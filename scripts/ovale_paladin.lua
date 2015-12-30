@@ -663,6 +663,14 @@ AddFunction RetributionDefaultMainActions
 {
 	#judgment,if=talent.empowered_seals.enabled&time<2
 	if Talent(empowered_seals_talent) and TimeInCombat() < 2 Spell(judgment)
+	#seal_of_truth,if=equipped.empty_drinking_horn&spell_targets.divine_storm<2&!talent.empowered_seals.enabled
+	if HasEquippedItem(empty_drinking_horn) and Enemies() < 2 and not Talent(empowered_seals_talent) Spell(seal_of_truth)
+	#seal_of_righteousness,if=equipped.empty_drinking_horn&spell_targets.divine_storm>=2&!talent.empowered_seals.enabled
+	if HasEquippedItem(empty_drinking_horn) and Enemies() >= 2 and not Talent(empowered_seals_talent) Spell(seal_of_righteousness)
+	#seal_of_truth,if=spell_targets.divine_storm<3&!talent.empowered_seals.enabled&!equipped.empty_drinking_horn
+	if Enemies() < 3 and not Talent(empowered_seals_talent) and not HasEquippedItem(empty_drinking_horn) Spell(seal_of_truth)
+	#seal_of_righteousness,if=spell_targets.divine_storm>=3&!talent.empowered_seals.enabled&!equipped.empty_drinking_horn
+	if Enemies() >= 3 and not Talent(empowered_seals_talent) and not HasEquippedItem(empty_drinking_horn) Spell(seal_of_righteousness)
 	#wait,sec=cooldown.seraphim.remains,if=talent.seraphim.enabled&cooldown.seraphim.remains>0&cooldown.seraphim.remains<gcd.max&holy_power>=5
 	unless Talent(seraphim_talent) and SpellCooldown(seraphim) > 0 and SpellCooldown(seraphim) < GCD() and HolyPower() >= 5 and SpellCooldown(seraphim) > 0
 	{
@@ -680,7 +688,7 @@ AddFunction RetributionDefaultShortCdActions
 	#speed_of_light,if=movement.distance>5
 	if 0 > 5 Spell(speed_of_light)
 
-	unless Talent(empowered_seals_talent) and TimeInCombat() < 2 and Spell(judgment)
+	unless Talent(empowered_seals_talent) and TimeInCombat() < 2 and Spell(judgment) or HasEquippedItem(empty_drinking_horn) and Enemies() < 2 and not Talent(empowered_seals_talent) and Spell(seal_of_truth) or HasEquippedItem(empty_drinking_horn) and Enemies() >= 2 and not Talent(empowered_seals_talent) and Spell(seal_of_righteousness) or Enemies() < 3 and not Talent(empowered_seals_talent) and not HasEquippedItem(empty_drinking_horn) and Spell(seal_of_truth) or Enemies() >= 3 and not Talent(empowered_seals_talent) and not HasEquippedItem(empty_drinking_horn) and Spell(seal_of_righteousness)
 	{
 		#execution_sentence,if=!talent.seraphim.enabled
 		if not Talent(seraphim_talent) Spell(execution_sentence)
@@ -702,7 +710,7 @@ AddFunction RetributionDefaultCdActions
 	#potion,name=draenic_strength,if=(buff.bloodlust.react|buff.avenging_wrath.up|target.time_to_die<=40)
 	if BuffPresent(burst_haste_buff any=1) or BuffPresent(avenging_wrath_melee_buff) or target.TimeToDie() <= 40 RetributionUsePotionStrength()
 
-	unless Talent(empowered_seals_talent) and TimeInCombat() < 2 and Spell(judgment) or not Talent(seraphim_talent) and Spell(execution_sentence) or Spell(seraphim) and Talent(seraphim_talent) and Spell(execution_sentence) or not Talent(seraphim_talent) and Spell(lights_hammer) or Spell(seraphim) and Talent(seraphim_talent) and Spell(lights_hammer)
+	unless Talent(empowered_seals_talent) and TimeInCombat() < 2 and Spell(judgment) or HasEquippedItem(empty_drinking_horn) and Enemies() < 2 and not Talent(empowered_seals_talent) and Spell(seal_of_truth) or HasEquippedItem(empty_drinking_horn) and Enemies() >= 2 and not Talent(empowered_seals_talent) and Spell(seal_of_righteousness) or Enemies() < 3 and not Talent(empowered_seals_talent) and not HasEquippedItem(empty_drinking_horn) and Spell(seal_of_truth) or Enemies() >= 3 and not Talent(empowered_seals_talent) and not HasEquippedItem(empty_drinking_horn) and Spell(seal_of_righteousness) or not Talent(seraphim_talent) and Spell(execution_sentence) or Spell(seraphim) and Talent(seraphim_talent) and Spell(execution_sentence) or not Talent(seraphim_talent) and Spell(lights_hammer) or Spell(seraphim) and Talent(seraphim_talent) and Spell(lights_hammer)
 	{
 		#use_item,name=thorasus_the_stone_heart_of_draenor,if=buff.avenging_wrath.up
 		if BuffPresent(avenging_wrath_melee_buff) RetributionUseItemActions()
@@ -823,22 +831,26 @@ AddFunction RetributionPrecombatMainActions
 	if not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) Spell(blessing_of_kings)
 	#blessing_of_might,if=!aura.mastery.up
 	if not BuffPresent(mastery_buff any=1) Spell(blessing_of_might)
-	#seal_of_truth,if=spell_targets.divine_storm<3
-	if Enemies() < 3 Spell(seal_of_truth)
-	#seal_of_righteousness,if=spell_targets.divine_storm>=3
-	if Enemies() >= 3 Spell(seal_of_righteousness)
+	#seal_of_truth,if=equipped.empty_drinking_horn&spell_targets.divine_storm<2
+	if HasEquippedItem(empty_drinking_horn) and Enemies() < 2 Spell(seal_of_truth)
+	#seal_of_righteousness,if=equipped.empty_drinking_horn&spell_targets.divine_storm>=2
+	if HasEquippedItem(empty_drinking_horn) and Enemies() >= 2 Spell(seal_of_righteousness)
+	#seal_of_truth,if=spell_targets.divine_storm<3&!equipped.empty_drinking_horn
+	if Enemies() < 3 and not HasEquippedItem(empty_drinking_horn) Spell(seal_of_truth)
+	#seal_of_righteousness,if=spell_targets.divine_storm>=3&!equipped.empty_drinking_horn
+	if Enemies() >= 3 and not HasEquippedItem(empty_drinking_horn) Spell(seal_of_righteousness)
 	#righteous_fury,if=buff.righteous_fury.up
 	if BuffPresent(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) Spell(righteous_fury)
 }
 
 AddFunction RetributionPrecombatShortCdPostConditions
 {
-	not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Enemies() < 3 and Spell(seal_of_truth) or Enemies() >= 3 and Spell(seal_of_righteousness) or BuffPresent(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) and Spell(righteous_fury)
+	not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or HasEquippedItem(empty_drinking_horn) and Enemies() < 2 and Spell(seal_of_truth) or HasEquippedItem(empty_drinking_horn) and Enemies() >= 2 and Spell(seal_of_righteousness) or Enemies() < 3 and not HasEquippedItem(empty_drinking_horn) and Spell(seal_of_truth) or Enemies() >= 3 and not HasEquippedItem(empty_drinking_horn) and Spell(seal_of_righteousness) or BuffPresent(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) and Spell(righteous_fury)
 }
 
 AddFunction RetributionPrecombatCdActions
 {
-	unless not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Enemies() < 3 and Spell(seal_of_truth) or Enemies() >= 3 and Spell(seal_of_righteousness) or BuffPresent(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) and Spell(righteous_fury)
+	unless not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or HasEquippedItem(empty_drinking_horn) and Enemies() < 2 and Spell(seal_of_truth) or HasEquippedItem(empty_drinking_horn) and Enemies() >= 2 and Spell(seal_of_righteousness) or Enemies() < 3 and not HasEquippedItem(empty_drinking_horn) and Spell(seal_of_truth) or Enemies() >= 3 and not HasEquippedItem(empty_drinking_horn) and Spell(seal_of_righteousness) or BuffPresent(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) and Spell(righteous_fury)
 	{
 		#snapshot_stats
 		#potion,name=draenic_strength
@@ -848,7 +860,7 @@ AddFunction RetributionPrecombatCdActions
 
 AddFunction RetributionPrecombatCdPostConditions
 {
-	not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or Enemies() < 3 and Spell(seal_of_truth) or Enemies() >= 3 and Spell(seal_of_righteousness) or BuffPresent(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) and Spell(righteous_fury)
+	not BuffPresent(str_agi_int_buff any=1) and BuffExpires(mastery_buff) and Spell(blessing_of_kings) or not BuffPresent(mastery_buff any=1) and Spell(blessing_of_might) or HasEquippedItem(empty_drinking_horn) and Enemies() < 2 and Spell(seal_of_truth) or HasEquippedItem(empty_drinking_horn) and Enemies() >= 2 and Spell(seal_of_righteousness) or Enemies() < 3 and not HasEquippedItem(empty_drinking_horn) and Spell(seal_of_truth) or Enemies() >= 3 and not HasEquippedItem(empty_drinking_horn) and Spell(seal_of_righteousness) or BuffPresent(righteous_fury_buff) and CheckBoxOn(opt_righteous_fury_check) and Spell(righteous_fury)
 }
 
 ### actions.single
@@ -1017,6 +1029,7 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 # divine_storm
 # draenic_strength_potion
 # empowered_seals_talent
+# empty_drinking_horn
 # execution_sentence
 # execution_sentence_talent
 # exorcism

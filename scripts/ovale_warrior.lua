@@ -412,7 +412,6 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # t18_class_trinket
 # taste_for_blood_talent
 # thunder_clap
-# wait
 # war_stomp
 # whirlwind
 ]]

@@ -129,7 +129,7 @@ do
 # Based on SimulationCraft profile "Druid_Balance_T18M".
 #	class=druid
 #	spec=balance
-#	talents=0001001
+#	talents=0002001
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -154,10 +154,16 @@ AddFunction BalanceUseItemActions
 
 AddFunction BalanceDefaultMainActions
 {
-	#call_action_list,name=aoe,if=spell_targets.starfall_pulse>1
-	if Enemies() > 1 BalanceAoeMainActions()
-	#call_action_list,name=single_target
-	BalanceSingleTargetMainActions()
+	#call_action_list,name=ca_aoe,if=buff.celestial_alignment.up&spell_targets.starfall_pulse>1&!t18_class_trinket
+	if BuffPresent(celestial_alignment_buff) and Enemies() > 1 and not HasTrinket(t18_class_trinket) BalanceCaAoeMainActions()
+	#call_action_list,name=ca,if=buff.celestial_alignment.up&(spell_targets.starfall_pulse=1|t18_class_trinket)
+	if BuffPresent(celestial_alignment_buff) and { Enemies() == 1 or HasTrinket(t18_class_trinket) } BalanceCaMainActions()
+	#call_action_list,name=aoe_t18_trinket,if=buff.celestial_alignment.down&spell_targets.starfall.pulse>1&t18_class_trinket
+	if BuffExpires(celestial_alignment_buff) and Enemies() > 1 and HasTrinket(t18_class_trinket) BalanceAoeT18TrinketMainActions()
+	#call_action_list,name=aoe,if=spell_targets.starfall_pulse>1&buff.celestial_alignment.down&!t18_class_trinket
+	if Enemies() > 1 and BuffExpires(celestial_alignment_buff) and not HasTrinket(t18_class_trinket) BalanceAoeMainActions()
+	#call_action_list,name=single_target,if=spell_targets.starfall_pulse=1&buff.celestial_alignment.down
+	if Enemies() == 1 and BuffExpires(celestial_alignment_buff) BalanceSingleTargetMainActions()
 }
 
 AddFunction BalanceDefaultShortCdActions
@@ -168,24 +174,10 @@ AddFunction BalanceDefaultShortCdActions
 
 AddFunction BalanceDefaultCdActions
 {
-	#potion,name=draenic_intellect,if=buff.celestial_alignment.up
-	if BuffPresent(celestial_alignment_buff) BalanceUsePotionIntellect()
-	#blood_fury,if=buff.celestial_alignment.up
-	if BuffPresent(celestial_alignment_buff) Spell(blood_fury_apsp)
-	#berserking,if=buff.celestial_alignment.up
-	if BuffPresent(celestial_alignment_buff) Spell(berserking)
-	#arcane_torrent,if=buff.celestial_alignment.up
-	if BuffPresent(celestial_alignment_buff) Spell(arcane_torrent_energy)
+	#call_action_list,name=cooldowns,if=cooldown.celestial_alignment.up&(eclipse_energy>=0|target.time_to_die<=30+gcd)
+	if not SpellCooldown(celestial_alignment) > 0 and { EclipseEnergy() >= 0 or target.TimeToDie() <= 30 + GCD() } BalanceCooldownsCdActions()
 	#use_item,slot=finger1
 	BalanceUseItemActions()
-	#call_action_list,name=aoe,if=spell_targets.starfall_pulse>1
-	if Enemies() > 1 BalanceAoeCdActions()
-
-	unless Enemies() > 1 and BalanceAoeCdPostConditions()
-	{
-		#call_action_list,name=single_target
-		BalanceSingleTargetCdActions()
-	}
 }
 
 ### actions.aoe
@@ -194,37 +186,102 @@ AddFunction BalanceAoeMainActions
 {
 	#sunfire,cycle_targets=1,if=remains<8
 	if target.DebuffRemaining(sunfire_debuff) < 8 Spell(sunfire)
-	#starsurge,if=t18_class_trinket&buff.starfall.remains<3&spell_targets.starfall_pulse>1
-	if HasTrinket(t18_class_trinket) and BuffRemaining(starfall_buff) < 3 and Enemies() > 1 Spell(starsurge)
-	#starfall,if=!t18_class_trinket&buff.starfall.remains<3&spell_targets.starfall_pulse>2
-	if not HasTrinket(t18_class_trinket) and BuffRemaining(starfall_buff) < 3 and Enemies() > 2 Spell(starfall)
-	#starsurge,if=(charges=2&recharge_time<6)|charges=3
-	if Charges(starsurge) == 2 and SpellChargeCooldown(starsurge) < 6 or Charges(starsurge) == 3 Spell(starsurge)
+	#starfall,if=spell_targets.starfall_pulse>2&buff.starfall.remains<3
+	if Enemies() > 2 and BuffRemaining(starfall_buff) < 3 Spell(starfall)
+	#starfall,if=@eclipse_energy<20&eclipse_dir.lunar&buff.starfall.remains<3&talent.euphoria.enabled
+	if EclipseEnergy() < 20 and EclipseEnergy() > -20 and EclipseDir() < 0 and BuffRemaining(starfall_buff) < 3 and Talent(euphoria_talent) Spell(starfall)
+	#starfall,if=@eclipse_energy<10&eclipse_dir.lunar&buff.starfall.remains<3&!talent.euphoria.enabled
+	if EclipseEnergy() < 10 and EclipseEnergy() > -10 and EclipseDir() < 0 and BuffRemaining(starfall_buff) < 3 and not Talent(euphoria_talent) Spell(starfall)
 	#moonfire,cycle_targets=1,if=remains<12
 	if target.DebuffRemaining(moonfire_debuff) < 12 Spell(moonfire)
 	#stellar_flare,cycle_targets=1,if=remains<7
 	if target.DebuffRemaining(stellar_flare_debuff) < 7 Spell(stellar_flare)
-	#starsurge,if=buff.lunar_empowerment.down&eclipse_energy>20&spell_targets.starfall_pulse=2
-	if BuffExpires(lunar_empowerment_buff) and EclipseEnergy() > 20 and Enemies() == 2 Spell(starsurge)
-	#starsurge,if=buff.solar_empowerment.down&eclipse_energy<-40&spell_targets.starfall_pulse=2
-	if BuffExpires(solar_empowerment_buff) and EclipseEnergy() < -40 and Enemies() == 2 Spell(starsurge)
-	#wrath,if=(eclipse_energy<=0&eclipse_change>cast_time)|(eclipse_energy>0&cast_time>eclipse_change)
-	if EclipseEnergy() <= 0 and TimeToEclipse() > CastTime(wrath) or EclipseEnergy() > 0 and CastTime(wrath) > TimeToEclipse() Spell(wrath)
+	#starsurge,if=(buff.lunar_empowerment.down&eclipse_energy>40&charges>1)|charges=3
+	if BuffExpires(lunar_empowerment_buff) and EclipseEnergy() > 40 and Charges(starsurge) > 1 or Charges(starsurge) == 3 Spell(starsurge)
+	#starsurge,if=(buff.solar_empowerment.down&eclipse_energy<-40&charges>1)|charges=3
+	if BuffExpires(solar_empowerment_buff) and EclipseEnergy() < -40 and Charges(starsurge) > 1 or Charges(starsurge) == 3 Spell(starsurge)
+	#wrath,if=(eclipse_energy<=0&eclipse_change>action.starfire.cast_time)|(eclipse_energy>0&cast_time>eclipse_change)
+	if EclipseEnergy() <= 0 and TimeToEclipse() > CastTime(starfire) or EclipseEnergy() > 0 and CastTime(wrath) > TimeToEclipse() Spell(wrath)
 	#starfire
 	Spell(starfire)
 }
 
-AddFunction BalanceAoeCdActions
+### actions.aoe_t18_trinket
+
+AddFunction BalanceAoeT18TrinketMainActions
 {
-	#celestial_alignment,if=lunar_max<8|target.time_to_die<20
-	if TimeToEclipse(lunar) < 8 or target.TimeToDie() < 20 Spell(celestial_alignment)
-	#incarnation,if=buff.celestial_alignment.up
-	if BuffPresent(celestial_alignment_buff) Spell(incarnation_chosen_of_elune)
+	#starsurge,if=charges=3
+	if Charges(starsurge) == 3 Spell(starsurge)
+	#sunfire,cycle_targets=1,if=remains<8
+	if target.DebuffRemaining(sunfire_debuff) < 8 Spell(sunfire)
+	#moonfire,cycle_targets=1,if=remains<12
+	if target.DebuffRemaining(moonfire_debuff) < 12 Spell(moonfire)
+	#starsurge,if=eclipse_energy>40&buff.lunar_empowerment.down
+	if EclipseEnergy() > 40 and BuffExpires(lunar_empowerment_buff) Spell(starsurge)
+	#starsurge,if=eclipse_energy<-40&buff.solar_empowerment.down
+	if EclipseEnergy() < -40 and BuffExpires(solar_empowerment_buff) Spell(starsurge)
+	#wrath,if=(eclipse_energy<0&action.starfire.cast_time<eclipse_change)|(eclipse_energy>0&cast_time>eclipse_change)
+	if EclipseEnergy() < 0 and CastTime(starfire) < TimeToEclipse() or EclipseEnergy() > 0 and CastTime(wrath) > TimeToEclipse() Spell(wrath)
+	#starfire
+	Spell(starfire)
 }
 
-AddFunction BalanceAoeCdPostConditions
+### actions.ca
+
+AddFunction BalanceCaMainActions
 {
-	target.DebuffRemaining(sunfire_debuff) < 8 and Spell(sunfire) or HasTrinket(t18_class_trinket) and BuffRemaining(starfall_buff) < 3 and Enemies() > 1 and Spell(starsurge) or not HasTrinket(t18_class_trinket) and BuffRemaining(starfall_buff) < 3 and Enemies() > 2 and Spell(starfall) or { Charges(starsurge) == 2 and SpellChargeCooldown(starsurge) < 6 or Charges(starsurge) == 3 } and Spell(starsurge) or target.DebuffRemaining(moonfire_debuff) < 12 and Spell(moonfire) or target.DebuffRemaining(stellar_flare_debuff) < 7 and Spell(stellar_flare) or BuffExpires(lunar_empowerment_buff) and EclipseEnergy() > 20 and Enemies() == 2 and Spell(starsurge) or BuffExpires(solar_empowerment_buff) and EclipseEnergy() < -40 and Enemies() == 2 and Spell(starsurge) or { EclipseEnergy() <= 0 and TimeToEclipse() > CastTime(wrath) or EclipseEnergy() > 0 and CastTime(wrath) > TimeToEclipse() } and Spell(wrath) or Spell(starfire)
+	#starsurge,if=(buff.lunar_empowerment.down&eclipse_energy>=0)|(buff.solar_empowerment.down&eclipse_energy<0)
+	if BuffExpires(lunar_empowerment_buff) and EclipseEnergy() >= 0 or BuffExpires(solar_empowerment_buff) and EclipseEnergy() < 0 Spell(starsurge)
+	#moonfire,cycle_targets=1,if=!dot.moonfire.remains|!dot.sunfire.remains
+	if not target.DebuffRemaining(moonfire_debuff) or not target.DebuffRemaining(sunfire_debuff) Spell(moonfire)
+	#sunfire,cycle_targets=1,if=!dot.moonfire.remains|!dot.sunfire.remains
+	if not target.DebuffRemaining(moonfire_debuff) or not target.DebuffRemaining(sunfire_debuff) Spell(sunfire)
+	#starfire,if=eclipse_energy>=0&buff.celestial_alignment.remains>cast_time
+	if EclipseEnergy() >= 0 and BuffRemaining(celestial_alignment_buff) > CastTime(starfire) Spell(starfire)
+	#wrath,if=buff.celestial_alignment.remains>cast_time
+	if BuffRemaining(celestial_alignment_buff) > CastTime(wrath) Spell(wrath)
+	#moonfire,cycle_targets=1
+	Spell(moonfire)
+	#sunfire,cycle_targets=1
+	Spell(sunfire)
+}
+
+### actions.ca_aoe
+
+AddFunction BalanceCaAoeMainActions
+{
+	#starfall,if=buff.starfall.remains<3
+	if BuffRemaining(starfall_buff) < 3 Spell(starfall)
+	#moonfire,cycle_targets=1,if=!dot.moonfire.ticking|!dot.sunfire.ticking
+	if not target.DebuffPresent(moonfire_debuff) or not target.DebuffPresent(sunfire_debuff) Spell(moonfire)
+	#sunfire,cycle_targets=1,if=!dot.moonfire.ticking|!dot.sunfire.ticking
+	if not target.DebuffPresent(moonfire_debuff) or not target.DebuffPresent(sunfire_debuff) Spell(sunfire)
+	#starsurge,if=buff.lunar_empowerment.down&eclipse_energy>=0&charges>1
+	if BuffExpires(lunar_empowerment_buff) and EclipseEnergy() >= 0 and Charges(starsurge) > 1 Spell(starsurge)
+	#starsurge,if=buff.solar_empowerment.down&eclipse_energy<0&charges>1
+	if BuffExpires(solar_empowerment_buff) and EclipseEnergy() < 0 and Charges(starsurge) > 1 Spell(starsurge)
+	#starfire,if=eclipse_energy>=0&buff.celestial_alignment.remains>cast_time
+	if EclipseEnergy() >= 0 and BuffRemaining(celestial_alignment_buff) > CastTime(starfire) Spell(starfire)
+	#wrath,if=buff.celestial_alignment.remains>cast_time
+	if BuffRemaining(celestial_alignment_buff) > CastTime(wrath) Spell(wrath)
+	#moonfire,cycle_targets=1
+	Spell(moonfire)
+	#sunfire,cycle_targets=1
+	Spell(sunfire)
+}
+
+### actions.cooldowns
+
+AddFunction BalanceCooldownsCdActions
+{
+	#incarnation
+	Spell(incarnation_chosen_of_elune)
+	#potion,name=draenic_intellect
+	BalanceUsePotionIntellect()
+	#Berserking
+	Spell(berserking)
+	#celestial_alignment
+	Spell(celestial_alignment)
 }
 
 ### actions.precombat
@@ -267,35 +324,26 @@ AddFunction BalancePrecombatCdPostConditions
 
 AddFunction BalanceSingleTargetMainActions
 {
-	#starsurge,if=buff.lunar_empowerment.down&(eclipse_energy>20|buff.celestial_alignment.up)
-	if BuffExpires(lunar_empowerment_buff) and { EclipseEnergy() > 20 or BuffPresent(celestial_alignment_buff) } Spell(starsurge)
+	#starsurge,if=charges=3
+	if Charges(starsurge) == 3 Spell(starsurge)
+	#starsurge,if=buff.lunar_empowerment.down&eclipse_energy>40
+	if BuffExpires(lunar_empowerment_buff) and EclipseEnergy() > 40 Spell(starsurge)
 	#starsurge,if=buff.solar_empowerment.down&eclipse_energy<-40
 	if BuffExpires(solar_empowerment_buff) and EclipseEnergy() < -40 Spell(starsurge)
-	#starsurge,if=(charges=2&recharge_time<6)|charges=3
-	if Charges(starsurge) == 2 and SpellChargeCooldown(starsurge) < 6 or Charges(starsurge) == 3 Spell(starsurge)
-	#sunfire,if=remains<7|(buff.solar_peak.up&buff.solar_peak.remains<action.wrath.cast_time&!talent.balance_of_power.enabled)
-	if target.DebuffRemaining(sunfire_debuff) < 7 or BuffPresent(solar_peak_buff) and BuffRemaining(solar_peak_buff) < CastTime(wrath) and not Talent(balance_of_power_talent) Spell(sunfire)
+	#sunfire,if=(remains<solar_max&eclipse_dir.solar)|(buff.solar_peak.up&buff.solar_peak.remains<action.wrath.cast_time&!talent.balance_of_power.enabled)
+	if target.DebuffRemaining(sunfire_debuff) < TimeToEclipse(solar) and EclipseDir() > 0 or BuffPresent(solar_peak_buff) and BuffRemaining(solar_peak_buff) < CastTime(wrath) and not Talent(balance_of_power_talent) Spell(sunfire)
 	#stellar_flare,if=remains<7
 	if target.DebuffRemaining(stellar_flare_debuff) < 7 Spell(stellar_flare)
-	#moonfire,if=!talent.balance_of_power.enabled&(buff.lunar_peak.up&buff.lunar_peak.remains<action.starfire.cast_time&remains<eclipse_change+20|remains<4|(buff.celestial_alignment.up&buff.celestial_alignment.remains<=2&remains<eclipse_change+20))
-	if not Talent(balance_of_power_talent) and { BuffPresent(lunar_peak_buff) and BuffRemaining(lunar_peak_buff) < CastTime(starfire) and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 or target.DebuffRemaining(moonfire_debuff) < 4 or BuffPresent(celestial_alignment_buff) and BuffRemaining(celestial_alignment_buff) <= 2 and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 } Spell(moonfire)
-	#moonfire,if=talent.balance_of_power.enabled&(remains<4|(buff.celestial_alignment.up&buff.celestial_alignment.remains<=2&remains<eclipse_change+20))
-	if Talent(balance_of_power_talent) and { target.DebuffRemaining(moonfire_debuff) < 4 or BuffPresent(celestial_alignment_buff) and BuffRemaining(celestial_alignment_buff) <= 2 and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 } Spell(moonfire)
-	#wrath,if=(eclipse_energy<=0&eclipse_change>cast_time)|(eclipse_energy>0&cast_time>eclipse_change)
-	if EclipseEnergy() <= 0 and TimeToEclipse() > CastTime(wrath) or EclipseEnergy() > 0 and CastTime(wrath) > TimeToEclipse() Spell(wrath)
+	#moonfire,if=!talent.euphoria.enabled&(remains<lunar_max&eclipse_dir.lunar)|(buff.lunar_peak.up&buff.lunar_peak.remains<action.starfire.cast_time&remains<eclipse_change+20)&!talent.balance_of_power.enabled
+	if not Talent(euphoria_talent) and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse(lunar) and EclipseDir() < 0 or BuffPresent(lunar_peak_buff) and BuffRemaining(lunar_peak_buff) < CastTime(starfire) and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 and not Talent(balance_of_power_talent) Spell(moonfire)
+	#moonfire,if=talent.euphoria.enabled&(remains<lunar_max&eclipse_dir.lunar)|(buff.lunar_peak.up&buff.lunar_peak.remains<action.starfire.cast_time&remains<eclipse_change+10)&!talent.balance_of_power.enabled
+	if Talent(euphoria_talent) and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse(lunar) and EclipseDir() < 0 or BuffPresent(lunar_peak_buff) and BuffRemaining(lunar_peak_buff) < CastTime(starfire) and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 10 and not Talent(balance_of_power_talent) Spell(moonfire)
+	#moonfire,if=talent.balance_of_power.enabled&remains<eclipse_change+14
+	if Talent(balance_of_power_talent) and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 14 Spell(moonfire)
+	#wrath,if=(eclipse_energy<0&eclipse_change>action.starfire.cast_time)|(eclipse_energy>0&cast_time>eclipse_change)
+	if EclipseEnergy() < 0 and TimeToEclipse() > CastTime(starfire) or EclipseEnergy() > 0 and CastTime(wrath) > TimeToEclipse() Spell(wrath)
 	#starfire
 	Spell(starfire)
-}
-
-AddFunction BalanceSingleTargetCdActions
-{
-	unless BuffExpires(lunar_empowerment_buff) and { EclipseEnergy() > 20 or BuffPresent(celestial_alignment_buff) } and Spell(starsurge) or BuffExpires(solar_empowerment_buff) and EclipseEnergy() < -40 and Spell(starsurge) or { Charges(starsurge) == 2 and SpellChargeCooldown(starsurge) < 6 or Charges(starsurge) == 3 } and Spell(starsurge)
-	{
-		#celestial_alignment,if=eclipse_energy>0
-		if EclipseEnergy() > 0 Spell(celestial_alignment)
-		#incarnation,if=eclipse_energy>0
-		if EclipseEnergy() > 0 Spell(incarnation_chosen_of_elune)
-	}
 }
 
 ### Balance icons.
@@ -349,13 +397,12 @@ AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
 }
 
 ### Required symbols
-# arcane_torrent_energy
 # balance_of_power_talent
 # berserking
-# blood_fury_apsp
 # celestial_alignment
 # celestial_alignment_buff
 # draenic_intellect_potion
+# euphoria_talent
 # force_of_nature_caster
 # incarnation_chosen_of_elune
 # lunar_empowerment_buff
@@ -516,8 +563,20 @@ AddFunction FeralDefaultCdActions
 		if { not BuffPresent(omen_of_clarity_melee_buff) and EnergyDeficit() >= 60 or EnergyDeficit() >= 80 or HasTrinket(t18_class_trinket) and BuffPresent(berserk_cat_buff) and BuffExpires(tigers_fury_buff) } and Spell(tigers_fury) Spell(arcane_torrent_energy)
 		#incarnation,if=cooldown.berserk.remains<10&energy.time_to_max>1
 		if SpellCooldown(berserk_cat) < 10 and TimeToMaxEnergy() > 1 Spell(incarnation_king_of_the_jungle)
-		#shadowmeld,if=dot.rake.remains<4.5&energy>=35&dot.rake.pmultiplier<2&(buff.bloodtalons.up|!talent.bloodtalons.enabled)&(!talent.incarnation.enabled|cooldown.incarnation.remains>15)&!buff.incarnation.up
-		if target.DebuffRemaining(rake_debuff) < 4.5 and Energy() >= 35 and target.DebuffPersistentMultiplier(rake_debuff) < 2 and { BuffPresent(bloodtalons_buff) or not Talent(bloodtalons_talent) } and { not Talent(incarnation_talent) or SpellCooldown(incarnation_king_of_the_jungle) > 15 } and not BuffPresent(incarnation_king_of_the_jungle_buff) Spell(shadowmeld)
+
+		unless target.DebuffPresent(rip_debuff) and target.DebuffRemaining(rip_debuff) < 3 and target.HealthPercent() < 25 and Spell(ferocious_bite) or Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and { ComboPoints() >= 4 and not ArmorSetBonus(T18 4) or ComboPoints() == 5 or BuffRemaining(predatory_swiftness_buff) < 1.5 } and Spell(healing_touch) or BuffExpires(savage_roar_buff) and Spell(savage_roar) or ArmorSetBonus(T18 4) and BuffPresent(omen_of_clarity_melee_buff) and target.DebuffRemaining(thrash_cat_debuff) < 4.5 and ComboPoints() + BuffStacks(bloodtalons_buff) != 6 and Spell(thrash_cat)
+		{
+			#pool_resource,for_next=1
+			#thrash_cat,cycle_targets=1,if=remains<4.5&(spell_targets.thrash_cat>=2&set_bonus.tier17_2pc|spell_targets.thrash_cat>=4)
+			unless target.DebuffRemaining(thrash_cat_debuff) < 4.5 and { Enemies() >= 2 and ArmorSetBonus(T17 2) or Enemies() >= 4 } and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat)
+			{
+				unless ComboPoints() == 5 and FeralFinisherCdPostConditions() or BuffRemaining(savage_roar_buff) < GCD() and Spell(savage_roar)
+				{
+					#call_action_list,name=maintain,if=combo_points<5
+					if ComboPoints() < 5 FeralMaintainCdActions()
+				}
+			}
+		}
 	}
 }
 
@@ -537,6 +596,11 @@ AddFunction FeralFinisherMainActions
 	if { ArmorSetBonus(T18 4) and Energy() > 50 or ArmorSetBonus(T18 2) and BuffPresent(omen_of_clarity_melee_buff) or TimeToMaxEnergy() <= 1 or BuffPresent(berserk_cat_buff) or SpellCooldown(tigers_fury) < 3 } and BuffRemaining(savage_roar_buff) < 12.6 Spell(savage_roar)
 	#ferocious_bite,max_energy=1,if=(set_bonus.tier18_4pc&energy>50)|(set_bonus.tier18_2pc&buff.omen_of_clarity.react)|energy.time_to_max<=1|buff.berserk.up|cooldown.tigers_fury.remains<3
 	if Energy() >= EnergyCost(ferocious_bite max=1) and { ArmorSetBonus(T18 4) and Energy() > 50 or ArmorSetBonus(T18 2) and BuffPresent(omen_of_clarity_melee_buff) or TimeToMaxEnergy() <= 1 or BuffPresent(berserk_cat_buff) or SpellCooldown(tigers_fury) < 3 } Spell(ferocious_bite)
+}
+
+AddFunction FeralFinisherCdPostConditions
+{
+	target.DebuffRemaining(rip_debuff) < 2 and target.TimeToDie() - target.DebuffRemaining(rip_debuff) > 18 and { target.HealthPercent() > 25 or not target.DebuffPresent(rip_debuff) } and Spell(rip) or Energy() >= EnergyCost(ferocious_bite max=1) and target.HealthPercent() < 25 and target.DebuffPresent(rip_debuff) and Spell(ferocious_bite) or target.DebuffRemaining(rip_debuff) < 7.2 and PersistentMultiplier(rip_debuff) > target.DebuffPersistentMultiplier(rip_debuff) and target.TimeToDie() - target.DebuffRemaining(rip_debuff) > 18 and Spell(rip) or target.DebuffRemaining(rip_debuff) < 7.2 and PersistentMultiplier(rip_debuff) == target.DebuffPersistentMultiplier(rip_debuff) and { TimeToMaxEnergy() <= 1 or ArmorSetBonus(T18 4) and Energy() > 50 or ArmorSetBonus(T18 2) and BuffPresent(omen_of_clarity_melee_buff) or not Talent(bloodtalons_talent) } and target.TimeToDie() - target.DebuffRemaining(rip_debuff) > 18 and Spell(rip) or { ArmorSetBonus(T18 4) and Energy() > 50 or ArmorSetBonus(T18 2) and BuffPresent(omen_of_clarity_melee_buff) or TimeToMaxEnergy() <= 1 or BuffPresent(berserk_cat_buff) or SpellCooldown(tigers_fury) < 3 } and BuffRemaining(savage_roar_buff) < 12.6 and Spell(savage_roar) or Energy() >= EnergyCost(ferocious_bite max=1) and { ArmorSetBonus(T18 4) and Energy() > 50 or ArmorSetBonus(T18 2) and BuffPresent(omen_of_clarity_melee_buff) or TimeToMaxEnergy() <= 1 or BuffPresent(berserk_cat_buff) or SpellCooldown(tigers_fury) < 3 } and Spell(ferocious_bite)
 }
 
 ### actions.generator
@@ -561,6 +625,12 @@ AddFunction FeralMaintainMainActions
 	if target.DebuffRemaining(moonfire_cat_debuff) < 4.2 and Enemies() <= 5 and target.TimeToDie() - target.DebuffRemaining(moonfire_cat_debuff) > target.TickTime(moonfire_cat_debuff) * 5 Spell(moonfire_cat)
 	#rake,cycle_targets=1,if=persistent_multiplier>dot.rake.pmultiplier&spell_targets.swipe=1&((target.time_to_die-remains>3&spell_targets.swipe<3)|target.time_to_die-remains>6)
 	if PersistentMultiplier(rake_debuff) > target.DebuffPersistentMultiplier(rake_debuff) and Enemies() == 1 and { target.TimeToDie() - target.DebuffRemaining(rake_debuff) > 3 and Enemies() < 3 or target.TimeToDie() - target.DebuffRemaining(rake_debuff) > 6 } Spell(rake)
+}
+
+AddFunction FeralMaintainCdActions
+{
+	#shadowmeld,if=energy>=35&dot.rake.pmultiplier<2.1&buff.tigers_fury.up&(buff.bloodtalons.up|!talent.bloodtalons.enabled)&(!talent.incarnation.enabled|cooldown.incarnation.remains>18)&!buff.incarnation.up
+	if Energy() >= 35 and target.DebuffPersistentMultiplier(rake_debuff) < 2.1 and BuffPresent(tigers_fury_buff) and { BuffPresent(bloodtalons_buff) or not Talent(bloodtalons_talent) } and { not Talent(incarnation_talent) or SpellCooldown(incarnation_king_of_the_jungle) > 18 } and not BuffPresent(incarnation_king_of_the_jungle_buff) Spell(shadowmeld)
 }
 
 ### actions.precombat
@@ -758,8 +828,6 @@ AddFunction GuardianInterruptActions
 
 AddFunction GuardianDefaultMainActions
 {
-	#cenarion_ward
-	Spell(cenarion_ward)
 	#rejuvenation,if=buff.heart_of_the_wild.up&remains<=3.6
 	if BuffPresent(heart_of_the_wild_tank_buff) and BuffRemaining(rejuvenation_buff) <= 3.6 and SpellKnown(enhanced_rejuvenation) Spell(rejuvenation)
 	#healing_touch,if=buff.dream_of_cenarius.react&health.pct<30
@@ -790,6 +858,8 @@ AddFunction GuardianDefaultShortCdActions
 	if BuffPresent(tooth_and_claw_buff) and IncomingDamage(1) > 0 Spell(maul)
 	#frenzied_regeneration,if=rage>=80
 	if Rage() >= 80 Spell(frenzied_regeneration)
+	#cenarion_ward
+	Spell(cenarion_ward)
 }
 
 AddFunction GuardianDefaultCdActions
@@ -842,14 +912,21 @@ AddFunction GuardianPrecombatMainActions
 	if not BuffPresent(str_agi_int_buff any=1) Spell(mark_of_the_wild)
 	#bear_form
 	Spell(bear_form)
-	#snapshot_stats
-	#cenarion_ward
-	Spell(cenarion_ward)
+}
+
+AddFunction GuardianPrecombatShortCdActions
+{
+	unless not BuffPresent(str_agi_int_buff any=1) and Spell(mark_of_the_wild) or Spell(bear_form)
+	{
+		#snapshot_stats
+		#cenarion_ward
+		Spell(cenarion_ward)
+	}
 }
 
 AddFunction GuardianPrecombatShortCdPostConditions
 {
-	not BuffPresent(str_agi_int_buff any=1) and Spell(mark_of_the_wild) or Spell(bear_form) or Spell(cenarion_ward)
+	not BuffPresent(str_agi_int_buff any=1) and Spell(mark_of_the_wild) or Spell(bear_form)
 }
 
 AddFunction GuardianPrecombatCdPostConditions
@@ -863,6 +940,7 @@ AddCheckBox(opt_druid_guardian_aoe L(AOE) default specialization=guardian)
 
 AddIcon checkbox=!opt_druid_guardian_aoe enemies=1 help=shortcd specialization=guardian
 {
+	if not InCombat() GuardianPrecombatShortCdActions()
 	unless not InCombat() and GuardianPrecombatShortCdPostConditions()
 	{
 		GuardianDefaultShortCdActions()
@@ -871,6 +949,7 @@ AddIcon checkbox=!opt_druid_guardian_aoe enemies=1 help=shortcd specialization=g
 
 AddIcon checkbox=opt_druid_guardian_aoe help=shortcd specialization=guardian
 {
+	if not InCombat() GuardianPrecombatShortCdActions()
 	unless not InCombat() and GuardianPrecombatShortCdPostConditions()
 	{
 		GuardianDefaultShortCdActions()

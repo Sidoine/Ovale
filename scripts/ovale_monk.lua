@@ -1509,6 +1509,266 @@ AddIcon checkbox=opt_monk_brewmaster_aoe help=cd specialization=brewmaster
 end
 
 do
+	local name = "simulationcraft_monk_mistweaver_t18m"
+	local desc = "[6.2] SimulationCraft: Monk_Mistweaver_T18M"
+	local code = [[
+# Based on SimulationCraft profile "Monk_Mistweaver_T18M".
+#	class=monk
+#	spec=mistweaver
+#	talents=1313323
+#	glyphs=touch_of_death
+
+Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
+Include(ovale_monk_spells)
+
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=mistweaver)
+AddCheckBox(opt_chi_burst SpellName(chi_burst) default specialization=mistweaver)
+
+AddFunction MistweaverUsePotionIntellect
+{
+	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
+}
+
+AddFunction MistweaverUseItemActions
+{
+	Item(HandSlot usable=1)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
+### actions.default
+
+AddFunction MistweaverDefaultMainActions
+{
+	#chi_brew,if=chi=0
+	if Chi() == 0 Spell(chi_brew)
+	#run_action_list,name=aoe,if=active_enemies>=3
+	if Enemies() >= 3 MistweaverAoeMainActions()
+	#call_action_list,name=st,if=active_enemies<3
+	if Enemies() < 3 MistweaverStMainActions()
+	#chi_sphere,if=talent.power_strikes.enabled&buff.chi_sphere.react&chi<chi.max
+	#mana_tea,if=buff.mana_tea.react>=2&mana.pct<=5,interrupt_if=mana.pct>15
+	if BuffStacks(mana_tea_buff) >= 2 and ManaPercent() <= 5 Spell(mana_tea)
+}
+
+AddFunction MistweaverDefaultShortCdActions
+{
+	#touch_of_death,if=target.health.percent<10&(glyph.touch_of_death.enabled|chi>=3)
+	if target.HealthPercent() < 10 and { Glyph(glyph_of_touch_of_death) or Chi() >= 3 } Spell(touch_of_death)
+	#run_action_list,name=aoe,if=active_enemies>=3
+	if Enemies() >= 3 MistweaverAoeShortCdActions()
+
+	unless Enemies() >= 3 and MistweaverAoeShortCdPostConditions()
+	{
+		#call_action_list,name=st,if=active_enemies<3
+		if Enemies() < 3 MistweaverStShortCdActions()
+	}
+}
+
+AddFunction MistweaverDefaultCdActions
+{
+	#auto_attack
+	#invoke_xuen
+	Spell(invoke_xuen)
+	#use_item,name=intuitions_gift
+	MistweaverUseItemActions()
+	#use_item,name=mirror_of_the_blademaster
+	MistweaverUseItemActions()
+	#blood_fury,if=target.time_to_die<18
+	if target.TimeToDie() < 18 Spell(blood_fury_apsp)
+	#berserking,if=target.time_to_die<18
+	if target.TimeToDie() < 18 Spell(berserking)
+	#arcane_torrent,if=chi.max-chi>=1&target.time_to_die<18
+	if MaxChi() - Chi() >= 1 and target.TimeToDie() < 18 Spell(arcane_torrent_chi)
+	#potion,name=draenic_intellect,if=buff.bloodlust.react|target.time_to_die<=60
+	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 MistweaverUsePotionIntellect()
+	#fortifying_brew,if=target.health.percent<10&cooldown.touch_of_death.remains=0&(glyph.touch_of_death.enabled|chi>=3)
+	if target.HealthPercent() < 10 and not SpellCooldown(touch_of_death) > 0 and { Glyph(glyph_of_touch_of_death) or Chi() >= 3 } Spell(fortifying_brew)
+}
+
+### actions.aoe
+
+AddFunction MistweaverAoeMainActions
+{
+	#spinning_crane_kick,if=!talent.rushing_jade_wind.enabled
+	if not Talent(rushing_jade_wind_talent) Spell(spinning_crane_kick)
+	#rushing_jade_wind,if=talent.rushing_jade_wind.enabled
+	if Talent(rushing_jade_wind_talent) Spell(rushing_jade_wind)
+	#zen_sphere,cycle_targets=1,if=talent.zen_sphere.enabled&!dot.zen_sphere.ticking
+	if Talent(zen_sphere_talent) and not BuffPresent(zen_sphere_buff) Spell(zen_sphere)
+	#tiger_palm,if=!buff.tiger_power.up
+	if not BuffPresent(tiger_power_buff) Spell(tiger_palm)
+	#blackout_kick,if=buff.tiger_power.up&chi>1
+	if BuffPresent(tiger_power_buff) and Chi() > 1 Spell(blackout_kick)
+	#jab,if=talent.rushing_jade_wind.enabled
+	if Talent(rushing_jade_wind_talent) Spell(jab)
+}
+
+AddFunction MistweaverAoeShortCdActions
+{
+	unless not Talent(rushing_jade_wind_talent) and Spell(spinning_crane_kick) or Talent(rushing_jade_wind_talent) and Spell(rushing_jade_wind) or Talent(zen_sphere_talent) and not BuffPresent(zen_sphere_buff) and Spell(zen_sphere)
+	{
+		#chi_burst,if=talent.chi_burst.enabled
+		if Talent(chi_burst_talent) and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
+	}
+}
+
+AddFunction MistweaverAoeShortCdPostConditions
+{
+	not Talent(rushing_jade_wind_talent) and Spell(spinning_crane_kick) or Talent(rushing_jade_wind_talent) and Spell(rushing_jade_wind) or Talent(zen_sphere_talent) and not BuffPresent(zen_sphere_buff) and Spell(zen_sphere) or not BuffPresent(tiger_power_buff) and Spell(tiger_palm) or BuffPresent(tiger_power_buff) and Chi() > 1 and Spell(blackout_kick) or Talent(rushing_jade_wind_talent) and Spell(jab)
+}
+
+### actions.precombat
+
+AddFunction MistweaverPrecombatMainActions
+{
+	#flask,type=greater_draenic_intellect_flask
+	#food,type=salty_squid_roll
+	#stance,choose=spirited_crane
+	Spell(stance_of_the_spirited_crane)
+	#legacy_of_the_emperor,if=!aura.str_agi_int.up
+	if not BuffPresent(str_agi_int_buff any=1) Spell(legacy_of_the_emperor)
+}
+
+AddFunction MistweaverPrecombatShortCdPostConditions
+{
+	Spell(stance_of_the_spirited_crane) or not BuffPresent(str_agi_int_buff any=1) and Spell(legacy_of_the_emperor)
+}
+
+AddFunction MistweaverPrecombatCdPostConditions
+{
+	Spell(stance_of_the_spirited_crane) or not BuffPresent(str_agi_int_buff any=1) and Spell(legacy_of_the_emperor)
+}
+
+### actions.st
+
+AddFunction MistweaverStMainActions
+{
+	#tiger_palm,if=!buff.tiger_power.up
+	if not BuffPresent(tiger_power_buff) Spell(tiger_palm)
+	#blackout_kick,if=!buff.cranes_zeal.up
+	if not BuffPresent(cranes_zeal_buff) Spell(blackout_kick)
+	#rising_sun_kick,if=debuff.rising_sun_kick.down
+	if target.DebuffExpires(rising_sun_kick_debuff) Spell(rising_sun_kick)
+	#chi_wave
+	Spell(chi_wave)
+	#zen_sphere,cycle_targets=1,if=!dot.zen_sphere.ticking
+	if not BuffPresent(zen_sphere_buff) Spell(zen_sphere)
+	#surging_mist,if=buff.vital_mists.stack=5&chi.max-chi>2
+	if BuffStacks(vital_mists_buff) == 5 and MaxChi() - Chi() > 2 Spell(surging_mist)
+	#blackout_kick,if=buff.cranes_zeal.remains<3
+	if BuffRemaining(cranes_zeal_buff) < 3 Spell(blackout_kick)
+	#tiger_palm,if=buff.tiger_power.remains<6.6
+	if BuffRemaining(tiger_power_buff) < 6.6 Spell(tiger_palm)
+	#rising_sun_kick
+	Spell(rising_sun_kick)
+	#expel_harm,if=chi.max-chi>2&health.percent<80
+	if MaxChi() - Chi() > 2 and HealthPercent() < 80 Spell(expel_harm)
+	#jab,if=chi.max-chi>1
+	if MaxChi() - Chi() > 1 Spell(jab)
+	#tiger_palm,if=buff.tiger_power.remains-6.6<buff.cranes_zeal.remains
+	if BuffRemaining(tiger_power_buff) - 6.6 < BuffRemaining(cranes_zeal_buff) Spell(tiger_palm)
+	#blackout_kick
+	Spell(blackout_kick)
+}
+
+AddFunction MistweaverStShortCdActions
+{
+	unless not BuffPresent(tiger_power_buff) and Spell(tiger_palm) or not BuffPresent(cranes_zeal_buff) and Spell(blackout_kick) or target.DebuffExpires(rising_sun_kick_debuff) and Spell(rising_sun_kick) or Spell(chi_wave)
+	{
+		#chi_burst
+		if CheckBoxOn(opt_chi_burst) Spell(chi_burst)
+	}
+}
+
+### Mistweaver icons.
+
+AddCheckBox(opt_monk_mistweaver_aoe L(AOE) default specialization=mistweaver)
+
+AddIcon checkbox=!opt_monk_mistweaver_aoe enemies=1 help=shortcd specialization=mistweaver
+{
+	unless not InCombat() and MistweaverPrecombatShortCdPostConditions()
+	{
+		MistweaverDefaultShortCdActions()
+	}
+}
+
+AddIcon checkbox=opt_monk_mistweaver_aoe help=shortcd specialization=mistweaver
+{
+	unless not InCombat() and MistweaverPrecombatShortCdPostConditions()
+	{
+		MistweaverDefaultShortCdActions()
+	}
+}
+
+AddIcon enemies=1 help=main specialization=mistweaver
+{
+	if not InCombat() MistweaverPrecombatMainActions()
+	MistweaverDefaultMainActions()
+}
+
+AddIcon checkbox=opt_monk_mistweaver_aoe help=aoe specialization=mistweaver
+{
+	if not InCombat() MistweaverPrecombatMainActions()
+	MistweaverDefaultMainActions()
+}
+
+AddIcon checkbox=!opt_monk_mistweaver_aoe enemies=1 help=cd specialization=mistweaver
+{
+	unless not InCombat() and MistweaverPrecombatCdPostConditions()
+	{
+		MistweaverDefaultCdActions()
+	}
+}
+
+AddIcon checkbox=opt_monk_mistweaver_aoe help=cd specialization=mistweaver
+{
+	unless not InCombat() and MistweaverPrecombatCdPostConditions()
+	{
+		MistweaverDefaultCdActions()
+	}
+}
+
+### Required symbols
+# arcane_torrent_chi
+# berserking
+# blackout_kick
+# blood_fury_apsp
+# chi_brew
+# chi_burst
+# chi_burst_talent
+# chi_wave
+# cranes_zeal_buff
+# draenic_intellect_potion
+# expel_harm
+# fortifying_brew
+# glyph_of_touch_of_death
+# invoke_xuen
+# jab
+# legacy_of_the_emperor
+# mana_tea
+# mana_tea_buff
+# rising_sun_kick
+# rising_sun_kick_debuff
+# rushing_jade_wind
+# rushing_jade_wind_talent
+# spinning_crane_kick
+# stance_of_the_spirited_crane
+# surging_mist
+# tiger_palm
+# tiger_power_buff
+# touch_of_death
+# vital_mists_buff
+# zen_sphere
+# zen_sphere_buff
+# zen_sphere_talent
+]]
+	OvaleScripts:RegisterScript("MONK", "mistweaver", name, desc, code, "script")
+end
+
+do
 	local name = "simulationcraft_monk_windwalker_1h_t18m"
 	local desc = "[6.2] SimulationCraft: Monk_Windwalker_1h_T18M"
 	local code = [[
@@ -1604,8 +1864,8 @@ AddFunction WindwalkerDefaultShortCdActions
 			if BuffExpires(tigereye_brew_use_buff) and BuffStacks(tigereye_brew_buff) == 20 Spell(tigereye_brew)
 			#tigereye_brew,if=buff.tigereye_brew_use.down&buff.tigereye_brew.stack>=9&buff.serenity.up
 			if BuffExpires(tigereye_brew_use_buff) and BuffStacks(tigereye_brew_buff) >= 9 and BuffPresent(serenity_buff) Spell(tigereye_brew)
-			#tigereye_brew,if=talent.chi_explosion.enabled&buff.tigereye_brew_use.down
-			if Talent(chi_explosion_talent) and BuffExpires(tigereye_brew_use_buff) Spell(tigereye_brew)
+			#tigereye_brew,if=talent.chi_explosion.enabled&buff.tigereye_brew.stack>=1&t18_class_trinket&set_bonus.tier18_4pc=1&buff.tigereye_brew_use.down
+			if Talent(chi_explosion_talent) and BuffStacks(tigereye_brew_buff) >= 1 and HasTrinket(t18_class_trinket) and ArmorSetBonus(T18 4) == 1 and BuffExpires(tigereye_brew_use_buff) Spell(tigereye_brew)
 			#tigereye_brew,if=buff.tigereye_brew_use.down&buff.tigereye_brew.stack>=9&cooldown.fists_of_fury.up&chi>=3&debuff.rising_sun_kick.up&buff.tiger_power.up
 			if BuffExpires(tigereye_brew_use_buff) and BuffStacks(tigereye_brew_buff) >= 9 and not SpellCooldown(fists_of_fury) > 0 and Chi() >= 3 and target.DebuffPresent(rising_sun_kick_debuff) and BuffPresent(tiger_power_buff) Spell(tigereye_brew)
 			#tigereye_brew,if=talent.hurricane_strike.enabled&buff.tigereye_brew_use.down&buff.tigereye_brew.stack>=9&cooldown.hurricane_strike.up&chi>=3&debuff.rising_sun_kick.up&buff.tiger_power.up
@@ -1919,16 +2179,18 @@ AddFunction WindwalkerPrecombatMainActions
 	if not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) Spell(legacy_of_the_white_tiger)
 	#stance,choose=fierce_tiger
 	Spell(stance_of_the_fierce_tiger)
+	#legacy_of_the_white_tiger,if=!aura.str_agi_int.up|!aura.critical_strike.up
+	if not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) Spell(legacy_of_the_white_tiger)
 }
 
 AddFunction WindwalkerPrecombatShortCdPostConditions
 {
-	{ not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) } and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger)
+	{ not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) } and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger) or { not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) } and Spell(legacy_of_the_white_tiger)
 }
 
 AddFunction WindwalkerPrecombatCdActions
 {
-	unless { not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) } and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger)
+	unless { not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) } and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger) or { not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) } and Spell(legacy_of_the_white_tiger)
 	{
 		#snapshot_stats
 		#potion,name=draenic_agility
@@ -1938,7 +2200,7 @@ AddFunction WindwalkerPrecombatCdActions
 
 AddFunction WindwalkerPrecombatCdPostConditions
 {
-	{ not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) } and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger)
+	{ not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) } and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger) or { not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) } and Spell(legacy_of_the_white_tiger)
 }
 
 ### actions.st
@@ -2124,6 +2386,7 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # stance_of_the_fierce_tiger
 # storm_earth_and_fire
 # storm_earth_and_fire_target_debuff
+# t18_class_trinket
 # tiger_palm
 # tiger_power_buff
 # tigereye_brew
@@ -2233,8 +2496,8 @@ AddFunction WindwalkerDefaultShortCdActions
 			if BuffExpires(tigereye_brew_use_buff) and BuffStacks(tigereye_brew_buff) == 20 Spell(tigereye_brew)
 			#tigereye_brew,if=buff.tigereye_brew_use.down&buff.tigereye_brew.stack>=9&buff.serenity.up
 			if BuffExpires(tigereye_brew_use_buff) and BuffStacks(tigereye_brew_buff) >= 9 and BuffPresent(serenity_buff) Spell(tigereye_brew)
-			#tigereye_brew,if=talent.chi_explosion.enabled&buff.tigereye_brew_use.down
-			if Talent(chi_explosion_talent) and BuffExpires(tigereye_brew_use_buff) Spell(tigereye_brew)
+			#tigereye_brew,if=talent.chi_explosion.enabled&buff.tigereye_brew.stack>=1&t18_class_trinket&set_bonus.tier18_4pc=1&buff.tigereye_brew_use.down
+			if Talent(chi_explosion_talent) and BuffStacks(tigereye_brew_buff) >= 1 and HasTrinket(t18_class_trinket) and ArmorSetBonus(T18 4) == 1 and BuffExpires(tigereye_brew_use_buff) Spell(tigereye_brew)
 			#tigereye_brew,if=buff.tigereye_brew_use.down&buff.tigereye_brew.stack>=9&cooldown.fists_of_fury.up&chi>=3&debuff.rising_sun_kick.up&buff.tiger_power.up
 			if BuffExpires(tigereye_brew_use_buff) and BuffStacks(tigereye_brew_buff) >= 9 and not SpellCooldown(fists_of_fury) > 0 and Chi() >= 3 and target.DebuffPresent(rising_sun_kick_debuff) and BuffPresent(tiger_power_buff) Spell(tigereye_brew)
 			#tigereye_brew,if=talent.hurricane_strike.enabled&buff.tigereye_brew_use.down&buff.tigereye_brew.stack>=9&cooldown.hurricane_strike.up&chi>=3&debuff.rising_sun_kick.up&buff.tiger_power.up
@@ -2548,16 +2811,18 @@ AddFunction WindwalkerPrecombatMainActions
 	if not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) Spell(legacy_of_the_white_tiger)
 	#stance,choose=fierce_tiger
 	Spell(stance_of_the_fierce_tiger)
+	#legacy_of_the_white_tiger,if=!aura.str_agi_int.up|!aura.critical_strike.up
+	if not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) Spell(legacy_of_the_white_tiger)
 }
 
 AddFunction WindwalkerPrecombatShortCdPostConditions
 {
-	{ not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) } and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger)
+	{ not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) } and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger) or { not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) } and Spell(legacy_of_the_white_tiger)
 }
 
 AddFunction WindwalkerPrecombatCdActions
 {
-	unless { not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) } and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger)
+	unless { not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) } and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger) or { not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) } and Spell(legacy_of_the_white_tiger)
 	{
 		#snapshot_stats
 		#potion,name=draenic_agility
@@ -2567,7 +2832,7 @@ AddFunction WindwalkerPrecombatCdActions
 
 AddFunction WindwalkerPrecombatCdPostConditions
 {
-	{ not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) } and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger)
+	{ not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) } and Spell(legacy_of_the_white_tiger) or Spell(stance_of_the_fierce_tiger) or { not BuffPresent(str_agi_int_buff any=1) or not BuffPresent(critical_strike_buff any=1) } and Spell(legacy_of_the_white_tiger)
 }
 
 ### actions.st
@@ -2753,6 +3018,7 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # stance_of_the_fierce_tiger
 # storm_earth_and_fire
 # storm_earth_and_fire_target_debuff
+# t18_class_trinket
 # tiger_palm
 # tiger_power_buff
 # tigereye_brew

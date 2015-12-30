@@ -135,8 +135,6 @@ AddFunction BeastMasteryDefaultCdActions
 	BeastMasteryInterruptActions()
 	#use_item,name=maalus_the_blood_drinker
 	BeastMasteryUseItemActions()
-	#use_item,name=mirror_of_the_blademaster
-	BeastMasteryUseItemActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury
