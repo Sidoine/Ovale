@@ -1044,7 +1044,7 @@ L["Prédictif"] = "两个技能" -- Needs review
 L["Raccourcis clavier"] = "快捷键"
 L["Right-Click for options."] = "右键点击打开选项"
 L["Script"] = "脚本"
--- L["Script défaut"] = ""
+L["Script défaut"] = "默认脚本" -- Needs review
 L["Script personnalisé"] = "自定义脚本"
 L["shortcd"] = [=[短CD技能.
 卡CD使用]=]
