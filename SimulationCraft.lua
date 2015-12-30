@@ -3545,6 +3545,10 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		code = target .. "True(debuff_flying_down)"
 	elseif operand == "distance" then
 		code = target .. "Distance()"
+	elseif strsub(operand, 1, 9) == "equipped." then
+		local name = strsub(operand, 10)
+		code = format("HasEquippedItem(%s)", name)
+		AddSymbol(annotation, name)
 	elseif operand == "gcd.max" then
 		code = "GCD()"
 	elseif operand == "gcd.remains" then
