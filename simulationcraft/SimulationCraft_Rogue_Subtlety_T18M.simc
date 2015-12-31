@@ -37,6 +37,7 @@ actions=potion,name=draenic_agility,if=buff.bloodlust.react|target.time_to_die<4
 actions+=/kick
 actions+=/shadow_reflection,if=buff.shadow_dance.up|time<2
 actions+=/use_item,slot=finger1,if=buff.shadow_dance.up
+actions+=/use_item,slot=trinket1,if=buff.shadow_dance.up
 actions+=/blood_fury,if=buff.shadow_dance.up
 actions+=/berserking,if=buff.shadow_dance.up
 actions+=/arcane_torrent,if=energy<80&buff.shadow_dance.up

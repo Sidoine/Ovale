@@ -44,6 +44,7 @@ actions+=/execution_sentence,sync=seraphim,if=talent.seraphim.enabled
 actions+=/lights_hammer,if=!talent.seraphim.enabled
 actions+=/lights_hammer,sync=seraphim,if=talent.seraphim.enabled
 actions+=/use_item,name=thorasus_the_stone_heart_of_draenor,if=buff.avenging_wrath.up
+actions+=/use_item,slot=trinket1,if=buff.avenging_wrath.up
 actions+=/avenging_wrath,sync=seraphim,if=talent.seraphim.enabled
 actions+=/avenging_wrath,if=!talent.seraphim.enabled&set_bonus.tier18_4pc=0
 actions+=/avenging_wrath,if=!talent.seraphim.enabled&time<20&set_bonus.tier18_4pc=1
