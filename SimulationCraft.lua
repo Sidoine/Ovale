@@ -4392,7 +4392,6 @@ local function InsertSupportingFunctions(child, annotation)
 		local fmt = [[
 			AddFunction %sUseItemActions
 			{
-				Item(HandSlot usable=1)
 				Item(Trinket0Slot usable=1)
 				Item(Trinket1Slot usable=1)
 			}
