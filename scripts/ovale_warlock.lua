@@ -20,17 +20,11 @@ Include(ovale_trinkets_wod)
 Include(ovale_warlock_spells)
 
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=affliction)
+AddCheckBox(opt_legendary_ring_intellect ItemName(legendary_ring_intellect) default specialization=affliction)
 
 AddFunction AfflictionUsePotionIntellect
 {
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
-}
-
-AddFunction AfflictionUseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
 }
 
 ### actions.default
@@ -129,7 +123,7 @@ AddFunction AfflictionDefaultCdActions
 		#arcane_torrent
 		Spell(arcane_torrent_mana)
 		#use_item,name=nithramus_the_allseer
-		AfflictionUseItemActions()
+		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
 
 		unless Talent(grimoire_of_service_talent) and { target.TimeToDie() > 120 or target.TimeToDie() <= 25 or BuffPresent(dark_soul_misery_buff) and target.HealthPercent() < 20 } and Spell(service_felhunter)
 		{
@@ -265,6 +259,7 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 # haunt_debuff
 # haunting_spirits_buff
 # kiljaedens_cunning
+# legendary_ring_intellect
 # life_tap
 # mannoroths_fury
 # nithramus_buff
@@ -300,17 +295,11 @@ Include(ovale_trinkets_wod)
 Include(ovale_warlock_spells)
 
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=demonology)
+AddCheckBox(opt_legendary_ring_intellect ItemName(legendary_ring_intellect) default specialization=demonology)
 
 AddFunction DemonologyUsePotionIntellect
 {
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
-}
-
-AddFunction DemonologyUseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
 }
 
 ### actions.default
@@ -414,7 +403,7 @@ AddFunction DemonologyDefaultCdActions
 	#arcane_torrent
 	Spell(arcane_torrent_mana)
 	#use_item,name=nithramus_the_allseer
-	DemonologyUseItemActions()
+	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
 
 	unless TimeInCombat() < 7 and Talent(demonic_servitude_talent) and DemonologyOpenerCdPostConditions() or Talent(grimoire_of_service_talent) and { target.TimeToDie() > 120 or target.TimeToDie() <= 25 or BuffPresent(dark_soul_knowledge_buff) and target.HealthPercent() < 20 } and Spell(service_felguard)
 	{
@@ -796,17 +785,11 @@ Include(ovale_trinkets_wod)
 Include(ovale_warlock_spells)
 
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=destruction)
+AddCheckBox(opt_legendary_ring_intellect ItemName(legendary_ring_intellect) default specialization=destruction)
 
 AddFunction DestructionUsePotionIntellect
 {
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
-}
-
-AddFunction DestructionUseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
 }
 
 ### actions.default
@@ -850,7 +833,7 @@ AddFunction DestructionDefaultCdActions
 	#arcane_torrent
 	Spell(arcane_torrent_mana)
 	#use_item,name=nithramus_the_allseer
-	DestructionUseItemActions()
+	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
 
 	unless Talent(grimoire_of_service_talent) and { target.TimeToDie() > 120 or target.TimeToDie() <= 25 or BuffPresent(dark_soul_instability_buff) and target.HealthPercent() < 20 } and Spell(service_felhunter)
 	{
@@ -961,6 +944,8 @@ AddFunction DestructionSingleTargetMainActions
 	if False(raid_event_adds_exists) and { True(target_is_sim_target) or not BuffPresent(havoc_buff) } and target.DebuffRemaining(immolate_debuff) <= CastTime(immolate) and { SpellCooldown(cataclysm) > CastTime(immolate) or not Talent(cataclysm_talent) } and target.DebuffRemaining(flamelicked_debuff) >= ExecuteTime(incinerate) + TravelTime(incinerate) + ExecuteTime(immolate) Spell(immolate)
 	#immolate,cycle_targets=1,if=!raid_event.adds.exists&remains<=cast_time&(cooldown.cataclysm.remains>cast_time|!talent.cataclysm.enabled)
 	if not False(raid_event_adds_exists) and target.DebuffRemaining(immolate_debuff) <= CastTime(immolate) and { SpellCooldown(cataclysm) > CastTime(immolate) or not Talent(cataclysm_talent) } Spell(immolate)
+	#cancel_buff,name=fire_and_brimstone,if=buff.fire_and_brimstone.up&dot.immolate.remains-action.immolate.cast_time>(dot.immolate.duration*0.3)
+	if BuffPresent(fire_and_brimstone_buff) and target.DebuffRemaining(immolate_debuff) - CastTime(immolate) > target.DebuffDuration(immolate_debuff) * 0.3 and BuffPresent(fire_and_brimstone_buff) Texture(fire_and_brimstone text=cancel)
 	#shadowburn,cycle_targets=1,if=raid_event.adds.exists&sim.target!=target&buff.havoc.remains
 	if False(raid_event_adds_exists) and False(target_is_sim_target) and BuffPresent(havoc_buff) Spell(shadowburn)
 	#chaos_bolt,cycle_targets=1,if=raid_event.adds.exists&sim.target!=target&buff.havoc.remains>cast_time&buff.havoc.stack>=3&target.time_to_die>=12
@@ -1029,7 +1014,7 @@ AddFunction DestructionSingleTargetShortCdActions
 		#fire_and_brimstone,if=buff.fire_and_brimstone.down&dot.immolate.remains<=action.immolate.cast_time&(cooldown.cataclysm.remains>action.immolate.cast_time|!talent.cataclysm.enabled)&spell_targets.fire_and_brimstone>4
 		if BuffExpires(fire_and_brimstone_buff) and target.DebuffRemaining(immolate_debuff) <= CastTime(immolate) and { SpellCooldown(cataclysm) > CastTime(immolate) or not Talent(cataclysm_talent) } and Enemies() > 4 Spell(fire_and_brimstone)
 
-		unless False(raid_event_adds_exists) and { True(target_is_sim_target) or not BuffPresent(havoc_buff) } and target.DebuffRemaining(immolate_debuff) <= CastTime(immolate) and { SpellCooldown(cataclysm) > CastTime(immolate) or not Talent(cataclysm_talent) } and target.DebuffRemaining(flamelicked_debuff) >= ExecuteTime(incinerate) + TravelTime(incinerate) + ExecuteTime(immolate) and Spell(immolate) or not False(raid_event_adds_exists) and target.DebuffRemaining(immolate_debuff) <= CastTime(immolate) and { SpellCooldown(cataclysm) > CastTime(immolate) or not Talent(cataclysm_talent) } and Spell(immolate) or False(raid_event_adds_exists) and False(target_is_sim_target) and BuffPresent(havoc_buff) and Spell(shadowburn) or False(raid_event_adds_exists) and False(target_is_sim_target) and BuffRemaining(havoc_buff) > CastTime(chaos_bolt) and BuffStacks(havoc_buff) >= 3 and target.TimeToDie() >= 12 and Spell(chaos_bolt) or not False(raid_event_adds_exists) and BuffPresent(havoc_buff) and Spell(shadowburn) or not False(raid_event_adds_exists) and BuffRemaining(havoc_buff) > CastTime(chaos_bolt) and BuffStacks(havoc_buff) >= 3 and Spell(chaos_bolt) or False(raid_event_adds_exists) and False(target_is_sim_target) and BuffRemaining(havoc_buff) <= GCD() * 3 and Charges(conflagrate) == 2 and Spell(conflagrate) or Charges(conflagrate) == 2 and Spell(conflagrate)
+		unless False(raid_event_adds_exists) and { True(target_is_sim_target) or not BuffPresent(havoc_buff) } and target.DebuffRemaining(immolate_debuff) <= CastTime(immolate) and { SpellCooldown(cataclysm) > CastTime(immolate) or not Talent(cataclysm_talent) } and target.DebuffRemaining(flamelicked_debuff) >= ExecuteTime(incinerate) + TravelTime(incinerate) + ExecuteTime(immolate) and Spell(immolate) or not False(raid_event_adds_exists) and target.DebuffRemaining(immolate_debuff) <= CastTime(immolate) and { SpellCooldown(cataclysm) > CastTime(immolate) or not Talent(cataclysm_talent) } and Spell(immolate) or BuffPresent(fire_and_brimstone_buff) and target.DebuffRemaining(immolate_debuff) - CastTime(immolate) > target.DebuffDuration(immolate_debuff) * 0.3 and BuffPresent(fire_and_brimstone_buff) and Texture(fire_and_brimstone text=cancel) or False(raid_event_adds_exists) and False(target_is_sim_target) and BuffPresent(havoc_buff) and Spell(shadowburn) or False(raid_event_adds_exists) and False(target_is_sim_target) and BuffRemaining(havoc_buff) > CastTime(chaos_bolt) and BuffStacks(havoc_buff) >= 3 and target.TimeToDie() >= 12 and Spell(chaos_bolt) or not False(raid_event_adds_exists) and BuffPresent(havoc_buff) and Spell(shadowburn) or not False(raid_event_adds_exists) and BuffRemaining(havoc_buff) > CastTime(chaos_bolt) and BuffStacks(havoc_buff) >= 3 and Spell(chaos_bolt) or False(raid_event_adds_exists) and False(target_is_sim_target) and BuffRemaining(havoc_buff) <= GCD() * 3 and Charges(conflagrate) == 2 and Spell(conflagrate) or Charges(conflagrate) == 2 and Spell(conflagrate)
 		{
 			#cataclysm
 			Spell(cataclysm)
@@ -1045,7 +1030,7 @@ AddFunction DestructionSingleTargetShortCdActions
 
 AddFunction DestructionSingleTargetShortCdPostConditions
 {
-	False(raid_event_adds_exists) and False(target_is_sim_target) and Talent(charred_remains_talent) and target.TimeToDie() < 10 and Spell(shadowburn) or Talent(charred_remains_talent) and target.TimeToDie() < 10 and Spell(shadowburn) or False(raid_event_adds_exists) and { True(target_is_sim_target) or not BuffPresent(havoc_buff) } and target.DebuffRemaining(immolate_debuff) <= CastTime(immolate) and { SpellCooldown(cataclysm) > CastTime(immolate) or not Talent(cataclysm_talent) } and target.DebuffRemaining(flamelicked_debuff) >= ExecuteTime(incinerate) + TravelTime(incinerate) + ExecuteTime(immolate) and Spell(immolate) or not False(raid_event_adds_exists) and target.DebuffRemaining(immolate_debuff) <= CastTime(immolate) and { SpellCooldown(cataclysm) > CastTime(immolate) or not Talent(cataclysm_talent) } and Spell(immolate) or False(raid_event_adds_exists) and False(target_is_sim_target) and BuffPresent(havoc_buff) and Spell(shadowburn) or False(raid_event_adds_exists) and False(target_is_sim_target) and BuffRemaining(havoc_buff) > CastTime(chaos_bolt) and BuffStacks(havoc_buff) >= 3 and target.TimeToDie() >= 12 and Spell(chaos_bolt) or not False(raid_event_adds_exists) and BuffPresent(havoc_buff) and Spell(shadowburn) or not False(raid_event_adds_exists) and BuffRemaining(havoc_buff) > CastTime(chaos_bolt) and BuffStacks(havoc_buff) >= 3 and Spell(chaos_bolt) or False(raid_event_adds_exists) and False(target_is_sim_target) and BuffRemaining(havoc_buff) <= GCD() * 3 and Charges(conflagrate) == 2 and Spell(conflagrate) or Charges(conflagrate) == 2 and Spell(conflagrate) or target.DebuffRemaining(rain_of_fire_debuff) <= target.TickTime(rain_of_fire_debuff) and { Enemies() > 4 or BuffPresent(mannoroths_fury_buff) and Enemies() > 2 } and Spell(rain_of_fire) or False(raid_event_adds_exists) and target.DebuffRemaining(flamelicked_debuff) <= ExecuteTime(incinerate) + TravelTime(incinerate) + ExecuteTime(chaos_bolt) and Spell(incinerate) or Talent(charred_remains_talent) and Enemies() > 1 and target.HealthPercent() > 20 and Spell(chaos_bolt) or Talent(charred_remains_talent) and BuffStacks(backdraft_buff) < 3 and BurningEmbers() / 10 >= 2.5 and Spell(chaos_bolt) or BuffStacks(backdraft_buff) < 3 and { BurningEmbers() / 10 >= 3.5 or BuffPresent(dark_soul_instability_buff) or target.TimeToDie() < 20 or BuffRemaining(nithramus_buff) > CastTime(chaos_bolt) + TravelTime(chaos_bolt) } and Spell(chaos_bolt) or BuffStacks(backdraft_buff) < 3 and ArmorSetBonus(T17 2) == 1 and BurningEmbers() / 10 >= 2.5 and Spell(chaos_bolt) or BuffStacks(backdraft_buff) < 3 and BuffPresent(archmages_greater_incandescence_int_buff) and BuffRemaining(archmages_greater_incandescence_int_buff) > CastTime(chaos_bolt) and Spell(chaos_bolt) or BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_intellect_buff) and BuffRemaining(trinket_proc_intellect_buff) > CastTime(chaos_bolt) and Spell(chaos_bolt) or BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_crit_buff) and BuffRemaining(trinket_proc_crit_buff) > CastTime(chaos_bolt) and Spell(chaos_bolt) or BuffStacks(backdraft_buff) < 3 and BuffStacks(trinket_stacking_proc_multistrike_buff) >= 8 and BuffRemaining(trinket_stacking_proc_multistrike_buff) >= CastTime(chaos_bolt) and Spell(chaos_bolt) or BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_multistrike_buff) and BuffRemaining(trinket_proc_multistrike_buff) > CastTime(chaos_bolt) and Spell(chaos_bolt) or BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_versatility_buff) and BuffRemaining(trinket_proc_versatility_buff) > CastTime(chaos_bolt) and Spell(chaos_bolt) or BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_mastery_buff) and BuffRemaining(trinket_proc_mastery_buff) > CastTime(chaos_bolt) and Spell(chaos_bolt) or { True(target_is_sim_target) or not BuffPresent(havoc_buff) or not False(raid_event_adds_exists) } and target.DebuffRemaining(immolate_debuff) - CastTime(immolate) <= BaseDuration(immolate_debuff) * 0.3 and Spell(immolate) or False(raid_event_adds_exists) and False(target_is_sim_target) and BuffRemaining(havoc_buff) <= GCD() * 3 and BuffStacks(backdraft_buff) == 0 and Spell(conflagrate) or BuffStacks(backdraft_buff) == 0 and Spell(conflagrate) or False(raid_event_adds_exists) and False(target_is_sim_target) and BuffRemaining(havoc_buff) <= CastTime(incinerate) * 3 and Spell(incinerate) or Spell(incinerate)
+	False(raid_event_adds_exists) and False(target_is_sim_target) and Talent(charred_remains_talent) and target.TimeToDie() < 10 and Spell(shadowburn) or Talent(charred_remains_talent) and target.TimeToDie() < 10 and Spell(shadowburn) or False(raid_event_adds_exists) and { True(target_is_sim_target) or not BuffPresent(havoc_buff) } and target.DebuffRemaining(immolate_debuff) <= CastTime(immolate) and { SpellCooldown(cataclysm) > CastTime(immolate) or not Talent(cataclysm_talent) } and target.DebuffRemaining(flamelicked_debuff) >= ExecuteTime(incinerate) + TravelTime(incinerate) + ExecuteTime(immolate) and Spell(immolate) or not False(raid_event_adds_exists) and target.DebuffRemaining(immolate_debuff) <= CastTime(immolate) and { SpellCooldown(cataclysm) > CastTime(immolate) or not Talent(cataclysm_talent) } and Spell(immolate) or BuffPresent(fire_and_brimstone_buff) and target.DebuffRemaining(immolate_debuff) - CastTime(immolate) > target.DebuffDuration(immolate_debuff) * 0.3 and BuffPresent(fire_and_brimstone_buff) and Texture(fire_and_brimstone text=cancel) or False(raid_event_adds_exists) and False(target_is_sim_target) and BuffPresent(havoc_buff) and Spell(shadowburn) or False(raid_event_adds_exists) and False(target_is_sim_target) and BuffRemaining(havoc_buff) > CastTime(chaos_bolt) and BuffStacks(havoc_buff) >= 3 and target.TimeToDie() >= 12 and Spell(chaos_bolt) or not False(raid_event_adds_exists) and BuffPresent(havoc_buff) and Spell(shadowburn) or not False(raid_event_adds_exists) and BuffRemaining(havoc_buff) > CastTime(chaos_bolt) and BuffStacks(havoc_buff) >= 3 and Spell(chaos_bolt) or False(raid_event_adds_exists) and False(target_is_sim_target) and BuffRemaining(havoc_buff) <= GCD() * 3 and Charges(conflagrate) == 2 and Spell(conflagrate) or Charges(conflagrate) == 2 and Spell(conflagrate) or target.DebuffRemaining(rain_of_fire_debuff) <= target.TickTime(rain_of_fire_debuff) and { Enemies() > 4 or BuffPresent(mannoroths_fury_buff) and Enemies() > 2 } and Spell(rain_of_fire) or False(raid_event_adds_exists) and target.DebuffRemaining(flamelicked_debuff) <= ExecuteTime(incinerate) + TravelTime(incinerate) + ExecuteTime(chaos_bolt) and Spell(incinerate) or Talent(charred_remains_talent) and Enemies() > 1 and target.HealthPercent() > 20 and Spell(chaos_bolt) or Talent(charred_remains_talent) and BuffStacks(backdraft_buff) < 3 and BurningEmbers() / 10 >= 2.5 and Spell(chaos_bolt) or BuffStacks(backdraft_buff) < 3 and { BurningEmbers() / 10 >= 3.5 or BuffPresent(dark_soul_instability_buff) or target.TimeToDie() < 20 or BuffRemaining(nithramus_buff) > CastTime(chaos_bolt) + TravelTime(chaos_bolt) } and Spell(chaos_bolt) or BuffStacks(backdraft_buff) < 3 and ArmorSetBonus(T17 2) == 1 and BurningEmbers() / 10 >= 2.5 and Spell(chaos_bolt) or BuffStacks(backdraft_buff) < 3 and BuffPresent(archmages_greater_incandescence_int_buff) and BuffRemaining(archmages_greater_incandescence_int_buff) > CastTime(chaos_bolt) and Spell(chaos_bolt) or BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_intellect_buff) and BuffRemaining(trinket_proc_intellect_buff) > CastTime(chaos_bolt) and Spell(chaos_bolt) or BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_crit_buff) and BuffRemaining(trinket_proc_crit_buff) > CastTime(chaos_bolt) and Spell(chaos_bolt) or BuffStacks(backdraft_buff) < 3 and BuffStacks(trinket_stacking_proc_multistrike_buff) >= 8 and BuffRemaining(trinket_stacking_proc_multistrike_buff) >= CastTime(chaos_bolt) and Spell(chaos_bolt) or BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_multistrike_buff) and BuffRemaining(trinket_proc_multistrike_buff) > CastTime(chaos_bolt) and Spell(chaos_bolt) or BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_versatility_buff) and BuffRemaining(trinket_proc_versatility_buff) > CastTime(chaos_bolt) and Spell(chaos_bolt) or BuffStacks(backdraft_buff) < 3 and BuffPresent(trinket_proc_mastery_buff) and BuffRemaining(trinket_proc_mastery_buff) > CastTime(chaos_bolt) and Spell(chaos_bolt) or { True(target_is_sim_target) or not BuffPresent(havoc_buff) or not False(raid_event_adds_exists) } and target.DebuffRemaining(immolate_debuff) - CastTime(immolate) <= BaseDuration(immolate_debuff) * 0.3 and Spell(immolate) or False(raid_event_adds_exists) and False(target_is_sim_target) and BuffRemaining(havoc_buff) <= GCD() * 3 and BuffStacks(backdraft_buff) == 0 and Spell(conflagrate) or BuffStacks(backdraft_buff) == 0 and Spell(conflagrate) or False(raid_event_adds_exists) and False(target_is_sim_target) and BuffRemaining(havoc_buff) <= CastTime(incinerate) * 3 and Spell(incinerate) or Spell(incinerate)
 }
 
 ### Destruction icons.
@@ -1131,6 +1116,7 @@ AddIcon checkbox=opt_warlock_destruction_aoe help=cd specialization=destruction
 # immolate_debuff
 # incinerate
 # kiljaedens_cunning
+# legendary_ring_intellect
 # mannoroths_fury
 # mannoroths_fury_buff
 # nithramus_buff

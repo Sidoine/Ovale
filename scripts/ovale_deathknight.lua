@@ -448,17 +448,11 @@ Include(ovale_deathknight_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=frost)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=frost)
 AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=frost)
+AddCheckBox(opt_legendary_ring_strength ItemName(legendary_ring_strength) default specialization=frost)
 
 AddFunction FrostDualWieldUsePotionStrength
 {
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
-}
-
-AddFunction FrostDualWieldUseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
 }
 
 AddFunction FrostDualWieldGetInMeleeRange
@@ -545,7 +539,7 @@ AddFunction FrostDualWieldDefaultCdActions
 	#arcane_torrent
 	Spell(arcane_torrent_runicpower)
 	#use_item,slot=finger1
-	FrostDualWieldUseItemActions()
+	if CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength)
 
 	unless target.DiseasesRemaining() < 1 and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Spell(soul_reaper_frost)
 	{
@@ -994,6 +988,7 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # horn_of_winter
 # howling_blast
 # killing_machine_buff
+# legendary_ring_strength
 # mind_freeze
 # necrotic_plague_debuff
 # necrotic_plague_talent
@@ -1033,17 +1028,11 @@ Include(ovale_deathknight_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=frost)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=frost)
 AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=frost)
+AddCheckBox(opt_legendary_ring_strength ItemName(legendary_ring_strength) default specialization=frost)
 
 AddFunction FrostTwoHanderUsePotionStrength
 {
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
-}
-
-AddFunction FrostTwoHanderUseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
 }
 
 AddFunction FrostTwoHanderGetInMeleeRange
@@ -1130,7 +1119,7 @@ AddFunction FrostTwoHanderDefaultCdActions
 	#arcane_torrent
 	Spell(arcane_torrent_runicpower)
 	#use_item,slot=finger1
-	FrostTwoHanderUseItemActions()
+	if CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength)
 
 	unless target.DiseasesRemaining() < 1 and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Spell(soul_reaper_frost)
 	{
@@ -1579,6 +1568,7 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # horn_of_winter
 # howling_blast
 # killing_machine_buff
+# legendary_ring_strength
 # mind_freeze
 # necrotic_plague_debuff
 # necrotic_plague_talent
@@ -1618,17 +1608,11 @@ Include(ovale_deathknight_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=unholy)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=unholy)
 AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=unholy)
+AddCheckBox(opt_legendary_ring_strength ItemName(legendary_ring_strength) default specialization=unholy)
 
 AddFunction UnholyUsePotionStrength
 {
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
-}
-
-AddFunction UnholyUseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
 }
 
 AddFunction UnholyGetInMeleeRange
@@ -1683,7 +1667,7 @@ AddFunction UnholyDefaultCdActions
 	#arcane_torrent,if=!talent.breath_of_sindragosa.enabled
 	if not Talent(breath_of_sindragosa_talent) Spell(arcane_torrent_runicpower)
 	#use_item,slot=finger1,if=!talent.breath_of_sindragosa.enabled
-	if not Talent(breath_of_sindragosa_talent) UnholyUseItemActions()
+	if not Talent(breath_of_sindragosa_talent) and CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength)
 	#potion,name=draenic_strength,if=(buff.dark_transformation.up&target.time_to_die<=60)&!talent.breath_of_sindragosa.enabled
 	if pet.BuffPresent(dark_transformation_buff) and target.TimeToDie() <= 60 and not Talent(breath_of_sindragosa_talent) UnholyUsePotionStrength()
 	#run_action_list,name=unholy
@@ -1744,7 +1728,7 @@ AddFunction UnholyBosCdActions
 	#berserking,if=dot.breath_of_sindragosa.ticking
 	if BuffPresent(breath_of_sindragosa_buff) Spell(berserking)
 	#use_item,slot=finger1,if=dot.breath_of_sindragosa.ticking
-	if BuffPresent(breath_of_sindragosa_buff) UnholyUseItemActions()
+	if BuffPresent(breath_of_sindragosa_buff) and CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength)
 	#potion,name=draenic_strength,if=dot.breath_of_sindragosa.ticking
 	if BuffPresent(breath_of_sindragosa_buff) UnholyUsePotionStrength()
 
@@ -1994,6 +1978,7 @@ AddIcon checkbox=opt_deathknight_unholy_aoe help=cd specialization=unholy
 # frost_fever_debuff
 # glyph_of_mind_freeze
 # horn_of_winter
+# legendary_ring_strength
 # mind_freeze
 # necrotic_plague_debuff
 # necrotic_plague_talent

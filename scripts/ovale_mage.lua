@@ -21,19 +21,13 @@ Include(ovale_mage_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=arcane)
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=arcane)
+AddCheckBox(opt_legendary_ring_intellect ItemName(legendary_ring_intellect) default specialization=arcane)
 AddCheckBox(opt_arcane_mage_burn_phase L(arcane_mage_burn_phase) default specialization=arcane)
 AddCheckBox(opt_time_warp SpellName(time_warp) specialization=arcane)
 
 AddFunction ArcaneUsePotionIntellect
 {
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
-}
-
-AddFunction ArcaneUseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
 }
 
 AddFunction ArcaneInterruptActions
@@ -367,7 +361,7 @@ AddFunction ArcaneCooldownsCdActions
 	#potion,name=draenic_intellect,if=buff.arcane_power.up&(!talent.prismatic_crystal.enabled|pet.prismatic_crystal.active)
 	if BuffPresent(arcane_power_buff) and { not Talent(prismatic_crystal_talent) or TotemPresent(prismatic_crystal) } ArcaneUsePotionIntellect()
 	#use_item,slot=finger2
-	ArcaneUseItemActions()
+	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
 }
 
 ### actions.crystal_sequence
@@ -649,18 +643,12 @@ Include(ovale_mage_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=fire)
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=fire)
+AddCheckBox(opt_legendary_ring_intellect ItemName(legendary_ring_intellect) default specialization=fire)
 AddCheckBox(opt_time_warp SpellName(time_warp) specialization=fire)
 
 AddFunction FireUsePotionIntellect
 {
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
-}
-
-AddFunction FireUseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
 }
 
 AddFunction FireInterruptActions
@@ -916,7 +904,7 @@ AddFunction FireCombustSequenceCdActions
 		#arcane_torrent
 		Spell(arcane_torrent_mana)
 		#use_item,slot=finger2
-		FireUseItemActions()
+		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
 		#potion,name=draenic_intellect
 		FireUsePotionIntellect()
 	}
@@ -1274,18 +1262,12 @@ Include(ovale_mage_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=frost)
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=frost)
+AddCheckBox(opt_legendary_ring_intellect ItemName(legendary_ring_intellect) default specialization=frost)
 AddCheckBox(opt_time_warp SpellName(time_warp) specialization=frost)
 
 AddFunction FrostUsePotionIntellect
 {
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
-}
-
-AddFunction FrostUseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
 }
 
 AddFunction FrostInterruptActions
@@ -1444,7 +1426,7 @@ AddFunction FrostCooldownsCdActions
 	#potion,name=draenic_intellect,if=buff.bloodlust.up|buff.icy_veins.up
 	if BuffPresent(burst_haste_buff any=1) or BuffPresent(icy_veins_buff) FrostUsePotionIntellect()
 	#use_item,slot=finger2
-	FrostUseItemActions()
+	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
 }
 
 ### actions.crystal_sequence
@@ -1773,6 +1755,7 @@ AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 # icy_veins
 # icy_veins_buff
 # incanters_flow_buff
+# legendary_ring_intellect
 # mirror_image
 # prismatic_crystal
 # prismatic_crystal_talent

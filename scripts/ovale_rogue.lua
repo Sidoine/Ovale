@@ -21,6 +21,7 @@ Include(ovale_rogue_spells)
 
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=assassination)
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=assassination)
+AddCheckBox(opt_legendary_ring_agility ItemName(legendary_ring_agility) default specialization=assassination)
 AddCheckBox(opt_vanish SpellName(vanish) default specialization=assassination)
 
 AddFunction AssassinationUsePotionAgility
@@ -30,7 +31,6 @@ AddFunction AssassinationUsePotionAgility
 
 AddFunction AssassinationUseItemActions
 {
-	Item(HandSlot usable=1)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
@@ -372,7 +372,7 @@ AddFunction AssassinationReflectionRotationAntRefCdActions
 	#use_item,slot=trinket2
 	AssassinationUseItemActions()
 	#use_item,slot=finger1
-	AssassinationUseItemActions()
+	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
 	#Arcane_Torrent,if=energy<90
 	if Energy() < 90 Spell(arcane_torrent_energy)
 	#blood_fury
@@ -479,6 +479,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # envenom
 # envenom_buff
 # kick
+# legendary_ring_agility
 # lethal_poison_buff
 # marked_for_death
 # mutilate
@@ -517,6 +518,7 @@ Include(ovale_rogue_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=combat)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=combat)
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=combat)
+AddCheckBox(opt_legendary_ring_agility ItemName(legendary_ring_agility) default specialization=combat)
 AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default specialization=combat)
 AddCheckBox(opt_vanish SpellName(vanish) default specialization=combat)
 
@@ -527,7 +529,6 @@ AddFunction CombatUsePotionAgility
 
 AddFunction CombatUseItemActions
 {
-	Item(HandSlot usable=1)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
@@ -589,7 +590,7 @@ AddFunction CombatDefaultCdActions
 	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>30
 	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 30 Spell(preparation)
 	#use_item,slot=finger1,if=buff.adrenaline_rush.up
-	if BuffPresent(adrenaline_rush_buff) CombatUseItemActions()
+	if BuffPresent(adrenaline_rush_buff) and CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
 	#use_item,slot=trinket2,if=buff.adrenaline_rush.up
 	if BuffPresent(adrenaline_rush_buff) CombatUseItemActions()
 	#blood_fury
@@ -777,6 +778,7 @@ AddIcon checkbox=opt_rogue_combat_aoe help=cd specialization=combat
 # kidney_shot
 # killing_spree
 # killing_spree_buff
+# legendary_ring_agility
 # lethal_poison_buff
 # maalus_buff
 # marked_for_death
@@ -821,6 +823,7 @@ Define(honor_among_thieves_cooldown_buff 51699)
 
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=subtlety)
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=subtlety)
+AddCheckBox(opt_legendary_ring_agility ItemName(legendary_ring_agility) default specialization=subtlety)
 
 AddFunction SubtletyUsePotionAgility
 {
@@ -829,7 +832,6 @@ AddFunction SubtletyUsePotionAgility
 
 AddFunction SubtletyUseItemActions
 {
-	Item(HandSlot usable=1)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
@@ -1115,7 +1117,7 @@ AddFunction SubtletyDanceRotationAntRefCdActions
 	#use_item,slot=trinket2
 	SubtletyUseItemActions()
 	#use_item,slot=finger1
-	SubtletyUseItemActions()
+	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
 	#Arcane_Torrent,if=energy<90
 	if Energy() < 90 Spell(arcane_torrent_energy)
 }
@@ -1185,7 +1187,7 @@ AddFunction SubtletyDanceRotationMfdRefCdActions
 	#use_item,slot=trinket2
 	SubtletyUseItemActions()
 	#use_item,slot=finger1
-	SubtletyUseItemActions()
+	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
 	#Arcane_Torrent,if=energy<90
 	if Energy() < 90 Spell(arcane_torrent_energy)
 }
@@ -1659,6 +1661,7 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 # find_weakness_debuff
 # honor_among_thieves_cooldown_buff
 # kick
+# legendary_ring_agility
 # lethal_poison_buff
 # marked_for_death
 # marked_for_death_talent
@@ -1702,18 +1705,12 @@ Include(ovale_rogue_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=assassination)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=assassination)
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=assassination)
+AddCheckBox(opt_legendary_ring_agility ItemName(legendary_ring_agility) default specialization=assassination)
 AddCheckBox(opt_vanish SpellName(vanish) default specialization=assassination)
 
 AddFunction AssassinationUsePotionAgility
 {
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
-}
-
-AddFunction AssassinationUseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
 }
 
 AddFunction AssassinationGetInMeleeRange
@@ -1788,7 +1785,7 @@ AddFunction AssassinationDefaultCdActions
 	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>60&time>10
 	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 60 and TimeInCombat() > 10 Spell(preparation)
 	#use_item,slot=finger1,if=spell_targets.fan_of_knives>1|(debuff.vendetta.up&spell_targets.fan_of_knives=1)
-	if Enemies() > 1 or target.DebuffPresent(vendetta_debuff) and Enemies() == 1 AssassinationUseItemActions()
+	if { Enemies() > 1 or target.DebuffPresent(vendetta_debuff) and Enemies() == 1 } and CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
 	#blood_fury
 	Spell(blood_fury_ap)
 	#berserking
@@ -1991,6 +1988,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # glyph_of_vendetta
 # kick
 # kidney_shot
+# legendary_ring_agility
 # lethal_poison_buff
 # marked_for_death
 # marked_for_death_talent
@@ -2031,19 +2029,13 @@ Include(ovale_rogue_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=combat)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=combat)
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=combat)
+AddCheckBox(opt_legendary_ring_agility ItemName(legendary_ring_agility) default specialization=combat)
 AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default specialization=combat)
 AddCheckBox(opt_vanish SpellName(vanish) default specialization=combat)
 
 AddFunction CombatUsePotionAgility
 {
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
-}
-
-AddFunction CombatUseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
 }
 
 AddFunction CombatGetInMeleeRange
@@ -2119,7 +2111,7 @@ AddFunction CombatDefaultCdActions
 	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>30
 	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 30 Spell(preparation)
 	#use_item,slot=finger1,if=buff.adrenaline_rush.up
-	if BuffPresent(adrenaline_rush_buff) CombatUseItemActions()
+	if BuffPresent(adrenaline_rush_buff) and CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
 	#blood_fury
 	Spell(blood_fury_ap)
 	#berserking
@@ -2308,6 +2300,7 @@ AddIcon checkbox=opt_rogue_combat_aoe help=cd specialization=combat
 # kidney_shot
 # killing_spree
 # killing_spree_buff
+# legendary_ring_agility
 # lethal_poison_buff
 # maalus_buff
 # marked_for_death
@@ -2354,17 +2347,11 @@ Define(honor_among_thieves_cooldown_buff 51699)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=subtlety)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=subtlety)
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=subtlety)
+AddCheckBox(opt_legendary_ring_agility ItemName(legendary_ring_agility) default specialization=subtlety)
 
 AddFunction SubtletyUsePotionAgility
 {
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
-}
-
-AddFunction SubtletyUseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
 }
 
 AddFunction SubtletyGetInMeleeRange
@@ -2514,7 +2501,7 @@ AddFunction SubtletyDefaultCdActions
 	#shadow_reflection,if=buff.shadow_dance.up|time<2
 	if BuffPresent(shadow_dance_buff) or TimeInCombat() < 2 Spell(shadow_reflection)
 	#use_item,slot=finger1,if=buff.shadow_dance.up
-	if BuffPresent(shadow_dance_buff) SubtletyUseItemActions()
+	if BuffPresent(shadow_dance_buff) and CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
 	#blood_fury,if=buff.shadow_dance.up
 	if BuffPresent(shadow_dance_buff) Spell(blood_fury_ap)
 	#berserking,if=buff.shadow_dance.up
@@ -2809,6 +2796,7 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 # honor_among_thieves_cooldown_buff
 # kick
 # kidney_shot
+# legendary_ring_agility
 # lethal_poison_buff
 # marked_for_death
 # marked_for_death_talent

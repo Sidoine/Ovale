@@ -137,17 +137,11 @@ Include(ovale_trinkets_wod)
 Include(ovale_druid_spells)
 
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=balance)
+AddCheckBox(opt_legendary_ring_intellect ItemName(legendary_ring_intellect) default specialization=balance)
 
 AddFunction BalanceUsePotionIntellect
 {
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
-}
-
-AddFunction BalanceUseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
 }
 
 ### actions.default
@@ -177,7 +171,7 @@ AddFunction BalanceDefaultCdActions
 	#call_action_list,name=cooldowns,if=cooldown.celestial_alignment.up&(eclipse_energy>=0|target.time_to_die<=30+gcd)
 	if not SpellCooldown(celestial_alignment) > 0 and { EclipseEnergy() >= 0 or target.TimeToDie() <= 30 + GCD() } BalanceCooldownsCdActions()
 	#use_item,slot=finger1
-	BalanceUseItemActions()
+	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
 }
 
 ### actions.aoe
@@ -405,6 +399,7 @@ AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
 # euphoria_talent
 # force_of_nature_caster
 # incarnation_chosen_of_elune
+# legendary_ring_intellect
 # lunar_empowerment_buff
 # lunar_peak_buff
 # mark_of_the_wild
@@ -445,17 +440,11 @@ Include(ovale_druid_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=feral)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=feral)
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=feral)
+AddCheckBox(opt_legendary_ring_agility ItemName(legendary_ring_agility) default specialization=feral)
 
 AddFunction FeralUsePotionAgility
 {
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
-}
-
-AddFunction FeralUseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
 }
 
 AddFunction FeralGetInMeleeRange
@@ -552,7 +541,7 @@ AddFunction FeralDefaultCdActions
 		#berserk,if=buff.tigers_fury.up&(buff.incarnation.up|!talent.incarnation_king_of_the_jungle.enabled)
 		if BuffPresent(tigers_fury_buff) and { BuffPresent(incarnation_king_of_the_jungle_buff) or not Talent(incarnation_king_of_the_jungle_talent) } Spell(berserk_cat)
 		#use_item,slot=finger1
-		FeralUseItemActions()
+		if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
 		#potion,name=draenic_agility,if=(buff.berserk.remains>10&(target.time_to_die<180|(trinket.proc.all.react&target.health.pct<25)))|target.time_to_die<=40
 		if BuffRemaining(berserk_cat_buff) > 10 and { target.TimeToDie() < 180 or BuffPresent(trinket_proc_any_buff) and target.HealthPercent() < 25 } or target.TimeToDie() <= 40 FeralUsePotionAgility()
 		#blood_fury,sync=tigers_fury
@@ -741,6 +730,7 @@ AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
 # incarnation_king_of_the_jungle_buff
 # incarnation_king_of_the_jungle_talent
 # incarnation_talent
+# legendary_ring_agility
 # maim
 # mangle
 # mark_of_the_wild
@@ -792,13 +782,7 @@ Include(ovale_druid_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=guardian)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=guardian)
-
-AddFunction GuardianUseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
-}
+AddCheckBox(opt_legendary_ring_bonus_armor ItemName(legendary_ring_bonus_armor) default specialization=guardian)
 
 AddFunction GuardianGetInMeleeRange
 {
@@ -873,7 +857,7 @@ AddFunction GuardianDefaultCdActions
 	#arcane_torrent
 	Spell(arcane_torrent_energy)
 	#use_item,slot=finger1
-	GuardianUseItemActions()
+	if CheckBoxOn(opt_legendary_ring_bonus_armor) Item(legendary_ring_bonus_armor)
 	#barkskin,if=buff.bristling_fur.down
 	if BuffExpires(bristling_fur_buff) Spell(barkskin)
 	#bristling_fur,if=buff.barkskin.down&buff.savage_defense.down
@@ -1006,6 +990,7 @@ AddIcon checkbox=opt_druid_guardian_aoe help=cd specialization=guardian
 # incarnation_son_of_ursoc_buff
 # lacerate
 # lacerate_debuff
+# legendary_ring_bonus_armor
 # maim
 # mangle
 # mark_of_the_wild

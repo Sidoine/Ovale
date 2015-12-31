@@ -1036,6 +1036,12 @@ end
 local function InitializeDisambiguation()
 	AddDisambiguation("bloodlust_buff",			"burst_haste_buff")
 	AddDisambiguation("trinket_proc_all_buff",	"trinket_proc_any_buff")
+	-- WoD legendary ring
+	AddDisambiguation("etheralus_the_eternal_reward",			"legendary_ring_spirit")
+	AddDisambiguation("maalus_the_blood_drinker",				"legendary_ring_agility")
+	AddDisambiguation("nithramus_the_allseer",					"legendary_ring_intellect")
+	AddDisambiguation("sanctus_sigil_of_the_unbroken",			"legendary_ring_bonus_armor")
+	AddDisambiguation("thorasus_the_stone_heart_of_draenor",	"legendary_ring_strength")
 	-- Death Knight
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_runicpower",	"DEATHKNIGHT")
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"DEATHKNIGHT")
@@ -1263,32 +1269,41 @@ end
 
 SplitByTagAction = function(tag, node, nodeList, annotation)
 	local bodyNode, conditionNode
-	if node.func == "spell" then
-		local spellIdNode = node.rawPositionalParams[1]
-		local spellId, spellName
-		if spellIdNode.type == "variable" then
-			spellName = spellIdNode.name
-			spellId = annotation.dictionary and annotation.dictionary[spellName]
-		elseif spellIdNode.type == "value" then
-			spellName = spellIdNode.value
-			spellId = spellName
+	local actionTag, invokesGCD
+	local name = "UNKNOWN"
+	local actionType = node.func
+	if actionType == "item" or actionType == "spell" then
+		local firstParamNode = node.rawPositionalParams[1]
+		local id, name
+		if firstParamNode.type == "variable" then
+			name = firstParamNode.name
+			id = annotation.dictionary and annotation.dictionary[name]
+		elseif firstParamNode.type == "value" then
+			name = firstParamNode.value
+			id = name
 		end
-		if spellId then
-			local spellTag, invokesGCD = OvaleData:GetSpellTagInfo(spellId)
-			if spellTag then
-				if spellTag == tag then
-					bodyNode = node
-				elseif invokesGCD and TagPriority(spellTag) < TagPriority(tag) then
-					conditionNode = node
-				end
-			else
-				OvaleSimulationCraft:Print("Warning: Unable to determine tag for '%s'.", spellName)
-				bodyNode = node
+		if id then
+			if actionType == "item" then
+				actionTag, invokesGCD = OvaleData:GetItemTagInfo(id)
+			elseif actionType == "spell" then
+				actionTag, invokesGCD = OvaleData:GetSpellTagInfo(id)
 			end
-		else
-			OvaleSimulationCraft:Print("Warning: Unable to determine spell ID and tag for '%s'.", node.asString)
-			bodyNode = node
 		end
+	elseif actionType == "texture" then
+		-- Textures are assumed to be "main" tag and invoke the GCD.
+		actionTag = "main"
+		invokesGCD = true
+	end
+	-- Default to "main" tag and assume the GCD is invoked.'
+	if not actionTag then
+		actionTag = "main"
+		invokesGCD = true
+		OvaleSimulationCraft:Print("Warning: Unable to determine tag for '%s', assuming '%s'.", name, actionTag)
+	end
+	if actionTag == tag then
+		bodyNode = node
+	elseif invokesGCD and TagPriority(actionTag) < TagPriority(tag) then
+		conditionNode = node
 	end
 	return bodyNode, conditionNode
 end
@@ -1952,29 +1967,35 @@ EmitAction = function(parseNode, nodeList, annotation)
 			annotation[action] = class
 			isSpellAction = false
 		elseif action == "use_item" then
-			if true then
+			local legendaryRing = false
+			if modifier.slot then
+				local slot = Unparse(modifier.slot)
+				if strmatch(slot, "finger") then
+					legendaryRing = Disambiguate("legendary_ring", class, specialization)
+				end
+			elseif modifier.name then
+				local name = Unparse(modifier.name)
+				name = Disambiguate(name, class, specialization)
+				if strmatch(name, "legendary_ring") then
+					legendaryRing = name
+				elseif false then
+					-- Use named item and require the symbol name.
+					bodyCode = format("Item(%s)", name)
+					AddSymbol(annotation, name)
+				end
+			end
+			if legendaryRing then
+				conditionCode = format("CheckBoxOn(opt_%s)", legendaryRing)
+				bodyCode = format("Item(%s)", legendaryRing)
+				AddSymbol(annotation, legendaryRing)
+				annotation.use_legendary_ring = legendaryRing
+			else
 				--[[
 					When "use_item" is encountered in an action list, it is usually meant to use
-					all of the equipped items at the same time, so all hand tinkers and on-use
-					trinkets.  Assume a "UseItemActions()" function is available that does this.
+					all of the equipped trinkets at the same time.
 				--]]
 				bodyCode = camelSpecialization .. "UseItemActions()"
 				annotation[action] = true
-			else
-				if modifier.name == "name" then
-					local name = Unparse(modifier.name)
-					if strmatch(name, "gauntlets") or strmatch(name, "gloves") or strmatch(name, "grips") or strmatch(name, "handguards") then
-						bodyCode = "Item(HandsSlot usable=1)"
-					end
-				elseif modifier.slot then
-					local slot = Unparse(modifier.slot)
-					if slot == "hands" then
-						bodyCode = "Item(HandsSlot usable=1)"
-					elseif strmatch(slot, "trinket") then
-						bodyCode = "{ Item(Trinket0Slot usable=1) Item(Trinket1Slot usable=1) }"
-						expressionType = "group"
-					end
-				end
 			end
 			isSpellAction = false
 		elseif action == "wait" then
@@ -4596,6 +4617,17 @@ local function InsertSupportingControls(child, annotation)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "righteous_fury")
+		count = count + 1
+	end
+	if annotation.use_legendary_ring then
+		local legendaryRing = annotation.use_legendary_ring
+		local fmt = [[
+			AddCheckBox(opt_%s ItemName(%s) default %s)
+		]]
+		local code = format(fmt, legendaryRing, legendaryRing, ifSpecialization)
+		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		AddSymbol(annotation, legendaryRing)
 		count = count + 1
 	end
 	if annotation.use_potion_strength then

@@ -21,17 +21,11 @@ Include(ovale_priest_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=shadow)
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=shadow)
+AddCheckBox(opt_legendary_ring_intellect ItemName(legendary_ring_intellect) default specialization=shadow)
 
 AddFunction ShadowUsePotionIntellect
 {
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
-}
-
-AddFunction ShadowUseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
 }
 
 AddFunction ShadowInterruptActions
@@ -82,11 +76,11 @@ AddFunction ShadowDefaultCdActions
 		#silence
 		ShadowInterruptActions()
 		#use_item,slot=finger1
-		ShadowUseItemActions()
+		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
 		#potion,name=draenic_intellect,if=buff.bloodlust.react|target.time_to_die<=40
 		if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 40 ShadowUsePotionIntellect()
 		#use_item,name=nithramus_the_allseer
-		ShadowUseItemActions()
+		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
 		#power_infusion,if=talent.power_infusion.enabled
 		if Talent(power_infusion_talent) Spell(power_infusion)
 		#silence,if=target.debuff.casting.react
@@ -1022,6 +1016,7 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # insanity
 # insanity_buff
 # insanity_talent
+# legendary_ring_intellect
 # mental_fatigue_debuff
 # mental_instinct_buff
 # mind_blast
@@ -1075,17 +1070,11 @@ Include(ovale_priest_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=shadow)
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=shadow)
+AddCheckBox(opt_legendary_ring_intellect ItemName(legendary_ring_intellect) default specialization=shadow)
 
 AddFunction ShadowUsePotionIntellect
 {
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
-}
-
-AddFunction ShadowUseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
 }
 
 AddFunction ShadowInterruptActions
@@ -1136,11 +1125,11 @@ AddFunction ShadowDefaultCdActions
 		#silence
 		ShadowInterruptActions()
 		#use_item,slot=finger1
-		ShadowUseItemActions()
+		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
 		#potion,name=draenic_intellect,if=buff.bloodlust.react|target.time_to_die<=40
 		if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 40 ShadowUsePotionIntellect()
 		#use_item,name=nithramus_the_allseer
-		ShadowUseItemActions()
+		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
 		#power_infusion,if=talent.power_infusion.enabled
 		if Talent(power_infusion_talent) Spell(power_infusion)
 		#silence,if=target.debuff.casting.react
@@ -2076,6 +2065,7 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # insanity
 # insanity_buff
 # insanity_talent
+# legendary_ring_intellect
 # mental_fatigue_debuff
 # mental_instinct_buff
 # mind_blast
@@ -2129,17 +2119,11 @@ Include(ovale_priest_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=shadow)
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=shadow)
+AddCheckBox(opt_legendary_ring_intellect ItemName(legendary_ring_intellect) default specialization=shadow)
 
 AddFunction ShadowUsePotionIntellect
 {
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
-}
-
-AddFunction ShadowUseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
 }
 
 AddFunction ShadowInterruptActions
@@ -2190,11 +2174,11 @@ AddFunction ShadowDefaultCdActions
 		#silence
 		ShadowInterruptActions()
 		#use_item,slot=finger1
-		ShadowUseItemActions()
+		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
 		#potion,name=draenic_intellect,if=buff.bloodlust.react|target.time_to_die<=40
 		if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 40 ShadowUsePotionIntellect()
 		#use_item,name=nithramus_the_allseer
-		ShadowUseItemActions()
+		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
 		#power_infusion,if=talent.power_infusion.enabled
 		if Talent(power_infusion_talent) Spell(power_infusion)
 		#silence,if=target.debuff.casting.react
@@ -3130,6 +3114,7 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # insanity
 # insanity_buff
 # insanity_talent
+# legendary_ring_intellect
 # mental_fatigue_debuff
 # mental_instinct_buff
 # mind_blast

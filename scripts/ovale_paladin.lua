@@ -621,18 +621,12 @@ Include(ovale_paladin_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=retribution)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=retribution)
 AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=retribution)
+AddCheckBox(opt_legendary_ring_strength ItemName(legendary_ring_strength) default specialization=retribution)
 AddCheckBox(opt_righteous_fury_check SpellName(righteous_fury) default specialization=retribution)
 
 AddFunction RetributionUsePotionStrength
 {
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
-}
-
-AddFunction RetributionUseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
 }
 
 AddFunction RetributionGetInMeleeRange
@@ -713,7 +707,7 @@ AddFunction RetributionDefaultCdActions
 	unless Talent(empowered_seals_talent) and TimeInCombat() < 2 and Spell(judgment) or HasEquippedItem(empty_drinking_horn) and Enemies() < 2 and not Talent(empowered_seals_talent) and Spell(seal_of_truth) or HasEquippedItem(empty_drinking_horn) and Enemies() >= 2 and not Talent(empowered_seals_talent) and Spell(seal_of_righteousness) or Enemies() < 3 and not Talent(empowered_seals_talent) and not HasEquippedItem(empty_drinking_horn) and Spell(seal_of_truth) or Enemies() >= 3 and not Talent(empowered_seals_talent) and not HasEquippedItem(empty_drinking_horn) and Spell(seal_of_righteousness) or not Talent(seraphim_talent) and Spell(execution_sentence) or Spell(seraphim) and Talent(seraphim_talent) and Spell(execution_sentence) or not Talent(seraphim_talent) and Spell(lights_hammer) or Spell(seraphim) and Talent(seraphim_talent) and Spell(lights_hammer)
 	{
 		#use_item,name=thorasus_the_stone_heart_of_draenor,if=buff.avenging_wrath.up
-		if BuffPresent(avenging_wrath_melee_buff) RetributionUseItemActions()
+		if BuffPresent(avenging_wrath_melee_buff) and CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength)
 		#avenging_wrath,sync=seraphim,if=talent.seraphim.enabled
 		if Spell(seraphim) and Talent(seraphim_talent) Spell(avenging_wrath_melee)
 		#avenging_wrath,if=!talent.seraphim.enabled&set_bonus.tier18_4pc=0
@@ -1048,6 +1042,7 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 # holy_avenger_buff
 # holy_prism
 # judgment
+# legendary_ring_strength
 # liadrins_righteousness_buff
 # lights_hammer
 # lights_hammer_talent

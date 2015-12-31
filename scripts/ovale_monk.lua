@@ -31,7 +31,6 @@ AddFunction BrewmasterUsePotionArmor
 
 AddFunction BrewmasterUseItemActions
 {
-	Item(HandSlot usable=1)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
@@ -407,7 +406,6 @@ AddFunction BrewmasterUsePotionArmor
 
 AddFunction BrewmasterUseItemActions
 {
-	Item(HandSlot usable=1)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
@@ -783,7 +781,6 @@ AddFunction BrewmasterUsePotionArmor
 
 AddFunction BrewmasterUseItemActions
 {
-	Item(HandSlot usable=1)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
@@ -1159,7 +1156,6 @@ AddFunction BrewmasterUsePotionArmor
 
 AddFunction BrewmasterUseItemActions
 {
-	Item(HandSlot usable=1)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
@@ -1533,7 +1529,6 @@ AddFunction MistweaverUsePotionIntellect
 
 AddFunction MistweaverUseItemActions
 {
-	Item(HandSlot usable=1)
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 }
@@ -1785,19 +1780,13 @@ Include(ovale_monk_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=windwalker)
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=windwalker)
+AddCheckBox(opt_legendary_ring_agility ItemName(legendary_ring_agility) default specialization=windwalker)
 AddCheckBox(opt_chi_burst SpellName(chi_burst) default specialization=windwalker)
 AddCheckBox(opt_storm_earth_and_fire SpellName(storm_earth_and_fire) specialization=windwalker)
 
 AddFunction WindwalkerUsePotionAgility
 {
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
-}
-
-AddFunction WindwalkerUseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
 }
 
 AddFunction WindwalkerInterruptActions
@@ -1945,7 +1934,7 @@ AddFunction WindwalkerDefaultCdActions
 			#potion,name=draenic_agility,if=buff.serenity.up|(!talent.serenity.enabled&(trinket.proc.agility.react|trinket.proc.multistrike.react))|buff.bloodlust.react|target.time_to_die<=60
 			if BuffPresent(serenity_buff) or not Talent(serenity_talent) and { BuffPresent(trinket_proc_agility_buff) or BuffPresent(trinket_proc_multistrike_buff) } or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 WindwalkerUsePotionAgility()
 			#use_item,name=maalus_the_blood_drinker,if=buff.tigereye_brew_use.up|target.time_to_die<18
-			if BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 WindwalkerUseItemActions()
+			if { BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 } and CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
 			#blood_fury,if=buff.tigereye_brew_use.up|target.time_to_die<18
 			if BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 Spell(blood_fury_apsp)
 			#berserking,if=buff.tigereye_brew_use.up|target.time_to_die<18
@@ -2160,7 +2149,7 @@ AddFunction WindwalkerOpenerCdActions
 	unless BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and BuffPresent(serenity_buff) and BuffRemaining(serenity_buff) < 1.5 and Spell(fists_of_fury) or BuffRemaining(tiger_power_buff) < 2 and Spell(tiger_palm)
 	{
 		#use_item,name=maalus_the_blood_drinker
-		WindwalkerUseItemActions()
+		if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
 	}
 }
 
@@ -2371,6 +2360,7 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # invoke_xuen
 # jab
 # legacy_of_the_white_tiger
+# legendary_ring_agility
 # nimble_brew
 # paralysis
 # quaking_palm
@@ -2417,19 +2407,13 @@ Include(ovale_monk_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=windwalker)
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=windwalker)
+AddCheckBox(opt_legendary_ring_agility ItemName(legendary_ring_agility) default specialization=windwalker)
 AddCheckBox(opt_chi_burst SpellName(chi_burst) default specialization=windwalker)
 AddCheckBox(opt_storm_earth_and_fire SpellName(storm_earth_and_fire) specialization=windwalker)
 
 AddFunction WindwalkerUsePotionAgility
 {
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
-}
-
-AddFunction WindwalkerUseItemActions
-{
-	Item(HandSlot usable=1)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
 }
 
 AddFunction WindwalkerInterruptActions
@@ -2577,7 +2561,7 @@ AddFunction WindwalkerDefaultCdActions
 			#potion,name=draenic_agility,if=buff.serenity.up|(!talent.serenity.enabled&(trinket.proc.agility.react|trinket.proc.multistrike.react))|buff.bloodlust.react|target.time_to_die<=60
 			if BuffPresent(serenity_buff) or not Talent(serenity_talent) and { BuffPresent(trinket_proc_agility_buff) or BuffPresent(trinket_proc_multistrike_buff) } or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 WindwalkerUsePotionAgility()
 			#use_item,name=maalus_the_blood_drinker,if=buff.tigereye_brew_use.up|target.time_to_die<18
-			if BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 WindwalkerUseItemActions()
+			if { BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 } and CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
 			#blood_fury,if=buff.tigereye_brew_use.up|target.time_to_die<18
 			if BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 Spell(blood_fury_apsp)
 			#berserking,if=buff.tigereye_brew_use.up|target.time_to_die<18
@@ -2792,7 +2776,7 @@ AddFunction WindwalkerOpenerCdActions
 	unless BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and BuffPresent(serenity_buff) and BuffRemaining(serenity_buff) < 1.5 and Spell(fists_of_fury) or BuffRemaining(tiger_power_buff) < 2 and Spell(tiger_palm)
 	{
 		#use_item,name=maalus_the_blood_drinker
-		WindwalkerUseItemActions()
+		if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
 	}
 }
 
@@ -3003,6 +2987,7 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # invoke_xuen
 # jab
 # legacy_of_the_white_tiger
+# legendary_ring_agility
 # nimble_brew
 # paralysis
 # quaking_palm

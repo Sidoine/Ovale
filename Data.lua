@@ -332,6 +332,12 @@ function OvaleData:GetSpellInfo(spellId)
 	end
 end
 
+-- Returns the tag for the item and whether the item invokes the GCD.
+function OvaleData:GetItemTagInfo(spellId)
+	-- Assume all items are on a long cooldown and do not invoke the GCD.
+	return "cd", false
+end
+
 -- Returns the tag for the spell and whether the spell invokes the GCD.
 function OvaleData:GetSpellTagInfo(spellId)
 	local tag = "main"
