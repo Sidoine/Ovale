@@ -27,6 +27,12 @@ AddFunction BloodUsePotionArmor
 	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(draenic_armor_potion usable=1)
 }
 
+AddFunction BloodUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction BloodGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(plague_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
@@ -138,6 +144,8 @@ AddFunction BloodDefaultCdActions
 	Spell(berserking)
 	#arcane_torrent
 	Spell(arcane_torrent_runicpower)
+	#use_item,slot=trinket1
+	BloodUseItemActions()
 
 	unless not BuffPresent(conversion_buff) and RunicPower() > 50 and HealthPercent() < 90 and Spell(conversion)
 	{
@@ -455,6 +463,12 @@ AddFunction FrostDualWieldUsePotionStrength
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 }
 
+AddFunction FrostDualWieldUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction FrostDualWieldGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(plague_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
@@ -540,6 +554,8 @@ AddFunction FrostDualWieldDefaultCdActions
 	Spell(arcane_torrent_runicpower)
 	#use_item,slot=finger1
 	if CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength)
+	#use_item,slot=trinket1
+	FrostDualWieldUseItemActions()
 
 	unless target.DiseasesRemaining() < 1 and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Spell(soul_reaper_frost)
 	{
@@ -1035,6 +1051,12 @@ AddFunction FrostTwoHanderUsePotionStrength
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 }
 
+AddFunction FrostTwoHanderUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction FrostTwoHanderGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(plague_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
@@ -1120,6 +1142,8 @@ AddFunction FrostTwoHanderDefaultCdActions
 	Spell(arcane_torrent_runicpower)
 	#use_item,slot=finger1
 	if CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength)
+	#use_item,slot=trinket1
+	FrostTwoHanderUseItemActions()
 
 	unless target.DiseasesRemaining() < 1 and target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 } and Spell(plague_leech) or target.HealthPercent() - 3 * { target.HealthPercent() / target.TimeToDie() } <= 35 and Spell(soul_reaper_frost)
 	{
@@ -1615,6 +1639,12 @@ AddFunction UnholyUsePotionStrength
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 }
 
+AddFunction UnholyUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction UnholyGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(plague_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
@@ -1668,6 +1698,8 @@ AddFunction UnholyDefaultCdActions
 	if not Talent(breath_of_sindragosa_talent) Spell(arcane_torrent_runicpower)
 	#use_item,slot=finger1,if=!talent.breath_of_sindragosa.enabled
 	if not Talent(breath_of_sindragosa_talent) and CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength)
+	#use_item,slot=trinket1,if=!talent.breath_of_sindragosa.enabled
+	if not Talent(breath_of_sindragosa_talent) UnholyUseItemActions()
 	#potion,name=draenic_strength,if=(buff.dark_transformation.up&target.time_to_die<=60)&!talent.breath_of_sindragosa.enabled
 	if pet.BuffPresent(dark_transformation_buff) and target.TimeToDie() <= 60 and not Talent(breath_of_sindragosa_talent) UnholyUsePotionStrength()
 	#run_action_list,name=unholy
@@ -1729,6 +1761,8 @@ AddFunction UnholyBosCdActions
 	if BuffPresent(breath_of_sindragosa_buff) Spell(berserking)
 	#use_item,slot=finger1,if=dot.breath_of_sindragosa.ticking
 	if BuffPresent(breath_of_sindragosa_buff) and CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength)
+	#use_item,slot=trinket1,if=dot.breath_of_sindragosa.ticking
+	if BuffPresent(breath_of_sindragosa_buff) UnholyUseItemActions()
 	#potion,name=draenic_strength,if=dot.breath_of_sindragosa.ticking
 	if BuffPresent(breath_of_sindragosa_buff) UnholyUsePotionStrength()
 

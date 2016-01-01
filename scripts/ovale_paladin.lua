@@ -33,6 +33,12 @@ AddFunction ProtectionUsePotionArmor
 	if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(draenic_armor_potion usable=1)
 }
 
+AddFunction ProtectionUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction ProtectionGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
@@ -175,6 +181,8 @@ AddFunction ProtectionDefaultCdActions
 {
 	#rebuke
 	ProtectionInterruptActions()
+	#use_item,slot=trinket1
+	ProtectionUseItemActions()
 	#blood_fury
 	Spell(blood_fury_apsp)
 	#berserking
@@ -629,6 +637,12 @@ AddFunction RetributionUsePotionStrength
 	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 }
 
+AddFunction RetributionUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction RetributionGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
@@ -708,6 +722,8 @@ AddFunction RetributionDefaultCdActions
 	{
 		#use_item,name=thorasus_the_stone_heart_of_draenor,if=buff.avenging_wrath.up
 		if BuffPresent(avenging_wrath_melee_buff) and CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength)
+		#use_item,slot=trinket1,if=buff.avenging_wrath.up
+		if BuffPresent(avenging_wrath_melee_buff) RetributionUseItemActions()
 		#avenging_wrath,sync=seraphim,if=talent.seraphim.enabled
 		if Spell(seraphim) and Talent(seraphim_talent) Spell(avenging_wrath_melee)
 		#avenging_wrath,if=!talent.seraphim.enabled&set_bonus.tier18_4pc=0

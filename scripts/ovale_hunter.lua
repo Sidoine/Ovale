@@ -28,6 +28,12 @@ AddFunction BeastMasteryUsePotionAgility
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
+AddFunction BeastMasteryUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction BeastMasteryInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
@@ -129,6 +135,8 @@ AddFunction BeastMasteryDefaultCdActions
 	BeastMasteryInterruptActions()
 	#use_item,name=maalus_the_blood_drinker
 	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+	#use_item,slot=trinket1
+	BeastMasteryUseItemActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury
@@ -305,6 +313,12 @@ AddFunction MarksmanshipUsePotionAgility
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
+AddFunction MarksmanshipUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction MarksmanshipInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
@@ -391,6 +405,8 @@ AddFunction MarksmanshipDefaultCdActions
 	MarksmanshipInterruptActions()
 	#use_item,name=maalus_the_blood_drinker
 	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+	#use_item,slot=trinket1
+	MarksmanshipUseItemActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury
@@ -695,6 +711,8 @@ AddFunction SurvivalDefaultCdActions
 	#use_item,name=maalus_the_blood_drinker
 	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
 	#use_item,name=beating_heart_of_the_mountain
+	SurvivalUseItemActions()
+	#use_item,slot=trinket1
 	SurvivalUseItemActions()
 	#potion,name=draenic_agility,if=(((cooldown.stampede.remains<1)&(cooldown.a_murder_of_crows.remains<1))&(trinket.stat.any.up|buff.archmages_greater_incandescence_agi.up))|target.time_to_die<=25
 	if SpellCooldown(stampede) < 1 and SpellCooldown(a_murder_of_crows) < 1 and { BuffPresent(trinket_stat_any_buff) or BuffPresent(archmages_greater_incandescence_agi_buff) } or target.TimeToDie() <= 25 SurvivalUsePotionAgility()

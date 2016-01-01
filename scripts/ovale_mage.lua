@@ -30,6 +30,12 @@ AddFunction ArcaneUsePotionIntellect
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
+AddFunction ArcaneUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction ArcaneInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
@@ -362,6 +368,8 @@ AddFunction ArcaneCooldownsCdActions
 	if BuffPresent(arcane_power_buff) and { not Talent(prismatic_crystal_talent) or TotemPresent(prismatic_crystal) } ArcaneUsePotionIntellect()
 	#use_item,slot=finger2
 	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+	#use_item,slot=trinket1
+	ArcaneUseItemActions()
 }
 
 ### actions.crystal_sequence
@@ -651,6 +659,12 @@ AddFunction FireUsePotionIntellect
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
+AddFunction FireUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction FireInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
@@ -905,6 +919,8 @@ AddFunction FireCombustSequenceCdActions
 		Spell(arcane_torrent_mana)
 		#use_item,slot=finger2
 		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+		#use_item,slot=trinket1
+		FireUseItemActions()
 		#potion,name=draenic_intellect
 		FireUsePotionIntellect()
 	}
@@ -1270,6 +1286,12 @@ AddFunction FrostUsePotionIntellect
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
+AddFunction FrostUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction FrostInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
@@ -1427,6 +1449,8 @@ AddFunction FrostCooldownsCdActions
 	if BuffPresent(burst_haste_buff any=1) or BuffPresent(icy_veins_buff) FrostUsePotionIntellect()
 	#use_item,slot=finger2
 	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+	#use_item,slot=trinket1
+	FrostUseItemActions()
 }
 
 ### actions.crystal_sequence

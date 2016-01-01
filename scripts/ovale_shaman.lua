@@ -158,6 +158,12 @@ AddFunction ElementalUsePotionIntellect
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
+AddFunction ElementalUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction ElementalBloodlust
 {
 	if CheckBoxOn(opt_bloodlust) and DebuffExpires(burst_haste_debuff any=1)
@@ -209,6 +215,8 @@ AddFunction ElementalDefaultCdActions
 	if target.HealthPercent() < 25 or TimeInCombat() > 0.5 ElementalBloodlust()
 	#use_item,name=nithramus_the_allseer
 	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+	#use_item,slot=trinket1
+	ElementalUseItemActions()
 	#potion,name=draenic_intellect,if=buff.ascendance.up|target.time_to_die<=30
 	if BuffPresent(ascendance_caster_buff) or target.TimeToDie() <= 30 ElementalUsePotionIntellect()
 	#berserking,if=!buff.bloodlust.up&!buff.elemental_mastery.up&(set_bonus.tier15_4pc_caster=1|(buff.ascendance.cooldown_remains=0&(dot.flame_shock.remains>buff.ascendance.duration|level<87)))
@@ -461,6 +469,12 @@ AddFunction EnhancementUsePotionAgility
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
+AddFunction EnhancementUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction EnhancementBloodlust
 {
 	if CheckBoxOn(opt_bloodlust) and DebuffExpires(burst_haste_debuff any=1)
@@ -519,6 +533,8 @@ AddFunction EnhancementDefaultCdActions
 	if target.HealthPercent() < 25 or TimeInCombat() > 0.5 EnhancementBloodlust()
 	#use_item,name=maalus_the_blood_drinker
 	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+	#use_item,slot=trinket1
+	EnhancementUseItemActions()
 	#potion,name=draenic_agility,if=(talent.storm_elemental_totem.enabled&(pet.storm_elemental_totem.remains>=25|(cooldown.storm_elemental_totem.remains>target.time_to_die&pet.fire_elemental_totem.remains>=25)))|(!talent.storm_elemental_totem.enabled&pet.fire_elemental_totem.remains>=25)|target.time_to_die<=30
 	if Talent(storm_elemental_totem_talent) and { TotemRemaining(storm_elemental_totem) >= 25 or SpellCooldown(storm_elemental_totem) > target.TimeToDie() and TotemRemaining(fire_elemental_totem) >= 25 } or not Talent(storm_elemental_totem_talent) and TotemRemaining(fire_elemental_totem) >= 25 or target.TimeToDie() <= 30 EnhancementUsePotionAgility()
 	#blood_fury

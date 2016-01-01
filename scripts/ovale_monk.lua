@@ -1789,6 +1789,12 @@ AddFunction WindwalkerUsePotionAgility
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
+AddFunction WindwalkerUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction WindwalkerInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
@@ -1935,6 +1941,8 @@ AddFunction WindwalkerDefaultCdActions
 			if BuffPresent(serenity_buff) or not Talent(serenity_talent) and { BuffPresent(trinket_proc_agility_buff) or BuffPresent(trinket_proc_multistrike_buff) } or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 WindwalkerUsePotionAgility()
 			#use_item,name=maalus_the_blood_drinker,if=buff.tigereye_brew_use.up|target.time_to_die<18
 			if { BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 } and CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+			#use_item,slot=trinket1,if=buff.tigereye_brew_use.up|target.time_to_die<18
+			if BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 WindwalkerUseItemActions()
 			#blood_fury,if=buff.tigereye_brew_use.up|target.time_to_die<18
 			if BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 Spell(blood_fury_apsp)
 			#berserking,if=buff.tigereye_brew_use.up|target.time_to_die<18
@@ -2150,6 +2158,8 @@ AddFunction WindwalkerOpenerCdActions
 	{
 		#use_item,name=maalus_the_blood_drinker
 		if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+		#use_item,slot=trinket1
+		WindwalkerUseItemActions()
 	}
 }
 
@@ -2416,6 +2426,12 @@ AddFunction WindwalkerUsePotionAgility
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
+AddFunction WindwalkerUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction WindwalkerInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
@@ -2562,6 +2578,8 @@ AddFunction WindwalkerDefaultCdActions
 			if BuffPresent(serenity_buff) or not Talent(serenity_talent) and { BuffPresent(trinket_proc_agility_buff) or BuffPresent(trinket_proc_multistrike_buff) } or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 WindwalkerUsePotionAgility()
 			#use_item,name=maalus_the_blood_drinker,if=buff.tigereye_brew_use.up|target.time_to_die<18
 			if { BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 } and CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+			#use_item,slot=trinket1,if=buff.tigereye_brew_use.up|target.time_to_die<18
+			if BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 WindwalkerUseItemActions()
 			#blood_fury,if=buff.tigereye_brew_use.up|target.time_to_die<18
 			if BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 Spell(blood_fury_apsp)
 			#berserking,if=buff.tigereye_brew_use.up|target.time_to_die<18
@@ -2777,6 +2795,8 @@ AddFunction WindwalkerOpenerCdActions
 	{
 		#use_item,name=maalus_the_blood_drinker
 		if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+		#use_item,slot=trinket1
+		WindwalkerUseItemActions()
 	}
 }
 

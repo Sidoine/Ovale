@@ -28,6 +28,12 @@ AddFunction ShadowUsePotionIntellect
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
+AddFunction ShadowUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction ShadowInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
@@ -77,6 +83,8 @@ AddFunction ShadowDefaultCdActions
 		ShadowInterruptActions()
 		#use_item,slot=finger1
 		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+		#use_item,slot=trinket1
+		ShadowUseItemActions()
 		#potion,name=draenic_intellect,if=buff.bloodlust.react|target.time_to_die<=40
 		if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 40 ShadowUsePotionIntellect()
 		#use_item,name=nithramus_the_allseer
@@ -1077,6 +1085,12 @@ AddFunction ShadowUsePotionIntellect
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
+AddFunction ShadowUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction ShadowInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
@@ -1126,6 +1140,8 @@ AddFunction ShadowDefaultCdActions
 		ShadowInterruptActions()
 		#use_item,slot=finger1
 		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+		#use_item,slot=trinket1
+		ShadowUseItemActions()
 		#potion,name=draenic_intellect,if=buff.bloodlust.react|target.time_to_die<=40
 		if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 40 ShadowUsePotionIntellect()
 		#use_item,name=nithramus_the_allseer
@@ -2126,6 +2142,12 @@ AddFunction ShadowUsePotionIntellect
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
+AddFunction ShadowUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction ShadowInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
@@ -2175,6 +2197,8 @@ AddFunction ShadowDefaultCdActions
 		ShadowInterruptActions()
 		#use_item,slot=finger1
 		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+		#use_item,slot=trinket1
+		ShadowUseItemActions()
 		#potion,name=draenic_intellect,if=buff.bloodlust.react|target.time_to_die<=40
 		if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 40 ShadowUsePotionIntellect()
 		#use_item,name=nithramus_the_allseer

@@ -1713,6 +1713,12 @@ AddFunction AssassinationUsePotionAgility
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
+AddFunction AssassinationUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction AssassinationGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(kick)
@@ -1786,6 +1792,8 @@ AddFunction AssassinationDefaultCdActions
 	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 60 and TimeInCombat() > 10 Spell(preparation)
 	#use_item,slot=finger1,if=spell_targets.fan_of_knives>1|(debuff.vendetta.up&spell_targets.fan_of_knives=1)
 	if { Enemies() > 1 or target.DebuffPresent(vendetta_debuff) and Enemies() == 1 } and CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+	#use_item,slot=trinket1,if=spell_targets.fan_of_knives>1|(debuff.vendetta.up&spell_targets.fan_of_knives=1)
+	if Enemies() > 1 or target.DebuffPresent(vendetta_debuff) and Enemies() == 1 AssassinationUseItemActions()
 	#blood_fury
 	Spell(blood_fury_ap)
 	#berserking
@@ -2038,6 +2046,12 @@ AddFunction CombatUsePotionAgility
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
+AddFunction CombatUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction CombatGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(kick)
@@ -2112,6 +2126,8 @@ AddFunction CombatDefaultCdActions
 	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 30 Spell(preparation)
 	#use_item,slot=finger1,if=buff.adrenaline_rush.up
 	if BuffPresent(adrenaline_rush_buff) and CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+	#use_item,slot=trinket1,if=buff.adrenaline_rush.up
+	if BuffPresent(adrenaline_rush_buff) CombatUseItemActions()
 	#blood_fury
 	Spell(blood_fury_ap)
 	#berserking
@@ -2354,6 +2370,12 @@ AddFunction SubtletyUsePotionAgility
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
+AddFunction SubtletyUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction SubtletyGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(kick)
@@ -2502,6 +2524,8 @@ AddFunction SubtletyDefaultCdActions
 	if BuffPresent(shadow_dance_buff) or TimeInCombat() < 2 Spell(shadow_reflection)
 	#use_item,slot=finger1,if=buff.shadow_dance.up
 	if BuffPresent(shadow_dance_buff) and CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+	#use_item,slot=trinket1,if=buff.shadow_dance.up
+	if BuffPresent(shadow_dance_buff) SubtletyUseItemActions()
 	#blood_fury,if=buff.shadow_dance.up
 	if BuffPresent(shadow_dance_buff) Spell(blood_fury_ap)
 	#berserking,if=buff.shadow_dance.up

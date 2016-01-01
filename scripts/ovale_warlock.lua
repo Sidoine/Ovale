@@ -27,6 +27,12 @@ AddFunction AfflictionUsePotionIntellect
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
+AddFunction AfflictionUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 ### actions.default
 
 AddFunction AfflictionDefaultMainActions
@@ -124,6 +130,8 @@ AddFunction AfflictionDefaultCdActions
 		Spell(arcane_torrent_mana)
 		#use_item,name=nithramus_the_allseer
 		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+		#use_item,slot=trinket1
+		AfflictionUseItemActions()
 
 		unless Talent(grimoire_of_service_talent) and { target.TimeToDie() > 120 or target.TimeToDie() <= 25 or BuffPresent(dark_soul_misery_buff) and target.HealthPercent() < 20 } and Spell(service_felhunter)
 		{
@@ -302,6 +310,12 @@ AddFunction DemonologyUsePotionIntellect
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
+AddFunction DemonologyUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 ### actions.default
 
 AddFunction DemonologyDefaultMainActions
@@ -404,6 +418,8 @@ AddFunction DemonologyDefaultCdActions
 	Spell(arcane_torrent_mana)
 	#use_item,name=nithramus_the_allseer
 	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+	#use_item,slot=trinket1
+	DemonologyUseItemActions()
 
 	unless TimeInCombat() < 7 and Talent(demonic_servitude_talent) and DemonologyOpenerCdPostConditions() or Talent(grimoire_of_service_talent) and { target.TimeToDie() > 120 or target.TimeToDie() <= 25 or BuffPresent(dark_soul_knowledge_buff) and target.HealthPercent() < 20 } and Spell(service_felguard)
 	{
@@ -792,6 +808,12 @@ AddFunction DestructionUsePotionIntellect
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
+AddFunction DestructionUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 ### actions.default
 
 AddFunction DestructionDefaultMainActions
@@ -834,6 +856,8 @@ AddFunction DestructionDefaultCdActions
 	Spell(arcane_torrent_mana)
 	#use_item,name=nithramus_the_allseer
 	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+	#use_item,slot=trinket1
+	DestructionUseItemActions()
 
 	unless Talent(grimoire_of_service_talent) and { target.TimeToDie() > 120 or target.TimeToDie() <= 25 or BuffPresent(dark_soul_instability_buff) and target.HealthPercent() < 20 } and Spell(service_felhunter)
 	{

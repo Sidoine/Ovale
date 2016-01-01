@@ -144,6 +144,12 @@ AddFunction BalanceUsePotionIntellect
 	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
 }
 
+AddFunction BalanceUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 ### actions.default
 
 AddFunction BalanceDefaultMainActions
@@ -172,6 +178,8 @@ AddFunction BalanceDefaultCdActions
 	if not SpellCooldown(celestial_alignment) > 0 and { EclipseEnergy() >= 0 or target.TimeToDie() <= 30 + GCD() } BalanceCooldownsCdActions()
 	#use_item,slot=finger1
 	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+	#use_item,slot=trinket1
+	BalanceUseItemActions()
 }
 
 ### actions.aoe
@@ -447,6 +455,12 @@ AddFunction FeralUsePotionAgility
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
 }
 
+AddFunction FeralUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction FeralGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and Stance(druid_bear_form) and not target.InRange(mangle) or { Stance(druid_cat_form) or Stance(druid_claws_of_shirvallah) } and not target.InRange(shred)
@@ -542,6 +556,8 @@ AddFunction FeralDefaultCdActions
 		if BuffPresent(tigers_fury_buff) and { BuffPresent(incarnation_king_of_the_jungle_buff) or not Talent(incarnation_king_of_the_jungle_talent) } Spell(berserk_cat)
 		#use_item,slot=finger1
 		if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+		#use_item,slot=trinket1,if=(prev.tigers_fury&(target.time_to_die>trinket.stat.any.cooldown|target.time_to_die<45))|prev.berserk|(buff.incarnation.up&time<10)
+		if PreviousSpell(tigers_fury) and { target.TimeToDie() > BuffCooldownDuration(trinket_stat_any_buff) or target.TimeToDie() < 45 } or PreviousSpell(berserk_cat) or BuffPresent(incarnation_king_of_the_jungle_buff) and TimeInCombat() < 10 FeralUseItemActions()
 		#potion,name=draenic_agility,if=(buff.berserk.remains>10&(target.time_to_die<180|(trinket.proc.all.react&target.health.pct<25)))|target.time_to_die<=40
 		if BuffRemaining(berserk_cat_buff) > 10 and { target.TimeToDie() < 180 or BuffPresent(trinket_proc_any_buff) and target.HealthPercent() < 25 } or target.TimeToDie() <= 40 FeralUsePotionAgility()
 		#blood_fury,sync=tigers_fury
@@ -784,6 +800,12 @@ AddCheckBox(opt_interrupt L(interrupt) default specialization=guardian)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=guardian)
 AddCheckBox(opt_legendary_ring_bonus_armor ItemName(legendary_ring_bonus_armor) default specialization=guardian)
 
+AddFunction GuardianUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
+
 AddFunction GuardianGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and Stance(druid_bear_form) and not target.InRange(mangle) or { Stance(druid_cat_form) or Stance(druid_claws_of_shirvallah) } and not target.InRange(shred)
@@ -858,6 +880,8 @@ AddFunction GuardianDefaultCdActions
 	Spell(arcane_torrent_energy)
 	#use_item,slot=finger1
 	if CheckBoxOn(opt_legendary_ring_bonus_armor) Item(legendary_ring_bonus_armor)
+	#use_item,slot=trinket1
+	GuardianUseItemActions()
 	#barkskin,if=buff.bristling_fur.down
 	if BuffExpires(bristling_fur_buff) Spell(barkskin)
 	#bristling_fur,if=buff.barkskin.down&buff.savage_defense.down
