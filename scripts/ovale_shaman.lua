@@ -214,7 +214,7 @@ AddFunction ElementalDefaultCdActions
 	#bloodlust,if=target.health.pct<25|time>0.500
 	if target.HealthPercent() < 25 or TimeInCombat() > 0.5 ElementalBloodlust()
 	#use_item,name=nithramus_the_allseer
-	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
 	#use_item,slot=trinket1
 	ElementalUseItemActions()
 	#potion,name=draenic_intellect,if=buff.ascendance.up|target.time_to_die<=30
@@ -532,7 +532,7 @@ AddFunction EnhancementDefaultCdActions
 	#bloodlust,if=target.health.pct<25|time>0.500
 	if target.HealthPercent() < 25 or TimeInCombat() > 0.5 EnhancementBloodlust()
 	#use_item,name=maalus_the_blood_drinker
-	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
 	#use_item,slot=trinket1
 	EnhancementUseItemActions()
 	#potion,name=draenic_agility,if=(talent.storm_elemental_totem.enabled&(pet.storm_elemental_totem.remains>=25|(cooldown.storm_elemental_totem.remains>target.time_to_die&pet.fire_elemental_totem.remains>=25)))|(!talent.storm_elemental_totem.enabled&pet.fire_elemental_totem.remains>=25)|target.time_to_die<=30

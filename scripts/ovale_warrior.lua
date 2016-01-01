@@ -106,7 +106,7 @@ AddFunction ArmsDefaultCdActions
 	unless 0 > 5 and ArmsMovementCdPostConditions()
 	{
 		#use_item,name=thorasus_the_stone_heart_of_draenor,if=(buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up))
-		if { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) } and CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength)
+		if { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) } and CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength usable=1)
 		#use_item,slot=trinket1,if=(buff.bloodbath.up|(!talent.bloodbath.enabled&debuff.colossus_smash.up))
 		if BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) and target.DebuffPresent(colossus_smash_debuff) ArmsUseItemActions()
 		#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<25
@@ -549,7 +549,7 @@ AddFunction FurySingleMindedFuryDefaultCdActions
 	unless 0 > 5 and FurySingleMindedFuryMovementCdPostConditions()
 	{
 		#use_item,name=thorasus_the_stone_heart_of_draenor,if=(spell_targets.whirlwind>1|!raid_event.adds.exists)&((talent.bladestorm.enabled&cooldown.bladestorm.remains=0)|buff.recklessness.up|target.time_to_die<25)
-		if { Enemies() > 1 or not False(raid_event_adds_exists) } and { Talent(bladestorm_talent) and not SpellCooldown(bladestorm) > 0 or BuffPresent(recklessness_buff) or target.TimeToDie() < 25 } and CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength)
+		if { Enemies() > 1 or not False(raid_event_adds_exists) } and { Talent(bladestorm_talent) and not SpellCooldown(bladestorm) > 0 or BuffPresent(recklessness_buff) or target.TimeToDie() < 25 } and CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength usable=1)
 		#use_item,slot=trinket1,if=(spell_targets.whirlwind>1|!raid_event.adds.exists)&((talent.bladestorm.enabled&cooldown.bladestorm.remains=0)|buff.recklessness.up|buff.avatar.up|buff.bloodbath.up|target.time_to_die<25)
 		if { Enemies() > 1 or not False(raid_event_adds_exists) } and { Talent(bladestorm_talent) and not SpellCooldown(bladestorm) > 0 or BuffPresent(recklessness_buff) or BuffPresent(avatar_buff) or BuffPresent(bloodbath_buff) or target.TimeToDie() < 25 } FurySingleMindedFuryUseItemActions()
 		#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=30
@@ -1190,7 +1190,7 @@ AddFunction FuryTitansGripDefaultCdActions
 	unless 0 > 5 and FuryTitansGripMovementCdPostConditions()
 	{
 		#use_item,name=thorasus_the_stone_heart_of_draenor,if=(spell_targets.whirlwind>1|!raid_event.adds.exists)&((talent.bladestorm.enabled&cooldown.bladestorm.remains=0)|buff.recklessness.up|target.time_to_die<25)
-		if { Enemies() > 1 or not False(raid_event_adds_exists) } and { Talent(bladestorm_talent) and not SpellCooldown(bladestorm) > 0 or BuffPresent(recklessness_buff) or target.TimeToDie() < 25 } and CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength)
+		if { Enemies() > 1 or not False(raid_event_adds_exists) } and { Talent(bladestorm_talent) and not SpellCooldown(bladestorm) > 0 or BuffPresent(recklessness_buff) or target.TimeToDie() < 25 } and CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength usable=1)
 		#use_item,slot=trinket1,if=(spell_targets.whirlwind>1|!raid_event.adds.exists)&((talent.bladestorm.enabled&cooldown.bladestorm.remains=0)|buff.recklessness.up|buff.avatar.up|buff.bloodbath.up|target.time_to_die<25)
 		if { Enemies() > 1 or not False(raid_event_adds_exists) } and { Talent(bladestorm_talent) and not SpellCooldown(bladestorm) > 0 or BuffPresent(recklessness_buff) or BuffPresent(avatar_buff) or BuffPresent(bloodbath_buff) or target.TimeToDie() < 25 } FuryTitansGripUseItemActions()
 		#potion,name=draenic_strength,if=(target.health.pct<20&buff.recklessness.up)|target.time_to_die<=30
@@ -1821,7 +1821,7 @@ AddFunction ProtectionGladiatorDefaultCdActions
 		#bloodbath
 		Spell(bloodbath)
 		#use_item,name=thorasus_the_stone_heart_of_draenor,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up|target.time_to_die<15
-		if { BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) or BuffPresent(shield_charge_buff) or target.TimeToDie() < 15 } and CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength)
+		if { BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) or BuffPresent(shield_charge_buff) or target.TimeToDie() < 15 } and CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength usable=1)
 		#use_item,slot=trinket1,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up|target.time_to_die<15
 		if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) or BuffPresent(shield_charge_buff) or target.TimeToDie() < 15 ProtectionGladiatorUseItemActions()
 		#blood_fury,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up|target.time_to_die<10

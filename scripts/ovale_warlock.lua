@@ -129,7 +129,7 @@ AddFunction AfflictionDefaultCdActions
 		#arcane_torrent
 		Spell(arcane_torrent_mana)
 		#use_item,name=nithramus_the_allseer
-		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
 		#use_item,slot=trinket1
 		AfflictionUseItemActions()
 
@@ -417,7 +417,7 @@ AddFunction DemonologyDefaultCdActions
 	#arcane_torrent
 	Spell(arcane_torrent_mana)
 	#use_item,name=nithramus_the_allseer
-	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
 	#use_item,slot=trinket1
 	DemonologyUseItemActions()
 
@@ -855,7 +855,7 @@ AddFunction DestructionDefaultCdActions
 	#arcane_torrent
 	Spell(arcane_torrent_mana)
 	#use_item,name=nithramus_the_allseer
-	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
 	#use_item,slot=trinket1
 	DestructionUseItemActions()
 

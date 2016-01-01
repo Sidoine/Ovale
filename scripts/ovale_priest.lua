@@ -82,13 +82,13 @@ AddFunction ShadowDefaultCdActions
 		#silence
 		ShadowInterruptActions()
 		#use_item,slot=finger1
-		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
 		#use_item,slot=trinket1
 		ShadowUseItemActions()
 		#potion,name=draenic_intellect,if=buff.bloodlust.react|target.time_to_die<=40
 		if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 40 ShadowUsePotionIntellect()
 		#use_item,name=nithramus_the_allseer
-		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
 		#power_infusion,if=talent.power_infusion.enabled
 		if Talent(power_infusion_talent) Spell(power_infusion)
 		#silence,if=target.debuff.casting.react
@@ -1139,13 +1139,13 @@ AddFunction ShadowDefaultCdActions
 		#silence
 		ShadowInterruptActions()
 		#use_item,slot=finger1
-		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
 		#use_item,slot=trinket1
 		ShadowUseItemActions()
 		#potion,name=draenic_intellect,if=buff.bloodlust.react|target.time_to_die<=40
 		if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 40 ShadowUsePotionIntellect()
 		#use_item,name=nithramus_the_allseer
-		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
 		#power_infusion,if=talent.power_infusion.enabled
 		if Talent(power_infusion_talent) Spell(power_infusion)
 		#silence,if=target.debuff.casting.react
@@ -2196,13 +2196,13 @@ AddFunction ShadowDefaultCdActions
 		#silence
 		ShadowInterruptActions()
 		#use_item,slot=finger1
-		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
 		#use_item,slot=trinket1
 		ShadowUseItemActions()
 		#potion,name=draenic_intellect,if=buff.bloodlust.react|target.time_to_die<=40
 		if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 40 ShadowUsePotionIntellect()
 		#use_item,name=nithramus_the_allseer
-		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
 		#power_infusion,if=talent.power_infusion.enabled
 		if Talent(power_infusion_talent) Spell(power_infusion)
 		#silence,if=target.debuff.casting.react

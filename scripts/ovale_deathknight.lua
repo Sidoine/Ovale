@@ -553,7 +553,7 @@ AddFunction FrostDualWieldDefaultCdActions
 	#arcane_torrent
 	Spell(arcane_torrent_runicpower)
 	#use_item,slot=finger1
-	if CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength)
+	if CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength usable=1)
 	#use_item,slot=trinket1
 	FrostDualWieldUseItemActions()
 
@@ -1141,7 +1141,7 @@ AddFunction FrostTwoHanderDefaultCdActions
 	#arcane_torrent
 	Spell(arcane_torrent_runicpower)
 	#use_item,slot=finger1
-	if CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength)
+	if CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength usable=1)
 	#use_item,slot=trinket1
 	FrostTwoHanderUseItemActions()
 
@@ -1697,7 +1697,7 @@ AddFunction UnholyDefaultCdActions
 	#arcane_torrent,if=!talent.breath_of_sindragosa.enabled
 	if not Talent(breath_of_sindragosa_talent) Spell(arcane_torrent_runicpower)
 	#use_item,slot=finger1,if=!talent.breath_of_sindragosa.enabled
-	if not Talent(breath_of_sindragosa_talent) and CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength)
+	if not Talent(breath_of_sindragosa_talent) and CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength usable=1)
 	#use_item,slot=trinket1,if=!talent.breath_of_sindragosa.enabled
 	if not Talent(breath_of_sindragosa_talent) UnholyUseItemActions()
 	#potion,name=draenic_strength,if=(buff.dark_transformation.up&target.time_to_die<=60)&!talent.breath_of_sindragosa.enabled
@@ -1760,7 +1760,7 @@ AddFunction UnholyBosCdActions
 	#berserking,if=dot.breath_of_sindragosa.ticking
 	if BuffPresent(breath_of_sindragosa_buff) Spell(berserking)
 	#use_item,slot=finger1,if=dot.breath_of_sindragosa.ticking
-	if BuffPresent(breath_of_sindragosa_buff) and CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength)
+	if BuffPresent(breath_of_sindragosa_buff) and CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength usable=1)
 	#use_item,slot=trinket1,if=dot.breath_of_sindragosa.ticking
 	if BuffPresent(breath_of_sindragosa_buff) UnholyUseItemActions()
 	#potion,name=draenic_strength,if=dot.breath_of_sindragosa.ticking

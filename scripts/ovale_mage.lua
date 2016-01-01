@@ -367,7 +367,7 @@ AddFunction ArcaneCooldownsCdActions
 	#potion,name=draenic_intellect,if=buff.arcane_power.up&(!talent.prismatic_crystal.enabled|pet.prismatic_crystal.active)
 	if BuffPresent(arcane_power_buff) and { not Talent(prismatic_crystal_talent) or TotemPresent(prismatic_crystal) } ArcaneUsePotionIntellect()
 	#use_item,slot=finger2
-	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
 	#use_item,slot=trinket1
 	ArcaneUseItemActions()
 }
@@ -918,7 +918,7 @@ AddFunction FireCombustSequenceCdActions
 		#arcane_torrent
 		Spell(arcane_torrent_mana)
 		#use_item,slot=finger2
-		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
 		#use_item,slot=trinket1
 		FireUseItemActions()
 		#potion,name=draenic_intellect
@@ -1448,7 +1448,7 @@ AddFunction FrostCooldownsCdActions
 	#potion,name=draenic_intellect,if=buff.bloodlust.up|buff.icy_veins.up
 	if BuffPresent(burst_haste_buff any=1) or BuffPresent(icy_veins_buff) FrostUsePotionIntellect()
 	#use_item,slot=finger2
-	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
 	#use_item,slot=trinket1
 	FrostUseItemActions()
 }

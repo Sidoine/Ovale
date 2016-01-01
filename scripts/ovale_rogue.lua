@@ -372,7 +372,7 @@ AddFunction AssassinationReflectionRotationAntRefCdActions
 	#use_item,slot=trinket2
 	AssassinationUseItemActions()
 	#use_item,slot=finger1
-	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
 	#Arcane_Torrent,if=energy<90
 	if Energy() < 90 Spell(arcane_torrent_energy)
 	#blood_fury
@@ -590,7 +590,7 @@ AddFunction CombatDefaultCdActions
 	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>30
 	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 30 Spell(preparation)
 	#use_item,slot=finger1,if=buff.adrenaline_rush.up
-	if BuffPresent(adrenaline_rush_buff) and CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+	if BuffPresent(adrenaline_rush_buff) and CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
 	#use_item,slot=trinket2,if=buff.adrenaline_rush.up
 	if BuffPresent(adrenaline_rush_buff) CombatUseItemActions()
 	#blood_fury
@@ -1117,7 +1117,7 @@ AddFunction SubtletyDanceRotationAntRefCdActions
 	#use_item,slot=trinket2
 	SubtletyUseItemActions()
 	#use_item,slot=finger1
-	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
 	#Arcane_Torrent,if=energy<90
 	if Energy() < 90 Spell(arcane_torrent_energy)
 }
@@ -1187,7 +1187,7 @@ AddFunction SubtletyDanceRotationMfdRefCdActions
 	#use_item,slot=trinket2
 	SubtletyUseItemActions()
 	#use_item,slot=finger1
-	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
 	#Arcane_Torrent,if=energy<90
 	if Energy() < 90 Spell(arcane_torrent_energy)
 }
@@ -1791,7 +1791,7 @@ AddFunction AssassinationDefaultCdActions
 	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>60&time>10
 	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 60 and TimeInCombat() > 10 Spell(preparation)
 	#use_item,slot=finger1,if=spell_targets.fan_of_knives>1|(debuff.vendetta.up&spell_targets.fan_of_knives=1)
-	if { Enemies() > 1 or target.DebuffPresent(vendetta_debuff) and Enemies() == 1 } and CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+	if { Enemies() > 1 or target.DebuffPresent(vendetta_debuff) and Enemies() == 1 } and CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
 	#use_item,slot=trinket1,if=spell_targets.fan_of_knives>1|(debuff.vendetta.up&spell_targets.fan_of_knives=1)
 	if Enemies() > 1 or target.DebuffPresent(vendetta_debuff) and Enemies() == 1 AssassinationUseItemActions()
 	#blood_fury
@@ -2125,7 +2125,7 @@ AddFunction CombatDefaultCdActions
 	#preparation,if=!buff.vanish.up&cooldown.vanish.remains>30
 	if not BuffPresent(vanish_buff) and SpellCooldown(vanish) > 30 Spell(preparation)
 	#use_item,slot=finger1,if=buff.adrenaline_rush.up
-	if BuffPresent(adrenaline_rush_buff) and CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+	if BuffPresent(adrenaline_rush_buff) and CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
 	#use_item,slot=trinket1,if=buff.adrenaline_rush.up
 	if BuffPresent(adrenaline_rush_buff) CombatUseItemActions()
 	#blood_fury
@@ -2523,7 +2523,7 @@ AddFunction SubtletyDefaultCdActions
 	#shadow_reflection,if=buff.shadow_dance.up|time<2
 	if BuffPresent(shadow_dance_buff) or TimeInCombat() < 2 Spell(shadow_reflection)
 	#use_item,slot=finger1,if=buff.shadow_dance.up
-	if BuffPresent(shadow_dance_buff) and CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+	if BuffPresent(shadow_dance_buff) and CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
 	#use_item,slot=trinket1,if=buff.shadow_dance.up
 	if BuffPresent(shadow_dance_buff) SubtletyUseItemActions()
 	#blood_fury,if=buff.shadow_dance.up

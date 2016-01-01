@@ -177,7 +177,7 @@ AddFunction BalanceDefaultCdActions
 	#call_action_list,name=cooldowns,if=cooldown.celestial_alignment.up&(eclipse_energy>=0|target.time_to_die<=30+gcd)
 	if not SpellCooldown(celestial_alignment) > 0 and { EclipseEnergy() >= 0 or target.TimeToDie() <= 30 + GCD() } BalanceCooldownsCdActions()
 	#use_item,slot=finger1
-	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect)
+	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
 	#use_item,slot=trinket1
 	BalanceUseItemActions()
 }
@@ -555,7 +555,7 @@ AddFunction FeralDefaultCdActions
 		#berserk,if=buff.tigers_fury.up&(buff.incarnation.up|!talent.incarnation_king_of_the_jungle.enabled)
 		if BuffPresent(tigers_fury_buff) and { BuffPresent(incarnation_king_of_the_jungle_buff) or not Talent(incarnation_king_of_the_jungle_talent) } Spell(berserk_cat)
 		#use_item,slot=finger1
-		if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+		if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
 		#use_item,slot=trinket1,if=(prev.tigers_fury&(target.time_to_die>trinket.stat.any.cooldown|target.time_to_die<45))|prev.berserk|(buff.incarnation.up&time<10)
 		if PreviousSpell(tigers_fury) and { target.TimeToDie() > BuffCooldownDuration(trinket_stat_any_buff) or target.TimeToDie() < 45 } or PreviousSpell(berserk_cat) or BuffPresent(incarnation_king_of_the_jungle_buff) and TimeInCombat() < 10 FeralUseItemActions()
 		#potion,name=draenic_agility,if=(buff.berserk.remains>10&(target.time_to_die<180|(trinket.proc.all.react&target.health.pct<25)))|target.time_to_die<=40
@@ -879,7 +879,7 @@ AddFunction GuardianDefaultCdActions
 	#arcane_torrent
 	Spell(arcane_torrent_energy)
 	#use_item,slot=finger1
-	if CheckBoxOn(opt_legendary_ring_bonus_armor) Item(legendary_ring_bonus_armor)
+	if CheckBoxOn(opt_legendary_ring_bonus_armor) Item(legendary_ring_bonus_armor usable=1)
 	#use_item,slot=trinket1
 	GuardianUseItemActions()
 	#barkskin,if=buff.bristling_fur.down

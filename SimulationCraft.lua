@@ -1980,13 +1980,13 @@ EmitAction = function(parseNode, nodeList, annotation)
 					legendaryRing = name
 				elseif false then
 					-- Use named item and require the symbol name.
-					bodyCode = format("Item(%s)", name)
+					bodyCode = format("Item(%s usable=1)", name)
 					AddSymbol(annotation, name)
 				end
 			end
 			if legendaryRing then
 				conditionCode = format("CheckBoxOn(opt_%s)", legendaryRing)
-				bodyCode = format("Item(%s)", legendaryRing)
+				bodyCode = format("Item(%s usable=1)", legendaryRing)
 				AddSymbol(annotation, legendaryRing)
 				annotation.use_legendary_ring = legendaryRing
 			else

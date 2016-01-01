@@ -134,7 +134,7 @@ AddFunction BeastMasteryDefaultCdActions
 	#counter_shot
 	BeastMasteryInterruptActions()
 	#use_item,name=maalus_the_blood_drinker
-	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
 	#use_item,slot=trinket1
 	BeastMasteryUseItemActions()
 	#arcane_torrent,if=focus.deficit>=30
@@ -404,7 +404,7 @@ AddFunction MarksmanshipDefaultCdActions
 	#counter_shot
 	MarksmanshipInterruptActions()
 	#use_item,name=maalus_the_blood_drinker
-	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
 	#use_item,slot=trinket1
 	MarksmanshipUseItemActions()
 	#arcane_torrent,if=focus.deficit>=30
@@ -709,7 +709,7 @@ AddFunction SurvivalDefaultCdActions
 	#berserking
 	Spell(berserking)
 	#use_item,name=maalus_the_blood_drinker
-	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
 	#use_item,name=beating_heart_of_the_mountain
 	SurvivalUseItemActions()
 	#use_item,slot=trinket1

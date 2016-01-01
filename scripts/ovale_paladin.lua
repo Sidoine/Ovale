@@ -721,7 +721,7 @@ AddFunction RetributionDefaultCdActions
 	unless Talent(empowered_seals_talent) and TimeInCombat() < 2 and Spell(judgment) or HasEquippedItem(empty_drinking_horn) and Enemies() < 2 and not Talent(empowered_seals_talent) and Spell(seal_of_truth) or HasEquippedItem(empty_drinking_horn) and Enemies() >= 2 and not Talent(empowered_seals_talent) and Spell(seal_of_righteousness) or Enemies() < 3 and not Talent(empowered_seals_talent) and not HasEquippedItem(empty_drinking_horn) and Spell(seal_of_truth) or Enemies() >= 3 and not Talent(empowered_seals_talent) and not HasEquippedItem(empty_drinking_horn) and Spell(seal_of_righteousness) or not Talent(seraphim_talent) and Spell(execution_sentence) or Spell(seraphim) and Talent(seraphim_talent) and Spell(execution_sentence) or not Talent(seraphim_talent) and Spell(lights_hammer) or Spell(seraphim) and Talent(seraphim_talent) and Spell(lights_hammer)
 	{
 		#use_item,name=thorasus_the_stone_heart_of_draenor,if=buff.avenging_wrath.up
-		if BuffPresent(avenging_wrath_melee_buff) and CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength)
+		if BuffPresent(avenging_wrath_melee_buff) and CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength usable=1)
 		#use_item,slot=trinket1,if=buff.avenging_wrath.up
 		if BuffPresent(avenging_wrath_melee_buff) RetributionUseItemActions()
 		#avenging_wrath,sync=seraphim,if=talent.seraphim.enabled

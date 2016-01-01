@@ -1940,7 +1940,7 @@ AddFunction WindwalkerDefaultCdActions
 			#potion,name=draenic_agility,if=buff.serenity.up|(!talent.serenity.enabled&(trinket.proc.agility.react|trinket.proc.multistrike.react))|buff.bloodlust.react|target.time_to_die<=60
 			if BuffPresent(serenity_buff) or not Talent(serenity_talent) and { BuffPresent(trinket_proc_agility_buff) or BuffPresent(trinket_proc_multistrike_buff) } or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 WindwalkerUsePotionAgility()
 			#use_item,name=maalus_the_blood_drinker,if=buff.tigereye_brew_use.up|target.time_to_die<18
-			if { BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 } and CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+			if { BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 } and CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
 			#use_item,slot=trinket1,if=buff.tigereye_brew_use.up|target.time_to_die<18
 			if BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 WindwalkerUseItemActions()
 			#blood_fury,if=buff.tigereye_brew_use.up|target.time_to_die<18
@@ -2157,7 +2157,7 @@ AddFunction WindwalkerOpenerCdActions
 	unless BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and BuffPresent(serenity_buff) and BuffRemaining(serenity_buff) < 1.5 and Spell(fists_of_fury) or BuffRemaining(tiger_power_buff) < 2 and Spell(tiger_palm)
 	{
 		#use_item,name=maalus_the_blood_drinker
-		if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+		if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
 		#use_item,slot=trinket1
 		WindwalkerUseItemActions()
 	}
@@ -2577,7 +2577,7 @@ AddFunction WindwalkerDefaultCdActions
 			#potion,name=draenic_agility,if=buff.serenity.up|(!talent.serenity.enabled&(trinket.proc.agility.react|trinket.proc.multistrike.react))|buff.bloodlust.react|target.time_to_die<=60
 			if BuffPresent(serenity_buff) or not Talent(serenity_talent) and { BuffPresent(trinket_proc_agility_buff) or BuffPresent(trinket_proc_multistrike_buff) } or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 WindwalkerUsePotionAgility()
 			#use_item,name=maalus_the_blood_drinker,if=buff.tigereye_brew_use.up|target.time_to_die<18
-			if { BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 } and CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+			if { BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 } and CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
 			#use_item,slot=trinket1,if=buff.tigereye_brew_use.up|target.time_to_die<18
 			if BuffPresent(tigereye_brew_use_buff) or target.TimeToDie() < 18 WindwalkerUseItemActions()
 			#blood_fury,if=buff.tigereye_brew_use.up|target.time_to_die<18
@@ -2794,7 +2794,7 @@ AddFunction WindwalkerOpenerCdActions
 	unless BuffRemaining(tiger_power_buff) > CastTime(fists_of_fury) and target.DebuffRemaining(rising_sun_kick_debuff) > CastTime(fists_of_fury) and BuffPresent(serenity_buff) and BuffRemaining(serenity_buff) < 1.5 and Spell(fists_of_fury) or BuffRemaining(tiger_power_buff) < 2 and Spell(tiger_palm)
 	{
 		#use_item,name=maalus_the_blood_drinker
-		if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility)
+		if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
 		#use_item,slot=trinket1
 		WindwalkerUseItemActions()
 	}
