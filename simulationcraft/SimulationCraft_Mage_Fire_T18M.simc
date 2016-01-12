@@ -75,7 +75,6 @@ actions.combust_sequence+=/blood_fury
 actions.combust_sequence+=/berserking
 actions.combust_sequence+=/arcane_torrent
 actions.combust_sequence+=/use_item,slot=finger2
-actions.combust_sequence+=/use_item,slot=trinket1
 actions.combust_sequence+=/potion,name=draenic_intellect
 actions.combust_sequence+=/meteor,if=active_enemies<=2
 actions.combust_sequence+=/pyroblast,if=set_bonus.tier17_4pc&buff.pyromaniac.up

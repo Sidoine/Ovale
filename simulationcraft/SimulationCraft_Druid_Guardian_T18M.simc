@@ -33,7 +33,6 @@ actions+=/blood_fury
 actions+=/berserking
 actions+=/arcane_torrent
 actions+=/use_item,slot=finger1
-actions+=/use_item,slot=trinket1
 actions+=/barkskin,if=buff.bristling_fur.down
 actions+=/bristling_fur,if=buff.barkskin.down&buff.savage_defense.down
 actions+=/maul,if=buff.tooth_and_claw.react&incoming_damage_1s
