@@ -35,7 +35,6 @@ actions+=/blood_fury
 actions+=/arcane_torrent
 actions+=/mannoroths_fury
 actions+=/use_item,name=nithramus_the_allseer
-actions+=/use_item,slot=trinket1
 actions+=/felguard:felstorm
 actions+=/wrathguard:wrathstorm
 actions+=/wrathguard:mortal_cleave,if=pet.wrathguard.cooldown.wrathstorm.remains>5

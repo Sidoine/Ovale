@@ -32,7 +32,6 @@ actions.precombat+=/focusing_shot
 actions=auto_shot
 actions+=/counter_shot
 actions+=/use_item,name=maalus_the_blood_drinker
-actions+=/use_item,slot=trinket1
 actions+=/arcane_torrent,if=focus.deficit>=30
 actions+=/blood_fury
 actions+=/berserking

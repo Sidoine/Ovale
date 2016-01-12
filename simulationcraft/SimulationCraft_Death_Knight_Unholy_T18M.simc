@@ -37,7 +37,6 @@ actions+=/blood_fury,if=!talent.breath_of_sindragosa.enabled
 actions+=/berserking,if=!talent.breath_of_sindragosa.enabled
 actions+=/arcane_torrent,if=!talent.breath_of_sindragosa.enabled
 actions+=/use_item,slot=finger1,if=!talent.breath_of_sindragosa.enabled
-actions+=/use_item,slot=trinket1,if=!talent.breath_of_sindragosa.enabled
 actions+=/potion,name=draenic_strength,if=(buff.dark_transformation.up&target.time_to_die<=60)&!talent.breath_of_sindragosa.enabled
 actions+=/run_action_list,name=unholy
 
@@ -78,7 +77,6 @@ actions.unholy+=/empower_rune_weapon,if=!talent.breath_of_sindragosa.enabled
 actions.bos=blood_fury,if=dot.breath_of_sindragosa.ticking
 actions.bos+=/berserking,if=dot.breath_of_sindragosa.ticking
 actions.bos+=/use_item,slot=finger1,if=dot.breath_of_sindragosa.ticking
-actions.bos+=/use_item,slot=trinket1,if=dot.breath_of_sindragosa.ticking
 actions.bos+=/potion,name=draenic_strength,if=dot.breath_of_sindragosa.ticking
 actions.bos+=/unholy_blight,if=!disease.ticking
 actions.bos+=/plague_strike,if=!disease.ticking

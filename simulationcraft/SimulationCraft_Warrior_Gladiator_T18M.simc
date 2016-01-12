@@ -37,7 +37,6 @@ actions+=/run_action_list,name=movement,if=movement.distance>5
 actions+=/avatar
 actions+=/bloodbath
 actions+=/use_item,name=thorasus_the_stone_heart_of_draenor,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up|target.time_to_die<15
-actions+=/use_item,slot=trinket1,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up|target.time_to_die<15
 actions+=/blood_fury,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up|target.time_to_die<10
 actions+=/berserking,if=buff.bloodbath.up|buff.avatar.up|buff.shield_charge.up|target.time_to_die<10
 actions+=/arcane_torrent,if=rage<rage.max-40

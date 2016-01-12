@@ -72,7 +72,6 @@ actions.cooldowns+=/berserking
 actions.cooldowns+=/arcane_torrent
 actions.cooldowns+=/potion,name=draenic_intellect,if=buff.arcane_power.up&(!talent.prismatic_crystal.enabled|pet.prismatic_crystal.active)
 actions.cooldowns+=/use_item,slot=finger2
-actions.cooldowns+=/use_item,slot=trinket1
 
 # AoE sequence
 actions.aoe=call_action_list,name=cooldowns
