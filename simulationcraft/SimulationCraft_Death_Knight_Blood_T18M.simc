@@ -102,6 +102,7 @@ actions.last+=/plague_leech
 
 actions.nbos=use_item,name=sanctus_sigil_of_the_unbroken,if=runic_power>=60
 actions.nbos+=/use_item,name=vial_of_convulsive_shadows,if=runic_power>=60
+actions.nbos+=/use_item,slot=trinket1,if=runic_power>=60
 actions.nbos+=/blood_fury,if=runic_power>=60
 actions.nbos+=/berserking,if=runic_power>=60
 actions.nbos+=/breath_of_sindragosa,if=runic_power>=60

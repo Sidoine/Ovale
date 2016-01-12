@@ -74,6 +74,7 @@ actions.cooldowns+=/berserking
 actions.cooldowns+=/arcane_torrent
 actions.cooldowns+=/potion,name=draenic_intellect,if=buff.bloodlust.up|buff.icy_veins.up
 actions.cooldowns+=/use_item,slot=finger2
+actions.cooldowns+=/use_item,slot=trinket1
 
 # Water Jet initialization
 actions.init_water_jet=frost_bomb,if=remains<4*spell_haste*(1+set_bonus.tier18_4pc)+cast_time

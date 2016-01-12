@@ -34,6 +34,7 @@ actions=charge
 actions+=/auto_attack
 actions+=/pummel
 actions+=/use_item,name=tablet_of_turnbuckle_teamwork,if=active_enemies=1&(buff.bloodbath.up|!talent.bloodbath.enabled)|(active_enemies>=2&buff.ravager_protection.up)
+actions+=/use_item,slot=trinket1,if=active_enemies=1&(buff.bloodbath.up|!talent.bloodbath.enabled)|(active_enemies>=2&buff.ravager_protection.up)
 actions+=/blood_fury,if=buff.bloodbath.up|buff.avatar.up
 actions+=/berserking,if=buff.bloodbath.up|buff.avatar.up
 actions+=/arcane_torrent,if=buff.bloodbath.up|buff.avatar.up
