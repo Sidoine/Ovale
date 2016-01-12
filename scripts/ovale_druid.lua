@@ -332,16 +332,18 @@ AddFunction BalanceSingleTargetMainActions
 	if BuffExpires(lunar_empowerment_buff) and EclipseEnergy() > 40 Spell(starsurge)
 	#starsurge,if=buff.solar_empowerment.down&eclipse_energy<-40
 	if BuffExpires(solar_empowerment_buff) and EclipseEnergy() < -40 Spell(starsurge)
-	#sunfire,if=(remains<solar_max&eclipse_dir.solar)|(buff.solar_peak.up&buff.solar_peak.remains<action.wrath.cast_time&!talent.balance_of_power.enabled)
-	if target.DebuffRemaining(sunfire_debuff) < TimeToEclipse(solar) and EclipseDir() > 0 or BuffPresent(solar_peak_buff) and BuffRemaining(solar_peak_buff) < CastTime(wrath) and not Talent(balance_of_power_talent) Spell(sunfire)
+	#sunfire,if=!talent.balance_of_power.enabled&((remains<solar_max&eclipse_dir.solar)|(buff.solar_peak.up&buff.solar_peak.remains<action.wrath.cast_time))
+	if not Talent(balance_of_power_talent) and { target.DebuffRemaining(sunfire_debuff) < TimeToEclipse(solar) and EclipseDir() > 0 or BuffPresent(solar_peak_buff) and BuffRemaining(solar_peak_buff) < CastTime(wrath) } Spell(sunfire)
+	#sunfire,if=talent.balance_of_power.enabled&(remains<lunar_max+10|remains<action.wrath.cast_time)
+	if Talent(balance_of_power_talent) and { target.DebuffRemaining(sunfire_debuff) < TimeToEclipse(lunar) + 10 or target.DebuffRemaining(sunfire_debuff) < CastTime(wrath) } Spell(sunfire)
 	#stellar_flare,if=remains<7
 	if target.DebuffRemaining(stellar_flare_debuff) < 7 Spell(stellar_flare)
-	#moonfire,if=!talent.euphoria.enabled&(remains<lunar_max&eclipse_dir.lunar)|(buff.lunar_peak.up&buff.lunar_peak.remains<action.starfire.cast_time&remains<eclipse_change+20)&!talent.balance_of_power.enabled
-	if not Talent(euphoria_talent) and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse(lunar) and EclipseDir() < 0 or BuffPresent(lunar_peak_buff) and BuffRemaining(lunar_peak_buff) < CastTime(starfire) and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 and not Talent(balance_of_power_talent) Spell(moonfire)
-	#moonfire,if=talent.euphoria.enabled&(remains<lunar_max&eclipse_dir.lunar)|(buff.lunar_peak.up&buff.lunar_peak.remains<action.starfire.cast_time&remains<eclipse_change+10)&!talent.balance_of_power.enabled
-	if Talent(euphoria_talent) and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse(lunar) and EclipseDir() < 0 or BuffPresent(lunar_peak_buff) and BuffRemaining(lunar_peak_buff) < CastTime(starfire) and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 10 and not Talent(balance_of_power_talent) Spell(moonfire)
-	#moonfire,if=talent.balance_of_power.enabled&remains<eclipse_change+14
-	if Talent(balance_of_power_talent) and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 14 Spell(moonfire)
+	#moonfire,if=!talent.euphoria.enabled&!talent.balance_of_power.enabled&((remains<lunar_max&eclipse_dir.lunar)|(buff.lunar_peak.up&buff.lunar_peak.remains<action.starfire.cast_time&remains<eclipse_change+20))
+	if not Talent(euphoria_talent) and not Talent(balance_of_power_talent) and { target.DebuffRemaining(moonfire_debuff) < TimeToEclipse(lunar) and EclipseDir() < 0 or BuffPresent(lunar_peak_buff) and BuffRemaining(lunar_peak_buff) < CastTime(starfire) and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 20 } Spell(moonfire)
+	#moonfire,if=talent.euphoria.enabled&((remains<lunar_max&eclipse_dir.lunar)|(buff.lunar_peak.up&buff.lunar_peak.remains<action.starfire.cast_time&remains<eclipse_change+10))
+	if Talent(euphoria_talent) and { target.DebuffRemaining(moonfire_debuff) < TimeToEclipse(lunar) and EclipseDir() < 0 or BuffPresent(lunar_peak_buff) and BuffRemaining(lunar_peak_buff) < CastTime(starfire) and target.DebuffRemaining(moonfire_debuff) < TimeToEclipse() + 10 } Spell(moonfire)
+	#moonfire,if=talent.balance_of_power.enabled&(remains<solar_max+10|remains<action.starfire.cast_time)
+	if Talent(balance_of_power_talent) and { target.DebuffRemaining(moonfire_debuff) < TimeToEclipse(solar) + 10 or target.DebuffRemaining(moonfire_debuff) < CastTime(starfire) } Spell(moonfire)
 	#wrath,if=(eclipse_energy<0&eclipse_change>action.starfire.cast_time)|(eclipse_energy>0&cast_time>eclipse_change)
 	if EclipseEnergy() < 0 and TimeToEclipse() > CastTime(starfire) or EclipseEnergy() > 0 and CastTime(wrath) > TimeToEclipse() Spell(wrath)
 	#starfire
@@ -550,8 +552,8 @@ AddFunction FeralDefaultCdActions
 {
 	unless Spell(cat_form) or 0 > 10 and Spell(displacer_beast) or 0 and BuffExpires(displacer_beast_buff) and True(wild_charge_movement_down) and Spell(dash) or { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake)
 	{
-		#skull_bash
-		FeralInterruptActions()
+		#skull_bash,if=target.debuff.casting.react
+		if target.IsInterruptible() FeralInterruptActions()
 		#berserk,if=buff.tigers_fury.up&(buff.incarnation.up|!talent.incarnation_king_of_the_jungle.enabled)
 		if BuffPresent(tigers_fury_buff) and { BuffPresent(incarnation_king_of_the_jungle_buff) or not Talent(incarnation_king_of_the_jungle_talent) } Spell(berserk_cat)
 		#use_item,slot=finger1
@@ -870,8 +872,8 @@ AddFunction GuardianDefaultShortCdActions
 
 AddFunction GuardianDefaultCdActions
 {
-	#skull_bash
-	GuardianInterruptActions()
+	#skull_bash,if=target.debuff.casting.react
+	if target.IsInterruptible() GuardianInterruptActions()
 	#blood_fury
 	Spell(blood_fury_apsp)
 	#berserking

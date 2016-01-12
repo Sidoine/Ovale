@@ -131,8 +131,8 @@ AddFunction BeastMasteryDefaultShortCdActions
 AddFunction BeastMasteryDefaultCdActions
 {
 	#auto_shot
-	#counter_shot
-	BeastMasteryInterruptActions()
+	#counter_shot,if=target.debuff.casting.react
+	if target.IsInterruptible() BeastMasteryInterruptActions()
 	#use_item,name=maalus_the_blood_drinker
 	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
 	#use_item,slot=trinket1
@@ -401,8 +401,8 @@ AddFunction MarksmanshipDefaultShortCdActions
 AddFunction MarksmanshipDefaultCdActions
 {
 	#auto_shot
-	#counter_shot
-	MarksmanshipInterruptActions()
+	#counter_shot,if=target.debuff.casting.react
+	if target.IsInterruptible() MarksmanshipInterruptActions()
 	#use_item,name=maalus_the_blood_drinker
 	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
 	#use_item,slot=trinket1
@@ -700,8 +700,8 @@ AddFunction SurvivalDefaultShortCdActions
 AddFunction SurvivalDefaultCdActions
 {
 	#auto_shot
-	#counter_shot
-	SurvivalInterruptActions()
+	#counter_shot,if=target.debuff.casting.react
+	if target.IsInterruptible() SurvivalInterruptActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury

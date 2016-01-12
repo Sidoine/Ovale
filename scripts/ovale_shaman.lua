@@ -209,8 +209,8 @@ AddFunction ElementalDefaultShortCdActions
 
 AddFunction ElementalDefaultCdActions
 {
-	#wind_shear
-	ElementalInterruptActions()
+	#wind_shear,if=target.debuff.casting.react
+	if target.IsInterruptible() ElementalInterruptActions()
 	#bloodlust,if=target.health.pct<25|time>0.500
 	if target.HealthPercent() < 25 or TimeInCombat() > 0.5 ElementalBloodlust()
 	#use_item,name=nithramus_the_allseer
@@ -527,8 +527,8 @@ AddFunction EnhancementDefaultShortCdActions
 
 AddFunction EnhancementDefaultCdActions
 {
-	#wind_shear
-	EnhancementInterruptActions()
+	#wind_shear,if=target.debuff.casting.react
+	if target.IsInterruptible() EnhancementInterruptActions()
 	#bloodlust,if=target.health.pct<25|time>0.500
 	if target.HealthPercent() < 25 or TimeInCombat() > 0.5 EnhancementBloodlust()
 	#use_item,name=maalus_the_blood_drinker

@@ -96,8 +96,8 @@ AddFunction BrewmasterDefaultCdActions
 {
 	unless target.Health() < Health() and Spell(touch_of_death)
 	{
-		#spear_hand_strike
-		BrewmasterInterruptActions()
+		#spear_hand_strike,if=target.debuff.casting.react
+		if target.IsInterruptible() BrewmasterInterruptActions()
 		#nimble_brew
 		if IsFeared() or IsRooted() or IsStunned() Spell(nimble_brew)
 		#blood_fury,if=energy<=40
@@ -114,6 +114,8 @@ AddFunction BrewmasterDefaultCdActions
 		#fortifying_brew,if=incoming_damage_1500ms&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.elusive_brew_activated.down
 		if IncomingDamage(1.5) > 0 and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(elusive_brew_activated_buff) Spell(fortifying_brew)
 		#use_item,name=tablet_of_turnbuckle_teamwork,if=incoming_damage_1500ms&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.fortifying_brew.down&buff.elusive_brew_activated.down
+		if IncomingDamage(1.5) > 0 and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(fortifying_brew_buff) and BuffExpires(elusive_brew_activated_buff) BrewmasterUseItemActions()
+		#use_item,slot=trinket1,if=incoming_damage_1500ms&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.fortifying_brew.down&buff.elusive_brew_activated.down
 		if IncomingDamage(1.5) > 0 and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(fortifying_brew_buff) and BuffExpires(elusive_brew_activated_buff) BrewmasterUseItemActions()
 		#invoke_xuen,if=talent.invoke_xuen.enabled&target.time_to_die>15&buff.shuffle.remains>=3&buff.serenity.down
 		if Talent(invoke_xuen_talent) and target.TimeToDie() > 15 and BuffRemaining(shuffle_buff) >= 3 and BuffExpires(serenity_buff) Spell(invoke_xuen)
@@ -471,8 +473,8 @@ AddFunction BrewmasterDefaultCdActions
 {
 	unless target.Health() < Health() and Spell(touch_of_death)
 	{
-		#spear_hand_strike
-		BrewmasterInterruptActions()
+		#spear_hand_strike,if=target.debuff.casting.react
+		if target.IsInterruptible() BrewmasterInterruptActions()
 		#nimble_brew
 		if IsFeared() or IsRooted() or IsStunned() Spell(nimble_brew)
 		#blood_fury,if=energy<=40
@@ -489,6 +491,8 @@ AddFunction BrewmasterDefaultCdActions
 		#fortifying_brew,if=incoming_damage_1500ms&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.elusive_brew_activated.down
 		if IncomingDamage(1.5) > 0 and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(elusive_brew_activated_buff) Spell(fortifying_brew)
 		#use_item,name=tablet_of_turnbuckle_teamwork,if=incoming_damage_1500ms&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.fortifying_brew.down&buff.elusive_brew_activated.down
+		if IncomingDamage(1.5) > 0 and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(fortifying_brew_buff) and BuffExpires(elusive_brew_activated_buff) BrewmasterUseItemActions()
+		#use_item,slot=trinket1,if=incoming_damage_1500ms&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.fortifying_brew.down&buff.elusive_brew_activated.down
 		if IncomingDamage(1.5) > 0 and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(fortifying_brew_buff) and BuffExpires(elusive_brew_activated_buff) BrewmasterUseItemActions()
 		#invoke_xuen,if=talent.invoke_xuen.enabled&target.time_to_die>15&buff.shuffle.remains>=3&buff.serenity.down
 		if Talent(invoke_xuen_talent) and target.TimeToDie() > 15 and BuffRemaining(shuffle_buff) >= 3 and BuffExpires(serenity_buff) Spell(invoke_xuen)
@@ -846,8 +850,8 @@ AddFunction BrewmasterDefaultCdActions
 {
 	unless target.Health() < Health() and Spell(touch_of_death)
 	{
-		#spear_hand_strike
-		BrewmasterInterruptActions()
+		#spear_hand_strike,if=target.debuff.casting.react
+		if target.IsInterruptible() BrewmasterInterruptActions()
 		#nimble_brew
 		if IsFeared() or IsRooted() or IsStunned() Spell(nimble_brew)
 		#blood_fury,if=energy<=40
@@ -864,6 +868,8 @@ AddFunction BrewmasterDefaultCdActions
 		#fortifying_brew,if=incoming_damage_1500ms&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.elusive_brew_activated.down
 		if IncomingDamage(1.5) > 0 and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(elusive_brew_activated_buff) Spell(fortifying_brew)
 		#use_item,name=tablet_of_turnbuckle_teamwork,if=incoming_damage_1500ms&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.fortifying_brew.down&buff.elusive_brew_activated.down
+		if IncomingDamage(1.5) > 0 and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(fortifying_brew_buff) and BuffExpires(elusive_brew_activated_buff) BrewmasterUseItemActions()
+		#use_item,slot=trinket1,if=incoming_damage_1500ms&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.fortifying_brew.down&buff.elusive_brew_activated.down
 		if IncomingDamage(1.5) > 0 and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(fortifying_brew_buff) and BuffExpires(elusive_brew_activated_buff) BrewmasterUseItemActions()
 		#invoke_xuen,if=talent.invoke_xuen.enabled&target.time_to_die>15&buff.shuffle.remains>=3&buff.serenity.down
 		if Talent(invoke_xuen_talent) and target.TimeToDie() > 15 and BuffRemaining(shuffle_buff) >= 3 and BuffExpires(serenity_buff) Spell(invoke_xuen)
@@ -1221,8 +1227,8 @@ AddFunction BrewmasterDefaultCdActions
 {
 	unless target.Health() < Health() and Spell(touch_of_death)
 	{
-		#spear_hand_strike
-		BrewmasterInterruptActions()
+		#spear_hand_strike,if=target.debuff.casting.react
+		if target.IsInterruptible() BrewmasterInterruptActions()
 		#nimble_brew
 		if IsFeared() or IsRooted() or IsStunned() Spell(nimble_brew)
 		#blood_fury,if=energy<=40
@@ -1239,6 +1245,8 @@ AddFunction BrewmasterDefaultCdActions
 		#fortifying_brew,if=incoming_damage_1500ms&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.elusive_brew_activated.down
 		if IncomingDamage(1.5) > 0 and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(elusive_brew_activated_buff) Spell(fortifying_brew)
 		#use_item,name=tablet_of_turnbuckle_teamwork,if=incoming_damage_1500ms&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.fortifying_brew.down&buff.elusive_brew_activated.down
+		if IncomingDamage(1.5) > 0 and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(fortifying_brew_buff) and BuffExpires(elusive_brew_activated_buff) BrewmasterUseItemActions()
+		#use_item,slot=trinket1,if=incoming_damage_1500ms&(buff.dampen_harm.down|buff.diffuse_magic.down)&buff.fortifying_brew.down&buff.elusive_brew_activated.down
 		if IncomingDamage(1.5) > 0 and { BuffExpires(dampen_harm_buff) or BuffExpires(diffuse_magic_buff) } and BuffExpires(fortifying_brew_buff) and BuffExpires(elusive_brew_activated_buff) BrewmasterUseItemActions()
 		#invoke_xuen,if=talent.invoke_xuen.enabled&target.time_to_die>15&buff.shuffle.remains>=3&buff.serenity.down
 		if Talent(invoke_xuen_talent) and target.TimeToDie() > 15 and BuffRemaining(shuffle_buff) >= 3 and BuffExpires(serenity_buff) Spell(invoke_xuen)
@@ -1519,6 +1527,7 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_monk_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=mistweaver)
 AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=mistweaver)
 AddCheckBox(opt_chi_burst SpellName(chi_burst) default specialization=mistweaver)
 
@@ -1531,6 +1540,21 @@ AddFunction MistweaverUseItemActions
 {
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
+}
+
+AddFunction MistweaverInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(spear_hand_strike) Spell(spear_hand_strike)
+		if not target.Classification(worldboss)
+		{
+			if target.InRange(paralysis) Spell(paralysis)
+			Spell(arcane_torrent_chi)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
 }
 
 ### actions.default
@@ -1565,11 +1589,15 @@ AddFunction MistweaverDefaultShortCdActions
 AddFunction MistweaverDefaultCdActions
 {
 	#auto_attack
+	#spear_hand_strike,if=target.debuff.casting.react
+	if target.IsInterruptible() MistweaverInterruptActions()
 	#invoke_xuen
 	Spell(invoke_xuen)
 	#use_item,name=intuitions_gift
 	MistweaverUseItemActions()
 	#use_item,name=mirror_of_the_blademaster
+	MistweaverUseItemActions()
+	#use_item,slot=trinket1
 	MistweaverUseItemActions()
 	#blood_fury,if=target.time_to_die<18
 	if target.TimeToDie() < 18 Spell(blood_fury_apsp)
@@ -1745,10 +1773,13 @@ AddIcon checkbox=opt_monk_mistweaver_aoe help=cd specialization=mistweaver
 # legacy_of_the_emperor
 # mana_tea
 # mana_tea_buff
+# paralysis
+# quaking_palm
 # rising_sun_kick
 # rising_sun_kick_debuff
 # rushing_jade_wind
 # rushing_jade_wind_talent
+# spear_hand_strike
 # spinning_crane_kick
 # stance_of_the_spirited_crane
 # surging_mist
@@ -1756,6 +1787,7 @@ AddIcon checkbox=opt_monk_mistweaver_aoe help=cd specialization=mistweaver
 # tiger_power_buff
 # touch_of_death
 # vital_mists_buff
+# war_stomp
 # zen_sphere
 # zen_sphere_buff
 # zen_sphere_talent
@@ -1922,8 +1954,8 @@ AddFunction WindwalkerDefaultShortCdActions
 AddFunction WindwalkerDefaultCdActions
 {
 	#auto_attack
-	#spear_hand_strike
-	WindwalkerInterruptActions()
+	#spear_hand_strike,if=target.debuff.casting.react
+	if target.IsInterruptible() WindwalkerInterruptActions()
 	#nimble_brew
 	if IsFeared() or IsRooted() or IsStunned() Spell(nimble_brew)
 	#invoke_xuen
@@ -2559,8 +2591,8 @@ AddFunction WindwalkerDefaultShortCdActions
 AddFunction WindwalkerDefaultCdActions
 {
 	#auto_attack
-	#spear_hand_strike
-	WindwalkerInterruptActions()
+	#spear_hand_strike,if=target.debuff.casting.react
+	if target.IsInterruptible() WindwalkerInterruptActions()
 	#nimble_brew
 	if IsFeared() or IsRooted() or IsStunned() Spell(nimble_brew)
 	#invoke_xuen

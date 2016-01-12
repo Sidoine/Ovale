@@ -79,8 +79,8 @@ AddFunction ShadowDefaultCdActions
 {
 	unless not BuffPresent(shadowform_buff) and Spell(shadowform)
 	{
-		#silence
-		ShadowInterruptActions()
+		#silence,if=target.debuff.casting.react
+		if target.IsInterruptible() ShadowInterruptActions()
 		#use_item,slot=finger1
 		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
 		#use_item,slot=trinket1
@@ -1136,8 +1136,8 @@ AddFunction ShadowDefaultCdActions
 {
 	unless not BuffPresent(shadowform_buff) and Spell(shadowform)
 	{
-		#silence
-		ShadowInterruptActions()
+		#silence,if=target.debuff.casting.react
+		if target.IsInterruptible() ShadowInterruptActions()
 		#use_item,slot=finger1
 		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
 		#use_item,slot=trinket1
@@ -2193,8 +2193,8 @@ AddFunction ShadowDefaultCdActions
 {
 	unless not BuffPresent(shadowform_buff) and Spell(shadowform)
 	{
-		#silence
-		ShadowInterruptActions()
+		#silence,if=target.debuff.casting.react
+		if target.IsInterruptible() ShadowInterruptActions()
 		#use_item,slot=finger1
 		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
 		#use_item,slot=trinket1

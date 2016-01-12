@@ -179,8 +179,8 @@ AddFunction ProtectionDefaultShortCdActions
 
 AddFunction ProtectionDefaultCdActions
 {
-	#rebuke
-	ProtectionInterruptActions()
+	#rebuke,if=target.debuff.casting.react
+	if target.IsInterruptible() ProtectionInterruptActions()
 	#use_item,slot=trinket1
 	ProtectionUseItemActions()
 	#blood_fury
@@ -713,8 +713,8 @@ AddFunction RetributionDefaultShortCdActions
 
 AddFunction RetributionDefaultCdActions
 {
-	#rebuke
-	RetributionInterruptActions()
+	#rebuke,if=target.debuff.casting.react
+	if target.IsInterruptible() RetributionInterruptActions()
 	#potion,name=draenic_strength,if=(buff.bloodlust.react|buff.avenging_wrath.up|target.time_to_die<=40)
 	if BuffPresent(burst_haste_buff any=1) or BuffPresent(avenging_wrath_melee_buff) or target.TimeToDie() <= 40 RetributionUsePotionStrength()
 

@@ -100,8 +100,8 @@ AddFunction ArmsDefaultShortCdActions
 
 AddFunction ArmsDefaultCdActions
 {
-	#pummel
-	ArmsInterruptActions()
+	#pummel,if=target.debuff.casting.react
+	if target.IsInterruptible() ArmsInterruptActions()
 
 	unless 0 > 5 and ArmsMovementCdPostConditions()
 	{
@@ -543,8 +543,8 @@ AddFunction FurySingleMindedFuryDefaultShortCdActions
 
 AddFunction FurySingleMindedFuryDefaultCdActions
 {
-	#pummel
-	FurySingleMindedFuryInterruptActions()
+	#pummel,if=target.debuff.casting.react
+	if target.IsInterruptible() FurySingleMindedFuryInterruptActions()
 
 	unless 0 > 5 and FurySingleMindedFuryMovementCdPostConditions()
 	{
@@ -1184,8 +1184,8 @@ AddFunction FuryTitansGripDefaultShortCdActions
 
 AddFunction FuryTitansGripDefaultCdActions
 {
-	#pummel
-	FuryTitansGripInterruptActions()
+	#pummel,if=target.debuff.casting.react
+	if target.IsInterruptible() FuryTitansGripInterruptActions()
 
 	unless 0 > 5 and FuryTitansGripMovementCdPostConditions()
 	{
@@ -1813,8 +1813,8 @@ AddFunction ProtectionGladiatorDefaultShortCdActions
 
 AddFunction ProtectionGladiatorDefaultCdActions
 {
-	#pummel
-	ProtectionGladiatorInterruptActions()
+	#pummel,if=target.debuff.casting.react
+	if target.IsInterruptible() ProtectionGladiatorInterruptActions()
 
 	unless 0 > 5 and ProtectionGladiatorMovementCdPostConditions()
 	{
@@ -2136,9 +2136,11 @@ AddFunction ProtectionDefaultShortCdActions
 
 AddFunction ProtectionDefaultCdActions
 {
-	#pummel
-	ProtectionInterruptActions()
+	#pummel,if=target.debuff.casting.react
+	if target.IsInterruptible() ProtectionInterruptActions()
 	#use_item,name=tablet_of_turnbuckle_teamwork,if=active_enemies=1&(buff.bloodbath.up|!talent.bloodbath.enabled)|(active_enemies>=2&buff.ravager_protection.up)
+	if Enemies() == 1 and { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } or Enemies() >= 2 and BuffPresent(ravager_protection_buff) ProtectionUseItemActions()
+	#use_item,slot=trinket1,if=active_enemies=1&(buff.bloodbath.up|!talent.bloodbath.enabled)|(active_enemies>=2&buff.ravager_protection.up)
 	if Enemies() == 1 and { BuffPresent(bloodbath_buff) or not Talent(bloodbath_talent) } or Enemies() >= 2 and BuffPresent(ravager_protection_buff) ProtectionUseItemActions()
 	#blood_fury,if=buff.bloodbath.up|buff.avatar.up
 	if BuffPresent(bloodbath_buff) or BuffPresent(avatar_buff) Spell(blood_fury_ap)
