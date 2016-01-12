@@ -1,3 +1,15 @@
+--[[--------------------------------------------------------------------
+import_simc.lua
+
+This standalone script imports SimulationCraft profiles into the Ovale
+repository. The profiles in the SimulationCraft checkout are filtered to
+exclude duplicates or driver files and then imported into the output
+directory with the correct file name.
+
+profilesDirectory points to the directory containing the SimC profiles.
+outputDirectory points to the directory where the profiles are imported.
+--]]--------------------------------------------------------------------
+
 -- Constants.
 local outputDirectory = "../simulationcraft"
 local profilesDirectory = "../../SimulationCraft/profiles/Tier18M"
