@@ -31,7 +31,7 @@ actions.precombat+=/potion,name=draenic_strength
 
 # Executed every time the actor is available.
 
-actions=rebuke
+actions=/rebuke,if=target.debuff.casting.react
 actions+=/potion,name=draenic_strength,if=(buff.bloodlust.react|buff.avenging_wrath.up|target.time_to_die<=40)
 actions+=/auto_attack,target_if=dot.censure.remains<4
 actions+=/speed_of_light,if=movement.distance>5

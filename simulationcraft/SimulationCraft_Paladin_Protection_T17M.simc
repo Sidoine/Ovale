@@ -33,7 +33,7 @@ actions.precombat+=/potion,name=draenic_armor
 # Executed every time the actor is available.
 
 actions=auto_attack
-actions+=/rebuke
+actions+=/rebuke,if=target.debuff.casting.react
 actions+=/speed_of_light,if=movement.remains>1
 actions+=/use_item,slot=trinket1
 actions+=/blood_fury

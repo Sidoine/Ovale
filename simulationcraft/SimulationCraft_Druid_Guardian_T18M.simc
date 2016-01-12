@@ -27,7 +27,7 @@ actions.precombat+=/cenarion_ward
 # Executed every time the actor is available.
 
 actions=auto_attack
-actions+=/skull_bash
+actions+=/skull_bash,if=target.debuff.casting.react
 actions+=/savage_defense,if=buff.barkskin.down
 actions+=/blood_fury
 actions+=/berserking

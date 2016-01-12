@@ -36,7 +36,7 @@ actions+=/displacer_beast,if=movement.distance>10
 actions+=/dash,if=movement.distance&buff.displacer_beast.down&buff.wild_charge_movement.down
 actions+=/rake,if=buff.prowl.up|buff.shadowmeld.up
 actions+=/auto_attack
-actions+=/skull_bash
+actions+=/skull_bash,if=target.debuff.casting.react
 actions+=/force_of_nature,if=charges=3|trinket.proc.all.react|target.time_to_die<20
 actions+=/berserk,if=buff.tigers_fury.up&(buff.incarnation.up|!talent.incarnation_king_of_the_jungle.enabled)
 actions+=/use_item,slot=finger1

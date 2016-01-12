@@ -30,7 +30,7 @@ actions.precombat+=/raise_dead
 # Executed every time the actor is available.
 
 actions=auto_attack
-actions+=/mind_freeze,if=!glyph.mind_freeze.enabled
+actions+=/mind_freeze,if=target.debuff.casting.react
 actions+=/deaths_advance,if=movement.remains>2
 actions+=/antimagic_shell,damage=100000,if=((dot.breath_of_sindragosa.ticking&runic_power<25)|cooldown.breath_of_sindragosa.remains>40)|!talent.breath_of_sindragosa.enabled
 actions+=/blood_fury,if=!talent.breath_of_sindragosa.enabled

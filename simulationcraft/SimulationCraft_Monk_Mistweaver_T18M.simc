@@ -26,6 +26,7 @@ actions.precombat+=/potion,name=draenic_intellect_potion
 # Executed every time the actor is available.
 
 actions=auto_attack
+actions+=/spear_hand_strike,if=target.debuff.casting.react
 actions+=/invoke_xuen
 actions+=/chi_brew,if=chi=0
 actions+=/use_item,name=intuitions_gift

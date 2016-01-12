@@ -27,7 +27,7 @@ actions.precombat+=/potion,name=draenic_agility
 # Executed every time the actor is available.
 
 actions=auto_attack
-actions+=/spear_hand_strike
+actions+=/spear_hand_strike,if=target.debuff.casting.react
 actions+=/nimble_brew
 actions+=/invoke_xuen
 actions+=/storm_earth_and_fire,target=2,if=debuff.storm_earth_and_fire_target.down

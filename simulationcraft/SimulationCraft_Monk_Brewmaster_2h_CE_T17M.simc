@@ -29,7 +29,7 @@ actions.precombat+=/dampen_harm
 
 actions=auto_attack
 actions+=/touch_of_death,if=target.health<health
-actions+=/spear_hand_strike
+actions+=/spear_hand_strike,if=target.debuff.casting.react
 actions+=/nimble_brew
 actions+=/blood_fury,if=energy<=40
 actions+=/berserking,if=energy<=40

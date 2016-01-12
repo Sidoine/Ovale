@@ -32,7 +32,7 @@ actions.precombat+=/potion,name=draenic_strength
 
 actions=charge,if=debuff.charge.down
 actions+=/auto_attack
-actions+=/pummel
+actions+=/pummel,if=target.debuff.casting.react
 # This is mostly to prevent cooldowns from being accidentally used during movement.
 actions+=/run_action_list,name=movement,if=movement.distance>5
 actions+=/berserker_rage,if=buff.enrage.down|(prev_gcd.bloodthirst&buff.raging_blow.stack<2)
