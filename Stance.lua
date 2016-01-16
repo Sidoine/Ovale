@@ -62,6 +62,9 @@ local SPELL_NAME_TO_STANCE = {
 	[API_GetSpellInfo(105361)] = "paladin_seal_of_command",
 	-- Priest
 	[API_GetSpellInfo( 15473)] = "priest_shadowform",
+	[API_GetSpellInfo( 81206)] = "priest_chakra_sanctuary",
+	[API_GetSpellInfo( 81208)] = "priest_chakra_serenity",
+	[API_GetSpellInfo( 81209)] = "priest_chakra_chastise",
 	-- Rogue
 	[API_GetSpellInfo(  1784)] = "rogue_stealth",
 	-- Warlock
