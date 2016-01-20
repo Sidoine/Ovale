@@ -190,9 +190,11 @@ function OvaleScripts:GetDefaultScriptName(class, specialization)
 			name = format("simulationcraft_paladin_%s_t17m", specialization)
 		end
 	elseif class == "PRIEST" then
-		if specialization == "discipline" or specialization == "holy" then
-			-- TODO: Create discipline and holy priest scripts.
+		if specialization == "discipline" then
+			-- TODO: Create discipline script.
 			name = DISABLED_NAME
+		elseif specialization == "holy" then
+			name = "nerien_priest_holy"
 		else -- if specialization == "shadow" then
 			local talentChoice = "cop"							-- Clarity of Power (default)
 			if OvaleSpellBook:GetTalentPoints(20) > 0 then		-- Void Entropy
