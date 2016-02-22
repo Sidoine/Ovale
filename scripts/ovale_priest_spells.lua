@@ -307,7 +307,6 @@ Define(weakened_soul_debuff 6788)
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(cascade_caster tag=shortcd)
 	SpellInfo(divine_star_caster tag=shortcd)
-	SpellInfo(mindbender tag=cd)
 ]]
 
 	OvaleScripts:RegisterScript("PRIEST", nil, name, desc, code, "include")
