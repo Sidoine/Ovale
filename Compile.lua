@@ -386,6 +386,9 @@ local function EvaluateSpellInfo(node)
 				local list = OvaleData.buffSpellList[v] or {}
 				list[spellId] = true
 				OvaleData.buffSpellList[v] = list
+			elseif k == "dummy_replace" then
+				local spellName = API_GetSpellInfo(v) or v
+				OvaleSpellBook:AddSpell(spellId, spellName)
 			elseif k == "learn" and v == 1 then
 				-- Forcibly learn this spell.
 				local spellName = API_GetSpellInfo(spellId)
