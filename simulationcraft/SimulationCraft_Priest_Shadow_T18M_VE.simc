@@ -51,8 +51,10 @@ actions.pvp_dispersion=call_action_list,name=decision,if=cooldown.dispersion.rem
 actions.pvp_dispersion+=/dispersion,interrupt=1
 actions.pvp_dispersion+=/call_action_list,name=decision
 
-actions.main=mindbender,if=talent.mindbender.enabled
-actions.main+=/shadowfiend,if=!talent.mindbender.enabled
+actions.main=mindbender_tier18_2pc,if=set_bonus.tier18_2pc&talent.mindbender.enabled
+actions.main+=/mindbender,if=!set_bonus.tier18_2pc&talent.mindbender.enabled
+actions.main+=/shadowfiend_tier18_2pc,if=if=set_bonus.tier18_2pc&!talent.mindbender.enabled
+actions.main+=/shadowfiend,if=!set_bonus.tier18_2pc&!talent.mindbender.enabled
 actions.main+=/shadow_word_death,if=target.health.pct<20&shadow_orb<=4,cycle_targets=1
 actions.main+=/mind_blast,if=glyph.mind_harvest.enabled&shadow_orb<=2&active_enemies<=5&cooldown_react
 actions.main+=/devouring_plague,if=shadow_orb=5&!target.dot.devouring_plague_dot.ticking&(talent.surge_of_darkness.enabled|set_bonus.tier17_4pc),cycle_targets=1
@@ -108,8 +110,8 @@ actions.main+=/divine_star,moving=1,if=talent.divine_star.enabled&target.distanc
 actions.main+=/cascade,moving=1,if=talent.cascade.enabled&target.distance<=40
 actions.main+=/shadow_word_pain,moving=1,cycle_targets=1
 
-actions.vent=mindbender,if=set_bonus.tier18_2pc&talent.mindbender.enabled
-actions.vent+=/shadowfiend,if=set_bonus.tier18_2pc&!talent.mindbender.enabled
+actions.main=mindbender_tier18_2pc,if=set_bonus.tier18_2pc&talent.mindbender.enabled
+actions.main+=/shadowfiend_tier18_2pc,if=set_bonus.tier18_2pc&!talent.mindbender.enabled
 actions.vent+=/void_entropy,if=shadow_orb=3&!ticking&target.time_to_die>60&active_enemies=1
 actions.vent+=/void_entropy,if=!dot.void_entropy.ticking&shadow_orb=5&active_enemies>=1&target.time_to_die>60,cycle_targets=1,max_cycle_targets=6
 actions.vent+=/devouring_plague,if=shadow_orb=5&dot.void_entropy.ticking&dot.void_entropy.remains<=gcd*2&cooldown_react&active_enemies=1
@@ -169,12 +171,14 @@ actions.cop_dotweave+=/shadow_word_death,if=target.health.pct<20&!target.dot.sha
 actions.cop_dotweave+=/shadow_word_death,if=target.health.pct<20,cycle_targets=1
 actions.cop_dotweave+=/mind_blast,if=glyph.mind_harvest.enabled&mind_harvest=0&shadow_orb<=2,cycle_targets=1
 actions.cop_dotweave+=/mind_blast,if=shadow_orb<=4&cooldown_react
-actions.cop_dotweave+=/shadowfiend,if=!talent.mindbender.enabled&set_bonus.tier18_2pc
-actions.cop_dotweave+=/mindbender,if=talent.mindbender.enabled&set_bonus.tier18_2pc
+actions.cop_dotweave+=/shadowfiend_tier18_2pc,if=!talent.mindbender.enabled&set_bonus.tier18_2pc
+actions.cop_dotweave+=/mindbender_tier18_2pc,if=talent.mindbender.enabled&set_bonus.tier18_2pc
 actions.cop_dotweave+=/searing_insanity,if=buff.insanity.remains<0.5*gcd&active_enemies>=3&cooldown.mind_blast.remains>0.5*gcd,chain=1,interrupt_if=(cooldown.mind_blast.remains<=0.1|cooldown.shadow_word_death.remains<=0.1),target_if=max:spell_targets.mind_sear_tick
 actions.cop_dotweave+=/searing_insanity,if=active_enemies>=3&cooldown.mind_blast.remains>0.5*gcd,interrupt_if=(cooldown.mind_blast.remains<=0.1|cooldown.shadow_word_death.remains<=0.1),target_if=max:spell_targets.mind_sear_tick
-actions.cop_dotweave+=/shadowfiend,if=!talent.mindbender.enabled&!buff.insanity.remains
-actions.cop_dotweave+=/mindbender,if=talent.mindbender.enabled&!buff.insanity.remains
+actions.cop_dotweave+=/shadowfiend_tier18_2pc,if=!talent.mindbender.enabled&set_bonus.tier18_2pc&!buff.insanity.remains
+actions.cop_dotweave+=/shadowfiend,if=!talent.mindbender.enabled&!set_bonus.tier18_2pc&!buff.insanity.remains
+actions.cop_dotweave+=/mindbender_tier18_2pc,if=talent.mindbender.enabled&set_bonus.tier18_2pc&!buff.insanity.remains
+actions.cop_dotweave+=/mindbender,if=talent.mindbender.enabled&!set_bonus.tier18_2pc&!buff.insanity.remains
 actions.cop_dotweave+=/shadow_word_pain,if=shadow_orb=4&set_bonus.tier17_2pc&!target.dot.shadow_word_pain.ticking&!target.dot.devouring_plague.ticking&cooldown.mind_blast.remains<gcd&cooldown.mind_blast.remains>0
 actions.cop_dotweave+=/shadow_word_pain,if=shadow_orb=5&!target.dot.devouring_plague.ticking&!target.dot.shadow_word_pain.ticking
 actions.cop_dotweave+=/vampiric_touch,if=shadow_orb=5&!target.dot.devouring_plague.ticking&!target.dot.vampiric_touch.ticking
@@ -215,12 +219,14 @@ actions.cop_insanity+=/shadow_word_death,if=target.health.pct<20,cycle_targets=1
 actions.cop_insanity+=/insanity,if=t18_class_trinket&target.debuff.mental_fatigue.remains<gcd,interrupt_if=target.debuff.mental_fatigue.remains>gcd
 actions.cop_insanity+=/devouring_plague,if=shadow_orb>=3&!set_bonus.tier17_2pc&!set_bonus.tier17_4pc&(cooldown.mind_blast.remains<gcd|(target.health.pct<20&cooldown.shadow_word_death.remains<gcd)),cycle_targets=1
 actions.cop_insanity+=/devouring_plague,if=shadow_orb>=3&set_bonus.tier17_2pc&!set_bonus.tier17_4pc&(cooldown.mind_blast.remains<=2|(target.health.pct<20&cooldown.shadow_word_death.remains<gcd)),cycle_targets=1
-actions.cop_insanity+=/shadowfiend,if=!talent.mindbender.enabled&set_bonus.tier18_2pc
-actions.cop_insanity+=/mindbender,if=talent.mindbender.enabled&set_bonus.tier18_2pc
+actions.cop_insanity+=/shadowfiend_tier18_2pc,if=!talent.mindbender.enabled&set_bonus.tier18_2pc
+actions.cop_insanity+=/mindbender_tier18_2pc,if=talent.mindbender.enabled&set_bonus.tier18_2pc
 actions.cop_insanity+=/searing_insanity,if=buff.insanity.remains<0.5*gcd&active_enemies>=3&cooldown.mind_blast.remains>0.5*gcd,chain=1,interrupt_if=(cooldown.mind_blast.remains<=0.1|cooldown.shadow_word_death.remains<=0.1),target_if=max:spell_targets.mind_sear_tick
 actions.cop_insanity+=/searing_insanity,if=active_enemies>=5,chain=1,interrupt_if=(cooldown.mind_blast.remains<=0.1|cooldown.shadow_word_death.remains<=0.1),target_if=max:spell_targets.mind_sear_tick
-actions.cop_insanity+=/mindbender,if=talent.mindbender.enabled
-actions.cop_insanity+=/shadowfiend,if=!talent.mindbender.enabled
+actions.cop_insanity+=/mindbender_tier18_2pc,if=talent.mindbender.enabled&set_bonus.tier18_2pc
+actions.cop_insanity+=/mindbender,if=talent.mindbender.enabled&!set_bonus.tier18_2pc
+actions.cop_insanity+=/shadowfiend_tier18_2pc,if=!talent.mindbender.enabled&set_bonus.tier18_2pc
+actions.cop_insanity+=/shadowfiend,if=!talent.mindbender.enabled&!set_bonus.tier18_2pc
 actions.cop_insanity+=/mind_flay,if=t18_class_trinket&(target.debuff.mental_fatigue.remains<gcd|(cooldown.mind_blast.remains<2*gcd&target.debuff.mental_fatigue.remains<2*gcd)),interrupt_if=target.debuff.mental_fatigue.remains>gcd
 actions.cop_insanity+=/shadow_word_pain,if=remains<(18*0.3)&target.time_to_die>(18*0.75)&miss_react&active_enemies<=5&primary_target=0,cycle_targets=1,max_cycle_targets=5
 actions.cop_insanity+=/vampiric_touch,if=remains<(15*0.3+cast_time)&target.time_to_die>(15*0.75+cast_time)&miss_react&active_enemies<=5&primary_target=0,cycle_targets=1,max_cycle_targets=5
@@ -245,8 +251,8 @@ actions.cop_insanity+=/cascade,if=talent.cascade.enabled&target.distance<=40,mov
 actions.cop_insanity+=/devouring_plague,moving=1
 actions.cop_insanity+=/shadow_word_pain,if=primary_target=0,moving=1,cycle_targets=1
 
-actions.cop=shadowfiend,if=!talent.mindbender.enabled&set_bonus.tier18_2pc
-actions.cop+=/mindbender,if=talent.mindbender.enabled&set_bonus.tier18_2pc
+actions.cop=shadowfiend_tier18_2pc,if=!talent.mindbender.enabled&set_bonus.tier18_2pc
+actions.cop+=/mindbender_tier18_2pc,if=talent.mindbender.enabled&set_bonus.tier18_2pc
 actions.cop+=/devouring_plague,if=shadow_orb=5&primary_target=0&!target.dot.devouring_plague_dot.ticking&target.time_to_die>=(gcd*4*7%6),cycle_targets=1
 actions.cop+=/devouring_plague,if=shadow_orb=5&primary_target=0&target.time_to_die>=(gcd*4*7%6)&(cooldown.mind_blast.remains<=gcd|(cooldown.shadow_word_death.remains<=gcd&target.health.pct<20)),cycle_targets=1
 actions.cop+=/devouring_plague,if=shadow_orb=5&!set_bonus.tier17_2pc&(cooldown.mind_blast.remains<=gcd|(cooldown.shadow_word_death.remains<=gcd&target.health.pct<20))
@@ -264,8 +270,10 @@ actions.cop+=/mind_blast,if=mind_harvest=0,cycle_targets=1
 actions.cop+=/mind_blast,if=cooldown_react
 actions.cop+=/shadow_word_death,if=target.health.pct<20&!target.dot.shadow_word_pain.ticking&!target.dot.vampiric_touch.ticking,cycle_targets=1
 actions.cop+=/shadow_word_death,if=target.health.pct<20,cycle_targets=1
-actions.cop+=/mindbender,if=talent.mindbender.enabled
-actions.cop+=/shadowfiend,if=!talent.mindbender.enabled
+actions.cop+=/mindbender_tier18_2pc,if=talent.mindbender.enabled&set_bonus.tier18_2pc
+actions.cop+=/mindbender,if=talent.mindbender.enabled&!set_bonus.tier18_2pc
+actions.cop+=/shadowfiend_tier18_2pc,if=!talent.mindbender.enabled&set_bonus.tier18_2pc
+actions.cop+=/shadowfiend,if=!talent.mindbender.enabled&!set_bonus.tier18_2pc
 actions.cop+=/halo,if=talent.halo.enabled&!set_bonus.tier18_4pc&target.distance<=30&target.distance>=17
 actions.cop+=/cascade,if=talent.cascade.enabled&!set_bonus.tier18_4pc&(active_enemies>1|target.distance>=28)&target.distance<=40&target.distance>=11
 actions.cop+=/divine_star,if=talent.divine_star.enabled&!set_bonus.tier18_4pc&active_enemies>3&target.distance<=24

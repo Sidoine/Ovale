@@ -16,6 +16,14 @@ Define(surge_of_light 109186)
 	SpellInfo(surge_of_light learn=1 level=45 specialization=discipline)
 	SpellInfo(surge_of_light learn=1 level=45 specialization=holy)
 
+# Dummy spells
+Define(mindbender_tier18_2pc 999123040)
+	SpellInfo(mindbender_tier18_2pc dummy_replace=123040 replace=mindbender)
+	SpellInfo(mindbender_tier18_2pc cd=20)
+Define(shadowfiend_tier18_2pc 999034433)
+	SpellInfo(shadowfiend_tier18_2pc dummy_replace=34433 replace=shadowfiend)
+	SpellInfo(shadowfiend_tier18_2pc cd=20)
+
 Define(archangel 81700)
 	SpellInfo(archangel cd=30 gcd=0 offgcd=1)
 	SpellRequire(archangel unusable 1=buff,!evangelism_buff)
