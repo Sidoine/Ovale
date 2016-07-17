@@ -1700,22 +1700,10 @@ do
 end
 
 do
-	--- Test if the given glyph is active.
-	-- @name Glyph
-	-- @paramsig boolean
-	-- @param id The glyph spell ID.
-	-- @param yesno Optional. If yes, then return true if the glyph is active. If no, then return true if it isn't active.
-	--     Default is yes.
-	--     Valid values: yes, no.
-	-- @return A boolean value.
-	-- @usage
-	-- if InCombat(no) and Glyph(glyph_of_savagery)
-	--     Spell(savage_roar)
-
+	--- Provided for backward compatibility, no use
 	local function Glyph(positionalParams, namedParams, state, atTime)
-		local glyph, yesno = positionalParams[1], positionalParams[2]
-		local boolean = OvaleSpellBook:IsActiveGlyph(glyph)
-		return TestBoolean(boolean, yesno)
+		local stub, yesno = positionalParams[1], positionalParams[2]
+		return TestBoolean(false, yesno)
 	end
 
 	OvaleCondition:RegisterCondition("glyph", false, Glyph)
@@ -2517,29 +2505,6 @@ do
 	end
 
 	OvaleCondition:RegisterCondition("list", false, List)
-end
-
-do
-	--- Check whether the target has the hidden Glyph of Mind Harvest debuff.
-	-- @name MindHarvest
-	-- @paramsig number
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=player.
-	--     Valid values: player, target, focus, pet.
-	-- @return 1 if the debuff is present, or 0 otherwise.
-	-- @usage
-	-- if target.MindHarvest() == 0 Spell(mind_blast)
-
-	local GLYPH_OF_MIND_HARVEST_DEBUFF = 162532
-
-	local function MindHarvest(positionalParams, namedParams, state, atTime)
-		local target = ParseCondition(positionalParams, namedParams, state)
-		local aura = state:GetAura(target, GLYPH_OF_MIND_HARVEST_DEBUFF, "HARMFUL", true)
-		local value = state:IsActiveAura(aura, atTime) and 1 or 0
-		return 0, INFINITY, value, 0, 0
-	end
-
-	OvaleCondition:RegisterCondition("mindharvest", false, MindHarvest)
 end
 
 do
@@ -4430,7 +4395,7 @@ do
 	-- @name Talent
 	-- @paramsig boolean
 	-- @param id The talent ID.
-	-- @param yesno Optional. If yes, then return true if the glyph is active. If no, then return true if it isn't active.
+	-- @param yesno Optional. If yes, then return true if the talent is active. If no, then return true if it isn't active.
 	--     Default is yes.
 	--     Valid values: yes, no.
 	-- @return A boolean value.

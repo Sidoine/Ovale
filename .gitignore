@@ -7,3 +7,4 @@ release/**
 tmp/**
 tests/OUT*
 tests/*.bat
+luac.out

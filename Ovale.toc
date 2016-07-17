@@ -1,4 +1,4 @@
-## Interface: 60200
+## Interface: 70000
 ## Title: Ovale Spell Priority
 ## Notes: Show the icon of the next spell to cast
 ## Notes-frFR: Affiche l'icône du prochain sort à lancer
@@ -63,7 +63,6 @@ DataBroker.lua
 Eclipse.lua
 Enemies.lua
 HonorAmongThieves.lua
-MindHarvest.lua
 PassiveAura.lua
 Recount.lua
 ShadowWordDeath.lua

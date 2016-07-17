@@ -4,7 +4,7 @@
     See the file LICENSE.txt for copying permission.
 --]]--------------------------------------------------------------------
 
--- This addon tracks the player's active spells, talents, and glyphs.
+-- This addon tracks the player's active spells and talents.
 
 local OVALE, Ovale = ...
 local OvaleSpellBook = Ovale:NewModule("OvaleSpellBook", "AceEvent-3.0")
@@ -35,8 +35,6 @@ local wipe = wipe
 local API_GetActiveSpecGroup = GetActiveSpecGroup
 local API_GetFlyoutInfo = GetFlyoutInfo
 local API_GetFlyoutSlotInfo = GetFlyoutSlotInfo
-local API_GetGlyphSocketInfo = GetGlyphSocketInfo
-local API_GetNumGlyphSockets = GetNumGlyphSockets
 local API_GetSpellBookItemInfo = GetSpellBookItemInfo
 local API_GetSpellInfo = GetSpellInfo
 local API_GetSpellLink = GetSpellLink
@@ -61,19 +59,6 @@ OvaleProfiler:RegisterProfiling(OvaleSpellBook)
 
 do
 	local debugOptions = {
-		glyph = {
-			name = L["Glyphs"],
-			type = "group",
-			args = {
-				glyph = {
-					name = L["Glyphs"],
-					type = "input",
-					multiline = 25,
-					width = "full",
-					get = function(info) return OvaleSpellBook:DebugGlyphs() end,
-				},
-			},
-		},
 		spellbook = {
 			name = L["Spellbook"],
 			type = "group",
@@ -128,13 +113,11 @@ OvaleSpellBook.texture = {}
 OvaleSpellBook.talent = {}
 -- self.talentPoints[talentId] = 0 or 1
 OvaleSpellBook.talentPoints = {}
--- self.glyph[glyphSpellId] = glyphName
-OvaleSpellBook.glyph = {}
 --</public-static-properties>
 
 --<private-static-methods>
 local function ParseHyperlink(hyperlink)
-	local color, linkType, linkData, text = strmatch(hyperlink, "|?c?f?f?(%x*)|?H?([^:]*):?(%d+)|?h?%[?([^%[%]]*)%]?|?h?|?r?")
+	local color, linkType, linkData, text = strmatch(hyperlink, "|?c?f?f?(%x*)|?H?([^:]*):?(%d*):?%d?|?h?%[?([^%[%]]*)%]?|?h?|?r?")
 	return color, linkType, linkData, text
 end
 
@@ -163,11 +146,6 @@ end
 function OvaleSpellBook:OnEnable()
 	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "Update")
 	self:RegisterEvent("CHARACTER_POINTS_CHANGED", "UpdateTalents")
-	self:RegisterEvent("GLYPH_ADDED", "UpdateGlyphs")
-	self:RegisterEvent("GLYPH_DISABLED", "UpdateGlyphs")
-	self:RegisterEvent("GLYPH_ENABLED", "UpdateGlyphs")
-	self:RegisterEvent("GLYPH_REMOVED", "UpdateGlyphs")
-	self:RegisterEvent("GLYPH_UPDATED", "UpdateGlyphs")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "Update")
 	self:RegisterEvent("PLAYER_TALENT_UPDATE", "UpdateTalents")
 	self:RegisterEvent("SPELLS_CHANGED", "UpdateSpells")
@@ -179,11 +157,6 @@ function OvaleSpellBook:OnDisable()
 	OvaleState:UnregisterState(self)
 	self:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 	self:UnregisterEvent("CHARACTER_POINTS_CHANGED")
-	self:UnregisterEvent("GLYPH_ADDED")
-	self:UnregisterEvent("GLYPH_DISABLED")
-	self:UnregisterEvent("GLYPH_ENABLED")
-	self:UnregisterEvent("GLYPH_REMOVED")
-	self:UnregisterEvent("GLYPH_UPDATED")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("PLAYER_TALENT_UPDATE")
 	self:UnregisterEvent("SPELLS_CHANGED")
@@ -199,7 +172,6 @@ end
 
 function OvaleSpellBook:Update()
 	self:UpdateTalents()
-	self:UpdateGlyphs()
 	self:UpdateSpells()
 	self.ready = true
 end
@@ -231,25 +203,6 @@ function OvaleSpellBook:UpdateTalents()
 	end
 	Ovale.refreshNeeded[Ovale.playerGUID] = true
 	self:SendMessage("Ovale_TalentsChanged")
-end
-
--- Update the player's glyphs by scanning the glyph socket tab for the active specialization.
-function OvaleSpellBook:UpdateGlyphs()
-	self:Debug("Updating glyphs.")
-	wipe(self.glyph)
-
-	for i = 1, API_GetNumGlyphSockets() do
-		local enabled, _, _, glyphSpell, _ = API_GetGlyphSocketInfo(i)
-		if enabled and glyphSpell then
-			local name = self:GetSpellName(glyphSpell)
-			self.glyph[glyphSpell] = name
-			self:Debug("    Glyph socket %d has %s (%d).", i, name, glyphSpell)
-		else
-			self:Debug("    Glyph socket %d is empty.", i)
-		end
-	end
-	Ovale.refreshNeeded[Ovale.playerGUID] = true
-	self:SendMessage("Ovale_GlyphsChanged")
 end
 
 function OvaleSpellBook:UpdateSpells()
@@ -291,7 +244,7 @@ function OvaleSpellBook:ScanSpellBook(bookType, numSpells, offset)
 			if spellLink then
 				local _, _, linkData, spellName = ParseHyperlink(spellLink)
 				local id = tonumber(linkData)
-				self:Debug("    %s (%d) is at offset %d.", spellName, id, index)
+				self:Debug("    %s (%d) is at offset %d (%s).", spellName, id, index, gsub(spellLink,"|","_"))
 				self.spell[id] = spellName
 				self.isHarmful[id] = API_IsHarmfulSpell(index, bookType)
 				self.isHelpful[id] = API_IsHelpfulSpell(index, bookType)
@@ -394,11 +347,6 @@ function OvaleSpellBook:AddSpell(spellId, name)
 	end
 end
 
--- Returns true if the given glyph spell Id is an active glyph in the player's glyph tab.
-function OvaleSpellBook:IsActiveGlyph(glyphId)
-	return (glyphId and self.glyph[glyphId]) and true or false
-end
-
 -- Returns whether a spell can be used against hostile units.
 function OvaleSpellBook:IsHarmfulSpell(spellId)
 	return (spellId and self.isHarmful[spellId]) and true or false
@@ -465,15 +413,8 @@ function OvaleSpellBook:IsUsableSpell(spellId)
 	end
 end
 
--- Print out the list of active glyphs in alphabetical order.
 do
 	local output = {}
-
-	function OvaleSpellBook:DebugGlyphs()
-		wipe(output)
-		OutputTableValues(output, self.glyph)
-		return tconcat(output, "\n")
-	end
 
 	-- Print out the list of known spells in alphabetical order.
 	function OvaleSpellBook:DebugSpells()

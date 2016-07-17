@@ -81,7 +81,6 @@ local DECLARATION_KEYWORD = {
 
 local PARAMETER_KEYWORD = {
 	["checkbox"] = true,
-	["glyph"] = true,
 	["help"] = true,
 	["if_spell"] = true,
 	["if_stance"] = true,

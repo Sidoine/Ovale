@@ -739,7 +739,7 @@ function OvaleFuture:UnitSpellcastEnded(event, unitId, spell, rank, lineId, spel
 				self_pool:Release(spellcast)
 				Ovale.refreshNeeded[self_playerGUID] = true
 			end
-		elseif lineId > 0 then
+		elseif lineId then
 			-- Suppress the warning spellcasts with a line ID of zero since those are thrown quite a lot.
 			self:Debug("Warning: no queued spell %s (%d) found to end casting.", spell, spellId)
 		end
@@ -759,7 +759,7 @@ end
 function OvaleFuture:GetSpellcast(spell, spellId, lineId, atTime)
 	self:StartProfiling("OvaleFuture_GetSpellcast")
 	local spellcast, index
-	if not lineId or lineId > 0 then
+	if not lineId or lineId ~= "" then
 		for i, sc in ipairs(self.queue) do
 			if not lineId or sc.lineId == lineId then
 				if spellId and sc.spellId == spellId then

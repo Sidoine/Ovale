@@ -36,10 +36,6 @@ local API_GetSpellInfo = GetSpellInfo
 OvaleProfiler:RegisterProfiling(OvaleStance)
 
 local SPELL_NAME_TO_STANCE = {
-	-- Death Knight
-	[API_GetSpellInfo( 48263)] = "deathknight_blood_presence",
-	[API_GetSpellInfo( 48265)] = "deathknight_unholy_presence",
-	[API_GetSpellInfo( 48266)] = "deathknight_frost_presence",
 	-- Druid
 	[API_GetSpellInfo(   768)] = "druid_cat_form",
 	[API_GetSpellInfo(   783)] = "druid_travel_form",
@@ -52,27 +48,10 @@ local SPELL_NAME_TO_STANCE = {
 	-- Monk
 	[API_GetSpellInfo(103985)] = "monk_stance_of_the_fierce_tiger",
 	[API_GetSpellInfo(115069)] = "monk_stance_of_the_sturdy_ox",
-	[API_GetSpellInfo(115070)] = "monk_stance_of_the_wise_serpent",
-	[API_GetSpellInfo(154436)] = "monk_stance_of_the_spirited_crane",
-	-- Paladin
-	[API_GetSpellInfo( 20154)] = "paladin_seal_of_righteousness",
-	[API_GetSpellInfo( 20164)] = "paladin_seal_of_justice",
-	[API_GetSpellInfo( 20165)] = "paladin_seal_of_insight",
-	[API_GetSpellInfo( 31801)] = "paladin_seal_of_truth",
-	[API_GetSpellInfo(105361)] = "paladin_seal_of_command",
-	-- Priest
-	[API_GetSpellInfo( 15473)] = "priest_shadowform",
-	[API_GetSpellInfo( 81206)] = "priest_chakra_sanctuary",
-	[API_GetSpellInfo( 81208)] = "priest_chakra_serenity",
-	[API_GetSpellInfo( 81209)] = "priest_chakra_chastise",
 	-- Rogue
 	[API_GetSpellInfo(  1784)] = "rogue_stealth",
-	-- Warlock
-	[API_GetSpellInfo(103958)] = "warlock_metamorphosis",
 	-- Warrior
 	[API_GetSpellInfo(    71)] = "warrior_defensive_stance",
-	[API_GetSpellInfo(  2457)] = "warrior_battle_stance",
-	[API_GetSpellInfo(156291)] = "warrior_gladiator_stance",
 }
 
 -- Table of all valid stance names.

@@ -339,23 +339,23 @@ end
 
 -- Normalized weapon attack speeds (http://www.wowpedia.org/Normalization)
 local OVALE_NORMALIZED_WEAPON_SPEED = {
-	[OVALE_WEAPON_CLASS[1]]  = 2.4,
-	[OVALE_WEAPON_CLASS[2]]  = 3.3,
-	[OVALE_WEAPON_CLASS[3]]  = 2.8,
-	[OVALE_WEAPON_CLASS[4]]  = 2.8,
-	[OVALE_WEAPON_CLASS[5]]  = 2.4,
-	[OVALE_WEAPON_CLASS[6]]  = 3.3,
-	[OVALE_WEAPON_CLASS[7]]  = 3.3,
-	[OVALE_WEAPON_CLASS[8]]  = 2.4,
-	[OVALE_WEAPON_CLASS[9]]  = 3.3,
-	[OVALE_WEAPON_CLASS[10]] = 3.3,
-	[OVALE_WEAPON_CLASS[11]] = 2.4,
-	[OVALE_WEAPON_CLASS[12]] = 2.4, -- ??
-	[OVALE_WEAPON_CLASS[13]] = 1.7,
-	[OVALE_WEAPON_CLASS[14]] = 1.7, -- ??
-	[OVALE_WEAPON_CLASS[15]] = 2.8,
-	[OVALE_WEAPON_CLASS[16]] = 2.4,
-	[OVALE_WEAPON_CLASS[17]] = 3.3,
+	-- [OVALE_WEAPON_CLASS[1]]  = 2.4,
+	-- [OVALE_WEAPON_CLASS[2]]  = 3.3,
+	-- [OVALE_WEAPON_CLASS[3]]  = 2.8,
+	-- [OVALE_WEAPON_CLASS[4]]  = 2.8,
+	-- [OVALE_WEAPON_CLASS[5]]  = 2.4,
+	-- [OVALE_WEAPON_CLASS[6]]  = 3.3,
+	-- [OVALE_WEAPON_CLASS[7]]  = 3.3,
+	-- [OVALE_WEAPON_CLASS[8]]  = 2.4,
+	-- [OVALE_WEAPON_CLASS[9]]  = 3.3,
+	-- [OVALE_WEAPON_CLASS[10]] = 3.3,
+	-- [OVALE_WEAPON_CLASS[11]] = 2.4,
+	-- [OVALE_WEAPON_CLASS[12]] = 2.4, -- ??
+	-- [OVALE_WEAPON_CLASS[13]] = 1.7,
+	-- [OVALE_WEAPON_CLASS[14]] = 1.7, -- ??
+	-- [OVALE_WEAPON_CLASS[15]] = 2.8,
+	-- [OVALE_WEAPON_CLASS[16]] = 2.4,
+	-- [OVALE_WEAPON_CLASS[17]] = 3.3,
 }
 --</private-static-properties>
 
@@ -418,7 +418,7 @@ local function GetNormalizedWeaponSpeed(slotId)
 		local itemId = OvaleEquipment:GetEquippedItem(slotId)
 		if itemId then
 			local _, _, _, _, _, _, weaponClass = API_GetItemInfo(itemId)
-			weaponSpeed = OVALE_NORMALIZED_WEAPON_SPEED[weaponClass]
+			-- weaponSpeed = OVALE_NORMALIZED_WEAPON_SPEED[weaponClass]
 		end
 	end
 	OvaleEquipment:StopProfiling("OvaleEquipment_GetNormalizedWeaponSpeed")
@@ -453,8 +453,7 @@ function OvaleEquipment:GET_ITEM_INFO_RECEIVED(event)
 	self.offHandItemType = GetEquippedItemType(INVSLOT_OFFHAND)
 	self.mainHandWeaponSpeed = self:HasMainHandWeapon() and GetNormalizedWeaponSpeed(INVSLOT_MAINHAND)
 	self.offHandWeaponSpeed = self:HasOffHandWeapon() and GetNormalizedWeaponSpeed(INVSLOT_OFFHAND)
-
-	local changed = self:UpdateMetaGem()
+	local changed = false
 	if changed then
 		Ovale.refreshNeeded[Ovale.playerGUID] = true
 		self:SendMessage("Ovale_EquipmentChanged")
@@ -697,9 +696,8 @@ function OvaleEquipment:UpdateEquippedItems()
 			changed = true
 		end
 	end
-	local changedMetaGem = self:UpdateMetaGem()
 	local changedItemLevels = self:UpdateEquippedItemLevels()
-	changed = changed or changedMetaGem or changedItemLevels
+	changed = changed or changedItemLevels
 
 	self.mainHandItemType = GetEquippedItemType(INVSLOT_MAINHAND)
 	self.offHandItemType = GetEquippedItemType(INVSLOT_OFFHAND)
@@ -731,31 +729,6 @@ function OvaleEquipment:UpdateEquippedItemLevels()
 		self:SendMessage("Ovale_EquipmentChanged")
 	end
 	self:StopProfiling("OvaleEquipment_UpdateEquippedItemLevels")
-	return changed
-end
-
-function OvaleEquipment:UpdateMetaGem()
-	self:StartProfiling("OvaleEquipment_UpdateMetaGem")
-	local changed = false
-	local gemId = API_GetInventoryItemGems(INVSLOT_HEAD)
-	if gemId then
-		local name, link, quality, iLevel, reqLevel, class, subclass = API_GetItemInfo(gemId)
-		if subclass == OVALE_META_GEM then
-			if gemId ~= self.metaGem then
-				self.metaGem = gemId
-				changed = true
-			end
-		end
-	else
-		if self.metaGem then
-			self.metaGem = nil
-			changed = true
-		end
-	end
-	if changed then
-		Ovale.refreshNeeded[Ovale.playerGUID] = true
-	end
-	self:StopProfiling("OvaleEquipment_UpdateMetaGem")
 	return changed
 end
 

@@ -12,7 +12,7 @@ outputDirectory points to the directory where the profiles are imported.
 
 -- Constants.
 local outputDirectory = "../simulationcraft"
-local profilesDirectory = "../../SimulationCraft/profiles/Tier18M"
+local profilesDirectory = "../../SimulationCraft/profiles/legion"
 local root = "../"
 
 local SIMC_CLASS = {
@@ -60,6 +60,8 @@ do
 	for _, name in ipairs(files) do
 		local ok = true
 		local lowername = strlower(name)
+
+		print ("import" .. lowername)
 
 		-- Lexer for the profile filename.
 		local tokenIterator = gmatch(lowername, "[^_.]+")

@@ -141,7 +141,7 @@ for _, filename in ipairs(files) do
 		local sandbox = WoWMock:NewSandbox(config)
 
 		-- Load addon files into the sandbox.
-		sandbox:LoadAddonFile("Ovale.toc", root)
+		sandbox:LoadAddonFile("Ovale.toc", root, false)
 
 		-- Fire events to simulate the addon-loading process.
 		sandbox:Fire("ADDON_LOADED")
@@ -152,7 +152,11 @@ for _, filename in ipairs(files) do
 		-- Enter sandbox.
 		setfenv(1, sandbox)
 
+		print(filename)
 		local OvaleSimulationCraft = Ovale.OvaleSimulationCraft
+		Ovale.OvaleOptions:OnInitialize()
+		Ovale.OvaleAST:OnInitialize()
+		OvaleSimulationCraft:OnInitialize()
 		local wipe = wipe
 		-- Parse SimulationCraft profile and emit the corresponding Ovale script.
 		local profile = OvaleSimulationCraft:ParseProfile(simc)
@@ -168,7 +172,7 @@ for _, filename in ipairs(files) do
 		output[#output + 1] = ""
 		output[#output + 1] = "do"
 		output[#output + 1] = format('	local name = "%s"', name)
-		output[#output + 1] = format('	local desc = "[6.2] %s"', desc)
+		output[#output + 1] = format('	local desc = "[7.0] %s"', desc)
 		output[#output + 1] = "	local code = [["
 		output[#output + 1] = OvaleSimulationCraft:Emit(profile, true)
 		output[#output + 1] = "]]"

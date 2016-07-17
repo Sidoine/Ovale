@@ -88,12 +88,6 @@ local function RequireValue(value)
 	return value, required
 end
 
-local function TestConditionGlyph(value)
-	local glyph, required = RequireValue(value)
-	local hasGlyph = OvaleSpellBook:IsActiveGlyph(glyph)
-	return (required and hasGlyph) or (not required and not hasGlyph)
-end
-
 local function TestConditionLevel(value)
 	return OvalePaperDoll.level >= value
 end
@@ -128,7 +122,6 @@ local function TestConditionTalent(value)
 end
 
 local TEST_CONDITION_DISPATCH = {
-	glyph = TestConditionGlyph,
 	if_spell = TestConditionSpell,
 	if_stance = TestConditionStance,
 	level = TestConditionLevel,
@@ -544,7 +537,6 @@ end
 function OvaleCompile:OnEnable()
 	self:RegisterMessage("Ovale_CheckBoxValueChanged", "ScriptControlChanged")
 	self:RegisterMessage("Ovale_EquipmentChanged", "EventHandler")
-	self:RegisterMessage("Ovale_GlyphsChanged", "EventHandler")
 	self:RegisterMessage("Ovale_ListValueChanged", "ScriptControlChanged")
 	self:RegisterMessage("Ovale_ScriptChanged")
 	self:RegisterMessage("Ovale_SpecializationChanged", "Ovale_ScriptChanged")
@@ -557,7 +549,6 @@ end
 function OvaleCompile:OnDisable()
 	self:UnregisterMessage("Ovale_CheckBoxValueChanged")
 	self:UnregisterMessage("Ovale_EquipmentChanged")
-	self:UnregisterMessage("Ovale_GlyphsChanged")
 	self:UnregisterMessage("Ovale_ListValueChanged")
 	self:UnregisterMessage("Ovale_ScriptChanged")
 	self:UnregisterMessage("Ovale_SpecializationChanged")

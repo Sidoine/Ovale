@@ -349,7 +349,7 @@ function OvalePaperDoll:UNIT_STATS(event, unitId)
 		self.agility = API_UnitStat(unitId, 2)
 		self.stamina = API_UnitStat(unitId, 3)
 		self.intellect = API_UnitStat(unitId, 4)
-		self.spirit = API_UnitStat(unitId, 5)
+		self.spirit = 0
 		self.snapshotTime = API_GetTime()
 		Ovale.refreshNeeded[self_playerGUID] = true
 		self:StopProfiling("OvalePaperDoll_UpdateStats")

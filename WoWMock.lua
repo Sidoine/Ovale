@@ -408,8 +408,11 @@ end
 do
 	local lib = {}
 	LibStub = lib
+	lib.libs = {}
+	lib.minors = {}
+	lib.minor = 1
 
-	lib.library = {
+	lib.libs = {
 		["AceAddon-3.0"] = AceAddon,
 		["AceComm-3.0"] = AceComm,
 		["AceConfig-3.0"] = AceConfig,
@@ -549,6 +552,9 @@ WoWMock.NUM_TALENT_COLUMNS = 3
 --]]--------------------------------------------------------------------
 WoWMock.debugprofilestop = ZeroFunction
 
+WoWMock.hooksecurefunc = function(table, functionName, hookFunc)
+end
+
 --[[--------------------------------------------------------------------
 	strjoin() is a non-standard Lua function that joins a list of
 	strings together using the given separator.
@@ -557,6 +563,8 @@ WoWMock.strjoin = function(sep, ...)
 	local t = { ... }
 	return table.concat(t, sep)
 end
+
+WoWMock.strmatch = string.match
 
 --[[--------------------------------------------------------------------
 	strsplit() is a non-standard Lua function that splits a string and
@@ -616,6 +624,10 @@ WoWMock.wipe = function(t)
 	end
 end
 
+WoWMock.C_Timer = {
+	After = function(duration, callback) end	
+}
+
 --[[-------------------------------------------------
 	Fake Blizzard API functions for unit testing.
 --]]-------------------------------------------------
@@ -629,8 +641,11 @@ WoWMock.mock["CreateFrame"] = [[
 
 		function CreateFrame(...)
 			local frame = {
+				ClearAllPoints = DoNothing,
+				CreateFontString = function(...) return CreateFrame() end,
 				CreateTexture = function(...) return CreateFrame() end,
 				EnableMouse = DoNothing,
+				GetScript = function(event) return nil end,
 				Hide = DoNothing,
 				IsVisible = DoNothing,
 				NumLines = ZeroFunction,
@@ -639,12 +654,17 @@ WoWMock.mock["CreateFrame"] = [[
 				SetFrameStrata = DoNothing,
 				SetHeight = DoNothing,
 				SetInventoryItem = DoNothing,
+				SetJustifyH = DoNothing,
+				SetJustifyV = DoNothing,
 				SetMovable = DoNothing,
 				SetOwner = DoNothing,
 				SetPoint = DoNothing,
 				SetScript = DoNothing,
+				SetText = DoNothing,
 				SetTexture = DoNothing,
 				SetWidth = DoNothing,
+				RegisterEvent = DoNothing,
+				UnregisterAllEvents = DoNothing
 			}
 			return frame
 		end
@@ -701,6 +721,18 @@ WoWMock.mock["GetBonusBarIndex"] = [[
 	end
 ]]
 
+WoWMock.mock["GetBuildInfo"] = [[
+	function GetBuildInfo()
+		return "7.0.0", "12345", "Oct 25 2020", 70000
+	end
+]]
+
+WoWMock.mock["GetCurrentRegion"] = [[
+	function GetCurrentRegion()
+		return 3
+	end
+]]
+
 WoWMock.mock["GetGlyphSocketInfo"] = [[
 	function GetGlyphSocketInfo(socket, talentGroup)
 		-- No glyphs.
@@ -749,6 +781,12 @@ WoWMock.mock["GetNumShapeshiftForms"] = ZeroFunction
 WoWMock.mock["GetPowerRegen"] = [[
 	function GetPowerRegen()
 		return 0, 0
+	end
+]]
+
+WoWMock.mock["GetRealmName"] = [[
+	function GetRealmName()
+		return "Elune"
 	end
 ]]
 
@@ -840,6 +878,11 @@ WoWMock.mock["HasPetSpells"] = [[
 	end
 ]]
 
+WoWMock.mock["InterfaceOptions_AddCategory"] = [[
+	function InterfaceOptions_AddCategory(category)
+	end
+]]
+
 WoWMock.mock["RegisterAddonMessagePrefix"] = DoNothing
 WoWMock.mock["RegisterStateDriver"] = DoNothing
 
@@ -848,10 +891,20 @@ WoWMock.UnitAura = function(unitId)
 	return nil
 end
 
+WoWMock.mock["SlashCmdList"] = [[
+	SlashCmdList = {}
+]]
+
 WoWMock.mock["UnitClass"] = [[
 	function UnitClass()
 		local class = WOWMOCK_CONFIG.class or "DEATHKNIGHT"
 		return class, class
+	end
+]]
+
+WoWMock.mock["UnitFactionGroup"] = [[
+	function UnitFactionGroup(unitId)
+		return "Horde", "Horde"
 	end
 ]]
 
@@ -873,6 +926,12 @@ WoWMock.mock["UnitName"] = [[
 	function UnitName()
 		local name = WOWMOCK_CONFIG.name or "AwesomePlayer"
 		return name
+	end
+]]
+
+WoWMock.mock["UnitRace"] = [[
+	function UnitRace()
+		return "Night Elf", "NightElf"
 	end
 ]]
 
@@ -1036,6 +1095,7 @@ end
 	addon file line that uses ... to get the file arguments.
 --]]--------------------------------------------------------------------
 function WoWMock:LoadLua(filename, directory, verbose)
+	local f = filename
 	if directory then
 		filename = directory .. filename
 	end
@@ -1045,11 +1105,14 @@ function WoWMock:LoadLua(filename, directory, verbose)
 
 	local ok = FileExists(filename, nil, verbose)
 	if ok then
-		local list = {}
+		local list = { }
 		for line in io.lines(filename) do
 			local varName = string.match(line, "^local%s+([%w_]+)%s*,[%w%s_,]*=%s*[.][.][.]%s*$")
 			if varName then
 				line = string.format("local %s = %q", varName, self.WOWMOCK_CONFIG.addonName)
+			end
+			if (#list == 0) then
+				line = '--[[' .. filename .. ']]' .. line
 			end
 			table.insert(list, line)
 		end
@@ -1131,6 +1194,9 @@ function WoWMock:LoadXML(filename, directory, verbose)
 		local list = {}
 		for line in io.lines(filename) do
 			local s = string.match(line, '<Script[%s]+file="([^"]+)"')
+			if not s then
+				 s = string.match(line, '<Include[%s]+file="([^"]+)"')
+			end
 			if s then
 				s = string.gsub(s, "\\", "/")
 				local t = {}
@@ -1152,9 +1218,11 @@ function WoWMock:LoadXML(filename, directory, verbose)
 			if FileExists(t.file, t.directory, verbose) then
 				if string.find(t.file, "[.]lua$") then
 					ok = ok and self:LoadLua(t.file, t.directory, verbose)
-					if not ok then
-						break
-					end
+				elseif string.find(t.file, "[.]xml$") then
+					ok = ok and self:LoadXML(t.file, t.directory, verbose)
+				end
+				if not ok then
+					break
 				end
 			end
 		end

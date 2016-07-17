@@ -5,7 +5,7 @@
 --]]----------------------------------------------------------------------
 
 local OVALE, Ovale = ...
-Ovale = LibStub("AceAddon-3.0"):NewAddon(Ovale, OVALE, "AceEvent-3.0")
+Ovale = LibStub("AceAddon-3.0"):NewAddon(Ovale or {}, OVALE or "Ovale", "AceEvent-3.0")
 
 -- Export "Ovale" symbol to global namespace.
 _G["Ovale"] = Ovale

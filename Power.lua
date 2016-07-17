@@ -110,16 +110,13 @@ OvalePower.inactiveRegen = 0
 OvalePower.POWER_INFO =
 {
 	alternate = { id = SPELL_POWER_ALTERNATE_POWER, token = "ALTERNATE_RESOURCE_TEXT", mini = 0 },
-	burningembers = { id = SPELL_POWER_BURNING_EMBERS, token = "BURNING_EMBERS", mini = 0, segments = true, costString = BURNING_EMBERS_COST },
 	chi = { id = SPELL_POWER_CHI, token = "CHI", mini = 0, costString = CHI_COST },
-	demonicfury = { id = SPELL_POWER_DEMONIC_FURY, token = "DEMONIC_FURY", mini = 0, costString = DEMONIC_FURY_COST },
 	energy = { id = SPELL_POWER_ENERGY, token = "ENERGY", mini = 0, costString = ENERGY_COST },
 	focus = { id = SPELL_POWER_FOCUS, token = "FOCUS", mini = 0, costString = FOCUS_COST },
 	holy = { id = SPELL_POWER_HOLY_POWER, token = "HOLY_POWER", mini = 0, costString = HOLY_POWER_COST },
 	mana = { id = SPELL_POWER_MANA, token = "MANA", mini = 0, costString = MANA_COST },
 	rage = { id = SPELL_POWER_RAGE, token = "RAGE", mini = 0, costString = RAGE_COST },
 	runicpower = { id = SPELL_POWER_RUNIC_POWER, token = "RUNIC_POWER", mini = 0, costString = RUNIC_POWER_COST },
-	shadoworbs = { id = SPELL_POWER_SHADOW_ORBS, token = "SHADOW_ORBS", mini = 0 },
 	shards = { id = SPELL_POWER_SOUL_SHARDS, token = "SOUL_SHARDS", mini = 0, costString = SOUL_SHARDS_COST },
 }
 
@@ -133,6 +130,9 @@ OvalePower.PRIMARY_POWER = {
 OvalePower.POWER_TYPE = {}
 do
 	for powerType, v in pairs(OvalePower.POWER_INFO) do
+		if not v.id then
+			OvalePower:Print("Unknown resource %s", v.token)
+		end
 		OvalePower.POWER_TYPE[v.id] = powerType
 		OvalePower.POWER_TYPE[v.token] = powerType
 	end

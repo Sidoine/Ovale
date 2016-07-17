@@ -53,6 +53,7 @@ local KEYWORD = {}
 
 local MODIFIER_KEYWORD = {
 	["ammo_type"] = true,
+	["attack_speed"] = true,
 	["chain"] = true,
 	["choose"] = true,
 	["cooldown"] = true,
@@ -74,6 +75,7 @@ local MODIFIER_KEYWORD = {
 	["moving"] = true,
 	["name"] = true,
 	["nonlethal"] = true,
+	["range"] = true,
 	["sec"] = true,
 	["slot"] = true,
 	["sync"] = true,
@@ -1144,9 +1146,6 @@ local function InitializeDisambiguation()
 	AddDisambiguation("dark_soul",				"dark_soul_instability",		"WARLOCK",		"destruction")
 	AddDisambiguation("dark_soul",				"dark_soul_knowledge",			"WARLOCK",		"demonology")
 	AddDisambiguation("dark_soul",				"dark_soul_misery",				"WARLOCK",		"affliction")
-	AddDisambiguation("glyph_of_dark_soul_instability",	"glyph_of_dark_soul",	"WARLOCK",		"destruction")
-	AddDisambiguation("glyph_of_dark_soul_knowledge",	"glyph_of_dark_soul",	"WARLOCK",		"demonology")
-	AddDisambiguation("glyph_of_dark_soul_misery",		"glyph_of_dark_soul",	"WARLOCK",		"affliction")
 	AddDisambiguation("legendary_ring",			"legendary_ring_intellect",		"WARLOCK")
 	-- Warrior
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_rage",			"WARRIOR")
@@ -1288,17 +1287,21 @@ SplitByTagAction = function(tag, node, nodeList, annotation)
 			elseif actionType == "spell" then
 				actionTag, invokesGCD = OvaleData:GetSpellTagInfo(id)
 			end
+		else
+			OvaleSimulationCraft:Print("Warning: Unable to find %s '%s'", actionType, name)
 		end
 	elseif actionType == "texture" then
 		-- Textures are assumed to be "main" tag and invoke the GCD.
 		actionTag = "main"
 		invokesGCD = true
+	else
+		OvaleSimulationCraft:Print("Warning: Unknown action type '%'", actionType)
 	end
 	-- Default to "main" tag and assume the GCD is invoked.'
 	if not actionTag then
 		actionTag = "main"
 		invokesGCD = true
-		OvaleSimulationCraft:Print("Warning: Unable to determine tag for '%s', assuming '%s'.", name, actionTag)
+		OvaleSimulationCraft:Print("Warning: Unable to determine tag for '%s', assuming '%s' (actionType: %s).", name, actionTag, actionType)
 	end
 	if actionTag == tag then
 		bodyNode = node
@@ -2557,6 +2560,8 @@ EmitOperand = function(parseNode, nodeList, annotation, action)
 			ok, node = EmitOperandActiveDot(operand, parseNode, nodeList, annotation, action, target)
 		elseif token == "aura" then
 			ok, node = EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target)
+		elseif token == "artifact" then
+			ok, node = EmitOperandArtifact(operand, parseNode, nodeList, annotation, action, target)
 		elseif token == "buff" then
 			ok, node = EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target)
 		elseif token == "cooldown" then
@@ -2589,6 +2594,7 @@ EmitOperand = function(parseNode, nodeList, annotation, action)
 		end
 	end
 	if not ok then
+		OvaleSimulationCraft:Print("Warning: Variable '%s' is not implemented.", parseNode.name)
 		node = OvaleAST:NewNode(nodeList)
 		node.type = "variable"
 		node.name = "FIXME_" .. parseNode.name
@@ -2732,6 +2738,33 @@ EmitOperandActiveDot = function(operand, parseNode, nodeList, annotation, action
 
 	return ok, node
 end
+
+EmitOperandArtifact = function(operand, parseNode, nodeList, annotation, action, target)
+	local ok = true
+	local node
+	local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
+	local token = tokenIterator()
+	if token == "artifact" then
+		local name = tokenIterator()
+		local property = tokenIterator()
+
+		if property == "enabled" then
+			code = format("PlayerBuffPresent(%s)", name)
+		else
+			ok = false
+		end
+
+		if ok and code then
+			annotation.astAnnotation = annotation.astAnnotation or {}
+			node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+			AddSymbol(annotation, name)
+		end
+	else
+		ok = false
+	end
+
+	return ok, node
+end 
 
 EmitOperandBuff = function(operand, parseNode, nodeList, annotation, action, target)
 	local ok = true
@@ -4944,7 +4977,6 @@ function OvaleSimulationCraft:EmitAST(profile)
 	ast.type = "script"
 
 	local annotation = profile.annotation
-	local annotation = profile.annotation
 	local ok = true
 	if profile.actionList then
 		annotation.astAnnotation = annotation.astAnnotation or {}
@@ -4965,6 +4997,7 @@ function OvaleSimulationCraft:EmitAST(profile)
 			dictionaryAST = OvaleAST:ParseCode("script", dictionaryCode, dictionaryAnnotation.nodeList, dictionaryAnnotation)
 			if dictionaryAST then
 				dictionaryAST.annotation = dictionaryAnnotation
+				annotation.dictionaryAST = dictionaryAST
 				annotation.dictionary = dictionaryAnnotation.definition
 				OvaleAST:PropagateConstants(dictionaryAST)
 				OvaleAST:PropagateStrings(dictionaryAST)
@@ -4993,11 +5026,6 @@ function OvaleSimulationCraft:EmitAST(profile)
 				ok = false
 				break
 			end
-		end
-		-- Clean up the dictionary that was only needed to generate the AST.
-		if dictionaryAST then
-			OvaleAST:Release(dictionaryAST)
-			annotation.dictionary = nil
 		end
 	end
 	if ok then
@@ -5161,9 +5189,20 @@ function OvaleSimulationCraft:Emit(profile, noFinalNewLine)
 		output[#output + 1] = "### Required symbols"
 		tsort(profile.annotation.symbolTable)
 		for _, symbol in ipairs(profile.annotation.symbolTable) do
+			if not profile.annotation.dictionary[symbol] then
+				self:Print("Warning: Symbol '%s' not defined", symbol)				
+			end
 			output[#output + 1] = "# " .. symbol
 		end
 	end
+
+	-- Clean-up
+	annotation.dictionary = nil
+	if annotation.dictionaryAST then
+		OvaleAST:Release(annotation.dictionaryAST)
+	end
+
+
 	-- Ensure that the script always ends in a blank line.
 	if not noFinalNewLine and output[#output] ~= "" then
 		output[#output + 1] = ""
