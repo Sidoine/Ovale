@@ -2738,6 +2738,21 @@ do
 		return Power("alternate", positionalParams, namedParams, state, atTime)
 	end
 
+	--- Get the current amount of astral power for balance druids.
+	-- @name AstraPower
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The current runic power.
+	-- @return A boolean value for the result of the comparison.
+	-- @usage
+	-- if AstraPower() >70 Spell(frost_strike)
+	-- if AstraPower(more 70) Spell(frost_strike)
+
+	local function AstraPower(positionalParams, namedParams, state, atTime)
+		return Power("astralpower", positionalParams, namedParams, state, atTime)
+	end
+
 	--- Get the current number of Burning Embers for destruction warlocks.
 	-- @name BurningEmbers
 	-- @paramsig number or boolean
@@ -2931,6 +2946,21 @@ do
 
 	local function AlternatePowerDeficit(positionalParams, namedParams, state, atTime)
 		return PowerDeficit("alternatepower", positionalParams, namedParams, state, atTime)
+	end
+
+	--- Get the number of lacking resource points for a full runic power bar, between 0 and maximum runic power, of the target.
+	-- @name AstralPowerDeficit
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return The current runic power deficit.
+	-- @return A boolean value for the result of the comparison.
+
+	local function AstralPowerDeficit(positionalParams, namedParams, state, atTime)
+		return PowerDeficit("astralpower", positionalParams, namedParams, state, atTime)
 	end
 
 	--- Get the number of lacking resource points for a full burning embers bar, between 0 and maximum burning embers, of the target.
@@ -3186,6 +3216,21 @@ do
 		return MaxPower("chi", positionalParams, namedParams, state, atTime)
 	end
 
+	--- Get the maximum amount of Chi of the target.
+	-- @name MaxChi
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return The maximum value.
+	-- @return A boolean value for the result of the comparison.
+
+	local function MaxComboPoints(positionalParams, namedParams, state, atTime)
+		return MaxPower("combopoints", positionalParams, namedParams, state, atTime)
+	end
+	
 	--- Get the maximum amount of Demonic Fury of the target.
 	-- @name MaxDemonicFury
 	-- @paramsig number or boolean
@@ -3607,55 +3652,18 @@ do
 	--- Get the current number of active and regenerating (fractional) runes of the given type for death knights.
 	-- @name Rune
 	-- @paramsig number or boolean
-	-- @param type The type of rune.
-	--     Valid values: blood, frost, unholy, death
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
-	-- @param death Optional. Set death=1 to include all active and regenerating death runes in the count. Set death=0 to exclude all death runes.
-	--     Defaults to unset.
-	--     Valid values: unset, 0, 1
 	-- @return The number of runes.
 	-- @return A boolean value for the result of the comparison.
-	-- @see DeathRune, RuneCount
+	-- @see RuneCount
 	-- @usage
-	-- if Rune(blood) > 1 Spell(blood_tap)
+	-- if Rune() > 1 Spell(blood_tap)
 
 	local function Rune(positionalParams, namedParams, state, atTime)
-		local name, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-		local includeDeath
-		if namedParams.death == 1 then
-			includeDeath = true
-		elseif namedParams.death == 0 then
-			includeDeath = false
-		--else
-		--	includeDeath = nil
-		end
-		local count, startCooldown, endCooldown = state:RuneCount(name, includeDeath, atTime)
-		if startCooldown < INFINITY then
-			local origin = startCooldown
-			local rate = 1 / (endCooldown - startCooldown)
-			local start, ending = startCooldown, INFINITY
-			return TestValue(start, ending, count, origin, rate, comparator, limit)
-		end
-		return Compare(count, comparator, limit)
-	end
-
-	--- Get the current number of active and regenerating (fractional) death runes of the given type for death knights.
-	-- @name DeathRune
-	-- @paramsig number or boolean
-	-- @param type The type of rune.
-	--     Valid values: blood, frost, unholy
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @return The number of runes.
-	-- @return A boolean value for the result of the comparison.
-	-- @see Rune
-	-- @usage
-	-- if DeathRune(blood) > 1 Spell(blood_tap)
-
-	local function DeathRune(positionalParams, namedParams, state, atTime)
-		local name, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-		local count, startCooldown, endCooldown = state:DeathRuneCount(name, atTime)
+		local comparator, limit = positionalParams[1], positionalParams[2]
+		
+		local count, startCooldown, endCooldown = state:RuneCount(atTime)
 		if startCooldown < INFINITY then
 			local origin = startCooldown
 			local rate = 1 / (endCooldown - startCooldown)
@@ -3668,8 +3676,6 @@ do
 	--- Get the current number of active runes of the given type for death knights.
 	-- @name RuneCount
 	-- @paramsig number or boolean
-	-- @param type The type of rune.
-	--     Valid values: blood, frost, unholy, death
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
 	-- @param death Optional. Set death=1 to include all active death runes in the count. Set death=0 to exclude all death runes.
@@ -3683,16 +3689,8 @@ do
 	--     Spell(obliterate)
 
 	local function RuneCount(positionalParams, namedParams, state, atTime)
-		local name, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-		local includeDeath
-		if namedParams.death == 1 then
-			includeDeath = true
-		elseif namedParams.death == 0 then
-			includeDeath = false
-		--else
-		--	includeDeath = nil
-		end
-		local count, startCooldown, endCooldown = state:RuneCount(name, includeDeath, atTime)
+		local comparator, limit = positionalParams[1], positionalParams[2]
+		local count, startCooldown, endCooldown = state:RuneCount(atTime)
 		if startCooldown < INFINITY then
 			local start, ending = startCooldown, endCooldown
 			return TestValue(start, ending, count, start, 0, comparator, limit)
@@ -3701,74 +3699,7 @@ do
 	end
 
 	OvaleCondition:RegisterCondition("rune", false, Rune)
-	OvaleCondition:RegisterCondition("deathrune", false, DeathRune)
 	OvaleCondition:RegisterCondition("runecount", false, RuneCount)
-end
-
-do
-	local RUNE_TYPE = OvaleRunes.RUNE_TYPE
-
-	local runes = {
-		blood = 0,
-		unholy = 0,
-		frost = 0,
-		death = 0,
-	}
-
-	local function ParseRuneCondition(positionalParams, namedParams, state)
-		for name in pairs(RUNE_TYPE) do
-			runes[name] = 0
-		end
-		local k = 1
-		while true do
-			local name, count = positionalParams[2*k - 1], positionalParams[2*k]
-			if not RUNE_TYPE[name] then break end
-			runes[name] = runes[name] + count
-			k = k + 1
-		end
-		return runes.blood, runes.unholy, runes.frost, runes.death
-	end
-
-	--- Test if the current active rune counts meets the minimum rune requirements set out in the parameters.
-	-- This condition takes pairs of "type number" to mean that there must be a minimum of number runes of the named type.
-	-- E.g., Runes(blood 1 frost 1 unholy 1) means at least one blood, one frost, and one unholy rune is available,
-	-- death runes included.
-	-- @name Runes
-	-- @paramsig boolean
-	-- @param type The type of rune.
-	--     Valid values: blood, frost, unholy, death
-	-- @param number The number of runes
-	-- @param ... Optional. Additional "type number" pairs for minimum rune requirements.
-	-- @return A boolean value.
-	-- @usage
-	-- if Runes(frost 1) Spell(howling_blast)
-
-	local function Runes(positionalParams, namedParams, state, atTime)
-		local blood, unholy, frost, death = ParseRuneCondition(positionalParams, namedParams, state)
-		local seconds = state:GetRunesCooldown(blood, unholy, frost, death, atTime)
-		return state.currentTime + seconds, INFINITY
-	end
-
-	--- Get the number of seconds before the rune conditions are met.
-	-- This condition takes pairs of "type number" to mean that there must be a minimum of number runes of the named type.
-	-- E.g., RunesCooldown(blood 1 frost 1 unholy 1) returns the number of seconds before
-	-- there are at least one blood, one frost, and one unholy rune, death runes included.
-	-- @name RunesCooldown
-	-- @paramsig number
-	-- @param type The type of rune.
-	--     Valid values: blood, frost, unholy, death
-	-- @param number The number of runes
-	-- @param ... Optional. Additional "type number" pairs for minimum rune requirements.
-	-- @return The number of seconds.
-
-	local function RunesCooldown(positionalParams, namedParams, state, atTime)
-		local blood, unholy, frost, death = ParseRuneCondition(positionalParams, namedParams, state)
-		local seconds = state:GetRunesCooldown(blood, unholy, frost, death, atTime)
-		return 0, state.currentTime + seconds, seconds, state.currentTime, -1
-	end
-
-	OvaleCondition:RegisterCondition("runes", false, Runes)
-	OvaleCondition:RegisterCondition("runescooldown", false, RunesCooldown)
 end
 
 do
@@ -4084,6 +4015,7 @@ do
 	local function SpellCharges(positionalParams, namedParams, state, atTime)
 		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
 		local charges, maxCharges, start, duration = state:GetSpellCharges(spellId, atTime)
+		if not charges then return nil end
 		charges = charges or 0
 		maxCharges = maxCharges or 1
 		if namedParams.count == 0 and charges < maxCharges then

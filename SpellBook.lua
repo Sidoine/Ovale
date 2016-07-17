@@ -180,8 +180,8 @@ end
 -- Store the number of points assigned to each talent.
 function OvaleSpellBook:UpdateTalents()
 	self:Debug("Updating talents.")
-	wipe(self.talent)
-	wipe(self.talentPoints)
+	-- wipe(self.talent)
+	-- wipe(self.talentPoints)
 
 	local activeTalentGroup = API_GetActiveSpecGroup()
 	for i = 1, MAX_TALENT_TIERS do
@@ -206,12 +206,12 @@ function OvaleSpellBook:UpdateTalents()
 end
 
 function OvaleSpellBook:UpdateSpells()
-	wipe(self.spell)
-	wipe(self.spellbookId[BOOKTYPE_PET])
-	wipe(self.spellbookId[BOOKTYPE_SPELL])
-	wipe(self.isHarmful)
-	wipe(self.isHelpful)
-	wipe(self.texture)
+	-- wipe(self.spell)
+	-- wipe(self.spellbookId[BOOKTYPE_PET])
+	-- wipe(self.spellbookId[BOOKTYPE_SPELL])
+	-- wipe(self.isHarmful)
+	-- wipe(self.isHelpful)
+	-- wipe(self.texture)
 
 	-- Scan the first two tabs of the player's spellbook.
 	for tab = 1, 2 do

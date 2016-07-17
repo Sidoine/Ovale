@@ -5,71 +5,244 @@ local OvaleScripts = Ovale.OvaleScripts
 -- ANY CHANGES MADE BELOW THIS POINT WILL BE LOST.
 
 do
-	local name = "simulationcraft_paladin_prot"
-	local desc = "[7.0] SimulationCraft: Paladin_Prot"
+	local name = "simulationcraft_paladin_retribution_t18m"
+	local desc = "[7.0] SimulationCraft: Paladin_Retribution_T18M"
 	local code = [[
-# Based on SimulationCraft profile "Paladin_Prot".
+# Based on SimulationCraft profile "Paladin_Retribution_T18M".
 #	class=paladin
-#	spec=protection
-#	talents=1211221
+#	spec=retribution
+#	talents=2112232
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_paladin_spells)
 
-AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=protection)
+AddCheckBox(opt_interrupt L(interrupt) default specialization=retribution)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=retribution)
+AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=retribution)
+AddCheckBox(opt_legendary_ring_strength ItemName(legendary_ring_strength) default specialization=retribution)
 
-AddFunction ProtectionGetInMeleeRange
+AddFunction RetributionUsePotionStrength
+{
+	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
+}
+
+AddFunction RetributionGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
-### actions.default
-
-AddFunction ProtectionDefaultMainActions
+AddFunction RetributionInterruptActions
 {
-	#spell_nuke,damage=3000000,cooldown=30
-	Spell(spell_nuke)
-	#spell_dot,damage=50000,cooldown=20
-	Spell(spell_dot)
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(rebuke) Spell(rebuke)
+		if not target.Classification(worldboss)
+		{
+			if target.InRange(fist_of_justice) Spell(fist_of_justice)
+			if target.InRange(hammer_of_justice) Spell(hammer_of_justice)
+			Spell(blinding_light)
+			Spell(arcane_torrent_holy)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
 }
 
-AddFunction ProtectionDefaultShortCdActions
+### actions.default
+
+AddFunction RetributionDefaultMainActions
 {
-	#auto_attack,damage=3300000,range=1000000,attack_speed=1.5
-	ProtectionGetInMeleeRange()
+	#holy_wrath
+	Spell(holy_wrath)
+	#avenging_wrath
+	Spell(avenging_wrath_melee)
+	#crusade,sync=judgment,if=holy_power>=3
+	if Spell(judgment) and HolyPower() >= 3 Spell(crusade)
+	#wake_of_ashes,if=holy_power>=0&time<2
+	if HolyPower() >= 0 and TimeInCombat() < 2 Spell(wake_of_ashes)
+	#execution_sentence,if=cooldown.judgment.remains<gcd*5&(holy_power>=3|buff.divine_purpose.react|buff.the_fires_of_justice.react)
+	if SpellCooldown(judgment) < GCD() * 5 and { HolyPower() >= 3 or BuffPresent(divine_purpose_buff) or BuffPresent(the_fires_of_justice_buff) } Spell(execution_sentence)
+	#blood_fury
+	Spell(blood_fury_apsp)
+	#berserking
+	Spell(berserking)
+	#arcane_torrent
+	Spell(arcane_torrent_holy)
+	#call_action_list,name=single
+	RetributionSingleMainActions()
+}
+
+AddFunction RetributionDefaultShortCdActions
+{
+	#auto_attack
+	RetributionGetInMeleeRange()
+}
+
+AddFunction RetributionDefaultCdActions
+{
+	#rebuke
+	RetributionInterruptActions()
+	#potion,name=draenic_strength,if=(buff.bloodlust.react|buff.avenging_wrath.up|target.time_to_die<=40)
+	if BuffPresent(burst_haste_buff any=1) or BuffPresent(avenging_wrath_melee_buff) or target.TimeToDie() <= 40 RetributionUsePotionStrength()
+	#use_item,name=thorasus_the_stone_heart_of_draenor,if=buff.avenging_wrath.up
+	if BuffPresent(avenging_wrath_melee_buff) and CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength usable=1)
 }
 
 ### actions.precombat
-### Protection icons.
 
-AddCheckBox(opt_paladin_protection_aoe L(AOE) default specialization=protection)
-
-AddIcon checkbox=!opt_paladin_protection_aoe enemies=1 help=shortcd specialization=protection
+AddFunction RetributionPrecombatCdActions
 {
-	ProtectionDefaultShortCdActions()
+	#flask,type=greater_draenic_strength_flask
+	#food,type=sleeper_sushi
+	#snapshot_stats
+	#potion,name=draenic_strength
+	RetributionUsePotionStrength()
 }
 
-AddIcon checkbox=opt_paladin_protection_aoe help=shortcd specialization=protection
+### actions.single
+
+AddFunction RetributionSingleMainActions
 {
-	ProtectionDefaultShortCdActions()
+	#judgment
+	Spell(judgment)
+	#divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&debuff.judgment.remains<gcd
+	if target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and target.DebuffRemaining(judgment_debuff) < GCD() Spell(divine_storm)
+	#divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&buff.divine_purpose.up&buff.divine_purpose.remains<gcd*2
+	if target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and BuffPresent(divine_purpose_buff) and BuffRemaining(divine_purpose_buff) < GCD() * 2 Spell(divine_storm)
+	#divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&holy_power>=5&buff.divine_purpose.react
+	if target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and HolyPower() >= 5 and BuffPresent(divine_purpose_buff) Spell(divine_storm)
+	#divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&holy_power>=5
+	if target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and HolyPower() >= 5 Spell(divine_storm)
+	#divine_storm,if=spell_targets.divine_storm>=2&cooldown.wake_of_ashes.remains<gcd*2&artifact.wake_of_ashes.enabled
+	if Enemies() >= 2 and SpellCooldown(wake_of_ashes) < GCD() * 2 and PlayerBuffPresent(wake_of_ashes) Spell(divine_storm)
+	#justicars_vengeance,if=debuff.judgment.up&buff.divine_purpose.up&debuff.judgment.remains<gcd
+	if target.DebuffPresent(judgment_debuff) and BuffPresent(divine_purpose_buff) and target.DebuffRemaining(judgment_debuff) < GCD() Spell(justicars_vengeance)
+	#justicars_vengeance,if=debuff.judgment.up&buff.divine_purpose.up&buff.divine_purpose.remains<gcd*2
+	if target.DebuffPresent(judgment_debuff) and BuffPresent(divine_purpose_buff) and BuffRemaining(divine_purpose_buff) < GCD() * 2 Spell(justicars_vengeance)
+	#justicars_vengeance,if=debuff.judgment.up&holy_power>=5&buff.divine_purpose.react
+	if target.DebuffPresent(judgment_debuff) and HolyPower() >= 5 and BuffPresent(divine_purpose_buff) Spell(justicars_vengeance)
+	#templars_verdict,if=debuff.judgment.up&debuff.judgment.remains<gcd
+	if target.DebuffPresent(judgment_debuff) and target.DebuffRemaining(judgment_debuff) < GCD() Spell(templars_verdict)
+	#templars_verdict,if=debuff.judgment.up&buff.divine_purpose.up&buff.divine_purpose.remains<gcd*2
+	if target.DebuffPresent(judgment_debuff) and BuffPresent(divine_purpose_buff) and BuffRemaining(divine_purpose_buff) < GCD() * 2 Spell(templars_verdict)
+	#templars_verdict,if=debuff.judgment.up&holy_power>=5&buff.divine_purpose.react
+	if target.DebuffPresent(judgment_debuff) and HolyPower() >= 5 and BuffPresent(divine_purpose_buff) Spell(templars_verdict)
+	#templars_verdict,if=debuff.judgment.up&holy_power>=5
+	if target.DebuffPresent(judgment_debuff) and HolyPower() >= 5 Spell(templars_verdict)
+	#justicars_vengeance,if=holy_power>=3&buff.divine_purpose.up&cooldown.wake_of_ashes.remains<gcd*2&artifact.wake_of_ashes.enabled
+	if HolyPower() >= 3 and BuffPresent(divine_purpose_buff) and SpellCooldown(wake_of_ashes) < GCD() * 2 and PlayerBuffPresent(wake_of_ashes) Spell(justicars_vengeance)
+	#templars_verdict,if=holy_power>=3&cooldown.wake_of_ashes.remains<gcd*2&artifact.wake_of_ashes.enabled
+	if HolyPower() >= 3 and SpellCooldown(wake_of_ashes) < GCD() * 2 and PlayerBuffPresent(wake_of_ashes) Spell(templars_verdict)
+	#wake_of_ashes,if=cooldown.judgment.remains>gcd*2
+	if SpellCooldown(judgment) > GCD() * 2 Spell(wake_of_ashes)
+	#zeal,if=charges=2&holy_power<=4
+	if Charges(zeal) == 2 and HolyPower() <= 4 Spell(zeal)
+	#crusader_strike,if=charges=2&!talent.the_fires_of_justice.enabled
+	if Charges(crusader_strike) == 2 and not Talent(the_fires_of_justice_talent) Spell(crusader_strike)
+	#blade_of_justice,if=holy_power<=3
+	if HolyPower() <= 3 Spell(blade_of_justice)
+	#blade_of_wrath,if=holy_power<=3
+	if HolyPower() <= 3 Spell(blade_of_wrath)
+	#divine_hammer,if=holy_power<=3
+	if HolyPower() <= 3 Spell(divine_hammer)
+	#crusader_strike,if=charges=2&talent.the_fires_of_justice.enabled
+	if Charges(crusader_strike) == 2 and Talent(the_fires_of_justice_talent) Spell(crusader_strike)
+	#divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&buff.divine_purpose.react
+	if target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and BuffPresent(divine_purpose_buff) Spell(divine_storm)
+	#divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&buff.the_fires_of_justice.up
+	if target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and BuffPresent(the_fires_of_justice_buff) Spell(divine_storm)
+	#divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&holy_power>=4
+	if target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and HolyPower() >= 4 Spell(divine_storm)
+	#justicars_vengeance,if=debuff.judgment.up&buff.divine_purpose.react
+	if target.DebuffPresent(judgment_debuff) and BuffPresent(divine_purpose_buff) Spell(justicars_vengeance)
+	#templars_verdict,if=debuff.judgment.up&buff.divine_purpose.react
+	if target.DebuffPresent(judgment_debuff) and BuffPresent(divine_purpose_buff) Spell(templars_verdict)
+	#templars_verdict,if=debuff.judgment.up&buff.the_fires_of_justice.up
+	if target.DebuffPresent(judgment_debuff) and BuffPresent(the_fires_of_justice_buff) Spell(templars_verdict)
+	#templars_verdict,if=debuff.judgment.up&holy_power>=4
+	if target.DebuffPresent(judgment_debuff) and HolyPower() >= 4 Spell(templars_verdict)
+	#consecration
+	Spell(consecration)
+	#zeal,if=holy_power<=4
+	if HolyPower() <= 4 Spell(zeal)
+	#crusader_strike,if=holy_power<=4
+	if HolyPower() <= 4 Spell(crusader_strike)
+	#divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&holy_power>=3
+	if target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and HolyPower() >= 3 Spell(divine_storm)
+	#templars_verdict,if=debuff.judgment.up&holy_power>=3
+	if target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 Spell(templars_verdict)
 }
 
-AddIcon enemies=1 help=main specialization=protection
+### Retribution icons.
+
+AddCheckBox(opt_paladin_retribution_aoe L(AOE) default specialization=retribution)
+
+AddIcon checkbox=!opt_paladin_retribution_aoe enemies=1 help=shortcd specialization=retribution
 {
-	ProtectionDefaultMainActions()
+	RetributionDefaultShortCdActions()
 }
 
-AddIcon checkbox=opt_paladin_protection_aoe help=aoe specialization=protection
+AddIcon checkbox=opt_paladin_retribution_aoe help=shortcd specialization=retribution
 {
-	ProtectionDefaultMainActions()
+	RetributionDefaultShortCdActions()
+}
+
+AddIcon enemies=1 help=main specialization=retribution
+{
+	RetributionDefaultMainActions()
+}
+
+AddIcon checkbox=opt_paladin_retribution_aoe help=aoe specialization=retribution
+{
+	RetributionDefaultMainActions()
+}
+
+AddIcon checkbox=!opt_paladin_retribution_aoe enemies=1 help=cd specialization=retribution
+{
+	if not InCombat() RetributionPrecombatCdActions()
+	RetributionDefaultCdActions()
+}
+
+AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
+{
+	if not InCombat() RetributionPrecombatCdActions()
+	RetributionDefaultCdActions()
 }
 
 ### Required symbols
+# arcane_torrent_holy
+# avenging_wrath_melee
+# avenging_wrath_melee_buff
+# berserking
+# blade_of_justice
+# blade_of_wrath
+# blinding_light
+# blood_fury_apsp
+# consecration
+# crusade
+# crusader_strike
+# divine_hammer
+# divine_purpose_buff
+# divine_storm
+# draenic_strength_potion
+# execution_sentence
+# fist_of_justice
+# hammer_of_justice
+# holy_wrath
+# judgment
+# judgment_debuff
+# justicars_vengeance
+# legendary_ring_strength
+# quaking_palm
 # rebuke
-# spell_dot
-# spell_nuke
+# templars_verdict
+# the_fires_of_justice_buff
+# the_fires_of_justice_talent
+# wake_of_ashes
+# war_stomp
+# zeal
 ]]
-	OvaleScripts:RegisterScript("PALADIN", "protection", name, desc, code, "script")
+	OvaleScripts:RegisterScript("PALADIN", "retribution", name, desc, code, "script")
 end

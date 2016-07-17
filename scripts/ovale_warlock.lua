@@ -5,25 +5,266 @@ local OvaleScripts = Ovale.OvaleScripts
 -- ANY CHANGES MADE BELOW THIS POINT WILL BE LOST.
 
 do
+	local name = "simulationcraft_warlock_affliction_t18m"
+	local desc = "[7.0] SimulationCraft: Warlock_Affliction_T18M"
+	local code = [[
+# Based on SimulationCraft profile "Warlock_Affliction_T18M".
+#	class=warlock
+#	spec=affliction
+#	talents=0000311
+#	pet=felhunter
+
+Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
+Include(ovale_warlock_spells)
+
+AddCheckBox(opt_legendary_ring_intellect ItemName(legendary_ring_intellect) default specialization=affliction)
+
+### actions.default
+
+AddFunction AfflictionDefaultMainActions
+{
+	#life_tap
+	Spell(life_tap)
+}
+
+AddFunction AfflictionDefaultCdActions
+{
+	#use_item,name=nithramus_the_allseer
+	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
+}
+
+### actions.precombat
+
+AddFunction AfflictionPrecombatMainActions
+{
+	#summon_pet,if=!talent.grimoire_of_supremacy.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.demonic_power.down)
+	if not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() Spell(summon_felhunter)
+	#summon_doomguard,if=talent.grimoire_of_supremacy.enabled&active_enemies<3
+	if Talent(grimoire_of_supremacy_talent) and Enemies() < 3 Spell(summon_doomguard)
+	#summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>=3
+	if Talent(grimoire_of_supremacy_talent) and Enemies() >= 3 Spell(summon_infernal)
+	#snapshot_stats
+	#grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
+	if Talent(grimoire_of_sacrifice_talent) and pet.Present() Spell(grimoire_of_sacrifice)
+}
+
+AddFunction AfflictionPrecombatCdPostConditions
+{
+	not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_felhunter) or Talent(grimoire_of_supremacy_talent) and Enemies() < 3 and Spell(summon_doomguard) or Talent(grimoire_of_supremacy_talent) and Enemies() >= 3 and Spell(summon_infernal) or Talent(grimoire_of_sacrifice_talent) and pet.Present() and Spell(grimoire_of_sacrifice)
+}
+
+### Affliction icons.
+
+AddCheckBox(opt_warlock_affliction_aoe L(AOE) default specialization=affliction)
+
+AddIcon enemies=1 help=main specialization=affliction
+{
+	if not InCombat() AfflictionPrecombatMainActions()
+	AfflictionDefaultMainActions()
+}
+
+AddIcon checkbox=opt_warlock_affliction_aoe help=aoe specialization=affliction
+{
+	if not InCombat() AfflictionPrecombatMainActions()
+	AfflictionDefaultMainActions()
+}
+
+AddIcon checkbox=!opt_warlock_affliction_aoe enemies=1 help=cd specialization=affliction
+{
+	unless not InCombat() and AfflictionPrecombatCdPostConditions()
+	{
+		AfflictionDefaultCdActions()
+	}
+}
+
+AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
+{
+	unless not InCombat() and AfflictionPrecombatCdPostConditions()
+	{
+		AfflictionDefaultCdActions()
+	}
+}
+
+### Required symbols
+# demonic_power_buff
+# grimoire_of_sacrifice
+# grimoire_of_sacrifice_talent
+# grimoire_of_supremacy_talent
+# legendary_ring_intellect
+# life_tap
+# summon_doomguard
+# summon_felhunter
+# summon_infernal
+]]
+	OvaleScripts:RegisterScript("WARLOCK", "affliction", name, desc, code, "script")
+end
+
+do
+	local name = "simulationcraft_warlock_demonology_t18m"
+	local desc = "[7.0] SimulationCraft: Warlock_Demonology_T18M"
+	local code = [[
+# Based on SimulationCraft profile "Warlock_Demonology_T18M".
+#	class=warlock
+#	spec=demonology
+#	talents=0000311
+#	pet=felguard
+
+Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
+Include(ovale_warlock_spells)
+
+AddCheckBox(opt_legendary_ring_intellect ItemName(legendary_ring_intellect) default specialization=demonology)
+
+### actions.default
+
+AddFunction DemonologyDefaultMainActions
+{
+	#life_tap
+	Spell(life_tap)
+}
+
+AddFunction DemonologyDefaultCdActions
+{
+	#use_item,name=nithramus_the_allseer
+	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
+}
+
+### actions.precombat
+
+AddFunction DemonologyPrecombatMainActions
+{
+	#summon_pet,if=!talent.grimoire_of_supremacy.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.demonic_power.down)
+	if not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() Spell(summon_felguard)
+	#summon_doomguard,if=talent.grimoire_of_supremacy.enabled&active_enemies<3
+	if Talent(grimoire_of_supremacy_talent) and Enemies() < 3 Spell(summon_doomguard)
+	#summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>=3
+	if Talent(grimoire_of_supremacy_talent) and Enemies() >= 3 Spell(summon_infernal)
+}
+
+AddFunction DemonologyPrecombatCdPostConditions
+{
+	not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_felguard) or Talent(grimoire_of_supremacy_talent) and Enemies() < 3 and Spell(summon_doomguard) or Talent(grimoire_of_supremacy_talent) and Enemies() >= 3 and Spell(summon_infernal)
+}
+
+### Demonology icons.
+
+AddCheckBox(opt_warlock_demonology_aoe L(AOE) default specialization=demonology)
+
+AddIcon enemies=1 help=main specialization=demonology
+{
+	if not InCombat() DemonologyPrecombatMainActions()
+	DemonologyDefaultMainActions()
+}
+
+AddIcon checkbox=opt_warlock_demonology_aoe help=aoe specialization=demonology
+{
+	if not InCombat() DemonologyPrecombatMainActions()
+	DemonologyDefaultMainActions()
+}
+
+AddIcon checkbox=!opt_warlock_demonology_aoe enemies=1 help=cd specialization=demonology
+{
+	unless not InCombat() and DemonologyPrecombatCdPostConditions()
+	{
+		DemonologyDefaultCdActions()
+	}
+}
+
+AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
+{
+	unless not InCombat() and DemonologyPrecombatCdPostConditions()
+	{
+		DemonologyDefaultCdActions()
+	}
+}
+
+### Required symbols
+# demonic_power_buff
+# grimoire_of_sacrifice_talent
+# grimoire_of_supremacy_talent
+# legendary_ring_intellect
+# life_tap
+# summon_doomguard
+# summon_felguard
+# summon_infernal
+]]
+	OvaleScripts:RegisterScript("WARLOCK", "demonology", name, desc, code, "script")
+end
+
+do
 	local name = "simulationcraft_warlock_destruction_t18m"
 	local desc = "[7.0] SimulationCraft: Warlock_Destruction_T18M"
 	local code = [[
 # Based on SimulationCraft profile "Warlock_Destruction_T18M".
 #	class=warlock
 #	spec=destruction
-#	talents=2101022
-#	pet=imp
+#	talents=2301032
+#	pet=felhunter
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_warlock_spells)
+
+AddCheckBox(opt_legendary_ring_intellect ItemName(legendary_ring_intellect) default specialization=destruction)
+
 ### actions.default
 
 AddFunction DestructionDefaultMainActions
 {
+	#service_pet,if=active_enemies<3
+	if Enemies() < 3 Spell(service_felhunter)
+	#service_voidwalker,if=active_enemies>=3
+	if Enemies() >= 3 Spell(service_voidwalker)
+	#summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening<3
+	if not Talent(grimoire_of_supremacy_talent) and Enemies() < 3 Spell(summon_doomguard)
+	#summon_infernal,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening>=3
+	if not Talent(grimoire_of_supremacy_talent) and Enemies() >= 3 Spell(summon_infernal)
+	#dimensional_rift,if=charges=3
+	if Charges(dimensional_rift) == 3 Spell(dimensional_rift)
+	#immolate,if=remains<=tick_time
+	if target.DebuffRemaining(immolate_debuff) <= target.TickTime(immolate_debuff) Spell(immolate)
+	#immolate,if=talent.roaring_blaze.enabled&remains<duration&action.conflagrate.charges>=1&action.conflagrate.recharge_time<cast_time+gcd
+	if Talent(roaring_blaze_talent) and target.DebuffRemaining(immolate_debuff) < BaseDuration(immolate_debuff) and Charges(conflagrate) >= 1 and SpellChargeCooldown(conflagrate) < CastTime(immolate) + GCD() Spell(immolate)
+	#conflagrate,if=talent.roaring_blaze.enabled&charges=2
+	if Talent(roaring_blaze_talent) and Charges(conflagrate) == 2 Spell(conflagrate)
+	#conflagrate,if=talent.roaring_blaze.enabled&prev_gcd.conflagrate
+	if Talent(roaring_blaze_talent) and PreviousGCDSpell(conflagrate) Spell(conflagrate)
+	#conflagrate,if=!talent.roaring_blaze.enabled&buff.conflagration_of_chaos.remains<=action.chaos_bolt.cast_time
+	if not Talent(roaring_blaze_talent) and BuffRemaining(conflagration_of_chaos_buff) <= CastTime(chaos_bolt) Spell(conflagrate)
+	#conflagrate,if=!talent.roaring_blaze.enabled&(charges=1&recharge_time<action.chaos_bolt.cast_time|charges=2)&soul_shard<5
+	if not Talent(roaring_blaze_talent) and { Charges(conflagrate) == 1 and SpellChargeCooldown(conflagrate) < CastTime(chaos_bolt) or Charges(conflagrate) == 2 } and SoulShards() < 5 Spell(conflagrate)
+	#soul_harvest
+	Spell(soul_harvest)
+	#channel_demonfire,if=dot.immolate.remains>cast_time
+	if target.DebuffRemaining(immolate_debuff) > CastTime(channel_demonfire) Spell(channel_demonfire)
+	#chaos_bolt,if=soul_shard>3
+	if SoulShards() > 3 Spell(chaos_bolt)
+	#dimensional_rift
+	Spell(dimensional_rift)
+	#mana_tap,if=buff.mana_tap.remains<=buff.mana_tap.duration*0.3&target.time_to_die>buff.mana_tap.duration*0.3
+	if BuffRemaining(mana_tap_buff) <= BaseDuration(mana_tap_buff) * 0.3 and target.TimeToDie() > BaseDuration(mana_tap_buff) * 0.3 Spell(mana_tap)
+	#chaos_bolt
+	Spell(chaos_bolt)
+	#cataclysm
+	Spell(cataclysm)
+	#conflagrate,if=!talent.roaring_blaze.enabled
+	if not Talent(roaring_blaze_talent) Spell(conflagrate)
+	#immolate,if=!talent.roaring_blaze.enabled&remains<=duration*0.3
+	if not Talent(roaring_blaze_talent) and target.DebuffRemaining(immolate_debuff) <= BaseDuration(immolate_debuff) * 0.3 Spell(immolate)
 	#incinerate
 	Spell(incinerate)
+	#life_tap
+	Spell(life_tap)
+}
+
+AddFunction DestructionDefaultCdActions
+{
+	#use_item,name=nithramus_the_allseer
+	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
 }
 
 ### actions.precombat
@@ -31,7 +272,7 @@ AddFunction DestructionDefaultMainActions
 AddFunction DestructionPrecombatMainActions
 {
 	#summon_pet,if=!talent.grimoire_of_supremacy.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.demonic_power.down)
-	if not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() Spell(summon_imp)
+	if not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() Spell(summon_felhunter)
 	#summon_doomguard,if=talent.grimoire_of_supremacy.enabled&active_enemies<3
 	if Talent(grimoire_of_supremacy_talent) and Enemies() < 3 Spell(summon_doomguard)
 	#summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>=3
@@ -41,6 +282,11 @@ AddFunction DestructionPrecombatMainActions
 	if Talent(grimoire_of_sacrifice_talent) and pet.Present() Spell(grimoire_of_sacrifice)
 	#incinerate
 	Spell(incinerate)
+}
+
+AddFunction DestructionPrecombatCdPostConditions
+{
+	not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_felhunter) or Talent(grimoire_of_supremacy_talent) and Enemies() < 3 and Spell(summon_doomguard) or Talent(grimoire_of_supremacy_talent) and Enemies() >= 3 and Spell(summon_infernal) or Talent(grimoire_of_sacrifice_talent) and pet.Present() and Spell(grimoire_of_sacrifice) or Spell(incinerate)
 }
 
 ### Destruction icons.
@@ -59,14 +305,46 @@ AddIcon checkbox=opt_warlock_destruction_aoe help=aoe specialization=destruction
 	DestructionDefaultMainActions()
 }
 
+AddIcon checkbox=!opt_warlock_destruction_aoe enemies=1 help=cd specialization=destruction
+{
+	unless not InCombat() and DestructionPrecombatCdPostConditions()
+	{
+		DestructionDefaultCdActions()
+	}
+}
+
+AddIcon checkbox=opt_warlock_destruction_aoe help=cd specialization=destruction
+{
+	unless not InCombat() and DestructionPrecombatCdPostConditions()
+	{
+		DestructionDefaultCdActions()
+	}
+}
+
 ### Required symbols
+# cataclysm
+# channel_demonfire
+# chaos_bolt
+# conflagrate
+# conflagration_of_chaos_buff
 # demonic_power_buff
+# dimensional_rift
 # grimoire_of_sacrifice
 # grimoire_of_sacrifice_talent
 # grimoire_of_supremacy_talent
+# immolate
+# immolate_debuff
 # incinerate
+# legendary_ring_intellect
+# life_tap
+# mana_tap
+# mana_tap_buff
+# roaring_blaze_talent
+# service_felhunter
+# service_voidwalker
+# soul_harvest
 # summon_doomguard
-# summon_imp
+# summon_felhunter
 # summon_infernal
 ]]
 	OvaleScripts:RegisterScript("WARLOCK", "destruction", name, desc, code, "script")

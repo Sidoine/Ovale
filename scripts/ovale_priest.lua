@@ -130,20 +130,198 @@ end
 -- ANY CHANGES MADE BELOW THIS POINT WILL BE LOST.
 
 do
-	local name = "simulationcraft_priest_shadow_legion"
-	local desc = "[7.0] SimulationCraft: Priest_Shadow_legion"
+	local name = "simulationcraft_priest_shadow_t18m"
+	local desc = "[7.0] SimulationCraft: Priest_Shadow_T18M"
 	local code = [[
-# Based on SimulationCraft profile "Priest_Shadow_legion".
+# Based on SimulationCraft profile "Priest_Shadow_T18M".
 #	class=priest
 #	spec=shadow
+#	talents=1133231
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_priest_spells)
+
+AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=shadow)
+AddCheckBox(opt_legendary_ring_intellect ItemName(legendary_ring_intellect) default specialization=shadow)
+
+AddFunction ShadowUsePotionIntellect
+{
+	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
+}
+
+### actions.default
+
+AddFunction ShadowDefaultMainActions
+{
+	#call_action_list,name=vf,if=buff.voidform.up
+	if BuffPresent(voidform_buff) ShadowVfMainActions()
+	#call_action_list,name=main
+	ShadowMainMainActions()
+}
+
+AddFunction ShadowDefaultCdActions
+{
+	#use_item,slot=finger1
+	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
+}
+
+### actions.main
+
+AddFunction ShadowMainMainActions
+{
+	#void_eruption
+	Spell(void_eruption)
+	#mindbender,if=talent.mindbender.enabled&set_bonus.tier18_2pc
+	if Talent(mindbender_talent) and ArmorSetBonus(T18 2) Spell(mindbender)
+	#shadow_word_death
+	Spell(shadow_word_death)
+	#mind_blast
+	Spell(mind_blast)
+	#shadow_word_pain,if=!ticking,cycle_targets=1
+	if not target.DebuffPresent(shadow_word_pain_debuff) Spell(shadow_word_pain)
+	#vampiric_touch,if=!ticking,cycle_targets=1
+	if not target.DebuffPresent(vampiric_touch_debuff) Spell(vampiric_touch)
+	#shadow_word_void
+	Spell(shadow_word_void)
+	#shadow_crash,if=talent.shadow_crash.enabled
+	if Talent(shadow_crash_talent) Spell(shadow_crash)
+	#shadowfiend,if=!talent.mindbender.enabled
+	if not Talent(mindbender_talent) Spell(shadowfiend)
+	#mind_flay,if=!talent.mind_spike.enabled,interrupt=1,chain=1
+	if not Talent(mind_spike_talent) Spell(mind_flay)
+	#mind_spike,if=talent.mind_spike.enabled
+	if Talent(mind_spike_talent) Spell(mind_spike)
+	#shadow_word_pain
+	Spell(shadow_word_pain)
+}
+
+### actions.precombat
+
+AddFunction ShadowPrecombatMainActions
+{
+	#mind_blast
+	Spell(mind_blast)
+}
+
+AddFunction ShadowPrecombatCdActions
+{
+	#flask,type=greater_draenic_intellect_flask
+	#food,type=pickled_eel
+	#snapshot_stats
+	#potion,name=draenic_intellect
+	ShadowUsePotionIntellect()
+}
+
+AddFunction ShadowPrecombatCdPostConditions
+{
+	Spell(mind_blast)
+}
+
+### actions.vf
+
+AddFunction ShadowVfMainActions
+{
+	#surrender_to_madness,if=talent.surrender_to_madness.enabled&insanity>=25&(cooldown.void_bolt.up|cooldown.void_torrent.up)&target.time_to_die<120
+	if Talent(surrender_to_madness_talent) and FIXME_insanity >= 25 and { not SpellCooldown(void_bolt) > 0 or not SpellCooldown(void_torrent) > 0 } and target.TimeToDie() < 120 Spell(surrender_to_madness)
+	#power_infusion,if=buff.voidform.stack>=10
+	if BuffStacks(voidform_buff) >= 10 Spell(power_infusion)
+	#berserking,if=buff.voidform.stack>10
+	if BuffStacks(voidform_buff) > 10 Spell(berserking)
+	#dispersion
+	Spell(dispersion)
+	#void_torrent,if=buff.voidform.stack>=10
+	if BuffStacks(voidform_buff) >= 10 Spell(void_torrent)
+	#void_bolt,if=dot.shadow_word_pain.remains<3.5*gcd,cycle_targets=1
+	if target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() Spell(void_bolt)
+	#void_bolt
+	Spell(void_bolt)
+	#mind_blast
+	Spell(mind_blast)
+	#mindbender,if=talent.mindbender.enabled
+	if Talent(mindbender_talent) Spell(mindbender)
+	#shadow_word_death
+	Spell(shadow_word_death)
+	#shadow_word_void
+	Spell(shadow_word_void)
+	#shadowfiend,if=!talent.mindbender.enabled
+	if not Talent(mindbender_talent) Spell(shadowfiend)
+	#shadow_word_pain,if=!ticking,cycle_targets=1
+	if not target.DebuffPresent(shadow_word_pain_debuff) Spell(shadow_word_pain)
+	#vampiric_touch,if=!ticking,cycle_targets=1
+	if not target.DebuffPresent(vampiric_touch_debuff) Spell(vampiric_touch)
+	#shadow_crash,if=talent.shadow_crash.enabled
+	if Talent(shadow_crash_talent) Spell(shadow_crash)
+	#mind_flay,if=!talent.mind_spike.enabled,interrupt=1,chain=1
+	if not Talent(mind_spike_talent) Spell(mind_flay)
+	#mind_spike,if=talent.mind_spike.enabled
+	if Talent(mind_spike_talent) Spell(mind_spike)
+	#shadow_word_pain
+	Spell(shadow_word_pain)
+}
+
 ### Shadow icons.
 
 AddCheckBox(opt_priest_shadow_aoe L(AOE) default specialization=shadow)
+
+AddIcon enemies=1 help=main specialization=shadow
+{
+	if not InCombat() ShadowPrecombatMainActions()
+	ShadowDefaultMainActions()
+}
+
+AddIcon checkbox=opt_priest_shadow_aoe help=aoe specialization=shadow
+{
+	if not InCombat() ShadowPrecombatMainActions()
+	ShadowDefaultMainActions()
+}
+
+AddIcon checkbox=!opt_priest_shadow_aoe enemies=1 help=cd specialization=shadow
+{
+	if not InCombat() ShadowPrecombatCdActions()
+	unless not InCombat() and ShadowPrecombatCdPostConditions()
+	{
+		ShadowDefaultCdActions()
+	}
+}
+
+AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
+{
+	if not InCombat() ShadowPrecombatCdActions()
+	unless not InCombat() and ShadowPrecombatCdPostConditions()
+	{
+		ShadowDefaultCdActions()
+	}
+}
+
+### Required symbols
+# berserking
+# dispersion
+# draenic_intellect_potion
+# legendary_ring_intellect
+# mind_blast
+# mind_flay
+# mind_spike
+# mind_spike_talent
+# mindbender
+# mindbender_talent
+# power_infusion
+# shadow_crash
+# shadow_crash_talent
+# shadow_word_death
+# shadow_word_pain
+# shadow_word_pain_debuff
+# shadow_word_void
+# shadowfiend
+# surrender_to_madness
+# surrender_to_madness_talent
+# vampiric_touch
+# vampiric_touch_debuff
+# void_bolt
+# void_eruption
+# void_torrent
+# voidform_buff
 ]]
 	OvaleScripts:RegisterScript("PRIEST", "shadow", name, desc, code, "script")
 end

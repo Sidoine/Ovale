@@ -12,7 +12,7 @@ outputDirectory points to the directory where the profiles are imported.
 
 -- Constants.
 local outputDirectory = "../simulationcraft"
-local profilesDirectory = "../../SimulationCraft/profiles/legion"
+local profilesDirectory = "../../SimulationCraft/profiles/Tier18M"
 local root = "../"
 
 local SIMC_CLASS = {

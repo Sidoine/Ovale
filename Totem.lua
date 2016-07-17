@@ -163,7 +163,7 @@ statePrototype.GetTotem = function(state, slot)
 	slot = TOTEM_SLOT[slot] or slot
 	-- Populate the totem information from the current game state if it is outdated.
 	local totem = state.totem[slot]
-	if totem and not totem.serial or totem.serial < self_serial then
+	if totem and (not totem.serial or totem.serial < self_serial) then
 		local haveTotem, name, startTime, duration, icon = API_GetTotemInfo(slot)
 		if haveTotem then
 			totem.name = name

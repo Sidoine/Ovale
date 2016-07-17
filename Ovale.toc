@@ -60,7 +60,6 @@ Frame.lua
 BanditsGuile.lua
 DamageTaken.lua
 DataBroker.lua
-Eclipse.lua
 Enemies.lua
 HonorAmongThieves.lua
 PassiveAura.lua

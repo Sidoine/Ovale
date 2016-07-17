@@ -1,0 +1,35 @@
+### SimulationCraft
+deathknight="Death_Knight_Unholy_T18M"
+level=100
+race=blood_elf
+role=attack
+position=back
+talents=2001003
+spec=unholy
+
+head=demongaze_helm,id=124332,bonus_id=567,upgrade=2
+neck=corrupted_talonguard_pendant,id=124218,bonus_id=567,upgrade=2,enchant=gift_of_multistrike
+shoulders=demongaze_pauldrons,id=124344,bonus_id=567,upgrade=2
+back=cloak_of_incendiary_wrath,id=124144,bonus_id=567,upgrade=2,enchant=gift_of_multistrike
+chest=demongaze_chestplate,id=124317,bonus_id=567,upgrade=2
+wrists=breachscarred_wristplates,id=124353,bonus_id=567,upgrade=2
+hands=gauntlets_of_derision,id=124326,bonus_id=567,upgrade=2
+waist=ravenous_girdle,id=124348,bonus_id=567,upgrade=2
+legs=demongaze_legplates,id=124338,bonus_id=567,upgrade=2
+feet=treads_of_the_defiler,id=124322,bonus_id=567,upgrade=2
+finger1=thorasus_the_stone_heart_of_draenor,id=124634,bonus_id=641,enchant=gift_of_multistrike
+finger2=congealed_globule_loop,id=124197,bonus_id=567,upgrade=2,enchant=gift_of_multistrike
+trinket1=empty_drinking_horn,id=124238,bonus_id=567,upgrade=2
+trinket2=discordant_chorus,id=124237,bonus_id=567,upgrade=2
+main_hand=hellrender,id=124360,bonus_id=567,upgrade=2,enchant=rune_of_the_fallen_crusader
+
+# Gear Summary
+# gear_ilvl=742.00
+# gear_strength=5475
+# gear_stamina=6981
+# gear_crit_rating=1626
+# gear_haste_rating=1890
+# gear_mastery_rating=2666
+# gear_armor=2588
+# set_bonus=tier18_2pc=1
+# set_bonus=tier18_4pc=1

@@ -62,7 +62,6 @@ You need to reach level 10 and choose a specialization.  However, be aware that 
   [Skada]: http://www.curse.com/addons/wow/skada
   [SpellFlashCore]: http://www.curse.com/addons/wow/spellflashcore
   [SpellFlash]: http://www.curse.com/addons/wow/spellflash
-  [balance-ticket]: http://wow.curseforge.com/addons/ovale/tickets/451-eclipse-energy-prediction/
   [ovale-forums]: http://wow.curseforge.com/addons/ovale/forum/
   [ovale-tickets]: http://wow.curseforge.com/addons/ovale/tickets/
   [ovale-video]: http://www.youtube.com/watch?v=rNHvk9GpyiM "Ovale WotLK video"

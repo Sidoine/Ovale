@@ -121,20 +121,7 @@ local SPECIAL_ACTION = {
 }
 
 local RUNE_OPERAND = {
-	["Blood"] = "blood",
-	["Frost"] = "frost",
-	["Unholy"] = "unholy",
-	["blood"] = "blood",
-	["blood.death"] = "blood",
-	["death"] = "death",
-	["frost"] = "frost",
-	["frost.death"] = "frost",
-	["unholy"] = "unholy",
-	["unholy.death"] = "unholy",
-	["rune.blood"] = "blood",
-	["rune.death"] = "death",
-	["rune.frost"] = "frost",
-	["rune.unholy"] = "unholy",
+	["rune"] = "rune"
 }
 
 do
@@ -2852,10 +2839,12 @@ end
 do
 	local CHARACTER_PROPERTY = {
 		["active_enemies"]		= "Enemies()",
+		["astral_power"] 		= "AstralPower()",
 		["blood.frac"]			= "Rune(blood)",
 		["chi"]					= "Chi()",
 		["chi.max"]				= "MaxChi()",
 		["combo_points"]		= "ComboPoints()",
+		["combo_points.max"]    = "MaxComboPoints()",
 		["crit_pct_current"]	= "SpellCritChance()",
 		["demonic_fury"]		= "DemonicFury()",
 		["desired_targets"]		= "Enemies(tagged=1)",
