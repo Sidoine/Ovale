@@ -98,9 +98,6 @@ function OvaleScripts:OnDisable()
 end
 
 function OvaleScripts:Ovale_StanceChanged(event, newStance, oldStance)
-	if newStance == "warrior_gladiator_stance" or oldStance == "warrior_gladiator_stance" then
-		self:SendMessage("Ovale_ScriptChanged")
-	end
 end
 
 -- Return a table of script descriptions indexed by name.
@@ -211,14 +208,8 @@ function OvaleScripts:GetDefaultScriptName(class, specialization)
 			local weaponType = OvaleEquipment:HasMainHandWeapon(1) and "1h" or "2h"
 			name = format("simulationcraft_warrior_fury_%s_t18m", weaponType)
 		elseif specialization == "protection" then
-			-- Check if the warrior is in Gladiator Stance for DPS.
-			if OvaleStance:IsStance("warrior_gladiator_stance") then
-				specialization = "gladiator"
-				name = format("simulationcraft_warrior_%s_t18m", specialization)
-			else
-				-- TODO: Use the Tier17M script until a new one has been created for patch 6.2.
-				name = format("simulationcraft_warrior_%s_t17m", specialization)
-			end
+			-- TODO: Use the Tier17M script until a new one has been created for patch 6.2.
+			name = format("simulationcraft_warrior_%s_t17m", specialization)
 		end
 	end
 	if not name and specialization then

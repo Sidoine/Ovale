@@ -47,9 +47,9 @@ AddFunction AssassinationDefaultMainActions
 	#rupture,if=cooldown.exsanguinate.remains<1&combo_points>5|(time<3&dot.hemorrhage.remains>10&dot.garrote.remains>8)
 	if SpellCooldown(exsanguinate) < 1 and ComboPoints() > 5 or TimeInCombat() < 3 and target.DebuffRemaining(hemorrhage_debuff) > 10 and target.DebuffRemaining(garrote_debuff) > 8 Spell(rupture)
 	#garrote,if=refreshable&combo_points<6&!dot.garrote.exsanguinated
-	if FIXME_refreshable and ComboPoints() < 6 and not FIXME_dot.garrote.exsanguinated Spell(garrote)
+	if target.DebuffPresent(garrote_debuff) and ComboPoints() < 6 and not FIXME_dot.garrote.exsanguinated Spell(garrote)
 	#hemorrhage,if=refreshable&combo_points<6
-	if FIXME_refreshable and ComboPoints() < 6 Spell(hemorrhage)
+	if target.DebuffPresent(hemorrhage_debuff) and ComboPoints() < 6 Spell(hemorrhage)
 	#kingsbane,if=time>5
 	if TimeInCombat() > 5 Spell(kingsbane)
 	#fan_of_knives,cycle_targets=1,if=spell_targets>4|(!dot.deadly_poison_dot.ticking&spell_targets>2)
@@ -63,7 +63,7 @@ AddFunction AssassinationDefaultMainActions
 	#mutilate,if=combo_points<5|(combo_points=5&(cooldown.exsanguinate.remains<2|dot.rupture.refreshable))
 	if ComboPoints() < 5 or ComboPoints() == 5 and { SpellCooldown(exsanguinate) < 2 or FIXME_dot.rupture.refreshable } Spell(mutilate)
 	#rupture,if=!exsanguinated&refreshable&combo_points>5
-	if not FIXME_exsanguinated and FIXME_refreshable and ComboPoints() > 5 Spell(rupture)
+	if not FIXME_exsanguinated and target.DebuffPresent(rupture_debuff) and ComboPoints() > 5 Spell(rupture)
 	#death_from_above,if=combo_points>4
 	if ComboPoints() > 4 Spell(death_from_above)
 	#rupture,cycle_targets=1,max_cycle_targets=3,if=spell_targets.fan_of_knives>1&!ticking&combo_points>4
@@ -73,7 +73,7 @@ AddFunction AssassinationDefaultMainActions
 	#marked_for_death,cycle_targets=1,target_if=min:target.time_to_die,if=combo_points.max-combo_points>=4
 	if MaxComboPoints() - ComboPoints() >= 4 Spell(marked_for_death)
 	#rupture,cycle_targets=1,max_cycle_targets=3,if=combo_points>4&refreshable&spell_targets.fan_of_knives>1
-	if DebuffCountOnAny(rupture_debuff) < Enemies() and DebuffCountOnAny(rupture_debuff) <= 3 and ComboPoints() > 4 and FIXME_refreshable and Enemies() > 1 Spell(rupture)
+	if DebuffCountOnAny(rupture_debuff) < Enemies() and DebuffCountOnAny(rupture_debuff) <= 3 and ComboPoints() > 4 and target.DebuffPresent(rupture_debuff) and Enemies() > 1 Spell(rupture)
 }
 
 AddFunction AssassinationDefaultCdActions

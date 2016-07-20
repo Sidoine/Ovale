@@ -2568,6 +2568,8 @@ EmitOperand = function(parseNode, nodeList, annotation, action)
 			ok, node = EmitOperandPet(operand, parseNode, nodeList, annotation, action)
 		elseif token == "prev" or token == "prev_gcd" or token == "prev_off_gcd" then
 			ok, node = EmitOperandPreviousSpell(operand, parseNode, nodeList, annotation, action)
+		elseif token == "refreshable" then
+			ok, node = EmitOperandRefresh(operand, parseNode, nodeList, annotation, action)
 		elseif token == "seal" then
 			ok, node = EmitOperandSeal(operand, parseNode, nodeList, annotation, action)
 		elseif token == "set_bonus" then
@@ -2753,6 +2755,25 @@ EmitOperandArtifact = function(operand, parseNode, nodeList, annotation, action,
 	return ok, node
 end 
 
+EmitOperandRefresh = function(operand, parseNode, nodeList, annotation, action, target)
+	local ok = true
+	local node
+	local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
+	local token = tokenIterator()
+	if token == "refreshable" then
+		local buffName = action .. "_debuff"
+		local target = "target"
+		local prefix = "Debuff"
+		local any = OvaleData.DEFAULT_SPELL_LIST[buffName] and " any=1" or ""
+		-- TODO Surely not the right function, need to look in simulationcraft code what means "refreshable"  
+		local code = format("%s%sPresent(%s%s)", target, prefix, buffName, any)
+		node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+		AddSymbol(annotation, buffName)
+	end
+
+	return ok, node
+end
+
 EmitOperandBuff = function(operand, parseNode, nodeList, annotation, action, target)
 	local ok = true
 	local node
@@ -2873,6 +2894,7 @@ do
 		["mana.deficit"]		= "ManaDeficit()",
 		["mana.max"]			= "MaxMana()",
 		["mana.pct"]			= "ManaPercent()",
+		["maelstrom"]			= "Maelstrom()",
 		["rage"]				= "Rage()",
 		["rage.deficit"]		= "RageDeficit()",
 		["rage.max"]			= "MaxRage()",
@@ -2922,8 +2944,6 @@ do
 			local name = "anticipation_buff"
 			code = format("BuffStacks(%s)", name)
 			AddSymbol(annotation, name)
-		elseif class == "WARLOCK" and operand == "burning_ember" then
-			code = format("%sBurningEmbers() / 10", target)
 		elseif strsub(operand, 1, 22) == "active_enemies_within." then
 			-- "active_enemies_within.<distance>" is roughly equivalent to the number of enemies.
 			code = "Enemies()"
@@ -4523,14 +4543,7 @@ local function InsertSupportingControls(child, annotation)
 	local nodeList = annotation.astAnnotation.nodeList
 
 	local ifSpecialization = "specialization=" .. annotation.specialization
-	if annotation.class == "WARRIOR" and annotation.specialization == "protection" then
-		if strfind(annotation.name, "_[gG]ladiator_") then
-			ifSpecialization = ifSpecialization .. " if_stance=warrior_gladiator_stance"
-		else
-			ifSpecialization = ifSpecialization .. " if_stance=!warrior_gladiator_stance"
-		end
-	end
-
+	
 	if annotation.using_apl and next(annotation.using_apl) then
 		-- Add non-default list items.
 		for name in pairs(annotation.using_apl) do

@@ -49,9 +49,7 @@ local SPELL_NAME_TO_STANCE = {
 	[API_GetSpellInfo(103985)] = "monk_stance_of_the_fierce_tiger",
 	[API_GetSpellInfo(115069)] = "monk_stance_of_the_sturdy_ox",
 	-- Rogue
-	[API_GetSpellInfo(  1784)] = "rogue_stealth",
-	-- Warrior
-	[API_GetSpellInfo(    71)] = "warrior_defensive_stance",
+	[API_GetSpellInfo(  1784)] = "rogue_stealth"
 }
 
 -- Table of all valid stance names.

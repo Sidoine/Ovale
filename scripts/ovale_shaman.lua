@@ -271,25 +271,25 @@ AddFunction ElementalSingleMainActions
 	#flame_shock,if=!ticking
 	if not target.DebuffPresent(flame_shock_debuff) Spell(flame_shock)
 	#flame_shock,if=maelstrom>=20&remains<=buff.ascendance.duration&cooldown.ascendance.remains+buff.ascendance.duration<=duration
-	if FIXME_maelstrom >= 20 and target.DebuffRemaining(flame_shock_debuff) <= BaseDuration(ascendance_caster_buff) and SpellCooldown(ascendance_caster) + BaseDuration(ascendance_caster_buff) <= BaseDuration(flame_shock_debuff) Spell(flame_shock)
+	if Maelstrom() >= 20 and target.DebuffRemaining(flame_shock_debuff) <= BaseDuration(ascendance_caster_buff) and SpellCooldown(ascendance_caster) + BaseDuration(ascendance_caster_buff) <= BaseDuration(flame_shock_debuff) Spell(flame_shock)
 	#earth_shock,if=maelstrom>=92
-	if FIXME_maelstrom >= 92 Spell(earth_shock)
+	if Maelstrom() >= 92 Spell(earth_shock)
 	#icefury,if=raid_event.movement.in<5
 	if 600 < 5 Spell(icefury)
 	#lava_burst,if=dot.flame_shock.remains>cast_time&(cooldown_react|buff.ascendance.up)
 	if target.DebuffRemaining(flame_shock_debuff) > CastTime(lava_burst) and { not SpellCooldown(lava_burst) > 0 or BuffPresent(ascendance_caster_buff) } Spell(lava_burst)
 	#flame_shock,if=maelstrom>=20&refreshable
-	if FIXME_maelstrom >= 20 and FIXME_refreshable Spell(flame_shock)
+	if Maelstrom() >= 20 and target.DebuffPresent(flame_shock_debuff) Spell(flame_shock)
 	#frost_shock,if=maelstrom>=20&raid_event.movement.in>(1.5*spell_haste*buff.icefury.stack)
-	if FIXME_maelstrom >= 20 and 600 > 1.5 * { 100 / { 100 + SpellHaste() } } * BuffStacks(icefury_buff) Spell(frost_shock)
+	if Maelstrom() >= 20 and 600 > 1.5 * { 100 / { 100 + SpellHaste() } } * BuffStacks(icefury_buff) Spell(frost_shock)
 	#frost_shock,moving=1,if=buff.icefury.up
 	if Speed() > 0 and BuffPresent(icefury_buff) Spell(frost_shock)
 	#earth_shock,if=maelstrom>=86
-	if FIXME_maelstrom >= 86 Spell(earth_shock)
+	if Maelstrom() >= 86 Spell(earth_shock)
 	#elemental_blast
 	Spell(elemental_blast)
 	#icefury,if=maelstrom<=76&raid_event.movement.in>30
-	if FIXME_maelstrom <= 76 and 600 > 30 Spell(icefury)
+	if Maelstrom() <= 76 and 600 > 30 Spell(icefury)
 	#liquid_magma_totem,if=raid_event.adds.count<3|raid_event.adds.in>50
 	if 0 < 3 or 600 > 50 Spell(liquid_magma_totem)
 	#stormkeeper,if=(talent.ascendance.enabled&cooldown.ascendance.remains>10)|!talent.ascendance.enabled
@@ -309,7 +309,7 @@ AddFunction ElementalSingleMainActions
 	#lightning_bolt
 	Spell(lightning_bolt)
 	#frost_shock,if=maelstrom>=20&dot.flame_shock.remains>19
-	if FIXME_maelstrom >= 20 and target.DebuffRemaining(flame_shock_debuff) > 19 Spell(frost_shock)
+	if Maelstrom() >= 20 and target.DebuffRemaining(flame_shock_debuff) > 19 Spell(frost_shock)
 }
 
 ### Elemental icons.
@@ -463,7 +463,7 @@ AddFunction EnhancementDefaultMainActions
 	#stormstrike
 	Spell(stormstrike)
 	#lightning_bolt,if=talent.overcharge.enabled&maelstrom>=60
-	if Talent(overcharge_talent) and FIXME_maelstrom >= 60 Spell(lightning_bolt)
+	if Talent(overcharge_talent) and Maelstrom() >= 60 Spell(lightning_bolt)
 	#lava_lash,if=buff.hot_hand.react
 	if BuffPresent(hot_hand_buff) Spell(lava_lash)
 	#boulderfist,if=charges_fractional>=1.5
@@ -477,7 +477,7 @@ AddFunction EnhancementDefaultMainActions
 	#sundering
 	Spell(sundering)
 	#lava_lash,if=maelstrom>=120
-	if FIXME_maelstrom >= 120 Spell(lava_lash)
+	if Maelstrom() >= 120 Spell(lava_lash)
 	#flametongue,if=talent.boulderfist.enabled
 	if Talent(boulderfist_talent) Spell(flametongue)
 	#boulderfist
@@ -506,17 +506,6 @@ AddFunction EnhancementDefaultCdActions
 
 ### actions.precombat
 
-AddFunction EnhancementPrecombatMainActions
-{
-	#lightning_shield
-	Spell(lightning_shield)
-}
-
-AddFunction EnhancementPrecombatShortCdPostConditions
-{
-	Spell(lightning_shield)
-}
-
 AddFunction EnhancementPrecombatCdActions
 {
 	#flask,type=greater_draenic_agility_flask
@@ -526,59 +515,40 @@ AddFunction EnhancementPrecombatCdActions
 	EnhancementUsePotionAgility()
 }
 
-AddFunction EnhancementPrecombatCdPostConditions
-{
-	Spell(lightning_shield)
-}
-
 ### Enhancement icons.
 
 AddCheckBox(opt_shaman_enhancement_aoe L(AOE) default specialization=enhancement)
 
 AddIcon checkbox=!opt_shaman_enhancement_aoe enemies=1 help=shortcd specialization=enhancement
 {
-	unless not InCombat() and EnhancementPrecombatShortCdPostConditions()
-	{
-		EnhancementDefaultShortCdActions()
-	}
+	EnhancementDefaultShortCdActions()
 }
 
 AddIcon checkbox=opt_shaman_enhancement_aoe help=shortcd specialization=enhancement
 {
-	unless not InCombat() and EnhancementPrecombatShortCdPostConditions()
-	{
-		EnhancementDefaultShortCdActions()
-	}
+	EnhancementDefaultShortCdActions()
 }
 
 AddIcon enemies=1 help=main specialization=enhancement
 {
-	if not InCombat() EnhancementPrecombatMainActions()
 	EnhancementDefaultMainActions()
 }
 
 AddIcon checkbox=opt_shaman_enhancement_aoe help=aoe specialization=enhancement
 {
-	if not InCombat() EnhancementPrecombatMainActions()
 	EnhancementDefaultMainActions()
 }
 
 AddIcon checkbox=!opt_shaman_enhancement_aoe enemies=1 help=cd specialization=enhancement
 {
 	if not InCombat() EnhancementPrecombatCdActions()
-	unless not InCombat() and EnhancementPrecombatCdPostConditions()
-	{
-		EnhancementDefaultCdActions()
-	}
+	EnhancementDefaultCdActions()
 }
 
 AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 {
 	if not InCombat() EnhancementPrecombatCdActions()
-	unless not InCombat() and EnhancementPrecombatCdPostConditions()
-	{
-		EnhancementDefaultCdActions()
-	}
+	EnhancementDefaultCdActions()
 }
 
 ### Required symbols
@@ -598,6 +568,7 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # draenic_agility_potion
 # earthen_spike
 # feral_spirit
+# fire_elemental
 # flametongue
 # flametongue_buff
 # frostbrand
@@ -610,7 +581,6 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # lava_lash
 # legendary_ring_agility
 # lightning_bolt
-# lightning_shield
 # overcharge_talent
 # primal_strike
 # quaking_palm

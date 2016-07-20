@@ -2753,21 +2753,6 @@ do
 		return Power("astralpower", positionalParams, namedParams, state, atTime)
 	end
 
-	--- Get the current number of Burning Embers for destruction warlocks.
-	-- @name BurningEmbers
-	-- @paramsig number or boolean
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @return The number of Burning Embers.
-	-- @return A boolean value for the result of the comparison.
-	-- @usage
-	-- if BurningEmbers() >10 Spell(chaos_bolt)
-	-- if BurningEmbers(more 10) Spell(chaos_bolt)
-
-	local function BurningEmbers(positionalParams, namedParams, state, atTime)
-		return Power("burningembers", positionalParams, namedParams, state, atTime)
-	end
-
 	--- Get the current amount of stored Chi for monks.
 	-- @name Chi
 	-- @paramsig number or boolean
@@ -2860,6 +2845,10 @@ do
 		return Power("mana", positionalParams, namedParams, state, atTime)
 	end
 
+	local function Maelstrom(positionalParams, namedParams, state, atTime)
+		return Power("maelstrom", positionalParams, namedParams, state, atTime)
+	end
+
 	--- Get the current amount of rage for guardian druids and warriors.
 	-- @name Rage
 	-- @paramsig number or boolean
@@ -2921,12 +2910,12 @@ do
 	end
 
 	OvaleCondition:RegisterCondition("alternatepower", false, AlternatePower)
-	OvaleCondition:RegisterCondition("burningembers", false, BurningEmbers)
 	OvaleCondition:RegisterCondition("chi", false, Chi)
 	OvaleCondition:RegisterCondition("demonicfury", false, DemonicFury)
 	OvaleCondition:RegisterCondition("energy", false, Energy)
 	OvaleCondition:RegisterCondition("focus", false, Focus)
 	OvaleCondition:RegisterCondition("holypower", false, HolyPower)
+	OvaleCondition:RegisterCondition("maelstrom", false, Maelstrom)
 	OvaleCondition:RegisterCondition("mana", false, Mana)
 	OvaleCondition:RegisterCondition("rage", false, Rage)
 	OvaleCondition:RegisterCondition("runicpower", false, RunicPower)
@@ -2961,21 +2950,6 @@ do
 
 	local function AstralPowerDeficit(positionalParams, namedParams, state, atTime)
 		return PowerDeficit("astralpower", positionalParams, namedParams, state, atTime)
-	end
-
-	--- Get the number of lacking resource points for a full burning embers bar, between 0 and maximum burning embers, of the target.
-	-- @name BurningEmbersDeficit
-	-- @paramsig number or boolean
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=player.
-	--     Valid values: player, target, focus, pet.
-	-- @return The current burning embers deficit.
-	-- @return A boolean value for the result of the comparison.
-
-	local function BurningEmbersDeficit(positionalParams, namedParams, state, atTime)
-		return PowerDeficit("burningembers", positionalParams, namedParams, state, atTime)
 	end
 
 	--- Get the number of lacking resource points for full chi, between 0 and maximum chi, of the target.
@@ -3138,7 +3112,6 @@ do
 	end
 
 	OvaleCondition:RegisterCondition("alternatepowerdeficit", false, AlternatePowerDeficit)
-	OvaleCondition:RegisterCondition("burningembersdeficit", false, BurningEmbersDeficit)
 	OvaleCondition:RegisterCondition("chideficit", false, ChiDeficit)
 	OvaleCondition:RegisterCondition("demonicfurydeficit", false, DemonicFuryDeficit)
 	OvaleCondition:RegisterCondition("energydeficit", false, EnergyDeficit)
@@ -3184,36 +3157,6 @@ do
 
 	local function MaxAlternatePower(positionalParams, namedParams, state, atTime)
 		return MaxPower("alternate", positionalParams, namedParams, state, atTime)
-	end
-
-	--- Get the maximum amount of burning embers of the target.
-	-- @name MaxBurningEmbers
-	-- @paramsig number or boolean
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=player.
-	--     Valid values: player, target, focus, pet.
-	-- @return The maximum value.
-	-- @return A boolean value for the result of the comparison.
-
-	local function MaxBurningEmbers(positionalParams, namedParams, state, atTime)
-		return MaxPower("burningembers", positionalParams, namedParams, state, atTime)
-	end
-
-	--- Get the maximum amount of Chi of the target.
-	-- @name MaxChi
-	-- @paramsig number or boolean
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=player.
-	--     Valid values: player, target, focus, pet.
-	-- @return The maximum value.
-	-- @return A boolean value for the result of the comparison.
-
-	local function MaxChi(positionalParams, namedParams, state, atTime)
-		return MaxPower("chi", positionalParams, namedParams, state, atTime)
 	end
 
 	--- Get the maximum amount of Chi of the target.
@@ -3369,7 +3312,6 @@ do
 	end
 
 	OvaleCondition:RegisterCondition("maxalternatepower", false, MaxAlternatePower)
-	OvaleCondition:RegisterCondition("maxburningembers", false, MaxBurningEmbers)
 	OvaleCondition:RegisterCondition("maxchi", false, MaxChi)
 	OvaleCondition:RegisterCondition("maxdemonicfury", false, MaxDemonicFury)
 	OvaleCondition:RegisterCondition("maxenergy", false, MaxEnergy)

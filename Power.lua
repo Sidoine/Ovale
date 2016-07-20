@@ -618,7 +618,6 @@ local statePrototype = OvalePower.statePrototype
 
 	statePrototype.alternate = nil
 	statePrototype.astralpower = nil
-	statePrototype.burningembers = nil
 	statePrototype.chi = nil
 	statePrototype.demonicfury = nil
 	statePrototype.energy = nil
