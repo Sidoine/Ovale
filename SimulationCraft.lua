@@ -3037,6 +3037,12 @@ EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
 			end
 		elseif property == "up" then
 			code = format("not %sCooldown(%s) > 0", prefix, name)
+		elseif property == "charges" then
+			if parseNode.asType == "boolean" then
+				code = format("%sChargeCooldown(%s) > 0", prefix, name)
+			else
+				code = format("%sChargeCooldown(%s)", prefix, name)
+			end
 		else
 			ok = false
 		end
@@ -5191,7 +5197,8 @@ function OvaleSimulationCraft:Emit(profile, noFinalNewLine)
 		output[#output + 1] = "### Required symbols"
 		tsort(profile.annotation.symbolTable)
 		for _, symbol in ipairs(profile.annotation.symbolTable) do
-			if not profile.annotation.dictionary[symbol] then
+			if profile.annotation.dictionary and not profile.annotation.dictionary[symbol] then
+				-- TODO Don't work if it is a spell list for example
 				self:Print("Warning: Symbol '%s' not defined", symbol)				
 			end
 			output[#output + 1] = "# " .. symbol

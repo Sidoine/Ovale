@@ -568,7 +568,6 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # draenic_agility_potion
 # earthen_spike
 # feral_spirit
-# fire_elemental
 # flametongue
 # flametongue_buff
 # frostbrand

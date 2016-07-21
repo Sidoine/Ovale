@@ -441,13 +441,13 @@ AddFunction SubtletyDefaultMainActions
 	if MaxComboPoints() - ComboPoints() >= 2 Spell(shadowstrike)
 	#pool_resource,for_next=1,extra_amount=energy.max-talent.master_of_shadows.enabled*30
 	#vanish,if=(energy.deficit<talent.master_of_shadows.enabled*30&combo_points.max-combo_points>=3&cooldown.shadow_dance.charges<2)|target.time_to_die<8
-	if EnergyDeficit() < TalentPoints(master_of_shadows_talent) * 30 and MaxComboPoints() - ComboPoints() >= 3 and FIXME_cooldown.shadow_dance.charges < 2 or target.TimeToDie() < 8 Spell(vanish)
-	unless { EnergyDeficit() < TalentPoints(master_of_shadows_talent) * 30 and MaxComboPoints() - ComboPoints() >= 3 and FIXME_cooldown.shadow_dance.charges < 2 or target.TimeToDie() < 8 } and SpellUsable(vanish) and SpellCooldown(vanish) < TimeToEnergyFor(vanish)
+	if EnergyDeficit() < TalentPoints(master_of_shadows_talent) * 30 and MaxComboPoints() - ComboPoints() >= 3 and SpellChargeCooldown(shadow_dance) < 2 or target.TimeToDie() < 8 Spell(vanish)
+	unless { EnergyDeficit() < TalentPoints(master_of_shadows_talent) * 30 and MaxComboPoints() - ComboPoints() >= 3 and SpellChargeCooldown(shadow_dance) < 2 or target.TimeToDie() < 8 } and SpellUsable(vanish) and SpellCooldown(vanish) < TimeToEnergyFor(vanish)
 	{
 		#pool_resource,for_next=1,extra_amount=energy.max-talent.master_of_shadows.enabled*30
 		#shadow_dance,if=combo_points.max-combo_points>=2&((cooldown.vanish.remains&buff.symbols_of_death.remains<=10.5&energy.deficit<talent.master_of_shadows.enabled*30)|cooldown.shadow_dance.charges>=2|target.time_to_die<25)
-		if MaxComboPoints() - ComboPoints() >= 2 and { SpellCooldown(vanish) > 0 and BuffRemaining(symbols_of_death_buff) <= 10.5 and EnergyDeficit() < TalentPoints(master_of_shadows_talent) * 30 or FIXME_cooldown.shadow_dance.charges >= 2 or target.TimeToDie() < 25 } Spell(shadow_dance)
-		unless MaxComboPoints() - ComboPoints() >= 2 and { SpellCooldown(vanish) > 0 and BuffRemaining(symbols_of_death_buff) <= 10.5 and EnergyDeficit() < TalentPoints(master_of_shadows_talent) * 30 or FIXME_cooldown.shadow_dance.charges >= 2 or target.TimeToDie() < 25 } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergyFor(shadow_dance)
+		if MaxComboPoints() - ComboPoints() >= 2 and { SpellCooldown(vanish) > 0 and BuffRemaining(symbols_of_death_buff) <= 10.5 and EnergyDeficit() < TalentPoints(master_of_shadows_talent) * 30 or SpellChargeCooldown(shadow_dance) >= 2 or target.TimeToDie() < 25 } Spell(shadow_dance)
+		unless MaxComboPoints() - ComboPoints() >= 2 and { SpellCooldown(vanish) > 0 and BuffRemaining(symbols_of_death_buff) <= 10.5 and EnergyDeficit() < TalentPoints(master_of_shadows_talent) * 30 or SpellChargeCooldown(shadow_dance) >= 2 or target.TimeToDie() < 25 } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergyFor(shadow_dance)
 		{
 			#shadowmeld,if=energy>40&combo_points.max-combo_points>=3&!(buff.shadow_dance.up|buff.vanish.up|buff.stealth.up)
 			if Energy() > 40 and MaxComboPoints() - ComboPoints() >= 3 and not { BuffPresent(shadow_dance_buff) or BuffPresent(vanish_buff) or BuffPresent(stealthed_buff any=1) } Spell(shadowmeld)
