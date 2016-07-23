@@ -1063,6 +1063,7 @@ local function InitializeDisambiguation()
 	AddDisambiguation("moonfire",				"moonfire_cat",					"DRUID",		"feral")
 	AddDisambiguation("omen_of_clarity",		"omen_of_clarity_melee",		"DRUID",		"feral")
 	AddDisambiguation("rejuvenation_debuff",	"rejuvenation_buff",			"DRUID")
+	AddDisambiguation("starsurge",				"starsurge_moonkin",			"DRUID",		"balance")
 	-- Hunter
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_focus",			"HUNTER")
 	AddDisambiguation("beast_cleave",			"pet_beast_cleave",				"HUNTER",		"beast_mastery")
@@ -2633,6 +2634,8 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
 		code = format("CastTime(%s)", name)
 	elseif property == "charges" then
 		code = format("Charges(%s)", name)
+	elseif property == "max_charges" then
+		code = format("SpellMaxCharges(%s)", name)
 	elseif property == "charges_fractional" then
 		code = format("Charges(%s count=0)", name)
 	elseif property == "cooldown" then
@@ -2738,7 +2741,7 @@ EmitOperandArtifact = function(operand, parseNode, nodeList, annotation, action,
 		local property = tokenIterator()
 
 		if property == "enabled" then
-			code = format("PlayerBuffPresent(%s)", name)
+			code = format("BuffPresent(%s_buff)", name)
 		else
 			ok = false
 		end
@@ -2861,6 +2864,7 @@ do
 	local CHARACTER_PROPERTY = {
 		["active_enemies"]		= "Enemies()",
 		["astral_power"] 		= "AstralPower()",
+		["astral_power.deficit"]= "AstralPowerDeficit()",
 		["blood.frac"]			= "Rune(blood)",
 		["chi"]					= "Chi()",
 		["chi.max"]				= "MaxChi()",
@@ -2888,6 +2892,7 @@ do
 		["health.pct"]			= "HealthPercent()",
 		["health.percent"]		= "HealthPercent()",
 		["holy_power"]			= "HolyPower()",
+		["insanity"]			= "Insanity()",
 		["level"]				= "Level()",
 		["lunar_max"]			= "TimeToEclipse(lunar)",	-- XXX
 		["mana"]				= "Mana()",
@@ -2982,7 +2987,7 @@ do
 			-- "spell_haste" is the player's spell factor, e.g.,
 			-- 25% haste corresponds to a "spell_haste" value of 1/(1 + 0.25) = 0.8.
 			code = "100 / { 100 + SpellHaste() }"
-		elseif strsub(operand, 1, 14) == "spell_targets." then
+		elseif strsub(operand, 1, 13) == "spell_targets" then
 			-- "spell_target.<spell>" is roughly equivalent to the number of enemies.
 			code = "Enemies()"
 		elseif operand == "t18_class_trinket" then
@@ -3121,6 +3126,11 @@ EmitOperandDot = function(operand, parseNode, nodeList, annotation, action, targ
 			code = format("%s%sPresent(%s)", target, prefix, dotName)
 		elseif property == "ticks_remain" then
 			code = format("%sTicksRemaining(%s)", target, dotName)
+		elseif property == "exsanguinated" then
+			code = format("TargetDebuffRemaining(%s_exsanguinated)", dotName)
+		elseif property == "refreshable" then
+			-- TODO What is the difference with ticking?
+			code = format("%s%sPresent(%s)", target, prefix, dotName)
 		else
 			ok = false
 		end
@@ -3563,6 +3573,11 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 	elseif class == "PRIEST" and operand == "primary_target" then
 		-- Ovale has no concept of the "primary", "main" or "boss" target, so "primary_target" should always return 1.
 		code = "1"
+	elseif class == "ROGUE" and operand == "poisoned_enemies" then
+		-- TODO Need to track the number of poisoned enemies
+		code = "0" 
+	elseif class == "ROGUE" and operand == "exsanguinated" then
+		code = "target.DebuffPresent(exsanguinated)"
 	elseif class == "ROGUE" and specialization == "subtlety" and strsub(operand, 1, 29) == "cooldown.honor_among_thieves." then
 		-- The cooldown of Honor Among Thieves is implemented as a hidden buff.
 		local property = strsub(operand, 30)
@@ -5197,8 +5212,8 @@ function OvaleSimulationCraft:Emit(profile, noFinalNewLine)
 		output[#output + 1] = "### Required symbols"
 		tsort(profile.annotation.symbolTable)
 		for _, symbol in ipairs(profile.annotation.symbolTable) do
-			if profile.annotation.dictionary and not profile.annotation.dictionary[symbol] then
-				-- TODO Don't work if it is a spell list for example
+			if not tonumber(symbol) and profile.annotation.dictionary and not profile.annotation.dictionary[symbol] and not OvaleData.buffSpellList[symbol] then
+				-- TODO Need to be redesigned
 				self:Print("Warning: Symbol '%s' not defined", symbol)				
 			end
 			output[#output + 1] = "# " .. symbol

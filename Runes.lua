@@ -302,13 +302,9 @@ statePrototype.ConsumeRune = function(state, spellId, atTime, snapshot)
 		consumedRune.startCooldown = start
 		consumedRune.endCooldown = start + duration
 
-		-- Each rune consumed generates 10 (12, if in Frost Presence) runic power.
+		-- Each rune consumed generates 10 runic power.
 		local runicpower = state.runicpower
-		if OvaleStance:IsStance("deathknight_frost_presence") then
-			runicpower = runicpower + 12
-		else
-			runicpower = runicpower + 10
-		end
+		runicpower = runicpower + 10
 		local maxi = OvalePower.maxPower.runicpower
 		state.runicpower = (runicpower < maxi) and runicpower or maxi
 	else

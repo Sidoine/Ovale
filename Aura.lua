@@ -1222,6 +1222,13 @@ statePrototype.IsActiveAura = function(state, aura, atTime)
 	return boolean
 end
 
+statePrototype.CanApplySpellAura = function(spellData)
+	if spellData["if_target_debuff"] then
+		-- TODO other combinations
+	elseif spellData["if_buff"] then
+	end
+end
+
 statePrototype.ApplySpellAuras = function(state, spellId, guid, atTime, auraList, spellcast)
 	OvaleAura:StartProfiling("OvaleAura_state_ApplySpellAuras")
 	for filter, filterInfo in pairs(auraList) do
@@ -1247,8 +1254,10 @@ statePrototype.ApplySpellAuras = function(state, spellId, guid, atTime, auraList
 				count = data
 			elseif value == "extend" then
 				extend = data
+			elseif tonumber(value) then
+				stacks = tonumber(value)
 			else
-				stacks = value
+				state:Log("Unknown stack %s", stacks)
 			end
 			if verified then
 				local si = OvaleData.spellInfo[auraId]

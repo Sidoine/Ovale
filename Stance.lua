@@ -45,9 +45,6 @@ local SPELL_NAME_TO_STANCE = {
 	[API_GetSpellInfo( 33943)] = "druid_flight_form",
 	[API_GetSpellInfo( 40120)] = "druid_swift_flight_form",
 	[API_GetSpellInfo(171745)] = "druid_claws_of_shirvallah",
-	-- Monk
-	[API_GetSpellInfo(103985)] = "monk_stance_of_the_fierce_tiger",
-	[API_GetSpellInfo(115069)] = "monk_stance_of_the_sturdy_ox",
 	-- Rogue
 	[API_GetSpellInfo(  1784)] = "rogue_stealth"
 }

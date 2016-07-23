@@ -39,25 +39,46 @@ AddFunction AfflictionDefaultCdActions
 
 AddFunction AfflictionPrecombatMainActions
 {
-	#summon_pet,if=!talent.grimoire_of_supremacy.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.demonic_power.down)
-	if not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() Spell(summon_felhunter)
-	#summon_doomguard,if=talent.grimoire_of_supremacy.enabled&active_enemies<3
-	if Talent(grimoire_of_supremacy_talent) and Enemies() < 3 Spell(summon_doomguard)
-	#summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>=3
-	if Talent(grimoire_of_supremacy_talent) and Enemies() >= 3 Spell(summon_infernal)
 	#snapshot_stats
 	#grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
 	if Talent(grimoire_of_sacrifice_talent) and pet.Present() Spell(grimoire_of_sacrifice)
 }
 
+AddFunction AfflictionPrecombatShortCdActions
+{
+	#summon_pet,if=!talent.grimoire_of_supremacy.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.demonic_power.down)
+	if not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() Spell(summon_felhunter)
+}
+
+AddFunction AfflictionPrecombatCdActions
+{
+	unless not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_felhunter)
+	{
+		#summon_doomguard,if=talent.grimoire_of_supremacy.enabled&active_enemies<3
+		if Talent(grimoire_of_supremacy_talent) and Enemies() < 3 Spell(summon_doomguard)
+		#summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>=3
+		if Talent(grimoire_of_supremacy_talent) and Enemies() >= 3 Spell(summon_infernal)
+	}
+}
+
 AddFunction AfflictionPrecombatCdPostConditions
 {
-	not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_felhunter) or Talent(grimoire_of_supremacy_talent) and Enemies() < 3 and Spell(summon_doomguard) or Talent(grimoire_of_supremacy_talent) and Enemies() >= 3 and Spell(summon_infernal) or Talent(grimoire_of_sacrifice_talent) and pet.Present() and Spell(grimoire_of_sacrifice)
+	not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_felhunter)
 }
 
 ### Affliction icons.
 
 AddCheckBox(opt_warlock_affliction_aoe L(AOE) default specialization=affliction)
+
+AddIcon checkbox=!opt_warlock_affliction_aoe enemies=1 help=shortcd specialization=affliction
+{
+	if not InCombat() AfflictionPrecombatShortCdActions()
+}
+
+AddIcon checkbox=opt_warlock_affliction_aoe help=shortcd specialization=affliction
+{
+	if not InCombat() AfflictionPrecombatShortCdActions()
+}
 
 AddIcon enemies=1 help=main specialization=affliction
 {
@@ -73,6 +94,7 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=aoe specialization=affliction
 
 AddIcon checkbox=!opt_warlock_affliction_aoe enemies=1 help=cd specialization=affliction
 {
+	if not InCombat() AfflictionPrecombatCdActions()
 	unless not InCombat() and AfflictionPrecombatCdPostConditions()
 	{
 		AfflictionDefaultCdActions()
@@ -81,6 +103,7 @@ AddIcon checkbox=!opt_warlock_affliction_aoe enemies=1 help=cd specialization=af
 
 AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 {
+	if not InCombat() AfflictionPrecombatCdActions()
 	unless not InCombat() and AfflictionPrecombatCdPostConditions()
 	{
 		AfflictionDefaultCdActions()
@@ -134,39 +157,55 @@ AddFunction DemonologyDefaultCdActions
 
 ### actions.precombat
 
-AddFunction DemonologyPrecombatMainActions
+AddFunction DemonologyPrecombatShortCdActions
 {
 	#summon_pet,if=!talent.grimoire_of_supremacy.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.demonic_power.down)
 	if not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() Spell(summon_felguard)
-	#summon_doomguard,if=talent.grimoire_of_supremacy.enabled&active_enemies<3
-	if Talent(grimoire_of_supremacy_talent) and Enemies() < 3 Spell(summon_doomguard)
-	#summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>=3
-	if Talent(grimoire_of_supremacy_talent) and Enemies() >= 3 Spell(summon_infernal)
+}
+
+AddFunction DemonologyPrecombatCdActions
+{
+	unless not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_felguard)
+	{
+		#summon_doomguard,if=talent.grimoire_of_supremacy.enabled&active_enemies<3
+		if Talent(grimoire_of_supremacy_talent) and Enemies() < 3 Spell(summon_doomguard)
+		#summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>=3
+		if Talent(grimoire_of_supremacy_talent) and Enemies() >= 3 Spell(summon_infernal)
+	}
 }
 
 AddFunction DemonologyPrecombatCdPostConditions
 {
-	not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_felguard) or Talent(grimoire_of_supremacy_talent) and Enemies() < 3 and Spell(summon_doomguard) or Talent(grimoire_of_supremacy_talent) and Enemies() >= 3 and Spell(summon_infernal)
+	not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_felguard)
 }
 
 ### Demonology icons.
 
 AddCheckBox(opt_warlock_demonology_aoe L(AOE) default specialization=demonology)
 
+AddIcon checkbox=!opt_warlock_demonology_aoe enemies=1 help=shortcd specialization=demonology
+{
+	if not InCombat() DemonologyPrecombatShortCdActions()
+}
+
+AddIcon checkbox=opt_warlock_demonology_aoe help=shortcd specialization=demonology
+{
+	if not InCombat() DemonologyPrecombatShortCdActions()
+}
+
 AddIcon enemies=1 help=main specialization=demonology
 {
-	if not InCombat() DemonologyPrecombatMainActions()
 	DemonologyDefaultMainActions()
 }
 
 AddIcon checkbox=opt_warlock_demonology_aoe help=aoe specialization=demonology
 {
-	if not InCombat() DemonologyPrecombatMainActions()
 	DemonologyDefaultMainActions()
 }
 
 AddIcon checkbox=!opt_warlock_demonology_aoe enemies=1 help=cd specialization=demonology
 {
+	if not InCombat() DemonologyPrecombatCdActions()
 	unless not InCombat() and DemonologyPrecombatCdPostConditions()
 	{
 		DemonologyDefaultCdActions()
@@ -175,6 +214,7 @@ AddIcon checkbox=!opt_warlock_demonology_aoe enemies=1 help=cd specialization=de
 
 AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 {
+	if not InCombat() DemonologyPrecombatCdActions()
 	unless not InCombat() and DemonologyPrecombatCdPostConditions()
 	{
 		DemonologyDefaultCdActions()
@@ -215,16 +255,6 @@ AddCheckBox(opt_legendary_ring_intellect ItemName(legendary_ring_intellect) defa
 
 AddFunction DestructionDefaultMainActions
 {
-	#service_pet,if=active_enemies<3
-	if Enemies() < 3 Spell(service_felhunter)
-	#service_voidwalker,if=active_enemies>=3
-	if Enemies() >= 3 Spell(service_voidwalker)
-	#summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening<3
-	if not Talent(grimoire_of_supremacy_talent) and Enemies() < 3 Spell(summon_doomguard)
-	#summon_infernal,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening>=3
-	if not Talent(grimoire_of_supremacy_talent) and Enemies() >= 3 Spell(summon_infernal)
-	#dimensional_rift,if=charges=3
-	if Charges(dimensional_rift) == 3 Spell(dimensional_rift)
 	#immolate,if=remains<=tick_time
 	if target.DebuffRemaining(immolate_debuff) <= target.TickTime(immolate_debuff) Spell(immolate)
 	#immolate,if=talent.roaring_blaze.enabled&remains<duration&action.conflagrate.charges>=1&action.conflagrate.recharge_time<cast_time+gcd
@@ -237,20 +267,14 @@ AddFunction DestructionDefaultMainActions
 	if not Talent(roaring_blaze_talent) and BuffRemaining(conflagration_of_chaos_buff) <= CastTime(chaos_bolt) Spell(conflagrate)
 	#conflagrate,if=!talent.roaring_blaze.enabled&(charges=1&recharge_time<action.chaos_bolt.cast_time|charges=2)&soul_shard<5
 	if not Talent(roaring_blaze_talent) and { Charges(conflagrate) == 1 and SpellChargeCooldown(conflagrate) < CastTime(chaos_bolt) or Charges(conflagrate) == 2 } and SoulShards() < 5 Spell(conflagrate)
-	#soul_harvest
-	Spell(soul_harvest)
 	#channel_demonfire,if=dot.immolate.remains>cast_time
 	if target.DebuffRemaining(immolate_debuff) > CastTime(channel_demonfire) Spell(channel_demonfire)
 	#chaos_bolt,if=soul_shard>3
 	if SoulShards() > 3 Spell(chaos_bolt)
-	#dimensional_rift
-	Spell(dimensional_rift)
 	#mana_tap,if=buff.mana_tap.remains<=buff.mana_tap.duration*0.3&target.time_to_die>buff.mana_tap.duration*0.3
 	if BuffRemaining(mana_tap_buff) <= BaseDuration(mana_tap_buff) * 0.3 and target.TimeToDie() > BaseDuration(mana_tap_buff) * 0.3 Spell(mana_tap)
 	#chaos_bolt
 	Spell(chaos_bolt)
-	#cataclysm
-	Spell(cataclysm)
 	#conflagrate,if=!talent.roaring_blaze.enabled
 	if not Talent(roaring_blaze_talent) Spell(conflagrate)
 	#immolate,if=!talent.roaring_blaze.enabled&remains<=duration*0.3
@@ -261,22 +285,52 @@ AddFunction DestructionDefaultMainActions
 	Spell(life_tap)
 }
 
+AddFunction DestructionDefaultShortCdActions
+{
+	#service_pet,if=active_enemies<3
+	if Enemies() < 3 Spell(service_felhunter)
+	#service_voidwalker,if=active_enemies>=3
+	if Enemies() >= 3 Spell(service_voidwalker)
+	#dimensional_rift,if=charges=3
+	if Charges(dimensional_rift) == 3 Spell(dimensional_rift)
+
+	unless target.DebuffRemaining(immolate_debuff) <= target.TickTime(immolate_debuff) and Spell(immolate) or Talent(roaring_blaze_talent) and target.DebuffRemaining(immolate_debuff) < BaseDuration(immolate_debuff) and Charges(conflagrate) >= 1 and SpellChargeCooldown(conflagrate) < CastTime(immolate) + GCD() and Spell(immolate) or Talent(roaring_blaze_talent) and Charges(conflagrate) == 2 and Spell(conflagrate) or Talent(roaring_blaze_talent) and PreviousGCDSpell(conflagrate) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and BuffRemaining(conflagration_of_chaos_buff) <= CastTime(chaos_bolt) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and { Charges(conflagrate) == 1 and SpellChargeCooldown(conflagrate) < CastTime(chaos_bolt) or Charges(conflagrate) == 2 } and SoulShards() < 5 and Spell(conflagrate)
+	{
+		#soul_harvest
+		Spell(soul_harvest)
+
+		unless target.DebuffRemaining(immolate_debuff) > CastTime(channel_demonfire) and Spell(channel_demonfire) or SoulShards() > 3 and Spell(chaos_bolt)
+		{
+			#dimensional_rift
+			Spell(dimensional_rift)
+
+			unless BuffRemaining(mana_tap_buff) <= BaseDuration(mana_tap_buff) * 0.3 and target.TimeToDie() > BaseDuration(mana_tap_buff) * 0.3 and Spell(mana_tap) or Spell(chaos_bolt)
+			{
+				#cataclysm
+				Spell(cataclysm)
+			}
+		}
+	}
+}
+
 AddFunction DestructionDefaultCdActions
 {
 	#use_item,name=nithramus_the_allseer
 	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
+
+	unless Enemies() < 3 and Spell(service_felhunter) or Enemies() >= 3 and Spell(service_voidwalker)
+	{
+		#summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening<3
+		if not Talent(grimoire_of_supremacy_talent) and Enemies() < 3 Spell(summon_doomguard)
+		#summon_infernal,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening>=3
+		if not Talent(grimoire_of_supremacy_talent) and Enemies() >= 3 Spell(summon_infernal)
+	}
 }
 
 ### actions.precombat
 
 AddFunction DestructionPrecombatMainActions
 {
-	#summon_pet,if=!talent.grimoire_of_supremacy.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.demonic_power.down)
-	if not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() Spell(summon_felhunter)
-	#summon_doomguard,if=talent.grimoire_of_supremacy.enabled&active_enemies<3
-	if Talent(grimoire_of_supremacy_talent) and Enemies() < 3 Spell(summon_doomguard)
-	#summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>=3
-	if Talent(grimoire_of_supremacy_talent) and Enemies() >= 3 Spell(summon_infernal)
 	#snapshot_stats
 	#grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
 	if Talent(grimoire_of_sacrifice_talent) and pet.Present() Spell(grimoire_of_sacrifice)
@@ -284,14 +338,54 @@ AddFunction DestructionPrecombatMainActions
 	Spell(incinerate)
 }
 
+AddFunction DestructionPrecombatShortCdActions
+{
+	#summon_pet,if=!talent.grimoire_of_supremacy.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.demonic_power.down)
+	if not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() Spell(summon_felhunter)
+}
+
+AddFunction DestructionPrecombatShortCdPostConditions
+{
+	Spell(incinerate)
+}
+
+AddFunction DestructionPrecombatCdActions
+{
+	unless not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_felhunter)
+	{
+		#summon_doomguard,if=talent.grimoire_of_supremacy.enabled&active_enemies<3
+		if Talent(grimoire_of_supremacy_talent) and Enemies() < 3 Spell(summon_doomguard)
+		#summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>=3
+		if Talent(grimoire_of_supremacy_talent) and Enemies() >= 3 Spell(summon_infernal)
+	}
+}
+
 AddFunction DestructionPrecombatCdPostConditions
 {
-	not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_felhunter) or Talent(grimoire_of_supremacy_talent) and Enemies() < 3 and Spell(summon_doomguard) or Talent(grimoire_of_supremacy_talent) and Enemies() >= 3 and Spell(summon_infernal) or Talent(grimoire_of_sacrifice_talent) and pet.Present() and Spell(grimoire_of_sacrifice) or Spell(incinerate)
+	not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_felhunter) or Spell(incinerate)
 }
 
 ### Destruction icons.
 
 AddCheckBox(opt_warlock_destruction_aoe L(AOE) default specialization=destruction)
+
+AddIcon checkbox=!opt_warlock_destruction_aoe enemies=1 help=shortcd specialization=destruction
+{
+	if not InCombat() DestructionPrecombatShortCdActions()
+	unless not InCombat() and DestructionPrecombatShortCdPostConditions()
+	{
+		DestructionDefaultShortCdActions()
+	}
+}
+
+AddIcon checkbox=opt_warlock_destruction_aoe help=shortcd specialization=destruction
+{
+	if not InCombat() DestructionPrecombatShortCdActions()
+	unless not InCombat() and DestructionPrecombatShortCdPostConditions()
+	{
+		DestructionDefaultShortCdActions()
+	}
+}
 
 AddIcon enemies=1 help=main specialization=destruction
 {
@@ -307,6 +401,7 @@ AddIcon checkbox=opt_warlock_destruction_aoe help=aoe specialization=destruction
 
 AddIcon checkbox=!opt_warlock_destruction_aoe enemies=1 help=cd specialization=destruction
 {
+	if not InCombat() DestructionPrecombatCdActions()
 	unless not InCombat() and DestructionPrecombatCdPostConditions()
 	{
 		DestructionDefaultCdActions()
@@ -315,6 +410,7 @@ AddIcon checkbox=!opt_warlock_destruction_aoe enemies=1 help=cd specialization=d
 
 AddIcon checkbox=opt_warlock_destruction_aoe help=cd specialization=destruction
 {
+	if not InCombat() DestructionPrecombatCdActions()
 	unless not InCombat() and DestructionPrecombatCdPostConditions()
 	{
 		DestructionDefaultCdActions()

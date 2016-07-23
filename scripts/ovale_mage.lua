@@ -46,18 +46,14 @@ AddFunction ArcaneDefaultMainActions
 {
 	#stop_burn_phase,if=prev_gcd.evocation&burn_phase_duration>gcd.max
 	if PreviousGCDSpell(evocation) and GetStateDuration(burn_phase) > GCD() and GetState(burn_phase) > 0 SetState(burn_phase 0)
-	#time_warp,if=target.health.pct<25|time>5
-	if { target.HealthPercent() < 25 or TimeInCombat() > 5 } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
-	#rune_of_power,if=buff.rune_of_power.remains<2*spell_haste
-	if TotemRemaining(rune_of_power) < 2 * { 100 / { 100 + SpellHaste() } } Spell(rune_of_power)
-	#mirror_image
-	Spell(mirror_image)
 }
 
 AddFunction ArcaneDefaultShortCdActions
 {
 	#stop_burn_phase,if=prev_gcd.evocation&burn_phase_duration>gcd.max
 	if PreviousGCDSpell(evocation) and GetStateDuration(burn_phase) > GCD() and GetState(burn_phase) > 0 SetState(burn_phase 0)
+	#rune_of_power,if=buff.rune_of_power.remains<2*spell_haste
+	if TotemRemaining(rune_of_power) < 2 * { 100 / { 100 + SpellHaste() } } Spell(rune_of_power)
 }
 
 AddFunction ArcaneDefaultCdActions
@@ -66,32 +62,44 @@ AddFunction ArcaneDefaultCdActions
 	if target.IsInterruptible() ArcaneInterruptActions()
 	#stop_burn_phase,if=prev_gcd.evocation&burn_phase_duration>gcd.max
 	if PreviousGCDSpell(evocation) and GetStateDuration(burn_phase) > GCD() and GetState(burn_phase) > 0 SetState(burn_phase 0)
+	#time_warp,if=target.health.pct<25|time>5
+	if { target.HealthPercent() < 25 or TimeInCombat() > 5 } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
+
+	unless TotemRemaining(rune_of_power) < 2 * { 100 / { 100 + SpellHaste() } } and Spell(rune_of_power)
+	{
+		#mirror_image
+		Spell(mirror_image)
+	}
 }
 
 ### actions.precombat
 
 AddFunction ArcanePrecombatMainActions
 {
+	#arcane_blast
+	Spell(arcane_blast)
+}
+
+AddFunction ArcanePrecombatShortCdActions
+{
 	#flask,type=greater_draenic_intellect_flask
 	#food,type=buttered_sturgeon
 	#snapshot_stats
 	#rune_of_power
 	Spell(rune_of_power)
-	#mirror_image
-	Spell(mirror_image)
-	#arcane_blast
-	Spell(arcane_blast)
 }
 
 AddFunction ArcanePrecombatShortCdPostConditions
 {
-	Spell(rune_of_power) or Spell(mirror_image) or Spell(arcane_blast)
+	Spell(arcane_blast)
 }
 
 AddFunction ArcanePrecombatCdActions
 {
-	unless Spell(rune_of_power) or Spell(mirror_image)
+	unless Spell(rune_of_power)
 	{
+		#mirror_image
+		Spell(mirror_image)
 		#potion,name=draenic_intellect
 		ArcaneUsePotionIntellect()
 	}
@@ -99,7 +107,7 @@ AddFunction ArcanePrecombatCdActions
 
 AddFunction ArcanePrecombatCdPostConditions
 {
-	Spell(rune_of_power) or Spell(mirror_image) or Spell(arcane_blast)
+	Spell(rune_of_power) or Spell(arcane_blast)
 }
 
 ### Arcane icons.
@@ -108,6 +116,7 @@ AddCheckBox(opt_mage_arcane_aoe L(AOE) default specialization=arcane)
 
 AddIcon checkbox=!opt_mage_arcane_aoe enemies=1 help=shortcd specialization=arcane
 {
+	if not InCombat() ArcanePrecombatShortCdActions()
 	unless not InCombat() and ArcanePrecombatShortCdPostConditions()
 	{
 		ArcaneDefaultShortCdActions()
@@ -116,6 +125,7 @@ AddIcon checkbox=!opt_mage_arcane_aoe enemies=1 help=shortcd specialization=arca
 
 AddIcon checkbox=opt_mage_arcane_aoe help=shortcd specialization=arcane
 {
+	if not InCombat() ArcanePrecombatShortCdActions()
 	unless not InCombat() and ArcanePrecombatShortCdPostConditions()
 	{
 		ArcaneDefaultShortCdActions()
@@ -207,8 +217,6 @@ AddFunction FireInterruptActions
 
 AddFunction FireDefaultMainActions
 {
-	#time_warp,if=target.health.pct<25|time=0
-	if { target.HealthPercent() < 25 or TimeInCombat() == 0 } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
 	#call_action_list,name=combustion_phase,if=cooldown.combustion.remains=0&buff.hot_streak.up|buff.combustion.up
 	if not SpellCooldown(combustion) > 0 and BuffPresent(hot_streak_buff) or BuffPresent(combustion_buff) FireCombustionPhaseMainActions()
 	#call_action_list,name=comb_prep,if=cooldown.combustion.remains<6&cooldown.flame_on.remains<6
@@ -217,21 +225,37 @@ AddFunction FireDefaultMainActions
 	FireSingleTargetMainActions()
 }
 
+AddFunction FireDefaultShortCdActions
+{
+	#call_action_list,name=combustion_phase,if=cooldown.combustion.remains=0&buff.hot_streak.up|buff.combustion.up
+	if not SpellCooldown(combustion) > 0 and BuffPresent(hot_streak_buff) or BuffPresent(combustion_buff) FireCombustionPhaseShortCdActions()
+
+	unless { not SpellCooldown(combustion) > 0 and BuffPresent(hot_streak_buff) or BuffPresent(combustion_buff) } and FireCombustionPhaseShortCdPostConditions()
+	{
+		#call_action_list,name=comb_prep,if=cooldown.combustion.remains<6&cooldown.flame_on.remains<6
+		if SpellCooldown(combustion) < 6 and SpellCooldown(flame_on) < 6 FireCombPrepShortCdActions()
+
+		unless SpellCooldown(combustion) < 6 and SpellCooldown(flame_on) < 6 and FireCombPrepShortCdPostConditions()
+		{
+			#call_action_list,name=single_target
+			FireSingleTargetShortCdActions()
+		}
+	}
+}
+
 AddFunction FireDefaultCdActions
 {
-	#counterspell,if=target.debff.casting.react
-	if FIXME_target.debff.casting.react FireInterruptActions()
-
-	unless { target.HealthPercent() < 25 or TimeInCombat() == 0 } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) and Spell(time_warp)
-	{
-		#call_action_list,name=combustion_phase,if=cooldown.combustion.remains=0&buff.hot_streak.up|buff.combustion.up
-		if not SpellCooldown(combustion) > 0 and BuffPresent(hot_streak_buff) or BuffPresent(combustion_buff) FireCombustionPhaseCdActions()
-	}
+	#counterspell,if=target.debuff.casting.react
+	if target.IsInterruptible() FireInterruptActions()
+	#time_warp,if=target.health.pct<25|time=0
+	if { target.HealthPercent() < 25 or TimeInCombat() == 0 } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
+	#call_action_list,name=combustion_phase,if=cooldown.combustion.remains=0&buff.hot_streak.up|buff.combustion.up
+	if not SpellCooldown(combustion) > 0 and BuffPresent(hot_streak_buff) or BuffPresent(combustion_buff) FireCombustionPhaseCdActions()
 }
 
 ### actions.active_talents
 
-AddFunction FireActiveTalentsMainActions
+AddFunction FireActiveTalentsShortCdActions
 {
 	#dragons_breath,if=equipped.132863
 	if HasEquippedItem(132863) Spell(dragons_breath)
@@ -241,9 +265,18 @@ AddFunction FireActiveTalentsMainActions
 
 AddFunction FireCombPrepMainActions
 {
+	#fireball
+	Spell(fireball)
+}
+
+AddFunction FireCombPrepShortCdActions
+{
 	#fire_blast,if=buff.heating_up.up
 	if BuffPresent(heating_up_buff) Spell(fire_blast)
-	#fireball
+}
+
+AddFunction FireCombPrepShortCdPostConditions
+{
 	Spell(fireball)
 }
 
@@ -251,54 +284,73 @@ AddFunction FireCombPrepMainActions
 
 AddFunction FireCombustionPhaseMainActions
 {
-	#combustion
-	Spell(combustion)
-	#blood_fury
-	Spell(blood_fury_sp)
-	#berserking
-	Spell(berserking)
-	#arcane_torrent
-	Spell(arcane_torrent_mana)
-	#call_action_list,name=active_talents
-	FireActiveTalentsMainActions()
 	#pyroblast,if=buff.hot_streak.up
 	if BuffPresent(hot_streak_buff) Spell(pyroblast)
-	#fire_blast,if=!prev_off_gcd.fire_blast
-	if not PreviousOffGCDSpell(fire_blast) Spell(fire_blast)
 	#scorch,if=target.health.pct<=25&equipped.132454
 	if target.HealthPercent() <= 25 and HasEquippedItem(132454) Spell(scorch)
 	#fireball
 	Spell(fireball)
 }
 
+AddFunction FireCombustionPhaseShortCdActions
+{
+	#call_action_list,name=active_talents
+	FireActiveTalentsShortCdActions()
+
+	unless BuffPresent(hot_streak_buff) and Spell(pyroblast)
+	{
+		#fire_blast,if=!prev_off_gcd.fire_blast
+		if not PreviousOffGCDSpell(fire_blast) Spell(fire_blast)
+	}
+}
+
+AddFunction FireCombustionPhaseShortCdPostConditions
+{
+	BuffPresent(hot_streak_buff) and Spell(pyroblast) or target.HealthPercent() <= 25 and HasEquippedItem(132454) and Spell(scorch) or Spell(fireball)
+}
+
 AddFunction FireCombustionPhaseCdActions
 {
-	unless Spell(combustion)
-	{
-		#use_item,slot=finger2
-		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
-	}
+	#combustion
+	Spell(combustion)
+	#use_item,slot=finger2
+	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
+	#blood_fury
+	Spell(blood_fury_sp)
+	#berserking
+	Spell(berserking)
+	#arcane_torrent
+	Spell(arcane_torrent_mana)
 }
 
 ### actions.precombat
 
 AddFunction FirePrecombatMainActions
 {
+	#pyroblast,if=!talent.mirror_image.enabled|!talent.rune_of_power.enabled
+	if not Talent(mirror_image_talent) or not Talent(rune_of_power_talent) Spell(pyroblast)
+}
+
+AddFunction FirePrecombatShortCdActions
+{
 	#flask,type=greater_draenic_intellect_flask
 	#food,type=pickled_eel
 	#snapshot_stats
 	#rune_of_power
 	Spell(rune_of_power)
-	#mirror_image
-	Spell(mirror_image)
-	#pyroblast,if=!talent.mirror_image.enabled|!talent.rune_of_power.enabled
-	if not Talent(mirror_image_talent) or not Talent(rune_of_power_talent) Spell(pyroblast)
+}
+
+AddFunction FirePrecombatShortCdPostConditions
+{
+	{ not Talent(mirror_image_talent) or not Talent(rune_of_power_talent) } and Spell(pyroblast)
 }
 
 AddFunction FirePrecombatCdActions
 {
-	unless Spell(rune_of_power) or Spell(mirror_image)
+	unless Spell(rune_of_power)
 	{
+		#mirror_image
+		Spell(mirror_image)
 		#potion,name=draenic_intellect
 		FireUsePotionIntellect()
 	}
@@ -306,7 +358,7 @@ AddFunction FirePrecombatCdActions
 
 AddFunction FirePrecombatCdPostConditions
 {
-	Spell(rune_of_power) or Spell(mirror_image) or { not Talent(mirror_image_talent) or not Talent(rune_of_power_talent) } and Spell(pyroblast)
+	Spell(rune_of_power) or { not Talent(mirror_image_talent) or not Talent(rune_of_power_talent) } and Spell(pyroblast)
 }
 
 ### actions.single_target
@@ -317,17 +369,42 @@ AddFunction FireSingleTargetMainActions
 	if BuffPresent(hot_streak_buff) and BuffRemaining(hot_streak_buff) < ExecuteTime(fireball) Spell(pyroblast)
 	#pyroblast,if=buff.hot_streak.up
 	if BuffPresent(hot_streak_buff) Spell(pyroblast)
-	#fire_blast,if=buff.hot_streak.down&buff.heating_up.up
-	if BuffExpires(hot_streak_buff) and BuffPresent(heating_up_buff) Spell(fire_blast)
-	#call_action_list,name=active_talents
-	FireActiveTalentsMainActions()
 	#scorch,if=target.health.pct<=25&equipped.132454
 	if target.HealthPercent() <= 25 and HasEquippedItem(132454) Spell(scorch)
+}
+
+AddFunction FireSingleTargetShortCdActions
+{
+	unless BuffPresent(hot_streak_buff) and BuffRemaining(hot_streak_buff) < ExecuteTime(fireball) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Spell(pyroblast)
+	{
+		#fire_blast,if=buff.hot_streak.down&buff.heating_up.up
+		if BuffExpires(hot_streak_buff) and BuffPresent(heating_up_buff) Spell(fire_blast)
+		#call_action_list,name=active_talents
+		FireActiveTalentsShortCdActions()
+	}
 }
 
 ### Fire icons.
 
 AddCheckBox(opt_mage_fire_aoe L(AOE) default specialization=fire)
+
+AddIcon checkbox=!opt_mage_fire_aoe enemies=1 help=shortcd specialization=fire
+{
+	if not InCombat() FirePrecombatShortCdActions()
+	unless not InCombat() and FirePrecombatShortCdPostConditions()
+	{
+		FireDefaultShortCdActions()
+	}
+}
+
+AddIcon checkbox=opt_mage_fire_aoe help=shortcd specialization=fire
+{
+	if not InCombat() FirePrecombatShortCdActions()
+	unless not InCombat() and FirePrecombatShortCdPostConditions()
+	{
+		FireDefaultShortCdActions()
+	}
+}
 
 AddIcon enemies=1 help=main specialization=fire
 {
@@ -429,22 +506,32 @@ AddFunction FrostInterruptActions
 
 AddFunction FrostDefaultMainActions
 {
-	#time_warp,if=target.health.pct<25|time>0
-	if { target.HealthPercent() < 25 or TimeInCombat() > 0 } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
-	#rune_of_power,if=(charges_fractional>=2)|(buff.icy_veins.up&!talent.ray_of_frost.enabled)|(cooldown.icy_veins.remains>target.time_to_die)|cooldown.ray_of_frost.remains=0
-	if Charges(rune_of_power count=0) >= 2 or BuffPresent(icy_veins_buff) and not Talent(ray_of_frost_talent) or SpellCooldown(icy_veins) > target.TimeToDie() or not SpellCooldown(ray_of_frost) > 0 Spell(rune_of_power)
 	#call_action_list,name=water_jet,if=prev_off_gcd.water_jet|debuff.water_jet.remains>0
 	if PreviousOffGCDSpell(water_elemental_water_jet) or target.DebuffRemaining(water_elemental_water_jet_debuff) > 0 FrostWaterJetMainActions()
 	#call_action_list,name=single_target
 	FrostSingleTargetMainActions()
 }
 
+AddFunction FrostDefaultShortCdActions
+{
+	#rune_of_power,if=(charges_fractional>=2)|(buff.icy_veins.up&!talent.ray_of_frost.enabled)|(cooldown.icy_veins.remains>target.time_to_die)|cooldown.ray_of_frost.remains=0
+	if Charges(rune_of_power count=0) >= 2 or BuffPresent(icy_veins_buff) and not Talent(ray_of_frost_talent) or SpellCooldown(icy_veins) > target.TimeToDie() or not SpellCooldown(ray_of_frost) > 0 Spell(rune_of_power)
+
+	unless { PreviousOffGCDSpell(water_elemental_water_jet) or target.DebuffRemaining(water_elemental_water_jet_debuff) > 0 } and FrostWaterJetShortCdPostConditions()
+	{
+		#call_action_list,name=single_target
+		FrostSingleTargetShortCdActions()
+	}
+}
+
 AddFunction FrostDefaultCdActions
 {
 	#counterspell,if=target.debuff.casting.react
 	if target.IsInterruptible() FrostInterruptActions()
+	#time_warp,if=target.health.pct<25|time>0
+	if { target.HealthPercent() < 25 or TimeInCombat() > 0 } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
 
-	unless { target.HealthPercent() < 25 or TimeInCombat() > 0 } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) and Spell(time_warp) or { Charges(rune_of_power count=0) >= 2 or BuffPresent(icy_veins_buff) and not Talent(ray_of_frost_talent) or SpellCooldown(icy_veins) > target.TimeToDie() or not SpellCooldown(ray_of_frost) > 0 } and Spell(rune_of_power)
+	unless { Charges(rune_of_power count=0) >= 2 or BuffPresent(icy_veins_buff) and not Talent(ray_of_frost_talent) or SpellCooldown(icy_veins) > target.TimeToDie() or not SpellCooldown(ray_of_frost) > 0 } and Spell(rune_of_power)
 	{
 		unless { PreviousOffGCDSpell(water_elemental_water_jet) or target.DebuffRemaining(water_elemental_water_jet_debuff) > 0 } and FrostWaterJetCdPostConditions()
 		{
@@ -458,39 +545,49 @@ AddFunction FrostDefaultCdActions
 
 AddFunction FrostActiveTalentsMainActions
 {
-	#ray_of_frost,if=buff.rune_of_power.up|!talent.rune_of_power.enabled
-	if BuffPresent(rune_of_power_buff) or not Talent(rune_of_power_talent) Spell(ray_of_frost)
 	#ice_nova
 	Spell(ice_nova)
-	#frozen_touch,if=buff.fingers_of_frost.stack=0
-	if BuffStacks(fingers_of_frost_buff) == 0 Spell(frozen_touch)
 	#glacial_spike
 	Spell(glacial_spike)
-	#comet_storm
-	Spell(comet_storm)
+}
+
+AddFunction FrostActiveTalentsShortCdActions
+{
+	#ray_of_frost,if=buff.rune_of_power.up|!talent.rune_of_power.enabled
+	if BuffPresent(rune_of_power_buff) or not Talent(rune_of_power_talent) Spell(ray_of_frost)
+
+	unless Spell(ice_nova)
+	{
+		#frozen_touch,if=buff.fingers_of_frost.stack=0
+		if BuffStacks(fingers_of_frost_buff) == 0 Spell(frozen_touch)
+
+		unless Spell(glacial_spike)
+		{
+			#comet_storm
+			Spell(comet_storm)
+		}
+	}
+}
+
+AddFunction FrostActiveTalentsShortCdPostConditions
+{
+	Spell(ice_nova) or Spell(glacial_spike)
 }
 
 ### actions.cooldowns
 
-AddFunction FrostCooldownsMainActions
+AddFunction FrostCooldownsCdActions
 {
 	#icy_veins
 	Spell(icy_veins)
+	#use_item,slot=finger2
+	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
 	#blood_fury
 	Spell(blood_fury_sp)
 	#berserking
 	Spell(berserking)
 	#arcane_torrent
 	Spell(arcane_torrent_mana)
-}
-
-AddFunction FrostCooldownsCdActions
-{
-	unless Spell(icy_veins)
-	{
-		#use_item,slot=finger2
-		if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
-	}
 }
 
 ### actions.init_water_jet
@@ -501,9 +598,20 @@ AddFunction FrostInitWaterJetMainActions
 	Spell(frostbolt)
 }
 
+AddFunction FrostInitWaterJetShortCdPostConditions
+{
+	Spell(frostbolt)
+}
+
 ### actions.precombat
 
 AddFunction FrostPrecombatMainActions
+{
+	#frostbolt,if=!talent.frost_bomb.enabled
+	if not Talent(frost_bomb_talent) Spell(frostbolt)
+}
+
+AddFunction FrostPrecombatShortCdActions
 {
 	#flask,type=greater_draenic_intellect_flask
 	#food,type=salty_squid_roll
@@ -512,18 +620,25 @@ AddFunction FrostPrecombatMainActions
 	#snapshot_stats
 	#rune_of_power
 	Spell(rune_of_power)
-	#mirror_image
-	Spell(mirror_image)
-	#frostbolt,if=!talent.frost_bomb.enabled
-	if not Talent(frost_bomb_talent) Spell(frostbolt)
-	#frost_bomb
-	Spell(frost_bomb)
+
+	unless not Talent(frost_bomb_talent) and Spell(frostbolt)
+	{
+		#frost_bomb
+		Spell(frost_bomb)
+	}
+}
+
+AddFunction FrostPrecombatShortCdPostConditions
+{
+	not Talent(frost_bomb_talent) and Spell(frostbolt)
 }
 
 AddFunction FrostPrecombatCdActions
 {
-	unless not pet.Present() and Spell(water_elemental) or Spell(rune_of_power) or Spell(mirror_image)
+	unless not pet.Present() and Spell(water_elemental) or Spell(rune_of_power)
 	{
+		#mirror_image
+		Spell(mirror_image)
 		#potion,name=draenic_intellect
 		FrostUsePotionIntellect()
 	}
@@ -531,35 +646,49 @@ AddFunction FrostPrecombatCdActions
 
 AddFunction FrostPrecombatCdPostConditions
 {
-	not pet.Present() and Spell(water_elemental) or Spell(rune_of_power) or Spell(mirror_image) or not Talent(frost_bomb_talent) and Spell(frostbolt) or Spell(frost_bomb)
+	not pet.Present() and Spell(water_elemental) or Spell(rune_of_power) or not Talent(frost_bomb_talent) and Spell(frostbolt) or Spell(frost_bomb)
 }
 
 ### actions.single_target
 
 AddFunction FrostSingleTargetMainActions
 {
-	#call_action_list,name=cooldowns
-	FrostCooldownsMainActions()
 	#ice_lance,if=(buff.fingers_of_frost.react&(buff.fingers_of_frost.remains<action.frostbolt.execute_time|buff.fingers_of_frost.remains<buff.fingers_of_frost.react*gcd.max))|prev_gcd.flurry
 	if BuffPresent(fingers_of_frost_buff) and { BuffRemaining(fingers_of_frost_buff) < ExecuteTime(frostbolt) or BuffRemaining(fingers_of_frost_buff) < BuffStacks(fingers_of_frost_buff) * GCD() } or PreviousGCDSpell(flurry) Spell(ice_lance)
 	#flurry,if=buff.brain_freeze.react&(buff.brain_freeze.remains<action.frostbolt.execute_time|(buff.fingers_of_frost.react=0&debuff.water_jet.remains=0))
 	if BuffPresent(brain_freeze_buff) and { BuffRemaining(brain_freeze_buff) < ExecuteTime(frostbolt) or BuffStacks(fingers_of_frost_buff) == 0 and not target.DebuffRemaining(water_elemental_water_jet_debuff) > 0 } Spell(flurry)
 	#ice_lance,if=buff.fingers_of_frost.react>(artifact.icy_hand.enabled)|prev_gcd.ebonbolt
-	if BuffStacks(fingers_of_frost_buff) > PlayerBuffPresent(icy_hand) or PreviousGCDSpell(ebonbolt) Spell(ice_lance)
+	if BuffStacks(fingers_of_frost_buff) > BuffPresent(icy_hand_buff) or PreviousGCDSpell(ebonbolt) Spell(ice_lance)
 	#ice_lance,if=buff.shatterlance.up
 	if HasTrinket(t18_class_trinket) and PreviousGCDSpell(frostbolt) Spell(ice_lance)
 	#call_action_list,name=active_talents
 	FrostActiveTalentsMainActions()
 	#call_action_list,name=init_water_jet,if=!talent.lonely_winter.enabled&pet.water_elemental.cooldown.water_jet.remains<=gcd.max&buff.fingers_of_frost.react<2+artifact.icy_hand.enabled&!dot.frozen_orb.ticking
-	if not Talent(lonely_winter_talent) and SpellCooldown(water_elemental_water_jet) <= GCD() and BuffStacks(fingers_of_frost_buff) < 2 + PlayerBuffPresent(icy_hand) and not SpellCooldown(frozen_orb) > SpellCooldownDuration(frozen_orb) - 10 FrostInitWaterJetMainActions()
-	#frozen_orb,if=buff.fingers_of_frost.stack<2+artifact.icy_hand.enabled
-	if BuffStacks(fingers_of_frost_buff) < 2 + PlayerBuffPresent(icy_hand) Spell(frozen_orb)
+	if not Talent(lonely_winter_talent) and SpellCooldown(water_elemental_water_jet) <= GCD() and BuffStacks(fingers_of_frost_buff) < 2 + BuffPresent(icy_hand_buff) and not SpellCooldown(frozen_orb) > SpellCooldownDuration(frozen_orb) - 10 FrostInitWaterJetMainActions()
 	#blizzard,if=talent.arctic_gale.enabled
 	if Talent(arctic_gale_talent) Spell(blizzard)
 	#ice_lance,if=!talent.frost_bomb.enabled&buff.fingers_of_frost.react&(!talent.thermal_void.enabled|cooldown.icy_veins.remains>8)
 	if not Talent(frost_bomb_talent) and BuffPresent(fingers_of_frost_buff) and { not Talent(thermal_void_talent) or SpellCooldown(icy_veins) > 8 } Spell(ice_lance)
 	#frostbolt
 	Spell(frostbolt)
+}
+
+AddFunction FrostSingleTargetShortCdActions
+{
+	unless { BuffPresent(fingers_of_frost_buff) and { BuffRemaining(fingers_of_frost_buff) < ExecuteTime(frostbolt) or BuffRemaining(fingers_of_frost_buff) < BuffStacks(fingers_of_frost_buff) * GCD() } or PreviousGCDSpell(flurry) } and Spell(ice_lance) or BuffPresent(brain_freeze_buff) and { BuffRemaining(brain_freeze_buff) < ExecuteTime(frostbolt) or BuffStacks(fingers_of_frost_buff) == 0 and not target.DebuffRemaining(water_elemental_water_jet_debuff) > 0 } and Spell(flurry) or { BuffStacks(fingers_of_frost_buff) > BuffPresent(icy_hand_buff) or PreviousGCDSpell(ebonbolt) } and Spell(ice_lance) or HasTrinket(t18_class_trinket) and PreviousGCDSpell(frostbolt) and Spell(ice_lance)
+	{
+		#call_action_list,name=active_talents
+		FrostActiveTalentsShortCdActions()
+
+		unless FrostActiveTalentsShortCdPostConditions()
+		{
+			unless not Talent(lonely_winter_talent) and SpellCooldown(water_elemental_water_jet) <= GCD() and BuffStacks(fingers_of_frost_buff) < 2 + BuffPresent(icy_hand_buff) and not SpellCooldown(frozen_orb) > SpellCooldownDuration(frozen_orb) - 10 and FrostInitWaterJetShortCdPostConditions()
+			{
+				#frozen_orb,if=buff.fingers_of_frost.stack<2+artifact.icy_hand.enabled
+				if BuffStacks(fingers_of_frost_buff) < 2 + BuffPresent(icy_hand_buff) Spell(frozen_orb)
+			}
+		}
+	}
 }
 
 AddFunction FrostSingleTargetCdActions
@@ -575,19 +704,42 @@ AddFunction FrostWaterJetMainActions
 	#frostbolt,if=prev_off_gcd.water_jet
 	if PreviousOffGCDSpell(water_elemental_water_jet) Spell(frostbolt)
 	#ice_lance,if=buff.fingers_of_frost.react>=2+artifact.icy_hand.enabled&action.frostbolt.in_flight
-	if BuffStacks(fingers_of_frost_buff) >= 2 + PlayerBuffPresent(icy_hand) and InFlightToTarget(frostbolt) Spell(ice_lance)
+	if BuffStacks(fingers_of_frost_buff) >= 2 + BuffPresent(icy_hand_buff) and InFlightToTarget(frostbolt) Spell(ice_lance)
 	#frostbolt,if=debuff.water_jet.remains>cast_time+travel_time
 	if target.DebuffRemaining(water_elemental_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) Spell(frostbolt)
 }
 
+AddFunction FrostWaterJetShortCdPostConditions
+{
+	PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or BuffStacks(fingers_of_frost_buff) >= 2 + BuffPresent(icy_hand_buff) and InFlightToTarget(frostbolt) and Spell(ice_lance) or target.DebuffRemaining(water_elemental_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) and Spell(frostbolt)
+}
+
 AddFunction FrostWaterJetCdPostConditions
 {
-	PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or BuffStacks(fingers_of_frost_buff) >= 2 + PlayerBuffPresent(icy_hand) and InFlightToTarget(frostbolt) and Spell(ice_lance) or target.DebuffRemaining(water_elemental_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) and Spell(frostbolt)
+	PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or BuffStacks(fingers_of_frost_buff) >= 2 + BuffPresent(icy_hand_buff) and InFlightToTarget(frostbolt) and Spell(ice_lance) or target.DebuffRemaining(water_elemental_water_jet_debuff) > CastTime(frostbolt) + TravelTime(frostbolt) and Spell(frostbolt)
 }
 
 ### Frost icons.
 
 AddCheckBox(opt_mage_frost_aoe L(AOE) default specialization=frost)
+
+AddIcon checkbox=!opt_mage_frost_aoe enemies=1 help=shortcd specialization=frost
+{
+	if not InCombat() FrostPrecombatShortCdActions()
+	unless not InCombat() and FrostPrecombatShortCdPostConditions()
+	{
+		FrostDefaultShortCdActions()
+	}
+}
+
+AddIcon checkbox=opt_mage_frost_aoe help=shortcd specialization=frost
+{
+	if not InCombat() FrostPrecombatShortCdActions()
+	unless not InCombat() and FrostPrecombatShortCdPostConditions()
+	{
+		FrostDefaultShortCdActions()
+	}
+}
 
 AddIcon enemies=1 help=main specialization=frost
 {

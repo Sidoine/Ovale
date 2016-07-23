@@ -319,6 +319,12 @@ end
 local function EvaluateSpellAuraList(node)
 	local ok = true
 	local spellId, positionalParams, namedParams = node.spellId, node.positionalParams, node.namedParams
+
+	if	not spellId then
+		OvaleCompile:Print("No spellId for name %s", node.name)
+		return false
+	end
+
 	if TestConditions(positionalParams, namedParams) then
 		local keyword = node.keyword
 		local si = OvaleData:SpellInfo(spellId)

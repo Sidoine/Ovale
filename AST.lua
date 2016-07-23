@@ -82,8 +82,10 @@ local DECLARATION_KEYWORD = {
 local PARAMETER_KEYWORD = {
 	["checkbox"] = true,
 	["help"] = true,
+	["if_buff"] = true,
 	["if_spell"] = true,
 	["if_stance"] = true,
+	["if_target_debuff"] = true,
 	["itemcount"] = true,
 	["itemset"] = true,
 	["level"] = true,
@@ -2029,6 +2031,7 @@ ParseSpellAuraList = function(tokenStream, nodeList, annotation)
 			ok = false
 		end
 	end
+	
 	-- Consume any parameters.
 	local positionalParams, namedParams
 	if ok then

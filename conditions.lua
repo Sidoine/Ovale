@@ -2749,7 +2749,7 @@ do
 	-- if AstraPower() >70 Spell(frost_strike)
 	-- if AstraPower(more 70) Spell(frost_strike)
 
-	local function AstraPower(positionalParams, namedParams, state, atTime)
+	local function AstralPower(positionalParams, namedParams, state, atTime)
 		return Power("astralpower", positionalParams, namedParams, state, atTime)
 	end
 
@@ -2826,6 +2826,10 @@ do
 
 	local function HolyPower(positionalParams, namedParams, state, atTime)
 		return Power("holy", positionalParams, namedParams, state, atTime)
+	end
+
+	local function Insanity(positionalParams, namedParams, state, atTime)
+		return Power("insanity", positionalParams, namedParams, state, atTime)
 	end
 
 	--- Get the current level of mana of the target.
@@ -2910,11 +2914,13 @@ do
 	end
 
 	OvaleCondition:RegisterCondition("alternatepower", false, AlternatePower)
+	OvaleCondition:RegisterCondition("astralpower", false, AstralPower)
 	OvaleCondition:RegisterCondition("chi", false, Chi)
 	OvaleCondition:RegisterCondition("demonicfury", false, DemonicFury)
 	OvaleCondition:RegisterCondition("energy", false, Energy)
 	OvaleCondition:RegisterCondition("focus", false, Focus)
 	OvaleCondition:RegisterCondition("holypower", false, HolyPower)
+	OvaleCondition:RegisterCondition("insanity", false, Insanity)
 	OvaleCondition:RegisterCondition("maelstrom", false, Maelstrom)
 	OvaleCondition:RegisterCondition("mana", false, Mana)
 	OvaleCondition:RegisterCondition("rage", false, Rage)
@@ -3112,6 +3118,7 @@ do
 	end
 
 	OvaleCondition:RegisterCondition("alternatepowerdeficit", false, AlternatePowerDeficit)
+	OvaleCondition:RegisterCondition("astralpowerdeficit", false, AstralPowerDeficit)
 	OvaleCondition:RegisterCondition("chideficit", false, ChiDeficit)
 	OvaleCondition:RegisterCondition("demonicfurydeficit", false, DemonicFuryDeficit)
 	OvaleCondition:RegisterCondition("energydeficit", false, EnergyDeficit)
@@ -3157,6 +3164,10 @@ do
 
 	local function MaxAlternatePower(positionalParams, namedParams, state, atTime)
 		return MaxPower("alternate", positionalParams, namedParams, state, atTime)
+	end
+
+	local function MaxChi(positionalParams, namedParams, state, atTime)
+		return MaxPower("chi", positionalParams, namedParams, state, atTime)
 	end
 
 	--- Get the maximum amount of Chi of the target.
@@ -3313,6 +3324,7 @@ do
 
 	OvaleCondition:RegisterCondition("maxalternatepower", false, MaxAlternatePower)
 	OvaleCondition:RegisterCondition("maxchi", false, MaxChi)
+	OvaleCondition:RegisterCondition("maxcombopoints", false, MaxComboPoints)
 	OvaleCondition:RegisterCondition("maxdemonicfury", false, MaxDemonicFury)
 	OvaleCondition:RegisterCondition("maxenergy", false, MaxEnergy)
 	OvaleCondition:RegisterCondition("maxfocus", false, MaxFocus)
@@ -4094,6 +4106,34 @@ do
 	end
 
 	OvaleCondition:RegisterCondition("spellknown", true, SpellKnown)
+end
+
+do
+	--- Get the maximum number of charges of the spell.
+	-- @name SpellMaxCharges
+	-- @paramsig number or boolean
+	-- @param id The spell ID.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param count Optional. Sets whether a count or a fractional value is returned.
+	--     Defaults to count=1.
+	--     Valid values: 0, 1.
+	-- @return The number of charges.
+	-- @return A boolean value for the result of the comparison.
+	-- @see SpellChargeCooldown
+	-- @usage
+	-- if SpellCharges(savage_defense) >1
+	--     Spell(savage_defense)
+
+	local function SpellCharges(positionalParams, namedParams, state, atTime)
+		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local charges, maxCharges, start, duration = state:GetSpellCharges(spellId, atTime)
+		if not maxCharges then return nil end
+		maxCharges = maxCharges or 1
+		return Compare(maxCharges, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("spellmaxcharges", true, SpellCharges)
 end
 
 do

@@ -154,8 +154,17 @@ for _, filename in ipairs(files) do
 
 		print(filename)
 		local OvaleSimulationCraft = Ovale.OvaleSimulationCraft
+		Ovale.playerGUID = "player"
 		Ovale.OvaleOptions:OnInitialize()
 		Ovale.OvaleAST:OnInitialize()
+		Ovale.OvaleData:OnInitialize()
+		Ovale.OvaleEquipment:OnInitialize()
+		Ovale.OvaleEquipment:UpdateEquippedItems()
+		Ovale.OvaleSpellBook:OnInitialize()
+		Ovale.OvaleSpellBook:Update()
+		Ovale.OvaleStance:OnInitialize()
+		Ovale.OvaleStance:UpdateStances()
+		Ovale.OvaleCompile:OnInitialize()
 		OvaleSimulationCraft:OnInitialize()
 		local wipe = wipe
 		-- Parse SimulationCraft profile and emit the corresponding Ovale script.

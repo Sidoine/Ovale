@@ -40,6 +40,49 @@ AddFunction BeastMasterySummonPet
 
 AddFunction BeastMasteryDefaultMainActions
 {
+	#dire_frenzy,if=cooldown.bestial_wrath.remains>2
+	if SpellCooldown(bestial_wrath) > 2 Spell(dire_frenzy)
+	#multishot,if=spell_targets.multi_shot>1&pet.cat.buff.beast_cleave.remains<0.5
+	if Enemies() > 1 and pet.BuffRemaining(pet_beast_cleave_buff) < 0.5 Spell(multishot)
+	#kill_command
+	if pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() Spell(kill_command)
+	#chimaera_shot
+	Spell(chimaera_shot)
+	#barrage,if=cooldown.kill_command.remains>1
+	if SpellCooldown(kill_command) > 1 Spell(barrage)
+	#cobra_shot,if=focus>90
+	if Focus() > 90 Spell(cobra_shot)
+}
+
+AddFunction BeastMasteryDefaultShortCdActions
+{
+	#dire_beast,if=cooldown.bestial_wrath.remains>2
+	if SpellCooldown(bestial_wrath) > 2 Spell(dire_beast)
+
+	unless SpellCooldown(bestial_wrath) > 2 and Spell(dire_frenzy)
+	{
+		#titans_thunder,if=buff.dire_beast.remains>6
+		if BuffRemaining(dire_beast_buff) > 6 Spell(titans_thunder)
+
+		unless Enemies() > 1 and pet.BuffRemaining(pet_beast_cleave_buff) < 0.5 and Spell(multishot)
+		{
+			#bestial_wrath
+			Spell(bestial_wrath)
+
+			unless pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command)
+			{
+				#a_murder_of_crows
+				Spell(a_murder_of_crows)
+			}
+		}
+	}
+}
+
+AddFunction BeastMasteryDefaultCdActions
+{
+	#auto_shot
+	#use_item,name=maalus_the_blood_drinker
+	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury
@@ -50,33 +93,6 @@ AddFunction BeastMasteryDefaultMainActions
 	Spell(aspect_of_the_wild)
 	#stampede
 	Spell(stampede)
-	#dire_beast,if=cooldown.bestial_wrath.remains>2
-	if SpellCooldown(bestial_wrath) > 2 Spell(dire_beast)
-	#dire_frenzy,if=cooldown.bestial_wrath.remains>2
-	if SpellCooldown(bestial_wrath) > 2 Spell(dire_frenzy)
-	#titans_thunder,if=buff.dire_beast.remains>6
-	if BuffRemaining(dire_beast_buff) > 6 Spell(titans_thunder)
-	#multishot,if=spell_targets.multi_shot>1&pet.cat.buff.beast_cleave.remains<0.5
-	if Enemies() > 1 and pet.BuffRemaining(pet_beast_cleave_buff) < 0.5 Spell(multishot)
-	#bestial_wrath
-	Spell(bestial_wrath)
-	#kill_command
-	if pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() Spell(kill_command)
-	#a_murder_of_crows
-	Spell(a_murder_of_crows)
-	#chimaera_shot
-	Spell(chimaera_shot)
-	#barrage,if=cooldown.kill_command.remains>1
-	if SpellCooldown(kill_command) > 1 Spell(barrage)
-	#cobra_shot,if=focus>90
-	if Focus() > 90 Spell(cobra_shot)
-}
-
-AddFunction BeastMasteryDefaultCdActions
-{
-	#auto_shot
-	#use_item,name=maalus_the_blood_drinker
-	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
 }
 
 ### actions.precombat
@@ -103,11 +119,13 @@ AddCheckBox(opt_hunter_beast_mastery_aoe L(AOE) default specialization=beast_mas
 AddIcon checkbox=!opt_hunter_beast_mastery_aoe enemies=1 help=shortcd specialization=beast_mastery
 {
 	if not InCombat() BeastMasteryPrecombatShortCdActions()
+	BeastMasteryDefaultShortCdActions()
 }
 
 AddIcon checkbox=opt_hunter_beast_mastery_aoe help=shortcd specialization=beast_mastery
 {
 	if not InCombat() BeastMasteryPrecombatShortCdActions()
+	BeastMasteryDefaultShortCdActions()
 }
 
 AddIcon enemies=1 help=main specialization=beast_mastery
@@ -196,18 +214,8 @@ AddFunction MarksmanshipSummonPet
 
 AddFunction MarksmanshipDefaultMainActions
 {
-	#arcane_torrent,if=focus.deficit>=30
-	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
-	#blood_fury
-	Spell(blood_fury_ap)
-	#berserking
-	Spell(berserking)
-	#trueshot,if=(target.time_to_die>195|target.health.pct<5)|buff.bullseye.stack>15
-	if target.TimeToDie() > 195 or target.HealthPercent() < 5 or BuffStacks(bullseye_buff) > 15 Spell(trueshot)
 	#marked_shot,if=!talent.sidewinders.enabled&prev_gcd.sentinel&debuff.hunters_mark.up
 	if not Talent(sidewinders_talent) and PreviousGCDSpell(sentinel) and target.DebuffPresent(hunters_mark_debuff) Spell(marked_shot)
-	#a_murder_of_crows
-	Spell(a_murder_of_crows)
 	#barrage
 	Spell(barrage)
 	#windburst
@@ -218,11 +226,28 @@ AddFunction MarksmanshipDefaultMainActions
 	Spell(black_arrow)
 }
 
+AddFunction MarksmanshipDefaultShortCdActions
+{
+	unless not Talent(sidewinders_talent) and PreviousGCDSpell(sentinel) and target.DebuffPresent(hunters_mark_debuff) and Spell(marked_shot)
+	{
+		#a_murder_of_crows
+		Spell(a_murder_of_crows)
+	}
+}
+
 AddFunction MarksmanshipDefaultCdActions
 {
 	#auto_shot
 	#use_item,name=maalus_the_blood_drinker
 	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
+	#arcane_torrent,if=focus.deficit>=30
+	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
+	#blood_fury
+	Spell(blood_fury_ap)
+	#berserking
+	Spell(berserking)
+	#trueshot,if=(target.time_to_die>195|target.health.pct<5)|buff.bullseye.stack>15
+	if target.TimeToDie() > 195 or target.HealthPercent() < 5 or BuffStacks(bullseye_buff) > 15 Spell(trueshot)
 }
 
 ### actions.careful_aim
@@ -251,11 +276,13 @@ AddCheckBox(opt_hunter_marksmanship_aoe L(AOE) default specialization=marksmansh
 AddIcon checkbox=!opt_hunter_marksmanship_aoe enemies=1 help=shortcd specialization=marksmanship
 {
 	if not InCombat() MarksmanshipPrecombatShortCdActions()
+	MarksmanshipDefaultShortCdActions()
 }
 
 AddIcon checkbox=opt_hunter_marksmanship_aoe help=shortcd specialization=marksmanship
 {
 	if not InCombat() MarksmanshipPrecombatShortCdActions()
+	MarksmanshipDefaultShortCdActions()
 }
 
 AddIcon enemies=1 help=main specialization=marksmanship
@@ -361,6 +388,54 @@ AddFunction SurvivalSummonPet
 
 AddFunction SurvivalDefaultMainActions
 {
+	#raptor_strike,if=talent.way_of_the_moknathal.enabled&(buff.moknathal_tactics.stack>=3&(buff.moknathal_tactics.remains<gcd)|(buff.mongoose_fury.stack>=4&buff.mongoose_fury.remains<2*gcd&buff.moknathal_tactics.remains<action.fury_of_the_eagle.duration+gcd))
+	if Talent(way_of_the_moknathal_talent) and { BuffStacks(moknathal_tactics_buff) >= 3 and BuffRemaining(moknathal_tactics_buff) < GCD() or BuffStacks(mongoose_fury_buff) >= 4 and BuffRemaining(mongoose_fury_buff) < 2 * GCD() and BuffRemaining(moknathal_tactics_buff) < BaseDuration(fury_of_the_eagle_debuff) + GCD() } Spell(raptor_strike)
+	#raptor_strike,if=talent.way_of_the_moknathal.enabled&(buff.moknathal_tactics.remains<2|buff.moknathal_tactics.down)
+	if Talent(way_of_the_moknathal_talent) and { BuffRemaining(moknathal_tactics_buff) < 2 or BuffExpires(moknathal_tactics_buff) } Spell(raptor_strike)
+	#mongoose_bite,if=((charges=3|(cooldown.fury_of_the_eagle.remains<5&buff.mongoose_fury.up))|focus.time_to_max>=2)&!(!buff.mongoose_fury.up&cooldown.explosive_trap.remains<gcd)
+	if { Charges(mongoose_bite) == 3 or SpellCooldown(fury_of_the_eagle) < 5 and BuffPresent(mongoose_fury_buff) or TimeToMaxFocus() >= 2 } and not { not BuffPresent(mongoose_fury_buff) and SpellCooldown(explosive_trap) < GCD() } Spell(mongoose_bite)
+	#lacerate,if=dot.lacerate.ticking&dot.lacerate.remains<=3|target.time_to_die>=5
+	if target.DebuffPresent(lacerate_debuff) and target.DebuffRemaining(lacerate_debuff) <= 3 or target.TimeToDie() >= 5 Spell(lacerate)
+	#flanking_strike,if=talent.way_of_the_moknathal.enabled&(focus>=55&buff.moknathal_tactics.remains>=3)|focus>=55
+	if Talent(way_of_the_moknathal_talent) and Focus() >= 55 and BuffRemaining(moknathal_tactics_buff) >= 3 or Focus() >= 55 Spell(flanking_strike)
+	#butchery,if=spell_targets.butchery>=2
+	if Enemies() >= 2 Spell(butchery)
+	#carve,if=spell_targets.carve>=4|spell_targets.carve>=3&dot.serpent_sting.ticking&dot.serpent_sting.remains<=3
+	if Enemies() >= 4 or Enemies() >= 3 and target.DebuffPresent(serpent_sting_debuff) and target.DebuffRemaining(serpent_sting_debuff) <= 3 Spell(carve)
+	#throwing_axes
+	Spell(throwing_axes)
+}
+
+AddFunction SurvivalDefaultShortCdActions
+{
+	#fury_of_the_eagle,if=buff.mongoose_fury.stack>=4&buff.mongoose_fury.remains<action.mongoose_bite.gcd
+	if BuffStacks(mongoose_fury_buff) >= 4 and BuffRemaining(mongoose_fury_buff) < GCD() Spell(fury_of_the_eagle)
+
+	unless Talent(way_of_the_moknathal_talent) and { BuffStacks(moknathal_tactics_buff) >= 3 and BuffRemaining(moknathal_tactics_buff) < GCD() or BuffStacks(mongoose_fury_buff) >= 4 and BuffRemaining(mongoose_fury_buff) < 2 * GCD() and BuffRemaining(moknathal_tactics_buff) < BaseDuration(fury_of_the_eagle_debuff) + GCD() } and Spell(raptor_strike)
+	{
+		#dragonsfire_grenade
+		Spell(dragonsfire_grenade)
+		#explosive_trap
+		if CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
+
+		unless Talent(way_of_the_moknathal_talent) and { BuffRemaining(moknathal_tactics_buff) < 2 or BuffExpires(moknathal_tactics_buff) } and Spell(raptor_strike) or { Charges(mongoose_bite) == 3 or SpellCooldown(fury_of_the_eagle) < 5 and BuffPresent(mongoose_fury_buff) or TimeToMaxFocus() >= 2 } and not { not BuffPresent(mongoose_fury_buff) and SpellCooldown(explosive_trap) < GCD() } and Spell(mongoose_bite) or { target.DebuffPresent(lacerate_debuff) and target.DebuffRemaining(lacerate_debuff) <= 3 or target.TimeToDie() >= 5 } and Spell(lacerate)
+		{
+			#snake_hunter,if=action.mongoose_bite.charges<1
+			if Charges(mongoose_bite) < 1 Spell(snake_hunter)
+			#fury_of_the_eagle,if=talent.way_of_the_moknathal.enabled&(buff.mongoose_fury.stack>=3&buff.moknathal_tactics.remains>3)|buff.mongoose_fury.stack>=3
+			if Talent(way_of_the_moknathal_talent) and BuffStacks(mongoose_fury_buff) >= 3 and BuffRemaining(moknathal_tactics_buff) > 3 or BuffStacks(mongoose_fury_buff) >= 3 Spell(fury_of_the_eagle)
+
+			unless { Talent(way_of_the_moknathal_talent) and Focus() >= 55 and BuffRemaining(moknathal_tactics_buff) >= 3 or Focus() >= 55 } and Spell(flanking_strike) or Enemies() >= 2 and Spell(butchery) or { Enemies() >= 4 or Enemies() >= 3 and target.DebuffPresent(serpent_sting_debuff) and target.DebuffRemaining(serpent_sting_debuff) <= 3 } and Spell(carve)
+			{
+				#spitting_cobra
+				Spell(spitting_cobra)
+			}
+		}
+	}
+}
+
+AddFunction SurvivalDefaultCdActions
+{
 	#auto_attack
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
@@ -368,46 +443,15 @@ AddFunction SurvivalDefaultMainActions
 	Spell(blood_fury_ap)
 	#berserking
 	Spell(berserking)
-	#fury_of_the_eagle,if=buff.mongoose_fury.stack>=4&buff.mongoose_fury.remains<action.mongoose_bite.gcd
-	if BuffStacks(mongoose_fury_buff) >= 4 and BuffRemaining(mongoose_fury_buff) < GCD() Spell(fury_of_the_eagle)
-	#raptor_strike,if=talent.way_of_the_moknathal.enabled&(buff.moknathal_tactics.stack>=3&(buff.moknathal_tactics.remains<gcd)|(buff.mongoose_fury.stack>=4&buff.mongoose_fury.remains<2*gcd&buff.moknathal_tactics.remains<action.fury_of_the_eagle.duration+gcd))
-	if Talent(way_of_the_moknathal_talent) and { BuffStacks(moknathal_tactics_buff) >= 3 and BuffRemaining(moknathal_tactics_buff) < GCD() or BuffStacks(mongoose_fury_buff) >= 4 and BuffRemaining(mongoose_fury_buff) < 2 * GCD() and BuffRemaining(moknathal_tactics_buff) < BaseDuration(fury_of_the_eagle_debuff) + GCD() } Spell(raptor_strike)
-	#dragonsfire_grenade
-	Spell(dragonsfire_grenade)
-	#explosive_trap
-	if CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) Spell(explosive_trap)
-	#raptor_strike,if=talent.way_of_the_moknathal.enabled&(buff.moknathal_tactics.remains<2|buff.moknathal_tactics.down)
-	if Talent(way_of_the_moknathal_talent) and { BuffRemaining(moknathal_tactics_buff) < 2 or BuffExpires(moknathal_tactics_buff) } Spell(raptor_strike)
-	#aspect_of_the_eagle
-	Spell(aspect_of_the_eagle)
-	#mongoose_bite,if=((charges=3|(cooldown.fury_of_the_eagle.remains<5&buff.mongoose_fury.up))|focus.time_to_max>=2)&!(!buff.mongoose_fury.up&cooldown.explosive_trap.remains<gcd)
-	if { Charges(mongoose_bite) == 3 or SpellCooldown(fury_of_the_eagle) < 5 and BuffPresent(mongoose_fury_buff) or TimeToMaxFocus() >= 2 } and not { not BuffPresent(mongoose_fury_buff) and SpellCooldown(explosive_trap) < GCD() } Spell(mongoose_bite)
-	#lacerate,if=dot.lacerate.ticking&dot.lacerate.remains<=3|target.time_to_die>=5
-	if target.DebuffPresent(lacerate_debuff) and target.DebuffRemaining(lacerate_debuff) <= 3 or target.TimeToDie() >= 5 Spell(lacerate)
-	#snake_hunter,if=action.mongoose_bite.charges<1
-	if Charges(mongoose_bite) < 1 Spell(snake_hunter)
-	#fury_of_the_eagle,if=talent.way_of_the_moknathal.enabled&(buff.mongoose_fury.stack>=3&buff.moknathal_tactics.remains>3)|buff.mongoose_fury.stack>=3
-	if Talent(way_of_the_moknathal_talent) and BuffStacks(mongoose_fury_buff) >= 3 and BuffRemaining(moknathal_tactics_buff) > 3 or BuffStacks(mongoose_fury_buff) >= 3 Spell(fury_of_the_eagle)
-	#flanking_strike,if=talent.way_of_the_moknathal.enabled&(focus>=55&buff.moknathal_tactics.remains>=3)|focus>=55
-	if Talent(way_of_the_moknathal_talent) and Focus() >= 55 and BuffRemaining(moknathal_tactics_buff) >= 3 or Focus() >= 55 Spell(flanking_strike)
-	#butchery,if=spell_targets.butchery>=2
-	if Enemies() >= 2 Spell(butchery)
-	#carve,if=spell_targets.carve>=4|spell_targets.carve>=3&dot.serpent_sting.ticking&dot.serpent_sting.remains<=3
-	if Enemies() >= 4 or Enemies() >= 3 and target.DebuffPresent(serpent_sting_debuff) and target.DebuffRemaining(serpent_sting_debuff) <= 3 Spell(carve)
-	#spitting_cobra
-	Spell(spitting_cobra)
-	#throwing_axes
-	Spell(throwing_axes)
-}
+	#use_item,name=maalus_the_blood_drinker
+	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
+	#use_item,name=beating_heart_of_the_mountain
+	SurvivalUseItemActions()
 
-AddFunction SurvivalDefaultCdActions
-{
-	unless FocusDeficit() >= 30 and Spell(arcane_torrent_focus) or Spell(blood_fury_ap) or Spell(berserking)
+	unless BuffStacks(mongoose_fury_buff) >= 4 and BuffRemaining(mongoose_fury_buff) < GCD() and Spell(fury_of_the_eagle) or Talent(way_of_the_moknathal_talent) and { BuffStacks(moknathal_tactics_buff) >= 3 and BuffRemaining(moknathal_tactics_buff) < GCD() or BuffStacks(mongoose_fury_buff) >= 4 and BuffRemaining(mongoose_fury_buff) < 2 * GCD() and BuffRemaining(moknathal_tactics_buff) < BaseDuration(fury_of_the_eagle_debuff) + GCD() } and Spell(raptor_strike) or Spell(dragonsfire_grenade) or CheckBoxOn(opt_trap_launcher) and not Glyph(glyph_of_explosive_trap) and Spell(explosive_trap) or Talent(way_of_the_moknathal_talent) and { BuffRemaining(moknathal_tactics_buff) < 2 or BuffExpires(moknathal_tactics_buff) } and Spell(raptor_strike)
 	{
-		#use_item,name=maalus_the_blood_drinker
-		if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
-		#use_item,name=beating_heart_of_the_mountain
-		SurvivalUseItemActions()
+		#aspect_of_the_eagle
+		Spell(aspect_of_the_eagle)
 	}
 }
 
@@ -435,11 +479,13 @@ AddCheckBox(opt_hunter_survival_aoe L(AOE) default specialization=survival)
 AddIcon checkbox=!opt_hunter_survival_aoe enemies=1 help=shortcd specialization=survival
 {
 	if not InCombat() SurvivalPrecombatShortCdActions()
+	SurvivalDefaultShortCdActions()
 }
 
 AddIcon checkbox=opt_hunter_survival_aoe help=shortcd specialization=survival
 {
 	if not InCombat() SurvivalPrecombatShortCdActions()
+	SurvivalDefaultShortCdActions()
 }
 
 AddIcon enemies=1 help=main specialization=survival

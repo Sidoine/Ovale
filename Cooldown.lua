@@ -94,11 +94,13 @@ function OvaleCooldown:OnEnable()
 	self:RegisterEvent("UPDATE_SHAPESHIFT_COOLDOWN", "Update")
 	OvaleFuture:RegisterSpellcastInfo(self)
 	OvaleState:RegisterState(self, self.statePrototype)
+	OvaleData:RegisterRequirement("cd", "RequireCooldownHandler", self)
 end
 
 function OvaleCooldown:OnDisable()
 	OvaleState:UnregisterState(self)
 	OvaleFuture:UnregisterSpellcastInfo(self)
+	OvaleData:UnregisterRequirement("cd")
 	self:UnregisterEvent("ACTIONBAR_UPDATE_COOLDOWN")
 	self:UnregisterEvent("BAG_UPDATE_COOLDOWN")
 	self:UnregisterEvent("PET_BAR_UPDATE_COOLDOWN")
@@ -218,22 +220,6 @@ function OvaleCooldown:GetBaseGCD()
 	else
 		gcd, isCaster = 1.5, true
 	end
-	if Ovale.playerClass == "DRUID" then
-		if OvaleStance:IsStance("druid_cat_form") then
-			gcd = 1.0
-			isCaster = false
-		elseif OvaleStance:IsStance("druid_bear_form") then
-			isCaster = false
-		end
-	elseif Ovale.playerClass == "MONK" then
-		if OvaleStance:IsStance("monk_stance_of_the_fierce_tiger") then
-			gcd = 1.0
-		elseif OvaleStance:IsStance("monk_stance_of_the_sturdy_ox") then
-			gcd = 1.0
-		else
-			isCaster = true
-		end
-	end
 	return gcd, isCaster
 end
 
@@ -254,6 +240,25 @@ function OvaleCooldown:SaveSpellcastInfo(spellcast, atTime, state)
 			spellcast.offgcd = true
 		end
 	end
+end
+
+function OvaleCooldown:RequireCooldownHandler(spellId, atTime, requirement, tokens, index, targetGUID)
+	local spellName = tokens
+	local verified = false
+	if index then
+		spellName = tokens[index]
+		index = index + 1
+	end
+	if spellName then
+		local spellName = tonumber(spellName) or spellName
+		local duration = self:GetSpellCooldownDuration(spellId, atTime, targetGUID)
+		verified = duration > 0
+		local result = verified and "passed" or "FAILED"
+		self:Log("    Require spell %s with cooldown at time=%f: %s", spellName, atTime, result)
+	else
+		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a spell argument.", requirement)
+	end
+	return verified, requirement, index
 end
 --</public-static-methods>
 
@@ -519,4 +524,6 @@ statePrototype.ResetSpellCooldown = function(state, spellId, atTime)
 		end
 	end
 end
+
+statePrototype.RequireCooldownHandler = OvaleCooldown.RequireCooldownHandler
 --</state-methods>

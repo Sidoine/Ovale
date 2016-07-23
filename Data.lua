@@ -358,6 +358,7 @@ function OvaleData:GetSpellTagInfo(spellId)
 			elseif not invokesGCD then
 				tag = "shortcd"
 			end
+			si.tag = tag
 		end
 		tag = tag or "main"
 	end
