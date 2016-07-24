@@ -314,6 +314,32 @@ do
 end
 
 do
+	-- Get the number of buff if the given spell list
+	-- @name BuffCount
+	-- @paramsig number or boolean
+	-- @param id the spell list ID	
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The number of buffs
+	-- @return A boolean value for the result of the comparison
+	local function BuffCount(positionalParams, namedParams, state, atTime)
+		local auraId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local spellList = OvaleData.buffSpellList[auraId]
+		local count = 0
+		for id in pairs(spellList) do
+			local si = OvaleData.spellInfo[id]
+			local aura = state:GetAura(target, auraId, filter, mine)
+			if state:IsActiveAura(aura, atTime) then
+				count = count + 1
+			end
+		end
+		return Compare(count, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("buffcount", false, BuffCount)
+end
+
+do
 	--- Get the duration in seconds of the cooldown before a buff can be gained again.
 	-- @name BuffCooldownDuration
 	-- @paramsig number or boolean
@@ -2976,6 +3002,10 @@ do
 		return PowerDeficit("chi", positionalParams, namedParams, state, atTime)
 	end
 
+	local function ComboPointsDeficit(positionalParams, namedParams, state, atTime)
+		return PowerDeficit("combopoints", positionalParams, namedParams, state, atTime)
+	end
+
 	--- Get the number of lacking resource points for a full demonic fury bar, between 0 and maximum demonic fury, of the target.
 	-- @name DemonicFuryDeficit
 	-- @paramsig number or boolean
@@ -3120,6 +3150,7 @@ do
 	OvaleCondition:RegisterCondition("alternatepowerdeficit", false, AlternatePowerDeficit)
 	OvaleCondition:RegisterCondition("astralpowerdeficit", false, AstralPowerDeficit)
 	OvaleCondition:RegisterCondition("chideficit", false, ChiDeficit)
+	OvaleCondition:RegisterCondition("combopointsdeficit", false, ComboPointsDeficit)
 	OvaleCondition:RegisterCondition("demonicfurydeficit", false, DemonicFuryDeficit)
 	OvaleCondition:RegisterCondition("energydeficit", false, EnergyDeficit)
 	OvaleCondition:RegisterCondition("focusdeficit", false, FocusDeficit)

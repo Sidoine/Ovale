@@ -183,13 +183,14 @@ do
 # Based on SimulationCraft profile "Monk_Windwalker_T18M".
 #	class=monk
 #	spec=windwalker
-#	talents=3020022
+#	talents=3030032
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_monk_spells)
 
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=windwalker)
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=windwalker)
 AddCheckBox(opt_legendary_ring_agility ItemName(legendary_ring_agility) default specialization=windwalker)
 AddCheckBox(opt_chi_burst SpellName(chi_burst) default specialization=windwalker)
@@ -198,6 +199,11 @@ AddCheckBox(opt_storm_earth_and_fire SpellName(storm_earth_and_fire) specializat
 AddFunction WindwalkerUsePotionAgility
 {
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
+}
+
+AddFunction WindwalkerGetInMeleeRange
+{
+	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
 ### actions.default
@@ -222,6 +228,8 @@ AddFunction WindwalkerDefaultMainActions
 
 AddFunction WindwalkerDefaultShortCdActions
 {
+	#auto_attack
+	WindwalkerGetInMeleeRange()
 	#touch_of_death,if=!artifact.gale_burst.enabled
 	if not BuffPresent(gale_burst_buff) Spell(touch_of_death)
 	#touch_of_death,if=artifact.gale_burst.enabled&cooldown.strike_of_the_windlord.up&!talent.serenity.enabled&cooldown.fists_of_fury.remains<=9&cooldown.rising_sun_kick.remains<=5
@@ -260,7 +268,6 @@ AddFunction WindwalkerDefaultShortCdActions
 
 AddFunction WindwalkerDefaultCdActions
 {
-	#auto_attack
 	#invoke_xuen
 	Spell(invoke_xuen)
 	#potion,name=draenic_agility,if=buff.serenity.up|buff.storm_earth_and_fire.up|(!talent.serenity.enabled&trinket.proc.agility.react)|buff.bloodlust.react|target.time_to_die<=60

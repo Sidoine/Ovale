@@ -7,6 +7,9 @@ do
 	local code = [[
 # Shaman spells and functions.
 
+#TODO Temp
+Define(augmentation 175456)
+
 # Learned spells.
 Define(fulmination 88766)
 	SpellInfo(fulmination learn=1 level=20 specialization=elemental)
@@ -220,6 +223,7 @@ Define(icefury 219271)
 	SpellAddBuff(icefury icefury_buff=4)
 Define(icefury_buff 210714)
 	SpellInfo(icefury_buff duration=15)
+Define(icefury_talent 15)
 Define(improved_flame_shock 157804)
 Define(improved_riptide 157812)
 Define(lava_beam 114074)
@@ -242,6 +246,9 @@ Define(lightning_bolt 403)
 	SpellAddBuff(lightning_bolt ancestral_swiftness_buff=0 if_spell=ancestral_swiftness)
 	SpellAddBuff(lightning_bolt maelstrom_weapon_buff=0 if_spell=maelstrom_weapon)
 	SpellAddBuff(lightning_bolt stormkeeper_buff=-1)
+Define(lightning_shield 192106)
+	SpellAddBuff(lightning_shield lightning_shield_buff=1)
+Define(lightning_shield_buff 192106)
 Define(liquid_magma 152255)
 	SpellInfo(liquid_magma cd=45)
 	SpellAddBuff(liquid_magma liquid_magma_buff=1)

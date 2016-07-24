@@ -113,6 +113,7 @@ OvalePower.POWER_INFO =
 {
 	alternate = { id = SPELL_POWER_ALTERNATE_POWER, token = "ALTERNATE_RESOURCE_TEXT", mini = 0 },
 	chi = { id = SPELL_POWER_CHI, token = "CHI", mini = 0, costString = CHI_COST },
+	combopoints = { id = SPELL_POWER_COMBO_POINTS, token = "COMBO_POINTS", mini = 0, costString = COMBO_POINTS_COST },
 	energy = { id = SPELL_POWER_ENERGY, token = "ENERGY", mini = 0, costString = ENERGY_COST },
 	focus = { id = SPELL_POWER_FOCUS, token = "FOCUS", mini = 0, costString = FOCUS_COST },
 	holy = { id = SPELL_POWER_HOLY_POWER, token = "HOLY_POWER", mini = 0, costString = HOLY_POWER_COST },

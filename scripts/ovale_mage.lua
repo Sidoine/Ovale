@@ -46,6 +46,8 @@ AddFunction ArcaneDefaultMainActions
 {
 	#stop_burn_phase,if=prev_gcd.evocation&burn_phase_duration>gcd.max
 	if PreviousGCDSpell(evocation) and GetStateDuration(burn_phase) > GCD() and GetState(burn_phase) > 0 SetState(burn_phase 0)
+	#arcane_blast
+	Spell(arcane_blast)
 }
 
 AddFunction ArcaneDefaultShortCdActions
@@ -227,6 +229,8 @@ AddFunction FireDefaultMainActions
 
 AddFunction FireDefaultShortCdActions
 {
+	#rune_of_power,if=recharge_time<cooldown.combustion.remains&buff.combustion.down|((cooldown.combustion.remains+5)>target.time_to_die)
+	if SpellChargeCooldown(rune_of_power) < SpellCooldown(combustion) and BuffExpires(combustion_buff) or SpellCooldown(combustion) + 5 > target.TimeToDie() Spell(rune_of_power)
 	#call_action_list,name=combustion_phase,if=cooldown.combustion.remains=0&buff.hot_streak.up|buff.combustion.up
 	if not SpellCooldown(combustion) > 0 and BuffPresent(hot_streak_buff) or BuffPresent(combustion_buff) FireCombustionPhaseShortCdActions()
 
@@ -249,16 +253,39 @@ AddFunction FireDefaultCdActions
 	if target.IsInterruptible() FireInterruptActions()
 	#time_warp,if=target.health.pct<25|time=0
 	if { target.HealthPercent() < 25 or TimeInCombat() == 0 } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
-	#call_action_list,name=combustion_phase,if=cooldown.combustion.remains=0&buff.hot_streak.up|buff.combustion.up
-	if not SpellCooldown(combustion) > 0 and BuffPresent(hot_streak_buff) or BuffPresent(combustion_buff) FireCombustionPhaseCdActions()
+
+	unless { SpellChargeCooldown(rune_of_power) < SpellCooldown(combustion) and BuffExpires(combustion_buff) or SpellCooldown(combustion) + 5 > target.TimeToDie() } and Spell(rune_of_power)
+	{
+		#call_action_list,name=combustion_phase,if=cooldown.combustion.remains=0&buff.hot_streak.up|buff.combustion.up
+		if not SpellCooldown(combustion) > 0 and BuffPresent(hot_streak_buff) or BuffPresent(combustion_buff) FireCombustionPhaseCdActions()
+	}
 }
 
 ### actions.active_talents
 
+AddFunction FireActiveTalentsMainActions
+{
+	#blast_wave,if=(buff.combustion.down)|(buff.combustion.up&action.fire_blast.charges<1)
+	if BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 Spell(blast_wave)
+	#cinderstorm,if=buff.combustion.down
+	if BuffExpires(combustion_buff) Spell(cinderstorm)
+}
+
 AddFunction FireActiveTalentsShortCdActions
 {
-	#dragons_breath,if=equipped.132863
-	if HasEquippedItem(132863) Spell(dragons_breath)
+	#flame_on,if=action.fire_blast.charges<1
+	if Charges(fire_blast) < 1 Spell(flame_on)
+
+	unless { BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 } and Spell(blast_wave)
+	{
+		#meteor,if=cooldown.combustion.remains>10|(cooldown.combustion.remains>target.time_to_die)
+		if SpellCooldown(combustion) > 10 or SpellCooldown(combustion) > target.TimeToDie() Spell(meteor)
+	}
+}
+
+AddFunction FireActiveTalentsShortCdPostConditions
+{
+	{ BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 } and Spell(blast_wave) or BuffExpires(combustion_buff) and Spell(cinderstorm)
 }
 
 ### actions.comb_prep
@@ -284,8 +311,12 @@ AddFunction FireCombPrepShortCdPostConditions
 
 AddFunction FireCombustionPhaseMainActions
 {
+	#call_action_list,name=active_talents
+	FireActiveTalentsMainActions()
 	#pyroblast,if=buff.hot_streak.up
 	if BuffPresent(hot_streak_buff) Spell(pyroblast)
+	#scorch,if=!artifact.phoenixs_flames.enabled&!prev_gcd.scorch
+	if not BuffPresent(phoenixs_flames_buff) and not PreviousGCDSpell(scorch) Spell(scorch)
 	#scorch,if=target.health.pct<=25&equipped.132454
 	if target.HealthPercent() <= 25 and HasEquippedItem(132454) Spell(scorch)
 	#fireball
@@ -297,7 +328,7 @@ AddFunction FireCombustionPhaseShortCdActions
 	#call_action_list,name=active_talents
 	FireActiveTalentsShortCdActions()
 
-	unless BuffPresent(hot_streak_buff) and Spell(pyroblast)
+	unless FireActiveTalentsShortCdPostConditions() or BuffPresent(hot_streak_buff) and Spell(pyroblast)
 	{
 		#fire_blast,if=!prev_off_gcd.fire_blast
 		if not PreviousOffGCDSpell(fire_blast) Spell(fire_blast)
@@ -306,7 +337,7 @@ AddFunction FireCombustionPhaseShortCdActions
 
 AddFunction FireCombustionPhaseShortCdPostConditions
 {
-	BuffPresent(hot_streak_buff) and Spell(pyroblast) or target.HealthPercent() <= 25 and HasEquippedItem(132454) and Spell(scorch) or Spell(fireball)
+	FireActiveTalentsShortCdPostConditions() or BuffPresent(hot_streak_buff) and Spell(pyroblast) or not BuffPresent(phoenixs_flames_buff) and not PreviousGCDSpell(scorch) and Spell(scorch) or target.HealthPercent() <= 25 and HasEquippedItem(132454) and Spell(scorch) or Spell(fireball)
 }
 
 AddFunction FireCombustionPhaseCdActions
@@ -369,8 +400,12 @@ AddFunction FireSingleTargetMainActions
 	if BuffPresent(hot_streak_buff) and BuffRemaining(hot_streak_buff) < ExecuteTime(fireball) Spell(pyroblast)
 	#pyroblast,if=buff.hot_streak.up
 	if BuffPresent(hot_streak_buff) Spell(pyroblast)
+	#call_action_list,name=active_talents
+	FireActiveTalentsMainActions()
 	#scorch,if=target.health.pct<=25&equipped.132454
 	if target.HealthPercent() <= 25 and HasEquippedItem(132454) Spell(scorch)
+	#fireball
+	Spell(fireball)
 }
 
 AddFunction FireSingleTargetShortCdActions
@@ -438,23 +473,25 @@ AddIcon checkbox=opt_mage_fire_aoe help=cd specialization=fire
 
 ### Required symbols
 # 132454
-# 132863
 # arcane_torrent_mana
 # berserking
+# blast_wave
 # blood_fury_sp
+# cinderstorm
 # combustion
 # combustion_buff
 # counterspell
 # draenic_intellect_potion
-# dragons_breath
 # fire_blast
 # fireball
 # flame_on
 # heating_up_buff
 # hot_streak_buff
 # legendary_ring_intellect
+# meteor
 # mirror_image
 # mirror_image_talent
+# phoenixs_flames
 # pyroblast
 # quaking_palm
 # rune_of_power

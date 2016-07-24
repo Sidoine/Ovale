@@ -1118,6 +1118,8 @@ local function InitializeDisambiguation()
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"ROGUE")
 	AddDisambiguation("legendary_ring",			"legendary_ring_agility",		"ROGUE")
 	AddDisambiguation("stealth_buff",			"stealthed_buff",				"ROGUE")
+	AddDisambiguation("roll_the_bones_debuff",	"roll_the_bones_buff",			"ROGUE")
+	AddDisambiguation("envenom_debuff",			"envenom_buff",					"ROGUE")
 	-- Shaman
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_mana",			"SHAMAN")
 	AddDisambiguation("ascendance",				"ascendance_caster",			"SHAMAN",		"elemental")
@@ -2765,8 +2767,14 @@ EmitOperandRefresh = function(operand, parseNode, nodeList, annotation, action, 
 	local token = tokenIterator()
 	if token == "refreshable" then
 		local buffName = action .. "_debuff"
-		local target = "target"
-		local prefix = "Debuff"
+		buffName = Disambiguate(buffName, annotation.class, annotation.specialization)
+		local target
+		local prefix = strfind(buffName, "_buff$") and "Buff" or "Debuff"
+		if prefix == "Debuff" then 
+			target = "target."
+		else
+			target = ""
+		end
 		local any = OvaleData.DEFAULT_SPELL_LIST[buffName] and " any=1" or ""
 		-- TODO Surely not the right function, need to look in simulationcraft code what means "refreshable"  
 		local code = format("%s%sPresent(%s%s)", target, prefix, buffName, any)
@@ -2869,7 +2877,9 @@ do
 		["chi"]					= "Chi()",
 		["chi.max"]				= "MaxChi()",
 		["combo_points"]		= "ComboPoints()",
+		["combo_points.deficit"]= "ComboPointsDeficit()",
 		["combo_points.max"]    = "MaxComboPoints()",
+		["cp_max_spend"]		= "MaxComboPoints()", -- TODO Difference with combo_points.max??
 		["crit_pct_current"]	= "SpellCritChance()",
 		["demonic_fury"]		= "DemonicFury()",
 		["desired_targets"]		= "Enemies(tagged=1)",
@@ -2904,6 +2914,7 @@ do
 		["rage.deficit"]		= "RageDeficit()",
 		["rage.max"]			= "MaxRage()",
 		["runic_power"]			= "RunicPower()",
+		["runic_power.deficit"]	= "RunicPowerDeficit()",
 		["shadow_orb"]			= "ShadowOrbs()",
 		["solar_max"]			= "TimeToEclipse(solar)",	-- XXX
 		["soul_shard"]			= "SoulShards()",
@@ -2945,6 +2956,8 @@ do
 				assume there is one in flight.
 			--]]
 			code = "1"
+		elseif operand == "rtb_buffs" then
+			code = "BuffCount(roll_the_bones_buff)"
 		elseif class == "ROGUE" and operand == "anticipation_charges" then
 			local name = "anticipation_buff"
 			code = format("BuffStacks(%s)", name)
@@ -3190,7 +3203,6 @@ EmitOperandPet = function(operand, parseNode, nodeList, annotation, action)
 		local property = tokenIterator()
 		name = strlower(Disambiguate(name, annotation.class, annotation.specialization))
 		local isTotem = IsTotem(name)
-
 		local code
 		if isTotem and property == "active" then
 			code = format("TotemPresent(%s)", name)
@@ -3198,6 +3210,11 @@ EmitOperandPet = function(operand, parseNode, nodeList, annotation, action)
 			code = format("TotemRemaining(%s)", name)
 		elseif property == "active" then
 			code = "pet.Present()"
+		elseif name == "buff" then
+			local pattern = format("^pet%%.([%%w_.]+)", operand)
+			local petOperand = strmatch(operand, pattern)
+
+			ok, node = EmitOperandBuff(petOperand, parseNode, nodeList, annotation, action, "pet")
 		else
 			-- Strip the "pet.<name>." from the operand and re-evaluate.
 			local pattern = format("^pet%%.%s%%.([%%w_.]+)", name)
@@ -3593,6 +3610,10 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		else
 			ok = false
 		end
+	elseif class == "SHAMAN" and strmatch(operand, "pet.[a-z_]+.remains") then
+		-- TODO Don't know how to do this
+		code = "PetPresent()"
+		ok = true
 	elseif class == "WARLOCK" and strmatch(operand, "pet%.service_[a-z_]+%..+") then
 		local spellName, property = strmatch(operand, "pet%.(service_[a-z_]+)%.(.+)")
 		if property == "active" then

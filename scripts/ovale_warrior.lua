@@ -509,6 +509,9 @@ AddFunction FurySingleMindedFurySingleTargetMainActions
 
 AddFunction FurySingleMindedFurySingleTargetShortCdActions
 {
+	#odyns_fury
+	Spell(odyns_fury)
+
 	unless { Rage() == 100 or BuffPresent(massacre_buff) } and Spell(rampage)
 	{
 		#berserker_rage,if=talent.outburst.enabled&cooldown.dragon_roar.remains=0&buff.enrage.down
@@ -527,7 +530,7 @@ AddFunction FurySingleMindedFurySingleTargetShortCdPostConditions
 
 AddFunction FurySingleMindedFurySingleTargetCdActions
 {
-	unless { Rage() == 100 or BuffPresent(massacre_buff) } and Spell(rampage) or { not Talent(bloodbath_talent) and { SpellCooldown(battle_cry) < 1 or SpellCooldown(battle_cry) > 10 } or Talent(bloodbath_talent) and not SpellCooldown(bloodbath) > 0 } and Spell(dragon_roar)
+	unless Spell(odyns_fury) or { Rage() == 100 or BuffPresent(massacre_buff) } and Spell(rampage) or { not Talent(bloodbath_talent) and { SpellCooldown(battle_cry) < 1 or SpellCooldown(battle_cry) > 10 } or Talent(bloodbath_talent) and not SpellCooldown(bloodbath) > 0 } and Spell(dragon_roar)
 	{
 		#bloodbath,if=buff.dragon_roar.up
 		if BuffPresent(dragon_roar_buff) Spell(bloodbath)
@@ -538,7 +541,7 @@ AddFunction FurySingleMindedFurySingleTargetCdActions
 
 AddFunction FurySingleMindedFurySingleTargetCdPostConditions
 {
-	{ Rage() == 100 or BuffPresent(massacre_buff) } and Spell(rampage) or { not Talent(bloodbath_talent) and { SpellCooldown(battle_cry) < 1 or SpellCooldown(battle_cry) > 10 } or Talent(bloodbath_talent) and not SpellCooldown(bloodbath) > 0 } and Spell(dragon_roar) or not IsEnraged() and Spell(rampage) or Talent(frenzy_talent) and { BuffExpires(frenzy_buff) or BuffRemaining(frenzy_buff) <= 3 } and Spell(furious_slash) or { IsEnraged() and not Talent(massacre_talent) and not Talent(inner_rage_talent) or Talent(massacre_talent) and not IsEnraged() or IsEnraged() and Talent(massacre_talent) and not Talent(inner_rage_talent) } and Spell(execute) or not Talent(inner_rage_talent) and Spell(bloodthirst) or not Talent(inner_rage_talent) and BuffPresent(wrecking_ball_buff) and Spell(whirlwind) or IsEnraged() and Spell(raging_blow) or BuffPresent(wrecking_ball_buff) and IsEnraged() and Spell(whirlwind) or { IsEnraged() and not Talent(frenzy_talent) or Talent(frenzy_talent) or Talent(massacre_talent) } and Spell(execute) or not IsEnraged() and Spell(bloodthirst) or Spell(raging_blow) or Spell(bloodthirst) or Spell(furious_slash)
+	Spell(odyns_fury) or { Rage() == 100 or BuffPresent(massacre_buff) } and Spell(rampage) or { not Talent(bloodbath_talent) and { SpellCooldown(battle_cry) < 1 or SpellCooldown(battle_cry) > 10 } or Talent(bloodbath_talent) and not SpellCooldown(bloodbath) > 0 } and Spell(dragon_roar) or not IsEnraged() and Spell(rampage) or Talent(frenzy_talent) and { BuffExpires(frenzy_buff) or BuffRemaining(frenzy_buff) <= 3 } and Spell(furious_slash) or { IsEnraged() and not Talent(massacre_talent) and not Talent(inner_rage_talent) or Talent(massacre_talent) and not IsEnraged() or IsEnraged() and Talent(massacre_talent) and not Talent(inner_rage_talent) } and Spell(execute) or not Talent(inner_rage_talent) and Spell(bloodthirst) or not Talent(inner_rage_talent) and BuffPresent(wrecking_ball_buff) and Spell(whirlwind) or IsEnraged() and Spell(raging_blow) or BuffPresent(wrecking_ball_buff) and IsEnraged() and Spell(whirlwind) or { IsEnraged() and not Talent(frenzy_talent) or Talent(frenzy_talent) or Talent(massacre_talent) } and Spell(execute) or not IsEnraged() and Spell(bloodthirst) or Spell(raging_blow) or Spell(bloodthirst) or Spell(furious_slash)
 }
 
 ### actions.two_targets
@@ -642,6 +645,7 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # massacre_buff
 # massacre_talent
 # meat_cleaver_buff
+# odyns_fury
 # outburst_talent
 # pummel
 # raging_blow
@@ -885,6 +889,9 @@ AddFunction FuryTitansGripSingleTargetMainActions
 
 AddFunction FuryTitansGripSingleTargetShortCdActions
 {
+	#odyns_fury
+	Spell(odyns_fury)
+
 	unless { Rage() == 100 or BuffPresent(massacre_buff) } and Spell(rampage)
 	{
 		#berserker_rage,if=talent.outburst.enabled&cooldown.dragon_roar.remains=0&buff.enrage.down
@@ -903,7 +910,7 @@ AddFunction FuryTitansGripSingleTargetShortCdPostConditions
 
 AddFunction FuryTitansGripSingleTargetCdActions
 {
-	unless { Rage() == 100 or BuffPresent(massacre_buff) } and Spell(rampage) or { not Talent(bloodbath_talent) and { SpellCooldown(battle_cry) < 1 or SpellCooldown(battle_cry) > 10 } or Talent(bloodbath_talent) and not SpellCooldown(bloodbath) > 0 } and Spell(dragon_roar)
+	unless Spell(odyns_fury) or { Rage() == 100 or BuffPresent(massacre_buff) } and Spell(rampage) or { not Talent(bloodbath_talent) and { SpellCooldown(battle_cry) < 1 or SpellCooldown(battle_cry) > 10 } or Talent(bloodbath_talent) and not SpellCooldown(bloodbath) > 0 } and Spell(dragon_roar)
 	{
 		#bloodbath,if=buff.dragon_roar.up
 		if BuffPresent(dragon_roar_buff) Spell(bloodbath)
@@ -914,7 +921,7 @@ AddFunction FuryTitansGripSingleTargetCdActions
 
 AddFunction FuryTitansGripSingleTargetCdPostConditions
 {
-	{ Rage() == 100 or BuffPresent(massacre_buff) } and Spell(rampage) or { not Talent(bloodbath_talent) and { SpellCooldown(battle_cry) < 1 or SpellCooldown(battle_cry) > 10 } or Talent(bloodbath_talent) and not SpellCooldown(bloodbath) > 0 } and Spell(dragon_roar) or not IsEnraged() and Spell(rampage) or Talent(frenzy_talent) and { BuffExpires(frenzy_buff) or BuffRemaining(frenzy_buff) <= 3 } and Spell(furious_slash) or { IsEnraged() and not Talent(massacre_talent) and not Talent(inner_rage_talent) or Talent(massacre_talent) and not IsEnraged() or IsEnraged() and Talent(massacre_talent) and not Talent(inner_rage_talent) } and Spell(execute) or not Talent(inner_rage_talent) and Spell(bloodthirst) or not Talent(inner_rage_talent) and BuffPresent(wrecking_ball_buff) and Spell(whirlwind) or IsEnraged() and Spell(raging_blow) or BuffPresent(wrecking_ball_buff) and IsEnraged() and Spell(whirlwind) or { IsEnraged() and not Talent(frenzy_talent) or Talent(frenzy_talent) or Talent(massacre_talent) } and Spell(execute) or not IsEnraged() and Spell(bloodthirst) or Spell(raging_blow) or Spell(bloodthirst) or Spell(furious_slash)
+	Spell(odyns_fury) or { Rage() == 100 or BuffPresent(massacre_buff) } and Spell(rampage) or { not Talent(bloodbath_talent) and { SpellCooldown(battle_cry) < 1 or SpellCooldown(battle_cry) > 10 } or Talent(bloodbath_talent) and not SpellCooldown(bloodbath) > 0 } and Spell(dragon_roar) or not IsEnraged() and Spell(rampage) or Talent(frenzy_talent) and { BuffExpires(frenzy_buff) or BuffRemaining(frenzy_buff) <= 3 } and Spell(furious_slash) or { IsEnraged() and not Talent(massacre_talent) and not Talent(inner_rage_talent) or Talent(massacre_talent) and not IsEnraged() or IsEnraged() and Talent(massacre_talent) and not Talent(inner_rage_talent) } and Spell(execute) or not Talent(inner_rage_talent) and Spell(bloodthirst) or not Talent(inner_rage_talent) and BuffPresent(wrecking_ball_buff) and Spell(whirlwind) or IsEnraged() and Spell(raging_blow) or BuffPresent(wrecking_ball_buff) and IsEnraged() and Spell(whirlwind) or { IsEnraged() and not Talent(frenzy_talent) or Talent(frenzy_talent) or Talent(massacre_talent) } and Spell(execute) or not IsEnraged() and Spell(bloodthirst) or Spell(raging_blow) or Spell(bloodthirst) or Spell(furious_slash)
 }
 
 ### actions.two_targets
@@ -1018,6 +1025,7 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # massacre_buff
 # massacre_talent
 # meat_cleaver_buff
+# odyns_fury
 # outburst_talent
 # pummel
 # raging_blow

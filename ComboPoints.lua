@@ -120,7 +120,7 @@ function OvaleComboPoints:OnEnable()
 	if Ovale.playerClass == "ROGUE" or Ovale.playerClass == "DRUID" then
 		self:RegisterEvent("PLAYER_ENTERING_WORLD", "Update")
 		self:RegisterEvent("PLAYER_TARGET_CHANGED")
-		self:RegisterEvent("UNIT_COMBO_POINTS")
+		self:RegisterEvent("UNIT_POWER")
 		self:RegisterEvent("Ovale_EquipmentChanged")
 		self:RegisterMessage("Ovale_SpellFinished")
 		self:RegisterMessage("Ovale_TalentsChanged")
@@ -137,7 +137,7 @@ function OvaleComboPoints:OnDisable()
 		OvaleData:UnregisterRequirement("combo")
 		self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 		self:UnregisterEvent("PLAYER_TARGET_CHANGED")
-		self:UnregisterEvent("UNIT_COMBO_POINTS")
+		self:UnregisterEvent("UNIT_POWER")
 		self:UnregisterEvent("Ovale_EquipmentChanged")
 		self:UnregisterMessage("Ovale_SpellFinished")
 		self:UnregisterMessage("Ovale_TalentsChanged")
@@ -153,7 +153,8 @@ function OvaleComboPoints:PLAYER_TARGET_CHANGED(event, cause)
 	end
 end
 
-function OvaleComboPoints:UNIT_COMBO_POINTS(event, unitId)
+function OvaleComboPoints:UNIT_POWER(event, unitId, powerToken)
+	if powerToken ~= SPELL_POWER_COMBO_POINTS then return end
 	if unitId == "player" then
 		-- Save the old combo point count and update to the current count.
 		local oldCombo = self.combo
