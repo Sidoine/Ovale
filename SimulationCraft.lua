@@ -2260,15 +2260,7 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
 			elseif parseNode.type == "compare" or parseNode.type == "arithmetic" then
 				operator = parseNode.operator
 			end
-			if parseNode.type == "arithmetic" and parseNode.child[1].rune and parseNode.child[1].includeDeath and parseNode.child[2].name == "death" then
-				--[[
-					Special handling for "Blood-death", "Frost-death", and "Unholy-death" arithmetic expressions.
-					These are trying to express the concept of "non-death runes of the given type".
-				--]]
-				local code = "Rune(" .. parseNode.child[1].rune .. " death=0)"
-				annotation.astAnnotation = annotation.astAnnotation or {}
-				node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
-			elseif parseNode.type == "compare" and parseNode.child[1].rune then
+			if parseNode.type == "compare" and parseNode.child[1].rune then
 				--[[
 					Special handling for rune comparisons.
 					This ONLY handles rune expressions of the form "<rune><operator><number>".
@@ -2285,24 +2277,15 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
 				if runeType and number then
 					local code
 					local op = parseNode.operator
-					local runeFunction = (strsub(lhsNode.name, -6) == ".death") and "DeathRune" or "Rune"
+					local runeFunction = "Rune"
 					local runeCondition
-					if lhsNode.includeDeath then
-						runeCondition = runeFunction .. "(" .. runeType .. " death=1)"
-					else
-						runeCondition = runeFunction .. "(" .. runeType .. ")"
-					end
+					runeCondition = runeFunction .. "()"
 					if op == ">" then
 						code = format("%s >= %d", runeCondition, number + 1)
 					elseif op == ">=" then
 						code = format("%s >= %d", runeCondition, number)
 					elseif op == "=" then
-						if runeType ~= "death" and number == 2 then
-							-- We can never have more than 2 non-death runes of the same type.
-							code = format("%s >= %d", runeCondition, number)
-						else
-							code = format("%s >= %d and %s < %d", runeCondition, number, runeCondition, number + 1)
-						end
+						code = format("%s >= %d", runeCondition, number)
 					elseif op == "<=" then
 						code = format("%s < %d", runeCondition, number + 1)
 					elseif op == "<" then
@@ -3362,17 +3345,10 @@ EmitOperandRune = function(operand, parseNode, nodeList, annotation, action)
 
 	local code
 	if parseNode.rune then
-		local runeParameters
-		if parseNode.includeDeath then
-			runeParameters = parseNode.rune .. " death=1"
-		else
-			runeParameters = parseNode.rune
-		end
 		if parseNode.asType == "boolean" then
-			local runeFunction = (strsub(parseNode.name, -6) == ".death") and "DeathRune" or "Rune"
-			code = format("%s(%s) >= 1", runeFunction, runeParameters)
+			code = "RuneCount() >= 1"
 		else
-			code = format("RuneCount(%s)", runeParameters)
+			code = "RuneCount()"
 		end
 	else
 		ok = false

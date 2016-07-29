@@ -2,19 +2,20 @@
 
 It displays one or more icons that show the cooldown of an action.  The action is conditionally defined through a user-defined script, e.g. you may display either [Corruption][] if the DoT is not on your target or [Shadow Bolt][] if the [Corruption][] DoT is already on your target.
 
-The current release of Ovale provides default scripts for the following classes for *Warlords of Draenor*:
+The current release of Ovale provides default scripts for the following classes for *Legion*:
+Note that these are *work in progress*. More support is coming soon and there may be bugs.
 
-- Death Knight: Blood, Frost, Unholy
-- Druid: Feral, Guardian, Restoration **([Balance is NOT currently supported][balance-ticket])**
+- Death Knight: None
+- Druid: Feral, Guardian
 - Hunter: Beast Mastery, Marksmanship, Survival
 - Mage: Arcane, Fire, Frost
 - Monk: Brewmaster, Windwalker
-- Paladin: Protection, Retribution
-- Priest: Shadow
-- Rogue: Assassination, Combat, Subtlety
-- Shaman: Elemental, Enhancement, Restoration
+- Paladin: Retribution
+- Priest: None
+- Rogue: Assassination, Outlaw, Subtlety
+- Shaman: Elemental, Enhancement
 - Warlock: Affliction, Demonology, Destruction
-- Warrior: Arms, Fury, Protection
+- Warrior: Arms, Fury
 
 Default scripts are based on [SimulationCraft][].  You may also customize the default script to suit your needs (see [Documentation][]) or use scripts made by other users.
 

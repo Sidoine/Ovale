@@ -726,9 +726,9 @@ AddFunction UnholyGenericMainActions
 	#clawing_shadows,if=buff.unholy_strength.react
 	if BuffPresent(unholy_strength_buff) Spell(clawing_shadows)
 	#scourge_strike,if=rune>=3
-	if Rune(rune) >= 3 Spell(scourge_strike)
+	if Rune() >= 3 Spell(scourge_strike)
 	#clawing_shadows,if=rune>=3
-	if Rune(rune) >= 3 Spell(clawing_shadows)
+	if Rune() >= 3 Spell(clawing_shadows)
 	#death_coil,if=talent.shadow_infusion.enabled&talent.dark_arbiter.enabled&!buff.dark_transformation.up&cooldown.dark_arbiter.remains>15
 	if Talent(shadow_infusion_talent) and Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and SpellCooldown(dark_arbiter) > 15 Spell(death_coil)
 	#death_coil,if=talent.shadow_infusion.enabled&!talent.dark_arbiter.enabled&!buff.dark_transformation.up

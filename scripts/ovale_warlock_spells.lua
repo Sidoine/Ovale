@@ -94,7 +94,7 @@ Define(doom 603)
 Define(doom_debuff 603)
 	SpellInfo(doom_debuff duration=60 haste=spell tick=15)
 Define(drain_life 689)
-Define(drain_soul 103103)
+Define(drain_soul 198590)
 	SpellInfo(drain_soul channel=4 haste=spell)
 Define(ember_master_buff 145164)	# tier16_4pc_caster
 	SpellInfo(ember_master_buff duration=5)
