@@ -103,9 +103,9 @@ AddFunction AssassinationAoeMainActions
 	#death_from_above,if=combo_points>=cp_max_spend-1
 	if ComboPoints() >= MaxComboPoints() - 1 Spell(death_from_above)
 	#envenom,if=combo_points>=cp_max_spend-1&refreshable&!dot.rupture.refreshable&energy.deficit<40&buff.elaborate_planning.remains<2
-	if ComboPoints() >= MaxComboPoints() - 1 and BuffPresent(envenom_buff) and not target.DebuffPresent(rupture_debuff) and EnergyDeficit() < 40 and BuffRemaining(elaborate_planning_buff) < 2 Spell(envenom)
+	if ComboPoints() >= MaxComboPoints() - 1 and Refreshable(envenom_buff) and not target.DebuffPresent(rupture_debuff) and EnergyDeficit() < 40 and BuffRemaining(elaborate_planning_buff) < 2 Spell(envenom)
 	#envenom,if=combo_points>=cp_max_spend&refreshable&cooldown.garrote.remains<1&buff.elaborate_planning.remains<2
-	if ComboPoints() >= MaxComboPoints() and BuffPresent(envenom_buff) and SpellCooldown(garrote) < 1 and BuffRemaining(elaborate_planning_buff) < 2 Spell(envenom)
+	if ComboPoints() >= MaxComboPoints() and Refreshable(envenom_buff) and SpellCooldown(garrote) < 1 and BuffRemaining(elaborate_planning_buff) < 2 Spell(envenom)
 	#mutilate,cycle_targets=1,target_if=min:dot.deadly_poison_dot.remains,if=combo_points.deficit>=2&dot.rupture.exsanguinated
 	if ComboPointsDeficit() >= 2 and target.DebuffRemaining(rupture_debuff_exsanguinated) Spell(mutilate)
 	#mutilate,cycle_targets=1,target_if=max:bleeds,if=combo_points.deficit>=2&spell_targets.fan_of_knives=2&dot.deadly_poison_dot.refreshable&dot.agonizing_poison_dot.refreshable
@@ -143,7 +143,7 @@ AddFunction AssassinationExsangMainActions
 	#death_from_above,if=combo_points>=cp_max_spend-1&dot.rupture.remains>2
 	if ComboPoints() >= MaxComboPoints() - 1 and target.DebuffRemaining(rupture_debuff) > 2 Spell(death_from_above)
 	#envenom,if=combo_points>=cp_max_spend-1&refreshable&dot.rupture.remains>2
-	if ComboPoints() >= MaxComboPoints() - 1 and BuffPresent(envenom_buff) and target.DebuffRemaining(rupture_debuff) > 2 Spell(envenom)
+	if ComboPoints() >= MaxComboPoints() - 1 and Refreshable(envenom_buff) and target.DebuffRemaining(rupture_debuff) > 2 Spell(envenom)
 	#hemorrhage,if=combo_points.deficit<=1&energy>40&dot.rupture.remains>1
 	if ComboPointsDeficit() <= 1 and Energy() > 40 and target.DebuffRemaining(rupture_debuff) > 1 Spell(hemorrhage)
 	#hemorrhage,if=combo_points.deficit>=1&debuff.hemorrhage.remains<1
@@ -202,15 +202,15 @@ AddFunction AssassinationPrecombatCdPostConditions
 AddFunction AssassinationStandardMainActions
 {
 	#rupture,if=combo_points>=cp_max_spend&refreshable&(!exsanguinated|ticks_remain<2)
-	if ComboPoints() >= MaxComboPoints() and target.DebuffPresent(rupture_debuff) and { not target.DebuffPresent(exsanguinated) or target.TicksRemaining(rupture_debuff) < 2 } Spell(rupture)
+	if ComboPoints() >= MaxComboPoints() and target.Refreshable(rupture_debuff) and { not target.DebuffPresent(exsanguinated) or target.TicksRemaining(rupture_debuff) < 2 } Spell(rupture)
 	#death_from_above,if=combo_points>=cp_max_spend-1
 	if ComboPoints() >= MaxComboPoints() - 1 Spell(death_from_above)
 	#envenom,if=combo_points>=cp_max_spend-1&refreshable&!dot.rupture.refreshable&energy.deficit<40&buff.elaborate_planning.remains<2
-	if ComboPoints() >= MaxComboPoints() - 1 and BuffPresent(envenom_buff) and not target.DebuffPresent(rupture_debuff) and EnergyDeficit() < 40 and BuffRemaining(elaborate_planning_buff) < 2 Spell(envenom)
+	if ComboPoints() >= MaxComboPoints() - 1 and Refreshable(envenom_buff) and not target.DebuffPresent(rupture_debuff) and EnergyDeficit() < 40 and BuffRemaining(elaborate_planning_buff) < 2 Spell(envenom)
 	#envenom,if=combo_points>=cp_max_spend&refreshable&cooldown.garrote.remains<1&buff.elaborate_planning.remains<2
-	if ComboPoints() >= MaxComboPoints() and BuffPresent(envenom_buff) and SpellCooldown(garrote) < 1 and BuffRemaining(elaborate_planning_buff) < 2 Spell(envenom)
+	if ComboPoints() >= MaxComboPoints() and Refreshable(envenom_buff) and SpellCooldown(garrote) < 1 and BuffRemaining(elaborate_planning_buff) < 2 Spell(envenom)
 	#hemorrhage,if=combo_points.deficit>=1&refreshable
-	if ComboPointsDeficit() >= 1 and target.DebuffPresent(hemorrhage_debuff) Spell(hemorrhage)
+	if ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) Spell(hemorrhage)
 	#hemorrhage,if=combo_points.deficit=1|combo_points.deficit=2
 	if ComboPointsDeficit() == 1 or ComboPointsDeficit() == 2 Spell(hemorrhage)
 	#mutilate,if=combo_points.deficit>=2&cooldown.garrote.remains>2

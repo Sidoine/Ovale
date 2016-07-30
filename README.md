@@ -21,7 +21,7 @@ Default scripts are based on [SimulationCraft][].  You may also customize the de
 
 See the [video of a survival hunter][ovale-video] using [Ovale][] during *Wrath of the Lich King*.
 
-**Please use the [forums][ovale-forums] to submit scripts or discuss them. If you want to report bugs, use the [ticket manager][ovale-tickets].**
+**Please use the [forums][ovale-forums] to submit scripts or discuss them. If you want to report bugs, use the [ticket manager][ovale-tickets]. You may contribute code on our [Github][https://github.com/Sidoine/Ovale] project.**
 
 Features
 ========
@@ -64,5 +64,5 @@ You need to reach level 10 and choose a specialization.  However, be aware that 
   [SpellFlashCore]: http://www.curse.com/addons/wow/spellflashcore
   [SpellFlash]: http://www.curse.com/addons/wow/spellflash
   [ovale-forums]: http://wow.curseforge.com/addons/ovale/forum/
-  [ovale-tickets]: http://wow.curseforge.com/addons/ovale/tickets/
+  [ovale-tickets]: https://github.com/Sidoine/Ovale/issues
   [ovale-video]: http://www.youtube.com/watch?v=rNHvk9GpyiM "Ovale WotLK video"

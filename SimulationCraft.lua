@@ -2760,7 +2760,7 @@ EmitOperandRefresh = function(operand, parseNode, nodeList, annotation, action, 
 		end
 		local any = OvaleData.DEFAULT_SPELL_LIST[buffName] and " any=1" or ""
 		-- TODO Surely not the right function, need to look in simulationcraft code what means "refreshable"  
-		local code = format("%s%sPresent(%s%s)", target, prefix, buffName, any)
+		local code = format("%sRefreshable(%s%s)", target, buffName, any)
 		node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
 		AddSymbol(annotation, buffName)
 	end

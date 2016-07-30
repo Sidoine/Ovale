@@ -3603,6 +3603,32 @@ do
 end
 
 do
+	local function Refreshable(positionalParams, namedParams, state, atTime)
+		local auraId = positionalParams[1]
+		local target, filter, mine = ParseCondition(positionalParams, namedParams, state)
+		local aura = state:GetAura(target, auraId, filter, mine)
+		if aura then
+			local tickTime
+			if state:IsActiveAura(aura, atTime) then
+				tickTime = aura.tick
+			else
+				tickTime = OvaleData:GetTickLength(auraId, state)
+			end
+
+			local gain, start, ending = aura.gain, aura.start, aura.ending
+			if ending - tickTime <= gain then
+				return gain, INFINITY
+			else
+				return ending - tickTime, INFINITY
+			end
+		end
+		return 0, INFINITY
+	end
+
+	OvaleCondition:RegisterCondition("refreshable", false, Refreshable)
+end
+
+do
 	--- Get the remaining cast time in seconds of the target's current spell cast.
 	-- @name RemainingCastTime
 	-- @paramsig number or boolean
