@@ -71,7 +71,7 @@ AddFunction FrostDualWieldDefaultCdActions
 	#use_item,slot=finger1
 	if CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength usable=1)
 	#potion,name=draenic_strength,if=cooldown.pillar_of_frost.remains<5&cooldown.thorasus_the_stone_heart_of_draenor.remains<10
-	if SpellCooldown(pillar_of_frost) < 5 and SpellCooldown(legendary_ring_strength) < 10 FrostDualWieldUsePotionStrength()
+	if SpellCooldown(pillar_of_frost) < 5 and ItemCooldown(legendary_ring_strength) < 10 FrostDualWieldUsePotionStrength()
 	#sindragosas_fury
 	Spell(sindragosas_fury)
 
@@ -359,7 +359,7 @@ AddFunction FrostTwoHanderDefaultCdActions
 	#use_item,slot=finger1
 	if CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength usable=1)
 	#potion,name=draenic_strength,if=cooldown.pillar_of_frost.remains<5&cooldown.thorasus_the_stone_heart_of_draenor.remains<10
-	if SpellCooldown(pillar_of_frost) < 5 and SpellCooldown(legendary_ring_strength) < 10 FrostTwoHanderUsePotionStrength()
+	if SpellCooldown(pillar_of_frost) < 5 and ItemCooldown(legendary_ring_strength) < 10 FrostTwoHanderUsePotionStrength()
 	#sindragosas_fury
 	Spell(sindragosas_fury)
 

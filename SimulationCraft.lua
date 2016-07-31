@@ -984,12 +984,12 @@ local function AddSymbol(annotation, symbol)
 	annotation.symbolTable = symbolTable
 end
 
-local function AddPerClassSpecialization(tbl, name, info, class, specialization)
+local function AddPerClassSpecialization(tbl, name, info, class, specialization, type)
 	class = class or "ALL_CLASSES"
 	specialization = specialization or "ALL_SPECIALIZATIONS"
 	tbl[class] = tbl[class] or {}
 	tbl[class][specialization] = tbl[class][specialization] or {}
-	tbl[class][specialization][name] = info
+	tbl[class][specialization][name] = { info, type or "Spell" }
 end
 
 local function GetPerClassSpecialization(tbl, name, class, specialization)
@@ -1011,33 +1011,40 @@ local function GetPerClassSpecialization(tbl, name, class, specialization)
 			break
 		end
 	end
-	return info
+	if info then
+		return info[1], info[2]
+	end
+	return nil
 end
 
-local function AddDisambiguation(name, info, class, specialization)
-	AddPerClassSpecialization(EMIT_DISAMBIGUATION, name, info, class, specialization)
+local function AddDisambiguation(name, info, class, specialization, type)
+	AddPerClassSpecialization(EMIT_DISAMBIGUATION, name, info, class, specialization, type)
 end
 
-local function Disambiguate(name, class, specialization)
-	return GetPerClassSpecialization(EMIT_DISAMBIGUATION, name, class, specialization) or name
+local function Disambiguate(name, class, specialization, type)
+	local disname, distype = GetPerClassSpecialization(EMIT_DISAMBIGUATION, name, class, specialization, type)
+	if not disname then
+	 	return name, type
+	end
+	return disname, distype
 end
 
 local function InitializeDisambiguation()
 	AddDisambiguation("bloodlust_buff",			"burst_haste_buff")
 	AddDisambiguation("trinket_proc_all_buff",	"trinket_proc_any_buff")
 	-- WoD legendary ring
-	AddDisambiguation("etheralus_the_eternal_reward",			"legendary_ring_spirit")
-	AddDisambiguation("maalus_the_blood_drinker",				"legendary_ring_agility")
-	AddDisambiguation("nithramus_the_allseer",					"legendary_ring_intellect")
-	AddDisambiguation("sanctus_sigil_of_the_unbroken",			"legendary_ring_bonus_armor")
-	AddDisambiguation("thorasus_the_stone_heart_of_draenor",	"legendary_ring_strength")
+	AddDisambiguation("etheralus_the_eternal_reward",			"legendary_ring_spirit", nil, nil, "Item")
+	AddDisambiguation("maalus_the_blood_drinker",				"legendary_ring_agility", nil, nil, "Item")
+	AddDisambiguation("nithramus_the_allseer",					"legendary_ring_intellect", nil, nil, "Item")
+	AddDisambiguation("sanctus_sigil_of_the_unbroken",			"legendary_ring_bonus_armor", nil, nil, "Item")
+	AddDisambiguation("thorasus_the_stone_heart_of_draenor",	"legendary_ring_strength", nil, nil, "Item")
 	-- Death Knight
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_runicpower",	"DEATHKNIGHT")
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"DEATHKNIGHT")
 	AddDisambiguation("breath_of_sindragosa_debuff",	"breath_of_sindragosa_buff",	"DEATHKNIGHT")
-	AddDisambiguation("legendary_ring",			"legendary_ring_bonus_armor",	"DEATHKNIGHT",	"blood")
-	AddDisambiguation("legendary_ring",			"legendary_ring_strength",		"DEATHKNIGHT",	"frost")
-	AddDisambiguation("legendary_ring",			"legendary_ring_strength",		"DEATHKNIGHT",	"unholy")
+	AddDisambiguation("legendary_ring",			"legendary_ring_bonus_armor",	"DEATHKNIGHT",	"blood", "Item")
+	AddDisambiguation("legendary_ring",			"legendary_ring_strength",		"DEATHKNIGHT",	"frost", "Item")
+	AddDisambiguation("legendary_ring",			"legendary_ring_strength",		"DEATHKNIGHT",	"unholy", "Item")
 	AddDisambiguation("soul_reaper",			"soul_reaper_blood",			"DEATHKNIGHT",	"blood")
 	AddDisambiguation("soul_reaper",			"soul_reaper_frost",			"DEATHKNIGHT",	"frost")
 	AddDisambiguation("soul_reaper",			"soul_reaper_unholy",			"DEATHKNIGHT",	"unholy")
@@ -1056,10 +1063,10 @@ local function InitializeDisambiguation()
 	AddDisambiguation("incarnation",			"incarnation_chosen_of_elune",	"DRUID",		"balance")
 	AddDisambiguation("incarnation",			"incarnation_king_of_the_jungle",	"DRUID",	"feral")
 	AddDisambiguation("incarnation",			"incarnation_son_of_ursoc",		"DRUID",		"guardian")
-	AddDisambiguation("legendary_ring",			"legendary_ring_agility",		"DRUID",		"feral")
-	AddDisambiguation("legendary_ring",			"legendary_ring_bonus_armor",	"DRUID",		"guardian")
-	AddDisambiguation("legendary_ring",			"legendary_ring_intellect",		"DRUID",		"balance")
-	AddDisambiguation("legendary_ring",			"legendary_ring_spirit",		"DRUID",		"restoration")
+	AddDisambiguation("legendary_ring",			"legendary_ring_agility",		"DRUID",		"feral", "Item")
+	AddDisambiguation("legendary_ring",			"legendary_ring_bonus_armor",	"DRUID",		"guardian", "Item")
+	AddDisambiguation("legendary_ring",			"legendary_ring_intellect",		"DRUID",		"balance", "Item")
+	AddDisambiguation("legendary_ring",			"legendary_ring_spirit",		"DRUID",		"restoration", "Item")
 	AddDisambiguation("moonfire",				"moonfire_cat",					"DRUID",		"feral")
 	AddDisambiguation("omen_of_clarity",		"omen_of_clarity_melee",		"DRUID",		"feral")
 	AddDisambiguation("rejuvenation_debuff",	"rejuvenation_buff",			"DRUID")
@@ -1070,12 +1077,12 @@ local function InitializeDisambiguation()
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"HUNTER")
 	AddDisambiguation("focusing_shot",			"focusing_shot_marksmanship",	"HUNTER",		"marksmanship")
 	AddDisambiguation("frenzy",					"pet_frenzy",					"HUNTER",		"beast_mastery")
-	AddDisambiguation("legendary_ring",			"legendary_ring_agility",		"HUNTER")
+	AddDisambiguation("legendary_ring",			"legendary_ring_agility",		"HUNTER",		nil, "Item")
 	-- Mage
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_mana",			"MAGE")
 	AddDisambiguation("arcane_charge_buff",		"arcane_charge_debuff",			"MAGE",			"arcane")
 	AddDisambiguation("blood_fury",				"blood_fury_sp",				"MAGE")
-	AddDisambiguation("legendary_ring",			"legendary_ring_intellect",		"MAGE")
+	AddDisambiguation("legendary_ring",			"legendary_ring_intellect",		"MAGE", 		nil, "Item")
 	AddDisambiguation("water_jet",				"water_elemental_water_jet",	"MAGE",			"frost")
 	-- Monk
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_chi",			"MONK")
@@ -1083,18 +1090,18 @@ local function InitializeDisambiguation()
 	AddDisambiguation("chi_explosion",			"chi_explosion_heal",			"MONK",			"mistweaver")
 	AddDisambiguation("chi_explosion",			"chi_explosion_melee",			"MONK",			"windwalker")
 	AddDisambiguation("chi_explosion",			"chi_explosion_tank",			"MONK",			"brewmaster")
-	AddDisambiguation("legendary_ring",			"legendary_ring_agility",		"MONK",			"windwalker")
-	AddDisambiguation("legendary_ring",			"legendary_ring_bonus_armor",	"MONK",			"brewmaster")
-	AddDisambiguation("legendary_ring",			"legendary_ring_spirit",		"MONK",			"mistweaver")
+	AddDisambiguation("legendary_ring",			"legendary_ring_agility",		"MONK",			"windwalker", "Item")
+	AddDisambiguation("legendary_ring",			"legendary_ring_bonus_armor",	"MONK",			"brewmaster", "Item")
+	AddDisambiguation("legendary_ring",			"legendary_ring_spirit",		"MONK",			"mistweaver", "Item")
 	AddDisambiguation("zen_sphere_debuff",		"zen_sphere_buff",				"MONK")
 	-- Paladin
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_holy",			"PALADIN")
 	AddDisambiguation("avenging_wrath",			"avenging_wrath_heal",			"PALADIN",		"holy")
 	AddDisambiguation("avenging_wrath",			"avenging_wrath_melee",			"PALADIN",		"retribution")
 	AddDisambiguation("blood_fury",				"blood_fury_apsp",				"PALADIN")
-	AddDisambiguation("legendary_ring",			"legendary_ring_bonus_armor",	"PALADIN",		"protection")
-	AddDisambiguation("legendary_ring",			"legendary_ring_spirit",		"PALADIN",		"holy")
-	AddDisambiguation("legendary_ring",			"legendary_ring_strength",		"PALADIN",		"retribution")
+	AddDisambiguation("legendary_ring",			"legendary_ring_bonus_armor",	"PALADIN",		"protection", "Item")
+	AddDisambiguation("legendary_ring",			"legendary_ring_spirit",		"PALADIN",		"holy", "Item")
+	AddDisambiguation("legendary_ring",			"legendary_ring_strength",		"PALADIN",		"retribution", "Item")
 	AddDisambiguation("sacred_shield_debuff",	"sacred_shield_buff",			"PALADIN")
 	-- Priest
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_mana",			"PRIEST")
@@ -1109,14 +1116,14 @@ local function InitializeDisambiguation()
 	AddDisambiguation("halo",					"halo_caster",					"PRIEST",		"shadow")
 	AddDisambiguation("halo",					"halo_heal",					"PRIEST",		"discipline")
 	AddDisambiguation("halo",					"halo_heal",					"PRIEST",		"holy")
-	AddDisambiguation("legendary_ring",			"legendary_ring_intellect",		"PRIEST",		"shadow")
-	AddDisambiguation("legendary_ring",			"legendary_ring_spirit",		"PRIEST",		"discipline")
-	AddDisambiguation("legendary_ring",			"legendary_ring_spirit",		"PRIEST",		"holy")
+	AddDisambiguation("legendary_ring",			"legendary_ring_intellect",		"PRIEST",		"shadow", "Item")
+	AddDisambiguation("legendary_ring",			"legendary_ring_spirit",		"PRIEST",		"discipline", "Item")
+	AddDisambiguation("legendary_ring",			"legendary_ring_spirit",		"PRIEST",		"holy", "Item")
 	AddDisambiguation("renew_debuff",			"renew_buff",					"PRIEST")
 	-- Rogue
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_energy",		"ROGUE")
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"ROGUE")
-	AddDisambiguation("legendary_ring",			"legendary_ring_agility",		"ROGUE")
+	AddDisambiguation("legendary_ring",			"legendary_ring_agility",		"ROGUE",		nil, "Item")
 	AddDisambiguation("stealth_buff",			"stealthed_buff",				"ROGUE")
 	AddDisambiguation("roll_the_bones_debuff",	"roll_the_bones_buff",			"ROGUE")
 	AddDisambiguation("envenom_debuff",			"envenom_buff",					"ROGUE")
@@ -1126,24 +1133,24 @@ local function InitializeDisambiguation()
 	AddDisambiguation("ascendance",				"ascendance_heal",				"SHAMAN",		"restoration")
 	AddDisambiguation("ascendance",				"ascendance_melee",				"SHAMAN",		"enhancement")
 	AddDisambiguation("blood_fury",				"blood_fury_apsp",				"SHAMAN")
-	AddDisambiguation("legendary_ring",			"legendary_ring_agility",		"SHAMAN",		"enhancement")
-	AddDisambiguation("legendary_ring",			"legendary_ring_intellect",		"SHAMAN",		"elemental")
-	AddDisambiguation("legendary_ring",			"legendary_ring_spirit",		"SHAMAN",		"restoration")
-	AddDisambiguation("unleashed_fury",			"unleashed_fury_melee",			"SHAMAN",		"enhancement")
+	AddDisambiguation("legendary_ring",			"legendary_ring_agility",		"SHAMAN",		"enhancement", "Item")
+	AddDisambiguation("legendary_ring",			"legendary_ring_intellect",		"SHAMAN",		"elemental", "Item")
+	AddDisambiguation("legendary_ring",			"legendary_ring_spirit",		"SHAMAN",		"restoration", "Item")
+	AddDisambiguation("unleashed_fury",			"unleashed_fury_melee",			"SHAMAN",		"enhancement", "Item")
 	-- Warlock
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_mana",			"WARLOCK")
 	AddDisambiguation("blood_fury",				"blood_fury_sp",				"WARLOCK")
 	AddDisambiguation("dark_soul",				"dark_soul_instability",		"WARLOCK",		"destruction")
 	AddDisambiguation("dark_soul",				"dark_soul_knowledge",			"WARLOCK",		"demonology")
 	AddDisambiguation("dark_soul",				"dark_soul_misery",				"WARLOCK",		"affliction")
-	AddDisambiguation("legendary_ring",			"legendary_ring_intellect",		"WARLOCK")
+	AddDisambiguation("legendary_ring",			"legendary_ring_intellect",		"WARLOCK",		nil, "Item")
 	-- Warrior
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_rage",			"WARRIOR")
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"WARRIOR")
 	AddDisambiguation("execute",				"execute_arms",					"WARRIOR",		"arms")
 	AddDisambiguation("legendary_ring",			"legendary_ring_bonus_armor",	"WARRIOR",		"protection")
-	AddDisambiguation("legendary_ring",			"legendary_ring_strength",		"WARRIOR",		"arms")
-	AddDisambiguation("legendary_ring",			"legendary_ring_strength",		"WARRIOR",		"fury")
+	AddDisambiguation("legendary_ring",			"legendary_ring_strength",		"WARRIOR",		"arms", "Item")
+	AddDisambiguation("legendary_ring",			"legendary_ring_strength",		"WARRIOR",		"fury", "Item")
 	AddDisambiguation("shield_barrier",			"shield_barrier_melee",			"WARRIOR",		"arms")
 	AddDisambiguation("shield_barrier",			"shield_barrier_melee",			"WARRIOR",		"fury")
 	AddDisambiguation("shield_barrier",			"shield_barrier_tank",			"WARRIOR",		"protection")
@@ -1572,7 +1579,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 	local specialization = annotation.specialization
 	local camelSpecialization = CamelSpecialization(annotation)
 	local role = annotation.role
-	local action = strlower(Disambiguate(canonicalizedName, class, specialization))
+	local action = Disambiguate(canonicalizedName, class, specialization)
 
 	if action == "auto_attack" and not annotation.melee then
 		-- skip
@@ -2595,7 +2602,7 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
 	end
 
 	local class, specialization = annotation.class, annotation.specialization
-	name = strlower(Disambiguate(name, class, specialization))
+	name = Disambiguate(name, class, specialization)
 	target = target and (target .. ".") or ""
 	local buffName = name .. "_debuff"
 	buffName = Disambiguate(buffName, class, specialization)
@@ -2697,7 +2704,7 @@ EmitOperandActiveDot = function(operand, parseNode, nodeList, annotation, action
 	local token = tokenIterator()
 	if token == "active_dot" then
 		local name = tokenIterator()
-		name = strlower(Disambiguate(name, annotation.class, annotation.specialization))
+		name = Disambiguate(name, annotation.class, annotation.specialization)
 		local dotName = name .. "_debuff"
 		dotName = Disambiguate(dotName, annotation.class, annotation.specialization)
 		local prefix = strfind(dotName, "_buff$") and "Buff" or "Debuff"
@@ -2777,7 +2784,7 @@ EmitOperandBuff = function(operand, parseNode, nodeList, annotation, action, tar
 	if token == "aura" or token == "buff" or token == "debuff" then
 		local name = tokenIterator()
 		local property = tokenIterator()
-		name = strlower(Disambiguate(name, annotation.class, annotation.specialization))
+		name = Disambiguate(name, annotation.class, annotation.specialization)
 		local buffName = (token == "debuff") and name .. "_debuff" or name .. "_buff"
 		buffName = Disambiguate(buffName, annotation.class, annotation.specialization)
 		local prefix = strfind(buffName, "_buff$") and "Buff" or "Debuff"
@@ -3010,9 +3017,9 @@ EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
 	if token == "cooldown" then
 		local name = tokenIterator()
 		local property = tokenIterator()
-		name = strlower(Disambiguate(name, annotation.class, annotation.specialization))
-		local prefix = "Spell"
-
+		local prefix
+		name, prefix = Disambiguate(name, annotation.class, annotation.specialization, "Spell")
+				
 		-- Assume that the "potion" action has already been seen.
 		if name == "potion" then
 			prefix = "Item"
@@ -3101,7 +3108,7 @@ EmitOperandDot = function(operand, parseNode, nodeList, annotation, action, targ
 	if token == "dot" then
 		local name = tokenIterator()
 		local property = tokenIterator()
-		name = strlower(Disambiguate(name, annotation.class, annotation.specialization))
+		name = Disambiguate(name, annotation.class, annotation.specialization)
 		local dotName = name .. "_debuff"
 		dotName = Disambiguate(dotName, annotation.class, annotation.specialization)
 		local prefix = strfind(dotName, "_buff$") and "Buff" or "Debuff"
@@ -3151,7 +3158,7 @@ EmitOperandGlyph = function(operand, parseNode, nodeList, annotation, action)
 	if token == "glyph" then
 		local name = tokenIterator()
 		local property = tokenIterator()
-		name = strlower(Disambiguate(name, annotation.class, annotation.specialization))
+		name = Disambiguate(name, annotation.class, annotation.specialization)
 		local glyphName = "glyph_of_" .. name
 		glyphName = Disambiguate(glyphName, annotation.class, annotation.specialization)
 
@@ -3184,7 +3191,7 @@ EmitOperandPet = function(operand, parseNode, nodeList, annotation, action)
 	if token == "pet" then
 		local name = tokenIterator()
 		local property = tokenIterator()
-		name = strlower(Disambiguate(name, annotation.class, annotation.specialization))
+		name = Disambiguate(name, annotation.class, annotation.specialization)
 		local isTotem = IsTotem(name)
 		local code
 		if isTotem and property == "active" then
@@ -3214,7 +3221,7 @@ EmitOperandPet = function(operand, parseNode, nodeList, annotation, action)
 				if not ok then
 					-- Prefix the pet ability name with the name of the pet if it does not already begin with "pet".
 					local petAbilityName = strmatch(petOperand, "^[%w_]+%.([^.]+)")
-					petAbilityName = strlower(Disambiguate(petAbilityName, annotation.class, annotation.specialization))
+					petAbilityName = Disambiguate(petAbilityName, annotation.class, annotation.specialization)
 					if strsub(petAbilityName, 1, 4) ~= "pet_" then
 						petOperand = gsub(petOperand, "^([%w_]+)%.", "%1." .. name .. "_")
 					end
@@ -3252,7 +3259,7 @@ EmitOperandPreviousSpell = function(operand, parseNode, nodeList, annotation, ac
 	local token = tokenIterator()
 	if token == "prev" or token == "prev_gcd" or token == "prev_off_gcd" then
 		local name = tokenIterator()
-		name = strlower(Disambiguate(name, annotation.class, annotation.specialization))
+		name = Disambiguate(name, annotation.class, annotation.specialization)
 		local code
 		if token == "prev" then
 			code = format("PreviousSpell(%s)", name)
