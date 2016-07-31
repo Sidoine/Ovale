@@ -20,6 +20,7 @@ local OvaleData = nil
 local OvaleEquipment = nil
 local OvaleFuture = nil
 local OvalePaperDoll = nil
+local OvalePower = nil
 local OvaleSpellBook = nil
 local OvaleState = nil
 
@@ -111,6 +112,7 @@ function OvaleComboPoints:OnInitialize()
 	OvaleEquipment = Ovale.OvaleEquipment
 	OvaleFuture = Ovale.OvaleFuture
 	OvalePaperDoll = Ovale.OvalePaperDoll
+	OvalePower = Ovale.OvalePower
 	OvaleSpellBook = Ovale.OvaleSpellBook
 	OvaleState = Ovale.OvaleState
 end
@@ -154,7 +156,7 @@ function OvaleComboPoints:PLAYER_TARGET_CHANGED(event, cause)
 end
 
 function OvaleComboPoints:UNIT_POWER(event, unitId, powerToken)
-	if powerToken ~= SPELL_POWER_COMBO_POINTS then return end
+	if powerToken ~= OvalePower.POWER_INFO.combopoints.token then return end
 	if unitId == "player" then
 		-- Save the old combo point count and update to the current count.
 		local oldCombo = self.combo
