@@ -13,7 +13,6 @@ Define(astral_communion 202359)
 	SpellInfo(astral_communion cd=80 astralpower=-75)
 Define(astral_influence 197524)
 Define(barkskin 22812)
-
 	SpellInfo(barkskin cd=90 gcd=0 offgcd=1)
 Define(bear_form 5487)
 	SpellInfo(bear_form to_stance=druid_bear_form)
