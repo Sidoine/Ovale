@@ -9,7 +9,6 @@ do
 # Druid spells and functions.
 Define(ashamanes_bite 210702)
 Define(ashamanes_rip_debuff 224435)
-
 Define(astral_communion 202359)
 	SpellInfo(astral_communion cd=80 astralpower=-75)
 Define(astral_influence 197524)
@@ -20,15 +19,10 @@ Define(bear_form 5487)
 	SpellInfo(bear_form to_stance=druid_bear_form)
 	SpellInfo(bear_form unusable=1 if_stance=druid_bear_form)
 Define(berserk 106951)
-
 Define(berserk_cat 106951)
 	SpellInfo(berserk_cat cd=180 gcd=0)
 	SpellAddBuff(berserk_cat berserk_cat_buff=1)
 	SpellInfo(berserk_cat duration=15)
-
-
-
-
 SpellList(berserk_cat_buff incarnation_king_of_the_jungle_buff berserk_cat) # berserk_cat_buff needs to apply to incarnation_king_of_the_jungle_buff as well
 Define(blessing_of_anshe_buff 202739)
 Define(blessing_of_elune 202737)
@@ -40,19 +34,6 @@ Define(blessing_of_the_ancients 202360)
 Define(bloodtalons 155672)
 Define(bloodtalons_buff 145152)
 	SpellInfo(bloodtalons_buff duration=30 max_stacks=2)
-
-
-
-
-
-
-
-
-
-
-
-
-
 Define(bristling_fur 155835)
 	SpellInfo(bristling_fur cd=40 gcd=0 offgcd=1)
 	SpellAddBuff(bristling_fur bristling_fur_buff=1)
@@ -74,14 +55,10 @@ Define(celestial_alignment 194223)
 Define(celestial_alignment_buff 194223)
 Define(clearcasting 135700)
 Define(clearcasting_buff 135700)
-
 	SpellInfo(clearcasting_buff duration=15)
-
 	#TODO Next spell have no energy cost
 Define(dash 1850)
 	SpellInfo(dash cd=180)
-
-
 	SpellInfo(dash to_stance=druid_cat_form if_stance=!druid_cat_form)
 Define(displacer_beast 102280)
 	SpellInfo(displacer_beast cd=30)
@@ -93,11 +70,7 @@ Define(elunes_guidance 202060)
 	SpellInfo(elunes_guidance cd=45 combo=5)
 Define(elunes_guidance_buff 202060)
 	#TODO 1 combo per s
-
 Define(entangling_roots 339)
-
-
-
 Define(ferocious_bite 22568)
 	SpellInfo(ferocious_bite combo=finisher energy=25 extra_energy=25 physical=1 stance=druid_cat_form)
 	SpellInfo(ferocious_bite buff_energy_half=berserk_cat_buff)
@@ -105,19 +78,12 @@ Define(ferocious_bite 22568)
 	SpellRequire(ferocious_bite energy -25=buff,clearcasting_buff if_spell=clearcasting itemset=T18 itemcount=4 specialization=feral)
 	SpellAddBuff(ferocious_bite bloodtalons_buff=-1)
 	SpellAddBuff(ferocious_bite clearcasting_buff=-1 if_spell=clearcasting)
-
-
-
 Define(force_of_nature 205636)
 	SpellInfo(force_of_nature cd=60)
 Define(frenzied_regeneration 22842)
-
-
-
 	SpellInfo(frenzied_regeneration cd=24)
 	SpellAddBuff(frenzied_regeneration frenzied_regeneration_debuff=1)
 Define(frenzied_regeneration_debuff 22842)
-
 Define(fury_of_elune 202770)
 	SpellInfo(fury_of_elune cd=90 astralpower=60)
 	SpellAddBuff(fury_of_elune fury_of_elune_up_buff=1)
@@ -127,20 +93,12 @@ Define(fury_of_elune_up_buff 202770)
 Define(full_moon 202771)	
 	SpellInfo(full_moon cd=15 astralpower=-40)
 Define(half_moon 202768)
-
 	SpellInfo(half_moon cd=15 astralpower=-20)
 Define(growl 6795)
-
-
-
-
-
 	SpellInfo(growl cd=8)
 Define(healing_touch 5185)
 	SpellInfo(healing_touch mana=9)
 	SpellAddBuff(healing_touch bloodtalons_buff=1 talent=bloodtalons_talent)
-
-
 Define(incapacitating_roar 99)
 	SpellInfo(incapacitating_roar cd=30)
 Define(incarnation_chosen_of_elune 102560)
@@ -158,8 +116,6 @@ Define(incarnation_son_of_ursoc 102558)
 	SpellAddBuff(incarnation_son_of_ursoc incarnation_son_of_ursoc_buff=1)
 Define(incarnation_son_of_ursoc_buff 102558)
 	SpellInfo(incarnation_son_of_ursoc_buff duration=30)
-
-
 Define(infected_wounds 48484)
 Define(innervate 29166)
 	SpellInfo(innervate cd=180)
@@ -177,32 +133,19 @@ Define(lunar_empowerment_buff 164547)
 Define(lunar_strike_balance 194153)
 	SpellInfo(lunar_strike_balance astralpower=-3 astralpower_more50=celestial_alignment_buff astralpower_more40=blessing_of_elune_buff)
 	SpellAddBuff(lunar_strike_balance lunar_empowerment_buff=0)
-
-
-
-
 Define(lunar_strike 197628)
 	SpellAddBuff(lunar_strike lunar_empowerment_buff=0)
 Define(maim 22570)
 	SpellInfo(maim cd=10 combo=finisher energy=35 interrupt=1 physical=1 stance=druid_cat_form)
 	SpellInfo(maim buff_energy_half=berserk_cat_buff)
 	SpellRequire(maim energy 0=buff,clearcasting_buff if_spell=clearcasting)
-
-
 Define(mangle 33917)
-
-
-
 	SpellInfo(mangle rage=-6 cd=6)
 Define(mark_of_ursol 192083)
 	SpellInfo(mark_of_ursol rage=45 cd=0.5)
 	SpellAddBuff(mark_of_ursol mark_of_ursol_buff=1)
 Define(mark_of_ursol_buff 192083)
 Define(mass_entanglement 102359)
-
-
-
-
 	SpellInfo(mass_entanglement cd=30)
 Define(maul 6807)
 	SpellInfo(maul cd=3 cd_haste=melee gcd=0 rage=20 stance=druid_bear_form)
@@ -217,17 +160,12 @@ Define(moonfire_cat 155625)
 	#SpellAddTargetDebuff(moonfire_cat moonfire_cat_debuff=1)
 Define(moonfire_cat_debuff 155625)
 	SpellInfo(moonfire_cat_debuff duration=14 haste=melee tick=2)
-
-
-
 Define(moonfire_debuff 164812)
 Define(moonfire_dmg_debuff 164812)
-
 Define(moonkin_form 24858)
 	SpellInfo(moonkin_form to_stance=druid_moonkin_form)
 	SpellInfo(moonkin_form unusable=1 if_stance=druid_moonkin_form)
 Define(new_moon 202767)
-
 	SpellInfo(new_moon cd=15 astralpower=-10)
 Define(omen_of_clarity 16864)
 Define(predatory_swiftness 16974)
@@ -246,7 +184,6 @@ Define(pulverize 80313)
 	SpellAddTargetDebuff(pulverize thrash_bear_debuff=-2)
 Define(pulverize_buff 158792)
 	SpellInfo(pulverize_buff duration=20)
-
 Define(rake 1822)
 	SpellInfo(rake combo=1 energy=35 stance=druid_cat_form)
 	SpellInfo(rake buff_energy_half=berserk_cat_buff)
@@ -268,23 +205,17 @@ Define(rake_debuff 155722)
 SpellList(improved_rake_buff incarnation_king_of_the_jungle_buff prowl_buff shadowmeld_buff)
 Define(rebirth 20484)
 	SpellAddBuff(rebirth predatory_swiftness_buff=0 if_spell=predatory_swiftness)
-
 Define(regrowth 8936)
 Define(rejuvenation 774)
 	SpellAddTargetBuff(rejuvenation rejuvenation_buff=1)
-
-
 Define(remove_corruption 2782)
 Define(renewal 108238)
 	SpellInfo(renewal cd=120 gcd=0 offgcd=1)
-
 Define(revive 50769)
 Define(rip 1079)
 	SpellInfo(rip combo=finisher energy=30 stance=druid_cat_form)
 	SpellInfo(rip buff_energy_half=berserk_cat_buff)
 	SpellRequire(rip energy 0=buff,clearcasting_buff if_spell=clearcasting)
-
-
 	#SpellAddTargetDebuff(rip rip_debuff=1)
 Define(rip_debuff 1079)
 	SpellInfo(rip_debuff duration=24 tick=2 talent=!jagged_wounds_talent)
@@ -316,7 +247,6 @@ Define(solar_beam 78675)
 Define(solar_wrath 190984)
 	SpellInfo(solar_wrath travel_time=1 astralpower=-6 astralpower_more40=blessing_of_elune_buff astralpower_more50=celestial_alignment_buff)
 	SpellAddBuff(solar_wrath solar_empowerment_buff=-1)
-
 Define(stampeding_roar 77761)
 	SpellInfo(stampeding_roar cd=120)
 Define(starfall 191034)
@@ -331,10 +261,6 @@ Define(starsurge_moonkin 78674)
 	SpellAddBuff(starsurge lunar_empowerment_buff=1)
 	SpellAddBuff(starsurge solar_empowerment_buff=1)
 Define(stellar_empowerment_debuff 197637)
-
-
-
-
 Define(stellar_flare 202347)
 	SpellInfo(stellar_flare astralpower=15)
 	SpellAddTargetDebuff(stellar_flare stellar_flare_debuff=1)
@@ -342,20 +268,11 @@ Define(stellar_flare_debuff 202347)
 	SpellInfo(stellar_flare_debuff duration=24 haste=spell tick=2)
 Define(sunfire 93402)
 	SpellAddTargetDebuff(sunfire sunfire_debuff=1)
-
 Define(sunfire_debuff 164815)
 	SpellInfo(sunfire_debuff duration=12)
-
 Define(sunfire_dmg_debuff 164815)
 Define(survival_instincts 61336)
 	SpellInfo(survival_instincts cd=120 gcd=0 offgcd=1)
-
-
-
-
-
-
-
 Define(swiftmend 18562)
 Define(swipe_cat 106785) # Artifact will reduce energy cost by 2 for every target with thrash_cat_debuff
 	SpellInfo(swipe_cat combo=1 energy=45 physical=1 stance=druid_cat_form)
@@ -364,8 +281,6 @@ Define(swipe_cat 106785) # Artifact will reduce energy cost by 2 for every targe
 	SpellAddBuff(swipe_cat bloodtalons_buff=-1 if_spell=bloodtalons)
 	SpellAddBuff(swipe_cat clearcasting_buff=-1 if_spell=clearcasting)
 Define(t18_class_trinket 124514)
-
-
 Define(tigers_fury 5217)
 	SpellInfo(tigers_fury cd=30 energy=-60 gcd=0 stance=druid_cat_form)
 
@@ -388,14 +303,11 @@ Define(thrash_cat 106830)
 Define(thrash_cat_debuff 106830)
 	SpellInfo(thrash_cat_debuff duration=15 tick=3 talent=!jagged_wounds_talent)
 	SpellInfo(thrash_cat_debuff duration=10.05 tick=2.01 talent=jagged_wounds_talent)
-
-
 Define(typhoon 132469)
 	SpellInfo(typhoon cd=30 interrupt=1)
 Define(warrior_of_elune 202425)
 Define(warrior_of_elune_buff 202425)
 	#TODO 2 Lunar strikes are instant
-
 Define(wild_charge 102401)
 	SpellInfo(wild_charge cd=15)
 	SpellInfo(wild_charge replace=wild_charge_bear if_stance=druid_bear_form)
@@ -404,10 +316,7 @@ Define(wild_charge_bear 16979)
 	SpellInfo(wild_charge_bear cd=15 stance=druid_bear_form)
 Define(wild_charge_cat 49376)
 	SpellInfo(wild_charge_cat cd=15 stance=druid_cat_form)
-
-
-
-
+	
 Define(astral_communion_talent 17)
 Define(balance_affinity_talent 7)
 Define(blessing_of_the_ancients_talent 18)
