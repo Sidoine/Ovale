@@ -282,11 +282,9 @@ Define(swipe_cat 106785) # Artifact will reduce energy cost by 2 for every targe
 Define(t18_class_trinket 124514)
 Define(tigers_fury 5217)
 	SpellInfo(tigers_fury cd=30 energy=-60 gcd=0 stance=druid_cat_form)
-
 	SpellAddBuff(tigers_fury tigers_fury_buff=1)
 Define(tigers_fury_buff 5217)
 	SpellInfo(tigers_fury duration=8)
-
 Define(thrash_bear 77758) # Applies the stacking debuff pulverize uses now
 	SpellInfo(thrash_bear rage=-4 cd=6 haste=melee stance=druid_bear_form)
 	SpellAddTargetDebuff(thrash_bear thrash_bear_debuff=1)
