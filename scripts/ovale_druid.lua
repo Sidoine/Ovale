@@ -791,7 +791,7 @@ AddFunction GuardianDefaultShortCdActions
 	unless { BuffExpires(ironfur_buff) or RageDeficit() < 25 } and Spell(ironfur)
 	{
 		#frenzied_regeneration,if=!ticking&incoming_damage_6s%health.max>0.25+(2-charges_fractional)*0.15
-		if not target.DebuffPresent(frenzied_regeneration_debuff) and IncomingDamage(6) / MaxHealth() > 0.25 + { 2 - Charges(frenzied_regeneration count=0) } * 0.15 Spell(frenzied_regeneration)
+		if not BuffPresent(frenzied_regeneration_buff) and IncomingDamage(6) / MaxHealth() > 0.25 + { 2 - Charges(frenzied_regeneration count=0) } * 0.15 Spell(frenzied_regeneration)
 
 		unless BuffExpires(pulverize_buff) and target.DebuffGain(lacerate_debuff) <= BaseDuration(lacerate_debuff) and Spell(pulverize) or Spell(mangle) or BuffRemaining(pulverize_buff) < GCD() and target.DebuffGain(lacerate_debuff) <= BaseDuration(lacerate_debuff) and Spell(pulverize)
 		{
@@ -897,7 +897,7 @@ AddIcon checkbox=opt_druid_guardian_aoe help=cd specialization=guardian
 # blood_fury_apsp
 # bristling_fur
 # frenzied_regeneration
-# frenzied_regeneration_debuff
+# frenzied_regeneration_buff
 # incarnation_son_of_ursoc
 # ironfur
 # ironfur_buff

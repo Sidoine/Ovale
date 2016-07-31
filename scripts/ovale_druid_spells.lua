@@ -309,6 +309,7 @@ Define(stellar_flare_debuff 152221)
 Define(sunfire 93402)
 	SpellAddTargetDebuff(sunfire sunfire_debuff=1)
 Define(sunfire_dmg_debuff 164815)
+Define(sunfire_debuff 164815)
 	SpellInfo(sunfire_debuff duration=12 haste=spell tick=2)
 Define(survival_instincts 61336) # 120 is correct for Feral; Bear is 240 and reduced by a talent by 33%
 	SpellInfo(survival_instincts cd=120 gcd=0 offgcd=1)

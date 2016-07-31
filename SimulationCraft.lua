@@ -1071,6 +1071,7 @@ local function InitializeDisambiguation()
 	AddDisambiguation("omen_of_clarity",		"omen_of_clarity_melee",		"DRUID",		"feral")
 	AddDisambiguation("rejuvenation_debuff",	"rejuvenation_buff",			"DRUID")
 	AddDisambiguation("starsurge",				"starsurge_moonkin",			"DRUID",		"balance")
+	AddDisambiguation("frenzied_regeneration_debuff", "frenzied_regeneration_buff", "DRUID", "guardian")
 	-- Hunter
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_focus",			"HUNTER")
 	AddDisambiguation("beast_cleave",			"pet_beast_cleave",				"HUNTER",		"beast_mastery")
@@ -2875,6 +2876,7 @@ do
 		["combo_points.max"]    = "MaxComboPoints()",
 		["cp_max_spend"]		= "MaxComboPoints()", -- TODO Difference with combo_points.max??
 		["crit_pct_current"]	= "SpellCritChance()",
+		["current_insanity_drain"] = "CurrentInsanityDrain()",
 		["demonic_fury"]		= "DemonicFury()",
 		["desired_targets"]		= "Enemies(tagged=1)",
 		["eclipse_change"]		= "TimeToEclipse()",	-- XXX
@@ -2907,6 +2909,7 @@ do
 		["rage"]				= "Rage()",
 		["rage.deficit"]		= "RageDeficit()",
 		["rage.max"]			= "MaxRage()",
+		["raw_haste_pct"]		= "SpellHaste()",
 		["runic_power"]			= "RunicPower()",
 		["runic_power.deficit"]	= "RunicPowerDeficit()",
 		["shadow_orb"]			= "ShadowOrbs()",

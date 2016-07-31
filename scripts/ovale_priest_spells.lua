@@ -141,6 +141,7 @@ Define(holy_word_serenity 88684)
 	SpellAddTargetBuff(holy_word_serenity renew_buff=refresh,buff,chakra_serenity_buff if_spell=chakra_serenity)
 Define(holy_word_serenity_buff 88684)
 	SpellInfo(holy_word_serenity_buff duration=6)
+Define(insanity_drain_stacks_buff 194249)
 Define(legacy_of_the_void_talent 19)
 Define(lightwell 126135)
 	SpellInfo(lightwell cd=180)
@@ -289,7 +290,6 @@ Define(void_bolt 205448)
 	SpellInfo(void_bolt cd=4.5 insanity=-16)
 	SpellAddTargetDebuff(void_bolt shadow_word_pain_debuff=refresh)
 	SpellAddTargetDebuff(void_bolt vampiric_touch_debuff=refresh)
-	# Replace void_eruption in void_form
 Define(void_entropy 155361)
 	SpellInfo(void_entropy shadoworbs=finisher min_shadoworbs=3)
 	SpellAddTargetDebuff(void_entropy void_entropy_debuff=1)
@@ -297,16 +297,16 @@ Define(void_entropy_debuff 155361)
 	SpellInfo(void_entropy_debuff duration=60 haste=spell tick=3)
 Define(void_entropy_talent 20)
 Define(void_eruption 228260)
-	SpellInfo(void_eruption cd=180)
-	SpellAddBuff(void_eruption unusable=1 voidform_buff=1)
-	SpellRequire(void_eruption unusable 0=insanity,100)
+	SpellInfo(void_eruption cd=180 insanity=100)
+	SpellAddBuff(void_eruption voidform_buff=1)
 	SpellRequire(void_eruption unusable 1=buff,voidform_buff)
+	SpellRequire(void_eruption replace void_bolt=buff,voidform_buff)
 Define(void_torrent 205065)
 	SpellInfo(void_torrent cd=60)
 	SpellRequire(void_torrent unusable 1=buff,voidform_buff)
 Define(void_torrent_buff 205065)
 # TODO Insanity does not drain during this buff
-Define(voidform_buff 228264)
+Define(voidform_buff 194249)
 Define(weakened_soul_debuff 6788)
 	SpellInfo(weakened_soul_debuff duration=15)
 	SpellInfo(weakened_soul_debuff addduration=-2 glyph=glyph_of_weakened_soul)
@@ -315,6 +315,12 @@ Define(weakened_soul_debuff 6788)
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(cascade_caster tag=shortcd)
 	SpellInfo(divine_star_caster tag=shortcd)
+
+AddFunction CurrentInsanityDrain {
+	if BuffPresent(void_torrent_buff) 0
+	if BuffPresent(voidform_buff) BuffStacks(voidform_buff)/2 + 9
+	0
+}
 ]]
 
 	OvaleScripts:RegisterScript("PRIEST", nil, name, desc, code, "include")

@@ -131,7 +131,7 @@ AddFunction ShadowMainShortCdActions
 AddFunction ShadowMainCdActions
 {
 	#surrender_to_madness,if=talent.surrender_to_madness.enabled&target.time_to_die<=90+((raw_haste_pct*100)*2)
-	if Talent(surrender_to_madness_talent) and target.TimeToDie() <= 90 + FIXME_raw_haste_pct * 100 * 2 Spell(surrender_to_madness)
+	if Talent(surrender_to_madness_talent) and target.TimeToDie() <= 90 + SpellHaste() * 100 * 2 Spell(surrender_to_madness)
 
 	unless Talent(mindbender_talent) and Spell(mindbender) or target.DebuffRemaining(shadow_word_pain_debuff) < { 3 + 4 / 3 } * GCD() and Spell(shadow_word_pain) or target.DebuffRemaining(vampiric_touch_debuff) < { 4 + 4 / 3 } * GCD() and Spell(vampiric_touch)
 	{
@@ -176,9 +176,9 @@ AddFunction ShadowS2mMainActions
 	#void_bolt
 	Spell(void_bolt)
 	#shadow_word_death,if=!talent.reaper_of_souls.enabled&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+30)<100
-	if not Talent(reaper_of_souls_talent) and FIXME_current_insanity_drain * GCD() > Insanity() and Insanity() - FIXME_current_insanity_drain * GCD() + 30 < 100 Spell(shadow_word_death)
+	if not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 30 < 100 Spell(shadow_word_death)
 	#shadow_word_death,if=talent.reaper_of_souls.enabled&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+90)<100
-	if Talent(reaper_of_souls_talent) and FIXME_current_insanity_drain * GCD() > Insanity() and Insanity() - FIXME_current_insanity_drain * GCD() + 90 < 100 Spell(shadow_word_death)
+	if Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 90 < 100 Spell(shadow_word_death)
 	#mind_blast
 	Spell(mind_blast)
 	#shadow_word_death,if=cooldown.shadow_word_death.charges=2
@@ -211,17 +211,17 @@ AddFunction ShadowS2mShortCdActions
 		#void_torrent
 		Spell(void_torrent)
 
-		unless not Talent(reaper_of_souls_talent) and FIXME_current_insanity_drain * GCD() > Insanity() and Insanity() - FIXME_current_insanity_drain * GCD() + 30 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and FIXME_current_insanity_drain * GCD() > Insanity() and Insanity() - FIXME_current_insanity_drain * GCD() + 90 < 100 and Spell(shadow_word_death) or Spell(mind_blast) or SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death)
+		unless not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 30 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 90 < 100 and Spell(shadow_word_death) or Spell(mind_blast) or SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death)
 		{
 			#shadow_word_void,if=(insanity-(current_insanity_drain*gcd.max)+75)<100
-			if Insanity() - FIXME_current_insanity_drain * GCD() + 75 < 100 Spell(shadow_word_void)
+			if Insanity() - CurrentInsanityDrain() * GCD() + 75 < 100 Spell(shadow_word_void)
 		}
 	}
 }
 
 AddFunction ShadowS2mShortCdPostConditions
 {
-	target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and Spell(void_bolt) or Spell(void_bolt) or not Talent(reaper_of_souls_talent) and FIXME_current_insanity_drain * GCD() > Insanity() and Insanity() - FIXME_current_insanity_drain * GCD() + 30 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and FIXME_current_insanity_drain * GCD() > Insanity() and Insanity() - FIXME_current_insanity_drain * GCD() + 90 < 100 and Spell(shadow_word_death) or Spell(mind_blast) or SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death) or not target.DebuffPresent(shadow_word_pain_debuff) and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and Spell(vampiric_touch) or not { SpellCooldown(void_bolt) < GCD() * 0.75 and SpellCooldown(void_bolt) > 0 } and { not Talent(mind_spike_talent) and Spell(mind_flay) or Talent(mind_spike_talent) and Spell(mind_spike) or Spell(shadow_word_pain) }
+	target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and Spell(void_bolt) or Spell(void_bolt) or not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 30 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 90 < 100 and Spell(shadow_word_death) or Spell(mind_blast) or SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death) or not target.DebuffPresent(shadow_word_pain_debuff) and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and Spell(vampiric_touch) or not { SpellCooldown(void_bolt) < GCD() * 0.75 and SpellCooldown(void_bolt) > 0 } and { not Talent(mind_spike_talent) and Spell(mind_flay) or Talent(mind_spike_talent) and Spell(mind_spike) or Spell(shadow_word_pain) }
 }
 
 AddFunction ShadowS2mCdActions
@@ -235,7 +235,7 @@ AddFunction ShadowS2mCdActions
 		#berserking,if=buff.voidform.stack>=10
 		if BuffStacks(voidform_buff) >= 10 Spell(berserking)
 
-		unless target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and Spell(void_bolt) or Spell(void_bolt) or Spell(void_torrent) or not Talent(reaper_of_souls_talent) and FIXME_current_insanity_drain * GCD() > Insanity() and Insanity() - FIXME_current_insanity_drain * GCD() + 30 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and FIXME_current_insanity_drain * GCD() > Insanity() and Insanity() - FIXME_current_insanity_drain * GCD() + 90 < 100 and Spell(shadow_word_death) or Spell(mind_blast) or SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death)
+		unless target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and Spell(void_bolt) or Spell(void_bolt) or Spell(void_torrent) or not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 30 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 90 < 100 and Spell(shadow_word_death) or Spell(mind_blast) or SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death)
 		{
 			#shadowfiend,if=!talent.mindbender.enabled,if=buff.voidform.stack>15
 			if BuffStacks(voidform_buff) > 15 Spell(shadowfiend)
@@ -245,7 +245,7 @@ AddFunction ShadowS2mCdActions
 
 AddFunction ShadowS2mCdPostConditions
 {
-	Talent(shadow_crash_talent) and Spell(shadow_crash) or Talent(mindbender_talent) and Spell(mindbender) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and Spell(void_bolt) or Spell(void_bolt) or Spell(void_torrent) or not Talent(reaper_of_souls_talent) and FIXME_current_insanity_drain * GCD() > Insanity() and Insanity() - FIXME_current_insanity_drain * GCD() + 30 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and FIXME_current_insanity_drain * GCD() > Insanity() and Insanity() - FIXME_current_insanity_drain * GCD() + 90 < 100 and Spell(shadow_word_death) or Spell(mind_blast) or SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death) or Insanity() - FIXME_current_insanity_drain * GCD() + 75 < 100 and Spell(shadow_word_void) or not target.DebuffPresent(shadow_word_pain_debuff) and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and Spell(vampiric_touch) or not { SpellCooldown(void_bolt) < GCD() * 0.75 and SpellCooldown(void_bolt) > 0 } and { not Talent(mind_spike_talent) and Spell(mind_flay) or Talent(mind_spike_talent) and Spell(mind_spike) or Spell(shadow_word_pain) }
+	Talent(shadow_crash_talent) and Spell(shadow_crash) or Talent(mindbender_talent) and Spell(mindbender) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and Spell(void_bolt) or Spell(void_bolt) or Spell(void_torrent) or not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 30 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 90 < 100 and Spell(shadow_word_death) or Spell(mind_blast) or SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death) or Insanity() - CurrentInsanityDrain() * GCD() + 75 < 100 and Spell(shadow_word_void) or not target.DebuffPresent(shadow_word_pain_debuff) and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and Spell(vampiric_touch) or not { SpellCooldown(void_bolt) < GCD() * 0.75 and SpellCooldown(void_bolt) > 0 } and { not Talent(mind_spike_talent) and Spell(mind_flay) or Talent(mind_spike_talent) and Spell(mind_spike) or Spell(shadow_word_pain) }
 }
 
 ### actions.vf
@@ -257,9 +257,9 @@ AddFunction ShadowVfMainActions
 	#void_bolt
 	Spell(void_bolt)
 	#shadow_word_death,if=!talent.reaper_of_souls.enabled&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+10)<100
-	if not Talent(reaper_of_souls_talent) and FIXME_current_insanity_drain * GCD() > Insanity() and Insanity() - FIXME_current_insanity_drain * GCD() + 10 < 100 Spell(shadow_word_death)
+	if not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 10 < 100 Spell(shadow_word_death)
 	#shadow_word_death,if=talent.reaper_of_souls.enabled&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+30)<100
-	if Talent(reaper_of_souls_talent) and FIXME_current_insanity_drain * GCD() > Insanity() and Insanity() - FIXME_current_insanity_drain * GCD() + 30 < 100 Spell(shadow_word_death)
+	if Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 30 < 100 Spell(shadow_word_death)
 	#mind_blast
 	Spell(mind_blast)
 	#shadow_word_death,if=cooldown.shadow_word_death.charges=2
@@ -292,23 +292,23 @@ AddFunction ShadowVfShortCdActions
 		#void_torrent
 		Spell(void_torrent)
 
-		unless not Talent(reaper_of_souls_talent) and FIXME_current_insanity_drain * GCD() > Insanity() and Insanity() - FIXME_current_insanity_drain * GCD() + 10 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and FIXME_current_insanity_drain * GCD() > Insanity() and Insanity() - FIXME_current_insanity_drain * GCD() + 30 < 100 and Spell(shadow_word_death) or Spell(mind_blast) or SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death)
+		unless not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 10 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 30 < 100 and Spell(shadow_word_death) or Spell(mind_blast) or SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death)
 		{
 			#shadow_word_void,if=(insanity-(current_insanity_drain*gcd.max)+25)<100
-			if Insanity() - FIXME_current_insanity_drain * GCD() + 25 < 100 Spell(shadow_word_void)
+			if Insanity() - CurrentInsanityDrain() * GCD() + 25 < 100 Spell(shadow_word_void)
 		}
 	}
 }
 
 AddFunction ShadowVfShortCdPostConditions
 {
-	target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and Spell(void_bolt) or Spell(void_bolt) or not Talent(reaper_of_souls_talent) and FIXME_current_insanity_drain * GCD() > Insanity() and Insanity() - FIXME_current_insanity_drain * GCD() + 10 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and FIXME_current_insanity_drain * GCD() > Insanity() and Insanity() - FIXME_current_insanity_drain * GCD() + 30 < 100 and Spell(shadow_word_death) or Spell(mind_blast) or SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death) or not target.DebuffPresent(shadow_word_pain_debuff) and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and Spell(vampiric_touch) or not { SpellCooldown(void_bolt) < GCD() * 0.75 and SpellCooldown(void_bolt) > 0 } and { not Talent(mind_spike_talent) and Spell(mind_flay) or Talent(mind_spike_talent) and Spell(mind_spike) or Spell(shadow_word_pain) }
+	target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and Spell(void_bolt) or Spell(void_bolt) or not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 10 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 30 < 100 and Spell(shadow_word_death) or Spell(mind_blast) or SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death) or not target.DebuffPresent(shadow_word_pain_debuff) and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and Spell(vampiric_touch) or not { SpellCooldown(void_bolt) < GCD() * 0.75 and SpellCooldown(void_bolt) > 0 } and { not Talent(mind_spike_talent) and Spell(mind_flay) or Talent(mind_spike_talent) and Spell(mind_spike) or Spell(shadow_word_pain) }
 }
 
 AddFunction ShadowVfCdActions
 {
 	#surrender_to_madness,if=talent.surrender_to_madness.enabled&insanity>=25&(cooldown.void_bolt.up|cooldown.void_torrent.up|cooldown.shadow_word_death.up|buff.shadowy_insight.up)&target.time_to_die<=90+((raw_haste_pct*100)*2)-buff.insanity_drain_stacks.stack
-	if Talent(surrender_to_madness_talent) and Insanity() >= 25 and { not SpellCooldown(void_bolt) > 0 or not SpellCooldown(void_torrent) > 0 or not SpellCooldown(shadow_word_death) > 0 or BuffPresent(shadowy_insight_buff) } and target.TimeToDie() <= 90 + FIXME_raw_haste_pct * 100 * 2 - BuffStacks(insanity_drain_stacks_buff) Spell(surrender_to_madness)
+	if Talent(surrender_to_madness_talent) and Insanity() >= 25 and { not SpellCooldown(void_bolt) > 0 or not SpellCooldown(void_torrent) > 0 or not SpellCooldown(shadow_word_death) > 0 or BuffPresent(shadowy_insight_buff) } and target.TimeToDie() <= 90 + SpellHaste() * 100 * 2 - BuffStacks(insanity_drain_stacks_buff) Spell(surrender_to_madness)
 
 	unless Talent(shadow_crash_talent) and Spell(shadow_crash) or Talent(mindbender_talent) and Spell(mindbender)
 	{
@@ -319,7 +319,7 @@ AddFunction ShadowVfCdActions
 		#berserking,if=buff.voidform.stack>=10&buff.insanity_drain_stacks.stack<=20
 		if BuffStacks(voidform_buff) >= 10 and BuffStacks(insanity_drain_stacks_buff) <= 20 Spell(berserking)
 
-		unless target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and Spell(void_bolt) or Spell(void_bolt) or Spell(void_torrent) or not Talent(reaper_of_souls_talent) and FIXME_current_insanity_drain * GCD() > Insanity() and Insanity() - FIXME_current_insanity_drain * GCD() + 10 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and FIXME_current_insanity_drain * GCD() > Insanity() and Insanity() - FIXME_current_insanity_drain * GCD() + 30 < 100 and Spell(shadow_word_death) or Spell(mind_blast) or SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death)
+		unless target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and Spell(void_bolt) or Spell(void_bolt) or Spell(void_torrent) or not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 10 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 30 < 100 and Spell(shadow_word_death) or Spell(mind_blast) or SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death)
 		{
 			#shadowfiend,if=!talent.mindbender.enabled,if=buff.voidform.stack>15
 			if BuffStacks(voidform_buff) > 15 Spell(shadowfiend)
@@ -329,7 +329,7 @@ AddFunction ShadowVfCdActions
 
 AddFunction ShadowVfCdPostConditions
 {
-	Talent(shadow_crash_talent) and Spell(shadow_crash) or Talent(mindbender_talent) and Spell(mindbender) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and Spell(void_bolt) or Spell(void_bolt) or Spell(void_torrent) or not Talent(reaper_of_souls_talent) and FIXME_current_insanity_drain * GCD() > Insanity() and Insanity() - FIXME_current_insanity_drain * GCD() + 10 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and FIXME_current_insanity_drain * GCD() > Insanity() and Insanity() - FIXME_current_insanity_drain * GCD() + 30 < 100 and Spell(shadow_word_death) or Spell(mind_blast) or SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death) or Insanity() - FIXME_current_insanity_drain * GCD() + 25 < 100 and Spell(shadow_word_void) or not target.DebuffPresent(shadow_word_pain_debuff) and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and Spell(vampiric_touch) or not { SpellCooldown(void_bolt) < GCD() * 0.75 and SpellCooldown(void_bolt) > 0 } and { not Talent(mind_spike_talent) and Spell(mind_flay) or Talent(mind_spike_talent) and Spell(mind_spike) or Spell(shadow_word_pain) }
+	Talent(shadow_crash_talent) and Spell(shadow_crash) or Talent(mindbender_talent) and Spell(mindbender) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and Spell(void_bolt) or Spell(void_bolt) or Spell(void_torrent) or not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 10 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 30 < 100 and Spell(shadow_word_death) or Spell(mind_blast) or SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death) or Insanity() - CurrentInsanityDrain() * GCD() + 25 < 100 and Spell(shadow_word_void) or not target.DebuffPresent(shadow_word_pain_debuff) and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and Spell(vampiric_touch) or not { SpellCooldown(void_bolt) < GCD() * 0.75 and SpellCooldown(void_bolt) > 0 } and { not Talent(mind_spike_talent) and Spell(mind_flay) or Talent(mind_spike_talent) and Spell(mind_spike) or Spell(shadow_word_pain) }
 }
 
 ### Shadow icons.
