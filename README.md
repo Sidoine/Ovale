@@ -5,13 +5,13 @@ It displays one or more icons that show the cooldown of an action.  The action i
 The current release of Ovale provides default scripts for the following classes for *Legion*:
 Note that these are *work in progress*. More support is coming soon and there may be bugs.
 
-- Death Knight: None
-- Druid: Feral, Guardian
+- Death Knight: Forst, Unholy
+- Druid: Balance, Feral, Guardian
 - Hunter: Beast Mastery, Marksmanship, Survival
 - Mage: Arcane, Fire, Frost
-- Monk: Brewmaster, Windwalker
+- Monk: Mistweaver, Windwalker
 - Paladin: Retribution
-- Priest: None
+- Priest: Shadow
 - Rogue: Assassination, Outlaw, Subtlety
 - Shaman: Elemental, Enhancement
 - Warlock: Affliction, Demonology, Destruction
