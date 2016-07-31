@@ -2406,6 +2406,10 @@ EmitModifier = function(modifier, parseNode, nodeList, annotation, action)
 
 	if modifier == "if" then
 		node = Emit(parseNode, nodeList, annotation, action)
+	elseif modifier == "target_if" then
+		-- TODO In fact, it asks to change the target to a target that fullfill this condition
+		-- Because it is not supported, for now just apply the condition to the current target
+		node = Emit(parseNode, nodeList, annotation, action)
 	elseif modifier == "five_stacks" and action == "focus_fire" then
 		local value = tonumber(Unparse(parseNode))
 		if value == 1 then

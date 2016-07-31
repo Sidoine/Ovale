@@ -97,14 +97,14 @@ AddFunction FrostDualWieldBosMainActions
 	#call_action_list,name=core
 	FrostDualWieldCoreMainActions()
 	#howling_blast,target_if=!dot.frost_fever.ticking
-	Spell(howling_blast)
+	if not target.DebuffPresent(frost_fever_debuff) Spell(howling_blast)
 	#howling_blast,if=buff.rime.react
 	if BuffPresent(rime_buff) Spell(howling_blast)
 }
 
 AddFunction FrostDualWieldBosShortCdActions
 {
-	unless FrostDualWieldCoreShortCdPostConditions() or Spell(howling_blast)
+	unless FrostDualWieldCoreShortCdPostConditions() or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast)
 	{
 		#horn_of_winter
 		if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
@@ -113,12 +113,12 @@ AddFunction FrostDualWieldBosShortCdActions
 
 AddFunction FrostDualWieldBosShortCdPostConditions
 {
-	FrostDualWieldCoreShortCdPostConditions() or Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast)
+	FrostDualWieldCoreShortCdPostConditions() or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast)
 }
 
 AddFunction FrostDualWieldBosCdActions
 {
-	unless FrostDualWieldCoreCdPostConditions() or Spell(howling_blast) or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
+	unless FrostDualWieldCoreCdPostConditions() or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
 	{
 		#empower_rune_weapon
 		Spell(empower_rune_weapon)
@@ -129,7 +129,7 @@ AddFunction FrostDualWieldBosCdActions
 
 AddFunction FrostDualWieldBosCdPostConditions
 {
-	FrostDualWieldCoreCdPostConditions() or Spell(howling_blast) or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or BuffPresent(rime_buff) and Spell(howling_blast)
+	FrostDualWieldCoreCdPostConditions() or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or BuffPresent(rime_buff) and Spell(howling_blast)
 }
 
 ### actions.core
@@ -167,7 +167,7 @@ AddFunction FrostDualWieldCoreCdPostConditions
 AddFunction FrostDualWieldGenericMainActions
 {
 	#howling_blast,target_if=!dot.frost_fever.ticking
-	Spell(howling_blast)
+	if not target.DebuffPresent(frost_fever_debuff) Spell(howling_blast)
 	#howling_blast,if=buff.rime.react
 	if BuffPresent(rime_buff) Spell(howling_blast)
 	#frost_strike,if=runic_power>=80
@@ -182,7 +182,7 @@ AddFunction FrostDualWieldGenericMainActions
 
 AddFunction FrostDualWieldGenericShortCdActions
 {
-	unless Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike)
+	unless not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike)
 	{
 		unless FrostDualWieldCoreShortCdPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and Spell(frost_strike) or not Talent(breath_of_sindragosa_talent) and Spell(frost_strike)
 		{
@@ -196,7 +196,7 @@ AddFunction FrostDualWieldGenericShortCdActions
 
 AddFunction FrostDualWieldGenericCdActions
 {
-	unless Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike)
+	unless not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike)
 	{
 		unless FrostDualWieldCoreCdPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and Spell(frost_strike) or not Talent(breath_of_sindragosa_talent) and Spell(frost_strike) or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
 		{
@@ -272,6 +272,7 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # breath_of_sindragosa_talent
 # draenic_strength_potion
 # empower_rune_weapon
+# frost_fever_debuff
 # frost_strike
 # frostscythe
 # frozen_pulse_talent
@@ -385,14 +386,14 @@ AddFunction FrostTwoHanderBosMainActions
 	#call_action_list,name=core
 	FrostTwoHanderCoreMainActions()
 	#howling_blast,target_if=!dot.frost_fever.ticking
-	Spell(howling_blast)
+	if not target.DebuffPresent(frost_fever_debuff) Spell(howling_blast)
 	#howling_blast,if=buff.rime.react
 	if BuffPresent(rime_buff) Spell(howling_blast)
 }
 
 AddFunction FrostTwoHanderBosShortCdActions
 {
-	unless FrostTwoHanderCoreShortCdPostConditions() or Spell(howling_blast)
+	unless FrostTwoHanderCoreShortCdPostConditions() or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast)
 	{
 		#horn_of_winter
 		if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
@@ -401,12 +402,12 @@ AddFunction FrostTwoHanderBosShortCdActions
 
 AddFunction FrostTwoHanderBosShortCdPostConditions
 {
-	FrostTwoHanderCoreShortCdPostConditions() or Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast)
+	FrostTwoHanderCoreShortCdPostConditions() or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast)
 }
 
 AddFunction FrostTwoHanderBosCdActions
 {
-	unless FrostTwoHanderCoreCdPostConditions() or Spell(howling_blast) or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
+	unless FrostTwoHanderCoreCdPostConditions() or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
 	{
 		#empower_rune_weapon
 		Spell(empower_rune_weapon)
@@ -417,7 +418,7 @@ AddFunction FrostTwoHanderBosCdActions
 
 AddFunction FrostTwoHanderBosCdPostConditions
 {
-	FrostTwoHanderCoreCdPostConditions() or Spell(howling_blast) or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or BuffPresent(rime_buff) and Spell(howling_blast)
+	FrostTwoHanderCoreCdPostConditions() or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or BuffPresent(rime_buff) and Spell(howling_blast)
 }
 
 ### actions.core
@@ -455,7 +456,7 @@ AddFunction FrostTwoHanderCoreCdPostConditions
 AddFunction FrostTwoHanderGenericMainActions
 {
 	#howling_blast,target_if=!dot.frost_fever.ticking
-	Spell(howling_blast)
+	if not target.DebuffPresent(frost_fever_debuff) Spell(howling_blast)
 	#howling_blast,if=buff.rime.react
 	if BuffPresent(rime_buff) Spell(howling_blast)
 	#frost_strike,if=runic_power>=80
@@ -470,7 +471,7 @@ AddFunction FrostTwoHanderGenericMainActions
 
 AddFunction FrostTwoHanderGenericShortCdActions
 {
-	unless Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike)
+	unless not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike)
 	{
 		unless FrostTwoHanderCoreShortCdPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and Spell(frost_strike) or not Talent(breath_of_sindragosa_talent) and Spell(frost_strike)
 		{
@@ -484,7 +485,7 @@ AddFunction FrostTwoHanderGenericShortCdActions
 
 AddFunction FrostTwoHanderGenericCdActions
 {
-	unless Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike)
+	unless not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike)
 	{
 		unless FrostTwoHanderCoreCdPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and Spell(frost_strike) or not Talent(breath_of_sindragosa_talent) and Spell(frost_strike) or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
 		{
@@ -560,6 +561,7 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # breath_of_sindragosa_talent
 # draenic_strength_potion
 # empower_rune_weapon
+# frost_fever_debuff
 # frost_strike
 # frostscythe
 # frozen_pulse_talent
@@ -613,7 +615,7 @@ AddFunction UnholyGetInMeleeRange
 AddFunction UnholyDefaultMainActions
 {
 	#outbreak,target_if=!dot.virulent_plague.ticking
-	Spell(outbreak)
+	if not target.DebuffPresent(virulent_plague_debuff) Spell(outbreak)
 	#run_action_list,name=valkyr,if=talent.dark_arbiter.enabled&pet.valkyr_battlemaiden.active
 	if Talent(dark_arbiter_talent) and pet.Present() UnholyValkyrMainActions()
 	#call_action_list,name=generic
@@ -625,7 +627,7 @@ AddFunction UnholyDefaultShortCdActions
 	#auto_attack
 	UnholyGetInMeleeRange()
 
-	unless Spell(outbreak)
+	unless not target.DebuffPresent(virulent_plague_debuff) and Spell(outbreak)
 	{
 		#dark_transformation
 		Spell(dark_transformation)
@@ -657,7 +659,7 @@ AddFunction UnholyDefaultCdActions
 	#potion,name=draenic_strength,if=cooldown.dark_arbiter.remains>165&talent.dark_arbiter.enabled
 	if SpellCooldown(dark_arbiter) > 165 and Talent(dark_arbiter_talent) UnholyUsePotionStrength()
 
-	unless Spell(outbreak) or Spell(dark_transformation) or Spell(blighted_rune_weapon)
+	unless not target.DebuffPresent(virulent_plague_debuff) and Spell(outbreak) or Spell(dark_transformation) or Spell(blighted_rune_weapon)
 	{
 		unless Talent(dark_arbiter_talent) and pet.Present() and UnholyValkyrCdPostConditions()
 		{
@@ -904,6 +906,7 @@ AddIcon checkbox=opt_deathknight_unholy_aoe help=cd specialization=unholy
 # summon_gargoyle
 # unholy_strength_buff
 # valkyr_battlemaiden
+# virulent_plague_debuff
 ]]
 	OvaleScripts:RegisterScript("DEATHKNIGHT", "unholy", name, desc, code, "script")
 end

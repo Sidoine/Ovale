@@ -110,17 +110,17 @@ AddFunction ElementalAoeMainActions
 	#earthquake_totem
 	Spell(earthquake_totem)
 	#lava_beam,target_if=!debuff.lightning_rod.up
-	Spell(lava_beam)
+	if not target.DebuffPresent(lightning_rod_debuff) Spell(lava_beam)
 	#lava_beam
 	Spell(lava_beam)
 	#chain_lightning,target_if=!debuff.lightning_rod.up
-	Spell(chain_lightning)
+	if not target.DebuffPresent(lightning_rod_debuff) Spell(chain_lightning)
 	#chain_lightning
 	Spell(chain_lightning)
 	#lava_burst,moving=1
 	if Speed() > 0 Spell(lava_burst)
 	#flame_shock,moving=1,target_if=refreshable
-	if Speed() > 0 Spell(flame_shock)
+	if Speed() > 0 and target.Refreshable(flame_shock_debuff) Spell(flame_shock)
 }
 
 AddFunction ElementalAoeShortCdActions
@@ -133,7 +133,7 @@ AddFunction ElementalAoeShortCdActions
 
 AddFunction ElementalAoeShortCdPostConditions
 {
-	Spell(earthquake_totem) or Spell(lava_beam) or Spell(lava_beam) or Spell(chain_lightning) or Spell(chain_lightning) or Speed() > 0 and Spell(lava_burst) or Speed() > 0 and Spell(flame_shock)
+	Spell(earthquake_totem) or not target.DebuffPresent(lightning_rod_debuff) and Spell(lava_beam) or Spell(lava_beam) or not target.DebuffPresent(lightning_rod_debuff) and Spell(chain_lightning) or Spell(chain_lightning) or Speed() > 0 and Spell(lava_burst) or Speed() > 0 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock)
 }
 
 AddFunction ElementalAoeCdActions
@@ -147,7 +147,7 @@ AddFunction ElementalAoeCdActions
 
 AddFunction ElementalAoeCdPostConditions
 {
-	Spell(stormkeeper) or Spell(liquid_magma_totem) or Spell(earthquake_totem) or Spell(lava_beam) or Spell(lava_beam) or Spell(chain_lightning) or Spell(chain_lightning) or Speed() > 0 and Spell(lava_burst) or Speed() > 0 and Spell(flame_shock)
+	Spell(stormkeeper) or Spell(liquid_magma_totem) or Spell(earthquake_totem) or not target.DebuffPresent(lightning_rod_debuff) and Spell(lava_beam) or Spell(lava_beam) or not target.DebuffPresent(lightning_rod_debuff) and Spell(chain_lightning) or Spell(chain_lightning) or Speed() > 0 and Spell(lava_burst) or Speed() > 0 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock)
 }
 
 ### actions.precombat
@@ -205,21 +205,21 @@ AddFunction ElementalSingleMainActions
 	#icefury,if=maelstrom<=70&raid_event.movement.in>30&((talent.ascendance.enabled&cooldown.ascendance.remains>buff.icefury.duration)|!talent.ascendance.enabled)
 	if Maelstrom() <= 70 and 600 > 30 and { Talent(ascendance_talent) and SpellCooldown(ascendance_caster) > BaseDuration(icefury_buff) or not Talent(ascendance_talent) } Spell(icefury)
 	#lava_beam,if=active_enemies>1&spell_targets.lava_beam>1,target_if=!debuff.lightning_rod.up
-	if Enemies() > 1 and Enemies() > 1 Spell(lava_beam)
+	if Enemies() > 1 and Enemies() > 1 and not target.DebuffPresent(lightning_rod_debuff) Spell(lava_beam)
 	#lava_beam,if=active_enemies>1&spell_targets.lava_beam>1
 	if Enemies() > 1 and Enemies() > 1 Spell(lava_beam)
 	#chain_lightning,if=active_enemies>1&spell_targets.chain_lightning>1,target_if=!debuff.lightning_rod.up
-	if Enemies() > 1 and Enemies() > 1 Spell(chain_lightning)
+	if Enemies() > 1 and Enemies() > 1 and not target.DebuffPresent(lightning_rod_debuff) Spell(chain_lightning)
 	#chain_lightning,if=active_enemies>1&spell_targets.chain_lightning>1
 	if Enemies() > 1 and Enemies() > 1 Spell(chain_lightning)
 	#lightning_bolt,target_if=!debuff.lightning_rod.up
-	Spell(lightning_bolt)
+	if not target.DebuffPresent(lightning_rod_debuff) Spell(lightning_bolt)
 	#lightning_bolt
 	Spell(lightning_bolt)
 	#frost_shock,if=maelstrom>=20&dot.flame_shock.remains>19
 	if Maelstrom() >= 20 and target.DebuffRemaining(flame_shock_debuff) > 19 Spell(frost_shock)
 	#flame_shock,moving=1,target_if=refreshable
-	if Speed() > 0 Spell(flame_shock)
+	if Speed() > 0 and target.Refreshable(flame_shock_debuff) Spell(flame_shock)
 	#flame_shock,moving=1
 	if Speed() > 0 Spell(flame_shock)
 }
@@ -317,6 +317,7 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 # lava_burst
 # legendary_ring_intellect
 # lightning_bolt
+# lightning_rod_debuff
 # liquid_magma_totem
 # quaking_palm
 # resonance_totem_buff
