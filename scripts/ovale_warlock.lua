@@ -270,14 +270,6 @@ AddFunction DemonologyUsePotionIntellect
 
 ### actions.default
 
-AddIcon {
-	SoulShards()
-}
-
-AddIcon {
-	if SoulShards() >= 1 Spell(hand_of_guldan)
-}
-
 AddFunction DemonologyDefaultMainActions
 {
 	#doom,if=talent.soul_harvest.enabled&!cooldown.soul_harvest.remains&!remains

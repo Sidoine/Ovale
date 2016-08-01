@@ -1796,9 +1796,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 				be toggled for that specialization.
 			--]]
 			annotation.vanish = class
-			local spellName = "preparation"
-			AddSymbol(annotation, spellName)
-			conditionCode = format("CheckBoxOn(opt_vanish) or not SpellCooldown(%s) > 0", spellName)
+			conditionCode = format("CheckBoxOn(opt_vanish)", spellName)
 		elseif class == "SHAMAN" and strsub(action, 1, 11) == "ascendance_" then
 			-- Ascendance doesn't go on cooldown until after the buff expires, so don't
 			-- suggest Ascendance if already in Ascendance.

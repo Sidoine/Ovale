@@ -107,9 +107,9 @@ AddFunction AssassinationCdsShortCdActions
 	#marked_for_death,cycle_targets=1,target_if=min:target.time_to_die,if=combo_points.deficit>=5
 	if ComboPointsDeficit() >= 5 Spell(marked_for_death)
 	#vanish,if=talent.subterfuge.enabled&combo_points<=2&!dot.rupture.exsanguinated
-	if Talent(subterfuge_talent) and ComboPoints() <= 2 and not target.DebuffRemaining(rupture_debuff_exsanguinated) and { CheckBoxOn(opt_vanish) or not SpellCooldown(preparation) > 0 } Spell(vanish)
+	if Talent(subterfuge_talent) and ComboPoints() <= 2 and not target.DebuffRemaining(rupture_debuff_exsanguinated) and CheckBoxOn(opt_vanish) Spell(vanish)
 	#vanish,if=talent.shadow_focus.enabled&!dot.rupture.exsanguinated&combo_points.deficit>=2
-	if Talent(shadow_focus_talent) and not target.DebuffRemaining(rupture_debuff_exsanguinated) and ComboPointsDeficit() >= 2 and { CheckBoxOn(opt_vanish) or not SpellCooldown(preparation) > 0 } Spell(vanish)
+	if Talent(shadow_focus_talent) and not target.DebuffRemaining(rupture_debuff_exsanguinated) and ComboPointsDeficit() >= 2 and CheckBoxOn(opt_vanish) Spell(vanish)
 }
 
 AddFunction AssassinationCdsCdActions
@@ -156,7 +156,7 @@ AddFunction AssassinationExsangComboMainActions
 AddFunction AssassinationExsangComboShortCdActions
 {
 	#vanish,if=talent.nightstalker.enabled&combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1&gcd.remains=0&energy>=25
-	if Talent(nightstalker_talent) and ComboPoints() >= MaxComboPoints() and SpellCooldown(exsanguinate) < 1 and not GCDRemaining() > 0 and Energy() >= 25 and { CheckBoxOn(opt_vanish) or not SpellCooldown(preparation) > 0 } Spell(vanish)
+	if Talent(nightstalker_talent) and ComboPoints() >= MaxComboPoints() and SpellCooldown(exsanguinate) < 1 and not GCDRemaining() > 0 and Energy() >= 25 and CheckBoxOn(opt_vanish) Spell(vanish)
 
 	unless ComboPoints() >= MaxComboPoints() and { BuffPresent(vanish_buff) or SpellCooldown(vanish) > 15 } and SpellCooldown(exsanguinate) < 1 and Spell(rupture)
 	{
@@ -318,7 +318,6 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # marked_for_death
 # mutilate
 # nightstalker_talent
-# preparation
 # rupture
 # rupture_debuff
 # shadow_focus_talent
