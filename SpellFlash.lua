@@ -294,7 +294,7 @@ function OvaleSpellFlash:Flash(state, node, element, start, now)
 			local interrupt = spellInfo and spellInfo.interrupt
 
 			-- Flash color.
-			local color = COLORTABLE["white"]
+			local color = nil -- default color is white
 			local flash = element.namedParams and element.namedParams.flash
 			local iconFlash = node.namedParams.flash
 			local iconHelp = node.namedParams.help

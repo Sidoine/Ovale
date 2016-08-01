@@ -270,6 +270,14 @@ AddFunction DemonologyUsePotionIntellect
 
 ### actions.default
 
+AddIcon {
+	SoulShards()
+}
+
+AddIcon {
+	if SoulShards() >= 1 Spell(hand_of_guldan)
+}
+
 AddFunction DemonologyDefaultMainActions
 {
 	#doom,if=talent.soul_harvest.enabled&!cooldown.soul_harvest.remains&!remains
@@ -279,7 +287,7 @@ AddFunction DemonologyDefaultMainActions
 	#hand_of_guldan,if=soul_shard>=1
 	if SoulShards() >= 1 Spell(hand_of_guldan)
 	#demonic_empowerment,if=wild_imp_no_de>=5
-	if FIXME_wild_imp_no_de >= 5 Spell(demonic_empowerment)
+	if 0 >= 5 Spell(demonic_empowerment)
 	#doom,if=talent.impending_doom.enabled&remains<=duration*0.3
 	if Talent(impending_doom_talent) and target.DebuffRemaining(doom_debuff) <= BaseDuration(doom_debuff) * 0.3 Spell(doom)
 	#demonbolt

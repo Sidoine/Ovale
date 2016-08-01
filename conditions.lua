@@ -2936,7 +2936,7 @@ do
 	-- if SoulShards(more 0) Spell(summon_felhunter)
 
 	local function SoulShards(positionalParams, namedParams, state, atTime)
-		return Power("shards", positionalParams, namedParams, state, atTime)
+		return Power("soulshards", positionalParams, namedParams, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("alternatepower", false, AlternatePower)
@@ -3144,7 +3144,7 @@ do
 	-- @return A boolean value for the result of the comparison.
 
 	local function SoulShardsDeficit(positionalParams, namedParams, state, atTime)
-		return PowerDeficit("shards", positionalParams, namedParams, state, atTime)
+		return PowerDeficit("soulshards", positionalParams, namedParams, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("alternatepowerdeficit", false, AlternatePowerDeficit)
@@ -3350,7 +3350,7 @@ do
 	-- @return A boolean value for the result of the comparison.
 
 	local function MaxSoulShards(positionalParams, namedParams, state, atTime)
-		return MaxPower("shards", positionalParams, namedParams, state, atTime)
+		return MaxPower("soulshards", positionalParams, namedParams, state, atTime)
 	end
 
 	OvaleCondition:RegisterCondition("maxalternatepower", false, MaxAlternatePower)

@@ -2923,6 +2923,7 @@ do
 		["time_to_die"]			= "TimeToDie()",
 		["time_to_die.remains"]	= "TimeToDie()",
 		["unholy.frac"]			= "Rune(unholy)",
+		["wild_imp_no_de"]		= "0" -- TODO
 	}
 
 	EmitOperandCharacter = function(operand, parseNode, nodeList, annotation, action, target)
