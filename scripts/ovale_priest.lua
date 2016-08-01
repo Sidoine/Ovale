@@ -130,8 +130,8 @@ AddFunction ShadowMainShortCdActions
 
 AddFunction ShadowMainCdActions
 {
-	#surrender_to_madness,if=talent.surrender_to_madness.enabled&target.time_to_die<=90+((raw_haste_pct*100)*2)
-	if Talent(surrender_to_madness_talent) and target.TimeToDie() <= 90 + SpellHaste() * 100 * 2 Spell(surrender_to_madness)
+	#surrender_to_madness,if=talent.surrender_to_madness.enabled&target.health.pct<30
+	if Talent(surrender_to_madness_talent) and target.HealthPercent() < 30 Spell(surrender_to_madness)
 
 	unless Talent(mindbender_talent) and Spell(mindbender) or target.DebuffRemaining(shadow_word_pain_debuff) < { 3 + 4 / 3 } * GCD() and Spell(shadow_word_pain) or target.DebuffRemaining(vampiric_touch_debuff) < { 4 + 4 / 3 } * GCD() and Spell(vampiric_touch)
 	{
@@ -307,8 +307,8 @@ AddFunction ShadowVfShortCdPostConditions
 
 AddFunction ShadowVfCdActions
 {
-	#surrender_to_madness,if=talent.surrender_to_madness.enabled&insanity>=25&(cooldown.void_bolt.up|cooldown.void_torrent.up|cooldown.shadow_word_death.up|buff.shadowy_insight.up)&target.time_to_die<=90+((raw_haste_pct*100)*2)-buff.insanity_drain_stacks.stack
-	if Talent(surrender_to_madness_talent) and Insanity() >= 25 and { not SpellCooldown(void_bolt) > 0 or not SpellCooldown(void_torrent) > 0 or not SpellCooldown(shadow_word_death) > 0 or BuffPresent(shadowy_insight_buff) } and target.TimeToDie() <= 90 + SpellHaste() * 100 * 2 - BuffStacks(insanity_drain_stacks_buff) Spell(surrender_to_madness)
+	#surrender_to_madness,if=talent.surrender_to_madness.enabled&insanity>=25&(cooldown.void_bolt.up|cooldown.void_torrent.up|cooldown.shadow_word_death.up|buff.shadowy_insight.up)&target.health.pct<30
+	if Talent(surrender_to_madness_talent) and Insanity() >= 25 and { not SpellCooldown(void_bolt) > 0 or not SpellCooldown(void_torrent) > 0 or not SpellCooldown(shadow_word_death) > 0 or BuffPresent(shadowy_insight_buff) } and target.HealthPercent() < 30 Spell(surrender_to_madness)
 
 	unless Talent(shadow_crash_talent) and Spell(shadow_crash) or Talent(mindbender_talent) and Spell(mindbender)
 	{

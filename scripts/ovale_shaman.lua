@@ -472,11 +472,13 @@ AddFunction EnhancementPrecombatMainActions
 	#flask,type=greater_draenic_agility_flask
 	#augmentation,type=hyper
 	Spell(augmentation)
+	#lightning_shield
+	Spell(lightning_shield)
 }
 
 AddFunction EnhancementPrecombatShortCdPostConditions
 {
-	Spell(augmentation)
+	Spell(augmentation) or Spell(lightning_shield)
 }
 
 AddFunction EnhancementPrecombatCdActions
@@ -492,7 +494,7 @@ AddFunction EnhancementPrecombatCdActions
 
 AddFunction EnhancementPrecombatCdPostConditions
 {
-	Spell(augmentation)
+	Spell(augmentation) or Spell(lightning_shield)
 }
 
 ### Enhancement icons.
@@ -575,6 +577,7 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # lava_lash
 # legendary_ring_agility
 # lightning_bolt
+# lightning_shield
 # overcharge_talent
 # primal_strike
 # quaking_palm

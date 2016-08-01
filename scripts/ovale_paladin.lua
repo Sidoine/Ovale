@@ -11,7 +11,7 @@ do
 # Based on SimulationCraft profile "Paladin_Retribution_T18M".
 #	class=paladin
 #	spec=retribution
-#	talents=2112232
+#	talents=1112112
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)

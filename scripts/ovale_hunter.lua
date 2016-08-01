@@ -63,8 +63,8 @@ AddFunction BeastMasteryDefaultShortCdActions
 
 	unless SpellCooldown(bestial_wrath) > 2 and Spell(dire_frenzy) or { Enemies() > 1 or Enemies() == 1 and Focus() > 90 } and Spell(barrage)
 	{
-		#titans_thunder,if=cooldown.dire_beast.remains>=3
-		if SpellCooldown(dire_beast) >= 3 Spell(titans_thunder)
+		#titans_thunder,if=cooldown.dire_beast.remains>=3|talent.dire_frenzy.enabled
+		if SpellCooldown(dire_beast) >= 3 or Talent(dire_frenzy_talent) Spell(titans_thunder)
 		#bestial_wrath
 		Spell(bestial_wrath)
 	}
@@ -163,6 +163,7 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # cobra_shot
 # dire_beast
 # dire_frenzy
+# dire_frenzy_talent
 # draenic_agility_potion
 # kill_command
 # killer_cobra_talent

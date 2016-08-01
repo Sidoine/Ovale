@@ -1128,6 +1128,7 @@ local function InitializeDisambiguation()
 	AddDisambiguation("stealth_buff",			"stealthed_buff",				"ROGUE")
 	AddDisambiguation("roll_the_bones_debuff",	"roll_the_bones_buff",			"ROGUE")
 	AddDisambiguation("envenom_debuff",			"envenom_buff",					"ROGUE")
+	AddDisambiguation("vendetta_buff",			"vendetta_debuff",				"ROGUE",		"assassination") -- TODO Strange, is there actualy a buff?
 	-- Shaman
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_mana",			"SHAMAN")
 	AddDisambiguation("ascendance",				"ascendance_caster",			"SHAMAN",		"elemental")
@@ -2737,7 +2738,9 @@ EmitOperandArtifact = function(operand, parseNode, nodeList, annotation, action,
 		local name = tokenIterator()
 		local property = tokenIterator()
 
-		if property == "enabled" then
+		if property == "rank" then
+			code = "0" 
+		elseif property == "enabled" then
 			code = format("BuffPresent(%s_buff)", name)
 		else
 			ok = false

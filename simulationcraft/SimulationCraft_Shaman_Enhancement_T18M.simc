@@ -22,7 +22,7 @@ actions.precombat+=/food,type=buttered_sturgeon
 # Snapshot raid buffed stats before combat begins and pre-potting is done.
 actions.precombat+=/snapshot_stats
 actions.precombat+=/potion,name=draenic_agility
-#actions.precombat+=/lightning_shield
+actions.precombat+=/lightning_shield
 
 # Executed every time the actor is available.
 
