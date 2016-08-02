@@ -968,6 +968,35 @@ function OvaleFuture:LastInFlightSpell()
 	return spellcast
 end
 
+-- Return the most recent spellcast sent.  
+-- Required when the UNIT_AURA event fires before the UNIT_SPELLCAST_SUCCEEDED event
+function OvaleFuture:LastSpellSent()
+	local spellcast = nil
+	if self.lastGCDSpellcast.success then
+		spellcast = self.lastGCDSpellcast
+	end
+	for i = #self.queue, 1, -1 do
+		local sc = self.queue[i]
+		-- If spell in queue was successful
+		if sc.success then 
+			-- Use the more recently successful spellcast.
+			if not spellcast or spellcast.success < sc.success then
+				spellcast = sc
+			end
+		-- If spell in queue was not (yet) successful and not a cast time spell
+		elseif not sc.start and not sc.stop then
+			-- If current most recent spell was successful, check next queued spell against the success time
+			if spellcast.success and spellcast.success < sc.queued then
+				spellcast = sc
+			-- If current most recent spell was not (yet) successful, check next queued spell against the queued time
+			elseif spellcast.queued < sc.queued then			
+				spellcast = sc
+			end
+		end
+	end
+	return spellcast
+end
+
 --[[
 	Apply the effects of any active spells to the simulator state.
 --]]
