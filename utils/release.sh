@@ -1313,4 +1313,4 @@ if [ -z "$skip_zipfile" ]; then
 	( cd "$releasedir" && $zip "$archive" $contents )
 fi
 
-cat "$topdir/$changelog"
+cat "$pkgdir/$changelog"
