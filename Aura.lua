@@ -173,6 +173,9 @@ local CLEU_SCHOOL_MASK_MAGIC = bit_bor(SCHOOL_MASK_ARCANE, SCHOOL_MASK_FIRE, SCH
 OvaleAura.aura = {}
 -- Current age of auras per unit: serial[guid] = age.
 OvaleAura.serial = {}
+-- Begin aura bypass code
+OvaleAura.bypassState = {}
+-- End aura bypass code
 -- Unused public property to suppress lint warnings.
 --OvaleAura.defaultTarget = nil
 --</public-static-properties>
@@ -377,6 +380,49 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hide
 	local arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24, arg25 = ...
 
 	local mine = (sourceGUID == self_playerGUID or OvaleGUID:IsPlayerPet(sourceGUID))
+	-- Begin aura bypass code.
+	if mine and cleuEvent == "SPELL_MISSED" then
+		local spellId, spellName, spellSchool = arg12, arg13, arg14
+		local si = OvaleData.spellInfo[spellId]
+		local bypassState = OvaleAura.bypassState
+		-- Bypass the state for auras applied to player. 
+		if si and si.aura and si.aura.player then
+			for filter, auraTable in pairs(si.aura.player) do 
+				for auraId in pairs(auraTable) do
+					print(auraId)
+					if not bypassState[auraId] then
+						bypassState[auraId] = {}
+					end
+					bypassState[auraId][self_playerGUID] = true
+				end
+			end
+		end
+		-- Bypass the state for auras applied to target.
+		if si and si.aura and si.aura.target then
+			for filter, auraTable in pairs(si.aura.target) do 
+				for auraId in pairs(auraTable) do
+					if not bypassState[auraId] then
+						bypassState[auraId] = {}
+					end
+					bypassState[auraId][destGUID] = true
+				end
+			end
+		end
+		-- Bypass the state for auras applied to pet.
+		if si and si.aura and si.aura.pet then
+			for filter, auraTable in pairs(si.aura.pet) do 
+				for auraId, index in pairs(auraTable) do
+					for petGUID in pairs(self_petGUID) do
+						if not bypassState[petGUID] then
+							bypassState[auraId] = {}
+						end
+						bypassState[auraId][petGUID] = true
+					end
+				end
+			end
+		end
+	end
+	-- End aura bypass code
 	if CLEU_AURA_EVENTS[cleuEvent] then
 		local unitId = OvaleGUID:GUIDUnit(destGUID)
 		if unitId then
@@ -1434,6 +1480,26 @@ end
 
 statePrototype.GetAura = function(state, unitId, auraId, filter, mine)
 	local guid = OvaleGUID:UnitGUID(unitId)
+	-- Begin aura bypass code
+	local stateAura = state:GetAuraByGUID(guid, auraId, filter, mine)
+	local aura = OvaleAura:GetAuraByGUID(guid, auraId, filter, mine)
+	local bypassState = OvaleAura.bypassState
+	if not bypassState[auraId] then
+		bypassState[auraId] = {}
+	end
+	-- Checks to see if we might need to bypass the state because a spell missed.
+	if bypassState[auraId][guid] then
+		if aura and aura.start and aura.ending and stateAura and stateAura.start and stateAura.ending and aura.start == stateAura.start and aura.ending == stateAura.ending then
+			-- If the auras match, we don't need to bypass anymore
+			bypassState[auraId][guid] = false
+			return stateAura
+		else
+			-- Aura on this GUID was flagged for a bypass and the state aura is still incorrect
+			return aura
+		end
+	end
+	-- No need to bypass, return the state aura
+	-- End aura bypass code
 	return state:GetAuraByGUID(guid, auraId, filter, mine)
 end
 
