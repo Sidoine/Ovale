@@ -389,7 +389,6 @@ function OvaleAura:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hide
 		if si and si.aura and si.aura.player then
 			for filter, auraTable in pairs(si.aura.player) do 
 				for auraId in pairs(auraTable) do
-					print(auraId)
 					if not bypassState[auraId] then
 						bypassState[auraId] = {}
 					end
