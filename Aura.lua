@@ -737,10 +737,10 @@ function OvaleAura:LostAuraOnGUID(guid, atTime, auraId, casterGUID)
 				end
 				if spellcast then 
 					-- If last spell is successful, check against stop time, i.e., end of cast for cast time spells or succeeded time for instant-cast spells
-					if (spellcast.success and spellcast.stop and IsWithinAuraLag(spellcast.stop, aura.ending))
+					if (spellcast.success and spellcast.stop and IsWithinAuraLag(spellcast.stop, aura.ending)) or
 					-- If last spell sent was not successful, check against the time it was queued, i.e., when the ability was sent
 					-- Required as sometimes UNIT_AURA event fires before UNIT_SPELLCAST_SUCCEEDED event
-						or (spellcast.queued and IsWithinAuraLag(spellcast.queued, aura.ending)) then
+						 (spellcast.queued and IsWithinAuraLag(spellcast.queued, aura.ending)) then
 						aura.consumed = true
 						local spellName = OvaleSpellBook:GetSpellName(spellcast.spellId) or "Unknown spell"
 						self:Debug("    Consuming %s %s (%d) on %s with queued %s (%d) at %f.", filter, aura.name, auraId, guid, spellName, spellcast.spellId, spellcast.queued)
