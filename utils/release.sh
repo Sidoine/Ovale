@@ -1314,3 +1314,5 @@ if [ -z "$skip_zipfile" ]; then
 fi
 
 cat "$pkgdir/$changelog"
+echo
+
