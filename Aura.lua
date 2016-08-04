@@ -1489,7 +1489,7 @@ statePrototype.GetAura = function(state, unitId, auraId, filter, mine)
 	end
 	-- Checks to see if we might need to bypass the state because a spell missed.
 	if bypassState[auraId][guid] then
-		if aura and aura.start and aura.ending and stateAura.start and stateAura.ending and aura.start == stateAura.start and aura.ending == stateAura.ending then
+		if aura and aura.start and aura.ending and stateAura and stateAura.start and stateAura.ending and aura.start == stateAura.start and aura.ending == stateAura.ending then
 			-- If the auras match, we don't need to bypass anymore
 			bypassState[auraId][guid] = false
 			return stateAura
