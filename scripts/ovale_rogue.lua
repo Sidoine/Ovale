@@ -87,13 +87,13 @@ AddFunction AssassinationBuildMainActions
 	#mutilate,target_if=min:dot.deadly_poison_dot.remains,if=combo_points.deficit>=2&dot.rupture.exsanguinated&spell_targets.fan_of_knives>1
 	if ComboPointsDeficit() >= 2 and target.DebuffRemaining(rupture_debuff_exsanguinated) and Enemies() > 1 Spell(mutilate)
 	#mutilate,target_if=max:bleeds,if=combo_points.deficit>=2&spell_targets.fan_of_knives=2&dot.deadly_poison_dot.refreshable&debuff.agonizing_poison.remains<=0.3*debuff.agonizing_poison.duration
-	if ComboPointsDeficit() >= 2 and Enemies() == 2 and target.DebuffPresent(deadly_poison_dot_debuff) and target.DebuffRemaining(agonizing_poison_debuff) <= 0.3 * BaseDuration(agonizing_poison_debuff) Spell(mutilate)
+	if ComboPointsDeficit() >= 2 and Enemies() == 2 and target.DebuffRefreshable(deadly_poison_dot_debuff) and target.DebuffRemaining(agonizing_poison_debuff) <= 0.3 * BaseDuration(agonizing_poison_debuff) Spell(mutilate)
 	#hemorrhage,target_if=max:target.time_to_die,if=combo_points.deficit>=1&!ticking&dot.rupture.remains>6&spell_targets.fan_of_knives>1
 	if ComboPointsDeficit() >= 1 and not target.DebuffPresent(hemorrhage_debuff) and target.DebuffRemaining(rupture_debuff) > 6 and Enemies() > 1 Spell(hemorrhage)
 	#fan_of_knives,if=combo_points.deficit>=1&(spell_targets>3|(poisoned_enemies<3&spell_targets>2))&spell_targets.fan_of_knives>1
 	if ComboPointsDeficit() >= 1 and { Enemies() > 3 or 0 < 3 and Enemies() > 2 } and Enemies() > 1 Spell(fan_of_knives)
 	#hemorrhage,if=(combo_points.deficit>=1&refreshable)|(combo_points.deficit=1&dot.rupture.refreshable)
-	if ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) or ComboPointsDeficit() == 1 and target.DebuffPresent(rupture_debuff) Spell(hemorrhage)
+	if ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) or ComboPointsDeficit() == 1 and target.DebuffRefreshable(rupture_debuff) Spell(hemorrhage)
 	#hemorrhage,if=combo_points.deficit=2&set_bonus.tier18_2pc&target.health.pct<=35
 	if ComboPointsDeficit() == 2 and ArmorSetBonus(T18 2) and target.HealthPercent() <= 35 Spell(hemorrhage)
 	#mutilate,if=cooldown.garrote.remains>2&(combo_points.deficit>=3|(combo_points.deficit>=2&!(set_bonus.tier18_2pc&target.health.pct<=35)))
@@ -176,9 +176,9 @@ AddFunction AssassinationFinishMainActions
 	#death_from_above,if=combo_points>=cp_max_spend-1
 	if ComboPoints() >= MaxComboPoints() - 1 Spell(death_from_above)
 	#envenom,if=combo_points>=cp_max_spend-1&!dot.rupture.refreshable&buff.elaborate_planning.remains<2&energy.deficit<40
-	if ComboPoints() >= MaxComboPoints() - 1 and not target.DebuffPresent(rupture_debuff) and BuffRemaining(elaborate_planning_buff) < 2 and EnergyDeficit() < 40 Spell(envenom)
+	if ComboPoints() >= MaxComboPoints() - 1 and not target.DebuffRefreshable(rupture_debuff) and BuffRemaining(elaborate_planning_buff) < 2 and EnergyDeficit() < 40 Spell(envenom)
 	#envenom,if=combo_points>=cp_max_spend&!dot.rupture.refreshable&buff.elaborate_planning.remains<2&cooldown.garrote.remains<1
-	if ComboPoints() >= MaxComboPoints() and not target.DebuffPresent(rupture_debuff) and BuffRemaining(elaborate_planning_buff) < 2 and SpellCooldown(garrote) < 1 Spell(envenom)
+	if ComboPoints() >= MaxComboPoints() and not target.DebuffRefreshable(rupture_debuff) and BuffRemaining(elaborate_planning_buff) < 2 and SpellCooldown(garrote) < 1 Spell(envenom)
 }
 
 ### actions.garrote

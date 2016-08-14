@@ -3141,8 +3141,7 @@ EmitOperandDot = function(operand, parseNode, nodeList, annotation, action, targ
 		elseif property == "exsanguinated" then
 			code = format("TargetDebuffRemaining(%s_exsanguinated)", dotName)
 		elseif property == "refreshable" then
-			-- TODO What is the difference with ticking?
-			code = format("%s%sPresent(%s)", target, prefix, dotName)
+			code = format("%s%sRefreshable(%s)", target, prefix, dotName)
 		else
 			ok = false
 		end

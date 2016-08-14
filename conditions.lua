@@ -3626,6 +3626,8 @@ do
 	end
 
 	OvaleCondition:RegisterCondition("refreshable", false, Refreshable)
+	OvaleCondition:RegisterCondition("debuffrefreshable", false, Refreshable)
+	OvaleCondition:RegisterCondition("buffrefreshable", false, Refreshable)
 end
 
 do
