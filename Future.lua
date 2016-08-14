@@ -327,7 +327,7 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hi
 				for i = #self.queue, 1, -1 do
 					local spellcast = self.queue[i]
 					if spellcast.success and (spellcast.spellId == spellId or spellcast.auraId == spellId) then
-						if self:FinishSpell(spellcast, cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName, delta, finish) then
+						if self:FinishSpell(spellcast, cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName, delta, finish, i) then
 							anyFinished = true
 						end
 					end
@@ -337,7 +337,7 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hi
 					for i = #self.queue, 1, -1 do
 						local spellcast = self.queue[i]
 						if spellcast.success and (spellcast.spellName == spellName) then
-							if self:FinishSpell(spellcast, cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName, delta, finish) then
+							if self:FinishSpell(spellcast, cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName, delta, finish, i) then
 								anyFinished = true
 							end
 						end
@@ -353,7 +353,7 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hi
 	end
 end
 
-function OvaleFuture:FinishSpell(spellcast, cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName, delta, finish)
+function OvaleFuture:FinishSpell(spellcast, cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName, delta, finish, i)
 	local finished = false
 	if not spellcast.auraId then
 		--[[
