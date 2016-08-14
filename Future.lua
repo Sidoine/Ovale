@@ -323,57 +323,81 @@ function OvaleFuture:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hi
 					more than one spellcast.
 				--]]
 				-- Scan backwards since we are removing list elements while traversing the list.
+				local anyFinished = false
 				for i = #self.queue, 1, -1 do
 					local spellcast = self.queue[i]
 					if spellcast.success and (spellcast.spellId == spellId or spellcast.auraId == spellId) then
-						local finished = false
-						if not spellcast.auraId then
-							--[[
-								There is no aura to detect, so the spell is finished when it lands,
-								but not if it is a channelled spell.
-							--]]
-							if not eventDebug then
-								self:DebugTimestamp("CLEU", cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName)
-								eventDebug = true
-							end
-							if not spellcast.channel then
-								self:Debug("Finished (%s) spell %s (%d) queued at %s due to %s.", finish, spellName, spellId, spellcast.queued, cleuEvent)
-								finished = true
-							end
-						elseif CLEU_AURA_EVENT[cleuEvent] and spellcast.auraGUID and destGUID == spellcast.auraGUID then
-							-- The spell is finished when the aura update is detected.
-							if not eventDebug then
-								self:DebugTimestamp("CLEU", cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName)
-								eventDebug = true
-							end
-							self:Debug("Finished (%s) spell %s (%d) queued at %s after seeing aura %d on %s.", finish, spellName, spellId, spellcast.queued, spellcast.auraId, spellcast.auraGUID)
-							finished = true
+						if self:FinishSpell(spellcast, cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName, delta, finish) then
+							anyFinished = true
 						end
-						if finished then
-							-- Update snapshots in cached spellcasts.
-							if self_timeAuraAdded then
-								if IsSameSpellcast(spellcast, self.lastGCDSpellcast) then
-									self:UpdateSpellcastSnapshot(self.lastGCDSpellcast, self_timeAuraAdded)
-								end
-								if IsSameSpellcast(spellcast, self.lastOffGCDSpellcast) then
-									self:UpdateSpellcastSnapshot(self.lastOffGCDSpellcast, self_timeAuraAdded)
-								end
+					end
+				end
+				if not anyFinished then
+					self:Debug("No spell found for %s (%d)", spellName, spellId)
+					for i = #self.queue, 1, -1 do
+						local spellcast = self.queue[i]
+						if spellcast.success and (spellcast.spellName == spellName) then
+							if self:FinishSpell(spellcast, cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName, delta, finish) then
+								anyFinished = true
 							end
-							local delta = now - spellcast.stop
-							local targetGUID = spellcast.target
-							self:Debug("Spell %s (%d) was in flight for %s seconds.", spellName, spellId, delta)
-							-- Remove the finished spellcast from the spell queue.
-							tremove(self.queue, i)
-							self_pool:Release(spellcast)
-							Ovale.refreshNeeded[self_playerGUID] = true
-							self:SendMessage("Ovale_SpellFinished", now, spellId, targetGUID, finish)
 						end
+					end
+
+					if not anyFinished then
+						self:Debug("No spell found for %s", spellName, spellId)
 					end
 				end
 			end
 		end
 		self:StopProfiling("OvaleFuture_COMBAT_LOG_EVENT_UNFILTERED")
 	end
+end
+
+function OvaleFuture:FinishSpell(spellcast, cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName, delta, finish)
+	local finished = false
+	if not spellcast.auraId then
+		--[[
+			There is no aura to detect, so the spell is finished when it lands,
+			but not if it is a channelled spell.
+		--]]
+		if not eventDebug then
+			self:DebugTimestamp("CLEU", cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName)
+			eventDebug = true
+		end
+		if not spellcast.channel then
+			self:Debug("Finished (%s) spell %s (%d) queued at %s due to %s.", finish, spellName, spellId, spellcast.queued, cleuEvent)
+			finished = true
+		end
+	elseif CLEU_AURA_EVENT[cleuEvent] and spellcast.auraGUID and destGUID == spellcast.auraGUID then
+		-- The spell is finished when the aura update is detected.
+		if not eventDebug then
+			self:DebugTimestamp("CLEU", cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName)
+			eventDebug = true
+		end
+		self:Debug("Finished (%s) spell %s (%d) queued at %s after seeing aura %d on %s.", finish, spellName, spellId, spellcast.queued, spellcast.auraId, spellcast.auraGUID)
+		finished = true
+	end
+	if finished then
+		local now = API_GetTime()
+		-- Update snapshots in cached spellcasts.
+		if self_timeAuraAdded then
+			if IsSameSpellcast(spellcast, self.lastGCDSpellcast) then
+				self:UpdateSpellcastSnapshot(self.lastGCDSpellcast, self_timeAuraAdded)
+			end
+			if IsSameSpellcast(spellcast, self.lastOffGCDSpellcast) then
+				self:UpdateSpellcastSnapshot(self.lastOffGCDSpellcast, self_timeAuraAdded)
+			end
+		end
+		local delta = now - spellcast.stop
+		local targetGUID = spellcast.target
+		self:Debug("Spell %s (%d) was in flight for %s seconds.", spellName, spellId, delta)
+		-- Remove the finished spellcast from the spell queue.
+		tremove(self.queue, i)
+		self_pool:Release(spellcast)
+		Ovale.refreshNeeded[self_playerGUID] = true
+		self:SendMessage("Ovale_SpellFinished", now, spellId, targetGUID, finish)
+	end
+	return finished
 end
 
 function OvaleFuture:PLAYER_ENTERING_WORLD(event)
