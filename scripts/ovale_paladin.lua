@@ -195,8 +195,8 @@ AddFunction RetributionSingleMainActions
 	if Enemies() <= 3 and { SpellCooldown(judgment) < GCD() * 4.5 or target.DebuffRemaining(judgment_debuff) > GCD() * 4.67 } and HolyPower() >= 3 and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 4 } Spell(execution_sentence)
 	#divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*4)
 	if target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 4 } Spell(divine_storm)
-	#templars_verdict,if=debuff.judgment.up&holy_power>=3&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*4)
-	if target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 4 } Spell(templars_verdict)
+	#templars_verdict,if=debuff.judgment.up&holy_power>=3
+	if target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 Spell(templars_verdict)
 }
 
 AddFunction RetributionSingleShortCdActions
