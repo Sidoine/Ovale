@@ -29,6 +29,8 @@ local API_GetTime = GetTime
 
 -- Spell ID for the dummy Global Cooldown spell.
 local GLOBAL_COOLDOWN = 61304
+-- This should be more than OvaleFuture's SIMULATOR_LAG.
+local COOLDOWN_THRESHOLD = 0.1
 
 -- Register for debugging messages.
 OvaleDebug:RegisterDebugging(OvaleCooldown)
@@ -64,6 +66,7 @@ OvaleCooldown.gcd = {
 	start = 0,
 	duration = 0,
 }
+
 --</public-static-properties>
 
 --<public-static-methods>
@@ -206,7 +209,10 @@ function OvaleCooldown:GetSpellCooldown(spellId)
 			cdStart, cdDuration, cdEnable = start, duration, enable
 		end
 	end
-	return cdStart, cdDuration, cdEnable
+
+	-- The game allows you to cast a spell a small time before it is really available, to compensate for lag.
+	-- The COOLDOWN_THRESHOLD is used to take this in account
+	return cdStart - COOLDOWN_THRESHOLD, cdDuration, cdEnable
 end
 
 -- Return the base GCD and caster status.
