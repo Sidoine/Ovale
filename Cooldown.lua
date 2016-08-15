@@ -35,24 +35,22 @@ OvaleDebug:RegisterDebugging(OvaleCooldown)
 -- Register for profiling.
 OvaleProfiler:RegisterProfiling(OvaleCooldown)
 
--- BASE_GCD[class] = { gcd, isCaster }
+-- BASE_GCD[class] = { gcd, haste }
 local BASE_GCD = {
-	["DEATHKNIGHT"]	= { 1.0, false },
-	["DRUID"]		= { 1.5,  true },
-	["HUNTER"]		= { 1.0, false },
-	["MAGE"]		= { 1.5,  true },
-	["MONK"]		= { 1.5, false },
-	["PALADIN"]		= { 1.5, false },
-	["PRIEST"]		= { 1.5,  true },
-	["ROGUE"]		= { 1.0, false },
-	["SHAMAN"]		= { 1.5,  true },
-	["WARLOCK"]		= { 1.5,  true },
-	["WARRIOR"]		= { 1.5, false },
+	["DEATHKNIGHT"]	= { 1.0, false    },
+	["DEMONHUNTER"]	= { 1.5, "melee"  },
+	["DRUID"]		= { 1.5, "spell"  },
+	["HUNTER"]		= { 1.5, "ranged" },
+	["MAGE"]		= { 1.5, "spell"  },
+	["MONK"]		= { 1.0, false    },
+	["PALADIN"]		= { 1.5, "spell"  },
+	["PRIEST"]		= { 1.5, "spell"  },
+	["ROGUE"]		= { 1.0, false    },
+	["SHAMAN"]		= { 1.5, "spell"  },
+	["WARLOCK"]		= { 1.5, "spell"  },
+	["WARRIOR"]		= { 1.5, "melee"  },
 }
 
--- Spells that cause haste to affect the global cooldown.
-local FOCUS_AND_HARMONY = 154555
-local HEADLONG_RUSH = 158836
 --</private-static-properties>
 
 --<public-static-properties>
@@ -213,14 +211,14 @@ end
 
 -- Return the base GCD and caster status.
 function OvaleCooldown:GetBaseGCD()
-	local gcd, isCaster
+	local gcd, haste
 	local baseGCD = BASE_GCD[Ovale.playerClass]
 	if baseGCD then
-		gcd, isCaster = baseGCD[1], baseGCD[2]
+		gcd, haste = baseGCD[1], baseGCD[2]
 	else
-		gcd, isCaster = 1.5, true
+		gcd, haste = 1.5, "spell"
 	end
-	return gcd, isCaster
+	return gcd, haste
 end
 
 -- Copy cooldown information from the spellcast to the destination table.
@@ -372,12 +370,27 @@ statePrototype.GetGCD = function(state, spellId, atTime, targetGUID)
 
 	local gcd = spellId and state:GetSpellInfoProperty(spellId, atTime, "gcd", targetGUID)
 	if not gcd then
-		local isCaster, haste
-		gcd, isCaster = OvaleCooldown:GetBaseGCD()
-		if Ovale.playerClass == "MONK" and OvaleSpellBook:IsKnownSpell(FOCUS_AND_HARMONY) then
-			haste = "melee"
-		elseif Ovale.playerClass == "WARRIOR" and OvaleSpellBook:IsKnownSpell(HEADLONG_RUSH) then
-			haste = "melee"
+		local haste
+		gcd, haste = OvaleCooldown:GetBaseGCD()
+		 
+		if Ovale.playerClass == "MONK" and OvalePaperDoll:IsSpecialization("mistweaver") then
+			-- Mistweaver Monk = 1.5, spell
+			gcd = 1.5
+			haste = "spell"
+		elseif Ovale.playerClass == "DRUID" then
+			if OvaleStance:IsStance("druid_cat_form") then
+				-- Cat Form Druid = 1.0, false
+				gcd = 1.0
+				haste = false
+			end
+		-- Adrenaline Rush buffed Outlaw Rogue = 0.8, false (TODO)
+		
+		-- Possible Additional Exceptions. 
+		-- Shouldn't be any differene between using melee haste or spell haste so didn't bother changing these.
+		-- Bear Form Druid = 1.5, melee
+		-- Retribution Paladin = 1.5, melee
+		-- Protection Paladin = 1.5, melee
+		-- Enhancement Shaman = 1.5, melee
 		end
 		local gcdHaste = spellId and state:GetSpellInfoProperty(spellId, atTime, "gcd_haste", targetGUID)
 		if gcdHaste then
@@ -388,13 +401,10 @@ statePrototype.GetGCD = function(state, spellId, atTime, targetGUID)
 				haste = siHaste
 			end
 		end
-		if not haste and isCaster then
-			haste = "spell"
-		end
 		local multiplier = state:GetHasteMultiplier(haste)
 		gcd = gcd / multiplier
-		-- Clamp GCD at 1s.
-		gcd = (gcd > 1) and gcd or 1
+		-- Clamp GCD at 750ms.
+		gcd = (gcd > 0.750) and gcd or 0.750
 	end
 	return gcd
 end
