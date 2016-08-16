@@ -30,7 +30,7 @@ local API_GetTime = GetTime
 -- Spell ID for the dummy Global Cooldown spell.
 local GLOBAL_COOLDOWN = 61304
 -- This should be more than OvaleFuture's SIMULATOR_LAG.
-local COOLDOWN_THRESHOLD = 0.1
+local COOLDOWN_THRESHOLD = 0.15
 
 -- Register for debugging messages.
 OvaleDebug:RegisterDebugging(OvaleCooldown)
@@ -39,7 +39,7 @@ OvaleProfiler:RegisterProfiling(OvaleCooldown)
 
 -- BASE_GCD[class] = { gcd, haste }
 local BASE_GCD = {
-	["DEATHKNIGHT"]	= { 1.5, "melee"  },
+	["DEATHKNIGHT"]	= { 1.0, false    },
 	["DEMONHUNTER"]	= { 1.5, "melee"  },
 	["DRUID"]		= { 1.5, "spell"  },
 	["HUNTER"]		= { 1.5, "ranged" },
@@ -435,7 +435,7 @@ statePrototype.GetCD = function(state, spellId)
 			start, duration = OvaleCooldown:GetSpellCooldown(si.forcecd)
 		end
 		cd.serial = OvaleCooldown.serial
-		cd.start = start
+		cd.start = start - COOLDOWN_THRESHOLD
 		cd.duration = duration
 		cd.enable = enable
 
