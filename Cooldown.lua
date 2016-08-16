@@ -39,7 +39,7 @@ OvaleProfiler:RegisterProfiling(OvaleCooldown)
 
 -- BASE_GCD[class] = { gcd, haste }
 local BASE_GCD = {
-	["DEATHKNIGHT"]	= { 1.0, false    },
+	["DEATHKNIGHT"]	= { 1.5, "melee"  },
 	["DEMONHUNTER"]	= { 1.5, "melee"  },
 	["DRUID"]		= { 1.5, "spell"  },
 	["HUNTER"]		= { 1.5, "ranged" },
