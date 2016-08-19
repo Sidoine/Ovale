@@ -57,6 +57,7 @@ local self_playerGUID = nil
 
 local OVALE_SPELLDAMAGE_SCHOOL = {
 	DEATHKNIGHT = 4, -- Nature
+	DEMONHUNTER = 3, -- Fire
 	DRUID = 4, -- Nature
 	HUNTER = 4, -- Nature
 	MAGE = 5, -- Frost
@@ -77,6 +78,7 @@ local OVALE_HEALING_CLASS = {
 }
 local OVALE_SPECIALIZATION_NAME = {
 	DEATHKNIGHT = { "blood", "frost", "unholy" },
+	DEMONHUNTER = { "havoc", "vengeance" },
 	DRUID = { "balance", "feral", "guardian", "restoration" },
 	HUNTER = { "beast_mastery", "marksmanship", "survival" },
 	MAGE = { "arcane", "fire", "frost" },
