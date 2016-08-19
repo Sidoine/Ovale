@@ -183,8 +183,8 @@ function OvaleScripts:GetDefaultScriptName(class, specialization)
 			-- TODO: Create a holy paladin script (see summonstone.com).
 			name = DISABLED_NAME
 		elseif specialization == "protection" then
-			-- TODO: Use the Tier17M script until a new one has been created for patch 6.2.
-			name = format("simulationcraft_paladin_%s_t17m", specialization)
+			-- Use Icy-Veins rotation
+			name = format("icyveins_paladin_%s", specialization)
 		end
 	elseif class == "PRIEST" then
 		if specialization == "discipline" then

@@ -28,6 +28,7 @@ local API_IsShiftKeyDown = IsShiftKeyDown
 -- Class icon textures.
 local CLASS_ICONS = {
 	["DEATHKNIGHT"] = "Interface\\Icons\\ClassIcon_DeathKnight",
+	["DEMONHUNTER"] = "Interface\\Icons\\ClassIcon_DemonHunter",
 	["DRUID"] = "Interface\\Icons\\ClassIcon_Druid",
 	["HUNTER"] = "Interface\\Icons\\ClassIcon_Hunter",
 	["MAGE"] = "Interface\\Icons\\ClassIcon_Mage",
