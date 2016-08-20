@@ -20,7 +20,6 @@ AddFunction DemonologyUsePotionIntellect
 
 ### actions.default
 
-
 AddFunction DemonologyDefaultMainActions
 {
 	if Talent(soul_harvest_talent) and not SpellCooldown(soul_harvest) > 0 and not target.DebuffRemaining(doom_debuff) Spell(doom)
