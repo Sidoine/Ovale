@@ -1331,7 +1331,10 @@ do
 
 	statePrototype.ApplySpell = function(state, spellId, targetGUID, startCast, endCast, channel, spellcast)
 		OvaleFuture:StartProfiling("OvaleFuture_state_ApplySpell")
-		if spellId and targetGUID then
+		if spellId then
+			if not targetGUID then
+				targetGUID = Ovale.playerGUID
+			end
 			-- Handle missing parameters.
 			local castTime
 			if startCast and endCast then
