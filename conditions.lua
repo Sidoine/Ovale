@@ -193,7 +193,19 @@ do
 
 	local function BaseDuration(positionalParams, namedParams, state, atTime)
 		local auraId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-		local value = OvaleData:GetBaseDuration(auraId, state)
+		local value
+		if (OvaleData.buffSpellList[auraId]) then
+			local spellList = OvaleData.buffSpellList[auraId]
+			local count = 0
+			for id in pairs(spellList) do
+				value = OvaleData:GetBaseDuration(id, state)
+				if value ~=  math.huge then
+					break
+				end
+			end
+		else
+			value = OvaleData:GetBaseDuration(auraId, state)
+		end
 		return Compare(value, comparator, limit)
 	end
 
@@ -324,6 +336,7 @@ do
 	-- @return A boolean value for the result of the comparison
 	local function BuffCount(positionalParams, namedParams, state, atTime)
 		local auraId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local target, filter, mine = ParseCondition(positionalParams, namedParams, state)
 		local spellList = OvaleData.buffSpellList[auraId]
 		local count = 0
 		for id in pairs(spellList) do
