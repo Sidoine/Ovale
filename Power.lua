@@ -121,9 +121,11 @@ OvalePower.POWER_INFO =
 	rage = { id = SPELL_POWER_RAGE, token = "RAGE", mini = 0, costString = RAGE_COST },
 	runicpower = { id = SPELL_POWER_RUNIC_POWER, token = "RUNIC_POWER", mini = 0, costString = RUNIC_POWER_COST },
 	soulshards = { id = SPELL_POWER_SOUL_SHARDS, token = "SOUL_SHARDS", mini = 0, costString = SOUL_SHARDS_COST },
-	astralpower = { id = SPELL_POWER_LUNAR_POWER, token = "LUNAR_POWER", mini = 0, costString = LUNAR_POWER_COST },
+	astralpower = { id = SPELL_POWER_LUNAR_POWER, token = "ASTRAL_POWER", mini = 0, costString = LUNAR_POWER_COST },
 	insanity = { id = SPELL_POWER_INSANITY, token = "INSANITY", mini = 0, costString = INSANITY_COST },
-	maelstrom = { id = SPELL_POWER_MAELSTROM, token = "MAELSTROM", mini = 0, costString = MAELSTROM_COST }
+	maelstrom = { id = SPELL_POWER_MAELSTROM, token = "MAELSTROM", mini = 0, costString = MAELSTROM_COST },
+	pain = { id = SPELL_POWER_PAIN, token = "PAIN", mini = 0, costString = PAIN_COST },
+	fury = { id = SPELL_POWER_FURY, token = "FURY", mini = 0, costString = PAIN_COST }
 }
 
 -- Power types that can regenerate/pool over time with no actions.
@@ -539,7 +541,6 @@ function OvalePower:RequirePowerHandler(spellId, atTime, requirement, tokens, in
 			if power >= cost then
 				verified = true
 			end
-			self:Log("   Has power %f %s", power, powerType)
 		else
 			verified = true
 		end
