@@ -8,7 +8,7 @@ do
 	local code = [[
 # Druid spells and functions.
 Define(ashamanes_bite 210702)
-Define(ashamanes_frenzy 210723)
+Define(ashamanes_frenzy 210722)
 	SpellInfo(ashamanes_frenzy cd=75 combo=3)
 	SpellAddBuff(ashamanes_frenzy bloodtalons_buff=-1)
 Define(ashamanes_rip_debuff 224435)
