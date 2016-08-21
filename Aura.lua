@@ -202,6 +202,20 @@ end
 
 local function GetAura(auraDB, guid, auraId, casterGUID)
 	if auraDB[guid] and auraDB[guid][auraId] and auraDB[guid][auraId][casterGUID] then
+		-- TODO: Use a SpellInfo instead of hard numbers here so it could be declared in the script in case any other abilities do this?
+		-- Wrecking Ball Buff
+		if auraId == 215570 then
+			local spellcast = OvaleFuture:LastInFlightSpell()
+			-- Whirlwind
+			if spellcast and spellcast.spellId and spellcast.spellId == 190411 and spellcast.start then
+				local aura = auraDB[guid][auraId][casterGUID]
+				if aura.start and aura.start < spellcast.start then
+					-- If the aura began before the start of the Whirlwind, then the aura has ended
+					-- Shows as an active aura in game until the animation of Whirlwind ends.
+					aura.ending = spellcast.start
+				end
+			end
+		end
 		return auraDB[guid][auraId][casterGUID]
 	end
 end
