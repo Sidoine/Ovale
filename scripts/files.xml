@@ -5,6 +5,8 @@
 
 	<Script file="ovale_deathknight.lua" />
 	<Script file="ovale_deathknight_spells.lua" />
+	<Script file="ovale_demonhunter.lua" />
+	<Script file="ovale_demonhunter_spells.lua" />
 	<Script file="ovale_druid.lua" />
 	<Script file="ovale_druid_spells.lua" />
 	<Script file="ovale_hunter.lua" />

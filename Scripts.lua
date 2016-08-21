@@ -150,6 +150,10 @@ function OvaleScripts:GetDefaultScriptName(class, specialization)
 		elseif specialization then
 			name = format("simulationcraft_death_knight_%s_t18m", specialization)
 		end
+	elseif class == "DEMONHUNTER" then
+		if specialization then 
+			name = format("icyveins_demonhunter_%s", specialization)
+		end
 	elseif class == "DRUID" then
 		if specialization == "balance" then
 			-- TODO: Add support for balance Eclipse energy to allow scripts to work.
