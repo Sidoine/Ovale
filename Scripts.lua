@@ -148,6 +148,8 @@ function OvaleScripts:GetDefaultScriptName(class, specialization)
 		elseif specialization == "frost" then
 			local weaponType = OvaleEquipment:HasOffHandWeapon() and "1h" or "2h"
 			name = format("simulationcraft_death_knight_frost_%s_t18m", weaponType)
+		elseif specialization == "unholy" then
+			name = "simulationcraft_death_knight_unholy_t18m"
 		end
 	elseif class == "DEMONHUNTER" then
 		if specialization then 
