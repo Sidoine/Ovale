@@ -179,8 +179,6 @@ function OvaleScripts:GetDefaultScriptName(class, specialization)
 				talentChoice = "ce"
 			end
 			name = format("simulationcraft_monk_brewmaster_%s_%s_t17m", weaponType, talentChoice)
-		elseif specialization == "windwalker" then
-			name = format("simulationcraft_monk_windwalker_%s_t18m", weaponType)
 		end
 	elseif class == "PALADIN" then
 		if specialization == "holy" then
