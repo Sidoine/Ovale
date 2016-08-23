@@ -1690,7 +1690,8 @@ do
 		local target = ParseCondition(positionalParams, namedParams, state, "target")
 		if state.lastSpellId then
 			local duration = state:GetGCD(state.lastSpellId, atTime, OvaleGUID:UnitGUID(target))
-			local start = state.startCast
+			local spellcast = OvaleFuture:LastInFlightSpell()
+			local start = spellcast.start or 0
 			local ending = start + duration
 			return TestValue(start, INFINITY, 0, ending, -1, comparator, limit)
 		end
