@@ -1618,10 +1618,10 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "DRUID" and action == "pulverize" then
 			--[[
 				WORKAROUND: Work around Blizzard bug where Pulverize can only be used within 15s of
-				when the existing Lacerate stack was applied, regardless of how much time is left on
+				when the existing Thrash stack was applied, regardless of how much time is left on
 				the DoT: http://us.battle.net/wow/en/forum/topic/15354966771
 			--]]
-			local debuffName = "lacerate_debuff"
+			local debuffName = "thrash_bear_debuff"
 			AddSymbol(annotation, debuffName)
 			conditionCode = format("target.DebuffGain(%s) <= BaseDuration(%s)", debuffName, debuffName)
 		elseif class == "DRUID" and specialization == "guardian" and action == "rejuvenation" then
