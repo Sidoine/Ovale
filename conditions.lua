@@ -2852,6 +2852,10 @@ do
 	local function Focus(positionalParams, namedParams, state, atTime)
 		return Power("focus", positionalParams, namedParams, state, atTime)
 	end
+	
+	local function Fury(positionalParams, namedParams, state, atTime)
+		return Power("fury", positionalParams, namedParams, state, atTime)
+	end
 
 	--- Get the current amount of holy power for a paladin.
 	-- @name HolyPower
@@ -2891,6 +2895,10 @@ do
 
 	local function Maelstrom(positionalParams, namedParams, state, atTime)
 		return Power("maelstrom", positionalParams, namedParams, state, atTime)
+	end
+	
+	local function Pain(positionalParams, namedParams, state, atTime)
+		return Power("pain", positionalParams, namedParams, state, atTime)
 	end
 
 	--- Get the current amount of rage for guardian druids and warriors.
@@ -2959,10 +2967,12 @@ do
 	OvaleCondition:RegisterCondition("demonicfury", false, DemonicFury)
 	OvaleCondition:RegisterCondition("energy", false, Energy)
 	OvaleCondition:RegisterCondition("focus", false, Focus)
+	OvaleCondition:RegisterCondition("fury", false, Fury)
 	OvaleCondition:RegisterCondition("holypower", false, HolyPower)
 	OvaleCondition:RegisterCondition("insanity", false, Insanity)
 	OvaleCondition:RegisterCondition("maelstrom", false, Maelstrom)
 	OvaleCondition:RegisterCondition("mana", false, Mana)
+	OvaleCondition:RegisterCondition("pain", false, Pain)
 	OvaleCondition:RegisterCondition("rage", false, Rage)
 	OvaleCondition:RegisterCondition("runicpower", false, RunicPower)
 	OvaleCondition:RegisterCondition("shadoworbs", false, ShadowOrbs)
