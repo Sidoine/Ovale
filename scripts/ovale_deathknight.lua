@@ -50,6 +50,7 @@ AddFunction BloodDefaultAoEActions
 	if RunicPower() >= 80 Spell(bonestorm)
 	if RunicPower() >= 80 Spell(death_strike)
 	if not Talent(soulgorge_talent) Spell(blood_boil)
+	Spell(death_and_decay)
 	if BuffStacks(bone_shield_buff) <= 7 and Enemies() < 3 Spell(marrowrend)
 	Spell(heart_strike)
 	Spell(blood_boil)
