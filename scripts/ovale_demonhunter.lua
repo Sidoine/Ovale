@@ -86,34 +86,36 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_demonhunter_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default specialization=vengeance)
-AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=vengeance)
-	
+AddCheckBox(opt_interrupt L(interrupt) default specialization=havoc)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=havoc)
+
 AddFunction HavocDefaultShortCDActions
 {
-	if CheckBoxOn(opt_melee_range) and not target.InRange(demons_bite) Texture(misc_arrowlup help=L(not_in_melee_range))
+	if CheckBoxOn(opt_melee_range) and not target.InRange(chaos_strike) {
+		if Charges(fel_rush)>=1 Spell(fel_rush)
+		Spell(throw_glaive)
+		Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
+	if Charges(fel_rush)==2 Spell(fel_rush)
 }
 
 AddFunction HavocDefaultMainActions
 {
-	if Talent(prepared_talent) and target.InRange(demons_bite) and Charges(fel_rush) >= 1 Spell(vengeful_retreat)
-	if ((Talent(fel_mastery_talent) and Fury() <= 70) or (Charges(fel_rush)==2)) Spell(fel_rush)
-	if not target.InRange(chaos_strike) Spell(throw_glaive)
-	if (Fury() > 70) Spell(chaos_strike)
+	if Talent(prepared_talent) and target.InRange(chaos_strike) Spell(vengeful_retreat)
+	if Talent(fel_mastery_talent) and Fury() <= 70 Spell(fel_rush)
+	if Fury() > 70 Spell(chaos_strike)
 	if not Talent(demon_blades_talent) Spell(demons_bite)
 	Spell(throw_glaive)
 }
 
 AddFunction HavocDefaultAoEActions
 {
-	if (Enemies() > 3 and ((Talent(fel_mastery_talent) and Fury() <= 70) or (Charges(fel_rush)==2))) Spell(fel_rush)
-	if Talent(prepared_talent) and target.InRange(demons_bite) and Charges(fel_rush) >= 1 Spell(vengeful_retreat)
-	if (Enemies() > 3 and Charges(fel_rush)==2) Spell(fel_rush)
-	if Fury() >= 50 Spell(eye_beam)
-	if not target.InRange(chaos_strike) Spell(throw_glaive)
+	if Enemies() > 3 and Talent(fel_mastery_talent) and Fury() <= 70 Spell(fel_rush)
+	if Talent(prepared_talent) and target.InRange(chaos_strike) Spell(vengeful_retreat)
+	Spell(eye_beam)
 	if Talent(chaos_cleave_talent) and Enemies() <= 3 Spell(chaos_strike)
 	if Enemies() >= 3 Spell(blade_dance)
-	if ((Talent(fel_mastery_talent) and Fury() <= 70) or (Charges(fel_rush)==2)) Spell(fel_rush)
+	if Talent(fel_mastery_talent) and Fury() <= 70 Spell(fel_rush)
 	if ((Talent(demon_blades_talent) and Fury() > 60) or Fury() > 70) Spell(chaos_strike)
 	if not Talent(demon_blades_talent) Spell(demons_bite)
 	Spell(throw_glaive)

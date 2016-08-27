@@ -67,6 +67,7 @@ local MODIFIER_KEYWORD = {
 	["if"] = true,
 	["interrupt"] = true,
 	["interrupt_if"] = true,
+	["interrupt_immediate"] = true,
 	["lethal"] = true,
 	["line_cd"] = true,
 	["max_cycle_targets"] = true,
@@ -75,6 +76,7 @@ local MODIFIER_KEYWORD = {
 	["moving"] = true,
 	["name"] = true,
 	["nonlethal"] = true,
+	["op"] = true,
 	["range"] = true,
 	["sec"] = true,
 	["slot"] = true,
@@ -87,9 +89,14 @@ local MODIFIER_KEYWORD = {
 	["target_if_min"] = true,
 	["travel_speed"] = true,
 	["type"] = true,
+	["value"] = true,
 	["wait"] = true,
 	["wait_on_ready"] = true,
 	["weapon"] = true,
+}
+
+local LITTERAL_MODIFIER = {
+	["name"] = true
 }
 
 local FUNCTION_KEYWORD = {
@@ -117,6 +124,7 @@ local SPECIAL_ACTION = {
 	["stop_moving"] = true,
 	["swap_action_list"] = true,
 	["use_item"] = true,
+	["variable"] = true,
 	["wait"] = true,
 }
 
@@ -579,7 +587,7 @@ ParseAction = function(action, nodeList, annotation)
 		if (tokenType == "keyword" and SPECIAL_ACTION[token]) or tokenType == "name" then
 			name = token
 		else
-			SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing action line; name or special action expected.", token)
+			SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing action line '%s'; name or special action expected.", token, action)
 			ok = false
 		end
 	end
@@ -597,7 +605,7 @@ ParseAction = function(action, nodeList, annotation)
 					tokenType, token = tokenStream:Peek()
 				end
 			else
-				SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing action line; ',' expected.", token)
+				SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing action line '%s'; ',' expected.", token, action)
 				ok = false
 			end
 		end
@@ -778,6 +786,16 @@ ParseFunction = function(tokenStream, nodeList, annotation)
 	return ok, node
 end
 
+ParseIdentifier = function(tokenStream, nodeList, annotation)
+	local tokenType, token = tokenStream:Consume()
+	local node = NewNode(nodeList)
+	node.type = "operand"
+	node.name = token
+	annotation.operand = annotation.operand or {}
+	annotation.operand[#annotation.operand + 1] = node
+	return true, node
+end
+
 ParseModifier = function(tokenStream, nodeList, annotation)
 	local ok = true
 	local name
@@ -800,9 +818,13 @@ ParseModifier = function(tokenStream, nodeList, annotation)
 	end
 	local expressionNode
 	if ok then
-		ok, expressionNode = ParseExpression(tokenStream, nodeList, annotation)
-		if ok and expressionNode and name == "sec" then
-			expressionNode.asType = "value"
+		if LITTERAL_MODIFIER[name] then 
+			ok, expressionNode = ParseIdentifier(tokenStream, nodeList, annotation)
+		else
+			ok, expressionNode = ParseExpression(tokenStream, nodeList, annotation)
+			if ok and expressionNode and name == "sec" then
+				expressionNode.asType = "value"
+			end
 		end
 	end
 	return ok, name, expressionNode
@@ -1129,6 +1151,7 @@ local function InitializeDisambiguation()
 	AddDisambiguation("roll_the_bones_debuff",	"roll_the_bones_buff",			"ROGUE")
 	AddDisambiguation("envenom_debuff",			"envenom_buff",					"ROGUE")
 	AddDisambiguation("vendetta_buff",			"vendetta_debuff",				"ROGUE",		"assassination") -- TODO Strange, is there actualy a buff?
+	AddDisambiguation("deeper_strategem_talent","deeper_stratagem_talent",      "ROGUE",        "subtlety")
 	-- Shaman
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_mana",			"SHAMAN")
 	AddDisambiguation("ascendance",				"ascendance_caster",			"SHAMAN",		"elemental")
@@ -1638,7 +1661,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			bodyCode = camelSpecialization .. "GetInMeleeRange()"
 			annotation[action] = class
 			isSpellAction = false
-		elseif class == "HUNTER" and action == "counter_shot" then
+		elseif class == "HUNTER" and (action == "muzzle" or action == "silencing_shot") then
 			bodyCode = camelSpecialization .. "InterruptActions()"
 			annotation[action] = class
 			annotation.interrupt = class
@@ -1893,6 +1916,10 @@ EmitAction = function(parseNode, nodeList, annotation)
 			isSpellAction = false
 		elseif action == "auto_attack" then
 			bodyCode = camelSpecialization .. "GetInMeleeRange()"
+			isSpellAction = false
+		elseif action == "variable" then
+			-- TODO #60
+			-- skip
 			isSpellAction = false
 		elseif action == "call_action_list" or action == "run_action_list" or action == "swap_action_list" then
 			if modifier.name then
@@ -2577,6 +2604,8 @@ EmitOperand = function(parseNode, nodeList, annotation, action)
 			ok, node = EmitOperandTotem(operand, parseNode, nodeList, annotation, action)
 		elseif token == "trinket" then
 			ok, node = EmitOperandTrinket(operand, parseNode, nodeList, annotation, action)
+		elseif token == "variable" then
+			ok, node = EmitOperandVariable(operand, parseNode, nodeList, annotation, action)
 		end
 	end
 	if not ok then
@@ -2686,6 +2715,10 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
 		symbol = buffName
 	elseif property == "travel_time" then
 		code = format("TravelTime(%s)", name)
+	elseif property == "usable" then
+		code = format("Spell(%s)", name)
+	elseif property == "usable_in" then
+		code = format("Spell(%s)", name)
 	else
 		ok = false
 	end
@@ -2917,6 +2950,7 @@ do
 		["solar_max"]			= "TimeToEclipse(solar)",	-- XXX
 		["soul_shard"]			= "SoulShards()",
 		["stat.multistrike_pct"]= "MultistrikeChance()",
+		["stealthed"]			= "Stealthed()",
 		["time"]				= "TimeInCombat()",
 		["time_to_die"]			= "TimeToDie()",
 		["time_to_die.remains"]	= "TimeToDie()",
@@ -3828,6 +3862,12 @@ EmitOperandTrinket = function(operand, parseNode, nodeList, annotation, action)
 	return ok, node
 end
 
+EmitOperandVariable = function(operand, parseNode, nodeList, annotation, action)
+	local code = "0"
+	local node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+	return true, node
+end
+
 do
 	EMIT_VISITOR = {
 		["action"] = EmitAction,
@@ -3979,6 +4019,34 @@ local function Sweep(node)
 	return isChanged, isSwept
 end
 
+local function InsertInterruptFunction(child, annotation, name)
+	local nodeList = annotation.astAnnotation.nodeList
+	local camelSpecialization = CamelSpecialization(annotation)
+	local fmt = [[
+		AddFunction %sInterruptActions
+		{
+			if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+			{
+				Spell(%s)
+				if not target.Classification(worldboss)
+				{
+					Spell(arcane_torrent_focus)
+					if target.InRange(quaking_palm) Spell(quaking_palm)
+					Spell(war_stomp)
+				}
+			}
+		}
+	]]
+	local code = format(fmt, camelSpecialization, name)
+	local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+	tinsert(child, 1, node)
+	annotation.functionTag[node.name] = "cd"
+	AddSymbol(annotation, "arcane_torrent_focus")
+	AddSymbol(annotation, name)
+	AddSymbol(annotation, "quaking_palm")
+	AddSymbol(annotation, "war_stomp")
+end
+
 local function InsertSupportingFunctions(child, annotation)
 	local count = 0
 	local nodeList = annotation.astAnnotation.nodeList
@@ -4018,14 +4086,14 @@ local function InsertSupportingFunctions(child, annotation)
 		local fmt = [[
 			AddFunction %sGetInMeleeRange
 			{
-				if CheckBoxOn(opt_melee_range) and not target.InRange(plague_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
+				if CheckBoxOn(opt_melee_range) and not target.InRange(death_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
 			}
 		]]
 		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "shortcd"
-		AddSymbol(annotation, "plague_strike")
+		AddSymbol(annotation, "death_strike")
 		count = count + 1
 	end
 	if annotation.skull_bash == "DRUID" then
@@ -4116,30 +4184,12 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "revive_pet")
 		count = count + 1
 	end
-	if annotation.counter_shot == "HUNTER" then
-		local fmt = [[
-			AddFunction %sInterruptActions
-			{
-				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-				{
-					Spell(counter_shot)
-					if not target.Classification(worldboss)
-					{
-						Spell(arcane_torrent_focus)
-						if target.InRange(quaking_palm) Spell(quaking_palm)
-						Spell(war_stomp)
-					}
-				}
-			}
-		]]
-		local code = format(fmt, camelSpecialization)
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		annotation.functionTag[node.name] = "cd"
-		AddSymbol(annotation, "arcane_torrent_focus")
-		AddSymbol(annotation, "counter_shot")
-		AddSymbol(annotation, "quaking_palm")
-		AddSymbol(annotation, "war_stomp")
+	if annotation.silencing_shot == "HUNTER" then
+		InsertInterruptFunction(child, annotation, "silencing_shot")
+		count = count + 1
+	end
+	if annotation.muzzle == "HUNTER" then
+		InsertInterruptFunction(child, annotation, "muzzle")
 		count = count + 1
 	end
 	if annotation.counterspell == "MAGE" then

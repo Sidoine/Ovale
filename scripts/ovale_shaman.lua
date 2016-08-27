@@ -55,6 +55,8 @@ AddFunction ElementalInterruptActions
 
 AddFunction ElementalDefaultMainActions
 {
+	#storm_elemental
+	Spell(storm_elemental)
 	#run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
 	if Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } ElementalAoeMainActions()
 	#run_action_list,name=single
@@ -63,15 +65,18 @@ AddFunction ElementalDefaultMainActions
 
 AddFunction ElementalDefaultShortCdActions
 {
-	#elemental_mastery
-	Spell(elemental_mastery)
-	#run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
-	if Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } ElementalAoeShortCdActions()
-
-	unless Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } and ElementalAoeShortCdPostConditions()
+	unless Spell(storm_elemental)
 	{
-		#run_action_list,name=single
-		ElementalSingleShortCdActions()
+		#elemental_mastery
+		Spell(elemental_mastery)
+		#run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
+		if Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } ElementalAoeShortCdActions()
+
+		unless Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } and ElementalAoeShortCdPostConditions()
+		{
+			#run_action_list,name=single
+			ElementalSingleShortCdActions()
+		}
 	}
 }
 
@@ -89,17 +94,21 @@ AddFunction ElementalDefaultCdActions
 	if BuffRemaining(resonance_totem_buff) < 2 Spell(totem_mastery)
 	#fire_elemental
 	Spell(fire_elemental)
-	#blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-	if not Talent(ascendance_talent) or BuffPresent(ascendance_caster_buff) or SpellCooldown(ascendance_caster) > 50 Spell(blood_fury_apsp)
-	#berserking,if=!talent.ascendance.enabled|buff.ascendance.up
-	if not Talent(ascendance_talent) or BuffPresent(ascendance_caster_buff) Spell(berserking)
-	#run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
-	if Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } ElementalAoeCdActions()
 
-	unless Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } and ElementalAoeCdPostConditions()
+	unless Spell(storm_elemental)
 	{
-		#run_action_list,name=single
-		ElementalSingleCdActions()
+		#blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+		if not Talent(ascendance_talent) or BuffPresent(ascendance_caster_buff) or SpellCooldown(ascendance_caster) > 50 Spell(blood_fury_apsp)
+		#berserking,if=!talent.ascendance.enabled|buff.ascendance.up
+		if not Talent(ascendance_talent) or BuffPresent(ascendance_caster_buff) Spell(berserking)
+		#run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
+		if Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } ElementalAoeCdActions()
+
+		unless Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } and ElementalAoeCdPostConditions()
+		{
+			#run_action_list,name=single
+			ElementalSingleCdActions()
+		}
 	}
 }
 
@@ -107,10 +116,12 @@ AddFunction ElementalDefaultCdActions
 
 AddFunction ElementalAoeMainActions
 {
+	#flame_shock,if=spell_targets.chain_lightning=3&maelstrom>=20,target_if=refreshable
+	if Enemies() == 3 and Maelstrom() >= 20 and target.Refreshable(flame_shock_debuff) Spell(flame_shock)
 	#earthquake_totem
 	Spell(earthquake_totem)
-	#lava_beam,target_if=!debuff.lightning_rod.up
-	if not target.DebuffPresent(lightning_rod_debuff) Spell(lava_beam)
+	#lava_burst,if=buff.lava_surge.up&spell_targets.chain_lightning=3
+	if BuffPresent(lava_surge_buff) and Enemies() == 3 Spell(lava_burst)
 	#lava_beam
 	Spell(lava_beam)
 	#chain_lightning,target_if=!debuff.lightning_rod.up
@@ -133,7 +144,7 @@ AddFunction ElementalAoeShortCdActions
 
 AddFunction ElementalAoeShortCdPostConditions
 {
-	Spell(earthquake_totem) or not target.DebuffPresent(lightning_rod_debuff) and Spell(lava_beam) or Spell(lava_beam) or not target.DebuffPresent(lightning_rod_debuff) and Spell(chain_lightning) or Spell(chain_lightning) or Speed() > 0 and Spell(lava_burst) or Speed() > 0 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock)
+	Enemies() == 3 and Maelstrom() >= 20 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Spell(earthquake_totem) or BuffPresent(lava_surge_buff) and Enemies() == 3 and Spell(lava_burst) or Spell(lava_beam) or not target.DebuffPresent(lightning_rod_debuff) and Spell(chain_lightning) or Spell(chain_lightning) or Speed() > 0 and Spell(lava_burst) or Speed() > 0 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock)
 }
 
 AddFunction ElementalAoeCdActions
@@ -147,7 +158,7 @@ AddFunction ElementalAoeCdActions
 
 AddFunction ElementalAoeCdPostConditions
 {
-	Spell(stormkeeper) or Spell(liquid_magma_totem) or Spell(earthquake_totem) or not target.DebuffPresent(lightning_rod_debuff) and Spell(lava_beam) or Spell(lava_beam) or not target.DebuffPresent(lightning_rod_debuff) and Spell(chain_lightning) or Spell(chain_lightning) or Speed() > 0 and Spell(lava_burst) or Speed() > 0 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock)
+	Spell(stormkeeper) or Spell(liquid_magma_totem) or Enemies() == 3 and Maelstrom() >= 20 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Spell(earthquake_totem) or BuffPresent(lava_surge_buff) and Enemies() == 3 and Spell(lava_burst) or Spell(lava_beam) or not target.DebuffPresent(lightning_rod_debuff) and Spell(chain_lightning) or Spell(chain_lightning) or Speed() > 0 and Spell(lava_burst) or Speed() > 0 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock)
 }
 
 ### actions.precombat
@@ -194,7 +205,7 @@ AddFunction ElementalSingleMainActions
 	if target.DebuffRemaining(flame_shock_debuff) > CastTime(lava_burst) and { not SpellCooldown(lava_burst) > 0 or BuffPresent(ascendance_caster_buff) } Spell(lava_burst)
 	#elemental_blast
 	Spell(elemental_blast)
-	#flame_shock,if=maelstrom>=20&refreshable
+	#flame_shock,if=maelstrom>=20,target_if=refreshable
 	if Maelstrom() >= 20 and target.Refreshable(flame_shock_debuff) Spell(flame_shock)
 	#frost_shock,if=talent.icefury.enabled&buff.icefury.up&((maelstrom>=20&raid_event.movement.in>buff.icefury.remains)|buff.icefury.remains<(1.5*spell_haste*buff.icefury.stack))
 	if Talent(icefury_talent) and BuffPresent(icefury_buff) and { Maelstrom() >= 20 and 600 > BuffRemaining(icefury_buff) or BuffRemaining(icefury_buff) < 1.5 * { 100 / { 100 + SpellHaste() } } * BuffStacks(icefury_buff) } Spell(frost_shock)
@@ -315,12 +326,14 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 # icefury_talent
 # lava_beam
 # lava_burst
+# lava_surge_buff
 # legendary_ring_intellect
 # lightning_bolt
 # lightning_rod_debuff
 # liquid_magma_totem
 # quaking_palm
 # resonance_totem_buff
+# storm_elemental
 # stormkeeper
 # stormkeeper_buff
 # totem_mastery
@@ -387,14 +400,14 @@ AddFunction EnhancementInterruptActions
 
 AddFunction EnhancementDefaultMainActions
 {
-	#boulderfist,if=!buff.boulderfist.up
-	if not BuffPresent(boulderfist_buff) Spell(boulderfist)
+	#boulderfist,if=buff.boulderfist.remains<gcd|charges_fractional>1.75
+	if BuffRemaining(boulderfist_buff) < GCD() or Charges(boulderfist count=0) > 1.75 Spell(boulderfist)
+	#frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<gcd
+	if Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < GCD() Spell(frostbrand)
+	#flametongue,if=buff.flametongue.remains<gcd
+	if BuffRemaining(flametongue_buff) < GCD() Spell(flametongue)
 	#fury_of_air,if=!ticking
 	if not target.DebuffPresent(fury_of_air_debuff) Spell(fury_of_air)
-	#frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<4.8
-	if Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 Spell(frostbrand)
-	#flametongue,if=buff.flametongue.remains<4.8
-	if BuffRemaining(flametongue_buff) < 4.8 Spell(flametongue)
 	#doom_winds
 	Spell(doom_winds)
 	#crash_lightning,if=active_enemies>=3
@@ -403,24 +416,26 @@ AddFunction EnhancementDefaultMainActions
 	Spell(windstrike)
 	#stormstrike
 	Spell(stormstrike)
-	#lightning_bolt,if=talent.overcharge.enabled&maelstrom>=45
-	if Talent(overcharge_talent) and Maelstrom() >= 45 Spell(lightning_bolt)
+	#frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<4.8
+	if Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 Spell(frostbrand)
+	#flametongue,if=buff.flametongue.remains<4.8
+	if BuffRemaining(flametongue_buff) < 4.8 Spell(flametongue)
+	#lightning_bolt,if=talent.overcharge.enabled&maelstrom>=60
+	if Talent(overcharge_talent) and Maelstrom() >= 60 Spell(lightning_bolt)
 	#lava_lash,if=buff.hot_hand.react
 	if BuffPresent(hot_hand_buff) Spell(lava_lash)
-	#boulderfist,if=charges_fractional>=1.5
-	if Charges(boulderfist count=0) >= 1.5 Spell(boulderfist)
 	#earthen_spike
 	Spell(earthen_spike)
 	#crash_lightning,if=active_enemies>1|talent.crashing_storm.enabled|(pet.feral_spirit.remains>5|pet.frost_wolf.remains>5|pet.fiery_wolf.remains>5|pet.lightning_wolf.remains>5)
 	if Enemies() > 1 or Talent(crashing_storm_talent) or PetPresent() > 5 or PetPresent() > 5 or PetPresent() > 5 or PetPresent() > 5 Spell(crash_lightning)
-	#lava_lash,if=maelstrom>=120
-	if Maelstrom() >= 120 Spell(lava_lash)
-	#flametongue,if=talent.boulderfist.enabled
-	if Talent(boulderfist_talent) Spell(flametongue)
-	#boulderfist
-	Spell(boulderfist)
+	#lava_lash,if=maelstrom>=90
+	if Maelstrom() >= 90 Spell(lava_lash)
 	#rockbiter
 	Spell(rockbiter)
+	#flametongue
+	Spell(flametongue)
+	#boulderfist
+	Spell(boulderfist)
 }
 
 AddFunction EnhancementDefaultShortCdActions
@@ -428,12 +443,12 @@ AddFunction EnhancementDefaultShortCdActions
 	#auto_attack
 	EnhancementGetInMeleeRange()
 
-	unless not BuffPresent(boulderfist_buff) and Spell(boulderfist)
+	unless { BuffRemaining(boulderfist_buff) < GCD() or Charges(boulderfist count=0) > 1.75 } and Spell(boulderfist) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < GCD() and Spell(frostbrand) or BuffRemaining(flametongue_buff) < GCD() and Spell(flametongue)
 	{
 		#windsong
 		Spell(windsong)
 
-		unless not target.DebuffPresent(fury_of_air_debuff) and Spell(fury_of_air) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 and Spell(frostbrand) or BuffRemaining(flametongue_buff) < 4.8 and Spell(flametongue) or Spell(doom_winds) or Enemies() >= 3 and Spell(crash_lightning) or Spell(windstrike) or Spell(stormstrike) or Talent(overcharge_talent) and Maelstrom() >= 45 and Spell(lightning_bolt) or BuffPresent(hot_hand_buff) and Spell(lava_lash) or Charges(boulderfist count=0) >= 1.5 and Spell(boulderfist) or Spell(earthen_spike) or { Enemies() > 1 or Talent(crashing_storm_talent) or PetPresent() > 5 or PetPresent() > 5 or PetPresent() > 5 or PetPresent() > 5 } and Spell(crash_lightning)
+		unless not target.DebuffPresent(fury_of_air_debuff) and Spell(fury_of_air) or Spell(doom_winds) or Enemies() >= 3 and Spell(crash_lightning) or Spell(windstrike) or Spell(stormstrike) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 and Spell(frostbrand) or BuffRemaining(flametongue_buff) < 4.8 and Spell(flametongue) or Talent(overcharge_talent) and Maelstrom() >= 60 and Spell(lightning_bolt) or BuffPresent(hot_hand_buff) and Spell(lava_lash) or Spell(earthen_spike) or { Enemies() > 1 or Talent(crashing_storm_talent) or PetPresent() > 5 or PetPresent() > 5 or PetPresent() > 5 or PetPresent() > 5 } and Spell(crash_lightning)
 		{
 			#sundering
 			Spell(sundering)
@@ -447,6 +462,8 @@ AddFunction EnhancementDefaultCdActions
 	EnhancementInterruptActions()
 	#bloodlust,if=target.health.pct<25|time>0.500
 	if target.HealthPercent() < 25 or TimeInCombat() > 0.5 EnhancementBloodlust()
+	#feral_spirit
+	Spell(feral_spirit)
 	#use_item,slot=finger2
 	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
 	#potion,name=draenic_agility,if=pet.feral_spirit.remains>10|pet.frost_wolf.remains>5|pet.fiery_wolf.remains>5|pet.lightning_wolf.remains>5|target.time_to_die<=30
@@ -455,10 +472,8 @@ AddFunction EnhancementDefaultCdActions
 	if BuffPresent(ascendance_melee_buff) or not Talent(ascendance_talent) or Level() < 100 Spell(berserking)
 	#blood_fury
 	Spell(blood_fury_apsp)
-	#feral_spirit
-	Spell(feral_spirit)
 
-	unless not BuffPresent(boulderfist_buff) and Spell(boulderfist)
+	unless { BuffRemaining(boulderfist_buff) < GCD() or Charges(boulderfist count=0) > 1.75 } and Spell(boulderfist) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < GCD() and Spell(frostbrand) or BuffRemaining(flametongue_buff) < GCD() and Spell(flametongue) or Spell(windsong)
 	{
 		#ascendance
 		if BuffExpires(ascendance_melee_buff) Spell(ascendance_melee)
@@ -558,7 +573,6 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # bloodlust
 # boulderfist
 # boulderfist_buff
-# boulderfist_talent
 # crash_lightning
 # crashing_storm_talent
 # doom_winds

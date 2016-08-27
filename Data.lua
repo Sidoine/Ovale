@@ -197,7 +197,6 @@ OvaleData.buffSpellList = {
 		[  5215] = true, -- Prowl
 		[ 11327] = true, -- Vanish
 		[ 24450] = true, -- Prowl (cat)
-		[ 51713] = true, -- Shadow Dance (subtlety rogue); not truly "stealth" but functions like it for spell usage.
 		[ 58984] = true, -- Shadowmeld
 		[ 90328] = true, -- Spirit Walk (spirit beast)
 		[102543] = true, -- Incarnation: King of the Jungle (feral druid); not truly "stealth" but functions like it for spell usage.
@@ -205,6 +204,7 @@ OvaleData.buffSpellList = {
 		[115191] = true, -- Stealth (Subterfuge-talented rogue)
 		[115192] = true, -- Subterfuge (rogue); not truly "stealth" but functions like it for spell usage.
 		[115193] = true, -- Vanish (Subterfuge-talented rogue)
+		[185422] = true, -- Shadow Dance (subtlety rogue); not truly "stealth" but functions like it for spell usage.
 	},
 
 	-- Raid buffs (short term)
@@ -481,6 +481,7 @@ function OvaleData:GetSpellInfoProperty(spellId, atTime, property, targetGUID)
 	targetGUID = targetGUID or OvaleGUID:UnitGUID(self.defaultTarget or "target")
 	local si = OvaleData.spellInfo[spellId]
 	local value = si and si[property]
+
 	local requirements = si and si.require[property]
 	if requirements then
 		for v, requirement in pairs(requirements) do
@@ -491,7 +492,27 @@ function OvaleData:GetSpellInfoProperty(spellId, atTime, property, targetGUID)
 			end
 		end
 	end
-	return value
+
+	if not value or not tonumber(value) then return value end
+
+	local ratio = si and si[property .. "_percent"]
+	if ratio then
+		ratio = ratio / 100
+	else
+		ratio = 1
+	end
+	
+	local multipliers = si and si.require[property .. '_percent']
+	if multipliers then
+		for v, requirement in pairs(multipliers) do
+			local verified = self:CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+			if verified then
+				ratio = ratio * (tonumber(v) or v) / 100
+			end
+		end
+	end
+
+	return value * ratio
 end
 
 --Compute the damage of the given spell.

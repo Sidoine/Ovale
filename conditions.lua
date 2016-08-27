@@ -3498,6 +3498,11 @@ do
 		return PowerCost("runicpower", positionalParams, namedParams, state, atTime)
 	end
 
+	local function AstralPowerCost(positionalParams, namedParams, state, atTime)
+		return PowerCost("astralpower", positionalParams, namedParams, state, atTime)
+	end
+
+	OvaleCondition:RegisterCondition("astralpowercost", true, AstralPowerCost)
 	OvaleCondition:RegisterCondition("energycost", true, EnergyCost)
 	OvaleCondition:RegisterCondition("focuscost", true, FocusCost)
 	OvaleCondition:RegisterCondition("manacost", true, ManaCost)
