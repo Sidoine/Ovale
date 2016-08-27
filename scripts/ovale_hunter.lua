@@ -193,12 +193,27 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_hunter_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=marksmanship)
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=marksmanship)
 AddCheckBox(opt_legendary_ring_agility ItemName(legendary_ring_agility) default specialization=marksmanship)
 
 AddFunction MarksmanshipUsePotionAgility
 {
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
+}
+
+AddFunction MarksmanshipInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		Spell(silencing_shot)
+		if not target.Classification(worldboss)
+		{
+			Spell(arcane_torrent_focus)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
 }
 
 AddFunction MarksmanshipSummonPet
@@ -293,6 +308,8 @@ AddFunction MarksmanshipDefaultShortCdActions
 AddFunction MarksmanshipDefaultCdActions
 {
 	#auto_shot
+	#silencing_shot
+	MarksmanshipInterruptActions()
 	#use_item,name=maalus_the_blood_drinker
 	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
 	#arcane_torrent,if=focus.deficit>=30
@@ -391,10 +408,12 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # multishot
 # patient_sniper_talent
 # piercing_shot
+# quaking_palm
 # revive_pet
 # sentinel
 # sidewinders
 # sidewinders_talent
+# silencing_shot
 # steady_focus_buff
 # steady_focus_talent
 # true_aim_debuff
@@ -402,6 +421,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # trueshot
 # trueshot_buff
 # vulnerability_debuff
+# war_stomp
 # windburst
 ]]
 	OvaleScripts:RegisterScript("HUNTER", "marksmanship", name, desc, code, "script")
@@ -421,6 +441,7 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_hunter_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=survival)
 AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=survival)
 AddCheckBox(opt_legendary_ring_agility ItemName(legendary_ring_agility) default specialization=survival)
 AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default specialization=survival)
@@ -428,6 +449,20 @@ AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default specialization=su
 AddFunction SurvivalUsePotionAgility
 {
 	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
+}
+
+AddFunction SurvivalInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		Spell(muzzle)
+		if not target.Classification(worldboss)
+		{
+			Spell(arcane_torrent_focus)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
 }
 
 AddFunction SurvivalSummonPet
@@ -507,6 +542,8 @@ AddFunction SurvivalDefaultShortCdActions
 AddFunction SurvivalDefaultCdActions
 {
 	#auto_attack
+	#muzzle
+	SurvivalInterruptActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury
@@ -632,6 +669,8 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # moknathal_tactics_buff
 # mongoose_bite
 # mongoose_fury_buff
+# muzzle
+# quaking_palm
 # raptor_strike
 # revive_pet
 # serpent_sting_debuff
@@ -642,6 +681,7 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # throwing_axes
 # throwing_axes_talent
 # trap_launcher
+# war_stomp
 # way_of_the_moknathal_talent
 ]]
 	OvaleScripts:RegisterScript("HUNTER", "survival", name, desc, code, "script")

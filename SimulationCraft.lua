@@ -4019,6 +4019,34 @@ local function Sweep(node)
 	return isChanged, isSwept
 end
 
+local function InsertInterruptFunction(child, annotation, name)
+	local nodeList = annotation.astAnnotation.nodeList
+	local camelSpecialization = CamelSpecialization(annotation)
+	local fmt = [[
+		AddFunction %sInterruptActions
+		{
+			if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+			{
+				Spell(%s)
+				if not target.Classification(worldboss)
+				{
+					Spell(arcane_torrent_focus)
+					if target.InRange(quaking_palm) Spell(quaking_palm)
+					Spell(war_stomp)
+				}
+			}
+		}
+	]]
+	local code = format(fmt, camelSpecialization, name)
+	local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+	tinsert(child, 1, node)
+	annotation.functionTag[node.name] = "cd"
+	AddSymbol(annotation, "arcane_torrent_focus")
+	AddSymbol(annotation, name)
+	AddSymbol(annotation, "quaking_palm")
+	AddSymbol(annotation, "war_stomp")
+end
+
 local function InsertSupportingFunctions(child, annotation)
 	local count = 0
 	local nodeList = annotation.astAnnotation.nodeList
@@ -4156,30 +4184,12 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "revive_pet")
 		count = count + 1
 	end
-	if annotation.counter_shot == "HUNTER" then
-		local fmt = [[
-			AddFunction %sInterruptActions
-			{
-				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-				{
-					Spell(counter_shot)
-					if not target.Classification(worldboss)
-					{
-						Spell(arcane_torrent_focus)
-						if target.InRange(quaking_palm) Spell(quaking_palm)
-						Spell(war_stomp)
-					}
-				}
-			}
-		]]
-		local code = format(fmt, camelSpecialization)
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		annotation.functionTag[node.name] = "cd"
-		AddSymbol(annotation, "arcane_torrent_focus")
-		AddSymbol(annotation, "counter_shot")
-		AddSymbol(annotation, "quaking_palm")
-		AddSymbol(annotation, "war_stomp")
+	if annotation.silencing_shot == "HUNTER" then
+		InsertInterruptFunction(child, annotation, "silencing_shot")
+		count = count + 1
+	end
+	if annotation.muzzle == "HUNTER" then
+		InsertInterruptFunction(child, annotation, "muzzle")
 		count = count + 1
 	end
 	if annotation.counterspell == "MAGE" then
