@@ -197,7 +197,6 @@ OvaleData.buffSpellList = {
 		[  5215] = true, -- Prowl
 		[ 11327] = true, -- Vanish
 		[ 24450] = true, -- Prowl (cat)
-		[ 51713] = true, -- Shadow Dance (subtlety rogue); not truly "stealth" but functions like it for spell usage.
 		[ 58984] = true, -- Shadowmeld
 		[ 90328] = true, -- Spirit Walk (spirit beast)
 		[102543] = true, -- Incarnation: King of the Jungle (feral druid); not truly "stealth" but functions like it for spell usage.
@@ -205,6 +204,8 @@ OvaleData.buffSpellList = {
 		[115191] = true, -- Stealth (Subterfuge-talented rogue)
 		[115192] = true, -- Subterfuge (rogue); not truly "stealth" but functions like it for spell usage.
 		[115193] = true, -- Vanish (Subterfuge-talented rogue)
+		[185422] = true, -- Shadow Dance (subtlety rogue); not truly "stealth" but functions like it for spell usage.
+
 	},
 
 	-- Raid buffs (short term)
