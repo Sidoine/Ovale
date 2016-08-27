@@ -101,6 +101,7 @@ AddIcon enemies=1 help=main specialization=blood
 
 AddIcon help=aoe specialization=blood
 {
+	if Enemies() <= 1 BloodDefaultMainActions()
 	BloodDefaultAoEActions()
 }
 
