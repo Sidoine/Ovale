@@ -141,7 +141,7 @@ AddFunction FrostDualWieldUsePotionStrength
 
 AddFunction FrostDualWieldGetInMeleeRange
 {
-	if CheckBoxOn(opt_melee_range) and not target.InRange(plague_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
+	if CheckBoxOn(opt_melee_range) and not target.InRange(death_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
 ### actions.default
@@ -430,7 +430,7 @@ AddFunction FrostTwoHanderUsePotionStrength
 
 AddFunction FrostTwoHanderGetInMeleeRange
 {
-	if CheckBoxOn(opt_melee_range) and not target.InRange(plague_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
+	if CheckBoxOn(opt_melee_range) and not target.InRange(death_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
 ### actions.default
@@ -719,7 +719,7 @@ AddFunction UnholyUsePotionStrength
 
 AddFunction UnholyGetInMeleeRange
 {
-	if CheckBoxOn(opt_melee_range) and not target.InRange(plague_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
+	if CheckBoxOn(opt_melee_range) and not target.InRange(death_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
 ### actions.default
