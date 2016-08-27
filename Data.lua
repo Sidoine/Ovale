@@ -493,7 +493,7 @@ function OvaleData:GetSpellInfoProperty(spellId, atTime, property, targetGUID)
 		end
 	end
 
-	if not value then return value end
+	if not value or not tonumber(value) then return value end
 
 	local ratio = si and si[property .. "_percent"]
 	if ratio then

@@ -77,8 +77,8 @@ AddFunction MistweaverDefaultCdActions
 
 AddFunction MistweaverAoeMainActions
 {
-	#spinning_crane_kick,if=!talent.refreshing_jade_wind.enabled
-	if not Talent(refreshing_jade_wind_talent) Spell(spinning_crane_kick)
+	#spinning_crane_kick
+	Spell(spinning_crane_kick)
 	#refreshing_jade_wind
 	Spell(refreshing_jade_wind)
 	#blackout_kick
@@ -89,7 +89,7 @@ AddFunction MistweaverAoeMainActions
 
 AddFunction MistweaverAoeShortCdActions
 {
-	unless not Talent(refreshing_jade_wind_talent) and Spell(spinning_crane_kick) or Spell(refreshing_jade_wind)
+	unless Spell(spinning_crane_kick) or Spell(refreshing_jade_wind)
 	{
 		#chi_burst
 		if CheckBoxOn(opt_chi_burst) Spell(chi_burst)
@@ -98,7 +98,7 @@ AddFunction MistweaverAoeShortCdActions
 
 AddFunction MistweaverAoeShortCdPostConditions
 {
-	not Talent(refreshing_jade_wind_talent) and Spell(spinning_crane_kick) or Spell(refreshing_jade_wind) or Spell(blackout_kick) or Talent(rushing_jade_wind_talent) and Spell(tiger_palm)
+	Spell(spinning_crane_kick) or Spell(refreshing_jade_wind) or Spell(blackout_kick) or Talent(rushing_jade_wind_talent) and Spell(tiger_palm)
 }
 
 ### actions.precombat
@@ -166,7 +166,6 @@ AddIcon checkbox=opt_monk_mistweaver_aoe help=cd specialization=mistweaver
 # draenic_intellect_potion
 # invoke_xuen
 # refreshing_jade_wind
-# refreshing_jade_wind_talent
 # rising_sun_kick
 # rushing_jade_wind_talent
 # spinning_crane_kick
@@ -210,8 +209,8 @@ AddFunction WindwalkerGetInMeleeRange
 
 AddFunction WindwalkerDefaultMainActions
 {
-	#storm_earth_and_fire,if=artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.up&cooldown.fists_of_fury.remains<=9&cooldown.rising_sun_kick.remains<=5
-	if BuffPresent(strike_of_the_windlord_buff) and not SpellCooldown(strike_of_the_windlord) > 0 and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } Spell(storm_earth_and_fire)
+	#storm_earth_and_fire,if=artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.remains<14&cooldown.fists_of_fury.remains<=9&cooldown.rising_sun_kick.remains<=5
+	if BuffPresent(strike_of_the_windlord_buff) and SpellCooldown(strike_of_the_windlord) < 14 and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } Spell(storm_earth_and_fire)
 	#storm_earth_and_fire,if=!artifact.strike_of_the_windlord.enabled&cooldown.fists_of_fury.remains<=9&cooldown.rising_sun_kick.remains<=5
 	if not BuffPresent(strike_of_the_windlord_buff) and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } Spell(storm_earth_and_fire)
 	#rushing_jade_wind,if=buff.serenity.up&!prev_gcd.rushing_jade_wind
@@ -232,15 +231,13 @@ AddFunction WindwalkerDefaultShortCdActions
 	WindwalkerGetInMeleeRange()
 	#touch_of_death,if=!artifact.gale_burst.enabled
 	if not BuffPresent(gale_burst_buff) Spell(touch_of_death)
-	#touch_of_death,if=artifact.gale_burst.enabled&cooldown.strike_of_the_windlord.up&!talent.serenity.enabled&cooldown.fists_of_fury.remains<=9&cooldown.rising_sun_kick.remains<=5
-	if BuffPresent(gale_burst_buff) and not SpellCooldown(strike_of_the_windlord) > 0 and not Talent(serenity_talent) and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 Spell(touch_of_death)
-	#touch_of_death,if=artifact.gale_burst.enabled&cooldown.strike_of_the_windlord.up&talent.serenity.enabled&cooldown.fists_of_fury.remains<=3&cooldown.rising_sun_kick.remains<8
-	if BuffPresent(gale_burst_buff) and not SpellCooldown(strike_of_the_windlord) > 0 and Talent(serenity_talent) and SpellCooldown(fists_of_fury) <= 3 and SpellCooldown(rising_sun_kick) < 8 Spell(touch_of_death)
+	#touch_of_death,if=artifact.gale_burst.enabled&cooldown.strike_of_the_windlord.remains<8&cooldown.fists_of_fury.remains<=3&cooldown.rising_sun_kick.remains<8
+	if BuffPresent(gale_burst_buff) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 3 and SpellCooldown(rising_sun_kick) < 8 Spell(touch_of_death)
 
-	unless BuffPresent(strike_of_the_windlord_buff) and not SpellCooldown(strike_of_the_windlord) > 0 and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } and Spell(storm_earth_and_fire) or not BuffPresent(strike_of_the_windlord_buff) and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } and Spell(storm_earth_and_fire)
+	unless BuffPresent(strike_of_the_windlord_buff) and SpellCooldown(strike_of_the_windlord) < 14 and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } and Spell(storm_earth_and_fire) or not BuffPresent(strike_of_the_windlord_buff) and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } and Spell(storm_earth_and_fire)
 	{
-		#serenity,if=artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.up&cooldown.fists_of_fury.remains<=3&cooldown.rising_sun_kick.remains<8
-		if BuffPresent(strike_of_the_windlord_buff) and not SpellCooldown(strike_of_the_windlord) > 0 and SpellCooldown(fists_of_fury) <= 3 and SpellCooldown(rising_sun_kick) < 8 Spell(serenity)
+		#serenity,if=artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.remains<7&cooldown.fists_of_fury.remains<=3&cooldown.rising_sun_kick.remains<8
+		if BuffPresent(strike_of_the_windlord_buff) and SpellCooldown(strike_of_the_windlord) < 7 and SpellCooldown(fists_of_fury) <= 3 and SpellCooldown(rising_sun_kick) < 8 Spell(serenity)
 		#serenity,if=!artifact.strike_of_the_windlord.enabled&cooldown.fists_of_fury.remains<=3&cooldown.rising_sun_kick.remains<8
 		if not BuffPresent(strike_of_the_windlord_buff) and SpellCooldown(fists_of_fury) <= 3 and SpellCooldown(rising_sun_kick) < 8 Spell(serenity)
 		#energizing_elixir,if=energy<energy.max&chi<=1&buff.serenity.down
@@ -248,8 +245,8 @@ AddFunction WindwalkerDefaultShortCdActions
 
 		unless BuffPresent(serenity_buff) and not PreviousGCDSpell(rushing_jade_wind) and Spell(rushing_jade_wind)
 		{
-			#strike_of_the_windlord,if=artifact.strike_of_the_windlord.enabled
-			if BuffPresent(strike_of_the_windlord_buff) Spell(strike_of_the_windlord)
+			#strike_of_the_windlord
+			Spell(strike_of_the_windlord)
 
 			unless Spell(whirling_dragon_punch) or Spell(fists_of_fury)
 			{
@@ -272,14 +269,18 @@ AddFunction WindwalkerDefaultCdActions
 	Spell(invoke_xuen)
 	#potion,name=draenic_agility,if=buff.serenity.up|buff.storm_earth_and_fire.up|(!talent.serenity.enabled&trinket.proc.agility.react)|buff.bloodlust.react|target.time_to_die<=60
 	if BuffPresent(serenity_buff) or BuffPresent(storm_earth_and_fire_buff) or not Talent(serenity_talent) and BuffPresent(trinket_proc_agility_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 WindwalkerUsePotionAgility()
-	#use_item,name=maalus_the_blood_drinker
-	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
-	#blood_fury
-	Spell(blood_fury_apsp)
-	#berserking
-	Spell(berserking)
-	#arcane_torrent,if=chi.max-chi>=1
-	if MaxChi() - Chi() >= 1 Spell(arcane_torrent_chi)
+
+	unless not BuffPresent(gale_burst_buff) and Spell(touch_of_death) or BuffPresent(gale_burst_buff) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 3 and SpellCooldown(rising_sun_kick) < 8 and Spell(touch_of_death)
+	{
+		#use_item,name=maalus_the_blood_drinker
+		if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
+		#blood_fury
+		Spell(blood_fury_apsp)
+		#berserking
+		Spell(berserking)
+		#arcane_torrent,if=chi.max-chi>=1
+		if MaxChi() - Chi() >= 1 Spell(arcane_torrent_chi)
+	}
 }
 
 ### actions.aoe
@@ -288,26 +289,24 @@ AddFunction WindwalkerAoeMainActions
 {
 	#spinning_crane_kick,if=!prev_gcd.spinning_crane_kick
 	if not PreviousGCDSpell(spinning_crane_kick) Spell(spinning_crane_kick)
-	#rushing_jade_wind,if=chi>=2&!prev_gcd.rushing_jade_wind
-	if Chi() >= 2 and not PreviousGCDSpell(rushing_jade_wind) Spell(rushing_jade_wind)
+	#rising_sun_kick,cycle_targets=1
+	Spell(rising_sun_kick)
+	#rushing_jade_wind,if=chi>1&!prev_gcd.rushing_jade_wind
+	if Chi() > 1 and not PreviousGCDSpell(rushing_jade_wind) Spell(rushing_jade_wind)
 	#chi_wave,if=energy.time_to_max>2|buff.serenity.down
 	if TimeToMaxEnergy() > 2 or BuffExpires(serenity_buff) Spell(chi_wave)
-	#tiger_palm,if=(buff.serenity.down&chi<=2)&!prev_gcd.tiger_palm
-	if BuffExpires(serenity_buff) and Chi() <= 2 and not PreviousGCDSpell(tiger_palm) Spell(tiger_palm)
+	#blackout_kick,if=(chi>1|buff.bok_proc.up)&!prev_gcd.blackout_kick,cycle_targets=1
+	if { Chi() > 1 or BuffPresent(bok_proc_buff) } and not PreviousGCDSpell(blackout_kick) Spell(blackout_kick)
+	#tiger_palm,if=(buff.serenity.down&chi.max-chi>1)&!prev_gcd.tiger_palm,cycle_targets=1
+	if BuffExpires(serenity_buff) and MaxChi() - Chi() > 1 and not PreviousGCDSpell(tiger_palm) Spell(tiger_palm)
 }
 
 AddFunction WindwalkerAoeShortCdActions
 {
-	unless not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick)
+	unless not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or Spell(rising_sun_kick) or Chi() > 1 and not PreviousGCDSpell(rushing_jade_wind) and Spell(rushing_jade_wind) or { TimeToMaxEnergy() > 2 or BuffExpires(serenity_buff) } and Spell(chi_wave)
 	{
-		#strike_of_the_windlord
-		Spell(strike_of_the_windlord)
-
-		unless Chi() >= 2 and not PreviousGCDSpell(rushing_jade_wind) and Spell(rushing_jade_wind) or { TimeToMaxEnergy() > 2 or BuffExpires(serenity_buff) } and Spell(chi_wave)
-		{
-			#chi_burst,if=energy.time_to_max>2|buff.serenity.down
-			if { TimeToMaxEnergy() > 2 or BuffExpires(serenity_buff) } and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
-		}
+		#chi_burst,if=energy.time_to_max>2|buff.serenity.down
+		if { TimeToMaxEnergy() > 2 or BuffExpires(serenity_buff) } and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
 	}
 }
 
@@ -341,16 +340,10 @@ AddFunction WindwalkerStMainActions
 
 AddFunction WindwalkerStShortCdActions
 {
-	unless Spell(rising_sun_kick)
+	unless Spell(rising_sun_kick) or Chi() > 1 and not PreviousGCDSpell(rushing_jade_wind) and Spell(rushing_jade_wind) or { TimeToMaxEnergy() > 2 or BuffExpires(serenity_buff) } and Spell(chi_wave)
 	{
-		#strike_of_the_windlord
-		Spell(strike_of_the_windlord)
-
-		unless Chi() > 1 and not PreviousGCDSpell(rushing_jade_wind) and Spell(rushing_jade_wind) or { TimeToMaxEnergy() > 2 or BuffExpires(serenity_buff) } and Spell(chi_wave)
-		{
-			#chi_burst,if=energy.time_to_max>2|buff.serenity.down
-			if { TimeToMaxEnergy() > 2 or BuffExpires(serenity_buff) } and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
-		}
+		#chi_burst,if=energy.time_to_max>2|buff.serenity.down
+		if { TimeToMaxEnergy() > 2 or BuffExpires(serenity_buff) } and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
 	}
 }
 

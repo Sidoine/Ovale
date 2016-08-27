@@ -36,20 +36,24 @@ AddFunction AssassinationDefaultMainActions
 	if ComboPoints() >= 2 and not target.DebuffPresent(rupture_debuff) and TimeInCombat() < 10 and not BuffPresent(urge_to_kill_buff) Spell(rupture)
 	#rupture,if=combo_points>=4&!ticking
 	if ComboPoints() >= 4 and not target.DebuffPresent(rupture_debuff) Spell(rupture)
-	#kingsbane,if=buff.vendetta.up|cooldown.vendetta.remains>30
-	if DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 30 Spell(kingsbane)
-	#run_action_list,name=exsang_combo,if=cooldown.exsanguinate.up&(buff.maalus.up|cooldown.vanish.remains>35)
-	if not SpellCooldown(exsanguinate) > 0 and { BuffPresent(maalus_buff) or SpellCooldown(vanish) > 35 } AssassinationExsangComboMainActions()
-	#call_action_list,name=garrote
-	AssassinationGarroteMainActions()
-	#rupture,if=combo_points>=5&cooldown.exsanguinate.remains<8&dot.rupture.remains<14
-	if ComboPoints() >= 5 and SpellCooldown(exsanguinate) < 8 and target.DebuffRemaining(rupture_debuff) < 14 Spell(rupture)
-	#call_action_list,name=exsang,if=dot.rupture.exsanguinated&spell_targets.fan_of_knives<=1
-	if target.DebuffRemaining(rupture_debuff_exsanguinated) and Enemies() <= 1 AssassinationExsangMainActions()
-	#call_action_list,name=finish
-	AssassinationFinishMainActions()
-	#call_action_list,name=build
-	AssassinationBuildMainActions()
+	#pool_resource,for_next=1
+	#kingsbane,if=!talent.exsanguinate.enabled&(buff.vendetta.up|cooldown.vendetta.remains>10)|talent.exsanguinate.enabled&dot.rupture.exsanguinated
+	if not Talent(exsanguinate_talent) and { DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 10 } or Talent(exsanguinate_talent) and target.DebuffRemaining(rupture_debuff_exsanguinated) Spell(kingsbane)
+	unless { not Talent(exsanguinate_talent) and { DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 10 } or Talent(exsanguinate_talent) and target.DebuffRemaining(rupture_debuff_exsanguinated) } and SpellUsable(kingsbane) and SpellCooldown(kingsbane) < TimeToEnergyFor(kingsbane)
+	{
+		#run_action_list,name=exsang_combo,if=cooldown.exsanguinate.up&(buff.maalus.up|cooldown.vanish.remains>35)&talent.exsanguinate.enabled
+		if not SpellCooldown(exsanguinate) > 0 and { BuffPresent(maalus_buff) or SpellCooldown(vanish) > 35 } and Talent(exsanguinate_talent) AssassinationExsangComboMainActions()
+		#call_action_list,name=garrote,if=spell_targets.fan_of_knives<=8-artifact.bag_of_tricks.enabled
+		if Enemies() <= 8 - BuffPresent(bag_of_tricks_buff) AssassinationGarroteMainActions()
+		#call_action_list,name=exsang,if=dot.rupture.exsanguinated
+		if target.DebuffRemaining(rupture_debuff_exsanguinated) AssassinationExsangMainActions()
+		#rupture,if=talent.exsanguinate.enabled&remains-cooldown.exsanguinate.remains<(4+cp_max_spend*4)*0.3&new_duration-cooldown.exsanguinate.remains>=(4+cp_max_spend*4)*0.3+3
+		if Talent(exsanguinate_talent) and target.DebuffRemaining(rupture_debuff) - SpellCooldown(exsanguinate) < { 4 + MaxComboPoints() * 4 } * 0.3 and FIXME_new_duration - SpellCooldown(exsanguinate) >= { 4 + MaxComboPoints() * 4 } * 0.3 + 3 Spell(rupture)
+		#call_action_list,name=finish
+		AssassinationFinishMainActions()
+		#call_action_list,name=build
+		AssassinationBuildMainActions()
+	}
 }
 
 AddFunction AssassinationDefaultShortCdActions
@@ -57,10 +61,15 @@ AddFunction AssassinationDefaultShortCdActions
 	#call_action_list,name=cds
 	AssassinationCdsShortCdActions()
 
-	unless ComboPoints() >= 2 and not target.DebuffPresent(rupture_debuff) and TimeInCombat() < 10 and not BuffPresent(urge_to_kill_buff) and Spell(rupture) or ComboPoints() >= 4 and not target.DebuffPresent(rupture_debuff) and Spell(rupture) or { DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 30 } and Spell(kingsbane)
+	unless ComboPoints() >= 2 and not target.DebuffPresent(rupture_debuff) and TimeInCombat() < 10 and not BuffPresent(urge_to_kill_buff) and Spell(rupture) or ComboPoints() >= 4 and not target.DebuffPresent(rupture_debuff) and Spell(rupture)
 	{
-		#run_action_list,name=exsang_combo,if=cooldown.exsanguinate.up&(buff.maalus.up|cooldown.vanish.remains>35)
-		if not SpellCooldown(exsanguinate) > 0 and { BuffPresent(maalus_buff) or SpellCooldown(vanish) > 35 } AssassinationExsangComboShortCdActions()
+		#pool_resource,for_next=1
+		#kingsbane,if=!talent.exsanguinate.enabled&(buff.vendetta.up|cooldown.vendetta.remains>10)|talent.exsanguinate.enabled&dot.rupture.exsanguinated
+		unless { not Talent(exsanguinate_talent) and { DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 10 } or Talent(exsanguinate_talent) and target.DebuffRemaining(rupture_debuff_exsanguinated) } and SpellUsable(kingsbane) and SpellCooldown(kingsbane) < TimeToEnergyFor(kingsbane)
+		{
+			#run_action_list,name=exsang_combo,if=cooldown.exsanguinate.up&(buff.maalus.up|cooldown.vanish.remains>35)&talent.exsanguinate.enabled
+			if not SpellCooldown(exsanguinate) > 0 and { BuffPresent(maalus_buff) or SpellCooldown(vanish) > 35 } and Talent(exsanguinate_talent) AssassinationExsangComboShortCdActions()
+		}
 	}
 }
 
@@ -74,8 +83,8 @@ AddFunction AssassinationDefaultCdActions
 	if target.DebuffPresent(vendetta_debuff) Spell(blood_fury_ap)
 	#berserking,if=debuff.vendetta.up
 	if target.DebuffPresent(vendetta_debuff) Spell(berserking)
-	#arcane_torrent,if=debuff.vendetta.up&energy.deficit>50&!dot.rupture.exsanguinated&(cooldown.exsanguinate.remains>3|!artifact.urge_to_kill.enabled)
-	if target.DebuffPresent(vendetta_debuff) and EnergyDeficit() > 50 and not target.DebuffRemaining(rupture_debuff_exsanguinated) and { SpellCooldown(exsanguinate) > 3 or not BuffPresent(urge_to_kill_buff) } Spell(arcane_torrent_energy)
+	#arcane_torrent,if=debuff.vendetta.up&energy.deficit>50
+	if target.DebuffPresent(vendetta_debuff) and EnergyDeficit() > 50 Spell(arcane_torrent_energy)
 	#call_action_list,name=cds
 	AssassinationCdsCdActions()
 }
@@ -84,16 +93,18 @@ AddFunction AssassinationDefaultCdActions
 
 AddFunction AssassinationBuildMainActions
 {
-	#mutilate,target_if=min:dot.deadly_poison_dot.remains,if=combo_points.deficit>=2&dot.rupture.exsanguinated&spell_targets.fan_of_knives>1
-	if ComboPointsDeficit() >= 2 and target.DebuffRemaining(rupture_debuff_exsanguinated) and Enemies() > 1 Spell(mutilate)
-	#mutilate,target_if=max:bleeds,if=combo_points.deficit>=2&spell_targets.fan_of_knives=2&dot.deadly_poison_dot.refreshable&debuff.agonizing_poison.remains<=0.3*debuff.agonizing_poison.duration
-	if ComboPointsDeficit() >= 2 and Enemies() == 2 and target.DebuffRefreshable(deadly_poison_dot_debuff) and target.DebuffRemaining(agonizing_poison_debuff) <= 0.3 * BaseDuration(agonizing_poison_debuff) Spell(mutilate)
-	#hemorrhage,target_if=max:target.time_to_die,if=combo_points.deficit>=1&!ticking&dot.rupture.remains>6&spell_targets.fan_of_knives>1
-	if ComboPointsDeficit() >= 1 and not target.DebuffPresent(hemorrhage_debuff) and target.DebuffRemaining(rupture_debuff) > 6 and Enemies() > 1 Spell(hemorrhage)
-	#fan_of_knives,if=combo_points.deficit>=1&(spell_targets>3|(poisoned_enemies<3&spell_targets>2))&spell_targets.fan_of_knives>1
-	if ComboPointsDeficit() >= 1 and { Enemies() > 3 or 0 < 3 and Enemies() > 2 } and Enemies() > 1 Spell(fan_of_knives)
-	#hemorrhage,if=(combo_points.deficit>=1&refreshable)|(combo_points.deficit=1&dot.rupture.refreshable)
-	if ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) or ComboPointsDeficit() == 1 and target.DebuffRefreshable(rupture_debuff) Spell(hemorrhage)
+	#hemorrhage,cycle_targets=1,if=combo_points.deficit>=1&refreshable&dot.rupture.remains>6&spell_targets.fan_of_knives>1&spell_targets.fan_of_knives<=4
+	if ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) and target.DebuffRemaining(rupture_debuff) > 6 and Enemies() > 1 and Enemies() <= 4 Spell(hemorrhage)
+	#hemorrhage,cycle_targets=1,max_cycle_targets=3,if=combo_points.deficit>=1&refreshable&dot.rupture.remains>6&spell_targets.fan_of_knives>1&spell_targets.fan_of_knives=5
+	if DebuffCountOnAny(hemorrhage_debuff) < Enemies() and DebuffCountOnAny(hemorrhage_debuff) <= 3 and ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) and target.DebuffRemaining(rupture_debuff) > 6 and Enemies() > 1 and Enemies() == 5 Spell(hemorrhage)
+	#fan_of_knives,if=(spell_targets>=2+debuff.vendetta.up&(combo_points.deficit>=1|energy.deficit<=30))|(!artifact.bag_of_tricks.enabled&spell_targets>=7+2*debuff.vendetta.up)
+	if Enemies() >= 2 + target.DebuffPresent(vendetta_debuff) and { ComboPointsDeficit() >= 1 or EnergyDeficit() <= 30 } or not BuffPresent(bag_of_tricks_buff) and Enemies() >= 7 + 2 * target.DebuffPresent(vendetta_debuff) Spell(fan_of_knives)
+	#fan_of_knives,if=equipped.the_dreadlords_deceit&((buff.the_dreadlords_deceit.stack>=29|buff.the_dreadlords_deceit.stack>=15&debuff.vendetta.remains<=3)&debuff.vendetta.up|buff.the_dreadlords_deceit.stack>=5&cooldown.vendetta.remains>60&cooldown.vendetta.remains<65)
+	if HasEquippedItem(the_dreadlords_deceit) and { { BuffStacks(the_dreadlords_deceit_buff) >= 29 or BuffStacks(the_dreadlords_deceit_buff) >= 15 and target.DebuffRemaining(vendetta_debuff) <= 3 } and target.DebuffPresent(vendetta_debuff) or BuffStacks(the_dreadlords_deceit_buff) >= 5 and SpellCooldown(vendetta) > 60 and SpellCooldown(vendetta) < 65 } Spell(fan_of_knives)
+	#hemorrhage,if=(combo_points.deficit>=1&refreshable)|(combo_points.deficit=1&(dot.rupture.exsanguinated&dot.rupture.remains<=2|cooldown.exsanguinate.remains<=2))
+	if ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) or ComboPointsDeficit() == 1 and { target.DebuffRemaining(rupture_debuff_exsanguinated) and target.DebuffRemaining(rupture_debuff) <= 2 or SpellCooldown(exsanguinate) <= 2 } Spell(hemorrhage)
+	#mutilate,if=combo_points.deficit<=1&energy.deficit<=30
+	if ComboPointsDeficit() <= 1 and EnergyDeficit() <= 30 Spell(mutilate)
 	#hemorrhage,if=combo_points.deficit=2&set_bonus.tier18_2pc&target.health.pct<=35
 	if ComboPointsDeficit() == 2 and ArmorSetBonus(T18 2) and target.HealthPercent() <= 35 Spell(hemorrhage)
 	#mutilate,if=cooldown.garrote.remains>2&(combo_points.deficit>=3|(combo_points.deficit>=2&!(set_bonus.tier18_2pc&target.health.pct<=35)))
@@ -104,12 +115,10 @@ AddFunction AssassinationBuildMainActions
 
 AddFunction AssassinationCdsShortCdActions
 {
-	#marked_for_death,cycle_targets=1,target_if=min:target.time_to_die,if=combo_points.deficit>=5
-	if ComboPointsDeficit() >= 5 Spell(marked_for_death)
-	#vanish,if=talent.subterfuge.enabled&combo_points<=2&!dot.rupture.exsanguinated
-	if Talent(subterfuge_talent) and ComboPoints() <= 2 and not target.DebuffRemaining(rupture_debuff_exsanguinated) and CheckBoxOn(opt_vanish) Spell(vanish)
-	#vanish,if=talent.shadow_focus.enabled&!dot.rupture.exsanguinated&combo_points.deficit>=2
-	if Talent(shadow_focus_talent) and not target.DebuffRemaining(rupture_debuff_exsanguinated) and ComboPointsDeficit() >= 2 and CheckBoxOn(opt_vanish) Spell(vanish)
+	#marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|combo_points.deficit>=5
+	if target.TimeToDie() < ComboPointsDeficit() or ComboPointsDeficit() >= 5 Spell(marked_for_death)
+	#vanish,if=talent.subterfuge.enabled&combo_points<=2&!dot.rupture.exsanguinated|talent.shadow_focus.enabled&!dot.rupture.exsanguinated&combo_points.deficit>=2
+	if { Talent(subterfuge_talent) and ComboPoints() <= 2 and not target.DebuffRemaining(rupture_debuff_exsanguinated) or Talent(shadow_focus_talent) and not target.DebuffRemaining(rupture_debuff_exsanguinated) and ComboPointsDeficit() >= 2 } and CheckBoxOn(opt_vanish) Spell(vanish)
 }
 
 AddFunction AssassinationCdsCdActions
@@ -122,33 +131,26 @@ AddFunction AssassinationCdsCdActions
 
 AddFunction AssassinationExsangMainActions
 {
+	#rupture,cycle_targets=1,max_cycle_targets=14-2*artifact.bag_of_tricks.enabled,if=!ticking&combo_points>=cp_max_spend-1&spell_targets.fan_of_knives>1&target.time_to_die-remains>6
+	if DebuffCountOnAny(rupture_debuff) < Enemies() and DebuffCountOnAny(rupture_debuff) <= 14 - 2 * BuffPresent(bag_of_tricks_buff) and not target.DebuffPresent(rupture_debuff) and ComboPoints() >= MaxComboPoints() - 1 and Enemies() > 1 and target.TimeToDie() - target.DebuffRemaining(rupture_debuff) > 6 Spell(rupture)
 	#rupture,if=combo_points>=cp_max_spend&ticks_remain<2
 	if ComboPoints() >= MaxComboPoints() and target.TicksRemaining(rupture_debuff) < 2 Spell(rupture)
-	#death_from_above,if=combo_points>=cp_max_spend-1&dot.rupture.remains>3
-	if ComboPoints() >= MaxComboPoints() - 1 and target.DebuffRemaining(rupture_debuff) > 3 Spell(death_from_above)
-	#envenom,if=combo_points>=cp_max_spend-1&dot.rupture.remains>3
-	if ComboPoints() >= MaxComboPoints() - 1 and target.DebuffRemaining(rupture_debuff) > 3 Spell(envenom)
-	#hemorrhage,if=combo_points.deficit<=1
-	if ComboPointsDeficit() <= 1 Spell(hemorrhage)
-	#hemorrhage,if=combo_points.deficit>=1&debuff.hemorrhage.remains<1
-	if ComboPointsDeficit() >= 1 and target.DebuffRemaining(hemorrhage_debuff) < 1 Spell(hemorrhage)
-	#pool_resource,for_next=1
-	#mutilate,if=combo_points.deficit>=2
-	if ComboPointsDeficit() >= 2 Spell(mutilate)
+	#death_from_above,if=combo_points>=cp_max_spend-1&(dot.rupture.remains>3|dot.rupture.remains>2&spell_targets.fan_of_knives>=3)&(artifact.bag_of_tricks.enabled|spell_targets.fan_of_knives<=6+2*debuff.vendetta.up)
+	if ComboPoints() >= MaxComboPoints() - 1 and { target.DebuffRemaining(rupture_debuff) > 3 or target.DebuffRemaining(rupture_debuff) > 2 and Enemies() >= 3 } and { BuffPresent(bag_of_tricks_buff) or Enemies() <= 6 + 2 * target.DebuffPresent(vendetta_debuff) } Spell(death_from_above)
+	#envenom,if=combo_points>=cp_max_spend-1&(dot.rupture.remains>3|dot.rupture.remains>2&spell_targets.fan_of_knives>=3)&(artifact.bag_of_tricks.enabled|spell_targets.fan_of_knives<=6+2*debuff.vendetta.up)
+	if ComboPoints() >= MaxComboPoints() - 1 and { target.DebuffRemaining(rupture_debuff) > 3 or target.DebuffRemaining(rupture_debuff) > 2 and Enemies() >= 3 } and { BuffPresent(bag_of_tricks_buff) or Enemies() <= 6 + 2 * target.DebuffPresent(vendetta_debuff) } Spell(envenom)
 }
 
 ### actions.exsang_combo
 
 AddFunction AssassinationExsangComboMainActions
 {
-	#rupture,if=combo_points>=cp_max_spend&(buff.vanish.up|cooldown.vanish.remains>15)&cooldown.exsanguinate.remains<1
-	if ComboPoints() >= MaxComboPoints() and { BuffPresent(vanish_buff) or SpellCooldown(vanish) > 15 } and SpellCooldown(exsanguinate) < 1 Spell(rupture)
-	#call_action_list,name=garrote
-	AssassinationGarroteMainActions()
-	#hemorrhage,if=combo_points.deficit=1
-	if ComboPointsDeficit() == 1 Spell(hemorrhage)
-	#mutilate,if=combo_points.deficit<=1
-	if ComboPointsDeficit() <= 1 Spell(mutilate)
+	#rupture,if=combo_points>=cp_max_spend&(!talent.nightstalker.enabled|buff.vanish.up|cooldown.vanish.remains>15)&cooldown.exsanguinate.remains<1
+	if ComboPoints() >= MaxComboPoints() and { not Talent(nightstalker_talent) or BuffPresent(vanish_buff) or SpellCooldown(vanish) > 15 } and SpellCooldown(exsanguinate) < 1 Spell(rupture)
+	#call_action_list,name=garrote,if=spell_targets.fan_of_knives<=8-artifact.bag_of_tricks.enabled
+	if Enemies() <= 8 - BuffPresent(bag_of_tricks_buff) AssassinationGarroteMainActions()
+	#hemorrhage,if=spell_targets.fan_of_knives>=2&!ticking
+	if Enemies() >= 2 and not target.DebuffPresent(hemorrhage_debuff) Spell(hemorrhage)
 	#call_action_list,name=build
 	AssassinationBuildMainActions()
 }
@@ -158,10 +160,10 @@ AddFunction AssassinationExsangComboShortCdActions
 	#vanish,if=talent.nightstalker.enabled&combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1&gcd.remains=0&energy>=25
 	if Talent(nightstalker_talent) and ComboPoints() >= MaxComboPoints() and SpellCooldown(exsanguinate) < 1 and not GCDRemaining() > 0 and Energy() >= 25 and CheckBoxOn(opt_vanish) Spell(vanish)
 
-	unless ComboPoints() >= MaxComboPoints() and { BuffPresent(vanish_buff) or SpellCooldown(vanish) > 15 } and SpellCooldown(exsanguinate) < 1 and Spell(rupture)
+	unless ComboPoints() >= MaxComboPoints() and { not Talent(nightstalker_talent) or BuffPresent(vanish_buff) or SpellCooldown(vanish) > 15 } and SpellCooldown(exsanguinate) < 1 and Spell(rupture)
 	{
-		#exsanguinate,if=prev_gcd.rupture&dot.rupture.remains>25+4*talent.deeper_stratagem.enabled&cooldown.vanish.remains>10
-		if PreviousGCDSpell(rupture) and target.DebuffRemaining(rupture_debuff) > 25 + 4 * TalentPoints(deeper_stratagem_talent) and SpellCooldown(vanish) > 10 Spell(exsanguinate)
+		#exsanguinate,if=prev_gcd.rupture&dot.rupture.remains>22+4*talent.deeper_stratagem.enabled&cooldown.vanish.remains>10
+		if PreviousGCDSpell(rupture) and target.DebuffRemaining(rupture_debuff) > 22 + 4 * TalentPoints(deeper_stratagem_talent) and SpellCooldown(vanish) > 10 Spell(exsanguinate)
 	}
 }
 
@@ -169,16 +171,16 @@ AddFunction AssassinationExsangComboShortCdActions
 
 AddFunction AssassinationFinishMainActions
 {
-	#rupture,target_if=max:target.time_to_die,if=!ticking&combo_points>=5&spell_targets.fan_of_knives>1
-	if not target.DebuffPresent(rupture_debuff) and ComboPoints() >= 5 and Enemies() > 1 Spell(rupture)
-	#rupture,if=combo_points>=cp_max_spend&refreshable&!exsanguinated
-	if ComboPoints() >= MaxComboPoints() and target.Refreshable(rupture_debuff) and not target.DebuffPresent(exsanguinated) Spell(rupture)
-	#death_from_above,if=combo_points>=cp_max_spend-1
-	if ComboPoints() >= MaxComboPoints() - 1 Spell(death_from_above)
-	#envenom,if=combo_points>=cp_max_spend-1&!dot.rupture.refreshable&buff.elaborate_planning.remains<2&energy.deficit<40
-	if ComboPoints() >= MaxComboPoints() - 1 and not target.DebuffRefreshable(rupture_debuff) and BuffRemaining(elaborate_planning_buff) < 2 and EnergyDeficit() < 40 Spell(envenom)
-	#envenom,if=combo_points>=cp_max_spend&!dot.rupture.refreshable&buff.elaborate_planning.remains<2&cooldown.garrote.remains<1
-	if ComboPoints() >= MaxComboPoints() and not target.DebuffRefreshable(rupture_debuff) and BuffRemaining(elaborate_planning_buff) < 2 and SpellCooldown(garrote) < 1 Spell(envenom)
+	#rupture,cycle_targets=1,max_cycle_targets=14-2*artifact.bag_of_tricks.enabled,if=!ticking&combo_points>=cp_max_spend-1&spell_targets.fan_of_knives>1&target.time_to_die-remains>6
+	if DebuffCountOnAny(rupture_debuff) < Enemies() and DebuffCountOnAny(rupture_debuff) <= 14 - 2 * BuffPresent(bag_of_tricks_buff) and not target.DebuffPresent(rupture_debuff) and ComboPoints() >= MaxComboPoints() - 1 and Enemies() > 1 and target.TimeToDie() - target.DebuffRemaining(rupture_debuff) > 6 Spell(rupture)
+	#rupture,if=combo_points>=cp_max_spend-1&refreshable&!exsanguinated
+	if ComboPoints() >= MaxComboPoints() - 1 and target.Refreshable(rupture_debuff) and not target.DebuffPresent(exsanguinated) Spell(rupture)
+	#death_from_above,if=combo_points>=cp_max_spend-1&(artifact.bag_of_tricks.enabled|spell_targets.fan_of_knives<=6)
+	if ComboPoints() >= MaxComboPoints() - 1 and { BuffPresent(bag_of_tricks_buff) or Enemies() <= 6 } Spell(death_from_above)
+	#envenom,if=combo_points>=cp_max_spend-1&!dot.rupture.refreshable&buff.elaborate_planning.remains<2&energy.deficit<40&(artifact.bag_of_tricks.enabled|spell_targets.fan_of_knives<=6)
+	if ComboPoints() >= MaxComboPoints() - 1 and not target.DebuffRefreshable(rupture_debuff) and BuffRemaining(elaborate_planning_buff) < 2 and EnergyDeficit() < 40 and { BuffPresent(bag_of_tricks_buff) or Enemies() <= 6 } Spell(envenom)
+	#envenom,if=combo_points>=cp_max_spend&!dot.rupture.refreshable&buff.elaborate_planning.remains<2&cooldown.garrote.remains<1&(artifact.bag_of_tricks.enabled|spell_targets.fan_of_knives<=6)
+	if ComboPoints() >= MaxComboPoints() and not target.DebuffRefreshable(rupture_debuff) and BuffRemaining(elaborate_planning_buff) < 2 and SpellCooldown(garrote) < 1 and { BuffPresent(bag_of_tricks_buff) or Enemies() <= 6 } Spell(envenom)
 }
 
 ### actions.garrote
@@ -186,9 +188,9 @@ AddFunction AssassinationFinishMainActions
 AddFunction AssassinationGarroteMainActions
 {
 	#pool_resource,for_next=1
-	#garrote,cycle_targets=1,target_if=max:target.time_to_die,if=talent.subterfuge.enabled&!ticking&combo_points.deficit>=1
-	if Talent(subterfuge_talent) and not target.DebuffPresent(garrote_debuff) and ComboPointsDeficit() >= 1 Spell(garrote)
-	unless Talent(subterfuge_talent) and not target.DebuffPresent(garrote_debuff) and ComboPointsDeficit() >= 1 and SpellUsable(garrote) and SpellCooldown(garrote) < TimeToEnergyFor(garrote)
+	#garrote,cycle_targets=1,if=talent.subterfuge.enabled&!ticking&combo_points.deficit>=1&spell_targets.fan_of_knives>=2
+	if Talent(subterfuge_talent) and not target.DebuffPresent(garrote_debuff) and ComboPointsDeficit() >= 1 and Enemies() >= 2 Spell(garrote)
+	unless Talent(subterfuge_talent) and not target.DebuffPresent(garrote_debuff) and ComboPointsDeficit() >= 1 and Enemies() >= 2 and SpellUsable(garrote) and SpellCooldown(garrote) < TimeToEnergyFor(garrote)
 	{
 		#pool_resource,for_next=1
 		#garrote,if=combo_points.deficit>=1&!exsanguinated
@@ -205,29 +207,28 @@ AddFunction AssassinationPrecombatMainActions
 	Spell(augmentation)
 	#food,type=jumbo_sea_dog
 	#snapshot_stats
-	#apply_poison,lethal=deadly
-	if BuffRemaining(lethal_poison_buff) < 1200 Spell(deadly_poison)
+	#apply_poison
 	#stealth
 	Spell(stealth)
 }
 
 AddFunction AssassinationPrecombatShortCdActions
 {
-	unless Spell(augmentation) or BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison) or Spell(stealth)
+	unless Spell(augmentation) or Spell(stealth)
 	{
-		#marked_for_death
-		Spell(marked_for_death)
+		#marked_for_death,if=raid_event.adds.in>40
+		if 600 > 40 Spell(marked_for_death)
 	}
 }
 
 AddFunction AssassinationPrecombatShortCdPostConditions
 {
-	Spell(augmentation) or BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison) or Spell(stealth)
+	Spell(augmentation) or Spell(stealth)
 }
 
 AddFunction AssassinationPrecombatCdActions
 {
-	unless Spell(augmentation) or BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison) or Spell(stealth)
+	unless Spell(augmentation) or Spell(stealth)
 	{
 		#potion,name=draenic_agility
 		AssassinationUsePotionAgility()
@@ -236,7 +237,7 @@ AddFunction AssassinationPrecombatCdActions
 
 AddFunction AssassinationPrecombatCdPostConditions
 {
-	Spell(augmentation) or BuffRemaining(lethal_poison_buff) < 1200 and Spell(deadly_poison) or Spell(stealth)
+	Spell(augmentation) or Spell(stealth)
 }
 
 ### Assassination icons.
@@ -292,19 +293,18 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 }
 
 ### Required symbols
-# agonizing_poison_debuff
 # arcane_torrent_energy
 # augmentation
+# bag_of_tricks
 # berserking
 # blood_fury_ap
-# deadly_poison
-# deadly_poison_dot_debuff
 # death_from_above
 # deeper_stratagem_talent
 # draenic_agility_potion
 # elaborate_planning_buff
 # envenom
 # exsanguinate
+# exsanguinate_talent
 # fan_of_knives
 # garrote
 # garrote_debuff
@@ -313,7 +313,6 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # kick
 # kingsbane
 # legendary_ring_agility
-# lethal_poison_buff
 # maalus_buff
 # marked_for_death
 # mutilate
@@ -324,6 +323,8 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # shadowstep
 # stealth
 # subterfuge_talent
+# the_dreadlords_deceit
+# the_dreadlords_deceit_buff
 # urge_to_kill
 # vanish
 # vanish_buff
@@ -360,64 +361,117 @@ AddFunction OutlawUsePotionAgility
 
 AddFunction OutlawDefaultMainActions
 {
-	#pool_resource,for_next=1
-	#ambush
-	Spell(ambush)
-	unless SpellUsable(ambush) and SpellCooldown(ambush) < TimeToEnergyFor(ambush)
-	{
-		#pool_resource,for_next=1,extra_amount=60
-		#vanish,if=combo_points.deficit>=2&energy>60
-		unless ComboPointsDeficit() >= 2 and Energy() > 60 and SpellUsable(vanish) and SpellCooldown(vanish) < TimeToEnergy(60)
-		{
-			#pool_resource,for_next=1,extra_amount=60
-			#shadowmeld,if=combo_points.deficit>=2&energy>60
-			unless ComboPointsDeficit() >= 2 and Energy() > 60 and SpellUsable(shadowmeld) and SpellCooldown(shadowmeld) < TimeToEnergy(60)
-			{
-				#slice_and_dice,if=combo_points>=5&buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<6
-				if ComboPoints() >= 5 and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < 6 Spell(slice_and_dice)
-				#roll_the_bones,if=combo_points>=5&buff.roll_the_bones.remains<target.time_to_die&(buff.roll_the_bones.remains<3|buff.roll_the_bones.remains<duration*0.3%rtb_buffs|(!buff.shark_infested_waters.up&rtb_buffs<2))
-				if ComboPoints() >= 5 and BuffRemaining(roll_the_bones_buff) < target.TimeToDie() and { BuffRemaining(roll_the_bones_buff) < 3 or BuffRemaining(roll_the_bones_buff) < BaseDuration(roll_the_bones_buff) * 0.3 / BuffCount(roll_the_bones_buff) or not BuffPresent(shark_infested_waters_buff) and BuffCount(roll_the_bones_buff) < 2 } Spell(roll_the_bones)
-				#call_action_list,name=finisher,if=combo_points>=5+talent.deeper_stratagem.enabled
-				if ComboPoints() >= 5 + TalentPoints(deeper_stratagem_talent) OutlawFinisherMainActions()
-				#call_action_list,name=generator,if=combo_points<5+talent.deeper_stratagem.enabled
-				if ComboPoints() < 5 + TalentPoints(deeper_stratagem_talent) OutlawGeneratorMainActions()
-			}
-		}
-	}
+	#variable,name=rtb_reroll,value=((!talent.slice_and_dice.enabled)&(rtb_buffs<=1&!(equipped.thraxis_tricksy_treads&buff.true_bearing.up)))
+	#variable,name=ss_useable_noreroll,value=(combo_points<5+talent.deeper_stratagem.enabled-(buff.broadsides.up|buff.jolly_roger.up)-(talent.alacrity.enabled&buff.alacrity.stack<=4))
+	#variable,name=ss_useable,value=((talent.anticipation.enabled&(combo_points<4))|(!talent.anticipation.enabled&(variable.rtb_reroll&(combo_points<4+talent.deeper_stratagem.enabled)|!variable.rtb_reroll&variable.ss_useable_noreroll)))
+	#call_action_list,name=bf
+	OutlawBfMainActions()
+	#call_action_list,name=stealth
+	OutlawStealthMainActions()
+	#death_from_above,if=energy.time_to_max>2&!variable.ss_useable_noreroll
+	if TimeToMaxEnergy() > 2 and not 0 Spell(death_from_above)
+	#slice_and_dice,if=!variable.ss_useable&buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<(1+combo_points)*1.8
+	if not 0 and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 Spell(slice_and_dice)
+	#roll_the_bones,if=!variable.ss_useable&buff.roll_the_bones.remains<target.time_to_die&(buff.roll_the_bones.remains<=3|variable.rtb_reroll)
+	if not 0 and BuffRemaining(roll_the_bones_buff) < target.TimeToDie() and { BuffRemaining(roll_the_bones_buff) <= 3 or 0 } Spell(roll_the_bones)
+	#call_action_list,name=build
+	OutlawBuildMainActions()
+	#call_action_list,name=finish,if=!variable.ss_useable
+	if not 0 OutlawFinishMainActions()
 }
 
 AddFunction OutlawDefaultShortCdActions
 {
-	#blade_flurry,if=(spell_targets.blade_flurry>=2&!buff.blade_flurry.up)|(spell_targets.blade_flurry<2&buff.blade_flurry.up)
-	if Enemies() >= 2 and not BuffPresent(blade_flurry_buff) or Enemies() < 2 and BuffPresent(blade_flurry_buff) Spell(blade_flurry)
-	#pool_resource,for_next=1
-	#ambush
-	unless SpellUsable(ambush) and SpellCooldown(ambush) < TimeToEnergyFor(ambush)
+	#variable,name=rtb_reroll,value=((!talent.slice_and_dice.enabled)&(rtb_buffs<=1&!(equipped.thraxis_tricksy_treads&buff.true_bearing.up)))
+	#variable,name=ss_useable_noreroll,value=(combo_points<5+talent.deeper_stratagem.enabled-(buff.broadsides.up|buff.jolly_roger.up)-(talent.alacrity.enabled&buff.alacrity.stack<=4))
+	#variable,name=ss_useable,value=((talent.anticipation.enabled&(combo_points<4))|(!talent.anticipation.enabled&(variable.rtb_reroll&(combo_points<4+talent.deeper_stratagem.enabled)|!variable.rtb_reroll&variable.ss_useable_noreroll)))
+	#call_action_list,name=bf
+	OutlawBfShortCdActions()
+
+	unless OutlawBfShortCdPostConditions()
 	{
-		#pool_resource,for_next=1,extra_amount=60
-		#vanish,if=combo_points.deficit>=2&energy>60
-		if ComboPointsDeficit() >= 2 and Energy() > 60 Spell(vanish)
-		unless ComboPointsDeficit() >= 2 and Energy() > 60 and SpellUsable(vanish) and SpellCooldown(vanish) < TimeToEnergy(60)
+		#call_action_list,name=cds
+		OutlawCdsShortCdActions()
+		#call_action_list,name=stealth
+		OutlawStealthShortCdActions()
+	}
+}
+
+AddFunction OutlawDefaultCdActions
+{
+	unless OutlawBfCdPostConditions()
+	{
+		#call_action_list,name=cds
+		OutlawCdsCdActions()
+
+		unless OutlawCdsCdPostConditions()
 		{
-			#pool_resource,for_next=1,extra_amount=60
-			#shadowmeld,if=combo_points.deficit>=2&energy>60
-			unless ComboPointsDeficit() >= 2 and Energy() > 60 and SpellUsable(shadowmeld) and SpellCooldown(shadowmeld) < TimeToEnergy(60)
+			#call_action_list,name=stealth
+			OutlawStealthCdActions()
+
+			unless OutlawStealthCdPostConditions() or TimeToMaxEnergy() > 2 and not 0 and Spell(death_from_above) or not 0 and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 and Spell(slice_and_dice) or not 0 and BuffRemaining(roll_the_bones_buff) < target.TimeToDie() and { BuffRemaining(roll_the_bones_buff) <= 3 or 0 } and Spell(roll_the_bones)
 			{
-				unless ComboPoints() >= 5 and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < 6 and Spell(slice_and_dice) or ComboPoints() >= 5 and BuffRemaining(roll_the_bones_buff) < target.TimeToDie() and { BuffRemaining(roll_the_bones_buff) < 3 or BuffRemaining(roll_the_bones_buff) < BaseDuration(roll_the_bones_buff) * 0.3 / BuffCount(roll_the_bones_buff) or not BuffPresent(shark_infested_waters_buff) and BuffCount(roll_the_bones_buff) < 2 } and Spell(roll_the_bones)
-				{
-					#cannonball_barrage,if=spell_targets.cannonball_barrage>=1
-					if Enemies() >= 1 Spell(cannonball_barrage)
-					#curse_of_the_dreadblades,if=combo_points.deficit>=4
-					if ComboPointsDeficit() >= 4 Spell(curse_of_the_dreadblades)
-					#marked_for_death,cycle_targets=1,target_if=min:target.time_to_die,if=combo_points.deficit>=4+talent.deeper_stratagem.enabled
-					if ComboPointsDeficit() >= 4 + TalentPoints(deeper_stratagem_talent) Spell(marked_for_death)
-				}
+				#killing_spree,if=energy.time_to_max>5|energy<15
+				if TimeToMaxEnergy() > 5 or Energy() < 15 Spell(killing_spree)
 			}
 		}
 	}
 }
 
-AddFunction OutlawDefaultCdActions
+### actions.bf
+
+AddFunction OutlawBfMainActions
+{
+	#cancel_buff,name=blade_flurry,if=equipped.shivarran_symmetry&cooldown.blade_flurry.up&buff.blade_flurry.up&spell_targets.blade_flurry>=2|spell_targets.blade_flurry<2&buff.blade_flurry.up
+	if { HasEquippedItem(shivarran_symmetry) and not SpellCooldown(blade_flurry) > 0 and BuffPresent(blade_flurry_buff) and Enemies() >= 2 or Enemies() < 2 and BuffPresent(blade_flurry_buff) } and BuffPresent(blade_flurry_buff) Texture(blade_flurry text=cancel)
+}
+
+AddFunction OutlawBfShortCdActions
+{
+	unless { HasEquippedItem(shivarran_symmetry) and not SpellCooldown(blade_flurry) > 0 and BuffPresent(blade_flurry_buff) and Enemies() >= 2 or Enemies() < 2 and BuffPresent(blade_flurry_buff) } and BuffPresent(blade_flurry_buff) and Texture(blade_flurry text=cancel)
+	{
+		#blade_flurry,if=spell_targets.blade_flurry>=2&!buff.blade_flurry.up
+		if Enemies() >= 2 and not BuffPresent(blade_flurry_buff) Spell(blade_flurry)
+	}
+}
+
+AddFunction OutlawBfShortCdPostConditions
+{
+	{ HasEquippedItem(shivarran_symmetry) and not SpellCooldown(blade_flurry) > 0 and BuffPresent(blade_flurry_buff) and Enemies() >= 2 or Enemies() < 2 and BuffPresent(blade_flurry_buff) } and BuffPresent(blade_flurry_buff) and Texture(blade_flurry text=cancel)
+}
+
+AddFunction OutlawBfCdPostConditions
+{
+	{ HasEquippedItem(shivarran_symmetry) and not SpellCooldown(blade_flurry) > 0 and BuffPresent(blade_flurry_buff) and Enemies() >= 2 or Enemies() < 2 and BuffPresent(blade_flurry_buff) } and BuffPresent(blade_flurry_buff) and Texture(blade_flurry text=cancel)
+}
+
+### actions.build
+
+AddFunction OutlawBuildMainActions
+{
+	#ghostly_strike,if=talent.ghostly_strike.enabled&(debuff.ghostly_strike.remains<4.5|cooldown.curse_of_the_dreadblades.remains<3)&combo_points.deficit>=1+buff.broadsides.up&!buff.curse_of_the_dreadblades.up&(combo_points>=3|variable.rtb_reroll&time>=10)
+	if Talent(ghostly_strike_talent) and { target.DebuffRemaining(ghostly_strike_debuff) < 4.5 or SpellCooldown(curse_of_the_dreadblades) < 3 } and ComboPointsDeficit() >= 1 + BuffPresent(broadsides_buff) and not BuffPresent(curse_of_the_dreadblades_buff) and { ComboPoints() >= 3 or 0 and TimeInCombat() >= 10 } Spell(ghostly_strike)
+	#pistol_shot,if=buff.opportunity.up&energy.time_to_max>2-talent.quick_draw.enabled&combo_points.deficit>=1+buff.broadsides.up
+	if BuffPresent(opportunity_buff) and TimeToMaxEnergy() > 2 - TalentPoints(quick_draw_talent) and ComboPointsDeficit() >= 1 + BuffPresent(broadsides_buff) Spell(pistol_shot)
+	#saber_slash,if=variable.ss_useable
+	if 0 Spell(saber_slash)
+}
+
+### actions.cds
+
+AddFunction OutlawCdsShortCdActions
+{
+	#cannonball_barrage,if=spell_targets.cannonball_barrage>=1
+	if Enemies() >= 1 Spell(cannonball_barrage)
+	#marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15)&combo_points.deficit>=4+talent.deeper_strategem.enabled+talent.anticipation.enabled)
+	if target.TimeToDie() < ComboPointsDeficit() or { 600 > 40 or BuffRemaining(true_bearing_buff) > 15 } and ComboPointsDeficit() >= 4 + TalentPoints(deeper_strategem_talent) + TalentPoints(anticipation_talent) Spell(marked_for_death)
+	#sprint,if=equipped.thraxis_tricksy_treads&!variable.ss_useable
+	if HasEquippedItem(thraxis_tricksy_treads) and not 0 Spell(sprint)
+	#curse_of_the_dreadblades,if=combo_points.deficit>=4&(!talent.ghostly_strike.enabled|debuff.ghostly_strike.up)
+	if ComboPointsDeficit() >= 4 and { not Talent(ghostly_strike_talent) or target.DebuffPresent(ghostly_strike_debuff) } Spell(curse_of_the_dreadblades)
+}
+
+AddFunction OutlawCdsCdActions
 {
 	#potion,name=draenic_agility,if=buff.bloodlust.react|target.time_to_die<=25|buff.adrenaline_rush.up
 	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 25 or BuffPresent(adrenaline_rush_buff) OutlawUsePotionAgility()
@@ -429,51 +483,27 @@ AddFunction OutlawDefaultCdActions
 	Spell(berserking)
 	#arcane_torrent,if=energy.deficit>40
 	if EnergyDeficit() > 40 Spell(arcane_torrent_energy)
-	#adrenaline_rush,if=!buff.adrenaline_rush.up
-	if not BuffPresent(adrenaline_rush_buff) Spell(adrenaline_rush)
-	#pool_resource,for_next=1
-	#ambush
-	unless SpellUsable(ambush) and SpellCooldown(ambush) < TimeToEnergyFor(ambush)
+
+	unless Enemies() >= 1 and Spell(cannonball_barrage)
 	{
-		#pool_resource,for_next=1,extra_amount=60
-		#vanish,if=combo_points.deficit>=2&energy>60
-		unless ComboPointsDeficit() >= 2 and Energy() > 60 and SpellUsable(vanish) and SpellCooldown(vanish) < TimeToEnergy(60)
-		{
-			#pool_resource,for_next=1,extra_amount=60
-			#shadowmeld,if=combo_points.deficit>=2&energy>60
-			if ComboPointsDeficit() >= 2 and Energy() > 60 Spell(shadowmeld)
-			unless ComboPointsDeficit() >= 2 and Energy() > 60 and SpellUsable(shadowmeld) and SpellCooldown(shadowmeld) < TimeToEnergy(60)
-			{
-				unless ComboPoints() >= 5 and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < 6 and Spell(slice_and_dice) or ComboPoints() >= 5 and BuffRemaining(roll_the_bones_buff) < target.TimeToDie() and { BuffRemaining(roll_the_bones_buff) < 3 or BuffRemaining(roll_the_bones_buff) < BaseDuration(roll_the_bones_buff) * 0.3 / BuffCount(roll_the_bones_buff) or not BuffPresent(shark_infested_waters_buff) and BuffCount(roll_the_bones_buff) < 2 } and Spell(roll_the_bones)
-				{
-					#killing_spree,if=energy.time_to_max>5|energy<15
-					if TimeToMaxEnergy() > 5 or Energy() < 15 Spell(killing_spree)
-				}
-			}
-		}
+		#adrenaline_rush,if=!buff.adrenaline_rush.up
+		if not BuffPresent(adrenaline_rush_buff) Spell(adrenaline_rush)
 	}
 }
 
-### actions.finisher
-
-AddFunction OutlawFinisherMainActions
+AddFunction OutlawCdsCdPostConditions
 {
-	#death_from_above
-	Spell(death_from_above)
-	#run_through
-	Spell(run_through)
+	Enemies() >= 1 and Spell(cannonball_barrage) or HasEquippedItem(thraxis_tricksy_treads) and not 0 and Spell(sprint) or ComboPointsDeficit() >= 4 and { not Talent(ghostly_strike_talent) or target.DebuffPresent(ghostly_strike_debuff) } and Spell(curse_of_the_dreadblades)
 }
 
-### actions.generator
+### actions.finish
 
-AddFunction OutlawGeneratorMainActions
+AddFunction OutlawFinishMainActions
 {
-	#ghostly_strike,if=talent.ghostly_strike.enabled&debuff.ghostly_strike.remains<duration*0.3
-	if Talent(ghostly_strike_talent) and target.DebuffRemaining(ghostly_strike_debuff) < BaseDuration(ghostly_strike_debuff) * 0.3 Spell(ghostly_strike)
-	#pistol_shot,if=buff.opportunity.up&energy<60
-	if BuffPresent(opportunity_buff) and Energy() < 60 Spell(pistol_shot)
-	#saber_slash
-	Spell(saber_slash)
+	#between_the_eyes,if=equipped.greenskins_waterlogged_wristcuffs&buff.shark_infested_waters.up
+	if HasEquippedItem(greenskins_waterlogged_wristcuffs) and BuffPresent(shark_infested_waters_buff) Spell(between_the_eyes)
+	#run_through,if=!talent.death_from_above.enabled|energy.time_to_max<cooldown.death_from_above.remains+3.5
+	if not Talent(death_from_above_talent) or TimeToMaxEnergy() < SpellCooldown(death_from_above) + 3.5 Spell(run_through)
 }
 
 ### actions.precombat
@@ -487,20 +517,22 @@ AddFunction OutlawPrecombatMainActions
 	#snapshot_stats
 	#stealth
 	Spell(stealth)
+	#roll_the_bones,if=!talent.slice_and_dice.enabled
+	if not Talent(slice_and_dice_talent) Spell(roll_the_bones)
 }
 
 AddFunction OutlawPrecombatShortCdActions
 {
 	unless Spell(augmentation) or Spell(stealth)
 	{
-		#marked_for_death
-		Spell(marked_for_death)
+		#marked_for_death,if=raid_event.adds.in>40
+		if 600 > 40 Spell(marked_for_death)
 	}
 }
 
 AddFunction OutlawPrecombatShortCdPostConditions
 {
-	Spell(augmentation) or Spell(stealth)
+	Spell(augmentation) or Spell(stealth) or not Talent(slice_and_dice_talent) and Spell(roll_the_bones)
 }
 
 AddFunction OutlawPrecombatCdActions
@@ -514,7 +546,39 @@ AddFunction OutlawPrecombatCdActions
 
 AddFunction OutlawPrecombatCdPostConditions
 {
-	Spell(augmentation) or Spell(stealth)
+	Spell(augmentation) or Spell(stealth) or not Talent(slice_and_dice_talent) and Spell(roll_the_bones)
+}
+
+### actions.stealth
+
+AddFunction OutlawStealthMainActions
+{
+	#variable,name=stealth_condition,value=(combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&!debuff.ghostly_strike.up)+buff.broadsides.up&energy>60&!buff.jolly_roger.up&!buff.hidden_blade.up&!buff.curse_of_the_dreadblades.up)
+	#ambush
+	Spell(ambush)
+}
+
+AddFunction OutlawStealthShortCdActions
+{
+	unless Spell(ambush)
+	{
+		#vanish,if=variable.stealth_condition
+		if 0 Spell(vanish)
+	}
+}
+
+AddFunction OutlawStealthCdActions
+{
+	unless Spell(ambush)
+	{
+		#shadowmeld,if=variable.stealth_condition
+		if 0 Spell(shadowmeld)
+	}
+}
+
+AddFunction OutlawStealthCdPostConditions
+{
+	Spell(ambush)
 }
 
 ### Outlaw icons.
@@ -573,26 +637,33 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # adrenaline_rush
 # adrenaline_rush_buff
 # ambush
+# anticipation_talent
 # arcane_torrent_energy
 # augmentation
 # berserking
+# between_the_eyes
 # blade_flurry
 # blade_flurry_buff
 # blood_fury_ap
+# broadsides_buff
 # cannonball_barrage
 # curse_of_the_dreadblades
+# curse_of_the_dreadblades_buff
 # death_from_above
-# deeper_stratagem_talent
+# death_from_above_talent
+# deeper_strategem_talent
 # draenic_agility_potion
 # ghostly_strike
 # ghostly_strike_debuff
 # ghostly_strike_talent
+# greenskins_waterlogged_wristcuffs
 # kick
 # killing_spree
 # legendary_ring_agility
 # marked_for_death
 # opportunity_buff
 # pistol_shot
+# quick_draw_talent
 # roll_the_bones
 # roll_the_bones_buff
 # run_through
@@ -600,9 +671,14 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # shadowmeld
 # shadowstep
 # shark_infested_waters_buff
+# shivarran_symmetry
 # slice_and_dice
 # slice_and_dice_buff
+# slice_and_dice_talent
+# sprint
 # stealth
+# thraxis_tricksy_treads
+# true_bearing_buff
 # vanish
 ]]
 	OvaleScripts:RegisterScript("ROGUE", "outlaw", name, desc, code, "script")
@@ -635,54 +711,29 @@ AddFunction SubtletyUsePotionAgility
 
 AddFunction SubtletyDefaultMainActions
 {
-	#symbols_of_death,if=buff.symbols_of_death.remains<target.time_to_die-4&buff.symbols_of_death.remains<=10.5&buff.shadowmeld.down
-	if BuffRemaining(symbols_of_death_buff) < target.TimeToDie() - 4 and BuffRemaining(symbols_of_death_buff) <= 10.5 and BuffExpires(shadowmeld_buff) Spell(symbols_of_death)
-	#shuriken_storm,if=buff.stealth.up&talent.premeditation.enabled&combo_points.max-combo_points>=3&spell_targets.shuriken_storm>=7
-	if BuffPresent(stealthed_buff any=1) and Talent(premeditation_talent) and MaxComboPoints() - ComboPoints() >= 3 and Enemies() >= 7 Spell(shuriken_storm)
-	#shuriken_storm,if=buff.stealth.up&!buff.death.up&combo_points.max-combo_points>=2&((!talent.premeditation.enabled&spell_targets.shuriken_storm>=4)|spell_targets.shuriken_storm>=8)
-	if BuffPresent(stealthed_buff any=1) and not BuffPresent(death_buff) and MaxComboPoints() - ComboPoints() >= 2 and { not Talent(premeditation_talent) and Enemies() >= 4 or Enemies() >= 8 } Spell(shuriken_storm)
-	#shadowstrike,if=combo_points.max-combo_points>=2
-	if MaxComboPoints() - ComboPoints() >= 2 Spell(shadowstrike)
-	#pool_resource,for_next=1,extra_amount=energy.max-talent.master_of_shadows.enabled*30
-	#vanish,if=(energy.deficit<talent.master_of_shadows.enabled*30&combo_points.max-combo_points>=3&cooldown.shadow_dance.charges<2)|target.time_to_die<8
-	unless { EnergyDeficit() < TalentPoints(master_of_shadows_talent) * 30 and MaxComboPoints() - ComboPoints() >= 3 and SpellChargeCooldown(shadow_dance) < 2 or target.TimeToDie() < 8 } and SpellUsable(vanish) and SpellCooldown(vanish) < TimeToEnergyFor(vanish)
-	{
-		#pool_resource,for_next=1,extra_amount=energy.max-talent.master_of_shadows.enabled*30
-		#shadow_dance,if=combo_points.max-combo_points>=2&((cooldown.vanish.remains&buff.symbols_of_death.remains<=10.5&energy.deficit<talent.master_of_shadows.enabled*30)|cooldown.shadow_dance.charges>=2|target.time_to_die<25)
-		unless MaxComboPoints() - ComboPoints() >= 2 and { SpellCooldown(vanish) > 0 and BuffRemaining(symbols_of_death_buff) <= 10.5 and EnergyDeficit() < TalentPoints(master_of_shadows_talent) * 30 or SpellChargeCooldown(shadow_dance) >= 2 or target.TimeToDie() < 25 } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergyFor(shadow_dance)
-		{
-			#enveloping_shadows,if=buff.enveloping_shadows.remains<target.time_to_die&((buff.enveloping_shadows.remains<=10.8+talent.deeper_stratagem.enabled*1.8&combo_points>=5+talent.deeper_stratagem.enabled)|buff.enveloping_shadows.remains<=6)
-			if BuffRemaining(enveloping_shadows_buff) < target.TimeToDie() and { BuffRemaining(enveloping_shadows_buff) <= 10.8 + TalentPoints(deeper_stratagem_talent) * 1.8 and ComboPoints() >= 5 + TalentPoints(deeper_stratagem_talent) or BuffRemaining(enveloping_shadows_buff) <= 6 } Spell(enveloping_shadows)
-			#run_action_list,name=finisher,if=combo_points>=5
-			if ComboPoints() >= 5 SubtletyFinisherMainActions()
-			#run_action_list,name=generator,if=combo_points<5
-			if ComboPoints() < 5 SubtletyGeneratorMainActions()
-		}
-	}
+	#nightblade,if=set_bonus.tier18_4pc&refreshable&time<5
+	if ArmorSetBonus(T18 4) and target.Refreshable(nightblade_debuff) and TimeInCombat() < 5 Spell(nightblade)
+	#run_action_list,name=stealthed,if=stealthed|buff.shadowmeld.up
+	if Stealthed() or BuffPresent(shadowmeld_buff) SubtletyStealthedMainActions()
+	#call_action_list,name=finish,if=combo_points>=5|(combo_points>=4&spell_targets.shuriken_storm>=3&spell_targets.shuriken_storm<=4)
+	if ComboPoints() >= 5 or ComboPoints() >= 4 and Enemies() >= 3 and Enemies() <= 4 SubtletyFinishMainActions()
+	#call_action_list,name=build,if=energy.deficit<=20|(energy.deficit<=45&talent.master_of_shadows.enabled)
+	if EnergyDeficit() <= 20 or EnergyDeficit() <= 45 and Talent(master_of_shadows_talent) SubtletyBuildMainActions()
 }
 
 AddFunction SubtletyDefaultShortCdActions
 {
-	#goremaws_bite,if=(combo_points.max-combo_points>=2&energy.deficit>55&time<10)|(combo_points.max-combo_points>=4&energy.deficit>45)|target.time_to_die<8
-	if MaxComboPoints() - ComboPoints() >= 2 and EnergyDeficit() > 55 and TimeInCombat() < 10 or MaxComboPoints() - ComboPoints() >= 4 and EnergyDeficit() > 45 or target.TimeToDie() < 8 Spell(goremaws_bite)
-
-	unless BuffRemaining(symbols_of_death_buff) < target.TimeToDie() - 4 and BuffRemaining(symbols_of_death_buff) <= 10.5 and BuffExpires(shadowmeld_buff) and Spell(symbols_of_death) or BuffPresent(stealthed_buff any=1) and Talent(premeditation_talent) and MaxComboPoints() - ComboPoints() >= 3 and Enemies() >= 7 and Spell(shuriken_storm) or BuffPresent(stealthed_buff any=1) and not BuffPresent(death_buff) and MaxComboPoints() - ComboPoints() >= 2 and { not Talent(premeditation_talent) and Enemies() >= 4 or Enemies() >= 8 } and Spell(shuriken_storm) or MaxComboPoints() - ComboPoints() >= 2 and Spell(shadowstrike)
+	unless ArmorSetBonus(T18 4) and target.Refreshable(nightblade_debuff) and TimeInCombat() < 5 and Spell(nightblade)
 	{
-		#pool_resource,for_next=1,extra_amount=energy.max-talent.master_of_shadows.enabled*30
-		#vanish,if=(energy.deficit<talent.master_of_shadows.enabled*30&combo_points.max-combo_points>=3&cooldown.shadow_dance.charges<2)|target.time_to_die<8
-		if EnergyDeficit() < TalentPoints(master_of_shadows_talent) * 30 and MaxComboPoints() - ComboPoints() >= 3 and SpellChargeCooldown(shadow_dance) < 2 or target.TimeToDie() < 8 Spell(vanish)
-		unless { EnergyDeficit() < TalentPoints(master_of_shadows_talent) * 30 and MaxComboPoints() - ComboPoints() >= 3 and SpellChargeCooldown(shadow_dance) < 2 or target.TimeToDie() < 8 } and SpellUsable(vanish) and SpellCooldown(vanish) < TimeToEnergyFor(vanish)
+		#call_action_list,name=cds
+		SubtletyCdsShortCdActions()
+
+		unless { Stealthed() or BuffPresent(shadowmeld_buff) } and SubtletyStealthedShortCdPostConditions()
 		{
-			#pool_resource,for_next=1,extra_amount=energy.max-talent.master_of_shadows.enabled*30
-			#shadow_dance,if=combo_points.max-combo_points>=2&((cooldown.vanish.remains&buff.symbols_of_death.remains<=10.5&energy.deficit<talent.master_of_shadows.enabled*30)|cooldown.shadow_dance.charges>=2|target.time_to_die<25)
-			if MaxComboPoints() - ComboPoints() >= 2 and { SpellCooldown(vanish) > 0 and BuffRemaining(symbols_of_death_buff) <= 10.5 and EnergyDeficit() < TalentPoints(master_of_shadows_talent) * 30 or SpellChargeCooldown(shadow_dance) >= 2 or target.TimeToDie() < 25 } Spell(shadow_dance)
-			unless MaxComboPoints() - ComboPoints() >= 2 and { SpellCooldown(vanish) > 0 and BuffRemaining(symbols_of_death_buff) <= 10.5 and EnergyDeficit() < TalentPoints(master_of_shadows_talent) * 30 or SpellChargeCooldown(shadow_dance) >= 2 or target.TimeToDie() < 25 } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergyFor(shadow_dance)
+			unless { ComboPoints() >= 5 or ComboPoints() >= 4 and Enemies() >= 3 and Enemies() <= 4 } and SubtletyFinishShortCdPostConditions()
 			{
-				unless BuffRemaining(enveloping_shadows_buff) < target.TimeToDie() and { BuffRemaining(enveloping_shadows_buff) <= 10.8 + TalentPoints(deeper_stratagem_talent) * 1.8 and ComboPoints() >= 5 + TalentPoints(deeper_stratagem_talent) or BuffRemaining(enveloping_shadows_buff) <= 6 } and Spell(enveloping_shadows)
-				{
-					#marked_for_death,cycle_targets=1,target_if=min:target.time_to_die,if=combo_points.deficit>=4+talent.deeper_stratagem.enabled
-					if ComboPointsDeficit() >= 4 + TalentPoints(deeper_stratagem_talent) Spell(marked_for_death)
-				}
+				#call_action_list,name=stealth_cds,if=combo_points.deficit>=2+talent.premeditation.enabled&(energy.deficit<=20|(energy.deficit<=45&talent.master_of_shadows.enabled)|(cooldown.shadowmeld.up&!cooldown.vanish.up&cooldown.shadow_dance.charges<=1))
+				if ComboPointsDeficit() >= 2 + TalentPoints(premeditation_talent) and { EnergyDeficit() <= 20 or EnergyDeficit() <= 45 and Talent(master_of_shadows_talent) or not SpellCooldown(shadowmeld) > 0 and not { not SpellCooldown(vanish) > 0 } and SpellChargeCooldown(shadow_dance) <= 1 } SubtletyStealthCdsShortCdActions()
 			}
 		}
 	}
@@ -690,62 +741,92 @@ AddFunction SubtletyDefaultShortCdActions
 
 AddFunction SubtletyDefaultCdActions
 {
-	#potion,name=draenic_agility,if=buff.bloodlust.react|target.time_to_die<=25|buff.shadow_blades.up
-	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 25 or BuffPresent(shadow_blades_buff) SubtletyUsePotionAgility()
-	#use_item,slot=finger1
-	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
-	#blood_fury,if=buff.shadow_dance.up|buff.vanish.up|buff.stealth.up
-	if BuffPresent(shadow_dance_buff) or BuffPresent(vanish_buff) or BuffPresent(stealthed_buff any=1) Spell(blood_fury_ap)
-	#berserking,if=buff.shadow_dance.up|buff.vanish.up|buff.stealth.up
-	if BuffPresent(shadow_dance_buff) or BuffPresent(vanish_buff) or BuffPresent(stealthed_buff any=1) Spell(berserking)
-	#arcane_torrent,if=energy.deficit>70&(buff.shadow_dance.up|buff.vanish.up|buff.stealth.up)
-	if EnergyDeficit() > 70 and { BuffPresent(shadow_dance_buff) or BuffPresent(vanish_buff) or BuffPresent(stealthed_buff any=1) } Spell(arcane_torrent_energy)
-	#shadow_blades,if=!buff.shadow_blades.up&energy.deficit<20&(buff.shadow_dance.up|buff.vanish.up|buff.stealth.up)
-	if not BuffPresent(shadow_blades_buff) and EnergyDeficit() < 20 and { BuffPresent(shadow_dance_buff) or BuffPresent(vanish_buff) or BuffPresent(stealthed_buff any=1) } Spell(shadow_blades)
-
-	unless { MaxComboPoints() - ComboPoints() >= 2 and EnergyDeficit() > 55 and TimeInCombat() < 10 or MaxComboPoints() - ComboPoints() >= 4 and EnergyDeficit() > 45 or target.TimeToDie() < 8 } and Spell(goremaws_bite) or BuffRemaining(symbols_of_death_buff) < target.TimeToDie() - 4 and BuffRemaining(symbols_of_death_buff) <= 10.5 and BuffExpires(shadowmeld_buff) and Spell(symbols_of_death) or BuffPresent(stealthed_buff any=1) and Talent(premeditation_talent) and MaxComboPoints() - ComboPoints() >= 3 and Enemies() >= 7 and Spell(shuriken_storm) or BuffPresent(stealthed_buff any=1) and not BuffPresent(death_buff) and MaxComboPoints() - ComboPoints() >= 2 and { not Talent(premeditation_talent) and Enemies() >= 4 or Enemies() >= 8 } and Spell(shuriken_storm) or MaxComboPoints() - ComboPoints() >= 2 and Spell(shadowstrike)
+	unless ArmorSetBonus(T18 4) and target.Refreshable(nightblade_debuff) and TimeInCombat() < 5 and Spell(nightblade)
 	{
-		#pool_resource,for_next=1,extra_amount=energy.max-talent.master_of_shadows.enabled*30
-		#vanish,if=(energy.deficit<talent.master_of_shadows.enabled*30&combo_points.max-combo_points>=3&cooldown.shadow_dance.charges<2)|target.time_to_die<8
-		unless { EnergyDeficit() < TalentPoints(master_of_shadows_talent) * 30 and MaxComboPoints() - ComboPoints() >= 3 and SpellChargeCooldown(shadow_dance) < 2 or target.TimeToDie() < 8 } and SpellUsable(vanish) and SpellCooldown(vanish) < TimeToEnergyFor(vanish)
+		#call_action_list,name=cds
+		SubtletyCdsCdActions()
+
+		unless SubtletyCdsCdPostConditions()
 		{
-			#pool_resource,for_next=1,extra_amount=energy.max-talent.master_of_shadows.enabled*30
-			#shadow_dance,if=combo_points.max-combo_points>=2&((cooldown.vanish.remains&buff.symbols_of_death.remains<=10.5&energy.deficit<talent.master_of_shadows.enabled*30)|cooldown.shadow_dance.charges>=2|target.time_to_die<25)
-			unless MaxComboPoints() - ComboPoints() >= 2 and { SpellCooldown(vanish) > 0 and BuffRemaining(symbols_of_death_buff) <= 10.5 and EnergyDeficit() < TalentPoints(master_of_shadows_talent) * 30 or SpellChargeCooldown(shadow_dance) >= 2 or target.TimeToDie() < 25 } and SpellUsable(shadow_dance) and SpellCooldown(shadow_dance) < TimeToEnergyFor(shadow_dance)
+			unless { Stealthed() or BuffPresent(shadowmeld_buff) } and SubtletyStealthedCdPostConditions()
 			{
-				#shadowmeld,if=energy>40&combo_points.max-combo_points>=3&!(buff.shadow_dance.up|buff.vanish.up|buff.stealth.up)
-				if Energy() > 40 and MaxComboPoints() - ComboPoints() >= 3 and not { BuffPresent(shadow_dance_buff) or BuffPresent(vanish_buff) or BuffPresent(stealthed_buff any=1) } Spell(shadowmeld)
+				unless { ComboPoints() >= 5 or ComboPoints() >= 4 and Enemies() >= 3 and Enemies() <= 4 } and SubtletyFinishCdPostConditions()
+				{
+					#call_action_list,name=stealth_cds,if=combo_points.deficit>=2+talent.premeditation.enabled&(energy.deficit<=20|(energy.deficit<=45&talent.master_of_shadows.enabled)|(cooldown.shadowmeld.up&!cooldown.vanish.up&cooldown.shadow_dance.charges<=1))
+					if ComboPointsDeficit() >= 2 + TalentPoints(premeditation_talent) and { EnergyDeficit() <= 20 or EnergyDeficit() <= 45 and Talent(master_of_shadows_talent) or not SpellCooldown(shadowmeld) > 0 and not { not SpellCooldown(vanish) > 0 } and SpellChargeCooldown(shadow_dance) <= 1 } SubtletyStealthCdsCdActions()
+				}
 			}
 		}
 	}
 }
 
-### actions.finisher
+### actions.build
 
-AddFunction SubtletyFinisherMainActions
+AddFunction SubtletyBuildMainActions
 {
+	#shuriken_storm,if=spell_targets.shuriken_storm>=2
+	if Enemies() >= 2 Spell(shuriken_storm)
+	#gloomblade
+	Spell(gloomblade)
+	#backstab
+	Spell(backstab)
+}
+
+### actions.cds
+
+AddFunction SubtletyCdsShortCdActions
+{
+	#goremaws_bite,if=(combo_points.deficit>=2&energy.deficit>55&time<10)|(combo_points.deficit>=4&energy.deficit>45)|target.time_to_die<8
+	if ComboPointsDeficit() >= 2 and EnergyDeficit() > 55 and TimeInCombat() < 10 or ComboPointsDeficit() >= 4 and EnergyDeficit() > 45 or target.TimeToDie() < 8 Spell(goremaws_bite)
+	#marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|(raid_event.adds.in>40&combo_points.deficit>=4+talent.deeper_strategem.enabled+talent.anticipation.enabled)
+	if target.TimeToDie() < ComboPointsDeficit() or 600 > 40 and ComboPointsDeficit() >= 4 + TalentPoints(deeper_stratagem_talent) + TalentPoints(anticipation_talent) Spell(marked_for_death)
+}
+
+AddFunction SubtletyCdsCdActions
+{
+	#potion,name=draenic_agility,if=buff.bloodlust.react|target.time_to_die<=25|buff.shadow_blades.up
+	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 25 or BuffPresent(shadow_blades_buff) SubtletyUsePotionAgility()
+	#use_item,slot=finger1
+	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
+	#blood_fury,if=stealthed
+	if Stealthed() Spell(blood_fury_ap)
+	#berserking,if=stealthed
+	if Stealthed() Spell(berserking)
+	#arcane_torrent,if=stealthed&energy.deficit>70
+	if Stealthed() and EnergyDeficit() > 70 Spell(arcane_torrent_energy)
+	#shadow_blades,if=!buff.shadow_blades.up
+	if not BuffPresent(shadow_blades_buff) Spell(shadow_blades)
+}
+
+AddFunction SubtletyCdsCdPostConditions
+{
+	{ ComboPointsDeficit() >= 2 and EnergyDeficit() > 55 and TimeInCombat() < 10 or ComboPointsDeficit() >= 4 and EnergyDeficit() > 45 or target.TimeToDie() < 8 } and Spell(goremaws_bite)
+}
+
+### actions.finish
+
+AddFunction SubtletyFinishMainActions
+{
+	#enveloping_shadows,if=buff.enveloping_shadows.remains<target.time_to_die&buff.enveloping_shadows.remains<=combo_points*1.8
+	if BuffRemaining(enveloping_shadows_buff) < target.TimeToDie() and BuffRemaining(enveloping_shadows_buff) <= ComboPoints() * 1.8 Spell(enveloping_shadows)
 	#death_from_above,if=spell_targets.death_from_above>=10
 	if Enemies() >= 10 Spell(death_from_above)
-	#nightblade,if=!dot.nightblade.ticking|dot.nightblade.remains<duration*0.3
-	if not target.DebuffPresent(nightblade_debuff) or target.DebuffRemaining(nightblade_debuff) < BaseDuration(nightblade_debuff) * 0.3 Spell(nightblade)
-	#nightblade,cycle_targets=1,target_if=max:target.time_to_die,if=active_dot.nightblade<6&target.time_to_die>6&(!dot.nightblade.ticking|dot.nightblade.remains<duration*0.3)
-	if DebuffCountOnAny(nightblade_debuff) < 6 and target.TimeToDie() > 6 and { not target.DebuffPresent(nightblade_debuff) or target.DebuffRemaining(nightblade_debuff) < BaseDuration(nightblade_debuff) * 0.3 } Spell(nightblade)
+	#nightblade,target_if=max:target.time_to_die,if=target.time_to_die>10&refreshable
+	if target.TimeToDie() > 10 and target.Refreshable(nightblade_debuff) Spell(nightblade)
 	#death_from_above
 	Spell(death_from_above)
 	#eviscerate
 	Spell(eviscerate)
 }
 
-### actions.generator
-
-AddFunction SubtletyGeneratorMainActions
+AddFunction SubtletyFinishShortCdPostConditions
 {
-	#shuriken_storm,if=spell_targets.shuriken_storm>=2
-	if Enemies() >= 2 Spell(shuriken_storm)
-	#gloomblade,if=energy.time_to_max<2.5
-	if TimeToMaxEnergy() < 2.5 Spell(gloomblade)
-	#backstab,if=energy.time_to_max<2.5
-	if TimeToMaxEnergy() < 2.5 Spell(backstab)
+	BuffRemaining(enveloping_shadows_buff) < target.TimeToDie() and BuffRemaining(enveloping_shadows_buff) <= ComboPoints() * 1.8 and Spell(enveloping_shadows) or Enemies() >= 10 and Spell(death_from_above) or target.TimeToDie() > 10 and target.Refreshable(nightblade_debuff) and Spell(nightblade) or Spell(death_from_above) or Spell(eviscerate)
+}
+
+AddFunction SubtletyFinishCdPostConditions
+{
+	BuffRemaining(enveloping_shadows_buff) < target.TimeToDie() and BuffRemaining(enveloping_shadows_buff) <= ComboPoints() * 1.8 and Spell(enveloping_shadows) or Enemies() >= 10 and Spell(death_from_above) or target.TimeToDie() > 10 and target.Refreshable(nightblade_debuff) and Spell(nightblade) or Spell(death_from_above) or Spell(eviscerate)
 }
 
 ### actions.precombat
@@ -767,8 +848,14 @@ AddFunction SubtletyPrecombatShortCdActions
 {
 	unless Spell(augmentation) or Spell(stealth)
 	{
-		#marked_for_death
-		Spell(marked_for_death)
+		#marked_for_death,if=raid_event.adds.in>40
+		if 600 > 40 Spell(marked_for_death)
+
+		unless Spell(symbols_of_death)
+		{
+			#vanish,if=set_bonus.tier18_4pc
+			if ArmorSetBonus(T18 4) Spell(vanish)
+		}
 	}
 }
 
@@ -789,6 +876,56 @@ AddFunction SubtletyPrecombatCdActions
 AddFunction SubtletyPrecombatCdPostConditions
 {
 	Spell(augmentation) or Spell(stealth) or Spell(symbols_of_death)
+}
+
+### actions.stealth_cds
+
+AddFunction SubtletyStealthCdsShortCdActions
+{
+	#shadow_dance,if=charges>=3
+	if Charges(shadow_dance) >= 3 Spell(shadow_dance)
+	#vanish
+	Spell(vanish)
+	#shadow_dance,if=charges>=2
+	if Charges(shadow_dance) >= 2 Spell(shadow_dance)
+	#pool_resource,for_next=1,extra_amount=40
+	#shadowmeld,if=energy>=40
+	unless True(pool_energy 40) and SpellUsable(shadowmeld) and SpellCooldown(shadowmeld) < TimeToEnergy(40)
+	{
+		#shadow_dance
+		Spell(shadow_dance)
+	}
+}
+
+AddFunction SubtletyStealthCdsCdActions
+{
+	#pool_resource,for_next=1,extra_amount=40
+	#shadowmeld,if=energy>=40
+	if Energy() >= 40 Spell(shadowmeld)
+}
+
+### actions.stealthed
+
+AddFunction SubtletyStealthedMainActions
+{
+	#symbols_of_death,if=buff.shadowmeld.down&buff.symbols_of_death.remains<target.time_to_die-4&buff.symbols_of_death.remains<=buff.symbols_of_death.duration*0.3
+	if BuffExpires(shadowmeld_buff) and BuffRemaining(symbols_of_death_buff) < target.TimeToDie() - 4 and BuffRemaining(symbols_of_death_buff) <= BaseDuration(symbols_of_death_buff) * 0.3 Spell(symbols_of_death)
+	#call_action_list,name=finish,if=combo_points>=5
+	if ComboPoints() >= 5 SubtletyFinishMainActions()
+	#shuriken_storm,if=buff.shadowmeld.down&combo_points.deficit>=3&spell_targets.shuriken_storm>=3+equipped.bleeding_hollow_toxin_vessel*talent.premeditation.enabled
+	if BuffExpires(shadowmeld_buff) and ComboPointsDeficit() >= 3 and Enemies() >= 3 + HasEquippedItem(bleeding_hollow_toxin_vessel) * TalentPoints(premeditation_talent) Spell(shuriken_storm)
+	#shadowstrike
+	Spell(shadowstrike)
+}
+
+AddFunction SubtletyStealthedShortCdPostConditions
+{
+	BuffExpires(shadowmeld_buff) and BuffRemaining(symbols_of_death_buff) < target.TimeToDie() - 4 and BuffRemaining(symbols_of_death_buff) <= BaseDuration(symbols_of_death_buff) * 0.3 and Spell(symbols_of_death) or ComboPoints() >= 5 and SubtletyFinishShortCdPostConditions() or BuffExpires(shadowmeld_buff) and ComboPointsDeficit() >= 3 and Enemies() >= 3 + HasEquippedItem(bleeding_hollow_toxin_vessel) * TalentPoints(premeditation_talent) and Spell(shuriken_storm) or Spell(shadowstrike)
+}
+
+AddFunction SubtletyStealthedCdPostConditions
+{
+	BuffExpires(shadowmeld_buff) and BuffRemaining(symbols_of_death_buff) < target.TimeToDie() - 4 and BuffRemaining(symbols_of_death_buff) <= BaseDuration(symbols_of_death_buff) * 0.3 and Spell(symbols_of_death) or ComboPoints() >= 5 and SubtletyFinishCdPostConditions() or BuffExpires(shadowmeld_buff) and ComboPointsDeficit() >= 3 and Enemies() >= 3 + HasEquippedItem(bleeding_hollow_toxin_vessel) * TalentPoints(premeditation_talent) and Spell(shuriken_storm) or Spell(shadowstrike)
 }
 
 ### Subtlety icons.
@@ -844,12 +981,13 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 }
 
 ### Required symbols
+# anticipation_talent
 # arcane_torrent_energy
 # augmentation
 # backstab
 # berserking
+# bleeding_hollow_toxin_vessel
 # blood_fury_ap
-# death_buff
 # death_from_above
 # deeper_stratagem_talent
 # draenic_agility_potion
@@ -868,7 +1006,6 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 # shadow_blades
 # shadow_blades_buff
 # shadow_dance
-# shadow_dance_buff
 # shadowmeld
 # shadowmeld_buff
 # shadowstep
@@ -878,7 +1015,6 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 # symbols_of_death
 # symbols_of_death_buff
 # vanish
-# vanish_buff
 ]]
 	OvaleScripts:RegisterScript("ROGUE", "subtlety", name, desc, code, "script")
 end

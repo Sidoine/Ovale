@@ -466,6 +466,10 @@ AddFunction DemonologyPrecombatMainActions
 {
 	#demonic_empowerment
 	Spell(demonic_empowerment)
+	#demonbolt,if=talent.demonbolt.enabled
+	if Talent(demonbolt_talent) Spell(demonbolt)
+	#shadow_bolt,if=!talent.demonbolt.enabled
+	if not Talent(demonbolt_talent) Spell(shadow_bolt)
 }
 
 AddFunction DemonologyPrecombatShortCdActions
@@ -478,7 +482,7 @@ AddFunction DemonologyPrecombatShortCdActions
 
 AddFunction DemonologyPrecombatShortCdPostConditions
 {
-	Spell(demonic_empowerment)
+	Spell(demonic_empowerment) or Talent(demonbolt_talent) and Spell(demonbolt) or not Talent(demonbolt_talent) and Spell(shadow_bolt)
 }
 
 AddFunction DemonologyPrecombatCdActions
@@ -497,7 +501,7 @@ AddFunction DemonologyPrecombatCdActions
 
 AddFunction DemonologyPrecombatCdPostConditions
 {
-	not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_felguard) or Spell(demonic_empowerment)
+	not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_felguard) or Spell(demonic_empowerment) or Talent(demonbolt_talent) and Spell(demonbolt) or not Talent(demonbolt_talent) and Spell(shadow_bolt)
 }
 
 ### Demonology icons.
@@ -557,6 +561,7 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 # berserking
 # blood_fury_sp
 # demonbolt
+# demonbolt_talent
 # demonic_empowerment
 # demonic_power_buff
 # doom
@@ -627,8 +632,8 @@ AddFunction DestructionDefaultMainActions
 	if target.DebuffRemaining(immolate_debuff) > CastTime(channel_demonfire) Spell(channel_demonfire)
 	#chaos_bolt,if=soul_shard>3
 	if SoulShards() > 3 Spell(chaos_bolt)
-	#mana_tap,if=buff.mana_tap.remains<=buff.mana_tap.duration*0.3&target.time_to_die>buff.mana_tap.duration*0.3
-	if BuffRemaining(mana_tap_buff) <= BaseDuration(mana_tap_buff) * 0.3 and target.TimeToDie() > BaseDuration(mana_tap_buff) * 0.3 Spell(mana_tap)
+	#mana_tap,if=buff.mana_tap.remains<=buff.mana_tap.duration*0.3&(mana.pct<20|buff.mana_tap.remains<=action.chaos_bolt.cast_time)&target.time_to_die>buff.mana_tap.duration*0.3
+	if BuffRemaining(mana_tap_buff) <= BaseDuration(mana_tap_buff) * 0.3 and { ManaPercent() < 20 or BuffRemaining(mana_tap_buff) <= CastTime(chaos_bolt) } and target.TimeToDie() > BaseDuration(mana_tap_buff) * 0.3 Spell(mana_tap)
 	#chaos_bolt
 	Spell(chaos_bolt)
 	#conflagrate,if=!talent.roaring_blaze.enabled
@@ -650,16 +655,10 @@ AddFunction DestructionDefaultShortCdActions
 		#service_pet
 		Spell(service_imp)
 
-		unless target.DebuffRemaining(immolate_debuff) > CastTime(channel_demonfire) and Spell(channel_demonfire) or SoulShards() > 3 and Spell(chaos_bolt)
+		unless target.DebuffRemaining(immolate_debuff) > CastTime(channel_demonfire) and Spell(channel_demonfire) or SoulShards() > 3 and Spell(chaos_bolt) or BuffRemaining(mana_tap_buff) <= BaseDuration(mana_tap_buff) * 0.3 and { ManaPercent() < 20 or BuffRemaining(mana_tap_buff) <= CastTime(chaos_bolt) } and target.TimeToDie() > BaseDuration(mana_tap_buff) * 0.3 and Spell(mana_tap) or Spell(chaos_bolt)
 		{
-			#dimensional_rift
-			Spell(dimensional_rift)
-
-			unless BuffRemaining(mana_tap_buff) <= BaseDuration(mana_tap_buff) * 0.3 and target.TimeToDie() > BaseDuration(mana_tap_buff) * 0.3 and Spell(mana_tap) or Spell(chaos_bolt)
-			{
-				#cataclysm
-				Spell(cataclysm)
-			}
+			#cataclysm
+			Spell(cataclysm)
 		}
 	}
 }
@@ -800,7 +799,6 @@ AddIcon checkbox=opt_warlock_destruction_aoe help=cd specialization=destruction
 # conflagrate
 # conflagration_of_chaos_buff
 # demonic_power_buff
-# dimensional_rift
 # draenic_intellect_potion
 # grimoire_of_sacrifice
 # grimoire_of_sacrifice_talent
