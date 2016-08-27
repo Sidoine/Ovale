@@ -23,7 +23,7 @@ Define(army_of_the_dead 42650)
 Define(army_of_the_dead_buff 42650) # XXX
 	SpellInfo(army_of_the_dead_buff duration=40)
 Define(asphyxiate 108194)
-	SpellInfo(asphyxiate cd=30 interrupt=1)
+	SpellInfo(asphyxiate cd=45 interrupt=1)
 Define(blighted_rune_weapon 194918)
 	SpellInfo(blighted_rune_weapon cd=60)
 Define(blood_boil 50842)
