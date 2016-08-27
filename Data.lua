@@ -205,7 +205,6 @@ OvaleData.buffSpellList = {
 		[115192] = true, -- Subterfuge (rogue); not truly "stealth" but functions like it for spell usage.
 		[115193] = true, -- Vanish (Subterfuge-talented rogue)
 		[185422] = true, -- Shadow Dance (subtlety rogue); not truly "stealth" but functions like it for spell usage.
-
 	},
 
 	-- Raid buffs (short term)
