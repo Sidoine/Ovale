@@ -481,6 +481,7 @@ function OvaleData:GetSpellInfoProperty(spellId, atTime, property, targetGUID)
 	targetGUID = targetGUID or OvaleGUID:UnitGUID(self.defaultTarget or "target")
 	local si = OvaleData.spellInfo[spellId]
 	local value = si and si[property]
+
 	local requirements = si and si.require[property]
 	if requirements then
 		for v, requirement in pairs(requirements) do
@@ -491,7 +492,27 @@ function OvaleData:GetSpellInfoProperty(spellId, atTime, property, targetGUID)
 			end
 		end
 	end
-	return value
+
+	if not value then return value end
+
+	local ratio = si and si[property .. "_percent"]
+	if ratio then
+		ratio = ratio / 100
+	else
+		ratio = 1
+	end
+	
+	local multipliers = si and si.require[property .. '_percent']
+	if multipliers then
+		for v, requirement in pairs(multipliers) do
+			local verified = self:CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+			if verified then
+				ratio = ratio * (tonumber(v) or v) / 100
+			end
+		end
+	end
+
+	return value * ratio
 end
 
 --Compute the damage of the given spell.

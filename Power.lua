@@ -58,16 +58,6 @@ local self_tooltip = nil
 -- Table of Lua patterns for matching spell costs in tooltips.
 local self_costPatterns = {}
 
--- Map suffix for buff parameters to multiplier for spell cost reduction.
-local BUFF_PERCENT_REDUCTION = {
-	["_less15"] = 0.15,
-	["_less50"] = 0.50,
-	["_less75"] = 0.75,
-	["_half"] = 0.5,
-	["_more40"] = -0.4,
-	["_more50"] = -0.5
-}
-
 do
 	local debugOptions = {
 		power = {
@@ -446,38 +436,7 @@ function OvalePower:PowerCost(spellId, powerType, atTime, targetGUID, maximumCos
 				end
 			end
 		end
-		--[[
-			Compute any multiplier to the resource cost of the spell due to the presence of a buff.
-			"buff_<powerType>_less<N>" is the spell Id of the buff that reduces the resource cost by N percent.
-		--]]
-		local multiplier = 1
-		for suffix, reduction in pairs(BUFF_PERCENT_REDUCTION) do
-			local buffPercentReduction = si[buffParam .. suffix]
-			if buffPercentReduction then
-				local aura = GetAuraByGUID(auraModule, self_playerGUID, buffPercentReduction)
-				local isActiveAura = IsActiveAura(auraModule, aura, atTime)
-				if isActiveAura then
-					-- Check if this aura has a stacking effect.
-					local siAura = OvaleData.spellInfo[buffPercentReduction]
-					if siAura and siAura.stacking == 1 then
-						reduction = reduction * aura.stacks
-						-- Clamp to a maximum of 100% reduction.
-						if reduction > 1 then
-							reduction = 1
-						end
-					end
-					multiplier = multiplier * (1 - reduction)
-				end
-			end
-		end
-		--[[
-			Apply any percent reductions to cost after fixed reductions are applied.
-			This seems to be a consistent Blizzard rule for spell costs so that you
-			never end up with a negative spell cost.
-		--]]
-		if cost > 0 then
-			cost = cost * multiplier
-		end
+		
 		--[[
 			Some abilities use "up to" N additional resources if available, e.g., Ferocious Bite.
 			Document this with "extra_<powerType>=N" in SpellInfo().
@@ -493,11 +452,6 @@ function OvalePower:PowerCost(spellId, powerType, atTime, targetGUID, maximumCos
 				if extraPower >= power then
 					extraPower = power
 				end
-			end
-			-- Apply any percent reductions to the extra resource cost.
-			if extraPower > 0 then
-				extraPower = extraPower * multiplier
-				self:Log("Spell ID '%d' will use %d extra %s.", spellId, extraPower, powerType)
 			end
 			cost = cost + extraPower
 		end
