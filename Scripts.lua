@@ -144,7 +144,7 @@ function OvaleScripts:GetDefaultScriptName(class, specialization)
 	-- default scripts in the form off "simulationcraft_<class>_<specialization>_t18m"
 	if class == "DEATHKNIGHT" then
 		if specialization == "blood" then
-			name = DISABLED_NAME
+			name = "icyveins_deathknight_blood"
 		elseif specialization == "unholy" then
 			name = "simulationcraft_death_knight_unholy_t18m"
 		end
