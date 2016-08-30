@@ -27,6 +27,7 @@ AddFunction BloodDefaultMainActions
 {
 	BloodHealMe()
 	if not Talent(soulgorge_talent) and target.DebuffRemaining(blood_plague_debuff) < 8 Spell(blood_boil)
+	Spell(consumption)
 	if BuffStacks(bone_shield_buff) <= 1 Spell(marrowrend)
 	if target.DebuffRemaining(blood_plague_debuff) < 8 Spell(deaths_caress)
 	if Talent(ossuary_talent) and BuffStacks(bone_shield_buff) <5 Spell(marrowrend)
@@ -43,6 +44,7 @@ AddFunction BloodDefaultAoEActions
 {
 	BloodHealMe()
 	if not Talent(soulgorge_talent) and target.DebuffRemaining(blood_plague_debuff) < 8 Spell(blood_boil)
+	Spell(consumption)
 	if BuffStacks(bone_shield_buff) <= 1 Spell(marrowrend)
 	if target.DebuffRemaining(blood_plague_debuff) < 8 Spell(deaths_caress)
 	if Talent(ossuary_talent) and BuffStacks(bone_shield_buff) < 5 and Enemies() < 3 Spell(marrowrend)
