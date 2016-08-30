@@ -69,10 +69,10 @@ AddFunction BloodHealMe
 AddFunction BloodDefaultCdActions
 {
 	BloodInterruptActions()
+	if IncomingDamage(1.5 magic=1) > 0 spell(antimagic_shell)
 	if CheckBoxOn(opt_legendary_ring_tank) Item(legendary_ring_bonus_armor usable=1)
 	Spell(vampiric_blood)
 	if target.InRange(blood_mirror) Spell(blood_mirror)
-	if IncomingDamage(1.5 magic=1) > 0 spell(antimagic_shell)
 	Spell(dancing_rune_weapon)
 	if BuffStacks(bone_shield_buff) >= 5 Spell(tombstone)
 }
