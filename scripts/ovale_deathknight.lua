@@ -34,7 +34,7 @@ AddFunction BloodDefaultMainActions
 	if Talent(mark_of_blood_talent) and not target.DebuffPresent(mark_of_blood_debuff) Spell(mark_of_blood)
 	if RunicPower() >= 80 Spell(death_strike)
 	if not Talent(soulgorge_talent) Spell(blood_boil)
-	if target.time_to_die >= 8 Spell(death_and_decay)
+	if target.TimeToDie() >= 8 Spell(death_and_decay)
 	if BuffStacks(bone_shield_buff) <= 7 Spell(marrowrend)
 	Spell(heart_strike)
 	Spell(blood_boil)
