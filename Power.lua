@@ -708,13 +708,16 @@ end
 
 -- Return the number of seconds before enough of the given power type is available for the spell.
 -- If not powerType is given, the the pooled resource for that class is used.
-statePrototype.TimeToPower = function(state, spellId, atTime, targetGUID, powerType)
+statePrototype.TimeToPower = function(state, spellId, atTime, targetGUID, powerType, extraPower)
 	local seconds = 0
 	powerType = powerType or OvalePower.POOLED_RESOURCE[state.class]
 	if powerType then
 		local cost = state:PowerCost(spellId, powerType, atTime, targetGUID)
 		local power = state:GetPower(powerType, atTime)
 		local powerRate = state.powerRate[powerType]
+		if extraPower then
+			cost = cost + extraPower
+		end
 		if power < cost then
 			if powerRate > 0 then
 				seconds = (cost - power) / powerRate
