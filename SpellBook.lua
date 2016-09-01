@@ -520,7 +520,7 @@ statePrototype.GetTimeToSpell = function(state, spellId, atTime, targetGUID, ext
 	do
 		local runes = state:GetSpellInfoProperty(spellId, atTime, "runes", targetGUID)
 		if runes then
-			local seconds = state:GetRunesCooldown(atTime)
+			local seconds = state:GetRunesCooldown(atTime, runes)
 			if timeToSpell < seconds then
 				timeToSpell = seconds
 			end

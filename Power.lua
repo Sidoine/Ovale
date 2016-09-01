@@ -114,7 +114,7 @@ OvalePower.POWER_INFO =
 	astralpower = { id = SPELL_POWER_LUNAR_POWER, token = "LUNAR_POWER", mini = 0, costString = LUNAR_POWER_COST },
 	insanity = { id = SPELL_POWER_INSANITY, token = "INSANITY", mini = 0, costString = INSANITY_COST },
 	maelstrom = { id = SPELL_POWER_MAELSTROM, token = "MAELSTROM", mini = 0, costString = MAELSTROM_COST },
-	arcanecharge = { id = SPELL_POWER_ARCANE_CHARGES, token = "ARCANE_CHARGE", mini = 0, costString = ARCANE_CHARGES_COST },
+	arcanecharges = { id = SPELL_POWER_ARCANE_CHARGES, token = "ARCANE_CHARGES", mini = 0, costString = ARCANE_CHARGES_COST },
 	pain = { id = SPELL_POWER_PAIN, token = "PAIN", mini = 0, costString = PAIN_COST },
 	fury = { id = SPELL_POWER_FURY, token = "FURY", mini = 0, costString = FURY_COST }
 }

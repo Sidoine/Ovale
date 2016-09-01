@@ -126,7 +126,7 @@ local function Update(self, element, startTime, actionTexture, actionInRange, ac
 		end
 
 		-- Icon color overlay (red or not red).
-		if element.namedParams.nored ~= 1 and actionResourceExtend > 0 then
+		if element.namedParams.nored ~= 1 and actionResourceExtend and actionResourceExtend > 0 then
 			self.icone:SetVertexColor(0.75, 0.2, 0.2)
 		else
 			self.icone:SetVertexColor(1, 1, 1)

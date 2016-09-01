@@ -2961,7 +2961,12 @@ do
 		return Power("soulshards", positionalParams, namedParams, state, atTime)
 	end
 
+	local function ArcaneCharges(positionalParams, namedParams, state, atTime)
+		return Power("arcanecharges", positionalParams, namedParams, state, atTime)
+	end
+
 	OvaleCondition:RegisterCondition("alternatepower", false, AlternatePower)
+	OvaleCondition:RegisterCondition("arcanecharges", false, ArcaneCharges)
 	OvaleCondition:RegisterCondition("astralpower", false, AstralPower)
 	OvaleCondition:RegisterCondition("chi", false, Chi)
 	OvaleCondition:RegisterCondition("demonicfury", false, DemonicFury)
@@ -3645,7 +3650,8 @@ do
 			local tickTime
 			if state:IsActiveAura(aura, atTime) then
 				tickTime = aura.tick
-			else
+			end
+			if not tickTime then
 				tickTime = OvaleData:GetTickLength(auraId, state)
 			end
 
@@ -3732,7 +3738,7 @@ do
 	-- @return A boolean value for the result of the comparison.
 	-- @see Rune
 	-- @usage
-	-- if RuneCount(unholy) ==2 or RuneCount(frost) ==2 or RuneCount(death) ==2
+	-- if RuneCount() ==2
 	--     Spell(obliterate)
 
 	local function RuneCount(positionalParams, namedParams, state, atTime)
