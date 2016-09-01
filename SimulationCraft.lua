@@ -1785,12 +1785,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 			else
 				isSpellAction = false
 			end
-		elseif class == "HUNTER" and action == "explosive_trap" then
-			-- Glyph of Explosive Trap removes the damage component from Explosive Trap.
-			local glyphName = "glyph_of_explosive_trap"
-			AddSymbol(annotation, glyphName)
-			annotation.trap_launcher = class
-			conditionCode = format("CheckBoxOn(opt_trap_launcher) and not Glyph(%s)", glyphName)
 		elseif class == "HUNTER" and action == "kill_command" then
 			-- Kill Command requires that a pet that can move freely.
 			conditionCode = "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()"
@@ -2726,9 +2720,11 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
 		code = format("SpellCooldown(%s)", name)
 	elseif property == "cooldown_react" then
 		code = format("not SpellCooldown(%s) > 0", name)
+	elseif property == "cost" then
+		code = format("PowerCost(%s)", name)
 	elseif property == "crit_damage" then
 		code = format("%sCritDamage(%s)", target, name)
-	elseif property == "duration" then
+	elseif property == "duration" or property == "new_duration" then -- TODO #75
 		code = format("BaseDuration(%s)", buffName)
 		symbol = buffName
 	elseif property == "enabled" then
@@ -3154,6 +3150,8 @@ EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
 			else
 				code = format("%sChargeCooldown(%s)", prefix, name)
 			end
+		elseif property == "charges_fractional" then
+			code = format("%sCharges(%s)", prefix, name)
 		else
 			ok = false
 		end

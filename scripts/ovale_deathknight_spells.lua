@@ -251,6 +251,10 @@ Define(vampiric_blood_buff 55233)
 	SpellInfo(vampiric_blood_buff duration=10)
 Define(virulent_plague_debuff 191587)
 
+# Artifact traits
+Define(apocalypse 220143)
+	SpellInfo(apocalypse cd=90)
+
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(blood_tap tag=main)
 	SpellInfo(outbreak tag=main)

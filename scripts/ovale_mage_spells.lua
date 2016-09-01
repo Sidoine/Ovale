@@ -92,6 +92,7 @@ Define(fingers_of_frost_buff 44544)
 Define(fire_blast 108853)
 	SpellInfo(fire_blast gcd=0 cd=12)
 Define(fireball 133)
+Define(flame_patch_talent 18)
 Define(flame_on 205029)
 	SpellInfo(flame_on cd=40)
 	#TODO Add two charges of fire_blast spell
@@ -164,6 +165,7 @@ Define(incanters_flow_talent 18)
 Define(inferno_blast 108853)
 	SpellInfo(inferno_blast cd=8)
 	SpellInfo(inferno_blast addcd=-2 itemset=T17 itemcount=2)
+Define(kaelthas_ultimate_ability_buff 209455)
 Define(kindling_talent 19)
 Define(living_bomb 44457)
 	SpellInfo(living_bomb gcd=1)
@@ -191,6 +193,7 @@ Define(pet_freeze 33395)
 Define(pet_water_jet 135029)
 Define(pet_water_jet_debuff 135029)
 Define(phoenixs_flames 194466)
+Define(phoenix_reborn 215773)
 Define(polymorph 118)
 	SpellAddBuff(polymorph presence_of_mind_buff=0)
 	SpellAddTargetDebuff(polymorph polymorph_debuff=1)
@@ -231,6 +234,7 @@ Define(rune_of_power_buff 116014)
 Define(rune_of_power_talent 8)
 Define(scorch 2948)
 	SpellInfo(scorch travel_time=1)
+Define(shard_of_the_exodar_warp 207970)
 Define(spellsteal 30449)
 Define(supernova 157980)
 Define(supernova_talent 15)
@@ -257,6 +261,19 @@ Define(water_elemental_water_jet 135029)
 Define(water_elemental_water_jet_debuff 135029)
 	SpellInfo(water_elemental_water_jet_debuff duration=4)
 	SpellInfo(water_elemental_water_jet_debuff addduration=10 itemset=T18 itemcount=4)
+Define(winters_chill_debuff 157997) # TODO ???
+
+# Talents
+Define(summon_arcane_familiar 205022)
+	SpellInfo(summon_arcane_familiar cd=10)
+	
+# Artifacts
+Define(mark_of_aluneth 210726)
+	SpellInfo(mark_of_aluneth cd=60)
+Define(mark_of_aluneth_debuff 210726) # ???
+
+# Legendary items
+Define(rhonins_assaulting_armwraps_buff 208081)
 
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(arcane_orb tag=shortcd)
