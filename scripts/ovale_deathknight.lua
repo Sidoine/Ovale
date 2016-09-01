@@ -152,34 +152,42 @@ AddFunction FrostGetInMeleeRange
 
 AddFunction FrostDefaultMainActions
 {
-	#potion,type=draenic_strength
-	Spell(potion)
 	#run_action_list,name=bos,if=dot.breath_of_sindragosa.ticking
 	if BuffPresent(breath_of_sindragosa_buff) FrostBosMainActions()
-	#call_action_list,name=generic
-	FrostGenericMainActions()
+
+	unless BuffPresent(breath_of_sindragosa_buff) and FrostBosMainPostConditions()
+	{
+		#call_action_list,name=generic
+		FrostGenericMainActions()
+	}
+}
+
+AddFunction FrostDefaultMainPostConditions
+{
+	BuffPresent(breath_of_sindragosa_buff) and FrostBosMainPostConditions() or FrostGenericMainPostConditions()
 }
 
 AddFunction FrostDefaultShortCdActions
 {
 	#auto_attack
 	FrostGetInMeleeRange()
+	#pillar_of_frost
+	Spell(pillar_of_frost)
+	#obliteration
+	Spell(obliteration)
+	#run_action_list,name=bos,if=dot.breath_of_sindragosa.ticking
+	if BuffPresent(breath_of_sindragosa_buff) FrostBosShortCdActions()
 
-	unless Spell(potion)
+	unless BuffPresent(breath_of_sindragosa_buff) and FrostBosShortCdPostConditions()
 	{
-		#pillar_of_frost
-		Spell(pillar_of_frost)
-		#obliteration
-		Spell(obliteration)
-		#run_action_list,name=bos,if=dot.breath_of_sindragosa.ticking
-		if BuffPresent(breath_of_sindragosa_buff) FrostBosShortCdActions()
-
-		unless BuffPresent(breath_of_sindragosa_buff) and FrostBosShortCdPostConditions()
-		{
-			#call_action_list,name=generic
-			FrostGenericShortCdActions()
-		}
+		#call_action_list,name=generic
+		FrostGenericShortCdActions()
 	}
+}
+
+AddFunction FrostDefaultShortCdPostConditions
+{
+	BuffPresent(breath_of_sindragosa_buff) and FrostBosShortCdPostConditions() or FrostGenericShortCdPostConditions()
 }
 
 AddFunction FrostDefaultCdActions
@@ -192,26 +200,29 @@ AddFunction FrostDefaultCdActions
 	Spell(berserking)
 	#use_item,slot=finger1
 	if CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength usable=1)
+	#potion,name=draenic_strength
+	FrostUsePotionStrength()
+	#sindragosas_fury
+	Spell(sindragosas_fury)
 
-	unless Spell(potion)
+	unless Spell(obliteration)
 	{
-		#sindragosas_fury
-		Spell(sindragosas_fury)
+		#breath_of_sindragosa,if=runic_power>=50
+		if RunicPower() >= 50 Spell(breath_of_sindragosa)
+		#run_action_list,name=bos,if=dot.breath_of_sindragosa.ticking
+		if BuffPresent(breath_of_sindragosa_buff) FrostBosCdActions()
 
-		unless Spell(obliteration)
+		unless BuffPresent(breath_of_sindragosa_buff) and FrostBosCdPostConditions()
 		{
-			#breath_of_sindragosa,if=runic_power>=50
-			if RunicPower() >= 50 Spell(breath_of_sindragosa)
-			#run_action_list,name=bos,if=dot.breath_of_sindragosa.ticking
-			if BuffPresent(breath_of_sindragosa_buff) FrostBosCdActions()
-
-			unless BuffPresent(breath_of_sindragosa_buff) and FrostBosCdPostConditions()
-			{
-				#call_action_list,name=generic
-				FrostGenericCdActions()
-			}
+			#call_action_list,name=generic
+			FrostGenericCdActions()
 		}
 	}
+}
+
+AddFunction FrostDefaultCdPostConditions
+{
+	Spell(obliteration) or BuffPresent(breath_of_sindragosa_buff) and FrostBosCdPostConditions() or FrostGenericCdPostConditions()
 }
 
 ### actions.bos
@@ -222,14 +233,26 @@ AddFunction FrostBosMainActions
 	if not target.DebuffPresent(frost_fever_debuff) Spell(howling_blast)
 	#call_action_list,name=core
 	FrostCoreMainActions()
-	#howling_blast,if=buff.rime.react
-	if BuffPresent(rime_buff) Spell(howling_blast)
+
+	unless FrostCoreMainPostConditions()
+	{
+		#howling_blast,if=buff.rime.react
+		if BuffPresent(rime_buff) Spell(howling_blast)
+	}
+}
+
+AddFunction FrostBosMainPostConditions
+{
+	FrostCoreMainPostConditions()
 }
 
 AddFunction FrostBosShortCdActions
 {
 	unless not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast)
 	{
+		#call_action_list,name=core
+		FrostCoreShortCdActions()
+
 		unless FrostCoreShortCdPostConditions()
 		{
 			#horn_of_winter
@@ -247,6 +270,9 @@ AddFunction FrostBosCdActions
 {
 	unless not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast)
 	{
+		#call_action_list,name=core
+		FrostCoreCdActions()
+
 		unless FrostCoreCdPostConditions() or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
 		{
 			#empower_rune_weapon,if=runic_power<=70
@@ -284,9 +310,21 @@ AddFunction FrostCoreMainActions
 	if Talent(frozen_pulse_talent) Spell(howling_blast)
 }
 
+AddFunction FrostCoreMainPostConditions
+{
+}
+
+AddFunction FrostCoreShortCdActions
+{
+}
+
 AddFunction FrostCoreShortCdPostConditions
 {
 	Spell(glacial_advance) or BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) and Spell(frost_strike) or not Talent(breath_of_sindragosa_talent) and { BuffPresent(killing_machine_buff) or Enemies() >= 4 } and Spell(frostscythe) or BuffPresent(killing_machine_buff) and Spell(obliterate) or Enemies() >= 2 and Spell(remorseless_winter) or Spell(obliterate) or Talent(frozen_pulse_talent) and Spell(frostscythe) or Talent(frozen_pulse_talent) and Spell(howling_blast)
+}
+
+AddFunction FrostCoreCdActions
+{
 }
 
 AddFunction FrostCoreCdPostConditions
@@ -306,16 +344,28 @@ AddFunction FrostGenericMainActions
 	if RunicPower() >= 80 Spell(frost_strike)
 	#call_action_list,name=core
 	FrostCoreMainActions()
-	#frost_strike,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains>15
-	if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 Spell(frost_strike)
-	#frost_strike,if=!talent.breath_of_sindragosa.enabled
-	if not Talent(breath_of_sindragosa_talent) Spell(frost_strike)
+
+	unless FrostCoreMainPostConditions()
+	{
+		#frost_strike,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains>15
+		if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 Spell(frost_strike)
+		#frost_strike,if=!talent.breath_of_sindragosa.enabled
+		if not Talent(breath_of_sindragosa_talent) Spell(frost_strike)
+	}
+}
+
+AddFunction FrostGenericMainPostConditions
+{
+	FrostCoreMainPostConditions()
 }
 
 AddFunction FrostGenericShortCdActions
 {
 	unless not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike)
 	{
+		#call_action_list,name=core
+		FrostCoreShortCdActions()
+
 		unless FrostCoreShortCdPostConditions()
 		{
 			#horn_of_winter,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains>15
@@ -326,10 +376,18 @@ AddFunction FrostGenericShortCdActions
 	}
 }
 
+AddFunction FrostGenericShortCdPostConditions
+{
+	not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike) or FrostCoreShortCdPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and Spell(frost_strike) or not Talent(breath_of_sindragosa_talent) and Spell(frost_strike)
+}
+
 AddFunction FrostGenericCdActions
 {
 	unless not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike)
 	{
+		#call_action_list,name=core
+		FrostCoreCdActions()
+
 		unless FrostCoreCdPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or not Talent(breath_of_sindragosa_talent) and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and Spell(frost_strike) or not Talent(breath_of_sindragosa_talent) and Spell(frost_strike)
 		{
 			#empower_rune_weapon,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains>15
@@ -344,7 +402,28 @@ AddFunction FrostGenericCdActions
 	}
 }
 
+AddFunction FrostGenericCdPostConditions
+{
+	not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike) or FrostCoreCdPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or not Talent(breath_of_sindragosa_talent) and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and Spell(frost_strike) or not Talent(breath_of_sindragosa_talent) and Spell(frost_strike)
+}
+
 ### actions.precombat
+
+AddFunction FrostPrecombatMainActions
+{
+}
+
+AddFunction FrostPrecombatMainPostConditions
+{
+}
+
+AddFunction FrostPrecombatShortCdActions
+{
+}
+
+AddFunction FrostPrecombatShortCdPostConditions
+{
+}
 
 AddFunction FrostPrecombatCdActions
 {
@@ -355,40 +434,66 @@ AddFunction FrostPrecombatCdActions
 	FrostUsePotionStrength()
 }
 
+AddFunction FrostPrecombatCdPostConditions
+{
+}
+
 ### Frost icons.
 
 AddCheckBox(opt_deathknight_frost_aoe L(AOE) default specialization=frost)
 
 AddIcon checkbox=!opt_deathknight_frost_aoe enemies=1 help=shortcd specialization=frost
 {
-	FrostDefaultShortCdActions()
+	if not InCombat() FrostPrecombatShortCdActions()
+	unless not InCombat() and FrostPrecombatShortCdPostConditions()
+	{
+		FrostDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_deathknight_frost_aoe help=shortcd specialization=frost
 {
-	FrostDefaultShortCdActions()
+	if not InCombat() FrostPrecombatShortCdActions()
+	unless not InCombat() and FrostPrecombatShortCdPostConditions()
+	{
+		FrostDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=frost
 {
-	FrostDefaultMainActions()
+	if not InCombat() FrostPrecombatMainActions()
+	unless not InCombat() and FrostPrecombatMainPostConditions()
+	{
+		FrostDefaultMainActions()
+	}
 }
 
 AddIcon checkbox=opt_deathknight_frost_aoe help=aoe specialization=frost
 {
-	FrostDefaultMainActions()
+	if not InCombat() FrostPrecombatMainActions()
+	unless not InCombat() and FrostPrecombatMainPostConditions()
+	{
+		FrostDefaultMainActions()
+	}
 }
 
 AddIcon checkbox=!opt_deathknight_frost_aoe enemies=1 help=cd specialization=frost
 {
 	if not InCombat() FrostPrecombatCdActions()
-	FrostDefaultCdActions()
+	unless not InCombat() and FrostPrecombatCdPostConditions()
+	{
+		FrostDefaultCdActions()
+	}
 }
 
 AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 {
 	if not InCombat() FrostPrecombatCdActions()
-	FrostDefaultCdActions()
+	unless not InCombat() and FrostPrecombatCdPostConditions()
+	{
+		FrostDefaultCdActions()
+	}
 }
 
 ### Required symbols
@@ -415,7 +520,6 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # obliteration
 # obliteration_buff
 # pillar_of_frost
-# potion
 # remorseless_winter
 # rime_buff
 # sindragosas_fury
@@ -459,8 +563,17 @@ AddFunction UnholyDefaultMainActions
 	if not target.DebuffPresent(virulent_plague_debuff) Spell(outbreak)
 	#run_action_list,name=valkyr,if=talent.dark_arbiter.enabled&pet.valkyr_battlemaiden.active
 	if Talent(dark_arbiter_talent) and pet.Present() UnholyValkyrMainActions()
-	#call_action_list,name=generic
-	UnholyGenericMainActions()
+
+	unless Talent(dark_arbiter_talent) and pet.Present() and UnholyValkyrMainPostConditions()
+	{
+		#call_action_list,name=generic
+		UnholyGenericMainActions()
+	}
+}
+
+AddFunction UnholyDefaultMainPostConditions
+{
+	Talent(dark_arbiter_talent) and pet.Present() and UnholyValkyrMainPostConditions() or UnholyGenericMainPostConditions()
 }
 
 AddFunction UnholyDefaultShortCdActions
@@ -485,6 +598,11 @@ AddFunction UnholyDefaultShortCdActions
 	}
 }
 
+AddFunction UnholyDefaultShortCdPostConditions
+{
+	not target.DebuffPresent(virulent_plague_debuff) and Spell(outbreak) or Talent(dark_arbiter_talent) and pet.Present() and UnholyValkyrShortCdPostConditions() or UnholyGenericShortCdPostConditions()
+}
+
 AddFunction UnholyDefaultCdActions
 {
 	#arcane_torrent,if=runic_power.deficit>20
@@ -500,6 +618,9 @@ AddFunction UnholyDefaultCdActions
 
 	unless not target.DebuffPresent(virulent_plague_debuff) and Spell(outbreak) or Spell(dark_transformation) or Spell(blighted_rune_weapon)
 	{
+		#run_action_list,name=valkyr,if=talent.dark_arbiter.enabled&pet.valkyr_battlemaiden.active
+		if Talent(dark_arbiter_talent) and pet.Present() UnholyValkyrCdActions()
+
 		unless Talent(dark_arbiter_talent) and pet.Present() and UnholyValkyrCdPostConditions()
 		{
 			#call_action_list,name=generic
@@ -508,10 +629,17 @@ AddFunction UnholyDefaultCdActions
 	}
 }
 
+AddFunction UnholyDefaultCdPostConditions
+{
+	not target.DebuffPresent(virulent_plague_debuff) and Spell(outbreak) or Spell(dark_transformation) or Spell(blighted_rune_weapon) or Talent(dark_arbiter_talent) and pet.Present() and UnholyValkyrCdPostConditions() or UnholyGenericCdPostConditions()
+}
+
 ### actions.aoe
 
 AddFunction UnholyAoeMainActions
 {
+	#death_and_decay,if=spell_targets.death_and_decay>=2
+	if Enemies() >= 2 Spell(death_and_decay)
 	#epidemic,if=spell_targets.epidemic>4
 	if Enemies() > 4 Spell(epidemic)
 	#scourge_strike,if=spell_targets.scourge_strike>=2&(dot.death_and_decay.ticking|dot.defile.ticking)
@@ -522,15 +650,21 @@ AddFunction UnholyAoeMainActions
 	if Enemies() > 2 Spell(epidemic)
 }
 
+AddFunction UnholyAoeMainPostConditions
+{
+}
+
 AddFunction UnholyAoeShortCdActions
 {
-	#death_and_decay,if=spell_targets.death_and_decay>=2
-	if Enemies() >= 2 Spell(death_and_decay)
 }
 
 AddFunction UnholyAoeShortCdPostConditions
 {
-	Enemies() > 4 and Spell(epidemic) or Enemies() >= 2 and { target.DebuffPresent(death_and_decay_debuff) or target.DebuffPresent(defile_debuff) } and Spell(scourge_strike) or Enemies() >= 2 and { target.DebuffPresent(death_and_decay_debuff) or target.DebuffPresent(defile_debuff) } and Spell(clawing_shadows) or Enemies() > 2 and Spell(epidemic)
+	Enemies() >= 2 and Spell(death_and_decay) or Enemies() > 4 and Spell(epidemic) or Enemies() >= 2 and { target.DebuffPresent(death_and_decay_debuff) or target.DebuffPresent(defile_debuff) } and Spell(scourge_strike) or Enemies() >= 2 and { target.DebuffPresent(death_and_decay_debuff) or target.DebuffPresent(defile_debuff) } and Spell(clawing_shadows) or Enemies() > 2 and Spell(epidemic)
+}
+
+AddFunction UnholyAoeCdActions
+{
 }
 
 AddFunction UnholyAoeCdPostConditions
@@ -542,8 +676,6 @@ AddFunction UnholyAoeCdPostConditions
 
 AddFunction UnholyGenericMainActions
 {
-	#apocalypse,if=debuff.festering_wound.stack=8
-	if target.DebuffStacks(festering_wound_debuff) == 8 Spell(apocalypse)
 	#death_coil,if=runic_power>80
 	if RunicPower() > 80 Spell(death_coil)
 	#death_coil,if=talent.dark_arbiter.enabled&buff.sudden_doom.react&cooldown.dark_arbiter.remains>5
@@ -560,33 +692,45 @@ AddFunction UnholyGenericMainActions
 	if target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 Spell(clawing_shadows)
 	#call_action_list,name=aoe,if=active_enemies>=2
 	if Enemies() >= 2 UnholyAoeMainActions()
-	#festering_strike,if=debuff.festering_wound.stack<=3
-	if target.DebuffStacks(festering_wound_debuff) <= 3 Spell(festering_strike)
-	#scourge_strike,if=buff.necrosis.react
-	if BuffPresent(necrosis_buff) Spell(scourge_strike)
-	#clawing_shadows,if=buff.necrosis.react
-	if BuffPresent(necrosis_buff) Spell(clawing_shadows)
-	#scourge_strike,if=buff.unholy_strength.react
-	if BuffPresent(unholy_strength_buff) Spell(scourge_strike)
-	#clawing_shadows,if=buff.unholy_strength.react
-	if BuffPresent(unholy_strength_buff) Spell(clawing_shadows)
-	#scourge_strike,if=rune>=2
-	if Rune() >= 2 Spell(scourge_strike)
-	#clawing_shadows,if=rune>=2
-	if Rune() >= 2 Spell(clawing_shadows)
-	#death_coil,if=talent.shadow_infusion.enabled&talent.dark_arbiter.enabled&!buff.dark_transformation.up&cooldown.dark_arbiter.remains>15
-	if Talent(shadow_infusion_talent) and Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and SpellCooldown(dark_arbiter) > 15 Spell(death_coil)
-	#death_coil,if=talent.shadow_infusion.enabled&!talent.dark_arbiter.enabled&!buff.dark_transformation.up
-	if Talent(shadow_infusion_talent) and not Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) Spell(death_coil)
-	#death_coil,if=talent.dark_arbiter.enabled&cooldown.dark_arbiter.remains>15
-	if Talent(dark_arbiter_talent) and SpellCooldown(dark_arbiter) > 15 Spell(death_coil)
-	#death_coil,if=!talent.shadow_infusion.enabled&!talent.dark_arbiter.enabled
-	if not Talent(shadow_infusion_talent) and not Talent(dark_arbiter_talent) Spell(death_coil)
+
+	unless Enemies() >= 2 and UnholyAoeMainPostConditions()
+	{
+		#festering_strike,if=debuff.festering_wound.stack<=3
+		if target.DebuffStacks(festering_wound_debuff) <= 3 Spell(festering_strike)
+		#scourge_strike,if=buff.necrosis.react
+		if BuffPresent(necrosis_buff) Spell(scourge_strike)
+		#clawing_shadows,if=buff.necrosis.react
+		if BuffPresent(necrosis_buff) Spell(clawing_shadows)
+		#scourge_strike,if=buff.unholy_strength.react
+		if BuffPresent(unholy_strength_buff) Spell(scourge_strike)
+		#clawing_shadows,if=buff.unholy_strength.react
+		if BuffPresent(unholy_strength_buff) Spell(clawing_shadows)
+		#scourge_strike,if=rune>=2
+		if Rune() >= 2 Spell(scourge_strike)
+		#clawing_shadows,if=rune>=2
+		if Rune() >= 2 Spell(clawing_shadows)
+		#death_coil,if=talent.shadow_infusion.enabled&talent.dark_arbiter.enabled&!buff.dark_transformation.up&cooldown.dark_arbiter.remains>15
+		if Talent(shadow_infusion_talent) and Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and SpellCooldown(dark_arbiter) > 15 Spell(death_coil)
+		#death_coil,if=talent.shadow_infusion.enabled&!talent.dark_arbiter.enabled&!buff.dark_transformation.up
+		if Talent(shadow_infusion_talent) and not Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) Spell(death_coil)
+		#death_coil,if=talent.dark_arbiter.enabled&cooldown.dark_arbiter.remains>15
+		if Talent(dark_arbiter_talent) and SpellCooldown(dark_arbiter) > 15 Spell(death_coil)
+		#death_coil,if=!talent.shadow_infusion.enabled&!talent.dark_arbiter.enabled
+		if not Talent(shadow_infusion_talent) and not Talent(dark_arbiter_talent) Spell(death_coil)
+	}
+}
+
+AddFunction UnholyGenericMainPostConditions
+{
+	Enemies() >= 2 and UnholyAoeMainPostConditions()
 }
 
 AddFunction UnholyGenericShortCdActions
 {
-	unless target.DebuffStacks(festering_wound_debuff) == 8 and Spell(apocalypse) or RunicPower() > 80 and Spell(death_coil) or Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and SpellCooldown(dark_arbiter) > 5 and Spell(death_coil) or not Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and Spell(death_coil) or target.DebuffStacks(festering_wound_debuff) < 8 and SpellCooldown(apocalypse) < 5 and Spell(festering_strike)
+	#apocalypse,if=debuff.festering_wound.stack=8
+	if target.DebuffStacks(festering_wound_debuff) == 8 Spell(apocalypse)
+
+	unless RunicPower() > 80 and Spell(death_coil) or Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and SpellCooldown(dark_arbiter) > 5 and Spell(death_coil) or not Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and Spell(death_coil) or target.DebuffStacks(festering_wound_debuff) < 8 and SpellCooldown(apocalypse) < 5 and Spell(festering_strike)
 	{
 		#soul_reaper,if=debuff.festering_wound.stack>=3
 		if target.DebuffStacks(festering_wound_debuff) >= 3 Spell(soul_reaper_unholy)
@@ -601,20 +745,48 @@ AddFunction UnholyGenericShortCdActions
 	}
 }
 
+AddFunction UnholyGenericShortCdPostConditions
+{
+	RunicPower() > 80 and Spell(death_coil) or Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and SpellCooldown(dark_arbiter) > 5 and Spell(death_coil) or not Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and Spell(death_coil) or target.DebuffStacks(festering_wound_debuff) < 8 and SpellCooldown(apocalypse) < 5 and Spell(festering_strike) or target.DebuffPresent(soul_reaper_unholy_debuff) and not target.DebuffPresent(festering_wound_debuff) and Spell(festering_strike) or target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 and Spell(scourge_strike) or target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 and Spell(clawing_shadows) or Enemies() >= 2 and UnholyAoeShortCdPostConditions() or target.DebuffStacks(festering_wound_debuff) <= 3 and Spell(festering_strike) or BuffPresent(necrosis_buff) and Spell(scourge_strike) or BuffPresent(necrosis_buff) and Spell(clawing_shadows) or BuffPresent(unholy_strength_buff) and Spell(scourge_strike) or BuffPresent(unholy_strength_buff) and Spell(clawing_shadows) or Rune() >= 2 and Spell(scourge_strike) or Rune() >= 2 and Spell(clawing_shadows) or Talent(shadow_infusion_talent) and Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and SpellCooldown(dark_arbiter) > 15 and Spell(death_coil) or Talent(shadow_infusion_talent) and not Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and Spell(death_coil) or Talent(dark_arbiter_talent) and SpellCooldown(dark_arbiter) > 15 and Spell(death_coil) or not Talent(shadow_infusion_talent) and not Talent(dark_arbiter_talent) and Spell(death_coil)
+}
+
 AddFunction UnholyGenericCdActions
 {
 	#dark_arbiter,if=runic_power>80
 	if RunicPower() > 80 Spell(dark_arbiter)
 	#summon_gargoyle
 	Spell(summon_gargoyle)
+
+	unless target.DebuffStacks(festering_wound_debuff) == 8 and Spell(apocalypse) or RunicPower() > 80 and Spell(death_coil) or Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and SpellCooldown(dark_arbiter) > 5 and Spell(death_coil) or not Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and Spell(death_coil) or target.DebuffStacks(festering_wound_debuff) < 8 and SpellCooldown(apocalypse) < 5 and Spell(festering_strike) or target.DebuffStacks(festering_wound_debuff) >= 3 and Spell(soul_reaper_unholy) or target.DebuffPresent(soul_reaper_unholy_debuff) and not target.DebuffPresent(festering_wound_debuff) and Spell(festering_strike) or target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 and Spell(scourge_strike) or target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 and Spell(clawing_shadows) or Spell(defile)
+	{
+		#call_action_list,name=aoe,if=active_enemies>=2
+		if Enemies() >= 2 UnholyAoeCdActions()
+	}
+}
+
+AddFunction UnholyGenericCdPostConditions
+{
+	target.DebuffStacks(festering_wound_debuff) == 8 and Spell(apocalypse) or RunicPower() > 80 and Spell(death_coil) or Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and SpellCooldown(dark_arbiter) > 5 and Spell(death_coil) or not Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and Spell(death_coil) or target.DebuffStacks(festering_wound_debuff) < 8 and SpellCooldown(apocalypse) < 5 and Spell(festering_strike) or target.DebuffStacks(festering_wound_debuff) >= 3 and Spell(soul_reaper_unholy) or target.DebuffPresent(soul_reaper_unholy_debuff) and not target.DebuffPresent(festering_wound_debuff) and Spell(festering_strike) or target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 and Spell(scourge_strike) or target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 and Spell(clawing_shadows) or Spell(defile) or Enemies() >= 2 and UnholyAoeCdPostConditions() or target.DebuffStacks(festering_wound_debuff) <= 3 and Spell(festering_strike) or BuffPresent(necrosis_buff) and Spell(scourge_strike) or BuffPresent(necrosis_buff) and Spell(clawing_shadows) or BuffPresent(unholy_strength_buff) and Spell(scourge_strike) or BuffPresent(unholy_strength_buff) and Spell(clawing_shadows) or Rune() >= 2 and Spell(scourge_strike) or Rune() >= 2 and Spell(clawing_shadows) or Talent(shadow_infusion_talent) and Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and SpellCooldown(dark_arbiter) > 15 and Spell(death_coil) or Talent(shadow_infusion_talent) and not Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and Spell(death_coil) or Talent(dark_arbiter_talent) and SpellCooldown(dark_arbiter) > 15 and Spell(death_coil) or not Talent(shadow_infusion_talent) and not Talent(dark_arbiter_talent) and Spell(death_coil)
 }
 
 ### actions.precombat
+
+AddFunction UnholyPrecombatMainActions
+{
+}
+
+AddFunction UnholyPrecombatMainPostConditions
+{
+}
 
 AddFunction UnholyPrecombatShortCdActions
 {
 	#raise_dead
 	Spell(raise_dead)
+}
+
+AddFunction UnholyPrecombatShortCdPostConditions
+{
 }
 
 AddFunction UnholyPrecombatCdActions
@@ -643,32 +815,54 @@ AddFunction UnholyValkyrMainActions
 {
 	#death_coil
 	Spell(death_coil)
-	#apocalypse,if=debuff.festering_wound.stack=8
-	if target.DebuffStacks(festering_wound_debuff) == 8 Spell(apocalypse)
 	#festering_strike,if=debuff.festering_wound.stack<8&cooldown.apocalypse.remains<5
 	if target.DebuffStacks(festering_wound_debuff) < 8 and SpellCooldown(apocalypse) < 5 Spell(festering_strike)
 	#call_action_list,name=aoe,if=active_enemies>=2
 	if Enemies() >= 2 UnholyAoeMainActions()
-	#festering_strike,if=debuff.festering_wound.stack<=3
-	if target.DebuffStacks(festering_wound_debuff) <= 3 Spell(festering_strike)
-	#scourge_strike,if=debuff.festering_wound.up
-	if target.DebuffPresent(festering_wound_debuff) Spell(scourge_strike)
-	#clawing_shadows,if=debuff.festering_wound.up
-	if target.DebuffPresent(festering_wound_debuff) Spell(clawing_shadows)
+
+	unless Enemies() >= 2 and UnholyAoeMainPostConditions()
+	{
+		#festering_strike,if=debuff.festering_wound.stack<=3
+		if target.DebuffStacks(festering_wound_debuff) <= 3 Spell(festering_strike)
+		#scourge_strike,if=debuff.festering_wound.up
+		if target.DebuffPresent(festering_wound_debuff) Spell(scourge_strike)
+		#clawing_shadows,if=debuff.festering_wound.up
+		if target.DebuffPresent(festering_wound_debuff) Spell(clawing_shadows)
+	}
+}
+
+AddFunction UnholyValkyrMainPostConditions
+{
+	Enemies() >= 2 and UnholyAoeMainPostConditions()
 }
 
 AddFunction UnholyValkyrShortCdActions
 {
-	unless Spell(death_coil) or target.DebuffStacks(festering_wound_debuff) == 8 and Spell(apocalypse) or target.DebuffStacks(festering_wound_debuff) < 8 and SpellCooldown(apocalypse) < 5 and Spell(festering_strike)
+	unless Spell(death_coil)
 	{
-		#call_action_list,name=aoe,if=active_enemies>=2
-		if Enemies() >= 2 UnholyAoeShortCdActions()
+		#apocalypse,if=debuff.festering_wound.stack=8
+		if target.DebuffStacks(festering_wound_debuff) == 8 Spell(apocalypse)
+
+		unless target.DebuffStacks(festering_wound_debuff) < 8 and SpellCooldown(apocalypse) < 5 and Spell(festering_strike)
+		{
+			#call_action_list,name=aoe,if=active_enemies>=2
+			if Enemies() >= 2 UnholyAoeShortCdActions()
+		}
 	}
 }
 
 AddFunction UnholyValkyrShortCdPostConditions
 {
-	Spell(death_coil) or target.DebuffStacks(festering_wound_debuff) == 8 and Spell(apocalypse) or target.DebuffStacks(festering_wound_debuff) < 8 and SpellCooldown(apocalypse) < 5 and Spell(festering_strike) or Enemies() >= 2 and UnholyAoeShortCdPostConditions() or target.DebuffStacks(festering_wound_debuff) <= 3 and Spell(festering_strike) or target.DebuffPresent(festering_wound_debuff) and Spell(scourge_strike) or target.DebuffPresent(festering_wound_debuff) and Spell(clawing_shadows)
+	Spell(death_coil) or target.DebuffStacks(festering_wound_debuff) < 8 and SpellCooldown(apocalypse) < 5 and Spell(festering_strike) or Enemies() >= 2 and UnholyAoeShortCdPostConditions() or target.DebuffStacks(festering_wound_debuff) <= 3 and Spell(festering_strike) or target.DebuffPresent(festering_wound_debuff) and Spell(scourge_strike) or target.DebuffPresent(festering_wound_debuff) and Spell(clawing_shadows)
+}
+
+AddFunction UnholyValkyrCdActions
+{
+	unless Spell(death_coil) or target.DebuffStacks(festering_wound_debuff) == 8 and Spell(apocalypse) or target.DebuffStacks(festering_wound_debuff) < 8 and SpellCooldown(apocalypse) < 5 and Spell(festering_strike)
+	{
+		#call_action_list,name=aoe,if=active_enemies>=2
+		if Enemies() >= 2 UnholyAoeCdActions()
+	}
 }
 
 AddFunction UnholyValkyrCdPostConditions
@@ -683,23 +877,37 @@ AddCheckBox(opt_deathknight_unholy_aoe L(AOE) default specialization=unholy)
 AddIcon checkbox=!opt_deathknight_unholy_aoe enemies=1 help=shortcd specialization=unholy
 {
 	if not InCombat() UnholyPrecombatShortCdActions()
-	UnholyDefaultShortCdActions()
+	unless not InCombat() and UnholyPrecombatShortCdPostConditions()
+	{
+		UnholyDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_deathknight_unholy_aoe help=shortcd specialization=unholy
 {
 	if not InCombat() UnholyPrecombatShortCdActions()
-	UnholyDefaultShortCdActions()
+	unless not InCombat() and UnholyPrecombatShortCdPostConditions()
+	{
+		UnholyDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=unholy
 {
-	UnholyDefaultMainActions()
+	if not InCombat() UnholyPrecombatMainActions()
+	unless not InCombat() and UnholyPrecombatMainPostConditions()
+	{
+		UnholyDefaultMainActions()
+	}
 }
 
 AddIcon checkbox=opt_deathknight_unholy_aoe help=aoe specialization=unholy
 {
-	UnholyDefaultMainActions()
+	if not InCombat() UnholyPrecombatMainActions()
+	unless not InCombat() and UnholyPrecombatMainPostConditions()
+	{
+		UnholyDefaultMainActions()
+	}
 }
 
 AddIcon checkbox=!opt_deathknight_unholy_aoe enemies=1 help=cd specialization=unholy

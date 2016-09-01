@@ -59,8 +59,17 @@ AddFunction ElementalDefaultMainActions
 	Spell(storm_elemental)
 	#run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
 	if Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } ElementalAoeMainActions()
-	#run_action_list,name=single
-	ElementalSingleMainActions()
+
+	unless Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } and ElementalAoeMainPostConditions()
+	{
+		#run_action_list,name=single
+		ElementalSingleMainActions()
+	}
+}
+
+AddFunction ElementalDefaultMainPostConditions
+{
+	Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } and ElementalAoeMainPostConditions() or ElementalSingleMainPostConditions()
 }
 
 AddFunction ElementalDefaultShortCdActions
@@ -78,6 +87,11 @@ AddFunction ElementalDefaultShortCdActions
 			ElementalSingleShortCdActions()
 		}
 	}
+}
+
+AddFunction ElementalDefaultShortCdPostConditions
+{
+	Spell(storm_elemental) or Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } and ElementalAoeShortCdPostConditions() or ElementalSingleShortCdPostConditions()
 }
 
 AddFunction ElementalDefaultCdActions
@@ -112,6 +126,11 @@ AddFunction ElementalDefaultCdActions
 	}
 }
 
+AddFunction ElementalDefaultCdPostConditions
+{
+	Spell(storm_elemental) or Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } and ElementalAoeCdPostConditions() or ElementalSingleCdPostConditions()
+}
+
 ### actions.aoe
 
 AddFunction ElementalAoeMainActions
@@ -132,6 +151,10 @@ AddFunction ElementalAoeMainActions
 	if Speed() > 0 Spell(lava_burst)
 	#flame_shock,moving=1,target_if=refreshable
 	if Speed() > 0 and target.Refreshable(flame_shock_debuff) Spell(flame_shock)
+}
+
+AddFunction ElementalAoeMainPostConditions
+{
 }
 
 AddFunction ElementalAoeShortCdActions
@@ -163,10 +186,22 @@ AddFunction ElementalAoeCdPostConditions
 
 ### actions.precombat
 
+AddFunction ElementalPrecombatMainActions
+{
+}
+
+AddFunction ElementalPrecombatMainPostConditions
+{
+}
+
 AddFunction ElementalPrecombatShortCdActions
 {
 	#stormkeeper
 	Spell(stormkeeper)
+}
+
+AddFunction ElementalPrecombatShortCdPostConditions
+{
 }
 
 AddFunction ElementalPrecombatCdActions
@@ -235,6 +270,10 @@ AddFunction ElementalSingleMainActions
 	if Speed() > 0 Spell(flame_shock)
 }
 
+AddFunction ElementalSingleMainPostConditions
+{
+}
+
 AddFunction ElementalSingleShortCdActions
 {
 	unless not target.DebuffPresent(flame_shock_debuff) and Spell(flame_shock) or Maelstrom() >= 20 and target.DebuffRemaining(flame_shock_debuff) <= BaseDuration(ascendance_caster_buff) and SpellCooldown(ascendance_caster) + BaseDuration(ascendance_caster_buff) <= BaseDuration(flame_shock_debuff) and Spell(flame_shock) or Maelstrom() >= 92 and Spell(earth_shock) or 600 < 5 and Spell(icefury) or target.DebuffRemaining(flame_shock_debuff) > CastTime(lava_burst) and { not SpellCooldown(lava_burst) > 0 or BuffPresent(ascendance_caster_buff) } and Spell(lava_burst) or Spell(elemental_blast) or Maelstrom() >= 20 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Talent(icefury_talent) and BuffPresent(icefury_buff) and { Maelstrom() >= 20 and 600 > BuffRemaining(icefury_buff) or BuffRemaining(icefury_buff) < 1.5 * { 100 / { 100 + SpellHaste() } } * BuffStacks(icefury_buff) } and Spell(frost_shock) or Speed() > 0 and BuffPresent(icefury_buff) and Spell(frost_shock) or Maelstrom() >= 86 and Spell(earth_shock) or Maelstrom() <= 70 and 600 > 30 and { Talent(ascendance_talent) and SpellCooldown(ascendance_caster) > BaseDuration(icefury_buff) or not Talent(ascendance_talent) } and Spell(icefury)
@@ -244,6 +283,11 @@ AddFunction ElementalSingleShortCdActions
 		#stormkeeper,if=(talent.ascendance.enabled&cooldown.ascendance.remains>10)|!talent.ascendance.enabled
 		if Talent(ascendance_talent) and SpellCooldown(ascendance_caster) > 10 or not Talent(ascendance_talent) Spell(stormkeeper)
 	}
+}
+
+AddFunction ElementalSingleShortCdPostConditions
+{
+	not target.DebuffPresent(flame_shock_debuff) and Spell(flame_shock) or Maelstrom() >= 20 and target.DebuffRemaining(flame_shock_debuff) <= BaseDuration(ascendance_caster_buff) and SpellCooldown(ascendance_caster) + BaseDuration(ascendance_caster_buff) <= BaseDuration(flame_shock_debuff) and Spell(flame_shock) or Maelstrom() >= 92 and Spell(earth_shock) or 600 < 5 and Spell(icefury) or target.DebuffRemaining(flame_shock_debuff) > CastTime(lava_burst) and { not SpellCooldown(lava_burst) > 0 or BuffPresent(ascendance_caster_buff) } and Spell(lava_burst) or Spell(elemental_blast) or Maelstrom() >= 20 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Talent(icefury_talent) and BuffPresent(icefury_buff) and { Maelstrom() >= 20 and 600 > BuffRemaining(icefury_buff) or BuffRemaining(icefury_buff) < 1.5 * { 100 / { 100 + SpellHaste() } } * BuffStacks(icefury_buff) } and Spell(frost_shock) or Speed() > 0 and BuffPresent(icefury_buff) and Spell(frost_shock) or Maelstrom() >= 86 and Spell(earth_shock) or Maelstrom() <= 70 and 600 > 30 and { Talent(ascendance_talent) and SpellCooldown(ascendance_caster) > BaseDuration(icefury_buff) or not Talent(ascendance_talent) } and Spell(icefury) or Enemies() > 1 and Enemies() > 1 and not target.DebuffPresent(lightning_rod_debuff) and Spell(lava_beam) or Enemies() > 1 and Enemies() > 1 and Spell(lava_beam) or Enemies() > 1 and Enemies() > 1 and not target.DebuffPresent(lightning_rod_debuff) and Spell(chain_lightning) or Enemies() > 1 and Enemies() > 1 and Spell(chain_lightning) or not target.DebuffPresent(lightning_rod_debuff) and Spell(lightning_bolt) or Spell(lightning_bolt) or Maelstrom() >= 20 and target.DebuffRemaining(flame_shock_debuff) > 19 and Spell(frost_shock) or Speed() > 0 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Speed() > 0 and Spell(flame_shock)
 }
 
 AddFunction ElementalSingleCdActions
@@ -258,6 +302,11 @@ AddFunction ElementalSingleCdActions
 	}
 }
 
+AddFunction ElementalSingleCdPostConditions
+{
+	not target.DebuffPresent(flame_shock_debuff) and Spell(flame_shock) or Maelstrom() >= 20 and target.DebuffRemaining(flame_shock_debuff) <= BaseDuration(ascendance_caster_buff) and SpellCooldown(ascendance_caster) + BaseDuration(ascendance_caster_buff) <= BaseDuration(flame_shock_debuff) and Spell(flame_shock) or Maelstrom() >= 92 and Spell(earth_shock) or 600 < 5 and Spell(icefury) or target.DebuffRemaining(flame_shock_debuff) > CastTime(lava_burst) and { not SpellCooldown(lava_burst) > 0 or BuffPresent(ascendance_caster_buff) } and Spell(lava_burst) or Spell(elemental_blast) or Maelstrom() >= 20 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Talent(icefury_talent) and BuffPresent(icefury_buff) and { Maelstrom() >= 20 and 600 > BuffRemaining(icefury_buff) or BuffRemaining(icefury_buff) < 1.5 * { 100 / { 100 + SpellHaste() } } * BuffStacks(icefury_buff) } and Spell(frost_shock) or Speed() > 0 and BuffPresent(icefury_buff) and Spell(frost_shock) or Maelstrom() >= 86 and Spell(earth_shock) or Maelstrom() <= 70 and 600 > 30 and { Talent(ascendance_talent) and SpellCooldown(ascendance_caster) > BaseDuration(icefury_buff) or not Talent(ascendance_talent) } and Spell(icefury) or { 0 < 3 or 600 > 50 } and Spell(liquid_magma_totem) or { Talent(ascendance_talent) and SpellCooldown(ascendance_caster) > 10 or not Talent(ascendance_talent) } and Spell(stormkeeper) or Enemies() > 1 and Enemies() > 1 and not target.DebuffPresent(lightning_rod_debuff) and Spell(lava_beam) or Enemies() > 1 and Enemies() > 1 and Spell(lava_beam) or Enemies() > 1 and Enemies() > 1 and not target.DebuffPresent(lightning_rod_debuff) and Spell(chain_lightning) or Enemies() > 1 and Enemies() > 1 and Spell(chain_lightning) or not target.DebuffPresent(lightning_rod_debuff) and Spell(lightning_bolt) or Spell(lightning_bolt) or Maelstrom() >= 20 and target.DebuffRemaining(flame_shock_debuff) > 19 and Spell(frost_shock) or Speed() > 0 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Speed() > 0 and Spell(flame_shock)
+}
+
 ### Elemental icons.
 
 AddCheckBox(opt_shaman_elemental_aoe L(AOE) default specialization=elemental)
@@ -265,23 +314,37 @@ AddCheckBox(opt_shaman_elemental_aoe L(AOE) default specialization=elemental)
 AddIcon checkbox=!opt_shaman_elemental_aoe enemies=1 help=shortcd specialization=elemental
 {
 	if not InCombat() ElementalPrecombatShortCdActions()
-	ElementalDefaultShortCdActions()
+	unless not InCombat() and ElementalPrecombatShortCdPostConditions()
+	{
+		ElementalDefaultShortCdActions()
+	}
 }
 
 AddIcon checkbox=opt_shaman_elemental_aoe help=shortcd specialization=elemental
 {
 	if not InCombat() ElementalPrecombatShortCdActions()
-	ElementalDefaultShortCdActions()
+	unless not InCombat() and ElementalPrecombatShortCdPostConditions()
+	{
+		ElementalDefaultShortCdActions()
+	}
 }
 
 AddIcon enemies=1 help=main specialization=elemental
 {
-	ElementalDefaultMainActions()
+	if not InCombat() ElementalPrecombatMainActions()
+	unless not InCombat() and ElementalPrecombatMainPostConditions()
+	{
+		ElementalDefaultMainActions()
+	}
 }
 
 AddIcon checkbox=opt_shaman_elemental_aoe help=aoe specialization=elemental
 {
-	ElementalDefaultMainActions()
+	if not InCombat() ElementalPrecombatMainActions()
+	unless not InCombat() and ElementalPrecombatMainPostConditions()
+	{
+		ElementalDefaultMainActions()
+	}
 }
 
 AddIcon checkbox=!opt_shaman_elemental_aoe enemies=1 help=cd specialization=elemental
@@ -438,6 +501,10 @@ AddFunction EnhancementDefaultMainActions
 	Spell(boulderfist)
 }
 
+AddFunction EnhancementDefaultMainPostConditions
+{
+}
+
 AddFunction EnhancementDefaultShortCdActions
 {
 	#auto_attack
@@ -454,6 +521,11 @@ AddFunction EnhancementDefaultShortCdActions
 			Spell(sundering)
 		}
 	}
+}
+
+AddFunction EnhancementDefaultShortCdPostConditions
+{
+	{ BuffRemaining(boulderfist_buff) < GCD() or Charges(boulderfist count=0) > 1.75 } and Spell(boulderfist) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < GCD() and Spell(frostbrand) or BuffRemaining(flametongue_buff) < GCD() and Spell(flametongue) or not target.DebuffPresent(fury_of_air_debuff) and Spell(fury_of_air) or Spell(doom_winds) or Enemies() >= 3 and Spell(crash_lightning) or Spell(windstrike) or Spell(stormstrike) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 and Spell(frostbrand) or BuffRemaining(flametongue_buff) < 4.8 and Spell(flametongue) or Talent(overcharge_talent) and Maelstrom() >= 60 and Spell(lightning_bolt) or BuffPresent(hot_hand_buff) and Spell(lava_lash) or Spell(earthen_spike) or { Enemies() > 1 or Talent(crashing_storm_talent) or PetPresent() > 5 or PetPresent() > 5 or PetPresent() > 5 or PetPresent() > 5 } and Spell(crash_lightning) or Maelstrom() >= 90 and Spell(lava_lash) or Spell(rockbiter) or Spell(flametongue) or Spell(boulderfist)
 }
 
 AddFunction EnhancementDefaultCdActions
@@ -480,6 +552,11 @@ AddFunction EnhancementDefaultCdActions
 	}
 }
 
+AddFunction EnhancementDefaultCdPostConditions
+{
+	{ BuffRemaining(boulderfist_buff) < GCD() or Charges(boulderfist count=0) > 1.75 } and Spell(boulderfist) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < GCD() and Spell(frostbrand) or BuffRemaining(flametongue_buff) < GCD() and Spell(flametongue) or Spell(windsong) or not target.DebuffPresent(fury_of_air_debuff) and Spell(fury_of_air) or Spell(doom_winds) or Enemies() >= 3 and Spell(crash_lightning) or Spell(windstrike) or Spell(stormstrike) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 and Spell(frostbrand) or BuffRemaining(flametongue_buff) < 4.8 and Spell(flametongue) or Talent(overcharge_talent) and Maelstrom() >= 60 and Spell(lightning_bolt) or BuffPresent(hot_hand_buff) and Spell(lava_lash) or Spell(earthen_spike) or { Enemies() > 1 or Talent(crashing_storm_talent) or PetPresent() > 5 or PetPresent() > 5 or PetPresent() > 5 or PetPresent() > 5 } and Spell(crash_lightning) or Spell(sundering) or Maelstrom() >= 90 and Spell(lava_lash) or Spell(rockbiter) or Spell(flametongue) or Spell(boulderfist)
+}
+
 ### actions.precombat
 
 AddFunction EnhancementPrecombatMainActions
@@ -489,6 +566,14 @@ AddFunction EnhancementPrecombatMainActions
 	Spell(augmentation)
 	#lightning_shield
 	Spell(lightning_shield)
+}
+
+AddFunction EnhancementPrecombatMainPostConditions
+{
+}
+
+AddFunction EnhancementPrecombatShortCdActions
+{
 }
 
 AddFunction EnhancementPrecombatShortCdPostConditions
@@ -518,6 +603,7 @@ AddCheckBox(opt_shaman_enhancement_aoe L(AOE) default specialization=enhancement
 
 AddIcon checkbox=!opt_shaman_enhancement_aoe enemies=1 help=shortcd specialization=enhancement
 {
+	if not InCombat() EnhancementPrecombatShortCdActions()
 	unless not InCombat() and EnhancementPrecombatShortCdPostConditions()
 	{
 		EnhancementDefaultShortCdActions()
@@ -526,6 +612,7 @@ AddIcon checkbox=!opt_shaman_enhancement_aoe enemies=1 help=shortcd specializati
 
 AddIcon checkbox=opt_shaman_enhancement_aoe help=shortcd specialization=enhancement
 {
+	if not InCombat() EnhancementPrecombatShortCdActions()
 	unless not InCombat() and EnhancementPrecombatShortCdPostConditions()
 	{
 		EnhancementDefaultShortCdActions()
@@ -535,13 +622,19 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=shortcd specialization=enhancem
 AddIcon enemies=1 help=main specialization=enhancement
 {
 	if not InCombat() EnhancementPrecombatMainActions()
-	EnhancementDefaultMainActions()
+	unless not InCombat() and EnhancementPrecombatMainPostConditions()
+	{
+		EnhancementDefaultMainActions()
+	}
 }
 
 AddIcon checkbox=opt_shaman_enhancement_aoe help=aoe specialization=enhancement
 {
 	if not InCombat() EnhancementPrecombatMainActions()
-	EnhancementDefaultMainActions()
+	unless not InCombat() and EnhancementPrecombatMainPostConditions()
+	{
+		EnhancementDefaultMainActions()
+	}
 }
 
 AddIcon checkbox=!opt_shaman_enhancement_aoe enemies=1 help=cd specialization=enhancement

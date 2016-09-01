@@ -35,6 +35,7 @@ local API_GetRuneCooldown = GetRuneCooldown
 local API_GetSpellInfo = GetSpellInfo
 local API_GetTime = GetTime
 local INFINITY = math.huge
+local sort = sort
 
 -- Register for debugging messages.
 OvaleDebug:RegisterDebugging(OvaleRunes)
@@ -342,48 +343,20 @@ do
 	local count = {}
 	local usedRune = {}
 
-	statePrototype.GetRunesCooldown = function(state, atTime)
+	statePrototype.GetRunesCooldown = function(state, atTime, runes)
+		if runes == 0 then return 0 end 
 		OvaleRunes:StartProfiling("OvaleRunes_state_GetRunesCooldown")
 		atTime = atTime or state.currentTime
 
 		-- Initialize static variables.
-
-		-- Match active, regular runes.
 		for slot = 1, RUNE_SLOTS do
 			local rune = state.rune[slot]
-			if not usedRune[rune] and IsActiveRune(rune, atTime) then
-				--debugprint(string.format("    [1] Match active regular rune in slot %d to %s", slot, RUNE_NAME[runeType]))
-				usedRune[rune] = true
-			end
+			usedRune[slot] = rune.endCooldown - atTime
 		end
 
-		-- Replace any used runes with a regenerating death rune with a shorter cooldown.
-		for slot, rune in pairs(state.rune) do
-			if not usedRune[rune] then
-				for used in pairs(usedRune) do
-					if rune.endCooldown < used.endCooldown then
-						--debugprint(string.format("    [7] Replacing matched rune in slot %d with regenerating rune in slot %d", used.slot, slot))
-						usedRune[used] = nil
-						usedRune[rune] = true
-						break
-					end
-				end
-			end
-		end
-
-		local seconds = 0
-		local maxEndCooldown = 0
-		for rune in pairs(usedRune) do
-			if maxEndCooldown < rune.endCooldown then
-				maxEndCooldown = rune.endCooldown
-			end
-		end
-		if maxEndCooldown > atTime then
-			seconds = maxEndCooldown - atTime
-		end
-
+		sort(usedRune)
 		OvaleRunes:StopProfiling("OvaleRunes_state_GetRunesCooldown")
-		return seconds
+		return usedRune[runes]
 	end
 end
 --</state-methods>

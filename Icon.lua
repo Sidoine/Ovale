@@ -62,7 +62,7 @@ local function SetValue(self, value, actionTexture)
 end
 
 local function Update(self, element, startTime, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-				actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget)
+				actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget, actionResourceExtend)
 	self.actionType = actionType
 	self.actionId = actionId
 	self.value = nil
@@ -126,13 +126,7 @@ local function Update(self, element, startTime, actionTexture, actionInRange, ac
 		end
 
 		-- Icon color overlay (red or not red).
-		local red = false
-		if startTime > actionCooldownStart + actionCooldownDuration + 0.01
-				and startTime > now
-				and startTime > state.nextCast then
-			red = true
-		end
-		if red then
+		if element.namedParams.nored ~= 1 and actionResourceExtend and actionResourceExtend > 0 then
 			self.icone:SetVertexColor(0.75, 0.2, 0.2)
 		else
 			self.icone:SetVertexColor(1, 1, 1)

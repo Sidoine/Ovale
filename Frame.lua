@@ -254,20 +254,19 @@ do
 		else
 			local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
 				actionUsable, actionShortcut, actionIsCurrent, actionEnable,
-				actionType, actionId, actionTarget = OvaleBestAction:GetActionInfo(element, state)
-
-			state:Log("GetAction: start=%s, id=%s", start, actionId)
-			--[[
-				If "nored=1" is given as an action parameter, then just use the actual start time of
-				the element itself.
-			--]]
-			if element and element.namedParams and element.namedParams.nored == 1 then
-				start = actionCooldownStart + actionCooldownDuration
-				if start < state.currentTime then
-					start = state.currentTime
+				actionType, actionId, actionTarget, actionResourceExtend = OvaleBestAction:GetActionInfo(element, state)
+			-- Add any extra time needed to pool resources.
+			if actionResourceExtend and actionResourceExtend > 0 then
+				if actionCooldownDuration > 0 then
+					state:Log("Extending cooldown of spell ID '%s' for primary resource by %fs.", actionId, actionResourceExtend)
+					actionCooldownDuration = actionCooldownDuration + actionResourceExtend
+				elseif element.namedParams.pool_resource and element.namedParams.pool_resource == 1 then
+					state:Log("Delaying spell ID '%s' for primary resource by %fs.", actionId, actionResourceExtend)
+					start = start + actionResourceExtend
 				end
-				state:Log("Adjusting for 'nored': start=%s", start)
 			end
+			state:Log("GetAction: start=%s, id=%s", start, actionId)
+			
 			-- If this action is the same as the spell currently casting in the simulator, then start after the previous cast has finished.
 			if actionType == "spell" and actionId == state.currentSpellId and start and state.nextCast and start < state.nextCast then
 				start = state.nextCast
@@ -276,7 +275,7 @@ do
 				icons[1]:Update(element, nil)
 			else
 				icons[1]:Update(element, start, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-					actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget)
+					actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget, actionResourceExtend)
 			end
 
 			-- TODO: Scoring should allow for other actions besides spells.
