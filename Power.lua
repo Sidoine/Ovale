@@ -356,9 +356,9 @@ end
 function OvalePower:GetPower(powerType, atTime)
 	local power = (self.power and self.power[powerType]) or self[powerType] or 0
 	local powerRate = 0
-	if self.powerType and self.powerType == powerType then
+	if self.powerType and self.powerType == powerType and self.activeRegen then
 		powerRate = self.activeRegen
-	elseif self.powerRate then
+	elseif self.powerRate and self.powerRate[powerType] then
 		powerRate = self.powerRate[powerType]
 	end
 	if atTime then
