@@ -28,7 +28,7 @@ AddFunction BloodDefaultMainActions
 	BloodHealMe()
 	if not Talent(soulgorge_talent) and target.DebuffRemaining(blood_plague_debuff) < 8 Spell(blood_boil)
 	Spell(consumption)
-	if BuffStacks(bone_shield_buff) <= 1 Spell(marrowrend pool_resource=1)
+	if BuffStacks(bone_shield_buff) <= 1 Spell(marrowrend)
 	if target.DebuffRemaining(blood_plague_debuff) < 8 Spell(deaths_caress)
 	if Talent(ossuary_talent) and BuffStacks(bone_shield_buff) <5 Spell(marrowrend)
 	if Talent(mark_of_blood_talent) and not target.DebuffPresent(mark_of_blood_debuff) Spell(mark_of_blood)
@@ -36,7 +36,7 @@ AddFunction BloodDefaultMainActions
 	if not Talent(soulgorge_talent) Spell(blood_boil)
 	if target.TimeToDie() >= 8 Spell(death_and_decay)
 	if BuffStacks(bone_shield_buff) <= 7 Spell(marrowrend)
-	Spell(heart_strike)
+	if BuffStacks(bone_shield_buff) >= 1 Spell(heart_strike)
 	Spell(blood_boil)
 }
 
@@ -45,7 +45,7 @@ AddFunction BloodDefaultAoEActions
 	BloodHealMe()
 	if not Talent(soulgorge_talent) and target.DebuffRemaining(blood_plague_debuff) < 8 Spell(blood_boil)
 	Spell(consumption)
-	if BuffStacks(bone_shield_buff) <= 1 Spell(marrowrend pool_resource=1)
+	if BuffStacks(bone_shield_buff) <= 1 Spell(marrowrend)
 	if target.DebuffRemaining(blood_plague_debuff) < 8 Spell(deaths_caress)
 	if Talent(ossuary_talent) and BuffStacks(bone_shield_buff) < 5 and Enemies() < 3 Spell(marrowrend)
 	if Talent(mark_of_blood_talent) and not target.DebuffPresent(mark_of_blood_debuff) Spell(mark_of_blood)
@@ -54,7 +54,7 @@ AddFunction BloodDefaultAoEActions
 	if not Talent(soulgorge_talent) Spell(blood_boil)
 	Spell(death_and_decay)
 	if BuffStacks(bone_shield_buff) <= 7 and Enemies() < 3 Spell(marrowrend)
-	Spell(heart_strike)
+	if BuffStacks(bone_shield_buff) >= 1 Spell(heart_strike)
 	Spell(blood_boil)
 	Spell(death_strike)
 }
