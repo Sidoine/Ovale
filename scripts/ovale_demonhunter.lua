@@ -16,7 +16,7 @@ AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=vengeance)
 AddFunction VengeanceDefaultShortCDActions
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(shear) Texture(misc_arrowlup help=L(not_in_melee_range))
-	if Pain() >= 20 Spell(demon_spikes)
+	if (Pain() >= 20) and not BuffPresent(demon_spikes_buff) Spell(demon_spikes)
 }
 
 AddFunction VengeanceDefaultMainActions
