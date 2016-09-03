@@ -55,6 +55,8 @@ AddFunction VengeanceInterruptActions
 	{
 		if target.InRange(consume_magic) Spell(consume_magic)
 		if not target.Classification(worldboss) Spell(arcane_torrent_dh)
+		Spell(sigil_of_silence)
+		if not target.Classification(worldboss) Spell(sigil_of_misery)
 	}
 }
 
