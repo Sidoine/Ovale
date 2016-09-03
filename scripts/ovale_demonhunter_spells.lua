@@ -66,7 +66,11 @@ Define(felblade 213241)
 	SpellInfo(felblade cd=15)
 	SpellInfo(felblade cd_haste=melee haste=melee specialization=vengeance)
 Define(fel_eruption 211881)
-
+Define(empower_wards 218256)
+	SpellInfo(empower_wards cd=20 gcd=0 offgcd=1)
+	SpellAddBuff(empower_wards empower_wards_buff=1)
+Define(empower_wards_buff 218256)
+	SpellInfo(empower_wards_buff duration=6)
 
 ]]
 
