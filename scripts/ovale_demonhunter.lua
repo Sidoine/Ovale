@@ -142,7 +142,7 @@ AddFunction HavocInterruptActions
 		if not target.Classification(worldboss) Spell(arcane_torrent_dh)
 	}
 }
-	
+
 AddIcon help=shortcd specialization=havoc
 {
 	HavocDefaultShortCDActions()
