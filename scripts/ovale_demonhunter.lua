@@ -21,18 +21,24 @@ AddFunction VengeanceDefaultShortCDActions
 
 AddFunction VengeanceDefaultMainActions
 {
+	Spell(soul_carver)
 	if (Pain() > 75 or (HealthPercent() < 50 and Pain() >= 30)) Spell(soul_cleave)
 	Spell(immolation_aura)
+	Spell(felblade)
+	Spell(fel_eruption)
 	Spell(sigil_of_flame)
 	Spell(shear)
 }
 
 AddFunction VengeanceDefaultAoEActions
 {
+	Spell(soul_carver)
 	if (Pain() > 75 or (HealthPercent() < 50 and Pain() >= 30)) Spell(soul_cleave)
 	Spell(immolation_aura)
-	Spell(sigil_of_flame)
+	Spell(felblade)
 	if Talent(burning_alive_talent) Spell(fiery_brand)
+	Spell(sigil_of_flame)
+	Spell(fel_eruption)
 	Spell(shear)
 }
 

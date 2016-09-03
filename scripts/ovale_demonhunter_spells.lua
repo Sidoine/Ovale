@@ -58,6 +58,12 @@ Define(vengeful_retreat 198793)
 	SpellAddTargetDebuff(vengeful_retreat vengeful_retreat_debuff=1)
 Define(vengeful_retreat_debuff 198813)
 	SpellInfo(vengeful_retreat_debuff duration=3)
+Define(soul_carver 214743)
+	SpellInfo(soul_carver cd=40)
+Define(felblade 213241)
+	SpellInfo(felblade cd=15)
+	SpellInfo(felblade cd_haste=melee haste=melee specialization=vengeance)
+Define(fel_eruption 211881)
 
 
 ]]
