@@ -8,8 +8,7 @@ do
 # Monk spells and functions.
 
 Define(blackout_kick 100784)
-	SpellInfo(blackout_kick chi=2)
-	SpellInfo(blackout_kick buff_chi=focus_of_xuen_buff buff_chi_amount=-1 itemset=T16_melee itemcount=4)
+	SpellInfo(blackout_kick chi=1 cd=3)
 	SpellRequire(blackout_kick chi 0=buff,combo_breaker_bok_buff)
 	SpellRequire(blackout_kick refund_chi cost=buff,serenity_buff if_spell=serenity)
 	SpellAddBuff(blackout_kick combo_breaker_bok_buff=0)
