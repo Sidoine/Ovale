@@ -511,7 +511,7 @@ statePrototype.GetTimeToSpell = function(state, spellId, atTime, targetGUID, ext
 	end
 	-- Pooled resource.
 	do
-		local seconds = state:TimeToPower(spellId, atTime, targetGUID, _, extraPower)
+		local seconds = state:TimeToPower(spellId, atTime, targetGUID, nil, extraPower)
 		if timeToSpell < seconds then
 			timeToSpell = seconds
 		end
