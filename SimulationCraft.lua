@@ -1850,6 +1850,8 @@ EmitAction = function(parseNode, nodeList, annotation)
 						  or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 }
 			]]
 			annotation[action] = class
+		elseif class == "MONK" and action == "whirling_dragon_punch" then
+			conditionCode = "SpellCooldown(fists_of_fury)>0 and SpellCooldown(rising_sun_kick)>0"
 		elseif class == "PALADIN" and action == "blessing_of_kings" then
 			-- Only cast Blessing of Kings if it won't overwrite the player's own Blessing of Might.
 			conditionCode = "BuffExpires(mastery_buff)"

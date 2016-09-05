@@ -687,7 +687,7 @@ statePrototype.ApplyPowerCost = function(state, spellId, targetGUID, atTime, spe
 				-- Add any power regenerated or consumed before the next spell can be cast.
 				local seconds = state.nextCast - atTime
 				if seconds > 0 then
-					local powerRate = state.powerRate[powerType]
+					local powerRate = state.powerRate[powerType] or 0
 					power = power + powerRate * seconds
 				end
 				-- Clamp power to lower and upper limits.
@@ -714,7 +714,7 @@ statePrototype.TimeToPower = function(state, spellId, atTime, targetGUID, powerT
 	if powerType then
 		local cost = state:PowerCost(spellId, powerType, atTime, targetGUID)
 		local power = state:GetPower(powerType, atTime)
-		local powerRate = state.powerRate[powerType]
+		local powerRate = state.powerRate[powerType] or 0
 		if extraPower then
 			cost = cost + extraPower
 		end
