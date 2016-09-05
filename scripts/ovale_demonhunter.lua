@@ -46,8 +46,8 @@ AddFunction VengeanceDefaultCdActions
 {
 	VengeanceInterruptActions()
 	if IncomingDamage(1.5 magic=1) > 0 Spell(empower_wards)
-	Spell(metamorphosis_veng)
 	Spell(fiery_brand)
+	Spell(metamorphosis_veng)
 }
 
 AddFunction VengeanceInterruptActions
