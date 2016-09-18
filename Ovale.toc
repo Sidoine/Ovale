@@ -70,6 +70,7 @@ SpellDamage.lua
 SteadyFocus.lua
 Totem.lua
 WarriorCharge.lua
+WildImps.lua
 
 conditions.lua
 scripts\files.xml

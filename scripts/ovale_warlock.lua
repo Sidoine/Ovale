@@ -145,38 +145,32 @@ end
 -- ANY CHANGES MADE BELOW THIS POINT WILL BE LOST.
 
 do
-	local name = "simulationcraft_warlock_affliction_t18m"
-	local desc = "[7.0] SimulationCraft: Warlock_Affliction_T18M"
+	local name = "simulationcraft_warlock_affliction_t19p"
+	local desc = "[7.0] SimulationCraft: Warlock_Affliction_T19P"
 	local code = [[
-# Based on SimulationCraft profile "Warlock_Affliction_T18M".
+# Based on SimulationCraft profile "Warlock_Affliction_T19P".
 #	class=warlock
 #	spec=affliction
-#	talents=2203011
+#	talents=2101021
 #	pet=felhunter
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_warlock_spells)
-
-AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=affliction)
-AddCheckBox(opt_legendary_ring_intellect ItemName(legendary_ring_intellect) default specialization=affliction)
-
-AddFunction AfflictionUsePotionIntellect
-{
-	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
-}
-
 ### actions.default
 
 AddFunction AfflictionDefaultMainActions
 {
+	#reap_souls,if=actions=reap_souls,if=!buff.deadwind_harvester.remains&(buff.soul_harvest.remains|buff.tormented_souls.react>=8|target.time_to_die<=buff.tormented_souls.react*5|trinket.proc.any.react)
+	if not BuffPresent(deadwind_harvester_buff) and { BuffPresent(soul_harvest_buff) or BuffStacks(tormented_souls_buff) >= 8 or target.TimeToDie() <= BuffStacks(tormented_souls_buff) * 5 or BuffPresent(trinket_proc_any_buff) } Spell(reap_souls)
 	#soul_effigy,if=!pet.soul_effigy.active
 	if not pet.Present() Spell(soul_effigy)
 	#agony,if=remains<=tick_time+gcd
 	if target.DebuffRemaining(agony_debuff) <= target.TickTime(agony_debuff) + GCD() Spell(agony)
 	#agony,target=soul_effigy,if=remains<=tick_time+gcd
 	if target.DebuffRemaining(agony_debuff) <= target.TickTime(agony_debuff) + GCD() Spell(agony text=soul_effigy)
+	#potion,name=deadly_grace,if=buff.soul_harvest.remains|trinket.proc.any.react
 	#corruption,if=remains<=tick_time+gcd
 	if target.DebuffRemaining(corruption_debuff) <= target.TickTime(corruption_debuff) + GCD() Spell(corruption)
 	#siphon_life,if=remains<=tick_time+gcd
@@ -185,24 +179,24 @@ AddFunction AfflictionDefaultMainActions
 	if target.DebuffRemaining(corruption_debuff) <= target.TickTime(corruption_debuff) + GCD() Spell(corruption text=soul_effigy)
 	#siphon_life,target=soul_effigy,if=remains<=tick_time+gcd
 	if target.DebuffRemaining(siphon_life_debuff) <= target.TickTime(siphon_life_debuff) + GCD() Spell(siphon_life text=soul_effigy)
-	#mana_tap,if=buff.mana_tap.remains<=buff.mana_tap.duration*0.3&target.time_to_die>buff.mana_tap.duration*0.3
-	if BuffRemaining(mana_tap_buff) <= BaseDuration(mana_tap_buff) * 0.3 and target.TimeToDie() > BaseDuration(mana_tap_buff) * 0.3 Spell(mana_tap)
-	#unstable_affliction,if=(soul_shard>=4|buff.shard_instability.remains|buff.instability.remains|buff.soul_harvest.remains|buff.nithramus.remains)
-	if SoulShards() >= 4 or BuffPresent(shard_instability_buff) or BuffPresent(instability_buff) or BuffPresent(soul_harvest_buff) or BuffPresent(nithramus_buff) Spell(unstable_affliction)
-	#agony,if=remains<=duration*0.3
-	if target.DebuffRemaining(agony_debuff) <= BaseDuration(agony_debuff) * 0.3 Spell(agony)
-	#agony,target=soul_effigy,if=remains<=duration*0.3
-	if target.DebuffRemaining(agony_debuff) <= BaseDuration(agony_debuff) * 0.3 Spell(agony text=soul_effigy)
-	#corruption,if=remains<=duration*0.3
-	if target.DebuffRemaining(corruption_debuff) <= BaseDuration(corruption_debuff) * 0.3 Spell(corruption)
+	#mana_tap,if=buff.mana_tap.remains<=buff.mana_tap.duration*0.3&(mana.pct<20|buff.mana_tap.remains<=gcd)&target.time_to_die>buff.mana_tap.duration*0.3
+	if BuffRemaining(mana_tap_buff) <= BaseDuration(mana_tap_buff) * 0.3 and { ManaPercent() < 20 or BuffRemaining(mana_tap_buff) <= GCD() } and target.TimeToDie() > BaseDuration(mana_tap_buff) * 0.3 Spell(mana_tap)
+	#unstable_affliction,if=talent.contagion.enabled|(soul_shard>=4|trinket.proc.intellect.react|trinket.stacking_proc.mastery.react|trinket.proc.mastery.react|trinket.proc.crit.react|trinket.proc.versatility.react|buff.soul_harvest.remains|buff.deadwind_harvester.remains|buff.compounding_horror.react=5|target.time_to_die<=20)
+	if Talent(contagion_talent) or SoulShards() >= 4 or BuffPresent(trinket_proc_intellect_buff) or BuffPresent(trinket_stacking_proc_mastery_buff) or BuffPresent(trinket_proc_mastery_buff) or BuffPresent(trinket_proc_crit_buff) or BuffPresent(trinket_proc_versatility_buff) or BuffPresent(soul_harvest_buff) or BuffPresent(deadwind_harvester_buff) or BuffStacks(compounding_horror_buff) == 5 or target.TimeToDie() <= 20 Spell(unstable_affliction)
+	#agony,if=remains<=duration*0.3&target.time_to_die>=remains
+	if target.DebuffRemaining(agony_debuff) <= BaseDuration(agony_debuff) * 0.3 and target.TimeToDie() >= target.DebuffRemaining(agony_debuff) Spell(agony)
+	#agony,target=soul_effigy,if=remains<=duration*0.3&target.time_to_die>=remains
+	if target.DebuffRemaining(agony_debuff) <= BaseDuration(agony_debuff) * 0.3 and target.TimeToDie() >= target.DebuffRemaining(agony_debuff) Spell(agony text=soul_effigy)
+	#corruption,if=remains<=duration*0.3&target.time_to_die>=remains
+	if target.DebuffRemaining(corruption_debuff) <= BaseDuration(corruption_debuff) * 0.3 and target.TimeToDie() >= target.DebuffRemaining(corruption_debuff) Spell(corruption)
 	#haunt
 	Spell(haunt)
-	#siphon_life,if=remains<=duration*0.3
-	if target.DebuffRemaining(siphon_life_debuff) <= BaseDuration(siphon_life_debuff) * 0.3 Spell(siphon_life)
-	#corruption,target=soul_effigy,if=remains<=duration*0.3
-	if target.DebuffRemaining(corruption_debuff) <= BaseDuration(corruption_debuff) * 0.3 Spell(corruption text=soul_effigy)
-	#siphon_life,target=soul_effigy,if=remains<=duration*0.3
-	if target.DebuffRemaining(siphon_life_debuff) <= BaseDuration(siphon_life_debuff) * 0.3 Spell(siphon_life text=soul_effigy)
+	#siphon_life,if=remains<=duration*0.3&target.time_to_die>=remains
+	if target.DebuffRemaining(siphon_life_debuff) <= BaseDuration(siphon_life_debuff) * 0.3 and target.TimeToDie() >= target.DebuffRemaining(siphon_life_debuff) Spell(siphon_life)
+	#corruption,target=soul_effigy,if=remains<=duration*0.3&target.time_to_die>=remains
+	if target.DebuffRemaining(corruption_debuff) <= BaseDuration(corruption_debuff) * 0.3 and target.TimeToDie() >= target.DebuffRemaining(corruption_debuff) Spell(corruption text=soul_effigy)
+	#siphon_life,target=soul_effigy,if=remains<=duration*0.3&target.time_to_die>=remains
+	if target.DebuffRemaining(siphon_life_debuff) <= BaseDuration(siphon_life_debuff) * 0.3 and target.TimeToDie() >= target.DebuffRemaining(siphon_life_debuff) Spell(siphon_life text=soul_effigy)
 	#life_tap,if=mana.pct<=10
 	if ManaPercent() <= 10 Spell(life_tap)
 	#drain_soul,chain=1,interrupt=1
@@ -219,12 +213,12 @@ AddFunction AfflictionDefaultMainPostConditions
 
 AddFunction AfflictionDefaultShortCdActions
 {
-	unless not pet.Present() and Spell(soul_effigy) or target.DebuffRemaining(agony_debuff) <= target.TickTime(agony_debuff) + GCD() and Spell(agony) or target.DebuffRemaining(agony_debuff) <= target.TickTime(agony_debuff) + GCD() and Spell(agony text=soul_effigy)
+	unless not BuffPresent(deadwind_harvester_buff) and { BuffPresent(soul_harvest_buff) or BuffStacks(tormented_souls_buff) >= 8 or target.TimeToDie() <= BuffStacks(tormented_souls_buff) * 5 or BuffPresent(trinket_proc_any_buff) } and Spell(reap_souls) or not pet.Present() and Spell(soul_effigy) or target.DebuffRemaining(agony_debuff) <= target.TickTime(agony_debuff) + GCD() and Spell(agony) or target.DebuffRemaining(agony_debuff) <= target.TickTime(agony_debuff) + GCD() and Spell(agony text=soul_effigy)
 	{
-		#service_pet
-		Spell(service_felhunter)
+		#service_pet,if=dot.corruption.remains&dot.agony.remains
+		if target.DebuffRemaining(corruption_debuff) and target.DebuffRemaining(agony_debuff) Spell(service_felhunter)
 
-		unless target.DebuffRemaining(corruption_debuff) <= target.TickTime(corruption_debuff) + GCD() and Spell(corruption) or target.DebuffRemaining(siphon_life_debuff) <= target.TickTime(siphon_life_debuff) + GCD() and Spell(siphon_life) or target.DebuffRemaining(corruption_debuff) <= target.TickTime(corruption_debuff) + GCD() and Spell(corruption text=soul_effigy) or target.DebuffRemaining(siphon_life_debuff) <= target.TickTime(siphon_life_debuff) + GCD() and Spell(siphon_life text=soul_effigy) or BuffRemaining(mana_tap_buff) <= BaseDuration(mana_tap_buff) * 0.3 and target.TimeToDie() > BaseDuration(mana_tap_buff) * 0.3 and Spell(mana_tap)
+		unless target.DebuffRemaining(corruption_debuff) <= target.TickTime(corruption_debuff) + GCD() and Spell(corruption) or target.DebuffRemaining(siphon_life_debuff) <= target.TickTime(siphon_life_debuff) + GCD() and Spell(siphon_life) or target.DebuffRemaining(corruption_debuff) <= target.TickTime(corruption_debuff) + GCD() and Spell(corruption text=soul_effigy) or target.DebuffRemaining(siphon_life_debuff) <= target.TickTime(siphon_life_debuff) + GCD() and Spell(siphon_life text=soul_effigy) or BuffRemaining(mana_tap_buff) <= BaseDuration(mana_tap_buff) * 0.3 and { ManaPercent() < 20 or BuffRemaining(mana_tap_buff) <= GCD() } and target.TimeToDie() > BaseDuration(mana_tap_buff) * 0.3 and Spell(mana_tap)
 		{
 			#phantom_singularity
 			Spell(phantom_singularity)
@@ -234,15 +228,12 @@ AddFunction AfflictionDefaultShortCdActions
 
 AddFunction AfflictionDefaultShortCdPostConditions
 {
-	not pet.Present() and Spell(soul_effigy) or target.DebuffRemaining(agony_debuff) <= target.TickTime(agony_debuff) + GCD() and Spell(agony) or target.DebuffRemaining(agony_debuff) <= target.TickTime(agony_debuff) + GCD() and Spell(agony text=soul_effigy) or target.DebuffRemaining(corruption_debuff) <= target.TickTime(corruption_debuff) + GCD() and Spell(corruption) or target.DebuffRemaining(siphon_life_debuff) <= target.TickTime(siphon_life_debuff) + GCD() and Spell(siphon_life) or target.DebuffRemaining(corruption_debuff) <= target.TickTime(corruption_debuff) + GCD() and Spell(corruption text=soul_effigy) or target.DebuffRemaining(siphon_life_debuff) <= target.TickTime(siphon_life_debuff) + GCD() and Spell(siphon_life text=soul_effigy) or BuffRemaining(mana_tap_buff) <= BaseDuration(mana_tap_buff) * 0.3 and target.TimeToDie() > BaseDuration(mana_tap_buff) * 0.3 and Spell(mana_tap) or { SoulShards() >= 4 or BuffPresent(shard_instability_buff) or BuffPresent(instability_buff) or BuffPresent(soul_harvest_buff) or BuffPresent(nithramus_buff) } and Spell(unstable_affliction) or target.DebuffRemaining(agony_debuff) <= BaseDuration(agony_debuff) * 0.3 and Spell(agony) or target.DebuffRemaining(agony_debuff) <= BaseDuration(agony_debuff) * 0.3 and Spell(agony text=soul_effigy) or target.DebuffRemaining(corruption_debuff) <= BaseDuration(corruption_debuff) * 0.3 and Spell(corruption) or Spell(haunt) or target.DebuffRemaining(siphon_life_debuff) <= BaseDuration(siphon_life_debuff) * 0.3 and Spell(siphon_life) or target.DebuffRemaining(corruption_debuff) <= BaseDuration(corruption_debuff) * 0.3 and Spell(corruption text=soul_effigy) or target.DebuffRemaining(siphon_life_debuff) <= BaseDuration(siphon_life_debuff) * 0.3 and Spell(siphon_life text=soul_effigy) or ManaPercent() <= 10 and Spell(life_tap) or Spell(drain_soul) or Spell(drain_life) or Spell(life_tap)
+	not BuffPresent(deadwind_harvester_buff) and { BuffPresent(soul_harvest_buff) or BuffStacks(tormented_souls_buff) >= 8 or target.TimeToDie() <= BuffStacks(tormented_souls_buff) * 5 or BuffPresent(trinket_proc_any_buff) } and Spell(reap_souls) or not pet.Present() and Spell(soul_effigy) or target.DebuffRemaining(agony_debuff) <= target.TickTime(agony_debuff) + GCD() and Spell(agony) or target.DebuffRemaining(agony_debuff) <= target.TickTime(agony_debuff) + GCD() and Spell(agony text=soul_effigy) or target.DebuffRemaining(corruption_debuff) <= target.TickTime(corruption_debuff) + GCD() and Spell(corruption) or target.DebuffRemaining(siphon_life_debuff) <= target.TickTime(siphon_life_debuff) + GCD() and Spell(siphon_life) or target.DebuffRemaining(corruption_debuff) <= target.TickTime(corruption_debuff) + GCD() and Spell(corruption text=soul_effigy) or target.DebuffRemaining(siphon_life_debuff) <= target.TickTime(siphon_life_debuff) + GCD() and Spell(siphon_life text=soul_effigy) or BuffRemaining(mana_tap_buff) <= BaseDuration(mana_tap_buff) * 0.3 and { ManaPercent() < 20 or BuffRemaining(mana_tap_buff) <= GCD() } and target.TimeToDie() > BaseDuration(mana_tap_buff) * 0.3 and Spell(mana_tap) or { Talent(contagion_talent) or SoulShards() >= 4 or BuffPresent(trinket_proc_intellect_buff) or BuffPresent(trinket_stacking_proc_mastery_buff) or BuffPresent(trinket_proc_mastery_buff) or BuffPresent(trinket_proc_crit_buff) or BuffPresent(trinket_proc_versatility_buff) or BuffPresent(soul_harvest_buff) or BuffPresent(deadwind_harvester_buff) or BuffStacks(compounding_horror_buff) == 5 or target.TimeToDie() <= 20 } and Spell(unstable_affliction) or target.DebuffRemaining(agony_debuff) <= BaseDuration(agony_debuff) * 0.3 and target.TimeToDie() >= target.DebuffRemaining(agony_debuff) and Spell(agony) or target.DebuffRemaining(agony_debuff) <= BaseDuration(agony_debuff) * 0.3 and target.TimeToDie() >= target.DebuffRemaining(agony_debuff) and Spell(agony text=soul_effigy) or target.DebuffRemaining(corruption_debuff) <= BaseDuration(corruption_debuff) * 0.3 and target.TimeToDie() >= target.DebuffRemaining(corruption_debuff) and Spell(corruption) or Spell(haunt) or target.DebuffRemaining(siphon_life_debuff) <= BaseDuration(siphon_life_debuff) * 0.3 and target.TimeToDie() >= target.DebuffRemaining(siphon_life_debuff) and Spell(siphon_life) or target.DebuffRemaining(corruption_debuff) <= BaseDuration(corruption_debuff) * 0.3 and target.TimeToDie() >= target.DebuffRemaining(corruption_debuff) and Spell(corruption text=soul_effigy) or target.DebuffRemaining(siphon_life_debuff) <= BaseDuration(siphon_life_debuff) * 0.3 and target.TimeToDie() >= target.DebuffRemaining(siphon_life_debuff) and Spell(siphon_life text=soul_effigy) or ManaPercent() <= 10 and Spell(life_tap) or Spell(drain_soul) or Spell(drain_life) or Spell(life_tap)
 }
 
 AddFunction AfflictionDefaultCdActions
 {
-	#use_item,name=nithramus_the_allseer
-	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
-
-	unless not pet.Present() and Spell(soul_effigy) or target.DebuffRemaining(agony_debuff) <= target.TickTime(agony_debuff) + GCD() and Spell(agony) or target.DebuffRemaining(agony_debuff) <= target.TickTime(agony_debuff) + GCD() and Spell(agony text=soul_effigy) or Spell(service_felhunter)
+	unless not BuffPresent(deadwind_harvester_buff) and { BuffPresent(soul_harvest_buff) or BuffStacks(tormented_souls_buff) >= 8 or target.TimeToDie() <= BuffStacks(tormented_souls_buff) * 5 or BuffPresent(trinket_proc_any_buff) } and Spell(reap_souls) or not pet.Present() and Spell(soul_effigy) or target.DebuffRemaining(agony_debuff) <= target.TickTime(agony_debuff) + GCD() and Spell(agony) or target.DebuffRemaining(agony_debuff) <= target.TickTime(agony_debuff) + GCD() and Spell(agony text=soul_effigy) or target.DebuffRemaining(corruption_debuff) and target.DebuffRemaining(agony_debuff) and Spell(service_felhunter)
 	{
 		#summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening<3
 		if not Talent(grimoire_of_supremacy_talent) and Enemies() < 3 Spell(summon_doomguard)
@@ -254,8 +245,6 @@ AddFunction AfflictionDefaultCdActions
 		Spell(blood_fury_sp)
 		#arcane_torrent
 		Spell(arcane_torrent_mana)
-		#potion,name=draenic_intellect,if=buff.nithramus.remains
-		if BuffPresent(nithramus_buff) AfflictionUsePotionIntellect()
 		#soul_harvest
 		Spell(soul_harvest)
 	}
@@ -263,16 +252,19 @@ AddFunction AfflictionDefaultCdActions
 
 AddFunction AfflictionDefaultCdPostConditions
 {
-	not pet.Present() and Spell(soul_effigy) or target.DebuffRemaining(agony_debuff) <= target.TickTime(agony_debuff) + GCD() and Spell(agony) or target.DebuffRemaining(agony_debuff) <= target.TickTime(agony_debuff) + GCD() and Spell(agony text=soul_effigy) or Spell(service_felhunter) or target.DebuffRemaining(corruption_debuff) <= target.TickTime(corruption_debuff) + GCD() and Spell(corruption) or target.DebuffRemaining(siphon_life_debuff) <= target.TickTime(siphon_life_debuff) + GCD() and Spell(siphon_life) or target.DebuffRemaining(corruption_debuff) <= target.TickTime(corruption_debuff) + GCD() and Spell(corruption text=soul_effigy) or target.DebuffRemaining(siphon_life_debuff) <= target.TickTime(siphon_life_debuff) + GCD() and Spell(siphon_life text=soul_effigy) or BuffRemaining(mana_tap_buff) <= BaseDuration(mana_tap_buff) * 0.3 and target.TimeToDie() > BaseDuration(mana_tap_buff) * 0.3 and Spell(mana_tap) or Spell(phantom_singularity) or { SoulShards() >= 4 or BuffPresent(shard_instability_buff) or BuffPresent(instability_buff) or BuffPresent(soul_harvest_buff) or BuffPresent(nithramus_buff) } and Spell(unstable_affliction) or target.DebuffRemaining(agony_debuff) <= BaseDuration(agony_debuff) * 0.3 and Spell(agony) or target.DebuffRemaining(agony_debuff) <= BaseDuration(agony_debuff) * 0.3 and Spell(agony text=soul_effigy) or target.DebuffRemaining(corruption_debuff) <= BaseDuration(corruption_debuff) * 0.3 and Spell(corruption) or Spell(haunt) or target.DebuffRemaining(siphon_life_debuff) <= BaseDuration(siphon_life_debuff) * 0.3 and Spell(siphon_life) or target.DebuffRemaining(corruption_debuff) <= BaseDuration(corruption_debuff) * 0.3 and Spell(corruption text=soul_effigy) or target.DebuffRemaining(siphon_life_debuff) <= BaseDuration(siphon_life_debuff) * 0.3 and Spell(siphon_life text=soul_effigy) or ManaPercent() <= 10 and Spell(life_tap) or Spell(drain_soul) or Spell(drain_life) or Spell(life_tap)
+	not BuffPresent(deadwind_harvester_buff) and { BuffPresent(soul_harvest_buff) or BuffStacks(tormented_souls_buff) >= 8 or target.TimeToDie() <= BuffStacks(tormented_souls_buff) * 5 or BuffPresent(trinket_proc_any_buff) } and Spell(reap_souls) or not pet.Present() and Spell(soul_effigy) or target.DebuffRemaining(agony_debuff) <= target.TickTime(agony_debuff) + GCD() and Spell(agony) or target.DebuffRemaining(agony_debuff) <= target.TickTime(agony_debuff) + GCD() and Spell(agony text=soul_effigy) or target.DebuffRemaining(corruption_debuff) and target.DebuffRemaining(agony_debuff) and Spell(service_felhunter) or target.DebuffRemaining(corruption_debuff) <= target.TickTime(corruption_debuff) + GCD() and Spell(corruption) or target.DebuffRemaining(siphon_life_debuff) <= target.TickTime(siphon_life_debuff) + GCD() and Spell(siphon_life) or target.DebuffRemaining(corruption_debuff) <= target.TickTime(corruption_debuff) + GCD() and Spell(corruption text=soul_effigy) or target.DebuffRemaining(siphon_life_debuff) <= target.TickTime(siphon_life_debuff) + GCD() and Spell(siphon_life text=soul_effigy) or BuffRemaining(mana_tap_buff) <= BaseDuration(mana_tap_buff) * 0.3 and { ManaPercent() < 20 or BuffRemaining(mana_tap_buff) <= GCD() } and target.TimeToDie() > BaseDuration(mana_tap_buff) * 0.3 and Spell(mana_tap) or Spell(phantom_singularity) or { Talent(contagion_talent) or SoulShards() >= 4 or BuffPresent(trinket_proc_intellect_buff) or BuffPresent(trinket_stacking_proc_mastery_buff) or BuffPresent(trinket_proc_mastery_buff) or BuffPresent(trinket_proc_crit_buff) or BuffPresent(trinket_proc_versatility_buff) or BuffPresent(soul_harvest_buff) or BuffPresent(deadwind_harvester_buff) or BuffStacks(compounding_horror_buff) == 5 or target.TimeToDie() <= 20 } and Spell(unstable_affliction) or target.DebuffRemaining(agony_debuff) <= BaseDuration(agony_debuff) * 0.3 and target.TimeToDie() >= target.DebuffRemaining(agony_debuff) and Spell(agony) or target.DebuffRemaining(agony_debuff) <= BaseDuration(agony_debuff) * 0.3 and target.TimeToDie() >= target.DebuffRemaining(agony_debuff) and Spell(agony text=soul_effigy) or target.DebuffRemaining(corruption_debuff) <= BaseDuration(corruption_debuff) * 0.3 and target.TimeToDie() >= target.DebuffRemaining(corruption_debuff) and Spell(corruption) or Spell(haunt) or target.DebuffRemaining(siphon_life_debuff) <= BaseDuration(siphon_life_debuff) * 0.3 and target.TimeToDie() >= target.DebuffRemaining(siphon_life_debuff) and Spell(siphon_life) or target.DebuffRemaining(corruption_debuff) <= BaseDuration(corruption_debuff) * 0.3 and target.TimeToDie() >= target.DebuffRemaining(corruption_debuff) and Spell(corruption text=soul_effigy) or target.DebuffRemaining(siphon_life_debuff) <= BaseDuration(siphon_life_debuff) * 0.3 and target.TimeToDie() >= target.DebuffRemaining(siphon_life_debuff) and Spell(siphon_life text=soul_effigy) or ManaPercent() <= 10 and Spell(life_tap) or Spell(drain_soul) or Spell(drain_life) or Spell(life_tap)
 }
 
 ### actions.precombat
 
 AddFunction AfflictionPrecombatMainActions
 {
+	#augmentation,type=defiled
+	Spell(augmentation)
 	#snapshot_stats
 	#grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
 	if Talent(grimoire_of_sacrifice_talent) and pet.Present() Spell(grimoire_of_sacrifice)
+	#potion,name=deadly_grace
 	#mana_tap,if=talent.mana_tap.enabled&!buff.mana_tap.remains
 	if Talent(mana_tap_talent) and not BuffPresent(mana_tap_buff) Spell(mana_tap)
 }
@@ -283,15 +275,15 @@ AddFunction AfflictionPrecombatMainPostConditions
 
 AddFunction AfflictionPrecombatShortCdActions
 {
-	#flask,type=greater_draenic_intellect_flask
-	#food,type=felmouth_frenzy
+	#flask,type=whispered_pact
+	#food,type=azshari_salad
 	#summon_pet,if=!talent.grimoire_of_supremacy.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.demonic_power.down)
 	if not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() Spell(summon_felhunter)
 }
 
 AddFunction AfflictionPrecombatShortCdPostConditions
 {
-	Talent(mana_tap_talent) and not BuffPresent(mana_tap_buff) and Spell(mana_tap)
+	Spell(augmentation) or Talent(mana_tap_talent) and not BuffPresent(mana_tap_buff) and Spell(mana_tap)
 }
 
 AddFunction AfflictionPrecombatCdActions
@@ -302,14 +294,12 @@ AddFunction AfflictionPrecombatCdActions
 		if Talent(grimoire_of_supremacy_talent) and Enemies() < 3 Spell(summon_doomguard)
 		#summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>=3
 		if Talent(grimoire_of_supremacy_talent) and Enemies() >= 3 Spell(summon_infernal)
-		#potion,name=draenic_intellect
-		AfflictionUsePotionIntellect()
 	}
 }
 
 AddFunction AfflictionPrecombatCdPostConditions
 {
-	not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_felhunter) or Talent(mana_tap_talent) and not BuffPresent(mana_tap_buff) and Spell(mana_tap)
+	not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_felhunter) or Spell(augmentation) or Talent(mana_tap_talent) and not BuffPresent(mana_tap_buff) and Spell(mana_tap)
 }
 
 ### Affliction icons.
@@ -374,28 +364,28 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 # agony
 # agony_debuff
 # arcane_torrent_mana
+# augmentation
 # berserking
 # blood_fury_sp
+# compounding_horror_buff
+# contagion_talent
 # corruption
 # corruption_debuff
+# deadwind_harvester_buff
 # demonic_power_buff
-# draenic_intellect_potion
 # drain_life
 # drain_soul
 # grimoire_of_sacrifice
 # grimoire_of_sacrifice_talent
 # grimoire_of_supremacy_talent
 # haunt
-# instability_buff
-# legendary_ring_intellect
 # life_tap
 # mana_tap
 # mana_tap_buff
 # mana_tap_talent
-# nithramus_buff
 # phantom_singularity
+# reap_souls
 # service_felhunter
-# shard_instability_buff
 # siphon_life
 # siphon_life_debuff
 # soul_effigy
@@ -404,48 +394,83 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 # summon_doomguard
 # summon_felhunter
 # summon_infernal
+# tormented_souls_buff
 # unstable_affliction
 ]]
 	OvaleScripts:RegisterScript("WARLOCK", "affliction", name, desc, code, "script")
 end
 
 do
-	local name = "simulationcraft_warlock_demonology_t18m"
-	local desc = "[7.0] SimulationCraft: Warlock_Demonology_T18M"
+	local name = "simulationcraft_warlock_demonology_t19p"
+	local desc = "[7.0] SimulationCraft: Warlock_Demonology_T19P"
 	local code = [[
-# Based on SimulationCraft profile "Warlock_Demonology_T18M".
+# Based on SimulationCraft profile "Warlock_Demonology_T19P".
 #	class=warlock
 #	spec=demonology
-#	talents=1102013
+#	talents=2201032
 #	pet=felguard
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_warlock_spells)
-
-AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=demonology)
-AddCheckBox(opt_legendary_ring_intellect ItemName(legendary_ring_intellect) default specialization=demonology)
-
-AddFunction DemonologyUsePotionIntellect
-{
-	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
-}
-
 ### actions.default
 
 AddFunction DemonologyDefaultMainActions
 {
-	#doom,if=talent.soul_harvest.enabled&!cooldown.soul_harvest.remains&!remains
-	if Talent(soul_harvest_talent) and not SpellCooldown(soul_harvest) > 0 and not target.DebuffRemaining(doom_debuff) Spell(doom)
-	#doom,if=talent.impending_doom.enabled&remains<=action.hand_of_guldan.cast_time
-	if Talent(impending_doom_talent) and target.DebuffRemaining(doom_debuff) <= CastTime(hand_of_guldan) Spell(doom)
-	#hand_of_guldan,if=soul_shard>=1
-	if SoulShards() >= 1 Spell(hand_of_guldan)
-	#demonic_empowerment,if=wild_imp_no_de>=5
-	if 0 >= 5 Spell(demonic_empowerment)
-	#doom,if=talent.impending_doom.enabled&remains<=duration*0.3
-	if Talent(impending_doom_talent) and target.DebuffRemaining(doom_debuff) <= BaseDuration(doom_debuff) * 0.3 Spell(doom)
+	#implosion,if=wild_imp_remaining_duration<=action.shadow_bolt.execute_time&buff.demonic_synergy.remains
+	if DemonDuration(wild_imp) <= ExecuteTime(shadow_bolt) and BuffPresent(demonic_synergy_buff) Spell(implosion)
+	#implosion,if=prev_gcd.hand_of_guldan&wild_imp_remaining_duration<=3&buff.demonic_synergy.remains
+	if PreviousGCDSpell(hand_of_guldan) and DemonDuration(wild_imp) <= 3 and BuffPresent(demonic_synergy_buff) Spell(implosion)
+	#implosion,if=wild_imp_count<=4&wild_imp_remaining_duration<=action.shadow_bolt.execute_time&spell_targets.implosion>1
+	if Demons(wild_imp) <= 4 and DemonDuration(wild_imp) <= ExecuteTime(shadow_bolt) and Enemies() > 1 Spell(implosion)
+	#implosion,if=prev_gcd.hand_of_guldan&wild_imp_remaining_duration<=4&spell_targets.implosion>2
+	if PreviousGCDSpell(hand_of_guldan) and DemonDuration(wild_imp) <= 4 and Enemies() > 2 Spell(implosion)
+	#shadowflame,if=debuff.shadowflame.stack>0&remains<action.shadow_bolt.cast_time+travel_time
+	if target.DebuffStacks(shadowflame_debuff) > 0 and target.DebuffRemaining(shadowflame_debuff) < CastTime(shadow_bolt) + TravelTime(shadowflame) Spell(shadowflame)
+	#call_dreadstalkers,if=!talent.summon_darkglare.enabled&(spell_targets.implosion<3|!talent.implosion.enabled)
+	if not Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } Spell(call_dreadstalkers)
+	#hand_of_guldan,if=soul_shard>=4&!talent.summon_darkglare.enabled
+	if SoulShards() >= 4 and not Talent(summon_darkglare_talent) Spell(hand_of_guldan)
+	#summon_darkglare,if=prev_gcd.hand_of_guldan
+	if PreviousGCDSpell(hand_of_guldan) Spell(summon_darkglare)
+	#summon_darkglare,if=prev_gcd.call_dreadstalkers
+	if PreviousGCDSpell(call_dreadstalkers) Spell(summon_darkglare)
+	#summon_darkglare,if=cooldown.call_dreadstalkers.remains>5&soul_shard<3
+	if SpellCooldown(call_dreadstalkers) > 5 and SoulShards() < 3 Spell(summon_darkglare)
+	#summon_darkglare,if=cooldown.call_dreadstalkers.remains<=action.summon_darkglare.cast_time&soul_shard>=3
+	if SpellCooldown(call_dreadstalkers) <= CastTime(summon_darkglare) and SoulShards() >= 3 Spell(summon_darkglare)
+	#summon_darkglare,if=cooldown.call_dreadstalkers.remains<=action.summon_darkglare.cast_time&soul_shard>=1&buff.demonic_calling.react
+	if SpellCooldown(call_dreadstalkers) <= CastTime(summon_darkglare) and SoulShards() >= 1 and BuffPresent(demonic_calling_buff) Spell(summon_darkglare)
+	#call_dreadstalkers,if=talent.summon_darkglare.enabled&(spell_targets.implosion<3|!talent.implosion.enabled)&cooldown.summon_darkglare.remains>2
+	if Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } and SpellCooldown(summon_darkglare) > 2 Spell(call_dreadstalkers)
+	#call_dreadstalkers,if=talent.summon_darkglare.enabled&(spell_targets.implosion<3|!talent.implosion.enabled)&prev_gcd.summon_darkglare
+	if Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } and PreviousGCDSpell(summon_darkglare) Spell(call_dreadstalkers)
+	#call_dreadstalkers,if=talent.summon_darkglare.enabled&(spell_targets.implosion<3|!talent.implosion.enabled)&cooldown.summon_darkglare.remains<=action.call_dreadstalkers.cast_time&soul_shard>=3
+	if Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } and SpellCooldown(summon_darkglare) <= CastTime(call_dreadstalkers) and SoulShards() >= 3 Spell(call_dreadstalkers)
+	#call_dreadstalkers,if=talent.summon_darkglare.enabled&(spell_targets.implosion<3|!talent.implosion.enabled)&cooldown.summon_darkglare.remains<=action.call_dreadstalkers.cast_time&soul_shard>=1&buff.demonic_calling.react
+	if Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } and SpellCooldown(summon_darkglare) <= CastTime(call_dreadstalkers) and SoulShards() >= 1 and BuffPresent(demonic_calling_buff) Spell(call_dreadstalkers)
+	#hand_of_guldan,if=soul_shard>=3&prev_gcd.call_dreadstalkers
+	if SoulShards() >= 3 and PreviousGCDSpell(call_dreadstalkers) Spell(hand_of_guldan)
+	#hand_of_guldan,if=soul_shard>=5&cooldown.summon_darkglare.remains<=action.hand_of_guldan.cast_time
+	if SoulShards() >= 5 and SpellCooldown(summon_darkglare) <= CastTime(hand_of_guldan) Spell(hand_of_guldan)
+	#hand_of_guldan,if=soul_shard>=4&cooldown.summon_darkglare.remains>2
+	if SoulShards() >= 4 and SpellCooldown(summon_darkglare) > 2 Spell(hand_of_guldan)
+	#demonic_empowerment,if=wild_imp_no_de>3|prev_gcd.hand_of_guldan
+	if NotDeDemons(wild_imp) > 3 or PreviousGCDSpell(hand_of_guldan) Spell(demonic_empowerment)
+	#demonic_empowerment,if=dreadstalker_no_de>0|darkglare_no_de>0|doomguard_no_de>0|infernal_no_de>0|service_no_de>0
+	if NotDeDemons(dreadstalker) > 0 or NotDeDemons(darkglare) > 0 or NotDeDemons(doomguard) > 0 or NotDeDemons(infernal) > 0 or 0 > 0 Spell(demonic_empowerment)
+	#doom,cycle_targets=1,if=!talent.hand_of_doom.enabled&target.time_to_die>duration&(!ticking|remains<duration*0.3)
+	if not Talent(hand_of_doom_talent) and target.TimeToDie() > BaseDuration(doom_debuff) and { not target.DebuffPresent(doom_debuff) or target.DebuffRemaining(doom_debuff) < BaseDuration(doom_debuff) * 0.3 } Spell(doom)
+	#potion,name=deadly_grace,if=buff.soul_harvest.remains|target.time_to_die<=30|trinket.proc.any.react
+	#shadowflame,if=charges=2
+	if Charges(shadowflame) == 2 Spell(shadowflame)
+	#life_tap,if=mana.pct<=30
+	if ManaPercent() <= 30 Spell(life_tap)
+	#demonwrath,chain=1,interrupt=1,if=spell_targets.demonwrath>=3
+	if Enemies() >= 3 Spell(demonwrath)
+	#demonwrath,moving=1,chain=1,interrupt=1
+	if Speed() > 0 Spell(demonwrath)
 	#demonbolt
 	Spell(demonbolt)
 	#shadow_bolt
@@ -460,48 +485,72 @@ AddFunction DemonologyDefaultMainPostConditions
 
 AddFunction DemonologyDefaultShortCdActions
 {
-	#service_pet
-	Spell(service_felguard)
+	unless DemonDuration(wild_imp) <= ExecuteTime(shadow_bolt) and BuffPresent(demonic_synergy_buff) and Spell(implosion) or PreviousGCDSpell(hand_of_guldan) and DemonDuration(wild_imp) <= 3 and BuffPresent(demonic_synergy_buff) and Spell(implosion) or Demons(wild_imp) <= 4 and DemonDuration(wild_imp) <= ExecuteTime(shadow_bolt) and Enemies() > 1 and Spell(implosion) or PreviousGCDSpell(hand_of_guldan) and DemonDuration(wild_imp) <= 4 and Enemies() > 2 and Spell(implosion) or target.DebuffStacks(shadowflame_debuff) > 0 and target.DebuffRemaining(shadowflame_debuff) < CastTime(shadow_bolt) + TravelTime(shadowflame) and Spell(shadowflame)
+	{
+		#service_pet,if=cooldown.summon_doomguard.remains<=gcd&soul_shard>=2
+		if SpellCooldown(summon_doomguard) <= GCD() and SoulShards() >= 2 Spell(service_felguard)
+		#service_pet,if=cooldown.summon_doomguard.remains>25
+		if SpellCooldown(summon_doomguard) > 25 Spell(service_felguard)
+
+		unless not Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } and Spell(call_dreadstalkers) or SoulShards() >= 4 and not Talent(summon_darkglare_talent) and Spell(hand_of_guldan) or PreviousGCDSpell(hand_of_guldan) and Spell(summon_darkglare) or PreviousGCDSpell(call_dreadstalkers) and Spell(summon_darkglare) or SpellCooldown(call_dreadstalkers) > 5 and SoulShards() < 3 and Spell(summon_darkglare) or SpellCooldown(call_dreadstalkers) <= CastTime(summon_darkglare) and SoulShards() >= 3 and Spell(summon_darkglare) or SpellCooldown(call_dreadstalkers) <= CastTime(summon_darkglare) and SoulShards() >= 1 and BuffPresent(demonic_calling_buff) and Spell(summon_darkglare) or Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } and SpellCooldown(summon_darkglare) > 2 and Spell(call_dreadstalkers) or Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } and PreviousGCDSpell(summon_darkglare) and Spell(call_dreadstalkers) or Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } and SpellCooldown(summon_darkglare) <= CastTime(call_dreadstalkers) and SoulShards() >= 3 and Spell(call_dreadstalkers) or Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } and SpellCooldown(summon_darkglare) <= CastTime(call_dreadstalkers) and SoulShards() >= 1 and BuffPresent(demonic_calling_buff) and Spell(call_dreadstalkers) or SoulShards() >= 3 and PreviousGCDSpell(call_dreadstalkers) and Spell(hand_of_guldan) or SoulShards() >= 5 and SpellCooldown(summon_darkglare) <= CastTime(hand_of_guldan) and Spell(hand_of_guldan) or SoulShards() >= 4 and SpellCooldown(summon_darkglare) > 2 and Spell(hand_of_guldan) or { NotDeDemons(wild_imp) > 3 or PreviousGCDSpell(hand_of_guldan) } and Spell(demonic_empowerment) or { NotDeDemons(dreadstalker) > 0 or NotDeDemons(darkglare) > 0 or NotDeDemons(doomguard) > 0 or NotDeDemons(infernal) > 0 or 0 > 0 } and Spell(demonic_empowerment)
+		{
+			#felguard:felstorm
+			if pet.Present() and pet.CreatureFamily(Felguard) Spell(felguard_felstorm)
+
+			unless not Talent(hand_of_doom_talent) and target.TimeToDie() > BaseDuration(doom_debuff) and { not target.DebuffPresent(doom_debuff) or target.DebuffRemaining(doom_debuff) < BaseDuration(doom_debuff) * 0.3 } and Spell(doom) or Charges(shadowflame) == 2 and Spell(shadowflame)
+			{
+				#thalkiels_consumption,if=(dreadstalker_remaining_duration>execute_time|talent.implosion.enabled&spell_targets.implosion>=3)&wild_imp_count>3&wild_imp_remaining_duration>execute_time
+				if { DemonDuration(dreadstalker) > ExecuteTime(thalkiels_consumption) or Talent(implosion_talent) and Enemies() >= 3 } and Demons(wild_imp) > 3 and DemonDuration(wild_imp) > ExecuteTime(thalkiels_consumption) Spell(thalkiels_consumption)
+			}
+		}
+	}
 }
 
 AddFunction DemonologyDefaultShortCdPostConditions
 {
-	Talent(soul_harvest_talent) and not SpellCooldown(soul_harvest) > 0 and not target.DebuffRemaining(doom_debuff) and Spell(doom) or Talent(impending_doom_talent) and target.DebuffRemaining(doom_debuff) <= CastTime(hand_of_guldan) and Spell(doom) or SoulShards() >= 1 and Spell(hand_of_guldan) or 0 >= 5 and Spell(demonic_empowerment) or Talent(impending_doom_talent) and target.DebuffRemaining(doom_debuff) <= BaseDuration(doom_debuff) * 0.3 and Spell(doom) or Spell(demonbolt) or Spell(shadow_bolt) or Spell(life_tap)
+	DemonDuration(wild_imp) <= ExecuteTime(shadow_bolt) and BuffPresent(demonic_synergy_buff) and Spell(implosion) or PreviousGCDSpell(hand_of_guldan) and DemonDuration(wild_imp) <= 3 and BuffPresent(demonic_synergy_buff) and Spell(implosion) or Demons(wild_imp) <= 4 and DemonDuration(wild_imp) <= ExecuteTime(shadow_bolt) and Enemies() > 1 and Spell(implosion) or PreviousGCDSpell(hand_of_guldan) and DemonDuration(wild_imp) <= 4 and Enemies() > 2 and Spell(implosion) or target.DebuffStacks(shadowflame_debuff) > 0 and target.DebuffRemaining(shadowflame_debuff) < CastTime(shadow_bolt) + TravelTime(shadowflame) and Spell(shadowflame) or not Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } and Spell(call_dreadstalkers) or SoulShards() >= 4 and not Talent(summon_darkglare_talent) and Spell(hand_of_guldan) or PreviousGCDSpell(hand_of_guldan) and Spell(summon_darkglare) or PreviousGCDSpell(call_dreadstalkers) and Spell(summon_darkglare) or SpellCooldown(call_dreadstalkers) > 5 and SoulShards() < 3 and Spell(summon_darkglare) or SpellCooldown(call_dreadstalkers) <= CastTime(summon_darkglare) and SoulShards() >= 3 and Spell(summon_darkglare) or SpellCooldown(call_dreadstalkers) <= CastTime(summon_darkglare) and SoulShards() >= 1 and BuffPresent(demonic_calling_buff) and Spell(summon_darkglare) or Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } and SpellCooldown(summon_darkglare) > 2 and Spell(call_dreadstalkers) or Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } and PreviousGCDSpell(summon_darkglare) and Spell(call_dreadstalkers) or Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } and SpellCooldown(summon_darkglare) <= CastTime(call_dreadstalkers) and SoulShards() >= 3 and Spell(call_dreadstalkers) or Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } and SpellCooldown(summon_darkglare) <= CastTime(call_dreadstalkers) and SoulShards() >= 1 and BuffPresent(demonic_calling_buff) and Spell(call_dreadstalkers) or SoulShards() >= 3 and PreviousGCDSpell(call_dreadstalkers) and Spell(hand_of_guldan) or SoulShards() >= 5 and SpellCooldown(summon_darkglare) <= CastTime(hand_of_guldan) and Spell(hand_of_guldan) or SoulShards() >= 4 and SpellCooldown(summon_darkglare) > 2 and Spell(hand_of_guldan) or { NotDeDemons(wild_imp) > 3 or PreviousGCDSpell(hand_of_guldan) } and Spell(demonic_empowerment) or { NotDeDemons(dreadstalker) > 0 or NotDeDemons(darkglare) > 0 or NotDeDemons(doomguard) > 0 or NotDeDemons(infernal) > 0 or 0 > 0 } and Spell(demonic_empowerment) or not Talent(hand_of_doom_talent) and target.TimeToDie() > BaseDuration(doom_debuff) and { not target.DebuffPresent(doom_debuff) or target.DebuffRemaining(doom_debuff) < BaseDuration(doom_debuff) * 0.3 } and Spell(doom) or Charges(shadowflame) == 2 and Spell(shadowflame) or ManaPercent() <= 30 and Spell(life_tap) or Enemies() >= 3 and Spell(demonwrath) or Speed() > 0 and Spell(demonwrath) or Spell(demonbolt) or Spell(shadow_bolt) or Spell(life_tap)
 }
 
 AddFunction DemonologyDefaultCdActions
 {
-	#use_item,name=nithramus_the_allseer
-	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
-	#berserking
-	Spell(berserking)
-	#blood_fury
-	Spell(blood_fury_sp)
-	#arcane_torrent
-	Spell(arcane_torrent_mana)
-	#potion,name=draenic_intellect,if=buff.nithramus.remains
-	if BuffPresent(nithramus_buff) DemonologyUsePotionIntellect()
-
-	unless Spell(service_felguard)
+	unless DemonDuration(wild_imp) <= ExecuteTime(shadow_bolt) and BuffPresent(demonic_synergy_buff) and Spell(implosion) or PreviousGCDSpell(hand_of_guldan) and DemonDuration(wild_imp) <= 3 and BuffPresent(demonic_synergy_buff) and Spell(implosion) or Demons(wild_imp) <= 4 and DemonDuration(wild_imp) <= ExecuteTime(shadow_bolt) and Enemies() > 1 and Spell(implosion) or PreviousGCDSpell(hand_of_guldan) and DemonDuration(wild_imp) <= 4 and Enemies() > 2 and Spell(implosion) or target.DebuffStacks(shadowflame_debuff) > 0 and target.DebuffRemaining(shadowflame_debuff) < CastTime(shadow_bolt) + TravelTime(shadowflame) and Spell(shadowflame) or SpellCooldown(summon_doomguard) <= GCD() and SoulShards() >= 2 and Spell(service_felguard) or SpellCooldown(summon_doomguard) > 25 and Spell(service_felguard)
 	{
-		#summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening<3
-		if not Talent(grimoire_of_supremacy_talent) and Enemies() < 3 Spell(summon_doomguard)
-		#summon_infernal,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening>=3
-		if not Talent(grimoire_of_supremacy_talent) and Enemies() >= 3 Spell(summon_infernal)
-		#soul_harvest,if=dot.doom.remains
-		if target.DebuffRemaining(doom_debuff) Spell(soul_harvest)
+		#summon_doomguard,if=talent.grimoire_of_service.enabled&prev.service_felguard&spell_targets.infernal_awakening<3
+		if Talent(grimoire_of_service_talent) and PreviousSpell(service_felguard) and Enemies() < 3 Spell(summon_doomguard)
+		#summon_doomguard,if=talent.grimoire_of_synergy.enabled&spell_targets.infernal_awakening<3
+		if Talent(grimoire_of_synergy_talent) and Enemies() < 3 Spell(summon_doomguard)
+		#summon_infernal,if=talent.grimoire_of_service.enabled&prev.service_felguard&spell_targets.infernal_awakening>=3
+		if Talent(grimoire_of_service_talent) and PreviousSpell(service_felguard) and Enemies() >= 3 Spell(summon_infernal)
+		#summon_infernal,if=talent.grimoire_of_synergy.enabled&spell_targets.infernal_awakening>=3
+		if Talent(grimoire_of_synergy_talent) and Enemies() >= 3 Spell(summon_infernal)
+
+		unless not Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } and Spell(call_dreadstalkers) or SoulShards() >= 4 and not Talent(summon_darkglare_talent) and Spell(hand_of_guldan) or PreviousGCDSpell(hand_of_guldan) and Spell(summon_darkglare) or PreviousGCDSpell(call_dreadstalkers) and Spell(summon_darkglare) or SpellCooldown(call_dreadstalkers) > 5 and SoulShards() < 3 and Spell(summon_darkglare) or SpellCooldown(call_dreadstalkers) <= CastTime(summon_darkglare) and SoulShards() >= 3 and Spell(summon_darkglare) or SpellCooldown(call_dreadstalkers) <= CastTime(summon_darkglare) and SoulShards() >= 1 and BuffPresent(demonic_calling_buff) and Spell(summon_darkglare) or Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } and SpellCooldown(summon_darkglare) > 2 and Spell(call_dreadstalkers) or Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } and PreviousGCDSpell(summon_darkglare) and Spell(call_dreadstalkers) or Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } and SpellCooldown(summon_darkglare) <= CastTime(call_dreadstalkers) and SoulShards() >= 3 and Spell(call_dreadstalkers) or Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } and SpellCooldown(summon_darkglare) <= CastTime(call_dreadstalkers) and SoulShards() >= 1 and BuffPresent(demonic_calling_buff) and Spell(call_dreadstalkers) or SoulShards() >= 3 and PreviousGCDSpell(call_dreadstalkers) and Spell(hand_of_guldan) or SoulShards() >= 5 and SpellCooldown(summon_darkglare) <= CastTime(hand_of_guldan) and Spell(hand_of_guldan) or SoulShards() >= 4 and SpellCooldown(summon_darkglare) > 2 and Spell(hand_of_guldan) or { NotDeDemons(wild_imp) > 3 or PreviousGCDSpell(hand_of_guldan) } and Spell(demonic_empowerment) or { NotDeDemons(dreadstalker) > 0 or NotDeDemons(darkglare) > 0 or NotDeDemons(doomguard) > 0 or NotDeDemons(infernal) > 0 or 0 > 0 } and Spell(demonic_empowerment) or not Talent(hand_of_doom_talent) and target.TimeToDie() > BaseDuration(doom_debuff) and { not target.DebuffPresent(doom_debuff) or target.DebuffRemaining(doom_debuff) < BaseDuration(doom_debuff) * 0.3 } and Spell(doom)
+		{
+			#arcane_torrent
+			Spell(arcane_torrent_mana)
+			#berserking
+			Spell(berserking)
+			#blood_fury
+			Spell(blood_fury_sp)
+			#soul_harvest
+			Spell(soul_harvest)
+		}
 	}
 }
 
 AddFunction DemonologyDefaultCdPostConditions
 {
-	Spell(service_felguard) or Talent(soul_harvest_talent) and not SpellCooldown(soul_harvest) > 0 and not target.DebuffRemaining(doom_debuff) and Spell(doom) or Talent(impending_doom_talent) and target.DebuffRemaining(doom_debuff) <= CastTime(hand_of_guldan) and Spell(doom) or SoulShards() >= 1 and Spell(hand_of_guldan) or 0 >= 5 and Spell(demonic_empowerment) or Talent(impending_doom_talent) and target.DebuffRemaining(doom_debuff) <= BaseDuration(doom_debuff) * 0.3 and Spell(doom) or Spell(demonbolt) or Spell(shadow_bolt) or Spell(life_tap)
+	DemonDuration(wild_imp) <= ExecuteTime(shadow_bolt) and BuffPresent(demonic_synergy_buff) and Spell(implosion) or PreviousGCDSpell(hand_of_guldan) and DemonDuration(wild_imp) <= 3 and BuffPresent(demonic_synergy_buff) and Spell(implosion) or Demons(wild_imp) <= 4 and DemonDuration(wild_imp) <= ExecuteTime(shadow_bolt) and Enemies() > 1 and Spell(implosion) or PreviousGCDSpell(hand_of_guldan) and DemonDuration(wild_imp) <= 4 and Enemies() > 2 and Spell(implosion) or target.DebuffStacks(shadowflame_debuff) > 0 and target.DebuffRemaining(shadowflame_debuff) < CastTime(shadow_bolt) + TravelTime(shadowflame) and Spell(shadowflame) or SpellCooldown(summon_doomguard) <= GCD() and SoulShards() >= 2 and Spell(service_felguard) or SpellCooldown(summon_doomguard) > 25 and Spell(service_felguard) or not Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } and Spell(call_dreadstalkers) or SoulShards() >= 4 and not Talent(summon_darkglare_talent) and Spell(hand_of_guldan) or PreviousGCDSpell(hand_of_guldan) and Spell(summon_darkglare) or PreviousGCDSpell(call_dreadstalkers) and Spell(summon_darkglare) or SpellCooldown(call_dreadstalkers) > 5 and SoulShards() < 3 and Spell(summon_darkglare) or SpellCooldown(call_dreadstalkers) <= CastTime(summon_darkglare) and SoulShards() >= 3 and Spell(summon_darkglare) or SpellCooldown(call_dreadstalkers) <= CastTime(summon_darkglare) and SoulShards() >= 1 and BuffPresent(demonic_calling_buff) and Spell(summon_darkglare) or Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } and SpellCooldown(summon_darkglare) > 2 and Spell(call_dreadstalkers) or Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } and PreviousGCDSpell(summon_darkglare) and Spell(call_dreadstalkers) or Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } and SpellCooldown(summon_darkglare) <= CastTime(call_dreadstalkers) and SoulShards() >= 3 and Spell(call_dreadstalkers) or Talent(summon_darkglare_talent) and { Enemies() < 3 or not Talent(implosion_talent) } and SpellCooldown(summon_darkglare) <= CastTime(call_dreadstalkers) and SoulShards() >= 1 and BuffPresent(demonic_calling_buff) and Spell(call_dreadstalkers) or SoulShards() >= 3 and PreviousGCDSpell(call_dreadstalkers) and Spell(hand_of_guldan) or SoulShards() >= 5 and SpellCooldown(summon_darkglare) <= CastTime(hand_of_guldan) and Spell(hand_of_guldan) or SoulShards() >= 4 and SpellCooldown(summon_darkglare) > 2 and Spell(hand_of_guldan) or { NotDeDemons(wild_imp) > 3 or PreviousGCDSpell(hand_of_guldan) } and Spell(demonic_empowerment) or { NotDeDemons(dreadstalker) > 0 or NotDeDemons(darkglare) > 0 or NotDeDemons(doomguard) > 0 or NotDeDemons(infernal) > 0 or 0 > 0 } and Spell(demonic_empowerment) or not Talent(hand_of_doom_talent) and target.TimeToDie() > BaseDuration(doom_debuff) and { not target.DebuffPresent(doom_debuff) or target.DebuffRemaining(doom_debuff) < BaseDuration(doom_debuff) * 0.3 } and Spell(doom) or Charges(shadowflame) == 2 and Spell(shadowflame) or { DemonDuration(dreadstalker) > ExecuteTime(thalkiels_consumption) or Talent(implosion_talent) and Enemies() >= 3 } and Demons(wild_imp) > 3 and DemonDuration(wild_imp) > ExecuteTime(thalkiels_consumption) and Spell(thalkiels_consumption) or ManaPercent() <= 30 and Spell(life_tap) or Enemies() >= 3 and Spell(demonwrath) or Speed() > 0 and Spell(demonwrath) or Spell(demonbolt) or Spell(shadow_bolt) or Spell(life_tap)
 }
 
 ### actions.precombat
 
 AddFunction DemonologyPrecombatMainActions
 {
+	#augmentation,type=defiled
+	Spell(augmentation)
+	#snapshot_stats
+	#potion,name=deadly_grace
 	#demonic_empowerment
 	Spell(demonic_empowerment)
 	#demonbolt,if=talent.demonbolt.enabled
@@ -516,15 +565,15 @@ AddFunction DemonologyPrecombatMainPostConditions
 
 AddFunction DemonologyPrecombatShortCdActions
 {
-	#flask,type=greater_draenic_intellect_flask
-	#food,type=frosty_stew
+	#flask,type=whispered_pact
+	#food,type=azshari_salad
 	#summon_pet,if=!talent.grimoire_of_supremacy.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.demonic_power.down)
 	if not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() Spell(summon_felguard)
 }
 
 AddFunction DemonologyPrecombatShortCdPostConditions
 {
-	Spell(demonic_empowerment) or Talent(demonbolt_talent) and Spell(demonbolt) or not Talent(demonbolt_talent) and Spell(shadow_bolt)
+	Spell(augmentation) or Spell(demonic_empowerment) or Talent(demonbolt_talent) and Spell(demonbolt) or not Talent(demonbolt_talent) and Spell(shadow_bolt)
 }
 
 AddFunction DemonologyPrecombatCdActions
@@ -535,15 +584,12 @@ AddFunction DemonologyPrecombatCdActions
 		if Talent(grimoire_of_supremacy_talent) and Enemies() < 3 Spell(summon_doomguard)
 		#summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>=3
 		if Talent(grimoire_of_supremacy_talent) and Enemies() >= 3 Spell(summon_infernal)
-		#snapshot_stats
-		#potion,name=draenic_intellect
-		DemonologyUsePotionIntellect()
 	}
 }
 
 AddFunction DemonologyPrecombatCdPostConditions
 {
-	not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_felguard) or Spell(demonic_empowerment) or Talent(demonbolt_talent) and Spell(demonbolt) or not Talent(demonbolt_talent) and Spell(shadow_bolt)
+	not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_felguard) or Spell(augmentation) or Spell(demonic_empowerment) or Talent(demonbolt_talent) and Spell(demonbolt) or not Talent(demonbolt_talent) and Spell(shadow_bolt)
 }
 
 ### Demonology icons.
@@ -606,56 +652,59 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 
 ### Required symbols
 # arcane_torrent_mana
+# augmentation
 # berserking
 # blood_fury_sp
+# call_dreadstalkers
 # demonbolt
 # demonbolt_talent
+# demonic_calling_buff
 # demonic_empowerment
 # demonic_power_buff
+# demonic_synergy_buff
+# demonwrath
 # doom
 # doom_debuff
-# draenic_intellect_potion
+# felguard_felstorm
 # grimoire_of_sacrifice_talent
+# grimoire_of_service_talent
 # grimoire_of_supremacy_talent
+# grimoire_of_synergy_talent
+# hand_of_doom_talent
 # hand_of_guldan
-# impending_doom_talent
-# legendary_ring_intellect
+# implosion
+# implosion_talent
 # life_tap
-# nithramus_buff
 # service_felguard
+# service_pet
 # shadow_bolt
+# shadowflame
+# shadowflame_debuff
 # soul_harvest
-# soul_harvest_talent
+# summon_darkglare
+# summon_darkglare_talent
 # summon_doomguard
 # summon_felguard
 # summon_infernal
+# thalkiels_consumption
 ]]
 	OvaleScripts:RegisterScript("WARLOCK", "demonology", name, desc, code, "script")
 end
 
 do
-	local name = "simulationcraft_warlock_destruction_t18m"
-	local desc = "[7.0] SimulationCraft: Warlock_Destruction_T18M"
+	local name = "simulationcraft_warlock_destruction_t19p"
+	local desc = "[7.0] SimulationCraft: Warlock_Destruction_T19P"
 	local code = [[
-# Based on SimulationCraft profile "Warlock_Destruction_T18M".
+# Based on SimulationCraft profile "Warlock_Destruction_T19P".
 #	class=warlock
 #	spec=destruction
-#	talents=2301033
+#	talents=2301022
 #	pet=imp
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_warlock_spells)
-
-AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=destruction)
-AddCheckBox(opt_legendary_ring_intellect ItemName(legendary_ring_intellect) default specialization=destruction)
-
-AddFunction DestructionUsePotionIntellect
-{
-	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
-}
-
 ### actions.default
 
 AddFunction DestructionDefaultMainActions
@@ -664,6 +713,7 @@ AddFunction DestructionDefaultMainActions
 	if target.DebuffRemaining(immolate_debuff) <= target.TickTime(immolate_debuff) Spell(immolate)
 	#immolate,if=talent.roaring_blaze.enabled&remains<=duration&!debuff.roaring_blaze.remains&(action.conflagrate.charges=2|(action.conflagrate.charges>=1&action.conflagrate.recharge_time<cast_time+gcd))
 	if Talent(roaring_blaze_talent) and target.DebuffRemaining(immolate_debuff) <= BaseDuration(immolate_debuff) and not target.DebuffPresent(roaring_blaze_debuff) and { Charges(conflagrate) == 2 or Charges(conflagrate) >= 1 and SpellChargeCooldown(conflagrate) < CastTime(immolate) + GCD() } Spell(immolate)
+	#potion,name=deadly_grace,if=(buff.soul_harvest.remains|trinket.proc.any.react|target.time_to_die<=30)
 	#conflagrate,if=talent.roaring_blaze.enabled&(charges=2|(action.conflagrate.charges>=1&action.conflagrate.recharge_time<gcd))
 	if Talent(roaring_blaze_talent) and { Charges(conflagrate) == 2 or Charges(conflagrate) >= 1 and SpellChargeCooldown(conflagrate) < GCD() } Spell(conflagrate)
 	#conflagrate,if=talent.roaring_blaze.enabled&prev_gcd.conflagrate
@@ -672,20 +722,24 @@ AddFunction DestructionDefaultMainActions
 	if Talent(roaring_blaze_talent) and target.DebuffStacks(roaring_blaze_debuff) == 2 Spell(conflagrate)
 	#conflagrate,if=talent.roaring_blaze.enabled&debuff.roaring_blaze.stack=3&buff.bloodlust.remains
 	if Talent(roaring_blaze_talent) and target.DebuffStacks(roaring_blaze_debuff) == 3 and BuffPresent(burst_haste_buff any=1) Spell(conflagrate)
-	#conflagrate,if=!talent.roaring_blaze.enabled&buff.conflagration_of_chaos.remains<=action.chaos_bolt.cast_time
-	if not Talent(roaring_blaze_talent) and BuffRemaining(conflagration_of_chaos_buff) <= CastTime(chaos_bolt) Spell(conflagrate)
-	#conflagrate,if=!talent.roaring_blaze.enabled&(charges=1&recharge_time<action.chaos_bolt.cast_time|charges=2)&soul_shard<5
-	if not Talent(roaring_blaze_talent) and { Charges(conflagrate) == 1 and SpellChargeCooldown(conflagrate) < CastTime(chaos_bolt) or Charges(conflagrate) == 2 } and SoulShards() < 5 Spell(conflagrate)
+	#conflagrate,if=!talent.roaring_blaze.enabled&!buff.backdraft.remains&buff.conflagration_of_chaos.remains<=action.chaos_bolt.cast_time
+	if not Talent(roaring_blaze_talent) and not BuffPresent(backdraft_buff) and BuffRemaining(conflagration_of_chaos_buff) <= CastTime(chaos_bolt) Spell(conflagrate)
+	#conflagrate,if=!talent.roaring_blaze.enabled&!buff.backdraft.remains&(charges=1&recharge_time<action.chaos_bolt.cast_time|charges=2)&soul_shard<5
+	if not Talent(roaring_blaze_talent) and not BuffPresent(backdraft_buff) and { Charges(conflagrate) == 1 and SpellChargeCooldown(conflagrate) < CastTime(chaos_bolt) or Charges(conflagrate) == 2 } and SoulShards() < 5 Spell(conflagrate)
 	#channel_demonfire,if=dot.immolate.remains>cast_time
 	if target.DebuffRemaining(immolate_debuff) > CastTime(channel_demonfire) Spell(channel_demonfire)
-	#chaos_bolt,if=soul_shard>3
-	if SoulShards() > 3 Spell(chaos_bolt)
+	#chaos_bolt,if=soul_shard>3|buff.backdraft.remains
+	if SoulShards() > 3 or BuffPresent(backdraft_buff) Spell(chaos_bolt)
+	#chaos_bolt,if=buff.backdraft.remains&prev_gcd.incinerate
+	if BuffPresent(backdraft_buff) and PreviousGCDSpell(incinerate) Spell(chaos_bolt)
+	#incinerate,if=buff.backdraft.remains
+	if BuffPresent(backdraft_buff) Spell(incinerate)
 	#mana_tap,if=buff.mana_tap.remains<=buff.mana_tap.duration*0.3&(mana.pct<20|buff.mana_tap.remains<=action.chaos_bolt.cast_time)&target.time_to_die>buff.mana_tap.duration*0.3
 	if BuffRemaining(mana_tap_buff) <= BaseDuration(mana_tap_buff) * 0.3 and { ManaPercent() < 20 or BuffRemaining(mana_tap_buff) <= CastTime(chaos_bolt) } and target.TimeToDie() > BaseDuration(mana_tap_buff) * 0.3 Spell(mana_tap)
 	#chaos_bolt
 	Spell(chaos_bolt)
-	#conflagrate,if=!talent.roaring_blaze.enabled
-	if not Talent(roaring_blaze_talent) Spell(conflagrate)
+	#conflagrate,if=!talent.roaring_blaze.enabled&!buff.backdraft.remains
+	if not Talent(roaring_blaze_talent) and not BuffPresent(backdraft_buff) Spell(conflagrate)
 	#immolate,if=!talent.roaring_blaze.enabled&remains<=duration*0.3
 	if not Talent(roaring_blaze_talent) and target.DebuffRemaining(immolate_debuff) <= BaseDuration(immolate_debuff) * 0.3 Spell(immolate)
 	#life_tap,if=talent.mana_tap.enabled&mana.pct<=10
@@ -702,30 +756,36 @@ AddFunction DestructionDefaultMainPostConditions
 
 AddFunction DestructionDefaultShortCdActions
 {
-	unless target.DebuffRemaining(immolate_debuff) <= target.TickTime(immolate_debuff) and Spell(immolate) or Talent(roaring_blaze_talent) and target.DebuffRemaining(immolate_debuff) <= BaseDuration(immolate_debuff) and not target.DebuffPresent(roaring_blaze_debuff) and { Charges(conflagrate) == 2 or Charges(conflagrate) >= 1 and SpellChargeCooldown(conflagrate) < CastTime(immolate) + GCD() } and Spell(immolate) or Talent(roaring_blaze_talent) and { Charges(conflagrate) == 2 or Charges(conflagrate) >= 1 and SpellChargeCooldown(conflagrate) < GCD() } and Spell(conflagrate) or Talent(roaring_blaze_talent) and PreviousGCDSpell(conflagrate) and Spell(conflagrate) or Talent(roaring_blaze_talent) and target.DebuffStacks(roaring_blaze_debuff) == 2 and Spell(conflagrate) or Talent(roaring_blaze_talent) and target.DebuffStacks(roaring_blaze_debuff) == 3 and BuffPresent(burst_haste_buff any=1) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and BuffRemaining(conflagration_of_chaos_buff) <= CastTime(chaos_bolt) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and { Charges(conflagrate) == 1 and SpellChargeCooldown(conflagrate) < CastTime(chaos_bolt) or Charges(conflagrate) == 2 } and SoulShards() < 5 and Spell(conflagrate)
+	#dimensional_rift,if=charges=3
+	if Charges(dimensional_rift) == 3 Spell(dimensional_rift)
+
+	unless target.DebuffRemaining(immolate_debuff) <= target.TickTime(immolate_debuff) and Spell(immolate) or Talent(roaring_blaze_talent) and target.DebuffRemaining(immolate_debuff) <= BaseDuration(immolate_debuff) and not target.DebuffPresent(roaring_blaze_debuff) and { Charges(conflagrate) == 2 or Charges(conflagrate) >= 1 and SpellChargeCooldown(conflagrate) < CastTime(immolate) + GCD() } and Spell(immolate) or Talent(roaring_blaze_talent) and { Charges(conflagrate) == 2 or Charges(conflagrate) >= 1 and SpellChargeCooldown(conflagrate) < GCD() } and Spell(conflagrate) or Talent(roaring_blaze_talent) and PreviousGCDSpell(conflagrate) and Spell(conflagrate) or Talent(roaring_blaze_talent) and target.DebuffStacks(roaring_blaze_debuff) == 2 and Spell(conflagrate) or Talent(roaring_blaze_talent) and target.DebuffStacks(roaring_blaze_debuff) == 3 and BuffPresent(burst_haste_buff any=1) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and not BuffPresent(backdraft_buff) and BuffRemaining(conflagration_of_chaos_buff) <= CastTime(chaos_bolt) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and not BuffPresent(backdraft_buff) and { Charges(conflagrate) == 1 and SpellChargeCooldown(conflagrate) < CastTime(chaos_bolt) or Charges(conflagrate) == 2 } and SoulShards() < 5 and Spell(conflagrate)
 	{
 		#service_pet
 		Spell(service_imp)
 
-		unless target.DebuffRemaining(immolate_debuff) > CastTime(channel_demonfire) and Spell(channel_demonfire) or SoulShards() > 3 and Spell(chaos_bolt) or BuffRemaining(mana_tap_buff) <= BaseDuration(mana_tap_buff) * 0.3 and { ManaPercent() < 20 or BuffRemaining(mana_tap_buff) <= CastTime(chaos_bolt) } and target.TimeToDie() > BaseDuration(mana_tap_buff) * 0.3 and Spell(mana_tap) or Spell(chaos_bolt)
+		unless target.DebuffRemaining(immolate_debuff) > CastTime(channel_demonfire) and Spell(channel_demonfire) or { SoulShards() > 3 or BuffPresent(backdraft_buff) } and Spell(chaos_bolt) or BuffPresent(backdraft_buff) and PreviousGCDSpell(incinerate) and Spell(chaos_bolt) or BuffPresent(backdraft_buff) and Spell(incinerate)
 		{
-			#cataclysm
-			Spell(cataclysm)
+			#dimensional_rift
+			Spell(dimensional_rift)
+
+			unless BuffRemaining(mana_tap_buff) <= BaseDuration(mana_tap_buff) * 0.3 and { ManaPercent() < 20 or BuffRemaining(mana_tap_buff) <= CastTime(chaos_bolt) } and target.TimeToDie() > BaseDuration(mana_tap_buff) * 0.3 and Spell(mana_tap) or Spell(chaos_bolt)
+			{
+				#cataclysm
+				Spell(cataclysm)
+			}
 		}
 	}
 }
 
 AddFunction DestructionDefaultShortCdPostConditions
 {
-	target.DebuffRemaining(immolate_debuff) <= target.TickTime(immolate_debuff) and Spell(immolate) or Talent(roaring_blaze_talent) and target.DebuffRemaining(immolate_debuff) <= BaseDuration(immolate_debuff) and not target.DebuffPresent(roaring_blaze_debuff) and { Charges(conflagrate) == 2 or Charges(conflagrate) >= 1 and SpellChargeCooldown(conflagrate) < CastTime(immolate) + GCD() } and Spell(immolate) or Talent(roaring_blaze_talent) and { Charges(conflagrate) == 2 or Charges(conflagrate) >= 1 and SpellChargeCooldown(conflagrate) < GCD() } and Spell(conflagrate) or Talent(roaring_blaze_talent) and PreviousGCDSpell(conflagrate) and Spell(conflagrate) or Talent(roaring_blaze_talent) and target.DebuffStacks(roaring_blaze_debuff) == 2 and Spell(conflagrate) or Talent(roaring_blaze_talent) and target.DebuffStacks(roaring_blaze_debuff) == 3 and BuffPresent(burst_haste_buff any=1) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and BuffRemaining(conflagration_of_chaos_buff) <= CastTime(chaos_bolt) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and { Charges(conflagrate) == 1 and SpellChargeCooldown(conflagrate) < CastTime(chaos_bolt) or Charges(conflagrate) == 2 } and SoulShards() < 5 and Spell(conflagrate) or target.DebuffRemaining(immolate_debuff) > CastTime(channel_demonfire) and Spell(channel_demonfire) or SoulShards() > 3 and Spell(chaos_bolt) or BuffRemaining(mana_tap_buff) <= BaseDuration(mana_tap_buff) * 0.3 and { ManaPercent() < 20 or BuffRemaining(mana_tap_buff) <= CastTime(chaos_bolt) } and target.TimeToDie() > BaseDuration(mana_tap_buff) * 0.3 and Spell(mana_tap) or Spell(chaos_bolt) or not Talent(roaring_blaze_talent) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and target.DebuffRemaining(immolate_debuff) <= BaseDuration(immolate_debuff) * 0.3 and Spell(immolate) or Talent(mana_tap_talent) and ManaPercent() <= 10 and Spell(life_tap) or Spell(incinerate) or Spell(life_tap)
+	target.DebuffRemaining(immolate_debuff) <= target.TickTime(immolate_debuff) and Spell(immolate) or Talent(roaring_blaze_talent) and target.DebuffRemaining(immolate_debuff) <= BaseDuration(immolate_debuff) and not target.DebuffPresent(roaring_blaze_debuff) and { Charges(conflagrate) == 2 or Charges(conflagrate) >= 1 and SpellChargeCooldown(conflagrate) < CastTime(immolate) + GCD() } and Spell(immolate) or Talent(roaring_blaze_talent) and { Charges(conflagrate) == 2 or Charges(conflagrate) >= 1 and SpellChargeCooldown(conflagrate) < GCD() } and Spell(conflagrate) or Talent(roaring_blaze_talent) and PreviousGCDSpell(conflagrate) and Spell(conflagrate) or Talent(roaring_blaze_talent) and target.DebuffStacks(roaring_blaze_debuff) == 2 and Spell(conflagrate) or Talent(roaring_blaze_talent) and target.DebuffStacks(roaring_blaze_debuff) == 3 and BuffPresent(burst_haste_buff any=1) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and not BuffPresent(backdraft_buff) and BuffRemaining(conflagration_of_chaos_buff) <= CastTime(chaos_bolt) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and not BuffPresent(backdraft_buff) and { Charges(conflagrate) == 1 and SpellChargeCooldown(conflagrate) < CastTime(chaos_bolt) or Charges(conflagrate) == 2 } and SoulShards() < 5 and Spell(conflagrate) or target.DebuffRemaining(immolate_debuff) > CastTime(channel_demonfire) and Spell(channel_demonfire) or { SoulShards() > 3 or BuffPresent(backdraft_buff) } and Spell(chaos_bolt) or BuffPresent(backdraft_buff) and PreviousGCDSpell(incinerate) and Spell(chaos_bolt) or BuffPresent(backdraft_buff) and Spell(incinerate) or BuffRemaining(mana_tap_buff) <= BaseDuration(mana_tap_buff) * 0.3 and { ManaPercent() < 20 or BuffRemaining(mana_tap_buff) <= CastTime(chaos_bolt) } and target.TimeToDie() > BaseDuration(mana_tap_buff) * 0.3 and Spell(mana_tap) or Spell(chaos_bolt) or not Talent(roaring_blaze_talent) and not BuffPresent(backdraft_buff) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and target.DebuffRemaining(immolate_debuff) <= BaseDuration(immolate_debuff) * 0.3 and Spell(immolate) or Talent(mana_tap_talent) and ManaPercent() <= 10 and Spell(life_tap) or Spell(incinerate) or Spell(life_tap)
 }
 
 AddFunction DestructionDefaultCdActions
 {
-	#use_item,name=nithramus_the_allseer
-	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
-
-	unless target.DebuffRemaining(immolate_debuff) <= target.TickTime(immolate_debuff) and Spell(immolate) or Talent(roaring_blaze_talent) and target.DebuffRemaining(immolate_debuff) <= BaseDuration(immolate_debuff) and not target.DebuffPresent(roaring_blaze_debuff) and { Charges(conflagrate) == 2 or Charges(conflagrate) >= 1 and SpellChargeCooldown(conflagrate) < CastTime(immolate) + GCD() } and Spell(immolate)
+	unless Charges(dimensional_rift) == 3 and Spell(dimensional_rift) or target.DebuffRemaining(immolate_debuff) <= target.TickTime(immolate_debuff) and Spell(immolate) or Talent(roaring_blaze_talent) and target.DebuffRemaining(immolate_debuff) <= BaseDuration(immolate_debuff) and not target.DebuffPresent(roaring_blaze_debuff) and { Charges(conflagrate) == 2 or Charges(conflagrate) >= 1 and SpellChargeCooldown(conflagrate) < CastTime(immolate) + GCD() } and Spell(immolate)
 	{
 		#berserking
 		Spell(berserking)
@@ -733,10 +793,8 @@ AddFunction DestructionDefaultCdActions
 		Spell(blood_fury_sp)
 		#arcane_torrent
 		Spell(arcane_torrent_mana)
-		#potion,name=draenic_intellect,if=buff.nithramus.remains
-		if BuffPresent(nithramus_buff) DestructionUsePotionIntellect()
 
-		unless Talent(roaring_blaze_talent) and { Charges(conflagrate) == 2 or Charges(conflagrate) >= 1 and SpellChargeCooldown(conflagrate) < GCD() } and Spell(conflagrate) or Talent(roaring_blaze_talent) and PreviousGCDSpell(conflagrate) and Spell(conflagrate) or Talent(roaring_blaze_talent) and target.DebuffStacks(roaring_blaze_debuff) == 2 and Spell(conflagrate) or Talent(roaring_blaze_talent) and target.DebuffStacks(roaring_blaze_debuff) == 3 and BuffPresent(burst_haste_buff any=1) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and BuffRemaining(conflagration_of_chaos_buff) <= CastTime(chaos_bolt) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and { Charges(conflagrate) == 1 and SpellChargeCooldown(conflagrate) < CastTime(chaos_bolt) or Charges(conflagrate) == 2 } and SoulShards() < 5 and Spell(conflagrate) or Spell(service_imp)
+		unless Talent(roaring_blaze_talent) and { Charges(conflagrate) == 2 or Charges(conflagrate) >= 1 and SpellChargeCooldown(conflagrate) < GCD() } and Spell(conflagrate) or Talent(roaring_blaze_talent) and PreviousGCDSpell(conflagrate) and Spell(conflagrate) or Talent(roaring_blaze_talent) and target.DebuffStacks(roaring_blaze_debuff) == 2 and Spell(conflagrate) or Talent(roaring_blaze_talent) and target.DebuffStacks(roaring_blaze_debuff) == 3 and BuffPresent(burst_haste_buff any=1) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and not BuffPresent(backdraft_buff) and BuffRemaining(conflagration_of_chaos_buff) <= CastTime(chaos_bolt) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and not BuffPresent(backdraft_buff) and { Charges(conflagrate) == 1 and SpellChargeCooldown(conflagrate) < CastTime(chaos_bolt) or Charges(conflagrate) == 2 } and SoulShards() < 5 and Spell(conflagrate) or Spell(service_imp)
 		{
 			#summon_infernal,if=artifact.lord_of_flames.rank>0&!buff.lord_of_flames.remains
 			if 0 > 0 and not BuffPresent(lord_of_flames_buff) Spell(summon_infernal)
@@ -752,16 +810,19 @@ AddFunction DestructionDefaultCdActions
 
 AddFunction DestructionDefaultCdPostConditions
 {
-	target.DebuffRemaining(immolate_debuff) <= target.TickTime(immolate_debuff) and Spell(immolate) or Talent(roaring_blaze_talent) and target.DebuffRemaining(immolate_debuff) <= BaseDuration(immolate_debuff) and not target.DebuffPresent(roaring_blaze_debuff) and { Charges(conflagrate) == 2 or Charges(conflagrate) >= 1 and SpellChargeCooldown(conflagrate) < CastTime(immolate) + GCD() } and Spell(immolate) or Talent(roaring_blaze_talent) and { Charges(conflagrate) == 2 or Charges(conflagrate) >= 1 and SpellChargeCooldown(conflagrate) < GCD() } and Spell(conflagrate) or Talent(roaring_blaze_talent) and PreviousGCDSpell(conflagrate) and Spell(conflagrate) or Talent(roaring_blaze_talent) and target.DebuffStacks(roaring_blaze_debuff) == 2 and Spell(conflagrate) or Talent(roaring_blaze_talent) and target.DebuffStacks(roaring_blaze_debuff) == 3 and BuffPresent(burst_haste_buff any=1) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and BuffRemaining(conflagration_of_chaos_buff) <= CastTime(chaos_bolt) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and { Charges(conflagrate) == 1 and SpellChargeCooldown(conflagrate) < CastTime(chaos_bolt) or Charges(conflagrate) == 2 } and SoulShards() < 5 and Spell(conflagrate) or Spell(service_imp) or target.DebuffRemaining(immolate_debuff) > CastTime(channel_demonfire) and Spell(channel_demonfire) or SoulShards() > 3 and Spell(chaos_bolt) or BuffRemaining(mana_tap_buff) <= BaseDuration(mana_tap_buff) * 0.3 and { ManaPercent() < 20 or BuffRemaining(mana_tap_buff) <= CastTime(chaos_bolt) } and target.TimeToDie() > BaseDuration(mana_tap_buff) * 0.3 and Spell(mana_tap) or Spell(chaos_bolt) or not Talent(roaring_blaze_talent) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and target.DebuffRemaining(immolate_debuff) <= BaseDuration(immolate_debuff) * 0.3 and Spell(immolate) or Talent(mana_tap_talent) and ManaPercent() <= 10 and Spell(life_tap) or Spell(incinerate) or Spell(life_tap)
+	Charges(dimensional_rift) == 3 and Spell(dimensional_rift) or target.DebuffRemaining(immolate_debuff) <= target.TickTime(immolate_debuff) and Spell(immolate) or Talent(roaring_blaze_talent) and target.DebuffRemaining(immolate_debuff) <= BaseDuration(immolate_debuff) and not target.DebuffPresent(roaring_blaze_debuff) and { Charges(conflagrate) == 2 or Charges(conflagrate) >= 1 and SpellChargeCooldown(conflagrate) < CastTime(immolate) + GCD() } and Spell(immolate) or Talent(roaring_blaze_talent) and { Charges(conflagrate) == 2 or Charges(conflagrate) >= 1 and SpellChargeCooldown(conflagrate) < GCD() } and Spell(conflagrate) or Talent(roaring_blaze_talent) and PreviousGCDSpell(conflagrate) and Spell(conflagrate) or Talent(roaring_blaze_talent) and target.DebuffStacks(roaring_blaze_debuff) == 2 and Spell(conflagrate) or Talent(roaring_blaze_talent) and target.DebuffStacks(roaring_blaze_debuff) == 3 and BuffPresent(burst_haste_buff any=1) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and not BuffPresent(backdraft_buff) and BuffRemaining(conflagration_of_chaos_buff) <= CastTime(chaos_bolt) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and not BuffPresent(backdraft_buff) and { Charges(conflagrate) == 1 and SpellChargeCooldown(conflagrate) < CastTime(chaos_bolt) or Charges(conflagrate) == 2 } and SoulShards() < 5 and Spell(conflagrate) or Spell(service_imp) or target.DebuffRemaining(immolate_debuff) > CastTime(channel_demonfire) and Spell(channel_demonfire) or { SoulShards() > 3 or BuffPresent(backdraft_buff) } and Spell(chaos_bolt) or BuffPresent(backdraft_buff) and PreviousGCDSpell(incinerate) and Spell(chaos_bolt) or BuffPresent(backdraft_buff) and Spell(incinerate) or Spell(dimensional_rift) or BuffRemaining(mana_tap_buff) <= BaseDuration(mana_tap_buff) * 0.3 and { ManaPercent() < 20 or BuffRemaining(mana_tap_buff) <= CastTime(chaos_bolt) } and target.TimeToDie() > BaseDuration(mana_tap_buff) * 0.3 and Spell(mana_tap) or Spell(chaos_bolt) or not Talent(roaring_blaze_talent) and not BuffPresent(backdraft_buff) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and target.DebuffRemaining(immolate_debuff) <= BaseDuration(immolate_debuff) * 0.3 and Spell(immolate) or Talent(mana_tap_talent) and ManaPercent() <= 10 and Spell(life_tap) or Spell(incinerate) or Spell(life_tap)
 }
 
 ### actions.precombat
 
 AddFunction DestructionPrecombatMainActions
 {
+	#augmentation,type=defiled
+	Spell(augmentation)
 	#snapshot_stats
 	#grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
 	if Talent(grimoire_of_sacrifice_talent) and pet.Present() Spell(grimoire_of_sacrifice)
+	#potion,name=deadly_grace
 	#mana_tap,if=talent.mana_tap.enabled&!buff.mana_tap.remains
 	if Talent(mana_tap_talent) and not BuffPresent(mana_tap_buff) Spell(mana_tap)
 	#incinerate
@@ -774,15 +835,15 @@ AddFunction DestructionPrecombatMainPostConditions
 
 AddFunction DestructionPrecombatShortCdActions
 {
-	#flask,type=greater_draenic_intellect_flask
-	#food,type=frosty_stew
+	#flask,type=whispered_pact
+	#food,type=azshari_salad
 	#summon_pet,if=!talent.grimoire_of_supremacy.enabled&(!talent.grimoire_of_sacrifice.enabled|buff.demonic_power.down)
 	if not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() Spell(summon_imp)
 }
 
 AddFunction DestructionPrecombatShortCdPostConditions
 {
-	Talent(mana_tap_talent) and not BuffPresent(mana_tap_buff) and Spell(mana_tap) or Spell(incinerate)
+	Spell(augmentation) or Talent(mana_tap_talent) and not BuffPresent(mana_tap_buff) and Spell(mana_tap) or Spell(incinerate)
 }
 
 AddFunction DestructionPrecombatCdActions
@@ -793,14 +854,12 @@ AddFunction DestructionPrecombatCdActions
 		if Talent(grimoire_of_supremacy_talent) and Enemies() < 3 Spell(summon_doomguard)
 		#summon_infernal,if=talent.grimoire_of_supremacy.enabled&active_enemies>=3
 		if Talent(grimoire_of_supremacy_talent) and Enemies() >= 3 Spell(summon_infernal)
-		#potion,name=draenic_intellect
-		DestructionUsePotionIntellect()
 	}
 }
 
 AddFunction DestructionPrecombatCdPostConditions
 {
-	not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_imp) or Talent(mana_tap_talent) and not BuffPresent(mana_tap_buff) and Spell(mana_tap) or Spell(incinerate)
+	not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_imp) or Spell(augmentation) or Talent(mana_tap_talent) and not BuffPresent(mana_tap_buff) and Spell(mana_tap) or Spell(incinerate)
 }
 
 ### Destruction icons.
@@ -863,6 +922,8 @@ AddIcon checkbox=opt_warlock_destruction_aoe help=cd specialization=destruction
 
 ### Required symbols
 # arcane_torrent_mana
+# augmentation
+# backdraft_buff
 # berserking
 # blood_fury_sp
 # cataclysm
@@ -871,21 +932,19 @@ AddIcon checkbox=opt_warlock_destruction_aoe help=cd specialization=destruction
 # conflagrate
 # conflagration_of_chaos_buff
 # demonic_power_buff
-# draenic_intellect_potion
+# dimensional_rift
 # grimoire_of_sacrifice
 # grimoire_of_sacrifice_talent
 # grimoire_of_supremacy_talent
 # immolate
 # immolate_debuff
 # incinerate
-# legendary_ring_intellect
 # life_tap
 # lord_of_flames
 # lord_of_flames_buff
 # mana_tap
 # mana_tap_buff
 # mana_tap_talent
-# nithramus_buff
 # roaring_blaze_debuff
 # roaring_blaze_talent
 # service_imp

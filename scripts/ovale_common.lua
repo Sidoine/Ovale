@@ -49,6 +49,11 @@ SpellList(potion_armor_buff draenic_armor_potion_buff mountains_potion_buff)
 SpellList(potion_intellect_buff draenic_intellect_potion_buff jade_serpent_potion_buff)
 SpellList(potion_strength_buff draenic_strength_potion_buff golemblood_potion_buff)
 
+# Legion
+Define(augmentation 140587)
+Define(unbending_potion_buff 188029)
+SpellList(potion_buff unbending_potion_buff)
+
 ###
 ### Trinkets
 ###

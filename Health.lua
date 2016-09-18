@@ -155,6 +155,7 @@ function OvaleHealth:Ovale_UnitChanged(event, unitId, guid)
 end
 
 function OvaleHealth:UpdateHealth(event, unitId)
+	if not unitId then return end
 	self:StartProfiling("OvaleHealth_UpdateHealth")
 	local func = API_UnitHealth
 	local db = self.health

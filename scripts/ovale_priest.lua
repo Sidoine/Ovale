@@ -5,23 +5,22 @@ local OvaleScripts = Ovale.OvaleScripts
 -- ANY CHANGES MADE BELOW THIS POINT WILL BE LOST.
 
 do
-	local name = "simulationcraft_priest_shadow_t18m"
-	local desc = "[7.0] SimulationCraft: Priest_Shadow_T18M"
+	local name = "simulationcraft_priest_shadow_t19p"
+	local desc = "[7.0] SimulationCraft: Priest_Shadow_T19P"
 	local code = [[
-# Based on SimulationCraft profile "Priest_Shadow_T18M".
+# Based on SimulationCraft profile "Priest_Shadow_T19P".
 #	class=priest
 #	spec=shadow
-#	talents=1213231
+#	talents=1001231
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_priest_spells)
 
-
 AddFunction s2mcheck_value
 {
-	0.85 * { 45 + SpellHaste() * 100 * { 2 + 1 * TalentPoints(reaper_of_souls_talent) + 2 * 0 - 1 * TalentPoints(sanlayn_talent) } } - actors_fight_time_mod() * 0
+	0.8 * { 45 + SpellHaste() * 100 * { 2 + 1 * TalentPoints(reaper_of_souls_talent) + 2 * 0 - 1 * TalentPoints(sanlayn_talent) } } - actors_fight_time_mod() * 0
 }
 
 AddFunction s2mcheck
@@ -42,22 +41,15 @@ AddFunction s2mcheck_min
 	180
 }
 
-AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default specialization=shadow)
-AddCheckBox(opt_legendary_ring_intellect ItemName(legendary_ring_intellect) default specialization=shadow)
-
-AddFunction ShadowUsePotionIntellect
-{
-	if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
-}
-
 ### actions.default
 
 AddFunction ShadowDefaultMainActions
 {
+	#potion,name=deadly_grace,if=buff.bloodlust.react|target.time_to_die<=40|buff.voidform.stack>80
 	#variable,op=set,name=actors_fight_time_mod,value=0
 	#variable,op=set,name=actors_fight_time_mod,value=-((-(450)+(time+target.time_to_die))%10),if=time+target.time_to_die>450&time+target.time_to_die<600
 	#variable,op=set,name=actors_fight_time_mod,value=((450-(time+target.time_to_die))%5),if=time+target.time_to_die<=450
-	#variable,op=set,name=s2mcheck,value=0.85*(45+((raw_haste_pct*100)*(2+(1*talent.reaper_of_souls.enabled)+(2*artifact.mass_hysteria.rank)-(1*talent.sanlayn.enabled))))-(variable.actors_fight_time_mod*nonexecute_actors_pct)
+	#variable,op=set,name=s2mcheck,value=0.8*(45+((raw_haste_pct*100)*(2+(1*talent.reaper_of_souls.enabled)+(2*artifact.mass_hysteria.rank)-(1*talent.sanlayn.enabled))))-(variable.actors_fight_time_mod*nonexecute_actors_pct)
 	#variable,op=min,name=s2mcheck,value=180
 	#call_action_list,name=s2m,if=buff.voidform.up&buff.surrender_to_madness.up
 	if BuffPresent(voidform_buff) and BuffPresent(surrender_to_madness_buff) ShadowS2mMainActions()
@@ -82,10 +74,11 @@ AddFunction ShadowDefaultMainPostConditions
 
 AddFunction ShadowDefaultShortCdActions
 {
+	#potion,name=deadly_grace,if=buff.bloodlust.react|target.time_to_die<=40|buff.voidform.stack>80
 	#variable,op=set,name=actors_fight_time_mod,value=0
 	#variable,op=set,name=actors_fight_time_mod,value=-((-(450)+(time+target.time_to_die))%10),if=time+target.time_to_die>450&time+target.time_to_die<600
 	#variable,op=set,name=actors_fight_time_mod,value=((450-(time+target.time_to_die))%5),if=time+target.time_to_die<=450
-	#variable,op=set,name=s2mcheck,value=0.85*(45+((raw_haste_pct*100)*(2+(1*talent.reaper_of_souls.enabled)+(2*artifact.mass_hysteria.rank)-(1*talent.sanlayn.enabled))))-(variable.actors_fight_time_mod*nonexecute_actors_pct)
+	#variable,op=set,name=s2mcheck,value=0.8*(45+((raw_haste_pct*100)*(2+(1*talent.reaper_of_souls.enabled)+(2*artifact.mass_hysteria.rank)-(1*talent.sanlayn.enabled))))-(variable.actors_fight_time_mod*nonexecute_actors_pct)
 	#variable,op=min,name=s2mcheck,value=180
 	#call_action_list,name=s2m,if=buff.voidform.up&buff.surrender_to_madness.up
 	if BuffPresent(voidform_buff) and BuffPresent(surrender_to_madness_buff) ShadowS2mShortCdActions()
@@ -110,14 +103,11 @@ AddFunction ShadowDefaultShortCdPostConditions
 
 AddFunction ShadowDefaultCdActions
 {
-	#use_item,slot=finger1
-	if CheckBoxOn(opt_legendary_ring_intellect) Item(legendary_ring_intellect usable=1)
-	#potion,name=draenic_intellect,if=buff.bloodlust.react|target.time_to_die<=40
-	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 40 ShadowUsePotionIntellect()
+	#potion,name=deadly_grace,if=buff.bloodlust.react|target.time_to_die<=40|buff.voidform.stack>80
 	#variable,op=set,name=actors_fight_time_mod,value=0
 	#variable,op=set,name=actors_fight_time_mod,value=-((-(450)+(time+target.time_to_die))%10),if=time+target.time_to_die>450&time+target.time_to_die<600
 	#variable,op=set,name=actors_fight_time_mod,value=((450-(time+target.time_to_die))%5),if=time+target.time_to_die<=450
-	#variable,op=set,name=s2mcheck,value=0.85*(45+((raw_haste_pct*100)*(2+(1*talent.reaper_of_souls.enabled)+(2*artifact.mass_hysteria.rank)-(1*talent.sanlayn.enabled))))-(variable.actors_fight_time_mod*nonexecute_actors_pct)
+	#variable,op=set,name=s2mcheck,value=0.8*(45+((raw_haste_pct*100)*(2+(1*talent.reaper_of_souls.enabled)+(2*artifact.mass_hysteria.rank)-(1*talent.sanlayn.enabled))))-(variable.actors_fight_time_mod*nonexecute_actors_pct)
 	#variable,op=min,name=s2mcheck,value=180
 	#call_action_list,name=s2m,if=buff.voidform.up&buff.surrender_to_madness.up
 	if BuffPresent(voidform_buff) and BuffPresent(surrender_to_madness_buff) ShadowS2mCdActions()
@@ -228,6 +218,12 @@ AddFunction ShadowMainCdPostConditions
 
 AddFunction ShadowPrecombatMainActions
 {
+	#flask,type=flask_of_the_whispered_pact
+	#food,type=azshari_salad
+	#augmentation,type=defiled
+	Spell(augmentation)
+	#snapshot_stats
+	#potion,name=deadly_grace
 	#mind_blast
 	Spell(mind_blast)
 }
@@ -242,21 +238,16 @@ AddFunction ShadowPrecombatShortCdActions
 
 AddFunction ShadowPrecombatShortCdPostConditions
 {
-	Spell(mind_blast)
+	Spell(augmentation) or Spell(mind_blast)
 }
 
 AddFunction ShadowPrecombatCdActions
 {
-	#flask,type=greater_draenic_intellect_flask
-	#food,type=buttered_sturgeon
-	#snapshot_stats
-	#potion,name=draenic_intellect
-	ShadowUsePotionIntellect()
 }
 
 AddFunction ShadowPrecombatCdPostConditions
 {
-	Spell(mind_blast)
+	Spell(augmentation) or Spell(mind_blast)
 }
 
 ### actions.s2m
@@ -599,16 +590,15 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 }
 
 ### Required symbols
+# augmentation
 # auspicious_spirits_talent
 # berserking
 # berserking_buff
 # dispersion
-# draenic_intellect_potion
 # fortress_of_the_mind_talent
 # from_the_shadows
 # insanity_drain_stacks_buff
 # legacy_of_the_void_talent
-# legendary_ring_intellect
 # mass_hysteria
 # mind_blast
 # mind_flay

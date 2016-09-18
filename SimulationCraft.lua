@@ -53,6 +53,7 @@ local KEYWORD = {}
 
 local MODIFIER_KEYWORD = {
 	["ammo_type"] = true,
+	["animation_cancel"] = true,
 	["attack_speed"] = true,
 	["chain"] = true,
 	["choose"] = true,
@@ -1081,6 +1082,7 @@ local function InitializeDisambiguation()
 	AddDisambiguation("force_of_nature",		"force_of_nature_caster",		"DRUID",		"balance")
 	AddDisambiguation("force_of_nature",		"force_of_nature_melee",		"DRUID",		"feral")
 	AddDisambiguation("force_of_nature",		"force_of_nature_tank",			"DRUID",		"guardian")
+	AddDisambiguation("fury_of_elue", "fury_of_elune", "DRUID")
 	AddDisambiguation("heart_of_the_wild",		"heart_of_the_wild_tank",		"DRUID",		"guardian")
 	AddDisambiguation("incarnation",			"incarnation_chosen_of_elune",	"DRUID",		"balance")
 	AddDisambiguation("incarnation",			"incarnation_king_of_the_jungle",	"DRUID",	"feral")
@@ -1121,6 +1123,7 @@ local function InitializeDisambiguation()
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_holy",			"PALADIN")
 	AddDisambiguation("avenging_wrath",			"avenging_wrath_heal",			"PALADIN",		"holy")
 	AddDisambiguation("avenging_wrath",			"avenging_wrath_melee",			"PALADIN",		"retribution")
+	AddDisambiguation("avenging_wrath",			"avenging_wrath_melee",			"PALADIN",		"protection")
 	AddDisambiguation("blood_fury",				"blood_fury_apsp",				"PALADIN")
 	AddDisambiguation("legendary_ring",			"legendary_ring_bonus_armor",	"PALADIN",		"protection", "Item")
 	AddDisambiguation("legendary_ring",			"legendary_ring_spirit",		"PALADIN",		"holy", "Item")
@@ -1152,6 +1155,7 @@ local function InitializeDisambiguation()
 	AddDisambiguation("envenom_debuff",			"envenom_buff",					"ROGUE")
 	AddDisambiguation("vendetta_buff",			"vendetta_debuff",				"ROGUE",		"assassination") -- TODO Strange, is there actualy a buff?
 	AddDisambiguation("deeper_strategem_talent","deeper_stratagem_talent",      "ROGUE",        "subtlety")
+	AddDisambiguation("finality_nightblade_buff", "finality_nightblade_debuff", "ROGUE")
 	-- Shaman
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_mana",			"SHAMAN")
 	AddDisambiguation("ascendance",				"ascendance_caster",			"SHAMAN",		"elemental")
@@ -2963,8 +2967,12 @@ do
 		["cp_max_spend"]		= "MaxComboPoints()", -- TODO Difference with combo_points.max??
 		["crit_pct_current"]	= "SpellCritChance()",
 		["current_insanity_drain"] = "CurrentInsanityDrain()",
+		["darkglare_no_de"]     = "NotDeDemons(darkglare)",
 		["demonic_fury"]		= "DemonicFury()",
 		["desired_targets"]		= "Enemies(tagged=1)",
+		["doomguard_no_de"]		= "NotDeDemons(doomguard)",
+		["dreadstalker_no_de"]  = "NotDeDemons(dreadstalker)",
+		["dreadstalker_remaining_duration"] = "DemonDuration(dreadstalker)",
 		["eclipse_change"]		= "TimeToEclipse()",	-- XXX
 		["eclipse_energy"]		= "EclipseEnergy()",	-- XXX
 		["enemies"]				= "Enemies()",
@@ -2973,17 +2981,21 @@ do
 		["energy.max"]			= "MaxEnergy()",
 		["energy.regen"]		= "EnergyRegenRate()",
 		["energy.time_to_max"]	= "TimeToMaxEnergy()",
+		["finality"]			= "HasArtifactTrait(finality)",
 		["focus"]				= "Focus()",
 		["focus.deficit"]		= "FocusDeficit()",
 		["focus.regen"]			= "FocusRegenRate()",
 		["focus.time_to_max"]	= "TimeToMaxFocus()",
 		["frost.frac"]			= "Rune(frost)",
+		["fury"]				= "DemonicFury()",
+		["fury.deficit"]		= "DemonicFuryDeficit()",
 		["health"]				= "Health()",
 		["health.deficit"]		= "HealthMissing()",
 		["health.max"]			= "MaxHealth()",
 		["health.pct"]			= "HealthPercent()",
 		["health.percent"]		= "HealthPercent()",
 		["holy_power"]			= "HolyPower()",
+		["infernal_no_de"]		= "NotDeDemons(infernal)",
 		["insanity"]			= "Insanity()",
 		["level"]				= "Level()",
 		["lunar_max"]			= "TimeToEclipse(lunar)",	-- XXX
@@ -2997,8 +3009,11 @@ do
 		["rage.deficit"]		= "RageDeficit()",
 		["rage.max"]			= "MaxRage()",
 		["raw_haste_pct"]		= "SpellHaste()",
+		["rtb_list.any.5"]		= "BuffCount(roll_the_bones_buff more 4)",
+		["rtb_list.any.6"]		= "BuffCount(roll_the_bones_buff more 5)",
 		["runic_power"]			= "RunicPower()",
 		["runic_power.deficit"]	= "RunicPowerDeficit()",
+		["service_no_de"]		= "0", -- TODO manage service pet in WildImps.lua
 		["shadow_orb"]			= "ShadowOrbs()",
 		["solar_max"]			= "TimeToEclipse(solar)",	-- XXX
 		["soul_shard"]			= "SoulShards()",
@@ -3007,7 +3022,9 @@ do
 		["time"]				= "TimeInCombat()",
 		["time_to_die"]			= "TimeToDie()",
 		["time_to_die.remains"]	= "TimeToDie()",
-		["wild_imp_no_de"]		= "0" -- TODO
+		["wild_imp_count"] 		= "Demons(wild_imp)",
+		["wild_imp_no_de"]		= "NotDeDemons(wild_imp)",
+		["wild_imp_remaining_duration"] = "DemonDuration(wild_imp)"
 	}
 
 	EmitOperandCharacter = function(operand, parseNode, nodeList, annotation, action, target)
@@ -3130,7 +3147,7 @@ EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
 		end
 
 		local code
-		if property == "duration" then
+		if property == "duration" or property == "ready" then
 			code = format("%sCooldownDuration(%s)", prefix, name)
 		elseif property == "remains" then
 			if parseNode.asType == "boolean" then

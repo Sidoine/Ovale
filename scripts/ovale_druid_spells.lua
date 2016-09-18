@@ -340,6 +340,12 @@ Define(wild_charge_cat 49376)
 	
 # Legendary items
 Define(ailuro_pouncers 137024)
+Define(the_emerald_dreamcatcher 137062)
+Define(the_emerald_dreamcatcher_buff 224706)
+	SpellAddBuff(starsurge the_emerald_dreamcatcher_buff=-1)
+Define(oneths_overconfidence_buff 209407)
+	SpellRequire(starfall astralpower 0=buff,oneths_overconfidence_buff)
+	SpellAddBuff(starfall oneths_overconfidence_buff=-1)
 
 # Talents
 Define(astral_communion_talent 17)

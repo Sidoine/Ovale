@@ -178,6 +178,16 @@ do
 end
 
 do
+	local function HasArtifactTrait(positionalParams, namedParams, state, atTime)
+		local spellId, yesno = positionalParams[1], positionalParams[2]
+		local value = false -- TODO
+		return TestBoolean(value, yesno)
+	end
+
+	OvaleCondition:RegisterCondition("hasartifacttrait", false, HasArtifactTrait)
+end
+
+do
 	--- Get the base duration of the aura in seconds if it is applied at the current time.
 	-- @name BaseDuration
 	-- @paramsig number or boolean
@@ -1264,6 +1274,30 @@ do
 
 	OvaleCondition:RegisterCondition("damagetaken", false, DamageTaken)
 	OvaleCondition:RegisterCondition("incomingdamage", false, DamageTaken)
+end
+
+do
+	local function Demons(positionalParams, namedParams, state, atTime)
+		local creatureId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local value = state:GetDemonsCount(creatureId, atTime)
+		return Compare(value, comparator, limit) 
+	end
+
+	local function NotDeDemons(positionalParams, namedParams, state, atTime)
+		local creatureId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local value = state:GetNotDemonicEmpoweredDemonsCount(creatureId, atTime)
+		return Compare(value, comparator, limit) 
+	end
+
+	local function DemonDuration(positionalParams, namedParams, state, atTime)
+		local creatureId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local value = state:GetRemainingDemonDuration(creatureId, atTime)
+		return Compare(value, comparator, limit) 
+	end
+
+	OvaleCondition:RegisterCondition("demons", false, Demons)
+	OvaleCondition:RegisterCondition("notdedemons", false, NotDeDemons)
+	OvaleCondition:RegisterCondition("demonduration", false, DemonDuration)
 end
 
 do

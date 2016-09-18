@@ -112,6 +112,7 @@ Define(frost_bomb 112948)
 Define(frost_bomb_debuff 112948)
 	SpellInfo(frost_bomb_debuff duration=12)
 Define(frost_bomb_talent 13)
+Define(frost_nova 122)
 Define(frostbolt 116)
 	SpellInfo(frostbolt travel_time=1)
 	SpellAddBuff(frostbolt ice_floes_buff=0 if_spell=ice_floes)
@@ -224,6 +225,8 @@ Define(pyroblast_debuff 11366)
 	SpellInfo(pyroblast_debuff duration=18 haste=spell tick=3)
 Define(pyromaniac_buff 166868)
 	SpellInfo(pyromaniac_buff duration=4)
+Define(quickening_buff 198924)
+	SpellAddBuff(arcane_barrage quickening_buff=0)
 Define(ray_of_frost 205021)
 	SpellInfo(ray_of_frost cd=60 channel=10)
 Define(ray_of_frost_talent 1)
@@ -267,6 +270,8 @@ Define(winters_chill_debuff 157997) # TODO ???
 # Talents
 Define(summon_arcane_familiar 205022)
 	SpellInfo(summon_arcane_familiar cd=10)
+Define(rune_on_power_talent 8)
+Define(unstable_magic_talent 17)
 	
 # Artifacts
 Define(mark_of_aluneth 210726)
@@ -275,6 +280,8 @@ Define(mark_of_aluneth_debuff 210726) # ???
 
 # Legendary items
 Define(rhonins_assaulting_armwraps_buff 208081)
+Define(zannesu_journey_buff 226852)
+	SpellAddBuff(blizzard zannesu_journey_buff=-1)
 
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(arcane_orb tag=shortcd)

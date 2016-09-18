@@ -514,6 +514,7 @@ WoWMock.SPELL_POWER_PAIN            = 18
 
 WoWMock.RAID_CLASS_COLORS = {
 	["HUNTER"] = { r = 0.67, g = 0.83, b = 0.45, colorStr = "ffabd473" },
+	["DEMONHUNTER"] = { r = 0.77, g = 0.19, b = 0.79, colorStr = "ffa330c9" },
 	["WARLOCK"] = { r = 0.58, g = 0.51, b = 0.79, colorStr = "ff9482c9" },
 	["PRIEST"] = { r = 1.0, g = 1.0, b = 1.0, colorStr = "ffffffff" },
 	["PALADIN"] = { r = 0.96, g = 0.55, b = 0.73, colorStr = "fff58cba" },
@@ -982,7 +983,7 @@ WoWMock.bit = {
 	bor = DoNothing,
 }
 
-WoWMock.LibStub = LibStub
+_G.LibStub = LibStub
 --</public-static-properties>
 
 --<private-static-methods>

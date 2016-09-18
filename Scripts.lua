@@ -146,9 +146,9 @@ function OvaleScripts:GetDefaultScriptName(class, specialization)
 		if specialization == "blood" then
 			name = "icyveins_deathknight_blood"
 		elseif specialization == "frost" then
-			name = "simulationcraft_death_knight_frost_t18m"
+			name = "simulationcraft_death_knight_frost_t19p"
 		elseif specialization == "unholy" then
-			name = "simulationcraft_death_knight_unholy_t18m"
+			name = "simulationcraft_death_knight_unholy_t19p"
 		end
 	elseif class == "DEMONHUNTER" then
 		if specialization then 
@@ -168,7 +168,7 @@ function OvaleScripts:GetDefaultScriptName(class, specialization)
 			short = "sv"
 		end
 		if short then
-			name = format("simulationcraft_hunter_%s_t18m", short)
+			name = format("simulationcraft_hunter_%s_t19p", short)
 		end
 	elseif class == "MONK" then
 		if specialization == "brewmaster" then
@@ -191,15 +191,15 @@ function OvaleScripts:GetDefaultScriptName(class, specialization)
 			name = DISABLED_NAME
 		end
 	elseif class == "WARRIOR" then
-		if specialization == "fury" then
-			local weaponType = OvaleEquipment:HasMainHandWeapon(1) and "1h" or "2h"
-			name = format("simulationcraft_warrior_fury_%s_t18m", weaponType)
-		elseif specialization == "protection" then
-			name = DISABLED_NAME
-		end
+		-- if specialization == "fury" then
+		-- 	local weaponType = OvaleEquipment:HasMainHandWeapon(1) and "1h" or "2h"
+		-- 	name = format("simulationcraft_warrior_fury_%s_t18m", weaponType)
+		-- elseif specialization == "protection" then
+		-- 	name = DISABLED_NAME
+		-- end
 	end
 	if not name and specialization then
-		name = format("simulationcraft_%s_%s_t18m", strlower(class), specialization)
+		name = format("simulationcraft_%s_%s_t19p", strlower(class), specialization)
 	end
 	if not (name and self.script[name]) then
 		name = DISABLED_NAME

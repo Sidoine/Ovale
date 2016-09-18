@@ -5,26 +5,18 @@ local OvaleScripts = Ovale.OvaleScripts
 -- ANY CHANGES MADE BELOW THIS POINT WILL BE LOST.
 
 do
-	local name = "simulationcraft_hunter_bm_t18m"
-	local desc = "[7.0] SimulationCraft: Hunter_BM_T18M"
+	local name = "simulationcraft_hunter_bm_t19p"
+	local desc = "[7.0] SimulationCraft: Hunter_BM_T19P"
 	local code = [[
-# Based on SimulationCraft profile "Hunter_BM_T18M".
+# Based on SimulationCraft profile "Hunter_BM_T19P".
 #	class=hunter
 #	spec=beast_mastery
-#	talents=3102012
+#	talents=2102012
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_hunter_spells)
-
-AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=beast_mastery)
-AddCheckBox(opt_legendary_ring_agility ItemName(legendary_ring_agility) default specialization=beast_mastery)
-
-AddFunction BeastMasteryUsePotionAgility
-{
-	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
-}
 
 AddFunction BeastMasterySummonPet
 {
@@ -85,8 +77,6 @@ AddFunction BeastMasteryDefaultShortCdPostConditions
 AddFunction BeastMasteryDefaultCdActions
 {
 	#auto_shot
-	#use_item,name=maalus_the_blood_drinker
-	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury
@@ -116,6 +106,10 @@ AddFunction BeastMasteryDefaultCdPostConditions
 
 AddFunction BeastMasteryPrecombatMainActions
 {
+	#snapshot_stats
+	#potion,name=deadly_grace
+	#augmentation,type=defiled
+	Spell(augmentation)
 }
 
 AddFunction BeastMasteryPrecombatMainPostConditions
@@ -124,25 +118,24 @@ AddFunction BeastMasteryPrecombatMainPostConditions
 
 AddFunction BeastMasteryPrecombatShortCdActions
 {
-	#flask,type=greater_draenic_agility_flask
-	#food,type=salty_squid_roll
+	#flask,type=flask_of_the_seventh_demon
+	#food,type=nightborne_delicacy_platter
 	#summon_pet
 	BeastMasterySummonPet()
 }
 
 AddFunction BeastMasteryPrecombatShortCdPostConditions
 {
+	Spell(augmentation)
 }
 
 AddFunction BeastMasteryPrecombatCdActions
 {
-	#snapshot_stats
-	#potion,name=draenic_agility
-	BeastMasteryUsePotionAgility()
 }
 
 AddFunction BeastMasteryPrecombatCdPostConditions
 {
+	Spell(augmentation)
 }
 
 ### BeastMastery icons.
@@ -207,6 +200,7 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # a_murder_of_crows
 # arcane_torrent_focus
 # aspect_of_the_wild
+# augmentation
 # barrage
 # berserking
 # bestial_wrath
@@ -216,10 +210,8 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # cobra_shot
 # dire_beast
 # dire_frenzy
-# draenic_agility_potion
 # kill_command
 # killer_cobra_talent
-# legendary_ring_agility
 # multi_shot
 # pet_beast_cleave_buff
 # revive_pet
@@ -230,10 +222,10 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 end
 
 do
-	local name = "simulationcraft_hunter_mm_t18m"
-	local desc = "[7.0] SimulationCraft: Hunter_MM_T18M"
+	local name = "simulationcraft_hunter_mm_t19p"
+	local desc = "[7.0] SimulationCraft: Hunter_MM_T19P"
 	local code = [[
-# Based on SimulationCraft profile "Hunter_MM_T18M".
+# Based on SimulationCraft profile "Hunter_MM_T19P".
 #	class=hunter
 #	spec=marksmanship
 #	talents=1103021
@@ -242,29 +234,6 @@ Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_hunter_spells)
-
-AddCheckBox(opt_interrupt L(interrupt) default specialization=marksmanship)
-AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=marksmanship)
-AddCheckBox(opt_legendary_ring_agility ItemName(legendary_ring_agility) default specialization=marksmanship)
-
-AddFunction MarksmanshipUsePotionAgility
-{
-	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
-}
-
-AddFunction MarksmanshipInterruptActions
-{
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-	{
-		Spell(silencing_shot)
-		if not target.Classification(worldboss)
-		{
-			Spell(arcane_torrent_focus)
-			if target.InRange(quaking_palm) Spell(quaking_palm)
-			Spell(war_stomp)
-		}
-	}
-}
 
 AddFunction MarksmanshipSummonPet
 {
@@ -382,10 +351,6 @@ AddFunction MarksmanshipDefaultShortCdPostConditions
 AddFunction MarksmanshipDefaultCdActions
 {
 	#auto_shot
-	#silencing_shot
-	MarksmanshipInterruptActions()
-	#use_item,name=maalus_the_blood_drinker
-	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury
@@ -435,6 +400,12 @@ AddFunction MarksmanshipCooldownsCdPostConditions
 
 AddFunction MarksmanshipPrecombatMainActions
 {
+	#snapshot_stats
+	#potion,name=deadly_grace
+	#augmentation,type=defiled
+	Spell(augmentation)
+	#windburst
+	Spell(windburst)
 }
 
 AddFunction MarksmanshipPrecombatMainPostConditions
@@ -443,25 +414,24 @@ AddFunction MarksmanshipPrecombatMainPostConditions
 
 AddFunction MarksmanshipPrecombatShortCdActions
 {
-	#flask,type=greater_draenic_agility_flask
-	#food,type=salty_squid_roll
+	#flask,type=flask_of_the_seventh_demon
+	#food,type=nightborne_delicacy_platter
 	#summon_pet
 	MarksmanshipSummonPet()
 }
 
 AddFunction MarksmanshipPrecombatShortCdPostConditions
 {
+	Spell(augmentation) or Spell(windburst)
 }
 
 AddFunction MarksmanshipPrecombatCdActions
 {
-	#snapshot_stats
-	#potion,name=draenic_agility
-	MarksmanshipUsePotionAgility()
 }
 
 AddFunction MarksmanshipPrecombatCdPostConditions
 {
+	Spell(augmentation) or Spell(windburst)
 }
 
 ### Marksmanship icons.
@@ -527,15 +497,14 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # aimed_shot
 # arcane_shot
 # arcane_torrent_focus
+# augmentation
 # barrage
 # berserking
 # black_arrow
 # blood_fury_ap
 # bullseye_buff
-# draenic_agility_potion
 # explosive_shot
 # hunters_mark_debuff
-# legendary_ring_agility
 # lock_and_load_buff
 # lone_wolf_talent
 # marked_shot
@@ -543,12 +512,10 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # multishot
 # patient_sniper_talent
 # piercing_shot
-# quaking_palm
 # revive_pet
 # sentinel
 # sidewinders
 # sidewinders_talent
-# silencing_shot
 # steady_focus_buff
 # steady_focus_talent
 # true_aim_debuff
@@ -556,17 +523,16 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # trueshot
 # trueshot_buff
 # vulnerability_debuff
-# war_stomp
 # windburst
 ]]
 	OvaleScripts:RegisterScript("HUNTER", "marksmanship", name, desc, code, "script")
 end
 
 do
-	local name = "simulationcraft_hunter_sv_t18m"
-	local desc = "[7.0] SimulationCraft: Hunter_SV_T18M"
+	local name = "simulationcraft_hunter_sv_t19p"
+	local desc = "[7.0] SimulationCraft: Hunter_SV_T19P"
 	local code = [[
-# Based on SimulationCraft profile "Hunter_SV_T18M".
+# Based on SimulationCraft profile "Hunter_SV_T19P".
 #	class=hunter
 #	spec=survival
 #	talents=3302022
@@ -576,28 +542,12 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_hunter_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default specialization=survival)
-AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default specialization=survival)
-AddCheckBox(opt_legendary_ring_agility ItemName(legendary_ring_agility) default specialization=survival)
 AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default specialization=survival)
 
-AddFunction SurvivalUsePotionAgility
+AddFunction SurvivalUseItemActions
 {
-	if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
-}
-
-AddFunction SurvivalInterruptActions
-{
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-	{
-		Spell(muzzle)
-		if not target.Classification(worldboss)
-		{
-			Spell(arcane_torrent_focus)
-			if target.InRange(quaking_palm) Spell(quaking_palm)
-			Spell(war_stomp)
-		}
-	}
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
 }
 
 AddFunction SurvivalSummonPet
@@ -686,16 +636,14 @@ AddFunction SurvivalDefaultShortCdPostConditions
 AddFunction SurvivalDefaultCdActions
 {
 	#auto_attack
-	#muzzle
-	SurvivalInterruptActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury
 	Spell(blood_fury_ap)
 	#berserking
 	Spell(berserking)
-	#use_item,name=maalus_the_blood_drinker
-	if CheckBoxOn(opt_legendary_ring_agility) Item(legendary_ring_agility usable=1)
+	#use_item,name=tirathons_betrayal
+	SurvivalUseItemActions()
 
 	unless CheckBoxOn(opt_trap_launcher) and Spell(steel_trap) or CheckBoxOn(opt_trap_launcher) and Spell(explosive_trap) or Spell(dragonsfire_grenade) or Spell(caltrops) or Talent(serpent_sting_talent) and Enemies() >= 3 and { not target.DebuffPresent(serpent_sting_debuff) or target.DebuffRemaining(serpent_sting_debuff) <= GCD() } and Spell(carve) or { Talent(serpent_sting_talent) and Enemies() <= 2 and { not target.DebuffPresent(serpent_sting_debuff) or target.DebuffRemaining(serpent_sting_debuff) <= GCD() } or Talent(way_of_the_moknathal_talent) and { BuffRemaining(moknathal_tactics_buff) < GCD() or BuffExpires(moknathal_tactics_buff) } } and Spell(raptor_strike)
 	{
@@ -713,6 +661,10 @@ AddFunction SurvivalDefaultCdPostConditions
 
 AddFunction SurvivalPrecombatMainActions
 {
+	#snapshot_stats
+	#potion,name=deadly_grace
+	#augmentation,type=defiled
+	Spell(augmentation)
 	#harpoon
 	Spell(harpoon)
 }
@@ -723,27 +675,24 @@ AddFunction SurvivalPrecombatMainPostConditions
 
 AddFunction SurvivalPrecombatShortCdActions
 {
-	#flask,type=greater_draenic_agility_flask
-	#food,type=pickled_eel
+	#flask,type=flask_of_the_seventh_demon
+	#food,type=seedbattered_fish_plate
 	#summon_pet
 	SurvivalSummonPet()
 }
 
 AddFunction SurvivalPrecombatShortCdPostConditions
 {
-	Spell(harpoon)
+	Spell(augmentation) or Spell(harpoon)
 }
 
 AddFunction SurvivalPrecombatCdActions
 {
-	#snapshot_stats
-	#potion,name=draenic_agility
-	SurvivalUsePotionAgility()
 }
 
 AddFunction SurvivalPrecombatCdPostConditions
 {
-	Spell(harpoon)
+	Spell(augmentation) or Spell(harpoon)
 }
 
 ### Survival icons.
@@ -809,12 +758,12 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # arcane_torrent_focus
 # aspect_of_the_eagle
 # aspect_of_the_eagle_buff
+# augmentation
 # berserking
 # blood_fury_ap
 # butchery
 # caltrops
 # carve
-# draenic_agility_potion
 # dragonsfire_grenade
 # explosive_trap
 # flanking_strike
@@ -822,13 +771,10 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # harpoon
 # lacerate
 # lacerate_debuff
-# legendary_ring_agility
 # lone_wolf_talent
 # moknathal_tactics_buff
 # mongoose_bite
 # mongoose_fury_buff
-# muzzle
-# quaking_palm
 # raptor_strike
 # revive_pet
 # serpent_sting_debuff
@@ -839,7 +785,6 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # throwing_axes
 # throwing_axes_talent
 # trap_launcher
-# war_stomp
 # way_of_the_moknathal_talent
 ]]
 	OvaleScripts:RegisterScript("HUNTER", "survival", name, desc, code, "script")

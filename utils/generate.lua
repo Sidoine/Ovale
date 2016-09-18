@@ -5,6 +5,7 @@ local root = "../"
 
 local SIMC_CLASS = {
 	deathknight = true,
+	demonhunter = true,
 	druid = true,
 	hunter = true,
 	mage = true,

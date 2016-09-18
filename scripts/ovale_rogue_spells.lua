@@ -150,6 +150,11 @@ Define(fan_of_knives 51723)
 	SpellInfo(fan_of_knives buff_energy=silent_blades_buff buff_energy_amount=-6 itemset=T16_melee itemcount=2 specialization=assassination)
 	SpellInfo(fan_of_knives buff_energy=silent_blades_buff buff_energy_amount=-2 itemset=T16_melee itemcount=2 specialization=subtlety)
 	SpellAddBuff(fan_of_knives silent_blades_buff=0 itemset=T16_melee itemcount=2)
+Define(finality_nightblade 197395)
+	SpellInfo(finality_nightblade combo=finisher energy=25)
+	SpellAddTargetDebuff(finality_nightblade finality_nightblade_debuff=1)
+Define(finality_nightblade_debuff 197395)
+	SpellInfo(finality_nightblade_debuff duration=6)
 Define(find_weakness 91023)
 Define(find_weakness_debuff 91021)
 	SpellInfo(find_weakness_debuff duration=10)
@@ -171,6 +176,8 @@ Define(gloomblade 200758)
 	SpellInfo(gloomblade combo=1 energy=35)
 Define(goremaws_bite 209782)
 	SpellInfo(goremaws_bite cd=60 combo=3)
+Define(gouge 1776)
+	SpellInfo(gouge combo=1 cd=10 energy=25)
 Define(hemorrhage 16511)
 	SpellInfo(hemorrhage combo=1 energy=30)
 	SpellInfo(hemorrhage buff_energy=silent_blades_buff buff_energy_amount=-2 itemset=T16_melee itemcount=2)
@@ -393,6 +400,17 @@ Define(wound_poison 8679)
 	SpellAddBuff(wound_poison wound_poison_buff=1)
 Define(wound_poison_buff 8679)
 	SpellInfo(wound_poison_buff duration=3600)
+
+# Artifact
+Define(finality 197406)
+
+# Legion legendary items
+Define(shadow_satyrs_walk 137032)
+
+# Talents
+Define(deeper_strategem_talent 7)
+Define(dirty_tricks_talent 15)
+Define(vigor_talent 9)
 
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(premeditation tag=main)

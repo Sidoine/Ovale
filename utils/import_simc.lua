@@ -12,7 +12,7 @@ outputDirectory points to the directory where the profiles are imported.
 
 -- Constants.
 local outputDirectory = "../simulationcraft"
-local profilesDirectory = "../../SimulationCraft/profiles/Tier18M"
+local profilesDirectory = "../../SimulationCraft/profiles/Tier19P"
 local root = "../"
 
 local SIMC_CLASS = {
@@ -62,7 +62,7 @@ do
 		local ok = true
 		local lowername = strlower(name)
 
-		print ("import" .. lowername)
+		print ("import " .. lowername)
 
 		-- Lexer for the profile filename.
 		local tokenIterator = gmatch(lowername, "[^_.]+")
@@ -77,7 +77,7 @@ do
 			local class = tokenIterator()
 			-- SimulationCraft uses "death_knight" while WoW uses "deathknight".
 			local wowClass = class
-			if class == "death" then
+			if class == "death" or class == "demon" then
 				local token = tokenIterator()
 				class = class .. "_" .. token
 				wowClass = wowClass .. token
@@ -85,10 +85,12 @@ do
 			baseProfileName = class
 			if not SIMC_CLASS[wowClass] then
 				ok = false
+				print(wowClass .. " is not a class")
 			end
 			-- Skip class driver profile that just forces other profiles to be run.
 			if ok and strfind(lowername, class .. "_t%d+[a-z].simc") then
 				ok = false
+				print("Just a driver")
 			end
 		end
 
