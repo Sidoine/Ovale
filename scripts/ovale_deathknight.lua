@@ -26,51 +26,61 @@ AddFunction BloodDefaultShortCDActions
 AddFunction BloodDefaultMainActions
 {
 	BloodHealMe()
+	if InCombat() and not BuffPresent(bone_shield_buff) Spell(marrowrend)
 	if not Talent(soulgorge_talent) and target.DebuffRemaining(blood_plague_debuff) < 8 Spell(blood_boil)
-	if BuffStacks(bone_shield_buff) <= 1 Spell(marrowrend)
 	if target.DebuffRemaining(blood_plague_debuff) < 8 Spell(deaths_caress)
-	if Talent(ossuary_talent) and BuffStacks(bone_shield_buff) <5 Spell(marrowrend)
-	if Talent(mark_of_blood_talent) and not target.DebuffPresent(mark_of_blood_debuff) Spell(mark_of_blood)
-	if RunicPower() >= 80 Spell(death_strike)
-	if not Talent(soulgorge_talent) Spell(blood_boil)
-	Spell(death_and_decay)
-	if BuffStacks(bone_shield_buff) <= 7 Spell(marrowrend)
-	Spell(heart_strike)
-	Spell(blood_boil)
+	Spell(consumption)
+	if not BuffPresent(death_and_decay_buff) and BuffPresent(crimson_scourge_buff) Spell(death_and_decay)
+	if (BuffStacks(bone_shield_buff) <= 1 or (Talent(ossuary_talent) and BuffStacks(bone_shield_buff) <5)) Spell(marrowrend)
+	if not target.DebuffPresent(mark_of_blood_debuff) Spell(mark_of_blood)
+	if RunicPowerDeficit() <= 20 Spell(death_strike)
+	if BuffStacks(bone_shield_buff) <5 Spell(blood_boil)
+	
+	unless (BuffStacks(bone_shield_buff) <= 1 or (Talent(ossuary_talent) and BuffStacks(bone_shield_buff) <5))
+	{
+		if BuffStacks(bone_shield_buff) <= 7 Spell(marrowrend)
+		if not BuffPresent(death_and_decay_buff) and target.TimeToDie() >= 8 Spell(death_and_decay)
+		Spell(heart_strike)
+		Spell(blood_boil)
+	}
 }
 
 AddFunction BloodDefaultAoEActions
 {
 	BloodHealMe()
+	if InCombat() and not BuffPresent(bone_shield_buff) Spell(marrowrend)
 	if not Talent(soulgorge_talent) and target.DebuffRemaining(blood_plague_debuff) < 8 Spell(blood_boil)
-	if BuffStacks(bone_shield_buff) <= 1 Spell(marrowrend)
 	if target.DebuffRemaining(blood_plague_debuff) < 8 Spell(deaths_caress)
-	if Talent(ossuary_talent) and BuffStacks(bone_shield_buff) < 5 and Enemies() < 3 Spell(marrowrend)
-	if Talent(mark_of_blood_talent) and not target.DebuffPresent(mark_of_blood_debuff) Spell(mark_of_blood)
+	Spell(consumption)
 	if RunicPower() >= 80 Spell(bonestorm)
-	if RunicPower() >= 80 Spell(death_strike)
-	if not Talent(soulgorge_talent) Spell(blood_boil)
-	Spell(death_and_decay)
-	if BuffStacks(bone_shield_buff) <= 7 and Enemies() < 3 Spell(marrowrend)
-	Spell(heart_strike)
-	Spell(blood_boil)
-	Spell(death_strike)
+	if not BuffPresent(death_and_decay_buff) Spell(death_and_decay)
+	if RunicPowerDeficit() <= 20 Spell(death_strike)
+	if (BuffStacks(bone_shield_buff) <= 1 or (Talent(ossuary_talent) and BuffStacks(bone_shield_buff) <5)) Spell(marrowrend)
+	if not target.DebuffPresent(mark_of_blood_debuff) Spell(mark_of_blood)
+	if BuffStacks(bone_shield_buff) <5 Spell(blood_boil)
+		
+	unless (BuffStacks(bone_shield_buff) <= 1 or (Talent(ossuary_talent) and BuffStacks(bone_shield_buff) <5))
+	{
+		if BuffStacks(bone_shield_buff) <= 7 Spell(marrowrend)
+		Spell(heart_strike)
+		Spell(blood_boil)
+	}
 }
 
 AddFunction BloodHealMe
 {
 	if HealthPercent() <= 70 Spell(death_strike)
-	if DamageTaken(5) * 0.2 > (Health() / 100 * 25) Spell(death_strike)
+	if (DamageTaken(5) * 0.2) > (Health() / 100 * 25) Spell(death_strike)
 	if (BuffStacks(bone_shield_buff) * 3) > (100 - HealthPercent()) Spell(tombstone)
 }
 
 AddFunction BloodDefaultCdActions
 {
 	BloodInterruptActions()
+	if IncomingDamage(1.5 magic=1) > 0 spell(antimagic_shell)
 	if CheckBoxOn(opt_legendary_ring_tank) Item(legendary_ring_bonus_armor usable=1)
 	Spell(vampiric_blood)
 	if target.InRange(blood_mirror) Spell(blood_mirror)
-	if IncomingDamage(1.5 magic=1) > 0 spell(antimagic_shell)
 	Spell(dancing_rune_weapon)
 	if BuffStacks(bone_shield_buff) >= 5 Spell(tombstone)
 }
@@ -90,6 +100,8 @@ AddFunction BloodInterruptActions
 	}
 }
 
+AddCheckBox(opt_deathknight_blood_aoe L(AOE) default specialization=blood)
+
 AddIcon help=shortcd specialization=blood
 {
 	BloodDefaultShortCDActions()
@@ -100,9 +112,8 @@ AddIcon enemies=1 help=main specialization=blood
 	BloodDefaultMainActions()
 }
 
-AddIcon help=aoe specialization=blood
+AddIcon checkbox=opt_deathknight_blood_aoe help=aoe specialization=blood
 {
-	if Enemies() <= 1 BloodDefaultMainActions()
 	BloodDefaultAoEActions()
 }
 
