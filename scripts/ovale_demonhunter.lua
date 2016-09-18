@@ -16,31 +16,38 @@ AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=vengeance)
 AddFunction VengeanceDefaultShortCDActions
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(shear) Texture(misc_arrowlup help=L(not_in_melee_range))
-	if Pain() >= 20 Spell(demon_spikes)
+	if (Pain() >= 20) and not BuffPresent(demon_spikes_buff) Spell(demon_spikes)
 }
 
 AddFunction VengeanceDefaultMainActions
 {
+	Spell(soul_carver)
 	if (Pain() > 75 or (HealthPercent() < 50 and Pain() >= 30)) Spell(soul_cleave)
 	Spell(immolation_aura)
+	Spell(felblade)
+	Spell(fel_eruption)
 	Spell(sigil_of_flame)
 	Spell(shear)
 }
 
 AddFunction VengeanceDefaultAoEActions
 {
+	Spell(soul_carver)
 	if (Pain() > 75 or (HealthPercent() < 50 and Pain() >= 30)) Spell(soul_cleave)
 	Spell(immolation_aura)
-	Spell(sigil_of_flame)
+	Spell(felblade)
 	if Talent(burning_alive_talent) Spell(fiery_brand)
+	Spell(sigil_of_flame)
+	Spell(fel_eruption)
 	Spell(shear)
 }
 
 AddFunction VengeanceDefaultCdActions
 {
 	VengeanceInterruptActions()
-	Spell(metamorphosis_veng)
+	if IncomingDamage(1.5 magic=1) > 0 Spell(empower_wards)
 	Spell(fiery_brand)
+	Spell(metamorphosis_veng)
 }
 
 AddFunction VengeanceInterruptActions
@@ -49,6 +56,8 @@ AddFunction VengeanceInterruptActions
 	{
 		if target.InRange(consume_magic) Spell(consume_magic)
 		if not target.Classification(worldboss) Spell(arcane_torrent_dh)
+		Spell(sigil_of_silence)
+		if not target.Classification(worldboss) Spell(sigil_of_misery)
 	}
 }
 
@@ -136,7 +145,7 @@ AddFunction HavocInterruptActions
 		if not target.Classification(worldboss) Spell(arcane_torrent_dh)
 	}
 }
-	
+
 AddIcon help=shortcd specialization=havoc
 {
 	HavocDefaultShortCDActions()
