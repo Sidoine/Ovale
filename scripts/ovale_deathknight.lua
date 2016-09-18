@@ -100,6 +100,8 @@ AddFunction BloodInterruptActions
 	}
 }
 
+AddCheckBox(opt_deathknight_blood_aoe L(AOE) default specialization=blood)
+
 AddIcon help=shortcd specialization=blood
 {
 	BloodDefaultShortCDActions()
@@ -110,9 +112,8 @@ AddIcon enemies=1 help=main specialization=blood
 	BloodDefaultMainActions()
 }
 
-AddIcon help=aoe specialization=blood
+AddIcon checkbox=opt_deathknight_blood_aoe help=aoe specialization=blood
 {
-	if Enemies() <= 1 BloodDefaultMainActions()
 	BloodDefaultAoEActions()
 }
 
