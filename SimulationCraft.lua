@@ -2403,21 +2403,17 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
 				AddSymbol(annotation, name)
 				annotation.astAnnotation = annotation.astAnnotation or {}
 				node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
-			elseif (parseNode.operator == "=" or parseNode.operator == "!=") and parseNode.child[1].name == "last_judgment_target" then
-				--[[
-					Special handling for "last_judgment_target=X" expressions.
-					TODO: Track the target of the previous cast of a spell.
-				--]]
-				local code
-				if parseNode.operator == "=" then
-					code = "True(last_judgement_target)"
-				else -- if parseNode.operator == "!=" then
-					local buffName = "glyph_of_double_jeopardy_buff"
-					code = "BuffPresent(" .. buffName .. ")"
-					AddSymbol(annotation, buffName)
-				end
-				annotation.astAnnotation = annotation.astAnnotation or {}
-				node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+			-- elseif (parseNode.operator == "=" or parseNode.operator == "!=") and parseNode.child[1].name == "last_judgment_target" then
+			-- 	local code
+			-- 	if parseNode.operator == "=" then
+			-- 		code = "True(last_judgement_target)"
+			-- 	else -- if parseNode.operator == "!=" then
+			-- 		local buffName = "glyph_of_double_jeopardy_buff"
+			-- 		code = "BuffPresent(" .. buffName .. ")"
+			-- 		AddSymbol(annotation, buffName)
+			-- 	end
+			-- 	annotation.astAnnotation = annotation.astAnnotation or {}
+			-- 	node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
 			elseif (parseNode.operator == "=" or parseNode.operator == "!=") and parseNode.child[1].name == "sim_target" then
 				--[[
 					Special handling for "sim_target=X" expressions.
@@ -4359,14 +4355,13 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction RetributionTimeToHPG
 			{
-				SpellCooldown(crusader_strike exorcism exorcism_glyphed hammer_of_wrath hammer_of_wrath_empowered judgment usable=1)
+				SpellCooldown(crusader_strike exorcism hammer_of_wrath hammer_of_wrath_empowered judgment usable=1)
 			}
 		]]
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "crusader_strike")
 		AddSymbol(annotation, "exorcism")
-		AddSymbol(annotation, "exorcism_glyphed")
 		AddSymbol(annotation, "hammer_of_wrath")
 		AddSymbol(annotation, "judgment")
 		count = count + 1
@@ -4574,7 +4569,6 @@ local function InsertSupportingFunctions(child, annotation)
 				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 				{
 					if target.InRange(pummel) Spell(pummel)
-					if Glyph(glyph_of_gag_order) and target.InRange(heroic_throw) Spell(heroic_throw)
 					if not target.Classification(worldboss)
 					{
 						Spell(arcane_torrent_rage)
@@ -4589,7 +4583,6 @@ local function InsertSupportingFunctions(child, annotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "cd"
 		AddSymbol(annotation, "arcane_torrent_rage")
-		AddSymbol(annotation, "glyph_of_gag_order")
 		AddSymbol(annotation, "heroic_throw")
 		AddSymbol(annotation, "pummel")
 		AddSymbol(annotation, "quaking_palm")
