@@ -351,7 +351,7 @@ do
 		local count = 0
 		for id in pairs(spellList) do
 			local si = OvaleData.spellInfo[id]
-			local aura = state:GetAura(target, auraId, filter, mine)
+			local aura = state:GetAura(target, id, filter, mine)
 			if state:IsActiveAura(aura, atTime) then
 				count = count + 1
 			end
