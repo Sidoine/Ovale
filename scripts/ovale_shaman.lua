@@ -418,7 +418,7 @@ AddFunction EnhancementBloodlust
 
 AddFunction EnhancementGetInMeleeRange
 {
-	if CheckBoxOn(opt_melee_range) and not target.InRange(primal_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
+	if CheckBoxOn(opt_melee_range) and not target.InRange(stormstrike) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
 AddFunction EnhancementInterruptActions
@@ -655,7 +655,6 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # lightning_bolt
 # lightning_shield
 # overcharge_talent
-# primal_strike
 # quaking_palm
 # rockbiter
 # stormstrike
