@@ -344,7 +344,12 @@ do
 	local usedRune = {}
 
 	statePrototype.GetRunesCooldown = function(state, atTime, runes)
-		if runes == 0 then return 0 end 
+		if runes <= 0 then return 0 end 
+		if runes > RUNE_SLOTS then
+			state:Log("Attempt to read %d runes but the maximum is %d", runes, RUNE_SLOTS)
+			return 0
+		end
+
 		OvaleRunes:StartProfiling("OvaleRunes_state_GetRunesCooldown")
 		atTime = atTime or state.currentTime
 
