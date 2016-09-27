@@ -45,6 +45,7 @@ Define(fiery_brand 204021)
 Define(fiery_brand_debuff 207744)
 	SpellInfo(fiery_brand_debuff duration=8)
 Define(first_blood_talent 8)
+Define(flame_crash_talent 8)
 Define(fury_of_the_ilidari 201467)
 	SpellInfo(fury_of_the_ilidari cd=60)
 Define(immolation_aura 178740)
@@ -75,6 +76,7 @@ Define(vengeful_retreat_debuff 198813)
 	SpellInfo(vengeful_retreat_debuff duration=3)
 Define(soul_carver 214743)
 	SpellInfo(soul_carver cd=40)
+Define(soul_fragments_buff 204256)
 Define(felblade 213241)
 	SpellInfo(felblade cd=15)
 	SpellInfo(felblade cd_haste=melee haste=melee specialization=vengeance)
@@ -84,6 +86,8 @@ Define(empower_wards 218256)
 	SpellAddBuff(empower_wards empower_wards_buff=1)
 Define(empower_wards_buff 218256)
 	SpellInfo(empower_wards_buff duration=6)
+ 
+  
 
 ]]
 
