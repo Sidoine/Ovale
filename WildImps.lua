@@ -63,12 +63,12 @@ function OvaleWildImps:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, 
         for id, v in pairs(demonData) do
             if id == creatureId then
                 self_demons[destGUID] = { id = creatureId, timestamp = now, finish = now + v.duration }
-                return
+                break
             end
         end
 
         for k, d in pairs(self_demons) do
-            if d.finish > now then
+            if d.finish < now then
                 self_demons[k] = nil
             end
         end
