@@ -84,7 +84,14 @@ Define(empower_wards 218256)
 	SpellAddBuff(empower_wards empower_wards_buff=1)
 Define(empower_wards_buff 218256)
 	SpellInfo(empower_wards_buff duration=6)
-
+Define(soul_fragments 203981)
+	SpellInfo(soul_fragments duration=20)		
+Define(soul_barrier 227225)
+	SpellInfo(soul_barrier cd=20)
+Define(spirit_bomb 218679)	
+Define(fel_devastation 212084)
+	SpellInfo(fel_devastation cd=60)
+Define(fracture 209795)	
 ]]
 
 	OvaleScripts:RegisterScript("DEMONHUNTER", nil, name, desc, code, "include")
