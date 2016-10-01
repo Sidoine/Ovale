@@ -61,10 +61,10 @@ AddFunction BrewmasterInterruptActions
 		if target.InRange(spear_hand_strike) Spell(spear_hand_strike)
 		if not target.Classification(worldboss)
 		{
-			Spell(arcane_torrent_chi)
+			if target.Distance(less 8) Spell(arcane_torrent_chi)
 			if target.InRange(quaking_palm) Spell(quaking_palm)
-			Spell(war_stomp)
-			Spell(leg_sweep)
+			if target.Distance(less 8) Spell(war_stomp)
+			if target.Distance(less 5) Spell(leg_sweep)
 			Spell(diffuse_magic)
 		}
 	}
