@@ -50,8 +50,8 @@ AddFunction BrewmasterDefaultCdActions
 	if CheckBoxOn(opt_legendary_ring_tank) Item(legendary_ring_bonus_armor usable=1)
 	Spell(fortifying_brew)
 	Spell(zen_meditation)
-	Spell(diffuse_magic)
 	Spell(dampen_harm)
+	Spell(diffuse_magic)
 }
 
 AddFunction BrewmasterInterruptActions
@@ -65,6 +65,7 @@ AddFunction BrewmasterInterruptActions
 			if target.InRange(quaking_palm) Spell(quaking_palm)
 			Spell(war_stomp)
 			Spell(leg_sweep)
+			Spell(diffuse_magic)
 		}
 	}
 }
