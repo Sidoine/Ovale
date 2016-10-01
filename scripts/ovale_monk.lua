@@ -110,6 +110,7 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_monk_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=windwalker)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=windwalker)
 AddCheckBox(opt_chi_burst SpellName(chi_burst) default specialization=windwalker)
 AddCheckBox(opt_storm_earth_and_fire SpellName(storm_earth_and_fire) specialization=windwalker)
@@ -117,6 +118,21 @@ AddCheckBox(opt_storm_earth_and_fire SpellName(storm_earth_and_fire) specializat
 AddFunction WindwalkerGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
+}
+
+AddFunction WindwalkerInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(spear_hand_strike) Spell(spear_hand_strike)
+		if not target.Classification(worldboss)
+		{
+			if target.InRange(paralysis) Spell(paralysis)
+			Spell(arcane_torrent_chi)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
 }
 
 ### actions.default
@@ -212,6 +228,8 @@ AddFunction WindwalkerDefaultShortCdPostConditions
 
 AddFunction WindwalkerDefaultCdActions
 {
+	#spear_hand_strike
+	WindwalkerInterruptActions()
 	#invoke_xuen
 	Spell(invoke_xuen)
 	#call_action_list,name=opener,if=time<15
@@ -556,15 +574,19 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # fists_of_fury
 # gale_burst
 # invoke_xuen
+# paralysis
+# quaking_palm
 # rising_sun_kick
 # rushing_jade_wind
 # serenity
 # serenity_buff
+# spear_hand_strike
 # spinning_crane_kick
 # storm_earth_and_fire
 # strike_of_the_windlord
 # tiger_palm
 # touch_of_death
+# war_stomp
 # whirling_dragon_punch
 ]]
 	OvaleScripts:RegisterScript("MONK", "windwalker", name, desc, code, "script")
