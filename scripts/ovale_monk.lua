@@ -64,6 +64,7 @@ AddFunction BrewmasterInterruptActions
 			Spell(arcane_torrent_chi)
 			if target.InRange(quaking_palm) Spell(quaking_palm)
 			Spell(war_stomp)
+			Spell(leg_sweep)
 		}
 	}
 }
