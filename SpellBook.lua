@@ -511,19 +511,16 @@ statePrototype.GetTimeToSpell = function(state, spellId, atTime, targetGUID, ext
 	end
 	-- Pooled resource.
 	do
-		local seconds = state:TimeToPower(spellId, atTime, targetGUID, _, extraPower)
+		local seconds = state:TimeToPower(spellId, atTime, targetGUID, nil, extraPower)
 		if timeToSpell < seconds then
 			timeToSpell = seconds
 		end
 	end
 	-- Death knight runes.
 	do
-		local blood = state:GetSpellInfoProperty(spellId, atTime, "blood", targetGUID)
-		local unholy = state:GetSpellInfoProperty(spellId, atTime, "unholy", targetGUID)
-		local frost = state:GetSpellInfoProperty(spellId, atTime, "frost", targetGUID)
-		local death = state:GetSpellInfoProperty(spellId, atTime, "death", targetGUID)
-		if blood or unholy or frost or death then
-			local seconds = state:GetRunesCooldown(blood, unholy, frost, death, atTime)
+		local runes = state:GetSpellInfoProperty(spellId, atTime, "runes", targetGUID)
+		if runes then
+			local seconds = state:GetRunesCooldown(atTime, runes)
 			if timeToSpell < seconds then
 				timeToSpell = seconds
 			end

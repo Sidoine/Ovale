@@ -114,7 +114,7 @@ OvalePower.POWER_INFO =
 	astralpower = { id = SPELL_POWER_LUNAR_POWER, token = "LUNAR_POWER", mini = 0, costString = LUNAR_POWER_COST },
 	insanity = { id = SPELL_POWER_INSANITY, token = "INSANITY", mini = 0, costString = INSANITY_COST },
 	maelstrom = { id = SPELL_POWER_MAELSTROM, token = "MAELSTROM", mini = 0, costString = MAELSTROM_COST },
-	arcanecharge = { id = SPELL_POWER_ARCANE_CHARGES, token = "ARCANE_CHARGE", mini = 0, costString = ARCANE_CHARGES_COST },
+	arcanecharges = { id = SPELL_POWER_ARCANE_CHARGES, token = "ARCANE_CHARGES", mini = 0, costString = ARCANE_CHARGES_COST },
 	pain = { id = SPELL_POWER_PAIN, token = "PAIN", mini = 0, costString = PAIN_COST },
 	fury = { id = SPELL_POWER_FURY, token = "FURY", mini = 0, costString = FURY_COST }
 }
@@ -356,9 +356,9 @@ end
 function OvalePower:GetPower(powerType, atTime)
 	local power = (self.power and self.power[powerType]) or self[powerType] or 0
 	local powerRate = 0
-	if self.powerType and self.powerType == powerType then
+	if self.powerType and self.powerType == powerType and self.activeRegen then
 		powerRate = self.activeRegen
-	elseif self.powerRate then
+	elseif self.powerRate and self.powerRate[powerType] then
 		powerRate = self.powerRate[powerType]
 	end
 	if atTime then
@@ -687,7 +687,7 @@ statePrototype.ApplyPowerCost = function(state, spellId, targetGUID, atTime, spe
 				-- Add any power regenerated or consumed before the next spell can be cast.
 				local seconds = state.nextCast - atTime
 				if seconds > 0 then
-					local powerRate = state.powerRate[powerType]
+					local powerRate = state.powerRate[powerType] or 0
 					power = power + powerRate * seconds
 				end
 				-- Clamp power to lower and upper limits.
@@ -714,7 +714,7 @@ statePrototype.TimeToPower = function(state, spellId, atTime, targetGUID, powerT
 	if powerType then
 		local cost = state:PowerCost(spellId, powerType, atTime, targetGUID)
 		local power = state:GetPower(powerType, atTime)
-		local powerRate = state.powerRate[powerType]
+		local powerRate = state.powerRate[powerType] or 0
 		if extraPower then
 			cost = cost + extraPower
 		end

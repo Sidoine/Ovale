@@ -1741,11 +1741,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 			annotation[action] = class
 			annotation.interrupt = class
 			isSpellAction = false
-		elseif class == "DEATHKNIGHT" and action == "plague_leech" then
-			-- Plague Leech requires diseases to exist on the target.
-			-- Scripts should be checking that there is least one pair of fully-depleted runes,
-			-- but they mostly don't, so add the check for all uses of Plague Leech.
-			conditionCode = "target.DiseasesTicking() and { Rune(blood) < 1 or Rune(frost) < 1 or Rune(unholy) < 1 }"
 		elseif class == "DRUID" and action == "pulverize" then
 			--[[
 				WORKAROUND: Work around Blizzard bug where Pulverize can only be used within 15s of
@@ -1785,12 +1780,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 			else
 				isSpellAction = false
 			end
-		elseif class == "HUNTER" and action == "explosive_trap" then
-			-- Glyph of Explosive Trap removes the damage component from Explosive Trap.
-			local glyphName = "glyph_of_explosive_trap"
-			AddSymbol(annotation, glyphName)
-			annotation.trap_launcher = class
-			conditionCode = format("CheckBoxOn(opt_trap_launcher) and not Glyph(%s)", glyphName)
 		elseif class == "HUNTER" and action == "kill_command" then
 			-- Kill Command requires that a pet that can move freely.
 			conditionCode = "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()"
@@ -1861,6 +1850,8 @@ EmitAction = function(parseNode, nodeList, annotation)
 						  or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 }
 			]]
 			annotation[action] = class
+		elseif class == "MONK" and action == "whirling_dragon_punch" then
+			conditionCode = "SpellCooldown(fists_of_fury)>0 and SpellCooldown(rising_sun_kick)>0"
 		elseif class == "PALADIN" and action == "blessing_of_kings" then
 			-- Only cast Blessing of Kings if it won't overwrite the player's own Blessing of Might.
 			conditionCode = "BuffExpires(mastery_buff)"
@@ -2726,9 +2717,11 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
 		code = format("SpellCooldown(%s)", name)
 	elseif property == "cooldown_react" then
 		code = format("not SpellCooldown(%s) > 0", name)
+	elseif property == "cost" then
+		code = format("PowerCost(%s)", name)
 	elseif property == "crit_damage" then
 		code = format("%sCritDamage(%s)", target, name)
-	elseif property == "duration" then
+	elseif property == "duration" or property == "new_duration" then -- TODO #75
 		code = format("BaseDuration(%s)", buffName)
 		symbol = buffName
 	elseif property == "enabled" then
@@ -3014,7 +3007,6 @@ do
 		["time"]				= "TimeInCombat()",
 		["time_to_die"]			= "TimeToDie()",
 		["time_to_die.remains"]	= "TimeToDie()",
-		["unholy.frac"]			= "Rune(unholy)",
 		["wild_imp_no_de"]		= "0" -- TODO
 	}
 
@@ -3154,6 +3146,8 @@ EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
 			else
 				code = format("%sChargeCooldown(%s)", prefix, name)
 			end
+		elseif property == "charges_fractional" then
+			code = format("%sCharges(%s)", prefix, name)
 		else
 			ok = false
 		end

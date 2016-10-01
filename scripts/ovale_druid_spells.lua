@@ -338,6 +338,10 @@ Define(wild_charge_bear 16979)
 Define(wild_charge_cat 49376)
 	SpellInfo(wild_charge_cat cd=15 stance=druid_cat_form)
 	
+# Legendary items
+Define(ailuro_pouncers 137024)
+
+# Talents
 Define(astral_communion_talent 17)
 Define(balance_affinity_talent 7)
 Define(blessing_of_the_ancients_talent 18)
