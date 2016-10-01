@@ -32,26 +32,39 @@ AddFunction BalanceDefaultMainActions
 {
 	#call_action_list,name=fury_of_elune,if=talent.fury_of_elune.enabled&cooldown.fury_of_elue.remains<target.time_to_die
 	if Talent(fury_of_elune_talent) and SpellCooldown(fury_of_elue) < target.TimeToDie() BalanceFuryOfEluneMainActions()
-	#new_moon,if=(charges=2&recharge_time<5)|charges=3
-	if Charges(new_moon) == 2 and SpellChargeCooldown(new_moon) < 5 or Charges(new_moon) == 3 Spell(new_moon)
-	#half_moon,if=(charges=2&recharge_time<5)|charges=3|(target.time_to_die<15&charges=2)
-	if Charges(half_moon) == 2 and SpellChargeCooldown(half_moon) < 5 or Charges(half_moon) == 3 or target.TimeToDie() < 15 and Charges(half_moon) == 2 Spell(half_moon)
-	#full_moon,if=(charges=2&recharge_time<5)|charges=3|target.time_to_die<15
-	if Charges(full_moon) == 2 and SpellChargeCooldown(full_moon) < 5 or Charges(full_moon) == 3 or target.TimeToDie() < 15 Spell(full_moon)
-	#stellar_flare,if=remains<7.2
-	if target.DebuffRemaining(stellar_flare_debuff) < 7.2 Spell(stellar_flare)
-	#moonfire,if=(talent.natures_balance.enabled&remains<3)|(remains<6.6&!talent.natures_balance.enabled)
-	if Talent(natures_balance_talent) and target.DebuffRemaining(moonfire_debuff) < 3 or target.DebuffRemaining(moonfire_debuff) < 6.6 and not Talent(natures_balance_talent) Spell(moonfire)
-	#sunfire,if=(talent.natures_balance.enabled&remains<3)|(remains<5.4&!talent.natures_balance.enabled)
-	if Talent(natures_balance_talent) and target.DebuffRemaining(sunfire_debuff) < 3 or target.DebuffRemaining(sunfire_debuff) < 5.4 and not Talent(natures_balance_talent) Spell(sunfire)
-	#solar_wrath,if=buff.solar_empowerment.stack=3
-	if BuffStacks(solar_empowerment_buff) == 3 Spell(solar_wrath)
-	#lunar_strike,if=buff.lunar_empowerment.stack=3
-	if BuffStacks(lunar_empowerment_buff) == 3 Spell(lunar_strike)
-	#call_action_list,name=celestial_alignment_phase,if=buff.celestial_alignment.up|buff.incarnation.up
-	if BuffPresent(celestial_alignment_buff) or BuffPresent(incarnation_chosen_of_elune_buff) BalanceCelestialAlignmentPhaseMainActions()
-	#call_action_list,name=single_target
-	BalanceSingleTargetMainActions()
+
+	unless Talent(fury_of_elune_talent) and SpellCooldown(fury_of_elue) < target.TimeToDie() and BalanceFuryOfEluneMainPostConditions()
+	{
+		#new_moon,if=(charges=2&recharge_time<5)|charges=3
+		if Charges(new_moon) == 2 and SpellChargeCooldown(new_moon) < 5 or Charges(new_moon) == 3 Spell(new_moon)
+		#half_moon,if=(charges=2&recharge_time<5)|charges=3|(target.time_to_die<15&charges=2)
+		if Charges(half_moon) == 2 and SpellChargeCooldown(half_moon) < 5 or Charges(half_moon) == 3 or target.TimeToDie() < 15 and Charges(half_moon) == 2 Spell(half_moon)
+		#full_moon,if=(charges=2&recharge_time<5)|charges=3|target.time_to_die<15
+		if Charges(full_moon) == 2 and SpellChargeCooldown(full_moon) < 5 or Charges(full_moon) == 3 or target.TimeToDie() < 15 Spell(full_moon)
+		#stellar_flare,if=remains<7.2
+		if target.DebuffRemaining(stellar_flare_debuff) < 7.2 Spell(stellar_flare)
+		#moonfire,if=(talent.natures_balance.enabled&remains<3)|(remains<6.6&!talent.natures_balance.enabled)
+		if Talent(natures_balance_talent) and target.DebuffRemaining(moonfire_debuff) < 3 or target.DebuffRemaining(moonfire_debuff) < 6.6 and not Talent(natures_balance_talent) Spell(moonfire)
+		#sunfire,if=(talent.natures_balance.enabled&remains<3)|(remains<5.4&!talent.natures_balance.enabled)
+		if Talent(natures_balance_talent) and target.DebuffRemaining(sunfire_debuff) < 3 or target.DebuffRemaining(sunfire_debuff) < 5.4 and not Talent(natures_balance_talent) Spell(sunfire)
+		#solar_wrath,if=buff.solar_empowerment.stack=3
+		if BuffStacks(solar_empowerment_buff) == 3 Spell(solar_wrath)
+		#lunar_strike,if=buff.lunar_empowerment.stack=3
+		if BuffStacks(lunar_empowerment_buff) == 3 Spell(lunar_strike)
+		#call_action_list,name=celestial_alignment_phase,if=buff.celestial_alignment.up|buff.incarnation.up
+		if BuffPresent(celestial_alignment_buff) or BuffPresent(incarnation_chosen_of_elune_buff) BalanceCelestialAlignmentPhaseMainActions()
+
+		unless { BuffPresent(celestial_alignment_buff) or BuffPresent(incarnation_chosen_of_elune_buff) } and BalanceCelestialAlignmentPhaseMainPostConditions()
+		{
+			#call_action_list,name=single_target
+			BalanceSingleTargetMainActions()
+		}
+	}
+}
+
+AddFunction BalanceDefaultMainPostConditions
+{
+	Talent(fury_of_elune_talent) and SpellCooldown(fury_of_elue) < target.TimeToDie() and BalanceFuryOfEluneMainPostConditions() or { BuffPresent(celestial_alignment_buff) or BuffPresent(incarnation_chosen_of_elune_buff) } and BalanceCelestialAlignmentPhaseMainPostConditions() or BalanceSingleTargetMainPostConditions()
 }
 
 AddFunction BalanceDefaultShortCdActions
@@ -63,7 +76,24 @@ AddFunction BalanceDefaultShortCdActions
 	{
 		#astral_communion,if=astral_power.deficit>=75
 		if AstralPowerDeficit() >= 75 Spell(astral_communion)
+
+		unless BuffStacks(solar_empowerment_buff) == 3 and Spell(solar_wrath) or BuffStacks(lunar_empowerment_buff) == 3 and Spell(lunar_strike)
+		{
+			#call_action_list,name=celestial_alignment_phase,if=buff.celestial_alignment.up|buff.incarnation.up
+			if BuffPresent(celestial_alignment_buff) or BuffPresent(incarnation_chosen_of_elune_buff) BalanceCelestialAlignmentPhaseShortCdActions()
+
+			unless { BuffPresent(celestial_alignment_buff) or BuffPresent(incarnation_chosen_of_elune_buff) } and BalanceCelestialAlignmentPhaseShortCdPostConditions()
+			{
+				#call_action_list,name=single_target
+				BalanceSingleTargetShortCdActions()
+			}
+		}
 	}
+}
+
+AddFunction BalanceDefaultShortCdPostConditions
+{
+	Talent(fury_of_elune_talent) and SpellCooldown(fury_of_elue) < target.TimeToDie() and BalanceFuryOfEluneShortCdPostConditions() or { Charges(new_moon) == 2 and SpellChargeCooldown(new_moon) < 5 or Charges(new_moon) == 3 } and Spell(new_moon) or { Charges(half_moon) == 2 and SpellChargeCooldown(half_moon) < 5 or Charges(half_moon) == 3 or target.TimeToDie() < 15 and Charges(half_moon) == 2 } and Spell(half_moon) or { Charges(full_moon) == 2 and SpellChargeCooldown(full_moon) < 5 or Charges(full_moon) == 3 or target.TimeToDie() < 15 } and Spell(full_moon) or target.DebuffRemaining(stellar_flare_debuff) < 7.2 and Spell(stellar_flare) or { Talent(natures_balance_talent) and target.DebuffRemaining(moonfire_debuff) < 3 or target.DebuffRemaining(moonfire_debuff) < 6.6 and not Talent(natures_balance_talent) } and Spell(moonfire) or { Talent(natures_balance_talent) and target.DebuffRemaining(sunfire_debuff) < 3 or target.DebuffRemaining(sunfire_debuff) < 5.4 and not Talent(natures_balance_talent) } and Spell(sunfire) or BuffStacks(solar_empowerment_buff) == 3 and Spell(solar_wrath) or BuffStacks(lunar_empowerment_buff) == 3 and Spell(lunar_strike) or { BuffPresent(celestial_alignment_buff) or BuffPresent(incarnation_chosen_of_elune_buff) } and BalanceCelestialAlignmentPhaseShortCdPostConditions() or BalanceSingleTargetShortCdPostConditions()
 }
 
 AddFunction BalanceDefaultCdActions
@@ -87,7 +117,24 @@ AddFunction BalanceDefaultCdActions
 		if AstralPower() >= 40 Spell(incarnation_chosen_of_elune)
 		#celestial_alignment,if=astral_power>=40
 		if AstralPower() >= 40 Spell(celestial_alignment)
+
+		unless BuffStacks(solar_empowerment_buff) == 3 and Spell(solar_wrath) or BuffStacks(lunar_empowerment_buff) == 3 and Spell(lunar_strike)
+		{
+			#call_action_list,name=celestial_alignment_phase,if=buff.celestial_alignment.up|buff.incarnation.up
+			if BuffPresent(celestial_alignment_buff) or BuffPresent(incarnation_chosen_of_elune_buff) BalanceCelestialAlignmentPhaseCdActions()
+
+			unless { BuffPresent(celestial_alignment_buff) or BuffPresent(incarnation_chosen_of_elune_buff) } and BalanceCelestialAlignmentPhaseCdPostConditions()
+			{
+				#call_action_list,name=single_target
+				BalanceSingleTargetCdActions()
+			}
+		}
 	}
+}
+
+AddFunction BalanceDefaultCdPostConditions
+{
+	Talent(fury_of_elune_talent) and SpellCooldown(fury_of_elue) < target.TimeToDie() and BalanceFuryOfEluneCdPostConditions() or { Charges(new_moon) == 2 and SpellChargeCooldown(new_moon) < 5 or Charges(new_moon) == 3 } and Spell(new_moon) or { Charges(half_moon) == 2 and SpellChargeCooldown(half_moon) < 5 or Charges(half_moon) == 3 or target.TimeToDie() < 15 and Charges(half_moon) == 2 } and Spell(half_moon) or { Charges(full_moon) == 2 and SpellChargeCooldown(full_moon) < 5 or Charges(full_moon) == 3 or target.TimeToDie() < 15 } and Spell(full_moon) or target.DebuffRemaining(stellar_flare_debuff) < 7.2 and Spell(stellar_flare) or { Talent(natures_balance_talent) and target.DebuffRemaining(moonfire_debuff) < 3 or target.DebuffRemaining(moonfire_debuff) < 6.6 and not Talent(natures_balance_talent) } and Spell(moonfire) or { Talent(natures_balance_talent) and target.DebuffRemaining(sunfire_debuff) < 3 or target.DebuffRemaining(sunfire_debuff) < 5.4 and not Talent(natures_balance_talent) } and Spell(sunfire) or AstralPowerDeficit() >= 75 and Spell(astral_communion) or BuffStacks(solar_empowerment_buff) == 3 and Spell(solar_wrath) or BuffStacks(lunar_empowerment_buff) == 3 and Spell(lunar_strike) or { BuffPresent(celestial_alignment_buff) or BuffPresent(incarnation_chosen_of_elune_buff) } and BalanceCelestialAlignmentPhaseCdPostConditions() or BalanceSingleTargetCdPostConditions()
 }
 
 ### actions.celestial_alignment_phase
@@ -110,6 +157,28 @@ AddFunction BalanceCelestialAlignmentPhaseMainActions
 	if Talent(natures_balance_talent) and target.DebuffRemaining(moonfire_dmg_debuff) < 5 and CastTime(lunar_strike) < target.DebuffRemaining(moonfire_dmg_debuff) Spell(lunar_strike)
 	#solar_wrath
 	Spell(solar_wrath)
+}
+
+AddFunction BalanceCelestialAlignmentPhaseMainPostConditions
+{
+}
+
+AddFunction BalanceCelestialAlignmentPhaseShortCdActions
+{
+}
+
+AddFunction BalanceCelestialAlignmentPhaseShortCdPostConditions
+{
+	Spell(starsurge_moonkin) or BuffStacks(lunar_empowerment_buff) >= 2 and { AstralPower() <= 70 and BuffExpires(blessing_of_elune_buff) or AstralPower() <= 58 and BuffPresent(blessing_of_elune_buff) } and Spell(warrior_of_elune) or BuffPresent(warrior_of_elune_buff) and Spell(lunar_strike) or BuffPresent(solar_empowerment_buff) and Spell(solar_wrath) or BuffPresent(lunar_empowerment_buff) and Spell(lunar_strike) or Talent(natures_balance_talent) and target.DebuffRemaining(sunfire_dmg_debuff) < 5 and CastTime(solar_wrath) < target.DebuffRemaining(sunfire_dmg_debuff) and Spell(solar_wrath) or Talent(natures_balance_talent) and target.DebuffRemaining(moonfire_dmg_debuff) < 5 and CastTime(lunar_strike) < target.DebuffRemaining(moonfire_dmg_debuff) and Spell(lunar_strike) or Spell(solar_wrath)
+}
+
+AddFunction BalanceCelestialAlignmentPhaseCdActions
+{
+}
+
+AddFunction BalanceCelestialAlignmentPhaseCdPostConditions
+{
+	Spell(starsurge_moonkin) or BuffStacks(lunar_empowerment_buff) >= 2 and { AstralPower() <= 70 and BuffExpires(blessing_of_elune_buff) or AstralPower() <= 58 and BuffPresent(blessing_of_elune_buff) } and Spell(warrior_of_elune) or BuffPresent(warrior_of_elune_buff) and Spell(lunar_strike) or BuffPresent(solar_empowerment_buff) and Spell(solar_wrath) or BuffPresent(lunar_empowerment_buff) and Spell(lunar_strike) or Talent(natures_balance_talent) and target.DebuffRemaining(sunfire_dmg_debuff) < 5 and CastTime(solar_wrath) < target.DebuffRemaining(sunfire_dmg_debuff) and Spell(solar_wrath) or Talent(natures_balance_talent) and target.DebuffRemaining(moonfire_dmg_debuff) < 5 and CastTime(lunar_strike) < target.DebuffRemaining(moonfire_dmg_debuff) and Spell(lunar_strike) or Spell(solar_wrath)
 }
 
 ### actions.fury_of_elune
@@ -146,6 +215,10 @@ AddFunction BalanceFuryOfEluneMainActions
 	if BuffStacks(lunar_empowerment_buff) == 3 or BuffRemaining(lunar_empowerment_buff) < 5 and BuffPresent(lunar_empowerment_buff) Spell(lunar_strike)
 	#solar_wrath
 	Spell(solar_wrath)
+}
+
+AddFunction BalanceFuryOfEluneMainPostConditions
+{
 }
 
 AddFunction BalanceFuryOfEluneShortCdActions
@@ -188,6 +261,14 @@ AddFunction BalancePrecombatMainActions
 	Spell(blessing_of_elune)
 	#new_moon
 	Spell(new_moon)
+}
+
+AddFunction BalancePrecombatMainPostConditions
+{
+}
+
+AddFunction BalancePrecombatShortCdActions
+{
 }
 
 AddFunction BalancePrecombatShortCdPostConditions
@@ -238,12 +319,35 @@ AddFunction BalanceSingleTargetMainActions
 	Spell(solar_wrath)
 }
 
+AddFunction BalanceSingleTargetMainPostConditions
+{
+}
+
+AddFunction BalanceSingleTargetShortCdActions
+{
+}
+
+AddFunction BalanceSingleTargetShortCdPostConditions
+{
+	AstralPower() <= 90 and Spell(new_moon) or AstralPower() <= 80 and Spell(half_moon) or AstralPower() <= 60 and Spell(full_moon) or Spell(starsurge_moonkin) or BuffStacks(lunar_empowerment_buff) >= 2 and { AstralPower() <= 80 and BuffExpires(blessing_of_elune_buff) or AstralPower() <= 72 and BuffPresent(blessing_of_elune_buff) } and Spell(warrior_of_elune) or BuffPresent(warrior_of_elune_buff) and Spell(lunar_strike) or BuffPresent(solar_empowerment_buff) and Spell(solar_wrath) or BuffPresent(lunar_empowerment_buff) and Spell(lunar_strike) or Talent(natures_balance_talent) and target.DebuffRemaining(sunfire_dmg_debuff) < 5 and CastTime(solar_wrath) < target.DebuffRemaining(sunfire_dmg_debuff) and Spell(solar_wrath) or Talent(natures_balance_talent) and target.DebuffRemaining(moonfire_dmg_debuff) < 5 and CastTime(lunar_strike) < target.DebuffRemaining(moonfire_dmg_debuff) and Spell(lunar_strike) or Spell(solar_wrath)
+}
+
+AddFunction BalanceSingleTargetCdActions
+{
+}
+
+AddFunction BalanceSingleTargetCdPostConditions
+{
+	AstralPower() <= 90 and Spell(new_moon) or AstralPower() <= 80 and Spell(half_moon) or AstralPower() <= 60 and Spell(full_moon) or Spell(starsurge_moonkin) or BuffStacks(lunar_empowerment_buff) >= 2 and { AstralPower() <= 80 and BuffExpires(blessing_of_elune_buff) or AstralPower() <= 72 and BuffPresent(blessing_of_elune_buff) } and Spell(warrior_of_elune) or BuffPresent(warrior_of_elune_buff) and Spell(lunar_strike) or BuffPresent(solar_empowerment_buff) and Spell(solar_wrath) or BuffPresent(lunar_empowerment_buff) and Spell(lunar_strike) or Talent(natures_balance_talent) and target.DebuffRemaining(sunfire_dmg_debuff) < 5 and CastTime(solar_wrath) < target.DebuffRemaining(sunfire_dmg_debuff) and Spell(solar_wrath) or Talent(natures_balance_talent) and target.DebuffRemaining(moonfire_dmg_debuff) < 5 and CastTime(lunar_strike) < target.DebuffRemaining(moonfire_dmg_debuff) and Spell(lunar_strike) or Spell(solar_wrath)
+}
+
 ### Balance icons.
 
 AddCheckBox(opt_druid_balance_aoe L(AOE) default specialization=balance)
 
 AddIcon checkbox=!opt_druid_balance_aoe enemies=1 help=shortcd specialization=balance
 {
+	if not InCombat() BalancePrecombatShortCdActions()
 	unless not InCombat() and BalancePrecombatShortCdPostConditions()
 	{
 		BalanceDefaultShortCdActions()
@@ -252,6 +356,7 @@ AddIcon checkbox=!opt_druid_balance_aoe enemies=1 help=shortcd specialization=ba
 
 AddIcon checkbox=opt_druid_balance_aoe help=shortcd specialization=balance
 {
+	if not InCombat() BalancePrecombatShortCdActions()
 	unless not InCombat() and BalancePrecombatShortCdPostConditions()
 	{
 		BalanceDefaultShortCdActions()
@@ -261,13 +366,19 @@ AddIcon checkbox=opt_druid_balance_aoe help=shortcd specialization=balance
 AddIcon enemies=1 help=main specialization=balance
 {
 	if not InCombat() BalancePrecombatMainActions()
-	BalanceDefaultMainActions()
+	unless not InCombat() and BalancePrecombatMainPostConditions()
+	{
+		BalanceDefaultMainActions()
+	}
 }
 
 AddIcon checkbox=opt_druid_balance_aoe help=aoe specialization=balance
 {
 	if not InCombat() BalancePrecombatMainActions()
-	BalanceDefaultMainActions()
+	unless not InCombat() and BalancePrecombatMainPostConditions()
+	{
+		BalanceDefaultMainActions()
+	}
 }
 
 AddIcon checkbox=!opt_druid_balance_aoe enemies=1 help=cd specialization=balance
@@ -391,12 +502,25 @@ AddFunction FeralDefaultMainActions
 	if Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and { ComboPoints() >= 5 or BuffRemaining(predatory_swiftness_buff) < 1.5 or Talent(bloodtalons_talent) and ComboPoints() == 2 and BuffExpires(bloodtalons_buff) and SpellCooldown(ashamanes_frenzy) < GCD() or Talent(elunes_guidance_talent) and { SpellCooldown(elunes_guidance) < GCD() and ComboPoints() == 0 or BuffPresent(elunes_guidance_buff) and ComboPoints() >= 4 } } Spell(healing_touch)
 	#call_action_list,name=sbt_opener,if=talent.sabertooth.enabled&time<20
 	if Talent(sabertooth_talent) and TimeInCombat() < 20 FeralSbtOpenerMainActions()
-	#healing_touch,if=equipped.ailuro_pouncers&talent.bloodtalons.enabled&buff.predatory_swiftness.stack>1&buff.bloodtalons.down
-	if HasEquippedItem(ailuro_pouncers) and Talent(bloodtalons_talent) and BuffStacks(predatory_swiftness_buff) > 1 and BuffExpires(bloodtalons_buff) Spell(healing_touch)
-	#call_action_list,name=finisher
-	FeralFinisherMainActions()
-	#call_action_list,name=generator
-	FeralGeneratorMainActions()
+
+	unless Talent(sabertooth_talent) and TimeInCombat() < 20 and FeralSbtOpenerMainPostConditions()
+	{
+		#healing_touch,if=equipped.ailuro_pouncers&talent.bloodtalons.enabled&buff.predatory_swiftness.stack>1&buff.bloodtalons.down
+		if HasEquippedItem(ailuro_pouncers) and Talent(bloodtalons_talent) and BuffStacks(predatory_swiftness_buff) > 1 and BuffExpires(bloodtalons_buff) Spell(healing_touch)
+		#call_action_list,name=finisher
+		FeralFinisherMainActions()
+
+		unless FeralFinisherMainPostConditions()
+		{
+			#call_action_list,name=generator
+			FeralGeneratorMainActions()
+		}
+	}
+}
+
+AddFunction FeralDefaultMainPostConditions
+{
+	Talent(sabertooth_talent) and TimeInCombat() < 20 and FeralSbtOpenerMainPostConditions() or FeralFinisherMainPostConditions() or FeralGeneratorMainPostConditions()
 }
 
 AddFunction FeralDefaultShortCdActions
@@ -422,6 +546,9 @@ AddFunction FeralDefaultShortCdActions
 
 				unless Talent(sabertooth_talent) and TimeInCombat() < 20 and FeralSbtOpenerShortCdPostConditions() or HasEquippedItem(ailuro_pouncers) and Talent(bloodtalons_talent) and BuffStacks(predatory_swiftness_buff) > 1 and BuffExpires(bloodtalons_buff) and Spell(healing_touch)
 				{
+					#call_action_list,name=finisher
+					FeralFinisherShortCdActions()
+
 					unless FeralFinisherShortCdPostConditions()
 					{
 						#call_action_list,name=generator
@@ -431,6 +558,11 @@ AddFunction FeralDefaultShortCdActions
 			}
 		}
 	}
+}
+
+AddFunction FeralDefaultShortCdPostConditions
+{
+	Spell(cat_form) or { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake) or target.DebuffPresent(rip_debuff) and target.DebuffRemaining(rip_debuff) < 3 and target.TimeToDie() > 3 and { target.HealthPercent() < 25 or Talent(sabertooth_talent) } and Spell(ferocious_bite) or Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and { ComboPoints() >= 5 or BuffRemaining(predatory_swiftness_buff) < 1.5 or Talent(bloodtalons_talent) and ComboPoints() == 2 and BuffExpires(bloodtalons_buff) and SpellCooldown(ashamanes_frenzy) < GCD() or Talent(elunes_guidance_talent) and { SpellCooldown(elunes_guidance) < GCD() and ComboPoints() == 0 or BuffPresent(elunes_guidance_buff) and ComboPoints() >= 4 } } and Spell(healing_touch) or Talent(sabertooth_talent) and TimeInCombat() < 20 and FeralSbtOpenerShortCdPostConditions() or HasEquippedItem(ailuro_pouncers) and Talent(bloodtalons_talent) and BuffStacks(predatory_swiftness_buff) > 1 and BuffExpires(bloodtalons_buff) and Spell(healing_touch) or FeralFinisherShortCdPostConditions() or FeralGeneratorShortCdPostConditions()
 }
 
 AddFunction FeralDefaultCdActions
@@ -460,8 +592,14 @@ AddFunction FeralDefaultCdActions
 
 			unless target.DebuffPresent(rip_debuff) and target.DebuffRemaining(rip_debuff) < 3 and target.TimeToDie() > 3 and { target.HealthPercent() < 25 or Talent(sabertooth_talent) } and Spell(ferocious_bite) or Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and { ComboPoints() >= 5 or BuffRemaining(predatory_swiftness_buff) < 1.5 or Talent(bloodtalons_talent) and ComboPoints() == 2 and BuffExpires(bloodtalons_buff) and SpellCooldown(ashamanes_frenzy) < GCD() or Talent(elunes_guidance_talent) and { SpellCooldown(elunes_guidance) < GCD() and ComboPoints() == 0 or BuffPresent(elunes_guidance_buff) and ComboPoints() >= 4 } } and Spell(healing_touch)
 			{
+				#call_action_list,name=sbt_opener,if=talent.sabertooth.enabled&time<20
+				if Talent(sabertooth_talent) and TimeInCombat() < 20 FeralSbtOpenerCdActions()
+
 				unless Talent(sabertooth_talent) and TimeInCombat() < 20 and FeralSbtOpenerCdPostConditions() or HasEquippedItem(ailuro_pouncers) and Talent(bloodtalons_talent) and BuffStacks(predatory_swiftness_buff) > 1 and BuffExpires(bloodtalons_buff) and Spell(healing_touch)
 				{
+					#call_action_list,name=finisher
+					FeralFinisherCdActions()
+
 					unless FeralFinisherCdPostConditions()
 					{
 						#call_action_list,name=generator
@@ -471,6 +609,11 @@ AddFunction FeralDefaultCdActions
 			}
 		}
 	}
+}
+
+AddFunction FeralDefaultCdPostConditions
+{
+	Spell(cat_form) or 0 > 10 and Spell(displacer_beast) or { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake) or target.DebuffPresent(rip_debuff) and target.DebuffRemaining(rip_debuff) < 3 and target.TimeToDie() > 3 and { target.HealthPercent() < 25 or Talent(sabertooth_talent) } and Spell(ferocious_bite) or Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and { ComboPoints() >= 5 or BuffRemaining(predatory_swiftness_buff) < 1.5 or Talent(bloodtalons_talent) and ComboPoints() == 2 and BuffExpires(bloodtalons_buff) and SpellCooldown(ashamanes_frenzy) < GCD() or Talent(elunes_guidance_talent) and { SpellCooldown(elunes_guidance) < GCD() and ComboPoints() == 0 or BuffPresent(elunes_guidance_buff) and ComboPoints() >= 4 } } and Spell(healing_touch) or Talent(sabertooth_talent) and TimeInCombat() < 20 and FeralSbtOpenerCdPostConditions() or HasEquippedItem(ailuro_pouncers) and Talent(bloodtalons_talent) and BuffStacks(predatory_swiftness_buff) > 1 and BuffExpires(bloodtalons_buff) and Spell(healing_touch) or FeralFinisherCdPostConditions() or FeralGeneratorCdPostConditions()
 }
 
 ### actions.finisher
@@ -505,9 +648,21 @@ AddFunction FeralFinisherMainActions
 	}
 }
 
+AddFunction FeralFinisherMainPostConditions
+{
+}
+
+AddFunction FeralFinisherShortCdActions
+{
+}
+
 AddFunction FeralFinisherShortCdPostConditions
 {
 	not BuffPresent(savage_roar_buff) and { ComboPoints() == 5 or Talent(brutal_slash_talent) and Enemies() > Enemies(tagged=1) and Charges(brutal_slash) > 0 } and Spell(savage_roar) or not { not BuffPresent(savage_roar_buff) and { ComboPoints() == 5 or Talent(brutal_slash_talent) and Enemies() > Enemies(tagged=1) and Charges(brutal_slash) > 0 } and SpellUsable(savage_roar) and SpellCooldown(savage_roar) < TimeToEnergyFor(savage_roar) } and { target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and Enemies() >= 5 and Spell(thrash_cat) or not { target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and Enemies() >= 5 and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat) } and { Enemies() >= 8 and Spell(swipe_cat) or not { Enemies() >= 8 and SpellUsable(swipe_cat) and SpellCooldown(swipe_cat) < TimeToEnergyFor(swipe_cat) } and { { not target.DebuffPresent(rip_debuff) or target.DebuffRemaining(rip_debuff) < 8 and target.HealthPercent() > 25 and not Talent(sabertooth_talent) or PersistentMultiplier(rip_debuff) > target.DebuffPersistentMultiplier(rip_debuff) } and target.TimeToDie() - target.DebuffRemaining(rip_debuff) > target.TickTime(rip_debuff) * 4 and ComboPoints() == 5 and { TimeToMaxEnergy() < 1 or BuffPresent(berserk_cat_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) or BuffPresent(elunes_guidance_buff) or SpellCooldown(tigers_fury) < 3 or ArmorSetBonus(T18 4) or BuffPresent(clearcasting_buff) or Talent(soul_of_the_forest_talent) or not target.DebuffPresent(rip_debuff) or target.DebuffRemaining(rake_debuff) < 1.5 and Enemies() < 6 } and Spell(rip) or { BuffRemaining(savage_roar_buff) <= 10.5 or BuffRemaining(savage_roar_buff) <= 7.2 and not Talent(jagged_wounds_talent) } and ComboPoints() == 5 and { TimeToMaxEnergy() < 1 or BuffPresent(berserk_cat_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) or BuffPresent(elunes_guidance_buff) or SpellCooldown(tigers_fury) < 3 or ArmorSetBonus(T18 4) or BuffPresent(clearcasting_buff) or Talent(soul_of_the_forest_talent) or not target.DebuffPresent(rip_debuff) or target.DebuffRemaining(rake_debuff) < 1.5 and Enemies() < 6 } and Spell(savage_roar) or ComboPoints() == 5 and { Enemies() >= 6 or Enemies() >= 3 and not Talent(bloodtalons_talent) } and ComboPoints() == 5 and { TimeToMaxEnergy() < 1 or BuffPresent(berserk_cat_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) or BuffPresent(elunes_guidance_buff) or SpellCooldown(tigers_fury) < 3 or ArmorSetBonus(T18 4) or Talent(moment_of_clarity_talent) and BuffPresent(clearcasting_buff) } and Spell(swipe_cat) or Energy() >= EnergyCost(ferocious_bite max=1) and ComboPoints() == 5 and { TimeToMaxEnergy() < 1 or BuffPresent(berserk_cat_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) or BuffPresent(elunes_guidance_buff) or SpellCooldown(tigers_fury) < 3 or ArmorSetBonus(T18 4) or Talent(moment_of_clarity_talent) and BuffPresent(clearcasting_buff) } and Spell(ferocious_bite) } } }
+}
+
+AddFunction FeralFinisherCdActions
+{
 }
 
 AddFunction FeralFinisherCdPostConditions
@@ -559,6 +714,10 @@ AddFunction FeralGeneratorMainActions
 	}
 }
 
+AddFunction FeralGeneratorMainPostConditions
+{
+}
+
 AddFunction FeralGeneratorShortCdActions
 {
 	unless Enemies() > Enemies(tagged=1) and ComboPoints() < 5 and Spell(brutal_slash)
@@ -570,6 +729,11 @@ AddFunction FeralGeneratorShortCdActions
 			if Talent(elunes_guidance_talent) and ComboPoints() == 0 and Energy() >= FIXME_action.ferocious_bite.cost + 25 Spell(elunes_guidance)
 		}
 	}
+}
+
+AddFunction FeralGeneratorShortCdPostConditions
+{
+	Enemies() > Enemies(tagged=1) and ComboPoints() < 5 and Spell(brutal_slash) or not { Talent(elunes_guidance_talent) and ComboPoints() == 0 and Energy() < FIXME_action.ferocious_bite.cost + 25 - EnergyRegenRate() * SpellCooldown(elunes_guidance) } and { Talent(brutal_slash_talent) and Enemies() >= 9 and Spell(thrash_cat) or not { Talent(brutal_slash_talent) and Enemies() >= 9 and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat) } and { Enemies() >= 6 and Spell(swipe_cat) or not { Enemies() >= 6 and SpellUsable(swipe_cat) and SpellCooldown(swipe_cat) < TimeToEnergyFor(swipe_cat) } and { ComboPoints() < 5 and { not target.DebuffPresent(rake_debuff) or not Talent(bloodtalons_talent) and target.DebuffRemaining(rake_debuff) < BaseDuration(rake_debuff) * 0.3 or Talent(bloodtalons_talent) and BuffPresent(bloodtalons_buff) and { not Talent(soul_of_the_forest_talent) and target.DebuffRemaining(rake_debuff) <= 7 or target.DebuffRemaining(rake_debuff) <= 5 } and PersistentMultiplier(rake_debuff) > target.DebuffPersistentMultiplier(rake_debuff) * 0.8 } and target.TimeToDie() - target.DebuffRemaining(rake_debuff) > target.TickTime(rake_debuff) and Spell(rake) or not { ComboPoints() < 5 and { not target.DebuffPresent(rake_debuff) or not Talent(bloodtalons_talent) and target.DebuffRemaining(rake_debuff) < BaseDuration(rake_debuff) * 0.3 or Talent(bloodtalons_talent) and BuffPresent(bloodtalons_buff) and { not Talent(soul_of_the_forest_talent) and target.DebuffRemaining(rake_debuff) <= 7 or target.DebuffRemaining(rake_debuff) <= 5 } and PersistentMultiplier(rake_debuff) > target.DebuffPersistentMultiplier(rake_debuff) * 0.8 } and target.TimeToDie() - target.DebuffRemaining(rake_debuff) > target.TickTime(rake_debuff) and SpellUsable(rake) and SpellCooldown(rake) < TimeToEnergyFor(rake) } and { ComboPoints() < 5 and target.DebuffRemaining(moonfire_cat_debuff) <= 4.2 and target.TimeToDie() - target.DebuffRemaining(moonfire_cat_debuff) > target.TickTime(moonfire_cat_debuff) * 2 and Spell(moonfire_cat) or target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and Enemies() >= 2 and Spell(thrash_cat) or not { target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and Enemies() >= 2 and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat) } and { ComboPoints() < 5 and { False(raid_event_adds_exists) and 600 > { 1 + SpellMaxCharges(brutal_slash) - Charges(brutal_slash count=0) } * 15 or not False(raid_event_adds_exists) and Charges(brutal_slash count=0) > 2.66 and TimeInCombat() > 10 } and Spell(brutal_slash) or ComboPoints() < 5 and Enemies() >= 3 and Spell(swipe_cat) or ComboPoints() < 5 and { Enemies() < 3 or Talent(brutal_slash_talent) } and Spell(shred) } } } } }
 }
 
 AddFunction FeralGeneratorCdActions
@@ -598,6 +762,11 @@ AddFunction FeralGeneratorCdActions
 	}
 }
 
+AddFunction FeralGeneratorCdPostConditions
+{
+	Enemies() > Enemies(tagged=1) and ComboPoints() < 5 and Spell(brutal_slash) or not { Talent(elunes_guidance_talent) and ComboPoints() == 0 and Energy() < FIXME_action.ferocious_bite.cost + 25 - EnergyRegenRate() * SpellCooldown(elunes_guidance) } and { Talent(elunes_guidance_talent) and ComboPoints() == 0 and Energy() >= FIXME_action.ferocious_bite.cost + 25 and Spell(elunes_guidance) or not { Talent(brutal_slash_talent) and Enemies() >= 9 and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat) } and not { Enemies() >= 6 and SpellUsable(swipe_cat) and SpellCooldown(swipe_cat) < TimeToEnergyFor(swipe_cat) } and { ComboPoints() < 5 and { not target.DebuffPresent(rake_debuff) or not Talent(bloodtalons_talent) and target.DebuffRemaining(rake_debuff) < BaseDuration(rake_debuff) * 0.3 or Talent(bloodtalons_talent) and BuffPresent(bloodtalons_buff) and { not Talent(soul_of_the_forest_talent) and target.DebuffRemaining(rake_debuff) <= 7 or target.DebuffRemaining(rake_debuff) <= 5 } and PersistentMultiplier(rake_debuff) > target.DebuffPersistentMultiplier(rake_debuff) * 0.8 } and target.TimeToDie() - target.DebuffRemaining(rake_debuff) > target.TickTime(rake_debuff) and Spell(rake) or not { ComboPoints() < 5 and { not target.DebuffPresent(rake_debuff) or not Talent(bloodtalons_talent) and target.DebuffRemaining(rake_debuff) < BaseDuration(rake_debuff) * 0.3 or Talent(bloodtalons_talent) and BuffPresent(bloodtalons_buff) and { not Talent(soul_of_the_forest_talent) and target.DebuffRemaining(rake_debuff) <= 7 or target.DebuffRemaining(rake_debuff) <= 5 } and PersistentMultiplier(rake_debuff) > target.DebuffPersistentMultiplier(rake_debuff) * 0.8 } and target.TimeToDie() - target.DebuffRemaining(rake_debuff) > target.TickTime(rake_debuff) and SpellUsable(rake) and SpellCooldown(rake) < TimeToEnergyFor(rake) } and { ComboPoints() < 5 and target.DebuffRemaining(moonfire_cat_debuff) <= 4.2 and target.TimeToDie() - target.DebuffRemaining(moonfire_cat_debuff) > target.TickTime(moonfire_cat_debuff) * 2 and Spell(moonfire_cat) or target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and Enemies() >= 2 and Spell(thrash_cat) or not { target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and Enemies() >= 2 and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat) } and { ComboPoints() < 5 and { False(raid_event_adds_exists) and 600 > { 1 + SpellMaxCharges(brutal_slash) - Charges(brutal_slash count=0) } * 15 or not False(raid_event_adds_exists) and Charges(brutal_slash count=0) > 2.66 and TimeInCombat() > 10 } and Spell(brutal_slash) or ComboPoints() < 5 and Enemies() >= 3 and Spell(swipe_cat) or ComboPoints() < 5 and { Enemies() < 3 or Talent(brutal_slash_talent) } and Spell(shred) } } } }
+}
+
 ### actions.precombat
 
 AddFunction FeralPrecombatMainActions
@@ -608,6 +777,10 @@ AddFunction FeralPrecombatMainActions
 	if Talent(bloodtalons_talent) Spell(healing_touch)
 	#cat_form
 	Spell(cat_form)
+}
+
+AddFunction FeralPrecombatMainPostConditions
+{
 }
 
 AddFunction FeralPrecombatShortCdActions
@@ -649,6 +822,10 @@ AddFunction FeralSbtOpenerMainActions
 	if Talent(bloodtalons_talent) and ComboPoints() == 5 and not BuffPresent(bloodtalons_buff) and not target.DebuffPresent(rip_debuff) Spell(healing_touch)
 }
 
+AddFunction FeralSbtOpenerMainPostConditions
+{
+}
+
 AddFunction FeralSbtOpenerShortCdActions
 {
 	unless Talent(bloodtalons_talent) and ComboPoints() == 5 and not BuffPresent(bloodtalons_buff) and not target.DebuffPresent(rip_debuff) and Spell(healing_touch)
@@ -661,6 +838,10 @@ AddFunction FeralSbtOpenerShortCdActions
 AddFunction FeralSbtOpenerShortCdPostConditions
 {
 	Talent(bloodtalons_talent) and ComboPoints() == 5 and not BuffPresent(bloodtalons_buff) and not target.DebuffPresent(rip_debuff) and Spell(healing_touch)
+}
+
+AddFunction FeralSbtOpenerCdActions
+{
 }
 
 AddFunction FeralSbtOpenerCdPostConditions
@@ -693,13 +874,19 @@ AddIcon checkbox=opt_druid_feral_aoe help=shortcd specialization=feral
 AddIcon enemies=1 help=main specialization=feral
 {
 	if not InCombat() FeralPrecombatMainActions()
-	FeralDefaultMainActions()
+	unless not InCombat() and FeralPrecombatMainPostConditions()
+	{
+		FeralDefaultMainActions()
+	}
 }
 
 AddIcon checkbox=opt_druid_feral_aoe help=aoe specialization=feral
 {
 	if not InCombat() FeralPrecombatMainActions()
-	FeralDefaultMainActions()
+	unless not InCombat() and FeralPrecombatMainPostConditions()
+	{
+		FeralDefaultMainActions()
+	}
 }
 
 AddIcon checkbox=!opt_druid_feral_aoe enemies=1 help=cd specialization=feral
@@ -854,6 +1041,10 @@ AddFunction GuardianDefaultMainActions
 	Spell(moonfire)
 }
 
+AddFunction GuardianDefaultMainPostConditions
+{
+}
+
 AddFunction GuardianDefaultShortCdActions
 {
 	#auto_attack
@@ -868,6 +1059,11 @@ AddFunction GuardianDefaultShortCdActions
 		#lunar_beam
 		Spell(lunar_beam)
 	}
+}
+
+AddFunction GuardianDefaultShortCdPostConditions
+{
+	{ BuffExpires(ironfur_buff) or RageDeficit() < 25 } and Spell(ironfur) or not BuffPresent(frenzied_regeneration_buff) and IncomingDamage(6) / MaxHealth() > 0.25 + { 2 - Charges(frenzied_regeneration count=0) } * 0.15 and Spell(frenzied_regeneration) or BuffExpires(pulverize_buff) and target.DebuffGain(thrash_bear_debuff) <= BaseDuration(thrash_bear_debuff) and Spell(pulverize) or Spell(mangle) or BuffRemaining(pulverize_buff) < GCD() and target.DebuffGain(thrash_bear_debuff) <= BaseDuration(thrash_bear_debuff) and Spell(pulverize) or Enemies() >= 2 and Spell(thrash_bear) or BuffRemaining(pulverize_buff) < 3.6 and target.DebuffGain(thrash_bear_debuff) <= BaseDuration(thrash_bear_debuff) and Spell(pulverize) or Talent(pulverize_talent) and BuffRemaining(pulverize_buff) < 3.6 and Spell(thrash_bear) or not target.DebuffPresent(moonfire_debuff) and Spell(moonfire) or target.DebuffRemaining(moonfire_debuff) < 3.6 and Spell(moonfire) or target.DebuffRemaining(moonfire_debuff) < 7.2 and Spell(moonfire) or Spell(moonfire)
 }
 
 AddFunction GuardianDefaultCdActions
@@ -890,6 +1086,11 @@ AddFunction GuardianDefaultCdActions
 	}
 }
 
+AddFunction GuardianDefaultCdPostConditions
+{
+	{ BuffExpires(ironfur_buff) or RageDeficit() < 25 } and Spell(ironfur) or not BuffPresent(frenzied_regeneration_buff) and IncomingDamage(6) / MaxHealth() > 0.25 + { 2 - Charges(frenzied_regeneration count=0) } * 0.15 and Spell(frenzied_regeneration) or BuffExpires(pulverize_buff) and target.DebuffGain(thrash_bear_debuff) <= BaseDuration(thrash_bear_debuff) and Spell(pulverize) or Spell(mangle) or BuffRemaining(pulverize_buff) < GCD() and target.DebuffGain(thrash_bear_debuff) <= BaseDuration(thrash_bear_debuff) and Spell(pulverize) or Spell(lunar_beam) or Enemies() >= 2 and Spell(thrash_bear) or BuffRemaining(pulverize_buff) < 3.6 and target.DebuffGain(thrash_bear_debuff) <= BaseDuration(thrash_bear_debuff) and Spell(pulverize) or Talent(pulverize_talent) and BuffRemaining(pulverize_buff) < 3.6 and Spell(thrash_bear) or not target.DebuffPresent(moonfire_debuff) and Spell(moonfire) or target.DebuffRemaining(moonfire_debuff) < 3.6 and Spell(moonfire) or target.DebuffRemaining(moonfire_debuff) < 7.2 and Spell(moonfire) or Spell(moonfire)
+}
+
 ### actions.precombat
 
 AddFunction GuardianPrecombatMainActions
@@ -900,9 +1101,21 @@ AddFunction GuardianPrecombatMainActions
 	Spell(bear_form)
 }
 
+AddFunction GuardianPrecombatMainPostConditions
+{
+}
+
+AddFunction GuardianPrecombatShortCdActions
+{
+}
+
 AddFunction GuardianPrecombatShortCdPostConditions
 {
 	Spell(bear_form)
+}
+
+AddFunction GuardianPrecombatCdActions
+{
 }
 
 AddFunction GuardianPrecombatCdPostConditions
@@ -916,6 +1129,7 @@ AddCheckBox(opt_druid_guardian_aoe L(AOE) default specialization=guardian)
 
 AddIcon checkbox=!opt_druid_guardian_aoe enemies=1 help=shortcd specialization=guardian
 {
+	if not InCombat() GuardianPrecombatShortCdActions()
 	unless not InCombat() and GuardianPrecombatShortCdPostConditions()
 	{
 		GuardianDefaultShortCdActions()
@@ -924,6 +1138,7 @@ AddIcon checkbox=!opt_druid_guardian_aoe enemies=1 help=shortcd specialization=g
 
 AddIcon checkbox=opt_druid_guardian_aoe help=shortcd specialization=guardian
 {
+	if not InCombat() GuardianPrecombatShortCdActions()
 	unless not InCombat() and GuardianPrecombatShortCdPostConditions()
 	{
 		GuardianDefaultShortCdActions()
@@ -933,17 +1148,24 @@ AddIcon checkbox=opt_druid_guardian_aoe help=shortcd specialization=guardian
 AddIcon enemies=1 help=main specialization=guardian
 {
 	if not InCombat() GuardianPrecombatMainActions()
-	GuardianDefaultMainActions()
+	unless not InCombat() and GuardianPrecombatMainPostConditions()
+	{
+		GuardianDefaultMainActions()
+	}
 }
 
 AddIcon checkbox=opt_druid_guardian_aoe help=aoe specialization=guardian
 {
 	if not InCombat() GuardianPrecombatMainActions()
-	GuardianDefaultMainActions()
+	unless not InCombat() and GuardianPrecombatMainPostConditions()
+	{
+		GuardianDefaultMainActions()
+	}
 }
 
 AddIcon checkbox=!opt_druid_guardian_aoe enemies=1 help=cd specialization=guardian
 {
+	if not InCombat() GuardianPrecombatCdActions()
 	unless not InCombat() and GuardianPrecombatCdPostConditions()
 	{
 		GuardianDefaultCdActions()
@@ -952,6 +1174,7 @@ AddIcon checkbox=!opt_druid_guardian_aoe enemies=1 help=cd specialization=guardi
 
 AddIcon checkbox=opt_druid_guardian_aoe help=cd specialization=guardian
 {
+	if not InCombat() GuardianPrecombatCdActions()
 	unless not InCombat() and GuardianPrecombatCdPostConditions()
 	{
 		GuardianDefaultCdActions()

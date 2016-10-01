@@ -98,6 +98,8 @@ do
 	tsort(files)
 end
 
+-- files = { "SimulationCraft_Priest_Shadow_T18M.simc"}
+
 local output = {}
 for _, filename in ipairs(files) do
 	local inputName = profilesDirectory .. "/" .. filename

@@ -1597,6 +1597,114 @@ Emit = function(parseNode, nodeList, annotation, action)
 	end
 end
 
+EmitConditionNode = function(nodeList, bodyNode, conditionNode, parseNode, annotation, action)
+	-- Put the extra conditions on the right-most side.
+	local extraConditionNode = conditionNode
+	conditionNode = nil
+	-- Concatenate all of the conditions from modifiers using the "and" operator.
+	for modifier, expressionNode in pairs(parseNode.child) do
+		local rhsNode = EmitModifier(modifier, expressionNode, nodeList, annotation, action)
+		if rhsNode then
+			if not conditionNode then
+				conditionNode = rhsNode
+			else
+				local lhsNode = conditionNode
+				conditionNode = OvaleAST:NewNode(nodeList, true)
+				conditionNode.type = "logical"
+				conditionNode.expressionType = "binary"
+				conditionNode.operator = "and"
+				conditionNode.child[1] = lhsNode
+				conditionNode.child[2] = rhsNode
+			end
+		end
+	end
+	if extraConditionNode then
+		if conditionNode then
+			local lhsNode = conditionNode
+			local rhsNode = extraConditionNode
+			conditionNode = OvaleAST:NewNode(nodeList, true)
+			conditionNode.type = "logical"
+			conditionNode.expressionType = "binary"
+			conditionNode.operator = "and"
+			conditionNode.child[1] = lhsNode
+			conditionNode.child[2] = rhsNode
+		else
+			conditionNode = extraConditionNode
+		end
+	end
+
+	-- Create "if" node.
+	if conditionNode then
+		local node = OvaleAST:NewNode(nodeList, true)
+		node.type = "if"
+		node.child[1] = conditionNode
+		node.child[2] = bodyNode
+		if bodyNode.type == "simc_pool_resource" then
+			node.simc_pool_resource = true
+		elseif bodyNode.type == "simc_wait" then
+			node.simc_wait = true
+		end
+		return node
+	else
+		return bodyNode
+	end
+end
+
+EmitNamedVariable = function(name, nodeList, annotation, modifier, parseNode, action)
+	if not annotation.variable then
+		annotation.variable = {}
+	end
+
+	local node = annotation.variable[name]
+	local group
+	if not node then
+		node = OvaleAST:NewNode(nodeList, true)
+		annotation.variable[name] = node
+		node.type = "add_function"
+		node.name = name
+		group = OvaleAST:NewNode(nodeList, true)
+		group.type = "group"
+		node.child[1] = group
+	else
+		group = node.child[1]
+	end 
+	local value = Emit(modifier.value, nodeList, annotation, action)
+	local newNode = EmitConditionNode(nodeList, value, nil, parseNode, annotation, action)
+	if newNode.type == "if" then
+		-- As Ovale stops at first value that is true, the if need to be in inverse order 
+		tinsert(group.child, 1, newNode)
+	else
+		tinsert(group.child, newNode)
+	end
+end
+
+EmitVariableMin = function(name, nodeList, annotation, modifier, parseNode, action)
+	EmitNamedVariable(name .. "_min", nodeList, annotation, modifier, parseNode, action)
+	local valueNode = annotation.variable[name] 
+	valueNode.name = name .. "_value"
+	annotation.variable[valueNode.name] = valueNode
+
+	local bodyCode = format("AddFunction %s { if %s_value() > %s_min() %s_value() %s_min() }", name, name, name, name, name)
+	local node = OvaleAST:ParseCode("add_function", bodyCode, nodeList, annotation.astAnnotation)
+	annotation.variable[name] = node
+end
+
+EmitVariable = function(nodeList, annotation, modifier, parseNode, action)
+	if not annotation.variable then
+		annotation.variable = {}
+	end
+
+	local op = (modifier.op and Unparse(modifier.op)) or "set"
+	local name = Unparse(modifier.name)
+	if op == "min" then
+		EmitVariableMin(name, nodeList, annotation, modifier, parseNode, action) 
+	elseif op == "set" then
+		EmitNamedVariable(name, nodeList, annotation, modifier, parseNode, action)
+	else
+		OvaleSimulationCraft:Error("Unknown variable operator '%s'.", op)
+	end
+end
+
 EmitAction = function(parseNode, nodeList, annotation)
 	local node
 	local canonicalizedName = strlower(gsub(parseNode.name, ":", "_"))
@@ -1918,8 +2026,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			bodyCode = camelSpecialization .. "GetInMeleeRange()"
 			isSpellAction = false
 		elseif action == "variable" then
-			-- TODO #60
-			-- skip
+			EmitVariable(nodeList, annotation, modifier, parseNode, action)
 			isSpellAction = false
 		elseif action == "call_action_list" or action == "run_action_list" or action == "swap_action_list" then
 			if modifier.name then
@@ -2071,55 +2178,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 
 		-- Conditions from modifiers, if present.
 		if bodyNode then
-			-- Put the extra conditions on the right-most side.
-			local extraConditionNode = conditionNode
-			conditionNode = nil
-			-- Concatenate all of the conditions from modifiers using the "and" operator.
-			for modifier, expressionNode in pairs(parseNode.child) do
-				local rhsNode = EmitModifier(modifier, expressionNode, nodeList, annotation, action)
-				if rhsNode then
-					if not conditionNode then
-						conditionNode = rhsNode
-					else
-						local lhsNode = conditionNode
-						conditionNode = OvaleAST:NewNode(nodeList, true)
-						conditionNode.type = "logical"
-						conditionNode.expressionType = "binary"
-						conditionNode.operator = "and"
-						conditionNode.child[1] = lhsNode
-						conditionNode.child[2] = rhsNode
-					end
-				end
-			end
-			if extraConditionNode then
-				if conditionNode then
-					local lhsNode = conditionNode
-					local rhsNode = extraConditionNode
-					conditionNode = OvaleAST:NewNode(nodeList, true)
-					conditionNode.type = "logical"
-					conditionNode.expressionType = "binary"
-					conditionNode.operator = "and"
-					conditionNode.child[1] = lhsNode
-					conditionNode.child[2] = rhsNode
-				else
-					conditionNode = extraConditionNode
-				end
-			end
-
-			-- Create "if" node.
-			if conditionNode then
-				node = OvaleAST:NewNode(nodeList, true)
-				node.type = "if"
-				node.child[1] = conditionNode
-				node.child[2] = bodyNode
-				if bodyNode.type == "simc_pool_resource" then
-					node.simc_pool_resource = true
-				elseif bodyNode.type == "simc_wait" then
-					node.simc_wait = true
-				end
-			else
-				node = bodyNode
-			end
+			node = EmitConditionNode(nodeList, bodyNode, conditionNode, parseNode, annotation, action)
 		end
 	end
 
@@ -2940,6 +2999,7 @@ do
 		["mana.max"]			= "MaxMana()",
 		["mana.pct"]			= "ManaPercent()",
 		["maelstrom"]			= "Maelstrom()",
+		["nonexecute_actors_pct"] = "0", -- TODO #74
 		["rage"]				= "Rage()",
 		["rage.deficit"]		= "RageDeficit()",
 		["rage.max"]			= "MaxRage()",
@@ -3863,9 +3923,20 @@ EmitOperandTrinket = function(operand, parseNode, nodeList, annotation, action)
 end
 
 EmitOperandVariable = function(operand, parseNode, nodeList, annotation, action)
-	local code = "0"
-	local node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
-	return true, node
+	-- local node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+	local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
+	local token = tokenIterator()
+	local node
+	local ok
+	if token == "variable" then
+		node = OvaleAST:NewNode(nodeList)
+		node.type = "function"
+		node.name = tokenIterator()
+		ok = true
+	else
+		ok = false
+	end
+	return ok, node
 end
 
 do
@@ -3921,11 +3992,12 @@ end
 local function Sweep(node)
 	local isChanged, isSwept = false, false
 	if node.type == "add_function" then
-		if self_functionUsed[node.name] then
-			isChanged, isSwept = Sweep(node.child[1])
-		else
-			isChanged, isSwept = true, true
-		end
+	-- TODODOO
+		-- if self_functionUsed[node.name] then
+		-- 	isChanged, isSwept = Sweep(node.child[1])
+		-- else
+		-- 	isChanged, isSwept = true, true
+		-- end
 	elseif node.type == "custom_function" and not self_functionDefined[node.name] then
 		isChanged, isSwept = true, true
 	elseif node.type == "group" or node.type == "script" then
@@ -4841,6 +4913,14 @@ local function InsertSupportingDefines(child, annotation)
 	return count
 end
 
+local function InsertVariables(child, annotation)
+	if annotation.variable then
+		for k,v in pairs(annotation.variable) do
+			tinsert(child, 1, v)
+		end
+	end
+end
+
 local function GenerateIconBody(tag, profile)
 	local annotation = profile.annotation
 	local precombatName = OvaleFunctionName("precombat", annotation)
@@ -5118,6 +5198,7 @@ function OvaleSimulationCraft:EmitAST(profile)
 		annotation.supportingFunctionCount = InsertSupportingFunctions(child, annotation)
 		annotation.supportingControlCount = InsertSupportingControls(child, annotation)
 		annotation.supportingDefineCount = InsertSupportingDefines(child, annotation)
+		InsertVariables(child, annotation)
 
 		-- Output a standard four-icon layout for the rotation: [shortcd] [main] [aoe] [cd]
 		local class, specialization = annotation.class, annotation.specialization

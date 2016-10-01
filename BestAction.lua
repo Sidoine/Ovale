@@ -210,7 +210,7 @@ local function GetActionSpellInfo(element, state, atTime, target)
 	OvaleBestAction:StartProfiling("OvaleBestAction_GetActionSpellInfo")
 
 	local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId
+		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionResourceExtend
 	local targetGUID = OvaleGUID:UnitGUID(target)
 
 	local spellId = element.positionalParams[1]
@@ -249,6 +249,7 @@ local function GetActionSpellInfo(element, state, atTime, target)
 			actionTexture = actionTexture or API_GetSpellTexture(spellId)
 			actionInRange = OvaleSpellBook:IsSpellInRange(spellId, target)
 			actionCooldownStart, actionCooldownDuration, actionEnable = state:GetSpellCooldown(spellId)
+			actionResourceExtend = 0
 			actionUsable = isUsable
 			if action then
 				actionShortcut = OvaleActionBar:GetBinding(action)
@@ -264,19 +265,15 @@ local function GetActionSpellInfo(element, state, atTime, target)
 				end
 				-- Extend the cooldown duration if the spell needs additional time to pool resources.
 				if actionCooldownStart and actionCooldownDuration then
-					local seconds = state:GetTimeToSpell(spellId, atTime, targetGUID)
-					if seconds > 0 then
-						local t = atTime + seconds
-						if t > actionCooldownStart + actionCooldownDuration then
-							if actionCooldownDuration > 0 then
-								local extend = t - (actionCooldownStart + actionCooldownDuration)
-								actionCooldownDuration = actionCooldownDuration + extend
-								state:Log("Extending cooldown of spell ID '%s' for primary resource by %fs.", spellId, extend)
-							else
-								actionCooldownStart = t
-								state:Log("Delaying spell ID '%s' for primary resource by %fs.", spellId, seconds)
-							end
+					local extraPower = element.namedParams.extra_amount or 0
+					local seconds = state:GetTimeToSpell(spellId, atTime, targetGUID, extraPower)
+					if seconds > 0 and seconds > actionCooldownDuration then
+						if actionCooldownDuration > 0 then
+							actionResourceExtend = seconds - actionCooldownDuration
+						else
+							actionResourceExtend = seconds
 						end
+						state:Log("Spell ID '%s' requires an extra %fs for primary resource.", spellId, actionResourceExtend)
 					end
 				end
 			end
@@ -285,7 +282,7 @@ local function GetActionSpellInfo(element, state, atTime, target)
 
 	OvaleBestAction:StopProfiling("OvaleBestAction_GetActionSpellInfo")
 	return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target
+		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target, actionResourceExtend
 end
 
 local function GetActionTextureInfo(element, state, atTime, target)
@@ -375,7 +372,8 @@ function OvaleBestAction:GetActionInfo(element, state, atTime)
 				element.actionEnable,
 				element.actionType,
 				element.actionId,
-				element.actionTarget
+				element.actionTarget,
+				element.actionResourceExtend
 		else
 			local target = element.namedParams.target or state.defaultTarget
 			if element.lowername == "item" then
@@ -519,7 +517,7 @@ function OvaleBestAction:ComputeAction(element, state, atTime)
 	state:Log("[%d]    evaluating action: %s(%s)", nodeId, element.name, element.paramsAsString)
 
 	local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget = self:GetActionInfo(element, state, atTime)
+		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget, actionResourceExtend = self:GetActionInfo(element, state, atTime)
 
 	-- Cache results for future GetActionInfo() when computation age has not advanced.
 	element.actionTexture = actionTexture
@@ -533,6 +531,7 @@ function OvaleBestAction:ComputeAction(element, state, atTime)
 	element.actionType = actionType
 	element.actionId = actionId
 	element.actionTarget = actionTarget
+	element.actionResourceExtend = actionResourceExtend
 
 	local action = element.positionalParams[1]
 	if not actionTexture then
@@ -567,12 +566,21 @@ function OvaleBestAction:ComputeAction(element, state, atTime)
 				state:Log("[%d]    Action %s is on cooldown (start=%f, duration=%f).", nodeId, action, actionCooldownStart, actionCooldownDuration)
 				start = actionCooldownStart + actionCooldownDuration
 			else
-				state:Log("[%d]    Action %s is waiting on the GCD or resources (start=%f).", nodeId, action, actionCooldownStart)
+				state:Log("[%d]    Action %s is waiting on the GCD (start=%f).", nodeId, action, actionCooldownStart)
 				start = actionCooldownStart
 			end
 		else
 			state:Log("[%d]    Action %s is off cooldown.", nodeId, action)
 			start = state.currentTime
+		end
+		-- If this is not a pool_resource action, extend the cooldown by the amount of extra time required for the ability to be ready.
+		if actionResourceExtend and actionResourceExtend > 0 then
+			if element.namedParams.pool_resource and element.namedParams.pool_resource == 1 then
+				state:Log("[%d]    Action %s is ignoring resource requirements because it is a pool_resource action.", nodeId, action)
+			else
+				state:Log("[%d]    Action %s is waiting on resources (start=%f, extend=%f).", nodeId, action, start, actionResourceExtend)
+				start = start + actionResourceExtend
+			end
 		end
 		state:Log("[%d]    start=%f atTime=%f", nodeId, start, atTime)
 

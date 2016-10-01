@@ -1004,7 +1004,7 @@ function OvaleFuture:LastSpellSent()
 		-- If spell in queue was successful
 		if sc.success then 
 			-- Use the more recently successful spellcast.
-			if not spellcast or spellcast.success < sc.success then
+			if not spellcast or (spellcast.success and spellcast.success < sc.success) or (not spellcast.success and spellcast.queued < sc.success) then
 				spellcast = sc
 			end
 		-- If spell in queue was not (yet) successful and not a cast time spell

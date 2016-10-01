@@ -494,7 +494,7 @@ statePrototype.IsUsableSpell = function(state, spellId, atTime, targetGUID)
 end
 
 -- Get the number of seconds before the spell is ready to be cast, either due to cooldown or resources.
-statePrototype.GetTimeToSpell = function(state, spellId, atTime, targetGUID)
+statePrototype.GetTimeToSpell = function(state, spellId, atTime, targetGUID, extraPower)
 	if type(atTime) == "string" and not targetGUID then
 		atTime, targetGUID = nil, atTime
 	end
@@ -511,7 +511,7 @@ statePrototype.GetTimeToSpell = function(state, spellId, atTime, targetGUID)
 	end
 	-- Pooled resource.
 	do
-		local seconds = state:TimeToPower(spellId, atTime, targetGUID)
+		local seconds = state:TimeToPower(spellId, atTime, targetGUID, _, extraPower)
 		if timeToSpell < seconds then
 			timeToSpell = seconds
 		end
