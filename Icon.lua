@@ -112,7 +112,7 @@ local function Update(self, element, startTime, actionTexture, actionInRange, ac
 			self.cd:Hide()
 		end
 
-		-- L'icône avec le cooldown
+		-- Icon texture and cooldown
 		self.icone:Show()
 		self.icone:SetTexture(actionTexture)
 
@@ -276,7 +276,7 @@ function OvaleIcon_OnEnter(self)
 			local actionHelp = self.actionHelp
 			if not actionHelp then
 				if self.actionType == "spell" then
-					actionHelp = OvaleSpellBook:GetSpellName(self.actionId)
+					actionHelp = OvaleSpellBook:GetSpellName(self.actionId) -- .. " (" .. self.actionId .. ")"
 				elseif self.actionType == "value" then
 					actionHelp = (self.value < INFINITY) and tostring(self.value) or "infinity"
 				else

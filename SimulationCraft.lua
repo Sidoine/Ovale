@@ -1768,7 +1768,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			bodyCode = camelSpecialization .. "GetInMeleeRange()"
 			annotation[action] = class
 			isSpellAction = false
-		elseif class == "HUNTER" and (action == "muzzle" or action == "silencing_shot") then
+		elseif class == "HUNTER" and (action == "muzzle" or action == "counter_shot") then
 			bodyCode = camelSpecialization .. "InterruptActions()"
 			annotation[action] = class
 			annotation.interrupt = class
@@ -4263,8 +4263,8 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "revive_pet")
 		count = count + 1
 	end
-	if annotation.silencing_shot == "HUNTER" then
-		InsertInterruptFunction(child, annotation, "silencing_shot")
+	if annotation.counter_shot == "HUNTER" then
+		InsertInterruptFunction(child, annotation, "counter_shot")
 		count = count + 1
 	end
 	if annotation.muzzle == "HUNTER" then
@@ -4533,14 +4533,14 @@ local function InsertSupportingFunctions(child, annotation)
 		local fmt = [[
 			AddFunction %sGetInMeleeRange
 			{
-				if CheckBoxOn(opt_melee_range) and not target.InRange(primal_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
+				if CheckBoxOn(opt_melee_range) and not target.InRange(stormstrike) Texture(misc_arrowlup help=L(not_in_melee_range))
 			}
 		]]
 		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "shortcd"
-		AddSymbol(annotation, "primal_strike")
+		AddSymbol(annotation, "stormstrike")
 		count = count + 1
 	end
 	if annotation.bloodlust == "SHAMAN" then

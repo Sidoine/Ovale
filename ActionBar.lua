@@ -13,12 +13,15 @@ Ovale.OvaleActionBar = OvaleActionBar
 local L = Ovale.L
 local OvaleDebug = Ovale.OvaleDebug
 local OvaleProfiler = Ovale.OvaleProfiler
+local OvaleSpellBook = nil
 
 local gsub = string.gsub
 local strlen = string.len
 local strmatch = string.match
 local strupper = string.upper
+local tconcat = table.concat
 local tonumber = tonumber
+local tsort = table.sort
 local wipe = wipe
 local API_GetActionInfo = GetActionInfo
 local API_GetActionText = GetActionText
@@ -31,6 +34,28 @@ local API_GetMacroSpell = GetMacroSpell
 OvaleDebug:RegisterDebugging(OvaleActionBar)
 -- Register for profiling.
 OvaleProfiler:RegisterProfiling(OvaleActionBar)
+
+do
+	local debugOptions = {
+		actionbar = {
+			name = L["Action bar"],
+			type = "group",
+			args = {
+				spellbook = {
+					name = L["Action bar"],
+					type = "input",
+					multiline = 25,
+					width = "full",
+					get = function(info) return OvaleActionBar:DebugActions() end,
+				},
+			},
+		}
+	}
+	-- Insert debug options into OvaleDebug.
+	for k, v in pairs(debugOptions) do
+		OvaleDebug.options.args[k] = v
+	end
+end
 --</private-static-properties>
 
 --<public-static-properties>
@@ -103,6 +128,7 @@ function OvaleActionBar:OnEnable()
 	self:RegisterEvent("UPDATE_BONUS_ACTIONBAR", "UpdateActionSlots")
 	self:RegisterMessage("Ovale_StanceChanged", "UpdateActionSlots")
 	self:RegisterMessage("Ovale_TalentsChanged", "UpdateActionSlots")
+	OvaleSpellBook = Ovale.OvaleSpellBook
 end
 	
 function OvaleActionBar:OnDisable()
@@ -253,4 +279,34 @@ end
 function OvaleActionBar:GetBinding(slot)
 	return self.keybind[slot]
 end
+
+
+do
+	local output = {}
+		
+	local function OutputTableValues(output, tbl)
+		
+	end
+
+	-- Print out the list of known spells in alphabetical order.
+	function OvaleActionBar:DebugActions()
+		wipe(output)
+		local array = {}
+		for k, v in pairs(self.spell) do
+			tinsert(array, tostring(GetKeyBinding(v)) .. ": " .. tostring(k) .. " " .. tostring(OvaleSpellBook:GetSpellName(k)))
+		end
+		tsort(array)
+		for _, v in ipairs(array) do
+			output[#output + 1] = v
+		end
+
+		local total = 0
+		for _ in pairs(self.spell) do
+			total = total + 1
+		end
+		output[#output + 1] = "Total spells: " .. total
+		return tconcat(output, "\n")
+	end
+end
+
 --</public-static-methods>
