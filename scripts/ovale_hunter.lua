@@ -24,7 +24,7 @@ AddFunction BeastMasteryInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
-		Spell(silencing_shot)
+		Spell(counter_shot)
 		if not target.Classification(worldboss)
 		{
 			Spell(arcane_torrent_focus)
@@ -93,7 +93,7 @@ AddFunction BeastMasteryDefaultShortCdPostConditions
 AddFunction BeastMasteryDefaultCdActions
 {
 	#auto_shot
-	#silencing_shot
+	#counter_shot
 	BeastMasteryInterruptActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
@@ -234,7 +234,7 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # pet_beast_cleave_buff
 # quaking_palm
 # revive_pet
-# silencing_shot
+# counter_shot
 # stampede
 # titans_thunder
 # war_stomp
@@ -262,7 +262,7 @@ AddFunction MarksmanshipInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
-		Spell(silencing_shot)
+		Spell(counter_shot)
 		if not target.Classification(worldboss)
 		{
 			Spell(arcane_torrent_focus)
@@ -388,7 +388,7 @@ AddFunction MarksmanshipDefaultShortCdPostConditions
 AddFunction MarksmanshipDefaultCdActions
 {
 	#auto_shot
-	#silencing_shot
+	#counter_shot
 	MarksmanshipInterruptActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
@@ -556,7 +556,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # sentinel
 # sidewinders
 # sidewinders_talent
-# silencing_shot
+# counter_shot
 # steady_focus_buff
 # steady_focus_talent
 # true_aim_debuff
