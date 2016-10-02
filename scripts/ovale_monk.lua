@@ -40,6 +40,7 @@ AddFunction BrewmasterDefaultAoEActions
 	Spell(exploding_keg)
 	Spell(keg_smash)
 	Spell(chi_burst)
+	Spell(chi_wave)
 	if target.DebuffPresent(keg_smash_debuff) Spell(breath_of_fire)
 	Spell(rushing_jade_wind)
 	if Energy() >= 65 Spell(tiger_palm)
