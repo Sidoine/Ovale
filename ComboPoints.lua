@@ -179,7 +179,7 @@ function OvaleComboPoints:UNIT_POWER(event, unitId, powerToken)
 				tremove(self_pendingComboEvents, 1)
 			end
 		end
-		if not pendingMatched and not OvaleFuture.inCombat and difference <= 0 then
+--[[	if not pendingMatched and not OvaleFuture.inCombat and difference <= 0 then
 			self:Debug("    Out-of-combat combo point decay.")
 			if difference == 0 then
 				-- Decrement the combo point count until game state catches up with the event.
@@ -187,7 +187,7 @@ function OvaleComboPoints:UNIT_POWER(event, unitId, powerToken)
 				self.combo = newCombo > 0 and newCombo or 0
 				self:Debug("    Decaying to %d combo point(s).", self.combo)
 			end
-		end
+		end ]]--
 	end
 end
 
