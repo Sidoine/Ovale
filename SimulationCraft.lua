@@ -722,6 +722,10 @@ ParseExpression = function(tokenStream, nodeList, annotation, minPrecedence)
 						node.child[1] = lhsNode
 						node.child[2] = rhsNode
 						lhsNode.asType = asType
+						if not rhsNode then
+							SyntaxError(tokenStream, "Syntax error: no right operand in binary operator %s.", token)
+							return false				
+						end
 						rhsNode.asType = asType
 						-- Left-rotate tree to preserve precedence.
 						while node.type == rhsNode.type and node.operator == rhsNode.operator and BINARY_OPERATOR[node.operator][3] == "associative" and rhsNode.expressionType == "binary" do
@@ -1071,6 +1075,11 @@ local function InitializeDisambiguation()
 	AddDisambiguation("soul_reaper",			"soul_reaper_blood",			"DEATHKNIGHT",	"blood")
 	AddDisambiguation("soul_reaper",			"soul_reaper_frost",			"DEATHKNIGHT",	"frost")
 	AddDisambiguation("soul_reaper",			"soul_reaper_unholy",			"DEATHKNIGHT",	"unholy")
+	-- Demon Hunter
+	AddDisambiguation("metamorphosis", 			"metamorphosis_veng", "DEMONHUNTER", "vengeance")
+	AddDisambiguation("metamorphosis_buff", 	"metamorphosis_veng_buff", "DEMONHUNTER", "vengeance")
+	AddDisambiguation("metamorphosis", 			"metamorphosis_havoc", "DEMONHUNTER", "havoc")
+	AddDisambiguation("metamorphosis_buff", 	"metamorphosis_havoc_buff", "DEMONHUNTER", "havoc")
 	-- Druid
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_energy",		"DRUID")
 	AddDisambiguation("berserk",				"berserk_bear",					"DRUID",		"guardian")
@@ -2822,9 +2831,9 @@ EmitOperandArtifact = function(operand, parseNode, nodeList, annotation, action,
 		local property = tokenIterator()
 
 		if property == "rank" then
-			code = "0" 
+			code = format("ArtifactTraitRank(%s)", name) 
 		elseif property == "enabled" then
-			code = format("BuffPresent(%s_buff)", name)
+			code = format("HasArtifactTrait(%s)", name)
 		else
 			ok = false
 		end
@@ -2954,6 +2963,7 @@ do
 		["active_enemies"]		= "Enemies()",
 		["astral_power"] 		= "AstralPower()",
 		["astral_power.deficit"]= "AstralPowerDeficit()",
+		["blade_dance_worth_using"] = "0",--TODO
 		["blood.frac"]			= "Rune(blood)",
 		["chi"]					= "Chi()",
 		["chi.max"]				= "MaxChi()",
@@ -2964,6 +2974,8 @@ do
 		["crit_pct_current"]	= "SpellCritChance()",
 		["current_insanity_drain"] = "CurrentInsanityDrain()",
 		["darkglare_no_de"]     = "NotDeDemons(darkglare)",
+		["death_sweep_worth_using"] = "0", --TODO
+		["delay"]				= "0", -- TODO
 		["demonic_fury"]		= "DemonicFury()",
 		["desired_targets"]		= "Enemies(tagged=1)",
 		["doomguard_no_de"]		= "NotDeDemons(doomguard)",
@@ -3001,6 +3013,7 @@ do
 		["mana.pct"]			= "ManaPercent()",
 		["maelstrom"]			= "Maelstrom()",
 		["nonexecute_actors_pct"] = "0", -- TODO #74
+		["pain"]				= "Pain()",
 		["rage"]				= "Rage()",
 		["rage.deficit"]		= "RageDeficit()",
 		["rage.max"]			= "MaxRage()",
@@ -3011,8 +3024,10 @@ do
 		["runic_power.deficit"]	= "RunicPowerDeficit()",
 		["service_no_de"]		= "0", -- TODO manage service pet in WildImps.lua
 		["shadow_orb"]			= "ShadowOrbs()",
+		["sigil_placed"]		= "PreviousSpell(sigil_of_flame)",
 		["solar_max"]			= "TimeToEclipse(solar)",	-- XXX
 		["soul_shard"]			= "SoulShards()",
+		["soul_fragments"]		= "BuffStacks(soul_fragments)",
 		["stat.multistrike_pct"]= "MultistrikeChance()",
 		["stealthed"]			= "Stealthed()",
 		["time"]				= "TimeInCombat()",
@@ -4173,6 +4188,20 @@ local function InsertSupportingFunctions(child, annotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "shortcd"
 		AddSymbol(annotation, "death_strike")
+		count = count + 1
+	end
+	if annotation.melee == "DEMONHUNTER" then
+		local fmt = [[
+			AddFunction %sGetInMeleeRange
+			{
+				if CheckBoxOn(opt_melee_range) and not target.InRange(consume_magic) Texture(misc_arrowlup help=L(not_in_melee_range))
+			}
+		]]
+		local code = format(fmt, camelSpecialization)
+		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		annotation.functionTag[node.name] = "shortcd"
+		AddSymbol(annotation, "consume_magic")
 		count = count + 1
 	end
 	if annotation.skull_bash == "DRUID" then

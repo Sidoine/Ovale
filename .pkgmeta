@@ -17,6 +17,7 @@ externals:
     libs/LibDBIcon-1.0: svn://svn.wowace.com/wow/libdbicon-1-0/mainline/trunk/LibDBIcon-1.0
     libs/LibStub: svn://svn.wowace.com/wow/libstub/mainline/trunk
     libs/LibTextDump-1.0: git://git.wowace.com/wow/libtextdump-1-0/mainline.git
+    libs/LibArtifactData-1.0: git://git.wowace.com/wow/libartifactdata-1-0/mainline.git
 
 enable-nolib-creation: no
 

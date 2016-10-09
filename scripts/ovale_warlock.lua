@@ -797,7 +797,7 @@ AddFunction DestructionDefaultCdActions
 		unless Talent(roaring_blaze_talent) and { Charges(conflagrate) == 2 or Charges(conflagrate) >= 1 and SpellChargeCooldown(conflagrate) < GCD() } and Spell(conflagrate) or Talent(roaring_blaze_talent) and PreviousGCDSpell(conflagrate) and Spell(conflagrate) or Talent(roaring_blaze_talent) and target.DebuffStacks(roaring_blaze_debuff) == 2 and Spell(conflagrate) or Talent(roaring_blaze_talent) and target.DebuffStacks(roaring_blaze_debuff) == 3 and BuffPresent(burst_haste_buff any=1) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and not BuffPresent(backdraft_buff) and BuffRemaining(conflagration_of_chaos_buff) <= CastTime(chaos_bolt) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and not BuffPresent(backdraft_buff) and { Charges(conflagrate) == 1 and SpellChargeCooldown(conflagrate) < CastTime(chaos_bolt) or Charges(conflagrate) == 2 } and SoulShards() < 5 and Spell(conflagrate) or Spell(service_imp)
 		{
 			#summon_infernal,if=artifact.lord_of_flames.rank>0&!buff.lord_of_flames.remains
-			if 0 > 0 and not BuffPresent(lord_of_flames_buff) Spell(summon_infernal)
+			if ArtifactTraitRank(lord_of_flames) > 0 and not BuffPresent(lord_of_flames_buff) Spell(summon_infernal)
 			#summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening<3
 			if not Talent(grimoire_of_supremacy_talent) and Enemies() < 3 Spell(summon_doomguard)
 			#summon_infernal,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening>=3

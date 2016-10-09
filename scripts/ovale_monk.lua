@@ -37,9 +37,9 @@ AddFunction WindwalkerDefaultMainActions
 	unless TimeInCombat() < 15 and WindwalkerOpenerMainPostConditions()
 	{
 		#storm_earth_and_fire,if=artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.remains<13&cooldown.fists_of_fury.remains<=9&cooldown.rising_sun_kick.remains<=5
-		if BuffPresent(strike_of_the_windlord_buff) and SpellCooldown(strike_of_the_windlord) < 13 and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } Spell(storm_earth_and_fire)
+		if HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) < 13 and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } Spell(storm_earth_and_fire)
 		#storm_earth_and_fire,if=!artifact.strike_of_the_windlord.enabled&cooldown.fists_of_fury.remains<=9&cooldown.rising_sun_kick.remains<=5
-		if not BuffPresent(strike_of_the_windlord_buff) and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } Spell(storm_earth_and_fire)
+		if not HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } Spell(storm_earth_and_fire)
 		#call_action_list,name=serenity,if=buff.serenity.up
 		if BuffPresent(serenity_buff) WindwalkerSerenityMainActions()
 
@@ -79,14 +79,14 @@ AddFunction WindwalkerDefaultShortCdActions
 	{
 		#potion,name=deadly_grace,if=buff.serenity.up|buff.storm_earth_and_fire.up|(!talent.serenity.enabled&trinket.proc.agility.react)|buff.bloodlust.react|target.time_to_die<=60
 		#serenity,if=artifact.gale_burst.enabled&cooldown.touch_of_death.ready&cooldown.strike_of_the_windlord.remains<14&cooldown.fists_of_fury.remains<=15&cooldown.rising_sun_kick.remains<7
-		if BuffPresent(gale_burst_buff) and SpellCooldownDuration(touch_of_death) and SpellCooldown(strike_of_the_windlord) < 14 and SpellCooldown(fists_of_fury) <= 15 and SpellCooldown(rising_sun_kick) < 7 Spell(serenity)
+		if HasArtifactTrait(gale_burst) and SpellCooldownDuration(touch_of_death) and SpellCooldown(strike_of_the_windlord) < 14 and SpellCooldown(fists_of_fury) <= 15 and SpellCooldown(rising_sun_kick) < 7 Spell(serenity)
 
-		unless BuffPresent(strike_of_the_windlord_buff) and SpellCooldown(strike_of_the_windlord) < 13 and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } and Spell(storm_earth_and_fire) or not BuffPresent(strike_of_the_windlord_buff) and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } and Spell(storm_earth_and_fire)
+		unless HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) < 13 and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } and Spell(storm_earth_and_fire) or not HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } and Spell(storm_earth_and_fire)
 		{
 			#serenity,if=artifact.strike_of_the_windlord.enabled&!artifact.gale_burst.enabled&cooldown.strike_of_the_windlord.remains<14&cooldown.fists_of_fury.remains<=15&cooldown.rising_sun_kick.remains<7
-			if BuffPresent(strike_of_the_windlord_buff) and not BuffPresent(gale_burst_buff) and SpellCooldown(strike_of_the_windlord) < 14 and SpellCooldown(fists_of_fury) <= 15 and SpellCooldown(rising_sun_kick) < 7 Spell(serenity)
+			if HasArtifactTrait(strike_of_the_windlord) and not HasArtifactTrait(gale_burst) and SpellCooldown(strike_of_the_windlord) < 14 and SpellCooldown(fists_of_fury) <= 15 and SpellCooldown(rising_sun_kick) < 7 Spell(serenity)
 			#serenity,if=!artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.remains<14&cooldown.fists_of_fury.remains<=15&cooldown.rising_sun_kick.remains<7
-			if not BuffPresent(strike_of_the_windlord_buff) and SpellCooldown(strike_of_the_windlord) < 14 and SpellCooldown(fists_of_fury) <= 15 and SpellCooldown(rising_sun_kick) < 7 Spell(serenity)
+			if not HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) < 14 and SpellCooldown(fists_of_fury) <= 15 and SpellCooldown(rising_sun_kick) < 7 Spell(serenity)
 			#call_action_list,name=serenity,if=buff.serenity.up
 			if BuffPresent(serenity_buff) WindwalkerSerenityShortCdActions()
 
@@ -115,7 +115,7 @@ AddFunction WindwalkerDefaultShortCdActions
 
 AddFunction WindwalkerDefaultShortCdPostConditions
 {
-	TimeInCombat() < 15 and WindwalkerOpenerShortCdPostConditions() or BuffPresent(strike_of_the_windlord_buff) and SpellCooldown(strike_of_the_windlord) < 13 and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } and Spell(storm_earth_and_fire) or not BuffPresent(strike_of_the_windlord_buff) and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } and Spell(storm_earth_and_fire) or BuffPresent(serenity_buff) and WindwalkerSerenityShortCdPostConditions() or Spell(fists_of_fury) or Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Enemies() < 3 and WindwalkerStShortCdPostConditions() or Enemies() >= 3 and WindwalkerAoeShortCdPostConditions()
+	TimeInCombat() < 15 and WindwalkerOpenerShortCdPostConditions() or HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) < 13 and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } and Spell(storm_earth_and_fire) or not HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } and Spell(storm_earth_and_fire) or BuffPresent(serenity_buff) and WindwalkerSerenityShortCdPostConditions() or Spell(fists_of_fury) or Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Enemies() < 3 and WindwalkerStShortCdPostConditions() or Enemies() >= 3 and WindwalkerAoeShortCdPostConditions()
 }
 
 AddFunction WindwalkerDefaultCdActions
@@ -128,9 +128,9 @@ AddFunction WindwalkerDefaultCdActions
 	unless TimeInCombat() < 15 and WindwalkerOpenerCdPostConditions()
 	{
 		#touch_of_death,if=!artifact.gale_burst.enabled
-		if not BuffPresent(gale_burst_buff) Spell(touch_of_death)
+		if not HasArtifactTrait(gale_burst) Spell(touch_of_death)
 		#touch_of_death,if=artifact.gale_burst.enabled&cooldown.strike_of_the_windlord.remains<8&cooldown.fists_of_fury.remains<=4&cooldown.rising_sun_kick.remains<7
-		if BuffPresent(gale_burst_buff) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 4 and SpellCooldown(rising_sun_kick) < 7 Spell(touch_of_death)
+		if HasArtifactTrait(gale_burst) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 4 and SpellCooldown(rising_sun_kick) < 7 Spell(touch_of_death)
 		#blood_fury
 		Spell(blood_fury_apsp)
 		#berserking
@@ -138,7 +138,7 @@ AddFunction WindwalkerDefaultCdActions
 		#arcane_torrent,if=chi.max-chi>=1
 		if MaxChi() - Chi() >= 1 Spell(arcane_torrent_chi)
 
-		unless BuffPresent(strike_of_the_windlord_buff) and SpellCooldown(strike_of_the_windlord) < 13 and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } and Spell(storm_earth_and_fire) or not BuffPresent(strike_of_the_windlord_buff) and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } and Spell(storm_earth_and_fire)
+		unless HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) < 13 and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } and Spell(storm_earth_and_fire) or not HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } and Spell(storm_earth_and_fire)
 		{
 			#call_action_list,name=serenity,if=buff.serenity.up
 			if BuffPresent(serenity_buff) WindwalkerSerenityCdActions()
@@ -160,7 +160,7 @@ AddFunction WindwalkerDefaultCdActions
 
 AddFunction WindwalkerDefaultCdPostConditions
 {
-	TimeInCombat() < 15 and WindwalkerOpenerCdPostConditions() or BuffPresent(strike_of_the_windlord_buff) and SpellCooldown(strike_of_the_windlord) < 13 and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } and Spell(storm_earth_and_fire) or not BuffPresent(strike_of_the_windlord_buff) and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } and Spell(storm_earth_and_fire) or BuffPresent(serenity_buff) and WindwalkerSerenityCdPostConditions() or Spell(strike_of_the_windlord) or Spell(fists_of_fury) or Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Enemies() < 3 and WindwalkerStCdPostConditions() or Enemies() >= 3 and WindwalkerAoeCdPostConditions()
+	TimeInCombat() < 15 and WindwalkerOpenerCdPostConditions() or HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) < 13 and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } and Spell(storm_earth_and_fire) or not HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 and CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } and Spell(storm_earth_and_fire) or BuffPresent(serenity_buff) and WindwalkerSerenityCdPostConditions() or Spell(strike_of_the_windlord) or Spell(fists_of_fury) or Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Enemies() < 3 and WindwalkerStCdPostConditions() or Enemies() >= 3 and WindwalkerAoeCdPostConditions()
 }
 
 ### actions.aoe
