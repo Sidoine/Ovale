@@ -70,7 +70,7 @@ AddFunction BeastMasteryDefaultMainPostConditions
 
 AddFunction BeastMasteryDefaultShortCdActions
 {
-  #Pet Healing Sicne they're a major part of DPS
+  #Pet Healing since they're a major part of DPS
   if(pet.HealthPercent(less 80)) Spell(mend_pet)
 	#potion,name=deadly_grace
 	#a_murder_of_crows
@@ -359,7 +359,7 @@ AddFunction MarksmanshipDefaultShortCdActions
 
 	unless MarksmanshipCooldownsShortCdPostConditions()
 	{
-    #Pet Healing Sicne they're a major part of DPS if no Lone Wolf
+    #Pet Healing since they're a major part of DPS if no Lone Wolf
     if(pet.HealthPercent(less 80) and not Talent(lone_wolf_talent)) Spell(mend_pet)
 		#a_murder_of_crows
 		Spell(a_murder_of_crows)
@@ -656,7 +656,7 @@ AddFunction SurvivalDefaultMainPostConditions
 
 AddFunction SurvivalDefaultShortCdActions
 {
-  #Pet Healing Sicne they're a major part of DPS if no Lone Wolf
+  #Pet Healing since they're a major part of DPS if no Lone Wolf
   if(pet.HealthPercent(less 80) and not Talent(lone_wolf_talent)) Spell(mend_pet)
 	#potion,name=deadly_grace
 	#steel_trap
