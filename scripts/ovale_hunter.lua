@@ -228,6 +228,7 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # blood_fury_ap
 # chimaera_shot
 # cobra_shot
+# counter_shot
 # dire_beast
 # dire_frenzy
 # kill_command
@@ -236,7 +237,6 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # pet_beast_cleave_buff
 # quaking_palm
 # revive_pet
-# counter_shot
 # stampede
 # titans_thunder
 # war_stomp
@@ -546,6 +546,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # black_arrow
 # blood_fury_ap
 # bullseye_buff
+# counter_shot
 # explosive_shot
 # hunters_mark_debuff
 # lock_and_load_buff
@@ -560,7 +561,6 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # sentinel
 # sidewinders
 # sidewinders_talent
-# counter_shot
 # steady_focus_buff
 # steady_focus_talent
 # true_aim_debuff

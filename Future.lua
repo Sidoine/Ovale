@@ -1173,15 +1173,15 @@ function OvaleFuture:ResetState(state)
 
 	state.nextCast = now
 	local reason = ""
-	-- local start, duration = OvaleCooldown:GetGlobalCooldown(now)
-	-- if start and start > 0 then
-	-- 	-- The GCD is active, so adjust the next cast time to the end of the GCD.
-	-- 	local ending = start + duration
-	-- 	if state.nextCast < ending then
-	-- 		state.nextCast = ending
-	-- 		reason = " (waiting for GCD)"
-	-- 	end
-	-- end
+	local start, duration = OvaleCooldown:GetGlobalCooldown(now)
+	if start and start > 0 then
+		-- The GCD is active, so adjust the next cast time to the end of the GCD.
+		local ending = start + duration
+		if state.nextCast < ending then
+			state.nextCast = ending
+			reason = " (waiting for GCD)"
+		end
+	end
 
 	local lastGCDSpellcastFound, lastOffGCDSpellcastFound, lastSpellcastFound
 	for i = #self.queue, 1, -1 do
