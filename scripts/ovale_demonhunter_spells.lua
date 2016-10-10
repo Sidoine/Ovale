@@ -58,14 +58,11 @@ Define(fiery_brand 204021)
 Define(fiery_brand_debuff 207744)
 	SpellInfo(fiery_brand_debuff duration=8)
 Define(first_blood_talent 8)
-<<<<<<< HEAD
 Define(flame_crash_talent 8)
-=======
 Define(fracture 209795)	
 Define(frailty_debuff 224509)
 	SpellInfo(frailty_debuff duration=15)
->>>>>>> 31f3a355ee8c745e967146a46fa098d49999846d
-Define(fury_of_the_ilidari 201467)
+Define(fury_of_the_illidari 201467)
 	SpellInfo(fury_of_the_ilidari cd=60)
 Define(immolation_aura 178740)
 	SpellAddBuff(immolation_aura immolation_aura_buff=1)
@@ -102,7 +99,6 @@ Define(soul_cleave  228477)
 	SpellAddBuff(soul_cleave soul_fragments=0)
 Define(soul_carver 214743)
 	SpellInfo(soul_carver cd=40)
-<<<<<<< HEAD
 Define(soul_fragments_buff 204256)
 Define(felblade 213241)
 	SpellInfo(felblade cd=15)
@@ -113,24 +109,14 @@ Define(empower_wards 218256)
 	SpellAddBuff(empower_wards empower_wards_buff=1)
 Define(empower_wards_buff 218256)
 	SpellInfo(empower_wards_buff duration=6)
-<<<<<<< HEAD
- 
-  
-
-=======
-=======
->>>>>>> 31f3a355ee8c745e967146a46fa098d49999846d
 Define(soul_fragments 203981)
 	SpellInfo(soul_fragments duration=20)		
 Define(soul_barrier 227225)
 	SpellInfo(soul_barrier cd=20)
 Define(spirit_bomb 218679)	
-<<<<<<< HEAD
 Define(fel_devastation 212084)
 	SpellInfo(fel_devastation cd=60)
 Define(fracture 209795)	
->>>>>>> ce984cf99194413d14f5b0d618e2885bd969d654
-=======
 Define(throw_glaive 185123)
 Define(vengeful_retreat 198793)
 	SpellAddTargetDebuff(vengeful_retreat vengeful_retreat_debuff=1)
@@ -152,7 +138,7 @@ Define(momentum_talent 13)
 Define(nemesis_talent 15)
 
 SpellInfo(fel_rush tag=shortcd)
->>>>>>> 31f3a355ee8c745e967146a46fa098d49999846d
+
 ]]
 
 	OvaleScripts:RegisterScript("DEMONHUNTER", nil, name, desc, code, "include")
