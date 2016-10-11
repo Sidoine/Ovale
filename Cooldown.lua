@@ -206,7 +206,7 @@ function OvaleCooldown:GetSpellCooldown(spellId)
 			end
 		else
 			-- Spell is ready now.
-			cdStart, cdDuration, cdEnable = start, duration, enable
+			cdStart, cdDuration, cdEnable = start or 0, duration, enable
 		end
 	end
 

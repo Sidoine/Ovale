@@ -722,6 +722,10 @@ ParseExpression = function(tokenStream, nodeList, annotation, minPrecedence)
 						node.child[1] = lhsNode
 						node.child[2] = rhsNode
 						lhsNode.asType = asType
+						if not rhsNode then
+							SyntaxError(tokenStream, "Syntax error: no right operand in binary operator %s.", token)
+							return false				
+						end
 						rhsNode.asType = asType
 						-- Left-rotate tree to preserve precedence.
 						while node.type == rhsNode.type and node.operator == rhsNode.operator and BINARY_OPERATOR[node.operator][3] == "associative" and rhsNode.expressionType == "binary" do
@@ -1071,6 +1075,11 @@ local function InitializeDisambiguation()
 	AddDisambiguation("soul_reaper",			"soul_reaper_blood",			"DEATHKNIGHT",	"blood")
 	AddDisambiguation("soul_reaper",			"soul_reaper_frost",			"DEATHKNIGHT",	"frost")
 	AddDisambiguation("soul_reaper",			"soul_reaper_unholy",			"DEATHKNIGHT",	"unholy")
+	-- Demon Hunter
+	AddDisambiguation("metamorphosis", 			"metamorphosis_veng", "DEMONHUNTER", "vengeance")
+	AddDisambiguation("metamorphosis_buff", 	"metamorphosis_veng_buff", "DEMONHUNTER", "vengeance")
+	AddDisambiguation("metamorphosis", 			"metamorphosis_havoc", "DEMONHUNTER", "havoc")
+	AddDisambiguation("metamorphosis_buff", 	"metamorphosis_havoc_buff", "DEMONHUNTER", "havoc")
 	-- Druid
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_energy",		"DRUID")
 	AddDisambiguation("berserk",				"berserk_bear",					"DRUID",		"guardian")
@@ -1768,7 +1777,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			bodyCode = camelSpecialization .. "GetInMeleeRange()"
 			annotation[action] = class
 			isSpellAction = false
-		elseif class == "HUNTER" and (action == "muzzle" or action == "silencing_shot") then
+		elseif class == "HUNTER" and (action == "muzzle" or action == "counter_shot") then
 			bodyCode = camelSpecialization .. "InterruptActions()"
 			annotation[action] = class
 			annotation.interrupt = class
@@ -2403,21 +2412,17 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
 				AddSymbol(annotation, name)
 				annotation.astAnnotation = annotation.astAnnotation or {}
 				node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
-			elseif (parseNode.operator == "=" or parseNode.operator == "!=") and parseNode.child[1].name == "last_judgment_target" then
-				--[[
-					Special handling for "last_judgment_target=X" expressions.
-					TODO: Track the target of the previous cast of a spell.
-				--]]
-				local code
-				if parseNode.operator == "=" then
-					code = "True(last_judgement_target)"
-				else -- if parseNode.operator == "!=" then
-					local buffName = "glyph_of_double_jeopardy_buff"
-					code = "BuffPresent(" .. buffName .. ")"
-					AddSymbol(annotation, buffName)
-				end
-				annotation.astAnnotation = annotation.astAnnotation or {}
-				node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+			-- elseif (parseNode.operator == "=" or parseNode.operator == "!=") and parseNode.child[1].name == "last_judgment_target" then
+			-- 	local code
+			-- 	if parseNode.operator == "=" then
+			-- 		code = "True(last_judgement_target)"
+			-- 	else -- if parseNode.operator == "!=" then
+			-- 		local buffName = "glyph_of_double_jeopardy_buff"
+			-- 		code = "BuffPresent(" .. buffName .. ")"
+			-- 		AddSymbol(annotation, buffName)
+			-- 	end
+			-- 	annotation.astAnnotation = annotation.astAnnotation or {}
+			-- 	node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
 			elseif (parseNode.operator == "=" or parseNode.operator == "!=") and parseNode.child[1].name == "sim_target" then
 				--[[
 					Special handling for "sim_target=X" expressions.
@@ -2826,9 +2831,9 @@ EmitOperandArtifact = function(operand, parseNode, nodeList, annotation, action,
 		local property = tokenIterator()
 
 		if property == "rank" then
-			code = "0" 
+			code = format("ArtifactTraitRank(%s)", name) 
 		elseif property == "enabled" then
-			code = format("BuffPresent(%s_buff)", name)
+			code = format("HasArtifactTrait(%s)", name)
 		else
 			ok = false
 		end
@@ -2958,6 +2963,7 @@ do
 		["active_enemies"]		= "Enemies()",
 		["astral_power"] 		= "AstralPower()",
 		["astral_power.deficit"]= "AstralPowerDeficit()",
+		["blade_dance_worth_using"] = "0",--TODO
 		["blood.frac"]			= "Rune(blood)",
 		["chi"]					= "Chi()",
 		["chi.max"]				= "MaxChi()",
@@ -2968,6 +2974,8 @@ do
 		["crit_pct_current"]	= "SpellCritChance()",
 		["current_insanity_drain"] = "CurrentInsanityDrain()",
 		["darkglare_no_de"]     = "NotDeDemons(darkglare)",
+		["death_sweep_worth_using"] = "0", --TODO
+		["delay"]				= "0", -- TODO
 		["demonic_fury"]		= "DemonicFury()",
 		["desired_targets"]		= "Enemies(tagged=1)",
 		["doomguard_no_de"]		= "NotDeDemons(doomguard)",
@@ -3005,6 +3013,7 @@ do
 		["mana.pct"]			= "ManaPercent()",
 		["maelstrom"]			= "Maelstrom()",
 		["nonexecute_actors_pct"] = "0", -- TODO #74
+		["pain"]				= "Pain()",
 		["rage"]				= "Rage()",
 		["rage.deficit"]		= "RageDeficit()",
 		["rage.max"]			= "MaxRage()",
@@ -3015,8 +3024,10 @@ do
 		["runic_power.deficit"]	= "RunicPowerDeficit()",
 		["service_no_de"]		= "0", -- TODO manage service pet in WildImps.lua
 		["shadow_orb"]			= "ShadowOrbs()",
+		["sigil_placed"]		= "PreviousSpell(sigil_of_flame)",
 		["solar_max"]			= "TimeToEclipse(solar)",	-- XXX
 		["soul_shard"]			= "SoulShards()",
+		["soul_fragments"]		= "BuffStacks(soul_fragments)",
 		["stat.multistrike_pct"]= "MultistrikeChance()",
 		["stealthed"]			= "Stealthed()",
 		["time"]				= "TimeInCombat()",
@@ -4179,6 +4190,20 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "death_strike")
 		count = count + 1
 	end
+	if annotation.melee == "DEMONHUNTER" then
+		local fmt = [[
+			AddFunction %sGetInMeleeRange
+			{
+				if CheckBoxOn(opt_melee_range) and not target.InRange(consume_magic) Texture(misc_arrowlup help=L(not_in_melee_range))
+			}
+		]]
+		local code = format(fmt, camelSpecialization)
+		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		annotation.functionTag[node.name] = "shortcd"
+		AddSymbol(annotation, "consume_magic")
+		count = count + 1
+	end
 	if annotation.skull_bash == "DRUID" then
 		local fmt = [[
 			AddFunction %sInterruptActions
@@ -4267,8 +4292,8 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "revive_pet")
 		count = count + 1
 	end
-	if annotation.silencing_shot == "HUNTER" then
-		InsertInterruptFunction(child, annotation, "silencing_shot")
+	if annotation.counter_shot == "HUNTER" then
+		InsertInterruptFunction(child, annotation, "counter_shot")
 		count = count + 1
 	end
 	if annotation.muzzle == "HUNTER" then
@@ -4359,14 +4384,13 @@ local function InsertSupportingFunctions(child, annotation)
 		local code = [[
 			AddFunction RetributionTimeToHPG
 			{
-				SpellCooldown(crusader_strike exorcism exorcism_glyphed hammer_of_wrath hammer_of_wrath_empowered judgment usable=1)
+				SpellCooldown(crusader_strike exorcism hammer_of_wrath hammer_of_wrath_empowered judgment usable=1)
 			}
 		]]
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		AddSymbol(annotation, "crusader_strike")
 		AddSymbol(annotation, "exorcism")
-		AddSymbol(annotation, "exorcism_glyphed")
 		AddSymbol(annotation, "hammer_of_wrath")
 		AddSymbol(annotation, "judgment")
 		count = count + 1
@@ -4538,14 +4562,14 @@ local function InsertSupportingFunctions(child, annotation)
 		local fmt = [[
 			AddFunction %sGetInMeleeRange
 			{
-				if CheckBoxOn(opt_melee_range) and not target.InRange(primal_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
+				if CheckBoxOn(opt_melee_range) and not target.InRange(stormstrike) Texture(misc_arrowlup help=L(not_in_melee_range))
 			}
 		]]
 		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "shortcd"
-		AddSymbol(annotation, "primal_strike")
+		AddSymbol(annotation, "stormstrike")
 		count = count + 1
 	end
 	if annotation.bloodlust == "SHAMAN" then
@@ -4574,7 +4598,6 @@ local function InsertSupportingFunctions(child, annotation)
 				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 				{
 					if target.InRange(pummel) Spell(pummel)
-					if Glyph(glyph_of_gag_order) and target.InRange(heroic_throw) Spell(heroic_throw)
 					if not target.Classification(worldboss)
 					{
 						Spell(arcane_torrent_rage)
@@ -4589,7 +4612,6 @@ local function InsertSupportingFunctions(child, annotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "cd"
 		AddSymbol(annotation, "arcane_torrent_rage")
-		AddSymbol(annotation, "glyph_of_gag_order")
 		AddSymbol(annotation, "heroic_throw")
 		AddSymbol(annotation, "pummel")
 		AddSymbol(annotation, "quaking_palm")

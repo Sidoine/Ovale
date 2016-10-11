@@ -8,7 +8,6 @@ local OVALE, Ovale = ...
 
 local LibBabbleCreatureType = LibStub("LibBabble-CreatureType-3.0", true)
 local LibRangeCheck = LibStub("LibRangeCheck-2.0", true)
-
 local OvaleBestAction = Ovale.OvaleBestAction
 local OvaleCompile = Ovale.OvaleCompile
 local OvaleCondition = Ovale.OvaleCondition
@@ -23,6 +22,7 @@ local OvalePower = Ovale.OvalePower
 local OvaleRunes = Ovale.OvaleRunes
 local OvaleSpellBook = Ovale.OvaleSpellBook
 local OvaleSpellDamage = Ovale.OvaleSpellDamage
+local OvaleArtifact = Ovale.OvaleArtifact
 
 local floor = math.floor
 local ipairs = ipairs
@@ -178,13 +178,20 @@ do
 end
 
 do
+	local function ArtifactTraitRank(positionalParams, namedParams, state, atTime)
+		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local value = OvaleArtifact:TraitRank(spellId)
+		return Compare(value, comparator, limit)
+	end
+
 	local function HasArtifactTrait(positionalParams, namedParams, state, atTime)
 		local spellId, yesno = positionalParams[1], positionalParams[2]
-		local value = false -- TODO
+		local value = OvaleArtifact:HasTrait(spellId)
 		return TestBoolean(value, yesno)
 	end
 
 	OvaleCondition:RegisterCondition("hasartifacttrait", false, HasArtifactTrait)
+	OvaleCondition:RegisterCondition("artifacttraitrank", false, ArtifactTraitRank)
 end
 
 do
@@ -351,7 +358,7 @@ do
 		local count = 0
 		for id in pairs(spellList) do
 			local si = OvaleData.spellInfo[id]
-			local aura = state:GetAura(target, auraId, filter, mine)
+			local aura = state:GetAura(target, id, filter, mine)
 			if state:IsActiveAura(aura, atTime) then
 				count = count + 1
 			end

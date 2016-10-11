@@ -25,6 +25,7 @@ actions.precombat+=/potion,name=deadly_grace
 # Executed every time the actor is available.
 actions=charge
 actions+=/auto_attack
+actions+=/pummel
 actions+=/potion,name=deadly_grace,if=(target.health.pct<20&buff.battle_cry.up)|target.time_to_die<=26
 actions+=/blood_fury,if=buff.battle_cry.up|target.time_to_die<=16
 actions+=/berserking,if=buff.battle_cry.up|target.time_to_die<=11

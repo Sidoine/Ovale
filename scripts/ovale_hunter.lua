@@ -18,6 +18,22 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_hunter_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=beast_mastery)
+
+AddFunction BeastMasteryInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		Spell(counter_shot)
+		if not target.Classification(worldboss)
+		{
+			Spell(arcane_torrent_focus)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
+}
+
 AddFunction BeastMasterySummonPet
 {
 	if pet.IsDead()
@@ -77,6 +93,8 @@ AddFunction BeastMasteryDefaultShortCdPostConditions
 AddFunction BeastMasteryDefaultCdActions
 {
 	#auto_shot
+	#counter_shot
+	BeastMasteryInterruptActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury
@@ -208,15 +226,18 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # blood_fury_ap
 # chimaera_shot
 # cobra_shot
+# counter_shot
 # dire_beast
 # dire_frenzy
 # kill_command
 # killer_cobra_talent
 # multi_shot
 # pet_beast_cleave_buff
+# quaking_palm
 # revive_pet
 # stampede
 # titans_thunder
+# war_stomp
 ]]
 	OvaleScripts:RegisterScript("HUNTER", "beast_mastery", name, desc, code, "script")
 end
@@ -234,6 +255,22 @@ Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_hunter_spells)
+
+AddCheckBox(opt_interrupt L(interrupt) default specialization=marksmanship)
+
+AddFunction MarksmanshipInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		Spell(counter_shot)
+		if not target.Classification(worldboss)
+		{
+			Spell(arcane_torrent_focus)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
+}
 
 AddFunction MarksmanshipSummonPet
 {
@@ -351,6 +388,8 @@ AddFunction MarksmanshipDefaultShortCdPostConditions
 AddFunction MarksmanshipDefaultCdActions
 {
 	#auto_shot
+	#counter_shot
+	MarksmanshipInterruptActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury
@@ -503,6 +542,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # black_arrow
 # blood_fury_ap
 # bullseye_buff
+# counter_shot
 # explosive_shot
 # hunters_mark_debuff
 # lock_and_load_buff
@@ -512,6 +552,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # multishot
 # patient_sniper_talent
 # piercing_shot
+# quaking_palm
 # revive_pet
 # sentinel
 # sidewinders
@@ -523,6 +564,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # trueshot
 # trueshot_buff
 # vulnerability_debuff
+# war_stomp
 # windburst
 ]]
 	OvaleScripts:RegisterScript("HUNTER", "marksmanship", name, desc, code, "script")
@@ -542,12 +584,27 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_hunter_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=survival)
 AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default specialization=survival)
 
 AddFunction SurvivalUseItemActions
 {
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
+}
+
+AddFunction SurvivalInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		Spell(muzzle)
+		if not target.Classification(worldboss)
+		{
+			Spell(arcane_torrent_focus)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
 }
 
 AddFunction SurvivalSummonPet
@@ -636,6 +693,8 @@ AddFunction SurvivalDefaultShortCdPostConditions
 AddFunction SurvivalDefaultCdActions
 {
 	#auto_attack
+	#muzzle
+	SurvivalInterruptActions()
 	#arcane_torrent,if=focus.deficit>=30
 	if FocusDeficit() >= 30 Spell(arcane_torrent_focus)
 	#blood_fury
@@ -775,6 +834,8 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # moknathal_tactics_buff
 # mongoose_bite
 # mongoose_fury_buff
+# muzzle
+# quaking_palm
 # raptor_strike
 # revive_pet
 # serpent_sting_debuff
@@ -785,6 +846,7 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # throwing_axes
 # throwing_axes_talent
 # trap_launcher
+# war_stomp
 # way_of_the_moknathal_talent
 ]]
 	OvaleScripts:RegisterScript("HUNTER", "survival", name, desc, code, "script")
