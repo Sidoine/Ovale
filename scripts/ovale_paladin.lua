@@ -1070,3 +1070,89 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 ]]
 	OvaleScripts:RegisterScript("PALADIN", "retribution", name, desc, code, "script")
 end
+
+
+do
+	local name = "icyveins_paladin_holy"
+	local desc = "[7.0] Icy-Veins: Paladin Holy"
+	local code = [[
+Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
+Include(ovale_paladin_spells)
+
+#AddCheckBox(opt_interrupt L(interrupt) default specialization=vengeance)
+#AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=vengeance)
+
+AddFunction HolyDefaultShortCDActions
+{
+	if CheckBoxOn(opt_melee_range) and not target.InRange(shear) Texture(misc_arrowlup help=L(not_in_melee_range))
+	if (Pain() >= 20) and not BuffPresent(demon_spikes_buff) Spell(demon_spikes)
+}
+
+AddFunction HolyDefaultMainActions
+{
+	if(target.isFriend())
+  {
+    
+  }
+  else
+  {
+    if(target.inRange())
+  }
+}
+
+AddFunction HolyDefaultAoEActions
+{
+	Spell(soul_carver)
+	if (Pain() > 75 or (HealthPercent() < 50 and Pain() >= 30)) Spell(soul_cleave)
+	Spell(immolation_aura)
+	Spell(felblade)
+	if Talent(burning_alive_talent) Spell(fiery_brand)
+	Spell(sigil_of_flame)
+	Spell(fel_eruption)
+	Spell(shear)
+}
+
+AddFunction HolyDefaultCdActions
+{
+	VengeanceInterruptActions()
+	if IncomingDamage(1.5 magic=1) > 0 Spell(empower_wards)
+	Spell(fiery_brand)
+	Spell(metamorphosis_veng)
+}
+
+AddFunction HolyInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(consume_magic) Spell(consume_magic)
+		if not target.Classification(worldboss) Spell(arcane_torrent_dh)
+		Spell(sigil_of_silence)
+		if not target.Classification(worldboss) Spell(sigil_of_misery)
+	}
+}
+
+AddIcon help=shortcd specialization=holy
+{
+	HolyDefaultShortCDActions()
+}
+
+AddIcon enemies=1 help=main specialization=holy
+{
+	HolyDefaultMainActions()
+}
+
+AddIcon help=aoe specialization=holy
+{
+	HolyDefaultAoEActions()
+}
+
+AddIcon help=cd specialization=holy
+{
+	#if not InCombat() HolyPrecombatCdActions()
+	HolyDefaultCdActions()
+}
+	]]
+	OvaleScripts:RegisterScript("PALADIN", "holy", name, desc, code, "script")
+end
