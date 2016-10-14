@@ -25,6 +25,7 @@ actions.precombat+=/potion,name=unbending_potion
 # Executed every time the actor is available.
 actions=intercept
 actions+=/auto_attack
+actions+=/pummel
 actions+=/blood_fury
 actions+=/berserking
 actions+=/arcane_torrent

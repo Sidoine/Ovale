@@ -4,7 +4,7 @@
 ## Notes-frFR: Affiche l'icône du prochain sort à lancer
 ## Author: Sidoine, Johnny C. Lam
 ## Version: @project-version@
-## OptionalDeps: Ace3, LibBabble-CreatureType-3.0, LibDataBroker-1.1, LibDBIcon-1.0, LibDualSpec-1.0, LibRangeCheck-2.0, LibTextDump-1.0, Masque, Recount, Skada, SpellFlashCore
+## OptionalDeps: Ace3, LibBabble-CreatureType-3.0, LibDataBroker-1.1, LibDBIcon-1.0, LibDualSpec-1.0, LibRangeCheck-2.0, LibTextDump-1.0, Masque, Recount, Skada, SpellFlashCore, LibArtifactData-1.0
 ## SavedVariables: OvaleDB
 
 # Libraries.
@@ -57,6 +57,7 @@ Icon.xml
 Frame.lua
 
 # Additional modules.
+Artifact.lua
 BanditsGuile.lua
 DamageTaken.lua
 DataBroker.lua

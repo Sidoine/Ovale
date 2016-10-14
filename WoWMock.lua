@@ -547,6 +547,10 @@ WoWMock.BOOKTYPE_PET = "pet"
 WoWMock.MAX_TALENT_TIERS = 7
 WoWMock.NUM_TALENT_COLUMNS = 3
 
+-- ArtifactUI
+
+WoWMock.C_ArtifactUI = {}
+
 --[[--------------------------------------------------------------------
 	debugprofilestop() is a non-standard Lua function that returns the
 	current time in milliseconds.

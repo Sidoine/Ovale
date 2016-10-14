@@ -251,6 +251,10 @@ Define(vampiric_blood_buff 55233)
 	SpellInfo(vampiric_blood_buff duration=10)
 Define(virulent_plague_debuff 191587)
 
+# Talents
+Define(castigator_talent 8)
+Define(necrosis_talent 17)
+
 # Artifact traits
 Define(apocalypse 220143)
 	SpellInfo(apocalypse cd=90)

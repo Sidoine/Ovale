@@ -18,6 +18,7 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_warrior_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=arms)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=arms)
 
 AddFunction ArmsUseItemActions
@@ -33,6 +34,20 @@ AddFunction ArmsGetInMeleeRange
 		if target.InRange(charge) Spell(charge)
 		if target.InRange(charge) Spell(heroic_leap)
 		if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
+}
+
+AddFunction ArmsInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(pummel) Spell(pummel)
+		if not target.Classification(worldboss)
+		{
+			Spell(arcane_torrent_rage)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
 	}
 }
 
@@ -134,6 +149,8 @@ AddFunction ArmsDefaultShortCdPostConditions
 
 AddFunction ArmsDefaultCdActions
 {
+	#pummel
+	ArmsInterruptActions()
 	#potion,name=deadly_grace,if=(target.health.pct<20&buff.battle_cry.up)|target.time_to_die<=26
 	#blood_fury,if=buff.battle_cry.up|target.time_to_die<=16
 	if BuffPresent(battle_cry_buff) or target.TimeToDie() <= 16 Spell(blood_fury_ap)
@@ -523,11 +540,13 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # focused_rage_talent
 # hamstring
 # heroic_leap
+# heroic_throw
 # mortal_strike
 # overpower
 # overpower_buff
 # precise_strikes_buff
 # pummel
+# quaking_palm
 # ravager
 # rend
 # rend_debuff
@@ -537,6 +556,7 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # stone_heart_buff
 # storm_bolt
 # sweeping_strikes_talent
+# war_stomp
 # warbreaker
 # whirlwind
 ]]
@@ -557,6 +577,7 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_warrior_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=fury)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=fury)
 
 AddFunction FuryUseItemActions
@@ -572,6 +593,20 @@ AddFunction FuryGetInMeleeRange
 		if target.InRange(charge) Spell(charge)
 		if target.InRange(charge) Spell(heroic_leap)
 		if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
+}
+
+AddFunction FuryInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(pummel) Spell(pummel)
+		if not target.Classification(worldboss)
+		{
+			Spell(arcane_torrent_rage)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
 	}
 }
 
@@ -652,6 +687,8 @@ AddFunction FuryDefaultShortCdPostConditions
 
 AddFunction FuryDefaultCdActions
 {
+	#pummel
+	FuryInterruptActions()
 	#run_action_list,name=movement,if=movement.distance>5
 	if 0 > 5 FuryMovementCdActions()
 
@@ -846,7 +883,7 @@ AddFunction FurySingleTargetMainActions
 	#bloodthirst,if=buff.fujiedas_fury.up&buff.fujiedas_fury.remains<2
 	if BuffPresent(fujiedas_fury_buff) and BuffRemaining(fujiedas_fury_buff) < 2 Spell(bloodthirst)
 	#execute,if=(artifact.juggernaut.enabled&(!buff.juggernaut.up|buff.juggernaut.remains<2))|buff.stone_heart.react
-	if BuffPresent(juggernaut_buff) and { not BuffPresent(juggernaut_buff) or BuffRemaining(juggernaut_buff) < 2 } or BuffPresent(stone_heart_buff) Spell(execute)
+	if HasArtifactTrait(juggernaut) and { not BuffPresent(juggernaut_buff) or BuffRemaining(juggernaut_buff) < 2 } or BuffPresent(stone_heart_buff) Spell(execute)
 	#rampage,if=rage=100&(target.health.pct>20|target.health.pct<20&!talent.massacre.enabled)|buff.massacre.react&buff.enrage.remains<1
 	if Rage() == 100 and { target.HealthPercent() > 20 or target.HealthPercent() < 20 and not Talent(massacre_talent) } or BuffPresent(massacre_buff) and EnrageRemaining() < 1 Spell(rampage)
 	#dragon_roar,if=!cooldown.odyns_fury.remains<=10|cooldown.odyns_fury.remains<3
@@ -866,7 +903,7 @@ AddFunction FurySingleTargetMainActions
 	#raging_blow,if=buff.enrage.down
 	if not IsEnraged() Spell(raging_blow)
 	#execute,if=artifact.juggernaut.enabled
-	if BuffPresent(juggernaut_buff) Spell(execute)
+	if HasArtifactTrait(juggernaut) Spell(execute)
 	#raging_blow
 	Spell(raging_blow)
 	#bloodthirst
@@ -884,7 +921,7 @@ AddFunction FurySingleTargetMainPostConditions
 
 AddFunction FurySingleTargetShortCdActions
 {
-	unless BuffPresent(fujiedas_fury_buff) and BuffRemaining(fujiedas_fury_buff) < 2 and Spell(bloodthirst) or { BuffPresent(juggernaut_buff) and { not BuffPresent(juggernaut_buff) or BuffRemaining(juggernaut_buff) < 2 } or BuffPresent(stone_heart_buff) } and Spell(execute) or { Rage() == 100 and { target.HealthPercent() > 20 or target.HealthPercent() < 20 and not Talent(massacre_talent) } or BuffPresent(massacre_buff) and EnrageRemaining() < 1 } and Spell(rampage)
+	unless BuffPresent(fujiedas_fury_buff) and BuffRemaining(fujiedas_fury_buff) < 2 and Spell(bloodthirst) or { HasArtifactTrait(juggernaut) and { not BuffPresent(juggernaut_buff) or BuffRemaining(juggernaut_buff) < 2 } or BuffPresent(stone_heart_buff) } and Spell(execute) or { Rage() == 100 and { target.HealthPercent() > 20 or target.HealthPercent() < 20 and not Talent(massacre_talent) } or BuffPresent(massacre_buff) and EnrageRemaining() < 1 } and Spell(rampage)
 	{
 		#berserker_rage,if=talent.outburst.enabled&cooldown.odyns_fury.remains=0&buff.enrage.down
 		if Talent(outburst_talent) and not SpellCooldown(odyns_fury) > 0 and not IsEnraged() Spell(berserker_rage)
@@ -894,7 +931,7 @@ AddFunction FurySingleTargetShortCdActions
 			#odyns_fury,if=buff.battle_cry.up&buff.enrage.up
 			if BuffPresent(battle_cry_buff) and IsEnraged() Spell(odyns_fury)
 
-			unless not IsEnraged() and BuffExpires(juggernaut_buff) and Spell(rampage) or Talent(frenzy_talent) and { BuffExpires(frenzy_buff) or BuffRemaining(frenzy_buff) <= 3 } and Spell(furious_slash) or BuffExpires(juggernaut_buff) and IsEnraged() and Spell(raging_blow) or BuffPresent(wrecking_ball_buff) and IsEnraged() and Spell(whirlwind) or { Talent(inner_rage_talent) or not Talent(inner_rage_talent) and Rage() > 50 } and Spell(execute) or not IsEnraged() and Spell(bloodthirst) or not IsEnraged() and Spell(raging_blow) or BuffPresent(juggernaut_buff) and Spell(execute) or Spell(raging_blow) or Spell(bloodthirst) or Spell(furious_slash)
+			unless not IsEnraged() and BuffExpires(juggernaut_buff) and Spell(rampage) or Talent(frenzy_talent) and { BuffExpires(frenzy_buff) or BuffRemaining(frenzy_buff) <= 3 } and Spell(furious_slash) or BuffExpires(juggernaut_buff) and IsEnraged() and Spell(raging_blow) or BuffPresent(wrecking_ball_buff) and IsEnraged() and Spell(whirlwind) or { Talent(inner_rage_talent) or not Talent(inner_rage_talent) and Rage() > 50 } and Spell(execute) or not IsEnraged() and Spell(bloodthirst) or not IsEnraged() and Spell(raging_blow) or HasArtifactTrait(juggernaut) and Spell(execute) or Spell(raging_blow) or Spell(bloodthirst) or Spell(furious_slash)
 			{
 				#call_action_list,name=bladestorm
 				FuryBladestormShortCdActions()
@@ -911,12 +948,12 @@ AddFunction FurySingleTargetShortCdActions
 
 AddFunction FurySingleTargetShortCdPostConditions
 {
-	BuffPresent(fujiedas_fury_buff) and BuffRemaining(fujiedas_fury_buff) < 2 and Spell(bloodthirst) or { BuffPresent(juggernaut_buff) and { not BuffPresent(juggernaut_buff) or BuffRemaining(juggernaut_buff) < 2 } or BuffPresent(stone_heart_buff) } and Spell(execute) or { Rage() == 100 and { target.HealthPercent() > 20 or target.HealthPercent() < 20 and not Talent(massacre_talent) } or BuffPresent(massacre_buff) and EnrageRemaining() < 1 } and Spell(rampage) or { not SpellCooldown(odyns_fury) <= 10 or SpellCooldown(odyns_fury) < 3 } and Spell(dragon_roar) or not IsEnraged() and BuffExpires(juggernaut_buff) and Spell(rampage) or Talent(frenzy_talent) and { BuffExpires(frenzy_buff) or BuffRemaining(frenzy_buff) <= 3 } and Spell(furious_slash) or BuffExpires(juggernaut_buff) and IsEnraged() and Spell(raging_blow) or BuffPresent(wrecking_ball_buff) and IsEnraged() and Spell(whirlwind) or { Talent(inner_rage_talent) or not Talent(inner_rage_talent) and Rage() > 50 } and Spell(execute) or not IsEnraged() and Spell(bloodthirst) or not IsEnraged() and Spell(raging_blow) or BuffPresent(juggernaut_buff) and Spell(execute) or Spell(raging_blow) or Spell(bloodthirst) or Spell(furious_slash) or FuryBladestormShortCdPostConditions()
+	BuffPresent(fujiedas_fury_buff) and BuffRemaining(fujiedas_fury_buff) < 2 and Spell(bloodthirst) or { HasArtifactTrait(juggernaut) and { not BuffPresent(juggernaut_buff) or BuffRemaining(juggernaut_buff) < 2 } or BuffPresent(stone_heart_buff) } and Spell(execute) or { Rage() == 100 and { target.HealthPercent() > 20 or target.HealthPercent() < 20 and not Talent(massacre_talent) } or BuffPresent(massacre_buff) and EnrageRemaining() < 1 } and Spell(rampage) or { not SpellCooldown(odyns_fury) <= 10 or SpellCooldown(odyns_fury) < 3 } and Spell(dragon_roar) or not IsEnraged() and BuffExpires(juggernaut_buff) and Spell(rampage) or Talent(frenzy_talent) and { BuffExpires(frenzy_buff) or BuffRemaining(frenzy_buff) <= 3 } and Spell(furious_slash) or BuffExpires(juggernaut_buff) and IsEnraged() and Spell(raging_blow) or BuffPresent(wrecking_ball_buff) and IsEnraged() and Spell(whirlwind) or { Talent(inner_rage_talent) or not Talent(inner_rage_talent) and Rage() > 50 } and Spell(execute) or not IsEnraged() and Spell(bloodthirst) or not IsEnraged() and Spell(raging_blow) or HasArtifactTrait(juggernaut) and Spell(execute) or Spell(raging_blow) or Spell(bloodthirst) or Spell(furious_slash) or FuryBladestormShortCdPostConditions()
 }
 
 AddFunction FurySingleTargetCdActions
 {
-	unless BuffPresent(fujiedas_fury_buff) and BuffRemaining(fujiedas_fury_buff) < 2 and Spell(bloodthirst) or { BuffPresent(juggernaut_buff) and { not BuffPresent(juggernaut_buff) or BuffRemaining(juggernaut_buff) < 2 } or BuffPresent(stone_heart_buff) } and Spell(execute) or { Rage() == 100 and { target.HealthPercent() > 20 or target.HealthPercent() < 20 and not Talent(massacre_talent) } or BuffPresent(massacre_buff) and EnrageRemaining() < 1 } and Spell(rampage) or { not SpellCooldown(odyns_fury) <= 10 or SpellCooldown(odyns_fury) < 3 } and Spell(dragon_roar) or BuffPresent(battle_cry_buff) and IsEnraged() and Spell(odyns_fury) or not IsEnraged() and BuffExpires(juggernaut_buff) and Spell(rampage) or Talent(frenzy_talent) and { BuffExpires(frenzy_buff) or BuffRemaining(frenzy_buff) <= 3 } and Spell(furious_slash) or BuffExpires(juggernaut_buff) and IsEnraged() and Spell(raging_blow) or BuffPresent(wrecking_ball_buff) and IsEnraged() and Spell(whirlwind) or { Talent(inner_rage_talent) or not Talent(inner_rage_talent) and Rage() > 50 } and Spell(execute) or not IsEnraged() and Spell(bloodthirst) or not IsEnraged() and Spell(raging_blow) or BuffPresent(juggernaut_buff) and Spell(execute) or Spell(raging_blow) or Spell(bloodthirst) or Spell(furious_slash)
+	unless BuffPresent(fujiedas_fury_buff) and BuffRemaining(fujiedas_fury_buff) < 2 and Spell(bloodthirst) or { HasArtifactTrait(juggernaut) and { not BuffPresent(juggernaut_buff) or BuffRemaining(juggernaut_buff) < 2 } or BuffPresent(stone_heart_buff) } and Spell(execute) or { Rage() == 100 and { target.HealthPercent() > 20 or target.HealthPercent() < 20 and not Talent(massacre_talent) } or BuffPresent(massacre_buff) and EnrageRemaining() < 1 } and Spell(rampage) or { not SpellCooldown(odyns_fury) <= 10 or SpellCooldown(odyns_fury) < 3 } and Spell(dragon_roar) or BuffPresent(battle_cry_buff) and IsEnraged() and Spell(odyns_fury) or not IsEnraged() and BuffExpires(juggernaut_buff) and Spell(rampage) or Talent(frenzy_talent) and { BuffExpires(frenzy_buff) or BuffRemaining(frenzy_buff) <= 3 } and Spell(furious_slash) or BuffExpires(juggernaut_buff) and IsEnraged() and Spell(raging_blow) or BuffPresent(wrecking_ball_buff) and IsEnraged() and Spell(whirlwind) or { Talent(inner_rage_talent) or not Talent(inner_rage_talent) and Rage() > 50 } and Spell(execute) or not IsEnraged() and Spell(bloodthirst) or not IsEnraged() and Spell(raging_blow) or HasArtifactTrait(juggernaut) and Spell(execute) or Spell(raging_blow) or Spell(bloodthirst) or Spell(furious_slash)
 	{
 		#call_action_list,name=bladestorm
 		FuryBladestormCdActions()
@@ -925,7 +962,7 @@ AddFunction FurySingleTargetCdActions
 
 AddFunction FurySingleTargetCdPostConditions
 {
-	BuffPresent(fujiedas_fury_buff) and BuffRemaining(fujiedas_fury_buff) < 2 and Spell(bloodthirst) or { BuffPresent(juggernaut_buff) and { not BuffPresent(juggernaut_buff) or BuffRemaining(juggernaut_buff) < 2 } or BuffPresent(stone_heart_buff) } and Spell(execute) or { Rage() == 100 and { target.HealthPercent() > 20 or target.HealthPercent() < 20 and not Talent(massacre_talent) } or BuffPresent(massacre_buff) and EnrageRemaining() < 1 } and Spell(rampage) or { not SpellCooldown(odyns_fury) <= 10 or SpellCooldown(odyns_fury) < 3 } and Spell(dragon_roar) or BuffPresent(battle_cry_buff) and IsEnraged() and Spell(odyns_fury) or not IsEnraged() and BuffExpires(juggernaut_buff) and Spell(rampage) or Talent(frenzy_talent) and { BuffExpires(frenzy_buff) or BuffRemaining(frenzy_buff) <= 3 } and Spell(furious_slash) or BuffExpires(juggernaut_buff) and IsEnraged() and Spell(raging_blow) or BuffPresent(wrecking_ball_buff) and IsEnraged() and Spell(whirlwind) or { Talent(inner_rage_talent) or not Talent(inner_rage_talent) and Rage() > 50 } and Spell(execute) or not IsEnraged() and Spell(bloodthirst) or not IsEnraged() and Spell(raging_blow) or BuffPresent(juggernaut_buff) and Spell(execute) or Spell(raging_blow) or Spell(bloodthirst) or Spell(furious_slash) or FuryBladestormCdPostConditions()
+	BuffPresent(fujiedas_fury_buff) and BuffRemaining(fujiedas_fury_buff) < 2 and Spell(bloodthirst) or { HasArtifactTrait(juggernaut) and { not BuffPresent(juggernaut_buff) or BuffRemaining(juggernaut_buff) < 2 } or BuffPresent(stone_heart_buff) } and Spell(execute) or { Rage() == 100 and { target.HealthPercent() > 20 or target.HealthPercent() < 20 and not Talent(massacre_talent) } or BuffPresent(massacre_buff) and EnrageRemaining() < 1 } and Spell(rampage) or { not SpellCooldown(odyns_fury) <= 10 or SpellCooldown(odyns_fury) < 3 } and Spell(dragon_roar) or BuffPresent(battle_cry_buff) and IsEnraged() and Spell(odyns_fury) or not IsEnraged() and BuffExpires(juggernaut_buff) and Spell(rampage) or Talent(frenzy_talent) and { BuffExpires(frenzy_buff) or BuffRemaining(frenzy_buff) <= 3 } and Spell(furious_slash) or BuffExpires(juggernaut_buff) and IsEnraged() and Spell(raging_blow) or BuffPresent(wrecking_ball_buff) and IsEnraged() and Spell(whirlwind) or { Talent(inner_rage_talent) or not Talent(inner_rage_talent) and Rage() > 50 } and Spell(execute) or not IsEnraged() and Spell(bloodthirst) or not IsEnraged() and Spell(raging_blow) or HasArtifactTrait(juggernaut) and Spell(execute) or Spell(raging_blow) or Spell(bloodthirst) or Spell(furious_slash) or FuryBladestormCdPostConditions()
 }
 
 ### actions.two_targets
@@ -1072,6 +1109,7 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # fujiedas_fury_buff
 # furious_slash
 # heroic_leap
+# heroic_throw
 # inner_rage_talent
 # juggernaut
 # juggernaut_buff
@@ -1081,9 +1119,11 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # odyns_fury
 # outburst_talent
 # pummel
+# quaking_palm
 # raging_blow
 # rampage
 # stone_heart_buff
+# war_stomp
 # whirlwind
 # wrecking_ball_buff
 ]]
@@ -1104,6 +1144,7 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_warrior_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=protection)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=protection)
 
 AddFunction ProtectionGetInMeleeRange
@@ -1113,6 +1154,20 @@ AddFunction ProtectionGetInMeleeRange
 		if target.InRange(charge) Spell(charge)
 		if target.InRange(charge) Spell(heroic_leap)
 		if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
+}
+
+AddFunction ProtectionInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(pummel) Spell(pummel)
+		if not target.Classification(worldboss)
+		{
+			Spell(arcane_torrent_rage)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
 	}
 }
 
@@ -1151,6 +1206,8 @@ AddFunction ProtectionDefaultCdActions
 {
 	unless Spell(intercept)
 	{
+		#pummel
+		ProtectionInterruptActions()
 		#blood_fury
 		Spell(blood_fury_ap)
 		#berserking
@@ -1399,12 +1456,14 @@ AddIcon checkbox=opt_warrior_protection_aoe help=cd specialization=protection
 # focused_rage
 # heavy_repercussions_talent
 # heroic_leap
+# heroic_throw
 # ignore_pain
 # intercept
 # last_stand
 # neltharions_fury
 # neltharions_fury_buff
 # pummel
+# quaking_palm
 # ravager
 # ravager_talent
 # revenge
@@ -1418,6 +1477,7 @@ AddIcon checkbox=opt_warrior_protection_aoe help=cd specialization=protection
 # vengeance_focused_rage_buff
 # vengeance_ignore_pain_buff
 # vengeance_talent
+# war_stomp
 ]]
 	OvaleScripts:RegisterScript("WARRIOR", "protection", name, desc, code, "script")
 end

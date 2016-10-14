@@ -193,7 +193,6 @@ Define(pet_freeze 33395)
 Define(pet_water_jet 135029)
 Define(pet_water_jet_debuff 135029)
 Define(phoenixs_flames 194466)
-Define(phoenix_reborn 215773)
 Define(polymorph 118)
 	SpellAddBuff(polymorph presence_of_mind_buff=0)
 	SpellAddTargetDebuff(polymorph polymorph_debuff=1)
@@ -275,6 +274,7 @@ Define(unstable_magic_talent 17)
 Define(mark_of_aluneth 210726)
 	SpellInfo(mark_of_aluneth cd=60)
 Define(mark_of_aluneth_debuff 210726) # ???
+Define(phoenix_reborn 215773)
 
 # Legendary items
 Define(rhonins_assaulting_armwraps_buff 208081)
