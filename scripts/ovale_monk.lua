@@ -20,7 +20,7 @@ AddFunction BrewmasterDefaultShortCDActions
 {
 	if StaggerRemaining() / MaxHealth() >0.4 Spell(purifying_brew)
 	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
-	if not BuffPresent(ironskin_brew_buff) Spell(ironskin_brew)
+	if Charges(ironskin_brew) > 1 and BuffExpires(ironskin_brew_buff 2) Spell(ironskin_brew)
 }
 
 AddFunction BrewmasterDefaultMainActions
