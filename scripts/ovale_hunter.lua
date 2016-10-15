@@ -652,7 +652,7 @@ AddFunction SurvivalDefaultMainPostConditions
 
 AddFunction SurvivalDefaultShortCdActions
 {
-	#potion,name=deadly_grace
+	#potion,name=old_war
 	#steel_trap
 	if CheckBoxOn(opt_trap_launcher) Spell(steel_trap)
 	#explosive_trap
@@ -721,7 +721,7 @@ AddFunction SurvivalDefaultCdPostConditions
 AddFunction SurvivalPrecombatMainActions
 {
 	#snapshot_stats
-	#potion,name=deadly_grace
+	#potion,name=potion_of_the_old_war
 	#augmentation,type=defiled
 	Spell(augmentation)
 	#harpoon

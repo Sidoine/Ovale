@@ -183,8 +183,8 @@ Define(molten_core_aura 122355)
 SpellList(molten_core_buff fel_molten_core_aura molten_core_aura)
 Define(phantom_singularity 205179)
 	SpellInfo(phantom_singularity cd=60)
-Define(rain_of_fire 104232)
-Define(rain_of_fire_debuff 104232)
+Define(rain_of_fire 5740)
+Define(rain_of_fire_debuff 5740)
 	SpellInfo(rain_of_fire_debuff duration=8 haste=spell tick=1)
 Define(roaring_blaze_debuff 205184) #TODO Check this
 Define(roaring_blaze_talent 2)
@@ -316,6 +316,7 @@ Define(grimoire_of_synergy_talent 18)
 Define(hand_of_doom_talent 10)
 Define(implosion_talent 6)
 Define(summon_darkglare_talent 19)
+Define(wreak_havoc_talent 19)
 
 # Legendary items
 Define(deadwind_harvester_buff 214867)

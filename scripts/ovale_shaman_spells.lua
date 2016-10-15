@@ -359,6 +359,9 @@ Define(echoes_of_the_great_sundering_buff 208723)
 Define(power_of_the_maelstrom_buff 191877)
 	SpellAddBuff(lightning_bolt power_of_the_maelstrom_buff=-1)
 
+# Artifact traits
+Define(alpha_wolf 198434)
+
 Define(hot_hand_talent 2)
 Define(boulderfist_talent 3)
 Define(totemic_persistence_talent 8)

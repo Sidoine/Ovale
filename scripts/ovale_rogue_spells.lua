@@ -403,6 +403,7 @@ Define(shadow_satyrs_walk 137032)
 # Talents
 Define(deeper_strategem_talent 7)
 Define(dirty_tricks_talent 15)
+Define(elaborate_planning_talent 2)
 Define(vigor_talent 9)
 
 # Non-default tags for OvaleSimulationCraft.

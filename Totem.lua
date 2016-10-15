@@ -45,6 +45,7 @@ local TOTEM_SLOT = {
 	earth = EARTH_TOTEM_SLOT,
 	fire = FIRE_TOTEM_SLOT,
 	water = WATER_TOTEM_SLOT,
+	spirit_wolf = 1
 }
 
 -- Shaman's Totemic Recall destroys all totems.
@@ -68,7 +69,7 @@ function OvaleTotem:OnEnable()
 	if TOTEM_CLASS[Ovale.playerClass] then
 		self:RegisterEvent("PLAYER_ENTERING_WORLD", "Update")
 		self:RegisterEvent("PLAYER_TALENT_UPDATE", "Update")
-		self:RegisterEvent("PLAYER_TOTEM_UPDATE", "Update")
+		self:RegisterEvent("PLAYER_TOTEM_UPDATE") --, "Update")
 		self:RegisterEvent("UPDATE_SHAPESHIFT_FORM", "Update")
 		OvaleState:RegisterState(self, self.statePrototype)
 	end
@@ -82,6 +83,12 @@ function OvaleTotem:OnDisable()
 		self:UnregisterEvent("PLAYER_TOTEM_UPDATE")
 		self:UnregisterEvent("UPDATE_SHAPESHIFT_FORM")
 	end
+end
+
+function OvaleTotem:PLAYER_TOTEM_UPDATE()
+	local haveTotem, totemName, startTime, duration, icon = GetTotemInfo(1)
+	print(totemName) 
+	self:Update()
 end
 
 function OvaleTotem:Update()
@@ -166,6 +173,7 @@ statePrototype.GetTotem = function(state, slot)
 	if totem and (not totem.serial or totem.serial < self_serial) then
 		local haveTotem, name, startTime, duration, icon = API_GetTotemInfo(slot)
 		if haveTotem then
+			OvaleTotem:Print("ajout %s à slot %s", totem.name, slot)
 			totem.name = name
 			totem.start = startTime
 			totem.duration = duration
