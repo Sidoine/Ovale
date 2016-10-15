@@ -165,8 +165,8 @@ AddFunction ArmsDefaultCdActions
 		if BuffPresent(burst_haste_buff any=1) or TimeInCombat() >= 1 Spell(avatar)
 		#use_item,name=gift_of_radiance
 		ArmsUseItemActions()
-		#hamstring,if=buff.battle_cry_deadly_calm.remains>cooldown.hamstring.remains
-		if BuffRemaining(battle_cry_deadly_calm_buff) > SpellCooldown(hamstring) Spell(hamstring)
+		#hamstring,if=!ptr&buff.battle_cry_deadly_calm.remains>cooldown.hamstring.remains
+		if not PTR() and BuffRemaining(battle_cry_deadly_calm_buff) > SpellCooldown(hamstring) Spell(hamstring)
 
 		unless target.DebuffRemaining(rend_debuff) < GCD() and Spell(rend) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or Spell(ravager) or BuffPresent(overpower_buff) and Spell(overpower)
 		{
@@ -414,12 +414,10 @@ AddFunction ArmsSingleMainActions
 	Spell(mortal_strike)
 	#execute,if=buff.stone_heart.react
 	if BuffPresent(stone_heart_buff) Spell(execute_arms)
-	#slam,if=buff.battle_cry_deadly_calm.up|buff.focused_rage.stack=3|rage.deficit<=30
-	if BuffPresent(battle_cry_deadly_calm_buff) or BuffStacks(focused_rage_buff) == 3 or RageDeficit() <= 30 Spell(slam)
+	#slam
+	Spell(slam)
 	#execute,if=equipped.archavons_heavy_hand
 	if HasEquippedItem(archavons_heavy_hand) Spell(execute_arms)
-	#slam,if=equipped.archavons_heavy_hand
-	if HasEquippedItem(archavons_heavy_hand) Spell(slam)
 }
 
 AddFunction ArmsSingleMainPostConditions
@@ -432,10 +430,10 @@ AddFunction ArmsSingleShortCdActions
 	{
 		#warbreaker,if=buff.shattered_defenses.down&cooldown.mortal_strike.remains<gcd
 		if BuffExpires(shattered_defenses_buff) and SpellCooldown(mortal_strike) < GCD() Spell(warbreaker)
-		#focused_rage,if=((!buff.focused_rage.react&prev_gcd.mortal_strike)|!prev_gcd.mortal_strike)&buff.focused_rage.stack<3&(buff.shattered_defenses.up|cooldown.colossus_smash.remains)
-		if { not BuffPresent(focused_rage_buff) and PreviousGCDSpell(mortal_strike) or not PreviousGCDSpell(mortal_strike) } and BuffStacks(focused_rage_buff) < 3 and { BuffPresent(shattered_defenses_buff) or SpellCooldown(colossus_smash) > 0 } Spell(focused_rage)
+		#focused_rage,if=(((!buff.focused_rage.react&prev_gcd.mortal_strike)|!prev_gcd.mortal_strike)&buff.focused_rage.stack<3&(buff.shattered_defenses.up|cooldown.colossus_smash.remains))&rage>60
+		if { not BuffPresent(focused_rage_buff) and PreviousGCDSpell(mortal_strike) or not PreviousGCDSpell(mortal_strike) } and BuffStacks(focused_rage_buff) < 3 and { BuffPresent(shattered_defenses_buff) or SpellCooldown(colossus_smash) > 0 } and Rage() > 60 Spell(focused_rage)
 
-		unless Spell(mortal_strike) or BuffPresent(stone_heart_buff) and Spell(execute_arms) or { BuffPresent(battle_cry_deadly_calm_buff) or BuffStacks(focused_rage_buff) == 3 or RageDeficit() <= 30 } and Spell(slam) or HasEquippedItem(archavons_heavy_hand) and Spell(execute_arms) or HasEquippedItem(archavons_heavy_hand) and Spell(slam)
+		unless Spell(mortal_strike) or BuffPresent(stone_heart_buff) and Spell(execute_arms) or Spell(slam) or HasEquippedItem(archavons_heavy_hand) and Spell(execute_arms)
 		{
 			#focused_rage,if=equipped.archavons_heavy_hand
 			if HasEquippedItem(archavons_heavy_hand) Spell(focused_rage)
@@ -447,7 +445,7 @@ AddFunction ArmsSingleShortCdActions
 
 AddFunction ArmsSingleShortCdPostConditions
 {
-	BuffPresent(battle_cry_buff) and BuffStacks(focused_rage_buff) >= 1 and BuffRemaining(battle_cry_buff) < GCD() and Spell(mortal_strike) or BuffExpires(shattered_defenses_buff) and Spell(colossus_smash) or Spell(mortal_strike) or BuffPresent(stone_heart_buff) and Spell(execute_arms) or { BuffPresent(battle_cry_deadly_calm_buff) or BuffStacks(focused_rage_buff) == 3 or RageDeficit() <= 30 } and Spell(slam) or HasEquippedItem(archavons_heavy_hand) and Spell(execute_arms) or HasEquippedItem(archavons_heavy_hand) and Spell(slam)
+	BuffPresent(battle_cry_buff) and BuffStacks(focused_rage_buff) >= 1 and BuffRemaining(battle_cry_buff) < GCD() and Spell(mortal_strike) or BuffExpires(shattered_defenses_buff) and Spell(colossus_smash) or Spell(mortal_strike) or BuffPresent(stone_heart_buff) and Spell(execute_arms) or Spell(slam) or HasEquippedItem(archavons_heavy_hand) and Spell(execute_arms)
 }
 
 AddFunction ArmsSingleCdActions
@@ -456,7 +454,7 @@ AddFunction ArmsSingleCdActions
 
 AddFunction ArmsSingleCdPostConditions
 {
-	BuffPresent(battle_cry_buff) and BuffStacks(focused_rage_buff) >= 1 and BuffRemaining(battle_cry_buff) < GCD() and Spell(mortal_strike) or BuffExpires(shattered_defenses_buff) and Spell(colossus_smash) or BuffExpires(shattered_defenses_buff) and SpellCooldown(mortal_strike) < GCD() and Spell(warbreaker) or Spell(mortal_strike) or BuffPresent(stone_heart_buff) and Spell(execute_arms) or { BuffPresent(battle_cry_deadly_calm_buff) or BuffStacks(focused_rage_buff) == 3 or RageDeficit() <= 30 } and Spell(slam) or HasEquippedItem(archavons_heavy_hand) and Spell(execute_arms) or HasEquippedItem(archavons_heavy_hand) and Spell(slam) or { 600 > 90 or not False(raid_event_adds_exists) or Enemies() > Enemies(tagged=1) } and Spell(bladestorm)
+	BuffPresent(battle_cry_buff) and BuffStacks(focused_rage_buff) >= 1 and BuffRemaining(battle_cry_buff) < GCD() and Spell(mortal_strike) or BuffExpires(shattered_defenses_buff) and Spell(colossus_smash) or BuffExpires(shattered_defenses_buff) and SpellCooldown(mortal_strike) < GCD() and Spell(warbreaker) or Spell(mortal_strike) or BuffPresent(stone_heart_buff) and Spell(execute_arms) or Spell(slam) or HasEquippedItem(archavons_heavy_hand) and Spell(execute_arms) or { 600 > 90 or not False(raid_event_adds_exists) or Enemies() > Enemies(tagged=1) } and Spell(bladestorm)
 }
 
 ### Arms icons.
@@ -1298,8 +1296,8 @@ AddFunction ProtectionProtShortCdActions
 {
 	#shield_block,if=!buff.neltharions_fury.up&((cooldown.shield_slam.remains<6&!buff.shield_block.up)|(cooldown.shield_slam.remains<6+buff.shield_block.remains&buff.shield_block.up))
 	if not BuffPresent(neltharions_fury_buff) and { SpellCooldown(shield_slam) < 6 and not BuffPresent(shield_block_buff) or SpellCooldown(shield_slam) < 6 + BuffRemaining(shield_block_buff) and BuffPresent(shield_block_buff) } Spell(shield_block)
-	#ignore_pain,if=(rage>=60&!talent.vengeance.enabled)|(buff.vengeance_ignore_pain.up&buff.ultimatum.up)|(buff.vengeance_ignore_pain.up&rage>=30)|(talent.vengeance.enabled&!buff.ultimatum.up&!buff.vengeance_ignore_pain.up&!buff.vengeance_focused_rage.up&rage<30)
-	if Rage() >= 60 and not Talent(vengeance_talent) or BuffPresent(vengeance_ignore_pain_buff) and BuffPresent(ultimatum_buff) or BuffPresent(vengeance_ignore_pain_buff) and Rage() >= 30 or Talent(vengeance_talent) and not BuffPresent(ultimatum_buff) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_focused_rage_buff) and Rage() < 30 Spell(ignore_pain)
+	#ignore_pain,if=(rage>=60&!talent.vengeance.enabled)|(buff.vengeance_ignore_pain.up&buff.ultimatum.up)|(buff.vengeance_ignore_pain.up&rage>=39)|(talent.vengeance.enabled&!buff.ultimatum.up&!buff.vengeance_ignore_pain.up&!buff.vengeance_focused_rage.up&rage<30)
+	if Rage() >= 60 and not Talent(vengeance_talent) or BuffPresent(vengeance_ignore_pain_buff) and BuffPresent(ultimatum_buff) or BuffPresent(vengeance_ignore_pain_buff) and Rage() >= 39 or Talent(vengeance_talent) and not BuffPresent(ultimatum_buff) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_focused_rage_buff) and Rage() < 30 Spell(ignore_pain)
 	#focused_rage,if=(buff.vengeance_focused_rage.up&!buff.vengeance_ignore_pain.up)|(buff.ultimatum.up&buff.vengeance_focused_rage.up&!buff.vengeance_ignore_pain.up)|(talent.vengeance.enabled&buff.ultimatum.up&!buff.vengeance_ignore_pain.up&!buff.vengeance_focused_rage.up)|(talent.vengeance.enabled&!buff.vengeance_ignore_pain.up&!buff.vengeance_focused_rage.up&rage>=30)|(buff.ultimatum.up&buff.vengeance_ignore_pain.up&cooldown.shield_slam.remains=0&rage<10)|(rage>=100)
 	if BuffPresent(vengeance_focused_rage_buff) and not BuffPresent(vengeance_ignore_pain_buff) or BuffPresent(ultimatum_buff) and BuffPresent(vengeance_focused_rage_buff) and not BuffPresent(vengeance_ignore_pain_buff) or Talent(vengeance_talent) and BuffPresent(ultimatum_buff) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_focused_rage_buff) or Talent(vengeance_talent) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_focused_rage_buff) and Rage() >= 30 or BuffPresent(ultimatum_buff) and BuffPresent(vengeance_ignore_pain_buff) and not SpellCooldown(shield_slam) > 0 and Rage() < 10 or Rage() >= 100 Spell(focused_rage)
 	#demoralizing_shout,if=incoming_damage_2500ms>health.max*0.20

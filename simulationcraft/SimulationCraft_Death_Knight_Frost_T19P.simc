@@ -49,7 +49,7 @@ actions.bos+=/howling_blast,if=buff.rime.react
 actions.core=remorseless_winter,if=artifact.frozen_soul.enabled
 actions.core+=/glacial_advance
 actions.core+=/frost_strike,if=buff.obliteration.up&!buff.killing_machine.react
-actions.core+=/remorseless_winter,if=spell_targets.remorseless_winter>=2
+actions.core+=/remorseless_winter,if=spell_targets.remorseless_winter>=2|talent.gathering_storm.enabled
 actions.core+=/frostscythe,if=!talent.breath_of_sindragosa.enabled&(buff.killing_machine.react|spell_targets.frostscythe>=4)
 actions.core+=/obliterate,if=buff.killing_machine.react
 actions.core+=/obliterate

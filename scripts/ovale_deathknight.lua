@@ -344,8 +344,8 @@ AddFunction FrostCoreMainActions
 	Spell(glacial_advance)
 	#frost_strike,if=buff.obliteration.up&!buff.killing_machine.react
 	if BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) Spell(frost_strike)
-	#remorseless_winter,if=spell_targets.remorseless_winter>=2
-	if Enemies() >= 2 Spell(remorseless_winter)
+	#remorseless_winter,if=spell_targets.remorseless_winter>=2|talent.gathering_storm.enabled
+	if Enemies() >= 2 or Talent(gathering_storm_talent) Spell(remorseless_winter)
 	#frostscythe,if=!talent.breath_of_sindragosa.enabled&(buff.killing_machine.react|spell_targets.frostscythe>=4)
 	if not Talent(breath_of_sindragosa_talent) and { BuffPresent(killing_machine_buff) or Enemies() >= 4 } Spell(frostscythe)
 	#obliterate,if=buff.killing_machine.react
@@ -370,7 +370,7 @@ AddFunction FrostCoreShortCdActions
 
 AddFunction FrostCoreShortCdPostConditions
 {
-	HasArtifactTrait(frozen_soul) and Spell(remorseless_winter) or Spell(glacial_advance) or BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) and Spell(frost_strike) or Enemies() >= 2 and Spell(remorseless_winter) or not Talent(breath_of_sindragosa_talent) and { BuffPresent(killing_machine_buff) or Enemies() >= 4 } and Spell(frostscythe) or BuffPresent(killing_machine_buff) and Spell(obliterate) or Spell(obliterate) or Spell(remorseless_winter) or Talent(frozen_pulse_talent) and Spell(frostscythe) or Talent(frozen_pulse_talent) and Spell(howling_blast)
+	HasArtifactTrait(frozen_soul) and Spell(remorseless_winter) or Spell(glacial_advance) or BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) and Spell(frost_strike) or { Enemies() >= 2 or Talent(gathering_storm_talent) } and Spell(remorseless_winter) or not Talent(breath_of_sindragosa_talent) and { BuffPresent(killing_machine_buff) or Enemies() >= 4 } and Spell(frostscythe) or BuffPresent(killing_machine_buff) and Spell(obliterate) or Spell(obliterate) or Spell(remorseless_winter) or Talent(frozen_pulse_talent) and Spell(frostscythe) or Talent(frozen_pulse_talent) and Spell(howling_blast)
 }
 
 AddFunction FrostCoreCdActions
@@ -379,7 +379,7 @@ AddFunction FrostCoreCdActions
 
 AddFunction FrostCoreCdPostConditions
 {
-	HasArtifactTrait(frozen_soul) and Spell(remorseless_winter) or Spell(glacial_advance) or BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) and Spell(frost_strike) or Enemies() >= 2 and Spell(remorseless_winter) or not Talent(breath_of_sindragosa_talent) and { BuffPresent(killing_machine_buff) or Enemies() >= 4 } and Spell(frostscythe) or BuffPresent(killing_machine_buff) and Spell(obliterate) or Spell(obliterate) or Spell(remorseless_winter) or Talent(frozen_pulse_talent) and Spell(frostscythe) or Talent(frozen_pulse_talent) and Spell(howling_blast)
+	HasArtifactTrait(frozen_soul) and Spell(remorseless_winter) or Spell(glacial_advance) or BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) and Spell(frost_strike) or { Enemies() >= 2 or Talent(gathering_storm_talent) } and Spell(remorseless_winter) or not Talent(breath_of_sindragosa_talent) and { BuffPresent(killing_machine_buff) or Enemies() >= 4 } and Spell(frostscythe) or BuffPresent(killing_machine_buff) and Spell(obliterate) or Spell(obliterate) or Spell(remorseless_winter) or Talent(frozen_pulse_talent) and Spell(frostscythe) or Talent(frozen_pulse_talent) and Spell(howling_blast)
 }
 
 ### actions.generic
@@ -716,6 +716,7 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # frostscythe
 # frozen_pulse_talent
 # frozen_soul
+# gathering_storm_talent
 # glacial_advance
 # horn_of_winter
 # howling_blast
