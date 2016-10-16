@@ -1853,15 +1853,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			annotation.interrupt = class
 			isSpellAction = false
 		elseif class == "MONK" and action == "storm_earth_and_fire" then
-			--[[
-				Only suggest SEF if it's toggled on and if there are enough enemies to
-				warrant sending out another SEF clone.
-			--]]
-			conditionCode = [[
-				CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1
-					and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1
-						  or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 }
-			]]
+			conditionCode = "CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff)"
 			annotation[action] = class
 		elseif class == "MONK" and action == "whirling_dragon_punch" then
 			conditionCode = "SpellCooldown(fists_of_fury)>0 and SpellCooldown(rising_sun_kick)>0"
