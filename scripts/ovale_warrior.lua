@@ -1185,8 +1185,6 @@ AddFunction ProtectionInterruptActions
 
 AddFunction ProtectionDefaultMainActions
 {
-	#intercept
-	Spell(intercept)
 	#call_action_list,name=prot
 	ProtectionProtMainActions()
 }
@@ -1198,18 +1196,17 @@ AddFunction ProtectionDefaultMainPostConditions
 
 AddFunction ProtectionDefaultShortCdActions
 {
-	unless Spell(intercept)
-	{
-		#auto_attack
-		ProtectionGetInMeleeRange()
-		#call_action_list,name=prot
-		ProtectionProtShortCdActions()
-	}
+	#intercept
+	Spell(intercept)
+	#auto_attack
+	ProtectionGetInMeleeRange()
+	#call_action_list,name=prot
+	ProtectionProtShortCdActions()
 }
 
 AddFunction ProtectionDefaultShortCdPostConditions
 {
-	Spell(intercept) or ProtectionProtShortCdPostConditions()
+	ProtectionProtShortCdPostConditions()
 }
 
 AddFunction ProtectionDefaultCdActions

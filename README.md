@@ -6,6 +6,7 @@ The current release of Ovale provides default scripts for the following classes 
 Note that these are *work in progress*. More support is coming soon and there may be bugs.
 
 - Death Knight: Forst, Unholy
+- Demon Hunter: Havoc, Vengeance
 - Druid: Balance, Feral, Guardian
 - Hunter: Beast Mastery, Marksmanship, Survival
 - Mage: Arcane, Fire, Frost
@@ -15,7 +16,7 @@ Note that these are *work in progress*. More support is coming soon and there ma
 - Rogue: Assassination, Outlaw, Subtlety
 - Shaman: Elemental, Enhancement
 - Warlock: Affliction, Demonology, Destruction
-- Warrior: Arms, Fury
+- Warrior: Arms, Fury, Protection
 
 Default scripts are based on [SimulationCraft][].  You may also customize the default script to suit your needs (see [Documentation][]) or use scripts made by other users.
 
