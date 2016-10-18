@@ -32,7 +32,7 @@ function OvaleWildImps:OnInitialize()
 end
 
 function OvaleWildImps:OnEnable()
-	if Ovale.playerClass == "WARLOCK" and GetSpecialization() == 2 then
+	if Ovale.playerClass == "WARLOCK" then
 		self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 		OvaleState:RegisterState(self, self.statePrototype)
         self_demons = {}
