@@ -58,7 +58,6 @@ function OvaleWildImps:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, 
     if cleuEvent == "SPELL_SUMMON" then
         local _, _, _, _, _, _, _, creatureId = destGUID:find('(%S+)-(%d+)-(%d+)-(%d+)-(%d+)-(%d+)-(%S+)')
         creatureId = tonumber(creatureId)
-        print("summon %d", creatureId)
         local now = API_GetTime()
         for id, v in pairs(demonData) do
             if id == creatureId then
