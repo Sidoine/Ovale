@@ -114,6 +114,7 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_monk_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=windwalker)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=windwalker)
 AddCheckBox(opt_chi_burst SpellName(chi_burst) default specialization=windwalker)
 AddCheckBox(opt_storm_earth_and_fire SpellName(storm_earth_and_fire) specialization=windwalker)
@@ -121,6 +122,21 @@ AddCheckBox(opt_storm_earth_and_fire SpellName(storm_earth_and_fire) specializat
 AddFunction WindwalkerGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
+}
+
+AddFunction WindwalkerInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(spear_hand_strike) Spell(spear_hand_strike)
+		if not target.Classification(worldboss)
+		{
+			if target.InRange(paralysis) Spell(paralysis)
+			Spell(arcane_torrent_chi)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
 }
 
 ### actions.default
@@ -201,6 +217,8 @@ AddFunction WindwalkerDefaultShortCdPostConditions
 
 AddFunction WindwalkerDefaultCdActions
 {
+	#spear_hand_strike
+	WindwalkerInterruptActions()
 	#potion,name=old_war,if=buff.serenity.up|buff.storm_earth_and_fire.up|(!talent.serenity.enabled&trinket.proc.agility.react)|buff.bloodlust.react|target.time_to_die<=60
 	#call_action_list,name=serenity,if=talent.serenity.enabled&((artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.remains<=14&cooldown.rising_sun_kick.remains<=4)|buff.serenity.up)
 	if Talent(serenity_talent) and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 14 and SpellCooldown(rising_sun_kick) <= 4 or BuffPresent(serenity_buff) } WindwalkerSerenityCdActions()
@@ -316,8 +334,6 @@ AddFunction WindwalkerSefMainActions
 
 	unless WindwalkerCdMainPostConditions()
 	{
-		#storm_earth_and_fire
-		if CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } Spell(storm_earth_and_fire)
 		#call_action_list,name=st
 		WindwalkerStMainActions()
 	}
@@ -335,8 +351,10 @@ AddFunction WindwalkerSefShortCdActions
 	#call_action_list,name=cd
 	WindwalkerCdShortCdActions()
 
-	unless WindwalkerCdShortCdPostConditions() or CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } and Spell(storm_earth_and_fire)
+	unless WindwalkerCdShortCdPostConditions()
 	{
+		#storm_earth_and_fire
+		if CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff) Spell(storm_earth_and_fire)
 		#call_action_list,name=st
 		WindwalkerStShortCdActions()
 	}
@@ -344,7 +362,7 @@ AddFunction WindwalkerSefShortCdActions
 
 AddFunction WindwalkerSefShortCdPostConditions
 {
-	WindwalkerCdShortCdPostConditions() or CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } and Spell(storm_earth_and_fire) or WindwalkerStShortCdPostConditions()
+	WindwalkerCdShortCdPostConditions() or WindwalkerStShortCdPostConditions()
 }
 
 AddFunction WindwalkerSefCdActions
@@ -354,7 +372,7 @@ AddFunction WindwalkerSefCdActions
 	#call_action_list,name=cd
 	WindwalkerCdCdActions()
 
-	unless WindwalkerCdCdPostConditions() or CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } and Spell(storm_earth_and_fire)
+	unless WindwalkerCdCdPostConditions() or CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff) and Spell(storm_earth_and_fire)
 	{
 		#call_action_list,name=st
 		WindwalkerStCdActions()
@@ -363,7 +381,7 @@ AddFunction WindwalkerSefCdActions
 
 AddFunction WindwalkerSefCdPostConditions
 {
-	WindwalkerCdCdPostConditions() or CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1 and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1 or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 } and Spell(storm_earth_and_fire) or WindwalkerStCdPostConditions()
+	WindwalkerCdCdPostConditions() or CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff) and Spell(storm_earth_and_fire) or WindwalkerStCdPostConditions()
 }
 
 ### actions.serenity
@@ -375,6 +393,8 @@ AddFunction WindwalkerSerenityMainActions
 
 	unless WindwalkerCdMainPostConditions()
 	{
+		#strike_of_the_windlord
+		Spell(strike_of_the_windlord)
 		#rising_sun_kick,cycle_targets=1,if=active_enemies<3
 		if Enemies() < 3 Spell(rising_sun_kick)
 		#fists_of_fury
@@ -408,14 +428,12 @@ AddFunction WindwalkerSerenityShortCdActions
 	{
 		#serenity
 		Spell(serenity)
-		#strike_of_the_windlord
-		Spell(strike_of_the_windlord)
 	}
 }
 
 AddFunction WindwalkerSerenityShortCdPostConditions
 {
-	WindwalkerCdShortCdPostConditions() or Enemies() < 3 and Spell(rising_sun_kick) or Spell(fists_of_fury) or Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or Enemies() >= 3 and Spell(rising_sun_kick) or not PreviousGCDSpell(blackout_kick) and Spell(blackout_kick) or not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or not PreviousGCDSpell(rushing_jade_wind) and Spell(rushing_jade_wind)
+	WindwalkerCdShortCdPostConditions() or Spell(strike_of_the_windlord) or Enemies() < 3 and Spell(rising_sun_kick) or Spell(fists_of_fury) or Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or Enemies() >= 3 and Spell(rising_sun_kick) or not PreviousGCDSpell(blackout_kick) and Spell(blackout_kick) or not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or not PreviousGCDSpell(rushing_jade_wind) and Spell(rushing_jade_wind)
 }
 
 AddFunction WindwalkerSerenityCdActions
@@ -438,6 +456,8 @@ AddFunction WindwalkerStMainActions
 
 	unless WindwalkerCdMainPostConditions()
 	{
+		#strike_of_the_windlord,if=talent.serenity.enabled|active_enemies<6
+		if Talent(serenity_talent) or Enemies() < 6 Spell(strike_of_the_windlord)
 		#fists_of_fury
 		Spell(fists_of_fury)
 		#rising_sun_kick,cycle_targets=1
@@ -475,10 +495,8 @@ AddFunction WindwalkerStShortCdActions
 	{
 		#energizing_elixir,if=energy<energy.max&chi<=1
 		if Energy() < MaxEnergy() and Chi() <= 1 Spell(energizing_elixir)
-		#strike_of_the_windlord,if=talent.serenity.enabled|active_enemies<6
-		if Talent(serenity_talent) or Enemies() < 6 Spell(strike_of_the_windlord)
 
-		unless Spell(fists_of_fury) or Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or MaxChi() - Chi() > 1 and not PreviousGCDSpell(rushing_jade_wind) and Spell(rushing_jade_wind) or { Chi() > 1 or BuffPresent(bok_proc_buff) } and not PreviousGCDSpell(blackout_kick) and Spell(blackout_kick) or TimeToMaxEnergy() >= 2.25 and Spell(chi_wave)
+		unless { Talent(serenity_talent) or Enemies() < 6 } and Spell(strike_of_the_windlord) or Spell(fists_of_fury) or Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or MaxChi() - Chi() > 1 and not PreviousGCDSpell(rushing_jade_wind) and Spell(rushing_jade_wind) or { Chi() > 1 or BuffPresent(bok_proc_buff) } and not PreviousGCDSpell(blackout_kick) and Spell(blackout_kick) or TimeToMaxEnergy() >= 2.25 and Spell(chi_wave)
 		{
 			#chi_burst,if=energy.time_to_max>=2.25
 			if TimeToMaxEnergy() >= 2.25 and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
@@ -488,7 +506,7 @@ AddFunction WindwalkerStShortCdActions
 
 AddFunction WindwalkerStShortCdPostConditions
 {
-	WindwalkerCdShortCdPostConditions() or Spell(fists_of_fury) or Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or MaxChi() - Chi() > 1 and not PreviousGCDSpell(rushing_jade_wind) and Spell(rushing_jade_wind) or { Chi() > 1 or BuffPresent(bok_proc_buff) } and not PreviousGCDSpell(blackout_kick) and Spell(blackout_kick) or TimeToMaxEnergy() >= 2.25 and Spell(chi_wave) or not PreviousGCDSpell(tiger_palm) and Spell(tiger_palm) or Talent(rushing_jade_wind_talent) and MaxChi() - Chi() == 1 and PreviousGCDSpell(blackout_kick) and SpellCooldown(rising_sun_kick) > 1 and SpellCooldown(fists_of_fury) > 1 and SpellCooldown(strike_of_the_windlord) > 1 and SpellCooldown(rushing_jade_wind) > 1 and Spell(crackling_jade_lightning) or not Talent(rushing_jade_wind_talent) and MaxChi() - Chi() == 1 and PreviousGCDSpell(blackout_kick) and SpellCooldown(rising_sun_kick) > 1 and SpellCooldown(fists_of_fury) > 1 and SpellCooldown(strike_of_the_windlord) > 1 and Spell(crackling_jade_lightning)
+	WindwalkerCdShortCdPostConditions() or { Talent(serenity_talent) or Enemies() < 6 } and Spell(strike_of_the_windlord) or Spell(fists_of_fury) or Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or MaxChi() - Chi() > 1 and not PreviousGCDSpell(rushing_jade_wind) and Spell(rushing_jade_wind) or { Chi() > 1 or BuffPresent(bok_proc_buff) } and not PreviousGCDSpell(blackout_kick) and Spell(blackout_kick) or TimeToMaxEnergy() >= 2.25 and Spell(chi_wave) or not PreviousGCDSpell(tiger_palm) and Spell(tiger_palm) or Talent(rushing_jade_wind_talent) and MaxChi() - Chi() == 1 and PreviousGCDSpell(blackout_kick) and SpellCooldown(rising_sun_kick) > 1 and SpellCooldown(fists_of_fury) > 1 and SpellCooldown(strike_of_the_windlord) > 1 and SpellCooldown(rushing_jade_wind) > 1 and Spell(crackling_jade_lightning) or not Talent(rushing_jade_wind_talent) and MaxChi() - Chi() == 1 and PreviousGCDSpell(blackout_kick) and SpellCooldown(rising_sun_kick) > 1 and SpellCooldown(fists_of_fury) > 1 and SpellCooldown(strike_of_the_windlord) > 1 and Spell(crackling_jade_lightning)
 }
 
 AddFunction WindwalkerStCdActions
@@ -581,12 +599,15 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # fists_of_fury
 # gale_burst
 # invoke_xuen
+# paralysis
+# quaking_palm
 # rising_sun_kick
 # rushing_jade_wind
 # rushing_jade_wind_talent
 # serenity
 # serenity_buff
 # serenity_talent
+# spear_hand_strike
 # spinning_crane_kick
 # storm_earth_and_fire
 # storm_earth_and_fire_buff
@@ -594,6 +615,7 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # tiger_palm
 # touch_of_death
 # touch_of_death_debuff
+# war_stomp
 # whirling_dragon_punch
 ]]
 	OvaleScripts:RegisterScript("MONK", "windwalker", name, desc, code, "script")
