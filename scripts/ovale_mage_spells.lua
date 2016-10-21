@@ -265,9 +265,10 @@ Define(water_elemental_water_jet_debuff 135029)
 Define(winters_chill_debuff 157997) # TODO ???
 
 # Talents
+Define(quickening_talent 20)
+Define(rune_on_power_talent 8)
 Define(summon_arcane_familiar 205022)
 	SpellInfo(summon_arcane_familiar cd=10)
-Define(rune_on_power_talent 8)
 Define(unstable_magic_talent 17)
 	
 # Artifacts

@@ -705,7 +705,12 @@ function OvaleBestAction:ComputeArithmetic(element, state, atTime)
 			--]]
 			l = A/B
 			m = t
-			n = (B*c - A*z)/(B^2)
+			local numerator = B*c - A*z
+			if numerator ~= INFINITY then 
+				n = numerator/(B^2)
+			else
+				n = numerator
+			end
 			local bound
 			if z == 0 then
 				bound = INFINITY

@@ -305,6 +305,7 @@ Define(wrecking_ball_talent 7)
 	SpellInfo(hamstring tag=cd)
 	SpellInfo(battlecry tag=cd)
 	SpellInfo(avatar tag=cd)
+	SpellInfo(intercept tag=shortcd)
 ]]
 
 	OvaleScripts:RegisterScript("WARRIOR", nil, name, desc, code, "include")

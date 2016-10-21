@@ -401,12 +401,6 @@ AddCheckBox(opt_interrupt L(interrupt) default specialization=enhancement)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=enhancement)
 AddCheckBox(opt_bloodlust SpellName(bloodlust) specialization=enhancement)
 
-AddFunction EnhancementUseItemActions
-{
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
-}
-
 AddFunction EnhancementBloodlust
 {
 	if CheckBoxOn(opt_bloodlust) and DebuffExpires(burst_haste_debuff any=1)
@@ -439,8 +433,24 @@ AddFunction EnhancementInterruptActions
 
 AddFunction EnhancementDefaultMainActions
 {
-	#boulderfist,if=buff.boulderfist.remains<gcd|charges_fractional>1.75
-	if BuffRemaining(boulderfist_buff) < GCD() or Charges(boulderfist count=0) > 1.75 Spell(boulderfist)
+	#crash_lightning,if=artifact.alpha_wolf.rank&prev_gcd.feral_spirit
+	if ArtifactTraitRank(alpha_wolf) and PreviousGCDSpell(feral_spirit) Spell(crash_lightning)
+	#crash_lightning,if=talent.crashing_storm.enabled&active_enemies>=3
+	if Talent(crashing_storm_talent) and Enemies() >= 3 Spell(crash_lightning)
+	#boulderfist,if=buff.boulderfist.remains<gcd&maelstrom>=50&active_enemies>=3
+	if BuffRemaining(boulderfist_buff) < GCD() and Maelstrom() >= 50 and Enemies() >= 3 Spell(boulderfist)
+	#boulderfist,if=buff.boulderfist.remains<gcd|(charges_fractional>1.75&maelstrom<=100&active_enemies<=2)
+	if BuffRemaining(boulderfist_buff) < GCD() or Charges(boulderfist count=0) > 1.75 and Maelstrom() <= 100 and Enemies() <= 2 Spell(boulderfist)
+	#crash_lightning,if=buff.crash_lightning.remains<gcd&active_enemies>=2
+	if BuffRemaining(crash_lightning_buff) < GCD() and Enemies() >= 2 Spell(crash_lightning)
+	#windstrike,if=active_enemies>=3&!talent.hailstorm.enabled
+	if Enemies() >= 3 and not Talent(hailstorm_talent) Spell(windstrike)
+	#stormstrike,if=active_enemies>=3&!talent.hailstorm.enabled
+	if Enemies() >= 3 and not Talent(hailstorm_talent) Spell(stormstrike)
+	#windstrike,if=buff.stormbringer.react
+	if BuffPresent(stormbringer_buff) Spell(windstrike)
+	#stormstrike,if=buff.stormbringer.react
+	if BuffPresent(stormbringer_buff) Spell(stormstrike)
 	#frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<gcd
 	if Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < GCD() Spell(frostbrand)
 	#flametongue,if=buff.flametongue.remains<gcd
@@ -455,18 +465,18 @@ AddFunction EnhancementDefaultMainActions
 	Spell(windstrike)
 	#stormstrike
 	Spell(stormstrike)
-	#frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<4.8
-	if Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 Spell(frostbrand)
-	#flametongue,if=buff.flametongue.remains<4.8
-	if BuffRemaining(flametongue_buff) < 4.8 Spell(flametongue)
 	#lightning_bolt,if=talent.overcharge.enabled&maelstrom>=60
 	if Talent(overcharge_talent) and Maelstrom() >= 60 Spell(lightning_bolt)
 	#lava_lash,if=buff.hot_hand.react
 	if BuffPresent(hot_hand_buff) Spell(lava_lash)
 	#earthen_spike
 	Spell(earthen_spike)
-	#crash_lightning,if=active_enemies>1|talent.crashing_storm.enabled|(pet.feral_spirit.remains>5|pet.frost_wolf.remains>5|pet.fiery_wolf.remains>5|pet.lightning_wolf.remains>5)
-	if Enemies() > 1 or Talent(crashing_storm_talent) or PetPresent() > 5 or PetPresent() > 5 or PetPresent() > 5 or PetPresent() > 5 Spell(crash_lightning)
+	#crash_lightning,if=active_enemies>1|talent.crashing_storm.enabled|feral_spirit.remains>5
+	if Enemies() > 1 or Talent(crashing_storm_talent) or TotemRemaining(sprit_wolf) > 5 Spell(crash_lightning)
+	#frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<4.8
+	if Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 Spell(frostbrand)
+	#flametongue,if=buff.flametongue.remains<4.8
+	if BuffRemaining(flametongue_buff) < 4.8 Spell(flametongue)
 	#lava_lash,if=maelstrom>=90
 	if Maelstrom() >= 90 Spell(lava_lash)
 	#rockbiter
@@ -486,12 +496,12 @@ AddFunction EnhancementDefaultShortCdActions
 	#auto_attack
 	EnhancementGetInMeleeRange()
 
-	unless { BuffRemaining(boulderfist_buff) < GCD() or Charges(boulderfist count=0) > 1.75 } and Spell(boulderfist) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < GCD() and Spell(frostbrand) or BuffRemaining(flametongue_buff) < GCD() and Spell(flametongue)
+	unless ArtifactTraitRank(alpha_wolf) and PreviousGCDSpell(feral_spirit) and Spell(crash_lightning) or Talent(crashing_storm_talent) and Enemies() >= 3 and Spell(crash_lightning) or BuffRemaining(boulderfist_buff) < GCD() and Maelstrom() >= 50 and Enemies() >= 3 and Spell(boulderfist) or { BuffRemaining(boulderfist_buff) < GCD() or Charges(boulderfist count=0) > 1.75 and Maelstrom() <= 100 and Enemies() <= 2 } and Spell(boulderfist) or BuffRemaining(crash_lightning_buff) < GCD() and Enemies() >= 2 and Spell(crash_lightning) or Enemies() >= 3 and not Talent(hailstorm_talent) and Spell(windstrike) or Enemies() >= 3 and not Talent(hailstorm_talent) and Spell(stormstrike) or BuffPresent(stormbringer_buff) and Spell(windstrike) or BuffPresent(stormbringer_buff) and Spell(stormstrike) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < GCD() and Spell(frostbrand) or BuffRemaining(flametongue_buff) < GCD() and Spell(flametongue)
 	{
 		#windsong
 		Spell(windsong)
 
-		unless not target.DebuffPresent(fury_of_air_debuff) and Spell(fury_of_air) or Spell(doom_winds) or Enemies() >= 3 and Spell(crash_lightning) or Spell(windstrike) or Spell(stormstrike) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 and Spell(frostbrand) or BuffRemaining(flametongue_buff) < 4.8 and Spell(flametongue) or Talent(overcharge_talent) and Maelstrom() >= 60 and Spell(lightning_bolt) or BuffPresent(hot_hand_buff) and Spell(lava_lash) or Spell(earthen_spike) or { Enemies() > 1 or Talent(crashing_storm_talent) or PetPresent() > 5 or PetPresent() > 5 or PetPresent() > 5 or PetPresent() > 5 } and Spell(crash_lightning)
+		unless not target.DebuffPresent(fury_of_air_debuff) and Spell(fury_of_air) or Spell(doom_winds) or Enemies() >= 3 and Spell(crash_lightning) or Spell(windstrike) or Spell(stormstrike) or Talent(overcharge_talent) and Maelstrom() >= 60 and Spell(lightning_bolt) or BuffPresent(hot_hand_buff) and Spell(lava_lash) or Spell(earthen_spike) or { Enemies() > 1 or Talent(crashing_storm_talent) or TotemRemaining(sprit_wolf) > 5 } and Spell(crash_lightning) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 and Spell(frostbrand) or BuffRemaining(flametongue_buff) < 4.8 and Spell(flametongue)
 		{
 			#sundering
 			Spell(sundering)
@@ -501,7 +511,7 @@ AddFunction EnhancementDefaultShortCdActions
 
 AddFunction EnhancementDefaultShortCdPostConditions
 {
-	{ BuffRemaining(boulderfist_buff) < GCD() or Charges(boulderfist count=0) > 1.75 } and Spell(boulderfist) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < GCD() and Spell(frostbrand) or BuffRemaining(flametongue_buff) < GCD() and Spell(flametongue) or not target.DebuffPresent(fury_of_air_debuff) and Spell(fury_of_air) or Spell(doom_winds) or Enemies() >= 3 and Spell(crash_lightning) or Spell(windstrike) or Spell(stormstrike) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 and Spell(frostbrand) or BuffRemaining(flametongue_buff) < 4.8 and Spell(flametongue) or Talent(overcharge_talent) and Maelstrom() >= 60 and Spell(lightning_bolt) or BuffPresent(hot_hand_buff) and Spell(lava_lash) or Spell(earthen_spike) or { Enemies() > 1 or Talent(crashing_storm_talent) or PetPresent() > 5 or PetPresent() > 5 or PetPresent() > 5 or PetPresent() > 5 } and Spell(crash_lightning) or Maelstrom() >= 90 and Spell(lava_lash) or Spell(rockbiter) or Spell(flametongue) or Spell(boulderfist)
+	ArtifactTraitRank(alpha_wolf) and PreviousGCDSpell(feral_spirit) and Spell(crash_lightning) or Talent(crashing_storm_talent) and Enemies() >= 3 and Spell(crash_lightning) or BuffRemaining(boulderfist_buff) < GCD() and Maelstrom() >= 50 and Enemies() >= 3 and Spell(boulderfist) or { BuffRemaining(boulderfist_buff) < GCD() or Charges(boulderfist count=0) > 1.75 and Maelstrom() <= 100 and Enemies() <= 2 } and Spell(boulderfist) or BuffRemaining(crash_lightning_buff) < GCD() and Enemies() >= 2 and Spell(crash_lightning) or Enemies() >= 3 and not Talent(hailstorm_talent) and Spell(windstrike) or Enemies() >= 3 and not Talent(hailstorm_talent) and Spell(stormstrike) or BuffPresent(stormbringer_buff) and Spell(windstrike) or BuffPresent(stormbringer_buff) and Spell(stormstrike) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < GCD() and Spell(frostbrand) or BuffRemaining(flametongue_buff) < GCD() and Spell(flametongue) or not target.DebuffPresent(fury_of_air_debuff) and Spell(fury_of_air) or Spell(doom_winds) or Enemies() >= 3 and Spell(crash_lightning) or Spell(windstrike) or Spell(stormstrike) or Talent(overcharge_talent) and Maelstrom() >= 60 and Spell(lightning_bolt) or BuffPresent(hot_hand_buff) and Spell(lava_lash) or Spell(earthen_spike) or { Enemies() > 1 or Talent(crashing_storm_talent) or TotemRemaining(sprit_wolf) > 5 } and Spell(crash_lightning) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 and Spell(frostbrand) or BuffRemaining(flametongue_buff) < 4.8 and Spell(flametongue) or Maelstrom() >= 90 and Spell(lava_lash) or Spell(rockbiter) or Spell(flametongue) or Spell(boulderfist)
 }
 
 AddFunction EnhancementDefaultCdActions
@@ -512,24 +522,26 @@ AddFunction EnhancementDefaultCdActions
 	if target.HealthPercent() < 25 or TimeInCombat() > 0.5 EnhancementBloodlust()
 	#feral_spirit
 	Spell(feral_spirit)
-	#use_item,slot=trinket2
-	EnhancementUseItemActions()
-	#potion,name=deadly_grace,if=pet.feral_spirit.remains>10|pet.frost_wolf.remains>5|pet.fiery_wolf.remains>5|pet.lightning_wolf.remains>5|target.time_to_die<=30
-	#berserking,if=buff.ascendance.up|!talent.ascendance.enabled|level<100
-	if BuffPresent(ascendance_melee_buff) or not Talent(ascendance_talent) or Level() < 100 Spell(berserking)
-	#blood_fury
-	Spell(blood_fury_apsp)
 
-	unless { BuffRemaining(boulderfist_buff) < GCD() or Charges(boulderfist count=0) > 1.75 } and Spell(boulderfist) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < GCD() and Spell(frostbrand) or BuffRemaining(flametongue_buff) < GCD() and Spell(flametongue) or Spell(windsong)
+	unless ArtifactTraitRank(alpha_wolf) and PreviousGCDSpell(feral_spirit) and Spell(crash_lightning)
 	{
-		#ascendance
-		if BuffExpires(ascendance_melee_buff) Spell(ascendance_melee)
+		#potion,name=old_war,if=feral_spirit.remains>5|target.time_to_die<=30
+		#berserking,if=buff.ascendance.up|!talent.ascendance.enabled|level<100
+		if BuffPresent(ascendance_melee_buff) or not Talent(ascendance_talent) or Level() < 100 Spell(berserking)
+		#blood_fury
+		Spell(blood_fury_apsp)
+
+		unless Talent(crashing_storm_talent) and Enemies() >= 3 and Spell(crash_lightning) or BuffRemaining(boulderfist_buff) < GCD() and Maelstrom() >= 50 and Enemies() >= 3 and Spell(boulderfist) or { BuffRemaining(boulderfist_buff) < GCD() or Charges(boulderfist count=0) > 1.75 and Maelstrom() <= 100 and Enemies() <= 2 } and Spell(boulderfist) or BuffRemaining(crash_lightning_buff) < GCD() and Enemies() >= 2 and Spell(crash_lightning) or Enemies() >= 3 and not Talent(hailstorm_talent) and Spell(windstrike) or Enemies() >= 3 and not Talent(hailstorm_talent) and Spell(stormstrike) or BuffPresent(stormbringer_buff) and Spell(windstrike) or BuffPresent(stormbringer_buff) and Spell(stormstrike) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < GCD() and Spell(frostbrand) or BuffRemaining(flametongue_buff) < GCD() and Spell(flametongue) or Spell(windsong)
+		{
+			#ascendance
+			if BuffExpires(ascendance_melee_buff) Spell(ascendance_melee)
+		}
 	}
 }
 
 AddFunction EnhancementDefaultCdPostConditions
 {
-	{ BuffRemaining(boulderfist_buff) < GCD() or Charges(boulderfist count=0) > 1.75 } and Spell(boulderfist) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < GCD() and Spell(frostbrand) or BuffRemaining(flametongue_buff) < GCD() and Spell(flametongue) or Spell(windsong) or not target.DebuffPresent(fury_of_air_debuff) and Spell(fury_of_air) or Spell(doom_winds) or Enemies() >= 3 and Spell(crash_lightning) or Spell(windstrike) or Spell(stormstrike) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 and Spell(frostbrand) or BuffRemaining(flametongue_buff) < 4.8 and Spell(flametongue) or Talent(overcharge_talent) and Maelstrom() >= 60 and Spell(lightning_bolt) or BuffPresent(hot_hand_buff) and Spell(lava_lash) or Spell(earthen_spike) or { Enemies() > 1 or Talent(crashing_storm_talent) or PetPresent() > 5 or PetPresent() > 5 or PetPresent() > 5 or PetPresent() > 5 } and Spell(crash_lightning) or Spell(sundering) or Maelstrom() >= 90 and Spell(lava_lash) or Spell(rockbiter) or Spell(flametongue) or Spell(boulderfist)
+	ArtifactTraitRank(alpha_wolf) and PreviousGCDSpell(feral_spirit) and Spell(crash_lightning) or Talent(crashing_storm_talent) and Enemies() >= 3 and Spell(crash_lightning) or BuffRemaining(boulderfist_buff) < GCD() and Maelstrom() >= 50 and Enemies() >= 3 and Spell(boulderfist) or { BuffRemaining(boulderfist_buff) < GCD() or Charges(boulderfist count=0) > 1.75 and Maelstrom() <= 100 and Enemies() <= 2 } and Spell(boulderfist) or BuffRemaining(crash_lightning_buff) < GCD() and Enemies() >= 2 and Spell(crash_lightning) or Enemies() >= 3 and not Talent(hailstorm_talent) and Spell(windstrike) or Enemies() >= 3 and not Talent(hailstorm_talent) and Spell(stormstrike) or BuffPresent(stormbringer_buff) and Spell(windstrike) or BuffPresent(stormbringer_buff) and Spell(stormstrike) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < GCD() and Spell(frostbrand) or BuffRemaining(flametongue_buff) < GCD() and Spell(flametongue) or Spell(windsong) or not target.DebuffPresent(fury_of_air_debuff) and Spell(fury_of_air) or Spell(doom_winds) or Enemies() >= 3 and Spell(crash_lightning) or Spell(windstrike) or Spell(stormstrike) or Talent(overcharge_talent) and Maelstrom() >= 60 and Spell(lightning_bolt) or BuffPresent(hot_hand_buff) and Spell(lava_lash) or Spell(earthen_spike) or { Enemies() > 1 or Talent(crashing_storm_talent) or TotemRemaining(sprit_wolf) > 5 } and Spell(crash_lightning) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 and Spell(frostbrand) or BuffRemaining(flametongue_buff) < 4.8 and Spell(flametongue) or Spell(sundering) or Maelstrom() >= 90 and Spell(lava_lash) or Spell(rockbiter) or Spell(flametongue) or Spell(boulderfist)
 }
 
 ### actions.precombat
@@ -539,9 +551,9 @@ AddFunction EnhancementPrecombatMainActions
 	#flask,type=seventh_demon
 	#augmentation,type=defiled
 	Spell(augmentation)
-	#food,name=azshari_salad
+	#food,name=nightborne_delicacy_platter
 	#snapshot_stats
-	#potion,name=deadly_grace
+	#potion,name=old_war
 	#lightning_shield
 	Spell(lightning_shield)
 }
@@ -627,6 +639,7 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 }
 
 ### Required symbols
+# alpha_wolf
 # arcane_torrent_mana
 # ascendance_melee
 # ascendance_melee_buff
@@ -638,6 +651,7 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # boulderfist
 # boulderfist_buff
 # crash_lightning
+# crash_lightning_buff
 # crashing_storm_talent
 # doom_winds
 # earthen_spike
@@ -657,6 +671,7 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # overcharge_talent
 # quaking_palm
 # rockbiter
+# stormbringer_buff
 # stormstrike
 # sundering
 # war_stomp

@@ -864,6 +864,8 @@ AddFunction RetributionDefaultShortCdActions
 {
 	#auto_attack
 	RetributionGetInMeleeRange()
+	#shield_of_vengeance
+	Spell(shield_of_vengeance)
 	#wake_of_ashes,if=holy_power>=0&time<2
 	if HolyPower() >= 0 and TimeInCombat() < 2 Spell(wake_of_ashes)
 
@@ -895,36 +897,40 @@ AddFunction RetributionDefaultCdActions
 {
 	#rebuke
 	RetributionInterruptActions()
-	#potion,name=deadly_grace,if=(buff.bloodlust.react|buff.avenging_wrath.up|buff.crusade.up|target.time_to_die<=40)
+	#potion,name=old_war,if=(buff.bloodlust.react|buff.avenging_wrath.up|buff.crusade.up|target.time_to_die<=40)
 	#use_item,name=faulty_countermeasure,if=(buff.avenging_wrath.up|buff.crusade.up)
 	if BuffPresent(avenging_wrath_melee_buff) or BuffPresent(crusade_buff) RetributionUseItemActions()
 	#holy_wrath
 	Spell(holy_wrath)
 	#avenging_wrath
 	Spell(avenging_wrath_melee)
-	#crusade,if=holy_power>=5
-	if HolyPower() >= 5 Spell(crusade)
 
-	unless HolyPower() >= 0 and TimeInCombat() < 2 and Spell(wake_of_ashes) or Enemies() <= 3 and { SpellCooldown(judgment) < GCD() * 4.5 or target.DebuffRemaining(judgment_debuff) > GCD() * 4.67 } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } and Spell(execution_sentence)
+	unless Spell(shield_of_vengeance)
 	{
-		#blood_fury
-		Spell(blood_fury_apsp)
-		#berserking
-		Spell(berserking)
-		#arcane_torrent,if=holy_power<5
-		if HolyPower() < 5 Spell(arcane_torrent_holy)
-		#call_action_list,name=VB,if=talent.virtues_blade.enabled
-		if Talent(virtues_blade_talent) RetributionVbCdActions()
+		#crusade,if=holy_power>=5
+		if HolyPower() >= 5 Spell(crusade)
 
-		unless Talent(virtues_blade_talent) and RetributionVbCdPostConditions()
+		unless HolyPower() >= 0 and TimeInCombat() < 2 and Spell(wake_of_ashes) or Enemies() <= 3 and { SpellCooldown(judgment) < GCD() * 4.5 or target.DebuffRemaining(judgment_debuff) > GCD() * 4.67 } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } and Spell(execution_sentence)
 		{
-			#call_action_list,name=BoW,if=talent.blade_of_wrath.enabled
-			if Talent(blade_of_wrath_talent) RetributionBowCdActions()
+			#blood_fury
+			Spell(blood_fury_apsp)
+			#berserking
+			Spell(berserking)
+			#arcane_torrent,if=holy_power<5
+			if HolyPower() < 5 Spell(arcane_torrent_holy)
+			#call_action_list,name=VB,if=talent.virtues_blade.enabled
+			if Talent(virtues_blade_talent) RetributionVbCdActions()
 
-			unless Talent(blade_of_wrath_talent) and RetributionBowCdPostConditions()
+			unless Talent(virtues_blade_talent) and RetributionVbCdPostConditions()
 			{
-				#call_action_list,name=DH,if=talent.divine_hammer.enabled
-				if Talent(divine_hammer_talent) RetributionDhCdActions()
+				#call_action_list,name=BoW,if=talent.blade_of_wrath.enabled
+				if Talent(blade_of_wrath_talent) RetributionBowCdActions()
+
+				unless Talent(blade_of_wrath_talent) and RetributionBowCdPostConditions()
+				{
+					#call_action_list,name=DH,if=talent.divine_hammer.enabled
+					if Talent(divine_hammer_talent) RetributionDhCdActions()
+				}
 			}
 		}
 	}
@@ -932,7 +938,7 @@ AddFunction RetributionDefaultCdActions
 
 AddFunction RetributionDefaultCdPostConditions
 {
-	HolyPower() >= 0 and TimeInCombat() < 2 and Spell(wake_of_ashes) or Enemies() <= 3 and { SpellCooldown(judgment) < GCD() * 4.5 or target.DebuffRemaining(judgment_debuff) > GCD() * 4.67 } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } and Spell(execution_sentence) or Talent(virtues_blade_talent) and RetributionVbCdPostConditions() or Talent(blade_of_wrath_talent) and RetributionBowCdPostConditions() or Talent(divine_hammer_talent) and RetributionDhCdPostConditions()
+	Spell(shield_of_vengeance) or HolyPower() >= 0 and TimeInCombat() < 2 and Spell(wake_of_ashes) or Enemies() <= 3 and { SpellCooldown(judgment) < GCD() * 4.5 or target.DebuffRemaining(judgment_debuff) > GCD() * 4.67 } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } and Spell(execution_sentence) or Talent(virtues_blade_talent) and RetributionVbCdPostConditions() or Talent(blade_of_wrath_talent) and RetributionBowCdPostConditions() or Talent(divine_hammer_talent) and RetributionDhCdPostConditions()
 }
 
 ### actions.precombat
@@ -1058,6 +1064,7 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 # justicars_vengeance
 # quaking_palm
 # rebuke
+# shield_of_vengeance
 # templars_verdict
 # the_fires_of_justice_buff
 # the_fires_of_justice_talent
