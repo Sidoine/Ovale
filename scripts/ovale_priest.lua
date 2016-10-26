@@ -224,6 +224,8 @@ AddFunction ShadowPrecombatMainActions
 	Spell(augmentation)
 	#snapshot_stats
 	#potion,name=deadly_grace
+	#shadowform,if=!buff.shadowform.up
+	if not BuffPresent(shadowform_buff) Spell(shadowform)
 	#mind_blast
 	Spell(mind_blast)
 }
@@ -238,7 +240,7 @@ AddFunction ShadowPrecombatShortCdActions
 
 AddFunction ShadowPrecombatShortCdPostConditions
 {
-	Spell(augmentation) or Spell(mind_blast)
+	Spell(augmentation) or not BuffPresent(shadowform_buff) and Spell(shadowform) or Spell(mind_blast)
 }
 
 AddFunction ShadowPrecombatCdActions
@@ -247,7 +249,7 @@ AddFunction ShadowPrecombatCdActions
 
 AddFunction ShadowPrecombatCdPostConditions
 {
-	Spell(augmentation) or Spell(mind_blast)
+	Spell(augmentation) or not BuffPresent(shadowform_buff) and Spell(shadowform) or Spell(mind_blast)
 }
 
 ### actions.s2m
@@ -613,6 +615,8 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # shadow_word_pain_debuff
 # shadow_word_void
 # shadowfiend
+# shadowform
+# shadowform_buff
 # shadowy_insight_buff
 # shadowy_insight_talent
 # sphere_of_insanity

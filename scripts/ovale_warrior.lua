@@ -165,8 +165,6 @@ AddFunction ArmsDefaultCdActions
 		if BuffPresent(burst_haste_buff any=1) or TimeInCombat() >= 1 Spell(avatar)
 		#use_item,name=gift_of_radiance
 		ArmsUseItemActions()
-		#hamstring,if=!ptr&buff.battle_cry_deadly_calm.remains>cooldown.hamstring.remains
-		if not PTR() and BuffRemaining(battle_cry_deadly_calm_buff) > SpellCooldown(hamstring) Spell(hamstring)
 
 		unless target.DebuffRemaining(rend_debuff) < GCD() and Spell(rend) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or Spell(ravager) or BuffPresent(overpower_buff) and Spell(overpower)
 		{
@@ -276,8 +274,8 @@ AddFunction ArmsCleaveMainActions
 	if target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 Spell(rend)
 	#cleave
 	Spell(cleave)
-	#whirlwind,if=rage>=100|buff.focused_rage.stack=3
-	if Rage() >= 100 or BuffStacks(focused_rage_buff) == 3 Spell(whirlwind)
+	#whirlwind,if=rage>40|buff.cleave.up
+	if Rage() > 40 or BuffPresent(cleave_buff) Spell(whirlwind)
 }
 
 AddFunction ArmsCleaveMainPostConditions
@@ -290,15 +288,15 @@ AddFunction ArmsCleaveShortCdActions
 	{
 		#warbreaker,if=buff.shattered_defenses.down
 		if BuffExpires(shattered_defenses_buff) Spell(warbreaker)
-		#focused_rage,if=buff.shattered_defenses.down
-		if BuffExpires(shattered_defenses_buff) Spell(focused_rage)
+		#focused_rage,if=rage>100|buff.battle_cry_deadly_calm.up
+		if Rage() > 100 or BuffPresent(battle_cry_deadly_calm_buff) Spell(focused_rage)
 
 		unless Talent(fervor_of_battle_talent) and { target.DebuffPresent(colossus_smash_debuff) or RageDeficit() < 50 } and { not Talent(focused_rage_talent) or BuffPresent(battle_cry_deadly_calm_buff) or BuffPresent(cleave_buff) } and Spell(whirlwind) or target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and Spell(rend)
 		{
 			#bladestorm
 			Spell(bladestorm)
 
-			unless Spell(cleave) or { Rage() >= 100 or BuffStacks(focused_rage_buff) == 3 } and Spell(whirlwind)
+			unless Spell(cleave) or { Rage() > 40 or BuffPresent(cleave_buff) } and Spell(whirlwind)
 			{
 				#shockwave
 				Spell(shockwave)
@@ -311,7 +309,7 @@ AddFunction ArmsCleaveShortCdActions
 
 AddFunction ArmsCleaveShortCdPostConditions
 {
-	Spell(mortal_strike) or BuffPresent(stone_heart_buff) and Spell(execute_arms) or BuffExpires(shattered_defenses_buff) and BuffExpires(precise_strikes_buff) and Spell(colossus_smash) or Talent(fervor_of_battle_talent) and { target.DebuffPresent(colossus_smash_debuff) or RageDeficit() < 50 } and { not Talent(focused_rage_talent) or BuffPresent(battle_cry_deadly_calm_buff) or BuffPresent(cleave_buff) } and Spell(whirlwind) or target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and Spell(rend) or Spell(cleave) or { Rage() >= 100 or BuffStacks(focused_rage_buff) == 3 } and Spell(whirlwind)
+	Spell(mortal_strike) or BuffPresent(stone_heart_buff) and Spell(execute_arms) or BuffExpires(shattered_defenses_buff) and BuffExpires(precise_strikes_buff) and Spell(colossus_smash) or Talent(fervor_of_battle_talent) and { target.DebuffPresent(colossus_smash_debuff) or RageDeficit() < 50 } and { not Talent(focused_rage_talent) or BuffPresent(battle_cry_deadly_calm_buff) or BuffPresent(cleave_buff) } and Spell(whirlwind) or target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and Spell(rend) or Spell(cleave) or { Rage() > 40 or BuffPresent(cleave_buff) } and Spell(whirlwind)
 }
 
 AddFunction ArmsCleaveCdActions
@@ -320,7 +318,7 @@ AddFunction ArmsCleaveCdActions
 
 AddFunction ArmsCleaveCdPostConditions
 {
-	Spell(mortal_strike) or BuffPresent(stone_heart_buff) and Spell(execute_arms) or BuffExpires(shattered_defenses_buff) and BuffExpires(precise_strikes_buff) and Spell(colossus_smash) or BuffExpires(shattered_defenses_buff) and Spell(warbreaker) or Talent(fervor_of_battle_talent) and { target.DebuffPresent(colossus_smash_debuff) or RageDeficit() < 50 } and { not Talent(focused_rage_talent) or BuffPresent(battle_cry_deadly_calm_buff) or BuffPresent(cleave_buff) } and Spell(whirlwind) or target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and Spell(rend) or Spell(bladestorm) or Spell(cleave) or { Rage() >= 100 or BuffStacks(focused_rage_buff) == 3 } and Spell(whirlwind) or Spell(shockwave) or Spell(storm_bolt)
+	Spell(mortal_strike) or BuffPresent(stone_heart_buff) and Spell(execute_arms) or BuffExpires(shattered_defenses_buff) and BuffExpires(precise_strikes_buff) and Spell(colossus_smash) or BuffExpires(shattered_defenses_buff) and Spell(warbreaker) or Talent(fervor_of_battle_talent) and { target.DebuffPresent(colossus_smash_debuff) or RageDeficit() < 50 } and { not Talent(focused_rage_talent) or BuffPresent(battle_cry_deadly_calm_buff) or BuffPresent(cleave_buff) } and Spell(whirlwind) or target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and Spell(rend) or Spell(bladestorm) or Spell(cleave) or { Rage() > 40 or BuffPresent(cleave_buff) } and Spell(whirlwind) or Spell(shockwave) or Spell(storm_bolt)
 }
 
 ### actions.execute
@@ -333,8 +331,12 @@ AddFunction ArmsExecuteMainActions
 	if BuffPresent(battle_cry_deadly_calm_buff) Spell(execute_arms)
 	#colossus_smash,if=buff.shattered_defenses.down
 	if BuffExpires(shattered_defenses_buff) Spell(colossus_smash)
-	#execute,if=buff.shattered_defenses.up&rage>22|buff.shattered_defenses.down
-	if BuffPresent(shattered_defenses_buff) and Rage() > 22 or BuffExpires(shattered_defenses_buff) Spell(execute_arms)
+	#execute,if=buff.shattered_defenses.up&rage>22
+	if BuffPresent(shattered_defenses_buff) and Rage() > 22 Spell(execute_arms)
+	#mortal_strike,if=equipped.archavons_heavy_hand&rage<60
+	if HasEquippedItem(archavons_heavy_hand) and Rage() < 60 Spell(mortal_strike)
+	#execute,if=buff.shattered_defenses.down
+	if BuffExpires(shattered_defenses_buff) Spell(execute_arms)
 }
 
 AddFunction ArmsExecuteMainPostConditions
@@ -348,7 +350,7 @@ AddFunction ArmsExecuteShortCdActions
 		#warbreaker,if=buff.shattered_defenses.down&rage<=30
 		if BuffExpires(shattered_defenses_buff) and Rage() <= 30 Spell(warbreaker)
 
-		unless { BuffPresent(shattered_defenses_buff) and Rage() > 22 or BuffExpires(shattered_defenses_buff) } and Spell(execute_arms)
+		unless BuffPresent(shattered_defenses_buff) and Rage() > 22 and Spell(execute_arms) or HasEquippedItem(archavons_heavy_hand) and Rage() < 60 and Spell(mortal_strike) or BuffExpires(shattered_defenses_buff) and Spell(execute_arms)
 		{
 			#bladestorm,interrupt=1,if=raid_event.adds.in>90|!raid_event.adds.exists|spell_targets.bladestorm_mh>desired_targets
 			if 600 > 90 or not False(raid_event_adds_exists) or Enemies() > Enemies(tagged=1) Spell(bladestorm)
@@ -358,7 +360,7 @@ AddFunction ArmsExecuteShortCdActions
 
 AddFunction ArmsExecuteShortCdPostConditions
 {
-	BuffPresent(battle_cry_buff) and BuffStacks(focused_rage_buff) == 3 and Spell(mortal_strike) or BuffPresent(battle_cry_deadly_calm_buff) and Spell(execute_arms) or BuffExpires(shattered_defenses_buff) and Spell(colossus_smash) or { BuffPresent(shattered_defenses_buff) and Rage() > 22 or BuffExpires(shattered_defenses_buff) } and Spell(execute_arms)
+	BuffPresent(battle_cry_buff) and BuffStacks(focused_rage_buff) == 3 and Spell(mortal_strike) or BuffPresent(battle_cry_deadly_calm_buff) and Spell(execute_arms) or BuffExpires(shattered_defenses_buff) and Spell(colossus_smash) or BuffPresent(shattered_defenses_buff) and Rage() > 22 and Spell(execute_arms) or HasEquippedItem(archavons_heavy_hand) and Rage() < 60 and Spell(mortal_strike) or BuffExpires(shattered_defenses_buff) and Spell(execute_arms)
 }
 
 AddFunction ArmsExecuteCdActions
@@ -367,7 +369,7 @@ AddFunction ArmsExecuteCdActions
 
 AddFunction ArmsExecuteCdPostConditions
 {
-	BuffPresent(battle_cry_buff) and BuffStacks(focused_rage_buff) == 3 and Spell(mortal_strike) or BuffPresent(battle_cry_deadly_calm_buff) and Spell(execute_arms) or BuffExpires(shattered_defenses_buff) and Spell(colossus_smash) or BuffExpires(shattered_defenses_buff) and Rage() <= 30 and Spell(warbreaker) or { BuffPresent(shattered_defenses_buff) and Rage() > 22 or BuffExpires(shattered_defenses_buff) } and Spell(execute_arms) or { 600 > 90 or not False(raid_event_adds_exists) or Enemies() > Enemies(tagged=1) } and Spell(bladestorm)
+	BuffPresent(battle_cry_buff) and BuffStacks(focused_rage_buff) == 3 and Spell(mortal_strike) or BuffPresent(battle_cry_deadly_calm_buff) and Spell(execute_arms) or BuffExpires(shattered_defenses_buff) and Spell(colossus_smash) or BuffExpires(shattered_defenses_buff) and Rage() <= 30 and Spell(warbreaker) or BuffPresent(shattered_defenses_buff) and Rage() > 22 and Spell(execute_arms) or HasEquippedItem(archavons_heavy_hand) and Rage() < 60 and Spell(mortal_strike) or BuffExpires(shattered_defenses_buff) and Spell(execute_arms) or { 600 > 90 or not False(raid_event_adds_exists) or Enemies() > Enemies(tagged=1) } and Spell(bladestorm)
 }
 
 ### actions.precombat
@@ -536,7 +538,6 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # focused_rage
 # focused_rage_buff
 # focused_rage_talent
-# hamstring
 # heroic_leap
 # heroic_throw
 # mortal_strike

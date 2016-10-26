@@ -1122,7 +1122,7 @@ do
 # Based on SimulationCraft profile "Mage_Frost_T19P".
 #	class=mage
 #	spec=frost
-#	talents=3022011
+#	talents=1121113
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -1156,6 +1156,8 @@ AddFunction FrostDefaultMainActions
 
 	unless FrostCooldownsMainPostConditions()
 	{
+		#blizzard,if=buff.potion_of_deadly_grace.up&!prev_off_gcd.water_jet
+		if BuffPresent(potion_of_deadly_grace_buff) and not PreviousOffGCDSpell(water_elemental_water_jet) Spell(blizzard)
 		#ice_nova,if=debuff.winters_chill.up
 		if target.DebuffPresent(winters_chill_debuff) Spell(ice_nova)
 		#frostbolt,if=prev_off_gcd.water_jet
@@ -1168,8 +1170,8 @@ AddFunction FrostDefaultMainActions
 		if BuffStacks(fingers_of_frost_buff) > 0 and SpellCooldown(icy_veins) > 10 or BuffStacks(fingers_of_frost_buff) > 2 Spell(ice_lance)
 		#ice_nova
 		Spell(ice_nova)
-		#blizzard
-		Spell(blizzard)
+		#blizzard,if=talent.artic_gale.enabled
+		if Talent(artic_gale_talent) Spell(blizzard)
 		#frostbolt
 		Spell(frostbolt)
 	}
@@ -1187,7 +1189,7 @@ AddFunction FrostDefaultShortCdActions
 		#call_action_list,name=cooldowns
 		FrostCooldownsShortCdActions()
 
-		unless FrostCooldownsShortCdPostConditions() or target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt)
+		unless FrostCooldownsShortCdPostConditions() or BuffPresent(potion_of_deadly_grace_buff) and not PreviousOffGCDSpell(water_elemental_water_jet) and Spell(blizzard) or target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt)
 		{
 			#water_jet,if=prev_gcd.frostbolt&buff.fingers_of_frost.stack<(2+artifact.icy_hand.enabled)&buff.brain_freeze.react=0
 			if PreviousGCDSpell(frostbolt) and BuffStacks(fingers_of_frost_buff) < 2 + HasArtifactTrait(icy_hand) and BuffStacks(brain_freeze_buff) == 0 Spell(water_elemental_water_jet)
@@ -1211,7 +1213,7 @@ AddFunction FrostDefaultShortCdActions
 						#comet_storm
 						Spell(comet_storm)
 
-						unless Spell(blizzard)
+						unless Talent(artic_gale_talent) and Spell(blizzard)
 						{
 							#ebonbolt,if=buff.fingers_of_frost.stack<=(0+artifact.icy_hand.enabled)
 							if BuffStacks(fingers_of_frost_buff) <= 0 + HasArtifactTrait(icy_hand) Spell(ebonbolt)
@@ -1225,7 +1227,7 @@ AddFunction FrostDefaultShortCdActions
 
 AddFunction FrostDefaultShortCdPostConditions
 {
-	BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(flurry) and Spell(ice_lance) or FrostCooldownsShortCdPostConditions() or target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or BuffPresent(brain_freeze_buff) and BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(frostbolt) and Spell(flurry) or Spell(glacial_spike) or { BuffStacks(fingers_of_frost_buff) > 0 and SpellCooldown(icy_veins) > 10 or BuffStacks(fingers_of_frost_buff) > 2 } and Spell(ice_lance) or Spell(ice_nova) or Spell(blizzard) or Spell(frostbolt)
+	BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(flurry) and Spell(ice_lance) or FrostCooldownsShortCdPostConditions() or BuffPresent(potion_of_deadly_grace_buff) and not PreviousOffGCDSpell(water_elemental_water_jet) and Spell(blizzard) or target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or BuffPresent(brain_freeze_buff) and BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(frostbolt) and Spell(flurry) or Spell(glacial_spike) or { BuffStacks(fingers_of_frost_buff) > 0 and SpellCooldown(icy_veins) > 10 or BuffStacks(fingers_of_frost_buff) > 2 } and Spell(ice_lance) or Spell(ice_nova) or Talent(artic_gale_talent) and Spell(blizzard) or Spell(frostbolt)
 }
 
 AddFunction FrostDefaultCdActions
@@ -1244,7 +1246,7 @@ AddFunction FrostDefaultCdActions
 
 AddFunction FrostDefaultCdPostConditions
 {
-	BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(flurry) and Spell(ice_lance) or FrostCooldownsCdPostConditions() or target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or { BuffPresent(icy_veins_buff) or SpellCooldown(icy_veins) > SpellCooldown(ray_of_frost) and BuffExpires(rune_of_power_buff) } and Spell(ray_of_frost) or BuffPresent(brain_freeze_buff) and BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(frostbolt) and Spell(flurry) or Spell(glacial_spike) or BuffStacks(fingers_of_frost_buff) <= 0 + HasArtifactTrait(icy_hand) and Spell(frozen_touch) or target.DebuffRemaining(frost_bomb_debuff) < TravelTime(ice_lance) and BuffStacks(fingers_of_frost_buff) > 0 and Spell(frost_bomb) or { BuffStacks(fingers_of_frost_buff) > 0 and SpellCooldown(icy_veins) > 10 or BuffStacks(fingers_of_frost_buff) > 2 } and Spell(ice_lance) or Spell(frozen_orb) or Spell(ice_nova) or Spell(comet_storm) or Spell(blizzard) or BuffStacks(fingers_of_frost_buff) <= 0 + HasArtifactTrait(icy_hand) and Spell(ebonbolt) or Spell(frostbolt)
+	BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(flurry) and Spell(ice_lance) or FrostCooldownsCdPostConditions() or BuffPresent(potion_of_deadly_grace_buff) and not PreviousOffGCDSpell(water_elemental_water_jet) and Spell(blizzard) or target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or { BuffPresent(icy_veins_buff) or SpellCooldown(icy_veins) > SpellCooldown(ray_of_frost) and BuffExpires(rune_of_power_buff) } and Spell(ray_of_frost) or BuffPresent(brain_freeze_buff) and BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(frostbolt) and Spell(flurry) or Spell(glacial_spike) or BuffStacks(fingers_of_frost_buff) <= 0 + HasArtifactTrait(icy_hand) and Spell(frozen_touch) or target.DebuffRemaining(frost_bomb_debuff) < TravelTime(ice_lance) and BuffStacks(fingers_of_frost_buff) > 0 and Spell(frost_bomb) or { BuffStacks(fingers_of_frost_buff) > 0 and SpellCooldown(icy_veins) > 10 or BuffStacks(fingers_of_frost_buff) > 2 } and Spell(ice_lance) or Spell(frozen_orb) or Spell(ice_nova) or Spell(comet_storm) or Talent(artic_gale_talent) and Spell(blizzard) or BuffStacks(fingers_of_frost_buff) <= 0 + HasArtifactTrait(icy_hand) and Spell(ebonbolt) or Spell(frostbolt)
 }
 
 ### actions.cooldowns
@@ -1396,6 +1398,7 @@ AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 ### Required symbols
 # 132410
 # arcane_torrent_mana
+# artic_gale_talent
 # augmentation
 # berserking
 # blizzard
@@ -1418,6 +1421,7 @@ AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 # icy_veins
 # icy_veins_buff
 # mirror_image
+# potion_of_deadly_grace_buff
 # quaking_palm
 # ray_of_frost
 # rune_of_power

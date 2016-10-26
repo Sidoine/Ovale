@@ -217,8 +217,8 @@ AddFunction WindwalkerDefaultShortCdPostConditions
 
 AddFunction WindwalkerDefaultCdActions
 {
-	#spear_hand_strike
-	WindwalkerInterruptActions()
+	#spear_hand_strike,if=target.debuff.casting.react
+	if target.IsInterruptible() WindwalkerInterruptActions()
 	#potion,name=old_war,if=buff.serenity.up|buff.storm_earth_and_fire.up|(!talent.serenity.enabled&trinket.proc.agility.react)|buff.bloodlust.react|target.time_to_die<=60
 	#call_action_list,name=serenity,if=talent.serenity.enabled&((artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.remains<=14&cooldown.rising_sun_kick.remains<=4)|buff.serenity.up)
 	if Talent(serenity_talent) and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 14 and SpellCooldown(rising_sun_kick) <= 4 or BuffPresent(serenity_buff) } WindwalkerSerenityCdActions()

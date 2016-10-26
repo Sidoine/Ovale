@@ -256,6 +256,8 @@ Define(virulent_plague_debuff 191587)
 
 # Talents
 Define(castigator_talent 8)
+Define(frostscythe_talent 16)
+Define(gathering_storm_talent 18)
 Define(icy_talons_talent 2)
 Define(necrosis_talent 17)
 Define(shattering_strikes_talent 1)

@@ -51,19 +51,17 @@ AddFunction AssassinationDefaultMainActions
 
 	unless AssassinationCdsMainPostConditions()
 	{
-		#rupture,if=combo_points>=2&!ticking&time<10&!artifact.urge_to_kill.enabled&talent.exsanguinate.enabled
-		if ComboPoints() >= 2 and not target.DebuffPresent(rupture_debuff) and TimeInCombat() < 10 and not HasArtifactTrait(urge_to_kill) and Talent(exsanguinate_talent) Spell(rupture)
-		#rupture,if=combo_points>=4&!ticking&talent.exsanguinate.enabled
-		if ComboPoints() >= 4 and not target.DebuffPresent(rupture_debuff) and Talent(exsanguinate_talent) Spell(rupture)
+		#rupture,if=talent.exsanguinate.enabled&combo_points>=2+artifact.urge_to_kill.enabled*2&!ticking&(artifact.urge_to_kill.enabled|time<10)
+		if Talent(exsanguinate_talent) and ComboPoints() >= 2 + HasArtifactTrait(urge_to_kill) * 2 and not target.DebuffPresent(rupture_debuff) and { HasArtifactTrait(urge_to_kill) or TimeInCombat() < 10 } Spell(rupture)
 		#pool_resource,for_next=1
-		#kingsbane,if=!talent.exsanguinate.enabled&(buff.vendetta.up|cooldown.vendetta.remains>10)|talent.exsanguinate.enabled&dot.rupture.exsanguinated
-		if not Talent(exsanguinate_talent) and { DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 10 } or Talent(exsanguinate_talent) and target.DebuffRemaining(rupture_debuff_exsanguinated) Spell(kingsbane)
-		unless { not Talent(exsanguinate_talent) and { DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 10 } or Talent(exsanguinate_talent) and target.DebuffRemaining(rupture_debuff_exsanguinated) } and SpellUsable(kingsbane) and SpellCooldown(kingsbane) < TimeToEnergyFor(kingsbane)
+		#kingsbane,if=(!talent.exsanguinate.enabled&(debuff.vendetta.up|cooldown.vendetta.remains>10))|(talent.exsanguinate.enabled&dot.rupture.exsanguinated)
+		if not Talent(exsanguinate_talent) and { target.DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 10 } or Talent(exsanguinate_talent) and target.DebuffRemaining(rupture_debuff_exsanguinated) Spell(kingsbane)
+		unless { not Talent(exsanguinate_talent) and { target.DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 10 } or Talent(exsanguinate_talent) and target.DebuffRemaining(rupture_debuff_exsanguinated) } and SpellUsable(kingsbane) and SpellCooldown(kingsbane) < TimeToEnergyFor(kingsbane)
 		{
-			#run_action_list,name=exsang_combo,if=cooldown.exsanguinate.remains<3&talent.exsanguinate.enabled&(buff.vendetta.up|cooldown.vendetta.remains>25)
-			if SpellCooldown(exsanguinate) < 3 and Talent(exsanguinate_talent) and { DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 25 } AssassinationExsangComboMainActions()
+			#run_action_list,name=exsang_combo,if=talent.exsanguinate.enabled&cooldown.exsanguinate.remains<3&(debuff.vendetta.up|cooldown.vendetta.remains>25)
+			if Talent(exsanguinate_talent) and SpellCooldown(exsanguinate) < 3 and { target.DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 25 } AssassinationExsangComboMainActions()
 
-			unless SpellCooldown(exsanguinate) < 3 and Talent(exsanguinate_talent) and { DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 25 } and AssassinationExsangComboMainPostConditions()
+			unless Talent(exsanguinate_talent) and SpellCooldown(exsanguinate) < 3 and { target.DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 25 } and AssassinationExsangComboMainPostConditions()
 			{
 				#call_action_list,name=garrote,if=spell_targets.fan_of_knives<=8-artifact.bag_of_tricks.enabled
 				if Enemies() <= 8 - HasArtifactTrait(bag_of_tricks) AssassinationGarroteMainActions()
@@ -106,7 +104,7 @@ AddFunction AssassinationDefaultMainActions
 
 AddFunction AssassinationDefaultMainPostConditions
 {
-	AssassinationCdsMainPostConditions() or not { { not Talent(exsanguinate_talent) and { DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 10 } or Talent(exsanguinate_talent) and target.DebuffRemaining(rupture_debuff_exsanguinated) } and SpellUsable(kingsbane) and SpellCooldown(kingsbane) < TimeToEnergyFor(kingsbane) } and { SpellCooldown(exsanguinate) < 3 and Talent(exsanguinate_talent) and { DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 25 } and AssassinationExsangComboMainPostConditions() or Enemies() <= 8 - HasArtifactTrait(bag_of_tricks) and AssassinationGarroteMainPostConditions() or target.DebuffRemaining(rupture_debuff_exsanguinated) and AssassinationExsangMainPostConditions() or Talent(exsanguinate_talent) and AssassinationFinishExMainPostConditions() or not Talent(exsanguinate_talent) and AssassinationFinishNoexMainPostConditions() or Talent(exsanguinate_talent) and AssassinationBuildExMainPostConditions() or not Talent(exsanguinate_talent) and AssassinationBuildNoexMainPostConditions() }
+	AssassinationCdsMainPostConditions() or not { { not Talent(exsanguinate_talent) and { target.DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 10 } or Talent(exsanguinate_talent) and target.DebuffRemaining(rupture_debuff_exsanguinated) } and SpellUsable(kingsbane) and SpellCooldown(kingsbane) < TimeToEnergyFor(kingsbane) } and { Talent(exsanguinate_talent) and SpellCooldown(exsanguinate) < 3 and { target.DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 25 } and AssassinationExsangComboMainPostConditions() or Enemies() <= 8 - HasArtifactTrait(bag_of_tricks) and AssassinationGarroteMainPostConditions() or target.DebuffRemaining(rupture_debuff_exsanguinated) and AssassinationExsangMainPostConditions() or Talent(exsanguinate_talent) and AssassinationFinishExMainPostConditions() or not Talent(exsanguinate_talent) and AssassinationFinishNoexMainPostConditions() or Talent(exsanguinate_talent) and AssassinationBuildExMainPostConditions() or not Talent(exsanguinate_talent) and AssassinationBuildNoexMainPostConditions() }
 }
 
 AddFunction AssassinationDefaultShortCdActions
@@ -114,16 +112,16 @@ AddFunction AssassinationDefaultShortCdActions
 	#call_action_list,name=cds
 	AssassinationCdsShortCdActions()
 
-	unless AssassinationCdsShortCdPostConditions() or ComboPoints() >= 2 and not target.DebuffPresent(rupture_debuff) and TimeInCombat() < 10 and not HasArtifactTrait(urge_to_kill) and Talent(exsanguinate_talent) and Spell(rupture) or ComboPoints() >= 4 and not target.DebuffPresent(rupture_debuff) and Talent(exsanguinate_talent) and Spell(rupture)
+	unless AssassinationCdsShortCdPostConditions() or Talent(exsanguinate_talent) and ComboPoints() >= 2 + HasArtifactTrait(urge_to_kill) * 2 and not target.DebuffPresent(rupture_debuff) and { HasArtifactTrait(urge_to_kill) or TimeInCombat() < 10 } and Spell(rupture)
 	{
 		#pool_resource,for_next=1
-		#kingsbane,if=!talent.exsanguinate.enabled&(buff.vendetta.up|cooldown.vendetta.remains>10)|talent.exsanguinate.enabled&dot.rupture.exsanguinated
-		unless { not Talent(exsanguinate_talent) and { DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 10 } or Talent(exsanguinate_talent) and target.DebuffRemaining(rupture_debuff_exsanguinated) } and SpellUsable(kingsbane) and SpellCooldown(kingsbane) < TimeToEnergyFor(kingsbane)
+		#kingsbane,if=(!talent.exsanguinate.enabled&(debuff.vendetta.up|cooldown.vendetta.remains>10))|(talent.exsanguinate.enabled&dot.rupture.exsanguinated)
+		unless { not Talent(exsanguinate_talent) and { target.DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 10 } or Talent(exsanguinate_talent) and target.DebuffRemaining(rupture_debuff_exsanguinated) } and SpellUsable(kingsbane) and SpellCooldown(kingsbane) < TimeToEnergyFor(kingsbane)
 		{
-			#run_action_list,name=exsang_combo,if=cooldown.exsanguinate.remains<3&talent.exsanguinate.enabled&(buff.vendetta.up|cooldown.vendetta.remains>25)
-			if SpellCooldown(exsanguinate) < 3 and Talent(exsanguinate_talent) and { DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 25 } AssassinationExsangComboShortCdActions()
+			#run_action_list,name=exsang_combo,if=talent.exsanguinate.enabled&cooldown.exsanguinate.remains<3&(debuff.vendetta.up|cooldown.vendetta.remains>25)
+			if Talent(exsanguinate_talent) and SpellCooldown(exsanguinate) < 3 and { target.DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 25 } AssassinationExsangComboShortCdActions()
 
-			unless SpellCooldown(exsanguinate) < 3 and Talent(exsanguinate_talent) and { DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 25 } and AssassinationExsangComboShortCdPostConditions()
+			unless Talent(exsanguinate_talent) and SpellCooldown(exsanguinate) < 3 and { target.DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 25 } and AssassinationExsangComboShortCdPostConditions()
 			{
 				#call_action_list,name=garrote,if=spell_targets.fan_of_knives<=8-artifact.bag_of_tricks.enabled
 				if Enemies() <= 8 - HasArtifactTrait(bag_of_tricks) AssassinationGarroteShortCdActions()
@@ -164,7 +162,7 @@ AddFunction AssassinationDefaultShortCdActions
 
 AddFunction AssassinationDefaultShortCdPostConditions
 {
-	AssassinationCdsShortCdPostConditions() or ComboPoints() >= 2 and not target.DebuffPresent(rupture_debuff) and TimeInCombat() < 10 and not HasArtifactTrait(urge_to_kill) and Talent(exsanguinate_talent) and Spell(rupture) or ComboPoints() >= 4 and not target.DebuffPresent(rupture_debuff) and Talent(exsanguinate_talent) and Spell(rupture) or not { { not Talent(exsanguinate_talent) and { DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 10 } or Talent(exsanguinate_talent) and target.DebuffRemaining(rupture_debuff_exsanguinated) } and SpellUsable(kingsbane) and SpellCooldown(kingsbane) < TimeToEnergyFor(kingsbane) } and { SpellCooldown(exsanguinate) < 3 and Talent(exsanguinate_talent) and { DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 25 } and AssassinationExsangComboShortCdPostConditions() or Enemies() <= 8 - HasArtifactTrait(bag_of_tricks) and AssassinationGarroteShortCdPostConditions() or target.DebuffRemaining(rupture_debuff_exsanguinated) and AssassinationExsangShortCdPostConditions() or Talent(exsanguinate_talent) and target.DebuffRemaining(rupture_debuff) - SpellCooldown(exsanguinate) < { 4 + MaxComboPoints() * 4 } * 0.3 and BaseDuration(rupture_debuff) - SpellCooldown(exsanguinate) >= { 4 + MaxComboPoints() * 4 } * 0.3 + 3 and Spell(rupture) or Talent(exsanguinate_talent) and AssassinationFinishExShortCdPostConditions() or not Talent(exsanguinate_talent) and AssassinationFinishNoexShortCdPostConditions() or Talent(exsanguinate_talent) and AssassinationBuildExShortCdPostConditions() or not Talent(exsanguinate_talent) and AssassinationBuildNoexShortCdPostConditions() }
+	AssassinationCdsShortCdPostConditions() or Talent(exsanguinate_talent) and ComboPoints() >= 2 + HasArtifactTrait(urge_to_kill) * 2 and not target.DebuffPresent(rupture_debuff) and { HasArtifactTrait(urge_to_kill) or TimeInCombat() < 10 } and Spell(rupture) or not { { not Talent(exsanguinate_talent) and { target.DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 10 } or Talent(exsanguinate_talent) and target.DebuffRemaining(rupture_debuff_exsanguinated) } and SpellUsable(kingsbane) and SpellCooldown(kingsbane) < TimeToEnergyFor(kingsbane) } and { Talent(exsanguinate_talent) and SpellCooldown(exsanguinate) < 3 and { target.DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 25 } and AssassinationExsangComboShortCdPostConditions() or Enemies() <= 8 - HasArtifactTrait(bag_of_tricks) and AssassinationGarroteShortCdPostConditions() or target.DebuffRemaining(rupture_debuff_exsanguinated) and AssassinationExsangShortCdPostConditions() or Talent(exsanguinate_talent) and target.DebuffRemaining(rupture_debuff) - SpellCooldown(exsanguinate) < { 4 + MaxComboPoints() * 4 } * 0.3 and BaseDuration(rupture_debuff) - SpellCooldown(exsanguinate) >= { 4 + MaxComboPoints() * 4 } * 0.3 + 3 and Spell(rupture) or Talent(exsanguinate_talent) and AssassinationFinishExShortCdPostConditions() or not Talent(exsanguinate_talent) and AssassinationFinishNoexShortCdPostConditions() or Talent(exsanguinate_talent) and AssassinationBuildExShortCdPostConditions() or not Talent(exsanguinate_talent) and AssassinationBuildNoexShortCdPostConditions() }
 }
 
 AddFunction AssassinationDefaultCdActions
@@ -183,16 +181,16 @@ AddFunction AssassinationDefaultCdActions
 	#call_action_list,name=cds
 	AssassinationCdsCdActions()
 
-	unless AssassinationCdsCdPostConditions() or ComboPoints() >= 2 and not target.DebuffPresent(rupture_debuff) and TimeInCombat() < 10 and not HasArtifactTrait(urge_to_kill) and Talent(exsanguinate_talent) and Spell(rupture) or ComboPoints() >= 4 and not target.DebuffPresent(rupture_debuff) and Talent(exsanguinate_talent) and Spell(rupture)
+	unless AssassinationCdsCdPostConditions() or Talent(exsanguinate_talent) and ComboPoints() >= 2 + HasArtifactTrait(urge_to_kill) * 2 and not target.DebuffPresent(rupture_debuff) and { HasArtifactTrait(urge_to_kill) or TimeInCombat() < 10 } and Spell(rupture)
 	{
 		#pool_resource,for_next=1
-		#kingsbane,if=!talent.exsanguinate.enabled&(buff.vendetta.up|cooldown.vendetta.remains>10)|talent.exsanguinate.enabled&dot.rupture.exsanguinated
-		unless { not Talent(exsanguinate_talent) and { DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 10 } or Talent(exsanguinate_talent) and target.DebuffRemaining(rupture_debuff_exsanguinated) } and SpellUsable(kingsbane) and SpellCooldown(kingsbane) < TimeToEnergyFor(kingsbane)
+		#kingsbane,if=(!talent.exsanguinate.enabled&(debuff.vendetta.up|cooldown.vendetta.remains>10))|(talent.exsanguinate.enabled&dot.rupture.exsanguinated)
+		unless { not Talent(exsanguinate_talent) and { target.DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 10 } or Talent(exsanguinate_talent) and target.DebuffRemaining(rupture_debuff_exsanguinated) } and SpellUsable(kingsbane) and SpellCooldown(kingsbane) < TimeToEnergyFor(kingsbane)
 		{
-			#run_action_list,name=exsang_combo,if=cooldown.exsanguinate.remains<3&talent.exsanguinate.enabled&(buff.vendetta.up|cooldown.vendetta.remains>25)
-			if SpellCooldown(exsanguinate) < 3 and Talent(exsanguinate_talent) and { DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 25 } AssassinationExsangComboCdActions()
+			#run_action_list,name=exsang_combo,if=talent.exsanguinate.enabled&cooldown.exsanguinate.remains<3&(debuff.vendetta.up|cooldown.vendetta.remains>25)
+			if Talent(exsanguinate_talent) and SpellCooldown(exsanguinate) < 3 and { target.DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 25 } AssassinationExsangComboCdActions()
 
-			unless SpellCooldown(exsanguinate) < 3 and Talent(exsanguinate_talent) and { DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 25 } and AssassinationExsangComboCdPostConditions()
+			unless Talent(exsanguinate_talent) and SpellCooldown(exsanguinate) < 3 and { target.DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 25 } and AssassinationExsangComboCdPostConditions()
 			{
 				#call_action_list,name=garrote,if=spell_targets.fan_of_knives<=8-artifact.bag_of_tricks.enabled
 				if Enemies() <= 8 - HasArtifactTrait(bag_of_tricks) AssassinationGarroteCdActions()
@@ -233,7 +231,7 @@ AddFunction AssassinationDefaultCdActions
 
 AddFunction AssassinationDefaultCdPostConditions
 {
-	AssassinationCdsCdPostConditions() or ComboPoints() >= 2 and not target.DebuffPresent(rupture_debuff) and TimeInCombat() < 10 and not HasArtifactTrait(urge_to_kill) and Talent(exsanguinate_talent) and Spell(rupture) or ComboPoints() >= 4 and not target.DebuffPresent(rupture_debuff) and Talent(exsanguinate_talent) and Spell(rupture) or not { { not Talent(exsanguinate_talent) and { DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 10 } or Talent(exsanguinate_talent) and target.DebuffRemaining(rupture_debuff_exsanguinated) } and SpellUsable(kingsbane) and SpellCooldown(kingsbane) < TimeToEnergyFor(kingsbane) } and { SpellCooldown(exsanguinate) < 3 and Talent(exsanguinate_talent) and { DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 25 } and AssassinationExsangComboCdPostConditions() or Enemies() <= 8 - HasArtifactTrait(bag_of_tricks) and AssassinationGarroteCdPostConditions() or target.DebuffRemaining(rupture_debuff_exsanguinated) and AssassinationExsangCdPostConditions() or Talent(exsanguinate_talent) and target.DebuffRemaining(rupture_debuff) - SpellCooldown(exsanguinate) < { 4 + MaxComboPoints() * 4 } * 0.3 and BaseDuration(rupture_debuff) - SpellCooldown(exsanguinate) >= { 4 + MaxComboPoints() * 4 } * 0.3 + 3 and Spell(rupture) or Talent(exsanguinate_talent) and AssassinationFinishExCdPostConditions() or not Talent(exsanguinate_talent) and AssassinationFinishNoexCdPostConditions() or Talent(exsanguinate_talent) and AssassinationBuildExCdPostConditions() or not Talent(exsanguinate_talent) and AssassinationBuildNoexCdPostConditions() }
+	AssassinationCdsCdPostConditions() or Talent(exsanguinate_talent) and ComboPoints() >= 2 + HasArtifactTrait(urge_to_kill) * 2 and not target.DebuffPresent(rupture_debuff) and { HasArtifactTrait(urge_to_kill) or TimeInCombat() < 10 } and Spell(rupture) or not { { not Talent(exsanguinate_talent) and { target.DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 10 } or Talent(exsanguinate_talent) and target.DebuffRemaining(rupture_debuff_exsanguinated) } and SpellUsable(kingsbane) and SpellCooldown(kingsbane) < TimeToEnergyFor(kingsbane) } and { Talent(exsanguinate_talent) and SpellCooldown(exsanguinate) < 3 and { target.DebuffPresent(vendetta_debuff) or SpellCooldown(vendetta) > 25 } and AssassinationExsangComboCdPostConditions() or Enemies() <= 8 - HasArtifactTrait(bag_of_tricks) and AssassinationGarroteCdPostConditions() or target.DebuffRemaining(rupture_debuff_exsanguinated) and AssassinationExsangCdPostConditions() or Talent(exsanguinate_talent) and target.DebuffRemaining(rupture_debuff) - SpellCooldown(exsanguinate) < { 4 + MaxComboPoints() * 4 } * 0.3 and BaseDuration(rupture_debuff) - SpellCooldown(exsanguinate) >= { 4 + MaxComboPoints() * 4 } * 0.3 + 3 and Spell(rupture) or Talent(exsanguinate_talent) and AssassinationFinishExCdPostConditions() or not Talent(exsanguinate_talent) and AssassinationFinishNoexCdPostConditions() or Talent(exsanguinate_talent) and AssassinationBuildExCdPostConditions() or not Talent(exsanguinate_talent) and AssassinationBuildNoexCdPostConditions() }
 }
 
 ### actions.build_ex
@@ -246,9 +244,9 @@ AddFunction AssassinationBuildExMainActions
 	if DebuffCountOnAny(hemorrhage_debuff) < Enemies() and DebuffCountOnAny(hemorrhage_debuff) <= 3 and ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) and target.DebuffRemaining(rupture_debuff) > 6 and Enemies() > 1 and Enemies() == 5 Spell(hemorrhage)
 	#fan_of_knives,if=(spell_targets>=2+debuff.vendetta.up&(combo_points.deficit>=1|energy.deficit<=30))|(!artifact.bag_of_tricks.enabled&spell_targets>=7+2*debuff.vendetta.up)
 	if Enemies() >= 2 + target.DebuffPresent(vendetta_debuff) and { ComboPointsDeficit() >= 1 or EnergyDeficit() <= 30 } or not HasArtifactTrait(bag_of_tricks) and Enemies() >= 7 + 2 * target.DebuffPresent(vendetta_debuff) Spell(fan_of_knives)
-	#fan_of_knives,if=equipped.the_dreadlords_deceit&((buff.the_dreadlords_deceit.stack>=29|buff.the_dreadlords_deceit.stack>=15&debuff.vendetta.remains<=3)&debuff.vendetta.up|buff.the_dreadlords_deceit.stack>=5&cooldown.vendetta.remains>60&cooldown.vendetta.remains<65)
-	if HasEquippedItem(the_dreadlords_deceit) and { { BuffStacks(the_dreadlords_deceit_buff) >= 29 or BuffStacks(the_dreadlords_deceit_buff) >= 15 and target.DebuffRemaining(vendetta_debuff) <= 3 } and target.DebuffPresent(vendetta_debuff) or BuffStacks(the_dreadlords_deceit_buff) >= 5 and SpellCooldown(vendetta) > 60 and SpellCooldown(vendetta) < 65 } Spell(fan_of_knives)
-	#hemorrhage,if=(combo_points.deficit>=1&refreshable)|(combo_points.deficit=1&(dot.rupture.exsanguinated&dot.rupture.remains<=2|cooldown.exsanguinate.remains<=2))
+	#fan_of_knives,if=(debuff.vendetta.up&buff.the_dreadlords_deceit.stack>=29-(debuff.vendetta.remains<=3)*14)|(cooldown.vendetta.remains>60&cooldown.vendetta.remains<65&buff.the_dreadlords_deceit.stack>=5)
+	if target.DebuffPresent(vendetta_debuff) and BuffStacks(the_dreadlords_deceit_buff) >= 29 - { target.DebuffRemaining(vendetta_debuff) <= 3 } * 14 or SpellCooldown(vendetta) > 60 and SpellCooldown(vendetta) < 65 and BuffStacks(the_dreadlords_deceit_buff) >= 5 Spell(fan_of_knives)
+	#hemorrhage,if=(combo_points.deficit>=1&refreshable)|(combo_points.deficit=1&((dot.rupture.exsanguinated&dot.rupture.remains<=2)|cooldown.exsanguinate.remains<=2))
 	if ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) or ComboPointsDeficit() == 1 and { target.DebuffRemaining(rupture_debuff_exsanguinated) and target.DebuffRemaining(rupture_debuff) <= 2 or SpellCooldown(exsanguinate) <= 2 } Spell(hemorrhage)
 	#mutilate,if=combo_points.deficit<=1&energy.deficit<=30
 	if ComboPointsDeficit() <= 1 and EnergyDeficit() <= 30 Spell(mutilate)
@@ -266,7 +264,7 @@ AddFunction AssassinationBuildExShortCdActions
 
 AddFunction AssassinationBuildExShortCdPostConditions
 {
-	ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) and target.DebuffRemaining(rupture_debuff) > 6 and Enemies() > 1 and Enemies() <= 4 and Spell(hemorrhage) or DebuffCountOnAny(hemorrhage_debuff) < Enemies() and DebuffCountOnAny(hemorrhage_debuff) <= 3 and ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) and target.DebuffRemaining(rupture_debuff) > 6 and Enemies() > 1 and Enemies() == 5 and Spell(hemorrhage) or { Enemies() >= 2 + target.DebuffPresent(vendetta_debuff) and { ComboPointsDeficit() >= 1 or EnergyDeficit() <= 30 } or not HasArtifactTrait(bag_of_tricks) and Enemies() >= 7 + 2 * target.DebuffPresent(vendetta_debuff) } and Spell(fan_of_knives) or HasEquippedItem(the_dreadlords_deceit) and { { BuffStacks(the_dreadlords_deceit_buff) >= 29 or BuffStacks(the_dreadlords_deceit_buff) >= 15 and target.DebuffRemaining(vendetta_debuff) <= 3 } and target.DebuffPresent(vendetta_debuff) or BuffStacks(the_dreadlords_deceit_buff) >= 5 and SpellCooldown(vendetta) > 60 and SpellCooldown(vendetta) < 65 } and Spell(fan_of_knives) or { ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) or ComboPointsDeficit() == 1 and { target.DebuffRemaining(rupture_debuff_exsanguinated) and target.DebuffRemaining(rupture_debuff) <= 2 or SpellCooldown(exsanguinate) <= 2 } } and Spell(hemorrhage) or ComboPointsDeficit() <= 1 and EnergyDeficit() <= 30 and Spell(mutilate) or ComboPointsDeficit() >= 2 and SpellCooldown(garrote) > 2 and Spell(mutilate)
+	ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) and target.DebuffRemaining(rupture_debuff) > 6 and Enemies() > 1 and Enemies() <= 4 and Spell(hemorrhage) or DebuffCountOnAny(hemorrhage_debuff) < Enemies() and DebuffCountOnAny(hemorrhage_debuff) <= 3 and ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) and target.DebuffRemaining(rupture_debuff) > 6 and Enemies() > 1 and Enemies() == 5 and Spell(hemorrhage) or { Enemies() >= 2 + target.DebuffPresent(vendetta_debuff) and { ComboPointsDeficit() >= 1 or EnergyDeficit() <= 30 } or not HasArtifactTrait(bag_of_tricks) and Enemies() >= 7 + 2 * target.DebuffPresent(vendetta_debuff) } and Spell(fan_of_knives) or { target.DebuffPresent(vendetta_debuff) and BuffStacks(the_dreadlords_deceit_buff) >= 29 - { target.DebuffRemaining(vendetta_debuff) <= 3 } * 14 or SpellCooldown(vendetta) > 60 and SpellCooldown(vendetta) < 65 and BuffStacks(the_dreadlords_deceit_buff) >= 5 } and Spell(fan_of_knives) or { ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) or ComboPointsDeficit() == 1 and { target.DebuffRemaining(rupture_debuff_exsanguinated) and target.DebuffRemaining(rupture_debuff) <= 2 or SpellCooldown(exsanguinate) <= 2 } } and Spell(hemorrhage) or ComboPointsDeficit() <= 1 and EnergyDeficit() <= 30 and Spell(mutilate) or ComboPointsDeficit() >= 2 and SpellCooldown(garrote) > 2 and Spell(mutilate)
 }
 
 AddFunction AssassinationBuildExCdActions
@@ -275,7 +273,7 @@ AddFunction AssassinationBuildExCdActions
 
 AddFunction AssassinationBuildExCdPostConditions
 {
-	ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) and target.DebuffRemaining(rupture_debuff) > 6 and Enemies() > 1 and Enemies() <= 4 and Spell(hemorrhage) or DebuffCountOnAny(hemorrhage_debuff) < Enemies() and DebuffCountOnAny(hemorrhage_debuff) <= 3 and ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) and target.DebuffRemaining(rupture_debuff) > 6 and Enemies() > 1 and Enemies() == 5 and Spell(hemorrhage) or { Enemies() >= 2 + target.DebuffPresent(vendetta_debuff) and { ComboPointsDeficit() >= 1 or EnergyDeficit() <= 30 } or not HasArtifactTrait(bag_of_tricks) and Enemies() >= 7 + 2 * target.DebuffPresent(vendetta_debuff) } and Spell(fan_of_knives) or HasEquippedItem(the_dreadlords_deceit) and { { BuffStacks(the_dreadlords_deceit_buff) >= 29 or BuffStacks(the_dreadlords_deceit_buff) >= 15 and target.DebuffRemaining(vendetta_debuff) <= 3 } and target.DebuffPresent(vendetta_debuff) or BuffStacks(the_dreadlords_deceit_buff) >= 5 and SpellCooldown(vendetta) > 60 and SpellCooldown(vendetta) < 65 } and Spell(fan_of_knives) or { ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) or ComboPointsDeficit() == 1 and { target.DebuffRemaining(rupture_debuff_exsanguinated) and target.DebuffRemaining(rupture_debuff) <= 2 or SpellCooldown(exsanguinate) <= 2 } } and Spell(hemorrhage) or ComboPointsDeficit() <= 1 and EnergyDeficit() <= 30 and Spell(mutilate) or ComboPointsDeficit() >= 2 and SpellCooldown(garrote) > 2 and Spell(mutilate)
+	ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) and target.DebuffRemaining(rupture_debuff) > 6 and Enemies() > 1 and Enemies() <= 4 and Spell(hemorrhage) or DebuffCountOnAny(hemorrhage_debuff) < Enemies() and DebuffCountOnAny(hemorrhage_debuff) <= 3 and ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) and target.DebuffRemaining(rupture_debuff) > 6 and Enemies() > 1 and Enemies() == 5 and Spell(hemorrhage) or { Enemies() >= 2 + target.DebuffPresent(vendetta_debuff) and { ComboPointsDeficit() >= 1 or EnergyDeficit() <= 30 } or not HasArtifactTrait(bag_of_tricks) and Enemies() >= 7 + 2 * target.DebuffPresent(vendetta_debuff) } and Spell(fan_of_knives) or { target.DebuffPresent(vendetta_debuff) and BuffStacks(the_dreadlords_deceit_buff) >= 29 - { target.DebuffRemaining(vendetta_debuff) <= 3 } * 14 or SpellCooldown(vendetta) > 60 and SpellCooldown(vendetta) < 65 and BuffStacks(the_dreadlords_deceit_buff) >= 5 } and Spell(fan_of_knives) or { ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) or ComboPointsDeficit() == 1 and { target.DebuffRemaining(rupture_debuff_exsanguinated) and target.DebuffRemaining(rupture_debuff) <= 2 or SpellCooldown(exsanguinate) <= 2 } } and Spell(hemorrhage) or ComboPointsDeficit() <= 1 and EnergyDeficit() <= 30 and Spell(mutilate) or ComboPointsDeficit() >= 2 and SpellCooldown(garrote) > 2 and Spell(mutilate)
 }
 
 ### actions.build_noex
@@ -288,8 +286,8 @@ AddFunction AssassinationBuildNoexMainActions
 	if DebuffCountOnAny(hemorrhage_debuff) < Enemies() and DebuffCountOnAny(hemorrhage_debuff) <= 3 and ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) and target.DebuffRemaining(rupture_debuff) > 6 and Enemies() > 1 and Enemies() == 5 Spell(hemorrhage)
 	#fan_of_knives,if=(spell_targets>=2+debuff.vendetta.up&(combo_points.deficit>=1|energy.deficit<=30))|(!artifact.bag_of_tricks.enabled&spell_targets>=7+2*debuff.vendetta.up)
 	if Enemies() >= 2 + target.DebuffPresent(vendetta_debuff) and { ComboPointsDeficit() >= 1 or EnergyDeficit() <= 30 } or not HasArtifactTrait(bag_of_tricks) and Enemies() >= 7 + 2 * target.DebuffPresent(vendetta_debuff) Spell(fan_of_knives)
-	#fan_of_knives,if=equipped.the_dreadlords_deceit&((buff.the_dreadlords_deceit.stack>=29|buff.the_dreadlords_deceit.stack>=15&debuff.vendetta.remains<=3)&debuff.vendetta.up|buff.the_dreadlords_deceit.stack>=5&cooldown.vendetta.remains>60&cooldown.vendetta.remains<65)
-	if HasEquippedItem(the_dreadlords_deceit) and { { BuffStacks(the_dreadlords_deceit_buff) >= 29 or BuffStacks(the_dreadlords_deceit_buff) >= 15 and target.DebuffRemaining(vendetta_debuff) <= 3 } and target.DebuffPresent(vendetta_debuff) or BuffStacks(the_dreadlords_deceit_buff) >= 5 and SpellCooldown(vendetta) > 60 and SpellCooldown(vendetta) < 65 } Spell(fan_of_knives)
+	#fan_of_knives,if=(debuff.vendetta.up&buff.the_dreadlords_deceit.stack>=29-(debuff.vendetta.remains<=3)*14)|(cooldown.vendetta.remains>60&cooldown.vendetta.remains<65&buff.the_dreadlords_deceit.stack>=5)
+	if target.DebuffPresent(vendetta_debuff) and BuffStacks(the_dreadlords_deceit_buff) >= 29 - { target.DebuffRemaining(vendetta_debuff) <= 3 } * 14 or SpellCooldown(vendetta) > 60 and SpellCooldown(vendetta) < 65 and BuffStacks(the_dreadlords_deceit_buff) >= 5 Spell(fan_of_knives)
 	#hemorrhage,if=combo_points.deficit>=1&refreshable
 	if ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) Spell(hemorrhage)
 	#mutilate,if=combo_points.deficit>=1&cooldown.garrote.remains>2
@@ -306,7 +304,7 @@ AddFunction AssassinationBuildNoexShortCdActions
 
 AddFunction AssassinationBuildNoexShortCdPostConditions
 {
-	ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) and target.DebuffRemaining(rupture_debuff) > 6 and Enemies() > 1 and Enemies() <= 4 and Spell(hemorrhage) or DebuffCountOnAny(hemorrhage_debuff) < Enemies() and DebuffCountOnAny(hemorrhage_debuff) <= 3 and ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) and target.DebuffRemaining(rupture_debuff) > 6 and Enemies() > 1 and Enemies() == 5 and Spell(hemorrhage) or { Enemies() >= 2 + target.DebuffPresent(vendetta_debuff) and { ComboPointsDeficit() >= 1 or EnergyDeficit() <= 30 } or not HasArtifactTrait(bag_of_tricks) and Enemies() >= 7 + 2 * target.DebuffPresent(vendetta_debuff) } and Spell(fan_of_knives) or HasEquippedItem(the_dreadlords_deceit) and { { BuffStacks(the_dreadlords_deceit_buff) >= 29 or BuffStacks(the_dreadlords_deceit_buff) >= 15 and target.DebuffRemaining(vendetta_debuff) <= 3 } and target.DebuffPresent(vendetta_debuff) or BuffStacks(the_dreadlords_deceit_buff) >= 5 and SpellCooldown(vendetta) > 60 and SpellCooldown(vendetta) < 65 } and Spell(fan_of_knives) or ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) and Spell(hemorrhage) or ComboPointsDeficit() >= 1 and SpellCooldown(garrote) > 2 and Spell(mutilate)
+	ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) and target.DebuffRemaining(rupture_debuff) > 6 and Enemies() > 1 and Enemies() <= 4 and Spell(hemorrhage) or DebuffCountOnAny(hemorrhage_debuff) < Enemies() and DebuffCountOnAny(hemorrhage_debuff) <= 3 and ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) and target.DebuffRemaining(rupture_debuff) > 6 and Enemies() > 1 and Enemies() == 5 and Spell(hemorrhage) or { Enemies() >= 2 + target.DebuffPresent(vendetta_debuff) and { ComboPointsDeficit() >= 1 or EnergyDeficit() <= 30 } or not HasArtifactTrait(bag_of_tricks) and Enemies() >= 7 + 2 * target.DebuffPresent(vendetta_debuff) } and Spell(fan_of_knives) or { target.DebuffPresent(vendetta_debuff) and BuffStacks(the_dreadlords_deceit_buff) >= 29 - { target.DebuffRemaining(vendetta_debuff) <= 3 } * 14 or SpellCooldown(vendetta) > 60 and SpellCooldown(vendetta) < 65 and BuffStacks(the_dreadlords_deceit_buff) >= 5 } and Spell(fan_of_knives) or ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) and Spell(hemorrhage) or ComboPointsDeficit() >= 1 and SpellCooldown(garrote) > 2 and Spell(mutilate)
 }
 
 AddFunction AssassinationBuildNoexCdActions
@@ -315,7 +313,7 @@ AddFunction AssassinationBuildNoexCdActions
 
 AddFunction AssassinationBuildNoexCdPostConditions
 {
-	ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) and target.DebuffRemaining(rupture_debuff) > 6 and Enemies() > 1 and Enemies() <= 4 and Spell(hemorrhage) or DebuffCountOnAny(hemorrhage_debuff) < Enemies() and DebuffCountOnAny(hemorrhage_debuff) <= 3 and ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) and target.DebuffRemaining(rupture_debuff) > 6 and Enemies() > 1 and Enemies() == 5 and Spell(hemorrhage) or { Enemies() >= 2 + target.DebuffPresent(vendetta_debuff) and { ComboPointsDeficit() >= 1 or EnergyDeficit() <= 30 } or not HasArtifactTrait(bag_of_tricks) and Enemies() >= 7 + 2 * target.DebuffPresent(vendetta_debuff) } and Spell(fan_of_knives) or HasEquippedItem(the_dreadlords_deceit) and { { BuffStacks(the_dreadlords_deceit_buff) >= 29 or BuffStacks(the_dreadlords_deceit_buff) >= 15 and target.DebuffRemaining(vendetta_debuff) <= 3 } and target.DebuffPresent(vendetta_debuff) or BuffStacks(the_dreadlords_deceit_buff) >= 5 and SpellCooldown(vendetta) > 60 and SpellCooldown(vendetta) < 65 } and Spell(fan_of_knives) or ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) and Spell(hemorrhage) or ComboPointsDeficit() >= 1 and SpellCooldown(garrote) > 2 and Spell(mutilate)
+	ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) and target.DebuffRemaining(rupture_debuff) > 6 and Enemies() > 1 and Enemies() <= 4 and Spell(hemorrhage) or DebuffCountOnAny(hemorrhage_debuff) < Enemies() and DebuffCountOnAny(hemorrhage_debuff) <= 3 and ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) and target.DebuffRemaining(rupture_debuff) > 6 and Enemies() > 1 and Enemies() == 5 and Spell(hemorrhage) or { Enemies() >= 2 + target.DebuffPresent(vendetta_debuff) and { ComboPointsDeficit() >= 1 or EnergyDeficit() <= 30 } or not HasArtifactTrait(bag_of_tricks) and Enemies() >= 7 + 2 * target.DebuffPresent(vendetta_debuff) } and Spell(fan_of_knives) or { target.DebuffPresent(vendetta_debuff) and BuffStacks(the_dreadlords_deceit_buff) >= 29 - { target.DebuffRemaining(vendetta_debuff) <= 3 } * 14 or SpellCooldown(vendetta) > 60 and SpellCooldown(vendetta) < 65 and BuffStacks(the_dreadlords_deceit_buff) >= 5 } and Spell(fan_of_knives) or ComboPointsDeficit() >= 1 and target.Refreshable(hemorrhage_debuff) and Spell(hemorrhage) or ComboPointsDeficit() >= 1 and SpellCooldown(garrote) > 2 and Spell(mutilate)
 }
 
 ### actions.cds
@@ -332,10 +330,10 @@ AddFunction AssassinationCdsShortCdActions
 {
 	#marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|combo_points.deficit>=5
 	if target.TimeToDie() < ComboPointsDeficit() or ComboPointsDeficit() >= 5 Spell(marked_for_death)
-	#vanish,if=talent.subterfuge.enabled&combo_points<=2&!dot.rupture.exsanguinated|talent.shadow_focus.enabled&!dot.rupture.exsanguinated&combo_points.deficit>=2
-	if { Talent(subterfuge_talent) and ComboPoints() <= 2 and not target.DebuffRemaining(rupture_debuff_exsanguinated) or Talent(shadow_focus_talent) and not target.DebuffRemaining(rupture_debuff_exsanguinated) and ComboPointsDeficit() >= 2 } and CheckBoxOn(opt_vanish) Spell(vanish)
-	#vanish,if=!talent.exsanguinate.enabled&talent.nightstalker.enabled&combo_points>=5+talent.deeper_stratagem.enabled&energy>=25&gcd.remains=0
-	if not Talent(exsanguinate_talent) and Talent(nightstalker_talent) and ComboPoints() >= 5 + TalentPoints(deeper_stratagem_talent) and Energy() >= 25 and not GCDRemaining() > 0 and CheckBoxOn(opt_vanish) Spell(vanish)
+	#vanish,if=!dot.rupture.exsanguinated&((talent.subterfuge.enabled&combo_points<=2)|(talent.shadow_focus.enabled&combo_points.deficit>=2))
+	if not target.DebuffRemaining(rupture_debuff_exsanguinated) and { Talent(subterfuge_talent) and ComboPoints() <= 2 or Talent(shadow_focus_talent) and ComboPointsDeficit() >= 2 } and CheckBoxOn(opt_vanish) Spell(vanish)
+	#vanish,if=!talent.exsanguinate.enabled&talent.nightstalker.enabled&combo_points>=cp_max_spend&gcd.remains=0&energy>=25
+	if not Talent(exsanguinate_talent) and Talent(nightstalker_talent) and ComboPoints() >= MaxComboPoints() and not GCDRemaining() > 0 and Energy() >= 25 and CheckBoxOn(opt_vanish) Spell(vanish)
 }
 
 AddFunction AssassinationCdsShortCdPostConditions
@@ -346,10 +344,8 @@ AddFunction AssassinationCdsCdActions
 {
 	#vendetta,if=target.time_to_die<20
 	if target.TimeToDie() < 20 Spell(vendetta)
-	#vendetta,if=artifact.urge_to_kill.enabled&dot.rupture.ticking&(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains<5)&(energy<55|time<10|spell_targets.fan_of_knives>=2)
-	if HasArtifactTrait(urge_to_kill) and target.DebuffPresent(rupture_debuff) and { not Talent(exsanguinate_talent) or SpellCooldown(exsanguinate) < 5 } and { Energy() < 55 or TimeInCombat() < 10 or Enemies() >= 2 } Spell(vendetta)
-	#vendetta,if=!artifact.urge_to_kill.enabled&dot.rupture.ticking&(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains<1)
-	if not HasArtifactTrait(urge_to_kill) and target.DebuffPresent(rupture_debuff) and { not Talent(exsanguinate_talent) or SpellCooldown(exsanguinate) < 1 } Spell(vendetta)
+	#vendetta,if=dot.rupture.ticking&(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains<1+4*!artifact.urge_to_kill.enabled)&(energy<55|time<10|spell_targets.fan_of_knives>=2|!artifact.urge_to_kill.enabled)
+	if target.DebuffPresent(rupture_debuff) and { not Talent(exsanguinate_talent) or SpellCooldown(exsanguinate) < 1 + 4 * { not HasArtifactTrait(urge_to_kill) } } and { Energy() < 55 or TimeInCombat() < 10 or Enemies() >= 2 or not HasArtifactTrait(urge_to_kill) } Spell(vendetta)
 }
 
 AddFunction AssassinationCdsCdPostConditions
@@ -360,13 +356,13 @@ AddFunction AssassinationCdsCdPostConditions
 
 AddFunction AssassinationExsangMainActions
 {
-	#rupture,cycle_targets=1,max_cycle_targets=14-2*artifact.bag_of_tricks.enabled,if=!ticking&combo_points>=cp_max_spend-1&spell_targets.fan_of_knives>1&target.time_to_die-remains>6
-	if DebuffCountOnAny(rupture_debuff) < Enemies() and DebuffCountOnAny(rupture_debuff) <= 14 - 2 * HasArtifactTrait(bag_of_tricks) and not target.DebuffPresent(rupture_debuff) and ComboPoints() >= MaxComboPoints() - 1 and Enemies() > 1 and target.TimeToDie() - target.DebuffRemaining(rupture_debuff) > 6 Spell(rupture)
+	#rupture,cycle_targets=1,max_cycle_targets=14-2*artifact.bag_of_tricks.enabled,if=!ticking&combo_points>=cp_max_spend-1&spell_targets.fan_of_knives>1&target.time_to_die>6
+	if DebuffCountOnAny(rupture_debuff) < Enemies() and DebuffCountOnAny(rupture_debuff) <= 14 - 2 * HasArtifactTrait(bag_of_tricks) and not target.DebuffPresent(rupture_debuff) and ComboPoints() >= MaxComboPoints() - 1 and Enemies() > 1 and target.TimeToDie() > 6 Spell(rupture)
 	#rupture,if=combo_points>=cp_max_spend&ticks_remain<2
 	if ComboPoints() >= MaxComboPoints() and target.TicksRemaining(rupture_debuff) < 2 Spell(rupture)
-	#death_from_above,if=combo_points>=cp_max_spend-1&(dot.rupture.remains>3|dot.rupture.remains>2&spell_targets.fan_of_knives>=3)&(artifact.bag_of_tricks.enabled|spell_targets.fan_of_knives<=6+2*debuff.vendetta.up)
+	#death_from_above,if=combo_points>=cp_max_spend-1&(dot.rupture.remains>3|(dot.rupture.remains>2&spell_targets.fan_of_knives>=3))&(artifact.bag_of_tricks.enabled|spell_targets.fan_of_knives<=6+2*debuff.vendetta.up)
 	if ComboPoints() >= MaxComboPoints() - 1 and { target.DebuffRemaining(rupture_debuff) > 3 or target.DebuffRemaining(rupture_debuff) > 2 and Enemies() >= 3 } and { HasArtifactTrait(bag_of_tricks) or Enemies() <= 6 + 2 * target.DebuffPresent(vendetta_debuff) } Spell(death_from_above)
-	#envenom,if=combo_points>=cp_max_spend-1&(dot.rupture.remains>3|dot.rupture.remains>2&spell_targets.fan_of_knives>=3)&(artifact.bag_of_tricks.enabled|spell_targets.fan_of_knives<=6+2*debuff.vendetta.up)
+	#envenom,if=combo_points>=cp_max_spend-1&(dot.rupture.remains>3|(dot.rupture.remains>2&spell_targets.fan_of_knives>=3))&(artifact.bag_of_tricks.enabled|spell_targets.fan_of_knives<=6+2*debuff.vendetta.up)
 	if ComboPoints() >= MaxComboPoints() - 1 and { target.DebuffRemaining(rupture_debuff) > 3 or target.DebuffRemaining(rupture_debuff) > 2 and Enemies() >= 3 } and { HasArtifactTrait(bag_of_tricks) or Enemies() <= 6 + 2 * target.DebuffPresent(vendetta_debuff) } Spell(envenom)
 }
 
@@ -380,7 +376,7 @@ AddFunction AssassinationExsangShortCdActions
 
 AddFunction AssassinationExsangShortCdPostConditions
 {
-	DebuffCountOnAny(rupture_debuff) < Enemies() and DebuffCountOnAny(rupture_debuff) <= 14 - 2 * HasArtifactTrait(bag_of_tricks) and not target.DebuffPresent(rupture_debuff) and ComboPoints() >= MaxComboPoints() - 1 and Enemies() > 1 and target.TimeToDie() - target.DebuffRemaining(rupture_debuff) > 6 and Spell(rupture) or ComboPoints() >= MaxComboPoints() and target.TicksRemaining(rupture_debuff) < 2 and Spell(rupture) or ComboPoints() >= MaxComboPoints() - 1 and { target.DebuffRemaining(rupture_debuff) > 3 or target.DebuffRemaining(rupture_debuff) > 2 and Enemies() >= 3 } and { HasArtifactTrait(bag_of_tricks) or Enemies() <= 6 + 2 * target.DebuffPresent(vendetta_debuff) } and Spell(death_from_above) or ComboPoints() >= MaxComboPoints() - 1 and { target.DebuffRemaining(rupture_debuff) > 3 or target.DebuffRemaining(rupture_debuff) > 2 and Enemies() >= 3 } and { HasArtifactTrait(bag_of_tricks) or Enemies() <= 6 + 2 * target.DebuffPresent(vendetta_debuff) } and Spell(envenom)
+	DebuffCountOnAny(rupture_debuff) < Enemies() and DebuffCountOnAny(rupture_debuff) <= 14 - 2 * HasArtifactTrait(bag_of_tricks) and not target.DebuffPresent(rupture_debuff) and ComboPoints() >= MaxComboPoints() - 1 and Enemies() > 1 and target.TimeToDie() > 6 and Spell(rupture) or ComboPoints() >= MaxComboPoints() and target.TicksRemaining(rupture_debuff) < 2 and Spell(rupture) or ComboPoints() >= MaxComboPoints() - 1 and { target.DebuffRemaining(rupture_debuff) > 3 or target.DebuffRemaining(rupture_debuff) > 2 and Enemies() >= 3 } and { HasArtifactTrait(bag_of_tricks) or Enemies() <= 6 + 2 * target.DebuffPresent(vendetta_debuff) } and Spell(death_from_above) or ComboPoints() >= MaxComboPoints() - 1 and { target.DebuffRemaining(rupture_debuff) > 3 or target.DebuffRemaining(rupture_debuff) > 2 and Enemies() >= 3 } and { HasArtifactTrait(bag_of_tricks) or Enemies() <= 6 + 2 * target.DebuffPresent(vendetta_debuff) } and Spell(envenom)
 }
 
 AddFunction AssassinationExsangCdActions
@@ -389,15 +385,15 @@ AddFunction AssassinationExsangCdActions
 
 AddFunction AssassinationExsangCdPostConditions
 {
-	DebuffCountOnAny(rupture_debuff) < Enemies() and DebuffCountOnAny(rupture_debuff) <= 14 - 2 * HasArtifactTrait(bag_of_tricks) and not target.DebuffPresent(rupture_debuff) and ComboPoints() >= MaxComboPoints() - 1 and Enemies() > 1 and target.TimeToDie() - target.DebuffRemaining(rupture_debuff) > 6 and Spell(rupture) or ComboPoints() >= MaxComboPoints() and target.TicksRemaining(rupture_debuff) < 2 and Spell(rupture) or ComboPoints() >= MaxComboPoints() - 1 and { target.DebuffRemaining(rupture_debuff) > 3 or target.DebuffRemaining(rupture_debuff) > 2 and Enemies() >= 3 } and { HasArtifactTrait(bag_of_tricks) or Enemies() <= 6 + 2 * target.DebuffPresent(vendetta_debuff) } and Spell(death_from_above) or ComboPoints() >= MaxComboPoints() - 1 and { target.DebuffRemaining(rupture_debuff) > 3 or target.DebuffRemaining(rupture_debuff) > 2 and Enemies() >= 3 } and { HasArtifactTrait(bag_of_tricks) or Enemies() <= 6 + 2 * target.DebuffPresent(vendetta_debuff) } and Spell(envenom)
+	DebuffCountOnAny(rupture_debuff) < Enemies() and DebuffCountOnAny(rupture_debuff) <= 14 - 2 * HasArtifactTrait(bag_of_tricks) and not target.DebuffPresent(rupture_debuff) and ComboPoints() >= MaxComboPoints() - 1 and Enemies() > 1 and target.TimeToDie() > 6 and Spell(rupture) or ComboPoints() >= MaxComboPoints() and target.TicksRemaining(rupture_debuff) < 2 and Spell(rupture) or ComboPoints() >= MaxComboPoints() - 1 and { target.DebuffRemaining(rupture_debuff) > 3 or target.DebuffRemaining(rupture_debuff) > 2 and Enemies() >= 3 } and { HasArtifactTrait(bag_of_tricks) or Enemies() <= 6 + 2 * target.DebuffPresent(vendetta_debuff) } and Spell(death_from_above) or ComboPoints() >= MaxComboPoints() - 1 and { target.DebuffRemaining(rupture_debuff) > 3 or target.DebuffRemaining(rupture_debuff) > 2 and Enemies() >= 3 } and { HasArtifactTrait(bag_of_tricks) or Enemies() <= 6 + 2 * target.DebuffPresent(vendetta_debuff) } and Spell(envenom)
 }
 
 ### actions.exsang_combo
 
 AddFunction AssassinationExsangComboMainActions
 {
-	#rupture,if=combo_points>=cp_max_spend&(!talent.nightstalker.enabled|buff.vanish.up|cooldown.vanish.remains>15)&cooldown.exsanguinate.remains<1
-	if ComboPoints() >= MaxComboPoints() and { not Talent(nightstalker_talent) or BuffPresent(vanish_buff) or SpellCooldown(vanish) > 15 } and SpellCooldown(exsanguinate) < 1 Spell(rupture)
+	#rupture,if=combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1&(!talent.nightstalker.enabled|buff.vanish.up|cooldown.vanish.remains>15)
+	if ComboPoints() >= MaxComboPoints() and SpellCooldown(exsanguinate) < 1 and { not Talent(nightstalker_talent) or BuffPresent(vanish_buff) or SpellCooldown(vanish) > 15 } Spell(rupture)
 	#call_action_list,name=garrote,if=spell_targets.fan_of_knives<=8-artifact.bag_of_tricks.enabled
 	if Enemies() <= 8 - HasArtifactTrait(bag_of_tricks) AssassinationGarroteMainActions()
 
@@ -420,7 +416,7 @@ AddFunction AssassinationExsangComboShortCdActions
 	#vanish,if=talent.nightstalker.enabled&combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1&gcd.remains=0&energy>=25
 	if Talent(nightstalker_talent) and ComboPoints() >= MaxComboPoints() and SpellCooldown(exsanguinate) < 1 and not GCDRemaining() > 0 and Energy() >= 25 and CheckBoxOn(opt_vanish) Spell(vanish)
 
-	unless ComboPoints() >= MaxComboPoints() and { not Talent(nightstalker_talent) or BuffPresent(vanish_buff) or SpellCooldown(vanish) > 15 } and SpellCooldown(exsanguinate) < 1 and Spell(rupture)
+	unless ComboPoints() >= MaxComboPoints() and SpellCooldown(exsanguinate) < 1 and { not Talent(nightstalker_talent) or BuffPresent(vanish_buff) or SpellCooldown(vanish) > 15 } and Spell(rupture)
 	{
 		#exsanguinate,if=prev_gcd.rupture&dot.rupture.remains>22+4*talent.deeper_stratagem.enabled&cooldown.vanish.remains>10
 		if PreviousGCDSpell(rupture) and target.DebuffRemaining(rupture_debuff) > 22 + 4 * TalentPoints(deeper_stratagem_talent) and SpellCooldown(vanish) > 10 Spell(exsanguinate)
@@ -437,12 +433,12 @@ AddFunction AssassinationExsangComboShortCdActions
 
 AddFunction AssassinationExsangComboShortCdPostConditions
 {
-	ComboPoints() >= MaxComboPoints() and { not Talent(nightstalker_talent) or BuffPresent(vanish_buff) or SpellCooldown(vanish) > 15 } and SpellCooldown(exsanguinate) < 1 and Spell(rupture) or Enemies() <= 8 - HasArtifactTrait(bag_of_tricks) and AssassinationGarroteShortCdPostConditions() or Enemies() >= 2 and not target.DebuffPresent(hemorrhage_debuff) and Spell(hemorrhage) or AssassinationBuildExShortCdPostConditions()
+	ComboPoints() >= MaxComboPoints() and SpellCooldown(exsanguinate) < 1 and { not Talent(nightstalker_talent) or BuffPresent(vanish_buff) or SpellCooldown(vanish) > 15 } and Spell(rupture) or Enemies() <= 8 - HasArtifactTrait(bag_of_tricks) and AssassinationGarroteShortCdPostConditions() or Enemies() >= 2 and not target.DebuffPresent(hemorrhage_debuff) and Spell(hemorrhage) or AssassinationBuildExShortCdPostConditions()
 }
 
 AddFunction AssassinationExsangComboCdActions
 {
-	unless ComboPoints() >= MaxComboPoints() and { not Talent(nightstalker_talent) or BuffPresent(vanish_buff) or SpellCooldown(vanish) > 15 } and SpellCooldown(exsanguinate) < 1 and Spell(rupture) or PreviousGCDSpell(rupture) and target.DebuffRemaining(rupture_debuff) > 22 + 4 * TalentPoints(deeper_stratagem_talent) and SpellCooldown(vanish) > 10 and Spell(exsanguinate)
+	unless ComboPoints() >= MaxComboPoints() and SpellCooldown(exsanguinate) < 1 and { not Talent(nightstalker_talent) or BuffPresent(vanish_buff) or SpellCooldown(vanish) > 15 } and Spell(rupture) or PreviousGCDSpell(rupture) and target.DebuffRemaining(rupture_debuff) > 22 + 4 * TalentPoints(deeper_stratagem_talent) and SpellCooldown(vanish) > 10 and Spell(exsanguinate)
 	{
 		#call_action_list,name=garrote,if=spell_targets.fan_of_knives<=8-artifact.bag_of_tricks.enabled
 		if Enemies() <= 8 - HasArtifactTrait(bag_of_tricks) AssassinationGarroteCdActions()
@@ -457,7 +453,7 @@ AddFunction AssassinationExsangComboCdActions
 
 AddFunction AssassinationExsangComboCdPostConditions
 {
-	ComboPoints() >= MaxComboPoints() and { not Talent(nightstalker_talent) or BuffPresent(vanish_buff) or SpellCooldown(vanish) > 15 } and SpellCooldown(exsanguinate) < 1 and Spell(rupture) or PreviousGCDSpell(rupture) and target.DebuffRemaining(rupture_debuff) > 22 + 4 * TalentPoints(deeper_stratagem_talent) and SpellCooldown(vanish) > 10 and Spell(exsanguinate) or Enemies() <= 8 - HasArtifactTrait(bag_of_tricks) and AssassinationGarroteCdPostConditions() or Enemies() >= 2 and not target.DebuffPresent(hemorrhage_debuff) and Spell(hemorrhage) or AssassinationBuildExCdPostConditions()
+	ComboPoints() >= MaxComboPoints() and SpellCooldown(exsanguinate) < 1 and { not Talent(nightstalker_talent) or BuffPresent(vanish_buff) or SpellCooldown(vanish) > 15 } and Spell(rupture) or PreviousGCDSpell(rupture) and target.DebuffRemaining(rupture_debuff) > 22 + 4 * TalentPoints(deeper_stratagem_talent) and SpellCooldown(vanish) > 10 and Spell(exsanguinate) or Enemies() <= 8 - HasArtifactTrait(bag_of_tricks) and AssassinationGarroteCdPostConditions() or Enemies() >= 2 and not target.DebuffPresent(hemorrhage_debuff) and Spell(hemorrhage) or AssassinationBuildExCdPostConditions()
 }
 
 ### actions.finish_ex
@@ -505,12 +501,12 @@ AddFunction AssassinationFinishNoexMainActions
 	#variable,name=envenom_condition,value=!(dot.rupture.refreshable&dot.rupture.pmultiplier<1.5)&(!talent.nightstalker.enabled|cooldown.vanish.remains>=6)&dot.rupture.remains>=6&buff.elaborate_planning.remains<1.5&(artifact.bag_of_tricks.enabled|spell_targets.fan_of_knives<=6)
 	#rupture,cycle_targets=1,max_cycle_targets=14-2*artifact.bag_of_tricks.enabled,if=!ticking&combo_points>=cp_max_spend&spell_targets.fan_of_knives>1&target.time_to_die-remains>6
 	if DebuffCountOnAny(rupture_debuff) < Enemies() and DebuffCountOnAny(rupture_debuff) <= 14 - 2 * HasArtifactTrait(bag_of_tricks) and not target.DebuffPresent(rupture_debuff) and ComboPoints() >= MaxComboPoints() and Enemies() > 1 and target.TimeToDie() - target.DebuffRemaining(rupture_debuff) > 6 Spell(rupture)
-	#rupture,if=combo_points>=cp_max_spend&(((dot.rupture.refreshable)|dot.rupture.ticks_remain<=1)|(talent.nightstalker.enabled&buff.vanish.up))
+	#rupture,if=combo_points>=cp_max_spend&((dot.rupture.refreshable|dot.rupture.ticks_remain<=1)|(talent.nightstalker.enabled&buff.vanish.up))
 	if ComboPoints() >= MaxComboPoints() and { target.DebuffRefreshable(rupture_debuff) or target.TicksRemaining(rupture_debuff) < 2 or Talent(nightstalker_talent) and BuffPresent(vanish_buff) } Spell(rupture)
-	#death_from_above,if=(combo_points>=5+talent.deeper_stratagem.enabled-2*talent.elaborate_planning.enabled)&variable.envenom_condition&(talent.elaborate_planning.enabled&!buff.elaborate_planning.up|cooldown.garrote.remains<1)
-	if ComboPoints() >= 5 + TalentPoints(deeper_stratagem_talent) - 2 * TalentPoints(elaborate_planning_talent) and envenom_condition() and { Talent(elaborate_planning_talent) and not BuffPresent(elaborate_planning_buff) or SpellCooldown(garrote) < 1 } Spell(death_from_above)
-	#envenom,if=(combo_points>=5+talent.deeper_stratagem.enabled-2*talent.elaborate_planning.enabled)&variable.envenom_condition&(refreshable|talent.elaborate_planning.enabled&!buff.elaborate_planning.up|cooldown.garrote.remains<1)
-	if ComboPoints() >= 5 + TalentPoints(deeper_stratagem_talent) - 2 * TalentPoints(elaborate_planning_talent) and envenom_condition() and { Refreshable(envenom_buff) or Talent(elaborate_planning_talent) and not BuffPresent(elaborate_planning_buff) or SpellCooldown(garrote) < 1 } Spell(envenom)
+	#death_from_above,if=variable.envenom_condition&(combo_points>=cp_max_spend-2*talent.elaborate_planning.enabled)&(refreshable|(talent.elaborate_planning.enabled&!buff.elaborate_planning.up)|cooldown.garrote.remains<1)
+	if envenom_condition() and ComboPoints() >= MaxComboPoints() - 2 * TalentPoints(elaborate_planning_talent) and { target.Refreshable(death_from_above_debuff) or Talent(elaborate_planning_talent) and not BuffPresent(elaborate_planning_buff) or SpellCooldown(garrote) < 1 } Spell(death_from_above)
+	#envenom,if=variable.envenom_condition&(combo_points>=cp_max_spend-2*talent.elaborate_planning.enabled)&(refreshable|(talent.elaborate_planning.enabled&!buff.elaborate_planning.up)|cooldown.garrote.remains<1)
+	if envenom_condition() and ComboPoints() >= MaxComboPoints() - 2 * TalentPoints(elaborate_planning_talent) and { Refreshable(envenom_buff) or Talent(elaborate_planning_talent) and not BuffPresent(elaborate_planning_buff) or SpellCooldown(garrote) < 1 } Spell(envenom)
 }
 
 AddFunction AssassinationFinishNoexMainPostConditions
@@ -523,7 +519,7 @@ AddFunction AssassinationFinishNoexShortCdActions
 
 AddFunction AssassinationFinishNoexShortCdPostConditions
 {
-	DebuffCountOnAny(rupture_debuff) < Enemies() and DebuffCountOnAny(rupture_debuff) <= 14 - 2 * HasArtifactTrait(bag_of_tricks) and not target.DebuffPresent(rupture_debuff) and ComboPoints() >= MaxComboPoints() and Enemies() > 1 and target.TimeToDie() - target.DebuffRemaining(rupture_debuff) > 6 and Spell(rupture) or ComboPoints() >= MaxComboPoints() and { target.DebuffRefreshable(rupture_debuff) or target.TicksRemaining(rupture_debuff) < 2 or Talent(nightstalker_talent) and BuffPresent(vanish_buff) } and Spell(rupture) or ComboPoints() >= 5 + TalentPoints(deeper_stratagem_talent) - 2 * TalentPoints(elaborate_planning_talent) and envenom_condition() and { Talent(elaborate_planning_talent) and not BuffPresent(elaborate_planning_buff) or SpellCooldown(garrote) < 1 } and Spell(death_from_above) or ComboPoints() >= 5 + TalentPoints(deeper_stratagem_talent) - 2 * TalentPoints(elaborate_planning_talent) and envenom_condition() and { Refreshable(envenom_buff) or Talent(elaborate_planning_talent) and not BuffPresent(elaborate_planning_buff) or SpellCooldown(garrote) < 1 } and Spell(envenom)
+	DebuffCountOnAny(rupture_debuff) < Enemies() and DebuffCountOnAny(rupture_debuff) <= 14 - 2 * HasArtifactTrait(bag_of_tricks) and not target.DebuffPresent(rupture_debuff) and ComboPoints() >= MaxComboPoints() and Enemies() > 1 and target.TimeToDie() - target.DebuffRemaining(rupture_debuff) > 6 and Spell(rupture) or ComboPoints() >= MaxComboPoints() and { target.DebuffRefreshable(rupture_debuff) or target.TicksRemaining(rupture_debuff) < 2 or Talent(nightstalker_talent) and BuffPresent(vanish_buff) } and Spell(rupture) or envenom_condition() and ComboPoints() >= MaxComboPoints() - 2 * TalentPoints(elaborate_planning_talent) and { target.Refreshable(death_from_above_debuff) or Talent(elaborate_planning_talent) and not BuffPresent(elaborate_planning_buff) or SpellCooldown(garrote) < 1 } and Spell(death_from_above) or envenom_condition() and ComboPoints() >= MaxComboPoints() - 2 * TalentPoints(elaborate_planning_talent) and { Refreshable(envenom_buff) or Talent(elaborate_planning_talent) and not BuffPresent(elaborate_planning_buff) or SpellCooldown(garrote) < 1 } and Spell(envenom)
 }
 
 AddFunction AssassinationFinishNoexCdActions
@@ -532,7 +528,7 @@ AddFunction AssassinationFinishNoexCdActions
 
 AddFunction AssassinationFinishNoexCdPostConditions
 {
-	DebuffCountOnAny(rupture_debuff) < Enemies() and DebuffCountOnAny(rupture_debuff) <= 14 - 2 * HasArtifactTrait(bag_of_tricks) and not target.DebuffPresent(rupture_debuff) and ComboPoints() >= MaxComboPoints() and Enemies() > 1 and target.TimeToDie() - target.DebuffRemaining(rupture_debuff) > 6 and Spell(rupture) or ComboPoints() >= MaxComboPoints() and { target.DebuffRefreshable(rupture_debuff) or target.TicksRemaining(rupture_debuff) < 2 or Talent(nightstalker_talent) and BuffPresent(vanish_buff) } and Spell(rupture) or ComboPoints() >= 5 + TalentPoints(deeper_stratagem_talent) - 2 * TalentPoints(elaborate_planning_talent) and envenom_condition() and { Talent(elaborate_planning_talent) and not BuffPresent(elaborate_planning_buff) or SpellCooldown(garrote) < 1 } and Spell(death_from_above) or ComboPoints() >= 5 + TalentPoints(deeper_stratagem_talent) - 2 * TalentPoints(elaborate_planning_talent) and envenom_condition() and { Refreshable(envenom_buff) or Talent(elaborate_planning_talent) and not BuffPresent(elaborate_planning_buff) or SpellCooldown(garrote) < 1 } and Spell(envenom)
+	DebuffCountOnAny(rupture_debuff) < Enemies() and DebuffCountOnAny(rupture_debuff) <= 14 - 2 * HasArtifactTrait(bag_of_tricks) and not target.DebuffPresent(rupture_debuff) and ComboPoints() >= MaxComboPoints() and Enemies() > 1 and target.TimeToDie() - target.DebuffRemaining(rupture_debuff) > 6 and Spell(rupture) or ComboPoints() >= MaxComboPoints() and { target.DebuffRefreshable(rupture_debuff) or target.TicksRemaining(rupture_debuff) < 2 or Talent(nightstalker_talent) and BuffPresent(vanish_buff) } and Spell(rupture) or envenom_condition() and ComboPoints() >= MaxComboPoints() - 2 * TalentPoints(elaborate_planning_talent) and { target.Refreshable(death_from_above_debuff) or Talent(elaborate_planning_talent) and not BuffPresent(elaborate_planning_buff) or SpellCooldown(garrote) < 1 } and Spell(death_from_above) or envenom_condition() and ComboPoints() >= MaxComboPoints() - 2 * TalentPoints(elaborate_planning_talent) and { Refreshable(envenom_buff) or Talent(elaborate_planning_talent) and not BuffPresent(elaborate_planning_buff) or SpellCooldown(garrote) < 1 } and Spell(envenom)
 }
 
 ### actions.garrote
@@ -545,8 +541,8 @@ AddFunction AssassinationGarroteMainActions
 	unless Talent(subterfuge_talent) and not target.DebuffPresent(garrote_debuff) and ComboPointsDeficit() >= 1 and Enemies() >= 2 and SpellUsable(garrote) and SpellCooldown(garrote) < TimeToEnergyFor(garrote)
 	{
 		#pool_resource,for_next=1
-		#garrote,if=combo_points.deficit>=1&!exsanguinated
-		if ComboPointsDeficit() >= 1 and not target.DebuffPresent(exsanguinated) Spell(garrote)
+		#garrote,if=combo_points.deficit>=1&!exsanguinated&refreshable
+		if ComboPointsDeficit() >= 1 and not target.DebuffPresent(exsanguinated) and target.Refreshable(garrote_debuff) Spell(garrote)
 	}
 }
 
@@ -560,7 +556,7 @@ AddFunction AssassinationGarroteShortCdActions
 
 AddFunction AssassinationGarroteShortCdPostConditions
 {
-	Talent(subterfuge_talent) and not target.DebuffPresent(garrote_debuff) and ComboPointsDeficit() >= 1 and Enemies() >= 2 and Spell(garrote) or not { Talent(subterfuge_talent) and not target.DebuffPresent(garrote_debuff) and ComboPointsDeficit() >= 1 and Enemies() >= 2 and SpellUsable(garrote) and SpellCooldown(garrote) < TimeToEnergyFor(garrote) } and ComboPointsDeficit() >= 1 and not target.DebuffPresent(exsanguinated) and Spell(garrote)
+	Talent(subterfuge_talent) and not target.DebuffPresent(garrote_debuff) and ComboPointsDeficit() >= 1 and Enemies() >= 2 and Spell(garrote) or not { Talent(subterfuge_talent) and not target.DebuffPresent(garrote_debuff) and ComboPointsDeficit() >= 1 and Enemies() >= 2 and SpellUsable(garrote) and SpellCooldown(garrote) < TimeToEnergyFor(garrote) } and ComboPointsDeficit() >= 1 and not target.DebuffPresent(exsanguinated) and target.Refreshable(garrote_debuff) and Spell(garrote)
 }
 
 AddFunction AssassinationGarroteCdActions
@@ -569,7 +565,7 @@ AddFunction AssassinationGarroteCdActions
 
 AddFunction AssassinationGarroteCdPostConditions
 {
-	Talent(subterfuge_talent) and not target.DebuffPresent(garrote_debuff) and ComboPointsDeficit() >= 1 and Enemies() >= 2 and Spell(garrote) or not { Talent(subterfuge_talent) and not target.DebuffPresent(garrote_debuff) and ComboPointsDeficit() >= 1 and Enemies() >= 2 and SpellUsable(garrote) and SpellCooldown(garrote) < TimeToEnergyFor(garrote) } and ComboPointsDeficit() >= 1 and not target.DebuffPresent(exsanguinated) and Spell(garrote)
+	Talent(subterfuge_talent) and not target.DebuffPresent(garrote_debuff) and ComboPointsDeficit() >= 1 and Enemies() >= 2 and Spell(garrote) or not { Talent(subterfuge_talent) and not target.DebuffPresent(garrote_debuff) and ComboPointsDeficit() >= 1 and Enemies() >= 2 and SpellUsable(garrote) and SpellCooldown(garrote) < TimeToEnergyFor(garrote) } and ComboPointsDeficit() >= 1 and not target.DebuffPresent(exsanguinated) and target.Refreshable(garrote_debuff) and Spell(garrote)
 }
 
 ### actions.precombat
@@ -679,6 +675,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # berserking
 # blood_fury_ap
 # death_from_above
+# death_from_above_debuff
 # deeper_stratagem_talent
 # elaborate_planning_buff
 # elaborate_planning_talent
@@ -702,7 +699,6 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # shadowstep
 # stealth
 # subterfuge_talent
-# the_dreadlords_deceit
 # the_dreadlords_deceit_buff
 # urge_to_kill
 # vanish
@@ -936,8 +932,8 @@ AddFunction OutlawBuildMainActions
 {
 	#ghostly_strike,if=combo_points.deficit>=1+buff.broadsides.up&!buff.curse_of_the_dreadblades.up&(debuff.ghostly_strike.remains<debuff.ghostly_strike.duration*0.3|(cooldown.curse_of_the_dreadblades.remains<3&debuff.ghostly_strike.remains<14))&(combo_points>=3|(variable.rtb_reroll&time>=10))
 	if ComboPointsDeficit() >= 1 + BuffPresent(broadsides_buff) and not BuffPresent(curse_of_the_dreadblades_buff) and { target.DebuffRemaining(ghostly_strike_debuff) < BaseDuration(ghostly_strike_debuff) * 0.3 or SpellCooldown(curse_of_the_dreadblades) < 3 and target.DebuffRemaining(ghostly_strike_debuff) < 14 } and { ComboPoints() >= 3 or rtb_reroll() and TimeInCombat() >= 10 } Spell(ghostly_strike)
-	#pistol_shot,if=combo_points.deficit>=1+buff.broadsides.up&buff.opportunity.up&energy.time_to_max>2-talent.quick_draw.enabled
-	if ComboPointsDeficit() >= 1 + BuffPresent(broadsides_buff) and BuffPresent(opportunity_buff) and TimeToMaxEnergy() > 2 - TalentPoints(quick_draw_talent) Spell(pistol_shot)
+	#pistol_shot,if=combo_points.deficit>=1+buff.broadsides.up&buff.opportunity.up&(energy.time_to_max>2-talent.quick_draw.enabled|(buff.blunderbuss.up&buff.greenskins_waterlogged_wristcuffs.up))
+	if ComboPointsDeficit() >= 1 + BuffPresent(broadsides_buff) and BuffPresent(opportunity_buff) and { TimeToMaxEnergy() > 2 - TalentPoints(quick_draw_talent) or BuffPresent(blunderbuss_buff) and BuffPresent(greenskins_waterlogged_wristcuffs_buff) } Spell(pistol_shot)
 	#saber_slash,if=variable.ss_useable
 	if ss_useable() Spell(saber_slash)
 }
@@ -952,7 +948,7 @@ AddFunction OutlawBuildShortCdActions
 
 AddFunction OutlawBuildShortCdPostConditions
 {
-	ComboPointsDeficit() >= 1 + BuffPresent(broadsides_buff) and not BuffPresent(curse_of_the_dreadblades_buff) and { target.DebuffRemaining(ghostly_strike_debuff) < BaseDuration(ghostly_strike_debuff) * 0.3 or SpellCooldown(curse_of_the_dreadblades) < 3 and target.DebuffRemaining(ghostly_strike_debuff) < 14 } and { ComboPoints() >= 3 or rtb_reroll() and TimeInCombat() >= 10 } and Spell(ghostly_strike) or ComboPointsDeficit() >= 1 + BuffPresent(broadsides_buff) and BuffPresent(opportunity_buff) and TimeToMaxEnergy() > 2 - TalentPoints(quick_draw_talent) and Spell(pistol_shot) or ss_useable() and Spell(saber_slash)
+	ComboPointsDeficit() >= 1 + BuffPresent(broadsides_buff) and not BuffPresent(curse_of_the_dreadblades_buff) and { target.DebuffRemaining(ghostly_strike_debuff) < BaseDuration(ghostly_strike_debuff) * 0.3 or SpellCooldown(curse_of_the_dreadblades) < 3 and target.DebuffRemaining(ghostly_strike_debuff) < 14 } and { ComboPoints() >= 3 or rtb_reroll() and TimeInCombat() >= 10 } and Spell(ghostly_strike) or ComboPointsDeficit() >= 1 + BuffPresent(broadsides_buff) and BuffPresent(opportunity_buff) and { TimeToMaxEnergy() > 2 - TalentPoints(quick_draw_talent) or BuffPresent(blunderbuss_buff) and BuffPresent(greenskins_waterlogged_wristcuffs_buff) } and Spell(pistol_shot) or ss_useable() and Spell(saber_slash)
 }
 
 AddFunction OutlawBuildCdActions
@@ -961,7 +957,7 @@ AddFunction OutlawBuildCdActions
 
 AddFunction OutlawBuildCdPostConditions
 {
-	ComboPointsDeficit() >= 1 + BuffPresent(broadsides_buff) and not BuffPresent(curse_of_the_dreadblades_buff) and { target.DebuffRemaining(ghostly_strike_debuff) < BaseDuration(ghostly_strike_debuff) * 0.3 or SpellCooldown(curse_of_the_dreadblades) < 3 and target.DebuffRemaining(ghostly_strike_debuff) < 14 } and { ComboPoints() >= 3 or rtb_reroll() and TimeInCombat() >= 10 } and Spell(ghostly_strike) or ComboPointsDeficit() >= 1 + BuffPresent(broadsides_buff) and BuffPresent(opportunity_buff) and TimeToMaxEnergy() > 2 - TalentPoints(quick_draw_talent) and Spell(pistol_shot) or ss_useable() and Spell(saber_slash)
+	ComboPointsDeficit() >= 1 + BuffPresent(broadsides_buff) and not BuffPresent(curse_of_the_dreadblades_buff) and { target.DebuffRemaining(ghostly_strike_debuff) < BaseDuration(ghostly_strike_debuff) * 0.3 or SpellCooldown(curse_of_the_dreadblades) < 3 and target.DebuffRemaining(ghostly_strike_debuff) < 14 } and { ComboPoints() >= 3 or rtb_reroll() and TimeInCombat() >= 10 } and Spell(ghostly_strike) or ComboPointsDeficit() >= 1 + BuffPresent(broadsides_buff) and BuffPresent(opportunity_buff) and { TimeToMaxEnergy() > 2 - TalentPoints(quick_draw_talent) or BuffPresent(blunderbuss_buff) and BuffPresent(greenskins_waterlogged_wristcuffs_buff) } and Spell(pistol_shot) or ss_useable() and Spell(saber_slash)
 }
 
 ### actions.cds
@@ -1018,8 +1014,8 @@ AddFunction OutlawCdsCdPostConditions
 
 AddFunction OutlawFinishMainActions
 {
-	#between_the_eyes,if=equipped.greenskins_waterlogged_wristcuffs&buff.shark_infested_waters.up
-	if HasEquippedItem(greenskins_waterlogged_wristcuffs) and BuffPresent(shark_infested_waters_buff) Spell(between_the_eyes)
+	#between_the_eyes,if=equipped.greenskins_waterlogged_wristcuffs&!buff.greenskins_waterlogged_wristcuffs.up
+	if HasEquippedItem(greenskins_waterlogged_wristcuffs) and not BuffPresent(greenskins_waterlogged_wristcuffs_buff) Spell(between_the_eyes)
 	#run_through,if=!talent.death_from_above.enabled|energy.time_to_max<cooldown.death_from_above.remains+3.5
 	if not Talent(death_from_above_talent) or TimeToMaxEnergy() < SpellCooldown(death_from_above) + 3.5 Spell(run_through)
 }
@@ -1034,7 +1030,7 @@ AddFunction OutlawFinishShortCdActions
 
 AddFunction OutlawFinishShortCdPostConditions
 {
-	HasEquippedItem(greenskins_waterlogged_wristcuffs) and BuffPresent(shark_infested_waters_buff) and Spell(between_the_eyes) or { not Talent(death_from_above_talent) or TimeToMaxEnergy() < SpellCooldown(death_from_above) + 3.5 } and Spell(run_through)
+	HasEquippedItem(greenskins_waterlogged_wristcuffs) and not BuffPresent(greenskins_waterlogged_wristcuffs_buff) and Spell(between_the_eyes) or { not Talent(death_from_above_talent) or TimeToMaxEnergy() < SpellCooldown(death_from_above) + 3.5 } and Spell(run_through)
 }
 
 AddFunction OutlawFinishCdActions
@@ -1043,7 +1039,7 @@ AddFunction OutlawFinishCdActions
 
 AddFunction OutlawFinishCdPostConditions
 {
-	HasEquippedItem(greenskins_waterlogged_wristcuffs) and BuffPresent(shark_infested_waters_buff) and Spell(between_the_eyes) or { not Talent(death_from_above_talent) or TimeToMaxEnergy() < SpellCooldown(death_from_above) + 3.5 } and Spell(run_through)
+	HasEquippedItem(greenskins_waterlogged_wristcuffs) and not BuffPresent(greenskins_waterlogged_wristcuffs_buff) and Spell(between_the_eyes) or { not Talent(death_from_above_talent) or TimeToMaxEnergy() < SpellCooldown(death_from_above) + 3.5 } and Spell(run_through)
 }
 
 ### actions.precombat
@@ -1202,6 +1198,7 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # blade_flurry
 # blade_flurry_buff
 # blood_fury_ap
+# blunderbuss_buff
 # broadsides_buff
 # cannonball_barrage
 # curse_of_the_dreadblades
@@ -1216,6 +1213,7 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # ghostly_strike_talent
 # gouge
 # greenskins_waterlogged_wristcuffs
+# greenskins_waterlogged_wristcuffs_buff
 # hidden_blade_buff
 # jolly_roger_buff
 # kick
@@ -1230,7 +1228,6 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # saber_slash
 # shadowmeld
 # shadowstep
-# shark_infested_waters_buff
 # shivarran_symmetry
 # slice_and_dice
 # slice_and_dice_buff
@@ -1270,12 +1267,6 @@ AddFunction ed_threshold
 }
 
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=subtlety)
-
-AddFunction SubtletyUseItemActions
-{
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
-}
 
 AddFunction SubtletyGetInMeleeRange
 {
@@ -1458,8 +1449,6 @@ AddFunction SubtletyCdsShortCdPostConditions
 AddFunction SubtletyCdsCdActions
 {
 	#potion,name=old_war,if=buff.bloodlust.react|target.time_to_die<=25|buff.shadow_blades.up
-	#use_item,slot=trinket2,if=stealthed|target.time_to_die<20
-	if Stealthed() or target.TimeToDie() < 20 SubtletyUseItemActions()
 	#blood_fury,if=stealthed
 	if Stealthed() Spell(blood_fury_ap)
 	#berserking,if=stealthed

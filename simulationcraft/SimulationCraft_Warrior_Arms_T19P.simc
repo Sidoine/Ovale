@@ -33,7 +33,6 @@ actions+=/arcane_torrent,if=buff.battle_cry_deadly_calm.down&rage.deficit>40
 actions+=/battle_cry,if=(buff.bloodlust.up|time>=1)&!gcd.remains&(buff.shattered_defenses.up|(cooldown.colossus_smash.remains&cooldown.warbreaker.remains))|target.time_to_die<=10
 actions+=/avatar,if=(buff.bloodlust.up|time>=1)
 actions+=/use_item,name=gift_of_radiance
-actions+=/hamstring,if=!ptr&buff.battle_cry_deadly_calm.remains>cooldown.hamstring.remains
 actions+=/heroic_leap,if=debuff.colossus_smash.up
 actions+=/rend,if=remains<gcd
 # The tl;dr of this line is to spam focused rage inside battle cry, the added nonsense is to help modeling the difficulty of timing focused rage immediately after mortal strike. 
@@ -64,12 +63,12 @@ actions.cleave=mortal_strike
 actions.cleave+=/execute,if=buff.stone_heart.react
 actions.cleave+=/colossus_smash,if=buff.shattered_defenses.down&buff.precise_strikes.down
 actions.cleave+=/warbreaker,if=buff.shattered_defenses.down
-actions.cleave+=/focused_rage,if=buff.shattered_defenses.down
+actions.cleave+=/focused_rage,if=rage>100|buff.battle_cry_deadly_calm.up
 actions.cleave+=/whirlwind,if=talent.fervor_of_battle.enabled&(debuff.colossus_smash.up|rage.deficit<50)&(!talent.focused_rage.enabled|buff.battle_cry_deadly_calm.up|buff.cleave.up)
 actions.cleave+=/rend,if=remains<=duration*0.3
 actions.cleave+=/bladestorm
 actions.cleave+=/cleave
-actions.cleave+=/whirlwind,if=rage>=100|buff.focused_rage.stack=3
+actions.cleave+=/whirlwind,if=rage>40|buff.cleave.up
 actions.cleave+=/shockwave
 actions.cleave+=/storm_bolt
 
@@ -77,7 +76,9 @@ actions.execute=mortal_strike,if=buff.battle_cry.up&buff.focused_rage.stack=3
 actions.execute+=/execute,if=buff.battle_cry_deadly_calm.up
 actions.execute+=/colossus_smash,if=buff.shattered_defenses.down
 actions.execute+=/warbreaker,if=buff.shattered_defenses.down&rage<=30
-actions.execute+=/execute,if=buff.shattered_defenses.up&rage>22|buff.shattered_defenses.down
+actions.execute+=/execute,if=buff.shattered_defenses.up&rage>22
+actions.execute+=/mortal_strike,if=equipped.archavons_heavy_hand&rage<60
+actions.execute+=/execute,if=buff.shattered_defenses.down
 # actions.single+=/heroic_charge,if=rage.deficit>=40&(!cooldown.heroic_leap.remains|swing.mh.remains>1.2)
 #Remove the # above to run out of melee and charge back in for rage.
 actions.execute+=/bladestorm,interrupt=1,if=raid_event.adds.in>90|!raid_event.adds.exists|spell_targets.bladestorm_mh>desired_targets
@@ -96,7 +97,7 @@ actions.single+=/focused_rage,if=equipped.archavons_heavy_hand
 actions.single+=/bladestorm,interrupt=1,if=raid_event.adds.in>90|!raid_event.adds.exists|spell_targets.bladestorm_mh>desired_targets
 
 head=vision_of_the_spider_queen,id=137451,bonus_id=1492/1727
-neck=brysngamen_torc_of_helheim,id=133636,bonus_id=1492/1727,enchant=mark_of_the_distant_army
+neck=brysngamen_torc_of_helheim,id=133636,bonus_id=1492/1727,enchant=mark_of_the_trained_soldier
 shoulders=mortar_guard_shoulderplates,id=137524,bonus_id=1492/1727
 back=stole_of_malefic_repose,id=134404,bonus_id=1492/1727,enchant=binding_of_strength
 chest=etheldrins_breastplate,id=136976,bonus_id=1492/1727
@@ -117,6 +118,6 @@ main_hand=stromkar_the_warbreaker,id=128910,gem_id=137469/137363/137377,relic_id
 # gear_stamina=17965
 # gear_crit_rating=984
 # gear_haste_rating=2270
-# gear_mastery_rating=12456
+# gear_mastery_rating=12756
 # gear_versatility_rating=2013
 # gear_armor=3965
