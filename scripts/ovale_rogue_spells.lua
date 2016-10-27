@@ -58,6 +58,7 @@ Define(blade_flurry 13877)
 Define(blade_flurry_buff 13877)
 Define(blindside_buff 121153)
 	SpellInfo(blindside_buff duration=10)
+Define(blunderbuss_buff 202895)
 Define(broadsides_buff 193356)
 Define(burst_of_speed 108212)
 	SpellInfo(burst_of_speed cd=3 energy=30)
@@ -399,6 +400,7 @@ Define(finality 197406)
 
 # Legion legendary items
 Define(shadow_satyrs_walk 137032)
+Define(greenskins_waterlogged_wristcuffs_buff 209423)
 
 # Talents
 Define(deeper_strategem_talent 7)
