@@ -457,8 +457,6 @@ AddFunction EnhancementDefaultMainActions
 	if BuffRemaining(flametongue_buff) < GCD() Spell(flametongue)
 	#fury_of_air,if=!ticking
 	if not target.DebuffPresent(fury_of_air_debuff) Spell(fury_of_air)
-	#doom_winds
-	Spell(doom_winds)
 	#crash_lightning,if=active_enemies>=3
 	if Enemies() >= 3 Spell(crash_lightning)
 	#windstrike
@@ -501,17 +499,23 @@ AddFunction EnhancementDefaultShortCdActions
 		#windsong
 		Spell(windsong)
 
-		unless not target.DebuffPresent(fury_of_air_debuff) and Spell(fury_of_air) or Spell(doom_winds) or Enemies() >= 3 and Spell(crash_lightning) or Spell(windstrike) or Spell(stormstrike) or Talent(overcharge_talent) and Maelstrom() >= 60 and Spell(lightning_bolt) or BuffPresent(hot_hand_buff) and Spell(lava_lash) or Spell(earthen_spike) or { Enemies() > 1 or Talent(crashing_storm_talent) or TotemRemaining(sprit_wolf) > 5 } and Spell(crash_lightning) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 and Spell(frostbrand) or BuffRemaining(flametongue_buff) < 4.8 and Spell(flametongue)
+		unless not target.DebuffPresent(fury_of_air_debuff) and Spell(fury_of_air)
 		{
-			#sundering
-			Spell(sundering)
+			#doom_winds
+			Spell(doom_winds)
+
+			unless Enemies() >= 3 and Spell(crash_lightning) or Spell(windstrike) or Spell(stormstrike) or Talent(overcharge_talent) and Maelstrom() >= 60 and Spell(lightning_bolt) or BuffPresent(hot_hand_buff) and Spell(lava_lash) or Spell(earthen_spike) or { Enemies() > 1 or Talent(crashing_storm_talent) or TotemRemaining(sprit_wolf) > 5 } and Spell(crash_lightning) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 and Spell(frostbrand) or BuffRemaining(flametongue_buff) < 4.8 and Spell(flametongue)
+			{
+				#sundering
+				Spell(sundering)
+			}
 		}
 	}
 }
 
 AddFunction EnhancementDefaultShortCdPostConditions
 {
-	ArtifactTraitRank(alpha_wolf) and PreviousGCDSpell(feral_spirit) and Spell(crash_lightning) or Talent(crashing_storm_talent) and Enemies() >= 3 and Spell(crash_lightning) or BuffRemaining(boulderfist_buff) < GCD() and Maelstrom() >= 50 and Enemies() >= 3 and Spell(boulderfist) or { BuffRemaining(boulderfist_buff) < GCD() or Charges(boulderfist count=0) > 1.75 and Maelstrom() <= 100 and Enemies() <= 2 } and Spell(boulderfist) or BuffRemaining(crash_lightning_buff) < GCD() and Enemies() >= 2 and Spell(crash_lightning) or Enemies() >= 3 and not Talent(hailstorm_talent) and Spell(windstrike) or Enemies() >= 3 and not Talent(hailstorm_talent) and Spell(stormstrike) or BuffPresent(stormbringer_buff) and Spell(windstrike) or BuffPresent(stormbringer_buff) and Spell(stormstrike) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < GCD() and Spell(frostbrand) or BuffRemaining(flametongue_buff) < GCD() and Spell(flametongue) or not target.DebuffPresent(fury_of_air_debuff) and Spell(fury_of_air) or Spell(doom_winds) or Enemies() >= 3 and Spell(crash_lightning) or Spell(windstrike) or Spell(stormstrike) or Talent(overcharge_talent) and Maelstrom() >= 60 and Spell(lightning_bolt) or BuffPresent(hot_hand_buff) and Spell(lava_lash) or Spell(earthen_spike) or { Enemies() > 1 or Talent(crashing_storm_talent) or TotemRemaining(sprit_wolf) > 5 } and Spell(crash_lightning) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 and Spell(frostbrand) or BuffRemaining(flametongue_buff) < 4.8 and Spell(flametongue) or Maelstrom() >= 90 and Spell(lava_lash) or Spell(rockbiter) or Spell(flametongue) or Spell(boulderfist)
+	ArtifactTraitRank(alpha_wolf) and PreviousGCDSpell(feral_spirit) and Spell(crash_lightning) or Talent(crashing_storm_talent) and Enemies() >= 3 and Spell(crash_lightning) or BuffRemaining(boulderfist_buff) < GCD() and Maelstrom() >= 50 and Enemies() >= 3 and Spell(boulderfist) or { BuffRemaining(boulderfist_buff) < GCD() or Charges(boulderfist count=0) > 1.75 and Maelstrom() <= 100 and Enemies() <= 2 } and Spell(boulderfist) or BuffRemaining(crash_lightning_buff) < GCD() and Enemies() >= 2 and Spell(crash_lightning) or Enemies() >= 3 and not Talent(hailstorm_talent) and Spell(windstrike) or Enemies() >= 3 and not Talent(hailstorm_talent) and Spell(stormstrike) or BuffPresent(stormbringer_buff) and Spell(windstrike) or BuffPresent(stormbringer_buff) and Spell(stormstrike) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < GCD() and Spell(frostbrand) or BuffRemaining(flametongue_buff) < GCD() and Spell(flametongue) or not target.DebuffPresent(fury_of_air_debuff) and Spell(fury_of_air) or Enemies() >= 3 and Spell(crash_lightning) or Spell(windstrike) or Spell(stormstrike) or Talent(overcharge_talent) and Maelstrom() >= 60 and Spell(lightning_bolt) or BuffPresent(hot_hand_buff) and Spell(lava_lash) or Spell(earthen_spike) or { Enemies() > 1 or Talent(crashing_storm_talent) or TotemRemaining(sprit_wolf) > 5 } and Spell(crash_lightning) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 and Spell(frostbrand) or BuffRemaining(flametongue_buff) < 4.8 and Spell(flametongue) or Maelstrom() >= 90 and Spell(lava_lash) or Spell(rockbiter) or Spell(flametongue) or Spell(boulderfist)
 }
 
 AddFunction EnhancementDefaultCdActions
@@ -541,7 +545,7 @@ AddFunction EnhancementDefaultCdActions
 
 AddFunction EnhancementDefaultCdPostConditions
 {
-	ArtifactTraitRank(alpha_wolf) and PreviousGCDSpell(feral_spirit) and Spell(crash_lightning) or Talent(crashing_storm_talent) and Enemies() >= 3 and Spell(crash_lightning) or BuffRemaining(boulderfist_buff) < GCD() and Maelstrom() >= 50 and Enemies() >= 3 and Spell(boulderfist) or { BuffRemaining(boulderfist_buff) < GCD() or Charges(boulderfist count=0) > 1.75 and Maelstrom() <= 100 and Enemies() <= 2 } and Spell(boulderfist) or BuffRemaining(crash_lightning_buff) < GCD() and Enemies() >= 2 and Spell(crash_lightning) or Enemies() >= 3 and not Talent(hailstorm_talent) and Spell(windstrike) or Enemies() >= 3 and not Talent(hailstorm_talent) and Spell(stormstrike) or BuffPresent(stormbringer_buff) and Spell(windstrike) or BuffPresent(stormbringer_buff) and Spell(stormstrike) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < GCD() and Spell(frostbrand) or BuffRemaining(flametongue_buff) < GCD() and Spell(flametongue) or Spell(windsong) or not target.DebuffPresent(fury_of_air_debuff) and Spell(fury_of_air) or Spell(doom_winds) or Enemies() >= 3 and Spell(crash_lightning) or Spell(windstrike) or Spell(stormstrike) or Talent(overcharge_talent) and Maelstrom() >= 60 and Spell(lightning_bolt) or BuffPresent(hot_hand_buff) and Spell(lava_lash) or Spell(earthen_spike) or { Enemies() > 1 or Talent(crashing_storm_talent) or TotemRemaining(sprit_wolf) > 5 } and Spell(crash_lightning) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 and Spell(frostbrand) or BuffRemaining(flametongue_buff) < 4.8 and Spell(flametongue) or Spell(sundering) or Maelstrom() >= 90 and Spell(lava_lash) or Spell(rockbiter) or Spell(flametongue) or Spell(boulderfist)
+	ArtifactTraitRank(alpha_wolf) and PreviousGCDSpell(feral_spirit) and Spell(crash_lightning) or Talent(crashing_storm_talent) and Enemies() >= 3 and Spell(crash_lightning) or BuffRemaining(boulderfist_buff) < GCD() and Maelstrom() >= 50 and Enemies() >= 3 and Spell(boulderfist) or { BuffRemaining(boulderfist_buff) < GCD() or Charges(boulderfist count=0) > 1.75 and Maelstrom() <= 100 and Enemies() <= 2 } and Spell(boulderfist) or BuffRemaining(crash_lightning_buff) < GCD() and Enemies() >= 2 and Spell(crash_lightning) or Enemies() >= 3 and not Talent(hailstorm_talent) and Spell(windstrike) or Enemies() >= 3 and not Talent(hailstorm_talent) and Spell(stormstrike) or BuffPresent(stormbringer_buff) and Spell(windstrike) or BuffPresent(stormbringer_buff) and Spell(stormstrike) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < GCD() and Spell(frostbrand) or BuffRemaining(flametongue_buff) < GCD() and Spell(flametongue) or Spell(windsong) or not target.DebuffPresent(fury_of_air_debuff) and Spell(fury_of_air) or Enemies() >= 3 and Spell(crash_lightning) or Spell(windstrike) or Spell(stormstrike) or Talent(overcharge_talent) and Maelstrom() >= 60 and Spell(lightning_bolt) or BuffPresent(hot_hand_buff) and Spell(lava_lash) or Spell(earthen_spike) or { Enemies() > 1 or Talent(crashing_storm_talent) or TotemRemaining(sprit_wolf) > 5 } and Spell(crash_lightning) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 and Spell(frostbrand) or BuffRemaining(flametongue_buff) < 4.8 and Spell(flametongue) or Spell(sundering) or Maelstrom() >= 90 and Spell(lava_lash) or Spell(rockbiter) or Spell(flametongue) or Spell(boulderfist)
 }
 
 ### actions.precombat
