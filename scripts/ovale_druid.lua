@@ -587,11 +587,15 @@ AddFunction FeralDefaultMainActions
 	if BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) Spell(rake)
 	#ferocious_bite,cycle_targets=1,if=dot.rip.ticking&dot.rip.remains<3&target.time_to_die>3&(target.health.pct<25|talent.sabertooth.enabled)
 	if target.DebuffPresent(rip_debuff) and target.DebuffRemaining(rip_debuff) < 3 and target.TimeToDie() > 3 and { target.HealthPercent() < 25 or Talent(sabertooth_talent) } Spell(ferocious_bite)
+	#regrowth,if=talent.bloodtalons.enabled&buff.predatory_swiftness.up&(combo_points>=5|buff.predatory_swiftness.remains<1.5|(talent.bloodtalons.enabled&combo_points=2&buff.bloodtalons.down&cooldown.ashamanes_frenzy.remains<gcd)|(talent.elunes_guidance.enabled&((cooldown.elunes_guidance.remains<gcd&combo_points=0)|(buff.elunes_guidance.up&combo_points>=4))))
+	if Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and { ComboPoints() >= 5 or BuffRemaining(predatory_swiftness_buff) < 1.5 or Talent(bloodtalons_talent) and ComboPoints() == 2 and BuffExpires(bloodtalons_buff) and SpellCooldown(ashamanes_frenzy) < GCD() or Talent(elunes_guidance_talent) and { SpellCooldown(elunes_guidance) < GCD() and ComboPoints() == 0 or BuffPresent(elunes_guidance_buff) and ComboPoints() >= 4 } } Spell(regrowth)
 	#call_action_list,name=sbt_opener,if=talent.sabertooth.enabled&time<20
 	if Talent(sabertooth_talent) and TimeInCombat() < 20 FeralSbtOpenerMainActions()
 
 	unless Talent(sabertooth_talent) and TimeInCombat() < 20 and FeralSbtOpenerMainPostConditions()
 	{
+		#regrowth,if=equipped.ailuro_pouncers&talent.bloodtalons.enabled&buff.predatory_swiftness.stack>1&buff.bloodtalons.down
+		if HasEquippedItem(ailuro_pouncers) and Talent(bloodtalons_talent) and BuffStacks(predatory_swiftness_buff) > 1 and BuffExpires(bloodtalons_buff) Spell(regrowth)
 		#call_action_list,name=finisher
 		FeralFinisherMainActions()
 
@@ -625,12 +629,12 @@ AddFunction FeralDefaultShortCdActions
 			#tigers_fury,if=(!buff.clearcasting.react&energy.deficit>=60)|energy.deficit>=80|(t18_class_trinket&buff.berserk.up&buff.tigers_fury.down)
 			if not BuffPresent(clearcasting_buff) and EnergyDeficit() >= 60 or EnergyDeficit() >= 80 or HasTrinket(t18_class_trinket) and BuffPresent(berserk_cat_buff) and BuffExpires(tigers_fury_buff) Spell(tigers_fury)
 
-			unless target.DebuffPresent(rip_debuff) and target.DebuffRemaining(rip_debuff) < 3 and target.TimeToDie() > 3 and { target.HealthPercent() < 25 or Talent(sabertooth_talent) } and Spell(ferocious_bite)
+			unless target.DebuffPresent(rip_debuff) and target.DebuffRemaining(rip_debuff) < 3 and target.TimeToDie() > 3 and { target.HealthPercent() < 25 or Talent(sabertooth_talent) } and Spell(ferocious_bite) or Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and { ComboPoints() >= 5 or BuffRemaining(predatory_swiftness_buff) < 1.5 or Talent(bloodtalons_talent) and ComboPoints() == 2 and BuffExpires(bloodtalons_buff) and SpellCooldown(ashamanes_frenzy) < GCD() or Talent(elunes_guidance_talent) and { SpellCooldown(elunes_guidance) < GCD() and ComboPoints() == 0 or BuffPresent(elunes_guidance_buff) and ComboPoints() >= 4 } } and Spell(regrowth)
 			{
 				#call_action_list,name=sbt_opener,if=talent.sabertooth.enabled&time<20
 				if Talent(sabertooth_talent) and TimeInCombat() < 20 FeralSbtOpenerShortCdActions()
 
-				unless Talent(sabertooth_talent) and TimeInCombat() < 20 and FeralSbtOpenerShortCdPostConditions()
+				unless Talent(sabertooth_talent) and TimeInCombat() < 20 and FeralSbtOpenerShortCdPostConditions() or HasEquippedItem(ailuro_pouncers) and Talent(bloodtalons_talent) and BuffStacks(predatory_swiftness_buff) > 1 and BuffExpires(bloodtalons_buff) and Spell(regrowth)
 				{
 					#call_action_list,name=finisher
 					FeralFinisherShortCdActions()
@@ -648,7 +652,7 @@ AddFunction FeralDefaultShortCdActions
 
 AddFunction FeralDefaultShortCdPostConditions
 {
-	Spell(cat_form) or { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake) or target.DebuffPresent(rip_debuff) and target.DebuffRemaining(rip_debuff) < 3 and target.TimeToDie() > 3 and { target.HealthPercent() < 25 or Talent(sabertooth_talent) } and Spell(ferocious_bite) or Talent(sabertooth_talent) and TimeInCombat() < 20 and FeralSbtOpenerShortCdPostConditions() or FeralFinisherShortCdPostConditions() or FeralGeneratorShortCdPostConditions()
+	Spell(cat_form) or { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake) or target.DebuffPresent(rip_debuff) and target.DebuffRemaining(rip_debuff) < 3 and target.TimeToDie() > 3 and { target.HealthPercent() < 25 or Talent(sabertooth_talent) } and Spell(ferocious_bite) or Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and { ComboPoints() >= 5 or BuffRemaining(predatory_swiftness_buff) < 1.5 or Talent(bloodtalons_talent) and ComboPoints() == 2 and BuffExpires(bloodtalons_buff) and SpellCooldown(ashamanes_frenzy) < GCD() or Talent(elunes_guidance_talent) and { SpellCooldown(elunes_guidance) < GCD() and ComboPoints() == 0 or BuffPresent(elunes_guidance_buff) and ComboPoints() >= 4 } } and Spell(regrowth) or Talent(sabertooth_talent) and TimeInCombat() < 20 and FeralSbtOpenerShortCdPostConditions() or HasEquippedItem(ailuro_pouncers) and Talent(bloodtalons_talent) and BuffStacks(predatory_swiftness_buff) > 1 and BuffExpires(bloodtalons_buff) and Spell(regrowth) or FeralFinisherShortCdPostConditions() or FeralGeneratorShortCdPostConditions()
 }
 
 AddFunction FeralDefaultCdActions
@@ -674,12 +678,12 @@ AddFunction FeralDefaultCdActions
 			#incarnation,if=energy.time_to_max>1&energy>=35
 			if TimeToMaxEnergy() > 1 and Energy() >= 35 Spell(incarnation_king_of_the_jungle)
 
-			unless target.DebuffPresent(rip_debuff) and target.DebuffRemaining(rip_debuff) < 3 and target.TimeToDie() > 3 and { target.HealthPercent() < 25 or Talent(sabertooth_talent) } and Spell(ferocious_bite)
+			unless target.DebuffPresent(rip_debuff) and target.DebuffRemaining(rip_debuff) < 3 and target.TimeToDie() > 3 and { target.HealthPercent() < 25 or Talent(sabertooth_talent) } and Spell(ferocious_bite) or Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and { ComboPoints() >= 5 or BuffRemaining(predatory_swiftness_buff) < 1.5 or Talent(bloodtalons_talent) and ComboPoints() == 2 and BuffExpires(bloodtalons_buff) and SpellCooldown(ashamanes_frenzy) < GCD() or Talent(elunes_guidance_talent) and { SpellCooldown(elunes_guidance) < GCD() and ComboPoints() == 0 or BuffPresent(elunes_guidance_buff) and ComboPoints() >= 4 } } and Spell(regrowth)
 			{
 				#call_action_list,name=sbt_opener,if=talent.sabertooth.enabled&time<20
 				if Talent(sabertooth_talent) and TimeInCombat() < 20 FeralSbtOpenerCdActions()
 
-				unless Talent(sabertooth_talent) and TimeInCombat() < 20 and FeralSbtOpenerCdPostConditions()
+				unless Talent(sabertooth_talent) and TimeInCombat() < 20 and FeralSbtOpenerCdPostConditions() or HasEquippedItem(ailuro_pouncers) and Talent(bloodtalons_talent) and BuffStacks(predatory_swiftness_buff) > 1 and BuffExpires(bloodtalons_buff) and Spell(regrowth)
 				{
 					#call_action_list,name=finisher
 					FeralFinisherCdActions()
@@ -697,7 +701,7 @@ AddFunction FeralDefaultCdActions
 
 AddFunction FeralDefaultCdPostConditions
 {
-	Spell(cat_form) or 0 > 10 and Spell(displacer_beast) or { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake) or target.DebuffPresent(rip_debuff) and target.DebuffRemaining(rip_debuff) < 3 and target.TimeToDie() > 3 and { target.HealthPercent() < 25 or Talent(sabertooth_talent) } and Spell(ferocious_bite) or Talent(sabertooth_talent) and TimeInCombat() < 20 and FeralSbtOpenerCdPostConditions() or FeralFinisherCdPostConditions() or FeralGeneratorCdPostConditions()
+	Spell(cat_form) or 0 > 10 and Spell(displacer_beast) or { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake) or target.DebuffPresent(rip_debuff) and target.DebuffRemaining(rip_debuff) < 3 and target.TimeToDie() > 3 and { target.HealthPercent() < 25 or Talent(sabertooth_talent) } and Spell(ferocious_bite) or Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and { ComboPoints() >= 5 or BuffRemaining(predatory_swiftness_buff) < 1.5 or Talent(bloodtalons_talent) and ComboPoints() == 2 and BuffExpires(bloodtalons_buff) and SpellCooldown(ashamanes_frenzy) < GCD() or Talent(elunes_guidance_talent) and { SpellCooldown(elunes_guidance) < GCD() and ComboPoints() == 0 or BuffPresent(elunes_guidance_buff) and ComboPoints() >= 4 } } and Spell(regrowth) or Talent(sabertooth_talent) and TimeInCombat() < 20 and FeralSbtOpenerCdPostConditions() or HasEquippedItem(ailuro_pouncers) and Talent(bloodtalons_talent) and BuffStacks(predatory_swiftness_buff) > 1 and BuffExpires(bloodtalons_buff) and Spell(regrowth) or FeralFinisherCdPostConditions() or FeralGeneratorCdPostConditions()
 }
 
 ### actions.finisher
@@ -861,6 +865,8 @@ AddFunction FeralPrecombatMainActions
 	#food,type=nightborne_delicacy_platter
 	#augmentation,type=defiled
 	Spell(augmentation)
+	#regrowth,if=talent.bloodtalons.enabled
+	if Talent(bloodtalons_talent) Spell(regrowth)
 	#cat_form
 	Spell(cat_form)
 }
@@ -871,7 +877,7 @@ AddFunction FeralPrecombatMainPostConditions
 
 AddFunction FeralPrecombatShortCdActions
 {
-	unless Spell(augmentation) or Spell(cat_form)
+	unless Spell(augmentation) or Talent(bloodtalons_talent) and Spell(regrowth) or Spell(cat_form)
 	{
 		#prowl
 		Spell(prowl)
@@ -880,7 +886,7 @@ AddFunction FeralPrecombatShortCdActions
 
 AddFunction FeralPrecombatShortCdPostConditions
 {
-	Spell(augmentation) or Spell(cat_form)
+	Spell(augmentation) or Talent(bloodtalons_talent) and Spell(regrowth) or Spell(cat_form)
 }
 
 AddFunction FeralPrecombatCdActions
@@ -889,13 +895,15 @@ AddFunction FeralPrecombatCdActions
 
 AddFunction FeralPrecombatCdPostConditions
 {
-	Spell(augmentation) or Spell(cat_form)
+	Spell(augmentation) or Talent(bloodtalons_talent) and Spell(regrowth) or Spell(cat_form)
 }
 
 ### actions.sbt_opener
 
 AddFunction FeralSbtOpenerMainActions
 {
+	#regrowth,if=talent.bloodtalons.enabled&combo_points=5&!buff.bloodtalons.up&!dot.rip.ticking
+	if Talent(bloodtalons_talent) and ComboPoints() == 5 and not BuffPresent(bloodtalons_buff) and not target.DebuffPresent(rip_debuff) Spell(regrowth)
 }
 
 AddFunction FeralSbtOpenerMainPostConditions
@@ -904,12 +912,16 @@ AddFunction FeralSbtOpenerMainPostConditions
 
 AddFunction FeralSbtOpenerShortCdActions
 {
-	#tigers_fury,if=!dot.rip.ticking&combo_points=5
-	if not target.DebuffPresent(rip_debuff) and ComboPoints() == 5 Spell(tigers_fury)
+	unless Talent(bloodtalons_talent) and ComboPoints() == 5 and not BuffPresent(bloodtalons_buff) and not target.DebuffPresent(rip_debuff) and Spell(regrowth)
+	{
+		#tigers_fury,if=!dot.rip.ticking&combo_points=5
+		if not target.DebuffPresent(rip_debuff) and ComboPoints() == 5 Spell(tigers_fury)
+	}
 }
 
 AddFunction FeralSbtOpenerShortCdPostConditions
 {
+	Talent(bloodtalons_talent) and ComboPoints() == 5 and not BuffPresent(bloodtalons_buff) and not target.DebuffPresent(rip_debuff) and Spell(regrowth)
 }
 
 AddFunction FeralSbtOpenerCdActions
@@ -918,6 +930,7 @@ AddFunction FeralSbtOpenerCdActions
 
 AddFunction FeralSbtOpenerCdPostConditions
 {
+	Talent(bloodtalons_talent) and ComboPoints() == 5 and not BuffPresent(bloodtalons_buff) and not target.DebuffPresent(rip_debuff) and Spell(regrowth)
 }
 
 ### Feral icons.
@@ -979,6 +992,7 @@ AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
 }
 
 ### Required symbols
+# ailuro_pouncers
 # ashamanes_frenzy
 # augmentation
 # berserk_cat
@@ -1007,10 +1021,12 @@ AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
 # moment_of_clarity_talent
 # moonfire_cat
 # moonfire_cat_debuff
+# predatory_swiftness_buff
 # prowl
 # prowl_buff
 # rake
 # rake_debuff
+# regrowth
 # rip
 # rip_debuff
 # sabertooth_talent
