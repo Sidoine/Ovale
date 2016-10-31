@@ -18,6 +18,7 @@ AddCheckBox(opt_monk_bm_aoe L(AOE) default specialization=brewmaster)
 
 AddFunction BrewmasterDefaultShortCDActions
 {
+	if DebuffPresent(heavy_stagger_debuff) Spell(purifying_brew)
 	if StaggerRemaining() / MaxHealth() >0.4 Spell(purifying_brew)
 	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
 	if ((Charges(ironskin_brew) > 1 and not Talent(light_brewing_talent)) or Charges(ironskin_brew) > 2) and BuffExpires(ironskin_brew_buff 2) Spell(ironskin_brew)
