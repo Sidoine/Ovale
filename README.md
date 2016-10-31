@@ -10,7 +10,7 @@ Note that these are *work in progress*. More support is coming soon and there ma
 - Druid: Balance, Feral, Guardian
 - Hunter: Beast Mastery, Marksmanship, Survival
 - Mage: Arcane, Fire, Frost
-- Monk: Brewmaster, Mistweaver, Windwalker
+- Monk: Brewmaster, Windwalker
 - Paladin: Protection, Retribution
 - Priest: Shadow
 - Rogue: Assassination, Outlaw, Subtlety
