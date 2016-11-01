@@ -83,16 +83,20 @@ local function GetKeyBinding(slot)
 		MULTIACTIONBAR4BUTTON1..12	=> top left (37..48)
 	--]]
 	local name
-	if slot <= 24 or slot > 72 then
-		name = "ACTIONBUTTON" .. (((slot - 1)%12) + 1)
-	elseif slot <= 36 then
-		name = "MULTIACTIONBAR3BUTTON" .. (slot - 24)
-	elseif slot <= 48 then
-		name = "MULTIACTIONBAR4BUTTON" .. (slot - 36)
-	elseif slot <= 60 then
-		name = "MULTIACTIONBAR2BUTTON" .. (slot - 48)
+	if Bartender4 then
+		name = "CLICK BT4Button" .. slot .. ":LeftButton"
 	else
-		name = "MULTIACTIONBAR1BUTTON" .. (slot - 60)
+		if slot <= 24 or slot > 72 then
+			name = "ACTIONBUTTON" .. (((slot - 1)%12) + 1)
+		elseif slot <= 36 then
+			name = "MULTIACTIONBAR3BUTTON" .. (slot - 24)
+		elseif slot <= 48 then
+			name = "MULTIACTIONBAR4BUTTON" .. (slot - 36)
+		elseif slot <= 60 then
+			name = "MULTIACTIONBAR2BUTTON" .. (slot - 48)
+		else
+			name = "MULTIACTIONBAR1BUTTON" .. (slot - 60)
+		end
 	end
 	local key = name and API_GetBindingKey(name)
 	-- Shorten the keybinding names.
