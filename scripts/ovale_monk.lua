@@ -27,7 +27,7 @@ AddFunction BrewmasterDefaultShortCDActions
 AddFunction BrewmasterDefaultMainActions
 {
 	Spell(keg_smash)
-	if Energy() >= 65 Spell(tiger_palm)
+	if EnergyDeficit() <= 35 Spell(tiger_palm)
 	Spell(blackout_strike)
 	Spell(rushing_jade_wind)
 	if target.DebuffPresent(keg_smash_debuff) Spell(breath_of_fire)
@@ -44,7 +44,7 @@ AddFunction BrewmasterDefaultAoEActions
 	Spell(chi_wave)
 	if target.DebuffPresent(keg_smash_debuff) Spell(breath_of_fire)
 	Spell(rushing_jade_wind)
-	if Energy() >= 65 Spell(tiger_palm)
+	if EnergyDeficit() <= 35 Spell(tiger_palm)
 	Spell(blackout_strike)
 }
 
