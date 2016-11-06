@@ -4265,7 +4265,7 @@ do
 	-- if SpellCharges(savage_defense) >1
 	--     Spell(savage_defense)
 
-	local function SpellCharges(positionalParams, namedParams, state, atTime)
+	local function SpellMaxCharges(positionalParams, namedParams, state, atTime)
 		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
 		local charges, maxCharges, start, duration = state:GetSpellCharges(spellId, atTime)
 		if not maxCharges then return nil end
@@ -4273,7 +4273,7 @@ do
 		return Compare(maxCharges, comparator, limit)
 	end
 
-	OvaleCondition:RegisterCondition("spellmaxcharges", true, SpellCharges)
+	OvaleCondition:RegisterCondition("spellmaxcharges", true, SpellMaxCharges)
 end
 
 do
