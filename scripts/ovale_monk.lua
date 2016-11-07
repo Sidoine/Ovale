@@ -74,6 +74,8 @@ AddFunction BrewmasterDefaultCdActions
 	BrewmasterInterruptActions()
 	if CheckBoxOn(opt_legendary_ring_tank) Item(legendary_ring_bonus_armor usable=1)
 	Spell(fortifying_brew)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
 	Spell(zen_meditation)
 	Spell(dampen_harm)
 	Spell(diffuse_magic)
