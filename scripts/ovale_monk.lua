@@ -40,7 +40,7 @@ AddFunction BrewmasterDefaultShortCDActions
 			# use up those charges when black_ox_brew_talent comes off cd
 			if (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 2) Spell(ironskin_brew)
 			# keep up ironskin_brew_buff but keep 2 charges ready for purifying when light_brewing_talent or elusive_dance_talent
-			if (BuffExpires(ironskin_brew_buff 2) and ((not Talent(light_brewing_talent) and not Talent(elusive_dance_talent)) or SpellCharges(purifying_brew) > 1)) Spell(ironskin_brew)
+			if (BuffExpires(brew_stache_buff 1) and BuffExpires(ironskin_brew_buff 2) and ((not Talent(light_brewing_talent) and not Talent(elusive_dance_talent)) or SpellCharges(purifying_brew) > 1)) Spell(ironskin_brew)
 		}
 	}
 }
