@@ -13,19 +13,28 @@ Include(ovale_demonhunter_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=vengeance)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=vengeance)
 
+AddFunction VengeanceHealMe
+{
+	if(HealthPercent() < 70) Spell(fel_devastation)
+	if(HealthPercent() < 50) Spell(soul_cleave)
+}
 AddFunction VengeanceDefaultShortCDActions
 {
+	VengeanceHealMe()
 	if CheckBoxOn(opt_melee_range) and not target.InRange(shear) Texture(misc_arrowlup help=L(not_in_melee_range))
-	if (Pain() >= 20) and not BuffPresent(demon_spikes_buff) Spell(demon_spikes)
+	if not BuffPresent(demon_spikes_buff) Spell(demon_spikes)
 }
 
 AddFunction VengeanceDefaultMainActions
 {
 	Spell(soul_carver)
-	if (Pain() > 75 or (HealthPercent() < 50 and Pain() >= 30)) Spell(soul_cleave)
+	if (Pain() >= 80) Spell(soul_cleave)
 	Spell(immolation_aura)
 	Spell(felblade)
 	Spell(fel_eruption)
+	if (not target.DebuffPresent(frailty_debuff)) Spell(spirit_bomb)
+	#if (BuffPresent(blade_turning_buff)) Spell(shear)
+	if (Pain() >= 60) Spell(fracture)
 	Spell(sigil_of_flame)
 	Spell(shear)
 }
@@ -33,10 +42,11 @@ AddFunction VengeanceDefaultMainActions
 AddFunction VengeanceDefaultAoEActions
 {
 	Spell(soul_carver)
-	if (Pain() > 75 or (HealthPercent() < 50 and Pain() >= 30)) Spell(soul_cleave)
+	if (Pain() >= 80) Spell(soul_cleave)
 	Spell(immolation_aura)
+	if (not target.DebuffPresent(frailty_debuff)) Spell(spirit_bomb)
 	Spell(felblade)
-	if Talent(burning_alive_talent) Spell(fiery_brand)
+	#if (BuffPresent(blade_turning_buff)) Spell(shear)
 	Spell(sigil_of_flame)
 	Spell(fel_eruption)
 	Spell(shear)
@@ -55,9 +65,15 @@ AddFunction VengeanceInterruptActions
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(consume_magic) Spell(consume_magic)
-		if not target.Classification(worldboss) Spell(arcane_torrent_dh)
 		Spell(sigil_of_silence)
-		if not target.Classification(worldboss) Spell(sigil_of_misery)
+		if not target.Classification(worldboss) 
+		{
+			Spell(arcane_torrent_dh)
+			Spell(sigil_of_misery)
+			Spell(fel_eruption)
+			if target.CreatureType(demon) Spell(imprison)
+			if target.IsTargetingPlayer() Spell(empower_wards)
+		}
 	}
 }
 
