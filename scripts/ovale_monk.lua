@@ -29,16 +29,17 @@ AddFunction BrewmasterDefaultShortCDActions
 	{
 		# purify moderate stagger
 		if (DebuffPresent(moderate_stagger_debuff) and (not Talent(elusive_dance_talent) or not BuffPresent(elusive_dance_buff))) Spell(purifying_brew)
-		# always keep 1 charge
-		unless not (SpellCharges(ironskin_brew) > 1 or SpellCooldown(black_ox_brew) <= 2)
+		# always keep 1 charge unless black_ox_brew is coming off cd
+		unless not (SpellCharges(ironskin_brew) > 1 or SpellCooldown(black_ox_brew) <= 3)
 		{
 			# keep elusive dance up
 			if (Talent(elusive_dance_talent) and (BuffAmount(elusive_dance_buff value=3) < 10 and DebuffPresent(moderate_stagger_debuff))) Spell(purifying_brew)
 			if (Talent(elusive_dance_talent) and (BuffAmount(elusive_dance_buff value=3) <  5 and StaggerRemaining() > 0)) Spell(purifying_brew)
-			# never be at (almost) max charges 
-			if (SpellCharges(ironskin_brew) >= SpellMaxCharges(ironskin_brew)-1 and SpellChargeCooldown(ironskin_brew) < SpellCooldown(keg_smash)) Spell(ironskin_brew)
+			# never be at max charges 
+			if (SpellCharges(ironskin_brew) >= SpellMaxCharges(ironskin_brew)) Spell(ironskin_brew)
+			if (SpellCharges(ironskin_brew) >= SpellMaxCharges(ironskin_brew)-1 and (SpellChargeCooldown(ironskin_brew) <= 2 or SpellChargeCooldown(ironskin_brew) <= SpellCooldown(keg_smash))) Spell(ironskin_brew)
 			# use up those charges when black_ox_brew_talent comes off cd
-			if (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 2) Spell(ironskin_brew)
+			if (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3) Spell(ironskin_brew)
 			# keep up ironskin_brew_buff but keep 2 charges ready for purifying when light_brewing_talent or elusive_dance_talent
 			if (BuffExpires(brew_stache_buff 1) and BuffExpires(ironskin_brew_buff 2) and ((not Talent(light_brewing_talent) and not Talent(elusive_dance_talent)) or SpellCharges(purifying_brew) > 1)) Spell(ironskin_brew)
 		}
