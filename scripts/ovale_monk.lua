@@ -16,16 +16,23 @@ AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=brewmaster)
 AddCheckBox(opt_legendary_ring_tank ItemName(legendary_ring_bonus_armor) default specialization=brewmaster)
 AddCheckBox(opt_monk_bm_aoe L(AOE) default specialization=brewmaster)
 
+AddFunction BrewmasterHealMe
+{
+	if (SpellCount(expel_harm) >= 1 and HealthPercent() < 35) Spell(expel_harm)
+}
+
 AddFunction BrewmasterDefaultShortCDActions
 {
 	# always purify red stagger
 	if (DebuffPresent(heavy_stagger_debuff) and SpellCharges(purifying_brew) > 0) Spell(purifying_brew)
 	# use black_ox_brew when at 0 charges but delay it when a charge is about to come off cd
 	if ((SpellCharges(purifying_brew) == 0) and (SpellChargeCooldown(purifying_brew) > 2 or DebuffPresent(heavy_stagger_debuff))) Spell(black_ox_brew)
+	# heal me
+	BrewmasterHealMe()
 	# range check
 	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
 	
-	unless DebuffPresent(heavy_stagger_debuff)
+	unless DebuffPresent(heavy_stagger_debuff) or BrewmasterHealMe()
 	{
 		# purify moderate stagger
 		if (DebuffPresent(moderate_stagger_debuff) and (not Talent(elusive_dance_talent) or not BuffPresent(elusive_dance_buff))) Spell(purifying_brew)
@@ -58,6 +65,8 @@ AddFunction BrewmasterDefaultMainActions
 	Spell(exploding_keg)
 	Spell(chi_burst)
 	Spell(chi_wave)
+	# use expel_harm offensively but avoid overhealing
+	if (SpellCount(expel_harm) >= 3 and (SpellCount(expel_harm) * 7.5 * AttackPower() * 2.65) <= HealthMissing()) Spell(expel_harm)
 }
 
 AddFunction BrewmasterDefaultAoEActions
@@ -70,6 +79,8 @@ AddFunction BrewmasterDefaultAoEActions
 	Spell(rushing_jade_wind)
 	if EnergyDeficit() <= 35 Spell(tiger_palm)
 	Spell(blackout_strike)
+	# use expel_harm offensively but avoid overhealing
+	if (SpellCount(expel_harm) >= 3 and (SpellCount(expel_harm) * 7.5 * AttackPower() * 2.65) <= HealthMissing()) Spell(expel_harm)
 }
 
 AddFunction BrewmasterDefaultCdActions 
