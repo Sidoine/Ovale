@@ -2007,8 +2007,8 @@ do
 		return Compare(maxHealth, comparator, limit)
 	end
 
-	OvaleCondition:RegisterCondition("healthmissing", false, Health)
-	OvaleCondition:RegisterCondition("lifemissing", false, Health)
+	OvaleCondition:RegisterCondition("healthmissing", false, HealthMissing)
+	OvaleCondition:RegisterCondition("lifemissing", false, HealthMissing)
 
 	--- Get the current percent level of health of the target.
 	-- @name HealthPercent
