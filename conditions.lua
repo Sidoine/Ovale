@@ -4227,6 +4227,27 @@ do
 end
 
 do
+	--- Returns the number of times a spell can be cast. Generally used for spells whose casting is limited by the number of item reagents in the player's possession. .
+	-- @name SpellCount
+	-- @paramsig number or boolean
+	-- @param id The spell ID.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The number of times a spell can be cast.
+	-- @return A boolean value for the result of the comparison.
+	-- @usage
+	-- if SpellCount(expel_harm) > 1
+	--     Spell(expel_harm)
+	local function SpellCount(positionalParams, namedParams, state, atTime)
+		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local spellCount = OvaleSpellBook:GetSpellCount(spellId)
+		return Compare(spellCount, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("spellcount", true, SpellCount)
+end
+
+do
 	--- Test if the given spell is in the spellbook.
 	-- A spell is known if the player has learned the spell and it is in the spellbook.
 	-- @name SpellKnown

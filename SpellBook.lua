@@ -37,6 +37,7 @@ local API_GetFlyoutInfo = GetFlyoutInfo
 local API_GetFlyoutSlotInfo = GetFlyoutSlotInfo
 local API_GetSpellBookItemInfo = GetSpellBookItemInfo
 local API_GetSpellInfo = GetSpellInfo
+local API_GetSpellCount = GetSpellCount
 local API_GetSpellLink = GetSpellLink
 local API_GetSpellTabInfo = GetSpellTabInfo
 local API_GetSpellTexture = GetSpellTexture
@@ -316,6 +317,20 @@ function OvaleSpellBook:GetSpellInfo(spellId)
 		return API_GetSpellInfo(index, bookType)
 	else
 		return API_GetSpellInfo(spellId)
+	end
+end
+
+function OvaleSpellBook:GetSpellCount(spellId)
+	local index, bookType = self:GetSpellBookIndex(spellId)
+	if index and bookType then
+		local spellCount = API_GetSpellCount(index, bookType)
+		self:Debug("GetSpellCount: index=%s bookType=%s for spellId=%s ==> spellCount=%s", index, bookType, spellId, spellCount)
+		return spellCount
+	else
+		local spellName = OvaleSpellBook:GetSpellName(spellId)
+		local spellCount = API_GetSpellCount(spellName)
+		self:Debug("GetSpellCount: spellName=%s for spellId=%s ==> spellCount=%s", spellName, spellId, spellCount)
+		return spellCount
 	end
 end
 
