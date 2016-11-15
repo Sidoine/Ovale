@@ -350,6 +350,8 @@ Define(eye_of_tyr_debuff 209202)
 # Talents
 Define(bastion_of_light_talent 5)
 Define(righteous_protector_talent 19)
+Define(seraphim_talent 20)
+Define(crusaders_judgment_talent 6)
 Define(zeal_talent 5)
 
 # Non-default tags for OvaleSimulationCraft.
