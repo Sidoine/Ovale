@@ -19,6 +19,8 @@ AddCheckBox(opt_monk_bm_aoe L(AOE) default specialization=brewmaster)
 AddFunction BrewmasterHealMe
 {
 	if (SpellCount(expel_harm) >= 1 and HealthPercent() < 35) Spell(expel_harm)
+	if (HealthPercent() < 35) Spell(healing_elixir)
+	if (HealthPercent() < 70 and (SpellCharges(healing_elixir) == 2)) Spell(healing_elixir)
 }
 
 AddFunction BrewmasterDefaultShortCDActions
