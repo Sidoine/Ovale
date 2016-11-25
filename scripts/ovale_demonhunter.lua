@@ -22,7 +22,7 @@ AddFunction VengeanceDefaultShortCDActions
 {
 	VengeanceHealMe()
 	if CheckBoxOn(opt_melee_range) and not target.InRange(shear) Texture(misc_arrowlup help=L(not_in_melee_range))
-	if not BuffPresent(demon_spikes_buff) Spell(demon_spikes)
+	if (not BuffPresent(demon_spikes_buff) and IncomingDamage(1) > 0) Spell(demon_spikes)
 }
 
 AddFunction VengeanceDefaultMainActions
