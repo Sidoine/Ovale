@@ -131,6 +131,7 @@ Define(master_of_the_glaive_talent 16)
 Define(momentum_talent 13)
 Define(nemesis_talent 15)
 Define(prepared_talent 4)
+Define(quickened_sigils_talent 15)
 
 SpellInfo(fel_rush tag=shortcd)
 ]]

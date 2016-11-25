@@ -65,14 +65,18 @@ AddFunction VengeanceInterruptActions
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(consume_magic) Spell(consume_magic)
-		Spell(sigil_of_silence)
 		if not target.Classification(worldboss) 
 		{
-			Spell(arcane_torrent_dh)
-			Spell(sigil_of_misery)
-			Spell(fel_eruption)
-			if target.CreatureType(demon) Spell(imprison)
-			if target.IsTargetingPlayer() Spell(empower_wards)
+			unless PreviousSpell(sigil_of_silence) or PreviousSpell(sigil_of_misery) or PreviousSpell(sigil_of_chains)
+			{
+				if (target.RemainingCastTime() >= 2 or (target.RemainingCastTime() >= 1 and Talent(quickened_sigils_talent))) Spell(sigil_of_silence)
+				if target.Distance(less 8) Spell(arcane_torrent_dh)
+				Spell(sigil_of_misery)
+				Spell(fel_eruption)
+				if target.CreatureType(Demon) Spell(imprison)
+				if target.IsTargetingPlayer() Spell(empower_wards)
+				Spell(sigil_of_chains)
+			}
 		}
 	}
 }
