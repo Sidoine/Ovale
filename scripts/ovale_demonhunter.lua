@@ -57,6 +57,8 @@ AddFunction VengeanceDefaultCdActions
 	VengeanceInterruptActions()
 	if IncomingDamage(1.5 magic=1) > 0 Spell(empower_wards)
 	Spell(fiery_brand)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
 	Spell(metamorphosis_veng)
 }
 
