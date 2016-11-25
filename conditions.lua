@@ -1256,6 +1256,9 @@ do
 	-- @param magic Optional. By default, all damage is counted. Set "magic=1" to count only magic damage.
 	--     Defaults to magic=0.
 	--     Valid values: 0, 1
+	-- @param physical Optional. By default, all damage is counted. Set "physical=1" to count only physical damage.
+	--     Defaults to physical=0.
+	--     Valid values: 0, 1
 	-- @return The amount of damage taken in the previous interval.
 	-- @return A boolean value for the result of the comparison.
 	-- @see IncomingDamage
@@ -1272,6 +1275,8 @@ do
 			local total, totalMagic = OvaleDamageTaken:GetRecentDamage(interval)
 			if namedParams.magic == 1 then
 				value = totalMagic
+			elseif namedParams.physical == 1 then
+				value = total - totalMagic
 			else
 				value = total
 			end
