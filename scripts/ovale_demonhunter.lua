@@ -21,8 +21,14 @@ AddFunction VengeanceHealMe
 AddFunction VengeanceDefaultShortCDActions
 {
 	VengeanceHealMe()
-	if CheckBoxOn(opt_melee_range) and not target.InRange(shear) Texture(misc_arrowlup help=L(not_in_melee_range))
 	if (not BuffPresent(demon_spikes_buff) and IncomingDamage(3 physical=1) > 0) Spell(demon_spikes)
+	if CheckBoxOn(opt_melee_range) and not target.InRange(shear) 
+	{
+		if target.InRange(felblade) Spell(felblade)
+		if (target.Distance(less 30) or (target.Distance(less 40) and Talent(abyssal_strike_talent))) Spell(infernal_strike)
+		Spell(throw_glaive)
+		Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
 }
 
 AddFunction VengeanceDefaultMainActions
