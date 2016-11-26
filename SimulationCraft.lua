@@ -3029,7 +3029,7 @@ do
 		["runic_power.deficit"]	= "RunicPowerDeficit()",
 		["service_no_de"]		= "0", -- TODO manage service pet in WildImps.lua
 		["shadow_orb"]			= "ShadowOrbs()",
-		["sigil_placed"]		= "PreviousSpell(sigil_of_flame)",
+		["sigil_placed"]		= "SigilCharging(flame)",
 		["solar_max"]			= "TimeToEclipse(solar)",	-- XXX
 		["soul_shard"]			= "SoulShards()",
 		["soul_fragments"]		= "BuffStacks(soul_fragments)",
