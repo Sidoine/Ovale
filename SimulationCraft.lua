@@ -3758,6 +3758,9 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		code = target .. "IsEnraged()"
 	elseif operand == "debuff.casting.react" then
 		code = target .. "IsInterruptible()"
+	elseif operand == "debuff.casting.up" then
+		local t = (target == "" and "target.") or target
+		code = t.."IsInterruptible()"
 	elseif operand == "debuff.flying.down" then
 		code = target .. "True(debuff_flying_down)"
 	elseif operand == "distance" then
