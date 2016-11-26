@@ -13,19 +13,34 @@ Include(ovale_demonhunter_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=vengeance)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=vengeance)
 
+AddFunction VengeanceHealMe
+{
+	if(HealthPercent() < 70) Spell(fel_devastation)
+	if(HealthPercent() < 50) Spell(soul_cleave)
+}
 AddFunction VengeanceDefaultShortCDActions
 {
-	if CheckBoxOn(opt_melee_range) and not target.InRange(shear) Texture(misc_arrowlup help=L(not_in_melee_range))
-	if (Pain() >= 20) and not BuffPresent(demon_spikes_buff) Spell(demon_spikes)
+	VengeanceHealMe()
+	if (not BuffPresent(demon_spikes_buff) and IncomingDamage(3 physical=1) > 0) Spell(demon_spikes)
+	if CheckBoxOn(opt_melee_range) and not target.InRange(shear) 
+	{
+		if target.InRange(felblade) Spell(felblade)
+		if (target.Distance(less 30) or (target.Distance(less 40) and Talent(abyssal_strike_talent))) Spell(infernal_strike)
+		Spell(throw_glaive)
+		Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
 }
 
 AddFunction VengeanceDefaultMainActions
 {
 	Spell(soul_carver)
-	if (Pain() > 75 or (HealthPercent() < 50 and Pain() >= 30)) Spell(soul_cleave)
+	if (Pain() >= 80) Spell(soul_cleave)
 	Spell(immolation_aura)
 	Spell(felblade)
 	Spell(fel_eruption)
+	if (not target.DebuffPresent(frailty_debuff)) Spell(spirit_bomb)
+	#if (BuffPresent(blade_turning_buff)) Spell(shear)
+	if (Pain() >= 60) Spell(fracture)
 	Spell(sigil_of_flame)
 	Spell(shear)
 }
@@ -33,10 +48,11 @@ AddFunction VengeanceDefaultMainActions
 AddFunction VengeanceDefaultAoEActions
 {
 	Spell(soul_carver)
-	if (Pain() > 75 or (HealthPercent() < 50 and Pain() >= 30)) Spell(soul_cleave)
+	if (Pain() >= 80) Spell(soul_cleave)
 	Spell(immolation_aura)
+	if (not target.DebuffPresent(frailty_debuff)) Spell(spirit_bomb)
 	Spell(felblade)
-	if Talent(burning_alive_talent) Spell(fiery_brand)
+	#if (BuffPresent(blade_turning_buff)) Spell(shear)
 	Spell(sigil_of_flame)
 	Spell(fel_eruption)
 	Spell(shear)
@@ -47,6 +63,8 @@ AddFunction VengeanceDefaultCdActions
 	VengeanceInterruptActions()
 	if IncomingDamage(1.5 magic=1) > 0 Spell(empower_wards)
 	Spell(fiery_brand)
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
 	Spell(metamorphosis_veng)
 }
 
@@ -55,9 +73,19 @@ AddFunction VengeanceInterruptActions
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(consume_magic) Spell(consume_magic)
-		if not target.Classification(worldboss) Spell(arcane_torrent_dh)
-		Spell(sigil_of_silence)
-		if not target.Classification(worldboss) Spell(sigil_of_misery)
+		if not target.Classification(worldboss) 
+		{
+			unless PreviousSpell(sigil_of_silence) or PreviousSpell(sigil_of_misery) or PreviousSpell(sigil_of_chains)
+			{
+				if (target.RemainingCastTime() >= 2 or (target.RemainingCastTime() >= 1 and Talent(quickened_sigils_talent))) Spell(sigil_of_silence)
+				if target.Distance(less 8) Spell(arcane_torrent_dh)
+				Spell(sigil_of_misery)
+				Spell(fel_eruption)
+				if target.CreatureType(Demon) Spell(imprison)
+				if target.IsTargetingPlayer() Spell(empower_wards)
+				Spell(sigil_of_chains)
+			}
+		}
 	}
 }
 
