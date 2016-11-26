@@ -41,7 +41,11 @@ AddFunction VengeanceDefaultMainActions
 	if (not target.DebuffPresent(frailty_debuff)) Spell(spirit_bomb)
 	#if (BuffPresent(blade_turning_buff)) Spell(shear)
 	if (Pain() >= 60) Spell(fracture)
-	Spell(sigil_of_flame)
+	if (not SigilCharging(flame) and ((target.BuffExpires(sigil_of_flame_debuff 2) and not Talent(quickened_sigils_talent)) or target.BuffExpires(sigil_of_flame_debuff 1)))
+	{
+		if (Talent(flame_crash_talent) and (SpellCharges(infernal_strike) >= SpellMaxCharges(infernal_strike))) Spell(infernal_strike)
+		Spell(sigil_of_flame)
+	}
 	Spell(shear)
 }
 
@@ -53,7 +57,11 @@ AddFunction VengeanceDefaultAoEActions
 	if (not target.DebuffPresent(frailty_debuff)) Spell(spirit_bomb)
 	Spell(felblade)
 	#if (BuffPresent(blade_turning_buff)) Spell(shear)
-	Spell(sigil_of_flame)
+	if (not SigilCharging(flame) and ((target.BuffExpires(sigil_of_flame_debuff 2) and not Talent(quickened_sigils_talent)) or target.BuffExpires(sigil_of_flame_debuff 1)))
+	{
+		if (Talent(flame_crash_talent) and (SpellCharges(infernal_strike) >= SpellMaxCharges(infernal_strike))) Spell(infernal_strike)
+		Spell(sigil_of_flame)
+	}
 	Spell(fel_eruption)
 	Spell(shear)
 }
@@ -75,7 +83,7 @@ AddFunction VengeanceInterruptActions
 		if target.InRange(consume_magic) Spell(consume_magic)
 		if not target.Classification(worldboss) 
 		{
-			unless PreviousSpell(sigil_of_silence) or PreviousSpell(sigil_of_misery) or PreviousSpell(sigil_of_chains)
+			unless SigilCharging(silence misery chains)
 			{
 				if (target.RemainingCastTime() >= 2 or (target.RemainingCastTime() >= 1 and Talent(quickened_sigils_talent))) Spell(sigil_of_silence)
 				if target.Distance(less 8) Spell(arcane_torrent_dh)
