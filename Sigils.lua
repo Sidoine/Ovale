@@ -23,6 +23,9 @@ function OvaleSigil:OnInitialize()
 	OvaleState = Ovale.OvaleState
 	
 	activated_sigils["flame"] = {}
+	activated_sigils["silence"] = {}
+	activated_sigils["misery"] = {}
+	activated_sigils["chains"] = {}
 end
 
 function OvaleSigil:OnEnable()
