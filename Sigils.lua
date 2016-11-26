@@ -69,9 +69,9 @@ function OvaleSigil:UNIT_SPELLCAST_SUCCEEDED(event, unitId, spellName, spellRank
 		local tal = s.talent or nil;
 		if (tal == nil or OvaleSpellBook:GetTalentPoints(tal) > 0) then
 			if(OvaleSpellBook:GetTalentPoints(QUICKENED_SIGILS_TALENT) > 0) then
-				tinsert(activated_sigils[t], API_GetTime()+2)
+				tinsert(activated_sigils[t], API_GetTime()+2.5)
 			else
-				tinsert(activated_sigils[t], API_GetTime()+3)
+				tinsert(activated_sigils[t], API_GetTime()+3.5)
 			end
 		end
 	end
