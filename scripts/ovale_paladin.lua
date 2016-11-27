@@ -114,6 +114,7 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_paladin_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=protection)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=protection)
 AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=protection)
 
@@ -131,6 +132,23 @@ AddFunction ProtectionUseItemActions
 AddFunction ProtectionGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
+}
+
+AddFunction ProtectionInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(rebuke) Spell(rebuke)
+		if not target.Classification(worldboss)
+		{
+			if target.InRange(fist_of_justice) Spell(fist_of_justice)
+			if target.InRange(hammer_of_justice) Spell(hammer_of_justice)
+			Spell(blinding_light)
+			Spell(arcane_torrent_holy)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
 }
 
 ### actions.default
@@ -167,14 +185,8 @@ AddFunction ProtectionDefaultCdActions
 	Spell(blood_fury_apsp)
 	#berserking
 	Spell(berserking)
-	#arcane_torrent
-	Spell(arcane_torrent_holy)
-	#blood_fury
-	Spell(blood_fury_apsp)
-	#berserking
-	Spell(berserking)
-	#arcane_torrent
-	Spell(arcane_torrent_holy)
+	#rebuke
+	ProtectionInterruptActions()
 	#call_action_list,name=prot
 	ProtectionProtCdActions()
 }
@@ -462,9 +474,11 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 # eye_of_tyr
 # eye_of_tyr_debuff
 # final_stand_talent
+# fist_of_justice
 # grand_crusader_buff
 # guardian_of_ancient_kings
 # guardian_of_ancient_kings_buff
+# hammer_of_justice
 # hammer_of_the_righteous
 # hand_of_the_protector
 # judgment
@@ -473,6 +487,7 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 # light_of_the_protector
 # potion_buff
 # potion_strength_buff
+# quaking_palm
 # rebuke
 # righteous_protector_talent
 # seraphim
@@ -480,6 +495,7 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 # seraphim_talent
 # shield_of_the_righteous
 # stoneform
+# war_stomp
 ]]
 	OvaleScripts:RegisterScript("PALADIN", "protection", name, desc, code, "script")
 end
