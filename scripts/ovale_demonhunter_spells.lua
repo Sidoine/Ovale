@@ -124,7 +124,7 @@ Define(anguish_of_the_deceiver 201473)
 Define(demon_speed 201469)
 Define(fiery_demise 212817)
 Define(fury_of_the_illidari 201467)
-	SpellInfo(fury_of_the_ilidari cd=60)
+	SpellInfo(fury_of_the_ilidari cd=60 tag=main)
 
 # Talents
 Define(abyssal_strike_talent 1)
