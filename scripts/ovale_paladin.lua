@@ -139,14 +139,14 @@ AddFunction ProtectionInterruptActions
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(rebuke) Spell(rebuke)
+		if target.InRange(avengers_shield) Spell(avengers_shield)
 		if not target.Classification(worldboss)
 		{
-			if target.InRange(fist_of_justice) Spell(fist_of_justice)
 			if target.InRange(hammer_of_justice) Spell(hammer_of_justice)
-			Spell(blinding_light)
-			Spell(arcane_torrent_holy)
+			if target.Distance(less 10) Spell(blinding_light)
+			if target.Distance(less 8) Spell(arcane_torrent_holy)
+			if target.Distance(less 8) Spell(war_stomp)
 			if target.InRange(quaking_palm) Spell(quaking_palm)
-			Spell(war_stomp)
 		}
 	}
 }
@@ -473,7 +473,6 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 # eye_of_tyr
 # eye_of_tyr_debuff
 # final_stand_talent
-# fist_of_justice
 # grand_crusader_buff
 # guardian_of_ancient_kings
 # guardian_of_ancient_kings_buff
@@ -532,14 +531,14 @@ AddFunction RetributionInterruptActions
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 	{
 		if target.InRange(rebuke) Spell(rebuke)
+		if target.InRange(avengers_shield) Spell(avengers_shield)
 		if not target.Classification(worldboss)
 		{
-			if target.InRange(fist_of_justice) Spell(fist_of_justice)
 			if target.InRange(hammer_of_justice) Spell(hammer_of_justice)
-			Spell(blinding_light)
-			Spell(arcane_torrent_holy)
+			if target.Distance(less 10) Spell(blinding_light)
+			if target.Distance(less 8) Spell(arcane_torrent_holy)
+			if target.Distance(less 8) Spell(war_stomp)
 			if target.InRange(quaking_palm) Spell(quaking_palm)
-			Spell(war_stomp)
 		}
 	}
 }
@@ -777,7 +776,6 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 # divine_purpose_buff
 # divine_storm
 # execution_sentence
-# fist_of_justice
 # greater_blessing_of_might
 # greater_judgment_talent
 # hammer_of_justice
