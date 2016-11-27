@@ -3168,8 +3168,10 @@ EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
 		end
 
 		local code
-		if property == "duration" or property == "ready" then
+		if property == "duration" then
 			code = format("%sCooldownDuration(%s)", prefix, name)
+		elseif property == "ready" then
+			code = format("%sCooldownDuration(%s) == 0", prefix, name)
 		elseif property == "remains" then
 			if parseNode.asType == "boolean" then
 				code = format("%sCooldown(%s) > 0", prefix, name)
