@@ -101,8 +101,8 @@ end
 -- ANY CHANGES MADE BELOW THIS POINT WILL BE LOST.
 
 do
-	local name = "paladin_protection_t19p"
-	local desc = "[7.0] Paladin_Protection_T19P"
+	local name = "simulationcraft_paladin_protection_t19p"
+	local desc = "[7.0] SimulationCraft: Paladin_Protection_T19P"
 	local code = [[
 # Based on SimulationCraft profile "Paladin_Protection_T19P".
 #	class=paladin
