@@ -155,6 +155,7 @@ AddFunction ProtectionInterruptActions
 
 AddFunction ProtectionDefaultMainActions
 {
+	#arcane_torrent
 	#call_action_list,name=prot
 	ProtectionProtMainActions()
 }
@@ -168,6 +169,7 @@ AddFunction ProtectionDefaultShortCdActions
 {
 	#auto_attack
 	ProtectionGetInMeleeRange()
+	#arcane_torrent
 	#call_action_list,name=prot
 	ProtectionProtShortCdActions()
 }
@@ -187,6 +189,7 @@ AddFunction ProtectionDefaultCdActions
 	Spell(berserking)
 	#rebuke
 	ProtectionInterruptActions()
+	#arcane_torrent
 	#call_action_list,name=prot
 	ProtectionProtCdActions()
 }
@@ -224,8 +227,6 @@ AddFunction ProtectionMaxDpsCdActions
 	Spell(blood_fury_apsp)
 	#berserking
 	Spell(berserking)
-	#arcane_torrent
-	Spell(arcane_torrent_holy)
 }
 
 AddFunction ProtectionMaxDpsCdPostConditions
@@ -260,8 +261,6 @@ AddFunction ProtectionMaxSurvivalCdActions
 	Spell(blood_fury_apsp)
 	#berserking
 	Spell(berserking)
-	#arcane_torrent
-	Spell(arcane_torrent_holy)
 }
 
 AddFunction ProtectionMaxSurvivalCdPostConditions

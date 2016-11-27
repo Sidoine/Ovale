@@ -28,6 +28,7 @@ actions+=/use_item,name=shivermaws_jawbone
 actions+=/blood_fury
 actions+=/berserking
 actions+=/rebuke
+actions+=/arcane_torrent
 actions+=/call_action_list,name=prot
 
 # This is a high-DPS (but low-survivability) configuration.

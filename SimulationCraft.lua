@@ -1883,6 +1883,9 @@ EmitAction = function(parseNode, nodeList, annotation)
 			annotation[action] = class
 			annotation.interrupt = class
 			isSpellAction = false
+		elseif class == "PALADIN" and specialization == "protection" and action == "arcane_torrent_holy" then
+			-- skip
+			isSpellAction = false
 		elseif class == "PALADIN" and action == "righteous_fury" then
 			-- Only suggest Righteous Fury if the check is toggled on.
 			conditionCode = "CheckBoxOn(opt_righteous_fury_check)"
