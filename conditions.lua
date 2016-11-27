@@ -2854,21 +2854,6 @@ do
 		return Power("chi", positionalParams, namedParams, state, atTime)
 	end
 
-	--- Get the current amount of demonic fury for demonology warlocks.
-	-- @name DemonicFury
-	-- @paramsig number or boolean
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @return The amount of demonic fury.
-	-- @return A boolean value for the result of the comparison.
-	-- @usage
-	-- if DemonicFury() >=1000 Spell(metamorphosis)
-	-- if DemonicFury(more 999) Spell(metamorphosis)
-
-	local function DemonicFury(positionalParams, namedParams, state, atTime)
-		return Power("demonicfury", positionalParams, namedParams, state, atTime)
-	end
-
 	--- Get the current amount of energy for feral druids, non-mistweaver monks, and rogues.
 	-- @name Energy
 	-- @paramsig number or boolean
@@ -2902,7 +2887,7 @@ do
 	local function Fury(positionalParams, namedParams, state, atTime)
 		return Power("fury", positionalParams, namedParams, state, atTime)
 	end
-
+	
 	--- Get the current amount of holy power for a paladin.
 	-- @name HolyPower
 	-- @paramsig number or boolean
@@ -2934,7 +2919,6 @@ do
 	-- @return A boolean value for the result of the comparison.
 	-- @usage
 	-- if {MaxMana() - Mana()} > 12500 Item(mana_gem)
-
 	local function Mana(positionalParams, namedParams, state, atTime)
 		return Power("mana", positionalParams, namedParams, state, atTime)
 	end
@@ -2946,7 +2930,7 @@ do
 	local function Pain(positionalParams, namedParams, state, atTime)
 		return Power("pain", positionalParams, namedParams, state, atTime)
 	end
-
+	
 	--- Get the current amount of rage for guardian druids and warriors.
 	-- @name Rage
 	-- @paramsig number or boolean
@@ -3015,7 +2999,6 @@ do
 	OvaleCondition:RegisterCondition("arcanecharges", false, ArcaneCharges)
 	OvaleCondition:RegisterCondition("astralpower", false, AstralPower)
 	OvaleCondition:RegisterCondition("chi", false, Chi)
-	OvaleCondition:RegisterCondition("demonicfury", false, DemonicFury)
 	OvaleCondition:RegisterCondition("energy", false, Energy)
 	OvaleCondition:RegisterCondition("focus", false, Focus)
 	OvaleCondition:RegisterCondition("fury", false, Fury)
@@ -3081,21 +3064,6 @@ do
 		return PowerDeficit("combopoints", positionalParams, namedParams, state, atTime)
 	end
 
-	--- Get the number of lacking resource points for a full demonic fury bar, between 0 and maximum demonic fury, of the target.
-	-- @name DemonicFuryDeficit
-	-- @paramsig number or boolean
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=player.
-	--     Valid values: player, target, focus, pet.
-	-- @return The current demonic fury deficit.
-	-- @return A boolean value for the result of the comparison.
-
-	local function DemonicFuryDeficit(positionalParams, namedParams, state, atTime)
-		return PowerDeficit("demonicfury", positionalParams, namedParams, state, atTime)
-	end
-
 	--- Get the number of lacking resource points for a full energy bar, between 0 and maximum energy, of the target.
 	-- @name EnergyDeficit
 	-- @paramsig number or boolean
@@ -3127,6 +3095,10 @@ do
 
 	local function FocusDeficit(positionalParams, namedParams, state, atTime)
 		return PowerDeficit("focus", positionalParams, namedParams, state, atTime)
+	end
+	
+	local function FuryDeficit(positionalParams, namedParams, state, atTime)
+		return PowerDeficit("fury", positionalParams, namedParams, state, atTime)
 	end
 
 	--- Get the number of lacking resource points for full holy power, between 0 and maximum holy power, of the target.
@@ -3226,9 +3198,9 @@ do
 	OvaleCondition:RegisterCondition("astralpowerdeficit", false, AstralPowerDeficit)
 	OvaleCondition:RegisterCondition("chideficit", false, ChiDeficit)
 	OvaleCondition:RegisterCondition("combopointsdeficit", false, ComboPointsDeficit)
-	OvaleCondition:RegisterCondition("demonicfurydeficit", false, DemonicFuryDeficit)
 	OvaleCondition:RegisterCondition("energydeficit", false, EnergyDeficit)
 	OvaleCondition:RegisterCondition("focusdeficit", false, FocusDeficit)
+	OvaleCondition:RegisterCondition("furydeficit", false, FuryDeficit)
 	OvaleCondition:RegisterCondition("holypowerdeficit", false, HolyPowerDeficit)
 	OvaleCondition:RegisterCondition("manadeficit", false, ManaDeficit)
 	OvaleCondition:RegisterCondition("ragedeficit", false, RageDeficit)
@@ -3291,21 +3263,6 @@ do
 		return MaxPower("combopoints", positionalParams, namedParams, state, atTime)
 	end
 	
-	--- Get the maximum amount of Demonic Fury of the target.
-	-- @name MaxDemonicFury
-	-- @paramsig number or boolean
-	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	-- @param number Optional. The number to compare against.
-	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	--     Defaults to target=player.
-	--     Valid values: player, target, focus, pet.
-	-- @return The maximum value.
-	-- @return A boolean value for the result of the comparison.
-
-	local function MaxDemonicFury(positionalParams, namedParams, state, atTime)
-		return MaxPower("demonicfury", positionalParams, namedParams, state, atTime)
-	end
-
 	--- Get the maximum amount of energy of the target.
 	-- @name MaxEnergy
 	-- @paramsig number or boolean
@@ -3334,6 +3291,10 @@ do
 
 	local function MaxFocus(positionalParams, namedParams, state, atTime)
 		return MaxPower("focus", positionalParams, namedParams, state, atTime)
+	end
+	
+	local function MaxFury(positionalParams, namedParams, state, atTime)
+		return MaxPower("fury", positionalParams, namedParams, state, atTime)
 	end
 
 	--- Get the maximum amount of Holy Power of the target.
@@ -3431,9 +3392,9 @@ do
 	OvaleCondition:RegisterCondition("maxalternatepower", false, MaxAlternatePower)
 	OvaleCondition:RegisterCondition("maxchi", false, MaxChi)
 	OvaleCondition:RegisterCondition("maxcombopoints", false, MaxComboPoints)
-	OvaleCondition:RegisterCondition("maxdemonicfury", false, MaxDemonicFury)
 	OvaleCondition:RegisterCondition("maxenergy", false, MaxEnergy)
 	OvaleCondition:RegisterCondition("maxfocus", false, MaxFocus)
+	OvaleCondition:RegisterCondition("maxfury", false, MaxFury)
 	OvaleCondition:RegisterCondition("maxholypower", false, MaxHolyPower)
 	OvaleCondition:RegisterCondition("maxmana", false, MaxMana)
 	OvaleCondition:RegisterCondition("maxrage", false, MaxRage)
@@ -3490,7 +3451,7 @@ do
 	local function FocusCost(positionalParams, namedParams, state, atTime)
 		return PowerCost("focus", positionalParams, namedParams, state, atTime)
 	end
-
+	
 	--- Get the amount of mana required to cast the given spell.
 	-- This returns zero for spells that use either mana or another resource based on stance/specialization, e.g., Monk's Jab.
 	-- @name ManaCost
