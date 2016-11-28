@@ -4487,6 +4487,31 @@ do
 end
 
 do
+	--- Get the number of points spent in a talent (0 or 1)
+	-- @name NotTalentPoints
+	-- @paramsig number or boolean
+	-- @param talent Talent to inspect.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The number of talent points.
+	-- @return A boolean value for the result of the comparison.
+	-- @usage
+	-- if TalentPoints(blood_tap_talent) Spell(blood_tap)
+
+	local function NotTalentPoints(positionalParams, namedParams, state, atTime)
+		local talent, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local value = OvaleSpellBook:GetTalentPoints(talent)
+		if value == 1 then 
+			return TestValue(0, INFINITY, 0, 0, 0, comparator, limit) --0
+		else 
+			return TestValue(0, INFINITY, 1, 0, 0, comparator, limit) --1
+		end
+	end
+
+	OvaleCondition:RegisterCondition("nottalentpoints", false, NotTalentPoints)
+end
+
+do
 	--- Test if the player is the in-game target of the target.
 	-- @name TargetIsPlayer
 	-- @paramsig boolean
