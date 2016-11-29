@@ -3029,7 +3029,7 @@ do
 		["runic_power.deficit"]	= "RunicPowerDeficit()",
 		["service_no_de"]		= "0", -- TODO manage service pet in WildImps.lua
 		["shadow_orb"]			= "ShadowOrbs()",
-		["sigil_placed"]		= "PreviousSpell(sigil_of_flame)",
+		["sigil_placed"]		= "SigilCharging(flame)",
 		["solar_max"]			= "TimeToEclipse(solar)",	-- XXX
 		["soul_shard"]			= "SoulShards()",
 		["soul_fragments"]		= "BuffStacks(soul_fragments)",
@@ -3758,6 +3758,9 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		code = target .. "IsEnraged()"
 	elseif operand == "debuff.casting.react" then
 		code = target .. "IsInterruptible()"
+	elseif operand == "debuff.casting.up" then
+		local t = (target == "" and "target.") or target
+		code = t.."IsInterruptible()"
 	elseif operand == "debuff.flying.down" then
 		code = target .. "True(debuff_flying_down)"
 	elseif operand == "distance" then

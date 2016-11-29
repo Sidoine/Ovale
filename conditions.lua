@@ -5153,3 +5153,22 @@ do
 
 	OvaleCondition:RegisterCondition("weaponenchantexpires", false, WeaponEnchantExpires)
 end
+
+do
+	--- Test if a sigil is charging
+	-- @name SigilCharging
+	-- @paramsig boolean
+	-- @param flame, silence, misery, chains
+	-- @return A boolean value.
+	-- @usage
+	-- if not SigilCharging(flame) Spell(sigil_of_flame)
+	local function SigilCharging(positionalParams, namedParams, state, atTime)
+		local charging = false
+		for _,v in ipairs(positionalParams) do
+			charging = charging or state:IsSigilCharging(v, atTime) 
+		end
+		return TestBoolean(charging, "yes")
+	end
+	
+	OvaleCondition:RegisterCondition("sigilcharging", false, SigilCharging)
+end
