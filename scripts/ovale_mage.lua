@@ -1162,6 +1162,8 @@ AddFunction FrostDefaultMainActions
 		if target.DebuffPresent(winters_chill_debuff) Spell(ice_nova)
 		#frostbolt,if=prev_off_gcd.water_jet
 		if PreviousOffGCDSpell(water_elemental_water_jet) Spell(frostbolt)
+		#ray_of_frost,if=buff.icy_veins.up|(cooldown.icy_veins.remains>action.ray_of_frost.cooldown&buff.rune_of_power.down)
+		if BuffPresent(icy_veins_buff) or SpellCooldown(icy_veins) > SpellCooldown(ray_of_frost) and BuffExpires(rune_of_power_buff) Spell(ray_of_frost)
 		#flurry,if=buff.brain_freeze.react&buff.fingers_of_frost.react=0&prev_gcd.frostbolt
 		if BuffPresent(brain_freeze_buff) and BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(frostbolt) Spell(flurry)
 		#glacial_spike
@@ -1193,10 +1195,8 @@ AddFunction FrostDefaultShortCdActions
 		{
 			#water_jet,if=prev_gcd.frostbolt&buff.fingers_of_frost.stack<(2+artifact.icy_hand.enabled)&buff.brain_freeze.react=0
 			if PreviousGCDSpell(frostbolt) and BuffStacks(fingers_of_frost_buff) < 2 + HasArtifactTrait(icy_hand) and BuffStacks(brain_freeze_buff) == 0 Spell(water_elemental_water_jet)
-			#ray_of_frost,if=buff.icy_veins.up|(cooldown.icy_veins.remains>action.ray_of_frost.cooldown&buff.rune_of_power.down)
-			if BuffPresent(icy_veins_buff) or SpellCooldown(icy_veins) > SpellCooldown(ray_of_frost) and BuffExpires(rune_of_power_buff) Spell(ray_of_frost)
 
-			unless BuffPresent(brain_freeze_buff) and BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(frostbolt) and Spell(flurry) or Spell(glacial_spike)
+			unless { BuffPresent(icy_veins_buff) or SpellCooldown(icy_veins) > SpellCooldown(ray_of_frost) and BuffExpires(rune_of_power_buff) } and Spell(ray_of_frost) or BuffPresent(brain_freeze_buff) and BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(frostbolt) and Spell(flurry) or Spell(glacial_spike)
 			{
 				#frozen_touch,if=buff.fingers_of_frost.stack<=(0+artifact.icy_hand.enabled)
 				if BuffStacks(fingers_of_frost_buff) <= 0 + HasArtifactTrait(icy_hand) Spell(frozen_touch)
@@ -1227,7 +1227,7 @@ AddFunction FrostDefaultShortCdActions
 
 AddFunction FrostDefaultShortCdPostConditions
 {
-	BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(flurry) and Spell(ice_lance) or FrostCooldownsShortCdPostConditions() or BuffPresent(potion_of_deadly_grace_buff) and not PreviousOffGCDSpell(water_elemental_water_jet) and Spell(blizzard) or target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or BuffPresent(brain_freeze_buff) and BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(frostbolt) and Spell(flurry) or Spell(glacial_spike) or { BuffStacks(fingers_of_frost_buff) > 0 and SpellCooldown(icy_veins) > 10 or BuffStacks(fingers_of_frost_buff) > 2 } and Spell(ice_lance) or Spell(ice_nova) or Talent(artic_gale_talent) and Spell(blizzard) or Spell(frostbolt)
+	BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(flurry) and Spell(ice_lance) or FrostCooldownsShortCdPostConditions() or BuffPresent(potion_of_deadly_grace_buff) and not PreviousOffGCDSpell(water_elemental_water_jet) and Spell(blizzard) or target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or { BuffPresent(icy_veins_buff) or SpellCooldown(icy_veins) > SpellCooldown(ray_of_frost) and BuffExpires(rune_of_power_buff) } and Spell(ray_of_frost) or BuffPresent(brain_freeze_buff) and BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(frostbolt) and Spell(flurry) or Spell(glacial_spike) or { BuffStacks(fingers_of_frost_buff) > 0 and SpellCooldown(icy_veins) > 10 or BuffStacks(fingers_of_frost_buff) > 2 } and Spell(ice_lance) or Spell(ice_nova) or Talent(artic_gale_talent) and Spell(blizzard) or Spell(frostbolt)
 }
 
 AddFunction FrostDefaultCdActions

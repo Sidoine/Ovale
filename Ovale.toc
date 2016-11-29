@@ -66,6 +66,7 @@ HonorAmongThieves.lua
 PassiveAura.lua
 Recount.lua
 ShadowWordDeath.lua
+Sigils.lua
 Skada.lua
 SpellDamage.lua
 SteadyFocus.lua

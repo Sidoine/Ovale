@@ -83,6 +83,7 @@ local PARAMETER_KEYWORD = {
 	["checkbox"] = true,
 	["help"] = true,
 	["if_buff"] = true,
+	["if_equipped"] = true,
 	["if_spell"] = true,
 	["if_stance"] = true,
 	["if_target_debuff"] = true,

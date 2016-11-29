@@ -1256,6 +1256,9 @@ do
 	-- @param magic Optional. By default, all damage is counted. Set "magic=1" to count only magic damage.
 	--     Defaults to magic=0.
 	--     Valid values: 0, 1
+	-- @param physical Optional. By default, all damage is counted. Set "physical=1" to count only physical damage.
+	--     Defaults to physical=0.
+	--     Valid values: 0, 1
 	-- @return The amount of damage taken in the previous interval.
 	-- @return A boolean value for the result of the comparison.
 	-- @see IncomingDamage
@@ -1272,6 +1275,8 @@ do
 			local total, totalMagic = OvaleDamageTaken:GetRecentDamage(interval)
 			if namedParams.magic == 1 then
 				value = totalMagic
+			elseif namedParams.physical == 1 then
+				value = total - totalMagic
 			else
 				value = total
 			end
@@ -2007,8 +2012,8 @@ do
 		return Compare(maxHealth, comparator, limit)
 	end
 
-	OvaleCondition:RegisterCondition("healthmissing", false, Health)
-	OvaleCondition:RegisterCondition("lifemissing", false, Health)
+	OvaleCondition:RegisterCondition("healthmissing", false, HealthMissing)
+	OvaleCondition:RegisterCondition("lifemissing", false, HealthMissing)
 
 	--- Get the current percent level of health of the target.
 	-- @name HealthPercent
@@ -5147,4 +5152,23 @@ do
 	end
 
 	OvaleCondition:RegisterCondition("weaponenchantexpires", false, WeaponEnchantExpires)
+end
+
+do
+	--- Test if a sigil is charging
+	-- @name SigilCharging
+	-- @paramsig boolean
+	-- @param flame, silence, misery, chains
+	-- @return A boolean value.
+	-- @usage
+	-- if not SigilCharging(flame) Spell(sigil_of_flame)
+	local function SigilCharging(positionalParams, namedParams, state, atTime)
+		local charging = false
+		for _,v in ipairs(positionalParams) do
+			charging = charging or state:IsSigilCharging(v, atTime) 
+		end
+		return TestBoolean(charging, "yes")
+	end
+	
+	OvaleCondition:RegisterCondition("sigilcharging", false, SigilCharging)
 end
