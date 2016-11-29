@@ -121,8 +121,15 @@ local function TestConditionTalent(value)
 	return (required and hasTalent) or (not required and not hasTalent)
 end
 
+local function TestConditionEquipped(value)
+	local item, required = RequireValue(value)
+	local hasItemEquipped = OvaleEquipment:HasEquippedItem(item)
+	return (required and hasItemEquipped) or (not required and not hasItemEquipped)
+end
+
 local TEST_CONDITION_DISPATCH = {
 	if_spell = TestConditionSpell,
+	if_equipped = TestConditionEquipped,
 	if_stance = TestConditionStance,
 	level = TestConditionLevel,
 	maxLevel = TestConditionMaxLevel,
