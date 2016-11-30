@@ -211,6 +211,8 @@ AddFunction ProtectionProtMainActions
 	Spell(avengers_shield)
 	#consecration
 	Spell(consecration)
+	#blinding_light
+	Spell(blinding_light)
 	#hammer_of_the_righteous
 	Spell(hammer_of_the_righteous)
 }
@@ -249,7 +251,7 @@ AddFunction ProtectionProtShortCdActions
 
 AddFunction ProtectionProtShortCdPostConditions
 {
-	Spell(judgment) or Talent(crusaders_judgment_talent) and BuffPresent(grand_crusader_buff) and Spell(avengers_shield) or Spell(blessed_hammer) or Spell(avengers_shield) or Spell(consecration) or Spell(hammer_of_the_righteous)
+	Spell(judgment) or Talent(crusaders_judgment_talent) and BuffPresent(grand_crusader_buff) and Spell(avengers_shield) or Spell(blessed_hammer) or Spell(avengers_shield) or Spell(consecration) or Spell(blinding_light) or Spell(hammer_of_the_righteous)
 }
 
 AddFunction ProtectionProtCdActions
@@ -278,18 +280,12 @@ AddFunction ProtectionProtCdActions
 		if not Talent(seraphim_talent) Spell(avenging_wrath_melee)
 		#avenging_wrath,if=talent.seraphim.enabled&buff.seraphim.up
 		if Talent(seraphim_talent) and BuffPresent(seraphim_buff) Spell(avenging_wrath_melee)
-
-		unless Spell(judgment) or Talent(crusaders_judgment_talent) and BuffPresent(grand_crusader_buff) and Spell(avengers_shield) or Spell(blessed_hammer) or Spell(avengers_shield) or Spell(consecration)
-		{
-			#blinding_light
-			Spell(blinding_light)
-		}
 	}
 }
 
 AddFunction ProtectionProtCdPostConditions
 {
-	HealthPercent() < 40 and Spell(light_of_the_protector) or HealthPercent() < 40 and Spell(hand_of_the_protector) or IncomingDamage(10) < MaxHealth() * 1.25 and HealthPercent() < 55 and Talent(righteous_protector_talent) and Spell(light_of_the_protector) or IncomingDamage(13) < MaxHealth() * 1.6 and HealthPercent() < 55 and Spell(light_of_the_protector) or IncomingDamage(6) < MaxHealth() * 0.7 and HealthPercent() < 65 and Talent(righteous_protector_talent) and Spell(hand_of_the_protector) or IncomingDamage(9) < MaxHealth() * 1.2 and HealthPercent() < 55 and Spell(hand_of_the_protector) or Talent(knight_templar_talent) and IncomingDamage(2.5) > MaxHealth() * 0.4 and not { target.DebuffPresent(eye_of_tyr_debuff) or BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff) } and Spell(divine_steed) or IncomingDamage(2.5) > MaxHealth() * 0.4 and not { target.DebuffPresent(eye_of_tyr_debuff) or BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff) } and Spell(eye_of_tyr) or Spell(judgment) or Talent(crusaders_judgment_talent) and BuffPresent(grand_crusader_buff) and Spell(avengers_shield) or Spell(blessed_hammer) or Spell(avengers_shield) or Spell(consecration) or Spell(hammer_of_the_righteous)
+	HealthPercent() < 40 and Spell(light_of_the_protector) or HealthPercent() < 40 and Spell(hand_of_the_protector) or IncomingDamage(10) < MaxHealth() * 1.25 and HealthPercent() < 55 and Talent(righteous_protector_talent) and Spell(light_of_the_protector) or IncomingDamage(13) < MaxHealth() * 1.6 and HealthPercent() < 55 and Spell(light_of_the_protector) or IncomingDamage(6) < MaxHealth() * 0.7 and HealthPercent() < 65 and Talent(righteous_protector_talent) and Spell(hand_of_the_protector) or IncomingDamage(9) < MaxHealth() * 1.2 and HealthPercent() < 55 and Spell(hand_of_the_protector) or Talent(knight_templar_talent) and IncomingDamage(2.5) > MaxHealth() * 0.4 and not { target.DebuffPresent(eye_of_tyr_debuff) or BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff) } and Spell(divine_steed) or IncomingDamage(2.5) > MaxHealth() * 0.4 and not { target.DebuffPresent(eye_of_tyr_debuff) or BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff) } and Spell(eye_of_tyr) or Spell(judgment) or Talent(crusaders_judgment_talent) and BuffPresent(grand_crusader_buff) and Spell(avengers_shield) or Spell(blessed_hammer) or Spell(avengers_shield) or Spell(consecration) or Spell(blinding_light) or Spell(hammer_of_the_righteous)
 }
 
 ### Protection icons.
