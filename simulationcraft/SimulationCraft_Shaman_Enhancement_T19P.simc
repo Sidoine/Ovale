@@ -17,10 +17,10 @@ spec=enhancement
 # Executed before combat begins. Accepts non-harmful actions only.
 actions.precombat=flask,type=seventh_demon
 actions.precombat+=/augmentation,type=defiled
-actions.precombat+=/food,name=azshari_salad
+actions.precombat+=/food,name=nightborne_delicacy_platter
 # Snapshot raid buffed stats before combat begins and pre-potting is done.
 actions.precombat+=/snapshot_stats
-actions.precombat+=/potion,name=deadly_grace
+actions.precombat+=/potion,name=old_war
 actions.precombat+=/lightning_shield
 
 # Executed every time the actor is available.
@@ -29,11 +29,18 @@ actions=wind_shear
 actions+=/bloodlust,if=target.health.pct<25|time>0.500
 actions+=/auto_attack
 actions+=/feral_spirit
-actions+=/use_item,slot=trinket2
-actions+=/potion,name=deadly_grace,if=pet.feral_spirit.remains>10|pet.frost_wolf.remains>5|pet.fiery_wolf.remains>5|pet.lightning_wolf.remains>5|target.time_to_die<=30
+actions+=/crash_lightning,if=artifact.alpha_wolf.rank&prev_gcd.feral_spirit
+actions+=/potion,name=old_war,if=feral_spirit.remains>5|target.time_to_die<=30
 actions+=/berserking,if=buff.ascendance.up|!talent.ascendance.enabled|level<100
 actions+=/blood_fury
-actions+=/boulderfist,if=buff.boulderfist.remains<gcd|charges_fractional>1.75
+actions+=/crash_lightning,if=talent.crashing_storm.enabled&active_enemies>=3
+actions+=/boulderfist,if=buff.boulderfist.remains<gcd&maelstrom>=50&active_enemies>=3
+actions+=/boulderfist,if=buff.boulderfist.remains<gcd|(charges_fractional>1.75&maelstrom<=100&active_enemies<=2)
+actions+=/crash_lightning,if=buff.crash_lightning.remains<gcd&active_enemies>=2
+actions+=/windstrike,if=active_enemies>=3&!talent.hailstorm.enabled
+actions+=/stormstrike,if=active_enemies>=3&!talent.hailstorm.enabled
+actions+=/windstrike,if=buff.stormbringer.react
+actions+=/stormstrike,if=buff.stormbringer.react
 actions+=/frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<gcd
 actions+=/flametongue,if=buff.flametongue.remains<gcd
 actions+=/windsong
@@ -43,12 +50,12 @@ actions+=/doom_winds
 actions+=/crash_lightning,if=active_enemies>=3
 actions+=/windstrike
 actions+=/stormstrike
-actions+=/frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<4.8
-actions+=/flametongue,if=buff.flametongue.remains<4.8
 actions+=/lightning_bolt,if=talent.overcharge.enabled&maelstrom>=60
 actions+=/lava_lash,if=buff.hot_hand.react
 actions+=/earthen_spike
-actions+=/crash_lightning,if=active_enemies>1|talent.crashing_storm.enabled|(pet.feral_spirit.remains>5|pet.frost_wolf.remains>5|pet.fiery_wolf.remains>5|pet.lightning_wolf.remains>5)
+actions+=/crash_lightning,if=active_enemies>1|talent.crashing_storm.enabled|feral_spirit.remains>5
+actions+=/frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<4.8
+actions+=/flametongue,if=buff.flametongue.remains<4.8
 actions+=/sundering
 actions+=/lava_lash,if=maelstrom>=90
 actions+=/rockbiter
@@ -56,27 +63,27 @@ actions+=/flametongue
 actions+=/boulderfist
 
 head=collar_of_honorable_exultation,id=136777,bonus_id=1727
-neck=wolfstride_pendant,id=133633,bonus_id=1727,enchant_id=5890
+neck=wolfstride_pendant,id=133633,bonus_id=1727,enchant=mark_of_the_hidden_satyr
 shoulders=thundercrush_pauldrons,id=134478,bonus_id=1727
-back=cape_of_rigid_order,id=134402,bonus_id=1727,enchant_id=5435
+back=cape_of_rigid_order,id=134402,bonus_id=1727,enchant=binding_of_agility
 chest=thunderfused_valkyr_hauberk,id=133622,bonus_id=1727
 wrists=remorseless_chain_armbands,id=137405,bonus_id=1727
 hands=lavabreaker_gauntlets,id=137519,bonus_id=1727
 waist=belt_of_mighty_links,id=137456,bonus_id=1727
 legs=mute_erasure_legguards,id=134475,bonus_id=1727
 feet=whelp_handlers_lined_boots,id=134464,bonus_id=1727
-finger1=grasping_tentacle_loop,id=133634,bonus_id=1727,enchant_id=5429
-finger2=archdruids_tainted_seal,id=134487,bonus_id=1727,enchant_id=5429
-trinket1=chaos_talisman,id=137459,bonus_id=1727
-trinket2=faulty_countermeasure,id=137539,bonus_id=1727
+finger1=grasping_tentacle_loop,id=133634,bonus_id=1727,enchant=binding_of_mastery
+finger2=archdruids_tainted_seal,id=134487,bonus_id=1727,enchant=binding_of_mastery
+trinket1=devilsaur_shockbaton,id=140030,bonus_id=1727
+trinket2=sixfeather_fan,id=141585,bonus_id=1727
 main_hand=doomhammer,id=128819,bonus_id=741,gem_id=137316/137543/133682,relic_id=3412/3412/3412
-off_hand=fury_of_the_stonemother,id=128873,ilevel=870
+off_hand=fury_of_the_stonemother,id=128873
 
 # Gear Summary
 # gear_ilvl=843.75
-# gear_agility=9960
+# gear_agility=11083
 # gear_stamina=17628
 # gear_crit_rating=1510
-# gear_haste_rating=5868
-# gear_mastery_rating=10579
+# gear_haste_rating=4970
+# gear_mastery_rating=10279
 # gear_armor=2433

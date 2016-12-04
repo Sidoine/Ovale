@@ -85,11 +85,24 @@ local function Update(self, element, startTime, actionTexture, actionInRange, ac
 			if duration == 0 and self.texture == actionTexture and self.cooldownStart and self.cooldownEnd then
 				resetCooldown = true
 			end
-			if self.texture ~= actionTexture or not self.cooldownStart or not self.cooldownEnd
-					or startTime < self.cooldownEnd - COOLDOWN_THRESHOLD
-					or startTime > self.cooldownEnd + COOLDOWN_THRESHOLD then
-				-- Update the cooldown if this is a new action or if the new end time would exceed the tolerance threshold.
+			if self.texture ~= actionTexture or not self.cooldownStart or not self.cooldownEnd then
+				-- Update the cooldown if this is a new action
 				self.cooldownStart = now
+				self.cooldownEnd = startTime
+				resetCooldown = true
+			elseif startTime < self.cooldownEnd - COOLDOWN_THRESHOLD
+					or startTime > self.cooldownEnd + COOLDOWN_THRESHOLD then
+				-- Update the cooldown if the new end time would exceed the tolerance threshold.
+				if startTime - self.cooldownEnd > 0.25 or startTime - self.cooldownEnd < -0.25 then 
+					self.cooldownStart = now
+				else
+					--[[ 
+						Modify the start and end time of the cooldown swipe so that it maintains the same 
+						percent progress and only accelerates/decelerates the swipe.
+					]]--
+					local oldCooldownProgressPercent = (now - self.cooldownStart) / (self.cooldownEnd - self.cooldownStart)
+					self.cooldownStart = (now - oldCooldownProgressPercent * startTime) / (1 - oldCooldownProgressPercent)
+				end
 				self.cooldownEnd = startTime
 				resetCooldown = true
 			end

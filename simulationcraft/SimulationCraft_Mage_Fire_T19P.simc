@@ -25,8 +25,7 @@ actions.precombat+=/pyroblast
 
 # Executed every time the actor is available.
 actions=counterspell,if=target.debuff.casting.react
-actions+=/time_warp,if=target.health.pct<25|time=0
-actions+=/shard_of_the_exodar_warp,if=buff.bloodlust.down
+actions+=/time_warp,if=(time=0&buff.bloodlust.down)|(buff.bloodlust.down&equipped.132410)
 actions+=/mirror_image,if=buff.combustion.down
 actions+=/rune_of_power,if=cooldown.combustion.remains>40&buff.combustion.down&(cooldown.flame_on.remains<5|cooldown.flame_on.remains>30)&!talent.kindling.enabled|target.time_to_die.remains<11|talent.kindling.enabled&(charges_fractional>1.8|time<40)&cooldown.combustion.remains>40
 actions+=/call_action_list,name=combustion_phase,if=cooldown.combustion.remains<=action.rune_of_power.cast_time+(!talent.kindling.enabled*gcd)|buff.combustion.up
@@ -38,7 +37,7 @@ actions.active_talents+=/blast_wave,if=(buff.combustion.down)|(buff.combustion.u
 actions.active_talents+=/meteor,if=cooldown.combustion.remains>30|(cooldown.combustion.remains>target.time_to_die)|buff.rune_of_power.up
 actions.active_talents+=/cinderstorm,if=cooldown.combustion.remains<cast_time&(buff.rune_of_power.up|!talent.rune_on_power.enabled)|cooldown.combustion.remains>10*spell_haste&!buff.combustion.up
 actions.active_talents+=/dragons_breath,if=equipped.132863
-actions.active_talents+=/living_bomb,if=active_enemies>3&buff.combustion.down
+actions.active_talents+=/living_bomb,if=active_enemies>1&buff.combustion.down
 
 actions.combustion_phase=rune_of_power,if=buff.combustion.down
 actions.combustion_phase+=/call_action_list,name=active_talents
@@ -89,16 +88,17 @@ feet=paranoid_sprinters,id=137319,bonus_id=1727
 finger1=seal_of_the_nazjatar_empire,id=134525,bonus_id=1727,enchant=binding_of_critical_strike
 finger2=band_of_callous_dominance,id=134528,bonus_id=1727,enchant=binding_of_critical_strike
 trinket1=naraxas_spiked_tongue,id=137349,bonus_id=1727
-trinket2=portable_manacracker,id=137398,bonus_id=1727
+trinket2=oakhearts_gnarled_root,id=137306,bonus_id=1727
 main_hand=felomelorn,id=128820,gem_id=137470/137420/133022,relic_id=3412/3412/3412
 off_hand=heart_of_the_phoenix,id=133959
 
 # Gear Summary
 # gear_ilvl=843.75
 # gear_stamina=17944
-# gear_intellect=19820
+# gear_intellect=18697
 # gear_crit_rating=10246
 # gear_haste_rating=2684
 # gear_mastery_rating=4024
+# gear_versatility_rating=898
 # gear_armor=1570
 # set_bonus=tier19p_cloth_2pc=1

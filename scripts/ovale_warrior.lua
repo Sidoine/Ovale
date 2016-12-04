@@ -151,7 +151,7 @@ AddFunction ArmsDefaultCdActions
 {
 	#pummel
 	ArmsInterruptActions()
-	#potion,name=deadly_grace,if=(target.health.pct<20&buff.battle_cry.up)|target.time_to_die<=26
+	#potion,name=old_war,if=(target.health.pct<20&buff.battle_cry.up)|target.time_to_die<=26
 	#blood_fury,if=buff.battle_cry.up|target.time_to_die<=16
 	if BuffPresent(battle_cry_buff) or target.TimeToDie() <= 16 Spell(blood_fury_ap)
 	#berserking,if=buff.battle_cry.up|target.time_to_die<=11
@@ -165,8 +165,6 @@ AddFunction ArmsDefaultCdActions
 		if BuffPresent(burst_haste_buff any=1) or TimeInCombat() >= 1 Spell(avatar)
 		#use_item,name=gift_of_radiance
 		ArmsUseItemActions()
-		#hamstring,if=buff.battle_cry_deadly_calm.remains>cooldown.hamstring.remains
-		if BuffRemaining(battle_cry_deadly_calm_buff) > SpellCooldown(hamstring) Spell(hamstring)
 
 		unless target.DebuffRemaining(rend_debuff) < GCD() and Spell(rend) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or Spell(ravager) or BuffPresent(overpower_buff) and Spell(overpower)
 		{
@@ -276,8 +274,8 @@ AddFunction ArmsCleaveMainActions
 	if target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 Spell(rend)
 	#cleave
 	Spell(cleave)
-	#whirlwind,if=rage>=100|buff.focused_rage.stack=3
-	if Rage() >= 100 or BuffStacks(focused_rage_buff) == 3 Spell(whirlwind)
+	#whirlwind,if=rage>40|buff.cleave.up
+	if Rage() > 40 or BuffPresent(cleave_buff) Spell(whirlwind)
 }
 
 AddFunction ArmsCleaveMainPostConditions
@@ -290,15 +288,15 @@ AddFunction ArmsCleaveShortCdActions
 	{
 		#warbreaker,if=buff.shattered_defenses.down
 		if BuffExpires(shattered_defenses_buff) Spell(warbreaker)
-		#focused_rage,if=buff.shattered_defenses.down
-		if BuffExpires(shattered_defenses_buff) Spell(focused_rage)
+		#focused_rage,if=rage>100|buff.battle_cry_deadly_calm.up
+		if Rage() > 100 or BuffPresent(battle_cry_deadly_calm_buff) Spell(focused_rage)
 
 		unless Talent(fervor_of_battle_talent) and { target.DebuffPresent(colossus_smash_debuff) or RageDeficit() < 50 } and { not Talent(focused_rage_talent) or BuffPresent(battle_cry_deadly_calm_buff) or BuffPresent(cleave_buff) } and Spell(whirlwind) or target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and Spell(rend)
 		{
 			#bladestorm
 			Spell(bladestorm)
 
-			unless Spell(cleave) or { Rage() >= 100 or BuffStacks(focused_rage_buff) == 3 } and Spell(whirlwind)
+			unless Spell(cleave) or { Rage() > 40 or BuffPresent(cleave_buff) } and Spell(whirlwind)
 			{
 				#shockwave
 				Spell(shockwave)
@@ -311,7 +309,7 @@ AddFunction ArmsCleaveShortCdActions
 
 AddFunction ArmsCleaveShortCdPostConditions
 {
-	Spell(mortal_strike) or BuffPresent(stone_heart_buff) and Spell(execute_arms) or BuffExpires(shattered_defenses_buff) and BuffExpires(precise_strikes_buff) and Spell(colossus_smash) or Talent(fervor_of_battle_talent) and { target.DebuffPresent(colossus_smash_debuff) or RageDeficit() < 50 } and { not Talent(focused_rage_talent) or BuffPresent(battle_cry_deadly_calm_buff) or BuffPresent(cleave_buff) } and Spell(whirlwind) or target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and Spell(rend) or Spell(cleave) or { Rage() >= 100 or BuffStacks(focused_rage_buff) == 3 } and Spell(whirlwind)
+	Spell(mortal_strike) or BuffPresent(stone_heart_buff) and Spell(execute_arms) or BuffExpires(shattered_defenses_buff) and BuffExpires(precise_strikes_buff) and Spell(colossus_smash) or Talent(fervor_of_battle_talent) and { target.DebuffPresent(colossus_smash_debuff) or RageDeficit() < 50 } and { not Talent(focused_rage_talent) or BuffPresent(battle_cry_deadly_calm_buff) or BuffPresent(cleave_buff) } and Spell(whirlwind) or target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and Spell(rend) or Spell(cleave) or { Rage() > 40 or BuffPresent(cleave_buff) } and Spell(whirlwind)
 }
 
 AddFunction ArmsCleaveCdActions
@@ -320,7 +318,7 @@ AddFunction ArmsCleaveCdActions
 
 AddFunction ArmsCleaveCdPostConditions
 {
-	Spell(mortal_strike) or BuffPresent(stone_heart_buff) and Spell(execute_arms) or BuffExpires(shattered_defenses_buff) and BuffExpires(precise_strikes_buff) and Spell(colossus_smash) or BuffExpires(shattered_defenses_buff) and Spell(warbreaker) or Talent(fervor_of_battle_talent) and { target.DebuffPresent(colossus_smash_debuff) or RageDeficit() < 50 } and { not Talent(focused_rage_talent) or BuffPresent(battle_cry_deadly_calm_buff) or BuffPresent(cleave_buff) } and Spell(whirlwind) or target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and Spell(rend) or Spell(bladestorm) or Spell(cleave) or { Rage() >= 100 or BuffStacks(focused_rage_buff) == 3 } and Spell(whirlwind) or Spell(shockwave) or Spell(storm_bolt)
+	Spell(mortal_strike) or BuffPresent(stone_heart_buff) and Spell(execute_arms) or BuffExpires(shattered_defenses_buff) and BuffExpires(precise_strikes_buff) and Spell(colossus_smash) or BuffExpires(shattered_defenses_buff) and Spell(warbreaker) or Talent(fervor_of_battle_talent) and { target.DebuffPresent(colossus_smash_debuff) or RageDeficit() < 50 } and { not Talent(focused_rage_talent) or BuffPresent(battle_cry_deadly_calm_buff) or BuffPresent(cleave_buff) } and Spell(whirlwind) or target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and Spell(rend) or Spell(bladestorm) or Spell(cleave) or { Rage() > 40 or BuffPresent(cleave_buff) } and Spell(whirlwind) or Spell(shockwave) or Spell(storm_bolt)
 }
 
 ### actions.execute
@@ -333,8 +331,12 @@ AddFunction ArmsExecuteMainActions
 	if BuffPresent(battle_cry_deadly_calm_buff) Spell(execute_arms)
 	#colossus_smash,if=buff.shattered_defenses.down
 	if BuffExpires(shattered_defenses_buff) Spell(colossus_smash)
-	#execute,if=buff.shattered_defenses.up&rage>22|buff.shattered_defenses.down
-	if BuffPresent(shattered_defenses_buff) and Rage() > 22 or BuffExpires(shattered_defenses_buff) Spell(execute_arms)
+	#execute,if=buff.shattered_defenses.up&rage>22
+	if BuffPresent(shattered_defenses_buff) and Rage() > 22 Spell(execute_arms)
+	#mortal_strike,if=equipped.archavons_heavy_hand&rage<60
+	if HasEquippedItem(archavons_heavy_hand) and Rage() < 60 Spell(mortal_strike)
+	#execute,if=buff.shattered_defenses.down
+	if BuffExpires(shattered_defenses_buff) Spell(execute_arms)
 }
 
 AddFunction ArmsExecuteMainPostConditions
@@ -348,7 +350,7 @@ AddFunction ArmsExecuteShortCdActions
 		#warbreaker,if=buff.shattered_defenses.down&rage<=30
 		if BuffExpires(shattered_defenses_buff) and Rage() <= 30 Spell(warbreaker)
 
-		unless { BuffPresent(shattered_defenses_buff) and Rage() > 22 or BuffExpires(shattered_defenses_buff) } and Spell(execute_arms)
+		unless BuffPresent(shattered_defenses_buff) and Rage() > 22 and Spell(execute_arms) or HasEquippedItem(archavons_heavy_hand) and Rage() < 60 and Spell(mortal_strike) or BuffExpires(shattered_defenses_buff) and Spell(execute_arms)
 		{
 			#bladestorm,interrupt=1,if=raid_event.adds.in>90|!raid_event.adds.exists|spell_targets.bladestorm_mh>desired_targets
 			if 600 > 90 or not False(raid_event_adds_exists) or Enemies() > Enemies(tagged=1) Spell(bladestorm)
@@ -358,7 +360,7 @@ AddFunction ArmsExecuteShortCdActions
 
 AddFunction ArmsExecuteShortCdPostConditions
 {
-	BuffPresent(battle_cry_buff) and BuffStacks(focused_rage_buff) == 3 and Spell(mortal_strike) or BuffPresent(battle_cry_deadly_calm_buff) and Spell(execute_arms) or BuffExpires(shattered_defenses_buff) and Spell(colossus_smash) or { BuffPresent(shattered_defenses_buff) and Rage() > 22 or BuffExpires(shattered_defenses_buff) } and Spell(execute_arms)
+	BuffPresent(battle_cry_buff) and BuffStacks(focused_rage_buff) == 3 and Spell(mortal_strike) or BuffPresent(battle_cry_deadly_calm_buff) and Spell(execute_arms) or BuffExpires(shattered_defenses_buff) and Spell(colossus_smash) or BuffPresent(shattered_defenses_buff) and Rage() > 22 and Spell(execute_arms) or HasEquippedItem(archavons_heavy_hand) and Rage() < 60 and Spell(mortal_strike) or BuffExpires(shattered_defenses_buff) and Spell(execute_arms)
 }
 
 AddFunction ArmsExecuteCdActions
@@ -367,7 +369,7 @@ AddFunction ArmsExecuteCdActions
 
 AddFunction ArmsExecuteCdPostConditions
 {
-	BuffPresent(battle_cry_buff) and BuffStacks(focused_rage_buff) == 3 and Spell(mortal_strike) or BuffPresent(battle_cry_deadly_calm_buff) and Spell(execute_arms) or BuffExpires(shattered_defenses_buff) and Spell(colossus_smash) or BuffExpires(shattered_defenses_buff) and Rage() <= 30 and Spell(warbreaker) or { BuffPresent(shattered_defenses_buff) and Rage() > 22 or BuffExpires(shattered_defenses_buff) } and Spell(execute_arms) or { 600 > 90 or not False(raid_event_adds_exists) or Enemies() > Enemies(tagged=1) } and Spell(bladestorm)
+	BuffPresent(battle_cry_buff) and BuffStacks(focused_rage_buff) == 3 and Spell(mortal_strike) or BuffPresent(battle_cry_deadly_calm_buff) and Spell(execute_arms) or BuffExpires(shattered_defenses_buff) and Spell(colossus_smash) or BuffExpires(shattered_defenses_buff) and Rage() <= 30 and Spell(warbreaker) or BuffPresent(shattered_defenses_buff) and Rage() > 22 and Spell(execute_arms) or HasEquippedItem(archavons_heavy_hand) and Rage() < 60 and Spell(mortal_strike) or BuffExpires(shattered_defenses_buff) and Spell(execute_arms) or { 600 > 90 or not False(raid_event_adds_exists) or Enemies() > Enemies(tagged=1) } and Spell(bladestorm)
 }
 
 ### actions.precombat
@@ -414,12 +416,10 @@ AddFunction ArmsSingleMainActions
 	Spell(mortal_strike)
 	#execute,if=buff.stone_heart.react
 	if BuffPresent(stone_heart_buff) Spell(execute_arms)
-	#slam,if=buff.battle_cry_deadly_calm.up|buff.focused_rage.stack=3|rage.deficit<=30
-	if BuffPresent(battle_cry_deadly_calm_buff) or BuffStacks(focused_rage_buff) == 3 or RageDeficit() <= 30 Spell(slam)
+	#slam
+	Spell(slam)
 	#execute,if=equipped.archavons_heavy_hand
 	if HasEquippedItem(archavons_heavy_hand) Spell(execute_arms)
-	#slam,if=equipped.archavons_heavy_hand
-	if HasEquippedItem(archavons_heavy_hand) Spell(slam)
 }
 
 AddFunction ArmsSingleMainPostConditions
@@ -432,10 +432,10 @@ AddFunction ArmsSingleShortCdActions
 	{
 		#warbreaker,if=buff.shattered_defenses.down&cooldown.mortal_strike.remains<gcd
 		if BuffExpires(shattered_defenses_buff) and SpellCooldown(mortal_strike) < GCD() Spell(warbreaker)
-		#focused_rage,if=((!buff.focused_rage.react&prev_gcd.mortal_strike)|!prev_gcd.mortal_strike)&buff.focused_rage.stack<3&(buff.shattered_defenses.up|cooldown.colossus_smash.remains)
-		if { not BuffPresent(focused_rage_buff) and PreviousGCDSpell(mortal_strike) or not PreviousGCDSpell(mortal_strike) } and BuffStacks(focused_rage_buff) < 3 and { BuffPresent(shattered_defenses_buff) or SpellCooldown(colossus_smash) > 0 } Spell(focused_rage)
+		#focused_rage,if=(((!buff.focused_rage.react&prev_gcd.mortal_strike)|!prev_gcd.mortal_strike)&buff.focused_rage.stack<3&(buff.shattered_defenses.up|cooldown.colossus_smash.remains))&rage>60
+		if { not BuffPresent(focused_rage_buff) and PreviousGCDSpell(mortal_strike) or not PreviousGCDSpell(mortal_strike) } and BuffStacks(focused_rage_buff) < 3 and { BuffPresent(shattered_defenses_buff) or SpellCooldown(colossus_smash) > 0 } and Rage() > 60 Spell(focused_rage)
 
-		unless Spell(mortal_strike) or BuffPresent(stone_heart_buff) and Spell(execute_arms) or { BuffPresent(battle_cry_deadly_calm_buff) or BuffStacks(focused_rage_buff) == 3 or RageDeficit() <= 30 } and Spell(slam) or HasEquippedItem(archavons_heavy_hand) and Spell(execute_arms) or HasEquippedItem(archavons_heavy_hand) and Spell(slam)
+		unless Spell(mortal_strike) or BuffPresent(stone_heart_buff) and Spell(execute_arms) or Spell(slam) or HasEquippedItem(archavons_heavy_hand) and Spell(execute_arms)
 		{
 			#focused_rage,if=equipped.archavons_heavy_hand
 			if HasEquippedItem(archavons_heavy_hand) Spell(focused_rage)
@@ -447,7 +447,7 @@ AddFunction ArmsSingleShortCdActions
 
 AddFunction ArmsSingleShortCdPostConditions
 {
-	BuffPresent(battle_cry_buff) and BuffStacks(focused_rage_buff) >= 1 and BuffRemaining(battle_cry_buff) < GCD() and Spell(mortal_strike) or BuffExpires(shattered_defenses_buff) and Spell(colossus_smash) or Spell(mortal_strike) or BuffPresent(stone_heart_buff) and Spell(execute_arms) or { BuffPresent(battle_cry_deadly_calm_buff) or BuffStacks(focused_rage_buff) == 3 or RageDeficit() <= 30 } and Spell(slam) or HasEquippedItem(archavons_heavy_hand) and Spell(execute_arms) or HasEquippedItem(archavons_heavy_hand) and Spell(slam)
+	BuffPresent(battle_cry_buff) and BuffStacks(focused_rage_buff) >= 1 and BuffRemaining(battle_cry_buff) < GCD() and Spell(mortal_strike) or BuffExpires(shattered_defenses_buff) and Spell(colossus_smash) or Spell(mortal_strike) or BuffPresent(stone_heart_buff) and Spell(execute_arms) or Spell(slam) or HasEquippedItem(archavons_heavy_hand) and Spell(execute_arms)
 }
 
 AddFunction ArmsSingleCdActions
@@ -456,7 +456,7 @@ AddFunction ArmsSingleCdActions
 
 AddFunction ArmsSingleCdPostConditions
 {
-	BuffPresent(battle_cry_buff) and BuffStacks(focused_rage_buff) >= 1 and BuffRemaining(battle_cry_buff) < GCD() and Spell(mortal_strike) or BuffExpires(shattered_defenses_buff) and Spell(colossus_smash) or BuffExpires(shattered_defenses_buff) and SpellCooldown(mortal_strike) < GCD() and Spell(warbreaker) or Spell(mortal_strike) or BuffPresent(stone_heart_buff) and Spell(execute_arms) or { BuffPresent(battle_cry_deadly_calm_buff) or BuffStacks(focused_rage_buff) == 3 or RageDeficit() <= 30 } and Spell(slam) or HasEquippedItem(archavons_heavy_hand) and Spell(execute_arms) or HasEquippedItem(archavons_heavy_hand) and Spell(slam) or { 600 > 90 or not False(raid_event_adds_exists) or Enemies() > Enemies(tagged=1) } and Spell(bladestorm)
+	BuffPresent(battle_cry_buff) and BuffStacks(focused_rage_buff) >= 1 and BuffRemaining(battle_cry_buff) < GCD() and Spell(mortal_strike) or BuffExpires(shattered_defenses_buff) and Spell(colossus_smash) or BuffExpires(shattered_defenses_buff) and SpellCooldown(mortal_strike) < GCD() and Spell(warbreaker) or Spell(mortal_strike) or BuffPresent(stone_heart_buff) and Spell(execute_arms) or Spell(slam) or HasEquippedItem(archavons_heavy_hand) and Spell(execute_arms) or { 600 > 90 or not False(raid_event_adds_exists) or Enemies() > Enemies(tagged=1) } and Spell(bladestorm)
 }
 
 ### Arms icons.
@@ -538,7 +538,6 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # focused_rage
 # focused_rage_buff
 # focused_rage_talent
-# hamstring
 # heroic_leap
 # heroic_throw
 # mortal_strike
@@ -619,7 +618,7 @@ AddFunction FuryDefaultMainActions
 
 	unless 0 > 5 and FuryMovementMainPostConditions()
 	{
-		#potion,name=deadly_grace,if=(target.health.pct<20&buff.battle_cry.up)|target.time_to_die<30
+		#potion,name=old_war,if=(target.health.pct<20&buff.battle_cry.up)|target.time_to_die<30
 		#battle_cry,if=(cooldown.odyns_fury.remains=0&(cooldown.bloodthirst.remains=0|(buff.enrage.remains>cooldown.bloodthirst.remains)))
 		if not SpellCooldown(odyns_fury) > 0 and { not SpellCooldown(bloodthirst) > 0 or EnrageRemaining() > SpellCooldown(bloodthirst) } Spell(battle_cry)
 		#call_action_list,name=two_targets,if=spell_targets.whirlwind=2|spell_targets.whirlwind=3
@@ -765,6 +764,12 @@ AddFunction FuryAoeShortCdActions
 	{
 		#call_action_list,name=bladestorm
 		FuryBladestormShortCdActions()
+
+		unless FuryBladestormShortCdPostConditions()
+		{
+			#odyns_fury,if=buff.battle_cry.up&buff.enrage.up
+			if BuffPresent(battle_cry_buff) and IsEnraged() Spell(odyns_fury)
+		}
 	}
 }
 
@@ -784,7 +789,7 @@ AddFunction FuryAoeCdActions
 
 AddFunction FuryAoeCdPostConditions
 {
-	{ not IsEnraged() or Rage() < 50 } and Spell(bloodthirst) or FuryBladestormCdPostConditions() or IsEnraged() and Spell(whirlwind) or Spell(dragon_roar) or BuffPresent(meat_cleaver_buff) and Spell(rampage) or Spell(bloodthirst) or Spell(whirlwind)
+	{ not IsEnraged() or Rage() < 50 } and Spell(bloodthirst) or FuryBladestormCdPostConditions() or BuffPresent(battle_cry_buff) and IsEnraged() and Spell(odyns_fury) or IsEnraged() and Spell(whirlwind) or Spell(dragon_roar) or BuffPresent(meat_cleaver_buff) and Spell(rampage) or Spell(bloodthirst) or Spell(whirlwind)
 }
 
 ### actions.bladestorm
@@ -886,8 +891,8 @@ AddFunction FurySingleTargetMainActions
 	if HasArtifactTrait(juggernaut) and { not BuffPresent(juggernaut_buff) or BuffRemaining(juggernaut_buff) < 2 } or BuffPresent(stone_heart_buff) Spell(execute)
 	#rampage,if=rage=100&(target.health.pct>20|target.health.pct<20&!talent.massacre.enabled)|buff.massacre.react&buff.enrage.remains<1
 	if Rage() == 100 and { target.HealthPercent() > 20 or target.HealthPercent() < 20 and not Talent(massacre_talent) } or BuffPresent(massacre_buff) and EnrageRemaining() < 1 Spell(rampage)
-	#dragon_roar,if=!cooldown.odyns_fury.remains<=10|cooldown.odyns_fury.remains<3
-	if not SpellCooldown(odyns_fury) <= 10 or SpellCooldown(odyns_fury) < 3 Spell(dragon_roar)
+	#dragon_roar,if=cooldown.odyns_fury.remains>=10|cooldown.odyns_fury.remains<=3
+	if SpellCooldown(odyns_fury) >= 10 or SpellCooldown(odyns_fury) <= 3 Spell(dragon_roar)
 	#rampage,if=buff.enrage.down&buff.juggernaut.down
 	if not IsEnraged() and BuffExpires(juggernaut_buff) Spell(rampage)
 	#furious_slash,if=talent.frenzy.enabled&(buff.frenzy.down|buff.frenzy.remains<=3)
@@ -926,7 +931,7 @@ AddFunction FurySingleTargetShortCdActions
 		#berserker_rage,if=talent.outburst.enabled&cooldown.odyns_fury.remains=0&buff.enrage.down
 		if Talent(outburst_talent) and not SpellCooldown(odyns_fury) > 0 and not IsEnraged() Spell(berserker_rage)
 
-		unless { not SpellCooldown(odyns_fury) <= 10 or SpellCooldown(odyns_fury) < 3 } and Spell(dragon_roar)
+		unless { SpellCooldown(odyns_fury) >= 10 or SpellCooldown(odyns_fury) <= 3 } and Spell(dragon_roar)
 		{
 			#odyns_fury,if=buff.battle_cry.up&buff.enrage.up
 			if BuffPresent(battle_cry_buff) and IsEnraged() Spell(odyns_fury)
@@ -948,12 +953,12 @@ AddFunction FurySingleTargetShortCdActions
 
 AddFunction FurySingleTargetShortCdPostConditions
 {
-	BuffPresent(fujiedas_fury_buff) and BuffRemaining(fujiedas_fury_buff) < 2 and Spell(bloodthirst) or { HasArtifactTrait(juggernaut) and { not BuffPresent(juggernaut_buff) or BuffRemaining(juggernaut_buff) < 2 } or BuffPresent(stone_heart_buff) } and Spell(execute) or { Rage() == 100 and { target.HealthPercent() > 20 or target.HealthPercent() < 20 and not Talent(massacre_talent) } or BuffPresent(massacre_buff) and EnrageRemaining() < 1 } and Spell(rampage) or { not SpellCooldown(odyns_fury) <= 10 or SpellCooldown(odyns_fury) < 3 } and Spell(dragon_roar) or not IsEnraged() and BuffExpires(juggernaut_buff) and Spell(rampage) or Talent(frenzy_talent) and { BuffExpires(frenzy_buff) or BuffRemaining(frenzy_buff) <= 3 } and Spell(furious_slash) or BuffExpires(juggernaut_buff) and IsEnraged() and Spell(raging_blow) or BuffPresent(wrecking_ball_buff) and IsEnraged() and Spell(whirlwind) or { Talent(inner_rage_talent) or not Talent(inner_rage_talent) and Rage() > 50 } and Spell(execute) or not IsEnraged() and Spell(bloodthirst) or not IsEnraged() and Spell(raging_blow) or HasArtifactTrait(juggernaut) and Spell(execute) or Spell(raging_blow) or Spell(bloodthirst) or Spell(furious_slash) or FuryBladestormShortCdPostConditions()
+	BuffPresent(fujiedas_fury_buff) and BuffRemaining(fujiedas_fury_buff) < 2 and Spell(bloodthirst) or { HasArtifactTrait(juggernaut) and { not BuffPresent(juggernaut_buff) or BuffRemaining(juggernaut_buff) < 2 } or BuffPresent(stone_heart_buff) } and Spell(execute) or { Rage() == 100 and { target.HealthPercent() > 20 or target.HealthPercent() < 20 and not Talent(massacre_talent) } or BuffPresent(massacre_buff) and EnrageRemaining() < 1 } and Spell(rampage) or { SpellCooldown(odyns_fury) >= 10 or SpellCooldown(odyns_fury) <= 3 } and Spell(dragon_roar) or not IsEnraged() and BuffExpires(juggernaut_buff) and Spell(rampage) or Talent(frenzy_talent) and { BuffExpires(frenzy_buff) or BuffRemaining(frenzy_buff) <= 3 } and Spell(furious_slash) or BuffExpires(juggernaut_buff) and IsEnraged() and Spell(raging_blow) or BuffPresent(wrecking_ball_buff) and IsEnraged() and Spell(whirlwind) or { Talent(inner_rage_talent) or not Talent(inner_rage_talent) and Rage() > 50 } and Spell(execute) or not IsEnraged() and Spell(bloodthirst) or not IsEnraged() and Spell(raging_blow) or HasArtifactTrait(juggernaut) and Spell(execute) or Spell(raging_blow) or Spell(bloodthirst) or Spell(furious_slash) or FuryBladestormShortCdPostConditions()
 }
 
 AddFunction FurySingleTargetCdActions
 {
-	unless BuffPresent(fujiedas_fury_buff) and BuffRemaining(fujiedas_fury_buff) < 2 and Spell(bloodthirst) or { HasArtifactTrait(juggernaut) and { not BuffPresent(juggernaut_buff) or BuffRemaining(juggernaut_buff) < 2 } or BuffPresent(stone_heart_buff) } and Spell(execute) or { Rage() == 100 and { target.HealthPercent() > 20 or target.HealthPercent() < 20 and not Talent(massacre_talent) } or BuffPresent(massacre_buff) and EnrageRemaining() < 1 } and Spell(rampage) or { not SpellCooldown(odyns_fury) <= 10 or SpellCooldown(odyns_fury) < 3 } and Spell(dragon_roar) or BuffPresent(battle_cry_buff) and IsEnraged() and Spell(odyns_fury) or not IsEnraged() and BuffExpires(juggernaut_buff) and Spell(rampage) or Talent(frenzy_talent) and { BuffExpires(frenzy_buff) or BuffRemaining(frenzy_buff) <= 3 } and Spell(furious_slash) or BuffExpires(juggernaut_buff) and IsEnraged() and Spell(raging_blow) or BuffPresent(wrecking_ball_buff) and IsEnraged() and Spell(whirlwind) or { Talent(inner_rage_talent) or not Talent(inner_rage_talent) and Rage() > 50 } and Spell(execute) or not IsEnraged() and Spell(bloodthirst) or not IsEnraged() and Spell(raging_blow) or HasArtifactTrait(juggernaut) and Spell(execute) or Spell(raging_blow) or Spell(bloodthirst) or Spell(furious_slash)
+	unless BuffPresent(fujiedas_fury_buff) and BuffRemaining(fujiedas_fury_buff) < 2 and Spell(bloodthirst) or { HasArtifactTrait(juggernaut) and { not BuffPresent(juggernaut_buff) or BuffRemaining(juggernaut_buff) < 2 } or BuffPresent(stone_heart_buff) } and Spell(execute) or { Rage() == 100 and { target.HealthPercent() > 20 or target.HealthPercent() < 20 and not Talent(massacre_talent) } or BuffPresent(massacre_buff) and EnrageRemaining() < 1 } and Spell(rampage) or { SpellCooldown(odyns_fury) >= 10 or SpellCooldown(odyns_fury) <= 3 } and Spell(dragon_roar) or BuffPresent(battle_cry_buff) and IsEnraged() and Spell(odyns_fury) or not IsEnraged() and BuffExpires(juggernaut_buff) and Spell(rampage) or Talent(frenzy_talent) and { BuffExpires(frenzy_buff) or BuffRemaining(frenzy_buff) <= 3 } and Spell(furious_slash) or BuffExpires(juggernaut_buff) and IsEnraged() and Spell(raging_blow) or BuffPresent(wrecking_ball_buff) and IsEnraged() and Spell(whirlwind) or { Talent(inner_rage_talent) or not Talent(inner_rage_talent) and Rage() > 50 } and Spell(execute) or not IsEnraged() and Spell(bloodthirst) or not IsEnraged() and Spell(raging_blow) or HasArtifactTrait(juggernaut) and Spell(execute) or Spell(raging_blow) or Spell(bloodthirst) or Spell(furious_slash)
 	{
 		#call_action_list,name=bladestorm
 		FuryBladestormCdActions()
@@ -962,7 +967,7 @@ AddFunction FurySingleTargetCdActions
 
 AddFunction FurySingleTargetCdPostConditions
 {
-	BuffPresent(fujiedas_fury_buff) and BuffRemaining(fujiedas_fury_buff) < 2 and Spell(bloodthirst) or { HasArtifactTrait(juggernaut) and { not BuffPresent(juggernaut_buff) or BuffRemaining(juggernaut_buff) < 2 } or BuffPresent(stone_heart_buff) } and Spell(execute) or { Rage() == 100 and { target.HealthPercent() > 20 or target.HealthPercent() < 20 and not Talent(massacre_talent) } or BuffPresent(massacre_buff) and EnrageRemaining() < 1 } and Spell(rampage) or { not SpellCooldown(odyns_fury) <= 10 or SpellCooldown(odyns_fury) < 3 } and Spell(dragon_roar) or BuffPresent(battle_cry_buff) and IsEnraged() and Spell(odyns_fury) or not IsEnraged() and BuffExpires(juggernaut_buff) and Spell(rampage) or Talent(frenzy_talent) and { BuffExpires(frenzy_buff) or BuffRemaining(frenzy_buff) <= 3 } and Spell(furious_slash) or BuffExpires(juggernaut_buff) and IsEnraged() and Spell(raging_blow) or BuffPresent(wrecking_ball_buff) and IsEnraged() and Spell(whirlwind) or { Talent(inner_rage_talent) or not Talent(inner_rage_talent) and Rage() > 50 } and Spell(execute) or not IsEnraged() and Spell(bloodthirst) or not IsEnraged() and Spell(raging_blow) or HasArtifactTrait(juggernaut) and Spell(execute) or Spell(raging_blow) or Spell(bloodthirst) or Spell(furious_slash) or FuryBladestormCdPostConditions()
+	BuffPresent(fujiedas_fury_buff) and BuffRemaining(fujiedas_fury_buff) < 2 and Spell(bloodthirst) or { HasArtifactTrait(juggernaut) and { not BuffPresent(juggernaut_buff) or BuffRemaining(juggernaut_buff) < 2 } or BuffPresent(stone_heart_buff) } and Spell(execute) or { Rage() == 100 and { target.HealthPercent() > 20 or target.HealthPercent() < 20 and not Talent(massacre_talent) } or BuffPresent(massacre_buff) and EnrageRemaining() < 1 } and Spell(rampage) or { SpellCooldown(odyns_fury) >= 10 or SpellCooldown(odyns_fury) <= 3 } and Spell(dragon_roar) or BuffPresent(battle_cry_buff) and IsEnraged() and Spell(odyns_fury) or not IsEnraged() and BuffExpires(juggernaut_buff) and Spell(rampage) or Talent(frenzy_talent) and { BuffExpires(frenzy_buff) or BuffRemaining(frenzy_buff) <= 3 } and Spell(furious_slash) or BuffExpires(juggernaut_buff) and IsEnraged() and Spell(raging_blow) or BuffPresent(wrecking_ball_buff) and IsEnraged() and Spell(whirlwind) or { Talent(inner_rage_talent) or not Talent(inner_rage_talent) and Rage() > 50 } and Spell(execute) or not IsEnraged() and Spell(bloodthirst) or not IsEnraged() and Spell(raging_blow) or HasArtifactTrait(juggernaut) and Spell(execute) or Spell(raging_blow) or Spell(bloodthirst) or Spell(furious_slash) or FuryBladestormCdPostConditions()
 }
 
 ### actions.two_targets
@@ -1004,6 +1009,12 @@ AddFunction FuryTwoTargetsShortCdActions
 	{
 		#call_action_list,name=bladestorm
 		FuryBladestormShortCdActions()
+
+		unless FuryBladestormShortCdPostConditions() or { not IsEnraged() or Rage() == 100 and BuffExpires(juggernaut_buff) or BuffPresent(massacre_buff) } and Spell(rampage) or not IsEnraged() and Spell(bloodthirst)
+		{
+			#odyns_fury,if=buff.battle_cry.up&buff.enrage.up
+			if BuffPresent(battle_cry_buff) and IsEnraged() Spell(odyns_fury)
+		}
 	}
 }
 
@@ -1023,7 +1034,7 @@ AddFunction FuryTwoTargetsCdActions
 
 AddFunction FuryTwoTargetsCdPostConditions
 {
-	BuffExpires(meat_cleaver_buff) and Spell(whirlwind) or FuryBladestormCdPostConditions() or { not IsEnraged() or Rage() == 100 and BuffExpires(juggernaut_buff) or BuffPresent(massacre_buff) } and Spell(rampage) or not IsEnraged() and Spell(bloodthirst) or Talent(inner_rage_talent) and Enemies() == 2 and Spell(raging_blow) or Enemies() > 2 and Spell(whirlwind) or Spell(dragon_roar) or Spell(bloodthirst) or Spell(whirlwind)
+	BuffExpires(meat_cleaver_buff) and Spell(whirlwind) or FuryBladestormCdPostConditions() or { not IsEnraged() or Rage() == 100 and BuffExpires(juggernaut_buff) or BuffPresent(massacre_buff) } and Spell(rampage) or not IsEnraged() and Spell(bloodthirst) or BuffPresent(battle_cry_buff) and IsEnraged() and Spell(odyns_fury) or Talent(inner_rage_talent) and Enemies() == 2 and Spell(raging_blow) or Enemies() > 2 and Spell(whirlwind) or Spell(dragon_roar) or Spell(bloodthirst) or Spell(whirlwind)
 }
 
 ### Fury icons.
@@ -1175,8 +1186,6 @@ AddFunction ProtectionInterruptActions
 
 AddFunction ProtectionDefaultMainActions
 {
-	#intercept
-	Spell(intercept)
 	#call_action_list,name=prot
 	ProtectionProtMainActions()
 }
@@ -1188,18 +1197,17 @@ AddFunction ProtectionDefaultMainPostConditions
 
 AddFunction ProtectionDefaultShortCdActions
 {
-	unless Spell(intercept)
-	{
-		#auto_attack
-		ProtectionGetInMeleeRange()
-		#call_action_list,name=prot
-		ProtectionProtShortCdActions()
-	}
+	#intercept
+	Spell(intercept)
+	#auto_attack
+	ProtectionGetInMeleeRange()
+	#call_action_list,name=prot
+	ProtectionProtShortCdActions()
 }
 
 AddFunction ProtectionDefaultShortCdPostConditions
 {
-	Spell(intercept) or ProtectionProtShortCdPostConditions()
+	ProtectionProtShortCdPostConditions()
 }
 
 AddFunction ProtectionDefaultCdActions
@@ -1286,8 +1294,8 @@ AddFunction ProtectionProtShortCdActions
 {
 	#shield_block,if=!buff.neltharions_fury.up&((cooldown.shield_slam.remains<6&!buff.shield_block.up)|(cooldown.shield_slam.remains<6+buff.shield_block.remains&buff.shield_block.up))
 	if not BuffPresent(neltharions_fury_buff) and { SpellCooldown(shield_slam) < 6 and not BuffPresent(shield_block_buff) or SpellCooldown(shield_slam) < 6 + BuffRemaining(shield_block_buff) and BuffPresent(shield_block_buff) } Spell(shield_block)
-	#ignore_pain,if=(rage>=60&!talent.vengeance.enabled)|(buff.vengeance_ignore_pain.up&buff.ultimatum.up)|(buff.vengeance_ignore_pain.up&rage>=30)|(talent.vengeance.enabled&!buff.ultimatum.up&!buff.vengeance_ignore_pain.up&!buff.vengeance_focused_rage.up&rage<30)
-	if Rage() >= 60 and not Talent(vengeance_talent) or BuffPresent(vengeance_ignore_pain_buff) and BuffPresent(ultimatum_buff) or BuffPresent(vengeance_ignore_pain_buff) and Rage() >= 30 or Talent(vengeance_talent) and not BuffPresent(ultimatum_buff) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_focused_rage_buff) and Rage() < 30 Spell(ignore_pain)
+	#ignore_pain,if=(rage>=60&!talent.vengeance.enabled)|(buff.vengeance_ignore_pain.up&buff.ultimatum.up)|(buff.vengeance_ignore_pain.up&rage>=39)|(talent.vengeance.enabled&!buff.ultimatum.up&!buff.vengeance_ignore_pain.up&!buff.vengeance_focused_rage.up&rage<30)
+	if Rage() >= 60 and not Talent(vengeance_talent) or BuffPresent(vengeance_ignore_pain_buff) and BuffPresent(ultimatum_buff) or BuffPresent(vengeance_ignore_pain_buff) and Rage() >= 39 or Talent(vengeance_talent) and not BuffPresent(ultimatum_buff) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_focused_rage_buff) and Rage() < 30 Spell(ignore_pain)
 	#focused_rage,if=(buff.vengeance_focused_rage.up&!buff.vengeance_ignore_pain.up)|(buff.ultimatum.up&buff.vengeance_focused_rage.up&!buff.vengeance_ignore_pain.up)|(talent.vengeance.enabled&buff.ultimatum.up&!buff.vengeance_ignore_pain.up&!buff.vengeance_focused_rage.up)|(talent.vengeance.enabled&!buff.vengeance_ignore_pain.up&!buff.vengeance_focused_rage.up&rage>=30)|(buff.ultimatum.up&buff.vengeance_ignore_pain.up&cooldown.shield_slam.remains=0&rage<10)|(rage>=100)
 	if BuffPresent(vengeance_focused_rage_buff) and not BuffPresent(vengeance_ignore_pain_buff) or BuffPresent(ultimatum_buff) and BuffPresent(vengeance_focused_rage_buff) and not BuffPresent(vengeance_ignore_pain_buff) or Talent(vengeance_talent) and BuffPresent(ultimatum_buff) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_focused_rage_buff) or Talent(vengeance_talent) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_focused_rage_buff) and Rage() >= 30 or BuffPresent(ultimatum_buff) and BuffPresent(vengeance_ignore_pain_buff) and not SpellCooldown(shield_slam) > 0 and Rage() < 10 or Rage() >= 100 Spell(focused_rage)
 	#demoralizing_shout,if=incoming_damage_2500ms>health.max*0.20

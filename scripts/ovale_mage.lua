@@ -39,24 +39,22 @@ AddFunction ArcaneInterruptActions
 
 AddFunction ArcaneDefaultMainActions
 {
-	#shard_of_the_exodar_warp,if=buff.bloodlust.down&burn_phase&time>3
-	if BuffExpires(burst_haste_buff any=1) and GetState(burn_phase) > 0 and TimeInCombat() > 3 Spell(shard_of_the_exodar_warp)
 	#stop_burn_phase,if=prev_gcd.evocation&burn_phase_duration>gcd.max
 	if PreviousGCDSpell(evocation) and GetStateDuration(burn_phase) > GCD() and GetState(burn_phase) > 0 SetState(burn_phase 0)
-	#call_action_list,name=build,if=buff.arcane_charge.stack<4&(mana.pct>=70|(cooldown.arcane_power.remains<3|(talent.rune_of_power.enabled&action.rune_of_power.recharge_time<cooldown.arcane_power.remains)))|(buff.arcane_charge.stack<3&mana.pct>=50)|buff.arcane_charge.stack<2
-	if DebuffStacks(arcane_charge_debuff) < 4 and { ManaPercent() >= 70 or SpellCooldown(arcane_power) < 3 or Talent(rune_of_power_talent) and SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or DebuffStacks(arcane_charge_debuff) < 3 and ManaPercent() >= 50 or DebuffStacks(arcane_charge_debuff) < 2 ArcaneBuildMainActions()
+	#call_action_list,name=build,if=buff.arcane_charge.stack<4
+	if DebuffStacks(arcane_charge_debuff) < 4 ArcaneBuildMainActions()
 
-	unless { DebuffStacks(arcane_charge_debuff) < 4 and { ManaPercent() >= 70 or SpellCooldown(arcane_power) < 3 or Talent(rune_of_power_talent) and SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or DebuffStacks(arcane_charge_debuff) < 3 and ManaPercent() >= 50 or DebuffStacks(arcane_charge_debuff) < 2 } and ArcaneBuildMainPostConditions()
+	unless DebuffStacks(arcane_charge_debuff) < 4 and ArcaneBuildMainPostConditions()
 	{
 		#call_action_list,name=init_burn,if=buff.arcane_power.down&buff.arcane_charge.stack=4&(cooldown.mark_of_aluneth.remains=0|cooldown.mark_of_aluneth.remains>20)&(!talent.rune_of_power.enabled|(cooldown.arcane_power.remains<=action.rune_of_power.cast_time|action.rune_of_power.recharge_time<cooldown.arcane_power.remains))|target.time_to_die<45
 		if { BuffExpires(arcane_power_buff) and DebuffStacks(arcane_charge_debuff) == 4 and { not SpellCooldown(mark_of_aluneth) > 0 or SpellCooldown(mark_of_aluneth) > 20 } and { not Talent(rune_of_power_talent) or SpellCooldown(arcane_power) <= CastTime(rune_of_power) or SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or target.TimeToDie() < 45 } and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneInitBurnMainActions()
 
 		unless { BuffExpires(arcane_power_buff) and DebuffStacks(arcane_charge_debuff) == 4 and { not SpellCooldown(mark_of_aluneth) > 0 or SpellCooldown(mark_of_aluneth) > 20 } and { not Talent(rune_of_power_talent) or SpellCooldown(arcane_power) <= CastTime(rune_of_power) or SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or target.TimeToDie() < 45 } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneInitBurnMainPostConditions()
 		{
-			#call_action_list,name=burn,if=burn_phase|((equipped.132413|equipped.132451)&mana.pct>30&cooldown.arcane_power.remains>40)
-			if { GetState(burn_phase) > 0 or { HasEquippedItem(132413) or HasEquippedItem(132451) } and ManaPercent() > 30 and SpellCooldown(arcane_power) > 40 } and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneBurnMainActions()
+			#call_action_list,name=burn,if=burn_phase
+			if GetState(burn_phase) > 0 and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneBurnMainActions()
 
-			unless { GetState(burn_phase) > 0 or { HasEquippedItem(132413) or HasEquippedItem(132451) } and ManaPercent() > 30 and SpellCooldown(arcane_power) > 40 } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnMainPostConditions()
+			unless GetState(burn_phase) > 0 and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnMainPostConditions()
 			{
 				#call_action_list,name=rop_phase,if=buff.rune_of_power.up&!burn_phase
 				if BuffPresent(rune_of_power_buff) and not GetState(burn_phase) > 0 ArcaneRopPhaseMainActions()
@@ -73,40 +71,37 @@ AddFunction ArcaneDefaultMainActions
 
 AddFunction ArcaneDefaultMainPostConditions
 {
-	{ DebuffStacks(arcane_charge_debuff) < 4 and { ManaPercent() >= 70 or SpellCooldown(arcane_power) < 3 or Talent(rune_of_power_talent) and SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or DebuffStacks(arcane_charge_debuff) < 3 and ManaPercent() >= 50 or DebuffStacks(arcane_charge_debuff) < 2 } and ArcaneBuildMainPostConditions() or { BuffExpires(arcane_power_buff) and DebuffStacks(arcane_charge_debuff) == 4 and { not SpellCooldown(mark_of_aluneth) > 0 or SpellCooldown(mark_of_aluneth) > 20 } and { not Talent(rune_of_power_talent) or SpellCooldown(arcane_power) <= CastTime(rune_of_power) or SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or target.TimeToDie() < 45 } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneInitBurnMainPostConditions() or { GetState(burn_phase) > 0 or { HasEquippedItem(132413) or HasEquippedItem(132451) } and ManaPercent() > 30 and SpellCooldown(arcane_power) > 40 } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnMainPostConditions() or BuffPresent(rune_of_power_buff) and not GetState(burn_phase) > 0 and ArcaneRopPhaseMainPostConditions() or ArcaneConserveMainPostConditions()
+	DebuffStacks(arcane_charge_debuff) < 4 and ArcaneBuildMainPostConditions() or { BuffExpires(arcane_power_buff) and DebuffStacks(arcane_charge_debuff) == 4 and { not SpellCooldown(mark_of_aluneth) > 0 or SpellCooldown(mark_of_aluneth) > 20 } and { not Talent(rune_of_power_talent) or SpellCooldown(arcane_power) <= CastTime(rune_of_power) or SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or target.TimeToDie() < 45 } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneInitBurnMainPostConditions() or GetState(burn_phase) > 0 and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnMainPostConditions() or BuffPresent(rune_of_power_buff) and not GetState(burn_phase) > 0 and ArcaneRopPhaseMainPostConditions() or ArcaneConserveMainPostConditions()
 }
 
 AddFunction ArcaneDefaultShortCdActions
 {
-	unless BuffExpires(burst_haste_buff any=1) and GetState(burn_phase) > 0 and TimeInCombat() > 3 and Spell(shard_of_the_exodar_warp)
+	#stop_burn_phase,if=prev_gcd.evocation&burn_phase_duration>gcd.max
+	if PreviousGCDSpell(evocation) and GetStateDuration(burn_phase) > GCD() and GetState(burn_phase) > 0 SetState(burn_phase 0)
+	#mark_of_aluneth,if=cooldown.arcane_power.remains>20
+	if SpellCooldown(arcane_power) > 20 Spell(mark_of_aluneth)
+	#call_action_list,name=build,if=buff.arcane_charge.stack<4
+	if DebuffStacks(arcane_charge_debuff) < 4 ArcaneBuildShortCdActions()
+
+	unless DebuffStacks(arcane_charge_debuff) < 4 and ArcaneBuildShortCdPostConditions()
 	{
-		#stop_burn_phase,if=prev_gcd.evocation&burn_phase_duration>gcd.max
-		if PreviousGCDSpell(evocation) and GetStateDuration(burn_phase) > GCD() and GetState(burn_phase) > 0 SetState(burn_phase 0)
-		#mark_of_aluneth,if=cooldown.arcane_power.remains>20
-		if SpellCooldown(arcane_power) > 20 Spell(mark_of_aluneth)
-		#call_action_list,name=build,if=buff.arcane_charge.stack<4&(mana.pct>=70|(cooldown.arcane_power.remains<3|(talent.rune_of_power.enabled&action.rune_of_power.recharge_time<cooldown.arcane_power.remains)))|(buff.arcane_charge.stack<3&mana.pct>=50)|buff.arcane_charge.stack<2
-		if DebuffStacks(arcane_charge_debuff) < 4 and { ManaPercent() >= 70 or SpellCooldown(arcane_power) < 3 or Talent(rune_of_power_talent) and SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or DebuffStacks(arcane_charge_debuff) < 3 and ManaPercent() >= 50 or DebuffStacks(arcane_charge_debuff) < 2 ArcaneBuildShortCdActions()
+		#call_action_list,name=init_burn,if=buff.arcane_power.down&buff.arcane_charge.stack=4&(cooldown.mark_of_aluneth.remains=0|cooldown.mark_of_aluneth.remains>20)&(!talent.rune_of_power.enabled|(cooldown.arcane_power.remains<=action.rune_of_power.cast_time|action.rune_of_power.recharge_time<cooldown.arcane_power.remains))|target.time_to_die<45
+		if { BuffExpires(arcane_power_buff) and DebuffStacks(arcane_charge_debuff) == 4 and { not SpellCooldown(mark_of_aluneth) > 0 or SpellCooldown(mark_of_aluneth) > 20 } and { not Talent(rune_of_power_talent) or SpellCooldown(arcane_power) <= CastTime(rune_of_power) or SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or target.TimeToDie() < 45 } and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneInitBurnShortCdActions()
 
-		unless { DebuffStacks(arcane_charge_debuff) < 4 and { ManaPercent() >= 70 or SpellCooldown(arcane_power) < 3 or Talent(rune_of_power_talent) and SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or DebuffStacks(arcane_charge_debuff) < 3 and ManaPercent() >= 50 or DebuffStacks(arcane_charge_debuff) < 2 } and ArcaneBuildShortCdPostConditions()
+		unless { BuffExpires(arcane_power_buff) and DebuffStacks(arcane_charge_debuff) == 4 and { not SpellCooldown(mark_of_aluneth) > 0 or SpellCooldown(mark_of_aluneth) > 20 } and { not Talent(rune_of_power_talent) or SpellCooldown(arcane_power) <= CastTime(rune_of_power) or SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or target.TimeToDie() < 45 } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneInitBurnShortCdPostConditions()
 		{
-			#call_action_list,name=init_burn,if=buff.arcane_power.down&buff.arcane_charge.stack=4&(cooldown.mark_of_aluneth.remains=0|cooldown.mark_of_aluneth.remains>20)&(!talent.rune_of_power.enabled|(cooldown.arcane_power.remains<=action.rune_of_power.cast_time|action.rune_of_power.recharge_time<cooldown.arcane_power.remains))|target.time_to_die<45
-			if { BuffExpires(arcane_power_buff) and DebuffStacks(arcane_charge_debuff) == 4 and { not SpellCooldown(mark_of_aluneth) > 0 or SpellCooldown(mark_of_aluneth) > 20 } and { not Talent(rune_of_power_talent) or SpellCooldown(arcane_power) <= CastTime(rune_of_power) or SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or target.TimeToDie() < 45 } and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneInitBurnShortCdActions()
+			#call_action_list,name=burn,if=burn_phase
+			if GetState(burn_phase) > 0 and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneBurnShortCdActions()
 
-			unless { BuffExpires(arcane_power_buff) and DebuffStacks(arcane_charge_debuff) == 4 and { not SpellCooldown(mark_of_aluneth) > 0 or SpellCooldown(mark_of_aluneth) > 20 } and { not Talent(rune_of_power_talent) or SpellCooldown(arcane_power) <= CastTime(rune_of_power) or SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or target.TimeToDie() < 45 } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneInitBurnShortCdPostConditions()
+			unless GetState(burn_phase) > 0 and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnShortCdPostConditions()
 			{
-				#call_action_list,name=burn,if=burn_phase|((equipped.132413|equipped.132451)&mana.pct>30&cooldown.arcane_power.remains>40)
-				if { GetState(burn_phase) > 0 or { HasEquippedItem(132413) or HasEquippedItem(132451) } and ManaPercent() > 30 and SpellCooldown(arcane_power) > 40 } and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneBurnShortCdActions()
+				#call_action_list,name=rop_phase,if=buff.rune_of_power.up&!burn_phase
+				if BuffPresent(rune_of_power_buff) and not GetState(burn_phase) > 0 ArcaneRopPhaseShortCdActions()
 
-				unless { GetState(burn_phase) > 0 or { HasEquippedItem(132413) or HasEquippedItem(132451) } and ManaPercent() > 30 and SpellCooldown(arcane_power) > 40 } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnShortCdPostConditions()
+				unless BuffPresent(rune_of_power_buff) and not GetState(burn_phase) > 0 and ArcaneRopPhaseShortCdPostConditions()
 				{
-					#call_action_list,name=rop_phase,if=buff.rune_of_power.up&!burn_phase
-					if BuffPresent(rune_of_power_buff) and not GetState(burn_phase) > 0 ArcaneRopPhaseShortCdActions()
-
-					unless BuffPresent(rune_of_power_buff) and not GetState(burn_phase) > 0 and ArcaneRopPhaseShortCdPostConditions()
-					{
-						#call_action_list,name=conserve
-						ArcaneConserveShortCdActions()
-					}
+					#call_action_list,name=conserve
+					ArcaneConserveShortCdActions()
 				}
 			}
 		}
@@ -115,46 +110,44 @@ AddFunction ArcaneDefaultShortCdActions
 
 AddFunction ArcaneDefaultShortCdPostConditions
 {
-	BuffExpires(burst_haste_buff any=1) and GetState(burn_phase) > 0 and TimeInCombat() > 3 and Spell(shard_of_the_exodar_warp) or { DebuffStacks(arcane_charge_debuff) < 4 and { ManaPercent() >= 70 or SpellCooldown(arcane_power) < 3 or Talent(rune_of_power_talent) and SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or DebuffStacks(arcane_charge_debuff) < 3 and ManaPercent() >= 50 or DebuffStacks(arcane_charge_debuff) < 2 } and ArcaneBuildShortCdPostConditions() or { BuffExpires(arcane_power_buff) and DebuffStacks(arcane_charge_debuff) == 4 and { not SpellCooldown(mark_of_aluneth) > 0 or SpellCooldown(mark_of_aluneth) > 20 } and { not Talent(rune_of_power_talent) or SpellCooldown(arcane_power) <= CastTime(rune_of_power) or SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or target.TimeToDie() < 45 } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneInitBurnShortCdPostConditions() or { GetState(burn_phase) > 0 or { HasEquippedItem(132413) or HasEquippedItem(132451) } and ManaPercent() > 30 and SpellCooldown(arcane_power) > 40 } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnShortCdPostConditions() or BuffPresent(rune_of_power_buff) and not GetState(burn_phase) > 0 and ArcaneRopPhaseShortCdPostConditions() or ArcaneConserveShortCdPostConditions()
+	DebuffStacks(arcane_charge_debuff) < 4 and ArcaneBuildShortCdPostConditions() or { BuffExpires(arcane_power_buff) and DebuffStacks(arcane_charge_debuff) == 4 and { not SpellCooldown(mark_of_aluneth) > 0 or SpellCooldown(mark_of_aluneth) > 20 } and { not Talent(rune_of_power_talent) or SpellCooldown(arcane_power) <= CastTime(rune_of_power) or SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or target.TimeToDie() < 45 } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneInitBurnShortCdPostConditions() or GetState(burn_phase) > 0 and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnShortCdPostConditions() or BuffPresent(rune_of_power_buff) and not GetState(burn_phase) > 0 and ArcaneRopPhaseShortCdPostConditions() or ArcaneConserveShortCdPostConditions()
 }
 
 AddFunction ArcaneDefaultCdActions
 {
 	#counterspell,if=target.debuff.casting.react
 	if target.IsInterruptible() ArcaneInterruptActions()
-	#time_warp,if=target.health.pct<25|time=0
-	if { target.HealthPercent() < 25 or TimeInCombat() == 0 } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
+	#time_warp,if=(time=0&buff.bloodlust.down)|(buff.bloodlust.down&equipped.132410)
+	if { TimeInCombat() == 0 and BuffExpires(burst_haste_buff any=1) or BuffExpires(burst_haste_buff any=1) and HasEquippedItem(132410) } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
+	#mirror_image,if=buff.arcane_power.down
+	if BuffExpires(arcane_power_buff) Spell(mirror_image)
+	#stop_burn_phase,if=prev_gcd.evocation&burn_phase_duration>gcd.max
+	if PreviousGCDSpell(evocation) and GetStateDuration(burn_phase) > GCD() and GetState(burn_phase) > 0 SetState(burn_phase 0)
 
-	unless BuffExpires(burst_haste_buff any=1) and GetState(burn_phase) > 0 and TimeInCombat() > 3 and Spell(shard_of_the_exodar_warp)
+	unless SpellCooldown(arcane_power) > 20 and Spell(mark_of_aluneth)
 	{
-		#stop_burn_phase,if=prev_gcd.evocation&burn_phase_duration>gcd.max
-		if PreviousGCDSpell(evocation) and GetStateDuration(burn_phase) > GCD() and GetState(burn_phase) > 0 SetState(burn_phase 0)
+		#call_action_list,name=build,if=buff.arcane_charge.stack<4
+		if DebuffStacks(arcane_charge_debuff) < 4 ArcaneBuildCdActions()
 
-		unless SpellCooldown(arcane_power) > 20 and Spell(mark_of_aluneth)
+		unless DebuffStacks(arcane_charge_debuff) < 4 and ArcaneBuildCdPostConditions()
 		{
-			#call_action_list,name=build,if=buff.arcane_charge.stack<4&(mana.pct>=70|(cooldown.arcane_power.remains<3|(talent.rune_of_power.enabled&action.rune_of_power.recharge_time<cooldown.arcane_power.remains)))|(buff.arcane_charge.stack<3&mana.pct>=50)|buff.arcane_charge.stack<2
-			if DebuffStacks(arcane_charge_debuff) < 4 and { ManaPercent() >= 70 or SpellCooldown(arcane_power) < 3 or Talent(rune_of_power_talent) and SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or DebuffStacks(arcane_charge_debuff) < 3 and ManaPercent() >= 50 or DebuffStacks(arcane_charge_debuff) < 2 ArcaneBuildCdActions()
+			#call_action_list,name=init_burn,if=buff.arcane_power.down&buff.arcane_charge.stack=4&(cooldown.mark_of_aluneth.remains=0|cooldown.mark_of_aluneth.remains>20)&(!talent.rune_of_power.enabled|(cooldown.arcane_power.remains<=action.rune_of_power.cast_time|action.rune_of_power.recharge_time<cooldown.arcane_power.remains))|target.time_to_die<45
+			if { BuffExpires(arcane_power_buff) and DebuffStacks(arcane_charge_debuff) == 4 and { not SpellCooldown(mark_of_aluneth) > 0 or SpellCooldown(mark_of_aluneth) > 20 } and { not Talent(rune_of_power_talent) or SpellCooldown(arcane_power) <= CastTime(rune_of_power) or SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or target.TimeToDie() < 45 } and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneInitBurnCdActions()
 
-			unless { DebuffStacks(arcane_charge_debuff) < 4 and { ManaPercent() >= 70 or SpellCooldown(arcane_power) < 3 or Talent(rune_of_power_talent) and SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or DebuffStacks(arcane_charge_debuff) < 3 and ManaPercent() >= 50 or DebuffStacks(arcane_charge_debuff) < 2 } and ArcaneBuildCdPostConditions()
+			unless { BuffExpires(arcane_power_buff) and DebuffStacks(arcane_charge_debuff) == 4 and { not SpellCooldown(mark_of_aluneth) > 0 or SpellCooldown(mark_of_aluneth) > 20 } and { not Talent(rune_of_power_talent) or SpellCooldown(arcane_power) <= CastTime(rune_of_power) or SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or target.TimeToDie() < 45 } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneInitBurnCdPostConditions()
 			{
-				#call_action_list,name=init_burn,if=buff.arcane_power.down&buff.arcane_charge.stack=4&(cooldown.mark_of_aluneth.remains=0|cooldown.mark_of_aluneth.remains>20)&(!talent.rune_of_power.enabled|(cooldown.arcane_power.remains<=action.rune_of_power.cast_time|action.rune_of_power.recharge_time<cooldown.arcane_power.remains))|target.time_to_die<45
-				if { BuffExpires(arcane_power_buff) and DebuffStacks(arcane_charge_debuff) == 4 and { not SpellCooldown(mark_of_aluneth) > 0 or SpellCooldown(mark_of_aluneth) > 20 } and { not Talent(rune_of_power_talent) or SpellCooldown(arcane_power) <= CastTime(rune_of_power) or SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or target.TimeToDie() < 45 } and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneInitBurnCdActions()
+				#call_action_list,name=burn,if=burn_phase
+				if GetState(burn_phase) > 0 and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneBurnCdActions()
 
-				unless { BuffExpires(arcane_power_buff) and DebuffStacks(arcane_charge_debuff) == 4 and { not SpellCooldown(mark_of_aluneth) > 0 or SpellCooldown(mark_of_aluneth) > 20 } and { not Talent(rune_of_power_talent) or SpellCooldown(arcane_power) <= CastTime(rune_of_power) or SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or target.TimeToDie() < 45 } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneInitBurnCdPostConditions()
+				unless GetState(burn_phase) > 0 and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnCdPostConditions()
 				{
-					#call_action_list,name=burn,if=burn_phase|((equipped.132413|equipped.132451)&mana.pct>30&cooldown.arcane_power.remains>40)
-					if { GetState(burn_phase) > 0 or { HasEquippedItem(132413) or HasEquippedItem(132451) } and ManaPercent() > 30 and SpellCooldown(arcane_power) > 40 } and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneBurnCdActions()
+					#call_action_list,name=rop_phase,if=buff.rune_of_power.up&!burn_phase
+					if BuffPresent(rune_of_power_buff) and not GetState(burn_phase) > 0 ArcaneRopPhaseCdActions()
 
-					unless { GetState(burn_phase) > 0 or { HasEquippedItem(132413) or HasEquippedItem(132451) } and ManaPercent() > 30 and SpellCooldown(arcane_power) > 40 } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnCdPostConditions()
+					unless BuffPresent(rune_of_power_buff) and not GetState(burn_phase) > 0 and ArcaneRopPhaseCdPostConditions()
 					{
-						#call_action_list,name=rop_phase,if=buff.rune_of_power.up&!burn_phase
-						if BuffPresent(rune_of_power_buff) and not GetState(burn_phase) > 0 ArcaneRopPhaseCdActions()
-
-						unless BuffPresent(rune_of_power_buff) and not GetState(burn_phase) > 0 and ArcaneRopPhaseCdPostConditions()
-						{
-							#call_action_list,name=conserve
-							ArcaneConserveCdActions()
-						}
+						#call_action_list,name=conserve
+						ArcaneConserveCdActions()
 					}
 				}
 			}
@@ -164,7 +157,7 @@ AddFunction ArcaneDefaultCdActions
 
 AddFunction ArcaneDefaultCdPostConditions
 {
-	BuffExpires(burst_haste_buff any=1) and GetState(burn_phase) > 0 and TimeInCombat() > 3 and Spell(shard_of_the_exodar_warp) or SpellCooldown(arcane_power) > 20 and Spell(mark_of_aluneth) or { DebuffStacks(arcane_charge_debuff) < 4 and { ManaPercent() >= 70 or SpellCooldown(arcane_power) < 3 or Talent(rune_of_power_talent) and SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or DebuffStacks(arcane_charge_debuff) < 3 and ManaPercent() >= 50 or DebuffStacks(arcane_charge_debuff) < 2 } and ArcaneBuildCdPostConditions() or { BuffExpires(arcane_power_buff) and DebuffStacks(arcane_charge_debuff) == 4 and { not SpellCooldown(mark_of_aluneth) > 0 or SpellCooldown(mark_of_aluneth) > 20 } and { not Talent(rune_of_power_talent) or SpellCooldown(arcane_power) <= CastTime(rune_of_power) or SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or target.TimeToDie() < 45 } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneInitBurnCdPostConditions() or { GetState(burn_phase) > 0 or { HasEquippedItem(132413) or HasEquippedItem(132451) } and ManaPercent() > 30 and SpellCooldown(arcane_power) > 40 } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnCdPostConditions() or BuffPresent(rune_of_power_buff) and not GetState(burn_phase) > 0 and ArcaneRopPhaseCdPostConditions() or ArcaneConserveCdPostConditions()
+	SpellCooldown(arcane_power) > 20 and Spell(mark_of_aluneth) or DebuffStacks(arcane_charge_debuff) < 4 and ArcaneBuildCdPostConditions() or { BuffExpires(arcane_power_buff) and DebuffStacks(arcane_charge_debuff) == 4 and { not SpellCooldown(mark_of_aluneth) > 0 or SpellCooldown(mark_of_aluneth) > 20 } and { not Talent(rune_of_power_talent) or SpellCooldown(arcane_power) <= CastTime(rune_of_power) or SpellChargeCooldown(rune_of_power) < SpellCooldown(arcane_power) } or target.TimeToDie() < 45 } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneInitBurnCdPostConditions() or GetState(burn_phase) > 0 and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnCdPostConditions() or BuffPresent(rune_of_power_buff) and not GetState(burn_phase) > 0 and ArcaneRopPhaseCdPostConditions() or ArcaneConserveCdPostConditions()
 }
 
 ### actions.build
@@ -219,22 +212,26 @@ AddFunction ArcaneBurnMainActions
 	{
 		#arcane_missiles,if=buff.arcane_missiles.react=3
 		if BuffStacks(arcane_missiles_buff) == 3 Spell(arcane_missiles)
-		#arcane_explosion,if=buff.quickening.remains<action.arcane_blast.cast_time
-		if BuffRemaining(quickening_buff) < CastTime(arcane_blast) Spell(arcane_explosion)
+		#arcane_explosion,if=buff.quickening.remains<action.arcane_blast.cast_time&talent.quickening.enabled
+		if BuffRemaining(quickening_buff) < CastTime(arcane_blast) and Talent(quickening_talent) Spell(arcane_explosion)
 		#nether_tempest,if=dot.nether_tempest.remains<=2|!ticking
 		if target.DebuffRemaining(nether_tempest_debuff) <= 2 or not target.DebuffPresent(nether_tempest_debuff) Spell(nether_tempest)
-		#arcane_blast,if=mana.pct%10*execute_time>target.time_to_die
-		if ManaPercent() / 10 * ExecuteTime(arcane_blast) > target.TimeToDie() Spell(arcane_blast)
+		#arcane_blast,if=active_enemies<=1&mana.pct%10*execute_time>target.time_to_die
+		if Enemies() <= 1 and ManaPercent() / 10 * ExecuteTime(arcane_blast) > target.TimeToDie() Spell(arcane_blast)
+		#arcane_explosion,if=active_enemies>1&mana.pct%10*execute_time>target.time_to_die
+		if Enemies() > 1 and ManaPercent() / 10 * ExecuteTime(arcane_explosion) > target.TimeToDie() Spell(arcane_explosion)
 		#arcane_missiles,if=buff.arcane_missiles.react>1
 		if BuffStacks(arcane_missiles_buff) > 1 Spell(arcane_missiles)
+		#arcane_explosion,if=active_enemies>1&buff.arcane_power.remains>cast_time
+		if Enemies() > 1 and BuffRemaining(arcane_power_buff) > CastTime(arcane_explosion) Spell(arcane_explosion)
 		#arcane_blast,if=buff.presence_of_mind.up|buff.arcane_power.remains>cast_time
 		if BuffPresent(presence_of_mind_buff) or BuffRemaining(arcane_power_buff) > CastTime(arcane_blast) Spell(arcane_blast)
 		#supernova,if=mana.pct<100
 		if ManaPercent() < 100 Spell(supernova)
-		#arcane_missiles,if=buff.arcane_power.up|mana.pct>10
-		if BuffPresent(arcane_power_buff) or ManaPercent() > 10 Spell(arcane_missiles)
-		#arcane_explosion,if=active_enemies>1+talent.unstable_magic.enabled
-		if Enemies() > 1 + TalentPoints(unstable_magic_talent) Spell(arcane_explosion)
+		#arcane_missiles,if=mana.pct>10&(talent.overpowered.enabled|buff.arcane_power.down)
+		if ManaPercent() > 10 and { Talent(overpowered_talent) or BuffExpires(arcane_power_buff) } Spell(arcane_missiles)
+		#arcane_explosion,if=active_enemies>1
+		if Enemies() > 1 Spell(arcane_explosion)
 		#arcane_blast
 		Spell(arcane_blast)
 	}
@@ -250,7 +247,7 @@ AddFunction ArcaneBurnShortCdActions
 	#call_action_list,name=cooldowns
 	ArcaneCooldownsShortCdActions()
 
-	unless ArcaneCooldownsShortCdPostConditions() or BuffStacks(arcane_missiles_buff) == 3 and Spell(arcane_missiles) or BuffRemaining(quickening_buff) < CastTime(arcane_blast) and Spell(arcane_explosion) or { target.DebuffRemaining(nether_tempest_debuff) <= 2 or not target.DebuffPresent(nether_tempest_debuff) } and Spell(nether_tempest) or ManaPercent() / 10 * ExecuteTime(arcane_blast) > target.TimeToDie() and Spell(arcane_blast)
+	unless ArcaneCooldownsShortCdPostConditions() or BuffStacks(arcane_missiles_buff) == 3 and Spell(arcane_missiles) or BuffRemaining(quickening_buff) < CastTime(arcane_blast) and Talent(quickening_talent) and Spell(arcane_explosion)
 	{
 		#presence_of_mind,if=buff.arcane_power.remains>2*gcd
 		if BuffRemaining(arcane_power_buff) > 2 * GCD() Spell(presence_of_mind)
@@ -259,7 +256,7 @@ AddFunction ArcaneBurnShortCdActions
 
 AddFunction ArcaneBurnShortCdPostConditions
 {
-	ArcaneCooldownsShortCdPostConditions() or BuffStacks(arcane_missiles_buff) == 3 and Spell(arcane_missiles) or BuffRemaining(quickening_buff) < CastTime(arcane_blast) and Spell(arcane_explosion) or { target.DebuffRemaining(nether_tempest_debuff) <= 2 or not target.DebuffPresent(nether_tempest_debuff) } and Spell(nether_tempest) or ManaPercent() / 10 * ExecuteTime(arcane_blast) > target.TimeToDie() and Spell(arcane_blast) or BuffStacks(arcane_missiles_buff) > 1 and Spell(arcane_missiles) or { BuffPresent(presence_of_mind_buff) or BuffRemaining(arcane_power_buff) > CastTime(arcane_blast) } and Spell(arcane_blast) or ManaPercent() < 100 and Spell(supernova) or { BuffPresent(arcane_power_buff) or ManaPercent() > 10 } and Spell(arcane_missiles) or Enemies() > 1 + TalentPoints(unstable_magic_talent) and Spell(arcane_explosion) or Spell(arcane_blast)
+	ArcaneCooldownsShortCdPostConditions() or BuffStacks(arcane_missiles_buff) == 3 and Spell(arcane_missiles) or BuffRemaining(quickening_buff) < CastTime(arcane_blast) and Talent(quickening_talent) and Spell(arcane_explosion) or { target.DebuffRemaining(nether_tempest_debuff) <= 2 or not target.DebuffPresent(nether_tempest_debuff) } and Spell(nether_tempest) or Enemies() <= 1 and ManaPercent() / 10 * ExecuteTime(arcane_blast) > target.TimeToDie() and Spell(arcane_blast) or Enemies() > 1 and ManaPercent() / 10 * ExecuteTime(arcane_explosion) > target.TimeToDie() and Spell(arcane_explosion) or BuffStacks(arcane_missiles_buff) > 1 and Spell(arcane_missiles) or Enemies() > 1 and BuffRemaining(arcane_power_buff) > CastTime(arcane_explosion) and Spell(arcane_explosion) or { BuffPresent(presence_of_mind_buff) or BuffRemaining(arcane_power_buff) > CastTime(arcane_blast) } and Spell(arcane_blast) or ManaPercent() < 100 and Spell(supernova) or ManaPercent() > 10 and { Talent(overpowered_talent) or BuffExpires(arcane_power_buff) } and Spell(arcane_missiles) or Enemies() > 1 and Spell(arcane_explosion) or Spell(arcane_blast)
 }
 
 AddFunction ArcaneBurnCdActions
@@ -267,16 +264,16 @@ AddFunction ArcaneBurnCdActions
 	#call_action_list,name=cooldowns
 	ArcaneCooldownsCdActions()
 
-	unless ArcaneCooldownsCdPostConditions() or BuffStacks(arcane_missiles_buff) == 3 and Spell(arcane_missiles) or BuffRemaining(quickening_buff) < CastTime(arcane_blast) and Spell(arcane_explosion) or { target.DebuffRemaining(nether_tempest_debuff) <= 2 or not target.DebuffPresent(nether_tempest_debuff) } and Spell(nether_tempest) or ManaPercent() / 10 * ExecuteTime(arcane_blast) > target.TimeToDie() and Spell(arcane_blast) or BuffStacks(arcane_missiles_buff) > 1 and Spell(arcane_missiles) or { BuffPresent(presence_of_mind_buff) or BuffRemaining(arcane_power_buff) > CastTime(arcane_blast) } and Spell(arcane_blast) or ManaPercent() < 100 and Spell(supernova) or { BuffPresent(arcane_power_buff) or ManaPercent() > 10 } and Spell(arcane_missiles) or Enemies() > 1 + TalentPoints(unstable_magic_talent) and Spell(arcane_explosion) or Spell(arcane_blast)
+	unless ArcaneCooldownsCdPostConditions() or BuffStacks(arcane_missiles_buff) == 3 and Spell(arcane_missiles) or BuffRemaining(quickening_buff) < CastTime(arcane_blast) and Talent(quickening_talent) and Spell(arcane_explosion) or { target.DebuffRemaining(nether_tempest_debuff) <= 2 or not target.DebuffPresent(nether_tempest_debuff) } and Spell(nether_tempest) or Enemies() <= 1 and ManaPercent() / 10 * ExecuteTime(arcane_blast) > target.TimeToDie() and Spell(arcane_blast) or Enemies() > 1 and ManaPercent() / 10 * ExecuteTime(arcane_explosion) > target.TimeToDie() and Spell(arcane_explosion) or BuffStacks(arcane_missiles_buff) > 1 and Spell(arcane_missiles) or Enemies() > 1 and BuffRemaining(arcane_power_buff) > CastTime(arcane_explosion) and Spell(arcane_explosion) or { BuffPresent(presence_of_mind_buff) or BuffRemaining(arcane_power_buff) > CastTime(arcane_blast) } and Spell(arcane_blast) or ManaPercent() < 100 and Spell(supernova) or ManaPercent() > 10 and { Talent(overpowered_talent) or BuffExpires(arcane_power_buff) } and Spell(arcane_missiles) or Enemies() > 1 and Spell(arcane_explosion) or Spell(arcane_blast)
 	{
-		#evocation
+		#evocation,interrupt_if=mana.pct>99
 		Spell(evocation)
 	}
 }
 
 AddFunction ArcaneBurnCdPostConditions
 {
-	ArcaneCooldownsCdPostConditions() or BuffStacks(arcane_missiles_buff) == 3 and Spell(arcane_missiles) or BuffRemaining(quickening_buff) < CastTime(arcane_blast) and Spell(arcane_explosion) or { target.DebuffRemaining(nether_tempest_debuff) <= 2 or not target.DebuffPresent(nether_tempest_debuff) } and Spell(nether_tempest) or ManaPercent() / 10 * ExecuteTime(arcane_blast) > target.TimeToDie() and Spell(arcane_blast) or BuffStacks(arcane_missiles_buff) > 1 and Spell(arcane_missiles) or { BuffPresent(presence_of_mind_buff) or BuffRemaining(arcane_power_buff) > CastTime(arcane_blast) } and Spell(arcane_blast) or ManaPercent() < 100 and Spell(supernova) or { BuffPresent(arcane_power_buff) or ManaPercent() > 10 } and Spell(arcane_missiles) or Enemies() > 1 + TalentPoints(unstable_magic_talent) and Spell(arcane_explosion) or Spell(arcane_blast)
+	ArcaneCooldownsCdPostConditions() or BuffStacks(arcane_missiles_buff) == 3 and Spell(arcane_missiles) or BuffRemaining(quickening_buff) < CastTime(arcane_blast) and Talent(quickening_talent) and Spell(arcane_explosion) or { target.DebuffRemaining(nether_tempest_debuff) <= 2 or not target.DebuffPresent(nether_tempest_debuff) } and Spell(nether_tempest) or Enemies() <= 1 and ManaPercent() / 10 * ExecuteTime(arcane_blast) > target.TimeToDie() and Spell(arcane_blast) or Enemies() > 1 and ManaPercent() / 10 * ExecuteTime(arcane_explosion) > target.TimeToDie() and Spell(arcane_explosion) or BuffStacks(arcane_missiles_buff) > 1 and Spell(arcane_missiles) or Enemies() > 1 and BuffRemaining(arcane_power_buff) > CastTime(arcane_explosion) and Spell(arcane_explosion) or { BuffPresent(presence_of_mind_buff) or BuffRemaining(arcane_power_buff) > CastTime(arcane_blast) } and Spell(arcane_blast) or ManaPercent() < 100 and Spell(supernova) or ManaPercent() > 10 and { Talent(overpowered_talent) or BuffExpires(arcane_power_buff) } and Spell(arcane_missiles) or Enemies() > 1 and Spell(arcane_explosion) or Spell(arcane_blast)
 }
 
 ### actions.conserve
@@ -285,12 +282,12 @@ AddFunction ArcaneConserveMainActions
 {
 	#arcane_missiles,if=buff.arcane_missiles.react=3
 	if BuffStacks(arcane_missiles_buff) == 3 Spell(arcane_missiles)
-	#arcane_explosion,if=buff.quickening.remains<action.arcane_blast.cast_time
-	if BuffRemaining(quickening_buff) < CastTime(arcane_blast) Spell(arcane_explosion)
+	#arcane_explosion,if=buff.quickening.remains<action.arcane_blast.cast_time&talent.quickening.enabled
+	if BuffRemaining(quickening_buff) < CastTime(arcane_blast) and Talent(quickening_talent) Spell(arcane_explosion)
 	#arcane_blast,if=mana.pct>99
 	if ManaPercent() > 99 Spell(arcane_blast)
-	#nether_tempest,if=(refreshable|!ticking)|(cooldown.rune_of_power.remains<gcd.max&dot.nether_tempest.remains<10)
-	if target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) or SpellCooldown(rune_of_power) < GCD() and target.DebuffRemaining(nether_tempest_debuff) < 10 Spell(nether_tempest)
+	#nether_tempest,if=(refreshable|!ticking)
+	if target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) Spell(nether_tempest)
 	#arcane_blast,if=buff.rhonins_assaulting_armwraps.up&equipped.132413
 	if BuffPresent(rhonins_assaulting_armwraps_buff) and HasEquippedItem(132413) Spell(arcane_blast)
 	#arcane_missiles
@@ -305,6 +302,8 @@ AddFunction ArcaneConserveMainActions
 	if ManaPercent() >= 82 and HasEquippedItem(132451) Spell(arcane_blast)
 	#arcane_barrage,if=mana.pct<100&cooldown.arcane_power.remains>5
 	if ManaPercent() < 100 and SpellCooldown(arcane_power) > 5 Spell(arcane_barrage)
+	#arcane_explosion,if=active_enemies>1
+	if Enemies() > 1 Spell(arcane_explosion)
 	#arcane_blast
 	Spell(arcane_blast)
 }
@@ -319,7 +318,7 @@ AddFunction ArcaneConserveShortCdActions
 
 AddFunction ArcaneConserveShortCdPostConditions
 {
-	BuffStacks(arcane_missiles_buff) == 3 and Spell(arcane_missiles) or BuffRemaining(quickening_buff) < CastTime(arcane_blast) and Spell(arcane_explosion) or ManaPercent() > 99 and Spell(arcane_blast) or { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) or SpellCooldown(rune_of_power) < GCD() and target.DebuffRemaining(nether_tempest_debuff) < 10 } and Spell(nether_tempest) or BuffPresent(rhonins_assaulting_armwraps_buff) and HasEquippedItem(132413) and Spell(arcane_blast) or Spell(arcane_missiles) or ManaPercent() < 100 and Spell(supernova) or HasEquippedItem(132452) and Spell(frost_nova) or ManaPercent() >= 82 and HasEquippedItem(132451) and Enemies() > 1 and Spell(arcane_explosion) or ManaPercent() >= 82 and HasEquippedItem(132451) and Spell(arcane_blast) or ManaPercent() < 100 and SpellCooldown(arcane_power) > 5 and Spell(arcane_barrage) or Spell(arcane_blast)
+	BuffStacks(arcane_missiles_buff) == 3 and Spell(arcane_missiles) or BuffRemaining(quickening_buff) < CastTime(arcane_blast) and Talent(quickening_talent) and Spell(arcane_explosion) or ManaPercent() > 99 and Spell(arcane_blast) or { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) } and Spell(nether_tempest) or BuffPresent(rhonins_assaulting_armwraps_buff) and HasEquippedItem(132413) and Spell(arcane_blast) or Spell(arcane_missiles) or ManaPercent() < 100 and Spell(supernova) or HasEquippedItem(132452) and Spell(frost_nova) or ManaPercent() >= 82 and HasEquippedItem(132451) and Enemies() > 1 and Spell(arcane_explosion) or ManaPercent() >= 82 and HasEquippedItem(132451) and Spell(arcane_blast) or ManaPercent() < 100 and SpellCooldown(arcane_power) > 5 and Spell(arcane_barrage) or Enemies() > 1 and Spell(arcane_explosion) or Spell(arcane_blast)
 }
 
 AddFunction ArcaneConserveCdActions
@@ -328,7 +327,7 @@ AddFunction ArcaneConserveCdActions
 
 AddFunction ArcaneConserveCdPostConditions
 {
-	BuffStacks(arcane_missiles_buff) == 3 and Spell(arcane_missiles) or BuffRemaining(quickening_buff) < CastTime(arcane_blast) and Spell(arcane_explosion) or ManaPercent() > 99 and Spell(arcane_blast) or { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) or SpellCooldown(rune_of_power) < GCD() and target.DebuffRemaining(nether_tempest_debuff) < 10 } and Spell(nether_tempest) or BuffPresent(rhonins_assaulting_armwraps_buff) and HasEquippedItem(132413) and Spell(arcane_blast) or Spell(arcane_missiles) or ManaPercent() < 100 and Spell(supernova) or HasEquippedItem(132452) and Spell(frost_nova) or ManaPercent() >= 82 and HasEquippedItem(132451) and Enemies() > 1 and Spell(arcane_explosion) or ManaPercent() >= 82 and HasEquippedItem(132451) and Spell(arcane_blast) or ManaPercent() < 100 and SpellCooldown(arcane_power) > 5 and Spell(arcane_barrage) or Spell(arcane_blast)
+	BuffStacks(arcane_missiles_buff) == 3 and Spell(arcane_missiles) or BuffRemaining(quickening_buff) < CastTime(arcane_blast) and Talent(quickening_talent) and Spell(arcane_explosion) or ManaPercent() > 99 and Spell(arcane_blast) or { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) } and Spell(nether_tempest) or BuffPresent(rhonins_assaulting_armwraps_buff) and HasEquippedItem(132413) and Spell(arcane_blast) or Spell(arcane_missiles) or ManaPercent() < 100 and Spell(supernova) or HasEquippedItem(132452) and Spell(frost_nova) or ManaPercent() >= 82 and HasEquippedItem(132451) and Enemies() > 1 and Spell(arcane_explosion) or ManaPercent() >= 82 and HasEquippedItem(132451) and Spell(arcane_blast) or ManaPercent() < 100 and SpellCooldown(arcane_power) > 5 and Spell(arcane_barrage) or Enemies() > 1 and Spell(arcane_explosion) or Spell(arcane_blast)
 }
 
 ### actions.cooldowns
@@ -343,8 +342,8 @@ AddFunction ArcaneCooldownsMainPostConditions
 
 AddFunction ArcaneCooldownsShortCdActions
 {
-	#rune_of_power
-	Spell(rune_of_power)
+	#rune_of_power,if=mana.pct>45&buff.arcane_power.down
+	if ManaPercent() > 45 and BuffExpires(arcane_power_buff) Spell(rune_of_power)
 }
 
 AddFunction ArcaneCooldownsShortCdPostConditions
@@ -353,7 +352,7 @@ AddFunction ArcaneCooldownsShortCdPostConditions
 
 AddFunction ArcaneCooldownsCdActions
 {
-	unless Spell(rune_of_power)
+	unless ManaPercent() > 45 and BuffExpires(arcane_power_buff) and Spell(rune_of_power)
 	{
 		#arcane_power
 		Spell(arcane_power)
@@ -368,7 +367,7 @@ AddFunction ArcaneCooldownsCdActions
 
 AddFunction ArcaneCooldownsCdPostConditions
 {
-	Spell(rune_of_power)
+	ManaPercent() > 45 and BuffExpires(arcane_power_buff) and Spell(rune_of_power)
 }
 
 ### actions.init_burn
@@ -469,8 +468,8 @@ AddFunction ArcaneRopPhaseMainActions
 {
 	#arcane_missiles,if=buff.arcane_missiles.react=3
 	if BuffStacks(arcane_missiles_buff) == 3 Spell(arcane_missiles)
-	#arcane_explosion,if=buff.quickening.remains<action.arcane_blast.cast_time
-	if BuffRemaining(quickening_buff) < CastTime(arcane_blast) Spell(arcane_explosion)
+	#arcane_explosion,if=buff.quickening.remains<action.arcane_blast.cast_time&talent.quickening.enabled
+	if BuffRemaining(quickening_buff) < CastTime(arcane_blast) and Talent(quickening_talent) Spell(arcane_explosion)
 	#nether_tempest,if=dot.nether_tempest.remains<=2|!ticking
 	if target.DebuffRemaining(nether_tempest_debuff) <= 2 or not target.DebuffPresent(nether_tempest_debuff) Spell(nether_tempest)
 	#arcane_missiles,if=buff.arcane_charge.stack=4
@@ -493,7 +492,7 @@ AddFunction ArcaneRopPhaseShortCdActions
 
 AddFunction ArcaneRopPhaseShortCdPostConditions
 {
-	BuffStacks(arcane_missiles_buff) == 3 and Spell(arcane_missiles) or BuffRemaining(quickening_buff) < CastTime(arcane_blast) and Spell(arcane_explosion) or { target.DebuffRemaining(nether_tempest_debuff) <= 2 or not target.DebuffPresent(nether_tempest_debuff) } and Spell(nether_tempest) or DebuffStacks(arcane_charge_debuff) == 4 and Spell(arcane_missiles) or Enemies() > 1 and Spell(arcane_explosion) or ManaPercent() > 45 and Spell(arcane_blast) or Spell(arcane_barrage)
+	BuffStacks(arcane_missiles_buff) == 3 and Spell(arcane_missiles) or BuffRemaining(quickening_buff) < CastTime(arcane_blast) and Talent(quickening_talent) and Spell(arcane_explosion) or { target.DebuffRemaining(nether_tempest_debuff) <= 2 or not target.DebuffPresent(nether_tempest_debuff) } and Spell(nether_tempest) or DebuffStacks(arcane_charge_debuff) == 4 and Spell(arcane_missiles) or Enemies() > 1 and Spell(arcane_explosion) or ManaPercent() > 45 and Spell(arcane_blast) or Spell(arcane_barrage)
 }
 
 AddFunction ArcaneRopPhaseCdActions
@@ -502,7 +501,7 @@ AddFunction ArcaneRopPhaseCdActions
 
 AddFunction ArcaneRopPhaseCdPostConditions
 {
-	BuffStacks(arcane_missiles_buff) == 3 and Spell(arcane_missiles) or BuffRemaining(quickening_buff) < CastTime(arcane_blast) and Spell(arcane_explosion) or { target.DebuffRemaining(nether_tempest_debuff) <= 2 or not target.DebuffPresent(nether_tempest_debuff) } and Spell(nether_tempest) or DebuffStacks(arcane_charge_debuff) == 4 and Spell(arcane_missiles) or Enemies() > 1 and Spell(arcane_explosion) or ManaPercent() > 45 and Spell(arcane_blast) or Spell(arcane_barrage)
+	BuffStacks(arcane_missiles_buff) == 3 and Spell(arcane_missiles) or BuffRemaining(quickening_buff) < CastTime(arcane_blast) and Talent(quickening_talent) and Spell(arcane_explosion) or { target.DebuffRemaining(nether_tempest_debuff) <= 2 or not target.DebuffPresent(nether_tempest_debuff) } and Spell(nether_tempest) or DebuffStacks(arcane_charge_debuff) == 4 and Spell(arcane_missiles) or Enemies() > 1 and Spell(arcane_explosion) or ManaPercent() > 45 and Spell(arcane_blast) or Spell(arcane_barrage)
 }
 
 ### Arcane icons.
@@ -564,6 +563,7 @@ AddIcon checkbox=opt_mage_arcane_aoe help=cd specialization=arcane
 }
 
 ### Required symbols
+# 132410
 # 132413
 # 132451
 # 132452
@@ -588,19 +588,19 @@ AddIcon checkbox=opt_mage_arcane_aoe help=cd specialization=arcane
 # mirror_image
 # nether_tempest
 # nether_tempest_debuff
+# overpowered_talent
 # presence_of_mind
 # presence_of_mind_buff
 # quaking_palm
 # quickening_buff
+# quickening_talent
 # rhonins_assaulting_armwraps_buff
 # rune_of_power
 # rune_of_power_buff
 # rune_of_power_talent
-# shard_of_the_exodar_warp
 # summon_arcane_familiar
 # supernova
 # time_warp
-# unstable_magic_talent
 ]]
 	OvaleScripts:RegisterScript("MAGE", "arcane", name, desc, code, "script")
 end
@@ -639,8 +639,6 @@ AddFunction FireInterruptActions
 
 AddFunction FireDefaultMainActions
 {
-	#shard_of_the_exodar_warp,if=buff.bloodlust.down
-	if BuffExpires(burst_haste_buff any=1) Spell(shard_of_the_exodar_warp)
 	#call_action_list,name=combustion_phase,if=cooldown.combustion.remains<=action.rune_of_power.cast_time+(!talent.kindling.enabled*gcd)|buff.combustion.up
 	if SpellCooldown(combustion) <= CastTime(rune_of_power) + { not TalentPoints(kindling_talent) * GCD() } or BuffPresent(combustion_buff) FireCombustionPhaseMainActions()
 
@@ -664,59 +662,52 @@ AddFunction FireDefaultMainPostConditions
 
 AddFunction FireDefaultShortCdActions
 {
-	unless BuffExpires(burst_haste_buff any=1) and Spell(shard_of_the_exodar_warp)
+	#rune_of_power,if=cooldown.combustion.remains>40&buff.combustion.down&(cooldown.flame_on.remains<5|cooldown.flame_on.remains>30)&!talent.kindling.enabled|target.time_to_die.remains<11|talent.kindling.enabled&(charges_fractional>1.8|time<40)&cooldown.combustion.remains>40
+	if SpellCooldown(combustion) > 40 and BuffExpires(combustion_buff) and { SpellCooldown(flame_on) < 5 or SpellCooldown(flame_on) > 30 } and not Talent(kindling_talent) or target.TimeToDie() < 11 or Talent(kindling_talent) and { Charges(rune_of_power count=0) > 1.8 or TimeInCombat() < 40 } and SpellCooldown(combustion) > 40 Spell(rune_of_power)
+	#call_action_list,name=combustion_phase,if=cooldown.combustion.remains<=action.rune_of_power.cast_time+(!talent.kindling.enabled*gcd)|buff.combustion.up
+	if SpellCooldown(combustion) <= CastTime(rune_of_power) + { not TalentPoints(kindling_talent) * GCD() } or BuffPresent(combustion_buff) FireCombustionPhaseShortCdActions()
+
+	unless { SpellCooldown(combustion) <= CastTime(rune_of_power) + { not TalentPoints(kindling_talent) * GCD() } or BuffPresent(combustion_buff) } and FireCombustionPhaseShortCdPostConditions()
 	{
-		#rune_of_power,if=cooldown.combustion.remains>40&buff.combustion.down&(cooldown.flame_on.remains<5|cooldown.flame_on.remains>30)&!talent.kindling.enabled|target.time_to_die.remains<11|talent.kindling.enabled&(charges_fractional>1.8|time<40)&cooldown.combustion.remains>40
-		if SpellCooldown(combustion) > 40 and BuffExpires(combustion_buff) and { SpellCooldown(flame_on) < 5 or SpellCooldown(flame_on) > 30 } and not Talent(kindling_talent) or target.TimeToDie() < 11 or Talent(kindling_talent) and { Charges(rune_of_power count=0) > 1.8 or TimeInCombat() < 40 } and SpellCooldown(combustion) > 40 Spell(rune_of_power)
-		#call_action_list,name=combustion_phase,if=cooldown.combustion.remains<=action.rune_of_power.cast_time+(!talent.kindling.enabled*gcd)|buff.combustion.up
-		if SpellCooldown(combustion) <= CastTime(rune_of_power) + { not TalentPoints(kindling_talent) * GCD() } or BuffPresent(combustion_buff) FireCombustionPhaseShortCdActions()
+		#call_action_list,name=rop_phase,if=buff.rune_of_power.up&buff.combustion.down
+		if BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) FireRopPhaseShortCdActions()
 
-		unless { SpellCooldown(combustion) <= CastTime(rune_of_power) + { not TalentPoints(kindling_talent) * GCD() } or BuffPresent(combustion_buff) } and FireCombustionPhaseShortCdPostConditions()
+		unless BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopPhaseShortCdPostConditions()
 		{
-			#call_action_list,name=rop_phase,if=buff.rune_of_power.up&buff.combustion.down
-			if BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) FireRopPhaseShortCdActions()
-
-			unless BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopPhaseShortCdPostConditions()
-			{
-				#call_action_list,name=single_target
-				FireSingleTargetShortCdActions()
-			}
+			#call_action_list,name=single_target
+			FireSingleTargetShortCdActions()
 		}
 	}
 }
 
 AddFunction FireDefaultShortCdPostConditions
 {
-	BuffExpires(burst_haste_buff any=1) and Spell(shard_of_the_exodar_warp) or { SpellCooldown(combustion) <= CastTime(rune_of_power) + { not TalentPoints(kindling_talent) * GCD() } or BuffPresent(combustion_buff) } and FireCombustionPhaseShortCdPostConditions() or BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopPhaseShortCdPostConditions() or FireSingleTargetShortCdPostConditions()
+	{ SpellCooldown(combustion) <= CastTime(rune_of_power) + { not TalentPoints(kindling_talent) * GCD() } or BuffPresent(combustion_buff) } and FireCombustionPhaseShortCdPostConditions() or BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopPhaseShortCdPostConditions() or FireSingleTargetShortCdPostConditions()
 }
 
 AddFunction FireDefaultCdActions
 {
 	#counterspell,if=target.debuff.casting.react
 	if target.IsInterruptible() FireInterruptActions()
-	#time_warp,if=target.health.pct<25|time=0
-	if { target.HealthPercent() < 25 or TimeInCombat() == 0 } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
+	#time_warp,if=(time=0&buff.bloodlust.down)|(buff.bloodlust.down&equipped.132410)
+	if { TimeInCombat() == 0 and BuffExpires(burst_haste_buff any=1) or BuffExpires(burst_haste_buff any=1) and HasEquippedItem(132410) } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
+	#mirror_image,if=buff.combustion.down
+	if BuffExpires(combustion_buff) Spell(mirror_image)
 
-	unless BuffExpires(burst_haste_buff any=1) and Spell(shard_of_the_exodar_warp)
+	unless { SpellCooldown(combustion) > 40 and BuffExpires(combustion_buff) and { SpellCooldown(flame_on) < 5 or SpellCooldown(flame_on) > 30 } and not Talent(kindling_talent) or target.TimeToDie() < 11 or Talent(kindling_talent) and { Charges(rune_of_power count=0) > 1.8 or TimeInCombat() < 40 } and SpellCooldown(combustion) > 40 } and Spell(rune_of_power)
 	{
-		#mirror_image,if=buff.combustion.down
-		if BuffExpires(combustion_buff) Spell(mirror_image)
+		#call_action_list,name=combustion_phase,if=cooldown.combustion.remains<=action.rune_of_power.cast_time+(!talent.kindling.enabled*gcd)|buff.combustion.up
+		if SpellCooldown(combustion) <= CastTime(rune_of_power) + { not TalentPoints(kindling_talent) * GCD() } or BuffPresent(combustion_buff) FireCombustionPhaseCdActions()
 
-		unless { SpellCooldown(combustion) > 40 and BuffExpires(combustion_buff) and { SpellCooldown(flame_on) < 5 or SpellCooldown(flame_on) > 30 } and not Talent(kindling_talent) or target.TimeToDie() < 11 or Talent(kindling_talent) and { Charges(rune_of_power count=0) > 1.8 or TimeInCombat() < 40 } and SpellCooldown(combustion) > 40 } and Spell(rune_of_power)
+		unless { SpellCooldown(combustion) <= CastTime(rune_of_power) + { not TalentPoints(kindling_talent) * GCD() } or BuffPresent(combustion_buff) } and FireCombustionPhaseCdPostConditions()
 		{
-			#call_action_list,name=combustion_phase,if=cooldown.combustion.remains<=action.rune_of_power.cast_time+(!talent.kindling.enabled*gcd)|buff.combustion.up
-			if SpellCooldown(combustion) <= CastTime(rune_of_power) + { not TalentPoints(kindling_talent) * GCD() } or BuffPresent(combustion_buff) FireCombustionPhaseCdActions()
+			#call_action_list,name=rop_phase,if=buff.rune_of_power.up&buff.combustion.down
+			if BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) FireRopPhaseCdActions()
 
-			unless { SpellCooldown(combustion) <= CastTime(rune_of_power) + { not TalentPoints(kindling_talent) * GCD() } or BuffPresent(combustion_buff) } and FireCombustionPhaseCdPostConditions()
+			unless BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopPhaseCdPostConditions()
 			{
-				#call_action_list,name=rop_phase,if=buff.rune_of_power.up&buff.combustion.down
-				if BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) FireRopPhaseCdActions()
-
-				unless BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopPhaseCdPostConditions()
-				{
-					#call_action_list,name=single_target
-					FireSingleTargetCdActions()
-				}
+				#call_action_list,name=single_target
+				FireSingleTargetCdActions()
 			}
 		}
 	}
@@ -724,7 +715,7 @@ AddFunction FireDefaultCdActions
 
 AddFunction FireDefaultCdPostConditions
 {
-	BuffExpires(burst_haste_buff any=1) and Spell(shard_of_the_exodar_warp) or { SpellCooldown(combustion) > 40 and BuffExpires(combustion_buff) and { SpellCooldown(flame_on) < 5 or SpellCooldown(flame_on) > 30 } and not Talent(kindling_talent) or target.TimeToDie() < 11 or Talent(kindling_talent) and { Charges(rune_of_power count=0) > 1.8 or TimeInCombat() < 40 } and SpellCooldown(combustion) > 40 } and Spell(rune_of_power) or { SpellCooldown(combustion) <= CastTime(rune_of_power) + { not TalentPoints(kindling_talent) * GCD() } or BuffPresent(combustion_buff) } and FireCombustionPhaseCdPostConditions() or BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopPhaseCdPostConditions() or FireSingleTargetCdPostConditions()
+	{ SpellCooldown(combustion) > 40 and BuffExpires(combustion_buff) and { SpellCooldown(flame_on) < 5 or SpellCooldown(flame_on) > 30 } and not Talent(kindling_talent) or target.TimeToDie() < 11 or Talent(kindling_talent) and { Charges(rune_of_power count=0) > 1.8 or TimeInCombat() < 40 } and SpellCooldown(combustion) > 40 } and Spell(rune_of_power) or { SpellCooldown(combustion) <= CastTime(rune_of_power) + { not TalentPoints(kindling_talent) * GCD() } or BuffPresent(combustion_buff) } and FireCombustionPhaseCdPostConditions() or BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopPhaseCdPostConditions() or FireSingleTargetCdPostConditions()
 }
 
 ### actions.active_talents
@@ -735,8 +726,8 @@ AddFunction FireActiveTalentsMainActions
 	if BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 and Charges(phoenixs_flames) < 1 Spell(blast_wave)
 	#cinderstorm,if=cooldown.combustion.remains<cast_time&(buff.rune_of_power.up|!talent.rune_on_power.enabled)|cooldown.combustion.remains>10*spell_haste&!buff.combustion.up
 	if SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_on_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellHaste() } } and not BuffPresent(combustion_buff) Spell(cinderstorm)
-	#living_bomb,if=active_enemies>3&buff.combustion.down
-	if Enemies() > 3 and BuffExpires(combustion_buff) Spell(living_bomb)
+	#living_bomb,if=active_enemies>1&buff.combustion.down
+	if Enemies() > 1 and BuffExpires(combustion_buff) Spell(living_bomb)
 }
 
 AddFunction FireActiveTalentsMainPostConditions
@@ -763,7 +754,7 @@ AddFunction FireActiveTalentsShortCdActions
 
 AddFunction FireActiveTalentsShortCdPostConditions
 {
-	{ BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 and Charges(phoenixs_flames) < 1 } and Spell(blast_wave) or { SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_on_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellHaste() } } and not BuffPresent(combustion_buff) } and Spell(cinderstorm) or Enemies() > 3 and BuffExpires(combustion_buff) and Spell(living_bomb)
+	{ BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 and Charges(phoenixs_flames) < 1 } and Spell(blast_wave) or { SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_on_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellHaste() } } and not BuffPresent(combustion_buff) } and Spell(cinderstorm) or Enemies() > 1 and BuffExpires(combustion_buff) and Spell(living_bomb)
 }
 
 AddFunction FireActiveTalentsCdActions
@@ -772,7 +763,7 @@ AddFunction FireActiveTalentsCdActions
 
 AddFunction FireActiveTalentsCdPostConditions
 {
-	Charges(fire_blast) == 0 and { SpellCooldown(combustion) > 40 + TalentPoints(kindling_talent) * 25 or target.TimeToDie() < SpellCooldown(combustion) } and Spell(flame_on) or { BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 and Charges(phoenixs_flames) < 1 } and Spell(blast_wave) or { SpellCooldown(combustion) > 30 or SpellCooldown(combustion) > target.TimeToDie() or BuffPresent(rune_of_power_buff) } and Spell(meteor) or { SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_on_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellHaste() } } and not BuffPresent(combustion_buff) } and Spell(cinderstorm) or HasEquippedItem(132863) and Spell(dragons_breath) or Enemies() > 3 and BuffExpires(combustion_buff) and Spell(living_bomb)
+	Charges(fire_blast) == 0 and { SpellCooldown(combustion) > 40 + TalentPoints(kindling_talent) * 25 or target.TimeToDie() < SpellCooldown(combustion) } and Spell(flame_on) or { BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 and Charges(phoenixs_flames) < 1 } and Spell(blast_wave) or { SpellCooldown(combustion) > 30 or SpellCooldown(combustion) > target.TimeToDie() or BuffPresent(rune_of_power_buff) } and Spell(meteor) or { SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_on_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellHaste() } } and not BuffPresent(combustion_buff) } and Spell(cinderstorm) or HasEquippedItem(132863) and Spell(dragons_breath) or Enemies() > 1 and BuffExpires(combustion_buff) and Spell(living_bomb)
 }
 
 ### actions.combustion_phase
@@ -1083,6 +1074,7 @@ AddIcon checkbox=opt_mage_fire_aoe help=cd specialization=fire
 }
 
 ### Required symbols
+# 132410
 # 132454
 # 132863
 # arcane_torrent_mana
@@ -1118,7 +1110,6 @@ AddIcon checkbox=opt_mage_fire_aoe help=cd specialization=fire
 # rune_of_power_talent
 # rune_on_power_talent
 # scorch
-# shard_of_the_exodar_warp
 # time_warp
 ]]
 	OvaleScripts:RegisterScript("MAGE", "fire", name, desc, code, "script")
@@ -1131,7 +1122,7 @@ do
 # Based on SimulationCraft profile "Mage_Frost_T19P".
 #	class=mage
 #	spec=frost
-#	talents=3022011
+#	talents=1121113
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -1160,13 +1151,13 @@ AddFunction FrostDefaultMainActions
 {
 	#ice_lance,if=buff.fingers_of_frost.react=0&prev_gcd.flurry
 	if BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(flurry) Spell(ice_lance)
-	#shard_of_the_exodar_warp,if=buff.bloodlust.down&time>5
-	if BuffExpires(burst_haste_buff any=1) and TimeInCombat() > 5 Spell(shard_of_the_exodar_warp)
 	#call_action_list,name=cooldowns
 	FrostCooldownsMainActions()
 
 	unless FrostCooldownsMainPostConditions()
 	{
+		#blizzard,if=buff.potion_of_deadly_grace.up&!prev_off_gcd.water_jet
+		if BuffPresent(potion_of_deadly_grace_buff) and not PreviousOffGCDSpell(water_elemental_water_jet) Spell(blizzard)
 		#ice_nova,if=debuff.winters_chill.up
 		if target.DebuffPresent(winters_chill_debuff) Spell(ice_nova)
 		#frostbolt,if=prev_off_gcd.water_jet
@@ -1179,8 +1170,8 @@ AddFunction FrostDefaultMainActions
 		if BuffStacks(fingers_of_frost_buff) > 0 and SpellCooldown(icy_veins) > 10 or BuffStacks(fingers_of_frost_buff) > 2 Spell(ice_lance)
 		#ice_nova
 		Spell(ice_nova)
-		#blizzard,if=talent.arctic_gale.enabled|active_enemies>3|buff.zannesu_journey.stack>4|(buff.zannesu_journey.remains>cast_time+1&buff.zannesu_journey.react)
-		if Talent(arctic_gale_talent) or Enemies() > 3 or BuffStacks(zannesu_journey_buff) > 4 or BuffRemaining(zannesu_journey_buff) > CastTime(blizzard) + 1 and BuffPresent(zannesu_journey_buff) Spell(blizzard)
+		#blizzard,if=talent.artic_gale.enabled
+		if Talent(artic_gale_talent) Spell(blizzard)
 		#frostbolt
 		Spell(frostbolt)
 	}
@@ -1193,12 +1184,12 @@ AddFunction FrostDefaultMainPostConditions
 
 AddFunction FrostDefaultShortCdActions
 {
-	unless BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(flurry) and Spell(ice_lance) or BuffExpires(burst_haste_buff any=1) and TimeInCombat() > 5 and Spell(shard_of_the_exodar_warp)
+	unless BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(flurry) and Spell(ice_lance)
 	{
 		#call_action_list,name=cooldowns
 		FrostCooldownsShortCdActions()
 
-		unless FrostCooldownsShortCdPostConditions() or target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt)
+		unless FrostCooldownsShortCdPostConditions() or BuffPresent(potion_of_deadly_grace_buff) and not PreviousOffGCDSpell(water_elemental_water_jet) and Spell(blizzard) or target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt)
 		{
 			#water_jet,if=prev_gcd.frostbolt&buff.fingers_of_frost.stack<(2+artifact.icy_hand.enabled)&buff.brain_freeze.react=0
 			if PreviousGCDSpell(frostbolt) and BuffStacks(fingers_of_frost_buff) < 2 + HasArtifactTrait(icy_hand) and BuffStacks(brain_freeze_buff) == 0 Spell(water_elemental_water_jet)
@@ -1222,7 +1213,7 @@ AddFunction FrostDefaultShortCdActions
 						#comet_storm
 						Spell(comet_storm)
 
-						unless { Talent(arctic_gale_talent) or Enemies() > 3 or BuffStacks(zannesu_journey_buff) > 4 or BuffRemaining(zannesu_journey_buff) > CastTime(blizzard) + 1 and BuffPresent(zannesu_journey_buff) } and Spell(blizzard)
+						unless Talent(artic_gale_talent) and Spell(blizzard)
 						{
 							#ebonbolt,if=buff.fingers_of_frost.stack<=(0+artifact.icy_hand.enabled)
 							if BuffStacks(fingers_of_frost_buff) <= 0 + HasArtifactTrait(icy_hand) Spell(ebonbolt)
@@ -1236,7 +1227,7 @@ AddFunction FrostDefaultShortCdActions
 
 AddFunction FrostDefaultShortCdPostConditions
 {
-	BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(flurry) and Spell(ice_lance) or BuffExpires(burst_haste_buff any=1) and TimeInCombat() > 5 and Spell(shard_of_the_exodar_warp) or FrostCooldownsShortCdPostConditions() or target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or BuffPresent(brain_freeze_buff) and BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(frostbolt) and Spell(flurry) or Spell(glacial_spike) or { BuffStacks(fingers_of_frost_buff) > 0 and SpellCooldown(icy_veins) > 10 or BuffStacks(fingers_of_frost_buff) > 2 } and Spell(ice_lance) or Spell(ice_nova) or { Talent(arctic_gale_talent) or Enemies() > 3 or BuffStacks(zannesu_journey_buff) > 4 or BuffRemaining(zannesu_journey_buff) > CastTime(blizzard) + 1 and BuffPresent(zannesu_journey_buff) } and Spell(blizzard) or Spell(frostbolt)
+	BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(flurry) and Spell(ice_lance) or FrostCooldownsShortCdPostConditions() or BuffPresent(potion_of_deadly_grace_buff) and not PreviousOffGCDSpell(water_elemental_water_jet) and Spell(blizzard) or target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or BuffPresent(brain_freeze_buff) and BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(frostbolt) and Spell(flurry) or Spell(glacial_spike) or { BuffStacks(fingers_of_frost_buff) > 0 and SpellCooldown(icy_veins) > 10 or BuffStacks(fingers_of_frost_buff) > 2 } and Spell(ice_lance) or Spell(ice_nova) or Talent(artic_gale_talent) and Spell(blizzard) or Spell(frostbolt)
 }
 
 AddFunction FrostDefaultCdActions
@@ -1246,20 +1237,16 @@ AddFunction FrostDefaultCdActions
 
 	unless BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(flurry) and Spell(ice_lance)
 	{
-		#time_warp,if=target.health.pct<25|time=0
-		if { target.HealthPercent() < 25 or TimeInCombat() == 0 } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
-
-		unless BuffExpires(burst_haste_buff any=1) and TimeInCombat() > 5 and Spell(shard_of_the_exodar_warp)
-		{
-			#call_action_list,name=cooldowns
-			FrostCooldownsCdActions()
-		}
+		#time_warp,if=(time=0&buff.bloodlust.down)|(buff.bloodlust.down&equipped.132410)
+		if { TimeInCombat() == 0 and BuffExpires(burst_haste_buff any=1) or BuffExpires(burst_haste_buff any=1) and HasEquippedItem(132410) } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
+		#call_action_list,name=cooldowns
+		FrostCooldownsCdActions()
 	}
 }
 
 AddFunction FrostDefaultCdPostConditions
 {
-	BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(flurry) and Spell(ice_lance) or BuffExpires(burst_haste_buff any=1) and TimeInCombat() > 5 and Spell(shard_of_the_exodar_warp) or FrostCooldownsCdPostConditions() or target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or { BuffPresent(icy_veins_buff) or SpellCooldown(icy_veins) > SpellCooldown(ray_of_frost) and BuffExpires(rune_of_power_buff) } and Spell(ray_of_frost) or BuffPresent(brain_freeze_buff) and BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(frostbolt) and Spell(flurry) or Spell(glacial_spike) or BuffStacks(fingers_of_frost_buff) <= 0 + HasArtifactTrait(icy_hand) and Spell(frozen_touch) or target.DebuffRemaining(frost_bomb_debuff) < TravelTime(ice_lance) and BuffStacks(fingers_of_frost_buff) > 0 and Spell(frost_bomb) or { BuffStacks(fingers_of_frost_buff) > 0 and SpellCooldown(icy_veins) > 10 or BuffStacks(fingers_of_frost_buff) > 2 } and Spell(ice_lance) or Spell(frozen_orb) or Spell(ice_nova) or Spell(comet_storm) or { Talent(arctic_gale_talent) or Enemies() > 3 or BuffStacks(zannesu_journey_buff) > 4 or BuffRemaining(zannesu_journey_buff) > CastTime(blizzard) + 1 and BuffPresent(zannesu_journey_buff) } and Spell(blizzard) or BuffStacks(fingers_of_frost_buff) <= 0 + HasArtifactTrait(icy_hand) and Spell(ebonbolt) or Spell(frostbolt)
+	BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(flurry) and Spell(ice_lance) or FrostCooldownsCdPostConditions() or BuffPresent(potion_of_deadly_grace_buff) and not PreviousOffGCDSpell(water_elemental_water_jet) and Spell(blizzard) or target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or { BuffPresent(icy_veins_buff) or SpellCooldown(icy_veins) > SpellCooldown(ray_of_frost) and BuffExpires(rune_of_power_buff) } and Spell(ray_of_frost) or BuffPresent(brain_freeze_buff) and BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(frostbolt) and Spell(flurry) or Spell(glacial_spike) or BuffStacks(fingers_of_frost_buff) <= 0 + HasArtifactTrait(icy_hand) and Spell(frozen_touch) or target.DebuffRemaining(frost_bomb_debuff) < TravelTime(ice_lance) and BuffStacks(fingers_of_frost_buff) > 0 and Spell(frost_bomb) or { BuffStacks(fingers_of_frost_buff) > 0 and SpellCooldown(icy_veins) > 10 or BuffStacks(fingers_of_frost_buff) > 2 } and Spell(ice_lance) or Spell(frozen_orb) or Spell(ice_nova) or Spell(comet_storm) or Talent(artic_gale_talent) and Spell(blizzard) or BuffStacks(fingers_of_frost_buff) <= 0 + HasArtifactTrait(icy_hand) and Spell(ebonbolt) or Spell(frostbolt)
 }
 
 ### actions.cooldowns
@@ -1409,8 +1396,9 @@ AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 }
 
 ### Required symbols
+# 132410
 # arcane_torrent_mana
-# arctic_gale_talent
+# artic_gale_talent
 # augmentation
 # berserking
 # blizzard
@@ -1433,16 +1421,15 @@ AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 # icy_veins
 # icy_veins_buff
 # mirror_image
+# potion_of_deadly_grace_buff
 # quaking_palm
 # ray_of_frost
 # rune_of_power
 # rune_of_power_buff
-# shard_of_the_exodar_warp
 # time_warp
 # water_elemental
 # water_elemental_water_jet
 # winters_chill_debuff
-# zannesu_journey_buff
 ]]
 	OvaleScripts:RegisterScript("MAGE", "frost", name, desc, code, "script")
 end

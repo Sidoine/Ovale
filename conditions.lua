@@ -1732,7 +1732,7 @@ do
 		if state.lastSpellId then
 			local duration = state:GetGCD(state.lastSpellId, atTime, OvaleGUID:UnitGUID(target))
 			local spellcast = OvaleFuture:LastInFlightSpell()
-			local start = spellcast.start or 0
+			local start = (spellcast and spellcast.start) or 0
 			local ending = start + duration
 			return TestValue(start, INFINITY, 0, ending, -1, comparator, limit)
 		end
@@ -4227,6 +4227,27 @@ do
 end
 
 do
+	--- Returns the number of times a spell can be cast. Generally used for spells whose casting is limited by the number of item reagents in the player's possession. .
+	-- @name SpellCount
+	-- @paramsig number or boolean
+	-- @param id The spell ID.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The number of times a spell can be cast.
+	-- @return A boolean value for the result of the comparison.
+	-- @usage
+	-- if SpellCount(expel_harm) > 1
+	--     Spell(expel_harm)
+	local function SpellCount(positionalParams, namedParams, state, atTime)
+		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local spellCount = OvaleSpellBook:GetSpellCount(spellId)
+		return Compare(spellCount, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("spellcount", true, SpellCount)
+end
+
+do
 	--- Test if the given spell is in the spellbook.
 	-- A spell is known if the player has learned the spell and it is in the spellbook.
 	-- @name SpellKnown
@@ -4265,7 +4286,7 @@ do
 	-- if SpellCharges(savage_defense) >1
 	--     Spell(savage_defense)
 
-	local function SpellCharges(positionalParams, namedParams, state, atTime)
+	local function SpellMaxCharges(positionalParams, namedParams, state, atTime)
 		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
 		local charges, maxCharges, start, duration = state:GetSpellCharges(spellId, atTime)
 		if not maxCharges then return nil end
@@ -4273,7 +4294,7 @@ do
 		return Compare(maxCharges, comparator, limit)
 	end
 
-	OvaleCondition:RegisterCondition("spellmaxcharges", true, SpellCharges)
+	OvaleCondition:RegisterCondition("spellmaxcharges", true, SpellMaxCharges)
 end
 
 do

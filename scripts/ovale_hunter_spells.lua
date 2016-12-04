@@ -181,6 +181,7 @@ Define(windburst 204147)
 	SpellInfo(windburst focus=20 cd=20)
 
 # Talents
+Define(barrage_talent 17)
 Define(lone_wolf_talent 1)
 Define(steady_focus_talent 2)
 Define(throwing_axes_talent 2)	

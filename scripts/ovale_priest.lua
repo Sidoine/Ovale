@@ -11,7 +11,7 @@ do
 # Based on SimulationCraft profile "Priest_Shadow_T19P".
 #	class=priest
 #	spec=shadow
-#	talents=1001231
+#	talents=1001232
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -224,6 +224,8 @@ AddFunction ShadowPrecombatMainActions
 	Spell(augmentation)
 	#snapshot_stats
 	#potion,name=deadly_grace
+	#shadowform,if=!buff.shadowform.up
+	if not BuffPresent(shadowform_buff) Spell(shadowform)
 	#mind_blast
 	Spell(mind_blast)
 }
@@ -238,7 +240,7 @@ AddFunction ShadowPrecombatShortCdActions
 
 AddFunction ShadowPrecombatShortCdPostConditions
 {
-	Spell(augmentation) or Spell(mind_blast)
+	Spell(augmentation) or not BuffPresent(shadowform_buff) and Spell(shadowform) or Spell(mind_blast)
 }
 
 AddFunction ShadowPrecombatCdActions
@@ -247,7 +249,7 @@ AddFunction ShadowPrecombatCdActions
 
 AddFunction ShadowPrecombatCdPostConditions
 {
-	Spell(augmentation) or Spell(mind_blast)
+	Spell(augmentation) or not BuffPresent(shadowform_buff) and Spell(shadowform) or Spell(mind_blast)
 }
 
 ### actions.s2m
@@ -293,7 +295,7 @@ AddFunction ShadowS2mMainActions
 			{
 				#mind_sear,if=active_enemies>=3,interrupt=1
 				if Enemies() >= 3 Spell(mind_sear)
-				#mind_flay,if=!talent.mind_spike.enabled,chain=1,interrupt_immediate=1,interrupt_if=action.void_bolt.usable_in<gcd.max*0.8
+				#mind_flay,if=!talent.mind_spike.enabled,chain=1,interrupt_immediate=1,interrupt_if=action.void_bolt.usable
 				if not Talent(mind_spike_talent) Spell(mind_flay)
 				#mind_spike,if=talent.mind_spike.enabled
 				if Talent(mind_spike_talent) Spell(mind_spike)
@@ -426,7 +428,7 @@ AddFunction ShadowVfMainActions
 			{
 				#mind_sear,if=active_enemies>=3,interrupt=1
 				if Enemies() >= 3 Spell(mind_sear)
-				#mind_flay,if=!talent.mind_spike.enabled,chain=1,interrupt_immediate=1,interrupt_if=action.void_bolt.usable_in<gcd.max*0.8
+				#mind_flay,if=!talent.mind_spike.enabled,chain=1,interrupt_immediate=1,interrupt_if=action.void_bolt.usable
 				if not Talent(mind_spike_talent) Spell(mind_flay)
 				#mind_spike,if=talent.mind_spike.enabled
 				if Talent(mind_spike_talent) Spell(mind_spike)
@@ -491,10 +493,6 @@ AddFunction ShadowVfCdActions
 
 	unless Talent(shadow_crash_talent) and Spell(shadow_crash) or Talent(mindbender_talent) and not Talent(surrender_to_madness_talent) and Spell(mindbender) or Talent(mindbender_talent) and Talent(surrender_to_madness_talent) and target.TimeToDie() > s2mcheck() - BuffStacks(insanity_drain_stacks_buff) + 30 and Spell(mindbender)
 	{
-		#dispersion,if=!buff.power_infusion.up&!buff.berserking.up&!buff.bloodlust.up&artifact.void_torrent.rank&!talent.surrender_to_madness.enabled
-		if not BuffPresent(power_infusion_buff) and not BuffPresent(berserking_buff) and not BuffPresent(burst_haste_buff any=1) and ArtifactTraitRank(void_torrent) and not Talent(surrender_to_madness_talent) Spell(dispersion)
-		#dispersion,if=!buff.power_infusion.up&!buff.berserking.up&!buff.bloodlust.up&artifact.void_torrent.rank&talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.stack)+(120-10*artifact.from_the_shadows.rank)
-		if not BuffPresent(power_infusion_buff) and not BuffPresent(berserking_buff) and not BuffPresent(burst_haste_buff any=1) and ArtifactTraitRank(void_torrent) and Talent(surrender_to_madness_talent) and target.TimeToDie() > s2mcheck() - BuffStacks(insanity_drain_stacks_buff) + { 120 - 10 * ArtifactTraitRank(from_the_shadows) } Spell(dispersion)
 		#power_infusion,if=buff.voidform.stack>=10&buff.insanity_drain_stacks.stack<=30&!talent.surrender_to_madness.enabled
 		if BuffStacks(voidform_buff) >= 10 and BuffStacks(insanity_drain_stacks_buff) <= 30 and not Talent(surrender_to_madness_talent) Spell(power_infusion)
 		#power_infusion,if=buff.voidform.stack>=10&talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.stack)+15
@@ -596,7 +594,6 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # berserking_buff
 # dispersion
 # fortress_of_the_mind_talent
-# from_the_shadows
 # insanity_drain_stacks_buff
 # legacy_of_the_void_talent
 # mass_hysteria
@@ -618,6 +615,8 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # shadow_word_pain_debuff
 # shadow_word_void
 # shadowfiend
+# shadowform
+# shadowform_buff
 # shadowy_insight_buff
 # shadowy_insight_talent
 # sphere_of_insanity

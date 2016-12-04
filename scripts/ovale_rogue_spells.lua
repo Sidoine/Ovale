@@ -58,6 +58,7 @@ Define(blade_flurry 13877)
 Define(blade_flurry_buff 13877)
 Define(blindside_buff 121153)
 	SpellInfo(blindside_buff duration=10)
+Define(blunderbuss_buff 202895)
 Define(broadsides_buff 193356)
 Define(burst_of_speed 108212)
 	SpellInfo(burst_of_speed cd=3 energy=30)
@@ -206,9 +207,9 @@ Define(killing_spree 51690)
 	SpellAddBuff(killing_spree killing_spree_buff=1)
 Define(killing_spree_buff 51690)
 	SpellInfo(killing_spree_buff duration=3)
-Define(kingsbane 192853)
+Define(kingsbane 192759)
 	SpellAddBuff(kingsbane kingsbane_buff=1)
-Define(kingsbane_buff 192853)
+Define(kingsbane_buff 192759)
 	SpellInfo(kingsbane_buff duration=20)
 Define(leeching_poison 108211)
 	SpellAddBuff(leeching_poison leeching_poison_buff=1)
@@ -399,10 +400,12 @@ Define(finality 197406)
 
 # Legion legendary items
 Define(shadow_satyrs_walk 137032)
+Define(greenskins_waterlogged_wristcuffs_buff 209423)
 
 # Talents
 Define(deeper_strategem_talent 7)
 Define(dirty_tricks_talent 15)
+Define(elaborate_planning_talent 2)
 Define(vigor_talent 9)
 
 # Non-default tags for OvaleSimulationCraft.

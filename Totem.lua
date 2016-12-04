@@ -45,6 +45,7 @@ local TOTEM_SLOT = {
 	earth = EARTH_TOTEM_SLOT,
 	fire = FIRE_TOTEM_SLOT,
 	water = WATER_TOTEM_SLOT,
+	spirit_wolf = 1
 }
 
 -- Shaman's Totemic Recall destroys all totems.

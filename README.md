@@ -5,17 +5,18 @@ It displays one or more icons that show the cooldown of an action.  The action i
 The current release of Ovale provides default scripts for the following classes for *Legion*:
 Note that these are *work in progress*. More support is coming soon and there may be bugs.
 
-- Death Knight: Forst, Unholy
+- Death Knight: Blood, Forst, Unholy
+- Demon Hunter: Havoc, Vengeance
 - Druid: Balance, Feral, Guardian
 - Hunter: Beast Mastery, Marksmanship, Survival
 - Mage: Arcane, Fire, Frost
-- Monk: Mistweaver, Windwalker
-- Paladin: Retribution
+- Monk: Brewmaster, Windwalker
+- Paladin: Protection, Retribution
 - Priest: Shadow
 - Rogue: Assassination, Outlaw, Subtlety
 - Shaman: Elemental, Enhancement
 - Warlock: Affliction, Demonology, Destruction
-- Warrior: Arms, Fury
+- Warrior: Arms, Fury, Protection
 
 Default scripts are based on [SimulationCraft][].  You may also customize the default script to suit your needs (see [Documentation][]) or use scripts made by other users.
 

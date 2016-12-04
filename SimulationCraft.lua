@@ -704,43 +704,50 @@ ParseExpression = function(tokenStream, nodeList, annotation, minPrecedence)
 	while ok do
 		local keepScanning = false
 		local tokenType, token = tokenStream:Peek()
-		if tokenType then
-			local opInfo = BINARY_OPERATOR[token]
-			if opInfo then
-				local opType, precedence = opInfo[1], opInfo[2]
-				local asType = (opType == "logical") and "boolean" or "value"
-				if precedence and precedence > minPrecedence then
-					keepScanning = true
-					tokenStream:Consume()
-					local operator = token
-					local lhsNode = node
-					local rhsNode
-					ok, rhsNode = ParseExpression(tokenStream, nodeList, annotation, precedence)
-					if ok then
-						node = NewNode(nodeList, true)
-						node.type = opType
-						node.expressionType = "binary"
-						node.operator = operator
-						node.precedence = precedence
-						node.child[1] = lhsNode
-						node.child[2] = rhsNode
-						lhsNode.asType = asType
-						if not rhsNode then
-							SyntaxError(tokenStream, "Syntax error: no right operand in binary operator %s.", token)
-							return false				
-						end
-						rhsNode.asType = asType
-						-- Left-rotate tree to preserve precedence.
-						while node.type == rhsNode.type and node.operator == rhsNode.operator and BINARY_OPERATOR[node.operator][3] == "associative" and rhsNode.expressionType == "binary" do
-							node.child[2] = rhsNode.child[1]
-							rhsNode.child[1] = node
-							node = rhsNode
-							rhsNode = node.child[2]
-						end
+
+		if not tokenType then
+			break
+		end
+
+		local opInfo = BINARY_OPERATOR[token]
+		if opInfo then
+			local opType, precedence = opInfo[1], opInfo[2]
+			local asType = (opType == "logical") and "boolean" or "value"
+			if precedence and precedence > minPrecedence then
+				keepScanning = true
+				tokenStream:Consume()
+				local operator = token
+				local lhsNode = node
+				local rhsNode
+				ok, rhsNode = ParseExpression(tokenStream, nodeList, annotation, precedence)
+				if ok then
+					node = NewNode(nodeList, true)
+					node.type = opType
+					node.expressionType = "binary"
+					node.operator = operator
+					node.precedence = precedence
+					node.child[1] = lhsNode
+					node.child[2] = rhsNode
+					lhsNode.asType = asType
+					if not rhsNode then
+						SyntaxError(tokenStream, "Internal error: no right operand in binary operator %s.", token)
+						return false				
+					end
+					rhsNode.asType = asType
+					-- Left-rotate tree to preserve precedence.
+					while node.type == rhsNode.type and node.operator == rhsNode.operator and BINARY_OPERATOR[node.operator][3] == "associative" and rhsNode.expressionType == "binary" do
+						node.child[2] = rhsNode.child[1]
+						rhsNode.child[1] = node
+						node = rhsNode
+						rhsNode = node.child[2]
 					end
 				end
 			end
+		elseif not node then
+			SyntaxError(tokenStream, "Syntax error: %s of type %s is not a binary operator", token, tokenType)
+			return false
 		end
+		
 		if not keepScanning then
 			break
 		end
@@ -869,7 +876,7 @@ ParseOperand = function(tokenStream, nodeList, annotation)
 		local tokenType, token = tokenStream:Consume()
 		if tokenType == "name" then
 			name = token
-		elseif tokenType == "keyword" and token == "target" then
+		elseif tokenType == "keyword" and (token == "target" or token == "cooldown") then
 			-- Allow a bare "target" to be used as an operand.
 			name = token
 		else
@@ -939,8 +946,11 @@ ParseSimpleExpression = function(tokenStream, nodeList, annotation)
 	elseif tokenType == "keyword" then
 		if FUNCTION_KEYWORD[token] then
 			ok, node = ParseFunction(tokenStream, nodeList, annotation)
-		elseif token == "target" then
+		elseif token == "target" or token == "cooldown" then
 			ok, node = ParseOperand(tokenStream, nodeList, annotation)
+		else
+			SyntaxError(tokenStream, "Warning: unknown keyword %s when parsing SIMPLE EXPRESSION", token)	
+			return false
 		end
 	elseif tokenType == "name" then
 		ok, node = ParseOperand(tokenStream, nodeList, annotation)
@@ -1103,6 +1113,7 @@ local function InitializeDisambiguation()
 	AddDisambiguation("legendary_ring",			"legendary_ring_bonus_armor",	"DRUID",		"guardian", "Item")
 	AddDisambiguation("legendary_ring",			"legendary_ring_intellect",		"DRUID",		"balance", "Item")
 	AddDisambiguation("legendary_ring",			"legendary_ring_spirit",		"DRUID",		"restoration", "Item")
+	AddDisambiguation("lunar_strike", "lunar_strike_balance", "DRUID", "balance")
 	AddDisambiguation("moonfire",				"moonfire_cat",					"DRUID",		"feral")
 	AddDisambiguation("omen_of_clarity",		"omen_of_clarity_melee",		"DRUID",		"feral")
 	AddDisambiguation("rejuvenation_debuff",	"rejuvenation_buff",			"DRUID")
@@ -1856,15 +1867,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			annotation.interrupt = class
 			isSpellAction = false
 		elseif class == "MONK" and action == "storm_earth_and_fire" then
-			--[[
-				Only suggest SEF if it's toggled on and if there are enough enemies to
-				warrant sending out another SEF clone.
-			--]]
-			conditionCode = [[
-				CheckBoxOn(opt_storm_earth_and_fire) and Enemies() > 1
-					and { Enemies() < 3 and BuffStacks(storm_earth_and_fire_buff) < 1
-						  or Enemies() >= 3 and BuffStacks(storm_earth_and_fire_buff) < 2 }
-			]]
+			conditionCode = "CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff)"
 			annotation[action] = class
 		elseif class == "MONK" and action == "whirling_dragon_punch" then
 			conditionCode = "SpellCooldown(fists_of_fury)>0 and SpellCooldown(rising_sun_kick)>0"
@@ -2968,6 +2971,7 @@ do
 		["astral_power.deficit"]= "AstralPowerDeficit()",
 		["blade_dance_worth_using"] = "0",--TODO
 		["blood.frac"]			= "Rune(blood)",
+		["buff.out_of_range.up"] = "not target.InRange()",
 		["chi"]					= "Chi()",
 		["chi.max"]				= "MaxChi()",
 		["combo_points"]		= "ComboPoints()",
@@ -2992,6 +2996,7 @@ do
 		["energy.max"]			= "MaxEnergy()",
 		["energy.regen"]		= "EnergyRegenRate()",
 		["energy.time_to_max"]	= "TimeToMaxEnergy()",
+		["feral_spirit.remains"] = "TotemRemaining(sprit_wolf)",
 		["finality"]			= "HasArtifactTrait(finality)",
 		["focus"]				= "Focus()",
 		["focus.deficit"]		= "FocusDeficit()",
