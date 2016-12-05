@@ -3848,7 +3848,7 @@ EmitOperandTalent = function(operand, parseNode, nodeList, annotation, action)
 			if parseNode.asType == "boolean" then
 				code = format("not Talent(%s)", talentName)
 			else
-				code = format("NotTalentPoints(%s)", talentName)
+				code = format("Talent(%s no)", talentName)
 			end
 		elseif property == "enabled" then
 			if parseNode.asType == "boolean" then
