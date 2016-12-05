@@ -86,13 +86,16 @@ AddFunction VengeanceInterruptActions
 		{
 			unless SigilCharging(silence misery chains)
 			{
-				if (target.RemainingCastTime() >= 2 or (target.RemainingCastTime() >= 1 and Talent(quickened_sigils_talent))) Spell(sigil_of_silence)
+				if (target.RemainingCastTime() >= 2 or (target.RemainingCastTime() >= 1 and Talent(quickened_sigils_talent))) 
+				{
+					Spell(sigil_of_silence)
+					Spell(sigil_of_misery)
+					Spell(sigil_of_chains)
+				}
 				if target.Distance(less 8) Spell(arcane_torrent_dh)
-				Spell(sigil_of_misery)
 				Spell(fel_eruption)
 				if target.CreatureType(Demon) Spell(imprison)
 				if target.IsTargetingPlayer() Spell(empower_wards)
-				Spell(sigil_of_chains)
 			}
 		}
 	}
