@@ -509,6 +509,7 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_demonhunter_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=vengeance)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=vengeance)
 
 AddFunction VengeanceInterruptActions
@@ -596,6 +597,8 @@ AddFunction VengeanceDefaultShortCdPostConditions
 
 AddFunction VengeanceDefaultCdActions
 {
+	#consume_magic
+	VengeanceInterruptActions()
 	#fiery_brand,if=buff.demon_spikes.down&buff.metamorphosis.down
 	if BuffExpires(demon_spikes_buff) and BuffExpires(metamorphosis_veng_buff) Spell(fiery_brand)
 
