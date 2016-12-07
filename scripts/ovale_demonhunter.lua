@@ -40,7 +40,7 @@ AddFunction VengeanceDefaultShortCDActions
 
 AddFunction VengeanceDefaultMainActions
 {
-	Spell(soul_carver)
+	if (BuffStacks(soul_fragments) <= 1) Spell(soul_carver)
 	if (not VengeancePlayDefensively()) Spell(fel_devastation)
 	if (Pain() >= 80) Spell(soul_cleave)
 	Spell(immolation_aura)
@@ -59,7 +59,7 @@ AddFunction VengeanceDefaultMainActions
 
 AddFunction VengeanceDefaultAoEActions
 {
-	Spell(soul_carver)
+	if (BuffStacks(soul_fragments) <= 1) Spell(soul_carver)
 	if (not VengeancePlayDefensively()) Spell(fel_devastation)
 	if (Pain() >= 80) Spell(soul_cleave)
 	Spell(immolation_aura)
