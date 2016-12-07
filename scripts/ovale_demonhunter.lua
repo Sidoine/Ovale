@@ -98,6 +98,8 @@ AddFunction VengeanceInterruptActions
 	}
 }
 
+AddCheckBox(opt_demonhunter_vengeance_aoe L(AOE) default specialization=vengeance)
+
 AddIcon help=shortcd specialization=vengeance
 {
 	VengeanceDefaultShortCDActions()
@@ -108,7 +110,7 @@ AddIcon enemies=1 help=main specialization=vengeance
 	VengeanceDefaultMainActions()
 }
 
-AddIcon help=aoe specialization=vengeance
+AddIcon checkbox=opt_demonhunter_vengeance_aoe help=aoe specialization=vengeance
 {
 	VengeanceDefaultAoEActions()
 }
