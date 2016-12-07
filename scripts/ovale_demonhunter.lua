@@ -13,6 +13,11 @@ Include(ovale_demonhunter_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=vengeance)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=vengeance)
 
+AddFunction VengeancePlayDefensively
+{
+	CheckBoxOn(opt_demonhunter_vengeance_defensive)
+}
+
 AddFunction VengeanceHealMe
 {
 	if(HealthPercent() < 70) Spell(fel_devastation)
@@ -35,13 +40,14 @@ AddFunction VengeanceDefaultShortCDActions
 AddFunction VengeanceDefaultMainActions
 {
 	Spell(soul_carver)
+	if (not VengeancePlayDefensively()) Spell(fel_devastation)
 	if (Pain() >= 80) Spell(soul_cleave)
 	Spell(immolation_aura)
 	Spell(felblade)
 	Spell(fel_eruption)
 	if (not target.DebuffPresent(frailty_debuff)) Spell(spirit_bomb)
 	#if (BuffPresent(blade_turning_buff)) Spell(shear)
-	if (Pain() >= 60) Spell(fracture)
+	if (not VengeancePlayDefensively() and Pain() >= 60) Spell(fracture)
 	if (not SigilCharging(flame) and ((target.BuffExpires(sigil_of_flame_debuff 2) and not Talent(quickened_sigils_talent)) or target.BuffExpires(sigil_of_flame_debuff 1)))
 	{
 		if (Talent(flame_crash_talent) and (SpellCharges(infernal_strike) >= SpellMaxCharges(infernal_strike))) Spell(infernal_strike)
@@ -53,6 +59,7 @@ AddFunction VengeanceDefaultMainActions
 AddFunction VengeanceDefaultAoEActions
 {
 	Spell(soul_carver)
+	if (not VengeancePlayDefensively()) Spell(fel_devastation)
 	if (Pain() >= 80) Spell(soul_cleave)
 	Spell(immolation_aura)
 	if (not target.DebuffPresent(frailty_debuff)) Spell(spirit_bomb)
