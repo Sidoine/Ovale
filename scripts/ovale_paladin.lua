@@ -19,7 +19,7 @@ AddFunction ProtectionDefaultMainActions
 	if Talent(blessed_hammer_talent) and (target.BuffExpires(blessed_hammer_debuff) or SpellCharges(blessed_hammer) == SpellMaxCharges(blessed_hammer)) Spell(blessed_hammer)
 	Spell(judgment)
 	if Talent(crusaders_judgment_talent) and BuffPresent(grand_crusader_buff) Spell(avengers_shield)
-	if not BuffPresent(consecration_buff) or target.BuffExpires(consecration_debuff 1) Spell(consecration)
+	if not BuffPresent(consecration_buff) Spell(consecration)
 	Spell(avengers_shield)
 	Spell(blinding_light)
 	Spell(hammer_of_the_righteous)
@@ -29,7 +29,7 @@ AddFunction ProtectionDefaultMainActions
 AddFunction ProtectionDefaultAoEActions
 {
 	Spell(avengers_shield)
-	if not BuffPresent(consecration_buff) or target.BuffExpires(consecration_debuff 1) Spell(consecration)
+	if not BuffPresent(consecration_buff) Spell(consecration)
 	if Talent(blessed_hammer_talent) and (target.BuffExpires(blessed_hammer_debuff) or SpellCharges(blessed_hammer) == SpellMaxCharges(blessed_hammer)) Spell(blessed_hammer)
 	Spell(judgment)
 	Spell(blinding_light)
