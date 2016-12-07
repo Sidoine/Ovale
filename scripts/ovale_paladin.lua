@@ -74,6 +74,8 @@ AddFunction ProtectionUsePotionStrength
 AddCheckBox(opt_avenging_wrath SpellName(avenging_wrath_melee) default specialization=protection)
 AddFunction ProtectionDefaultCdActions
 {
+	ProtectionInterruptActions()
+
 	#bastion_of_light,if=talent.bastion_of_light.enabled&action.shield_of_the_righteous.charges<1
 	if Talent(bastion_of_light_talent) and Charges(shield_of_the_righteous) < 1 Spell(bastion_of_light)
 
