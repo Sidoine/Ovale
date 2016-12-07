@@ -16,20 +16,25 @@ AddCheckBox(opt_legendary_ring_tank ItemName(legendary_ring_bonus_armor) default
 
 AddFunction ProtectionDefaultMainActions
 {
-	if not PreviousGCDSpell(blessed_hammer) Spell(blessed_hammer)
+	if Talent(blessed_hammer_talent) and (target.BuffExpires(blessed_hammer_debuff) or SpellCharges(blessed_hammer) == SpellMaxCharges(blessed_hammer)) Spell(blessed_hammer)
 	Spell(judgment)
-	Spell(consecration)
+	if Talent(crusaders_judgment_talent) and BuffPresent(grand_crusader_buff) Spell(avengers_shield)
+	if not BuffPresent(consecration_buff) or target.BuffExpires(consecration_debuff 1) Spell(consecration)
 	Spell(avengers_shield)
+	Spell(blinding_light)
 	Spell(hammer_of_the_righteous)
+	Spell(consecration)
 }
 
 AddFunction ProtectionDefaultAoEActions
 {
 	Spell(avengers_shield)
-	Spell(consecration)
-	Spell(blessed_hammer)
+	if not BuffPresent(consecration_buff) or target.BuffExpires(consecration_debuff 1) Spell(consecration)
+	if Talent(blessed_hammer_talent) and (target.BuffExpires(blessed_hammer_debuff) or SpellCharges(blessed_hammer) == SpellMaxCharges(blessed_hammer)) Spell(blessed_hammer)
 	Spell(judgment)
+	Spell(blinding_light)
 	Spell(hammer_of_the_righteous)
+	Spell(consecration)
 }
 
 AddFunction ProtectionDefaultShortCDActions
@@ -58,7 +63,12 @@ AddFunction ProtectionDefaultShortCDActions
 
 AddFunction ProtectionCooldownTreshold
 {
-	IncomingDamage(2.5) > MaxHealth() * 0.3 #or HealthPercent() < 40
+	IncomingDamage(2.5) > MaxHealth() * 0.3 or HealthPercent() < 40
+}
+
+AddFunction ProtectionUsePotionStrength
+{
+	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 }
 
 AddCheckBox(opt_avenging_wrath SpellName(avenging_wrath_melee) default specialization=protection)
@@ -570,8 +580,6 @@ AddFunction RetributionInterruptActions
 		}
 	}
 }
-
-### actions.default
 
 AddFunction RetributionDefaultMainActions
 {
