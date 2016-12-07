@@ -20,17 +20,18 @@ AddFunction VengeancePlayDefensively
 
 AddFunction VengeanceHealMe
 {
-	if(HealthPercent() < 70) Spell(fel_devastation)
-	if(HealthPercent() < 50) Spell(soul_cleave)
+	if (HealthPercent() < 70) Spell(fel_devastation)
+	if (HealthPercent() < 50) Spell(soul_cleave)
+	if (IncomingDamage(5) >= MaxHealth() * 0.7) Spell(soul_cleave)
 }
 AddFunction VengeanceDefaultShortCDActions
 {
 	VengeanceHealMe()
 	if (InCombat() and (Charges(demon_spikes) == 2)) Spell(demon_spikes)
 	if (IncomingDamage(3 physical=1) > 0 and BuffExpires(demon_spikes_buff) and not target.DebuffPresent(fiery_brand_debuff) and BuffExpires(metamorphosis_veng_buff)) Spell(demon_spikes)
-	if CheckBoxOn(opt_melee_range) and not target.InRange(shear) 
+	if (CheckBoxOn(opt_melee_range) and not target.InRange(shear))
 	{
-		if target.InRange(felblade) Spell(felblade)
+		if (target.InRange(felblade)) Spell(felblade)
 		if (target.Distance(less 30) or (target.Distance(less 40) and Talent(abyssal_strike_talent))) Spell(infernal_strike)
 		Spell(throw_glaive)
 		Texture(misc_arrowlup help=L(not_in_melee_range))
