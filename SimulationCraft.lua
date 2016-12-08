@@ -568,6 +568,9 @@ ParseAction = function(action, nodeList, annotation)
 		stream = gsub(stream, "!([a-z_%.]+)%.cooldown%.up", "%1.cooldown.down")
 	end
 	do
+		stream = gsub(stream, "!talent%.([a-z_%.]+)%.enabled", "talent.%1.disabled")
+	end
+	do
 		--[[
 			Mage APLs have a custom "target_if=max:..." modifier to the "choose_target"
 			action which does not adhere to the language standard.
@@ -3848,7 +3851,11 @@ EmitOperandTalent = function(operand, parseNode, nodeList, annotation, action)
 
 		local code
 		if property == "disabled" then
-			code = format("not Talent(%s)", talentName)
+			if parseNode.asType == "boolean" then
+				code = format("not Talent(%s)", talentName)
+			else
+				code = format("Talent(%s no)", talentName)
+			end
 		elseif property == "enabled" then
 			if parseNode.asType == "boolean" then
 				code = format("Talent(%s)", talentName)
