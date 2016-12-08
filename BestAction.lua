@@ -778,7 +778,14 @@ function OvaleBestAction:ComputeCompare(element, state, atTime)
 				wipe(timeSpan)
 			end
 		else
-			local t = (B - A)/(c - z)
+			local diff = B - A
+			self:Debug(diff)
+			local t
+			if diff == INFINITY then
+				t = INFINITY
+			else
+				t = diff/(c - z)
+			end
 			t = (t > 0) and t or 0
 			state:Log("[%d]    intersection at t = %s", element.nodeId, t)
 			local scratch

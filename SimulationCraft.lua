@@ -568,6 +568,9 @@ ParseAction = function(action, nodeList, annotation)
 		stream = gsub(stream, "!([a-z_%.]+)%.cooldown%.up", "%1.cooldown.down")
 	end
 	do
+		stream = gsub(stream, "!talent%.([a-z_%.]+)%.enabled", "talent.%1.disabled")
+	end
+	do
 		--[[
 			Mage APLs have a custom "target_if=max:..." modifier to the "choose_target"
 			action which does not adhere to the language standard.
@@ -1887,6 +1890,9 @@ EmitAction = function(parseNode, nodeList, annotation)
 			bodyCode = camelSpecialization .. "InterruptActions()"
 			annotation[action] = class
 			annotation.interrupt = class
+			isSpellAction = false
+		elseif class == "PALADIN" and specialization == "protection" and action == "arcane_torrent_holy" then
+			-- skip
 			isSpellAction = false
 		elseif class == "PALADIN" and action == "righteous_fury" then
 			-- Only suggest Righteous Fury if the check is toggled on.
@@ -3852,7 +3858,11 @@ EmitOperandTalent = function(operand, parseNode, nodeList, annotation, action)
 
 		local code
 		if property == "disabled" then
-			code = format("not Talent(%s)", talentName)
+			if parseNode.asType == "boolean" then
+				code = format("not Talent(%s)", talentName)
+			else
+				code = format("Talent(%s no)", talentName)
+			end
 		elseif property == "enabled" then
 			if parseNode.asType == "boolean" then
 				code = format("Talent(%s)", talentName)
@@ -4496,14 +4506,14 @@ local function InsertSupportingFunctions(child, annotation)
 				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 				{
 					if target.InRange(rebuke) Spell(rebuke)
+					if target.InRange(avengers_shield) Spell(avengers_shield)
 					if not target.Classification(worldboss)
 					{
-						if target.InRange(fist_of_justice) Spell(fist_of_justice)
 						if target.InRange(hammer_of_justice) Spell(hammer_of_justice)
-						Spell(blinding_light)
-						Spell(arcane_torrent_holy)
+						if target.Distance(less 10) Spell(blinding_light)
+						if target.Distance(less 8) Spell(arcane_torrent_holy)
+						if target.Distance(less 8) Spell(war_stomp)
 						if target.InRange(quaking_palm) Spell(quaking_palm)
-						Spell(war_stomp)
 					}
 				}
 			}
@@ -4514,7 +4524,6 @@ local function InsertSupportingFunctions(child, annotation)
 		annotation.functionTag[node.name] = "cd"
 		AddSymbol(annotation, "arcane_torrent_holy")
 		AddSymbol(annotation, "blinding_light")
-		AddSymbol(annotation, "fist_of_justice")
 		AddSymbol(annotation, "hammer_of_justice")
 		AddSymbol(annotation, "quaking_palm")
 		AddSymbol(annotation, "rebuke")
