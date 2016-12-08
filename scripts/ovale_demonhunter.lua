@@ -108,7 +108,7 @@ AddFunction VengeanceInterruptActions
 	}
 }
 
-AddCheckBox(opt_demonhunter_vengeance_defensive L(Play defensively) default specialization=vengeance)
+AddCheckBox(opt_demonhunter_vengeance_defensive L("Play Defensively") default specialization=vengeance)
 AddCheckBox(opt_demonhunter_vengeance_aoe L(AOE) default specialization=vengeance)
 
 AddIcon help=shortcd specialization=vengeance
