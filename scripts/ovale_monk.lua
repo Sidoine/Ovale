@@ -108,8 +108,12 @@ AddFunction BrewmasterInterruptActions
 			if target.InRange(quaking_palm) Spell(quaking_palm)
 			if target.Distance(less 8) Spell(war_stomp)
 			if target.Distance(less 5) Spell(leg_sweep)
-			if target.IsTargetingPlayer() Spell(diffuse_magic)
-			if target.IsTargetingPlayer() Spell(zen_meditation)
+		}
+		if target.IsTargetingPlayer() 
+		{
+			Spell(diffuse_magic)
+			Spell(zen_meditation)
+			Spell(dampen_harm)
 		}
 	}
 }
