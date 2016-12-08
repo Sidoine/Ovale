@@ -1883,6 +1883,9 @@ EmitAction = function(parseNode, nodeList, annotation)
 			annotation[action] = class
 			annotation.interrupt = class
 			isSpellAction = false
+		elseif class == "PALADIN" and specialization == "protection" and action == "arcane_torrent_holy" then
+			-- skip
+			isSpellAction = false
 		elseif class == "PALADIN" and action == "righteous_fury" then
 			-- Only suggest Righteous Fury if the check is toggled on.
 			conditionCode = "CheckBoxOn(opt_righteous_fury_check)"
@@ -4426,14 +4429,14 @@ local function InsertSupportingFunctions(child, annotation)
 				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
 				{
 					if target.InRange(rebuke) Spell(rebuke)
+					if target.InRange(avengers_shield) Spell(avengers_shield)
 					if not target.Classification(worldboss)
 					{
-						if target.InRange(fist_of_justice) Spell(fist_of_justice)
 						if target.InRange(hammer_of_justice) Spell(hammer_of_justice)
-						Spell(blinding_light)
-						Spell(arcane_torrent_holy)
+						if target.Distance(less 10) Spell(blinding_light)
+						if target.Distance(less 8) Spell(arcane_torrent_holy)
+						if target.Distance(less 8) Spell(war_stomp)
 						if target.InRange(quaking_palm) Spell(quaking_palm)
-						Spell(war_stomp)
 					}
 				}
 			}
@@ -4444,7 +4447,6 @@ local function InsertSupportingFunctions(child, annotation)
 		annotation.functionTag[node.name] = "cd"
 		AddSymbol(annotation, "arcane_torrent_holy")
 		AddSymbol(annotation, "blinding_light")
-		AddSymbol(annotation, "fist_of_justice")
 		AddSymbol(annotation, "hammer_of_justice")
 		AddSymbol(annotation, "quaking_palm")
 		AddSymbol(annotation, "rebuke")
