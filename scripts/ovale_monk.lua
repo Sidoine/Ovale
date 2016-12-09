@@ -16,6 +16,11 @@ AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=brewmaster)
 AddCheckBox(opt_legendary_ring_tank ItemName(legendary_ring_bonus_armor) default specialization=brewmaster)
 AddCheckBox(opt_monk_bm_aoe L(AOE) default specialization=brewmaster)
 
+AddFunction BrewmasterExpelHarmOffensivelyPreConditions
+{
+	(SpellCount(expel_harm) >= 3 and (SpellCount(expel_harm) * 7.5 * AttackPower() * 2.65) <= HealthMissing()) and Spell(expel_harm)
+}
+
 AddFunction BrewmasterHealMe
 {
 	if (SpellCount(expel_harm) >= 1 and HealthPercent() < 35) Spell(expel_harm)
@@ -68,7 +73,7 @@ AddFunction BrewmasterDefaultMainActions
 	Spell(chi_burst)
 	Spell(chi_wave)
 	# use expel_harm offensively but avoid overhealing
-	if (SpellCount(expel_harm) >= 3 and (SpellCount(expel_harm) * 7.5 * AttackPower() * 2.65) <= HealthMissing()) Spell(expel_harm)
+	if BrewmasterExpelHarmOffensivelyPreConditions() Spell(expel_harm)
 }
 
 AddFunction BrewmasterDefaultAoEActions
@@ -81,8 +86,7 @@ AddFunction BrewmasterDefaultAoEActions
 	Spell(rushing_jade_wind)
 	if EnergyDeficit() <= 35 Spell(tiger_palm)
 	Spell(blackout_strike)
-	# use expel_harm offensively but avoid overhealing
-	if (SpellCount(expel_harm) >= 3 and (SpellCount(expel_harm) * 7.5 * AttackPower() * 2.65) <= HealthMissing()) Spell(expel_harm)
+	if BrewmasterExpelHarmOffensivelyPreConditions() Spell(expel_harm)
 }
 
 AddFunction BrewmasterDefaultCdActions 
