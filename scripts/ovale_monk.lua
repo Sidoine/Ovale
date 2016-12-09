@@ -101,8 +101,11 @@ AddFunction BrewmasterBlackoutComboMainActions
 		Spell(chi_burst)
 		Spell(chi_wave)
 		if EnergyDeficit() <= 35 Spell(tiger_palm)
-		if BrewmasterExpelHarmOffensivelyPreConditions() Spell(expel_harm)
-		Spell(exploding_keg)
+		unless EnergyDeficit() <= 35
+		{
+			if BrewmasterExpelHarmOffensivelyPreConditions() Spell(expel_harm)
+			Spell(exploding_keg)
+		}
 	}
 }
 
@@ -143,7 +146,10 @@ AddFunction BrewmasterBlackoutComboAoEActions
 		Spell(chi_burst)
 		Spell(chi_wave)
 		if EnergyDeficit() <= 35 Spell(tiger_palm)
-		if BrewmasterExpelHarmOffensivelyPreConditions() Spell(expel_harm)
+		unless EnergyDeficit() <= 35
+		{
+			if BrewmasterExpelHarmOffensivelyPreConditions() Spell(expel_harm)
+		}
 	}
 }
 
