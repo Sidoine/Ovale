@@ -70,13 +70,16 @@ AddFunction BrewmasterDefaultMainActions
 {
 	Spell(keg_smash)
 	if EnergyDeficit() <= 35 Spell(tiger_palm)
-	Spell(blackout_strike)
-	Spell(rushing_jade_wind)
-	if target.DebuffPresent(keg_smash_debuff) Spell(breath_of_fire)
-	Spell(exploding_keg)
-	Spell(chi_burst)
-	Spell(chi_wave)
-	if BrewmasterExpelHarmOffensivelyPreConditions() Spell(expel_harm)
+	unless EnergyDeficit() <= 35
+	{
+		Spell(blackout_strike)
+		Spell(rushing_jade_wind)
+		if target.DebuffPresent(keg_smash_debuff) Spell(breath_of_fire)
+		Spell(exploding_keg)
+		Spell(chi_burst)
+		Spell(chi_wave)
+		if BrewmasterExpelHarmOffensivelyPreConditions() Spell(expel_harm)
+	}
 }
 
 AddFunction BrewmasterBlackoutComboMainActions
@@ -116,8 +119,11 @@ AddFunction BrewmasterDefaultAoEActions
 	if target.DebuffPresent(keg_smash_debuff) Spell(breath_of_fire)
 	Spell(rushing_jade_wind)
 	if EnergyDeficit() <= 35 Spell(tiger_palm)
-	Spell(blackout_strike)
-	if BrewmasterExpelHarmOffensivelyPreConditions() Spell(expel_harm)
+	unless EnergyDeficit() <= 35
+	{
+		Spell(blackout_strike)
+		if BrewmasterExpelHarmOffensivelyPreConditions() Spell(expel_harm)
+	}
 }
 
 AddFunction BrewmasterBlackoutComboAoEActions
