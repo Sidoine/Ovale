@@ -62,6 +62,10 @@ AddFunction BrewmasterDefaultShortCDActions
 	}
 }
 
+#
+# Single-Target
+#
+
 AddFunction BrewmasterDefaultMainActions
 {
 	Spell(keg_smash)
@@ -72,9 +76,36 @@ AddFunction BrewmasterDefaultMainActions
 	Spell(exploding_keg)
 	Spell(chi_burst)
 	Spell(chi_wave)
-	# use expel_harm offensively but avoid overhealing
 	if BrewmasterExpelHarmOffensivelyPreConditions() Spell(expel_harm)
 }
+
+AddFunction BrewmasterBlackoutComboMainActions
+{
+	if(not BuffPresent(blackout_combo_buff)) Spell(blackout_strike)
+	if(BuffPresent(blackout_combo_buff)) 
+	{
+		Spell(keg_smash)
+		unless (SpellCooldown(keg_smash) < GCD())
+		{
+			Spell(breath_of_fire)
+			Spell(tiger_palm)
+		}
+	}
+	
+	unless (BuffPresent(blackout_combo_buff)) 
+	{
+		Spell(rushing_jade_wind)
+		Spell(chi_burst)
+		Spell(chi_wave)
+		if EnergyDeficit() <= 35 Spell(tiger_palm)
+		if BrewmasterExpelHarmOffensivelyPreConditions() Spell(expel_harm)
+		Spell(exploding_keg)
+	}
+}
+
+#
+# AOE
+#
 
 AddFunction BrewmasterDefaultAoEActions
 {
@@ -87,6 +118,27 @@ AddFunction BrewmasterDefaultAoEActions
 	if EnergyDeficit() <= 35 Spell(tiger_palm)
 	Spell(blackout_strike)
 	if BrewmasterExpelHarmOffensivelyPreConditions() Spell(expel_harm)
+}
+
+AddFunction BrewmasterBlackoutComboAoEActions
+{
+	if(not BuffPresent(blackout_combo_buff)) Spell(blackout_strike)
+	if(BuffPresent(blackout_combo_buff)) 
+	{
+		Spell(keg_smash)
+		Spell(breath_of_fire)
+		Spell(tiger_palm)
+	}
+	
+	unless (BuffPresent(blackout_combo_buff)) 
+	{
+		Spell(exploding_keg)
+		Spell(rushing_jade_wind)
+		Spell(chi_burst)
+		Spell(chi_wave)
+		if EnergyDeficit() <= 35 Spell(tiger_palm)
+		if BrewmasterExpelHarmOffensivelyPreConditions() Spell(expel_harm)
+	}
 }
 
 AddFunction BrewmasterDefaultCdActions 
@@ -129,12 +181,20 @@ AddIcon help=shortcd specialization=brewmaster
 
 AddIcon enemies=1 help=main specialization=brewmaster
 {
-	BrewmasterDefaultMainActions()
+	if Talent(blackout_combo_talent) BrewmasterBlackoutComboMainActions()
+	unless Talent(blackout_combo_talent) 
+	{
+		BrewmasterDefaultMainActions()
+	}
 }
 
 AddIcon checkbox=opt_monk_bm_aoe help=aoe specialization=brewmaster
 {
-	BrewmasterDefaultAoEActions()
+	if Talent(blackout_combo_talent) BrewmasterBlackoutComboAoEActions()
+	unless Talent(blackout_combo_talent) 
+	{
+		BrewmasterDefaultAoEActions()
+	}
 }
 
 AddIcon help=cd specialization=brewmaster

@@ -7,6 +7,9 @@ do
 	local code = [[
 # Monk spells and functions.
 
+Define(blackout_combo_buff 228563)
+	SpellInfo(blackout_combo_buff duration=15)
+Define(blackout_combo_talent 20)
 Define(blackout_kick 100784)
 	SpellInfo(blackout_kick cd=3)
 	SpellInfo(blackout_kick chi=1 specialization=windwalker)
@@ -18,6 +21,7 @@ Define(blackout_kick 100784)
 	SpellAddBuff(blackout_kick teachings_of_the_monastery_buff=0)
 Define(blackout_strike 205523)
 	SpellInfo(blackout_strike cd=3)
+	SpellAddBuff(blackout_strike blackout_combo_buff=1 talent=blackout_combo_talent)
 Define(black_ox_brew 115399)
 	SpellInfo(black_ox_brew cd=90 gcd=0 offgcd=1 talent=black_ox_brew_talent)
 Define(black_ox_brew_talent 8)
