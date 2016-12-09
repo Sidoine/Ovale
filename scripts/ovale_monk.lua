@@ -51,8 +51,8 @@ AddFunction BrewmasterDefaultShortCDActions
 			if (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3) Spell(ironskin_brew)
 			# keep brew-stache rolling
 			if (HasArtifactTrait(brew_stache_trait) and not BuffPresent(brew_stache_buff)) Spell(ironskin_brew text=stache)
-			# keep up ironskin_brew_buff but keep 2 charges ready for purifying when light_brewing_talent or elusive_dance_talent
-			if (not HasArtifactTrait(brew_stache_trait) and (BuffExpires(ironskin_brew_buff 2) and ((not Talent(light_brewing_talent) and not Talent(elusive_dance_talent)) or SpellCharges(purifying_brew) > 1))) Spell(ironskin_brew)
+			# keep up ironskin_brew_buff but keep 2 charges ready for purifying when elusive_dance_talent
+			if (BuffExpires(ironskin_brew_buff 2) and (not Talent(elusive_dance_talent) or SpellCharges(purifying_brew) >= 2)) Spell(ironskin_brew)
 		}
 	}
 }
