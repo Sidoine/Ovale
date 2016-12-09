@@ -34,7 +34,7 @@ AddFunction BrewmasterDefaultShortCDActions
 	# range check
 	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
 	
-	unless DebuffPresent(heavy_stagger_debuff) or BrewmasterHealMe()
+	unless DebuffPresent(heavy_stagger_debuff) or BrewmasterHealMe() or StaggerRemaining() == 0
 	{
 		# purify moderate stagger
 		if (DebuffPresent(moderate_stagger_debuff) and (not Talent(elusive_dance_talent) or not BuffPresent(elusive_dance_buff))) Spell(purifying_brew)
