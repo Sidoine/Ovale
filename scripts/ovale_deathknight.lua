@@ -143,6 +143,7 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_deathknight_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=frost)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=frost)
 AddCheckBox(opt_legendary_ring_strength ItemName(legendary_ring_strength) default specialization=frost)
 
@@ -155,6 +156,22 @@ AddFunction FrostUseItemActions
 AddFunction FrostGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(death_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
+}
+
+AddFunction FrostInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(mind_freeze) Spell(mind_freeze)
+		if not target.Classification(worldboss)
+		{
+			if target.InRange(asphyxiate) Spell(asphyxiate)
+			if target.InRange(strangulate) Spell(strangulate)
+			Spell(arcane_torrent_runicpower)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
 }
 
 ### actions.default
@@ -171,21 +188,15 @@ AddFunction FrostDefaultMainActions
 
 		unless Talent(shattering_strikes_talent) and FrostShatterMainPostConditions()
 		{
-			#call_action_list,name=icytalons,if=talent.icy_talons.enabled
-			if Talent(icy_talons_talent) FrostIcytalonsMainActions()
-
-			unless Talent(icy_talons_talent) and FrostIcytalonsMainPostConditions()
-			{
-				#call_action_list,name=generic,if=(!talent.shattering_strikes.enabled&!talent.icy_talons.enabled)
-				if not Talent(shattering_strikes_talent) and not Talent(icy_talons_talent) FrostGenericMainActions()
-			}
+			#call_action_list,name=generic,if=!talent.shattering_strikes.enabled
+			if not Talent(shattering_strikes_talent) FrostGenericMainActions()
 		}
 	}
 }
 
 AddFunction FrostDefaultMainPostConditions
 {
-	BuffPresent(breath_of_sindragosa_buff) and FrostBosMainPostConditions() or Talent(shattering_strikes_talent) and FrostShatterMainPostConditions() or Talent(icy_talons_talent) and FrostIcytalonsMainPostConditions() or not Talent(shattering_strikes_talent) and not Talent(icy_talons_talent) and FrostGenericMainPostConditions()
+	BuffPresent(breath_of_sindragosa_buff) and FrostBosMainPostConditions() or Talent(shattering_strikes_talent) and FrostShatterMainPostConditions() or not Talent(shattering_strikes_talent) and FrostGenericMainPostConditions()
 }
 
 AddFunction FrostDefaultShortCdActions
@@ -206,25 +217,21 @@ AddFunction FrostDefaultShortCdActions
 
 		unless Talent(shattering_strikes_talent) and FrostShatterShortCdPostConditions()
 		{
-			#call_action_list,name=icytalons,if=talent.icy_talons.enabled
-			if Talent(icy_talons_talent) FrostIcytalonsShortCdActions()
-
-			unless Talent(icy_talons_talent) and FrostIcytalonsShortCdPostConditions()
-			{
-				#call_action_list,name=generic,if=(!talent.shattering_strikes.enabled&!talent.icy_talons.enabled)
-				if not Talent(shattering_strikes_talent) and not Talent(icy_talons_talent) FrostGenericShortCdActions()
-			}
+			#call_action_list,name=generic,if=!talent.shattering_strikes.enabled
+			if not Talent(shattering_strikes_talent) FrostGenericShortCdActions()
 		}
 	}
 }
 
 AddFunction FrostDefaultShortCdPostConditions
 {
-	BuffPresent(breath_of_sindragosa_buff) and FrostBosShortCdPostConditions() or Talent(shattering_strikes_talent) and FrostShatterShortCdPostConditions() or Talent(icy_talons_talent) and FrostIcytalonsShortCdPostConditions() or not Talent(shattering_strikes_talent) and not Talent(icy_talons_talent) and FrostGenericShortCdPostConditions()
+	BuffPresent(breath_of_sindragosa_buff) and FrostBosShortCdPostConditions() or Talent(shattering_strikes_talent) and FrostShatterShortCdPostConditions() or not Talent(shattering_strikes_talent) and FrostGenericShortCdPostConditions()
 }
 
 AddFunction FrostDefaultCdActions
 {
+	#mind_freeze
+	FrostInterruptActions()
 	#arcane_torrent,if=runic_power.deficit>20
 	if RunicPowerDeficit() > 20 Spell(arcane_torrent_runicpower)
 	#blood_fury,if=!talent.breath_of_sindragosa.enabled|dot.breath_of_sindragosa.ticking
@@ -253,14 +260,8 @@ AddFunction FrostDefaultCdActions
 
 			unless Talent(shattering_strikes_talent) and FrostShatterCdPostConditions()
 			{
-				#call_action_list,name=icytalons,if=talent.icy_talons.enabled
-				if Talent(icy_talons_talent) FrostIcytalonsCdActions()
-
-				unless Talent(icy_talons_talent) and FrostIcytalonsCdPostConditions()
-				{
-					#call_action_list,name=generic,if=(!talent.shattering_strikes.enabled&!talent.icy_talons.enabled)
-					if not Talent(shattering_strikes_talent) and not Talent(icy_talons_talent) FrostGenericCdActions()
-				}
+				#call_action_list,name=generic,if=!talent.shattering_strikes.enabled
+				if not Talent(shattering_strikes_talent) FrostGenericCdActions()
 			}
 		}
 	}
@@ -268,7 +269,7 @@ AddFunction FrostDefaultCdActions
 
 AddFunction FrostDefaultCdPostConditions
 {
-	Spell(obliteration) or BuffPresent(breath_of_sindragosa_buff) and FrostBosCdPostConditions() or Talent(shattering_strikes_talent) and FrostShatterCdPostConditions() or Talent(icy_talons_talent) and FrostIcytalonsCdPostConditions() or not Talent(shattering_strikes_talent) and not Talent(icy_talons_talent) and FrostGenericCdPostConditions()
+	Spell(obliteration) or BuffPresent(breath_of_sindragosa_buff) and FrostBosCdPostConditions() or Talent(shattering_strikes_talent) and FrostShatterCdPostConditions() or not Talent(shattering_strikes_talent) and FrostGenericCdPostConditions()
 }
 
 ### actions.bos
@@ -340,22 +341,22 @@ AddFunction FrostCoreMainActions
 {
 	#frost_strike,if=buff.obliteration.up&!buff.killing_machine.react
 	if BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) Spell(frost_strike)
-	#remorseless_winter,if=(spell_targets.remorseless_winter>=2|talent.gathering_storm.enabled)&!talent.frozen_pulse.enabled
-	if { Enemies() >= 2 or Talent(gathering_storm_talent) } and not Talent(frozen_pulse_talent) Spell(remorseless_winter)
-	#frostscythe,if=!talent.breath_of_sindragosa.enabled&(buff.killing_machine.react|spell_targets.frostscythe>=4)
-	if not Talent(breath_of_sindragosa_talent) and { BuffPresent(killing_machine_buff) or Enemies() >= 4 } Spell(frostscythe)
-	#glacial_advance
-	Spell(glacial_advance)
+	#remorseless_winter,if=(spell_targets.remorseless_winter>=2|talent.gathering_storm.enabled)&!(talent.frostscythe.enabled&buff.killing_machine.react&spell_targets.frostscythe>=2)
+	if { Enemies() >= 2 or Talent(gathering_storm_talent) } and not { Talent(frostscythe_talent) and BuffPresent(killing_machine_buff) and Enemies() >= 2 } Spell(remorseless_winter)
+	#frostscythe,if=(buff.killing_machine.react&spell_targets.frostscythe>=2)
+	if BuffPresent(killing_machine_buff) and Enemies() >= 2 Spell(frostscythe)
+	#glacial_advance,if=spell_targets.glacial_advance>=2
+	if Enemies() >= 2 Spell(glacial_advance)
+	#frostscythe,if=spell_targets.frostscythe>=3
+	if Enemies() >= 3 Spell(frostscythe)
 	#obliterate,if=buff.killing_machine.react
 	if BuffPresent(killing_machine_buff) Spell(obliterate)
 	#obliterate
 	Spell(obliterate)
+	#glacial_advance
+	Spell(glacial_advance)
 	#remorseless_winter,if=talent.frozen_pulse.enabled
 	if Talent(frozen_pulse_talent) Spell(remorseless_winter)
-	#frostscythe,if=talent.frozen_pulse.enabled
-	if Talent(frozen_pulse_talent) Spell(frostscythe)
-	#howling_blast,if=talent.frozen_pulse.enabled
-	if Talent(frozen_pulse_talent) Spell(howling_blast)
 }
 
 AddFunction FrostCoreMainPostConditions
@@ -368,7 +369,7 @@ AddFunction FrostCoreShortCdActions
 
 AddFunction FrostCoreShortCdPostConditions
 {
-	BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) and Spell(frost_strike) or { Enemies() >= 2 or Talent(gathering_storm_talent) } and not Talent(frozen_pulse_talent) and Spell(remorseless_winter) or not Talent(breath_of_sindragosa_talent) and { BuffPresent(killing_machine_buff) or Enemies() >= 4 } and Spell(frostscythe) or Spell(glacial_advance) or BuffPresent(killing_machine_buff) and Spell(obliterate) or Spell(obliterate) or Talent(frozen_pulse_talent) and Spell(remorseless_winter) or Talent(frozen_pulse_talent) and Spell(frostscythe) or Talent(frozen_pulse_talent) and Spell(howling_blast)
+	BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) and Spell(frost_strike) or { Enemies() >= 2 or Talent(gathering_storm_talent) } and not { Talent(frostscythe_talent) and BuffPresent(killing_machine_buff) and Enemies() >= 2 } and Spell(remorseless_winter) or BuffPresent(killing_machine_buff) and Enemies() >= 2 and Spell(frostscythe) or Enemies() >= 2 and Spell(glacial_advance) or Enemies() >= 3 and Spell(frostscythe) or BuffPresent(killing_machine_buff) and Spell(obliterate) or Spell(obliterate) or Spell(glacial_advance) or Talent(frozen_pulse_talent) and Spell(remorseless_winter)
 }
 
 AddFunction FrostCoreCdActions
@@ -377,13 +378,15 @@ AddFunction FrostCoreCdActions
 
 AddFunction FrostCoreCdPostConditions
 {
-	BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) and Spell(frost_strike) or { Enemies() >= 2 or Talent(gathering_storm_talent) } and not Talent(frozen_pulse_talent) and Spell(remorseless_winter) or not Talent(breath_of_sindragosa_talent) and { BuffPresent(killing_machine_buff) or Enemies() >= 4 } and Spell(frostscythe) or Spell(glacial_advance) or BuffPresent(killing_machine_buff) and Spell(obliterate) or Spell(obliterate) or Talent(frozen_pulse_talent) and Spell(remorseless_winter) or Talent(frozen_pulse_talent) and Spell(frostscythe) or Talent(frozen_pulse_talent) and Spell(howling_blast)
+	BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) and Spell(frost_strike) or { Enemies() >= 2 or Talent(gathering_storm_talent) } and not { Talent(frostscythe_talent) and BuffPresent(killing_machine_buff) and Enemies() >= 2 } and Spell(remorseless_winter) or BuffPresent(killing_machine_buff) and Enemies() >= 2 and Spell(frostscythe) or Enemies() >= 2 and Spell(glacial_advance) or Enemies() >= 3 and Spell(frostscythe) or BuffPresent(killing_machine_buff) and Spell(obliterate) or Spell(obliterate) or Spell(glacial_advance) or Talent(frozen_pulse_talent) and Spell(remorseless_winter)
 }
 
 ### actions.generic
 
 AddFunction FrostGenericMainActions
 {
+	#frost_strike,if=buff.icy_talons.remains<1.5&talent.icy_talons.enabled
+	if BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) Spell(frost_strike)
 	#howling_blast,target_if=!dot.frost_fever.ticking
 	if not target.DebuffPresent(frost_fever_debuff) Spell(howling_blast)
 	#howling_blast,if=buff.rime.react
@@ -409,7 +412,7 @@ AddFunction FrostGenericMainPostConditions
 
 AddFunction FrostGenericShortCdActions
 {
-	unless not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike)
+	unless BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike)
 	{
 		#call_action_list,name=core
 		FrostCoreShortCdActions()
@@ -426,12 +429,12 @@ AddFunction FrostGenericShortCdActions
 
 AddFunction FrostGenericShortCdPostConditions
 {
-	not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike) or FrostCoreShortCdPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and Spell(frost_strike) or not Talent(breath_of_sindragosa_talent) and Spell(frost_strike)
+	BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike) or FrostCoreShortCdPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and Spell(frost_strike) or not Talent(breath_of_sindragosa_talent) and Spell(frost_strike)
 }
 
 AddFunction FrostGenericCdActions
 {
-	unless not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike)
+	unless BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike)
 	{
 		#call_action_list,name=core
 		FrostCoreCdActions()
@@ -452,88 +455,7 @@ AddFunction FrostGenericCdActions
 
 AddFunction FrostGenericCdPostConditions
 {
-	not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike) or FrostCoreCdPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or not Talent(breath_of_sindragosa_talent) and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and Spell(frost_strike) or not Talent(breath_of_sindragosa_talent) and Spell(frost_strike)
-}
-
-### actions.icytalons
-
-AddFunction FrostIcytalonsMainActions
-{
-	#frost_strike,if=buff.icy_talons.remains<1.5
-	if BuffRemaining(icy_talons_buff) < 1.5 Spell(frost_strike)
-	#howling_blast,target_if=!dot.frost_fever.ticking
-	if not target.DebuffPresent(frost_fever_debuff) Spell(howling_blast)
-	#howling_blast,if=buff.rime.react
-	if BuffPresent(rime_buff) Spell(howling_blast)
-	#frost_strike,if=runic_power>=80|buff.icy_talons.stack<3
-	if RunicPower() >= 80 or BuffStacks(icy_talons_buff) < 3 Spell(frost_strike)
-	#call_action_list,name=core
-	FrostCoreMainActions()
-
-	unless FrostCoreMainPostConditions()
-	{
-		#frost_strike,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains>15&!talent.frozen_pulse.enabled
-		if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and not Talent(frozen_pulse_talent) Spell(frost_strike)
-		#frost_strike,if=!talent.breath_of_sindragosa.enabled&!talent.frozen_pulse.enabled
-		if not Talent(breath_of_sindragosa_talent) and not Talent(frozen_pulse_talent) Spell(frost_strike)
-		#frost_strike,if=buff.icy_talons.remains<1.5|buff.icy_talons.stack<3&talent.frostscythe.enabled
-		if BuffRemaining(icy_talons_buff) < 1.5 or BuffStacks(icy_talons_buff) < 3 and Talent(frostscythe_talent) Spell(frost_strike)
-		#frost_strike,if=!talent.frostscythe.enabled
-		if not Talent(frostscythe_talent) Spell(frost_strike)
-	}
-}
-
-AddFunction FrostIcytalonsMainPostConditions
-{
-	FrostCoreMainPostConditions()
-}
-
-AddFunction FrostIcytalonsShortCdActions
-{
-	unless BuffRemaining(icy_talons_buff) < 1.5 and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or { RunicPower() >= 80 or BuffStacks(icy_talons_buff) < 3 } and Spell(frost_strike)
-	{
-		#call_action_list,name=core
-		FrostCoreShortCdActions()
-
-		unless FrostCoreShortCdPostConditions()
-		{
-			#horn_of_winter,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains>15
-			if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
-			#horn_of_winter,if=!talent.breath_of_sindragosa.enabled
-			if not Talent(breath_of_sindragosa_talent) and BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
-		}
-	}
-}
-
-AddFunction FrostIcytalonsShortCdPostConditions
-{
-	BuffRemaining(icy_talons_buff) < 1.5 and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or { RunicPower() >= 80 or BuffStacks(icy_talons_buff) < 3 } and Spell(frost_strike) or FrostCoreShortCdPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and not Talent(frozen_pulse_talent) and Spell(frost_strike) or not Talent(breath_of_sindragosa_talent) and not Talent(frozen_pulse_talent) and Spell(frost_strike) or { BuffRemaining(icy_talons_buff) < 1.5 or BuffStacks(icy_talons_buff) < 3 and Talent(frostscythe_talent) } and Spell(frost_strike) or not Talent(frostscythe_talent) and Spell(frost_strike)
-}
-
-AddFunction FrostIcytalonsCdActions
-{
-	unless BuffRemaining(icy_talons_buff) < 1.5 and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or { RunicPower() >= 80 or BuffStacks(icy_talons_buff) < 3 } and Spell(frost_strike)
-	{
-		#call_action_list,name=core
-		FrostCoreCdActions()
-
-		unless FrostCoreCdPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or not Talent(breath_of_sindragosa_talent) and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and not Talent(frozen_pulse_talent) and Spell(frost_strike) or not Talent(breath_of_sindragosa_talent) and not Talent(frozen_pulse_talent) and Spell(frost_strike) or { BuffRemaining(icy_talons_buff) < 1.5 or BuffStacks(icy_talons_buff) < 3 and Talent(frostscythe_talent) } and Spell(frost_strike) or not Talent(frostscythe_talent) and Spell(frost_strike)
-		{
-			#empower_rune_weapon,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains>15
-			if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 Spell(empower_rune_weapon)
-			#hungering_rune_weapon,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains>15
-			if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 Spell(hungering_rune_weapon)
-			#empower_rune_weapon,if=!talent.breath_of_sindragosa.enabled
-			if not Talent(breath_of_sindragosa_talent) Spell(empower_rune_weapon)
-			#hungering_rune_weapon,if=!talent.breath_of_sindragosa.enabled
-			if not Talent(breath_of_sindragosa_talent) Spell(hungering_rune_weapon)
-		}
-	}
-}
-
-AddFunction FrostIcytalonsCdPostConditions
-{
-	BuffRemaining(icy_talons_buff) < 1.5 and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or { RunicPower() >= 80 or BuffStacks(icy_talons_buff) < 3 } and Spell(frost_strike) or FrostCoreCdPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or not Talent(breath_of_sindragosa_talent) and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and not Talent(frozen_pulse_talent) and Spell(frost_strike) or not Talent(breath_of_sindragosa_talent) and not Talent(frozen_pulse_talent) and Spell(frost_strike) or { BuffRemaining(icy_talons_buff) < 1.5 or BuffStacks(icy_talons_buff) < 3 and Talent(frostscythe_talent) } and Spell(frost_strike) or not Talent(frostscythe_talent) and Spell(frost_strike)
+	BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike) or FrostCoreCdPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or not Talent(breath_of_sindragosa_talent) and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and Spell(frost_strike) or not Talent(breath_of_sindragosa_talent) and Spell(frost_strike)
 }
 
 ### actions.precombat
@@ -541,7 +463,7 @@ AddFunction FrostIcytalonsCdPostConditions
 AddFunction FrostPrecombatMainActions
 {
 	#flask,name=countless_armies
-	#food,name=the_hungry_magister
+	#food,name=fishbrul_special
 	#augmentation,name=defiled
 	Spell(augmentation)
 }
@@ -705,6 +627,7 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 
 ### Required symbols
 # arcane_torrent_runicpower
+# asphyxiate
 # augmentation
 # berserking
 # blood_fury_ap
@@ -727,16 +650,20 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # icy_talons_talent
 # killing_machine_buff
 # legendary_ring_strength
+# mind_freeze
 # obliterate
 # obliteration
 # obliteration_buff
 # pillar_of_frost
 # pillar_of_frost_buff
+# quaking_palm
 # razorice_debuff
 # remorseless_winter
 # rime_buff
 # shattering_strikes_talent
 # sindragosas_fury
+# strangulate
+# war_stomp
 ]]
 	OvaleScripts:RegisterScript("DEATHKNIGHT", "frost", name, desc, code, "script")
 end
@@ -755,6 +682,7 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_deathknight_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=unholy)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=unholy)
 
 AddFunction UnholyUseItemActions
@@ -766,6 +694,22 @@ AddFunction UnholyUseItemActions
 AddFunction UnholyGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(death_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
+}
+
+AddFunction UnholyInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(mind_freeze) Spell(mind_freeze)
+		if not target.Classification(worldboss)
+		{
+			if target.InRange(asphyxiate) Spell(asphyxiate)
+			if target.InRange(strangulate) Spell(strangulate)
+			Spell(arcane_torrent_runicpower)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
 }
 
 ### actions.default
@@ -835,6 +779,8 @@ AddFunction UnholyDefaultShortCdPostConditions
 
 AddFunction UnholyDefaultCdActions
 {
+	#mind_freeze
+	UnholyInterruptActions()
 	#arcane_torrent,if=runic_power.deficit>20
 	if RunicPowerDeficit() > 20 Spell(arcane_torrent_runicpower)
 	#blood_fury
@@ -1365,6 +1311,7 @@ AddIcon checkbox=opt_deathknight_unholy_aoe help=cd specialization=unholy
 # apocalypse
 # arcane_torrent_runicpower
 # army_of_the_dead
+# asphyxiate
 # augmentation
 # berserking
 # blighted_rune_weapon
@@ -1384,19 +1331,23 @@ AddIcon checkbox=opt_deathknight_unholy_aoe help=cd specialization=unholy
 # epidemic
 # festering_strike
 # festering_wound_debuff
+# mind_freeze
 # necrosis_buff
 # necrosis_talent
 # outbreak
+# quaking_palm
 # raise_dead
 # scourge_strike
 # shadow_infusion_talent
 # soul_reaper_unholy
 # soul_reaper_unholy_debuff
+# strangulate
 # sudden_doom_buff
 # summon_gargoyle
 # unholy_strength_buff
 # valkyr_battlemaiden
 # virulent_plague_debuff
+# war_stomp
 ]]
 	OvaleScripts:RegisterScript("DEATHKNIGHT", "unholy", name, desc, code, "script")
 end
