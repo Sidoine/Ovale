@@ -20,13 +20,13 @@ Include(ovale_priest_spells)
 
 AddFunction s2mcheck_value
 {
-	0.8 * { 45 + SpellHaste() * 100 * { 2 + 1 * TalentPoints(reaper_of_souls_talent) + 2 * ArtifactTraitRank(mass_hysteria) - 1 * TalentPoints(sanlayn_talent) } } - actors_fight_time_mod() * 0
+	0.8 * { 130 + 7 * s2mbeltcheck() + SpellHaste() * 25 * { 2 + 1 * TalentPoints(reaper_of_souls_talent) + 2 * ArtifactTraitRank(mass_hysteria) - 1 * TalentPoints(sanlayn_talent) } } - actors_fight_time_mod() * 0
 }
 
-AddFunction s2mcheck
+AddFunction s2mbeltcheck
 {
-	if s2mcheck_value() > s2mcheck_min() s2mcheck_value()
-	s2mcheck_min()
+	if SpellChargeCooldown(mind_blast) <= 1 0
+	if SpellChargeCooldown(mind_blast) >= 2 1
 }
 
 AddFunction actors_fight_time_mod
@@ -34,6 +34,12 @@ AddFunction actors_fight_time_mod
 	if TimeInCombat() + target.TimeToDie() <= 450 { 450 - { TimeInCombat() + target.TimeToDie() } } / 5
 	if TimeInCombat() + target.TimeToDie() > 450 and TimeInCombat() + target.TimeToDie() < 600 -{ { -450 + TimeInCombat() + target.TimeToDie() } / 10 }
 	0
+}
+
+AddFunction s2mcheck
+{
+	if s2mcheck_value() > s2mcheck_min() s2mcheck_value()
+	s2mcheck_min()
 }
 
 AddFunction s2mcheck_min
@@ -45,11 +51,11 @@ AddFunction s2mcheck_min
 
 AddFunction ShadowDefaultMainActions
 {
-	#potion,name=deadly_grace,if=buff.bloodlust.react|target.time_to_die<=40|buff.voidform.stack>80
+	#potion,name=deadly_grace,if=buff.bloodlust.react|target.time_to_die<=40|(buff.voidform.stack>80&buff.power_infusion.up)
 	#variable,op=set,name=actors_fight_time_mod,value=0
 	#variable,op=set,name=actors_fight_time_mod,value=-((-(450)+(time+target.time_to_die))%10),if=time+target.time_to_die>450&time+target.time_to_die<600
 	#variable,op=set,name=actors_fight_time_mod,value=((450-(time+target.time_to_die))%5),if=time+target.time_to_die<=450
-	#variable,op=set,name=s2mcheck,value=0.8*(45+((raw_haste_pct*100)*(2+(1*talent.reaper_of_souls.enabled)+(2*artifact.mass_hysteria.rank)-(1*talent.sanlayn.enabled))))-(variable.actors_fight_time_mod*nonexecute_actors_pct)
+	#variable,op=set,name=s2mcheck,value=0.8*(130+7*variable.s2mbeltcheck+((raw_haste_pct*25)*(2+(1*talent.reaper_of_souls.enabled)+(2*artifact.mass_hysteria.rank)-(1*talent.sanlayn.enabled))))-(variable.actors_fight_time_mod*nonexecute_actors_pct)
 	#variable,op=min,name=s2mcheck,value=180
 	#call_action_list,name=s2m,if=buff.voidform.up&buff.surrender_to_madness.up
 	if BuffPresent(voidform_buff) and BuffPresent(surrender_to_madness_buff) ShadowS2mMainActions()
@@ -74,11 +80,11 @@ AddFunction ShadowDefaultMainPostConditions
 
 AddFunction ShadowDefaultShortCdActions
 {
-	#potion,name=deadly_grace,if=buff.bloodlust.react|target.time_to_die<=40|buff.voidform.stack>80
+	#potion,name=deadly_grace,if=buff.bloodlust.react|target.time_to_die<=40|(buff.voidform.stack>80&buff.power_infusion.up)
 	#variable,op=set,name=actors_fight_time_mod,value=0
 	#variable,op=set,name=actors_fight_time_mod,value=-((-(450)+(time+target.time_to_die))%10),if=time+target.time_to_die>450&time+target.time_to_die<600
 	#variable,op=set,name=actors_fight_time_mod,value=((450-(time+target.time_to_die))%5),if=time+target.time_to_die<=450
-	#variable,op=set,name=s2mcheck,value=0.8*(45+((raw_haste_pct*100)*(2+(1*talent.reaper_of_souls.enabled)+(2*artifact.mass_hysteria.rank)-(1*talent.sanlayn.enabled))))-(variable.actors_fight_time_mod*nonexecute_actors_pct)
+	#variable,op=set,name=s2mcheck,value=0.8*(130+7*variable.s2mbeltcheck+((raw_haste_pct*25)*(2+(1*talent.reaper_of_souls.enabled)+(2*artifact.mass_hysteria.rank)-(1*talent.sanlayn.enabled))))-(variable.actors_fight_time_mod*nonexecute_actors_pct)
 	#variable,op=min,name=s2mcheck,value=180
 	#call_action_list,name=s2m,if=buff.voidform.up&buff.surrender_to_madness.up
 	if BuffPresent(voidform_buff) and BuffPresent(surrender_to_madness_buff) ShadowS2mShortCdActions()
@@ -103,11 +109,11 @@ AddFunction ShadowDefaultShortCdPostConditions
 
 AddFunction ShadowDefaultCdActions
 {
-	#potion,name=deadly_grace,if=buff.bloodlust.react|target.time_to_die<=40|buff.voidform.stack>80
+	#potion,name=deadly_grace,if=buff.bloodlust.react|target.time_to_die<=40|(buff.voidform.stack>80&buff.power_infusion.up)
 	#variable,op=set,name=actors_fight_time_mod,value=0
 	#variable,op=set,name=actors_fight_time_mod,value=-((-(450)+(time+target.time_to_die))%10),if=time+target.time_to_die>450&time+target.time_to_die<600
 	#variable,op=set,name=actors_fight_time_mod,value=((450-(time+target.time_to_die))%5),if=time+target.time_to_die<=450
-	#variable,op=set,name=s2mcheck,value=0.8*(45+((raw_haste_pct*100)*(2+(1*talent.reaper_of_souls.enabled)+(2*artifact.mass_hysteria.rank)-(1*talent.sanlayn.enabled))))-(variable.actors_fight_time_mod*nonexecute_actors_pct)
+	#variable,op=set,name=s2mcheck,value=0.8*(130+7*variable.s2mbeltcheck+((raw_haste_pct*25)*(2+(1*talent.reaper_of_souls.enabled)+(2*artifact.mass_hysteria.rank)-(1*talent.sanlayn.enabled))))-(variable.actors_fight_time_mod*nonexecute_actors_pct)
 	#variable,op=min,name=s2mcheck,value=180
 	#call_action_list,name=s2m,if=buff.voidform.up&buff.surrender_to_madness.up
 	if BuffPresent(voidform_buff) and BuffPresent(surrender_to_madness_buff) ShadowS2mCdActions()
@@ -156,8 +162,10 @@ AddFunction ShadowMainMainActions
 	if not target.DebuffPresent(vampiric_touch_debuff) and target.TimeToDie() > 10 and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } Spell(vampiric_touch)
 	#shadow_word_pain,if=!ticking&target.time_to_die>10&(active_enemies<5&artifact.sphere_of_insanity.rank),cycle_targets=1
 	if not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and ArtifactTraitRank(sphere_of_insanity) Spell(shadow_word_pain)
-	#mind_sear,if=active_enemies>=3,interrupt=1,chain=1
-	if Enemies() >= 3 Spell(mind_sear)
+	#mind_flay,line_cd=10,if=!talent.mind_spike.enabled&active_enemies>=2&active_enemies<4,interrupt=1,chain=1
+	if not Talent(mind_spike_talent) and Enemies() >= 2 and Enemies() < 4 and TimeSincePreviousSpell(mind_flay) > 10 Spell(mind_flay)
+	#mind_sear,if=active_enemies>=2,interrupt=1,chain=1
+	if Enemies() >= 2 Spell(mind_sear)
 	#mind_flay,if=!talent.mind_spike.enabled,interrupt=1,chain=1
 	if not Talent(mind_spike_talent) Spell(mind_flay)
 	#mind_spike,if=talent.mind_spike.enabled
@@ -194,7 +202,7 @@ AddFunction ShadowMainShortCdActions
 
 AddFunction ShadowMainShortCdPostConditions
 {
-	target.DebuffRemaining(shadow_word_pain_debuff) < { 3 + 4 / 3 } * GCD() and Spell(shadow_word_pain) or target.DebuffRemaining(vampiric_touch_debuff) < { 4 + 4 / 3 } * GCD() and Spell(vampiric_touch) or not target.DebuffPresent(shadow_word_pain_debuff) and Talent(legacy_of_the_void_talent) and Insanity() >= 70 and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and Talent(legacy_of_the_void_talent) and Insanity() >= 70 and Spell(vampiric_touch) or not Talent(reaper_of_souls_talent) and SpellChargeCooldown(shadow_word_death) == 2 and Insanity() <= 90 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and SpellChargeCooldown(shadow_word_death) == 2 and Insanity() <= 70 and Spell(shadow_word_death) or Talent(legacy_of_the_void_talent) and { Insanity() <= 81 or Insanity() <= 75.2 and Talent(fortress_of_the_mind_talent) } and Spell(mind_blast) or { not Talent(legacy_of_the_void_talent) or Insanity() <= 96 or Insanity() <= 95.2 and Talent(fortress_of_the_mind_talent) } and Spell(mind_blast) or not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and target.TimeToDie() > 10 and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and Spell(vampiric_touch) or not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and ArtifactTraitRank(sphere_of_insanity) and Spell(shadow_word_pain) or Enemies() >= 3 and Spell(mind_sear) or not Talent(mind_spike_talent) and Spell(mind_flay) or Talent(mind_spike_talent) and Spell(mind_spike) or Spell(shadow_word_pain)
+	target.DebuffRemaining(shadow_word_pain_debuff) < { 3 + 4 / 3 } * GCD() and Spell(shadow_word_pain) or target.DebuffRemaining(vampiric_touch_debuff) < { 4 + 4 / 3 } * GCD() and Spell(vampiric_touch) or not target.DebuffPresent(shadow_word_pain_debuff) and Talent(legacy_of_the_void_talent) and Insanity() >= 70 and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and Talent(legacy_of_the_void_talent) and Insanity() >= 70 and Spell(vampiric_touch) or not Talent(reaper_of_souls_talent) and SpellChargeCooldown(shadow_word_death) == 2 and Insanity() <= 90 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and SpellChargeCooldown(shadow_word_death) == 2 and Insanity() <= 70 and Spell(shadow_word_death) or Talent(legacy_of_the_void_talent) and { Insanity() <= 81 or Insanity() <= 75.2 and Talent(fortress_of_the_mind_talent) } and Spell(mind_blast) or { not Talent(legacy_of_the_void_talent) or Insanity() <= 96 or Insanity() <= 95.2 and Talent(fortress_of_the_mind_talent) } and Spell(mind_blast) or not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and target.TimeToDie() > 10 and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and Spell(vampiric_touch) or not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and ArtifactTraitRank(sphere_of_insanity) and Spell(shadow_word_pain) or not Talent(mind_spike_talent) and Enemies() >= 2 and Enemies() < 4 and TimeSincePreviousSpell(mind_flay) > 10 and Spell(mind_flay) or Enemies() >= 2 and Spell(mind_sear) or not Talent(mind_spike_talent) and Spell(mind_flay) or Talent(mind_spike_talent) and Spell(mind_spike) or Spell(shadow_word_pain)
 }
 
 AddFunction ShadowMainCdActions
@@ -211,7 +219,7 @@ AddFunction ShadowMainCdActions
 
 AddFunction ShadowMainCdPostConditions
 {
-	Talent(mindbender_talent) and not Talent(surrender_to_madness_talent) and Spell(mindbender) or Talent(mindbender_talent) and Talent(surrender_to_madness_talent) and target.TimeToDie() > s2mcheck() + 60 and Spell(mindbender) or target.DebuffRemaining(shadow_word_pain_debuff) < { 3 + 4 / 3 } * GCD() and Spell(shadow_word_pain) or target.DebuffRemaining(vampiric_touch_debuff) < { 4 + 4 / 3 } * GCD() and Spell(vampiric_touch) or Talent(shadow_crash_talent) and Spell(shadow_crash) or Talent(mindbender_talent) and ArmorSetBonus(T18 2) and Spell(mindbender) or not target.DebuffPresent(shadow_word_pain_debuff) and Talent(legacy_of_the_void_talent) and Insanity() >= 70 and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and Talent(legacy_of_the_void_talent) and Insanity() >= 70 and Spell(vampiric_touch) or not Talent(reaper_of_souls_talent) and SpellChargeCooldown(shadow_word_death) == 2 and Insanity() <= 90 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and SpellChargeCooldown(shadow_word_death) == 2 and Insanity() <= 70 and Spell(shadow_word_death) or Talent(legacy_of_the_void_talent) and { Insanity() <= 81 or Insanity() <= 75.2 and Talent(fortress_of_the_mind_talent) } and Spell(mind_blast) or { not Talent(legacy_of_the_void_talent) or Insanity() <= 96 or Insanity() <= 95.2 and Talent(fortress_of_the_mind_talent) } and Spell(mind_blast) or not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and target.TimeToDie() > 10 and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and Spell(vampiric_touch) or not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and ArtifactTraitRank(sphere_of_insanity) and Spell(shadow_word_pain) or { Insanity() <= 70 and Talent(legacy_of_the_void_talent) or Insanity() <= 85 and not Talent(legacy_of_the_void_talent) } and Spell(shadow_word_void) or Enemies() >= 3 and Spell(mind_sear) or not Talent(mind_spike_talent) and Spell(mind_flay) or Talent(mind_spike_talent) and Spell(mind_spike) or Spell(shadow_word_pain)
+	Talent(mindbender_talent) and not Talent(surrender_to_madness_talent) and Spell(mindbender) or Talent(mindbender_talent) and Talent(surrender_to_madness_talent) and target.TimeToDie() > s2mcheck() + 60 and Spell(mindbender) or target.DebuffRemaining(shadow_word_pain_debuff) < { 3 + 4 / 3 } * GCD() and Spell(shadow_word_pain) or target.DebuffRemaining(vampiric_touch_debuff) < { 4 + 4 / 3 } * GCD() and Spell(vampiric_touch) or Talent(shadow_crash_talent) and Spell(shadow_crash) or Talent(mindbender_talent) and ArmorSetBonus(T18 2) and Spell(mindbender) or not target.DebuffPresent(shadow_word_pain_debuff) and Talent(legacy_of_the_void_talent) and Insanity() >= 70 and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and Talent(legacy_of_the_void_talent) and Insanity() >= 70 and Spell(vampiric_touch) or not Talent(reaper_of_souls_talent) and SpellChargeCooldown(shadow_word_death) == 2 and Insanity() <= 90 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and SpellChargeCooldown(shadow_word_death) == 2 and Insanity() <= 70 and Spell(shadow_word_death) or Talent(legacy_of_the_void_talent) and { Insanity() <= 81 or Insanity() <= 75.2 and Talent(fortress_of_the_mind_talent) } and Spell(mind_blast) or { not Talent(legacy_of_the_void_talent) or Insanity() <= 96 or Insanity() <= 95.2 and Talent(fortress_of_the_mind_talent) } and Spell(mind_blast) or not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and target.TimeToDie() > 10 and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and Spell(vampiric_touch) or not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and ArtifactTraitRank(sphere_of_insanity) and Spell(shadow_word_pain) or { Insanity() <= 70 and Talent(legacy_of_the_void_talent) or Insanity() <= 85 and not Talent(legacy_of_the_void_talent) } and Spell(shadow_word_void) or not Talent(mind_spike_talent) and Enemies() >= 2 and Enemies() < 4 and TimeSincePreviousSpell(mind_flay) > 10 and Spell(mind_flay) or Enemies() >= 2 and Spell(mind_sear) or not Talent(mind_spike_talent) and Spell(mind_flay) or Talent(mind_spike_talent) and Spell(mind_spike) or Spell(shadow_word_pain)
 }
 
 ### actions.precombat
@@ -226,6 +234,8 @@ AddFunction ShadowPrecombatMainActions
 	#potion,name=deadly_grace
 	#shadowform,if=!buff.shadowform.up
 	if not BuffPresent(shadowform_buff) Spell(shadowform)
+	#variable,op=set,name=s2mbeltcheck,value=1,if=cooldown.mind_blast.charges>=2
+	#variable,op=set,name=s2mbeltcheck,value=0,if=cooldown.mind_blast.charges<=1
 	#mind_blast
 	Spell(mind_blast)
 }
@@ -256,6 +266,10 @@ AddFunction ShadowPrecombatCdPostConditions
 
 AddFunction ShadowS2mMainActions
 {
+	#shadow_word_death,if=!talent.reaper_of_souls.enabled&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+15)<100&!buff.power_infusion.up&buff.insanity_drain_stacks.stack<=60&cooldown.shadow_word_death.charges=2
+	if not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 15 < 100 and not BuffPresent(power_infusion_buff) and BuffStacks(insanity_drain_stacks_buff) <= 60 and SpellChargeCooldown(shadow_word_death) == 2 Spell(shadow_word_death)
+	#shadow_word_death,if=talent.reaper_of_souls.enabled&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+75)<100&!buff.power_infusion.up&buff.insanity_drain_stacks.stack<=60&cooldown.shadow_word_death.charges=2
+	if Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 75 < 100 and not BuffPresent(power_infusion_buff) and BuffStacks(insanity_drain_stacks_buff) <= 60 and SpellChargeCooldown(shadow_word_death) == 2 Spell(shadow_word_death)
 	#void_bolt,if=dot.shadow_word_pain.remains<3.5*gcd&dot.vampiric_touch.remains<3.5*gcd&target.time_to_die>10,cycle_targets=1
 	if target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and target.TimeToDie() > 10 Spell(void_bolt)
 	#void_bolt,if=dot.shadow_word_pain.remains<3.5*gcd&(talent.auspicious_spirits.enabled|talent.shadowy_insight.enabled)&target.time_to_die>10,cycle_targets=1
@@ -266,17 +280,17 @@ AddFunction ShadowS2mMainActions
 	if target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and ArtifactTraitRank(sphere_of_insanity) and target.TimeToDie() > 10 Spell(void_bolt)
 	#void_bolt
 	Spell(void_bolt)
-	#shadow_word_death,if=!talent.reaper_of_souls.enabled&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+30)<100
-	if not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 30 < 100 Spell(shadow_word_death)
-	#shadow_word_death,if=talent.reaper_of_souls.enabled&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+90)<100
-	if Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 90 < 100 Spell(shadow_word_death)
-	#wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.25
-	unless Spell(void_bolt) < GCD() * 0.25 and Spell(void_bolt) > 0
+	#shadow_word_death,if=!talent.reaper_of_souls.enabled&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+15)<100
+	if not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 15 < 100 Spell(shadow_word_death)
+	#shadow_word_death,if=talent.reaper_of_souls.enabled&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+75)<100
+	if Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 75 < 100 Spell(shadow_word_death)
+	#wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.28
+	unless Spell(void_bolt) < GCD() * 0.28 and Spell(void_bolt) > 0
 	{
 		#mind_blast
 		Spell(mind_blast)
-		#wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.25
-		unless Spell(mind_blast) < GCD() * 0.25 and Spell(mind_blast) > 0
+		#wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.28
+		unless Spell(mind_blast) < GCD() * 0.28 and Spell(mind_blast) > 0
 		{
 			#shadow_word_death,if=cooldown.shadow_word_death.charges=2
 			if SpellChargeCooldown(shadow_word_death) == 2 Spell(shadow_word_death)
@@ -290,16 +304,14 @@ AddFunction ShadowS2mMainActions
 			if not target.DebuffPresent(vampiric_touch_debuff) and target.TimeToDie() > 10 and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } Spell(vampiric_touch)
 			#shadow_word_pain,if=!ticking&target.time_to_die>10&(active_enemies<5&artifact.sphere_of_insanity.rank),cycle_targets=1
 			if not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and ArtifactTraitRank(sphere_of_insanity) Spell(shadow_word_pain)
-			#wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable|action.void_bolt.usable_in<gcd.max*0.8
-			unless { Spell(void_bolt) or Spell(void_bolt) < GCD() * 0.8 } and Spell(void_bolt) > 0
-			{
-				#mind_sear,if=active_enemies>=3,interrupt=1
-				if Enemies() >= 3 Spell(mind_sear)
-				#mind_flay,if=!talent.mind_spike.enabled,chain=1,interrupt_immediate=1,interrupt_if=action.void_bolt.usable
-				if not Talent(mind_spike_talent) Spell(mind_flay)
-				#mind_spike,if=talent.mind_spike.enabled
-				if Talent(mind_spike_talent) Spell(mind_spike)
-			}
+			#mind_flay,line_cd=10,if=!talent.mind_spike.enabled&active_enemies>=2&active_enemies<4,chain=1,interrupt_immediate=1,interrupt_if=((current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+75)<100&cooldown.shadow_word_death.charges>=1)|action.void_bolt.usable)&ticks>=2
+			if TimeSincePreviousSpell(mind_flay) > 10 and not Talent(mind_spike_talent) and Enemies() >= 2 and Enemies() < 4 Spell(mind_flay)
+			#mind_sear,if=active_enemies>=2,interrupt=1,interrupt_immediate=1,interrupt_if=((current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+75)<100&cooldown.shadow_word_death.charges>=1)|action.void_bolt.usable)&ticks>=2
+			if Enemies() >= 2 Spell(mind_sear)
+			#mind_flay,if=!talent.mind_spike.enabled,chain=1,interrupt_immediate=1,interrupt_if=((current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+75)<100&cooldown.shadow_word_death.charges>=1)|action.void_bolt.usable)&ticks>=2
+			if not Talent(mind_spike_talent) Spell(mind_flay)
+			#mind_spike,if=talent.mind_spike.enabled
+			if Talent(mind_spike_talent) Spell(mind_spike)
 		}
 	}
 }
@@ -314,27 +326,23 @@ AddFunction ShadowS2mShortCdActions
 	if Talent(shadow_crash_talent) Spell(shadow_crash)
 	#mindbender,if=talent.mindbender.enabled
 	if Talent(mindbender_talent) Spell(mindbender)
+	#void_torrent,if=dot.shadow_word_pain.remains>5.5&dot.vampiric_touch.remains>5.5
+	if target.DebuffRemaining(shadow_word_pain_debuff) > 5.5 and target.DebuffRemaining(vampiric_touch_debuff) > 5.5 Spell(void_torrent)
 
-	unless target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and { Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and ArtifactTraitRank(sphere_of_insanity) and target.TimeToDie() > 10 and Spell(void_bolt) or Spell(void_bolt)
+	unless not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 15 < 100 and not BuffPresent(power_infusion_buff) and BuffStacks(insanity_drain_stacks_buff) <= 60 and SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 75 < 100 and not BuffPresent(power_infusion_buff) and BuffStacks(insanity_drain_stacks_buff) <= 60 and SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and { Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and ArtifactTraitRank(sphere_of_insanity) and target.TimeToDie() > 10 and Spell(void_bolt) or Spell(void_bolt) or not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 15 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 75 < 100 and Spell(shadow_word_death)
 	{
-		#void_torrent
-		Spell(void_torrent)
-
-		unless not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 30 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 90 < 100 and Spell(shadow_word_death)
+		#wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.28
+		unless Spell(void_bolt) < GCD() * 0.28 and Spell(void_bolt) > 0
 		{
-			#wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.25
-			unless Spell(void_bolt) < GCD() * 0.25 and Spell(void_bolt) > 0
+			unless Spell(mind_blast)
 			{
-				unless Spell(mind_blast)
+				#wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.28
+				unless Spell(mind_blast) < GCD() * 0.28 and Spell(mind_blast) > 0
 				{
-					#wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.25
-					unless Spell(mind_blast) < GCD() * 0.25 and Spell(mind_blast) > 0
+					unless SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death)
 					{
-						unless SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death)
-						{
-							#shadow_word_void,if=(insanity-(current_insanity_drain*gcd.max)+75)<100
-							if Insanity() - CurrentInsanityDrain() * GCD() + 75 < 100 Spell(shadow_word_void)
-						}
+						#shadow_word_void,if=(insanity-(current_insanity_drain*gcd.max)+75)<100
+						if Insanity() - CurrentInsanityDrain() * GCD() + 75 < 100 Spell(shadow_word_void)
 					}
 				}
 			}
@@ -344,29 +352,32 @@ AddFunction ShadowS2mShortCdActions
 
 AddFunction ShadowS2mShortCdPostConditions
 {
-	target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and { Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and ArtifactTraitRank(sphere_of_insanity) and target.TimeToDie() > 10 and Spell(void_bolt) or Spell(void_bolt) or not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 30 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 90 < 100 and Spell(shadow_word_death) or not { Spell(void_bolt) < GCD() * 0.25 and Spell(void_bolt) > 0 } and { Spell(mind_blast) or not { Spell(mind_blast) < GCD() * 0.25 and Spell(mind_blast) > 0 } and { SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death) or not target.DebuffPresent(shadow_word_pain_debuff) and { Enemies() < 5 or Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) or ArtifactTraitRank(sphere_of_insanity) } and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and Spell(vampiric_touch) or not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and target.TimeToDie() > 10 and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and Spell(vampiric_touch) or not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and ArtifactTraitRank(sphere_of_insanity) and Spell(shadow_word_pain) or not { { Spell(void_bolt) or Spell(void_bolt) < GCD() * 0.8 } and Spell(void_bolt) > 0 } and { Enemies() >= 3 and Spell(mind_sear) or not Talent(mind_spike_talent) and Spell(mind_flay) or Talent(mind_spike_talent) and Spell(mind_spike) } } }
+	not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 15 < 100 and not BuffPresent(power_infusion_buff) and BuffStacks(insanity_drain_stacks_buff) <= 60 and SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 75 < 100 and not BuffPresent(power_infusion_buff) and BuffStacks(insanity_drain_stacks_buff) <= 60 and SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and { Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and ArtifactTraitRank(sphere_of_insanity) and target.TimeToDie() > 10 and Spell(void_bolt) or Spell(void_bolt) or not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 15 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 75 < 100 and Spell(shadow_word_death) or not { Spell(void_bolt) < GCD() * 0.28 and Spell(void_bolt) > 0 } and { Spell(mind_blast) or not { Spell(mind_blast) < GCD() * 0.28 and Spell(mind_blast) > 0 } and { SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death) or not target.DebuffPresent(shadow_word_pain_debuff) and { Enemies() < 5 or Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) or ArtifactTraitRank(sphere_of_insanity) } and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and Spell(vampiric_touch) or not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and target.TimeToDie() > 10 and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and Spell(vampiric_touch) or not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and ArtifactTraitRank(sphere_of_insanity) and Spell(shadow_word_pain) or TimeSincePreviousSpell(mind_flay) > 10 and not Talent(mind_spike_talent) and Enemies() >= 2 and Enemies() < 4 and Spell(mind_flay) or Enemies() >= 2 and Spell(mind_sear) or not Talent(mind_spike_talent) and Spell(mind_flay) or Talent(mind_spike_talent) and Spell(mind_spike) } }
 }
 
 AddFunction ShadowS2mCdActions
 {
-	unless Talent(shadow_crash_talent) and Spell(shadow_crash) or Talent(mindbender_talent) and Spell(mindbender)
+	unless Talent(shadow_crash_talent) and Spell(shadow_crash) or Talent(mindbender_talent) and Spell(mindbender) or target.DebuffRemaining(shadow_word_pain_debuff) > 5.5 and target.DebuffRemaining(vampiric_touch_debuff) > 5.5 and Spell(void_torrent)
 	{
-		#dispersion,if=!buff.power_infusion.up&!buff.berserking.up&!buff.bloodlust.up
-		if not BuffPresent(power_infusion_buff) and not BuffPresent(berserking_buff) and not BuffPresent(burst_haste_buff any=1) Spell(dispersion)
-		#power_infusion,if=buff.insanity_drain_stacks.stack>=85
-		if BuffStacks(insanity_drain_stacks_buff) >= 85 Spell(power_infusion)
-		#berserking,if=buff.voidform.stack>=90
-		if BuffStacks(voidform_buff) >= 90 Spell(berserking)
+		#berserking,if=buff.voidform.stack>=80
+		if BuffStacks(voidform_buff) >= 80 Spell(berserking)
+		#dispersion,if=dot.shadow_word_pain.remains>7.5&dot.vampiric_touch.remains>7.5&buff.voidform.stack<10
+		if target.DebuffRemaining(shadow_word_pain_debuff) > 7.5 and target.DebuffRemaining(vampiric_touch_debuff) > 7.5 and BuffStacks(voidform_buff) < 10 Spell(dispersion)
 
-		unless target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and { Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and ArtifactTraitRank(sphere_of_insanity) and target.TimeToDie() > 10 and Spell(void_bolt) or Spell(void_bolt) or Spell(void_torrent) or not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 30 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 90 < 100 and Spell(shadow_word_death)
+		unless not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 15 < 100 and not BuffPresent(power_infusion_buff) and BuffStacks(insanity_drain_stacks_buff) <= 60 and SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 75 < 100 and not BuffPresent(power_infusion_buff) and BuffStacks(insanity_drain_stacks_buff) <= 60 and SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and { Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and ArtifactTraitRank(sphere_of_insanity) and target.TimeToDie() > 10 and Spell(void_bolt) or Spell(void_bolt) or not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 15 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 75 < 100 and Spell(shadow_word_death)
 		{
-			#wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.25
-			unless Spell(void_bolt) < GCD() * 0.25 and Spell(void_bolt) > 0
+			#power_infusion,if=cooldown.shadow_word_death.charges=0&cooldown.shadow_word_death.remains>3*gcd.max
+			if SpellChargeCooldown(shadow_word_death) == 0 and SpellCooldown(shadow_word_death) > 3 * GCD() Spell(power_infusion)
+			#wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.28
+			unless Spell(void_bolt) < GCD() * 0.28 and Spell(void_bolt) > 0
 			{
+				#dispersion,if=current_insanity_drain*gcd.max>insanity&!buff.power_infusion.up
+				if CurrentInsanityDrain() * GCD() > Insanity() and not BuffPresent(power_infusion_buff) Spell(dispersion)
+
 				unless Spell(mind_blast)
 				{
-					#wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.25
-					unless Spell(mind_blast) < GCD() * 0.25 and Spell(mind_blast) > 0
+					#wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.28
+					unless Spell(mind_blast) < GCD() * 0.28 and Spell(mind_blast) > 0
 					{
 						unless SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death)
 						{
@@ -382,7 +393,7 @@ AddFunction ShadowS2mCdActions
 
 AddFunction ShadowS2mCdPostConditions
 {
-	Talent(shadow_crash_talent) and Spell(shadow_crash) or Talent(mindbender_talent) and Spell(mindbender) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and { Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and ArtifactTraitRank(sphere_of_insanity) and target.TimeToDie() > 10 and Spell(void_bolt) or Spell(void_bolt) or Spell(void_torrent) or not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 30 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 90 < 100 and Spell(shadow_word_death) or not { Spell(void_bolt) < GCD() * 0.25 and Spell(void_bolt) > 0 } and { Spell(mind_blast) or not { Spell(mind_blast) < GCD() * 0.25 and Spell(mind_blast) > 0 } and { SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death) or Insanity() - CurrentInsanityDrain() * GCD() + 75 < 100 and Spell(shadow_word_void) or not target.DebuffPresent(shadow_word_pain_debuff) and { Enemies() < 5 or Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) or ArtifactTraitRank(sphere_of_insanity) } and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and Spell(vampiric_touch) or not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and target.TimeToDie() > 10 and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and Spell(vampiric_touch) or not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and ArtifactTraitRank(sphere_of_insanity) and Spell(shadow_word_pain) or not { { Spell(void_bolt) or Spell(void_bolt) < GCD() * 0.8 } and Spell(void_bolt) > 0 } and { Enemies() >= 3 and Spell(mind_sear) or not Talent(mind_spike_talent) and Spell(mind_flay) or Talent(mind_spike_talent) and Spell(mind_spike) } } }
+	Talent(shadow_crash_talent) and Spell(shadow_crash) or Talent(mindbender_talent) and Spell(mindbender) or target.DebuffRemaining(shadow_word_pain_debuff) > 5.5 and target.DebuffRemaining(vampiric_touch_debuff) > 5.5 and Spell(void_torrent) or not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 15 < 100 and not BuffPresent(power_infusion_buff) and BuffStacks(insanity_drain_stacks_buff) <= 60 and SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 75 < 100 and not BuffPresent(power_infusion_buff) and BuffStacks(insanity_drain_stacks_buff) <= 60 and SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and { Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and ArtifactTraitRank(sphere_of_insanity) and target.TimeToDie() > 10 and Spell(void_bolt) or Spell(void_bolt) or not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 15 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 75 < 100 and Spell(shadow_word_death) or not { Spell(void_bolt) < GCD() * 0.28 and Spell(void_bolt) > 0 } and { Spell(mind_blast) or not { Spell(mind_blast) < GCD() * 0.28 and Spell(mind_blast) > 0 } and { SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death) or Insanity() - CurrentInsanityDrain() * GCD() + 75 < 100 and Spell(shadow_word_void) or not target.DebuffPresent(shadow_word_pain_debuff) and { Enemies() < 5 or Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) or ArtifactTraitRank(sphere_of_insanity) } and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and Spell(vampiric_touch) or not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and target.TimeToDie() > 10 and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and Spell(vampiric_touch) or not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and ArtifactTraitRank(sphere_of_insanity) and Spell(shadow_word_pain) or TimeSincePreviousSpell(mind_flay) > 10 and not Talent(mind_spike_talent) and Enemies() >= 2 and Enemies() < 4 and Spell(mind_flay) or Enemies() >= 2 and Spell(mind_sear) or not Talent(mind_spike_talent) and Spell(mind_flay) or Talent(mind_spike_talent) and Spell(mind_spike) } }
 }
 
 ### actions.vf
@@ -403,13 +414,13 @@ AddFunction ShadowVfMainActions
 	if not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 10 < 100 Spell(shadow_word_death)
 	#shadow_word_death,if=talent.reaper_of_souls.enabled&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+30)<100
 	if Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 30 < 100 Spell(shadow_word_death)
-	#wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.25
-	unless Spell(void_bolt) < GCD() * 0.25 and Spell(void_bolt) > 0
+	#wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.28
+	unless Spell(void_bolt) < GCD() * 0.28 and Spell(void_bolt) > 0
 	{
 		#mind_blast
 		Spell(mind_blast)
-		#wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.25
-		unless Spell(mind_blast) < GCD() * 0.25 and Spell(mind_blast) > 0
+		#wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.28
+		unless Spell(mind_blast) < GCD() * 0.28 and Spell(mind_blast) > 0
 		{
 			#shadow_word_death,if=cooldown.shadow_word_death.charges=2
 			if SpellChargeCooldown(shadow_word_death) == 2 Spell(shadow_word_death)
@@ -426,8 +437,10 @@ AddFunction ShadowVfMainActions
 			#wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable|action.void_bolt.usable_in<gcd.max*0.8
 			unless { Spell(void_bolt) or Spell(void_bolt) < GCD() * 0.8 } and Spell(void_bolt) > 0
 			{
-				#mind_sear,if=active_enemies>=3,interrupt=1
-				if Enemies() >= 3 Spell(mind_sear)
+				#mind_flay,line_cd=10,if=!talent.mind_spike.enabled&active_enemies>=2&active_enemies<4,chain=1,interrupt_immediate=1,interrupt_if=action.void_bolt.usable
+				if TimeSincePreviousSpell(mind_flay) > 10 and not Talent(mind_spike_talent) and Enemies() >= 2 and Enemies() < 4 Spell(mind_flay)
+				#mind_sear,if=active_enemies>=2,interrupt_immediate=1,interrupt_if=action.void_bolt.usable
+				if Enemies() >= 2 Spell(mind_sear)
 				#mind_flay,if=!talent.mind_spike.enabled,chain=1,interrupt_immediate=1,interrupt_if=action.void_bolt.usable
 				if not Talent(mind_spike_talent) Spell(mind_flay)
 				#mind_spike,if=talent.mind_spike.enabled
@@ -447,33 +460,29 @@ AddFunction ShadowVfShortCdActions
 {
 	#shadow_crash,if=talent.shadow_crash.enabled
 	if Talent(shadow_crash_talent) Spell(shadow_crash)
+	#void_torrent,if=dot.shadow_word_pain.remains>5.5&dot.vampiric_touch.remains>5.5&talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.stack)+60
+	if target.DebuffRemaining(shadow_word_pain_debuff) > 5.5 and target.DebuffRemaining(vampiric_touch_debuff) > 5.5 and Talent(surrender_to_madness_talent) and target.TimeToDie() > s2mcheck() - BuffStacks(insanity_drain_stacks_buff) + 60 Spell(void_torrent)
+	#void_torrent,if=!talent.surrender_to_madness.enabled
+	if not Talent(surrender_to_madness_talent) Spell(void_torrent)
 	#mindbender,if=talent.mindbender.enabled&!talent.surrender_to_madness.enabled
 	if Talent(mindbender_talent) and not Talent(surrender_to_madness_talent) Spell(mindbender)
 	#mindbender,if=talent.mindbender.enabled&talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.stack)+30
 	if Talent(mindbender_talent) and Talent(surrender_to_madness_talent) and target.TimeToDie() > s2mcheck() - BuffStacks(insanity_drain_stacks_buff) + 30 Spell(mindbender)
 
-	unless target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and { Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and ArtifactTraitRank(sphere_of_insanity) and target.TimeToDie() > 10 and Spell(void_bolt) or Spell(void_bolt)
+	unless target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and { Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and ArtifactTraitRank(sphere_of_insanity) and target.TimeToDie() > 10 and Spell(void_bolt) or Spell(void_bolt) or not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 10 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 30 < 100 and Spell(shadow_word_death)
 	{
-		#void_torrent,if=!talent.surrender_to_madness.enabled
-		if not Talent(surrender_to_madness_talent) Spell(void_torrent)
-		#void_torrent,if=talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.stack)+60
-		if Talent(surrender_to_madness_talent) and target.TimeToDie() > s2mcheck() - BuffStacks(insanity_drain_stacks_buff) + 60 Spell(void_torrent)
-
-		unless not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 10 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 30 < 100 and Spell(shadow_word_death)
+		#wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.28
+		unless Spell(void_bolt) < GCD() * 0.28 and Spell(void_bolt) > 0
 		{
-			#wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.25
-			unless Spell(void_bolt) < GCD() * 0.25 and Spell(void_bolt) > 0
+			unless Spell(mind_blast)
 			{
-				unless Spell(mind_blast)
+				#wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.28
+				unless Spell(mind_blast) < GCD() * 0.28 and Spell(mind_blast) > 0
 				{
-					#wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.25
-					unless Spell(mind_blast) < GCD() * 0.25 and Spell(mind_blast) > 0
+					unless SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death)
 					{
-						unless SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death)
-						{
-							#shadow_word_void,if=(insanity-(current_insanity_drain*gcd.max)+25)<100
-							if Insanity() - CurrentInsanityDrain() * GCD() + 25 < 100 Spell(shadow_word_void)
-						}
+						#shadow_word_void,if=(insanity-(current_insanity_drain*gcd.max)+25)<100
+						if Insanity() - CurrentInsanityDrain() * GCD() + 25 < 100 Spell(shadow_word_void)
 					}
 				}
 			}
@@ -483,7 +492,7 @@ AddFunction ShadowVfShortCdActions
 
 AddFunction ShadowVfShortCdPostConditions
 {
-	target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and { Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and ArtifactTraitRank(sphere_of_insanity) and target.TimeToDie() > 10 and Spell(void_bolt) or Spell(void_bolt) or not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 10 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 30 < 100 and Spell(shadow_word_death) or not { Spell(void_bolt) < GCD() * 0.25 and Spell(void_bolt) > 0 } and { Spell(mind_blast) or not { Spell(mind_blast) < GCD() * 0.25 and Spell(mind_blast) > 0 } and { SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death) or not target.DebuffPresent(shadow_word_pain_debuff) and { Enemies() < 5 or Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) or ArtifactTraitRank(sphere_of_insanity) } and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and Spell(vampiric_touch) or not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and target.TimeToDie() > 10 and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and Spell(vampiric_touch) or not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and ArtifactTraitRank(sphere_of_insanity) and Spell(shadow_word_pain) or not { { Spell(void_bolt) or Spell(void_bolt) < GCD() * 0.8 } and Spell(void_bolt) > 0 } and { Enemies() >= 3 and Spell(mind_sear) or not Talent(mind_spike_talent) and Spell(mind_flay) or Talent(mind_spike_talent) and Spell(mind_spike) or Spell(shadow_word_pain) } } }
+	target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and { Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and ArtifactTraitRank(sphere_of_insanity) and target.TimeToDie() > 10 and Spell(void_bolt) or Spell(void_bolt) or not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 10 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 30 < 100 and Spell(shadow_word_death) or not { Spell(void_bolt) < GCD() * 0.28 and Spell(void_bolt) > 0 } and { Spell(mind_blast) or not { Spell(mind_blast) < GCD() * 0.28 and Spell(mind_blast) > 0 } and { SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death) or not target.DebuffPresent(shadow_word_pain_debuff) and { Enemies() < 5 or Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) or ArtifactTraitRank(sphere_of_insanity) } and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and Spell(vampiric_touch) or not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and target.TimeToDie() > 10 and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and Spell(vampiric_touch) or not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and ArtifactTraitRank(sphere_of_insanity) and Spell(shadow_word_pain) or not { { Spell(void_bolt) or Spell(void_bolt) < GCD() * 0.8 } and Spell(void_bolt) > 0 } and { TimeSincePreviousSpell(mind_flay) > 10 and not Talent(mind_spike_talent) and Enemies() >= 2 and Enemies() < 4 and Spell(mind_flay) or Enemies() >= 2 and Spell(mind_sear) or not Talent(mind_spike_talent) and Spell(mind_flay) or Talent(mind_spike_talent) and Spell(mind_spike) or Spell(shadow_word_pain) } } }
 }
 
 AddFunction ShadowVfCdActions
@@ -491,26 +500,26 @@ AddFunction ShadowVfCdActions
 	#surrender_to_madness,if=talent.surrender_to_madness.enabled&insanity>=25&(cooldown.void_bolt.up|cooldown.void_torrent.up|cooldown.shadow_word_death.up|buff.shadowy_insight.up)&target.time_to_die<=variable.s2mcheck-(buff.insanity_drain_stacks.stack)
 	if Talent(surrender_to_madness_talent) and Insanity() >= 25 and { not SpellCooldown(void_bolt) > 0 or not SpellCooldown(void_torrent) > 0 or not SpellCooldown(shadow_word_death) > 0 or BuffPresent(shadowy_insight_buff) } and target.TimeToDie() <= s2mcheck() - BuffStacks(insanity_drain_stacks_buff) Spell(surrender_to_madness)
 
-	unless Talent(shadow_crash_talent) and Spell(shadow_crash) or Talent(mindbender_talent) and not Talent(surrender_to_madness_talent) and Spell(mindbender) or Talent(mindbender_talent) and Talent(surrender_to_madness_talent) and target.TimeToDie() > s2mcheck() - BuffStacks(insanity_drain_stacks_buff) + 30 and Spell(mindbender)
+	unless Talent(shadow_crash_talent) and Spell(shadow_crash) or target.DebuffRemaining(shadow_word_pain_debuff) > 5.5 and target.DebuffRemaining(vampiric_touch_debuff) > 5.5 and Talent(surrender_to_madness_talent) and target.TimeToDie() > s2mcheck() - BuffStacks(insanity_drain_stacks_buff) + 60 and Spell(void_torrent) or not Talent(surrender_to_madness_talent) and Spell(void_torrent) or Talent(mindbender_talent) and not Talent(surrender_to_madness_talent) and Spell(mindbender) or Talent(mindbender_talent) and Talent(surrender_to_madness_talent) and target.TimeToDie() > s2mcheck() - BuffStacks(insanity_drain_stacks_buff) + 30 and Spell(mindbender)
 	{
 		#power_infusion,if=buff.voidform.stack>=10&buff.insanity_drain_stacks.stack<=30&!talent.surrender_to_madness.enabled
 		if BuffStacks(voidform_buff) >= 10 and BuffStacks(insanity_drain_stacks_buff) <= 30 and not Talent(surrender_to_madness_talent) Spell(power_infusion)
-		#power_infusion,if=buff.voidform.stack>=10&talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.stack)+15
-		if BuffStacks(voidform_buff) >= 10 and Talent(surrender_to_madness_talent) and target.TimeToDie() > s2mcheck() - BuffStacks(insanity_drain_stacks_buff) + 15 Spell(power_infusion)
+		#power_infusion,if=buff.voidform.stack>=10&talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.stack)+41
+		if BuffStacks(voidform_buff) >= 10 and Talent(surrender_to_madness_talent) and target.TimeToDie() > s2mcheck() - BuffStacks(insanity_drain_stacks_buff) + 41 Spell(power_infusion)
 		#berserking,if=buff.voidform.stack>=10&buff.insanity_drain_stacks.stack<=20&!talent.surrender_to_madness.enabled
 		if BuffStacks(voidform_buff) >= 10 and BuffStacks(insanity_drain_stacks_buff) <= 20 and not Talent(surrender_to_madness_talent) Spell(berserking)
-		#berserking,if=buff.voidform.stack>=10&talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.stack)+70
-		if BuffStacks(voidform_buff) >= 10 and Talent(surrender_to_madness_talent) and target.TimeToDie() > s2mcheck() - BuffStacks(insanity_drain_stacks_buff) + 70 Spell(berserking)
+		#berserking,if=buff.voidform.stack>=10&talent.surrender_to_madness.enabled&target.time_to_die>variable.s2mcheck-(buff.insanity_drain_stacks.stack)+60
+		if BuffStacks(voidform_buff) >= 10 and Talent(surrender_to_madness_talent) and target.TimeToDie() > s2mcheck() - BuffStacks(insanity_drain_stacks_buff) + 60 Spell(berserking)
 
-		unless target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and { Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and ArtifactTraitRank(sphere_of_insanity) and target.TimeToDie() > 10 and Spell(void_bolt) or Spell(void_bolt) or not Talent(surrender_to_madness_talent) and Spell(void_torrent) or Talent(surrender_to_madness_talent) and target.TimeToDie() > s2mcheck() - BuffStacks(insanity_drain_stacks_buff) + 60 and Spell(void_torrent) or not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 10 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 30 < 100 and Spell(shadow_word_death)
+		unless target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and { Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and ArtifactTraitRank(sphere_of_insanity) and target.TimeToDie() > 10 and Spell(void_bolt) or Spell(void_bolt) or not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 10 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 30 < 100 and Spell(shadow_word_death)
 		{
-			#wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.25
-			unless Spell(void_bolt) < GCD() * 0.25 and Spell(void_bolt) > 0
+			#wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.28
+			unless Spell(void_bolt) < GCD() * 0.28 and Spell(void_bolt) > 0
 			{
 				unless Spell(mind_blast)
 				{
-					#wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.25
-					unless Spell(mind_blast) < GCD() * 0.25 and Spell(mind_blast) > 0
+					#wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.28
+					unless Spell(mind_blast) < GCD() * 0.28 and Spell(mind_blast) > 0
 					{
 						unless SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death)
 						{
@@ -526,7 +535,7 @@ AddFunction ShadowVfCdActions
 
 AddFunction ShadowVfCdPostConditions
 {
-	Talent(shadow_crash_talent) and Spell(shadow_crash) or Talent(mindbender_talent) and not Talent(surrender_to_madness_talent) and Spell(mindbender) or Talent(mindbender_talent) and Talent(surrender_to_madness_talent) and target.TimeToDie() > s2mcheck() - BuffStacks(insanity_drain_stacks_buff) + 30 and Spell(mindbender) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and { Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and ArtifactTraitRank(sphere_of_insanity) and target.TimeToDie() > 10 and Spell(void_bolt) or Spell(void_bolt) or not Talent(surrender_to_madness_talent) and Spell(void_torrent) or Talent(surrender_to_madness_talent) and target.TimeToDie() > s2mcheck() - BuffStacks(insanity_drain_stacks_buff) + 60 and Spell(void_torrent) or not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 10 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 30 < 100 and Spell(shadow_word_death) or not { Spell(void_bolt) < GCD() * 0.25 and Spell(void_bolt) > 0 } and { Spell(mind_blast) or not { Spell(mind_blast) < GCD() * 0.25 and Spell(mind_blast) > 0 } and { SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death) or Insanity() - CurrentInsanityDrain() * GCD() + 25 < 100 and Spell(shadow_word_void) or not target.DebuffPresent(shadow_word_pain_debuff) and { Enemies() < 5 or Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) or ArtifactTraitRank(sphere_of_insanity) } and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and Spell(vampiric_touch) or not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and target.TimeToDie() > 10 and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and Spell(vampiric_touch) or not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and ArtifactTraitRank(sphere_of_insanity) and Spell(shadow_word_pain) or not { { Spell(void_bolt) or Spell(void_bolt) < GCD() * 0.8 } and Spell(void_bolt) > 0 } and { Enemies() >= 3 and Spell(mind_sear) or not Talent(mind_spike_talent) and Spell(mind_flay) or Talent(mind_spike_talent) and Spell(mind_spike) or Spell(shadow_word_pain) } } }
+	Talent(shadow_crash_talent) and Spell(shadow_crash) or target.DebuffRemaining(shadow_word_pain_debuff) > 5.5 and target.DebuffRemaining(vampiric_touch_debuff) > 5.5 and Talent(surrender_to_madness_talent) and target.TimeToDie() > s2mcheck() - BuffStacks(insanity_drain_stacks_buff) + 60 and Spell(void_torrent) or not Talent(surrender_to_madness_talent) and Spell(void_torrent) or Talent(mindbender_talent) and not Talent(surrender_to_madness_talent) and Spell(mindbender) or Talent(mindbender_talent) and Talent(surrender_to_madness_talent) and target.TimeToDie() > s2mcheck() - BuffStacks(insanity_drain_stacks_buff) + 30 and Spell(mindbender) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(vampiric_touch_debuff) < 3.5 * GCD() and { Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and target.TimeToDie() > 10 and Spell(void_bolt) or target.DebuffRemaining(shadow_word_pain_debuff) < 3.5 * GCD() and ArtifactTraitRank(sphere_of_insanity) and target.TimeToDie() > 10 and Spell(void_bolt) or Spell(void_bolt) or not Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 10 < 100 and Spell(shadow_word_death) or Talent(reaper_of_souls_talent) and CurrentInsanityDrain() * GCD() > Insanity() and Insanity() - CurrentInsanityDrain() * GCD() + 30 < 100 and Spell(shadow_word_death) or not { Spell(void_bolt) < GCD() * 0.28 and Spell(void_bolt) > 0 } and { Spell(mind_blast) or not { Spell(mind_blast) < GCD() * 0.28 and Spell(mind_blast) > 0 } and { SpellChargeCooldown(shadow_word_death) == 2 and Spell(shadow_word_death) or Insanity() - CurrentInsanityDrain() * GCD() + 25 < 100 and Spell(shadow_word_void) or not target.DebuffPresent(shadow_word_pain_debuff) and { Enemies() < 5 or Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) or ArtifactTraitRank(sphere_of_insanity) } and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and Spell(vampiric_touch) or not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and Spell(shadow_word_pain) or not target.DebuffPresent(vampiric_touch_debuff) and target.TimeToDie() > 10 and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and Spell(vampiric_touch) or not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and ArtifactTraitRank(sphere_of_insanity) and Spell(shadow_word_pain) or not { { Spell(void_bolt) or Spell(void_bolt) < GCD() * 0.8 } and Spell(void_bolt) > 0 } and { TimeSincePreviousSpell(mind_flay) > 10 and not Talent(mind_spike_talent) and Enemies() >= 2 and Enemies() < 4 and Spell(mind_flay) or Enemies() >= 2 and Spell(mind_sear) or not Talent(mind_spike_talent) and Spell(mind_flay) or Talent(mind_spike_talent) and Spell(mind_spike) or Spell(shadow_word_pain) } } }
 }
 
 ### Shadow icons.
@@ -591,7 +600,6 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # augmentation
 # auspicious_spirits_talent
 # berserking
-# berserking_buff
 # dispersion
 # fortress_of_the_mind_talent
 # insanity_drain_stacks_buff

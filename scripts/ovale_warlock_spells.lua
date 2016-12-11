@@ -102,6 +102,7 @@ Define(drain_soul 198590)
 	SpellInfo(drain_soul channel=4 haste=spell)
 Define(ember_master_buff 145164)	# tier16_4pc_caster
 	SpellInfo(ember_master_buff duration=5)
+Define(empowered_life_tap_buff 235156)
 Define(enhanced_haunt 157072)
 Define(enhanced_havoc 157126)
 Define(fel_molten_core_aura 140074)
@@ -308,16 +309,23 @@ Define(wrathguard_wrathstorm 115831)
 	SpellInfo(wrathguard_wrathstorm cd=45 gcd=0)
 
 # Talents
+Define(absolute_corruption_talent 5)
 Define(contagion_talent 4)
+Define(empowered_life_tap_talent 6)
 Define(grimoire_of_synergy_talent 18)
 Define(hand_of_doom_talent 10)
+Define(haunt_talent 1)
 Define(implosion_talent 6)
+Define(malefic_grasp_talent 3)
+Define(siphon_life_talent 10)
 Define(summon_darkglare_talent 19)
 Define(wreak_havoc_talent 19)
+Define(writhe_in_agony_talent 2)
 
 # Legendary items
 Define(deadwind_harvester_buff 214867)
 	SpellAddBuff(reap_souls tormented_souls_buff=0)
+Define(sindorei_spite_icd 208871) # TODO should be the internal cooldown of the spell
 Define(tormented_souls_buff 216695)
 
 # Legion Artifact

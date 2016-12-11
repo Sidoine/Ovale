@@ -640,9 +640,9 @@ AddFunction FireInterruptActions
 AddFunction FireDefaultMainActions
 {
 	#call_action_list,name=combustion_phase,if=cooldown.combustion.remains<=action.rune_of_power.cast_time+(!talent.kindling.enabled*gcd)|buff.combustion.up
-	if SpellCooldown(combustion) <= CastTime(rune_of_power) + { not TalentPoints(kindling_talent) * GCD() } or BuffPresent(combustion_buff) FireCombustionPhaseMainActions()
+	if SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() or BuffPresent(combustion_buff) FireCombustionPhaseMainActions()
 
-	unless { SpellCooldown(combustion) <= CastTime(rune_of_power) + { not TalentPoints(kindling_talent) * GCD() } or BuffPresent(combustion_buff) } and FireCombustionPhaseMainPostConditions()
+	unless { SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() or BuffPresent(combustion_buff) } and FireCombustionPhaseMainPostConditions()
 	{
 		#call_action_list,name=rop_phase,if=buff.rune_of_power.up&buff.combustion.down
 		if BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) FireRopPhaseMainActions()
@@ -657,7 +657,7 @@ AddFunction FireDefaultMainActions
 
 AddFunction FireDefaultMainPostConditions
 {
-	{ SpellCooldown(combustion) <= CastTime(rune_of_power) + { not TalentPoints(kindling_talent) * GCD() } or BuffPresent(combustion_buff) } and FireCombustionPhaseMainPostConditions() or BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopPhaseMainPostConditions() or FireSingleTargetMainPostConditions()
+	{ SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() or BuffPresent(combustion_buff) } and FireCombustionPhaseMainPostConditions() or BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopPhaseMainPostConditions() or FireSingleTargetMainPostConditions()
 }
 
 AddFunction FireDefaultShortCdActions
@@ -665,9 +665,9 @@ AddFunction FireDefaultShortCdActions
 	#rune_of_power,if=cooldown.combustion.remains>40&buff.combustion.down&(cooldown.flame_on.remains<5|cooldown.flame_on.remains>30)&!talent.kindling.enabled|target.time_to_die.remains<11|talent.kindling.enabled&(charges_fractional>1.8|time<40)&cooldown.combustion.remains>40
 	if SpellCooldown(combustion) > 40 and BuffExpires(combustion_buff) and { SpellCooldown(flame_on) < 5 or SpellCooldown(flame_on) > 30 } and not Talent(kindling_talent) or target.TimeToDie() < 11 or Talent(kindling_talent) and { Charges(rune_of_power count=0) > 1.8 or TimeInCombat() < 40 } and SpellCooldown(combustion) > 40 Spell(rune_of_power)
 	#call_action_list,name=combustion_phase,if=cooldown.combustion.remains<=action.rune_of_power.cast_time+(!talent.kindling.enabled*gcd)|buff.combustion.up
-	if SpellCooldown(combustion) <= CastTime(rune_of_power) + { not TalentPoints(kindling_talent) * GCD() } or BuffPresent(combustion_buff) FireCombustionPhaseShortCdActions()
+	if SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() or BuffPresent(combustion_buff) FireCombustionPhaseShortCdActions()
 
-	unless { SpellCooldown(combustion) <= CastTime(rune_of_power) + { not TalentPoints(kindling_talent) * GCD() } or BuffPresent(combustion_buff) } and FireCombustionPhaseShortCdPostConditions()
+	unless { SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() or BuffPresent(combustion_buff) } and FireCombustionPhaseShortCdPostConditions()
 	{
 		#call_action_list,name=rop_phase,if=buff.rune_of_power.up&buff.combustion.down
 		if BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) FireRopPhaseShortCdActions()
@@ -682,7 +682,7 @@ AddFunction FireDefaultShortCdActions
 
 AddFunction FireDefaultShortCdPostConditions
 {
-	{ SpellCooldown(combustion) <= CastTime(rune_of_power) + { not TalentPoints(kindling_talent) * GCD() } or BuffPresent(combustion_buff) } and FireCombustionPhaseShortCdPostConditions() or BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopPhaseShortCdPostConditions() or FireSingleTargetShortCdPostConditions()
+	{ SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() or BuffPresent(combustion_buff) } and FireCombustionPhaseShortCdPostConditions() or BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopPhaseShortCdPostConditions() or FireSingleTargetShortCdPostConditions()
 }
 
 AddFunction FireDefaultCdActions
@@ -697,9 +697,9 @@ AddFunction FireDefaultCdActions
 	unless { SpellCooldown(combustion) > 40 and BuffExpires(combustion_buff) and { SpellCooldown(flame_on) < 5 or SpellCooldown(flame_on) > 30 } and not Talent(kindling_talent) or target.TimeToDie() < 11 or Talent(kindling_talent) and { Charges(rune_of_power count=0) > 1.8 or TimeInCombat() < 40 } and SpellCooldown(combustion) > 40 } and Spell(rune_of_power)
 	{
 		#call_action_list,name=combustion_phase,if=cooldown.combustion.remains<=action.rune_of_power.cast_time+(!talent.kindling.enabled*gcd)|buff.combustion.up
-		if SpellCooldown(combustion) <= CastTime(rune_of_power) + { not TalentPoints(kindling_talent) * GCD() } or BuffPresent(combustion_buff) FireCombustionPhaseCdActions()
+		if SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() or BuffPresent(combustion_buff) FireCombustionPhaseCdActions()
 
-		unless { SpellCooldown(combustion) <= CastTime(rune_of_power) + { not TalentPoints(kindling_talent) * GCD() } or BuffPresent(combustion_buff) } and FireCombustionPhaseCdPostConditions()
+		unless { SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() or BuffPresent(combustion_buff) } and FireCombustionPhaseCdPostConditions()
 		{
 			#call_action_list,name=rop_phase,if=buff.rune_of_power.up&buff.combustion.down
 			if BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) FireRopPhaseCdActions()
@@ -715,7 +715,7 @@ AddFunction FireDefaultCdActions
 
 AddFunction FireDefaultCdPostConditions
 {
-	{ SpellCooldown(combustion) > 40 and BuffExpires(combustion_buff) and { SpellCooldown(flame_on) < 5 or SpellCooldown(flame_on) > 30 } and not Talent(kindling_talent) or target.TimeToDie() < 11 or Talent(kindling_talent) and { Charges(rune_of_power count=0) > 1.8 or TimeInCombat() < 40 } and SpellCooldown(combustion) > 40 } and Spell(rune_of_power) or { SpellCooldown(combustion) <= CastTime(rune_of_power) + { not TalentPoints(kindling_talent) * GCD() } or BuffPresent(combustion_buff) } and FireCombustionPhaseCdPostConditions() or BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopPhaseCdPostConditions() or FireSingleTargetCdPostConditions()
+	{ SpellCooldown(combustion) > 40 and BuffExpires(combustion_buff) and { SpellCooldown(flame_on) < 5 or SpellCooldown(flame_on) > 30 } and not Talent(kindling_talent) or target.TimeToDie() < 11 or Talent(kindling_talent) and { Charges(rune_of_power count=0) > 1.8 or TimeInCombat() < 40 } and SpellCooldown(combustion) > 40 } and Spell(rune_of_power) or { SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() or BuffPresent(combustion_buff) } and FireCombustionPhaseCdPostConditions() or BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopPhaseCdPostConditions() or FireSingleTargetCdPostConditions()
 }
 
 ### actions.active_talents
@@ -775,6 +775,8 @@ AddFunction FireCombustionPhaseMainActions
 
 	unless FireActiveTalentsMainPostConditions()
 	{
+		#pyroblast,if=buff.kaelthas_ultimate_ability.react&buff.combustion.remains>execute_time
+		if BuffPresent(kaelthas_ultimate_ability_buff) and BuffRemaining(combustion_buff) > ExecuteTime(pyroblast) Spell(pyroblast)
 		#pyroblast,if=buff.hot_streak.up
 		if BuffPresent(hot_streak_buff) Spell(pyroblast)
 		#phoenixs_flames
@@ -798,7 +800,7 @@ AddFunction FireCombustionPhaseShortCdActions
 	#call_action_list,name=active_talents
 	FireActiveTalentsShortCdActions()
 
-	unless FireActiveTalentsShortCdPostConditions() or BuffPresent(hot_streak_buff) and Spell(pyroblast)
+	unless FireActiveTalentsShortCdPostConditions() or BuffPresent(kaelthas_ultimate_ability_buff) and BuffRemaining(combustion_buff) > ExecuteTime(pyroblast) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Spell(pyroblast)
 	{
 		#fire_blast,if=buff.heating_up.up
 		if BuffPresent(heating_up_buff) Spell(fire_blast)
@@ -807,7 +809,7 @@ AddFunction FireCombustionPhaseShortCdActions
 
 AddFunction FireCombustionPhaseShortCdPostConditions
 {
-	FireActiveTalentsShortCdPostConditions() or BuffPresent(hot_streak_buff) and Spell(pyroblast) or Spell(phoenixs_flames) or BuffRemaining(combustion_buff) > CastTime(scorch) and Spell(scorch) or target.HealthPercent() <= 25 and HasEquippedItem(132454) and Spell(scorch)
+	FireActiveTalentsShortCdPostConditions() or BuffPresent(kaelthas_ultimate_ability_buff) and BuffRemaining(combustion_buff) > ExecuteTime(pyroblast) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Spell(pyroblast) or Spell(phoenixs_flames) or BuffRemaining(combustion_buff) > CastTime(scorch) and Spell(scorch) or target.HealthPercent() <= 25 and HasEquippedItem(132454) and Spell(scorch)
 }
 
 AddFunction FireCombustionPhaseCdActions
@@ -834,7 +836,7 @@ AddFunction FireCombustionPhaseCdActions
 
 AddFunction FireCombustionPhaseCdPostConditions
 {
-	BuffExpires(combustion_buff) and Spell(rune_of_power) or FireActiveTalentsCdPostConditions() or BuffPresent(hot_streak_buff) and Spell(pyroblast) or Spell(phoenixs_flames) or BuffRemaining(combustion_buff) > CastTime(scorch) and Spell(scorch) or target.HealthPercent() <= 25 and HasEquippedItem(132454) and Spell(scorch)
+	BuffExpires(combustion_buff) and Spell(rune_of_power) or FireActiveTalentsCdPostConditions() or BuffPresent(kaelthas_ultimate_ability_buff) and BuffRemaining(combustion_buff) > ExecuteTime(pyroblast) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Spell(pyroblast) or Spell(phoenixs_flames) or BuffRemaining(combustion_buff) > CastTime(scorch) and Spell(scorch) or target.HealthPercent() <= 25 and HasEquippedItem(132454) and Spell(scorch)
 }
 
 ### actions.precombat
@@ -1122,7 +1124,7 @@ do
 # Based on SimulationCraft profile "Mage_Frost_T19P".
 #	class=mage
 #	spec=frost
-#	talents=1121113
+#	talents=3122111
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -1156,8 +1158,6 @@ AddFunction FrostDefaultMainActions
 
 	unless FrostCooldownsMainPostConditions()
 	{
-		#blizzard,if=buff.potion_of_deadly_grace.up&!prev_off_gcd.water_jet
-		if BuffPresent(potion_of_deadly_grace_buff) and not PreviousOffGCDSpell(water_elemental_water_jet) Spell(blizzard)
 		#ice_nova,if=debuff.winters_chill.up
 		if target.DebuffPresent(winters_chill_debuff) Spell(ice_nova)
 		#frostbolt,if=prev_off_gcd.water_jet
@@ -1166,14 +1166,14 @@ AddFunction FrostDefaultMainActions
 		if BuffPresent(icy_veins_buff) or SpellCooldown(icy_veins) > SpellCooldown(ray_of_frost) and BuffExpires(rune_of_power_buff) Spell(ray_of_frost)
 		#flurry,if=buff.brain_freeze.react&buff.fingers_of_frost.react=0&prev_gcd.frostbolt
 		if BuffPresent(brain_freeze_buff) and BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(frostbolt) Spell(flurry)
-		#glacial_spike
-		Spell(glacial_spike)
 		#ice_lance,if=buff.fingers_of_frost.react>0&cooldown.icy_veins.remains>10|buff.fingers_of_frost.react>2
 		if BuffStacks(fingers_of_frost_buff) > 0 and SpellCooldown(icy_veins) > 10 or BuffStacks(fingers_of_frost_buff) > 2 Spell(ice_lance)
 		#ice_nova
 		Spell(ice_nova)
-		#blizzard,if=talent.artic_gale.enabled
-		if Talent(artic_gale_talent) Spell(blizzard)
+		#blizzard,if=talent.arctic_gale.enabled|active_enemies>1|((buff.zannesu_journey.stack>4|buff.zannesu_journey.remains<cast_time+1)&equipped.133970)
+		if Talent(arctic_gale_talent) or Enemies() > 1 or { BuffStacks(zannesu_journey_buff) > 4 or BuffRemaining(zannesu_journey_buff) < CastTime(blizzard) + 1 } and HasEquippedItem(133970) Spell(blizzard)
+		#glacial_spike
+		Spell(glacial_spike)
 		#frostbolt
 		Spell(frostbolt)
 	}
@@ -1191,15 +1191,15 @@ AddFunction FrostDefaultShortCdActions
 		#call_action_list,name=cooldowns
 		FrostCooldownsShortCdActions()
 
-		unless FrostCooldownsShortCdPostConditions() or BuffPresent(potion_of_deadly_grace_buff) and not PreviousOffGCDSpell(water_elemental_water_jet) and Spell(blizzard) or target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt)
+		unless FrostCooldownsShortCdPostConditions() or target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt)
 		{
 			#water_jet,if=prev_gcd.frostbolt&buff.fingers_of_frost.stack<(2+artifact.icy_hand.enabled)&buff.brain_freeze.react=0
 			if PreviousGCDSpell(frostbolt) and BuffStacks(fingers_of_frost_buff) < 2 + HasArtifactTrait(icy_hand) and BuffStacks(brain_freeze_buff) == 0 Spell(water_elemental_water_jet)
 
-			unless { BuffPresent(icy_veins_buff) or SpellCooldown(icy_veins) > SpellCooldown(ray_of_frost) and BuffExpires(rune_of_power_buff) } and Spell(ray_of_frost) or BuffPresent(brain_freeze_buff) and BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(frostbolt) and Spell(flurry) or Spell(glacial_spike)
+			unless { BuffPresent(icy_veins_buff) or SpellCooldown(icy_veins) > SpellCooldown(ray_of_frost) and BuffExpires(rune_of_power_buff) } and Spell(ray_of_frost) or BuffPresent(brain_freeze_buff) and BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(frostbolt) and Spell(flurry)
 			{
-				#frozen_touch,if=buff.fingers_of_frost.stack<=(0+artifact.icy_hand.enabled)
-				if BuffStacks(fingers_of_frost_buff) <= 0 + HasArtifactTrait(icy_hand) Spell(frozen_touch)
+				#frozen_touch,if=buff.fingers_of_frost.stack<=(0+artifact.icy_hand.enabled)&((cooldown.icy_veins.remains>30&talent.thermal_void.enabled)|!talent.thermal_void.enabled)
+				if BuffStacks(fingers_of_frost_buff) <= 0 + HasArtifactTrait(icy_hand) and { SpellCooldown(icy_veins) > 30 and Talent(thermal_void_talent) or not Talent(thermal_void_talent) } Spell(frozen_touch)
 				#frost_bomb,if=debuff.frost_bomb.remains<action.ice_lance.travel_time&buff.fingers_of_frost.react>0
 				if target.DebuffRemaining(frost_bomb_debuff) < TravelTime(ice_lance) and BuffStacks(fingers_of_frost_buff) > 0 Spell(frost_bomb)
 
@@ -1213,7 +1213,7 @@ AddFunction FrostDefaultShortCdActions
 						#comet_storm
 						Spell(comet_storm)
 
-						unless Talent(artic_gale_talent) and Spell(blizzard)
+						unless { Talent(arctic_gale_talent) or Enemies() > 1 or { BuffStacks(zannesu_journey_buff) > 4 or BuffRemaining(zannesu_journey_buff) < CastTime(blizzard) + 1 } and HasEquippedItem(133970) } and Spell(blizzard)
 						{
 							#ebonbolt,if=buff.fingers_of_frost.stack<=(0+artifact.icy_hand.enabled)
 							if BuffStacks(fingers_of_frost_buff) <= 0 + HasArtifactTrait(icy_hand) Spell(ebonbolt)
@@ -1227,7 +1227,7 @@ AddFunction FrostDefaultShortCdActions
 
 AddFunction FrostDefaultShortCdPostConditions
 {
-	BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(flurry) and Spell(ice_lance) or FrostCooldownsShortCdPostConditions() or BuffPresent(potion_of_deadly_grace_buff) and not PreviousOffGCDSpell(water_elemental_water_jet) and Spell(blizzard) or target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or { BuffPresent(icy_veins_buff) or SpellCooldown(icy_veins) > SpellCooldown(ray_of_frost) and BuffExpires(rune_of_power_buff) } and Spell(ray_of_frost) or BuffPresent(brain_freeze_buff) and BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(frostbolt) and Spell(flurry) or Spell(glacial_spike) or { BuffStacks(fingers_of_frost_buff) > 0 and SpellCooldown(icy_veins) > 10 or BuffStacks(fingers_of_frost_buff) > 2 } and Spell(ice_lance) or Spell(ice_nova) or Talent(artic_gale_talent) and Spell(blizzard) or Spell(frostbolt)
+	BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(flurry) and Spell(ice_lance) or FrostCooldownsShortCdPostConditions() or target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or { BuffPresent(icy_veins_buff) or SpellCooldown(icy_veins) > SpellCooldown(ray_of_frost) and BuffExpires(rune_of_power_buff) } and Spell(ray_of_frost) or BuffPresent(brain_freeze_buff) and BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(frostbolt) and Spell(flurry) or { BuffStacks(fingers_of_frost_buff) > 0 and SpellCooldown(icy_veins) > 10 or BuffStacks(fingers_of_frost_buff) > 2 } and Spell(ice_lance) or Spell(ice_nova) or { Talent(arctic_gale_talent) or Enemies() > 1 or { BuffStacks(zannesu_journey_buff) > 4 or BuffRemaining(zannesu_journey_buff) < CastTime(blizzard) + 1 } and HasEquippedItem(133970) } and Spell(blizzard) or Spell(glacial_spike) or Spell(frostbolt)
 }
 
 AddFunction FrostDefaultCdActions
@@ -1246,7 +1246,7 @@ AddFunction FrostDefaultCdActions
 
 AddFunction FrostDefaultCdPostConditions
 {
-	BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(flurry) and Spell(ice_lance) or FrostCooldownsCdPostConditions() or BuffPresent(potion_of_deadly_grace_buff) and not PreviousOffGCDSpell(water_elemental_water_jet) and Spell(blizzard) or target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or { BuffPresent(icy_veins_buff) or SpellCooldown(icy_veins) > SpellCooldown(ray_of_frost) and BuffExpires(rune_of_power_buff) } and Spell(ray_of_frost) or BuffPresent(brain_freeze_buff) and BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(frostbolt) and Spell(flurry) or Spell(glacial_spike) or BuffStacks(fingers_of_frost_buff) <= 0 + HasArtifactTrait(icy_hand) and Spell(frozen_touch) or target.DebuffRemaining(frost_bomb_debuff) < TravelTime(ice_lance) and BuffStacks(fingers_of_frost_buff) > 0 and Spell(frost_bomb) or { BuffStacks(fingers_of_frost_buff) > 0 and SpellCooldown(icy_veins) > 10 or BuffStacks(fingers_of_frost_buff) > 2 } and Spell(ice_lance) or Spell(frozen_orb) or Spell(ice_nova) or Spell(comet_storm) or Talent(artic_gale_talent) and Spell(blizzard) or BuffStacks(fingers_of_frost_buff) <= 0 + HasArtifactTrait(icy_hand) and Spell(ebonbolt) or Spell(frostbolt)
+	BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(flurry) and Spell(ice_lance) or FrostCooldownsCdPostConditions() or target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or { BuffPresent(icy_veins_buff) or SpellCooldown(icy_veins) > SpellCooldown(ray_of_frost) and BuffExpires(rune_of_power_buff) } and Spell(ray_of_frost) or BuffPresent(brain_freeze_buff) and BuffStacks(fingers_of_frost_buff) == 0 and PreviousGCDSpell(frostbolt) and Spell(flurry) or BuffStacks(fingers_of_frost_buff) <= 0 + HasArtifactTrait(icy_hand) and { SpellCooldown(icy_veins) > 30 and Talent(thermal_void_talent) or not Talent(thermal_void_talent) } and Spell(frozen_touch) or target.DebuffRemaining(frost_bomb_debuff) < TravelTime(ice_lance) and BuffStacks(fingers_of_frost_buff) > 0 and Spell(frost_bomb) or { BuffStacks(fingers_of_frost_buff) > 0 and SpellCooldown(icy_veins) > 10 or BuffStacks(fingers_of_frost_buff) > 2 } and Spell(ice_lance) or Spell(frozen_orb) or Spell(ice_nova) or Spell(comet_storm) or { Talent(arctic_gale_talent) or Enemies() > 1 or { BuffStacks(zannesu_journey_buff) > 4 or BuffRemaining(zannesu_journey_buff) < CastTime(blizzard) + 1 } and HasEquippedItem(133970) } and Spell(blizzard) or BuffStacks(fingers_of_frost_buff) <= 0 + HasArtifactTrait(icy_hand) and Spell(ebonbolt) or Spell(glacial_spike) or Spell(frostbolt)
 }
 
 ### actions.cooldowns
@@ -1273,6 +1273,7 @@ AddFunction FrostCooldownsCdActions
 {
 	unless { SpellCooldown(icy_veins) < CastTime(rune_of_power) or Charges(rune_of_power count=0) > 1.9 and SpellCooldown(icy_veins) > 10 or BuffPresent(icy_veins_buff) or target.TimeToDie() + 5 < Charges(rune_of_power count=0) * 10 } and Spell(rune_of_power)
 	{
+		#potion,name=potion_of_prolonged_power,if=cooldown.icy_veins.remains<1
 		#icy_veins,if=buff.icy_veins.down
 		if BuffExpires(icy_veins_buff) Spell(icy_veins)
 		#mirror_image
@@ -1397,8 +1398,9 @@ AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 
 ### Required symbols
 # 132410
+# 133970
 # arcane_torrent_mana
-# artic_gale_talent
+# arctic_gale_talent
 # augmentation
 # berserking
 # blizzard
@@ -1421,15 +1423,16 @@ AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 # icy_veins
 # icy_veins_buff
 # mirror_image
-# potion_of_deadly_grace_buff
 # quaking_palm
 # ray_of_frost
 # rune_of_power
 # rune_of_power_buff
+# thermal_void_talent
 # time_warp
 # water_elemental
 # water_elemental_water_jet
 # winters_chill_debuff
+# zannesu_journey_buff
 ]]
 	OvaleScripts:RegisterScript("MAGE", "frost", name, desc, code, "script")
 end
