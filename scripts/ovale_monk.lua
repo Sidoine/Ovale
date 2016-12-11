@@ -23,9 +23,9 @@ AddFunction BrewmasterExpelHarmOffensivelyPreConditions
 
 AddFunction BrewmasterHealMe
 {
-	if (SpellCount(expel_harm) >= 1 and HealthPercent() < 35) Spell(expel_harm)
 	if (HealthPercent() < 35) Spell(healing_elixir)
-	if (HealthPercent() < 75 and (SpellCharges(healing_elixir) == 2)) Spell(healing_elixir)
+	if (SpellCount(expel_harm) >= 1 and HealthPercent() < 35) Spell(expel_harm)
+	if (HealthPercent() <= 100 - (15 * 2.6)) Spell(healing_elixir)
 }
 
 AddFunction BrewmasterDefaultShortCDActions
