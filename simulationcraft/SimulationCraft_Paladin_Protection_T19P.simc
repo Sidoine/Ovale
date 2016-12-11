@@ -28,7 +28,9 @@ actions=auto_attack
 actions+=/use_item,name=shivermaws_jawbone
 actions+=/blood_fury
 actions+=/berserking
-actions+=/rebuke
+actions+=/arcane_torrent
+actions+=/blood_fury
+actions+=/berserking
 actions+=/arcane_torrent
 actions+=/call_action_list,name=prot
 
