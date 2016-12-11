@@ -2049,6 +2049,38 @@ do
 	OvaleCondition:RegisterCondition("healthpercent", false, HealthPercent)
 	OvaleCondition:RegisterCondition("lifepercent", false, HealthPercent)
 
+	--- Get the current percent level of health of the target.
+	-- @name HealthPercent
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return The current health percent.
+	-- @return A boolean value for the result of the comparison.
+	-- @see LifePercent
+	-- @usage
+	-- if HealthPercent() <20 Spell(last_stand)
+	-- if target.HealthPercent(less 25) Spell(kill_shot)
+
+	local function TimeToHealthPercent(positionalParams, namedParams, state, atTime)
+		local percent, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local target = ParseCondition(positionalParams, namedParams, state)
+		local now = API_GetTime()
+		local health = OvaleHealth:UnitHealth(target) or 0
+		local maxHealth = OvaleHealth:UnitHealthMax(target) or 1
+		local healthPercent = health / maxHealth * 100
+		local timeToDie = OvaleHealth:UnitTimeToDie(target)
+		local timeToPercent = timeToDie / healthPercent * (healthPercent - percent)
+		if timeToPercent < 0 then timeToPercent = 0 end
+		local value, origin, rate = timeToPercent, now, -1
+		local start, ending = now, now + timeToPercent
+		return TestValue(start, ending, value, origin, rate, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("timetohealthpercent", false, TimeToHealthPercent)
+
 	--- Get the amount of health points of the target when it is at full health.
 	-- @name MaxHealth
 	-- @paramsig number or boolean

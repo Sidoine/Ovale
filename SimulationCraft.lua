@@ -88,6 +88,7 @@ local MODIFIER_KEYWORD = {
 	["target_if_first"] = true,		-- "target_if_<type>" is a fake modifier.
 	["target_if_max"] = true,
 	["target_if_min"] = true,
+	["toggle"] = true,
 	["travel_speed"] = true,
 	["type"] = true,
 	["value"] = true,
@@ -284,22 +285,33 @@ local function print_r(node, indent, done, output)
 	done = done or {}
 	output = output or {}
 	indent = indent or ''
-	for key, value in pairs(node) do
-		if type(value) == "table" then
-			if done[value] then
-				tinsert(output, indent .. "[" .. tostring(key) .. "] => (self_reference)")
+	if node == nil then
+		tinsert(output, indent.. 'nil')
+	elseif type(node) ~= "table" then
+		tinsert(output, indent .. node)
+	else
+		for key, value in pairs(node) do
+			if type(value) == "table" then
+				if done[value] then
+					tinsert(output, indent .. "[" .. tostring(key) .. "] => (self_reference)")
+				else
+					-- Shortcut conditional allocation
+					done[value] = true
+					tinsert(output, indent .. "[" .. tostring(key) .. "] => {")
+					print_r(value, indent .. "    ", done, output)
+					tinsert(output, indent .. "}")
+				end
 			else
-				-- Shortcut conditional allocation
-				done[value] = true
-				tinsert(output, indent .. "[" .. tostring(key) .. "] => {")
-				print_r(value, indent .. "    ", done, output)
-				tinsert(output, indent .. "}")
+				tinsert(output, indent .. "[" .. tostring(key) .. "] => " .. tostring(value))
 			end
-		else
-			tinsert(output, indent .. "[" .. tostring(key) .. "] => " .. tostring(value))
 		end
 	end
 	return output
+end
+
+local function debug_r(tbl)
+	local output = print_r(tbl)
+	print(tconcat(output, "\n"))
 end
 
 -- Get a new node from the pool and save it in the nodes array.
@@ -1126,6 +1138,7 @@ local function InitializeDisambiguation()
 	AddDisambiguation("focusing_shot",			"focusing_shot_marksmanship",	"HUNTER",		"marksmanship")
 	AddDisambiguation("frenzy",					"pet_frenzy",					"HUNTER",		"beast_mastery")
 	AddDisambiguation("legendary_ring",			"legendary_ring_agility",		"HUNTER",		nil, "Item")
+	AddDisambiguation("trueshot_debuff", "trueshot_buff", "HUNTER")
 	-- Mage
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_mana",			"MAGE")
 	AddDisambiguation("arcane_charge_buff",		"arcane_charge_debuff",			"MAGE",			"arcane")
@@ -1196,6 +1209,7 @@ local function InitializeDisambiguation()
 	AddDisambiguation("dark_soul",				"dark_soul_knowledge",			"WARLOCK",		"demonology")
 	AddDisambiguation("dark_soul",				"dark_soul_misery",				"WARLOCK",		"affliction")
 	AddDisambiguation("legendary_ring",			"legendary_ring_intellect",		"WARLOCK",		nil, "Item")
+	AddDisambiguation("life_tap_debuff",		"empowered_life_tap_buff", "WARLOCK")
 	-- Warrior
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_rage",			"WARRIOR")
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"WARRIOR")
@@ -1810,6 +1824,9 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "HUNTER" and action == "kill_command" then
 			-- Kill Command requires that a pet that can move freely.
 			conditionCode = "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()"
+		elseif class == "HUNTER" and action == "volley" then
+			annotation.volley = class
+			conditionCode = "CheckBoxOn(opt_volley)"
 		elseif class == "HUNTER" and strsub(action, -5) == "_trap" then
 			annotation.trap_launcher = class
 			conditionCode = "CheckBoxOn(opt_trap_launcher)"
@@ -2793,6 +2810,9 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
 		ok = false
 	end
 	if ok and code then
+		if name == "call_action_list" and property ~= "gcd" then
+			OvaleSimulationCraft:Print("Warning: dubious use of call_action_list in %s", code)
+		end
 		annotation.astAnnotation = annotation.astAnnotation or {}
 		node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
 		if not SPECIAL_ACTION[symbol] then
@@ -3041,7 +3061,10 @@ do
 		["soul_fragments"]		= "BuffStacks(soul_fragments)",
 		["stat.multistrike_pct"]= "MultistrikeChance()",
 		["stealthed"]			= "Stealthed()",
+		["stealthed.all"]		= "Stealthed()",
+		["stealthed.rogue"]		= "Stealthed()",
 		["time"]				= "TimeInCombat()",
+		["time_to_20pct"]		= "TimeToHealthPercent(20)",
 		["time_to_die"]			= "TimeToDie()",
 		["time_to_die.remains"]	= "TimeToDie()",
 		["wild_imp_count"] 		= "Demons(wild_imp)",
@@ -3169,7 +3192,9 @@ EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
 		end
 
 		local code
-		if property == "duration" or property == "ready" then
+		if property == "execute_time" then
+			code = format("ExecuteTime(%s)", name)
+		elseif property == "duration" or property == "ready" then
 			code = format("%sCooldownDuration(%s)", prefix, name)
 		elseif property == "remains" then
 			if parseNode.asType == "boolean" then
@@ -4769,6 +4794,16 @@ local function InsertSupportingControls(child, annotation)
 			local node = OvaleAST:ParseCode("list_item", code, nodeList, annotation.astAnnotation)
 			tinsert(child, 1, node)
 		end
+	end
+	if annotation.volley == "HUNTER" then
+		local fmt = [[
+			AddCheckBox(opt_volley SpellName(volley) default %s)
+		]]
+		local code = format(fmt, ifSpecialization)
+		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		AddSymbol(annotation, "volley")
+		count = count + 1
 	end
 	if annotation.trap_launcher == "HUNTER" then
 		local fmt = [[

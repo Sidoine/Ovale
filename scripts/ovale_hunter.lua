@@ -19,6 +19,7 @@ Include(ovale_trinkets_wod)
 Include(ovale_hunter_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=beast_mastery)
+AddCheckBox(opt_volley SpellName(volley) default specialization=beast_mastery)
 
 AddFunction BeastMasteryInterruptActions
 {
@@ -48,20 +49,20 @@ AddFunction BeastMasterySummonPet
 
 AddFunction BeastMasteryDefaultMainActions
 {
-	#dire_beast,if=cooldown.bestial_wrath.remains>2
-	if SpellCooldown(bestial_wrath) > 2 Spell(dire_beast)
-	#dire_frenzy,if=cooldown.bestial_wrath.remains>2
-	if SpellCooldown(bestial_wrath) > 2 Spell(dire_frenzy)
-	#multi_shot,if=spell_targets.multi_shot>4&(pet.buff.beast_cleave.remains<gcd.max|pet.buff.beast_cleave.down)
+	#dire_beast,if=cooldown.bestial_wrath.remains>3
+	if SpellCooldown(bestial_wrath) > 3 Spell(dire_beast)
+	#dire_frenzy,if=cooldown.bestial_wrath.remains>6|target.time_to_die<9
+	if SpellCooldown(bestial_wrath) > 6 or target.TimeToDie() < 9 Spell(dire_frenzy)
+	#multi_shot,if=spell_targets>4&(pet.buff.beast_cleave.remains<gcd.max|pet.buff.beast_cleave.down)
 	if Enemies() > 4 and { pet.BuffRemaining(pet_beast_cleave_buff) < GCD() or pet.BuffExpires(pet_beast_cleave_buff) } Spell(multi_shot)
 	#kill_command
 	if pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() Spell(kill_command)
-	#multi_shot,if=spell_targets.multi_shot>1&(pet.buff.beast_cleave.remains<gcd.max*2|pet.buff.beast_cleave.down)
+	#multi_shot,if=spell_targets>1&(pet.buff.beast_cleave.remains<gcd.max*2|pet.buff.beast_cleave.down)
 	if Enemies() > 1 and { pet.BuffRemaining(pet_beast_cleave_buff) < GCD() * 2 or pet.BuffExpires(pet_beast_cleave_buff) } Spell(multi_shot)
 	#chimaera_shot,if=focus<90
 	if Focus() < 90 Spell(chimaera_shot)
-	#cobra_shot,if=talent.killer_cobra.enabled&(cooldown.bestial_wrath.remains>=4&(buff.bestial_wrath.up&cooldown.kill_command.remains>=2)|focus>119)|!talent.killer_cobra.enabled&focus>90
-	if Talent(killer_cobra_talent) and { SpellCooldown(bestial_wrath) >= 4 and BuffPresent(bestial_wrath_buff) and SpellCooldown(kill_command) >= 2 or Focus() > 119 } or not Talent(killer_cobra_talent) and Focus() > 90 Spell(cobra_shot)
+	#cobra_shot,if=cooldown.kill_command.remains>focus.time_to_max&cooldown.bestial_wrath.remains>focus.time_to_max|(buff.bestial_wrath.up&focus.regen*cooldown.kill_command.remains>30)|target.time_to_die<cooldown.kill_command.remains
+	if SpellCooldown(kill_command) > TimeToMaxFocus() and SpellCooldown(bestial_wrath) > TimeToMaxFocus() or BuffPresent(bestial_wrath_buff) and FocusRegenRate() * SpellCooldown(kill_command) > 30 or target.TimeToDie() < SpellCooldown(kill_command) Spell(cobra_shot)
 }
 
 AddFunction BeastMasteryDefaultMainPostConditions
@@ -70,16 +71,16 @@ AddFunction BeastMasteryDefaultMainPostConditions
 
 AddFunction BeastMasteryDefaultShortCdActions
 {
-	#potion,name=deadly_grace
+	#potion,name=prolonged_power,if=buff.bestial_wrath.remains|!cooldown.beastial_wrath.remains
 	#a_murder_of_crows
 	Spell(a_murder_of_crows)
 
-	unless SpellCooldown(bestial_wrath) > 2 and Spell(dire_beast) or SpellCooldown(bestial_wrath) > 2 and Spell(dire_frenzy)
+	unless SpellCooldown(bestial_wrath) > 3 and Spell(dire_beast) or { SpellCooldown(bestial_wrath) > 6 or target.TimeToDie() < 9 } and Spell(dire_frenzy)
 	{
-		#barrage,if=spell_targets.barrage>1|(spell_targets.barrage=1&focus>90)
-		if Enemies() > 1 or Enemies() == 1 and Focus() > 90 Spell(barrage)
-		#titans_thunder,if=cooldown.dire_beast.remains>=3|buff.bestial_wrath.up&pet.dire_beast.active
-		if SpellCooldown(dire_beast) >= 3 or BuffPresent(bestial_wrath_buff) and pet.Present() Spell(titans_thunder)
+		#barrage,if=spell_targets.barrage>1
+		if Enemies() > 1 Spell(barrage)
+		#titans_thunder,if=talent.dire_frenzy.enabled|cooldown.dire_beast.remains>=3|buff.bestial_wrath.up&pet.dire_beast.active
+		if Talent(dire_frenzy_talent) or SpellCooldown(dire_beast) >= 3 or BuffPresent(bestial_wrath_buff) and pet.Present() Spell(titans_thunder)
 		#bestial_wrath
 		Spell(bestial_wrath)
 	}
@@ -87,7 +88,7 @@ AddFunction BeastMasteryDefaultShortCdActions
 
 AddFunction BeastMasteryDefaultShortCdPostConditions
 {
-	SpellCooldown(bestial_wrath) > 2 and Spell(dire_beast) or SpellCooldown(bestial_wrath) > 2 and Spell(dire_frenzy) or Enemies() > 4 and { pet.BuffRemaining(pet_beast_cleave_buff) < GCD() or pet.BuffExpires(pet_beast_cleave_buff) } and Spell(multi_shot) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Enemies() > 1 and { pet.BuffRemaining(pet_beast_cleave_buff) < GCD() * 2 or pet.BuffExpires(pet_beast_cleave_buff) } and Spell(multi_shot) or Focus() < 90 and Spell(chimaera_shot) or { Talent(killer_cobra_talent) and { SpellCooldown(bestial_wrath) >= 4 and BuffPresent(bestial_wrath_buff) and SpellCooldown(kill_command) >= 2 or Focus() > 119 } or not Talent(killer_cobra_talent) and Focus() > 90 } and Spell(cobra_shot)
+	SpellCooldown(bestial_wrath) > 3 and Spell(dire_beast) or { SpellCooldown(bestial_wrath) > 6 or target.TimeToDie() < 9 } and Spell(dire_frenzy) or Enemies() > 4 and { pet.BuffRemaining(pet_beast_cleave_buff) < GCD() or pet.BuffExpires(pet_beast_cleave_buff) } and Spell(multi_shot) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Enemies() > 1 and { pet.BuffRemaining(pet_beast_cleave_buff) < GCD() * 2 or pet.BuffExpires(pet_beast_cleave_buff) } and Spell(multi_shot) or Focus() < 90 and Spell(chimaera_shot) or { SpellCooldown(kill_command) > TimeToMaxFocus() and SpellCooldown(bestial_wrath) > TimeToMaxFocus() or BuffPresent(bestial_wrath_buff) and FocusRegenRate() * SpellCooldown(kill_command) > 30 or target.TimeToDie() < SpellCooldown(kill_command) } and Spell(cobra_shot)
 }
 
 AddFunction BeastMasteryDefaultCdActions
@@ -107,17 +108,17 @@ AddFunction BeastMasteryDefaultCdActions
 		#stampede,if=buff.bloodlust.up|buff.bestial_wrath.up|cooldown.bestial_wrath.remains<=2|target.time_to_die<=14
 		if BuffPresent(burst_haste_buff any=1) or BuffPresent(bestial_wrath_buff) or SpellCooldown(bestial_wrath) <= 2 or target.TimeToDie() <= 14 Spell(stampede)
 
-		unless SpellCooldown(bestial_wrath) > 2 and Spell(dire_beast) or SpellCooldown(bestial_wrath) > 2 and Spell(dire_frenzy)
+		unless SpellCooldown(bestial_wrath) > 3 and Spell(dire_beast) or { SpellCooldown(bestial_wrath) > 6 or target.TimeToDie() < 9 } and Spell(dire_frenzy)
 		{
-			#aspect_of_the_wild,if=buff.bestial_wrath.up
-			if BuffPresent(bestial_wrath_buff) Spell(aspect_of_the_wild)
+			#aspect_of_the_wild,if=buff.bestial_wrath.up|target.time_to_die<12
+			if BuffPresent(bestial_wrath_buff) or target.TimeToDie() < 12 Spell(aspect_of_the_wild)
 		}
 	}
 }
 
 AddFunction BeastMasteryDefaultCdPostConditions
 {
-	Spell(a_murder_of_crows) or SpellCooldown(bestial_wrath) > 2 and Spell(dire_beast) or SpellCooldown(bestial_wrath) > 2 and Spell(dire_frenzy) or { Enemies() > 1 or Enemies() == 1 and Focus() > 90 } and Spell(barrage) or { SpellCooldown(dire_beast) >= 3 or BuffPresent(bestial_wrath_buff) and pet.Present() } and Spell(titans_thunder) or Enemies() > 4 and { pet.BuffRemaining(pet_beast_cleave_buff) < GCD() or pet.BuffExpires(pet_beast_cleave_buff) } and Spell(multi_shot) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Enemies() > 1 and { pet.BuffRemaining(pet_beast_cleave_buff) < GCD() * 2 or pet.BuffExpires(pet_beast_cleave_buff) } and Spell(multi_shot) or Focus() < 90 and Spell(chimaera_shot) or { Talent(killer_cobra_talent) and { SpellCooldown(bestial_wrath) >= 4 and BuffPresent(bestial_wrath_buff) and SpellCooldown(kill_command) >= 2 or Focus() > 119 } or not Talent(killer_cobra_talent) and Focus() > 90 } and Spell(cobra_shot)
+	Spell(a_murder_of_crows) or SpellCooldown(bestial_wrath) > 3 and Spell(dire_beast) or { SpellCooldown(bestial_wrath) > 6 or target.TimeToDie() < 9 } and Spell(dire_frenzy) or Enemies() > 1 and Spell(barrage) or { Talent(dire_frenzy_talent) or SpellCooldown(dire_beast) >= 3 or BuffPresent(bestial_wrath_buff) and pet.Present() } and Spell(titans_thunder) or Enemies() > 4 and { pet.BuffRemaining(pet_beast_cleave_buff) < GCD() or pet.BuffExpires(pet_beast_cleave_buff) } and Spell(multi_shot) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Enemies() > 1 and { pet.BuffRemaining(pet_beast_cleave_buff) < GCD() * 2 or pet.BuffExpires(pet_beast_cleave_buff) } and Spell(multi_shot) or Focus() < 90 and Spell(chimaera_shot) or { SpellCooldown(kill_command) > TimeToMaxFocus() and SpellCooldown(bestial_wrath) > TimeToMaxFocus() or BuffPresent(bestial_wrath_buff) and FocusRegenRate() * SpellCooldown(kill_command) > 30 or target.TimeToDie() < SpellCooldown(kill_command) } and Spell(cobra_shot)
 }
 
 ### actions.precombat
@@ -125,9 +126,11 @@ AddFunction BeastMasteryDefaultCdPostConditions
 AddFunction BeastMasteryPrecombatMainActions
 {
 	#snapshot_stats
-	#potion,name=deadly_grace
+	#potion,name=prolonged_power
 	#augmentation,type=defiled
 	Spell(augmentation)
+	#volley,toggle=on
+	if CheckBoxOn(opt_volley) Spell(volley)
 }
 
 AddFunction BeastMasteryPrecombatMainPostConditions
@@ -137,14 +140,14 @@ AddFunction BeastMasteryPrecombatMainPostConditions
 AddFunction BeastMasteryPrecombatShortCdActions
 {
 	#flask,type=flask_of_the_seventh_demon
-	#food,type=fishbrul_special
+	#food,type=nightborne_delicacy_platter
 	#summon_pet
 	BeastMasterySummonPet()
 }
 
 AddFunction BeastMasteryPrecombatShortCdPostConditions
 {
-	Spell(augmentation)
+	Spell(augmentation) or CheckBoxOn(opt_volley) and Spell(volley)
 }
 
 AddFunction BeastMasteryPrecombatCdActions
@@ -153,7 +156,7 @@ AddFunction BeastMasteryPrecombatCdActions
 
 AddFunction BeastMasteryPrecombatCdPostConditions
 {
-	Spell(augmentation)
+	Spell(augmentation) or CheckBoxOn(opt_volley) and Spell(volley)
 }
 
 ### BeastMastery icons.
@@ -229,14 +232,15 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # counter_shot
 # dire_beast
 # dire_frenzy
+# dire_frenzy_talent
 # kill_command
-# killer_cobra_talent
 # multi_shot
 # pet_beast_cleave_buff
 # quaking_palm
 # revive_pet
 # stampede
 # titans_thunder
+# volley
 # war_stomp
 ]]
 	OvaleScripts:RegisterScript("HUNTER", "beast_mastery", name, desc, code, "script")
@@ -257,12 +261,18 @@ Include(ovale_trinkets_wod)
 Include(ovale_hunter_spells)
 
 
-AddFunction vulnerable_time
+AddFunction use_multishot
 {
-	target.DebuffPresent(vulnerability_debuff)
+	{ BuffPresent(marking_targets_buff) or BuffPresent(trueshot_buff) } and Enemies() > 1 or BuffExpires(marking_targets_buff) and BuffExpires(trueshot_buff) and Enemies() > 2
+}
+
+AddFunction safe_to_build
+{
+	target.DebuffExpires(hunters_mark_debuff) or BuffExpires(trueshot_buff) and BuffExpires(marking_targets_buff)
 }
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=marksmanship)
+AddCheckBox(opt_volley SpellName(volley) default specialization=marksmanship)
 
 AddFunction MarksmanshipInterruptActions
 {
@@ -295,68 +305,41 @@ AddFunction MarksmanshipSummonPet
 
 AddFunction MarksmanshipDefaultMainActions
 {
+	#volley,toggle=on
+	if CheckBoxOn(opt_volley) Spell(volley)
 	#auto_shot
-	#variable,name=vulnerable_time,value=debuff.vulnerability.remains
-	#call_action_list,name=open,if=time<=15&talent.sidewinders.enabled&active_enemies=1
-	if TimeInCombat() <= 15 and Talent(sidewinders_talent) and Enemies() == 1 MarksmanshipOpenMainActions()
+	#variable,name=safe_to_build,value=debuff.hunters_mark.down|(buff.trueshot.down&buff.marking_targets.down)
+	#variable,name=use_multishot,value=((buff.marking_targets.up|buff.trueshot.up)&spell_targets.multishot>1)|(buff.marking_targets.down&buff.trueshot.down&spell_targets.multishot>2)
+	#call_action_list,name=open,if=active_enemies=1&time<=15
+	if Enemies() == 1 and TimeInCombat() <= 15 MarksmanshipOpenMainActions()
 
-	unless TimeInCombat() <= 15 and Talent(sidewinders_talent) and Enemies() == 1 and MarksmanshipOpenMainPostConditions()
+	unless Enemies() == 1 and TimeInCombat() <= 15 and MarksmanshipOpenMainPostConditions()
 	{
 		#call_action_list,name=cooldowns
 		MarksmanshipCooldownsMainActions()
 
 		unless MarksmanshipCooldownsMainPostConditions()
 		{
-			#call_action_list,name=trueshotaoe,if=active_enemies>1&!talent.sidewinders.enabled&buff.trueshot.up
-			if Enemies() > 1 and not Talent(sidewinders_talent) and BuffPresent(trueshot_buff) MarksmanshipTrueshotaoeMainActions()
+			#call_action_list,name=trueshotaoe,if=(target.time_to_die>=cooldown.trueshot.remains+cooldown.trueshot.duration|target.health.pct<20)&(debuff.hunters_mark.down|(debuff.hunters_mark.remains>cooldown.trueshot.execute_time&debuff.vulnerability.remains>cooldown.trueshot.execute_time&focus+(focus.regen*debuff.vulnerability.remains)>=60&focus+(focus.regen*debuff.hunters_mark.remains)>=60))
+			if { target.TimeToDie() >= SpellCooldown(trueshot) + SpellCooldownDuration(trueshot) or target.HealthPercent() < 20 } and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(trueshot) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(trueshot) and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 60 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 60 } MarksmanshipTrueshotaoeMainActions()
 
-			unless Enemies() > 1 and not Talent(sidewinders_talent) and BuffPresent(trueshot_buff) and MarksmanshipTrueshotaoeMainPostConditions()
+			unless { target.TimeToDie() >= SpellCooldown(trueshot) + SpellCooldownDuration(trueshot) or target.HealthPercent() < 20 } and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(trueshot) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(trueshot) and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 60 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 60 } and MarksmanshipTrueshotaoeMainPostConditions()
 			{
-				#black_arrow,if=debuff.hunters_mark.down
-				if target.DebuffExpires(hunters_mark_debuff) Spell(black_arrow)
-				#black_arrow,if=variable.vulnerable_time>execute_time&debuff.hunters_mark.remains>execute_time&focus+(focus.regen*variable.vulnerable_time)>70&focus+(focus.regen*debuff.hunters_mark.remains)>=70
-				if vulnerable_time() > ExecuteTime(black_arrow) and target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(black_arrow) and Focus() + FocusRegenRate() * vulnerable_time() > 70 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 70 Spell(black_arrow)
-				#windburst,if=(!talent.patient_sniper.enabled|talent.sidewinders.enabled)&(debuff.hunters_mark.down|debuff.hunters_mark.remains>execute_time&focus+(focus.regen*debuff.hunters_mark.remains)>50)
-				if { not Talent(patient_sniper_talent) or Talent(sidewinders_talent) } and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(windburst) and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) > 50 } Spell(windburst)
-				#windburst,if=talent.patient_sniper.enabled&!talent.sidewinders.enabled&((debuff.vulnerability.down|debuff.vulnerability.remains<2)|(debuff.hunters_mark.up&buff.marking_targets.up&debuff.vulnerability.down))
-				if Talent(patient_sniper_talent) and not Talent(sidewinders_talent) and { target.DebuffExpires(vulnerability_debuff) or target.DebuffRemaining(vulnerability_debuff) < 2 or target.DebuffPresent(hunters_mark_debuff) and BuffPresent(marking_targets_buff) and target.DebuffExpires(vulnerability_debuff) } Spell(windburst)
+				#black_arrow,if=debuff.hunters_mark.down|(debuff.hunters_mark.remains>execute_time&debuff.vulnerability.remains>execute_time&focus+(focus.regen*debuff.vulnerability.remains)>=70&focus+(focus.regen*debuff.hunters_mark.remains)>=70)
+				if target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(black_arrow) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(black_arrow) and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 70 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 70 Spell(black_arrow)
 				#call_action_list,name=targetdie,if=target.time_to_die<6&active_enemies=1
 				if target.TimeToDie() < 6 and Enemies() == 1 MarksmanshipTargetdieMainActions()
 
 				unless target.TimeToDie() < 6 and Enemies() == 1 and MarksmanshipTargetdieMainPostConditions()
 				{
-					#sidewinders,if=(debuff.hunters_mark.down|(buff.marking_targets.down&buff.trueshot.down))&((buff.trueshot.react&focus<80)|charges_fractional>=1.9)
-					if { target.DebuffExpires(hunters_mark_debuff) or BuffExpires(marking_targets_buff) and BuffExpires(trueshot_buff) } and { BuffPresent(trueshot_buff) and Focus() < 80 or Charges(sidewinders count=0) >= 1.9 } Spell(sidewinders)
-					#marked_shot,target=2,if=!talent.patient_sniper.enabled&debuff.vulnerability.stack<3
-					if not Talent(patient_sniper_talent) and target.DebuffStacks(vulnerability_debuff) < 3 Spell(marked_shot text=other)
-					#arcane_shot,if=!talent.patient_sniper.enabled&spell_targets.barrage=1&debuff.vulnerability.stack<3&((buff.marking_targets.up&debuff.hunters_mark.down)|buff.trueshot.up)
-					if not Talent(patient_sniper_talent) and Enemies() == 1 and target.DebuffStacks(vulnerability_debuff) < 3 and { BuffPresent(marking_targets_buff) and target.DebuffExpires(hunters_mark_debuff) or BuffPresent(trueshot_buff) } Spell(arcane_shot)
-					#multishot,if=!talent.patient_sniper.enabled&spell_targets.barrage>1&debuff.vulnerability.stack<3&((buff.marking_targets.up&debuff.hunters_mark.down)|buff.trueshot.up)
-					if not Talent(patient_sniper_talent) and Enemies() > 1 and target.DebuffStacks(vulnerability_debuff) < 3 and { BuffPresent(marking_targets_buff) and target.DebuffExpires(hunters_mark_debuff) or BuffPresent(trueshot_buff) } Spell(multishot)
-					#arcane_shot,if=talent.steady_focus.enabled&spell_targets.barrage=1&(buff.steady_focus.down|buff.steady_focus.remains<2)
-					if Talent(steady_focus_talent) and Enemies() == 1 and { BuffExpires(steady_focus_buff) or BuffRemaining(steady_focus_buff) < 2 } Spell(arcane_shot)
-					#multishot,if=talent.steady_focus.enabled&spell_targets.barrage>1&(buff.steady_focus.down|buff.steady_focus.remains<2)
-					if Talent(steady_focus_talent) and Enemies() > 1 and { BuffExpires(steady_focus_buff) or BuffRemaining(steady_focus_buff) < 2 } Spell(multishot)
-					#marked_shot,if=!talent.patient_sniper.enabled|(talent.barrage.enabled&spell_targets.barrage>2)
-					if not Talent(patient_sniper_talent) or Talent(barrage_talent) and Enemies() > 2 Spell(marked_shot)
-					#aimed_shot,if=debuff.hunters_mark.remains>execute_time&variable.vulnerable_time>execute_time&(buff.lock_and_load.up|(focus+debuff.hunters_mark.remains*focus.regen>=80&focus+focus.regen*variable.vulnerable_time>=80))
-					if target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(aimed_shot) and vulnerable_time() > ExecuteTime(aimed_shot) and { BuffPresent(lock_and_load_buff) or Focus() + target.DebuffRemaining(hunters_mark_debuff) * FocusRegenRate() >= 80 and Focus() + FocusRegenRate() * vulnerable_time() >= 80 } Spell(aimed_shot)
-					#aimed_shot,if=debuff.hunters_mark.down&debuff.vulnerability.remains>execute_time&(talent.sidewinders.enabled|buff.marking_targets.down|(debuff.hunters_mark.remains>execute_time+gcd&focus+5+focus.regen*debuff.hunters_mark.remains>80))
-					if target.DebuffExpires(hunters_mark_debuff) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(aimed_shot) and { Talent(sidewinders_talent) or BuffExpires(marking_targets_buff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(aimed_shot) + GCD() and Focus() + 5 + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) > 80 } Spell(aimed_shot)
-					#marked_shot,if=debuff.hunters_mark.remains<1|variable.vulnerable_time<1|spell_targets.barrage>1|buff.trueshot.up
-					if target.DebuffRemaining(hunters_mark_debuff) < 1 or vulnerable_time() < 1 or Enemies() > 1 or BuffPresent(trueshot_buff) Spell(marked_shot)
-					#marked_shot,if=buff.marking_targets.up&(!talent.sidewinders.enabled|cooldown.sidewinders.charges_fractional>=1.2)
-					if BuffPresent(marking_targets_buff) and { not Talent(sidewinders_talent) or SpellCharges(sidewinders) >= 1.2 } Spell(marked_shot)
-					#sidewinders,if=buff.marking_targets.up&debuff.hunters_mark.down&(focus<=80|(variable.vulnerable_time<2&cooldown.windburst.remains>3&cooldown.sidewinders.charges_fractional>=1.2))
-					if BuffPresent(marking_targets_buff) and target.DebuffExpires(hunters_mark_debuff) and { Focus() <= 80 or vulnerable_time() < 2 and SpellCooldown(windburst) > 3 and SpellCharges(sidewinders) >= 1.2 } Spell(sidewinders)
-					#arcane_shot,if=spell_targets.barrage=1&(debuff.hunters_mark.down&buff.marking_targets.react|focus.time_to_max>=2)
-					if Enemies() == 1 and { target.DebuffExpires(hunters_mark_debuff) and BuffPresent(marking_targets_buff) or TimeToMaxFocus() >= 2 } Spell(arcane_shot)
-					#multishot,if=spell_targets.barrage>1&(debuff.hunters_mark.down&buff.marking_targets.react|focus.time_to_max>=2)
-					if Enemies() > 1 and { target.DebuffExpires(hunters_mark_debuff) and BuffPresent(marking_targets_buff) or TimeToMaxFocus() >= 2 } Spell(multishot)
-					#aimed_shot,if=debuff.vulnerability.down&focus>80&cooldown.windburst.remains>3
-					if target.DebuffExpires(vulnerability_debuff) and Focus() > 80 and SpellCooldown(windburst) > 3 Spell(aimed_shot)
-					#multishot,if=spell_targets.barrage>2
-					if Enemies() > 2 Spell(multishot)
+					#call_action_list,name=patient_sniper,if=talent.patient_sniper.enabled
+					if Talent(patient_sniper_talent) MarksmanshipPatientSniperMainActions()
+
+					unless Talent(patient_sniper_talent) and MarksmanshipPatientSniperMainPostConditions()
+					{
+						#call_action_list,name=non_patient_sniper,if=!talent.patient_sniper.enabled
+						if not Talent(patient_sniper_talent) MarksmanshipNonPatientSniperMainActions()
+					}
 				}
 			}
 		}
@@ -365,67 +348,47 @@ AddFunction MarksmanshipDefaultMainActions
 
 AddFunction MarksmanshipDefaultMainPostConditions
 {
-	TimeInCombat() <= 15 and Talent(sidewinders_talent) and Enemies() == 1 and MarksmanshipOpenMainPostConditions() or MarksmanshipCooldownsMainPostConditions() or Enemies() > 1 and not Talent(sidewinders_talent) and BuffPresent(trueshot_buff) and MarksmanshipTrueshotaoeMainPostConditions() or target.TimeToDie() < 6 and Enemies() == 1 and MarksmanshipTargetdieMainPostConditions()
+	Enemies() == 1 and TimeInCombat() <= 15 and MarksmanshipOpenMainPostConditions() or MarksmanshipCooldownsMainPostConditions() or { target.TimeToDie() >= SpellCooldown(trueshot) + SpellCooldownDuration(trueshot) or target.HealthPercent() < 20 } and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(trueshot) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(trueshot) and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 60 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 60 } and MarksmanshipTrueshotaoeMainPostConditions() or target.TimeToDie() < 6 and Enemies() == 1 and MarksmanshipTargetdieMainPostConditions() or Talent(patient_sniper_talent) and MarksmanshipPatientSniperMainPostConditions() or not Talent(patient_sniper_talent) and MarksmanshipNonPatientSniperMainPostConditions()
 }
 
 AddFunction MarksmanshipDefaultShortCdActions
 {
-	#auto_shot
-	#variable,name=vulnerable_time,value=debuff.vulnerability.remains
-	#call_action_list,name=open,if=time<=15&talent.sidewinders.enabled&active_enemies=1
-	if TimeInCombat() <= 15 and Talent(sidewinders_talent) and Enemies() == 1 MarksmanshipOpenShortCdActions()
-
-	unless TimeInCombat() <= 15 and Talent(sidewinders_talent) and Enemies() == 1 and MarksmanshipOpenShortCdPostConditions()
+	unless CheckBoxOn(opt_volley) and Spell(volley)
 	{
-		#call_action_list,name=cooldowns
-		MarksmanshipCooldownsShortCdActions()
+		#auto_shot
+		#variable,name=safe_to_build,value=debuff.hunters_mark.down|(buff.trueshot.down&buff.marking_targets.down)
+		#variable,name=use_multishot,value=((buff.marking_targets.up|buff.trueshot.up)&spell_targets.multishot>1)|(buff.marking_targets.down&buff.trueshot.down&spell_targets.multishot>2)
+		#call_action_list,name=open,if=active_enemies=1&time<=15
+		if Enemies() == 1 and TimeInCombat() <= 15 MarksmanshipOpenShortCdActions()
 
-		unless MarksmanshipCooldownsShortCdPostConditions()
+		unless Enemies() == 1 and TimeInCombat() <= 15 and MarksmanshipOpenShortCdPostConditions()
 		{
-			#a_murder_of_crows,if=debuff.hunters_mark.down
-			if target.DebuffExpires(hunters_mark_debuff) Spell(a_murder_of_crows)
-			#call_action_list,name=trueshotaoe,if=active_enemies>1&!talent.sidewinders.enabled&buff.trueshot.up
-			if Enemies() > 1 and not Talent(sidewinders_talent) and BuffPresent(trueshot_buff) MarksmanshipTrueshotaoeShortCdActions()
+			#a_murder_of_crows,if=(target.time_to_die>=cooldown+duration|target.health.pct<20)&(debuff.hunters_mark.down|(debuff.hunters_mark.remains>execute_time&debuff.vulnerability.remains>execute_time&focus+(focus.regen*debuff.vulnerability.remains)>=60&focus+(focus.regen*debuff.hunters_mark.remains)>=60))
+			if { target.TimeToDie() >= SpellCooldown(a_murder_of_crows) + BaseDuration(a_murder_of_crows_debuff) or target.HealthPercent() < 20 } and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(a_murder_of_crows) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(a_murder_of_crows) and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 60 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 60 } Spell(a_murder_of_crows)
+			#call_action_list,name=cooldowns
+			MarksmanshipCooldownsShortCdActions()
 
-			unless Enemies() > 1 and not Talent(sidewinders_talent) and BuffPresent(trueshot_buff) and MarksmanshipTrueshotaoeShortCdPostConditions()
+			unless MarksmanshipCooldownsShortCdPostConditions()
 			{
-				#barrage,if=debuff.hunters_mark.down
-				if target.DebuffExpires(hunters_mark_debuff) Spell(barrage)
+				#call_action_list,name=trueshotaoe,if=(target.time_to_die>=cooldown.trueshot.remains+cooldown.trueshot.duration|target.health.pct<20)&(debuff.hunters_mark.down|(debuff.hunters_mark.remains>cooldown.trueshot.execute_time&debuff.vulnerability.remains>cooldown.trueshot.execute_time&focus+(focus.regen*debuff.vulnerability.remains)>=60&focus+(focus.regen*debuff.hunters_mark.remains)>=60))
+				if { target.TimeToDie() >= SpellCooldown(trueshot) + SpellCooldownDuration(trueshot) or target.HealthPercent() < 20 } and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(trueshot) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(trueshot) and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 60 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 60 } MarksmanshipTrueshotaoeShortCdActions()
 
-				unless target.DebuffExpires(hunters_mark_debuff) and Spell(black_arrow)
+				unless { target.TimeToDie() >= SpellCooldown(trueshot) + SpellCooldownDuration(trueshot) or target.HealthPercent() < 20 } and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(trueshot) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(trueshot) and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 60 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 60 } and MarksmanshipTrueshotaoeShortCdPostConditions() or { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(black_arrow) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(black_arrow) and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 70 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 70 } and Spell(black_arrow)
 				{
-					#a_murder_of_crows,if=(target.health.pct>30|target.health.pct<=20)&variable.vulnerable_time>execute_time&debuff.hunters_mark.remains>execute_time&focus+(focus.regen*variable.vulnerable_time)>60&focus+(focus.regen*debuff.hunters_mark.remains)>=60
-					if { target.HealthPercent() > 30 or target.HealthPercent() <= 20 } and vulnerable_time() > ExecuteTime(a_murder_of_crows) and target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(a_murder_of_crows) and Focus() + FocusRegenRate() * vulnerable_time() > 60 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 60 Spell(a_murder_of_crows)
-					#barrage,if=variable.vulnerable_time>execute_time&debuff.hunters_mark.remains>execute_time&focus+(focus.regen*variable.vulnerable_time)>90&focus+(focus.regen*debuff.hunters_mark.remains)>=90
-					if vulnerable_time() > ExecuteTime(barrage) and target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(barrage) and Focus() + FocusRegenRate() * vulnerable_time() > 90 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 90 Spell(barrage)
+					#barrage,if=(target.time_to_20pct>10|target.health.pct<=20|spell_targets>1)&((buff.trueshot.down|(target.health.pct<=20&buff.bullseye.stack<29)|spell_targets>1)&debuff.hunters_mark.down|(debuff.hunters_mark.remains>execute_time&debuff.vulnerability.remains>execute_time&focus+(focus.regen*debuff.vulnerability.remains)>=90&focus+(focus.regen*debuff.hunters_mark.remains)>=90))
+					if { target.TimeToHealthPercent(20) > 10 or target.HealthPercent() <= 20 or Enemies() > 1 } and { { BuffExpires(trueshot_buff) or target.HealthPercent() <= 20 and BuffStacks(bullseye_buff) < 29 or Enemies() > 1 } and target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(barrage) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(barrage) and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 90 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 90 } Spell(barrage)
+					#call_action_list,name=targetdie,if=target.time_to_die<6&active_enemies=1
+					if target.TimeToDie() < 6 and Enemies() == 1 MarksmanshipTargetdieShortCdActions()
 
-					unless vulnerable_time() > ExecuteTime(black_arrow) and target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(black_arrow) and Focus() + FocusRegenRate() * vulnerable_time() > 70 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 70 and Spell(black_arrow)
+					unless target.TimeToDie() < 6 and Enemies() == 1 and MarksmanshipTargetdieShortCdPostConditions()
 					{
-						#piercing_shot,if=!talent.patient_sniper.enabled&focus>50
-						if not Talent(patient_sniper_talent) and Focus() > 50 Spell(piercing_shot)
+						#call_action_list,name=patient_sniper,if=talent.patient_sniper.enabled
+						if Talent(patient_sniper_talent) MarksmanshipPatientSniperShortCdActions()
 
-						unless { not Talent(patient_sniper_talent) or Talent(sidewinders_talent) } and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(windburst) and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) > 50 } and Spell(windburst) or Talent(patient_sniper_talent) and not Talent(sidewinders_talent) and { target.DebuffExpires(vulnerability_debuff) or target.DebuffRemaining(vulnerability_debuff) < 2 or target.DebuffPresent(hunters_mark_debuff) and BuffPresent(marking_targets_buff) and target.DebuffExpires(vulnerability_debuff) } and Spell(windburst)
+						unless Talent(patient_sniper_talent) and MarksmanshipPatientSniperShortCdPostConditions()
 						{
-							#call_action_list,name=targetdie,if=target.time_to_die<6&active_enemies=1
-							if target.TimeToDie() < 6 and Enemies() == 1 MarksmanshipTargetdieShortCdActions()
-
-							unless target.TimeToDie() < 6 and Enemies() == 1 and MarksmanshipTargetdieShortCdPostConditions() or { target.DebuffExpires(hunters_mark_debuff) or BuffExpires(marking_targets_buff) and BuffExpires(trueshot_buff) } and { BuffPresent(trueshot_buff) and Focus() < 80 or Charges(sidewinders count=0) >= 1.9 } and Spell(sidewinders)
-							{
-								#sentinel,if=debuff.hunters_mark.down&(buff.marking_targets.down|buff.trueshot.up)
-								if target.DebuffExpires(hunters_mark_debuff) and { BuffExpires(marking_targets_buff) or BuffPresent(trueshot_buff) } Spell(sentinel)
-
-								unless not Talent(patient_sniper_talent) and target.DebuffStacks(vulnerability_debuff) < 3 and Spell(marked_shot text=other) or not Talent(patient_sniper_talent) and Enemies() == 1 and target.DebuffStacks(vulnerability_debuff) < 3 and { BuffPresent(marking_targets_buff) and target.DebuffExpires(hunters_mark_debuff) or BuffPresent(trueshot_buff) } and Spell(arcane_shot) or not Talent(patient_sniper_talent) and Enemies() > 1 and target.DebuffStacks(vulnerability_debuff) < 3 and { BuffPresent(marking_targets_buff) and target.DebuffExpires(hunters_mark_debuff) or BuffPresent(trueshot_buff) } and Spell(multishot) or Talent(steady_focus_talent) and Enemies() == 1 and { BuffExpires(steady_focus_buff) or BuffRemaining(steady_focus_buff) < 2 } and Spell(arcane_shot) or Talent(steady_focus_talent) and Enemies() > 1 and { BuffExpires(steady_focus_buff) or BuffRemaining(steady_focus_buff) < 2 } and Spell(multishot)
-								{
-									#explosive_shot
-									Spell(explosive_shot)
-
-									unless { not Talent(patient_sniper_talent) or Talent(barrage_talent) and Enemies() > 2 } and Spell(marked_shot) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(aimed_shot) and vulnerable_time() > ExecuteTime(aimed_shot) and { BuffPresent(lock_and_load_buff) or Focus() + target.DebuffRemaining(hunters_mark_debuff) * FocusRegenRate() >= 80 and Focus() + FocusRegenRate() * vulnerable_time() >= 80 } and Spell(aimed_shot) or target.DebuffExpires(hunters_mark_debuff) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(aimed_shot) and { Talent(sidewinders_talent) or BuffExpires(marking_targets_buff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(aimed_shot) + GCD() and Focus() + 5 + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) > 80 } and Spell(aimed_shot) or { target.DebuffRemaining(hunters_mark_debuff) < 1 or vulnerable_time() < 1 or Enemies() > 1 or BuffPresent(trueshot_buff) } and Spell(marked_shot) or BuffPresent(marking_targets_buff) and { not Talent(sidewinders_talent) or SpellCharges(sidewinders) >= 1.2 } and Spell(marked_shot) or BuffPresent(marking_targets_buff) and target.DebuffExpires(hunters_mark_debuff) and { Focus() <= 80 or vulnerable_time() < 2 and SpellCooldown(windburst) > 3 and SpellCharges(sidewinders) >= 1.2 } and Spell(sidewinders)
-									{
-										#piercing_shot,if=talent.patient_sniper.enabled&focus>80
-										if Talent(patient_sniper_talent) and Focus() > 80 Spell(piercing_shot)
-									}
-								}
-							}
+							#call_action_list,name=non_patient_sniper,if=!talent.patient_sniper.enabled
+							if not Talent(patient_sniper_talent) MarksmanshipNonPatientSniperShortCdActions()
 						}
 					}
 				}
@@ -436,7 +399,7 @@ AddFunction MarksmanshipDefaultShortCdActions
 
 AddFunction MarksmanshipDefaultShortCdPostConditions
 {
-	TimeInCombat() <= 15 and Talent(sidewinders_talent) and Enemies() == 1 and MarksmanshipOpenShortCdPostConditions() or MarksmanshipCooldownsShortCdPostConditions() or Enemies() > 1 and not Talent(sidewinders_talent) and BuffPresent(trueshot_buff) and MarksmanshipTrueshotaoeShortCdPostConditions() or target.DebuffExpires(hunters_mark_debuff) and Spell(black_arrow) or vulnerable_time() > ExecuteTime(black_arrow) and target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(black_arrow) and Focus() + FocusRegenRate() * vulnerable_time() > 70 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 70 and Spell(black_arrow) or { not Talent(patient_sniper_talent) or Talent(sidewinders_talent) } and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(windburst) and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) > 50 } and Spell(windburst) or Talent(patient_sniper_talent) and not Talent(sidewinders_talent) and { target.DebuffExpires(vulnerability_debuff) or target.DebuffRemaining(vulnerability_debuff) < 2 or target.DebuffPresent(hunters_mark_debuff) and BuffPresent(marking_targets_buff) and target.DebuffExpires(vulnerability_debuff) } and Spell(windburst) or target.TimeToDie() < 6 and Enemies() == 1 and MarksmanshipTargetdieShortCdPostConditions() or { target.DebuffExpires(hunters_mark_debuff) or BuffExpires(marking_targets_buff) and BuffExpires(trueshot_buff) } and { BuffPresent(trueshot_buff) and Focus() < 80 or Charges(sidewinders count=0) >= 1.9 } and Spell(sidewinders) or not Talent(patient_sniper_talent) and target.DebuffStacks(vulnerability_debuff) < 3 and Spell(marked_shot text=other) or not Talent(patient_sniper_talent) and Enemies() == 1 and target.DebuffStacks(vulnerability_debuff) < 3 and { BuffPresent(marking_targets_buff) and target.DebuffExpires(hunters_mark_debuff) or BuffPresent(trueshot_buff) } and Spell(arcane_shot) or not Talent(patient_sniper_talent) and Enemies() > 1 and target.DebuffStacks(vulnerability_debuff) < 3 and { BuffPresent(marking_targets_buff) and target.DebuffExpires(hunters_mark_debuff) or BuffPresent(trueshot_buff) } and Spell(multishot) or Talent(steady_focus_talent) and Enemies() == 1 and { BuffExpires(steady_focus_buff) or BuffRemaining(steady_focus_buff) < 2 } and Spell(arcane_shot) or Talent(steady_focus_talent) and Enemies() > 1 and { BuffExpires(steady_focus_buff) or BuffRemaining(steady_focus_buff) < 2 } and Spell(multishot) or { not Talent(patient_sniper_talent) or Talent(barrage_talent) and Enemies() > 2 } and Spell(marked_shot) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(aimed_shot) and vulnerable_time() > ExecuteTime(aimed_shot) and { BuffPresent(lock_and_load_buff) or Focus() + target.DebuffRemaining(hunters_mark_debuff) * FocusRegenRate() >= 80 and Focus() + FocusRegenRate() * vulnerable_time() >= 80 } and Spell(aimed_shot) or target.DebuffExpires(hunters_mark_debuff) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(aimed_shot) and { Talent(sidewinders_talent) or BuffExpires(marking_targets_buff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(aimed_shot) + GCD() and Focus() + 5 + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) > 80 } and Spell(aimed_shot) or { target.DebuffRemaining(hunters_mark_debuff) < 1 or vulnerable_time() < 1 or Enemies() > 1 or BuffPresent(trueshot_buff) } and Spell(marked_shot) or BuffPresent(marking_targets_buff) and { not Talent(sidewinders_talent) or SpellCharges(sidewinders) >= 1.2 } and Spell(marked_shot) or BuffPresent(marking_targets_buff) and target.DebuffExpires(hunters_mark_debuff) and { Focus() <= 80 or vulnerable_time() < 2 and SpellCooldown(windburst) > 3 and SpellCharges(sidewinders) >= 1.2 } and Spell(sidewinders) or Enemies() == 1 and { target.DebuffExpires(hunters_mark_debuff) and BuffPresent(marking_targets_buff) or TimeToMaxFocus() >= 2 } and Spell(arcane_shot) or Enemies() > 1 and { target.DebuffExpires(hunters_mark_debuff) and BuffPresent(marking_targets_buff) or TimeToMaxFocus() >= 2 } and Spell(multishot) or target.DebuffExpires(vulnerability_debuff) and Focus() > 80 and SpellCooldown(windburst) > 3 and Spell(aimed_shot) or Enemies() > 2 and Spell(multishot)
+	CheckBoxOn(opt_volley) and Spell(volley) or Enemies() == 1 and TimeInCombat() <= 15 and MarksmanshipOpenShortCdPostConditions() or MarksmanshipCooldownsShortCdPostConditions() or { target.TimeToDie() >= SpellCooldown(trueshot) + SpellCooldownDuration(trueshot) or target.HealthPercent() < 20 } and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(trueshot) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(trueshot) and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 60 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 60 } and MarksmanshipTrueshotaoeShortCdPostConditions() or { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(black_arrow) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(black_arrow) and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 70 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 70 } and Spell(black_arrow) or target.TimeToDie() < 6 and Enemies() == 1 and MarksmanshipTargetdieShortCdPostConditions() or Talent(patient_sniper_talent) and MarksmanshipPatientSniperShortCdPostConditions() or not Talent(patient_sniper_talent) and MarksmanshipNonPatientSniperShortCdPostConditions()
 }
 
 AddFunction MarksmanshipDefaultCdActions
@@ -450,25 +413,42 @@ AddFunction MarksmanshipDefaultCdActions
 	Spell(blood_fury_ap)
 	#berserking
 	Spell(berserking)
-	#auto_shot
-	#variable,name=vulnerable_time,value=debuff.vulnerability.remains
-	#call_action_list,name=open,if=time<=15&talent.sidewinders.enabled&active_enemies=1
-	if TimeInCombat() <= 15 and Talent(sidewinders_talent) and Enemies() == 1 MarksmanshipOpenCdActions()
 
-	unless TimeInCombat() <= 15 and Talent(sidewinders_talent) and Enemies() == 1 and MarksmanshipOpenCdPostConditions()
+	unless CheckBoxOn(opt_volley) and Spell(volley)
 	{
-		#call_action_list,name=cooldowns
-		MarksmanshipCooldownsCdActions()
+		#auto_shot
+		#variable,name=safe_to_build,value=debuff.hunters_mark.down|(buff.trueshot.down&buff.marking_targets.down)
+		#variable,name=use_multishot,value=((buff.marking_targets.up|buff.trueshot.up)&spell_targets.multishot>1)|(buff.marking_targets.down&buff.trueshot.down&spell_targets.multishot>2)
+		#call_action_list,name=open,if=active_enemies=1&time<=15
+		if Enemies() == 1 and TimeInCombat() <= 15 MarksmanshipOpenCdActions()
 
-		unless MarksmanshipCooldownsCdPostConditions() or target.DebuffExpires(hunters_mark_debuff) and Spell(a_murder_of_crows)
+		unless Enemies() == 1 and TimeInCombat() <= 15 and MarksmanshipOpenCdPostConditions() or { target.TimeToDie() >= SpellCooldown(a_murder_of_crows) + BaseDuration(a_murder_of_crows_debuff) or target.HealthPercent() < 20 } and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(a_murder_of_crows) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(a_murder_of_crows) and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 60 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 60 } and Spell(a_murder_of_crows)
 		{
-			#call_action_list,name=trueshotaoe,if=active_enemies>1&!talent.sidewinders.enabled&buff.trueshot.up
-			if Enemies() > 1 and not Talent(sidewinders_talent) and BuffPresent(trueshot_buff) MarksmanshipTrueshotaoeCdActions()
+			#call_action_list,name=cooldowns
+			MarksmanshipCooldownsCdActions()
 
-			unless Enemies() > 1 and not Talent(sidewinders_talent) and BuffPresent(trueshot_buff) and MarksmanshipTrueshotaoeCdPostConditions() or target.DebuffExpires(hunters_mark_debuff) and Spell(barrage) or target.DebuffExpires(hunters_mark_debuff) and Spell(black_arrow) or { target.HealthPercent() > 30 or target.HealthPercent() <= 20 } and vulnerable_time() > ExecuteTime(a_murder_of_crows) and target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(a_murder_of_crows) and Focus() + FocusRegenRate() * vulnerable_time() > 60 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 60 and Spell(a_murder_of_crows) or vulnerable_time() > ExecuteTime(barrage) and target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(barrage) and Focus() + FocusRegenRate() * vulnerable_time() > 90 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 90 and Spell(barrage) or vulnerable_time() > ExecuteTime(black_arrow) and target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(black_arrow) and Focus() + FocusRegenRate() * vulnerable_time() > 70 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 70 and Spell(black_arrow) or not Talent(patient_sniper_talent) and Focus() > 50 and Spell(piercing_shot) or { not Talent(patient_sniper_talent) or Talent(sidewinders_talent) } and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(windburst) and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) > 50 } and Spell(windburst) or Talent(patient_sniper_talent) and not Talent(sidewinders_talent) and { target.DebuffExpires(vulnerability_debuff) or target.DebuffRemaining(vulnerability_debuff) < 2 or target.DebuffPresent(hunters_mark_debuff) and BuffPresent(marking_targets_buff) and target.DebuffExpires(vulnerability_debuff) } and Spell(windburst)
+			unless MarksmanshipCooldownsCdPostConditions()
 			{
-				#call_action_list,name=targetdie,if=target.time_to_die<6&active_enemies=1
-				if target.TimeToDie() < 6 and Enemies() == 1 MarksmanshipTargetdieCdActions()
+				#call_action_list,name=trueshotaoe,if=(target.time_to_die>=cooldown.trueshot.remains+cooldown.trueshot.duration|target.health.pct<20)&(debuff.hunters_mark.down|(debuff.hunters_mark.remains>cooldown.trueshot.execute_time&debuff.vulnerability.remains>cooldown.trueshot.execute_time&focus+(focus.regen*debuff.vulnerability.remains)>=60&focus+(focus.regen*debuff.hunters_mark.remains)>=60))
+				if { target.TimeToDie() >= SpellCooldown(trueshot) + SpellCooldownDuration(trueshot) or target.HealthPercent() < 20 } and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(trueshot) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(trueshot) and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 60 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 60 } MarksmanshipTrueshotaoeCdActions()
+
+				unless { target.TimeToDie() >= SpellCooldown(trueshot) + SpellCooldownDuration(trueshot) or target.HealthPercent() < 20 } and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(trueshot) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(trueshot) and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 60 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 60 } and MarksmanshipTrueshotaoeCdPostConditions() or { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(black_arrow) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(black_arrow) and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 70 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 70 } and Spell(black_arrow) or { target.TimeToHealthPercent(20) > 10 or target.HealthPercent() <= 20 or Enemies() > 1 } and { { BuffExpires(trueshot_buff) or target.HealthPercent() <= 20 and BuffStacks(bullseye_buff) < 29 or Enemies() > 1 } and target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(barrage) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(barrage) and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 90 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 90 } and Spell(barrage)
+				{
+					#call_action_list,name=targetdie,if=target.time_to_die<6&active_enemies=1
+					if target.TimeToDie() < 6 and Enemies() == 1 MarksmanshipTargetdieCdActions()
+
+					unless target.TimeToDie() < 6 and Enemies() == 1 and MarksmanshipTargetdieCdPostConditions()
+					{
+						#call_action_list,name=patient_sniper,if=talent.patient_sniper.enabled
+						if Talent(patient_sniper_talent) MarksmanshipPatientSniperCdActions()
+
+						unless Talent(patient_sniper_talent) and MarksmanshipPatientSniperCdPostConditions()
+						{
+							#call_action_list,name=non_patient_sniper,if=!talent.patient_sniper.enabled
+							if not Talent(patient_sniper_talent) MarksmanshipNonPatientSniperCdActions()
+						}
+					}
+				}
 			}
 		}
 	}
@@ -476,7 +456,7 @@ AddFunction MarksmanshipDefaultCdActions
 
 AddFunction MarksmanshipDefaultCdPostConditions
 {
-	TimeInCombat() <= 15 and Talent(sidewinders_talent) and Enemies() == 1 and MarksmanshipOpenCdPostConditions() or MarksmanshipCooldownsCdPostConditions() or target.DebuffExpires(hunters_mark_debuff) and Spell(a_murder_of_crows) or Enemies() > 1 and not Talent(sidewinders_talent) and BuffPresent(trueshot_buff) and MarksmanshipTrueshotaoeCdPostConditions() or target.DebuffExpires(hunters_mark_debuff) and Spell(barrage) or target.DebuffExpires(hunters_mark_debuff) and Spell(black_arrow) or { target.HealthPercent() > 30 or target.HealthPercent() <= 20 } and vulnerable_time() > ExecuteTime(a_murder_of_crows) and target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(a_murder_of_crows) and Focus() + FocusRegenRate() * vulnerable_time() > 60 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 60 and Spell(a_murder_of_crows) or vulnerable_time() > ExecuteTime(barrage) and target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(barrage) and Focus() + FocusRegenRate() * vulnerable_time() > 90 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 90 and Spell(barrage) or vulnerable_time() > ExecuteTime(black_arrow) and target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(black_arrow) and Focus() + FocusRegenRate() * vulnerable_time() > 70 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 70 and Spell(black_arrow) or not Talent(patient_sniper_talent) and Focus() > 50 and Spell(piercing_shot) or { not Talent(patient_sniper_talent) or Talent(sidewinders_talent) } and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(windburst) and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) > 50 } and Spell(windburst) or Talent(patient_sniper_talent) and not Talent(sidewinders_talent) and { target.DebuffExpires(vulnerability_debuff) or target.DebuffRemaining(vulnerability_debuff) < 2 or target.DebuffPresent(hunters_mark_debuff) and BuffPresent(marking_targets_buff) and target.DebuffExpires(vulnerability_debuff) } and Spell(windburst) or target.TimeToDie() < 6 and Enemies() == 1 and MarksmanshipTargetdieCdPostConditions() or { target.DebuffExpires(hunters_mark_debuff) or BuffExpires(marking_targets_buff) and BuffExpires(trueshot_buff) } and { BuffPresent(trueshot_buff) and Focus() < 80 or Charges(sidewinders count=0) >= 1.9 } and Spell(sidewinders) or target.DebuffExpires(hunters_mark_debuff) and { BuffExpires(marking_targets_buff) or BuffPresent(trueshot_buff) } and Spell(sentinel) or not Talent(patient_sniper_talent) and target.DebuffStacks(vulnerability_debuff) < 3 and Spell(marked_shot text=other) or not Talent(patient_sniper_talent) and Enemies() == 1 and target.DebuffStacks(vulnerability_debuff) < 3 and { BuffPresent(marking_targets_buff) and target.DebuffExpires(hunters_mark_debuff) or BuffPresent(trueshot_buff) } and Spell(arcane_shot) or not Talent(patient_sniper_talent) and Enemies() > 1 and target.DebuffStacks(vulnerability_debuff) < 3 and { BuffPresent(marking_targets_buff) and target.DebuffExpires(hunters_mark_debuff) or BuffPresent(trueshot_buff) } and Spell(multishot) or Talent(steady_focus_talent) and Enemies() == 1 and { BuffExpires(steady_focus_buff) or BuffRemaining(steady_focus_buff) < 2 } and Spell(arcane_shot) or Talent(steady_focus_talent) and Enemies() > 1 and { BuffExpires(steady_focus_buff) or BuffRemaining(steady_focus_buff) < 2 } and Spell(multishot) or Spell(explosive_shot) or { not Talent(patient_sniper_talent) or Talent(barrage_talent) and Enemies() > 2 } and Spell(marked_shot) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(aimed_shot) and vulnerable_time() > ExecuteTime(aimed_shot) and { BuffPresent(lock_and_load_buff) or Focus() + target.DebuffRemaining(hunters_mark_debuff) * FocusRegenRate() >= 80 and Focus() + FocusRegenRate() * vulnerable_time() >= 80 } and Spell(aimed_shot) or target.DebuffExpires(hunters_mark_debuff) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(aimed_shot) and { Talent(sidewinders_talent) or BuffExpires(marking_targets_buff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(aimed_shot) + GCD() and Focus() + 5 + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) > 80 } and Spell(aimed_shot) or { target.DebuffRemaining(hunters_mark_debuff) < 1 or vulnerable_time() < 1 or Enemies() > 1 or BuffPresent(trueshot_buff) } and Spell(marked_shot) or BuffPresent(marking_targets_buff) and { not Talent(sidewinders_talent) or SpellCharges(sidewinders) >= 1.2 } and Spell(marked_shot) or BuffPresent(marking_targets_buff) and target.DebuffExpires(hunters_mark_debuff) and { Focus() <= 80 or vulnerable_time() < 2 and SpellCooldown(windburst) > 3 and SpellCharges(sidewinders) >= 1.2 } and Spell(sidewinders) or Talent(patient_sniper_talent) and Focus() > 80 and Spell(piercing_shot) or Enemies() == 1 and { target.DebuffExpires(hunters_mark_debuff) and BuffPresent(marking_targets_buff) or TimeToMaxFocus() >= 2 } and Spell(arcane_shot) or Enemies() > 1 and { target.DebuffExpires(hunters_mark_debuff) and BuffPresent(marking_targets_buff) or TimeToMaxFocus() >= 2 } and Spell(multishot) or target.DebuffExpires(vulnerability_debuff) and Focus() > 80 and SpellCooldown(windburst) > 3 and Spell(aimed_shot) or Enemies() > 2 and Spell(multishot)
+	CheckBoxOn(opt_volley) and Spell(volley) or Enemies() == 1 and TimeInCombat() <= 15 and MarksmanshipOpenCdPostConditions() or { target.TimeToDie() >= SpellCooldown(a_murder_of_crows) + BaseDuration(a_murder_of_crows_debuff) or target.HealthPercent() < 20 } and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(a_murder_of_crows) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(a_murder_of_crows) and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 60 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 60 } and Spell(a_murder_of_crows) or MarksmanshipCooldownsCdPostConditions() or { target.TimeToDie() >= SpellCooldown(trueshot) + SpellCooldownDuration(trueshot) or target.HealthPercent() < 20 } and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(trueshot) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(trueshot) and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 60 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 60 } and MarksmanshipTrueshotaoeCdPostConditions() or { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(black_arrow) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(black_arrow) and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 70 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 70 } and Spell(black_arrow) or { target.TimeToHealthPercent(20) > 10 or target.HealthPercent() <= 20 or Enemies() > 1 } and { { BuffExpires(trueshot_buff) or target.HealthPercent() <= 20 and BuffStacks(bullseye_buff) < 29 or Enemies() > 1 } and target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(barrage) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(barrage) and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 90 and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 90 } and Spell(barrage) or target.TimeToDie() < 6 and Enemies() == 1 and MarksmanshipTargetdieCdPostConditions() or Talent(patient_sniper_talent) and MarksmanshipPatientSniperCdPostConditions() or not Talent(patient_sniper_talent) and MarksmanshipNonPatientSniperCdPostConditions()
 }
 
 ### actions.cooldowns
@@ -499,35 +479,101 @@ AddFunction MarksmanshipCooldownsShortCdPostConditions
 
 AddFunction MarksmanshipCooldownsCdActions
 {
+	#potion,name=prolonged_power,if=spell_targets.multishot>2&((buff.trueshot.react&buff.bloodlust.react)|buff.bullseye.react>=23|target.time_to_die<62)
 	#potion,name=deadly_grace,if=(buff.trueshot.react&buff.bloodlust.react)|buff.bullseye.react>=23|target.time_to_die<31
-	#trueshot,if=buff.bloodlust.react|target.time_to_die>=(cooldown+30)|buff.bullseye.react>25|target.time_to_die<16
-	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() >= SpellCooldown(trueshot) + 30 or BuffStacks(bullseye_buff) > 25 or target.TimeToDie() < 16 Spell(trueshot)
+	#trueshot,if=time<5|buff.bloodlust.react|target.time_to_die>=(cooldown+duration)|buff.bullseye.react>25|target.time_to_die<16
+	if TimeInCombat() < 5 or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() >= SpellCooldown(trueshot) + BaseDuration(trueshot_buff) or BuffStacks(bullseye_buff) > 25 or target.TimeToDie() < 16 Spell(trueshot)
 }
 
 AddFunction MarksmanshipCooldownsCdPostConditions
 {
 }
 
+### actions.non_patient_sniper
+
+AddFunction MarksmanshipNonPatientSniperMainActions
+{
+	#windburst
+	Spell(windburst)
+	#sidewinders,if=debuff.vulnerability.remains<gcd&time>6
+	if target.DebuffRemaining(vulnerability_debuff) < GCD() and TimeInCombat() > 6 Spell(sidewinders)
+	#aimed_shot,if=buff.lock_and_load.up&spell_targets.barrage<3
+	if BuffPresent(lock_and_load_buff) and Enemies() < 3 Spell(aimed_shot)
+	#marked_shot
+	Spell(marked_shot)
+	#sidewinders,if=((buff.marking_targets.up|buff.trueshot.up)&focus.deficit>70)|charges_fractional>=1.9
+	if { BuffPresent(marking_targets_buff) or BuffPresent(trueshot_buff) } and FocusDeficit() > 70 or Charges(sidewinders count=0) >= 1.9 Spell(sidewinders)
+	#arcane_shot,if=!variable.use_multishot&(buff.marking_targets.up|(talent.steady_focus.enabled&(buff.steady_focus.down|buff.steady_focus.remains<2)))
+	if not use_multishot() and { BuffPresent(marking_targets_buff) or Talent(steady_focus_talent) and { BuffExpires(steady_focus_buff) or BuffRemaining(steady_focus_buff) < 2 } } Spell(arcane_shot)
+	#multishot,if=variable.use_multishot&(buff.marking_targets.up|(talent.steady_focus.enabled&(buff.steady_focus.down|buff.steady_focus.remains<2)))
+	if use_multishot() and { BuffPresent(marking_targets_buff) or Talent(steady_focus_talent) and { BuffExpires(steady_focus_buff) or BuffRemaining(steady_focus_buff) < 2 } } Spell(multishot)
+	#aimed_shot,if=!talent.piercing_shot.enabled|cooldown.piercing_shot.remains>3
+	if not Talent(piercing_shot_talent) or SpellCooldown(piercing_shot) > 3 Spell(aimed_shot)
+	#arcane_shot,if=!variable.use_multishot
+	if not use_multishot() Spell(arcane_shot)
+	#multishot,if=variable.use_multishot
+	if use_multishot() Spell(multishot)
+}
+
+AddFunction MarksmanshipNonPatientSniperMainPostConditions
+{
+}
+
+AddFunction MarksmanshipNonPatientSniperShortCdActions
+{
+	unless Spell(windburst)
+	{
+		#piercing_shot,if=focus>=100
+		if Focus() >= 100 Spell(piercing_shot)
+		#sentinel,if=debuff.hunters_mark.down&focus>30&buff.trueshot.down
+		if target.DebuffExpires(hunters_mark_debuff) and Focus() > 30 and BuffExpires(trueshot_buff) Spell(sentinel)
+
+		unless target.DebuffRemaining(vulnerability_debuff) < GCD() and TimeInCombat() > 6 and Spell(sidewinders) or BuffPresent(lock_and_load_buff) and Enemies() < 3 and Spell(aimed_shot) or Spell(marked_shot)
+		{
+			#explosive_shot
+			Spell(explosive_shot)
+		}
+	}
+}
+
+AddFunction MarksmanshipNonPatientSniperShortCdPostConditions
+{
+	Spell(windburst) or target.DebuffRemaining(vulnerability_debuff) < GCD() and TimeInCombat() > 6 and Spell(sidewinders) or BuffPresent(lock_and_load_buff) and Enemies() < 3 and Spell(aimed_shot) or Spell(marked_shot) or { { BuffPresent(marking_targets_buff) or BuffPresent(trueshot_buff) } and FocusDeficit() > 70 or Charges(sidewinders count=0) >= 1.9 } and Spell(sidewinders) or not use_multishot() and { BuffPresent(marking_targets_buff) or Talent(steady_focus_talent) and { BuffExpires(steady_focus_buff) or BuffRemaining(steady_focus_buff) < 2 } } and Spell(arcane_shot) or use_multishot() and { BuffPresent(marking_targets_buff) or Talent(steady_focus_talent) and { BuffExpires(steady_focus_buff) or BuffRemaining(steady_focus_buff) < 2 } } and Spell(multishot) or { not Talent(piercing_shot_talent) or SpellCooldown(piercing_shot) > 3 } and Spell(aimed_shot) or not use_multishot() and Spell(arcane_shot) or use_multishot() and Spell(multishot)
+}
+
+AddFunction MarksmanshipNonPatientSniperCdActions
+{
+}
+
+AddFunction MarksmanshipNonPatientSniperCdPostConditions
+{
+	Spell(windburst) or Focus() >= 100 and Spell(piercing_shot) or target.DebuffExpires(hunters_mark_debuff) and Focus() > 30 and BuffExpires(trueshot_buff) and Spell(sentinel) or target.DebuffRemaining(vulnerability_debuff) < GCD() and TimeInCombat() > 6 and Spell(sidewinders) or BuffPresent(lock_and_load_buff) and Enemies() < 3 and Spell(aimed_shot) or Spell(marked_shot) or Spell(explosive_shot) or { { BuffPresent(marking_targets_buff) or BuffPresent(trueshot_buff) } and FocusDeficit() > 70 or Charges(sidewinders count=0) >= 1.9 } and Spell(sidewinders) or not use_multishot() and { BuffPresent(marking_targets_buff) or Talent(steady_focus_talent) and { BuffExpires(steady_focus_buff) or BuffRemaining(steady_focus_buff) < 2 } } and Spell(arcane_shot) or use_multishot() and { BuffPresent(marking_targets_buff) or Talent(steady_focus_talent) and { BuffExpires(steady_focus_buff) or BuffRemaining(steady_focus_buff) < 2 } } and Spell(multishot) or { not Talent(piercing_shot_talent) or SpellCooldown(piercing_shot) > 3 } and Spell(aimed_shot) or not use_multishot() and Spell(arcane_shot) or use_multishot() and Spell(multishot)
+}
+
 ### actions.open
 
 AddFunction MarksmanshipOpenMainActions
 {
+	#arcane_shot,line_cd=16&!talent.patient_sniper.enabled
+	if TimeSincePreviousSpell(arcane_shot) > 16 and not Talent(patient_sniper_talent) Spell(arcane_shot)
 	#sidewinders,if=(buff.marking_targets.down&buff.trueshot.remains<2)|(charges_fractional>=1.9&focus<80)
 	if BuffExpires(marking_targets_buff) and BuffRemaining(trueshot_buff) < 2 or Charges(sidewinders count=0) >= 1.9 and Focus() < 80 Spell(sidewinders)
 	#marked_shot
 	Spell(marked_shot)
+	#aimed_shot,if=(buff.lock_and_load.up&execute_time<debuff.vulnerability.remains)|focus>90&!talent.patient_sniper.enabled&talent.trick_shot.enabled
+	if BuffPresent(lock_and_load_buff) and ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) or Focus() > 90 and not Talent(patient_sniper_talent) and Talent(trick_shot_talent) Spell(aimed_shot)
 	#aimed_shot,if=buff.lock_and_load.up&execute_time<debuff.vulnerability.remains
 	if BuffPresent(lock_and_load_buff) and ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) Spell(aimed_shot)
 	#black_arrow
 	Spell(black_arrow)
+	#arcane_shot
+	Spell(arcane_shot)
 	#aimed_shot,if=execute_time<debuff.vulnerability.remains
 	if ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) Spell(aimed_shot)
 	#sidewinders
 	Spell(sidewinders)
 	#aimed_shot
 	Spell(aimed_shot)
-	#arcane_shot
-	Spell(arcane_shot)
 }
 
 AddFunction MarksmanshipOpenMainPostConditions
@@ -538,17 +584,29 @@ AddFunction MarksmanshipOpenShortCdActions
 {
 	#a_murder_of_crows
 	Spell(a_murder_of_crows)
+	#piercing_shot
+	Spell(piercing_shot)
+	#explosive_shot
+	Spell(explosive_shot)
+	#barrage,if=!talent.patient_sniper.enabled
+	if not Talent(patient_sniper_talent) Spell(barrage)
 
-	unless { BuffExpires(marking_targets_buff) and BuffRemaining(trueshot_buff) < 2 or Charges(sidewinders count=0) >= 1.9 and Focus() < 80 } and Spell(sidewinders) or Spell(marked_shot) or BuffPresent(lock_and_load_buff) and ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) and Spell(aimed_shot) or Spell(black_arrow)
+	unless TimeSincePreviousSpell(arcane_shot) > 16 and not Talent(patient_sniper_talent) and Spell(arcane_shot) or { BuffExpires(marking_targets_buff) and BuffRemaining(trueshot_buff) < 2 or Charges(sidewinders count=0) >= 1.9 and Focus() < 80 } and Spell(sidewinders) or Spell(marked_shot)
 	{
-		#barrage
-		Spell(barrage)
+		#barrage,if=buff.bloodlust.up
+		if BuffPresent(burst_haste_buff any=1) Spell(barrage)
+
+		unless { BuffPresent(lock_and_load_buff) and ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) or Focus() > 90 and not Talent(patient_sniper_talent) and Talent(trick_shot_talent) } and Spell(aimed_shot) or BuffPresent(lock_and_load_buff) and ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) and Spell(aimed_shot) or Spell(black_arrow)
+		{
+			#barrage
+			Spell(barrage)
+		}
 	}
 }
 
 AddFunction MarksmanshipOpenShortCdPostConditions
 {
-	{ BuffExpires(marking_targets_buff) and BuffRemaining(trueshot_buff) < 2 or Charges(sidewinders count=0) >= 1.9 and Focus() < 80 } and Spell(sidewinders) or Spell(marked_shot) or BuffPresent(lock_and_load_buff) and ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) and Spell(aimed_shot) or Spell(black_arrow) or ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) and Spell(aimed_shot) or Spell(sidewinders) or Spell(aimed_shot) or Spell(arcane_shot)
+	TimeSincePreviousSpell(arcane_shot) > 16 and not Talent(patient_sniper_talent) and Spell(arcane_shot) or { BuffExpires(marking_targets_buff) and BuffRemaining(trueshot_buff) < 2 or Charges(sidewinders count=0) >= 1.9 and Focus() < 80 } and Spell(sidewinders) or Spell(marked_shot) or { BuffPresent(lock_and_load_buff) and ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) or Focus() > 90 and not Talent(patient_sniper_talent) and Talent(trick_shot_talent) } and Spell(aimed_shot) or BuffPresent(lock_and_load_buff) and ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) and Spell(aimed_shot) or Spell(black_arrow) or Spell(arcane_shot) or ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) and Spell(aimed_shot) or Spell(sidewinders) or Spell(aimed_shot)
 }
 
 AddFunction MarksmanshipOpenCdActions
@@ -562,7 +620,74 @@ AddFunction MarksmanshipOpenCdActions
 
 AddFunction MarksmanshipOpenCdPostConditions
 {
-	Spell(a_murder_of_crows) or { BuffExpires(marking_targets_buff) and BuffRemaining(trueshot_buff) < 2 or Charges(sidewinders count=0) >= 1.9 and Focus() < 80 } and Spell(sidewinders) or Spell(marked_shot) or BuffPresent(lock_and_load_buff) and ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) and Spell(aimed_shot) or Spell(black_arrow) or Spell(barrage) or ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) and Spell(aimed_shot) or Spell(sidewinders) or Spell(aimed_shot) or Spell(arcane_shot)
+	Spell(a_murder_of_crows) or Spell(piercing_shot) or Spell(explosive_shot) or not Talent(patient_sniper_talent) and Spell(barrage) or TimeSincePreviousSpell(arcane_shot) > 16 and not Talent(patient_sniper_talent) and Spell(arcane_shot) or { BuffExpires(marking_targets_buff) and BuffRemaining(trueshot_buff) < 2 or Charges(sidewinders count=0) >= 1.9 and Focus() < 80 } and Spell(sidewinders) or Spell(marked_shot) or BuffPresent(burst_haste_buff any=1) and Spell(barrage) or { BuffPresent(lock_and_load_buff) and ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) or Focus() > 90 and not Talent(patient_sniper_talent) and Talent(trick_shot_talent) } and Spell(aimed_shot) or BuffPresent(lock_and_load_buff) and ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) and Spell(aimed_shot) or Spell(black_arrow) or Spell(barrage) or Spell(arcane_shot) or ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) and Spell(aimed_shot) or Spell(sidewinders) or Spell(aimed_shot)
+}
+
+### actions.patient_sniper
+
+AddFunction MarksmanshipPatientSniperMainActions
+{
+	#marked_shot,cycle_targets=1,if=(talent.sidewinders.enabled&talent.barrage.enabled&spell_targets>2)|debuff.hunters_mark.remains<2|((debuff.vulnerability.up|talent.sidewinders.enabled)&debuff.vulnerability.remains<gcd)
+	if Talent(sidewinders_talent) and Talent(barrage_talent) and Enemies() > 2 or target.DebuffRemaining(hunters_mark_debuff) < 2 or { target.DebuffPresent(vulnerability_debuff) or Talent(sidewinders_talent) } and target.DebuffRemaining(vulnerability_debuff) < GCD() Spell(marked_shot)
+	#windburst,if=talent.sidewinders.enabled&(debuff.hunters_mark.down|(debuff.hunters_mark.remains>execute_time&focus+(focus.regen*debuff.hunters_mark.remains)>=50))|buff.trueshot.up
+	if Talent(sidewinders_talent) and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(windburst) and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 50 } or BuffPresent(trueshot_buff) Spell(windburst)
+	#sidewinders,if=buff.trueshot.up&((buff.marking_targets.down&buff.trueshot.remains<2)|(charges_fractional>=1.9&(focus.deficit>70|spell_targets>1)))
+	if BuffPresent(trueshot_buff) and { BuffExpires(marking_targets_buff) and BuffRemaining(trueshot_buff) < 2 or Charges(sidewinders count=0) >= 1.9 and { FocusDeficit() > 70 or Enemies() > 1 } } Spell(sidewinders)
+	#multishot,if=buff.marking_targets.up&debuff.hunters_mark.down&variable.use_multishot&focus.deficit>2*spell_targets+gcd*focus.regen
+	if BuffPresent(marking_targets_buff) and target.DebuffExpires(hunters_mark_debuff) and use_multishot() and FocusDeficit() > 2 * Enemies() + GCD() * FocusRegenRate() Spell(multishot)
+	#aimed_shot,if=buff.lock_and_load.up&buff.trueshot.up&debuff.vulnerability.remains>execute_time
+	if BuffPresent(lock_and_load_buff) and BuffPresent(trueshot_buff) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(aimed_shot) Spell(aimed_shot)
+	#marked_shot,if=buff.trueshot.up&!talent.sidewinders.enabled
+	if BuffPresent(trueshot_buff) and not Talent(sidewinders_talent) Spell(marked_shot)
+	#arcane_shot,if=buff.trueshot.up
+	if BuffPresent(trueshot_buff) Spell(arcane_shot)
+	#aimed_shot,if=debuff.hunters_mark.down&debuff.vulnerability.remains>execute_time
+	if target.DebuffExpires(hunters_mark_debuff) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(aimed_shot) Spell(aimed_shot)
+	#aimed_shot,if=talent.sidewinders.enabled&debuff.hunters_mark.remains>execute_time&debuff.vulnerability.remains>execute_time&(buff.lock_and_load.up|(focus+debuff.hunters_mark.remains*focus.regen>=80&focus+focus.regen*debuff.vulnerability.remains>=80))&(!talent.piercing_shot.enabled|cooldown.piercing_shot.remains>5|focus>120)
+	if Talent(sidewinders_talent) and target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(aimed_shot) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(aimed_shot) and { BuffPresent(lock_and_load_buff) or Focus() + target.DebuffRemaining(hunters_mark_debuff) * FocusRegenRate() >= 80 and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 80 } and { not Talent(piercing_shot_talent) or SpellCooldown(piercing_shot) > 5 or Focus() > 120 } Spell(aimed_shot)
+	#aimed_shot,if=!talent.sidewinders.enabled&debuff.hunters_mark.remains>execute_time&debuff.vulnerability.remains>execute_time&(buff.lock_and_load.up|(buff.trueshot.up&focus>=80)|(buff.trueshot.down&focus+debuff.hunters_mark.remains*focus.regen>=80&focus+focus.regen*debuff.vulnerability.remains>=80))&(!talent.piercing_shot.enabled|cooldown.piercing_shot.remains>5|focus>120)
+	if not Talent(sidewinders_talent) and target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(aimed_shot) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(aimed_shot) and { BuffPresent(lock_and_load_buff) or BuffPresent(trueshot_buff) and Focus() >= 80 or BuffExpires(trueshot_buff) and Focus() + target.DebuffRemaining(hunters_mark_debuff) * FocusRegenRate() >= 80 and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 80 } and { not Talent(piercing_shot_talent) or SpellCooldown(piercing_shot) > 5 or Focus() > 120 } Spell(aimed_shot)
+	#windburst,if=!talent.sidewinders.enabled&focus>80&(debuff.hunters_mark.down|(debuff.hunters_mark.remains>execute_time&focus+(focus.regen*debuff.hunters_mark.remains)>=50))
+	if not Talent(sidewinders_talent) and Focus() > 80 and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(windburst) and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 50 } Spell(windburst)
+	#marked_shot,if=(talent.sidewinders.enabled&spell_targets>1)|focus.deficit<50|buff.trueshot.up|(buff.marking_targets.up&(!talent.sidewinders.enabled|cooldown.sidewinders.charges_fractional>=1.2))
+	if Talent(sidewinders_talent) and Enemies() > 1 or FocusDeficit() < 50 or BuffPresent(trueshot_buff) or BuffPresent(marking_targets_buff) and { not Talent(sidewinders_talent) or SpellCharges(sidewinders) >= 1.2 } Spell(marked_shot)
+	#sidewinders,if=variable.safe_to_build&((buff.trueshot.up&focus.deficit>70)|charges_fractional>=1.9)
+	if safe_to_build() and { BuffPresent(trueshot_buff) and FocusDeficit() > 70 or Charges(sidewinders count=0) >= 1.9 } Spell(sidewinders)
+	#sidewinders,if=(buff.marking_targets.up&debuff.hunters_mark.down&buff.trueshot.down)|(cooldown.sidewinders.charges_fractional>1&target.time_to_die<11)
+	if BuffPresent(marking_targets_buff) and target.DebuffExpires(hunters_mark_debuff) and BuffExpires(trueshot_buff) or SpellCharges(sidewinders) > 1 and target.TimeToDie() < 11 Spell(sidewinders)
+	#arcane_shot,if=variable.safe_to_build&!variable.use_multishot&focus.deficit>5+gcd*focus.regen
+	if safe_to_build() and not use_multishot() and FocusDeficit() > 5 + GCD() * FocusRegenRate() Spell(arcane_shot)
+	#multishot,if=variable.safe_to_build&variable.use_multishot&focus.deficit>2*spell_targets+gcd*focus.regen
+	if safe_to_build() and use_multishot() and FocusDeficit() > 2 * Enemies() + GCD() * FocusRegenRate() Spell(multishot)
+	#aimed_shot,if=debuff.vulnerability.down&focus>80&cooldown.windburst.remains>focus.time_to_max
+	if target.DebuffExpires(vulnerability_debuff) and Focus() > 80 and SpellCooldown(windburst) > TimeToMaxFocus() Spell(aimed_shot)
+}
+
+AddFunction MarksmanshipPatientSniperMainPostConditions
+{
+}
+
+AddFunction MarksmanshipPatientSniperShortCdActions
+{
+	unless { Talent(sidewinders_talent) and Talent(barrage_talent) and Enemies() > 2 or target.DebuffRemaining(hunters_mark_debuff) < 2 or { target.DebuffPresent(vulnerability_debuff) or Talent(sidewinders_talent) } and target.DebuffRemaining(vulnerability_debuff) < GCD() } and Spell(marked_shot) or { Talent(sidewinders_talent) and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(windburst) and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 50 } or BuffPresent(trueshot_buff) } and Spell(windburst) or BuffPresent(trueshot_buff) and { BuffExpires(marking_targets_buff) and BuffRemaining(trueshot_buff) < 2 or Charges(sidewinders count=0) >= 1.9 and { FocusDeficit() > 70 or Enemies() > 1 } } and Spell(sidewinders) or BuffPresent(marking_targets_buff) and target.DebuffExpires(hunters_mark_debuff) and use_multishot() and FocusDeficit() > 2 * Enemies() + GCD() * FocusRegenRate() and Spell(multishot) or BuffPresent(lock_and_load_buff) and BuffPresent(trueshot_buff) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(aimed_shot) and Spell(aimed_shot) or BuffPresent(trueshot_buff) and not Talent(sidewinders_talent) and Spell(marked_shot) or BuffPresent(trueshot_buff) and Spell(arcane_shot) or target.DebuffExpires(hunters_mark_debuff) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(aimed_shot) and Spell(aimed_shot) or Talent(sidewinders_talent) and target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(aimed_shot) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(aimed_shot) and { BuffPresent(lock_and_load_buff) or Focus() + target.DebuffRemaining(hunters_mark_debuff) * FocusRegenRate() >= 80 and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 80 } and { not Talent(piercing_shot_talent) or SpellCooldown(piercing_shot) > 5 or Focus() > 120 } and Spell(aimed_shot) or not Talent(sidewinders_talent) and target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(aimed_shot) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(aimed_shot) and { BuffPresent(lock_and_load_buff) or BuffPresent(trueshot_buff) and Focus() >= 80 or BuffExpires(trueshot_buff) and Focus() + target.DebuffRemaining(hunters_mark_debuff) * FocusRegenRate() >= 80 and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 80 } and { not Talent(piercing_shot_talent) or SpellCooldown(piercing_shot) > 5 or Focus() > 120 } and Spell(aimed_shot) or not Talent(sidewinders_talent) and Focus() > 80 and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(windburst) and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 50 } and Spell(windburst) or { Talent(sidewinders_talent) and Enemies() > 1 or FocusDeficit() < 50 or BuffPresent(trueshot_buff) or BuffPresent(marking_targets_buff) and { not Talent(sidewinders_talent) or SpellCharges(sidewinders) >= 1.2 } } and Spell(marked_shot)
+	{
+		#piercing_shot,if=focus>80
+		if Focus() > 80 Spell(piercing_shot)
+	}
+}
+
+AddFunction MarksmanshipPatientSniperShortCdPostConditions
+{
+	{ Talent(sidewinders_talent) and Talent(barrage_talent) and Enemies() > 2 or target.DebuffRemaining(hunters_mark_debuff) < 2 or { target.DebuffPresent(vulnerability_debuff) or Talent(sidewinders_talent) } and target.DebuffRemaining(vulnerability_debuff) < GCD() } and Spell(marked_shot) or { Talent(sidewinders_talent) and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(windburst) and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 50 } or BuffPresent(trueshot_buff) } and Spell(windburst) or BuffPresent(trueshot_buff) and { BuffExpires(marking_targets_buff) and BuffRemaining(trueshot_buff) < 2 or Charges(sidewinders count=0) >= 1.9 and { FocusDeficit() > 70 or Enemies() > 1 } } and Spell(sidewinders) or BuffPresent(marking_targets_buff) and target.DebuffExpires(hunters_mark_debuff) and use_multishot() and FocusDeficit() > 2 * Enemies() + GCD() * FocusRegenRate() and Spell(multishot) or BuffPresent(lock_and_load_buff) and BuffPresent(trueshot_buff) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(aimed_shot) and Spell(aimed_shot) or BuffPresent(trueshot_buff) and not Talent(sidewinders_talent) and Spell(marked_shot) or BuffPresent(trueshot_buff) and Spell(arcane_shot) or target.DebuffExpires(hunters_mark_debuff) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(aimed_shot) and Spell(aimed_shot) or Talent(sidewinders_talent) and target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(aimed_shot) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(aimed_shot) and { BuffPresent(lock_and_load_buff) or Focus() + target.DebuffRemaining(hunters_mark_debuff) * FocusRegenRate() >= 80 and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 80 } and { not Talent(piercing_shot_talent) or SpellCooldown(piercing_shot) > 5 or Focus() > 120 } and Spell(aimed_shot) or not Talent(sidewinders_talent) and target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(aimed_shot) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(aimed_shot) and { BuffPresent(lock_and_load_buff) or BuffPresent(trueshot_buff) and Focus() >= 80 or BuffExpires(trueshot_buff) and Focus() + target.DebuffRemaining(hunters_mark_debuff) * FocusRegenRate() >= 80 and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 80 } and { not Talent(piercing_shot_talent) or SpellCooldown(piercing_shot) > 5 or Focus() > 120 } and Spell(aimed_shot) or not Talent(sidewinders_talent) and Focus() > 80 and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(windburst) and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 50 } and Spell(windburst) or { Talent(sidewinders_talent) and Enemies() > 1 or FocusDeficit() < 50 or BuffPresent(trueshot_buff) or BuffPresent(marking_targets_buff) and { not Talent(sidewinders_talent) or SpellCharges(sidewinders) >= 1.2 } } and Spell(marked_shot) or safe_to_build() and { BuffPresent(trueshot_buff) and FocusDeficit() > 70 or Charges(sidewinders count=0) >= 1.9 } and Spell(sidewinders) or { BuffPresent(marking_targets_buff) and target.DebuffExpires(hunters_mark_debuff) and BuffExpires(trueshot_buff) or SpellCharges(sidewinders) > 1 and target.TimeToDie() < 11 } and Spell(sidewinders) or safe_to_build() and not use_multishot() and FocusDeficit() > 5 + GCD() * FocusRegenRate() and Spell(arcane_shot) or safe_to_build() and use_multishot() and FocusDeficit() > 2 * Enemies() + GCD() * FocusRegenRate() and Spell(multishot) or target.DebuffExpires(vulnerability_debuff) and Focus() > 80 and SpellCooldown(windburst) > TimeToMaxFocus() and Spell(aimed_shot)
+}
+
+AddFunction MarksmanshipPatientSniperCdActions
+{
+}
+
+AddFunction MarksmanshipPatientSniperCdPostConditions
+{
+	{ Talent(sidewinders_talent) and Talent(barrage_talent) and Enemies() > 2 or target.DebuffRemaining(hunters_mark_debuff) < 2 or { target.DebuffPresent(vulnerability_debuff) or Talent(sidewinders_talent) } and target.DebuffRemaining(vulnerability_debuff) < GCD() } and Spell(marked_shot) or { Talent(sidewinders_talent) and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(windburst) and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 50 } or BuffPresent(trueshot_buff) } and Spell(windburst) or BuffPresent(trueshot_buff) and { BuffExpires(marking_targets_buff) and BuffRemaining(trueshot_buff) < 2 or Charges(sidewinders count=0) >= 1.9 and { FocusDeficit() > 70 or Enemies() > 1 } } and Spell(sidewinders) or BuffPresent(marking_targets_buff) and target.DebuffExpires(hunters_mark_debuff) and use_multishot() and FocusDeficit() > 2 * Enemies() + GCD() * FocusRegenRate() and Spell(multishot) or BuffPresent(lock_and_load_buff) and BuffPresent(trueshot_buff) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(aimed_shot) and Spell(aimed_shot) or BuffPresent(trueshot_buff) and not Talent(sidewinders_talent) and Spell(marked_shot) or BuffPresent(trueshot_buff) and Spell(arcane_shot) or target.DebuffExpires(hunters_mark_debuff) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(aimed_shot) and Spell(aimed_shot) or Talent(sidewinders_talent) and target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(aimed_shot) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(aimed_shot) and { BuffPresent(lock_and_load_buff) or Focus() + target.DebuffRemaining(hunters_mark_debuff) * FocusRegenRate() >= 80 and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 80 } and { not Talent(piercing_shot_talent) or SpellCooldown(piercing_shot) > 5 or Focus() > 120 } and Spell(aimed_shot) or not Talent(sidewinders_talent) and target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(aimed_shot) and target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(aimed_shot) and { BuffPresent(lock_and_load_buff) or BuffPresent(trueshot_buff) and Focus() >= 80 or BuffExpires(trueshot_buff) and Focus() + target.DebuffRemaining(hunters_mark_debuff) * FocusRegenRate() >= 80 and Focus() + FocusRegenRate() * target.DebuffRemaining(vulnerability_debuff) >= 80 } and { not Talent(piercing_shot_talent) or SpellCooldown(piercing_shot) > 5 or Focus() > 120 } and Spell(aimed_shot) or not Talent(sidewinders_talent) and Focus() > 80 and { target.DebuffExpires(hunters_mark_debuff) or target.DebuffRemaining(hunters_mark_debuff) > ExecuteTime(windburst) and Focus() + FocusRegenRate() * target.DebuffRemaining(hunters_mark_debuff) >= 50 } and Spell(windburst) or { Talent(sidewinders_talent) and Enemies() > 1 or FocusDeficit() < 50 or BuffPresent(trueshot_buff) or BuffPresent(marking_targets_buff) and { not Talent(sidewinders_talent) or SpellCharges(sidewinders) >= 1.2 } } and Spell(marked_shot) or Focus() > 80 and Spell(piercing_shot) or safe_to_build() and { BuffPresent(trueshot_buff) and FocusDeficit() > 70 or Charges(sidewinders count=0) >= 1.9 } and Spell(sidewinders) or { BuffPresent(marking_targets_buff) and target.DebuffExpires(hunters_mark_debuff) and BuffExpires(trueshot_buff) or SpellCharges(sidewinders) > 1 and target.TimeToDie() < 11 } and Spell(sidewinders) or safe_to_build() and not use_multishot() and FocusDeficit() > 5 + GCD() * FocusRegenRate() and Spell(arcane_shot) or safe_to_build() and use_multishot() and FocusDeficit() > 2 * Enemies() + GCD() * FocusRegenRate() and Spell(multishot) or target.DebuffExpires(vulnerability_debuff) and Focus() > 80 and SpellCooldown(windburst) > TimeToMaxFocus() and Spell(aimed_shot)
 }
 
 ### actions.precombat
@@ -570,6 +695,7 @@ AddFunction MarksmanshipOpenCdPostConditions
 AddFunction MarksmanshipPrecombatMainActions
 {
 	#snapshot_stats
+	#potion,name=prolonged_power,if=active_enemies>2
 	#potion,name=deadly_grace
 	#augmentation,type=defiled
 	Spell(augmentation)
@@ -584,7 +710,7 @@ AddFunction MarksmanshipPrecombatMainPostConditions
 AddFunction MarksmanshipPrecombatShortCdActions
 {
 	#flask,type=flask_of_the_seventh_demon
-	#food,type=fishbrul_special
+	#food,type=nightborne_delicacy_platter
 	#summon_pet
 	MarksmanshipSummonPet()
 }
@@ -611,8 +737,8 @@ AddFunction MarksmanshipTargetdieMainActions
 	Spell(marked_shot)
 	#windburst
 	Spell(windburst)
-	#aimed_shot,if=execute_time<debuff.vulnerability.remains
-	if ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) Spell(aimed_shot)
+	#aimed_shot,if=debuff.vulnerability.remains>execute_time&target.time_to_die>execute_time
+	if target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(aimed_shot) and target.TimeToDie() > ExecuteTime(aimed_shot) Spell(aimed_shot)
 	#sidewinders
 	Spell(sidewinders)
 	#aimed_shot
@@ -631,7 +757,7 @@ AddFunction MarksmanshipTargetdieShortCdActions
 
 AddFunction MarksmanshipTargetdieShortCdPostConditions
 {
-	Spell(marked_shot) or Spell(windburst) or ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) and Spell(aimed_shot) or Spell(sidewinders) or Spell(aimed_shot) or Spell(arcane_shot)
+	Spell(marked_shot) or Spell(windburst) or target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(aimed_shot) and target.TimeToDie() > ExecuteTime(aimed_shot) and Spell(aimed_shot) or Spell(sidewinders) or Spell(aimed_shot) or Spell(arcane_shot)
 }
 
 AddFunction MarksmanshipTargetdieCdActions
@@ -640,7 +766,7 @@ AddFunction MarksmanshipTargetdieCdActions
 
 AddFunction MarksmanshipTargetdieCdPostConditions
 {
-	Spell(marked_shot) or Spell(windburst) or ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) and Spell(aimed_shot) or Spell(sidewinders) or Spell(aimed_shot) or Spell(arcane_shot)
+	Spell(marked_shot) or Spell(windburst) or target.DebuffRemaining(vulnerability_debuff) > ExecuteTime(aimed_shot) and target.TimeToDie() > ExecuteTime(aimed_shot) and Spell(aimed_shot) or Spell(sidewinders) or Spell(aimed_shot) or Spell(arcane_shot)
 }
 
 ### actions.trueshotaoe
@@ -649,8 +775,8 @@ AddFunction MarksmanshipTrueshotaoeMainActions
 {
 	#marked_shot
 	Spell(marked_shot)
-	#aimed_shot,if=active_enemies=2&buff.lock_and_load.up&execute_time<debuff.vulnerability.remains
-	if Enemies() == 2 and BuffPresent(lock_and_load_buff) and ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) Spell(aimed_shot)
+	#aimed_shot,if=(!talent.patient_sniper.enabled|talent.trick_shot.enabled)&spell_targets.multishot=2&buff.lock_and_load.up&execute_time<debuff.vulnerability.remains
+	if { not Talent(patient_sniper_talent) or Talent(trick_shot_talent) } and Enemies() == 2 and BuffPresent(lock_and_load_buff) and ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) Spell(aimed_shot)
 	#multishot
 	Spell(multishot)
 }
@@ -663,10 +789,10 @@ AddFunction MarksmanshipTrueshotaoeShortCdActions
 {
 	unless Spell(marked_shot)
 	{
+		#barrage,if=!talent.patient_sniper.enabled
+		if not Talent(patient_sniper_talent) Spell(barrage)
 		#piercing_shot
 		Spell(piercing_shot)
-		#barrage
-		Spell(barrage)
 		#explosive_shot
 		Spell(explosive_shot)
 	}
@@ -674,7 +800,7 @@ AddFunction MarksmanshipTrueshotaoeShortCdActions
 
 AddFunction MarksmanshipTrueshotaoeShortCdPostConditions
 {
-	Spell(marked_shot) or Enemies() == 2 and BuffPresent(lock_and_load_buff) and ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) and Spell(aimed_shot) or Spell(multishot)
+	Spell(marked_shot) or { not Talent(patient_sniper_talent) or Talent(trick_shot_talent) } and Enemies() == 2 and BuffPresent(lock_and_load_buff) and ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) and Spell(aimed_shot) or Spell(multishot)
 }
 
 AddFunction MarksmanshipTrueshotaoeCdActions
@@ -683,7 +809,7 @@ AddFunction MarksmanshipTrueshotaoeCdActions
 
 AddFunction MarksmanshipTrueshotaoeCdPostConditions
 {
-	Spell(marked_shot) or Spell(piercing_shot) or Spell(barrage) or Spell(explosive_shot) or Enemies() == 2 and BuffPresent(lock_and_load_buff) and ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) and Spell(aimed_shot) or Spell(multishot)
+	Spell(marked_shot) or not Talent(patient_sniper_talent) and Spell(barrage) or Spell(piercing_shot) or Spell(explosive_shot) or { not Talent(patient_sniper_talent) or Talent(trick_shot_talent) } and Enemies() == 2 and BuffPresent(lock_and_load_buff) and ExecuteTime(aimed_shot) < target.DebuffRemaining(vulnerability_debuff) and Spell(aimed_shot) or Spell(multishot)
 }
 
 ### Marksmanship icons.
@@ -746,6 +872,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 
 ### Required symbols
 # a_murder_of_crows
+# a_murder_of_crows_debuff
 # aimed_shot
 # arcane_shot
 # arcane_torrent_focus
@@ -766,6 +893,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # multishot
 # patient_sniper_talent
 # piercing_shot
+# piercing_shot_talent
 # quaking_palm
 # revive_pet
 # sentinel
@@ -773,8 +901,10 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # sidewinders_talent
 # steady_focus_buff
 # steady_focus_talent
+# trick_shot_talent
 # trueshot
 # trueshot_buff
+# volley
 # vulnerability_debuff
 # war_stomp
 # windburst
@@ -836,12 +966,14 @@ AddFunction SurvivalSummonPet
 
 AddFunction SurvivalDefaultMainActions
 {
+	#raptor_strike,if=talent.way_of_the_moknathal.enabled&buff.moknathal_tactics.remains&buff.moknathal_tactics.remains<gcd.max
+	if Talent(way_of_the_moknathal_talent) and BuffPresent(moknathal_tactics_buff) and BuffRemaining(moknathal_tactics_buff) < GCD() Spell(raptor_strike)
 	#caltrops
 	Spell(caltrops)
 	#carve,cycle_targets=1,if=talent.serpent_sting.enabled&active_enemies>=3&(!dot.serpent_sting.ticking|dot.serpent_sting.remains<=gcd.max)
 	if Talent(serpent_sting_talent) and Enemies() >= 3 and { not target.DebuffPresent(serpent_sting_debuff) or target.DebuffRemaining(serpent_sting_debuff) <= GCD() } Spell(carve)
-	#raptor_strike,cycle_targets=1,if=talent.serpent_sting.enabled&active_enemies<=2&(!dot.serpent_sting.ticking|dot.serpent_sting.remains<=gcd.max)|talent.way_of_the_moknathal.enabled&(buff.moknathal_tactics.remains<gcd.max|buff.moknathal_tactics.down)
-	if Talent(serpent_sting_talent) and Enemies() <= 2 and { not target.DebuffPresent(serpent_sting_debuff) or target.DebuffRemaining(serpent_sting_debuff) <= GCD() } or Talent(way_of_the_moknathal_talent) and { BuffRemaining(moknathal_tactics_buff) < GCD() or BuffExpires(moknathal_tactics_buff) } Spell(raptor_strike)
+	#raptor_strike,cycle_targets=1,if=talent.serpent_sting.enabled&active_enemies<=2&(!dot.serpent_sting.ticking|dot.serpent_sting.remains<=gcd.max)|talent.way_of_the_moknathal.enabled&buff.moknathal_tactics.down
+	if Talent(serpent_sting_talent) and Enemies() <= 2 and { not target.DebuffPresent(serpent_sting_debuff) or target.DebuffRemaining(serpent_sting_debuff) <= GCD() } or Talent(way_of_the_moknathal_talent) and BuffExpires(moknathal_tactics_buff) Spell(raptor_strike)
 	#mongoose_bite,if=buff.aspect_of_the_eagle.up&(charges>=2|charges>=1&cooldown.mongoose_bite.remains<=2)|(buff.mongoose_fury.up|cooldown.fury_of_the_eagle.remains<5|charges=3)
 	if BuffPresent(aspect_of_the_eagle_buff) and { Charges(mongoose_bite) >= 2 or Charges(mongoose_bite) >= 1 and SpellCooldown(mongoose_bite) <= 2 } or BuffPresent(mongoose_fury_buff) or SpellCooldown(fury_of_the_eagle) < 5 or Charges(mongoose_bite) == 3 Spell(mongoose_bite)
 	#lacerate,if=dot.lacerate.ticking&dot.lacerate.remains<=3|target.time_to_die>=5
@@ -864,34 +996,30 @@ AddFunction SurvivalDefaultMainPostConditions
 
 AddFunction SurvivalDefaultShortCdActions
 {
-	#potion,name=old_war
-	#steel_trap
-	if CheckBoxOn(opt_trap_launcher) Spell(steel_trap)
-	#explosive_trap
-	if CheckBoxOn(opt_trap_launcher) Spell(explosive_trap)
-	#dragonsfire_grenade
-	Spell(dragonsfire_grenade)
+	#potion,name=old_war,if=buff.aspect_of_the_eagle.remains
+	#fury_of_the_eagle,if=(buff.mongoose_fury.up&buff.mongoose_fury.remains<=gcd)|target.time_to_die<=execute_time
+	if BuffPresent(mongoose_fury_buff) and BuffRemaining(mongoose_fury_buff) <= GCD() or target.TimeToDie() <= ExecuteTime(fury_of_the_eagle) Spell(fury_of_the_eagle)
 
-	unless Spell(caltrops) or Talent(serpent_sting_talent) and Enemies() >= 3 and { not target.DebuffPresent(serpent_sting_debuff) or target.DebuffRemaining(serpent_sting_debuff) <= GCD() } and Spell(carve) or { Talent(serpent_sting_talent) and Enemies() <= 2 and { not target.DebuffPresent(serpent_sting_debuff) or target.DebuffRemaining(serpent_sting_debuff) <= GCD() } or Talent(way_of_the_moknathal_talent) and { BuffRemaining(moknathal_tactics_buff) < GCD() or BuffExpires(moknathal_tactics_buff) } } and Spell(raptor_strike)
+	unless Talent(way_of_the_moknathal_talent) and BuffPresent(moknathal_tactics_buff) and BuffRemaining(moknathal_tactics_buff) < GCD() and Spell(raptor_strike)
 	{
-		#fury_of_the_eagle,if=buff.mongoose_fury.up&(buff.mongoose_fury.stack=6|action.mongoose_bite.charges=0&cooldown.snake_hunter.remains|buff.mongoose_fury.remains<=gcd.max*2)
-		if BuffPresent(mongoose_fury_buff) and { BuffStacks(mongoose_fury_buff) == 6 or Charges(mongoose_bite) == 0 and SpellCooldown(snake_hunter) > 0 or BuffRemaining(mongoose_fury_buff) <= GCD() * 2 } Spell(fury_of_the_eagle)
+		#a_murder_of_crows
+		Spell(a_murder_of_crows)
+		#steel_trap
+		if CheckBoxOn(opt_trap_launcher) Spell(steel_trap)
+		#explosive_trap
+		if CheckBoxOn(opt_trap_launcher) Spell(explosive_trap)
+		#dragonsfire_grenade
+		Spell(dragonsfire_grenade)
 
-		unless { BuffPresent(aspect_of_the_eagle_buff) and { Charges(mongoose_bite) >= 2 or Charges(mongoose_bite) >= 1 and SpellCooldown(mongoose_bite) <= 2 } or BuffPresent(mongoose_fury_buff) or SpellCooldown(fury_of_the_eagle) < 5 or Charges(mongoose_bite) == 3 } and Spell(mongoose_bite)
+		unless Spell(caltrops) or Talent(serpent_sting_talent) and Enemies() >= 3 and { not target.DebuffPresent(serpent_sting_debuff) or target.DebuffRemaining(serpent_sting_debuff) <= GCD() } and Spell(carve) or { Talent(serpent_sting_talent) and Enemies() <= 2 and { not target.DebuffPresent(serpent_sting_debuff) or target.DebuffRemaining(serpent_sting_debuff) <= GCD() } or Talent(way_of_the_moknathal_talent) and BuffExpires(moknathal_tactics_buff) } and Spell(raptor_strike)
 		{
-			#a_murder_of_crows
-			Spell(a_murder_of_crows)
+			#snake_hunter,if=action.mongoose_bite.charges<=0&buff.mongoose_fury.remains
+			if Charges(mongoose_bite) <= 0 and BuffPresent(mongoose_fury_buff) Spell(snake_hunter)
 
-			unless { target.DebuffPresent(lacerate_debuff) and target.DebuffRemaining(lacerate_debuff) <= 3 or target.TimeToDie() >= 5 } and Spell(lacerate)
+			unless { BuffPresent(aspect_of_the_eagle_buff) and { Charges(mongoose_bite) >= 2 or Charges(mongoose_bite) >= 1 and SpellCooldown(mongoose_bite) <= 2 } or BuffPresent(mongoose_fury_buff) or SpellCooldown(fury_of_the_eagle) < 5 or Charges(mongoose_bite) == 3 } and Spell(mongoose_bite) or { target.DebuffPresent(lacerate_debuff) and target.DebuffRemaining(lacerate_debuff) <= 3 or target.TimeToDie() >= 5 } and Spell(lacerate) or { Talent(way_of_the_moknathal_talent) and BuffRemaining(moknathal_tactics_buff) >= 3 or not Talent(way_of_the_moknathal_talent) } and Spell(flanking_strike) or Enemies() >= 2 and Spell(butchery) or Enemies() >= 4 and Spell(carve)
 			{
-				#snake_hunter,if=action.mongoose_bite.charges<=1&buff.mongoose_fury.remains>gcd.max*4|action.mongoose_bite.charges=0&buff.aspect_of_the_eagle.up
-				if Charges(mongoose_bite) <= 1 and BuffRemaining(mongoose_fury_buff) > GCD() * 4 or Charges(mongoose_bite) == 0 and BuffPresent(aspect_of_the_eagle_buff) Spell(snake_hunter)
-
-				unless { Talent(way_of_the_moknathal_talent) and BuffRemaining(moknathal_tactics_buff) >= 3 or not Talent(way_of_the_moknathal_talent) } and Spell(flanking_strike) or Enemies() >= 2 and Spell(butchery) or Enemies() >= 4 and Spell(carve)
-				{
-					#spitting_cobra
-					Spell(spitting_cobra)
-				}
+				#spitting_cobra
+				Spell(spitting_cobra)
 			}
 		}
 	}
@@ -899,7 +1027,7 @@ AddFunction SurvivalDefaultShortCdActions
 
 AddFunction SurvivalDefaultShortCdPostConditions
 {
-	Spell(caltrops) or Talent(serpent_sting_talent) and Enemies() >= 3 and { not target.DebuffPresent(serpent_sting_debuff) or target.DebuffRemaining(serpent_sting_debuff) <= GCD() } and Spell(carve) or { Talent(serpent_sting_talent) and Enemies() <= 2 and { not target.DebuffPresent(serpent_sting_debuff) or target.DebuffRemaining(serpent_sting_debuff) <= GCD() } or Talent(way_of_the_moknathal_talent) and { BuffRemaining(moknathal_tactics_buff) < GCD() or BuffExpires(moknathal_tactics_buff) } } and Spell(raptor_strike) or { BuffPresent(aspect_of_the_eagle_buff) and { Charges(mongoose_bite) >= 2 or Charges(mongoose_bite) >= 1 and SpellCooldown(mongoose_bite) <= 2 } or BuffPresent(mongoose_fury_buff) or SpellCooldown(fury_of_the_eagle) < 5 or Charges(mongoose_bite) == 3 } and Spell(mongoose_bite) or { target.DebuffPresent(lacerate_debuff) and target.DebuffRemaining(lacerate_debuff) <= 3 or target.TimeToDie() >= 5 } and Spell(lacerate) or { Talent(way_of_the_moknathal_talent) and BuffRemaining(moknathal_tactics_buff) >= 3 or not Talent(way_of_the_moknathal_talent) } and Spell(flanking_strike) or Enemies() >= 2 and Spell(butchery) or Enemies() >= 4 and Spell(carve) or Spell(throwing_axes) or not Talent(throwing_axes_talent) and Focus() > 75 - SpellCooldown(flanking_strike) * FocusRegenRate() and Spell(raptor_strike)
+	Talent(way_of_the_moknathal_talent) and BuffPresent(moknathal_tactics_buff) and BuffRemaining(moknathal_tactics_buff) < GCD() and Spell(raptor_strike) or Spell(caltrops) or Talent(serpent_sting_talent) and Enemies() >= 3 and { not target.DebuffPresent(serpent_sting_debuff) or target.DebuffRemaining(serpent_sting_debuff) <= GCD() } and Spell(carve) or { Talent(serpent_sting_talent) and Enemies() <= 2 and { not target.DebuffPresent(serpent_sting_debuff) or target.DebuffRemaining(serpent_sting_debuff) <= GCD() } or Talent(way_of_the_moknathal_talent) and BuffExpires(moknathal_tactics_buff) } and Spell(raptor_strike) or { BuffPresent(aspect_of_the_eagle_buff) and { Charges(mongoose_bite) >= 2 or Charges(mongoose_bite) >= 1 and SpellCooldown(mongoose_bite) <= 2 } or BuffPresent(mongoose_fury_buff) or SpellCooldown(fury_of_the_eagle) < 5 or Charges(mongoose_bite) == 3 } and Spell(mongoose_bite) or { target.DebuffPresent(lacerate_debuff) and target.DebuffRemaining(lacerate_debuff) <= 3 or target.TimeToDie() >= 5 } and Spell(lacerate) or { Talent(way_of_the_moknathal_talent) and BuffRemaining(moknathal_tactics_buff) >= 3 or not Talent(way_of_the_moknathal_talent) } and Spell(flanking_strike) or Enemies() >= 2 and Spell(butchery) or Enemies() >= 4 and Spell(carve) or Spell(throwing_axes) or not Talent(throwing_axes_talent) and Focus() > 75 - SpellCooldown(flanking_strike) * FocusRegenRate() and Spell(raptor_strike)
 }
 
 AddFunction SurvivalDefaultCdActions
@@ -916,7 +1044,7 @@ AddFunction SurvivalDefaultCdActions
 	#use_item,name=tirathons_betrayal
 	SurvivalUseItemActions()
 
-	unless CheckBoxOn(opt_trap_launcher) and Spell(steel_trap) or CheckBoxOn(opt_trap_launcher) and Spell(explosive_trap) or Spell(dragonsfire_grenade) or Spell(caltrops) or Talent(serpent_sting_talent) and Enemies() >= 3 and { not target.DebuffPresent(serpent_sting_debuff) or target.DebuffRemaining(serpent_sting_debuff) <= GCD() } and Spell(carve) or { Talent(serpent_sting_talent) and Enemies() <= 2 and { not target.DebuffPresent(serpent_sting_debuff) or target.DebuffRemaining(serpent_sting_debuff) <= GCD() } or Talent(way_of_the_moknathal_talent) and { BuffRemaining(moknathal_tactics_buff) < GCD() or BuffExpires(moknathal_tactics_buff) } } and Spell(raptor_strike)
+	unless { BuffPresent(mongoose_fury_buff) and BuffRemaining(mongoose_fury_buff) <= GCD() or target.TimeToDie() <= ExecuteTime(fury_of_the_eagle) } and Spell(fury_of_the_eagle) or Talent(way_of_the_moknathal_talent) and BuffPresent(moknathal_tactics_buff) and BuffRemaining(moknathal_tactics_buff) < GCD() and Spell(raptor_strike) or Spell(a_murder_of_crows) or CheckBoxOn(opt_trap_launcher) and Spell(steel_trap) or CheckBoxOn(opt_trap_launcher) and Spell(explosive_trap) or Spell(dragonsfire_grenade) or Spell(caltrops) or Talent(serpent_sting_talent) and Enemies() >= 3 and { not target.DebuffPresent(serpent_sting_debuff) or target.DebuffRemaining(serpent_sting_debuff) <= GCD() } and Spell(carve) or { Talent(serpent_sting_talent) and Enemies() <= 2 and { not target.DebuffPresent(serpent_sting_debuff) or target.DebuffRemaining(serpent_sting_debuff) <= GCD() } or Talent(way_of_the_moknathal_talent) and BuffExpires(moknathal_tactics_buff) } and Spell(raptor_strike)
 	{
 		#aspect_of_the_eagle
 		Spell(aspect_of_the_eagle)
@@ -925,7 +1053,7 @@ AddFunction SurvivalDefaultCdActions
 
 AddFunction SurvivalDefaultCdPostConditions
 {
-	CheckBoxOn(opt_trap_launcher) and Spell(steel_trap) or CheckBoxOn(opt_trap_launcher) and Spell(explosive_trap) or Spell(dragonsfire_grenade) or Spell(caltrops) or Talent(serpent_sting_talent) and Enemies() >= 3 and { not target.DebuffPresent(serpent_sting_debuff) or target.DebuffRemaining(serpent_sting_debuff) <= GCD() } and Spell(carve) or { Talent(serpent_sting_talent) and Enemies() <= 2 and { not target.DebuffPresent(serpent_sting_debuff) or target.DebuffRemaining(serpent_sting_debuff) <= GCD() } or Talent(way_of_the_moknathal_talent) and { BuffRemaining(moknathal_tactics_buff) < GCD() or BuffExpires(moknathal_tactics_buff) } } and Spell(raptor_strike) or BuffPresent(mongoose_fury_buff) and { BuffStacks(mongoose_fury_buff) == 6 or Charges(mongoose_bite) == 0 and SpellCooldown(snake_hunter) > 0 or BuffRemaining(mongoose_fury_buff) <= GCD() * 2 } and Spell(fury_of_the_eagle) or { BuffPresent(aspect_of_the_eagle_buff) and { Charges(mongoose_bite) >= 2 or Charges(mongoose_bite) >= 1 and SpellCooldown(mongoose_bite) <= 2 } or BuffPresent(mongoose_fury_buff) or SpellCooldown(fury_of_the_eagle) < 5 or Charges(mongoose_bite) == 3 } and Spell(mongoose_bite) or Spell(a_murder_of_crows) or { target.DebuffPresent(lacerate_debuff) and target.DebuffRemaining(lacerate_debuff) <= 3 or target.TimeToDie() >= 5 } and Spell(lacerate) or { Charges(mongoose_bite) <= 1 and BuffRemaining(mongoose_fury_buff) > GCD() * 4 or Charges(mongoose_bite) == 0 and BuffPresent(aspect_of_the_eagle_buff) } and Spell(snake_hunter) or { Talent(way_of_the_moknathal_talent) and BuffRemaining(moknathal_tactics_buff) >= 3 or not Talent(way_of_the_moknathal_talent) } and Spell(flanking_strike) or Enemies() >= 2 and Spell(butchery) or Enemies() >= 4 and Spell(carve) or Spell(spitting_cobra) or Spell(throwing_axes) or not Talent(throwing_axes_talent) and Focus() > 75 - SpellCooldown(flanking_strike) * FocusRegenRate() and Spell(raptor_strike)
+	{ BuffPresent(mongoose_fury_buff) and BuffRemaining(mongoose_fury_buff) <= GCD() or target.TimeToDie() <= ExecuteTime(fury_of_the_eagle) } and Spell(fury_of_the_eagle) or Talent(way_of_the_moknathal_talent) and BuffPresent(moknathal_tactics_buff) and BuffRemaining(moknathal_tactics_buff) < GCD() and Spell(raptor_strike) or Spell(a_murder_of_crows) or CheckBoxOn(opt_trap_launcher) and Spell(steel_trap) or CheckBoxOn(opt_trap_launcher) and Spell(explosive_trap) or Spell(dragonsfire_grenade) or Spell(caltrops) or Talent(serpent_sting_talent) and Enemies() >= 3 and { not target.DebuffPresent(serpent_sting_debuff) or target.DebuffRemaining(serpent_sting_debuff) <= GCD() } and Spell(carve) or { Talent(serpent_sting_talent) and Enemies() <= 2 and { not target.DebuffPresent(serpent_sting_debuff) or target.DebuffRemaining(serpent_sting_debuff) <= GCD() } or Talent(way_of_the_moknathal_talent) and BuffExpires(moknathal_tactics_buff) } and Spell(raptor_strike) or Charges(mongoose_bite) <= 0 and BuffPresent(mongoose_fury_buff) and Spell(snake_hunter) or { BuffPresent(aspect_of_the_eagle_buff) and { Charges(mongoose_bite) >= 2 or Charges(mongoose_bite) >= 1 and SpellCooldown(mongoose_bite) <= 2 } or BuffPresent(mongoose_fury_buff) or SpellCooldown(fury_of_the_eagle) < 5 or Charges(mongoose_bite) == 3 } and Spell(mongoose_bite) or { target.DebuffPresent(lacerate_debuff) and target.DebuffRemaining(lacerate_debuff) <= 3 or target.TimeToDie() >= 5 } and Spell(lacerate) or { Talent(way_of_the_moknathal_talent) and BuffRemaining(moknathal_tactics_buff) >= 3 or not Talent(way_of_the_moknathal_talent) } and Spell(flanking_strike) or Enemies() >= 2 and Spell(butchery) or Enemies() >= 4 and Spell(carve) or Spell(spitting_cobra) or Spell(throwing_axes) or not Talent(throwing_axes_talent) and Focus() > 75 - SpellCooldown(flanking_strike) * FocusRegenRate() and Spell(raptor_strike)
 }
 
 ### actions.precombat
@@ -947,7 +1075,7 @@ AddFunction SurvivalPrecombatMainPostConditions
 AddFunction SurvivalPrecombatShortCdActions
 {
 	#flask,type=flask_of_the_seventh_demon
-	#food,type=nightborne_delicacy_platter
+	#food,type=seedbattered_fish_plate
 	#summon_pet
 	SurvivalSummonPet()
 }

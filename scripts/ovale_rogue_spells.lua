@@ -226,6 +226,7 @@ Define(mutilate 1329)
 	SpellInfo(mutilate buff_energy=silent_blades_buff buff_energy_amount=-6 itemset=T16_melee itemcount=2)
 	SpellAddBuff(mutilate silent_blades_buff=0 itemset=T16_melee itemcount=2)
 	SpellAddBuff(mutilate enhanced_vendetta_buff=0 if_spell=enhanced_vendetta)
+Define(mutilated_flesh_debuff 211672)
 Define(nightblade 195452)
 	SpellInfo(nightblade energy=25 combo=finisher)
 	SpellAddTargetDebuff(nightblade nightblade_debuff=1)
@@ -403,9 +404,11 @@ Define(shadow_satyrs_walk 137032)
 Define(greenskins_waterlogged_wristcuffs_buff 209423)
 
 # Talents
+Define(agonizing_poison_talent 16)
 Define(deeper_strategem_talent 7)
 Define(dirty_tricks_talent 15)
 Define(elaborate_planning_talent 2)
+Define(master_poisoner_talent 1)
 Define(vigor_talent 9)
 
 # Non-default tags for OvaleSimulationCraft.
