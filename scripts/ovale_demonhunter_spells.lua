@@ -131,6 +131,7 @@ Define(fury_of_the_illidari 201467)
 
 # Talents
 Define(abyssal_strike_talent 1)
+Define(burning_alive_talent 6)
 Define(chaos_blades_talent 19)
 Define(demon_blades_talent 5)
 Define(demonic_appetite_talent 6)

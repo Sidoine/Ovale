@@ -40,7 +40,8 @@ AddFunction VengeanceDefaultShortCDActions
 
 AddFunction VengeanceDefaultMainActions
 {
-	if (BuffStacks(soul_fragments) <= 1) Spell(soul_carver)
+	if (not VengeancePlayDefensively() and HasArtifactTrait(fiery_demise)) Spell(fiery_brand)
+	if (not VengeancePlayDefensively() or BuffStacks(soul_fragments) <= 1) Spell(soul_carver)
 	if (not VengeancePlayDefensively()) Spell(fel_devastation)
 	if (Pain() >= 80) Spell(soul_barrier)
 	if (Pain() >= 80) Spell(soul_cleave)
@@ -64,6 +65,7 @@ AddFunction VengeanceDefaultAoEActions
 	if (not VengeancePlayDefensively()) Spell(fel_devastation)
 	if (Pain() >= 80) Spell(soul_barrier)
 	if (Pain() >= 80) Spell(soul_cleave)
+	if (not VengeancePlayDefensively() and Talent(burning_alive_talent)) Spell(fiery_brand)
 	Spell(immolation_aura)
 	if (BuffStacks(soul_fragments) >= 1 and target.DebuffExpires(frailty_debuff)) Spell(spirit_bomb)
 	Spell(felblade)
