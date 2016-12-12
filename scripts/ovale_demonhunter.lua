@@ -193,7 +193,7 @@ AddFunction HavocInterruptActions
 
 AddFunction HavocGetInMeleeRange
 {
-	if CheckBoxOn(opt_melee_range) and not target.InRange(consume_magic) Texture(misc_arrowlup help=L(not_in_melee_range))
+	if CheckBoxOn(opt_melee_range) and not target.InRange(demons_bite) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
 ### actions.default
@@ -545,7 +545,7 @@ AddFunction VengeanceInterruptActions
 
 AddFunction VengeanceGetInMeleeRange
 {
-	if CheckBoxOn(opt_melee_range) and not target.InRange(consume_magic) Texture(misc_arrowlup help=L(not_in_melee_range))
+	if CheckBoxOn(opt_melee_range) and not target.InRange(shear) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
 ### actions.default

@@ -4240,18 +4240,32 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "death_strike")
 		count = count + 1
 	end
-	if annotation.melee == "DEMONHUNTER" then
+	if annotation.melee == "DEMONHUNTER" and annotation.specialization == "havoc" then
 		local fmt = [[
 			AddFunction %sGetInMeleeRange
 			{
-				if CheckBoxOn(opt_melee_range) and not target.InRange(consume_magic) Texture(misc_arrowlup help=L(not_in_melee_range))
+				if CheckBoxOn(opt_melee_range) and not target.InRange(demons_bite) Texture(misc_arrowlup help=L(not_in_melee_range))
 			}
 		]]
 		local code = format(fmt, camelSpecialization)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "shortcd"
-		AddSymbol(annotation, "consume_magic")
+		AddSymbol(annotation, "demons_bite")
+		count = count + 1
+	end
+	if annotation.melee == "DEMONHUNTER" and annotation.specialization == "vengeance" then
+		local fmt = [[
+			AddFunction %sGetInMeleeRange
+			{
+				if CheckBoxOn(opt_melee_range) and not target.InRange(shear) Texture(misc_arrowlup help=L(not_in_melee_range))
+			}
+		]]
+		local code = format(fmt, camelSpecialization)
+		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		annotation.functionTag[node.name] = "shortcd"
+		AddSymbol(annotation, "shear")
 		count = count + 1
 	end
 	if annotation.melee == "DEMONHUNTER" and annotation.specialization == "havoc" then
