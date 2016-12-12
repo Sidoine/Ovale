@@ -1782,6 +1782,11 @@ EmitAction = function(parseNode, nodeList, annotation)
 			annotation[action] = class
 			annotation.interrupt = class
 			isSpellAction = false
+		elseif class == "DEMONHUNTER" and action == "consume_magic" then
+			bodyCode = camelSpecialization .. "InterruptActions()"
+			annotation[action] = class
+			annotation.interrupt = class
+			isSpellAction = false
 		elseif class == "DRUID" and action == "pulverize" then
 			--[[
 				WORKAROUND: Work around Blizzard bug where Pulverize can only be used within 15s of
@@ -3026,8 +3031,8 @@ do
 		["focus.regen"]			= "FocusRegenRate()",
 		["focus.time_to_max"]	= "TimeToMaxFocus()",
 		["frost.frac"]			= "Rune(frost)",
-		["fury"]				= "DemonicFury()",
-		["fury.deficit"]		= "DemonicFuryDeficit()",
+		["fury"]				= "Fury()",
+		["fury.deficit"]		= "FuryDeficit()",
 		["health"]				= "Health()",
 		["health.deficit"]		= "HealthMissing()",
 		["health.max"]			= "MaxHealth()",
@@ -3194,8 +3199,10 @@ EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
 		local code
 		if property == "execute_time" then
 			code = format("ExecuteTime(%s)", name)
-		elseif property == "duration" or property == "ready" then
+		elseif property == "duration" then
 			code = format("%sCooldownDuration(%s)", prefix, name)
+		elseif property == "ready" then
+			code = format("%sCooldown(%s) == 0", prefix, name)
 		elseif property == "remains" then
 			if parseNode.asType == "boolean" then
 				code = format("%sCooldown(%s) > 0", prefix, name)
@@ -4233,11 +4240,48 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "death_strike")
 		count = count + 1
 	end
-	if annotation.melee == "DEMONHUNTER" then
+	if annotation.melee == "DEMONHUNTER" and annotation.specialization == "havoc" then
 		local fmt = [[
 			AddFunction %sGetInMeleeRange
 			{
-				if CheckBoxOn(opt_melee_range) and not target.InRange(consume_magic) Texture(misc_arrowlup help=L(not_in_melee_range))
+				if CheckBoxOn(opt_melee_range) and not target.InRange(demons_bite) Texture(misc_arrowlup help=L(not_in_melee_range))
+			}
+		]]
+		local code = format(fmt, camelSpecialization)
+		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		annotation.functionTag[node.name] = "shortcd"
+		AddSymbol(annotation, "demons_bite")
+		count = count + 1
+	end
+	if annotation.melee == "DEMONHUNTER" and annotation.specialization == "vengeance" then
+		local fmt = [[
+			AddFunction %sGetInMeleeRange
+			{
+				if CheckBoxOn(opt_melee_range) and not target.InRange(shear) Texture(misc_arrowlup help=L(not_in_melee_range))
+			}
+		]]
+		local code = format(fmt, camelSpecialization)
+		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		annotation.functionTag[node.name] = "shortcd"
+		AddSymbol(annotation, "shear")
+		count = count + 1
+	end
+	if annotation.melee == "DEMONHUNTER" and annotation.specialization == "havoc" then
+		local fmt = [[
+			AddFunction %sInterruptActions
+			{
+				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+				{
+					if target.InRange(consume_magic) Spell(consume_magic)
+					if not target.Classification(worldboss) 
+					{
+						if target.Distance(less 8) Spell(arcane_torrent_dh)
+						Spell(fel_eruption)
+						if target.CreatureType(Demon) Spell(imprison)
+					}
+				}
 			}
 		]]
 		local code = format(fmt, camelSpecialization)
@@ -4245,6 +4289,46 @@ local function InsertSupportingFunctions(child, annotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "shortcd"
 		AddSymbol(annotation, "consume_magic")
+		AddSymbol(annotation, "arcane_torrent_dh")
+		AddSymbol(annotation, "fel_eruption")
+		AddSymbol(annotation, "imprison")
+		count = count + 1
+	end
+	if annotation.melee == "DEMONHUNTER" and annotation.specialization == "vengeance" then
+		local fmt = [[
+			AddFunction %sInterruptActions
+			{
+				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+				{
+					if target.InRange(consume_magic) Spell(consume_magic)
+					if not target.Classification(worldboss) 
+					{
+						unless SigilCharging(silence misery chains)
+						{
+							if (target.RemainingCastTime() >= 2 or (target.RemainingCastTime() >= 1 and Talent(quickened_sigils_talent))) Spell(sigil_of_silence)
+							if target.Distance(less 8) Spell(arcane_torrent_dh)
+							Spell(sigil_of_misery)
+							Spell(fel_eruption)
+							if target.CreatureType(Demon) Spell(imprison)
+							Spell(sigil_of_chains)
+							if target.IsTargetingPlayer() Spell(empower_wards)
+						}
+					}
+				}
+			}
+		]]
+		local code = format(fmt, camelSpecialization)
+		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		annotation.functionTag[node.name] = "shortcd"
+		AddSymbol(annotation, "consume_magic")
+		AddSymbol(annotation, "sigil_of_silence")
+		AddSymbol(annotation, "arcane_torrent_dh")
+		AddSymbol(annotation, "sigil_of_misery")
+		AddSymbol(annotation, "fel_eruption")
+		AddSymbol(annotation, "imprison")
+		AddSymbol(annotation, "sigil_of_chains")
+		AddSymbol(annotation, "empower_wards")
 		count = count + 1
 	end
 	if annotation.skull_bash == "DRUID" then
