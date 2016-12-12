@@ -16,11 +16,16 @@ AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=brewmaster)
 AddCheckBox(opt_legendary_ring_tank ItemName(legendary_ring_bonus_armor) default specialization=brewmaster)
 AddCheckBox(opt_monk_bm_aoe L(AOE) default specialization=brewmaster)
 
+AddFunction BrewmasterExpelHarmOffensivelyPreConditions
+{
+	(SpellCount(expel_harm) >= 3 and (SpellCount(expel_harm) * 7.5 * AttackPower() * 2.65) <= HealthMissing()) and Spell(expel_harm)
+}
+
 AddFunction BrewmasterHealMe
 {
-	if (SpellCount(expel_harm) >= 1 and HealthPercent() < 35) Spell(expel_harm)
 	if (HealthPercent() < 35) Spell(healing_elixir)
-	if (HealthPercent() < 70 and (SpellCharges(healing_elixir) == 2)) Spell(healing_elixir)
+	if (SpellCount(expel_harm) >= 1 and HealthPercent() < 35) Spell(expel_harm)
+	if (HealthPercent() <= 100 - (15 * 2.6)) Spell(healing_elixir)
 }
 
 AddFunction BrewmasterDefaultShortCDActions
@@ -34,7 +39,7 @@ AddFunction BrewmasterDefaultShortCDActions
 	# range check
 	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
 	
-	unless DebuffPresent(heavy_stagger_debuff) or BrewmasterHealMe()
+	unless DebuffPresent(heavy_stagger_debuff) or BrewmasterHealMe() or StaggerRemaining() == 0
 	{
 		# purify moderate stagger
 		if (DebuffPresent(moderate_stagger_debuff) and (not Talent(elusive_dance_talent) or not BuffPresent(elusive_dance_buff))) Spell(purifying_brew)
@@ -51,25 +56,62 @@ AddFunction BrewmasterDefaultShortCDActions
 			if (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3) Spell(ironskin_brew)
 			# keep brew-stache rolling
 			if (HasArtifactTrait(brew_stache_trait) and not BuffPresent(brew_stache_buff)) Spell(ironskin_brew text=stache)
-			# keep up ironskin_brew_buff but keep 2 charges ready for purifying when light_brewing_talent or elusive_dance_talent
-			if (not HasArtifactTrait(brew_stache_trait) and (BuffExpires(ironskin_brew_buff 2) and ((not Talent(light_brewing_talent) and not Talent(elusive_dance_talent)) or SpellCharges(purifying_brew) > 1))) Spell(ironskin_brew)
+			# keep up ironskin_brew_buff but keep 2 charges ready for purifying when elusive_dance_talent
+			if (BuffExpires(ironskin_brew_buff 2) and (not Talent(elusive_dance_talent) or SpellCharges(purifying_brew) >= 2)) Spell(ironskin_brew)
 		}
 	}
 }
+
+#
+# Single-Target
+#
 
 AddFunction BrewmasterDefaultMainActions
 {
 	Spell(keg_smash)
 	if EnergyDeficit() <= 35 Spell(tiger_palm)
-	Spell(blackout_strike)
-	Spell(rushing_jade_wind)
-	if target.DebuffPresent(keg_smash_debuff) Spell(breath_of_fire)
-	Spell(exploding_keg)
-	Spell(chi_burst)
-	Spell(chi_wave)
-	# use expel_harm offensively but avoid overhealing
-	if (SpellCount(expel_harm) >= 3 and (SpellCount(expel_harm) * 7.5 * AttackPower() * 2.65) <= HealthMissing()) Spell(expel_harm)
+	unless EnergyDeficit() <= 35
+	{
+		Spell(blackout_strike)
+		Spell(rushing_jade_wind)
+		if target.DebuffPresent(keg_smash_debuff) Spell(breath_of_fire)
+		Spell(exploding_keg)
+		Spell(chi_burst)
+		Spell(chi_wave)
+		if BrewmasterExpelHarmOffensivelyPreConditions() Spell(expel_harm)
+	}
 }
+
+AddFunction BrewmasterBlackoutComboMainActions
+{
+	if(not BuffPresent(blackout_combo_buff)) Spell(blackout_strike)
+	if(BuffPresent(blackout_combo_buff)) 
+	{
+		Spell(keg_smash)
+		unless (SpellCooldown(keg_smash) < GCD())
+		{
+			Spell(breath_of_fire)
+			Spell(tiger_palm)
+		}
+	}
+	
+	unless (BuffPresent(blackout_combo_buff)) 
+	{
+		Spell(rushing_jade_wind)
+		Spell(chi_burst)
+		Spell(chi_wave)
+		if EnergyDeficit() <= 35 Spell(tiger_palm)
+		unless EnergyDeficit() <= 35
+		{
+			if BrewmasterExpelHarmOffensivelyPreConditions() Spell(expel_harm)
+			Spell(exploding_keg)
+		}
+	}
+}
+
+#
+# AOE
+#
 
 AddFunction BrewmasterDefaultAoEActions
 {
@@ -80,9 +122,35 @@ AddFunction BrewmasterDefaultAoEActions
 	if target.DebuffPresent(keg_smash_debuff) Spell(breath_of_fire)
 	Spell(rushing_jade_wind)
 	if EnergyDeficit() <= 35 Spell(tiger_palm)
-	Spell(blackout_strike)
-	# use expel_harm offensively but avoid overhealing
-	if (SpellCount(expel_harm) >= 3 and (SpellCount(expel_harm) * 7.5 * AttackPower() * 2.65) <= HealthMissing()) Spell(expel_harm)
+	unless EnergyDeficit() <= 35
+	{
+		Spell(blackout_strike)
+		if BrewmasterExpelHarmOffensivelyPreConditions() Spell(expel_harm)
+	}
+}
+
+AddFunction BrewmasterBlackoutComboAoEActions
+{
+	if(not BuffPresent(blackout_combo_buff)) Spell(blackout_strike)
+	if(BuffPresent(blackout_combo_buff)) 
+	{
+		Spell(keg_smash)
+		Spell(breath_of_fire)
+		Spell(tiger_palm)
+	}
+	
+	unless (BuffPresent(blackout_combo_buff)) 
+	{
+		Spell(exploding_keg)
+		Spell(rushing_jade_wind)
+		Spell(chi_burst)
+		Spell(chi_wave)
+		if EnergyDeficit() <= 35 Spell(tiger_palm)
+		unless EnergyDeficit() <= 35
+		{
+			if BrewmasterExpelHarmOffensivelyPreConditions() Spell(expel_harm)
+		}
+	}
 }
 
 AddFunction BrewmasterDefaultCdActions 
@@ -108,8 +176,12 @@ AddFunction BrewmasterInterruptActions
 			if target.InRange(quaking_palm) Spell(quaking_palm)
 			if target.Distance(less 8) Spell(war_stomp)
 			if target.Distance(less 5) Spell(leg_sweep)
-			if target.IsTargetingPlayer() Spell(diffuse_magic)
-			if target.IsTargetingPlayer() Spell(zen_meditation)
+		}
+		if target.IsTargetingPlayer() 
+		{
+			Spell(diffuse_magic)
+			Spell(zen_meditation)
+			Spell(dampen_harm)
 		}
 	}
 }
@@ -121,12 +193,20 @@ AddIcon help=shortcd specialization=brewmaster
 
 AddIcon enemies=1 help=main specialization=brewmaster
 {
-	BrewmasterDefaultMainActions()
+	if Talent(blackout_combo_talent) BrewmasterBlackoutComboMainActions()
+	unless Talent(blackout_combo_talent) 
+	{
+		BrewmasterDefaultMainActions()
+	}
 }
 
 AddIcon checkbox=opt_monk_bm_aoe help=aoe specialization=brewmaster
 {
-	BrewmasterDefaultAoEActions()
+	if Talent(blackout_combo_talent) BrewmasterBlackoutComboAoEActions()
+	unless Talent(blackout_combo_talent) 
+	{
+		BrewmasterDefaultAoEActions()
+	}
 }
 
 AddIcon help=cd specialization=brewmaster
