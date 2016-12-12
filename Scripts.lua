@@ -151,8 +151,10 @@ function OvaleScripts:GetDefaultScriptName(class, specialization)
 			name = "simulationcraft_death_knight_unholy_t19p"
 		end
 	elseif class == "DEMONHUNTER" then
-		if specialization then 
-			name = format("icyveins_demonhunter_%s", specialization)
+		if specialization == "vengeance" then 
+			name = "icyveins_demonhunter_vengeance"
+		elseif specialization == "havoc" then
+			name = "simulationcraft_demon_hunter_havoc_t19p"
 		end
 	elseif class == "DRUID" then
 		if specialization == "restoration" then
