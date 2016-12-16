@@ -28,7 +28,7 @@ AddFunction VengeanceDefaultShortCDActions
 {
 	VengeanceHealMe()
 	if (InCombat() and (Charges(demon_spikes) == 2)) Spell(demon_spikes)
-	if (IncomingDamage(10 physical=1) > 0 and not target.DebuffPresent(fiery_brand_debuff) and BuffExpires(metamorphosis_veng_buff)) Spell(demon_spikes)
+	if (InCombat() and IncomingDamage(10 physical=1) > 0 and not target.DebuffPresent(fiery_brand_debuff) and BuffExpires(metamorphosis_veng_buff)) Spell(demon_spikes)
 	if (CheckBoxOn(opt_melee_range) and not target.InRange(shear))
 	{
 		if (target.InRange(felblade)) Spell(felblade)
@@ -40,15 +40,16 @@ AddFunction VengeanceDefaultShortCDActions
 
 AddFunction VengeanceDefaultMainActions
 {
-	if (BuffStacks(soul_fragments) <= 1) Spell(soul_carver)
+	if (not VengeancePlayDefensively() and HasArtifactTrait(fiery_demise)) Spell(fiery_brand)
+	if (not VengeancePlayDefensively() or BuffStacks(soul_fragments) <= 1) Spell(soul_carver)
 	if (not VengeancePlayDefensively()) Spell(fel_devastation)
 	if (Pain() >= 80) Spell(soul_barrier)
 	if (Pain() >= 80) Spell(soul_cleave)
 	Spell(immolation_aura)
 	Spell(felblade)
 	Spell(fel_eruption)
-	if (target.DebuffExpires(frailty_debuff)) Spell(spirit_bomb)
-	#if (BuffPresent(blade_turning_buff)) Spell(shear)
+	if (BuffStacks(soul_fragments) >= 1 and target.DebuffExpires(frailty_debuff)) Spell(spirit_bomb)
+	if (BuffPresent(blade_turning_buff)) Spell(shear)
 	if (not VengeancePlayDefensively() and Pain() >= 60) Spell(fracture)
 	if (not SigilCharging(flame) and ((target.BuffExpires(sigil_of_flame_debuff 2) and not Talent(quickened_sigils_talent)) or target.BuffExpires(sigil_of_flame_debuff 1)))
 	{
@@ -64,10 +65,11 @@ AddFunction VengeanceDefaultAoEActions
 	if (not VengeancePlayDefensively()) Spell(fel_devastation)
 	if (Pain() >= 80) Spell(soul_barrier)
 	if (Pain() >= 80) Spell(soul_cleave)
+	if (not VengeancePlayDefensively() and Talent(burning_alive_talent)) Spell(fiery_brand)
 	Spell(immolation_aura)
-	if (target.DebuffExpires(frailty_debuff)) Spell(spirit_bomb)
+	if (BuffStacks(soul_fragments) >= 1 and target.DebuffExpires(frailty_debuff)) Spell(spirit_bomb)
 	Spell(felblade)
-	#if (BuffPresent(blade_turning_buff)) Spell(shear)
+	if (BuffPresent(blade_turning_buff)) Spell(shear)
 	if (not SigilCharging(flame) and ((target.BuffExpires(sigil_of_flame_debuff 2) and not Talent(quickened_sigils_talent)) or target.BuffExpires(sigil_of_flame_debuff 1)))
 	{
 		if (Talent(flame_crash_talent) and (SpellCharges(infernal_strike) >= SpellMaxCharges(infernal_strike))) Spell(infernal_strike)
@@ -94,7 +96,7 @@ AddFunction VengeanceInterruptActions
 		if target.InRange(consume_magic) Spell(consume_magic)
 		if not target.Classification(worldboss) and not SigilCharging(silence misery chains)
 		{
-			if (target.RemainingCastTime() >= 2 or (target.RemainingCastTime() >= 1 and Talent(quickened_sigils_talent))) 
+			if (target.RemainingCastTime() >= (2 - Talent(quickened_sigils_talent) + GCDRemaining()))
 			{
 				Spell(sigil_of_silence)
 				Spell(sigil_of_misery)

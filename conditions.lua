@@ -1739,7 +1739,10 @@ do
 			local spellcast = OvaleFuture:LastInFlightSpell()
 			local start = (spellcast and spellcast.start) or 0
 			local ending = start + duration
-			return TestValue(start, INFINITY, 0, ending, -1, comparator, limit)
+			
+			if atTime < ending then
+				return TestValue(start, INFINITY, 0, ending, -1, comparator, limit)
+			end
 		end
 		return Compare(0, comparator, limit)
 	end
