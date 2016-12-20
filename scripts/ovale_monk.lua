@@ -44,7 +44,7 @@ AddFunction BrewmasterDefaultShortCDActions
 		# purify moderate stagger
 		if (DebuffPresent(moderate_stagger_debuff) and (not Talent(elusive_dance_talent) or not BuffPresent(elusive_dance_buff))) Spell(purifying_brew)
 		# always keep 1 charge unless black_ox_brew is coming off cd
-		unless not (SpellCharges(ironskin_brew) > 1 or SpellCooldown(black_ox_brew) <= 3)
+		unless not (SpellCharges(ironskin_brew) > 1 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3))
 		{
 			# keep elusive dance up
 			if (Talent(elusive_dance_talent) and (BuffAmount(elusive_dance_buff value=3) < 10 and DebuffPresent(moderate_stagger_debuff))) Spell(purifying_brew)
