@@ -17,54 +17,42 @@ AddCheckBox(opt_legendary_ring_tank ItemName(legendary_ring_bonus_armor) default
 
 AddFunction BloodDefaultShortCDActions
 {
-	Spell(death_and_decay)
 	if CheckBoxOn(opt_melee_range) and not target.InRange(death_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
 	if not BuffPresent(rune_tap_buff) Spell(rune_tap)
-	if RuneCount() < 6 Spell(blood_tap)
+	if RuneCount() <= 2 Spell(blood_tap)
 }
 
 AddFunction BloodDefaultMainActions
 {
 	BloodHealMe()
-	if InCombat() and not BuffPresent(bone_shield_buff) Spell(marrowrend)
+	if InCombat() and BuffExpires(bone_shield_buff 3) Spell(marrowrend)
 	if not Talent(soulgorge_talent) and target.DebuffRemaining(blood_plague_debuff) < 8 Spell(blood_boil)
 	if target.DebuffRemaining(blood_plague_debuff) < 8 Spell(deaths_caress)
-	Spell(consumption)
-	if not BuffPresent(death_and_decay_buff) and BuffPresent(crimson_scourge_buff) Spell(death_and_decay)
-	if (BuffStacks(bone_shield_buff) <= 1 or (Talent(ossuary_talent) and BuffStacks(bone_shield_buff) <5)) Spell(marrowrend)
-	if not target.DebuffPresent(mark_of_blood_debuff) Spell(mark_of_blood)
+	if not BuffPresent(death_and_decay_buff) and BuffPresent(crimson_scourge_buff) and Talent(rapid_decomposition_talent) Spell(death_and_decay)
 	if RunicPowerDeficit() <= 20 Spell(death_strike)
-	if BuffStacks(bone_shield_buff) <5 Spell(blood_boil)
-	
-	unless (BuffStacks(bone_shield_buff) <= 1 or (Talent(ossuary_talent) and BuffStacks(bone_shield_buff) <5))
-	{
-		if BuffStacks(bone_shield_buff) <= 7 Spell(marrowrend)
-		if not BuffPresent(death_and_decay_buff) and target.TimeToDie() >= 8 Spell(death_and_decay)
-		Spell(heart_strike)
-		Spell(blood_boil)
-	}
+	if (BuffStacks(bone_shield_buff) <= 1 or (Talent(ossuary_talent) and BuffStacks(bone_shield_buff) < 5)) Spell(marrowrend)
+	if not BuffPresent(death_and_decay_buff) and RuneCount() >= 3 and Talent(rapid_decomposition_talent) Spell(death_and_decay)
+	if not target.DebuffPresent(mark_of_blood_debuff) Spell(mark_of_blood)
+	if not (BuffStacks(bone_shield_buff) <= 1 or (Talent(ossuary_talent) and BuffStacks(bone_shield_buff) < 5)) and (RuneCount() >= 3 or RunicPower() < 45) Spell(heart_strike)
+	Spell(consumption)
+	Spell(blood_boil)
 }
 
 AddFunction BloodDefaultAoEActions
 {
 	BloodHealMe()
-	if InCombat() and not BuffPresent(bone_shield_buff) Spell(marrowrend)
+	if InCombat() and BuffExpires(bone_shield_buff 3) Spell(marrowrend)
 	if not Talent(soulgorge_talent) and target.DebuffRemaining(blood_plague_debuff) < 8 Spell(blood_boil)
 	if target.DebuffRemaining(blood_plague_debuff) < 8 Spell(deaths_caress)
-	Spell(consumption)
-	if RunicPower() >= 80 Spell(bonestorm)
-	if not BuffPresent(death_and_decay_buff) Spell(death_and_decay)
+	if not BuffPresent(death_and_decay_buff) and BuffPresent(crimson_scourge_buff) Spell(death_and_decay)
 	if RunicPowerDeficit() <= 20 Spell(death_strike)
-	if (BuffStacks(bone_shield_buff) <= 1 or (Talent(ossuary_talent) and BuffStacks(bone_shield_buff) <5)) Spell(marrowrend)
+	if (BuffStacks(bone_shield_buff) <= 1 or (Talent(ossuary_talent) and BuffStacks(bone_shield_buff) < 5)) Spell(marrowrend)
+	if not BuffPresent(death_and_decay_buff) and Enemies() >= 3 Spell(death_and_decay)
 	if not target.DebuffPresent(mark_of_blood_debuff) Spell(mark_of_blood)
-	if BuffStacks(bone_shield_buff) <5 Spell(blood_boil)
-		
-	unless (BuffStacks(bone_shield_buff) <= 1 or (Talent(ossuary_talent) and BuffStacks(bone_shield_buff) <5))
-	{
-		if BuffStacks(bone_shield_buff) <= 7 Spell(marrowrend)
-		Spell(heart_strike)
-		Spell(blood_boil)
-	}
+	if not (BuffStacks(bone_shield_buff) <= 1 or (Talent(ossuary_talent) and BuffStacks(bone_shield_buff) < 5)) and (RuneCount() >= 3 or RunicPower() < 45) Spell(heart_strike)
+	Spell(consumption)
+	Spell(blood_boil)
+
 }
 
 AddFunction BloodHealMe
@@ -72,6 +60,7 @@ AddFunction BloodHealMe
 	if HealthPercent() <= 70 Spell(death_strike)
 	if (DamageTaken(5) * 0.2) > (Health() / 100 * 25) Spell(death_strike)
 	if (BuffStacks(bone_shield_buff) * 3) > (100 - HealthPercent()) Spell(tombstone)
+	if HealthPercent() <= 70 Spell(consumption)
 }
 
 AddFunction BloodDefaultCdActions
