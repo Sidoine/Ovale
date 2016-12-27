@@ -63,7 +63,7 @@ AddFunction ProtectionDefaultShortCDActions
 
 AddFunction ProtectionCooldownTreshold
 {
-	IncomingDamage(2.5) > MaxHealth() * 0.3 or HealthPercent() < 40
+	HealthPercent() <= 100
 }
 
 AddFunction ProtectionUsePotionStrength
