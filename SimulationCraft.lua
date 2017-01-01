@@ -1691,7 +1691,7 @@ EmitConditionNode = function(nodeList, bodyNode, conditionNode, parseNode, annot
 	end
 end
 
-EmitNamedVariable = function(name, nodeList, annotation, modifier, parseNode, action)
+EmitNamedVariable = function(name, nodeList, annotation, modifier, parseNode, action, conditionNode)
 	if not annotation.variable then
 		annotation.variable = {}
 	end
@@ -1710,7 +1710,7 @@ EmitNamedVariable = function(name, nodeList, annotation, modifier, parseNode, ac
 		group = node.child[1]
 	end 
 	local value = Emit(modifier.value, nodeList, annotation, action)
-	local newNode = EmitConditionNode(nodeList, value, nil, parseNode, annotation, action)
+	local newNode = EmitConditionNode(nodeList, value, conditionNode or nil, parseNode, annotation, action)
 	if newNode.type == "if" then
 		-- As Ovale stops at first value that is true, the if need to be in inverse order 
 		tinsert(group.child, 1, newNode)
@@ -1730,7 +1730,7 @@ EmitVariableMin = function(name, nodeList, annotation, modifier, parseNode, acti
 	annotation.variable[name] = node
 end
 
-EmitVariable = function(nodeList, annotation, modifier, parseNode, action)
+EmitVariable = function(nodeList, annotation, modifier, parseNode, action, conditionNode)
 	if not annotation.variable then
 		annotation.variable = {}
 	end
@@ -1740,7 +1740,7 @@ EmitVariable = function(nodeList, annotation, modifier, parseNode, action)
 	if op == "min" then
 		EmitVariableMin(name, nodeList, annotation, modifier, parseNode, action) 
 	elseif op == "set" then
-		EmitNamedVariable(name, nodeList, annotation, modifier, parseNode, action)
+		EmitNamedVariable(name, nodeList, annotation, modifier, parseNode, action, conditionNode)
 	else
 		OvaleSimulationCraft:Error("Unknown variable operator '%s'.", op)
 	end
@@ -2060,6 +2060,13 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif action == "auto_attack" then
 			bodyCode = camelSpecialization .. "GetInMeleeRange()"
 			isSpellAction = false
+		elseif class == "DEMONHUNTER" and action == "variable" and Unparse(modifier.name) == "pooling_for_meta" then
+			-- Add a checkbox asking whether to only pool for meta during boss fights
+			local conditionCode = "not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()"
+			local conditionNode = OvaleAST:ParseCode(expressionType, conditionCode, nodeList, annotation.astAnnotation)
+			EmitVariable(nodeList, annotation, modifier, parseNode, action, conditionNode)
+			isSpellAction = false
+			annotation.pooling_for_meta = class
 		elseif action == "variable" then
 			EmitVariable(nodeList, annotation, modifier, parseNode, action)
 			isSpellAction = false
@@ -4878,6 +4885,16 @@ local function InsertSupportingControls(child, annotation)
 			local node = OvaleAST:ParseCode("list_item", code, nodeList, annotation.astAnnotation)
 			tinsert(child, 1, node)
 		end
+	end
+	if annotation.pooling_for_meta == "DEMONHUNTER" then
+		local fmt = [[
+			AddCheckBox(opt_meta_only_during_boss L(meta_only_during_boss) default %s)
+		]]
+		local code = format(fmt, ifSpecialization)
+		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		AddSymbol(annotation, "metamorphosis_havoc")
+		count = count + 1
 	end
 	if annotation.volley == "HUNTER" then
 		local fmt = [[
