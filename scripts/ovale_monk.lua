@@ -379,6 +379,14 @@ AddFunction WindwalkerDefaultCdPostConditions
 
 AddFunction WindwalkerCdMainActions
 {
+	#touch_of_death,cycle_targets=1,max_cycle_targets=2,if=!artifact.gale_burst.enabled&equipped.137057&!prev_gcd.touch_of_death
+	if DebuffCountOnAny(touch_of_death_debuff) < Enemies() and DebuffCountOnAny(touch_of_death_debuff) <= 2 and not HasArtifactTrait(gale_burst) and HasEquippedItem(137057) and not PreviousGCDSpell(touch_of_death) Spell(touch_of_death)
+	#touch_of_death,if=!artifact.gale_burst.enabled&!equipped.137057
+	if not HasArtifactTrait(gale_burst) and not HasEquippedItem(137057) Spell(touch_of_death)
+	#touch_of_death,cycle_targets=1,max_cycle_targets=2,if=artifact.gale_burst.enabled&equipped.137057&cooldown.strike_of_the_windlord.remains<8&cooldown.fists_of_fury.remains<=4&cooldown.rising_sun_kick.remains<7&!prev_gcd.touch_of_death
+	if DebuffCountOnAny(touch_of_death_debuff) < Enemies() and DebuffCountOnAny(touch_of_death_debuff) <= 2 and HasArtifactTrait(gale_burst) and HasEquippedItem(137057) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 4 and SpellCooldown(rising_sun_kick) < 7 and not PreviousGCDSpell(touch_of_death) Spell(touch_of_death)
+	#touch_of_death,if=artifact.gale_burst.enabled&!equipped.137057&cooldown.strike_of_the_windlord.remains<8&cooldown.fists_of_fury.remains<=4&cooldown.rising_sun_kick.remains<7
+	if HasArtifactTrait(gale_burst) and not HasEquippedItem(137057) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 4 and SpellCooldown(rising_sun_kick) < 7 Spell(touch_of_death)
 }
 
 AddFunction WindwalkerCdMainPostConditions
@@ -391,6 +399,7 @@ AddFunction WindwalkerCdShortCdActions
 
 AddFunction WindwalkerCdShortCdPostConditions
 {
+	DebuffCountOnAny(touch_of_death_debuff) < Enemies() and DebuffCountOnAny(touch_of_death_debuff) <= 2 and not HasArtifactTrait(gale_burst) and HasEquippedItem(137057) and not PreviousGCDSpell(touch_of_death) and Spell(touch_of_death) or not HasArtifactTrait(gale_burst) and not HasEquippedItem(137057) and Spell(touch_of_death) or DebuffCountOnAny(touch_of_death_debuff) < Enemies() and DebuffCountOnAny(touch_of_death_debuff) <= 2 and HasArtifactTrait(gale_burst) and HasEquippedItem(137057) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 4 and SpellCooldown(rising_sun_kick) < 7 and not PreviousGCDSpell(touch_of_death) and Spell(touch_of_death) or HasArtifactTrait(gale_burst) and not HasEquippedItem(137057) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 4 and SpellCooldown(rising_sun_kick) < 7 and Spell(touch_of_death)
 }
 
 AddFunction WindwalkerCdCdActions
@@ -401,18 +410,11 @@ AddFunction WindwalkerCdCdActions
 	Spell(blood_fury_apsp)
 	#berserking
 	Spell(berserking)
-	#touch_of_death,cycle_targets=1,max_cycle_targets=2,if=!artifact.gale_burst.enabled&equipped.137057&!prev_gcd.touch_of_death
-	if DebuffCountOnAny(touch_of_death_debuff) < Enemies() and DebuffCountOnAny(touch_of_death_debuff) <= 2 and not HasArtifactTrait(gale_burst) and HasEquippedItem(137057) and not PreviousGCDSpell(touch_of_death) Spell(touch_of_death)
-	#touch_of_death,if=!artifact.gale_burst.enabled&!equipped.137057
-	if not HasArtifactTrait(gale_burst) and not HasEquippedItem(137057) Spell(touch_of_death)
-	#touch_of_death,cycle_targets=1,max_cycle_targets=2,if=artifact.gale_burst.enabled&equipped.137057&cooldown.strike_of_the_windlord.remains<8&cooldown.fists_of_fury.remains<=4&cooldown.rising_sun_kick.remains<7&!prev_gcd.touch_of_death
-	if DebuffCountOnAny(touch_of_death_debuff) < Enemies() and DebuffCountOnAny(touch_of_death_debuff) <= 2 and HasArtifactTrait(gale_burst) and HasEquippedItem(137057) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 4 and SpellCooldown(rising_sun_kick) < 7 and not PreviousGCDSpell(touch_of_death) Spell(touch_of_death)
-	#touch_of_death,if=artifact.gale_burst.enabled&!equipped.137057&cooldown.strike_of_the_windlord.remains<8&cooldown.fists_of_fury.remains<=4&cooldown.rising_sun_kick.remains<7
-	if HasArtifactTrait(gale_burst) and not HasEquippedItem(137057) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 4 and SpellCooldown(rising_sun_kick) < 7 Spell(touch_of_death)
 }
 
 AddFunction WindwalkerCdCdPostConditions
 {
+	DebuffCountOnAny(touch_of_death_debuff) < Enemies() and DebuffCountOnAny(touch_of_death_debuff) <= 2 and not HasArtifactTrait(gale_burst) and HasEquippedItem(137057) and not PreviousGCDSpell(touch_of_death) and Spell(touch_of_death) or not HasArtifactTrait(gale_burst) and not HasEquippedItem(137057) and Spell(touch_of_death) or DebuffCountOnAny(touch_of_death_debuff) < Enemies() and DebuffCountOnAny(touch_of_death_debuff) <= 2 and HasArtifactTrait(gale_burst) and HasEquippedItem(137057) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 4 and SpellCooldown(rising_sun_kick) < 7 and not PreviousGCDSpell(touch_of_death) and Spell(touch_of_death) or HasArtifactTrait(gale_burst) and not HasEquippedItem(137057) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 4 and SpellCooldown(rising_sun_kick) < 7 and Spell(touch_of_death)
 }
 
 ### actions.precombat
@@ -475,8 +477,6 @@ AddFunction WindwalkerSefShortCdActions
 
 	unless WindwalkerCdShortCdPostConditions()
 	{
-		#storm_earth_and_fire
-		if CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff) Spell(storm_earth_and_fire)
 		#call_action_list,name=st
 		WindwalkerStShortCdActions()
 	}
@@ -494,8 +494,10 @@ AddFunction WindwalkerSefCdActions
 	#call_action_list,name=cd
 	WindwalkerCdCdActions()
 
-	unless WindwalkerCdCdPostConditions() or CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff) and Spell(storm_earth_and_fire)
+	unless WindwalkerCdCdPostConditions()
 	{
+		#storm_earth_and_fire
+		if CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff) Spell(storm_earth_and_fire)
 		#call_action_list,name=st
 		WindwalkerStCdActions()
 	}
@@ -503,7 +505,7 @@ AddFunction WindwalkerSefCdActions
 
 AddFunction WindwalkerSefCdPostConditions
 {
-	WindwalkerCdCdPostConditions() or CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff) and Spell(storm_earth_and_fire) or WindwalkerStCdPostConditions()
+	WindwalkerCdCdPostConditions() or WindwalkerStCdPostConditions()
 }
 
 ### actions.serenity
@@ -594,6 +596,8 @@ AddFunction WindwalkerStMainActions
 		if { Chi() > 1 or BuffPresent(bok_proc_buff) } and not PreviousGCDSpell(blackout_kick) Spell(blackout_kick)
 		#chi_wave,if=energy.time_to_max>=2.25
 		if TimeToMaxEnergy() >= 2.25 Spell(chi_wave)
+		#chi_burst,if=energy.time_to_max>=2.25
+		if TimeToMaxEnergy() >= 2.25 and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
 		#tiger_palm,cycle_targets=1,if=!prev_gcd.tiger_palm
 		if not PreviousGCDSpell(tiger_palm) Spell(tiger_palm)
 	}
@@ -613,18 +617,12 @@ AddFunction WindwalkerStShortCdActions
 	{
 		#energizing_elixir,if=energy<energy.max&chi<=1
 		if Energy() < MaxEnergy() and Chi() <= 1 Spell(energizing_elixir)
-
-		unless { Talent(serenity_talent) or Enemies() < 6 } and Spell(strike_of_the_windlord) or Spell(fists_of_fury) or Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or MaxChi() - Chi() > 1 and not PreviousGCDSpell(rushing_jade_wind) and Spell(rushing_jade_wind) or { Chi() > 1 or BuffPresent(bok_proc_buff) } and not PreviousGCDSpell(blackout_kick) and Spell(blackout_kick) or TimeToMaxEnergy() >= 2.25 and Spell(chi_wave)
-		{
-			#chi_burst,if=energy.time_to_max>=2.25
-			if TimeToMaxEnergy() >= 2.25 and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
-		}
 	}
 }
 
 AddFunction WindwalkerStShortCdPostConditions
 {
-	WindwalkerCdShortCdPostConditions() or { Talent(serenity_talent) or Enemies() < 6 } and Spell(strike_of_the_windlord) or Spell(fists_of_fury) or Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or MaxChi() - Chi() > 1 and not PreviousGCDSpell(rushing_jade_wind) and Spell(rushing_jade_wind) or { Chi() > 1 or BuffPresent(bok_proc_buff) } and not PreviousGCDSpell(blackout_kick) and Spell(blackout_kick) or TimeToMaxEnergy() >= 2.25 and Spell(chi_wave) or not PreviousGCDSpell(tiger_palm) and Spell(tiger_palm)
+	WindwalkerCdShortCdPostConditions() or { Talent(serenity_talent) or Enemies() < 6 } and Spell(strike_of_the_windlord) or Spell(fists_of_fury) or Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or MaxChi() - Chi() > 1 and not PreviousGCDSpell(rushing_jade_wind) and Spell(rushing_jade_wind) or { Chi() > 1 or BuffPresent(bok_proc_buff) } and not PreviousGCDSpell(blackout_kick) and Spell(blackout_kick) or TimeToMaxEnergy() >= 2.25 and Spell(chi_wave) or TimeToMaxEnergy() >= 2.25 and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or not PreviousGCDSpell(tiger_palm) and Spell(tiger_palm)
 }
 
 AddFunction WindwalkerStCdActions
