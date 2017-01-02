@@ -26,8 +26,8 @@ AddFunction BloodDefaultMainActions
 {
 	BloodHealMe()
 	if InCombat() and BuffExpires(bone_shield_buff 3) Spell(marrowrend)
-	if not Talent(soulgorge_talent) and target.DebuffRemaining(blood_plague_debuff) < 8 Spell(blood_boil)
-	if target.DebuffRemaining(blood_plague_debuff) < 8 Spell(deaths_caress)
+	if not Talent(soulgorge_talent) and DebuffCountOnAny(blood_plague_debuff) < Enemies() Spell(blood_boil)
+	if target.DebuffRefreshable(blood_plague_debuff) Spell(deaths_caress)
 	if not BuffPresent(death_and_decay_buff) and BuffPresent(crimson_scourge_buff) and Talent(rapid_decomposition_talent) Spell(death_and_decay)
 	if RunicPowerDeficit() <= 20 Spell(death_strike)
 	if BuffStacks(bone_shield_buff) <= 2+4*Talent(ossuary_talent) Spell(marrowrend)
@@ -42,8 +42,7 @@ AddFunction BloodDefaultAoEActions
 {
 	BloodHealMe()
 	if InCombat() and BuffExpires(bone_shield_buff 3) Spell(marrowrend)
-	if not Talent(soulgorge_talent) and target.DebuffRemaining(blood_plague_debuff) < 8 Spell(blood_boil)
-	if target.DebuffRemaining(blood_plague_debuff) < 8 Spell(deaths_caress)
+	if not Talent(soulgorge_talent) and DebuffCountOnAny(blood_plague_debuff) < Enemies() Spell(blood_boil)
 	if not BuffPresent(death_and_decay_buff) and BuffPresent(crimson_scourge_buff) Spell(death_and_decay)
 	if RunicPowerDeficit() <= 20 Spell(death_strike)
 	if BuffStacks(bone_shield_buff) <= 2+4*Talent(ossuary_talent) Spell(marrowrend)
@@ -52,7 +51,7 @@ AddFunction BloodDefaultAoEActions
 	if not (BuffStacks(bone_shield_buff) <= 1 or (Talent(ossuary_talent) and BuffStacks(bone_shield_buff) < 5)) and (Rune() >= 3 or RunicPower() < 45) Spell(heart_strike)
 	Spell(consumption)
 	Spell(blood_boil)
-
+	if target.DebuffRefreshable(blood_plague_debuff) Spell(deaths_caress)
 }
 
 AddFunction BloodHealMe
