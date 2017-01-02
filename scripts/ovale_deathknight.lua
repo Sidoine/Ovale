@@ -19,7 +19,7 @@ AddFunction BloodDefaultShortCDActions
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(death_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
 	if not BuffPresent(rune_tap_buff) Spell(rune_tap)
-	if RuneCount() <= 2 Spell(blood_tap)
+	if Rune() <= 2 Spell(blood_tap)
 }
 
 AddFunction BloodDefaultMainActions
@@ -31,9 +31,9 @@ AddFunction BloodDefaultMainActions
 	if not BuffPresent(death_and_decay_buff) and BuffPresent(crimson_scourge_buff) and Talent(rapid_decomposition_talent) Spell(death_and_decay)
 	if RunicPowerDeficit() <= 20 Spell(death_strike)
 	if (BuffStacks(bone_shield_buff) <= 1 or (Talent(ossuary_talent) and BuffStacks(bone_shield_buff) < 5)) Spell(marrowrend)
-	if not BuffPresent(death_and_decay_buff) and RuneCount() >= 3 and Talent(rapid_decomposition_talent) Spell(death_and_decay)
+	if not BuffPresent(death_and_decay_buff) and Rune() >= 3 and Talent(rapid_decomposition_talent) Spell(death_and_decay)
 	if not target.DebuffPresent(mark_of_blood_debuff) Spell(mark_of_blood)
-	if not (BuffStacks(bone_shield_buff) <= 1 or (Talent(ossuary_talent) and BuffStacks(bone_shield_buff) < 5)) and (RuneCount() >= 3 or RunicPower() < 45) Spell(heart_strike)
+	if not (BuffStacks(bone_shield_buff) <= 1 or (Talent(ossuary_talent) and BuffStacks(bone_shield_buff) < 5)) and (Rune() >= 3 or RunicPower() < 45) Spell(heart_strike)
 	Spell(consumption)
 	Spell(blood_boil)
 }
@@ -49,7 +49,7 @@ AddFunction BloodDefaultAoEActions
 	if (BuffStacks(bone_shield_buff) <= 1 or (Talent(ossuary_talent) and BuffStacks(bone_shield_buff) < 5)) Spell(marrowrend)
 	if not BuffPresent(death_and_decay_buff) and Enemies() >= 3 Spell(death_and_decay)
 	if not target.DebuffPresent(mark_of_blood_debuff) Spell(mark_of_blood)
-	if not (BuffStacks(bone_shield_buff) <= 1 or (Talent(ossuary_talent) and BuffStacks(bone_shield_buff) < 5)) and (RuneCount() >= 3 or RunicPower() < 45) Spell(heart_strike)
+	if not (BuffStacks(bone_shield_buff) <= 1 or (Talent(ossuary_talent) and BuffStacks(bone_shield_buff) < 5)) and (Rune() >= 3 or RunicPower() < 45) Spell(heart_strike)
 	Spell(consumption)
 	Spell(blood_boil)
 
