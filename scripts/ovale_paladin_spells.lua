@@ -326,11 +326,6 @@ Define(word_of_glory 85673)
 SpellList(word_of_glory_no_holy_buff bastion_of_power_buff divine_purpose_buff lawful_words_buff)
 Define(zeal 217020)
 	SpellInfo(zeal cd=4.5 holy=-1)
-
-# Talents
-Define(bastion_of_light_talent 5)
-Define(righteous_protector_talent 19)
-Define(seraphim_talent 20)
 Define(zeal_talent 5)
 ]]
 
