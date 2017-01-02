@@ -33,7 +33,7 @@ AddFunction BloodDefaultMainActions
 	if BuffStacks(bone_shield_buff) <= 2+4*Talent(ossuary_talent) Spell(marrowrend)
 	if not BuffPresent(death_and_decay_buff) and Rune() >= 3 and Talent(rapid_decomposition_talent) Spell(death_and_decay)
 	if not target.DebuffPresent(mark_of_blood_debuff) Spell(mark_of_blood)
-	if not (BuffStacks(bone_shield_buff) <= 1 or (Talent(ossuary_talent) and BuffStacks(bone_shield_buff) < 5)) and (Rune() >= 3 or RunicPower() < 45) Spell(heart_strike)
+	if Rune() >= 3 or RunicPower() < 45 Spell(heart_strike)
 	Spell(consumption)
 	Spell(blood_boil)
 }
@@ -48,7 +48,7 @@ AddFunction BloodDefaultAoEActions
 	if BuffStacks(bone_shield_buff) <= 2+4*Talent(ossuary_talent) Spell(marrowrend)
 	if not BuffPresent(death_and_decay_buff) and Enemies() >= 3 Spell(death_and_decay)
 	if not target.DebuffPresent(mark_of_blood_debuff) Spell(mark_of_blood)
-	if not (BuffStacks(bone_shield_buff) <= 1 or (Talent(ossuary_talent) and BuffStacks(bone_shield_buff) < 5)) and (Rune() >= 3 or RunicPower() < 45) Spell(heart_strike)
+	if Rune() >= 3 or RunicPower() < 45 Spell(heart_strike)
 	Spell(consumption)
 	Spell(blood_boil)
 	if target.DebuffRefreshable(blood_plague_debuff) Spell(deaths_caress)
