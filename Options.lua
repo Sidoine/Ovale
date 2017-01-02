@@ -493,6 +493,8 @@ end
 function OvaleOptions:HandleProfileChanges()
 	self:SendMessage("Ovale_ProfileChanged")
 	self:SendMessage("Ovale_ScriptChanged")
+	self:SendMessage("Ovale_OptionChanged", "layout")
+	self:SendMessage("Ovale_OptionChanged", "visibility")
 end
 
 function OvaleOptions:ToggleConfig()

@@ -361,7 +361,7 @@ do
 
 			local width, height, newScale
 			local nbIcons
-			if (node.namedParams.size == "small") then
+			if (node.namedParams ~= nil and node.namedParams.size == "small") then
 				newScale = profile.apparence.smallIconScale
 				width = newScale * 36 + margin
 				height = newScale * 36 + margin
@@ -416,7 +416,7 @@ do
 				icon:SetScale(scale)
 				icon:SetFontScale(profile.apparence.fontScale)
 				icon:SetParams(node.positionalParams, node.namedParams)
-				icon:SetHelp(node.namedParams.help)
+				icon:SetHelp((node.namedParams ~= nil and node.namedParams.help) or nil)
 				icon:SetRangeIndicator(profile.apparence.targetText)
 				icon:EnableMouse(not profile.apparence.clickThru)
 				icon.cdShown = (l == 1)
