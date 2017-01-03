@@ -157,7 +157,7 @@ Include(ovale_demonhunter_spells)
 
 AddFunction pooling_for_meta
 {
-	SpellCooldown(metamorphosis_havoc) == 0 and BuffExpires(metamorphosis_havoc_buff) and { not Talent(demonic_talent) or not SpellCooldown(eye_beam) == 0 } and { not Talent(chaos_blades_talent) or SpellCooldown(chaos_blades) == 0 } and { not Talent(nemesis_talent) or target.DebuffPresent(nemesis_debuff) or SpellCooldown(nemesis) == 0 }
+	if not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight() SpellCooldown(metamorphosis_havoc) == 0 and BuffExpires(metamorphosis_havoc_buff) and { not Talent(demonic_talent) or not SpellCooldown(eye_beam) == 0 } and { not Talent(chaos_blades_talent) or SpellCooldown(chaos_blades) == 0 } and { not Talent(nemesis_talent) or target.DebuffPresent(nemesis_debuff) or SpellCooldown(nemesis) == 0 }
 }
 
 AddFunction pooling_for_blade_dance
@@ -172,6 +172,7 @@ AddFunction blade_dance
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=havoc)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=havoc)
+AddCheckBox(opt_meta_only_during_boss L(meta_only_during_boss) default specialization=havoc)
 
 AddFunction HavocUseItemActions
 {

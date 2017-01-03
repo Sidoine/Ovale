@@ -23,6 +23,7 @@ local OvaleRunes = Ovale.OvaleRunes
 local OvaleSpellBook = Ovale.OvaleSpellBook
 local OvaleSpellDamage = Ovale.OvaleSpellDamage
 local OvaleArtifact = Ovale.OvaleArtifact
+local OvaleBossMod = Ovale.OvaleBossMod
 
 local floor = math.floor
 local ipairs = ipairs
@@ -5167,4 +5168,23 @@ do
 	end
 	
 	OvaleCondition:RegisterCondition("sigilcharging", false, SigilCharging)
+end
+
+do
+	--- Test with DBM or BigWigs whether a boss is currently engaged
+	-- @name IsBossFight
+	-- @return A boolean value.
+	-- @usage
+	-- if IsBossFight() Spell(metamorphisis)
+	local function IsBossFight(positionalParams, namedParams, state, atTime)
+		if not OvaleBossMod:HasBossMod() then
+			-- we don't have a boss mod, assume we are in a boss fight anyway
+			return 0, INFINITY
+		end
+		
+		local bossEngaged = OvaleBossMod:HasBossMod() and OvaleBossMod:IsBossEngaged()
+		return TestBoolean(bossEngaged, "yes")
+	end
+	
+	OvaleCondition:RegisterCondition("isbossfight", false, IsBossFight)
 end
