@@ -18,6 +18,11 @@ AddFunction VengeancePlayDefensively
 	CheckBoxOn(opt_demonhunter_vengeance_defensive)
 }
 
+AddFunction VengeancePlayOffensively
+{
+	not VengeancePlayDefensively()
+}
+
 AddFunction VengeanceHealMe
 {
 	if (HealthPercent() < 70) Spell(fel_devastation)
@@ -42,8 +47,8 @@ AddFunction VengeanceDefaultMainActions
 {
 	VengeanceHealMe()
 	if (not VengeancePlayDefensively() and HasArtifactTrait(fiery_demise)) Spell(fiery_brand)
-	if (not VengeancePlayDefensively() or BuffStacks(soul_fragments) <= 1) Spell(soul_carver)
-	if (not VengeancePlayDefensively()) Spell(fel_devastation)
+	if (VengeancePlayOffensively() or BuffStacks(soul_fragments) <= 1) Spell(soul_carver)
+	if (VengeancePlayOffensively()) Spell(fel_devastation)
 	if (Pain() >= 80) Spell(soul_barrier)
 	if (Pain() >= 80 and not Talent(fracture_talent)) Spell(soul_cleave)
 	Spell(immolation_aura)
@@ -51,7 +56,7 @@ AddFunction VengeanceDefaultMainActions
 	Spell(fel_eruption)
 	if (BuffStacks(soul_fragments) >= 1 and target.DebuffExpires(frailty_debuff)) Spell(spirit_bomb)
 	if (BuffPresent(blade_turning_buff)) Spell(shear)
-	if (not VengeancePlayDefensively() and Pain() >= 60) Spell(fracture)
+	if (VengeancePlayOffensively() and Pain() >= 60) Spell(fracture)
 	if (not SigilCharging(flame) and target.DebuffRemaining(sigil_of_flame_debuff) <= 2-Talent(quickened_sigils_talent))
 	{
 		if (Talent(flame_crash_talent) and (SpellCharges(infernal_strike) >= SpellMaxCharges(infernal_strike))) Spell(infernal_strike)
@@ -64,10 +69,10 @@ AddFunction VengeanceDefaultAoEActions
 {
 	VengeanceHealMe()
 	if (BuffStacks(soul_fragments) <= 1) Spell(soul_carver)
-	if (not VengeancePlayDefensively()) Spell(fel_devastation)
+	if (VengeancePlayOffensively()) Spell(fel_devastation)
 	if (Pain() >= 80) Spell(soul_barrier)
 	if (Pain() >= 80) Spell(soul_cleave)
-	if (not VengeancePlayDefensively() and Talent(burning_alive_talent)) Spell(fiery_brand)
+	if (VengeancePlayOffensively() and Talent(burning_alive_talent)) Spell(fiery_brand)
 	Spell(immolation_aura)
 	if (BuffStacks(soul_fragments) >= 1 and target.DebuffExpires(frailty_debuff)) Spell(spirit_bomb)
 	Spell(felblade)
