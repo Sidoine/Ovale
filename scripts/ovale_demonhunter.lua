@@ -46,7 +46,6 @@ AddFunction VengeanceDefaultShortCDActions
 AddFunction VengeanceDefaultMainActions
 {
 	VengeanceHealMe()
-	if (not VengeancePlayDefensively() and HasArtifactTrait(fiery_demise)) Spell(fiery_brand)
 	if (VengeancePlayOffensively() or BuffStacks(soul_fragments) <= 1) Spell(soul_carver)
 	if (VengeancePlayOffensively()) Spell(fel_devastation)
 	if (Pain() >= 80) Spell(soul_barrier)
