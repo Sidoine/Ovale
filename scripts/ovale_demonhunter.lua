@@ -50,7 +50,7 @@ AddFunction VengeanceDefaultMainActions
 	if (VengeancePlayOffensively() or BuffStacks(soul_fragments) <= 1) Spell(soul_carver)
 	if (VengeancePlayOffensively()) Spell(fel_devastation)
 	if (Pain() >= 80) Spell(soul_barrier)
-	if (Pain() >= 80 and not Talent(fracture_talent)) Spell(soul_cleave)
+	if (Pain() >= 80 and (not Talent(fracture_talent) or VengeancePlayDefensively())) Spell(soul_cleave)
 	Spell(immolation_aura)
 	Spell(felblade)
 	Spell(fel_eruption)
