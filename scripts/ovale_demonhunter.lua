@@ -26,7 +26,7 @@ AddFunction VengeanceHealMe
 }
 AddFunction VengeanceDefaultShortCDActions
 {
-	VengeanceHealMe()
+
 	if (InCombat() and (Charges(demon_spikes) == 2)) Spell(demon_spikes)
 	if (InCombat() and IncomingDamage(10 physical=1) > 0 and not target.DebuffPresent(fiery_brand_debuff) and BuffExpires(metamorphosis_veng_buff)) Spell(demon_spikes)
 	if (CheckBoxOn(opt_melee_range) and not target.InRange(shear))
@@ -40,6 +40,7 @@ AddFunction VengeanceDefaultShortCDActions
 
 AddFunction VengeanceDefaultMainActions
 {
+	VengeanceHealMe()
 	if (not VengeancePlayDefensively() and HasArtifactTrait(fiery_demise)) Spell(fiery_brand)
 	if (not VengeancePlayDefensively() or BuffStacks(soul_fragments) <= 1) Spell(soul_carver)
 	if (not VengeancePlayDefensively()) Spell(fel_devastation)
@@ -61,6 +62,7 @@ AddFunction VengeanceDefaultMainActions
 
 AddFunction VengeanceDefaultAoEActions
 {
+	VengeanceHealMe()
 	if (BuffStacks(soul_fragments) <= 1) Spell(soul_carver)
 	if (not VengeancePlayDefensively()) Spell(fel_devastation)
 	if (Pain() >= 80) Spell(soul_barrier)
