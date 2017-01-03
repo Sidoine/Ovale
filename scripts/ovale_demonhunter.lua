@@ -24,9 +24,9 @@ AddFunction VengeanceHealMe
 	if (HealthPercent() < 50) Spell(soul_cleave)
 	if (IncomingDamage(5) >= MaxHealth() * 0.7) Spell(soul_cleave)
 }
+
 AddFunction VengeanceDefaultShortCDActions
 {
-
 	if (InCombat() and (Charges(demon_spikes) == 2)) Spell(demon_spikes)
 	if (InCombat() and IncomingDamage(10 physical=1) > 0 and not target.DebuffPresent(fiery_brand_debuff) and BuffExpires(metamorphosis_veng_buff)) Spell(demon_spikes)
 	if (CheckBoxOn(opt_melee_range) and not target.InRange(shear))
