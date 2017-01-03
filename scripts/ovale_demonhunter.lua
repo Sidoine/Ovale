@@ -52,7 +52,7 @@ AddFunction VengeanceDefaultMainActions
 	if (BuffStacks(soul_fragments) >= 1 and target.DebuffExpires(frailty_debuff)) Spell(spirit_bomb)
 	if (BuffPresent(blade_turning_buff)) Spell(shear)
 	if (not VengeancePlayDefensively() and Pain() >= 60) Spell(fracture)
-	if (not SigilCharging(flame) and ((target.BuffExpires(sigil_of_flame_debuff 2) and not Talent(quickened_sigils_talent)) or target.BuffExpires(sigil_of_flame_debuff 1)))
+	if (not SigilCharging(flame) and target.DebuffRemaining(sigil_of_flame_debuff) <= 2-Talent(quickened_sigils_talent))
 	{
 		if (Talent(flame_crash_talent) and (SpellCharges(infernal_strike) >= SpellMaxCharges(infernal_strike))) Spell(infernal_strike)
 		Spell(sigil_of_flame)
@@ -72,7 +72,7 @@ AddFunction VengeanceDefaultAoEActions
 	if (BuffStacks(soul_fragments) >= 1 and target.DebuffExpires(frailty_debuff)) Spell(spirit_bomb)
 	Spell(felblade)
 	if (BuffPresent(blade_turning_buff)) Spell(shear)
-	if (not SigilCharging(flame) and ((target.BuffExpires(sigil_of_flame_debuff 2) and not Talent(quickened_sigils_talent)) or target.BuffExpires(sigil_of_flame_debuff 1)))
+	if (not SigilCharging(flame) and target.DebuffRemaining(sigil_of_flame_debuff) <= 2-Talent(quickened_sigils_talent))
 	{
 		if (Talent(flame_crash_talent) and (SpellCharges(infernal_strike) >= SpellMaxCharges(infernal_strike))) Spell(infernal_strike)
 		Spell(sigil_of_flame)
