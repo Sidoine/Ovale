@@ -16,7 +16,7 @@ AddCheckBox(opt_legendary_ring_tank ItemName(legendary_ring_bonus_armor) default
 
 AddFunction ProtectionDefaultMainActions
 {
-	if Charges(shield_of_the_righteous) < 1 and not BuffPresent(shield_of_the_righteous_buff) and ProtectionCooldownTreshold() and (not Talent(bastion_of_light_talent) or SpellCooldown(bastion_of_light) == 0) Spell(eye_of_tyr)
+	if Charges(shield_of_the_righteous) <= 2*Talent(seraphim_talent) and not BuffPresent(shield_of_the_righteous_buff) and ProtectionCooldownTreshold() and (not Talent(bastion_of_light_talent) or SpellCooldown(bastion_of_light) == 0) Spell(eye_of_tyr)
 	if Talent(blessed_hammer_talent) Spell(blessed_hammer)
 	Spell(judgment)
 	if Talent(crusaders_judgment_talent) and BuffPresent(grand_crusader_buff) Spell(avengers_shield)
@@ -29,7 +29,7 @@ AddFunction ProtectionDefaultMainActions
 
 AddFunction ProtectionDefaultAoEActions
 {
-	if Charges(shield_of_the_righteous) < 1 and not BuffPresent(shield_of_the_righteous_buff) and ProtectionCooldownTreshold() and (not Talent(bastion_of_light_talent) or SpellCooldown(bastion_of_light) == 0) Spell(eye_of_tyr)
+	if Charges(shield_of_the_righteous) <= 2*Talent(seraphim_talent) and not BuffPresent(shield_of_the_righteous_buff) and ProtectionCooldownTreshold() and (not Talent(bastion_of_light_talent) or SpellCooldown(bastion_of_light) == 0) Spell(eye_of_tyr)
 	Spell(avengers_shield)
 	if not Talent(consecrated_hammer_talent) and not BuffPresent(consecration_buff) Spell(consecration)
 	if Talent(blessed_hammer_talent) Spell(blessed_hammer)
