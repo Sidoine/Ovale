@@ -81,26 +81,17 @@ AddCheckBox(opt_avenging_wrath SpellName(avenging_wrath_melee) default specializ
 AddFunction ProtectionDefaultCdActions
 {
 	ProtectionInterruptActions()
-	#avenging_wrath
 	if CheckBoxOn(opt_avenging_wrath) and (not Talent(seraphim_talent) or BuffPresent(seraphim_buff)) Spell(avenging_wrath_melee)
 	
-	#ardent_defender,if=incoming_damage_2500ms>health.max*0.4&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
 	if ProtectionCooldownTreshold() Spell(ardent_defender)
-	#aegis_of_light,if=incoming_damage_2500ms>health.max*0.4&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
 	if ProtectionCooldownTreshold() Spell(aegis_of_light)
-	#guardian_of_ancient_kings,if=incoming_damage_2500ms>health.max*0.4&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
 	if ProtectionCooldownTreshold() Spell(guardian_of_ancient_kings)
-	#divine_shield,if=talent.final_stand.enabled&incoming_damage_2500ms>health.max*0.4&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
 	if not DebuffPresent(forbearance_debuff) and Talent(final_stand_talent) and ProtectionCooldownTreshold() Spell(divine_shield)
-	#lay_on_hands,if=health.pct<15
 	if not DebuffPresent(forbearance_debuff) and HealthPercent() < 15 Spell(lay_on_hands)
-	#potion,name=unbending_potion
-	#potion,name=draenic_strength,if=incoming_damage_2500ms>health.max*0.4&&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)|target.time_to_die<=25
-	if ProtectionCooldownTreshold() or target.TimeToDie() <= 25 ProtectionUsePotionStrength()
-	#stoneform,if=incoming_damage_2500ms>health.max*0.4&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
-	if ProtectionCooldownTreshold() Spell(stoneform)
-	#divine_steed,if=talent.knight_templar.enabled&incoming_damage_2500ms>health.max*0.4&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
+
 	if Talent(knight_templar_talent) and ProtectionCooldownTreshold() Spell(divine_steed)
+	if ProtectionCooldownTreshold() or target.TimeToDie() <= 25 ProtectionUsePotionStrength()
+	if ProtectionCooldownTreshold() Spell(stoneform)
 }
 
 AddFunction ProtectionInterruptActions
