@@ -25,6 +25,7 @@ end
 function OvaleBossMod:OnEnable()
 	-- hook into DBM if DBM is loaded
 	if DBM then
+		self:Debug("DBM is loaded")
 		hooksecurefunc(DBM, "StartCombat", function(DBM, mod, delay, event, ...)
 			if event ~= "TIMER_RECOVERY" then
 				OvaleBossMod.EngagedDBM = mod
@@ -35,10 +36,11 @@ function OvaleBossMod:OnEnable()
 		end)
 	end
 	if BigWigsLoader then
-		BigWigsLoader.RegisterMessage(owner, "BigWigs_OnBossEngage", function(_, mod, diff)
+		self:Debug("BigWigs is loaded")
+		BigWigsLoader.RegisterMessage(OvaleBossMod, "BigWigs_OnBossEngage", function(_, mod, diff)
 			OvaleBossMod.EngagedBigWigs = mod
 		end)
-		BigWigsLoader.RegisterMessage(owner, "BigWigs_OnBossDisable", function(_, mod)
+		BigWigsLoader.RegisterMessage(OvaleBossMod, "BigWigs_OnBossDisable", function(_, mod)
 			OvaleBossMod.EngagedBigWigs = nil
 		end)
 	end
