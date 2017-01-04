@@ -5176,7 +5176,7 @@ do
 	-- @name IsBossFight
 	-- @return A boolean value.
 	-- @usage
-	-- if IsBossFight() Spell(metamorphisis)
+	-- if IsBossFight() Spell(metamorphosis_havoc)
 	local function IsBossFight(positionalParams, namedParams, state, atTime)
 		local bossEngaged = state.inCombat and OvaleBossMod:IsBossEngaged(state)
 		return TestBoolean(bossEngaged, "yes")
