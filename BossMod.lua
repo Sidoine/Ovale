@@ -59,7 +59,7 @@ function OvaleBossMod:IsBossEngaged(state)
 	local neitherEngaged = (DBM == nil and BigWigsLoader == nil and OvaleBossMod:ScanTargets()) -- neither
 	
 	if dbmEngaged then
-		self:Debug("DBM Engaged: [id=%s]", OvaleBossMod.EngagedDBM.id)
+		self:Debug("DBM Engaged: [id=%s]", OvaleBossMod.EngagedDBM.localization.general.name)
 	end
 	if bigWigsEngaged then
 		self:Debug("BigWigs Engaged: [displayName=%s]", OvaleBossMod.EngagedBigWigs.displayName)
