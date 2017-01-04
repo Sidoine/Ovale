@@ -69,7 +69,7 @@ AddFunction ProtectionCooldownTreshold
 {
 	HealthPercent() <= 100 
 		and not { target.DebuffPresent(eye_of_tyr_debuff) or BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff) }
-		and { not Talent(seraphim_talent) or BuffPresent(seraphim_buff) }
+		and not { not Talent(seraphim_talent) or BuffPresent(seraphim_buff) }
 }
 
 AddFunction ProtectionUsePotionStrength
