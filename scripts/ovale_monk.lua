@@ -379,14 +379,6 @@ AddFunction WindwalkerDefaultCdPostConditions
 
 AddFunction WindwalkerCdMainActions
 {
-	#touch_of_death,cycle_targets=1,max_cycle_targets=2,if=!artifact.gale_burst.enabled&equipped.137057&!prev_gcd.touch_of_death
-	if DebuffCountOnAny(touch_of_death_debuff) < Enemies() and DebuffCountOnAny(touch_of_death_debuff) <= 2 and not HasArtifactTrait(gale_burst) and HasEquippedItem(137057) and not PreviousGCDSpell(touch_of_death) Spell(touch_of_death)
-	#touch_of_death,if=!artifact.gale_burst.enabled&!equipped.137057
-	if not HasArtifactTrait(gale_burst) and not HasEquippedItem(137057) Spell(touch_of_death)
-	#touch_of_death,cycle_targets=1,max_cycle_targets=2,if=artifact.gale_burst.enabled&equipped.137057&cooldown.strike_of_the_windlord.remains<8&cooldown.fists_of_fury.remains<=4&cooldown.rising_sun_kick.remains<7&!prev_gcd.touch_of_death
-	if DebuffCountOnAny(touch_of_death_debuff) < Enemies() and DebuffCountOnAny(touch_of_death_debuff) <= 2 and HasArtifactTrait(gale_burst) and HasEquippedItem(137057) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 4 and SpellCooldown(rising_sun_kick) < 7 and not PreviousGCDSpell(touch_of_death) Spell(touch_of_death)
-	#touch_of_death,if=artifact.gale_burst.enabled&!equipped.137057&cooldown.strike_of_the_windlord.remains<8&cooldown.fists_of_fury.remains<=4&cooldown.rising_sun_kick.remains<7
-	if HasArtifactTrait(gale_burst) and not HasEquippedItem(137057) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 4 and SpellCooldown(rising_sun_kick) < 7 Spell(touch_of_death)
 }
 
 AddFunction WindwalkerCdMainPostConditions
@@ -399,7 +391,6 @@ AddFunction WindwalkerCdShortCdActions
 
 AddFunction WindwalkerCdShortCdPostConditions
 {
-	DebuffCountOnAny(touch_of_death_debuff) < Enemies() and DebuffCountOnAny(touch_of_death_debuff) <= 2 and not HasArtifactTrait(gale_burst) and HasEquippedItem(137057) and not PreviousGCDSpell(touch_of_death) and Spell(touch_of_death) or not HasArtifactTrait(gale_burst) and not HasEquippedItem(137057) and Spell(touch_of_death) or DebuffCountOnAny(touch_of_death_debuff) < Enemies() and DebuffCountOnAny(touch_of_death_debuff) <= 2 and HasArtifactTrait(gale_burst) and HasEquippedItem(137057) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 4 and SpellCooldown(rising_sun_kick) < 7 and not PreviousGCDSpell(touch_of_death) and Spell(touch_of_death) or HasArtifactTrait(gale_burst) and not HasEquippedItem(137057) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 4 and SpellCooldown(rising_sun_kick) < 7 and Spell(touch_of_death)
 }
 
 AddFunction WindwalkerCdCdActions
@@ -410,11 +401,18 @@ AddFunction WindwalkerCdCdActions
 	Spell(blood_fury_apsp)
 	#berserking
 	Spell(berserking)
+	#touch_of_death,cycle_targets=1,max_cycle_targets=2,if=!artifact.gale_burst.enabled&equipped.137057&!prev_gcd.touch_of_death
+	if DebuffCountOnAny(touch_of_death_debuff) < Enemies() and DebuffCountOnAny(touch_of_death_debuff) <= 2 and not HasArtifactTrait(gale_burst) and HasEquippedItem(137057) and not PreviousGCDSpell(touch_of_death) Spell(touch_of_death)
+	#touch_of_death,if=!artifact.gale_burst.enabled&!equipped.137057
+	if not HasArtifactTrait(gale_burst) and not HasEquippedItem(137057) Spell(touch_of_death)
+	#touch_of_death,cycle_targets=1,max_cycle_targets=2,if=artifact.gale_burst.enabled&equipped.137057&cooldown.strike_of_the_windlord.remains<8&cooldown.fists_of_fury.remains<=4&cooldown.rising_sun_kick.remains<7&!prev_gcd.touch_of_death
+	if DebuffCountOnAny(touch_of_death_debuff) < Enemies() and DebuffCountOnAny(touch_of_death_debuff) <= 2 and HasArtifactTrait(gale_burst) and HasEquippedItem(137057) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 4 and SpellCooldown(rising_sun_kick) < 7 and not PreviousGCDSpell(touch_of_death) Spell(touch_of_death)
+	#touch_of_death,if=artifact.gale_burst.enabled&!equipped.137057&cooldown.strike_of_the_windlord.remains<8&cooldown.fists_of_fury.remains<=4&cooldown.rising_sun_kick.remains<7
+	if HasArtifactTrait(gale_burst) and not HasEquippedItem(137057) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 4 and SpellCooldown(rising_sun_kick) < 7 Spell(touch_of_death)
 }
 
 AddFunction WindwalkerCdCdPostConditions
 {
-	DebuffCountOnAny(touch_of_death_debuff) < Enemies() and DebuffCountOnAny(touch_of_death_debuff) <= 2 and not HasArtifactTrait(gale_burst) and HasEquippedItem(137057) and not PreviousGCDSpell(touch_of_death) and Spell(touch_of_death) or not HasArtifactTrait(gale_burst) and not HasEquippedItem(137057) and Spell(touch_of_death) or DebuffCountOnAny(touch_of_death_debuff) < Enemies() and DebuffCountOnAny(touch_of_death_debuff) <= 2 and HasArtifactTrait(gale_burst) and HasEquippedItem(137057) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 4 and SpellCooldown(rising_sun_kick) < 7 and not PreviousGCDSpell(touch_of_death) and Spell(touch_of_death) or HasArtifactTrait(gale_burst) and not HasEquippedItem(137057) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 4 and SpellCooldown(rising_sun_kick) < 7 and Spell(touch_of_death)
 }
 
 ### actions.precombat
