@@ -50,10 +50,24 @@ function OvaleBossMod:OnDisable()
 	
 end
 
-function OvaleBossMod:IsBossEngaged()
-	return (DBM ~= nil and OvaleBossMod.EngagedDBM ~= nil and OvaleBossMod.EngagedDBM.inCombat) -- DBM
-		or (BigWigsLoader ~= nil and OvaleBossMod.EngagedBigWigs ~= nil and OvaleBossMod.EngagedBigWigs.isEngaged)-- Bigwigs
-		or (DBM == nil and BigWigsLoader == nil and OvaleBossMod:ScanTargets()) -- neither
+function OvaleBossMod:IsBossEngaged(state)
+	-- return false when we're not in combat, no reason to check
+	if not state.inCombat then
+		return false
+	end
+	
+	local dbmEngaged = (DBM ~= nil and OvaleBossMod.EngagedDBM ~= nil and OvaleBossMod.EngagedDBM.inCombat) -- DBM
+	local bigWigsEngaged = (BigWigsLoader ~= nil and OvaleBossMod.EngagedBigWigs ~= nil and OvaleBossMod.EngagedBigWigs.isEngaged)-- Bigwigs
+	local neitherEngaged = (DBM == nil and BigWigsLoader == nil and OvaleBossMod:ScanTargets()) -- neither
+	
+	if dbmEngaged then
+		self:Debug("DBM Engaged: [name=%s]", OvaleBossMod.EngagedDBM.localization.general.name)
+	end
+	if bigWigsEngaged then
+		self:Debug("BigWigs Engaged: [name=%s]", OvaleBossMod.EngagedBigWigs.displayName)
+	end
+	
+	return dbmEngaged or bigWigsEngaged or neitherEngaged
 end
 
 function OvaleBossMod:ScanTargets()
@@ -75,8 +89,6 @@ function OvaleBossMod:ScanTargets()
 	bossEngaged = bossEngaged or API_UnitExists("boss1") or API_UnitExists("boss2") or API_UnitExists("boss3") or API_UnitExists("boss4")
 
 	-- scan targets for worldbosses
-	local t = "target"
-
 	bossEngaged = bossEngaged 
 		or RecursiveScanTargets("target") 
 		or RecursiveScanTargets("pet") 
