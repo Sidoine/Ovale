@@ -4253,7 +4253,11 @@ local function InsertSupportingFunctions(child, annotation)
 		local fmt = [[
 			AddFunction %sGetInMeleeRange
 			{
-				if CheckBoxOn(opt_melee_range) and not target.InRange(demons_bite) Texture(misc_arrowlup help=L(not_in_melee_range))
+				if CheckBoxOn(opt_melee_range) and not target.InRange(demons_bite) 
+				{
+					Spell(felblade)
+					Texture(misc_arrowlup help=L(not_in_melee_range))
+				}
 			}
 		]]
 		local code = format(fmt, camelSpecialization)
