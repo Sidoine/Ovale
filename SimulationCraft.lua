@@ -3484,7 +3484,7 @@ EmitOperandRaidEvent = function(operand, parseNode, nodeList, annotation, action
 			-- Pretend the next "movement" raid event is ten minutes from now.
 			code = "600"
 		elseif property == "distance" then
-			code = "0"
+			code = "target.Distance()"
 		elseif property == "exists" then
 			code = "False(raid_event_movement_exists)"
 		elseif property == "remains" then
