@@ -16,28 +16,28 @@ AddCheckBox(opt_legendary_ring_tank ItemName(legendary_ring_bonus_armor) default
 
 AddFunction ProtectionDefaultMainActions
 {
-	if HasEquippedItem(heathcliffs_immortality) not BuffPresent(consecration_buff) Spell(consecration)
+	if Speed() == 0 and HasEquippedItem(heathcliffs_immortality) and not BuffPresent(consecration_buff) Spell(consecration)
 	if Charges(shield_of_the_righteous) <= 2*Talent(seraphim_talent) and not BuffPresent(shield_of_the_righteous_buff) and ProtectionCooldownTreshold() and (not Talent(bastion_of_light_talent) or SpellCooldown(bastion_of_light) == 0) Spell(eye_of_tyr)
 	if Talent(blessed_hammer_talent) Spell(blessed_hammer)
 	Spell(judgment)
 	if Talent(crusaders_judgment_talent) and BuffPresent(grand_crusader_buff) Spell(avengers_shield)
-	if not Talent(consecrated_hammer_talent) and not BuffPresent(consecration_buff) Spell(consecration)
+	if Speed() == 0 and not Talent(consecrated_hammer_talent) and not BuffPresent(consecration_buff) Spell(consecration)
 	Spell(avengers_shield)
 	Spell(blinding_light)
-	Spell(consecration)
+	if Speed() == 0 Spell(consecration)
 	Spell(hammer_of_the_righteous)
 }
 
 AddFunction ProtectionDefaultAoEActions
 {
-	if HasEquippedItem(heathcliffs_immortality) not BuffPresent(consecration_buff) Spell(consecration)
+	if Speed() == 0 and HasEquippedItem(heathcliffs_immortality) and not BuffPresent(consecration_buff) Spell(consecration)
 	if Charges(shield_of_the_righteous) <= 2*Talent(seraphim_talent) and not BuffPresent(shield_of_the_righteous_buff) and ProtectionCooldownTreshold() and (not Talent(bastion_of_light_talent) or SpellCooldown(bastion_of_light) == 0) Spell(eye_of_tyr)
 	Spell(avengers_shield)
-	if not Talent(consecrated_hammer_talent) and not BuffPresent(consecration_buff) Spell(consecration)
+	if Speed() == 0 and not Talent(consecrated_hammer_talent) and not BuffPresent(consecration_buff) Spell(consecration)
 	if Talent(blessed_hammer_talent) Spell(blessed_hammer)
 	Spell(judgment)
 	Spell(blinding_light)
-	Spell(consecration)
+	if Speed() == 0 Spell(consecration)
 	Spell(hammer_of_the_righteous)
 }
 
