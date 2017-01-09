@@ -5,6 +5,9 @@ do
 	local name = "ovale_paladin_spells"
 	local desc = "[7.0] Ovale: Paladin spells"
 	local code = [[
+# Items
+Define(heathcliffs_immortality 137047)
+	
 # Paladin spells and functions.
 
 # Learned spells.
