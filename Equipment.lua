@@ -568,16 +568,27 @@ function OvaleEquipment:GetEquippedTrinkets()
 	return self.equippedItems[INVSLOT_TRINKET1], self.equippedItems[INVSLOT_TRINKET2]
 end
 
-function OvaleEquipment:HasEquippedItem(itemId, ...)
-	local N = select("#", ...)
-	if N > 0 then
-		for n = 1, N do
-			local slotId = select(n, ...)
-			if slotId and type(slotId) ~= "number" then
-				slotId = OVALE_SLOTNAME[slotId]
-			end
-			if slotId and self.equippedItems[slotId] == itemId then
-				return slotId
+-- ... check for additional slots
+function OvaleEquipment:HasEquippedItem(itemId, slot, ...)
+	if (slot ~= nil) then
+		local slotId = slot
+		if type(slotId) ~= "number" then
+			slotId = OVALE_SLOTNAME[slotId]
+		end
+		if slotId and self.equippedItems[slotId] == itemId then
+			return slotId
+		end
+		
+		local additionalSlotsCount = select("#", ...)
+		if additionalSlotsCount > 0 then
+			for n = 1, additionalSlotsCount do
+				slotId = select(n, ...)
+				if slotId and type(slotId) ~= "number" then
+					slotId = OVALE_SLOTNAME[slotId]
+				end
+				if slotId and self.equippedItems[slotId] == itemId then
+					return slotId
+				end
 			end
 		end
 	else
