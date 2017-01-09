@@ -26,7 +26,7 @@ AddFunction BloodDefaultMainActions
 {
 	BloodHealMe()
 	if InCombat() and BuffExpires(bone_shield_buff 3) Spell(marrowrend)
-	if not Talent(soulgorge_talent) and DebuffCountOnAny(blood_plague_debuff) < Enemies() Spell(blood_boil)
+	if not Talent(soulgorge_talent) and target.DebuffRefreshable(blood_plague_debuff) Spell(blood_boil)
 	if target.DebuffRefreshable(blood_plague_debuff) Spell(deaths_caress)
 	if not BuffPresent(death_and_decay_buff) and BuffPresent(crimson_scourge_buff) and Talent(rapid_decomposition_talent) Spell(death_and_decay)
 	if RunicPower() >= 100 and target.TimeToDie() >= 10 Spell(bonestorm)
