@@ -49,7 +49,7 @@ AddFunction VengeanceDefaultMainActions
 {
 	VengeanceHealMe()
 	if (VengeancePlayOffensively() and HasArtifactTrait(fiery_demise) and target.TimeToDie() >= 8)) Spell(fiery_brand)
-	if (VengeancePlayOffensively() or BuffStacks(soul_fragments) <= 1) Spell(soul_carver)
+	if (VengeancePlayOffensively() or BuffStacks(soul_fragments) <= 2) Spell(soul_carver)
 	if (VengeancePlayOffensively()) Spell(fel_devastation)
 	if (Pain() >= 80) Spell(soul_barrier)
 	if (Pain() >= 80 and (not Talent(fracture_talent) or VengeancePlayDefensively())) Spell(soul_cleave)
@@ -70,7 +70,7 @@ AddFunction VengeanceDefaultMainActions
 AddFunction VengeanceDefaultAoEActions
 {
 	VengeanceHealMe()
-	if (BuffStacks(soul_fragments) <= 1) Spell(soul_carver)
+	if (BuffStacks(soul_fragments) <= 2) Spell(soul_carver)
 	if (VengeancePlayOffensively()) Spell(fel_devastation)
 	if (Pain() >= 80) Spell(soul_barrier)
 	if (Pain() >= 80) Spell(soul_cleave)
