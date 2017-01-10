@@ -28,7 +28,7 @@ AddFunction VengeancePlayOffensively
 AddFunction VengeanceHealMe
 {
 	if (HealthPercent() < 70) Spell(fel_devastation)
-	if (HealthPercent() < 50) Spell(soul_cleave)
+	if (HealthPercent() < 70) Spell(soul_cleave)
 	if (IncomingDamage(5) >= MaxHealth() * 0.7) Spell(soul_cleave)
 }
 
