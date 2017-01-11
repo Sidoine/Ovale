@@ -3038,6 +3038,7 @@ do
 		["finality"]			= "HasArtifactTrait(finality)",
 		["focus"]				= "Focus()",
 		["focus.deficit"]		= "FocusDeficit()",
+		["focus.max"]			= "MaxFocus()",
 		["focus.regen"]			= "FocusRegenRate()",
 		["focus.time_to_max"]	= "TimeToMaxFocus()",
 		["frost.frac"]			= "Rune(frost)",
@@ -3162,6 +3163,8 @@ do
 			-- "spell_haste" is the player's spell factor, e.g.,
 			-- 25% haste corresponds to a "spell_haste" value of 1/(1 + 0.25) = 0.8.
 			code = "100 / { 100 + SpellHaste() }"
+		elseif operand == "attack_haste" or operand == "stat.attack_haste" then
+			code = "100 / { 100 + MeleeHaste() }"
 		elseif strsub(operand, 1, 13) == "spell_targets" then
 			-- "spell_target.<spell>" is roughly equivalent to the number of enemies.
 			code = "Enemies()"

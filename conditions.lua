@@ -3916,6 +3916,18 @@ do
 	local function MeleeCritChance(positionalParams, namedParams, state, atTime)
 		return SnapshotCritChance("meleeCrit", 0, positionalParams, namedParams, state, atTime)
 	end
+	
+	--- Get the current percent increase to melee haste of the player.
+	-- @name MeleeHaste
+	-- @paramsig number or boolean
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The current percent increase to melee haste.
+	-- @return A boolean value for the result of the comparison.
+
+	local function MeleeHaste(positionalParams, namedParams, state, atTime)
+		return Snapshot("meleeHaste", 0, positionalParams, namedParams, state, atTime)
+	end
 
 	--- Get the current multistrike chance of the player.
 	-- @name MultistrikeChance
@@ -4028,6 +4040,7 @@ do
 	OvaleCondition:RegisterCondition("masteryeffect", false, MasteryEffect)
 	OvaleCondition:RegisterCondition("masteryrating", false, MasteryRating)
 	OvaleCondition:RegisterCondition("meleecritchance", false, MeleeCritChance)
+	OvaleCondition:RegisterCondition("meleehaste", false, MeleeHaste)
 	OvaleCondition:RegisterCondition("multistrikechance", false, MultistrikeChance)
 	OvaleCondition:RegisterCondition("rangedcritchance", false, RangedCritChance)
 	OvaleCondition:RegisterCondition("spellcritchance", false, SpellCritChance)
