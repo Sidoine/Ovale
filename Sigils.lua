@@ -46,15 +46,15 @@ local sigil_start = {
 	[204596] = { type="flame"}, -- Sigil of flame
 	[189111] = { type="flame", talent=8}, -- Infernal strike
 	[202137] = { type="silence"}, -- Sigil of Silence
-	-- [xxxxxx] = { type="misery"}, -- Sigil of Misery
-	-- [xxxxxx] = { type="chains"}, -- Sigil of Chains
+	[207684] = { type="misery"}, -- Sigil of Misery
+	[202138] = { type="chains"}, -- Sigil of Chains
 }
 
 local sigil_end = {
-	[208710] = { type="flame"},
-	[208709] = { type="silence"},
-	-- [xxxxxx] = { type="misery"},
-	-- [xxxxxx] = { type="chains"},
+	[204598] = { type="flame"},
+	[204490] = { type="silence"},
+	[207685] = { type="misery"},
+	[204834] = { type="chains"},
 }
 
 local QUICKENED_SIGILS_TALENT = 15
@@ -64,7 +64,7 @@ function OvaleSigil:UNIT_SPELLCAST_SUCCEEDED(event, unitId, spellName, spellRank
 	if (unitId == nil or unitId ~= "player") then return end
 
 	local id = tonumber(spellId)
-
+	--print(event .. " " .. spellName .. " " .. id)
 	-- queue all the sigils when they are cast
 	if (sigil_start[id] ~= nil) then
 		local s = sigil_start[id];

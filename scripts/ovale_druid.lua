@@ -619,7 +619,7 @@ AddFunction FeralDefaultShortCdActions
 		#wild_charge
 		FeralGetInMeleeRange()
 		#displacer_beast,if=movement.distance>10
-		if 0 > 10 Spell(displacer_beast)
+		if target.Distance() > 10 Spell(displacer_beast)
 
 		unless { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake)
 		{
@@ -660,10 +660,10 @@ AddFunction FeralDefaultCdActions
 	#dash,if=!buff.cat_form.up
 	if not BuffPresent(cat_form_buff) Spell(dash)
 
-	unless Spell(cat_form) or 0 > 10 and Spell(displacer_beast)
+	unless Spell(cat_form) or target.Distance() > 10 and Spell(displacer_beast)
 	{
 		#dash,if=movement.distance&buff.displacer_beast.down&buff.wild_charge_movement.down
-		if 0 and BuffExpires(displacer_beast_buff) and True(wild_charge_movement_down) Spell(dash)
+		if target.Distance() and BuffExpires(displacer_beast_buff) and True(wild_charge_movement_down) Spell(dash)
 
 		unless { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake)
 		{
@@ -701,7 +701,7 @@ AddFunction FeralDefaultCdActions
 
 AddFunction FeralDefaultCdPostConditions
 {
-	Spell(cat_form) or 0 > 10 and Spell(displacer_beast) or { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake) or target.DebuffPresent(rip_debuff) and target.DebuffRemaining(rip_debuff) < 3 and target.TimeToDie() > 3 and { target.HealthPercent() < 25 or Talent(sabertooth_talent) } and Spell(ferocious_bite) or Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and { ComboPoints() >= 5 or BuffRemaining(predatory_swiftness_buff) < 1.5 or Talent(bloodtalons_talent) and ComboPoints() == 2 and BuffExpires(bloodtalons_buff) and SpellCooldown(ashamanes_frenzy) < GCD() or Talent(elunes_guidance_talent) and { SpellCooldown(elunes_guidance) < GCD() and ComboPoints() == 0 or BuffPresent(elunes_guidance_buff) and ComboPoints() >= 4 } } and Spell(regrowth) or Talent(sabertooth_talent) and TimeInCombat() < 20 and FeralSbtOpenerCdPostConditions() or HasEquippedItem(ailuro_pouncers) and Talent(bloodtalons_talent) and BuffStacks(predatory_swiftness_buff) > 1 and BuffExpires(bloodtalons_buff) and Spell(regrowth) or FeralFinisherCdPostConditions() or FeralGeneratorCdPostConditions()
+	Spell(cat_form) or target.Distance() > 10 and Spell(displacer_beast) or { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake) or target.DebuffPresent(rip_debuff) and target.DebuffRemaining(rip_debuff) < 3 and target.TimeToDie() > 3 and { target.HealthPercent() < 25 or Talent(sabertooth_talent) } and Spell(ferocious_bite) or Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and { ComboPoints() >= 5 or BuffRemaining(predatory_swiftness_buff) < 1.5 or Talent(bloodtalons_talent) and ComboPoints() == 2 and BuffExpires(bloodtalons_buff) and SpellCooldown(ashamanes_frenzy) < GCD() or Talent(elunes_guidance_talent) and { SpellCooldown(elunes_guidance) < GCD() and ComboPoints() == 0 or BuffPresent(elunes_guidance_buff) and ComboPoints() >= 4 } } and Spell(regrowth) or Talent(sabertooth_talent) and TimeInCombat() < 20 and FeralSbtOpenerCdPostConditions() or HasEquippedItem(ailuro_pouncers) and Talent(bloodtalons_talent) and BuffStacks(predatory_swiftness_buff) > 1 and BuffExpires(bloodtalons_buff) and Spell(regrowth) or FeralFinisherCdPostConditions() or FeralGeneratorCdPostConditions()
 }
 
 ### actions.finisher

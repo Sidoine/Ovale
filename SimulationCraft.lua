@@ -1101,10 +1101,12 @@ local function InitializeDisambiguation()
 	AddDisambiguation("soul_reaper",			"soul_reaper_frost",			"DEATHKNIGHT",	"frost")
 	AddDisambiguation("soul_reaper",			"soul_reaper_unholy",			"DEATHKNIGHT",	"unholy")
 	-- Demon Hunter
-	AddDisambiguation("metamorphosis", 			"metamorphosis_veng", "DEMONHUNTER", "vengeance")
-	AddDisambiguation("metamorphosis_buff", 	"metamorphosis_veng_buff", "DEMONHUNTER", "vengeance")
-	AddDisambiguation("metamorphosis", 			"metamorphosis_havoc", "DEMONHUNTER", "havoc")
-	AddDisambiguation("metamorphosis_buff", 	"metamorphosis_havoc_buff", "DEMONHUNTER", "havoc")
+	AddDisambiguation("metamorphosis", 			"metamorphosis_veng", 			"DEMONHUNTER", "vengeance")
+	AddDisambiguation("metamorphosis_buff", 	"metamorphosis_veng_buff", 		"DEMONHUNTER", "vengeance")
+	AddDisambiguation("metamorphosis", 			"metamorphosis_havoc", 			"DEMONHUNTER", "havoc")
+	AddDisambiguation("metamorphosis_buff", 	"metamorphosis_havoc_buff", 	"DEMONHUNTER", "havoc")
+	AddDisambiguation("throw_glaive", 			"throw_glaive_veng", 			"DEMONHUNTER", "vengeance")
+	AddDisambiguation("throw_glaive", 			"throw_glaive_havoc", 			"DEMONHUNTER", "havoc")
 	-- Druid
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_energy",		"DRUID")
 	AddDisambiguation("berserk",				"berserk_bear",					"DRUID",		"guardian")
@@ -3225,7 +3227,7 @@ EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
 				code = format("%sChargeCooldown(%s)", prefix, name)
 			end
 		elseif property == "charges_fractional" then
-			code = format("%sCharges(%s)", prefix, name)
+			code = format("%sCharges(%s count=0)", prefix, name)
 		else
 			ok = false
 		end
@@ -3482,7 +3484,7 @@ EmitOperandRaidEvent = function(operand, parseNode, nodeList, annotation, action
 			-- Pretend the next "movement" raid event is ten minutes from now.
 			code = "600"
 		elseif property == "distance" then
-			code = "0"
+			code = "target.Distance()"
 		elseif property == "exists" then
 			code = "False(raid_event_movement_exists)"
 		elseif property == "remains" then
@@ -4251,7 +4253,11 @@ local function InsertSupportingFunctions(child, annotation)
 		local fmt = [[
 			AddFunction %sGetInMeleeRange
 			{
-				if CheckBoxOn(opt_melee_range) and not target.InRange(demons_bite) Texture(misc_arrowlup help=L(not_in_melee_range))
+				if CheckBoxOn(opt_melee_range) and not target.InRange(demons_bite) 
+				{
+					Spell(felblade)
+					Texture(misc_arrowlup help=L(not_in_melee_range))
+				}
 			}
 		]]
 		local code = format(fmt, camelSpecialization)
@@ -4285,6 +4291,7 @@ local function InsertSupportingFunctions(child, annotation)
 					if not target.Classification(worldboss) 
 					{
 						if target.Distance(less 8) Spell(arcane_torrent_dh)
+						if target.Distance(less 8) Spell(chaos_nova)
 						Spell(fel_eruption)
 						if target.CreatureType(Demon) Spell(imprison)
 					}
