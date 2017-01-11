@@ -5,6 +5,9 @@ do
 	local name = "ovale_paladin_spells"
 	local desc = "[7.0] Ovale: Paladin spells"
 	local code = [[
+# Items
+Define(heathcliffs_immortality 137047)
+	
 # Paladin spells and functions.
 
 # Learned spells.
@@ -35,6 +38,7 @@ Define(avenging_wrath_melee_buff 31884)
 	SpellInfo(avenging_wrath_melee_buff addduration=10 if_spell=sanctified_wrath)
 Define(bastion_of_light 204035)
 	SpellInfo(bastion_of_light cd=180 gcd=0 offgcd=1)
+Define(bastion_of_light_talent 5)
 Define(bastion_of_power_buff 144569)
 	SpellInfo(bastion_of_power_buff duration=20)
 Define(beacon_of_light 53563)
@@ -267,9 +271,7 @@ Define(maraads_truth_buff 156990)
 Define(rebuke 96231)
 	SpellInfo(rebuke cd=15 gcd=0 interrupt=1 offgcd=1)
 Define(redemption 7328)
-Define(righteous_fury 25780)
-	SpellAddBuff(righteous_fury righteous_fury_buff=toggle)
-Define(righteous_fury_buff 25780)
+Define(righteous_protector_talent 19)
 Define(sacred_shield 20925)
 	SpellInfo(sacred_shield cd=6)
 	SpellAddBuff(sacred_shield sacred_shield_buff=1)
@@ -327,11 +329,6 @@ Define(word_of_glory 85673)
 SpellList(word_of_glory_no_holy_buff bastion_of_power_buff divine_purpose_buff lawful_words_buff)
 Define(zeal 217020)
 	SpellInfo(zeal cd=4.5 holy=-1)
-
-# Talents
-Define(bastion_of_light_talent 5)
-Define(righteous_protector_talent 19)
-Define(seraphim_talent 20)
 Define(zeal_talent 5)
 ]]
 
