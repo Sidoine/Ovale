@@ -156,7 +156,6 @@ AddFunction BrewmasterDefaultCdActions
 	Spell(fortifying_brew)
 	Spell(zen_meditation)
 	Spell(dampen_harm)
-	Spell(diffuse_magic)
 }
 
 AddFunction BrewmasterInterruptActions
@@ -173,7 +172,6 @@ AddFunction BrewmasterInterruptActions
 		}
 		if target.IsTargetingPlayer() 
 		{
-			Spell(diffuse_magic)
 			Spell(zen_meditation)
 			Spell(dampen_harm)
 		}
