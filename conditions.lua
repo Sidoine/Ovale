@@ -5197,3 +5197,26 @@ do
 	
 	OvaleCondition:RegisterCondition("isbossfight", false, IsBossFight)
 end
+
+do
+	--- Check for the target's race
+	-- @name Race
+	-- @param all the races you which to check for
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @usage
+	-- if Race(blood_elf) Spell(arcane_torrent)
+	local function Race(positionalParams, namedParams, state, atTime)
+		local isRace = false
+		local target = namedParams.target or "player"
+		local _, targetRaceId = API_UnitRace(target)
+		
+		for _,v in ipairs(positionalParams) do
+			isRace = isRace or (v == raceId)
+		end
+		return TestBoolean(isRace, "yes")
+	end
+	
+	OvaleCondition:RegisterCondition("race", false, Race)
+end

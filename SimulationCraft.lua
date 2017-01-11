@@ -1624,6 +1624,7 @@ local EmitOperandGlyph = nil
 local EmitOperandPet = nil
 local EmitOperandPreviousSpell = nil
 local EmitOperandRaidEvent = nil
+local EmitOperandRace = nil
 local EmitOperandRune = nil
 local EmitOperandSeal = nil
 local EmitOperandSetBonus = nil
@@ -2660,6 +2661,9 @@ EmitOperand = function(parseNode, nodeList, annotation, action)
 		ok, node = EmitOperandRaidEvent(operand, parseNode, nodeList, annotation, action)
 	end
 	if not ok then
+		ok, node = EmitOperandRace(operand, parseNode, nodeList, annotation, action)
+	end
+	if not ok then
 		ok, node = EmitOperandAction(operand, parseNode, nodeList, annotation, action, target)
 	end
 	if not ok then
@@ -3522,6 +3526,37 @@ EmitOperandRaidEvent = function(operand, parseNode, nodeList, annotation, action
 	if ok and code then
 		annotation.astAnnotation = annotation.astAnnotation or {}
 		node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+	end
+
+	return ok, node
+end
+
+EmitOperandRace = function(operand, parseNode, nodeList, annotation, action)
+	local ok = true
+	local node
+	
+	local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
+	local token = tokenIterator()
+	if token == "race" then
+		local race = strlower(tokenIterator())
+		local code
+		if race then
+			local raceId = nil
+			if(race == "blood_elf") then
+				raceId = "BloodElf"
+			else
+				self:Print("Warning: Race '%s' not defined", race)				
+			end
+			code = format("Race(%s)", raceId)
+		else
+			ok = false
+		end
+		if ok and code then
+			annotation.astAnnotation = annotation.astAnnotation or {}
+			node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+		end
+	else
+		ok = false
 	end
 
 	return ok, node
