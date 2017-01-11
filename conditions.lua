@@ -5171,18 +5171,14 @@ do
 end
 
 do
-	--- Test with DBM or BigWigs whether a boss is currently engaged
+	--- Test with DBM or BigWigs (if available) whether a boss is currently engaged
+	--- otherwise test for known units and/or world boss
 	-- @name IsBossFight
 	-- @return A boolean value.
 	-- @usage
-	-- if IsBossFight() Spell(metamorphisis)
+	-- if IsBossFight() Spell(metamorphosis_havoc)
 	local function IsBossFight(positionalParams, namedParams, state, atTime)
-		if not OvaleBossMod:HasBossMod() then
-			-- we don't have a boss mod, assume we are in a boss fight anyway
-			return 0, INFINITY
-		end
-		
-		local bossEngaged = OvaleBossMod:HasBossMod() and OvaleBossMod:IsBossEngaged()
+		local bossEngaged = state.inCombat and OvaleBossMod:IsBossEngaged(state)
 		return TestBoolean(bossEngaged, "yes")
 	end
 	
