@@ -7,6 +7,7 @@ do
 	local code = [[
 # Mage spells and functions.
 
+Define(alexstraszas_fury_talent 10)
 Define(arcane_affinity 166871)
 	SpellInfo(arcane_affinity duration=15)
 Define(arcane_barrage 44425)
