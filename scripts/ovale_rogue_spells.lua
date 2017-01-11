@@ -9,11 +9,16 @@ do
 
 # Items
 Define(bleeding_hollow_toxin_vessel 124520)
-Define(thraxis_tricksy_treads 137031)
-Define(shivarran_symmetry 141321)
+Define(convergence_of_fates 140806)
+Define(denial_of_the_halfgiants 137100)
+Define(duskwalkers_footpads 137030)
 Define(greenskins_waterlogged_wristcuffs 137099)
+Define(greenskins_waterlogged_wristcuffs_buff 209423)
 Define(the_dreadlords_deceit 137021)
 Define(the_dreadlords_deceit_buff 208692)
+Define(thraxis_tricksy_treads 137031)
+Define(shadow_satyrs_walk 137032)
+Define(shivarran_symmetry 141321)
 
 # Learned spells.
 Define(blindside 121152)
@@ -150,6 +155,7 @@ Define(fan_of_knives 51723)
 	SpellInfo(fan_of_knives buff_energy=silent_blades_buff buff_energy_amount=-6 itemset=T16_melee itemcount=2 specialization=assassination)
 	SpellInfo(fan_of_knives buff_energy=silent_blades_buff buff_energy_amount=-2 itemset=T16_melee itemcount=2 specialization=subtlety)
 	SpellAddBuff(fan_of_knives silent_blades_buff=0 itemset=T16_melee itemcount=2)
+Define(finality 197406)
 Define(finality_nightblade 197395)
 	SpellInfo(finality_nightblade combo=finisher energy=25)
 	SpellAddTargetDebuff(finality_nightblade finality_nightblade_debuff=1)
@@ -219,6 +225,7 @@ SpellList(lethal_poison_buff deadly_poison_buff instant_poison_buff wound_poison
 Define(marked_for_death 137619)
 	SpellInfo(marked_for_death cd=60 combo=5 gcd=0 offgcd=1 temp_combo=1)
 Define(marked_for_death_talent 17)
+Define(master_assassin 192349)
 Define(master_of_shadows_talent 19)
 Define(master_of_subtlety_buff 31665)
 Define(mutilate 1329)
@@ -396,19 +403,13 @@ Define(wound_poison 8679)
 Define(wound_poison_buff 8679)
 	SpellInfo(wound_poison_buff duration=3600)
 
-# Artifact
-Define(finality 197406)
-
-# Legion legendary items
-Define(shadow_satyrs_walk 137032)
-Define(greenskins_waterlogged_wristcuffs_buff 209423)
-
 # Talents
 Define(agonizing_poison_talent 16)
 Define(deeper_strategem_talent 7)
 Define(dirty_tricks_talent 15)
 Define(elaborate_planning_talent 2)
 Define(master_poisoner_talent 1)
+Define(venom_rush_talent 19)
 Define(vigor_talent 9)
 
 # Non-default tags for OvaleSimulationCraft.
