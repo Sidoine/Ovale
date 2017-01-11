@@ -3627,6 +3627,10 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		local buffName = "breath_of_sindragosa_buff"
 		code = format("BuffPresent(%s)", buffName)
 		AddSymbol(annotation, buffName)
+	elseif class == "DEATHKNIGHT" and operand == "dot.hungering_rune_weapon.ticking" then
+		local buffName = "hungering_rune_weapon_buff"
+		code = format("BuffPresent(%s)", buffName)
+		AddSymbol(annotation, buffName)
 	elseif class == "DEATHKNIGHT" and strsub(operand, -9, -1) == ".ready_in" then
 		local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
 		local spellName = tokenIterator()

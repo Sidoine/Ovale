@@ -168,25 +168,31 @@ AddFunction FrostInterruptActions
 
 AddFunction FrostDefaultMainActions
 {
-	#run_action_list,name=bos,if=dot.breath_of_sindragosa.ticking
-	if BuffPresent(breath_of_sindragosa_buff) FrostBosMainActions()
+	#call_action_list,name=generic,if=!talent.breath_of_sindragosa.enabled
+	if not Talent(breath_of_sindragosa_talent) FrostGenericMainActions()
 
-	unless BuffPresent(breath_of_sindragosa_buff) and FrostBosMainPostConditions()
+	unless not Talent(breath_of_sindragosa_talent) and FrostGenericMainPostConditions()
 	{
-		#call_action_list,name=shatter,if=talent.shattering_strikes.enabled
-		if Talent(shattering_strikes_talent) FrostShatterMainActions()
+		#call_action_list,name=bos,if=talent.breath_of_sindragosa.enabled&!dot.breath_of_sindragosa.ticking
+		if Talent(breath_of_sindragosa_talent) and not BuffPresent(breath_of_sindragosa_buff) FrostBosMainActions()
 
-		unless Talent(shattering_strikes_talent) and FrostShatterMainPostConditions()
+		unless Talent(breath_of_sindragosa_talent) and not BuffPresent(breath_of_sindragosa_buff) and FrostBosMainPostConditions()
 		{
-			#call_action_list,name=generic,if=!talent.shattering_strikes.enabled
-			if not Talent(shattering_strikes_talent) FrostGenericMainActions()
+			#call_action_list,name=bos_ticking,if=talent.breath_of_sindragosa.enabled&dot.breath_of_sindragosa.ticking
+			if Talent(breath_of_sindragosa_talent) and BuffPresent(breath_of_sindragosa_buff) FrostBosTickingMainActions()
+
+			unless Talent(breath_of_sindragosa_talent) and BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingMainPostConditions()
+			{
+				#call_action_list,name=gs_ticking,if=talent.gathering_storm.enabled&buff.remorseless_winter.remains
+				if Talent(gathering_storm_talent) and BuffPresent(remorseless_winter_buff) FrostGsTickingMainActions()
+			}
 		}
 	}
 }
 
 AddFunction FrostDefaultMainPostConditions
 {
-	BuffPresent(breath_of_sindragosa_buff) and FrostBosMainPostConditions() or Talent(shattering_strikes_talent) and FrostShatterMainPostConditions() or not Talent(shattering_strikes_talent) and FrostGenericMainPostConditions()
+	not Talent(breath_of_sindragosa_talent) and FrostGenericMainPostConditions() or Talent(breath_of_sindragosa_talent) and not BuffPresent(breath_of_sindragosa_buff) and FrostBosMainPostConditions() or Talent(breath_of_sindragosa_talent) and BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingMainPostConditions() or Talent(gathering_storm_talent) and BuffPresent(remorseless_winter_buff) and FrostGsTickingMainPostConditions()
 }
 
 AddFunction FrostDefaultShortCdActions
@@ -195,27 +201,33 @@ AddFunction FrostDefaultShortCdActions
 	FrostGetInMeleeRange()
 	#pillar_of_frost
 	Spell(pillar_of_frost)
-	#obliteration
-	Spell(obliteration)
-	#run_action_list,name=bos,if=dot.breath_of_sindragosa.ticking
-	if BuffPresent(breath_of_sindragosa_buff) FrostBosShortCdActions()
+	#obliteration,if=(!talent.frozen_pulse.enabled|(rune<2&runic_power<28))&!talent.gathering_storm.enabled
+	if { not Talent(frozen_pulse_talent) or Rune() < 2 and RunicPower() < 28 } and not Talent(gathering_storm_talent) Spell(obliteration)
+	#call_action_list,name=generic,if=!talent.breath_of_sindragosa.enabled
+	if not Talent(breath_of_sindragosa_talent) FrostGenericShortCdActions()
 
-	unless BuffPresent(breath_of_sindragosa_buff) and FrostBosShortCdPostConditions()
+	unless not Talent(breath_of_sindragosa_talent) and FrostGenericShortCdPostConditions()
 	{
-		#call_action_list,name=shatter,if=talent.shattering_strikes.enabled
-		if Talent(shattering_strikes_talent) FrostShatterShortCdActions()
+		#call_action_list,name=bos,if=talent.breath_of_sindragosa.enabled&!dot.breath_of_sindragosa.ticking
+		if Talent(breath_of_sindragosa_talent) and not BuffPresent(breath_of_sindragosa_buff) FrostBosShortCdActions()
 
-		unless Talent(shattering_strikes_talent) and FrostShatterShortCdPostConditions()
+		unless Talent(breath_of_sindragosa_talent) and not BuffPresent(breath_of_sindragosa_buff) and FrostBosShortCdPostConditions()
 		{
-			#call_action_list,name=generic,if=!talent.shattering_strikes.enabled
-			if not Talent(shattering_strikes_talent) FrostGenericShortCdActions()
+			#call_action_list,name=bos_ticking,if=talent.breath_of_sindragosa.enabled&dot.breath_of_sindragosa.ticking
+			if Talent(breath_of_sindragosa_talent) and BuffPresent(breath_of_sindragosa_buff) FrostBosTickingShortCdActions()
+
+			unless Talent(breath_of_sindragosa_talent) and BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingShortCdPostConditions()
+			{
+				#call_action_list,name=gs_ticking,if=talent.gathering_storm.enabled&buff.remorseless_winter.remains
+				if Talent(gathering_storm_talent) and BuffPresent(remorseless_winter_buff) FrostGsTickingShortCdActions()
+			}
 		}
 	}
 }
 
 AddFunction FrostDefaultShortCdPostConditions
 {
-	BuffPresent(breath_of_sindragosa_buff) and FrostBosShortCdPostConditions() or Talent(shattering_strikes_talent) and FrostShatterShortCdPostConditions() or not Talent(shattering_strikes_talent) and FrostGenericShortCdPostConditions()
+	not Talent(breath_of_sindragosa_talent) and FrostGenericShortCdPostConditions() or Talent(breath_of_sindragosa_talent) and not BuffPresent(breath_of_sindragosa_buff) and FrostBosShortCdPostConditions() or Talent(breath_of_sindragosa_talent) and BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingShortCdPostConditions() or Talent(gathering_storm_talent) and BuffPresent(remorseless_winter_buff) and FrostGsTickingShortCdPostConditions()
 }
 
 AddFunction FrostDefaultCdActions
@@ -224,34 +236,38 @@ AddFunction FrostDefaultCdActions
 	FrostInterruptActions()
 	#arcane_torrent,if=runic_power.deficit>20
 	if RunicPowerDeficit() > 20 Spell(arcane_torrent_runicpower)
-	#blood_fury,if=!talent.breath_of_sindragosa.enabled|dot.breath_of_sindragosa.ticking
-	if not Talent(breath_of_sindragosa_talent) or BuffPresent(breath_of_sindragosa_buff) Spell(blood_fury_ap)
+	#blood_fury,if=buff.pillar_of_frost.up
+	if BuffPresent(pillar_of_frost_buff) Spell(blood_fury_ap)
 	#berserking,if=buff.pillar_of_frost.up
 	if BuffPresent(pillar_of_frost_buff) Spell(berserking)
 	#use_item,slot=finger2
 	if CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength usable=1)
 	#use_item,slot=trinket1
 	FrostUseItemActions()
-	#potion,name=old_war
-	#sindragosas_fury,if=buff.pillar_of_frost.up
-	if BuffPresent(pillar_of_frost_buff) Spell(sindragosas_fury)
+	#potion,name=old_war,if=buff.pillar_of_frost.up
+	#sindragosas_fury,if=buff.pillar_of_frost.up&(buff.unholy_strength.up|(buff.pillar_of_frost.remains<3&target.time_to_die<60))&debuff.razorice.stack=5&!buff.obliteration.up
+	if BuffPresent(pillar_of_frost_buff) and { BuffPresent(unholy_strength_buff) or BuffRemaining(pillar_of_frost_buff) < 3 and target.TimeToDie() < 60 } and target.DebuffStacks(razorice_debuff) == 5 and not BuffPresent(obliteration_buff) Spell(sindragosas_fury)
 
-	unless Spell(obliteration)
+	unless { not Talent(frozen_pulse_talent) or Rune() < 2 and RunicPower() < 28 } and not Talent(gathering_storm_talent) and Spell(obliteration)
 	{
-		#breath_of_sindragosa,if=runic_power>=50
-		if RunicPower() >= 50 Spell(breath_of_sindragosa)
-		#run_action_list,name=bos,if=dot.breath_of_sindragosa.ticking
-		if BuffPresent(breath_of_sindragosa_buff) FrostBosCdActions()
+		#call_action_list,name=generic,if=!talent.breath_of_sindragosa.enabled
+		if not Talent(breath_of_sindragosa_talent) FrostGenericCdActions()
 
-		unless BuffPresent(breath_of_sindragosa_buff) and FrostBosCdPostConditions()
+		unless not Talent(breath_of_sindragosa_talent) and FrostGenericCdPostConditions()
 		{
-			#call_action_list,name=shatter,if=talent.shattering_strikes.enabled
-			if Talent(shattering_strikes_talent) FrostShatterCdActions()
+			#call_action_list,name=bos,if=talent.breath_of_sindragosa.enabled&!dot.breath_of_sindragosa.ticking
+			if Talent(breath_of_sindragosa_talent) and not BuffPresent(breath_of_sindragosa_buff) FrostBosCdActions()
 
-			unless Talent(shattering_strikes_talent) and FrostShatterCdPostConditions()
+			unless Talent(breath_of_sindragosa_talent) and not BuffPresent(breath_of_sindragosa_buff) and FrostBosCdPostConditions()
 			{
-				#call_action_list,name=generic,if=!talent.shattering_strikes.enabled
-				if not Talent(shattering_strikes_talent) FrostGenericCdActions()
+				#call_action_list,name=bos_ticking,if=talent.breath_of_sindragosa.enabled&dot.breath_of_sindragosa.ticking
+				if Talent(breath_of_sindragosa_talent) and BuffPresent(breath_of_sindragosa_buff) FrostBosTickingCdActions()
+
+				unless Talent(breath_of_sindragosa_talent) and BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingCdPostConditions()
+				{
+					#call_action_list,name=gs_ticking,if=talent.gathering_storm.enabled&buff.remorseless_winter.remains
+					if Talent(gathering_storm_talent) and BuffPresent(remorseless_winter_buff) FrostGsTickingCdActions()
+				}
 			}
 		}
 	}
@@ -259,80 +275,139 @@ AddFunction FrostDefaultCdActions
 
 AddFunction FrostDefaultCdPostConditions
 {
-	Spell(obliteration) or BuffPresent(breath_of_sindragosa_buff) and FrostBosCdPostConditions() or Talent(shattering_strikes_talent) and FrostShatterCdPostConditions() or not Talent(shattering_strikes_talent) and FrostGenericCdPostConditions()
+	{ not Talent(frozen_pulse_talent) or Rune() < 2 and RunicPower() < 28 } and not Talent(gathering_storm_talent) and Spell(obliteration) or not Talent(breath_of_sindragosa_talent) and FrostGenericCdPostConditions() or Talent(breath_of_sindragosa_talent) and not BuffPresent(breath_of_sindragosa_buff) and FrostBosCdPostConditions() or Talent(breath_of_sindragosa_talent) and BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingCdPostConditions() or Talent(gathering_storm_talent) and BuffPresent(remorseless_winter_buff) and FrostGsTickingCdPostConditions()
 }
 
 ### actions.bos
 
 AddFunction FrostBosMainActions
 {
+	#frost_strike,if=talent.icy_talons.enabled&buff.icy_talons.remains<1.5&cooldown.breath_of_sindragosa.remains>6
+	if Talent(icy_talons_talent) and BuffRemaining(icy_talons_buff) < 1.5 and SpellCooldown(breath_of_sindragosa) > 6 Spell(frost_strike)
 	#howling_blast,target_if=!dot.frost_fever.ticking
 	if not target.DebuffPresent(frost_fever_debuff) Spell(howling_blast)
-	#call_action_list,name=core
-	FrostCoreMainActions()
-
-	unless FrostCoreMainPostConditions()
-	{
-		#howling_blast,if=buff.rime.react
-		if BuffPresent(rime_buff) Spell(howling_blast)
-	}
+	#frost_strike,if=runic_power>=90&set_bonus.tier19_4pc
+	if RunicPower() >= 90 and ArmorSetBonus(T19 4) Spell(frost_strike)
+	#remorseless_winter,if=(buff.rime.react&equipped.132459)|talent.gathering_storm.enabled
+	if BuffPresent(rime_buff) and HasEquippedItem(132459) or Talent(gathering_storm_talent) Spell(remorseless_winter)
+	#howling_blast,if=buff.rime.react&(dot.remorseless_winter.ticking|cooldown.remorseless_winter.remains>1.5|!equipped.132459)
+	if BuffPresent(rime_buff) and { target.DebuffPresent(remorseless_winter_debuff) or SpellCooldown(remorseless_winter) > 1.5 or not HasEquippedItem(132459) } Spell(howling_blast)
+	#frost_strike,if=runic_power>=70
+	if RunicPower() >= 70 Spell(frost_strike)
+	#obliterate,if=!buff.rime.react
+	if not BuffPresent(rime_buff) Spell(obliterate)
+	#frost_strike,if=cooldown.breath_of_sindragosa.remains>15
+	if SpellCooldown(breath_of_sindragosa) > 15 Spell(frost_strike)
+	#remorseless_winter,if=cooldown.breath_of_sindragosa.remains>10
+	if SpellCooldown(breath_of_sindragosa) > 10 Spell(remorseless_winter)
 }
 
 AddFunction FrostBosMainPostConditions
 {
-	FrostCoreMainPostConditions()
 }
 
 AddFunction FrostBosShortCdActions
 {
-	unless not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast)
+	unless Talent(icy_talons_talent) and BuffRemaining(icy_talons_buff) < 1.5 and SpellCooldown(breath_of_sindragosa) > 6 and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or RunicPower() >= 90 and ArmorSetBonus(T19 4) and Spell(frost_strike) or { BuffPresent(rime_buff) and HasEquippedItem(132459) or Talent(gathering_storm_talent) } and Spell(remorseless_winter) or BuffPresent(rime_buff) and { target.DebuffPresent(remorseless_winter_debuff) or SpellCooldown(remorseless_winter) > 1.5 or not HasEquippedItem(132459) } and Spell(howling_blast) or RunicPower() >= 70 and Spell(frost_strike) or not BuffPresent(rime_buff) and Spell(obliterate)
 	{
-		#call_action_list,name=core
-		FrostCoreShortCdActions()
-
-		unless FrostCoreShortCdPostConditions()
-		{
-			#horn_of_winter
-			if BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
-		}
+		#horn_of_winter,if=cooldown.breath_of_sindragosa.remains>15&runic_power<=70
+		if SpellCooldown(breath_of_sindragosa) > 15 and RunicPower() <= 70 and BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
 	}
 }
 
 AddFunction FrostBosShortCdPostConditions
 {
-	not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or FrostCoreShortCdPostConditions() or BuffPresent(rime_buff) and Spell(howling_blast)
+	Talent(icy_talons_talent) and BuffRemaining(icy_talons_buff) < 1.5 and SpellCooldown(breath_of_sindragosa) > 6 and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or RunicPower() >= 90 and ArmorSetBonus(T19 4) and Spell(frost_strike) or { BuffPresent(rime_buff) and HasEquippedItem(132459) or Talent(gathering_storm_talent) } and Spell(remorseless_winter) or BuffPresent(rime_buff) and { target.DebuffPresent(remorseless_winter_debuff) or SpellCooldown(remorseless_winter) > 1.5 or not HasEquippedItem(132459) } and Spell(howling_blast) or RunicPower() >= 70 and Spell(frost_strike) or not BuffPresent(rime_buff) and Spell(obliterate) or SpellCooldown(breath_of_sindragosa) > 15 and Spell(frost_strike) or SpellCooldown(breath_of_sindragosa) > 10 and Spell(remorseless_winter)
 }
 
 AddFunction FrostBosCdActions
 {
-	unless not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast)
+	unless Talent(icy_talons_talent) and BuffRemaining(icy_talons_buff) < 1.5 and SpellCooldown(breath_of_sindragosa) > 6 and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast)
 	{
-		#call_action_list,name=core
-		FrostCoreCdActions()
-
-		unless FrostCoreCdPostConditions() or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
-		{
-			#empower_rune_weapon,if=runic_power<=70
-			if RunicPower() <= 70 Spell(empower_rune_weapon)
-			#hungering_rune_weapon
-			Spell(hungering_rune_weapon)
-		}
+		#breath_of_sindragosa,if=runic_power>=50
+		if RunicPower() >= 50 Spell(breath_of_sindragosa)
 	}
 }
 
 AddFunction FrostBosCdPostConditions
 {
-	not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or FrostCoreCdPostConditions() or BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or BuffPresent(rime_buff) and Spell(howling_blast)
+	Talent(icy_talons_talent) and BuffRemaining(icy_talons_buff) < 1.5 and SpellCooldown(breath_of_sindragosa) > 6 and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or RunicPower() >= 90 and ArmorSetBonus(T19 4) and Spell(frost_strike) or { BuffPresent(rime_buff) and HasEquippedItem(132459) or Talent(gathering_storm_talent) } and Spell(remorseless_winter) or BuffPresent(rime_buff) and { target.DebuffPresent(remorseless_winter_debuff) or SpellCooldown(remorseless_winter) > 1.5 or not HasEquippedItem(132459) } and Spell(howling_blast) or RunicPower() >= 70 and Spell(frost_strike) or not BuffPresent(rime_buff) and Spell(obliterate) or SpellCooldown(breath_of_sindragosa) > 15 and RunicPower() <= 70 and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or SpellCooldown(breath_of_sindragosa) > 15 and Spell(frost_strike) or SpellCooldown(breath_of_sindragosa) > 10 and Spell(remorseless_winter)
 }
 
-### actions.core
+### actions.bos_ticking
 
-AddFunction FrostCoreMainActions
+AddFunction FrostBosTickingMainActions
 {
+	#howling_blast,target_if=!dot.frost_fever.ticking
+	if not target.DebuffPresent(frost_fever_debuff) Spell(howling_blast)
+	#remorseless_winter,if=((runic_power>=20&set_bonus.tier19_4pc)|runic_power>=30)&((buff.rime.react&!dot.hungering_rune_weapon.ticking&equipped.132459)|talent.gathering_storm.enabled)
+	if { RunicPower() >= 20 and ArmorSetBonus(T19 4) or RunicPower() >= 30 } and { BuffPresent(rime_buff) and not BuffPresent(hungering_rune_weapon_buff) and HasEquippedItem(132459) or Talent(gathering_storm_talent) } Spell(remorseless_winter)
+	#howling_blast,if=((runic_power>=20&set_bonus.tier19_4pc)|runic_power>=30)&buff.rime.react&!dot.hungering_rune_weapon.ticking
+	if { RunicPower() >= 20 and ArmorSetBonus(T19 4) or RunicPower() >= 30 } and BuffPresent(rime_buff) and not BuffPresent(hungering_rune_weapon_buff) Spell(howling_blast)
+	#frost_strike,if=runic_power>=95&dot.hungering_rune_weapon.ticking
+	if RunicPower() >= 95 and BuffPresent(hungering_rune_weapon_buff) Spell(frost_strike)
+	#obliterate,if=runic_power<=70|rune>3
+	if RunicPower() <= 70 or Rune() >= 4 Spell(obliterate)
+	#remorseless_winter,if=runic_power<20
+	if RunicPower() < 20 Spell(remorseless_winter)
+}
+
+AddFunction FrostBosTickingMainPostConditions
+{
+}
+
+AddFunction FrostBosTickingShortCdActions
+{
+	unless not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or { RunicPower() >= 20 and ArmorSetBonus(T19 4) or RunicPower() >= 30 } and { BuffPresent(rime_buff) and not BuffPresent(hungering_rune_weapon_buff) and HasEquippedItem(132459) or Talent(gathering_storm_talent) } and Spell(remorseless_winter) or { RunicPower() >= 20 and ArmorSetBonus(T19 4) or RunicPower() >= 30 } and BuffPresent(rime_buff) and not BuffPresent(hungering_rune_weapon_buff) and Spell(howling_blast) or RunicPower() >= 95 and BuffPresent(hungering_rune_weapon_buff) and Spell(frost_strike) or { RunicPower() <= 70 or Rune() >= 4 } and Spell(obliterate)
+	{
+		#horn_of_winter,if=runic_power<70&!dot.hungering_rune_weapon.ticking
+		if RunicPower() < 70 and not BuffPresent(hungering_rune_weapon_buff) and BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
+	}
+}
+
+AddFunction FrostBosTickingShortCdPostConditions
+{
+	not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or { RunicPower() >= 20 and ArmorSetBonus(T19 4) or RunicPower() >= 30 } and { BuffPresent(rime_buff) and not BuffPresent(hungering_rune_weapon_buff) and HasEquippedItem(132459) or Talent(gathering_storm_talent) } and Spell(remorseless_winter) or { RunicPower() >= 20 and ArmorSetBonus(T19 4) or RunicPower() >= 30 } and BuffPresent(rime_buff) and not BuffPresent(hungering_rune_weapon_buff) and Spell(howling_blast) or RunicPower() >= 95 and BuffPresent(hungering_rune_weapon_buff) and Spell(frost_strike) or { RunicPower() <= 70 or Rune() >= 4 } and Spell(obliterate) or RunicPower() < 20 and Spell(remorseless_winter)
+}
+
+AddFunction FrostBosTickingCdActions
+{
+	unless not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or { RunicPower() >= 20 and ArmorSetBonus(T19 4) or RunicPower() >= 30 } and { BuffPresent(rime_buff) and not BuffPresent(hungering_rune_weapon_buff) and HasEquippedItem(132459) or Talent(gathering_storm_talent) } and Spell(remorseless_winter) or { RunicPower() >= 20 and ArmorSetBonus(T19 4) or RunicPower() >= 30 } and BuffPresent(rime_buff) and not BuffPresent(hungering_rune_weapon_buff) and Spell(howling_blast) or RunicPower() >= 95 and BuffPresent(hungering_rune_weapon_buff) and Spell(frost_strike) or { RunicPower() <= 70 or Rune() >= 4 } and Spell(obliterate) or RunicPower() < 70 and not BuffPresent(hungering_rune_weapon_buff) and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter)
+	{
+		#hungering_rune_weapon,if=runic_power<20&!dot.hungering_rune_weapon.ticking
+		if RunicPower() < 20 and not BuffPresent(hungering_rune_weapon_buff) Spell(hungering_rune_weapon)
+		#empower_rune_weapon,if=runic_power<20
+		if RunicPower() < 20 Spell(empower_rune_weapon)
+	}
+}
+
+AddFunction FrostBosTickingCdPostConditions
+{
+	not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or { RunicPower() >= 20 and ArmorSetBonus(T19 4) or RunicPower() >= 30 } and { BuffPresent(rime_buff) and not BuffPresent(hungering_rune_weapon_buff) and HasEquippedItem(132459) or Talent(gathering_storm_talent) } and Spell(remorseless_winter) or { RunicPower() >= 20 and ArmorSetBonus(T19 4) or RunicPower() >= 30 } and BuffPresent(rime_buff) and not BuffPresent(hungering_rune_weapon_buff) and Spell(howling_blast) or RunicPower() >= 95 and BuffPresent(hungering_rune_weapon_buff) and Spell(frost_strike) or { RunicPower() <= 70 or Rune() >= 4 } and Spell(obliterate) or RunicPower() < 70 and not BuffPresent(hungering_rune_weapon_buff) and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or RunicPower() < 20 and Spell(remorseless_winter)
+}
+
+### actions.generic
+
+AddFunction FrostGenericMainActions
+{
+	#frost_strike,if=!talent.shattering_strikes.enabled&(buff.icy_talons.remains<1.5&talent.icy_talons.enabled)
+	if not Talent(shattering_strikes_talent) and BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) Spell(frost_strike)
+	#frost_strike,if=talent.shattering_strikes.enabled&debuff.razorice.stack=5
+	if Talent(shattering_strikes_talent) and target.DebuffStacks(razorice_debuff) == 5 Spell(frost_strike)
+	#howling_blast,target_if=!dot.frost_fever.ticking
+	if not target.DebuffPresent(frost_fever_debuff) Spell(howling_blast)
+	#obliterate,if=equipped.132366&talent.runic_attenuation.enabled&set_bonus.tier19_2pc=1
+	if HasEquippedItem(132366) and Talent(runic_attenuation_talent) and ArmorSetBonus(T19 2) == 1 Spell(obliterate)
+	#remorseless_winter,if=(buff.rime.react&equipped.132459&!(buff.obliteration.up&spell_targets.howling_blast<2))|talent.gathering_storm.enabled
+	if BuffPresent(rime_buff) and HasEquippedItem(132459) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } or Talent(gathering_storm_talent) Spell(remorseless_winter)
+	#howling_blast,if=buff.rime.react&!(buff.obliteration.up&spell_targets.howling_blast<2)
+	if BuffPresent(rime_buff) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } Spell(howling_blast)
+	#frost_strike,if=runic_power.deficit<=10
+	if RunicPowerDeficit() <= 10 Spell(frost_strike)
 	#frost_strike,if=buff.obliteration.up&!buff.killing_machine.react
 	if BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) Spell(frost_strike)
-	#remorseless_winter,if=(spell_targets.remorseless_winter>=2|talent.gathering_storm.enabled)&!(talent.frostscythe.enabled&buff.killing_machine.react&spell_targets.frostscythe>=2)
-	if { Enemies() >= 2 or Talent(gathering_storm_talent) } and not { Talent(frostscythe_talent) and BuffPresent(killing_machine_buff) and Enemies() >= 2 } Spell(remorseless_winter)
+	#remorseless_winter,if=spell_targets.remorseless_winter>=2&!(talent.frostscythe.enabled&buff.killing_machine.react&spell_targets.frostscythe>=2)
+	if Enemies() >= 2 and not { Talent(frostscythe_talent) and BuffPresent(killing_machine_buff) and Enemies() >= 2 } Spell(remorseless_winter)
 	#frostscythe,if=(buff.killing_machine.react&spell_targets.frostscythe>=2)
 	if BuffPresent(killing_machine_buff) and Enemies() >= 2 Spell(frostscythe)
 	#glacial_advance,if=spell_targets.glacial_advance>=2
@@ -345,107 +420,100 @@ AddFunction FrostCoreMainActions
 	Spell(obliterate)
 	#glacial_advance
 	Spell(glacial_advance)
+	#frost_strike
+	Spell(frost_strike)
 	#remorseless_winter,if=talent.frozen_pulse.enabled
 	if Talent(frozen_pulse_talent) Spell(remorseless_winter)
 }
 
-AddFunction FrostCoreMainPostConditions
-{
-}
-
-AddFunction FrostCoreShortCdActions
-{
-}
-
-AddFunction FrostCoreShortCdPostConditions
-{
-	BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) and Spell(frost_strike) or { Enemies() >= 2 or Talent(gathering_storm_talent) } and not { Talent(frostscythe_talent) and BuffPresent(killing_machine_buff) and Enemies() >= 2 } and Spell(remorseless_winter) or BuffPresent(killing_machine_buff) and Enemies() >= 2 and Spell(frostscythe) or Enemies() >= 2 and Spell(glacial_advance) or Enemies() >= 3 and Spell(frostscythe) or BuffPresent(killing_machine_buff) and Spell(obliterate) or Spell(obliterate) or Spell(glacial_advance) or Talent(frozen_pulse_talent) and Spell(remorseless_winter)
-}
-
-AddFunction FrostCoreCdActions
-{
-}
-
-AddFunction FrostCoreCdPostConditions
-{
-	BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) and Spell(frost_strike) or { Enemies() >= 2 or Talent(gathering_storm_talent) } and not { Talent(frostscythe_talent) and BuffPresent(killing_machine_buff) and Enemies() >= 2 } and Spell(remorseless_winter) or BuffPresent(killing_machine_buff) and Enemies() >= 2 and Spell(frostscythe) or Enemies() >= 2 and Spell(glacial_advance) or Enemies() >= 3 and Spell(frostscythe) or BuffPresent(killing_machine_buff) and Spell(obliterate) or Spell(obliterate) or Spell(glacial_advance) or Talent(frozen_pulse_talent) and Spell(remorseless_winter)
-}
-
-### actions.generic
-
-AddFunction FrostGenericMainActions
-{
-	#frost_strike,if=buff.icy_talons.remains<1.5&talent.icy_talons.enabled
-	if BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) Spell(frost_strike)
-	#howling_blast,target_if=!dot.frost_fever.ticking
-	if not target.DebuffPresent(frost_fever_debuff) Spell(howling_blast)
-	#howling_blast,if=buff.rime.react
-	if BuffPresent(rime_buff) Spell(howling_blast)
-	#frost_strike,if=runic_power>=80
-	if RunicPower() >= 80 Spell(frost_strike)
-	#call_action_list,name=core
-	FrostCoreMainActions()
-
-	unless FrostCoreMainPostConditions()
-	{
-		#frost_strike,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains>15
-		if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 Spell(frost_strike)
-		#frost_strike,if=!talent.breath_of_sindragosa.enabled
-		if not Talent(breath_of_sindragosa_talent) Spell(frost_strike)
-	}
-}
-
 AddFunction FrostGenericMainPostConditions
 {
-	FrostCoreMainPostConditions()
 }
 
 AddFunction FrostGenericShortCdActions
 {
-	unless BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike)
+	unless not Talent(shattering_strikes_talent) and BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) and Spell(frost_strike) or Talent(shattering_strikes_talent) and target.DebuffStacks(razorice_debuff) == 5 and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or HasEquippedItem(132366) and Talent(runic_attenuation_talent) and ArmorSetBonus(T19 2) == 1 and Spell(obliterate) or { BuffPresent(rime_buff) and HasEquippedItem(132459) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } or Talent(gathering_storm_talent) } and Spell(remorseless_winter) or BuffPresent(rime_buff) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } and Spell(howling_blast) or RunicPowerDeficit() <= 10 and Spell(frost_strike) or BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) and Spell(frost_strike) or Enemies() >= 2 and not { Talent(frostscythe_talent) and BuffPresent(killing_machine_buff) and Enemies() >= 2 } and Spell(remorseless_winter) or BuffPresent(killing_machine_buff) and Enemies() >= 2 and Spell(frostscythe) or Enemies() >= 2 and Spell(glacial_advance) or Enemies() >= 3 and Spell(frostscythe) or BuffPresent(killing_machine_buff) and Spell(obliterate) or Spell(obliterate) or Spell(glacial_advance)
 	{
-		#call_action_list,name=core
-		FrostCoreShortCdActions()
-
-		unless FrostCoreShortCdPostConditions()
-		{
-			#horn_of_winter,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains>15
-			if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
-			#horn_of_winter,if=!talent.breath_of_sindragosa.enabled
-			if not Talent(breath_of_sindragosa_talent) and BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
-		}
+		#horn_of_winter,if=!dot.hungering_rune_weapon.ticking
+		if not BuffPresent(hungering_rune_weapon_buff) and BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
 	}
 }
 
 AddFunction FrostGenericShortCdPostConditions
 {
-	BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike) or FrostCoreShortCdPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and Spell(frost_strike) or not Talent(breath_of_sindragosa_talent) and Spell(frost_strike)
+	not Talent(shattering_strikes_talent) and BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) and Spell(frost_strike) or Talent(shattering_strikes_talent) and target.DebuffStacks(razorice_debuff) == 5 and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or HasEquippedItem(132366) and Talent(runic_attenuation_talent) and ArmorSetBonus(T19 2) == 1 and Spell(obliterate) or { BuffPresent(rime_buff) and HasEquippedItem(132459) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } or Talent(gathering_storm_talent) } and Spell(remorseless_winter) or BuffPresent(rime_buff) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } and Spell(howling_blast) or RunicPowerDeficit() <= 10 and Spell(frost_strike) or BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) and Spell(frost_strike) or Enemies() >= 2 and not { Talent(frostscythe_talent) and BuffPresent(killing_machine_buff) and Enemies() >= 2 } and Spell(remorseless_winter) or BuffPresent(killing_machine_buff) and Enemies() >= 2 and Spell(frostscythe) or Enemies() >= 2 and Spell(glacial_advance) or Enemies() >= 3 and Spell(frostscythe) or BuffPresent(killing_machine_buff) and Spell(obliterate) or Spell(obliterate) or Spell(glacial_advance) or Spell(frost_strike) or Talent(frozen_pulse_talent) and Spell(remorseless_winter)
 }
 
 AddFunction FrostGenericCdActions
 {
-	unless BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike)
+	unless not Talent(shattering_strikes_talent) and BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) and Spell(frost_strike) or Talent(shattering_strikes_talent) and target.DebuffStacks(razorice_debuff) == 5 and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or HasEquippedItem(132366) and Talent(runic_attenuation_talent) and ArmorSetBonus(T19 2) == 1 and Spell(obliterate) or { BuffPresent(rime_buff) and HasEquippedItem(132459) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } or Talent(gathering_storm_talent) } and Spell(remorseless_winter) or BuffPresent(rime_buff) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } and Spell(howling_blast) or RunicPowerDeficit() <= 10 and Spell(frost_strike) or BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) and Spell(frost_strike) or Enemies() >= 2 and not { Talent(frostscythe_talent) and BuffPresent(killing_machine_buff) and Enemies() >= 2 } and Spell(remorseless_winter) or BuffPresent(killing_machine_buff) and Enemies() >= 2 and Spell(frostscythe) or Enemies() >= 2 and Spell(glacial_advance) or Enemies() >= 3 and Spell(frostscythe) or BuffPresent(killing_machine_buff) and Spell(obliterate) or Spell(obliterate) or Spell(glacial_advance) or not BuffPresent(hungering_rune_weapon_buff) and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Spell(frost_strike) or Talent(frozen_pulse_talent) and Spell(remorseless_winter)
 	{
-		#call_action_list,name=core
-		FrostCoreCdActions()
-
-		unless FrostCoreCdPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or not Talent(breath_of_sindragosa_talent) and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and Spell(frost_strike) or not Talent(breath_of_sindragosa_talent) and Spell(frost_strike)
-		{
-			#empower_rune_weapon,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains>15
-			if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 Spell(empower_rune_weapon)
-			#hungering_rune_weapon,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains>15
-			if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 Spell(hungering_rune_weapon)
-			#empower_rune_weapon,if=!talent.breath_of_sindragosa.enabled
-			if not Talent(breath_of_sindragosa_talent) Spell(empower_rune_weapon)
-			#hungering_rune_weapon,if=!talent.breath_of_sindragosa.enabled
-			if not Talent(breath_of_sindragosa_talent) Spell(hungering_rune_weapon)
-		}
+		#empower_rune_weapon
+		Spell(empower_rune_weapon)
+		#hungering_rune_weapon,if=!dot.hungering_rune_weapon.ticking
+		if not BuffPresent(hungering_rune_weapon_buff) Spell(hungering_rune_weapon)
 	}
 }
 
 AddFunction FrostGenericCdPostConditions
 {
-	BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike) or FrostCoreCdPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or not Talent(breath_of_sindragosa_talent) and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and Spell(frost_strike) or not Talent(breath_of_sindragosa_talent) and Spell(frost_strike)
+	not Talent(shattering_strikes_talent) and BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) and Spell(frost_strike) or Talent(shattering_strikes_talent) and target.DebuffStacks(razorice_debuff) == 5 and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or HasEquippedItem(132366) and Talent(runic_attenuation_talent) and ArmorSetBonus(T19 2) == 1 and Spell(obliterate) or { BuffPresent(rime_buff) and HasEquippedItem(132459) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } or Talent(gathering_storm_talent) } and Spell(remorseless_winter) or BuffPresent(rime_buff) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } and Spell(howling_blast) or RunicPowerDeficit() <= 10 and Spell(frost_strike) or BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) and Spell(frost_strike) or Enemies() >= 2 and not { Talent(frostscythe_talent) and BuffPresent(killing_machine_buff) and Enemies() >= 2 } and Spell(remorseless_winter) or BuffPresent(killing_machine_buff) and Enemies() >= 2 and Spell(frostscythe) or Enemies() >= 2 and Spell(glacial_advance) or Enemies() >= 3 and Spell(frostscythe) or BuffPresent(killing_machine_buff) and Spell(obliterate) or Spell(obliterate) or Spell(glacial_advance) or not BuffPresent(hungering_rune_weapon_buff) and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Spell(frost_strike) or Talent(frozen_pulse_talent) and Spell(remorseless_winter)
+}
+
+### actions.gs_ticking
+
+AddFunction FrostGsTickingMainActions
+{
+	#frost_strike,if=buff.icy_talons.remains<1.5&talent.icy_talons.enabled
+	if BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) Spell(frost_strike)
+	#howling_blast,target_if=!dot.frost_fever.ticking
+	if not target.DebuffPresent(frost_fever_debuff) Spell(howling_blast)
+	#howling_blast,if=buff.rime.react&!(buff.obliteration.up&spell_targets.howling_blast<2)
+	if BuffPresent(rime_buff) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } Spell(howling_blast)
+	#obliterate,if=rune>3|buff.killing_machine.react|buff.obliteration.up
+	if Rune() >= 4 or BuffPresent(killing_machine_buff) or BuffPresent(obliteration_buff) Spell(obliterate)
+	#frost_strike,if=runic_power>80|(buff.obliteration.up&!buff.killing_machine.react)
+	if RunicPower() > 80 or BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) Spell(frost_strike)
+	#obliterate
+	Spell(obliterate)
+	#glacial_advance
+	Spell(glacial_advance)
+	#frost_strike
+	Spell(frost_strike)
+}
+
+AddFunction FrostGsTickingMainPostConditions
+{
+}
+
+AddFunction FrostGsTickingShortCdActions
+{
+	unless BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } and Spell(howling_blast) or { Rune() >= 4 or BuffPresent(killing_machine_buff) or BuffPresent(obliteration_buff) } and Spell(obliterate) or { RunicPower() > 80 or BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) } and Spell(frost_strike) or Spell(obliterate)
+	{
+		#horn_of_winter,if=runic_power<70&!dot.hungering_rune_weapon.ticking
+		if RunicPower() < 70 and not BuffPresent(hungering_rune_weapon_buff) and BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
+	}
+}
+
+AddFunction FrostGsTickingShortCdPostConditions
+{
+	BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } and Spell(howling_blast) or { Rune() >= 4 or BuffPresent(killing_machine_buff) or BuffPresent(obliteration_buff) } and Spell(obliterate) or { RunicPower() > 80 or BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) } and Spell(frost_strike) or Spell(obliterate) or Spell(glacial_advance) or Spell(frost_strike)
+}
+
+AddFunction FrostGsTickingCdActions
+{
+	unless BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } and Spell(howling_blast) or { Rune() >= 4 or BuffPresent(killing_machine_buff) or BuffPresent(obliteration_buff) } and Spell(obliterate) or { RunicPower() > 80 or BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) } and Spell(frost_strike) or Spell(obliterate) or RunicPower() < 70 and not BuffPresent(hungering_rune_weapon_buff) and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Spell(glacial_advance) or Spell(frost_strike)
+	{
+		#hungering_rune_weapon,if=!dot.hungering_rune_weapon.ticking
+		if not BuffPresent(hungering_rune_weapon_buff) Spell(hungering_rune_weapon)
+		#empower_rune_weapon
+		Spell(empower_rune_weapon)
+	}
+}
+
+AddFunction FrostGsTickingCdPostConditions
+{
+	BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } and Spell(howling_blast) or { Rune() >= 4 or BuffPresent(killing_machine_buff) or BuffPresent(obliteration_buff) } and Spell(obliterate) or { RunicPower() > 80 or BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) } and Spell(frost_strike) or Spell(obliterate) or RunicPower() < 70 and not BuffPresent(hungering_rune_weapon_buff) and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Spell(glacial_advance) or Spell(frost_strike)
 }
 
 ### actions.precombat
@@ -478,83 +546,6 @@ AddFunction FrostPrecombatCdActions
 AddFunction FrostPrecombatCdPostConditions
 {
 	Spell(augmentation)
-}
-
-### actions.shatter
-
-AddFunction FrostShatterMainActions
-{
-	#frost_strike,if=debuff.razorice.stack=5
-	if target.DebuffStacks(razorice_debuff) == 5 Spell(frost_strike)
-	#howling_blast,target_if=!dot.frost_fever.ticking
-	if not target.DebuffPresent(frost_fever_debuff) Spell(howling_blast)
-	#howling_blast,if=buff.rime.react
-	if BuffPresent(rime_buff) Spell(howling_blast)
-	#frost_strike,if=runic_power>=80
-	if RunicPower() >= 80 Spell(frost_strike)
-	#call_action_list,name=core
-	FrostCoreMainActions()
-
-	unless FrostCoreMainPostConditions()
-	{
-		#frost_strike,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains>15
-		if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 Spell(frost_strike)
-		#frost_strike,if=!talent.breath_of_sindragosa.enabled
-		if not Talent(breath_of_sindragosa_talent) Spell(frost_strike)
-	}
-}
-
-AddFunction FrostShatterMainPostConditions
-{
-	FrostCoreMainPostConditions()
-}
-
-AddFunction FrostShatterShortCdActions
-{
-	unless target.DebuffStacks(razorice_debuff) == 5 and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike)
-	{
-		#call_action_list,name=core
-		FrostCoreShortCdActions()
-
-		unless FrostCoreShortCdPostConditions()
-		{
-			#horn_of_winter,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains>15
-			if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
-			#horn_of_winter,if=!talent.breath_of_sindragosa.enabled
-			if not Talent(breath_of_sindragosa_talent) and BuffExpires(attack_power_multiplier_buff any=1) Spell(horn_of_winter)
-		}
-	}
-}
-
-AddFunction FrostShatterShortCdPostConditions
-{
-	target.DebuffStacks(razorice_debuff) == 5 and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike) or FrostCoreShortCdPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and Spell(frost_strike) or not Talent(breath_of_sindragosa_talent) and Spell(frost_strike)
-}
-
-AddFunction FrostShatterCdActions
-{
-	unless target.DebuffStacks(razorice_debuff) == 5 and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike)
-	{
-		#call_action_list,name=core
-		FrostCoreCdActions()
-
-		unless FrostCoreCdPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or not Talent(breath_of_sindragosa_talent) and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and Spell(frost_strike) or not Talent(breath_of_sindragosa_talent) and Spell(frost_strike)
-		{
-			#empower_rune_weapon,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains>15
-			if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 Spell(empower_rune_weapon)
-			#hungering_rune_weapon,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains>15
-			if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 Spell(hungering_rune_weapon)
-			#empower_rune_weapon,if=!talent.breath_of_sindragosa.enabled
-			if not Talent(breath_of_sindragosa_talent) Spell(empower_rune_weapon)
-			#hungering_rune_weapon,if=!talent.breath_of_sindragosa.enabled
-			if not Talent(breath_of_sindragosa_talent) Spell(hungering_rune_weapon)
-		}
-	}
-}
-
-AddFunction FrostShatterCdPostConditions
-{
-	target.DebuffStacks(razorice_debuff) == 5 and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and Spell(howling_blast) or RunicPower() >= 80 and Spell(frost_strike) or FrostCoreCdPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or not Talent(breath_of_sindragosa_talent) and BuffExpires(attack_power_multiplier_buff any=1) and Spell(horn_of_winter) or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 15 and Spell(frost_strike) or not Talent(breath_of_sindragosa_talent) and Spell(frost_strike)
 }
 
 ### Frost icons.
@@ -616,6 +607,8 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 }
 
 ### Required symbols
+# 132366
+# 132459
 # arcane_torrent_runicpower
 # asphyxiate
 # augmentation
@@ -636,6 +629,7 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # horn_of_winter
 # howling_blast
 # hungering_rune_weapon
+# hungering_rune_weapon_buff
 # icy_talons_buff
 # icy_talons_talent
 # killing_machine_buff
@@ -649,10 +643,14 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # quaking_palm
 # razorice_debuff
 # remorseless_winter
+# remorseless_winter_buff
+# remorseless_winter_debuff
 # rime_buff
+# runic_attenuation_talent
 # shattering_strikes_talent
 # sindragosas_fury
 # strangulate
+# unholy_strength_buff
 # war_stomp
 ]]
 	OvaleScripts:RegisterScript("DEATHKNIGHT", "frost", name, desc, code, "script")
@@ -886,41 +884,37 @@ AddFunction UnholyCastigatorCdPostConditions
 
 AddFunction UnholyGenericMainActions
 {
-	#death_coil,if=runic_power.deficit<30
-	if RunicPowerDeficit() < 30 Spell(death_coil)
+	#death_coil,if=runic_power.deficit<10
+	if RunicPowerDeficit() < 10 Spell(death_coil)
 	#death_coil,if=!talent.dark_arbiter.enabled&buff.sudden_doom.up&!buff.necrosis.up&rune<=3
 	if not Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and not BuffPresent(necrosis_buff) and Rune() < 4 Spell(death_coil)
 	#death_coil,if=talent.dark_arbiter.enabled&buff.sudden_doom.up&cooldown.dark_arbiter.remains>5&rune<=3
 	if Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and SpellCooldown(dark_arbiter) > 5 and Rune() < 4 Spell(death_coil)
 	#festering_strike,if=debuff.festering_wound.stack<7&cooldown.apocalypse.remains<5
 	if target.DebuffStacks(festering_wound_debuff) < 7 and SpellCooldown(apocalypse) < 5 Spell(festering_strike)
-	#wait,sec=cooldown.apocalypse.remains,if=cooldown.apocalypse.remains<=1&cooldown.apocalypse.remains
-	unless SpellCooldown(apocalypse) <= 1 and SpellCooldown(apocalypse) > 0 and SpellCooldown(apocalypse) > 0
+	#festering_strike,if=debuff.soul_reaper.up&!debuff.festering_wound.up
+	if target.DebuffPresent(soul_reaper_unholy_debuff) and not target.DebuffPresent(festering_wound_debuff) Spell(festering_strike)
+	#scourge_strike,if=debuff.soul_reaper.up&debuff.festering_wound.stack>=1
+	if target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 Spell(scourge_strike)
+	#clawing_shadows,if=debuff.soul_reaper.up&debuff.festering_wound.stack>=1
+	if target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 Spell(clawing_shadows)
+	#call_action_list,name=aoe,if=active_enemies>=2
+	if Enemies() >= 2 UnholyAoeMainActions()
+
+	unless Enemies() >= 2 and UnholyAoeMainPostConditions()
 	{
-		#festering_strike,if=debuff.soul_reaper.up&!debuff.festering_wound.up
-		if target.DebuffPresent(soul_reaper_unholy_debuff) and not target.DebuffPresent(festering_wound_debuff) Spell(festering_strike)
-		#scourge_strike,if=debuff.soul_reaper.up&debuff.festering_wound.stack>=1
-		if target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 Spell(scourge_strike)
-		#clawing_shadows,if=debuff.soul_reaper.up&debuff.festering_wound.stack>=1
-		if target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 Spell(clawing_shadows)
-		#call_action_list,name=aoe,if=active_enemies>=2
-		if Enemies() >= 2 UnholyAoeMainActions()
+		#call_action_list,name=instructors,if=equipped.132448
+		if HasEquippedItem(132448) UnholyInstructorsMainActions()
 
-		unless Enemies() >= 2 and UnholyAoeMainPostConditions()
+		unless HasEquippedItem(132448) and UnholyInstructorsMainPostConditions()
 		{
-			#call_action_list,name=instructors,if=equipped.132448
-			if HasEquippedItem(132448) UnholyInstructorsMainActions()
+			#call_action_list,name=standard,if=!talent.castigator.enabled&!equipped.132448
+			if not Talent(castigator_talent) and not HasEquippedItem(132448) UnholyStandardMainActions()
 
-			unless HasEquippedItem(132448) and UnholyInstructorsMainPostConditions()
+			unless not Talent(castigator_talent) and not HasEquippedItem(132448) and UnholyStandardMainPostConditions()
 			{
-				#call_action_list,name=standard,if=!talent.castigator.enabled&!equipped.132448
-				if not Talent(castigator_talent) and not HasEquippedItem(132448) UnholyStandardMainActions()
-
-				unless not Talent(castigator_talent) and not HasEquippedItem(132448) and UnholyStandardMainPostConditions()
-				{
-					#call_action_list,name=castigator,if=talent.castigator.enabled&!equipped.132448
-					if Talent(castigator_talent) and not HasEquippedItem(132448) UnholyCastigatorMainActions()
-				}
+				#call_action_list,name=castigator,if=talent.castigator.enabled&!equipped.132448
+				if Talent(castigator_talent) and not HasEquippedItem(132448) UnholyCastigatorMainActions()
 			}
 		}
 	}
@@ -928,7 +922,7 @@ AddFunction UnholyGenericMainActions
 
 AddFunction UnholyGenericMainPostConditions
 {
-	not { SpellCooldown(apocalypse) <= 1 and SpellCooldown(apocalypse) > 0 and SpellCooldown(apocalypse) > 0 } and { Enemies() >= 2 and UnholyAoeMainPostConditions() or HasEquippedItem(132448) and UnholyInstructorsMainPostConditions() or not Talent(castigator_talent) and not HasEquippedItem(132448) and UnholyStandardMainPostConditions() or Talent(castigator_talent) and not HasEquippedItem(132448) and UnholyCastigatorMainPostConditions() }
+	Enemies() >= 2 and UnholyAoeMainPostConditions() or HasEquippedItem(132448) and UnholyInstructorsMainPostConditions() or not Talent(castigator_talent) and not HasEquippedItem(132448) and UnholyStandardMainPostConditions() or Talent(castigator_talent) and not HasEquippedItem(132448) and UnholyCastigatorMainPostConditions()
 }
 
 AddFunction UnholyGenericShortCdActions
@@ -938,36 +932,32 @@ AddFunction UnholyGenericShortCdActions
 	#apocalypse,if=debuff.festering_wound.stack>=7
 	if target.DebuffStacks(festering_wound_debuff) >= 7 Spell(apocalypse)
 
-	unless RunicPowerDeficit() < 30 and Spell(death_coil) or not Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and not BuffPresent(necrosis_buff) and Rune() < 4 and Spell(death_coil) or Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and SpellCooldown(dark_arbiter) > 5 and Rune() < 4 and Spell(death_coil) or target.DebuffStacks(festering_wound_debuff) < 7 and SpellCooldown(apocalypse) < 5 and Spell(festering_strike)
+	unless RunicPowerDeficit() < 10 and Spell(death_coil) or not Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and not BuffPresent(necrosis_buff) and Rune() < 4 and Spell(death_coil) or Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and SpellCooldown(dark_arbiter) > 5 and Rune() < 4 and Spell(death_coil) or target.DebuffStacks(festering_wound_debuff) < 7 and SpellCooldown(apocalypse) < 5 and Spell(festering_strike)
 	{
-		#wait,sec=cooldown.apocalypse.remains,if=cooldown.apocalypse.remains<=1&cooldown.apocalypse.remains
-		unless SpellCooldown(apocalypse) <= 1 and SpellCooldown(apocalypse) > 0 and SpellCooldown(apocalypse) > 0
+		#soul_reaper,if=debuff.festering_wound.stack>=3
+		if target.DebuffStacks(festering_wound_debuff) >= 3 Spell(soul_reaper_unholy)
+
+		unless target.DebuffPresent(soul_reaper_unholy_debuff) and not target.DebuffPresent(festering_wound_debuff) and Spell(festering_strike) or target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 and Spell(scourge_strike) or target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 and Spell(clawing_shadows)
 		{
-			#soul_reaper,if=debuff.festering_wound.stack>=3
-			if target.DebuffStacks(festering_wound_debuff) >= 3 Spell(soul_reaper_unholy)
+			#defile
+			Spell(defile)
+			#call_action_list,name=aoe,if=active_enemies>=2
+			if Enemies() >= 2 UnholyAoeShortCdActions()
 
-			unless target.DebuffPresent(soul_reaper_unholy_debuff) and not target.DebuffPresent(festering_wound_debuff) and Spell(festering_strike) or target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 and Spell(scourge_strike) or target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 and Spell(clawing_shadows)
+			unless Enemies() >= 2 and UnholyAoeShortCdPostConditions()
 			{
-				#defile
-				Spell(defile)
-				#call_action_list,name=aoe,if=active_enemies>=2
-				if Enemies() >= 2 UnholyAoeShortCdActions()
+				#call_action_list,name=instructors,if=equipped.132448
+				if HasEquippedItem(132448) UnholyInstructorsShortCdActions()
 
-				unless Enemies() >= 2 and UnholyAoeShortCdPostConditions()
+				unless HasEquippedItem(132448) and UnholyInstructorsShortCdPostConditions()
 				{
-					#call_action_list,name=instructors,if=equipped.132448
-					if HasEquippedItem(132448) UnholyInstructorsShortCdActions()
+					#call_action_list,name=standard,if=!talent.castigator.enabled&!equipped.132448
+					if not Talent(castigator_talent) and not HasEquippedItem(132448) UnholyStandardShortCdActions()
 
-					unless HasEquippedItem(132448) and UnholyInstructorsShortCdPostConditions()
+					unless not Talent(castigator_talent) and not HasEquippedItem(132448) and UnholyStandardShortCdPostConditions()
 					{
-						#call_action_list,name=standard,if=!talent.castigator.enabled&!equipped.132448
-						if not Talent(castigator_talent) and not HasEquippedItem(132448) UnholyStandardShortCdActions()
-
-						unless not Talent(castigator_talent) and not HasEquippedItem(132448) and UnholyStandardShortCdPostConditions()
-						{
-							#call_action_list,name=castigator,if=talent.castigator.enabled&!equipped.132448
-							if Talent(castigator_talent) and not HasEquippedItem(132448) UnholyCastigatorShortCdActions()
-						}
+						#call_action_list,name=castigator,if=talent.castigator.enabled&!equipped.132448
+						if Talent(castigator_talent) and not HasEquippedItem(132448) UnholyCastigatorShortCdActions()
 					}
 				}
 			}
@@ -977,7 +967,7 @@ AddFunction UnholyGenericShortCdActions
 
 AddFunction UnholyGenericShortCdPostConditions
 {
-	RunicPowerDeficit() < 30 and Spell(death_coil) or not Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and not BuffPresent(necrosis_buff) and Rune() < 4 and Spell(death_coil) or Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and SpellCooldown(dark_arbiter) > 5 and Rune() < 4 and Spell(death_coil) or target.DebuffStacks(festering_wound_debuff) < 7 and SpellCooldown(apocalypse) < 5 and Spell(festering_strike) or not { SpellCooldown(apocalypse) <= 1 and SpellCooldown(apocalypse) > 0 and SpellCooldown(apocalypse) > 0 } and { target.DebuffPresent(soul_reaper_unholy_debuff) and not target.DebuffPresent(festering_wound_debuff) and Spell(festering_strike) or target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 and Spell(scourge_strike) or target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 and Spell(clawing_shadows) or Enemies() >= 2 and UnholyAoeShortCdPostConditions() or HasEquippedItem(132448) and UnholyInstructorsShortCdPostConditions() or not Talent(castigator_talent) and not HasEquippedItem(132448) and UnholyStandardShortCdPostConditions() or Talent(castigator_talent) and not HasEquippedItem(132448) and UnholyCastigatorShortCdPostConditions() }
+	RunicPowerDeficit() < 10 and Spell(death_coil) or not Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and not BuffPresent(necrosis_buff) and Rune() < 4 and Spell(death_coil) or Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and SpellCooldown(dark_arbiter) > 5 and Rune() < 4 and Spell(death_coil) or target.DebuffStacks(festering_wound_debuff) < 7 and SpellCooldown(apocalypse) < 5 and Spell(festering_strike) or target.DebuffPresent(soul_reaper_unholy_debuff) and not target.DebuffPresent(festering_wound_debuff) and Spell(festering_strike) or target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 and Spell(scourge_strike) or target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 and Spell(clawing_shadows) or Enemies() >= 2 and UnholyAoeShortCdPostConditions() or HasEquippedItem(132448) and UnholyInstructorsShortCdPostConditions() or not Talent(castigator_talent) and not HasEquippedItem(132448) and UnholyStandardShortCdPostConditions() or Talent(castigator_talent) and not HasEquippedItem(132448) and UnholyCastigatorShortCdPostConditions()
 }
 
 AddFunction UnholyGenericCdActions
@@ -991,32 +981,25 @@ AddFunction UnholyGenericCdActions
 	#summon_gargoyle,if=equipped.137075&cooldown.dark_transformation.remains<10&rune<=3
 	if HasEquippedItem(137075) and SpellCooldown(dark_transformation) < 10 and Rune() < 4 Spell(summon_gargoyle)
 
-	unless target.DebuffStacks(festering_wound_debuff) >= 7 and SpellCooldown(apocalypse) < 2 and Spell(soul_reaper_unholy) or target.DebuffStacks(festering_wound_debuff) >= 7 and Spell(apocalypse) or RunicPowerDeficit() < 30 and Spell(death_coil) or not Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and not BuffPresent(necrosis_buff) and Rune() < 4 and Spell(death_coil) or Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and SpellCooldown(dark_arbiter) > 5 and Rune() < 4 and Spell(death_coil) or target.DebuffStacks(festering_wound_debuff) < 7 and SpellCooldown(apocalypse) < 5 and Spell(festering_strike)
+	unless target.DebuffStacks(festering_wound_debuff) >= 7 and SpellCooldown(apocalypse) < 2 and Spell(soul_reaper_unholy) or target.DebuffStacks(festering_wound_debuff) >= 7 and Spell(apocalypse) or RunicPowerDeficit() < 10 and Spell(death_coil) or not Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and not BuffPresent(necrosis_buff) and Rune() < 4 and Spell(death_coil) or Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and SpellCooldown(dark_arbiter) > 5 and Rune() < 4 and Spell(death_coil) or target.DebuffStacks(festering_wound_debuff) < 7 and SpellCooldown(apocalypse) < 5 and Spell(festering_strike) or target.DebuffStacks(festering_wound_debuff) >= 3 and Spell(soul_reaper_unholy) or target.DebuffPresent(soul_reaper_unholy_debuff) and not target.DebuffPresent(festering_wound_debuff) and Spell(festering_strike) or target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 and Spell(scourge_strike) or target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 and Spell(clawing_shadows) or Spell(defile)
 	{
-		#wait,sec=cooldown.apocalypse.remains,if=cooldown.apocalypse.remains<=1&cooldown.apocalypse.remains
-		unless SpellCooldown(apocalypse) <= 1 and SpellCooldown(apocalypse) > 0 and SpellCooldown(apocalypse) > 0
+		#call_action_list,name=aoe,if=active_enemies>=2
+		if Enemies() >= 2 UnholyAoeCdActions()
+
+		unless Enemies() >= 2 and UnholyAoeCdPostConditions()
 		{
-			unless target.DebuffStacks(festering_wound_debuff) >= 3 and Spell(soul_reaper_unholy) or target.DebuffPresent(soul_reaper_unholy_debuff) and not target.DebuffPresent(festering_wound_debuff) and Spell(festering_strike) or target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 and Spell(scourge_strike) or target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 and Spell(clawing_shadows) or Spell(defile)
+			#call_action_list,name=instructors,if=equipped.132448
+			if HasEquippedItem(132448) UnholyInstructorsCdActions()
+
+			unless HasEquippedItem(132448) and UnholyInstructorsCdPostConditions()
 			{
-				#call_action_list,name=aoe,if=active_enemies>=2
-				if Enemies() >= 2 UnholyAoeCdActions()
+				#call_action_list,name=standard,if=!talent.castigator.enabled&!equipped.132448
+				if not Talent(castigator_talent) and not HasEquippedItem(132448) UnholyStandardCdActions()
 
-				unless Enemies() >= 2 and UnholyAoeCdPostConditions()
+				unless not Talent(castigator_talent) and not HasEquippedItem(132448) and UnholyStandardCdPostConditions()
 				{
-					#call_action_list,name=instructors,if=equipped.132448
-					if HasEquippedItem(132448) UnholyInstructorsCdActions()
-
-					unless HasEquippedItem(132448) and UnholyInstructorsCdPostConditions()
-					{
-						#call_action_list,name=standard,if=!talent.castigator.enabled&!equipped.132448
-						if not Talent(castigator_talent) and not HasEquippedItem(132448) UnholyStandardCdActions()
-
-						unless not Talent(castigator_talent) and not HasEquippedItem(132448) and UnholyStandardCdPostConditions()
-						{
-							#call_action_list,name=castigator,if=talent.castigator.enabled&!equipped.132448
-							if Talent(castigator_talent) and not HasEquippedItem(132448) UnholyCastigatorCdActions()
-						}
-					}
+					#call_action_list,name=castigator,if=talent.castigator.enabled&!equipped.132448
+					if Talent(castigator_talent) and not HasEquippedItem(132448) UnholyCastigatorCdActions()
 				}
 			}
 		}
@@ -1025,29 +1008,29 @@ AddFunction UnholyGenericCdActions
 
 AddFunction UnholyGenericCdPostConditions
 {
-	target.DebuffStacks(festering_wound_debuff) >= 7 and SpellCooldown(apocalypse) < 2 and Spell(soul_reaper_unholy) or target.DebuffStacks(festering_wound_debuff) >= 7 and Spell(apocalypse) or RunicPowerDeficit() < 30 and Spell(death_coil) or not Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and not BuffPresent(necrosis_buff) and Rune() < 4 and Spell(death_coil) or Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and SpellCooldown(dark_arbiter) > 5 and Rune() < 4 and Spell(death_coil) or target.DebuffStacks(festering_wound_debuff) < 7 and SpellCooldown(apocalypse) < 5 and Spell(festering_strike) or not { SpellCooldown(apocalypse) <= 1 and SpellCooldown(apocalypse) > 0 and SpellCooldown(apocalypse) > 0 } and { target.DebuffStacks(festering_wound_debuff) >= 3 and Spell(soul_reaper_unholy) or target.DebuffPresent(soul_reaper_unholy_debuff) and not target.DebuffPresent(festering_wound_debuff) and Spell(festering_strike) or target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 and Spell(scourge_strike) or target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 and Spell(clawing_shadows) or Spell(defile) or Enemies() >= 2 and UnholyAoeCdPostConditions() or HasEquippedItem(132448) and UnholyInstructorsCdPostConditions() or not Talent(castigator_talent) and not HasEquippedItem(132448) and UnholyStandardCdPostConditions() or Talent(castigator_talent) and not HasEquippedItem(132448) and UnholyCastigatorCdPostConditions() }
+	target.DebuffStacks(festering_wound_debuff) >= 7 and SpellCooldown(apocalypse) < 2 and Spell(soul_reaper_unholy) or target.DebuffStacks(festering_wound_debuff) >= 7 and Spell(apocalypse) or RunicPowerDeficit() < 10 and Spell(death_coil) or not Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and not BuffPresent(necrosis_buff) and Rune() < 4 and Spell(death_coil) or Talent(dark_arbiter_talent) and BuffPresent(sudden_doom_buff) and SpellCooldown(dark_arbiter) > 5 and Rune() < 4 and Spell(death_coil) or target.DebuffStacks(festering_wound_debuff) < 7 and SpellCooldown(apocalypse) < 5 and Spell(festering_strike) or target.DebuffStacks(festering_wound_debuff) >= 3 and Spell(soul_reaper_unholy) or target.DebuffPresent(soul_reaper_unholy_debuff) and not target.DebuffPresent(festering_wound_debuff) and Spell(festering_strike) or target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 and Spell(scourge_strike) or target.DebuffPresent(soul_reaper_unholy_debuff) and target.DebuffStacks(festering_wound_debuff) >= 1 and Spell(clawing_shadows) or Spell(defile) or Enemies() >= 2 and UnholyAoeCdPostConditions() or HasEquippedItem(132448) and UnholyInstructorsCdPostConditions() or not Talent(castigator_talent) and not HasEquippedItem(132448) and UnholyStandardCdPostConditions() or Talent(castigator_talent) and not HasEquippedItem(132448) and UnholyCastigatorCdPostConditions()
 }
 
 ### actions.instructors
 
 AddFunction UnholyInstructorsMainActions
 {
-	#festering_strike,if=debuff.festering_wound.stack<=4&runic_power.deficit>23
-	if target.DebuffStacks(festering_wound_debuff) <= 4 and RunicPowerDeficit() > 23 Spell(festering_strike)
+	#festering_strike,if=debuff.festering_wound.stack<=3&runic_power.deficit>13
+	if target.DebuffStacks(festering_wound_debuff) <= 3 and RunicPowerDeficit() > 13 Spell(festering_strike)
 	#death_coil,if=!buff.necrosis.up&talent.necrosis.enabled&rune<=3
 	if not BuffPresent(necrosis_buff) and Talent(necrosis_talent) and Rune() < 4 Spell(death_coil)
-	#scourge_strike,if=buff.necrosis.react&debuff.festering_wound.stack>=5&runic_power.deficit>29
-	if BuffPresent(necrosis_buff) and target.DebuffStacks(festering_wound_debuff) >= 5 and RunicPowerDeficit() > 29 Spell(scourge_strike)
-	#clawing_shadows,if=buff.necrosis.react&debuff.festering_wound.stack>=5&runic_power.deficit>29
-	if BuffPresent(necrosis_buff) and target.DebuffStacks(festering_wound_debuff) >= 5 and RunicPowerDeficit() > 29 Spell(clawing_shadows)
-	#scourge_strike,if=buff.unholy_strength.react&debuff.festering_wound.stack>=5&runic_power.deficit>29
-	if BuffPresent(unholy_strength_buff) and target.DebuffStacks(festering_wound_debuff) >= 5 and RunicPowerDeficit() > 29 Spell(scourge_strike)
-	#clawing_shadows,if=buff.unholy_strength.react&debuff.festering_wound.stack>=5&runic_power.deficit>29
-	if BuffPresent(unholy_strength_buff) and target.DebuffStacks(festering_wound_debuff) >= 5 and RunicPowerDeficit() > 29 Spell(clawing_shadows)
-	#scourge_strike,if=rune>=2&debuff.festering_wound.stack>=5&runic_power.deficit>29
-	if Rune() >= 2 and target.DebuffStacks(festering_wound_debuff) >= 5 and RunicPowerDeficit() > 29 Spell(scourge_strike)
-	#clawing_shadows,if=rune>=2&debuff.festering_wound.stack>=5&runic_power.deficit>29
-	if Rune() >= 2 and target.DebuffStacks(festering_wound_debuff) >= 5 and RunicPowerDeficit() > 29 Spell(clawing_shadows)
+	#scourge_strike,if=buff.necrosis.react&debuff.festering_wound.stack>=4&runic_power.deficit>29
+	if BuffPresent(necrosis_buff) and target.DebuffStacks(festering_wound_debuff) >= 4 and RunicPowerDeficit() > 29 Spell(scourge_strike)
+	#clawing_shadows,if=buff.necrosis.react&debuff.festering_wound.stack>=4&runic_power.deficit>11
+	if BuffPresent(necrosis_buff) and target.DebuffStacks(festering_wound_debuff) >= 4 and RunicPowerDeficit() > 11 Spell(clawing_shadows)
+	#scourge_strike,if=buff.unholy_strength.react&debuff.festering_wound.stack>=4&runic_power.deficit>29
+	if BuffPresent(unholy_strength_buff) and target.DebuffStacks(festering_wound_debuff) >= 4 and RunicPowerDeficit() > 29 Spell(scourge_strike)
+	#clawing_shadows,if=buff.unholy_strength.react&debuff.festering_wound.stack>=4&runic_power.deficit>11
+	if BuffPresent(unholy_strength_buff) and target.DebuffStacks(festering_wound_debuff) >= 4 and RunicPowerDeficit() > 11 Spell(clawing_shadows)
+	#scourge_strike,if=rune>=2&debuff.festering_wound.stack>=4&runic_power.deficit>29
+	if Rune() >= 2 and target.DebuffStacks(festering_wound_debuff) >= 4 and RunicPowerDeficit() > 29 Spell(scourge_strike)
+	#clawing_shadows,if=rune>=2&debuff.festering_wound.stack>=4&runic_power.deficit>11
+	if Rune() >= 2 and target.DebuffStacks(festering_wound_debuff) >= 4 and RunicPowerDeficit() > 11 Spell(clawing_shadows)
 	#death_coil,if=talent.shadow_infusion.enabled&talent.dark_arbiter.enabled&!buff.dark_transformation.up&cooldown.dark_arbiter.remains>15
 	if Talent(shadow_infusion_talent) and Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and SpellCooldown(dark_arbiter) > 15 Spell(death_coil)
 	#death_coil,if=talent.shadow_infusion.enabled&!talent.dark_arbiter.enabled&!buff.dark_transformation.up
@@ -1068,7 +1051,7 @@ AddFunction UnholyInstructorsShortCdActions
 
 AddFunction UnholyInstructorsShortCdPostConditions
 {
-	target.DebuffStacks(festering_wound_debuff) <= 4 and RunicPowerDeficit() > 23 and Spell(festering_strike) or not BuffPresent(necrosis_buff) and Talent(necrosis_talent) and Rune() < 4 and Spell(death_coil) or BuffPresent(necrosis_buff) and target.DebuffStacks(festering_wound_debuff) >= 5 and RunicPowerDeficit() > 29 and Spell(scourge_strike) or BuffPresent(necrosis_buff) and target.DebuffStacks(festering_wound_debuff) >= 5 and RunicPowerDeficit() > 29 and Spell(clawing_shadows) or BuffPresent(unholy_strength_buff) and target.DebuffStacks(festering_wound_debuff) >= 5 and RunicPowerDeficit() > 29 and Spell(scourge_strike) or BuffPresent(unholy_strength_buff) and target.DebuffStacks(festering_wound_debuff) >= 5 and RunicPowerDeficit() > 29 and Spell(clawing_shadows) or Rune() >= 2 and target.DebuffStacks(festering_wound_debuff) >= 5 and RunicPowerDeficit() > 29 and Spell(scourge_strike) or Rune() >= 2 and target.DebuffStacks(festering_wound_debuff) >= 5 and RunicPowerDeficit() > 29 and Spell(clawing_shadows) or Talent(shadow_infusion_talent) and Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and SpellCooldown(dark_arbiter) > 15 and Spell(death_coil) or Talent(shadow_infusion_talent) and not Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and Spell(death_coil) or Talent(dark_arbiter_talent) and SpellCooldown(dark_arbiter) > 15 and Spell(death_coil) or not Talent(shadow_infusion_talent) and not Talent(dark_arbiter_talent) and Spell(death_coil)
+	target.DebuffStacks(festering_wound_debuff) <= 3 and RunicPowerDeficit() > 13 and Spell(festering_strike) or not BuffPresent(necrosis_buff) and Talent(necrosis_talent) and Rune() < 4 and Spell(death_coil) or BuffPresent(necrosis_buff) and target.DebuffStacks(festering_wound_debuff) >= 4 and RunicPowerDeficit() > 29 and Spell(scourge_strike) or BuffPresent(necrosis_buff) and target.DebuffStacks(festering_wound_debuff) >= 4 and RunicPowerDeficit() > 11 and Spell(clawing_shadows) or BuffPresent(unholy_strength_buff) and target.DebuffStacks(festering_wound_debuff) >= 4 and RunicPowerDeficit() > 29 and Spell(scourge_strike) or BuffPresent(unholy_strength_buff) and target.DebuffStacks(festering_wound_debuff) >= 4 and RunicPowerDeficit() > 11 and Spell(clawing_shadows) or Rune() >= 2 and target.DebuffStacks(festering_wound_debuff) >= 4 and RunicPowerDeficit() > 29 and Spell(scourge_strike) or Rune() >= 2 and target.DebuffStacks(festering_wound_debuff) >= 4 and RunicPowerDeficit() > 11 and Spell(clawing_shadows) or Talent(shadow_infusion_talent) and Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and SpellCooldown(dark_arbiter) > 15 and Spell(death_coil) or Talent(shadow_infusion_talent) and not Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and Spell(death_coil) or Talent(dark_arbiter_talent) and SpellCooldown(dark_arbiter) > 15 and Spell(death_coil) or not Talent(shadow_infusion_talent) and not Talent(dark_arbiter_talent) and Spell(death_coil)
 }
 
 AddFunction UnholyInstructorsCdActions
@@ -1077,7 +1060,7 @@ AddFunction UnholyInstructorsCdActions
 
 AddFunction UnholyInstructorsCdPostConditions
 {
-	target.DebuffStacks(festering_wound_debuff) <= 4 and RunicPowerDeficit() > 23 and Spell(festering_strike) or not BuffPresent(necrosis_buff) and Talent(necrosis_talent) and Rune() < 4 and Spell(death_coil) or BuffPresent(necrosis_buff) and target.DebuffStacks(festering_wound_debuff) >= 5 and RunicPowerDeficit() > 29 and Spell(scourge_strike) or BuffPresent(necrosis_buff) and target.DebuffStacks(festering_wound_debuff) >= 5 and RunicPowerDeficit() > 29 and Spell(clawing_shadows) or BuffPresent(unholy_strength_buff) and target.DebuffStacks(festering_wound_debuff) >= 5 and RunicPowerDeficit() > 29 and Spell(scourge_strike) or BuffPresent(unholy_strength_buff) and target.DebuffStacks(festering_wound_debuff) >= 5 and RunicPowerDeficit() > 29 and Spell(clawing_shadows) or Rune() >= 2 and target.DebuffStacks(festering_wound_debuff) >= 5 and RunicPowerDeficit() > 29 and Spell(scourge_strike) or Rune() >= 2 and target.DebuffStacks(festering_wound_debuff) >= 5 and RunicPowerDeficit() > 29 and Spell(clawing_shadows) or Talent(shadow_infusion_talent) and Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and SpellCooldown(dark_arbiter) > 15 and Spell(death_coil) or Talent(shadow_infusion_talent) and not Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and Spell(death_coil) or Talent(dark_arbiter_talent) and SpellCooldown(dark_arbiter) > 15 and Spell(death_coil) or not Talent(shadow_infusion_talent) and not Talent(dark_arbiter_talent) and Spell(death_coil)
+	target.DebuffStacks(festering_wound_debuff) <= 3 and RunicPowerDeficit() > 13 and Spell(festering_strike) or not BuffPresent(necrosis_buff) and Talent(necrosis_talent) and Rune() < 4 and Spell(death_coil) or BuffPresent(necrosis_buff) and target.DebuffStacks(festering_wound_debuff) >= 4 and RunicPowerDeficit() > 29 and Spell(scourge_strike) or BuffPresent(necrosis_buff) and target.DebuffStacks(festering_wound_debuff) >= 4 and RunicPowerDeficit() > 11 and Spell(clawing_shadows) or BuffPresent(unholy_strength_buff) and target.DebuffStacks(festering_wound_debuff) >= 4 and RunicPowerDeficit() > 29 and Spell(scourge_strike) or BuffPresent(unholy_strength_buff) and target.DebuffStacks(festering_wound_debuff) >= 4 and RunicPowerDeficit() > 11 and Spell(clawing_shadows) or Rune() >= 2 and target.DebuffStacks(festering_wound_debuff) >= 4 and RunicPowerDeficit() > 29 and Spell(scourge_strike) or Rune() >= 2 and target.DebuffStacks(festering_wound_debuff) >= 4 and RunicPowerDeficit() > 11 and Spell(clawing_shadows) or Talent(shadow_infusion_talent) and Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and SpellCooldown(dark_arbiter) > 15 and Spell(death_coil) or Talent(shadow_infusion_talent) and not Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and Spell(death_coil) or Talent(dark_arbiter_talent) and SpellCooldown(dark_arbiter) > 15 and Spell(death_coil) or not Talent(shadow_infusion_talent) and not Talent(dark_arbiter_talent) and Spell(death_coil)
 }
 
 ### actions.precombat
@@ -1085,7 +1068,7 @@ AddFunction UnholyInstructorsCdPostConditions
 AddFunction UnholyPrecombatMainActions
 {
 	#flask,name=countless_armies
-	#food,name=the_hungry_magister
+	#food,name=nightborne_delicacy_platter
 	#augmentation,name=defiled
 	Spell(augmentation)
 }
@@ -1128,22 +1111,22 @@ AddFunction UnholyPrecombatCdPostConditions
 
 AddFunction UnholyStandardMainActions
 {
-	#festering_strike,if=debuff.festering_wound.stack<=4&runic_power.deficit>23
-	if target.DebuffStacks(festering_wound_debuff) <= 4 and RunicPowerDeficit() > 23 Spell(festering_strike)
+	#festering_strike,if=debuff.festering_wound.stack<=3&runic_power.deficit>13
+	if target.DebuffStacks(festering_wound_debuff) <= 3 and RunicPowerDeficit() > 13 Spell(festering_strike)
 	#death_coil,if=!buff.necrosis.up&talent.necrosis.enabled&rune<=3
 	if not BuffPresent(necrosis_buff) and Talent(necrosis_talent) and Rune() < 4 Spell(death_coil)
 	#scourge_strike,if=buff.necrosis.react&debuff.festering_wound.stack>=1&runic_power.deficit>15
 	if BuffPresent(necrosis_buff) and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 15 Spell(scourge_strike)
-	#clawing_shadows,if=buff.necrosis.react&debuff.festering_wound.stack>=1&runic_power.deficit>15
-	if BuffPresent(necrosis_buff) and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 15 Spell(clawing_shadows)
+	#clawing_shadows,if=buff.necrosis.react&debuff.festering_wound.stack>=1&runic_power.deficit>11
+	if BuffPresent(necrosis_buff) and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 11 Spell(clawing_shadows)
 	#scourge_strike,if=buff.unholy_strength.react&debuff.festering_wound.stack>=1&runic_power.deficit>15
 	if BuffPresent(unholy_strength_buff) and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 15 Spell(scourge_strike)
-	#clawing_shadows,if=buff.unholy_strength.react&debuff.festering_wound.stack>=1&runic_power.deficit>15
-	if BuffPresent(unholy_strength_buff) and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 15 Spell(clawing_shadows)
+	#clawing_shadows,if=buff.unholy_strength.react&debuff.festering_wound.stack>=1&runic_power.deficit>11
+	if BuffPresent(unholy_strength_buff) and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 11 Spell(clawing_shadows)
 	#scourge_strike,if=rune>=2&debuff.festering_wound.stack>=1&runic_power.deficit>15
 	if Rune() >= 2 and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 15 Spell(scourge_strike)
-	#clawing_shadows,if=rune>=2&debuff.festering_wound.stack>=1&runic_power.deficit>15
-	if Rune() >= 2 and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 15 Spell(clawing_shadows)
+	#clawing_shadows,if=rune>=2&debuff.festering_wound.stack>=1&runic_power.deficit>11
+	if Rune() >= 2 and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 11 Spell(clawing_shadows)
 	#death_coil,if=talent.shadow_infusion.enabled&talent.dark_arbiter.enabled&!buff.dark_transformation.up&cooldown.dark_arbiter.remains>15
 	if Talent(shadow_infusion_talent) and Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and SpellCooldown(dark_arbiter) > 15 Spell(death_coil)
 	#death_coil,if=talent.shadow_infusion.enabled&!talent.dark_arbiter.enabled&!buff.dark_transformation.up
@@ -1164,7 +1147,7 @@ AddFunction UnholyStandardShortCdActions
 
 AddFunction UnholyStandardShortCdPostConditions
 {
-	target.DebuffStacks(festering_wound_debuff) <= 4 and RunicPowerDeficit() > 23 and Spell(festering_strike) or not BuffPresent(necrosis_buff) and Talent(necrosis_talent) and Rune() < 4 and Spell(death_coil) or BuffPresent(necrosis_buff) and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 15 and Spell(scourge_strike) or BuffPresent(necrosis_buff) and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 15 and Spell(clawing_shadows) or BuffPresent(unholy_strength_buff) and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 15 and Spell(scourge_strike) or BuffPresent(unholy_strength_buff) and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 15 and Spell(clawing_shadows) or Rune() >= 2 and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 15 and Spell(scourge_strike) or Rune() >= 2 and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 15 and Spell(clawing_shadows) or Talent(shadow_infusion_talent) and Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and SpellCooldown(dark_arbiter) > 15 and Spell(death_coil) or Talent(shadow_infusion_talent) and not Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and Spell(death_coil) or Talent(dark_arbiter_talent) and SpellCooldown(dark_arbiter) > 15 and Spell(death_coil) or not Talent(shadow_infusion_talent) and not Talent(dark_arbiter_talent) and Spell(death_coil)
+	target.DebuffStacks(festering_wound_debuff) <= 3 and RunicPowerDeficit() > 13 and Spell(festering_strike) or not BuffPresent(necrosis_buff) and Talent(necrosis_talent) and Rune() < 4 and Spell(death_coil) or BuffPresent(necrosis_buff) and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 15 and Spell(scourge_strike) or BuffPresent(necrosis_buff) and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 11 and Spell(clawing_shadows) or BuffPresent(unholy_strength_buff) and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 15 and Spell(scourge_strike) or BuffPresent(unholy_strength_buff) and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 11 and Spell(clawing_shadows) or Rune() >= 2 and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 15 and Spell(scourge_strike) or Rune() >= 2 and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 11 and Spell(clawing_shadows) or Talent(shadow_infusion_talent) and Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and SpellCooldown(dark_arbiter) > 15 and Spell(death_coil) or Talent(shadow_infusion_talent) and not Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and Spell(death_coil) or Talent(dark_arbiter_talent) and SpellCooldown(dark_arbiter) > 15 and Spell(death_coil) or not Talent(shadow_infusion_talent) and not Talent(dark_arbiter_talent) and Spell(death_coil)
 }
 
 AddFunction UnholyStandardCdActions
@@ -1173,7 +1156,7 @@ AddFunction UnholyStandardCdActions
 
 AddFunction UnholyStandardCdPostConditions
 {
-	target.DebuffStacks(festering_wound_debuff) <= 4 and RunicPowerDeficit() > 23 and Spell(festering_strike) or not BuffPresent(necrosis_buff) and Talent(necrosis_talent) and Rune() < 4 and Spell(death_coil) or BuffPresent(necrosis_buff) and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 15 and Spell(scourge_strike) or BuffPresent(necrosis_buff) and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 15 and Spell(clawing_shadows) or BuffPresent(unholy_strength_buff) and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 15 and Spell(scourge_strike) or BuffPresent(unholy_strength_buff) and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 15 and Spell(clawing_shadows) or Rune() >= 2 and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 15 and Spell(scourge_strike) or Rune() >= 2 and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 15 and Spell(clawing_shadows) or Talent(shadow_infusion_talent) and Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and SpellCooldown(dark_arbiter) > 15 and Spell(death_coil) or Talent(shadow_infusion_talent) and not Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and Spell(death_coil) or Talent(dark_arbiter_talent) and SpellCooldown(dark_arbiter) > 15 and Spell(death_coil) or not Talent(shadow_infusion_talent) and not Talent(dark_arbiter_talent) and Spell(death_coil)
+	target.DebuffStacks(festering_wound_debuff) <= 3 and RunicPowerDeficit() > 13 and Spell(festering_strike) or not BuffPresent(necrosis_buff) and Talent(necrosis_talent) and Rune() < 4 and Spell(death_coil) or BuffPresent(necrosis_buff) and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 15 and Spell(scourge_strike) or BuffPresent(necrosis_buff) and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 11 and Spell(clawing_shadows) or BuffPresent(unholy_strength_buff) and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 15 and Spell(scourge_strike) or BuffPresent(unholy_strength_buff) and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 11 and Spell(clawing_shadows) or Rune() >= 2 and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 15 and Spell(scourge_strike) or Rune() >= 2 and target.DebuffStacks(festering_wound_debuff) >= 1 and RunicPowerDeficit() > 11 and Spell(clawing_shadows) or Talent(shadow_infusion_talent) and Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and SpellCooldown(dark_arbiter) > 15 and Spell(death_coil) or Talent(shadow_infusion_talent) and not Talent(dark_arbiter_talent) and not pet.BuffPresent(dark_transformation_buff) and Spell(death_coil) or Talent(dark_arbiter_talent) and SpellCooldown(dark_arbiter) > 15 and Spell(death_coil) or not Talent(shadow_infusion_talent) and not Talent(dark_arbiter_talent) and Spell(death_coil)
 }
 
 ### actions.valkyr
