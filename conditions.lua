@@ -3170,6 +3170,10 @@ do
 		return PowerDeficit("mana", positionalParams, namedParams, state, atTime)
 	end
 
+	local function PainDeficit(positionalParams, namedParams, state, atTime)
+		return PowerDeficit("pain", positionalParams, namedParams, state, atTime)
+	end
+
 	--- Get the number of lacking resource points for a full rage bar, between 0 and maximum rage, of the target.
 	-- @name RageDeficit
 	-- @paramsig number or boolean
@@ -3239,6 +3243,7 @@ do
 	OvaleCondition:RegisterCondition("furydeficit", false, FuryDeficit)
 	OvaleCondition:RegisterCondition("holypowerdeficit", false, HolyPowerDeficit)
 	OvaleCondition:RegisterCondition("manadeficit", false, ManaDeficit)
+	OvaleCondition:RegisterCondition("paindeficit", false, PainDeficit)
 	OvaleCondition:RegisterCondition("ragedeficit", false, RageDeficit)
 	OvaleCondition:RegisterCondition("runicpowerdeficit", false, RunicPowerDeficit)
 	OvaleCondition:RegisterCondition("shadoworbsdeficit", false, ShadowOrbsDeficit)
@@ -3364,6 +3369,10 @@ do
 	local function MaxMana(positionalParams, namedParams, state, atTime)
 		return MaxPower("mana", positionalParams, namedParams, state, atTime)
 	end
+	
+	local function MaxPain(positionalParams, namedParams, state, atTime)
+		return MaxPower("pain", positionalParams, namedParams, state, atTime)
+	end
 
 	--- Get the maximum amount of rage of the target.
 	-- @name MaxRage
@@ -3433,6 +3442,7 @@ do
 	OvaleCondition:RegisterCondition("maxfury", false, MaxFury)
 	OvaleCondition:RegisterCondition("maxholypower", false, MaxHolyPower)
 	OvaleCondition:RegisterCondition("maxmana", false, MaxMana)
+	OvaleCondition:RegisterCondition("maxpain", false, MaxPain)
 	OvaleCondition:RegisterCondition("maxrage", false, MaxRage)
 	OvaleCondition:RegisterCondition("maxrunicpower", false, MaxRunicPower)
 	OvaleCondition:RegisterCondition("maxshadoworbs", false, MaxShadowOrbs)
