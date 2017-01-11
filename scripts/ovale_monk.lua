@@ -258,30 +258,23 @@ AddFunction WindwalkerInterruptActions
 
 AddFunction WindwalkerDefaultMainActions
 {
-	#potion,name=old_war,if=buff.serenity.up|buff.storm_earth_and_fire.up|(!talent.serenity.enabled&trinket.proc.agility.react)|buff.bloodlust.react|target.time_to_die<=60
-	#call_action_list,name=serenity,if=(talent.serenity.enabled&cooldown.serenity.remains<=0)&((artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.remains<=15&cooldown.fists_of_fury.remains<8&cooldown.rising_sun_kick.remains<=4)|buff.serenity.up)
-	if Talent(serenity_talent) and SpellCooldown(serenity) <= 0 and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 15 and SpellCooldown(fists_of_fury) < 8 and SpellCooldown(rising_sun_kick) <= 4 or BuffPresent(serenity_buff) } WindwalkerSerenityMainActions()
+	#call_action_list,name=serenity,if=(talent.serenity.enabled&cooldown.serenity.remains<=0)|buff.serenity.up
+	if Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) WindwalkerSerenityMainActions()
 
-	unless Talent(serenity_talent) and SpellCooldown(serenity) <= 0 and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 15 and SpellCooldown(fists_of_fury) < 8 and SpellCooldown(rising_sun_kick) <= 4 or BuffPresent(serenity_buff) } and WindwalkerSerenityMainPostConditions()
+	unless { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and WindwalkerSerenityMainPostConditions()
 	{
-		#call_action_list,name=sef,if=!talent.serenity.enabled&((artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.remains<=14&cooldown.fists_of_fury.remains<=6&cooldown.rising_sun_kick.remains<=6)|buff.storm_earth_and_fire.up)
-		if not Talent(serenity_talent) and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 14 and SpellCooldown(fists_of_fury) <= 6 and SpellCooldown(rising_sun_kick) <= 6 or BuffPresent(storm_earth_and_fire_buff) } WindwalkerSefMainActions()
+		#call_action_list,name=sef,if=!talent.serenity.enabled&equipped.drinking_horn_cover&((cooldown.fists_of_fury.remains<=1&chi>=3)|buff.storm_earth_and_fire.up|cooldown.storm_earth_and_fire.charges=2|target.time_to_die<=25|cooldown.touch_of_death.remains>=85)
+		if not Talent(serenity_talent) and HasEquippedItem(drinking_horn_cover) and { SpellCooldown(fists_of_fury) <= 1 and Chi() >= 3 or BuffPresent(storm_earth_and_fire_buff) or SpellChargeCooldown(storm_earth_and_fire) == 2 or target.TimeToDie() <= 25 or SpellCooldown(touch_of_death) >= 85 } WindwalkerSefMainActions()
 
-		unless not Talent(serenity_talent) and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 14 and SpellCooldown(fists_of_fury) <= 6 and SpellCooldown(rising_sun_kick) <= 6 or BuffPresent(storm_earth_and_fire_buff) } and WindwalkerSefMainPostConditions()
+		unless not Talent(serenity_talent) and HasEquippedItem(drinking_horn_cover) and { SpellCooldown(fists_of_fury) <= 1 and Chi() >= 3 or BuffPresent(storm_earth_and_fire_buff) or SpellChargeCooldown(storm_earth_and_fire) == 2 or target.TimeToDie() <= 25 or SpellCooldown(touch_of_death) >= 85 } and WindwalkerSefMainPostConditions()
 		{
-			#call_action_list,name=serenity,if=(talent.serenity.enabled&cooldown.serenity.remains<=0)&(!artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.remains<14&cooldown.fists_of_fury.remains<=15&cooldown.rising_sun_kick.remains<7)|buff.serenity.up
-			if Talent(serenity_talent) and SpellCooldown(serenity) <= 0 and not HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) < 14 and SpellCooldown(fists_of_fury) <= 15 and SpellCooldown(rising_sun_kick) < 7 or BuffPresent(serenity_buff) WindwalkerSerenityMainActions()
+			#call_action_list,name=sef,if=!talent.serenity.enabled&!equipped.drinking_horn_cover&((artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.remains<=14&cooldown.fists_of_fury.remains<=6&cooldown.rising_sun_kick.remains<=6)|buff.storm_earth_and_fire.up)
+			if not Talent(serenity_talent) and not HasEquippedItem(drinking_horn_cover) and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 14 and SpellCooldown(fists_of_fury) <= 6 and SpellCooldown(rising_sun_kick) <= 6 or BuffPresent(storm_earth_and_fire_buff) } WindwalkerSefMainActions()
 
-			unless { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 and not HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) < 14 and SpellCooldown(fists_of_fury) <= 15 and SpellCooldown(rising_sun_kick) < 7 or BuffPresent(serenity_buff) } and WindwalkerSerenityMainPostConditions()
+			unless not Talent(serenity_talent) and not HasEquippedItem(drinking_horn_cover) and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 14 and SpellCooldown(fists_of_fury) <= 6 and SpellCooldown(rising_sun_kick) <= 6 or BuffPresent(storm_earth_and_fire_buff) } and WindwalkerSefMainPostConditions()
 			{
-				#call_action_list,name=sef,if=!talent.serenity.enabled&((!artifact.strike_of_the_windlord.enabled&cooldown.fists_of_fury.remains<=9&cooldown.rising_sun_kick.remains<=5)|buff.storm_earth_and_fire.up)
-				if not Talent(serenity_talent) and { not HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 or BuffPresent(storm_earth_and_fire_buff) } WindwalkerSefMainActions()
-
-				unless not Talent(serenity_talent) and { not HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 or BuffPresent(storm_earth_and_fire_buff) } and WindwalkerSefMainPostConditions()
-				{
-					#call_action_list,name=st
-					WindwalkerStMainActions()
-				}
+				#call_action_list,name=st
+				WindwalkerStMainActions()
 			}
 		}
 	}
@@ -289,37 +282,30 @@ AddFunction WindwalkerDefaultMainActions
 
 AddFunction WindwalkerDefaultMainPostConditions
 {
-	Talent(serenity_talent) and SpellCooldown(serenity) <= 0 and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 15 and SpellCooldown(fists_of_fury) < 8 and SpellCooldown(rising_sun_kick) <= 4 or BuffPresent(serenity_buff) } and WindwalkerSerenityMainPostConditions() or not Talent(serenity_talent) and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 14 and SpellCooldown(fists_of_fury) <= 6 and SpellCooldown(rising_sun_kick) <= 6 or BuffPresent(storm_earth_and_fire_buff) } and WindwalkerSefMainPostConditions() or { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 and not HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) < 14 and SpellCooldown(fists_of_fury) <= 15 and SpellCooldown(rising_sun_kick) < 7 or BuffPresent(serenity_buff) } and WindwalkerSerenityMainPostConditions() or not Talent(serenity_talent) and { not HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 or BuffPresent(storm_earth_and_fire_buff) } and WindwalkerSefMainPostConditions() or WindwalkerStMainPostConditions()
+	{ Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and WindwalkerSerenityMainPostConditions() or not Talent(serenity_talent) and HasEquippedItem(drinking_horn_cover) and { SpellCooldown(fists_of_fury) <= 1 and Chi() >= 3 or BuffPresent(storm_earth_and_fire_buff) or SpellChargeCooldown(storm_earth_and_fire) == 2 or target.TimeToDie() <= 25 or SpellCooldown(touch_of_death) >= 85 } and WindwalkerSefMainPostConditions() or not Talent(serenity_talent) and not HasEquippedItem(drinking_horn_cover) and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 14 and SpellCooldown(fists_of_fury) <= 6 and SpellCooldown(rising_sun_kick) <= 6 or BuffPresent(storm_earth_and_fire_buff) } and WindwalkerSefMainPostConditions() or WindwalkerStMainPostConditions()
 }
 
 AddFunction WindwalkerDefaultShortCdActions
 {
 	#auto_attack
 	WindwalkerGetInMeleeRange()
-	#potion,name=old_war,if=buff.serenity.up|buff.storm_earth_and_fire.up|(!talent.serenity.enabled&trinket.proc.agility.react)|buff.bloodlust.react|target.time_to_die<=60
-	#call_action_list,name=serenity,if=(talent.serenity.enabled&cooldown.serenity.remains<=0)&((artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.remains<=15&cooldown.fists_of_fury.remains<8&cooldown.rising_sun_kick.remains<=4)|buff.serenity.up)
-	if Talent(serenity_talent) and SpellCooldown(serenity) <= 0 and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 15 and SpellCooldown(fists_of_fury) < 8 and SpellCooldown(rising_sun_kick) <= 4 or BuffPresent(serenity_buff) } WindwalkerSerenityShortCdActions()
+	#call_action_list,name=serenity,if=(talent.serenity.enabled&cooldown.serenity.remains<=0)|buff.serenity.up
+	if Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) WindwalkerSerenityShortCdActions()
 
-	unless Talent(serenity_talent) and SpellCooldown(serenity) <= 0 and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 15 and SpellCooldown(fists_of_fury) < 8 and SpellCooldown(rising_sun_kick) <= 4 or BuffPresent(serenity_buff) } and WindwalkerSerenityShortCdPostConditions()
+	unless { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and WindwalkerSerenityShortCdPostConditions()
 	{
-		#call_action_list,name=sef,if=!talent.serenity.enabled&((artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.remains<=14&cooldown.fists_of_fury.remains<=6&cooldown.rising_sun_kick.remains<=6)|buff.storm_earth_and_fire.up)
-		if not Talent(serenity_talent) and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 14 and SpellCooldown(fists_of_fury) <= 6 and SpellCooldown(rising_sun_kick) <= 6 or BuffPresent(storm_earth_and_fire_buff) } WindwalkerSefShortCdActions()
+		#call_action_list,name=sef,if=!talent.serenity.enabled&equipped.drinking_horn_cover&((cooldown.fists_of_fury.remains<=1&chi>=3)|buff.storm_earth_and_fire.up|cooldown.storm_earth_and_fire.charges=2|target.time_to_die<=25|cooldown.touch_of_death.remains>=85)
+		if not Talent(serenity_talent) and HasEquippedItem(drinking_horn_cover) and { SpellCooldown(fists_of_fury) <= 1 and Chi() >= 3 or BuffPresent(storm_earth_and_fire_buff) or SpellChargeCooldown(storm_earth_and_fire) == 2 or target.TimeToDie() <= 25 or SpellCooldown(touch_of_death) >= 85 } WindwalkerSefShortCdActions()
 
-		unless not Talent(serenity_talent) and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 14 and SpellCooldown(fists_of_fury) <= 6 and SpellCooldown(rising_sun_kick) <= 6 or BuffPresent(storm_earth_and_fire_buff) } and WindwalkerSefShortCdPostConditions()
+		unless not Talent(serenity_talent) and HasEquippedItem(drinking_horn_cover) and { SpellCooldown(fists_of_fury) <= 1 and Chi() >= 3 or BuffPresent(storm_earth_and_fire_buff) or SpellChargeCooldown(storm_earth_and_fire) == 2 or target.TimeToDie() <= 25 or SpellCooldown(touch_of_death) >= 85 } and WindwalkerSefShortCdPostConditions()
 		{
-			#call_action_list,name=serenity,if=(talent.serenity.enabled&cooldown.serenity.remains<=0)&(!artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.remains<14&cooldown.fists_of_fury.remains<=15&cooldown.rising_sun_kick.remains<7)|buff.serenity.up
-			if Talent(serenity_talent) and SpellCooldown(serenity) <= 0 and not HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) < 14 and SpellCooldown(fists_of_fury) <= 15 and SpellCooldown(rising_sun_kick) < 7 or BuffPresent(serenity_buff) WindwalkerSerenityShortCdActions()
+			#call_action_list,name=sef,if=!talent.serenity.enabled&!equipped.drinking_horn_cover&((artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.remains<=14&cooldown.fists_of_fury.remains<=6&cooldown.rising_sun_kick.remains<=6)|buff.storm_earth_and_fire.up)
+			if not Talent(serenity_talent) and not HasEquippedItem(drinking_horn_cover) and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 14 and SpellCooldown(fists_of_fury) <= 6 and SpellCooldown(rising_sun_kick) <= 6 or BuffPresent(storm_earth_and_fire_buff) } WindwalkerSefShortCdActions()
 
-			unless { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 and not HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) < 14 and SpellCooldown(fists_of_fury) <= 15 and SpellCooldown(rising_sun_kick) < 7 or BuffPresent(serenity_buff) } and WindwalkerSerenityShortCdPostConditions()
+			unless not Talent(serenity_talent) and not HasEquippedItem(drinking_horn_cover) and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 14 and SpellCooldown(fists_of_fury) <= 6 and SpellCooldown(rising_sun_kick) <= 6 or BuffPresent(storm_earth_and_fire_buff) } and WindwalkerSefShortCdPostConditions()
 			{
-				#call_action_list,name=sef,if=!talent.serenity.enabled&((!artifact.strike_of_the_windlord.enabled&cooldown.fists_of_fury.remains<=9&cooldown.rising_sun_kick.remains<=5)|buff.storm_earth_and_fire.up)
-				if not Talent(serenity_talent) and { not HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 or BuffPresent(storm_earth_and_fire_buff) } WindwalkerSefShortCdActions()
-
-				unless not Talent(serenity_talent) and { not HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 or BuffPresent(storm_earth_and_fire_buff) } and WindwalkerSefShortCdPostConditions()
-				{
-					#call_action_list,name=st
-					WindwalkerStShortCdActions()
-				}
+				#call_action_list,name=st
+				WindwalkerStShortCdActions()
 			}
 		}
 	}
@@ -327,37 +313,33 @@ AddFunction WindwalkerDefaultShortCdActions
 
 AddFunction WindwalkerDefaultShortCdPostConditions
 {
-	Talent(serenity_talent) and SpellCooldown(serenity) <= 0 and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 15 and SpellCooldown(fists_of_fury) < 8 and SpellCooldown(rising_sun_kick) <= 4 or BuffPresent(serenity_buff) } and WindwalkerSerenityShortCdPostConditions() or not Talent(serenity_talent) and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 14 and SpellCooldown(fists_of_fury) <= 6 and SpellCooldown(rising_sun_kick) <= 6 or BuffPresent(storm_earth_and_fire_buff) } and WindwalkerSefShortCdPostConditions() or { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 and not HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) < 14 and SpellCooldown(fists_of_fury) <= 15 and SpellCooldown(rising_sun_kick) < 7 or BuffPresent(serenity_buff) } and WindwalkerSerenityShortCdPostConditions() or not Talent(serenity_talent) and { not HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 or BuffPresent(storm_earth_and_fire_buff) } and WindwalkerSefShortCdPostConditions() or WindwalkerStShortCdPostConditions()
+	{ Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and WindwalkerSerenityShortCdPostConditions() or not Talent(serenity_talent) and HasEquippedItem(drinking_horn_cover) and { SpellCooldown(fists_of_fury) <= 1 and Chi() >= 3 or BuffPresent(storm_earth_and_fire_buff) or SpellChargeCooldown(storm_earth_and_fire) == 2 or target.TimeToDie() <= 25 or SpellCooldown(touch_of_death) >= 85 } and WindwalkerSefShortCdPostConditions() or not Talent(serenity_talent) and not HasEquippedItem(drinking_horn_cover) and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 14 and SpellCooldown(fists_of_fury) <= 6 and SpellCooldown(rising_sun_kick) <= 6 or BuffPresent(storm_earth_and_fire_buff) } and WindwalkerSefShortCdPostConditions() or WindwalkerStShortCdPostConditions()
 }
 
 AddFunction WindwalkerDefaultCdActions
 {
 	#spear_hand_strike,if=target.debuff.casting.react
 	if target.IsInterruptible() WindwalkerInterruptActions()
-	#potion,name=old_war,if=buff.serenity.up|buff.storm_earth_and_fire.up|(!talent.serenity.enabled&trinket.proc.agility.react)|buff.bloodlust.react|target.time_to_die<=60
-	#call_action_list,name=serenity,if=(talent.serenity.enabled&cooldown.serenity.remains<=0)&((artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.remains<=15&cooldown.fists_of_fury.remains<8&cooldown.rising_sun_kick.remains<=4)|buff.serenity.up)
-	if Talent(serenity_talent) and SpellCooldown(serenity) <= 0 and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 15 and SpellCooldown(fists_of_fury) < 8 and SpellCooldown(rising_sun_kick) <= 4 or BuffPresent(serenity_buff) } WindwalkerSerenityCdActions()
+	#potion,name=prolonged_power,if=buff.serenity.up|buff.storm_earth_and_fire.up|(!talent.serenity.enabled&trinket.proc.agility.react)|buff.bloodlust.react|target.time_to_die<=60
+	#touch_of_death,if=target.time_to_die<=9
+	if target.TimeToDie() <= 9 Spell(touch_of_death)
+	#call_action_list,name=serenity,if=(talent.serenity.enabled&cooldown.serenity.remains<=0)|buff.serenity.up
+	if Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) WindwalkerSerenityCdActions()
 
-	unless Talent(serenity_talent) and SpellCooldown(serenity) <= 0 and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 15 and SpellCooldown(fists_of_fury) < 8 and SpellCooldown(rising_sun_kick) <= 4 or BuffPresent(serenity_buff) } and WindwalkerSerenityCdPostConditions()
+	unless { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and WindwalkerSerenityCdPostConditions()
 	{
-		#call_action_list,name=sef,if=!talent.serenity.enabled&((artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.remains<=14&cooldown.fists_of_fury.remains<=6&cooldown.rising_sun_kick.remains<=6)|buff.storm_earth_and_fire.up)
-		if not Talent(serenity_talent) and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 14 and SpellCooldown(fists_of_fury) <= 6 and SpellCooldown(rising_sun_kick) <= 6 or BuffPresent(storm_earth_and_fire_buff) } WindwalkerSefCdActions()
+		#call_action_list,name=sef,if=!talent.serenity.enabled&equipped.drinking_horn_cover&((cooldown.fists_of_fury.remains<=1&chi>=3)|buff.storm_earth_and_fire.up|cooldown.storm_earth_and_fire.charges=2|target.time_to_die<=25|cooldown.touch_of_death.remains>=85)
+		if not Talent(serenity_talent) and HasEquippedItem(drinking_horn_cover) and { SpellCooldown(fists_of_fury) <= 1 and Chi() >= 3 or BuffPresent(storm_earth_and_fire_buff) or SpellChargeCooldown(storm_earth_and_fire) == 2 or target.TimeToDie() <= 25 or SpellCooldown(touch_of_death) >= 85 } WindwalkerSefCdActions()
 
-		unless not Talent(serenity_talent) and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 14 and SpellCooldown(fists_of_fury) <= 6 and SpellCooldown(rising_sun_kick) <= 6 or BuffPresent(storm_earth_and_fire_buff) } and WindwalkerSefCdPostConditions()
+		unless not Talent(serenity_talent) and HasEquippedItem(drinking_horn_cover) and { SpellCooldown(fists_of_fury) <= 1 and Chi() >= 3 or BuffPresent(storm_earth_and_fire_buff) or SpellChargeCooldown(storm_earth_and_fire) == 2 or target.TimeToDie() <= 25 or SpellCooldown(touch_of_death) >= 85 } and WindwalkerSefCdPostConditions()
 		{
-			#call_action_list,name=serenity,if=(talent.serenity.enabled&cooldown.serenity.remains<=0)&(!artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.remains<14&cooldown.fists_of_fury.remains<=15&cooldown.rising_sun_kick.remains<7)|buff.serenity.up
-			if Talent(serenity_talent) and SpellCooldown(serenity) <= 0 and not HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) < 14 and SpellCooldown(fists_of_fury) <= 15 and SpellCooldown(rising_sun_kick) < 7 or BuffPresent(serenity_buff) WindwalkerSerenityCdActions()
+			#call_action_list,name=sef,if=!talent.serenity.enabled&!equipped.drinking_horn_cover&((artifact.strike_of_the_windlord.enabled&cooldown.strike_of_the_windlord.remains<=14&cooldown.fists_of_fury.remains<=6&cooldown.rising_sun_kick.remains<=6)|buff.storm_earth_and_fire.up)
+			if not Talent(serenity_talent) and not HasEquippedItem(drinking_horn_cover) and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 14 and SpellCooldown(fists_of_fury) <= 6 and SpellCooldown(rising_sun_kick) <= 6 or BuffPresent(storm_earth_and_fire_buff) } WindwalkerSefCdActions()
 
-			unless { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 and not HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) < 14 and SpellCooldown(fists_of_fury) <= 15 and SpellCooldown(rising_sun_kick) < 7 or BuffPresent(serenity_buff) } and WindwalkerSerenityCdPostConditions()
+			unless not Talent(serenity_talent) and not HasEquippedItem(drinking_horn_cover) and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 14 and SpellCooldown(fists_of_fury) <= 6 and SpellCooldown(rising_sun_kick) <= 6 or BuffPresent(storm_earth_and_fire_buff) } and WindwalkerSefCdPostConditions()
 			{
-				#call_action_list,name=sef,if=!talent.serenity.enabled&((!artifact.strike_of_the_windlord.enabled&cooldown.fists_of_fury.remains<=9&cooldown.rising_sun_kick.remains<=5)|buff.storm_earth_and_fire.up)
-				if not Talent(serenity_talent) and { not HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 or BuffPresent(storm_earth_and_fire_buff) } WindwalkerSefCdActions()
-
-				unless not Talent(serenity_talent) and { not HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 or BuffPresent(storm_earth_and_fire_buff) } and WindwalkerSefCdPostConditions()
-				{
-					#call_action_list,name=st
-					WindwalkerStCdActions()
-				}
+				#call_action_list,name=st
+				WindwalkerStCdActions()
 			}
 		}
 	}
@@ -365,7 +347,7 @@ AddFunction WindwalkerDefaultCdActions
 
 AddFunction WindwalkerDefaultCdPostConditions
 {
-	Talent(serenity_talent) and SpellCooldown(serenity) <= 0 and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 15 and SpellCooldown(fists_of_fury) < 8 and SpellCooldown(rising_sun_kick) <= 4 or BuffPresent(serenity_buff) } and WindwalkerSerenityCdPostConditions() or not Talent(serenity_talent) and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 14 and SpellCooldown(fists_of_fury) <= 6 and SpellCooldown(rising_sun_kick) <= 6 or BuffPresent(storm_earth_and_fire_buff) } and WindwalkerSefCdPostConditions() or { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 and not HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) < 14 and SpellCooldown(fists_of_fury) <= 15 and SpellCooldown(rising_sun_kick) < 7 or BuffPresent(serenity_buff) } and WindwalkerSerenityCdPostConditions() or not Talent(serenity_talent) and { not HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(fists_of_fury) <= 9 and SpellCooldown(rising_sun_kick) <= 5 or BuffPresent(storm_earth_and_fire_buff) } and WindwalkerSefCdPostConditions() or WindwalkerStCdPostConditions()
+	{ Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and WindwalkerSerenityCdPostConditions() or not Talent(serenity_talent) and HasEquippedItem(drinking_horn_cover) and { SpellCooldown(fists_of_fury) <= 1 and Chi() >= 3 or BuffPresent(storm_earth_and_fire_buff) or SpellChargeCooldown(storm_earth_and_fire) == 2 or target.TimeToDie() <= 25 or SpellCooldown(touch_of_death) >= 85 } and WindwalkerSefCdPostConditions() or not Talent(serenity_talent) and not HasEquippedItem(drinking_horn_cover) and { HasArtifactTrait(strike_of_the_windlord) and SpellCooldown(strike_of_the_windlord) <= 14 and SpellCooldown(fists_of_fury) <= 6 and SpellCooldown(rising_sun_kick) <= 6 or BuffPresent(storm_earth_and_fire_buff) } and WindwalkerSefCdPostConditions() or WindwalkerStCdPostConditions()
 }
 
 ### actions.cd
@@ -394,14 +376,16 @@ AddFunction WindwalkerCdCdActions
 	Spell(blood_fury_apsp)
 	#berserking
 	Spell(berserking)
-	#touch_of_death,cycle_targets=1,max_cycle_targets=2,if=!artifact.gale_burst.enabled&equipped.137057&!prev_gcd.touch_of_death
-	if DebuffCountOnAny(touch_of_death_debuff) < Enemies() and DebuffCountOnAny(touch_of_death_debuff) <= 2 and not HasArtifactTrait(gale_burst) and HasEquippedItem(137057) and not PreviousGCDSpell(touch_of_death) Spell(touch_of_death)
-	#touch_of_death,if=!artifact.gale_burst.enabled&!equipped.137057
-	if not HasArtifactTrait(gale_burst) and not HasEquippedItem(137057) Spell(touch_of_death)
-	#touch_of_death,cycle_targets=1,max_cycle_targets=2,if=artifact.gale_burst.enabled&equipped.137057&cooldown.strike_of_the_windlord.remains<8&cooldown.fists_of_fury.remains<=4&cooldown.rising_sun_kick.remains<7&!prev_gcd.touch_of_death
-	if DebuffCountOnAny(touch_of_death_debuff) < Enemies() and DebuffCountOnAny(touch_of_death_debuff) <= 2 and HasArtifactTrait(gale_burst) and HasEquippedItem(137057) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 4 and SpellCooldown(rising_sun_kick) < 7 and not PreviousGCDSpell(touch_of_death) Spell(touch_of_death)
-	#touch_of_death,if=artifact.gale_burst.enabled&!equipped.137057&cooldown.strike_of_the_windlord.remains<8&cooldown.fists_of_fury.remains<=4&cooldown.rising_sun_kick.remains<7
-	if HasArtifactTrait(gale_burst) and not HasEquippedItem(137057) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 4 and SpellCooldown(rising_sun_kick) < 7 Spell(touch_of_death)
+	#touch_of_death,cycle_targets=1,max_cycle_targets=2,if=!artifact.gale_burst.enabled&equipped.hidden_masters_forbidden_touch&(prev_gcd.2.touch_of_death|prev_gcd.3.touch_of_death|prev_gcd.4.touch_of_death)
+	if DebuffCountOnAny(touch_of_death_debuff) < Enemies() and DebuffCountOnAny(touch_of_death_debuff) <= 2 and not HasArtifactTrait(gale_burst) and HasEquippedItem(hidden_masters_forbidden_touch) and { PreviousGCDSpell(2) or PreviousGCDSpell(3) or PreviousGCDSpell(4) } Spell(touch_of_death)
+	#touch_of_death,if=!artifact.gale_burst.enabled&!equipped.hidden_masters_forbidden_touch
+	if not HasArtifactTrait(gale_burst) and not HasEquippedItem(hidden_masters_forbidden_touch) Spell(touch_of_death)
+	#touch_of_death,cycle_targets=1,max_cycle_targets=2,if=artifact.gale_burst.enabled&equipped.hidden_masters_forbidden_touch&cooldown.strike_of_the_windlord.remains<8&cooldown.fists_of_fury.remains<=4&cooldown.rising_sun_kick.remains<7&(prev_gcd.2.touch_of_death|prev_gcd.3.touch_of_death|prev_gcd.4.touch_of_death)
+	if DebuffCountOnAny(touch_of_death_debuff) < Enemies() and DebuffCountOnAny(touch_of_death_debuff) <= 2 and HasArtifactTrait(gale_burst) and HasEquippedItem(hidden_masters_forbidden_touch) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 4 and SpellCooldown(rising_sun_kick) < 7 and { PreviousGCDSpell(2) or PreviousGCDSpell(3) or PreviousGCDSpell(4) } Spell(touch_of_death)
+	#touch_of_death,if=artifact.gale_burst.enabled&!talent.serenity.enabled&!equipped.hidden_masters_forbidden_touch&cooldown.strike_of_the_windlord.remains<8&cooldown.fists_of_fury.remains<=4&cooldown.rising_sun_kick.remains<7&chi>=2
+	if HasArtifactTrait(gale_burst) and not Talent(serenity_talent) and not HasEquippedItem(hidden_masters_forbidden_touch) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 4 and SpellCooldown(rising_sun_kick) < 7 and Chi() >= 2 Spell(touch_of_death)
+	#touch_of_death,if=artifact.gale_burst.enabled&talent.serenity.enabled&!equipped.hidden_masters_forbidden_touch&cooldown.strike_of_the_windlord.remains<8&cooldown.fists_of_fury.remains<=4&cooldown.rising_sun_kick.remains<7
+	if HasArtifactTrait(gale_burst) and Talent(serenity_talent) and not HasEquippedItem(hidden_masters_forbidden_touch) and SpellCooldown(strike_of_the_windlord) < 8 and SpellCooldown(fists_of_fury) <= 4 and SpellCooldown(rising_sun_kick) < 7 Spell(touch_of_death)
 }
 
 AddFunction WindwalkerCdCdPostConditions
@@ -413,7 +397,7 @@ AddFunction WindwalkerCdCdPostConditions
 AddFunction WindwalkerPrecombatMainActions
 {
 	#flask,type=flask_of_the_seventh_demon
-	#food,type=fishbrul_special
+	#food,type=the_hungry_magister
 	#augmentation,type=defiled
 	Spell(augmentation)
 }
@@ -444,11 +428,17 @@ AddFunction WindwalkerPrecombatCdPostConditions
 
 AddFunction WindwalkerSefMainActions
 {
+	#tiger_palm,if=energy=energy.max&chi<1
+	if Energy() == MaxEnergy() and Chi() < 1 Spell(tiger_palm)
 	#call_action_list,name=cd
 	WindwalkerCdMainActions()
 
 	unless WindwalkerCdMainPostConditions()
 	{
+		#fists_of_fury,if=buff.storm_earth_and_fire.up
+		if BuffPresent(storm_earth_and_fire_buff) Spell(fists_of_fury)
+		#rising_sun_kick,if=buff.storm_earth_and_fire.up&chi=2&energy<energy.max
+		if BuffPresent(storm_earth_and_fire_buff) and Chi() == 2 and Energy() < MaxEnergy() Spell(rising_sun_kick)
 		#call_action_list,name=st
 		WindwalkerStMainActions()
 	}
@@ -461,42 +451,56 @@ AddFunction WindwalkerSefMainPostConditions
 
 AddFunction WindwalkerSefShortCdActions
 {
-	#energizing_elixir
-	Spell(energizing_elixir)
-	#call_action_list,name=cd
-	WindwalkerCdShortCdActions()
-
-	unless WindwalkerCdShortCdPostConditions()
+	unless Energy() == MaxEnergy() and Chi() < 1 and Spell(tiger_palm)
 	{
-		#call_action_list,name=st
-		WindwalkerStShortCdActions()
+		#call_action_list,name=cd
+		WindwalkerCdShortCdActions()
+
+		unless WindwalkerCdShortCdPostConditions() or BuffPresent(storm_earth_and_fire_buff) and Spell(fists_of_fury) or BuffPresent(storm_earth_and_fire_buff) and Chi() == 2 and Energy() < MaxEnergy() and Spell(rising_sun_kick)
+		{
+			#call_action_list,name=st
+			WindwalkerStShortCdActions()
+		}
 	}
 }
 
 AddFunction WindwalkerSefShortCdPostConditions
 {
-	WindwalkerCdShortCdPostConditions() or WindwalkerStShortCdPostConditions()
+	Energy() == MaxEnergy() and Chi() < 1 and Spell(tiger_palm) or WindwalkerCdShortCdPostConditions() or BuffPresent(storm_earth_and_fire_buff) and Spell(fists_of_fury) or BuffPresent(storm_earth_and_fire_buff) and Chi() == 2 and Energy() < MaxEnergy() and Spell(rising_sun_kick) or WindwalkerStShortCdPostConditions()
 }
 
 AddFunction WindwalkerSefCdActions
 {
-	#arcane_torrent,if=chi.max-chi>=1&energy.time_to_max>=0.5
-	if MaxChi() - Chi() >= 1 and TimeToMaxEnergy() >= 0.5 Spell(arcane_torrent_chi)
-	#call_action_list,name=cd
-	WindwalkerCdCdActions()
-
-	unless WindwalkerCdCdPostConditions()
+	unless Energy() == MaxEnergy() and Chi() < 1 and Spell(tiger_palm)
 	{
-		#storm_earth_and_fire
-		if CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff) Spell(storm_earth_and_fire)
-		#call_action_list,name=st
-		WindwalkerStCdActions()
+		#arcane_torrent,if=chi.max-chi>=1&energy.time_to_max>=0.5
+		if MaxChi() - Chi() >= 1 and TimeToMaxEnergy() >= 0.5 Spell(arcane_torrent_chi)
+		#call_action_list,name=cd
+		WindwalkerCdCdActions()
+
+		unless WindwalkerCdCdPostConditions()
+		{
+			#storm_earth_and_fire,if=!buff.storm_earth_and_fire.up&(cooldown.touch_of_death.remains<=8|cooldown.touch_of_death.remains>85)
+			if not BuffPresent(storm_earth_and_fire_buff) and { SpellCooldown(touch_of_death) <= 8 or SpellCooldown(touch_of_death) > 85 } and CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff) Spell(storm_earth_and_fire)
+			#storm_earth_and_fire,if=!buff.storm_earth_and_fire.up&cooldown.storm_earth_and_fire.charges=2
+			if not BuffPresent(storm_earth_and_fire_buff) and SpellChargeCooldown(storm_earth_and_fire) == 2 and CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff) Spell(storm_earth_and_fire)
+			#storm_earth_and_fire,if=!buff.storm_earth_and_fire.up&target.time_to_die<=25
+			if not BuffPresent(storm_earth_and_fire_buff) and target.TimeToDie() <= 25 and CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff) Spell(storm_earth_and_fire)
+			#storm_earth_and_fire,if=!buff.storm_earth_and_fire.up&cooldown.fists_of_fury.remains<=1&chi>=3
+			if not BuffPresent(storm_earth_and_fire_buff) and SpellCooldown(fists_of_fury) <= 1 and Chi() >= 3 and CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff) Spell(storm_earth_and_fire)
+
+			unless BuffPresent(storm_earth_and_fire_buff) and Spell(fists_of_fury) or BuffPresent(storm_earth_and_fire_buff) and Chi() == 2 and Energy() < MaxEnergy() and Spell(rising_sun_kick)
+			{
+				#call_action_list,name=st
+				WindwalkerStCdActions()
+			}
+		}
 	}
 }
 
 AddFunction WindwalkerSefCdPostConditions
 {
-	WindwalkerCdCdPostConditions() or WindwalkerStCdPostConditions()
+	Energy() == MaxEnergy() and Chi() < 1 and Spell(tiger_palm) or WindwalkerCdCdPostConditions() or BuffPresent(storm_earth_and_fire_buff) and Spell(fists_of_fury) or BuffPresent(storm_earth_and_fire_buff) and Chi() == 2 and Energy() < MaxEnergy() and Spell(rising_sun_kick) or WindwalkerStCdPostConditions()
 }
 
 ### actions.serenity
@@ -514,16 +518,16 @@ AddFunction WindwalkerSerenityMainActions
 		if Enemies() < 3 Spell(rising_sun_kick)
 		#fists_of_fury
 		Spell(fists_of_fury)
-		#spinning_crane_kick,if=active_enemies>=3&!prev_gcd.spinning_crane_kick
-		if Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) Spell(spinning_crane_kick)
+		#spinning_crane_kick,if=active_enemies>=3&!prev_gcd.1.spinning_crane_kick
+		if Enemies() >= 3 and not PreviousGCDSpell(1) Spell(spinning_crane_kick)
 		#rising_sun_kick,cycle_targets=1,if=active_enemies>=3
 		if Enemies() >= 3 Spell(rising_sun_kick)
-		#blackout_kick,cycle_targets=1,if=!prev_gcd.blackout_kick
-		if not PreviousGCDSpell(blackout_kick) Spell(blackout_kick)
-		#spinning_crane_kick,if=!prev_gcd.spinning_crane_kick
-		if not PreviousGCDSpell(spinning_crane_kick) Spell(spinning_crane_kick)
-		#rushing_jade_wind,if=!prev_gcd.rushing_jade_wind
-		if not PreviousGCDSpell(rushing_jade_wind) Spell(rushing_jade_wind)
+		#spinning_crane_kick,if=!prev_gcd.1.spinning_crane_kick
+		if not PreviousGCDSpell(1) Spell(spinning_crane_kick)
+		#blackout_kick,cycle_targets=1,if=!prev_gcd.1.blackout_kick
+		if not PreviousGCDSpell(1) Spell(blackout_kick)
+		#rushing_jade_wind,if=!prev_gcd.1.rushing_jade_wind
+		if not PreviousGCDSpell(1) Spell(rushing_jade_wind)
 	}
 }
 
@@ -534,8 +538,6 @@ AddFunction WindwalkerSerenityMainPostConditions
 
 AddFunction WindwalkerSerenityShortCdActions
 {
-	#energizing_elixir
-	Spell(energizing_elixir)
 	#call_action_list,name=cd
 	WindwalkerCdShortCdActions()
 
@@ -548,7 +550,7 @@ AddFunction WindwalkerSerenityShortCdActions
 
 AddFunction WindwalkerSerenityShortCdPostConditions
 {
-	WindwalkerCdShortCdPostConditions() or Spell(strike_of_the_windlord) or Enemies() < 3 and Spell(rising_sun_kick) or Spell(fists_of_fury) or Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or Enemies() >= 3 and Spell(rising_sun_kick) or not PreviousGCDSpell(blackout_kick) and Spell(blackout_kick) or not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or not PreviousGCDSpell(rushing_jade_wind) and Spell(rushing_jade_wind)
+	WindwalkerCdShortCdPostConditions() or Spell(strike_of_the_windlord) or Enemies() < 3 and Spell(rising_sun_kick) or Spell(fists_of_fury) or Enemies() >= 3 and not PreviousGCDSpell(1) and Spell(spinning_crane_kick) or Enemies() >= 3 and Spell(rising_sun_kick) or not PreviousGCDSpell(1) and Spell(spinning_crane_kick) or not PreviousGCDSpell(1) and Spell(blackout_kick) or not PreviousGCDSpell(1) and Spell(rushing_jade_wind)
 }
 
 AddFunction WindwalkerSerenityCdActions
@@ -559,7 +561,7 @@ AddFunction WindwalkerSerenityCdActions
 
 AddFunction WindwalkerSerenityCdPostConditions
 {
-	WindwalkerCdCdPostConditions() or Spell(strike_of_the_windlord) or Enemies() < 3 and Spell(rising_sun_kick) or Spell(fists_of_fury) or Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or Enemies() >= 3 and Spell(rising_sun_kick) or not PreviousGCDSpell(blackout_kick) and Spell(blackout_kick) or not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or not PreviousGCDSpell(rushing_jade_wind) and Spell(rushing_jade_wind)
+	WindwalkerCdCdPostConditions() or Spell(strike_of_the_windlord) or Enemies() < 3 and Spell(rising_sun_kick) or Spell(fists_of_fury) or Enemies() >= 3 and not PreviousGCDSpell(1) and Spell(spinning_crane_kick) or Enemies() >= 3 and Spell(rising_sun_kick) or not PreviousGCDSpell(1) and Spell(spinning_crane_kick) or not PreviousGCDSpell(1) and Spell(blackout_kick) or not PreviousGCDSpell(1) and Spell(rushing_jade_wind)
 }
 
 ### actions.st
@@ -571,26 +573,42 @@ AddFunction WindwalkerStMainActions
 
 	unless WindwalkerCdMainPostConditions()
 	{
-		#strike_of_the_windlord,if=talent.serenity.enabled|active_enemies<6
-		if Talent(serenity_talent) or Enemies() < 6 Spell(strike_of_the_windlord)
-		#fists_of_fury
-		Spell(fists_of_fury)
-		#rising_sun_kick,cycle_targets=1
-		Spell(rising_sun_kick)
+		#strike_of_the_windlord,if=equipped.convergence_of_fates&talent.serenity.enabled&cooldown.serenity.remains>=10
+		if HasEquippedItem(convergence_of_fates) and Talent(serenity_talent) and SpellCooldown(serenity) >= 10 Spell(strike_of_the_windlord)
+		#strike_of_the_windlord,if=equipped.convergence_of_fates&!talent.serenity.enabled
+		if HasEquippedItem(convergence_of_fates) and not Talent(serenity_talent) Spell(strike_of_the_windlord)
+		#strike_of_the_windlord,if=!equipped.convergence_of_fates
+		if not HasEquippedItem(convergence_of_fates) Spell(strike_of_the_windlord)
+		#fists_of_fury,if=equipped.convergence_of_fates&talent.serenity.enabled&cooldown.serenity.remains>=5
+		if HasEquippedItem(convergence_of_fates) and Talent(serenity_talent) and SpellCooldown(serenity) >= 5 Spell(fists_of_fury)
+		#fists_of_fury,if=equipped.convergence_of_fates&!talent.serenity.enabled
+		if HasEquippedItem(convergence_of_fates) and not Talent(serenity_talent) Spell(fists_of_fury)
+		#fists_of_fury,if=!equipped.convergence_of_fates
+		if not HasEquippedItem(convergence_of_fates) Spell(fists_of_fury)
+		#tiger_palm,cycle_targets=1,if=!prev_gcd.1.tiger_palm&energy=energy.max&chi<=3&buff.storm_earth_and_fire.up
+		if not PreviousGCDSpell(1) and Energy() == MaxEnergy() and Chi() <= 3 and BuffPresent(storm_earth_and_fire_buff) Spell(tiger_palm)
+		#rising_sun_kick,cycle_targets=1,if=equipped.convergence_of_fates&talent.serenity.enabled&cooldown.serenity.remains>=2
+		if HasEquippedItem(convergence_of_fates) and Talent(serenity_talent) and SpellCooldown(serenity) >= 2 Spell(rising_sun_kick)
+		#rising_sun_kick,cycle_targets=1,if=equipped.convergence_of_fates&!talent.serenity.enabled
+		if HasEquippedItem(convergence_of_fates) and not Talent(serenity_talent) Spell(rising_sun_kick)
+		#rising_sun_kick,cycle_targets=1,if=!equipped.convergence_of_fates
+		if not HasEquippedItem(convergence_of_fates) Spell(rising_sun_kick)
 		#whirling_dragon_punch
 		if SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 Spell(whirling_dragon_punch)
-		#spinning_crane_kick,if=active_enemies>=3&!prev_gcd.spinning_crane_kick
-		if Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) Spell(spinning_crane_kick)
-		#rushing_jade_wind,if=chi.max-chi>1&!prev_gcd.rushing_jade_wind
-		if MaxChi() - Chi() > 1 and not PreviousGCDSpell(rushing_jade_wind) Spell(rushing_jade_wind)
-		#blackout_kick,cycle_targets=1,if=(chi>1|buff.bok_proc.up)&!prev_gcd.blackout_kick
-		if { Chi() > 1 or BuffPresent(bok_proc_buff) } and not PreviousGCDSpell(blackout_kick) Spell(blackout_kick)
+		#crackling_jade_lightning,if=equipped.the_emperors_capacitor&buff.the_emperors_capacitor.stack>=19
+		if HasEquippedItem(the_emperors_capacitor) and BuffStacks(the_emperors_capacitor_buff) >= 19 Spell(crackling_jade_lightning)
+		#spinning_crane_kick,if=active_enemies>=3&!prev_gcd.1.spinning_crane_kick
+		if Enemies() >= 3 and not PreviousGCDSpell(1) Spell(spinning_crane_kick)
+		#rushing_jade_wind,if=chi.max-chi>1&!prev_gcd.1.rushing_jade_wind
+		if MaxChi() - Chi() > 1 and not PreviousGCDSpell(1) Spell(rushing_jade_wind)
+		#blackout_kick,cycle_targets=1,if=(chi>1|buff.bok_proc.up)&!prev_gcd.1.blackout_kick
+		if { Chi() > 1 or BuffPresent(bok_proc_buff) } and not PreviousGCDSpell(1) Spell(blackout_kick)
 		#chi_wave,if=energy.time_to_max>=2.25
 		if TimeToMaxEnergy() >= 2.25 Spell(chi_wave)
 		#chi_burst,if=energy.time_to_max>=2.25
 		if TimeToMaxEnergy() >= 2.25 and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
-		#tiger_palm,cycle_targets=1,if=!prev_gcd.tiger_palm
-		if not PreviousGCDSpell(tiger_palm) Spell(tiger_palm)
+		#tiger_palm,cycle_targets=1,if=!prev_gcd.1.tiger_palm
+		if not PreviousGCDSpell(1) Spell(tiger_palm)
 	}
 }
 
@@ -613,7 +631,7 @@ AddFunction WindwalkerStShortCdActions
 
 AddFunction WindwalkerStShortCdPostConditions
 {
-	WindwalkerCdShortCdPostConditions() or { Talent(serenity_talent) or Enemies() < 6 } and Spell(strike_of_the_windlord) or Spell(fists_of_fury) or Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or MaxChi() - Chi() > 1 and not PreviousGCDSpell(rushing_jade_wind) and Spell(rushing_jade_wind) or { Chi() > 1 or BuffPresent(bok_proc_buff) } and not PreviousGCDSpell(blackout_kick) and Spell(blackout_kick) or TimeToMaxEnergy() >= 2.25 and Spell(chi_wave) or TimeToMaxEnergy() >= 2.25 and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or not PreviousGCDSpell(tiger_palm) and Spell(tiger_palm)
+	WindwalkerCdShortCdPostConditions() or HasEquippedItem(convergence_of_fates) and Talent(serenity_talent) and SpellCooldown(serenity) >= 10 and Spell(strike_of_the_windlord) or HasEquippedItem(convergence_of_fates) and not Talent(serenity_talent) and Spell(strike_of_the_windlord) or not HasEquippedItem(convergence_of_fates) and Spell(strike_of_the_windlord) or HasEquippedItem(convergence_of_fates) and Talent(serenity_talent) and SpellCooldown(serenity) >= 5 and Spell(fists_of_fury) or HasEquippedItem(convergence_of_fates) and not Talent(serenity_talent) and Spell(fists_of_fury) or not HasEquippedItem(convergence_of_fates) and Spell(fists_of_fury) or not PreviousGCDSpell(1) and Energy() == MaxEnergy() and Chi() <= 3 and BuffPresent(storm_earth_and_fire_buff) and Spell(tiger_palm) or HasEquippedItem(convergence_of_fates) and Talent(serenity_talent) and SpellCooldown(serenity) >= 2 and Spell(rising_sun_kick) or HasEquippedItem(convergence_of_fates) and not Talent(serenity_talent) and Spell(rising_sun_kick) or not HasEquippedItem(convergence_of_fates) and Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or HasEquippedItem(the_emperors_capacitor) and BuffStacks(the_emperors_capacitor_buff) >= 19 and Spell(crackling_jade_lightning) or Enemies() >= 3 and not PreviousGCDSpell(1) and Spell(spinning_crane_kick) or MaxChi() - Chi() > 1 and not PreviousGCDSpell(1) and Spell(rushing_jade_wind) or { Chi() > 1 or BuffPresent(bok_proc_buff) } and not PreviousGCDSpell(1) and Spell(blackout_kick) or TimeToMaxEnergy() >= 2.25 and Spell(chi_wave) or TimeToMaxEnergy() >= 2.25 and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or not PreviousGCDSpell(1) and Spell(tiger_palm)
 }
 
 AddFunction WindwalkerStCdActions
@@ -630,7 +648,7 @@ AddFunction WindwalkerStCdActions
 
 AddFunction WindwalkerStCdPostConditions
 {
-	WindwalkerCdCdPostConditions() or { Talent(serenity_talent) or Enemies() < 6 } and Spell(strike_of_the_windlord) or Spell(fists_of_fury) or Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or MaxChi() - Chi() > 1 and not PreviousGCDSpell(rushing_jade_wind) and Spell(rushing_jade_wind) or { Chi() > 1 or BuffPresent(bok_proc_buff) } and not PreviousGCDSpell(blackout_kick) and Spell(blackout_kick) or TimeToMaxEnergy() >= 2.25 and Spell(chi_wave) or TimeToMaxEnergy() >= 2.25 and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or not PreviousGCDSpell(tiger_palm) and Spell(tiger_palm)
+	WindwalkerCdCdPostConditions() or HasEquippedItem(convergence_of_fates) and Talent(serenity_talent) and SpellCooldown(serenity) >= 10 and Spell(strike_of_the_windlord) or HasEquippedItem(convergence_of_fates) and not Talent(serenity_talent) and Spell(strike_of_the_windlord) or not HasEquippedItem(convergence_of_fates) and Spell(strike_of_the_windlord) or HasEquippedItem(convergence_of_fates) and Talent(serenity_talent) and SpellCooldown(serenity) >= 5 and Spell(fists_of_fury) or HasEquippedItem(convergence_of_fates) and not Talent(serenity_talent) and Spell(fists_of_fury) or not HasEquippedItem(convergence_of_fates) and Spell(fists_of_fury) or not PreviousGCDSpell(1) and Energy() == MaxEnergy() and Chi() <= 3 and BuffPresent(storm_earth_and_fire_buff) and Spell(tiger_palm) or HasEquippedItem(convergence_of_fates) and Talent(serenity_talent) and SpellCooldown(serenity) >= 2 and Spell(rising_sun_kick) or HasEquippedItem(convergence_of_fates) and not Talent(serenity_talent) and Spell(rising_sun_kick) or not HasEquippedItem(convergence_of_fates) and Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or HasEquippedItem(the_emperors_capacitor) and BuffStacks(the_emperors_capacitor_buff) >= 19 and Spell(crackling_jade_lightning) or Enemies() >= 3 and not PreviousGCDSpell(1) and Spell(spinning_crane_kick) or MaxChi() - Chi() > 1 and not PreviousGCDSpell(1) and Spell(rushing_jade_wind) or { Chi() > 1 or BuffPresent(bok_proc_buff) } and not PreviousGCDSpell(1) and Spell(blackout_kick) or TimeToMaxEnergy() >= 2.25 and Spell(chi_wave) or TimeToMaxEnergy() >= 2.25 and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or not PreviousGCDSpell(1) and Spell(tiger_palm)
 }
 
 ### Windwalker icons.
@@ -692,7 +710,10 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 }
 
 ### Required symbols
-# 137057
+# 1
+# 2
+# 3
+# 4
 # arcane_torrent_chi
 # augmentation
 # berserking
@@ -701,9 +722,13 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # bok_proc_buff
 # chi_burst
 # chi_wave
+# convergence_of_fates
+# crackling_jade_lightning
+# drinking_horn_cover
 # energizing_elixir
 # fists_of_fury
 # gale_burst
+# hidden_masters_forbidden_touch
 # invoke_xuen
 # paralysis
 # quaking_palm
@@ -717,6 +742,8 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # storm_earth_and_fire
 # storm_earth_and_fire_buff
 # strike_of_the_windlord
+# the_emperors_capacitor
+# the_emperors_capacitor_buff
 # tiger_palm
 # touch_of_death
 # touch_of_death_debuff
