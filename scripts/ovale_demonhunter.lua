@@ -156,7 +156,7 @@ do
 # Based on SimulationCraft profile "Demon_Hunter_Havoc_T19P".
 #	class=demonhunter
 #	spec=havoc
-#	talents=1130111
+#	talents=2220311
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -166,17 +166,22 @@ Include(ovale_demonhunter_spells)
 
 AddFunction pooling_for_meta
 {
-	if not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight() SpellCooldown(metamorphosis_havoc) == 0 and BuffExpires(metamorphosis_havoc_buff) and { not Talent(demonic_talent) or not SpellCooldown(eye_beam) == 0 } and { not Talent(chaos_blades_talent) or SpellCooldown(chaos_blades) == 0 } and { not Talent(nemesis_talent) or target.DebuffPresent(nemesis_debuff) or SpellCooldown(nemesis) == 0 }
+	if not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight() SpellCooldown(metamorphosis_havoc) == 0 and { not Talent(demonic_talent) or not SpellCooldown(eye_beam) == 0 } and { not Talent(chaos_blades_talent) or SpellCooldown(chaos_blades) == 0 } and { not Talent(nemesis_talent) or target.DebuffPresent(nemesis_debuff) or SpellCooldown(nemesis) == 0 }
 }
 
 AddFunction pooling_for_blade_dance
 {
-	blade_dance() and Fury() - 40 < 35 - TalentPoints(first_blood_talent) * 20 and Enemies() >= 2
+	blade_dance() and Fury() - 40 < 35 - TalentPoints(first_blood_talent) * 20 and Enemies() >= 3 + TalentPoints(chaos_cleave_talent) * 2
+}
+
+AddFunction pooling_for_chaos_strike
+{
+	Talent(chaos_cleave_talent) and FuryDeficit() > 40 and not False(raid_event_adds_exists) and 600 < 2 * GCD()
 }
 
 AddFunction blade_dance
 {
-	Talent(first_blood_talent) or Enemies() >= 2 + TalentPoints(chaos_cleave_talent)
+	Talent(first_blood_talent) or Enemies() >= 3 + TalentPoints(chaos_cleave_talent) * 2
 }
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=havoc)
@@ -224,60 +229,62 @@ AddFunction HavocDefaultMainActions
 	{
 		#fel_rush,animation_cancel=1,if=time=0
 		if TimeInCombat() == 0 Spell(fel_rush)
-		#pick_up_fragment,if=talent.demonic_appetite.enabled&fury.deficit>=30
-		if Talent(demonic_appetite_talent) and FuryDeficit() >= 30 Spell(pick_up_fragment)
+		#pick_up_fragment,if=talent.demonic_appetite.enabled&fury.deficit>=35
+		if Talent(demonic_appetite_talent) and FuryDeficit() >= 35 Spell(pick_up_fragment)
 		#vengeful_retreat,if=(talent.prepared.enabled|talent.momentum.enabled)&buff.prepared.down&buff.momentum.down
 		if { Talent(prepared_talent) or Talent(momentum_talent) } and BuffExpires(prepared_buff) and BuffExpires(momentum_buff) Spell(vengeful_retreat)
-		#fel_rush,animation_cancel=1,if=(talent.momentum.enabled|talent.fel_mastery.enabled)&(!talent.momentum.enabled|(charges=2|cooldown.vengeful_retreat.remains>4)&buff.momentum.down)&(!talent.fel_mastery.enabled|fury.deficit>=25)&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
+		#fel_rush,if=(talent.momentum.enabled|talent.fel_mastery.enabled)&(!talent.momentum.enabled|(charges=2|cooldown.vengeful_retreat.remains>4)&buff.momentum.down)&(!talent.fel_mastery.enabled|fury.deficit>=25)&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
 		if { Talent(momentum_talent) or Talent(fel_mastery_talent) } and { not Talent(momentum_talent) or { Charges(fel_rush) == 2 or SpellCooldown(vengeful_retreat) > 4 } and BuffExpires(momentum_buff) } and { not Talent(fel_mastery_talent) or FuryDeficit() >= 25 } and { Charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } Spell(fel_rush)
-		#fel_barrage,if=charges>=5&(buff.momentum.up|!talent.momentum.enabled)&(active_enemies>desired_targets|raid_event.adds.in>30)
-		if Charges(fel_barrage) >= 5 and { BuffPresent(momentum_buff) or not Talent(momentum_talent) } and { Enemies() > Enemies(tagged=1) or 600 > 30 } Spell(fel_barrage)
+		#fel_barrage,if=charges>=5&(buff.momentum.up|!talent.momentum.enabled)&((active_enemies>desired_targets&active_enemies>1)|raid_event.adds.in>30)
+		if Charges(fel_barrage) >= 5 and { BuffPresent(momentum_buff) or not Talent(momentum_talent) } and { Enemies() > Enemies(tagged=1) and Enemies() > 1 or 600 > 30 } Spell(fel_barrage)
 		#throw_glaive,if=talent.bloodlet.enabled&(!talent.momentum.enabled|buff.momentum.up)&charges=2
 		if Talent(bloodlet_talent) and { not Talent(momentum_talent) or BuffPresent(momentum_buff) } and Charges(throw_glaive_havoc) == 2 Spell(throw_glaive_havoc)
-		#fury_of_the_illidari,if=active_enemies>desired_targets|raid_event.adds.in>55&(!talent.momentum.enabled|buff.momentum.up)
-		if Enemies() > Enemies(tagged=1) or 600 > 55 and { not Talent(momentum_talent) or BuffPresent(momentum_buff) } Spell(fury_of_the_illidari)
-		#eye_beam,if=talent.demonic.enabled&buff.metamorphosis.down&fury.deficit<30
-		if Talent(demonic_talent) and BuffExpires(metamorphosis_havoc_buff) and FuryDeficit() < 30 Spell(eye_beam)
+		#fel_eruption
+		Spell(fel_eruption)
+		#fury_of_the_illidari,if=(active_enemies>desired_targets&active_enemies>1)|raid_event.adds.in>55&(!talent.momentum.enabled|buff.momentum.up)
+		if Enemies() > Enemies(tagged=1) and Enemies() > 1 or 600 > 55 and { not Talent(momentum_talent) or BuffPresent(momentum_buff) } Spell(fury_of_the_illidari)
+		#eye_beam,if=talent.demonic.enabled&(talent.demon_blades.enabled|talent.blind_fury.enabled|(!talent.blind_fury.enabled&fury.deficit<30))&((active_enemies>desired_targets&active_enemies>1)|raid_event.adds.in>30)
+		if Talent(demonic_talent) and { Talent(demon_blades_talent) or Talent(blind_fury_talent) or not Talent(blind_fury_talent) and FuryDeficit() < 30 } and { Enemies() > Enemies(tagged=1) and Enemies() > 1 or 600 > 30 } Spell(eye_beam)
 		#death_sweep,if=variable.blade_dance
 		if blade_dance() Spell(death_sweep)
 		#blade_dance,if=variable.blade_dance
 		if blade_dance() Spell(blade_dance)
-		#throw_glaive,if=talent.bloodlet.enabled&spell_targets>=2+talent.chaos_cleave.enabled&(!talent.master_of_the_glaive.enabled|!talent.momentum.enabled|buff.momentum.up)&(spell_targets>=3|raid_event.adds.in>recharge_time+cooldown)
-		if Talent(bloodlet_talent) and Enemies() >= 2 + TalentPoints(chaos_cleave_talent) and { not Talent(master_of_the_glaive_talent) or not Talent(momentum_talent) or BuffPresent(momentum_buff) } and { Enemies() >= 3 or 600 > SpellChargeCooldown(throw_glaive_havoc) + SpellCooldown(throw_glaive_havoc) } Spell(throw_glaive_havoc)
-		#fel_eruption
-		Spell(fel_eruption)
+		#throw_glaive,if=talent.bloodlet.enabled&spell_targets>=2&(!talent.master_of_the_glaive.enabled|!talent.momentum.enabled|buff.momentum.up)&(spell_targets>=3|raid_event.adds.in>recharge_time+cooldown)
+		if Talent(bloodlet_talent) and Enemies() >= 2 and { not Talent(master_of_the_glaive_talent) or not Talent(momentum_talent) or BuffPresent(momentum_buff) } and { Enemies() >= 3 or 600 > SpellChargeCooldown(throw_glaive_havoc) + SpellCooldown(throw_glaive_havoc) } Spell(throw_glaive_havoc)
 		#felblade,if=fury.deficit>=30+buff.prepared.up*8
 		if FuryDeficit() >= 30 + BuffPresent(prepared_buff) * 8 Spell(felblade)
+		#eye_beam,if=talent.blind_fury.enabled&(spell_targets.eye_beam_tick>desired_targets|fury.deficit>=35)
+		if Talent(blind_fury_talent) and { Enemies() > Enemies(tagged=1) or FuryDeficit() >= 35 } Spell(eye_beam)
 		#annihilation,if=(talent.demon_blades.enabled|!talent.momentum.enabled|buff.momentum.up|fury.deficit<30+buff.prepared.up*8|buff.metamorphosis.remains<5)&!variable.pooling_for_blade_dance
 		if { Talent(demon_blades_talent) or not Talent(momentum_talent) or BuffPresent(momentum_buff) or FuryDeficit() < 30 + BuffPresent(prepared_buff) * 8 or BuffRemaining(metamorphosis_havoc_buff) < 5 } and not pooling_for_blade_dance() Spell(annihilation)
 		#throw_glaive,if=talent.bloodlet.enabled&(!talent.master_of_the_glaive.enabled|!talent.momentum.enabled|buff.momentum.up)&raid_event.adds.in>recharge_time+cooldown
 		if Talent(bloodlet_talent) and { not Talent(master_of_the_glaive_talent) or not Talent(momentum_talent) or BuffPresent(momentum_buff) } and 600 > SpellChargeCooldown(throw_glaive_havoc) + SpellCooldown(throw_glaive_havoc) Spell(throw_glaive_havoc)
-		#eye_beam,if=!talent.demonic.enabled&((spell_targets.eye_beam_tick>desired_targets&active_enemies>1)|(raid_event.adds.in>45&!variable.pooling_for_meta&buff.metamorphosis.down&(artifact.anguish_of_the_deceiver.enabled|active_enemies>1)))
-		if not Talent(demonic_talent) and { Enemies() > Enemies(tagged=1) and Enemies() > 1 or 600 > 45 and not pooling_for_meta() and BuffExpires(metamorphosis_havoc_buff) and { HasArtifactTrait(anguish_of_the_deceiver) or Enemies() > 1 } } Spell(eye_beam)
-		#demons_bite,if=talent.demonic.enabled&buff.metamorphosis.down&cooldown.eye_beam.remains<gcd&fury.deficit>=20
-		if Talent(demonic_talent) and BuffExpires(metamorphosis_havoc_buff) and SpellCooldown(eye_beam) < GCD() and FuryDeficit() >= 20 Spell(demons_bite)
-		#demons_bite,if=talent.demonic.enabled&buff.metamorphosis.down&cooldown.eye_beam.remains<2*gcd&fury.deficit>=45
-		if Talent(demonic_talent) and BuffExpires(metamorphosis_havoc_buff) and SpellCooldown(eye_beam) < 2 * GCD() and FuryDeficit() >= 45 Spell(demons_bite)
+		#eye_beam,if=!talent.demonic.enabled&!talent.blind_fury.enabled&((spell_targets.eye_beam_tick>desired_targets&active_enemies>1)|(raid_event.adds.in>45&!variable.pooling_for_meta&buff.metamorphosis.down&(artifact.anguish_of_the_deceiver.enabled|active_enemies>1)&!talent.chaos_cleave.enabled))
+		if not Talent(demonic_talent) and not Talent(blind_fury_talent) and { Enemies() > Enemies(tagged=1) and Enemies() > 1 or 600 > 45 and not pooling_for_meta() and BuffExpires(metamorphosis_havoc_buff) and { HasArtifactTrait(anguish_of_the_deceiver) or Enemies() > 1 } and not Talent(chaos_cleave_talent) } Spell(eye_beam)
+		#demons_bite,if=talent.demonic.enabled&!talent.blind_fury.enabled&buff.metamorphosis.down&cooldown.eye_beam.remains<gcd&fury.deficit>=20
+		if Talent(demonic_talent) and not Talent(blind_fury_talent) and BuffExpires(metamorphosis_havoc_buff) and SpellCooldown(eye_beam) < GCD() and FuryDeficit() >= 20 Spell(demons_bite)
+		#demons_bite,if=talent.demonic.enabled&!talent.blind_fury.enabled&buff.metamorphosis.down&cooldown.eye_beam.remains<2*gcd&fury.deficit>=45
+		if Talent(demonic_talent) and not Talent(blind_fury_talent) and BuffExpires(metamorphosis_havoc_buff) and SpellCooldown(eye_beam) < 2 * GCD() and FuryDeficit() >= 45 Spell(demons_bite)
 		#throw_glaive,if=buff.metamorphosis.down&spell_targets>=2
 		if BuffExpires(metamorphosis_havoc_buff) and Enemies() >= 2 Spell(throw_glaive_havoc)
-		#chaos_strike,if=(talent.demon_blades.enabled|!talent.momentum.enabled|buff.momentum.up|fury.deficit<30+buff.prepared.up*8)&!variable.pooling_for_meta&!variable.pooling_for_blade_dance&(!talent.demonic.enabled|!cooldown.eye_beam.ready)
-		if { Talent(demon_blades_talent) or not Talent(momentum_talent) or BuffPresent(momentum_buff) or FuryDeficit() < 30 + BuffPresent(prepared_buff) * 8 } and not pooling_for_meta() and not pooling_for_blade_dance() and { not Talent(demonic_talent) or not SpellCooldown(eye_beam) == 0 } Spell(chaos_strike)
-		#fel_barrage,if=charges=4&buff.metamorphosis.down&(buff.momentum.up|!talent.momentum.enabled)&(active_enemies>desired_targets|raid_event.adds.in>30)
-		if Charges(fel_barrage) == 4 and BuffExpires(metamorphosis_havoc_buff) and { BuffPresent(momentum_buff) or not Talent(momentum_talent) } and { Enemies() > Enemies(tagged=1) or 600 > 30 } Spell(fel_barrage)
-		#fel_rush,animation_cancel=1,if=!talent.momentum.enabled&raid_event.movement.in>charges*10
+		#chaos_strike,if=(talent.demon_blades.enabled|!talent.momentum.enabled|buff.momentum.up|fury.deficit<30+buff.prepared.up*8)&!variable.pooling_for_chaos_strike&!variable.pooling_for_meta&!variable.pooling_for_blade_dance&(!talent.demonic.enabled|!cooldown.eye_beam.ready|(talent.blind_fury.enabled&fury.deficit<35))
+		if { Talent(demon_blades_talent) or not Talent(momentum_talent) or BuffPresent(momentum_buff) or FuryDeficit() < 30 + BuffPresent(prepared_buff) * 8 } and not pooling_for_chaos_strike() and not pooling_for_meta() and not pooling_for_blade_dance() and { not Talent(demonic_talent) or not SpellCooldown(eye_beam) == 0 or Talent(blind_fury_talent) and FuryDeficit() < 35 } Spell(chaos_strike)
+		#fel_barrage,if=charges=4&buff.metamorphosis.down&(buff.momentum.up|!talent.momentum.enabled)&((active_enemies>desired_targets&active_enemies>1)|raid_event.adds.in>30)
+		if Charges(fel_barrage) == 4 and BuffExpires(metamorphosis_havoc_buff) and { BuffPresent(momentum_buff) or not Talent(momentum_talent) } and { Enemies() > Enemies(tagged=1) and Enemies() > 1 or 600 > 30 } Spell(fel_barrage)
+		#fel_rush,if=!talent.momentum.enabled&raid_event.movement.in>charges*10
 		if not Talent(momentum_talent) and 600 > Charges(fel_rush) * 10 Spell(fel_rush)
 		#demons_bite
 		Spell(demons_bite)
-		#throw_glaive,if=buff.out_of_range.up|buff.raid_movement.up
-		if not target.InRange() or BuffPresent(raid_movement_buff any=1) Spell(throw_glaive_havoc)
+		#throw_glaive,if=buff.out_of_range.up
+		if not target.InRange() Spell(throw_glaive_havoc)
 		#felblade,if=movement.distance|buff.out_of_range.up
 		if target.Distance() or not target.InRange() Spell(felblade)
 		#fel_rush,if=movement.distance>15|(buff.out_of_range.up&!talent.momentum.enabled)
 		if target.Distance() > 15 or not target.InRange() and not Talent(momentum_talent) Spell(fel_rush)
 		#vengeful_retreat,if=movement.distance>15
 		if target.Distance() > 15 Spell(vengeful_retreat)
-		#throw_glaive,if=talent.felblade.enabled
-		if Talent(felblade_talent) Spell(throw_glaive_havoc)
+		#throw_glaive,if=!talent.bloodlet.enabled
+		if not Talent(bloodlet_talent) Spell(throw_glaive_havoc)
 	}
 }
 
@@ -290,9 +297,10 @@ AddFunction HavocDefaultShortCdActions
 {
 	#auto_attack
 	HavocGetInMeleeRange()
-	#variable,name=pooling_for_meta,value=cooldown.metamorphosis.ready&buff.metamorphosis.down&(!talent.demonic.enabled|!cooldown.eye_beam.ready)&(!talent.chaos_blades.enabled|cooldown.chaos_blades.ready)&(!talent.nemesis.enabled|debuff.nemesis.up|cooldown.nemesis.ready)
-	#variable,name=blade_dance,value=talent.first_blood.enabled|spell_targets.blade_dance1>=2+talent.chaos_cleave.enabled
-	#variable,name=pooling_for_blade_dance,value=variable.blade_dance&fury-40<35-talent.first_blood.enabled*20&spell_targets.blade_dance1>=2
+	#variable,name=pooling_for_meta,value=cooldown.metamorphosis.ready&(!talent.demonic.enabled|!cooldown.eye_beam.ready)&(!talent.chaos_blades.enabled|cooldown.chaos_blades.ready)&(!talent.nemesis.enabled|debuff.nemesis.up|cooldown.nemesis.ready)
+	#variable,name=blade_dance,value=talent.first_blood.enabled|spell_targets.blade_dance1>=3+(talent.chaos_cleave.enabled*2)
+	#variable,name=pooling_for_blade_dance,value=variable.blade_dance&fury-40<35-talent.first_blood.enabled*20&(spell_targets.blade_dance1>=3+(talent.chaos_cleave.enabled*2))
+	#variable,name=pooling_for_chaos_strike,value=talent.chaos_cleave.enabled&fury.deficit>40&!raid_event.adds.up&raid_event.adds.in<2*gcd
 	#blur,if=artifact.demon_speed.enabled&cooldown.fel_rush.charges_fractional<0.5&cooldown.vengeful_retreat.remains-buff.momentum.remains>4
 	if HasArtifactTrait(demon_speed) and SpellCharges(fel_rush count=0) < 0.5 and SpellCooldown(vengeful_retreat) - BuffRemaining(momentum_buff) > 4 Spell(blur)
 	#call_action_list,name=cooldown
@@ -301,7 +309,7 @@ AddFunction HavocDefaultShortCdActions
 
 AddFunction HavocDefaultShortCdPostConditions
 {
-	HavocCooldownShortCdPostConditions() or TimeInCombat() == 0 and Spell(fel_rush) or Talent(demonic_appetite_talent) and FuryDeficit() >= 30 and Spell(pick_up_fragment) or { Talent(prepared_talent) or Talent(momentum_talent) } and BuffExpires(prepared_buff) and BuffExpires(momentum_buff) and Spell(vengeful_retreat) or { Talent(momentum_talent) or Talent(fel_mastery_talent) } and { not Talent(momentum_talent) or { Charges(fel_rush) == 2 or SpellCooldown(vengeful_retreat) > 4 } and BuffExpires(momentum_buff) } and { not Talent(fel_mastery_talent) or FuryDeficit() >= 25 } and { Charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and Spell(fel_rush) or Charges(fel_barrage) >= 5 and { BuffPresent(momentum_buff) or not Talent(momentum_talent) } and { Enemies() > Enemies(tagged=1) or 600 > 30 } and Spell(fel_barrage) or Talent(bloodlet_talent) and { not Talent(momentum_talent) or BuffPresent(momentum_buff) } and Charges(throw_glaive_havoc) == 2 and Spell(throw_glaive_havoc) or { Enemies() > Enemies(tagged=1) or 600 > 55 and { not Talent(momentum_talent) or BuffPresent(momentum_buff) } } and Spell(fury_of_the_illidari) or Talent(demonic_talent) and BuffExpires(metamorphosis_havoc_buff) and FuryDeficit() < 30 and Spell(eye_beam) or blade_dance() and Spell(death_sweep) or blade_dance() and Spell(blade_dance) or Talent(bloodlet_talent) and Enemies() >= 2 + TalentPoints(chaos_cleave_talent) and { not Talent(master_of_the_glaive_talent) or not Talent(momentum_talent) or BuffPresent(momentum_buff) } and { Enemies() >= 3 or 600 > SpellChargeCooldown(throw_glaive_havoc) + SpellCooldown(throw_glaive_havoc) } and Spell(throw_glaive_havoc) or Spell(fel_eruption) or FuryDeficit() >= 30 + BuffPresent(prepared_buff) * 8 and Spell(felblade) or { Talent(demon_blades_talent) or not Talent(momentum_talent) or BuffPresent(momentum_buff) or FuryDeficit() < 30 + BuffPresent(prepared_buff) * 8 or BuffRemaining(metamorphosis_havoc_buff) < 5 } and not pooling_for_blade_dance() and Spell(annihilation) or Talent(bloodlet_talent) and { not Talent(master_of_the_glaive_talent) or not Talent(momentum_talent) or BuffPresent(momentum_buff) } and 600 > SpellChargeCooldown(throw_glaive_havoc) + SpellCooldown(throw_glaive_havoc) and Spell(throw_glaive_havoc) or not Talent(demonic_talent) and { Enemies() > Enemies(tagged=1) and Enemies() > 1 or 600 > 45 and not pooling_for_meta() and BuffExpires(metamorphosis_havoc_buff) and { HasArtifactTrait(anguish_of_the_deceiver) or Enemies() > 1 } } and Spell(eye_beam) or Talent(demonic_talent) and BuffExpires(metamorphosis_havoc_buff) and SpellCooldown(eye_beam) < GCD() and FuryDeficit() >= 20 and Spell(demons_bite) or Talent(demonic_talent) and BuffExpires(metamorphosis_havoc_buff) and SpellCooldown(eye_beam) < 2 * GCD() and FuryDeficit() >= 45 and Spell(demons_bite) or BuffExpires(metamorphosis_havoc_buff) and Enemies() >= 2 and Spell(throw_glaive_havoc) or { Talent(demon_blades_talent) or not Talent(momentum_talent) or BuffPresent(momentum_buff) or FuryDeficit() < 30 + BuffPresent(prepared_buff) * 8 } and not pooling_for_meta() and not pooling_for_blade_dance() and { not Talent(demonic_talent) or not SpellCooldown(eye_beam) == 0 } and Spell(chaos_strike) or Charges(fel_barrage) == 4 and BuffExpires(metamorphosis_havoc_buff) and { BuffPresent(momentum_buff) or not Talent(momentum_talent) } and { Enemies() > Enemies(tagged=1) or 600 > 30 } and Spell(fel_barrage) or not Talent(momentum_talent) and 600 > Charges(fel_rush) * 10 and Spell(fel_rush) or Spell(demons_bite) or { not target.InRange() or BuffPresent(raid_movement_buff any=1) } and Spell(throw_glaive_havoc) or { target.Distance() or not target.InRange() } and Spell(felblade) or { target.Distance() > 15 or not target.InRange() and not Talent(momentum_talent) } and Spell(fel_rush) or target.Distance() > 15 and Spell(vengeful_retreat) or Talent(felblade_talent) and Spell(throw_glaive_havoc)
+	HavocCooldownShortCdPostConditions() or TimeInCombat() == 0 and Spell(fel_rush) or Talent(demonic_appetite_talent) and FuryDeficit() >= 35 and Spell(pick_up_fragment) or { Talent(prepared_talent) or Talent(momentum_talent) } and BuffExpires(prepared_buff) and BuffExpires(momentum_buff) and Spell(vengeful_retreat) or { Talent(momentum_talent) or Talent(fel_mastery_talent) } and { not Talent(momentum_talent) or { Charges(fel_rush) == 2 or SpellCooldown(vengeful_retreat) > 4 } and BuffExpires(momentum_buff) } and { not Talent(fel_mastery_talent) or FuryDeficit() >= 25 } and { Charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and Spell(fel_rush) or Charges(fel_barrage) >= 5 and { BuffPresent(momentum_buff) or not Talent(momentum_talent) } and { Enemies() > Enemies(tagged=1) and Enemies() > 1 or 600 > 30 } and Spell(fel_barrage) or Talent(bloodlet_talent) and { not Talent(momentum_talent) or BuffPresent(momentum_buff) } and Charges(throw_glaive_havoc) == 2 and Spell(throw_glaive_havoc) or Spell(fel_eruption) or { Enemies() > Enemies(tagged=1) and Enemies() > 1 or 600 > 55 and { not Talent(momentum_talent) or BuffPresent(momentum_buff) } } and Spell(fury_of_the_illidari) or Talent(demonic_talent) and { Talent(demon_blades_talent) or Talent(blind_fury_talent) or not Talent(blind_fury_talent) and FuryDeficit() < 30 } and { Enemies() > Enemies(tagged=1) and Enemies() > 1 or 600 > 30 } and Spell(eye_beam) or blade_dance() and Spell(death_sweep) or blade_dance() and Spell(blade_dance) or Talent(bloodlet_talent) and Enemies() >= 2 and { not Talent(master_of_the_glaive_talent) or not Talent(momentum_talent) or BuffPresent(momentum_buff) } and { Enemies() >= 3 or 600 > SpellChargeCooldown(throw_glaive_havoc) + SpellCooldown(throw_glaive_havoc) } and Spell(throw_glaive_havoc) or FuryDeficit() >= 30 + BuffPresent(prepared_buff) * 8 and Spell(felblade) or Talent(blind_fury_talent) and { Enemies() > Enemies(tagged=1) or FuryDeficit() >= 35 } and Spell(eye_beam) or { Talent(demon_blades_talent) or not Talent(momentum_talent) or BuffPresent(momentum_buff) or FuryDeficit() < 30 + BuffPresent(prepared_buff) * 8 or BuffRemaining(metamorphosis_havoc_buff) < 5 } and not pooling_for_blade_dance() and Spell(annihilation) or Talent(bloodlet_talent) and { not Talent(master_of_the_glaive_talent) or not Talent(momentum_talent) or BuffPresent(momentum_buff) } and 600 > SpellChargeCooldown(throw_glaive_havoc) + SpellCooldown(throw_glaive_havoc) and Spell(throw_glaive_havoc) or not Talent(demonic_talent) and not Talent(blind_fury_talent) and { Enemies() > Enemies(tagged=1) and Enemies() > 1 or 600 > 45 and not pooling_for_meta() and BuffExpires(metamorphosis_havoc_buff) and { HasArtifactTrait(anguish_of_the_deceiver) or Enemies() > 1 } and not Talent(chaos_cleave_talent) } and Spell(eye_beam) or Talent(demonic_talent) and not Talent(blind_fury_talent) and BuffExpires(metamorphosis_havoc_buff) and SpellCooldown(eye_beam) < GCD() and FuryDeficit() >= 20 and Spell(demons_bite) or Talent(demonic_talent) and not Talent(blind_fury_talent) and BuffExpires(metamorphosis_havoc_buff) and SpellCooldown(eye_beam) < 2 * GCD() and FuryDeficit() >= 45 and Spell(demons_bite) or BuffExpires(metamorphosis_havoc_buff) and Enemies() >= 2 and Spell(throw_glaive_havoc) or { Talent(demon_blades_talent) or not Talent(momentum_talent) or BuffPresent(momentum_buff) or FuryDeficit() < 30 + BuffPresent(prepared_buff) * 8 } and not pooling_for_chaos_strike() and not pooling_for_meta() and not pooling_for_blade_dance() and { not Talent(demonic_talent) or not SpellCooldown(eye_beam) == 0 or Talent(blind_fury_talent) and FuryDeficit() < 35 } and Spell(chaos_strike) or Charges(fel_barrage) == 4 and BuffExpires(metamorphosis_havoc_buff) and { BuffPresent(momentum_buff) or not Talent(momentum_talent) } and { Enemies() > Enemies(tagged=1) and Enemies() > 1 or 600 > 30 } and Spell(fel_barrage) or not Talent(momentum_talent) and 600 > Charges(fel_rush) * 10 and Spell(fel_rush) or Spell(demons_bite) or not target.InRange() and Spell(throw_glaive_havoc) or { target.Distance() or not target.InRange() } and Spell(felblade) or { target.Distance() > 15 or not target.InRange() and not Talent(momentum_talent) } and Spell(fel_rush) or target.Distance() > 15 and Spell(vengeful_retreat) or not Talent(bloodlet_talent) and Spell(throw_glaive_havoc)
 }
 
 AddFunction HavocDefaultCdActions
@@ -311,7 +319,7 @@ AddFunction HavocDefaultCdActions
 		#call_action_list,name=cooldown
 		HavocCooldownCdActions()
 
-		unless HavocCooldownCdPostConditions() or TimeInCombat() == 0 and Spell(fel_rush) or Talent(demonic_appetite_talent) and FuryDeficit() >= 30 and Spell(pick_up_fragment)
+		unless HavocCooldownCdPostConditions() or TimeInCombat() == 0 and Spell(fel_rush) or Talent(demonic_appetite_talent) and FuryDeficit() >= 35 and Spell(pick_up_fragment)
 		{
 			#consume_magic
 			HavocInterruptActions()
@@ -321,7 +329,7 @@ AddFunction HavocDefaultCdActions
 
 AddFunction HavocDefaultCdPostConditions
 {
-	HasArtifactTrait(demon_speed) and SpellCharges(fel_rush count=0) < 0.5 and SpellCooldown(vengeful_retreat) - BuffRemaining(momentum_buff) > 4 and Spell(blur) or HavocCooldownCdPostConditions() or TimeInCombat() == 0 and Spell(fel_rush) or Talent(demonic_appetite_talent) and FuryDeficit() >= 30 and Spell(pick_up_fragment) or { Talent(prepared_talent) or Talent(momentum_talent) } and BuffExpires(prepared_buff) and BuffExpires(momentum_buff) and Spell(vengeful_retreat) or { Talent(momentum_talent) or Talent(fel_mastery_talent) } and { not Talent(momentum_talent) or { Charges(fel_rush) == 2 or SpellCooldown(vengeful_retreat) > 4 } and BuffExpires(momentum_buff) } and { not Talent(fel_mastery_talent) or FuryDeficit() >= 25 } and { Charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and Spell(fel_rush) or Charges(fel_barrage) >= 5 and { BuffPresent(momentum_buff) or not Talent(momentum_talent) } and { Enemies() > Enemies(tagged=1) or 600 > 30 } and Spell(fel_barrage) or Talent(bloodlet_talent) and { not Talent(momentum_talent) or BuffPresent(momentum_buff) } and Charges(throw_glaive_havoc) == 2 and Spell(throw_glaive_havoc) or { Enemies() > Enemies(tagged=1) or 600 > 55 and { not Talent(momentum_talent) or BuffPresent(momentum_buff) } } and Spell(fury_of_the_illidari) or Talent(demonic_talent) and BuffExpires(metamorphosis_havoc_buff) and FuryDeficit() < 30 and Spell(eye_beam) or blade_dance() and Spell(death_sweep) or blade_dance() and Spell(blade_dance) or Talent(bloodlet_talent) and Enemies() >= 2 + TalentPoints(chaos_cleave_talent) and { not Talent(master_of_the_glaive_talent) or not Talent(momentum_talent) or BuffPresent(momentum_buff) } and { Enemies() >= 3 or 600 > SpellChargeCooldown(throw_glaive_havoc) + SpellCooldown(throw_glaive_havoc) } and Spell(throw_glaive_havoc) or Spell(fel_eruption) or FuryDeficit() >= 30 + BuffPresent(prepared_buff) * 8 and Spell(felblade) or { Talent(demon_blades_talent) or not Talent(momentum_talent) or BuffPresent(momentum_buff) or FuryDeficit() < 30 + BuffPresent(prepared_buff) * 8 or BuffRemaining(metamorphosis_havoc_buff) < 5 } and not pooling_for_blade_dance() and Spell(annihilation) or Talent(bloodlet_talent) and { not Talent(master_of_the_glaive_talent) or not Talent(momentum_talent) or BuffPresent(momentum_buff) } and 600 > SpellChargeCooldown(throw_glaive_havoc) + SpellCooldown(throw_glaive_havoc) and Spell(throw_glaive_havoc) or not Talent(demonic_talent) and { Enemies() > Enemies(tagged=1) and Enemies() > 1 or 600 > 45 and not pooling_for_meta() and BuffExpires(metamorphosis_havoc_buff) and { HasArtifactTrait(anguish_of_the_deceiver) or Enemies() > 1 } } and Spell(eye_beam) or Talent(demonic_talent) and BuffExpires(metamorphosis_havoc_buff) and SpellCooldown(eye_beam) < GCD() and FuryDeficit() >= 20 and Spell(demons_bite) or Talent(demonic_talent) and BuffExpires(metamorphosis_havoc_buff) and SpellCooldown(eye_beam) < 2 * GCD() and FuryDeficit() >= 45 and Spell(demons_bite) or BuffExpires(metamorphosis_havoc_buff) and Enemies() >= 2 and Spell(throw_glaive_havoc) or { Talent(demon_blades_talent) or not Talent(momentum_talent) or BuffPresent(momentum_buff) or FuryDeficit() < 30 + BuffPresent(prepared_buff) * 8 } and not pooling_for_meta() and not pooling_for_blade_dance() and { not Talent(demonic_talent) or not SpellCooldown(eye_beam) == 0 } and Spell(chaos_strike) or Charges(fel_barrage) == 4 and BuffExpires(metamorphosis_havoc_buff) and { BuffPresent(momentum_buff) or not Talent(momentum_talent) } and { Enemies() > Enemies(tagged=1) or 600 > 30 } and Spell(fel_barrage) or not Talent(momentum_talent) and 600 > Charges(fel_rush) * 10 and Spell(fel_rush) or Spell(demons_bite) or { not target.InRange() or BuffPresent(raid_movement_buff any=1) } and Spell(throw_glaive_havoc) or { target.Distance() or not target.InRange() } and Spell(felblade) or { target.Distance() > 15 or not target.InRange() and not Talent(momentum_talent) } and Spell(fel_rush) or target.Distance() > 15 and Spell(vengeful_retreat) or Talent(felblade_talent) and Spell(throw_glaive_havoc)
+	HasArtifactTrait(demon_speed) and SpellCharges(fel_rush count=0) < 0.5 and SpellCooldown(vengeful_retreat) - BuffRemaining(momentum_buff) > 4 and Spell(blur) or HavocCooldownCdPostConditions() or TimeInCombat() == 0 and Spell(fel_rush) or Talent(demonic_appetite_talent) and FuryDeficit() >= 35 and Spell(pick_up_fragment) or { Talent(prepared_talent) or Talent(momentum_talent) } and BuffExpires(prepared_buff) and BuffExpires(momentum_buff) and Spell(vengeful_retreat) or { Talent(momentum_talent) or Talent(fel_mastery_talent) } and { not Talent(momentum_talent) or { Charges(fel_rush) == 2 or SpellCooldown(vengeful_retreat) > 4 } and BuffExpires(momentum_buff) } and { not Talent(fel_mastery_talent) or FuryDeficit() >= 25 } and { Charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and Spell(fel_rush) or Charges(fel_barrage) >= 5 and { BuffPresent(momentum_buff) or not Talent(momentum_talent) } and { Enemies() > Enemies(tagged=1) and Enemies() > 1 or 600 > 30 } and Spell(fel_barrage) or Talent(bloodlet_talent) and { not Talent(momentum_talent) or BuffPresent(momentum_buff) } and Charges(throw_glaive_havoc) == 2 and Spell(throw_glaive_havoc) or Spell(fel_eruption) or { Enemies() > Enemies(tagged=1) and Enemies() > 1 or 600 > 55 and { not Talent(momentum_talent) or BuffPresent(momentum_buff) } } and Spell(fury_of_the_illidari) or Talent(demonic_talent) and { Talent(demon_blades_talent) or Talent(blind_fury_talent) or not Talent(blind_fury_talent) and FuryDeficit() < 30 } and { Enemies() > Enemies(tagged=1) and Enemies() > 1 or 600 > 30 } and Spell(eye_beam) or blade_dance() and Spell(death_sweep) or blade_dance() and Spell(blade_dance) or Talent(bloodlet_talent) and Enemies() >= 2 and { not Talent(master_of_the_glaive_talent) or not Talent(momentum_talent) or BuffPresent(momentum_buff) } and { Enemies() >= 3 or 600 > SpellChargeCooldown(throw_glaive_havoc) + SpellCooldown(throw_glaive_havoc) } and Spell(throw_glaive_havoc) or FuryDeficit() >= 30 + BuffPresent(prepared_buff) * 8 and Spell(felblade) or Talent(blind_fury_talent) and { Enemies() > Enemies(tagged=1) or FuryDeficit() >= 35 } and Spell(eye_beam) or { Talent(demon_blades_talent) or not Talent(momentum_talent) or BuffPresent(momentum_buff) or FuryDeficit() < 30 + BuffPresent(prepared_buff) * 8 or BuffRemaining(metamorphosis_havoc_buff) < 5 } and not pooling_for_blade_dance() and Spell(annihilation) or Talent(bloodlet_talent) and { not Talent(master_of_the_glaive_talent) or not Talent(momentum_talent) or BuffPresent(momentum_buff) } and 600 > SpellChargeCooldown(throw_glaive_havoc) + SpellCooldown(throw_glaive_havoc) and Spell(throw_glaive_havoc) or not Talent(demonic_talent) and not Talent(blind_fury_talent) and { Enemies() > Enemies(tagged=1) and Enemies() > 1 or 600 > 45 and not pooling_for_meta() and BuffExpires(metamorphosis_havoc_buff) and { HasArtifactTrait(anguish_of_the_deceiver) or Enemies() > 1 } and not Talent(chaos_cleave_talent) } and Spell(eye_beam) or Talent(demonic_talent) and not Talent(blind_fury_talent) and BuffExpires(metamorphosis_havoc_buff) and SpellCooldown(eye_beam) < GCD() and FuryDeficit() >= 20 and Spell(demons_bite) or Talent(demonic_talent) and not Talent(blind_fury_talent) and BuffExpires(metamorphosis_havoc_buff) and SpellCooldown(eye_beam) < 2 * GCD() and FuryDeficit() >= 45 and Spell(demons_bite) or BuffExpires(metamorphosis_havoc_buff) and Enemies() >= 2 and Spell(throw_glaive_havoc) or { Talent(demon_blades_talent) or not Talent(momentum_talent) or BuffPresent(momentum_buff) or FuryDeficit() < 30 + BuffPresent(prepared_buff) * 8 } and not pooling_for_chaos_strike() and not pooling_for_meta() and not pooling_for_blade_dance() and { not Talent(demonic_talent) or not SpellCooldown(eye_beam) == 0 or Talent(blind_fury_talent) and FuryDeficit() < 35 } and Spell(chaos_strike) or Charges(fel_barrage) == 4 and BuffExpires(metamorphosis_havoc_buff) and { BuffPresent(momentum_buff) or not Talent(momentum_talent) } and { Enemies() > Enemies(tagged=1) and Enemies() > 1 or 600 > 30 } and Spell(fel_barrage) or not Talent(momentum_talent) and 600 > Charges(fel_rush) * 10 and Spell(fel_rush) or Spell(demons_bite) or not target.InRange() and Spell(throw_glaive_havoc) or { target.Distance() or not target.InRange() } and Spell(felblade) or { target.Distance() > 15 or not target.InRange() and not Talent(momentum_talent) } and Spell(fel_rush) or target.Distance() > 15 and Spell(vengeful_retreat) or not Talent(bloodlet_talent) and Spell(throw_glaive_havoc)
 }
 
 ### actions.cooldown
@@ -346,16 +354,16 @@ AddFunction HavocCooldownCdActions
 {
 	#use_item,slot=trinket2,if=buff.chaos_blades.up|!talent.chaos_blades.enabled
 	if BuffPresent(chaos_blades_buff) or not Talent(chaos_blades_talent) HavocUseItemActions()
-	#nemesis,target_if=min:target.time_to_die,if=raid_event.adds.exists&debuff.nemesis.down&(active_enemies>desired_targets|raid_event.adds.in>60)
-	if False(raid_event_adds_exists) and target.DebuffExpires(nemesis_debuff) and { Enemies() > Enemies(tagged=1) or 600 > 60 } Spell(nemesis)
+	#nemesis,target_if=min:target.time_to_die,if=raid_event.adds.exists&debuff.nemesis.down&((active_enemies>desired_targets&active_enemies>1)|raid_event.adds.in>60)
+	if False(raid_event_adds_exists) and target.DebuffExpires(nemesis_debuff) and { Enemies() > Enemies(tagged=1) and Enemies() > 1 or 600 > 60 } Spell(nemesis)
 	#nemesis,if=!raid_event.adds.exists&(cooldown.metamorphosis.remains>100|target.time_to_die<70)
 	if not False(raid_event_adds_exists) and { SpellCooldown(metamorphosis_havoc) > 100 or target.TimeToDie() < 70 } Spell(nemesis)
 	#nemesis,sync=metamorphosis,if=!raid_event.adds.exists
-	if Spell(metamorphosis_havoc) and not False(raid_event_adds_exists) Spell(nemesis)
+	if not { Talent(demon_reborn_talent) and Talent(demonic_talent) } and Spell(metamorphosis_havoc) and not False(raid_event_adds_exists) Spell(nemesis)
 	#chaos_blades,if=buff.metamorphosis.up|cooldown.metamorphosis.remains>100|target.time_to_die<20
 	if BuffPresent(metamorphosis_havoc_buff) or SpellCooldown(metamorphosis_havoc) > 100 or target.TimeToDie() < 20 Spell(chaos_blades)
-	#metamorphosis,if=variable.pooling_for_meta&fury.deficit<30&(talent.chaos_blades.enabled|!cooldown.fury_of_the_illidari.ready)
-	if pooling_for_meta() and FuryDeficit() < 30 and { Talent(chaos_blades_talent) or not SpellCooldown(fury_of_the_illidari) == 0 } Spell(metamorphosis_havoc)
+	#metamorphosis,if=variable.pooling_for_meta&fury.deficit<30
+	if pooling_for_meta() and FuryDeficit() < 30 Spell(metamorphosis_havoc)
 }
 
 AddFunction HavocCooldownCdPostConditions
@@ -367,7 +375,7 @@ AddFunction HavocCooldownCdPostConditions
 AddFunction HavocPrecombatMainActions
 {
 	#flask,type=flask_of_the_seventh_demon
-	#food,type=the_hungry_magister
+	#food,type=nightborne_delicacy_platter
 	#augmentation,type=defiled
 	Spell(augmentation)
 }
@@ -391,8 +399,8 @@ AddFunction HavocPrecombatCdActions
 	{
 		#snapshot_stats
 		#potion,name=old_war
-		#metamorphosis
-		Spell(metamorphosis_havoc)
+		#metamorphosis,if=!(talent.demon_reborn.enabled&talent.demonic.enabled)
+		if not { Talent(demon_reborn_talent) and Talent(demonic_talent) } Spell(metamorphosis_havoc)
 	}
 }
 
@@ -465,6 +473,7 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # arcane_torrent_dh
 # augmentation
 # blade_dance
+# blind_fury_talent
 # bloodlet_talent
 # blur
 # chaos_blades
@@ -475,6 +484,7 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # consume_magic
 # death_sweep
 # demon_blades_talent
+# demon_reborn_talent
 # demon_speed
 # demonic_appetite_talent
 # demonic_talent
@@ -485,7 +495,6 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # fel_mastery_talent
 # fel_rush
 # felblade
-# felblade_talent
 # first_blood_talent
 # fury_of_the_illidari
 # imprison
@@ -522,6 +531,12 @@ Include(ovale_demonhunter_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=vengeance)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=vengeance)
+
+AddFunction VengeanceUseItemActions
+{
+	Item(Trinket0Slot usable=1)
+	Item(Trinket1Slot usable=1)
+}
 
 AddFunction VengeanceInterruptActions
 {
@@ -610,6 +625,8 @@ AddFunction VengeanceDefaultCdActions
 {
 	#consume_magic
 	VengeanceInterruptActions()
+	#use_item,slot=trinket2
+	VengeanceUseItemActions()
 	#fiery_brand,if=buff.demon_spikes.down&buff.metamorphosis.down
 	if BuffExpires(demon_spikes_buff) and BuffExpires(metamorphosis_veng_buff) Spell(fiery_brand)
 
@@ -636,7 +653,7 @@ AddFunction VengeanceDefaultCdPostConditions
 AddFunction VengeancePrecombatMainActions
 {
 	#flask,type=flask_of_the_seventh_demon
-	#food,type=the_hungry_magister
+	#food,type=nightborne_delicacy_platter
 	#augmentation,type=defiled
 	Spell(augmentation)
 }
