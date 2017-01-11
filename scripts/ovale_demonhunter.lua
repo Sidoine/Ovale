@@ -37,6 +37,7 @@ AddFunction VengeanceDefaultShortCDActions
 	if (Charges(demon_spikes) == 0 and PainDeficit() >= 60) Spell(demonic_infusion)
 	if (Charges(demon_spikes) >= 2) Spell(demon_spikes)
 	if ((IncomingDamage(10 physical=1) > 0 or SpellCooldown(demonic_infusion) < 3) and not target.DebuffPresent(fiery_brand_debuff) and BuffExpires(metamorphosis_veng_buff)) Spell(demon_spikes)
+	if (Pain() > SpellData(demon_spikes pain) + SpellData(soul_barrier pain)) Spell(soul_barrier)
 	if (CheckBoxOn(opt_melee_range) and not target.InRange(shear))
 	{
 		if (target.InRange(felblade)) Spell(felblade)
@@ -52,7 +53,6 @@ AddFunction VengeanceDefaultMainActions
 	if (VengeancePlayOffensively() and HasArtifactTrait(fiery_demise) and target.TimeToDie() >= 8) Spell(fiery_brand)
 	if (VengeancePlayOffensively() or BuffStacks(soul_fragments) <= 2) Spell(soul_carver)
 	if (VengeancePlayOffensively()) Spell(fel_devastation)
-	if (Pain() >= 80) Spell(soul_barrier)
 	if (Pain() >= 80 and (not Talent(fracture_talent) or VengeancePlayDefensively())) Spell(soul_cleave)
 	Spell(immolation_aura)
 	Spell(felblade)
@@ -73,7 +73,6 @@ AddFunction VengeanceDefaultAoEActions
 	VengeanceHealMe()
 	if (BuffStacks(soul_fragments) <= 2) Spell(soul_carver)
 	if (VengeancePlayOffensively()) Spell(fel_devastation)
-	if (Pain() >= 80) Spell(soul_barrier)
 	if (Pain() >= 80) Spell(soul_cleave)
 	if (Talent(burning_alive_talent) or (VengeancePlayOffensively() and HasArtifactTrait(fiery_demise) and target.TimeToDie() >= 8)) Spell(fiery_brand)
 	Spell(immolation_aura)
