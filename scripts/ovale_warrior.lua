@@ -606,9 +606,9 @@ AddFunction FuryInterruptActions
 AddFunction FuryDefaultMainActions
 {
 	#run_action_list,name=movement,if=movement.distance>5
-	if 0 > 5 FuryMovementMainActions()
+	if target.Distance() > 5 FuryMovementMainActions()
 
-	unless 0 > 5 and FuryMovementMainPostConditions()
+	unless target.Distance() > 5 and FuryMovementMainPostConditions()
 	{
 		#potion,name=old_war,if=(target.health.pct<20&buff.battle_cry.up)|target.time_to_die<30
 		#battle_cry,if=(cooldown.odyns_fury.remains=0&(cooldown.bloodthirst.remains=0|(buff.enrage.remains>cooldown.bloodthirst.remains)))
@@ -632,7 +632,7 @@ AddFunction FuryDefaultMainActions
 
 AddFunction FuryDefaultMainPostConditions
 {
-	0 > 5 and FuryMovementMainPostConditions() or { Enemies() == 2 or Enemies() == 3 } and FuryTwoTargetsMainPostConditions() or Enemies() > 3 and FuryAoeMainPostConditions() or FurySingleTargetMainPostConditions()
+	target.Distance() > 5 and FuryMovementMainPostConditions() or { Enemies() == 2 or Enemies() == 3 } and FuryTwoTargetsMainPostConditions() or Enemies() > 3 and FuryAoeMainPostConditions() or FurySingleTargetMainPostConditions()
 }
 
 AddFunction FuryDefaultShortCdActions
@@ -642,12 +642,12 @@ AddFunction FuryDefaultShortCdActions
 	#charge
 	if CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(charge)
 	#run_action_list,name=movement,if=movement.distance>5
-	if 0 > 5 FuryMovementShortCdActions()
+	if target.Distance() > 5 FuryMovementShortCdActions()
 
-	unless 0 > 5 and FuryMovementShortCdPostConditions()
+	unless target.Distance() > 5 and FuryMovementShortCdPostConditions()
 	{
 		#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
-		if { 0 > 25 and 600 > 45 or not False(raid_event_movement_exists) } and CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(heroic_leap)
+		if { target.Distance() > 25 and 600 > 45 or not False(raid_event_movement_exists) } and CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(heroic_leap)
 
 		unless not SpellCooldown(odyns_fury) > 0 and { not SpellCooldown(bloodthirst) > 0 or EnrageRemaining() > SpellCooldown(bloodthirst) } and Spell(battle_cry)
 		{
@@ -673,7 +673,7 @@ AddFunction FuryDefaultShortCdActions
 
 AddFunction FuryDefaultShortCdPostConditions
 {
-	0 > 5 and FuryMovementShortCdPostConditions() or not SpellCooldown(odyns_fury) > 0 and { not SpellCooldown(bloodthirst) > 0 or EnrageRemaining() > SpellCooldown(bloodthirst) } and Spell(battle_cry) or { Enemies() == 2 or Enemies() == 3 } and FuryTwoTargetsShortCdPostConditions() or Enemies() > 3 and FuryAoeShortCdPostConditions() or FurySingleTargetShortCdPostConditions()
+	target.Distance() > 5 and FuryMovementShortCdPostConditions() or not SpellCooldown(odyns_fury) > 0 and { not SpellCooldown(bloodthirst) > 0 or EnrageRemaining() > SpellCooldown(bloodthirst) } and Spell(battle_cry) or { Enemies() == 2 or Enemies() == 3 } and FuryTwoTargetsShortCdPostConditions() or Enemies() > 3 and FuryAoeShortCdPostConditions() or FurySingleTargetShortCdPostConditions()
 }
 
 AddFunction FuryDefaultCdActions
@@ -681,9 +681,9 @@ AddFunction FuryDefaultCdActions
 	#pummel
 	FuryInterruptActions()
 	#run_action_list,name=movement,if=movement.distance>5
-	if 0 > 5 FuryMovementCdActions()
+	if target.Distance() > 5 FuryMovementCdActions()
 
-	unless 0 > 5 and FuryMovementCdPostConditions()
+	unless target.Distance() > 5 and FuryMovementCdPostConditions()
 	{
 		#use_item,name=faulty_countermeasure,if=(spell_targets.whirlwind>1|!raid_event.adds.exists)&((talent.bladestorm.enabled&cooldown.bladestorm.remains=0)|buff.battle_cry.up|target.time_to_die<25)
 		if { Enemies() > 1 or not False(raid_event_adds_exists) } and { Talent(bladestorm_talent) and not SpellCooldown(bladestorm) > 0 or BuffPresent(battle_cry_buff) or target.TimeToDie() < 25 } FuryUseItemActions()
@@ -718,7 +718,7 @@ AddFunction FuryDefaultCdActions
 
 AddFunction FuryDefaultCdPostConditions
 {
-	0 > 5 and FuryMovementCdPostConditions() or not SpellCooldown(odyns_fury) > 0 and { not SpellCooldown(bloodthirst) > 0 or EnrageRemaining() > SpellCooldown(bloodthirst) } and Spell(battle_cry) or { Enemies() == 2 or Enemies() == 3 } and FuryTwoTargetsCdPostConditions() or Enemies() > 3 and FuryAoeCdPostConditions() or FurySingleTargetCdPostConditions()
+	target.Distance() > 5 and FuryMovementCdPostConditions() or not SpellCooldown(odyns_fury) > 0 and { not SpellCooldown(bloodthirst) > 0 or EnrageRemaining() > SpellCooldown(bloodthirst) } and Spell(battle_cry) or { Enemies() == 2 or Enemies() == 3 } and FuryTwoTargetsCdPostConditions() or Enemies() > 3 and FuryAoeCdPostConditions() or FurySingleTargetCdPostConditions()
 }
 
 ### actions.aoe

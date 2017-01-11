@@ -18,6 +18,7 @@ externals:
     libs/LibStub: svn://svn.wowace.com/wow/libstub/mainline/trunk
     libs/LibTextDump-1.0: git://git.wowace.com/wow/libtextdump-1-0/mainline.git
     libs/LibArtifactData-1.0: git://git.wowace.com/wow/libartifactdata-1-0/mainline.git
+    libs/LibRangeCheck-2.0: https://repos.wowace.com/wow/librangecheck-2-0/trunk
 
 enable-nolib-creation: no
 
