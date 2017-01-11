@@ -26,6 +26,7 @@ Define(berserk_cat 106951)
 	SpellInfo(berserk_cat cd=180 gcd=0 offgcd=1)
 	SpellAddBuff(berserk_cat berserk_cat_buff=1)
 	SpellInfo(berserk_cat duration=15)
+	SpellInfo(berserk_cat replace=incarnation_king_of_the_jungle talent=incarnation_talent)
 SpellList(berserk_cat_buff incarnation_king_of_the_jungle_buff berserk_cat) # berserk_cat_buff needs to apply to incarnation_king_of_the_jungle_buff as well
 Define(blessing_of_anshe_buff 202739)
 Define(blessing_of_elune 202737)
