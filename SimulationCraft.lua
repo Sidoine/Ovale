@@ -3830,6 +3830,9 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		else
 			ok = false
 		end
+	elseif class == "WARLOCK" and strmatch(operand, "dot.unstable_affliction_([1-5]).remains") then
+		local num = strmatch(operand, "dot.unstable_affliction_([1-5]).remains")
+		code = format("target.DebuffCount(unstable_affliction_debuff) >= %s", num)
 	elseif class == "WARRIOR" and strsub(operand, 1, 23) == "buff.colossus_smash_up." then
 		local property = strsub(operand, 24)
 		local debuffName = "colossus_smash_debuff"
