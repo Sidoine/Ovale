@@ -1306,8 +1306,6 @@ AddFunction ProtectionProtShortCdActions
 			{
 				#ignore_pain,if=(rage>=60&!talent.vengeance.enabled)|(buff.vengeance_ignore_pain.up&rage>=39)|(talent.vengeance.enabled&!buff.ultimatum.up&!buff.vengeance_ignore_pain.up&!buff.vengeance_focused_rage.up&rage<30)
 				if Rage() >= 60 and not Talent(vengeance_talent) or BuffPresent(vengeance_ignore_pain_buff) and Rage() >= 39 or Talent(vengeance_talent) and not BuffPresent(ultimatum_buff) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_focused_rage_buff) and Rage() < 30 Spell(ignore_pain)
-				#focused_rage,if=(buff.vengeance_focused_rage.up&!buff.vengeance_ignore_pain.up&rage>=59)|(buff.ultimatum.up&!buff.vengeance_ignore_pain.up)|(talent.vengeance.enabled&!buff.vengeance_ignore_pain.up&!buff.vengeance_focused_rage.up&rage>=69)|(rage>=100)
-				if BuffPresent(vengeance_focused_rage_buff) and not BuffPresent(vengeance_ignore_pain_buff) and Rage() >= 59 or BuffPresent(ultimatum_buff) and not BuffPresent(vengeance_ignore_pain_buff) or Talent(vengeance_talent) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_focused_rage_buff) and Rage() >= 69 or Rage() >= 100 Spell(focused_rage)
 			}
 		}
 	}
@@ -1403,7 +1401,6 @@ AddIcon checkbox=opt_warrior_protection_aoe help=cd specialization=protection
 # charge
 # demoralizing_shout
 # devastate
-# focused_rage
 # heavy_repercussions_talent
 # heroic_leap
 # heroic_throw
