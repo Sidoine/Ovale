@@ -34,8 +34,9 @@ AddFunction VengeanceHealMe
 
 AddFunction VengeanceDefaultShortCDActions
 {
-	if (InCombat() and (Charges(demon_spikes) == 2)) Spell(demon_spikes)
-	if (InCombat() and IncomingDamage(10 physical=1) > 0 and not target.DebuffPresent(fiery_brand_debuff) and BuffExpires(metamorphosis_veng_buff)) Spell(demon_spikes)
+	if (Charges(demon_spikes) == 0 and PainDeficit() >= 60) Spell(demonic_infusion)
+	if (Charges(demon_spikes) >= 2) Spell(demon_spikes)
+	if ((IncomingDamage(10 physical=1) > 0 or SpellCooldown(demonic_infusion) < 3) and not target.DebuffPresent(fiery_brand_debuff) and BuffExpires(metamorphosis_veng_buff)) Spell(demon_spikes)
 	if (CheckBoxOn(opt_melee_range) and not target.InRange(shear))
 	{
 		if (target.InRange(felblade)) Spell(felblade)
