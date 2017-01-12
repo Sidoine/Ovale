@@ -59,6 +59,7 @@ local API_UnitLevel = UnitLevel
 local API_UnitName = UnitName
 local API_UnitPower = UnitPower
 local API_UnitPowerMax = UnitPowerMax
+local API_UnitRace = UnitRace
 local API_UnitStagger = UnitStagger
 local INFINITY = math.huge
 

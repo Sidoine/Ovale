@@ -779,7 +779,6 @@ function OvaleBestAction:ComputeCompare(element, state, atTime)
 			end
 		else
 			local diff = B - A
-			self:Debug(diff)
 			local t
 			if diff == INFINITY then
 				t = INFINITY
