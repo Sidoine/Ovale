@@ -184,7 +184,7 @@ AddFunction AssassinationCdsShortCdActions
 	#vanish,if=talent.shadow_focus.enabled&energy.time_to_max>=2&combo_points.deficit>=4
 	if Talent(shadow_focus_talent) and TimeToMaxEnergy() >= 2 and ComboPointsDeficit() >= 4 and CheckBoxOn(opt_vanish) Spell(vanish)
 	#exsanguinate,if=prev_gcd.1.rupture&dot.rupture.remains>4+4*cp_max_spend
-	if PreviousGCDSpell(1) and target.DebuffRemaining(rupture_debuff) > 4 + 4 * MaxComboPoints() Spell(exsanguinate)
+	if PreviousGCDSpell(rupture) and target.DebuffRemaining(rupture_debuff) > 4 + 4 * MaxComboPoints() Spell(exsanguinate)
 }
 
 AddFunction AssassinationCdsShortCdPostConditions
@@ -214,7 +214,7 @@ AddFunction AssassinationCdsCdActions
 
 AddFunction AssassinationCdsCdPostConditions
 {
-	PreviousGCDSpell(1) and target.DebuffRemaining(rupture_debuff) > 4 + 4 * MaxComboPoints() and Spell(exsanguinate)
+	PreviousGCDSpell(rupture) and target.DebuffRemaining(rupture_debuff) > 4 + 4 * MaxComboPoints() and Spell(exsanguinate)
 }
 
 ### actions.finish
@@ -387,7 +387,6 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 }
 
 ### Required symbols
-# 1
 # agonizing_poison_debuff
 # agonizing_poison_talent
 # arcane_torrent_energy

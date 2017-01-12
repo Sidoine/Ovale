@@ -1148,6 +1148,7 @@ statePrototype.channel = nil
 statePrototype.lastSpellId = nil
 -- The previous GCD spell cast in the simulator.
 statePrototype.lastGCDSpellId = nil
+statePrototype.lastGCDSpellIds = []
 -- The previous off-GCD spell cast in the simulator.
 statePrototype.lastOffGCDSpellId = nil
 -- Counters for spells cast in the simulator.
@@ -1159,6 +1160,16 @@ statePrototype.counter = nil
 function OvaleFuture:InitializeState(state)
 	state.lastCast = {}
 	state.counter = {}
+end
+
+function OvaleFuture:PushGCDSpellId(state, spellId)
+	if state.lastGCDSpellId then 
+		tinsert(state.lastGCDSpellIds, state.lastGCDSpellId)
+		if #state.lastGCDSpellIds > 5 then
+			tremove(state.lastGCDSpellIds, 1)
+		end
+	end
+	state.lastGCDSpellId = spellId
 end
 
 -- Reset the state to the current conditions.
@@ -1200,7 +1211,7 @@ function OvaleFuture:ResetState(state)
 				lastSpellcastFound = true
 			end
 			if not lastGCDSpellcastFound and not spellcast.offgcd then
-				state.lastGCDSpellId = spellcast.spellId
+				self:PushGCDSpellId(state, spellcast.spellId)
 				if spellcast.stop and state.nextCast < spellcast.stop then
 					--[[
 						The most recent GCD spellcast is still being cast, so adjust the next
@@ -1381,7 +1392,7 @@ do
 				state.nextCast = nextCast
 			end
 			if gcd > 0 then
-				state.lastGCDSpellId = spellId
+				self:PushGCDSpellId(state, spellId)
 			else
 				state.lastOffGCDSpellId = spellId
 			end
