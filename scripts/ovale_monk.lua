@@ -46,6 +46,8 @@ AddFunction BrewmasterDefaultShortCDActions
 			# always keep 1 charge unless black_ox_brew is coming off cd
 			unless not (SpellCharges(ironskin_brew) > 1 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3))
 			{
+				# purify light stagger when doing trash when talent elusive dance 
+				if (Talent(elusive_dance_talent) and StaggerRemaining() > 0 and not IsBossFight() and BuffExpires(elusive_dance_buff)) Spell(purifying_brew)
 				# never be at (almost) max charges 
 				if (SpellCharges(ironskin_brew count=0) >= SpellMaxCharges(ironskin_brew)-0.7) Spell(ironskin_brew)
 				# use up those charges when black_ox_brew_talent comes off cd
