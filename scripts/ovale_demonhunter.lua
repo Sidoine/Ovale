@@ -65,7 +65,6 @@ AddFunction VengeanceDefaultMainActions
 		if (Talent(flame_crash_talent) and (SpellCharges(infernal_strike) >= SpellMaxCharges(infernal_strike))) Spell(infernal_strike)
 		Spell(sigil_of_flame)
 	}
-	if (not Talent(flame_crash_talent) and (SpellCharges(infernal_strike) >= SpellMaxCharges(infernal_strike))) Spell(infernal_strike)
 	Spell(shear)
 }
 
@@ -86,7 +85,6 @@ AddFunction VengeanceDefaultAoEActions
 		Spell(sigil_of_flame)
 	}
 	Spell(fel_eruption)
-	if (not Talent(flame_crash_talent) and (SpellCharges(infernal_strike) >= SpellMaxCharges(infernal_strike))) Spell(infernal_strike)
 	Spell(shear)
 }
 
