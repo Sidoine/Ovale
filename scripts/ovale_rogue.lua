@@ -223,8 +223,8 @@ AddFunction AssassinationFinishMainActions
 {
 	#death_from_above,if=combo_points>=cp_max_spend
 	if ComboPoints() >= MaxComboPoints() Spell(death_from_above)
-	#envenom,if=combo_points>=5|(talent.elaborate_planning.enabled&combo_points>=3+!talent.exsanguinate.enabled&buff.elaborate_planning.remains<0.1)
-	if ComboPoints() >= 5 or Talent(elaborate_planning_talent) and ComboPoints() >= 3 + Talent(exsanguinate_talent no) and BuffRemaining(elaborate_planning_buff) < 0.1 Spell(envenom)
+	#envenom,if=combo_points>=4|(talent.elaborate_planning.enabled&combo_points>=3+!talent.exsanguinate.enabled&buff.elaborate_planning.remains<0.1)
+	if ComboPoints() >= 4 or Talent(elaborate_planning_talent) and ComboPoints() >= 3 + Talent(exsanguinate_talent no) and BuffRemaining(elaborate_planning_buff) < 0.1 Spell(envenom)
 }
 
 AddFunction AssassinationFinishMainPostConditions
@@ -237,7 +237,7 @@ AddFunction AssassinationFinishShortCdActions
 
 AddFunction AssassinationFinishShortCdPostConditions
 {
-	ComboPoints() >= MaxComboPoints() and Spell(death_from_above) or { ComboPoints() >= 5 or Talent(elaborate_planning_talent) and ComboPoints() >= 3 + Talent(exsanguinate_talent no) and BuffRemaining(elaborate_planning_buff) < 0.1 } and Spell(envenom)
+	ComboPoints() >= MaxComboPoints() and Spell(death_from_above) or { ComboPoints() >= 4 or Talent(elaborate_planning_talent) and ComboPoints() >= 3 + Talent(exsanguinate_talent no) and BuffRemaining(elaborate_planning_buff) < 0.1 } and Spell(envenom)
 }
 
 AddFunction AssassinationFinishCdActions
@@ -246,7 +246,7 @@ AddFunction AssassinationFinishCdActions
 
 AddFunction AssassinationFinishCdPostConditions
 {
-	ComboPoints() >= MaxComboPoints() and Spell(death_from_above) or { ComboPoints() >= 5 or Talent(elaborate_planning_talent) and ComboPoints() >= 3 + Talent(exsanguinate_talent no) and BuffRemaining(elaborate_planning_buff) < 0.1 } and Spell(envenom)
+	ComboPoints() >= MaxComboPoints() and Spell(death_from_above) or { ComboPoints() >= 4 or Talent(elaborate_planning_talent) and ComboPoints() >= 3 + Talent(exsanguinate_talent no) and BuffRemaining(elaborate_planning_buff) < 0.1 } and Spell(envenom)
 }
 
 ### actions.maintain

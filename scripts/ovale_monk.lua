@@ -30,36 +30,41 @@ AddFunction BrewmasterHealMe
 
 AddFunction BrewmasterDefaultShortCDActions
 {
-	# always purify red stagger
-	if (DebuffPresent(heavy_stagger_debuff) and SpellCharges(purifying_brew) > 0) Spell(purifying_brew)
-	# use black_ox_brew when at 0 charges but delay it when a charge is about to come off cd
-	if ((SpellCharges(purifying_brew) == 0) and (SpellChargeCooldown(purifying_brew) > 2 or DebuffPresent(heavy_stagger_debuff))) Spell(black_ox_brew)
-	# heal me
-	BrewmasterHealMe()
-	# range check
-	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
-	
-	unless DebuffPresent(heavy_stagger_debuff) or BrewmasterHealMe() or StaggerRemaining() == 0
+	if(InCombat()) 
 	{
-		# purify moderate stagger
-		if (DebuffPresent(moderate_stagger_debuff) and (not Talent(elusive_dance_talent) or not BuffPresent(elusive_dance_buff))) Spell(purifying_brew)
-		# always keep 1 charge unless black_ox_brew is coming off cd
-		unless not (SpellCharges(ironskin_brew) > 1 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3))
+		# always purify red stagger
+		if (DebuffPresent(heavy_stagger_debuff) and SpellCharges(purifying_brew) > 0) Spell(purifying_brew)
+		# use black_ox_brew when at 0 charges but delay it when a charge is about to come off cd
+		if ((SpellCharges(purifying_brew) == 0) and (SpellChargeCooldown(purifying_brew) > 2 or DebuffPresent(heavy_stagger_debuff))) Spell(black_ox_brew)
+		# heal me
+		BrewmasterHealMe()
+
+		unless DebuffPresent(heavy_stagger_debuff) or BrewmasterHealMe() or (StaggerRemaining() == 0 and not Talent(special_delivery_talent))
 		{
-			# keep elusive dance up
-			if (Talent(elusive_dance_talent) and (BuffAmount(elusive_dance_buff value=3) < 10 and DebuffPresent(moderate_stagger_debuff))) Spell(purifying_brew)
-			if (Talent(elusive_dance_talent) and (BuffAmount(elusive_dance_buff value=3) <  5 and StaggerRemaining() > 0)) Spell(purifying_brew)
-			# never be at max charges 
-			if (SpellCharges(ironskin_brew) >= SpellMaxCharges(ironskin_brew)) Spell(ironskin_brew)
-			if (SpellCharges(ironskin_brew) >= SpellMaxCharges(ironskin_brew)-1 and (SpellChargeCooldown(ironskin_brew) <= 2 or SpellChargeCooldown(ironskin_brew) <= SpellCooldown(keg_smash))) Spell(ironskin_brew)
-			# use up those charges when black_ox_brew_talent comes off cd
-			if (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3) Spell(ironskin_brew)
-			# keep brew-stache rolling
-			if (HasArtifactTrait(brew_stache_trait) and not BuffPresent(brew_stache_buff)) Spell(ironskin_brew text=stache)
-			# keep up ironskin_brew_buff but keep 2 charges ready for purifying when elusive_dance_talent
-			if (BuffExpires(ironskin_brew_buff 2) and (not Talent(elusive_dance_talent) or SpellCharges(purifying_brew) >= 2)) Spell(ironskin_brew)
+			# purify moderate stagger
+			if (DebuffPresent(moderate_stagger_debuff) and (not Talent(elusive_dance_talent) or BuffExpires(elusive_dance_buff))) Spell(purifying_brew)
+			# always keep 1 charge unless black_ox_brew is coming off cd
+			unless not (SpellCharges(ironskin_brew) > 1 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3))
+			{
+				# purify light stagger when doing trash when talent elusive dance 
+				if (Talent(elusive_dance_talent) and StaggerRemaining() > 0 and not IsBossFight() and BuffExpires(elusive_dance_buff)) Spell(purifying_brew)
+				# never be at (almost) max charges 
+				if (SpellCharges(ironskin_brew count=0) >= SpellMaxCharges(ironskin_brew)-0.7) Spell(ironskin_brew)
+				# use up those charges when black_ox_brew_talent comes off cd
+				if (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3) Spell(ironskin_brew)
+				
+				if(StaggerRemaining() > 0)
+				{
+					# keep brew-stache rolling
+					if (HasArtifactTrait(brew_stache_trait) and not BuffPresent(brew_stache_buff)) Spell(ironskin_brew text=stache)
+					# keep up ironskin_brew_buff but keep 2 charges ready for purifying when elusive_dance_talent
+					if (BuffExpires(ironskin_brew_buff 2) and (not Talent(elusive_dance_talent) or SpellCharges(purifying_brew) >= 2)) Spell(ironskin_brew)
+				}
+			}
 		}
 	}
+	# range check
+	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
 #
@@ -156,7 +161,6 @@ AddFunction BrewmasterDefaultCdActions
 	Spell(fortifying_brew)
 	Spell(zen_meditation)
 	Spell(dampen_harm)
-	Spell(diffuse_magic)
 }
 
 AddFunction BrewmasterInterruptActions
@@ -173,7 +177,6 @@ AddFunction BrewmasterInterruptActions
 		}
 		if target.IsTargetingPlayer() 
 		{
-			Spell(diffuse_magic)
 			Spell(zen_meditation)
 			Spell(dampen_harm)
 		}
