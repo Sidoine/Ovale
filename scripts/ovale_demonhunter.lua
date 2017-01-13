@@ -64,7 +64,7 @@ AddFunction VengeanceDefaultMainActions
 	if (PainDeficit() >= 20) Spell(felblade)
 	Spell(fel_eruption)
 	if (BuffStacks(soul_fragments) >= 1 and target.DebuffExpires(frailty_debuff)) Spell(spirit_bomb)
-	if (PainDeficit() >= 10) and BuffPresent(blade_turning_buff)) Spell(shear)
+	if (PainDeficit() >= 17 and BuffPresent(blade_turning_buff)) Spell(shear)
 	if (VengeancePlayOffensively() and Pain() >= 80) Spell(fracture)
 	if (not SigilCharging(flame) and target.DebuffRemaining(sigil_of_flame_debuff) <= 2-Talent(quickened_sigils_talent))
 	{
@@ -86,7 +86,7 @@ AddFunction VengeanceDefaultAoEActions
 	if (PainDeficit() >= 20) Spell(immolation_aura)
 	if (BuffStacks(soul_fragments) >= 1 and target.DebuffExpires(frailty_debuff)) Spell(spirit_bomb)
 	if (PainDeficit() >= 20) Spell(felblade)
-	if (PainDeficit() >= 10) and BuffPresent(blade_turning_buff)) Spell(shear)
+	if (PainDeficit() >= 17 and BuffPresent(blade_turning_buff)) Spell(shear)
 	if (not SigilCharging(flame) and target.DebuffRemaining(sigil_of_flame_debuff) <= 2-Talent(quickened_sigils_talent))
 	{
 		if (Talent(flame_crash_talent) and (SpellCharges(infernal_strike) >= SpellMaxCharges(infernal_strike))) Spell(infernal_strike)
