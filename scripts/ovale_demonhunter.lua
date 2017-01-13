@@ -57,7 +57,7 @@ AddFunction VengeanceDefaultMainActions
 	if (VengeancePlayOffensively()) Spell(fel_devastation)
 	if (Pain() >= SpellData(demon_spikes pain) + SpellData(soul_cleave pain) + SpellData(soul_cleave extra_pain) and (not Talent(fracture_talent) or VengeancePlayDefensively())) Spell(soul_cleave)
 	Spell(immolation_aura)
-	Spell(felblade)
+	if (PainDeficit() >= 20) Spell(felblade)
 	Spell(fel_eruption)
 	if (BuffStacks(soul_fragments) >= 1 and target.DebuffExpires(frailty_debuff)) Spell(spirit_bomb)
 	if (BuffPresent(blade_turning_buff)) Spell(shear)
@@ -81,7 +81,7 @@ AddFunction VengeanceDefaultAoEActions
 	if (Talent(burning_alive_talent) or (VengeancePlayOffensively() and HasArtifactTrait(fiery_demise) and target.TimeToDie() >= 8)) Spell(fiery_brand)
 	Spell(immolation_aura)
 	if (BuffStacks(soul_fragments) >= 1 and target.DebuffExpires(frailty_debuff)) Spell(spirit_bomb)
-	Spell(felblade)
+	if (PainDeficit() >= 20) Spell(felblade)
 	if (BuffPresent(blade_turning_buff)) Spell(shear)
 	if (not SigilCharging(flame) and target.DebuffRemaining(sigil_of_flame_debuff) <= 2-Talent(quickened_sigils_talent))
 	{
