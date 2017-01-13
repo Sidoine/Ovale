@@ -40,7 +40,7 @@ AddFunction VengeanceDefaultShortCDActions
 		if (Charges(demon_spikes) >= 1) Spell(demon_spikes)
 	}
 	
-	if (Pain() > SpellData(demon_spikes pain) + SpellData(soul_barrier pain)) Spell(soul_barrier)
+	Spell(soul_barrier)
 	
 	if (CheckBoxOn(opt_melee_range) and not target.InRange(shear))
 	{
@@ -59,7 +59,7 @@ AddFunction VengeanceDefaultMainActions
 	if (VengeancePlayOffensively() and HasArtifactTrait(fiery_demise) and target.TimeToDie() >= 8) Spell(fiery_brand)
 	if (VengeancePlayOffensively() or BuffStacks(soul_fragments) <= 2) Spell(soul_carver)
 	if (VengeancePlayOffensively()) Spell(fel_devastation)
-	if (Pain() >= SpellData(demon_spikes pain) + SpellData(soul_cleave pain) + SpellData(soul_cleave extra_pain) and (not Talent(fracture_talent) or VengeancePlayDefensively())) Spell(soul_cleave)
+	if (Pain() >= 80 and (not Talent(fracture_talent) or VengeancePlayDefensively())) Spell(soul_cleave)
 	Spell(immolation_aura)
 	if (PainDeficit() >= 20) Spell(felblade)
 	Spell(fel_eruption)
@@ -81,7 +81,7 @@ AddFunction VengeanceDefaultAoEActions
 	if (VengeancePlayOffensively() and Talent(razor_spikes_talent) and not BuffExpires(demon_spikes_buff)) Spell(soul_cleave)
 	if (BuffStacks(soul_fragments) <= 2) Spell(soul_carver)
 	if (VengeancePlayOffensively()) Spell(fel_devastation)
-	if (Pain() >= SpellData(demon_spikes pain) + SpellData(soul_cleave pain) + SpellData(soul_cleave extra_pain)) Spell(soul_cleave)
+	if (Pain() >= 80) Spell(soul_cleave)
 	if (Talent(burning_alive_talent) or (VengeancePlayOffensively() and HasArtifactTrait(fiery_demise) and target.TimeToDie() >= 8)) Spell(fiery_brand)
 	Spell(immolation_aura)
 	if (BuffStacks(soul_fragments) >= 1 and target.DebuffExpires(frailty_debuff)) Spell(spirit_bomb)
