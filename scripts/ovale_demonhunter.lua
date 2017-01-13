@@ -121,7 +121,7 @@ AddFunction VengeanceInterruptActions
 				Spell(sigil_of_misery)
 				Spell(sigil_of_chains)
 			}
-			if target.CreatureType(Demon) Spell(imprison)
+			if target.CreatureType(Demon Humanoid Beast) Spell(imprison)
 		}
 		if target.IsTargetingPlayer() Spell(empower_wards)
 	}
@@ -212,7 +212,7 @@ AddFunction HavocInterruptActions
 			if target.Distance(less 8) Spell(arcane_torrent_dh)
 			if target.Distance(less 8) Spell(chaos_nova)
 			Spell(fel_eruption)
-			if target.CreatureType(Demon) Spell(imprison)
+			if target.CreatureType(Demon Humanoid Beast) Spell(imprison)
 		}
 	}
 }

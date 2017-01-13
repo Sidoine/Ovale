@@ -4349,7 +4349,7 @@ local function InsertSupportingFunctions(child, annotation)
 						if target.Distance(less 8) Spell(arcane_torrent_dh)
 						if target.Distance(less 8) Spell(chaos_nova)
 						Spell(fel_eruption)
-						if target.CreatureType(Demon) Spell(imprison)
+						if target.CreatureType(Demon Humanoid Beast) Spell(imprison)
 					}
 				}
 			}
