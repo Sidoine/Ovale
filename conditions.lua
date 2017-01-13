@@ -59,6 +59,7 @@ local API_UnitLevel = UnitLevel
 local API_UnitName = UnitName
 local API_UnitPower = UnitPower
 local API_UnitPowerMax = UnitPowerMax
+local API_UnitRace = UnitRace
 local API_UnitStagger = UnitStagger
 local INFINITY = math.huge
 
@@ -3611,7 +3612,13 @@ do
 
 	local function PreviousGCDSpell(positionalParams, namedParams, state, atTime)
 		local spellId, yesno = positionalParams[1], positionalParams[2]
-		local boolean = (spellId == state.lastGCDSpellId)
+		local count = namedParams.count
+		local boolean
+		if count and count > 1 then
+			boolean = (spellId == state.lastGCDSpellIds[#state.lastGCDSpellIds - count + 2])
+		else
+			boolean = (spellId == state.lastGCDSpellId)
+		end
 		return TestBoolean(boolean, yesno)
 	end
 

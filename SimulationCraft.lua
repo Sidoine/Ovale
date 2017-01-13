@@ -3444,12 +3444,21 @@ EmitOperandPreviousSpell = function(operand, parseNode, nodeList, annotation, ac
 	local token = tokenIterator()
 	if token == "prev" or token == "prev_gcd" or token == "prev_off_gcd" then
 		local name = tokenIterator()
+		local howMany = 1
+		if tonumber(name) ~= math.nan then
+			howMany = tonumber(name)
+			name = tokenIterator()
+		end
 		name = Disambiguate(name, annotation.class, annotation.specialization)
 		local code
 		if token == "prev" then
 			code = format("PreviousSpell(%s)", name)
 		elseif token == "prev_gcd" then
-			code = format("PreviousGCDSpell(%s)", name)
+			if howMany ~= 1 then
+				code = format("PreviousGCDSpell(%s count=%d)", name, howMany)
+			else
+				code = format("PreviousGCDSpell(%s)", name)
+			end
 		else -- if token == "prev_off_gcd" then
 			code = format("PreviousOffGCDSpell(%s)", name)
 		end

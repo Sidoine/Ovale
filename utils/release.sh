@@ -941,45 +941,7 @@ checkout_queued_external() {
 		_cqe_checkout_dir="$pkgdir/$external_dir/.checkout"
 		$mkdir -p "$_cqe_checkout_dir"
 		case $external_uri in
-		git:*|http://git*|https://git*)
-			if [ -z "$external_tag" ]; then
-				echo "Fetching latest version of external $external_uri."
-				$git clone --depth 1 "$external_uri" "$_cqe_checkout_dir"
-			elif [ "$external_tag" != "latest" ]; then
-				echo "Fetching tag \`\`$external_tag'' of external $external_uri."
-				$git clone --depth 1 --branch "$external_tag" "$external_uri" "$_cqe_checkout_dir"
-			else
-				# We need to determine the latest tag in a remote Git repository:
-				#
-				#	1. Clone the latest 100 commits from the remote repository.
-				#	2. Find the most recent annotated tag.
-				#	3. Checkout that tag into the working directory.
-				#	4. If no tag is found, then leave the latest commit as the checkout.
-				#
-				echo "Fetching external $external_uri."
-				$git clone --depth 100 "$external_uri" "$_cqe_checkout_dir"
-				external_tag=$(
-					cd "$_cqe_checkout_dir"
-					latest_tag=$( $git for-each-ref refs/tags --sort=-taggerdate --format="%(refname)" --count=1 )
-					latest_tag=${latest_tag#refs/tags/}
-					if [ -n "$latest_tag" ]; then
-						echo "$latest_tag"
-					else
-						echo "latest"
-					fi
-				)
-				if [ "$external_tag" != "latest" ]; then
-					echo "Checking out \`\`$external_tag'' into \`\`$_cqe_checkout_dir''."
-					( cd "$_cqe_checkout_dir" && $git checkout "$external_tag" )
-				fi
-			fi
-			set_info_git "$_cqe_checkout_dir"
-			_cqe_meta_subdir=$si_meta_subdir
-			# Set _cqe_external_version to the external project version.
-			_cqe_external_version=$si_version
-			_cqe_external_project_revision=$si_project_revision
-			;;
-		svn:*|http://svn*|https://svn*)
+		*trunk*)
 			if [ -z "$external_tag" ]; then
 				echo "Fetching latest version of external $external_uri."
 				$svn checkout "$external_uri" "$_cqe_checkout_dir"
@@ -1032,8 +994,44 @@ checkout_queued_external() {
 			_cqe_external_version=$si_version
 			;;
 		*)
-			echo "Unknown external: $external_uri" >&2
+			if [ -z "$external_tag" ]; then
+				echo "Fetching latest version of external $external_uri."
+				$git clone --depth 1 "$external_uri" "$_cqe_checkout_dir"
+			elif [ "$external_tag" != "latest" ]; then
+				echo "Fetching tag \`\`$external_tag'' of external $external_uri."
+				$git clone --depth 1 --branch "$external_tag" "$external_uri" "$_cqe_checkout_dir"
+			else
+				# We need to determine the latest tag in a remote Git repository:
+				#
+				#	1. Clone the latest 100 commits from the remote repository.
+				#	2. Find the most recent annotated tag.
+				#	3. Checkout that tag into the working directory.
+				#	4. If no tag is found, then leave the latest commit as the checkout.
+				#
+				echo "Fetching external $external_uri."
+				$git clone --depth 100 "$external_uri" "$_cqe_checkout_dir"
+				external_tag=$(
+					cd "$_cqe_checkout_dir"
+					latest_tag=$( $git for-each-ref refs/tags --sort=-taggerdate --format="%(refname)" --count=1 )
+					latest_tag=${latest_tag#refs/tags/}
+					if [ -n "$latest_tag" ]; then
+						echo "$latest_tag"
+					else
+						echo "latest"
+					fi
+				)
+				if [ "$external_tag" != "latest" ]; then
+					echo "Checking out \`\`$external_tag'' into \`\`$_cqe_checkout_dir''."
+					( cd "$_cqe_checkout_dir" && $git checkout "$external_tag" )
+				fi
+			fi
+			set_info_git "$_cqe_checkout_dir"
+			_cqe_meta_subdir=$si_meta_subdir
+			# Set _cqe_external_version to the external project version.
+			_cqe_external_version=$si_version
+			_cqe_external_project_revision=$si_project_revision
 			;;
+
 		esac
 		# Copy the checkout into the proper external directory.
 		(
