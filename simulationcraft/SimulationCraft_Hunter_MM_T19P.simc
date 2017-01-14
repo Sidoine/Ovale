@@ -1,4 +1,5 @@
 ### SimulationCraft
+### SimulationCraft
 hunter="Hunter_MM_T19P"
 level=110
 race=blood_elf
@@ -44,7 +45,7 @@ actions+=/call_action_list,name=non_patient_sniper,if=!talent.patient_sniper.ena
 
 actions.cooldowns=potion,name=prolonged_power,if=spell_targets.multishot>2&((buff.trueshot.react&buff.bloodlust.react)|buff.bullseye.react>=23|target.time_to_die<62)
 actions.cooldowns+=/potion,name=deadly_grace,if=(buff.trueshot.react&buff.bloodlust.react)|buff.bullseye.react>=23|target.time_to_die<31
-actions.cooldowns+=/variable,name=trueshot_cooldown,op=set,value=time*1.1,if=time>15&cooldown.trueshot.up
+actions.cooldowns+=/variable,name=trueshot_cooldown,op=set,value=time*1.1,if=time>15&cooldown.trueshot.up&variable.trueshot_cooldown=0
 actions.cooldowns+=/trueshot,if=time<=15|buff.bloodlust.react|(variable.trueshot_cooldown>0&target.time_to_die>(variable.trueshot_cooldown+duration))|buff.bullseye.react>25|target.time_to_die<16
 
 actions.non_patient_sniper=windburst,if=debuff.vulnerability.remains<(2*attack_haste)
@@ -62,9 +63,8 @@ actions.non_patient_sniper+=/aimed_shot,if=(debuff.vulnerability.remains>execute
 actions.non_patient_sniper+=/arcane_shot,if=spell_targets.multishot<2
 actions.non_patient_sniper+=/multishot,if=spell_targets.multishot>1
 
-actions.patient_sniper=variable,name=vuln_aim_casts_,op=set,value=floor(debuff.vulnerability.remains%(2*attack_haste))
-actions.patient_sniper+=/variable,name=vuln_aim_casts,op=set,value=variable.vuln_aim_casts_
-actions.patient_sniper+=/variable,name=vuln_aim_casts,op=set,value=floor((focus.regen*(debuff.vulnerability.remains-(2*attack_haste))+focus)%50),if=variable.vuln_aim_casts_>floor((focus.regen*(debuff.vulnerability.remains-(2*attack_haste))+focus)%50)
+actions.patient_sniper=variable,name=vuln_aim_casts,op=set,value=floor(debuff.vulnerability.remains%(2*attack_haste))
+actions.patient_sniper+=/variable,name=vuln_aim_casts,op=set,value=floor((focus.regen*(debuff.vulnerability.remains-(2*attack_haste))+focus)%50),if=variable.vuln_aim_casts>floor((focus.regen*(debuff.vulnerability.remains-(2*attack_haste))+focus)%50)
 actions.patient_sniper+=/variable,name=focus_after_vuln,op=set,value=(focus.regen*debuff.vulnerability.remains)-(variable.vuln_aim_casts*50)
 actions.patient_sniper+=/sidewinders,if=buff.trueshot.up&(debuff.vulnerability.remains<(2*attack_haste)|focus<35)&(spell_targets.sidewinders<2|debuff.hunters_mark.down)
 actions.patient_sniper+=/sidewinders,if=buff.trueshot.down&debuff.vulnerability.remains<(2*attack_haste)&focus<60&(debuff.hunters_mark.down|(charges_fractional>1.3&spell_targets.sidewinders<2))

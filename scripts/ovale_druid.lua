@@ -1067,7 +1067,6 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_druid_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default specialization=guardian)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=guardian)
 
 AddFunction GuardianUseItemActions
@@ -1082,21 +1081,6 @@ AddFunction GuardianGetInMeleeRange
 	{
 		if target.InRange(wild_charge) Spell(wild_charge)
 		Texture(misc_arrowlup help=L(not_in_melee_range))
-	}
-}
-
-AddFunction GuardianInterruptActions
-{
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-	{
-		if target.InRange(skull_bash) Spell(skull_bash)
-		if not target.Classification(worldboss)
-		{
-			if target.InRange(mighty_bash) Spell(mighty_bash)
-			Spell(typhoon)
-			if target.InRange(maim) Spell(maim)
-			Spell(war_stomp)
-		}
 	}
 }
 
@@ -1155,8 +1139,6 @@ AddFunction GuardianDefaultShortCdPostConditions
 
 AddFunction GuardianDefaultCdActions
 {
-	#skull_bash
-	GuardianInterruptActions()
 	#blood_fury
 	Spell(blood_fury_apsp)
 	#berserking
@@ -1281,21 +1263,16 @@ AddIcon checkbox=opt_druid_guardian_aoe help=cd specialization=guardian
 # ironfur
 # ironfur_buff
 # lunar_beam
-# maim
 # mangle
-# mighty_bash
 # moonfire
 # moonfire_debuff
 # pulverize
 # pulverize_buff
 # rage_of_the_sleeper
 # shred
-# skull_bash
 # swipe_bear
 # thrash_bear
 # thrash_bear_debuff
-# typhoon
-# war_stomp
 # wild_charge
 # wild_charge_bear
 # wild_charge_cat

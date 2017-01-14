@@ -245,7 +245,7 @@ AddFunction FrostDefaultCdActions
 	#use_item,slot=trinket1
 	FrostUseItemActions()
 	#potion,name=old_war,if=buff.pillar_of_frost.up
-	#sindragosas_fury,if=buff.pillar_of_frost.up&(buff.unholy_strength.up|(buff.pillar_of_frost.remains<3&target.time_to_die<60))&debuff.razorice.stack=5&!buff.obliteration.up
+	#sindragosas_fury,if=buff.pillar_of_frost.up&(buff.unholy_strength.up|(buff.pillar_of_frost.remains<3&target.time_to_die<60))&debuff.razorice.stack==5&!buff.obliteration.up
 	if BuffPresent(pillar_of_frost_buff) and { BuffPresent(unholy_strength_buff) or BuffRemaining(pillar_of_frost_buff) < 3 and target.TimeToDie() < 60 } and target.DebuffStacks(razorice_debuff) == 5 and not BuffPresent(obliteration_buff) Spell(sindragosas_fury)
 
 	unless { not Talent(frozen_pulse_talent) or Rune() < 2 and RunicPower() < 28 } and not Talent(gathering_storm_talent) and Spell(obliteration)
