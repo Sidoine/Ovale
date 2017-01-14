@@ -5223,7 +5223,7 @@ do
 	--     Defaults to target=player.
 	--     Valid values: player, target, focus, pet.
 	-- @usage
-	-- if Race(blood_elf) Spell(arcane_torrent)
+	-- if Race(BloodElf) Spell(arcane_torrent)
 	local function Race(positionalParams, namedParams, state, atTime)
 		local isRace = false
 		local target = namedParams.target or "player"
