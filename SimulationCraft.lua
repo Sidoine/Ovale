@@ -3021,7 +3021,6 @@ do
 		["combo_points"]		= "ComboPoints()",
 		["combo_points.deficit"]= "ComboPointsDeficit()",
 		["combo_points.max"]    = "MaxComboPoints()",
-		["cooldowntarget.time_to_die"] = "TimeToDie()",
 		["cp_max_spend"]		= "MaxComboPoints()", -- TODO Difference with combo_points.max??
 		["crit_pct_current"]	= "SpellCritChance()",
 		["current_insanity_drain"] = "CurrentInsanityDrain()",
