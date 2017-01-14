@@ -695,8 +695,8 @@ AddFunction OutlawCdsShortCdActions
 {
 	#cannonball_barrage,if=spell_targets.cannonball_barrage>=1
 	if Enemies() >= 1 Spell(cannonball_barrage)
-	#marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15)&combo_points.deficit>=4+talent.deeper_strategem.enabled+talent.anticipation.enabled)
-	if target.TimeToDie() < ComboPointsDeficit() or { 600 > 40 or BuffRemaining(true_bearing_buff) > 15 } and ComboPointsDeficit() >= 4 + TalentPoints(deeper_strategem_talent) + TalentPoints(anticipation_talent) Spell(marked_for_death)
+	#marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15)&combo_points.deficit>=4+talent.deeper_stratagem.enabled+talent.anticipation.enabled)
+	if target.TimeToDie() < ComboPointsDeficit() or { 600 > 40 or BuffRemaining(true_bearing_buff) > 15 } and ComboPointsDeficit() >= 4 + TalentPoints(deeper_stratagem_talent) + TalentPoints(anticipation_talent) Spell(marked_for_death)
 	#sprint,if=equipped.thraxis_tricksy_treads&!variable.ss_useable
 	if HasEquippedItem(thraxis_tricksy_treads) and not ss_useable() Spell(sprint)
 	#curse_of_the_dreadblades,if=combo_points.deficit>=4&(!talent.ghostly_strike.enabled|debuff.ghostly_strike.up)
@@ -927,7 +927,6 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # death_from_above
 # death_from_above_talent
 # deeper_stratagem_talent
-# deeper_strategem_talent
 # dirty_tricks_talent
 # ghostly_strike
 # ghostly_strike_debuff
@@ -984,7 +983,7 @@ AddFunction stealth_threshold
 
 AddFunction ssw_refund
 {
-	HasEquippedItem(shadow_satyrs_walk) * { 4 + { target.Range() % 3 - 1 } }
+	HasEquippedItem(shadow_satyrs_walk) * { 4 + { target.Distance() % 3 - 1 } }
 }
 
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=subtlety)
@@ -1153,7 +1152,7 @@ AddFunction SubtletyCdsShortCdActions
 {
 	#goremaws_bite,if=!stealthed.all&cooldown.shadow_dance.charges_fractional<=2.45&((combo_points.deficit>=4-(time<10)*2&energy.deficit>50+talent.vigor.enabled*25-(time>=10)*15)|target.time_to_die<8)
 	if not Stealthed() and SpellCharges(shadow_dance count=0) <= 2.45 and { ComboPointsDeficit() >= 4 - { TimeInCombat() < 10 } * 2 and EnergyDeficit() > 50 + TalentPoints(vigor_talent) * 25 - { TimeInCombat() >= 10 } * 15 or target.TimeToDie() < 8 } Spell(goremaws_bite)
-	#marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|(raid_event.adds.in>40&combo_points.deficit>=4+talent.deeper_strategem.enabled+talent.anticipation.enabled)
+	#marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|(raid_event.adds.in>40&combo_points.deficit>=4+talent.deeper_stratagem.enabled+talent.anticipation.enabled)
 	if target.TimeToDie() < ComboPointsDeficit() or 600 > 40 and ComboPointsDeficit() >= 4 + TalentPoints(deeper_stratagem_talent) + TalentPoints(anticipation_talent) Spell(marked_for_death)
 }
 

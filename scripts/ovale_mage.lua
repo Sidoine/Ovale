@@ -117,8 +117,8 @@ AddFunction ArcaneDefaultCdActions
 {
 	#counterspell,if=target.debuff.casting.react
 	if target.IsInterruptible() ArcaneInterruptActions()
-	#time_warp,if=(time=0&buff.bloodlust.down)|(buff.bloodlust.down&equipped.132410)
-	if { TimeInCombat() == 0 and BuffExpires(burst_haste_buff any=1) or BuffExpires(burst_haste_buff any=1) and HasEquippedItem(132410) } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
+	#time_warp,if=(buff.bloodlust.down)&((time=0)|(equipped.132410&buff.arcane_power.up&prev_off_gcd.arcane_power)|(target.time_to_die<40))
+	if BuffExpires(burst_haste_buff any=1) and { TimeInCombat() == 0 or HasEquippedItem(132410) and BuffPresent(arcane_power_buff) and PreviousOffGCDSpell(arcane_power) or target.TimeToDie() < 40 } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
 	#mirror_image,if=buff.arcane_power.down
 	if BuffExpires(arcane_power_buff) Spell(mirror_image)
 	#stop_burn_phase,if=prev_gcd.1.evocation&burn_phase_duration>gcd.max
@@ -681,8 +681,8 @@ AddFunction FireDefaultCdActions
 {
 	#counterspell,if=target.debuff.casting.react
 	if target.IsInterruptible() FireInterruptActions()
-	#time_warp,if=(time=0&buff.bloodlust.down)|(buff.bloodlust.down&equipped.132410)
-	if { TimeInCombat() == 0 and BuffExpires(burst_haste_buff any=1) or BuffExpires(burst_haste_buff any=1) and HasEquippedItem(132410) } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
+	#time_warp,if=(time=0&buff.bloodlust.down)|(buff.bloodlust.down&equipped.132410&(cooldown.combustion.remains<1|target.time_to_die.remains<50))
+	if { TimeInCombat() == 0 and BuffExpires(burst_haste_buff any=1) or BuffExpires(burst_haste_buff any=1) and HasEquippedItem(132410) and { SpellCooldown(combustion) < 1 or target.TimeToDie() < 50 } } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
 	#mirror_image,if=buff.combustion.down
 	if BuffExpires(combustion_buff) Spell(mirror_image)
 
@@ -716,8 +716,8 @@ AddFunction FireActiveTalentsMainActions
 {
 	#blast_wave,if=(buff.combustion.down)|(buff.combustion.up&action.fire_blast.charges<1&action.phoenixs_flames.charges<1)
 	if BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 and Charges(phoenixs_flames) < 1 Spell(blast_wave)
-	#cinderstorm,if=cooldown.combustion.remains<cast_time&(buff.rune_of_power.up|!talent.rune_on_power.enabled)|cooldown.combustion.remains>10*spell_haste&!buff.combustion.up
-	if SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_on_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellHaste() } } and not BuffPresent(combustion_buff) Spell(cinderstorm)
+	#cinderstorm,if=cooldown.combustion.remains<cast_time&(buff.rune_of_power.up|!talent.rune_of_power.enabled)|cooldown.combustion.remains>10*spell_haste&!buff.combustion.up
+	if SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_of_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellHaste() } } and not BuffPresent(combustion_buff) Spell(cinderstorm)
 	#living_bomb,if=active_enemies>1&buff.combustion.down
 	if Enemies() > 1 and BuffExpires(combustion_buff) Spell(living_bomb)
 }
@@ -733,7 +733,7 @@ AddFunction FireActiveTalentsShortCdActions
 		#meteor,if=cooldown.combustion.remains>30|(cooldown.combustion.remains>target.time_to_die)|buff.rune_of_power.up
 		if SpellCooldown(combustion) > 30 or SpellCooldown(combustion) > target.TimeToDie() or BuffPresent(rune_of_power_buff) Spell(meteor)
 
-		unless { SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_on_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellHaste() } } and not BuffPresent(combustion_buff) } and Spell(cinderstorm)
+		unless { SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_of_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellHaste() } } and not BuffPresent(combustion_buff) } and Spell(cinderstorm)
 		{
 			#dragons_breath,if=equipped.132863|(talent.alexstraszas_fury.enabled&buff.hot_streak.down)
 			if HasEquippedItem(132863) or Talent(alexstraszas_fury_talent) and BuffExpires(hot_streak_buff) Spell(dragons_breath)
@@ -743,7 +743,7 @@ AddFunction FireActiveTalentsShortCdActions
 
 AddFunction FireActiveTalentsShortCdPostConditions
 {
-	{ BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 and Charges(phoenixs_flames) < 1 } and Spell(blast_wave) or { SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_on_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellHaste() } } and not BuffPresent(combustion_buff) } and Spell(cinderstorm) or Enemies() > 1 and BuffExpires(combustion_buff) and Spell(living_bomb)
+	{ BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 and Charges(phoenixs_flames) < 1 } and Spell(blast_wave) or { SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_of_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellHaste() } } and not BuffPresent(combustion_buff) } and Spell(cinderstorm) or Enemies() > 1 and BuffExpires(combustion_buff) and Spell(living_bomb)
 }
 
 AddFunction FireActiveTalentsCdActions
@@ -752,7 +752,7 @@ AddFunction FireActiveTalentsCdActions
 
 AddFunction FireActiveTalentsCdPostConditions
 {
-	{ BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 and Charges(phoenixs_flames) < 1 } and Spell(blast_wave) or { SpellCooldown(combustion) > 30 or SpellCooldown(combustion) > target.TimeToDie() or BuffPresent(rune_of_power_buff) } and Spell(meteor) or { SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_on_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellHaste() } } and not BuffPresent(combustion_buff) } and Spell(cinderstorm) or { HasEquippedItem(132863) or Talent(alexstraszas_fury_talent) and BuffExpires(hot_streak_buff) } and Spell(dragons_breath) or Enemies() > 1 and BuffExpires(combustion_buff) and Spell(living_bomb)
+	{ BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 and Charges(phoenixs_flames) < 1 } and Spell(blast_wave) or { SpellCooldown(combustion) > 30 or SpellCooldown(combustion) > target.TimeToDie() or BuffPresent(rune_of_power_buff) } and Spell(meteor) or { SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_of_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellHaste() } } and not BuffPresent(combustion_buff) } and Spell(cinderstorm) or { HasEquippedItem(132863) or Talent(alexstraszas_fury_talent) and BuffExpires(hot_streak_buff) } and Spell(dragons_breath) or Enemies() > 1 and BuffExpires(combustion_buff) and Spell(living_bomb)
 }
 
 ### actions.combustion_phase
@@ -1105,7 +1105,6 @@ AddIcon checkbox=opt_mage_fire_aoe help=cd specialization=fire
 # rune_of_power
 # rune_of_power_buff
 # rune_of_power_talent
-# rune_on_power_talent
 # scorch
 # time_warp
 ]]

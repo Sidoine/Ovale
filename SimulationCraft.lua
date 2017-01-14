@@ -168,6 +168,7 @@ local BINARY_OPERATOR = {
 	["<"]  = { "compare", 20 },
 	["<="] = { "compare", 20 },
 	["="]  = { "compare", 20 },
+	["=="]  = { "compare", 20 },
 	[">"]  = { "compare", 20 },
 	[">="] = { "compare", 20 },
 	["~"]  = { "compare", 20 },
@@ -362,6 +363,7 @@ do
 		{ "^<=", Tokenize },
 		{ "^>=", Tokenize },
 		{ "^!~", Tokenize },
+		{ "^==", Tokenize },
 		{ "^.", Tokenize },
 		{ "^$", NoToken },
 	}
@@ -3019,6 +3021,7 @@ do
 		["combo_points"]		= "ComboPoints()",
 		["combo_points.deficit"]= "ComboPointsDeficit()",
 		["combo_points.max"]    = "MaxComboPoints()",
+		["cooldowntarget.time_to_die"] = "TimeToDie()",
 		["cp_max_spend"]		= "MaxComboPoints()", -- TODO Difference with combo_points.max??
 		["crit_pct_current"]	= "SpellCritChance()",
 		["current_insanity_drain"] = "CurrentInsanityDrain()",
@@ -3079,7 +3082,7 @@ do
 		["solar_max"]			= "TimeToEclipse(solar)",	-- XXX
 		["soul_shard"]			= "SoulShards()",
 		["soul_fragments"]		= "BuffStacks(soul_fragments)",
-		["ssw_refund_offset"]	= "target.Range() % 3 - 1",
+		["ssw_refund_offset"]	= "target.Distance() % 3 - 1",
 		["stat.multistrike_pct"]= "MultistrikeChance()",
 		["stealthed"]			= "Stealthed()",
 		["stealthed.all"]		= "Stealthed()",
@@ -3841,7 +3844,7 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		end
 	elseif class == "WARLOCK" and strmatch(operand, "dot.unstable_affliction_([1-5]).remains") then
 		local num = strmatch(operand, "dot.unstable_affliction_([1-5]).remains")
-		code = format("target.DebuffCount(unstable_affliction_debuff) >= %s", num)
+		code = format("target.DebuffStacks(unstable_affliction_debuff) >= %s", num)
 	elseif class == "WARRIOR" and strsub(operand, 1, 23) == "buff.colossus_smash_up." then
 		local property = strsub(operand, 24)
 		local debuffName = "colossus_smash_debuff"

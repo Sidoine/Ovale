@@ -276,8 +276,8 @@ AddFunction safe_to_build
 
 AddFunction vuln_aim_casts
 {
-	if vuln_aim_casts_() > { FocusRegenRate() * { target.DebuffRemaining(vulnerability_debuff) - 2 * { 100 / { 100 + MeleeHaste() } } } + Focus() } / 50 { FocusRegenRate() * { target.DebuffRemaining(vulnerability_debuff) - 2 * { 100 / { 100 + MeleeHaste() } } } + Focus() } / 50
-	vuln_aim_casts_()
+	if vuln_aim_casts() > { FocusRegenRate() * { target.DebuffRemaining(vulnerability_debuff) - 2 * { 100 / { 100 + MeleeHaste() } } } + Focus() } / 50 { FocusRegenRate() * { target.DebuffRemaining(vulnerability_debuff) - 2 * { 100 / { 100 + MeleeHaste() } } } + Focus() } / 50
+	target.DebuffRemaining(vulnerability_debuff) / { 2 * { 100 / { 100 + MeleeHaste() } } }
 }
 
 AddFunction use_multishot
@@ -285,14 +285,9 @@ AddFunction use_multishot
 	{ BuffPresent(marking_targets_buff) or BuffPresent(trueshot_buff) } and Enemies() > 1 or BuffExpires(marking_targets_buff) and BuffExpires(trueshot_buff) and Enemies() > 2
 }
 
-AddFunction vuln_aim_casts_
-{
-	target.DebuffRemaining(vulnerability_debuff) / { 2 * { 100 / { 100 + MeleeHaste() } } }
-}
-
 AddFunction trueshot_cooldown
 {
-	if TimeInCombat() > 15 and not SpellCooldown(trueshot) > 0 TimeInCombat() * 1.1
+	if TimeInCombat() > 15 and not SpellCooldown(trueshot) > 0 and trueshot_cooldown() == 0 TimeInCombat() * 1.1
 }
 
 AddFunction sentinel_soon
@@ -470,7 +465,7 @@ AddFunction MarksmanshipCooldownsCdActions
 {
 	#potion,name=prolonged_power,if=spell_targets.multishot>2&((buff.trueshot.react&buff.bloodlust.react)|buff.bullseye.react>=23|target.time_to_die<62)
 	#potion,name=deadly_grace,if=(buff.trueshot.react&buff.bloodlust.react)|buff.bullseye.react>=23|target.time_to_die<31
-	#variable,name=trueshot_cooldown,op=set,value=time*1.1,if=time>15&cooldown.trueshot.up
+	#variable,name=trueshot_cooldown,op=set,value=time*1.1,if=time>15&cooldown.trueshot.up&variable.trueshot_cooldown=0
 	#trueshot,if=time<=15|buff.bloodlust.react|(variable.trueshot_cooldown>0&target.time_to_die>(variable.trueshot_cooldown+duration))|buff.bullseye.react>25|target.time_to_die<16
 	if TimeInCombat() <= 15 or BuffPresent(burst_haste_buff any=1) or trueshot_cooldown() > 0 and target.TimeToDie() > trueshot_cooldown() + BaseDuration(trueshot_buff) or BuffStacks(bullseye_buff) > 25 or target.TimeToDie() < 16 Spell(trueshot)
 }
@@ -546,9 +541,8 @@ AddFunction MarksmanshipNonPatientSniperCdPostConditions
 
 AddFunction MarksmanshipPatientSniperMainActions
 {
-	#variable,name=vuln_aim_casts_,op=set,value=floor(debuff.vulnerability.remains%(2*attack_haste))
-	#variable,name=vuln_aim_casts,op=set,value=variable.vuln_aim_casts_
-	#variable,name=vuln_aim_casts,op=set,value=floor((focus.regen*(debuff.vulnerability.remains-(2*attack_haste))+focus)%50),if=variable.vuln_aim_casts_>floor((focus.regen*(debuff.vulnerability.remains-(2*attack_haste))+focus)%50)
+	#variable,name=vuln_aim_casts,op=set,value=floor(debuff.vulnerability.remains%(2*attack_haste))
+	#variable,name=vuln_aim_casts,op=set,value=floor((focus.regen*(debuff.vulnerability.remains-(2*attack_haste))+focus)%50),if=variable.vuln_aim_casts>floor((focus.regen*(debuff.vulnerability.remains-(2*attack_haste))+focus)%50)
 	#variable,name=focus_after_vuln,op=set,value=(focus.regen*debuff.vulnerability.remains)-(variable.vuln_aim_casts*50)
 	#sidewinders,if=buff.trueshot.up&(debuff.vulnerability.remains<(2*attack_haste)|focus<35)&(spell_targets.sidewinders<2|debuff.hunters_mark.down)
 	if BuffPresent(trueshot_buff) and { target.DebuffRemaining(vulnerability_debuff) < 2 * { 100 / { 100 + MeleeHaste() } } or Focus() < 35 } and { Enemies() < 2 or target.DebuffExpires(hunters_mark_debuff) } Spell(sidewinders)

@@ -1195,15 +1195,17 @@ AddFunction ProtectionDefaultShortCdActions
 {
 	#auto_attack
 	ProtectionGetInMeleeRange()
-	#intercept
-	Spell(intercept)
-	#call_action_list,name=prot
-	ProtectionProtShortCdActions()
+
+	unless Spell(intercept)
+	{
+		#call_action_list,name=prot
+		ProtectionProtShortCdActions()
+	}
 }
 
 AddFunction ProtectionDefaultShortCdPostConditions
 {
-	ProtectionProtShortCdPostConditions()
+	Spell(intercept) or ProtectionProtShortCdPostConditions()
 }
 
 AddFunction ProtectionDefaultCdActions
@@ -1270,10 +1272,14 @@ AddFunction ProtectionProtMainActions
 	#potion,name=unbending_potion,if=(incoming_damage_2500ms>health.max*0.15&!buff.potion.up)|target.time_to_die<=25
 	#battle_cry,if=cooldown.shield_slam.remains=0
 	if not SpellCooldown(shield_slam) > 0 Spell(battle_cry)
+	#revenge,if=buff.revenge.react
+	if BuffPresent(revenge_buff) Spell(revenge)
 	#shield_slam,if=!(cooldown.shield_block.remains<=gcd.max*2&!buff.shield_block.up&talent.heavy_repercussions.enabled)
 	if not { SpellCooldown(shield_block) <= GCD() * 2 and not BuffPresent(shield_block_buff) and Talent(heavy_repercussions_talent) } Spell(shield_slam)
 	#revenge,if=cooldown.shield_slam.remains<=gcd.max*1.5|spell_targets.revenge>=2
 	if SpellCooldown(shield_slam) <= GCD() * 1.5 or Enemies() >= 2 Spell(revenge)
+	#revenge,if=(buff.vengeance_revenge.up&!buff.vengeance_ignore_pain.up&rage>=59)|!buff.vengeance_ignore_pain.up|(talent.vengeance.enabled&!buff.vengeance_ignore_pain.up&!buff.vengeance_revenge.up&rage>=69)|(rage>=100)
+	if BuffPresent(vengeance_revenge_buff) and not BuffPresent(vengeance_ignore_pain_buff) and Rage() >= 59 or not BuffPresent(vengeance_ignore_pain_buff) or Talent(vengeance_talent) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_revenge_buff) and Rage() >= 69 or Rage() >= 100 Spell(revenge)
 	#thunder_clap,if=spell_targets.thunder_clap>=4
 	if Enemies() >= 4 Spell(thunder_clap)
 	#devastate
@@ -1291,7 +1297,7 @@ AddFunction ProtectionProtShortCdActions
 		#demoralizing_shout,if=incoming_damage_2500ms>health.max*0.20
 		if IncomingDamage(2.5) > MaxHealth() * 0.2 Spell(demoralizing_shout)
 
-		unless not SpellCooldown(shield_slam) > 0 and Spell(battle_cry)
+		unless not SpellCooldown(shield_slam) > 0 and Spell(battle_cry) or BuffPresent(revenge_buff) and Spell(revenge)
 		{
 			#demoralizing_shout,if=talent.booming_voice.enabled&buff.battle_cry.up
 			if Talent(booming_voice_talent) and BuffPresent(battle_cry_buff) Spell(demoralizing_shout)
@@ -1304,8 +1310,8 @@ AddFunction ProtectionProtShortCdActions
 
 			unless not { SpellCooldown(shield_block) <= GCD() * 2 and not BuffPresent(shield_block_buff) and Talent(heavy_repercussions_talent) } and Spell(shield_slam) or { SpellCooldown(shield_slam) <= GCD() * 1.5 or Enemies() >= 2 } and Spell(revenge)
 			{
-				#ignore_pain,if=(rage>=60&!talent.vengeance.enabled)|(buff.vengeance_ignore_pain.up&rage>=39)|(talent.vengeance.enabled&!buff.ultimatum.up&!buff.vengeance_ignore_pain.up&!buff.vengeance_focused_rage.up&rage<30)
-				if Rage() >= 60 and not Talent(vengeance_talent) or BuffPresent(vengeance_ignore_pain_buff) and Rage() >= 39 or Talent(vengeance_talent) and not BuffPresent(ultimatum_buff) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_focused_rage_buff) and Rage() < 30 Spell(ignore_pain)
+				#ignore_pain,if=(rage>=60&!talent.vengeance.enabled)|(buff.vengeance_ignore_pain.up&rage>=39)|(talent.vengeance.enabled&!buff.vengeance_ignore_pain.up&!buff.vengeance_revenge.up&rage<30)
+				if Rage() >= 60 and not Talent(vengeance_talent) or BuffPresent(vengeance_ignore_pain_buff) and Rage() >= 39 or Talent(vengeance_talent) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_revenge_buff) and Rage() < 30 Spell(ignore_pain)
 			}
 		}
 	}
@@ -1313,7 +1319,7 @@ AddFunction ProtectionProtShortCdActions
 
 AddFunction ProtectionProtShortCdPostConditions
 {
-	IncomingDamage(2.5) > MaxHealth() * 0.2 and Spell(spell_reflection) or not SpellCooldown(shield_slam) > 0 and Spell(battle_cry) or not { SpellCooldown(shield_block) <= GCD() * 2 and not BuffPresent(shield_block_buff) and Talent(heavy_repercussions_talent) } and Spell(shield_slam) or { SpellCooldown(shield_slam) <= GCD() * 1.5 or Enemies() >= 2 } and Spell(revenge) or Enemies() >= 4 and Spell(thunder_clap) or Spell(devastate)
+	IncomingDamage(2.5) > MaxHealth() * 0.2 and Spell(spell_reflection) or not SpellCooldown(shield_slam) > 0 and Spell(battle_cry) or BuffPresent(revenge_buff) and Spell(revenge) or not { SpellCooldown(shield_block) <= GCD() * 2 and not BuffPresent(shield_block_buff) and Talent(heavy_repercussions_talent) } and Spell(shield_slam) or { SpellCooldown(shield_slam) <= GCD() * 1.5 or Enemies() >= 2 } and Spell(revenge) or { BuffPresent(vengeance_revenge_buff) and not BuffPresent(vengeance_ignore_pain_buff) and Rage() >= 59 or not BuffPresent(vengeance_ignore_pain_buff) or Talent(vengeance_talent) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_revenge_buff) and Rage() >= 69 or Rage() >= 100 } and Spell(revenge) or Enemies() >= 4 and Spell(thunder_clap) or Spell(devastate)
 }
 
 AddFunction ProtectionProtCdActions
@@ -1329,7 +1335,7 @@ AddFunction ProtectionProtCdActions
 
 AddFunction ProtectionProtCdPostConditions
 {
-	IncomingDamage(2.5) > MaxHealth() * 0.2 and Spell(spell_reflection) or not SpellCooldown(shield_slam) > 0 and Spell(battle_cry) or Talent(ravager_talent) and BuffPresent(battle_cry_buff) and Spell(ravager) or not BuffPresent(shield_block_buff) and SpellCooldown(shield_block) > 3 and SpellCooldown(shield_slam) > 3 and Spell(neltharions_fury) or not { SpellCooldown(shield_block) <= GCD() * 2 and not BuffPresent(shield_block_buff) and Talent(heavy_repercussions_talent) } and Spell(shield_slam) or { SpellCooldown(shield_slam) <= GCD() * 1.5 or Enemies() >= 2 } and Spell(revenge) or Enemies() >= 4 and Spell(thunder_clap) or Spell(devastate)
+	IncomingDamage(2.5) > MaxHealth() * 0.2 and Spell(spell_reflection) or not SpellCooldown(shield_slam) > 0 and Spell(battle_cry) or BuffPresent(revenge_buff) and Spell(revenge) or Talent(ravager_talent) and BuffPresent(battle_cry_buff) and Spell(ravager) or not BuffPresent(shield_block_buff) and SpellCooldown(shield_block) > 3 and SpellCooldown(shield_slam) > 3 and Spell(neltharions_fury) or not { SpellCooldown(shield_block) <= GCD() * 2 and not BuffPresent(shield_block_buff) and Talent(heavy_repercussions_talent) } and Spell(shield_slam) or { SpellCooldown(shield_slam) <= GCD() * 1.5 or Enemies() >= 2 } and Spell(revenge) or { BuffPresent(vengeance_revenge_buff) and not BuffPresent(vengeance_ignore_pain_buff) and Rage() >= 59 or not BuffPresent(vengeance_ignore_pain_buff) or Talent(vengeance_talent) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_revenge_buff) and Rage() >= 69 or Rage() >= 100 } and Spell(revenge) or Enemies() >= 4 and Spell(thunder_clap) or Spell(devastate)
 }
 
 ### Protection icons.
@@ -1414,15 +1420,15 @@ AddIcon checkbox=opt_warrior_protection_aoe help=cd specialization=protection
 # ravager
 # ravager_talent
 # revenge
+# revenge_buff
 # shield_block
 # shield_block_buff
 # shield_slam
 # shield_wall
 # spell_reflection
 # thunder_clap
-# ultimatum_buff
-# vengeance_focused_rage_buff
 # vengeance_ignore_pain_buff
+# vengeance_revenge_buff
 # vengeance_talent
 # war_stomp
 ]]
