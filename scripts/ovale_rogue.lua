@@ -983,7 +983,7 @@ AddFunction stealth_threshold
 
 AddFunction ssw_refund
 {
-	HasEquippedItem(shadow_satyrs_walk) * { 4 + { target.Range() % 3 - 1 } }
+	HasEquippedItem(shadow_satyrs_walk) * { 4 + { target.Distance() % 3 - 1 } }
 }
 
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=subtlety)

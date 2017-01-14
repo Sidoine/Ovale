@@ -3082,7 +3082,7 @@ do
 		["solar_max"]			= "TimeToEclipse(solar)",	-- XXX
 		["soul_shard"]			= "SoulShards()",
 		["soul_fragments"]		= "BuffStacks(soul_fragments)",
-		["ssw_refund_offset"]	= "target.Range() % 3 - 1",
+		["ssw_refund_offset"]	= "target.Distance() % 3 - 1",
 		["stat.multistrike_pct"]= "MultistrikeChance()",
 		["stealthed"]			= "Stealthed()",
 		["stealthed.all"]		= "Stealthed()",
