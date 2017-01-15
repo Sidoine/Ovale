@@ -109,6 +109,9 @@ case $basedir in
 	;;
 esac
 
+# pkgmeta file name
+pkgmeta = "pkgmeta.yaml"
+
 # The default slug is the lowercase basename of the checkout directory.
 slug_default=$( echo "$basedir" | $tr '[A-Z]' '[a-z]' )
 
@@ -415,7 +418,7 @@ ignore=
 license=
 contents=
 
-if [ -f "$topdir/.pkgmeta" ]; then
+if [ -f "$topdir/$pkgmeta" ]; then
 	yaml_eof=
 	while [ -z "$yaml_eof" ]; do
 		IFS='' read -r yaml_line || yaml_eof=true
@@ -482,7 +485,7 @@ if [ -f "$topdir/.pkgmeta" ]; then
 			esac
 			;;
 		esac
-	done < "$topdir/.pkgmeta"
+	done < "$topdir/$pkgmeta"
 fi
 
 # Set $slug to the basename of the checkout directory if not already set.
@@ -1106,7 +1109,7 @@ checkout_queued_external() {
 	external_tag=
 }
 
-if [ -f "$topdir/.pkgmeta" ]; then
+if [ -f "$topdir/$pkgmeta" ]; then
 	yaml_eof=
 	while [ -z "$yaml_eof" ]; do
 		IFS='' read -r yaml_line || yaml_eof=true
@@ -1157,7 +1160,7 @@ if [ -f "$topdir/.pkgmeta" ]; then
 			esac
 			;;
 		esac
-	done < "$topdir/.pkgmeta"
+	done < "$topdir/$pkgmeta"
 	# Reached end of file, so checkout any remaining queued externals.
 	checkout_queued_external
 fi
@@ -1234,7 +1237,7 @@ fi
 ### Process .pkgmeta to perform move-folders actions.
 ###
 
-if [ -f "$topdir/.pkgmeta" ]; then
+if [ -f "$topdir/$pkgmeta" ]; then
 	yaml_eof=
 	while [ -z "$yaml_eof" ]; do
 		IFS='' read -r yaml_line || yaml_eof=true
@@ -1295,7 +1298,7 @@ if [ -f "$topdir/.pkgmeta" ]; then
 			esac
 			;;
 		esac
-	done < "$topdir/.pkgmeta"
+	done < "$topdir/$pkgmeta"
 fi
 
 ###
