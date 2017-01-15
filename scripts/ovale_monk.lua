@@ -158,6 +158,7 @@ AddFunction BrewmasterDefaultCdActions
 	Spell(invoke_niuzao)
 	Item(Trinket0Slot usable=1 text=13)
 	Item(Trinket1Slot usable=1 text=14)
+	if (HasEquippedItem(fundamental_observation)) Spell(zen_meditation)
 	Spell(fortifying_brew)
 	Spell(zen_meditation)
 	Spell(dampen_harm)

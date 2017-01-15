@@ -29,7 +29,7 @@ AddFunction VengeanceHealMe
 {
 	if (HealthPercent() < 70) Spell(fel_devastation)
 	if (HealthPercent() < 70) Spell(soul_cleave)
-	if (IncomingDamage(5) >= MaxHealth() * 0.7) Spell(soul_cleave)
+	if (IncomingDamage(5) >= MaxHealth() * 0.5) Spell(soul_cleave)
 }
 
 AddFunction VengeanceDefaultShortCDActions
@@ -40,7 +40,7 @@ AddFunction VengeanceDefaultShortCDActions
 		if (Charges(demon_spikes) >= 1) Spell(demon_spikes)
 	}
 	
-	if (Pain() > SpellData(demon_spikes pain) + SpellData(soul_barrier pain)) Spell(soul_barrier)
+	Spell(soul_barrier)
 	
 	if (CheckBoxOn(opt_melee_range) and not target.InRange(shear))
 	{
@@ -59,13 +59,13 @@ AddFunction VengeanceDefaultMainActions
 	if (VengeancePlayOffensively() and HasArtifactTrait(fiery_demise) and target.TimeToDie() >= 8) Spell(fiery_brand)
 	if (VengeancePlayOffensively() or BuffStacks(soul_fragments) <= 2) Spell(soul_carver)
 	if (VengeancePlayOffensively()) Spell(fel_devastation)
-	if (Pain() >= SpellData(demon_spikes pain) + SpellData(soul_cleave pain) + SpellData(soul_cleave extra_pain) and (not Talent(fracture_talent) or VengeancePlayDefensively())) Spell(soul_cleave)
-	Spell(immolation_aura)
+	if (Pain() >= 80 and (not Talent(fracture_talent) or VengeancePlayDefensively())) Spell(soul_cleave)
+	if (PainDeficit() >= 20) Spell(immolation_aura)
 	if (PainDeficit() >= 20) Spell(felblade)
 	Spell(fel_eruption)
 	if (BuffStacks(soul_fragments) >= 1 and target.DebuffExpires(frailty_debuff)) Spell(spirit_bomb)
-	if (BuffPresent(blade_turning_buff)) Spell(shear)
-	if (VengeancePlayOffensively() and Pain() >= SpellData(demon_spikes pain) + SpellData(soul_cleave pain) + SpellData(fracture pain)) Spell(fracture)
+	if (PainDeficit() >= 17 and BuffPresent(blade_turning_buff)) Spell(shear)
+	if (VengeancePlayOffensively() and Pain() >= 80) Spell(fracture)
 	if (not SigilCharging(flame) and target.DebuffRemaining(sigil_of_flame_debuff) <= 2-Talent(quickened_sigils_talent))
 	{
 		if (Talent(flame_crash_talent) and (SpellCharges(infernal_strike) >= SpellMaxCharges(infernal_strike))) Spell(infernal_strike)
@@ -81,12 +81,12 @@ AddFunction VengeanceDefaultAoEActions
 	if (VengeancePlayOffensively() and Talent(razor_spikes_talent) and not BuffExpires(demon_spikes_buff)) Spell(soul_cleave)
 	if (BuffStacks(soul_fragments) <= 2) Spell(soul_carver)
 	if (VengeancePlayOffensively()) Spell(fel_devastation)
-	if (Pain() >= SpellData(demon_spikes pain) + SpellData(soul_cleave pain) + SpellData(soul_cleave extra_pain)) Spell(soul_cleave)
+	if (Pain() >= 80) Spell(soul_cleave)
 	if (Talent(burning_alive_talent) or (VengeancePlayOffensively() and HasArtifactTrait(fiery_demise) and target.TimeToDie() >= 8)) Spell(fiery_brand)
-	Spell(immolation_aura)
+	if (PainDeficit() >= 20) Spell(immolation_aura)
 	if (BuffStacks(soul_fragments) >= 1 and target.DebuffExpires(frailty_debuff)) Spell(spirit_bomb)
 	if (PainDeficit() >= 20) Spell(felblade)
-	if (BuffPresent(blade_turning_buff)) Spell(shear)
+	if (PainDeficit() >= 17 and BuffPresent(blade_turning_buff)) Spell(shear)
 	if (not SigilCharging(flame) and target.DebuffRemaining(sigil_of_flame_debuff) <= 2-Talent(quickened_sigils_talent))
 	{
 		if (Talent(flame_crash_talent) and (SpellCharges(infernal_strike) >= SpellMaxCharges(infernal_strike))) Spell(infernal_strike)
@@ -121,7 +121,7 @@ AddFunction VengeanceInterruptActions
 				Spell(sigil_of_misery)
 				Spell(sigil_of_chains)
 			}
-			if target.CreatureType(Demon) Spell(imprison)
+			if target.CreatureType(Demon Humanoid Beast) Spell(imprison)
 		}
 		if target.IsTargetingPlayer() Spell(empower_wards)
 	}
@@ -212,7 +212,7 @@ AddFunction HavocInterruptActions
 			if target.Distance(less 8) Spell(arcane_torrent_dh)
 			if target.Distance(less 8) Spell(chaos_nova)
 			Spell(fel_eruption)
-			if target.CreatureType(Demon) Spell(imprison)
+			if target.CreatureType(Demon Humanoid Beast) Spell(imprison)
 		}
 	}
 }

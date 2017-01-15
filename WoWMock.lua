@@ -657,6 +657,7 @@ WoWMock.mock["CreateFrame"] = [[
 				Hide = DoNothing,
 				IsVisible = DoNothing,
 				NumLines = ZeroFunction,
+				RegisterUnitEvent = DoNothing,
 				SetAllPoints = DoNothing,
 				SetAlpha = DoNothing,
 				SetFrameStrata = DoNothing,
@@ -671,6 +672,7 @@ WoWMock.mock["CreateFrame"] = [[
 				SetText = DoNothing,
 				SetTexture = DoNothing,
 				SetWidth = DoNothing,
+				Show = DoNothing,
 				RegisterEvent = DoNothing,
 				UnregisterAllEvents = DoNothing
 			}
@@ -757,6 +759,13 @@ WoWMock.mock["GetInventoryItemGems"] = [[
 
 WoWMock.mock["GetInventoryItemID"] = [[
 	function GetInventoryItemID(unitId, slot)
+		-- All units are naked.
+		return nil
+	end
+]]
+
+WoWMock.mock["GetInventorySlotInfo"] = [[
+	function GetInventorySlotInfo(slotName)
 		-- All units are naked.
 		return nil
 	end
