@@ -82,7 +82,7 @@ AddFunction VengeanceDefaultAoEActions
 	if (BuffStacks(soul_fragments) <= 2) Spell(soul_carver)
 	if (VengeancePlayOffensively()) Spell(fel_devastation)
 	if (Pain() >= 80) Spell(soul_cleave)
-	if (Talent(burning_alive_talent) and target.TimeToDie() >= 8)) Spell(fiery_brand)
+	if (Talent(burning_alive_talent) and target.TimeToDie() >= 8) Spell(fiery_brand)
 	if (PainDeficit() >= 20) Spell(immolation_aura)
 	if (BuffStacks(soul_fragments) >= 1 and target.DebuffExpires(frailty_debuff)) Spell(spirit_bomb)
 	if (PainDeficit() >= 20) Spell(felblade)
