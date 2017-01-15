@@ -517,12 +517,6 @@ AddFunction OutlawDefaultMainActions
 				{
 					#call_action_list,name=finish,if=!variable.ss_useable
 					if not ss_useable() OutlawFinishMainActions()
-
-					unless not ss_useable() and OutlawFinishMainPostConditions()
-					{
-						#gouge,if=talent.dirty_tricks.enabled&combo_points.deficit>=1
-						if Talent(dirty_tricks_talent) and ComboPointsDeficit() >= 1 Spell(gouge)
-					}
 				}
 			}
 		}
@@ -561,6 +555,12 @@ AddFunction OutlawDefaultShortCdActions
 				{
 					#call_action_list,name=finish,if=!variable.ss_useable
 					if not ss_useable() OutlawFinishShortCdActions()
+
+					unless not ss_useable() and OutlawFinishShortCdPostConditions()
+					{
+						#gouge,if=talent.dirty_tricks.enabled&combo_points.deficit>=1
+						if Talent(dirty_tricks_talent) and ComboPointsDeficit() >= 1 Spell(gouge)
+					}
 				}
 			}
 		}
@@ -569,7 +569,7 @@ AddFunction OutlawDefaultShortCdActions
 
 AddFunction OutlawDefaultShortCdPostConditions
 {
-	OutlawBfShortCdPostConditions() or OutlawCdsShortCdPostConditions() or { Stealthed() or not SpellCooldown(vanish) > 0 or not SpellCooldown(shadowmeld) > 0 } and OutlawStealthShortCdPostConditions() or TimeToMaxEnergy() > 2 and not ss_useable_noreroll() and Spell(death_from_above) or not ss_useable() and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 and Spell(slice_and_dice) or not ss_useable() and BuffRemaining(roll_the_bones_buff) < target.TimeToDie() and { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and Spell(roll_the_bones) or OutlawBuildShortCdPostConditions() or not ss_useable() and OutlawFinishShortCdPostConditions() or Talent(dirty_tricks_talent) and ComboPointsDeficit() >= 1 and Spell(gouge)
+	OutlawBfShortCdPostConditions() or OutlawCdsShortCdPostConditions() or { Stealthed() or not SpellCooldown(vanish) > 0 or not SpellCooldown(shadowmeld) > 0 } and OutlawStealthShortCdPostConditions() or TimeToMaxEnergy() > 2 and not ss_useable_noreroll() and Spell(death_from_above) or not ss_useable() and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 and Spell(slice_and_dice) or not ss_useable() and BuffRemaining(roll_the_bones_buff) < target.TimeToDie() and { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and Spell(roll_the_bones) or OutlawBuildShortCdPostConditions() or not ss_useable() and OutlawFinishShortCdPostConditions()
 }
 
 AddFunction OutlawDefaultCdActions
