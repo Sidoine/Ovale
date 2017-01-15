@@ -1705,16 +1705,24 @@ EmitNamedVariable = function(name, nodeList, annotation, modifier, parseNode, ac
 	local node = annotation.variable[name]
 	local group
 	if not node then
+		-- The variable does not already exist, create it
 		node = OvaleAST:NewNode(nodeList, true)
 		annotation.variable[name] = node
 		node.type = "add_function"
 		node.name = name
+		-- The condition will be in a group that will be the first child
 		group = OvaleAST:NewNode(nodeList, true)
 		group.type = "group"
 		node.child[1] = group
 	else
+		-- Add the condition to the existing group (the first child)
 		group = node.child[1]
 	end 
+
+	-- Need to know which is the current variable in order to avoid recursive calls
+	-- For now, there does not seems complicated cases where variable A uses variable B, which uses variable A
+	annotation.currentVariable = node
+
 	local value = Emit(modifier.value, nodeList, annotation, action)
 	local newNode = EmitConditionNode(nodeList, value, conditionNode or nil, parseNode, annotation, action)
 	if newNode.type == "if" then
@@ -1723,6 +1731,8 @@ EmitNamedVariable = function(name, nodeList, annotation, modifier, parseNode, ac
 	else
 		tinsert(group.child, newNode)
 	end
+
+	annotation.currentVariable = nil
 end
 
 EmitVariableMin = function(name, nodeList, annotation, modifier, parseNode, action)
@@ -4069,9 +4079,21 @@ EmitOperandVariable = function(operand, parseNode, nodeList, annotation, action)
 	local node
 	local ok
 	if token == "variable" then
-		node = OvaleAST:NewNode(nodeList)
-		node.type = "function"
-		node.name = tokenIterator()
+		local name = tokenIterator()
+
+		if annotation.currentVariable and annotation.currentVariable.name == name then
+			local group = annotation.currentVariable.child[1]
+			if #group.child == 0 then
+				node = OvaleAST:ParseCode("expression", "0", nodeList, annotation.astAnnotation)
+			else
+				-- TODO: create a sub-function
+				node = OvaleAST:ParseCode("expression", OvaleAST:Unparse(group), nodeList, annotation.astAnnotation)
+			end
+		else
+			node = OvaleAST:NewNode(nodeList)
+			node.type = "function"
+			node.name = name
+		end
 		ok = true
 	else
 		ok = false

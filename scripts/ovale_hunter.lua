@@ -276,7 +276,7 @@ AddFunction safe_to_build
 
 AddFunction vuln_aim_casts
 {
-	if vuln_aim_casts() > { FocusRegenRate() * { target.DebuffRemaining(vulnerability_debuff) - 2 * { 100 / { 100 + MeleeHaste() } } } + Focus() } / 50 { FocusRegenRate() * { target.DebuffRemaining(vulnerability_debuff) - 2 * { 100 / { 100 + MeleeHaste() } } } + Focus() } / 50
+	if target.DebuffRemaining(vulnerability_debuff) / { 2 * { 100 / { 100 + MeleeHaste() } } } > { FocusRegenRate() * { target.DebuffRemaining(vulnerability_debuff) - 2 * { 100 / { 100 + MeleeHaste() } } } + Focus() } / 50 { FocusRegenRate() * { target.DebuffRemaining(vulnerability_debuff) - 2 * { 100 / { 100 + MeleeHaste() } } } + Focus() } / 50
 	target.DebuffRemaining(vulnerability_debuff) / { 2 * { 100 / { 100 + MeleeHaste() } } }
 }
 
@@ -287,7 +287,7 @@ AddFunction use_multishot
 
 AddFunction trueshot_cooldown
 {
-	if TimeInCombat() > 15 and not SpellCooldown(trueshot) > 0 and trueshot_cooldown() == 0 TimeInCombat() * 1.1
+	if TimeInCombat() > 15 and not SpellCooldown(trueshot) > 0 and 0 == 0 TimeInCombat() * 1.1
 }
 
 AddFunction sentinel_soon
