@@ -465,6 +465,7 @@ AddFunction rtb_reroll
 	not Talent(slice_and_dice_talent) and BuffCount(roll_the_bones_buff) <= 2 and not BuffCount(roll_the_bones_buff more 5)
 }
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=outlaw)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=outlaw)
 
 AddFunction OutlawUseItemActions
@@ -482,13 +483,28 @@ AddFunction OutlawGetInMeleeRange
 	}
 }
 
+AddFunction OutlawInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		if target.InRange(kick) Spell(kick)
+		if not target.Classification(worldboss)
+		{
+			if target.InRange(cheap_shot) Spell(cheap_shot)
+			if target.InRange(deadly_throw) and ComboPoints() == 5 Spell(deadly_throw)
+			if target.InRange(between_the_eyes) Spell(between_the_eyes)
+			if target.InRange(kidney_shot) Spell(kidney_shot)
+			Spell(arcane_torrent_energy)
+			if target.InRange(gouge) Spell(gouge)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+		}
+	}
+}
+
 ### actions.default
 
 AddFunction OutlawDefaultMainActions
 {
-	#variable,name=rtb_reroll,value=!talent.slice_and_dice.enabled&(rtb_buffs<=2&!rtb_list.any.6)
-	#variable,name=ss_useable_noreroll,value=(combo_points<5+talent.deeper_stratagem.enabled-(buff.broadsides.up|buff.jolly_roger.up)-(talent.alacrity.enabled&buff.alacrity.stack<=4))
-	#variable,name=ss_useable,value=(talent.anticipation.enabled&combo_points<4)|(!talent.anticipation.enabled&((variable.rtb_reroll&combo_points<4+talent.deeper_stratagem.enabled)|(!variable.rtb_reroll&variable.ss_useable_noreroll)))
 	#call_action_list,name=bf
 	OutlawBfMainActions()
 
@@ -536,9 +552,6 @@ AddFunction OutlawDefaultMainPostConditions
 
 AddFunction OutlawDefaultShortCdActions
 {
-	#variable,name=rtb_reroll,value=!talent.slice_and_dice.enabled&(rtb_buffs<=2&!rtb_list.any.6)
-	#variable,name=ss_useable_noreroll,value=(combo_points<5+talent.deeper_stratagem.enabled-(buff.broadsides.up|buff.jolly_roger.up)-(talent.alacrity.enabled&buff.alacrity.stack<=4))
-	#variable,name=ss_useable,value=(talent.anticipation.enabled&combo_points<4)|(!talent.anticipation.enabled&((variable.rtb_reroll&combo_points<4+talent.deeper_stratagem.enabled)|(!variable.rtb_reroll&variable.ss_useable_noreroll)))
 	#call_action_list,name=bf
 	OutlawBfShortCdActions()
 
@@ -577,6 +590,8 @@ AddFunction OutlawDefaultCdActions
 	#variable,name=rtb_reroll,value=!talent.slice_and_dice.enabled&(rtb_buffs<=2&!rtb_list.any.6)
 	#variable,name=ss_useable_noreroll,value=(combo_points<5+talent.deeper_stratagem.enabled-(buff.broadsides.up|buff.jolly_roger.up)-(talent.alacrity.enabled&buff.alacrity.stack<=4))
 	#variable,name=ss_useable,value=(talent.anticipation.enabled&combo_points<4)|(!talent.anticipation.enabled&((variable.rtb_reroll&combo_points<4+talent.deeper_stratagem.enabled)|(!variable.rtb_reroll&variable.ss_useable_noreroll)))
+	#kick
+	OutlawInterruptActions()
 	#call_action_list,name=bf
 	OutlawBfCdActions()
 
@@ -922,8 +937,10 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # blunderbuss_buff
 # broadsides_buff
 # cannonball_barrage
+# cheap_shot
 # curse_of_the_dreadblades
 # curse_of_the_dreadblades_buff
+# deadly_throw
 # death_from_above
 # death_from_above_talent
 # deeper_stratagem_talent
@@ -937,10 +954,12 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # hidden_blade_buff
 # jolly_roger_buff
 # kick
+# kidney_shot
 # killing_spree
 # marked_for_death
 # opportunity_buff
 # pistol_shot
+# quaking_palm
 # quick_draw_talent
 # roll_the_bones
 # roll_the_bones_buff
