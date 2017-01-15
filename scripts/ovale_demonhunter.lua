@@ -219,7 +219,7 @@ AddFunction HavocInterruptActions
 
 AddFunction HavocGetInMeleeRange
 {
-	if CheckBoxOn(opt_melee_range) and not target.InRange(demons_bite)
+	if CheckBoxOn(opt_melee_range) and not target.InRange(chaos_strike)
 	{
 		Spell(felblade)
 		Texture(misc_arrowlup help=L(not_in_melee_range))

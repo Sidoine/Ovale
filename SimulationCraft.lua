@@ -4311,7 +4311,7 @@ local function InsertSupportingFunctions(child, annotation)
 		local fmt = [[
 			AddFunction %sGetInMeleeRange
 			{
-				if CheckBoxOn(opt_melee_range) and not target.InRange(demons_bite) 
+				if CheckBoxOn(opt_melee_range) and not target.InRange(chaos_strike) 
 				{
 					Spell(felblade)
 					Texture(misc_arrowlup help=L(not_in_melee_range))
@@ -4322,7 +4322,7 @@ local function InsertSupportingFunctions(child, annotation)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "shortcd"
-		AddSymbol(annotation, "demons_bite")
+		AddSymbol(annotation, "chaos_strike")
 		count = count + 1
 	end
 	if annotation.melee == "DEMONHUNTER" and annotation.specialization == "vengeance" then
