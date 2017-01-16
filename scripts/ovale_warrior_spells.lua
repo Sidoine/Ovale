@@ -196,8 +196,9 @@ Define(rend 772)
 Define(rend_debuff 772)
 	SpellInfo(rend_debuff duration=15 tick=3)
 Define(revenge 6572)
+	# do not add a rage cost, free revenges do not have an aura and thus we cannot set the rage and the SpellRequire.
+	# OvalePower:Power will fall back to using OvalePower:GetSpellCost() which will give the actual (and current) rage cost
 	SpellInfo(revenge cd=9 cd_haste=melee)
-	SpellInfo(revenge rage=-5)
 	SpellAddTargetDebuff(devastate deep_wounds_debuff=1 if_spell=deep_wounds)
 Define(sense_death_buff 200979)
 	SpellRequire(execute rage 0=buff,sense_death_buff)
