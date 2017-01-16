@@ -2073,9 +2073,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 			annotation[action] = class
 			annotation.interrupt = class
 			isSpellAction = false
-		elseif class == "WARRIOR" and action == "revenge" and Unparse(modifier["if"]) == "buff.revenge.react" then
-			modifier["if"] = nil
-			conditionCode = "RageCost(revenge) == 0"
 		elseif action == "auto_attack" then
 			bodyCode = camelSpecialization .. "GetInMeleeRange()"
 			isSpellAction = false
@@ -3868,6 +3865,8 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		else
 			ok = false
 		end
+	elseif class == "WARRIOR" and operand == "buff.revenge.react" then
+		code = "RageCost(revenge) == 0"
 	elseif operand == "buff.enrage.down" then
 		code = "not " .. target .. "IsEnraged()"
 	elseif operand == "buff.enrage.remains" then
