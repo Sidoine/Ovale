@@ -3031,7 +3031,6 @@ do
 		["combo_points"]		= "ComboPoints()",
 		["combo_points.deficit"]= "ComboPointsDeficit()",
 		["combo_points.max"]    = "MaxComboPoints()",
-		["cooldowntarget.time_to_die"] = "TimeToDie()",
 		["cp_max_spend"]		= "MaxComboPoints()", -- TODO Difference with combo_points.max??
 		["crit_pct_current"]	= "SpellCritChance()",
 		["current_insanity_drain"] = "CurrentInsanityDrain()",
@@ -4334,7 +4333,7 @@ local function InsertSupportingFunctions(child, annotation)
 		local fmt = [[
 			AddFunction %sGetInMeleeRange
 			{
-				if CheckBoxOn(opt_melee_range) and not target.InRange(demons_bite) 
+				if CheckBoxOn(opt_melee_range) and not target.InRange(chaos_strike) 
 				{
 					Spell(felblade)
 					Texture(misc_arrowlup help=L(not_in_melee_range))
@@ -4345,7 +4344,7 @@ local function InsertSupportingFunctions(child, annotation)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "shortcd"
-		AddSymbol(annotation, "demons_bite")
+		AddSymbol(annotation, "chaos_strike")
 		count = count + 1
 	end
 	if annotation.melee == "DEMONHUNTER" and annotation.specialization == "vengeance" then
@@ -4715,8 +4714,10 @@ local function InsertSupportingFunctions(child, annotation)
 					{
 						if target.InRange(cheap_shot) Spell(cheap_shot)
 						if target.InRange(deadly_throw) and ComboPoints() == 5 Spell(deadly_throw)
+						if target.InRange(between_the_eyes) Spell(between_the_eyes)
 						if target.InRange(kidney_shot) Spell(kidney_shot)
 						Spell(arcane_torrent_energy)
+						if target.InRange(gouge) Spell(gouge)
 						if target.InRange(quaking_palm) Spell(quaking_palm)
 					}
 				}
@@ -4727,6 +4728,7 @@ local function InsertSupportingFunctions(child, annotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "cd"
 		AddSymbol(annotation, "arcane_torrent_energy")
+		AddSymbol(annotation, "between_the_eyes")
 		AddSymbol(annotation, "cheap_shot")
 		AddSymbol(annotation, "deadly_throw")
 		AddSymbol(annotation, "kick")

@@ -34,6 +34,7 @@ actions+=/variable,name=ss_useable_noreroll,value=(combo_points<5+talent.deeper_
 # Condition to use Saber Slash, when you have RtB or not
 actions+=/variable,name=ss_useable,value=(talent.anticipation.enabled&combo_points<4)|(!talent.anticipation.enabled&((variable.rtb_reroll&combo_points<4+talent.deeper_stratagem.enabled)|(!variable.rtb_reroll&variable.ss_useable_noreroll)))
 # Normal rotation
+actions+=/kick
 actions+=/call_action_list,name=bf
 actions+=/call_action_list,name=cds
 # Conditions are here to avoid worthless check if nothing is available
