@@ -30,6 +30,7 @@ local tostring = tostring
 local wipe = wipe
 local API_CreateFrame = CreateFrame
 local API_GetPowerRegen = GetPowerRegen
+local API_GetSpellPowerCost = GetSpellPowerCost
 local API_GetTime = GetTime
 local API_UnitPower = UnitPower
 local API_UnitPowerMax = UnitPowerMax
@@ -53,10 +54,6 @@ local self_SpellcastInfoPowerTypes = { "chi", "holy" }
 
 -- Frame for resolving strings.
 local self_button = nil
--- Frame for tooltip-scanning.
-local self_tooltip = nil
--- Table of Lua patterns for matching spell costs in tooltips.
-local self_costPatterns = {}
 
 do
 	local debugOptions = {
@@ -153,25 +150,6 @@ function OvalePower:OnInitialize()
 	OvaleData = Ovale.OvaleData
 	OvaleFuture = Ovale.OvaleFuture
 	OvaleState = Ovale.OvaleState
-
-	-- Create the tooltip used for scanning.
-	self_tooltip = API_CreateFrame("GameTooltip", "OvalePower_ScanningTooltip", nil, "GameTooltipTemplate")
-	self_tooltip:SetOwner(UIParent, "ANCHOR_NONE")
-
-	-- Populate the table of patterns to match spell costs in tooltips.
-	self_button = API_CreateFrame("Button")
-	for powerType, powerInfo in pairs(self.POWER_INFO) do
-		local costString = powerInfo.costString
-		if costString then
-			for i = 1, 3 do
-				-- Resolve the string then extract it again.
-				self_button:SetFormattedText(format(costString, i))
-				local text = self_button:GetText()
-				local pattern = gsub(text, tostring(i), "(%%d)")
-				self_costPatterns[pattern] = powerType
-			end
-		end
-	end
 end
 
 function OvalePower:OnEnable()
@@ -326,29 +304,19 @@ end
 
 function OvalePower:GetSpellCost(spellId, powerType)
 	self:StartProfiling("OvalePower_GetSpellCost")
-	self_tooltip:SetSpellByID(spellId)
-	local spellCost, spellPowerType
-	for i = 2, self_tooltip:NumLines() do
-		local line = _G["OvalePower_ScanningTooltipTextLeft" .. i]
-		local text = line:GetText()
-		if text then
-			for pattern, pt in pairs(self_costPatterns) do
-				if not powerType or pt == powerType then
-					local cost = strmatch(text, pattern)
-					if cost then
-						spellCost = tonumber(cost)
-						spellPowerType = pt
-						break
-					end
-				end
-			end
-			if spellCost and spellPowerType then
-				break
+	
+	local spellPowerCost = API_GetSpellPowerCost(spellId)[1]
+	if spellPowerCost then
+		local cost = spellPowerCost.cost
+		local typeId = spellPowerCost.type
+	
+		for pt, p in pairs(self.POWER_INFO) do
+			if p.id == typeId and (powerType == nil or pt == powerType) then
+				return cost, pt
 			end
 		end
 	end
-	self:StopProfiling("OvalePower_GetSpellCost")
-	return spellCost, spellPowerType
+	return nil
 end
 
 -- Get power at the given time.
@@ -378,6 +346,7 @@ function OvalePower:PowerCost(spellId, powerType, atTime, targetGUID, maximumCos
 	local buffParam = "buff_" .. powerType
 	local spellCost = 0
 	local spellRefund = 0
+	
 	local si = OvaleData.spellInfo[spellId]
 	if si and si[powerType] then
 		-- Get references to mirrored methods used.
