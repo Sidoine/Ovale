@@ -13,8 +13,6 @@ Include(ovale_demonhunter_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=vengeance)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=vengeance)
 
-
-
 AddFunction VengeancePlayDefensively
 {
 	CheckBoxOn(opt_demonhunter_vengeance_defensive) or HealthPercent() <= 35 or IncomingDamage(5) >= MaxHealth() * 0.5
