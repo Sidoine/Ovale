@@ -51,6 +51,7 @@ SpellList(potion_strength_buff draenic_strength_potion_buff golemblood_potion_bu
 
 # Legion
 Define(augmentation 140587)
+Define(unbending_potion 127845)
 Define(unbending_potion_buff 188029)
 SpellList(potion_buff unbending_potion_buff)
 

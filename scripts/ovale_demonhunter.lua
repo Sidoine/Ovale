@@ -13,8 +13,6 @@ Include(ovale_demonhunter_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=vengeance)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=vengeance)
 
-
-
 AddFunction VengeancePlayDefensively
 {
 	CheckBoxOn(opt_demonhunter_vengeance_defensive) or HealthPercent() <= 35 or IncomingDamage(5) >= MaxHealth() * 0.5
@@ -34,13 +32,14 @@ AddFunction VengeanceHealMe
 
 AddFunction VengeanceDefaultShortCDActions
 {
-	if (BuffExpires(demon_spikes_buff) or not HasArtifactTrait(defensive_spikes) or (VengeancePlayOffensively() and Talent(razor_spikes_talent)))
+	if ((BuffExpires(demon_spikes) and VengeancePlayOffensively() and Talent(razor_spikes_talent)) or (VengeancePlayDefensively())) Spell(soul_barrier)
+	
+	if ((VengeancePlayDefensively() and (BuffExpires(demon_spikes_buff) or not HasArtifactTrait(defensive_spikes))) or (VengeancePlayOffensively()))
 	{
 		if (Charges(demon_spikes) == 0 and PainDeficit() >= 60) Spell(demonic_infusion)
-		if (Charges(demon_spikes) >= 1) Spell(demon_spikes)
+		if (Charges(demon_spikes) >= 1 and (VengeancePlayOffensively() and Talent(razor_spikes_talent) and Pain() < 90)) Spell(demon_spikes text=pool)
+		if (Charges(demon_spikes) >= 1 and not (VengeancePlayOffensively() and Talent(razor_spikes_talent) and Pain() < 90)) Spell(demon_spikes)
 	}
-	
-	Spell(soul_barrier)
 	
 	if (CheckBoxOn(opt_melee_range) and not target.InRange(shear))
 	{
@@ -55,16 +54,23 @@ AddFunction VengeanceDefaultMainActions
 {
 	VengeanceHealMe()
 	
-	if (VengeancePlayOffensively() and Talent(razor_spikes_talent) and not BuffExpires(demon_spikes_buff)) Spell(fracture)
-	if (VengeancePlayOffensively() and SpellCooldown(soul_carver) <= 0) Spell(fiery_brand)
-	if ((VengeancePlayOffensively() and not target.BuffExpires(fiery_brand_debuff)) or BuffStacks(soul_fragments) <= 2) Spell(soul_carver)
-	if (VengeancePlayOffensively()) Spell(fel_devastation)
+	# Razor spikes are up
+	if (VengeancePlayOffensively() and Talent(razor_spikes_talent) and not BuffExpires(demon_spikes_buff))
+	{
+		Spell(fracture)
+		Spell(soul_cleave)
+		Spell(shear)
+	}
+	
+	if (VengeancePlayOffensively() and SpellCooldown(soul_carver) <= 0 and (not Talent(fel_devastation_talent) or (SpellCooldown(fel_devastation) == 0 and Pain() >= 30)) and target.TimeToDie() >= 8) Spell(fiery_brand)
+	if ((VengeancePlayOffensively() and (not target.BuffExpires(fiery_demise_debuff) or not HasArtifactTrait(fiery_demise)) or (VengeancePlayDefensively() and BuffStacks(soul_fragments) <= 2)) Spell(soul_carver)
+	if ((VengeancePlayOffensively() and (not target.BuffExpires(fiery_demise_debuff) or not HasArtifactTrait(fiery_demise)))) Spell(fel_devastation)
 	if (Pain() >= 80 and (not Talent(fracture_talent) or VengeancePlayDefensively())) Spell(soul_cleave)
-	if (PainDeficit() >= 20) Spell(immolation_aura)
-	if (PainDeficit() >= 20) Spell(felblade)
+	if (PainDeficit() > 10) Spell(immolation_aura)
+	if (PainDeficit() > 20) Spell(felblade)
 	Spell(fel_eruption)
 	if (BuffStacks(soul_fragments) >= 1 and target.DebuffExpires(frailty_debuff)) Spell(spirit_bomb)
-	if (PainDeficit() >= 17 and BuffPresent(blade_turning_buff)) Spell(shear)
+	if (PainDeficit() > 17 and not BuffExpires(blade_turning_buff)) Spell(shear)
 	if (VengeancePlayOffensively() and Pain() >= 80) Spell(fracture)
 	if (not SigilCharging(flame) and target.DebuffRemaining(sigil_of_flame_debuff) <= 2-Talent(quickened_sigils_talent))
 	{
@@ -104,6 +110,7 @@ AddFunction VengeanceDefaultCdActions
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 	if not BuffExpires(metamorphosis_veng_buff) Spell(metamorphosis_veng)
+	Item(unbending_potion usable=1)
 }
 
 AddFunction VengeanceInterruptActions

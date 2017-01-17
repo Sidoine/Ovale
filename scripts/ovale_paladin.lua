@@ -74,11 +74,6 @@ AddFunction ProtectionCooldownTreshold
 		and not { Talent(seraphim_talent) and BuffPresent(seraphim_buff) }
 }
 
-AddFunction ProtectionUsePotionStrength
-{
-	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
-}
-
 AddCheckBox(opt_avenging_wrath SpellName(avenging_wrath_melee) default specialization=protection)
 AddFunction ProtectionDefaultCdActions
 {
@@ -92,7 +87,7 @@ AddFunction ProtectionDefaultCdActions
 	if not DebuffPresent(forbearance_debuff) and HealthPercent() < 15 Spell(lay_on_hands)
 
 	if Talent(knight_templar_talent) and ProtectionCooldownTreshold() Spell(divine_steed)
-	if ProtectionCooldownTreshold() or target.TimeToDie() <= 25 ProtectionUsePotionStrength()
+	if ProtectionCooldownTreshold() Item(unbending_potion usable=1)
 	if ProtectionCooldownTreshold() Spell(stoneform)
 }
 

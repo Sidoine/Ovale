@@ -294,7 +294,7 @@ Define(void_eruption 228260)
 	SpellRequire(void_eruption replace void_bolt=buff,voidform_buff)
 Define(void_torrent 205065)
 	SpellInfo(void_torrent cd=60)
-	SpellRequire(void_torrent unusable 1=buff,voidform_buff)
+	SpellRequire(void_torrent unusable 0=buff,voidform_buff)
 Define(void_torrent_buff 205065)
 # TODO Insanity does not drain during this buff
 Define(voidform_buff 194249)

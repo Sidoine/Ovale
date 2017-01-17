@@ -73,6 +73,7 @@ AddFunction BloodDefaultCdActions
 	if target.InRange(blood_mirror) Spell(blood_mirror)
 	Spell(dancing_rune_weapon)
 	if BuffStacks(bone_shield_buff) >= 5 Spell(tombstone)
+	Item(unbending_potion usable=1)
 }
 
 AddFunction BloodInterruptActions
