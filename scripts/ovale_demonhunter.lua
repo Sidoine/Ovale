@@ -59,7 +59,6 @@ AddFunction VengeanceDefaultMainActions
 	{
 		Spell(fracture)
 		Spell(soul_cleave)
-		Spell(felblade)
 		Spell(shear)
 	}
 	
