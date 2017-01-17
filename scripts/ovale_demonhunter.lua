@@ -55,7 +55,7 @@ AddFunction VengeanceDefaultMainActions
 	VengeanceHealMe()
 	
 	if (VengeancePlayOffensively() and Talent(razor_spikes_talent) and not BuffExpires(demon_spikes_buff)) Spell(fracture)
-	if (VengeancePlayOffensively() and SpellCooldown(soul_carver) <= 0) Spell(fiery_brand)
+	if (VengeancePlayOffensively() and SpellCooldown(soul_carver) <= 0 and target.TimeToDie() >= 8) Spell(fiery_brand)
 	if ((VengeancePlayOffensively() and not target.BuffExpires(fiery_brand_debuff)) or BuffStacks(soul_fragments) <= 2) Spell(soul_carver)
 	if (VengeancePlayOffensively()) Spell(fel_devastation)
 	if (Pain() >= 80 and (not Talent(fracture_talent) or VengeancePlayDefensively())) Spell(soul_cleave)
