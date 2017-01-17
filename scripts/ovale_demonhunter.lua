@@ -62,9 +62,9 @@ AddFunction VengeanceDefaultMainActions
 		Spell(shear)
 	}
 	
-	if (VengeancePlayOffensively() and SpellCooldown(soul_carver) <= 0 and (not Talent(fel_devastation_talent) or SpellCooldown(fel_devastation) == 0) and target.TimeToDie() >= 8 and Pain() >= 30) Spell(fiery_brand)
-	if ((VengeancePlayOffensively() and not target.BuffExpires(fiery_brand_debuff)) or (VengeancePlayDefensively() and BuffStacks(soul_fragments) <= 2)) Spell(soul_carver)
-	if (VengeancePlayOffensively() and not target.BuffExpires(fiery_brand_debuff)) Spell(fel_devastation)
+	if (VengeancePlayOffensively() and SpellCooldown(soul_carver) <= 0 and (not Talent(fel_devastation_talent) or (SpellCooldown(fel_devastation) == 0 and Pain() >= 30)) and target.TimeToDie() >= 8) Spell(fiery_brand)
+	if ((VengeancePlayOffensively() and (not target.BuffExpires(fiery_demise_debuff) or not HasArtifactTrait(fiery_demise)) or (VengeancePlayDefensively() and BuffStacks(soul_fragments) <= 2)) Spell(soul_carver)
+	if ((VengeancePlayOffensively() and (not target.BuffExpires(fiery_demise_debuff) or not HasArtifactTrait(fiery_demise)))) Spell(fel_devastation)
 	if (Pain() >= 80 and (not Talent(fracture_talent) or VengeancePlayDefensively())) Spell(soul_cleave)
 	if (PainDeficit() > 10) Spell(immolation_aura)
 	if (PainDeficit() > 20) Spell(felblade)
