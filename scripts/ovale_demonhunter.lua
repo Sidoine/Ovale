@@ -103,6 +103,7 @@ AddFunction VengeanceDefaultCdActions
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
 	if not BuffExpires(metamorphosis_veng_buff) Spell(metamorphosis_veng)
+	Item(unbending_potion usable=1)
 }
 
 AddFunction VengeanceInterruptActions

@@ -162,6 +162,7 @@ AddFunction BrewmasterDefaultCdActions
 	Spell(fortifying_brew)
 	Spell(zen_meditation)
 	Spell(dampen_harm)
+	Item(unbending_potion usable=1)
 }
 
 AddFunction BrewmasterInterruptActions
