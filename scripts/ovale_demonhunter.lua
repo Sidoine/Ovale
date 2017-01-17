@@ -35,8 +35,8 @@ AddFunction VengeanceDefaultShortCDActions
 	if (BuffExpires(demon_spikes_buff) or not HasArtifactTrait(defensive_spikes) or (VengeancePlayOffensively() and Talent(razor_spikes_talent)))
 	{
 		if (Charges(demon_spikes) == 0 and PainDeficit() >= 60) Spell(demonic_infusion)
-		if (Charges(demon_spikes) >= 1 and (VengeancePlayOffensively() and Talent(razor_spikes_talent)) and Pain() >= 80) Spell(demon_spikes razor)
-		if (Charges(demon_spikes) >= 1 and not (VengeancePlayOffensively() and Talent(razor_spikes_talent))) Spell(demon_spikes)
+		if (Charges(demon_spikes) >= 1 and (VengeancePlayOffensively() and Talent(razor_spikes_talent) and Pain() < 90)) Spell(demon_spikes text=pool)
+		if (Charges(demon_spikes) >= 1 and not (VengeancePlayOffensively() and Talent(razor_spikes_talent) and Pain() < 90)) Spell(demon_spikes)
 	}
 	
 	if ((BuffExpires(demon_spikes) and VengeancePlayOffensively() and Talent(razor_spikes_talent)) or (VengeancePlayDefensively())) Spell(soul_barrier)
