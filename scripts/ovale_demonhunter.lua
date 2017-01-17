@@ -32,7 +32,7 @@ AddFunction VengeanceHealMe
 
 AddFunction VengeanceDefaultShortCDActions
 {
-	if (BuffExpires(demon_spikes_buff) or not HasArtifactTrait(defensive_spikes) or (VengeancePlayOffensively() and Talent(razor_spikes_talent)))
+	if ((VengeancePlayDefensively() and (BuffExpires(demon_spikes_buff) or not HasArtifactTrait(defensive_spikes))) or (VengeancePlayOffensively()))
 	if ((BuffExpires(demon_spikes) and VengeancePlayOffensively() and Talent(razor_spikes_talent)) or (VengeancePlayDefensively())) Spell(soul_barrier)
 	
 	{
