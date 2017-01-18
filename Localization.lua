@@ -48,6 +48,8 @@ elseif locale == "ptBR" then
 --@localization(locale="ptBR", format="lua_additive_table", handle-subnamespaces="concat", handle-unlocalized="blank")@
 elseif locale == "ruRU" then
 --@localization(locale="ruRU", format="lua_additive_table", handle-subnamespaces="concat", handle-unlocalized="blank")@
+elseif locale == "zhCN" then
+--@localization(locale="zhCN", format="lua_additive_table", handle-subnamespaces="concat", handle-unlocalized="blank")@
 elseif locale == "zhTW" then
 --@localization(locale="zhTW", format="lua_additive_table", handle-subnamespaces="concat", handle-unlocalized="blank")@
 end
