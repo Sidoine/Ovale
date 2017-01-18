@@ -83,9 +83,10 @@ AddFunction VengeanceDefaultMainActions
 	if (Pain() >= 60) Spell(fracture)
 	if (not SigilCharging(flame) and target.DebuffRemaining(sigil_of_flame_debuff) <= 2-Talent(quickened_sigils_talent))
 	{
-		if (Talent(flame_crash_talent) and (SpellCharges(infernal_strike) >= SpellMaxCharges(infernal_strike))) Spell(infernal_strike)
+		if (Talent(flame_crash_talent) and (SpellCharges(infernal_strike) >= SpellMaxCharges(infernal_strike))) Spell(infernal_strike text=crash)
 		Spell(sigil_of_flame)
 	}
+	if (not Talent(flame_crash_talent) and SpellCharges(infernal_strike) >= SpellMaxCharges(infernal_strike)) Spell(infernal_strike)
 	Spell(shear)
 }
 
