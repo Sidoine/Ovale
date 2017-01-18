@@ -45,7 +45,6 @@ AddFunction VengeanceDefaultShortCDActions
 	{
 		if (target.InRange(felblade)) Spell(felblade)
 		if (target.Distance(less 30) or (target.Distance(less 40) and Talent(abyssal_strike_talent))) Spell(infernal_strike)
-		Spell(throw_glaive_veng)
 		Texture(misc_arrowlup help=L(not_in_melee_range))
 	}
 }
@@ -62,16 +61,26 @@ AddFunction VengeanceDefaultMainActions
 		Spell(shear)
 	}
 	
-	if (VengeancePlayOffensively() and SpellCooldown(soul_carver) <= 0 and (not Talent(fel_devastation_talent) or (SpellCooldown(fel_devastation) == 0 and Pain() >= 30)) and target.TimeToDie() >= 8) Spell(fiery_brand)
-	if ((VengeancePlayOffensively() and (not target.BuffExpires(fiery_demise_debuff) or not HasArtifactTrait(fiery_demise)) or (VengeancePlayDefensively() and BuffStacks(soul_fragments) <= 2))) Spell(soul_carver)
-	if ((VengeancePlayOffensively() and (not target.BuffExpires(fiery_demise_debuff) or not HasArtifactTrait(fiery_demise)))) Spell(fel_devastation)
-	if (Pain() >= 80 and (not Talent(fracture_talent) or VengeancePlayDefensively())) Spell(soul_cleave)
+	# Fiery demise
+	if (VengeancePlayOffensively() and SpellCooldown(soul_carver) <= 6.5 and (not Talent(fel_devastation_talent) or (SpellCooldown(fel_devastation) <= 4 and Pain() >= 30)) and target.TimeToDie() >= 8) Spell(fiery_brand)
+	if (VengeancePlayOffensively() and not target.BuffExpires(fiery_demise_debuff))
+	{
+		Spell(soul_carver)
+		Spell(fel_devastation)
+		Spell(fel_eruption)
+		if (PainDeficit() > 20) Spell(felblade)
+	}
+	
+	# Regular rotation
+	if (VengeancePlayDefensively()) Spell(soul_carver)
+	if ((VengeancePlayOffensively() and not HasArtifactTrait(fiery_demise))) Spell(fel_devastation)
+	if (Pain() >= 80 and not Talent(fracture_talent)) Spell(soul_cleave)
 	if (PainDeficit() > 10) Spell(immolation_aura)
 	if (PainDeficit() > 20) Spell(felblade)
 	Spell(fel_eruption)
 	if (BuffStacks(soul_fragments) >= 1 and target.DebuffExpires(frailty_debuff)) Spell(spirit_bomb)
 	if (PainDeficit() > 17 and not BuffExpires(blade_turning_buff)) Spell(shear)
-	if (VengeancePlayOffensively() and Pain() >= 80) Spell(fracture)
+	if (Pain() >= 60) Spell(fracture)
 	if (not SigilCharging(flame) and target.DebuffRemaining(sigil_of_flame_debuff) <= 2-Talent(quickened_sigils_talent))
 	{
 		if (Talent(flame_crash_talent) and (SpellCharges(infernal_strike) >= SpellMaxCharges(infernal_strike))) Spell(infernal_strike)
