@@ -324,7 +324,7 @@ Define(wreak_havoc_talent 19)
 Define(writhe_in_agony_talent 2)
 
 # Legendary items
-Define(deadwind_harvester_buff 214867)
+Define(deadwind_harvester_buff 216708)
 	SpellAddBuff(reap_souls tormented_souls_buff=0)
 Define(sindorei_spite_icd 208871) # TODO should be the internal cooldown of the spell
 Define(tormented_souls_buff 216695)
