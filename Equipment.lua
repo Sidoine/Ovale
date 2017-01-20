@@ -81,7 +81,7 @@ local OVALE_SLOTNAME = {
 	WristSlot = INVSLOT_WRIST,
 }
 -- slots that can contain pieces from armor sets
-local OVALE_ARMORSET_SLOT_IDS = { INVSLOT_CHEST, INVSLOT_HAND, INVSLOT_HEAD, INVSLOT_LEGS, INVSLOT_SHOULDER }
+local OVALE_ARMORSET_SLOT_IDS = { INVSLOT_CHEST, INVSLOT_HAND, INVSLOT_HEAD, INVSLOT_LEGS, INVSLOT_SHOULDER, INVSLOT_BACK }
 -- database of armor set items: OVALE_ARMORSET[itemId] = armorSetName
 local OVALE_ARMORSET = {
 	-- Death Knight
@@ -194,6 +194,7 @@ local OVALE_ARMORSET = {
 	[ 99565] = "T16_tank",	[ 99606] = "T16_tank",	[ 99607] = "T16_tank",	[ 99643] = "T16_tank",	[ 99644] = "T16_tank",
 	[115555] = "T17",		[115556] = "T17",		[115557] = "T17",		[115558] = "T17",		[115559] = "T17",
 	[124247] = "T18",		[124256] = "T18",		[124262] = "T18",		[124268] = "T18",		[124276] = "T18",
+	[138325] = "T19",		[138328] = "T19",		[138331] = "T19",		[138334] = "T19",		[138337] = "T19",		[138367] = "T19",
 	-- Paladin
 	[ 85319] = "T14_tank",	[ 85320] = "T14_tank",	[ 85321] = "T14_tank",	[ 85322] = "T14_tank",	[ 85323] = "T14_tank",
 	[ 85339] = "T14_melee",	[ 85340] = "T14_melee",	[ 85341] = "T14_melee",	[ 85342] = "T14_melee",	[ 85343] = "T14_melee",
