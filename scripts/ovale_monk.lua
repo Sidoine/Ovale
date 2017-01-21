@@ -44,7 +44,7 @@ AddFunction BrewmasterDefaultShortCDActions
 			# purify moderate stagger
 			if (DebuffPresent(moderate_stagger_debuff) and (not Talent(elusive_dance_talent) or BuffExpires(elusive_dance_buff))) Spell(purifying_brew)
 			# always keep 1 charge unless black_ox_brew is coming off cd
-			unless not (SpellCharges(ironskin_brew) > 1 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3))
+			if (SpellCharges(ironskin_brew) > 1 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3))
 			{
 				# purify light stagger when doing trash when talent elusive dance 
 				if (Talent(elusive_dance_talent) and StaggerRemaining() > 0 and not IsBossFight() and BuffExpires(elusive_dance_buff)) Spell(purifying_brew)
@@ -57,8 +57,8 @@ AddFunction BrewmasterDefaultShortCDActions
 				{
 					# keep brew-stache rolling
 					if (HasArtifactTrait(brew_stache_trait) and not BuffPresent(brew_stache_buff)) Spell(ironskin_brew text=stache)
-					# keep up ironskin_brew_buff but keep 2 charges ready for purifying when elusive_dance_talent
-					if (BuffExpires(ironskin_brew_buff 2) and (not Talent(elusive_dance_talent) or SpellCharges(purifying_brew) >= 2)) Spell(ironskin_brew)
+					# keep up ironskin_brew_buff
+					if (BuffExpires(ironskin_brew_buff 2)) Spell(ironskin_brew)
 				}
 			}
 		}
