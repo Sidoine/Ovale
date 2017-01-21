@@ -54,7 +54,7 @@ AddFunction BrewmasterDefaultShortCDActions
 				if(StaggerRemaining() > 0)
 				{
 					# keep brew-stache rolling
-					if (HasArtifactTrait(brew_stache_trait) and not BuffPresent(brew_stache_buff)) Spell(ironskin_brew text=stache)
+					if (HasArtifactTrait(brew_stache_trait) and BuffExpires(brew_stache_buff)) Spell(ironskin_brew text=stache)
 					# keep up ironskin_brew_buff
 					if (BuffExpires(ironskin_brew_buff 2)) Spell(ironskin_brew)
 				}
