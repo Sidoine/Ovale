@@ -14,6 +14,7 @@ local OvaleDebug = Ovale.OvaleDebug
 local OvaleProfiler = Ovale.OvaleProfiler
 
 -- Forward declarations for module dependencies.
+local OvaleArtifact = nil
 local OvaleAST = nil
 local OvaleCondition = nil
 local OvaleCooldown = nil
@@ -127,6 +128,12 @@ local function TestConditionEquipped(value)
 	return (required and hasItemEquipped) or (not required and not hasItemEquipped)
 end
 
+local function TestConditionTrait(value)
+	local trait, required = RequireValue(value)
+	local hasTrait = OvaleArtifact:HasTrait(trait)
+	return (required and hasTrait) or (not required and not hasTrait)
+end
+
 local TEST_CONDITION_DISPATCH = {
 	if_spell = TestConditionSpell,
 	if_equipped = TestConditionEquipped,
@@ -135,6 +142,7 @@ local TEST_CONDITION_DISPATCH = {
 	maxLevel = TestConditionMaxLevel,
 	specialization = TestConditionSpecialization,
 	talent = TestConditionTalent,
+	trait = TestConditionTrait,
 }
 
 local function TestConditions(positionalParams, namedParams)
@@ -535,6 +543,7 @@ end
 --<public-static-methods>
 function OvaleCompile:OnInitialize()
 	-- Resolve module dependencies.
+	OvaleArtifact = Ovale.OvaleArtifact
 	OvaleAST = Ovale.OvaleAST
 	OvaleCondition = Ovale.OvaleCondition
 	OvaleCooldown = Ovale.OvaleCooldown
