@@ -3,7 +3,6 @@
 It displays one or more icons that show the cooldown of an action.  The action is conditionally defined through a user-defined script, e.g. you may display either [Corruption][] if the DoT is not on your target or [Shadow Bolt][] if the [Corruption][] DoT is already on your target.
 
 The current release of Ovale provides default scripts for the following classes for *Legion*:
-Note that these are *work in progress*. More support is coming soon and there may be bugs.
 
 - Death Knight: Blood, Forst, Unholy
 - Demon Hunter: Havoc, Vengeance
@@ -22,7 +21,7 @@ Default scripts are based on [SimulationCraft][].  You may also customize the de
 
 See the [video of a survival hunter][ovale-video] using [Ovale][] during *Wrath of the Lich King*.
 
-**Please use the [forums][ovale-forums] to submit scripts or discuss them. If you want to report bugs, use the [ticket manager][ovale-tickets]. You may contribute code on our [Github][] project.**
+**Please use the [forums][ovale-forums] (closed) to submit scripts or discuss them. If you want to report bugs, use the [ticket manager][ovale-tickets]. You may contribute code on our [Github][] project or help with [translation][].**
 
 Features
 ========
@@ -68,3 +67,4 @@ You need to reach level 10 and choose a specialization.  However, be aware that 
   [ovale-tickets]: https://github.com/Sidoine/Ovale/issues
   [ovale-video]: http://www.youtube.com/watch?v=rNHvk9GpyiM "Ovale WotLK video"
   [GitHub]: https://github.com/Sidoine/Ovale
+  [translation]: https://wow.curseforge.com/projects/ovale/localization
