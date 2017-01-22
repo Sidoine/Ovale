@@ -151,7 +151,7 @@ AddFunction BrewmasterDefaultCdActions
 {
 	BrewmasterInterruptActions()
 	if CheckBoxOn(opt_legendary_ring_tank) Item(legendary_ring_bonus_armor usable=1)
-	Spell(invoke_niuzao)
+	if not PetPresent(name=Niuzao) Spell(invoke_niuzao)
 	Spell(exploding_keg)
 	Item(Trinket0Slot usable=1 text=13)
 	Item(Trinket1Slot usable=1 text=14)
