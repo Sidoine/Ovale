@@ -149,6 +149,7 @@ Define(enhanced_chain_lightning 157765)
 Define(enhanced_chain_lightning_buff 157766)
 	SpellInfo(enhanced_chain_lightning_buff duration=15) # max_stacks=?
 Define(feral_lunge 196884)
+	SpellInfo(feral_lunge cd=30)
 Define(feral_spirit 51533)
 	SpellInfo(feral_spirit cd=120 duration=15)
 Define(fire_elemental 198067)
