@@ -1239,6 +1239,8 @@ AddFunction FrostAoeMainActions
 	if { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) } and BuffStacks(fingers_of_frost_buff) == 0 Spell(flurry)
 	#ice_lance,if=buff.fingers_of_frost.react>0
 	if BuffStacks(fingers_of_frost_buff) > 0 Spell(ice_lance)
+	#ebonbolt,if=buff.brain_freeze.react=0
+	if BuffStacks(brain_freeze_buff) == 0 Spell(ebonbolt)
 	#glacial_spike
 	Spell(glacial_spike)
 	#frostbolt
@@ -1267,12 +1269,6 @@ AddFunction FrostAoeShortCdActions
 			{
 				#frost_bomb,if=debuff.frost_bomb.remains<action.ice_lance.travel_time&buff.fingers_of_frost.react>0
 				if target.DebuffRemaining(frost_bomb_debuff) < TravelTime(ice_lance) and BuffStacks(fingers_of_frost_buff) > 0 Spell(frost_bomb)
-
-				unless BuffStacks(fingers_of_frost_buff) > 0 and Spell(ice_lance)
-				{
-					#ebonbolt,if=buff.brain_freeze.react=0
-					if BuffStacks(brain_freeze_buff) == 0 Spell(ebonbolt)
-				}
 			}
 		}
 	}
@@ -1280,7 +1276,7 @@ AddFunction FrostAoeShortCdActions
 
 AddFunction FrostAoeShortCdPostConditions
 {
-	PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or Spell(blizzard) or Spell(ice_nova) or { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) } and BuffStacks(fingers_of_frost_buff) == 0 and Spell(flurry) or BuffStacks(fingers_of_frost_buff) > 0 and Spell(ice_lance) or Spell(glacial_spike) or Spell(frostbolt)
+	PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or Spell(blizzard) or Spell(ice_nova) or { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) } and BuffStacks(fingers_of_frost_buff) == 0 and Spell(flurry) or BuffStacks(fingers_of_frost_buff) > 0 and Spell(ice_lance) or BuffStacks(brain_freeze_buff) == 0 and Spell(ebonbolt) or Spell(glacial_spike) or Spell(frostbolt)
 }
 
 AddFunction FrostAoeCdActions
@@ -1400,6 +1396,8 @@ AddFunction FrostSingleMainActions
 	Spell(ice_nova)
 	#blizzard,if=talent.arctic_gale.enabled|active_enemies>1|(buff.zannesu_journey.stack=5&buff.zannesu_journey.remains>cast_time)
 	if Talent(arctic_gale_talent) or Enemies() > 1 or BuffStacks(zannesu_journey_buff) == 5 and BuffRemaining(zannesu_journey_buff) > CastTime(blizzard) Spell(blizzard)
+	#ebonbolt,if=buff.brain_freeze.react=0
+	if BuffStacks(brain_freeze_buff) == 0 Spell(ebonbolt)
 	#glacial_spike
 	Spell(glacial_spike)
 	#frostbolt
@@ -1431,12 +1429,6 @@ AddFunction FrostSingleShortCdActions
 				{
 					#comet_storm
 					Spell(comet_storm)
-
-					unless { Talent(arctic_gale_talent) or Enemies() > 1 or BuffStacks(zannesu_journey_buff) == 5 and BuffRemaining(zannesu_journey_buff) > CastTime(blizzard) } and Spell(blizzard)
-					{
-						#ebonbolt,if=buff.brain_freeze.react=0
-						if BuffStacks(brain_freeze_buff) == 0 Spell(ebonbolt)
-					}
 				}
 			}
 		}
@@ -1445,7 +1437,7 @@ AddFunction FrostSingleShortCdActions
 
 AddFunction FrostSingleShortCdPostConditions
 {
-	target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or { BuffPresent(icy_veins_buff) or SpellCooldown(icy_veins) > SpellCooldown(ray_of_frost) and BuffExpires(rune_of_power_buff) } and Spell(ray_of_frost) or { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) } and BuffStacks(fingers_of_frost_buff) == 0 and Spell(flurry) or { BuffStacks(fingers_of_frost_buff) > 0 and SpellCooldown(icy_veins) > 10 or BuffStacks(fingers_of_frost_buff) > 2 } and Spell(ice_lance) or Spell(ice_nova) or { Talent(arctic_gale_talent) or Enemies() > 1 or BuffStacks(zannesu_journey_buff) == 5 and BuffRemaining(zannesu_journey_buff) > CastTime(blizzard) } and Spell(blizzard) or Spell(glacial_spike) or Spell(frostbolt)
+	target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or { BuffPresent(icy_veins_buff) or SpellCooldown(icy_veins) > SpellCooldown(ray_of_frost) and BuffExpires(rune_of_power_buff) } and Spell(ray_of_frost) or { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) } and BuffStacks(fingers_of_frost_buff) == 0 and Spell(flurry) or { BuffStacks(fingers_of_frost_buff) > 0 and SpellCooldown(icy_veins) > 10 or BuffStacks(fingers_of_frost_buff) > 2 } and Spell(ice_lance) or Spell(ice_nova) or { Talent(arctic_gale_talent) or Enemies() > 1 or BuffStacks(zannesu_journey_buff) == 5 and BuffRemaining(zannesu_journey_buff) > CastTime(blizzard) } and Spell(blizzard) or BuffStacks(brain_freeze_buff) == 0 and Spell(ebonbolt) or Spell(glacial_spike) or Spell(frostbolt)
 }
 
 AddFunction FrostSingleCdActions
