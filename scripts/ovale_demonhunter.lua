@@ -80,7 +80,7 @@ AddFunction VengeanceDefaultMainActions
 	Spell(fel_eruption)
 	if (BuffStacks(soul_fragments) >= 1 and target.DebuffExpires(frailty_debuff)) Spell(spirit_bomb)
 	if (PainDeficit() > 17 and not BuffExpires(blade_turning_buff)) Spell(shear)
-	if (Pain() >= 60) Spell(fracture)
+	if (Pain() >= 60 and not Talent(razor_spikes_talent)) Spell(fracture)
 	if (not SigilCharging(flame) and target.DebuffRemaining(sigil_of_flame_debuff) <= 2-Talent(quickened_sigils_talent))
 	{
 		if (Talent(flame_crash_talent) and (SpellCharges(infernal_strike) >= SpellMaxCharges(infernal_strike))) Spell(infernal_strike text=crash)
