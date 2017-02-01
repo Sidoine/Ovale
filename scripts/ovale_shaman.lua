@@ -607,7 +607,11 @@ AddFunction EnhancementBloodlust
 
 AddFunction EnhancementGetInMeleeRange
 {
-	if CheckBoxOn(opt_melee_range) and not target.InRange(stormstrike) Texture(misc_arrowlup help=L(not_in_melee_range))
+	if CheckBoxOn(opt_melee_range) and not target.InRange(stormstrike)
+	{
+		if target.Distance() >= 8 and target.Distance() <= 25 Spell(feral_lunge)
+		Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
 }
 
 AddFunction EnhancementInterruptActions

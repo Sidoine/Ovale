@@ -14,6 +14,11 @@ AddCheckBox(opt_interrupt L(interrupt) default specialization=protection)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=protection)
 AddCheckBox(opt_legendary_ring_tank ItemName(legendary_ring_bonus_armor) default specialization=protection)
 
+AddFunction ProtectionGetInMeleeRange
+{
+	if CheckBoxOn(opt_melee_range) and not target.InRange(shield_of_the_righteous) Texture(misc_arrowlup help=L(not_in_melee_range))
+}
+
 AddFunction ProtectionDefaultMainActions
 {
 	if Speed() == 0 and HasEquippedItem(heathcliffs_immortality) and not BuffPresent(consecration_buff) Spell(consecration)
@@ -47,6 +52,9 @@ AddFunction ProtectionDefaultShortCDActions
 	if Talent(bastion_of_light_talent) and Charges(shield_of_the_righteous) < 1 Spell(bastion_of_light)
 	#seraphim,if=talent.seraphim.enabled&action.shield_of_the_righteous.charges>=2
 	if Talent(seraphim_talent) and Charges(shield_of_the_righteous) >= 2 Spell(seraphim)
+	
+	ProtectionGetInMeleeRange()
+	
 	#shield_of_the_righteous,if=(!talent.seraphim.enabled|action.shield_of_the_righteous.charges>2)&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
 	if { not Talent(seraphim_talent) or Charges(shield_of_the_righteous) > 2 } and ProtectionCooldownTreshold() Spell(shield_of_the_righteous)
 	#shield_of_the_righteous,if=(talent.bastion_of_light.enabled&talent.seraphim.enabled&buff.seraphim.up&cooldown.bastion_of_light.up)&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)

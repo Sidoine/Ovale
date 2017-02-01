@@ -2718,11 +2718,15 @@ do
 	-- @usage
 	-- if target.IsInterruptible() and PetPresent(yes)
 	--     Spell(pet_pummel)
+	-- if PetPresent(name=Niuzao) 
+	--     Spell(provoke_pet)
+
 
 	local function PetPresent(positionalParams, namedParams, state, atTime)
 		local yesno = positionalParams[1]
+		local name = namedParams.name
 		local target = "pet"
-		local boolean = API_UnitExists(target) and not API_UnitIsDead(target)
+		local boolean = API_UnitExists(target) and not API_UnitIsDead(target) and (name == nil or name == API_UnitName(target))
 		return TestBoolean(boolean, yesno)
 	end
 

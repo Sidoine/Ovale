@@ -44,22 +44,23 @@ AddFunction BrewmasterDefaultShortCDActions
 			# purify moderate stagger
 			if (DebuffPresent(moderate_stagger_debuff) and (not Talent(elusive_dance_talent) or BuffExpires(elusive_dance_buff))) Spell(purifying_brew)
 			# always keep 1 charge unless black_ox_brew is coming off cd
-			unless not (SpellCharges(ironskin_brew) > 1 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3))
+			if (SpellCharges(ironskin_brew) > 1 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3))
 			{
-				# purify light stagger when doing trash when talent elusive dance 
-				if (Talent(elusive_dance_talent) and StaggerRemaining() > 0 and not IsBossFight() and BuffExpires(elusive_dance_buff)) Spell(purifying_brew)
 				# never be at (almost) max charges 
-				if (SpellCharges(ironskin_brew count=0) >= SpellMaxCharges(ironskin_brew)-0.7) Spell(ironskin_brew)
+				if (SpellCharges(ironskin_brew count=0) >= SpellMaxCharges(ironskin_brew)-0.3) Spell(ironskin_brew)
 				# use up those charges when black_ox_brew_talent comes off cd
 				if (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3) Spell(ironskin_brew)
 				
 				if(StaggerRemaining() > 0)
 				{
-					# keep brew-stache rolling
-					if (HasArtifactTrait(brew_stache_trait) and not BuffPresent(brew_stache_buff)) Spell(ironskin_brew text=stache)
-					# keep up ironskin_brew_buff but keep 2 charges ready for purifying when elusive_dance_talent
-					if (BuffExpires(ironskin_brew_buff 2) and (not Talent(elusive_dance_talent) or SpellCharges(purifying_brew) >= 2)) Spell(ironskin_brew)
+					# keep brew-stache rolling (when not elusive_dance)
+					if (HasArtifactTrait(brew_stache_trait) and BuffExpires(brew_stache_buff) and not Talent(elusive_dance_talent)) Spell(ironskin_brew text=stache)
+					# keep up ironskin_brew_buff
+					if (BuffExpires(ironskin_brew_buff 2)) Spell(ironskin_brew)
 				}
+				
+				# purify light stagger when doing trash when talent elusive dance 
+				if (Talent(elusive_dance_talent) and StaggerRemaining() > 0 and not IsBossFight() and BuffExpires(elusive_dance_buff)) Spell(purifying_brew)
 			}
 		}
 	}
@@ -80,7 +81,6 @@ AddFunction BrewmasterDefaultMainActions
 		Spell(blackout_strike)
 		Spell(rushing_jade_wind)
 		if target.DebuffPresent(keg_smash_debuff) Spell(breath_of_fire)
-		Spell(exploding_keg)
 		Spell(chi_burst)
 		Spell(chi_wave)
 	}
@@ -105,10 +105,6 @@ AddFunction BrewmasterBlackoutComboMainActions
 		Spell(chi_burst)
 		Spell(chi_wave)
 		if EnergyDeficit() <= 35 Spell(tiger_palm)
-		unless EnergyDeficit() <= 35
-		{
-			Spell(exploding_keg)
-		}
 	}
 }
 
@@ -155,7 +151,8 @@ AddFunction BrewmasterDefaultCdActions
 {
 	BrewmasterInterruptActions()
 	if CheckBoxOn(opt_legendary_ring_tank) Item(legendary_ring_bonus_armor usable=1)
-	Spell(invoke_niuzao)
+	if not PetPresent(name=Niuzao) Spell(invoke_niuzao)
+	Spell(exploding_keg)
 	Item(Trinket0Slot usable=1 text=13)
 	Item(Trinket1Slot usable=1 text=14)
 	if (HasEquippedItem(fundamental_observation)) Spell(zen_meditation)

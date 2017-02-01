@@ -37,8 +37,8 @@ AddFunction VengeanceDefaultShortCDActions
 	if ((VengeancePlayDefensively() and (BuffExpires(demon_spikes_buff) or not HasArtifactTrait(defensive_spikes))) or VengeancePlayOffensively())
 	{
 		if (Charges(demon_spikes) == 0 and PainDeficit() >= 60) Spell(demonic_infusion)
-		if (Charges(demon_spikes) >= 1 and (VengeancePlayOffensively() and Talent(razor_spikes_talent) and Pain() < 90)) Spell(demon_spikes text=pool)
-		if (Charges(demon_spikes) >= 1 and not (VengeancePlayOffensively() and Talent(razor_spikes_talent) and Pain() < 90)) Spell(demon_spikes)
+		#if (Charges(demon_spikes) >= 1 and (VengeancePlayOffensively() and Talent(razor_spikes_talent) and Pain() < 80)) Spell(demon_spikes text=pool)
+		if (Charges(demon_spikes) >= 1 and not (VengeancePlayOffensively() and Talent(razor_spikes_talent) and Pain() < 80)) Spell(demon_spikes)
 	}
 	
 	if (CheckBoxOn(opt_melee_range) and not target.InRange(shear))
@@ -80,7 +80,7 @@ AddFunction VengeanceDefaultMainActions
 	Spell(fel_eruption)
 	if (BuffStacks(soul_fragments) >= 1 and target.DebuffExpires(frailty_debuff)) Spell(spirit_bomb)
 	if (PainDeficit() > 17 and not BuffExpires(blade_turning_buff)) Spell(shear)
-	if (Pain() >= 60) Spell(fracture)
+	if (Pain() >= 60 and not Talent(razor_spikes_talent)) Spell(fracture)
 	if (not SigilCharging(flame) and target.DebuffRemaining(sigil_of_flame_debuff) <= 2-Talent(quickened_sigils_talent))
 	{
 		if (Talent(flame_crash_talent) and (SpellCharges(infernal_strike) >= SpellMaxCharges(infernal_strike))) Spell(infernal_strike text=crash)
