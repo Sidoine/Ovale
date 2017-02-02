@@ -81,6 +81,7 @@ AddFunction BrewmasterDefaultMainActions
 		if target.DebuffPresent(keg_smash_debuff) Spell(breath_of_fire)
 		Spell(chi_burst)
 		Spell(chi_wave)
+		Spell(exploding_keg)
 	}
 }
 
@@ -103,6 +104,7 @@ AddFunction BrewmasterBlackoutComboMainActions
 		Spell(chi_burst)
 		Spell(chi_wave)
 		if EnergyDeficit() <= 35 Spell(tiger_palm)
+		Spell(exploding_keg)
 	}
 }
 
@@ -150,7 +152,6 @@ AddFunction BrewmasterDefaultCdActions
 	BrewmasterInterruptActions()
 	if CheckBoxOn(opt_legendary_ring_tank) Item(legendary_ring_bonus_armor usable=1)
 	if not PetPresent(name=Niuzao) Spell(invoke_niuzao)
-	Spell(exploding_keg)
 	Item(Trinket0Slot usable=1 text=13)
 	Item(Trinket1Slot usable=1 text=14)
 	if (HasEquippedItem(fundamental_observation)) Spell(zen_meditation)
