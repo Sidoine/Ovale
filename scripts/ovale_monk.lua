@@ -30,42 +30,40 @@ AddFunction BrewmasterHealMe
 
 AddFunction BrewmasterDefaultShortCDActions
 {
-	if(InCombat()) 
-	{
-		# always purify red stagger
-		if (DebuffPresent(heavy_stagger_debuff) and SpellCharges(purifying_brew) > 0) Spell(purifying_brew)
-		# use black_ox_brew when at 0 charges but delay it when a charge is about to come off cd
-		if ((SpellCharges(purifying_brew) == 0) and (SpellChargeCooldown(purifying_brew) > 2 or DebuffPresent(heavy_stagger_debuff))) Spell(black_ox_brew)
-		# heal me
-		BrewmasterHealMe()
-
-		unless DebuffPresent(heavy_stagger_debuff) or BrewmasterHealMe() or (StaggerRemaining() == 0 and not Talent(special_delivery_talent))
-		{
-			# purify moderate stagger
-			if (DebuffPresent(moderate_stagger_debuff) and (not Talent(elusive_dance_talent) or BuffExpires(elusive_dance_buff))) Spell(purifying_brew)
-			# always keep 1 charge unless black_ox_brew is coming off cd
-			if (SpellCharges(ironskin_brew) > 1 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3))
-			{
-				# never be at (almost) max charges 
-				if (SpellCharges(ironskin_brew count=0) >= SpellMaxCharges(ironskin_brew)-0.3) Spell(ironskin_brew)
-				# use up those charges when black_ox_brew_talent comes off cd
-				if (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3) Spell(ironskin_brew)
-				
-				if(StaggerRemaining() > 0)
-				{
-					# keep brew-stache rolling (when not elusive_dance)
-					if (HasArtifactTrait(brew_stache_trait) and BuffExpires(brew_stache_buff) and not Talent(elusive_dance_talent)) Spell(ironskin_brew text=stache)
-					# keep up ironskin_brew_buff
-					if (BuffExpires(ironskin_brew_buff 2)) Spell(ironskin_brew)
-				}
-				
-				# purify light stagger when doing trash when talent elusive dance 
-				if (Talent(elusive_dance_talent) and StaggerRemaining() > 0 and not IsBossFight() and BuffExpires(elusive_dance_buff)) Spell(purifying_brew)
-			}
-		}
-	}
+	# always purify red stagger
+	if (DebuffPresent(heavy_stagger_debuff) and SpellCharges(purifying_brew) > 0) Spell(purifying_brew)
+	# use black_ox_brew when at 0 charges but delay it when a charge is about to come off cd
+	if ((SpellCharges(purifying_brew) == 0) and (SpellChargeCooldown(purifying_brew) > 2 or DebuffPresent(heavy_stagger_debuff))) Spell(black_ox_brew)
+	# heal me
+	BrewmasterHealMe()
+	
 	# range check
 	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
+
+	unless DebuffPresent(heavy_stagger_debuff) or BrewmasterHealMe() or (StaggerRemaining() == 0 and not Talent(special_delivery_talent))
+	{
+		# purify moderate stagger
+		if (DebuffPresent(moderate_stagger_debuff) and (not Talent(elusive_dance_talent) or BuffExpires(elusive_dance_buff))) Spell(purifying_brew)
+		# always keep 1 charge unless black_ox_brew is coming off cd
+		if (SpellCharges(ironskin_brew) > 1 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3))
+		{
+			# never be at (almost) max charges 
+			if (SpellCharges(ironskin_brew count=0) >= SpellMaxCharges(ironskin_brew)-0.3) Spell(ironskin_brew)
+			# use up those charges when black_ox_brew_talent comes off cd
+			if (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3) Spell(ironskin_brew)
+			
+			if(StaggerRemaining() > 0)
+			{
+				# keep brew-stache rolling (when not elusive_dance)
+				if (HasArtifactTrait(brew_stache_trait) and BuffExpires(brew_stache_buff) and not Talent(elusive_dance_talent)) Spell(ironskin_brew text=stache)
+				# keep up ironskin_brew_buff
+				if (BuffExpires(ironskin_brew_buff 2)) Spell(ironskin_brew)
+			}
+			
+			# purify light stagger when doing trash when talent elusive dance 
+			if (Talent(elusive_dance_talent) and StaggerRemaining() > 0 and not IsBossFight() and BuffExpires(elusive_dance_buff)) Spell(purifying_brew)
+		}
+	}
 }
 
 #
