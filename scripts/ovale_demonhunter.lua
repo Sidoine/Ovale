@@ -44,7 +44,7 @@ AddFunction VengeanceDefaultShortCDActions
 	if (CheckBoxOn(opt_melee_range) and not target.InRange(shear))
 	{
 		if (target.InRange(felblade)) Spell(felblade)
-		if (target.Distance(less 30) or (target.Distance(less 40) and Talent(abyssal_strike_talent))) Spell(infernal_strike)
+		if (target.Distance(less 30) or (target.Distance(less 40) and Talent(abyssal_strike_talent))) Spell(infernal_strike text=range)
 		Texture(misc_arrowlup help=L(not_in_melee_range))
 	}
 }
