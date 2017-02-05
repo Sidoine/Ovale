@@ -67,6 +67,10 @@ Define(cooldown_reduction_agility_buff 146019)
 Define(cooldown_reduction_strength_buff 145955)
 Define(cooldown_reduction_tank_buff 146025)
 
+Define(coagulated_nightwell_residue 137400)
+	ItemRequire(coagulated_nightwell_residue unusable 1=buff,!nightwell_energy_buff)
+Define(nightwell_energy_buff 214572)
+
 ###
 ### Legendary Meta Gem
 ###

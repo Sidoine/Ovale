@@ -332,6 +332,17 @@ function OvaleData:GetSpellInfo(spellId)
 	end
 end
 
+function OvaleData:ItemInfo(itemId)
+	local ii = self.itemInfo[itemId]
+	if not ii then
+		ii = {
+			require = {},
+		}
+		self.itemInfo[itemId] = ii
+	end
+	return ii
+end
+
 -- Returns the tag for the item and whether the item invokes the GCD.
 function OvaleData:GetItemTagInfo(spellId)
 	-- Assume all items are on a long cooldown and do not invoke the GCD.
@@ -367,6 +378,9 @@ end
 
 -- Check "run-time" requirements specified in SpellRequire().
 -- NOTE: Mirrored in statePrototype below.
+
+-- TODO: find a better way to pass spellId or itemId as the first param
+--       reason: OvaleData:GetItemInfoProperty also calls CheckRequirements but with itemId as first param
 function OvaleData:CheckRequirements(spellId, atTime, tokens, index, targetGUID)
 	targetGUID = targetGUID or OvaleGUID:UnitGUID(self.defaultTarget or "target")
 	local name = tokens[index]
@@ -475,6 +489,24 @@ function OvaleData:CheckSpellInfo(spellId, atTime, targetGUID)
 	return verified, requirement
 end
 
+function OvaleData:GetItemInfoProperty(itemId, atTime, property)
+	targetGUID = OvaleGUID:UnitGUID("player")
+	local ii = OvaleData:ItemInfo(itemId)
+	local value = ii and ii[property]
+
+	local requirements = ii and ii.require[property]
+	if requirements then
+		for v, requirement in pairs(requirements) do
+			local verified = self:CheckRequirements(itemId, atTime, requirement, 1, targetGUID)
+			if verified then
+				value = tonumber(v) or v
+				break
+			end
+		end
+	end
+
+	return value 
+end
 -- Get SpellInfo property with run-time checks as specified in SpellRequire().
 -- NOTE: Mirrored in statePrototype below.
 function OvaleData:GetSpellInfoProperty(spellId, atTime, property, targetGUID)
@@ -599,5 +631,6 @@ local statePrototype = OvaleData.statePrototype
 statePrototype.CheckRequirements = OvaleData.CheckRequirements
 statePrototype.CheckSpellAuraData = OvaleData.CheckSpellAuraData
 statePrototype.CheckSpellInfo = OvaleData.CheckSpellInfo
+statePrototype.GetItemInfoProperty = OvaleData.GetItemInfoProperty
 statePrototype.GetSpellInfoProperty = OvaleData.GetSpellInfoProperty
 --</state-methods>

@@ -72,6 +72,7 @@ local DECLARATION_KEYWORD = {
 	["Define"] = true,
 	["Include"] = true,
 	["ItemInfo"] = true,
+	["ItemRequire"] = true,
 	["ItemList"] = true,
 	["ScoreSpells"] = true,
 	["SpellInfo"] = true,
@@ -445,6 +446,7 @@ local UnparseFunction = nil
 local UnparseGroup = nil
 local UnparseIf = nil
 local UnparseItemInfo = nil
+local UnparseItemRequire = nil
 local UnparseList = nil
 local UnparseNumber = nil
 local UnparseParameters = nil
@@ -642,6 +644,11 @@ UnparseItemInfo = function(node)
 	return format("ItemInfo(%s %s)", identifier, UnparseParameters(node.rawPositionalParams, node.rawNamedParams))
 end
 
+UnparseItemRequire = function(node)
+	local identifier = node.name and node.name or node.spellId
+	return format("ItemRequire(%s %s %s)", identifier, node.property, UnparseParameters(node.rawPositionalParams, node.rawNamedParams))
+end
+
 UnparseList = function(node)
 	return format("%s(%s %s)", node.keyword, node.name, UnparseParameters(node.rawPositionalParams, node.rawNamedParams))
 end
@@ -763,6 +770,7 @@ do
 		["icon"] = UnparseAddIcon,
 		["if"] = UnparseIf,
 		["item_info"] = UnparseItemInfo,
+		["item_require"] = UnparseItemRequire,
 		["list"] = UnparseList,
 		["list_item"] = UnparseAddListItem,
 		["logical"] = UnparseExpression,
@@ -814,6 +822,7 @@ local ParseGroup = nil
 local ParseIf = nil
 local ParseInclude = nil
 local ParseItemInfo = nil
+local ParseItemRequire = nil
 local ParseList = nil
 local ParseNumber = nil
 local ParseParameterValue = nil
@@ -1080,6 +1089,8 @@ ParseDeclaration = function(tokenStream, nodeList, annotation)
 			ok, node = ParseInclude(tokenStream, nodeList, annotation)
 		elseif token == "ItemInfo" then
 			ok, node = ParseItemInfo(tokenStream, nodeList, annotation)
+		elseif token == "ItemRequire" then
+			ok, node = ParseItemRequire(tokenStream, nodeList, annotation)
 		elseif token == "ItemList" then
 			ok, node = ParseList(tokenStream, nodeList, annotation)
 		elseif token == "ScoreSpells" then
@@ -1576,6 +1587,81 @@ ParseItemInfo = function(tokenStream, nodeList, annotation)
 		node.type = "item_info"
 		node.itemId = itemId
 		node.name = name
+		node.rawPositionalParams = positionalParams
+		node.rawNamedParams = namedParams
+		annotation.parametersReference = annotation.parametersReference or {}
+		annotation.parametersReference[#annotation.parametersReference + 1] = node
+		if name then
+			annotation.nameReference = annotation.nameReference or {}
+			annotation.nameReference[#annotation.nameReference + 1] = node
+		end
+	end
+	return ok, node
+end
+
+ParseItemRequire = function(tokenStream, nodeList, annotation)
+	local ok = true
+	-- Consume the keyword token.
+	do
+		local tokenType, token = tokenStream:Consume()
+		if not (tokenType == "keyword" and token == "ItemRequire") then
+			SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ITEMREQUIRE; keyword expected.", token)
+			ok = false
+		end
+	end
+	-- Consume the left parenthesis.
+	if ok then
+		local tokenType, token = tokenStream:Consume()
+		if tokenType ~= "(" then
+			SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ITEMREQUIRE; '(' expected.", token)
+			ok = false
+		end
+	end
+	-- Consume the item ID.
+	local itemId, name
+	if ok then
+		local tokenType, token = tokenStream:Consume()
+		if tokenType == "number" then
+			itemId = token
+		elseif tokenType == "name" then
+			name = token
+		else
+			SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ITEMREQUIRE; number or name expected.", token)
+			ok = false
+		end
+	end
+	-- Consume the property name.
+	local property
+	if ok then
+		local tokenType, token = tokenStream:Consume()
+		if tokenType == "name" then
+			property = token
+		else
+			SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ITEMREQUIRE; property name expected.", token)
+			ok = false
+		end
+	end
+	-- Consume any parameters.
+	local positionalParams, namedParams
+	if ok then
+		ok, positionalParams, namedParams = ParseParameters(tokenStream, nodeList, annotation)
+	end
+	-- Consume the right parenthesis.
+	if ok then
+		local tokenType, token = tokenStream:Consume()
+		if tokenType ~= ")" then
+			SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ITEMREQUIRE; ')' expected.", token)
+			ok = false
+		end
+	end
+	-- Create the AST node.
+	local node
+	if ok then
+		node = OvaleAST:NewNode(nodeList)
+		node.type = "item_require"
+		node.itemId = itemId
+		node.name = name
+		node.property = property
 		node.rawPositionalParams = positionalParams
 		node.rawNamedParams = namedParams
 		annotation.parametersReference = annotation.parametersReference or {}
@@ -2351,6 +2437,7 @@ do
 		["icon"] = ParseAddIcon,
 		["if"] = ParseIf,
 		["item_info"] = ParseItemInfo,
+		["item_require"] = ParseItemRequire,
 		["list"] = ParseList,
 		["list_item"] = ParseAddListItem,
 		["logical"] = ParseExpression,
@@ -2490,7 +2577,7 @@ function OvaleAST:PropagateConstants(ast)
 		local dictionary = ast.annotation.definition
 		if dictionary and ast.annotation.nameReference then
 			for _, node in ipairs(ast.annotation.nameReference) do
-				if node.type == "item_info" and node.name then
+				if (node.type == "item_info" or node.type == "item_require") and node.name then
 					local itemId = dictionary[node.name]
 					if itemId then
 						node.itemId = itemId
