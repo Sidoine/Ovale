@@ -645,7 +645,7 @@ UnparseItemInfo = function(node)
 end
 
 UnparseItemRequire = function(node)
-	local identifier = node.name and node.name or node.spellId
+	local identifier = node.name and node.name or node.itemId
 	return format("ItemRequire(%s %s %s)", identifier, node.property, UnparseParameters(node.rawPositionalParams, node.rawNamedParams))
 end
 
