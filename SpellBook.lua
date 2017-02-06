@@ -482,7 +482,7 @@ statePrototype.IsUsableItem = function(state, itemId, atTime)
 		end
 	end
 	
-	OvaleSpellBook:StopProfiling("OvaleSpellBook_state_IsUsableSpell")
+	OvaleSpellBook:StopProfiling("OvaleSpellBook_state_IsUsableItem")
 	return isUsable
 end
 
