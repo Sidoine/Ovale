@@ -30,7 +30,7 @@ local API_GetTime = GetTime
 -- Spell ID for the dummy Global Cooldown spell.
 local GLOBAL_COOLDOWN = 61304
 -- This should be more than OvaleFuture's SIMULATOR_LAG.
-local COOLDOWN_THRESHOLD = 0.15
+local COOLDOWN_THRESHOLD = 0.10
 
 -- Register for debugging messages.
 OvaleDebug:RegisterDebugging(OvaleCooldown)
