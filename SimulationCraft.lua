@@ -1790,9 +1790,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 		if class == "DEATHKNIGHT" and action == "antimagic_shell" then
 			-- Only suggest Anti-Magic Shell if there is incoming magic damage to absorb to generate runic power.
 			conditionCode = "IncomingDamage(1.5 magic=1) > 0"
-		elseif class == "DEATHKNIGHT" and action == "horn_of_winter" then
-			-- Only cast Horn of Winter if not already raid-buffed.
-			conditionCode = "BuffExpires(attack_power_multiplier_buff any=1)"
 		elseif class == "DEATHKNIGHT" and action == "mind_freeze" then
 			bodyCode = camelSpecialization .. "InterruptActions()"
 			annotation[action] = class
@@ -3686,10 +3683,6 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 	if class == "DEATHKNIGHT" and operand == "dot.breath_of_sindragosa.ticking" then
 		-- Breath of Sindragosa is the player buff from channeling the spell.
 		local buffName = "breath_of_sindragosa_buff"
-		code = format("BuffPresent(%s)", buffName)
-		AddSymbol(annotation, buffName)
-	elseif class == "DEATHKNIGHT" and operand == "dot.hungering_rune_weapon.ticking" then
-		local buffName = "hungering_rune_weapon_buff"
 		code = format("BuffPresent(%s)", buffName)
 		AddSymbol(annotation, buffName)
 	elseif class == "DEATHKNIGHT" and strsub(operand, -9, -1) == ".ready_in" then
