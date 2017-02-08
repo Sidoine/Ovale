@@ -4233,6 +4233,32 @@ do
 end
 
 do
+	--- Get the recharge duration in seconds for a given spell.
+	-- @name SpellRechargeDuration
+	-- @paramsig number or boolean
+	-- @param id The spell ID.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param target Optional. Sets the target of the spell. The target may also be given as a prefix to the condition.
+	--     Defaults to target=target.
+	--     Valid values: player, target, focus, pet.
+	-- @return The number of seconds.
+	-- @return A boolean value for the result of the comparison.
+
+	local function SpellRechargeDuration(positionalParams, namedParams, state, atTime)
+		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local target = ParseCondition(positionalParams, namedParams, state, "target")
+		
+		local cd = state:GetCD(spellId)
+		local duration = cd.chargeDuration or state:GetSpellCooldownDuration(spellId, atTime, target)
+		
+		return Compare(duration, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("spellrechargeduration", true, SpellRechargeDuration)
+end
+
+do
 	--- Get data for the given spell defined by SpellInfo(...)
 	-- @name SpellData
 	-- @paramsig number or boolean
