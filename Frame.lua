@@ -414,6 +414,7 @@ do
 				end
 				icon:SetPoint("TOPLEFT",self.frame,"TOPLEFT",(action.left + (l-1)*action.dx)/scale,(action.top - (l-1)*action.dy)/scale)
 				icon:SetScale(scale)
+				icon:SetRemainsFont(profile.apparence.remainsFontColor)
 				icon:SetFontScale(profile.apparence.fontScale)
 				icon:SetParams(node.positionalParams, node.namedParams)
 				icon:SetHelp((node.namedParams ~= nil and node.namedParams.help) or nil)
