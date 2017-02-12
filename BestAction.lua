@@ -162,7 +162,7 @@ local function GetActionItemInfo(element, state, atTime, target)
 		actionTexture = actionTexture or API_GetItemIcon(itemId)
 		actionInRange = API_IsItemInRange(itemId, target)
 		actionCooldownStart, actionCooldownDuration, actionEnable = API_GetItemCooldown(itemId)
-		actionUsable = spellName and API_IsUsableItem(itemId)
+		actionUsable = spellName and API_IsUsableItem(itemId) and state:IsUsableItem(itemId)
 		if action then
 			actionShortcut = OvaleActionBar:GetBinding(action)
 			actionIsCurrent = API_IsCurrentAction(action)

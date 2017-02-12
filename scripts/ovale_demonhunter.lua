@@ -44,7 +44,7 @@ AddFunction VengeanceDefaultShortCDActions
 	if (CheckBoxOn(opt_melee_range) and not target.InRange(shear))
 	{
 		if (target.InRange(felblade)) Spell(felblade)
-		if (target.Distance(less 30) or (target.Distance(less 40) and Talent(abyssal_strike_talent))) Spell(infernal_strike)
+		if (target.Distance(less 30) or (target.Distance(less 40) and Talent(abyssal_strike_talent))) Spell(infernal_strike text=range)
 		Texture(misc_arrowlup help=L(not_in_melee_range))
 	}
 }
@@ -105,10 +105,11 @@ AddFunction VengeanceDefaultAoEActions
 	if (PainDeficit() >= 17 and BuffPresent(blade_turning_buff)) Spell(shear)
 	if (not SigilCharging(flame) and target.DebuffRemaining(sigil_of_flame_debuff) <= 2-Talent(quickened_sigils_talent))
 	{
-		if (Talent(flame_crash_talent) and (SpellCharges(infernal_strike) >= SpellMaxCharges(infernal_strike))) Spell(infernal_strike)
+		if (Talent(flame_crash_talent) and (SpellCharges(infernal_strike) >= SpellMaxCharges(infernal_strike))) Spell(infernal_strike text=crash)
 		Spell(sigil_of_flame)
 	}
 	Spell(fel_eruption)
+	if (not Talent(flame_crash_talent) and SpellCharges(infernal_strike) >= SpellMaxCharges(infernal_strike)) Spell(infernal_strike)
 	Spell(shear)
 }
 

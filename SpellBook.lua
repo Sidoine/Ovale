@@ -46,6 +46,7 @@ local API_HasPetSpells = HasPetSpells
 local API_IsHarmfulSpell = IsHarmfulSpell
 local API_IsHelpfulSpell = IsHelpfulSpell
 local API_IsSpellInRange = IsSpellInRange
+local API_IsUsableItem = IsUsableItem
 local API_IsUsableSpell = IsUsableSpell
 local BOOKTYPE_PET = BOOKTYPE_PET
 local BOOKTYPE_SPELL = BOOKTYPE_SPELL
@@ -465,6 +466,26 @@ local statePrototype = OvaleSpellBook.statePrototype
 --</private-static-properties>
 
 --<state-methods>
+statePrototype.IsUsableItem = function(state, itemId, atTime)
+	OvaleSpellBook:StartProfiling("OvaleSpellBook_state_IsUsableItem")
+	
+	local isUsable = API_IsUsableItem(itemId)
+	local ii = OvaleData:ItemInfo(itemId)
+	if ii then
+		-- Flagged as not usable in the item information.
+		if isUsable then
+			local unusable = state:GetItemInfoProperty(itemId, atTime, "unusable")
+			if unusable and unusable > 0 then
+				state:Log("Item ID '%s' is flagged as unusable.", itemId)
+				isUsable = false
+			end
+		end
+	end
+	
+	OvaleSpellBook:StopProfiling("OvaleSpellBook_state_IsUsableItem")
+	return isUsable
+end
+
 statePrototype.IsUsableSpell = function(state, spellId, atTime, targetGUID)
 	OvaleSpellBook:StartProfiling("OvaleSpellBook_state_IsUsableSpell")
 	if type(atTime) == "string" and not targetGUID then

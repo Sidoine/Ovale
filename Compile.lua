@@ -270,7 +270,7 @@ local function EvaluateItemInfo(node)
 	local ok = true
 	local itemId, positionalParams, namedParams = node.itemId, node.positionalParams, node.namedParams
 	if itemId and TestConditions(positionalParams, namedParams) then
-		local ii = OvaleData.itemInfo[itemId] or {}
+		local ii = OvaleData:ItemInfo(itemId)
 		for k, v in pairs(namedParams) do
 			if k == "proc" then
 				-- Add the buff for this item proc to the spell list "item_proc_<proc>".
@@ -289,6 +289,27 @@ local function EvaluateItemInfo(node)
 			end
 		end
 		OvaleData.itemInfo[itemId] = ii
+	end
+	return ok
+end
+
+local function EvaluateItemRequire(node)
+	local ok = true
+	local itemId, positionalParams, namedParams = node.itemId, node.positionalParams, node.namedParams
+	if TestConditions(positionalParams, namedParams) then
+		local property = node.property
+		local count = 0
+		local ii = OvaleData:ItemInfo(itemId)
+		local tbl = ii.require[property] or {}
+		for k, v in pairs(namedParams) do
+			if not OvaleAST.PARAMETER_KEYWORD[k] then
+				tbl[k] = v
+				count = count + 1
+			end
+		end
+		if count > 0 then
+			ii.require[property] = tbl
+		end
 	end
 	return ok
 end
@@ -524,7 +545,7 @@ do
 		trinket[1], trinket[2] = OvaleEquipment:GetEquippedTrinkets()
 		for i = 1, 2 do
 			local itemId = trinket[i]
-			local ii = itemId and OvaleData.itemInfo[itemId]
+			local ii = itemId and OvaleData:ItemInfo(itemId)
 			local buffId = ii and ii.buff
 			if buffId then
 				if type(buffId) == "table" then
@@ -663,6 +684,8 @@ function OvaleCompile:EvaluateScript(ast, forceEvaluation)
 				ok = EvaluateAddListItem(node)
 			elseif nodeType == "item_info" then
 				ok = EvaluateItemInfo(node)
+			elseif nodeType == "item_require" then
+				ok = EvaluateItemRequire(node)
 			elseif nodeType == "list" then
 				ok = EvaluateList(node)
 			elseif nodeType == "score_spells" then
