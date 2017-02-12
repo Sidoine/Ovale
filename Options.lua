@@ -50,6 +50,7 @@ OvaleOptions.defaultDB = {
 			-- Icon
 			alpha = 1,
 			flashIcon = true,
+			remainsFontColor = {r=1,g=1,b=1},
 			fontScale = 1,
 			highlightIcon = true,
 			iconScale = 1,
@@ -244,6 +245,21 @@ OvaleOptions.options = {
 							desc = L["La taille des petites icônes"],
 							min = 0.5, max = 3, bigStep = 0.01,
 							isPercent = true,
+						},
+						remainsFontColor =
+						{
+							type = "color",
+							order = 25,
+							name = L["Remaining time font color"],
+							get = function(info)
+								local t = Ovale.db.profile.apparence.remainsFontColor
+								return t.r, t.g, t.b
+							end,
+							set = function(info, r, g, b)
+								local t = Ovale.db.profile.apparence.remainsFontColor
+								t.r, t.g, t.b = r, g, b
+								Ovale.db.profile.apparence.remainsFontColor = t
+							end,
 						},
 						fontScale =
 						{

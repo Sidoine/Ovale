@@ -260,8 +260,15 @@ local function SetParams(self, positionalParams, namedParams, secure)
 	end
 end
 
+local function SetRemainsFont(self, color)
+	self.remains:SetTextColor(color.r, color.g, color.b, 1.0)
+	self.remains:SetJustifyH("left")
+	self.remains:SetPoint("BOTTOMLEFT", 2, 2)	
+end
+
 local function SetFontScale(self, scale)
 	self.fontScale = scale
+	self.remains:SetFont(self.fontName, self.fontHeight * self.fontScale, self.fontFlags)
 	self.shortcut:SetFont(self.fontName, self.fontHeight * self.fontScale, self.fontFlags)
 	self.rangeIndicator:SetFont(self.fontName, self.fontHeight * self.fontScale, self.fontFlags)
 end
@@ -359,6 +366,7 @@ function OvaleIcon_OnLoad(self)
 	self.Update = Update
 	self.SetHelp = SetHelp
 	self.SetParams = SetParams
+	self.SetRemainsFont = SetRemainsFont
 	self.SetFontScale = SetFontScale
 	self.SetRangeIndicator = SetRangeIndicator
 	self.SetValue = SetValue
