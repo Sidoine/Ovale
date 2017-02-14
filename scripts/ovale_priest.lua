@@ -25,7 +25,7 @@ AddFunction DisciplineDefaultMainActions
 		if not Talent(purge_the_wicked_talent) and target.DebuffRefreshable(shadow_word_pain_debuff) and target.TimeToDie() > target.DebuffRemaining(shadow_word_pain_debuff) Spell(shadow_word_pain)
 		if Talent(purge_the_wicked_talent) and target.DebuffRefreshable(purge_the_wicked_debuff) and target.TimeToDie() > target.DebuffRemaining(purge_the_wicked_debuff) Spell(purge_the_wicked)
 	}
-	if target.TimeToDie() > 6 Spell(schism)
+	Spell(schism)
 	Spell(penance)
 	Spell(power_word_solace)
 	Spell(smite)
