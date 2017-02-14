@@ -3711,19 +3711,14 @@ do
 		local target, filter, mine = ParseCondition(positionalParams, namedParams, state)
 		local aura = state:GetAura(target, auraId, filter, mine)
 		if aura then
-			local tickTime
-			if state:IsActiveAura(aura, atTime) then
-				tickTime = aura.tick
-			end
-			if not tickTime then
-				tickTime = OvaleData:GetTickLength(auraId, state)
-			end
+			local baseDuration = OvaleData:GetBaseDuration(auraId)
+			local remainingDuration = aura.ending - atTime
+			local extensionDuration = 0.3 * baseDuration
 
-			local gain, start, ending = aura.gain, aura.start, aura.ending
-			if ending - tickTime <= gain then
-				return gain, INFINITY
+			if remainingDuration <= extensionDuration then
+				return remainingDuration, INFINITY
 			else
-				return ending - tickTime, INFINITY
+				return aura.ending - extensionDuration, INFINITY
 			end
 		end
 		return 0, INFINITY
