@@ -78,6 +78,7 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_priest_spells)
 
+
 AddFunction s2mcheck_value
 {
 	0.8 * { 83 - 5 * TalentPoints(sanlayn_talent) + 33 * TalentPoints(reaper_of_souls_talent) + ArmorSetBonus(T19 2) * 4 + 8 * s2mbeltcheck() + SpellHaste() * 10 * { 2 + 0.8 * ArmorSetBonus(T19 2) + 1 * TalentPoints(reaper_of_souls_talent) + 2 * ArtifactTraitRank(mass_hysteria) - 1 * TalentPoints(sanlayn_talent) } } - actors_fight_time_mod() * 0
@@ -107,11 +108,26 @@ AddFunction s2mcheck_min
 	180
 }
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=shadow)
+
+AddFunction ShadowInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	{
+		Spell(silence)
+		if not target.Classification(worldboss)
+		{
+			Spell(arcane_torrent_mana)
+			if target.InRange(quaking_palm) Spell(quaking_palm)
+			Spell(war_stomp)
+		}
+	}
+}
+
 ### actions.default
 
 AddFunction ShadowDefaultMainActions
 {
-	#potion,name=deadly_grace,if=buff.bloodlust.react|target.time_to_die<=40|(buff.voidform.stack>60&buff.power_infusion.up)
 	#call_action_list,name=check,if=talent.surrender_to_madness.enabled&!buff.surrender_to_madness.up
 	if Talent(surrender_to_madness_talent) and not BuffPresent(surrender_to_madness_buff) ShadowCheckMainActions()
 
@@ -141,7 +157,6 @@ AddFunction ShadowDefaultMainPostConditions
 
 AddFunction ShadowDefaultShortCdActions
 {
-	#potion,name=deadly_grace,if=buff.bloodlust.react|target.time_to_die<=40|(buff.voidform.stack>60&buff.power_infusion.up)
 	#call_action_list,name=check,if=talent.surrender_to_madness.enabled&!buff.surrender_to_madness.up
 	if Talent(surrender_to_madness_talent) and not BuffPresent(surrender_to_madness_buff) ShadowCheckShortCdActions()
 
@@ -172,6 +187,8 @@ AddFunction ShadowDefaultShortCdPostConditions
 AddFunction ShadowDefaultCdActions
 {
 	#potion,name=deadly_grace,if=buff.bloodlust.react|target.time_to_die<=40|(buff.voidform.stack>60&buff.power_infusion.up)
+	#silence
+	ShadowInterruptActions()
 	#call_action_list,name=check,if=talent.surrender_to_madness.enabled&!buff.surrender_to_madness.up
 	if Talent(surrender_to_madness_talent) and not BuffPresent(surrender_to_madness_buff) ShadowCheckCdActions()
 
@@ -575,6 +592,7 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 }
 
 ### Required symbols
+# arcane_torrent_mana
 # augmentation
 # auspicious_spirits_talent
 # berserking
@@ -590,6 +608,7 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # misery_talent
 # power_infusion
 # power_infusion_buff
+# quaking_palm
 # reaper_of_souls_talent
 # sanlayn_talent
 # shadow_crash
@@ -604,6 +623,7 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # shadowform_buff
 # shadowy_insight_buff
 # shadowy_insight_talent
+# silence
 # sphere_of_insanity
 # surrender_to_madness
 # surrender_to_madness_buff
@@ -615,6 +635,7 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # void_eruption
 # void_torrent
 # voidform_buff
+# war_stomp
 ]]
 	OvaleScripts:RegisterScript("PRIEST", "shadow", name, desc, code, "script")
 end
