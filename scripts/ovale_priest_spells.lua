@@ -157,7 +157,8 @@ Define(void_torrent_buff 205065) # TODO Insanity does not drain during this buff
 Define(voidform_buff 194249)
 
 AddFunction CurrentInsanityDrain {
-	if BuffPresent(void_torrent_buff) 0
+	if BuffPresent(dispersion_buff) 0 
+	if BuffPresent(void_torrent_buff) 0 # for some reason, this does not work as expected
 	if BuffPresent(voidform_buff) BuffStacks(voidform_buff)/2 + 9
 	0
 }
