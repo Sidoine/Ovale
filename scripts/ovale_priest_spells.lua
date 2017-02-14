@@ -34,8 +34,9 @@ Define(mental_fatigue_debuff 185104)
 Define(mental_instinct_buff 167254)
 	SpellInfo(mental_instinct_buff duration=4 max_stacks=12)
 Define(mind_blast 8092)
-	SpellInfo(mind_blast cd=9 cd_haste=spell insanity=-15)
+	SpellInfo(mind_blast cd=9 cd_haste=spell insanity=-15 charges=1)
 	SpellInfo(mind_blast insanity_percent=120 talent=fortress_of_the_mind_talent)
+	SpellInfo(mind_blast charges=2 if_equipped=mangazas_madness)
 	SpellRequire(mind_blast insanity_percent 125=buff,power_infusion_buff)
 	SpellRequire(mind_blast insanity_percent 200=buff,surrender_to_madness_buff)
 	SpellRequire(mind_blast cd 6=buff,voidform_buff)
@@ -162,6 +163,9 @@ AddFunction CurrentInsanityDrain {
 	if BuffPresent(voidform_buff) BuffStacks(voidform_buff)/2 + 9
 	0
 }
+
+#Legendary
+Define(mangazas_madness 132864)
 ]]
 
 	OvaleScripts:RegisterScript("PRIEST", nil, name, desc, code, "include")
