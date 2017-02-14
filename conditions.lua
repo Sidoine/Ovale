@@ -4278,6 +4278,33 @@ do
 end
 
 do
+	--- Get data for the given spell defined by SpellInfo(...) after calculations
+	-- @name SpellInfoProperty
+	-- @paramsig number or boolean
+	-- @param id The spell ID.
+	-- @param key The name of the data set by SpellInfo(...).
+	--     Valid values are any alphanumeric string.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The number data associated with the given key after calculations
+	-- @return A boolean value for the result of the comparison.
+	-- @usage
+	-- if Insanity() + SpellInfoProperty(mind_blast insanity) < 100
+	--     Spell(mind_blast)
+
+	local function SpellInfoProperty(positionalParams, namedParams, state, atTime)
+		local spellId, key, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3], positionalParams[4]
+		local value = state:GetSpellInfoProperty(spellId, atTime, key)
+		if value then
+			return Compare(value, comparator, limit)
+		end
+		return nil
+	end
+
+	OvaleCondition:RegisterCondition("spellinfoproperty", false, SpellInfoProperty)
+end
+
+do
 	--- Returns the number of times a spell can be cast. Generally used for spells whose casting is limited by the number of item reagents in the player's possession. .
 	-- @name SpellCount
 	-- @paramsig number or boolean
