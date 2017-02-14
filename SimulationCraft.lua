@@ -3240,9 +3240,9 @@ EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
 			code = format("not %sCooldown(%s) > 0", prefix, name)
 		elseif property == "charges" then
 			if parseNode.asType == "boolean" then
-				code = format("%sChargeCooldown(%s) > 0", prefix, name)
+				code = format("%sCharges(%s) > 0", prefix, name)
 			else
-				code = format("%sChargeCooldown(%s)", prefix, name)
+				code = format("%sCharges(%s)", prefix, name)
 			end
 		elseif property == "charges_fractional" then
 			code = format("%sCharges(%s count=0)", prefix, name)
