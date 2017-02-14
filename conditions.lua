@@ -3712,14 +3712,8 @@ do
 		local aura = state:GetAura(target, auraId, filter, mine)
 		if aura then
 			local baseDuration = OvaleData:GetBaseDuration(auraId)
-			local remainingDuration = aura.ending - atTime
 			local extensionDuration = 0.3 * baseDuration
-
-			if remainingDuration <= extensionDuration then
-				return remainingDuration, INFINITY
-			else
-				return aura.ending - extensionDuration, INFINITY
-			end
+			return aura.ending - extensionDuration, INFINITY
 		end
 		return 0, INFINITY
 	end
