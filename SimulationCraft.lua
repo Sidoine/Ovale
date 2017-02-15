@@ -2831,9 +2831,9 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
 	elseif property == "travel_time" then
 		code = format("TravelTime(%s)", name)
 	elseif property == "usable" then
-		code = format("Spell(%s)", name)
+		code = format("CanCast(%s)", name)
 	elseif property == "usable_in" then
-		code = format("Spell(%s)", name)
+		code = format("SpellCooldown(%s)", name)
 	else
 		ok = false
 	end
