@@ -251,7 +251,6 @@ local function GetActionSpellInfo(element, state, atTime, target)
 			actionInRange = OvaleSpellBook:IsSpellInRange(spellId, target)
 			actionCooldownStart, actionCooldownDuration, actionEnable = state:GetSpellCooldown(spellId)
 			actionCharges = state:GetSpellCharges(spellId)
-			state:Log("Spell ID '%s' has %s charges.", spellId, actionCharges or "(nil)")
 			actionResourceExtend = 0
 			actionUsable = isUsable
 			if action then
