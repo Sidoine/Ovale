@@ -210,7 +210,8 @@ local function GetActionSpellInfo(element, state, atTime, target)
 	OvaleBestAction:StartProfiling("OvaleBestAction_GetActionSpellInfo")
 
 	local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionResourceExtend
+		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionResourceExtend,
+		actionCharges
 	local targetGUID = OvaleGUID:UnitGUID(target)
 
 	local spellId = element.positionalParams[1]
@@ -249,6 +250,8 @@ local function GetActionSpellInfo(element, state, atTime, target)
 			actionTexture = actionTexture or API_GetSpellTexture(spellId)
 			actionInRange = OvaleSpellBook:IsSpellInRange(spellId, target)
 			actionCooldownStart, actionCooldownDuration, actionEnable = state:GetSpellCooldown(spellId)
+			actionCharges = state:GetSpellCharges(spellId)
+			state:Log("Spell ID '%s' has %s charges.", spellId, actionCharges or "(nil)")
 			actionResourceExtend = 0
 			actionUsable = isUsable
 			if action then
@@ -282,7 +285,8 @@ local function GetActionSpellInfo(element, state, atTime, target)
 
 	OvaleBestAction:StopProfiling("OvaleBestAction_GetActionSpellInfo")
 	return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target, actionResourceExtend
+		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target, actionResourceExtend,
+		actionCharges
 end
 
 local function GetActionTextureInfo(element, state, atTime, target)
@@ -373,7 +377,8 @@ function OvaleBestAction:GetActionInfo(element, state, atTime)
 				element.actionType,
 				element.actionId,
 				element.actionTarget,
-				element.actionResourceExtend
+				element.actionResourceExtend,
+				element.actionCharges
 		else
 			local target = element.namedParams.target or state.defaultTarget
 			if element.lowername == "item" then
@@ -517,7 +522,7 @@ function OvaleBestAction:ComputeAction(element, state, atTime)
 	state:Log("[%d]    evaluating action: %s(%s)", nodeId, element.name, element.paramsAsString)
 
 	local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration,
-		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget, actionResourceExtend = self:GetActionInfo(element, state, atTime)
+		actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget, actionResourceExtend, actionCharges = self:GetActionInfo(element, state, atTime)
 
 	-- Cache results for future GetActionInfo() when computation age has not advanced.
 	element.actionTexture = actionTexture
@@ -532,6 +537,7 @@ function OvaleBestAction:ComputeAction(element, state, atTime)
 	element.actionId = actionId
 	element.actionTarget = actionTarget
 	element.actionResourceExtend = actionResourceExtend
+	element.actionCharges = actionCharges
 
 	local action = element.positionalParams[1]
 	if not actionTexture then
@@ -560,7 +566,8 @@ function OvaleBestAction:ComputeAction(element, state, atTime)
 
 		-- If the action is not on cooldown, then treat it like it's immediately ready.
 		local start
-		if actionCooldownStart and actionCooldownStart > 0 then
+		if actionCooldownStart and actionCooldownStart > 0 and (actionCharges == nil or actionCharges == 0) then
+			state:Log("[%d]    Action %s (actionCharges=%s)", nodeId, action, actionCharges or "(nil)")
 			-- Action is on cooldown.
 			if actionCooldownDuration and actionCooldownDuration > 0 then
 				state:Log("[%d]    Action %s is on cooldown (start=%f, duration=%f).", nodeId, action, actionCooldownStart, actionCooldownDuration)
@@ -570,7 +577,11 @@ function OvaleBestAction:ComputeAction(element, state, atTime)
 				start = actionCooldownStart
 			end
 		else
-			state:Log("[%d]    Action %s is off cooldown.", nodeId, action)
+			if actionCharges == nil then
+				state:Log("[%d]    Action %s is off cooldown.", nodeId, action)
+			else
+				state:Log("[%d]    Action %s still has %f charges.", nodeId, action, actionCharges)
+			end
 			start = state.currentTime
 		end
 		-- If this is not a pool_resource action, extend the cooldown by the amount of extra time required for the ability to be ready.
