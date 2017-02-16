@@ -33,10 +33,10 @@ AddFunction DisciplineDefaultMainActions
 
 AddFunction DisciplineDefaultCdActions
 {
+	Spell(lights_wrath)
+	if Talent(mindbender_talent) Spell(mindbender)
 	Item(Trinket0Slot usable=1 text=13)
 	Item(Trinket1Slot usable=1 text=14)
-	if Talent(mindbender_talent) Spell(mindbender)
-	Spell(lights_wrath)
 	Spell(power_infusion)
 	Spell(shadowfiend)
 }
