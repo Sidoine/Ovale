@@ -26,14 +26,14 @@ AddFunction DisciplineDefaultMainActions
 		if Talent(purge_the_wicked_talent) and target.DebuffRefreshable(purge_the_wicked_debuff) and target.TimeToDie() > target.DebuffRemaining(purge_the_wicked_debuff) Spell(purge_the_wicked)
 	}
 	Spell(schism)
-	Spell(penance)
-	Spell(power_word_solace)
+	if (not Talent(schism_talent) or not target.DebuffExpires(schism_debuff)) Spell(penance)
+	if (not Talent(schism_talent) or not target.DebuffExpires(schism_debuff)) Spell(power_word_solace)
 	Spell(smite)
 }
 
 AddFunction DisciplineDefaultCdActions
 {
-	Spell(lights_wrath)
+	if (not Talent(schism_talent) or not target.DebuffExpires(schism_debuff)) Spell(lights_wrath)
 	if Talent(mindbender_talent) Spell(mindbender)
 	Item(Trinket0Slot usable=1 text=13)
 	Item(Trinket1Slot usable=1 text=14)
