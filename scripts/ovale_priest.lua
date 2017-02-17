@@ -38,6 +38,7 @@ AddFunction DisciplineDefaultCdActions
 	Item(Trinket0Slot usable=1 text=13)
 	Item(Trinket1Slot usable=1 text=14)
 	Spell(power_infusion)
+	Spell(rapture)
 	Spell(shadowfiend)
 }
 	
