@@ -3711,20 +3711,9 @@ do
 		local target, filter, mine = ParseCondition(positionalParams, namedParams, state)
 		local aura = state:GetAura(target, auraId, filter, mine)
 		if aura then
-			local tickTime
-			if state:IsActiveAura(aura, atTime) then
-				tickTime = aura.tick
-			end
-			if not tickTime then
-				tickTime = OvaleData:GetTickLength(auraId, state)
-			end
-
-			local gain, start, ending = aura.gain, aura.start, aura.ending
-			if ending - tickTime <= gain then
-				return gain, INFINITY
-			else
-				return ending - tickTime, INFINITY
-			end
+			local baseDuration = OvaleData:GetBaseDuration(auraId)
+			local extensionDuration = 0.3 * baseDuration
+			return aura.ending - extensionDuration, INFINITY
 		end
 		return 0, INFINITY
 	end
@@ -4286,6 +4275,33 @@ do
 	end
 
 	OvaleCondition:RegisterCondition("spelldata", false, SpellData)
+end
+
+do
+	--- Get data for the given spell defined by SpellInfo(...) after calculations
+	-- @name SpellInfoProperty
+	-- @paramsig number or boolean
+	-- @param id The spell ID.
+	-- @param key The name of the data set by SpellInfo(...).
+	--     Valid values are any alphanumeric string.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The number data associated with the given key after calculations
+	-- @return A boolean value for the result of the comparison.
+	-- @usage
+	-- if Insanity() + SpellInfoProperty(mind_blast insanity) < 100
+	--     Spell(mind_blast)
+
+	local function SpellInfoProperty(positionalParams, namedParams, state, atTime)
+		local spellId, key, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3], positionalParams[4]
+		local value = state:GetSpellInfoProperty(spellId, atTime, key)
+		if value then
+			return Compare(value, comparator, limit)
+		end
+		return nil
+	end
+
+	OvaleCondition:RegisterCondition("spellinfoproperty", false, SpellInfoProperty)
 end
 
 do
