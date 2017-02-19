@@ -4330,7 +4330,7 @@ local function InsertSupportingFunctions(child, annotation)
 			{
 				if CheckBoxOn(opt_melee_range) and not target.InRange(chaos_strike) 
 				{
-					Spell(felblade)
+					if target.InRange(felblade) Spell(felblade)
 					Texture(misc_arrowlup help=L(not_in_melee_range))
 				}
 			}
