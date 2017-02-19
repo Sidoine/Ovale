@@ -1297,9 +1297,9 @@ AddFunction SubtletyStealthAlsMainActions
 		unless Enemies() >= 5 and SubtletyStealthCdsMainPostConditions()
 		{
 			#call_action_list,name=stealth_cds,if=(cooldown.shadowmeld.up&!cooldown.vanish.up&cooldown.shadow_dance.charges<=1)
-			if not SpellCooldown(shadowmeld) > 0 and not { not SpellCooldown(vanish) > 0 } and SpellChargeCooldown(shadow_dance) <= 1 SubtletyStealthCdsMainActions()
+			if not SpellCooldown(shadowmeld) > 0 and not { not SpellCooldown(vanish) > 0 } and SpellCharges(shadow_dance) <= 1 SubtletyStealthCdsMainActions()
 
-			unless not SpellCooldown(shadowmeld) > 0 and not { not SpellCooldown(vanish) > 0 } and SpellChargeCooldown(shadow_dance) <= 1 and SubtletyStealthCdsMainPostConditions()
+			unless not SpellCooldown(shadowmeld) > 0 and not { not SpellCooldown(vanish) > 0 } and SpellCharges(shadow_dance) <= 1 and SubtletyStealthCdsMainPostConditions()
 			{
 				#call_action_list,name=stealth_cds,if=target.time_to_die<12*cooldown.shadow_dance.charges_fractional*(1+equipped.shadow_satyrs_walk*0.5)
 				if target.TimeToDie() < 12 * SpellCharges(shadow_dance count=0) * { 1 + HasEquippedItem(shadow_satyrs_walk) * 0.5 } SubtletyStealthCdsMainActions()
@@ -1310,7 +1310,7 @@ AddFunction SubtletyStealthAlsMainActions
 
 AddFunction SubtletyStealthAlsMainPostConditions
 {
-	EnergyDeficit() <= stealth_threshold() and { not HasEquippedItem(shadow_satyrs_walk) or SpellCharges(shadow_dance count=0) >= 2.45 or EnergyDeficit() >= 10 } and SubtletyStealthCdsMainPostConditions() or Enemies() >= 5 and SubtletyStealthCdsMainPostConditions() or not SpellCooldown(shadowmeld) > 0 and not { not SpellCooldown(vanish) > 0 } and SpellChargeCooldown(shadow_dance) <= 1 and SubtletyStealthCdsMainPostConditions() or target.TimeToDie() < 12 * SpellCharges(shadow_dance count=0) * { 1 + HasEquippedItem(shadow_satyrs_walk) * 0.5 } and SubtletyStealthCdsMainPostConditions()
+	EnergyDeficit() <= stealth_threshold() and { not HasEquippedItem(shadow_satyrs_walk) or SpellCharges(shadow_dance count=0) >= 2.45 or EnergyDeficit() >= 10 } and SubtletyStealthCdsMainPostConditions() or Enemies() >= 5 and SubtletyStealthCdsMainPostConditions() or not SpellCooldown(shadowmeld) > 0 and not { not SpellCooldown(vanish) > 0 } and SpellCharges(shadow_dance) <= 1 and SubtletyStealthCdsMainPostConditions() or target.TimeToDie() < 12 * SpellCharges(shadow_dance count=0) * { 1 + HasEquippedItem(shadow_satyrs_walk) * 0.5 } and SubtletyStealthCdsMainPostConditions()
 }
 
 AddFunction SubtletyStealthAlsShortCdActions
@@ -1326,9 +1326,9 @@ AddFunction SubtletyStealthAlsShortCdActions
 		unless Enemies() >= 5 and SubtletyStealthCdsShortCdPostConditions()
 		{
 			#call_action_list,name=stealth_cds,if=(cooldown.shadowmeld.up&!cooldown.vanish.up&cooldown.shadow_dance.charges<=1)
-			if not SpellCooldown(shadowmeld) > 0 and not { not SpellCooldown(vanish) > 0 } and SpellChargeCooldown(shadow_dance) <= 1 SubtletyStealthCdsShortCdActions()
+			if not SpellCooldown(shadowmeld) > 0 and not { not SpellCooldown(vanish) > 0 } and SpellCharges(shadow_dance) <= 1 SubtletyStealthCdsShortCdActions()
 
-			unless not SpellCooldown(shadowmeld) > 0 and not { not SpellCooldown(vanish) > 0 } and SpellChargeCooldown(shadow_dance) <= 1 and SubtletyStealthCdsShortCdPostConditions()
+			unless not SpellCooldown(shadowmeld) > 0 and not { not SpellCooldown(vanish) > 0 } and SpellCharges(shadow_dance) <= 1 and SubtletyStealthCdsShortCdPostConditions()
 			{
 				#call_action_list,name=stealth_cds,if=target.time_to_die<12*cooldown.shadow_dance.charges_fractional*(1+equipped.shadow_satyrs_walk*0.5)
 				if target.TimeToDie() < 12 * SpellCharges(shadow_dance count=0) * { 1 + HasEquippedItem(shadow_satyrs_walk) * 0.5 } SubtletyStealthCdsShortCdActions()
@@ -1339,7 +1339,7 @@ AddFunction SubtletyStealthAlsShortCdActions
 
 AddFunction SubtletyStealthAlsShortCdPostConditions
 {
-	EnergyDeficit() <= stealth_threshold() and { not HasEquippedItem(shadow_satyrs_walk) or SpellCharges(shadow_dance count=0) >= 2.45 or EnergyDeficit() >= 10 } and SubtletyStealthCdsShortCdPostConditions() or Enemies() >= 5 and SubtletyStealthCdsShortCdPostConditions() or not SpellCooldown(shadowmeld) > 0 and not { not SpellCooldown(vanish) > 0 } and SpellChargeCooldown(shadow_dance) <= 1 and SubtletyStealthCdsShortCdPostConditions() or target.TimeToDie() < 12 * SpellCharges(shadow_dance count=0) * { 1 + HasEquippedItem(shadow_satyrs_walk) * 0.5 } and SubtletyStealthCdsShortCdPostConditions()
+	EnergyDeficit() <= stealth_threshold() and { not HasEquippedItem(shadow_satyrs_walk) or SpellCharges(shadow_dance count=0) >= 2.45 or EnergyDeficit() >= 10 } and SubtletyStealthCdsShortCdPostConditions() or Enemies() >= 5 and SubtletyStealthCdsShortCdPostConditions() or not SpellCooldown(shadowmeld) > 0 and not { not SpellCooldown(vanish) > 0 } and SpellCharges(shadow_dance) <= 1 and SubtletyStealthCdsShortCdPostConditions() or target.TimeToDie() < 12 * SpellCharges(shadow_dance count=0) * { 1 + HasEquippedItem(shadow_satyrs_walk) * 0.5 } and SubtletyStealthCdsShortCdPostConditions()
 }
 
 AddFunction SubtletyStealthAlsCdActions
@@ -1355,9 +1355,9 @@ AddFunction SubtletyStealthAlsCdActions
 		unless Enemies() >= 5 and SubtletyStealthCdsCdPostConditions()
 		{
 			#call_action_list,name=stealth_cds,if=(cooldown.shadowmeld.up&!cooldown.vanish.up&cooldown.shadow_dance.charges<=1)
-			if not SpellCooldown(shadowmeld) > 0 and not { not SpellCooldown(vanish) > 0 } and SpellChargeCooldown(shadow_dance) <= 1 SubtletyStealthCdsCdActions()
+			if not SpellCooldown(shadowmeld) > 0 and not { not SpellCooldown(vanish) > 0 } and SpellCharges(shadow_dance) <= 1 SubtletyStealthCdsCdActions()
 
-			unless not SpellCooldown(shadowmeld) > 0 and not { not SpellCooldown(vanish) > 0 } and SpellChargeCooldown(shadow_dance) <= 1 and SubtletyStealthCdsCdPostConditions()
+			unless not SpellCooldown(shadowmeld) > 0 and not { not SpellCooldown(vanish) > 0 } and SpellCharges(shadow_dance) <= 1 and SubtletyStealthCdsCdPostConditions()
 			{
 				#call_action_list,name=stealth_cds,if=target.time_to_die<12*cooldown.shadow_dance.charges_fractional*(1+equipped.shadow_satyrs_walk*0.5)
 				if target.TimeToDie() < 12 * SpellCharges(shadow_dance count=0) * { 1 + HasEquippedItem(shadow_satyrs_walk) * 0.5 } SubtletyStealthCdsCdActions()
@@ -1368,7 +1368,7 @@ AddFunction SubtletyStealthAlsCdActions
 
 AddFunction SubtletyStealthAlsCdPostConditions
 {
-	EnergyDeficit() <= stealth_threshold() and { not HasEquippedItem(shadow_satyrs_walk) or SpellCharges(shadow_dance count=0) >= 2.45 or EnergyDeficit() >= 10 } and SubtletyStealthCdsCdPostConditions() or Enemies() >= 5 and SubtletyStealthCdsCdPostConditions() or not SpellCooldown(shadowmeld) > 0 and not { not SpellCooldown(vanish) > 0 } and SpellChargeCooldown(shadow_dance) <= 1 and SubtletyStealthCdsCdPostConditions() or target.TimeToDie() < 12 * SpellCharges(shadow_dance count=0) * { 1 + HasEquippedItem(shadow_satyrs_walk) * 0.5 } and SubtletyStealthCdsCdPostConditions()
+	EnergyDeficit() <= stealth_threshold() and { not HasEquippedItem(shadow_satyrs_walk) or SpellCharges(shadow_dance count=0) >= 2.45 or EnergyDeficit() >= 10 } and SubtletyStealthCdsCdPostConditions() or Enemies() >= 5 and SubtletyStealthCdsCdPostConditions() or not SpellCooldown(shadowmeld) > 0 and not { not SpellCooldown(vanish) > 0 } and SpellCharges(shadow_dance) <= 1 and SubtletyStealthCdsCdPostConditions() or target.TimeToDie() < 12 * SpellCharges(shadow_dance count=0) * { 1 + HasEquippedItem(shadow_satyrs_walk) * 0.5 } and SubtletyStealthCdsCdPostConditions()
 }
 
 ### actions.stealth_cds
