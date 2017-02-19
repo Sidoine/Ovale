@@ -8,6 +8,7 @@ do
 	local code = [[
 # Druid spells and functions.
 Define(ashamanes_bite 210702)
+Define(ashamanes_energy_buff 210583)
 Define(ashamanes_frenzy 210722)
 	SpellInfo(ashamanes_frenzy cd=75 combo=3)
 	SpellAddBuff(ashamanes_frenzy bloodtalons_buff=-1)
@@ -246,6 +247,7 @@ Define(savage_roar 52610)
 	SpellInfo(savage_roar unusable=1 talent=!savage_roar_talent)
 	SpellAddBuff(savage_roar savage_roar_buff=1)
 Define(savage_roar_buff 52610)
+Define(scent_of_blood_buff 210664)
 Define(solar_empowerment_buff 164545)
 Define(shadowmeld_buff 58984)
 Define(shred 5221)
@@ -339,6 +341,7 @@ Define(wild_charge_cat 49376)
 	
 # Legendary items
 Define(ailuro_pouncers 137024)
+Define(luffa_wrappings 137056)
 Define(the_emerald_dreamcatcher 137062)
 Define(the_emerald_dreamcatcher_buff 224706)
 	SpellAddBuff(starsurge the_emerald_dreamcatcher_buff=-1)
