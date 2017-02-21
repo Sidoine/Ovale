@@ -159,6 +159,8 @@ function OvaleScripts:GetDefaultScriptName(class, specialization)
 	elseif class == "DRUID" then
 		if specialization == "restoration" then
 			name = DISABLED_NAME
+		elseif specialization == "guardian" then
+			name = "icyveins_druid_guardian"
 		end
 	elseif class == "HUNTER" then
 		local short
