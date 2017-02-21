@@ -54,8 +54,8 @@ AddFunction GuardianDefaultMainActions
 	if not BuffExpires(galactic_guardian_buff) Spell(moonfire)
 	Spell(mangle)
 	Spell(thrash_bear)
-	if DebuffStacks(thrash_bear_debuff) >= 2 Spell(pulverize)
-	if DebuffRefreshable(moonfire_debuff) Spell(moonfire)
+	if target.DebuffStacks(thrash_bear_debuff) >= 3 Spell(pulverize)
+	if target.DebuffRefreshable(moonfire_debuff) Spell(moonfire)
 	Spell(swipe_bear)
 	if RageDeficit() <= 20 Spell(maul)
 }
@@ -71,8 +71,8 @@ AddFunction GuardianDefaultAoEActions
 	if not BuffExpires(galactic_guardian_buff) Spell(moonfire)
 	Spell(thrash_bear)
 	Spell(mangle)
-	if DebuffStacks(thrash_bear_debuff) >= 2 Spell(pulverize)
-	if Enemies() <= 3 and DebuffRefreshable(moonfire_debuff) Spell(moonfire)
+	if target.DebuffStacks(thrash_bear_debuff) >= 2 Spell(pulverize)
+	if Enemies() <= 3 and target.DebuffRefreshable(moonfire_debuff) Spell(moonfire)
 	Spell(swipe_bear)
 	if RageDeficit() <= 20 Spell(maul)
 }
