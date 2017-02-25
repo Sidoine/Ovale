@@ -609,7 +609,7 @@ AddFunction EnhancementGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(stormstrike)
 	{
-		if target.Distance() >= 8 and target.Distance() <= 25 Spell(feral_lunge)
+		if target.InRange(feral_lunge) Spell(feral_lunge)
 		Texture(misc_arrowlup help=L(not_in_melee_range))
 	}
 }
