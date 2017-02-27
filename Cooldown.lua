@@ -288,6 +288,12 @@ function OvaleCooldown:InitializeState(state)
 	state.cd = {}
 end
 
+function OvaleCooldown:ResetState(state)
+	for spellId, cd in pairs(state.cd) do
+		cd.serial = nil
+	end
+end
+
 -- Release state resources prior to removing from the simulator.
 function OvaleCooldown:CleanState(state)
 	for spellId, cd in pairs(state.cd) do
@@ -344,7 +350,7 @@ statePrototype.ApplyCooldown = function(state, spellId, targetGUID, atTime)
 		end
 	end
 
-	state:Log("Spell %d cooldown info: start=%f, duration=%f", spellId, cd.start, cd.duration)
+	state:Log("Spell %d cooldown info: start=%f, duration=%f, charges=%s", spellId, cd.start, cd.duration, cd.charges or "(nil)")
 	OvaleCooldown:StopProfiling("OvaleCooldown_state_ApplyCooldown")
 end
 
