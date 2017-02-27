@@ -184,7 +184,7 @@ function OvaleScripts:GetDefaultScriptName(class, specialization)
 		end
 	elseif class == "PRIEST" then
 		if specialization == "discipline" then
-			name = DISABLED_NAME
+			name = "icyveins_priest_discipline"
 		elseif specialization == "holy" then
 			name = DISABLED_NAME
 		end

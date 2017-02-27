@@ -2831,9 +2831,9 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
 	elseif property == "travel_time" then
 		code = format("TravelTime(%s)", name)
 	elseif property == "usable" then
-		code = format("Spell(%s)", name)
+		code = format("CanCast(%s)", name)
 	elseif property == "usable_in" then
-		code = format("Spell(%s)", name)
+		code = format("SpellCooldown(%s)", name)
 	else
 		ok = false
 	end
@@ -3240,9 +3240,9 @@ EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
 			code = format("not %sCooldown(%s) > 0", prefix, name)
 		elseif property == "charges" then
 			if parseNode.asType == "boolean" then
-				code = format("%sChargeCooldown(%s) > 0", prefix, name)
+				code = format("%sCharges(%s) > 0", prefix, name)
 			else
-				code = format("%sChargeCooldown(%s)", prefix, name)
+				code = format("%sCharges(%s)", prefix, name)
 			end
 		elseif property == "charges_fractional" then
 			code = format("%sCharges(%s count=0)", prefix, name)
@@ -4330,7 +4330,7 @@ local function InsertSupportingFunctions(child, annotation)
 			{
 				if CheckBoxOn(opt_melee_range) and not target.InRange(chaos_strike) 
 				{
-					Spell(felblade)
+					if target.InRange(felblade) Spell(felblade)
 					Texture(misc_arrowlup help=L(not_in_melee_range))
 				}
 			}
