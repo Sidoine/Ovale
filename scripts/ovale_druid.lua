@@ -20,7 +20,6 @@ AddFunction GuardianHealMe
 {
 	if IncomingDamage(5) / MaxHealth() >= 0.5 Spell(frenzied_regeneration)
 	if HealthPercent() <= 40 Spell(frenzied_regeneration)
-	
 	if IncomingDamage(5) / MaxHealth() >= 0.3 Spell(lunar_beam)
 }
 
