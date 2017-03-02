@@ -28,22 +28,27 @@ AddFunction BrewmasterHealMe
 	if (HealthPercent() <= 100 - (15 * 2.6)) Spell(healing_elixir)
 }
 
+AddFunction StaggerPercentage
+{
+	StaggerRemaining() / MaxHealth()
+}
+
 AddFunction BrewmasterDefaultShortCDActions
 {
 	# always purify red stagger
-	if (DebuffPresent(heavy_stagger_debuff) and SpellCharges(purifying_brew) > 0) Spell(purifying_brew)
+	if (StaggerPercentage() > 100 and SpellCharges(purifying_brew) > 0) Spell(purifying_brew)
 	# use black_ox_brew when at 0 charges but delay it when a charge is about to come off cd
-	if ((SpellCharges(purifying_brew) == 0) and (SpellChargeCooldown(purifying_brew) > 2 or DebuffPresent(heavy_stagger_debuff))) Spell(black_ox_brew)
+	if ((SpellCharges(purifying_brew) == 0) and (SpellChargeCooldown(purifying_brew) > 2 or StaggerPercentage() > 100)) Spell(black_ox_brew)
 	# heal me
 	BrewmasterHealMe()
 	
 	# range check
 	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
 
-	unless DebuffPresent(heavy_stagger_debuff) or BrewmasterHealMe() or (StaggerRemaining() == 0 and not Talent(special_delivery_talent))
+	unless StaggerPercentage() > 100 or BrewmasterHealMe() or (StaggerRemaining() == 0 and not Talent(special_delivery_talent))
 	{
-		# purify moderate stagger
-		if (DebuffPresent(moderate_stagger_debuff) and (not Talent(elusive_dance_talent) or BuffExpires(elusive_dance_buff)) and (BuffRemaining(ironskin_brew_buff) > SpellRechargeDuration(ironskin_brew))) Spell(purifying_brew)
+		# purify moderate or heavy stagger when we have enough ISB
+		if ((DebuffPresent(moderate_stagger_debuff) or DebuffPresent(heavy_stagger_debuff)) and (not Talent(elusive_dance_talent) or BuffExpires(elusive_dance_buff)) and (BuffRemaining(ironskin_brew_buff) > 2*SpellRechargeDuration(ironskin_brew))) Spell(purifying_brew)
 		# always keep 1 charge unless black_ox_brew is coming off cd
 		if (SpellCharges(ironskin_brew) > 1 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3))
 		{
