@@ -14,15 +14,54 @@ AddCheckBox(opt_interrupt L(interrupt) default specialization=protection)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=protection)
 AddCheckBox(opt_legendary_ring_tank ItemName(legendary_ring_bonus_armor) default specialization=protection)
 
+AddFunction ProtectionSelfHealCondition
+{
+	(HealthPercent() < 40)
+		or (IncomingDamage(10) < MaxHealth() * 1.25 and HealthPercent() < 55 and Talent(righteous_protector_talent))
+		or (IncomingDamage(13) < MaxHealth() * 1.6 and HealthPercent() < 55)
+		or (IncomingDamage(6) < MaxHealth() * 0.7 and HealthPercent() < 65 and Talent(righteous_protector_talent))
+		or (IncomingDamage(9) < MaxHealth() * 1.2 and HealthPercent() < 55)
+		or (HealthPercent() < 60 and HasEquippedItem(saruans_resolve) and (SpellCharges(light_of_the_protector) >= 2 or SpellCharges(hand_of_the_protector) >= 2))
+}
+
+AddFunction ProtectionHasProtectiveCooldown
+{
+	target.DebuffPresent(eye_of_tyr_debuff) or BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff)
+}
+
+AddFunction ProtectionCooldownTreshold
+{
+	HealthPercent() <= 100 and not ProtectionHasProtectiveCooldown()
+}
+
 AddFunction ProtectionGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(shield_of_the_righteous) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
+AddFunction ProtectionDefaultShortCDActions
+{
+	if ProtectionSelfHealCondition() Spell(light_of_the_protector)
+	
+	#bastion_of_light,if=talent.bastion_of_light.enabled&action.shield_of_the_righteous.charges<1
+	if Talent(bastion_of_light_talent) and Charges(shield_of_the_righteous) < 1 Spell(bastion_of_light)
+	#seraphim,if=talent.seraphim.enabled&action.shield_of_the_righteous.charges>=2
+	if Talent(seraphim_talent) and Charges(shield_of_the_righteous) >= 2 Spell(seraphim)
+
+	ProtectionGetInMeleeRange()
+	
+	#shield_of_the_righteous,if=(!talent.seraphim.enabled|action.shield_of_the_righteous.charges>2)&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
+	if { not Talent(seraphim_talent) or Charges(shield_of_the_righteous) > 2 } and not ProtectionHasProtectiveCooldown() Spell(shield_of_the_righteous)
+	#shield_of_the_righteous,if=(talent.bastion_of_light.enabled&talent.seraphim.enabled&buff.seraphim.up&cooldown.bastion_of_light.up)&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
+	if Talent(bastion_of_light_talent) and Talent(seraphim_talent) and BuffPresent(seraphim_buff) and not SpellCooldown(bastion_of_light) > 0 and not ProtectionHasProtectiveCooldown() Spell(shield_of_the_righteous)
+	#shield_of_the_righteous,if=(talent.bastion_of_light.enabled&!talent.seraphim.enabled&cooldown.bastion_of_light.up)&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
+	if Talent(bastion_of_light_talent) and not Talent(seraphim_talent) and not SpellCooldown(bastion_of_light) > 0 and not ProtectionHasProtectiveCooldown() Spell(shield_of_the_righteous)
+}
+
 AddFunction ProtectionDefaultMainActions
 {
 	if Speed() == 0 and HasEquippedItem(heathcliffs_immortality) and not BuffPresent(consecration_buff) Spell(consecration)
-	if Charges(shield_of_the_righteous) <= 2*Talent(seraphim_talent) and not BuffPresent(shield_of_the_righteous_buff) and ProtectionCooldownTreshold() and (not Talent(bastion_of_light_talent) or SpellCooldown(bastion_of_light) == 0) Spell(eye_of_tyr)
+	if Charges(shield_of_the_righteous) <= 2*Talent(seraphim_talent) and not BuffPresent(shield_of_the_righteous_buff) and ProtectionCooldownTreshold() and (not Talent(bastion_of_light_talent) or SpellCooldown(bastion_of_light) > 0) Spell(eye_of_tyr)
 	if Talent(blessed_hammer_talent) Spell(blessed_hammer)
 	Spell(judgment)
 	if Talent(crusaders_judgment_talent) and BuffPresent(grand_crusader_buff) Spell(avengers_shield)
@@ -44,42 +83,6 @@ AddFunction ProtectionDefaultAoEActions
 	Spell(blinding_light)
 	if Speed() == 0 Spell(consecration)
 	Spell(hammer_of_the_righteous)
-}
-
-AddFunction ProtectionDefaultShortCDActions
-{
-	#bastion_of_light,if=talent.bastion_of_light.enabled&action.shield_of_the_righteous.charges<1
-	if Talent(bastion_of_light_talent) and Charges(shield_of_the_righteous) < 1 Spell(bastion_of_light)
-	#seraphim,if=talent.seraphim.enabled&action.shield_of_the_righteous.charges>=2
-	if Talent(seraphim_talent) and Charges(shield_of_the_righteous) >= 2 Spell(seraphim)
-	
-	ProtectionGetInMeleeRange()
-	
-	#shield_of_the_righteous,if=(!talent.seraphim.enabled|action.shield_of_the_righteous.charges>2)&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
-	if { not Talent(seraphim_talent) or Charges(shield_of_the_righteous) > 2 } and ProtectionCooldownTreshold() Spell(shield_of_the_righteous)
-	#shield_of_the_righteous,if=(talent.bastion_of_light.enabled&talent.seraphim.enabled&buff.seraphim.up&cooldown.bastion_of_light.up)&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
-	if Talent(bastion_of_light_talent) and Talent(seraphim_talent) and BuffPresent(seraphim_buff) and not SpellCooldown(bastion_of_light) > 0 and ProtectionCooldownTreshold() Spell(shield_of_the_righteous)
-	#shield_of_the_righteous,if=(talent.bastion_of_light.enabled&!talent.seraphim.enabled&cooldown.bastion_of_light.up)&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
-	if Talent(bastion_of_light_talent) and not Talent(seraphim_talent) and not SpellCooldown(bastion_of_light) > 0 and ProtectionCooldownTreshold() Spell(shield_of_the_righteous)
-	#light_of_the_protector,if=(health.pct<40)
-	if HealthPercent() < 40 Spell(light_of_the_protector)
-	#hand_of_the_protector,if=(health.pct<40)
-	if HealthPercent() < 40 Spell(hand_of_the_protector)
-	#light_of_the_protector,if=(incoming_damage_10000ms<health.max*1.25)&health.pct<55&talent.righteous_protector.enabled
-	if IncomingDamage(10) < MaxHealth() * 1.25 and HealthPercent() < 55 and Talent(righteous_protector_talent) Spell(light_of_the_protector)
-	#light_of_the_protector,if=(incoming_damage_13000ms<health.max*1.6)&health.pct<55
-	if IncomingDamage(13) < MaxHealth() * 1.6 and HealthPercent() < 55 Spell(light_of_the_protector)
-	#hand_of_the_protector,if=(incoming_damage_6000ms<health.max*0.7)&health.pct<65&talent.righteous_protector.enabled
-	if IncomingDamage(6) < MaxHealth() * 0.7 and HealthPercent() < 65 and Talent(righteous_protector_talent) Spell(hand_of_the_protector)
-	#hand_of_the_protector,if=(incoming_damage_9000ms<health.max*1.2)&health.pct<55
-	if IncomingDamage(9) < MaxHealth() * 1.2 and HealthPercent() < 55 Spell(hand_of_the_protector)
-}
-
-AddFunction ProtectionCooldownTreshold
-{
-	HealthPercent() <= 100 
-		and not { target.DebuffPresent(eye_of_tyr_debuff) or BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff) }
-		and not { Talent(seraphim_talent) and BuffPresent(seraphim_buff) }
 }
 
 AddCheckBox(opt_avenging_wrath SpellName(avenging_wrath_melee) default specialization=protection)
