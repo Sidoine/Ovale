@@ -24,14 +24,11 @@ AddCheckBox(opt_time_warp SpellName(time_warp) specialization=arcane)
 
 AddFunction ArcaneInterruptActions
 {
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
 	{
-		Spell(counterspell)
-		if not target.Classification(worldboss)
-		{
-			Spell(arcane_torrent_mana)
-			if target.InRange(quaking_palm) Spell(quaking_palm)
-		}
+		if target.InRange(counterspell) and target.IsInterruptible() Spell(counterspell)
+		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_mana)
+		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
 	}
 }
 
@@ -616,14 +613,11 @@ AddCheckBox(opt_time_warp SpellName(time_warp) specialization=fire)
 
 AddFunction FireInterruptActions
 {
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
 	{
-		Spell(counterspell)
-		if not target.Classification(worldboss)
-		{
-			Spell(arcane_torrent_mana)
-			if target.InRange(quaking_palm) Spell(quaking_palm)
-		}
+		if target.InRange(counterspell) and target.IsInterruptible() Spell(counterspell)
+		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_mana)
+		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
 	}
 }
 
@@ -1130,14 +1124,11 @@ AddCheckBox(opt_time_warp SpellName(time_warp) specialization=frost)
 
 AddFunction FrostInterruptActions
 {
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
 	{
-		Spell(counterspell)
-		if not target.Classification(worldboss)
-		{
-			Spell(arcane_torrent_mana)
-			if target.InRange(quaking_palm) Spell(quaking_palm)
-		}
+		if target.InRange(counterspell) and target.IsInterruptible() Spell(counterspell)
+		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_mana)
+		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
 	}
 }
 

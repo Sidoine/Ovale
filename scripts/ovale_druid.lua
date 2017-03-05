@@ -547,6 +547,18 @@ Include(ovale_druid_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=feral)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=feral)
 
+AddFunction FeralInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+	{
+		if target.InRange(skull_bash) and target.IsInterruptible() Spell(skull_bash)
+		if target.InRange(mighty_bash) and not target.Classification(worldboss) Spell(mighty_bash)
+		if target.Distance(less 15) and not target.Classification(worldboss) Spell(typhoon)
+		if target.InRange(maim) and not target.Classification(worldboss) Spell(maim)
+		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+	}
+}
+
 AddFunction FeralUseItemActions
 {
 	Item(Trinket0Slot usable=1)
@@ -559,21 +571,6 @@ AddFunction FeralGetInMeleeRange
 	{
 		if target.InRange(wild_charge) Spell(wild_charge)
 		Texture(misc_arrowlup help=L(not_in_melee_range))
-	}
-}
-
-AddFunction FeralInterruptActions
-{
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-	{
-		if target.InRange(skull_bash) Spell(skull_bash)
-		if not target.Classification(worldboss)
-		{
-			if target.InRange(mighty_bash) Spell(mighty_bash)
-			Spell(typhoon)
-			if target.InRange(maim) Spell(maim)
-			Spell(war_stomp)
-		}
 	}
 }
 
