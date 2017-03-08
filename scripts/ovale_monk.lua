@@ -30,7 +30,7 @@ AddFunction BrewmasterHealMe
 
 AddFunction StaggerPercentage
 {
-	StaggerRemaining() / MaxHealth()
+	StaggerRemaining() / MaxHealth() * 100
 }
 
 AddFunction BrewmasterDefaultShortCDActions
