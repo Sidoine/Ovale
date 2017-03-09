@@ -33,6 +33,11 @@ AddFunction StaggerPercentage
 	StaggerRemaining() / MaxHealth() * 100
 }
 
+AddFunction BrewmasterRangeCheck
+{
+	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
+}
+
 AddFunction BrewmasterDefaultShortCDActions
 {
 	# always purify red stagger
@@ -43,7 +48,7 @@ AddFunction BrewmasterDefaultShortCDActions
 	BrewmasterHealMe()
 	
 	# range check
-	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
+	BrewmasterRangeCheck()
 
 	unless StaggerPercentage() > 100 or BrewmasterHealMe() or (StaggerRemaining() == 0 and not Talent(special_delivery_talent))
 	{
