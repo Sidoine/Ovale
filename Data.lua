@@ -26,6 +26,49 @@ local INFINITY = math.huge
 -- Handler is invoked as handler(state, name, tokens, index, targetGUID).
 local self_requirement = {}
 
+local BLOODELF_CLASSES = { 
+	["DEATHKNIGHT"] = true, 
+	["DEMONHUNTER"] = true,
+	["DRUID"] = false,
+	["HUNTER"] = true, 
+	["MAGE"] = true, 
+	["MONK"] = true, 
+	["PALADIN"] = true, 
+	["PRIEST"] = true, 
+	["ROGUE"] = true, 
+	["SHAMAN"] = false,
+	["WARLOCK"] = true, 
+	["WARRIOR"] = true,
+}
+local PANDAREN_CLASSES = { 
+	["DEATHKNIGHT"] = false, 
+	["DEMONHUNTER"] = false,
+	["DRUID"] = false,
+	["HUNTER"] = true, 
+	["MAGE"] = true, 
+	["MONK"] = true, 
+	["PALADIN"] = false, 
+	["PRIEST"] = true, 
+	["ROGUE"] = true, 
+	["SHAMAN"] = true,
+	["WARLOCK"] = false, 
+	["WARRIOR"] = true,
+}
+local TAUREN_CLASSES = { 
+	["DEATHKNIGHT"] = true, 
+	["DEMONHUNTER"] = false,
+	["DRUID"] = true,
+	["HUNTER"] = true, 
+	["MAGE"] = false, 
+	["MONK"] = true, 
+	["PALADIN"] = true, 
+	["PRIEST"] = true, 
+	["ROGUE"] = false, 
+	["SHAMAN"] = true,
+	["WARLOCK"] = false, 
+	["WARRIOR"] = true,
+}
+
 local STAT_NAMES = { "agility", "bonus_armor", "critical_strike", "haste", "intellect", "mastery", "multistrike", "spirit", "spellpower", "strength", "versatility" }
 local STAT_SHORTNAME = {
 	agility = "agi",
@@ -42,6 +85,10 @@ local STAT_USE_NAMES = { "trinket_proc", "trinket_stacking_proc", "trinket_stack
 OvaleData.STAT_NAMES = STAT_NAMES
 OvaleData.STAT_SHORTNAME = STAT_SHORTNAME
 OvaleData.STAT_USE_NAMES = STAT_USE_NAMES
+
+OvaleData.BLOODELF_CLASSES = BLOODELF_CLASSES
+OvaleData.PANDAREN_CLASSES = PANDAREN_CLASSES
+OvaleData.TAUREN_CLASSES = TAUREN_CLASSES
 
 -- Item information from the current script (by item ID).
 OvaleData.itemInfo = {}

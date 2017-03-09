@@ -468,6 +468,19 @@ AddFunction rtb_reroll
 AddCheckBox(opt_interrupt L(interrupt) default specialization=outlaw)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=outlaw)
 
+AddFunction OutlawInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+	{
+		if target.InRange(kick) and target.IsInterruptible() Spell(kick)
+		if target.InRange(cheap_shot) and not target.Classification(worldboss) Spell(cheap_shot)
+		if target.InRange(between_the_eyes) and not target.Classification(worldboss) and ComboPoints() >= 1 Spell(between_the_eyes)
+		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_energy)
+		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+		if target.InRange(gouge) and not target.Classification(worldboss) Spell(gouge)
+	}
+}
+
 AddFunction OutlawUseItemActions
 {
 	Item(Trinket0Slot usable=1)
@@ -480,24 +493,6 @@ AddFunction OutlawGetInMeleeRange
 	{
 		Spell(shadowstep)
 		Texture(misc_arrowlup help=L(not_in_melee_range))
-	}
-}
-
-AddFunction OutlawInterruptActions
-{
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-	{
-		if target.InRange(kick) Spell(kick)
-		if not target.Classification(worldboss)
-		{
-			if target.InRange(cheap_shot) Spell(cheap_shot)
-			if target.InRange(deadly_throw) and ComboPoints() == 5 Spell(deadly_throw)
-			if target.InRange(between_the_eyes) Spell(between_the_eyes)
-			if target.InRange(kidney_shot) Spell(kidney_shot)
-			Spell(arcane_torrent_energy)
-			if target.InRange(gouge) Spell(gouge)
-			if target.InRange(quaking_palm) Spell(quaking_palm)
-		}
 	}
 }
 
@@ -940,7 +935,6 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # cheap_shot
 # curse_of_the_dreadblades
 # curse_of_the_dreadblades_buff
-# deadly_throw
 # death_from_above
 # death_from_above_talent
 # deeper_stratagem_talent
@@ -954,7 +948,6 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # hidden_blade_buff
 # jolly_roger_buff
 # kick
-# kidney_shot
 # killing_spree
 # marked_for_death
 # opportunity_buff

@@ -21,6 +21,17 @@ Include(ovale_warrior_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=arms)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=arms)
 
+AddFunction ArmsInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+	{
+		if target.InRange(pummel) and target.IsInterruptible() Spell(pummel)
+		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_rage)
+		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+	}
+}
+
 AddFunction ArmsUseItemActions
 {
 	Item(Trinket0Slot usable=1)
@@ -34,20 +45,6 @@ AddFunction ArmsGetInMeleeRange
 		if target.InRange(charge) Spell(charge)
 		if target.InRange(charge) Spell(heroic_leap)
 		if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
-	}
-}
-
-AddFunction ArmsInterruptActions
-{
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-	{
-		if target.InRange(pummel) Spell(pummel)
-		if not target.Classification(worldboss)
-		{
-			Spell(arcane_torrent_rage)
-			if target.InRange(quaking_palm) Spell(quaking_palm)
-			Spell(war_stomp)
-		}
 	}
 }
 
@@ -531,7 +528,6 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # focused_rage_buff
 # focused_rage_talent
 # heroic_leap
-# heroic_throw
 # mortal_strike
 # overpower
 # overpower_buff
@@ -571,6 +567,17 @@ Include(ovale_warrior_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=fury)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=fury)
 
+AddFunction FuryInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+	{
+		if target.InRange(pummel) and target.IsInterruptible() Spell(pummel)
+		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_rage)
+		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+	}
+}
+
 AddFunction FuryUseItemActions
 {
 	Item(Trinket0Slot usable=1)
@@ -584,20 +591,6 @@ AddFunction FuryGetInMeleeRange
 		if target.InRange(charge) Spell(charge)
 		if target.InRange(charge) Spell(heroic_leap)
 		if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
-	}
-}
-
-AddFunction FuryInterruptActions
-{
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-	{
-		if target.InRange(pummel) Spell(pummel)
-		if not target.Classification(worldboss)
-		{
-			Spell(arcane_torrent_rage)
-			if target.InRange(quaking_palm) Spell(quaking_palm)
-			Spell(war_stomp)
-		}
 	}
 }
 
@@ -1102,7 +1095,6 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # fujiedas_fury_buff
 # furious_slash
 # heroic_leap
-# heroic_throw
 # inner_rage_talent
 # juggernaut
 # juggernaut_buff
@@ -1142,6 +1134,17 @@ Include(ovale_warrior_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=protection)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=protection)
 
+AddFunction ProtectionInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+	{
+		if target.InRange(pummel) and target.IsInterruptible() Spell(pummel)
+		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_rage)
+		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+	}
+}
+
 AddFunction ProtectionGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range)
@@ -1149,20 +1152,6 @@ AddFunction ProtectionGetInMeleeRange
 		if target.InRange(charge) Spell(charge)
 		if target.InRange(charge) Spell(heroic_leap)
 		if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
-	}
-}
-
-AddFunction ProtectionInterruptActions
-{
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-	{
-		if target.InRange(pummel) Spell(pummel)
-		if not target.Classification(worldboss)
-		{
-			Spell(arcane_torrent_rage)
-			if target.InRange(quaking_palm) Spell(quaking_palm)
-			Spell(war_stomp)
-		}
 	}
 }
 
@@ -1397,7 +1386,6 @@ AddIcon checkbox=opt_warrior_protection_aoe help=cd specialization=protection
 # devastate
 # heavy_repercussions_talent
 # heroic_leap
-# heroic_throw
 # ignore_pain
 # intercept
 # last_stand

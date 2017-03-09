@@ -140,6 +140,16 @@ AddCheckBox(opt_interrupt L(interrupt) default specialization=frost)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=frost)
 AddCheckBox(opt_legendary_ring_strength ItemName(legendary_ring_strength) default specialization=frost)
 
+AddFunction FrostInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+	{
+		if target.InRange(mind_freeze) and target.IsInterruptible() Spell(mind_freeze)
+		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_runicpower)
+		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+	}
+}
+
 AddFunction FrostUseItemActions
 {
 	Item(Trinket0Slot usable=1)
@@ -149,22 +159,6 @@ AddFunction FrostUseItemActions
 AddFunction FrostGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(death_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
-}
-
-AddFunction FrostInterruptActions
-{
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-	{
-		if target.InRange(mind_freeze) Spell(mind_freeze)
-		if not target.Classification(worldboss)
-		{
-			if target.InRange(asphyxiate) Spell(asphyxiate)
-			if target.InRange(strangulate) Spell(strangulate)
-			Spell(arcane_torrent_runicpower)
-			if target.InRange(quaking_palm) Spell(quaking_palm)
-			Spell(war_stomp)
-		}
-	}
 }
 
 ### actions.default
@@ -612,7 +606,6 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # 132459
 # 140806
 # arcane_torrent_runicpower
-# asphyxiate
 # augmentation
 # berserking
 # blood_fury_ap
@@ -646,7 +639,6 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # perseverance_of_the_ebon_martyr_debuff
 # pillar_of_frost
 # pillar_of_frost_buff
-# quaking_palm
 # razorice_debuff
 # remorseless_winter
 # remorseless_winter_buff
@@ -655,7 +647,6 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # runic_attenuation_talent
 # shattering_strikes_talent
 # sindragosas_fury
-# strangulate
 # unholy_strength_buff
 # war_stomp
 ]]
@@ -679,6 +670,17 @@ Include(ovale_deathknight_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=unholy)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=unholy)
 
+AddFunction UnholyInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+	{
+		if target.InRange(mind_freeze) and target.IsInterruptible() Spell(mind_freeze)
+		if target.InRange(asphyxiate) and not target.Classification(worldboss) Spell(asphyxiate)
+		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_runicpower)
+		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+	}
+}
+
 AddFunction UnholyUseItemActions
 {
 	Item(Trinket0Slot usable=1)
@@ -688,22 +690,6 @@ AddFunction UnholyUseItemActions
 AddFunction UnholyGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(death_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
-}
-
-AddFunction UnholyInterruptActions
-{
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-	{
-		if target.InRange(mind_freeze) Spell(mind_freeze)
-		if not target.Classification(worldboss)
-		{
-			if target.InRange(asphyxiate) Spell(asphyxiate)
-			if target.InRange(strangulate) Spell(strangulate)
-			Spell(arcane_torrent_runicpower)
-			if target.InRange(quaking_palm) Spell(quaking_palm)
-			Spell(war_stomp)
-		}
-	}
 }
 
 ### actions.default
@@ -1314,13 +1300,11 @@ AddIcon checkbox=opt_deathknight_unholy_aoe help=cd specialization=unholy
 # necrosis_buff
 # necrosis_talent
 # outbreak
-# quaking_palm
 # raise_dead
 # scourge_strike
 # shadow_infusion_talent
 # soul_reaper_unholy
 # soul_reaper_unholy_debuff
-# strangulate
 # sudden_doom_buff
 # summon_gargoyle
 # unholy_strength_buff

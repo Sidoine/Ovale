@@ -234,24 +234,22 @@ AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=windwalker)
 AddCheckBox(opt_chi_burst SpellName(chi_burst) default specialization=windwalker)
 AddCheckBox(opt_storm_earth_and_fire SpellName(storm_earth_and_fire) specialization=windwalker)
 
+AddFunction WindwalkerInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+	{
+		if target.InRange(spear_hand_strike) and target.IsInterruptible() Spell(spear_hand_strike)
+		if target.Distance(less 5) and not target.Classification(worldboss) Spell(leg_sweep)
+		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_chi)
+		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+		if target.InRange(paralysis) and not target.Classification(worldboss) Spell(paralysis)
+	}
+}
+
 AddFunction WindwalkerGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
-}
-
-AddFunction WindwalkerInterruptActions
-{
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-	{
-		if target.InRange(spear_hand_strike) Spell(spear_hand_strike)
-		if not target.Classification(worldboss)
-		{
-			if target.InRange(paralysis) Spell(paralysis)
-			Spell(arcane_torrent_chi)
-			if target.InRange(quaking_palm) Spell(quaking_palm)
-			Spell(war_stomp)
-		}
-	}
 }
 
 ### actions.default
@@ -726,6 +724,7 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # gale_burst
 # hidden_masters_forbidden_touch
 # invoke_xuen
+# leg_sweep
 # paralysis
 # quaking_palm
 # rising_sun_kick

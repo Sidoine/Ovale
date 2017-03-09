@@ -214,25 +214,22 @@ AddCheckBox(opt_interrupt L(interrupt) default specialization=havoc)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=havoc)
 AddCheckBox(opt_meta_only_during_boss L(meta_only_during_boss) default specialization=havoc)
 
+AddFunction HavocInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+	{
+		if target.InRange(consume_magic) and target.IsInterruptible() Spell(consume_magic)
+		if target.InRange(fel_eruption) and not target.Classification(worldboss) Spell(fel_eruption)
+		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_dh)
+		if target.Distance(less 8) and not target.Classification(worldboss) Spell(chaos_nova)
+		if target.InRange(imprison) and not target.Classification(worldboss) and target.CreatureType(Demon Humanoid Beast) Spell(imprison)
+	}
+}
+
 AddFunction HavocUseItemActions
 {
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
-}
-
-AddFunction HavocInterruptActions
-{
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-	{
-		if target.InRange(consume_magic) Spell(consume_magic)
-		if not target.Classification(worldboss)
-		{
-			if target.Distance(less 8) Spell(arcane_torrent_dh)
-			if target.Distance(less 8) Spell(chaos_nova)
-			Spell(fel_eruption)
-			if target.CreatureType(Demon Humanoid Beast) Spell(imprison)
-		}
-	}
 }
 
 AddFunction HavocGetInMeleeRange
@@ -506,6 +503,7 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # chaos_blades_buff
 # chaos_blades_talent
 # chaos_cleave_talent
+# chaos_nova
 # chaos_strike
 # consume_magic
 # death_sweep
@@ -558,31 +556,24 @@ Include(ovale_demonhunter_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=vengeance)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=vengeance)
 
+AddFunction VengeanceInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+	{
+		if target.InRange(consume_magic) and target.IsInterruptible() Spell(consume_magic)
+		if target.InRange(fel_eruption) and not target.Classification(worldboss) Spell(fel_eruption)
+		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_dh)
+		if target.IsInterruptible() and not target.Classification(worldboss) and not SigilCharging(silence misery chains) and target.RemainingCastTime() >= 2 - Talent(quickened_sigils_talent) + GCDRemaining() Spell(sigil_of_silence)
+		if not target.Classification(worldboss) and not SigilCharging(silence misery chains) and target.RemainingCastTime() >= 2 - Talent(quickened_sigils_talent) + GCDRemaining() Spell(sigil_of_misery)
+		if not target.Classification(worldboss) and not SigilCharging(silence misery chains) and target.RemainingCastTime() >= 2 - Talent(quickened_sigils_talent) + GCDRemaining() Spell(sigil_of_chains)
+		if target.InRange(imprison) and not target.Classification(worldboss) and target.CreatureType(Demon Humanoid Beast) Spell(imprison)
+	}
+}
+
 AddFunction VengeanceUseItemActions
 {
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
-}
-
-AddFunction VengeanceInterruptActions
-{
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-	{
-		if target.InRange(consume_magic) Spell(consume_magic)
-		if not target.Classification(worldboss)
-		{
-			unless SigilCharging(silence misery chains)
-			{
-				if target.RemainingCastTime() >= 2 or target.RemainingCastTime() >= 1 and Talent(quickened_sigils_talent) Spell(sigil_of_silence)
-				if target.Distance(less 8) Spell(arcane_torrent_dh)
-				Spell(sigil_of_misery)
-				Spell(fel_eruption)
-				if target.CreatureType(Demon) Spell(imprison)
-				Spell(sigil_of_chains)
-				if target.IsTargetingPlayer() Spell(empower_wards)
-			}
-		}
-	}
 }
 
 AddFunction VengeanceGetInMeleeRange
