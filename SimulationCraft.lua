@@ -4414,7 +4414,7 @@ local function InsertInterruptFunctions(child, annotation)
 	if annotation.wind_shear == "SHAMAN" then
 		tinsert(interrupts, {name = "wind_shear", interrupt=1, onBoss=1, order=10})
 		tinsert(interrupts, {name = "sundering", knockback=1, onBoss=0, order=20, range="target.Distance(less 5)"})
-		tinsert(interrupts, {name = "lightning_surge_totem", stun=1, onBoss=0, order=30, range="target.RemainingCastTime() > 2"})
+		tinsert(interrupts, {name = "lightning_surge_totem", stun=1, onBoss=0, order=30, range="", extraCondition="target.RemainingCastTime() > 2"})
 		tinsert(interrupts, {name = "hex", cc=1, onBoss=0, order=100, extraCondition="target.RemainingCastTime() > CastTime(hex) + GCDRemaining() and target.CreatureType(Humanoid Beast)"})
 	end
 	if annotation.pummel == "WARRIOR" then
