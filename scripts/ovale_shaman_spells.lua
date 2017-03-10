@@ -372,6 +372,7 @@ Define(power_of_the_maelstrom_buff 191877)
 
 # Artifact traits
 Define(alpha_wolf 198434)
+Define(swelling_maelstrom 238105)
 
 Define(hot_hand_talent 2)
 Define(boulderfist_talent 3)

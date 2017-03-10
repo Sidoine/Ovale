@@ -69,7 +69,12 @@ Define(cooldown_reduction_tank_buff 146025)
 
 Define(coagulated_nightwell_residue 137400)
 	ItemRequire(coagulated_nightwell_residue unusable 1=buff,!nightwell_energy_buff)
+Define(convergence_of_fates 140806)
+Define(draught_of_souls 140808)
+Define(gnawed_thumb_ring 134526)
+	ItemInfo(gnawed_thumb_ring cd=180)
 Define(nightwell_energy_buff 214572)
+
 
 ###
 ### Legendary Meta Gem

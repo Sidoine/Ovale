@@ -267,8 +267,11 @@ Define(winters_chill_debuff 157997) # TODO ???
 
 # Talents
 Define(artic_gale_talent 18)
+Define(charged_up_talent 11)
+Define(glacial_spike_talent 20)
 Define(quickening_talent 20)
 Define(rune_on_power_talent 8)
+Define(splitting_ice_talent 12)
 Define(summon_arcane_familiar 205022)
 	SpellInfo(summon_arcane_familiar cd=10)
 Define(unstable_magic_talent 17)

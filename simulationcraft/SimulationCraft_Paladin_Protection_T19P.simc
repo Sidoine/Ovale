@@ -25,6 +25,7 @@ actions.precombat+=/potion,name=unbending_potion
 
 # Executed every time the actor is available.
 actions=auto_attack
+actions+=/rebuke
 actions+=/use_item,name=shivermaws_jawbone
 actions+=/blood_fury
 actions+=/berserking
