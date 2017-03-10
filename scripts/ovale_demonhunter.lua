@@ -355,6 +355,8 @@ AddFunction HavocDefaultShortCdPostConditions
 
 AddFunction HavocDefaultCdActions
 {
+	#consume_magic
+	HavocInterruptActions()
 	#variable,name=waiting_for_nemesis,value=!(!talent.nemesis.enabled|cooldown.nemesis.ready|cooldown.nemesis.remains>target.time_to_die|cooldown.nemesis.remains>60)
 	#variable,name=waiting_for_chaos_blades,value=!(!talent.chaos_blades.enabled|cooldown.chaos_blades.ready|cooldown.chaos_blades.remains>target.time_to_die|cooldown.chaos_blades.remains>60)
 	#variable,name=pooling_for_meta,value=cooldown.metamorphosis.remains<6&fury.deficit>30&!talent.demonic.enabled&(!variable.waiting_for_nemesis|cooldown.nemesis.remains<10)&(!variable.waiting_for_chaos_blades|cooldown.chaos_blades.remains<6)
@@ -363,12 +365,6 @@ AddFunction HavocDefaultCdActions
 	#variable,name=pooling_for_chaos_strike,value=talent.chaos_cleave.enabled&fury.deficit>40&!raid_event.adds.up&raid_event.adds.in<2*gcd
 	#call_action_list,name=cooldown,if=gcd.remains=0
 	if not GCDRemaining() > 0 HavocCooldownCdActions()
-
-	unless not GCDRemaining() > 0 and HavocCooldownCdPostConditions() or Talent(demonic_appetite_talent) and FuryDeficit() >= 35 and { not Talent(demonic_talent) or SpellCooldown(eye_beam) > 5 } and Spell(pick_up_fragment)
-	{
-		#consume_magic
-		HavocInterruptActions()
-	}
 }
 
 AddFunction HavocDefaultCdPostConditions

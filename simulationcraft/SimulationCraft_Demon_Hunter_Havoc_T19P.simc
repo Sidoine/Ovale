@@ -28,6 +28,7 @@ actions.precombat+=/metamorphosis,if=!(talent.demon_reborn.enabled&talent.demoni
 
 # Executed every time the actor is available.
 actions=auto_attack
+actions+=/consume_magic
 actions+=/variable,name=waiting_for_nemesis,value=!(!talent.nemesis.enabled|cooldown.nemesis.ready|cooldown.nemesis.remains>target.time_to_die|cooldown.nemesis.remains>60)
 actions+=/variable,name=waiting_for_chaos_blades,value=!(!talent.chaos_blades.enabled|cooldown.chaos_blades.ready|cooldown.chaos_blades.remains>target.time_to_die|cooldown.chaos_blades.remains>60)
 # "Getting ready to use meta" conditions, this is used in a few places.
@@ -41,7 +42,6 @@ actions+=/variable,name=pooling_for_blade_dance,value=variable.blade_dance&fury-
 actions+=/variable,name=pooling_for_chaos_strike,value=talent.chaos_cleave.enabled&fury.deficit>40&!raid_event.adds.up&raid_event.adds.in<2*gcd
 actions+=/call_action_list,name=cooldown,if=gcd.remains=0
 actions+=/pick_up_fragment,if=talent.demonic_appetite.enabled&fury.deficit>=35&(!talent.demonic.enabled|cooldown.eye_beam.remains>5)
-actions+=/consume_magic
 # Vengeful Retreat backwards through the target to minimize downtime.
 actions+=/vengeful_retreat,if=(talent.prepared.enabled|talent.momentum.enabled)&buff.prepared.down&buff.momentum.down
 # Fel Rush for Momentum and for fury from Fel Mastery.
