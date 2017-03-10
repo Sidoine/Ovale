@@ -1103,6 +1103,7 @@ local function InitializeDisambiguation()
 	AddDisambiguation("soul_reaper",			"soul_reaper_frost",			"DEATHKNIGHT",	"frost")
 	AddDisambiguation("soul_reaper",			"soul_reaper_unholy",			"DEATHKNIGHT",	"unholy")
 	-- Demon Hunter
+	AddDisambiguation("arcane_torrent",			"arcane_torrent_dh",			"DEMONHUNTER")
 	AddDisambiguation("metamorphosis", 			"metamorphosis_veng", 			"DEMONHUNTER", "vengeance")
 	AddDisambiguation("metamorphosis_buff", 	"metamorphosis_veng_buff", 		"DEMONHUNTER", "vengeance")
 	AddDisambiguation("metamorphosis", 			"metamorphosis_havoc", 			"DEMONHUNTER", "havoc")
@@ -4247,32 +4248,160 @@ local function Sweep(node)
 	return isChanged, isSwept
 end
 
-local function InsertInterruptFunction(child, annotation, name)
+local function InsertInterruptFunction(child, annotation, interrupts)
 	local nodeList = annotation.astAnnotation.nodeList
+	local class = annotation.class
+	local specialization = annotation.specialization
 	local camelSpecialization = CamelSpecialization(annotation)
+	
+	local spells = interrupts or {}
+	if OvaleData.BLOODELF_CLASSES[class] then
+		tinsert(spells, {name = Disambiguate("arcane_torrent", class, specialization), interrupt=1, onBoss=1, order = 97, range = "target.Distance(less 8)"})
+	end
+	if OvaleData.PANDAREN_CLASSES[class] then
+		tinsert(spells, {name = "quaking_palm", stun=1, onBoss=0, order = 98})
+	end
+	if OvaleData.TAUREN_CLASSES[class] then
+		tinsert(spells, {name = "war_stomp", stun=1, onBoss=0, order = 99, range = "target.Distance(less 5)"})
+	end
+	
+	tsort(spells, function(a, b) return tonumber(a.order or 0) < tonumber(b.order or 0) end)
+			
+	local lines = {}
+	for _, spell in pairs(spells) do
+		-- AddSymbol
+		AddSymbol(annotation, spell.name)
+		
+		-- Build conditions
+		local conditions = {}
+		if spell.range == nil then
+			tinsert(conditions, format("target.InRange(%s)", spell.name))
+		elseif spell.range ~= "" then
+			tinsert(conditions, spell.range)
+		end
+		if spell.interrupt == 1 then
+			tinsert(conditions, "target.IsInterruptible()")
+		end
+		if spell.onBoss == 0 then
+			tinsert(conditions, "not target.Classification(worldboss)")
+		end
+		if spell.extraCondition ~= nil then
+			tinsert(conditions, spell.extraCondition)
+		end
+		
+		-- Buld line
+		local line = ""
+		
+		if #conditions > 0 then
+			line  = line .. "if " .. tconcat(conditions, " and ") .. " "
+		end
+		line = line .. format("Spell(%s)", spell.name)
+		
+		-- Add line
+		tinsert(lines, line)
+	end
+	
 	local fmt = [[
 		AddFunction %sInterruptActions
 		{
-			if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+			if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
 			{
-				Spell(%s)
-				if not target.Classification(worldboss)
-				{
-					Spell(arcane_torrent_focus)
-					if target.InRange(quaking_palm) Spell(quaking_palm)
-					Spell(war_stomp)
-				}
+				%s
 			}
 		}
 	]]
-	local code = format(fmt, camelSpecialization, name)
+	local code = format(fmt, camelSpecialization, tconcat(lines, "\n"))
 	local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 	tinsert(child, 1, node)
 	annotation.functionTag[node.name] = "cd"
-	AddSymbol(annotation, "arcane_torrent_focus")
-	AddSymbol(annotation, name)
-	AddSymbol(annotation, "quaking_palm")
-	AddSymbol(annotation, "war_stomp")
+end
+
+local function InsertInterruptFunctions(child, annotation)
+	local count = 0
+	local nodeList = annotation.astAnnotation.nodeList
+	local camelSpecialization = CamelSpecialization(annotation)
+	
+	local interrupts = {}
+	if annotation.mind_freeze == "DEATHKNIGHT" then
+		tinsert(interrupts, {name = "mind_freeze", interrupt=1, onBoss=1, order=10})
+		if annotation.specialization == "blood" or annotation.specialization == "unholy" then
+			tinsert(interrupts, {name = "asphyxiate", stun=1, onBoss=0, order=20})
+		end
+	end
+	if annotation.consume_magic == "DEMONHUNTER" then
+		tinsert(interrupts, {name = "consume_magic", interrupt=1, onBoss=1, order=10})
+		tinsert(interrupts, {name = "fel_eruption", stun=1, onBoss=0, order=20})
+		tinsert(interrupts, {name = "imprison", cc=1, onBoss=0, extraCondition="target.CreatureType(Demon Humanoid Beast)", order=999})
+		if annotation.specialization == "havoc" then 
+			tinsert(interrupts, {name = "chaos_nova", stun=1, onBoss=0, range="target.Distance(less 8)", order=100})
+		end
+		if annotation.specialization == "vengeance" then
+			tinsert(interrupts, {name = "sigil_of_silence", interrupt=1, onBoss=0, order=110, range="", extraCondition = "not SigilCharging(silence misery chains) and (target.RemainingCastTime() >= (2 - Talent(quickened_sigils_talent) + GCDRemaining()))"}) 
+			tinsert(interrupts, {name = "sigil_of_misery", disorient=1, onBoss=0, order=120, range="", extraCondition = "not SigilCharging(silence misery chains) and (target.RemainingCastTime() >= (2 - Talent(quickened_sigils_talent) + GCDRemaining()))"}) 
+			tinsert(interrupts, {name = "sigil_of_chains", pull=1, onBoss=0, order=130, range="", extraCondition = "not SigilCharging(silence misery chains) and (target.RemainingCastTime() >= (2 - Talent(quickened_sigils_talent) + GCDRemaining()))"}) 
+		end
+	end
+	if annotation.skull_bash == "DRUID" then
+		tinsert(interrupts, {name = "skull_bash", interrupt=1, onBoss=1, order=10})
+		tinsert(interrupts, {name = "mighty_bash", stun=1, onBoss=0, order=20})
+		tinsert(interrupts, {name = "typhoon", knockback=1, onBoss=0, order=30, range="target.Distance(less 15)"})
+		if annotation.specialization == "feral" then
+			tinsert(interrupts, {name = "maim", stun=1, onBoss=0, order=40})
+		end
+	end
+	if annotation.counter_shot == "HUNTER" then
+		tinsert(interrupts, {name = "counter_shot", interrupt=1, onBoss=1, order=10})
+	end
+	if annotation.muzzle == "HUNTER" then
+		tinsert(interrupts, {name = "muzzle", interrupt=1, onBoss=1, order=10})
+	end
+	if annotation.counterspell == "MAGE" then
+		tinsert(interrupts, {name = "counterspell", interrupt=1, onBoss=1, order=10})
+	end
+	if annotation.spear_hand_strike == "MONK" then
+		tinsert(interrupts, {name = "spear_hand_strike", interrupt=1, onBoss=1, order=10})
+		tinsert(interrupts, {name = "paralysis", cc=1, onBoss=0, order=999})
+		tinsert(interrupts, {name = "leg_sweep", stun=1, onBoss=0, order=30, range = "target.Distance(less 5)"})
+	end
+	if annotation.rebuke == "PALADIN" then
+		tinsert(interrupts, {name = "rebuke", interrupt=1, onBoss=1, order=10})
+		tinsert(interrupts, {name = "hammer_of_justice", stun=1, onBoss=0, order=20})
+		
+		if annotation.specialization == "protection" then
+			tinsert(interrupts, {name = "avengers_shield", interrupt=1, onBoss=1, order=15})
+			tinsert(interrupts, {name = "blinding_light", disorient=1, onBoss=0, order=50, range="target.Distance(less 10)"})
+		end
+	end	
+	if annotation.silence == "PRIEST" then
+		tinsert(interrupts, {name = "silence", interrupt=1, onBoss=1, order=10})
+	end
+	if annotation.kick == "ROGUE" then
+		tinsert(interrupts, {name = "kick", interrupt=1, onBoss=1, order=10})
+		tinsert(interrupts, {name = "cheap_shot", stun=1, onBoss=0, order=20})
+		if annotation.specialization == "outlaw" then
+			tinsert(interrupts, {name = "between_the_eyes", stun=1, onBoss=0, order=30, extraCondition="ComboPoints() >= 1"})
+			tinsert(interrupts, {name = "gouge", incapacitate=1, onBoss=0, order=100})
+		end
+		if annotation.specialization == "assassination" or annotation.specialization == "subtlety" then
+			tinsert(interrupts, {name = "kidney_shot", stun=1, onBoss=0, order=30, extraCondition="ComboPoints() >= 1"})
+		end
+	end
+	if annotation.wind_shear == "SHAMAN" then
+		tinsert(interrupts, {name = "wind_shear", interrupt=1, onBoss=1, order=10})
+		tinsert(interrupts, {name = "sundering", knockback=1, onBoss=0, order=20, range="target.Distance(less 5)"})
+		tinsert(interrupts, {name = "lightning_surge_totem", stun=1, onBoss=0, order=30, range="target.RemainingCastTime() > 2"})
+		tinsert(interrupts, {name = "hex", cc=1, onBoss=0, order=100, extraCondition="target.RemainingCastTime() > CastTime(hex) + GCDRemaining() and target.CreatureType(Humanoid Beast)"})
+	end
+	if annotation.pummel == "WARRIOR" then
+		tinsert(interrupts, {name = "pummel", interrupt=1, onBoss=1, order=10})
+	end
+	
+	if #interrupts > 0 then
+		InsertInterruptFunction(child, annotation, interrupts)
+		return 1
+	else
+		return 0
+	end
 end
 
 local function InsertSupportingFunctions(child, annotation)
@@ -4280,36 +4409,6 @@ local function InsertSupportingFunctions(child, annotation)
 	local nodeList = annotation.astAnnotation.nodeList
 	local camelSpecialization = CamelSpecialization(annotation)
 
-	if annotation.mind_freeze == "DEATHKNIGHT" then
-		local fmt = [[
-			AddFunction %sInterruptActions
-			{
-				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-				{
-					if target.InRange(mind_freeze) Spell(mind_freeze)
-					if not target.Classification(worldboss)
-					{
-						if target.InRange(asphyxiate) Spell(asphyxiate)
-						if target.InRange(strangulate) Spell(strangulate)
-						Spell(arcane_torrent_runicpower)
-						if target.InRange(quaking_palm) Spell(quaking_palm)
-						Spell(war_stomp)
-					}
-				}
-			}
-		]]
-		local code = format(fmt, camelSpecialization)
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		annotation.functionTag[node.name] = "cd"
-		AddSymbol(annotation, "arcane_torrent_runicpower")
-		AddSymbol(annotation, "asphyxiate")
-		AddSymbol(annotation, "mind_freeze")
-		AddSymbol(annotation, "quaking_palm")
-		AddSymbol(annotation, "strangulate")
-		AddSymbol(annotation, "war_stomp")
-		count = count + 1
-	end
 	if annotation.melee == "DEATHKNIGHT" then
 		local fmt = [[
 			AddFunction %sGetInMeleeRange
@@ -4354,98 +4453,6 @@ local function InsertSupportingFunctions(child, annotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "shortcd"
 		AddSymbol(annotation, "shear")
-		count = count + 1
-	end
-	if annotation.melee == "DEMONHUNTER" and annotation.specialization == "havoc" then
-		local fmt = [[
-			AddFunction %sInterruptActions
-			{
-				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-				{
-					if target.InRange(consume_magic) Spell(consume_magic)
-					if not target.Classification(worldboss) 
-					{
-						if target.Distance(less 8) Spell(arcane_torrent_dh)
-						if target.Distance(less 8) Spell(chaos_nova)
-						Spell(fel_eruption)
-						if target.CreatureType(Demon Humanoid Beast) Spell(imprison)
-					}
-				}
-			}
-		]]
-		local code = format(fmt, camelSpecialization)
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		annotation.functionTag[node.name] = "shortcd"
-		AddSymbol(annotation, "consume_magic")
-		AddSymbol(annotation, "arcane_torrent_dh")
-		AddSymbol(annotation, "fel_eruption")
-		AddSymbol(annotation, "imprison")
-		count = count + 1
-	end
-	if annotation.melee == "DEMONHUNTER" and annotation.specialization == "vengeance" then
-		local fmt = [[
-			AddFunction %sInterruptActions
-			{
-				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-				{
-					if target.InRange(consume_magic) Spell(consume_magic)
-					if not target.Classification(worldboss) 
-					{
-						unless SigilCharging(silence misery chains)
-						{
-							if (target.RemainingCastTime() >= 2 or (target.RemainingCastTime() >= 1 and Talent(quickened_sigils_talent))) Spell(sigil_of_silence)
-							if target.Distance(less 8) Spell(arcane_torrent_dh)
-							Spell(sigil_of_misery)
-							Spell(fel_eruption)
-							if target.CreatureType(Demon) Spell(imprison)
-							Spell(sigil_of_chains)
-							if target.IsTargetingPlayer() Spell(empower_wards)
-						}
-					}
-				}
-			}
-		]]
-		local code = format(fmt, camelSpecialization)
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		annotation.functionTag[node.name] = "shortcd"
-		AddSymbol(annotation, "consume_magic")
-		AddSymbol(annotation, "sigil_of_silence")
-		AddSymbol(annotation, "arcane_torrent_dh")
-		AddSymbol(annotation, "sigil_of_misery")
-		AddSymbol(annotation, "fel_eruption")
-		AddSymbol(annotation, "imprison")
-		AddSymbol(annotation, "sigil_of_chains")
-		AddSymbol(annotation, "empower_wards")
-		count = count + 1
-	end
-	if annotation.skull_bash == "DRUID" then
-		local fmt = [[
-			AddFunction %sInterruptActions
-			{
-				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-				{
-					if target.InRange(skull_bash) Spell(skull_bash)
-					if not target.Classification(worldboss)
-					{
-						if target.InRange(mighty_bash) Spell(mighty_bash)
-						Spell(typhoon)
-						if target.InRange(maim) Spell(maim)
-						Spell(war_stomp)
-					}
-				}
-			}
-		]]
-		local code = format(fmt, camelSpecialization)
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		annotation.functionTag[node.name] = "cd"
-		AddSymbol(annotation, "maim")
-		AddSymbol(annotation, "mighty_bash")
-		AddSymbol(annotation, "skull_bash")
-		AddSymbol(annotation, "typhoon")
-		AddSymbol(annotation, "war_stomp")
 		count = count + 1
 	end
 	if annotation.melee == "DRUID" then
@@ -4508,66 +4515,6 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "revive_pet")
 		count = count + 1
 	end
-	if annotation.counter_shot == "HUNTER" then
-		InsertInterruptFunction(child, annotation, "counter_shot")
-		count = count + 1
-	end
-	if annotation.muzzle == "HUNTER" then
-		InsertInterruptFunction(child, annotation, "muzzle")
-		count = count + 1
-	end
-	if annotation.counterspell == "MAGE" then
-		local fmt = [[
-			AddFunction %sInterruptActions
-			{
-				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-				{
-					Spell(counterspell)
-					if not target.Classification(worldboss)
-					{
-						Spell(arcane_torrent_mana)
-						if target.InRange(quaking_palm) Spell(quaking_palm)
-					}
-				}
-			}
-		]]
-		local code = format(fmt, camelSpecialization)
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		annotation.functionTag[node.name] = "cd"
-		AddSymbol(annotation, "arcane_torrent_mana")
-		AddSymbol(annotation, "counterspell")
-		AddSymbol(annotation, "quaking_palm")
-		count = count + 1
-	end
-	if annotation.spear_hand_strike == "MONK" then
-		local fmt = [[
-			AddFunction %sInterruptActions
-			{
-				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-				{
-					if target.InRange(spear_hand_strike) Spell(spear_hand_strike)
-					if not target.Classification(worldboss)
-					{
-						if target.InRange(paralysis) Spell(paralysis)
-						Spell(arcane_torrent_chi)
-						if target.InRange(quaking_palm) Spell(quaking_palm)
-						Spell(war_stomp)
-					}
-				}
-			}
-		]]
-		local code = format(fmt, camelSpecialization)
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		annotation.functionTag[node.name] = "cd"
-		AddSymbol(annotation, "arcane_torrent_chi")
-		AddSymbol(annotation, "paralysis")
-		AddSymbol(annotation, "quaking_palm")
-		AddSymbol(annotation, "spear_hand_strike")
-		AddSymbol(annotation, "war_stomp")
-		count = count + 1
-	end
 	if annotation.melee == "MONK" then
 		local fmt = [[
 			AddFunction %sGetInMeleeRange
@@ -4627,37 +4574,6 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "sanctified_wrath_talent")
 		count = count + 1
 	end
-	if annotation.rebuke == "PALADIN" then
-		local fmt = [[
-			AddFunction %sInterruptActions
-			{
-				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-				{
-					if target.InRange(rebuke) Spell(rebuke)
-					if target.InRange(avengers_shield) Spell(avengers_shield)
-					if not target.Classification(worldboss)
-					{
-						if target.InRange(hammer_of_justice) Spell(hammer_of_justice)
-						if target.Distance(less 10) Spell(blinding_light)
-						if target.Distance(less 8) Spell(arcane_torrent_holy)
-						if target.Distance(less 8) Spell(war_stomp)
-						if target.InRange(quaking_palm) Spell(quaking_palm)
-					}
-				}
-			}
-		]]
-		local code = format(fmt, camelSpecialization)
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		annotation.functionTag[node.name] = "cd"
-		AddSymbol(annotation, "arcane_torrent_holy")
-		AddSymbol(annotation, "blinding_light")
-		AddSymbol(annotation, "hammer_of_justice")
-		AddSymbol(annotation, "quaking_palm")
-		AddSymbol(annotation, "rebuke")
-		AddSymbol(annotation, "war_stomp")
-		count = count + 1
-	end
 	if annotation.melee == "PALADIN" then
 		local fmt = [[
 			AddFunction %sGetInMeleeRange
@@ -4670,65 +4586,6 @@ local function InsertSupportingFunctions(child, annotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "shortcd"
 		AddSymbol(annotation, "rebuke")
-		count = count + 1
-	end
-	if annotation.silence == "PRIEST" then
-		local fmt = [[
-			AddFunction %sInterruptActions
-			{
-				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-				{
-					Spell(silence)
-					if not target.Classification(worldboss)
-					{
-						Spell(arcane_torrent_mana)
-						if target.InRange(quaking_palm) Spell(quaking_palm)
-						Spell(war_stomp)
-					}
-				}
-			}
-		]]
-		local code = format(fmt, camelSpecialization)
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		annotation.functionTag[node.name] = "cd"
-		AddSymbol(annotation, "arcane_torrent_mana")
-		AddSymbol(annotation, "quaking_palm")
-		AddSymbol(annotation, "silence")
-		AddSymbol(annotation, "war_stomp")
-		count = count + 1
-	end
-	if annotation.kick == "ROGUE" then
-		local fmt = [[
-			AddFunction %sInterruptActions
-			{
-				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-				{
-					if target.InRange(kick) Spell(kick)
-					if not target.Classification(worldboss)
-					{
-						if target.InRange(cheap_shot) Spell(cheap_shot)
-						if target.InRange(deadly_throw) and ComboPoints() == 5 Spell(deadly_throw)
-						if target.InRange(between_the_eyes) Spell(between_the_eyes)
-						if target.InRange(kidney_shot) Spell(kidney_shot)
-						Spell(arcane_torrent_energy)
-						if target.InRange(gouge) Spell(gouge)
-						if target.InRange(quaking_palm) Spell(quaking_palm)
-					}
-				}
-			}
-		]]
-		local code = format(fmt, camelSpecialization)
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		annotation.functionTag[node.name] = "cd"
-		AddSymbol(annotation, "arcane_torrent_energy")
-		AddSymbol(annotation, "between_the_eyes")
-		AddSymbol(annotation, "cheap_shot")
-		AddSymbol(annotation, "deadly_throw")
-		AddSymbol(annotation, "kick")
-		AddSymbol(annotation, "kidney_shot")
-		AddSymbol(annotation, "quaking_palm")
 		count = count + 1
 	end
 	if annotation.melee == "ROGUE" then
@@ -4748,32 +4605,6 @@ local function InsertSupportingFunctions(child, annotation)
 		annotation.functionTag[node.name] = "shortcd"
 		AddSymbol(annotation, "kick")
 		AddSymbol(annotation, "shadowstep")
-		count = count + 1
-	end
-	if annotation.wind_shear == "SHAMAN" then
-		local fmt = [[
-			AddFunction %sInterruptActions
-			{
-				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-				{
-					Spell(wind_shear)
-					if not target.Classification(worldboss)
-					{
-						Spell(arcane_torrent_mana)
-						if target.InRange(quaking_palm) Spell(quaking_palm)
-						Spell(war_stomp)
-					}
-				}
-			}
-		]]
-		local code = format(fmt, camelSpecialization)
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		annotation.functionTag[node.name] = "cd"
-		AddSymbol(annotation, "arcane_torrent_mana")
-		AddSymbol(annotation, "quaking_palm")
-		AddSymbol(annotation, "wind_shear")
-		AddSymbol(annotation, "war_stomp")
 		count = count + 1
 	end
 	if annotation.melee == "SHAMAN" then
@@ -4811,33 +4642,6 @@ local function InsertSupportingFunctions(child, annotation)
 		annotation.functionTag[node.name] = "cd"
 		AddSymbol(annotation, "bloodlust")
 		AddSymbol(annotation, "heroism")
-		count = count + 1
-	end
-	if annotation.pummel == "WARRIOR" then
-		local fmt = [[
-			AddFunction %sInterruptActions
-			{
-				if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-				{
-					if target.InRange(pummel) Spell(pummel)
-					if not target.Classification(worldboss)
-					{
-						Spell(arcane_torrent_rage)
-						if target.InRange(quaking_palm) Spell(quaking_palm)
-						Spell(war_stomp)
-					}
-				}
-			}
-		]]
-		local code = format(fmt, camelSpecialization)
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		annotation.functionTag[node.name] = "cd"
-		AddSymbol(annotation, "arcane_torrent_rage")
-		AddSymbol(annotation, "heroic_throw")
-		AddSymbol(annotation, "pummel")
-		AddSymbol(annotation, "quaking_palm")
-		AddSymbol(annotation, "war_stomp")
 		count = count + 1
 	end
 	if annotation.melee == "WARRIOR" then
@@ -5471,6 +5275,7 @@ function OvaleSimulationCraft:EmitAST(profile)
 	if ok then
 		-- Insert header nodes.
 		annotation.supportingFunctionCount = InsertSupportingFunctions(child, annotation)
+		annotation.supportingInterruptCount = InsertInterruptFunctions(child, annotation)
 		annotation.supportingControlCount = InsertSupportingControls(child, annotation)
 		annotation.supportingDefineCount = InsertSupportingDefines(child, annotation)
 		InsertVariables(child, annotation)

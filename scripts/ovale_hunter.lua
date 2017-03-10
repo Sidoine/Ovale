@@ -23,15 +23,12 @@ AddCheckBox(opt_volley SpellName(volley) default specialization=beast_mastery)
 
 AddFunction BeastMasteryInterruptActions
 {
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
 	{
-		Spell(counter_shot)
-		if not target.Classification(worldboss)
-		{
-			Spell(arcane_torrent_focus)
-			if target.InRange(quaking_palm) Spell(quaking_palm)
-			Spell(war_stomp)
-		}
+		if target.InRange(counter_shot) and target.IsInterruptible() Spell(counter_shot)
+		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_focus)
+		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
 	}
 }
 
@@ -305,15 +302,12 @@ AddCheckBox(opt_volley SpellName(volley) default specialization=marksmanship)
 
 AddFunction MarksmanshipInterruptActions
 {
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
 	{
-		Spell(counter_shot)
-		if not target.Classification(worldboss)
-		{
-			Spell(arcane_torrent_focus)
-			if target.InRange(quaking_palm) Spell(quaking_palm)
-			Spell(war_stomp)
-		}
+		if target.InRange(counter_shot) and target.IsInterruptible() Spell(counter_shot)
+		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_focus)
+		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
 	}
 }
 
@@ -802,24 +796,21 @@ Include(ovale_hunter_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=survival)
 AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default specialization=survival)
 
+AddFunction SurvivalInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+	{
+		if target.InRange(muzzle) and target.IsInterruptible() Spell(muzzle)
+		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_focus)
+		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+	}
+}
+
 AddFunction SurvivalUseItemActions
 {
 	Item(Trinket0Slot usable=1)
 	Item(Trinket1Slot usable=1)
-}
-
-AddFunction SurvivalInterruptActions
-{
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-	{
-		Spell(muzzle)
-		if not target.Classification(worldboss)
-		{
-			Spell(arcane_torrent_focus)
-			if target.InRange(quaking_palm) Spell(quaking_palm)
-			Spell(war_stomp)
-		}
-	}
 }
 
 AddFunction SurvivalSummonPet

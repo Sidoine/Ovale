@@ -596,6 +596,19 @@ AddCheckBox(opt_interrupt L(interrupt) default specialization=enhancement)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=enhancement)
 AddCheckBox(opt_bloodlust SpellName(bloodlust) specialization=enhancement)
 
+AddFunction EnhancementInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+	{
+		if target.InRange(wind_shear) and target.IsInterruptible() Spell(wind_shear)
+		if target.Distance(less 5) and not target.Classification(worldboss) Spell(sundering)
+		if target.RemainingCastTime() > 2 and not target.Classification(worldboss) Spell(lightning_surge_totem)
+		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+		if target.InRange(hex) and not target.Classification(worldboss) and target.RemainingCastTime() > CastTime(hex) + GCDRemaining() and target.CreatureType(Humanoid Beast) Spell(hex)
+	}
+}
+
 AddFunction EnhancementBloodlust
 {
 	if CheckBoxOn(opt_bloodlust) and DebuffExpires(burst_haste_debuff any=1)
@@ -611,20 +624,6 @@ AddFunction EnhancementGetInMeleeRange
 	{
 		if target.InRange(feral_lunge) Spell(feral_lunge)
 		Texture(misc_arrowlup help=L(not_in_melee_range))
-	}
-}
-
-AddFunction EnhancementInterruptActions
-{
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-	{
-		Spell(wind_shear)
-		if not target.Classification(worldboss)
-		{
-			Spell(arcane_torrent_mana)
-			if target.InRange(quaking_palm) Spell(quaking_palm)
-			Spell(war_stomp)
-		}
 	}
 }
 
@@ -845,7 +844,6 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 
 ### Required symbols
 # alpha_wolf
-# arcane_torrent_mana
 # ascendance_melee
 # ascendance_melee_buff
 # ascendance_talent
@@ -871,6 +869,7 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # fury_of_air_talent
 # hailstorm_talent
 # heroism
+# hex
 # hot_hand_buff
 # hot_hand_talent
 # landslide_buff
@@ -878,6 +877,7 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # lava_lash
 # lightning_bolt
 # lightning_shield
+# lightning_surge_totem
 # overcharge_talent
 # quaking_palm
 # rockbiter

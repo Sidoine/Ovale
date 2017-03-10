@@ -112,15 +112,12 @@ AddCheckBox(opt_interrupt L(interrupt) default specialization=shadow)
 
 AddFunction ShadowInterruptActions
 {
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
 	{
-		Spell(silence)
-		if not target.Classification(worldboss)
-		{
-			Spell(arcane_torrent_mana)
-			if target.InRange(quaking_palm) Spell(quaking_palm)
-			Spell(war_stomp)
-		}
+		if target.InRange(silence) and target.IsInterruptible() Spell(silence)
+		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_mana)
+		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
 	}
 }
 

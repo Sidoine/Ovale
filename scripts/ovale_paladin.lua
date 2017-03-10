@@ -531,6 +531,17 @@ Include(ovale_paladin_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=retribution)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=retribution)
 
+AddFunction RetributionInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+	{
+		if target.InRange(rebuke) and target.IsInterruptible() Spell(rebuke)
+		if target.InRange(hammer_of_justice) and not target.Classification(worldboss) Spell(hammer_of_justice)
+		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_holy)
+		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+	}
+}
+
 AddFunction RetributionUseItemActions
 {
 	Item(Trinket0Slot usable=1)
@@ -540,23 +551,6 @@ AddFunction RetributionUseItemActions
 AddFunction RetributionGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
-}
-
-AddFunction RetributionInterruptActions
-{
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-	{
-		if target.InRange(rebuke) Spell(rebuke)
-		if target.InRange(avengers_shield) Spell(avengers_shield)
-		if not target.Classification(worldboss)
-		{
-			if target.InRange(hammer_of_justice) Spell(hammer_of_justice)
-			if target.Distance(less 10) Spell(blinding_light)
-			if target.Distance(less 8) Spell(arcane_torrent_holy)
-			if target.Distance(less 8) Spell(war_stomp)
-			if target.InRange(quaking_palm) Spell(quaking_palm)
-		}
-	}
 }
 
 ### actions.default
@@ -789,7 +783,6 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 # berserking
 # blade_of_justice
 # blade_of_wrath_talent
-# blinding_light
 # blood_fury_apsp
 # consecration
 # crusade
@@ -805,7 +798,6 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 # holy_wrath
 # judgment
 # judgment_debuff
-# quaking_palm
 # rebuke
 # shield_of_vengeance
 # templars_verdict
