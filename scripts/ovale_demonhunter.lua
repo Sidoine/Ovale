@@ -192,7 +192,7 @@ Include(ovale_demonhunter_spells)
 
 AddFunction pooling_for_meta
 {
-	if not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight() SpellCooldown(metamorphosis_havoc) < 6 and FuryDeficit() > 30 and not Talent(demonic_talent) and { not waiting_for_nemesis() or SpellCooldown(nemesis) < 10 } and { not waiting_for_chaos_blades() or SpellCooldown(chaos_blades) < 6 }
+	SpellCooldown(metamorphosis_havoc) < 6 and FuryDeficit() > 30 and not Talent(demonic_talent) and { not waiting_for_nemesis() or SpellCooldown(nemesis) < 10 } and { not waiting_for_chaos_blades() or SpellCooldown(chaos_blades) < 6 }
 }
 
 AddFunction pooling_for_chaos_strike
@@ -202,7 +202,7 @@ AddFunction pooling_for_chaos_strike
 
 AddFunction waiting_for_chaos_blades
 {
-	not { not Talent(chaos_blades_talent) or SpellCooldown(chaos_blades) == 0 or SpellCooldown(chaos_blades) > target.TimeToDie() or SpellCooldown(chaos_blades) > 60 }
+	not { not Talent(chaos_blades_talent) or Talent(chaos_blades_talent) and SpellCooldown(chaos_blades) == 0 or SpellCooldown(chaos_blades) > target.TimeToDie() or SpellCooldown(chaos_blades) > 60 }
 }
 
 AddFunction pooling_for_blade_dance
@@ -212,7 +212,7 @@ AddFunction pooling_for_blade_dance
 
 AddFunction waiting_for_nemesis
 {
-	not { not Talent(nemesis_talent) or SpellCooldown(nemesis) == 0 or SpellCooldown(nemesis) > target.TimeToDie() or SpellCooldown(nemesis) > 60 }
+	not { not Talent(nemesis_talent) or Talent(nemesis_talent) and SpellCooldown(nemesis) == 0 or SpellCooldown(nemesis) > target.TimeToDie() or SpellCooldown(nemesis) > 60 }
 }
 
 AddFunction blade_dance
@@ -393,7 +393,7 @@ AddFunction HavocCooldownShortCdPostConditions
 AddFunction HavocCooldownCdActions
 {
 	#metamorphosis,if=!(variable.pooling_for_meta|variable.waiting_for_nemesis|variable.waiting_for_chaos_blades)|target.time_to_die<25
-	if not { pooling_for_meta() or waiting_for_nemesis() or waiting_for_chaos_blades() } or target.TimeToDie() < 25 Spell(metamorphosis_havoc)
+	if { not { pooling_for_meta() or waiting_for_nemesis() or waiting_for_chaos_blades() } or target.TimeToDie() < 25 } and { not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight() } Spell(metamorphosis_havoc)
 	#nemesis,target_if=min:target.time_to_die,if=raid_event.adds.exists&debuff.nemesis.down&((active_enemies>desired_targets&active_enemies>1)|raid_event.adds.in>60)
 	if False(raid_event_adds_exists) and target.DebuffExpires(nemesis_debuff) and { Enemies() > Enemies(tagged=1) and Enemies() > 1 or 600 > 60 } Spell(nemesis)
 	#nemesis,if=!raid_event.adds.exists&(buff.chaos_blades.up|buff.metamorphosis.up|cooldown.metamorphosis.adjusted_remains<20|target.time_to_die<=60)
@@ -438,7 +438,7 @@ AddFunction HavocPrecombatCdActions
 		#snapshot_stats
 		#potion,name=old_war
 		#metamorphosis,if=!(talent.demon_reborn.enabled&talent.demonic.enabled)
-		if not { Talent(demon_reborn_talent) and Talent(demonic_talent) } Spell(metamorphosis_havoc)
+		if not { Talent(demon_reborn_talent) and Talent(demonic_talent) } and { not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight() } Spell(metamorphosis_havoc)
 	}
 }
 

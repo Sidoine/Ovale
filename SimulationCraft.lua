@@ -2079,13 +2079,10 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif action == "auto_attack" then
 			bodyCode = camelSpecialization .. "GetInMeleeRange()"
 			isSpellAction = false
-		elseif class == "DEMONHUNTER" and action == "variable" and Unparse(modifier.name) == "pooling_for_meta" then
+		elseif class == "DEMONHUNTER" and action == "metamorphosis_havoc" then
 			-- Add a checkbox asking whether to only pool for meta during boss fights
-			local conditionCode = "not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()"
-			local conditionNode = OvaleAST:ParseCode(expressionType, conditionCode, nodeList, annotation.astAnnotation)
-			EmitVariable(nodeList, annotation, modifier, parseNode, action, conditionNode)
-			isSpellAction = false
-			annotation.pooling_for_meta = class
+			conditionCode = "not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()"
+			annotation.opt_meta_only_during_boss = "DEMONHUNTER"
 		elseif action == "variable" then
 			EmitVariable(nodeList, annotation, modifier, parseNode, action)
 			isSpellAction = false
@@ -3714,6 +3711,14 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 			end
 			ok, node = EmitOperandDot(petOperand, parseNode, nodeList, annotation, action, target)
 		end
+	elseif class == "DEMONHUNTER" and operand == "cooldown.chaos_blades.ready" then
+		code = "Talent(chaos_blades_talent) and SpellCooldown(chaos_blades) == 0"
+		AddSymbol(annotation, "chaos_blades_talent")
+		AddSymbol(annotation, "chaos_blades")
+	elseif class == "DEMONHUNTER" and operand == "cooldown.nemesis.ready" then
+		code = "Talent(nemesis_talent) and SpellCooldown(nemesis) == 0"
+		AddSymbol(annotation, "nemesis_talent")
+		AddSymbol(annotation, "nemesis")
 	elseif class == "DRUID" and operand == "buff.wild_charge_movement.down" then
 		-- "wild_charge_movement" is a fake SimulationCraft buff that lasts for the
 		-- duration of the movement during Wild Charge.
@@ -4804,7 +4809,7 @@ local function InsertSupportingControls(child, annotation)
 			tinsert(child, 1, node)
 		end
 	end
-	if annotation.pooling_for_meta == "DEMONHUNTER" then
+	if annotation.opt_meta_only_during_boss == "DEMONHUNTER" then
 		local fmt = [[
 			AddCheckBox(opt_meta_only_during_boss L(meta_only_during_boss) default %s)
 		]]
