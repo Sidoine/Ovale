@@ -36,7 +36,7 @@ AddFunction GuardianDefaultShortCDActions
 {
 	if InCombat() and BuffExpires(bristling_fur_buff)
 	{
-		if IncomingDamage(1.5 magic=1) Spell(mark_of_ursol)
+		if IncomingDamage(1.5 magic=1) and BuffRefreshable(mark_of_ursol_buff) Spell(mark_of_ursol)
 		if IncomingDamage(3 physical=1) Spell(ironfur)
 	}
 	# range check
