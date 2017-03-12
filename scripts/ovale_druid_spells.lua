@@ -347,6 +347,7 @@ Define(thrash_cat_debuff 106830)
 Define(typhoon 132469)
 	SpellInfo(typhoon cd=30 interrupt=1)
 Define(warrior_of_elune 202425)
+	SpellInfo(warrior_of_elune gcd=0 c45 offgcd=1)
 Define(warrior_of_elune_buff 202425)
 	#TODO 2 Lunar strikes are instant
 Define(wild_charge 102401)
