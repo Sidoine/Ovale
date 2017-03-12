@@ -79,7 +79,7 @@ AddFunction GuardianDefaultAoEActions
 AddFunction GuardianDefaultCdActions 
 {
 	GuardianInterruptActions()
-	#Spell(incarnation_guardian_of_ursoc)
+	Spell(incarnation_guardian_of_ursoc)
 	if CheckBoxOn(opt_legendary_ring_tank) Item(legendary_ring_bonus_armor usable=1)
 	if BuffExpires(ironfur_buff) and BuffExpires(survival_instincts_buff) and BuffExpires(rage_of_the_sleeper_buff) and BuffExpires(barkskin_buff) Spell(bristling_fur)
 	if BuffExpires(bristling_fur_buff)
