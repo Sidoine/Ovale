@@ -312,8 +312,6 @@ AddFunction BalanceCelestialAlignmentPhaseMainActions
 	if Enemies() >= 2 and Talent(stellar_drift_talent) or Enemies() >= 3 Spell(starfall)
 	#starsurge,if=active_enemies<=2
 	if Enemies() <= 2 Spell(starsurge_moonkin)
-	#warrior_of_elune
-	Spell(warrior_of_elune)
 	#lunar_strike,if=buff.warrior_of_elune.up
 	if BuffPresent(warrior_of_elune_buff) Spell(lunar_strike_balance)
 	#solar_wrath,if=buff.solar_empowerment.up
@@ -334,11 +332,16 @@ AddFunction BalanceCelestialAlignmentPhaseMainPostConditions
 
 AddFunction BalanceCelestialAlignmentPhaseShortCdActions
 {
+	unless { Enemies() >= 2 and Talent(stellar_drift_talent) or Enemies() >= 3 } and Spell(starfall) or Enemies() <= 2 and Spell(starsurge_moonkin)
+	{
+		#warrior_of_elune
+		Spell(warrior_of_elune)
+	}
 }
 
 AddFunction BalanceCelestialAlignmentPhaseShortCdPostConditions
 {
-	{ Enemies() >= 2 and Talent(stellar_drift_talent) or Enemies() >= 3 } and Spell(starfall) or Enemies() <= 2 and Spell(starsurge_moonkin) or Spell(warrior_of_elune) or BuffPresent(warrior_of_elune_buff) and Spell(lunar_strike_balance) or BuffPresent(solar_empowerment_buff) and Spell(solar_wrath) or BuffPresent(lunar_empowerment_buff) and Spell(lunar_strike_balance) or Talent(natures_balance_talent) and target.DebuffRemaining(sunfire_dmg_debuff) < 5 and CastTime(solar_wrath) < target.DebuffRemaining(sunfire_dmg_debuff) and Spell(solar_wrath) or { Talent(natures_balance_talent) and target.DebuffRemaining(moonfire_dmg_debuff) < 5 and CastTime(lunar_strike_balance) < target.DebuffRemaining(moonfire_dmg_debuff) or Enemies() >= 2 } and Spell(lunar_strike_balance) or Spell(solar_wrath)
+	{ Enemies() >= 2 and Talent(stellar_drift_talent) or Enemies() >= 3 } and Spell(starfall) or Enemies() <= 2 and Spell(starsurge_moonkin) or BuffPresent(warrior_of_elune_buff) and Spell(lunar_strike_balance) or BuffPresent(solar_empowerment_buff) and Spell(solar_wrath) or BuffPresent(lunar_empowerment_buff) and Spell(lunar_strike_balance) or Talent(natures_balance_talent) and target.DebuffRemaining(sunfire_dmg_debuff) < 5 and CastTime(solar_wrath) < target.DebuffRemaining(sunfire_dmg_debuff) and Spell(solar_wrath) or { Talent(natures_balance_talent) and target.DebuffRemaining(moonfire_dmg_debuff) < 5 and CastTime(lunar_strike_balance) < target.DebuffRemaining(moonfire_dmg_debuff) or Enemies() >= 2 } and Spell(lunar_strike_balance) or Spell(solar_wrath)
 }
 
 AddFunction BalanceCelestialAlignmentPhaseCdActions
@@ -347,7 +350,7 @@ AddFunction BalanceCelestialAlignmentPhaseCdActions
 
 AddFunction BalanceCelestialAlignmentPhaseCdPostConditions
 {
-	{ Enemies() >= 2 and Talent(stellar_drift_talent) or Enemies() >= 3 } and Spell(starfall) or Enemies() <= 2 and Spell(starsurge_moonkin) or Spell(warrior_of_elune) or BuffPresent(warrior_of_elune_buff) and Spell(lunar_strike_balance) or BuffPresent(solar_empowerment_buff) and Spell(solar_wrath) or BuffPresent(lunar_empowerment_buff) and Spell(lunar_strike_balance) or Talent(natures_balance_talent) and target.DebuffRemaining(sunfire_dmg_debuff) < 5 and CastTime(solar_wrath) < target.DebuffRemaining(sunfire_dmg_debuff) and Spell(solar_wrath) or { Talent(natures_balance_talent) and target.DebuffRemaining(moonfire_dmg_debuff) < 5 and CastTime(lunar_strike_balance) < target.DebuffRemaining(moonfire_dmg_debuff) or Enemies() >= 2 } and Spell(lunar_strike_balance) or Spell(solar_wrath)
+	{ Enemies() >= 2 and Talent(stellar_drift_talent) or Enemies() >= 3 } and Spell(starfall) or Enemies() <= 2 and Spell(starsurge_moonkin) or BuffPresent(warrior_of_elune_buff) and Spell(lunar_strike_balance) or BuffPresent(solar_empowerment_buff) and Spell(solar_wrath) or BuffPresent(lunar_empowerment_buff) and Spell(lunar_strike_balance) or Talent(natures_balance_talent) and target.DebuffRemaining(sunfire_dmg_debuff) < 5 and CastTime(solar_wrath) < target.DebuffRemaining(sunfire_dmg_debuff) and Spell(solar_wrath) or { Talent(natures_balance_talent) and target.DebuffRemaining(moonfire_dmg_debuff) < 5 and CastTime(lunar_strike_balance) < target.DebuffRemaining(moonfire_dmg_debuff) or Enemies() >= 2 } and Spell(lunar_strike_balance) or Spell(solar_wrath)
 }
 
 ### actions.ed
@@ -433,8 +436,6 @@ AddFunction BalanceFuryOfEluneMainActions
 	if { Charges(half_moon) == 2 and SpellChargeCooldown(half_moon) < 5 or Charges(half_moon) == 3 } and { BuffPresent(fury_of_elune_up_buff) or SpellCooldown(fury_of_elune) > GCD() * 3 and AstralPower() <= 80 } Spell(half_moon)
 	#full_moon,if=((charges=2&recharge_time<5)|charges=3)&&(buff.fury_of_elune_up.up|(cooldown.fury_of_elune.remains>gcd*3&astral_power<=60))
 	if { Charges(full_moon) == 2 and SpellChargeCooldown(full_moon) < 5 or Charges(full_moon) == 3 } and { BuffPresent(fury_of_elune_up_buff) or SpellCooldown(fury_of_elune) > GCD() * 3 and AstralPower() <= 60 } Spell(full_moon)
-	#warrior_of_elune,if=buff.fury_of_elune_up.up|(cooldown.fury_of_elune.remains>=35&buff.lunar_empowerment.up)
-	if BuffPresent(fury_of_elune_up_buff) or SpellCooldown(fury_of_elune) >= 35 and BuffPresent(lunar_empowerment_buff) Spell(warrior_of_elune)
 	#lunar_strike,if=buff.warrior_of_elune.up&(astral_power<=90|(astral_power<=85&buff.incarnation.up))
 	if BuffPresent(warrior_of_elune_buff) and { AstralPower() <= 90 or AstralPower() <= 85 and BuffPresent(incarnation_chosen_of_elune_buff) } Spell(lunar_strike_balance)
 	#new_moon,if=astral_power<=90&buff.fury_of_elune_up.up
@@ -476,12 +477,14 @@ AddFunction BalanceFuryOfEluneShortCdActions
 	{
 		#astral_communion,if=buff.fury_of_elune_up.up&astral_power<=25
 		if BuffPresent(fury_of_elune_up_buff) and AstralPower() <= 25 Spell(astral_communion)
+		#warrior_of_elune,if=buff.fury_of_elune_up.up|(cooldown.fury_of_elune.remains>=35&buff.lunar_empowerment.up)
+		if BuffPresent(fury_of_elune_up_buff) or SpellCooldown(fury_of_elune) >= 35 and BuffPresent(lunar_empowerment_buff) Spell(warrior_of_elune)
 	}
 }
 
 AddFunction BalanceFuryOfEluneShortCdPostConditions
 {
-	{ Charges(new_moon) == 2 and SpellChargeCooldown(new_moon) < 5 or Charges(new_moon) == 3 } and { BuffPresent(fury_of_elune_up_buff) or SpellCooldown(fury_of_elune) > GCD() * 3 and AstralPower() <= 90 } and Spell(new_moon) or { Charges(half_moon) == 2 and SpellChargeCooldown(half_moon) < 5 or Charges(half_moon) == 3 } and { BuffPresent(fury_of_elune_up_buff) or SpellCooldown(fury_of_elune) > GCD() * 3 and AstralPower() <= 80 } and Spell(half_moon) or { Charges(full_moon) == 2 and SpellChargeCooldown(full_moon) < 5 or Charges(full_moon) == 3 } and { BuffPresent(fury_of_elune_up_buff) or SpellCooldown(fury_of_elune) > GCD() * 3 and AstralPower() <= 60 } and Spell(full_moon) or { BuffPresent(fury_of_elune_up_buff) or SpellCooldown(fury_of_elune) >= 35 and BuffPresent(lunar_empowerment_buff) } and Spell(warrior_of_elune) or BuffPresent(warrior_of_elune_buff) and { AstralPower() <= 90 or AstralPower() <= 85 and BuffPresent(incarnation_chosen_of_elune_buff) } and Spell(lunar_strike_balance) or AstralPower() <= 90 and BuffPresent(fury_of_elune_up_buff) and Spell(new_moon) or AstralPower() <= 80 and BuffPresent(fury_of_elune_up_buff) and AstralPower() > CastTime(half_moon) * 12 and Spell(half_moon) or AstralPower() <= 60 and BuffPresent(fury_of_elune_up_buff) and AstralPower() > CastTime(full_moon) * 12 and Spell(full_moon) or BuffExpires(fury_of_elune_up_buff) and target.DebuffRemaining(moonfire_debuff) <= 6.6 and Spell(moonfire) or BuffExpires(fury_of_elune_up_buff) and target.DebuffRemaining(sunfire_debuff) < 5.4 and Spell(sunfire) or target.DebuffRemaining(stellar_flare_debuff) < 7.2 and Enemies() == 1 and Spell(stellar_flare) or { Enemies() >= 2 and Talent(stellar_flare_talent) or Enemies() >= 3 } and BuffExpires(fury_of_elune_up_buff) and SpellCooldown(fury_of_elune) > 10 and Spell(starfall) or Enemies() <= 2 and BuffExpires(fury_of_elune_up_buff) and SpellCooldown(fury_of_elune) > 7 and Spell(starsurge_moonkin) or BuffExpires(fury_of_elune_up_buff) and { AstralPower() >= 92 and SpellCooldown(fury_of_elune) > GCD() * 3 or SpellCooldown(warrior_of_elune) <= 5 and SpellCooldown(fury_of_elune) >= 35 and BuffStacks(lunar_empowerment_buff) < 2 } and Spell(starsurge_moonkin) or BuffPresent(solar_empowerment_buff) and Spell(solar_wrath) or { BuffStacks(lunar_empowerment_buff) == 3 or BuffRemaining(lunar_empowerment_buff) < 5 and BuffPresent(lunar_empowerment_buff) or Enemies() >= 2 } and Spell(lunar_strike_balance) or Spell(solar_wrath)
+	{ Charges(new_moon) == 2 and SpellChargeCooldown(new_moon) < 5 or Charges(new_moon) == 3 } and { BuffPresent(fury_of_elune_up_buff) or SpellCooldown(fury_of_elune) > GCD() * 3 and AstralPower() <= 90 } and Spell(new_moon) or { Charges(half_moon) == 2 and SpellChargeCooldown(half_moon) < 5 or Charges(half_moon) == 3 } and { BuffPresent(fury_of_elune_up_buff) or SpellCooldown(fury_of_elune) > GCD() * 3 and AstralPower() <= 80 } and Spell(half_moon) or { Charges(full_moon) == 2 and SpellChargeCooldown(full_moon) < 5 or Charges(full_moon) == 3 } and { BuffPresent(fury_of_elune_up_buff) or SpellCooldown(fury_of_elune) > GCD() * 3 and AstralPower() <= 60 } and Spell(full_moon) or BuffPresent(warrior_of_elune_buff) and { AstralPower() <= 90 or AstralPower() <= 85 and BuffPresent(incarnation_chosen_of_elune_buff) } and Spell(lunar_strike_balance) or AstralPower() <= 90 and BuffPresent(fury_of_elune_up_buff) and Spell(new_moon) or AstralPower() <= 80 and BuffPresent(fury_of_elune_up_buff) and AstralPower() > CastTime(half_moon) * 12 and Spell(half_moon) or AstralPower() <= 60 and BuffPresent(fury_of_elune_up_buff) and AstralPower() > CastTime(full_moon) * 12 and Spell(full_moon) or BuffExpires(fury_of_elune_up_buff) and target.DebuffRemaining(moonfire_debuff) <= 6.6 and Spell(moonfire) or BuffExpires(fury_of_elune_up_buff) and target.DebuffRemaining(sunfire_debuff) < 5.4 and Spell(sunfire) or target.DebuffRemaining(stellar_flare_debuff) < 7.2 and Enemies() == 1 and Spell(stellar_flare) or { Enemies() >= 2 and Talent(stellar_flare_talent) or Enemies() >= 3 } and BuffExpires(fury_of_elune_up_buff) and SpellCooldown(fury_of_elune) > 10 and Spell(starfall) or Enemies() <= 2 and BuffExpires(fury_of_elune_up_buff) and SpellCooldown(fury_of_elune) > 7 and Spell(starsurge_moonkin) or BuffExpires(fury_of_elune_up_buff) and { AstralPower() >= 92 and SpellCooldown(fury_of_elune) > GCD() * 3 or SpellCooldown(warrior_of_elune) <= 5 and SpellCooldown(fury_of_elune) >= 35 and BuffStacks(lunar_empowerment_buff) < 2 } and Spell(starsurge_moonkin) or BuffPresent(solar_empowerment_buff) and Spell(solar_wrath) or { BuffStacks(lunar_empowerment_buff) == 3 or BuffRemaining(lunar_empowerment_buff) < 5 and BuffPresent(lunar_empowerment_buff) or Enemies() >= 2 } and Spell(lunar_strike_balance) or Spell(solar_wrath)
 }
 
 AddFunction BalanceFuryOfEluneCdActions
@@ -492,7 +495,7 @@ AddFunction BalanceFuryOfEluneCdActions
 
 AddFunction BalanceFuryOfEluneCdPostConditions
 {
-	AstralPower() >= 95 and Spell(fury_of_elune) or { Charges(new_moon) == 2 and SpellChargeCooldown(new_moon) < 5 or Charges(new_moon) == 3 } and { BuffPresent(fury_of_elune_up_buff) or SpellCooldown(fury_of_elune) > GCD() * 3 and AstralPower() <= 90 } and Spell(new_moon) or { Charges(half_moon) == 2 and SpellChargeCooldown(half_moon) < 5 or Charges(half_moon) == 3 } and { BuffPresent(fury_of_elune_up_buff) or SpellCooldown(fury_of_elune) > GCD() * 3 and AstralPower() <= 80 } and Spell(half_moon) or { Charges(full_moon) == 2 and SpellChargeCooldown(full_moon) < 5 or Charges(full_moon) == 3 } and { BuffPresent(fury_of_elune_up_buff) or SpellCooldown(fury_of_elune) > GCD() * 3 and AstralPower() <= 60 } and Spell(full_moon) or BuffPresent(fury_of_elune_up_buff) and AstralPower() <= 25 and Spell(astral_communion) or { BuffPresent(fury_of_elune_up_buff) or SpellCooldown(fury_of_elune) >= 35 and BuffPresent(lunar_empowerment_buff) } and Spell(warrior_of_elune) or BuffPresent(warrior_of_elune_buff) and { AstralPower() <= 90 or AstralPower() <= 85 and BuffPresent(incarnation_chosen_of_elune_buff) } and Spell(lunar_strike_balance) or AstralPower() <= 90 and BuffPresent(fury_of_elune_up_buff) and Spell(new_moon) or AstralPower() <= 80 and BuffPresent(fury_of_elune_up_buff) and AstralPower() > CastTime(half_moon) * 12 and Spell(half_moon) or AstralPower() <= 60 and BuffPresent(fury_of_elune_up_buff) and AstralPower() > CastTime(full_moon) * 12 and Spell(full_moon) or BuffExpires(fury_of_elune_up_buff) and target.DebuffRemaining(moonfire_debuff) <= 6.6 and Spell(moonfire) or BuffExpires(fury_of_elune_up_buff) and target.DebuffRemaining(sunfire_debuff) < 5.4 and Spell(sunfire) or target.DebuffRemaining(stellar_flare_debuff) < 7.2 and Enemies() == 1 and Spell(stellar_flare) or { Enemies() >= 2 and Talent(stellar_flare_talent) or Enemies() >= 3 } and BuffExpires(fury_of_elune_up_buff) and SpellCooldown(fury_of_elune) > 10 and Spell(starfall) or Enemies() <= 2 and BuffExpires(fury_of_elune_up_buff) and SpellCooldown(fury_of_elune) > 7 and Spell(starsurge_moonkin) or BuffExpires(fury_of_elune_up_buff) and { AstralPower() >= 92 and SpellCooldown(fury_of_elune) > GCD() * 3 or SpellCooldown(warrior_of_elune) <= 5 and SpellCooldown(fury_of_elune) >= 35 and BuffStacks(lunar_empowerment_buff) < 2 } and Spell(starsurge_moonkin) or BuffPresent(solar_empowerment_buff) and Spell(solar_wrath) or { BuffStacks(lunar_empowerment_buff) == 3 or BuffRemaining(lunar_empowerment_buff) < 5 and BuffPresent(lunar_empowerment_buff) or Enemies() >= 2 } and Spell(lunar_strike_balance) or Spell(solar_wrath)
+	AstralPower() >= 95 and Spell(fury_of_elune) or { Charges(new_moon) == 2 and SpellChargeCooldown(new_moon) < 5 or Charges(new_moon) == 3 } and { BuffPresent(fury_of_elune_up_buff) or SpellCooldown(fury_of_elune) > GCD() * 3 and AstralPower() <= 90 } and Spell(new_moon) or { Charges(half_moon) == 2 and SpellChargeCooldown(half_moon) < 5 or Charges(half_moon) == 3 } and { BuffPresent(fury_of_elune_up_buff) or SpellCooldown(fury_of_elune) > GCD() * 3 and AstralPower() <= 80 } and Spell(half_moon) or { Charges(full_moon) == 2 and SpellChargeCooldown(full_moon) < 5 or Charges(full_moon) == 3 } and { BuffPresent(fury_of_elune_up_buff) or SpellCooldown(fury_of_elune) > GCD() * 3 and AstralPower() <= 60 } and Spell(full_moon) or BuffPresent(fury_of_elune_up_buff) and AstralPower() <= 25 and Spell(astral_communion) or BuffPresent(warrior_of_elune_buff) and { AstralPower() <= 90 or AstralPower() <= 85 and BuffPresent(incarnation_chosen_of_elune_buff) } and Spell(lunar_strike_balance) or AstralPower() <= 90 and BuffPresent(fury_of_elune_up_buff) and Spell(new_moon) or AstralPower() <= 80 and BuffPresent(fury_of_elune_up_buff) and AstralPower() > CastTime(half_moon) * 12 and Spell(half_moon) or AstralPower() <= 60 and BuffPresent(fury_of_elune_up_buff) and AstralPower() > CastTime(full_moon) * 12 and Spell(full_moon) or BuffExpires(fury_of_elune_up_buff) and target.DebuffRemaining(moonfire_debuff) <= 6.6 and Spell(moonfire) or BuffExpires(fury_of_elune_up_buff) and target.DebuffRemaining(sunfire_debuff) < 5.4 and Spell(sunfire) or target.DebuffRemaining(stellar_flare_debuff) < 7.2 and Enemies() == 1 and Spell(stellar_flare) or { Enemies() >= 2 and Talent(stellar_flare_talent) or Enemies() >= 3 } and BuffExpires(fury_of_elune_up_buff) and SpellCooldown(fury_of_elune) > 10 and Spell(starfall) or Enemies() <= 2 and BuffExpires(fury_of_elune_up_buff) and SpellCooldown(fury_of_elune) > 7 and Spell(starsurge_moonkin) or BuffExpires(fury_of_elune_up_buff) and { AstralPower() >= 92 and SpellCooldown(fury_of_elune) > GCD() * 3 or SpellCooldown(warrior_of_elune) <= 5 and SpellCooldown(fury_of_elune) >= 35 and BuffStacks(lunar_empowerment_buff) < 2 } and Spell(starsurge_moonkin) or BuffPresent(solar_empowerment_buff) and Spell(solar_wrath) or { BuffStacks(lunar_empowerment_buff) == 3 or BuffRemaining(lunar_empowerment_buff) < 5 and BuffPresent(lunar_empowerment_buff) or Enemies() >= 2 } and Spell(lunar_strike_balance) or Spell(solar_wrath)
 }
 
 ### actions.precombat
@@ -549,8 +552,6 @@ AddFunction BalanceSingleTargetMainActions
 	if Enemies() >= 2 and Talent(stellar_drift_talent) or Enemies() >= 3 Spell(starfall)
 	#starsurge,if=active_enemies<=2
 	if Enemies() <= 2 Spell(starsurge_moonkin)
-	#warrior_of_elune
-	Spell(warrior_of_elune)
 	#lunar_strike,if=buff.warrior_of_elune.up
 	if BuffPresent(warrior_of_elune_buff) Spell(lunar_strike_balance)
 	#solar_wrath,if=buff.solar_empowerment.up
@@ -571,11 +572,16 @@ AddFunction BalanceSingleTargetMainPostConditions
 
 AddFunction BalanceSingleTargetShortCdActions
 {
+	unless AstralPower() <= 90 and Spell(new_moon) or AstralPower() <= 80 and Spell(half_moon) or AstralPower() <= 60 and Spell(full_moon) or { Enemies() >= 2 and Talent(stellar_drift_talent) or Enemies() >= 3 } and Spell(starfall) or Enemies() <= 2 and Spell(starsurge_moonkin)
+	{
+		#warrior_of_elune
+		Spell(warrior_of_elune)
+	}
 }
 
 AddFunction BalanceSingleTargetShortCdPostConditions
 {
-	AstralPower() <= 90 and Spell(new_moon) or AstralPower() <= 80 and Spell(half_moon) or AstralPower() <= 60 and Spell(full_moon) or { Enemies() >= 2 and Talent(stellar_drift_talent) or Enemies() >= 3 } and Spell(starfall) or Enemies() <= 2 and Spell(starsurge_moonkin) or Spell(warrior_of_elune) or BuffPresent(warrior_of_elune_buff) and Spell(lunar_strike_balance) or BuffPresent(solar_empowerment_buff) and Spell(solar_wrath) or BuffPresent(lunar_empowerment_buff) and Spell(lunar_strike_balance) or Talent(natures_balance_talent) and target.DebuffRemaining(sunfire_dmg_debuff) < 5 and CastTime(solar_wrath) < target.DebuffRemaining(sunfire_dmg_debuff) and Spell(solar_wrath) or { Talent(natures_balance_talent) and target.DebuffRemaining(moonfire_dmg_debuff) < 5 and CastTime(lunar_strike_balance) < target.DebuffRemaining(moonfire_dmg_debuff) or Enemies() >= 2 } and Spell(lunar_strike_balance) or Spell(solar_wrath)
+	AstralPower() <= 90 and Spell(new_moon) or AstralPower() <= 80 and Spell(half_moon) or AstralPower() <= 60 and Spell(full_moon) or { Enemies() >= 2 and Talent(stellar_drift_talent) or Enemies() >= 3 } and Spell(starfall) or Enemies() <= 2 and Spell(starsurge_moonkin) or BuffPresent(warrior_of_elune_buff) and Spell(lunar_strike_balance) or BuffPresent(solar_empowerment_buff) and Spell(solar_wrath) or BuffPresent(lunar_empowerment_buff) and Spell(lunar_strike_balance) or Talent(natures_balance_talent) and target.DebuffRemaining(sunfire_dmg_debuff) < 5 and CastTime(solar_wrath) < target.DebuffRemaining(sunfire_dmg_debuff) and Spell(solar_wrath) or { Talent(natures_balance_talent) and target.DebuffRemaining(moonfire_dmg_debuff) < 5 and CastTime(lunar_strike_balance) < target.DebuffRemaining(moonfire_dmg_debuff) or Enemies() >= 2 } and Spell(lunar_strike_balance) or Spell(solar_wrath)
 }
 
 AddFunction BalanceSingleTargetCdActions
@@ -584,7 +590,7 @@ AddFunction BalanceSingleTargetCdActions
 
 AddFunction BalanceSingleTargetCdPostConditions
 {
-	AstralPower() <= 90 and Spell(new_moon) or AstralPower() <= 80 and Spell(half_moon) or AstralPower() <= 60 and Spell(full_moon) or { Enemies() >= 2 and Talent(stellar_drift_talent) or Enemies() >= 3 } and Spell(starfall) or Enemies() <= 2 and Spell(starsurge_moonkin) or Spell(warrior_of_elune) or BuffPresent(warrior_of_elune_buff) and Spell(lunar_strike_balance) or BuffPresent(solar_empowerment_buff) and Spell(solar_wrath) or BuffPresent(lunar_empowerment_buff) and Spell(lunar_strike_balance) or Talent(natures_balance_talent) and target.DebuffRemaining(sunfire_dmg_debuff) < 5 and CastTime(solar_wrath) < target.DebuffRemaining(sunfire_dmg_debuff) and Spell(solar_wrath) or { Talent(natures_balance_talent) and target.DebuffRemaining(moonfire_dmg_debuff) < 5 and CastTime(lunar_strike_balance) < target.DebuffRemaining(moonfire_dmg_debuff) or Enemies() >= 2 } and Spell(lunar_strike_balance) or Spell(solar_wrath)
+	AstralPower() <= 90 and Spell(new_moon) or AstralPower() <= 80 and Spell(half_moon) or AstralPower() <= 60 and Spell(full_moon) or { Enemies() >= 2 and Talent(stellar_drift_talent) or Enemies() >= 3 } and Spell(starfall) or Enemies() <= 2 and Spell(starsurge_moonkin) or BuffPresent(warrior_of_elune_buff) and Spell(lunar_strike_balance) or BuffPresent(solar_empowerment_buff) and Spell(solar_wrath) or BuffPresent(lunar_empowerment_buff) and Spell(lunar_strike_balance) or Talent(natures_balance_talent) and target.DebuffRemaining(sunfire_dmg_debuff) < 5 and CastTime(solar_wrath) < target.DebuffRemaining(sunfire_dmg_debuff) and Spell(solar_wrath) or { Talent(natures_balance_talent) and target.DebuffRemaining(moonfire_dmg_debuff) < 5 and CastTime(lunar_strike_balance) < target.DebuffRemaining(moonfire_dmg_debuff) or Enemies() >= 2 } and Spell(lunar_strike_balance) or Spell(solar_wrath)
 }
 
 ### Balance icons.
