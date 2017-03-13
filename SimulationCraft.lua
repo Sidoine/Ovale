@@ -4281,13 +4281,13 @@ local function InsertInterruptFunction(child, annotation, interrupts)
 	
 	local spells = interrupts or {}
 	if OvaleData.BLOODELF_CLASSES[class] then
-		tinsert(spells, {name = Disambiguate("arcane_torrent", class, specialization), interrupt=1, onBoss=1, order = 97, range = "target.Distance(less 8)"})
+		tinsert(spells, {name = Disambiguate("arcane_torrent", class, specialization), interrupt=1, worksOnBoss=1, order = 97, range = "target.Distance(less 8)"})
 	end
 	if OvaleData.PANDAREN_CLASSES[class] then
-		tinsert(spells, {name = "quaking_palm", stun=1, onBoss=0, order = 98})
+		tinsert(spells, {name = "quaking_palm", stun=1, order = 98})
 	end
 	if OvaleData.TAUREN_CLASSES[class] then
-		tinsert(spells, {name = "war_stomp", stun=1, onBoss=0, order = 99, range = "target.Distance(less 5)"})
+		tinsert(spells, {name = "war_stomp", stun=1, order = 99, range = "target.Distance(less 5)"})
 	end
 	
 	tsort(spells, function(a, b) return tonumber(a.order or 0) < tonumber(b.order or 0) end)
@@ -4307,7 +4307,7 @@ local function InsertInterruptFunction(child, annotation, interrupts)
 		if spell.interrupt == 1 then
 			tinsert(conditions, "target.IsInterruptible()")
 		end
-		if spell.onBoss == 0 then
+		if spell.worksOnBoss == 0 or spell.worksOnBoss == nil then
 			tinsert(conditions, "not target.Classification(worldboss)")
 		end
 		if spell.extraCondition ~= nil then
@@ -4348,82 +4348,82 @@ local function InsertInterruptFunctions(child, annotation)
 	
 	local interrupts = {}
 	if annotation.mind_freeze == "DEATHKNIGHT" then
-		tinsert(interrupts, {name = "mind_freeze", interrupt=1, onBoss=1, order=10})
+		tinsert(interrupts, {name = "mind_freeze", interrupt=1, worksOnBoss=1, order=10})
 		if annotation.specialization == "blood" or annotation.specialization == "unholy" then
-			tinsert(interrupts, {name = "asphyxiate", stun=1, onBoss=0, order=20})
+			tinsert(interrupts, {name = "asphyxiate", stun=1, order=20})
 		end
 	end
 	if annotation.consume_magic == "DEMONHUNTER" then
-		tinsert(interrupts, {name = "consume_magic", interrupt=1, onBoss=1, order=10})
-		tinsert(interrupts, {name = "fel_eruption", stun=1, onBoss=0, order=20})
-		tinsert(interrupts, {name = "imprison", cc=1, onBoss=0, extraCondition="target.CreatureType(Demon Humanoid Beast)", order=999})
+		tinsert(interrupts, {name = "consume_magic", interrupt=1, worksOnBoss=1, order=10})
+		tinsert(interrupts, {name = "fel_eruption", stun=1, order=20})
+		tinsert(interrupts, {name = "imprison", cc=1, extraCondition="target.CreatureType(Demon Humanoid Beast)", order=999})
 		if annotation.specialization == "havoc" then 
-			tinsert(interrupts, {name = "chaos_nova", stun=1, onBoss=0, range="target.Distance(less 8)", order=100})
+			tinsert(interrupts, {name = "chaos_nova", stun=1, range="target.Distance(less 8)", order=100})
 		end
 		if annotation.specialization == "vengeance" then
-			tinsert(interrupts, {name = "sigil_of_silence", interrupt=1, onBoss=0, order=110, range="", extraCondition = "not SigilCharging(silence misery chains) and (target.RemainingCastTime() >= (2 - Talent(quickened_sigils_talent) + GCDRemaining()))"}) 
-			tinsert(interrupts, {name = "sigil_of_misery", disorient=1, onBoss=0, order=120, range="", extraCondition = "not SigilCharging(silence misery chains) and (target.RemainingCastTime() >= (2 - Talent(quickened_sigils_talent) + GCDRemaining()))"}) 
-			tinsert(interrupts, {name = "sigil_of_chains", pull=1, onBoss=0, order=130, range="", extraCondition = "not SigilCharging(silence misery chains) and (target.RemainingCastTime() >= (2 - Talent(quickened_sigils_talent) + GCDRemaining()))"}) 
+			tinsert(interrupts, {name = "sigil_of_silence", interrupt=1, order=110, range="", extraCondition = "not SigilCharging(silence misery chains) and (target.RemainingCastTime() >= (2 - Talent(quickened_sigils_talent) + GCDRemaining()))"}) 
+			tinsert(interrupts, {name = "sigil_of_misery", disorient=1, order=120, range="", extraCondition = "not SigilCharging(silence misery chains) and (target.RemainingCastTime() >= (2 - Talent(quickened_sigils_talent) + GCDRemaining()))"}) 
+			tinsert(interrupts, {name = "sigil_of_chains", pull=1, order=130, range="", extraCondition = "not SigilCharging(silence misery chains) and (target.RemainingCastTime() >= (2 - Talent(quickened_sigils_talent) + GCDRemaining()))"}) 
 		end
 	end
 	if annotation.skull_bash == "DRUID" or annotation.solar_beam == "DRUID" then
 		if annotation.specialization == "guardian" or annotation.specialization == "feral" then
-			tinsert(interrupts, {name = "skull_bash", interrupt=1, onBoss=1, order=10})
+			tinsert(interrupts, {name = "skull_bash", interrupt=1, worksOnBoss=1, order=10})
 		end
 		if annotation.specialization == "balance" then
-			tinsert(interrupts, {name = "solar_beam", interrupt=1, onBoss=1, order=10})
+			tinsert(interrupts, {name = "solar_beam", interrupt=1, worksOnBoss=1, order=10})
 		end
-		tinsert(interrupts, {name = "mighty_bash", stun=1, onBoss=0, order=20})
-		tinsert(interrupts, {name = "typhoon", knockback=1, onBoss=0, order=30, range="target.Distance(less 15)"})
+		tinsert(interrupts, {name = "mighty_bash", stun=1, order=20})
+		tinsert(interrupts, {name = "typhoon", knockback=1, order=30, range="target.Distance(less 15)"})
 		if annotation.specialization == "feral" then
-			tinsert(interrupts, {name = "maim", stun=1, onBoss=0, order=40})
+			tinsert(interrupts, {name = "maim", stun=1, order=40})
 		end
 	end
 	if annotation.counter_shot == "HUNTER" then
-		tinsert(interrupts, {name = "counter_shot", interrupt=1, onBoss=1, order=10})
+		tinsert(interrupts, {name = "counter_shot", interrupt=1, worksOnBoss=1, order=10})
 	end
 	if annotation.muzzle == "HUNTER" then
-		tinsert(interrupts, {name = "muzzle", interrupt=1, onBoss=1, order=10})
+		tinsert(interrupts, {name = "muzzle", interrupt=1, worksOnBoss=1, order=10})
 	end
 	if annotation.counterspell == "MAGE" then
-		tinsert(interrupts, {name = "counterspell", interrupt=1, onBoss=1, order=10})
+		tinsert(interrupts, {name = "counterspell", interrupt=1, worksOnBoss=1, order=10})
 	end
 	if annotation.spear_hand_strike == "MONK" then
-		tinsert(interrupts, {name = "spear_hand_strike", interrupt=1, onBoss=1, order=10})
-		tinsert(interrupts, {name = "paralysis", cc=1, onBoss=0, order=999})
-		tinsert(interrupts, {name = "leg_sweep", stun=1, onBoss=0, order=30, range = "target.Distance(less 5)"})
+		tinsert(interrupts, {name = "spear_hand_strike", interrupt=1, worksOnBoss=1, order=10})
+		tinsert(interrupts, {name = "paralysis", cc=1, order=999})
+		tinsert(interrupts, {name = "leg_sweep", stun=1, order=30, range = "target.Distance(less 5)"})
 	end
 	if annotation.rebuke == "PALADIN" then
-		tinsert(interrupts, {name = "rebuke", interrupt=1, onBoss=1, order=10})
-		tinsert(interrupts, {name = "hammer_of_justice", stun=1, onBoss=0, order=20})
+		tinsert(interrupts, {name = "rebuke", interrupt=1, worksOnBoss=1, order=10})
+		tinsert(interrupts, {name = "hammer_of_justice", stun=1, order=20})
 		
 		if annotation.specialization == "protection" then
-			tinsert(interrupts, {name = "avengers_shield", interrupt=1, onBoss=1, order=15})
-			tinsert(interrupts, {name = "blinding_light", disorient=1, onBoss=0, order=50, range="target.Distance(less 10)"})
+			tinsert(interrupts, {name = "avengers_shield", interrupt=1, worksOnBoss=1, order=15})
+			tinsert(interrupts, {name = "blinding_light", disorient=1, order=50, range="target.Distance(less 10)"})
 		end
 	end	
 	if annotation.silence == "PRIEST" then
-		tinsert(interrupts, {name = "silence", interrupt=1, onBoss=1, order=10})
+		tinsert(interrupts, {name = "silence", interrupt=1, worksOnBoss=1, order=10})
 	end
 	if annotation.kick == "ROGUE" then
-		tinsert(interrupts, {name = "kick", interrupt=1, onBoss=1, order=10})
-		tinsert(interrupts, {name = "cheap_shot", stun=1, onBoss=0, order=20})
+		tinsert(interrupts, {name = "kick", interrupt=1, worksOnBoss=1, order=10})
+		tinsert(interrupts, {name = "cheap_shot", stun=1, order=20})
 		if annotation.specialization == "outlaw" then
-			tinsert(interrupts, {name = "between_the_eyes", stun=1, onBoss=0, order=30, extraCondition="ComboPoints() >= 1"})
-			tinsert(interrupts, {name = "gouge", incapacitate=1, onBoss=0, order=100})
+			tinsert(interrupts, {name = "between_the_eyes", stun=1, order=30, extraCondition="ComboPoints() >= 1"})
+			tinsert(interrupts, {name = "gouge", incapacitate=1, order=100})
 		end
 		if annotation.specialization == "assassination" or annotation.specialization == "subtlety" then
-			tinsert(interrupts, {name = "kidney_shot", stun=1, onBoss=0, order=30, extraCondition="ComboPoints() >= 1"})
+			tinsert(interrupts, {name = "kidney_shot", stun=1, order=30, extraCondition="ComboPoints() >= 1"})
 		end
 	end
 	if annotation.wind_shear == "SHAMAN" then
-		tinsert(interrupts, {name = "wind_shear", interrupt=1, onBoss=1, order=10})
-		tinsert(interrupts, {name = "sundering", knockback=1, onBoss=0, order=20, range="target.Distance(less 5)"})
-		tinsert(interrupts, {name = "lightning_surge_totem", stun=1, onBoss=0, order=30, range="", extraCondition="target.RemainingCastTime() > 2"})
-		tinsert(interrupts, {name = "hex", cc=1, onBoss=0, order=100, extraCondition="target.RemainingCastTime() > CastTime(hex) + GCDRemaining() and target.CreatureType(Humanoid Beast)"})
+		tinsert(interrupts, {name = "wind_shear", interrupt=1, worksOnBoss=1, order=10})
+		tinsert(interrupts, {name = "sundering", knockback=1, order=20, range="target.Distance(less 5)"})
+		tinsert(interrupts, {name = "lightning_surge_totem", stun=1, order=30, range="", extraCondition="target.RemainingCastTime() > 2"})
+		tinsert(interrupts, {name = "hex", cc=1, order=100, extraCondition="target.RemainingCastTime() > CastTime(hex) + GCDRemaining() and target.CreatureType(Humanoid Beast)"})
 	end
 	if annotation.pummel == "WARRIOR" then
-		tinsert(interrupts, {name = "pummel", interrupt=1, onBoss=1, order=10})
+		tinsert(interrupts, {name = "pummel", interrupt=1, worksOnBoss=1, order=10})
 	end
 	
 	if #interrupts > 0 then

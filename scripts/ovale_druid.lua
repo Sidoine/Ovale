@@ -95,21 +95,15 @@ AddFunction GuardianDefaultCdActions
 
 AddFunction GuardianInterruptActions
 {
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
 	{
-		if target.InRange(skull_bash) Spell(skull_bash)
+		if target.InRange(skull_bash) and target.IsInterruptible() Spell(skull_bash)
 		if not target.Classification(worldboss)
 		{
 			Spell(mighty_bash)
 			if target.Distance(less 15) Spell(typhoon)
 			if target.Distance(less 10) Spell(incapacitating_roar)
 			if target.Distance(less 8) Spell(war_stomp)
-		}
-		if target.IsTargetingPlayer() 
-		{
-			Spell(mark_of_ursol)
-			Spell(barkskin)
-			Spell(survival_instincts)
 		}
 	}
 }
