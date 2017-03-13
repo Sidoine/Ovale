@@ -79,6 +79,7 @@ Define(elunes_guidance 202060)
 	SpellInfo(elunes_guidance cd=45 combo=5)
 Define(elunes_guidance_buff 202060)
 	#TODO 1 combo per s
+Define(embrace_of_the_nightmare 200855)
 Define(entangling_roots 339)
 Define(ferocious_bite 22568)
 	SpellInfo(ferocious_bite combo=finisher energy=25 extra_energy=25 physical=1 stance=druid_cat_form)
