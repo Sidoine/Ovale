@@ -1048,7 +1048,7 @@ do
 		local target = ParseCondition(positionalParams, namedParams, state)
 		if API_UnitLevel(target) < 0 then
 			targetClassification = "worldboss"
-		elseif API_UnitExists("boss1") and OvaleGUID:UnitGUID(target) == OvaleGUID:UnitGUID("boss1")
+		elseif API_UnitExists("boss1") and OvaleGUID:UnitGUID(target) == OvaleGUID:UnitGUID("boss1") then
 			targetClassification = "worldboss"
 		else
 			targetClassification = API_UnitClassification(target)
