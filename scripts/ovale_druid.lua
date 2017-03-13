@@ -83,7 +83,7 @@ AddFunction GuardianDefaultCdActions
 	if HasArtifactTrait(embrace_of_the_nightmare) Spell(rage_of_the_sleeper)
 	if CheckBoxOn(opt_legendary_ring_tank) Item(legendary_ring_bonus_armor usable=1)
 	if BuffExpires(survival_instincts_buff) and BuffExpires(rage_of_the_sleeper_buff) and BuffExpires(barkskin_buff) Spell(bristling_fur)
-	if BuffExpires(bristling_fur_buff)
+	if BuffExpires(bristling_fur_buff) and BuffExpires(survival_instincts_buff) and BuffExpires(rage_of_the_sleeper_buff) and BuffExpires(barkskin_buff) and BuffExpires(potion_buff)
 	{
 		Spell(barkskin)
 		Spell(rage_of_the_sleeper)
