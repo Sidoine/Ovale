@@ -34,8 +34,8 @@ AddFunction ArmsInterruptActions
 
 AddFunction ArmsUseItemActions
 {
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
+	Item(Trinket0Slot text=13 usable=1)
+	Item(Trinket1Slot text=14 usable=1)
 }
 
 AddFunction ArmsGetInMeleeRange
@@ -582,8 +582,8 @@ AddFunction FuryInterruptActions
 
 AddFunction FuryUseItemActions
 {
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
+	Item(Trinket0Slot text=13 usable=1)
+	Item(Trinket1Slot text=14 usable=1)
 }
 
 AddFunction FuryGetInMeleeRange

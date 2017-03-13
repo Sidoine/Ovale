@@ -152,8 +152,8 @@ AddFunction FrostInterruptActions
 
 AddFunction FrostUseItemActions
 {
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
+	Item(Trinket0Slot text=13 usable=1)
+	Item(Trinket1Slot text=14 usable=1)
 }
 
 AddFunction FrostGetInMeleeRange
@@ -689,8 +689,8 @@ AddFunction UnholyInterruptActions
 
 AddFunction UnholyUseItemActions
 {
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
+	Item(Trinket0Slot text=13 usable=1)
+	Item(Trinket1Slot text=14 usable=1)
 }
 
 AddFunction UnholyGetInMeleeRange

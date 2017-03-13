@@ -4699,8 +4699,8 @@ local function InsertSupportingFunctions(child, annotation)
 		local fmt = [[
 			AddFunction %sUseItemActions
 			{
-				Item(Trinket0Slot usable=1)
-				Item(Trinket1Slot usable=1)
+				Item(Trinket0Slot usable=1 text=13)
+				Item(Trinket1Slot usable=1 text=14)
 			}
 		]]
 		local code = format(fmt, camelSpecialization)
