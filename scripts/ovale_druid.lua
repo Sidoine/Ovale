@@ -83,12 +83,12 @@ AddFunction GuardianDefaultCdActions
 	if HasArtifactTrait(embrace_of_the_nightmare) Spell(rage_of_the_sleeper)
 	if CheckBoxOn(opt_legendary_ring_tank) Item(legendary_ring_bonus_armor usable=1)
 	if BuffExpires(survival_instincts_buff) and BuffExpires(rage_of_the_sleeper_buff) and BuffExpires(barkskin_buff) Spell(bristling_fur)
+	Item(Trinket0Slot usable=1 text=13)
+	Item(Trinket1Slot usable=1 text=14)
 	if BuffExpires(bristling_fur_buff) and BuffExpires(survival_instincts_buff) and BuffExpires(rage_of_the_sleeper_buff) and BuffExpires(barkskin_buff) and BuffExpires(potion_buff)
 	{
 		Spell(barkskin)
 		Spell(rage_of_the_sleeper)
-		Item(Trinket0Slot usable=1 text=13)
-		Item(Trinket1Slot usable=1 text=14)
 		Spell(survival_instincts)
 		Item(unbending_potion usable=1)
 	}
