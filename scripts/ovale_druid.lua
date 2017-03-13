@@ -102,9 +102,9 @@ AddFunction GuardianInterruptActions
 		if not target.Classification(worldboss)
 		{
 			Spell(mighty_bash)
-			if target.Distance(less 15) Spell(typhoon)
 			if target.Distance(less 10) Spell(incapacitating_roar)
 			if target.Distance(less 8) Spell(war_stomp)
+			if target.Distance(less 15) Spell(typhoon)
 		}
 	}
 }
@@ -159,8 +159,8 @@ AddFunction BalanceInterruptActions
 	{
 		if target.InRange(solar_beam) and target.IsInterruptible() Spell(solar_beam)
 		if target.InRange(mighty_bash) and not target.Classification(worldboss) Spell(mighty_bash)
-		if target.Distance(less 15) and not target.Classification(worldboss) Spell(typhoon)
 		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+		if target.Distance(less 15) and not target.Classification(worldboss) Spell(typhoon)
 	}
 }
 
@@ -727,9 +727,9 @@ AddFunction FeralInterruptActions
 	{
 		if target.InRange(skull_bash) and target.IsInterruptible() Spell(skull_bash)
 		if target.InRange(mighty_bash) and not target.Classification(worldboss) Spell(mighty_bash)
-		if target.Distance(less 15) and not target.Classification(worldboss) Spell(typhoon)
 		if target.InRange(maim) and not target.Classification(worldboss) Spell(maim)
 		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+		if target.Distance(less 15) and not target.Classification(worldboss) Spell(typhoon)
 	}
 }
 
@@ -1250,8 +1250,9 @@ AddFunction GuardianInterruptActions
 	{
 		if target.InRange(skull_bash) and target.IsInterruptible() Spell(skull_bash)
 		if target.InRange(mighty_bash) and not target.Classification(worldboss) Spell(mighty_bash)
-		if target.Distance(less 15) and not target.Classification(worldboss) Spell(typhoon)
+		if target.Distance(less 10) and not target.Classification(worldboss) Spell(incapacitating_roar)
 		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+		if target.Distance(less 15) and not target.Classification(worldboss) Spell(typhoon)
 	}
 }
 
@@ -1446,6 +1447,7 @@ AddIcon checkbox=opt_druid_guardian_aoe help=cd specialization=guardian
 # frenzied_regeneration
 # galactic_guardian_buff
 # gory_fur_buff
+# incapacitating_roar
 # incarnation_guardian_of_ursoc
 # incarnation_guardian_of_ursoc_buff
 # ironfur

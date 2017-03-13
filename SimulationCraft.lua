@@ -4374,7 +4374,10 @@ local function InsertInterruptFunctions(child, annotation)
 			tinsert(interrupts, {name = "solar_beam", interrupt=1, worksOnBoss=1, order=10})
 		end
 		tinsert(interrupts, {name = "mighty_bash", stun=1, order=20})
-		tinsert(interrupts, {name = "typhoon", knockback=1, order=30, range="target.Distance(less 15)"})
+		if annotation.specialization == "guardian" then
+			tinsert(interrupts, {name = "incapacitating_roar", incapacitate=1, order=30, range="target.Distance(less 10)"})
+		end
+		tinsert(interrupts, {name = "typhoon", knockback=1, order=110, range="target.Distance(less 15)"})
 		if annotation.specialization == "feral" then
 			tinsert(interrupts, {name = "maim", stun=1, order=40})
 		end
