@@ -81,14 +81,14 @@ AddFunction GuardianDefaultCdActions
 	GuardianInterruptActions()
 	Spell(incarnation_guardian_of_ursoc)
 	if CheckBoxOn(opt_legendary_ring_tank) Item(legendary_ring_bonus_armor usable=1)
-	if BuffExpires(ironfur_buff) and BuffExpires(survival_instincts_buff) and BuffExpires(rage_of_the_sleeper_buff) and BuffExpires(barkskin_buff) Spell(bristling_fur)
+	if BuffExpires(survival_instincts_buff) and BuffExpires(rage_of_the_sleeper_buff) and BuffExpires(barkskin_buff) Spell(bristling_fur)
 	if BuffExpires(bristling_fur_buff)
 	{
+		Spell(barkskin)
+		Spell(rage_of_the_sleeper)
 		Item(Trinket0Slot usable=1 text=13)
 		Item(Trinket1Slot usable=1 text=14)
 		Spell(survival_instincts)
-		Spell(rage_of_the_sleeper)
-		Spell(barkskin)
 		Item(unbending_potion usable=1)
 	}
 }
