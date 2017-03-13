@@ -919,7 +919,7 @@ do
 		else
 			local spellName, _, _, _, startTime, endTime = API_UnitCastingInfo(target)
 			if not spellName then
-				spellName, _, _, _, startTime, endTime = API_UnitChannelInfo("unit")
+				spellName, _, _, _, startTime, endTime = API_UnitChannelInfo(target)
 			end
 			if spellName then
 				castSpellName = spellName
