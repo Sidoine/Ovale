@@ -413,7 +413,8 @@ AddFunction HavocCooldownCdPostConditions
 AddFunction HavocPrecombatMainActions
 {
 	#flask,type=flask_of_the_seventh_demon
-	#food,type=the_hungry_magister
+	#food,type=the_hungry_magister,if=!equipped.majordomos_dinner_bell
+	#food,type=nightborne_delicacy_platter,if=equipped.majordomos_dinner_bell
 	#augmentation,type=defiled
 	Spell(augmentation)
 }

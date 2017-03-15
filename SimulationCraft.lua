@@ -3026,6 +3026,7 @@ do
 		["blade_dance_worth_using"] = "0",--TODO
 		["blood.frac"]			= "Rune(blood)",
 		["buff.out_of_range.up"] = "not target.InRange()",
+		["bugs"] = "0", --TODO
 		["chi"]					= "Chi()",
 		["chi.max"]				= "MaxChi()",
 		["combo_points"]		= "ComboPoints()",
