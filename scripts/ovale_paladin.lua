@@ -14,15 +14,54 @@ AddCheckBox(opt_interrupt L(interrupt) default specialization=protection)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=protection)
 AddCheckBox(opt_legendary_ring_tank ItemName(legendary_ring_bonus_armor) default specialization=protection)
 
+AddFunction ProtectionSelfHealCondition
+{
+	(HealthPercent() < 40)
+		or (IncomingDamage(10) < MaxHealth() * 1.25 and HealthPercent() < 55 and Talent(righteous_protector_talent))
+		or (IncomingDamage(13) < MaxHealth() * 1.6 and HealthPercent() < 55)
+		or (IncomingDamage(6) < MaxHealth() * 0.7 and HealthPercent() < 65 and Talent(righteous_protector_talent))
+		or (IncomingDamage(9) < MaxHealth() * 1.2 and HealthPercent() < 55)
+		or (HealthPercent() < 60 and HasEquippedItem(saruans_resolve) and (SpellCharges(light_of_the_protector) >= 2 or SpellCharges(hand_of_the_protector) >= 2))
+}
+
+AddFunction ProtectionHasProtectiveCooldown
+{
+	target.DebuffPresent(eye_of_tyr_debuff) or BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff)
+}
+
+AddFunction ProtectionCooldownTreshold
+{
+	HealthPercent() <= 100 and not ProtectionHasProtectiveCooldown()
+}
+
 AddFunction ProtectionGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(shield_of_the_righteous) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
+AddFunction ProtectionDefaultShortCDActions
+{
+	if ProtectionSelfHealCondition() Spell(light_of_the_protector)
+	
+	#bastion_of_light,if=talent.bastion_of_light.enabled&action.shield_of_the_righteous.charges<1
+	if Talent(bastion_of_light_talent) and Charges(shield_of_the_righteous) < 1 Spell(bastion_of_light)
+	#seraphim,if=talent.seraphim.enabled&action.shield_of_the_righteous.charges>=2
+	if Talent(seraphim_talent) and Charges(shield_of_the_righteous) >= 2 Spell(seraphim)
+
+	ProtectionGetInMeleeRange()
+	
+	#shield_of_the_righteous,if=(!talent.seraphim.enabled|action.shield_of_the_righteous.charges>2)&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
+	if { not Talent(seraphim_talent) or Charges(shield_of_the_righteous) > 2 } and not ProtectionHasProtectiveCooldown() Spell(shield_of_the_righteous)
+	#shield_of_the_righteous,if=(talent.bastion_of_light.enabled&talent.seraphim.enabled&buff.seraphim.up&cooldown.bastion_of_light.up)&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
+	if Talent(bastion_of_light_talent) and Talent(seraphim_talent) and BuffPresent(seraphim_buff) and not SpellCooldown(bastion_of_light) > 0 and not ProtectionHasProtectiveCooldown() Spell(shield_of_the_righteous)
+	#shield_of_the_righteous,if=(talent.bastion_of_light.enabled&!talent.seraphim.enabled&cooldown.bastion_of_light.up)&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
+	if Talent(bastion_of_light_talent) and not Talent(seraphim_talent) and not SpellCooldown(bastion_of_light) > 0 and not ProtectionHasProtectiveCooldown() Spell(shield_of_the_righteous)
+}
+
 AddFunction ProtectionDefaultMainActions
 {
 	if Speed() == 0 and HasEquippedItem(heathcliffs_immortality) and not BuffPresent(consecration_buff) Spell(consecration)
-	if Charges(shield_of_the_righteous) <= 2*Talent(seraphim_talent) and not BuffPresent(shield_of_the_righteous_buff) and ProtectionCooldownTreshold() and (not Talent(bastion_of_light_talent) or SpellCooldown(bastion_of_light) == 0) Spell(eye_of_tyr)
+	if Charges(shield_of_the_righteous) <= 2*Talent(seraphim_talent) and not BuffPresent(shield_of_the_righteous_buff) and ProtectionCooldownTreshold() and (not Talent(bastion_of_light_talent) or SpellCooldown(bastion_of_light) > 0) Spell(eye_of_tyr)
 	if Talent(blessed_hammer_talent) Spell(blessed_hammer)
 	Spell(judgment)
 	if Talent(crusaders_judgment_talent) and BuffPresent(grand_crusader_buff) Spell(avengers_shield)
@@ -44,42 +83,6 @@ AddFunction ProtectionDefaultAoEActions
 	Spell(blinding_light)
 	if Speed() == 0 Spell(consecration)
 	Spell(hammer_of_the_righteous)
-}
-
-AddFunction ProtectionDefaultShortCDActions
-{
-	#bastion_of_light,if=talent.bastion_of_light.enabled&action.shield_of_the_righteous.charges<1
-	if Talent(bastion_of_light_talent) and Charges(shield_of_the_righteous) < 1 Spell(bastion_of_light)
-	#seraphim,if=talent.seraphim.enabled&action.shield_of_the_righteous.charges>=2
-	if Talent(seraphim_talent) and Charges(shield_of_the_righteous) >= 2 Spell(seraphim)
-	
-	ProtectionGetInMeleeRange()
-	
-	#shield_of_the_righteous,if=(!talent.seraphim.enabled|action.shield_of_the_righteous.charges>2)&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
-	if { not Talent(seraphim_talent) or Charges(shield_of_the_righteous) > 2 } and ProtectionCooldownTreshold() Spell(shield_of_the_righteous)
-	#shield_of_the_righteous,if=(talent.bastion_of_light.enabled&talent.seraphim.enabled&buff.seraphim.up&cooldown.bastion_of_light.up)&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
-	if Talent(bastion_of_light_talent) and Talent(seraphim_talent) and BuffPresent(seraphim_buff) and not SpellCooldown(bastion_of_light) > 0 and ProtectionCooldownTreshold() Spell(shield_of_the_righteous)
-	#shield_of_the_righteous,if=(talent.bastion_of_light.enabled&!talent.seraphim.enabled&cooldown.bastion_of_light.up)&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
-	if Talent(bastion_of_light_talent) and not Talent(seraphim_talent) and not SpellCooldown(bastion_of_light) > 0 and ProtectionCooldownTreshold() Spell(shield_of_the_righteous)
-	#light_of_the_protector,if=(health.pct<40)
-	if HealthPercent() < 40 Spell(light_of_the_protector)
-	#hand_of_the_protector,if=(health.pct<40)
-	if HealthPercent() < 40 Spell(hand_of_the_protector)
-	#light_of_the_protector,if=(incoming_damage_10000ms<health.max*1.25)&health.pct<55&talent.righteous_protector.enabled
-	if IncomingDamage(10) < MaxHealth() * 1.25 and HealthPercent() < 55 and Talent(righteous_protector_talent) Spell(light_of_the_protector)
-	#light_of_the_protector,if=(incoming_damage_13000ms<health.max*1.6)&health.pct<55
-	if IncomingDamage(13) < MaxHealth() * 1.6 and HealthPercent() < 55 Spell(light_of_the_protector)
-	#hand_of_the_protector,if=(incoming_damage_6000ms<health.max*0.7)&health.pct<65&talent.righteous_protector.enabled
-	if IncomingDamage(6) < MaxHealth() * 0.7 and HealthPercent() < 65 and Talent(righteous_protector_talent) Spell(hand_of_the_protector)
-	#hand_of_the_protector,if=(incoming_damage_9000ms<health.max*1.2)&health.pct<55
-	if IncomingDamage(9) < MaxHealth() * 1.2 and HealthPercent() < 55 Spell(hand_of_the_protector)
-}
-
-AddFunction ProtectionCooldownTreshold
-{
-	HealthPercent() <= 100 
-		and not { target.DebuffPresent(eye_of_tyr_debuff) or BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff) }
-		and not { Talent(seraphim_talent) and BuffPresent(seraphim_buff) }
 }
 
 AddCheckBox(opt_avenging_wrath SpellName(avenging_wrath_melee) default specialization=protection)
@@ -158,8 +161,22 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_paladin_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=protection)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=protection)
 AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=protection)
+
+AddFunction ProtectionInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+	{
+		if target.InRange(rebuke) and target.IsInterruptible() Spell(rebuke)
+		if target.InRange(avengers_shield) and target.IsInterruptible() Spell(avengers_shield)
+		if target.InRange(hammer_of_justice) and not target.Classification(worldboss) Spell(hammer_of_justice)
+		if target.Distance(less 10) and not target.Classification(worldboss) Spell(blinding_light)
+		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_holy)
+		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+	}
+}
 
 AddFunction ProtectionUsePotionStrength
 {
@@ -168,8 +185,8 @@ AddFunction ProtectionUsePotionStrength
 
 AddFunction ProtectionUseItemActions
 {
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
+	Item(Trinket0Slot text=13 usable=1)
+	Item(Trinket1Slot text=14 usable=1)
 }
 
 AddFunction ProtectionGetInMeleeRange
@@ -207,6 +224,8 @@ AddFunction ProtectionDefaultShortCdPostConditions
 
 AddFunction ProtectionDefaultCdActions
 {
+	#rebuke
+	ProtectionInterruptActions()
 	#use_item,name=shivermaws_jawbone
 	ProtectionUseItemActions()
 	#blood_fury
@@ -470,6 +489,7 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 ### Required symbols
 # aegis_of_light
 # aegis_of_light_buff
+# arcane_torrent_holy
 # ardent_defender
 # ardent_defender_buff
 # avengers_shield
@@ -492,6 +512,7 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 # grand_crusader_buff
 # guardian_of_ancient_kings
 # guardian_of_ancient_kings_buff
+# hammer_of_justice
 # hammer_of_the_righteous
 # hand_of_the_protector
 # judgment
@@ -507,6 +528,7 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 # seraphim_talent
 # shield_of_the_righteous
 # stoneform
+# war_stomp
 ]]
 	OvaleScripts:RegisterScript("PALADIN", "protection", name, desc, code, "script")
 end
@@ -541,8 +563,8 @@ AddFunction RetributionInterruptActions
 
 AddFunction RetributionUseItemActions
 {
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
+	Item(Trinket0Slot text=13 usable=1)
+	Item(Trinket1Slot text=14 usable=1)
 }
 
 AddFunction RetributionGetInMeleeRange
@@ -562,8 +584,8 @@ AddFunction RetributionDefaultMainActions
 	if TimeInCombat() < 2 and { HasEquippedItem(137048) or Race(BloodElf) } Spell(divine_hammer)
 	#wake_of_ashes,if=holy_power<=1&time<2
 	if HolyPower() <= 1 and TimeInCombat() < 2 Spell(wake_of_ashes)
-	#execution_sentence,if=spell_targets.divine_storm<=3&(cooldown.judgment.remains<gcd*4.5|debuff.judgment.remains>gcd*4.67)&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*2)
-	if Enemies() <= 3 and { SpellCooldown(judgment) < GCD() * 4.5 or target.DebuffRemaining(judgment_debuff) > GCD() * 4.67 } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } Spell(execution_sentence)
+	#execution_sentence,if=spell_targets.divine_storm<=3&(cooldown.judgment.remains<gcd*4.65|debuff.judgment.remains>gcd*4.65)&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*2)
+	if Enemies() <= 3 and { SpellCooldown(judgment) < GCD() * 4.65 or target.DebuffRemaining(judgment_debuff) > GCD() * 4.65 } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } Spell(execution_sentence)
 	#divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&buff.divine_purpose.up&buff.divine_purpose.remains<gcd*2
 	if target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and BuffPresent(divine_purpose_buff) and BuffRemaining(divine_purpose_buff) < GCD() * 2 Spell(divine_storm)
 	#divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&holy_power>=5&buff.divine_purpose.react
@@ -578,30 +600,28 @@ AddFunction RetributionDefaultMainActions
 	if target.DebuffPresent(judgment_debuff) and HolyPower() >= 5 and BuffPresent(divine_purpose_buff) Spell(templars_verdict)
 	#templars_verdict,if=debuff.judgment.up&holy_power>=3&buff.crusade.up&(buff.crusade.stack<15|buff.bloodlust.up)
 	if target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 and BuffPresent(crusade_buff) and { BuffStacks(crusade_buff) < 15 or BuffPresent(burst_haste_buff any=1) } Spell(templars_verdict)
-	#templars_verdict,if=debuff.judgment.up&holy_power>=5&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*3)
-	if target.DebuffPresent(judgment_debuff) and HolyPower() >= 5 and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 3 } Spell(templars_verdict)
+	#templars_verdict,if=debuff.judgment.up&holy_power>=5&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*3)&(!talent.execution_sentence.enabled|cooldown.execution_sentence.remains>gcd)
+	if target.DebuffPresent(judgment_debuff) and HolyPower() >= 5 and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 3 } and { not Talent(execution_sentence_talent) or SpellCooldown(execution_sentence) > GCD() } Spell(templars_verdict)
 	#divine_storm,if=debuff.judgment.up&holy_power>=3&spell_targets.divine_storm>=2&(cooldown.wake_of_ashes.remains<gcd*2&artifact.wake_of_ashes.enabled|buff.whisper_of_the_nathrezim.up&buff.whisper_of_the_nathrezim.remains<gcd)&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*4)
 	if target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 and Enemies() >= 2 and { SpellCooldown(wake_of_ashes) < GCD() * 2 and HasArtifactTrait(wake_of_ashes) or BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 4 } Spell(divine_storm)
 	#templars_verdict,if=debuff.judgment.up&holy_power>=3&(cooldown.wake_of_ashes.remains<gcd*2&artifact.wake_of_ashes.enabled|buff.whisper_of_the_nathrezim.up&buff.whisper_of_the_nathrezim.remains<gcd)&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*4)
 	if target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 and { SpellCooldown(wake_of_ashes) < GCD() * 2 and HasArtifactTrait(wake_of_ashes) or BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 4 } Spell(templars_verdict)
+	#judgment,if=dot.execution_sentence.ticking&dot.execution_sentence.remains<gcd*2&debuff.judgment.remains<gcd*2
+	if target.DebuffPresent(execution_sentence_debuff) and target.DebuffRemaining(execution_sentence_debuff) < GCD() * 2 and target.DebuffRemaining(judgment_debuff) < GCD() * 2 Spell(judgment)
 	#wake_of_ashes,if=holy_power=0|holy_power=1&(cooldown.blade_of_justice.remains>gcd|cooldown.divine_hammer.remains>gcd)|holy_power=2&(cooldown.zeal.charges_fractional<=0.65|cooldown.crusader_strike.charges_fractional<=0.65)
 	if HolyPower() == 0 or HolyPower() == 1 and { SpellCooldown(blade_of_justice) > GCD() or SpellCooldown(divine_hammer) > GCD() } or HolyPower() == 2 and { SpellCharges(zeal count=0) <= 0.65 or SpellCharges(crusader_strike count=0) <= 0.65 } Spell(wake_of_ashes)
-	#blade_of_justice,if=holy_power<=3&buff.whisper_of_the_nathrezim.up&buff.whisper_of_the_nathrezim.remains>gcd&buff.whisper_of_the_nathrezim.remains<gcd*3&debuff.judgment.up&debuff.judgment.remains>gcd*2
-	if HolyPower() <= 3 and BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) > GCD() and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() * 3 and target.DebuffPresent(judgment_debuff) and target.DebuffRemaining(judgment_debuff) > GCD() * 2 Spell(blade_of_justice)
 	#divine_hammer,if=holy_power<=3&buff.whisper_of_the_nathrezim.up&buff.whisper_of_the_nathrezim.remains>gcd&buff.whisper_of_the_nathrezim.remains<gcd*3&debuff.judgment.up&debuff.judgment.remains>gcd*2
 	if HolyPower() <= 3 and BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) > GCD() and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() * 3 and target.DebuffPresent(judgment_debuff) and target.DebuffRemaining(judgment_debuff) > GCD() * 2 Spell(divine_hammer)
-	#blade_of_justice,if=talent.blade_of_wrath.enabled&holy_power<=3
-	if Talent(blade_of_wrath_talent) and HolyPower() <= 3 Spell(blade_of_justice)
+	#blade_of_justice,if=holy_power<=3
+	if HolyPower() <= 3 Spell(blade_of_justice)
 	#zeal,if=charges=2&holy_power<=4
 	if Charges(zeal) == 2 and HolyPower() <= 4 Spell(zeal)
 	#crusader_strike,if=charges=2&holy_power<=4
 	if Charges(crusader_strike) == 2 and HolyPower() <= 4 Spell(crusader_strike)
-	#blade_of_justice,if=holy_power<=2|(holy_power<=3&(cooldown.zeal.charges_fractional<=1.34|cooldown.crusader_strike.charges_fractional<=1.34))
-	if HolyPower() <= 2 or HolyPower() <= 3 and { SpellCharges(zeal count=0) <= 1.34 or SpellCharges(crusader_strike count=0) <= 1.34 } Spell(blade_of_justice)
 	#divine_hammer,if=holy_power<=2|(holy_power<=3&(cooldown.zeal.charges_fractional<=1.34|cooldown.crusader_strike.charges_fractional<=1.34))
 	if HolyPower() <= 2 or HolyPower() <= 3 and { SpellCharges(zeal count=0) <= 1.34 or SpellCharges(crusader_strike count=0) <= 1.34 } Spell(divine_hammer)
-	#judgment,if=holy_power>=3|((cooldown.zeal.charges_fractional<=1.67|cooldown.crusader_strike.charges_fractional<=1.67)&(cooldown.divine_hammer.remains>gcd|cooldown.blade_of_justice.remains>gcd))|(talent.greater_judgment.enabled&target.health.pct>50)
-	if HolyPower() >= 3 or { SpellCharges(zeal count=0) <= 1.67 or SpellCharges(crusader_strike count=0) <= 1.67 } and { SpellCooldown(divine_hammer) > GCD() or SpellCooldown(blade_of_justice) > GCD() } or Talent(greater_judgment_talent) and target.HealthPercent() > 50 Spell(judgment)
+	#judgment
+	Spell(judgment)
 	#consecration
 	Spell(consecration)
 	#divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&buff.divine_purpose.react
@@ -614,8 +634,8 @@ AddFunction RetributionDefaultMainActions
 	if target.DebuffPresent(judgment_debuff) and BuffPresent(divine_purpose_buff) Spell(templars_verdict)
 	#templars_verdict,if=debuff.judgment.up&buff.the_fires_of_justice.react&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*3)
 	if target.DebuffPresent(judgment_debuff) and BuffPresent(the_fires_of_justice_buff) and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 3 } Spell(templars_verdict)
-	#templars_verdict,if=debuff.judgment.up&(holy_power>=4|((cooldown.zeal.charges_fractional<=1.34|cooldown.crusader_strike.charges_fractional<=1.34)&(cooldown.divine_hammer.remains>gcd|cooldown.blade_of_justice.remains>gcd)))&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*4)
-	if target.DebuffPresent(judgment_debuff) and { HolyPower() >= 4 or { SpellCharges(zeal count=0) <= 1.34 or SpellCharges(crusader_strike count=0) <= 1.34 } and { SpellCooldown(divine_hammer) > GCD() or SpellCooldown(blade_of_justice) > GCD() } } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 4 } Spell(templars_verdict)
+	#templars_verdict,if=debuff.judgment.up&(holy_power>=4|((cooldown.zeal.charges_fractional<=1.34|cooldown.crusader_strike.charges_fractional<=1.34)&(cooldown.divine_hammer.remains>gcd|cooldown.blade_of_justice.remains>gcd)))&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*4)&(!talent.execution_sentence.enabled|cooldown.execution_sentence.remains>gcd*2)
+	if target.DebuffPresent(judgment_debuff) and { HolyPower() >= 4 or { SpellCharges(zeal count=0) <= 1.34 or SpellCharges(crusader_strike count=0) <= 1.34 } and { SpellCooldown(divine_hammer) > GCD() or SpellCooldown(blade_of_justice) > GCD() } } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 4 } and { not Talent(execution_sentence_talent) or SpellCooldown(execution_sentence) > GCD() * 2 } Spell(templars_verdict)
 	#zeal,if=holy_power<=4
 	if HolyPower() <= 4 Spell(zeal)
 	#crusader_strike,if=holy_power<=4
@@ -644,7 +664,7 @@ AddFunction RetributionDefaultShortCdActions
 
 AddFunction RetributionDefaultShortCdPostConditions
 {
-	TimeInCombat() < 2 and Spell(judgment) or TimeInCombat() < 2 and { HasEquippedItem(137048) or Race(BloodElf) } and Spell(blade_of_justice) or TimeInCombat() < 2 and { HasEquippedItem(137048) or Race(BloodElf) } and Spell(divine_hammer) or HolyPower() <= 1 and TimeInCombat() < 2 and Spell(wake_of_ashes) or Enemies() <= 3 and { SpellCooldown(judgment) < GCD() * 4.5 or target.DebuffRemaining(judgment_debuff) > GCD() * 4.67 } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } and Spell(execution_sentence) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and BuffPresent(divine_purpose_buff) and BuffRemaining(divine_purpose_buff) < GCD() * 2 and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and HolyPower() >= 5 and BuffPresent(divine_purpose_buff) and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and HolyPower() >= 3 and BuffPresent(crusade_buff) and { BuffStacks(crusade_buff) < 15 or BuffPresent(burst_haste_buff any=1) } and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and HolyPower() >= 5 and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 3 } and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and BuffPresent(divine_purpose_buff) and BuffRemaining(divine_purpose_buff) < GCD() * 2 and Spell(templars_verdict) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 5 and BuffPresent(divine_purpose_buff) and Spell(templars_verdict) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 and BuffPresent(crusade_buff) and { BuffStacks(crusade_buff) < 15 or BuffPresent(burst_haste_buff any=1) } and Spell(templars_verdict) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 5 and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 3 } and Spell(templars_verdict) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 and Enemies() >= 2 and { SpellCooldown(wake_of_ashes) < GCD() * 2 and HasArtifactTrait(wake_of_ashes) or BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 4 } and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 and { SpellCooldown(wake_of_ashes) < GCD() * 2 and HasArtifactTrait(wake_of_ashes) or BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 4 } and Spell(templars_verdict) or { HolyPower() == 0 or HolyPower() == 1 and { SpellCooldown(blade_of_justice) > GCD() or SpellCooldown(divine_hammer) > GCD() } or HolyPower() == 2 and { SpellCharges(zeal count=0) <= 0.65 or SpellCharges(crusader_strike count=0) <= 0.65 } } and Spell(wake_of_ashes) or HolyPower() <= 3 and BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) > GCD() and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() * 3 and target.DebuffPresent(judgment_debuff) and target.DebuffRemaining(judgment_debuff) > GCD() * 2 and Spell(blade_of_justice) or HolyPower() <= 3 and BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) > GCD() and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() * 3 and target.DebuffPresent(judgment_debuff) and target.DebuffRemaining(judgment_debuff) > GCD() * 2 and Spell(divine_hammer) or Talent(blade_of_wrath_talent) and HolyPower() <= 3 and Spell(blade_of_justice) or Charges(zeal) == 2 and HolyPower() <= 4 and Spell(zeal) or Charges(crusader_strike) == 2 and HolyPower() <= 4 and Spell(crusader_strike) or { HolyPower() <= 2 or HolyPower() <= 3 and { SpellCharges(zeal count=0) <= 1.34 or SpellCharges(crusader_strike count=0) <= 1.34 } } and Spell(blade_of_justice) or { HolyPower() <= 2 or HolyPower() <= 3 and { SpellCharges(zeal count=0) <= 1.34 or SpellCharges(crusader_strike count=0) <= 1.34 } } and Spell(divine_hammer) or { HolyPower() >= 3 or { SpellCharges(zeal count=0) <= 1.67 or SpellCharges(crusader_strike count=0) <= 1.67 } and { SpellCooldown(divine_hammer) > GCD() or SpellCooldown(blade_of_justice) > GCD() } or Talent(greater_judgment_talent) and target.HealthPercent() > 50 } and Spell(judgment) or Spell(consecration) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and BuffPresent(divine_purpose_buff) and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and BuffPresent(the_fires_of_justice_buff) and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 3 } and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and { HolyPower() >= 4 or { SpellCharges(zeal count=0) <= 1.34 or SpellCharges(crusader_strike count=0) <= 1.34 } and { SpellCooldown(divine_hammer) > GCD() or SpellCooldown(blade_of_justice) > GCD() } } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 4 } and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and BuffPresent(divine_purpose_buff) and Spell(templars_verdict) or target.DebuffPresent(judgment_debuff) and BuffPresent(the_fires_of_justice_buff) and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 3 } and Spell(templars_verdict) or target.DebuffPresent(judgment_debuff) and { HolyPower() >= 4 or { SpellCharges(zeal count=0) <= 1.34 or SpellCharges(crusader_strike count=0) <= 1.34 } and { SpellCooldown(divine_hammer) > GCD() or SpellCooldown(blade_of_justice) > GCD() } } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 4 } and Spell(templars_verdict) or HolyPower() <= 4 and Spell(zeal) or HolyPower() <= 4 and Spell(crusader_strike) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 and Enemies() >= 2 and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 5 } and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 5 } and Spell(templars_verdict)
+	TimeInCombat() < 2 and Spell(judgment) or TimeInCombat() < 2 and { HasEquippedItem(137048) or Race(BloodElf) } and Spell(blade_of_justice) or TimeInCombat() < 2 and { HasEquippedItem(137048) or Race(BloodElf) } and Spell(divine_hammer) or HolyPower() <= 1 and TimeInCombat() < 2 and Spell(wake_of_ashes) or Enemies() <= 3 and { SpellCooldown(judgment) < GCD() * 4.65 or target.DebuffRemaining(judgment_debuff) > GCD() * 4.65 } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } and Spell(execution_sentence) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and BuffPresent(divine_purpose_buff) and BuffRemaining(divine_purpose_buff) < GCD() * 2 and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and HolyPower() >= 5 and BuffPresent(divine_purpose_buff) and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and HolyPower() >= 3 and BuffPresent(crusade_buff) and { BuffStacks(crusade_buff) < 15 or BuffPresent(burst_haste_buff any=1) } and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and HolyPower() >= 5 and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 3 } and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and BuffPresent(divine_purpose_buff) and BuffRemaining(divine_purpose_buff) < GCD() * 2 and Spell(templars_verdict) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 5 and BuffPresent(divine_purpose_buff) and Spell(templars_verdict) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 and BuffPresent(crusade_buff) and { BuffStacks(crusade_buff) < 15 or BuffPresent(burst_haste_buff any=1) } and Spell(templars_verdict) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 5 and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 3 } and { not Talent(execution_sentence_talent) or SpellCooldown(execution_sentence) > GCD() } and Spell(templars_verdict) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 and Enemies() >= 2 and { SpellCooldown(wake_of_ashes) < GCD() * 2 and HasArtifactTrait(wake_of_ashes) or BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 4 } and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 and { SpellCooldown(wake_of_ashes) < GCD() * 2 and HasArtifactTrait(wake_of_ashes) or BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 4 } and Spell(templars_verdict) or target.DebuffPresent(execution_sentence_debuff) and target.DebuffRemaining(execution_sentence_debuff) < GCD() * 2 and target.DebuffRemaining(judgment_debuff) < GCD() * 2 and Spell(judgment) or { HolyPower() == 0 or HolyPower() == 1 and { SpellCooldown(blade_of_justice) > GCD() or SpellCooldown(divine_hammer) > GCD() } or HolyPower() == 2 and { SpellCharges(zeal count=0) <= 0.65 or SpellCharges(crusader_strike count=0) <= 0.65 } } and Spell(wake_of_ashes) or HolyPower() <= 3 and BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) > GCD() and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() * 3 and target.DebuffPresent(judgment_debuff) and target.DebuffRemaining(judgment_debuff) > GCD() * 2 and Spell(divine_hammer) or HolyPower() <= 3 and Spell(blade_of_justice) or Charges(zeal) == 2 and HolyPower() <= 4 and Spell(zeal) or Charges(crusader_strike) == 2 and HolyPower() <= 4 and Spell(crusader_strike) or { HolyPower() <= 2 or HolyPower() <= 3 and { SpellCharges(zeal count=0) <= 1.34 or SpellCharges(crusader_strike count=0) <= 1.34 } } and Spell(divine_hammer) or Spell(judgment) or Spell(consecration) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and BuffPresent(divine_purpose_buff) and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and BuffPresent(the_fires_of_justice_buff) and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 3 } and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and { HolyPower() >= 4 or { SpellCharges(zeal count=0) <= 1.34 or SpellCharges(crusader_strike count=0) <= 1.34 } and { SpellCooldown(divine_hammer) > GCD() or SpellCooldown(blade_of_justice) > GCD() } } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 4 } and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and BuffPresent(divine_purpose_buff) and Spell(templars_verdict) or target.DebuffPresent(judgment_debuff) and BuffPresent(the_fires_of_justice_buff) and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 3 } and Spell(templars_verdict) or target.DebuffPresent(judgment_debuff) and { HolyPower() >= 4 or { SpellCharges(zeal count=0) <= 1.34 or SpellCharges(crusader_strike count=0) <= 1.34 } and { SpellCooldown(divine_hammer) > GCD() or SpellCooldown(blade_of_justice) > GCD() } } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 4 } and { not Talent(execution_sentence_talent) or SpellCooldown(execution_sentence) > GCD() * 2 } and Spell(templars_verdict) or HolyPower() <= 4 and Spell(zeal) or HolyPower() <= 4 and Spell(crusader_strike) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 and Enemies() >= 2 and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 5 } and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 5 } and Spell(templars_verdict)
 }
 
 AddFunction RetributionDefaultCdActions
@@ -678,7 +698,7 @@ AddFunction RetributionDefaultCdActions
 
 AddFunction RetributionDefaultCdPostConditions
 {
-	TimeInCombat() < 2 and Spell(judgment) or TimeInCombat() < 2 and { HasEquippedItem(137048) or Race(BloodElf) } and Spell(blade_of_justice) or TimeInCombat() < 2 and { HasEquippedItem(137048) or Race(BloodElf) } and Spell(divine_hammer) or HolyPower() <= 1 and TimeInCombat() < 2 and Spell(wake_of_ashes) or Spell(shield_of_vengeance) or Enemies() <= 3 and { SpellCooldown(judgment) < GCD() * 4.5 or target.DebuffRemaining(judgment_debuff) > GCD() * 4.67 } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } and Spell(execution_sentence) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and BuffPresent(divine_purpose_buff) and BuffRemaining(divine_purpose_buff) < GCD() * 2 and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and HolyPower() >= 5 and BuffPresent(divine_purpose_buff) and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and HolyPower() >= 3 and BuffPresent(crusade_buff) and { BuffStacks(crusade_buff) < 15 or BuffPresent(burst_haste_buff any=1) } and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and HolyPower() >= 5 and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 3 } and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and BuffPresent(divine_purpose_buff) and BuffRemaining(divine_purpose_buff) < GCD() * 2 and Spell(templars_verdict) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 5 and BuffPresent(divine_purpose_buff) and Spell(templars_verdict) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 and BuffPresent(crusade_buff) and { BuffStacks(crusade_buff) < 15 or BuffPresent(burst_haste_buff any=1) } and Spell(templars_verdict) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 5 and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 3 } and Spell(templars_verdict) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 and Enemies() >= 2 and { SpellCooldown(wake_of_ashes) < GCD() * 2 and HasArtifactTrait(wake_of_ashes) or BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 4 } and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 and { SpellCooldown(wake_of_ashes) < GCD() * 2 and HasArtifactTrait(wake_of_ashes) or BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 4 } and Spell(templars_verdict) or { HolyPower() == 0 or HolyPower() == 1 and { SpellCooldown(blade_of_justice) > GCD() or SpellCooldown(divine_hammer) > GCD() } or HolyPower() == 2 and { SpellCharges(zeal count=0) <= 0.65 or SpellCharges(crusader_strike count=0) <= 0.65 } } and Spell(wake_of_ashes) or HolyPower() <= 3 and BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) > GCD() and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() * 3 and target.DebuffPresent(judgment_debuff) and target.DebuffRemaining(judgment_debuff) > GCD() * 2 and Spell(blade_of_justice) or HolyPower() <= 3 and BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) > GCD() and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() * 3 and target.DebuffPresent(judgment_debuff) and target.DebuffRemaining(judgment_debuff) > GCD() * 2 and Spell(divine_hammer) or Talent(blade_of_wrath_talent) and HolyPower() <= 3 and Spell(blade_of_justice) or Charges(zeal) == 2 and HolyPower() <= 4 and Spell(zeal) or Charges(crusader_strike) == 2 and HolyPower() <= 4 and Spell(crusader_strike) or { HolyPower() <= 2 or HolyPower() <= 3 and { SpellCharges(zeal count=0) <= 1.34 or SpellCharges(crusader_strike count=0) <= 1.34 } } and Spell(blade_of_justice) or { HolyPower() <= 2 or HolyPower() <= 3 and { SpellCharges(zeal count=0) <= 1.34 or SpellCharges(crusader_strike count=0) <= 1.34 } } and Spell(divine_hammer) or { HolyPower() >= 3 or { SpellCharges(zeal count=0) <= 1.67 or SpellCharges(crusader_strike count=0) <= 1.67 } and { SpellCooldown(divine_hammer) > GCD() or SpellCooldown(blade_of_justice) > GCD() } or Talent(greater_judgment_talent) and target.HealthPercent() > 50 } and Spell(judgment) or Spell(consecration) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and BuffPresent(divine_purpose_buff) and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and BuffPresent(the_fires_of_justice_buff) and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 3 } and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and { HolyPower() >= 4 or { SpellCharges(zeal count=0) <= 1.34 or SpellCharges(crusader_strike count=0) <= 1.34 } and { SpellCooldown(divine_hammer) > GCD() or SpellCooldown(blade_of_justice) > GCD() } } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 4 } and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and BuffPresent(divine_purpose_buff) and Spell(templars_verdict) or target.DebuffPresent(judgment_debuff) and BuffPresent(the_fires_of_justice_buff) and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 3 } and Spell(templars_verdict) or target.DebuffPresent(judgment_debuff) and { HolyPower() >= 4 or { SpellCharges(zeal count=0) <= 1.34 or SpellCharges(crusader_strike count=0) <= 1.34 } and { SpellCooldown(divine_hammer) > GCD() or SpellCooldown(blade_of_justice) > GCD() } } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 4 } and Spell(templars_verdict) or HolyPower() <= 4 and Spell(zeal) or HolyPower() <= 4 and Spell(crusader_strike) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 and Enemies() >= 2 and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 5 } and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 5 } and Spell(templars_verdict)
+	TimeInCombat() < 2 and Spell(judgment) or TimeInCombat() < 2 and { HasEquippedItem(137048) or Race(BloodElf) } and Spell(blade_of_justice) or TimeInCombat() < 2 and { HasEquippedItem(137048) or Race(BloodElf) } and Spell(divine_hammer) or HolyPower() <= 1 and TimeInCombat() < 2 and Spell(wake_of_ashes) or Spell(shield_of_vengeance) or Enemies() <= 3 and { SpellCooldown(judgment) < GCD() * 4.65 or target.DebuffRemaining(judgment_debuff) > GCD() * 4.65 } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } and Spell(execution_sentence) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and BuffPresent(divine_purpose_buff) and BuffRemaining(divine_purpose_buff) < GCD() * 2 and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and HolyPower() >= 5 and BuffPresent(divine_purpose_buff) and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and HolyPower() >= 3 and BuffPresent(crusade_buff) and { BuffStacks(crusade_buff) < 15 or BuffPresent(burst_haste_buff any=1) } and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and HolyPower() >= 5 and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 3 } and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and BuffPresent(divine_purpose_buff) and BuffRemaining(divine_purpose_buff) < GCD() * 2 and Spell(templars_verdict) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 5 and BuffPresent(divine_purpose_buff) and Spell(templars_verdict) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 and BuffPresent(crusade_buff) and { BuffStacks(crusade_buff) < 15 or BuffPresent(burst_haste_buff any=1) } and Spell(templars_verdict) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 5 and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 3 } and { not Talent(execution_sentence_talent) or SpellCooldown(execution_sentence) > GCD() } and Spell(templars_verdict) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 and Enemies() >= 2 and { SpellCooldown(wake_of_ashes) < GCD() * 2 and HasArtifactTrait(wake_of_ashes) or BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 4 } and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 and { SpellCooldown(wake_of_ashes) < GCD() * 2 and HasArtifactTrait(wake_of_ashes) or BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 4 } and Spell(templars_verdict) or target.DebuffPresent(execution_sentence_debuff) and target.DebuffRemaining(execution_sentence_debuff) < GCD() * 2 and target.DebuffRemaining(judgment_debuff) < GCD() * 2 and Spell(judgment) or { HolyPower() == 0 or HolyPower() == 1 and { SpellCooldown(blade_of_justice) > GCD() or SpellCooldown(divine_hammer) > GCD() } or HolyPower() == 2 and { SpellCharges(zeal count=0) <= 0.65 or SpellCharges(crusader_strike count=0) <= 0.65 } } and Spell(wake_of_ashes) or HolyPower() <= 3 and BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) > GCD() and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() * 3 and target.DebuffPresent(judgment_debuff) and target.DebuffRemaining(judgment_debuff) > GCD() * 2 and Spell(divine_hammer) or HolyPower() <= 3 and Spell(blade_of_justice) or Charges(zeal) == 2 and HolyPower() <= 4 and Spell(zeal) or Charges(crusader_strike) == 2 and HolyPower() <= 4 and Spell(crusader_strike) or { HolyPower() <= 2 or HolyPower() <= 3 and { SpellCharges(zeal count=0) <= 1.34 or SpellCharges(crusader_strike count=0) <= 1.34 } } and Spell(divine_hammer) or Spell(judgment) or Spell(consecration) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and BuffPresent(divine_purpose_buff) and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and BuffPresent(the_fires_of_justice_buff) and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 3 } and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and Enemies() >= 2 and { HolyPower() >= 4 or { SpellCharges(zeal count=0) <= 1.34 or SpellCharges(crusader_strike count=0) <= 1.34 } and { SpellCooldown(divine_hammer) > GCD() or SpellCooldown(blade_of_justice) > GCD() } } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 4 } and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and BuffPresent(divine_purpose_buff) and Spell(templars_verdict) or target.DebuffPresent(judgment_debuff) and BuffPresent(the_fires_of_justice_buff) and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 3 } and Spell(templars_verdict) or target.DebuffPresent(judgment_debuff) and { HolyPower() >= 4 or { SpellCharges(zeal count=0) <= 1.34 or SpellCharges(crusader_strike count=0) <= 1.34 } and { SpellCooldown(divine_hammer) > GCD() or SpellCooldown(blade_of_justice) > GCD() } } and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 4 } and { not Talent(execution_sentence_talent) or SpellCooldown(execution_sentence) > GCD() * 2 } and Spell(templars_verdict) or HolyPower() <= 4 and Spell(zeal) or HolyPower() <= 4 and Spell(crusader_strike) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 and Enemies() >= 2 and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 5 } and Spell(divine_storm) or target.DebuffPresent(judgment_debuff) and HolyPower() >= 3 and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 5 } and Spell(templars_verdict)
 }
 
 ### actions.precombat
@@ -779,7 +799,6 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 # avenging_wrath_melee_buff
 # berserking
 # blade_of_justice
-# blade_of_wrath_talent
 # blood_fury_apsp
 # consecration
 # crusade
@@ -790,7 +809,8 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 # divine_purpose_buff
 # divine_storm
 # execution_sentence
-# greater_judgment_talent
+# execution_sentence_debuff
+# execution_sentence_talent
 # hammer_of_justice
 # holy_wrath
 # judgment

@@ -20,6 +20,7 @@ actions.precombat+=/arcane_blast
 # Executed every time the actor is available.
 
 actions=nether_tempest,if=time<1
+actions+=/counterspell
 actions+=/time_warp,if=target.health.pct<25|time=0
 actions+=/shard_of_the_exodar_warp,if=buff.bloodlust.down&burn_phase
 actions+=/stop_burn_phase,if=cooldown.arcane_power.remains>20&buff.arcane_power.down&cooldown.evocation.remains>20&burn_phase_duration>13+action.evocation.execute_time&(time>5|!equipped.132451&mana.pct<50|mana.pct<50&time<100|mana.pct<20)&!(mana%165000*action.arcane_blast.execute_time*2>target.time_to_die.remains-2)

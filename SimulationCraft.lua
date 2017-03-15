@@ -1125,7 +1125,7 @@ local function InitializeDisambiguation()
 	AddDisambiguation("heart_of_the_wild",		"heart_of_the_wild_tank",		"DRUID",		"guardian")
 	AddDisambiguation("incarnation",			"incarnation_chosen_of_elune",	"DRUID",		"balance")
 	AddDisambiguation("incarnation",			"incarnation_king_of_the_jungle",	"DRUID",	"feral")
-	AddDisambiguation("incarnation",			"incarnation_son_of_ursoc",		"DRUID",		"guardian")
+	AddDisambiguation("incarnation",			"incarnation_guardian_of_ursoc",		"DRUID",		"guardian")
 	AddDisambiguation("legendary_ring",			"legendary_ring_agility",		"DRUID",		"feral", "Item")
 	AddDisambiguation("legendary_ring",			"legendary_ring_bonus_armor",	"DRUID",		"guardian", "Item")
 	AddDisambiguation("legendary_ring",			"legendary_ring_intellect",		"DRUID",		"balance", "Item")
@@ -1135,12 +1135,14 @@ local function InitializeDisambiguation()
 	AddDisambiguation("omen_of_clarity",		"omen_of_clarity_melee",		"DRUID",		"feral")
 	AddDisambiguation("rejuvenation_debuff",	"rejuvenation_buff",			"DRUID")
 	AddDisambiguation("starsurge",				"starsurge_moonkin",			"DRUID",		"balance")
+	AddDisambiguation("starfall_debuff",		"starfall_buff",				"DRUID",		"balance")
 	AddDisambiguation("frenzied_regeneration_debuff", "frenzied_regeneration_buff", "DRUID", 	"guardian")
 	AddDisambiguation("thrash_debuff", 			"thrash_bear_debuff", 			"DRUID", 		"guardian")
 	-- Hunter
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_focus",			"HUNTER")
 	AddDisambiguation("beast_cleave",			"pet_beast_cleave",				"HUNTER",		"beast_mastery")
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"HUNTER")
+	AddDisambiguation("cat_dire_frenzy",		"pet_dire_frenzy", 					"HUNTER")
 	AddDisambiguation("focusing_shot",			"focusing_shot_marksmanship",	"HUNTER",		"marksmanship")
 	AddDisambiguation("frenzy",					"pet_frenzy",					"HUNTER",		"beast_mastery")
 	AddDisambiguation("legendary_ring",			"legendary_ring_agility",		"HUNTER",		nil, "Item")
@@ -1215,7 +1217,8 @@ local function InitializeDisambiguation()
 	AddDisambiguation("dark_soul",				"dark_soul_knowledge",			"WARLOCK",		"demonology")
 	AddDisambiguation("dark_soul",				"dark_soul_misery",				"WARLOCK",		"affliction")
 	AddDisambiguation("legendary_ring",			"legendary_ring_intellect",		"WARLOCK",		nil, "Item")
-	AddDisambiguation("life_tap_debuff",		"empowered_life_tap_buff", "WARLOCK")
+	AddDisambiguation("life_tap_debuff",		"empowered_life_tap_buff", 		"WARLOCK")
+	AddDisambiguation("soul_effigy_agony", 		"agony", 						"WARLOCK",		"affliction")
 	-- Warrior
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_rage",			"WARRIOR")
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"WARRIOR")
@@ -1815,7 +1818,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			local spellName = "enhanced_rejuvenation"
 			AddSymbol(annotation, spellName)
 			conditionCode = format("SpellKnown(%s)", spellName)
-		elseif class == "DRUID" and action == "skull_bash" then
+		elseif class == "DRUID" and (action == "skull_bash" or action == "solar_beam") then
 			bodyCode = camelSpecialization .. "InterruptActions()"
 			annotation[action] = class
 			annotation.interrupt = class
@@ -1948,6 +1951,8 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "ROGUE" and specialization == "combat" and action == "blade_flurry" then
 			annotation.blade_flurry = class
 			conditionCode = "CheckBoxOn(opt_blade_flurry)"
+		elseif class == "ROGUE" and action == "cancel_autoattack" then
+			isSpellAction = false
 		elseif class == "ROGUE" and action == "honor_among_thieves" then
 			if modifier.cooldown then
 				local cooldown = Unparse(modifier.cooldown)
@@ -2074,13 +2079,10 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif action == "auto_attack" then
 			bodyCode = camelSpecialization .. "GetInMeleeRange()"
 			isSpellAction = false
-		elseif class == "DEMONHUNTER" and action == "variable" and Unparse(modifier.name) == "pooling_for_meta" then
+		elseif class == "DEMONHUNTER" and action == "metamorphosis_havoc" then
 			-- Add a checkbox asking whether to only pool for meta during boss fights
-			local conditionCode = "not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()"
-			local conditionNode = OvaleAST:ParseCode(expressionType, conditionCode, nodeList, annotation.astAnnotation)
-			EmitVariable(nodeList, annotation, modifier, parseNode, action, conditionNode)
-			isSpellAction = false
-			annotation.pooling_for_meta = class
+			conditionCode = "not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()"
+			annotation.opt_meta_only_during_boss = "DEMONHUNTER"
 		elseif action == "variable" then
 			EmitVariable(nodeList, annotation, modifier, parseNode, action)
 			isSpellAction = false
@@ -3231,7 +3233,7 @@ EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
 			code = format("%sCooldownDuration(%s)", prefix, name)
 		elseif property == "ready" then
 			code = format("%sCooldown(%s) == 0", prefix, name)
-		elseif property == "remains" then
+		elseif property == "remains" or property == "adjusted_remains" then
 			if parseNode.asType == "boolean" then
 				code = format("%sCooldown(%s) > 0", prefix, name)
 			else
@@ -3398,7 +3400,6 @@ EmitOperandPet = function(operand, parseNode, nodeList, annotation, action)
 		elseif name == "buff" then
 			local pattern = format("^pet%%.([%%w_.]+)", operand)
 			local petOperand = strmatch(operand, pattern)
-
 			ok, node = EmitOperandBuff(petOperand, parseNode, nodeList, annotation, action, "pet")
 		else
 			-- Strip the "pet.<name>." from the operand and re-evaluate.
@@ -3426,6 +3427,8 @@ EmitOperandPet = function(operand, parseNode, nodeList, annotation, action)
 						ok, node = EmitOperandCooldown(petOperand, parseNode, nodeList, annotation, action)
 					elseif property == "debuff" then
 						ok, node = EmitOperandBuff(petOperand, parseNode, nodeList, annotation, action, target)
+					elseif property == "dot" then
+						ok, node = EmitOperandDot(petOperand, parseNode, nodeList, annotation, action, target)
 					else
 						ok = false
 					end
@@ -3708,6 +3711,14 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 			end
 			ok, node = EmitOperandDot(petOperand, parseNode, nodeList, annotation, action, target)
 		end
+	elseif class == "DEMONHUNTER" and operand == "cooldown.chaos_blades.ready" then
+		code = "Talent(chaos_blades_talent) and SpellCooldown(chaos_blades) == 0"
+		AddSymbol(annotation, "chaos_blades_talent")
+		AddSymbol(annotation, "chaos_blades")
+	elseif class == "DEMONHUNTER" and operand == "cooldown.nemesis.ready" then
+		code = "Talent(nemesis_talent) and SpellCooldown(nemesis) == 0"
+		AddSymbol(annotation, "nemesis_talent")
+		AddSymbol(annotation, "nemesis")
 	elseif class == "DRUID" and operand == "buff.wild_charge_movement.down" then
 		-- "wild_charge_movement" is a fake SimulationCraft buff that lasts for the
 		-- duration of the movement during Wild Charge.
@@ -3733,6 +3744,9 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		local spellName = "stampede"
 		code = format("TimeSincePreviousSpell(%s) < 40", spellName)
 		AddSymbol(annotation, spellName)
+	elseif class == "HUNTER" and operand == "lowest_vuln_within.5" then
+		code = "target.DebuffRemaining(vulnerable)"
+		AddSymbol(annotation, "vulnerable")
 	elseif class == "MAGE" and operand == "buff.rune_of_power.remains" then
 		code = "TotemRemaining(rune_of_power)"
 	elseif class == "MAGE" and operand == "buff.shatterlance.up" then
@@ -3792,6 +3806,9 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		else
 			ok = false
 		end
+	elseif class == "MONK" and operand == "spinning_crane_kick.count" then
+		code = "SpellCount(spinning_crane_kick)"
+		AddSymbol(annotation, "spinning_crane_kick")
 	elseif class == "PALADIN" and operand == "dot.sacred_shield.remains" then
 		--[[
 			Sacred Shield is handled specially because SimulationCraft treats it like
@@ -3808,11 +3825,18 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 	elseif class == "PRIEST" and operand == "primary_target" then
 		-- Ovale has no concept of the "primary", "main" or "boss" target, so "primary_target" should always return 1.
 		code = "1"
+	elseif class == "ROGUE" and operand == "trinket.cooldown.up" then
+		code = "HasTrinket(draught_of_souls) and ItemCooldown(draught_of_souls) > 0"
+		AddSymbol(annotation, "draught_of_souls")
+	elseif class == "ROGUE" and operand == "mantle_duration" then
+		code = "BuffRemaining(master_assassins_initiative)"
+		AddSymbol(annotation, "master_assassins_initiative")
 	elseif class == "ROGUE" and operand == "poisoned_enemies" then
 		-- TODO Need to track the number of poisoned enemies
 		code = "0" 
 	elseif class == "ROGUE" and operand == "exsanguinated" then
 		code = "target.DebuffPresent(exsanguinated)"
+		AddSymbol(annotation, "exsanguinated")
 	elseif class == "ROGUE" and specialization == "subtlety" and strsub(operand, 1, 29) == "cooldown.honor_among_thieves." then
 		-- The cooldown of Honor Among Thieves is implemented as a hidden buff.
 		local property = strsub(operand, 30)
@@ -3828,9 +3852,8 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		else
 			ok = false
 		end
-	elseif class == "SHAMAN" and strmatch(operand, "pet.[a-z_]+.remains") then
-		-- TODO Don't know how to do this
-		code = "PetPresent()"
+	elseif class == "SHAMAN" and strmatch(operand, "pet.[a-z_]+.active") then
+		code = "pet.Present()"
 		ok = true
 	elseif class == "WARLOCK" and strmatch(operand, "pet%.service_[a-z_]+%..+") then
 		local spellName, property = strmatch(operand, "pet%.(service_[a-z_]+)%.(.+)")
@@ -3848,6 +3871,8 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 	elseif class == "WARLOCK" and strmatch(operand, "dot.unstable_affliction_([1-5]).remains") then
 		local num = strmatch(operand, "dot.unstable_affliction_([1-5]).remains")
 		code = format("target.DebuffStacks(unstable_affliction_debuff) >= %s", num)
+	elseif class == "WARLOCK" and operand == "buff.active_uas.stack" then
+		code = "target.DebuffStacks(unstable_affliction_debuff)"
 	elseif class == "WARRIOR" and strsub(operand, 1, 23) == "buff.colossus_smash_up." then
 		local property = strsub(operand, 24)
 		local debuffName = "colossus_smash_debuff"
@@ -4256,13 +4281,13 @@ local function InsertInterruptFunction(child, annotation, interrupts)
 	
 	local spells = interrupts or {}
 	if OvaleData.BLOODELF_CLASSES[class] then
-		tinsert(spells, {name = Disambiguate("arcane_torrent", class, specialization), interrupt=1, onBoss=1, order = 97, range = "target.Distance(less 8)"})
+		tinsert(spells, {name = Disambiguate("arcane_torrent", class, specialization), interrupt=1, worksOnBoss=1, order = 97, range = "target.Distance(less 8)"})
 	end
 	if OvaleData.PANDAREN_CLASSES[class] then
-		tinsert(spells, {name = "quaking_palm", stun=1, onBoss=0, order = 98})
+		tinsert(spells, {name = "quaking_palm", stun=1, order = 98})
 	end
 	if OvaleData.TAUREN_CLASSES[class] then
-		tinsert(spells, {name = "war_stomp", stun=1, onBoss=0, order = 99, range = "target.Distance(less 5)"})
+		tinsert(spells, {name = "war_stomp", stun=1, order = 99, range = "target.Distance(less 5)"})
 	end
 	
 	tsort(spells, function(a, b) return tonumber(a.order or 0) < tonumber(b.order or 0) end)
@@ -4282,7 +4307,7 @@ local function InsertInterruptFunction(child, annotation, interrupts)
 		if spell.interrupt == 1 then
 			tinsert(conditions, "target.IsInterruptible()")
 		end
-		if spell.onBoss == 0 then
+		if spell.worksOnBoss == 0 or spell.worksOnBoss == nil then
 			tinsert(conditions, "not target.Classification(worldboss)")
 		end
 		if spell.extraCondition ~= nil then
@@ -4323,77 +4348,85 @@ local function InsertInterruptFunctions(child, annotation)
 	
 	local interrupts = {}
 	if annotation.mind_freeze == "DEATHKNIGHT" then
-		tinsert(interrupts, {name = "mind_freeze", interrupt=1, onBoss=1, order=10})
+		tinsert(interrupts, {name = "mind_freeze", interrupt=1, worksOnBoss=1, order=10})
 		if annotation.specialization == "blood" or annotation.specialization == "unholy" then
-			tinsert(interrupts, {name = "asphyxiate", stun=1, onBoss=0, order=20})
+			tinsert(interrupts, {name = "asphyxiate", stun=1, order=20})
 		end
 	end
 	if annotation.consume_magic == "DEMONHUNTER" then
-		tinsert(interrupts, {name = "consume_magic", interrupt=1, onBoss=1, order=10})
-		tinsert(interrupts, {name = "fel_eruption", stun=1, onBoss=0, order=20})
-		tinsert(interrupts, {name = "imprison", cc=1, onBoss=0, extraCondition="target.CreatureType(Demon Humanoid Beast)", order=999})
+		tinsert(interrupts, {name = "consume_magic", interrupt=1, worksOnBoss=1, order=10})
+		tinsert(interrupts, {name = "fel_eruption", stun=1, order=20})
+		tinsert(interrupts, {name = "imprison", cc=1, extraCondition="target.CreatureType(Demon Humanoid Beast)", order=999})
 		if annotation.specialization == "havoc" then 
-			tinsert(interrupts, {name = "chaos_nova", stun=1, onBoss=0, range="target.Distance(less 8)", order=100})
+			tinsert(interrupts, {name = "chaos_nova", stun=1, range="target.Distance(less 8)", order=100})
 		end
 		if annotation.specialization == "vengeance" then
-			tinsert(interrupts, {name = "sigil_of_silence", interrupt=1, onBoss=0, order=110, range="", extraCondition = "not SigilCharging(silence misery chains) and (target.RemainingCastTime() >= (2 - Talent(quickened_sigils_talent) + GCDRemaining()))"}) 
-			tinsert(interrupts, {name = "sigil_of_misery", disorient=1, onBoss=0, order=120, range="", extraCondition = "not SigilCharging(silence misery chains) and (target.RemainingCastTime() >= (2 - Talent(quickened_sigils_talent) + GCDRemaining()))"}) 
-			tinsert(interrupts, {name = "sigil_of_chains", pull=1, onBoss=0, order=130, range="", extraCondition = "not SigilCharging(silence misery chains) and (target.RemainingCastTime() >= (2 - Talent(quickened_sigils_talent) + GCDRemaining()))"}) 
+			tinsert(interrupts, {name = "sigil_of_silence", interrupt=1, order=110, range="", extraCondition = "not SigilCharging(silence misery chains) and (target.RemainingCastTime() >= (2 - Talent(quickened_sigils_talent) + GCDRemaining()))"}) 
+			tinsert(interrupts, {name = "sigil_of_misery", disorient=1, order=120, range="", extraCondition = "not SigilCharging(silence misery chains) and (target.RemainingCastTime() >= (2 - Talent(quickened_sigils_talent) + GCDRemaining()))"}) 
+			tinsert(interrupts, {name = "sigil_of_chains", pull=1, order=130, range="", extraCondition = "not SigilCharging(silence misery chains) and (target.RemainingCastTime() >= (2 - Talent(quickened_sigils_talent) + GCDRemaining()))"}) 
 		end
 	end
-	if annotation.skull_bash == "DRUID" then
-		tinsert(interrupts, {name = "skull_bash", interrupt=1, onBoss=1, order=10})
-		tinsert(interrupts, {name = "mighty_bash", stun=1, onBoss=0, order=20})
-		tinsert(interrupts, {name = "typhoon", knockback=1, onBoss=0, order=30, range="target.Distance(less 15)"})
+	if annotation.skull_bash == "DRUID" or annotation.solar_beam == "DRUID" then
+		if annotation.specialization == "guardian" or annotation.specialization == "feral" then
+			tinsert(interrupts, {name = "skull_bash", interrupt=1, worksOnBoss=1, order=10})
+		end
+		if annotation.specialization == "balance" then
+			tinsert(interrupts, {name = "solar_beam", interrupt=1, worksOnBoss=1, order=10})
+		end
+		tinsert(interrupts, {name = "mighty_bash", stun=1, order=20})
+		if annotation.specialization == "guardian" then
+			tinsert(interrupts, {name = "incapacitating_roar", incapacitate=1, order=30, range="target.Distance(less 10)"})
+		end
+		tinsert(interrupts, {name = "typhoon", knockback=1, order=110, range="target.Distance(less 15)"})
 		if annotation.specialization == "feral" then
-			tinsert(interrupts, {name = "maim", stun=1, onBoss=0, order=40})
+			tinsert(interrupts, {name = "maim", stun=1, order=40})
 		end
 	end
 	if annotation.counter_shot == "HUNTER" then
-		tinsert(interrupts, {name = "counter_shot", interrupt=1, onBoss=1, order=10})
+		tinsert(interrupts, {name = "counter_shot", interrupt=1, worksOnBoss=1, order=10})
 	end
 	if annotation.muzzle == "HUNTER" then
-		tinsert(interrupts, {name = "muzzle", interrupt=1, onBoss=1, order=10})
+		tinsert(interrupts, {name = "muzzle", interrupt=1, worksOnBoss=1, order=10})
 	end
 	if annotation.counterspell == "MAGE" then
-		tinsert(interrupts, {name = "counterspell", interrupt=1, onBoss=1, order=10})
+		tinsert(interrupts, {name = "counterspell", interrupt=1, worksOnBoss=1, order=10})
 	end
 	if annotation.spear_hand_strike == "MONK" then
-		tinsert(interrupts, {name = "spear_hand_strike", interrupt=1, onBoss=1, order=10})
-		tinsert(interrupts, {name = "paralysis", cc=1, onBoss=0, order=999})
-		tinsert(interrupts, {name = "leg_sweep", stun=1, onBoss=0, order=30, range = "target.Distance(less 5)"})
+		tinsert(interrupts, {name = "spear_hand_strike", interrupt=1, worksOnBoss=1, order=10})
+		tinsert(interrupts, {name = "paralysis", cc=1, order=999})
+		tinsert(interrupts, {name = "leg_sweep", stun=1, order=30, range = "target.Distance(less 5)"})
 	end
 	if annotation.rebuke == "PALADIN" then
-		tinsert(interrupts, {name = "rebuke", interrupt=1, onBoss=1, order=10})
-		tinsert(interrupts, {name = "hammer_of_justice", stun=1, onBoss=0, order=20})
+		tinsert(interrupts, {name = "rebuke", interrupt=1, worksOnBoss=1, order=10})
+		tinsert(interrupts, {name = "hammer_of_justice", stun=1, order=20})
 		
 		if annotation.specialization == "protection" then
-			tinsert(interrupts, {name = "avengers_shield", interrupt=1, onBoss=1, order=15})
-			tinsert(interrupts, {name = "blinding_light", disorient=1, onBoss=0, order=50, range="target.Distance(less 10)"})
+			tinsert(interrupts, {name = "avengers_shield", interrupt=1, worksOnBoss=1, order=15})
+			tinsert(interrupts, {name = "blinding_light", disorient=1, order=50, range="target.Distance(less 10)"})
 		end
 	end	
 	if annotation.silence == "PRIEST" then
-		tinsert(interrupts, {name = "silence", interrupt=1, onBoss=1, order=10})
+		tinsert(interrupts, {name = "silence", interrupt=1, worksOnBoss=1, order=10})
 	end
 	if annotation.kick == "ROGUE" then
-		tinsert(interrupts, {name = "kick", interrupt=1, onBoss=1, order=10})
-		tinsert(interrupts, {name = "cheap_shot", stun=1, onBoss=0, order=20})
+		tinsert(interrupts, {name = "kick", interrupt=1, worksOnBoss=1, order=10})
+		tinsert(interrupts, {name = "cheap_shot", stun=1, order=20})
 		if annotation.specialization == "outlaw" then
-			tinsert(interrupts, {name = "between_the_eyes", stun=1, onBoss=0, order=30, extraCondition="ComboPoints() >= 1"})
-			tinsert(interrupts, {name = "gouge", incapacitate=1, onBoss=0, order=100})
+			tinsert(interrupts, {name = "between_the_eyes", stun=1, order=30, extraCondition="ComboPoints() >= 1"})
+			tinsert(interrupts, {name = "gouge", incapacitate=1, order=100})
 		end
 		if annotation.specialization == "assassination" or annotation.specialization == "subtlety" then
-			tinsert(interrupts, {name = "kidney_shot", stun=1, onBoss=0, order=30, extraCondition="ComboPoints() >= 1"})
+			tinsert(interrupts, {name = "kidney_shot", stun=1, order=30, extraCondition="ComboPoints() >= 1"})
 		end
 	end
 	if annotation.wind_shear == "SHAMAN" then
-		tinsert(interrupts, {name = "wind_shear", interrupt=1, onBoss=1, order=10})
-		tinsert(interrupts, {name = "sundering", knockback=1, onBoss=0, order=20, range="target.Distance(less 5)"})
-		tinsert(interrupts, {name = "lightning_surge_totem", stun=1, onBoss=0, order=30, range="target.RemainingCastTime() > 2"})
-		tinsert(interrupts, {name = "hex", cc=1, onBoss=0, order=100, extraCondition="target.RemainingCastTime() > CastTime(hex) + GCDRemaining() and target.CreatureType(Humanoid Beast)"})
+		tinsert(interrupts, {name = "wind_shear", interrupt=1, worksOnBoss=1, order=10})
+		tinsert(interrupts, {name = "sundering", knockback=1, order=20, range="target.Distance(less 5)"})
+		tinsert(interrupts, {name = "lightning_surge_totem", stun=1, order=30, range="", extraCondition="target.RemainingCastTime() > 2"})
+		tinsert(interrupts, {name = "hex", cc=1, order=100, extraCondition="target.RemainingCastTime() > CastTime(hex) + GCDRemaining() and target.CreatureType(Humanoid Beast)"})
 	end
 	if annotation.pummel == "WARRIOR" then
-		tinsert(interrupts, {name = "pummel", interrupt=1, onBoss=1, order=10})
+		tinsert(interrupts, {name = "pummel", interrupt=1, worksOnBoss=1, order=10})
 	end
 	
 	if #interrupts > 0 then
@@ -4613,7 +4646,7 @@ local function InsertSupportingFunctions(child, annotation)
 			{
 				if CheckBoxOn(opt_melee_range) and not target.InRange(stormstrike) 
 				{
-					if target.Distance() >= 8 and target.Distance() <= 25 Spell(feral_lunge)
+					if target.InRange(feral_lunge) Spell(feral_lunge)
 					Texture(misc_arrowlup help=L(not_in_melee_range))
 				}
 			}
@@ -4669,8 +4702,8 @@ local function InsertSupportingFunctions(child, annotation)
 		local fmt = [[
 			AddFunction %sUseItemActions
 			{
-				Item(Trinket0Slot usable=1)
-				Item(Trinket1Slot usable=1)
+				Item(Trinket0Slot usable=1 text=13)
+				Item(Trinket1Slot usable=1 text=14)
 			}
 		]]
 		local code = format(fmt, camelSpecialization)
@@ -4779,7 +4812,7 @@ local function InsertSupportingControls(child, annotation)
 			tinsert(child, 1, node)
 		end
 	end
-	if annotation.pooling_for_meta == "DEMONHUNTER" then
+	if annotation.opt_meta_only_during_boss == "DEMONHUNTER" then
 		local fmt = [[
 			AddCheckBox(opt_meta_only_during_boss L(meta_only_during_boss) default %s)
 		]]
