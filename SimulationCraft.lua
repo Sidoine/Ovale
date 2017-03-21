@@ -4511,6 +4511,25 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "wild_charge_cat")
 		count = count + 1
 	end
+
+	if annotation.melee == "HUNTER" then
+		local fmt = [[
+			AddFunction %sGetInMeleeRange
+			{
+				if CheckBoxOn(opt_melee_range) and not target.InRange(raptor_strike)
+				{
+					Texture(misc_arrowlup help=L(not_in_melee_range))
+				}
+			}
+		]]
+		local code = format(fmt, camelSpecialization)
+		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		annotation.functionTag[node.name] = "shortcd"
+		AddSymbol(annotation, "raptor_strike")
+		count = count + 1
+	end
+
 	if annotation.summon_pet == "HUNTER" then
 		local fmt
 		if annotation.specialization == "beast_mastery" then
