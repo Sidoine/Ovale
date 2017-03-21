@@ -241,8 +241,8 @@ Include(ovale_monk_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=windwalker)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=windwalker)
-AddCheckBox(opt_chi_burst SpellName(chi_burst) default specialization=windwalker)
 AddCheckBox(opt_storm_earth_and_fire SpellName(storm_earth_and_fire) specialization=windwalker)
+AddCheckBox(opt_chi_burst SpellName(chi_burst) default specialization=windwalker)
 
 AddFunction WindwalkerInterruptActions
 {

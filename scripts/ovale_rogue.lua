@@ -488,6 +488,7 @@ AddFunction rtb_reroll
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=outlaw)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=outlaw)
+AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default specialization=outlaw)
 
 AddFunction OutlawInterruptActions
 {
@@ -660,7 +661,7 @@ AddFunction OutlawBfShortCdActions
 	unless { HasEquippedItem(shivarran_symmetry) and not SpellCooldown(blade_flurry) > 0 and BuffPresent(blade_flurry_buff) and Enemies() >= 2 or Enemies() < 2 and BuffPresent(blade_flurry_buff) } and BuffPresent(blade_flurry_buff) and Texture(blade_flurry text=cancel)
 	{
 		#blade_flurry,if=spell_targets.blade_flurry>=2&!buff.blade_flurry.up
-		if Enemies() >= 2 and not BuffPresent(blade_flurry_buff) Spell(blade_flurry)
+		if Enemies() >= 2 and not BuffPresent(blade_flurry_buff) and CheckBoxOn(opt_blade_flurry) Spell(blade_flurry)
 	}
 }
 
