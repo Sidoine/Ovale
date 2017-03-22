@@ -63,7 +63,7 @@ You need to reach level 10 and choose a specialization.  However, be aware that 
   [Skada]: http://www.curse.com/addons/wow/skada
   [SpellFlashCore]: http://www.curse.com/addons/wow/spellflashcore
   [SpellFlash]: http://www.curse.com/addons/wow/spellflash
-  [ovale-forums]: http://wow.curseforge.com/addons/ovale/forum/
+  [ovale-forums]: http://forums.wowdps.com/
   [ovale-tickets]: https://github.com/Sidoine/Ovale/issues
   [ovale-video]: http://www.youtube.com/watch?v=rNHvk9GpyiM "Ovale WotLK video"
   [GitHub]: https://github.com/Sidoine/Ovale
