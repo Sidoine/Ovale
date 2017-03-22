@@ -21,7 +21,7 @@ Default scripts are based on [SimulationCraft][].  You may also customize the de
 
 See the [video of a survival hunter][ovale-video] using [Ovale][] during *Wrath of the Lich King*.
 
-**Please use the [forums][ovale-forums] (closed) to submit scripts or discuss them. If you want to report bugs, use the [ticket manager][ovale-tickets]. You may contribute code on our [Github][] project or help with [translation][].**
+**Please use the [forums][ovale-forums] to submit scripts or discuss them. If you want to report bugs, use the [ticket manager][ovale-tickets]. You may contribute code on our [Github][] project or help with [translation][].**
 
 Features
 ========
