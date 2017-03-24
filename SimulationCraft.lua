@@ -215,6 +215,20 @@ local POTION_STAT = {
 	["virmens_bite"]		= "agility",
 }
 
+local OPTIONAL_SKILLS = {
+	["volley"] = { class = "HUNTER", default = true },
+	["trap_launcher"] = { class = "HUNTER", default = true },
+	["time_warp"] = { class = "MAGE" },
+	["storm_earth_and_fire"] = { class = "MONK" },
+	["chi_burst"] = { class = "MONK", default = true },
+	["vanish"] = { class = "ROGUE", specialization = "assassination", default = true },
+	["blade_flurry"] = { class = "ROGUE", specialization = "outlaw", default = true },
+	["bloodlust"] = { class = "SHAMAN" },
+	["righteous_fury"] = { class = "PALADIN" },
+	["fel_rush"] = { class = "DEMONHUNTER", default = true },
+	["vengeful_retreat"] = { class = "DEMONHUNTER", default = true }
+}
+
 -- Mark() and Sweep() static variables.
 -- functionDefined[name] = true if the function is declared with AddFunction(), or false otherwise.
 local self_functionDefined = {}
@@ -1766,6 +1780,23 @@ EmitVariable = function(nodeList, annotation, modifier, parseNode, action, condi
 	end
 end
 
+local function checkOptionalSkill(action, class, specialization)
+	local data = OPTIONAL_SKILLS[action]
+	if not data then
+		return false
+	end
+
+	if data.specialization and data.specialization ~= specialization then
+		return false
+	end
+
+	if data.class and data.class ~= class then
+		return false
+	end
+
+	return true
+end
+
 EmitAction = function(parseNode, nodeList, annotation)
 	local node
 	local canonicalizedName = strlower(gsub(parseNode.name, ":", "_"))
@@ -1854,9 +1885,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "HUNTER" and action == "kill_command" then
 			-- Kill Command requires that a pet that can move freely.
 			conditionCode = "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()"
-		elseif class == "HUNTER" and action == "volley" then
-			annotation.volley = class
-			conditionCode = "CheckBoxOn(opt_volley)"
 		elseif class == "HUNTER" and strsub(action, -5) == "_trap" then
 			annotation.trap_launcher = class
 			conditionCode = "CheckBoxOn(opt_trap_launcher)"
@@ -1895,10 +1923,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "MAGE" and action == "water_elemental" then
 			-- Only suggest summoning the Water Elemental if the pet is not already summoned.
 			conditionCode = "not pet.Present()"
-		elseif class == "MONK" and action == "chi_burst" then
-			-- Only suggest Chi Burst if it's toggled on.
-			conditionCode = "CheckBoxOn(opt_chi_burst)"
-			annotation[action] = class
 		elseif class == "MONK" and action == "chi_sphere" then
 			-- skip
 			isSpellAction = false
@@ -2091,6 +2115,9 @@ EmitAction = function(parseNode, nodeList, annotation)
 			-- Add a checkbox asking whether to only pool for meta during boss fights
 			conditionCode = "not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()"
 			annotation.opt_meta_only_during_boss = "DEMONHUNTER"
+		elseif checkOptionalSkill(action, class, specialization) then
+			annotation[action] = class
+			conditionCode = "CheckBoxOn(opt_" .. action .. ")"
 		elseif action == "variable" then
 			EmitVariable(nodeList, annotation, modifier, parseNode, action)
 			isSpellAction = false
@@ -4519,6 +4546,25 @@ local function InsertSupportingFunctions(child, annotation)
 		AddSymbol(annotation, "wild_charge_cat")
 		count = count + 1
 	end
+
+	if annotation.melee == "HUNTER" then
+		local fmt = [[
+			AddFunction %sGetInMeleeRange
+			{
+				if CheckBoxOn(opt_melee_range) and not target.InRange(raptor_strike)
+				{
+					Texture(misc_arrowlup help=L(not_in_melee_range))
+				}
+			}
+		]]
+		local code = format(fmt, camelSpecialization)
+		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		annotation.functionTag[node.name] = "shortcd"
+		AddSymbol(annotation, "raptor_strike")
+		count = count + 1
+	end
+
 	if annotation.summon_pet == "HUNTER" then
 		local fmt
 		if annotation.specialization == "beast_mastery" then
@@ -4794,8 +4840,41 @@ local function InsertSupportingFunctions(child, annotation)
 	return count
 end
 
+local function AddOptionalSkillCheckBox(child, annotation, data, skill)
+	local nodeList = annotation.astAnnotation.nodeList
+	
+	if data.class ~= annotation[skill] then
+		return 0
+	end
+	
+	-- if data.specialization and data.specialization ~= annotation.specialization then
+	-- 	return 0
+	-- end
+
+	local default 
+	if data.default then
+		default = " default"
+	else
+		default = ""
+	end
+
+	local fmt = [[
+		AddCheckBox(opt_%s SpellName(%s)%s specialization=%s)
+	]]
+	local code = format(fmt, skill, skill, default, annotation.specialization)
+	local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+	tinsert(child, 1, node)
+	AddSymbol(annotation, skill)
+	return 1
+end
+
 local function InsertSupportingControls(child, annotation)
 	local count = 0
+
+	for skill, data in pairs(OPTIONAL_SKILLS) do
+		count = count + AddOptionalSkillCheckBox(child, annotation, data, skill)
+	end
+
 	local nodeList = annotation.astAnnotation.nodeList
 
 	local ifSpecialization = "specialization=" .. annotation.specialization
@@ -4831,36 +4910,7 @@ local function InsertSupportingControls(child, annotation)
 		AddSymbol(annotation, "metamorphosis_havoc")
 		count = count + 1
 	end
-	if annotation.volley == "HUNTER" then
-		local fmt = [[
-			AddCheckBox(opt_volley SpellName(volley) default %s)
-		]]
-		local code = format(fmt, ifSpecialization)
-		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		AddSymbol(annotation, "volley")
-		count = count + 1
-	end
-	if annotation.trap_launcher == "HUNTER" then
-		local fmt = [[
-			AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default %s)
-		]]
-		local code = format(fmt, ifSpecialization)
-		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		AddSymbol(annotation, "trap_launcher")
-		count = count + 1
-	end
-	if annotation.time_warp == "MAGE" then
-		local fmt = [[
-			AddCheckBox(opt_time_warp SpellName(time_warp) %s)
-		]]
-		local code = format(fmt, ifSpecialization)
-		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		AddSymbol(annotation, "time_warp")
-		count = count + 1
-	end
+	
 	if annotation.opt_arcane_mage_burn_phase == "MAGE" then
 		local fmt = [[
 			AddCheckBox(opt_arcane_mage_burn_phase L(arcane_mage_burn_phase) default %s)
@@ -4870,66 +4920,7 @@ local function InsertSupportingControls(child, annotation)
 		tinsert(child, 1, node)
 		count = count + 1
 	end
-	if annotation.storm_earth_and_fire == "MONK" then
-		local fmt = [[
-			AddCheckBox(opt_storm_earth_and_fire SpellName(storm_earth_and_fire) %s)
-		]]
-		local code = format(fmt, ifSpecialization)
-		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		AddSymbol(annotation, "storm_earth_and_fire")
-		count = count + 1
-	end
-	if annotation.chi_burst == "MONK" then
-		local fmt = [[
-			AddCheckBox(opt_chi_burst SpellName(chi_burst) default %s)
-		]]
-		local code = format(fmt, ifSpecialization)
-		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		AddSymbol(annotation, "chi_burst")
-		count = count + 1
-	end
-	if annotation.vanish == "ROGUE" then
-		local fmt = [[
-			AddCheckBox(opt_vanish SpellName(vanish) default %s)
-		]]
-		local code = format(fmt, ifSpecialization)
-		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		AddSymbol(annotation, "vanish")
-		count = count + 1
-	end
-	if annotation.blade_flurry == "ROGUE" then
-		local fmt = [[
-			AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default %s)
-		]]
-		local code = format(fmt, ifSpecialization)
-		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		AddSymbol(annotation, "blade_flurry")
-		count = count + 1
-	end
-	if annotation.bloodlust == "SHAMAN" then
-		local fmt = [[
-			AddCheckBox(opt_bloodlust SpellName(bloodlust) %s)
-		]]
-		local code = format(fmt, ifSpecialization)
-		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		AddSymbol(annotation, "bloodlust")
-		count = count + 1
-	end
-	if annotation.righteous_fury == "PALADIN" then
-		local fmt = [[
-			AddCheckBox(opt_righteous_fury_check SpellName(righteous_fury) default %s)
-		]]
-		local code = format(fmt, ifSpecialization)
-		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		AddSymbol(annotation, "righteous_fury")
-		count = count + 1
-	end
+	
 	if annotation.use_legendary_ring then
 		local legendaryRing = annotation.use_legendary_ring
 		local fmt = [[

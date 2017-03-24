@@ -855,6 +855,14 @@ AddFunction SurvivalSummonPet
 	}
 }
 
+AddFunction SurvivalGetInMeleeRange
+{
+	if CheckBoxOn(opt_melee_range) and not target.InRange(raptor_strike)
+	{
+		Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
+}
+
 ### actions.default
 
 AddFunction SurvivalDefaultMainActions
