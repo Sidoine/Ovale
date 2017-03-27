@@ -166,9 +166,9 @@ AddFunction BrewmasterDefaultCdActions
 	if (HasEquippedItem(firestone_walkers)) Spell(fortifying_brew)
 	if (HasEquippedItem(fundamental_observation)) Spell(zen_meditation)
 	Spell(fortifying_brew)
-	Spell(zen_meditation)
 	Spell(dampen_harm)
 	Item(unbending_potion usable=1)
+	Spell(zen_meditation)
 }
 
 AddFunction BrewmasterInterruptActions
