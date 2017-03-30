@@ -919,7 +919,7 @@ do
 		else
 			local spellName, _, _, _, startTime, endTime = API_UnitCastingInfo(target)
 			if not spellName then
-				spellName, _, _, _, startTime, endTime = API_UnitChannelInfo("unit")
+				spellName, _, _, _, startTime, endTime = API_UnitChannelInfo(target)
 			end
 			if spellName then
 				castSpellName = spellName
@@ -1047,6 +1047,8 @@ do
 		local targetClassification
 		local target = ParseCondition(positionalParams, namedParams, state)
 		if API_UnitLevel(target) < 0 then
+			targetClassification = "worldboss"
+		elseif API_UnitExists("boss1") and OvaleGUID:UnitGUID(target) == OvaleGUID:UnitGUID("boss1") then
 			targetClassification = "worldboss"
 		else
 			targetClassification = API_UnitClassification(target)

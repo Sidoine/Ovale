@@ -22,7 +22,7 @@ actions.precombat+=/food,name=seedbattered_fish_plate
 # Snapshot raid buffed stats before combat begins and pre-potting is done.
 actions.precombat+=/snapshot_stats
 actions.precombat+=/stealth
-actions.precombat+=/potion,name=old_war
+actions.precombat+=/potion,name=prolonged_power
 actions.precombat+=/marked_for_death,if=raid_event.adds.in>40
 actions.precombat+=/roll_the_bones,if=!talent.slice_and_dice.enabled
 
@@ -58,7 +58,7 @@ actions.build+=/pistol_shot,if=combo_points.deficit>=1+buff.broadsides.up&buff.o
 actions.build+=/saber_slash,if=variable.ss_useable
 
 # Cooldowns
-actions.cds=potion,name=old_war,if=buff.bloodlust.react|target.time_to_die<=25|buff.adrenaline_rush.up
+actions.cds=potion,name=prolonged_power,if=buff.bloodlust.react|target.time_to_die<=25|buff.adrenaline_rush.up
 actions.cds+=/use_item,slot=trinket2,if=buff.bloodlust.react|target.time_to_die<=20|combo_points.deficit<=2
 actions.cds+=/blood_fury
 actions.cds+=/berserking
@@ -67,6 +67,7 @@ actions.cds+=/cannonball_barrage,if=spell_targets.cannonball_barrage>=1
 actions.cds+=/adrenaline_rush,if=!buff.adrenaline_rush.up&energy.deficit>0
 actions.cds+=/marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15)&combo_points.deficit>=4+talent.deeper_stratagem.enabled+talent.anticipation.enabled)
 actions.cds+=/sprint,if=equipped.thraxis_tricksy_treads&!variable.ss_useable
+actions.cds+=/darkflight,if=equipped.thraxis_tricksy_treads&!variable.ss_useable&buff.sprint.down
 actions.cds+=/curse_of_the_dreadblades,if=combo_points.deficit>=4&(!talent.ghostly_strike.enabled|debuff.ghostly_strike.up)
 
 # Finishers
@@ -75,9 +76,9 @@ actions.finish+=/run_through,if=!talent.death_from_above.enabled|energy.time_to_
 
 # Stealth
 # Condition to use stealth abilities
-actions.stealth=variable,name=stealth_condition,value=(combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&!debuff.ghostly_strike.up)+buff.broadsides.up&energy>60&!buff.jolly_roger.up&!buff.hidden_blade.up&!buff.curse_of_the_dreadblades.up)
+actions.stealth=variable,name=stealth_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&!debuff.ghostly_strike.up)+buff.broadsides.up&energy>60&!buff.jolly_roger.up&!buff.hidden_blade.up&!buff.curse_of_the_dreadblades.up
 actions.stealth+=/ambush
-actions.stealth+=/vanish,if=variable.stealth_condition
+actions.stealth+=/vanish,if=(equipped.mantle_of_the_master_assassin&buff.true_bearing.up)|variable.stealth_condition
 actions.stealth+=/shadowmeld,if=variable.stealth_condition
 
 head=vigilant_bondbreaker_headdress,id=134446,bonus_id=1727

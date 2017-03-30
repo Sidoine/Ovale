@@ -259,6 +259,8 @@ Define(wrecking_ball_buff 215570)
 	SpellInfo(wrecking_ball_buff duration=12)
 
 # Artifacts
+Define(corrupted_blood_of_zakajz_buff 209567)
+	SpellInfo(corrupted_blood_of_zakajz_buff duration=5)
 Define(neltharions_fury 203524)
 	SpellInfo(neltharions_fury cd=45)
 Define(neltharions_fury_buff 203524)
@@ -270,6 +272,7 @@ Define(archavons_heavy_hand_spell 205144)
 	# TODO Mortal strike refunds 15 rage
 Define(fujiedas_fury_buff 207776)
 	SpellAddBuff(bloodthirst fujiedas_fury_buff=1 if_spell=fujiedas_fury_buff)
+Define(weight_of_the_earth 137077)
 
 # Talents
 Define(anger_management_talent 19)

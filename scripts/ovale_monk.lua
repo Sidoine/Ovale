@@ -28,22 +28,32 @@ AddFunction BrewmasterHealMe
 	if (HealthPercent() <= 100 - (15 * 2.6)) Spell(healing_elixir)
 }
 
+AddFunction StaggerPercentage
+{
+	StaggerRemaining() / MaxHealth() * 100
+}
+
+AddFunction BrewmasterRangeCheck
+{
+	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
+}
+
 AddFunction BrewmasterDefaultShortCDActions
 {
-	# always purify red stagger
-	if (DebuffPresent(heavy_stagger_debuff) and SpellCharges(purifying_brew) > 0) Spell(purifying_brew)
+	# keep stagger below 100%
+	if (StaggerPercentage() > 100 and SpellCharges(purifying_brew) > 0) Spell(purifying_brew)
 	# use black_ox_brew when at 0 charges but delay it when a charge is about to come off cd
-	if ((SpellCharges(purifying_brew) == 0) and (SpellChargeCooldown(purifying_brew) > 2 or DebuffPresent(heavy_stagger_debuff))) Spell(black_ox_brew)
+	if ((SpellCharges(purifying_brew) == 0) and (SpellChargeCooldown(purifying_brew) > 2 or StaggerPercentage() > 100)) Spell(black_ox_brew)
 	# heal me
 	BrewmasterHealMe()
 	
 	# range check
-	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
+	BrewmasterRangeCheck()
 
-	unless DebuffPresent(heavy_stagger_debuff) or BrewmasterHealMe() or (StaggerRemaining() == 0 and not Talent(special_delivery_talent))
+	unless StaggerPercentage() > 100 or BrewmasterHealMe() or (StaggerRemaining() == 0 and not Talent(special_delivery_talent))
 	{
-		# purify moderate stagger
-		if (DebuffPresent(moderate_stagger_debuff) and (not Talent(elusive_dance_talent) or BuffExpires(elusive_dance_buff)) and (BuffRemaining(ironskin_brew_buff) > SpellRechargeDuration(ironskin_brew))) Spell(purifying_brew)
+		# purify heavy stagger when we have enough ISB
+		if (DebuffPresent(heavy_stagger_debuff) and (not Talent(elusive_dance_talent) or BuffExpires(elusive_dance_buff)) and (BuffRemaining(ironskin_brew_buff) > 1.5*SpellRechargeDuration(ironskin_brew))) Spell(purifying_brew)
 		# always keep 1 charge unless black_ox_brew is coming off cd
 		if (SpellCharges(ironskin_brew) > 1 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3))
 		{
@@ -58,7 +68,7 @@ AddFunction BrewmasterDefaultShortCDActions
 				if (HasArtifactTrait(brew_stache_trait) and BuffExpires(brew_stache_buff) and not Talent(elusive_dance_talent)) Spell(ironskin_brew text=stache)
 				# keep up ironskin_brew_buff
 				if (BuffExpires(ironskin_brew_buff 2)) Spell(ironskin_brew)
-				# purify light stagger when doing trash when talent elusive dance 
+				# purify stagger when doing trash when talent elusive dance 
 				if (Talent(elusive_dance_talent) and not IsBossFight() and BuffExpires(elusive_dance_buff)) Spell(purifying_brew)
 			}
 		}
@@ -153,11 +163,12 @@ AddFunction BrewmasterDefaultCdActions
 	if not PetPresent(name=Niuzao) Spell(invoke_niuzao)
 	Item(Trinket0Slot usable=1 text=13)
 	Item(Trinket1Slot usable=1 text=14)
+	if (HasEquippedItem(firestone_walkers)) Spell(fortifying_brew)
 	if (HasEquippedItem(fundamental_observation)) Spell(zen_meditation)
 	Spell(fortifying_brew)
-	Spell(zen_meditation)
 	Spell(dampen_harm)
 	Item(unbending_potion usable=1)
+	Spell(zen_meditation)
 }
 
 AddFunction BrewmasterInterruptActions
@@ -222,7 +233,7 @@ do
 # Based on SimulationCraft profile "Monk_Windwalker_T19P".
 #	class=monk
 #	spec=windwalker
-#	talents=3010033
+#	talents=3010032
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -231,27 +242,25 @@ Include(ovale_monk_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=windwalker)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=windwalker)
-AddCheckBox(opt_chi_burst SpellName(chi_burst) default specialization=windwalker)
 AddCheckBox(opt_storm_earth_and_fire SpellName(storm_earth_and_fire) specialization=windwalker)
+AddCheckBox(opt_chi_burst SpellName(chi_burst) default specialization=windwalker)
+
+AddFunction WindwalkerInterruptActions
+{
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+	{
+		if target.InRange(spear_hand_strike) and target.IsInterruptible() Spell(spear_hand_strike)
+		if target.Distance(less 5) and not target.Classification(worldboss) Spell(leg_sweep)
+		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_chi)
+		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+		if target.InRange(paralysis) and not target.Classification(worldboss) Spell(paralysis)
+	}
+}
 
 AddFunction WindwalkerGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
-}
-
-AddFunction WindwalkerInterruptActions
-{
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
-	{
-		if target.InRange(spear_hand_strike) Spell(spear_hand_strike)
-		if not target.Classification(worldboss)
-		{
-			if target.InRange(paralysis) Spell(paralysis)
-			Spell(arcane_torrent_chi)
-			if target.InRange(quaking_palm) Spell(quaking_palm)
-			Spell(war_stomp)
-		}
-	}
 }
 
 ### actions.default
@@ -597,8 +606,8 @@ AddFunction WindwalkerStMainActions
 		if SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 Spell(whirling_dragon_punch)
 		#crackling_jade_lightning,if=equipped.the_emperors_capacitor&buff.the_emperors_capacitor.stack>=19
 		if HasEquippedItem(the_emperors_capacitor) and BuffStacks(the_emperors_capacitor_buff) >= 19 Spell(crackling_jade_lightning)
-		#spinning_crane_kick,if=active_enemies>=3&!prev_gcd.1.spinning_crane_kick
-		if Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) Spell(spinning_crane_kick)
+		#spinning_crane_kick,if=(active_enemies>=3|spinning_crane_kick.count>=3)&!prev_gcd.1.spinning_crane_kick
+		if { Enemies() >= 3 or SpellCount(spinning_crane_kick) >= 3 } and not PreviousGCDSpell(spinning_crane_kick) Spell(spinning_crane_kick)
 		#rushing_jade_wind,if=chi.max-chi>1&!prev_gcd.1.rushing_jade_wind
 		if MaxChi() - Chi() > 1 and not PreviousGCDSpell(rushing_jade_wind) Spell(rushing_jade_wind)
 		#blackout_kick,cycle_targets=1,if=(chi>1|buff.bok_proc.up)&!prev_gcd.1.blackout_kick
@@ -631,7 +640,7 @@ AddFunction WindwalkerStShortCdActions
 
 AddFunction WindwalkerStShortCdPostConditions
 {
-	WindwalkerCdShortCdPostConditions() or HasEquippedItem(convergence_of_fates) and Talent(serenity_talent) and SpellCooldown(serenity) >= 10 and Spell(strike_of_the_windlord) or HasEquippedItem(convergence_of_fates) and not Talent(serenity_talent) and Spell(strike_of_the_windlord) or not HasEquippedItem(convergence_of_fates) and Spell(strike_of_the_windlord) or HasEquippedItem(convergence_of_fates) and Talent(serenity_talent) and SpellCooldown(serenity) >= 5 and Spell(fists_of_fury) or HasEquippedItem(convergence_of_fates) and not Talent(serenity_talent) and Spell(fists_of_fury) or not HasEquippedItem(convergence_of_fates) and Spell(fists_of_fury) or not PreviousGCDSpell(tiger_palm) and Energy() == MaxEnergy() and Chi() <= 3 and BuffPresent(storm_earth_and_fire_buff) and Spell(tiger_palm) or HasEquippedItem(convergence_of_fates) and Talent(serenity_talent) and SpellCooldown(serenity) >= 2 and Spell(rising_sun_kick) or HasEquippedItem(convergence_of_fates) and not Talent(serenity_talent) and Spell(rising_sun_kick) or not HasEquippedItem(convergence_of_fates) and Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or HasEquippedItem(the_emperors_capacitor) and BuffStacks(the_emperors_capacitor_buff) >= 19 and Spell(crackling_jade_lightning) or Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or MaxChi() - Chi() > 1 and not PreviousGCDSpell(rushing_jade_wind) and Spell(rushing_jade_wind) or { Chi() > 1 or BuffPresent(bok_proc_buff) } and not PreviousGCDSpell(blackout_kick) and Spell(blackout_kick) or TimeToMaxEnergy() >= 2.25 and Spell(chi_wave) or TimeToMaxEnergy() >= 2.25 and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or not PreviousGCDSpell(tiger_palm) and Spell(tiger_palm)
+	WindwalkerCdShortCdPostConditions() or HasEquippedItem(convergence_of_fates) and Talent(serenity_talent) and SpellCooldown(serenity) >= 10 and Spell(strike_of_the_windlord) or HasEquippedItem(convergence_of_fates) and not Talent(serenity_talent) and Spell(strike_of_the_windlord) or not HasEquippedItem(convergence_of_fates) and Spell(strike_of_the_windlord) or HasEquippedItem(convergence_of_fates) and Talent(serenity_talent) and SpellCooldown(serenity) >= 5 and Spell(fists_of_fury) or HasEquippedItem(convergence_of_fates) and not Talent(serenity_talent) and Spell(fists_of_fury) or not HasEquippedItem(convergence_of_fates) and Spell(fists_of_fury) or not PreviousGCDSpell(tiger_palm) and Energy() == MaxEnergy() and Chi() <= 3 and BuffPresent(storm_earth_and_fire_buff) and Spell(tiger_palm) or HasEquippedItem(convergence_of_fates) and Talent(serenity_talent) and SpellCooldown(serenity) >= 2 and Spell(rising_sun_kick) or HasEquippedItem(convergence_of_fates) and not Talent(serenity_talent) and Spell(rising_sun_kick) or not HasEquippedItem(convergence_of_fates) and Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or HasEquippedItem(the_emperors_capacitor) and BuffStacks(the_emperors_capacitor_buff) >= 19 and Spell(crackling_jade_lightning) or { Enemies() >= 3 or SpellCount(spinning_crane_kick) >= 3 } and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or MaxChi() - Chi() > 1 and not PreviousGCDSpell(rushing_jade_wind) and Spell(rushing_jade_wind) or { Chi() > 1 or BuffPresent(bok_proc_buff) } and not PreviousGCDSpell(blackout_kick) and Spell(blackout_kick) or TimeToMaxEnergy() >= 2.25 and Spell(chi_wave) or TimeToMaxEnergy() >= 2.25 and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or not PreviousGCDSpell(tiger_palm) and Spell(tiger_palm)
 }
 
 AddFunction WindwalkerStCdActions
@@ -648,7 +657,7 @@ AddFunction WindwalkerStCdActions
 
 AddFunction WindwalkerStCdPostConditions
 {
-	WindwalkerCdCdPostConditions() or HasEquippedItem(convergence_of_fates) and Talent(serenity_talent) and SpellCooldown(serenity) >= 10 and Spell(strike_of_the_windlord) or HasEquippedItem(convergence_of_fates) and not Talent(serenity_talent) and Spell(strike_of_the_windlord) or not HasEquippedItem(convergence_of_fates) and Spell(strike_of_the_windlord) or HasEquippedItem(convergence_of_fates) and Talent(serenity_talent) and SpellCooldown(serenity) >= 5 and Spell(fists_of_fury) or HasEquippedItem(convergence_of_fates) and not Talent(serenity_talent) and Spell(fists_of_fury) or not HasEquippedItem(convergence_of_fates) and Spell(fists_of_fury) or not PreviousGCDSpell(tiger_palm) and Energy() == MaxEnergy() and Chi() <= 3 and BuffPresent(storm_earth_and_fire_buff) and Spell(tiger_palm) or HasEquippedItem(convergence_of_fates) and Talent(serenity_talent) and SpellCooldown(serenity) >= 2 and Spell(rising_sun_kick) or HasEquippedItem(convergence_of_fates) and not Talent(serenity_talent) and Spell(rising_sun_kick) or not HasEquippedItem(convergence_of_fates) and Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or HasEquippedItem(the_emperors_capacitor) and BuffStacks(the_emperors_capacitor_buff) >= 19 and Spell(crackling_jade_lightning) or Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or MaxChi() - Chi() > 1 and not PreviousGCDSpell(rushing_jade_wind) and Spell(rushing_jade_wind) or { Chi() > 1 or BuffPresent(bok_proc_buff) } and not PreviousGCDSpell(blackout_kick) and Spell(blackout_kick) or TimeToMaxEnergy() >= 2.25 and Spell(chi_wave) or TimeToMaxEnergy() >= 2.25 and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or not PreviousGCDSpell(tiger_palm) and Spell(tiger_palm)
+	WindwalkerCdCdPostConditions() or HasEquippedItem(convergence_of_fates) and Talent(serenity_talent) and SpellCooldown(serenity) >= 10 and Spell(strike_of_the_windlord) or HasEquippedItem(convergence_of_fates) and not Talent(serenity_talent) and Spell(strike_of_the_windlord) or not HasEquippedItem(convergence_of_fates) and Spell(strike_of_the_windlord) or HasEquippedItem(convergence_of_fates) and Talent(serenity_talent) and SpellCooldown(serenity) >= 5 and Spell(fists_of_fury) or HasEquippedItem(convergence_of_fates) and not Talent(serenity_talent) and Spell(fists_of_fury) or not HasEquippedItem(convergence_of_fates) and Spell(fists_of_fury) or not PreviousGCDSpell(tiger_palm) and Energy() == MaxEnergy() and Chi() <= 3 and BuffPresent(storm_earth_and_fire_buff) and Spell(tiger_palm) or HasEquippedItem(convergence_of_fates) and Talent(serenity_talent) and SpellCooldown(serenity) >= 2 and Spell(rising_sun_kick) or HasEquippedItem(convergence_of_fates) and not Talent(serenity_talent) and Spell(rising_sun_kick) or not HasEquippedItem(convergence_of_fates) and Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or HasEquippedItem(the_emperors_capacitor) and BuffStacks(the_emperors_capacitor_buff) >= 19 and Spell(crackling_jade_lightning) or { Enemies() >= 3 or SpellCount(spinning_crane_kick) >= 3 } and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or MaxChi() - Chi() > 1 and not PreviousGCDSpell(rushing_jade_wind) and Spell(rushing_jade_wind) or { Chi() > 1 or BuffPresent(bok_proc_buff) } and not PreviousGCDSpell(blackout_kick) and Spell(blackout_kick) or TimeToMaxEnergy() >= 2.25 and Spell(chi_wave) or TimeToMaxEnergy() >= 2.25 and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or not PreviousGCDSpell(tiger_palm) and Spell(tiger_palm)
 }
 
 ### Windwalker icons.
@@ -726,6 +735,7 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # gale_burst
 # hidden_masters_forbidden_touch
 # invoke_xuen
+# leg_sweep
 # paralysis
 # quaking_palm
 # rising_sun_kick
