@@ -68,8 +68,8 @@ AddFunction BrewmasterDefaultShortCDActions
 				if (HasArtifactTrait(brew_stache_trait) and BuffExpires(brew_stache_buff) and not Talent(elusive_dance_talent)) Spell(ironskin_brew text=stache)
 				# keep up ironskin_brew_buff
 				if (BuffExpires(ironskin_brew_buff 2)) Spell(ironskin_brew)
-				# purify stagger when doing trash when talent elusive dance 
-				if (Talent(elusive_dance_talent) and not IsBossFight() and BuffExpires(elusive_dance_buff)) Spell(purifying_brew)
+				# purify stagger when talent elusive dance 
+				if (Talent(elusive_dance_talent) and BuffExpires(elusive_dance_buff)) Spell(purifying_brew)
 			}
 		}
 	}
