@@ -1858,6 +1858,14 @@ EmitAction = function(parseNode, nodeList, annotation)
 			bodyCode = camelSpecialization .. "GetInMeleeRange()"
 			annotation[action] = class
 			isSpellAction = false
+		elseif class == "DRUID" and action == "new_moon" then
+			conditionCode = "not SpellKnown(half_moon) and not SpellKnown(full_moon)"
+			AddSymbol(annotation, "half_moon")
+			AddSymbol(annotation, "full_moon")
+		elseif class == "DRUID" and action == "half_moon" then
+			conditionCode = "SpellKnown(half_moon)"
+		elseif class == "DRUID" and action == "full_moon" then
+			conditionCode = "SpellKnown(full_moon)"
 		elseif class == "HUNTER" and (action == "muzzle" or action == "counter_shot") then
 			bodyCode = camelSpecialization .. "InterruptActions()"
 			annotation[action] = class
