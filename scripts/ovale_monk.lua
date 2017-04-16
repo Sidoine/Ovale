@@ -161,14 +161,14 @@ AddFunction BrewmasterDefaultCdActions
 	BrewmasterInterruptActions()
 	if CheckBoxOn(opt_legendary_ring_tank) Item(legendary_ring_bonus_armor usable=1)
 	if not PetPresent(name=Niuzao) Spell(invoke_niuzao)
+	if (HasEquippedItem(firestone_walkers)) Spell(fortifying_brew text=FW)
+	if (HasEquippedItem(fundamental_observation)) Spell(zen_meditation text=FO)
 	Item(Trinket0Slot usable=1 text=13)
 	Item(Trinket1Slot usable=1 text=14)
-	if (HasEquippedItem(firestone_walkers)) Spell(fortifying_brew)
-	if (HasEquippedItem(fundamental_observation)) Spell(zen_meditation text=FO)
 	Spell(fortifying_brew)
 	Spell(dampen_harm)
-	Item(unbending_potion usable=1)
 	Spell(zen_meditation)
+	Item(unbending_potion usable=1)
 }
 
 AddFunction BrewmasterInterruptActions
