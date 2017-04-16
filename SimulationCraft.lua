@@ -3747,6 +3747,11 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 			end
 			ok, node = EmitOperandDot(petOperand, parseNode, nodeList, annotation, action, target)
 		end
+	elseif class == "DEMONHUNTER" and operand == "buff.metamorphosis.extended_by_demonic" then
+		-- the first time of each meta window eye beam extends the duration, all consecutive casts of eye beam don't anymore
+		-- how to implement that?
+		-- for now, just assume we never extend
+		code = "False()"
 	elseif class == "DEMONHUNTER" and operand == "cooldown.chaos_blades.ready" then
 		code = "Talent(chaos_blades_talent) and SpellCooldown(chaos_blades) == 0"
 		AddSymbol(annotation, "chaos_blades_talent")
