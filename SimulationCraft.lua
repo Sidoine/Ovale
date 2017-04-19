@@ -1940,6 +1940,11 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "MONK" and action == "storm_earth_and_fire" then
 			conditionCode = "CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff)"
 			annotation[action] = class
+		elseif class == "MONK" and action == "touch_of_death" then
+			conditionCode = "not CheckBoxOn(opt_touch_of_death_on_elite_only) or target.Classification(elite) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff)"
+			annotation[action] = class
+			annotation.opt_touch_of_death_on_elite_only = "MONK"
+			AddSymbol(annotation, "hidden_masters_forbidden_touch_buff")
 		elseif class == "MONK" and action == "whirling_dragon_punch" then
 			conditionCode = "SpellCooldown(fists_of_fury)>0 and SpellCooldown(rising_sun_kick)>0"
 		elseif class == "PALADIN" and action == "blessing_of_kings" then
@@ -4912,10 +4917,8 @@ local function InsertSupportingControls(child, annotation)
 		local code = format(fmt, ifSpecialization)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
-		AddSymbol(annotation, "metamorphosis_havoc")
 		count = count + 1
 	end
-	
 	if annotation.opt_arcane_mage_burn_phase == "MAGE" then
 		local fmt = [[
 			AddCheckBox(opt_arcane_mage_burn_phase L(arcane_mage_burn_phase) default %s)
@@ -4925,7 +4928,15 @@ local function InsertSupportingControls(child, annotation)
 		tinsert(child, 1, node)
 		count = count + 1
 	end
-	
+	if annotation.opt_touch_of_death_on_elite_only == "MONK" then
+		local fmt = [[
+			AddCheckBox(opt_touch_of_death_on_elite_only L(touch_of_death_on_elite_only) default %s)
+		]]
+		local code = format(fmt, ifSpecialization)
+		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+		tinsert(child, 1, node)
+		count = count + 1
+	end
 	if annotation.use_legendary_ring then
 		local legendaryRing = annotation.use_legendary_ring
 		local fmt = [[
