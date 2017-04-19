@@ -34,13 +34,12 @@ AddFunction DisciplineDefaultMainActions
 
 AddFunction DisciplineDefaultCdActions
 {
-	if Talent(mindbender_talent) Spell(mindbender)
 	if (not Talent(schism_talent) or not target.DebuffExpires(schism_debuff)) Spell(lights_wrath)
+	Spell(shadowfiend)
 	Item(Trinket0Slot usable=1 text=13)
 	Item(Trinket1Slot usable=1 text=14)
 	Spell(power_infusion)
 	Spell(rapture)
-	Spell(shadowfiend)
 }
 	
 AddIcon help=mainheal specialization=discipline
