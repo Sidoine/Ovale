@@ -65,6 +65,7 @@ Define(empower_wards_buff 218256)
 	SpellInfo(empower_wards_buff duration=6)
 Define(eye_beam 198013)
 	SpellInfo(eye_beam fury=50)
+	SpellInfo(eye_beam addfury=-5 pertrait=wide_eyes_trait)
 Define(felblade 232893)
 	SpellInfo(felblade cd=15 tag=main cd_haste=melee fury=-30 pain=-20)
 Define(fel_barrage 211053)
@@ -182,6 +183,7 @@ Define(vengeful_retreat 198793)
 	SpellAddTargetDebuff(vengeful_retreat vengeful_retreat_debuff=1)
 Define(vengeful_retreat_debuff 198813)
 	SpellInfo(vengeful_retreat_debuff duration=3)
+Define(wide_eyes_trait 238045)
 
 ]]
 
