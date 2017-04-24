@@ -21,6 +21,7 @@ local OvaleCooldown = nil
 local OvaleData = nil
 local OvaleEquipment = nil
 local OvalePaperDoll = nil
+local OvalePower = nil
 local OvaleScore = nil
 local OvaleScripts = nil
 local OvaleSpellBook = nil
@@ -143,6 +144,7 @@ local TEST_CONDITION_DISPATCH = {
 	specialization = TestConditionSpecialization,
 	talent = TestConditionTalent,
 	trait = TestConditionTrait,
+	pertrait = TestConditionTrait,
 }
 
 local function TestConditions(positionalParams, namedParams)
@@ -391,6 +393,13 @@ local function EvaluateSpellAuraList(node)
 end
 
 local function EvaluateSpellInfo(node)
+	local addpower = {}
+	for powertype, _ in pairs(OvalePower.POWER_INFO) do
+		local key = "add" .. powertype
+		addpower[key] = powertype
+	end
+	
+	
 	local ok = true
 	local spellId, positionalParams, namedParams = node.spellId, node.positionalParams, node.namedParams
 	if spellId and TestConditions(positionalParams, namedParams) then
@@ -431,6 +440,21 @@ local function EvaluateSpellInfo(node)
 			elseif k == "sharedcd" then
 				si[k] = v
 				OvaleCooldown:AddSharedCooldown(v, spellId)
+			elseif addpower[k] ~= nil  then
+				local powertype = addpower[k]
+				-- Accumulate "add<power>" into a single "add<power>" SpellInfo property.
+				local value = tonumber(v)
+				if value then
+					local realValue = value
+					if namedParams.pertrait ~= nil then
+						realValue = value * OvaleArtifact:TraitRank(namedParams.pertrait)
+					end
+					local power = si[k] or 0
+					si[k] = power + realValue
+				else
+					ok = false
+					break
+				end
 			elseif not OvaleAST.PARAMETER_KEYWORD[k] then
 				si[k] = v
 			end
@@ -571,6 +595,7 @@ function OvaleCompile:OnInitialize()
 	OvaleData = Ovale.OvaleData
 	OvaleEquipment = Ovale.OvaleEquipment
 	OvalePaperDoll = Ovale.OvalePaperDoll
+	OvalePower = Ovale.OvalePower
 	OvaleScore = Ovale.OvaleScore
 	OvaleScripts = Ovale.OvaleScripts
 	OvaleSpellBook = Ovale.OvaleSpellBook
