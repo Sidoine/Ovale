@@ -3765,6 +3765,9 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		code = "Talent(nemesis_talent) and SpellCooldown(nemesis) == 0"
 		AddSymbol(annotation, "nemesis_talent")
 		AddSymbol(annotation, "nemesis")
+	elseif class == "DEMONHUNTER" and operand == "cooldown.metamorphosis.ready" and specialization == "havoc" then
+		code = "(not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()) and SpellCooldown(metamorphosis_havoc) == 0"
+		AddSymbol(annotation, "metamorphosis_havoc")
 	elseif class == "DRUID" and operand == "buff.wild_charge_movement.down" then
 		-- "wild_charge_movement" is a fake SimulationCraft buff that lasts for the
 		-- duration of the movement during Wild Charge.
