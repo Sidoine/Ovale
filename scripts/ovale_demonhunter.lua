@@ -62,9 +62,10 @@ AddFunction VengeanceDefaultMainActions
 	}
 	
 	# Fiery demise
-	if (VengeancePlayOffensively() and SpellCooldown(soul_carver) <= 6.5 and (not Talent(fel_devastation_talent) or (SpellCooldown(fel_devastation) <= 4 and Pain() >= 30)) and target.TimeToDie() >= 8) Spell(fiery_brand)
-	if (VengeancePlayOffensively() and not target.BuffExpires(fiery_demise_debuff))
+	if (HasArtifactTrait(fiery_demise) and VengeancePlayOffensively() and SpellCooldown(soul_carver) <= 6.5 and (not Talent(fel_devastation_talent) or (SpellCooldown(fel_devastation) <= 4 and Pain() >= 30)) and target.TimeToDie() >= 8) Spell(fiery_brand)
+	if (HasArtifactTrait(fiery_demise) and VengeancePlayOffensively() and not target.BuffExpires(fiery_demise_debuff))
 	{
+		if (PainDeficit() > 10) Spell(immolation_aura)
 		Spell(soul_carver)
 		Spell(fel_devastation)
 		Spell(fel_eruption)
@@ -72,7 +73,7 @@ AddFunction VengeanceDefaultMainActions
 	}
 	
 	# Regular rotation
-	if (VengeancePlayDefensively()) Spell(soul_carver)
+	if (BuffStacks(soul_fragments) <= 2) Spell(soul_carver)
 	if ((VengeancePlayOffensively() and not HasArtifactTrait(fiery_demise))) Spell(fel_devastation)
 	if (Pain() >= 80 and not Talent(fracture_talent)) Spell(soul_cleave)
 	if (PainDeficit() > 10) Spell(immolation_aura)
