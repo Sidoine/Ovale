@@ -234,6 +234,7 @@ Include(ovale_trinkets_wod)
 Include(ovale_monk_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=windwalker)
+AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=windwalker)
 AddCheckBox(opt_touch_of_death_on_elite_only L(touch_of_death_on_elite_only) default specialization=windwalker)
 AddCheckBox(opt_storm_earth_and_fire SpellName(storm_earth_and_fire) specialization=windwalker)
 AddCheckBox(opt_chi_burst SpellName(chi_burst) default specialization=windwalker)
@@ -249,6 +250,17 @@ AddFunction WindwalkerInterruptActions
 		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
 		if target.InRange(paralysis) and not target.Classification(worldboss) Spell(paralysis)
 	}
+}
+
+AddFunction WindwalkerUseItemActions
+{
+	Item(Trinket0Slot text=13 usable=1)
+	Item(Trinket1Slot text=14 usable=1)
+}
+
+AddFunction WindwalkerGetInMeleeRange
+{
+	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
 ### actions.default
@@ -293,6 +305,9 @@ AddFunction WindwalkerDefaultMainPostConditions
 
 AddFunction WindwalkerDefaultShortCdActions
 {
+	#auto_attack
+	WindwalkerGetInMeleeRange()
+
 	unless target.TimeToDie() <= 9 and { not CheckBoxOn(opt_touch_of_death_on_elite_only) or target.Classification(elite) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff) } and Spell(touch_of_death)
 	{
 		#call_action_list,name=serenity,if=(talent.serenity.enabled&cooldown.serenity.remains<=0)|buff.serenity.up
@@ -331,7 +346,6 @@ AddFunction WindwalkerDefaultShortCdPostConditions
 
 AddFunction WindwalkerDefaultCdActions
 {
-	#auto_attack
 	#spear_hand_strike,if=target.debuff.casting.react
 	if target.IsInterruptible() WindwalkerInterruptActions()
 
@@ -404,6 +418,14 @@ AddFunction WindwalkerCdCdActions
 	Spell(blood_fury_apsp)
 	#berserking
 	Spell(berserking)
+
+	unless DebuffCountOnAny(touch_of_death_debuff) < Enemies() and DebuffCountOnAny(touch_of_death_debuff) <= 2 and not HasArtifactTrait(gale_burst) and HasEquippedItem(hidden_masters_forbidden_touch) and not PreviousGCDSpell(touch_of_death) and { not CheckBoxOn(opt_touch_of_death_on_elite_only) or target.Classification(elite) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff) } and Spell(touch_of_death) or not HasArtifactTrait(gale_burst) and not HasEquippedItem(hidden_masters_forbidden_touch) and { not CheckBoxOn(opt_touch_of_death_on_elite_only) or target.Classification(elite) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff) } and Spell(touch_of_death) or DebuffCountOnAny(touch_of_death_debuff) < Enemies() and DebuffCountOnAny(touch_of_death_debuff) <= 2 and HasArtifactTrait(gale_burst) and { Talent(serenity_talent) and SpellCooldown(serenity) <= 1 or Chi() >= 2 } and { SpellCooldown(strike_of_the_windlord) < 8 or SpellCooldown(fists_of_fury) <= 4 } and SpellCooldown(rising_sun_kick) < 7 and not PreviousGCDSpell(touch_of_death) and { not CheckBoxOn(opt_touch_of_death_on_elite_only) or target.Classification(elite) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff) } and Spell(touch_of_death)
+	{
+		#use_item,name=draught_of_souls,if=talent.serenity.enabled&!buff.serenity.up&energy.time_to_max>3
+		if Talent(serenity_talent) and not BuffPresent(serenity_buff) and TimeToMaxEnergy() > 3 WindwalkerUseItemActions()
+		#use_item,name=draught_of_souls,if=!talent.serenity.enabled&!buff.storm_earth_and_fire.up&energy.time_to_max>3
+		if not Talent(serenity_talent) and not BuffPresent(storm_earth_and_fire_buff) and TimeToMaxEnergy() > 3 WindwalkerUseItemActions()
+	}
 }
 
 AddFunction WindwalkerCdCdPostConditions
