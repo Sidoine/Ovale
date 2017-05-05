@@ -92,8 +92,10 @@ local PARAMETER_KEYWORD = {
 	["itemset"] = true,
 	["level"] = true,
 	["listitem"] = true,
+	["pertrait"] = true,
 	["specialization"] = true,
 	["talent"] = true,
+	["trait"] = true,
 	["text"] = true,
 	["wait"] = true,
 }
