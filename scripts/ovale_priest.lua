@@ -28,7 +28,7 @@ AddFunction DisciplineDefaultMainActions
 	if target.TimeToDie() >= 6 Spell(schism)
 	if (not Talent(schism_talent) or not target.DebuffExpires(schism_debuff)) Spell(penance)
 	if (not Talent(schism_talent) or not target.DebuffExpires(schism_debuff)) Spell(power_word_solace)
-	if target.Range() <= 30 Spell(divine_star)
+	if target.Distance() <= 30 Spell(divine_star)
 	Spell(smite)
 }
 
