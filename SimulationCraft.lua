@@ -134,6 +134,13 @@ local RUNE_OPERAND = {
 	["rune"] = "rune"
 }
 
+local CONSUMABLE_ITEMS = {
+	["potion"] = true,
+	["food"] = true,
+	["flask"] = true,
+	["augmentation"] = true,
+}
+
 do
 	-- All expression keywords are keywords.
 	for keyword, value in pairs(MODIFIER_KEYWORD) do
@@ -1100,6 +1107,7 @@ end
 local function InitializeDisambiguation()
 	AddDisambiguation("bloodlust_buff",			"burst_haste_buff")
 	AddDisambiguation("trinket_proc_all_buff",	"trinket_proc_any_buff")
+	AddDisambiguation("trinket_stack_proc_all_buff",	"trinket_proc_any_buff")
 	-- WoD legendary ring
 	AddDisambiguation("etheralus_the_eternal_reward",			"legendary_ring_spirit", nil, nil, "Item")
 	AddDisambiguation("maalus_the_blood_drinker",				"legendary_ring_agility", nil, nil, "Item")
@@ -1812,7 +1820,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 		-- skip
 	elseif action == "choose_target" then
 		-- skip
-	elseif action == "elixir" or action == "flask" or action == "food" then
+	elseif action == "augmentation" or action == "flask" or action == "food" then
 		-- skip
 	elseif action == "snapshot_stats" then
 		-- skip
@@ -2148,10 +2156,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 				conditionCode = format("BuffPresent(%s)", buffName)
 				isSpellAction = false
 			end
-		elseif action == "mana_potion" then
-			bodyCode = camelSpecialization .. "UsePotionMana()"
-			annotation.use_potion_mana = class
-			isSpellAction = false
 		elseif action == "pool_resource" then
 			-- Create a special "simc_pool_resource" AST node that will be transformed in
 			-- a later step into something OvaleAST can understand and unparse.
@@ -2163,22 +2167,15 @@ EmitAction = function(parseNode, nodeList, annotation)
 			end
 			isSpellAction = false
 		elseif action == "potion" then
-			if modifier.name then
-				local name = Unparse(modifier.name)
-				local stat = POTION_STAT[name]
-				if stat == "agility" then
-					bodyCode = camelSpecialization .. "UsePotionAgility()"
-					annotation.use_potion_agility = class
-				elseif stat == "armor" then
-					bodyCode = camelSpecialization .. "UsePotionArmor()"
-					annotation.use_potion_armor = class
-				elseif stat == "intellect" then
-					bodyCode = camelSpecialization .. "UsePotionIntellect()"
-					annotation.use_potion_intellect = class
-				elseif stat == "strength" then
-					bodyCode = camelSpecialization .. "UsePotionStrength()"
-					annotation.use_potion_strength = class
-				end
+			local name = (modifier.name and Unparse(modifier.name)) or annotation.consumables["potion"]
+			if strmatch(name, "^(%w+)_potion") then
+				name = strmatch(name, "^(%w+)_potion")
+			end
+			if name then
+				bodyCode = format("Item(%s_potion usable=1)", name)
+				conditionCode = "CheckBoxOn(opt_use_consumables) and target.Classification(worldboss)"
+				annotation.opt_use_consumables = class
+				AddSymbol(annotation, format("%s_potion", name))
 				isSpellAction = false
 			end
 		elseif action == "stance" then
@@ -2198,6 +2195,10 @@ EmitAction = function(parseNode, nodeList, annotation)
 			bodyCode = camelSpecialization .. "SummonPet()"
 			annotation[action] = class
 			isSpellAction = false
+		elseif action == "use_items" then
+			bodyCode = camelSpecialization .. "UseItemActions()"
+			annotation[action] = true
+			isSpellAction = false
 		elseif action == "use_item" then
 			local legendaryRing = false
 			if modifier.slot then
@@ -2210,7 +2211,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 				name = Disambiguate(name, class, specialization)
 				if strmatch(name, "legendary_ring") then
 					legendaryRing = name
-				elseif false then
+				elseif false then -- TODO: use all other items here
 					-- Use named item and require the symbol name.
 					bodyCode = format("Item(%s usable=1)", name)
 					AddSymbol(annotation, name)
@@ -3004,19 +3005,6 @@ EmitOperandBuff = function(operand, parseNode, nodeList, annotation, action, tar
 			target = "pet."
 		end
 
-		-- Assume that the "potion" action has already been seen.
-		if buffName == "potion_buff" then
-			if annotation.use_potion_agility then
-				buffName = "potion_agility_buff"
-			elseif annotation.use_potion_armor then
-				buffName = "potion_armor_buff"
-			elseif annotation.use_potion_intellect then
-				buffName = "potion_intellect_buff"
-			elseif annotation.use_potion_strength then
-				buffName = "potion_strength_buff"
-			end
-		end
-
 		local code
 		if property == "cooldown_remains" then
 			-- Assume that the spell and the buff have the same name.
@@ -3253,20 +3241,6 @@ EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
 		local prefix
 		name, prefix = Disambiguate(name, annotation.class, annotation.specialization, "Spell")
 				
-		-- Assume that the "potion" action has already been seen.
-		if name == "potion" then
-			prefix = "Item"
-			if annotation.use_potion_agility then
-				name = "draenic_agility_potion"
-			elseif annotation.use_potion_armor then
-				name = "draenic_armor_potion"
-			elseif annotation.use_potion_intellect then
-				name = "draenic_intellect_potion"
-			elseif annotation.use_potion_strength then
-				name = "draenic_strength_potion"
-			end
-		end
-
 		local code
 		if property == "execute_time" then
 			code = format("ExecuteTime(%s)", name)
@@ -4091,7 +4065,8 @@ end
 EmitOperandTrinket = function(operand, parseNode, nodeList, annotation, action)
 	local ok = true
 	local node
-
+	
+	print(operand)
 	local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
 	local token = tokenIterator()
 	if token == "trinket" then
@@ -4107,6 +4082,7 @@ EmitOperandTrinket = function(operand, parseNode, nodeList, annotation, action)
 			local property = tokenIterator()
 			local buffName = format("trinket_%s_%s_buff", procType, statName)
 			buffName = Disambiguate(buffName, annotation.class, annotation.specialization)
+			
 
 			if property == "cooldown" then
 				code = format("BuffCooldownDuration(%s)", buffName)
@@ -4129,6 +4105,7 @@ EmitOperandTrinket = function(operand, parseNode, nodeList, annotation, action)
 			else
 				ok = false
 			end
+			print(buffName, ok and "true" or "false")
 			if ok then
 				AddSymbol(annotation, buffName)
 			end
@@ -4783,76 +4760,6 @@ local function InsertSupportingFunctions(child, annotation)
 		annotation.functionTag[node.name] = "cd"
 		count = count + 1
 	end
-	if annotation.use_potion_strength then
-		local fmt = [[
-			AddFunction %sUsePotionStrength
-			{
-				if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
-			}
-		]]
-		local code = format(fmt, camelSpecialization)
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		annotation.functionTag[node.name] = "cd"
-		AddSymbol(annotation, "draenic_strength_potion")
-		count = count + 1
-	end
-	if annotation.use_potion_mana then
-		local fmt = [[
-			AddFunction %sUsePotionMana
-			{
-				if CheckBoxOn(opt_potion_mana) Item(draenic_mana_potion usable=1)
-			}
-		]]
-		local code = format(fmt, camelSpecialization)
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		annotation.functionTag[node.name] = "cd"
-		AddSymbol(annotation, "draenic_mana_potion")
-		count = count + 1
-	end
-	if annotation.use_potion_intellect then
-		local fmt = [[
-			AddFunction %sUsePotionIntellect
-			{
-				if CheckBoxOn(opt_potion_intellect) and target.Classification(worldboss) Item(draenic_intellect_potion usable=1)
-			}
-		]]
-		local code = format(fmt, camelSpecialization)
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		annotation.functionTag[node.name] = "cd"
-		AddSymbol(annotation, "draenic_intellect_potion")
-		count = count + 1
-	end
-	if annotation.use_potion_armor then
-		local fmt = [[
-			AddFunction %sUsePotionArmor
-			{
-				if CheckBoxOn(opt_potion_armor) and target.Classification(worldboss) Item(draenic_armor_potion usable=1)
-			}
-		]]
-		local code = format(fmt, camelSpecialization)
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		annotation.functionTag[node.name] = "cd"
-		AddSymbol(annotation, "draenic_armor_potion")
-		count = count + 1
-	end
-	if annotation.use_potion_agility then
-		local fmt = [[
-			AddFunction %sUsePotionAgility
-			{
-				if CheckBoxOn(opt_potion_agility) and target.Classification(worldboss) Item(draenic_agility_potion usable=1)
-			}
-		]]
-		local code = format(fmt, camelSpecialization)
-		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		annotation.functionTag[node.name] = "cd"
-		AddSymbol(annotation, "draenic_agility_potion")
-		count = count + 1
-	end
 	return count
 end
 
@@ -4954,54 +4861,13 @@ local function InsertSupportingControls(child, annotation)
 		AddSymbol(annotation, legendaryRing)
 		count = count + 1
 	end
-	if annotation.use_potion_strength then
+	if annotation.opt_use_consumables then
 		local fmt = [[
-			AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default %s)
+			AddCheckBox(opt_use_consumables L(opt_use_consumables) default %s)
 		]]
 		local code = format(fmt, ifSpecialization)
 		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
-		AddSymbol(annotation, "draenic_strength_potion")
-		count = count + 1
-	end
-	if annotation.use_potion_mana then
-		local fmt = [[
-			AddCheckBox(opt_potion_mana ItemName(draenic_mana_potion) default %s)
-		]]
-		local code = format(fmt, ifSpecialization)
-		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		AddSymbol(annotation, "draenic_mana_potion")
-		count = count + 1
-	end
-	if annotation.use_potion_intellect then
-		local fmt = [[
-			AddCheckBox(opt_potion_intellect ItemName(draenic_intellect_potion) default %s)
-		]]
-		local code = format(fmt, ifSpecialization)
-		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		AddSymbol(annotation, "draenic_intellect_potion")
-		count = count + 1
-	end
-	if annotation.use_potion_armor then
-		local fmt = [[
-			AddCheckBox(opt_potion_armor ItemName(draenic_armor_potion) default %s)
-		]]
-		local code = format(fmt, ifSpecialization)
-		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		AddSymbol(annotation, "draenic_armor_potion")
-		count = count + 1
-	end
-	if annotation.use_potion_agility then
-		local fmt = [[
-			AddCheckBox(opt_potion_agility ItemName(draenic_agility_potion) default %s)
-		]]
-		local code = format(fmt, ifSpecialization)
-		local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
-		tinsert(child, 1, node)
-		AddSymbol(annotation, "draenic_agility_potion")
 		count = count + 1
 	end
 	if annotation.melee then
@@ -5175,11 +5041,13 @@ function OvaleSimulationCraft:ParseProfile(simc)
 			tinsert(profile.templates, k)
 		end
 	end
+	
 	-- Parse the action lists.
 	local ok = true
 	local annotation = {}
 	local nodeList = {}
 	local actionList = {}
+	
 	for k, v in pairs(profile) do
 		if ok and strmatch(k, "^actions") then
 			-- Name the default action list "_default" so it's first alphabetically.
@@ -5215,6 +5083,15 @@ function OvaleSimulationCraft:ParseProfile(simc)
 	annotation.level = profile.level
 	ok = ok and (annotation.class and annotation.specialization and annotation.level)
 	annotation.pet = profile.default_pet
+	
+	-- create consumables
+	local consumables = {}
+	for k,v in pairs(CONSUMABLE_ITEMS) do
+		if v then
+			if profile[k] ~= nil then consumables[k] = profile[k] end
+		end
+	end
+	annotation.consumables = consumables
 
 	-- Set the attack range of the class and role.
 	if profile.role == "tank" then
