@@ -4104,7 +4104,6 @@ EmitOperandTrinket = function(operand, parseNode, nodeList, annotation, action)
 			else
 				ok = false
 			end
-			print(buffName, ok and "true" or "false")
 			if ok then
 				AddSymbol(annotation, buffName)
 			end
