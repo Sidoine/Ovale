@@ -1224,13 +1224,14 @@ local function InitializeDisambiguation()
 	AddDisambiguation("finality_nightblade_buff", "finality_nightblade_debuff", "ROGUE")
 	-- Shaman
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_mana",			"SHAMAN")
-	AddDisambiguation("ascendance",				"ascendance_caster",			"SHAMAN",		"elemental")
-	AddDisambiguation("ascendance",				"ascendance_heal",				"SHAMAN",		"restoration")
-	AddDisambiguation("ascendance",				"ascendance_melee",				"SHAMAN",		"enhancement")
+	AddDisambiguation("ascendance",				"ascendance_elemental",			"SHAMAN",		"elemental")
+	AddDisambiguation("ascendance",				"ascendance_enhancement",		"SHAMAN",		"enhancement")
 	AddDisambiguation("blood_fury",				"blood_fury_apsp",				"SHAMAN")
 	AddDisambiguation("legendary_ring",			"legendary_ring_agility",		"SHAMAN",		"enhancement", "Item")
 	AddDisambiguation("legendary_ring",			"legendary_ring_intellect",		"SHAMAN",		"elemental", "Item")
 	AddDisambiguation("legendary_ring",			"legendary_ring_spirit",		"SHAMAN",		"restoration", "Item")
+	AddDisambiguation("lightning_bolt",			"lightning_bolt_elemental",		"SHAMAN",		"elemental")
+	AddDisambiguation("lightning_bolt",			"lightning_bolt_enhancement",	"SHAMAN",		"enhancement")
 	AddDisambiguation("unleashed_fury",			"unleashed_fury_melee",			"SHAMAN",		"enhancement", "Item")
 	-- Warlock
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_mana",			"WARLOCK")
@@ -2042,6 +2043,11 @@ EmitAction = function(parseNode, nodeList, annotation)
 			local spellName = "primal_strike"
 			AddSymbol(annotation, spellName)
 			conditionCode = format("target.InRange(%s)", spellName)
+		elseif class == "SHAMAN" and action == "totem_mastery" then
+			-- only propose totem_mastery once when out of combat 
+			-- only propose totem_mastery when standing still
+			conditionCode = "(not TotemPresent(totem_mastery) or InCombat()) and Speed() == 0"
+			AddSymbol(annotation, "totem_mastery")
 		elseif class == "SHAMAN" and action == "wind_shear" then
 			bodyCode = camelSpecialization .. "InterruptActions()"
 			annotation[action] = class
@@ -4448,7 +4454,9 @@ local function InsertInterruptFunctions(child, annotation)
 	end
 	if annotation.wind_shear == "SHAMAN" then
 		tinsert(interrupts, {name = "wind_shear", interrupt=1, worksOnBoss=1, order=10})
-		tinsert(interrupts, {name = "sundering", knockback=1, order=20, range="target.Distance(less 5)"})
+		if annotation.specialization == "enhancement" then
+			tinsert(interrupts, {name = "sundering", knockback=1, order=20, range="target.Distance(less 5)"})
+		end
 		tinsert(interrupts, {name = "lightning_surge_totem", stun=1, order=30, range="", extraCondition="target.RemainingCastTime() > 2"})
 		tinsert(interrupts, {name = "hex", cc=1, order=100, extraCondition="target.RemainingCastTime() > CastTime(hex) + GCDRemaining() and target.CreatureType(Humanoid Beast)"})
 	end
@@ -4701,6 +4709,7 @@ local function InsertSupportingFunctions(child, annotation)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "shortcd"
+		AddSymbol(annotation, "feral_lunge")
 		AddSymbol(annotation, "stormstrike")
 		count = count + 1
 	end
