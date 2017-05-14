@@ -77,7 +77,7 @@ local STAT_SHORTNAME = {
 	strength = "str",
 	spirit = "spi",
 }
-local STAT_USE_NAMES = { "trinket_proc", "trinket_stacking_proc", "trinket_stacking_stat", "trinket_stat" }
+local STAT_USE_NAMES = { "trinket_proc", "trinket_stacking_proc", "trinket_stacking_stat", "trinket_stat", "trinket_stack_proc" }
 --<private-static-properties>
 
 --<public-static-properties>
