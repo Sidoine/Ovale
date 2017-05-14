@@ -3901,6 +3901,9 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		else
 			ok = false
 		end
+	elseif class == "SHAMAN" and operand == "buff.resonance_totem.remains" then
+		code = "TotemRemaining(totem_mastery)"
+		ok = true
 	elseif class == "SHAMAN" and strmatch(operand, "pet.[a-z_]+.active") then
 		code = "pet.Present()"
 		ok = true
