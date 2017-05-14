@@ -54,13 +54,19 @@ AddFunction BrewmasterDefaultShortCDActions
 	{
 		# purify heavy stagger when we have enough ISB
 		if (DebuffPresent(heavy_stagger_debuff) and (not Talent(elusive_dance_talent) or BuffExpires(elusive_dance_buff)) and (BuffRemaining(ironskin_brew_buff) > 1.5*SpellRechargeDuration(ironskin_brew))) Spell(purifying_brew)
+		# purify medium stagger when low on hp
+		if ((DebuffPresent(heavy_stagger_debuff) or DebuffPresent(moderate_stagger_debuff)) and HealthPercent() <= 50) Spell(purifying_brew)
 		# always keep 1 charge unless black_ox_brew is coming off cd
 		if (SpellCharges(ironskin_brew) > 1 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3))
 		{
 			# never be at (almost) max charges 
 			if (SpellCharges(ironskin_brew count=0) >= SpellMaxCharges(ironskin_brew)-0.3) Spell(ironskin_brew)
 			# use up those charges when black_ox_brew_talent comes off cd
-			if (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3) Spell(ironskin_brew)
+			if (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3)
+			{
+				if (DebuffPresent(heavy_stagger_debuff) or DebuffPresent(moderate_stagger_debuff)) Spell(purifying_brew)
+				Spell(ironskin_brew)
+			}
 			
 			if(StaggerRemaining() > 0)
 			{
