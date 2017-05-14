@@ -163,7 +163,7 @@ Include(ovale_paladin_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=protection)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=protection)
-AddCheckBox(opt_potion_strength ItemName(draenic_strength_potion) default specialization=protection)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=protection)
 
 AddFunction ProtectionInterruptActions
 {
@@ -176,11 +176,6 @@ AddFunction ProtectionInterruptActions
 		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_holy)
 		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
 	}
-}
-
-AddFunction ProtectionUsePotionStrength
-{
-	if CheckBoxOn(opt_potion_strength) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 }
 
 AddFunction ProtectionUseItemActions
@@ -335,6 +330,13 @@ AddFunction ProtectionPrecombatShortCdPostConditions
 
 AddFunction ProtectionPrecombatCdActions
 {
+	#flask,type=flask_of_ten_thousand_scars
+	#flask,type=flask_of_the_countless_armies,if=role.attack|using_apl.max_dps
+	#food,type=seedbattered_fish_plate
+	#food,type=azshari_salad,if=role.attack|using_apl.max_dps
+	#snapshot_stats
+	#potion,name=unbending_potion
+	if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(unbending_potion usable=1)
 }
 
 AddFunction ProtectionPrecombatCdPostConditions
@@ -413,10 +415,11 @@ AddFunction ProtectionProtCdActions
 	#lay_on_hands,if=health.pct<15
 	if HealthPercent() < 15 Spell(lay_on_hands)
 	#potion,name=unbending_potion
+	if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(unbending_potion usable=1)
 	#potion,name=draenic_strength,if=incoming_damage_2500ms>health.max*0.4&&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)|target.time_to_die<=25
-	if IncomingDamage(2.5) > MaxHealth() * 0.4 and not { target.DebuffPresent(eye_of_tyr_debuff) or BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_strength_buff) } or target.TimeToDie() <= 25 ProtectionUsePotionStrength()
+	if { IncomingDamage(2.5) > MaxHealth() * 0.4 and not { target.DebuffPresent(eye_of_tyr_debuff) or BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff) } or target.TimeToDie() <= 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
 	#stoneform,if=incoming_damage_2500ms>health.max*0.4&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
-	if IncomingDamage(2.5) > MaxHealth() * 0.4 and not { target.DebuffPresent(eye_of_tyr_debuff) or BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_strength_buff) } Spell(stoneform)
+	if IncomingDamage(2.5) > MaxHealth() * 0.4 and not { target.DebuffPresent(eye_of_tyr_debuff) or BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff) } Spell(stoneform)
 	#avenging_wrath,if=!talent.seraphim.enabled
 	if not Talent(seraphim_talent) Spell(avenging_wrath_melee)
 	#avenging_wrath,if=talent.seraphim.enabled&buff.seraphim.up
@@ -520,7 +523,6 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 # lay_on_hands
 # light_of_the_protector
 # potion_buff
-# potion_strength_buff
 # rebuke
 # righteous_protector_talent
 # seraphim
@@ -528,6 +530,7 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 # seraphim_talent
 # shield_of_the_righteous
 # stoneform
+# unbending_potion
 # war_stomp
 ]]
 	OvaleScripts:RegisterScript("PALADIN", "protection", name, desc, code, "script")
@@ -549,6 +552,7 @@ Include(ovale_paladin_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=retribution)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=retribution)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=retribution)
 
 AddFunction RetributionInterruptActions
 {
@@ -672,6 +676,7 @@ AddFunction RetributionDefaultCdActions
 	#rebuke
 	RetributionInterruptActions()
 	#potion,name=old_war,if=(buff.bloodlust.react|buff.avenging_wrath.up|buff.crusade.up&buff.crusade.remains<25|target.time_to_die<=40)
+	if { BuffPresent(burst_haste_buff any=1) or BuffPresent(avenging_wrath_melee_buff) or BuffPresent(crusade_buff) and BuffRemaining(crusade_buff) < 25 or target.TimeToDie() <= 40 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
 	#use_item,name=faulty_countermeasure,if=(buff.avenging_wrath.up|buff.crusade.up)
 	if BuffPresent(avenging_wrath_melee_buff) or BuffPresent(crusade_buff) RetributionUseItemActions()
 	#blood_fury
@@ -705,10 +710,6 @@ AddFunction RetributionDefaultCdPostConditions
 
 AddFunction RetributionPrecombatMainActions
 {
-	#flask,type=flask_of_the_countless_armies
-	#food,type=azshari_salad
-	#augmentation,type=defiled
-	Spell(augmentation)
 }
 
 AddFunction RetributionPrecombatMainPostConditions
@@ -721,16 +722,20 @@ AddFunction RetributionPrecombatShortCdActions
 
 AddFunction RetributionPrecombatShortCdPostConditions
 {
-	Spell(augmentation)
 }
 
 AddFunction RetributionPrecombatCdActions
 {
+	#flask,type=flask_of_the_countless_armies
+	#food,type=azshari_salad
+	#augmentation,type=defiled
+	#snapshot_stats
+	#potion,name=old_war
+	if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
 }
 
 AddFunction RetributionPrecombatCdPostConditions
 {
-	Spell(augmentation)
 }
 
 ### Retribution icons.
@@ -794,7 +799,6 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 ### Required symbols
 # 137048
 # arcane_torrent_holy
-# augmentation
 # avenging_wrath_melee
 # avenging_wrath_melee_buff
 # berserking
@@ -815,6 +819,7 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 # holy_wrath
 # judgment
 # judgment_debuff
+# old_war_potion
 # rebuke
 # shield_of_vengeance
 # templars_verdict

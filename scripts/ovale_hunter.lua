@@ -19,6 +19,7 @@ Include(ovale_trinkets_wod)
 Include(ovale_hunter_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=beast_mastery)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=beast_mastery)
 AddCheckBox(opt_volley SpellName(volley) default specialization=beast_mastery)
 
 AddFunction BeastMasteryInterruptActions
@@ -72,7 +73,6 @@ AddFunction BeastMasteryDefaultShortCdActions
 {
 	unless CheckBoxOn(opt_volley) and Spell(volley)
 	{
-		#potion,name=prolonged_power,if=buff.bestial_wrath.remains|!cooldown.beastial_wrath.remains
 		#a_murder_of_crows
 		Spell(a_murder_of_crows)
 
@@ -105,15 +105,21 @@ AddFunction BeastMasteryDefaultCdActions
 	#blood_fury
 	Spell(blood_fury_ap)
 
-	unless CheckBoxOn(opt_volley) and Spell(volley) or Spell(a_murder_of_crows)
+	unless CheckBoxOn(opt_volley) and Spell(volley)
 	{
-		#stampede,if=buff.bloodlust.up|buff.bestial_wrath.up|cooldown.bestial_wrath.remains<=2|target.time_to_die<=14
-		if BuffPresent(burst_haste_buff any=1) or BuffPresent(bestial_wrath_buff) or SpellCooldown(bestial_wrath) <= 2 or target.TimeToDie() <= 14 Spell(stampede)
+		#potion,name=prolonged_power,if=buff.bestial_wrath.remains|!cooldown.bestial_wrath.remains
+		if { BuffPresent(bestial_wrath_buff) or not SpellCooldown(bestial_wrath) > 0 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
 
-		unless SpellCooldown(bestial_wrath) > 3 and Spell(dire_beast) or { SpellCooldown(bestial_wrath) > 6 and { not HasEquippedItem(the_mantle_of_command) or pet.BuffRemaining(pet_dire_frenzy_buff) <= GCD() * 1.2 } or Charges(dire_frenzy) >= 2 and FocusDeficit() >= 25 + TalentPoints(dire_stable_talent) * 12 or target.TimeToDie() < 9 } and Spell(dire_frenzy)
+		unless Spell(a_murder_of_crows)
 		{
-			#aspect_of_the_wild,if=buff.bestial_wrath.up|target.time_to_die<12
-			if BuffPresent(bestial_wrath_buff) or target.TimeToDie() < 12 Spell(aspect_of_the_wild)
+			#stampede,if=buff.bloodlust.up|buff.bestial_wrath.up|cooldown.bestial_wrath.remains<=2|target.time_to_die<=14
+			if BuffPresent(burst_haste_buff any=1) or BuffPresent(bestial_wrath_buff) or SpellCooldown(bestial_wrath) <= 2 or target.TimeToDie() <= 14 Spell(stampede)
+
+			unless SpellCooldown(bestial_wrath) > 3 and Spell(dire_beast) or { SpellCooldown(bestial_wrath) > 6 and { not HasEquippedItem(the_mantle_of_command) or pet.BuffRemaining(pet_dire_frenzy_buff) <= GCD() * 1.2 } or Charges(dire_frenzy) >= 2 and FocusDeficit() >= 25 + TalentPoints(dire_stable_talent) * 12 or target.TimeToDie() < 9 } and Spell(dire_frenzy)
+			{
+				#aspect_of_the_wild,if=buff.bestial_wrath.up|target.time_to_die<12
+				if BuffPresent(bestial_wrath_buff) or target.TimeToDie() < 12 Spell(aspect_of_the_wild)
+			}
 		}
 	}
 }
@@ -127,10 +133,6 @@ AddFunction BeastMasteryDefaultCdPostConditions
 
 AddFunction BeastMasteryPrecombatMainActions
 {
-	#snapshot_stats
-	#potion,name=prolonged_power
-	#augmentation,type=defiled
-	Spell(augmentation)
 }
 
 AddFunction BeastMasteryPrecombatMainPostConditions
@@ -147,16 +149,17 @@ AddFunction BeastMasteryPrecombatShortCdActions
 
 AddFunction BeastMasteryPrecombatShortCdPostConditions
 {
-	Spell(augmentation)
 }
 
 AddFunction BeastMasteryPrecombatCdActions
 {
+	#snapshot_stats
+	#potion,name=prolonged_power
+	if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
 }
 
 AddFunction BeastMasteryPrecombatCdPostConditions
 {
-	Spell(augmentation)
 }
 
 ### BeastMastery icons.
@@ -221,7 +224,6 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # a_murder_of_crows
 # arcane_torrent_focus
 # aspect_of_the_wild
-# augmentation
 # barrage
 # berserking
 # bestial_wrath
@@ -238,6 +240,7 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # multishot
 # pet_beast_cleave_buff
 # pet_dire_frenzy_buff
+# prolonged_power_potion
 # quaking_palm
 # revive_pet
 # stampede
@@ -297,6 +300,7 @@ AddFunction can_gcd
 }
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=marksmanship)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=marksmanship)
 AddCheckBox(opt_volley SpellName(volley) default specialization=marksmanship)
 
 AddFunction MarksmanshipInterruptActions
@@ -457,7 +461,9 @@ AddFunction MarksmanshipCooldownsCdActions
 	#blood_fury,if=buff.trueshot.up
 	if BuffPresent(trueshot_buff) Spell(blood_fury_ap)
 	#potion,name=prolonged_power,if=spell_targets.multishot>2&((buff.trueshot.react&buff.bloodlust.react)|buff.bullseye.react>=23|target.time_to_die<62)
+	if Enemies() > 2 and { BuffPresent(trueshot_buff) and BuffPresent(burst_haste_buff any=1) or BuffStacks(bullseye_buff) >= 23 or target.TimeToDie() < 62 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
 	#potion,name=deadly_grace,if=(buff.trueshot.react&buff.bloodlust.react)|buff.bullseye.react>=23|target.time_to_die<31
+	if { BuffPresent(trueshot_buff) and BuffPresent(burst_haste_buff any=1) or BuffStacks(bullseye_buff) >= 23 or target.TimeToDie() < 31 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(deadly_grace_potion usable=1)
 	#variable,name=trueshot_cooldown,op=set,value=time*1.1,if=time>15&cooldown.trueshot.up&variable.trueshot_cooldown=0
 	#trueshot,if=variable.trueshot_cooldown=0|buff.bloodlust.up|(variable.trueshot_cooldown>0&target.time_to_die>(variable.trueshot_cooldown+duration))|buff.bullseye.react>25|target.time_to_die<16
 	if trueshot_cooldown() == 0 or BuffPresent(burst_haste_buff any=1) or trueshot_cooldown() > 0 and target.TimeToDie() > trueshot_cooldown() + BaseDuration(trueshot_buff) or BuffStacks(bullseye_buff) > 25 or target.TimeToDie() < 16 Spell(trueshot)
@@ -626,11 +632,7 @@ AddFunction MarksmanshipPatientSniperCdPostConditions
 
 AddFunction MarksmanshipPrecombatMainActions
 {
-	#snapshot_stats
-	#potion,name=prolonged_power,if=spell_targets.multi_shot>2
-	#potion,name=deadly_grace
 	#augmentation,type=defiled
-	Spell(augmentation)
 	#windburst
 	Spell(windburst)
 }
@@ -649,16 +651,21 @@ AddFunction MarksmanshipPrecombatShortCdActions
 
 AddFunction MarksmanshipPrecombatShortCdPostConditions
 {
-	Spell(augmentation) or Spell(windburst)
+	Spell(windburst)
 }
 
 AddFunction MarksmanshipPrecombatCdActions
 {
+	#snapshot_stats
+	#potion,name=prolonged_power,if=spell_targets.multi_shot>2
+	if Enemies() > 2 and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
+	#potion,name=deadly_grace
+	if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(deadly_grace_potion usable=1)
 }
 
 AddFunction MarksmanshipPrecombatCdPostConditions
 {
-	Spell(augmentation) or Spell(windburst)
+	Spell(windburst)
 }
 
 ### actions.targetdie
@@ -771,13 +778,13 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # aimed_shot
 # arcane_shot
 # arcane_torrent_focus
-# augmentation
 # barrage
 # berserking
 # black_arrow
 # blood_fury_ap
 # bullseye_buff
 # counter_shot
+# deadly_grace_potion
 # explosive_shot
 # hunters_mark_debuff
 # lock_and_load_buff
@@ -788,6 +795,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # patient_sniper_talent
 # piercing_shot
 # piercing_shot_talent
+# prolonged_power_potion
 # quaking_palm
 # revive_pet
 # sentinel
@@ -823,6 +831,7 @@ Include(ovale_hunter_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=survival)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=survival)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=survival)
 AddCheckBox(opt_trap_launcher SpellName(trap_launcher) default specialization=survival)
 
 AddFunction SurvivalInterruptActions
@@ -867,7 +876,6 @@ AddFunction SurvivalGetInMeleeRange
 
 AddFunction SurvivalDefaultMainActions
 {
-	#potion,name=prolonged_power,if=(talent.spitting_cobra.enabled&buff.spitting_cobra.remains)|(!talent.spitting_cobra.enabled&buff.aspect_of_the_eagle.remains)
 	#call_action_list,name=moknathal,if=talent.way_of_the_moknathal.enabled
 	if Talent(way_of_the_moknathal_talent) SurvivalMoknathalMainActions()
 
@@ -887,7 +895,6 @@ AddFunction SurvivalDefaultShortCdActions
 {
 	#auto_attack
 	SurvivalGetInMeleeRange()
-	#potion,name=prolonged_power,if=(talent.spitting_cobra.enabled&buff.spitting_cobra.remains)|(!talent.spitting_cobra.enabled&buff.aspect_of_the_eagle.remains)
 	#call_action_list,name=moknathal,if=talent.way_of_the_moknathal.enabled
 	if Talent(way_of_the_moknathal_talent) SurvivalMoknathalShortCdActions()
 
@@ -916,6 +923,7 @@ AddFunction SurvivalDefaultCdActions
 	#blood_fury,if=(buff.spitting_cobra.up&buff.mongoose_fury.stack>2&buff.aspect_of_the_eagle.up)|(!talent.spitting_cobra.enabled&buff.aspect_of_the_eagle.up)
 	if BuffPresent(spitting_cobra_buff) and BuffStacks(mongoose_fury_buff) > 2 and BuffPresent(aspect_of_the_eagle_buff) or not Talent(spitting_cobra_talent) and BuffPresent(aspect_of_the_eagle_buff) Spell(blood_fury_ap)
 	#potion,name=prolonged_power,if=(talent.spitting_cobra.enabled&buff.spitting_cobra.remains)|(!talent.spitting_cobra.enabled&buff.aspect_of_the_eagle.remains)
+	if { Talent(spitting_cobra_talent) and BuffPresent(spitting_cobra_buff) or not Talent(spitting_cobra_talent) and BuffPresent(aspect_of_the_eagle_buff) } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
 	#call_action_list,name=moknathal,if=talent.way_of_the_moknathal.enabled
 	if Talent(way_of_the_moknathal_talent) SurvivalMoknathalCdActions()
 
@@ -1204,10 +1212,6 @@ AddFunction SurvivalNomokCdPostConditions
 
 AddFunction SurvivalPrecombatMainActions
 {
-	#snapshot_stats
-	#potion,name=prolonged_power
-	#augmentation,type=defiled
-	Spell(augmentation)
 	#harpoon
 	Spell(harpoon)
 }
@@ -1222,30 +1226,30 @@ AddFunction SurvivalPrecombatShortCdActions
 	#food,type=azshari_salad
 	#summon_pet
 	SurvivalSummonPet()
-
-	unless Spell(augmentation)
-	{
-		#explosive_trap
-		if CheckBoxOn(opt_trap_launcher) Spell(explosive_trap)
-		#steel_trap
-		if CheckBoxOn(opt_trap_launcher) Spell(steel_trap)
-		#dragonsfire_grenade
-		Spell(dragonsfire_grenade)
-	}
+	#augmentation,type=defiled
+	#explosive_trap
+	if CheckBoxOn(opt_trap_launcher) Spell(explosive_trap)
+	#steel_trap
+	if CheckBoxOn(opt_trap_launcher) Spell(steel_trap)
+	#dragonsfire_grenade
+	Spell(dragonsfire_grenade)
 }
 
 AddFunction SurvivalPrecombatShortCdPostConditions
 {
-	Spell(augmentation) or Spell(harpoon)
+	Spell(harpoon)
 }
 
 AddFunction SurvivalPrecombatCdActions
 {
+	#snapshot_stats
+	#potion,name=prolonged_power
+	if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
 }
 
 AddFunction SurvivalPrecombatCdPostConditions
 {
-	Spell(augmentation) or CheckBoxOn(opt_trap_launcher) and Spell(explosive_trap) or CheckBoxOn(opt_trap_launcher) and Spell(steel_trap) or Spell(dragonsfire_grenade) or Spell(harpoon)
+	CheckBoxOn(opt_trap_launcher) and Spell(explosive_trap) or CheckBoxOn(opt_trap_launcher) and Spell(steel_trap) or Spell(dragonsfire_grenade) or Spell(harpoon)
 }
 
 ### Survival icons.
@@ -1312,7 +1316,6 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # arcane_torrent_focus
 # aspect_of_the_eagle
 # aspect_of_the_eagle_buff
-# augmentation
 # berserking
 # blood_fury_ap
 # butchery
@@ -1332,6 +1335,7 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # mongoose_bite
 # mongoose_fury_buff
 # muzzle
+# prolonged_power_potion
 # quaking_palm
 # raptor_strike
 # revive_pet

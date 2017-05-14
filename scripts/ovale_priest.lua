@@ -109,6 +109,7 @@ AddFunction s2mcheck_min
 }
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=shadow)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=shadow)
 
 AddFunction ShadowInterruptActions
 {
@@ -184,6 +185,7 @@ AddFunction ShadowDefaultShortCdPostConditions
 AddFunction ShadowDefaultCdActions
 {
 	#potion,name=prolonged_power,if=buff.bloodlust.react|target.time_to_die<=80|(target.health.pct<35&cooldown.power_infusion.remains<30)
+	if { BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 80 or target.HealthPercent() < 35 and SpellCooldown(power_infusion) < 30 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
 	#silence
 	ShadowInterruptActions()
 	#call_action_list,name=check,if=talent.surrender_to_madness.enabled&!buff.surrender_to_madness.up
@@ -311,12 +313,6 @@ AddFunction ShadowMainCdPostConditions
 
 AddFunction ShadowPrecombatMainActions
 {
-	#flask,type=flask_of_the_whispered_pact
-	#food,type=azshari_salad
-	#augmentation,type=defiled
-	Spell(augmentation)
-	#snapshot_stats
-	#potion,name=prolonged_power
 	#shadowform,if=!buff.shadowform.up
 	if not BuffPresent(shadowform_buff) Spell(shadowform)
 	#variable,op=set,name=s2mbeltcheck,value=cooldown.mind_blast.charges>=2
@@ -334,16 +330,22 @@ AddFunction ShadowPrecombatShortCdActions
 
 AddFunction ShadowPrecombatShortCdPostConditions
 {
-	Spell(augmentation) or not BuffPresent(shadowform_buff) and Spell(shadowform) or Spell(mind_blast)
+	not BuffPresent(shadowform_buff) and Spell(shadowform) or Spell(mind_blast)
 }
 
 AddFunction ShadowPrecombatCdActions
 {
+	#flask,type=flask_of_the_whispered_pact
+	#food,type=azshari_salad
+	#augmentation,type=defiled
+	#snapshot_stats
+	#potion,name=prolonged_power
+	if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
 }
 
 AddFunction ShadowPrecombatCdPostConditions
 {
-	Spell(augmentation) or not BuffPresent(shadowform_buff) and Spell(shadowform) or Spell(mind_blast)
+	not BuffPresent(shadowform_buff) and Spell(shadowform) or Spell(mind_blast)
 }
 
 ### actions.s2m
@@ -614,7 +616,6 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 
 ### Required symbols
 # arcane_torrent_mana
-# augmentation
 # auspicious_spirits_talent
 # berserking
 # dispersion
@@ -629,6 +630,7 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # misery_talent
 # power_infusion
 # power_infusion_buff
+# prolonged_power_potion
 # quaking_palm
 # reaper_of_souls_talent
 # sanlayn_talent

@@ -20,6 +20,7 @@ Include(ovale_rogue_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=assassination)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=assassination)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=assassination)
 AddCheckBox(opt_vanish SpellName(vanish) default specialization=assassination)
 
 AddFunction AssassinationInterruptActions
@@ -209,6 +210,7 @@ AddFunction AssassinationCdsShortCdPostConditions
 AddFunction AssassinationCdsCdActions
 {
 	#potion,name=old_war,if=buff.bloodlust.react|target.time_to_die<=25|debuff.vendetta.up&cooldown.vanish.remains<5
+	if { BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 25 or target.DebuffPresent(vendetta_debuff) and SpellCooldown(vanish) < 5 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
 	#use_item,slot=trinket1,if=buff.bloodlust.react|target.time_to_die<=20|debuff.vendetta.up
 	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 20 or target.DebuffPresent(vendetta_debuff) AssassinationUseItemActions()
 	#use_item,slot=trinket2,if=buff.bloodlust.react|target.time_to_die<=20|debuff.vendetta.up
@@ -309,7 +311,6 @@ AddFunction AssassinationPrecombatMainActions
 {
 	#flask,name=flask_of_the_seventh_demon
 	#augmentation,name=defiled
-	Spell(augmentation)
 	#food,name=seedbattered_fish_plate,if=talent.exsanguinate.enabled
 	#food,name=nightborne_delicacy_platter,if=!talent.exsanguinate.enabled
 	#snapshot_stats
@@ -324,9 +325,8 @@ AddFunction AssassinationPrecombatMainPostConditions
 
 AddFunction AssassinationPrecombatShortCdActions
 {
-	unless Spell(augmentation) or Spell(stealth)
+	unless Spell(stealth)
 	{
-		#potion,name=old_war
 		#marked_for_death,if=raid_event.adds.in>40
 		if 600 > 40 Spell(marked_for_death)
 	}
@@ -334,16 +334,21 @@ AddFunction AssassinationPrecombatShortCdActions
 
 AddFunction AssassinationPrecombatShortCdPostConditions
 {
-	Spell(augmentation) or Spell(stealth)
+	Spell(stealth)
 }
 
 AddFunction AssassinationPrecombatCdActions
 {
+	unless Spell(stealth)
+	{
+		#potion,name=old_war
+		if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
+	}
 }
 
 AddFunction AssassinationPrecombatCdPostConditions
 {
-	Spell(augmentation) or Spell(stealth)
+	Spell(stealth)
 }
 
 ### Assassination icons.
@@ -408,7 +413,6 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # agonizing_poison_debuff
 # agonizing_poison_talent
 # arcane_torrent_energy
-# augmentation
 # berserking
 # blood_fury_ap
 # cheap_shot
@@ -434,6 +438,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # marked_for_death
 # mutilate
 # nightstalker_talent
+# old_war_potion
 # quaking_palm
 # rupture
 # rupture_debuff
@@ -488,6 +493,7 @@ AddFunction rtb_reroll
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=outlaw)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=outlaw)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=outlaw)
 AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default specialization=outlaw)
 
 AddFunction OutlawInterruptActions
@@ -742,6 +748,7 @@ AddFunction OutlawCdsShortCdPostConditions
 AddFunction OutlawCdsCdActions
 {
 	#potion,name=prolonged_power,if=buff.bloodlust.react|target.time_to_die<=25|buff.adrenaline_rush.up
+	if { BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 25 or BuffPresent(adrenaline_rush_buff) } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
 	#use_item,slot=trinket2,if=buff.bloodlust.react|target.time_to_die<=20|combo_points.deficit<=2
 	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 20 or ComboPointsDeficit() <= 2 OutlawUseItemActions()
 	#blood_fury
@@ -807,7 +814,6 @@ AddFunction OutlawPrecombatMainActions
 {
 	#flask,name=flask_of_the_seventh_demon
 	#augmentation,name=defiled
-	Spell(augmentation)
 	#food,name=seedbattered_fish_plate
 	#snapshot_stats
 	#stealth
@@ -822,9 +828,8 @@ AddFunction OutlawPrecombatMainPostConditions
 
 AddFunction OutlawPrecombatShortCdActions
 {
-	unless Spell(augmentation) or Spell(stealth)
+	unless Spell(stealth)
 	{
-		#potion,name=prolonged_power
 		#marked_for_death,if=raid_event.adds.in>40
 		if 600 > 40 Spell(marked_for_death)
 	}
@@ -832,16 +837,21 @@ AddFunction OutlawPrecombatShortCdActions
 
 AddFunction OutlawPrecombatShortCdPostConditions
 {
-	Spell(augmentation) or Spell(stealth) or not Talent(slice_and_dice_talent) and Spell(roll_the_bones)
+	Spell(stealth) or not Talent(slice_and_dice_talent) and Spell(roll_the_bones)
 }
 
 AddFunction OutlawPrecombatCdActions
 {
+	unless Spell(stealth)
+	{
+		#potion,name=prolonged_power
+		if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
+	}
 }
 
 AddFunction OutlawPrecombatCdPostConditions
 {
-	Spell(augmentation) or Spell(stealth) or not Talent(slice_and_dice_talent) and Spell(roll_the_bones)
+	Spell(stealth) or not Talent(slice_and_dice_talent) and Spell(roll_the_bones)
 }
 
 ### actions.stealth
@@ -951,7 +961,6 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # ambush
 # anticipation_talent
 # arcane_torrent_energy
-# augmentation
 # berserking
 # between_the_eyes
 # blade_flurry
@@ -982,6 +991,7 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # marked_for_death
 # opportunity_buff
 # pistol_shot
+# prolonged_power_potion
 # quaking_palm
 # quick_draw_talent
 # roll_the_bones
@@ -1036,6 +1046,7 @@ AddFunction stealth_threshold
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=subtlety)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=subtlety)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=subtlety)
 
 AddFunction SubtletyInterruptActions
 {
@@ -1248,6 +1259,7 @@ AddFunction SubtletyCdsShortCdPostConditions
 AddFunction SubtletyCdsCdActions
 {
 	#potion,name=old_war,if=buff.bloodlust.react|target.time_to_die<=25|buff.shadow_blades.up
+	if { BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 25 or BuffPresent(shadow_blades_buff) } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
 	#blood_fury,if=stealthed.rogue
 	if Stealthed() Spell(blood_fury_ap)
 	#berserking,if=stealthed.rogue
@@ -1309,7 +1321,6 @@ AddFunction SubtletyPrecombatMainActions
 {
 	#flask,name=flask_of_the_seventh_demon
 	#augmentation,name=defiled
-	Spell(augmentation)
 	#food,name=nightborne_delicacy_platter
 	#snapshot_stats
 	#stealth
@@ -1329,9 +1340,8 @@ AddFunction SubtletyPrecombatMainPostConditions
 
 AddFunction SubtletyPrecombatShortCdActions
 {
-	unless Spell(augmentation) or Spell(stealth)
+	unless Spell(stealth)
 	{
-		#potion,name=prolonged_power
 		#marked_for_death,if=raid_event.adds.in>40
 		if 600 > 40 Spell(marked_for_death)
 
@@ -1345,16 +1355,21 @@ AddFunction SubtletyPrecombatShortCdActions
 
 AddFunction SubtletyPrecombatShortCdPostConditions
 {
-	Spell(augmentation) or Spell(stealth) or ComboPoints() >= 5 and Spell(enveloping_shadows) or Spell(symbols_of_death)
+	Spell(stealth) or ComboPoints() >= 5 and Spell(enveloping_shadows) or Spell(symbols_of_death)
 }
 
 AddFunction SubtletyPrecombatCdActions
 {
+	unless Spell(stealth)
+	{
+		#potion,name=prolonged_power
+		if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
+	}
 }
 
 AddFunction SubtletyPrecombatCdPostConditions
 {
-	Spell(augmentation) or Spell(stealth) or ComboPoints() >= 5 and Spell(enveloping_shadows) or Spell(symbols_of_death)
+	Spell(stealth) or ComboPoints() >= 5 and Spell(enveloping_shadows) or Spell(symbols_of_death)
 }
 
 ### actions.sprinted
@@ -1659,7 +1674,6 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 
 ### Required symbols
 # arcane_torrent_energy
-# augmentation
 # backstab
 # berserking
 # blood_fury_ap
@@ -1681,7 +1695,9 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 # master_of_shadows_talent
 # nightblade
 # nightblade_debuff
+# old_war_potion
 # premeditation_talent
+# prolonged_power_potion
 # quaking_palm
 # shadow_blades
 # shadow_blades_buff

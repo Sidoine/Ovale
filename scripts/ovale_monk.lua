@@ -241,6 +241,7 @@ Include(ovale_monk_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=windwalker)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=windwalker)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=windwalker)
 AddCheckBox(opt_touch_of_death_on_elite_only L(touch_of_death_on_elite_only) default specialization=windwalker)
 AddCheckBox(opt_storm_earth_and_fire SpellName(storm_earth_and_fire) specialization=windwalker)
 AddCheckBox(opt_chi_burst SpellName(chi_burst) default specialization=windwalker)
@@ -273,7 +274,6 @@ AddFunction WindwalkerGetInMeleeRange
 
 AddFunction WindwalkerDefaultMainActions
 {
-	#potion,name=prolonged_power,if=buff.serenity.up|buff.storm_earth_and_fire.up|(!talent.serenity.enabled&trinket.proc.agility.react)|buff.bloodlust.react|target.time_to_die<=60
 	#touch_of_death,if=target.time_to_die<=9
 	if target.TimeToDie() <= 9 and { not CheckBoxOn(opt_touch_of_death_on_elite_only) or target.Classification(elite) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff) } Spell(touch_of_death)
 	#call_action_list,name=serenity,if=(talent.serenity.enabled&cooldown.serenity.remains<=0)|buff.serenity.up
@@ -354,6 +354,8 @@ AddFunction WindwalkerDefaultCdActions
 {
 	#spear_hand_strike,if=target.debuff.casting.react
 	if target.IsInterruptible() WindwalkerInterruptActions()
+	#potion,name=prolonged_power,if=buff.serenity.up|buff.storm_earth_and_fire.up|(!talent.serenity.enabled&trinket.proc.agility.react)|buff.bloodlust.react|target.time_to_die<=60
+	if { BuffPresent(serenity_buff) or BuffPresent(storm_earth_and_fire_buff) or not Talent(serenity_talent) and BuffPresent(trinket_proc_agility_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
 
 	unless target.TimeToDie() <= 9 and { not CheckBoxOn(opt_touch_of_death_on_elite_only) or target.Classification(elite) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff) } and Spell(touch_of_death)
 	{
@@ -443,10 +445,6 @@ AddFunction WindwalkerCdCdPostConditions
 
 AddFunction WindwalkerPrecombatMainActions
 {
-	#flask,type=flask_of_the_seventh_demon
-	#food,type=lavish_suramar
-	#augmentation,type=defiled
-	Spell(augmentation)
 }
 
 AddFunction WindwalkerPrecombatMainPostConditions
@@ -459,16 +457,20 @@ AddFunction WindwalkerPrecombatShortCdActions
 
 AddFunction WindwalkerPrecombatShortCdPostConditions
 {
-	Spell(augmentation)
 }
 
 AddFunction WindwalkerPrecombatCdActions
 {
+	#flask,type=flask_of_the_seventh_demon
+	#food,type=lavish_suramar
+	#augmentation,type=defiled
+	#snapshot_stats
+	#potion,name=prolonged_power
+	if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
 }
 
 AddFunction WindwalkerPrecombatCdPostConditions
 {
-	Spell(augmentation)
 }
 
 ### actions.sef
@@ -750,7 +752,6 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 
 ### Required symbols
 # arcane_torrent_chi
-# augmentation
 # berserking
 # blackout_kick
 # blood_fury_apsp
@@ -768,6 +769,7 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # invoke_xuen
 # leg_sweep
 # paralysis
+# prolonged_power_potion
 # quaking_palm
 # rising_fist_debuff
 # rising_sun_kick

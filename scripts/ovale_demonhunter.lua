@@ -223,6 +223,7 @@ AddFunction blade_dance
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=havoc)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=havoc)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=havoc)
 AddCheckBox(opt_meta_only_during_boss L(meta_only_during_boss) default specialization=havoc)
 AddCheckBox(opt_fel_rush SpellName(fel_rush) default specialization=havoc)
 AddCheckBox(opt_vengeful_retreat SpellName(vengeful_retreat) default specialization=havoc)
@@ -367,6 +368,8 @@ AddFunction HavocCooldownCdActions
 	if BuffPresent(metamorphosis_havoc_buff) or SpellCooldown(metamorphosis_havoc) > 60 or target.TimeToDie() <= 12 Spell(chaos_blades)
 	#use_item,slot=trinket2,if=!buff.metamorphosis.up&(!talent.first_blood.enabled|!cooldown.blade_dance.ready)&(!talent.nemesis.enabled|cooldown.nemesis.remains>30|target.time_to_die<cooldown.nemesis.remains+3)
 	if not BuffPresent(metamorphosis_havoc_buff) and { not Talent(first_blood_talent) or not SpellCooldown(blade_dance) == 0 } and { not Talent(nemesis_talent) or SpellCooldown(nemesis) > 30 or target.TimeToDie() < SpellCooldown(nemesis) + 3 } HavocUseItemActions()
+	#potion,name=old_war,if=buff.metamorphosis.remains>25|target.time_to_die<30
+	if { BuffRemaining(metamorphosis_havoc_buff) > 25 or target.TimeToDie() < 30 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
 }
 
 AddFunction HavocCooldownCdPostConditions
@@ -523,11 +526,6 @@ AddFunction HavocNormalCdPostConditions
 
 AddFunction HavocPrecombatMainActions
 {
-	#flask,type=flask_of_the_seventh_demon
-	#food,type=lavish_suramar_feast,if=!equipped.majordomos_dinner_bell
-	#food,type=nightborne_delicacy_platter,if=equipped.majordomos_dinner_bell
-	#augmentation,type=defiled
-	Spell(augmentation)
 }
 
 AddFunction HavocPrecombatMainPostConditions
@@ -540,23 +538,23 @@ AddFunction HavocPrecombatShortCdActions
 
 AddFunction HavocPrecombatShortCdPostConditions
 {
-	Spell(augmentation)
 }
 
 AddFunction HavocPrecombatCdActions
 {
-	unless Spell(augmentation)
-	{
-		#snapshot_stats
-		#potion,name=old_war
-		#metamorphosis,if=!(talent.demon_reborn.enabled&talent.demonic.enabled)
-		if not { Talent(demon_reborn_talent) and Talent(demonic_talent) } and { not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight() } Spell(metamorphosis_havoc)
-	}
+	#flask,type=flask_of_the_seventh_demon
+	#food,type=lavish_suramar_feast,if=!equipped.majordomos_dinner_bell
+	#food,type=nightborne_delicacy_platter,if=equipped.majordomos_dinner_bell
+	#augmentation,type=defiled
+	#snapshot_stats
+	#potion,name=old_war
+	if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
+	#metamorphosis,if=!(talent.demon_reborn.enabled&talent.demonic.enabled)
+	if not { Talent(demon_reborn_talent) and Talent(demonic_talent) } and { not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight() } Spell(metamorphosis_havoc)
 }
 
 AddFunction HavocPrecombatCdPostConditions
 {
-	Spell(augmentation)
 }
 
 ### Havoc icons.
@@ -621,7 +619,6 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # anguish_of_the_deceiver
 # annihilation
 # arcane_torrent_dh
-# augmentation
 # blade_dance
 # blind_fury_talent
 # bloodlet_talent
@@ -655,6 +652,7 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # nemesis
 # nemesis_debuff
 # nemesis_talent
+# old_war_potion
 # pick_up_fragment
 # prepared_buff
 # prepared_talent
@@ -680,6 +678,7 @@ Include(ovale_demonhunter_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=vengeance)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=vengeance)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=vengeance)
 
 AddFunction VengeanceInterruptActions
 {
@@ -794,10 +793,6 @@ AddFunction VengeanceDefaultCdPostConditions
 
 AddFunction VengeancePrecombatMainActions
 {
-	#flask,type=flask_of_the_seventh_demon
-	#food,type=nightborne_delicacy_platter
-	#augmentation,type=defiled
-	Spell(augmentation)
 }
 
 AddFunction VengeancePrecombatMainPostConditions
@@ -810,16 +805,20 @@ AddFunction VengeancePrecombatShortCdActions
 
 AddFunction VengeancePrecombatShortCdPostConditions
 {
-	Spell(augmentation)
 }
 
 AddFunction VengeancePrecombatCdActions
 {
+	#flask,type=flask_of_the_seventh_demon
+	#food,type=nightborne_delicacy_platter
+	#augmentation,type=defiled
+	#snapshot_stats
+	#potion,name=unbending_potion
+	if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(unbending_potion usable=1)
 }
 
 AddFunction VengeancePrecombatCdPostConditions
 {
-	Spell(augmentation)
 }
 
 ### Vengeance icons.
@@ -882,7 +881,6 @@ AddIcon checkbox=opt_demonhunter_vengeance_aoe help=cd specialization=vengeance
 
 ### Required symbols
 # arcane_torrent_dh
-# augmentation
 # consume_magic
 # demon_spikes
 # demon_spikes_buff
@@ -911,6 +909,7 @@ AddIcon checkbox=opt_demonhunter_vengeance_aoe help=cd specialization=vengeance
 # soul_carver
 # soul_cleave
 # spirit_bomb
+# unbending_potion
 ]]
 	OvaleScripts:RegisterScript("DEMONHUNTER", "vengeance", name, desc, code, "script")
 end
