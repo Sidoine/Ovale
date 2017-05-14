@@ -4066,7 +4066,6 @@ EmitOperandTrinket = function(operand, parseNode, nodeList, annotation, action)
 	local ok = true
 	local node
 	
-	print(operand)
 	local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
 	local token = tokenIterator()
 	if token == "trinket" then
