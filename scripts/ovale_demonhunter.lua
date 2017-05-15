@@ -42,7 +42,7 @@ AddFunction VengeanceInfernalStrike
 AddFunction VengeanceSigilOfFlame
 {
 	if (not SigilCharging(flame) and target.DebuffRemaining(sigil_of_flame_debuff) <= 2-Talent(quickened_sigils_talent)) Spell(sigil_of_flame)
-	if (VengeanceInfernalStrike()) Spell(infernal_strike text=crash)
+	if (VengeanceInfernalStrike()) Spell(infernal_strike)
 }
 
 AddFunction VengeanceDefaultShortCDActions
