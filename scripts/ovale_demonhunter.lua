@@ -151,7 +151,6 @@ AddFunction VengeanceInterruptActions
 			}
 			if target.CreatureType(Demon Humanoid Beast) Spell(imprison)
 		}
-		if target.IsTargetingPlayer() Spell(empower_wards)
 	}
 }
 
