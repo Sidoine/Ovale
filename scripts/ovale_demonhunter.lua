@@ -90,7 +90,7 @@ AddFunction VengeanceDefaultMainActions
 		Spell(fel_eruption)
 		if (PainDeficit() > 20) Spell(felblade)
 		VengeanceSigilOfFlame()
-		if VengeanceInfernalStrike() Spell(infernal_strike)
+		if (VengeanceInfernalStrike()) Spell(infernal_strike)
 	}
 	
 	# Regular rotation
@@ -104,7 +104,7 @@ AddFunction VengeanceDefaultMainActions
 	if (PainDeficit() > 17 and not BuffExpires(blade_turning_buff)) Spell(shear)
 	if (Pain() >= 60 and not Talent(razor_spikes_talent)) Spell(fracture)
 	VengeanceSigilOfFlame()
-	if VengeanceInfernalStrike() Spell(infernal_strike)
+	if (VengeanceInfernalStrike()) Spell(infernal_strike)
 	Spell(shear)
 }
 
