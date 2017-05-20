@@ -1244,6 +1244,8 @@ local function InitializeDisambiguation()
 	AddDisambiguation("soul_effigy_agony", 		"agony", 						"WARLOCK",		"affliction")
 	-- Warrior
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_rage",			"WARRIOR")
+	AddDisambiguation("bladestorm",				"bladestorm_arms",				"WARRIOR",		"arms")
+	AddDisambiguation("bladestorm",				"bladestorm_fury",				"WARRIOR",		"fury")
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"WARRIOR")
 	AddDisambiguation("execute",				"execute_arms",					"WARRIOR",		"arms")
 	AddDisambiguation("legendary_ring",			"legendary_ring_bonus_armor",	"WARRIOR",		"protection")
