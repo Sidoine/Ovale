@@ -1950,7 +1950,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			conditionCode = "CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff)"
 			annotation[action] = class
 		elseif class == "MONK" and action == "touch_of_death" then
-			conditionCode = "not CheckBoxOn(opt_touch_of_death_on_elite_only) or target.Classification(elite) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff)"
+			conditionCode = "(not CheckBoxOn(opt_touch_of_death_on_elite_only) or (not UnitInRaid() and target.Classification(elite)) or target.Classification(worldboss)) or not BuffExpires(hidden_masters_forbidden_touch_buff)"
 			annotation[action] = class
 			annotation.opt_touch_of_death_on_elite_only = "MONK"
 			AddSymbol(annotation, "hidden_masters_forbidden_touch_buff")
