@@ -5,7 +5,7 @@ race=blood_elf
 role=attack
 position=back
 talents=1332311
-artifact=36:0:0:0:0:1136:1:1137:1:1139:1:1142:1:1145:3:1147:3:1148:3:1149:3:1150:3:1356:1
+artifact=36:139261:142510:142512:0:1136:1:1137:1:1138:1:1139:1:1140:1:1141:1:1142:1:1143:3:1144:3:1145:3:1146:3:1147:4:1148:3:1149:4:1150:4:1151:3:1356:1
 spec=arms
 
 # This default action priority list is automatically created based on your character.
@@ -91,28 +91,28 @@ actions.single+=/whirlwind,if=spell_targets.whirlwind>1|talent.fervor_of_battle.
 actions.single+=/slam,if=spell_targets.whirlwind=1&!talent.fervor_of_battle.enabled
 actions.single+=/bladestorm,interrupt=1,if=raid_event.adds.in>90|!raid_event.adds.exists|spell_targets.bladestorm_mh>desired_targets
 
-head=vision_of_the_spider_queen,id=137451,bonus_id=1492/1727
-neck=brysngamen_torc_of_helheim,id=133636,bonus_id=1492/1727,enchant=mark_of_the_trained_soldier
-shoulders=mortar_guard_shoulderplates,id=137524,bonus_id=1492/1727
-back=stole_of_malefic_repose,id=134404,bonus_id=1492/1727,enchant=binding_of_strength
-chest=etheldrins_breastplate,id=136976,bonus_id=1492/1727
-wrists=exomesh_carpalform_armplates_mk._vii,id=134502,bonus_id=1492/1727
-hands=fists_of_the_legion,id=134509,bonus_id=1492/1727
-waist=roaring_breeze_waistguard,id=137499,bonus_id=1492/1727
-legs=legplates_of_the_swarm,id=134506,bonus_id=1492/1727
-feet=leadfoot_earthshakers,id=134507,bonus_id=1492/1727
-finger1=loop_of_eightfold_eyes,id=134527,bonus_id=1492/1727,enchant=binding_of_mastery
-finger2=archdruids_tainted_seal,id=134487,bonus_id=1492/1727,enchant=binding_of_mastery
-trinket1=gift_of_radiance,id=133647,bonus_id=1492/1727
-trinket2=terrorbound_nexus,id=137406,bonus_id=1492/1727
-main_hand=stromkar_the_warbreaker,id=128910,gem_id=137469/137363/137377,relic_id=1492:1727/1492:1727/1492:1727
+head=venomfanged_barbute,id=139229,bonus_id=1806
+neck=cursed_beartooth_necklace,id=139239,bonus_id=1806,enchant=mark_of_the_hidden_satyr
+shoulders=midnight_heralds_pauldrons,id=139232,bonus_id=1806
+back=drape_of_the_unworthy,id=142521,bonus_id=3469/1512,enchant=binding_of_strength
+chest=insectetched_chestplate,id=139224,bonus_id=1806
+wrists=dragonbone_wristclamps,id=138218,bonus_id=1806
+hands=reinforced_houndhandlers_gauntlets,id=142435,bonus_id=3469
+waist=krakenbone_waistplate,id=142424,bonus_id=3469/1512
+legs=goldrune_legplates,id=142425,bonus_id=3469
+feet=trampling_warboots,id=139234,bonus_id=1806
+finger1=dreadful_cyclopean_signet,id=139237,bonus_id=1806,enchant=binding_of_haste
+finger2=shadowruby_band,id=136713,bonus_id=670/1703,gems=150mastery,enchant=binding_of_mastery
+trinket1=spontaneous_appendages,id=139325,bonus_id=1806
+trinket2=chains_of_the_valorous,id=142508,bonus_id=604/3469
+main_hand=stromkar_the_warbreaker,id=128910,bonus_id=750,gem_id=139261/142510/142512,relic_id=1806/3469:1512/3469
 
 # Gear Summary
-# gear_ilvl=842.00
-# gear_strength=11682
-# gear_stamina=18862
-# gear_crit_rating=1034
-# gear_haste_rating=2435
-# gear_mastery_rating=14042
-# gear_versatility_rating=2222
-# gear_armor=3965
+# gear_ilvl=884.53
+# gear_strength=18023
+# gear_stamina=28159
+# gear_crit_rating=2533
+# gear_haste_rating=7681
+# gear_mastery_rating=12331
+# gear_versatility_rating=470
+# gear_armor=4384
