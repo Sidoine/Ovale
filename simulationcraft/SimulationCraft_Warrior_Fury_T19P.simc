@@ -5,7 +5,7 @@ race=troll
 role=attack
 position=back
 talents=2333232
-artifact=35:0:0:0:0:982:1:984:1:985:1:986:1:988:3:990:3:991:3:995:3:996:3:1357:1
+artifact=35:142516:142518:142511:0:980:1:981:1:982:1:984:1:985:1:986:1:987:1:988:3:989:3:990:3:991:4:992:4:993:3:994:3:995:4:996:3:1357:1
 spec=fury
 
 # This default action priority list is automatically created based on your character.
@@ -97,30 +97,30 @@ actions.single_target+=/raging_blow,if=!set_bonus.tier19_2pc&!talent.inner_rage.
 actions.single_target+=/whirlwind,if=spell_targets.whirlwind>2
 actions.single_target+=/furious_slash
 
-head=helmet_of_reverent_loyalty,id=134513,bonus_id=1492/1727
-neck=chain_of_scorched_bones,id=134529,bonus_id=1492/1727,enchant=mark_of_the_hidden_satyr
-shoulders=frozen_pendulum_shoulderguards,id=134518,bonus_id=1492/1727
-back=cloak_of_enthralling_darkness,id=137531,bonus_id=1492/1727,enchant=binding_of_strength
-chest=inferno_breastplate,id=134503,bonus_id=1492/1727
-wrists=deepfurrow_bracers,id=137337,bonus_id=1492/1727
-hands=fists_of_the_legion,id=134509,bonus_id=1492/1727
-waist=slack_tide_girdle,id=133770,bonus_id=1492/1727
-legs=keelhauler_legplates,id=134514,bonus_id=1492/1727
-feet=rook_footmans_warboots,id=139241,bonus_id=1492/1727
-finger1=loop_of_vitriolic_intent,id=134530,bonus_id=1492/1727,enchant=binding_of_mastery
-finger2=jeweled_signet_of_melandrus,id=134542,bonus_id=1492/1727,enchant=binding_of_mastery
-trinket1=chaos_talisman,id=137459,bonus_id=1492/1727
-trinket2=faulty_countermeasure,id=137539,bonus_id=1492/1727
-main_hand=warswords_of_the_valarjar,id=128908,gem_id=137546/137365/137472,relic_id=1492:1727/1492:1727/1492:1727
+head=venomfanged_barbute,id=139229,bonus_id=1806
+neck=cursed_beartooth_necklace,id=139239,bonus_id=1806,enchant=mark_of_the_hidden_satyr
+shoulders=frozen_pendulum_shoulderguards,id=134518,bonus_id=1727/1522
+back=drape_of_the_unworthy,id=142521,bonus_id=3469/1512,enchant=binding_of_strength
+chest=inferno_breastplate,id=134503,bonus_id=1727/1522
+wrists=calcareous_wristclamps,id=142427,bonus_id=3469/1512
+hands=fitted_ironbark_gauntlets,id=139225,bonus_id=1806
+waist=krakenbone_waistplate,id=142424,bonus_id=3469/1512
+legs=stormbattered_legplates,id=139230,bonus_id=1806
+feet=trampling_warboots,id=139234,bonus_id=1806
+finger1=dreadful_cyclopean_signet,id=139237,bonus_id=1806,enchant=binding_of_haste
+finger2=dawnlight_band,id=130231,bonus_id=3373/670,gem_id=130220,enchant=binding_of_haste
+trinket1=spontaneous_appendages,id=139325,bonus_id=1806
+trinket2=faulty_countermeasure,id=137539,bonus_id=1727/1522
+main_hand=warswords_of_the_valarjar,id=128908,bonus_id=751,gem_id=142516/142518/142511,relic_id=3469/3469:1512/3469
 off_hand=warswords_of_the_valarjar,id=134553
 
 # Gear Summary
-# gear_ilvl=843.75
-# gear_strength=12321
-# gear_stamina=21323
-# gear_crit_rating=6023
-# gear_haste_rating=10351
-# gear_mastery_rating=3672
-# gear_versatility_rating=698
-# gear_armor=3965
+# gear_ilvl=883.88
+# gear_strength=18297
+# gear_stamina=31389
+# gear_crit_rating=3759
+# gear_haste_rating=11082
+# gear_mastery_rating=9454
+# gear_versatility_rating=319
+# gear_armor=4343
 # set_bonus=tier19p_plate_2pc=1
