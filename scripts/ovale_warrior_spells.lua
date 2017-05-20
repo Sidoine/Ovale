@@ -311,8 +311,7 @@ Define(wrecking_ball_talent 7)
 	SpellInfo(impending_victory tag=main)
 	SpellInfo(colossus_smash tag=main)
 	# SpellInfo(dragon_roar tag=main) # TODO: As Checkbox?
-	SpellInfo(hamstring tag=cd)
-	SpellInfo(battlecry tag=cd)
+	SpellInfo(hamstring tag=shortcd)
 	SpellInfo(avatar tag=cd)
 	SpellInfo(intercept tag=misc)
 ]]
