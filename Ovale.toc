@@ -62,6 +62,7 @@ BanditsGuile.lua
 BossMod.lua
 DamageTaken.lua
 DataBroker.lua
+DemonHunterDemonic.lua
 Enemies.lua
 HonorAmongThieves.lua
 PassiveAura.lua
