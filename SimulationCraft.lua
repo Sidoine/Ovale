@@ -2119,9 +2119,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			isSpellAction = false
 		elseif class == "WARRIOR" and action == "heroic_leap" then
 			-- Use Charge as a range-finder for Heroic Leap.
-			local spellName = "charge"
-			AddSymbol(annotation, spellName)
-			conditionCode = format("CheckBoxOn(opt_melee_range) and target.InRange(%s)", spellName)
+			conditionCode = "CheckBoxOn(opt_melee_range) and target.Distance(atLeast 8) and target.Distance(atMost 40)"
 		elseif class == "WARRIOR" and action == "pummel" then
 			bodyCode = camelSpecialization .. "InterruptActions()"
 			annotation[action] = class
@@ -4739,7 +4737,7 @@ local function InsertSupportingFunctions(child, annotation)
 				if CheckBoxOn(opt_melee_range)
 				{
 					if target.InRange(charge) Spell(charge)
-					if target.InRange(charge) Spell(heroic_leap)
+					if SpellCharges(charge) == 0 and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
 					if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
 				}
 			}

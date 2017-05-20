@@ -44,7 +44,7 @@ AddFunction ArmsGetInMeleeRange
 	if CheckBoxOn(opt_melee_range)
 	{
 		if target.InRange(charge) Spell(charge)
-		if target.InRange(charge) Spell(heroic_leap)
+		if SpellCharges(charge) == 0 and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
 		if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
 	}
 }
@@ -98,7 +98,7 @@ AddFunction ArmsDefaultShortCdActions
 	unless { GCDRemaining() < 0.25 and SpellCooldown(avatar) >= 10 and { BuffPresent(shattered_defenses_buff) or SpellCooldown(warbreaker) > 7 and SpellCooldown(colossus_smash) > 7 or SpellCooldown(colossus_smash) > 0 and target.DebuffRemaining(colossus_smash_debuff) > GCD() } or target.TimeToDie() <= 7 } and Spell(battle_cry)
 	{
 		#heroic_leap,if=(debuff.colossus_smash.down|debuff.colossus_smash.remains<2)&cooldown.colossus_smash.remains&equipped.weight_of_the_earth|!equipped.weight_of_the_earth&debuff.colossus_smash.up
-		if { { target.DebuffExpires(colossus_smash_debuff) or target.DebuffRemaining(colossus_smash_debuff) < 2 } and SpellCooldown(colossus_smash) > 0 and HasEquippedItem(weight_of_the_earth) or not HasEquippedItem(weight_of_the_earth) and target.DebuffPresent(colossus_smash_debuff) } and CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(heroic_leap)
+		if { { target.DebuffExpires(colossus_smash_debuff) or target.DebuffRemaining(colossus_smash_debuff) < 2 } and SpellCooldown(colossus_smash) > 0 and HasEquippedItem(weight_of_the_earth) or not HasEquippedItem(weight_of_the_earth) and target.DebuffPresent(colossus_smash_debuff) } and CheckBoxOn(opt_melee_range) and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
 
 		unless target.DebuffRemaining(rend_debuff) < GCD() and Spell(rend)
 		{
@@ -594,7 +594,7 @@ AddFunction FuryGetInMeleeRange
 	if CheckBoxOn(opt_melee_range)
 	{
 		if target.InRange(charge) Spell(charge)
-		if target.InRange(charge) Spell(heroic_leap)
+		if SpellCharges(charge) == 0 and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
 		if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
 	}
 }
@@ -656,7 +656,7 @@ AddFunction FuryDefaultShortCdActions
 	unless target.Distance() > 5 and FuryMovementShortCdPostConditions()
 	{
 		#heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
-		if { target.Distance() > 25 and 600 > 45 or not False(raid_event_movement_exists) } and CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(heroic_leap)
+		if { target.Distance() > 25 and 600 > 45 or not False(raid_event_movement_exists) } and CheckBoxOn(opt_melee_range) and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
 
 		unless { HasEquippedItem(convergence_of_fates) and SpellCooldown(battle_cry) < 2 or not HasEquippedItem(convergence_of_fates) and { SpellCooldown(battle_cry) > 10 or SpellCooldown(battle_cry) < 2 } } and Spell(dragon_roar) or not GCDRemaining() > 0 and not Talent(dragon_roar_talent) and { not HasEquippedItem(convergence_of_fates) or not Talent(bloodbath_talent) or not SpellCooldown(bloodbath) > 0 or SpellCooldown(bloodbath) >= 10 } and Spell(battle_cry) or not GCDRemaining() > 0 and BuffPresent(dragon_roar_buff) and { not SpellCooldown(bloodthirst) > 0 or EnrageRemaining() > SpellCooldown(bloodthirst) } and Spell(battle_cry)
 		{
@@ -911,7 +911,7 @@ AddFunction FuryMovementMainPostConditions
 AddFunction FuryMovementShortCdActions
 {
 	#heroic_leap
-	if CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(heroic_leap)
+	if CheckBoxOn(opt_melee_range) and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
 }
 
 AddFunction FuryMovementShortCdPostConditions
@@ -1155,7 +1155,7 @@ AddFunction ProtectionGetInMeleeRange
 	if CheckBoxOn(opt_melee_range)
 	{
 		if target.InRange(charge) Spell(charge)
-		if target.InRange(charge) Spell(heroic_leap)
+		if SpellCharges(charge) == 0 and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
 		if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
 	}
 }
