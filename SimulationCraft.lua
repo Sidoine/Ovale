@@ -3919,6 +3919,7 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		code = "0"
 	elseif class == "WARRIOR" and operand == "buff.revenge.react" then
 		code = "RageCost(revenge) == 0"
+		AddSymbol(annotation, "revenge")
 	elseif operand == "buff.enrage.down" then
 		code = "not " .. target .. "IsEnraged()"
 	elseif operand == "buff.enrage.remains" then
