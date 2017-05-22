@@ -15,6 +15,7 @@ AddCheckBox(opt_interrupt L(interrupt) default specialization=brewmaster)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=brewmaster)
 AddCheckBox(opt_legendary_ring_tank ItemName(legendary_ring_bonus_armor) default specialization=brewmaster)
 AddCheckBox(opt_monk_bm_aoe L(AOE) default specialization=brewmaster)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=brewmaster)
 
 AddFunction BrewmasterExpelHarmOffensivelyPreConditions
 {
@@ -173,8 +174,8 @@ AddFunction BrewmasterDefaultCdActions
 	Item(Trinket1Slot usable=1 text=14)
 	Spell(fortifying_brew)
 	Spell(dampen_harm)
+	if CheckBoxOn(opt_use_consumables) Item(unbending_potion usable=1)
 	Spell(zen_meditation)
-	Item(unbending_potion usable=1)
 }
 
 AddFunction BrewmasterInterruptActions

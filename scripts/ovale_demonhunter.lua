@@ -12,6 +12,7 @@ Include(ovale_demonhunter_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=vengeance)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=vengeance)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=vengeance)
 
 AddFunction VengeancePlayDefensively
 {
@@ -132,10 +133,10 @@ AddFunction VengeanceDefaultCdActions
 	VengeanceInterruptActions()
 	if IncomingDamage(1.5 magic=1) > 0 Spell(empower_wards)
 	Spell(fiery_brand)
-	Item(Trinket0Slot usable=1)
-	Item(Trinket1Slot usable=1)
+	Item(Trinket0Slot text=13 usable=1)
+	Item(Trinket1Slot text=14 usable=1)
 	if BuffExpires(metamorphosis_veng_buff) Spell(metamorphosis_veng)
-	Item(unbending_potion usable=1)
+	if CheckBoxOn(opt_use_consumables) Item(unbending_potion usable=1)
 }
 
 AddFunction VengeanceInterruptActions
