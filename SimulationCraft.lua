@@ -1980,7 +1980,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			-- Only suggest Righteous Fury if the check is toggled on.
 			conditionCode = "CheckBoxOn(opt_righteous_fury_check)"
 			annotation[action] = class
-		elseif class == "PRIEST" and action == "silence" then
+		elseif class == "PRIEST" and (action == "silence" or action == "mind_bomb") then
 			bodyCode = camelSpecialization .. "InterruptActions()"
 			annotation[action] = class
 			annotation.interrupt = class
@@ -3127,6 +3127,7 @@ do
 		["soul_shard"]			= "SoulShards()",
 		["soul_fragments"]		= "BuffStacks(soul_fragments)",
 		["ssw_refund_offset"]	= "target.Distance() % 3 - 1",
+		["stat.mastery_rating"]	= "MasteryRating()",
 		["stat.multistrike_pct"]= "MultistrikeChance()",
 		["stealthed"]			= "Stealthed()",
 		["stealthed.all"]		= "Stealthed()",
@@ -3990,6 +3991,12 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		code = format("List(opt_using_apl %s)", aplName)
 		annotation.using_apl = annotation.using_apl or {}
 		annotation.using_apl[aplName] = true
+	elseif operand == "cooldown.buff_sephuzs_secret.remains" then
+		code = "BuffCooldown(sephuzs_secret_buff)"
+		AddSymbol(annotation, "sephuzs_secret_buff")
+	elseif operand == "is_add" then
+		local t = target or "target."
+		code = format("not %sClassification(worldboss)", t)
 	else
 		ok = false
 	end
@@ -4444,6 +4451,7 @@ local function InsertInterruptFunctions(child, annotation)
 	end	
 	if annotation.silence == "PRIEST" then
 		tinsert(interrupts, {name = "silence", interrupt=1, worksOnBoss=1, order=10})
+		tinsert(interrupts, {name = "mind_bomb", stun=1, order=30, extraCondition="target.RemainingCastTime() > 2"})
 	end
 	if annotation.kick == "ROGUE" then
 		tinsert(interrupts, {name = "kick", interrupt=1, worksOnBoss=1, order=10})

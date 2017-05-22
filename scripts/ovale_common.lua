@@ -114,6 +114,14 @@ Define(archmages_greater_incandescence_str_buff 177175)
 	SpellInfo(archmages_greater_incandescence_str_buff duration=10)
 Define(archmages_incandescence_str_buff 177160)
 	SpellInfo(archmages_incandescence_str_buff duration=10)
+	
+###
+### Legendary Shared legiondaries
+###
+
+Define(sephuzs_secret 132452)
+Define(sephuzs_secret_buff 208051)
+	SpellInfo(sephuzs_secret_buff buff_cd=30 duration=10)
 
 ###
 ### Racials
