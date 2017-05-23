@@ -20,26 +20,26 @@ AddFunction DisciplineDefaultHealActions
 
 AddFunction DisciplineDefaultMainActions
 {
-	if (not Talent(schism_talent) or target.DebuffExpires(schism_debuff))
+	if (target.DebuffExpires(schism_debuff))
 	{
 		if not Talent(purge_the_wicked_talent) and target.DebuffRefreshable(shadow_word_pain_debuff) and target.TimeToDie() > target.DebuffRemaining(shadow_word_pain_debuff) Spell(shadow_word_pain)
 		if Talent(purge_the_wicked_talent) and target.DebuffRefreshable(purge_the_wicked_debuff) and target.TimeToDie() > target.DebuffRemaining(purge_the_wicked_debuff) Spell(purge_the_wicked)
 	}
-	Spell(schism)
+	if target.TimeToDie() >= 6 Spell(schism)
 	if (not Talent(schism_talent) or not target.DebuffExpires(schism_debuff)) Spell(penance)
 	if (not Talent(schism_talent) or not target.DebuffExpires(schism_debuff)) Spell(power_word_solace)
+	if target.Distance() <= 30 Spell(divine_star)
 	Spell(smite)
 }
 
 AddFunction DisciplineDefaultCdActions
 {
-	if Talent(mindbender_talent) Spell(mindbender)
 	if (not Talent(schism_talent) or not target.DebuffExpires(schism_debuff)) Spell(lights_wrath)
+	Spell(shadowfiend)
 	Item(Trinket0Slot usable=1 text=13)
 	Item(Trinket1Slot usable=1 text=14)
 	Spell(power_infusion)
 	Spell(rapture)
-	Spell(shadowfiend)
 }
 	
 AddIcon help=mainheal specialization=discipline
@@ -109,6 +109,7 @@ AddFunction s2mcheck_min
 }
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=shadow)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=shadow)
 
 AddFunction ShadowInterruptActions
 {
@@ -184,6 +185,7 @@ AddFunction ShadowDefaultShortCdPostConditions
 AddFunction ShadowDefaultCdActions
 {
 	#potion,name=prolonged_power,if=buff.bloodlust.react|target.time_to_die<=80|(target.health.pct<35&cooldown.power_infusion.remains<30)
+	if { BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 80 or target.HealthPercent() < 35 and SpellCooldown(power_infusion) < 30 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
 	#silence
 	ShadowInterruptActions()
 	#call_action_list,name=check,if=talent.surrender_to_madness.enabled&!buff.surrender_to_madness.up
@@ -253,6 +255,8 @@ AddFunction ShadowMainMainActions
 	if not Talent(misery_talent) and target.DebuffRemaining(shadow_word_pain_debuff) < { 3 + 4 / 3 } * GCD() Spell(shadow_word_pain)
 	#vampiric_touch,if=!talent.misery.enabled&dot.vampiric_touch.remains<(4+(4%3))*gcd
 	if not Talent(misery_talent) and target.DebuffRemaining(vampiric_touch_debuff) < { 4 + 4 / 3 } * GCD() Spell(vampiric_touch)
+	#void_eruption,if=insanity>=70|(talent.auspicious_spirits.enabled&insanity>=(65-shadowy_apparitions_in_flight*3))|set_bonus.tier19_4pc
+	if Insanity() >= 70 or Talent(auspicious_spirits_talent) and Insanity() >= 65 - 1 * 3 or ArmorSetBonus(T19 4) Spell(void_eruption)
 	#shadow_crash,if=talent.shadow_crash.enabled
 	if Talent(shadow_crash_talent) Spell(shadow_crash)
 	#mindbender,if=talent.mindbender.enabled&set_bonus.tier18_2pc
@@ -291,36 +295,24 @@ AddFunction ShadowMainShortCdActions
 
 AddFunction ShadowMainShortCdPostConditions
 {
-	Talent(mindbender_talent) and { Talent(surrender_to_madness_talent) and target.TimeToDie() > s2mcheck() + 60 or not Talent(surrender_to_madness_talent) } and Spell(mindbender) or Speed() > 0 and Talent(misery_talent) and target.DebuffRemaining(shadow_word_pain_debuff) < GCD() and Spell(shadow_word_pain) or Talent(misery_talent) and { target.DebuffRemaining(vampiric_touch_debuff) < 3 * GCD() or target.DebuffRemaining(shadow_word_pain_debuff) < 3 * GCD() } and Spell(vampiric_touch) or not Talent(misery_talent) and target.DebuffRemaining(shadow_word_pain_debuff) < { 3 + 4 / 3 } * GCD() and Spell(shadow_word_pain) or not Talent(misery_talent) and target.DebuffRemaining(vampiric_touch_debuff) < { 4 + 4 / 3 } * GCD() and Spell(vampiric_touch) or Talent(shadow_crash_talent) and Spell(shadow_crash) or Talent(mindbender_talent) and ArmorSetBonus(T18 2) and Spell(mindbender) or not Talent(misery_talent) and not target.DebuffPresent(shadow_word_pain_debuff) and Talent(legacy_of_the_void_talent) and Insanity() >= 70 and Spell(shadow_word_pain) or not Talent(misery_talent) and not target.DebuffPresent(vampiric_touch_debuff) and Talent(legacy_of_the_void_talent) and Insanity() >= 70 and Spell(vampiric_touch) or { Enemies() <= 4 or Talent(reaper_of_souls_talent) and Enemies() <= 2 } and SpellCharges(shadow_word_death) == 2 and Insanity() <= 85 - 15 * TalentPoints(reaper_of_souls_talent) and Spell(shadow_word_death) or Enemies() <= 4 and Talent(legacy_of_the_void_talent) and { Insanity() <= 81 or Insanity() <= 75.2 and Talent(fortress_of_the_mind_talent) } and Spell(mind_blast) or { Enemies() <= 4 and not Talent(legacy_of_the_void_talent) or Insanity() <= 96 or Insanity() <= 95.2 and Talent(fortress_of_the_mind_talent) } and Spell(mind_blast) or not Talent(misery_talent) and not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and Spell(shadow_word_pain) or not Talent(misery_talent) and not target.DebuffPresent(vampiric_touch_debuff) and target.TimeToDie() > 10 and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and Spell(vampiric_touch) or not Talent(misery_talent) and not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and ArtifactTraitRank(sphere_of_insanity) and Spell(shadow_word_pain) or { Talent(shadow_word_void_talent) and Insanity() <= 70 and Talent(legacy_of_the_void_talent) or Insanity() <= 85 and not Talent(legacy_of_the_void_talent) } and Spell(shadow_word_void) or Spell(mind_flay) or Spell(shadow_word_pain)
+	Talent(mindbender_talent) and { Talent(surrender_to_madness_talent) and target.TimeToDie() > s2mcheck() + 60 or not Talent(surrender_to_madness_talent) } and Spell(mindbender) or Speed() > 0 and Talent(misery_talent) and target.DebuffRemaining(shadow_word_pain_debuff) < GCD() and Spell(shadow_word_pain) or Talent(misery_talent) and { target.DebuffRemaining(vampiric_touch_debuff) < 3 * GCD() or target.DebuffRemaining(shadow_word_pain_debuff) < 3 * GCD() } and Spell(vampiric_touch) or not Talent(misery_talent) and target.DebuffRemaining(shadow_word_pain_debuff) < { 3 + 4 / 3 } * GCD() and Spell(shadow_word_pain) or not Talent(misery_talent) and target.DebuffRemaining(vampiric_touch_debuff) < { 4 + 4 / 3 } * GCD() and Spell(vampiric_touch) or { Insanity() >= 70 or Talent(auspicious_spirits_talent) and Insanity() >= 65 - 1 * 3 or ArmorSetBonus(T19 4) } and Spell(void_eruption) or Talent(shadow_crash_talent) and Spell(shadow_crash) or Talent(mindbender_talent) and ArmorSetBonus(T18 2) and Spell(mindbender) or not Talent(misery_talent) and not target.DebuffPresent(shadow_word_pain_debuff) and Talent(legacy_of_the_void_talent) and Insanity() >= 70 and Spell(shadow_word_pain) or not Talent(misery_talent) and not target.DebuffPresent(vampiric_touch_debuff) and Talent(legacy_of_the_void_talent) and Insanity() >= 70 and Spell(vampiric_touch) or { Enemies() <= 4 or Talent(reaper_of_souls_talent) and Enemies() <= 2 } and SpellCharges(shadow_word_death) == 2 and Insanity() <= 85 - 15 * TalentPoints(reaper_of_souls_talent) and Spell(shadow_word_death) or Enemies() <= 4 and Talent(legacy_of_the_void_talent) and { Insanity() <= 81 or Insanity() <= 75.2 and Talent(fortress_of_the_mind_talent) } and Spell(mind_blast) or { Enemies() <= 4 and not Talent(legacy_of_the_void_talent) or Insanity() <= 96 or Insanity() <= 95.2 and Talent(fortress_of_the_mind_talent) } and Spell(mind_blast) or not Talent(misery_talent) and not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and Spell(shadow_word_pain) or not Talent(misery_talent) and not target.DebuffPresent(vampiric_touch_debuff) and target.TimeToDie() > 10 and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and Spell(vampiric_touch) or not Talent(misery_talent) and not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and ArtifactTraitRank(sphere_of_insanity) and Spell(shadow_word_pain) or { Talent(shadow_word_void_talent) and Insanity() <= 70 and Talent(legacy_of_the_void_talent) or Insanity() <= 85 and not Talent(legacy_of_the_void_talent) } and Spell(shadow_word_void) or Spell(mind_flay) or Spell(shadow_word_pain)
 }
 
 AddFunction ShadowMainCdActions
 {
 	#surrender_to_madness,if=talent.surrender_to_madness.enabled&target.time_to_die<=variable.s2mcheck
 	if Talent(surrender_to_madness_talent) and target.TimeToDie() <= s2mcheck() Spell(surrender_to_madness)
-
-	unless Talent(mindbender_talent) and { Talent(surrender_to_madness_talent) and target.TimeToDie() > s2mcheck() + 60 or not Talent(surrender_to_madness_talent) } and Spell(mindbender) or Speed() > 0 and Talent(misery_talent) and target.DebuffRemaining(shadow_word_pain_debuff) < GCD() and Spell(shadow_word_pain) or Talent(misery_talent) and { target.DebuffRemaining(vampiric_touch_debuff) < 3 * GCD() or target.DebuffRemaining(shadow_word_pain_debuff) < 3 * GCD() } and Spell(vampiric_touch) or not Talent(misery_talent) and target.DebuffRemaining(shadow_word_pain_debuff) < { 3 + 4 / 3 } * GCD() and Spell(shadow_word_pain) or not Talent(misery_talent) and target.DebuffRemaining(vampiric_touch_debuff) < { 4 + 4 / 3 } * GCD() and Spell(vampiric_touch)
-	{
-		#void_eruption,if=insanity>=70|(talent.auspicious_spirits.enabled&insanity>=(65-shadowy_apparitions_in_flight*3))|set_bonus.tier19_4pc
-		if Insanity() >= 70 or Talent(auspicious_spirits_talent) and Insanity() >= 65 - 1 * 3 or ArmorSetBonus(T19 4) Spell(void_eruption)
-	}
 }
 
 AddFunction ShadowMainCdPostConditions
 {
-	Talent(mindbender_talent) and { Talent(surrender_to_madness_talent) and target.TimeToDie() > s2mcheck() + 60 or not Talent(surrender_to_madness_talent) } and Spell(mindbender) or Speed() > 0 and Talent(misery_talent) and target.DebuffRemaining(shadow_word_pain_debuff) < GCD() and Spell(shadow_word_pain) or Talent(misery_talent) and { target.DebuffRemaining(vampiric_touch_debuff) < 3 * GCD() or target.DebuffRemaining(shadow_word_pain_debuff) < 3 * GCD() } and Spell(vampiric_touch) or not Talent(misery_talent) and target.DebuffRemaining(shadow_word_pain_debuff) < { 3 + 4 / 3 } * GCD() and Spell(shadow_word_pain) or not Talent(misery_talent) and target.DebuffRemaining(vampiric_touch_debuff) < { 4 + 4 / 3 } * GCD() and Spell(vampiric_touch) or Talent(shadow_crash_talent) and Spell(shadow_crash) or Talent(mindbender_talent) and ArmorSetBonus(T18 2) and Spell(mindbender) or not Talent(misery_talent) and not target.DebuffPresent(shadow_word_pain_debuff) and Talent(legacy_of_the_void_talent) and Insanity() >= 70 and Spell(shadow_word_pain) or not Talent(misery_talent) and not target.DebuffPresent(vampiric_touch_debuff) and Talent(legacy_of_the_void_talent) and Insanity() >= 70 and Spell(vampiric_touch) or { Enemies() <= 4 or Talent(reaper_of_souls_talent) and Enemies() <= 2 } and SpellCharges(shadow_word_death) == 2 and Insanity() <= 85 - 15 * TalentPoints(reaper_of_souls_talent) and Spell(shadow_word_death) or Enemies() <= 4 and Talent(legacy_of_the_void_talent) and { Insanity() <= 81 or Insanity() <= 75.2 and Talent(fortress_of_the_mind_talent) } and Spell(mind_blast) or { Enemies() <= 4 and not Talent(legacy_of_the_void_talent) or Insanity() <= 96 or Insanity() <= 95.2 and Talent(fortress_of_the_mind_talent) } and Spell(mind_blast) or not Talent(misery_talent) and not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and Spell(shadow_word_pain) or not Talent(misery_talent) and not target.DebuffPresent(vampiric_touch_debuff) and target.TimeToDie() > 10 and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and Spell(vampiric_touch) or not Talent(misery_talent) and not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and ArtifactTraitRank(sphere_of_insanity) and Spell(shadow_word_pain) or { Talent(shadow_word_void_talent) and Insanity() <= 70 and Talent(legacy_of_the_void_talent) or Insanity() <= 85 and not Talent(legacy_of_the_void_talent) } and Spell(shadow_word_void) or Spell(mind_flay) or Spell(shadow_word_pain)
+	Talent(mindbender_talent) and { Talent(surrender_to_madness_talent) and target.TimeToDie() > s2mcheck() + 60 or not Talent(surrender_to_madness_talent) } and Spell(mindbender) or Speed() > 0 and Talent(misery_talent) and target.DebuffRemaining(shadow_word_pain_debuff) < GCD() and Spell(shadow_word_pain) or Talent(misery_talent) and { target.DebuffRemaining(vampiric_touch_debuff) < 3 * GCD() or target.DebuffRemaining(shadow_word_pain_debuff) < 3 * GCD() } and Spell(vampiric_touch) or not Talent(misery_talent) and target.DebuffRemaining(shadow_word_pain_debuff) < { 3 + 4 / 3 } * GCD() and Spell(shadow_word_pain) or not Talent(misery_talent) and target.DebuffRemaining(vampiric_touch_debuff) < { 4 + 4 / 3 } * GCD() and Spell(vampiric_touch) or { Insanity() >= 70 or Talent(auspicious_spirits_talent) and Insanity() >= 65 - 1 * 3 or ArmorSetBonus(T19 4) } and Spell(void_eruption) or Talent(shadow_crash_talent) and Spell(shadow_crash) or Talent(mindbender_talent) and ArmorSetBonus(T18 2) and Spell(mindbender) or not Talent(misery_talent) and not target.DebuffPresent(shadow_word_pain_debuff) and Talent(legacy_of_the_void_talent) and Insanity() >= 70 and Spell(shadow_word_pain) or not Talent(misery_talent) and not target.DebuffPresent(vampiric_touch_debuff) and Talent(legacy_of_the_void_talent) and Insanity() >= 70 and Spell(vampiric_touch) or { Enemies() <= 4 or Talent(reaper_of_souls_talent) and Enemies() <= 2 } and SpellCharges(shadow_word_death) == 2 and Insanity() <= 85 - 15 * TalentPoints(reaper_of_souls_talent) and Spell(shadow_word_death) or Enemies() <= 4 and Talent(legacy_of_the_void_talent) and { Insanity() <= 81 or Insanity() <= 75.2 and Talent(fortress_of_the_mind_talent) } and Spell(mind_blast) or { Enemies() <= 4 and not Talent(legacy_of_the_void_talent) or Insanity() <= 96 or Insanity() <= 95.2 and Talent(fortress_of_the_mind_talent) } and Spell(mind_blast) or not Talent(misery_talent) and not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and { Talent(auspicious_spirits_talent) or Talent(shadowy_insight_talent) } and Spell(shadow_word_pain) or not Talent(misery_talent) and not target.DebuffPresent(vampiric_touch_debuff) and target.TimeToDie() > 10 and { Enemies() < 4 or Talent(sanlayn_talent) or Talent(auspicious_spirits_talent) and ArtifactTraitRank(unleash_the_shadows) } and Spell(vampiric_touch) or not Talent(misery_talent) and not target.DebuffPresent(shadow_word_pain_debuff) and target.TimeToDie() > 10 and Enemies() < 5 and ArtifactTraitRank(sphere_of_insanity) and Spell(shadow_word_pain) or { Talent(shadow_word_void_talent) and Insanity() <= 70 and Talent(legacy_of_the_void_talent) or Insanity() <= 85 and not Talent(legacy_of_the_void_talent) } and Spell(shadow_word_void) or Spell(mind_flay) or Spell(shadow_word_pain)
 }
 
 ### actions.precombat
 
 AddFunction ShadowPrecombatMainActions
 {
-	#flask,type=flask_of_the_whispered_pact
-	#food,type=azshari_salad
-	#augmentation,type=defiled
-	Spell(augmentation)
-	#snapshot_stats
-	#potion,name=prolonged_power
 	#shadowform,if=!buff.shadowform.up
 	if not BuffPresent(shadowform_buff) Spell(shadowform)
 	#variable,op=set,name=s2mbeltcheck,value=cooldown.mind_blast.charges>=2
@@ -338,16 +330,22 @@ AddFunction ShadowPrecombatShortCdActions
 
 AddFunction ShadowPrecombatShortCdPostConditions
 {
-	Spell(augmentation) or not BuffPresent(shadowform_buff) and Spell(shadowform) or Spell(mind_blast)
+	not BuffPresent(shadowform_buff) and Spell(shadowform) or Spell(mind_blast)
 }
 
 AddFunction ShadowPrecombatCdActions
 {
+	#flask,type=flask_of_the_whispered_pact
+	#food,type=azshari_salad
+	#augmentation,type=defiled
+	#snapshot_stats
+	#potion,name=prolonged_power
+	if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
 }
 
 AddFunction ShadowPrecombatCdPostConditions
 {
-	Spell(augmentation) or not BuffPresent(shadowform_buff) and Spell(shadowform) or Spell(mind_blast)
+	not BuffPresent(shadowform_buff) and Spell(shadowform) or Spell(mind_blast)
 }
 
 ### actions.s2m
@@ -618,7 +616,6 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 
 ### Required symbols
 # arcane_torrent_mana
-# augmentation
 # auspicious_spirits_talent
 # berserking
 # dispersion
@@ -633,6 +630,7 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # misery_talent
 # power_infusion
 # power_infusion_buff
+# prolonged_power_potion
 # quaking_palm
 # reaper_of_souls_talent
 # sanlayn_talent

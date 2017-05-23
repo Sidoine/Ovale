@@ -20,6 +20,7 @@ Include(ovale_warrior_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=arms)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=arms)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=arms)
 
 AddFunction ArmsInterruptActions
 {
@@ -149,6 +150,7 @@ AddFunction ArmsDefaultCdActions
 	#pummel
 	ArmsInterruptActions()
 	#potion,name=old_war,if=buff.avatar.up&buff.battle_cry.up&debuff.colossus_smash.up|target.time_to_die<=26
+	if { BuffPresent(avatar_buff) and BuffPresent(battle_cry_buff) and target.DebuffPresent(colossus_smash_debuff) or target.TimeToDie() <= 26 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
 	#blood_fury,if=buff.battle_cry.up|target.time_to_die<=16
 	if BuffPresent(battle_cry_buff) or target.TimeToDie() <= 16 Spell(blood_fury_ap)
 	#berserking,if=buff.battle_cry.up|target.time_to_die<=11
@@ -369,10 +371,6 @@ AddFunction ArmsExecuteCdPostConditions
 
 AddFunction ArmsPrecombatMainActions
 {
-	#flask,type=countless_armies
-	#food,type=fishbrul_special
-	#augmentation,type=defiled
-	Spell(augmentation)
 }
 
 AddFunction ArmsPrecombatMainPostConditions
@@ -385,16 +383,20 @@ AddFunction ArmsPrecombatShortCdActions
 
 AddFunction ArmsPrecombatShortCdPostConditions
 {
-	Spell(augmentation)
 }
 
 AddFunction ArmsPrecombatCdActions
 {
+	#flask,type=countless_armies
+	#food,type=fishbrul_special
+	#augmentation,type=defiled
+	#snapshot_stats
+	#potion,name=old_war
+	if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
 }
 
 AddFunction ArmsPrecombatCdPostConditions
 {
-	Spell(augmentation)
 }
 
 ### actions.single
@@ -507,7 +509,6 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 ### Required symbols
 # arcane_torrent_rage
 # archavons_heavy_hand
-# augmentation
 # avatar
 # avatar_buff
 # battle_cry
@@ -530,6 +531,7 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # heroic_leap
 # in_for_the_kill_talent
 # mortal_strike
+# old_war_potion
 # overpower
 # overpower_buff
 # precise_strikes_buff
@@ -568,6 +570,7 @@ Include(ovale_warrior_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=fury)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=fury)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=fury)
 
 AddFunction FuryInterruptActions
 {
@@ -696,6 +699,7 @@ AddFunction FuryDefaultCdActions
 	unless target.Distance() > 5 and FuryMovementCdPostConditions()
 	{
 		#potion,name=old_war,if=(target.health.pct<20&buff.battle_cry.up)|target.time_to_die<30
+		if { target.HealthPercent() < 20 and BuffPresent(battle_cry_buff) or target.TimeToDie() < 30 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
 		#use_item,name=faulty_countermeasure,if=buff.battle_cry.up&buff.enrage.up
 		if BuffPresent(battle_cry_buff) and IsEnraged() FuryUseItemActions()
 
@@ -926,10 +930,6 @@ AddFunction FuryMovementCdPostConditions
 
 AddFunction FuryPrecombatMainActions
 {
-	#flask,type=countless_armies
-	#food,type=azshari_salad
-	#augmentation,type=defiled
-	Spell(augmentation)
 }
 
 AddFunction FuryPrecombatMainPostConditions
@@ -942,16 +942,20 @@ AddFunction FuryPrecombatShortCdActions
 
 AddFunction FuryPrecombatShortCdPostConditions
 {
-	Spell(augmentation)
 }
 
 AddFunction FuryPrecombatCdActions
 {
+	#flask,type=countless_armies
+	#food,type=azshari_salad
+	#augmentation,type=defiled
+	#snapshot_stats
+	#potion,name=old_war
+	if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
 }
 
 AddFunction FuryPrecombatCdPostConditions
 {
-	Spell(augmentation)
 }
 
 ### actions.single_target
@@ -1073,7 +1077,6 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 
 ### Required symbols
 # arcane_torrent_rage
-# augmentation
 # avatar
 # battle_cry
 # battle_cry_buff
@@ -1104,6 +1107,7 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # massacre_talent
 # meat_cleaver_buff
 # odyns_fury
+# old_war_potion
 # outburst_talent
 # pummel
 # quaking_palm
@@ -1133,6 +1137,7 @@ Include(ovale_warrior_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=protection)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=protection)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=protection)
 
 AddFunction ProtectionInterruptActions
 {
@@ -1212,10 +1217,6 @@ AddFunction ProtectionDefaultCdPostConditions
 
 AddFunction ProtectionPrecombatMainActions
 {
-	#flask,type=ten_thousand_scars
-	#food,type=azshari_salad
-	#augmentation,type=defiled
-	Spell(augmentation)
 }
 
 AddFunction ProtectionPrecombatMainPostConditions
@@ -1228,16 +1229,20 @@ AddFunction ProtectionPrecombatShortCdActions
 
 AddFunction ProtectionPrecombatShortCdPostConditions
 {
-	Spell(augmentation)
 }
 
 AddFunction ProtectionPrecombatCdActions
 {
+	#flask,type=ten_thousand_scars
+	#food,type=azshari_salad
+	#augmentation,type=defiled
+	#snapshot_stats
+	#potion,name=unbending_potion
+	if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(unbending_potion usable=1)
 }
 
 AddFunction ProtectionPrecombatCdPostConditions
 {
-	Spell(augmentation)
 }
 
 ### actions.prot
@@ -1246,7 +1251,6 @@ AddFunction ProtectionProtMainActions
 {
 	#spell_reflection,if=incoming_damage_2500ms>health.max*0.20
 	if IncomingDamage(2.5) > MaxHealth() * 0.2 Spell(spell_reflection)
-	#potion,name=unbending_potion,if=(incoming_damage_2500ms>health.max*0.15&!buff.potion.up)|target.time_to_die<=25
 	#battle_cry,if=cooldown.shield_slam.remains=0
 	if not SpellCooldown(shield_slam) > 0 Spell(battle_cry)
 	#shield_slam,if=(!(cooldown.shield_block.remains<=gcd.max*2&!buff.shield_block.up)&talent.heavy_repercussions.enabled)|!talent.heavy_repercussions.enabled
@@ -1299,6 +1303,8 @@ AddFunction ProtectionProtCdActions
 		if IncomingDamage(2.5) > MaxHealth() * 0.4 Spell(last_stand)
 		#shield_wall,if=incoming_damage_2500ms>health.max*0.40&!cooldown.last_stand.remains=0
 		if IncomingDamage(2.5) > MaxHealth() * 0.4 and not { not SpellCooldown(last_stand) > 0 } Spell(shield_wall)
+		#potion,name=unbending_potion,if=(incoming_damage_2500ms>health.max*0.15&!buff.potion.up)|target.time_to_die<=25
+		if { IncomingDamage(2.5) > MaxHealth() * 0.15 and not BuffPresent(potion_buff) or target.TimeToDie() <= 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(unbending_potion usable=1)
 	}
 }
 
@@ -1367,7 +1373,6 @@ AddIcon checkbox=opt_warrior_protection_aoe help=cd specialization=protection
 
 ### Required symbols
 # arcane_torrent_rage
-# augmentation
 # battle_cry
 # battle_cry_buff
 # berserking
@@ -1383,6 +1388,7 @@ AddIcon checkbox=opt_warrior_protection_aoe help=cd specialization=protection
 # last_stand
 # neltharions_fury
 # neltharions_fury_buff
+# potion_buff
 # pummel
 # quaking_palm
 # ravager
@@ -1394,6 +1400,7 @@ AddIcon checkbox=opt_warrior_protection_aoe help=cd specialization=protection
 # shield_wall
 # spell_reflection
 # thunder_clap
+# unbending_potion
 # vengeance_ignore_pain_buff
 # vengeance_revenge_buff
 # vengeance_talent

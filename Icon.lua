@@ -271,6 +271,7 @@ local function SetFontScale(self, scale)
 	self.remains:SetFont(self.fontName, self.fontHeight * self.fontScale, self.fontFlags)
 	self.shortcut:SetFont(self.fontName, self.fontHeight * self.fontScale, self.fontFlags)
 	self.rangeIndicator:SetFont(self.fontName, self.fontHeight * self.fontScale, self.fontFlags)
+	self.focusText:SetFont(self.fontName, self.fontHeight * self.fontScale, self.fontFlags)
 end
 
 local function SetRangeIndicator(self, text)

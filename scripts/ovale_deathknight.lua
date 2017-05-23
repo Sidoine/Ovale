@@ -138,6 +138,7 @@ Include(ovale_deathknight_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=frost)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=frost)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=frost)
 AddCheckBox(opt_legendary_ring_strength ItemName(legendary_ring_strength) default specialization=frost)
 
 AddFunction FrostInterruptActions
@@ -244,6 +245,7 @@ AddFunction FrostDefaultCdActions
 	#use_item,slot=trinket1
 	FrostUseItemActions()
 	#potion,name=prolonged_power,if=buff.pillar_of_frost.up&(!talent.breath_of_sindragosa.enabled|!cooldown.breath_of_sindragosa.remains)
+	if BuffPresent(pillar_of_frost_buff) and { not Talent(breath_of_sindragosa_talent) or not SpellCooldown(breath_of_sindragosa) > 0 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
 	#sindragosas_fury,if=buff.pillar_of_frost.up&(buff.unholy_strength.up|(buff.pillar_of_frost.remains<3&target.time_to_die<60))&debuff.razorice.stack=5&!buff.obliteration.up
 	if BuffPresent(pillar_of_frost_buff) and { BuffPresent(unholy_strength_buff) or BuffRemaining(pillar_of_frost_buff) < 3 and target.TimeToDie() < 60 } and target.DebuffStacks(razorice_debuff) == 5 and not BuffPresent(obliteration_buff) Spell(sindragosas_fury)
 	#call_action_list,name=generic,if=!talent.breath_of_sindragosa.enabled&!(talent.gathering_storm.enabled&buff.remorseless_winter.remains)
@@ -521,10 +523,6 @@ AddFunction FrostGsTickingCdPostConditions
 
 AddFunction FrostPrecombatMainActions
 {
-	#flask,name=countless_armies
-	#food,name=fishbrul_special
-	#augmentation,name=defiled
-	Spell(augmentation)
 }
 
 AddFunction FrostPrecombatMainPostConditions
@@ -537,16 +535,20 @@ AddFunction FrostPrecombatShortCdActions
 
 AddFunction FrostPrecombatShortCdPostConditions
 {
-	Spell(augmentation)
 }
 
 AddFunction FrostPrecombatCdActions
 {
+	#flask,name=countless_armies
+	#food,name=fishbrul_special
+	#augmentation,name=defiled
+	#snapshot_stats
+	#potion,name=prolonged_power
+	if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
 }
 
 AddFunction FrostPrecombatCdPostConditions
 {
-	Spell(augmentation)
 }
 
 ### Frost icons.
@@ -612,7 +614,6 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # 132459
 # 140806
 # arcane_torrent_runicpower
-# augmentation
 # berserking
 # blood_fury_ap
 # breath_of_sindragosa
@@ -645,6 +646,7 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # perseverance_of_the_ebon_martyr_debuff
 # pillar_of_frost
 # pillar_of_frost_buff
+# prolonged_power_potion
 # razorice_debuff
 # remorseless_winter
 # remorseless_winter_buff
@@ -675,6 +677,7 @@ Include(ovale_deathknight_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=unholy)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=unholy)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=unholy)
 
 AddFunction UnholyInterruptActions
 {
@@ -702,7 +705,6 @@ AddFunction UnholyGetInMeleeRange
 
 AddFunction UnholyDefaultMainActions
 {
-	#potion,name=prolonged_power,if=buff.unholy_strength.react
 	#outbreak,target_if=!dot.virulent_plague.ticking
 	if not target.DebuffPresent(virulent_plague_debuff) Spell(outbreak)
 	#run_action_list,name=valkyr,if=talent.dark_arbiter.enabled&pet.valkyr_battlemaiden.active
@@ -775,6 +777,8 @@ AddFunction UnholyDefaultCdActions
 	Spell(berserking)
 	#use_item,slot=trinket1
 	UnholyUseItemActions()
+	#potion,name=prolonged_power,if=buff.unholy_strength.react
+	if BuffPresent(unholy_strength_buff) and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
 
 	unless not target.DebuffPresent(virulent_plague_debuff) and Spell(outbreak) or HasEquippedItem(137075) and SpellCooldown(dark_arbiter) > 165 and Spell(dark_transformation) or HasEquippedItem(137075) and not Talent(shadow_infusion_talent) and SpellCooldown(dark_arbiter) > 55 and Spell(dark_transformation) or HasEquippedItem(137075) and Talent(shadow_infusion_talent) and SpellCooldown(dark_arbiter) > 35 and Spell(dark_transformation) or HasEquippedItem(137075) and target.TimeToDie() < SpellCooldown(dark_arbiter) - 8 and Spell(dark_transformation) or HasEquippedItem(137075) and SpellCooldown(summon_gargoyle) > 160 and Spell(dark_transformation) or HasEquippedItem(137075) and not Talent(shadow_infusion_talent) and SpellCooldown(summon_gargoyle) > 55 and Spell(dark_transformation) or HasEquippedItem(137075) and Talent(shadow_infusion_talent) and SpellCooldown(summon_gargoyle) > 35 and Spell(dark_transformation) or HasEquippedItem(137075) and target.TimeToDie() < SpellCooldown(summon_gargoyle) - 8 and Spell(dark_transformation) or not HasEquippedItem(137075) and Rune() < 4 and Spell(dark_transformation) or Rune() < 4 and Spell(blighted_rune_weapon)
 	{
@@ -1065,10 +1069,6 @@ AddFunction UnholyInstructorsCdPostConditions
 
 AddFunction UnholyPrecombatMainActions
 {
-	#flask,name=countless_armies
-	#food,name=nightborne_delicacy_platter
-	#augmentation,name=defiled
-	Spell(augmentation)
 }
 
 AddFunction UnholyPrecombatMainPostConditions
@@ -1077,23 +1077,24 @@ AddFunction UnholyPrecombatMainPostConditions
 
 AddFunction UnholyPrecombatShortCdActions
 {
-	unless Spell(augmentation)
-	{
-		#snapshot_stats
-		#potion,name=prolonged_power
-		#raise_dead
-		Spell(raise_dead)
-	}
+	#raise_dead
+	Spell(raise_dead)
 }
 
 AddFunction UnholyPrecombatShortCdPostConditions
 {
-	Spell(augmentation)
 }
 
 AddFunction UnholyPrecombatCdActions
 {
-	unless Spell(augmentation) or Spell(raise_dead)
+	#flask,name=countless_armies
+	#food,name=nightborne_delicacy_platter
+	#augmentation,name=defiled
+	#snapshot_stats
+	#potion,name=prolonged_power
+	if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
+
+	unless Spell(raise_dead)
 	{
 		#army_of_the_dead
 		Spell(army_of_the_dead)
@@ -1102,7 +1103,7 @@ AddFunction UnholyPrecombatCdActions
 
 AddFunction UnholyPrecombatCdPostConditions
 {
-	Spell(augmentation) or Spell(raise_dead)
+	Spell(raise_dead)
 }
 
 ### actions.standard
@@ -1283,7 +1284,6 @@ AddIcon checkbox=opt_deathknight_unholy_aoe help=cd specialization=unholy
 # arcane_torrent_runicpower
 # army_of_the_dead
 # asphyxiate
-# augmentation
 # berserking
 # blighted_rune_weapon
 # blood_fury_ap
@@ -1306,6 +1306,7 @@ AddIcon checkbox=opt_deathknight_unholy_aoe help=cd specialization=unholy
 # necrosis_buff
 # necrosis_talent
 # outbreak
+# prolonged_power_potion
 # raise_dead
 # scourge_strike
 # shadow_infusion_talent

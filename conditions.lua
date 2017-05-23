@@ -1027,6 +1027,8 @@ do
 end
 
 do
+	local IMBUED_BUFF_ID = 214336
+	
 	--- Test whether the target's classification matches the given classification.
 	-- @name Classification
 	-- @paramsig boolean
@@ -1051,11 +1053,16 @@ do
 		elseif API_UnitExists("boss1") and OvaleGUID:UnitGUID(target) == OvaleGUID:UnitGUID("boss1") then
 			targetClassification = "worldboss"
 		else
-			targetClassification = API_UnitClassification(target)
-			if targetClassification == "rareelite" then
-				targetClassification = "elite"
-			elseif targetClassification == "rare" then
-				targetClassification = "normal"
+			local aura = state:GetAura(target, IMBUED_BUFF_ID, "debuff", false)
+			if state:IsActiveAura(aura, atTime) then
+				targetClassification = "worldboss"
+			else 
+				targetClassification = API_UnitClassification(target)
+				if targetClassification == "rareelite" then
+					targetClassification = "elite"
+				elseif targetClassification == "rare" then
+					targetClassification = "normal"
+				end
 			end
 		end
 		local boolean = (targetClassification == classification)
@@ -2673,7 +2680,7 @@ do
 	local function PTR(positionalParams, namedParams, state, atTime)
 		local comparator, limit = positionalParams[1], positionalParams[2]
 		local _, _, _, uiVersion = API_GetBuildInfo()
-		local value = (uiVersion > 70100) and 1 or 0
+		local value = (uiVersion > 70200) and 1 or 0
 		return Compare(value, comparator, limit)
 	end
 

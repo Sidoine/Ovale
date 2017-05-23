@@ -19,6 +19,7 @@ Include(ovale_trinkets_wod)
 Include(ovale_mage_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=arcane)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=arcane)
 AddCheckBox(opt_arcane_mage_burn_phase L(arcane_mage_burn_phase) default specialization=arcane)
 AddCheckBox(opt_time_warp SpellName(time_warp) specialization=arcane)
 
@@ -355,6 +356,8 @@ AddFunction ArcaneCooldownsCdActions
 		Spell(berserking)
 		#arcane_torrent
 		Spell(arcane_torrent_mana)
+		#potion,name=deadly_grace,if=buff.arcane_power.up&(buff.berserking.up|buff.blood_fury.up)
+		if BuffPresent(arcane_power_buff) and { BuffPresent(berserking_buff) or BuffPresent(blood_fury_sp_buff) } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(deadly_grace_potion usable=1)
 	}
 }
 
@@ -417,10 +420,8 @@ AddFunction ArcanePrecombatMainActions
 	#flask,type=flask_of_the_whispered_pact
 	#food,type=the_hungry_magister
 	#augmentation,type=defiled
-	Spell(augmentation)
 	#summon_arcane_familiar
 	Spell(summon_arcane_familiar)
-	#potion,name=deadly_grace
 	#arcane_blast
 	Spell(arcane_blast)
 }
@@ -435,22 +436,24 @@ AddFunction ArcanePrecombatShortCdActions
 
 AddFunction ArcanePrecombatShortCdPostConditions
 {
-	Spell(augmentation) or Spell(summon_arcane_familiar) or Spell(arcane_blast)
+	Spell(summon_arcane_familiar) or Spell(arcane_blast)
 }
 
 AddFunction ArcanePrecombatCdActions
 {
-	unless Spell(augmentation) or Spell(summon_arcane_familiar)
+	unless Spell(summon_arcane_familiar)
 	{
 		#snapshot_stats
 		#mirror_image
 		Spell(mirror_image)
+		#potion,name=deadly_grace
+		if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(deadly_grace_potion usable=1)
 	}
 }
 
 AddFunction ArcanePrecombatCdPostConditions
 {
-	Spell(augmentation) or Spell(summon_arcane_familiar) or Spell(arcane_blast)
+	Spell(summon_arcane_familiar) or Spell(arcane_blast)
 }
 
 ### actions.rop_phase
@@ -565,12 +568,14 @@ AddIcon checkbox=opt_mage_arcane_aoe help=cd specialization=arcane
 # arcane_power
 # arcane_power_buff
 # arcane_torrent_mana
-# augmentation
 # berserking
+# berserking_buff
 # blood_fury_sp
+# blood_fury_sp_buff
 # charged_up
 # charged_up_talent
 # counterspell
+# deadly_grace_potion
 # evocation
 # mark_of_aluneth
 # mirror_image
@@ -606,6 +611,7 @@ Include(ovale_trinkets_wod)
 Include(ovale_mage_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=fire)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=fire)
 AddCheckBox(opt_time_warp SpellName(time_warp) specialization=fire)
 
 AddFunction FireInterruptActions
@@ -810,6 +816,7 @@ AddFunction FireCombustionPhaseCdActions
 			#combustion
 			Spell(combustion)
 			#potion,name=deadly_grace
+			if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(deadly_grace_potion usable=1)
 			#blood_fury
 			Spell(blood_fury_sp)
 			#berserking
@@ -829,11 +836,6 @@ AddFunction FireCombustionPhaseCdPostConditions
 
 AddFunction FirePrecombatMainActions
 {
-	#flask,type=flask_of_the_whispered_pact
-	#food,type=the_hungry_magister
-	#augmentation,type=defiled
-	Spell(augmentation)
-	#potion,name=deadly_grace
 	#pyroblast
 	Spell(pyroblast)
 }
@@ -848,22 +850,24 @@ AddFunction FirePrecombatShortCdActions
 
 AddFunction FirePrecombatShortCdPostConditions
 {
-	Spell(augmentation) or Spell(pyroblast)
+	Spell(pyroblast)
 }
 
 AddFunction FirePrecombatCdActions
 {
-	unless Spell(augmentation)
-	{
-		#snapshot_stats
-		#mirror_image
-		Spell(mirror_image)
-	}
+	#flask,type=flask_of_the_whispered_pact
+	#food,type=the_hungry_magister
+	#augmentation,type=defiled
+	#snapshot_stats
+	#mirror_image
+	Spell(mirror_image)
+	#potion,name=deadly_grace
+	if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(deadly_grace_potion usable=1)
 }
 
 AddFunction FirePrecombatCdPostConditions
 {
-	Spell(augmentation) or Spell(pyroblast)
+	Spell(pyroblast)
 }
 
 ### actions.rop_phase
@@ -1079,7 +1083,6 @@ AddIcon checkbox=opt_mage_fire_aoe help=cd specialization=fire
 # 132863
 # alexstraszas_fury_talent
 # arcane_torrent_mana
-# augmentation
 # berserking
 # blast_wave
 # blood_fury_sp
@@ -1087,6 +1090,7 @@ AddIcon checkbox=opt_mage_fire_aoe help=cd specialization=fire
 # combustion
 # combustion_buff
 # counterspell
+# deadly_grace_potion
 # dragons_breath
 # fire_blast
 # fireball
@@ -1129,6 +1133,7 @@ Include(ovale_trinkets_wod)
 Include(ovale_mage_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=frost)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=frost)
 AddCheckBox(opt_time_warp SpellName(time_warp) specialization=frost)
 
 AddFunction FrostInterruptActions
@@ -1313,6 +1318,7 @@ AddFunction FrostCooldownsCdActions
 	unless { SpellCooldown(icy_veins) < CastTime(rune_of_power) or Charges(rune_of_power count=0) > 1.9 and SpellCooldown(icy_veins) > 10 or BuffPresent(icy_veins_buff) or target.TimeToDie() + 5 < Charges(rune_of_power count=0) * 10 } and Spell(rune_of_power)
 	{
 		#potion,name=prolonged_power,if=cooldown.icy_veins.remains<1
+		if SpellCooldown(icy_veins) < 1 and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
 		#icy_veins,if=buff.icy_veins.down
 		if BuffExpires(icy_veins_buff) Spell(icy_veins)
 		#mirror_image
@@ -1335,11 +1341,6 @@ AddFunction FrostCooldownsCdPostConditions
 
 AddFunction FrostPrecombatMainActions
 {
-	#flask,type=flask_of_the_whispered_pact
-	#food,type=azshari_salad
-	#augmentation,type=defiled
-	Spell(augmentation)
-	#potion,name=prolonged_power
 	#frostbolt
 	Spell(frostbolt)
 }
@@ -1350,31 +1351,33 @@ AddFunction FrostPrecombatMainPostConditions
 
 AddFunction FrostPrecombatShortCdActions
 {
-	unless Spell(augmentation)
-	{
-		#water_elemental
-		if not pet.Present() Spell(water_elemental)
-	}
+	#flask,type=flask_of_the_whispered_pact
+	#food,type=azshari_salad
+	#augmentation,type=defiled
+	#water_elemental
+	if not pet.Present() Spell(water_elemental)
 }
 
 AddFunction FrostPrecombatShortCdPostConditions
 {
-	Spell(augmentation) or Spell(frostbolt)
+	Spell(frostbolt)
 }
 
 AddFunction FrostPrecombatCdActions
 {
-	unless Spell(augmentation) or not pet.Present() and Spell(water_elemental)
+	unless not pet.Present() and Spell(water_elemental)
 	{
 		#snapshot_stats
 		#mirror_image
 		Spell(mirror_image)
+		#potion,name=prolonged_power
+		if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
 	}
 }
 
 AddFunction FrostPrecombatCdPostConditions
 {
-	Spell(augmentation) or not pet.Present() and Spell(water_elemental) or Spell(frostbolt)
+	not pet.Present() and Spell(water_elemental) or Spell(frostbolt)
 }
 
 ### actions.single
@@ -1509,7 +1512,6 @@ AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 ### Required symbols
 # 132410
 # arcane_torrent_mana
-# augmentation
 # berserking
 # blizzard
 # blood_fury_sp
@@ -1531,6 +1533,7 @@ AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 # icy_veins
 # icy_veins_buff
 # mirror_image
+# prolonged_power_potion
 # quaking_palm
 # ray_of_frost
 # rune_of_power
@@ -1560,6 +1563,7 @@ Include(ovale_trinkets_wod)
 Include(ovale_mage_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=arcane)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=arcane)
 AddCheckBox(opt_arcane_mage_burn_phase L(arcane_mage_burn_phase) default specialization=arcane)
 AddCheckBox(opt_time_warp SpellName(time_warp) specialization=arcane)
 
@@ -1810,6 +1814,8 @@ AddFunction ArcaneCooldownsCdActions
 		Spell(arcane_power)
 		#berserking
 		Spell(berserking)
+		#potion,name=deadly_grace,if=buff.berserking.up
+		if BuffPresent(berserking_buff) and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(deadly_grace_potion usable=1)
 	}
 }
 
@@ -1825,10 +1831,8 @@ AddFunction ArcanePrecombatMainActions
 	#flask,type=flask_of_the_whispered_pact
 	#food,type=the_hungry_magister
 	#augmentation,type=defiled
-	Spell(augmentation)
 	#summon_arcane_familiar
 	Spell(summon_arcane_familiar)
-	#potion,name=deadly_grace
 	#arcane_blast
 	Spell(arcane_blast)
 }
@@ -1843,22 +1847,24 @@ AddFunction ArcanePrecombatShortCdActions
 
 AddFunction ArcanePrecombatShortCdPostConditions
 {
-	Spell(augmentation) or Spell(summon_arcane_familiar) or Spell(arcane_blast)
+	Spell(summon_arcane_familiar) or Spell(arcane_blast)
 }
 
 AddFunction ArcanePrecombatCdActions
 {
-	unless Spell(augmentation) or Spell(summon_arcane_familiar)
+	unless Spell(summon_arcane_familiar)
 	{
 		#snapshot_stats
 		#mirror_image
 		Spell(mirror_image)
+		#potion,name=deadly_grace
+		if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(deadly_grace_potion usable=1)
 	}
 }
 
 AddFunction ArcanePrecombatCdPostConditions
 {
-	Spell(augmentation) or Spell(summon_arcane_familiar) or Spell(arcane_blast)
+	Spell(summon_arcane_familiar) or Spell(arcane_blast)
 }
 
 ### Arcane icons.
@@ -1930,9 +1936,10 @@ AddIcon checkbox=opt_mage_arcane_aoe help=cd specialization=arcane
 # arcane_power
 # arcane_power_buff
 # arcane_torrent_mana
-# augmentation
 # berserking
+# berserking_buff
 # counterspell
+# deadly_grace_potion
 # evocation
 # mark_of_aluneth
 # mark_of_aluneth_debuff

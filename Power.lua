@@ -428,7 +428,7 @@ function OvalePower:PowerCost(spellId, powerType, atTime, targetGUID, maximumCos
 		if extraPower then
 			if not maximumCost then
 				-- Clamp the extra power to the remaining power.
-				local power = self:GetPower(powerType, atTime)
+				local power = floor(self:GetPower(powerType, atTime))
 				power = power > cost and power - cost or 0
 				if extraPower >= power then
 					extraPower = power

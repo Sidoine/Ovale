@@ -155,6 +155,7 @@ Include(ovale_trinkets_wod)
 Include(ovale_druid_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=balance)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=balance)
 
 AddFunction BalanceInterruptActions
 {
@@ -261,6 +262,7 @@ AddFunction BalanceDefaultShortCdPostConditions
 AddFunction BalanceDefaultCdActions
 {
 	#potion,name=deadly_grace,if=buff.celestial_alignment.up|buff.incarnation.up
+	if { BuffPresent(celestial_alignment_buff) or BuffPresent(incarnation_chosen_of_elune_buff) } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(deadly_grace_potion usable=1)
 	#solar_beam
 	BalanceInterruptActions()
 
@@ -509,13 +511,10 @@ AddFunction BalancePrecombatMainActions
 	#flask,type=flask_of_the_whispered_pact
 	#food,type=azshari_salad
 	#augmentation,type=defiled
-	Spell(augmentation)
 	#moonkin_form
 	Spell(moonkin_form)
 	#blessing_of_elune
 	Spell(blessing_of_elune)
-	#snapshot_stats
-	#potion,name=deadly_grace
 	#new_moon
 	if not SpellKnown(half_moon) and not SpellKnown(full_moon) Spell(new_moon)
 }
@@ -530,16 +529,22 @@ AddFunction BalancePrecombatShortCdActions
 
 AddFunction BalancePrecombatShortCdPostConditions
 {
-	Spell(augmentation) or Spell(moonkin_form) or Spell(blessing_of_elune) or not SpellKnown(half_moon) and not SpellKnown(full_moon) and Spell(new_moon)
+	Spell(moonkin_form) or Spell(blessing_of_elune) or not SpellKnown(half_moon) and not SpellKnown(full_moon) and Spell(new_moon)
 }
 
 AddFunction BalancePrecombatCdActions
 {
+	unless Spell(moonkin_form) or Spell(blessing_of_elune)
+	{
+		#snapshot_stats
+		#potion,name=deadly_grace
+		if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(deadly_grace_potion usable=1)
+	}
 }
 
 AddFunction BalancePrecombatCdPostConditions
 {
-	Spell(augmentation) or Spell(moonkin_form) or Spell(blessing_of_elune) or not SpellKnown(half_moon) and not SpellKnown(full_moon) and Spell(new_moon)
+	Spell(moonkin_form) or Spell(blessing_of_elune) or not SpellKnown(half_moon) and not SpellKnown(full_moon) and Spell(new_moon)
 }
 
 ### actions.single_target
@@ -658,7 +663,6 @@ AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
 ### Required symbols
 # arcane_torrent_energy
 # astral_communion
-# augmentation
 # berserking
 # blessing_of_anshe_buff
 # blessing_of_elune
@@ -667,6 +671,7 @@ AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
 # blood_fury_apsp
 # celestial_alignment
 # celestial_alignment_buff
+# deadly_grace_potion
 # full_moon
 # fury_of_elune
 # fury_of_elune_talent
@@ -723,6 +728,7 @@ Include(ovale_druid_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=feral)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=feral)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=feral)
 
 AddFunction FeralInterruptActions
 {
@@ -799,7 +805,6 @@ AddFunction FeralDefaultShortCdActions
 		{
 			#auto_attack
 			FeralGetInMeleeRange()
-			#potion,name=old_war,if=((buff.berserk.remains>10|buff.incarnation.remains>20)&(target.time_to_die<180|(trinket.proc.all.react&target.health.pct<25)))|target.time_to_die<=40
 			#tigers_fury,if=(!buff.clearcasting.react&energy.deficit>=60)|energy.deficit>=80|(t18_class_trinket&buff.berserk.up&buff.tigers_fury.down)
 			if not BuffPresent(clearcasting_buff) and EnergyDeficit() >= 60 or EnergyDeficit() >= 80 or HasTrinket(t18_class_trinket) and BuffPresent(berserk_cat_buff) and BuffExpires(tigers_fury_buff) Spell(tigers_fury)
 
@@ -849,6 +854,8 @@ AddFunction FeralDefaultCdActions
 			if SpellCooldown(tigers_fury) < GCD() Spell(incarnation_king_of_the_jungle)
 			#use_item,slot=trinket2,if=(buff.tigers_fury.up&(target.time_to_die>trinket.stat.any.cooldown|target.time_to_die<45))|buff.incarnation.remains>20
 			if BuffPresent(tigers_fury_buff) and { target.TimeToDie() > BuffCooldownDuration(trinket_stat_any_buff) or target.TimeToDie() < 45 } or BuffRemaining(incarnation_king_of_the_jungle_buff) > 20 FeralUseItemActions()
+			#potion,name=old_war,if=((buff.berserk.remains>10|buff.incarnation.remains>20)&(target.time_to_die<180|(trinket.proc.all.react&target.health.pct<25)))|target.time_to_die<=40
+			if { { BuffRemaining(berserk_cat_buff) > 10 or BuffRemaining(incarnation_king_of_the_jungle_buff) > 20 } and { target.TimeToDie() < 180 or BuffPresent(trinket_proc_any_buff) and target.HealthPercent() < 25 } or target.TimeToDie() <= 40 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
 			#incarnation,if=energy.time_to_max>1&energy>=35
 			if TimeToMaxEnergy() > 1 and Energy() >= 35 Spell(incarnation_king_of_the_jungle)
 
@@ -1040,7 +1047,6 @@ AddFunction FeralPrecombatMainActions
 	#flask,type=flask_of_the_seventh_demon
 	#food,type=nightborne_delicacy_platter
 	#augmentation,type=defiled
-	Spell(augmentation)
 	#regrowth,if=talent.bloodtalons.enabled
 	if Talent(bloodtalons_talent) Spell(regrowth)
 	#cat_form
@@ -1053,7 +1059,7 @@ AddFunction FeralPrecombatMainPostConditions
 
 AddFunction FeralPrecombatShortCdActions
 {
-	unless Spell(augmentation) or Talent(bloodtalons_talent) and Spell(regrowth) or Spell(cat_form)
+	unless Talent(bloodtalons_talent) and Spell(regrowth) or Spell(cat_form)
 	{
 		#prowl
 		Spell(prowl)
@@ -1062,16 +1068,22 @@ AddFunction FeralPrecombatShortCdActions
 
 AddFunction FeralPrecombatShortCdPostConditions
 {
-	Spell(augmentation) or Talent(bloodtalons_talent) and Spell(regrowth) or Spell(cat_form)
+	Talent(bloodtalons_talent) and Spell(regrowth) or Spell(cat_form)
 }
 
 AddFunction FeralPrecombatCdActions
 {
+	unless Talent(bloodtalons_talent) and Spell(regrowth) or Spell(cat_form)
+	{
+		#snapshot_stats
+		#potion,name=old_war
+		if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
+	}
 }
 
 AddFunction FeralPrecombatCdPostConditions
 {
-	Spell(augmentation) or Talent(bloodtalons_talent) and Spell(regrowth) or Spell(cat_form)
+	Talent(bloodtalons_talent) and Spell(regrowth) or Spell(cat_form)
 }
 
 ### actions.sbt_opener
@@ -1170,7 +1182,6 @@ AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
 ### Required symbols
 # ailuro_pouncers
 # ashamanes_frenzy
-# augmentation
 # berserk_cat
 # berserk_cat_buff
 # bloodtalons_buff
@@ -1198,6 +1209,7 @@ AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
 # moment_of_clarity_talent
 # moonfire_cat
 # moonfire_cat_debuff
+# old_war_potion
 # predatory_swiftness_buff
 # prowl
 # prowl_buff
@@ -1355,7 +1367,6 @@ AddFunction GuardianPrecombatMainActions
 	#flask,type=flask_of_the_seventh_demon
 	#food,type=azshari_salad
 	#augmentation,type=defiled
-	Spell(augmentation)
 	#bear_form
 	Spell(bear_form)
 }
@@ -1370,7 +1381,7 @@ AddFunction GuardianPrecombatShortCdActions
 
 AddFunction GuardianPrecombatShortCdPostConditions
 {
-	Spell(augmentation) or Spell(bear_form)
+	Spell(bear_form)
 }
 
 AddFunction GuardianPrecombatCdActions
@@ -1379,7 +1390,7 @@ AddFunction GuardianPrecombatCdActions
 
 AddFunction GuardianPrecombatCdPostConditions
 {
-	Spell(augmentation) or Spell(bear_form)
+	Spell(bear_form)
 }
 
 ### Guardian icons.
@@ -1442,7 +1453,6 @@ AddIcon checkbox=opt_druid_guardian_aoe help=cd specialization=guardian
 
 ### Required symbols
 # arcane_torrent_energy
-# augmentation
 # bear_form
 # berserking
 # blood_fury_apsp

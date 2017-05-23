@@ -158,6 +158,9 @@ Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_warlock_spells)
+
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=affliction)
+
 ### actions.default
 
 AddFunction AfflictionDefaultMainActions
@@ -168,8 +171,6 @@ AddFunction AfflictionDefaultMainActions
 	if not pet.Present() Spell(soul_effigy)
 	#agony,cycle_targets=1,if=remains<=tick_time+gcd
 	if target.DebuffRemaining(agony_debuff) <= target.TickTime(agony_debuff) + GCD() Spell(agony)
-	#potion,name=prolonged_power,if=!talent.soul_harvest.enabled&(trinket.proc.any.react|trinket.stack_proc.any.react|target.time_to_die<=70|!cooldown.haunt.remains|buff.active_uas.stack>2)
-	#potion,name=prolonged_power,if=talent.soul_harvest.enabled&buff.soul_harvest.remains&(trinket.proc.any.react|trinket.stack_proc.any.react|target.time_to_die<=70|!cooldown.haunt.remains|buff.active_uas.stack>2)
 	#corruption,if=remains<=tick_time+gcd&(spell_targets.seed_of_corruption<3&talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<4)&(buff.active_uas.stack<2&soul_shard=0|!talent.malefic_grasp.enabled)
 	if target.DebuffRemaining(corruption_debuff) <= target.TickTime(corruption_debuff) + GCD() and { Enemies() < 3 and Talent(sow_the_seeds_talent) or Enemies() < 4 } and { target.DebuffStacks(unstable_affliction_debuff) < 2 and SoulShards() == 0 or not Talent(malefic_grasp_talent) } Spell(corruption)
 	#corruption,cycle_targets=1,if=(talent.absolute_corruption.enabled|!talent.malefic_grasp.enabled|!talent.soul_effigy.enabled)&active_enemies>1&remains<=tick_time+gcd&(spell_targets.seed_of_corruption<3&talent.sow_the_seeds.enabled|spell_targets.seed_of_corruption<4)
@@ -276,6 +277,10 @@ AddFunction AfflictionDefaultCdActions
 		Spell(arcane_torrent_mana)
 		#soul_harvest,if=buff.active_uas.stack>=3|!equipped.132394&!equipped.132457&(debuff.haunt.remains|talent.writhe_in_agony.enabled)
 		if target.DebuffStacks(unstable_affliction_debuff) >= 3 or not HasEquippedItem(132394) and not HasEquippedItem(132457) and { target.DebuffPresent(haunt_debuff) or Talent(writhe_in_agony_talent) } Spell(soul_harvest)
+		#potion,name=prolonged_power,if=!talent.soul_harvest.enabled&(trinket.proc.any.react|trinket.stack_proc.any.react|target.time_to_die<=70|!cooldown.haunt.remains|buff.active_uas.stack>2)
+		if not Talent(soul_harvest_talent) and { BuffPresent(trinket_proc_any_buff) or BuffPresent(trinket_stack_proc_any_buff) or target.TimeToDie() <= 70 or not SpellCooldown(haunt) > 0 or target.DebuffStacks(unstable_affliction_debuff) > 2 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
+		#potion,name=prolonged_power,if=talent.soul_harvest.enabled&buff.soul_harvest.remains&(trinket.proc.any.react|trinket.stack_proc.any.react|target.time_to_die<=70|!cooldown.haunt.remains|buff.active_uas.stack>2)
+		if Talent(soul_harvest_talent) and BuffPresent(soul_harvest_buff) and { BuffPresent(trinket_proc_any_buff) or BuffPresent(trinket_stack_proc_any_buff) or target.TimeToDie() <= 70 or not SpellCooldown(haunt) > 0 or target.DebuffStacks(unstable_affliction_debuff) > 2 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
 	}
 }
 
@@ -289,7 +294,6 @@ AddFunction AfflictionDefaultCdPostConditions
 AddFunction AfflictionPrecombatMainActions
 {
 	#augmentation,type=defiled
-	Spell(augmentation)
 	#snapshot_stats
 	#grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
 	if Talent(grimoire_of_sacrifice_talent) and pet.Present() Spell(grimoire_of_sacrifice)
@@ -311,7 +315,7 @@ AddFunction AfflictionPrecombatShortCdActions
 
 AddFunction AfflictionPrecombatShortCdPostConditions
 {
-	Spell(augmentation) or Talent(empowered_life_tap_talent) and not BuffPresent(empowered_life_tap_buff) and Spell(life_tap)
+	Talent(empowered_life_tap_talent) and not BuffPresent(empowered_life_tap_buff) and Spell(life_tap)
 }
 
 AddFunction AfflictionPrecombatCdActions
@@ -324,12 +328,18 @@ AddFunction AfflictionPrecombatCdActions
 		if Talent(grimoire_of_supremacy_talent) and Enemies() > 1 Spell(summon_infernal)
 		#summon_doomguard,if=talent.grimoire_of_supremacy.enabled&active_enemies=1&artifact.lord_of_flames.rank=0
 		if Talent(grimoire_of_supremacy_talent) and Enemies() == 1 and ArtifactTraitRank(lord_of_flames) == 0 Spell(summon_doomguard)
+
+		unless Talent(empowered_life_tap_talent) and not BuffPresent(empowered_life_tap_buff) and Spell(life_tap)
+		{
+			#potion,name=prolonged_power
+			if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
+		}
 	}
 }
 
 AddFunction AfflictionPrecombatCdPostConditions
 {
-	not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_felhunter) or Spell(augmentation) or Talent(empowered_life_tap_talent) and not BuffPresent(empowered_life_tap_buff) and Spell(life_tap)
+	not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_felhunter) or Talent(empowered_life_tap_talent) and not BuffPresent(empowered_life_tap_buff) and Spell(life_tap)
 }
 
 ### Affliction icons.
@@ -399,7 +409,6 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 # agony
 # agony_debuff
 # arcane_torrent_mana
-# augmentation
 # berserking
 # blood_fury_sp
 # compounding_horror_buff
@@ -421,6 +430,7 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 # lord_of_flames
 # malefic_grasp_talent
 # phantom_singularity
+# prolonged_power_potion
 # reap_souls
 # seed_of_corruption
 # service_felhunter
@@ -431,6 +441,7 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 # soul_effigy_talent
 # soul_harvest
 # soul_harvest_buff
+# soul_harvest_talent
 # sow_the_seeds_talent
 # summon_doomguard
 # summon_felhunter
@@ -456,6 +467,9 @@ Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_warlock_spells)
+
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=demonology)
+
 ### actions.default
 
 AddFunction DemonologyDefaultMainActions
@@ -486,7 +500,6 @@ AddFunction DemonologyDefaultMainActions
 	if NotDeDemons(dreadstalker) > 0 or NotDeDemons(darkglare) > 0 or NotDeDemons(doomguard) > 0 or NotDeDemons(infernal) > 0 or 0 > 0 Spell(demonic_empowerment)
 	#doom,cycle_targets=1,if=!talent.hand_of_doom.enabled&target.time_to_die>duration&(!ticking|remains<duration*0.3)
 	if not Talent(hand_of_doom_talent) and target.TimeToDie() > BaseDuration(doom_debuff) and { not target.DebuffPresent(doom_debuff) or target.DebuffRemaining(doom_debuff) < BaseDuration(doom_debuff) * 0.3 } Spell(doom)
-	#potion,name=prolonged_power,if=buff.soul_harvest.remains|target.time_to_die<=70|trinket.proc.any.react
 	#shadowflame,if=charges=2&spell_targets.demonwrath<5
 	if Charges(shadowflame) == 2 and Enemies() < 5 Spell(shadowflame)
 	#life_tap,if=mana.pct<=30
@@ -550,6 +563,8 @@ AddFunction DemonologyDefaultCdActions
 			Spell(blood_fury_sp)
 			#soul_harvest
 			Spell(soul_harvest)
+			#potion,name=prolonged_power,if=buff.soul_harvest.remains|target.time_to_die<=70|trinket.proc.any.react
+			if { BuffPresent(soul_harvest_buff) or target.TimeToDie() <= 70 or BuffPresent(trinket_proc_any_buff) } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
 		}
 	}
 }
@@ -563,10 +578,6 @@ AddFunction DemonologyDefaultCdPostConditions
 
 AddFunction DemonologyPrecombatMainActions
 {
-	#augmentation,type=defiled
-	Spell(augmentation)
-	#snapshot_stats
-	#potion,name=prolonged_power
 	#demonic_empowerment
 	Spell(demonic_empowerment)
 	#demonbolt,if=talent.demonbolt.enabled
@@ -589,7 +600,7 @@ AddFunction DemonologyPrecombatShortCdActions
 
 AddFunction DemonologyPrecombatShortCdPostConditions
 {
-	Spell(augmentation) or Spell(demonic_empowerment) or Talent(demonbolt_talent) and Spell(demonbolt) or not Talent(demonbolt_talent) and Spell(shadow_bolt)
+	Spell(demonic_empowerment) or Talent(demonbolt_talent) and Spell(demonbolt) or not Talent(demonbolt_talent) and Spell(shadow_bolt)
 }
 
 AddFunction DemonologyPrecombatCdActions
@@ -602,12 +613,16 @@ AddFunction DemonologyPrecombatCdActions
 		if Talent(grimoire_of_supremacy_talent) and Enemies() > 1 Spell(summon_infernal)
 		#summon_doomguard,if=talent.grimoire_of_supremacy.enabled&active_enemies=1&artifact.lord_of_flames.rank=0
 		if Talent(grimoire_of_supremacy_talent) and Enemies() == 1 and ArtifactTraitRank(lord_of_flames) == 0 Spell(summon_doomguard)
+		#augmentation,type=defiled
+		#snapshot_stats
+		#potion,name=prolonged_power
+		if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
 	}
 }
 
 AddFunction DemonologyPrecombatCdPostConditions
 {
-	not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_felguard) or Spell(augmentation) or Spell(demonic_empowerment) or Talent(demonbolt_talent) and Spell(demonbolt) or not Talent(demonbolt_talent) and Spell(shadow_bolt)
+	not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_felguard) or Spell(demonic_empowerment) or Talent(demonbolt_talent) and Spell(demonbolt) or not Talent(demonbolt_talent) and Spell(shadow_bolt)
 }
 
 ### Demonology icons.
@@ -672,7 +687,6 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 # 132369
 # 132379
 # arcane_torrent_mana
-# augmentation
 # berserking
 # blood_fury_sp
 # call_dreadstalkers
@@ -694,6 +708,7 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 # life_tap
 # lord_of_flames
 # power_trip_talent
+# prolonged_power_potion
 # service_felguard
 # shadow_bolt
 # shadowflame
@@ -701,6 +716,7 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 # sindorei_spite_icd
 # soul_conduit_talent
 # soul_harvest
+# soul_harvest_buff
 # summon_darkglare
 # summon_darkglare_talent
 # summon_doomguard
@@ -725,6 +741,9 @@ Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_warlock_spells)
+
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=destruction)
+
 ### actions.default
 
 AddFunction DestructionDefaultMainActions
@@ -735,7 +754,6 @@ AddFunction DestructionDefaultMainActions
 	if Enemies() > 1 and target.DebuffRemaining(immolate_debuff) <= target.TickTime(immolate_debuff) and { not Talent(roaring_blaze_talent) or not target.DebuffPresent(roaring_blaze_debuff) and Charges(conflagrate) < 2 + ArmorSetBonus(T19 4) } Spell(immolate)
 	#immolate,if=talent.roaring_blaze.enabled&remains<=duration&!debuff.roaring_blaze.remains&target.time_to_die>10&(action.conflagrate.charges=2+set_bonus.tier19_4pc|(action.conflagrate.charges>=1+set_bonus.tier19_4pc&action.conflagrate.recharge_time<cast_time+gcd)|target.time_to_die<24)
 	if Talent(roaring_blaze_talent) and target.DebuffRemaining(immolate_debuff) <= BaseDuration(immolate_debuff) and not target.DebuffPresent(roaring_blaze_debuff) and target.TimeToDie() > 10 and { Charges(conflagrate) == 2 + ArmorSetBonus(T19 4) or Charges(conflagrate) >= 1 + ArmorSetBonus(T19 4) and SpellChargeCooldown(conflagrate) < CastTime(immolate) + GCD() or target.TimeToDie() < 24 } Spell(immolate)
-	#potion,name=deadly_grace,if=(buff.soul_harvest.remains|trinket.proc.any.react|target.time_to_die<=45)
 	#shadowburn,if=buff.conflagration_of_chaos.remains<=action.chaos_bolt.cast_time
 	if BuffRemaining(conflagration_of_chaos_buff) <= CastTime(chaos_bolt) Spell(shadowburn)
 	#shadowburn,if=(charges=1+set_bonus.tier19_4pc&recharge_time<action.chaos_bolt.cast_time|charges=2+set_bonus.tier19_4pc)&soul_shard<5
@@ -825,6 +843,8 @@ AddFunction DestructionDefaultCdActions
 		Spell(blood_fury_sp)
 		#arcane_torrent
 		Spell(arcane_torrent_mana)
+		#potion,name=deadly_grace,if=(buff.soul_harvest.remains|trinket.proc.any.react|target.time_to_die<=45)
+		if { BuffPresent(soul_harvest_buff) or BuffPresent(trinket_proc_any_buff) or target.TimeToDie() <= 45 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(deadly_grace_potion usable=1)
 
 		unless BuffRemaining(conflagration_of_chaos_buff) <= CastTime(chaos_bolt) and Spell(shadowburn) or { Charges(shadowburn) == 1 + ArmorSetBonus(T19 4) and SpellChargeCooldown(shadowburn) < CastTime(chaos_bolt) or Charges(shadowburn) == 2 + ArmorSetBonus(T19 4) } and SoulShards() < 5 and Spell(shadowburn) or Talent(roaring_blaze_talent) and { Charges(conflagrate) == 2 + ArmorSetBonus(T19 4) or Charges(conflagrate) >= 1 + ArmorSetBonus(T19 4) and SpellChargeCooldown(conflagrate) < GCD() or target.TimeToDie() < 24 } and Spell(conflagrate) or Talent(roaring_blaze_talent) and target.DebuffStacks(roaring_blaze_debuff) > 0 and target.DebuffRemaining(immolate_debuff) > target.DebuffDuration(immolate_debuff) * 0.3 and { Enemies() == 1 or SoulShards() < 3 } and SoulShards() < 5 and Spell(conflagrate) or not Talent(roaring_blaze_talent) and BuffStacks(backdraft_buff) < 3 and BuffRemaining(conflagration_of_chaos_buff) <= CastTime(chaos_bolt) and Spell(conflagrate) or not Talent(roaring_blaze_talent) and BuffStacks(backdraft_buff) < 3 and { Charges(conflagrate) == 1 + ArmorSetBonus(T19 4) and SpellChargeCooldown(conflagrate) < CastTime(chaos_bolt) or Charges(conflagrate) == 2 + ArmorSetBonus(T19 4) } and SoulShards() < 5 and Spell(conflagrate) or Talent(empowered_life_tap_talent) and BuffRemaining(empowered_life_tap_buff) <= GCD() and Spell(life_tap) or HasEquippedItem(144369) and not BuffPresent(lessons_of_spacetime_buff) and { not Talent(grimoire_of_supremacy_talent) and not SpellCooldown(summon_doomguard) > 0 or Talent(grimoire_of_service_talent) and not SpellCooldown(service_pet) > 0 or Talent(soul_harvest_talent) and not SpellCooldown(soul_harvest) > 0 } and Spell(dimensional_rift) or Spell(service_imp)
 		{
@@ -856,13 +876,11 @@ AddFunction DestructionDefaultCdPostConditions
 AddFunction DestructionPrecombatMainActions
 {
 	#augmentation,type=defiled
-	Spell(augmentation)
 	#snapshot_stats
 	#grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
 	if Talent(grimoire_of_sacrifice_talent) and pet.Present() Spell(grimoire_of_sacrifice)
 	#life_tap,if=talent.empowered_life_tap.enabled&!buff.empowered_life_tap.remains
 	if Talent(empowered_life_tap_talent) and not BuffPresent(empowered_life_tap_buff) Spell(life_tap)
-	#potion,name=prolonged_power
 	#chaos_bolt
 	Spell(chaos_bolt)
 }
@@ -881,7 +899,7 @@ AddFunction DestructionPrecombatShortCdActions
 
 AddFunction DestructionPrecombatShortCdPostConditions
 {
-	Spell(augmentation) or Talent(empowered_life_tap_talent) and not BuffPresent(empowered_life_tap_buff) and Spell(life_tap) or Spell(chaos_bolt)
+	Talent(empowered_life_tap_talent) and not BuffPresent(empowered_life_tap_buff) and Spell(life_tap) or Spell(chaos_bolt)
 }
 
 AddFunction DestructionPrecombatCdActions
@@ -894,12 +912,18 @@ AddFunction DestructionPrecombatCdActions
 		if Talent(grimoire_of_supremacy_talent) and Enemies() > 1 Spell(summon_infernal)
 		#summon_doomguard,if=talent.grimoire_of_supremacy.enabled&active_enemies=1&artifact.lord_of_flames.rank=0
 		if Talent(grimoire_of_supremacy_talent) and Enemies() == 1 and ArtifactTraitRank(lord_of_flames) == 0 Spell(summon_doomguard)
+
+		unless Talent(empowered_life_tap_talent) and not BuffPresent(empowered_life_tap_buff) and Spell(life_tap)
+		{
+			#potion,name=prolonged_power
+			if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
+		}
 	}
 }
 
 AddFunction DestructionPrecombatCdPostConditions
 {
-	not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_imp) or Spell(augmentation) or Talent(empowered_life_tap_talent) and not BuffPresent(empowered_life_tap_buff) and Spell(life_tap) or Spell(chaos_bolt)
+	not Talent(grimoire_of_supremacy_talent) and { not Talent(grimoire_of_sacrifice_talent) or BuffExpires(demonic_power_buff) } and not pet.Present() and Spell(summon_imp) or Talent(empowered_life_tap_talent) and not BuffPresent(empowered_life_tap_buff) and Spell(life_tap) or Spell(chaos_bolt)
 }
 
 ### Destruction icons.
@@ -965,7 +989,6 @@ AddIcon checkbox=opt_warlock_destruction_aoe help=cd specialization=destruction
 # 132379
 # 144369
 # arcane_torrent_mana
-# augmentation
 # backdraft_buff
 # berserking
 # blood_fury_sp
@@ -974,6 +997,7 @@ AddIcon checkbox=opt_warlock_destruction_aoe help=cd specialization=destruction
 # chaos_bolt
 # conflagrate
 # conflagration_of_chaos_buff
+# deadly_grace_potion
 # demonic_power_buff
 # dimensional_rift
 # doomguard
@@ -994,6 +1018,7 @@ AddIcon checkbox=opt_warlock_destruction_aoe help=cd specialization=destruction
 # life_tap
 # lord_of_flames
 # lord_of_flames_buff
+# prolonged_power_potion
 # rain_of_fire
 # roaring_blaze_debuff
 # roaring_blaze_talent
@@ -1002,6 +1027,7 @@ AddIcon checkbox=opt_warlock_destruction_aoe help=cd specialization=destruction
 # shadowburn
 # sindorei_spite_icd
 # soul_harvest
+# soul_harvest_buff
 # soul_harvest_talent
 # summon_doomguard
 # summon_imp
