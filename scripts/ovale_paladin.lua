@@ -12,6 +12,7 @@ Include(ovale_paladin_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=protection)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=protection)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=protection)
 
 AddFunction ProtectionSelfHealCondition
 {
@@ -98,7 +99,7 @@ AddFunction ProtectionDefaultCdActions
 	if not DebuffPresent(forbearance_debuff) and HealthPercent() < 15 Spell(lay_on_hands)
 
 	if Talent(knight_templar_talent) and ProtectionCooldownTreshold() Spell(divine_steed)
-	if ProtectionCooldownTreshold() Item(unbending_potion usable=1)
+	if ProtectionCooldownTreshold() and CheckBoxOn(opt_use_consumables) Item(unbending_potion usable=1)
 	if ProtectionCooldownTreshold() Spell(stoneform)
 }
 
