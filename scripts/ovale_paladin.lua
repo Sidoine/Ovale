@@ -91,6 +91,7 @@ AddFunction ProtectionDefaultCdActions
 	ProtectionInterruptActions()
 	if CheckBoxOn(opt_avenging_wrath) and (not Talent(seraphim_talent) or BuffPresent(seraphim_buff)) Spell(avenging_wrath_melee)
 	
+	if ProtectionCooldownTreshold() Spell(divine_protection)
 	if ProtectionCooldownTreshold() Spell(ardent_defender)
 	if ProtectionCooldownTreshold() Spell(aegis_of_light)
 	if ProtectionCooldownTreshold() Spell(guardian_of_ancient_kings)
