@@ -103,7 +103,7 @@ AddFunction ProtectionDefaultCdActions
 
 	if Talent(knight_templar_talent) and ProtectionCooldownTreshold() Spell(divine_steed)
 	if ProtectionCooldownTreshold() and CheckBoxOn(opt_use_consumables) Item(unbending_potion usable=1)
-	if ProtectionCooldownTreshold() Spell(stoneform)
+	if ProtectionCooldownTreshold() UseRacialSurvivalActions()
 }
 
 AddFunction ProtectionInterruptActions
