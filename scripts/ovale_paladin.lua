@@ -91,6 +91,9 @@ AddFunction ProtectionDefaultCdActions
 	ProtectionInterruptActions()
 	if CheckBoxOn(opt_avenging_wrath) and (not Talent(seraphim_talent) or BuffPresent(seraphim_buff)) Spell(avenging_wrath_melee)
 	
+	Item(Trinket0Slot usable=1 text=13)
+	Item(Trinket1Slot usable=1 text=14)
+	
 	if ProtectionCooldownTreshold() Spell(divine_protection)
 	if ProtectionCooldownTreshold() Spell(ardent_defender)
 	if ProtectionCooldownTreshold() Spell(aegis_of_light)
