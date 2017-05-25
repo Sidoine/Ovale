@@ -12,7 +12,6 @@ Include(ovale_paladin_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=protection)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=protection)
-AddCheckBox(opt_legendary_ring_tank ItemName(legendary_ring_bonus_armor) default specialization=protection)
 
 AddFunction ProtectionSelfHealCondition
 {
