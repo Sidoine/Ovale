@@ -176,6 +176,7 @@ AddFunction BrewmasterDefaultCdActions
 	Spell(dampen_harm)
 	if CheckBoxOn(opt_use_consumables) Item(unbending_potion usable=1)
 	Spell(zen_meditation)
+	UseRacialSurvivalActions()
 }
 
 AddFunction BrewmasterInterruptActions
