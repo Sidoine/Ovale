@@ -95,7 +95,7 @@ AddFunction ProtectionDefaultCdActions
 	if ProtectionCooldownTreshold() Spell(ardent_defender)
 	if ProtectionCooldownTreshold() Spell(aegis_of_light)
 	if ProtectionCooldownTreshold() Spell(guardian_of_ancient_kings)
-	if not DebuffPresent(forbearance_debuff) and Talent(final_stand_talent) and ProtectionCooldownTreshold() Spell(divine_shield)
+	if ProtectionCooldownTreshold() and Talent(final_stand_talent) Spell(divine_shield)
 	if not DebuffPresent(forbearance_debuff) and HealthPercent() < 15 Spell(lay_on_hands)
 
 	if Talent(knight_templar_talent) and ProtectionCooldownTreshold() Spell(divine_steed)
