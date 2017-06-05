@@ -35,10 +35,11 @@ AddFunction DisciplineDefaultMainActions
 AddFunction DisciplineDefaultCdActions
 {
 	if (not Talent(schism_talent) or not target.DebuffExpires(schism_debuff)) Spell(lights_wrath)
-	Spell(shadowfiend)
+	if Talent(mindbender_talent) Spell(mindbender)
+	Spell(power_infusion)
 	Item(Trinket0Slot usable=1 text=13)
 	Item(Trinket1Slot usable=1 text=14)
-	Spell(power_infusion)
+	Spell(shadowfiend)
 	Spell(rapture)
 }
 	
