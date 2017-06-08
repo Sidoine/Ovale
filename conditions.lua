@@ -51,6 +51,7 @@ local API_UnitCreatureFamily = UnitCreatureFamily
 local API_UnitCreatureType = UnitCreatureType
 local API_UnitDetailedThreatSituation = UnitDetailedThreatSituation
 local API_UnitExists = UnitExists
+local API_UnitInRaid = UnitInRaid
 local API_UnitIsDead = UnitIsDead
 local API_UnitIsFriend = UnitIsFriend
 local API_UnitIsPVP = UnitIsPVP
@@ -5291,4 +5292,21 @@ do
 	end
 	
 	OvaleCondition:RegisterCondition("race", false, Race)
+end
+
+do
+	--- Check if the unit is in raid
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @usage
+	-- if UnitInRaid(player) Spell(bloodlust)
+	local function UnitInRaid(positionalParams, namedParams, state, atTime)
+		local target = namedParams.target or "player"
+		local raidIndex = API_UnitInRaid(target)
+		
+		return TestBoolean(raidIndex ~= nul, "yes")
+	end
+	
+	OvaleCondition:RegisterCondition("unitinraid", false, UnitInRaid)
 end

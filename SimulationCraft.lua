@@ -1244,6 +1244,8 @@ local function InitializeDisambiguation()
 	AddDisambiguation("soul_effigy_agony", 		"agony", 						"WARLOCK",		"affliction")
 	-- Warrior
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_rage",			"WARRIOR")
+	AddDisambiguation("bladestorm",				"bladestorm_arms",				"WARRIOR",		"arms")
+	AddDisambiguation("bladestorm",				"bladestorm_fury",				"WARRIOR",		"fury")
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"WARRIOR")
 	AddDisambiguation("execute",				"execute_arms",					"WARRIOR",		"arms")
 	AddDisambiguation("legendary_ring",			"legendary_ring_bonus_armor",	"WARRIOR",		"protection")
@@ -1950,7 +1952,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			conditionCode = "CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff)"
 			annotation[action] = class
 		elseif class == "MONK" and action == "touch_of_death" then
-			conditionCode = "not CheckBoxOn(opt_touch_of_death_on_elite_only) or target.Classification(elite) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff)"
+			conditionCode = "(not CheckBoxOn(opt_touch_of_death_on_elite_only) or (not UnitInRaid() and target.Classification(elite)) or target.Classification(worldboss)) or not BuffExpires(hidden_masters_forbidden_touch_buff)"
 			annotation[action] = class
 			annotation.opt_touch_of_death_on_elite_only = "MONK"
 			AddSymbol(annotation, "hidden_masters_forbidden_touch_buff")
@@ -1978,7 +1980,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			-- Only suggest Righteous Fury if the check is toggled on.
 			conditionCode = "CheckBoxOn(opt_righteous_fury_check)"
 			annotation[action] = class
-		elseif class == "PRIEST" and action == "silence" then
+		elseif class == "PRIEST" and (action == "silence" or action == "mind_bomb") then
 			bodyCode = camelSpecialization .. "InterruptActions()"
 			annotation[action] = class
 			annotation.interrupt = class
@@ -2119,9 +2121,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			isSpellAction = false
 		elseif class == "WARRIOR" and action == "heroic_leap" then
 			-- Use Charge as a range-finder for Heroic Leap.
-			local spellName = "charge"
-			AddSymbol(annotation, spellName)
-			conditionCode = format("CheckBoxOn(opt_melee_range) and target.InRange(%s)", spellName)
+			conditionCode = "CheckBoxOn(opt_melee_range) and target.Distance(atLeast 8) and target.Distance(atMost 40)"
 		elseif class == "WARRIOR" and action == "pummel" then
 			bodyCode = camelSpecialization .. "InterruptActions()"
 			annotation[action] = class
@@ -3127,6 +3127,7 @@ do
 		["soul_shard"]			= "SoulShards()",
 		["soul_fragments"]		= "BuffStacks(soul_fragments)",
 		["ssw_refund_offset"]	= "target.Distance() % 3 - 1",
+		["stat.mastery_rating"]	= "MasteryRating()",
 		["stat.multistrike_pct"]= "MultistrikeChance()",
 		["stealthed"]			= "Stealthed()",
 		["stealthed.all"]		= "Stealthed()",
@@ -3734,9 +3735,9 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		end
 	elseif class == "DEMONHUNTER" and operand == "buff.metamorphosis.extended_by_demonic" then
 		-- the first time of each meta window eye beam extends the duration, all consecutive casts of eye beam don't anymore
-		-- how to implement that?
-		-- for now, just assume we never extend
-		code = "False()"
+		-- OvaleDemonHunterDemonic 	adds a hidden buff on the player whenever eye beam is used
+		-- 							casting metamorphosis will remove the buff on the player
+		code = "not BuffExpires(extended_by_demonic_buff)"
 	elseif class == "DEMONHUNTER" and operand == "cooldown.chaos_blades.ready" then
 		code = "Talent(chaos_blades_talent) and SpellCooldown(chaos_blades) == 0"
 		AddSymbol(annotation, "chaos_blades_talent")
@@ -3916,8 +3917,12 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		else
 			ok = false
 		end
+	elseif class == "WARRIOR" and operand == "gcd.remains" and (action == "battle_cry" or action == "avatar") then
+		-- Always assume the gcd is over
+		code = "0"
 	elseif class == "WARRIOR" and operand == "buff.revenge.react" then
 		code = "RageCost(revenge) == 0"
+		AddSymbol(annotation, "revenge")
 	elseif operand == "buff.enrage.down" then
 		code = "not " .. target .. "IsEnraged()"
 	elseif operand == "buff.enrage.remains" then
@@ -3986,6 +3991,12 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		code = format("List(opt_using_apl %s)", aplName)
 		annotation.using_apl = annotation.using_apl or {}
 		annotation.using_apl[aplName] = true
+	elseif operand == "cooldown.buff_sephuzs_secret.remains" then
+		code = "BuffCooldown(sephuzs_secret_buff)"
+		AddSymbol(annotation, "sephuzs_secret_buff")
+	elseif operand == "is_add" then
+		local t = target or "target."
+		code = format("not %sClassification(worldboss)", t)
 	else
 		ok = false
 	end
@@ -4088,7 +4099,6 @@ EmitOperandTrinket = function(operand, parseNode, nodeList, annotation, action)
 			local buffName = format("trinket_%s_%s_buff", procType, statName)
 			buffName = Disambiguate(buffName, annotation.class, annotation.specialization)
 			
-
 			if property == "cooldown" then
 				code = format("BuffCooldownDuration(%s)", buffName)
 			elseif property == "cooldown_remains" then
@@ -4440,6 +4450,7 @@ local function InsertInterruptFunctions(child, annotation)
 	end	
 	if annotation.silence == "PRIEST" then
 		tinsert(interrupts, {name = "silence", interrupt=1, worksOnBoss=1, order=10})
+		tinsert(interrupts, {name = "mind_bomb", stun=1, order=30, extraCondition="target.RemainingCastTime() > 2"})
 	end
 	if annotation.kick == "ROGUE" then
 		tinsert(interrupts, {name = "kick", interrupt=1, worksOnBoss=1, order=10})
@@ -4739,7 +4750,7 @@ local function InsertSupportingFunctions(child, annotation)
 				if CheckBoxOn(opt_melee_range)
 				{
 					if target.InRange(charge) Spell(charge)
-					if target.InRange(charge) Spell(heroic_leap)
+					if SpellCharges(charge) == 0 and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
 					if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
 				}
 			}

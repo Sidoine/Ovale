@@ -12,7 +12,7 @@ Include(ovale_paladin_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=protection)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=protection)
-AddCheckBox(opt_legendary_ring_tank ItemName(legendary_ring_bonus_armor) default specialization=protection)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=protection)
 
 AddFunction ProtectionSelfHealCondition
 {
@@ -50,12 +50,15 @@ AddFunction ProtectionDefaultShortCDActions
 
 	ProtectionGetInMeleeRange()
 	
-	#shield_of_the_righteous,if=(!talent.seraphim.enabled|action.shield_of_the_righteous.charges>2)&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
-	if { not Talent(seraphim_talent) or Charges(shield_of_the_righteous) > 2 } and not ProtectionHasProtectiveCooldown() Spell(shield_of_the_righteous)
-	#shield_of_the_righteous,if=(talent.bastion_of_light.enabled&talent.seraphim.enabled&buff.seraphim.up&cooldown.bastion_of_light.up)&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
-	if Talent(bastion_of_light_talent) and Talent(seraphim_talent) and BuffPresent(seraphim_buff) and not SpellCooldown(bastion_of_light) > 0 and not ProtectionHasProtectiveCooldown() Spell(shield_of_the_righteous)
-	#shield_of_the_righteous,if=(talent.bastion_of_light.enabled&!talent.seraphim.enabled&cooldown.bastion_of_light.up)&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
-	if Talent(bastion_of_light_talent) and not Talent(seraphim_talent) and not SpellCooldown(bastion_of_light) > 0 and not ProtectionHasProtectiveCooldown() Spell(shield_of_the_righteous)
+	if ((Charges(shield_of_the_righteous) >= 2) or (Charges(shield_of_the_righteous) >= 1 and BuffRemaining(shield_of_the_righteous_buff) > SpellChargeCooldown(shield_of_the_righteous))) 
+	{
+		#shield_of_the_righteous,if=(!talent.seraphim.enabled|action.shield_of_the_righteous.charges>2)&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
+		if { not Talent(seraphim_talent) or Charges(shield_of_the_righteous) > 2 } and not ProtectionHasProtectiveCooldown() Spell(shield_of_the_righteous)
+		#shield_of_the_righteous,if=(talent.bastion_of_light.enabled&talent.seraphim.enabled&buff.seraphim.up&cooldown.bastion_of_light.up)&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
+		if Talent(bastion_of_light_talent) and Talent(seraphim_talent) and BuffPresent(seraphim_buff) and not SpellCooldown(bastion_of_light) > 0 and not ProtectionHasProtectiveCooldown() Spell(shield_of_the_righteous)
+		#shield_of_the_righteous,if=(talent.bastion_of_light.enabled&!talent.seraphim.enabled&cooldown.bastion_of_light.up)&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
+		if Talent(bastion_of_light_talent) and not Talent(seraphim_talent) and not SpellCooldown(bastion_of_light) > 0 and not ProtectionHasProtectiveCooldown() Spell(shield_of_the_righteous)
+	}
 }
 
 AddFunction ProtectionDefaultMainActions
@@ -91,15 +94,19 @@ AddFunction ProtectionDefaultCdActions
 	ProtectionInterruptActions()
 	if CheckBoxOn(opt_avenging_wrath) and (not Talent(seraphim_talent) or BuffPresent(seraphim_buff)) Spell(avenging_wrath_melee)
 	
+	Item(Trinket0Slot usable=1 text=13)
+	Item(Trinket1Slot usable=1 text=14)
+	
+	if ProtectionCooldownTreshold() Spell(divine_protection)
 	if ProtectionCooldownTreshold() Spell(ardent_defender)
-	if ProtectionCooldownTreshold() Spell(aegis_of_light)
 	if ProtectionCooldownTreshold() Spell(guardian_of_ancient_kings)
-	if not DebuffPresent(forbearance_debuff) and Talent(final_stand_talent) and ProtectionCooldownTreshold() Spell(divine_shield)
+	if ProtectionCooldownTreshold() Spell(aegis_of_light)
+	if ProtectionCooldownTreshold() and Talent(final_stand_talent) Spell(divine_shield)
 	if not DebuffPresent(forbearance_debuff) and HealthPercent() < 15 Spell(lay_on_hands)
 
 	if Talent(knight_templar_talent) and ProtectionCooldownTreshold() Spell(divine_steed)
-	if ProtectionCooldownTreshold() Item(unbending_potion usable=1)
-	if ProtectionCooldownTreshold() Spell(stoneform)
+	if ProtectionCooldownTreshold() and CheckBoxOn(opt_use_consumables) Item(unbending_potion usable=1)
+	if ProtectionCooldownTreshold() UseRacialSurvivalActions()
 }
 
 AddFunction ProtectionInterruptActions
