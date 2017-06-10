@@ -185,6 +185,8 @@ AddFunction ShadowDefaultCdActions
 	if { BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 80 or target.HealthPercent() < 35 and SpellCooldown(power_infusion) < 30 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
 	#silence
 	ShadowInterruptActions()
+	#use_items,if=buff.voidform.up
+	if BuffPresent(voidform_buff) ShadowUseItemActions()
 	#call_action_list,name=check,if=talent.surrender_to_madness.enabled&!buff.surrender_to_madness.up
 	if Talent(surrender_to_madness_talent) and not BuffPresent(surrender_to_madness_buff) ShadowCheckCdActions()
 
