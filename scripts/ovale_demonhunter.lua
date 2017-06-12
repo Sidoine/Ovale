@@ -82,7 +82,7 @@ AddFunction VengeanceDefaultMainActions
 		and (not Talent(fel_devastation_talent) or (SpellCooldown(fel_devastation) <= 4 and Pain() >= 30)) 
 		and target.TimeToDie() >= 8
 	) Spell(fiery_brand)
-	if (not target.BuffExpires(fiery_demise_debuff))
+	if (not target.DebuffExpires(fiery_demise_debuff))
 	{
 		if (PainDeficit() > 10) Spell(immolation_aura)
 		Spell(soul_carver)

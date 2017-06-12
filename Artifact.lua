@@ -29,6 +29,7 @@ function OvaleArtifact:OnInitialize()
 end
 
 function OvaleArtifact:OnEnable()
+	self:RegisterEvent("SPELLS_CHANGED", "UpdateTraits")
     LibArtifactData.RegisterCallback(OvaleArtifact, "ARTIFACT_ADDED", "UpdateTraits")
     LibArtifactData.RegisterCallback(OvaleArtifact, "ARTIFACT_EQUIPPED_CHANGED", "UpdateTraits")
     LibArtifactData.RegisterCallback(OvaleArtifact, "ARTIFACT_ACTIVE_CHANGED", "UpdateTraits")
@@ -40,6 +41,7 @@ function OvaleArtifact:OnDisable()
     LibArtifactData.UnregisterCallback(OvaleArtifact, "ARTIFACT_EQUIPPED_CHANGED")
     LibArtifactData.UnregisterCallback(OvaleArtifact, "ARTIFACT_ACTIVE_CHANGED")
     LibArtifactData.UnregisterCallback(OvaleArtifact, "ARTIFACT_TRAITS_CHANGED")
+	self:UnregisterEvent("SPELLS_CHANGED")
 end
 
 function OvaleArtifact:UpdateTraits(message)
