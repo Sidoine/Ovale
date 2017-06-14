@@ -70,7 +70,7 @@ Define(extended_by_demonic_buff -22547) # OvaleDemonHunterDemonic
 Define(felblade 232893)
 	SpellInfo(felblade cd=15 tag=main cd_haste=melee fury=-30 pain=-20)
 Define(fel_barrage 211053)
-	SpellInfo(fel_barrage cd=30 charges=5 tag=main)
+	SpellInfo(fel_barrage cd=60 tag=main)
 Define(fel_devastation 212084)
 	SpellInfo(fel_devastation cd=60)
 	SpellInfo(fel_devastation pain=30)
