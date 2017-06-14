@@ -87,13 +87,14 @@ AddFunction BrewmasterDefaultShortCDActions
 
 AddFunction BrewmasterDefaultMainActions
 {
-	Spell(keg_smash)
-	if EnergyDeficit() <= 35 Spell(tiger_palm)
-	unless EnergyDeficit() <= 35
+	if Talent(blackout_combo_talent) BrewmasterBlackoutComboMainActions()
+	unless Talent(blackout_combo_talent) 
 	{
+		Spell(keg_smash)
 		Spell(blackout_strike)
-		Spell(rushing_jade_wind)
 		if target.DebuffPresent(keg_smash_debuff) Spell(breath_of_fire)
+		if BuffRefreshable(rushing_jade_wind_buff) Spell(rushing_jade_wind)
+		if EnergyDeficit() <= 35 Spell(tiger_palm)
 		Spell(chi_burst)
 		Spell(chi_wave)
 		Spell(exploding_keg)
@@ -102,23 +103,17 @@ AddFunction BrewmasterDefaultMainActions
 
 AddFunction BrewmasterBlackoutComboMainActions
 {
+	Spell(keg_smash)
 	if(not BuffPresent(blackout_combo_buff)) Spell(blackout_strike)
-	if(BuffPresent(blackout_combo_buff)) 
-	{
-		Spell(keg_smash)
-		unless (SpellCooldown(keg_smash) < GCD())
-		{
-			Spell(breath_of_fire)
-			Spell(tiger_palm)
-		}
-	}
+	if(BuffPresent(blackout_combo_buff)) Spell(tiger_palm)
 	
-	unless (BuffPresent(blackout_combo_buff)) 
+	unless BuffPresent(blackout_combo_buff)
 	{
-		Spell(rushing_jade_wind)
+		if target.DebuffPresent(keg_smash_debuff) Spell(breath_of_fire)
+		if BuffRefreshable(rushing_jade_wind_buff) Spell(rushing_jade_wind)
+		if EnergyDeficit() <= 35 Spell(tiger_palm)
 		Spell(chi_burst)
 		Spell(chi_wave)
-		if EnergyDeficit() <= 35 Spell(tiger_palm)
 		Spell(exploding_keg)
 	}
 }
@@ -129,17 +124,14 @@ AddFunction BrewmasterBlackoutComboMainActions
 
 AddFunction BrewmasterDefaultAoEActions
 {
-	Spell(exploding_keg)
+	if (Talent(blackout_combo) and not BuffPresent(blackout_combo_buff)) Spell(blackout_strike)
 	Spell(keg_smash)
 	Spell(chi_burst)
 	Spell(chi_wave)
 	if target.DebuffPresent(keg_smash_debuff) Spell(breath_of_fire)
-	Spell(rushing_jade_wind)
+	if BuffRefreshable(rushing_jade_wind_buff) Spell(rushing_jade_wind)
 	if EnergyDeficit() <= 35 Spell(tiger_palm)
-	unless EnergyDeficit() <= 35
-	{
-		Spell(blackout_strike)
-	}
+	Spell(blackout_strike)
 }
 
 AddFunction BrewmasterBlackoutComboAoEActions
@@ -198,20 +190,12 @@ AddIcon help=shortcd specialization=brewmaster
 
 AddIcon enemies=1 help=main specialization=brewmaster
 {
-	if Talent(blackout_combo_talent) BrewmasterBlackoutComboMainActions()
-	unless Talent(blackout_combo_talent) 
-	{
-		BrewmasterDefaultMainActions()
-	}
+	BrewmasterDefaultMainActions()
 }
 
 AddIcon checkbox=opt_monk_bm_aoe help=aoe specialization=brewmaster
 {
-	if Talent(blackout_combo_talent) BrewmasterBlackoutComboAoEActions()
-	unless Talent(blackout_combo_talent) 
-	{
-		BrewmasterDefaultAoEActions()
-	}
+	BrewmasterDefaultAoEActions()
 }
 
 AddIcon help=cd specialization=brewmaster
