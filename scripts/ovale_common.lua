@@ -79,6 +79,7 @@ Define(draught_of_souls 140808)
 Define(gnawed_thumb_ring 134526)
 	ItemInfo(gnawed_thumb_ring cd=180)
 Define(nightwell_energy_buff 214572)
+Define(specter_of_betrayal 151190)
 
 
 ###
