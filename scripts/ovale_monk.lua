@@ -17,11 +17,6 @@ AddCheckBox(opt_legendary_ring_tank ItemName(legendary_ring_bonus_armor) default
 AddCheckBox(opt_monk_bm_aoe L(AOE) default specialization=brewmaster)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=brewmaster)
 
-AddFunction BrewmasterExpelHarmOffensivelyPreConditions
-{
-	(SpellCount(expel_harm) >= 3 and (SpellCount(expel_harm) * 7.5 * AttackPower() * 2.65) <= HealthMissing()) and Spell(expel_harm)
-}
-
 AddFunction BrewmasterHealMe
 {
 	if (HealthPercent() < 35) Spell(healing_elixir)
