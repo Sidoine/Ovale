@@ -189,8 +189,10 @@ Define(power_strikes_talent 7)
 Define(purifying_brew 119582)
 	SpellInfo(purifying_brew cd=21 charges=3 gcd=0 offgcd=1 cd_haste=melee)
 	SpellInfo(purifying_brew cd=18 charges=4 gcd=0 offgcd=1 cd_haste=melee talent=light_brewing_talent)
+	SpellInfo(purifying_brew unusable=1)
 	SpellAddBuff(purifying_brew elusive_dance_buff=1 talent=elusive_dance_talent)
 	SpellAddBuff(purifying_brew brew_stache_buff=1 trait=brew_stache_trait)
+	SpellRequire(purifying_brew unusable 0=debuff,any_stagger_debuff)
 Define(refreshing_jade_wind 196725)
 	SpellInfo(refreshing_jade_wind cd=6 mana=5)
 Define(refreshing_jade_wind_talent 16)
@@ -297,6 +299,9 @@ Define(zen_sphere 124081)
 Define(zen_sphere_buff 124081)
 	SpellInfo(zen_sphere_buff duration=16 haste=spell tick=2)
 Define(zen_sphere_talent 5)
+
+# Stagger
+SpellList(any_stagger_debuff light_stagger_debuff moderate_stagger_debuff heavy_stagger_debuff)
 
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(chi_brew tag=main)

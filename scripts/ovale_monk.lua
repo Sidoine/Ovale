@@ -42,7 +42,7 @@ AddFunction BrewmasterRangeCheck
 AddFunction BrewmasterDefaultShortCDActions
 {
 	# keep stagger below 100%
-	if (StaggerPercentage() > 100 and SpellCharges(purifying_brew) > 0) Spell(purifying_brew)
+	if (StaggerPercentage() > 100) Spell(purifying_brew)
 	# use black_ox_brew when at 0 charges but delay it when a charge is about to come off cd
 	if ((SpellCharges(purifying_brew) == 0) and (SpellChargeCooldown(purifying_brew) > 2 or StaggerPercentage() > 100)) Spell(black_ox_brew)
 	# heal me
