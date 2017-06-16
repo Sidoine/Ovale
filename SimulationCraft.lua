@@ -1664,6 +1664,7 @@ local EmitOperandSeal = nil
 local EmitOperandSetBonus = nil
 local EmitOperandSpecial = nil
 local EmitOperandTalent = nil
+local EmitOperandTarget = nil
 local EmitOperandTotem = nil
 local EmitOperandTrinket = nil
 
@@ -2711,11 +2712,16 @@ EmitOperand = function(parseNode, nodeList, annotation, action)
 	local token = strmatch(operand, OPERAND_TOKEN_PATTERN)	-- peek
 	local target
 	if token == "target" then
-		target = token
-		operand = strsub(operand, strlen(target) + 2)		-- consume
-		token = strmatch(operand, OPERAND_TOKEN_PATTERN)	-- peek
+		ok, node = EmitOperandTarget(operand, parseNode, nodeList, annotation, action)
+		if not ok then
+			target = token
+			operand = strsub(operand, strlen(target) + 2)		-- consume
+			token = strmatch(operand, OPERAND_TOKEN_PATTERN)	-- peek
+		end
 	end
-	ok, node = EmitOperandRune(operand, parseNode, nodeList, annotation, action)
+	if not ok then
+		ok, node = EmitOperandRune(operand, parseNode, nodeList, annotation, action)
+	end
 	if not ok then
 		ok, node = EmitOperandSpecial(operand, parseNode, nodeList, annotation, action, target)
 	end
@@ -4045,6 +4051,31 @@ EmitOperandTalent = function(operand, parseNode, nodeList, annotation, action)
 			annotation.astAnnotation = annotation.astAnnotation or {}
 			node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
 			AddSymbol(annotation, talentName)
+		end
+	else
+		ok = false
+	end
+
+	return ok, node
+end
+
+EmitOperandTarget = function(operand, parseNode, nodeList, annotation, action)
+	local ok = true
+	local node
+
+	local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
+	local token = tokenIterator()
+	if token == "target" then
+		local property = tokenIterator()
+		local code
+		if property == "adds" then
+			code = "Enemies()-1"
+		else
+			ok = false
+		end
+		if ok and code then
+			annotation.astAnnotation = annotation.astAnnotation or {}
+			node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
 		end
 	else
 		ok = false
