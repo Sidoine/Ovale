@@ -623,6 +623,12 @@ AddFunction EnhancementInterruptActions
 	}
 }
 
+AddFunction EnhancementUseItemActions
+{
+	Item(Trinket0Slot text=13 usable=1)
+	Item(Trinket1Slot text=14 usable=1)
+}
+
 AddFunction EnhancementBloodlust
 {
 	if CheckBoxOn(opt_bloodlust) and DebuffExpires(burst_haste_debuff any=1)

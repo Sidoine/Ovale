@@ -2207,7 +2207,7 @@ EmitAction = function(parseNode, nodeList, annotation)
 			isSpellAction = false
 		elseif action == "use_items" then
 			bodyCode = camelSpecialization .. "UseItemActions()"
-			annotation[action] = true
+			annotation["use_item"] = true
 			isSpellAction = false
 		elseif action == "use_item" then
 			local legendaryRing = false
