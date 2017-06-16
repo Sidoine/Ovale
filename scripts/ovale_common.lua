@@ -79,6 +79,7 @@ Define(draught_of_souls 140808)
 Define(gnawed_thumb_ring 134526)
 	ItemInfo(gnawed_thumb_ring cd=180)
 Define(nightwell_energy_buff 214572)
+Define(specter_of_betrayal 151190)
 
 
 ###
@@ -142,8 +143,8 @@ Define(arcane_torrent_rage 69179)
 Define(arcane_torrent_runicpower 50613)
 	SpellInfo(arcane_torrent_runicpower cd=120 runicpower=-20)
 Define(arcane_torrent_dh 202719)
-	SpellInfo(arcane_torrent_pain cd=120 pain=-15 specialization=vengeance)
-	SpellInfo(arcane_torrent_pain cd=120 fury=-15 specialization=havoc)
+	SpellInfo(arcane_torrent_dh cd=120 pain=-15 specialization=vengeance)
+	SpellInfo(arcane_torrent_dh cd=120 fury=-15 specialization=havoc)
 Define(berserking 26297)
 	SpellInfo(berserking cd=180)
 	SpellAddBuff(berserking berserking_buff=1)

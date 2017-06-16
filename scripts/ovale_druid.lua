@@ -39,7 +39,6 @@ AddFunction GuardianDefaultShortCDActions
 	GuardianHealMe()
 	if InCombat() and BuffExpires(bristling_fur_buff)
 	{
-		if IncomingDamage(10 physical=1) < IncomingDamage(10 magic=1) and BuffRefreshable(mark_of_ursol_buff) Spell(mark_of_ursol)
 		if IncomingDamage(3 physical=1) Spell(ironfur)
 	}
 	if BuffExpires(survival_instincts_buff) and BuffExpires(rage_of_the_sleeper_buff) and BuffExpires(barkskin_buff) Spell(bristling_fur)

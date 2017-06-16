@@ -650,6 +650,10 @@ function OvaleData:GetBaseDuration(auraId, spellcast)
 			duration = duration + si.adddurationholy * (holy - 1)
 		end
 	end
+	if si and si.haste and spellcast then
+		local multiplier = spellcast:GetHasteMultiplier(si.haste)
+		duration = duration / multiplier
+	end
 	return duration
 end
 

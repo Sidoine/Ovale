@@ -70,7 +70,6 @@ AddFunction ProtectionDefaultMainActions
 	if Talent(crusaders_judgment_talent) and BuffPresent(grand_crusader_buff) Spell(avengers_shield)
 	if Speed() == 0 and not Talent(consecrated_hammer_talent) and not BuffPresent(consecration_buff) Spell(consecration)
 	Spell(avengers_shield)
-	Spell(blinding_light)
 	if Speed() == 0 Spell(consecration)
 	Spell(hammer_of_the_righteous)
 }
@@ -83,7 +82,6 @@ AddFunction ProtectionDefaultAoEActions
 	if Speed() == 0 and not Talent(consecrated_hammer_talent) and not BuffPresent(consecration_buff) Spell(consecration)
 	if Talent(blessed_hammer_talent) Spell(blessed_hammer)
 	Spell(judgment)
-	Spell(blinding_light)
 	if Speed() == 0 Spell(consecration)
 	Spell(hammer_of_the_righteous)
 }
