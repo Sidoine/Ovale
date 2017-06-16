@@ -257,7 +257,7 @@ function OvaleCooldown:RequireCooldownHandler(spellId, atTime, requirement, toke
 		local cd = self:GetCD(cdSpellId)
 		verified = cd.duration > 0
 		local result = verified and "passed" or "FAILED"
-		self:Log("    Require spell %s with cooldown at time=%f: %s (duration = %f)", cdSpellId, atTime, result, duration)
+		self:Log("    Require spell %s with cooldown at time=%f: %s (duration = %f)", cdSpellId, atTime, result, cd.duration)
 	else
 		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a spell argument.", requirement)
 	end
