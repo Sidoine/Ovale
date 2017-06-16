@@ -44,7 +44,6 @@ local SPELL_NAME_TO_STANCE = {
 	[API_GetSpellInfo( 24858)] = "druid_moonkin_form",
 	[API_GetSpellInfo( 33943)] = "druid_flight_form",
 	[API_GetSpellInfo( 40120)] = "druid_swift_flight_form",
-	[API_GetSpellInfo(171745)] = "druid_claws_of_shirvallah",
 	-- Rogue
 	[API_GetSpellInfo(  1784)] = "rogue_stealth"
 }
