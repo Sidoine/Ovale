@@ -5310,3 +5310,16 @@ do
 	
 	OvaleCondition:RegisterCondition("unitinraid", false, UnitInRaid)
 end
+
+do
+	--- Check the amount of Soul Fragments for Vengeance DH
+	-- @usage
+	-- if SoulFragments() > 3 Spell(spirit_bomb)
+	local function SoulFragments(positionalParams, namedParams, state, atTime)
+		local comparator, limit = positionalParams[1], positionalParams[2]
+		local value = state:SoulFragments(atTime)
+		return Compare(value, comparator, limit)
+	end
+	
+	OvaleCondition:RegisterCondition("soulfragments", false, SoulFragments)
+end
