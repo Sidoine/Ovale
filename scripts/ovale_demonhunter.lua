@@ -90,7 +90,7 @@ AddFunction VengeanceDefaultMainActions
 	}
 	
 	# Regular rotation
-	Spell(soul_carver)
+	if (target.TimeToDie() > 5) Spell(soul_carver)
 	if (VengeancePlayOffensively() and (not HasArtifactTrait(fiery_demise) or SpellCooldownDuration(fel_devastation) < SpellCooldown(fiery_brand))) Spell(fel_devastation)
 	if (Pain() >= 70) Spell(fracture)
 	if (Pain() >= 70) Spell(soul_cleave)
@@ -108,7 +108,7 @@ AddFunction VengeanceDefaultAoEActions
 	VengeanceHealMe()
 	
 	if (VengeancePlayOffensively() and Talent(razor_spikes_talent) and not BuffExpires(demon_spikes_buff)) Spell(soul_cleave)
-	Spell(soul_carver)
+	if (target.TimeToDie() > 5) Spell(soul_carver)
 	if (VengeancePlayOffensively()) Spell(fel_devastation)
 	if (SoulFragments() >= 5-Talent(fracture_talent) or target.DebuffRefreshable(frailty_debuff)) Spell(spirit_bomb)
 	if (Pain() >= 70) Spell(fracture)
