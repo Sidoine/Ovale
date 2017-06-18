@@ -110,7 +110,7 @@ AddFunction VengeanceDefaultAoEActions
 	if (VengeancePlayOffensively() and Talent(razor_spikes_talent) and not BuffExpires(demon_spikes_buff)) Spell(soul_cleave)
 	if (target.TimeToDie() > 5) Spell(soul_carver)
 	if (VengeancePlayOffensively()) Spell(fel_devastation)
-	if (SoulFragments() >= 5-Talent(fracture_talent) or target.DebuffRefreshable(frailty_debuff)) Spell(spirit_bomb)
+	if (VengeancePlayDefensively() and target.DebuffRefreshable(frailty_debuff) or SoulFragments() >= 5-Talent(fracture_talent)) Spell(spirit_bomb)
 	if (Pain() >= 70) Spell(fracture)
 	if (Pain() >= 70) Spell(soul_cleave)
 	if (VengeanceInfernalStrike()) Spell(infernal_strike)
