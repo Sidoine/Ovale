@@ -42,6 +42,12 @@ local SOUL_FRAGMENTS_BUFF_ID = 228477
 local SOUL_FRAGMENTS_SPELL_HEAL_ID = 203794
 local SOUL_FRAGMENTS_SPELL_CAST_SUCCESS_ID = 204255
 
+local SOUL_FRAGMENT_FINISHERS = {
+	[228477] = true, -- Soul Cleave
+	[247454] = true, -- Spirit Bomb
+	[227225] = true, -- Soul Barrier
+}
+
 function OvaleDemonHunterSoulFragments:PLAYER_REGEN_ENABLED()
 	self:SetCurrentSoulFragments()
 end
@@ -63,6 +69,10 @@ function OvaleDemonHunterSoulFragments:COMBAT_LOG_EVENT_UNFILTERED( event, _, su
 		
 		if subtype == "SPELL_CAST_SUCCESS" and spellID == SOUL_FRAGMENTS_SPELL_CAST_SUCCESS_ID then
 			self:SetCurrentSoulFragments(self.last_soul_fragment_count.fragments+1)
+		end
+		
+		if subtype == "SPELL_CAST_SUCCESS" and SOUL_FRAGMENT_FINISHERS[spellID] then
+			self:SetCurrentSoulFragments(0)
 		end
     end
 	
