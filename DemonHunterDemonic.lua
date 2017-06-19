@@ -2,15 +2,6 @@ local OVALE, Ovale = ...
 local OvaleDemonHunterDemonic = Ovale:NewModule("OvaleDemonHunterDemonic", "AceEvent-3.0")
 Ovale.OvaleDemonHunterDemonic = OvaleDemonHunterDemonic
 
---[[
-	Charge will generate rage the first time that it is used against a new target,
-	and then subsequent charges to the same target no longer generate rage.
-
-	Add a hidden debuff on a target when it has been the target of a Charge.
-	Remove the debuff from the existing target when the warrior uses Charge on a
-	new target.
---]]
-
 -- Forward declarations for module dependencies.
 local OvaleDebug = nil
 local OvaleAura = nil

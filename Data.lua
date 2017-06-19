@@ -651,8 +651,8 @@ function OvaleData:GetBaseDuration(auraId, spellcast)
 		end
 	end
 	if si and si.haste and spellcast then
-		local multiplier = spellcast:GetHasteMultiplier(si.haste)
-		duration = duration / multiplier
+		local hasteMultiplier = OvalePaperDoll:GetHasteMultiplier(si.haste, spellcast)
+		duration = duration / hasteMultiplier
 	end
 	return duration
 end

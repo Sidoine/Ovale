@@ -63,12 +63,13 @@ BossMod.lua
 DamageTaken.lua
 DataBroker.lua
 DemonHunterDemonic.lua
+DemonHunterSigils.lua
+DemonHunterSoulFragments.lua
 Enemies.lua
 HonorAmongThieves.lua
 PassiveAura.lua
 Recount.lua
 ShadowWordDeath.lua
-Sigils.lua
 Skada.lua
 SpellDamage.lua
 SteadyFocus.lua
