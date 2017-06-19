@@ -98,13 +98,6 @@ function OvaleDemonHunterSoulFragments:SetCurrentSoulFragments(count)
 	tinsert(self.soul_fragments, entry)
 end
 
-function OvaleDemonHunterSoulFragments:Ovale_AuraAdded(event, timestamp, target, auraId, caster)
-	local me = Ovale.playerGUID
-	if target == me then
-		local aura = OvaleAura:GetAura("player", auraId, "HELPFUL", true)
-	end
-end
-
 -- /run Ovale.OvaleDemonHunterSoulFragments:DebugSoulFragments()
 -- /dump Ovale.OvaleDemonHunterSoulFragments.soul_fragments
 function OvaleDemonHunterSoulFragments:DebugSoulFragments()
