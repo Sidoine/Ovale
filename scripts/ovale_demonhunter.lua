@@ -86,7 +86,6 @@ AddFunction VengeanceDefaultMainActions
 		if (VengeanceSigilOfFlame()) Spell(sigil_of_flame)
 		if (VengeanceInfernalStrike()) Spell(infernal_strike)
 		Spell(fel_eruption)
-		Spell(spirit_bomb)
 	}
 	
 	# Regular rotation
