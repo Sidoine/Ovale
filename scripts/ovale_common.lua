@@ -57,6 +57,7 @@ Define(old_war_potion 127844)
 Define(prolonged_power_potion 142117)
 Define(unbending_potion 127845)
 
+Define(prolonged_power_buff 229206)
 Define(unbending_potion_buff 188029)
 SpellList(potion_buff unbending_potion_buff)
 

@@ -2747,6 +2747,8 @@ EmitOperand = function(parseNode, nodeList, annotation, action)
 			ok, node = EmitOperandArtifact(operand, parseNode, nodeList, annotation, action, target)
 		elseif token == "buff" then
 			ok, node = EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target)
+		elseif token == "consumable" then
+			ok, node = EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target)
 		elseif token == "cooldown" then
 			ok, node = EmitOperandCooldown(operand, parseNode, nodeList, annotation, action)
 		elseif token == "debuff" then
@@ -2997,9 +2999,10 @@ EmitOperandBuff = function(operand, parseNode, nodeList, annotation, action, tar
 
 	local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
 	local token = tokenIterator()
-	if token == "aura" or token == "buff" or token == "debuff" then
+	if token == "aura" or token == "buff" or token == "debuff" or token == "consumable" then
 		local name = tokenIterator()
 		local property = tokenIterator()
+		if(token == "consumable" and property == nil) then property = "remains" end
 		name = Disambiguate(name, annotation.class, annotation.specialization)
 		local buffName = (token == "debuff") and name .. "_debuff" or name .. "_buff"
 		buffName = Disambiguate(buffName, annotation.class, annotation.specialization)
