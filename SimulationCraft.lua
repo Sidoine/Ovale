@@ -3134,7 +3134,7 @@ do
 		["sigil_placed"]		= "SigilCharging(flame)",
 		["solar_max"]			= "TimeToEclipse(solar)",	-- XXX
 		["soul_shard"]			= "SoulShards()",
-		["soul_fragments"]		= "BuffStacks(soul_fragments)",
+		["soul_fragments"]		= "SoulFragments()",
 		["ssw_refund_offset"]	= "target.Distance() % 3 - 1",
 		["stat.mastery_rating"]	= "MasteryRating()",
 		["stat.multistrike_pct"]= "MultistrikeChance()",
