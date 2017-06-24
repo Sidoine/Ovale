@@ -423,6 +423,9 @@ do
 	-- @param excludeTarget Optional. Sets whether to ignore the current target when scanning targets.
 	--     Defaults to excludeTarget=0.
 	--     Valid values: 0, 1.
+	-- @param count Optional. Sets whether a count or a fractional value is returned.
+	--     Defaults to count=1.
+	--     Valid values: 0, 1.
 	-- @return The total aura count.
 	-- @return A boolean value for the result of the comparison.
 	-- @see DebuffCountOnAny
@@ -431,9 +434,10 @@ do
 		local auraId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
 		local _, filter, mine = ParseCondition(positionalParams, namedParams, state)
 		local excludeUnitId = (namedParams.excludeTarget == 1) and state.defaultTarget or nil
+		local fractional = (namedParams.count == 0) and true or false
 
 		local count, stacks, startChangeCount, endingChangeCount, startFirst, endingLast = state:AuraCount(auraId, filter, mine, namedParams.stacks, atTime, excludeUnitId)
-		if count > 0 and startChangeCount < INFINITY then
+		if count > 0 and startChangeCount < INFINITY and fractional then
 			local origin = startChangeCount
 			local rate = -1 / (endingChangeCount - startChangeCount)
 			local start, ending = startFirst, endingLast
