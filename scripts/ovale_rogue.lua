@@ -21,7 +21,7 @@ Include(ovale_rogue_spells)
 
 AddFunction energy_regen_combined
 {
-	EnergyRegenRate() + { DebuffCountOnAny(rupture_debuff) + DebuffCountOnAny(garrote_debuff) } * { 7 + TalentPoints(venom_rush_talent) * 3 } / 2
+	EnergyRegenRate() + { DebuffCountOnAny(rupture_debuff) + DebuffCountOnAny(garrote_debuff) + Talent(internal_bleeding_talent) * DebuffCountOnAny(internal_bleeding_debuff) } * { 7 + TalentPoints(venom_rush_talent) * 3 } / 2
 }
 
 AddFunction energy_time_to_max_combined
@@ -513,6 +513,8 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # hemorrhage
 # hemorrhage_debuff
 # insignia_of_ravenholdt
+# internal_bleeding_debuff
+# internal_bleeding_talent
 # kick
 # kidney_shot
 # kingsbane

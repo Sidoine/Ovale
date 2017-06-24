@@ -3878,9 +3878,11 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		code = "0" 
 	elseif class == "ROGUE" and operand == "poisoned_bleeds" then
 		-- TODO Need to track the number of poisoned enemies
-		code = "DebuffCountOnAny(rupture_debuff) + DebuffCountOnAny(garrote_debuff)"
+		code = "DebuffCountOnAny(rupture_debuff) + DebuffCountOnAny(garrote_debuff) + Talent(internal_bleeding_talent) * DebuffCountOnAny(internal_bleeding_debuff)"
 		AddSymbol(annotation, "rupture_debuff")
 		AddSymbol(annotation, "garrote_debuff")
+		AddSymbol(annotation, "internal_bleeding_talent")
+		AddSymbol(annotation, "internal_bleeding_debuff")
 	elseif class == "ROGUE" and operand == "exsanguinated" then
 		code = "target.DebuffPresent(exsanguinated)"
 		AddSymbol(annotation, "exsanguinated")
