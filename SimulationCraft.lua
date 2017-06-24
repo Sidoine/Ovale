@@ -2866,7 +2866,7 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
 	elseif property == "miss_react" then
 		-- "miss_react" has no meaning in Ovale.
 		code = "True(miss_react)"
-	elseif property == "persistent_multiplier" then
+	elseif property == "persistent_multiplier" or property == "pmultiplier" then
 		code = format("PersistentMultiplier(%s)", buffName)
 	elseif property == "recharge_time" then
 		code = format("SpellChargeCooldown(%s)", name)
@@ -3876,6 +3876,11 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 	elseif class == "ROGUE" and operand == "poisoned_enemies" then
 		-- TODO Need to track the number of poisoned enemies
 		code = "0" 
+	elseif class == "ROGUE" and operand == "poisoned_bleeds" then
+		-- TODO Need to track the number of poisoned enemies
+		code = "DebuffCountOnAny(rupture_debuff) + DebuffCountOnAny(garrote_debuff)"
+		AddSymbol(annotation, "rupture_debuff")
+		AddSymbol(annotation, "garrote_debuff")
 	elseif class == "ROGUE" and operand == "exsanguinated" then
 		code = "target.DebuffPresent(exsanguinated)"
 		AddSymbol(annotation, "exsanguinated")
