@@ -47,12 +47,13 @@ AddFunction VengeanceSigilOfFlame
 
 AddFunction VengeanceDefaultShortCDActions
 {
-	if ((VengeancePlayOffensively() and (BuffExpires(demon_spikes) or not Talent(razor_spikes_talent))) or (VengeancePlayDefensively())) Spell(soul_barrier)
+	if ((VengeancePlayOffensively() and (BuffExpires(demon_spikes) or not Talent(razor_spikes_talent))) or VengeancePlayDefensively()) Spell(soul_barrier)
 	
-	if (IncomingDamage(5 physical=1) > 0)
+	if (IncomingDamage(5 physical=1) > 0 and BuffRemaining(demon_spikes_buff)<2*BaseDuration(demon_spikes_buff))
 	{
-		if (Charges(demon_spikes) == 0 and PainDeficit() >= 60*(1+0.2*BuffPresent(blade_turning_buff)) and BuffRemaining(demon_spikes_buff)<2*BaseDuration(demon_spikes_buff)) Spell(demonic_infusion)
-		if (Charges(demon_spikes) >= 1 and not (VengeancePlayOffensively() and Talent(razor_spikes_talent) and Pain() < 80) and BuffRemaining(demon_spikes_buff)<2*BaseDuration(demon_spikes_buff)) Spell(demon_spikes)
+		if (Charges(demon_spikes) == 0 and PainDeficit() >= 60*(1+0.2*BuffPresent(blade_turning_buff))) Spell(demonic_infusion)
+		if (VengeancePlayDefensively() or Talent(razor_spikes_talent)) Spell(demon_spikes)
+		if (Charges(demon_spikes count=0) >= 1.8) Spell(demon_spikes)
 	}
 	
 	if (CheckBoxOn(opt_melee_range) and not target.InRange(shear))
