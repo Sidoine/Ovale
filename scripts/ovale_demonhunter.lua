@@ -72,7 +72,7 @@ AddFunction VengeanceDefaultMainActions
 	if (VengeancePlayOffensively() and Talent(razor_spikes_talent) and not BuffExpires(demon_spikes_buff))
 	{
 		Spell(fracture)
-		Spell(soul_cleave)
+		if not Talent(fracture_talent) Spell(soul_cleave)
 		Spell(shear)
 	}
 	
