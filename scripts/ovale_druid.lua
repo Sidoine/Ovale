@@ -13,7 +13,6 @@ Include(ovale_druid_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=guardian)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=guardian)
-AddCheckBox(opt_legendary_ring_tank ItemName(legendary_ring_bonus_armor) default specialization=guardian)
 AddCheckBox(opt_druid_guardian_aoe L(AOE) default specialization=guardian)
 
 AddFunction GuardianHealMe
@@ -84,7 +83,6 @@ AddFunction GuardianDefaultCdActions
 	GuardianInterruptActions()
 	Spell(incarnation_guardian_of_ursoc)
 	if HasArtifactTrait(embrace_of_the_nightmare) Spell(rage_of_the_sleeper)
-	if CheckBoxOn(opt_legendary_ring_tank) Item(legendary_ring_bonus_armor usable=1)
 	Item(Trinket0Slot usable=1 text=13)
 	Item(Trinket1Slot usable=1 text=14)
 	if BuffExpires(bristling_fur_buff) and BuffExpires(survival_instincts_buff) and BuffExpires(rage_of_the_sleeper_buff) and BuffExpires(barkskin_buff) and BuffExpires(potion_buff)
