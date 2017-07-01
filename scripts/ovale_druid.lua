@@ -38,7 +38,7 @@ AddFunction GuardianDefaultShortCDActions
 	GuardianHealMe()
 	if InCombat() and BuffExpires(bristling_fur_buff)
 	{
-		if IncomingDamage(3 physical=1) Spell(ironfur)
+		if IncomingDamage(5 physical=1) Spell(ironfur)
 	}
 	if BuffExpires(survival_instincts_buff) and BuffExpires(rage_of_the_sleeper_buff) and BuffExpires(barkskin_buff) Spell(bristling_fur)
 	# range check
@@ -55,7 +55,7 @@ AddFunction GuardianDefaultMainActions
 	if not BuffExpires(galactic_guardian_buff) Spell(moonfire)
 	Spell(mangle)
 	Spell(thrash_bear)
-	if target.DebuffStacks(thrash_bear_debuff) >= 3 Spell(pulverize)
+	if target.DebuffStacks(thrash_bear_debuff) >= 2 Spell(pulverize)
 	if target.DebuffRefreshable(moonfire_debuff) Spell(moonfire)
 	if RageDeficit() <= 20 Spell(maul)
 	Spell(swipe_bear)
