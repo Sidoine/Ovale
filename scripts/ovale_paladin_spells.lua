@@ -7,6 +7,7 @@ do
 	local code = [[
 # Items
 Define(heathcliffs_immortality 137047)
+Define(pillars_of_inmost_light 151812)
 	
 # Paladin spells and functions.
 
@@ -130,6 +131,7 @@ Define(exorcism 879)
 	SpellAddBuff(exorcism blazing_contempt_buff=0 itemset=T17 itemcount=4 specialization=retribution)
 Define(eye_of_tyr 209202)
 	SpellInfo(eye_of_tyr cd=60 tag=cd)
+	SpellInfo(eye_of_tyr cd=45 if_equipped=pillars_of_inmost_light)
 	SpellAddTargetDebuff(eye_of_tyr eye_of_tyr_debuff=1)
 Define(eye_of_tyr_debuff 209202)
 	SpellInfo(eye_of_tyr_debuff duration=9)
