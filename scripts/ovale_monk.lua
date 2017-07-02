@@ -13,7 +13,6 @@ Include(ovale_monk_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=brewmaster)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=brewmaster)
-AddCheckBox(opt_legendary_ring_tank ItemName(legendary_ring_bonus_armor) default specialization=brewmaster)
 AddCheckBox(opt_monk_bm_aoe L(AOE) default specialization=brewmaster)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=brewmaster)
 
@@ -157,7 +156,6 @@ AddFunction BrewmasterBlackoutComboAoEActions
 AddFunction BrewmasterDefaultCdActions 
 {
 	BrewmasterInterruptActions()
-	if CheckBoxOn(opt_legendary_ring_tank) Item(legendary_ring_bonus_armor usable=1)
 	if not PetPresent(name=Niuzao) Spell(invoke_niuzao)
 	if (HasEquippedItem(firestone_walkers)) Spell(fortifying_brew text=FW)
 	if (HasEquippedItem(fundamental_observation)) Spell(zen_meditation text=FO)

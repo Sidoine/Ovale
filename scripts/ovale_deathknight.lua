@@ -13,7 +13,6 @@ Include(ovale_deathknight_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=blood)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=blood)
-AddCheckBox(opt_legendary_ring_tank ItemName(legendary_ring_bonus_armor) default specialization=blood)
 
 AddFunction BloodDefaultShortCDActions
 {
@@ -68,7 +67,6 @@ AddFunction BloodDefaultCdActions
 {
 	BloodInterruptActions()
 	if IncomingDamage(1.5 magic=1) > 0 spell(antimagic_shell)
-	if CheckBoxOn(opt_legendary_ring_tank) Item(legendary_ring_bonus_armor usable=1)
 	Item(Trinket0Slot usable=1 text=13)
 	Item(Trinket1Slot usable=1 text=14)
 	Spell(vampiric_blood)
