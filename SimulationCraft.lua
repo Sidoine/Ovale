@@ -4800,19 +4800,23 @@ local function InsertSupportingFunctions(child, annotation)
 		local fmt = [[
 			AddFunction %sGetInMeleeRange
 			{
-				if CheckBoxOn(opt_melee_range)
+				if CheckBoxOn(opt_melee_range) and not InFlightToTarget(%s) and not InFlightToTarget(heroic_leap)
 				{
-					if target.InRange(charge) Spell(charge)
-					if SpellCharges(charge) == 0 and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
+					if target.InRange(%s) Spell(%s)
+					if SpellCharges(%s) == 0 and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
 					if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
 				}
 			}
 		]]
-		local code = format(fmt, camelSpecialization)
+		local charge = "charge"
+		if annotation.specialization == "protection" then
+			charge = "intercept"
+		end
+		local code = format(fmt, camelSpecialization, charge, charge, charge, charge)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "shortcd"
-		AddSymbol(annotation, "charge")
+		AddSymbol(annotation, charge)
 		AddSymbol(annotation, "heroic_leap")
 		AddSymbol(annotation, "pummel")
 		count = count + 1

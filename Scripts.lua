@@ -197,12 +197,9 @@ function OvaleScripts:GetDefaultScriptName(class, specialization)
 			name = DISABLED_NAME
 		end
 	elseif class == "WARRIOR" then
-		-- if specialization == "fury" then
-		-- 	local weaponType = OvaleEquipment:HasMainHandWeapon(1) and "1h" or "2h"
-		-- 	name = format("simulationcraft_warrior_fury_%s_t18m", weaponType)
-		-- elseif specialization == "protection" then
-		-- 	name = DISABLED_NAME
-		-- end
+		if specialization == "protection" then
+			name = "icyveins_warrior_protection"
+		end
 	end
 	if not name and specialization then
 		name = format("simulationcraft_%s_%s_t19p", strlower(class), specialization)
