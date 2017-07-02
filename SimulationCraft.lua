@@ -4383,6 +4383,11 @@ local function InsertInterruptFunction(child, annotation, interrupts)
 	for _, spell in pairs(spells) do
 		-- AddSymbol
 		AddSymbol(annotation, spell.name)
+		if(spell.addSymbol ~= nil) then
+			for k,v in pairs(spell.addSymbol) do
+				AddSymbol(annotation, v)
+			end
+		end
 		
 		-- Build conditions
 		local conditions = {}
@@ -4517,6 +4522,13 @@ local function InsertInterruptFunctions(child, annotation)
 	end
 	if annotation.pummel == "WARRIOR" then
 		tinsert(interrupts, {name = "pummel", interrupt=1, worksOnBoss=1, order=10})
+		tinsert(interrupts, {name = "shockwave", stun=1, worksOnBoss=0, order=20, range="target.Distance(less 10)"})
+		tinsert(interrupts, {name = "storm_bolt", stun=1, worksOnBoss=0, order=20})
+		if(annotation.specialization == "protection") then
+			tinsert(interrupts, {name = "intercept", stun=1, worksOnBoss=0, order=20, extraCondition="Talent(warbringer_talent)", addSymbol={"warbringer_talent"}})
+		end
+		tinsert(interrupts, {name = "intimidating_shout", incapacitate=1, worksOnBoss=0, order=100})
+		
 	end
 	
 	if #interrupts > 0 then

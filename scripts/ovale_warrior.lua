@@ -27,9 +27,12 @@ AddFunction ArmsInterruptActions
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
 	{
 		if target.InRange(pummel) and target.IsInterruptible() Spell(pummel)
+		if target.Distance(less 10) and not target.Classification(worldboss) Spell(shockwave)
+		if target.InRange(storm_bolt) and not target.Classification(worldboss) Spell(storm_bolt)
 		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_rage)
 		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
 		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+		if target.InRange(intimidating_shout) and not target.Classification(worldboss) Spell(intimidating_shout)
 	}
 }
 
@@ -518,6 +521,7 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # focused_rage_talent
 # heroic_leap
 # in_for_the_kill_talent
+# intimidating_shout
 # mortal_strike
 # old_war_potion
 # overpower
@@ -565,9 +569,12 @@ AddFunction FuryInterruptActions
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
 	{
 		if target.InRange(pummel) and target.IsInterruptible() Spell(pummel)
+		if target.Distance(less 10) and not target.Classification(worldboss) Spell(shockwave)
+		if target.InRange(storm_bolt) and not target.Classification(worldboss) Spell(storm_bolt)
 		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_rage)
 		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
 		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+		if target.InRange(intimidating_shout) and not target.Classification(worldboss) Spell(intimidating_shout)
 	}
 }
 
@@ -1089,6 +1096,7 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # furious_slash
 # heroic_leap
 # inner_rage_talent
+# intimidating_shout
 # juggernaut
 # juggernaut_buff
 # massacre_buff
@@ -1101,7 +1109,9 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # quaking_palm
 # raging_blow
 # rampage
+# shockwave
 # stone_heart_buff
+# storm_bolt
 # war_stomp
 # whirlwind
 # wrecking_ball_buff
@@ -1132,9 +1142,13 @@ AddFunction ProtectionInterruptActions
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
 	{
 		if target.InRange(pummel) and target.IsInterruptible() Spell(pummel)
+		if target.InRange(storm_bolt) and not target.Classification(worldboss) Spell(storm_bolt)
+		if target.InRange(intercept) and not target.Classification(worldboss) and Talent(warbringer_talent) Spell(intercept)
+		if target.Distance(less 10) and not target.Classification(worldboss) Spell(shockwave)
 		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_rage)
 		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
 		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+		if target.InRange(intimidating_shout) and not target.Classification(worldboss) Spell(intimidating_shout)
 	}
 }
 
@@ -1369,6 +1383,7 @@ AddIcon checkbox=opt_warrior_protection_aoe help=cd specialization=protection
 # heroic_leap
 # ignore_pain
 # intercept
+# intimidating_shout
 # last_stand
 # neltharions_fury
 # neltharions_fury_buff
@@ -1382,13 +1397,16 @@ AddIcon checkbox=opt_warrior_protection_aoe help=cd specialization=protection
 # shield_block_buff
 # shield_slam
 # shield_wall
+# shockwave
 # spell_reflection
+# storm_bolt
 # thunder_clap
 # unbending_potion
 # vengeance_ignore_pain_buff
 # vengeance_revenge_buff
 # vengeance_talent
 # war_stomp
+# warbringer_talent
 ]]
 	OvaleScripts:RegisterScript("WARRIOR", "protection", name, desc, code, "script")
 end
