@@ -157,7 +157,7 @@ AddFunction BrewmasterDefaultCdActions
 {
 	BrewmasterInterruptActions()
 	if not PetPresent(name=Niuzao) Spell(invoke_niuzao)
-	if (HasEquippedItem(firestone_walkers)) Spell(fortifying_brew text=FW)
+	if (HasEquippedItem(firestone_walkers)) Spell(fortifying_brew)
 	if (HasEquippedItem(shifting_cosmic_sliver)) Spell(fortifying_brew)
 	if (HasEquippedItem(fundamental_observation)) Spell(zen_meditation text=FO)
 	Item(Trinket0Slot usable=1 text=13)
