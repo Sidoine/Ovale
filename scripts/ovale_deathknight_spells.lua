@@ -5,6 +5,9 @@ do
 	local name = "ovale_deathknight_spells"
 	local desc = "[7.0] Ovale: Death Knight spells"
 	local code = [[
+
+ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!icebound_fortitude,buff,!icebound_fortitude_buff)
+	
 # Death Knight spells and functions.
 
 # Learned spells.

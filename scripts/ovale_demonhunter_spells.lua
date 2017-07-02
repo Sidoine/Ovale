@@ -6,6 +6,8 @@ do
 	local desc = "[7.0] Ovale: DemonHunter spells"
 	local code = [[
 
+ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!metamorphosis_veng,buff,!metamorphosis_veng_buff)	
+
 Define(abyssal_strike_talent 1)
 Define(agonizing_flames_talent 2)
 Define(anguish_of_the_deceiver 201473)

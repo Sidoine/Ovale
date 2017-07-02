@@ -83,10 +83,11 @@ AddFunction GuardianDefaultCdActions
 	GuardianInterruptActions()
 	Spell(incarnation_guardian_of_ursoc)
 	if HasArtifactTrait(embrace_of_the_nightmare) Spell(rage_of_the_sleeper)
-	Item(Trinket0Slot usable=1 text=13)
-	Item(Trinket1Slot usable=1 text=14)
 	if BuffExpires(bristling_fur_buff) and BuffExpires(survival_instincts_buff) and BuffExpires(rage_of_the_sleeper_buff) and BuffExpires(barkskin_buff) and BuffExpires(potion_buff)
 	{
+		if (HasEquippedItem(shifting_cosmic_sliver)) Spell(survival_instincts)
+		Item(Trinket0Slot usable=1 text=13)
+		Item(Trinket1Slot usable=1 text=14)
 		Spell(barkskin)
 		Spell(rage_of_the_sleeper)
 		Spell(survival_instincts)

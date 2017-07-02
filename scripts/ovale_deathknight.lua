@@ -67,9 +67,11 @@ AddFunction BloodDefaultCdActions
 {
 	BloodInterruptActions()
 	if IncomingDamage(1.5 magic=1) > 0 spell(antimagic_shell)
+	if (HasEquippedItem(shifting_cosmic_sliver)) Spell(icebound_fortitude)
 	Item(Trinket0Slot usable=1 text=13)
 	Item(Trinket1Slot usable=1 text=14)
 	Spell(vampiric_blood)
+	Spell(icebound_fortitude)
 	if target.InRange(blood_mirror) Spell(blood_mirror)
 	Spell(dancing_rune_weapon)
 	if BuffStacks(bone_shield_buff) >= 5 Spell(tombstone)

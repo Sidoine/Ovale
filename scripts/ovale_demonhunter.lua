@@ -126,6 +126,7 @@ AddFunction VengeanceDefaultCdActions
 {
 	VengeanceInterruptActions()
 	if IncomingDamage(1.5 magic=1) > 0 Spell(empower_wards)
+	if (HasEquippedItem(shifting_cosmic_sliver)) Spell(metamorphosis_veng)
 	Spell(fiery_brand)
 	Item(Trinket0Slot text=13 usable=1)
 	Item(Trinket1Slot text=14 usable=1)

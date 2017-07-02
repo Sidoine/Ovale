@@ -6,6 +6,9 @@ do
 	local desc = "[7.0] Ovale: Druid spells"
 
 	local code = [[
+	
+ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!survival_instincts,buff,!survival_instincts_buff)	
+	
 # Druid spells and functions.
 Define(ashamanes_bite 210702)
 Define(ashamanes_energy_buff 210583)

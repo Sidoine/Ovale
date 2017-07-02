@@ -5,6 +5,9 @@ do
 	local name = "ovale_warrior_spells"
 	local desc = "[7.0] Ovale: Warrior spells"
 	local code = [[
+
+ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!shield_wall,buff,!shield_wall_buff)	
+	
 # Warrior spells and functions.
 
 # Learned spells.

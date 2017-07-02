@@ -5,6 +5,9 @@ do
 	local name = "ovale_monk_spells"
 	local desc = "[7.0] Ovale: Monk spells"
 	local code = [[
+
+ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!fortifying_brew,buff,!fortifying_brew_buff)
+
 # Monk spells and functions.
 
 Define(blackout_combo_buff 228563)
