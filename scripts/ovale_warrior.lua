@@ -53,8 +53,6 @@ AddFunction ArmsGetInMeleeRange
 
 AddFunction ArmsDefaultMainActions
 {
-	#battle_cry,if=gcd.remains<0.25&cooldown.avatar.remains>=10&(buff.shattered_defenses.up|cooldown.warbreaker.remains>7&cooldown.colossus_smash.remains>7|cooldown.colossus_smash.remains&debuff.colossus_smash.remains>gcd)|target.time_to_die<=7
-	if 0 < 0.25 and SpellCooldown(avatar) >= 10 and { BuffPresent(shattered_defenses_buff) or SpellCooldown(warbreaker) > 7 and SpellCooldown(colossus_smash) > 7 or SpellCooldown(colossus_smash) > 0 and target.DebuffRemaining(colossus_smash_debuff) > GCD() } or target.TimeToDie() <= 7 Spell(battle_cry)
 	#rend,if=remains<gcd
 	if target.DebuffRemaining(rend_debuff) < GCD() Spell(rend)
 	#colossus_smash,if=cooldown_react&debuff.colossus_smash.remains<gcd
@@ -153,6 +151,8 @@ AddFunction ArmsDefaultCdActions
 	if BuffPresent(battle_cry_buff) or target.TimeToDie() <= 11 Spell(berserking)
 	#arcane_torrent,if=buff.battle_cry_deadly_calm.down&rage.deficit>40&cooldown.battle_cry.remains
 	if BuffExpires(battle_cry_deadly_calm_buff) and RageDeficit() > 40 and SpellCooldown(battle_cry) > 0 Spell(arcane_torrent_rage)
+	#battle_cry,if=gcd.remains<0.25&cooldown.avatar.remains>=10&(buff.shattered_defenses.up|cooldown.warbreaker.remains>7&cooldown.colossus_smash.remains>7|cooldown.colossus_smash.remains&debuff.colossus_smash.remains>gcd)|target.time_to_die<=7
+	if 0 < 0.25 and SpellCooldown(avatar) >= 10 and { BuffPresent(shattered_defenses_buff) or SpellCooldown(warbreaker) > 7 and SpellCooldown(colossus_smash) > 7 or SpellCooldown(colossus_smash) > 0 and target.DebuffRemaining(colossus_smash_debuff) > GCD() } or target.TimeToDie() <= 7 Spell(battle_cry)
 	#avatar,if=gcd.remains<0.25&(buff.battle_cry.up|cooldown.battle_cry.remains<15)|target.time_to_die<=20
 	if 0 < 0.25 and { BuffPresent(battle_cry_buff) or SpellCooldown(battle_cry) < 15 } or target.TimeToDie() <= 20 Spell(avatar)
 	#use_item,name=gift_of_radiance,if=buff.avatar.up&debuff.colossus_smash.up&buff.battle_cry.up
@@ -598,10 +598,6 @@ AddFunction FuryDefaultMainActions
 	{
 		#dragon_roar,if=(equipped.convergence_of_fates&cooldown.battle_cry.remains<2)|!equipped.convergence_of_fates&(cooldown.battle_cry.remains>10|cooldown.battle_cry.remains<2)
 		if HasEquippedItem(convergence_of_fates) and SpellCooldown(battle_cry) < 2 or not HasEquippedItem(convergence_of_fates) and { SpellCooldown(battle_cry) > 10 or SpellCooldown(battle_cry) < 2 } Spell(dragon_roar)
-		#battle_cry,if=gcd.remains=0&!talent.dragon_roar.enabled&(!equipped.convergence_of_fates|!talent.bloodbath.enabled|!cooldown.bloodbath.remains|cooldown.bloodbath.remains>=10)
-		if not 0 > 0 and not Talent(dragon_roar_talent) and { not HasEquippedItem(convergence_of_fates) or not Talent(bloodbath_talent) or not SpellCooldown(bloodbath) > 0 or SpellCooldown(bloodbath) >= 10 } Spell(battle_cry)
-		#battle_cry,if=gcd.remains=0&buff.dragon_roar.up&(cooldown.bloodthirst.remains=0|buff.enrage.remains>cooldown.bloodthirst.remains)
-		if not 0 > 0 and BuffPresent(dragon_roar_buff) and { not SpellCooldown(bloodthirst) > 0 or EnrageRemaining() > SpellCooldown(bloodthirst) } Spell(battle_cry)
 		#bloodbath,if=buff.dragon_roar.up|!talent.dragon_roar.enabled&buff.battle_cry.up
 		if BuffPresent(dragon_roar_buff) or not Talent(dragon_roar_talent) and BuffPresent(battle_cry_buff) Spell(bloodbath)
 		#call_action_list,name=cooldowns,if=buff.battle_cry.up
@@ -693,6 +689,10 @@ AddFunction FuryDefaultCdActions
 
 		unless { HasEquippedItem(convergence_of_fates) and SpellCooldown(battle_cry) < 2 or not HasEquippedItem(convergence_of_fates) and { SpellCooldown(battle_cry) > 10 or SpellCooldown(battle_cry) < 2 } } and Spell(dragon_roar)
 		{
+			#battle_cry,if=gcd.remains=0&!talent.dragon_roar.enabled&(!equipped.convergence_of_fates|!talent.bloodbath.enabled|!cooldown.bloodbath.remains|cooldown.bloodbath.remains>=10)
+			if not 0 > 0 and not Talent(dragon_roar_talent) and { not HasEquippedItem(convergence_of_fates) or not Talent(bloodbath_talent) or not SpellCooldown(bloodbath) > 0 or SpellCooldown(bloodbath) >= 10 } Spell(battle_cry)
+			#battle_cry,if=gcd.remains=0&buff.dragon_roar.up&(cooldown.bloodthirst.remains=0|buff.enrage.remains>cooldown.bloodthirst.remains)
+			if not 0 > 0 and BuffPresent(dragon_roar_buff) and { not SpellCooldown(bloodthirst) > 0 or EnrageRemaining() > SpellCooldown(bloodthirst) } Spell(battle_cry)
 			#avatar,if=buff.battle_cry.up|(target.time_to_die<(cooldown.battle_cry.remains+10))
 			if BuffPresent(battle_cry_buff) or target.TimeToDie() < SpellCooldown(battle_cry) + 10 Spell(avatar)
 			#blood_fury,if=buff.battle_cry.up
@@ -1239,8 +1239,6 @@ AddFunction ProtectionProtMainActions
 {
 	#spell_reflection,if=incoming_damage_2500ms>health.max*0.20
 	if IncomingDamage(2.5) > MaxHealth() * 0.2 Spell(spell_reflection)
-	#battle_cry,if=cooldown.shield_slam.remains=0
-	if not SpellCooldown(shield_slam) > 0 Spell(battle_cry)
 	#shield_slam,if=(!(cooldown.shield_block.remains<=gcd.max*2&!buff.shield_block.up)&talent.heavy_repercussions.enabled)|!talent.heavy_repercussions.enabled
 	if not { SpellCooldown(shield_block) <= GCD() * 2 and not BuffPresent(shield_block_buff) } and Talent(heavy_repercussions_talent) or not Talent(heavy_repercussions_talent) Spell(shield_slam)
 	#thunder_clap
@@ -1289,6 +1287,8 @@ AddFunction ProtectionProtCdActions
 		if IncomingDamage(2.5) > MaxHealth() * 0.4 and not { not SpellCooldown(last_stand) > 0 } Spell(shield_wall)
 		#potion,name=unbending_potion,if=(incoming_damage_2500ms>health.max*0.15&!buff.potion.up)|target.time_to_die<=25
 		if { IncomingDamage(2.5) > MaxHealth() * 0.15 and not BuffPresent(potion_buff) or target.TimeToDie() <= 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(unbending_potion usable=1)
+		#battle_cry,if=cooldown.shield_slam.remains=0
+		if not SpellCooldown(shield_slam) > 0 Spell(battle_cry)
 	}
 }
 
