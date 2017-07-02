@@ -175,7 +175,9 @@ function OvaleScripts:GetDefaultScriptName(class, specialization)
 			name = format("simulationcraft_hunter_%s_t19p", short)
 		end
 	elseif class == "MONK" then
-		if specialization == "brewmaster" then
+		if specialization == "mistweaver" then
+			name = DISABLED_NAME
+		elseif specialization == "brewmaster" then
 			name = "icyveins_monk_brewmaster"
 		end
 	elseif class == "PALADIN" then
