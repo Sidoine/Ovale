@@ -3939,9 +3939,6 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 	elseif class == "WARRIOR" and operand == "gcd.remains" and (action == "battle_cry" or action == "avatar") then
 		-- Always assume the gcd is over
 		code = "0"
-	elseif class == "WARRIOR" and operand == "buff.revenge.react" then
-		code = "RageCost(revenge) == 0"
-		AddSymbol(annotation, "revenge")
 	elseif operand == "buff.enrage.down" then
 		code = "not " .. target .. "IsEnraged()"
 	elseif operand == "buff.enrage.remains" then

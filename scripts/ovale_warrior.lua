@@ -1258,7 +1258,7 @@ AddFunction ProtectionProtMainActions
 	#thunder_clap
 	Spell(thunder_clap)
 	#revenge,if=(talent.vengeance.enabled&buff.revenge.react&!buff.vengeance_ignore_pain.up)|(buff.vengeance_revenge.up&rage>=59)|(talent.vengeance.enabled&!buff.vengeance_ignore_pain.up&!buff.vengeance_revenge.up&rage>=69)|(!talent.vengeance.enabled&buff.revenge.react)
-	if Talent(vengeance_talent) and RageCost(revenge) == 0 and not BuffPresent(vengeance_ignore_pain_buff) or BuffPresent(vengeance_revenge_buff) and Rage() >= 59 or Talent(vengeance_talent) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_revenge_buff) and Rage() >= 69 or not Talent(vengeance_talent) and RageCost(revenge) == 0 Spell(revenge)
+	if Talent(vengeance_talent) and BuffPresent(revenge_buff) and not BuffPresent(vengeance_ignore_pain_buff) or BuffPresent(vengeance_revenge_buff) and Rage() >= 59 or Talent(vengeance_talent) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_revenge_buff) and Rage() >= 69 or not Talent(vengeance_talent) and BuffPresent(revenge_buff) Spell(revenge)
 	#devastate
 	Spell(devastate)
 }
@@ -1282,13 +1282,13 @@ AddFunction ProtectionProtShortCdActions
 		#shield_block,if=!buff.neltharions_fury.up&((cooldown.shield_slam.remains=0&talent.heavy_repercussions.enabled)|action.shield_block.charges=2|!talent.heavy_repercussions.enabled)
 		if not BuffPresent(neltharions_fury_buff) and { not SpellCooldown(shield_slam) > 0 and Talent(heavy_repercussions_talent) or Charges(shield_block) == 2 or not Talent(heavy_repercussions_talent) } Spell(shield_block)
 		#ignore_pain,if=(rage>=60&!talent.vengeance.enabled)|(buff.vengeance_ignore_pain.up&rage>=39)|(talent.vengeance.enabled&!buff.vengeance_ignore_pain.up&!buff.vengeance_revenge.up&rage<30&!buff.revenge.react)
-		if Rage() >= 60 and not Talent(vengeance_talent) or BuffPresent(vengeance_ignore_pain_buff) and Rage() >= 39 or Talent(vengeance_talent) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_revenge_buff) and Rage() < 30 and not RageCost(revenge) == 0 Spell(ignore_pain)
+		if Rage() >= 60 and not Talent(vengeance_talent) or BuffPresent(vengeance_ignore_pain_buff) and Rage() >= 39 or Talent(vengeance_talent) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_revenge_buff) and Rage() < 30 and not BuffPresent(revenge_buff) Spell(ignore_pain)
 	}
 }
 
 AddFunction ProtectionProtShortCdPostConditions
 {
-	IncomingDamage(2.5) > MaxHealth() * 0.2 and Spell(spell_reflection) or { not { SpellCooldown(shield_block) <= GCD() * 2 and not BuffPresent(shield_block_buff) } and Talent(heavy_repercussions_talent) or not Talent(heavy_repercussions_talent) } and Spell(shield_slam) or Spell(thunder_clap) or { Talent(vengeance_talent) and RageCost(revenge) == 0 and not BuffPresent(vengeance_ignore_pain_buff) or BuffPresent(vengeance_revenge_buff) and Rage() >= 59 or Talent(vengeance_talent) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_revenge_buff) and Rage() >= 69 or not Talent(vengeance_talent) and RageCost(revenge) == 0 } and Spell(revenge) or Spell(devastate)
+	IncomingDamage(2.5) > MaxHealth() * 0.2 and Spell(spell_reflection) or { not { SpellCooldown(shield_block) <= GCD() * 2 and not BuffPresent(shield_block_buff) } and Talent(heavy_repercussions_talent) or not Talent(heavy_repercussions_talent) } and Spell(shield_slam) or Spell(thunder_clap) or { Talent(vengeance_talent) and BuffPresent(revenge_buff) and not BuffPresent(vengeance_ignore_pain_buff) or BuffPresent(vengeance_revenge_buff) and Rage() >= 59 or Talent(vengeance_talent) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_revenge_buff) and Rage() >= 69 or not Talent(vengeance_talent) and BuffPresent(revenge_buff) } and Spell(revenge) or Spell(devastate)
 }
 
 AddFunction ProtectionProtCdActions
@@ -1308,7 +1308,7 @@ AddFunction ProtectionProtCdActions
 
 AddFunction ProtectionProtCdPostConditions
 {
-	IncomingDamage(2.5) > MaxHealth() * 0.2 and Spell(spell_reflection) or Talent(ravager_talent) and BuffPresent(battle_cry_buff) and Spell(ravager) or not BuffPresent(shield_block_buff) and SpellCooldown(shield_block) > 3 and { SpellCooldown(shield_slam) > 3 and Talent(heavy_repercussions_talent) or not Talent(heavy_repercussions_talent) } and Spell(neltharions_fury) or { not { SpellCooldown(shield_block) <= GCD() * 2 and not BuffPresent(shield_block_buff) } and Talent(heavy_repercussions_talent) or not Talent(heavy_repercussions_talent) } and Spell(shield_slam) or Spell(thunder_clap) or { Talent(vengeance_talent) and RageCost(revenge) == 0 and not BuffPresent(vengeance_ignore_pain_buff) or BuffPresent(vengeance_revenge_buff) and Rage() >= 59 or Talent(vengeance_talent) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_revenge_buff) and Rage() >= 69 or not Talent(vengeance_talent) and RageCost(revenge) == 0 } and Spell(revenge) or Spell(devastate)
+	IncomingDamage(2.5) > MaxHealth() * 0.2 and Spell(spell_reflection) or Talent(ravager_talent) and BuffPresent(battle_cry_buff) and Spell(ravager) or not BuffPresent(shield_block_buff) and SpellCooldown(shield_block) > 3 and { SpellCooldown(shield_slam) > 3 and Talent(heavy_repercussions_talent) or not Talent(heavy_repercussions_talent) } and Spell(neltharions_fury) or { not { SpellCooldown(shield_block) <= GCD() * 2 and not BuffPresent(shield_block_buff) } and Talent(heavy_repercussions_talent) or not Talent(heavy_repercussions_talent) } and Spell(shield_slam) or Spell(thunder_clap) or { Talent(vengeance_talent) and BuffPresent(revenge_buff) and not BuffPresent(vengeance_ignore_pain_buff) or BuffPresent(vengeance_revenge_buff) and Rage() >= 59 or Talent(vengeance_talent) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_revenge_buff) and Rage() >= 69 or not Talent(vengeance_talent) and BuffPresent(revenge_buff) } and Spell(revenge) or Spell(devastate)
 }
 
 ### Protection icons.
@@ -1393,6 +1393,7 @@ AddIcon checkbox=opt_warrior_protection_aoe help=cd specialization=protection
 # ravager
 # ravager_talent
 # revenge
+# revenge_buff
 # shield_block
 # shield_block_buff
 # shield_slam
