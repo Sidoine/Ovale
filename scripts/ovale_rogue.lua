@@ -200,6 +200,8 @@ AddFunction AssassinationBuildCdPostConditions
 
 AddFunction AssassinationCdsMainActions
 {
+	#exsanguinate,if=prev_gcd.1.rupture&dot.rupture.remains>4+4*cp_max_spend&!stealthed.rogue|!dot.garrote.pmultiplier<=1&!cooldown.vanish.up&buff.subterfuge.up
+	if PreviousGCDSpell(rupture) and target.DebuffRemaining(rupture_debuff) > 4 + 4 * MaxComboPoints() and not Stealthed() or not target.DebuffPersistentMultiplier(garrote_debuff) <= 1 and not { not SpellCooldown(vanish) > 0 } and BuffPresent(subterfuge_buff) Spell(exsanguinate)
 }
 
 AddFunction AssassinationCdsMainPostConditions
@@ -220,12 +222,11 @@ AddFunction AssassinationCdsShortCdActions
 	if Talent(subterfuge_talent) and not HasEquippedItem(mantle_of_the_master_assassin) and not Stealthed() and target.DebuffRefreshable(garrote_debuff) and { Enemies() <= 3 and ComboPointsDeficit() >= 1 + Enemies() or Enemies() >= 4 and ComboPointsDeficit() >= 4 } and CheckBoxOn(opt_vanish) Spell(vanish)
 	#vanish,if=talent.shadow_focus.enabled&variable.energy_time_to_max_combined>=2&combo_points.deficit>=4
 	if Talent(shadow_focus_talent) and energy_time_to_max_combined() >= 2 and ComboPointsDeficit() >= 4 and CheckBoxOn(opt_vanish) Spell(vanish)
-	#exsanguinate,if=prev_gcd.1.rupture&dot.rupture.remains>4+4*cp_max_spend&!stealthed.rogue|!dot.garrote.pmultiplier<=1&!cooldown.vanish.up&buff.subterfuge.up
-	if PreviousGCDSpell(rupture) and target.DebuffRemaining(rupture_debuff) > 4 + 4 * MaxComboPoints() and not Stealthed() or not target.DebuffPersistentMultiplier(garrote_debuff) <= 1 and not { not SpellCooldown(vanish) > 0 } and BuffPresent(subterfuge_buff) Spell(exsanguinate)
 }
 
 AddFunction AssassinationCdsShortCdPostConditions
 {
+	{ PreviousGCDSpell(rupture) and target.DebuffRemaining(rupture_debuff) > 4 + 4 * MaxComboPoints() and not Stealthed() or not target.DebuffPersistentMultiplier(garrote_debuff) <= 1 and not { not SpellCooldown(vanish) > 0 } and BuffPresent(subterfuge_buff) } and Spell(exsanguinate)
 }
 
 AddFunction AssassinationCdsCdActions

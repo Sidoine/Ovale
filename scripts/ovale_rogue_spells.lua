@@ -147,7 +147,7 @@ Define(envenom_buff 32645)
 Define(eviscerate 196819)
 	SpellInfo(eviscerate combo=finisher energy=35)
 Define(exsanguinate 200806)
-	SpellInfo(exsanguinate cd=45)
+	SpellInfo(exsanguinate cd=45 tag=main)
 	SpellAddTargetDebuff(exsanguinate rupture_debuff_exsanguinated=1 if_target_debuff=rupture_debuff) #TODO if_target_debuff is not implemented here
 	SpellAddTargetDebuff(exsanguinate garrote_debuff_exsanguinated=1 if_target_debuff=garrote_debuff)
 Define(exsanguinate_talent 18)
