@@ -80,6 +80,7 @@ local MODIFIER_KEYWORD = {
 	["nonlethal"] = true,
 	["op"] = true,
 	["pct_health"] = true,
+	["precombat"] = true,
 	["range"] = true,
 	["sec"] = true,
 	["slot"] = true,
@@ -2638,6 +2639,13 @@ EmitModifier = function(modifier, parseNode, nodeList, annotation, action)
 			code = "not Speed() > 0"
 		else
 			code = "Speed() > 0"
+		end
+	elseif modifier == "precombat" then
+		local value = tonumber(Unparse(parseNode))
+		if value == 1 then
+			code = "not InCombat()"
+		else
+			code = "InCombat()"
 		end
 	elseif modifier == "sync" then
 		local name = Unparse(parseNode)
