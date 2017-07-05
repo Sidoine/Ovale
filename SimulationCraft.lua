@@ -1990,6 +1990,9 @@ EmitAction = function(parseNode, nodeList, annotation)
 			annotation[action] = class
 			annotation.interrupt = class
 			isSpellAction = false
+		elseif class == "ROGUE" and action == "adrenaline_rush" then
+			-- workaround to prevent flashing at max energy
+			conditionCode = "EnergyDeficit() > 1"
 		elseif class == "ROGUE" and action == "apply_poison" then
 			if modifier.lethal then
 				local name = Unparse(modifier.lethal)

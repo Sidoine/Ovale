@@ -854,7 +854,7 @@ AddFunction OutlawCdsCdActions
 	unless Enemies() >= 1 and Spell(cannonball_barrage)
 	{
 		#adrenaline_rush,if=!buff.adrenaline_rush.up&energy.deficit>0
-		if not BuffPresent(adrenaline_rush_buff) and EnergyDeficit() > 0 Spell(adrenaline_rush)
+		if not BuffPresent(adrenaline_rush_buff) and EnergyDeficit() > 0 and EnergyDeficit() > 1 Spell(adrenaline_rush)
 
 		unless HasEquippedItem(thraxis_tricksy_treads) and not ss_useable() and Spell(sprint)
 		{
