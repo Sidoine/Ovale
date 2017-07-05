@@ -19,7 +19,7 @@ AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=br
 AddFunction BrewmasterHealMe
 {
 	if (HealthPercent() < 35) Spell(healing_elixir)
-	if (SpellCount(expel_harm) >= 1 and HealthPercent() < 35) Spell(expel_harm)
+	if (HealthPercent() < 35) Spell(expel_harm)
 	if (HealthPercent() <= 100 - (15 * 2.6)) Spell(healing_elixir)
 }
 

@@ -156,9 +156,14 @@ function OvaleSpellBook:OnEnable()
 	self:RegisterEvent("SPELLS_CHANGED", "UpdateSpells")
 	self:RegisterEvent("UNIT_PET")
 	OvaleState:RegisterState(self, self.statePrototype)
+	
+	OvaleData:RegisterRequirement("spellcount_min", "RequireSpellCountHandler", self)
+	OvaleData:RegisterRequirement("spellcount_max", "RequireSpellCountHandler", self)
 end
 
 function OvaleSpellBook:OnDisable()
+	OvaleData:UnregisterRequirement("spellcount_max")
+	OvaleData:UnregisterRequirement("spellcount_min")
 	OvaleState:UnregisterState(self)
 	self:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 	self:UnregisterEvent("CHARACTER_POINTS_CHANGED")
@@ -463,6 +468,24 @@ do
 		return tconcat(output, "\n")
 	end
 end
+
+function OvaleSpellBook:RequireSpellCountHandler(spellId, atTime, requirement, tokens, index, targetGUID)
+	local verified = false
+	-- If index isn't given, then tokens holds the actual token value.
+	local count = tokens
+	if index then
+		count = tokens[index]
+		index = index + 1
+	end
+	if count then
+		count = tonumber(count) or 1
+		local actualCount = OvaleSpellBook:GetSpellCount(spellId)
+		verified = (requirement == "spellcount_min" and count <= actualCount) or (requirement == "spellcount_max" and count >= actualCount)
+	else
+		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a count argument.", requirement)
+	end
+	return verified, requirement, index
+end
 --</public-static-methods>
 
 --[[----------------------------------------------------------------------------
@@ -577,3 +600,5 @@ statePrototype.GetTimeToSpell = function(state, spellId, atTime, targetGUID, ext
 	return timeToSpell
 end
 --</state-methods>
+
+statePrototype.RequireSpellCountHandler = OvaleSpellBook.RequireSpellCountHandler
