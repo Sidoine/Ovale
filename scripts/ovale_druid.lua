@@ -17,8 +17,8 @@ AddCheckBox(opt_druid_guardian_aoe L(AOE) default specialization=guardian)
 
 AddFunction GuardianHealMe
 {
-	if IncomingDamage(5) / MaxHealth() >= 0.5 Spell(frenzied_regeneration)
-	if ((IncomingDamage(5) / MaxHealth() / 2 <= HealthMissing() / MaxHealth()) and (IncomingDamage(5) / MaxHealth() / 2 > 0.1) and SpellCharges(frenzied_regeneration) >= 2) Spell(frenzied_regeneration)
+	if IncomingDamage(5) >= MaxHealth() * 0.5 Spell(frenzied_regeneration)
+	if ((IncomingDamage(5) / 2 <= HealthMissing()) and (IncomingDamage(5) / 2 > MaxHealth() * 0.1) and SpellCharges(frenzied_regeneration) >= 2) Spell(frenzied_regeneration)
 	if HealthPercent() <= 50 Spell(lunar_beam)
 	if HealthPercent() <= 50 and IncomingDamage(5 physical=1) == 0 Spell(regrowth)
 	if HealthPercent() <= 80 and not InCombat() Spell(regrowth)
