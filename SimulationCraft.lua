@@ -1392,9 +1392,28 @@ SplitByTagAction = function(tag, node, nodeList, annotation)
 			OvaleSimulationCraft:Print("Warning: Unable to find %s '%s'", actionType, name)
 		end
 	elseif actionType == "texture" then
-		-- Textures are assumed to be "main" tag and invoke the GCD.
-		actionTag = "main"
-		invokesGCD = true
+		local firstParamNode = node.rawPositionalParams[1]
+		local id, name
+		if firstParamNode.type == "variable" then
+			name = firstParamNode.name
+			id = annotation.dictionary and annotation.dictionary[name]
+		elseif firstParamNode.type == "value" then
+			name = firstParamNode.value
+			id = name
+		end
+		
+		if actionTag == nil then
+			actionTag, invokesGCD = OvaleData:GetSpellTagInfo(id)
+		end
+		if actionTag == nil then
+			actionTag, invokesGCD = OvaleData:GetItemTagInfo(id)
+		end
+		
+		if actionTag == nil then
+			-- Textures are assumed to be "main" tag and invoke the GCD.
+			actionTag = "main"
+			invokesGCD = true
+		end
 	else
 		OvaleSimulationCraft:Print("Warning: Unknown action type '%'", actionType)
 	end
