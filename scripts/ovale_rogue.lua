@@ -830,6 +830,8 @@ AddFunction OutlawCdsShortCdActions
 	if target.TimeToDie() < ComboPointsDeficit() or { 600 > 40 or BuffRemaining(true_bearing_buff) > 15 } and ComboPointsDeficit() >= 4 + TalentPoints(deeper_stratagem_talent) + TalentPoints(anticipation_talent) Spell(marked_for_death)
 	#sprint,if=equipped.thraxis_tricksy_treads&!variable.ss_useable
 	if HasEquippedItem(thraxis_tricksy_treads) and not ss_useable() Spell(sprint)
+	#curse_of_the_dreadblades,if=combo_points.deficit>=4&(!talent.ghostly_strike.enabled|debuff.ghostly_strike.up)
+	if ComboPointsDeficit() >= 4 and { not Talent(ghostly_strike_talent) or target.DebuffPresent(ghostly_strike_debuff) } Spell(curse_of_the_dreadblades)
 }
 
 AddFunction OutlawCdsShortCdPostConditions
@@ -858,15 +860,13 @@ AddFunction OutlawCdsCdActions
 		{
 			#darkflight,if=equipped.thraxis_tricksy_treads&!variable.ss_useable&buff.sprint.down
 			if HasEquippedItem(thraxis_tricksy_treads) and not ss_useable() and BuffExpires(sprint_buff) Spell(darkflight)
-			#curse_of_the_dreadblades,if=combo_points.deficit>=4&(!talent.ghostly_strike.enabled|debuff.ghostly_strike.up)
-			if ComboPointsDeficit() >= 4 and { not Talent(ghostly_strike_talent) or target.DebuffPresent(ghostly_strike_debuff) } Spell(curse_of_the_dreadblades)
 		}
 	}
 }
 
 AddFunction OutlawCdsCdPostConditions
 {
-	Enemies() >= 1 and Spell(cannonball_barrage) or HasEquippedItem(thraxis_tricksy_treads) and not ss_useable() and Spell(sprint)
+	Enemies() >= 1 and Spell(cannonball_barrage) or HasEquippedItem(thraxis_tricksy_treads) and not ss_useable() and Spell(sprint) or ComboPointsDeficit() >= 4 and { not Talent(ghostly_strike_talent) or target.DebuffPresent(ghostly_strike_debuff) } and Spell(curse_of_the_dreadblades)
 }
 
 ### actions.finish
