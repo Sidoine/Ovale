@@ -2001,6 +2001,8 @@ EmitAction = function(parseNode, nodeList, annotation)
 			else
 				isSpellAction = false
 			end
+		elseif class == "ROGUE" and action == "between_the_eyes" then
+			bodyCode = "Spell(between_the_eyes text=BTE)"
 		elseif class == "ROGUE" and specialization == "combat" and action == "blade_flurry" then
 			annotation.blade_flurry = class
 			conditionCode = "CheckBoxOn(opt_blade_flurry)"
@@ -2019,6 +2021,8 @@ EmitAction = function(parseNode, nodeList, annotation)
 			annotation[action] = class
 			annotation.interrupt = class
 			isSpellAction = false
+		elseif class == "ROGUE" and action == "pistol_shot" then
+			bodyCode = "Spell(pistol_shot text=PS)"
 		elseif class == "ROGUE" and action == "premeditation" then
 			-- Don't suggest Premeditation if already at the combo point cap.
 			conditionCode = "ComboPoints() < 5"
