@@ -80,6 +80,7 @@ local MODIFIER_KEYWORD = {
 	["nonlethal"] = true,
 	["op"] = true,
 	["pct_health"] = true,
+	["precombat"] = true,
 	["range"] = true,
 	["sec"] = true,
 	["slot"] = true,
@@ -1391,9 +1392,28 @@ SplitByTagAction = function(tag, node, nodeList, annotation)
 			OvaleSimulationCraft:Print("Warning: Unable to find %s '%s'", actionType, name)
 		end
 	elseif actionType == "texture" then
-		-- Textures are assumed to be "main" tag and invoke the GCD.
-		actionTag = "main"
-		invokesGCD = true
+		local firstParamNode = node.rawPositionalParams[1]
+		local id, name
+		if firstParamNode.type == "variable" then
+			name = firstParamNode.name
+			id = annotation.dictionary and annotation.dictionary[name]
+		elseif firstParamNode.type == "value" then
+			name = firstParamNode.value
+			id = name
+		end
+		
+		if actionTag == nil then
+			actionTag, invokesGCD = OvaleData:GetSpellTagInfo(id)
+		end
+		if actionTag == nil then
+			actionTag, invokesGCD = OvaleData:GetItemTagInfo(id)
+		end
+		
+		if actionTag == nil then
+			-- Textures are assumed to be "main" tag and invoke the GCD.
+			actionTag = "main"
+			invokesGCD = true
+		end
 	else
 		OvaleSimulationCraft:Print("Warning: Unknown action type '%'", actionType)
 	end
@@ -1989,6 +2009,9 @@ EmitAction = function(parseNode, nodeList, annotation)
 			annotation[action] = class
 			annotation.interrupt = class
 			isSpellAction = false
+		elseif class == "ROGUE" and action == "adrenaline_rush" then
+			-- workaround to prevent flashing at max energy
+			conditionCode = "EnergyDeficit() > 1"
 		elseif class == "ROGUE" and action == "apply_poison" then
 			if modifier.lethal then
 				local name = Unparse(modifier.lethal)
@@ -2000,6 +2023,8 @@ EmitAction = function(parseNode, nodeList, annotation)
 			else
 				isSpellAction = false
 			end
+		elseif class == "ROGUE" and action == "between_the_eyes" then
+			bodyCode = "Spell(between_the_eyes text=BTE)"
 		elseif class == "ROGUE" and specialization == "combat" and action == "blade_flurry" then
 			annotation.blade_flurry = class
 			conditionCode = "CheckBoxOn(opt_blade_flurry)"
@@ -2018,6 +2043,8 @@ EmitAction = function(parseNode, nodeList, annotation)
 			annotation[action] = class
 			annotation.interrupt = class
 			isSpellAction = false
+		elseif class == "ROGUE" and action == "pistol_shot" then
+			bodyCode = "Spell(pistol_shot text=PS)"
 		elseif class == "ROGUE" and action == "premeditation" then
 			-- Don't suggest Premeditation if already at the combo point cap.
 			conditionCode = "ComboPoints() < 5"
@@ -2639,6 +2666,13 @@ EmitModifier = function(modifier, parseNode, nodeList, annotation, action)
 		else
 			code = "Speed() > 0"
 		end
+	elseif modifier == "precombat" then
+		local value = tonumber(Unparse(parseNode))
+		if value == 1 then
+			code = "not InCombat()"
+		else
+			code = "InCombat()"
+		end
 	elseif modifier == "sync" then
 		local name = Unparse(parseNode)
 		-- Fix only known case where we need to disambiguate a name within a SimulationCraft profile.
@@ -2746,6 +2780,8 @@ EmitOperand = function(parseNode, nodeList, annotation, action)
 		elseif token == "artifact" then
 			ok, node = EmitOperandArtifact(operand, parseNode, nodeList, annotation, action, target)
 		elseif token == "buff" then
+			ok, node = EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target)
+		elseif token == "consumable" then
 			ok, node = EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target)
 		elseif token == "cooldown" then
 			ok, node = EmitOperandCooldown(operand, parseNode, nodeList, annotation, action)
@@ -2864,7 +2900,7 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
 	elseif property == "miss_react" then
 		-- "miss_react" has no meaning in Ovale.
 		code = "True(miss_react)"
-	elseif property == "persistent_multiplier" then
+	elseif property == "persistent_multiplier" or property == "pmultiplier" then
 		code = format("PersistentMultiplier(%s)", buffName)
 	elseif property == "recharge_time" then
 		code = format("SpellChargeCooldown(%s)", name)
@@ -2997,9 +3033,10 @@ EmitOperandBuff = function(operand, parseNode, nodeList, annotation, action, tar
 
 	local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
 	local token = tokenIterator()
-	if token == "aura" or token == "buff" or token == "debuff" then
+	if token == "aura" or token == "buff" or token == "debuff" or token == "consumable" then
 		local name = tokenIterator()
 		local property = tokenIterator()
+		if(token == "consumable" and property == nil) then property = "remains" end
 		name = Disambiguate(name, annotation.class, annotation.specialization)
 		local buffName = (token == "debuff") and name .. "_debuff" or name .. "_buff"
 		buffName = Disambiguate(buffName, annotation.class, annotation.specialization)
@@ -3134,7 +3171,7 @@ do
 		["sigil_placed"]		= "SigilCharging(flame)",
 		["solar_max"]			= "TimeToEclipse(solar)",	-- XXX
 		["soul_shard"]			= "SoulShards()",
-		["soul_fragments"]		= "BuffStacks(soul_fragments)",
+		["soul_fragments"]		= "SoulFragments()",
 		["ssw_refund_offset"]	= "target.Distance() % 3 - 1",
 		["stat.mastery_rating"]	= "MasteryRating()",
 		["stat.multistrike_pct"]= "MultistrikeChance()",
@@ -3873,6 +3910,13 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 	elseif class == "ROGUE" and operand == "poisoned_enemies" then
 		-- TODO Need to track the number of poisoned enemies
 		code = "0" 
+	elseif class == "ROGUE" and operand == "poisoned_bleeds" then
+		-- TODO Need to track the number of poisoned enemies
+		code = "DebuffCountOnAny(rupture_debuff) + DebuffCountOnAny(garrote_debuff) + Talent(internal_bleeding_talent) * DebuffCountOnAny(internal_bleeding_debuff)"
+		AddSymbol(annotation, "rupture_debuff")
+		AddSymbol(annotation, "garrote_debuff")
+		AddSymbol(annotation, "internal_bleeding_talent")
+		AddSymbol(annotation, "internal_bleeding_debuff")
 	elseif class == "ROGUE" and operand == "exsanguinated" then
 		code = "target.DebuffPresent(exsanguinated)"
 		AddSymbol(annotation, "exsanguinated")
@@ -3929,9 +3973,6 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 	elseif class == "WARRIOR" and operand == "gcd.remains" and (action == "battle_cry" or action == "avatar") then
 		-- Always assume the gcd is over
 		code = "0"
-	elseif class == "WARRIOR" and operand == "buff.revenge.react" then
-		code = "RageCost(revenge) == 0"
-		AddSymbol(annotation, "revenge")
 	elseif operand == "buff.enrage.down" then
 		code = "not " .. target .. "IsEnraged()"
 	elseif operand == "buff.enrage.remains" then
@@ -4373,6 +4414,11 @@ local function InsertInterruptFunction(child, annotation, interrupts)
 	for _, spell in pairs(spells) do
 		-- AddSymbol
 		AddSymbol(annotation, spell.name)
+		if(spell.addSymbol ~= nil) then
+			for k,v in pairs(spell.addSymbol) do
+				AddSymbol(annotation, v)
+			end
+		end
 		
 		-- Build conditions
 		local conditions = {}
@@ -4507,6 +4553,13 @@ local function InsertInterruptFunctions(child, annotation)
 	end
 	if annotation.pummel == "WARRIOR" then
 		tinsert(interrupts, {name = "pummel", interrupt=1, worksOnBoss=1, order=10})
+		tinsert(interrupts, {name = "shockwave", stun=1, worksOnBoss=0, order=20, range="target.Distance(less 10)"})
+		tinsert(interrupts, {name = "storm_bolt", stun=1, worksOnBoss=0, order=20})
+		if(annotation.specialization == "protection") then
+			tinsert(interrupts, {name = "intercept", stun=1, worksOnBoss=0, order=20, extraCondition="Talent(warbringer_talent)", addSymbol={"warbringer_talent"}})
+		end
+		tinsert(interrupts, {name = "intimidating_shout", incapacitate=1, worksOnBoss=0, order=100})
+		
 	end
 	
 	if #interrupts > 0 then
@@ -4781,19 +4834,23 @@ local function InsertSupportingFunctions(child, annotation)
 		local fmt = [[
 			AddFunction %sGetInMeleeRange
 			{
-				if CheckBoxOn(opt_melee_range)
+				if CheckBoxOn(opt_melee_range) and not InFlightToTarget(%s) and not InFlightToTarget(heroic_leap)
 				{
-					if target.InRange(charge) Spell(charge)
-					if SpellCharges(charge) == 0 and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
+					if target.InRange(%s) Spell(%s)
+					if SpellCharges(%s) == 0 and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
 					if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
 				}
 			}
 		]]
-		local code = format(fmt, camelSpecialization)
+		local charge = "charge"
+		if annotation.specialization == "protection" then
+			charge = "intercept"
+		end
+		local code = format(fmt, camelSpecialization, charge, charge, charge, charge)
 		local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
 		tinsert(child, 1, node)
 		annotation.functionTag[node.name] = "shortcd"
-		AddSymbol(annotation, "charge")
+		AddSymbol(annotation, charge)
 		AddSymbol(annotation, "heroic_leap")
 		AddSymbol(annotation, "pummel")
 		count = count + 1

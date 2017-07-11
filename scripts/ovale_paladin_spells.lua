@@ -7,6 +7,9 @@ do
 	local code = [[
 # Items
 Define(heathcliffs_immortality 137047)
+Define(pillars_of_inmost_light 151812)
+
+ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!guardian_of_ancient_kings,buff,!guardian_of_ancient_kings_buff)	
 	
 # Paladin spells and functions.
 
@@ -53,8 +56,7 @@ Define(blazing_contempt_buff 166831)
 Define(blessed_hammer 204019)
 Define(blessed_hammer_debuff 204301)
 Define(blinding_light 115750)
-	SpellInfo(blinding_light cd=120 interrupt=1 tag=main)
-	SpellInfo(blinding_light tag=main specialization=protection)
+	SpellInfo(blinding_light cd=120 interrupt=1 tag=cd)
 Define(cleanse 4987)
 	SpellInfo(cleanse cd=8)
 Define(consecration 26573)
@@ -131,6 +133,7 @@ Define(exorcism 879)
 	SpellAddBuff(exorcism blazing_contempt_buff=0 itemset=T17 itemcount=4 specialization=retribution)
 Define(eye_of_tyr 209202)
 	SpellInfo(eye_of_tyr cd=60 tag=cd)
+	SpellInfo(eye_of_tyr cd=45 if_equipped=pillars_of_inmost_light)
 	SpellAddTargetDebuff(eye_of_tyr eye_of_tyr_debuff=1)
 Define(eye_of_tyr_debuff 209202)
 	SpellInfo(eye_of_tyr_debuff duration=9)

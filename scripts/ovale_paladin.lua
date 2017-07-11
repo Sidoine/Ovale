@@ -65,7 +65,7 @@ AddFunction ProtectionDefaultMainActions
 {
 	if Speed() == 0 and HasEquippedItem(heathcliffs_immortality) and not BuffPresent(consecration_buff) Spell(consecration)
 	if Charges(shield_of_the_righteous) <= 2*Talent(seraphim_talent) and not BuffPresent(shield_of_the_righteous_buff) and ProtectionCooldownTreshold() and (not Talent(bastion_of_light_talent) or SpellCooldown(bastion_of_light) > 0) Spell(eye_of_tyr)
-	if Talent(blessed_hammer_talent) Spell(blessed_hammer)
+	if Talent(blessed_hammer_talent) and not PreviousSpell(blessed_hammer) Spell(blessed_hammer)
 	Spell(judgment)
 	if Talent(crusaders_judgment_talent) and BuffPresent(grand_crusader_buff) Spell(avengers_shield)
 	if Speed() == 0 and not Talent(consecrated_hammer_talent) and not BuffPresent(consecration_buff) Spell(consecration)
@@ -92,6 +92,7 @@ AddFunction ProtectionDefaultCdActions
 	ProtectionInterruptActions()
 	if CheckBoxOn(opt_avenging_wrath) and (not Talent(seraphim_talent) or BuffPresent(seraphim_buff)) Spell(avenging_wrath_melee)
 	
+	if (ProtectionCooldownTreshold() and HasEquippedItem(shifting_cosmic_sliver)) Spell(guardian_of_ancient_kings)
 	Item(Trinket0Slot usable=1 text=13)
 	Item(Trinket1Slot usable=1 text=14)
 	
@@ -362,8 +363,6 @@ AddFunction ProtectionProtMainActions
 	Spell(avengers_shield)
 	#consecration
 	Spell(consecration)
-	#blinding_light
-	Spell(blinding_light)
 	#hammer_of_the_righteous
 	Spell(hammer_of_the_righteous)
 }
@@ -398,7 +397,7 @@ AddFunction ProtectionProtShortCdActions
 
 AddFunction ProtectionProtShortCdPostConditions
 {
-	Spell(judgment) or Talent(crusaders_judgment_talent) and BuffPresent(grand_crusader_buff) and Spell(avengers_shield) or Spell(blessed_hammer) or Spell(avengers_shield) or Spell(consecration) or Spell(blinding_light) or Spell(hammer_of_the_righteous)
+	Spell(judgment) or Talent(crusaders_judgment_talent) and BuffPresent(grand_crusader_buff) and Spell(avengers_shield) or Spell(blessed_hammer) or Spell(avengers_shield) or Spell(consecration) or Spell(hammer_of_the_righteous)
 }
 
 AddFunction ProtectionProtCdActions
@@ -429,11 +428,17 @@ AddFunction ProtectionProtCdActions
 	if not Talent(seraphim_talent) Spell(avenging_wrath_melee)
 	#avenging_wrath,if=talent.seraphim.enabled&buff.seraphim.up
 	if Talent(seraphim_talent) and BuffPresent(seraphim_buff) Spell(avenging_wrath_melee)
+
+	unless Spell(judgment) or Talent(crusaders_judgment_talent) and BuffPresent(grand_crusader_buff) and Spell(avengers_shield) or Spell(blessed_hammer) or Spell(avengers_shield) or Spell(consecration)
+	{
+		#blinding_light
+		Spell(blinding_light)
+	}
 }
 
 AddFunction ProtectionProtCdPostConditions
 {
-	Spell(judgment) or Talent(crusaders_judgment_talent) and BuffPresent(grand_crusader_buff) and Spell(avengers_shield) or Spell(blessed_hammer) or Spell(avengers_shield) or Spell(consecration) or Spell(blinding_light) or Spell(hammer_of_the_righteous)
+	Spell(judgment) or Talent(crusaders_judgment_talent) and BuffPresent(grand_crusader_buff) and Spell(avengers_shield) or Spell(blessed_hammer) or Spell(avengers_shield) or Spell(consecration) or Spell(hammer_of_the_righteous)
 }
 
 ### Protection icons.

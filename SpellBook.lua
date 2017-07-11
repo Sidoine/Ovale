@@ -48,11 +48,14 @@ local API_IsHelpfulSpell = IsHelpfulSpell
 local API_IsSpellInRange = IsSpellInRange
 local API_IsUsableItem = IsUsableItem
 local API_IsUsableSpell = IsUsableSpell
+local API_UnitIsFriend = UnitIsFriend
 local BOOKTYPE_PET = BOOKTYPE_PET
 local BOOKTYPE_SPELL = BOOKTYPE_SPELL
 local MAX_TALENT_TIERS = MAX_TALENT_TIERS
 local NUM_TALENT_COLUMNS = NUM_TALENT_COLUMNS
 local MAX_NUM_TALENTS = NUM_TALENT_COLUMNS * MAX_TALENT_TIERS
+local WARRIOR_INCERCEPT_SPELLID = 198304
+local WARRIOR_HEROICTHROW_SPELLID = 57755
 
 -- Register for debugging messages.
 OvaleDebug:RegisterDebugging(OvaleSpellBook)
@@ -153,9 +156,14 @@ function OvaleSpellBook:OnEnable()
 	self:RegisterEvent("SPELLS_CHANGED", "UpdateSpells")
 	self:RegisterEvent("UNIT_PET")
 	OvaleState:RegisterState(self, self.statePrototype)
+	
+	OvaleData:RegisterRequirement("spellcount_min", "RequireSpellCountHandler", self)
+	OvaleData:RegisterRequirement("spellcount_max", "RequireSpellCountHandler", self)
 end
 
 function OvaleSpellBook:OnDisable()
+	OvaleData:UnregisterRequirement("spellcount_max")
+	OvaleData:UnregisterRequirement("spellcount_min")
 	OvaleState:UnregisterState(self)
 	self:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 	self:UnregisterEvent("CHARACTER_POINTS_CHANGED")
@@ -404,16 +412,25 @@ function OvaleSpellBook:IsPetSpell(spellId)
 	return bookType == BOOKTYPE_PET
 end
 
+
 -- Returns whether the unit is within range of the spell.
 function OvaleSpellBook:IsSpellInRange(spellId, unitId)
 	local index, bookType = self:GetSpellBookIndex(spellId)
+	local returnValue = nil
 	if index and bookType then
-		return API_IsSpellInRange(index, bookType, unitId)
+		returnValue = API_IsSpellInRange(index, bookType, unitId)
 	elseif self:IsKnownSpell(spellId) then
 		local name = self:GetSpellName(spellId)
-		return API_IsSpellInRange(name, unitId)
+		returnValue = API_IsSpellInRange(name, unitId)
 	end
-	return nil
+	-- intercept behaves weird
+	-- for enemy target the range is 8-25
+	-- for friendly target the range is 0-25
+	-- yet, the function returns true even if range <8 and enemy target
+	if(returnValue == 1 and spellId == WARRIOR_INCERCEPT_SPELLID) then
+		return (API_UnitIsFriend("player", unitId) == 1 or OvaleSpellBook:IsSpellInRange(WARRIOR_HEROICTHROW_SPELLID, unitId) == 1) and 1 or 0
+	end
+	return returnValue
 end
 
 -- Returns true if the given spell ID is usable.  A spell is *not* usable if:
@@ -450,6 +467,24 @@ do
 		OutputTableValues(output, self.talent)
 		return tconcat(output, "\n")
 	end
+end
+
+function OvaleSpellBook:RequireSpellCountHandler(spellId, atTime, requirement, tokens, index, targetGUID)
+	local verified = false
+	-- If index isn't given, then tokens holds the actual token value.
+	local count = tokens
+	if index then
+		count = tokens[index]
+		index = index + 1
+	end
+	if count then
+		count = tonumber(count) or 1
+		local actualCount = OvaleSpellBook:GetSpellCount(spellId)
+		verified = (requirement == "spellcount_min" and count <= actualCount) or (requirement == "spellcount_max" and count >= actualCount)
+	else
+		Ovale:OneTimeMessage("Warning: requirement '%s' is missing a count argument.", requirement)
+	end
+	return verified, requirement, index
 end
 --</public-static-methods>
 
@@ -565,3 +600,5 @@ statePrototype.GetTimeToSpell = function(state, spellId, atTime, targetGUID, ext
 	return timeToSpell
 end
 --</state-methods>
+
+statePrototype.RequireSpellCountHandler = OvaleSpellBook.RequireSpellCountHandler

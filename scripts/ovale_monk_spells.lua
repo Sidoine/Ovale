@@ -5,6 +5,9 @@ do
 	local name = "ovale_monk_spells"
 	local desc = "[7.0] Ovale: Monk spells"
 	local code = [[
+
+ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!fortifying_brew,buff,!fortifying_brew_buff)
+
 # Monk spells and functions.
 
 Define(blackout_combo_buff 228563)
@@ -103,6 +106,7 @@ Define(enveloping_mist_buff 132120)
 	SpellInfo(enveloping_mist_buff duration=6 tick=1)
 Define(expel_harm 115072)
 	SpellInfo(expel_harm energy=15 specialization=brewmaster)
+	SpellRequire(expel_harm unusable 1=spellcount_max,0)
 Define(exploding_keg 214326)
 Define(extend_life_buff 185158)
 	SpellInfo(extend_life_buff duration=12)

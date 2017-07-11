@@ -13,13 +13,12 @@ Include(ovale_druid_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=guardian)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=guardian)
-AddCheckBox(opt_legendary_ring_tank ItemName(legendary_ring_bonus_armor) default specialization=guardian)
 AddCheckBox(opt_druid_guardian_aoe L(AOE) default specialization=guardian)
 
 AddFunction GuardianHealMe
 {
-	if IncomingDamage(5) / MaxHealth() >= 0.5 Spell(frenzied_regeneration)
-	if ((IncomingDamage(5) / MaxHealth() / 2 <= HealthMissing() / MaxHealth()) and (IncomingDamage(5) / MaxHealth() / 2 > 0.1) and SpellCharges(frenzied_regeneration) >= 2) Spell(frenzied_regeneration)
+	if IncomingDamage(5) >= MaxHealth() * 0.5 Spell(frenzied_regeneration)
+	if ((IncomingDamage(5) / 2 <= HealthMissing()) and (IncomingDamage(5) / 2 > MaxHealth() * 0.1) and SpellCharges(frenzied_regeneration) >= 2) Spell(frenzied_regeneration)
 	if HealthPercent() <= 50 Spell(lunar_beam)
 	if HealthPercent() <= 50 and IncomingDamage(5 physical=1) == 0 Spell(regrowth)
 	if HealthPercent() <= 80 and not InCombat() Spell(regrowth)
@@ -39,7 +38,7 @@ AddFunction GuardianDefaultShortCDActions
 	GuardianHealMe()
 	if InCombat() and BuffExpires(bristling_fur_buff)
 	{
-		if IncomingDamage(3 physical=1) Spell(ironfur)
+		if IncomingDamage(5 physical=1) Spell(ironfur)
 	}
 	if BuffExpires(survival_instincts_buff) and BuffExpires(rage_of_the_sleeper_buff) and BuffExpires(barkskin_buff) Spell(bristling_fur)
 	# range check
@@ -56,7 +55,7 @@ AddFunction GuardianDefaultMainActions
 	if not BuffExpires(galactic_guardian_buff) Spell(moonfire)
 	Spell(mangle)
 	Spell(thrash_bear)
-	if target.DebuffStacks(thrash_bear_debuff) >= 3 Spell(pulverize)
+	if target.DebuffStacks(thrash_bear_debuff) >= 2 Spell(pulverize)
 	if target.DebuffRefreshable(moonfire_debuff) Spell(moonfire)
 	if RageDeficit() <= 20 Spell(maul)
 	Spell(swipe_bear)
@@ -84,11 +83,11 @@ AddFunction GuardianDefaultCdActions
 	GuardianInterruptActions()
 	Spell(incarnation_guardian_of_ursoc)
 	if HasArtifactTrait(embrace_of_the_nightmare) Spell(rage_of_the_sleeper)
-	if CheckBoxOn(opt_legendary_ring_tank) Item(legendary_ring_bonus_armor usable=1)
-	Item(Trinket0Slot usable=1 text=13)
-	Item(Trinket1Slot usable=1 text=14)
 	if BuffExpires(bristling_fur_buff) and BuffExpires(survival_instincts_buff) and BuffExpires(rage_of_the_sleeper_buff) and BuffExpires(barkskin_buff) and BuffExpires(potion_buff)
 	{
+		if (HasEquippedItem(shifting_cosmic_sliver)) Spell(survival_instincts)
+		Item(Trinket0Slot usable=1 text=13)
+		Item(Trinket1Slot usable=1 text=14)
 		Spell(barkskin)
 		Spell(rage_of_the_sleeper)
 		Spell(survival_instincts)

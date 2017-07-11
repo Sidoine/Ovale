@@ -13,15 +13,20 @@ Include(ovale_monk_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=brewmaster)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=brewmaster)
-AddCheckBox(opt_legendary_ring_tank ItemName(legendary_ring_bonus_armor) default specialization=brewmaster)
 AddCheckBox(opt_monk_bm_aoe L(AOE) default specialization=brewmaster)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=brewmaster)
 
 AddFunction BrewmasterHealMe
 {
 	if (HealthPercent() < 35) Spell(healing_elixir)
-	if (SpellCount(expel_harm) >= 1 and HealthPercent() < 35) Spell(expel_harm)
+	if (HealthPercent() < 35) Spell(expel_harm)
 	if (HealthPercent() <= 100 - (15 * 2.6)) Spell(healing_elixir)
+	if (ArmorSetBonus(T20 2)) 
+	{	
+		if HealthPercent() <= 70 Spell(expel_harm)
+		if IncomingDamage(5) >=  MaxHealth() * 0.3 Spell(expel_harm)
+		if StaggerPercentage() > 60 Spell(expel_harm)
+	}
 }
 
 AddFunction StaggerPercentage
@@ -49,7 +54,7 @@ AddFunction BrewmasterDefaultShortCDActions
 	unless StaggerPercentage() > 100 or BrewmasterHealMe()
 	{
 		# purify heavy stagger when we have enough ISB
-		if (DebuffPresent(heavy_stagger_debuff) and (BuffRemaining(ironskin_brew_buff) >= 2*BaseDuration(ironskin_brew))) Spell(purifying_brew)
+		if (DebuffPresent(heavy_stagger_debuff) and (BuffRemaining(ironskin_brew_buff) >= 2*BaseDuration(ironskin_brew_buff))) Spell(purifying_brew)
 		# purify medium stagger when low on hp
 		if ((DebuffPresent(heavy_stagger_debuff) or DebuffPresent(moderate_stagger_debuff)) and HealthPercent() <= 50) Spell(purifying_brew)
 		# always keep 1 charge unless black_ox_brew is coming off cd
@@ -58,7 +63,7 @@ AddFunction BrewmasterDefaultShortCDActions
 			# never be at (almost) max charges 
 			if (SpellCharges(ironskin_brew count=0) >= SpellMaxCharges(ironskin_brew)-0.3)
 			{
-				if (BuffRemaining(ironskin_brew_buff) < 2*BaseDuration(ironskin_brew)) Spell(ironskin_brew)
+				if (BuffRemaining(ironskin_brew_buff) < 2*BaseDuration(ironskin_brew_buff)) Spell(ironskin_brew)
 				Spell(purifying_brew)
 			}
 			# use up those charges when black_ox_brew_talent comes off cd
@@ -71,9 +76,9 @@ AddFunction BrewmasterDefaultShortCDActions
 			if(StaggerRemaining() > 0)
 			{
 				# keep brew-stache rolling (when not elusive_dance)
-				if (HasArtifactTrait(brew_stache_trait) and BuffExpires(brew_stache_buff) and not Talent(elusive_dance_talent) and (BuffRemaining(ironskin_brew_buff) < 2*BaseDuration(ironskin_brew))) Spell(ironskin_brew text=stache)
+				if (HasArtifactTrait(brew_stache_trait) and BuffExpires(brew_stache_buff) and not Talent(elusive_dance_talent) and (BuffRemaining(ironskin_brew_buff) < 2*BaseDuration(ironskin_brew_buff))) Spell(ironskin_brew text=stache)
 				# keep up ironskin_brew_buff
-				if (BuffRemaining(ironskin_brew_buff) < BaseDuration(ironskin_brew)) Spell(ironskin_brew)
+				if (BuffRemaining(ironskin_brew_buff) < BaseDuration(ironskin_brew_buff)) Spell(ironskin_brew)
 				# purify stagger when talent elusive dance 
 				if (Talent(elusive_dance_talent) and BuffExpires(elusive_dance_buff)) Spell(purifying_brew)
 			}
@@ -157,9 +162,9 @@ AddFunction BrewmasterBlackoutComboAoEActions
 AddFunction BrewmasterDefaultCdActions 
 {
 	BrewmasterInterruptActions()
-	if CheckBoxOn(opt_legendary_ring_tank) Item(legendary_ring_bonus_armor usable=1)
 	if not PetPresent(name=Niuzao) Spell(invoke_niuzao)
-	if (HasEquippedItem(firestone_walkers)) Spell(fortifying_brew text=FW)
+	if (HasEquippedItem(firestone_walkers)) Spell(fortifying_brew)
+	if (HasEquippedItem(shifting_cosmic_sliver)) Spell(fortifying_brew)
 	if (HasEquippedItem(fundamental_observation)) Spell(zen_meditation text=FO)
 	Item(Trinket0Slot usable=1 text=13)
 	Item(Trinket1Slot usable=1 text=14)

@@ -57,6 +57,7 @@ Define(old_war_potion 127844)
 Define(prolonged_power_potion 142117)
 Define(unbending_potion 127845)
 
+Define(prolonged_power_buff 229206)
 Define(unbending_potion_buff 188029)
 SpellList(potion_buff unbending_potion_buff)
 
@@ -74,11 +75,13 @@ Define(cooldown_reduction_tank_buff 146025)
 
 Define(coagulated_nightwell_residue 137400)
 	ItemRequire(coagulated_nightwell_residue unusable 1=buff,!nightwell_energy_buff)
+Define(cunning_of_the_deceiver 242629)
 Define(convergence_of_fates 140806)
 Define(draught_of_souls 140808)
 Define(gnawed_thumb_ring 134526)
 	ItemInfo(gnawed_thumb_ring cd=180)
 Define(nightwell_energy_buff 214572)
+Define(shifting_cosmic_sliver 147026)
 Define(specter_of_betrayal 151190)
 
 
