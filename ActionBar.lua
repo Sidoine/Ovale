@@ -6,7 +6,7 @@
 
 -- Keep data about the player action bars (key bindings mostly)
 local OVALE, Ovale = ...
-local OvaleActionBar = Ovale:NewModule("OvaleActionBar", "AceEvent-3.0")
+local OvaleActionBar = Ovale:NewModule("OvaleActionBar", "AceEvent-3.0", "AceTimer-3.0")
 Ovale.OvaleActionBar = OvaleActionBar
 
 --<private-static-properties>
@@ -149,13 +149,23 @@ function OvaleActionBar:ACTIONBAR_SLOT_CHANGED(event, slot)
 	if slot == 0 then
 		self:UpdateActionSlots(event)
 	elseif slot then
-		self:UpdateActionSlot(slot)
+	    -- Don't update the slot if this is an inactive bonus slot
+		local bonus = tonumber(API_GetBonusBarIndex()) * 12
+		local bonusStart = (bonus > 0) and (bonus - 11) or 1
+		local isBonus = slot >= bonusStart and slot < bonusStart + 12
+		if isBonus or slot > 12 and slot < 73 then
+			self:UpdateActionSlot(slot)
+		end
 	end
 end
 
 function OvaleActionBar:UPDATE_BINDINGS(event)
 	self:Debug("%s: Updating key bindings.", event)
 	self:UpdateKeyBindings()
+end
+
+function OvaleActionBar:TimerUpdateActionSlots()
+  self:UpdateActionSlots("TimerUpdateActionSlots")
 end
 
 function OvaleActionBar:UpdateActionSlots(event)
@@ -176,6 +186,12 @@ function OvaleActionBar:UpdateActionSlots(event)
 	end
 	for slot = start, 72 do
 		self:UpdateActionSlot(slot)
+	end
+	-- If a spell changes ID due to a stance change, the new ID hasn't taken
+    -- effect when the UPDATE_BONUS_ACTIONBAR event occurs. Fire a timer so
+    -- it we can update the spell ID once they are updated.
+	if event ~= "TimerUpdateActionSlots" then
+	    self:ScheduleTimer("TimerUpdateActionSlots", 1)
 	end
 	self:StopProfiling("OvaleActionBar_UpdateActionSlots")
 end
