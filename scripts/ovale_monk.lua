@@ -55,8 +55,9 @@ AddFunction BrewmasterDefaultShortCDActions
 		if ((DebuffPresent(heavy_stagger_debuff) or DebuffPresent(moderate_stagger_debuff)) and ArmorSetBonus(T20 4) and SpellCount(expel_harm) >= 6) Spell(expel_harm)
 		# purify medium stagger when low on hp
 		if ((DebuffPresent(heavy_stagger_debuff) or DebuffPresent(moderate_stagger_debuff)) and HealthPercent() <= 50) Spell(purifying_brew)
+		
 		# always keep 1 charge unless black_ox_brew is coming off cd
-		if (SpellCharges(ironskin_brew count=0) >= 1.9 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3))
+		if (SpellCharges(ironskin_brew count=0) >= 1.8 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3))
 		{
 			# never be at (almost) max charges 
 			if (SpellCharges(ironskin_brew count=0) >= SpellMaxCharges(ironskin_brew)-0.3)
