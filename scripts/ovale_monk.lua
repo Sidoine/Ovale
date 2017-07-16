@@ -35,6 +35,8 @@ AddFunction BrewmasterRangeCheck
 
 AddFunction BrewmasterDefaultShortCDActions
 {
+	# keep ISB up always
+	if BuffRemaining(ironskin_brew_buff) < 5 Spell(ironskin_brew)
 	# keep stagger below 100%
 	if (StaggerPercentage() > 100) Spell(purifying_brew)
 	# use black_ox_brew when at 0 charges but delay it when a charge is about to come off cd
