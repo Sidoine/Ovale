@@ -66,12 +66,6 @@ AddFunction BrewmasterDefaultShortCDActions
 				if (BuffRemaining(ironskin_brew_buff) < 2*BaseDuration(ironskin_brew_buff)) Spell(ironskin_brew)
 				Spell(purifying_brew)
 			}
-			# use up those charges when black_ox_brew_talent comes off cd
-			if (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3)
-			{
-				Spell(purifying_brew)
-				Spell(ironskin_brew)
-			}
 			
 			if(StaggerRemaining() > 0)
 			{
