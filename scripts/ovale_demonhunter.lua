@@ -33,7 +33,7 @@ AddFunction VengeanceHealMe
 
 AddFunction VengeanceInfernalStrike
 {
-	(not Talent(flame_crash_talent) or (not SigilCharging(flame) and target.DebuffRemaining(sigil_of_flame_debuff) <= 2-Talent(quickened_sigils_talent))) and
+	(not Talent(flame_crash_talent) or VengeanceSigilOfFlame()) and
 	(	
 		(SpellCharges(infernal_strike) >= SpellMaxCharges(infernal_strike)) or 
 		(SpellCharges(infernal_strike) == SpellMaxCharges(infernal_strike)-1 and SpellChargeCooldown(infernal_strike)<=2*GCD())

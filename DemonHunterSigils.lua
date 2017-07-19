@@ -44,7 +44,7 @@ end
 
 local sigil_start = {
 	[204596] = { type="flame"}, -- Sigil of flame
-	[189111] = { type="flame", talent=8}, -- Infernal strike
+	[189110] = { type="flame", talent=8}, -- Infernal strike
 	[202137] = { type="silence"}, -- Sigil of Silence
 	[207684] = { type="misery"}, -- Sigil of Misery
 	[202138] = { type="chains"}, -- Sigil of Chains
