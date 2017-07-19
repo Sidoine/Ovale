@@ -39,7 +39,7 @@ AddFunction BrewmasterDefaultShortCDActions
 	if BuffRemaining(ironskin_brew_buff) < 5 Spell(ironskin_brew)
 	
 	# expel_harm T20 4set purify when we can
-	if ((DebuffPresent(heavy_stagger_debuff) or DebuffPresent(moderate_stagger_debuff)) and ArmorSetBonus(T20 4) and SpellCount(expel_harm) >= 6) Spell(expel_harm)
+	if (StaggerPercentage() > 30 and ArmorSetBonus(T20 4) and SpellCount(expel_harm) >= 6) Spell(expel_harm)
 	# keep stagger below 100%
 	if (StaggerPercentage() > 100) Spell(purifying_brew)
 	# use black_ox_brew when at 0 charges and low energy (or in an emergency)
@@ -53,9 +53,9 @@ AddFunction BrewmasterDefaultShortCDActions
 	unless StaggerPercentage() > 100 or BrewmasterHealMe()
 	{
 		# purify heavy stagger when we have enough ISB
-		if (DebuffPresent(heavy_stagger_debuff) and (BuffRemaining(ironskin_brew_buff) >= 2*BaseDuration(ironskin_brew_buff))) Spell(purifying_brew)
+		if (StaggerPercentage() > 60 and (BuffRemaining(ironskin_brew_buff) >= 2*BaseDuration(ironskin_brew_buff))) Spell(purifying_brew)
 		# purify medium stagger when low on hp
-		if ((DebuffPresent(heavy_stagger_debuff) or DebuffPresent(moderate_stagger_debuff)) and HealthPercent() <= 50) Spell(purifying_brew)
+		if (StaggerPercentage() > 30 and HealthPercent() <= 50) Spell(purifying_brew)
 		
 		# always keep 1 charge unless black_ox_brew is coming off cd
 		if (SpellCharges(ironskin_brew count=0) >= 1.8 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3))
