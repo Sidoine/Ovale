@@ -76,7 +76,7 @@ AddFunction BrewmasterDefaultShortCDActions
 			if(StaggerRemaining() > 0)
 			{
 				# keep brew-stache rolling (when not elusive_dance)
-				if (HasArtifactTrait(brew_stache_trait) and BuffExpires(brew_stache_buff) and not Talent(elusive_dance_talent) and (BuffRemaining(ironskin_brew_buff) < 2*BaseDuration(ironskin_brew_buff))) Spell(ironskin_brew text=stache)
+				if (IncomingDamage(5 physical=1)>0 and HasArtifactTrait(brew_stache_trait) and BuffExpires(brew_stache_buff) and not Talent(elusive_dance_talent) and (BuffRemaining(ironskin_brew_buff) < 2*BaseDuration(ironskin_brew_buff))) Spell(ironskin_brew text=stache)
 				# keep up ironskin_brew_buff
 				if (BuffRemaining(ironskin_brew_buff) < BaseDuration(ironskin_brew_buff)) Spell(ironskin_brew)
 				# purify stagger when talent elusive dance 
