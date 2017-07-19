@@ -54,8 +54,6 @@ AddFunction BrewmasterDefaultShortCDActions
 	{
 		# purify heavy stagger when we have enough ISB
 		if (StaggerPercentage() > 60 and (BuffRemaining(ironskin_brew_buff) >= 2*BaseDuration(ironskin_brew_buff))) Spell(purifying_brew)
-		# purify medium stagger when low on hp
-		if (StaggerPercentage() > 30 and HealthPercent() <= 50) Spell(purifying_brew)
 		
 		# always keep 1 charge unless black_ox_brew is coming off cd
 		if (SpellCharges(ironskin_brew count=0) >= 1.8 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3))
