@@ -42,8 +42,8 @@ AddFunction BrewmasterDefaultShortCDActions
 	if ((DebuffPresent(heavy_stagger_debuff) or DebuffPresent(moderate_stagger_debuff)) and ArmorSetBonus(T20 4) and SpellCount(expel_harm) >= 6) Spell(expel_harm)
 	# keep stagger below 100%
 	if (StaggerPercentage() > 100) Spell(purifying_brew)
-	# use black_ox_brew when at 0 charges but delay it when a charge is about to come off cd
-	if ((SpellCharges(purifying_brew) == 0) and (SpellChargeCooldown(purifying_brew) > 2 or StaggerPercentage() > 100)) Spell(black_ox_brew)
+	# use black_ox_brew when at 0 charges and low energy (or in an emergency)
+	if ((SpellCharges(purifying_brew) == 0) and (Energy() < 30 or StaggerPercentage() > 100)) Spell(black_ox_brew)
 	# heal me
 	BrewmasterHealMe()
 	
