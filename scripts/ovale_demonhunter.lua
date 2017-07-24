@@ -79,8 +79,8 @@ AddFunction VengeanceDefaultMainActions
 	# Fiery demise
 	if (not target.DebuffExpires(fiery_demise_debuff))
 	{
-		if (PainDeficit() > 10*(1+0.2*BuffPresent(blade_turning_buff))) Spell(immolation_aura)
 		Spell(soul_carver)
+		if (PainDeficit() > 10*(1+0.2*BuffPresent(blade_turning_buff))) Spell(immolation_aura)
 		Spell(fel_devastation)
 		if (PainDeficit() > 20*(1+0.2*BuffPresent(blade_turning_buff))) Spell(felblade)
 		if (SoulFragments() >= 5-Talent(fracture_talent)) Spell(spirit_bomb)
