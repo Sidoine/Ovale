@@ -59,7 +59,7 @@ AddFunction BrewmasterDefaultShortCDActions
 		if (SpellCharges(ironskin_brew count=0) >= 1.8 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3))
 		{
 			# never be at (almost) max charges 
-			if (SpellCharges(ironskin_brew count=0) >= SpellMaxCharges(ironskin_brew)-0.3) or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3))
+			if ((SpellCharges(ironskin_brew count=0) >= SpellMaxCharges(ironskin_brew)-0.3) or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3))
 			{
 				if (BuffRemaining(ironskin_brew_buff) < 2*BaseDuration(ironskin_brew_buff)) Spell(ironskin_brew)
 				if (StaggerPercentage() > 30) Spell(purifying_brew)
