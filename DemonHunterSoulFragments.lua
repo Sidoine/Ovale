@@ -54,6 +54,7 @@ end
 
 function OvaleDemonHunterSoulFragments:PLAYER_REGEN_DISABLED()
 	self.soul_fragments = {}
+	self.last_checked = nil
 	self:SetCurrentSoulFragments()
 end
 
@@ -74,28 +75,29 @@ function OvaleDemonHunterSoulFragments:COMBAT_LOG_EVENT_UNFILTERED( event, _, su
 		if subtype == "SPELL_CAST_SUCCESS" and SOUL_FRAGMENT_FINISHERS[spellID] then
 			self:SetCurrentSoulFragments(0)
 		end
+		
+		-- sync up the count if needed
+		local now = API_GetTime()
+		if self.last_checked == nil or now - self.last_checked >= 1.5 then
+			self:SetCurrentSoulFragments()
+		end
     end
-	
-	-- sync up the count if needed
-	local now = API_GetTime()
-	if now - self.last_soul_fragment_count.timestamp >= 1.5 then
-		self:SetCurrentSoulFragments()
-	end
 end
 
 function OvaleDemonHunterSoulFragments:SetCurrentSoulFragments(count)
-	self.soul_fragments = self.soul_fragments or {}
-	
 	local now = API_GetTime()
+	self.last_checked = now
+	self.soul_fragments = self.soul_fragments or {}
+		
 	if type(count) ~= "number" then count = API_GetSpellCount(SOUL_FRAGMENTS_BUFF_ID) or 0 end
 	if count < 0 then count = 0 end
 	
-	local entry = {["timestamp"] =  now, ["fragments"] = count}
-
-	self:Debug("Setting current soul fragment count to '%d' (at: %s)", entry.fragments, entry.timestamp)
-	self.last_soul_fragment_count = entry
-	-- only insert in combat
-	tinsert(self.soul_fragments, entry)
+	if self.last_soul_fragment_count == nil or self.last_soul_fragment_count.fragments ~= count then
+		local entry = {["timestamp"] =  now, ["fragments"] = count}
+		self:Debug("Setting current soul fragment count to '%d' (at: %s)", entry.fragments, entry.timestamp)
+		self.last_soul_fragment_count = entry
+		tinsert(self.soul_fragments, entry)
+	end
 end
 
 -- /run Ovale.OvaleDemonHunterSoulFragments:DebugSoulFragments()
@@ -114,7 +116,7 @@ statePrototype.SoulFragments = function(state, atTime)
 			return v["fragments"]
 		end
 	end
-	return self.last_soul_fragment_count.fragments or 0
+	return (OvaleDemonHunterSoulFragments.last_soul_fragment_count ~= nil and OvaleDemonHunterSoulFragments.last_soul_fragment_count.fragments) or 0
 end
 
 -- https://stackoverflow.com/a/15706820/1134155
