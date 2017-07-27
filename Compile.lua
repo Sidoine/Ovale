@@ -409,8 +409,12 @@ local function EvaluateSpellInfo(node)
 				-- Accumulate "addduration" into a single "addduration" SpellInfo property.
 				local value = tonumber(v)
 				if value then
+					local realValue = value
+					if namedParams.pertrait ~= nil then
+						realValue = value * OvaleArtifact:TraitRank(namedParams.pertrait)
+					end
 					local addDuration = si.addduration or 0
-					si.addduration = addDuration + value
+					si.addduration = addDuration + realValue
 				else
 					ok = false
 					break

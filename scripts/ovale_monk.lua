@@ -21,12 +21,6 @@ AddFunction BrewmasterHealMe
 	if (HealthPercent() < 35) Spell(healing_elixir)
 	if (HealthPercent() < 35) Spell(expel_harm)
 	if (HealthPercent() <= 100 - (15 * 2.6)) Spell(healing_elixir)
-	if (ArmorSetBonus(T20 2)) 
-	{	
-		if HealthPercent() <= 70 Spell(expel_harm)
-		if IncomingDamage(5) >=  MaxHealth() * 0.3 Spell(expel_harm)
-		if StaggerPercentage() > 60 Spell(expel_harm)
-	}
 }
 
 AddFunction StaggerPercentage
@@ -41,10 +35,15 @@ AddFunction BrewmasterRangeCheck
 
 AddFunction BrewmasterDefaultShortCDActions
 {
+	# keep ISB up always
+	if BuffRemaining(ironskin_brew_buff) < 5 Spell(ironskin_brew)
+	
+	# expel_harm T20 4set purify when we can
+	if (StaggerPercentage() > 30 and ArmorSetBonus(T20 4) and SpellCount(expel_harm) >= 6) Spell(expel_harm)
 	# keep stagger below 100%
 	if (StaggerPercentage() > 100) Spell(purifying_brew)
-	# use black_ox_brew when at 0 charges but delay it when a charge is about to come off cd
-	if ((SpellCharges(purifying_brew) == 0) and (SpellChargeCooldown(purifying_brew) > 2 or StaggerPercentage() > 100)) Spell(black_ox_brew)
+	# use black_ox_brew when at 0 charges and low energy (or in an emergency)
+	if ((SpellCharges(purifying_brew) == 0) and (Energy() < 30 or StaggerPercentage() > 60)) Spell(black_ox_brew)
 	# heal me
 	BrewmasterHealMe()
 	
@@ -54,29 +53,22 @@ AddFunction BrewmasterDefaultShortCDActions
 	unless StaggerPercentage() > 100 or BrewmasterHealMe()
 	{
 		# purify heavy stagger when we have enough ISB
-		if (DebuffPresent(heavy_stagger_debuff) and (BuffRemaining(ironskin_brew_buff) >= 2*BaseDuration(ironskin_brew_buff))) Spell(purifying_brew)
-		# purify medium stagger when low on hp
-		if ((DebuffPresent(heavy_stagger_debuff) or DebuffPresent(moderate_stagger_debuff)) and HealthPercent() <= 50) Spell(purifying_brew)
+		if (StaggerPercentage() > 60 and (BuffRemaining(ironskin_brew_buff) >= 2*BaseDuration(ironskin_brew_buff))) Spell(purifying_brew)
+		
 		# always keep 1 charge unless black_ox_brew is coming off cd
-		if (SpellCharges(ironskin_brew count=0) >= 1.9 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3))
+		if (SpellCharges(ironskin_brew count=0) >= 1.8 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3))
 		{
 			# never be at (almost) max charges 
-			if (SpellCharges(ironskin_brew count=0) >= SpellMaxCharges(ironskin_brew)-0.3)
+			if ((SpellCharges(ironskin_brew count=0) >= SpellMaxCharges(ironskin_brew)-0.3) or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3))
 			{
 				if (BuffRemaining(ironskin_brew_buff) < 2*BaseDuration(ironskin_brew_buff)) Spell(ironskin_brew)
-				Spell(purifying_brew)
-			}
-			# use up those charges when black_ox_brew_talent comes off cd
-			if (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3)
-			{
-				Spell(purifying_brew)
-				Spell(ironskin_brew)
+				if (StaggerPercentage() > 30) Spell(purifying_brew)
 			}
 			
 			if(StaggerRemaining() > 0)
 			{
 				# keep brew-stache rolling (when not elusive_dance)
-				if (HasArtifactTrait(brew_stache_trait) and BuffExpires(brew_stache_buff) and not Talent(elusive_dance_talent) and (BuffRemaining(ironskin_brew_buff) < 2*BaseDuration(ironskin_brew_buff))) Spell(ironskin_brew text=stache)
+				if (IncomingDamage(5 physical=1)>0 and HasArtifactTrait(brew_stache_trait) and BuffExpires(brew_stache_buff) and not Talent(elusive_dance_talent) and (BuffRemaining(ironskin_brew_buff) < 2*BaseDuration(ironskin_brew_buff))) Spell(ironskin_brew text=stache)
 				# keep up ironskin_brew_buff
 				if (BuffRemaining(ironskin_brew_buff) < BaseDuration(ironskin_brew_buff)) Spell(ironskin_brew)
 				# purify stagger when talent elusive dance 

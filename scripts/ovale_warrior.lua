@@ -61,8 +61,8 @@ AddFunction ProtectionDefaultShortCDActions
 	ProtectionHealMe()
 	if IncomingDamage(5 physical=1) 
 	{
-		if not BuffPresent(neltharions_fury_buff) Spell(shield_block)
-		if not BuffPresent(shield_block_buff) Spell(neltharions_fury)
+		if not BuffPresent(shield_block_buff) and SpellCharges(shield_block) < SpellMaxCharges(shield_block) Spell(neltharions_fury)
+		if not BuffPresent(neltharions_fury_buff) and (SpellCooldown(neltharions_fury)>0 or SpellCharges(shield_block) == SpellMaxCharges(shield_block)) Spell(shield_block)
 	}
 	if (not BuffPresent(renewed_fury_buff) or FuryDeficit() <= 30) Spell(ignore_pain)
 	

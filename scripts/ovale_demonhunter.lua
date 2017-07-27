@@ -33,7 +33,7 @@ AddFunction VengeanceHealMe
 
 AddFunction VengeanceInfernalStrike
 {
-	(not Talent(flame_crash_talent) or (not SigilCharging(flame) and target.DebuffRemaining(sigil_of_flame_debuff) <= 2-Talent(quickened_sigils_talent))) and
+	(not Talent(flame_crash_talent) or VengeanceSigilOfFlame()) and
 	(	
 		(SpellCharges(infernal_strike) >= SpellMaxCharges(infernal_strike)) or 
 		(SpellCharges(infernal_strike) == SpellMaxCharges(infernal_strike)-1 and SpellChargeCooldown(infernal_strike)<=2*GCD())
@@ -79,8 +79,8 @@ AddFunction VengeanceDefaultMainActions
 	# Fiery demise
 	if (not target.DebuffExpires(fiery_demise_debuff))
 	{
-		if (PainDeficit() > 10*(1+0.2*BuffPresent(blade_turning_buff))) Spell(immolation_aura)
 		Spell(soul_carver)
+		if (PainDeficit() > 10*(1+0.2*BuffPresent(blade_turning_buff))) Spell(immolation_aura)
 		Spell(fel_devastation)
 		if (PainDeficit() > 20*(1+0.2*BuffPresent(blade_turning_buff))) Spell(felblade)
 		if (SoulFragments() >= 5-Talent(fracture_talent)) Spell(spirit_bomb)
