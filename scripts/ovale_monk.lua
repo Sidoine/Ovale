@@ -43,7 +43,7 @@ AddFunction BrewmasterDefaultShortCDActions
 	# keep stagger below 100%
 	if (StaggerPercentage() > 100) Spell(purifying_brew)
 	# use black_ox_brew when at 0 charges and low energy (or in an emergency)
-	if ((SpellCharges(purifying_brew) == 0) and (Energy() < 30 or StaggerPercentage() > 60)) Spell(black_ox_brew)
+	if ((SpellCharges(purifying_brew) == 0) and (Energy() < 30 or StaggerPercentage() > 75)) Spell(black_ox_brew)
 	# heal me
 	BrewmasterHealMe()
 	
@@ -62,13 +62,17 @@ AddFunction BrewmasterDefaultShortCDActions
 			if ((SpellCharges(ironskin_brew count=0) >= SpellMaxCharges(ironskin_brew)-0.3) or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 3))
 			{
 				if (BuffRemaining(ironskin_brew_buff) < 2*BaseDuration(ironskin_brew_buff)) Spell(ironskin_brew)
-				if (StaggerPercentage() > 30) Spell(purifying_brew)
+				if (StaggerPercentage() > 30 or Talent(special_delivery_talent)) Spell(purifying_brew)
 			}
 			
 			if(StaggerRemaining() > 0)
 			{
 				# keep brew-stache rolling (when not elusive_dance)
-				if (IncomingDamage(5 physical=1)>0 and HasArtifactTrait(brew_stache_trait) and BuffExpires(brew_stache_buff) and not Talent(elusive_dance_talent) and (BuffRemaining(ironskin_brew_buff) < 2*BaseDuration(ironskin_brew_buff))) Spell(ironskin_brew text=stache)
+				if (IncomingDamage(5 physical=1)>0 and HasArtifactTrait(brew_stache_trait) and BuffExpires(brew_stache_buff)) 
+				{
+					if (BuffRemaining(ironskin_brew_buff) < 2*BaseDuration(ironskin_brew_buff)) Spell(ironskin_brew text=stache)
+					if (StaggerPercentage() > 30) Spell(purifying_brew text=stache)
+				}
 				# keep up ironskin_brew_buff
 				if (BuffRemaining(ironskin_brew_buff) < BaseDuration(ironskin_brew_buff)) Spell(ironskin_brew)
 				# purify stagger when talent elusive dance 
@@ -91,7 +95,7 @@ AddFunction BrewmasterDefaultMainActions
 		Spell(blackout_strike)
 		if target.DebuffPresent(keg_smash_debuff) Spell(breath_of_fire)
 		if BuffRefreshable(rushing_jade_wind_buff) Spell(rushing_jade_wind)
-		if EnergyDeficit() <= 35 Spell(tiger_palm)
+		if (EnergyDeficit() <= 35 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= GCD())) Spell(tiger_palm)
 		Spell(chi_burst)
 		Spell(chi_wave)
 		Spell(exploding_keg)
