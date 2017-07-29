@@ -78,4 +78,5 @@ WarriorCharge.lua
 WildImps.lua
 
 conditions.lua
+conditions_xeltor.lua
 scripts\files.xml
