@@ -3,6 +3,6 @@ CHANGELOG*
 *.tmp
 release/**
 tmp/**
-tests/OUT*
-tests/*.bat
 luac.out
+/tests
+/utils
