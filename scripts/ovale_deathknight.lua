@@ -13,6 +13,7 @@ Include(ovale_deathknight_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=blood)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=blood)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=blood)
 
 AddFunction BloodDefaultShortCDActions
 {
@@ -73,7 +74,8 @@ AddFunction BloodDefaultCdActions
 	if target.InRange(blood_mirror) Spell(blood_mirror)
 	Spell(dancing_rune_weapon)
 	if BuffStacks(bone_shield_buff) >= 5 Spell(tombstone)
-	Item(unbending_potion usable=1)
+	if CheckBoxOn(opt_use_consumables) Item(unbending_potion usable=1)
+	UseRacialSurvivalActions()
 }
 
 AddFunction BloodInterruptActions
