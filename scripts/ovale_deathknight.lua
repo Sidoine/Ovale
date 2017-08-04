@@ -78,16 +78,12 @@ AddFunction BloodDefaultCdActions
 
 AddFunction BloodInterruptActions
 {
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
 	{
-		if target.InRange(mind_freeze) Spell(mind_freeze)
-		if not target.Classification(worldboss)
-		{
-			if target.InRange(asphyxiate) Spell(asphyxiate)
-			Spell(arcane_torrent_runicpower)
-			if target.InRange(quaking_palm) Spell(quaking_palm)
-			Spell(war_stomp)
-		}
+		if target.InRange(mind_freeze) and target.IsInterruptible() Spell(mind_freeze)
+		if target.InRange(asphyxiate) and not target.Classification(worldboss) Spell(asphyxiate)
+		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_runicpower)
+		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
 	}
 }
 
