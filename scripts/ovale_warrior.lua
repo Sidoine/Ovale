@@ -64,7 +64,7 @@ AddFunction ProtectionDefaultShortCDActions
 		if not BuffPresent(shield_block_buff) and SpellCharges(shield_block) < SpellMaxCharges(shield_block) Spell(neltharions_fury)
 		if not BuffPresent(neltharions_fury_buff) and (SpellCooldown(neltharions_fury)>0 or SpellCharges(shield_block) == SpellMaxCharges(shield_block)) Spell(shield_block)
 	}
-	if (not BuffPresent(renewed_fury_buff) or FuryDeficit() <= 30) Spell(ignore_pain)
+	if ((not BuffPresent(renewed_fury_buff) and Talent(renewed_fury_talent)) or Rage() >= 60) Spell(ignore_pain)
 	
 	# range check
 	ProtectionGetInMeleeRange()
