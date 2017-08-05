@@ -108,6 +108,7 @@ AddFunction ProtectionDefaultCdActions
 {
 	ProtectionInterruptActions()
 	ProtectionOffensiveCooldowns()
+	if ArmorSetBonus(T20 2) and RageDeficit() >= 26 Spell(berserker_rage)
 	if IncomingDamage(1.5 magic=1) > 0 Spell(spell_reflection)
 	if (HasEquippedItem(shifting_cosmic_sliver)) Spell(shield_wall)
 	Item(Trinket0Slot usable=1 text=13)
