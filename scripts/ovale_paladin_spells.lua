@@ -9,6 +9,9 @@ do
 Define(heathcliffs_immortality 137047)
 Define(pillars_of_inmost_light 151812)
 
+Define(liadrins_fury_unleashed_buff 208410)
+Define(scarlet_inquisitors_expurgation_buff 248289)
+
 ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!guardian_of_ancient_kings,buff,!guardian_of_ancient_kings_buff)	
 	
 # Paladin spells and functions.
