@@ -82,7 +82,6 @@ AddFunction ProtectionDefaultMainActions
 	Spell(thunder_clap)
 	if BuffPresent(revenge_buff) Spell(revenge)
 	Spell(storm_bolt)
-	Spell(ravager)
 	Spell(devastate)
 }
 
