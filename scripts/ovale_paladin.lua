@@ -700,19 +700,14 @@ AddFunction RetributionCooldownsCdActions
 	if HolyPower() <= 4 Spell(arcane_torrent_holy)
 	#holy_wrath
 	Spell(holy_wrath)
-
-	unless Spell(shield_of_vengeance)
-	{
-		#avenging_wrath
-		Spell(avenging_wrath_melee)
-		#crusade,if=holy_power>=3|((equipped.137048|race.blood_elf)&holy_power>=2)
-		if HolyPower() >= 3 or { HasEquippedItem(137048) or Race(BloodElf) } and HolyPower() >= 2 Spell(crusade)
-	}
+	#avenging_wrath
+	Spell(avenging_wrath_melee)
+	#crusade,if=holy_power>=3|((equipped.137048|race.blood_elf)&holy_power>=2)
+	if HolyPower() >= 3 or { HasEquippedItem(137048) or Race(BloodElf) } and HolyPower() >= 2 Spell(crusade)
 }
 
 AddFunction RetributionCooldownsCdPostConditions
 {
-	Spell(shield_of_vengeance)
 }
 
 ### actions.opener
