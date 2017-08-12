@@ -170,7 +170,6 @@ AddFunction HolyDefaultHealActions
 {
 	Spell(holy_shock)
 	Spell(bestow_faith)
-	if Speed() > 0 and HealthPercent() > 60 Spell(light_of_the_martyr)
 	if BuffPresent(infusion_of_light_buff) Spell(flash_of_light)
 	Spell(holy_light)
 }
