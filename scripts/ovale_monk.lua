@@ -36,7 +36,7 @@ AddFunction BrewmasterRangeCheck
 AddFunction BrewmasterDefaultShortCDActions
 {
 	# keep ISB up always
-	if BuffRemaining(ironskin_brew_buff) < 5 Spell(ironskin_brew)
+	if BuffRemaining(ironskin_brew_buff) < 3 Spell(ironskin_brew)
 	
 	# keep stagger below 100%
 	if (StaggerPercentage() > 100) Spell(purifying_brew)
@@ -67,8 +67,8 @@ AddFunction BrewmasterDefaultShortCDActions
 			
 			if(StaggerRemaining() > 0)
 			{
-				# keep brew-stache rolling (when not elusive_dance)
-				if (IncomingDamage(5 physical=1)>0 and HasArtifactTrait(brew_stache_trait) and BuffExpires(brew_stache_buff)) 
+				# keep brew-stache rolling
+				if (IncomingDamage(3 physical=1)>0 and HasArtifactTrait(brew_stache_trait) and BuffExpires(brew_stache_buff)) 
 				{
 					if (BuffRemaining(ironskin_brew_buff) < 2*BaseDuration(ironskin_brew_buff)) Spell(ironskin_brew text=stache)
 					if (StaggerPercentage() > 30) Spell(purifying_brew text=stache)
