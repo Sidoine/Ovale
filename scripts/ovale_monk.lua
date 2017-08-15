@@ -104,7 +104,7 @@ AddFunction BrewmasterDefaultMainActions
 
 AddFunction BrewmasterBlackoutComboMainActions
 {
-	if(not BuffPresent(blackout_combo_buff) or SpellCharges(ironskin_brew) == 0 or (Talent(special_delivery_talent) and SpellCharges(ironskin_brew count=0) < SpellMaxCharges(ironskin_brew)-0.5)) Spell(keg_smash)
+	if(not BuffPresent(blackout_combo_buff) or SpellCharges(ironskin_brew) == 0) Spell(keg_smash)
 	if(not BuffPresent(blackout_combo_buff)) Spell(blackout_strike)
 	if(BuffPresent(blackout_combo_buff)) Spell(tiger_palm)
 	
