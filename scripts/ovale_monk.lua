@@ -95,7 +95,7 @@ AddFunction BrewmasterDefaultMainActions
 		Spell(blackout_strike)
 		if target.DebuffPresent(keg_smash_debuff) Spell(breath_of_fire)
 		if BuffRefreshable(rushing_jade_wind_buff) Spell(rushing_jade_wind)
-		if (EnergyDeficit() <= 35 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= GCD())) Spell(tiger_palm)
+		if (EnergyDeficit() <= 35) Spell(tiger_palm)
 		Spell(chi_burst)
 		Spell(chi_wave)
 		Spell(exploding_keg)
@@ -131,7 +131,7 @@ AddFunction BrewmasterDefaultAoEActions
 	Spell(chi_wave)
 	if (target.DebuffPresent(keg_smash_debuff) and (not HasEquippedItem(salsalabims_lost_tunic) or not BuffPresent(blackout_combo_buff))) Spell(breath_of_fire)
 	if BuffRefreshable(rushing_jade_wind_buff) Spell(rushing_jade_wind)
-	if (EnergyDeficit() <= 35 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= GCD())) Spell(tiger_palm)
+	if (EnergyDeficit() <= 35) Spell(tiger_palm)
 	if not BuffPresent(blackout_combo_buff) Spell(blackout_strike)	
 }
 
