@@ -160,6 +160,7 @@ Define(wind_shear 57994)
 	SpellInfo(wind_shear cd=12 gcd=0 offgcd=1 interrupt=1)
 	
 # Talents
+Define(aftershock_talent 10)
 Define(ascendance_talent 19)
 Define(boulderfist_talent 3)
 Define(crashing_storm_talent 16)
@@ -188,6 +189,8 @@ Define(power_of_the_maelstrom_buff 191877)
 # Legendary items
 Define(echoes_of_the_great_sundering_buff 208723)
 	SpellAddBuff(earthquake echoes_of_the_great_sundering_buff=0)
+Define(smoldering_heart 151819)
+Define(the_deceivers_blood_pact 137035)
 
 	
 ]]
