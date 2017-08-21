@@ -36,7 +36,7 @@ AddFunction BrewmasterRangeCheck
 AddFunction BrewmasterDefaultShortCDActions
 {
 	# keep ISB up always
-	if BuffRemaining(ironskin_brew_buff) < 3 Spell(ironskin_brew)
+	if BuffRemaining(ironskin_brew_buff) < 3 Spell(ironskin_brew text=min)
 	
 	# keep stagger below 100%
 	if (StaggerPercentage() > 100) Spell(purifying_brew)
