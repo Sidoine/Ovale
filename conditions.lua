@@ -4625,6 +4625,30 @@ do
 end
 
 do
+	--- Test if the target is also the focus
+	-- @name IsFocus
+	-- @paramsig boolean
+	-- @param yesno Optional. If yes, then return true if it matches. If no, then return true if it doesn't match.
+	--     Default is yes.
+	--     Valid values: yes, no.
+	-- @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	--     Defaults to target=player.
+	--     Valid values: player, target, focus, pet.
+	-- @return A boolean value.
+	-- @usage
+	-- if target.IsFocus() Spell(feign_death)
+
+	local function IsFocus(positionalParams, namedParams, state, atTime)
+		local yesno = positionalParams[1]
+		local target = ParseCondition(positionalParams, namedParams, state)
+		local boolean = API_UnitIsUnit("focus", "target")
+		return TestBoolean(boolean, yesno)
+	end
+
+	OvaleCondition:RegisterCondition("isfocus", false, IsFocus)
+end
+
+do
 	--- Get the amount of threat on the current target relative to the its primary aggro target, scaled to between 0 (zero) and 100.
 	-- This is a number between 0 (no threat) and 100 (will become the primary aggro target).
 	-- @name Threat
