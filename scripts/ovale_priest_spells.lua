@@ -173,6 +173,14 @@ AddFunction CurrentInsanityDrain {
 	0
 }
 
+#Talents
+Define(lingering_insanity_talent 10)
+
+#Artifact
+Define(to_the_pain 193644)
+Define(touch_of_darkness 194007)
+Define(void_corruption 194016)
+
 #Legendary
 Define(mangazas_madness 132864)
 ]]
