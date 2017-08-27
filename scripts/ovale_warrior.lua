@@ -50,6 +50,7 @@ AddFunction ProtectionOffensiveCooldowns
 {
 	Spell(avatar)
 	Spell(battle_cry)
+	if (Talent(booming_voice_talent) and RageDeficit() >= Talent(booming_voice_talent)*60) Spell(demoralizing_shout)
 }
 
 #
