@@ -42,8 +42,6 @@ AddFunction BrewmasterDefaultShortCDActions
 	if (StaggerPercentage() > 100) Spell(purifying_brew)
 	# use black_ox_brew when at 0 charges and low energy (or in an emergency)
 	if ((SpellCharges(purifying_brew) == 0) and (Energy() < 30 or StaggerPercentage() > 75)) Spell(black_ox_brew)
-	# expel_harm T20 4set purify when we can
-	if (StaggerPercentage() > 30 and ArmorSetBonus(T20 4) and SpellCount(expel_harm) >= 6) Spell(expel_harm)
 	# heal me
 	BrewmasterHealMe()
 	
