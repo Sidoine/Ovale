@@ -13,6 +13,9 @@ local tinsert = table.insert
 local tremove = table.remove
 local API_GetTime = GetTime
 
+local UPDATE_DELAY = 0.5
+local SIGIL_ACTIVATION_TIME = math.huge
+
 local activated_sigils = {}
 
 OvaleProfiler:RegisterProfiling(OvaleSigil)
@@ -71,11 +74,7 @@ function OvaleSigil:UNIT_SPELLCAST_SUCCEEDED(event, unitId, spellName, spellRank
 		local t = s.type
 		local tal = s.talent or nil;
 		if (tal == nil or OvaleSpellBook:GetTalentPoints(tal) > 0) then
-			if(OvaleSpellBook:GetTalentPoints(QUICKENED_SIGILS_TALENT) > 0) then
-				tinsert(activated_sigils[t], API_GetTime()+2.5)
-			else
-				tinsert(activated_sigils[t], API_GetTime()+3.5)
-			end
+			tinsert(activated_sigils[t], API_GetTime())
 		end
 	end
 	
@@ -97,7 +96,11 @@ statePrototype.IsSigilCharging = function(state, type, atTime)
 	
 	local charging = false
 	for _,v in ipairs(activated_sigils[type]) do
-		charging = charging or atTime < v
+		local activation_time = SIGIL_ACTIVATION_TIME + UPDATE_DELAY
+		if(OvaleSpellBook:GetTalentPoints(QUICKENED_SIGILS_TALENT) > 0) then
+			activation_time = activation_time - 1
+		end
+		charging = charging or atTime < v + activation_time
 	end
 	return charging
 end

@@ -13,6 +13,7 @@ Include(ovale_deathknight_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=blood)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=blood)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=blood)
 
 AddFunction BloodDefaultShortCDActions
 {
@@ -25,8 +26,7 @@ AddFunction BloodDefaultMainActions
 {
 	BloodHealMe()
 	if InCombat() and BuffExpires(bone_shield_buff 3) Spell(marrowrend)
-	if not Talent(soulgorge_talent) and target.DebuffRefreshable(blood_plague_debuff) Spell(blood_boil)
-	if target.DebuffRefreshable(blood_plague_debuff) Spell(deaths_caress)
+	if target.DebuffRefreshable(blood_plague_debuff) Spell(blood_boil)
 	if not BuffPresent(death_and_decay_buff) and BuffPresent(crimson_scourge_buff) and Talent(rapid_decomposition_talent) Spell(death_and_decay)
 	if RunicPower() >= 100 and target.TimeToDie() >= 10 Spell(bonestorm)
 	if RunicPowerDeficit() <= 20 Spell(death_strike)
@@ -43,7 +43,7 @@ AddFunction BloodDefaultAoEActions
 	BloodHealMe()
 	if RunicPower() >= 100 Spell(bonestorm)
 	if InCombat() and BuffExpires(bone_shield_buff 3) Spell(marrowrend)
-	if not Talent(soulgorge_talent) and DebuffCountOnAny(blood_plague_debuff) < Enemies(tagged=1) Spell(blood_boil)
+	if DebuffCountOnAny(blood_plague_debuff) < Enemies(tagged=1) Spell(blood_boil)
 	if not BuffPresent(death_and_decay_buff) and BuffPresent(crimson_scourge_buff) Spell(death_and_decay)
 	if RunicPowerDeficit() <= 20 Spell(death_strike)
 	if BuffStacks(bone_shield_buff) <= 2+4*Talent(ossuary_talent) Spell(marrowrend)
@@ -52,7 +52,6 @@ AddFunction BloodDefaultAoEActions
 	if Rune() >= 3 or RunicPower() < 45 Spell(heart_strike)
 	Spell(consumption)
 	Spell(blood_boil)
-	if target.DebuffRefreshable(blood_plague_debuff) Spell(deaths_caress)
 }
 
 AddFunction BloodHealMe
@@ -75,21 +74,18 @@ AddFunction BloodDefaultCdActions
 	if target.InRange(blood_mirror) Spell(blood_mirror)
 	Spell(dancing_rune_weapon)
 	if BuffStacks(bone_shield_buff) >= 5 Spell(tombstone)
-	Item(unbending_potion usable=1)
+	if CheckBoxOn(opt_use_consumables) Item(unbending_potion usable=1)
+	UseRacialSurvivalActions()
 }
 
 AddFunction BloodInterruptActions
 {
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.IsInterruptible()
+	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
 	{
-		if target.InRange(mind_freeze) Spell(mind_freeze)
-		if not target.Classification(worldboss)
-		{
-			if target.InRange(asphyxiate) Spell(asphyxiate)
-			Spell(arcane_torrent_runicpower)
-			if target.InRange(quaking_palm) Spell(quaking_palm)
-			Spell(war_stomp)
-		}
+		if target.InRange(mind_freeze) and target.IsInterruptible() Spell(mind_freeze)
+		if target.InRange(asphyxiate) and not target.Classification(worldboss) Spell(asphyxiate)
+		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_runicpower)
+		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
 	}
 }
 

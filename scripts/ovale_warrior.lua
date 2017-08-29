@@ -50,6 +50,7 @@ AddFunction ProtectionOffensiveCooldowns
 {
 	Spell(avatar)
 	Spell(battle_cry)
+	if (Talent(booming_voice_talent) and RageDeficit() >= Talent(booming_voice_talent)*60) Spell(demoralizing_shout)
 }
 
 #
@@ -59,13 +60,13 @@ AddFunction ProtectionOffensiveCooldowns
 AddFunction ProtectionDefaultShortCDActions
 {
 	ProtectionHealMe()
+	if ArmorSetBonus(T20 2) and RageDeficit() >= 26 Spell(berserker_rage)
 	if IncomingDamage(5 physical=1) 
 	{
 		if not BuffPresent(shield_block_buff) and SpellCharges(shield_block) < SpellMaxCharges(shield_block) Spell(neltharions_fury)
 		if not BuffPresent(neltharions_fury_buff) and (SpellCooldown(neltharions_fury)>0 or SpellCharges(shield_block) == SpellMaxCharges(shield_block)) Spell(shield_block)
 	}
-	if (not BuffPresent(renewed_fury_buff) or FuryDeficit() <= 30) Spell(ignore_pain)
-	
+	if ((not BuffPresent(renewed_fury_buff) and Talent(renewed_fury_talent)) or Rage() >= 60) Spell(ignore_pain)
 	# range check
 	ProtectionGetInMeleeRange()
 }
@@ -82,7 +83,6 @@ AddFunction ProtectionDefaultMainActions
 	Spell(thunder_clap)
 	if BuffPresent(revenge_buff) Spell(revenge)
 	Spell(storm_bolt)
-	Spell(ravager)
 	Spell(devastate)
 }
 
