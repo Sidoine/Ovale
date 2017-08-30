@@ -8,6 +8,7 @@ local OVALE, Ovale = ...
 
 local LibBabbleCreatureType = LibStub("LibBabble-CreatureType-3.0", true)
 local LibRangeCheck = LibStub("LibRangeCheck-2.0", true)
+local LibInterrupt = LibStub("LibInterrupt-1.0", true)
 local OvaleBestAction = Ovale.OvaleBestAction
 local OvaleCompile = Ovale.OvaleCompile
 local OvaleCondition = Ovale.OvaleCondition
@@ -2413,7 +2414,7 @@ do
 		if not name then
 			name, _, _, _, _, _, _, notInterruptible = API_UnitChannelInfo(target)
 		end
-		local boolean = notInterruptible ~= nil and not notInterruptible
+		local boolean = notInterruptible ~= nil and not notInterruptible and LibInterrupt:MustInterrupt()
 		return TestBoolean(boolean, yesno)
 	end
 
