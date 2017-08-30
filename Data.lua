@@ -595,8 +595,9 @@ function OvaleData:GetSpellInfoProperty(spellId, atTime, property, targetGUID)
 			end
 		end
 	end
-
-	return value * ratio
+	
+	local actual = (value > 0 and floor(value * ratio)) or ceil(value * ratio)
+	return actual
 end
 
 --Compute the damage of the given spell.

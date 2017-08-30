@@ -196,17 +196,18 @@ function OvaleSpellBook:UpdateTalents()
 	local activeTalentGroup = API_GetActiveSpecGroup()
 	for i = 1, MAX_TALENT_TIERS do
 		for j = 1, NUM_TALENT_COLUMNS do
-			local talentId, name, _, selected, _ = API_GetTalentInfo(i, j, activeTalentGroup)
+			local talentId, name, _, selected, _, _, _, _, _, _, selectedByLegendary = API_GetTalentInfo(i, j, activeTalentGroup)
 			if talentId then
+				local combinedSelected = selected or selectedByLegendary
 				local index = 3 * (i - 1) + j
 				if index <= MAX_NUM_TALENTS then
 					self.talent[index] = name
-					if selected then
+					if combinedSelected then
 						self.talentPoints[index] = 1
 					else
 						self.talentPoints[index] = 0
 					end
-					self:Debug("    Talent %s (%d) is %s.", name, index, selected and "enabled" or "disabled")
+					self:Debug("    Talent %s (%d) is %s.", name, index, combinedSelected and "enabled" or "disabled")
 				end
 			end
 		end

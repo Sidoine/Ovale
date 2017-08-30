@@ -45,6 +45,16 @@ AddFunction VengeanceSigilOfFlame
 	(not SigilCharging(flame) and target.DebuffRemaining(sigil_of_flame_debuff) <= 2-Talent(quickened_sigils_talent))
 }
 
+AddFunction VengeanceRangeCheck
+{
+	if (CheckBoxOn(opt_melee_range) and not target.InRange(fracture))
+	{
+		if (target.InRange(felblade)) Spell(felblade)
+		if (target.Distance(more 5) and (target.Distance(less 30) or (target.Distance(less 40) and Talent(abyssal_strike_talent)))) Spell(infernal_strike text=range)
+		Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
+}
+
 AddFunction VengeanceDefaultShortCDActions
 {
 	if ((VengeancePlayOffensively() and (BuffExpires(demon_spikes) or not Talent(razor_spikes_talent))) or VengeancePlayDefensively()) Spell(soul_barrier)
@@ -56,12 +66,7 @@ AddFunction VengeanceDefaultShortCDActions
 		if (Charges(demon_spikes count=0) >= 1.8) Spell(demon_spikes)
 	}
 	
-	if (CheckBoxOn(opt_melee_range) and not target.InRange(shear))
-	{
-		if (target.InRange(felblade)) Spell(felblade)
-		if (target.Distance(less 30) or (target.Distance(less 40) and Talent(abyssal_strike_talent))) Spell(infernal_strike text=range)
-		Texture(misc_arrowlup help=L(not_in_melee_range))
-	}
+	VengeanceRangeCheck()
 }
 
 AddFunction VengeanceDefaultMainActions

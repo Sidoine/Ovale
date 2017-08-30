@@ -280,7 +280,6 @@ Define(runic_corruption_talent 12)
 Define(runic_empowerment_talent 11)
 Define(shadow_infusion_talent 16)
 Define(shattering_strikes_talent 1)
-Define(soulgorge_talent 5)
 Define(unholy_blight_talent 3)
 
 # Artifact traits
