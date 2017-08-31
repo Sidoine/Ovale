@@ -103,6 +103,18 @@ InterruptTable["Blazing Hydra Spawn"] = {
     ["Blazing Nova"] = true
 }
 
+InterruptTable["Ritualist Lesha"] = {
+    ["Aqua Spout"] = true
+}
+
+InterruptTable["Channeler Varisz"] = {
+    ["Polymorph: Fish"] = true
+}
+
+InterruptTable["Mystic Ssa'veh"] = {
+    ["Storm"] = true
+}
+
 -- Halls of Valor
 InterruptTable["Valarjar Thundercaller"] = {
     ["Thunderous Bolt"] = true
