@@ -243,7 +243,7 @@ InterruptTable["Deranged Mindflayer"] = {
 -- Violet Hold
 InterruptTable["Portal Guardian"] = {
     ["Shield of Eyes"] = true,
-	["Carrion Swarm"] = true,
+    ["Carrion Swarm"] = true,
     ["Vampiric Cleave"] = true,
     ["Fel Destruction"] = true
 }
