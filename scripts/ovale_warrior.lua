@@ -181,6 +181,12 @@ AddFunction ArmsInterruptActions
 	}
 }
 
+AddFunction ArmsUseItemActions
+{
+	Item(Trinket0Slot text=13 usable=1)
+	Item(Trinket1Slot text=14 usable=1)
+}
+
 AddFunction ArmsGetInMeleeRange
 {
 	if CheckBoxOn(opt_melee_range) and not InFlightToTarget(charge) and not InFlightToTarget(heroic_leap)
@@ -271,6 +277,8 @@ AddFunction ArmsDefaultCdActions
 	if 0 < 0.25 and { BuffPresent(battle_cry_buff) or SpellCooldown(battle_cry) < 15 } or target.TimeToDie() <= 20 Spell(avatar)
 	#battle_cry,if=target.time_to_die<=6|(gcd.remains<=0.5&prev_gcd.1.ravager)|!talent.ravager.enabled&!gcd.remains&target.debuff.colossus_smash.remains>=5&(!cooldown.bladestorm.remains|!set_bonus.tier20_4pc)&(!talent.rend.enabled|dot.rend.remains>4)
 	if target.TimeToDie() <= 6 or 0 <= 0.5 and PreviousGCDSpell(ravager) or not Talent(ravager_talent) and not 0 and target.DebuffRemaining(colossus_smash_debuff) >= 5 and { not SpellCooldown(bladestorm_arms) > 0 or not ArmorSetBonus(T20 4) } and { not Talent(rend_talent) or target.DebuffRemaining(rend_debuff) > 4 } Spell(battle_cry)
+	#use_items
+	ArmsUseItemActions()
 	#run_action_list,name=cleave,if=spell_targets.whirlwind>=2&talent.sweeping_strikes.enabled
 	if Enemies() >= 2 and Talent(sweeping_strikes_talent) ArmsCleaveCdActions()
 
