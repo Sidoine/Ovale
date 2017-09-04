@@ -62,7 +62,7 @@ Define(unbending_potion_buff 188029)
 SpellList(potion_buff unbending_potion_buff)
 
 ###
-### Trinkets
+### Trinkets & OnUse Rings
 ###
 
 # Amplification trinket passive buff.
@@ -83,7 +83,9 @@ Define(gnawed_thumb_ring 134526)
 Define(nightwell_energy_buff 214572)
 Define(shifting_cosmic_sliver 147026)
 Define(specter_of_betrayal 151190)
-
+Define(ring_of_collapsing_futures 142173)
+	ItemInfo(ring_of_collapsing_futures cd=15)
+	Define(temptation_buff 234143)
 
 ###
 ### Legendary Meta Gem
