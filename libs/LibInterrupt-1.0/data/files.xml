@@ -3,4 +3,5 @@
     <Script file="legion_raid.lua"/>
     <Script file="legion_dungeon.lua"/>
     <Script file="legion_world.lua"/>
+    <Script file="cataclysm_dungeon.lua"/>
 </Ui>
