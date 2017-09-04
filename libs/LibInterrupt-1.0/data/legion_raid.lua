@@ -160,3 +160,9 @@ InterruptTable["Fallen Priestess"] = {
 InterruptTable["Maiden of Vigilance"] = {
     ["Wrath of the Creators"] = true
 }
+
+-- Antorus, the Burning Throne
+-- Portal Keeper Hasabel
+InterruptTable["Vulcanar"] = {
+    ["Flames of Xoroth"] = true
+}
