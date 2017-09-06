@@ -125,7 +125,7 @@ do
 # Based on SimulationCraft profile "Death_Knight_Frost_T19P".
 #	class=deathknight
 #	spec=frost
-#	talents=3320032
+#	talents=3210031
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -135,13 +135,13 @@ Include(ovale_deathknight_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=frost)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=frost)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=frost)
-AddCheckBox(opt_legendary_ring_strength ItemName(legendary_ring_strength) default specialization=frost)
 
 AddFunction FrostInterruptActions
 {
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
 	{
 		if target.InRange(mind_freeze) and target.IsInterruptible() Spell(mind_freeze)
+		if target.Distance(less 12) and not target.Classification(worldboss) Spell(blinding_sleet)
 		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_runicpower)
 		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
 	}
@@ -162,25 +162,29 @@ AddFunction FrostGetInMeleeRange
 
 AddFunction FrostDefaultMainActions
 {
-	#obliteration,if=(!talent.frozen_pulse.enabled|(rune<2&runic_power<28))&!talent.gathering_storm.enabled
-	if { not Talent(frozen_pulse_talent) or Rune() < 2 and RunicPower() < 28 } and not Talent(gathering_storm_talent) Spell(obliteration)
-	#call_action_list,name=generic,if=!talent.breath_of_sindragosa.enabled&!(talent.gathering_storm.enabled&buff.remorseless_winter.remains)
-	if not Talent(breath_of_sindragosa_talent) and not { Talent(gathering_storm_talent) and BuffPresent(remorseless_winter_buff) } FrostGenericMainActions()
+	#call_action_list,name=cds
+	FrostCdsMainActions()
 
-	unless not Talent(breath_of_sindragosa_talent) and not { Talent(gathering_storm_talent) and BuffPresent(remorseless_winter_buff) } and FrostGenericMainPostConditions()
+	unless FrostCdsMainPostConditions()
 	{
-		#call_action_list,name=bos,if=talent.breath_of_sindragosa.enabled&!dot.breath_of_sindragosa.ticking
-		if Talent(breath_of_sindragosa_talent) and not BuffPresent(breath_of_sindragosa_buff) FrostBosMainActions()
+		#run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains<15
+		if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 15 FrostBosPoolingMainActions()
 
-		unless Talent(breath_of_sindragosa_talent) and not BuffPresent(breath_of_sindragosa_buff) and FrostBosMainPostConditions()
+		unless Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 15 and FrostBosPoolingMainPostConditions()
 		{
-			#call_action_list,name=bos_ticking,if=talent.breath_of_sindragosa.enabled&dot.breath_of_sindragosa.ticking
+			#run_action_list,name=bos_ticking,if=talent.breath_of_sindragosa.enabled&dot.breath_of_sindragosa.ticking
 			if Talent(breath_of_sindragosa_talent) and BuffPresent(breath_of_sindragosa_buff) FrostBosTickingMainActions()
 
 			unless Talent(breath_of_sindragosa_talent) and BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingMainPostConditions()
 			{
-				#call_action_list,name=gs_ticking,if=talent.gathering_storm.enabled&buff.remorseless_winter.remains&!talent.breath_of_sindragosa.enabled
-				if Talent(gathering_storm_talent) and BuffPresent(remorseless_winter_buff) and not Talent(breath_of_sindragosa_talent) FrostGsTickingMainActions()
+				#run_action_list,name=obliteration,if=buff.obliteration.up
+				if BuffPresent(obliteration_buff) FrostObliterationMainActions()
+
+				unless BuffPresent(obliteration_buff) and FrostObliterationMainPostConditions()
+				{
+					#call_action_list,name=standard
+					FrostStandardMainActions()
+				}
 			}
 		}
 	}
@@ -188,34 +192,36 @@ AddFunction FrostDefaultMainActions
 
 AddFunction FrostDefaultMainPostConditions
 {
-	not Talent(breath_of_sindragosa_talent) and not { Talent(gathering_storm_talent) and BuffPresent(remorseless_winter_buff) } and FrostGenericMainPostConditions() or Talent(breath_of_sindragosa_talent) and not BuffPresent(breath_of_sindragosa_buff) and FrostBosMainPostConditions() or Talent(breath_of_sindragosa_talent) and BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingMainPostConditions() or Talent(gathering_storm_talent) and BuffPresent(remorseless_winter_buff) and not Talent(breath_of_sindragosa_talent) and FrostGsTickingMainPostConditions()
+	FrostCdsMainPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 15 and FrostBosPoolingMainPostConditions() or Talent(breath_of_sindragosa_talent) and BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingMainPostConditions() or BuffPresent(obliteration_buff) and FrostObliterationMainPostConditions() or FrostStandardMainPostConditions()
 }
 
 AddFunction FrostDefaultShortCdActions
 {
 	#auto_attack
 	FrostGetInMeleeRange()
-	#pillar_of_frost,if=!equipped.140806|!talent.breath_of_sindragosa.enabled
-	if not HasEquippedItem(140806) or not Talent(breath_of_sindragosa_talent) Spell(pillar_of_frost)
-	#pillar_of_frost,if=equipped.140806&talent.breath_of_sindragosa.enabled&((runic_power>=50&cooldown.hungering_rune_weapon.remains<10)|(cooldown.breath_of_sindragosa.remains>20))
-	if HasEquippedItem(140806) and Talent(breath_of_sindragosa_talent) and { RunicPower() >= 50 and SpellCooldown(hungering_rune_weapon) < 10 or SpellCooldown(breath_of_sindragosa) > 20 } Spell(pillar_of_frost)
-	#call_action_list,name=generic,if=!talent.breath_of_sindragosa.enabled&!(talent.gathering_storm.enabled&buff.remorseless_winter.remains)
-	if not Talent(breath_of_sindragosa_talent) and not { Talent(gathering_storm_talent) and BuffPresent(remorseless_winter_buff) } FrostGenericShortCdActions()
+	#call_action_list,name=cds
+	FrostCdsShortCdActions()
 
-	unless not Talent(breath_of_sindragosa_talent) and not { Talent(gathering_storm_talent) and BuffPresent(remorseless_winter_buff) } and FrostGenericShortCdPostConditions()
+	unless FrostCdsShortCdPostConditions()
 	{
-		#call_action_list,name=bos,if=talent.breath_of_sindragosa.enabled&!dot.breath_of_sindragosa.ticking
-		if Talent(breath_of_sindragosa_talent) and not BuffPresent(breath_of_sindragosa_buff) FrostBosShortCdActions()
+		#run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains<15
+		if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 15 FrostBosPoolingShortCdActions()
 
-		unless Talent(breath_of_sindragosa_talent) and not BuffPresent(breath_of_sindragosa_buff) and FrostBosShortCdPostConditions()
+		unless Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 15 and FrostBosPoolingShortCdPostConditions()
 		{
-			#call_action_list,name=bos_ticking,if=talent.breath_of_sindragosa.enabled&dot.breath_of_sindragosa.ticking
+			#run_action_list,name=bos_ticking,if=talent.breath_of_sindragosa.enabled&dot.breath_of_sindragosa.ticking
 			if Talent(breath_of_sindragosa_talent) and BuffPresent(breath_of_sindragosa_buff) FrostBosTickingShortCdActions()
 
 			unless Talent(breath_of_sindragosa_talent) and BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingShortCdPostConditions()
 			{
-				#call_action_list,name=gs_ticking,if=talent.gathering_storm.enabled&buff.remorseless_winter.remains&!talent.breath_of_sindragosa.enabled
-				if Talent(gathering_storm_talent) and BuffPresent(remorseless_winter_buff) and not Talent(breath_of_sindragosa_talent) FrostGsTickingShortCdActions()
+				#run_action_list,name=obliteration,if=buff.obliteration.up
+				if BuffPresent(obliteration_buff) FrostObliterationShortCdActions()
+
+				unless BuffPresent(obliteration_buff) and FrostObliterationShortCdPostConditions()
+				{
+					#call_action_list,name=standard
+					FrostStandardShortCdActions()
+				}
 			}
 		}
 	}
@@ -223,44 +229,36 @@ AddFunction FrostDefaultShortCdActions
 
 AddFunction FrostDefaultShortCdPostConditions
 {
-	not Talent(breath_of_sindragosa_talent) and not { Talent(gathering_storm_talent) and BuffPresent(remorseless_winter_buff) } and FrostGenericShortCdPostConditions() or Talent(breath_of_sindragosa_talent) and not BuffPresent(breath_of_sindragosa_buff) and FrostBosShortCdPostConditions() or Talent(breath_of_sindragosa_talent) and BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingShortCdPostConditions() or Talent(gathering_storm_talent) and BuffPresent(remorseless_winter_buff) and not Talent(breath_of_sindragosa_talent) and FrostGsTickingShortCdPostConditions()
+	FrostCdsShortCdPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 15 and FrostBosPoolingShortCdPostConditions() or Talent(breath_of_sindragosa_talent) and BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingShortCdPostConditions() or BuffPresent(obliteration_buff) and FrostObliterationShortCdPostConditions() or FrostStandardShortCdPostConditions()
 }
 
 AddFunction FrostDefaultCdActions
 {
 	#mind_freeze
 	FrostInterruptActions()
-	#arcane_torrent,if=runic_power.deficit>20
-	if RunicPowerDeficit() > 20 Spell(arcane_torrent_runicpower)
-	#blood_fury,if=buff.pillar_of_frost.up
-	if BuffPresent(pillar_of_frost_buff) Spell(blood_fury_ap)
-	#berserking,if=buff.pillar_of_frost.up
-	if BuffPresent(pillar_of_frost_buff) Spell(berserking)
-	#use_item,slot=finger2
-	if CheckBoxOn(opt_legendary_ring_strength) Item(legendary_ring_strength usable=1)
-	#use_item,slot=trinket1
-	FrostUseItemActions()
-	#potion,name=prolonged_power,if=buff.pillar_of_frost.up&(!talent.breath_of_sindragosa.enabled|!cooldown.breath_of_sindragosa.remains)
-	if BuffPresent(pillar_of_frost_buff) and { not Talent(breath_of_sindragosa_talent) or not SpellCooldown(breath_of_sindragosa) > 0 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
-	#sindragosas_fury,if=buff.pillar_of_frost.up&(buff.unholy_strength.up|(buff.pillar_of_frost.remains<3&target.time_to_die<60))&debuff.razorice.stack=5&!buff.obliteration.up
-	if BuffPresent(pillar_of_frost_buff) and { BuffPresent(unholy_strength_buff) or BuffRemaining(pillar_of_frost_buff) < 3 and target.TimeToDie() < 60 } and target.DebuffStacks(razorice_debuff) == 5 and not BuffPresent(obliteration_buff) Spell(sindragosas_fury)
-	#call_action_list,name=generic,if=!talent.breath_of_sindragosa.enabled&!(talent.gathering_storm.enabled&buff.remorseless_winter.remains)
-	if not Talent(breath_of_sindragosa_talent) and not { Talent(gathering_storm_talent) and BuffPresent(remorseless_winter_buff) } FrostGenericCdActions()
+	#call_action_list,name=cds
+	FrostCdsCdActions()
 
-	unless not Talent(breath_of_sindragosa_talent) and not { Talent(gathering_storm_talent) and BuffPresent(remorseless_winter_buff) } and FrostGenericCdPostConditions()
+	unless FrostCdsCdPostConditions()
 	{
-		#call_action_list,name=bos,if=talent.breath_of_sindragosa.enabled&!dot.breath_of_sindragosa.ticking
-		if Talent(breath_of_sindragosa_talent) and not BuffPresent(breath_of_sindragosa_buff) FrostBosCdActions()
+		#run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains<15
+		if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 15 FrostBosPoolingCdActions()
 
-		unless Talent(breath_of_sindragosa_talent) and not BuffPresent(breath_of_sindragosa_buff) and FrostBosCdPostConditions()
+		unless Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 15 and FrostBosPoolingCdPostConditions()
 		{
-			#call_action_list,name=bos_ticking,if=talent.breath_of_sindragosa.enabled&dot.breath_of_sindragosa.ticking
+			#run_action_list,name=bos_ticking,if=talent.breath_of_sindragosa.enabled&dot.breath_of_sindragosa.ticking
 			if Talent(breath_of_sindragosa_talent) and BuffPresent(breath_of_sindragosa_buff) FrostBosTickingCdActions()
 
 			unless Talent(breath_of_sindragosa_talent) and BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingCdPostConditions()
 			{
-				#call_action_list,name=gs_ticking,if=talent.gathering_storm.enabled&buff.remorseless_winter.remains&!talent.breath_of_sindragosa.enabled
-				if Talent(gathering_storm_talent) and BuffPresent(remorseless_winter_buff) and not Talent(breath_of_sindragosa_talent) FrostGsTickingCdActions()
+				#run_action_list,name=obliteration,if=buff.obliteration.up
+				if BuffPresent(obliteration_buff) FrostObliterationCdActions()
+
+				unless BuffPresent(obliteration_buff) and FrostObliterationCdPostConditions()
+				{
+					#call_action_list,name=standard
+					FrostStandardCdActions()
+				}
 			}
 		}
 	}
@@ -268,82 +266,98 @@ AddFunction FrostDefaultCdActions
 
 AddFunction FrostDefaultCdPostConditions
 {
-	not Talent(breath_of_sindragosa_talent) and not { Talent(gathering_storm_talent) and BuffPresent(remorseless_winter_buff) } and FrostGenericCdPostConditions() or Talent(breath_of_sindragosa_talent) and not BuffPresent(breath_of_sindragosa_buff) and FrostBosCdPostConditions() or Talent(breath_of_sindragosa_talent) and BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingCdPostConditions() or Talent(gathering_storm_talent) and BuffPresent(remorseless_winter_buff) and not Talent(breath_of_sindragosa_talent) and FrostGsTickingCdPostConditions()
+	FrostCdsCdPostConditions() or Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) < 15 and FrostBosPoolingCdPostConditions() or Talent(breath_of_sindragosa_talent) and BuffPresent(breath_of_sindragosa_buff) and FrostBosTickingCdPostConditions() or BuffPresent(obliteration_buff) and FrostObliterationCdPostConditions() or FrostStandardCdPostConditions()
 }
 
-### actions.bos
+### actions.bos_pooling
 
-AddFunction FrostBosMainActions
+AddFunction FrostBosPoolingMainActions
 {
-	#frost_strike,if=talent.icy_talons.enabled&buff.icy_talons.remains<1.5&cooldown.breath_of_sindragosa.remains>6
-	if Talent(icy_talons_talent) and BuffRemaining(icy_talons_buff) < 1.5 and SpellCooldown(breath_of_sindragosa) > 6 Spell(frost_strike)
 	#remorseless_winter,if=talent.gathering_storm.enabled
 	if Talent(gathering_storm_talent) Spell(remorseless_winter)
-	#howling_blast,target_if=!dot.frost_fever.ticking
-	if not target.DebuffPresent(frost_fever_debuff) Spell(howling_blast)
-	#frost_strike,if=runic_power>=90&set_bonus.tier19_4pc
-	if RunicPower() >= 90 and ArmorSetBonus(T19 4) Spell(frost_strike)
-	#remorseless_winter,if=buff.rime.react&equipped.132459
-	if BuffPresent(rime_buff) and HasEquippedItem(132459) Spell(remorseless_winter)
-	#howling_blast,if=buff.rime.react&(dot.remorseless_winter.ticking|cooldown.remorseless_winter.remains>1.5|!equipped.132459)
-	if BuffPresent(rime_buff) and { target.DebuffPresent(remorseless_winter_debuff) or SpellCooldown(remorseless_winter) > 1.5 or not HasEquippedItem(132459) } Spell(howling_blast)
-	#obliterate,if=!buff.rime.react&!(talent.gathering_storm.enabled&!(cooldown.remorseless_winter.remains>2|rune>4))&rune>3
-	if not BuffPresent(rime_buff) and not { Talent(gathering_storm_talent) and not { SpellCooldown(remorseless_winter) > 2 or Rune() >= 5 } } and Rune() >= 4 Spell(obliterate)
-	#frost_strike,if=runic_power>=70|((talent.gathering_storm.enabled&cooldown.remorseless_winter.remains<3&cooldown.breath_of_sindragosa.remains>10)&rune<5)
-	if RunicPower() >= 70 or Talent(gathering_storm_talent) and SpellCooldown(remorseless_winter) < 3 and SpellCooldown(breath_of_sindragosa) > 10 and Rune() < 5 Spell(frost_strike)
-	#obliterate,if=!buff.rime.react&!(talent.gathering_storm.enabled&!(cooldown.remorseless_winter.remains>2|rune>4))
-	if not BuffPresent(rime_buff) and not { Talent(gathering_storm_talent) and not { SpellCooldown(remorseless_winter) > 2 or Rune() >= 5 } } Spell(obliterate)
-	#horn_of_winter,if=cooldown.breath_of_sindragosa.remains>15&runic_power<=70&rune<4
-	if SpellCooldown(breath_of_sindragosa) > 15 and RunicPower() <= 70 and Rune() < 4 Spell(horn_of_winter)
-	#frost_strike,if=cooldown.breath_of_sindragosa.remains>15
-	if SpellCooldown(breath_of_sindragosa) > 15 Spell(frost_strike)
-	#remorseless_winter,if=cooldown.breath_of_sindragosa.remains>10
-	if SpellCooldown(breath_of_sindragosa) > 10 Spell(remorseless_winter)
+	#howling_blast,if=buff.rime.react&rune.time_to_4<(gcd*2)
+	if BuffPresent(rime_buff) and TimeToRunes(4) < GCD() * 2 Spell(howling_blast)
+	#obliterate,if=rune.time_to_6<gcd&!talent.gathering_storm.enabled
+	if TimeToRunes(6) < GCD() and not Talent(gathering_storm_talent) Spell(obliterate)
+	#obliterate,if=rune.time_to_4<gcd&(cooldown.breath_of_sindragosa.remains|runic_power<70)
+	if TimeToRunes(4) < GCD() and { SpellCooldown(breath_of_sindragosa) > 0 or RunicPower() < 70 } Spell(obliterate)
+	#frost_strike,if=runic_power>=95&set_bonus.tier19_4pc&cooldown.breath_of_sindragosa.remains&(!talent.shattering_strikes.enabled|debuff.razorice.stack<5|cooldown.breath_of_sindragosa.remains>6)
+	if RunicPower() >= 95 and ArmorSetBonus(T19 4) and SpellCooldown(breath_of_sindragosa) > 0 and { not Talent(shattering_strikes_talent) or target.DebuffStacks(razorice_debuff) < 5 or SpellCooldown(breath_of_sindragosa) > 6 } Spell(frost_strike)
+	#remorseless_winter,if=buff.rime.react&equipped.perseverance_of_the_ebon_martyr
+	if BuffPresent(rime_buff) and HasEquippedItem(perseverance_of_the_ebon_martyr) Spell(remorseless_winter)
+	#howling_blast,if=buff.rime.react&(buff.remorseless_winter.up|cooldown.remorseless_winter.remains>gcd|(!equipped.perseverance_of_the_ebon_martyr&!talent.gathering_storm.enabled))
+	if BuffPresent(rime_buff) and { BuffPresent(remorseless_winter_buff) or SpellCooldown(remorseless_winter) > GCD() or not HasEquippedItem(perseverance_of_the_ebon_martyr) and not Talent(gathering_storm_talent) } Spell(howling_blast)
+	#obliterate,if=!buff.rime.react&!(talent.gathering_storm.enabled&!(cooldown.remorseless_winter.remains>(gcd*2)|rune>4))&rune>3
+	if not BuffPresent(rime_buff) and not { Talent(gathering_storm_talent) and not { SpellCooldown(remorseless_winter) > GCD() * 2 or Rune() >= 5 } } and Rune() >= 4 Spell(obliterate)
+	#frost_strike,if=runic_power>=70&(!talent.shattering_strikes.enabled|debuff.razorice.stack<5|cooldown.breath_of_sindragosa.remains>rune.time_to_4)
+	if RunicPower() >= 70 and { not Talent(shattering_strikes_talent) or target.DebuffStacks(razorice_debuff) < 5 or SpellCooldown(breath_of_sindragosa) > TimeToRunes(4) } Spell(frost_strike)
+	#frostscythe,if=buff.killing_machine.up&(!equipped.koltiras_newfound_will|spell_targets.frostscythe>=2)
+	if BuffPresent(killing_machine_buff) and { not HasEquippedItem(koltiras_newfound_will) or Enemies() >= 2 } Spell(frostscythe)
+	#glacial_advance,if=spell_targets.glacial_advance>=2
+	if Enemies() >= 2 Spell(glacial_advance)
+	#remorseless_winter,if=spell_targets.remorseless_winter>=2
+	if Enemies() >= 2 Spell(remorseless_winter)
+	#frostscythe,if=spell_targets.frostscythe>=3
+	if Enemies() >= 3 Spell(frostscythe)
+	#frost_strike,if=(cooldown.remorseless_winter.remains<(gcd*2)|buff.gathering_storm.stack=10)&cooldown.breath_of_sindragosa.remains>rune.time_to_4&talent.gathering_storm.enabled&(!talent.shattering_strikes.enabled|debuff.razorice.stack<5|cooldown.breath_of_sindragosa.remains>6)
+	if { SpellCooldown(remorseless_winter) < GCD() * 2 or BuffStacks(gathering_storm_buff) == 10 } and SpellCooldown(breath_of_sindragosa) > TimeToRunes(4) and Talent(gathering_storm_talent) and { not Talent(shattering_strikes_talent) or target.DebuffStacks(razorice_debuff) < 5 or SpellCooldown(breath_of_sindragosa) > 6 } Spell(frost_strike)
+	#obliterate,if=!buff.rime.react&(!talent.gathering_storm.enabled|cooldown.remorseless_winter.remains>gcd)
+	if not BuffPresent(rime_buff) and { not Talent(gathering_storm_talent) or SpellCooldown(remorseless_winter) > GCD() } Spell(obliterate)
+	#frost_strike,if=cooldown.breath_of_sindragosa.remains>rune.time_to_4&(!talent.shattering_strikes.enabled|debuff.razorice.stack<5|cooldown.breath_of_sindragosa.remains>6)
+	if SpellCooldown(breath_of_sindragosa) > TimeToRunes(4) and { not Talent(shattering_strikes_talent) or target.DebuffStacks(razorice_debuff) < 5 or SpellCooldown(breath_of_sindragosa) > 6 } Spell(frost_strike)
 }
 
-AddFunction FrostBosMainPostConditions
+AddFunction FrostBosPoolingMainPostConditions
 {
 }
 
-AddFunction FrostBosShortCdActions
+AddFunction FrostBosPoolingShortCdActions
 {
 }
 
-AddFunction FrostBosShortCdPostConditions
+AddFunction FrostBosPoolingShortCdPostConditions
 {
-	Talent(icy_talons_talent) and BuffRemaining(icy_talons_buff) < 1.5 and SpellCooldown(breath_of_sindragosa) > 6 and Spell(frost_strike) or Talent(gathering_storm_talent) and Spell(remorseless_winter) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or RunicPower() >= 90 and ArmorSetBonus(T19 4) and Spell(frost_strike) or BuffPresent(rime_buff) and HasEquippedItem(132459) and Spell(remorseless_winter) or BuffPresent(rime_buff) and { target.DebuffPresent(remorseless_winter_debuff) or SpellCooldown(remorseless_winter) > 1.5 or not HasEquippedItem(132459) } and Spell(howling_blast) or not BuffPresent(rime_buff) and not { Talent(gathering_storm_talent) and not { SpellCooldown(remorseless_winter) > 2 or Rune() >= 5 } } and Rune() >= 4 and Spell(obliterate) or { RunicPower() >= 70 or Talent(gathering_storm_talent) and SpellCooldown(remorseless_winter) < 3 and SpellCooldown(breath_of_sindragosa) > 10 and Rune() < 5 } and Spell(frost_strike) or not BuffPresent(rime_buff) and not { Talent(gathering_storm_talent) and not { SpellCooldown(remorseless_winter) > 2 or Rune() >= 5 } } and Spell(obliterate) or SpellCooldown(breath_of_sindragosa) > 15 and RunicPower() <= 70 and Rune() < 4 and Spell(horn_of_winter) or SpellCooldown(breath_of_sindragosa) > 15 and Spell(frost_strike) or SpellCooldown(breath_of_sindragosa) > 10 and Spell(remorseless_winter)
+	Talent(gathering_storm_talent) and Spell(remorseless_winter) or BuffPresent(rime_buff) and TimeToRunes(4) < GCD() * 2 and Spell(howling_blast) or TimeToRunes(6) < GCD() and not Talent(gathering_storm_talent) and Spell(obliterate) or TimeToRunes(4) < GCD() and { SpellCooldown(breath_of_sindragosa) > 0 or RunicPower() < 70 } and Spell(obliterate) or RunicPower() >= 95 and ArmorSetBonus(T19 4) and SpellCooldown(breath_of_sindragosa) > 0 and { not Talent(shattering_strikes_talent) or target.DebuffStacks(razorice_debuff) < 5 or SpellCooldown(breath_of_sindragosa) > 6 } and Spell(frost_strike) or BuffPresent(rime_buff) and HasEquippedItem(perseverance_of_the_ebon_martyr) and Spell(remorseless_winter) or BuffPresent(rime_buff) and { BuffPresent(remorseless_winter_buff) or SpellCooldown(remorseless_winter) > GCD() or not HasEquippedItem(perseverance_of_the_ebon_martyr) and not Talent(gathering_storm_talent) } and Spell(howling_blast) or not BuffPresent(rime_buff) and not { Talent(gathering_storm_talent) and not { SpellCooldown(remorseless_winter) > GCD() * 2 or Rune() >= 5 } } and Rune() >= 4 and Spell(obliterate) or RunicPower() >= 70 and { not Talent(shattering_strikes_talent) or target.DebuffStacks(razorice_debuff) < 5 or SpellCooldown(breath_of_sindragosa) > TimeToRunes(4) } and Spell(frost_strike) or BuffPresent(killing_machine_buff) and { not HasEquippedItem(koltiras_newfound_will) or Enemies() >= 2 } and Spell(frostscythe) or Enemies() >= 2 and Spell(glacial_advance) or Enemies() >= 2 and Spell(remorseless_winter) or Enemies() >= 3 and Spell(frostscythe) or { SpellCooldown(remorseless_winter) < GCD() * 2 or BuffStacks(gathering_storm_buff) == 10 } and SpellCooldown(breath_of_sindragosa) > TimeToRunes(4) and Talent(gathering_storm_talent) and { not Talent(shattering_strikes_talent) or target.DebuffStacks(razorice_debuff) < 5 or SpellCooldown(breath_of_sindragosa) > 6 } and Spell(frost_strike) or not BuffPresent(rime_buff) and { not Talent(gathering_storm_talent) or SpellCooldown(remorseless_winter) > GCD() } and Spell(obliterate) or SpellCooldown(breath_of_sindragosa) > TimeToRunes(4) and { not Talent(shattering_strikes_talent) or target.DebuffStacks(razorice_debuff) < 5 or SpellCooldown(breath_of_sindragosa) > 6 } and Spell(frost_strike)
 }
 
-AddFunction FrostBosCdActions
+AddFunction FrostBosPoolingCdActions
 {
-	unless Talent(icy_talons_talent) and BuffRemaining(icy_talons_buff) < 1.5 and SpellCooldown(breath_of_sindragosa) > 6 and Spell(frost_strike) or Talent(gathering_storm_talent) and Spell(remorseless_winter) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast)
+	unless Talent(gathering_storm_talent) and Spell(remorseless_winter) or BuffPresent(rime_buff) and TimeToRunes(4) < GCD() * 2 and Spell(howling_blast) or TimeToRunes(6) < GCD() and not Talent(gathering_storm_talent) and Spell(obliterate) or TimeToRunes(4) < GCD() and { SpellCooldown(breath_of_sindragosa) > 0 or RunicPower() < 70 } and Spell(obliterate) or RunicPower() >= 95 and ArmorSetBonus(T19 4) and SpellCooldown(breath_of_sindragosa) > 0 and { not Talent(shattering_strikes_talent) or target.DebuffStacks(razorice_debuff) < 5 or SpellCooldown(breath_of_sindragosa) > 6 } and Spell(frost_strike) or BuffPresent(rime_buff) and HasEquippedItem(perseverance_of_the_ebon_martyr) and Spell(remorseless_winter) or BuffPresent(rime_buff) and { BuffPresent(remorseless_winter_buff) or SpellCooldown(remorseless_winter) > GCD() or not HasEquippedItem(perseverance_of_the_ebon_martyr) and not Talent(gathering_storm_talent) } and Spell(howling_blast) or not BuffPresent(rime_buff) and not { Talent(gathering_storm_talent) and not { SpellCooldown(remorseless_winter) > GCD() * 2 or Rune() >= 5 } } and Rune() >= 4 and Spell(obliterate)
 	{
-		#breath_of_sindragosa,if=runic_power>=50&(!equipped.140806|cooldown.hungering_rune_weapon.remains<10)
-		if RunicPower() >= 50 and { not HasEquippedItem(140806) or SpellCooldown(hungering_rune_weapon) < 10 } Spell(breath_of_sindragosa)
+		#sindragosas_fury,if=(equipped.consorts_cold_core|buff.pillar_of_frost.up)&buff.unholy_strength.up&debuff.razorice.stack=5
+		if { HasEquippedItem(consorts_cold_core) or BuffPresent(pillar_of_frost_buff) } and BuffPresent(unholy_strength_buff) and target.DebuffStacks(razorice_debuff) == 5 Spell(sindragosas_fury)
 	}
 }
 
-AddFunction FrostBosCdPostConditions
+AddFunction FrostBosPoolingCdPostConditions
 {
-	Talent(icy_talons_talent) and BuffRemaining(icy_talons_buff) < 1.5 and SpellCooldown(breath_of_sindragosa) > 6 and Spell(frost_strike) or Talent(gathering_storm_talent) and Spell(remorseless_winter) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or RunicPower() >= 90 and ArmorSetBonus(T19 4) and Spell(frost_strike) or BuffPresent(rime_buff) and HasEquippedItem(132459) and Spell(remorseless_winter) or BuffPresent(rime_buff) and { target.DebuffPresent(remorseless_winter_debuff) or SpellCooldown(remorseless_winter) > 1.5 or not HasEquippedItem(132459) } and Spell(howling_blast) or not BuffPresent(rime_buff) and not { Talent(gathering_storm_talent) and not { SpellCooldown(remorseless_winter) > 2 or Rune() >= 5 } } and Rune() >= 4 and Spell(obliterate) or { RunicPower() >= 70 or Talent(gathering_storm_talent) and SpellCooldown(remorseless_winter) < 3 and SpellCooldown(breath_of_sindragosa) > 10 and Rune() < 5 } and Spell(frost_strike) or not BuffPresent(rime_buff) and not { Talent(gathering_storm_talent) and not { SpellCooldown(remorseless_winter) > 2 or Rune() >= 5 } } and Spell(obliterate) or SpellCooldown(breath_of_sindragosa) > 15 and RunicPower() <= 70 and Rune() < 4 and Spell(horn_of_winter) or SpellCooldown(breath_of_sindragosa) > 15 and Spell(frost_strike) or SpellCooldown(breath_of_sindragosa) > 10 and Spell(remorseless_winter)
+	Talent(gathering_storm_talent) and Spell(remorseless_winter) or BuffPresent(rime_buff) and TimeToRunes(4) < GCD() * 2 and Spell(howling_blast) or TimeToRunes(6) < GCD() and not Talent(gathering_storm_talent) and Spell(obliterate) or TimeToRunes(4) < GCD() and { SpellCooldown(breath_of_sindragosa) > 0 or RunicPower() < 70 } and Spell(obliterate) or RunicPower() >= 95 and ArmorSetBonus(T19 4) and SpellCooldown(breath_of_sindragosa) > 0 and { not Talent(shattering_strikes_talent) or target.DebuffStacks(razorice_debuff) < 5 or SpellCooldown(breath_of_sindragosa) > 6 } and Spell(frost_strike) or BuffPresent(rime_buff) and HasEquippedItem(perseverance_of_the_ebon_martyr) and Spell(remorseless_winter) or BuffPresent(rime_buff) and { BuffPresent(remorseless_winter_buff) or SpellCooldown(remorseless_winter) > GCD() or not HasEquippedItem(perseverance_of_the_ebon_martyr) and not Talent(gathering_storm_talent) } and Spell(howling_blast) or not BuffPresent(rime_buff) and not { Talent(gathering_storm_talent) and not { SpellCooldown(remorseless_winter) > GCD() * 2 or Rune() >= 5 } } and Rune() >= 4 and Spell(obliterate) or RunicPower() >= 70 and { not Talent(shattering_strikes_talent) or target.DebuffStacks(razorice_debuff) < 5 or SpellCooldown(breath_of_sindragosa) > TimeToRunes(4) } and Spell(frost_strike) or BuffPresent(killing_machine_buff) and { not HasEquippedItem(koltiras_newfound_will) or Enemies() >= 2 } and Spell(frostscythe) or Enemies() >= 2 and Spell(glacial_advance) or Enemies() >= 2 and Spell(remorseless_winter) or Enemies() >= 3 and Spell(frostscythe) or { SpellCooldown(remorseless_winter) < GCD() * 2 or BuffStacks(gathering_storm_buff) == 10 } and SpellCooldown(breath_of_sindragosa) > TimeToRunes(4) and Talent(gathering_storm_talent) and { not Talent(shattering_strikes_talent) or target.DebuffStacks(razorice_debuff) < 5 or SpellCooldown(breath_of_sindragosa) > 6 } and Spell(frost_strike) or not BuffPresent(rime_buff) and { not Talent(gathering_storm_talent) or SpellCooldown(remorseless_winter) > GCD() } and Spell(obliterate) or SpellCooldown(breath_of_sindragosa) > TimeToRunes(4) and { not Talent(shattering_strikes_talent) or target.DebuffStacks(razorice_debuff) < 5 or SpellCooldown(breath_of_sindragosa) > 6 } and Spell(frost_strike)
 }
 
 ### actions.bos_ticking
 
 AddFunction FrostBosTickingMainActions
 {
-	#howling_blast,target_if=!dot.frost_fever.ticking
-	if not target.DebuffPresent(frost_fever_debuff) Spell(howling_blast)
-	#remorseless_winter,if=runic_power>=30&((buff.rime.react&equipped.132459)|(talent.gathering_storm.enabled&(dot.remorseless_winter.remains<=gcd|!dot.remorseless_winter.ticking)))
-	if RunicPower() >= 30 and { BuffPresent(rime_buff) and HasEquippedItem(132459) or Talent(gathering_storm_talent) and { target.DebuffRemaining(remorseless_winter_debuff) <= GCD() or not target.DebuffPresent(remorseless_winter_debuff) } } Spell(remorseless_winter)
+	#frost_strike,if=talent.shattering_strikes.enabled&runic_power<40&rune.time_to_2>2&cooldown.empower_rune_weapon.remains&debuff.razorice.stack=5&(cooldown.horn_of_winter.remains|!talent.horn_of_winter.enabled)
+	if Talent(shattering_strikes_talent) and RunicPower() < 40 and TimeToRunes(2) > 2 and SpellCooldown(empower_rune_weapon) > 0 and target.DebuffStacks(razorice_debuff) == 5 and { SpellCooldown(horn_of_winter) > 0 or not Talent(horn_of_winter_talent) } Spell(frost_strike)
+	#remorseless_winter,if=runic_power>=30&((buff.rime.react&equipped.perseverance_of_the_ebon_martyr)|(talent.gathering_storm.enabled&(buff.remorseless_winter.remains<=gcd|!buff.remorseless_winter.remains)))
+	if RunicPower() >= 30 and { BuffPresent(rime_buff) and HasEquippedItem(perseverance_of_the_ebon_martyr) or Talent(gathering_storm_talent) and { BuffRemaining(remorseless_winter_buff) <= GCD() or not BuffPresent(remorseless_winter_buff) } } Spell(remorseless_winter)
 	#howling_blast,if=((runic_power>=20&set_bonus.tier19_4pc)|runic_power>=30)&buff.rime.react
 	if { RunicPower() >= 20 and ArmorSetBonus(T19 4) or RunicPower() >= 30 } and BuffPresent(rime_buff) Spell(howling_blast)
+	#frost_strike,if=set_bonus.tier20_2pc&runic_power>85&rune<=3&buff.pillar_of_frost.up&!talent.shattering_strikes.enabled
+	if ArmorSetBonus(T20 2) and RunicPower() > 85 and Rune() < 4 and BuffPresent(pillar_of_frost_buff) and not Talent(shattering_strikes_talent) Spell(frost_strike)
+	#obliterate,if=runic_power<=45|rune.time_to_5<gcd
+	if RunicPower() <= 45 or TimeToRunes(5) < GCD() Spell(obliterate)
+	#horn_of_winter,if=runic_power<70&rune.time_to_3>gcd
+	if RunicPower() < 70 and TimeToRunes(3) > GCD() Spell(horn_of_winter)
+	#frostscythe,if=buff.killing_machine.up&(!equipped.koltiras_newfound_will|talent.gathering_storm.enabled|spell_targets.frostscythe>=2)
+	if BuffPresent(killing_machine_buff) and { not HasEquippedItem(koltiras_newfound_will) or Talent(gathering_storm_talent) or Enemies() >= 2 } Spell(frostscythe)
+	#glacial_advance,if=spell_targets.remorseless_winter>=2
+	if Enemies() >= 2 Spell(glacial_advance)
+	#remorseless_winter,if=spell_targets.remorseless_winter>=2
+	if Enemies() >= 2 Spell(remorseless_winter)
 	#obliterate,if=runic_power<=75|rune>3
 	if RunicPower() <= 75 or Rune() >= 4 Spell(obliterate)
-	#horn_of_winter,if=runic_power<70&!buff.hungering_rune_weapon.up&rune<5
-	if RunicPower() < 70 and not BuffPresent(hungering_rune_weapon_buff) and Rune() < 5 Spell(horn_of_winter)
-	#remorseless_winter,if=talent.gathering_storm.enabled|!set_bonus.tier19_4pc|runic_power<30
-	if Talent(gathering_storm_talent) or not ArmorSetBonus(T19 4) or RunicPower() < 30 Spell(remorseless_winter)
 }
 
 AddFunction FrostBosTickingMainPostConditions
@@ -356,163 +370,182 @@ AddFunction FrostBosTickingShortCdActions
 
 AddFunction FrostBosTickingShortCdPostConditions
 {
-	not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or RunicPower() >= 30 and { BuffPresent(rime_buff) and HasEquippedItem(132459) or Talent(gathering_storm_talent) and { target.DebuffRemaining(remorseless_winter_debuff) <= GCD() or not target.DebuffPresent(remorseless_winter_debuff) } } and Spell(remorseless_winter) or { RunicPower() >= 20 and ArmorSetBonus(T19 4) or RunicPower() >= 30 } and BuffPresent(rime_buff) and Spell(howling_blast) or { RunicPower() <= 75 or Rune() >= 4 } and Spell(obliterate) or RunicPower() < 70 and not BuffPresent(hungering_rune_weapon_buff) and Rune() < 5 and Spell(horn_of_winter) or { Talent(gathering_storm_talent) or not ArmorSetBonus(T19 4) or RunicPower() < 30 } and Spell(remorseless_winter)
+	Talent(shattering_strikes_talent) and RunicPower() < 40 and TimeToRunes(2) > 2 and SpellCooldown(empower_rune_weapon) > 0 and target.DebuffStacks(razorice_debuff) == 5 and { SpellCooldown(horn_of_winter) > 0 or not Talent(horn_of_winter_talent) } and Spell(frost_strike) or RunicPower() >= 30 and { BuffPresent(rime_buff) and HasEquippedItem(perseverance_of_the_ebon_martyr) or Talent(gathering_storm_talent) and { BuffRemaining(remorseless_winter_buff) <= GCD() or not BuffPresent(remorseless_winter_buff) } } and Spell(remorseless_winter) or { RunicPower() >= 20 and ArmorSetBonus(T19 4) or RunicPower() >= 30 } and BuffPresent(rime_buff) and Spell(howling_blast) or ArmorSetBonus(T20 2) and RunicPower() > 85 and Rune() < 4 and BuffPresent(pillar_of_frost_buff) and not Talent(shattering_strikes_talent) and Spell(frost_strike) or { RunicPower() <= 45 or TimeToRunes(5) < GCD() } and Spell(obliterate) or RunicPower() < 70 and TimeToRunes(3) > GCD() and Spell(horn_of_winter) or BuffPresent(killing_machine_buff) and { not HasEquippedItem(koltiras_newfound_will) or Talent(gathering_storm_talent) or Enemies() >= 2 } and Spell(frostscythe) or Enemies() >= 2 and Spell(glacial_advance) or Enemies() >= 2 and Spell(remorseless_winter) or { RunicPower() <= 75 or Rune() >= 4 } and Spell(obliterate)
 }
 
 AddFunction FrostBosTickingCdActions
 {
-	unless not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or RunicPower() >= 30 and { BuffPresent(rime_buff) and HasEquippedItem(132459) or Talent(gathering_storm_talent) and { target.DebuffRemaining(remorseless_winter_debuff) <= GCD() or not target.DebuffPresent(remorseless_winter_debuff) } } and Spell(remorseless_winter) or { RunicPower() >= 20 and ArmorSetBonus(T19 4) or RunicPower() >= 30 } and BuffPresent(rime_buff) and Spell(howling_blast) or { RunicPower() <= 75 or Rune() >= 4 } and Spell(obliterate) or RunicPower() < 70 and not BuffPresent(hungering_rune_weapon_buff) and Rune() < 5 and Spell(horn_of_winter)
+	unless Talent(shattering_strikes_talent) and RunicPower() < 40 and TimeToRunes(2) > 2 and SpellCooldown(empower_rune_weapon) > 0 and target.DebuffStacks(razorice_debuff) == 5 and { SpellCooldown(horn_of_winter) > 0 or not Talent(horn_of_winter_talent) } and Spell(frost_strike) or RunicPower() >= 30 and { BuffPresent(rime_buff) and HasEquippedItem(perseverance_of_the_ebon_martyr) or Talent(gathering_storm_talent) and { BuffRemaining(remorseless_winter_buff) <= GCD() or not BuffPresent(remorseless_winter_buff) } } and Spell(remorseless_winter) or { RunicPower() >= 20 and ArmorSetBonus(T19 4) or RunicPower() >= 30 } and BuffPresent(rime_buff) and Spell(howling_blast) or ArmorSetBonus(T20 2) and RunicPower() > 85 and Rune() < 4 and BuffPresent(pillar_of_frost_buff) and not Talent(shattering_strikes_talent) and Spell(frost_strike) or { RunicPower() <= 45 or TimeToRunes(5) < GCD() } and Spell(obliterate)
 	{
-		#hungering_rune_weapon,if=equipped.140806&(runic_power<30|(runic_power<70&talent.gathering_storm.enabled))&!buff.hungering_rune_weapon.up&rune<2
-		if HasEquippedItem(140806) and { RunicPower() < 30 or RunicPower() < 70 and Talent(gathering_storm_talent) } and not BuffPresent(hungering_rune_weapon_buff) and Rune() < 2 Spell(hungering_rune_weapon)
-		#hungering_rune_weapon,if=talent.runic_attenuation.enabled&runic_power<30&!buff.hungering_rune_weapon.up&rune<2
-		if Talent(runic_attenuation_talent) and RunicPower() < 30 and not BuffPresent(hungering_rune_weapon_buff) and Rune() < 2 Spell(hungering_rune_weapon)
-		#hungering_rune_weapon,if=runic_power<35&!buff.hungering_rune_weapon.up&rune<2
-		if RunicPower() < 35 and not BuffPresent(hungering_rune_weapon_buff) and Rune() < 2 Spell(hungering_rune_weapon)
-		#hungering_rune_weapon,if=runic_power<25&!buff.hungering_rune_weapon.up&rune<1
-		if RunicPower() < 25 and not BuffPresent(hungering_rune_weapon_buff) and Rune() < 1 Spell(hungering_rune_weapon)
-		#empower_rune_weapon,if=runic_power<20
-		if RunicPower() < 20 Spell(empower_rune_weapon)
+		#sindragosas_fury,if=(equipped.consorts_cold_core|buff.pillar_of_frost.up)&buff.unholy_strength.up&debuff.razorice.stack=5
+		if { HasEquippedItem(consorts_cold_core) or BuffPresent(pillar_of_frost_buff) } and BuffPresent(unholy_strength_buff) and target.DebuffStacks(razorice_debuff) == 5 Spell(sindragosas_fury)
+
+		unless RunicPower() < 70 and TimeToRunes(3) > GCD() and Spell(horn_of_winter) or BuffPresent(killing_machine_buff) and { not HasEquippedItem(koltiras_newfound_will) or Talent(gathering_storm_talent) or Enemies() >= 2 } and Spell(frostscythe) or Enemies() >= 2 and Spell(glacial_advance) or Enemies() >= 2 and Spell(remorseless_winter) or { RunicPower() <= 75 or Rune() >= 4 } and Spell(obliterate)
+		{
+			#empower_rune_weapon,if=runic_power<30&rune.time_to_2>gcd
+			if RunicPower() < 30 and TimeToRunes(2) > GCD() Spell(empower_rune_weapon)
+		}
 	}
 }
 
 AddFunction FrostBosTickingCdPostConditions
 {
-	not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or RunicPower() >= 30 and { BuffPresent(rime_buff) and HasEquippedItem(132459) or Talent(gathering_storm_talent) and { target.DebuffRemaining(remorseless_winter_debuff) <= GCD() or not target.DebuffPresent(remorseless_winter_debuff) } } and Spell(remorseless_winter) or { RunicPower() >= 20 and ArmorSetBonus(T19 4) or RunicPower() >= 30 } and BuffPresent(rime_buff) and Spell(howling_blast) or { RunicPower() <= 75 or Rune() >= 4 } and Spell(obliterate) or RunicPower() < 70 and not BuffPresent(hungering_rune_weapon_buff) and Rune() < 5 and Spell(horn_of_winter) or { Talent(gathering_storm_talent) or not ArmorSetBonus(T19 4) or RunicPower() < 30 } and Spell(remorseless_winter)
+	Talent(shattering_strikes_talent) and RunicPower() < 40 and TimeToRunes(2) > 2 and SpellCooldown(empower_rune_weapon) > 0 and target.DebuffStacks(razorice_debuff) == 5 and { SpellCooldown(horn_of_winter) > 0 or not Talent(horn_of_winter_talent) } and Spell(frost_strike) or RunicPower() >= 30 and { BuffPresent(rime_buff) and HasEquippedItem(perseverance_of_the_ebon_martyr) or Talent(gathering_storm_talent) and { BuffRemaining(remorseless_winter_buff) <= GCD() or not BuffPresent(remorseless_winter_buff) } } and Spell(remorseless_winter) or { RunicPower() >= 20 and ArmorSetBonus(T19 4) or RunicPower() >= 30 } and BuffPresent(rime_buff) and Spell(howling_blast) or ArmorSetBonus(T20 2) and RunicPower() > 85 and Rune() < 4 and BuffPresent(pillar_of_frost_buff) and not Talent(shattering_strikes_talent) and Spell(frost_strike) or { RunicPower() <= 45 or TimeToRunes(5) < GCD() } and Spell(obliterate) or RunicPower() < 70 and TimeToRunes(3) > GCD() and Spell(horn_of_winter) or BuffPresent(killing_machine_buff) and { not HasEquippedItem(koltiras_newfound_will) or Talent(gathering_storm_talent) or Enemies() >= 2 } and Spell(frostscythe) or Enemies() >= 2 and Spell(glacial_advance) or Enemies() >= 2 and Spell(remorseless_winter) or { RunicPower() <= 75 or Rune() >= 4 } and Spell(obliterate)
 }
 
-### actions.generic
+### actions.cds
 
-AddFunction FrostGenericMainActions
+AddFunction FrostCdsMainActions
 {
-	#frost_strike,if=!talent.shattering_strikes.enabled&(buff.icy_talons.remains<1.5&talent.icy_talons.enabled)
-	if not Talent(shattering_strikes_talent) and BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) Spell(frost_strike)
-	#frost_strike,if=talent.shattering_strikes.enabled&debuff.razorice.stack=5
-	if Talent(shattering_strikes_talent) and target.DebuffStacks(razorice_debuff) == 5 Spell(frost_strike)
-	#howling_blast,target_if=!dot.frost_fever.ticking
-	if not target.DebuffPresent(frost_fever_debuff) Spell(howling_blast)
-	#remorseless_winter,if=(buff.rime.react&equipped.132459&!(buff.obliteration.up&spell_targets.howling_blast<2))|talent.gathering_storm.enabled
-	if BuffPresent(rime_buff) and HasEquippedItem(132459) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } or Talent(gathering_storm_talent) Spell(remorseless_winter)
-	#howling_blast,if=buff.rime.react&!(buff.obliteration.up&spell_targets.howling_blast<2)&!(equipped.132459&talent.gathering_storm.enabled)
-	if BuffPresent(rime_buff) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } and not { HasEquippedItem(132459) and Talent(gathering_storm_talent) } Spell(howling_blast)
-	#howling_blast,if=buff.rime.react&!(buff.obliteration.up&spell_targets.howling_blast<2)&equipped.132459&talent.gathering_storm.enabled&(debuff.perseverance_of_the_ebon_martyr.up|cooldown.remorseless_winter.remains>3)
-	if BuffPresent(rime_buff) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } and HasEquippedItem(132459) and Talent(gathering_storm_talent) and { target.DebuffPresent(perseverance_of_the_ebon_martyr_debuff) or SpellCooldown(remorseless_winter) > 3 } Spell(howling_blast)
-	#obliterate,if=!buff.obliteration.up&(equipped.132366&talent.frozen_pulse.enabled&(set_bonus.tier19_2pc=1|set_bonus.tier19_4pc=1))
-	if not BuffPresent(obliteration_buff) and HasEquippedItem(132366) and Talent(frozen_pulse_talent) and { ArmorSetBonus(T19 2) == 1 or ArmorSetBonus(T19 4) == 1 } Spell(obliterate)
-	#frost_strike,if=runic_power.deficit<=10
-	if RunicPowerDeficit() <= 10 Spell(frost_strike)
-	#frost_strike,if=buff.obliteration.up&!buff.killing_machine.react
-	if BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) Spell(frost_strike)
-	#remorseless_winter,if=spell_targets.remorseless_winter>=2&!(talent.frostscythe.enabled&buff.killing_machine.react&spell_targets.frostscythe>=2)
-	if Enemies() >= 2 and not { Talent(frostscythe_talent) and BuffPresent(killing_machine_buff) and Enemies() >= 2 } Spell(remorseless_winter)
-	#frostscythe,if=(buff.killing_machine.react&spell_targets.frostscythe>=2)
-	if BuffPresent(killing_machine_buff) and Enemies() >= 2 Spell(frostscythe)
-	#glacial_advance,if=spell_targets.glacial_advance>=2
-	if Enemies() >= 2 Spell(glacial_advance)
-	#frostscythe,if=spell_targets.frostscythe>=3
-	if Enemies() >= 3 Spell(frostscythe)
-	#obliterate,if=buff.killing_machine.react
+	#call_action_list,name=cold_heart,if=equipped.cold_heart&((buff.cold_heart.stack>=10&!buff.obliteration.up)|target.time_to_die<=gcd)
+	if HasEquippedItem(cold_heart) and { BuffStacks(cold_heart_buff) >= 10 and not BuffPresent(obliteration_buff) or target.TimeToDie() <= GCD() } FrostColdHeartMainActions()
+}
+
+AddFunction FrostCdsMainPostConditions
+{
+	HasEquippedItem(cold_heart) and { BuffStacks(cold_heart_buff) >= 10 and not BuffPresent(obliteration_buff) or target.TimeToDie() <= GCD() } and FrostColdHeartMainPostConditions()
+}
+
+AddFunction FrostCdsShortCdActions
+{
+	#pillar_of_frost,if=talent.obliteration.enabled&(cooldown.obliteration.remains>20|cooldown.obliteration.remains<10|!talent.icecap.enabled)
+	if Talent(obliteration_talent) and { SpellCooldown(obliteration) > 20 or SpellCooldown(obliteration) < 10 or not Talent(icecap_talent) } Spell(pillar_of_frost)
+	#pillar_of_frost,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.ready&runic_power>50
+	if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) == 0 and RunicPower() > 50 Spell(pillar_of_frost)
+	#pillar_of_frost,if=talent.breath_of_sindragosa.enabled&cooldown.breath_of_sindragosa.remains>40
+	if Talent(breath_of_sindragosa_talent) and SpellCooldown(breath_of_sindragosa) > 40 Spell(pillar_of_frost)
+	#pillar_of_frost,if=talent.hungering_rune_weapon.enabled
+	if Talent(hungering_rune_weapon_talent) Spell(pillar_of_frost)
+	#call_action_list,name=cold_heart,if=equipped.cold_heart&((buff.cold_heart.stack>=10&!buff.obliteration.up)|target.time_to_die<=gcd)
+	if HasEquippedItem(cold_heart) and { BuffStacks(cold_heart_buff) >= 10 and not BuffPresent(obliteration_buff) or target.TimeToDie() <= GCD() } FrostColdHeartShortCdActions()
+}
+
+AddFunction FrostCdsShortCdPostConditions
+{
+	HasEquippedItem(cold_heart) and { BuffStacks(cold_heart_buff) >= 10 and not BuffPresent(obliteration_buff) or target.TimeToDie() <= GCD() } and FrostColdHeartShortCdPostConditions()
+}
+
+AddFunction FrostCdsCdActions
+{
+	#arcane_torrent,if=runic_power<80&!talent.breath_of_sindragosa.enabled
+	if RunicPower() < 80 and not Talent(breath_of_sindragosa_talent) Spell(arcane_torrent_runicpower)
+	#arcane_torrent,if=dot.breath_of_sindragosa.ticking&runic_power<50&rune<2
+	if BuffPresent(breath_of_sindragosa_buff) and RunicPower() < 50 and Rune() < 2 Spell(arcane_torrent_runicpower)
+	#blood_fury,if=buff.pillar_of_frost.up
+	if BuffPresent(pillar_of_frost_buff) Spell(blood_fury_ap)
+	#berserking,if=buff.pillar_of_frost.up
+	if BuffPresent(pillar_of_frost_buff) Spell(berserking)
+	#use_items
+	FrostUseItemActions()
+	#use_item,name=ring_of_collapsing_futures,if=(buff.temptation.stack=0&target.time_to_die>60)|target.time_to_die<60
+	if BuffStacks(temptation_buff) == 0 and target.TimeToDie() > 60 or target.TimeToDie() < 60 FrostUseItemActions()
+	#use_item,name=horn_of_valor,if=buff.pillar_of_frost.up&(!talent.breath_of_sindragosa.enabled|!cooldown.breath_of_sindragosa.remains)
+	if BuffPresent(pillar_of_frost_buff) and { not Talent(breath_of_sindragosa_talent) or not SpellCooldown(breath_of_sindragosa) > 0 } FrostUseItemActions()
+	#use_item,name=draught_of_souls,if=rune.time_to_5<3&(!dot.breath_of_sindragosa.ticking|runic_power>60)
+	if TimeToRunes(5) < 3 and { not BuffPresent(breath_of_sindragosa_buff) or RunicPower() > 60 } FrostUseItemActions()
+	#use_item,name=feloiled_infernal_machine,if=!talent.obliteration.enabled|buff.obliteration.up
+	if not Talent(obliteration_talent) or BuffPresent(obliteration_buff) FrostUseItemActions()
+	#potion,if=buff.pillar_of_frost.up&(dot.breath_of_sindragosa.ticking|buff.obliteration.up|talent.hungering_rune_weapon.enabled)
+	if BuffPresent(pillar_of_frost_buff) and { BuffPresent(breath_of_sindragosa_buff) or BuffPresent(obliteration_buff) or Talent(hungering_rune_weapon_talent) } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
+	#breath_of_sindragosa,if=buff.pillar_of_frost.up
+	if BuffPresent(pillar_of_frost_buff) Spell(breath_of_sindragosa)
+	#call_action_list,name=cold_heart,if=equipped.cold_heart&((buff.cold_heart.stack>=10&!buff.obliteration.up)|target.time_to_die<=gcd)
+	if HasEquippedItem(cold_heart) and { BuffStacks(cold_heart_buff) >= 10 and not BuffPresent(obliteration_buff) or target.TimeToDie() <= GCD() } FrostColdHeartCdActions()
+
+	unless HasEquippedItem(cold_heart) and { BuffStacks(cold_heart_buff) >= 10 and not BuffPresent(obliteration_buff) or target.TimeToDie() <= GCD() } and FrostColdHeartCdPostConditions()
+	{
+		#obliteration,if=rune>=1&runic_power>=20&(!talent.frozen_pulse.enabled|rune<2|buff.pillar_of_frost.remains<=12)&(!talent.gathering_storm.enabled|!cooldown.remorseless_winter.ready)&(buff.pillar_of_frost.up|!talent.icecap.enabled)
+		if Rune() >= 1 and RunicPower() >= 20 and { not Talent(frozen_pulse_talent) or Rune() < 2 or BuffRemaining(pillar_of_frost_buff) <= 12 } and { not Talent(gathering_storm_talent) or not SpellCooldown(remorseless_winter) == 0 } and { BuffPresent(pillar_of_frost_buff) or not Talent(icecap_talent) } Spell(obliteration)
+		#hungering_rune_weapon,if=!buff.hungering_rune_weapon.up&rune.time_to_2>gcd&runic_power<40
+		if not BuffPresent(hungering_rune_weapon_buff) and TimeToRunes(2) > GCD() and RunicPower() < 40 Spell(hungering_rune_weapon)
+	}
+}
+
+AddFunction FrostCdsCdPostConditions
+{
+	HasEquippedItem(cold_heart) and { BuffStacks(cold_heart_buff) >= 10 and not BuffPresent(obliteration_buff) or target.TimeToDie() <= GCD() } and FrostColdHeartCdPostConditions()
+}
+
+### actions.cold_heart
+
+AddFunction FrostColdHeartMainActions
+{
+	#chains_of_ice,if=buff.cold_heart.stack=20&buff.unholy_strength.up&cooldown.pillar_of_frost.remains>6
+	if BuffStacks(cold_heart_buff) == 20 and BuffPresent(unholy_strength_buff) and SpellCooldown(pillar_of_frost) > 6 Spell(chains_of_ice)
+	#chains_of_ice,if=buff.pillar_of_frost.up&buff.pillar_of_frost.remains<gcd&(buff.cold_heart.stack>=11|(buff.cold_heart.stack>=10&set_bonus.tier20_4pc))
+	if BuffPresent(pillar_of_frost_buff) and BuffRemaining(pillar_of_frost_buff) < GCD() and { BuffStacks(cold_heart_buff) >= 11 or BuffStacks(cold_heart_buff) >= 10 and ArmorSetBonus(T20 4) } Spell(chains_of_ice)
+	#chains_of_ice,if=buff.unholy_strength.up&buff.unholy_strength.remains<gcd&buff.cold_heart.stack>16&cooldown.pillar_of_frost.remains>6
+	if BuffPresent(unholy_strength_buff) and BuffRemaining(unholy_strength_buff) < GCD() and BuffStacks(cold_heart_buff) > 16 and SpellCooldown(pillar_of_frost) > 6 Spell(chains_of_ice)
+	#chains_of_ice,if=buff.cold_heart.stack>=4&target.time_to_die<=gcd
+	if BuffStacks(cold_heart_buff) >= 4 and target.TimeToDie() <= GCD() Spell(chains_of_ice)
+}
+
+AddFunction FrostColdHeartMainPostConditions
+{
+}
+
+AddFunction FrostColdHeartShortCdActions
+{
+}
+
+AddFunction FrostColdHeartShortCdPostConditions
+{
+	BuffStacks(cold_heart_buff) == 20 and BuffPresent(unholy_strength_buff) and SpellCooldown(pillar_of_frost) > 6 and Spell(chains_of_ice) or BuffPresent(pillar_of_frost_buff) and BuffRemaining(pillar_of_frost_buff) < GCD() and { BuffStacks(cold_heart_buff) >= 11 or BuffStacks(cold_heart_buff) >= 10 and ArmorSetBonus(T20 4) } and Spell(chains_of_ice) or BuffPresent(unholy_strength_buff) and BuffRemaining(unholy_strength_buff) < GCD() and BuffStacks(cold_heart_buff) > 16 and SpellCooldown(pillar_of_frost) > 6 and Spell(chains_of_ice) or BuffStacks(cold_heart_buff) >= 4 and target.TimeToDie() <= GCD() and Spell(chains_of_ice)
+}
+
+AddFunction FrostColdHeartCdActions
+{
+}
+
+AddFunction FrostColdHeartCdPostConditions
+{
+	BuffStacks(cold_heart_buff) == 20 and BuffPresent(unholy_strength_buff) and SpellCooldown(pillar_of_frost) > 6 and Spell(chains_of_ice) or BuffPresent(pillar_of_frost_buff) and BuffRemaining(pillar_of_frost_buff) < GCD() and { BuffStacks(cold_heart_buff) >= 11 or BuffStacks(cold_heart_buff) >= 10 and ArmorSetBonus(T20 4) } and Spell(chains_of_ice) or BuffPresent(unholy_strength_buff) and BuffRemaining(unholy_strength_buff) < GCD() and BuffStacks(cold_heart_buff) > 16 and SpellCooldown(pillar_of_frost) > 6 and Spell(chains_of_ice) or BuffStacks(cold_heart_buff) >= 4 and target.TimeToDie() <= GCD() and Spell(chains_of_ice)
+}
+
+### actions.obliteration
+
+AddFunction FrostObliterationMainActions
+{
+	#remorseless_winter,if=talent.gathering_storm.enabled
+	if Talent(gathering_storm_talent) Spell(remorseless_winter)
+	#howling_blast,if=buff.rime.up&!buff.killing_machine.up&spell_targets.howling_blast>1
+	if BuffPresent(rime_buff) and not BuffPresent(killing_machine_buff) and Enemies() > 1 Spell(howling_blast)
+	#howling_blast,if=!buff.rime.up&!buff.killing_machine.up&spell_targets.howling_blast>2&rune>3&talent.freezing_fog.enabled&talent.gathering_storm.enabled
+	if not BuffPresent(rime_buff) and not BuffPresent(killing_machine_buff) and Enemies() > 2 and Rune() >= 4 and Talent(freezing_fog_talent) and Talent(gathering_storm_talent) Spell(howling_blast)
+	#frost_strike,if=!buff.killing_machine.up&(!buff.rime.up|rune.time_to_1>=gcd|runic_power>=80)
+	if not BuffPresent(killing_machine_buff) and { not BuffPresent(rime_buff) or TimeToRunes(1) >= GCD() or RunicPower() >= 80 } Spell(frost_strike)
+	#frostscythe,if=buff.killing_machine.up&spell_targets.frostscythe>1
+	if BuffPresent(killing_machine_buff) and Enemies() > 1 Spell(frostscythe)
+	#howling_blast,if=buff.rime.up&!buff.killing_machine.up
+	if BuffPresent(rime_buff) and not BuffPresent(killing_machine_buff) Spell(howling_blast)
+	#obliterate,if=buff.killing_machine.up
 	if BuffPresent(killing_machine_buff) Spell(obliterate)
-	#frost_strike,if=talent.gathering_storm.enabled&talent.murderous_efficiency.enabled&(set_bonus.tier19_2pc=1|set_bonus.tier19_4pc=1)
-	if Talent(gathering_storm_talent) and Talent(murderous_efficiency_talent) and { ArmorSetBonus(T19 2) == 1 or ArmorSetBonus(T19 4) == 1 } Spell(frost_strike)
-	#frost_strike,if=(talent.horn_of_winter.enabled|talent.hungering_rune_weapon.enabled)&(set_bonus.tier19_2pc=1|set_bonus.tier19_4pc=1)
-	if { Talent(horn_of_winter_talent) or Talent(hungering_rune_weapon_talent) } and { ArmorSetBonus(T19 2) == 1 or ArmorSetBonus(T19 4) == 1 } Spell(frost_strike)
+	#frost_strike,if=!buff.killing_machine.up&rune.time_to_1>=gcd
+	if not BuffPresent(killing_machine_buff) and TimeToRunes(1) >= GCD() Spell(frost_strike)
 	#obliterate
 	Spell(obliterate)
-	#glacial_advance
-	Spell(glacial_advance)
-	#horn_of_winter,if=!buff.hungering_rune_weapon.up
-	if not BuffPresent(hungering_rune_weapon_buff) Spell(horn_of_winter)
-	#frost_strike
-	Spell(frost_strike)
-	#remorseless_winter,if=talent.frozen_pulse.enabled
-	if Talent(frozen_pulse_talent) Spell(remorseless_winter)
 }
 
-AddFunction FrostGenericMainPostConditions
+AddFunction FrostObliterationMainPostConditions
 {
 }
 
-AddFunction FrostGenericShortCdActions
+AddFunction FrostObliterationShortCdActions
 {
 }
 
-AddFunction FrostGenericShortCdPostConditions
+AddFunction FrostObliterationShortCdPostConditions
 {
-	not Talent(shattering_strikes_talent) and BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) and Spell(frost_strike) or Talent(shattering_strikes_talent) and target.DebuffStacks(razorice_debuff) == 5 and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or { BuffPresent(rime_buff) and HasEquippedItem(132459) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } or Talent(gathering_storm_talent) } and Spell(remorseless_winter) or BuffPresent(rime_buff) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } and not { HasEquippedItem(132459) and Talent(gathering_storm_talent) } and Spell(howling_blast) or BuffPresent(rime_buff) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } and HasEquippedItem(132459) and Talent(gathering_storm_talent) and { target.DebuffPresent(perseverance_of_the_ebon_martyr_debuff) or SpellCooldown(remorseless_winter) > 3 } and Spell(howling_blast) or not BuffPresent(obliteration_buff) and HasEquippedItem(132366) and Talent(frozen_pulse_talent) and { ArmorSetBonus(T19 2) == 1 or ArmorSetBonus(T19 4) == 1 } and Spell(obliterate) or RunicPowerDeficit() <= 10 and Spell(frost_strike) or BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) and Spell(frost_strike) or Enemies() >= 2 and not { Talent(frostscythe_talent) and BuffPresent(killing_machine_buff) and Enemies() >= 2 } and Spell(remorseless_winter) or BuffPresent(killing_machine_buff) and Enemies() >= 2 and Spell(frostscythe) or Enemies() >= 2 and Spell(glacial_advance) or Enemies() >= 3 and Spell(frostscythe) or BuffPresent(killing_machine_buff) and Spell(obliterate) or Talent(gathering_storm_talent) and Talent(murderous_efficiency_talent) and { ArmorSetBonus(T19 2) == 1 or ArmorSetBonus(T19 4) == 1 } and Spell(frost_strike) or { Talent(horn_of_winter_talent) or Talent(hungering_rune_weapon_talent) } and { ArmorSetBonus(T19 2) == 1 or ArmorSetBonus(T19 4) == 1 } and Spell(frost_strike) or Spell(obliterate) or Spell(glacial_advance) or not BuffPresent(hungering_rune_weapon_buff) and Spell(horn_of_winter) or Spell(frost_strike) or Talent(frozen_pulse_talent) and Spell(remorseless_winter)
+	Talent(gathering_storm_talent) and Spell(remorseless_winter) or BuffPresent(rime_buff) and not BuffPresent(killing_machine_buff) and Enemies() > 1 and Spell(howling_blast) or not BuffPresent(rime_buff) and not BuffPresent(killing_machine_buff) and Enemies() > 2 and Rune() >= 4 and Talent(freezing_fog_talent) and Talent(gathering_storm_talent) and Spell(howling_blast) or not BuffPresent(killing_machine_buff) and { not BuffPresent(rime_buff) or TimeToRunes(1) >= GCD() or RunicPower() >= 80 } and Spell(frost_strike) or BuffPresent(killing_machine_buff) and Enemies() > 1 and Spell(frostscythe) or BuffPresent(rime_buff) and not BuffPresent(killing_machine_buff) and Spell(howling_blast) or BuffPresent(killing_machine_buff) and Spell(obliterate) or not BuffPresent(killing_machine_buff) and TimeToRunes(1) >= GCD() and Spell(frost_strike) or Spell(obliterate)
 }
 
-AddFunction FrostGenericCdActions
-{
-	unless not Talent(shattering_strikes_talent) and BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) and Spell(frost_strike) or Talent(shattering_strikes_talent) and target.DebuffStacks(razorice_debuff) == 5 and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or { BuffPresent(rime_buff) and HasEquippedItem(132459) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } or Talent(gathering_storm_talent) } and Spell(remorseless_winter) or BuffPresent(rime_buff) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } and not { HasEquippedItem(132459) and Talent(gathering_storm_talent) } and Spell(howling_blast) or BuffPresent(rime_buff) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } and HasEquippedItem(132459) and Talent(gathering_storm_talent) and { target.DebuffPresent(perseverance_of_the_ebon_martyr_debuff) or SpellCooldown(remorseless_winter) > 3 } and Spell(howling_blast) or not BuffPresent(obliteration_buff) and HasEquippedItem(132366) and Talent(frozen_pulse_talent) and { ArmorSetBonus(T19 2) == 1 or ArmorSetBonus(T19 4) == 1 } and Spell(obliterate) or RunicPowerDeficit() <= 10 and Spell(frost_strike) or BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) and Spell(frost_strike) or Enemies() >= 2 and not { Talent(frostscythe_talent) and BuffPresent(killing_machine_buff) and Enemies() >= 2 } and Spell(remorseless_winter) or BuffPresent(killing_machine_buff) and Enemies() >= 2 and Spell(frostscythe) or Enemies() >= 2 and Spell(glacial_advance) or Enemies() >= 3 and Spell(frostscythe) or BuffPresent(killing_machine_buff) and Spell(obliterate) or Talent(gathering_storm_talent) and Talent(murderous_efficiency_talent) and { ArmorSetBonus(T19 2) == 1 or ArmorSetBonus(T19 4) == 1 } and Spell(frost_strike) or { Talent(horn_of_winter_talent) or Talent(hungering_rune_weapon_talent) } and { ArmorSetBonus(T19 2) == 1 or ArmorSetBonus(T19 4) == 1 } and Spell(frost_strike) or Spell(obliterate) or Spell(glacial_advance) or not BuffPresent(hungering_rune_weapon_buff) and Spell(horn_of_winter) or Spell(frost_strike) or Talent(frozen_pulse_talent) and Spell(remorseless_winter)
-	{
-		#empower_rune_weapon
-		Spell(empower_rune_weapon)
-		#hungering_rune_weapon,if=!buff.hungering_rune_weapon.up
-		if not BuffPresent(hungering_rune_weapon_buff) Spell(hungering_rune_weapon)
-	}
-}
-
-AddFunction FrostGenericCdPostConditions
-{
-	not Talent(shattering_strikes_talent) and BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) and Spell(frost_strike) or Talent(shattering_strikes_talent) and target.DebuffStacks(razorice_debuff) == 5 and Spell(frost_strike) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or { BuffPresent(rime_buff) and HasEquippedItem(132459) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } or Talent(gathering_storm_talent) } and Spell(remorseless_winter) or BuffPresent(rime_buff) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } and not { HasEquippedItem(132459) and Talent(gathering_storm_talent) } and Spell(howling_blast) or BuffPresent(rime_buff) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } and HasEquippedItem(132459) and Talent(gathering_storm_talent) and { target.DebuffPresent(perseverance_of_the_ebon_martyr_debuff) or SpellCooldown(remorseless_winter) > 3 } and Spell(howling_blast) or not BuffPresent(obliteration_buff) and HasEquippedItem(132366) and Talent(frozen_pulse_talent) and { ArmorSetBonus(T19 2) == 1 or ArmorSetBonus(T19 4) == 1 } and Spell(obliterate) or RunicPowerDeficit() <= 10 and Spell(frost_strike) or BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) and Spell(frost_strike) or Enemies() >= 2 and not { Talent(frostscythe_talent) and BuffPresent(killing_machine_buff) and Enemies() >= 2 } and Spell(remorseless_winter) or BuffPresent(killing_machine_buff) and Enemies() >= 2 and Spell(frostscythe) or Enemies() >= 2 and Spell(glacial_advance) or Enemies() >= 3 and Spell(frostscythe) or BuffPresent(killing_machine_buff) and Spell(obliterate) or Talent(gathering_storm_talent) and Talent(murderous_efficiency_talent) and { ArmorSetBonus(T19 2) == 1 or ArmorSetBonus(T19 4) == 1 } and Spell(frost_strike) or { Talent(horn_of_winter_talent) or Talent(hungering_rune_weapon_talent) } and { ArmorSetBonus(T19 2) == 1 or ArmorSetBonus(T19 4) == 1 } and Spell(frost_strike) or Spell(obliterate) or Spell(glacial_advance) or not BuffPresent(hungering_rune_weapon_buff) and Spell(horn_of_winter) or Spell(frost_strike) or Talent(frozen_pulse_talent) and Spell(remorseless_winter)
-}
-
-### actions.gs_ticking
-
-AddFunction FrostGsTickingMainActions
-{
-	#frost_strike,if=buff.icy_talons.remains<1.5&talent.icy_talons.enabled
-	if BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) Spell(frost_strike)
-	#remorseless_winter
-	Spell(remorseless_winter)
-	#howling_blast,target_if=!dot.frost_fever.ticking
-	if not target.DebuffPresent(frost_fever_debuff) Spell(howling_blast)
-	#howling_blast,if=buff.rime.react&!(buff.obliteration.up&spell_targets.howling_blast<2)
-	if BuffPresent(rime_buff) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } Spell(howling_blast)
-	#obliteration,if=(!talent.frozen_pulse.enabled|(rune<2&runic_power<28))
-	if not Talent(frozen_pulse_talent) or Rune() < 2 and RunicPower() < 28 Spell(obliteration)
-	#obliterate,if=rune>3|buff.killing_machine.react|buff.obliteration.up
-	if Rune() >= 4 or BuffPresent(killing_machine_buff) or BuffPresent(obliteration_buff) Spell(obliterate)
-	#frost_strike,if=runic_power>80|(buff.obliteration.up&!buff.killing_machine.react)
-	if RunicPower() > 80 or BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) Spell(frost_strike)
-	#obliterate
-	Spell(obliterate)
-	#horn_of_winter,if=runic_power<70&!buff.hungering_rune_weapon.up
-	if RunicPower() < 70 and not BuffPresent(hungering_rune_weapon_buff) Spell(horn_of_winter)
-	#glacial_advance
-	Spell(glacial_advance)
-	#frost_strike
-	Spell(frost_strike)
-}
-
-AddFunction FrostGsTickingMainPostConditions
+AddFunction FrostObliterationCdActions
 {
 }
 
-AddFunction FrostGsTickingShortCdActions
+AddFunction FrostObliterationCdPostConditions
 {
-}
-
-AddFunction FrostGsTickingShortCdPostConditions
-{
-	BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) and Spell(frost_strike) or Spell(remorseless_winter) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } and Spell(howling_blast) or { Rune() >= 4 or BuffPresent(killing_machine_buff) or BuffPresent(obliteration_buff) } and Spell(obliterate) or { RunicPower() > 80 or BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) } and Spell(frost_strike) or Spell(obliterate) or RunicPower() < 70 and not BuffPresent(hungering_rune_weapon_buff) and Spell(horn_of_winter) or Spell(glacial_advance) or Spell(frost_strike)
-}
-
-AddFunction FrostGsTickingCdActions
-{
-	unless BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) and Spell(frost_strike) or Spell(remorseless_winter) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } and Spell(howling_blast) or { Rune() >= 4 or BuffPresent(killing_machine_buff) or BuffPresent(obliteration_buff) } and Spell(obliterate) or { RunicPower() > 80 or BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) } and Spell(frost_strike) or Spell(obliterate) or RunicPower() < 70 and not BuffPresent(hungering_rune_weapon_buff) and Spell(horn_of_winter) or Spell(glacial_advance) or Spell(frost_strike)
-	{
-		#hungering_rune_weapon,if=!buff.hungering_rune_weapon.up
-		if not BuffPresent(hungering_rune_weapon_buff) Spell(hungering_rune_weapon)
-		#empower_rune_weapon
-		Spell(empower_rune_weapon)
-	}
-}
-
-AddFunction FrostGsTickingCdPostConditions
-{
-	BuffRemaining(icy_talons_buff) < 1.5 and Talent(icy_talons_talent) and Spell(frost_strike) or Spell(remorseless_winter) or not target.DebuffPresent(frost_fever_debuff) and Spell(howling_blast) or BuffPresent(rime_buff) and not { BuffPresent(obliteration_buff) and Enemies() < 2 } and Spell(howling_blast) or { Rune() >= 4 or BuffPresent(killing_machine_buff) or BuffPresent(obliteration_buff) } and Spell(obliterate) or { RunicPower() > 80 or BuffPresent(obliteration_buff) and not BuffPresent(killing_machine_buff) } and Spell(frost_strike) or Spell(obliterate) or RunicPower() < 70 and not BuffPresent(hungering_rune_weapon_buff) and Spell(horn_of_winter) or Spell(glacial_advance) or Spell(frost_strike)
+	Talent(gathering_storm_talent) and Spell(remorseless_winter) or BuffPresent(rime_buff) and not BuffPresent(killing_machine_buff) and Enemies() > 1 and Spell(howling_blast) or not BuffPresent(rime_buff) and not BuffPresent(killing_machine_buff) and Enemies() > 2 and Rune() >= 4 and Talent(freezing_fog_talent) and Talent(gathering_storm_talent) and Spell(howling_blast) or not BuffPresent(killing_machine_buff) and { not BuffPresent(rime_buff) or TimeToRunes(1) >= GCD() or RunicPower() >= 80 } and Spell(frost_strike) or BuffPresent(killing_machine_buff) and Enemies() > 1 and Spell(frostscythe) or BuffPresent(rime_buff) and not BuffPresent(killing_machine_buff) and Spell(howling_blast) or BuffPresent(killing_machine_buff) and Spell(obliterate) or not BuffPresent(killing_machine_buff) and TimeToRunes(1) >= GCD() and Spell(frost_strike) or Spell(obliterate)
 }
 
 ### actions.precombat
@@ -535,16 +568,89 @@ AddFunction FrostPrecombatShortCdPostConditions
 
 AddFunction FrostPrecombatCdActions
 {
-	#flask,name=countless_armies
-	#food,name=fishbrul_special
-	#augmentation,name=defiled
+	#flask
+	#food
+	#augmentation
 	#snapshot_stats
-	#potion,name=prolonged_power
+	#potion
 	if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
 }
 
 AddFunction FrostPrecombatCdPostConditions
 {
+}
+
+### actions.standard
+
+AddFunction FrostStandardMainActions
+{
+	#frost_strike,if=talent.icy_talons.enabled&buff.icy_talons.remains<=gcd
+	if Talent(icy_talons_talent) and BuffRemaining(icy_talons_buff) <= GCD() Spell(frost_strike)
+	#frost_strike,if=talent.shattering_strikes.enabled&debuff.razorice.stack=5&buff.gathering_storm.stack<2&!buff.rime.up
+	if Talent(shattering_strikes_talent) and target.DebuffStacks(razorice_debuff) == 5 and BuffStacks(gathering_storm_buff) < 2 and not BuffPresent(rime_buff) Spell(frost_strike)
+	#remorseless_winter,if=(buff.rime.react&equipped.perseverance_of_the_ebon_martyr)|talent.gathering_storm.enabled
+	if BuffPresent(rime_buff) and HasEquippedItem(perseverance_of_the_ebon_martyr) or Talent(gathering_storm_talent) Spell(remorseless_winter)
+	#obliterate,if=(equipped.koltiras_newfound_will&talent.frozen_pulse.enabled&set_bonus.tier19_2pc=1)|rune.time_to_4<gcd&buff.hungering_rune_weapon.up
+	if HasEquippedItem(koltiras_newfound_will) and Talent(frozen_pulse_talent) and ArmorSetBonus(T19 2) == 1 or TimeToRunes(4) < GCD() and BuffPresent(hungering_rune_weapon_buff) Spell(obliterate)
+	#frost_strike,if=(!talent.shattering_strikes.enabled|debuff.razorice.stack<5)&runic_power>=90
+	if { not Talent(shattering_strikes_talent) or target.DebuffStacks(razorice_debuff) < 5 } and RunicPower() >= 90 Spell(frost_strike)
+	#howling_blast,if=buff.rime.react
+	if BuffPresent(rime_buff) Spell(howling_blast)
+	#obliterate,if=(equipped.koltiras_newfound_will&talent.frozen_pulse.enabled&set_bonus.tier19_2pc=1)|rune.time_to_5<gcd
+	if HasEquippedItem(koltiras_newfound_will) and Talent(frozen_pulse_talent) and ArmorSetBonus(T19 2) == 1 or TimeToRunes(5) < GCD() Spell(obliterate)
+	#frost_strike,if=runic_power>=90&!buff.hungering_rune_weapon.up
+	if RunicPower() >= 90 and not BuffPresent(hungering_rune_weapon_buff) Spell(frost_strike)
+	#frostscythe,if=buff.killing_machine.up&(!equipped.koltiras_newfound_will|spell_targets.frostscythe>=2)
+	if BuffPresent(killing_machine_buff) and { not HasEquippedItem(koltiras_newfound_will) or Enemies() >= 2 } Spell(frostscythe)
+	#remorseless_winter,if=spell_targets.remorseless_winter>=2
+	if Enemies() >= 2 Spell(remorseless_winter)
+	#glacial_advance,if=spell_targets.glacial_advance>=2
+	if Enemies() >= 2 Spell(glacial_advance)
+	#frostscythe,if=spell_targets.frostscythe>=3
+	if Enemies() >= 3 Spell(frostscythe)
+	#obliterate,if=buff.killing_machine.react
+	if BuffPresent(killing_machine_buff) Spell(obliterate)
+	#frost_strike,if=runic_power>=80
+	if RunicPower() >= 80 Spell(frost_strike)
+	#obliterate
+	Spell(obliterate)
+	#horn_of_winter,if=!buff.hungering_rune_weapon.up&(rune.time_to_2>gcd|!talent.frozen_pulse.enabled)
+	if not BuffPresent(hungering_rune_weapon_buff) and { TimeToRunes(2) > GCD() or not Talent(frozen_pulse_talent) } Spell(horn_of_winter)
+	#frost_strike,if=!(runic_power<50&talent.obliteration.enabled&cooldown.obliteration.remains<=gcd)
+	if not { RunicPower() < 50 and Talent(obliteration_talent) and SpellCooldown(obliteration) <= GCD() } Spell(frost_strike)
+}
+
+AddFunction FrostStandardMainPostConditions
+{
+}
+
+AddFunction FrostStandardShortCdActions
+{
+}
+
+AddFunction FrostStandardShortCdPostConditions
+{
+	Talent(icy_talons_talent) and BuffRemaining(icy_talons_buff) <= GCD() and Spell(frost_strike) or Talent(shattering_strikes_talent) and target.DebuffStacks(razorice_debuff) == 5 and BuffStacks(gathering_storm_buff) < 2 and not BuffPresent(rime_buff) and Spell(frost_strike) or { BuffPresent(rime_buff) and HasEquippedItem(perseverance_of_the_ebon_martyr) or Talent(gathering_storm_talent) } and Spell(remorseless_winter) or { HasEquippedItem(koltiras_newfound_will) and Talent(frozen_pulse_talent) and ArmorSetBonus(T19 2) == 1 or TimeToRunes(4) < GCD() and BuffPresent(hungering_rune_weapon_buff) } and Spell(obliterate) or { not Talent(shattering_strikes_talent) or target.DebuffStacks(razorice_debuff) < 5 } and RunicPower() >= 90 and Spell(frost_strike) or BuffPresent(rime_buff) and Spell(howling_blast) or { HasEquippedItem(koltiras_newfound_will) and Talent(frozen_pulse_talent) and ArmorSetBonus(T19 2) == 1 or TimeToRunes(5) < GCD() } and Spell(obliterate) or RunicPower() >= 90 and not BuffPresent(hungering_rune_weapon_buff) and Spell(frost_strike) or BuffPresent(killing_machine_buff) and { not HasEquippedItem(koltiras_newfound_will) or Enemies() >= 2 } and Spell(frostscythe) or Enemies() >= 2 and Spell(remorseless_winter) or Enemies() >= 2 and Spell(glacial_advance) or Enemies() >= 3 and Spell(frostscythe) or BuffPresent(killing_machine_buff) and Spell(obliterate) or RunicPower() >= 80 and Spell(frost_strike) or Spell(obliterate) or not BuffPresent(hungering_rune_weapon_buff) and { TimeToRunes(2) > GCD() or not Talent(frozen_pulse_talent) } and Spell(horn_of_winter) or not { RunicPower() < 50 and Talent(obliteration_talent) and SpellCooldown(obliteration) <= GCD() } and Spell(frost_strike)
+}
+
+AddFunction FrostStandardCdActions
+{
+	unless Talent(icy_talons_talent) and BuffRemaining(icy_talons_buff) <= GCD() and Spell(frost_strike) or Talent(shattering_strikes_talent) and target.DebuffStacks(razorice_debuff) == 5 and BuffStacks(gathering_storm_buff) < 2 and not BuffPresent(rime_buff) and Spell(frost_strike) or { BuffPresent(rime_buff) and HasEquippedItem(perseverance_of_the_ebon_martyr) or Talent(gathering_storm_talent) } and Spell(remorseless_winter) or { HasEquippedItem(koltiras_newfound_will) and Talent(frozen_pulse_talent) and ArmorSetBonus(T19 2) == 1 or TimeToRunes(4) < GCD() and BuffPresent(hungering_rune_weapon_buff) } and Spell(obliterate) or { not Talent(shattering_strikes_talent) or target.DebuffStacks(razorice_debuff) < 5 } and RunicPower() >= 90 and Spell(frost_strike) or BuffPresent(rime_buff) and Spell(howling_blast) or { HasEquippedItem(koltiras_newfound_will) and Talent(frozen_pulse_talent) and ArmorSetBonus(T19 2) == 1 or TimeToRunes(5) < GCD() } and Spell(obliterate)
+	{
+		#sindragosas_fury,if=(equipped.consorts_cold_core|buff.pillar_of_frost.up)&buff.unholy_strength.up&debuff.razorice.stack=5
+		if { HasEquippedItem(consorts_cold_core) or BuffPresent(pillar_of_frost_buff) } and BuffPresent(unholy_strength_buff) and target.DebuffStacks(razorice_debuff) == 5 Spell(sindragosas_fury)
+
+		unless RunicPower() >= 90 and not BuffPresent(hungering_rune_weapon_buff) and Spell(frost_strike) or BuffPresent(killing_machine_buff) and { not HasEquippedItem(koltiras_newfound_will) or Enemies() >= 2 } and Spell(frostscythe) or Enemies() >= 2 and Spell(remorseless_winter) or Enemies() >= 2 and Spell(glacial_advance) or Enemies() >= 3 and Spell(frostscythe) or BuffPresent(killing_machine_buff) and Spell(obliterate) or RunicPower() >= 80 and Spell(frost_strike) or Spell(obliterate) or not BuffPresent(hungering_rune_weapon_buff) and { TimeToRunes(2) > GCD() or not Talent(frozen_pulse_talent) } and Spell(horn_of_winter) or not { RunicPower() < 50 and Talent(obliteration_talent) and SpellCooldown(obliteration) <= GCD() } and Spell(frost_strike)
+		{
+			#empower_rune_weapon,if=!talent.breath_of_sindragosa.enabled|target.time_to_die<cooldown.breath_of_sindragosa.remains
+			if not Talent(breath_of_sindragosa_talent) or target.TimeToDie() < SpellCooldown(breath_of_sindragosa) Spell(empower_rune_weapon)
+		}
+	}
+}
+
+AddFunction FrostStandardCdPostConditions
+{
+	Talent(icy_talons_talent) and BuffRemaining(icy_talons_buff) <= GCD() and Spell(frost_strike) or Talent(shattering_strikes_talent) and target.DebuffStacks(razorice_debuff) == 5 and BuffStacks(gathering_storm_buff) < 2 and not BuffPresent(rime_buff) and Spell(frost_strike) or { BuffPresent(rime_buff) and HasEquippedItem(perseverance_of_the_ebon_martyr) or Talent(gathering_storm_talent) } and Spell(remorseless_winter) or { HasEquippedItem(koltiras_newfound_will) and Talent(frozen_pulse_talent) and ArmorSetBonus(T19 2) == 1 or TimeToRunes(4) < GCD() and BuffPresent(hungering_rune_weapon_buff) } and Spell(obliterate) or { not Talent(shattering_strikes_talent) or target.DebuffStacks(razorice_debuff) < 5 } and RunicPower() >= 90 and Spell(frost_strike) or BuffPresent(rime_buff) and Spell(howling_blast) or { HasEquippedItem(koltiras_newfound_will) and Talent(frozen_pulse_talent) and ArmorSetBonus(T19 2) == 1 or TimeToRunes(5) < GCD() } and Spell(obliterate) or RunicPower() >= 90 and not BuffPresent(hungering_rune_weapon_buff) and Spell(frost_strike) or BuffPresent(killing_machine_buff) and { not HasEquippedItem(koltiras_newfound_will) or Enemies() >= 2 } and Spell(frostscythe) or Enemies() >= 2 and Spell(remorseless_winter) or Enemies() >= 2 and Spell(glacial_advance) or Enemies() >= 3 and Spell(frostscythe) or BuffPresent(killing_machine_buff) and Spell(obliterate) or RunicPower() >= 80 and Spell(frost_strike) or Spell(obliterate) or not BuffPresent(hungering_rune_weapon_buff) and { TimeToRunes(2) > GCD() or not Talent(frozen_pulse_talent) } and Spell(horn_of_winter) or not { RunicPower() < 50 and Talent(obliteration_talent) and SpellCooldown(obliteration) <= GCD() } and Spell(frost_strike)
 }
 
 ### Frost icons.
@@ -606,22 +712,24 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 }
 
 ### Required symbols
-# 132366
-# 132459
-# 140806
 # arcane_torrent_runicpower
 # berserking
+# blinding_sleet
 # blood_fury_ap
 # breath_of_sindragosa
 # breath_of_sindragosa_buff
 # breath_of_sindragosa_talent
+# chains_of_ice
+# cold_heart
+# cold_heart_buff
+# consorts_cold_core
 # death_strike
 # empower_rune_weapon
-# frost_fever_debuff
+# freezing_fog_talent
 # frost_strike
 # frostscythe
-# frostscythe_talent
 # frozen_pulse_talent
+# gathering_storm_buff
 # gathering_storm_talent
 # glacial_advance
 # horn_of_winter
@@ -630,27 +738,27 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # hungering_rune_weapon
 # hungering_rune_weapon_buff
 # hungering_rune_weapon_talent
+# icecap_talent
 # icy_talons_buff
 # icy_talons_talent
 # killing_machine_buff
-# legendary_ring_strength
+# koltiras_newfound_will
 # mind_freeze
-# murderous_efficiency_talent
 # obliterate
 # obliteration
 # obliteration_buff
-# perseverance_of_the_ebon_martyr_debuff
+# obliteration_talent
+# perseverance_of_the_ebon_martyr
 # pillar_of_frost
 # pillar_of_frost_buff
 # prolonged_power_potion
 # razorice_debuff
 # remorseless_winter
 # remorseless_winter_buff
-# remorseless_winter_debuff
 # rime_buff
-# runic_attenuation_talent
 # shattering_strikes_talent
 # sindragosas_fury
+# temptation_buff
 # unholy_strength_buff
 # war_stomp
 ]]

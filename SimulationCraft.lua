@@ -3664,6 +3664,9 @@ EmitOperandRune = function(operand, parseNode, nodeList, annotation, action)
 		else
 			code = "RuneCount()"
 		end
+	elseif strmatch(operand, "^rune.time_to_([%d]+)$") then
+		local runes = strmatch(operand, "^rune.time_to_([%d]+)$")
+		code = format("TimeToRunes(%d)", runes)
 	else
 		ok = false
 	end
@@ -4475,6 +4478,9 @@ local function InsertInterruptFunctions(child, annotation)
 		tinsert(interrupts, {name = "mind_freeze", interrupt=1, worksOnBoss=1, order=10})
 		if annotation.specialization == "blood" or annotation.specialization == "unholy" then
 			tinsert(interrupts, {name = "asphyxiate", stun=1, order=20})
+		end
+		if annotation.specialization == "frost" then
+			tinsert(interrupts, {name = "blinding_sleet", disorient=1, range="target.Distance(less 12)", order=20})
 		end
 	end
 	if annotation.consume_magic == "DEMONHUNTER" then

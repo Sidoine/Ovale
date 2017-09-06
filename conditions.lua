@@ -3818,9 +3818,28 @@ do
 		end
 		return Compare(count, comparator, limit)
 	end
+	
+		--- Get the number of seconds before the player reaches the given amount of runes.
+	-- @name TimeToRunes
+	-- @paramsig number or boolean
+	-- @param runes. The amount of runes to reach.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @return The number of seconds.
+	-- @return A boolean value for the result of the comparison.
+	-- @usage
+	-- if TimeToRunes(2) > 5 Spell(horn_of_winter)
+
+	local function TimeToRunes(positionalParams, namedParams, state, atTime)
+		local runes, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local seconds = state:GetRunesCooldown(atTime, runes)
+		if seconds < 0 then seconds = 0 end
+		return Compare(seconds, comparator, limit)
+	end
 
 	OvaleCondition:RegisterCondition("rune", false, Rune)
 	OvaleCondition:RegisterCondition("runecount", false, RuneCount)
+	OvaleCondition:RegisterCondition("timetorunes", false, TimeToRunes)
 end
 
 do
@@ -4843,6 +4862,7 @@ do
 		end
 	end
 
+
 	--- Get the number of seconds before the player reaches the given energy level for feral druids, non-mistweaver monks and rogues.
 	-- @name TimeToEnergy
 	-- @paramsig number or boolean
@@ -4912,7 +4932,7 @@ do
 		local level = OvalePower.maxPower[powerType] or 0
 		return TimeToPower(powerType, level, comparator, limit, state, atTime)
 	end
-
+	
 	OvaleCondition:RegisterCondition("timetoenergy", false, TimeToEnergy)
 	OvaleCondition:RegisterCondition("timetofocus", false, TimeToFocus)
 	OvaleCondition:RegisterCondition("timetomaxenergy", false, TimeToMaxEnergy)
