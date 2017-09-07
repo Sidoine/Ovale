@@ -142,6 +142,18 @@ InterruptTable["King Ranulf"] = {
     ["Unruly Yell"] = true
 }
 
+InterruptTable["King Bjorn"] = {
+    ["Unruly Yell"] = true
+}
+
+InterruptTable["King Haldor"] = {
+    ["Unruly Yell"] = true
+}
+
+InterruptTable["King Tor"] = {
+    ["Unruly Yell"] = true
+}
+
 InterruptTable["Stormforged Obliterator"] = {
     ["Surge"] = true
 }
@@ -285,6 +297,10 @@ InterruptTable["Mindflayer Kaahrj"] = {
 
 InterruptTable["Lord Malgath"] = {
     ["Shadow Bolt Volley"] = true
+}
+
+InterruptTable["Blazing Infernal"] = {
+    ["Blazing Hellfire"] = true
 }
 
 -- Return to Karazhan
