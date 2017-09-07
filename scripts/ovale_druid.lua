@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "icyveins_druid_guardian"
-	local desc = "[7.1.5] Icy-Veins: Druid Guardian"
+	local desc = "[7.3.0] Icy-Veins: Druid Guardian"
 	local code = [[
 
 Include(ovale_common)
@@ -52,10 +52,10 @@ AddFunction GuardianDefaultShortCDActions
 AddFunction GuardianDefaultMainActions
 {
 	if not Stance(druid_bear_form) Spell(bear_form)
-	if not BuffExpires(galactic_guardian_buff) Spell(moonfire)
 	Spell(mangle)
+	if not BuffExpires(galactic_guardian_buff) Spell(moonfire)
 	Spell(thrash_bear)
-	if target.DebuffStacks(thrash_bear_debuff) >= 2 Spell(pulverize)
+	if (target.DebuffStacks(thrash_bear_debuff) >= 2 and BuffRefreshable(pulverize_buff) or target.DebuffStacks(thrash_bear_debuff) >= 5) Spell(pulverize)
 	if target.DebuffRefreshable(moonfire_debuff) Spell(moonfire)
 	if RageDeficit() <= 20 Spell(maul)
 	Spell(swipe_bear)
@@ -72,7 +72,7 @@ AddFunction GuardianDefaultAoEActions
 	if not BuffExpires(galactic_guardian_buff) Spell(moonfire)
 	Spell(thrash_bear)
 	Spell(mangle)
-	if target.DebuffStacks(thrash_bear_debuff) >= 2 Spell(pulverize)
+	if (target.DebuffStacks(thrash_bear_debuff) >= 2 and BuffRefreshable(pulverize_buff) or target.DebuffStacks(thrash_bear_debuff) >= 5) Spell(pulverize)
 	if Enemies() <= 3 and target.DebuffRefreshable(moonfire_debuff) Spell(moonfire)
 	if RageDeficit() <= 20 Spell(maul)
 	Spell(swipe_bear)
