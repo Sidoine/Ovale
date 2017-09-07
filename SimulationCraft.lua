@@ -229,6 +229,7 @@ local OPTIONAL_SKILLS = {
 	["volley"] = { class = "HUNTER", default = true },
 	["trap_launcher"] = { class = "HUNTER", default = true },
 	["time_warp"] = { class = "MAGE" },
+	["blink"] = { class = "MAGE" },
 	["storm_earth_and_fire"] = { class = "MONK" },
 	["chi_burst"] = { class = "MONK", default = true },
 	["touch_of_karma"] = { class = "MONK", default = false },
@@ -1110,6 +1111,7 @@ end
 
 local function InitializeDisambiguation()
 	AddDisambiguation("bloodlust_buff",			"burst_haste_buff")
+	AddDisambiguation("exhaustion_buff",		"burst_haste_debuff")
 	AddDisambiguation("trinket_proc_all_buff",	"trinket_proc_any_buff")
 	AddDisambiguation("trinket_stack_proc_all_buff",	"trinket_proc_any_buff")
 	-- WoD legendary ring
@@ -3855,6 +3857,11 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		-- The Frozen Orb is ticking if fewer than 10s have elapsed since it was cast.
 		local name = "frozen_orb"
 		code = format("SpellCooldown(%s) > SpellCooldownDuration(%s) - 10", name, name)
+		AddSymbol(annotation, name)
+	elseif class == "MAGE" and operand == "ground_aoe.frozen_orb.remains" then
+		-- The Frozen Orb is ticking if fewer than 10s have elapsed since it was cast.
+		local name = "frozen_orb"
+		code = format("10 - (SpellCooldownDuration(%s) - SpellCooldown(%s))", name, name)
 		AddSymbol(annotation, name)
 	elseif class == "MONK" and strsub(operand, 1, 35) == "debuff.storm_earth_and_fire_target." then
 		local property = strsub(operand, 36)
