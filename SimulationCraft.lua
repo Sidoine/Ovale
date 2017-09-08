@@ -1961,6 +1961,8 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "MAGE" and action == "water_elemental" then
 			-- Only suggest summoning the Water Elemental if the pet is not already summoned.
 			conditionCode = "not pet.Present()"
+		elseif class == "MAGE" and action == "cone_of_cold" then
+			conditionCode = "target.Distance() < 12"
 		elseif class == "MONK" and action == "chi_sphere" then
 			-- skip
 			isSpellAction = false

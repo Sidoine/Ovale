@@ -1340,7 +1340,7 @@ AddFunction FrostAoeShortCdActions
 					unless fof_react() > 0 and Spell(ice_lance) or Spell(ebonbolt) or Spell(glacial_spike) or Spell(frostbolt)
 					{
 						#cone_of_cold
-						Spell(cone_of_cold)
+						if target.Distance() < 12 Spell(cone_of_cold)
 					}
 				}
 			}
@@ -1359,7 +1359,7 @@ AddFunction FrostAoeCdActions
 
 AddFunction FrostAoeCdPostConditions
 {
-	PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or Spell(frozen_orb) or Spell(blizzard) or Spell(comet_storm) or Spell(ice_nova) or { PreviousGCDSpell(ebonbolt) or { PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(frostbolt) } and BuffPresent(brain_freeze_buff) } and Spell(flurry) or target.DebuffRemaining(frost_bomb_debuff) < TravelTime(ice_lance) and fof_react() > 0 and Spell(frost_bomb) or fof_react() > 0 and Spell(ice_lance) or Spell(ebonbolt) or Spell(glacial_spike) or Spell(frostbolt) or Spell(cone_of_cold) or Spell(ice_lance)
+	PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or Spell(frozen_orb) or Spell(blizzard) or Spell(comet_storm) or Spell(ice_nova) or { PreviousGCDSpell(ebonbolt) or { PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(frostbolt) } and BuffPresent(brain_freeze_buff) } and Spell(flurry) or target.DebuffRemaining(frost_bomb_debuff) < TravelTime(ice_lance) and fof_react() > 0 and Spell(frost_bomb) or fof_react() > 0 and Spell(ice_lance) or Spell(ebonbolt) or Spell(glacial_spike) or Spell(frostbolt) or target.Distance() < 12 and Spell(cone_of_cold) or Spell(ice_lance)
 }
 
 ### actions.cooldowns
