@@ -44,12 +44,7 @@ AddFunction GuardianGetInMeleeRange
 AddFunction GuardianDefaultShortCDActions
 {
 	GuardianHealMe()
-	if InCombat() and BuffExpires(bristling_fur_buff)
-	{
-		if IncomingDamage(5 physical=1) Spell(ironfur)
-	}
-	if BuffExpires(survival_instincts_buff) and BuffExpires(rage_of_the_sleeper_buff) and BuffExpires(barkskin_buff) Spell(bristling_fur)
-	# range check
+	if IncomingDamage(5 physical=1) Spell(ironfur)
 	GuardianGetInMeleeRange()
 }
 
@@ -93,6 +88,7 @@ AddFunction GuardianDefaultCdActions
 	if HasArtifactTrait(embrace_of_the_nightmare) Spell(rage_of_the_sleeper)
 	if BuffExpires(bristling_fur_buff) and BuffExpires(survival_instincts_buff) and BuffExpires(rage_of_the_sleeper_buff) and BuffExpires(barkskin_buff) and BuffExpires(potion_buff)
 	{
+		Spell(bristling_fur)
 		if (HasEquippedItem(shifting_cosmic_sliver)) Spell(survival_instincts)
 		Item(Trinket0Slot usable=1 text=13)
 		Item(Trinket1Slot usable=1 text=14)
