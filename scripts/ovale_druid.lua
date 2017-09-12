@@ -15,12 +15,20 @@ AddCheckBox(opt_interrupt L(interrupt) default specialization=guardian)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=guardian)
 AddCheckBox(opt_druid_guardian_aoe L(AOE) default specialization=guardian)
 
+AddFunction FrenziedRegenHealTotal
+{
+	IncomingDamage(5) / 2
+}
+
 AddFunction GuardianHealMe
 {
-	if IncomingDamage(5) >= MaxHealth() * 0.5 Spell(frenzied_regeneration)
-	if ((IncomingDamage(5) / 2 <= HealthMissing()) and (IncomingDamage(5) / 2 > MaxHealth() * 0.1) and SpellCharges(frenzied_regeneration) >= 2) Spell(frenzied_regeneration)
+	if BuffExpires(frenzied_regeneration_buff) 
+	{
+		if (FrenziedRegenHealTotal() >= MaxHealth() * 0.25) Spell(frenzied_regeneration)
+		if (SpellCharges(frenzied_regeneration) >= 2 and (FrenziedRegenHealTotal() <= HealthMissing()) and (FrenziedRegenHealTotal() > MaxHealth() * 0.10)) Spell(frenzied_regeneration)
+	}
+	
 	if HealthPercent() <= 50 Spell(lunar_beam)
-	if HealthPercent() <= 50 and IncomingDamage(5 physical=1) == 0 Spell(regrowth)
 	if HealthPercent() <= 80 and not InCombat() Spell(regrowth)
 }
 
