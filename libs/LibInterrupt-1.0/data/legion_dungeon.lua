@@ -394,3 +394,21 @@ InterruptTable["Felborne Botanist"] = {
 InterruptTable["Hellblaze Imp"] = {
     ["Fel Blast"] = true
 }
+
+-- Seat of the Triumvirate
+InterruptTable["Famished Broken"] = {
+    ["Consume Essence"] = true
+}
+
+InterruptTable["Rift Warden"] = {
+    ["Stygian Blast"] = true
+}
+
+InterruptTable["Shadewing"] = {
+    ["Dread Screech"] = true
+}
+
+InterruptTable["Viceroy Nezhar"] = {
+    ["Howling Dark"] = true,
+    ["Eternal Twilight"] = true
+}
