@@ -47,6 +47,10 @@ InterruptTable["Talixae Flamewreath"] = {
     ["Withering Soul"] = true
 }
 
+InterruptTable["Vigilant Duskwatch"] = {
+    ["Hinder"] = true
+}
+
 -- Darkheart Thicket
 InterruptTable["Dreadsoul Ruiner"] = {
     ["Star Shower"] = true
