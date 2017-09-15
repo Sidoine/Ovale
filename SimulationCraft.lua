@@ -3229,6 +3229,10 @@ do
 			local name = "anticipation_buff"
 			code = format("BuffStacks(%s)", name)
 			AddSymbol(annotation, name)
+		elseif class == "ROGUE" and operand == "buff.slice_and_dice.improved" then
+			local buff = "slice_and_dice_buff"
+			code = format("BuffAmount(%s value=3)>125", buff)
+			AddSymbol(annotation, buff)
 		elseif strsub(operand, 1, 22) == "active_enemies_within." then
 			-- "active_enemies_within.<distance>" is roughly equivalent to the number of enemies.
 			code = "Enemies()"

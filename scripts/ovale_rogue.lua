@@ -556,7 +556,7 @@ do
 # Based on SimulationCraft profile "Rogue_Outlaw_T19P".
 #	class=rogue
 #	spec=outlaw
-#	talents=1310022
+#	talents=3310022
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -564,14 +564,14 @@ Include(ovale_trinkets_wod)
 Include(ovale_rogue_spells)
 
 
-AddFunction stealth_condition
+AddFunction ambush_condition
 {
-	ComboPointsDeficit() >= 2 + 2 * { Talent(ghostly_strike_talent) and not target.DebuffPresent(ghostly_strike_debuff) } + BuffPresent(broadsides_buff) and Energy() > 60 and not BuffPresent(jolly_roger_buff) and not BuffPresent(hidden_blade_buff) and not BuffPresent(curse_of_the_dreadblades_buff)
+	ComboPointsDeficit() >= 2 + 2 * { Talent(ghostly_strike_talent) and not target.DebuffPresent(ghostly_strike_debuff) } + BuffPresent(broadsides_buff) and Energy() > 60 and not BuffPresent(jolly_roger_buff) and not BuffPresent(hidden_blade_buff)
 }
 
 AddFunction ss_useable
 {
-	Talent(anticipation_talent) and ComboPoints() < 4 or not Talent(anticipation_talent) and { rtb_reroll() and ComboPoints() < 4 + TalentPoints(deeper_stratagem_talent) or not rtb_reroll() and ss_useable_noreroll() }
+	Talent(anticipation_talent) and ComboPoints() < 5 or not Talent(anticipation_talent) and { rtb_reroll() and ComboPoints() < 4 + TalentPoints(deeper_stratagem_talent) or not rtb_reroll() and ss_useable_noreroll() }
 }
 
 AddFunction ss_useable_noreroll
@@ -581,7 +581,7 @@ AddFunction ss_useable_noreroll
 
 AddFunction rtb_reroll
 {
-	not Talent(slice_and_dice_talent) and BuffCount(roll_the_bones_buff) <= 2 and not BuffCount(roll_the_bones_buff more 5)
+	not Talent(slice_and_dice_talent) and BuffPresent(loaded_dice_buff) and { BuffCount(roll_the_bones_buff) < 2 or BuffCount(roll_the_bones_buff) == 2 and not BuffPresent(true_bearing_buff) }
 }
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=outlaw)
@@ -638,10 +638,14 @@ AddFunction OutlawDefaultMainActions
 			{
 				#death_from_above,if=energy.time_to_max>2&!variable.ss_useable_noreroll
 				if TimeToMaxEnergy() > 2 and not ss_useable_noreroll() Spell(death_from_above)
-				#slice_and_dice,if=!variable.ss_useable&buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<(1+combo_points)*1.8
-				if not ss_useable() and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 Spell(slice_and_dice)
-				#roll_the_bones,if=!variable.ss_useable&buff.roll_the_bones.remains<target.time_to_die&(buff.roll_the_bones.remains<=3|variable.rtb_reroll)
-				if not ss_useable() and BuffRemaining(roll_the_bones_buff) < target.TimeToDie() and { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } Spell(roll_the_bones)
+				#slice_and_dice,if=!variable.ss_useable&buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<(1+combo_points)*1.8&!buff.slice_and_dice.improved&!buff.loaded_dice.up
+				if not ss_useable() and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 and not BuffAmount(slice_and_dice_buff value=3) > 125 and not BuffPresent(loaded_dice_buff) Spell(slice_and_dice)
+				#slice_and_dice,if=buff.loaded_dice.up&combo_points>=cp_max_spend&(!buff.slice_and_dice.improved|buff.slice_and_dice.remains<4)
+				if BuffPresent(loaded_dice_buff) and ComboPoints() >= MaxComboPoints() and { not BuffAmount(slice_and_dice_buff value=3) > 125 or BuffRemaining(slice_and_dice_buff) < 4 } Spell(slice_and_dice)
+				#slice_and_dice,if=buff.slice_and_dice.improved&buff.slice_and_dice.remains<=2&combo_points>=2&!buff.loaded_dice.up
+				if BuffAmount(slice_and_dice_buff value=3) > 125 and BuffRemaining(slice_and_dice_buff) <= 2 and ComboPoints() >= 2 and not BuffPresent(loaded_dice_buff) Spell(slice_and_dice)
+				#roll_the_bones,if=!variable.ss_useable&(target.time_to_die>20|buff.roll_the_bones.remains<target.time_to_die)&(buff.roll_the_bones.remains<=3|variable.rtb_reroll)
+				if not ss_useable() and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } Spell(roll_the_bones)
 				#call_action_list,name=build
 				OutlawBuildMainActions()
 
@@ -681,7 +685,7 @@ AddFunction OutlawDefaultShortCdActions
 			#call_action_list,name=stealth,if=stealthed.rogue|cooldown.vanish.up|cooldown.shadowmeld.up
 			if Stealthed() or not SpellCooldown(vanish) > 0 or not SpellCooldown(shadowmeld) > 0 OutlawStealthShortCdActions()
 
-			unless { Stealthed() or not SpellCooldown(vanish) > 0 or not SpellCooldown(shadowmeld) > 0 } and OutlawStealthShortCdPostConditions() or TimeToMaxEnergy() > 2 and not ss_useable_noreroll() and Spell(death_from_above) or not ss_useable() and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 and Spell(slice_and_dice) or not ss_useable() and BuffRemaining(roll_the_bones_buff) < target.TimeToDie() and { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and Spell(roll_the_bones)
+			unless { Stealthed() or not SpellCooldown(vanish) > 0 or not SpellCooldown(shadowmeld) > 0 } and OutlawStealthShortCdPostConditions() or TimeToMaxEnergy() > 2 and not ss_useable_noreroll() and Spell(death_from_above) or not ss_useable() and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 and not BuffAmount(slice_and_dice_buff value=3) > 125 and not BuffPresent(loaded_dice_buff) and Spell(slice_and_dice) or BuffPresent(loaded_dice_buff) and ComboPoints() >= MaxComboPoints() and { not BuffAmount(slice_and_dice_buff value=3) > 125 or BuffRemaining(slice_and_dice_buff) < 4 } and Spell(slice_and_dice) or BuffAmount(slice_and_dice_buff value=3) > 125 and BuffRemaining(slice_and_dice_buff) <= 2 and ComboPoints() >= 2 and not BuffPresent(loaded_dice_buff) and Spell(slice_and_dice) or not ss_useable() and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and Spell(roll_the_bones)
 			{
 				#call_action_list,name=build
 				OutlawBuildShortCdActions()
@@ -698,14 +702,14 @@ AddFunction OutlawDefaultShortCdActions
 
 AddFunction OutlawDefaultShortCdPostConditions
 {
-	OutlawBfShortCdPostConditions() or OutlawCdsShortCdPostConditions() or { Stealthed() or not SpellCooldown(vanish) > 0 or not SpellCooldown(shadowmeld) > 0 } and OutlawStealthShortCdPostConditions() or TimeToMaxEnergy() > 2 and not ss_useable_noreroll() and Spell(death_from_above) or not ss_useable() and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 and Spell(slice_and_dice) or not ss_useable() and BuffRemaining(roll_the_bones_buff) < target.TimeToDie() and { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and Spell(roll_the_bones) or OutlawBuildShortCdPostConditions() or not ss_useable() and OutlawFinishShortCdPostConditions() or Talent(dirty_tricks_talent) and ComboPointsDeficit() >= 1 and Spell(gouge)
+	OutlawBfShortCdPostConditions() or OutlawCdsShortCdPostConditions() or { Stealthed() or not SpellCooldown(vanish) > 0 or not SpellCooldown(shadowmeld) > 0 } and OutlawStealthShortCdPostConditions() or TimeToMaxEnergy() > 2 and not ss_useable_noreroll() and Spell(death_from_above) or not ss_useable() and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 and not BuffAmount(slice_and_dice_buff value=3) > 125 and not BuffPresent(loaded_dice_buff) and Spell(slice_and_dice) or BuffPresent(loaded_dice_buff) and ComboPoints() >= MaxComboPoints() and { not BuffAmount(slice_and_dice_buff value=3) > 125 or BuffRemaining(slice_and_dice_buff) < 4 } and Spell(slice_and_dice) or BuffAmount(slice_and_dice_buff value=3) > 125 and BuffRemaining(slice_and_dice_buff) <= 2 and ComboPoints() >= 2 and not BuffPresent(loaded_dice_buff) and Spell(slice_and_dice) or not ss_useable() and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and Spell(roll_the_bones) or OutlawBuildShortCdPostConditions() or not ss_useable() and OutlawFinishShortCdPostConditions() or Talent(dirty_tricks_talent) and ComboPointsDeficit() >= 1 and Spell(gouge)
 }
 
 AddFunction OutlawDefaultCdActions
 {
-	#variable,name=rtb_reroll,value=!talent.slice_and_dice.enabled&(rtb_buffs<=2&!rtb_list.any.6)
+	#variable,name=rtb_reroll,value=!talent.slice_and_dice.enabled&buff.loaded_dice.up&(rtb_buffs<2|rtb_buffs=2&!buff.true_bearing.up)
 	#variable,name=ss_useable_noreroll,value=(combo_points<5+talent.deeper_stratagem.enabled-(buff.broadsides.up|buff.jolly_roger.up)-(talent.alacrity.enabled&buff.alacrity.stack<=4))
-	#variable,name=ss_useable,value=(talent.anticipation.enabled&combo_points<4)|(!talent.anticipation.enabled&((variable.rtb_reroll&combo_points<4+talent.deeper_stratagem.enabled)|(!variable.rtb_reroll&variable.ss_useable_noreroll)))
+	#variable,name=ss_useable,value=(talent.anticipation.enabled&combo_points<5)|(!talent.anticipation.enabled&((variable.rtb_reroll&combo_points<4+talent.deeper_stratagem.enabled)|(!variable.rtb_reroll&variable.ss_useable_noreroll)))
 	#kick
 	OutlawInterruptActions()
 	#call_action_list,name=bf
@@ -721,7 +725,7 @@ AddFunction OutlawDefaultCdActions
 			#call_action_list,name=stealth,if=stealthed.rogue|cooldown.vanish.up|cooldown.shadowmeld.up
 			if Stealthed() or not SpellCooldown(vanish) > 0 or not SpellCooldown(shadowmeld) > 0 OutlawStealthCdActions()
 
-			unless { Stealthed() or not SpellCooldown(vanish) > 0 or not SpellCooldown(shadowmeld) > 0 } and OutlawStealthCdPostConditions() or TimeToMaxEnergy() > 2 and not ss_useable_noreroll() and Spell(death_from_above) or not ss_useable() and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 and Spell(slice_and_dice) or not ss_useable() and BuffRemaining(roll_the_bones_buff) < target.TimeToDie() and { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and Spell(roll_the_bones)
+			unless { Stealthed() or not SpellCooldown(vanish) > 0 or not SpellCooldown(shadowmeld) > 0 } and OutlawStealthCdPostConditions() or TimeToMaxEnergy() > 2 and not ss_useable_noreroll() and Spell(death_from_above) or not ss_useable() and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 and not BuffAmount(slice_and_dice_buff value=3) > 125 and not BuffPresent(loaded_dice_buff) and Spell(slice_and_dice) or BuffPresent(loaded_dice_buff) and ComboPoints() >= MaxComboPoints() and { not BuffAmount(slice_and_dice_buff value=3) > 125 or BuffRemaining(slice_and_dice_buff) < 4 } and Spell(slice_and_dice) or BuffAmount(slice_and_dice_buff value=3) > 125 and BuffRemaining(slice_and_dice_buff) <= 2 and ComboPoints() >= 2 and not BuffPresent(loaded_dice_buff) and Spell(slice_and_dice) or not ss_useable() and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and Spell(roll_the_bones)
 			{
 				#killing_spree,if=energy.time_to_max>5|energy<15
 				if TimeToMaxEnergy() > 5 or Energy() < 15 Spell(killing_spree)
@@ -740,7 +744,7 @@ AddFunction OutlawDefaultCdActions
 
 AddFunction OutlawDefaultCdPostConditions
 {
-	OutlawBfCdPostConditions() or OutlawCdsCdPostConditions() or { Stealthed() or not SpellCooldown(vanish) > 0 or not SpellCooldown(shadowmeld) > 0 } and OutlawStealthCdPostConditions() or TimeToMaxEnergy() > 2 and not ss_useable_noreroll() and Spell(death_from_above) or not ss_useable() and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 and Spell(slice_and_dice) or not ss_useable() and BuffRemaining(roll_the_bones_buff) < target.TimeToDie() and { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and Spell(roll_the_bones) or OutlawBuildCdPostConditions() or not ss_useable() and OutlawFinishCdPostConditions() or Talent(dirty_tricks_talent) and ComboPointsDeficit() >= 1 and Spell(gouge)
+	OutlawBfCdPostConditions() or OutlawCdsCdPostConditions() or { Stealthed() or not SpellCooldown(vanish) > 0 or not SpellCooldown(shadowmeld) > 0 } and OutlawStealthCdPostConditions() or TimeToMaxEnergy() > 2 and not ss_useable_noreroll() and Spell(death_from_above) or not ss_useable() and BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 and not BuffAmount(slice_and_dice_buff value=3) > 125 and not BuffPresent(loaded_dice_buff) and Spell(slice_and_dice) or BuffPresent(loaded_dice_buff) and ComboPoints() >= MaxComboPoints() and { not BuffAmount(slice_and_dice_buff value=3) > 125 or BuffRemaining(slice_and_dice_buff) < 4 } and Spell(slice_and_dice) or BuffAmount(slice_and_dice_buff value=3) > 125 and BuffRemaining(slice_and_dice_buff) <= 2 and ComboPoints() >= 2 and not BuffPresent(loaded_dice_buff) and Spell(slice_and_dice) or not ss_useable() and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and Spell(roll_the_bones) or OutlawBuildCdPostConditions() or not ss_useable() and OutlawFinishCdPostConditions() or Talent(dirty_tricks_talent) and ComboPointsDeficit() >= 1 and Spell(gouge)
 }
 
 ### actions.bf
@@ -755,8 +759,10 @@ AddFunction OutlawBfMainPostConditions
 
 AddFunction OutlawBfShortCdActions
 {
-	#cancel_buff,name=blade_flurry,if=equipped.shivarran_symmetry&cooldown.blade_flurry.up&buff.blade_flurry.up&spell_targets.blade_flurry>=2|spell_targets.blade_flurry<2&buff.blade_flurry.up
-	if { HasEquippedItem(shivarran_symmetry) and not SpellCooldown(blade_flurry) > 0 and BuffPresent(blade_flurry_buff) and Enemies() >= 2 or Enemies() < 2 and BuffPresent(blade_flurry_buff) } and BuffPresent(blade_flurry_buff) Texture(blade_flurry text=cancel)
+	#cancel_buff,name=blade_flurry,if=spell_targets.blade_flurry<2&buff.blade_flurry.up
+	if Enemies() < 2 and BuffPresent(blade_flurry_buff) and BuffPresent(blade_flurry_buff) Texture(blade_flurry text=cancel)
+	#cancel_buff,name=blade_flurry,if=equipped.shivarran_symmetry&cooldown.blade_flurry.up&buff.blade_flurry.up&spell_targets.blade_flurry>=2
+	if HasEquippedItem(shivarran_symmetry) and not SpellCooldown(blade_flurry) > 0 and BuffPresent(blade_flurry_buff) and Enemies() >= 2 and BuffPresent(blade_flurry_buff) Texture(blade_flurry text=cancel)
 	#blade_flurry,if=spell_targets.blade_flurry>=2&!buff.blade_flurry.up
 	if Enemies() >= 2 and not BuffPresent(blade_flurry_buff) and CheckBoxOn(opt_blade_flurry) Spell(blade_flurry)
 }
@@ -821,8 +827,8 @@ AddFunction OutlawCdsShortCdActions
 {
 	#cannonball_barrage,if=spell_targets.cannonball_barrage>=1
 	if Enemies() >= 1 Spell(cannonball_barrage)
-	#marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15)&combo_points.deficit>=4+talent.deeper_stratagem.enabled+talent.anticipation.enabled)
-	if target.TimeToDie() < ComboPointsDeficit() or { 600 > 40 or BuffRemaining(true_bearing_buff) > 15 } and ComboPointsDeficit() >= 4 + TalentPoints(deeper_stratagem_talent) + TalentPoints(anticipation_talent) Spell(marked_for_death)
+	#marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit|((raid_event.adds.in>40|buff.true_bearing.remains>15-buff.adrenaline_rush.up*5)&!stealthed.rogue&combo_points.deficit>=cp_max_spend-1)
+	if target.TimeToDie() < ComboPointsDeficit() or { 600 > 40 or BuffRemaining(true_bearing_buff) > 15 - BuffPresent(adrenaline_rush_buff) * 5 } and not Stealthed() and ComboPointsDeficit() >= MaxComboPoints() - 1 Spell(marked_for_death)
 	#sprint,if=equipped.thraxis_tricksy_treads&!variable.ss_useable
 	if HasEquippedItem(thraxis_tricksy_treads) and not ss_useable() Spell(sprint)
 }
@@ -833,10 +839,10 @@ AddFunction OutlawCdsShortCdPostConditions
 
 AddFunction OutlawCdsCdActions
 {
-	#potion,name=prolonged_power,if=buff.bloodlust.react|target.time_to_die<=25|buff.adrenaline_rush.up
-	if { BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 25 or BuffPresent(adrenaline_rush_buff) } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
-	#use_item,slot=trinket2,if=buff.bloodlust.react|target.time_to_die<=20|combo_points.deficit<=2
-	if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 20 or ComboPointsDeficit() <= 2 OutlawUseItemActions()
+	#potion,if=buff.bloodlust.react|target.time_to_die<=60|buff.adrenaline_rush.up
+	if { BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 or BuffPresent(adrenaline_rush_buff) } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
+	#use_item,name=specter_of_betrayal,if=(mantle_duration>0|buff.curse_of_the_dreadblades.up|(cooldown.vanish.remains>11&cooldown.curse_of_the_dreadblades.remains>11))
+	if BuffRemaining(master_assassins_initiative) > 0 or BuffPresent(curse_of_the_dreadblades_buff) or SpellCooldown(vanish) > 11 and SpellCooldown(curse_of_the_dreadblades) > 11 OutlawUseItemActions()
 	#blood_fury
 	Spell(blood_fury_ap)
 	#berserking
@@ -868,8 +874,8 @@ AddFunction OutlawCdsCdPostConditions
 
 AddFunction OutlawFinishMainActions
 {
-	#between_the_eyes,if=equipped.greenskins_waterlogged_wristcuffs&!buff.greenskins_waterlogged_wristcuffs.up
-	if HasEquippedItem(greenskins_waterlogged_wristcuffs) and not BuffPresent(greenskins_waterlogged_wristcuffs_buff) Spell(between_the_eyes text=BTE)
+	#between_the_eyes,if=(mantle_duration>=gcd.remains+0.2&!equipped.thraxis_tricksy_treads)|(equipped.greenskins_waterlogged_wristcuffs&!buff.greenskins_waterlogged_wristcuffs.up)
+	if BuffRemaining(master_assassins_initiative) >= GCDRemaining() + 0.2 and not HasEquippedItem(thraxis_tricksy_treads) or HasEquippedItem(greenskins_waterlogged_wristcuffs) and not BuffPresent(greenskins_waterlogged_wristcuffs_buff) Spell(between_the_eyes text=BTE)
 	#run_through,if=!talent.death_from_above.enabled|energy.time_to_max<cooldown.death_from_above.remains+3.5
 	if not Talent(death_from_above_talent) or TimeToMaxEnergy() < SpellCooldown(death_from_above) + 3.5 Spell(run_through)
 }
@@ -884,7 +890,7 @@ AddFunction OutlawFinishShortCdActions
 
 AddFunction OutlawFinishShortCdPostConditions
 {
-	HasEquippedItem(greenskins_waterlogged_wristcuffs) and not BuffPresent(greenskins_waterlogged_wristcuffs_buff) and Spell(between_the_eyes text=BTE) or { not Talent(death_from_above_talent) or TimeToMaxEnergy() < SpellCooldown(death_from_above) + 3.5 } and Spell(run_through)
+	{ BuffRemaining(master_assassins_initiative) >= GCDRemaining() + 0.2 and not HasEquippedItem(thraxis_tricksy_treads) or HasEquippedItem(greenskins_waterlogged_wristcuffs) and not BuffPresent(greenskins_waterlogged_wristcuffs_buff) } and Spell(between_the_eyes text=BTE) or { not Talent(death_from_above_talent) or TimeToMaxEnergy() < SpellCooldown(death_from_above) + 3.5 } and Spell(run_through)
 }
 
 AddFunction OutlawFinishCdActions
@@ -893,16 +899,16 @@ AddFunction OutlawFinishCdActions
 
 AddFunction OutlawFinishCdPostConditions
 {
-	HasEquippedItem(greenskins_waterlogged_wristcuffs) and not BuffPresent(greenskins_waterlogged_wristcuffs_buff) and Spell(between_the_eyes text=BTE) or { not Talent(death_from_above_talent) or TimeToMaxEnergy() < SpellCooldown(death_from_above) + 3.5 } and Spell(run_through)
+	{ BuffRemaining(master_assassins_initiative) >= GCDRemaining() + 0.2 and not HasEquippedItem(thraxis_tricksy_treads) or HasEquippedItem(greenskins_waterlogged_wristcuffs) and not BuffPresent(greenskins_waterlogged_wristcuffs_buff) } and Spell(between_the_eyes text=BTE) or { not Talent(death_from_above_talent) or TimeToMaxEnergy() < SpellCooldown(death_from_above) + 3.5 } and Spell(run_through)
 }
 
 ### actions.precombat
 
 AddFunction OutlawPrecombatMainActions
 {
-	#flask,name=flask_of_the_seventh_demon
-	#augmentation,name=defiled
-	#food,name=seedbattered_fish_plate
+	#flask
+	#augmentation
+	#food
 	#snapshot_stats
 	#stealth
 	Spell(stealth)
@@ -932,8 +938,14 @@ AddFunction OutlawPrecombatCdActions
 {
 	unless Spell(stealth)
 	{
-		#potion,name=prolonged_power
+		#potion
 		if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
+
+		unless not Talent(slice_and_dice_talent) and Spell(roll_the_bones)
+		{
+			#curse_of_the_dreadblades,if=combo_points.deficit>=4
+			if ComboPointsDeficit() >= 4 Spell(curse_of_the_dreadblades)
+		}
 	}
 }
 
@@ -946,9 +958,9 @@ AddFunction OutlawPrecombatCdPostConditions
 
 AddFunction OutlawStealthMainActions
 {
-	#variable,name=stealth_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&!debuff.ghostly_strike.up)+buff.broadsides.up&energy>60&!buff.jolly_roger.up&!buff.hidden_blade.up&!buff.curse_of_the_dreadblades.up
-	#ambush
-	Spell(ambush)
+	#variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&!debuff.ghostly_strike.up)+buff.broadsides.up&energy>60&!buff.jolly_roger.up&!buff.hidden_blade.up
+	#ambush,if=variable.ambush_condition
+	if ambush_condition() Spell(ambush)
 }
 
 AddFunction OutlawStealthMainPostConditions
@@ -957,30 +969,30 @@ AddFunction OutlawStealthMainPostConditions
 
 AddFunction OutlawStealthShortCdActions
 {
-	unless Spell(ambush)
+	unless ambush_condition() and Spell(ambush)
 	{
-		#vanish,if=(equipped.mantle_of_the_master_assassin&buff.true_bearing.up)|variable.stealth_condition
-		if HasEquippedItem(mantle_of_the_master_assassin) and BuffPresent(true_bearing_buff) or stealth_condition() Spell(vanish)
+		#vanish,if=variable.ambush_condition|(equipped.mantle_of_the_master_assassin&mantle_duration=0&!variable.rtb_reroll&!variable.ss_useable)
+		if ambush_condition() or HasEquippedItem(mantle_of_the_master_assassin) and BuffRemaining(master_assassins_initiative) == 0 and not rtb_reroll() and not ss_useable() Spell(vanish)
 	}
 }
 
 AddFunction OutlawStealthShortCdPostConditions
 {
-	Spell(ambush)
+	ambush_condition() and Spell(ambush)
 }
 
 AddFunction OutlawStealthCdActions
 {
-	unless Spell(ambush)
+	unless ambush_condition() and Spell(ambush)
 	{
-		#shadowmeld,if=variable.stealth_condition
-		if stealth_condition() Spell(shadowmeld)
+		#shadowmeld,if=variable.ambush_condition
+		if ambush_condition() Spell(shadowmeld)
 	}
 }
 
 AddFunction OutlawStealthCdPostConditions
 {
-	Spell(ambush)
+	ambush_condition() and Spell(ambush)
 }
 
 ### Outlaw icons.
@@ -1075,8 +1087,10 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # jolly_roger_buff
 # kick
 # killing_spree
+# loaded_dice_buff
 # mantle_of_the_master_assassin
 # marked_for_death
+# master_assassins_initiative
 # opportunity_buff
 # pistol_shot
 # prolonged_power_potion
