@@ -229,6 +229,7 @@ local OPTIONAL_SKILLS = {
 	["volley"] = { class = "HUNTER", default = true },
 	["trap_launcher"] = { class = "HUNTER", default = true },
 	["time_warp"] = { class = "MAGE" },
+	["blink"] = { class = "MAGE" },
 	["storm_earth_and_fire"] = { class = "MONK" },
 	["chi_burst"] = { class = "MONK", default = true },
 	["touch_of_karma"] = { class = "MONK", default = false },
@@ -1110,6 +1111,7 @@ end
 
 local function InitializeDisambiguation()
 	AddDisambiguation("bloodlust_buff",			"burst_haste_buff")
+	AddDisambiguation("exhaustion_buff",		"burst_haste_debuff")
 	AddDisambiguation("trinket_proc_all_buff",	"trinket_proc_any_buff")
 	AddDisambiguation("trinket_stack_proc_all_buff",	"trinket_proc_any_buff")
 	-- WoD legendary ring
@@ -1959,6 +1961,8 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "MAGE" and action == "water_elemental" then
 			-- Only suggest summoning the Water Elemental if the pet is not already summoned.
 			conditionCode = "not pet.Present()"
+		elseif class == "MAGE" and action == "cone_of_cold" then
+			conditionCode = "target.Distance() < 12"
 		elseif class == "MONK" and action == "chi_sphere" then
 			-- skip
 			isSpellAction = false
@@ -3225,6 +3229,10 @@ do
 			local name = "anticipation_buff"
 			code = format("BuffStacks(%s)", name)
 			AddSymbol(annotation, name)
+		elseif class == "ROGUE" and operand == "buff.slice_and_dice.improved" then
+			local buff = "slice_and_dice_buff"
+			code = format("BuffAmount(%s value=3)>125", buff)
+			AddSymbol(annotation, buff)
 		elseif strsub(operand, 1, 22) == "active_enemies_within." then
 			-- "active_enemies_within.<distance>" is roughly equivalent to the number of enemies.
 			code = "Enemies()"
@@ -3855,6 +3863,11 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		-- The Frozen Orb is ticking if fewer than 10s have elapsed since it was cast.
 		local name = "frozen_orb"
 		code = format("SpellCooldown(%s) > SpellCooldownDuration(%s) - 10", name, name)
+		AddSymbol(annotation, name)
+	elseif class == "MAGE" and operand == "ground_aoe.frozen_orb.remains" then
+		-- The Frozen Orb is ticking if fewer than 10s have elapsed since it was cast.
+		local name = "frozen_orb"
+		code = format("10 - (SpellCooldownDuration(%s) - SpellCooldown(%s))", name, name)
 		AddSymbol(annotation, name)
 	elseif class == "MONK" and strsub(operand, 1, 35) == "debuff.storm_earth_and_fire_target." then
 		local property = strsub(operand, 36)
@@ -4632,7 +4645,7 @@ local function InsertSupportingFunctions(child, annotation)
 		local fmt = [[
 			AddFunction %sGetInMeleeRange
 			{
-				if CheckBoxOn(opt_melee_range) and Stance(druid_bear_form) and not target.InRange(mangle) or { Stance(druid_cat_form) or Stance(druid_claws_of_shirvallah) } and not target.InRange(shred)
+				if CheckBoxOn(opt_melee_range) and ((Stance(druid_bear_form) and not target.InRange(mangle)) or (Stance(druid_cat_form) and not target.InRange(shred)))
 				{
 					if target.InRange(wild_charge) Spell(wild_charge)
 					Texture(misc_arrowlup help=L(not_in_melee_range))
