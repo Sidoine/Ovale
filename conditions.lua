@@ -4181,6 +4181,34 @@ do
 end
 
 do
+	--- Get the number of seconds for a full recharge of the spell.
+	-- @name SpellFullRecharge
+	-- @paramsig number or boolean
+	-- @param id The spell ID.
+	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	-- @param number Optional. The number to compare against.
+	-- @param count Optional. Sets whether a count or a fractional value is returned.
+	--     Defaults to count=1.
+	--     Valid values: 0, 1.
+	-- @usage
+	-- if SpellFullRecharge(dire_frenzy) < GCD()
+	--     Spell(dire_frenzy)
+
+	local function SpellFullRecharge(positionalParams, namedParams, state, atTime)
+		local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local charges, maxCharges, start, dur = state:GetSpellCharges(spellId, atTime)
+		if charges and charges < maxCharges then
+			local duration = (maxCharges - charges) * dur
+			local ending = start + duration
+			return TestValue(start, ending, ending - start, start, -1, comparator, limit)
+		end
+		return Compare(0, comparator, limit)
+	end
+
+	OvaleCondition:RegisterCondition("spellfullrecharge", true, SpellFullRecharge)
+end
+
+do
 	--- Get the number of seconds before any of the listed spells are ready for use.
 	-- @name SpellCooldown
 	-- @paramsig number or boolean
@@ -4206,6 +4234,7 @@ do
 				break
 			elseif not usable or state:IsUsableSpell(spellId, atTime, OvaleGUID:UnitGUID(target)) then
 				local start, duration = state:GetSpellCooldown(spellId)
+				if spellId == 217200 or spellId == 120679 then print(spellId, start, duration) end
 				local t = 0
 				if start > 0 and duration > 0 then
 					t = start + duration

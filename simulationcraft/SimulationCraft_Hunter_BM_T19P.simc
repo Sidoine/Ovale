@@ -1,12 +1,19 @@
 ### SimulationCraft
 hunter="Hunter_BM_T19P"
+spec=beast_mastery
 level=110
 race=orc
 role=attack
 position=ranged_back
-talents=2102012
-artifact=56:0:0:0:0:869:3:870:3:872:3:874:3:875:3:878:1:880:1:881:1:882:1:1095:3:1336:1
-spec=beast_mastery
+talents=2202012
+artifact=56:0:0:0:0:868:4:869:4:870:4:871:4:872:4:873:4:874:4:875:4:876:1:877:1:878:1:879:1:880:1:881:1:882:1:1095:4:1336:1:1368:1:1517:4:1518:1:1519:1:1520:24:1636:1
+crucible=1739:3:1780:3:875:1:870:2
+
+# Default consumables
+potion=prolonged_power
+flask=seventh_demon
+food=lavish_suramar_feast
+augmentation=defiled
 
 # This default action priority list is automatically created based on your character.
 # It is a attempt to provide you with a action list that is both simple and practicable,
@@ -15,61 +22,66 @@ spec=beast_mastery
 # SimulationCraft is always looking for updates and improvements to the default action lists.
 
 # Executed before combat begins. Accepts non-harmful actions only.
-actions.precombat=flask,type=flask_of_the_seventh_demon
-actions.precombat+=/food,type=nightborne_delicacy_platter
+actions.precombat=flask
+actions.precombat+=/augmentation
+actions.precombat+=/food
 actions.precombat+=/summon_pet
 # Snapshot raid buffed stats before combat begins and pre-potting is done.
 actions.precombat+=/snapshot_stats
-actions.precombat+=/potion,name=prolonged_power
-actions.precombat+=/augmentation,type=defiled
+actions.precombat+=/potion
 
 # Executed every time the actor is available.
 actions=auto_shot
-actions+=/counter_shot
+actions+=/counter_shot,if=target.debuff.casting.react
+actions+=/use_items
 actions+=/arcane_torrent,if=focus.deficit>=30
-actions+=/berserking
-actions+=/blood_fury
+actions+=/berserking,if=buff.bestial_wrath.remains>7
+actions+=/blood_fury,if=buff.bestial_wrath.remains>7
 actions+=/volley,toggle=on
-actions+=/potion,name=prolonged_power,if=buff.bestial_wrath.remains|!cooldown.bestial_wrath.remains
-actions+=/a_murder_of_crows
+actions+=/potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up
+actions+=/a_murder_of_crows,if=cooldown.bestial_wrath.remains<3|cooldown.bestial_wrath.remains>30|target.time_to_die<16
 actions+=/stampede,if=buff.bloodlust.up|buff.bestial_wrath.up|cooldown.bestial_wrath.remains<=2|target.time_to_die<=14
-actions+=/dire_beast,if=cooldown.bestial_wrath.remains>3
-actions+=/dire_frenzy,if=(cooldown.bestial_wrath.remains>6&(!equipped.the_mantle_of_command|pet.cat.buff.dire_frenzy.remains<=gcd.max*1.2))|(charges>=2&focus.deficit>=25+talent.dire_stable.enabled*12)|target.time_to_die<9
-actions+=/aspect_of_the_wild,if=buff.bestial_wrath.up|target.time_to_die<12
+actions+=/bestial_wrath,if=!buff.bestial_wrath.up
+# With both AotW cdr sources and OwtP, there's no visible benefit if it's delayed, use it on cd. With only one or neither, pair it with Bestial Wrath. Also use it if the fight will end when the buff does.
+actions+=/aspect_of_the_wild,if=(equipped.call_of_the_wild&equipped.convergence_of_fates&talent.one_with_the_pack.enabled)|buff.bestial_wrath.remains>7|target.time_to_die<12
+actions+=/kill_command,target_if=min:bestial_ferocity.remains,if=equipped.qapla_eredun_war_order
+# Hold charges of Dire Beast as long as possible to take advantage of T20 2pc unless T19 2pc is on. With Qa'pla, also try not to waste Kill Command cdr if it is just about to come off cooldown.
+actions+=/dire_beast,if=((!equipped.qapla_eredun_war_order|cooldown.kill_command.remains>=1)&(set_bonus.tier19_2pc|!buff.bestial_wrath.up))|full_recharge_time<gcd.max|cooldown.titans_thunder.up|spell_targets>1
+actions+=/dire_frenzy,if=(pet.cat.buff.dire_frenzy.remains<=gcd.max*1.2)|full_recharge_time<gcd.max|target.time_to_die<9
 actions+=/barrage,if=spell_targets.barrage>1
-actions+=/titans_thunder,if=talent.dire_frenzy.enabled|cooldown.dire_beast.remains>=3|(buff.bestial_wrath.up&pet.dire_beast.active)
-actions+=/bestial_wrath
+actions+=/titans_thunder,if=(talent.dire_frenzy.enabled&(buff.bestial_wrath.up|cooldown.bestial_wrath.remains>35))|buff.bestial_wrath.up
 actions+=/multishot,if=spell_targets>4&(pet.cat.buff.beast_cleave.remains<gcd.max|pet.cat.buff.beast_cleave.down)
 actions+=/kill_command
-actions+=/multishot,if=spell_targets>1&(pet.cat.buff.beast_cleave.remains<gcd.max*2|pet.cat.buff.beast_cleave.down)
+actions+=/multishot,if=spell_targets>1&(pet.cat.buff.beast_cleave.remains<gcd.max|pet.cat.buff.beast_cleave.down)
 actions+=/chimaera_shot,if=focus<90
-actions+=/cobra_shot,if=(cooldown.kill_command.remains>focus.time_to_max&cooldown.bestial_wrath.remains>focus.time_to_max)|(buff.bestial_wrath.up&focus.regen*cooldown.kill_command.remains>30)|target.time_to_die<cooldown.kill_command.remains
+actions+=/cobra_shot,if=(cooldown.kill_command.remains>focus.time_to_max&cooldown.bestial_wrath.remains>focus.time_to_max)|(buff.bestial_wrath.up&(spell_targets.multishot=1|focus.regen*cooldown.kill_command.remains>action.kill_command.cost))|target.time_to_die<cooldown.kill_command.remains|(equipped.parsels_tongue&buff.parsels_tongue.remains<=gcd.max*2)
+actions+=/dire_beast,if=buff.bestial_wrath.up
 
-head=collar_of_honorable_exultation,id=136777,bonus_id=1727
-neck=strand_of_the_stars,id=137487,bonus_id=1727,enchant=mark_of_the_distant_army
-shoulders=epaulets_of_deceitful_intent,id=134480,bonus_id=1727
-back=cape_of_rigid_order,id=134402,bonus_id=1727,enchant=200agi
-chest=thunderfused_valkyr_hauberk,id=133622,bonus_id=1727
-wrists=remorseless_chain_armbands,id=137405,bonus_id=1727
-hands=lavabreaker_gauntlets,id=137519,bonus_id=1727
-waist=belt_of_mighty_links,id=137456,bonus_id=1727
-legs=mute_erasure_legguards,id=134475,bonus_id=1727
-feet=whelp_handlers_lined_boots,id=134464,bonus_id=1727
-finger1=archdruids_tainted_seal,id=134487,bonus_id=1727,enchant=200mastery
-finger2=ring_of_twisted_webbing,id=134540,bonus_id=1727,enchant=200mastery
-trinket1=naraxas_spiked_tongue,id=137349,bonus_id=1727
-trinket2=chrono_shard,id=137419,bonus_id=1727
-main_hand=titanstrike,id=128861,ilevel=870
+head=wildstalker_helmet,id=147142,bonus_id=1512/3563
+neck=locket_of_splintered_souls,id=147014,bonus_id=1512/3563,enchant=mark_of_the_trained_soldier
+shoulders=wildstalker_spaulders,id=147144,bonus_id=1512/3563
+back=wildstalker_cape,id=147140,bonus_id=1512/3563,enchant=binding_of_agility
+chest=parsels_tongue,id=151805,bonus_id=3570
+wrists=painsinged_armguards,id=147057,bonus_id=1512/3563
+hands=vicegrip_of_the_unrepentant,id=147048,bonus_id=1522/3563
+waist=roar_of_the_seven_lions,id=137080,bonus_id=3570
+legs=wildstalker_leggings,id=147143,bonus_id=1512/3563
+feet=starstalker_treads,id=147046,bonus_id=1522/3563
+finger1=scaled_band_of_servitude,id=147020,bonus_id=1512/3563,enchant=binding_of_mastery
+finger2=seal_of_the_second_duumvirate,id=147195,bonus_id=1522/3563,enchant=binding_of_mastery
+trinket1=tarnished_sentinel_medallion,id=147017,bonus_id=1512/3563
+trinket2=engine_of_eradication,id=147015,bonus_id=1512/3563
+main_hand=titanstrike,id=128861,gem_id=147113/147076/147102,relic_id=1512:3563/1512:3563/1512:3563
 
 # Gear Summary
-# gear_ilvl=842.00
-# gear_agility=11859
-# gear_stamina=18862
-# gear_crit_rating=1373
-# gear_haste_rating=4310
-# gear_mastery_rating=11541
-# gear_versatility_rating=1107
-# gear_armor=2433
-# set_bonus=journey_through_time_2pc=1
-# set_bonus=tier19p_mail_2pc=1
+# gear_ilvl=939.73
+# gear_agility=27351
+# gear_stamina=48231
+# gear_crit_rating=7866
+# gear_haste_rating=9000
+# gear_mastery_rating=12294
+# gear_versatility_rating=1162
+# gear_armor=3358
+# set_bonus=tier20_2pc=1
+# set_bonus=tier20_4pc=1
 summon_pet=cat

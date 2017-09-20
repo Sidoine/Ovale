@@ -2909,6 +2909,8 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
 		code = format("PersistentMultiplier(%s)", buffName)
 	elseif property == "recharge_time" then
 		code = format("SpellChargeCooldown(%s)", name)
+	elseif property == "full_recharge_time" then
+		code = format("SpellFullRecharge(%s)", name)
 	elseif property == "remains" then
 		if IsTotem(name) then
 			code = format("TotemRemaining(%s)", name)
