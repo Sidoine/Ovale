@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "icyveins_druid_guardian"
-	local desc = "[7.1.5] Icy-Veins: Druid Guardian"
+	local desc = "[7.3.0] Icy-Veins: Druid Guardian"
 	local code = [[
 
 Include(ovale_common)
@@ -15,12 +15,20 @@ AddCheckBox(opt_interrupt L(interrupt) default specialization=guardian)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=guardian)
 AddCheckBox(opt_druid_guardian_aoe L(AOE) default specialization=guardian)
 
+AddFunction FrenziedRegenHealTotal
+{
+	IncomingDamage(5) / 2
+}
+
 AddFunction GuardianHealMe
 {
-	if IncomingDamage(5) >= MaxHealth() * 0.5 Spell(frenzied_regeneration)
-	if ((IncomingDamage(5) / 2 <= HealthMissing()) and (IncomingDamage(5) / 2 > MaxHealth() * 0.1) and SpellCharges(frenzied_regeneration) >= 2) Spell(frenzied_regeneration)
+	if BuffExpires(frenzied_regeneration_buff) 
+	{
+		if (FrenziedRegenHealTotal() >= MaxHealth() * 0.25) Spell(frenzied_regeneration)
+		if (SpellCharges(frenzied_regeneration) >= 2 and (FrenziedRegenHealTotal() <= HealthMissing()) and (FrenziedRegenHealTotal() > MaxHealth() * 0.10)) Spell(frenzied_regeneration)
+	}
+	
 	if HealthPercent() <= 50 Spell(lunar_beam)
-	if HealthPercent() <= 50 and IncomingDamage(5 physical=1) == 0 Spell(regrowth)
 	if HealthPercent() <= 80 and not InCombat() Spell(regrowth)
 }
 
@@ -36,12 +44,7 @@ AddFunction GuardianGetInMeleeRange
 AddFunction GuardianDefaultShortCDActions
 {
 	GuardianHealMe()
-	if InCombat() and BuffExpires(bristling_fur_buff)
-	{
-		if IncomingDamage(5 physical=1) Spell(ironfur)
-	}
-	if BuffExpires(survival_instincts_buff) and BuffExpires(rage_of_the_sleeper_buff) and BuffExpires(barkskin_buff) Spell(bristling_fur)
-	# range check
+	if IncomingDamage(5 physical=1) Spell(ironfur)
 	GuardianGetInMeleeRange()
 }
 
@@ -52,10 +55,10 @@ AddFunction GuardianDefaultShortCDActions
 AddFunction GuardianDefaultMainActions
 {
 	if not Stance(druid_bear_form) Spell(bear_form)
-	if not BuffExpires(galactic_guardian_buff) Spell(moonfire)
 	Spell(mangle)
+	if not BuffExpires(galactic_guardian_buff) Spell(moonfire)
 	Spell(thrash_bear)
-	if target.DebuffStacks(thrash_bear_debuff) >= 2 Spell(pulverize)
+	if (target.DebuffStacks(thrash_bear_debuff) >= 2 and BuffRefreshable(pulverize_buff) or target.DebuffStacks(thrash_bear_debuff) >= 5) Spell(pulverize)
 	if target.DebuffRefreshable(moonfire_debuff) Spell(moonfire)
 	if RageDeficit() <= 20 Spell(maul)
 	Spell(swipe_bear)
@@ -72,7 +75,7 @@ AddFunction GuardianDefaultAoEActions
 	if not BuffExpires(galactic_guardian_buff) Spell(moonfire)
 	Spell(thrash_bear)
 	Spell(mangle)
-	if target.DebuffStacks(thrash_bear_debuff) >= 2 Spell(pulverize)
+	if (target.DebuffStacks(thrash_bear_debuff) >= 2 and BuffRefreshable(pulverize_buff) or target.DebuffStacks(thrash_bear_debuff) >= 5) Spell(pulverize)
 	if Enemies() <= 3 and target.DebuffRefreshable(moonfire_debuff) Spell(moonfire)
 	if RageDeficit() <= 20 Spell(maul)
 	Spell(swipe_bear)
@@ -85,6 +88,7 @@ AddFunction GuardianDefaultCdActions
 	if HasArtifactTrait(embrace_of_the_nightmare) Spell(rage_of_the_sleeper)
 	if BuffExpires(bristling_fur_buff) and BuffExpires(survival_instincts_buff) and BuffExpires(rage_of_the_sleeper_buff) and BuffExpires(barkskin_buff) and BuffExpires(potion_buff)
 	{
+		Spell(bristling_fur)
 		if (HasEquippedItem(shifting_cosmic_sliver)) Spell(survival_instincts)
 		Item(Trinket0Slot usable=1 text=13)
 		Item(Trinket1Slot usable=1 text=14)
@@ -748,7 +752,7 @@ AddFunction FeralUseItemActions
 
 AddFunction FeralGetInMeleeRange
 {
-	if CheckBoxOn(opt_melee_range) and Stance(druid_bear_form) and not target.InRange(mangle) or { Stance(druid_cat_form) or Stance(druid_claws_of_shirvallah) } and not target.InRange(shred)
+	if CheckBoxOn(opt_melee_range) and { Stance(druid_bear_form) and not target.InRange(mangle) or Stance(druid_cat_form) and not target.InRange(shred) }
 	{
 		if target.InRange(wild_charge) Spell(wild_charge)
 		Texture(misc_arrowlup help=L(not_in_melee_range))
@@ -1277,7 +1281,7 @@ AddFunction GuardianUseItemActions
 
 AddFunction GuardianGetInMeleeRange
 {
-	if CheckBoxOn(opt_melee_range) and Stance(druid_bear_form) and not target.InRange(mangle) or { Stance(druid_cat_form) or Stance(druid_claws_of_shirvallah) } and not target.InRange(shred)
+	if CheckBoxOn(opt_melee_range) and { Stance(druid_bear_form) and not target.InRange(mangle) or Stance(druid_cat_form) and not target.InRange(shred) }
 	{
 		if target.InRange(wild_charge) Spell(wild_charge)
 		Texture(misc_arrowlup help=L(not_in_melee_range))
