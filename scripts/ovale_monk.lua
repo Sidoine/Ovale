@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "icyveins_monk_brewmaster"
-	local desc = "[7.0] Icy-Veins: Monk Brewmaster"
+	local desc = "[7.3.0] Icy-Veins: Monk Brewmaster"
 	local code = [[
 
 Include(ovale_common)
@@ -96,7 +96,6 @@ AddFunction BrewmasterDefaultMainActions
 		if (EnergyDeficit() <= 35) Spell(tiger_palm)
 		Spell(chi_burst)
 		Spell(chi_wave)
-		Spell(exploding_keg)
 	}
 }
 
