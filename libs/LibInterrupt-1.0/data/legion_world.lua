@@ -16,3 +16,8 @@ InterruptTable["Fiery Trickster"] = {
 InterruptTable["Occularus"] = {
     ["Searing Gaze"] = true
 }
+
+-- Mage Tower
+InterruptTable["Tugar Bloodtotem"] = {
+    ["Fel Burst"] = true
+}
