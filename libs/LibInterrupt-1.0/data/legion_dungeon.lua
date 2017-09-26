@@ -373,6 +373,14 @@ InterruptTable["Nightbane"] = {
     ["Reverberating Shadows"] = true
 }
 
+InterruptTable["Shade of Medivh"] = {
+    ["Frostbite"] = true
+}
+
+InterruptTable["Viz'aduum the Watcher"] = {
+    ["Burning Blast"] = true
+}
+
 -- Cathedral of Eternal Night
 InterruptTable["Felguard Destroyer"] = {
     ["Shadow Wall"] = true
