@@ -715,344 +715,191 @@ AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
 end
 
 do
-	local name = "simulationcraft_druid_feral_t19p"
-	local desc = "[7.0] SimulationCraft: Druid_Feral_T19P"
+	local name = "simulationcraft_druid_feral_t20m"
+	local desc = "[7.0] SimulationCraft: Druid_Feral_T20M"
 	local code = [[
-# Based on SimulationCraft profile "Druid_Feral_T19P".
-#	class=druid
-#	spec=feral
-#	talents=3323322
+# Based on SimulationCraft profile "Druid_Feral_T20M".
+#    class=druid
+#    spec=feral
+#    talents=2331232
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_druid_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default specialization=feral)
+
+AddFunction use_thrash
+{
+    if HasEquippedItem(luffa_wrappings) 1
+    0
+}
+
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=feral)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=feral)
 
-AddFunction FeralInterruptActions
-{
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
-	{
-		if target.InRange(skull_bash) and target.IsInterruptible() Spell(skull_bash)
-		if target.InRange(mighty_bash) and not target.Classification(worldboss) Spell(mighty_bash)
-		if target.InRange(maim) and not target.Classification(worldboss) Spell(maim)
-		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
-		if target.Distance(less 15) and not target.Classification(worldboss) Spell(typhoon)
-	}
-}
-
 AddFunction FeralUseItemActions
 {
-	Item(Trinket0Slot text=13 usable=1)
-	Item(Trinket1Slot text=14 usable=1)
+    Item(Trinket0Slot text=13 usable=1)
+    Item(Trinket1Slot text=14 usable=1)
 }
 
 AddFunction FeralGetInMeleeRange
 {
-	if CheckBoxOn(opt_melee_range) and { Stance(druid_bear_form) and not target.InRange(mangle) or Stance(druid_cat_form) and not target.InRange(shred) }
-	{
-		if target.InRange(wild_charge) Spell(wild_charge)
-		Texture(misc_arrowlup help=L(not_in_melee_range))
-	}
+    if CheckBoxOn(opt_melee_range) and { Stance(druid_bear_form) and not target.InRange(mangle) or Stance(druid_cat_form) and not target.InRange(shred) }
+    {
+        if target.InRange(wild_charge) Spell(wild_charge)
+        Texture(misc_arrowlup help=L(not_in_melee_range))
+    }
 }
 
 ### actions.default
 
 AddFunction FeralDefaultMainActions
 {
-	#cat_form
-	Spell(cat_form)
-	#rake,if=buff.prowl.up|buff.shadowmeld.up
-	if BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) Spell(rake)
-	#ferocious_bite,cycle_targets=1,if=dot.rip.ticking&dot.rip.remains<3&target.time_to_die>3&(target.health.pct<25|talent.sabertooth.enabled)
-	if target.DebuffPresent(rip_debuff) and target.DebuffRemaining(rip_debuff) < 3 and target.TimeToDie() > 3 and { target.HealthPercent() < 25 or Talent(sabertooth_talent) } Spell(ferocious_bite)
-	#regrowth,if=talent.bloodtalons.enabled&buff.predatory_swiftness.up&buff.bloodtalons.down&(combo_points>=5|buff.predatory_swiftness.remains<1.5|(talent.bloodtalons.enabled&combo_points=2&cooldown.ashamanes_frenzy.remains<gcd)|(talent.elunes_guidance.enabled&((cooldown.elunes_guidance.remains<gcd&combo_points=0)|(buff.elunes_guidance.up&combo_points>=4))))
-	if Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and BuffExpires(bloodtalons_buff) and { ComboPoints() >= 5 or BuffRemaining(predatory_swiftness_buff) < 1.5 or Talent(bloodtalons_talent) and ComboPoints() == 2 and SpellCooldown(ashamanes_frenzy) < GCD() or Talent(elunes_guidance_talent) and { SpellCooldown(elunes_guidance) < GCD() and ComboPoints() == 0 or BuffPresent(elunes_guidance_buff) and ComboPoints() >= 4 } } Spell(regrowth)
-	#call_action_list,name=sbt_opener,if=talent.sabertooth.enabled&time<20
-	if Talent(sabertooth_talent) and TimeInCombat() < 20 FeralSbtOpenerMainActions()
+    #run_action_list,name=single_target,if=dot.rip.ticking|time>15
+    if target.DebuffPresent(rip_debuff) or TimeInCombat() > 15 FeralSingleTargetMainActions()
 
-	unless Talent(sabertooth_talent) and TimeInCombat() < 20 and FeralSbtOpenerMainPostConditions()
-	{
-		#regrowth,if=equipped.ailuro_pouncers&talent.bloodtalons.enabled&buff.predatory_swiftness.stack>1&buff.bloodtalons.down
-		if HasEquippedItem(ailuro_pouncers) and Talent(bloodtalons_talent) and BuffStacks(predatory_swiftness_buff) > 1 and BuffExpires(bloodtalons_buff) Spell(regrowth)
-		#call_action_list,name=finisher
-		FeralFinisherMainActions()
-
-		unless FeralFinisherMainPostConditions()
-		{
-			#call_action_list,name=generator
-			FeralGeneratorMainActions()
-		}
-	}
+    unless { target.DebuffPresent(rip_debuff) or TimeInCombat() > 15 } and FeralSingleTargetMainPostConditions()
+    {
+        #rake,if=!ticking|buff.prowl.up
+        if not target.DebuffPresent(rake_debuff) or BuffPresent(prowl_buff) Spell(rake)
+        #moonfire_cat,if=talent.lunar_inspiration.enabled&!ticking
+        if Talent(lunar_inspiration_talent) and not target.DebuffPresent(moonfire_cat_debuff) Spell(moonfire_cat)
+        #savage_roar,if=!buff.savage_roar.up
+        if not BuffPresent(savage_roar_buff) Spell(savage_roar)
+        #regrowth,if=(talent.sabertooth.enabled|buff.predatory_swiftness.up)&talent.bloodtalons.enabled&buff.bloodtalons.down&combo_points=5
+        if { Talent(sabertooth_talent) or BuffPresent(predatory_swiftness_buff) } and Talent(bloodtalons_talent) and BuffExpires(bloodtalons_buff) and ComboPoints() == 5 Spell(regrowth)
+        #rip,if=combo_points=5
+        if ComboPoints() == 5 Spell(rip)
+        #thrash_cat,if=!ticking&variable.use_thrash>0
+        if not target.DebuffPresent(thrash_cat_debuff) and use_thrash() > 0 Spell(thrash_cat)
+        #shred
+        Spell(shred)
+    }
 }
 
 AddFunction FeralDefaultMainPostConditions
 {
-	Talent(sabertooth_talent) and TimeInCombat() < 20 and FeralSbtOpenerMainPostConditions() or FeralFinisherMainPostConditions() or FeralGeneratorMainPostConditions()
+    { target.DebuffPresent(rip_debuff) or TimeInCombat() > 15 } and FeralSingleTargetMainPostConditions()
 }
 
 AddFunction FeralDefaultShortCdActions
 {
-	unless Spell(cat_form)
-	{
-		#wild_charge
-		FeralGetInMeleeRange()
-		#displacer_beast,if=movement.distance>10
-		if target.Distance() > 10 Spell(displacer_beast)
+    #run_action_list,name=single_target,if=dot.rip.ticking|time>15
+    if target.DebuffPresent(rip_debuff) or TimeInCombat() > 15 FeralSingleTargetShortCdActions()
 
-		unless { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake)
-		{
-			#auto_attack
-			FeralGetInMeleeRange()
-			#tigers_fury,if=(!buff.clearcasting.react&energy.deficit>=60)|energy.deficit>=80|(t18_class_trinket&buff.berserk.up&buff.tigers_fury.down)
-			if not BuffPresent(clearcasting_buff) and EnergyDeficit() >= 60 or EnergyDeficit() >= 80 or HasTrinket(t18_class_trinket) and BuffPresent(berserk_cat_buff) and BuffExpires(tigers_fury_buff) Spell(tigers_fury)
+    unless { target.DebuffPresent(rip_debuff) or TimeInCombat() > 15 } and FeralSingleTargetShortCdPostConditions() or { not target.DebuffPresent(rake_debuff) or BuffPresent(prowl_buff) } and Spell(rake)
+    {
+        #auto_attack
+        FeralGetInMeleeRange()
 
-			unless target.DebuffPresent(rip_debuff) and target.DebuffRemaining(rip_debuff) < 3 and target.TimeToDie() > 3 and { target.HealthPercent() < 25 or Talent(sabertooth_talent) } and Spell(ferocious_bite) or Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and BuffExpires(bloodtalons_buff) and { ComboPoints() >= 5 or BuffRemaining(predatory_swiftness_buff) < 1.5 or Talent(bloodtalons_talent) and ComboPoints() == 2 and SpellCooldown(ashamanes_frenzy) < GCD() or Talent(elunes_guidance_talent) and { SpellCooldown(elunes_guidance) < GCD() and ComboPoints() == 0 or BuffPresent(elunes_guidance_buff) and ComboPoints() >= 4 } } and Spell(regrowth)
-			{
-				#call_action_list,name=sbt_opener,if=talent.sabertooth.enabled&time<20
-				if Talent(sabertooth_talent) and TimeInCombat() < 20 FeralSbtOpenerShortCdActions()
-
-				unless Talent(sabertooth_talent) and TimeInCombat() < 20 and FeralSbtOpenerShortCdPostConditions() or HasEquippedItem(ailuro_pouncers) and Talent(bloodtalons_talent) and BuffStacks(predatory_swiftness_buff) > 1 and BuffExpires(bloodtalons_buff) and Spell(regrowth)
-				{
-					#call_action_list,name=finisher
-					FeralFinisherShortCdActions()
-
-					unless FeralFinisherShortCdPostConditions()
-					{
-						#call_action_list,name=generator
-						FeralGeneratorShortCdActions()
-					}
-				}
-			}
-		}
-	}
+        unless Talent(lunar_inspiration_talent) and not target.DebuffPresent(moonfire_cat_debuff) and Spell(moonfire_cat) or not BuffPresent(savage_roar_buff) and Spell(savage_roar)
+        {
+            #tigers_fury
+            Spell(tigers_fury)
+            #ashamanes_frenzy
+            Spell(ashamanes_frenzy)
+        }
+    }
 }
 
 AddFunction FeralDefaultShortCdPostConditions
 {
-	Spell(cat_form) or { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake) or target.DebuffPresent(rip_debuff) and target.DebuffRemaining(rip_debuff) < 3 and target.TimeToDie() > 3 and { target.HealthPercent() < 25 or Talent(sabertooth_talent) } and Spell(ferocious_bite) or Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and BuffExpires(bloodtalons_buff) and { ComboPoints() >= 5 or BuffRemaining(predatory_swiftness_buff) < 1.5 or Talent(bloodtalons_talent) and ComboPoints() == 2 and SpellCooldown(ashamanes_frenzy) < GCD() or Talent(elunes_guidance_talent) and { SpellCooldown(elunes_guidance) < GCD() and ComboPoints() == 0 or BuffPresent(elunes_guidance_buff) and ComboPoints() >= 4 } } and Spell(regrowth) or Talent(sabertooth_talent) and TimeInCombat() < 20 and FeralSbtOpenerShortCdPostConditions() or HasEquippedItem(ailuro_pouncers) and Talent(bloodtalons_talent) and BuffStacks(predatory_swiftness_buff) > 1 and BuffExpires(bloodtalons_buff) and Spell(regrowth) or FeralFinisherShortCdPostConditions() or FeralGeneratorShortCdPostConditions()
+    { target.DebuffPresent(rip_debuff) or TimeInCombat() > 15 } and FeralSingleTargetShortCdPostConditions() or { not target.DebuffPresent(rake_debuff) or BuffPresent(prowl_buff) } and Spell(rake) or Talent(lunar_inspiration_talent) and not target.DebuffPresent(moonfire_cat_debuff) and Spell(moonfire_cat) or not BuffPresent(savage_roar_buff) and Spell(savage_roar) or { Talent(sabertooth_talent) or BuffPresent(predatory_swiftness_buff) } and Talent(bloodtalons_talent) and BuffExpires(bloodtalons_buff) and ComboPoints() == 5 and Spell(regrowth) or ComboPoints() == 5 and Spell(rip) or not target.DebuffPresent(thrash_cat_debuff) and use_thrash() > 0 and Spell(thrash_cat) or Spell(shred)
 }
 
 AddFunction FeralDefaultCdActions
 {
-	#dash,if=!buff.cat_form.up
-	if not BuffPresent(cat_form_buff) Spell(dash)
+    #run_action_list,name=single_target,if=dot.rip.ticking|time>15
+    if target.DebuffPresent(rip_debuff) or TimeInCombat() > 15 FeralSingleTargetCdActions()
 
-	unless Spell(cat_form) or target.Distance() > 10 and Spell(displacer_beast)
-	{
-		#dash,if=movement.distance&buff.displacer_beast.down&buff.wild_charge_movement.down
-		if target.Distance() and BuffExpires(displacer_beast_buff) and True(wild_charge_movement_down) Spell(dash)
+    unless { target.DebuffPresent(rip_debuff) or TimeInCombat() > 15 } and FeralSingleTargetCdPostConditions() or { not target.DebuffPresent(rake_debuff) or BuffPresent(prowl_buff) } and Spell(rake)
+    {
+        #dash,if=!buff.cat_form.up
+        if not BuffPresent(cat_form_buff) Spell(dash)
 
-		unless { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake)
-		{
-			#skull_bash
-			FeralInterruptActions()
-			#berserk,if=buff.tigers_fury.up
-			if BuffPresent(tigers_fury_buff) Spell(berserk_cat)
-			#incarnation,if=cooldown.tigers_fury.remains<gcd
-			if SpellCooldown(tigers_fury) < GCD() Spell(incarnation_king_of_the_jungle)
-			#use_item,slot=trinket2,if=(buff.tigers_fury.up&(target.time_to_die>trinket.stat.any.cooldown|target.time_to_die<45))|buff.incarnation.remains>20
-			if BuffPresent(tigers_fury_buff) and { target.TimeToDie() > BuffCooldownDuration(trinket_stat_any_buff) or target.TimeToDie() < 45 } or BuffRemaining(incarnation_king_of_the_jungle_buff) > 20 FeralUseItemActions()
-			#potion,name=old_war,if=((buff.berserk.remains>10|buff.incarnation.remains>20)&(target.time_to_die<180|(trinket.proc.all.react&target.health.pct<25)))|target.time_to_die<=40
-			if { { BuffRemaining(berserk_cat_buff) > 10 or BuffRemaining(incarnation_king_of_the_jungle_buff) > 20 } and { target.TimeToDie() < 180 or BuffPresent(trinket_proc_any_buff) and target.HealthPercent() < 25 } or target.TimeToDie() <= 40 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
-			#incarnation,if=energy.time_to_max>1&energy>=35
-			if TimeToMaxEnergy() > 1 and Energy() >= 35 Spell(incarnation_king_of_the_jungle)
-
-			unless target.DebuffPresent(rip_debuff) and target.DebuffRemaining(rip_debuff) < 3 and target.TimeToDie() > 3 and { target.HealthPercent() < 25 or Talent(sabertooth_talent) } and Spell(ferocious_bite) or Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and BuffExpires(bloodtalons_buff) and { ComboPoints() >= 5 or BuffRemaining(predatory_swiftness_buff) < 1.5 or Talent(bloodtalons_talent) and ComboPoints() == 2 and SpellCooldown(ashamanes_frenzy) < GCD() or Talent(elunes_guidance_talent) and { SpellCooldown(elunes_guidance) < GCD() and ComboPoints() == 0 or BuffPresent(elunes_guidance_buff) and ComboPoints() >= 4 } } and Spell(regrowth)
-			{
-				#call_action_list,name=sbt_opener,if=talent.sabertooth.enabled&time<20
-				if Talent(sabertooth_talent) and TimeInCombat() < 20 FeralSbtOpenerCdActions()
-
-				unless Talent(sabertooth_talent) and TimeInCombat() < 20 and FeralSbtOpenerCdPostConditions() or HasEquippedItem(ailuro_pouncers) and Talent(bloodtalons_talent) and BuffStacks(predatory_swiftness_buff) > 1 and BuffExpires(bloodtalons_buff) and Spell(regrowth)
-				{
-					#call_action_list,name=finisher
-					FeralFinisherCdActions()
-
-					unless FeralFinisherCdPostConditions()
-					{
-						#call_action_list,name=generator
-						FeralGeneratorCdActions()
-					}
-				}
-			}
-		}
-	}
+        unless Talent(lunar_inspiration_talent) and not target.DebuffPresent(moonfire_cat_debuff) and Spell(moonfire_cat) or not BuffPresent(savage_roar_buff) and Spell(savage_roar)
+        {
+            #berserk
+            Spell(berserk_cat)
+            #incarnation
+            Spell(incarnation_king_of_the_jungle)
+        }
+    }
 }
 
 AddFunction FeralDefaultCdPostConditions
 {
-	Spell(cat_form) or target.Distance() > 10 and Spell(displacer_beast) or { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake) or target.DebuffPresent(rip_debuff) and target.DebuffRemaining(rip_debuff) < 3 and target.TimeToDie() > 3 and { target.HealthPercent() < 25 or Talent(sabertooth_talent) } and Spell(ferocious_bite) or Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and BuffExpires(bloodtalons_buff) and { ComboPoints() >= 5 or BuffRemaining(predatory_swiftness_buff) < 1.5 or Talent(bloodtalons_talent) and ComboPoints() == 2 and SpellCooldown(ashamanes_frenzy) < GCD() or Talent(elunes_guidance_talent) and { SpellCooldown(elunes_guidance) < GCD() and ComboPoints() == 0 or BuffPresent(elunes_guidance_buff) and ComboPoints() >= 4 } } and Spell(regrowth) or Talent(sabertooth_talent) and TimeInCombat() < 20 and FeralSbtOpenerCdPostConditions() or HasEquippedItem(ailuro_pouncers) and Talent(bloodtalons_talent) and BuffStacks(predatory_swiftness_buff) > 1 and BuffExpires(bloodtalons_buff) and Spell(regrowth) or FeralFinisherCdPostConditions() or FeralGeneratorCdPostConditions()
+    { target.DebuffPresent(rip_debuff) or TimeInCombat() > 15 } and FeralSingleTargetCdPostConditions() or { not target.DebuffPresent(rake_debuff) or BuffPresent(prowl_buff) } and Spell(rake) or Talent(lunar_inspiration_talent) and not target.DebuffPresent(moonfire_cat_debuff) and Spell(moonfire_cat) or not BuffPresent(savage_roar_buff) and Spell(savage_roar) or Spell(ashamanes_frenzy) or { Talent(sabertooth_talent) or BuffPresent(predatory_swiftness_buff) } and Talent(bloodtalons_talent) and BuffExpires(bloodtalons_buff) and ComboPoints() == 5 and Spell(regrowth) or ComboPoints() == 5 and Spell(rip) or not target.DebuffPresent(thrash_cat_debuff) and use_thrash() > 0 and Spell(thrash_cat) or Spell(shred)
 }
 
-### actions.finisher
+### actions.cooldowns
 
-AddFunction FeralFinisherMainActions
-{
-	#pool_resource,for_next=1
-	#savage_roar,if=!buff.savage_roar.up&(combo_points=5|(talent.brutal_slash.enabled&spell_targets.brutal_slash>desired_targets&action.brutal_slash.charges>0))
-	if not BuffPresent(savage_roar_buff) and { ComboPoints() == 5 or Talent(brutal_slash_talent) and Enemies() > Enemies(tagged=1) and Charges(brutal_slash) > 0 } Spell(savage_roar)
-	unless not BuffPresent(savage_roar_buff) and { ComboPoints() == 5 or Talent(brutal_slash_talent) and Enemies() > Enemies(tagged=1) and Charges(brutal_slash) > 0 } and SpellUsable(savage_roar) and SpellCooldown(savage_roar) < TimeToEnergyFor(savage_roar)
-	{
-		#pool_resource,for_next=1
-		#thrash_cat,cycle_targets=1,if=remains<=duration*0.3&spell_targets.thrash_cat>=5
-		if target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and Enemies() >= 5 Spell(thrash_cat)
-		unless target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and Enemies() >= 5 and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat)
-		{
-			#pool_resource,for_next=1
-			#swipe_cat,if=spell_targets.swipe_cat>=8
-			if Enemies() >= 8 Spell(swipe_cat)
-			unless Enemies() >= 8 and SpellUsable(swipe_cat) and SpellCooldown(swipe_cat) < TimeToEnergyFor(swipe_cat)
-			{
-				#rip,cycle_targets=1,if=(!ticking|(remains<8&target.health.pct>25&!talent.sabertooth.enabled)|persistent_multiplier>dot.rip.pmultiplier)&target.time_to_die-remains>tick_time*4&combo_points=5&(energy.time_to_max<1|buff.berserk.up|buff.incarnation.up|buff.elunes_guidance.up|cooldown.tigers_fury.remains<3|set_bonus.tier18_4pc|(buff.clearcasting.react&energy>65)|talent.soul_of_the_forest.enabled|!dot.rip.ticking|(dot.rake.remains<1.5&spell_targets.swipe_cat<6))
-				if { not target.DebuffPresent(rip_debuff) or target.DebuffRemaining(rip_debuff) < 8 and target.HealthPercent() > 25 and not Talent(sabertooth_talent) or PersistentMultiplier(rip_debuff) > target.DebuffPersistentMultiplier(rip_debuff) } and target.TimeToDie() - target.DebuffRemaining(rip_debuff) > target.TickTime(rip_debuff) * 4 and ComboPoints() == 5 and { TimeToMaxEnergy() < 1 or BuffPresent(berserk_cat_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) or BuffPresent(elunes_guidance_buff) or SpellCooldown(tigers_fury) < 3 or ArmorSetBonus(T18 4) or BuffPresent(clearcasting_buff) and Energy() > 65 or Talent(soul_of_the_forest_talent) or not target.DebuffPresent(rip_debuff) or target.DebuffRemaining(rake_debuff) < 1.5 and Enemies() < 6 } Spell(rip)
-				#savage_roar,if=((buff.savage_roar.remains<=10.5&talent.jagged_wounds.enabled)|(buff.savage_roar.remains<=7.2))&combo_points=5&(energy.time_to_max<1|buff.berserk.up|buff.incarnation.up|buff.elunes_guidance.up|cooldown.tigers_fury.remains<3|set_bonus.tier18_4pc|(buff.clearcasting.react&energy>65)|talent.soul_of_the_forest.enabled|!dot.rip.ticking|(dot.rake.remains<1.5&spell_targets.swipe_cat<6))
-				if { BuffRemaining(savage_roar_buff) <= 10.5 and Talent(jagged_wounds_talent) or BuffRemaining(savage_roar_buff) <= 7.2 } and ComboPoints() == 5 and { TimeToMaxEnergy() < 1 or BuffPresent(berserk_cat_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) or BuffPresent(elunes_guidance_buff) or SpellCooldown(tigers_fury) < 3 or ArmorSetBonus(T18 4) or BuffPresent(clearcasting_buff) and Energy() > 65 or Talent(soul_of_the_forest_talent) or not target.DebuffPresent(rip_debuff) or target.DebuffRemaining(rake_debuff) < 1.5 and Enemies() < 6 } Spell(savage_roar)
-				#swipe_cat,if=combo_points=5&(spell_targets.swipe_cat>=6|(spell_targets.swipe_cat>=3&!talent.bloodtalons.enabled))&combo_points=5&(energy.time_to_max<1|buff.berserk.up|buff.incarnation.up|buff.elunes_guidance.up|cooldown.tigers_fury.remains<3|set_bonus.tier18_4pc|(talent.moment_of_clarity.enabled&buff.clearcasting.react))
-				if ComboPoints() == 5 and { Enemies() >= 6 or Enemies() >= 3 and not Talent(bloodtalons_talent) } and ComboPoints() == 5 and { TimeToMaxEnergy() < 1 or BuffPresent(berserk_cat_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) or BuffPresent(elunes_guidance_buff) or SpellCooldown(tigers_fury) < 3 or ArmorSetBonus(T18 4) or Talent(moment_of_clarity_talent) and BuffPresent(clearcasting_buff) } Spell(swipe_cat)
-				#maim,,if=combo_points=5&buff.fiery_red_maimers.up&(energy.time_to_max<1|buff.berserk.up|buff.incarnation.up|buff.elunes_guidance.up|cooldown.tigers_fury.remains<3)
-				if ComboPoints() == 5 and BuffPresent(fiery_red_maimers_buff) and { TimeToMaxEnergy() < 1 or BuffPresent(berserk_cat_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) or BuffPresent(elunes_guidance_buff) or SpellCooldown(tigers_fury) < 3 } Spell(maim)
-				#ferocious_bite,max_energy=1,cycle_targets=1,if=combo_points=5&(energy.time_to_max<1|buff.berserk.up|buff.incarnation.up|buff.elunes_guidance.up|cooldown.tigers_fury.remains<3)
-				if Energy() >= EnergyCost(ferocious_bite max=1) and ComboPoints() == 5 and { TimeToMaxEnergy() < 1 or BuffPresent(berserk_cat_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) or BuffPresent(elunes_guidance_buff) or SpellCooldown(tigers_fury) < 3 } Spell(ferocious_bite)
-			}
-		}
-	}
-}
-
-AddFunction FeralFinisherMainPostConditions
+AddFunction FeralCooldownsMainActions
 {
 }
 
-AddFunction FeralFinisherShortCdActions
+AddFunction FeralCooldownsMainPostConditions
 {
 }
 
-AddFunction FeralFinisherShortCdPostConditions
+AddFunction FeralCooldownsShortCdActions
 {
-	not BuffPresent(savage_roar_buff) and { ComboPoints() == 5 or Talent(brutal_slash_talent) and Enemies() > Enemies(tagged=1) and Charges(brutal_slash) > 0 } and Spell(savage_roar) or not { not BuffPresent(savage_roar_buff) and { ComboPoints() == 5 or Talent(brutal_slash_talent) and Enemies() > Enemies(tagged=1) and Charges(brutal_slash) > 0 } and SpellUsable(savage_roar) and SpellCooldown(savage_roar) < TimeToEnergyFor(savage_roar) } and { target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and Enemies() >= 5 and Spell(thrash_cat) or not { target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and Enemies() >= 5 and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat) } and { Enemies() >= 8 and Spell(swipe_cat) or not { Enemies() >= 8 and SpellUsable(swipe_cat) and SpellCooldown(swipe_cat) < TimeToEnergyFor(swipe_cat) } and { { not target.DebuffPresent(rip_debuff) or target.DebuffRemaining(rip_debuff) < 8 and target.HealthPercent() > 25 and not Talent(sabertooth_talent) or PersistentMultiplier(rip_debuff) > target.DebuffPersistentMultiplier(rip_debuff) } and target.TimeToDie() - target.DebuffRemaining(rip_debuff) > target.TickTime(rip_debuff) * 4 and ComboPoints() == 5 and { TimeToMaxEnergy() < 1 or BuffPresent(berserk_cat_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) or BuffPresent(elunes_guidance_buff) or SpellCooldown(tigers_fury) < 3 or ArmorSetBonus(T18 4) or BuffPresent(clearcasting_buff) and Energy() > 65 or Talent(soul_of_the_forest_talent) or not target.DebuffPresent(rip_debuff) or target.DebuffRemaining(rake_debuff) < 1.5 and Enemies() < 6 } and Spell(rip) or { BuffRemaining(savage_roar_buff) <= 10.5 and Talent(jagged_wounds_talent) or BuffRemaining(savage_roar_buff) <= 7.2 } and ComboPoints() == 5 and { TimeToMaxEnergy() < 1 or BuffPresent(berserk_cat_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) or BuffPresent(elunes_guidance_buff) or SpellCooldown(tigers_fury) < 3 or ArmorSetBonus(T18 4) or BuffPresent(clearcasting_buff) and Energy() > 65 or Talent(soul_of_the_forest_talent) or not target.DebuffPresent(rip_debuff) or target.DebuffRemaining(rake_debuff) < 1.5 and Enemies() < 6 } and Spell(savage_roar) or ComboPoints() == 5 and { Enemies() >= 6 or Enemies() >= 3 and not Talent(bloodtalons_talent) } and ComboPoints() == 5 and { TimeToMaxEnergy() < 1 or BuffPresent(berserk_cat_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) or BuffPresent(elunes_guidance_buff) or SpellCooldown(tigers_fury) < 3 or ArmorSetBonus(T18 4) or Talent(moment_of_clarity_talent) and BuffPresent(clearcasting_buff) } and Spell(swipe_cat) or ComboPoints() == 5 and BuffPresent(fiery_red_maimers_buff) and { TimeToMaxEnergy() < 1 or BuffPresent(berserk_cat_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) or BuffPresent(elunes_guidance_buff) or SpellCooldown(tigers_fury) < 3 } and Spell(maim) or Energy() >= EnergyCost(ferocious_bite max=1) and ComboPoints() == 5 and { TimeToMaxEnergy() < 1 or BuffPresent(berserk_cat_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) or BuffPresent(elunes_guidance_buff) or SpellCooldown(tigers_fury) < 3 } and Spell(ferocious_bite) } } }
+    #tigers_fury,if=energy.deficit>=60
+    if EnergyDeficit() >= 60 Spell(tigers_fury)
+    #elunes_guidance,if=combo_points=0&energy>=50
+    if ComboPoints() == 0 and Energy() >= 50 Spell(elunes_guidance)
+    #ashamanes_frenzy,if=combo_points>=2&(!talent.bloodtalons.enabled|buff.bloodtalons.up)
+    if ComboPoints() >= 2 and { not Talent(bloodtalons_talent) or BuffPresent(bloodtalons_buff) } Spell(ashamanes_frenzy)
 }
 
-AddFunction FeralFinisherCdActions
-{
-}
-
-AddFunction FeralFinisherCdPostConditions
-{
-	not BuffPresent(savage_roar_buff) and { ComboPoints() == 5 or Talent(brutal_slash_talent) and Enemies() > Enemies(tagged=1) and Charges(brutal_slash) > 0 } and Spell(savage_roar) or not { not BuffPresent(savage_roar_buff) and { ComboPoints() == 5 or Talent(brutal_slash_talent) and Enemies() > Enemies(tagged=1) and Charges(brutal_slash) > 0 } and SpellUsable(savage_roar) and SpellCooldown(savage_roar) < TimeToEnergyFor(savage_roar) } and { target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and Enemies() >= 5 and Spell(thrash_cat) or not { target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and Enemies() >= 5 and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat) } and { Enemies() >= 8 and Spell(swipe_cat) or not { Enemies() >= 8 and SpellUsable(swipe_cat) and SpellCooldown(swipe_cat) < TimeToEnergyFor(swipe_cat) } and { { not target.DebuffPresent(rip_debuff) or target.DebuffRemaining(rip_debuff) < 8 and target.HealthPercent() > 25 and not Talent(sabertooth_talent) or PersistentMultiplier(rip_debuff) > target.DebuffPersistentMultiplier(rip_debuff) } and target.TimeToDie() - target.DebuffRemaining(rip_debuff) > target.TickTime(rip_debuff) * 4 and ComboPoints() == 5 and { TimeToMaxEnergy() < 1 or BuffPresent(berserk_cat_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) or BuffPresent(elunes_guidance_buff) or SpellCooldown(tigers_fury) < 3 or ArmorSetBonus(T18 4) or BuffPresent(clearcasting_buff) and Energy() > 65 or Talent(soul_of_the_forest_talent) or not target.DebuffPresent(rip_debuff) or target.DebuffRemaining(rake_debuff) < 1.5 and Enemies() < 6 } and Spell(rip) or { BuffRemaining(savage_roar_buff) <= 10.5 and Talent(jagged_wounds_talent) or BuffRemaining(savage_roar_buff) <= 7.2 } and ComboPoints() == 5 and { TimeToMaxEnergy() < 1 or BuffPresent(berserk_cat_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) or BuffPresent(elunes_guidance_buff) or SpellCooldown(tigers_fury) < 3 or ArmorSetBonus(T18 4) or BuffPresent(clearcasting_buff) and Energy() > 65 or Talent(soul_of_the_forest_talent) or not target.DebuffPresent(rip_debuff) or target.DebuffRemaining(rake_debuff) < 1.5 and Enemies() < 6 } and Spell(savage_roar) or ComboPoints() == 5 and { Enemies() >= 6 or Enemies() >= 3 and not Talent(bloodtalons_talent) } and ComboPoints() == 5 and { TimeToMaxEnergy() < 1 or BuffPresent(berserk_cat_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) or BuffPresent(elunes_guidance_buff) or SpellCooldown(tigers_fury) < 3 or ArmorSetBonus(T18 4) or Talent(moment_of_clarity_talent) and BuffPresent(clearcasting_buff) } and Spell(swipe_cat) or ComboPoints() == 5 and BuffPresent(fiery_red_maimers_buff) and { TimeToMaxEnergy() < 1 or BuffPresent(berserk_cat_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) or BuffPresent(elunes_guidance_buff) or SpellCooldown(tigers_fury) < 3 } and Spell(maim) or Energy() >= EnergyCost(ferocious_bite max=1) and ComboPoints() == 5 and { TimeToMaxEnergy() < 1 or BuffPresent(berserk_cat_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) or BuffPresent(elunes_guidance_buff) or SpellCooldown(tigers_fury) < 3 } and Spell(ferocious_bite) } } }
-}
-
-### actions.generator
-
-AddFunction FeralGeneratorMainActions
-{
-	#brutal_slash,if=spell_targets.brutal_slash>desired_targets&combo_points<5
-	if Enemies() > Enemies(tagged=1) and ComboPoints() < 5 Spell(brutal_slash)
-	#pool_resource,if=talent.elunes_guidance.enabled&combo_points=0&energy<action.ferocious_bite.cost+25-energy.regen*cooldown.elunes_guidance.remains
-	unless Talent(elunes_guidance_talent) and ComboPoints() == 0 and Energy() < PowerCost(ferocious_bite) + 25 - EnergyRegenRate() * SpellCooldown(elunes_guidance)
-	{
-		#pool_resource,for_next=1
-		#thrash_cat,if=talent.brutal_slash.enabled&spell_targets.thrash_cat>=9
-		if Talent(brutal_slash_talent) and Enemies() >= 9 Spell(thrash_cat)
-		unless Talent(brutal_slash_talent) and Enemies() >= 9 and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat)
-		{
-			#pool_resource,for_next=1
-			#swipe_cat,if=spell_targets.swipe_cat>=6
-			if Enemies() >= 6 Spell(swipe_cat)
-			unless Enemies() >= 6 and SpellUsable(swipe_cat) and SpellCooldown(swipe_cat) < TimeToEnergyFor(swipe_cat)
-			{
-				#pool_resource,for_next=1
-				#rake,cycle_targets=1,if=combo_points<5&(!ticking|(!talent.bloodtalons.enabled&remains<duration*0.3)|(talent.bloodtalons.enabled&buff.bloodtalons.up&(!talent.soul_of_the_forest.enabled&remains<=7|remains<=5)&persistent_multiplier>dot.rake.pmultiplier*0.80))&target.time_to_die-remains>tick_time
-				if ComboPoints() < 5 and { not target.DebuffPresent(rake_debuff) or not Talent(bloodtalons_talent) and target.DebuffRemaining(rake_debuff) < BaseDuration(rake_debuff) * 0.3 or Talent(bloodtalons_talent) and BuffPresent(bloodtalons_buff) and { not Talent(soul_of_the_forest_talent) and target.DebuffRemaining(rake_debuff) <= 7 or target.DebuffRemaining(rake_debuff) <= 5 } and PersistentMultiplier(rake_debuff) > target.DebuffPersistentMultiplier(rake_debuff) * 0.8 } and target.TimeToDie() - target.DebuffRemaining(rake_debuff) > target.TickTime(rake_debuff) Spell(rake)
-				unless ComboPoints() < 5 and { not target.DebuffPresent(rake_debuff) or not Talent(bloodtalons_talent) and target.DebuffRemaining(rake_debuff) < BaseDuration(rake_debuff) * 0.3 or Talent(bloodtalons_talent) and BuffPresent(bloodtalons_buff) and { not Talent(soul_of_the_forest_talent) and target.DebuffRemaining(rake_debuff) <= 7 or target.DebuffRemaining(rake_debuff) <= 5 } and PersistentMultiplier(rake_debuff) > target.DebuffPersistentMultiplier(rake_debuff) * 0.8 } and target.TimeToDie() - target.DebuffRemaining(rake_debuff) > target.TickTime(rake_debuff) and SpellUsable(rake) and SpellCooldown(rake) < TimeToEnergyFor(rake)
-				{
-					#moonfire_cat,cycle_targets=1,if=combo_points<5&remains<=4.2&target.time_to_die-remains>tick_time*2
-					if ComboPoints() < 5 and target.DebuffRemaining(moonfire_cat_debuff) <= 4.2 and target.TimeToDie() - target.DebuffRemaining(moonfire_cat_debuff) > target.TickTime(moonfire_cat_debuff) * 2 Spell(moonfire_cat)
-					#pool_resource,for_next=1
-					#thrash_cat,cycle_targets=1,if=remains<=duration*0.3&spell_targets.swipe_cat>=2
-					if target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and Enemies() >= 2 Spell(thrash_cat)
-					unless target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and Enemies() >= 2 and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat)
-					{
-						#brutal_slash,if=combo_points<5&((raid_event.adds.exists&raid_event.adds.in>(1+max_charges-charges_fractional)*15)|(!raid_event.adds.exists&(charges_fractional>2.66&time>10)))
-						if ComboPoints() < 5 and { False(raid_event_adds_exists) and 600 > { 1 + SpellMaxCharges(brutal_slash) - Charges(brutal_slash count=0) } * 15 or not False(raid_event_adds_exists) and Charges(brutal_slash count=0) > 2.66 and TimeInCombat() > 10 } Spell(brutal_slash)
-						#swipe_cat,if=combo_points<5&spell_targets.swipe_cat>=3
-						if ComboPoints() < 5 and Enemies() >= 3 Spell(swipe_cat)
-						#shred,if=combo_points<5&(spell_targets.swipe_cat<3|talent.brutal_slash.enabled)
-						if ComboPoints() < 5 and { Enemies() < 3 or Talent(brutal_slash_talent) } Spell(shred)
-					}
-				}
-			}
-		}
-	}
-}
-
-AddFunction FeralGeneratorMainPostConditions
+AddFunction FeralCooldownsShortCdPostConditions
 {
 }
 
-AddFunction FeralGeneratorShortCdActions
+AddFunction FeralCooldownsCdActions
 {
-	unless Enemies() > Enemies(tagged=1) and ComboPoints() < 5 and Spell(brutal_slash)
-	{
-		#ashamanes_frenzy,if=combo_points<=2&buff.elunes_guidance.down&(buff.bloodtalons.up|!talent.bloodtalons.enabled)&(buff.savage_roar.up|!talent.savage_roar.enabled)
-		if ComboPoints() <= 2 and BuffExpires(elunes_guidance_buff) and { BuffPresent(bloodtalons_buff) or not Talent(bloodtalons_talent) } and { BuffPresent(savage_roar_buff) or not Talent(savage_roar_talent) } Spell(ashamanes_frenzy)
-		#pool_resource,if=talent.elunes_guidance.enabled&combo_points=0&energy<action.ferocious_bite.cost+25-energy.regen*cooldown.elunes_guidance.remains
-		unless Talent(elunes_guidance_talent) and ComboPoints() == 0 and Energy() < PowerCost(ferocious_bite) + 25 - EnergyRegenRate() * SpellCooldown(elunes_guidance)
-		{
-			#elunes_guidance,if=talent.elunes_guidance.enabled&combo_points=0&energy>=action.ferocious_bite.cost+25
-			if Talent(elunes_guidance_talent) and ComboPoints() == 0 and Energy() >= PowerCost(ferocious_bite) + 25 Spell(elunes_guidance)
-		}
-	}
+    #dash,if=!buff.cat_form.up
+    if not BuffPresent(cat_form_buff) Spell(dash)
+    #berserk,if=energy>=30&(cooldown.tigers_fury.remains>5|buff.tigers_fury.up)
+    if Energy() >= 30 and { SpellCooldown(tigers_fury) > 5 or BuffPresent(tigers_fury_buff) } Spell(berserk_cat)
+
+    unless ComboPoints() == 0 and Energy() >= 50 and Spell(elunes_guidance)
+    {
+        #incarnation,if=energy>=30&(cooldown.tigers_fury.remains>15|buff.tigers_fury.up)
+        if Energy() >= 30 and { SpellCooldown(tigers_fury) > 15 or BuffPresent(tigers_fury_buff) } Spell(incarnation_king_of_the_jungle)
+        #potion,name=prolonged_power,if=target.time_to_die<65|(time_to_die<180&(buff.berserk.up|buff.incarnation.up))
+        if { target.TimeToDie() < 65 or target.TimeToDie() < 180 and { BuffPresent(berserk_cat_buff) or BuffPresent(incarnation_king_of_the_jungle_buff) } } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
+
+        unless ComboPoints() >= 2 and { not Talent(bloodtalons_talent) or BuffPresent(bloodtalons_buff) } and Spell(ashamanes_frenzy)
+        {
+            #shadowmeld,if=combo_points<5&energy>=action.rake.cost&dot.rake.pmultiplier<2.1&buff.tigers_fury.up&(buff.bloodtalons.up|!talent.bloodtalons.enabled)&(!talent.incarnation.enabled|cooldown.incarnation.remains>18)&!buff.incarnation.up
+            if ComboPoints() < 5 and Energy() >= PowerCost(rake) and target.DebuffPersistentMultiplier(rake_debuff) < 2.1 and BuffPresent(tigers_fury_buff) and { BuffPresent(bloodtalons_buff) or not Talent(bloodtalons_talent) } and { not Talent(incarnation_talent) or SpellCooldown(incarnation_king_of_the_jungle) > 18 } and not BuffPresent(incarnation_king_of_the_jungle_buff) Spell(shadowmeld)
+            #use_items
+            FeralUseItemActions()
+        }
+    }
 }
 
-AddFunction FeralGeneratorShortCdPostConditions
+AddFunction FeralCooldownsCdPostConditions
 {
-	Enemies() > Enemies(tagged=1) and ComboPoints() < 5 and Spell(brutal_slash) or not { Talent(elunes_guidance_talent) and ComboPoints() == 0 and Energy() < PowerCost(ferocious_bite) + 25 - EnergyRegenRate() * SpellCooldown(elunes_guidance) } and { Talent(brutal_slash_talent) and Enemies() >= 9 and Spell(thrash_cat) or not { Talent(brutal_slash_talent) and Enemies() >= 9 and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat) } and { Enemies() >= 6 and Spell(swipe_cat) or not { Enemies() >= 6 and SpellUsable(swipe_cat) and SpellCooldown(swipe_cat) < TimeToEnergyFor(swipe_cat) } and { ComboPoints() < 5 and { not target.DebuffPresent(rake_debuff) or not Talent(bloodtalons_talent) and target.DebuffRemaining(rake_debuff) < BaseDuration(rake_debuff) * 0.3 or Talent(bloodtalons_talent) and BuffPresent(bloodtalons_buff) and { not Talent(soul_of_the_forest_talent) and target.DebuffRemaining(rake_debuff) <= 7 or target.DebuffRemaining(rake_debuff) <= 5 } and PersistentMultiplier(rake_debuff) > target.DebuffPersistentMultiplier(rake_debuff) * 0.8 } and target.TimeToDie() - target.DebuffRemaining(rake_debuff) > target.TickTime(rake_debuff) and Spell(rake) or not { ComboPoints() < 5 and { not target.DebuffPresent(rake_debuff) or not Talent(bloodtalons_talent) and target.DebuffRemaining(rake_debuff) < BaseDuration(rake_debuff) * 0.3 or Talent(bloodtalons_talent) and BuffPresent(bloodtalons_buff) and { not Talent(soul_of_the_forest_talent) and target.DebuffRemaining(rake_debuff) <= 7 or target.DebuffRemaining(rake_debuff) <= 5 } and PersistentMultiplier(rake_debuff) > target.DebuffPersistentMultiplier(rake_debuff) * 0.8 } and target.TimeToDie() - target.DebuffRemaining(rake_debuff) > target.TickTime(rake_debuff) and SpellUsable(rake) and SpellCooldown(rake) < TimeToEnergyFor(rake) } and { ComboPoints() < 5 and target.DebuffRemaining(moonfire_cat_debuff) <= 4.2 and target.TimeToDie() - target.DebuffRemaining(moonfire_cat_debuff) > target.TickTime(moonfire_cat_debuff) * 2 and Spell(moonfire_cat) or target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and Enemies() >= 2 and Spell(thrash_cat) or not { target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and Enemies() >= 2 and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat) } and { ComboPoints() < 5 and { False(raid_event_adds_exists) and 600 > { 1 + SpellMaxCharges(brutal_slash) - Charges(brutal_slash count=0) } * 15 or not False(raid_event_adds_exists) and Charges(brutal_slash count=0) > 2.66 and TimeInCombat() > 10 } and Spell(brutal_slash) or ComboPoints() < 5 and Enemies() >= 3 and Spell(swipe_cat) or ComboPoints() < 5 and { Enemies() < 3 or Talent(brutal_slash_talent) } and Spell(shred) } } } } }
-}
-
-AddFunction FeralGeneratorCdActions
-{
-	unless Enemies() > Enemies(tagged=1) and ComboPoints() < 5 and Spell(brutal_slash) or ComboPoints() <= 2 and BuffExpires(elunes_guidance_buff) and { BuffPresent(bloodtalons_buff) or not Talent(bloodtalons_talent) } and { BuffPresent(savage_roar_buff) or not Talent(savage_roar_talent) } and Spell(ashamanes_frenzy)
-	{
-		#pool_resource,if=talent.elunes_guidance.enabled&combo_points=0&energy<action.ferocious_bite.cost+25-energy.regen*cooldown.elunes_guidance.remains
-		unless Talent(elunes_guidance_talent) and ComboPoints() == 0 and Energy() < PowerCost(ferocious_bite) + 25 - EnergyRegenRate() * SpellCooldown(elunes_guidance)
-		{
-			unless Talent(elunes_guidance_talent) and ComboPoints() == 0 and Energy() >= PowerCost(ferocious_bite) + 25 and Spell(elunes_guidance)
-			{
-				#pool_resource,for_next=1
-				#thrash_cat,if=talent.brutal_slash.enabled&spell_targets.thrash_cat>=9
-				unless Talent(brutal_slash_talent) and Enemies() >= 9 and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat)
-				{
-					#pool_resource,for_next=1
-					#swipe_cat,if=spell_targets.swipe_cat>=6
-					unless Enemies() >= 6 and SpellUsable(swipe_cat) and SpellCooldown(swipe_cat) < TimeToEnergyFor(swipe_cat)
-					{
-						#shadowmeld,if=combo_points<5&energy>=action.rake.cost&dot.rake.pmultiplier<2.1&buff.tigers_fury.up&(buff.bloodtalons.up|!talent.bloodtalons.enabled)&(!talent.incarnation.enabled|cooldown.incarnation.remains>18)&!buff.incarnation.up
-						if ComboPoints() < 5 and Energy() >= PowerCost(rake) and target.DebuffPersistentMultiplier(rake_debuff) < 2.1 and BuffPresent(tigers_fury_buff) and { BuffPresent(bloodtalons_buff) or not Talent(bloodtalons_talent) } and { not Talent(incarnation_talent) or SpellCooldown(incarnation_king_of_the_jungle) > 18 } and not BuffPresent(incarnation_king_of_the_jungle_buff) Spell(shadowmeld)
-					}
-				}
-			}
-		}
-	}
-}
-
-AddFunction FeralGeneratorCdPostConditions
-{
-	Enemies() > Enemies(tagged=1) and ComboPoints() < 5 and Spell(brutal_slash) or ComboPoints() <= 2 and BuffExpires(elunes_guidance_buff) and { BuffPresent(bloodtalons_buff) or not Talent(bloodtalons_talent) } and { BuffPresent(savage_roar_buff) or not Talent(savage_roar_talent) } and Spell(ashamanes_frenzy) or not { Talent(elunes_guidance_talent) and ComboPoints() == 0 and Energy() < PowerCost(ferocious_bite) + 25 - EnergyRegenRate() * SpellCooldown(elunes_guidance) } and { Talent(elunes_guidance_talent) and ComboPoints() == 0 and Energy() >= PowerCost(ferocious_bite) + 25 and Spell(elunes_guidance) or not { Talent(brutal_slash_talent) and Enemies() >= 9 and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat) } and not { Enemies() >= 6 and SpellUsable(swipe_cat) and SpellCooldown(swipe_cat) < TimeToEnergyFor(swipe_cat) } and { ComboPoints() < 5 and { not target.DebuffPresent(rake_debuff) or not Talent(bloodtalons_talent) and target.DebuffRemaining(rake_debuff) < BaseDuration(rake_debuff) * 0.3 or Talent(bloodtalons_talent) and BuffPresent(bloodtalons_buff) and { not Talent(soul_of_the_forest_talent) and target.DebuffRemaining(rake_debuff) <= 7 or target.DebuffRemaining(rake_debuff) <= 5 } and PersistentMultiplier(rake_debuff) > target.DebuffPersistentMultiplier(rake_debuff) * 0.8 } and target.TimeToDie() - target.DebuffRemaining(rake_debuff) > target.TickTime(rake_debuff) and Spell(rake) or not { ComboPoints() < 5 and { not target.DebuffPresent(rake_debuff) or not Talent(bloodtalons_talent) and target.DebuffRemaining(rake_debuff) < BaseDuration(rake_debuff) * 0.3 or Talent(bloodtalons_talent) and BuffPresent(bloodtalons_buff) and { not Talent(soul_of_the_forest_talent) and target.DebuffRemaining(rake_debuff) <= 7 or target.DebuffRemaining(rake_debuff) <= 5 } and PersistentMultiplier(rake_debuff) > target.DebuffPersistentMultiplier(rake_debuff) * 0.8 } and target.TimeToDie() - target.DebuffRemaining(rake_debuff) > target.TickTime(rake_debuff) and SpellUsable(rake) and SpellCooldown(rake) < TimeToEnergyFor(rake) } and { ComboPoints() < 5 and target.DebuffRemaining(moonfire_cat_debuff) <= 4.2 and target.TimeToDie() - target.DebuffRemaining(moonfire_cat_debuff) > target.TickTime(moonfire_cat_debuff) * 2 and Spell(moonfire_cat) or target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and Enemies() >= 2 and Spell(thrash_cat) or not { target.DebuffRemaining(thrash_cat_debuff) <= BaseDuration(thrash_cat_debuff) * 0.3 and Enemies() >= 2 and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat) } and { ComboPoints() < 5 and { False(raid_event_adds_exists) and 600 > { 1 + SpellMaxCharges(brutal_slash) - Charges(brutal_slash count=0) } * 15 or not False(raid_event_adds_exists) and Charges(brutal_slash count=0) > 2.66 and TimeInCombat() > 10 } and Spell(brutal_slash) or ComboPoints() < 5 and Enemies() >= 3 and Spell(swipe_cat) or ComboPoints() < 5 and { Enemies() < 3 or Talent(brutal_slash_talent) } and Spell(shred) } } } }
+    ComboPoints() == 0 and Energy() >= 50 and Spell(elunes_guidance) or ComboPoints() >= 2 and { not Talent(bloodtalons_talent) or BuffPresent(bloodtalons_buff) } and Spell(ashamanes_frenzy)
 }
 
 ### actions.precombat
 
 AddFunction FeralPrecombatMainActions
 {
-	#flask,type=flask_of_the_seventh_demon
-	#food,type=nightborne_delicacy_platter
-	#augmentation,type=defiled
-	#regrowth,if=talent.bloodtalons.enabled
-	if Talent(bloodtalons_talent) Spell(regrowth)
-	#cat_form
-	Spell(cat_form)
+    #flask
+    #food
+    #augmentation
+    #regrowth,if=talent.bloodtalons.enabled
+    if Talent(bloodtalons_talent) Spell(regrowth)
+    #variable,name=use_thrash,value=0
+    #variable,name=use_thrash,value=1,if=equipped.luffa_wrappings
+    #cat_form
+    Spell(cat_form)
 }
 
 AddFunction FeralPrecombatMainPostConditions
@@ -1061,66 +908,244 @@ AddFunction FeralPrecombatMainPostConditions
 
 AddFunction FeralPrecombatShortCdActions
 {
-	unless Talent(bloodtalons_talent) and Spell(regrowth) or Spell(cat_form)
-	{
-		#prowl
-		Spell(prowl)
-	}
+    unless Talent(bloodtalons_talent) and Spell(regrowth) or Spell(cat_form)
+    {
+        #prowl
+        Spell(prowl)
+    }
 }
 
 AddFunction FeralPrecombatShortCdPostConditions
 {
-	Talent(bloodtalons_talent) and Spell(regrowth) or Spell(cat_form)
+    Talent(bloodtalons_talent) and Spell(regrowth) or Spell(cat_form)
 }
 
 AddFunction FeralPrecombatCdActions
 {
-	unless Talent(bloodtalons_talent) and Spell(regrowth) or Spell(cat_form)
-	{
-		#snapshot_stats
-		#potion,name=old_war
-		if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
-	}
+    unless Talent(bloodtalons_talent) and Spell(regrowth) or Spell(cat_form)
+    {
+        #snapshot_stats
+        #potion
+        if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
+    }
 }
 
 AddFunction FeralPrecombatCdPostConditions
 {
-	Talent(bloodtalons_talent) and Spell(regrowth) or Spell(cat_form)
+    Talent(bloodtalons_talent) and Spell(regrowth) or Spell(cat_form)
 }
 
-### actions.sbt_opener
+### actions.single_target
 
-AddFunction FeralSbtOpenerMainActions
+AddFunction FeralSingleTargetMainActions
 {
-	#regrowth,if=talent.bloodtalons.enabled&combo_points=5&!buff.bloodtalons.up&!dot.rip.ticking
-	if Talent(bloodtalons_talent) and ComboPoints() == 5 and not BuffPresent(bloodtalons_buff) and not target.DebuffPresent(rip_debuff) Spell(regrowth)
+    #cat_form,if=!buff.cat_form.up
+    if not BuffPresent(cat_form_buff) Spell(cat_form)
+    #rake,if=buff.prowl.up|buff.shadowmeld.up
+    if BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) Spell(rake)
+    #call_action_list,name=cooldowns
+    FeralCooldownsMainActions()
+
+    unless FeralCooldownsMainPostConditions()
+    {
+        #regrowth,if=combo_points=5&talent.bloodtalons.enabled&buff.bloodtalons.down&(!buff.incarnation.up|dot.rip.remains<8|dot.rake.remains<5)
+        if ComboPoints() == 5 and Talent(bloodtalons_talent) and BuffExpires(bloodtalons_buff) and { not BuffPresent(incarnation_king_of_the_jungle_buff) or target.DebuffRemaining(rip_debuff) < 8 or target.DebuffRemaining(rake_debuff) < 5 } Spell(regrowth)
+        #run_action_list,name=st_finishers,if=combo_points>4
+        if ComboPoints() > 4 FeralStFinishersMainActions()
+
+        unless ComboPoints() > 4 and FeralStFinishersMainPostConditions()
+        {
+            #run_action_list,name=st_generators
+            FeralStGeneratorsMainActions()
+        }
+    }
 }
 
-AddFunction FeralSbtOpenerMainPostConditions
+AddFunction FeralSingleTargetMainPostConditions
+{
+    FeralCooldownsMainPostConditions() or ComboPoints() > 4 and FeralStFinishersMainPostConditions() or FeralStGeneratorsMainPostConditions()
+}
+
+AddFunction FeralSingleTargetShortCdActions
+{
+    unless not BuffPresent(cat_form_buff) and Spell(cat_form)
+    {
+        #auto_attack
+        FeralGetInMeleeRange()
+
+        unless { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake)
+        {
+            #call_action_list,name=cooldowns
+            FeralCooldownsShortCdActions()
+
+            unless FeralCooldownsShortCdPostConditions() or ComboPoints() == 5 and Talent(bloodtalons_talent) and BuffExpires(bloodtalons_buff) and { not BuffPresent(incarnation_king_of_the_jungle_buff) or target.DebuffRemaining(rip_debuff) < 8 or target.DebuffRemaining(rake_debuff) < 5 } and Spell(regrowth)
+            {
+                #run_action_list,name=st_finishers,if=combo_points>4
+                if ComboPoints() > 4 FeralStFinishersShortCdActions()
+
+                unless ComboPoints() > 4 and FeralStFinishersShortCdPostConditions()
+                {
+                    #run_action_list,name=st_generators
+                    FeralStGeneratorsShortCdActions()
+                }
+            }
+        }
+    }
+}
+
+AddFunction FeralSingleTargetShortCdPostConditions
+{
+    not BuffPresent(cat_form_buff) and Spell(cat_form) or { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake) or FeralCooldownsShortCdPostConditions() or ComboPoints() == 5 and Talent(bloodtalons_talent) and BuffExpires(bloodtalons_buff) and { not BuffPresent(incarnation_king_of_the_jungle_buff) or target.DebuffRemaining(rip_debuff) < 8 or target.DebuffRemaining(rake_debuff) < 5 } and Spell(regrowth) or ComboPoints() > 4 and FeralStFinishersShortCdPostConditions() or FeralStGeneratorsShortCdPostConditions()
+}
+
+AddFunction FeralSingleTargetCdActions
+{
+    unless not BuffPresent(cat_form_buff) and Spell(cat_form) or { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake)
+    {
+        #call_action_list,name=cooldowns
+        FeralCooldownsCdActions()
+
+        unless FeralCooldownsCdPostConditions() or ComboPoints() == 5 and Talent(bloodtalons_talent) and BuffExpires(bloodtalons_buff) and { not BuffPresent(incarnation_king_of_the_jungle_buff) or target.DebuffRemaining(rip_debuff) < 8 or target.DebuffRemaining(rake_debuff) < 5 } and Spell(regrowth)
+        {
+            #run_action_list,name=st_finishers,if=combo_points>4
+            if ComboPoints() > 4 FeralStFinishersCdActions()
+
+            unless ComboPoints() > 4 and FeralStFinishersCdPostConditions()
+            {
+                #run_action_list,name=st_generators
+                FeralStGeneratorsCdActions()
+            }
+        }
+    }
+}
+
+AddFunction FeralSingleTargetCdPostConditions
+{
+    not BuffPresent(cat_form_buff) and Spell(cat_form) or { BuffPresent(prowl_buff) or BuffPresent(shadowmeld_buff) } and Spell(rake) or FeralCooldownsCdPostConditions() or ComboPoints() == 5 and Talent(bloodtalons_talent) and BuffExpires(bloodtalons_buff) and { not BuffPresent(incarnation_king_of_the_jungle_buff) or target.DebuffRemaining(rip_debuff) < 8 or target.DebuffRemaining(rake_debuff) < 5 } and Spell(regrowth) or ComboPoints() > 4 and FeralStFinishersCdPostConditions() or FeralStGeneratorsCdPostConditions()
+}
+
+### actions.st_finishers
+
+AddFunction FeralStFinishersMainActions
+{
+    #pool_resource,for_next=1
+    #savage_roar,if=buff.savage_roar.down
+    if BuffExpires(savage_roar_buff) Spell(savage_roar)
+    unless BuffExpires(savage_roar_buff) and SpellUsable(savage_roar) and SpellCooldown(savage_roar) < TimeToEnergyFor(savage_roar)
+    {
+        #pool_resource,for_next=1
+        #rip,target_if=!ticking|(remains<=duration*0.3)&(target.health.pct>25&!talent.sabertooth.enabled)|(remains<=duration*0.8&persistent_multiplier>dot.rip.pmultiplier)&target.time_to_die>8
+        if not target.DebuffPresent(rip_debuff) or target.DebuffRemaining(rip_debuff) <= BaseDuration(rip_debuff) * 0.3 and target.HealthPercent() > 25 and not Talent(sabertooth_talent) or target.DebuffRemaining(rip_debuff) <= BaseDuration(rip_debuff) * 0.8 and PersistentMultiplier(rip_debuff) > target.DebuffPersistentMultiplier(rip_debuff) and target.TimeToDie() > 8 Spell(rip)
+        unless { not target.DebuffPresent(rip_debuff) or target.DebuffRemaining(rip_debuff) <= BaseDuration(rip_debuff) * 0.3 and target.HealthPercent() > 25 and not Talent(sabertooth_talent) or target.DebuffRemaining(rip_debuff) <= BaseDuration(rip_debuff) * 0.8 and PersistentMultiplier(rip_debuff) > target.DebuffPersistentMultiplier(rip_debuff) and target.TimeToDie() > 8 } and SpellUsable(rip) and SpellCooldown(rip) < TimeToEnergyFor(rip)
+        {
+            #pool_resource,for_next=1
+            #savage_roar,if=buff.savage_roar.remains<12
+            if BuffRemaining(savage_roar_buff) < 12 Spell(savage_roar)
+            unless BuffRemaining(savage_roar_buff) < 12 and SpellUsable(savage_roar) and SpellCooldown(savage_roar) < TimeToEnergyFor(savage_roar)
+            {
+                #maim,if=buff.fiery_red_maimers.up
+                if BuffPresent(fiery_red_maimers_buff) Spell(maim)
+                #ferocious_bite,max_energy=1
+                if Energy() >= EnergyCost(ferocious_bite max=1) Spell(ferocious_bite)
+            }
+        }
+    }
+}
+
+AddFunction FeralStFinishersMainPostConditions
 {
 }
 
-AddFunction FeralSbtOpenerShortCdActions
-{
-	unless Talent(bloodtalons_talent) and ComboPoints() == 5 and not BuffPresent(bloodtalons_buff) and not target.DebuffPresent(rip_debuff) and Spell(regrowth)
-	{
-		#tigers_fury,if=!dot.rip.ticking&combo_points=5
-		if not target.DebuffPresent(rip_debuff) and ComboPoints() == 5 Spell(tigers_fury)
-	}
-}
-
-AddFunction FeralSbtOpenerShortCdPostConditions
-{
-	Talent(bloodtalons_talent) and ComboPoints() == 5 and not BuffPresent(bloodtalons_buff) and not target.DebuffPresent(rip_debuff) and Spell(regrowth)
-}
-
-AddFunction FeralSbtOpenerCdActions
+AddFunction FeralStFinishersShortCdActions
 {
 }
 
-AddFunction FeralSbtOpenerCdPostConditions
+AddFunction FeralStFinishersShortCdPostConditions
 {
-	Talent(bloodtalons_talent) and ComboPoints() == 5 and not BuffPresent(bloodtalons_buff) and not target.DebuffPresent(rip_debuff) and Spell(regrowth)
+    BuffExpires(savage_roar_buff) and Spell(savage_roar) or not { BuffExpires(savage_roar_buff) and SpellUsable(savage_roar) and SpellCooldown(savage_roar) < TimeToEnergyFor(savage_roar) } and { { not target.DebuffPresent(rip_debuff) or target.DebuffRemaining(rip_debuff) <= BaseDuration(rip_debuff) * 0.3 and target.HealthPercent() > 25 and not Talent(sabertooth_talent) or target.DebuffRemaining(rip_debuff) <= BaseDuration(rip_debuff) * 0.8 and PersistentMultiplier(rip_debuff) > target.DebuffPersistentMultiplier(rip_debuff) and target.TimeToDie() > 8 } and Spell(rip) or not { { not target.DebuffPresent(rip_debuff) or target.DebuffRemaining(rip_debuff) <= BaseDuration(rip_debuff) * 0.3 and target.HealthPercent() > 25 and not Talent(sabertooth_talent) or target.DebuffRemaining(rip_debuff) <= BaseDuration(rip_debuff) * 0.8 and PersistentMultiplier(rip_debuff) > target.DebuffPersistentMultiplier(rip_debuff) and target.TimeToDie() > 8 } and SpellUsable(rip) and SpellCooldown(rip) < TimeToEnergyFor(rip) } and { BuffRemaining(savage_roar_buff) < 12 and Spell(savage_roar) or not { BuffRemaining(savage_roar_buff) < 12 and SpellUsable(savage_roar) and SpellCooldown(savage_roar) < TimeToEnergyFor(savage_roar) } and { BuffPresent(fiery_red_maimers_buff) and Spell(maim) or Energy() >= EnergyCost(ferocious_bite max=1) and Spell(ferocious_bite) } } }
+}
+
+AddFunction FeralStFinishersCdActions
+{
+}
+
+AddFunction FeralStFinishersCdPostConditions
+{
+    BuffExpires(savage_roar_buff) and Spell(savage_roar) or not { BuffExpires(savage_roar_buff) and SpellUsable(savage_roar) and SpellCooldown(savage_roar) < TimeToEnergyFor(savage_roar) } and { { not target.DebuffPresent(rip_debuff) or target.DebuffRemaining(rip_debuff) <= BaseDuration(rip_debuff) * 0.3 and target.HealthPercent() > 25 and not Talent(sabertooth_talent) or target.DebuffRemaining(rip_debuff) <= BaseDuration(rip_debuff) * 0.8 and PersistentMultiplier(rip_debuff) > target.DebuffPersistentMultiplier(rip_debuff) and target.TimeToDie() > 8 } and Spell(rip) or not { { not target.DebuffPresent(rip_debuff) or target.DebuffRemaining(rip_debuff) <= BaseDuration(rip_debuff) * 0.3 and target.HealthPercent() > 25 and not Talent(sabertooth_talent) or target.DebuffRemaining(rip_debuff) <= BaseDuration(rip_debuff) * 0.8 and PersistentMultiplier(rip_debuff) > target.DebuffPersistentMultiplier(rip_debuff) and target.TimeToDie() > 8 } and SpellUsable(rip) and SpellCooldown(rip) < TimeToEnergyFor(rip) } and { BuffRemaining(savage_roar_buff) < 12 and Spell(savage_roar) or not { BuffRemaining(savage_roar_buff) < 12 and SpellUsable(savage_roar) and SpellCooldown(savage_roar) < TimeToEnergyFor(savage_roar) } and { BuffPresent(fiery_red_maimers_buff) and Spell(maim) or Energy() >= EnergyCost(ferocious_bite max=1) and Spell(ferocious_bite) } } }
+}
+
+### actions.st_generators
+
+AddFunction FeralStGeneratorsMainActions
+{
+    #regrowth,if=talent.bloodtalons.enabled&buff.predatory_swiftness.up&buff.bloodtalons.down&combo_points>=2&cooldown.ashamanes_frenzy.remains<gcd
+    if Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and BuffExpires(bloodtalons_buff) and ComboPoints() >= 2 and SpellCooldown(ashamanes_frenzy) < GCD() Spell(regrowth)
+    #regrowth,if=talent.bloodtalons.enabled&buff.predatory_swiftness.up&buff.bloodtalons.down&combo_points=4&dot.rake.remains<4
+    if Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and BuffExpires(bloodtalons_buff) and ComboPoints() == 4 and target.DebuffRemaining(rake_debuff) < 4 Spell(regrowth)
+    #regrowth,if=equipped.ailuro_pouncers&talent.bloodtalons.enabled&(buff.predatory_swiftness.stack>2|(buff.predatory_swiftness.stack>1&dot.rake.remains<3))&buff.bloodtalons.down
+    if HasEquippedItem(ailuro_pouncers) and Talent(bloodtalons_talent) and { BuffStacks(predatory_swiftness_buff) > 2 or BuffStacks(predatory_swiftness_buff) > 1 and target.DebuffRemaining(rake_debuff) < 3 } and BuffExpires(bloodtalons_buff) Spell(regrowth)
+    #brutal_slash,if=spell_targets.brutal_slash>desired_targets
+    if Enemies() > Enemies(tagged=1) Spell(brutal_slash)
+    #pool_resource,for_next=1
+    #thrash_cat,if=(!ticking|remains<duration*0.3)&(spell_targets.thrash_cat>2)
+    if { not target.DebuffPresent(thrash_cat_debuff) or target.DebuffRemaining(thrash_cat_debuff) < BaseDuration(thrash_cat_debuff) * 0.3 } and Enemies() > 2 Spell(thrash_cat)
+    unless { not target.DebuffPresent(thrash_cat_debuff) or target.DebuffRemaining(thrash_cat_debuff) < BaseDuration(thrash_cat_debuff) * 0.3 } and Enemies() > 2 and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat)
+    {
+        #pool_resource,for_next=1
+        #rake,target_if=!ticking|(!talent.bloodtalons.enabled&remains<duration*0.3)&target.time_to_die>4
+        if not target.DebuffPresent(rake_debuff) or not Talent(bloodtalons_talent) and target.DebuffRemaining(rake_debuff) < BaseDuration(rake_debuff) * 0.3 and target.TimeToDie() > 4 Spell(rake)
+        unless { not target.DebuffPresent(rake_debuff) or not Talent(bloodtalons_talent) and target.DebuffRemaining(rake_debuff) < BaseDuration(rake_debuff) * 0.3 and target.TimeToDie() > 4 } and SpellUsable(rake) and SpellCooldown(rake) < TimeToEnergyFor(rake)
+        {
+            #pool_resource,for_next=1
+            #rake,target_if=talent.bloodtalons.enabled&buff.bloodtalons.up&((remains<=7)&persistent_multiplier>dot.rake.pmultiplier*0.85)&target.time_to_die>4
+            if Talent(bloodtalons_talent) and BuffPresent(bloodtalons_buff) and target.DebuffRemaining(rake_debuff) <= 7 and PersistentMultiplier(rake_debuff) > target.DebuffPersistentMultiplier(rake_debuff) * 0.85 and target.TimeToDie() > 4 Spell(rake)
+            unless Talent(bloodtalons_talent) and BuffPresent(bloodtalons_buff) and target.DebuffRemaining(rake_debuff) <= 7 and PersistentMultiplier(rake_debuff) > target.DebuffPersistentMultiplier(rake_debuff) * 0.85 and target.TimeToDie() > 4 and SpellUsable(rake) and SpellCooldown(rake) < TimeToEnergyFor(rake)
+            {
+                #brutal_slash,if=(buff.tigers_fury.up&(raid_event.adds.in>(1+max_charges-charges_fractional)*recharge_time))
+                if BuffPresent(tigers_fury_buff) and 600 > { 1 + SpellMaxCharges(brutal_slash) - Charges(brutal_slash count=0) } * SpellChargeCooldown(brutal_slash) Spell(brutal_slash)
+                #moonfire_cat,target_if=remains<=duration*0.3
+                if target.DebuffRemaining(moonfire_cat_debuff) <= BaseDuration(moonfire_cat_debuff) * 0.3 Spell(moonfire_cat)
+                #pool_resource,for_next=1
+                #thrash_cat,if=(!ticking|remains<duration*0.3)&(variable.use_thrash=2|spell_targets.thrash_cat>1)
+                if { not target.DebuffPresent(thrash_cat_debuff) or target.DebuffRemaining(thrash_cat_debuff) < BaseDuration(thrash_cat_debuff) * 0.3 } and { use_thrash() == 2 or Enemies() > 1 } Spell(thrash_cat)
+                unless { not target.DebuffPresent(thrash_cat_debuff) or target.DebuffRemaining(thrash_cat_debuff) < BaseDuration(thrash_cat_debuff) * 0.3 } and { use_thrash() == 2 or Enemies() > 1 } and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat)
+                {
+                    #thrash_cat,if=(!ticking|remains<duration*0.3)&variable.use_thrash=1&buff.clearcasting.react
+                    if { not target.DebuffPresent(thrash_cat_debuff) or target.DebuffRemaining(thrash_cat_debuff) < BaseDuration(thrash_cat_debuff) * 0.3 } and use_thrash() == 1 and BuffPresent(clearcasting_buff) Spell(thrash_cat)
+                    #pool_resource,for_next=1
+                    #swipe_cat,if=spell_targets.swipe_cat>1
+                    if Enemies() > 1 Spell(swipe_cat)
+                    unless Enemies() > 1 and SpellUsable(swipe_cat) and SpellCooldown(swipe_cat) < TimeToEnergyFor(swipe_cat)
+                    {
+                        #shred
+                        Spell(shred)
+                    }
+                }
+            }
+        }
+    }
+}
+
+AddFunction FeralStGeneratorsMainPostConditions
+{
+}
+
+AddFunction FeralStGeneratorsShortCdActions
+{
+}
+
+AddFunction FeralStGeneratorsShortCdPostConditions
+{
+    Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and BuffExpires(bloodtalons_buff) and ComboPoints() >= 2 and SpellCooldown(ashamanes_frenzy) < GCD() and Spell(regrowth) or Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and BuffExpires(bloodtalons_buff) and ComboPoints() == 4 and target.DebuffRemaining(rake_debuff) < 4 and Spell(regrowth) or HasEquippedItem(ailuro_pouncers) and Talent(bloodtalons_talent) and { BuffStacks(predatory_swiftness_buff) > 2 or BuffStacks(predatory_swiftness_buff) > 1 and target.DebuffRemaining(rake_debuff) < 3 } and BuffExpires(bloodtalons_buff) and Spell(regrowth) or Enemies() > Enemies(tagged=1) and Spell(brutal_slash) or { not target.DebuffPresent(thrash_cat_debuff) or target.DebuffRemaining(thrash_cat_debuff) < BaseDuration(thrash_cat_debuff) * 0.3 } and Enemies() > 2 and Spell(thrash_cat) or not { { not target.DebuffPresent(thrash_cat_debuff) or target.DebuffRemaining(thrash_cat_debuff) < BaseDuration(thrash_cat_debuff) * 0.3 } and Enemies() > 2 and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat) } and { { not target.DebuffPresent(rake_debuff) or not Talent(bloodtalons_talent) and target.DebuffRemaining(rake_debuff) < BaseDuration(rake_debuff) * 0.3 and target.TimeToDie() > 4 } and Spell(rake) or not { { not target.DebuffPresent(rake_debuff) or not Talent(bloodtalons_talent) and target.DebuffRemaining(rake_debuff) < BaseDuration(rake_debuff) * 0.3 and target.TimeToDie() > 4 } and SpellUsable(rake) and SpellCooldown(rake) < TimeToEnergyFor(rake) } and { Talent(bloodtalons_talent) and BuffPresent(bloodtalons_buff) and target.DebuffRemaining(rake_debuff) <= 7 and PersistentMultiplier(rake_debuff) > target.DebuffPersistentMultiplier(rake_debuff) * 0.85 and target.TimeToDie() > 4 and Spell(rake) or not { Talent(bloodtalons_talent) and BuffPresent(bloodtalons_buff) and target.DebuffRemaining(rake_debuff) <= 7 and PersistentMultiplier(rake_debuff) > target.DebuffPersistentMultiplier(rake_debuff) * 0.85 and target.TimeToDie() > 4 and SpellUsable(rake) and SpellCooldown(rake) < TimeToEnergyFor(rake) } and { BuffPresent(tigers_fury_buff) and 600 > { 1 + SpellMaxCharges(brutal_slash) - Charges(brutal_slash count=0) } * SpellChargeCooldown(brutal_slash) and Spell(brutal_slash) or target.DebuffRemaining(moonfire_cat_debuff) <= BaseDuration(moonfire_cat_debuff) * 0.3 and Spell(moonfire_cat) or { not target.DebuffPresent(thrash_cat_debuff) or target.DebuffRemaining(thrash_cat_debuff) < BaseDuration(thrash_cat_debuff) * 0.3 } and { use_thrash() == 2 or Enemies() > 1 } and Spell(thrash_cat) or not { { not target.DebuffPresent(thrash_cat_debuff) or target.DebuffRemaining(thrash_cat_debuff) < BaseDuration(thrash_cat_debuff) * 0.3 } and { use_thrash() == 2 or Enemies() > 1 } and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat) } and { { not target.DebuffPresent(thrash_cat_debuff) or target.DebuffRemaining(thrash_cat_debuff) < BaseDuration(thrash_cat_debuff) * 0.3 } and use_thrash() == 1 and BuffPresent(clearcasting_buff) and Spell(thrash_cat) or Enemies() > 1 and Spell(swipe_cat) or not { Enemies() > 1 and SpellUsable(swipe_cat) and SpellCooldown(swipe_cat) < TimeToEnergyFor(swipe_cat) } and Spell(shred) } } } }
+}
+
+AddFunction FeralStGeneratorsCdActions
+{
+}
+
+AddFunction FeralStGeneratorsCdPostConditions
+{
+    Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and BuffExpires(bloodtalons_buff) and ComboPoints() >= 2 and SpellCooldown(ashamanes_frenzy) < GCD() and Spell(regrowth) or Talent(bloodtalons_talent) and BuffPresent(predatory_swiftness_buff) and BuffExpires(bloodtalons_buff) and ComboPoints() == 4 and target.DebuffRemaining(rake_debuff) < 4 and Spell(regrowth) or HasEquippedItem(ailuro_pouncers) and Talent(bloodtalons_talent) and { BuffStacks(predatory_swiftness_buff) > 2 or BuffStacks(predatory_swiftness_buff) > 1 and target.DebuffRemaining(rake_debuff) < 3 } and BuffExpires(bloodtalons_buff) and Spell(regrowth) or Enemies() > Enemies(tagged=1) and Spell(brutal_slash) or { not target.DebuffPresent(thrash_cat_debuff) or target.DebuffRemaining(thrash_cat_debuff) < BaseDuration(thrash_cat_debuff) * 0.3 } and Enemies() > 2 and Spell(thrash_cat) or not { { not target.DebuffPresent(thrash_cat_debuff) or target.DebuffRemaining(thrash_cat_debuff) < BaseDuration(thrash_cat_debuff) * 0.3 } and Enemies() > 2 and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat) } and { { not target.DebuffPresent(rake_debuff) or not Talent(bloodtalons_talent) and target.DebuffRemaining(rake_debuff) < BaseDuration(rake_debuff) * 0.3 and target.TimeToDie() > 4 } and Spell(rake) or not { { not target.DebuffPresent(rake_debuff) or not Talent(bloodtalons_talent) and target.DebuffRemaining(rake_debuff) < BaseDuration(rake_debuff) * 0.3 and target.TimeToDie() > 4 } and SpellUsable(rake) and SpellCooldown(rake) < TimeToEnergyFor(rake) } and { Talent(bloodtalons_talent) and BuffPresent(bloodtalons_buff) and target.DebuffRemaining(rake_debuff) <= 7 and PersistentMultiplier(rake_debuff) > target.DebuffPersistentMultiplier(rake_debuff) * 0.85 and target.TimeToDie() > 4 and Spell(rake) or not { Talent(bloodtalons_talent) and BuffPresent(bloodtalons_buff) and target.DebuffRemaining(rake_debuff) <= 7 and PersistentMultiplier(rake_debuff) > target.DebuffPersistentMultiplier(rake_debuff) * 0.85 and target.TimeToDie() > 4 and SpellUsable(rake) and SpellCooldown(rake) < TimeToEnergyFor(rake) } and { BuffPresent(tigers_fury_buff) and 600 > { 1 + SpellMaxCharges(brutal_slash) - Charges(brutal_slash count=0) } * SpellChargeCooldown(brutal_slash) and Spell(brutal_slash) or target.DebuffRemaining(moonfire_cat_debuff) <= BaseDuration(moonfire_cat_debuff) * 0.3 and Spell(moonfire_cat) or { not target.DebuffPresent(thrash_cat_debuff) or target.DebuffRemaining(thrash_cat_debuff) < BaseDuration(thrash_cat_debuff) * 0.3 } and { use_thrash() == 2 or Enemies() > 1 } and Spell(thrash_cat) or not { { not target.DebuffPresent(thrash_cat_debuff) or target.DebuffRemaining(thrash_cat_debuff) < BaseDuration(thrash_cat_debuff) * 0.3 } and { use_thrash() == 2 or Enemies() > 1 } and SpellUsable(thrash_cat) and SpellCooldown(thrash_cat) < TimeToEnergyFor(thrash_cat) } and { { not target.DebuffPresent(thrash_cat_debuff) or target.DebuffRemaining(thrash_cat_debuff) < BaseDuration(thrash_cat_debuff) * 0.3 } and use_thrash() == 1 and BuffPresent(clearcasting_buff) and Spell(thrash_cat) or Enemies() > 1 and Spell(swipe_cat) or not { Enemies() > 1 and SpellUsable(swipe_cat) and SpellCooldown(swipe_cat) < TimeToEnergyFor(swipe_cat) } and Spell(shred) } } } }
 }
 
 ### Feral icons.
@@ -1129,56 +1154,56 @@ AddCheckBox(opt_druid_feral_aoe L(AOE) default specialization=feral)
 
 AddIcon checkbox=!opt_druid_feral_aoe enemies=1 help=shortcd specialization=feral
 {
-	if not InCombat() FeralPrecombatShortCdActions()
-	unless not InCombat() and FeralPrecombatShortCdPostConditions()
-	{
-		FeralDefaultShortCdActions()
-	}
+    if not InCombat() FeralPrecombatShortCdActions()
+    unless not InCombat() and FeralPrecombatShortCdPostConditions()
+    {
+        FeralDefaultShortCdActions()
+    }
 }
 
 AddIcon checkbox=opt_druid_feral_aoe help=shortcd specialization=feral
 {
-	if not InCombat() FeralPrecombatShortCdActions()
-	unless not InCombat() and FeralPrecombatShortCdPostConditions()
-	{
-		FeralDefaultShortCdActions()
-	}
+    if not InCombat() FeralPrecombatShortCdActions()
+    unless not InCombat() and FeralPrecombatShortCdPostConditions()
+    {
+        FeralDefaultShortCdActions()
+    }
 }
 
 AddIcon enemies=1 help=main specialization=feral
 {
-	if not InCombat() FeralPrecombatMainActions()
-	unless not InCombat() and FeralPrecombatMainPostConditions()
-	{
-		FeralDefaultMainActions()
-	}
+    if not InCombat() FeralPrecombatMainActions()
+    unless not InCombat() and FeralPrecombatMainPostConditions()
+    {
+        FeralDefaultMainActions()
+    }
 }
 
 AddIcon checkbox=opt_druid_feral_aoe help=aoe specialization=feral
 {
-	if not InCombat() FeralPrecombatMainActions()
-	unless not InCombat() and FeralPrecombatMainPostConditions()
-	{
-		FeralDefaultMainActions()
-	}
+    if not InCombat() FeralPrecombatMainActions()
+    unless not InCombat() and FeralPrecombatMainPostConditions()
+    {
+        FeralDefaultMainActions()
+    }
 }
 
 AddIcon checkbox=!opt_druid_feral_aoe enemies=1 help=cd specialization=feral
 {
-	if not InCombat() FeralPrecombatCdActions()
-	unless not InCombat() and FeralPrecombatCdPostConditions()
-	{
-		FeralDefaultCdActions()
-	}
+    if not InCombat() FeralPrecombatCdActions()
+    unless not InCombat() and FeralPrecombatCdPostConditions()
+    {
+        FeralDefaultCdActions()
+    }
 }
 
 AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
 {
-	if not InCombat() FeralPrecombatCdActions()
-	unless not InCombat() and FeralPrecombatCdPostConditions()
-	{
-		FeralDefaultCdActions()
-	}
+    if not InCombat() FeralPrecombatCdActions()
+    unless not InCombat() and FeralPrecombatCdPostConditions()
+    {
+        FeralDefaultCdActions()
+    }
 }
 
 ### Required symbols
@@ -1189,30 +1214,25 @@ AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
 # bloodtalons_buff
 # bloodtalons_talent
 # brutal_slash
-# brutal_slash_talent
 # cat_form
 # cat_form_buff
 # clearcasting_buff
 # dash
-# displacer_beast
-# displacer_beast_buff
 # elunes_guidance
-# elunes_guidance_buff
-# elunes_guidance_talent
 # ferocious_bite
 # fiery_red_maimers_buff
 # incarnation_king_of_the_jungle
 # incarnation_king_of_the_jungle_buff
 # incarnation_talent
-# jagged_wounds_talent
+# luffa_wrappings
+# lunar_inspiration_talent
 # maim
 # mangle
-# mighty_bash
-# moment_of_clarity_talent
 # moonfire_cat
 # moonfire_cat_debuff
 # old_war_potion
 # predatory_swiftness_buff
+# prolonged_power_potion
 # prowl
 # prowl_buff
 # rake
@@ -1223,20 +1243,14 @@ AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
 # sabertooth_talent
 # savage_roar
 # savage_roar_buff
-# savage_roar_talent
 # shadowmeld
 # shadowmeld_buff
 # shred
-# skull_bash
-# soul_of_the_forest_talent
 # swipe_cat
-# t18_class_trinket
 # thrash_cat
 # thrash_cat_debuff
 # tigers_fury
 # tigers_fury_buff
-# typhoon
-# war_stomp
 # wild_charge
 # wild_charge_bear
 # wild_charge_cat
