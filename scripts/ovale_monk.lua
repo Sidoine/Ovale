@@ -41,7 +41,7 @@ AddFunction BrewmasterDefaultShortCDActions
 	# keep stagger below 100%
 	if (StaggerPercentage() > 100) Spell(purifying_brew)
 	# use black_ox_brew when at 0 charges and low energy (or in an emergency)
-	if ((SpellCharges(purifying_brew) == 0) and (Energy() < 30 or StaggerPercentage() > 75)) Spell(black_ox_brew)
+	if ((SpellCharges(purifying_brew) == 0) and (Energy() < 40 or StaggerPercentage() > 75)) Spell(black_ox_brew)
 	# heal me
 	BrewmasterHealMe()
 	
