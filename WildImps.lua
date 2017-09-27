@@ -14,11 +14,11 @@ local tinsert = table.insert
 local tremove = table.remove
 
 local demonData = {
-    [55659]  = { duration=12}, -- Wild imps from Hand of Gul'dan
-    [98035]  = { duration=12}, -- Dreadstalkers, which is a vehicle. Imps on dreadstalkers are 99737
-    [103673] = { duration=12}, -- Darkglare
-    [11859] = { duration=25}, -- Doomguard
-    [89] = { duration= 25 } -- Infernal
+    [55659]  = { duration=12 }, -- Wild imps from Hand of Gul'dan
+    [98035]  = { duration=12 }, -- Dreadstalkers, which is a vehicle. Imps on dreadstalkers are 99737
+    [103673] = { duration=12 }, -- Darkglare
+    [11859] = { duration=25 }, -- Doomguard
+    [89] = { duration=25 } -- Infernal
 }
 
 local self_demons = {}
