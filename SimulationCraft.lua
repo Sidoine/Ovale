@@ -3163,6 +3163,7 @@ do
 		["maelstrom"]			= "Maelstrom()",
 		["nonexecute_actors_pct"] = "0", -- TODO #74
 		["pain"]				= "Pain()",
+		["pain.deficit"]		= "PainDeficit()",
 		["rage"]				= "Rage()",
 		["rage.deficit"]		= "RageDeficit()",
 		["rage.max"]			= "MaxRage()",
