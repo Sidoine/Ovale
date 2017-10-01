@@ -59,6 +59,7 @@ Define(chimaera_shot 53209)
 	SpellInfo(chimaera_shot focus=-10 cd=15 cd_haste=ranged)
 Define(cobra_shot 193455)
 	SpellInfo(cobra_shot focus=40)
+	SpellAddBuff(cobra_shot parsels_tongue_buff=1 if_equipped=parsels_tongue)
 Define(counter_shot 147362)
 	SpellInfo(counter_shot cd=24)
 Define(dire_beast 120679)
@@ -193,7 +194,15 @@ Define(way_of_the_moknathal_talent 3)
 Define(windburst 204147)
 	SpellInfo(windburst focus=20 cd=20)
 
+# Items
+Define(call_of_the_wild 137101)
+Define(parsels_tongue 151805)
+Define(parsels_tongue_buff 248085)
+	SpellInfo(parsels_tongue_buff duration=8 max_stacks=4)
+Define(qapla_eredun_war_order 137227)
+	
 # Talents
+Define(one_with_the_pack_talent 10)
 Define(barrage_talent 17)
 Define(lone_wolf_talent 1)
 Define(steady_focus_talent 2)
