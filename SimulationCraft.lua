@@ -3105,7 +3105,7 @@ end
 
 do
 	local CHARACTER_PROPERTY = {
-		["active_enemies"]		= "Enemies()",
+		["active_enemies"]		= "Enemies(tagged=1)",
 		["astral_power"] 		= "AstralPower()",
 		["astral_power.deficit"]= "AstralPowerDeficit()",
 		["blade_dance_worth_using"] = "0",--TODO
@@ -3130,7 +3130,7 @@ do
 		["dreadstalker_remaining_duration"] = "DemonDuration(dreadstalker)",
 		["eclipse_change"]		= "TimeToEclipse()",	-- XXX
 		["eclipse_energy"]		= "EclipseEnergy()",	-- XXX
-		["enemies"]				= "Enemies()",
+		["enemies"]				= "Enemies(tagged=1)",
 		["energy"]				= "Energy()",
 		["energy.deficit"]		= "EnergyDeficit()",
 		["energy.max"]			= "MaxEnergy()",
@@ -3236,7 +3236,7 @@ do
 			AddSymbol(annotation, buff)
 		elseif strsub(operand, 1, 22) == "active_enemies_within." then
 			-- "active_enemies_within.<distance>" is roughly equivalent to the number of enemies.
-			code = "Enemies()"
+			code = "Enemies(tagged=1)"
 		elseif strfind(operand, "^incoming_damage_") then
 			local seconds, measure = strmatch(operand, "^incoming_damage_([%d]+)(m?s?)$")
 			seconds = tonumber(seconds)
