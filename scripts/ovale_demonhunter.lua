@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "icyveins_demonhunter_vengeance"
-	local desc = "[7.0] Icy-Veins: DemonHunter Vengeance"
+	local desc = "[7.3.0] Icy-Veins: DemonHunter Vengeance"
 	local code = [[
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -14,21 +14,14 @@ AddCheckBox(opt_interrupt L(interrupt) default specialization=vengeance)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=vengeance)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=vengeance)
 
-AddFunction VengeancePlayDefensively
-{
-	CheckBoxOn(opt_demonhunter_vengeance_defensive) or HealthPercent() <= 35 or IncomingDamage(5) >= MaxHealth() * 0.5
-}
-
-AddFunction VengeancePlayOffensively
-{
-	not VengeancePlayDefensively()
-}
-
 AddFunction VengeanceHealMe
 {
-	if (HealthPercent() < 70) Spell(fel_devastation)
-	if (HealthPercent() < 70) Spell(soul_cleave)
-	if (IncomingDamage(5) >= MaxHealth() * 0.5) Spell(soul_cleave)
+	if (HealthPercent() < 70) 
+	{
+		Spell(fel_devastation)
+		if (SoulFragments() >= 4) Spell(spirit_bomb)
+		if (HealthPercent() < 50) Spell(soul_cleave)
+	}
 	if (HealthPercent() < 35) UseHealthPotions()
 }
 
@@ -58,13 +51,12 @@ AddFunction VengeanceRangeCheck
 
 AddFunction VengeanceDefaultShortCDActions
 {
-	if ((VengeancePlayOffensively() and (BuffExpires(demon_spikes) or not Talent(razor_spikes_talent))) or VengeancePlayDefensively()) Spell(soul_barrier)
+	Spell(soul_barrier)
 	
 	if (IncomingDamage(5 physical=1) > 0 and BuffRemaining(demon_spikes_buff)<2*BaseDuration(demon_spikes_buff))
 	{
 		if (Charges(demon_spikes) == 0 and PainDeficit() >= 60*(1+0.2*BuffPresent(blade_turning_buff))) Spell(demonic_infusion)
-		if (VengeancePlayDefensively() or Talent(razor_spikes_talent)) Spell(demon_spikes)
-		if (Charges(demon_spikes count=0) >= 1.8) Spell(demon_spikes)
+		Spell(demon_spikes)
 	}
 	
 	VengeanceRangeCheck()
@@ -73,58 +65,31 @@ AddFunction VengeanceDefaultShortCDActions
 AddFunction VengeanceDefaultMainActions
 {
 	VengeanceHealMe()
+	if (VengeanceInfernalStrike()) Spell(infernal_strike)
 	
 	# Razor spikes are up
-	if (VengeancePlayOffensively() and Talent(razor_spikes_talent) and not BuffExpires(demon_spikes_buff))
+	if (Talent(razor_spikes_talent) and not BuffExpires(demon_spikes_buff))
 	{
-		Spell(fracture)
-		if not Talent(fracture_talent) Spell(soul_cleave)
+		if (Enemies() == 1) Spell(fracture)
+		Spell(soul_cleave)
 		Spell(shear)
 	}
 	
-	# Fiery demise
-	if (not target.DebuffExpires(fiery_demise_debuff))
-	{
-		Spell(soul_carver)
-		if (PainDeficit() > 10*(1+0.2*BuffPresent(blade_turning_buff))) Spell(immolation_aura)
-		Spell(fel_devastation)
-		if (PainDeficit() > 20*(1+0.2*BuffPresent(blade_turning_buff))) Spell(felblade)
-		if (SoulFragments() >= 5-Talent(fracture_talent)) Spell(spirit_bomb)
-		if (VengeanceSigilOfFlame()) Spell(sigil_of_flame)
-		if (VengeanceInfernalStrike()) Spell(infernal_strike)
-		Spell(fel_eruption)
-	}
-	
-	# Regular rotation
+	# default rotation
 	if (target.TimeToDie() > 5) Spell(soul_carver)
-	if (VengeancePlayOffensively() and (not HasArtifactTrait(fiery_demise) or SpellCooldownDuration(fel_devastation) < SpellCooldown(fiery_brand))) Spell(fel_devastation)
-	if (Pain() >= 70) Spell(fracture)
-	if (Pain() >= 70) Spell(soul_cleave)
-	if (target.DebuffRefreshable(frailty_debuff) or (VengeancePlayOffensively() and SoulFragments() >= 5-Talent(fracture_talent))) Spell(spirit_bomb)
 	if (PainDeficit() > 10*(1+0.2*BuffPresent(blade_turning_buff))) Spell(immolation_aura)
+	if (target.DebuffExpires(fiery_demise_debuff) and SoulFragments() <= 4) Spell(fracture)
+	if (SoulFragments() >= 4) Spell(spirit_bomb)
+	if (VengeanceSigilOfFlame()) Spell(sigil_of_flame)
 	if (PainDeficit() > 20*(1+0.2*BuffPresent(blade_turning_buff))) Spell(felblade)
 	Spell(fel_eruption)
-	if (VengeanceSigilOfFlame()) Spell(sigil_of_flame)
-	if (VengeanceInfernalStrike()) Spell(infernal_strike)
-	Spell(shear)
-}
-
-AddFunction VengeanceDefaultAoEActions
-{
-	VengeanceHealMe()
 	
-	if (VengeancePlayOffensively() and Talent(razor_spikes_talent) and not BuffExpires(demon_spikes_buff)) Spell(soul_cleave)
-	if (target.TimeToDie() > 5) Spell(soul_carver)
-	if (VengeancePlayOffensively()) Spell(fel_devastation)
-	if (VengeancePlayDefensively() and target.DebuffRefreshable(frailty_debuff) or SoulFragments() >= 5-Talent(fracture_talent)) Spell(spirit_bomb)
-	if (Pain() >= 70) Spell(fracture)
-	if (Pain() >= 70) Spell(soul_cleave)
-	if (VengeanceInfernalStrike()) Spell(infernal_strike)
-	if (Talent(burning_alive_talent) and target.TimeToDie() >= 8) Spell(fiery_brand)
-	if (PainDeficit() >= 20*(1+0.2*BuffPresent(blade_turning_buff))) Spell(immolation_aura)
-	if (PainDeficit() >= 20*(1+0.2*BuffPresent(blade_turning_buff))) Spell(felblade)
-	if (VengeanceSigilOfFlame()) Spell(sigil_of_flame)
-	Spell(fel_eruption)
+	# filler
+	if (Pain() > 70)
+	{
+		Spell(fracture)
+		Spell(soul_cleave)
+	}
 	Spell(shear)
 }
 
@@ -160,7 +125,6 @@ AddFunction VengeanceInterruptActions
 	}
 }
 
-AddCheckBox(opt_demonhunter_vengeance_defensive L("Play Defensively") default specialization=vengeance)
 AddCheckBox(opt_demonhunter_vengeance_aoe L(AOE) default specialization=vengeance)
 
 AddIcon help=shortcd specialization=vengeance
@@ -175,7 +139,7 @@ AddIcon enemies=1 help=main specialization=vengeance
 
 AddIcon checkbox=opt_demonhunter_vengeance_aoe help=aoe specialization=vengeance
 {
-	VengeanceDefaultAoEActions()
+	VengeanceDefaultMainActions()
 }
 
 AddIcon help=cd specialization=vengeance
