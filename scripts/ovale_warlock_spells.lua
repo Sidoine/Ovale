@@ -123,7 +123,7 @@ Define(grimoire_of_sacrifice_buff 108503)
 	SpellInfo(grimoire_of_sacrifice_buff duration=3600)
 Define(grimoire_of_sacrifice_talent 15)
 Define(grimoire_of_service_talent 14)
-Define(grimoire_of_supremacy_talent 13)
+Define(grimoire_of_supremacy_talent 16)
 Define(hand_of_guldan 105174)
 	SpellInfo(hand_of_guldan max_travel_time=1.5 shards=finisher) # maximum observed travel time with a bit of padding
 	SpellAddTargetDebuff(hand_of_guldan shadowflame_debuff=1)
