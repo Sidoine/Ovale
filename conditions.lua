@@ -4187,9 +4187,6 @@ do
 	-- @param id The spell ID.
 	-- @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	-- @param number Optional. The number to compare against.
-	-- @param count Optional. Sets whether a count or a fractional value is returned.
-	--     Defaults to count=1.
-	--     Valid values: 0, 1.
 	-- @usage
 	-- if SpellFullRecharge(dire_frenzy) < GCD()
 	--     Spell(dire_frenzy)
