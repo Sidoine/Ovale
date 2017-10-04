@@ -29,6 +29,7 @@ AddFunction VengeanceHealMe
 	if (HealthPercent() < 70) Spell(fel_devastation)
 	if (HealthPercent() < 70) Spell(soul_cleave)
 	if (IncomingDamage(5) >= MaxHealth() * 0.5) Spell(soul_cleave)
+	if (HealthPercent() < 35) UseHealthPotions()
 }
 
 AddFunction VengeanceInfernalStrike

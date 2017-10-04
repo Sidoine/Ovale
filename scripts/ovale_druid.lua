@@ -30,6 +30,7 @@ AddFunction GuardianHealMe
 	
 	if HealthPercent() <= 50 Spell(lunar_beam)
 	if HealthPercent() <= 80 and not InCombat() Spell(regrowth)
+	if (HealthPercent() < 35) UseHealthPotions()
 }
 
 AddFunction GuardianGetInMeleeRange

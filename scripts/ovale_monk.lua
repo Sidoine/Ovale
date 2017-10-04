@@ -21,6 +21,7 @@ AddFunction BrewmasterHealMe
 	if (HealthPercent() < 35) Spell(healing_elixir)
 	if (HealthPercent() < 35) Spell(expel_harm)
 	if (HealthPercent() <= 100 - (15 * 2.6)) Spell(healing_elixir)
+	if (HealthPercent() < 35) UseHealthPotions()
 }
 
 AddFunction StaggerPercentage
