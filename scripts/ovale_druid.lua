@@ -695,10 +695,13 @@ AddFunction Generators_SwipeCat
 }
 
 #shred,if=dot.rake.remains>(action.shred.cost+action.rake.cost-energy)%energy.regen|buff.clearcasting.react
+# MODIFICATION: or target.TimeToDie() <= 6 + target.DebuffRemaining(rake_debuff)
+# REASON: To make shred show up if Rake is not on a target about to die.
 AddFunction Generators_Shred
 {
     target.DebuffRemaining(rake_debuff) > { PowerCost(shred) + PowerCost(rake) - Energy() } / EnergyRegenRate() 
         or BuffPresent(clearcasting_buff)
+		or target.TimeToDie() <= 6 + target.DebuffRemaining(rake_debuff)
 }
 
 
@@ -773,6 +776,9 @@ AddFunction FeralDefaultCdActions
 {
     unless Main_Rake_Prowl() and Spell(rake) or BuffExpires(cat_form_buff) and Spell(cat_form)
     {
+		#skull_bash
+		FeralInterruptActions()
+		
         #call_action_list,name=opener,if=!dot.rip.ticking&time<8
         if Main_Opener_Conditions() FeralOpenerCdActions()
         unless Main_Opener_Conditions() and FeralOpenerCdPostConditions()
