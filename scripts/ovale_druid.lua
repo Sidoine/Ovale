@@ -44,7 +44,6 @@ AddFunction GuardianGetInMeleeRange
 
 AddFunction GuardianDefaultShortCDActions
 {
-	GuardianHealMe()
 	if IncomingDamage(5 physical=1) Spell(ironfur)
 	GuardianGetInMeleeRange()
 }
@@ -55,6 +54,7 @@ AddFunction GuardianDefaultShortCDActions
 
 AddFunction GuardianDefaultMainActions
 {
+	GuardianHealMe()
 	if not Stance(druid_bear_form) Spell(bear_form)
 	Spell(mangle)
 	if not BuffExpires(galactic_guardian_buff) Spell(moonfire)
@@ -71,6 +71,7 @@ AddFunction GuardianDefaultMainActions
 
 AddFunction GuardianDefaultAoEActions
 {
+	GuardianHealMe()
 	if not Stance(druid_bear_form) Spell(bear_form)
 	if Enemies() >= 4 and HealthPercent() <= 80 Spell(lunar_beam)
 	if not BuffExpires(galactic_guardian_buff) Spell(moonfire)

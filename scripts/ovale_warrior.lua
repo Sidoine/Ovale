@@ -60,7 +60,6 @@ AddFunction ProtectionOffensiveCooldowns
 
 AddFunction ProtectionDefaultShortCDActions
 {
-	ProtectionHealMe()
 	if ArmorSetBonus(T20 2) and RageDeficit() >= 26 Spell(berserker_rage)
 	if IncomingDamage(5 physical=1) 
 	{
@@ -78,6 +77,7 @@ AddFunction ProtectionDefaultShortCDActions
 
 AddFunction ProtectionDefaultMainActions
 {
+	ProtectionHealMe()
 	Spell(shield_slam)
 	if Talent(devastatator_talent) and BuffPresent(revenge_buff) Spell(revenge)
 	if BuffPresent(vengeance_revenge_buff) Spell(revenge)
@@ -93,6 +93,7 @@ AddFunction ProtectionDefaultMainActions
 
 AddFunction ProtectionDefaultAoEActions
 {
+	ProtectionHealMe()
 	Spell(ravager)
 	Spell(revenge)
 	Spell(thunder_clap)
