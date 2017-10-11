@@ -201,6 +201,7 @@ AddFunction CanMove
 {
 	if BuffPresent(norgannons_foresight_buff) 1
     if BuffPresent(stellar_drift_buff) 1
+	if BuffPresent(ice_floes_buff) 1
     0
 }
 ]]
