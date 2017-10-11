@@ -1223,12 +1223,12 @@ local function InitializeDisambiguation()
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_energy",		"ROGUE")
 	AddDisambiguation("blood_fury",				"blood_fury_ap",				"ROGUE")
 	AddDisambiguation("legendary_ring",			"legendary_ring_agility",		"ROGUE",		nil, "Item")
-	AddDisambiguation("stealth_buff",			"stealthed_buff",				"ROGUE")
+	-- AddDisambiguation("stealth_buff",			"stealthed_buff",				"ROGUE") -- Need buff.stealth.up to only apply to stealth, not all stealthed buffs
 	AddDisambiguation("roll_the_bones_debuff",	"roll_the_bones_buff",			"ROGUE")
 	AddDisambiguation("envenom_debuff",			"envenom_buff",					"ROGUE")
 	AddDisambiguation("vendetta_buff",			"vendetta_debuff",				"ROGUE",		"assassination") -- TODO Strange, is there actualy a buff?
 	AddDisambiguation("deeper_strategem_talent","deeper_stratagem_talent",      "ROGUE",        "subtlety")
-	AddDisambiguation("finality_nightblade_buff", "finality_nightblade_debuff", "ROGUE")
+	AddDisambiguation("symbols_of_death_debuff","symbols_of_death_buff", 		"ROGUE")
 	-- Shaman
 	AddDisambiguation("arcane_torrent",			"arcane_torrent_mana",			"SHAMAN")
 	AddDisambiguation("ascendance",				"ascendance_elemental",			"SHAMAN",		"elemental")
