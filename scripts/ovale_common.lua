@@ -192,6 +192,17 @@ AddFunction UseRacialSurvivalActions
 {
 	Spell(stoneform)
 }
+
+# Movement allowing defines
+Define(stellar_drift_buff 202461)
+Define(norgannons_foresight_buff 236380)
+
+AddFunction CanMove
+{
+	if BuffPresent(norgannons_foresight_buff) 1
+    if BuffPresent(stellar_drift_buff) 1
+    0
+}
 ]]
 
 	OvaleScripts:RegisterScript(nil, nil, name, desc, code, "include")
