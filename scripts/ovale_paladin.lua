@@ -47,6 +47,7 @@ AddFunction ProtectionGetInMeleeRange
 
 AddFunction ProtectionDefaultShortCDActions
 {
+	PaladinHealMe()
 	#bastion_of_light,if=talent.bastion_of_light.enabled&action.shield_of_the_righteous.charges<1
 	if Talent(bastion_of_light_talent) and Charges(shield_of_the_righteous) < 1 Spell(bastion_of_light)
 	#seraphim,if=talent.seraphim.enabled&action.shield_of_the_righteous.charges>=2
@@ -73,7 +74,6 @@ AddFunction ProtectionDefaultShortCDActions
 
 AddFunction ProtectionDefaultMainActions
 {
-	PaladinHealMe()
 	if Speed() == 0 and HasEquippedItem(heathcliffs_immortality) and not BuffPresent(consecration_buff) Spell(consecration)
 	if Talent(blessed_hammer_talent) and (not PreviousGCDSpell(blessed_hammer) or Charges(blessed_hammer) == SpellMaxCharges(blessed_hammer)) Spell(blessed_hammer)
 	Spell(judgment)
@@ -86,7 +86,6 @@ AddFunction ProtectionDefaultMainActions
 
 AddFunction ProtectionDefaultAoEActions
 {
-	PaladinHealMe()
 	if Speed() == 0 and HasEquippedItem(heathcliffs_immortality) and not BuffPresent(consecration_buff) Spell(consecration)
 	Spell(avengers_shield)
 	if Speed() == 0 and not Talent(consecrated_hammer_talent) and not BuffPresent(consecration_buff) Spell(consecration)
