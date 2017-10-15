@@ -78,15 +78,15 @@ AddFunction VengeanceDefaultMainActions
 	# default rotation
 	if (target.TimeToDie() > 5) Spell(soul_carver)
 	if (PainDeficit() > 10*(1+0.2*BuffPresent(blade_turning_buff))) Spell(immolation_aura)
-	if (target.DebuffExpires(fiery_demise_debuff) and SoulFragments() <= 4) Spell(fracture)
 	if (HealthPercent() < 50) Spell(shear)
+	if (target.DebuffExpires(fiery_demise_debuff) and SoulFragments() <= 4 and (BuffRemaining(demon_spikes_buff) > GCD() + GCDRemaining() or Pain()>50)) Spell(fracture)
 	if (SoulFragments() >= 4) Spell(spirit_bomb)
 	if (VengeanceSigilOfFlame()) Spell(sigil_of_flame)
 	if (PainDeficit() > 20*(1+0.2*BuffPresent(blade_turning_buff))) Spell(felblade)
 	Spell(fel_eruption)
 	
 	# filler
-	if (Pain() > 70)
+	if (Pain() > 75)
 	{
 		Spell(fracture)
 		Spell(soul_cleave)
