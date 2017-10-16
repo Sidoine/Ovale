@@ -231,7 +231,8 @@ Define(ray_of_frost 205021)
 	SpellInfo(ray_of_frost cd=60 channel=10 tag=main)
 Define(ray_of_frost_talent 1)
 Define(rune_of_power 116011)
-	SpellInfo(rune_of_power buff_totem=rune_of_power_buff duration=10 max_totems=2 totem=1)
+	SpellInfo(rune_of_power buff_totem=rune_of_power_buff duration=10 max_totems=2 totem=1 unusable=0)
+	SpellRequire(rune_of_power unusable 1=buff,rune_of_power_buff,1)
 	SpellAddBuff(rune_of_power rune_of_power_buff=1)
 	SpellAddBuff(rune_of_power ice_floes_buff=0 if_spell=ice_floes)
 	SpellAddBuff(rune_of_power presence_of_mind_buff=0 if_spell=presence_of_mind)
@@ -273,6 +274,7 @@ Define(water_elemental_water_jet_debuff 135029)
 Define(winters_chill_debuff 157997) # TODO ???
 
 # Talents
+Define(firestarter_talent 3)
 Define(artic_gale_talent 18)
 Define(charged_up_talent 11)
 Define(glacial_spike_talent 20)
@@ -298,6 +300,7 @@ Define(zannesu_journey_buff 226852)
 	SpellAddBuff(blizzard zannesu_journey_buff=-1)
 Define(lady_vashjs_grasp 132411)
 Define(shard_of_the_exodar 132410)
+Define(erupting_infernal_core_buff 248147)
 
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(arcane_orb tag=shortcd)
