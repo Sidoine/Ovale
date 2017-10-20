@@ -129,13 +129,11 @@ local function Update(self, element, startTime, actionTexture, actionInRange, ac
 		self.icone:Show()
 		self.icone:SetTexture(actionTexture)
 
-		local alpha = profile.apparence.alpha
 		if actionUsable then
-			self.icone:SetAlpha(alpha)
+			self.icone:SetAlpha(1)
 		else
 			-- Unusable actions are displayed at half the normal alpha.
-			alpha = alpha / 2
-			self.icone:SetAlpha(alpha)
+			self.icone:SetAlpha(0.5)
 		end
 
 		-- Icon color overlay (red or not red).
