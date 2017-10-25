@@ -49,7 +49,9 @@ AddFunction BrewmasterDefaultShortCDActions
 	if (StaggerPercentage() >= 100 or (StaggerPercentage() >= 60 and SpellCooldown(black_ox_brew) <= 0)) Spell(purifying_brew)
 	# use black_ox_brew when at 0 charges and low energy (or in an emergency)
 	if ((SpellCharges(purifying_brew) == 0) and (Energy() < 40 or StaggerPercentage() >= 60)) Spell(black_ox_brew)
-	
+
+	# heal mean
+	BrewmasterHealMe()
 	# range check
 	BrewmasterRangeCheck()
 
@@ -86,7 +88,6 @@ AddFunction BrewmasterDefaultShortCDActions
 
 AddFunction BrewmasterDefaultMainActions
 {
-	BrewmasterHealMe()
 	if Talent(blackout_combo_talent) BrewmasterBlackoutComboMainActions()
 	unless Talent(blackout_combo_talent) 
 	{
@@ -122,7 +123,6 @@ AddFunction BrewmasterBlackoutComboMainActions
 
 AddFunction BrewmasterDefaultAoEActions
 {
-	BrewmasterHealMe()
 	if(Talent(blackout_combo_talent) and not BuffPresent(blackout_combo_buff)) Spell(blackout_strike)
 	Spell(exploding_keg)
 	Spell(keg_smash)
