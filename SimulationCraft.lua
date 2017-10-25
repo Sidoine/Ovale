@@ -2909,6 +2909,8 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
 		code = format("PersistentMultiplier(%s)", buffName)
 	elseif property == "recharge_time" then
 		code = format("SpellChargeCooldown(%s)", name)
+	elseif property == "full_recharge_time" then
+		code = format("SpellFullRecharge(%s)", name)
 	elseif property == "remains" then
 		if IsTotem(name) then
 			code = format("TotemRemaining(%s)", name)
@@ -3869,6 +3871,9 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
 		local name = "frozen_orb"
 		code = format("10 - (SpellCooldownDuration(%s) - SpellCooldown(%s))", name, name)
 		AddSymbol(annotation, name)
+	elseif class == "MAGE" and operand == "firestarter.active" then
+		code = "HasTalent(firestarter_talent) and target.HealthPercent() >= 90"
+		AddSymbol(annotation, "firestarter_talent")
 	elseif class == "MONK" and strsub(operand, 1, 35) == "debuff.storm_earth_and_fire_target." then
 		local property = strsub(operand, 36)
 		if target == "" then

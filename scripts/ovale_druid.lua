@@ -14,6 +14,7 @@ Include(ovale_druid_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=guardian)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=guardian)
 AddCheckBox(opt_druid_guardian_aoe L(AOE) default specialization=guardian)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=guardian)
 
 AddFunction FrenziedRegenHealTotal
 {
@@ -30,6 +31,7 @@ AddFunction GuardianHealMe
 	
 	if HealthPercent() <= 50 Spell(lunar_beam)
 	if HealthPercent() <= 80 and not InCombat() Spell(regrowth)
+	if (HealthPercent() < 35) UseHealthPotions()
 }
 
 AddFunction GuardianGetInMeleeRange
@@ -95,7 +97,7 @@ AddFunction GuardianDefaultCdActions
 		Spell(barkskin)
 		Spell(rage_of_the_sleeper)
 		Spell(survival_instincts)
-		Item(unbending_potion usable=1)
+		if CheckBoxOn(opt_use_consumables) Item(unbending_potion usable=1)
 	}
 }
 

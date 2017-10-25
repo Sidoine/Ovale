@@ -61,6 +61,11 @@ Define(prolonged_power_buff 229206)
 Define(unbending_potion_buff 188029)
 SpellList(potion_buff unbending_potion_buff)
 
+Define(astral_healing_potion 152615)
+Define(ancient_healing_potion 127834)
+Define(aged_healing_potion 136569)
+Define(healthstone 5512)
+
 ###
 ### Trinkets & OnUse Rings
 ###
@@ -192,7 +197,19 @@ AddFunction UseRacialSurvivalActions
 {
 	Spell(stoneform)
 }
+
+AddFunction UseHealthPotions
+{
+	Item(healthstone usable=1)
+	if CheckBoxOn(opt_use_consumables) 
+	{
+		Item(astral_healing_potion usable=1)
+		Item(ancient_healing_potion usable=1)
+		Item(aged_healing_potion usable=1)
+	}
+}
 ]]
 
 	OvaleScripts:RegisterScript(nil, nil, name, desc, code, "include")
 end
+

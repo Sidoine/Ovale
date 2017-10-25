@@ -24,6 +24,12 @@ AddFunction ProtectionSelfHealCondition
 		or (HealthPercent() < 60 and HasEquippedItem(saruans_resolve) and (SpellCharges(light_of_the_protector) >= 2 or SpellCharges(hand_of_the_protector) >= 2))
 }
 
+AddFunction PaladinHealMe
+{
+	if ProtectionSelfHealCondition() Spell(light_of_the_protector)
+	if (HealthPercent() < 35) UseHealthPotions()
+}
+
 AddFunction ProtectionHasProtectiveCooldown
 {
 	target.DebuffPresent(eye_of_tyr_debuff) or BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff)
@@ -41,8 +47,7 @@ AddFunction ProtectionGetInMeleeRange
 
 AddFunction ProtectionDefaultShortCDActions
 {
-	if ProtectionSelfHealCondition() Spell(light_of_the_protector)
-	
+	PaladinHealMe()
 	#bastion_of_light,if=talent.bastion_of_light.enabled&action.shield_of_the_righteous.charges<1
 	if Talent(bastion_of_light_talent) and Charges(shield_of_the_righteous) < 1 Spell(bastion_of_light)
 	#seraphim,if=talent.seraphim.enabled&action.shield_of_the_righteous.charges>=2
