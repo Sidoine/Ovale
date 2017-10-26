@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "icyveins_monk_brewmaster"
-	local desc = "[7.3.0] Icy-Veins: Monk Brewmaster"
+	local desc = "[7.3.2] Icy-Veins: Monk Brewmaster"
 	local code = [[
 
 Include(ovale_common)

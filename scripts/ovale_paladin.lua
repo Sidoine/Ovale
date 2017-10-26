@@ -3,7 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "icyveins_paladin_protection"
-	local desc = "[7.0] Icy-Veins: Paladin Protection"
+	local desc = "[7.3.2] Icy-Veins: Paladin Protection"
 	local code = [[
 Include(ovale_common)
 Include(ovale_trinkets_mop)
