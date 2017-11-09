@@ -3,8 +3,8 @@
 
 
 "@types/node@^8.0.44":
-  version "8.0.47"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.47.tgz#968e596f91acd59069054558a00708c445ca30c2"
+  version "8.0.50"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.50.tgz#dc545448e128c88c4eec7cd64025fcc3b7604541"
 
 "@wowts/ace_comm-3.0@^1.0.0":
   version "1.0.0"
@@ -153,9 +153,9 @@
     "@wowts/tsaddon" "^1.0.0"
     "@wowts/tslib" "^1.0.0"
 
-"@wowts/lua@^1.0.3", "@wowts/lua@^1.0.4", "@wowts/lua@^1.0.5":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@wowts/lua/-/lua-1.0.5.tgz#a794fb82ff44156bb0e7499543d5f894b0f3b895"
+"@wowts/lua@^1.0.3", "@wowts/lua@^1.0.5", "@wowts/lua@^1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@wowts/lua/-/lua-1.0.6.tgz#0162358e8f89ecc936cc5b1d91944aae8afab57e"
 
 "@wowts/masque@^1.0.0":
   version "1.0.0"
@@ -179,9 +179,9 @@
     "@wowts/tslib" "^1.0.0"
     "@wowts/wow-mock" "^1.0.1"
 
-"@wowts/string@^1.0.4":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@wowts/string/-/string-1.0.4.tgz#5f37bcb8c97a8b060ca113445c94566cc68d7f5d"
+"@wowts/string@^1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@wowts/string/-/string-1.0.5.tgz#7a7ac53794b25dfeb6c50cd511093ce3b90ed1c1"
   dependencies:
     "@wowts/coroutine" "^1.0.0"
 
@@ -191,9 +191,9 @@
   dependencies:
     "@wowts/lua" "^1.0.5"
 
-"@wowts/tsaddon@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@wowts/tsaddon/-/tsaddon-1.0.0.tgz#4994e22c93be50b069bdd51bc49941ac84ce9266"
+"@wowts/tsaddon@^1.0.0", "@wowts/tsaddon@^1.1.0":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@wowts/tsaddon/-/tsaddon-1.1.1.tgz#d336a5b2e4b202a4ee611d57bf7bad25fa5fcbfa"
   dependencies:
     "@wowts/lua" "^1.0.3"
     "@wowts/table" "^1.0.0"
@@ -201,14 +201,14 @@
     "@wowts/wow-mock" "^1.0.1"
 
 "@wowts/tslib@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@wowts/tslib/-/tslib-1.0.0.tgz#278bf29a3fbb955e19f612fcf10908183f82fea0"
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@wowts/tslib/-/tslib-1.0.1.tgz#330eb661750126b1f4afb94c680569b1562424cc"
   dependencies:
     "@wowts/lua" "^1.0.3"
 
-"@wowts/tstolua@^1.0.6":
-  version "1.0.9"
-  resolved "https://registry.yarnpkg.com/@wowts/tstolua/-/tstolua-1.0.9.tgz#374b24a3a0544a00e713dae7a588477833d8c91a"
+"@wowts/tstolua@^1.0.10":
+  version "1.0.10"
+  resolved "https://registry.yarnpkg.com/@wowts/tstolua/-/tstolua-1.0.10.tgz#eb4f83d3fd2893fa1081beed1b5d0bdac50a774d"
   dependencies:
     commander "^2.11.0"
     typescript "^2.5.3"
@@ -275,8 +275,8 @@ chalk@^2.1.0:
     supports-color "^4.0.0"
 
 color-convert@^1.9.0:
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/color-convert/-/color-convert-1.9.0.tgz#1accf97dd739b983bf994d56fec8f95853641b7a"
+  version "1.9.1"
+  resolved "https://registry.yarnpkg.com/color-convert/-/color-convert-1.9.1.tgz#c1261107aeb2f294ebffec9ed9ecad529a6097ed"
   dependencies:
     color-name "^1.1.1"
 
@@ -411,14 +411,14 @@ tslint@^5.7.0:
     tsutils "^2.12.1"
 
 tsutils@^2.12.1:
-  version "2.12.1"
-  resolved "https://registry.yarnpkg.com/tsutils/-/tsutils-2.12.1.tgz#f4d95ce3391c8971e46e54c4cf0edb0a21dd5b24"
+  version "2.12.2"
+  resolved "https://registry.yarnpkg.com/tsutils/-/tsutils-2.12.2.tgz#ad58a4865d17ec3ddb6631b6ca53be14a5656ff3"
   dependencies:
     tslib "^1.7.1"
 
 typescript@^2.5.3:
-  version "2.5.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.5.3.tgz#df3dcdc38f3beb800d4bc322646b04a3f6ca7f0d"
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.6.1.tgz#ef39cdea27abac0b500242d6726ab90e0c846631"
 
 wrappy@1:
   version "1.0.2"

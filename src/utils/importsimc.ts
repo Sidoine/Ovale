@@ -13,7 +13,7 @@ import { OvaleSimulationCraft } from "../SimulationCraft";
 import  { registerScripts } from "../scripts/index";
 
 let outputDirectory = "src/scripts";
-let profilesDirectory = "c:/Users/Sidoine/Git/simc/profiles/Tier19P";
+let profilesDirectory = process.argv[2];
 let root = "../";
 let SIMC_CLASS = [
     "deathknight",
