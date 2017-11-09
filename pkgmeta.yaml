@@ -30,4 +30,6 @@ ignore:
     - src
     - package.json
     - tsconfig.json
+    - tsconfig.lua.json
     - tslint.json
+    - yarn.lock
