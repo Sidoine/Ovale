@@ -3,6 +3,7 @@ local OvaleScripts = Ovale.OvaleScripts
 
 do
 	local name = "icyveins_warrior_protection"
+	local desc = "[7.3.2] Icy-Veins: Warrior Protection"
 	local code = [[
 
 Include(ovale_common)
@@ -63,7 +64,7 @@ AddFunction ProtectionDefaultShortCDActions
 	if ArmorSetBonus(T20 2) and RageDeficit() >= 26 Spell(berserker_rage)
 	if IncomingDamage(5 physical=1) 
 	{
-		if not BuffPresent(shield_block_buff) and SpellCharges(shield_block) < SpellMaxCharges(shield_block) Spell(neltharions_fury)
+		if not BuffPresent(shield_block_buff) and SpellFullRecharge(shield_block) > 3 Spell(neltharions_fury)
 		if not BuffPresent(neltharions_fury_buff) and (SpellCooldown(neltharions_fury)>0 or SpellCharges(shield_block) == SpellMaxCharges(shield_block)) Spell(shield_block)
 	}
 	if ((not BuffPresent(renewed_fury_buff) and Talent(renewed_fury_talent)) or Rage() >= 60) Spell(ignore_pain)
