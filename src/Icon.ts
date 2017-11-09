@@ -129,12 +129,10 @@ export class OvaleIcon {
             }
             this.icone.Show();
             this.icone.SetTexture(actionTexture);
-            let alpha = profile.apparence.alpha;
             if (actionUsable) {
-                this.icone.SetAlpha(alpha);
+                this.icone.SetAlpha(1);
             } else {
-                alpha = alpha / 2;
-                this.icone.SetAlpha(alpha);
+                this.icone.SetAlpha(0.5);
             }
             if (element.namedParams.nored != 1 && actionResourceExtend && actionResourceExtend > 0) {
                 this.icone.SetVertexColor(0.75, 0.2, 0.2);
