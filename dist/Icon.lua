@@ -107,12 +107,10 @@ __exports.OvaleIcon = __class(nil, {
             end
             self.icone:Show()
             self.icone:SetTexture(actionTexture)
-            local alpha = profile.apparence.alpha
             if actionUsable then
-                self.icone:SetAlpha(alpha)
+                self.icone:SetAlpha(1)
             else
-                alpha = alpha / 2
-                self.icone:SetAlpha(alpha)
+                self.icone:SetAlpha(0.5)
             end
             if element.namedParams.nored ~= 1 and actionResourceExtend and actionResourceExtend > 0 then
                 self.icone:SetVertexColor(0.75, 0.2, 0.2)
