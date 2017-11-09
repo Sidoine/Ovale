@@ -4231,7 +4231,6 @@ do
 				break
 			elseif not usable or state:IsUsableSpell(spellId, atTime, OvaleGUID:UnitGUID(target)) then
 				local start, duration = state:GetSpellCooldown(spellId)
-				if spellId == 217200 or spellId == 120679 then print(spellId, start, duration) end
 				local t = 0
 				if start > 0 and duration > 0 then
 					t = start + duration
