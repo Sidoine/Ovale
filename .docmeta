@@ -1,8 +1,0 @@
--
-    type: markdown
-    input-file: README.md
-    output-page: Main
--
-    type: luadoc
-    input-file: conditions.lua
-    output-page: Conditions

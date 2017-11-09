@@ -1,0 +1,90 @@
+import Skada from "Skada";
+let OvaleSkada = Skada && Skada.NewModule(OVALE) || Ovale.NewModule("OvaleSkada");
+Ovale.OvaleSkada = OvaleSkada;
+let OvaleScore = undefined;
+let _ipairs = ipairs;
+let floor = math.floor;
+let _tostring = tostring;
+const GetValue = function(set) {
+    if (set.ovaleMax && set.ovaleMax > 0) {
+        return floor(1000 * set.ovale / set.ovaleMax);
+    } else {
+        return undefined;
+    }
+}
+class OvaleSkada {
+    OnInitialize() {
+        OvaleScore = Ovale.OvaleScore;
+    }
+    OnEnable() {
+        this.metadata = {
+            showspots: true
+        }
+        if (Skada) {
+            Skada.AddMode(this);
+            OvaleScore.RegisterDamageMeter("OvaleSkada", this, "ReceiveScore");
+        }
+    }
+    OnDisable() {
+        OvaleScore.UnregisterDamageMeter("OvaleSkada");
+        if (Skada) {
+            Skada.RemoveMode(this);
+        }
+    }
+    ReceiveScore(name, guid, scored, scoreMax) {
+        if (guid && Skada && Skada.current && Skada.total) {
+            let player = Skada.get_player(Skada.current, guid, undefined);
+            if (player) {
+                this.AddPlayerAttributes(player);
+                player.ovale = player.ovale + scored;
+                player.ovaleMax = player.ovaleMax + scoreMax;
+                player = Skada.get_player(Skada.total, guid, undefined);
+                player.ovale = player.ovale + scored;
+                player.ovaleMax = player.ovaleMax + scoreMax;
+            }
+        }
+    }
+    Update(win, set) {
+        let max = 0;
+        let nr = 1;
+        for (const [i, player] of _ipairs(set.players)) {
+            if (player.ovaleMax && player.ovaleMax > 0) {
+                let d = win.dataset[nr] || {
+                }
+                win.dataset[nr] = d;
+                d.value = GetValue(player);
+                d.label = player.name;
+                d.class = player.class;
+                d.id = player.id;
+                d.valuetext = _tostring(d.value);
+                if (d.value > max) {
+                    max = d.value;
+                }
+                nr = nr + 1;
+            }
+        }
+        win.metadata.maxvalue = max;
+    }
+    AddToTooltip(set, tooltip) {
+        GameTooltip.AddDoubleLine("Ovale", GetValue(set), 1, 1, 1);
+    }
+    AddPlayerAttributes(player) {
+        if (!player.ovale) {
+            player.ovale = 0;
+        }
+        if (!player.ovaleMax) {
+            player.ovaleMax = 0;
+        }
+    }
+    AddSetAttributes(set) {
+        if (!set.ovale) {
+            set.ovale = 0;
+        }
+        if (!set.ovaleMax) {
+            set.ovaleMax = 0;
+        }
+    }
+    GetSetSummary(set) {
+        return GetValue(set);
+    }
+}

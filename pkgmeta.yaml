@@ -19,12 +19,15 @@ externals:
     libs/LibTextDump-1.0: https://repos.wowace.com/wow/libtextdump-1-0
     libs/LibArtifactData-1.0: https://github.com/Rainrider/LibArtifactData-1.0.git
     libs/LibRangeCheck-2.0: https://repos.wowace.com/wow/librangecheck-2-0/trunk
+    libs/tslib: https://github.com/wowts/tslib.git
+    libs/tsaddon: https://github.com/wowts/tsaddon.git
 
 enable-nolib-creation: no
 
 ignore:
     - release
     - tests
-    - tmp
-    - utils
-    - WoWMock.lua
+    - src
+    - package.json
+    - tsconfig.json
+    - tslint.json

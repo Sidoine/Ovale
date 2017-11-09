@@ -1,0 +1,7 @@
+{
+    "extends": [],
+    "rules": {
+        "no-unused-variable": true,
+        "unified-signatures":false
+    }    
+}
