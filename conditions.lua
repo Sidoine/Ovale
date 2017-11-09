@@ -4620,6 +4620,7 @@ do
 	end
 
 	OvaleCondition:RegisterCondition("talent", false, Talent)
+	OvaleCondition:RegisterCondition("hastalent", false, Talent)
 end
 
 do
