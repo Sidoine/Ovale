@@ -80,7 +80,7 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
         }
         return descriptionsTable;
     }
-    RegisterScript(className, specialization, name, description, code, scriptType) {
+    RegisterScript(className: string, specialization: string, name: string, description: string, code: string, scriptType: "script" | "include") {
         if (!className || className == Ovale.playerClass) {
             this.script[name] = this.script[name] || {
             }
@@ -122,6 +122,8 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
                 name = DISABLED_NAME;
             } else if (specialization == "guardian") {
                 name = "icyveins_druid_guardian";
+            } else if (specialization == "feral") {
+                name = "shmoodude_druid_feral";
             }
         } else if (className == "MONK") {
             if (specialization == "mistweaver") {
