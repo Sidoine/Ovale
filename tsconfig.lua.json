@@ -4,7 +4,8 @@
       "module": "commonjs",
       "noImplicitAny": false,
       "outDir": "dist",
-      "rootDir": "src"
+      "rootDir": "src",
+      "noUnusedLocals": true
     },
     "exclude": [
       "node_modules",

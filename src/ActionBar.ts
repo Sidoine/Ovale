@@ -41,6 +41,9 @@ class OvaleActionBarClass extends OvaleActionBarBase {
         for (const [k, v] of pairs(this.debugOptions)) {
             OvaleDebug.options.args[k] = v;
         }
+    }
+
+    OnInitialize() {
         this.RegisterEvent("ACTIONBAR_SLOT_CHANGED");
         this.RegisterEvent("PLAYER_ENTERING_WORLD", event => this.UpdateActionSlots(event));
         this.RegisterEvent("UPDATE_BINDINGS");

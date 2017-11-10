@@ -189,7 +189,7 @@ Define(rain_of_fire_debuff 5740)
 Define(roaring_blaze_debuff 205184) #TODO Check this
 Define(roaring_blaze_talent 2)
 Define(seed_of_corruption 27243)
-	SpellInfo(seed_of_corruption soulshards=10)
+	SpellInfo(seed_of_corruption soulshards=1)
 	SpellRequire(seed_of_corruption replace seed_of_corruption_soulburn=buff,soulburn_buff if_spell=soulburn)
 	SpellRequire(seed_of_corruption unusable 1=buff,soulburn_buff if_spell=soulburn)
 	SpellAddTargetDebuff(seed_of_corruption seed_of_corruption_debuff=1)

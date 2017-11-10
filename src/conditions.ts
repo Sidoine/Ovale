@@ -144,13 +144,13 @@ function GetHastedTime(seconds, haste, state: BaseState) {
         if ((OvaleData.buffSpellList[auraId])) {
             let spellList = OvaleData.buffSpellList[auraId];
             for (const [id] of pairs(spellList)) {
-                value = OvaleData.GetBaseDuration(id, state);
+                value = OvaleData.GetBaseDuration(id, paperDollState);
                 if (value != huge) {
                     break;
                 }
             }
         } else {
-            value = OvaleData.GetBaseDuration(auraId, state);
+            value = OvaleData.GetBaseDuration(auraId, paperDollState);
         }
         return Compare(value, comparator, limit);
     }
@@ -532,8 +532,8 @@ function GetHastedTime(seconds, haste, state: BaseState) {
 }
 {
     function BuffImproved(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        let [auraId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
-        let [target, filter, mine] = ParseCondition(positionalParams, namedParams, state);
+        let [, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
+        let [, , ] = ParseCondition(positionalParams, namedParams, state);
         // TODO Not implemented
         return Compare(0, comparator, limit);
     }
@@ -4297,7 +4297,7 @@ l    */
         if (auraState.IsActiveAura(aura, atTime)) {
             tickTime = aura.tick;
         } else {
-            tickTime = OvaleData.GetTickLength(auraId, state);
+            tickTime = OvaleData.GetTickLength(auraId, paperDollState);
         }
         if (tickTime && tickTime > 0) {
             return Compare(tickTime, comparator, limit);

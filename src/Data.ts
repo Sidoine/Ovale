@@ -7,6 +7,8 @@ import { self_requirement, CheckRequirements } from "./Requirement";
 import { type, pairs, tonumber, wipe, truthy, LuaArray, LuaObj } from "@wowts/lua";
 import { find } from "@wowts/string";
 import { huge, floor, ceil } from "@wowts/math";
+import { PaperDollSnapshot, SpellCast } from "./LastSpell";
+
 let OvaleDataBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleData"));
 let INFINITY = huge;
 
@@ -512,9 +514,10 @@ class OvaleDataClass extends OvaleDataBase {
         }
         return damage;
     }
-    GetBaseDuration(auraId, spellcast?) {
-        let combo = spellcast && spellcast.combo;
-        let holy = spellcast && spellcast.holy;
+    GetBaseDuration(auraId, spellcast?: SpellCast) {
+        spellcast = spellcast || OvalePaperDoll;
+        let combo = spellcast.combo || 0;
+        let holy = spellcast.holy || 0;
         let duration = INFINITY;
         let si = this.spellInfo[auraId];
         if (si && si.duration) {
@@ -535,7 +538,7 @@ class OvaleDataClass extends OvaleDataBase {
         }
         return duration;
     }
-    GetTickLength(auraId, snapshot?) {
+    GetTickLength(auraId, snapshot?: PaperDollSnapshot) {
         let tick = 3;
         let si = this.spellInfo[auraId];
         if (si) {

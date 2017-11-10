@@ -47,7 +47,6 @@ local sub = string.sub
 local GetSpellInfo = GetSpellInfo
 local OvaleCompileBase = Ovale:NewModule("OvaleCompile", aceEvent)
 local self_compileOnStances = false
-local self_canEvaluate = false
 local self_serial = 0
 local self_timesEvaluated = 0
 local self_icon = {}

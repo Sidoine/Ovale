@@ -8,6 +8,7 @@ import { auraState } from "./Aura";
 import { GetSpellCharges } from "@wowts/wow-mock";
 import { sub } from "@wowts/string";
 import { pairs, LuaObj } from "@wowts/lua";
+import { SpellCast } from "./LastSpell";
 
 let COOLDOWN_THRESHOLD = 0.10;
 
@@ -26,14 +27,14 @@ class CooldownState implements StateModule {
     cd: LuaObj<Cooldown> = undefined;
 
     
-    ApplySpellStartCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast) {
+    ApplySpellStartCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast: SpellCast) {
         OvaleCooldown.StartProfiling("OvaleCooldown_ApplySpellStartCast");
         if (isChanneled) {
             this.ApplyCooldown(spellId, targetGUID, startCast);
         }
         OvaleCooldown.StopProfiling("OvaleCooldown_ApplySpellStartCast");
     }
-    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast) {
+    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast: SpellCast) {
         OvaleCooldown.StartProfiling("OvaleCooldown_ApplySpellAfterCast");
         if (!isChanneled) {
             this.ApplyCooldown(spellId, targetGUID, endCast);

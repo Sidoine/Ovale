@@ -10,6 +10,7 @@ import { ipairs, pairs, LuaArray } from "@wowts/lua";
 import { GetRuneCooldown, GetTime } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
 import { sort } from "@wowts/table";
+import { SpellCast, PaperDollSnapshot } from "./LastSpell";
 
 let OvaleRunesBase = OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleRunes", aceEvent)));
 export let OvaleRunes: OvaleRunesClass;
@@ -131,14 +132,14 @@ class RunesState implements StateModule {
             this.rune[slot] = undefined;
         }
     }
-    ApplySpellStartCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast) {
+    ApplySpellStartCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast: SpellCast) {
         OvaleRunes.StartProfiling("OvaleRunes_ApplySpellStartCast");
         if (isChanneled) {
             this.ApplyRuneCost(spellId, startCast, spellcast);
         }
         OvaleRunes.StopProfiling("OvaleRunes_ApplySpellStartCast");
     }
-    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast) {
+    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast: SpellCast) {
         OvaleRunes.StartProfiling("OvaleRunes_ApplySpellAfterCast");
         if (!isChanneled) {
             this.ApplyRuneCost(spellId, endCast, spellcast);
@@ -162,7 +163,7 @@ class RunesState implements StateModule {
             }
         }
     }
-    ApplyRuneCost(spellId, atTime, spellcast) {
+    ApplyRuneCost(spellId, atTime, spellcast: SpellCast) {
         let si = OvaleData.spellInfo[spellId];
         if (si) {
             let count = si.runes || 0;
@@ -182,7 +183,7 @@ class RunesState implements StateModule {
         }
         rune.endCooldown = atTime;
     }
-    ConsumeRune(spellId, atTime, snapshot) {
+    ConsumeRune(spellId: number, atTime: number, snapshot: PaperDollSnapshot) {
         OvaleRunes.StartProfiling("OvaleRunes_state_ConsumeRune");
         let consumedRune: Rune;
         for (let slot = 1; slot <= RUNE_SLOTS; slot += 1) {

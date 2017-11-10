@@ -13,7 +13,6 @@ local pairs = pairs
 local type = type
 local IsInGroup = IsInGroup
 local SendAddonMessage = SendAddonMessage
-local UnitName = UnitName
 local LE_PARTY_CATEGORY_INSTANCE = LE_PARTY_CATEGORY_INSTANCE
 local GetTime = GetTime
 local UnitCastingInfo = UnitCastingInfo
@@ -21,11 +20,9 @@ local UnitChannelInfo = UnitChannelInfo
 local OvaleScoreBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleScore", aceEvent, AceSerializer))
 local MSG_PREFIX = Ovale.MSG_PREFIX
 local self_playerGUID = nil
-local self_name = nil
 local OvaleScoreClass = __class(OvaleScoreBase, {
     OnInitialize = function(self)
         self_playerGUID = Ovale.playerGUID
-        self_name = UnitName("player")
         self:RegisterEvent("CHAT_MSG_ADDON")
         self:RegisterEvent("PLAYER_REGEN_ENABLED")
         self:RegisterEvent("PLAYER_REGEN_DISABLED")

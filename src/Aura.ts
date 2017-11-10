@@ -624,7 +624,7 @@ class OvaleAuraClass extends OvaleAuraBase {
                 aura.lastTickTime = undefined;
                 aura.tick = undefined;
                 if (aura.start + aura.duration > aura.ending) {
-                    let spellcast;
+                    let spellcast: SpellCast;
                     if (guid == self_playerGUID) {
                         spellcast = lastSpell.LastSpellSent();
                     } else {
@@ -841,7 +841,7 @@ class AuraState implements StateModule {
             RemoveAurasOnGUID(this.aura, guid);
         }
     }
-    ApplySpellStartCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast) {
+    ApplySpellStartCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast: SpellCast) {
         OvaleAura.StartProfiling("OvaleAura_ApplySpellStartCast");
         if (isChanneled) {
             let si = OvaleData.spellInfo[spellId];
@@ -862,7 +862,7 @@ class AuraState implements StateModule {
         }
         OvaleAura.StopProfiling("OvaleAura_ApplySpellStartCast");
     }
-    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast) {
+    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast: SpellCast) {
         OvaleAura.StartProfiling("OvaleAura_ApplySpellAfterCast");
         if (!isChanneled) {
             let si = OvaleData.spellInfo[spellId];
@@ -880,7 +880,7 @@ class AuraState implements StateModule {
         }
         OvaleAura.StopProfiling("OvaleAura_ApplySpellAfterCast");
     }
-    ApplySpellOnHit(spellId, targetGUID, startCast, endCast, isChanneled, spellcast) {
+    ApplySpellOnHit(spellId, targetGUID, startCast, endCast, isChanneled, spellcast: SpellCast) {
         OvaleAura.StartProfiling("OvaleAura_ApplySpellAfterHit");
         if (!isChanneled) {
             let si = OvaleData.spellInfo[spellId];

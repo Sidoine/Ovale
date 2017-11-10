@@ -86,8 +86,7 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
     talentPoints = {    }
 
     
-    constructor() {
-        super();
+    OnInitialize() {
         this.RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "Update");
         this.RegisterEvent("CHARACTER_POINTS_CHANGED", "UpdateTalents");
         this.RegisterEvent("PLAYER_ENTERING_WORLD", "Update");

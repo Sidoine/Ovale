@@ -21,7 +21,6 @@ import { GetSpellInfo } from "@wowts/wow-mock";
 let OvaleCompileBase = Ovale.NewModule("OvaleCompile", aceEvent);
 export let OvaleCompile: OvaleCompileClass;
 let self_compileOnStances = false;
-let self_canEvaluate = false;
  
 let self_serial = 0;
 let self_timesEvaluated = 0;

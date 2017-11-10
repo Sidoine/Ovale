@@ -336,10 +336,6 @@ interface DefineNode extends AstNode {
     value: string | number;
 }
 
-function isDefineNode(node: AstNode): node is DefineNode {
-    return node.type === "define";
-}
-
 const TokenizeComment:Tokenizer = function(token) {
     return ["comment", token];
 }
@@ -594,7 +590,6 @@ class OvaleASTClass extends OvaleASTBase {
 
     /** "Flatten" a parameter value node into a string, or a table of strings if it is a comma-separated value. */
     FlattenParameterValue(parameterValue: SimpleValue, annotation: AstAnnotation): FlattenParameterValue {
-        let value = parameterValue;
         if (isAstNode(parameterValue) && isCsvNode(parameterValue)) {
             const parameters = this.self_flattenParametersPool.Get();
             for (const [k, v] of ipairs(parameterValue.csv)) {
@@ -2469,7 +2464,7 @@ class OvaleASTClass extends OvaleASTBase {
                 this.self_pool.Release(node);
             }
         }
-        for (const [key, value] of pairs(annotation)) {
+        for (const [, value] of pairs(annotation)) {
             if (type(value) == "table") {
                 wipe(value);
             }

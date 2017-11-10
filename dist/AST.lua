@@ -231,9 +231,6 @@ end
 __exports.isValueNode = function(node)
     return node.type == "value"
 end
-local function isDefineNode(node)
-    return node.type == "define"
-end
 local TokenizeComment = function(token)
     return "comment", token
 end
@@ -433,7 +430,6 @@ local OvaleASTClass = __class(OvaleASTBase, {
         return parameterValue
     end,
     FlattenParameterValue = function(self, parameterValue, annotation)
-        local value = parameterValue
         if isAstNode(parameterValue) and isCsvNode(parameterValue) then
             local parameters = self.self_flattenParametersPool:Get()
             for k, v in ipairs(parameterValue.csv) do
@@ -801,7 +797,7 @@ local OvaleASTClass = __class(OvaleASTBase, {
                 self.self_pool:Release(node)
             end
         end
-        for key, value in pairs(annotation) do
+        for _, value in pairs(annotation) do
             if type(value) == "table" then
                 wipe(value)
             end

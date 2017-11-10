@@ -2,6 +2,7 @@ import { OvaleDebug } from "./Debug";
 import { OvaleQueue } from "./Queue";
 import { Ovale } from "./Ovale";
 import { pairs, LuaObj } from "@wowts/lua";
+import { SpellCast } from "./LastSpell";
 
 let OvaleStateBase = Ovale.NewModule("OvaleState");
 export let OvaleState: OvaleStateClass;
@@ -12,9 +13,9 @@ export interface StateModule {
     CleanState():void;
     InitializeState():void;
     ResetState():void;
-    ApplySpellStartCast?(spellId, targetGUID, startCast, endCast, channel, spellcast):void;
-    ApplySpellAfterCast?(spellId, targetGUID, startCast, endCast, channel, spellcast):void;
-    ApplySpellOnHit?(spellId, targetGUID, startCast, endCast, channel, spellcast):void;
+    ApplySpellStartCast?(spellId, targetGUID, startCast, endCast, channel, spellcast: SpellCast):void;
+    ApplySpellAfterCast?(spellId, targetGUID, startCast, endCast, channel, spellcast: SpellCast):void;
+    ApplySpellOnHit?(spellId, targetGUID, startCast, endCast, channel, spellcast: SpellCast):void;
 }
 
 const OvaleStateBaseClass = OvaleDebug.RegisterDebugging(OvaleStateBase);
@@ -46,7 +47,7 @@ class OvaleStateClass extends OvaleStateBaseClass {
         }
     }
 
-    ApplySpellStartCast(spellId, targetGUID, startCast, endCast, channel, spellcast) {
+    ApplySpellStartCast(spellId, targetGUID, startCast, endCast, channel, spellcast: SpellCast) {
         const iterator = self_stateAddons.Iterator();
         while (iterator.Next()) {
             if (iterator.value.ApplySpellStartCast) {
@@ -55,7 +56,7 @@ class OvaleStateClass extends OvaleStateBaseClass {
         }
     }
 
-    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, channel, spellcast) {
+    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, channel, spellcast: SpellCast) {
         const iterator = self_stateAddons.Iterator();
         while (iterator.Next()) {
             if (iterator.value.ApplySpellAfterCast){
@@ -64,7 +65,7 @@ class OvaleStateClass extends OvaleStateBaseClass {
         }
     }
     
-    ApplySpellOnHit(spellId, targetGUID, startCast, endCast, channel, spellcast) {
+    ApplySpellOnHit(spellId, targetGUID, startCast, endCast, channel, spellcast: SpellCast) {
         const iterator = self_stateAddons.Iterator();
         while (iterator.Next()) {
             if (iterator.value.ApplySpellOnHit) {

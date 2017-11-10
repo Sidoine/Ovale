@@ -513,8 +513,9 @@ local OvaleDataClass = __class(OvaleDataBase, {
         return damage
     end,
     GetBaseDuration = function(self, auraId, spellcast)
-        local combo = spellcast and spellcast.combo
-        local holy = spellcast and spellcast.holy
+        spellcast = spellcast or OvalePaperDoll
+        local combo = spellcast.combo or 0
+        local holy = spellcast.holy or 0
         local duration = INFINITY
         local si = self.spellInfo[auraId]
         if si and si.duration then

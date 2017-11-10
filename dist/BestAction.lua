@@ -517,7 +517,7 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
         end
         self.ComputeGroup = function(element, state, atTime)
             self:StartProfiling("OvaleBestAction_Compute")
-            local bestTimeSpan, bestElement, bestCastTime
+            local bestTimeSpan, bestElement
             local best = newTimeSpan()
             local current = newTimeSpan()
             for _, node in ipairs(element.child) do
@@ -549,7 +549,6 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
                         best:copyFromArray(current)
                         bestTimeSpan = currentTimeSpan
                         bestElement = currentElement
-                        bestCastTime = currentCastTime
                     end
                 end
             end

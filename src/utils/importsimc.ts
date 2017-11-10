@@ -1,20 +1,15 @@
-import { format, gmatch, gsub, find, len, lower, sub, upper } from "@wowts/string";
+import { format } from "@wowts/string";
 import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync } from "fs";
 import { Ovale } from "../Ovale";
-import { OvaleOptions } from "../Options";
-import { OvaleAST } from "../AST";
-import { OvaleData } from "../Data";
 import { eventDispatcher } from "@wowts/wow-mock";
 import { OvaleEquipment } from "../Equipment";
 import { OvaleSpellBook } from "../SpellBook";
 import { OvaleStance } from "../Stance";
-import { OvaleCompile } from "../Compile";
 import { OvaleSimulationCraft } from "../SimulationCraft";
 import  { registerScripts } from "../scripts/index";
 
 let outputDirectory = "src/scripts";
 let profilesDirectory = process.argv[2];
-let root = "../";
 let SIMC_CLASS = [
     "deathknight",
     "demonhunter",
@@ -104,10 +99,7 @@ for (const filename of files) {
                     break;
                 }
             }
-            let config = {
-                class: className,
-                specialization: specialization
-            }
+            
             console.log(filename);
             Ovale.playerGUID = "player";
             Ovale.playerClass = className;

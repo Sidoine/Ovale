@@ -62,6 +62,8 @@ local OvaleActionBarClass = __class(OvaleActionBarBase, {
         for k, v in pairs(self.debugOptions) do
             OvaleDebug.options.args[k] = v
         end
+    end,
+    OnInitialize = function(self)
         self:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
         self:RegisterEvent("PLAYER_ENTERING_WORLD", function(event)
             return self:UpdateActionSlots(event)

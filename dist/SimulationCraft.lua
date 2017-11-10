@@ -1802,7 +1802,7 @@ local EmitConditionNode = function(nodeList, bodyNode, conditionNode, parseNode,
     end
 end
 
-local EmitNamedVariable = function(name, nodeList, annotation, modifier, parseNode, action, conditionNode)
+local function EmitNamedVariable(name, nodeList, annotation, modifier, parseNode, action, conditionNode)
     if  not annotation.variable then
         annotation.variable = {}
     end
@@ -1829,8 +1829,7 @@ local EmitNamedVariable = function(name, nodeList, annotation, modifier, parseNo
     end
     annotation.currentVariable = nil
 end
-
-local EmitVariableMin = function(name, nodeList, annotation, modifier, parseNode, action)
+local function EmitVariableMin(name, nodeList, annotation, modifier, parseNode, action)
     EmitNamedVariable(name .. "_min", nodeList, annotation, modifier, parseNode, action)
     local valueNode = annotation.variable[name]
     valueNode.name = name .. "_value"
@@ -1839,8 +1838,7 @@ local EmitVariableMin = function(name, nodeList, annotation, modifier, parseNode
     local node = OvaleAST:ParseCode("add_function", bodyCode, nodeList, annotation.astAnnotation)
     annotation.variable[name] = node
 end
-
-local EmitVariableMax = function(name, nodeList, annotation, modifier, parseNode, action)
+local function EmitVariableMax(name, nodeList, annotation, modifier, parseNode, action)
     EmitNamedVariable(name .. "_max", nodeList, annotation, modifier, parseNode, action)
     local valueNode = annotation.variable[name]
     valueNode.name = name .. "_value"
@@ -1849,10 +1847,8 @@ local EmitVariableMax = function(name, nodeList, annotation, modifier, parseNode
     local node = OvaleAST:ParseCode("add_function", bodyCode, nodeList, annotation.astAnnotation)
     annotation.variable[name] = node
 end
-
-local EmitVariableAdd = function(name, nodeList, annotation, modifier, parseNode, action)
+local function EmitVariableAdd(name, nodeList, annotation, modifier, parseNode, action)
 end
-
 local function EmitVariableIf(name, nodeList, annotation, modifier, parseNode, action)
     local node = annotation.variable[name]
     local group
@@ -1880,12 +1876,15 @@ local function EmitVariableIf(name, nodeList, annotation, modifier, parseNode, a
     insert(group.child, elseNode)
     annotation.currentVariable = nil
 end
-local EmitVariable = function(nodeList, annotation, modifier, parseNode, action, conditionNode)
+local function EmitVariable(nodeList, annotation, modifier, parseNode, action, conditionNode)
     if  not annotation.variable then
         annotation.variable = {}
     end
     local op = (modifier.op and Unparse(modifier.op)) or "set"
     local name = Unparse(modifier.name)
+    if match(name, "^%d") then
+        name = "_" .. name
+    end
     if op == "min" then
         EmitVariableMin(name, nodeList, annotation, modifier, parseNode, action)
     elseif op == "max" then
@@ -1901,7 +1900,6 @@ local EmitVariable = function(nodeList, annotation, modifier, parseNode, action,
         __exports.OvaleSimulationCraft:Error("Unknown variable operator '%s'.", op)
     end
 end
-
 local checkOptionalSkill = function(action, className, specialization)
     local data = OPTIONAL_SKILLS[action]
     if  not data then

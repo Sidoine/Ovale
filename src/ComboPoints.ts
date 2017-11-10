@@ -9,7 +9,7 @@ import { OvaleSpellBook } from "./SpellBook";
 import { Ovale, RegisterPrinter } from "./Ovale";
 import { OvaleState, StateModule } from "./State";
 import { RegisterRequirement, UnregisterRequirement } from "./Requirement";
-import { lastSpell } from "./LastSpell";
+import { lastSpell, SpellCast } from "./LastSpell";
 import { dataState } from "./DataState";
 import aceEvent from "@wowts/ace_event-3.0";
 import { insert, remove } from "@wowts/table";
@@ -109,13 +109,11 @@ class OvaleComboPointsClass extends OvaleComboPointsBase {
             this.DebugTimestamp("%s: %d -> %d.", event, oldCombo, this.combo);
             let now = API_GetTime();
             RemovePendingComboEvents(now);
-            let pendingMatched = false;
             if (lualength(self_pendingComboEvents) > 0) {
                 let comboEvent = self_pendingComboEvents[1];
                 let [spellId, , reason, combo] = [comboEvent.spellId, comboEvent.guid, comboEvent.reason, comboEvent.combo];
                 if (combo == difference || (combo == "finisher" && this.combo == 0 && difference < 0)) {
                     this.Debug("    Matches pending %s event for %d.", reason, spellId);
-                    pendingMatched = true;
                     tremove(self_pendingComboEvents, 1);
                 }
             }
@@ -253,12 +251,12 @@ class OvaleComboPointsClass extends OvaleComboPointsBase {
         }
         return [verified, requirement, index];
     }
-    CopySpellcastInfo(spellcast, dest) {
+    CopySpellcastInfo = (mod: this, spellcast: SpellCast, dest) => {
         if (spellcast.combo) {
             dest.combo = spellcast.combo;
         }
     }
-    SaveSpellcastInfo = (module, spellcast, atTime, state:ComboPointsState) => {
+    SaveSpellcastInfo = (module: this, spellcast: SpellCast, atTime, state:ComboPointsState) => {
         let spellId = spellcast.spellId;
         if (spellId) {
             let si = OvaleData.spellInfo[spellId];
@@ -294,7 +292,7 @@ OvaleComboPoints = new OvaleComboPointsClass();
 export class ComboPointsState implements StateModule {
     combo = undefined;
     
-    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast) {
+    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast: SpellCast) {
         OvaleComboPoints.StartProfiling("OvaleComboPoints_ApplySpellAfterCast");
         let si = OvaleData.spellInfo[spellId];
         if (si && si.combo) {

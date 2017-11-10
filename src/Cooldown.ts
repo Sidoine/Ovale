@@ -3,7 +3,7 @@ import { OvaleProfiler } from "./Profiler";
 import { OvaleData } from "./Data";
 import { OvaleSpellBook } from "./SpellBook";
 import { Ovale } from "./Ovale";
-import { lastSpell } from "./LastSpell";
+import { lastSpell, SpellCast } from "./LastSpell";
 import { RegisterRequirement, UnregisterRequirement } from "./Requirement";
 import { DataState } from "./DataState";
 import aceEvent from "@wowts/ace_event-3.0";
@@ -75,8 +75,7 @@ class OvaleCooldownClass extends OvaleCooldownBase {
         duration: 0
     }
 
-    constructor() {
-        super();
+    OnInitialize() {
         this.RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN", "Update");
         this.RegisterEvent("BAG_UPDATE_COOLDOWN", "Update");
         this.RegisterEvent("PET_BAR_UPDATE_COOLDOWN", "Update");
@@ -191,12 +190,12 @@ class OvaleCooldownClass extends OvaleCooldownBase {
         }
         return [gcd, haste];
     }
-    CopySpellcastInfo(spellcast, dest) {
+    CopySpellcastInfo = (mod: this, spellcast: SpellCast, dest: SpellCast) => {
         if (spellcast.offgcd) {
             dest.offgcd = spellcast.offgcd;
         }
     }
-    SaveSpellcastInfo= (mod: OvaleCooldownClass, spellcast, atTime, state: DataState) => {
+    SaveSpellcastInfo= (mod: this, spellcast: SpellCast, atTime, state: DataState) => {
         let spellId = spellcast.spellId;
         if (spellId) {
             let gcd:number| string;

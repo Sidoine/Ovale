@@ -2,6 +2,7 @@ import { StateModule, OvaleState } from "./State";
 import { OvaleStance } from "./Stance";
 import { dataState } from "./DataState";
 import { type } from "@wowts/lua";
+import { SpellCast } from "./LastSpell";
 
 class StanceState implements StateModule {
     stance = undefined;
@@ -15,7 +16,7 @@ class StanceState implements StateModule {
         this.stance = OvaleStance.stance || 0;
         OvaleStance.StopProfiling("OvaleStance_ResetState");
     }
-    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast) {
+    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast: SpellCast) {
         OvaleStance.StartProfiling("OvaleStance_ApplySpellAfterCast");
         let stance = dataState.GetSpellInfoProperty(spellId, endCast, "to_stance", targetGUID);
         if (stance) {

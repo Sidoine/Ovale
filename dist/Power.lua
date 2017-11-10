@@ -692,6 +692,8 @@ local PowerState = __class(nil, {
     end,
     constructor = function(self)
         self.powerRate = nil
+        self.holy = 0
+        self.combo = 0
     end
 })
 __exports.powerState = PowerState()

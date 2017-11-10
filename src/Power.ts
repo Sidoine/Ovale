@@ -9,7 +9,7 @@ import { OvaleState, baseState, StateModule } from "./State";
 import { paperDollState } from "./PaperDoll";
 import { RegisterRequirement, UnregisterRequirement } from "./Requirement";
 import { futureState } from "./FutureState";
-import { lastSpell } from "./LastSpell";
+import { lastSpell, SpellCast } from "./LastSpell";
 import { DataState, dataState } from "./DataState";
 import aceEvent from "@wowts/ace_event-3.0";
 import { ceil, huge as INFINITY, floor } from "@wowts/math";
@@ -493,14 +493,14 @@ class OvalePowerClass extends OvalePowerBase {
         this.Print("Active regen: %f", this.activeRegen);
         this.Print("Inactive regen: %f", this.inactiveRegen);
     }
-    CopySpellcastInfo = (mod, spellcast, dest) => {
+    CopySpellcastInfo = (mod: this, spellcast: SpellCast, dest: SpellCast) => {
         for (const [, powerType] of pairs(self_SpellcastInfoPowerTypes)) {
             if (spellcast[powerType]) {
                 dest[powerType] = spellcast[powerType];
             }
         }
     }
-    SaveSpellcastInfo = (mod, spellcast, atTime, state: DataState) => {
+    SaveSpellcastInfo = (mod: this, spellcast: SpellCast, atTime: number, state: DataState) => {
         let spellId = spellcast.spellId;
         if (spellId) {
             let si = OvaleData.spellInfo[spellId];
@@ -538,6 +538,8 @@ let output = {}
 
 class PowerState implements StateModule {
     powerRate = undefined;
+    holy = 0;
+    combo = 0;
     InitializeState() {
         for (const [powerType] of pairs(OvalePower.POWER_INFO)) {
             this[powerType] = 0;
@@ -568,7 +570,7 @@ class PowerState implements StateModule {
             this.powerRate[k] = undefined;
         }
     }
-    ApplySpellStartCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast) {
+    ApplySpellStartCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast: SpellCast) {
         OvalePower.StartProfiling("OvalePower_ApplySpellStartCast");
         if (isChanneled) {
             if (baseState.inCombat) {
@@ -578,7 +580,7 @@ class PowerState implements StateModule {
         }
         OvalePower.StopProfiling("OvalePower_ApplySpellStartCast");
     }
-    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast) {
+    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast: SpellCast) {
         OvalePower.StartProfiling("OvalePower_ApplySpellAfterCast");
         if (!isChanneled) {
             if (baseState.inCombat) {
@@ -589,7 +591,7 @@ class PowerState implements StateModule {
         OvalePower.StopProfiling("OvalePower_ApplySpellAfterCast");
     }
 
-    ApplyPowerCost(spellId, targetGUID, atTime, spellcast) {
+    ApplyPowerCost(spellId, targetGUID, atTime, spellcast: SpellCast) {
         OvalePower.StartProfiling("OvalePower_state_ApplyPowerCost");
         let si = OvaleData.spellInfo[spellId];
         {

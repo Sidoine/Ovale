@@ -806,7 +806,7 @@ AddFunction no_de1
  NotDeDemons(dreadstalker) > 0 or NotDeDemons(darkglare) > 0 or NotDeDemons(doomguard) > 0 or NotDeDemons(infernal) > 0 or 0 > 0
 }
 
-AddFunction 3min
+AddFunction _3min
 {
  NotDeDemons(doomguard) > 0 or NotDeDemons(infernal) > 0
 }

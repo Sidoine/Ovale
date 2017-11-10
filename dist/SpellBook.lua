@@ -104,19 +104,7 @@ end
 local output = {}
 local OvaleSpellBookBase = OvaleProfiler:RegisterProfiling(OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleSpellBook", aceEvent)))
 local OvaleSpellBookClass = __class(OvaleSpellBookBase, {
-    constructor = function(self)
-        self.ready = false
-        self.spell = {}
-        self.spellbookId = {
-            [BOOKTYPE_PET] = {},
-            [BOOKTYPE_SPELL] = {}
-        }
-        self.isHarmful = {}
-        self.isHelpful = {}
-        self.texture = {}
-        self.talent = {}
-        self.talentPoints = {}
-        OvaleSpellBookBase.constructor(self)
+    OnInitialize = function(self)
         self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "Update")
         self:RegisterEvent("CHARACTER_POINTS_CHANGED", "UpdateTalents")
         self:RegisterEvent("PLAYER_ENTERING_WORLD", "Update")
@@ -391,5 +379,19 @@ local OvaleSpellBookClass = __class(OvaleSpellBookBase, {
         end
         return verified, requirement, index
     end,
+    constructor = function(self, ...)
+        OvaleSpellBookBase.constructor(self, ...)
+        self.ready = false
+        self.spell = {}
+        self.spellbookId = {
+            [BOOKTYPE_PET] = {},
+            [BOOKTYPE_SPELL] = {}
+        }
+        self.isHarmful = {}
+        self.isHelpful = {}
+        self.texture = {}
+        self.talent = {}
+        self.talentPoints = {}
+    end
 })
 __exports.OvaleSpellBook = OvaleSpellBookClass()

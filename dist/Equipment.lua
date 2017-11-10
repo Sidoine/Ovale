@@ -1290,11 +1290,6 @@ local OVALE_WEAPON_CLASS = {}
 do
     OVALE_WEAPON_CLASS[1], OVALE_WEAPON_CLASS[2], OVALE_WEAPON_CLASS[3], OVALE_WEAPON_CLASS[4], OVALE_WEAPON_CLASS[5], OVALE_WEAPON_CLASS[6], OVALE_WEAPON_CLASS[7], OVALE_WEAPON_CLASS[8], OVALE_WEAPON_CLASS[9], OVALE_WEAPON_CLASS[10], OVALE_WEAPON_CLASS[11], OVALE_WEAPON_CLASS[12], OVALE_WEAPON_CLASS[13], OVALE_WEAPON_CLASS[14], OVALE_WEAPON_CLASS[15], OVALE_WEAPON_CLASS[16], OVALE_WEAPON_CLASS[17] = GetAuctionItemSubClasses(1)
 end
-local OVALE_META_GEM = nil
-do
-    local _, _, _, _, _, _, name = GetAuctionItemSubClasses(8)
-    OVALE_META_GEM = name
-end
 local GetEquippedItemType = function(slotId)
     __exports.OvaleEquipment:StartProfiling("OvaleEquipment_GetEquippedItemType")
     local itemId = __exports.OvaleEquipment:GetEquippedItem(slotId)

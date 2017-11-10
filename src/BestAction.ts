@@ -18,7 +18,7 @@ import { futureState } from "./FutureState";
 import { cooldownState } from "./CooldownState";
 import aceEvent from "@wowts/ace_event-3.0";
 import { abs, huge, floor } from "@wowts/math";
-import { assert, ipairs, loadstring, pairs, tonumber, type, wipe, LuaObj, LuaArray, lualength } from "@wowts/lua";
+import { assert, ipairs, loadstring, pairs, tonumber, type, wipe, LuaObj, lualength } from "@wowts/lua";
 import { GetActionCooldown, GetActionTexture, GetItemIcon, GetItemCooldown, GetItemSpell, GetSpellTexture, IsActionInRange, IsCurrentAction, IsItemInRange, IsUsableAction, IsUsableItem } from "@wowts/wow-mock";
 import { AstNode, isValueNode, ValueNode } from "./AST";
 
@@ -638,7 +638,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
     }
     ComputeGroup: ComputerFunction = (element, state: BaseState, atTime):[OvaleTimeSpan, Element] => {
         this.StartProfiling("OvaleBestAction_Compute");
-        let bestTimeSpan, bestElement, bestCastTime;
+        let bestTimeSpan, bestElement;
         let best = newTimeSpan();
         let current = newTimeSpan();
         for (const [, node] of ipairs<{nodeId:number}>(element.child)) {
@@ -670,7 +670,6 @@ class OvaleBestActionClass extends OvaleBestActionBase {
                     best.copyFromArray(current);
                     bestTimeSpan = currentTimeSpan;
                     bestElement = currentElement;
-                    bestCastTime = currentCastTime;
                 }
             }
         }

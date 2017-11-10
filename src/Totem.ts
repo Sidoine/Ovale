@@ -9,6 +9,7 @@ import aceEvent from "@wowts/ace_event-3.0";
 import { ipairs, pairs } from "@wowts/lua";
 import { GetTotemInfo, AIR_TOTEM_SLOT, EARTH_TOTEM_SLOT, FIRE_TOTEM_SLOT, MAX_TOTEMS, WATER_TOTEM_SLOT } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
+import { SpellCast } from "./LastSpell";
 
 let OvaleTotemBase = OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleTotem", aceEvent));
 export let OvaleTotem: OvaleTotemClass;
@@ -74,7 +75,7 @@ class TotemState implements StateModule {
             this.totem[slot] = undefined;
         }
     }
-    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast) {
+    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast: SpellCast ) {
         OvaleTotem.StartProfiling("OvaleTotem_ApplySpellAfterCast");
         if (Ovale.playerClass == "SHAMAN" && spellId == TOTEMIC_RECALL) {
             for (const [slot] of ipairs(this.totem)) {

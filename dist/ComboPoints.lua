@@ -87,6 +87,11 @@ end
 local OvaleComboPointsClass = __class(OvaleComboPointsBase, {
     constructor = function(self)
         self.combo = 0
+        self.CopySpellcastInfo = function(mod, spellcast, dest)
+            if spellcast.combo then
+                dest.combo = spellcast.combo
+            end
+        end
         self.SaveSpellcastInfo = function(module, spellcast, atTime, state)
             local spellId = spellcast.spellId
             if spellId then
@@ -158,13 +163,11 @@ local OvaleComboPointsClass = __class(OvaleComboPointsBase, {
             self:DebugTimestamp("%s: %d -> %d.", event, oldCombo, self.combo)
             local now = API_GetTime()
             RemovePendingComboEvents(now)
-            local pendingMatched = false
             if #self_pendingComboEvents > 0 then
                 local comboEvent = self_pendingComboEvents[1]
                 local spellId, _, reason, combo = comboEvent.spellId, comboEvent.guid, comboEvent.reason, comboEvent.combo
                 if combo == difference or (combo == "finisher" and self.combo == 0 and difference < 0) then
                     self:Debug("    Matches pending %s event for %d.", reason, spellId)
-                    pendingMatched = true
                     tremove(self_pendingComboEvents, 1)
                 end
             end
@@ -301,11 +304,6 @@ local OvaleComboPointsClass = __class(OvaleComboPointsBase, {
             Ovale:OneTimeMessage("Warning: requirement '%s' is missing a cost argument.", requirement)
         end
         return verified, requirement, index
-    end,
-    CopySpellcastInfo = function(self, spellcast, dest)
-        if spellcast.combo then
-            dest.combo = spellcast.combo
-        end
     end,
 })
 __exports.OvaleComboPoints = OvaleComboPointsClass()

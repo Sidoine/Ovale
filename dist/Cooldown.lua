@@ -75,29 +75,7 @@ local BASE_GCD = {
     }
 }
 local OvaleCooldownClass = __class(OvaleCooldownBase, {
-    constructor = function(self)
-        self.serial = 0
-        self.sharedCooldown = {}
-        self.gcd = {
-            serial = 0,
-            start = 0,
-            duration = 0
-        }
-        self.SaveSpellcastInfo = function(mod, spellcast, atTime, state)
-            local spellId = spellcast.spellId
-            if spellId then
-                local gcd
-                if state then
-                    gcd = state:GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target)
-                else
-                    gcd = OvaleData:GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target)
-                end
-                if gcd and gcd == 0 then
-                    spellcast.offgcd = true
-                end
-            end
-        end
-        OvaleCooldownBase.constructor(self)
+    OnInitialize = function(self)
         self:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN", "Update")
         self:RegisterEvent("BAG_UPDATE_COOLDOWN", "Update")
         self:RegisterEvent("PET_BAR_UPDATE_COOLDOWN", "Update")
@@ -211,10 +189,34 @@ local OvaleCooldownClass = __class(OvaleCooldownBase, {
         end
         return gcd, haste
     end,
-    CopySpellcastInfo = function(self, spellcast, dest)
-        if spellcast.offgcd then
-            dest.offgcd = spellcast.offgcd
+    constructor = function(self, ...)
+        OvaleCooldownBase.constructor(self, ...)
+        self.serial = 0
+        self.sharedCooldown = {}
+        self.gcd = {
+            serial = 0,
+            start = 0,
+            duration = 0
+        }
+        self.CopySpellcastInfo = function(mod, spellcast, dest)
+            if spellcast.offgcd then
+                dest.offgcd = spellcast.offgcd
+            end
         end
-    end,
+        self.SaveSpellcastInfo = function(mod, spellcast, atTime, state)
+            local spellId = spellcast.spellId
+            if spellId then
+                local gcd
+                if state then
+                    gcd = state:GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target)
+                else
+                    gcd = OvaleData:GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target)
+                end
+                if gcd and gcd == 0 then
+                    spellcast.offgcd = true
+                end
+            end
+        end
+    end
 })
 __exports.OvaleCooldown = OvaleCooldownClass()

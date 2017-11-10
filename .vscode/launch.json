@@ -10,8 +10,8 @@
             "name": "SimulationCraft",
             "program": "${workspaceFolder}/dist/utils/importsimc.js",
             "protocol": "inspector",
-            "runtimeArgs": [
-                "c:/Users/Sidoine/Git/simc/profiles/Tier19"
+            "args": [
+                "c:/Users/Sidoine/Git/simc/profiles/Tier19P"
             ],
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"

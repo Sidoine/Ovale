@@ -165,13 +165,13 @@ local function BaseDuration(positionalParams, namedParams, state, atTime)
         if (OvaleData.buffSpellList[auraId]) then
             local spellList = OvaleData.buffSpellList[auraId]
             for id in pairs(spellList) do
-                value = OvaleData:GetBaseDuration(id, state)
+                value = OvaleData:GetBaseDuration(id, paperDollState)
                 if value ~= huge then
                     break
                 end
             end
         else
-            value = OvaleData:GetBaseDuration(auraId, state)
+            value = OvaleData:GetBaseDuration(auraId, paperDollState)
         end
         return Compare(value, comparator, limit)
     end
@@ -369,8 +369,8 @@ local function BuffGain(positionalParams, namedParams, state, atTime)
 end
 do
 local function BuffImproved(positionalParams, namedParams, state, atTime)
-        local auraId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-        local target, filter, mine = ParseCondition(positionalParams, namedParams, state)
+        local _, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+        local _, _ = ParseCondition(positionalParams, namedParams, state)
         return Compare(0, comparator, limit)
     end
     OvaleCondition:RegisterCondition("buffimproved", false, BuffImproved)
@@ -2122,7 +2122,7 @@ local function TickTime(positionalParams, namedParams, state, atTime)
         if auraState:IsActiveAura(aura, atTime) then
             tickTime = aura.tick
         else
-            tickTime = OvaleData:GetTickLength(auraId, state)
+            tickTime = OvaleData:GetTickLength(auraId, paperDollState)
         end
         if tickTime and tickTime > 0 then
             return Compare(tickTime, comparator, limit)

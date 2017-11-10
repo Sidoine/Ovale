@@ -7,6 +7,7 @@ import { OvaleState, StateModule } from "./State";
 import aceEvent from "@wowts/ace_event-3.0";
 import { GetTime } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
+import { SpellCast } from "./LastSpell";
 
 let OvaleSteadyFocusBase = OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleSteadyFocus", aceEvent)));
 export let OvaleSteadyFocus: OvaleSteadyFocusClass;
@@ -128,7 +129,7 @@ class SteadyFocusState implements StateModule {
     }
     ResetState(): void {
     }
-    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, channel, spellcast) {
+    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, channel, spellcast: SpellCast) {
         if (OvaleSteadyFocus.hasSteadyFocus) {
             OvaleSteadyFocus.StartProfiling("OvaleSteadyFocus_ApplySpellAfterCast");
             if (STEADY_SHOT[spellId]) {

@@ -16,7 +16,6 @@ import { format, gmatch, gsub, find, len, lower, match, sub, upper } from "@wowt
 import { ipairs, next, pairs, rawset, tonumber, tostring, type, wipe, LuaObj, LuaArray, setmetatable, lualength, truthy } from "@wowts/lua";
 import { concat, insert, remove, sort } from "@wowts/table";
 import { RAID_CLASS_COLORS } from "@wowts/wow-mock";
-import { nan } from "@wowts/math";
 
 let OvaleSimulationCraftBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleSimulationCraft"));
 export let OvaleSimulationCraft: OvaleSimulationCraftClass;
@@ -419,26 +418,7 @@ let OPTIONAL_SKILLS: LuaObj<{class: string, default?: boolean, specialization?: 
     }
 }
 
-type ScNodeType = "number" | "logical" | "arithmetic" | "action" | "action_list" |
-    "compare" | "function" | "operand";
-
 type ScNode = ParseNode;
-// interface ScNode {
-//     child: LuaArray<ScNode>;
-//     nodeId: number;
-//     type: ScNodeType;
-//     action: string;
-//     name: string;
-//     expressionType: "unary" | "binary";
-//     operator: OperatorType;
-//     precedence: number;
-//     value: number;
-//     asType: NodeType;
-//     rune: string;
-//     includeDeath: boolean;
-//     left: string;
-//     right: string;
-// }
 
 let self_functionDefined: LuaObj<boolean> = {
 }
@@ -1918,7 +1898,7 @@ const EmitConditionNode = function (nodeList: LuaArray<AstNode>, bodyNode: AstNo
         return bodyNode;
     }
 }
-const EmitNamedVariable = function (name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifier: ChildParseNode, parseNode: ParseNode, action: string, conditionNode?: AstNode) {
+function EmitNamedVariable(name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifier: ChildParseNode, parseNode: ParseNode, action: string, conditionNode?: AstNode) {
     if (!annotation.variable) {
         annotation.variable = {}
     }
@@ -1946,7 +1926,7 @@ const EmitNamedVariable = function (name: string, nodeList: LuaArray<AstNode>, a
     annotation.currentVariable = undefined;
 }
 
-const EmitVariableMin = function (name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifier: ChildParseNode, parseNode: ParseNode, action: string) {
+function EmitVariableMin(name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifier: ChildParseNode, parseNode: ParseNode, action: string) {
     EmitNamedVariable(`${name}_min`, nodeList, annotation, modifier, parseNode, action);
     let valueNode = annotation.variable[name];
     valueNode.name = `${name}_value`;
@@ -1956,7 +1936,7 @@ const EmitVariableMin = function (name: string, nodeList: LuaArray<AstNode>, ann
     annotation.variable[name] = node;
 }
 
-const EmitVariableMax = function (name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifier: ChildParseNode, parseNode: ParseNode, action: string) {
+function EmitVariableMax(name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifier: ChildParseNode, parseNode: ParseNode, action: string) {
     EmitNamedVariable(`${name}_max`, nodeList, annotation, modifier, parseNode, action);
     let valueNode = annotation.variable[name];
     valueNode.name = `${name}_value`;
@@ -1966,7 +1946,7 @@ const EmitVariableMax = function (name: string, nodeList: LuaArray<AstNode>, ann
     annotation.variable[name] = node;
 }
 
-const EmitVariableAdd = function (name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifier: ChildParseNode, parseNode: ParseNode, action: string) {
+function EmitVariableAdd(name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifier: ChildParseNode, parseNode: ParseNode, action: string) {
     // EmitNamedVariable(`${name}_add`, nodeList, annotation, modifier, parseNode, action);
     // let valueNode = annotation.variable[name];
     // valueNode.name = `${name}_value`;
@@ -2007,12 +1987,15 @@ function EmitVariableIf(name: string, nodeList: LuaArray<AstNode>, annotation: A
     annotation.currentVariable = undefined;
 }
 
-const EmitVariable = function (nodeList: LuaArray<AstNode>, annotation: Annotation, modifier: ChildParseNode, parseNode: ParseNode, action: string, conditionNode?: AstNode) {
+function EmitVariable(nodeList: LuaArray<AstNode>, annotation: Annotation, modifier: ChildParseNode, parseNode: ParseNode, action: string, conditionNode?: AstNode) {
     if (!annotation.variable) {
         annotation.variable = {}
     }
     let op = (modifier.op && Unparse(modifier.op)) || "set";
     let name = Unparse(modifier.name);
+    if (truthy(match(name, "^%d"))) {
+        name = "_" + name;
+    }
     if (op == "min") {
         EmitVariableMin(name, nodeList, annotation, modifier, parseNode, action);
     } else if (op == "max") {

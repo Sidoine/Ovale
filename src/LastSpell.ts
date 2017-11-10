@@ -16,10 +16,11 @@ export interface SpellCast extends PaperDollSnapshot {
     auraGUID?: string;
     channel?: boolean;
     caster?: string;
-    offgcd?:number;
+    offgcd?:boolean;
     damageMultiplier?: number;
+    combo?: number;
+    holy?:number;
 }
-
 
 export interface PaperDollSnapshot {
     snapshotTime?: number;
@@ -64,7 +65,7 @@ class LastSpell {
     modules: LuaObj<SpellCastModule> = {}
     
     LastInFlightSpell() {
-        let spellcast;
+        let spellcast: SpellCast;
         if (this.lastGCDSpellcast.success) {
             spellcast = this.lastGCDSpellcast;
         }
@@ -103,7 +104,7 @@ class LastSpell {
     }
 
     LastSpellSent() {
-        let spellcast = undefined;
+        let spellcast: SpellCast = undefined;
         if (this.lastGCDSpellcast.success) {
             spellcast = this.lastGCDSpellcast;
         }
