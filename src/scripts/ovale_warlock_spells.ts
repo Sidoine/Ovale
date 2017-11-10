@@ -127,7 +127,7 @@ Define(hand_of_guldan 105174)
 	SpellInfo(hand_of_guldan max_travel_time=1.5 shards=finisher) # maximum observed travel time with a bit of padding
 	SpellAddTargetDebuff(hand_of_guldan shadowflame_debuff=1)
 Define(haunt 48181)
-	SpellInfo(haunt soulshards=1)
+	SpellInfo(haunt mana=5)
 	SpellInfo(haunt travel_time=2.3) # maximum observed travel time with a bit of padding
 	SpellAddTargetDebuff(haunt haunt_debuff=1)
 Define(haunt_debuff 48181)
@@ -189,6 +189,7 @@ Define(rain_of_fire_debuff 5740)
 Define(roaring_blaze_debuff 205184) #TODO Check this
 Define(roaring_blaze_talent 2)
 Define(seed_of_corruption 27243)
+	SpellInfo(seed_of_corruption soulshards=10)
 	SpellRequire(seed_of_corruption replace seed_of_corruption_soulburn=buff,soulburn_buff if_spell=soulburn)
 	SpellRequire(seed_of_corruption unusable 1=buff,soulburn_buff if_spell=soulburn)
 	SpellAddTargetDebuff(seed_of_corruption seed_of_corruption_debuff=1)
