@@ -789,6 +789,24 @@ local OvaleAuraClass = __class(OvaleAuraBase, {
 })
 __exports.OvaleAura = OvaleAuraClass()
 local array = {}
+local count
+local stacks
+local startChangeCount, endingChangeCount
+local startFirst, endingLast
+local function CountMatchingActiveAura(aura)
+    OvaleState:Log("Counting aura %s found on %s with (%s, %s)", aura.spellId, aura.guid, aura.start, aura.ending)
+    count = count + 1
+    stacks = stacks + aura.stacks
+    if aura.ending < endingChangeCount then
+        startChangeCount, endingChangeCount = aura.gain, aura.ending
+    end
+    if aura.gain < startFirst then
+        startFirst = aura.gain
+    end
+    if aura.ending > endingLast then
+        endingLast = aura.ending
+    end
+end
 local AuraState = __class(nil, {
     InitializeState = function(self)
         self.aura = {}
@@ -1318,50 +1336,32 @@ local AuraState = __class(nil, {
         end
         return start, ending
     end,
-    CountMatchingActiveAura = function(self, aura)
-        local count
-        local stacks
-        local startChangeCount, endingChangeCount
-        local startFirst, endingLast
-        OvaleState:Log("Counting aura %s found on %s with (%s, %s)", aura.spellId, aura.guid, aura.start, aura.ending)
-        count = count + 1
-        stacks = stacks + aura.stacks
-        if aura.ending < endingChangeCount then
-            startChangeCount, endingChangeCount = aura.gain, aura.ending
-        end
-        if aura.gain < startFirst then
-            startFirst = aura.gain
-        end
-        if aura.ending > endingLast then
-            endingLast = aura.ending
-        end
-    end,
     AuraCount = function(self, auraId, filter, mine, minStacks, atTime, excludeUnitId)
         __exports.OvaleAura:StartProfiling("OvaleAura_state_AuraCount")
         minStacks = minStacks or 1
-        local count = 0
-        local stacks = 0
-        local startChangeCount, endingChangeCount = INFINITY, INFINITY
-        local startFirst, endingLast = INFINITY, 0
+        count = 0
+        stacks = 0
+        startChangeCount, endingChangeCount = INFINITY, INFINITY
+        startFirst, endingLast = INFINITY, 0
         local excludeGUID = excludeUnitId and OvaleGUID:UnitGUID(excludeUnitId) or nil
         for guid, auraTable in pairs(__exports.OvaleAura.aura) do
             if guid ~= excludeGUID and auraTable[auraId] then
                 if mine then
                     local aura = self:GetStateAura(guid, auraId, self_playerGUID)
                     if self:IsActiveAura(aura, atTime) and aura.filter == filter and aura.stacks >= minStacks and  not aura.state then
-                        self:CountMatchingActiveAura(aura)
+                        CountMatchingActiveAura(aura)
                     end
                     for petGUID in pairs(self_petGUID) do
                         aura = self:GetStateAura(guid, auraId, petGUID)
                         if self:IsActiveAura(aura, atTime) and aura.filter == filter and aura.stacks >= minStacks and  not aura.state then
-                            self:CountMatchingActiveAura(aura)
+                            CountMatchingActiveAura(aura)
                         end
                     end
                 else
                     for casterGUID in pairs(auraTable[auraId]) do
                         local aura = self:GetStateAura(guid, auraId, casterGUID)
                         if self:IsActiveAura(aura, atTime) and aura.filter == filter and aura.stacks >= minStacks and  not aura.state then
-                            self:CountMatchingActiveAura(aura)
+                            CountMatchingActiveAura(aura)
                         end
                     end
                 end
@@ -1373,19 +1373,19 @@ local AuraState = __class(nil, {
                     local aura = auraTable[auraId][self_playerGUID]
                     if aura then
                         if self:IsActiveAura(aura, atTime) and aura.filter == filter and aura.stacks >= minStacks then
-                            self:CountMatchingActiveAura(aura)
+                            CountMatchingActiveAura(aura)
                         end
                     end
                     for petGUID in pairs(self_petGUID) do
                         aura = auraTable[auraId][petGUID]
                         if self:IsActiveAura(aura, atTime) and aura.filter == filter and aura.stacks >= minStacks and  not aura.state then
-                            self:CountMatchingActiveAura(aura)
+                            CountMatchingActiveAura(aura)
                         end
                     end
                 else
                     for _, aura in pairs(auraTable[auraId]) do
                         if self:IsActiveAura(aura, atTime) and aura.filter == filter and aura.stacks >= minStacks then
-                            self:CountMatchingActiveAura(aura)
+                            CountMatchingActiveAura(aura)
                         end
                     end
                 end

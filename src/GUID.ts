@@ -125,8 +125,7 @@ class OvaleGUIDClass extends OvaleGUIDBase {
     petGUID: LuaObj<number> = {}
     UNIT_AURA_UNIT = UNIT_AURA_UNIT;
     
-    constructor() {
-        super();
+    OnInitialize() {
         this.RegisterEvent("ARENA_OPPONENT_UPDATE");
         this.RegisterEvent("GROUP_ROSTER_UPDATE");
         this.RegisterEvent("INSTANCE_ENCOUNTER_ENGAGE_UNIT");

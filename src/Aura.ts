@@ -803,6 +803,26 @@ OvaleAura = new OvaleAuraClass();
 
 let array = {}
 
+let count;
+let stacks;
+let startChangeCount, endingChangeCount;
+let startFirst, endingLast;
+
+function CountMatchingActiveAura(aura) {
+    OvaleState.Log("Counting aura %s found on %s with (%s, %s)", aura.spellId, aura.guid, aura.start, aura.ending);
+    count = count + 1;
+    stacks = stacks + aura.stacks;
+    if (aura.ending < endingChangeCount) {
+        [startChangeCount, endingChangeCount] = [aura.gain, aura.ending];
+    }
+    if (aura.gain < startFirst) {
+        startFirst = aura.gain;
+    }
+    if (aura.ending > endingLast) {
+        endingLast = aura.ending;
+    }
+}
+
 class AuraState implements StateModule {
     aura = undefined;
     serial = undefined;
@@ -1343,50 +1363,32 @@ class AuraState implements StateModule {
         return [start, ending];
     }   
 
-    CountMatchingActiveAura(aura) {
-        let count;
-        let stacks;
-        let startChangeCount, endingChangeCount;
-        let startFirst, endingLast;
-        OvaleState.Log("Counting aura %s found on %s with (%s, %s)", aura.spellId, aura.guid, aura.start, aura.ending);
-        count = count + 1;
-        stacks = stacks + aura.stacks;
-        if (aura.ending < endingChangeCount) {
-            [startChangeCount, endingChangeCount] = [aura.gain, aura.ending];
-        }
-        if (aura.gain < startFirst) {
-            startFirst = aura.gain;
-        }
-        if (aura.ending > endingLast) {
-            endingLast = aura.ending;
-        }
-    }
     AuraCount(auraId, filter, mine, minStacks, atTime, excludeUnitId) {
         OvaleAura.StartProfiling("OvaleAura_state_AuraCount");
         minStacks = minStacks || 1;
-        let count = 0;
-        let stacks = 0;
-        let [startChangeCount, endingChangeCount] = [INFINITY, INFINITY];
-        let [startFirst, endingLast] = [INFINITY, 0];
+        count = 0;
+        stacks = 0;
+        [startChangeCount, endingChangeCount] = [INFINITY, INFINITY];
+        [startFirst, endingLast] = [INFINITY, 0];
         let excludeGUID = excludeUnitId && OvaleGUID.UnitGUID(excludeUnitId) || undefined;
         for (const [guid, auraTable] of pairs(OvaleAura.aura)) {
             if (guid != excludeGUID && auraTable[auraId]) {
                 if (mine) {
                     let aura = this.GetStateAura(guid, auraId, self_playerGUID);
                     if (this.IsActiveAura(aura, atTime) && aura.filter == filter && aura.stacks >= minStacks && !aura.state) {
-                        this.CountMatchingActiveAura(aura);
+                        CountMatchingActiveAura(aura);
                     }
                     for (const [petGUID] of pairs(self_petGUID)) {
                         aura = this.GetStateAura(guid, auraId, petGUID);
                         if (this.IsActiveAura(aura, atTime) && aura.filter == filter && aura.stacks >= minStacks && !aura.state) {
-                            this.CountMatchingActiveAura(aura);
+                            CountMatchingActiveAura(aura);
                         }
                     }
                 } else {
                     for (const [casterGUID] of pairs(auraTable[auraId])) {
                         let aura = this.GetStateAura(guid, auraId, casterGUID);
                         if (this.IsActiveAura(aura, atTime) && aura.filter == filter && aura.stacks >= minStacks && !aura.state) {
-                            this.CountMatchingActiveAura(aura);
+                            CountMatchingActiveAura(aura);
                         }
                     }
                 }
@@ -1398,19 +1400,19 @@ class AuraState implements StateModule {
                     let aura = auraTable[auraId][self_playerGUID];
                     if (aura) {
                         if (this.IsActiveAura(aura, atTime) && aura.filter == filter && aura.stacks >= minStacks) {
-                            this.CountMatchingActiveAura(aura);
+                            CountMatchingActiveAura(aura);
                         }
                     }
                     for (const [petGUID] of pairs(self_petGUID)) {
                         aura = auraTable[auraId][petGUID];
                         if (this.IsActiveAura(aura, atTime) && aura.filter == filter && aura.stacks >= minStacks && !aura.state) {
-                            this.CountMatchingActiveAura(aura);
+                            CountMatchingActiveAura(aura);
                         }
                     }
                 } else {
                     for (const [, aura] of pairs(auraTable[auraId])) {
                         if (this.IsActiveAura(aura, atTime) && aura.filter == filter && aura.stacks >= minStacks) {
-                            this.CountMatchingActiveAura(aura);
+                            CountMatchingActiveAura(aura);
                         }
                     }
                 }

@@ -123,16 +123,7 @@ local CompareUnit = function(a, b)
 end
 
 local OvaleGUIDClass = __class(OvaleGUIDBase, {
-    constructor = function(self)
-        self.unitGUID = {}
-        self.guidUnit = {}
-        self.unitName = {}
-        self.nameUnit = {}
-        self.guidName = {}
-        self.nameGUID = {}
-        self.petGUID = {}
-        self.UNIT_AURA_UNIT = UNIT_AURA_UNIT
-        OvaleGUIDBase.constructor(self)
+    OnInitialize = function(self)
         self:RegisterEvent("ARENA_OPPONENT_UPDATE")
         self:RegisterEvent("GROUP_ROSTER_UPDATE")
         self:RegisterEvent("INSTANCE_ENCOUNTER_ENGAGE_UNIT")
@@ -317,5 +308,16 @@ local OvaleGUIDClass = __class(OvaleGUIDBase, {
         end
         return nil
     end,
+    constructor = function(self, ...)
+        OvaleGUIDBase.constructor(self, ...)
+        self.unitGUID = {}
+        self.guidUnit = {}
+        self.unitName = {}
+        self.nameUnit = {}
+        self.guidName = {}
+        self.nameGUID = {}
+        self.petGUID = {}
+        self.UNIT_AURA_UNIT = UNIT_AURA_UNIT
+    end
 })
 __exports.OvaleGUID = OvaleGUIDClass()
