@@ -1153,7 +1153,8 @@ do
     # tigers_fury_buff
     # wild_charge
     # wild_charge_bear
-    # wild_charge_cat	]]
+    # wild_charge_cat
+]]
     OvaleScripts:RegisterScript("DRUID", "feral", name, desc, code, "script")
 end
 do
