@@ -1,7 +1,6 @@
 import { OvaleDebug } from "./Debug";
 import { OvaleQueue } from "./Queue";
-import { Ovale } from "./Ovale";
-import { pairs, LuaObj } from "@wowts/lua";
+import { Ovale, Constructor } from "./Ovale";
 import { SpellCast } from "./LastSpell";
 
 let OvaleStateBase = Ovale.NewModule("OvaleState");
@@ -20,6 +19,17 @@ export interface StateModule {
 
 const OvaleStateBaseClass = OvaleDebug.RegisterDebugging(OvaleStateBase);
 class OvaleStateClass extends OvaleStateBaseClass {
+    RegisterHasState<T extends Constructor<{}>, U>(Base: T, ctor: new () => U) {
+        return class extends Base {
+            current = new ctor();
+            next = new ctor();
+            GetState(atTime: number) {
+                if (!atTime) return this.current;
+                return this.next;
+            }
+        }
+    }
+
     RegisterState(stateAddon: StateModule) {
         self_stateAddons.Insert(stateAddon);
     }
@@ -76,84 +86,3 @@ class OvaleStateClass extends OvaleStateBaseClass {
 }
 
 OvaleState = new OvaleStateClass();
-
-export class BaseState implements StateModule {
-    isState = true;
-    isInitialized = false;
-    futureVariable: LuaObj<any> = undefined;
-    futureLastEnable: LuaObj<number> = undefined;
-    variable:LuaObj<any> = undefined;
-    lastEnable: LuaObj<number> = undefined;
-    inCombat: boolean;
-    currentTime: number;
-    defaultTarget: string;
-
-   
-    InitializeState() {
-        this.futureVariable = {}
-        this.futureLastEnable = {}
-        this.variable = {}
-        this.lastEnable = {}
-        this.defaultTarget = "target";
-    }
-    ResetState() {
-        for (const [k] of pairs(this.futureVariable)) {
-            this.futureVariable[k] = undefined;
-            this.futureLastEnable[k] = undefined;
-        }
-        if (!this.inCombat) {
-            for (const [k] of pairs(this.variable)) {
-                this.Log("Resetting state variable '%s'.", k);
-                this.variable[k] = undefined;
-                this.lastEnable[k] = undefined;
-            }
-        }
-    }
-    CleanState() {
-        for (const [k] of pairs(this.futureVariable)) {
-            this.futureVariable[k] = undefined;
-        }
-        for (const [k] of pairs(this.futureLastEnable)) {
-            this.futureLastEnable[k] = undefined;
-        }
-        for (const [k] of pairs(this.variable)) {
-            this.variable[k] = undefined;
-        }
-        for (const [k] of pairs(this.lastEnable)) {
-            this.lastEnable[k] = undefined;
-        }
-        this.defaultTarget = undefined;        
-    }
-
-    GetState(name) {
-        return this.futureVariable[name] || this.variable[name] || 0;
-    }
-    GetStateDuration(name) {
-        let lastEnable = this.futureLastEnable[name] || this.lastEnable[name] || this.currentTime;
-        return this.currentTime - lastEnable;
-    }
-    PutState (name, value, isFuture) {
-        if (isFuture) {
-            let oldValue = this.GetState(name);
-            if (value != oldValue) {
-                this.Log("Setting future state: %s from %s to %s.", name, oldValue, value);
-                this.futureVariable[name] = value;
-                this.futureLastEnable[name] = this.currentTime;
-            }
-        } else {
-            let oldValue = this.variable[name] || 0;
-            if (value != oldValue) {
-                OvaleState.DebugTimestamp("Advancing combat state: %s from %s to %s.", name, oldValue, value);
-                this.Log("Advancing combat state: %s from %s to %s.", name, oldValue, value);
-                this.variable[name] = value;
-                this.lastEnable[name] = this.currentTime;
-            }
-        }
-    }
-
-    Log(...__args) {
-        OvaleState.Log(...__args);
-    }
-}
-
-export const baseState = new BaseState();

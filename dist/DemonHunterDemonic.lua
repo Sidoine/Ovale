@@ -73,7 +73,7 @@ local OvaleDemonHunterDemonicClass = __class(OvaleDemonHunterDemonicBase, {
     end,
     GainAura = function(self)
         local now = GetTime()
-        local aura_meta = OvaleAura:GetAura("player", HAVOC_META_BUFF_ID, "HELPFUL", true)
+        local aura_meta = OvaleAura:GetAura("player", HAVOC_META_BUFF_ID, nil, "HELPFUL", true)
         if OvaleAura:IsActiveAura(aura_meta, now) then
             self:Debug("Adding '%s' (%d) buff to player %s.", HIDDEN_BUFF_EXTENDED_BY_DEMONIC, HIDDEN_BUFF_ID, self.playerGUID)
             local duration = HIDDEN_BUFF_DURATION

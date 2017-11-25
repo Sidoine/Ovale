@@ -25,7 +25,10 @@ local GetNumShapeshiftForms = GetNumShapeshiftForms
 local GetShapeshiftForm = GetShapeshiftForm
 local GetShapeshiftFormInfo = GetShapeshiftFormInfo
 local GetSpellInfo = GetSpellInfo
-local OvaleStanceBase = OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvaleStance", aceEvent)))
+local __State = LibStub:GetLibrary("ovale/State")
+local OvaleState = __State.OvaleState
+local __Data = LibStub:GetLibrary("ovale/Data")
+local OvaleData = __Data.OvaleData
 local druidCatForm = GetSpellInfo(768)
 local druidTravelForm = GetSpellInfo(783)
 local druidAquaticForm = GetSpellInfo(1066)
@@ -74,20 +77,20 @@ do
     end
 end
 local array = {}
-local OvaleStanceClass = __class(OvaleStanceBase, {
+local StanceData = __class(nil, {
     constructor = function(self)
-        self.ready = false
-        self.stanceList = {}
-        self.stanceId = {}
         self.stance = nil
-        self.STANCE_NAME = STANCE_NAME
-        OvaleStanceBase.constructor(self)
+    end
+})
+local OvaleStanceBase = OvaleState:RegisterHasState(OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvaleStance", aceEvent))), StanceData)
+local OvaleStanceClass = __class(OvaleStanceBase, {
+    OnInitialize = function(self)
         self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateStances")
         self:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
         self:RegisterEvent("UPDATE_SHAPESHIFT_FORMS")
         self:RegisterMessage("Ovale_SpellsChanged", "UpdateStances")
         self:RegisterMessage("Ovale_TalentsChanged", "UpdateStances")
-        RegisterRequirement("stance", "RequireStanceHandler", self)
+        RegisterRequirement("stance", self.RequireStanceHandler)
     end,
     OnDisable = function(self)
         UnregisterRequirement("stance")
@@ -99,7 +102,7 @@ local OvaleStanceClass = __class(OvaleStanceBase, {
         self:UnregisterMessage("Ovale_TalentsChanged")
     end,
     PLAYER_TALENT_UPDATE = function(self, event)
-        self.stance = nil
+        self.current.stance = nil
         self:UpdateStances()
     end,
     UPDATE_SHAPESHIFT_FORM = function(self, event)
@@ -126,7 +129,7 @@ local OvaleStanceClass = __class(OvaleStanceBase, {
     DebugStances = function(self)
         wipe(array)
         for k, v in pairs(self.stanceList) do
-            if self.stance == k then
+            if self.current.stance == k then
                 insert(array, v .. " (active)")
             else
                 insert(array, v)
@@ -136,15 +139,16 @@ local OvaleStanceClass = __class(OvaleStanceBase, {
         return concat(array, "\n")
     end,
     GetStance = function(self, stanceId)
-        stanceId = stanceId or self.stance
+        stanceId = stanceId or self.current.stance
         return self.stanceList[stanceId]
     end,
-    IsStance = function(self, name)
-        if name and self.stance then
+    IsStance = function(self, name, atTime)
+        local state = self:GetState(atTime)
+        if name and state.stance then
             if type(name) == "number" then
-                return name == self.stance
+                return name == state.stance
             else
-                return name == __exports.OvaleStance:GetStance(self.stance)
+                return name == self:GetStance(state.stance)
             end
         end
         return false
@@ -155,10 +159,10 @@ local OvaleStanceClass = __class(OvaleStanceBase, {
     end,
     ShapeshiftEventHandler = function(self)
         self:StartProfiling("OvaleStance_ShapeshiftEventHandler")
-        local oldStance = self.stance
+        local oldStance = self.current.stance
         local newStance = GetShapeshiftForm()
         if oldStance ~= newStance then
-            self.stance = newStance
+            self.current.stance = newStance
             Ovale:needRefresh()
             self:SendMessage("Ovale_StanceChanged", self:GetStance(newStance), self:GetStance(oldStance))
         end
@@ -169,34 +173,62 @@ local OvaleStanceClass = __class(OvaleStanceBase, {
         self:ShapeshiftEventHandler()
         self.ready = true
     end,
-    RequireStanceHandler = function(self, spellId, atTime, requirement, tokens, index, targetGUID)
-        local verified = false
-        local stance = tokens
-        if index then
-            stance = tokens[index]
-            index = index + 1
-        end
-        if stance then
-            local isBang = false
-            if sub(stance, 1, 1) == "!" then
-                isBang = true
-                stance = sub(stance, 2)
-            end
-            stance = tonumber(stance) or stance
-            local isStance = self:IsStance(stance)
-            if  not isBang and isStance or isBang and  not isStance then
-                verified = true
-            end
-            local result = verified and "passed" or "FAILED"
-            if isBang then
-                self:Log("    Require NOT stance '%s': %s", stance, result)
-            else
-                self:Log("    Require stance '%s': %s", stance, result)
-            end
-        else
-            Ovale:OneTimeMessage("Warning: requirement '%s' is missing a stance argument.", requirement)
-        end
-        return verified, requirement, index
+    InitializeState = function(self)
+        self.next.stance = nil
     end,
+    CleanState = function(self)
+    end,
+    ResetState = function(self)
+        __exports.OvaleStance:StartProfiling("OvaleStance_ResetState")
+        self.next.stance = self.current.stance or 0
+        __exports.OvaleStance:StopProfiling("OvaleStance_ResetState")
+    end,
+    ApplySpellAfterCast = function(self, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
+        __exports.OvaleStance:StartProfiling("OvaleStance_ApplySpellAfterCast")
+        local stance = OvaleData:GetSpellInfoProperty(spellId, endCast, "to_stance", targetGUID)
+        if stance then
+            if type(stance) == "string" then
+                stance = __exports.OvaleStance.stanceId[stance]
+            end
+            self.next.stance = stance
+        end
+        __exports.OvaleStance:StopProfiling("OvaleStance_ApplySpellAfterCast")
+    end,
+    constructor = function(self, ...)
+        OvaleStanceBase.constructor(self, ...)
+        self.ready = false
+        self.stanceList = {}
+        self.stanceId = {}
+        self.STANCE_NAME = STANCE_NAME
+        self.RequireStanceHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
+            local verified = false
+            local stance = tokens
+            if index then
+                stance = tokens[index]
+                index = index + 1
+            end
+            if stance then
+                local isBang = false
+                if sub(stance, 1, 1) == "!" then
+                    isBang = true
+                    stance = sub(stance, 2)
+                end
+                stance = tonumber(stance) or stance
+                local isStance = self:IsStance(stance, atTime)
+                if  not isBang and isStance or isBang and  not isStance then
+                    verified = true
+                end
+                local result = verified and "passed" or "FAILED"
+                if isBang then
+                    self:Log("    Require NOT stance '%s': %s", stance, result)
+                else
+                    self:Log("    Require stance '%s': %s", stance, result)
+                end
+            else
+                Ovale:OneTimeMessage("Warning: requirement '%s' is missing a stance argument.", requirement)
+            end
+            return verified, requirement, index
+        end
+    end
 })
 __exports.OvaleStance = OvaleStanceClass()

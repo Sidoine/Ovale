@@ -4,12 +4,14 @@ import { OvaleProfiler } from "./Profiler";
 import { Ovale } from "./Ovale";
 import { RegisterRequirement, UnregisterRequirement } from "./Requirement";
 import aceEvent from "@wowts/ace_event-3.0";
-import { pairs, tonumber, type, wipe, LuaObj } from "@wowts/lua";
+import { pairs, tonumber, type, wipe, LuaObj, LuaArray } from "@wowts/lua";
 import { sub } from "@wowts/string";
 import { concat, insert, sort } from "@wowts/table";
 import { GetNumShapeshiftForms, GetShapeshiftForm, GetShapeshiftFormInfo, GetSpellInfo } from "@wowts/wow-mock";
+import { OvaleState } from "./State";
+import { SpellCast } from "./LastSpell";
+import { OvaleData } from "./Data";
 
-let OvaleStanceBase = OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleStance", aceEvent)));
 export let OvaleStance: OvaleStanceClass;
 
 const [druidCatForm] = GetSpellInfo(768);
@@ -63,24 +65,28 @@ let STANCE_NAME: LuaObj<boolean> = {
 let array = {
 }
 
+class StanceData {
+    stance: number = undefined;
+}
+
+let OvaleStanceBase = OvaleState.RegisterHasState(OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleStance", aceEvent))), StanceData);
+
+
 class OvaleStanceClass extends OvaleStanceBase {
     ready = false;
-    stanceList = {
-    }
+    stanceList: LuaArray<string> = {}
     stanceId = {
     }
-    stance = undefined;
     STANCE_NAME = STANCE_NAME;
 
     
-    constructor() {
-        super();
+    OnInitialize() {
         this.RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateStances");
         this.RegisterEvent("UPDATE_SHAPESHIFT_FORM");
         this.RegisterEvent("UPDATE_SHAPESHIFT_FORMS");
         this.RegisterMessage("Ovale_SpellsChanged", "UpdateStances");
         this.RegisterMessage("Ovale_TalentsChanged", "UpdateStances");
-        RegisterRequirement("stance", "RequireStanceHandler", this);
+        RegisterRequirement("stance", this.RequireStanceHandler);
     }
     OnDisable() {
         UnregisterRequirement("stance");
@@ -92,7 +98,7 @@ class OvaleStanceClass extends OvaleStanceBase {
         this.UnregisterMessage("Ovale_TalentsChanged");
     }
     PLAYER_TALENT_UPDATE(event) {
-        this.stance = undefined;
+        this.current.stance = undefined;
         this.UpdateStances();
     }
     UPDATE_SHAPESHIFT_FORM(event) {
@@ -119,7 +125,7 @@ class OvaleStanceClass extends OvaleStanceBase {
     DebugStances() {
         wipe(array);
         for (const [k, v] of pairs(this.stanceList)) {
-            if (this.stance == k) {
+            if (this.current.stance == k) {
                 insert(array, `${v} (active)`);
             } else {
                 insert(array, v);
@@ -130,15 +136,16 @@ class OvaleStanceClass extends OvaleStanceBase {
     }
 
     GetStance(stanceId) {
-        stanceId = stanceId || this.stance;
+        stanceId = stanceId || this.current.stance;
         return this.stanceList[stanceId];
     }
-    IsStance(name) {
-        if (name && this.stance) {
+    IsStance(name: string|number, atTime: number) {
+        const state = this.GetState(atTime);
+        if (name && state.stance) {
             if (type(name) == "number") {
-                return name == this.stance;
+                return name == state.stance;
             } else {
-                return name == OvaleStance.GetStance(this.stance);
+                return name == this.GetStance(state.stance);
             }
         }
         return false;
@@ -149,10 +156,10 @@ class OvaleStanceClass extends OvaleStanceBase {
     }
     ShapeshiftEventHandler() {
         this.StartProfiling("OvaleStance_ShapeshiftEventHandler");
-        let oldStance = this.stance;
+        let oldStance = this.current.stance;
         let newStance = GetShapeshiftForm();
         if (oldStance != newStance) {
-            this.stance = newStance;
+            this.current.stance = newStance;
             Ovale.needRefresh();
             this.SendMessage("Ovale_StanceChanged", this.GetStance(newStance), this.GetStance(oldStance));
         }
@@ -163,7 +170,7 @@ class OvaleStanceClass extends OvaleStanceBase {
         this.ShapeshiftEventHandler();
         this.ready = true;
     }
-    RequireStanceHandler(spellId, atTime, requirement, tokens, index, targetGUID) {
+    RequireStanceHandler = (spellId, atTime, requirement:string, tokens, index: number, targetGUID):[boolean, string, number] => {
         let verified = false;
         let stance = tokens;
         if (index) {
@@ -177,7 +184,7 @@ class OvaleStanceClass extends OvaleStanceBase {
                 stance = sub(stance, 2);
             }
             stance = tonumber(stance) || stance;
-            let isStance = this.IsStance(stance);
+            let isStance = this.IsStance(stance, atTime);
             if (!isBang && isStance || isBang && !isStance) {
                 verified = true;
             }
@@ -191,6 +198,28 @@ class OvaleStanceClass extends OvaleStanceBase {
             Ovale.OneTimeMessage("Warning: requirement '%s' is missing a stance argument.", requirement);
         }
         return [verified, requirement, index];
+    }
+
+    InitializeState() {
+        this.next.stance = undefined;
+    }
+    CleanState(): void {
+    }
+    ResetState() {
+        OvaleStance.StartProfiling("OvaleStance_ResetState");
+        this.next.stance = this.current.stance || 0;
+        OvaleStance.StopProfiling("OvaleStance_ResetState");
+    }
+    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast: SpellCast) {
+        OvaleStance.StartProfiling("OvaleStance_ApplySpellAfterCast");
+        let stance = OvaleData.GetSpellInfoProperty(spellId, endCast, "to_stance", targetGUID);
+        if (stance) {
+            if (type(stance) == "string") {
+                stance = OvaleStance.stanceId[stance];
+            }
+            this.next.stance = <number>stance;
+        }
+        OvaleStance.StopProfiling("OvaleStance_ApplySpellAfterCast");
     }
 }
 

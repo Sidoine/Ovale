@@ -28,9 +28,7 @@ local self_pool = OvalePool("OvaleDamageTaken_pool")
 local DAMAGE_TAKEN_WINDOW = 20
 local SCHOOL_MASK_MAGIC = bor(SCHOOL_MASK_ARCANE, SCHOOL_MASK_FIRE, SCHOOL_MASK_FROST, SCHOOL_MASK_HOLY, SCHOOL_MASK_NATURE, SCHOOL_MASK_SHADOW)
 local OvaleDamageTakenClass = __class(OvaleDamageTakenBase, {
-    constructor = function(self)
-        self.damageEvent = OvaleQueue("OvaleDamageTaken_damageEvent")
-        OvaleDamageTakenBase.constructor(self)
+    OnInitialize = function(self)
         self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
         self:RegisterEvent("PLAYER_REGEN_ENABLED")
     end,
@@ -120,5 +118,9 @@ local OvaleDamageTakenClass = __class(OvaleDamageTakenBase, {
             self:Print("%d: %d damage", event.timestamp, event.damage)
         end
     end,
+    constructor = function(self, ...)
+        OvaleDamageTakenBase.constructor(self, ...)
+        self.damageEvent = OvaleQueue("OvaleDamageTaken_damageEvent")
+    end
 })
 __exports.OvaleDamageTaken = OvaleDamageTakenClass()

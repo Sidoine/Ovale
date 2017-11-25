@@ -88,7 +88,7 @@ end
 local TestConditionStance = function(value)
     self_compileOnStances = true
     local stance, required = RequireValue(value)
-    local isStance = OvaleStance:IsStance(stance)
+    local isStance = OvaleStance:IsStance(stance, nil)
     return (required and isStance) or ( not required and  not isStance)
 end
 
@@ -517,6 +517,9 @@ local AddToBuffList = function(buffId, statName, isStacking)
     end
 end
 
+local function isTable(t)
+    return type(t) == "table"
+end
 local UpdateTrinketInfo = nil
 do
     local trinket = {}
@@ -527,7 +530,7 @@ do
             local ii = itemId and OvaleData:ItemInfo(itemId)
             local buffId = ii and ii.buff
             if buffId then
-                if type(buffId) == "table" then
+                if isTable(buffId) then
                     for _, id in ipairs(buffId) do
                         AddToBuffList(id)
                     end

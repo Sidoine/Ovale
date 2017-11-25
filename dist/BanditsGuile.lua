@@ -10,6 +10,7 @@ local OvaleAura = __Aura.OvaleAura
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local GetSpellInfo = GetSpellInfo
 local GetTime = GetTime
+local tostring = tostring
 local OvaleBanditsGuileBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleBanditsGuile", aceEvent))
 local API_GetSpellInfo = GetSpellInfo
 local API_GetTime = GetTime
@@ -75,7 +76,7 @@ local OvaleBanditsGuile = __class(OvaleBanditsGuileBase, {
         if target == self_playerGUID then
             local auraName = INSIGHT_BUFF[auraId]
             if auraName then
-                local playerAura = OvaleAura:GetAura("player", auraId, "HELPFUL", true)
+                local playerAura = OvaleAura:GetAura("player", auraId, nil, "HELPFUL", true)
                 self.start, self.ending = playerAura.start, playerAura.ending
                 if auraId == SHALLOW_INSIGHT then
                     self.stacks = 4
@@ -93,7 +94,7 @@ local OvaleBanditsGuile = __class(OvaleBanditsGuileBase, {
         if target == self_playerGUID then
             local auraName = INSIGHT_BUFF[auraId]
             if auraName then
-                local playerAura = OvaleAura:GetAura("player", auraId, "HELPFUL", true)
+                local playerAura = OvaleAura:GetAura("player", auraId, nil, "HELPFUL", true)
                 self.start, self.ending = playerAura.start, playerAura.ending
                 self.stacks = self.stacks + 1
                 self:Debug(event, auraName, self.stacks)
@@ -115,7 +116,7 @@ local OvaleBanditsGuile = __class(OvaleBanditsGuileBase, {
         OvaleAura:GainedAuraOnGUID(self_playerGUID, atTime, self.spellId, self_playerGUID, "HELPFUL", nil, nil, self.stacks, nil, self.duration, self.ending, nil, self.spellName, nil, nil, nil)
     end,
     DebugBanditsGuile = function(self)
-        local playerAura = OvaleAura:GetAuraByGUID(self_playerGUID, self.spellId, "HELPFUL", true)
+        local playerAura = OvaleAura:GetAuraByGUID(self_playerGUID, tostring(self.spellId), "HELPFUL", true, nil)
         if playerAura then
             self:Print("Player has Bandit's Guile aura with start=%s, end=%s, stacks=%d.", playerAura.start, playerAura.ending, playerAura.stacks)
         end

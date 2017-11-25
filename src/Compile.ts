@@ -14,7 +14,7 @@ import { OvaleStance } from "./Stance";
 import { RegisterPrinter, Ovale } from "./Ovale";
 import { checkBoxes, lists, ResetControls } from "./Controls";
 import aceEvent from "@wowts/ace_event-3.0";
-import { ipairs, pairs, tonumber, tostring, type, wipe, LuaArray, lualength, truthy } from "@wowts/lua";
+import { ipairs, pairs, tonumber, tostring, type, wipe, LuaArray, lualength, truthy, LuaObj } from "@wowts/lua";
 import { find, match, sub } from "@wowts/string";
 import { GetSpellInfo } from "@wowts/wow-mock";
 
@@ -59,7 +59,7 @@ const TestConditionSpecialization = function(value) {
 const TestConditionStance = function(value) {
     self_compileOnStances = true;
     let [stance, required] = RequireValue(value);
-    let isStance = OvaleStance.IsStance(stance);
+    let isStance = OvaleStance.IsStance(stance, undefined);
     return (required && isStance) || (!required && !isStance);
 }
 const TestConditionSpell = function(value) {
@@ -479,6 +479,11 @@ const AddToBuffList = function(buffId, statName?, isStacking?) {
         }
     }
 }
+
+function isTable(t: any): t is LuaObj<any> {
+    return type(t) === "table";
+}
+
 let UpdateTrinketInfo = undefined;
 {
     let trinket = {
@@ -490,7 +495,7 @@ let UpdateTrinketInfo = undefined;
             let ii = itemId && OvaleData.ItemInfo(itemId);
             let buffId = ii && ii.buff;
             if (buffId) {
-                if (type(buffId) == "table") {
+                if (isTable(buffId)) {
                     for (const [, id] of ipairs(buffId)) {
                         AddToBuffList(id);
                     }

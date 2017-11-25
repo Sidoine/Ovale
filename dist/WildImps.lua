@@ -31,8 +31,7 @@ local demonData = {
 local self_demons = {}
 local self_serial = 1
 local OvaleWildImpsClass = __class(OvaleWildImpsBase, {
-    constructor = function(self)
-        OvaleWildImpsBase.constructor(self)
+    OnInitialize = function(self)
         if Ovale.playerClass == "WARLOCK" then
             self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
             self_demons = {}
@@ -80,8 +79,6 @@ local OvaleWildImpsClass = __class(OvaleWildImpsBase, {
             end
         end
     end,
-})
-local WildImpsState = __class(nil, {
     CleanState = function(self)
     end,
     InitializeState = function(self)
@@ -119,6 +116,5 @@ local WildImpsState = __class(nil, {
         return max
     end,
 })
-__exports.wildImpsState = WildImpsState()
-OvaleState:RegisterState(__exports.wildImpsState)
 __exports.OvaleWildImps = OvaleWildImpsClass()
+OvaleState:RegisterState(__exports.OvaleWildImps)

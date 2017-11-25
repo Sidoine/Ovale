@@ -33,8 +33,7 @@ local TooltipFuncs = function(self, name, data)
 end
 
 local OvaleRecountClass = __class(OvaleRecountBase, {
-    constructor = function(self)
-        OvaleRecountBase.constructor(self)
+    OnInitialize = function(self)
         if Recount then
             local aceLocale = AceLocale and AceLocale:GetLocale("Recount", true)
             if  not aceLocale then

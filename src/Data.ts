@@ -1,16 +1,13 @@
 import { Ovale } from "./Ovale";
 import { OvaleGUID } from "./GUID";
-import { OvalePaperDoll } from "./PaperDoll";
-import { baseState } from "./State";
 import { OvaleDebug } from "./Debug";
-import { self_requirement, CheckRequirements } from "./Requirement";
+import { nowRequirements, CheckRequirements } from "./Requirement";
 import { type, pairs, tonumber, wipe, truthy, LuaArray, LuaObj } from "@wowts/lua";
 import { find } from "@wowts/string";
-import { huge, floor, ceil } from "@wowts/math";
-import { PaperDollSnapshot, SpellCast } from "./LastSpell";
+import { floor, ceil } from "@wowts/math";
+import { baseState } from "./BaseState";
 
 let OvaleDataBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleData"));
-let INFINITY = huge;
 
 let BLOODELF_CLASSES: LuaObj<boolean> = {
     ["DEATHKNIGHT"]: true,
@@ -82,6 +79,63 @@ let STAT_USE_NAMES: LuaArray<string> = {
     5: "trinket_stack_proc"
 }
 
+type Requirements = LuaObj<LuaArray<string>>;
+
+interface SpellInfo {
+    require: LuaObj<Requirements>;
+    aura?: {
+        player: LuaObj<{}>;
+        target: LuaObj<{}>;
+        pet: LuaObj<{}>;
+        damage: LuaObj<{}>;
+    };
+    gcd?: number;
+    tag?:string;
+    cd?: number;
+    base?:number;
+    bonusmainhand?:number;
+    bonusoffhand?:number;
+    bonuscp?: number;
+    bonusap?: number;
+    bonusapcp?:number;
+    bonussp?:number;
+    sharedcd?:number;
+    stacking?:number;
+    forcecd?:number;
+    addcd?:number;
+    max_travel_time?:number;
+    physical?:number;
+    travel_time?:number;
+    buff_cd?:number;
+    buff_cdr?:number;
+    haste?:string;
+    canStopChannelling?:number;
+    channel?:number;
+    replace?:number;
+    texture?:string;
+    runes?:number;
+    totem?:number;
+    buff_totem?:number;
+    max_totems?:number;
+    addduration?:number;
+    max_stacks?:number;
+    maxstacks?:number;
+    stat?:string | LuaArray<string>;
+    buff?:number | LuaArray<number>;
+    combo?:number | "finisher";
+    mincombo?:number;
+    min_combo?:number;
+    maxcombo?:number;
+    max_combo?:number;
+    temp_combo?:number;
+    buff_combo?:number;
+    buff_combo_amount?:number;
+    adddurationcp?:number;
+    adddurationholy?:number;
+    tick?:number;
+    duration?:number;
+}
+
 class OvaleDataClass extends OvaleDataBase {
     STAT_NAMES = STAT_NAMES;
     STAT_SHORTNAME = STAT_SHORTNAME;
@@ -89,9 +143,9 @@ class OvaleDataClass extends OvaleDataBase {
     BLOODELF_CLASSES = BLOODELF_CLASSES;
     PANDAREN_CLASSES = PANDAREN_CLASSES;
     TAUREN_CLASSES = TAUREN_CLASSES;
-    itemInfo = {}
+    itemInfo: LuaArray<SpellInfo> = {}
     itemList = {}
-    spellInfo = {}
+    spellInfo: LuaObj<SpellInfo> = {}
     buffSpellList: LuaObj<LuaArray<boolean>> = {
         fear_debuff: {
             [5246]: true,
@@ -368,7 +422,7 @@ class OvaleDataClass extends OvaleDataBase {
         return [tag, invokesGCD];
     }
     
-    CheckSpellAuraData(auraId, spellData, atTime, guid) {
+    CheckSpellAuraData(auraId: number | string, spellData, atTime: number, guid: string) {
         guid = guid || OvaleGUID.UnitGUID("player");
         let index, value, data;
         if (type(spellData) == "table") {
@@ -405,21 +459,19 @@ class OvaleDataClass extends OvaleDataBase {
         }
         let verified = true;
         if (index) {
-            [verified] = CheckRequirements(auraId, atTime, spellData, index, guid);
+            [verified] = CheckRequirements(<number>auraId, atTime, spellData, index, guid);
         }
         return [verified, value, data];
     }
     CheckSpellInfo(spellId, atTime, targetGUID) {
-        targetGUID = targetGUID || OvaleGUID.UnitGUID(baseState.defaultTarget || "target");
+        targetGUID = targetGUID || OvaleGUID.UnitGUID(baseState.next.defaultTarget || "target");
         let verified = true;
         let requirement;
-        for (const [name, handler] of pairs(self_requirement)) {
+        for (const [name, handler] of pairs(nowRequirements)) {
             let value = this.GetSpellInfoProperty(spellId, atTime, name, targetGUID);
             if (value) {
-                let [method, arg] = [handler[1], handler[2]];
-                arg = this[method] && this || arg;
                 let index = (type(value) == "table") && 1 || undefined;
-                [verified, requirement] = arg[method](arg, spellId, atTime, name, value, index, targetGUID);
+                [verified, requirement] = handler(spellId, atTime, name, value, index, targetGUID);
                 if (!verified) {
                     break;
                 }
@@ -444,8 +496,8 @@ class OvaleDataClass extends OvaleDataBase {
         return value;
     }
     //GetSpellInfoProperty(spellId, atTime, property:"gcd"|"duration"|"combo"|"inccounter"|"resetcounter", targetGUID):number;
-    GetSpellInfoProperty(spellId, atTime, property:string, targetGUID): string|number {
-        targetGUID = targetGUID || OvaleGUID.UnitGUID(baseState.defaultTarget || "target");
+    GetSpellInfoProperty(spellId, atTime, property:string, targetGUID: string|undefined): string|number {
+        targetGUID = targetGUID || OvaleGUID.UnitGUID(baseState.next.defaultTarget || "target");
         let si = this.spellInfo[spellId];
         let value = si && si[property];
         let requirements = si && si.require[property];
@@ -513,40 +565,6 @@ class OvaleDataClass extends OvaleDataBase {
             damage = damage + si.bonussp * spellpower;
         }
         return damage;
-    }
-    GetBaseDuration(auraId, spellcast?: SpellCast) {
-        spellcast = spellcast || OvalePaperDoll;
-        let combo = spellcast.combo || 0;
-        let holy = spellcast.holy || 0;
-        let duration = INFINITY;
-        let si = this.spellInfo[auraId];
-        if (si && si.duration) {
-            duration = si.duration;
-            if (si.addduration) {
-                duration = duration + si.addduration;
-            }
-            if (si.adddurationcp && combo) {
-                duration = duration + si.adddurationcp * combo;
-            }
-            if (si.adddurationholy && holy) {
-                duration = duration + si.adddurationholy * (holy - 1);
-            }
-        }
-        if (si && si.haste && spellcast) {
-            let hasteMultiplier = OvalePaperDoll.GetHasteMultiplier(si.haste, spellcast);
-            duration = duration / hasteMultiplier;
-        }
-        return duration;
-    }
-    GetTickLength(auraId, snapshot?: PaperDollSnapshot) {
-        let tick = 3;
-        let si = this.spellInfo[auraId];
-        if (si) {
-            tick = si.tick || tick;
-            let hasteMultiplier = OvalePaperDoll.GetHasteMultiplier(si.haste, snapshot);
-            tick = tick / hasteMultiplier;
-        }
-        return tick;
     }
 }
 

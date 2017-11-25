@@ -9,8 +9,6 @@ local __Ovale = LibStub:GetLibrary("ovale/Ovale")
 local Ovale = __Ovale.Ovale
 local __Data = LibStub:GetLibrary("ovale/Data")
 local OvaleData = __Data.OvaleData
-local __Future = LibStub:GetLibrary("ovale/Future")
-local OvaleFuture = __Future.OvaleFuture
 local __SpellBook = LibStub:GetLibrary("ovale/SpellBook")
 local OvaleSpellBook = __SpellBook.OvaleSpellBook
 local __Stance = LibStub:GetLibrary("ovale/Stance")
@@ -23,6 +21,8 @@ local UnitHasVehicleUI = UnitHasVehicleUI
 local UnitExists = UnitExists
 local UnitIsDead = UnitIsDead
 local UnitCanAttack = UnitCanAttack
+local __BaseState = LibStub:GetLibrary("ovale/BaseState")
+local baseState = __BaseState.baseState
 local OvaleSpellFlashBase = Ovale:NewModule("OvaleSpellFlash", aceEvent)
 local SpellFlashCore = nil
 local colorMain = {
@@ -297,8 +297,7 @@ do
     OvaleOptions:RegisterOptions(__exports.OvaleSpellFlash)
 end
 local OvaleSpellFlashClass = __class(OvaleSpellFlashBase, {
-    constructor = function(self)
-        OvaleSpellFlashBase.constructor(self)
+    OnInitialize = function(self)
         SpellFlashCore = _G["SpellFlashCore"]
         self:RegisterMessage("Ovale_OptionChanged")
         self:Ovale_OptionChanged()
@@ -328,7 +327,7 @@ local OvaleSpellFlashClass = __class(OvaleSpellFlashBase, {
         if enabled and  not db.enabled then
             enabled = false
         end
-        if enabled and db.inCombat and  not OvaleFuture.inCombat then
+        if enabled and db.inCombat and  not baseState:IsInCombat(nil) then
             enabled = false
         end
         if enabled and db.hideInVehicle and UnitHasVehicleUI("player") then

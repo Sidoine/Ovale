@@ -32,7 +32,9 @@ class OvaleDemonHunterSoulFragmentsClass extends OvaleDemonHunterSoulFragmentsBa
     constructor() {
         super();
         this.SetCurrentSoulFragments(0);
-    
+    }
+
+    OnInitialize() {
         if (Ovale.playerClass == "DEMONHUNTER") {
             this.RegisterEvent("PLAYER_REGEN_ENABLED");
             this.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
@@ -98,6 +100,19 @@ class OvaleDemonHunterSoulFragmentsClass extends OvaleDemonHunterSoulFragmentsBa
     }
     DebugSoulFragments() {
     }
+    
+    SoulFragments(atTime: number) {
+        let currentTime:number = undefined;
+        let count: number = undefined;
+        for (const [, v] of pairs(this.soul_fragments)) {
+            if (v.timestamp >= atTime && (currentTime == undefined || v.timestamp < currentTime)) {
+                currentTime = v.timestamp;
+                count = v.fragments;
+            }
+        }
+        if (count) return count;
+        return (this.last_soul_fragment_count != undefined && this.last_soul_fragment_count.fragments) || 0;
+    }
 }
 
 class DemonHunterSoulFragmentsState implements StateModule {
@@ -107,19 +122,6 @@ class DemonHunterSoulFragmentsState implements StateModule {
     }
     ResetState(): void {
     }
-    SoulFragments(atTime: number) {
-        let currentTime:number = undefined;
-        let count: number = undefined;
-        for (const [, v] of pairs(OvaleDemonHunterSoulFragments.soul_fragments)) {
-            if (v.timestamp >= atTime && (currentTime == undefined || v.timestamp < currentTime)) {
-                currentTime = v.timestamp;
-                count = v.fragments;
-            }
-        }
-        if (count) return count;
-        return (OvaleDemonHunterSoulFragments.last_soul_fragment_count != undefined && OvaleDemonHunterSoulFragments.last_soul_fragment_count.fragments) || 0;
-    }
-
 }
 
 export const demonHunterSoulFragmentsState = new DemonHunterSoulFragmentsState();

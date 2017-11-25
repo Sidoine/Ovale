@@ -57,7 +57,7 @@ local LastSpell = __class(nil, {
                     spellcast = sc
                 end
             elseif  not sc.start and  not sc.stop then
-                if spellcast.success and spellcast.success < sc.queued then
+                if  not spellcast or (spellcast.success and spellcast.success < sc.queued) then
                     spellcast = sc
                 elseif spellcast.queued < sc.queued then
                     spellcast = sc

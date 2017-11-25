@@ -48,6 +48,8 @@ local OvaleArtifactClass = __class(OvaleArtifactBase, {
         for k, v in pairs(self.debugOptions) do
             OvaleDebug.options.args[k] = v
         end
+    end,
+    OnInitialize = function(self)
         self:RegisterEvent("SPELLS_CHANGED", function(message)
             return self:UpdateTraits(message)
         end)

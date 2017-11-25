@@ -1338,6 +1338,9 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
     
     constructor() {
         super();
+    }
+
+    OnInitialize() {
         self_tooltip = CreateFrame("GameTooltip", "OvaleEquipment_ScanningTooltip", undefined, "GameTooltipTemplate");
         self_tooltip.SetOwner(UIParent, "ANCHOR_NONE");
         this.RegisterEvent("GET_ITEM_INFO_RECEIVED");

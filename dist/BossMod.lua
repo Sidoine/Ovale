@@ -18,14 +18,13 @@ local LE_PARTY_CATEGORY_HOME = LE_PARTY_CATEGORY_HOME
 local UnitName = UnitName
 local _G = _G
 local hooksecurefunc = hooksecurefunc
+local __BaseState = LibStub:GetLibrary("ovale/BaseState")
+local baseState = __BaseState.baseState
 local OvaleBossModBase = OvaleProfiler:RegisterProfiling(OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleBossMod")))
 local _BigWigsLoader = _G["BigWigsLoader"]
 local _DBM = _G["DBM"]
 local OvaleBossModClass = __class(OvaleBossModBase, {
-    constructor = function(self)
-        self.EngagedDBM = nil
-        self.EngagedBigWigs = nil
-        OvaleBossModBase.constructor(self)
+    OnInitialize = function(self)
         if _DBM then
             self:Debug("DBM is loaded")
             hooksecurefunc(_DBM, "StartCombat", function(_DBM, mod, delay, event, ...)
@@ -49,8 +48,8 @@ local OvaleBossModClass = __class(OvaleBossModBase, {
     end,
     OnDisable = function(self)
     end,
-    IsBossEngaged = function(self, state)
-        if  not state.inCombat then
+    IsBossEngaged = function(self, atTime)
+        if  not baseState:IsInCombat(atTime) then
             return false
         end
         local dbmEngaged = (_DBM ~= nil and self.EngagedDBM ~= nil and self.EngagedDBM.inCombat)
@@ -103,5 +102,10 @@ local OvaleBossModClass = __class(OvaleBossModBase, {
         self:StopProfiling("OvaleBossMod:ScanTargets")
         return bossEngaged
     end,
+    constructor = function(self, ...)
+        OvaleBossModBase.constructor(self, ...)
+        self.EngagedDBM = nil
+        self.EngagedBigWigs = nil
+    end
 })
 __exports.OvaleBossMod = OvaleBossModClass()

@@ -2,7 +2,7 @@ import { OvaleProfiler } from "./Profiler";
 import { Ovale } from "./Ovale";
 import { OvalePaperDoll } from "./PaperDoll";
 import { OvaleSpellBook } from "./SpellBook";
-import { OvaleState, StateModule, baseState } from "./State";
+import { OvaleState } from "./State";
 import aceEvent from "@wowts/ace_event-3.0";
 import { ipairs, LuaObj, LuaArray, tonumber, lualength } from "@wowts/lua";
 import { insert, remove } from "@wowts/table";
@@ -59,7 +59,9 @@ class OvaleSigilClass extends OvaleSigilBase {
         }
         activated_sigils["chains"] = {
         }
+    }
     
+    OnInitialize() {
         if (Ovale.playerClass == "DEMONHUNTER") {
             this.RegisterEvent("UNIT_SPELLCAST_SUCCEEDED");
         }
@@ -92,17 +94,8 @@ class OvaleSigilClass extends OvaleSigilBase {
             remove(activated_sigils[t], 1);
         }
     }
-}
-
-class SigilState implements StateModule {
-    CleanState(): void {
-    }
-    InitializeState(): void {
-    }
-    ResetState(): void {
-    }
-    IsSigilCharging(type, atTime) {
-        atTime = atTime || baseState.currentTime;
+    
+    IsSigilCharging(type, atTime: number) {
         if ((lualength(activated_sigils[type]) == 0)) {
             return false;
         }
@@ -116,7 +109,12 @@ class SigilState implements StateModule {
         }
         return charging;
     }
+    CleanState(): void {
+    }
+    InitializeState(): void {
+    }
+    ResetState(): void {
+    }
 }
 OvaleSigil = new OvaleSigilClass();
-export const sigilState = new SigilState();
-OvaleState.RegisterState(sigilState);
+OvaleState.RegisterState(OvaleSigil);

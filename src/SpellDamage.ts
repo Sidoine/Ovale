@@ -10,8 +10,7 @@ let CLEU_DAMAGE_EVENT = {
 const OvaleSpellDamageBase = OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleSpellDamage", aceEvent));
 class OvaleSpellDamageClass extends OvaleSpellDamageBase {
     value = {}
-    constructor() {
-        super();
+    OnInitialize() {
         this.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
     }
     OnDisable() {

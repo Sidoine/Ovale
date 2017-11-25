@@ -1,4 +1,4 @@
-import { OvaleState, StateModule } from "./State";
+import { OvaleState } from "./State";
 import { Ovale } from "./Ovale";
 import aceEvent from "@wowts/ace_event-3.0";
 import { LuaArray, tonumber, pairs } from "@wowts/lua";
@@ -28,8 +28,7 @@ let self_demons = {
 }
 let self_serial = 1;
 class OvaleWildImpsClass extends OvaleWildImpsBase {
-    constructor() {
-        super();
+    OnInitialize() {
         if (Ovale.playerClass == "WARLOCK") {
             this.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
             self_demons = {}
@@ -77,9 +76,7 @@ class OvaleWildImpsClass extends OvaleWildImpsBase {
             }
         }
     }
-}
 
-class WildImpsState implements StateModule {
     CleanState(): void {
     }
     InitializeState(): void {
@@ -118,7 +115,5 @@ class WildImpsState implements StateModule {
     }
 }
 
-export const wildImpsState = new WildImpsState();
-OvaleState.RegisterState(wildImpsState);
-
 OvaleWildImps = new OvaleWildImpsClass();
+OvaleState.RegisterState(OvaleWildImps);

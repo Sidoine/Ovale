@@ -21,7 +21,14 @@ local next = next
 local pairs = pairs
 local GetSpellCooldown = GetSpellCooldown
 local GetTime = GetTime
-local OvaleCooldownBase = OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvaleCooldown", aceEvent)))
+local GetSpellCharges = GetSpellCharges
+local sub = string.sub
+local __State = LibStub:GetLibrary("ovale/State")
+local OvaleState = __State.OvaleState
+local __PaperDoll = LibStub:GetLibrary("ovale/PaperDoll")
+local OvalePaperDoll = __PaperDoll.OvalePaperDoll
+local __Aura = LibStub:GetLibrary("ovale/Aura")
+local OvaleAura = __Aura.OvaleAura
 local GLOBAL_COOLDOWN = 61304
 local COOLDOWN_THRESHOLD = 0.1
 local BASE_GCD = {
@@ -74,6 +81,12 @@ local BASE_GCD = {
         [2] = "melee"
     }
 }
+__exports.CooldownData = __class(nil, {
+    constructor = function(self)
+        self.cd = nil
+    end
+})
+local OvaleCooldownBase = OvaleState:RegisterHasState(OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvaleCooldown", aceEvent))), __exports.CooldownData)
 local OvaleCooldownClass = __class(OvaleCooldownBase, {
     OnInitialize = function(self)
         self:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN", "Update")
@@ -88,7 +101,7 @@ local OvaleCooldownClass = __class(OvaleCooldownBase, {
         self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", "Update")
         self:RegisterEvent("UPDATE_SHAPESHIFT_COOLDOWN", "Update")
         lastSpell:RegisterSpellcastInfo(self)
-        RegisterRequirement("oncooldown", "RequireCooldownHandler", self)
+        RegisterRequirement("oncooldown", self.RequireCooldownHandler)
     end,
     OnDisable = function(self)
         lastSpell:UnregisterSpellcastInfo(self)
@@ -146,11 +159,15 @@ local OvaleCooldownClass = __class(OvaleCooldownBase, {
         end
         return cd.start, cd.duration
     end,
-    GetSpellCooldown = function(self, spellId)
+    GetSpellCooldown = function(self, spellId, atTime)
+        if atTime then
+            local cd = self:GetCD(spellId, atTime)
+            return cd.start, cd.duration, cd.enable
+        end
         local cdStart, cdDuration, cdEnable = 0, 0, 1
         if self.sharedCooldown[spellId] then
             for id in pairs(self.sharedCooldown[spellId]) do
-                local start, duration, enable = self:GetSpellCooldown(id)
+                local start, duration, enable = self:GetSpellCooldown(id, atTime)
                 if start then
                     cdStart, cdDuration, cdEnable = start, duration, enable
                     break
@@ -164,8 +181,10 @@ local OvaleCooldownClass = __class(OvaleCooldownBase, {
             else
                 start, duration, enable = GetSpellCooldown(spellId)
             end
+            self:Log("Call GetSpellCooldown which returned %f, %f, %d", start, duration, enable)
             if start and start > 0 then
                 local gcdStart, gcdDuration = self:GetGlobalCooldown()
+                self:Log("GlobalCooldown is %d, %d", gcdStart, gcdDuration)
                 if start + duration > gcdStart + gcdDuration then
                     cdStart, cdDuration, cdEnable = start, duration, enable
                 else
@@ -189,6 +208,100 @@ local OvaleCooldownClass = __class(OvaleCooldownBase, {
         end
         return gcd, haste
     end,
+    GetCD = function(self, spellId, atTime)
+        __exports.OvaleCooldown:StartProfiling("OvaleCooldown_state_GetCD")
+        local cdName = spellId
+        local si = OvaleData.spellInfo[spellId]
+        if si and si.sharedcd then
+            cdName = si.sharedcd
+        end
+        if  not self.next.cd[cdName] then
+            self.next.cd[cdName] = {}
+        end
+        local cd = self.next.cd[cdName]
+        if  not cd.start or  not cd.serial or cd.serial < self.serial then
+            self:Log("Didn't find an existing cd in next, look for one in current")
+            local start, duration, enable = self:GetSpellCooldown(spellId, nil)
+            if si and si.forcecd then
+                start, duration = self:GetSpellCooldown(si.forcecd, nil)
+            end
+            self:Log("It returned %f, %f", start, duration)
+            cd.serial = self.serial
+            cd.start = start - COOLDOWN_THRESHOLD
+            cd.duration = duration
+            cd.enable = enable
+            local charges, maxCharges, chargeStart, chargeDuration = GetSpellCharges(spellId)
+            if charges then
+                cd.charges = charges
+                cd.maxCharges = maxCharges
+                cd.chargeStart = chargeStart
+                cd.chargeDuration = chargeDuration
+            end
+        end
+        local now = atTime
+        if cd.start then
+            if cd.start + cd.duration <= now then
+                self:Log("Spell cooldown is in the past")
+                cd.start = 0
+                cd.duration = 0
+            end
+        end
+        if cd.charges then
+            local charges, maxCharges, chargeStart, chargeDuration = cd.charges, cd.maxCharges, cd.chargeStart, cd.chargeDuration
+            while chargeStart + chargeDuration <= now and charges < maxCharges do
+                chargeStart = chargeStart + chargeDuration
+                charges = charges + 1
+            end
+            cd.charges = charges
+            cd.chargeStart = chargeStart
+        end
+        self:Log("Cooldown of spell %d is %f + %f", spellId, cd.start, cd.duration)
+        self:StopProfiling("OvaleCooldown_state_GetCD")
+        return cd
+    end,
+    GetSpellCooldownDuration = function(self, spellId, atTime, targetGUID)
+        local start, duration = self:GetSpellCooldown(spellId, atTime)
+        if duration > 0 and start + duration > atTime then
+            __exports.OvaleCooldown:Log("Spell %d is on cooldown for %fs starting at %s.", spellId, duration, start)
+        else
+            local si = OvaleData.spellInfo[spellId]
+            duration = OvaleData:GetSpellInfoProperty(spellId, atTime, "cd", targetGUID)
+            if duration then
+                if si and si.addcd then
+                    duration = duration + si.addcd
+                end
+                if duration < 0 then
+                    duration = 0
+                end
+            else
+                duration = 0
+            end
+            __exports.OvaleCooldown:Log("Spell %d has a base cooldown of %fs.", spellId, duration)
+            if duration > 0 then
+                local haste = OvaleData:GetSpellInfoProperty(spellId, atTime, "cd_haste", targetGUID)
+                local multiplier = OvalePaperDoll:GetHasteMultiplier(haste, OvalePaperDoll.next)
+                duration = duration / multiplier
+                if si and si.buff_cdr then
+                    local aura = OvaleAura:GetAura("player", si.buff_cdr, atTime)
+                    if OvaleAura:IsActiveAura(aura, atTime) then
+                        duration = duration * aura.value1
+                    end
+                end
+            end
+        end
+        return duration
+    end,
+    GetSpellCharges = function(self, spellId, atTime)
+        local cd = self:GetCD(spellId, atTime)
+        local charges, maxCharges, chargeStart, chargeDuration = cd.charges, cd.maxCharges, cd.chargeStart, cd.chargeDuration
+        if charges then
+            while chargeStart + chargeDuration <= atTime and charges < maxCharges do
+                chargeStart = chargeStart + chargeDuration
+                charges = charges + 1
+            end
+        end
+        return charges, maxCharges, chargeStart, chargeDuration
+    end,
     constructor = function(self, ...)
         OvaleCooldownBase.constructor(self, ...)
         self.serial = 0
@@ -207,15 +320,33 @@ local OvaleCooldownClass = __class(OvaleCooldownBase, {
             local spellId = spellcast.spellId
             if spellId then
                 local gcd
-                if state then
-                    gcd = state:GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target)
-                else
-                    gcd = OvaleData:GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target)
-                end
+                gcd = OvaleData:GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target)
                 if gcd and gcd == 0 then
                     spellcast.offgcd = true
                 end
             end
+        end
+        self.RequireCooldownHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
+            local cdSpellId = tokens
+            local verified = false
+            if index then
+                cdSpellId = tokens[index]
+                index = index + 1
+            end
+            if cdSpellId then
+                local isBang = false
+                if sub(cdSpellId, 1, 1) == "!" then
+                    isBang = true
+                    cdSpellId = sub(cdSpellId, 2)
+                end
+                local cd = self:GetCD(cdSpellId, atTime)
+                verified =  not isBang and cd.duration > 0 or isBang and cd.duration <= 0
+                local result = verified and "passed" or "FAILED"
+                self:Log("    Require spell %s %s cooldown at time=%f: %s (duration = %f)", cdSpellId, isBang and "OFF" or  not isBang and "ON", atTime, result, cd.duration)
+            else
+                Ovale:OneTimeMessage("Warning: requirement '%s' is missing a spell argument.", requirement)
+            end
+            return verified, requirement, index
         end
     end
 })

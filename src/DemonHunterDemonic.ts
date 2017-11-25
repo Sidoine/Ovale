@@ -71,7 +71,7 @@ class OvaleDemonHunterDemonicClass extends OvaleDemonHunterDemonicBase {
     }
     GainAura() {
         let now = GetTime();
-        let aura_meta = OvaleAura.GetAura("player", HAVOC_META_BUFF_ID, "HELPFUL", true);
+        let aura_meta = OvaleAura.GetAura("player", HAVOC_META_BUFF_ID, undefined, "HELPFUL", true);
         if (OvaleAura.IsActiveAura(aura_meta, now)) {
             this.Debug("Adding '%s' (%d) buff to player %s.", HIDDEN_BUFF_EXTENDED_BY_DEMONIC, HIDDEN_BUFF_ID, this.playerGUID);
             let duration = HIDDEN_BUFF_DURATION;

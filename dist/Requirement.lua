@@ -4,31 +4,27 @@ local __GUID = LibStub:GetLibrary("ovale/GUID")
 local OvaleGUID = __GUID.OvaleGUID
 local __Ovale = LibStub:GetLibrary("ovale/Ovale")
 local Ovale = __Ovale.Ovale
-local __State = LibStub:GetLibrary("ovale/State")
-local baseState = __State.baseState
-__exports.self_requirement = {}
-__exports.RegisterRequirement = function(name, method, arg)
-    __exports.self_requirement[name] = {
-        [1] = method,
-        [2] = arg
-    }
+local __BaseState = LibStub:GetLibrary("ovale/BaseState")
+local baseState = __BaseState.baseState
+__exports.nowRequirements = {}
+__exports.RegisterRequirement = function(name, nowMethod)
+    __exports.nowRequirements[name] = nowMethod
 end
 __exports.UnregisterRequirement = function(name)
-    __exports.self_requirement[name] = nil
+    __exports.nowRequirements[name] = nil
 end
 __exports.CheckRequirements = function(spellId, atTime, tokens, index, targetGUID)
-    targetGUID = targetGUID or OvaleGUID:UnitGUID(baseState.defaultTarget or "target")
+    local requirements = __exports.nowRequirements
+    targetGUID = targetGUID or OvaleGUID:UnitGUID(baseState.next.defaultTarget or "target")
     local name = tokens[index]
     index = index + 1
     if name then
         local verified = true
         local requirement = name
         while verified and name do
-            local handler = __exports.self_requirement[name]
+            local handler = requirements[name]
             if handler then
-                local method = handler[1]
-                local arg = handler[2]
-                verified, requirement, index = arg[method](arg, spellId, atTime, name, tokens, index, targetGUID)
+                verified, requirement, index = handler(spellId, atTime, name, tokens, index, targetGUID)
                 name = tokens[index]
                 index = index + 1
             else

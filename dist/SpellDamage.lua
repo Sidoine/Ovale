@@ -12,9 +12,7 @@ local CLEU_DAMAGE_EVENT = {
 }
 local OvaleSpellDamageBase = OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvaleSpellDamage", aceEvent))
 local OvaleSpellDamageClass = __class(OvaleSpellDamageBase, {
-    constructor = function(self)
-        self.value = {}
-        OvaleSpellDamageBase.constructor(self)
+    OnInitialize = function(self)
         self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     end,
     OnDisable = function(self)
@@ -35,5 +33,9 @@ local OvaleSpellDamageClass = __class(OvaleSpellDamageBase, {
     Get = function(self, spellId)
         return self.value[spellId]
     end,
+    constructor = function(self, ...)
+        OvaleSpellDamageBase.constructor(self, ...)
+        self.value = {}
+    end
 })
 __exports.OvaleSpellDamage = OvaleSpellDamageClass()

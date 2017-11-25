@@ -5,25 +5,21 @@ local __Ovale = LibStub:GetLibrary("ovale/Ovale")
 local Ovale = __Ovale.Ovale
 local __GUID = LibStub:GetLibrary("ovale/GUID")
 local OvaleGUID = __GUID.OvaleGUID
-local __PaperDoll = LibStub:GetLibrary("ovale/PaperDoll")
-local OvalePaperDoll = __PaperDoll.OvalePaperDoll
-local __State = LibStub:GetLibrary("ovale/State")
-local baseState = __State.baseState
 local __Debug = LibStub:GetLibrary("ovale/Debug")
 local OvaleDebug = __Debug.OvaleDebug
 local __Requirement = LibStub:GetLibrary("ovale/Requirement")
-local self_requirement = __Requirement.self_requirement
+local nowRequirements = __Requirement.nowRequirements
 local CheckRequirements = __Requirement.CheckRequirements
 local type = type
 local pairs = pairs
 local tonumber = tonumber
 local wipe = wipe
 local find = string.find
-local huge = math.huge
 local floor = math.floor
 local ceil = math.ceil
+local __BaseState = LibStub:GetLibrary("ovale/BaseState")
+local baseState = __BaseState.baseState
 local OvaleDataBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleData"))
-local INFINITY = huge
 local BLOODELF_CLASSES = {
     ["DEATHKNIGHT"] = true,
     ["DEMONHUNTER"] = true,
@@ -409,16 +405,14 @@ local OvaleDataClass = __class(OvaleDataBase, {
         return verified, value, data
     end,
     CheckSpellInfo = function(self, spellId, atTime, targetGUID)
-        targetGUID = targetGUID or OvaleGUID:UnitGUID(baseState.defaultTarget or "target")
+        targetGUID = targetGUID or OvaleGUID:UnitGUID(baseState.next.defaultTarget or "target")
         local verified = true
         local requirement
-        for name, handler in pairs(self_requirement) do
+        for name, handler in pairs(nowRequirements) do
             local value = self:GetSpellInfoProperty(spellId, atTime, name, targetGUID)
             if value then
-                local method, arg = handler[1], handler[2]
-                arg = self[method] and self or arg
                 local index = (type(value) == "table") and 1 or nil
-                verified, requirement = arg[method](arg, spellId, atTime, name, value, index, targetGUID)
+                verified, requirement = handler(spellId, atTime, name, value, index, targetGUID)
                 if  not verified then
                     break
                 end
@@ -443,7 +437,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
         return value
     end,
     GetSpellInfoProperty = function(self, spellId, atTime, property, targetGUID)
-        targetGUID = targetGUID or OvaleGUID:UnitGUID(baseState.defaultTarget or "target")
+        targetGUID = targetGUID or OvaleGUID:UnitGUID(baseState.next.defaultTarget or "target")
         local si = self.spellInfo[spellId]
         local value = si and si[property]
         local requirements = si and si.require[property]
@@ -511,40 +505,6 @@ local OvaleDataClass = __class(OvaleDataBase, {
             damage = damage + si.bonussp * spellpower
         end
         return damage
-    end,
-    GetBaseDuration = function(self, auraId, spellcast)
-        spellcast = spellcast or OvalePaperDoll
-        local combo = spellcast.combo or 0
-        local holy = spellcast.holy or 0
-        local duration = INFINITY
-        local si = self.spellInfo[auraId]
-        if si and si.duration then
-            duration = si.duration
-            if si.addduration then
-                duration = duration + si.addduration
-            end
-            if si.adddurationcp and combo then
-                duration = duration + si.adddurationcp * combo
-            end
-            if si.adddurationholy and holy then
-                duration = duration + si.adddurationholy * (holy - 1)
-            end
-        end
-        if si and si.haste and spellcast then
-            local hasteMultiplier = OvalePaperDoll:GetHasteMultiplier(si.haste, spellcast)
-            duration = duration / hasteMultiplier
-        end
-        return duration
-    end,
-    GetTickLength = function(self, auraId, snapshot)
-        local tick = 3
-        local si = self.spellInfo[auraId]
-        if si then
-            tick = si.tick or tick
-            local hasteMultiplier = OvalePaperDoll:GetHasteMultiplier(si.haste, snapshot)
-            tick = tick / hasteMultiplier
-        end
-        return tick
     end,
 })
 __exports.OvaleData = OvaleDataClass()

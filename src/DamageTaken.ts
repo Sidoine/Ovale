@@ -24,8 +24,7 @@ let SCHOOL_MASK_MAGIC = bor(SCHOOL_MASK_ARCANE, SCHOOL_MASK_FIRE, SCHOOL_MASK_FR
 class OvaleDamageTakenClass extends OvaleDamageTakenBase {
     damageEvent = new OvaleQueue<Event>("OvaleDamageTaken_damageEvent");
 
-    constructor() {
-        super();
+    OnInitialize() {
         this.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         this.RegisterEvent("PLAYER_REGEN_ENABLED");
     }

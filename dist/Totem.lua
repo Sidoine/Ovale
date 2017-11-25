@@ -11,11 +11,6 @@ local __SpellBook = LibStub:GetLibrary("ovale/SpellBook")
 local OvaleSpellBook = __SpellBook.OvaleSpellBook
 local __State = LibStub:GetLibrary("ovale/State")
 local OvaleState = __State.OvaleState
-local baseState = __State.baseState
-local __Aura = LibStub:GetLibrary("ovale/Aura")
-local auraState = __Aura.auraState
-local __DataState = LibStub:GetLibrary("ovale/DataState")
-local dataState = __DataState.dataState
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local ipairs = ipairs
 local pairs = pairs
@@ -25,7 +20,8 @@ local EARTH_TOTEM_SLOT = EARTH_TOTEM_SLOT
 local FIRE_TOTEM_SLOT = FIRE_TOTEM_SLOT
 local WATER_TOTEM_SLOT = WATER_TOTEM_SLOT
 local huge = math.huge
-local OvaleTotemBase = OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvaleTotem", aceEvent))
+local __Aura = LibStub:GetLibrary("ovale/Aura")
+local OvaleAura = __Aura.OvaleAura
 local INFINITY = huge
 local self_serial = 0
 local TOTEM_CLASS = {
@@ -42,10 +38,14 @@ local TOTEM_SLOT = {
     spirit_wolf = 1
 }
 local TOTEMIC_RECALL = 36936
-local OvaleTotemClass = __class(OvaleTotemBase, {
+local TotemData = __class(nil, {
     constructor = function(self)
         self.totem = {}
-        OvaleTotemBase.constructor(self)
+    end
+})
+local OvaleTotemBase = OvaleState:RegisterHasState(OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvaleTotem", aceEvent)), TotemData)
+local OvaleTotemClass = __class(OvaleTotemBase, {
+    OnInitialize = function(self)
         if TOTEM_CLASS[Ovale.playerClass] then
             self:RegisterEvent("PLAYER_ENTERING_WORLD", "Update")
             self:RegisterEvent("PLAYER_TALENT_UPDATE", "Update")
@@ -65,28 +65,26 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
         self_serial = self_serial + 1
         Ovale:needRefresh()
     end,
-})
-local TotemState = __class(nil, {
     InitializeState = function(self)
-        self.totem = {}
+        self.next.totem = {}
         for slot = 1, MAX_TOTEMS, 1 do
-            self.totem[slot] = {}
+            self.next.totem[slot] = {}
         end
     end,
     ResetState = function(self)
     end,
     CleanState = function(self)
-        for slot, totem in pairs(self.totem) do
+        for slot, totem in pairs(self.next.totem) do
             for k in pairs(totem) do
                 totem[k] = nil
             end
-            self.totem[slot] = nil
+            self.next.totem[slot] = nil
         end
     end,
     ApplySpellAfterCast = function(self, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
         __exports.OvaleTotem:StartProfiling("OvaleTotem_ApplySpellAfterCast")
         if Ovale.playerClass == "SHAMAN" and spellId == TOTEMIC_RECALL then
-            for slot in ipairs(self.totem) do
+            for slot in ipairs(self.next.totem) do
                 self:DestroyTotem(slot, endCast)
             end
         else
@@ -99,7 +97,6 @@ local TotemState = __class(nil, {
         __exports.OvaleTotem:StopProfiling("OvaleTotem_ApplySpellAfterCast")
     end,
     IsActiveTotem = function(self, totem, atTime)
-        atTime = atTime or baseState.currentTime
         local boolean = false
         if totem and (totem.serial == self_serial) and totem.start and totem.duration and totem.start < atTime and atTime < totem.start + totem.duration then
             boolean = true
@@ -109,7 +106,7 @@ local TotemState = __class(nil, {
     GetTotem = function(self, slot)
         __exports.OvaleTotem:StartProfiling("OvaleTotem_state_GetTotem")
         slot = TOTEM_SLOT[slot] or slot
-        local totem = self.totem[slot]
+        local totem = self.next.totem[slot]
         if totem and ( not totem.serial or totem.serial < self_serial) then
             local haveTotem, name, startTime, duration, icon = GetTotemInfo(slot)
             if haveTotem then
@@ -142,20 +139,19 @@ local TotemState = __class(nil, {
         return haveTotem, name, startTime, duration, icon
     end,
     GetTotemCount = function(self, spellId, atTime)
-        atTime = atTime or baseState.currentTime
         local start, ending
         local count = 0
         local si = OvaleData.spellInfo[spellId]
         if si and si.totem then
             local buffPresent = true
             if si.buff_totem then
-                local aura = auraState:GetAura("player", si.buff_totem)
-                buffPresent = auraState:IsActiveAura(aura, atTime)
+                local aura = OvaleAura:GetAura("player", si.buff_totem, atTime)
+                buffPresent = OvaleAura:IsActiveAura(aura, atTime)
             end
             if buffPresent then
                 local texture = OvaleSpellBook:GetSpellTexture(spellId)
                 local maxTotems = si.max_totems or 1
-                for slot in ipairs(self.totem) do
+                for slot in ipairs(self.next.totem) do
                     local totem = self:GetTotem(slot)
                     if self:IsActiveTotem(totem, atTime) and totem.icon == texture then
                         count = count + 1
@@ -176,14 +172,13 @@ local TotemState = __class(nil, {
     end,
     GetTotemSlot = function(self, spellId, atTime)
         __exports.OvaleTotem:StartProfiling("OvaleTotem_state_GetTotemSlot")
-        atTime = atTime or baseState.currentTime
         local totemSlot
         local si = OvaleData.spellInfo[spellId]
         if si and si.totem then
             totemSlot = TOTEM_SLOT[si.totem]
             if  not totemSlot then
                 local availableSlot
-                for slot in ipairs(self.totem) do
+                for slot in ipairs(self.next.totem) do
                     local totem = self:GetTotem(slot)
                     if  not self:IsActiveTotem(totem, atTime) then
                         availableSlot = slot
@@ -194,7 +189,7 @@ local TotemState = __class(nil, {
                 local maxTotems = si.max_totems or 1
                 local count = 0
                 local start = INFINITY
-                for slot in ipairs(self.totem) do
+                for slot in ipairs(self.next.totem) do
                     local totem = self:GetTotem(slot)
                     if self:IsActiveTotem(totem, atTime) and totem.icon == texture then
                         count = count + 1
@@ -215,11 +210,10 @@ local TotemState = __class(nil, {
     end,
     SummonTotem = function(self, spellId, slot, atTime)
         __exports.OvaleTotem:StartProfiling("OvaleTotem_state_SummonTotem")
-        atTime = atTime or baseState.currentTime
         slot = TOTEM_SLOT[slot] or slot
         local name, _, icon = OvaleSpellBook:GetSpellInfo(spellId)
-        local duration = dataState:GetSpellInfoProperty(spellId, atTime, "duration")
-        local totem = self.totem[slot]
+        local duration = OvaleData:GetSpellInfoProperty(spellId, atTime, "duration", nil)
+        local totem = self.next.totem[slot]
         totem.name = name
         totem.start = atTime
         totem.duration = duration or 15
@@ -228,9 +222,8 @@ local TotemState = __class(nil, {
     end,
     DestroyTotem = function(self, slot, atTime)
         __exports.OvaleTotem:StartProfiling("OvaleTotem_state_DestroyTotem")
-        atTime = atTime or baseState.currentTime
         slot = TOTEM_SLOT[slot] or slot
-        local totem = self.totem[slot]
+        local totem = self.next.totem[slot]
         local duration = atTime - totem.start
         if duration < 0 then
             duration = 0
@@ -238,10 +231,6 @@ local TotemState = __class(nil, {
         totem.duration = duration
         __exports.OvaleTotem:StopProfiling("OvaleTotem_state_DestroyTotem")
     end,
-    constructor = function(self)
-        self.totem = nil
-    end
 })
-__exports.totemState = TotemState()
-OvaleState:RegisterState(__exports.totemState)
 __exports.OvaleTotem = OvaleTotemClass()
+OvaleState:RegisterState(__exports.OvaleTotem)

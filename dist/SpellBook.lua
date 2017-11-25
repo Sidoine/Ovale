@@ -9,9 +9,6 @@ local __Profiler = LibStub:GetLibrary("ovale/Profiler")
 local OvaleProfiler = __Profiler.OvaleProfiler
 local __Ovale = LibStub:GetLibrary("ovale/Ovale")
 local Ovale = __Ovale.Ovale
-local __Requirement = LibStub:GetLibrary("ovale/Requirement")
-local RegisterRequirement = __Requirement.RegisterRequirement
-local UnregisterRequirement = __Requirement.UnregisterRequirement
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local ipairs = ipairs
 local pairs = pairs
@@ -28,7 +25,6 @@ local GetFlyoutInfo = GetFlyoutInfo
 local GetFlyoutSlotInfo = GetFlyoutSlotInfo
 local GetSpellBookItemInfo = GetSpellBookItemInfo
 local GetSpellInfo = GetSpellInfo
-local GetSpellCount = GetSpellCount
 local GetSpellLink = GetSpellLink
 local GetSpellTabInfo = GetSpellTabInfo
 local GetSpellTexture = GetSpellTexture
@@ -36,16 +32,11 @@ local GetTalentInfo = GetTalentInfo
 local HasPetSpells = HasPetSpells
 local IsHarmfulSpell = IsHarmfulSpell
 local IsHelpfulSpell = IsHelpfulSpell
-local IsSpellInRange = IsSpellInRange
-local IsUsableSpell = IsUsableSpell
-local UnitIsFriend = UnitIsFriend
 local BOOKTYPE_PET = BOOKTYPE_PET
 local BOOKTYPE_SPELL = BOOKTYPE_SPELL
 local MAX_TALENT_TIERS = MAX_TALENT_TIERS
 local NUM_TALENT_COLUMNS = NUM_TALENT_COLUMNS
 local MAX_NUM_TALENTS = NUM_TALENT_COLUMNS * MAX_TALENT_TIERS
-local WARRIOR_INCERCEPT_SPELLID = 198304
-local WARRIOR_HEROICTHROW_SPELLID = 57755
 do
     local debugOptions = {
         spellbook = {
@@ -111,12 +102,8 @@ local OvaleSpellBookClass = __class(OvaleSpellBookBase, {
         self:RegisterEvent("PLAYER_TALENT_UPDATE", "UpdateTalents")
         self:RegisterEvent("SPELLS_CHANGED", "UpdateSpells")
         self:RegisterEvent("UNIT_PET")
-        RegisterRequirement("spellcount_min", "RequireSpellCountHandler", self)
-        RegisterRequirement("spellcount_max", "RequireSpellCountHandler", self)
     end,
     OnDisable = function(self)
-        UnregisterRequirement("spellcount_max")
-        UnregisterRequirement("spellcount_min")
         self:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
         self:UnregisterEvent("CHARACTER_POINTS_CHANGED")
         self:UnregisterEvent("PLAYER_ENTERING_WORLD")
@@ -258,19 +245,6 @@ local OvaleSpellBookClass = __class(OvaleSpellBookBase, {
             return GetSpellInfo(spellId)
         end
     end,
-    GetSpellCount = function(self, spellId)
-        local index, bookType = self:GetSpellBookIndex(spellId)
-        if index and bookType then
-            local spellCount = GetSpellCount(index, bookType)
-            self:Debug("GetSpellCount: index=%s bookType=%s for spellId=%s ==> spellCount=%s", index, bookType, spellId, spellCount)
-            return spellCount
-        else
-            local spellName = __exports.OvaleSpellBook:GetSpellName(spellId)
-            local spellCount = GetSpellCount(spellName)
-            self:Debug("GetSpellCount: spellName=%s for spellId=%s ==> spellCount=%s", spellName, spellId, spellCount)
-            return spellCount
-        end
-    end,
     GetSpellName = function(self, spellId)
         if spellId then
             local spellName = self.spell[spellId]
@@ -325,29 +299,6 @@ local OvaleSpellBookClass = __class(OvaleSpellBookBase, {
         local _, bookType = self:GetSpellBookIndex(spellId)
         return bookType == BOOKTYPE_PET
     end,
-    IsSpellInRange = function(self, spellId, unitId)
-        local index, bookType = self:GetSpellBookIndex(spellId)
-        local returnValue = nil
-        if index and bookType then
-            returnValue = IsSpellInRange(index, bookType, unitId)
-        elseif self:IsKnownSpell(spellId) then
-            local name = self:GetSpellName(spellId)
-            returnValue = IsSpellInRange(name, unitId)
-        end
-        if (returnValue == 1 and spellId == WARRIOR_INCERCEPT_SPELLID) then
-            return (UnitIsFriend("player", unitId) == 1 or __exports.OvaleSpellBook:IsSpellInRange(WARRIOR_HEROICTHROW_SPELLID, unitId) == 1) and 1 or 0
-        end
-        return returnValue
-    end,
-    IsUsableSpell = function(self, spellId)
-        local index, bookType = self:GetSpellBookIndex(spellId)
-        if index and bookType then
-            return IsUsableSpell(index, bookType)
-        elseif self:IsKnownSpell(spellId) then
-            local name = self:GetSpellName(spellId)
-            return IsUsableSpell(name)
-        end
-    end,
     DebugSpells = function(self)
         wipe(output)
         OutputTableValues(output, self.spell)
@@ -362,22 +313,6 @@ local OvaleSpellBookClass = __class(OvaleSpellBookBase, {
         wipe(output)
         OutputTableValues(output, self.talent)
         return concat(output, "\n")
-    end,
-    RequireSpellCountHandler = function(self, spellId, atTime, requirement, tokens, index, targetGUID)
-        local verified = false
-        local count = tokens
-        if index then
-            count = tokens[index]
-            index = index + 1
-        end
-        if count then
-            count = tonumber(count) or 1
-            local actualCount = __exports.OvaleSpellBook:GetSpellCount(spellId)
-            verified = (requirement == "spellcount_min" and count <= actualCount) or (requirement == "spellcount_max" and count >= actualCount)
-        else
-            Ovale:OneTimeMessage("Warning: requirement '%s' is missing a count argument.", requirement)
-        end
-        return verified, requirement, index
     end,
     constructor = function(self, ...)
         OvaleSpellBookBase.constructor(self, ...)

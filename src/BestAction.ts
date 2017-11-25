@@ -10,17 +10,18 @@ import { OvaleEquipment } from "./Equipment";
 import { OvaleGUID } from "./GUID";
 import { OvaleSpellBook } from "./SpellBook";
 import { Ovale } from "./Ovale";
-import { OvaleState, BaseState } from "./State";
-import { paperDollState } from "./PaperDoll";
-import { dataState } from "./DataState";
-import { spellBookState } from "./SpellBookState";
-import { futureState } from "./FutureState";
-import { cooldownState } from "./CooldownState";
+import { OvaleState } from "./State";
 import aceEvent from "@wowts/ace_event-3.0";
 import { abs, huge, floor } from "@wowts/math";
 import { assert, ipairs, loadstring, pairs, tonumber, type, wipe, LuaObj, lualength } from "@wowts/lua";
 import { GetActionCooldown, GetActionTexture, GetItemIcon, GetItemCooldown, GetItemSpell, GetSpellTexture, IsActionInRange, IsCurrentAction, IsItemInRange, IsUsableAction, IsUsableItem } from "@wowts/wow-mock";
 import { AstNode, isValueNode, ValueNode } from "./AST";
+import { OvaleFuture } from "./Future";
+import { OvaleCooldown } from "./Cooldown";
+import { variables } from "./Variables";
+import { OvalePaperDoll } from "./PaperDoll";
+import { baseState } from "./BaseState";
+import { OvaleSpells } from "./Spells";
 
 let OvaleBestActionBase = OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleBestAction", aceEvent)));
 let INFINITY = huge;
@@ -55,6 +56,7 @@ interface Element extends AstNode {
     lua?:string;
 }
 
+type BaseState = {};
 type ComputerFunction = (element: Element, state: BaseState, atTime:number) => [OvaleTimeSpan, Element];
 
 export let OvaleBestAction:OvaleBestActionClass = undefined;
@@ -102,9 +104,9 @@ const GetActionItemInfo = function(element, state: BaseState, atTime, target) {
         itemId = OvaleEquipment.GetEquippedItem(itemId);
     }
     if (!itemId) {
-        state.Log("Unknown item '%s'.", element.positionalParams[1]);
+        OvaleBestAction.Log("Unknown item '%s'.", element.positionalParams[1]);
     } else {
-        state.Log("Item ID '%s'", itemId);
+        OvaleBestAction.Log("Item ID '%s'", itemId);
         let action = OvaleActionBar.GetForItem(itemId);
         let spellName = GetItemSpell(itemId);
         if (element.namedParams.texture) {
@@ -113,7 +115,7 @@ const GetActionItemInfo = function(element, state: BaseState, atTime, target) {
         actionTexture = actionTexture || GetItemIcon(itemId);
         actionInRange = IsItemInRange(itemId, target);
         [actionCooldownStart, actionCooldownDuration, actionEnable] = GetItemCooldown(itemId);
-        actionUsable = spellName && IsUsableItem(itemId) && spellBookState.IsUsableItem(itemId);
+        actionUsable = spellName && IsUsableItem(itemId) && OvaleSpells.IsUsableItem(itemId, atTime);
         if (action) {
             actionShortcut = OvaleActionBar.GetBinding(action);
             actionIsCurrent = IsCurrentAction(action);
@@ -130,7 +132,7 @@ const GetActionMacroInfo = function(element, state: BaseState, atTime, target) {
     let macro = element.positionalParams[1];
     let action = OvaleActionBar.GetForMacro(macro);
     if (!action) {
-        state.Log("Unknown macro '%s'.", macro);
+        OvaleBestAction.Log("Unknown macro '%s'.", macro);
     } else {
         if (element.namedParams.texture) {
             actionTexture = `Interface\\Icons\\${element.namedParams.texture}`;
@@ -147,7 +149,7 @@ const GetActionMacroInfo = function(element, state: BaseState, atTime, target) {
     OvaleBestAction.StopProfiling("OvaleBestAction_GetActionMacroInfo");
     return [actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target];
 }
-const GetActionSpellInfo = function(element, state: BaseState, atTime, target) {
+function GetActionSpellInfo(element, state: BaseState, atTime, target) {
     OvaleBestAction.StartProfiling("OvaleBestAction_GetActionSpellInfo");
     let actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionResourceExtend, actionCharges;
     let targetGUID = OvaleGUID.UnitGUID(target);
@@ -155,36 +157,37 @@ const GetActionSpellInfo = function(element, state: BaseState, atTime, target) {
     let si = OvaleData.spellInfo[spellId];
     let replacedSpellId = undefined;
     if (si && si.replace) {
-        let replacement = dataState.GetSpellInfoProperty(spellId, atTime, "replace", targetGUID);
+        let replacement = OvaleData.GetSpellInfoProperty(spellId, atTime, "replace", targetGUID);
         if (replacement) {
             replacedSpellId = spellId;
             spellId = replacement;
             si = OvaleData.spellInfo[spellId];
-            state.Log("Spell ID '%s' is replaced by spell ID '%s'.", replacedSpellId, spellId);
+            OvaleBestAction.Log("Spell ID '%s' is replaced by spell ID '%s'.", replacedSpellId, spellId);
         }
     }
     let action = OvaleActionBar.GetForSpell(spellId);
     if (!action && replacedSpellId) {
-        state.Log("Action not found for spell ID '%s'; checking for replaced spell ID '%s'.", spellId, replacedSpellId);
+        OvaleBestAction.Log("Action not found for spell ID '%s'; checking for replaced spell ID '%s'.", spellId, replacedSpellId);
         action = OvaleActionBar.GetForSpell(replacedSpellId);
     }
     let isKnownSpell = OvaleSpellBook.IsKnownSpell(spellId);
     if (!isKnownSpell && replacedSpellId) {
-        state.Log("Spell ID '%s' is not known; checking for replaced spell ID '%s'.", spellId, replacedSpellId);
+        OvaleBestAction.Log("Spell ID '%s' is not known; checking for replaced spell ID '%s'.", spellId, replacedSpellId);
         isKnownSpell = OvaleSpellBook.IsKnownSpell(replacedSpellId);
     }
     if (!isKnownSpell && !action) {
-        state.Log("Unknown spell ID '%s'.", spellId);
+        OvaleBestAction.Log("Unknown spell ID '%s'.", spellId);
     } else {
-        let [isUsable, noMana] = spellBookState.IsUsableSpell(spellId, atTime, targetGUID);
+        let [isUsable, noMana] = OvaleSpells.IsUsableSpell(spellId, atTime, targetGUID);
         if (isUsable || noMana) {
             if (element.namedParams.texture) {
                 actionTexture = `Interface\\Icons\\${element.namedParams.texture}`;
             }
             actionTexture = actionTexture || GetSpellTexture(spellId);
-            actionInRange = OvaleSpellBook.IsSpellInRange(spellId, target);
-            [actionCooldownStart, actionCooldownDuration, actionEnable] = cooldownState.GetSpellCooldown(spellId);
-            actionCharges = cooldownState.GetSpellCharges(spellId);
+            actionInRange = OvaleSpells.IsSpellInRange(spellId, target);
+            [actionCooldownStart, actionCooldownDuration, actionEnable] = OvaleCooldown.GetSpellCooldown(spellId, atTime);
+            OvaleBestAction.Log("GetSpellCooldown returned %f, %f", actionCooldownStart, actionCooldownDuration);
+            actionCharges = OvaleCooldown.GetSpellCharges(spellId, atTime);
             actionResourceExtend = 0;
             actionUsable = isUsable;
             if (action) {
@@ -199,14 +202,14 @@ const GetActionSpellInfo = function(element, state: BaseState, atTime, target) {
                 }
                 if (actionCooldownStart && actionCooldownDuration) {
                     let extraPower = element.namedParams.extra_amount || 0;
-                    let seconds = spellBookState.GetTimeToSpell(spellId, atTime, targetGUID, extraPower);
+                    let seconds = OvaleSpells.GetTimeToSpell(spellId, atTime, targetGUID, extraPower);
                     if (seconds > 0 && seconds > actionCooldownDuration) {
                         if (actionCooldownDuration > 0) {
                             actionResourceExtend = seconds - actionCooldownDuration;
                         } else {
                             actionResourceExtend = seconds;
                         }
-                        state.Log("Spell ID '%s' requires an extra %fs for primary resource.", spellId, actionResourceExtend);
+                        OvaleBestAction.Log("Spell ID '%s' requires an extra %fs for primary resource.", spellId, actionResourceExtend);
                     }
                 }
             }
@@ -261,16 +264,16 @@ class OvaleBestActionClass extends OvaleBestActionBase {
     }
     StartNewAction() {
         OvaleState.ResetState();
-        futureState.ApplyInFlightSpells();
+        OvaleFuture.ApplyInFlightSpells();
         self_serial = self_serial + 1;
     }
-    GetActionInfo(element, state: BaseState, atTime) {
+    GetActionInfo(element, state: BaseState, atTime: number) {
         if (element && element.type == "action") {
             if (element.serial && element.serial >= self_serial) {
-                state.Log("[%d]    using cached result (age = %d)", element.nodeId, element.serial);
+                OvaleSpellBook.Log("[%d]    using cached result (age = %d)", element.nodeId, element.serial);
                 return [element.actionTexture, element.actionInRange, element.actionCooldownStart, element.actionCooldownDuration, element.actionUsable, element.actionShortcut, element.actionIsCurrent, element.actionEnable, element.actionType, element.actionId, element.actionTarget, element.actionResourceExtend, element.actionCharges];
             } else {
-                let target = element.namedParams.target || state.defaultTarget;
+                let target = element.namedParams.target || baseState.next.defaultTarget;
                 if (element.lowername == "item") {
                     return GetActionItemInfo(element, state, atTime, target);
                 } else if (element.lowername == "macro") {
@@ -291,7 +294,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         if (element && element.type == "state") {
             let [variable, value] = [element.positionalParams[1], element.positionalParams[2]];
             let isFuture = !timeSpan.HasTime(atTime);
-            state.PutState(variable, value, isFuture);
+            variables.PutState(<string>variable, <string>value, isFuture, atTime);
         }
         this.StopProfiling("OvaleBestAction_GetAction");
         return [timeSpan, element];
@@ -311,16 +314,16 @@ class OvaleBestActionClass extends OvaleBestActionBase {
                     let shortCircuit = false;
                     if (parentNode.child && parentNode.child[1] == childNode) {
                         if (parentNode.type == "if" && timeSpan.Measure() == 0) {
-                            state.Log("[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with zero-measure time span.", element.nodeId, childNode.type, parentNode.nodeId);
+                            OvaleBestAction.Log("[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with zero-measure time span.", element.nodeId, childNode.type, parentNode.nodeId);
                             shortCircuit = true;
                         } else if (parentNode.type == "unless" && timeSpan.IsUniverse()) {
-                            state.Log("[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with universe as time span.", element.nodeId, childNode.type, parentNode.nodeId);
+                            OvaleBestAction.Log("[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with universe as time span.", element.nodeId, childNode.type, parentNode.nodeId);
                             shortCircuit = true;
                         } else if (parentNode.type == "logical" && parentNode.operator == "and" && timeSpan.Measure() == 0) {
-                            state.Log("[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with zero measure.", element.nodeId, childNode.type, parentNode.nodeId);
+                            OvaleBestAction.Log("[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with zero measure.", element.nodeId, childNode.type, parentNode.nodeId);
                             shortCircuit = true;
                         } else if (parentNode.type == "logical" && parentNode.operator == "or" && timeSpan.IsUniverse()) {
-                            state.Log("[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with universe as time span.", element.nodeId, childNode.type, parentNode.nodeId);
+                            OvaleBestAction.Log("[%d]    '%s' will trigger short-circuit evaluation of parent node [%d] with universe as time span.", element.nodeId, childNode.type, parentNode.nodeId);
                             shortCircuit = true;
                         }
                     }
@@ -348,9 +351,9 @@ class OvaleBestActionClass extends OvaleBestActionBase {
                 result = element.result;
             } else {
                 if (element.asString) {
-                    state.Log("[%d] >>> Computing '%s' at time=%f: %s", element.nodeId, element.type, atTime, element.asString);
+                    OvaleBestAction.Log("[%d] >>> Computing '%s' at time=%f: %s", element.nodeId, element.type, atTime, element.asString);
                 } else {
-                    state.Log("[%d] >>> Computing '%s' at time=%f", element.nodeId, element.type, atTime);
+                    OvaleBestAction.Log("[%d] >>> Computing '%s' at time=%f", element.nodeId, element.type, atTime);
                 }
                 let visitor = this.COMPUTE_VISITOR[element.type];
                 if (visitor) {
@@ -359,14 +362,14 @@ class OvaleBestActionClass extends OvaleBestActionBase {
                     element.timeSpan = timeSpan;
                     element.result = result;
                 } else {
-                    state.Log("[%d] Runtime error: unable to compute node of type '%s'.", element.nodeId, element.type);
+                    OvaleBestAction.Log("[%d] Runtime error: unable to compute node of type '%s'.", element.nodeId, element.type);
                 }
                 if (result && isValueNode(result)) {
-                    state.Log("[%d] <<< '%s' returns %s with value = %s, %s, %s", element.nodeId, element.type, timeSpan, result.value, result.origin, result.rate);
+                    OvaleBestAction.Log("[%d] <<< '%s' returns %s with value = %s, %s, %s", element.nodeId, element.type, timeSpan, result.value, result.origin, result.rate);
                 } else if (result && result.nodeId) {
-                    state.Log("[%d] <<< '%s' returns [%d] %s", element.nodeId, element.type, result.nodeId, timeSpan);
+                    OvaleBestAction.Log("[%d] <<< '%s' returns [%d] %s", element.nodeId, element.type, result.nodeId, timeSpan);
                 } else {
-                    state.Log("[%d] <<< '%s' returns %s", element.nodeId, element.type, timeSpan);
+                    OvaleBestAction.Log("[%d] <<< '%s' returns %s", element.nodeId, element.type, timeSpan);
                 }
             }
         }
@@ -381,12 +384,12 @@ class OvaleBestActionClass extends OvaleBestActionBase {
             return timeSpan;
         }
     }
-    ComputeAction: ComputerFunction = (element, state: BaseState, atTime):[OvaleTimeSpan, any] => {
+    ComputeAction: ComputerFunction = (element, state: BaseState, atTime: number):[OvaleTimeSpan, any] => {
         this.StartProfiling("OvaleBestAction_ComputeAction");
         let nodeId = element.nodeId;
         let timeSpan = GetTimeSpan(element);
         let result;
-        state.Log("[%d]    evaluating action: %s(%s)", nodeId, element.name, element.paramsAsString);
+        OvaleBestAction.Log("[%d]    evaluating action: %s(%s)", nodeId, element.name, element.paramsAsString);
         let [actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget, actionResourceExtend, actionCharges] = this.GetActionInfo(element, state, atTime);
         element.actionTexture = actionTexture;
         element.actionInRange = actionInRange;
@@ -403,13 +406,13 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         element.actionCharges = actionCharges;
         let action = element.positionalParams[1];
         if (!actionTexture) {
-            state.Log("[%d]    Action %s not found.", nodeId, action);
+            OvaleBestAction.Log("[%d]    Action %s not found.", nodeId, action);
             wipe(timeSpan);
         } else if (!(actionEnable && actionEnable > 0)) {
-            state.Log("[%d]    Action %s not enabled.", nodeId, action);
+            OvaleBestAction.Log("[%d]    Action %s not enabled.", nodeId, action);
             wipe(timeSpan);
         } else if (element.namedParams.usable == 1 && !actionUsable) {
-            state.Log("[%d]    Action %s not usable.", nodeId, action);
+            OvaleBestAction.Log("[%d]    Action %s not usable.", nodeId, action);
             wipe(timeSpan);
         } else {
             let spellInfo;
@@ -426,48 +429,53 @@ class OvaleBestActionClass extends OvaleBestActionBase {
             }
             let start: number;
             if (actionCooldownStart && actionCooldownStart > 0 && (actionCharges == undefined || actionCharges == 0)) {
-                state.Log("[%d]    Action %s (actionCharges=%s)", nodeId, action, actionCharges || "(nil)");
+                OvaleBestAction.Log("[%d]    Action %s (actionCharges=%s)", nodeId, action, actionCharges || "(nil)");
                 if (actionCooldownDuration && actionCooldownDuration > 0) {
-                    state.Log("[%d]    Action %s is on cooldown (start=%f, duration=%f).", nodeId, action, actionCooldownStart, actionCooldownDuration);
+                    OvaleBestAction.Log("[%d]    Action %s is on cooldown (start=%f, duration=%f).", nodeId, action, actionCooldownStart, actionCooldownDuration);
                     start = actionCooldownStart + actionCooldownDuration;
                 } else {
-                    state.Log("[%d]    Action %s is waiting on the GCD (start=%f).", nodeId, action, actionCooldownStart);
+                    OvaleBestAction.Log("[%d]    Action %s is waiting on the GCD (start=%f).", nodeId, action, actionCooldownStart);
                     start = actionCooldownStart;
                 }
             } else {
                 if (actionCharges == undefined) {
-                    state.Log("[%d]    Action %s is off cooldown.", nodeId, action);
-                } else {
-                    state.Log("[%d]    Action %s still has %f charges.", nodeId, action, actionCharges);
+                    OvaleBestAction.Log("[%d]    Action %s is off cooldown.", nodeId, action);
+                    start = atTime;
+                } else if (actionCooldownDuration && actionCooldownDuration > 0) {
+                    OvaleBestAction.Log("[%d]    Action %s still has %f charges and is not on GCD.", nodeId, action, actionCharges);
+                    start = atTime;
                 }
-                start = state.currentTime;
+                else {
+                    this.Log("[%d]    Action %s still has %f charges but is on GCD (start=%f).", nodeId, action, actionCharges, actionCooldownStart);
+                    start = actionCooldownStart;
+                }
             }
             if (actionResourceExtend && actionResourceExtend > 0) {
                 if (element.namedParams.pool_resource && element.namedParams.pool_resource == 1) {
-                    state.Log("[%d]    Action %s is ignoring resource requirements because it is a pool_resource action.", nodeId, action);
+                    OvaleBestAction.Log("[%d]    Action %s is ignoring resource requirements because it is a pool_resource action.", nodeId, action);
                 } else {
-                    state.Log("[%d]    Action %s is waiting on resources (start=%f, extend=%f).", nodeId, action, start, actionResourceExtend);
+                    OvaleBestAction.Log("[%d]    Action %s is waiting on resources (start=%f, extend=%f).", nodeId, action, start, actionResourceExtend);
                     start = start + actionResourceExtend;
                 }
             }
-            state.Log("[%d]    start=%f atTime=%f", nodeId, start, atTime);
+            OvaleBestAction.Log("[%d]    start=%f atTime=%f", nodeId, start, atTime);
             let offgcd = element.namedParams.offgcd || (spellInfo && spellInfo.offgcd) || 0;
             element.offgcd = (offgcd == 1) && true || undefined;
             if (element.offgcd) {
-                state.Log("[%d]    Action %s is off the global cooldown.", nodeId, action);
+                OvaleBestAction.Log("[%d]    Action %s is off the global cooldown.", nodeId, action);
             } else if (start < atTime) {
-                state.Log("[%d]    Action %s is waiting for the global cooldown.", nodeId, action);
+                OvaleBestAction.Log("[%d]    Action %s is waiting for the global cooldown.", nodeId, action);
                 let newStart = atTime;
-                if (futureState.IsChanneling(atTime)) {
-                    let spellId = futureState.currentSpellId;
-                    let si = spellId && OvaleData.spellInfo[spellId];
+                if (OvaleFuture.IsChanneling(atTime)) {
+                    let spell = OvaleFuture.GetCurrentCast(atTime);
+                    let si = spell && spell.spellId && OvaleData.spellInfo[spell.spellId];
                     if (si) {
                         let channel = si.channel || si.canStopChannelling;
                         if (channel) {
-                            let hasteMultiplier = paperDollState.GetHasteMultiplier(si.haste);
+                            let hasteMultiplier = OvalePaperDoll.GetHasteMultiplier(si.haste, OvalePaperDoll.next);
                             let numTicks = floor(channel * hasteMultiplier + 0.5);
-                            let tick = (futureState.endCast - futureState.startCast) / numTicks;
-                            let tickTime = futureState.startCast;
+                            let tick = (spell.stop - spell.start) / numTicks;
+                            let tickTime = spell.start;
                             for (let i = 1; i <= numTicks; i += 1) {
                                 tickTime = tickTime + tick;
                                 if (newStart <= tickTime) {
@@ -475,7 +483,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
                                 }
                             }
                             newStart = tickTime;
-                            state.Log("[%d]    %s start=%f, numTicks=%d, tick=%f, tickTime=%f", nodeId, spellId, newStart, numTicks, tick, tickTime);
+                            OvaleBestAction.Log("[%d]    %s start=%f, numTicks=%d, tick=%f, tickTime=%f", nodeId, spell.spellId, newStart, numTicks, tick, tickTime);
                         }
                     }
                 }
@@ -483,7 +491,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
                     start = newStart;
                 }
             }
-            state.Log("[%d]    Action %s can start at %f.", nodeId, action, start);
+            OvaleBestAction.Log("[%d]    Action %s can start at %f.", nodeId, action, start);
             timeSpan.Copy(start, INFINITY);
             result = element;
         }
@@ -500,12 +508,12 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         let [x, y, z, timeSpanB] = AsValue(atTime, rawTimeSpanB);
         timeSpanA.Intersect(timeSpanB, timeSpan);
         if (timeSpan.Measure() == 0) {
-            state.Log("[%d]    arithmetic '%s' returns %s with zero measure", element.nodeId, element.operator, timeSpan);
+            OvaleBestAction.Log("[%d]    arithmetic '%s' returns %s with zero measure", element.nodeId, element.operator, timeSpan);
             result = SetValue(element, 0);
         } else {
             let operator = element.operator;
             let t = atTime;
-            state.Log("[%d]    %s+(t-%s)*%s %s %s+(t-%s)*%s", element.nodeId, a, b, c, operator, x, y, z);
+            OvaleBestAction.Log("[%d]    %s+(t-%s)*%s %s %s+(t-%s)*%s", element.nodeId, a, b, c, operator, x, y, z);
             let l, m, n;
             let A = a + (t - b) * c;
             let B = x + (t - y) * z;
@@ -551,7 +559,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
                     n = 0;
                 }
             }
-            state.Log("[%d]    arithmetic '%s' returns %s+(t-%s)*%s", element.nodeId, operator, l, m, n);
+            OvaleBestAction.Log("[%d]    arithmetic '%s' returns %s+(t-%s)*%s", element.nodeId, operator, l, m, n);
             result = SetValue(element, l, m, n);
         }
         this.StopProfiling("OvaleBestAction_Compute");
@@ -566,10 +574,10 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         let [x, y, z, timeSpanB] = AsValue(atTime, rawTimeSpanB, elementB);
         timeSpanA.Intersect(timeSpanB, timeSpan);
         if (timeSpan.Measure() == 0) {
-            state.Log("[%d]    compare '%s' returns %s with zero measure", element.nodeId, element.operator, timeSpan);
+            OvaleBestAction.Log("[%d]    compare '%s' returns %s with zero measure", element.nodeId, element.operator, timeSpan);
         } else {
             let operator = element.operator;
-            state.Log("[%d]    %s+(t-%s)*%s %s %s+(t-%s)*%s", element.nodeId, a, b, c, operator, x, y, z);
+            OvaleBestAction.Log("[%d]    %s+(t-%s)*%s %s %s+(t-%s)*%s", element.nodeId, a, b, c, operator, x, y, z);
             let A = a - b * c;
             let B = x - y * z;
             if (c == z) {
@@ -585,7 +593,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
                     t = diff / (c - z);
                 }
                 t = (t > 0) && t || 0;
-                state.Log("[%d]    intersection at t = %s", element.nodeId, t);
+                OvaleBestAction.Log("[%d]    intersection at t = %s", element.nodeId, t);
                 let scratch:OvaleTimeSpan;
                 if ((c > z && operator == "<") || (c > z && operator == "<=") || (c < z && operator == ">") || (c < z && operator == ">=")) {
                     scratch = timeSpan.IntersectInterval(0, t);
@@ -599,7 +607,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
                     wipe(timeSpan);
                 }
             }
-            state.Log("[%d]    compare '%s' returns %s", element.nodeId, operator, timeSpan);
+            OvaleBestAction.Log("[%d]    compare '%s' returns %s", element.nodeId, operator, timeSpan);
         }
         this.StopProfiling("OvaleBestAction_Compute");
         return [timeSpan, element];
@@ -619,7 +627,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         this.StopProfiling("OvaleBestAction_Compute");
         return [timeSpan, result];
     }
-    ComputeFunction:ComputerFunction = (element, state: BaseState, atTime):[OvaleTimeSpan, Element] => {
+    ComputeFunction:ComputerFunction = (element, state: BaseState, atTime: number):[OvaleTimeSpan, Element] => {
         this.StartProfiling("OvaleBestAction_ComputeFunction");
         let timeSpan = GetTimeSpan(element);
         let result;
@@ -632,7 +640,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         if (value) {
             result = SetValue(element, value, origin, rate);
         }
-        state.Log("[%d]    condition '%s' returns %s, %s, %s, %s, %s", element.nodeId, element.name, start, ending, value, origin, rate);
+        OvaleBestAction.Log("[%d]    condition '%s' returns %s, %s, %s, %s, %s", element.nodeId, element.name, start, ending, value, origin, rate);
         this.StopProfiling("OvaleBestAction_ComputeFunction");
         return [timeSpan, result];
     }
@@ -646,23 +654,23 @@ class OvaleBestActionClass extends OvaleBestActionBase {
             currentTimeSpan.IntersectInterval(atTime, INFINITY, current);
             if (current.Measure() > 0) {
                 let nodeString = (currentElement && currentElement.nodeId) && ` [${currentElement.nodeId}]` || "";
-                state.Log("[%d]    group checking [%d]: %s%s", element.nodeId, node.nodeId, current, nodeString);
+                OvaleBestAction.Log("[%d]    group checking [%d]: %s%s", element.nodeId, node.nodeId, current, nodeString);
                 let currentCastTime;
                 if (currentElement) {
                     currentCastTime = currentElement.castTime;
                 }
-                let gcd = futureState.GetGCD();
+                let gcd = OvaleFuture.GetGCD(undefined, atTime);
                 if (!currentCastTime || currentCastTime < gcd) {
                     currentCastTime = gcd;
                 }
                 let currentIsBetter = false;
                 if (best.Measure() == 0) {
-                    state.Log("[%d]    group first best is [%d]: %s%s", element.nodeId, node.nodeId, current, nodeString);
+                    OvaleBestAction.Log("[%d]    group first best is [%d]: %s%s", element.nodeId, node.nodeId, current, nodeString);
                     currentIsBetter = true;
                 } else {
                     let threshold = (bestElement && bestElement.namedParams) && bestElement.namedParams.wait || 0;
                     if (best[1] - current[1] > threshold) {
-                        state.Log("[%d]    group new best is [%d]: %s%s", element.nodeId, node.nodeId, current, nodeString);
+                        OvaleBestAction.Log("[%d]    group new best is [%d]: %s%s", element.nodeId, node.nodeId, current, nodeString);
                         currentIsBetter = true;
                     }
                 }
@@ -683,9 +691,9 @@ class OvaleBestActionClass extends OvaleBestActionBase {
             if (bestElement.positionalParams) {
                 id = bestElement.positionalParams[1];
             }
-            state.Log("[%d]    group best action %s remains %s", element.nodeId, id, timeSpan);
+            OvaleBestAction.Log("[%d]    group best action %s remains %s", element.nodeId, id, timeSpan);
         } else {
-            state.Log("[%d]    group no best action returns %s", element.nodeId, timeSpan);
+            OvaleBestAction.Log("[%d]    group no best action returns %s", element.nodeId, timeSpan);
         }
         this.StopProfiling("OvaleBestAction_Compute");
         return [timeSpan, bestElement];
@@ -701,11 +709,11 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         }
         if (conditionTimeSpan.Measure() == 0) {
             timeSpan.copyFromArray(conditionTimeSpan);
-            state.Log("[%d]    '%s' returns %s with zero measure", element.nodeId, element.type, timeSpan);
+            OvaleBestAction.Log("[%d]    '%s' returns %s with zero measure", element.nodeId, element.type, timeSpan);
         } else {
             let [timeSpanB, elementB] = this.Compute(element.child[2], state, atTime);
             conditionTimeSpan.Intersect(timeSpanB, timeSpan);
-            state.Log("[%d]    '%s' returns %s (intersection of %s and %s)", element.nodeId, element.type, timeSpan, conditionTimeSpan, timeSpanB);
+            OvaleBestAction.Log("[%d]    '%s' returns %s (intersection of %s and %s)", element.nodeId, element.type, timeSpan, conditionTimeSpan, timeSpanB);
             result = elementB;
         }
         if (element.type == "unless") {
@@ -721,7 +729,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         if (element.operator == "and") {
             if (timeSpanA.Measure() == 0) {
                 timeSpan.copyFromArray(timeSpanA);
-                state.Log("[%d]    logical '%s' short-circuits with zero measure left argument", element.nodeId, element.operator);
+                OvaleBestAction.Log("[%d]    logical '%s' short-circuits with zero measure left argument", element.nodeId, element.operator);
             } else {
                 let timeSpanB = this.ComputeBool(element.child[2], state, atTime);
                 timeSpanA.Intersect(timeSpanB, timeSpan);
@@ -731,7 +739,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         } else if (element.operator == "or") {
             if (timeSpanA.IsUniverse()) {
                 timeSpan.copyFromArray(timeSpanA);
-                state.Log("[%d]    logical '%s' short-circuits with universe as left argument", element.nodeId, element.operator);
+                OvaleBestAction.Log("[%d]    logical '%s' short-circuits with universe as left argument", element.nodeId, element.operator);
             } else {
                 let timeSpanB = this.ComputeBool(element.child[2], state, atTime);
                 timeSpanA.Union(timeSpanB, timeSpan);
@@ -746,14 +754,14 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         } else {
             wipe(timeSpan);
         }
-        state.Log("[%d]    logical '%s' returns %s", element.nodeId, element.operator, timeSpan);
+        OvaleBestAction.Log("[%d]    logical '%s' returns %s", element.nodeId, element.operator, timeSpan);
         this.StopProfiling("OvaleBestAction_Compute");
         return [timeSpan, element];
     }
     ComputeLua: ComputerFunction = (element, state: BaseState, atTime) => {
         this.StartProfiling("OvaleBestAction_ComputeLua");
         let value = loadstring(element.lua)();
-        state.Log("[%d]    lua returns %s", element.nodeId, value);
+        OvaleBestAction.Log("[%d]    lua returns %s", element.nodeId, value);
         let result;
         if (value) {
             result = SetValue(element, value);
@@ -766,20 +774,20 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         this.StartProfiling("OvaleBestAction_Compute");
         let result = element;
         assert(element.func == "setstate");
-        state.Log("[%d]    %s: %s = %s", element.nodeId, element.name, element.positionalParams[1], element.positionalParams[2]);
+        OvaleBestAction.Log("[%d]    %s: %s = %s", element.nodeId, element.name, element.positionalParams[1], element.positionalParams[2]);
         let timeSpan = GetTimeSpan(element, UNIVERSE);
         this.StopProfiling("OvaleBestAction_Compute");
         return [timeSpan, result];
     }
     ComputeValue: ComputerFunction = (element:ValueNode, state: BaseState, atTime):[OvaleTimeSpan, any] => {
         this.StartProfiling("OvaleBestAction_Compute");
-        state.Log("[%d]    value is %s", element.nodeId, element.value);
+        OvaleBestAction.Log("[%d]    value is %s", element.nodeId, element.value);
         let timeSpan = GetTimeSpan(element, UNIVERSE);
         this.StopProfiling("OvaleBestAction_Compute");
         return [timeSpan, element];
     }
 
-    Compute(element, state: BaseState, atTime): [OvaleTimeSpan, Element] {
+    Compute(element, state: BaseState, atTime: number): [OvaleTimeSpan, Element] {
         return this.PostOrderCompute(element, state, atTime);
     }
 

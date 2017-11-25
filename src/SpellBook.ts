@@ -2,18 +2,15 @@ import { L } from "./Localization";
 import { OvaleDebug } from "./Debug";
 import { OvaleProfiler } from "./Profiler";
 import { Ovale } from "./Ovale";
-import { RegisterRequirement, UnregisterRequirement } from "./Requirement";
 import aceEvent from "@wowts/ace_event-3.0";
 import { ipairs, pairs, tonumber, tostring, wipe, lualength } from "@wowts/lua";
 import { match, gsub } from "@wowts/string";
 import { concat, insert, sort } from "@wowts/table";
-import { GetActiveSpecGroup, GetFlyoutInfo, GetFlyoutSlotInfo, GetSpellBookItemInfo, GetSpellInfo, GetSpellCount, GetSpellLink, GetSpellTabInfo, GetSpellTexture, GetTalentInfo, HasPetSpells, IsHarmfulSpell, IsHelpfulSpell, IsSpellInRange, IsUsableSpell, UnitIsFriend, BOOKTYPE_PET, BOOKTYPE_SPELL, MAX_TALENT_TIERS, NUM_TALENT_COLUMNS } from "@wowts/wow-mock";
+import { GetActiveSpecGroup, GetFlyoutInfo, GetFlyoutSlotInfo, GetSpellBookItemInfo, GetSpellInfo, GetSpellLink, GetSpellTabInfo, GetSpellTexture, GetTalentInfo, HasPetSpells, IsHarmfulSpell, IsHelpfulSpell, BOOKTYPE_PET, BOOKTYPE_SPELL, MAX_TALENT_TIERS, NUM_TALENT_COLUMNS } from "@wowts/wow-mock";
 
 export let OvaleSpellBook:OvaleSpellBookClass;
 
 let MAX_NUM_TALENTS = NUM_TALENT_COLUMNS * MAX_TALENT_TIERS;
-let WARRIOR_INCERCEPT_SPELLID = 198304;
-let WARRIOR_HEROICTHROW_SPELLID = 57755;
 {
     let debugOptions = {
         spellbook: {
@@ -93,12 +90,8 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
         this.RegisterEvent("PLAYER_TALENT_UPDATE", "UpdateTalents");
         this.RegisterEvent("SPELLS_CHANGED", "UpdateSpells");
         this.RegisterEvent("UNIT_PET");
-        RegisterRequirement("spellcount_min", "RequireSpellCountHandler", this);
-        RegisterRequirement("spellcount_max", "RequireSpellCountHandler", this);
     }
     OnDisable() {
-        UnregisterRequirement("spellcount_max");
-        UnregisterRequirement("spellcount_min");
         this.UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED");
         this.UnregisterEvent("CHARACTER_POINTS_CHANGED");
         this.UnregisterEvent("PLAYER_ENTERING_WORLD");
@@ -240,19 +233,6 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
             return GetSpellInfo(spellId);
         }
     }
-    GetSpellCount(spellId) {
-        let [index, bookType] = this.GetSpellBookIndex(spellId);
-        if (index && bookType) {
-            let spellCount = GetSpellCount(index, bookType);
-            this.Debug("GetSpellCount: index=%s bookType=%s for spellId=%s ==> spellCount=%s", index, bookType, spellId, spellCount);
-            return spellCount;
-        } else {
-            let spellName = OvaleSpellBook.GetSpellName(spellId);
-            let spellCount = GetSpellCount(spellName);
-            this.Debug("GetSpellCount: spellName=%s for spellId=%s ==> spellCount=%s", spellName, spellId, spellCount);
-            return spellCount;
-        }
-    }
     GetSpellName(spellId) {
         if (spellId) {
             let spellName = this.spell[spellId];
@@ -307,29 +287,7 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
         let [, bookType] = this.GetSpellBookIndex(spellId);
         return bookType == BOOKTYPE_PET;
     }
-    IsSpellInRange(spellId, unitId) {
-        let [index, bookType] = this.GetSpellBookIndex(spellId);
-        let returnValue = undefined;
-        if (index && bookType) {
-            returnValue = IsSpellInRange(index, bookType, unitId);
-        } else if (this.IsKnownSpell(spellId)) {
-            let name = this.GetSpellName(spellId);
-            returnValue = IsSpellInRange(name, unitId);
-        }
-        if ((returnValue == 1 && spellId == WARRIOR_INCERCEPT_SPELLID)) {
-            return (UnitIsFriend("player", unitId) == 1 || OvaleSpellBook.IsSpellInRange(WARRIOR_HEROICTHROW_SPELLID, unitId) == 1) && 1 || 0;
-        }
-        return returnValue;
-    }
-    IsUsableSpell(spellId) {
-        let [index, bookType] = this.GetSpellBookIndex(spellId);
-        if (index && bookType) {
-            return IsUsableSpell(index, bookType);
-        } else if (this.IsKnownSpell(spellId)) {
-            let name = this.GetSpellName(spellId);
-            return IsUsableSpell(name);
-        }
-    }
+
     DebugSpells() {
         wipe(output);
         OutputTableValues(output, this.spell);
@@ -344,23 +302,6 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
         wipe(output);
         OutputTableValues(output, this.talent);
         return concat(output, "\n");
-    }
-
-    RequireSpellCountHandler(spellId, atTime, requirement, tokens, index, targetGUID) {
-        let verified = false;
-        let count = tokens;
-        if (index) {
-            count = tokens[index];
-            index = index + 1;
-        }
-        if (count) {
-            count = tonumber(count) || 1;
-            let actualCount = OvaleSpellBook.GetSpellCount(spellId);
-            verified = (requirement == "spellcount_min" && count <= actualCount) || (requirement == "spellcount_max" && count >= actualCount);
-        } else {
-            Ovale.OneTimeMessage("Warning: requirement '%s' is missing a count argument.", requirement);
-        }
-        return [verified, requirement, index];
     }
 }
 

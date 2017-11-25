@@ -2,13 +2,12 @@ import { L } from "./Localization";
 import { OvaleOptions } from "./Options";
 import { Ovale } from "./Ovale";
 import { OvaleData } from "./Data";
-import { OvaleFuture } from "./Future";
 import { OvaleSpellBook } from "./SpellBook";
 import { OvaleStance } from "./Stance";
-import { BaseState } from "./State";
 import aceEvent from "@wowts/ace_event-3.0";
 import { pairs, lualength, _G } from "@wowts/lua";
 import { GetTime, UnitHasVehicleUI, UnitExists, UnitIsDead, UnitCanAttack } from "@wowts/wow-mock";
+import { baseState } from "./BaseState";
 
 interface SpellFlashCoreClass {
     FlashForm(spellId, color, size, brightness):void;   
@@ -263,8 +262,7 @@ let COLORTABLE = {
     OvaleOptions.RegisterOptions(OvaleSpellFlash);
 }
 class OvaleSpellFlashClass extends OvaleSpellFlashBase {
-    constructor() {
-        super();
+    OnInitialize() {
         SpellFlashCore = _G["SpellFlashCore"];
         this.RegisterMessage("Ovale_OptionChanged");
         this.Ovale_OptionChanged();
@@ -294,7 +292,7 @@ class OvaleSpellFlashClass extends OvaleSpellFlashBase {
         if (enabled && !db.enabled) {
             enabled = false;
         }
-        if (enabled && db.inCombat && !OvaleFuture.inCombat) {
+        if (enabled && db.inCombat && !baseState.IsInCombat(undefined)) {
             enabled = false;
         }
         if (enabled && db.hideInVehicle && UnitHasVehicleUI("player")) {
@@ -308,7 +306,7 @@ class OvaleSpellFlashClass extends OvaleSpellFlashBase {
         }
         return enabled;
     }
-    Flash(state: BaseState, node, element, start, now?:number) {
+    Flash(state: {}, node, element, start, now?:number) {
         const db = Ovale.db.profile.apparence.spellFlash
         now = now || GetTime();
         if (this.IsSpellFlashEnabled() && start && start - now <= db.threshold / 1000) {

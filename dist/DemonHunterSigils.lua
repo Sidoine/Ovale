@@ -11,7 +11,6 @@ local __SpellBook = LibStub:GetLibrary("ovale/SpellBook")
 local OvaleSpellBook = __SpellBook.OvaleSpellBook
 local __State = LibStub:GetLibrary("ovale/State")
 local OvaleState = __State.OvaleState
-local baseState = __State.baseState
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local ipairs = ipairs
 local tonumber = tonumber
@@ -63,6 +62,8 @@ local OvaleSigilClass = __class(OvaleSigilBase, {
         activated_sigils["silence"] = {}
         activated_sigils["misery"] = {}
         activated_sigils["chains"] = {}
+    end,
+    OnInitialize = function(self)
         if Ovale.playerClass == "DEMONHUNTER" then
             self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
         end
@@ -94,16 +95,7 @@ local OvaleSigilClass = __class(OvaleSigilBase, {
             remove(activated_sigils[t], 1)
         end
     end,
-})
-local SigilState = __class(nil, {
-    CleanState = function(self)
-    end,
-    InitializeState = function(self)
-    end,
-    ResetState = function(self)
-    end,
     IsSigilCharging = function(self, type, atTime)
-        atTime = atTime or baseState.currentTime
         if (#activated_sigils[type] == 0) then
             return false
         end
@@ -117,7 +109,12 @@ local SigilState = __class(nil, {
         end
         return charging
     end,
+    CleanState = function(self)
+    end,
+    InitializeState = function(self)
+    end,
+    ResetState = function(self)
+    end,
 })
 __exports.OvaleSigil = OvaleSigilClass()
-__exports.sigilState = SigilState()
-OvaleState:RegisterState(__exports.sigilState)
+OvaleState:RegisterState(__exports.OvaleSigil)

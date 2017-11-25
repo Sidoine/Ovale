@@ -26,6 +26,8 @@ local OvaleDemonHunterSoulFragmentsClass = __class(OvaleDemonHunterSoulFragments
     constructor = function(self)
         OvaleDemonHunterSoulFragmentsBase.constructor(self)
         self:SetCurrentSoulFragments(0)
+    end,
+    OnInitialize = function(self)
         if Ovale.playerClass == "DEMONHUNTER" then
             self:RegisterEvent("PLAYER_REGEN_ENABLED")
             self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -87,18 +89,10 @@ local OvaleDemonHunterSoulFragmentsClass = __class(OvaleDemonHunterSoulFragments
     end,
     DebugSoulFragments = function(self)
     end,
-})
-local DemonHunterSoulFragmentsState = __class(nil, {
-    CleanState = function(self)
-    end,
-    InitializeState = function(self)
-    end,
-    ResetState = function(self)
-    end,
     SoulFragments = function(self, atTime)
         local currentTime = nil
         local count = nil
-        for _, v in pairs(__exports.OvaleDemonHunterSoulFragments.soul_fragments) do
+        for _, v in pairs(self.soul_fragments) do
             if v.timestamp >= atTime and (currentTime == nil or v.timestamp < currentTime) then
                 currentTime = v.timestamp
                 count = v.fragments
@@ -107,7 +101,15 @@ local DemonHunterSoulFragmentsState = __class(nil, {
         if count then
             return count
         end
-        return (__exports.OvaleDemonHunterSoulFragments.last_soul_fragment_count ~= nil and __exports.OvaleDemonHunterSoulFragments.last_soul_fragment_count.fragments) or 0
+        return (self.last_soul_fragment_count ~= nil and self.last_soul_fragment_count.fragments) or 0
+    end,
+})
+local DemonHunterSoulFragmentsState = __class(nil, {
+    CleanState = function(self)
+    end,
+    InitializeState = function(self)
+    end,
+    ResetState = function(self)
     end,
 })
 __exports.demonHunterSoulFragmentsState = DemonHunterSoulFragmentsState()

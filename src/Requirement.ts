@@ -1,27 +1,23 @@
 import { OvaleGUID } from "./GUID";
 import { Ovale } from "./Ovale";
-import { baseState } from "./State";
-import { LuaObj } from "@wowts/lua";
+import { LuaObj, LuaArray } from "@wowts/lua";
+import { baseState } from "./BaseState";
 
-interface Requirement {
-    1: any;
-    2: any;
-}
+export type RequirementMethod = (spellId: number, atTime: number, name: string, tokens: LuaArray<string> | string | number, index: number, targetGUID: string) => [boolean, string, number];
 
-export const self_requirement:LuaObj<Requirement> = {}
-export function RegisterRequirement(name, method, arg) {
-    self_requirement[name] = {
-        1: method,
-        2: arg
-    }
+export const nowRequirements:LuaObj<RequirementMethod> = {}
+export function RegisterRequirement(name: string, nowMethod: RequirementMethod) {
+    nowRequirements[name] = nowMethod;
 }
 
 export function UnregisterRequirement(name) {
-    self_requirement[name] = undefined;
+    nowRequirements[name] = undefined;
 }
 
-export function CheckRequirements(spellId, atTime, tokens, index, targetGUID):[boolean, string, number] {
-    targetGUID = targetGUID || OvaleGUID.UnitGUID(baseState.defaultTarget || "target");
+export function CheckRequirements(spellId: number, atTime: number, tokens: LuaArray<string>, index: number, targetGUID: string):[boolean, string, number] {
+    let requirements = nowRequirements;
+
+    targetGUID = targetGUID || OvaleGUID.UnitGUID(baseState.next.defaultTarget || "target");
     let name = tokens[index];
     index = index + 1;
     if (name) {
@@ -29,11 +25,9 @@ export function CheckRequirements(spellId, atTime, tokens, index, targetGUID):[b
         let verified = true;
         let requirement = name;
         while (verified && name) {
-            let handler = self_requirement[name];
+            let handler = requirements[name];
             if (handler) {
-                let method = handler[1];
-                let arg = /*this[method] && this ||*/ handler[2]; //TODO
-                [verified, requirement, index] = arg[method](arg, spellId, atTime, name, tokens, index, targetGUID);
+                [verified, requirement, index] = handler(spellId, atTime, name, tokens, index, targetGUID);
                 name = tokens[index];
                 index = index + 1;
             } else {

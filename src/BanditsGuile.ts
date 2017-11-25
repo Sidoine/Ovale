@@ -3,6 +3,7 @@ import { Ovale } from "./Ovale";
 import { OvaleAura } from "./Aura";
 import aceEvent from "@wowts/ace_event-3.0";
 import { GetSpellInfo, GetTime } from "@wowts/wow-mock";
+import { tostring } from "@wowts/lua";
 
 let OvaleBanditsGuileBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleBanditsGuile", aceEvent));
 let API_GetSpellInfo = GetSpellInfo;
@@ -77,7 +78,7 @@ class OvaleBanditsGuile extends OvaleBanditsGuileBase {
         if (target == self_playerGUID) {
             let auraName = INSIGHT_BUFF[auraId];
             if (auraName) {
-                let playerAura = OvaleAura.GetAura("player", auraId, "HELPFUL", true);
+                let playerAura = OvaleAura.GetAura("player", auraId, undefined, "HELPFUL", true);
                 [this.start, this.ending] = [playerAura.start, playerAura.ending];
                 if (auraId == SHALLOW_INSIGHT) {
                     this.stacks = 4;
@@ -95,7 +96,7 @@ class OvaleBanditsGuile extends OvaleBanditsGuileBase {
         if (target == self_playerGUID) {
             let auraName = INSIGHT_BUFF[auraId];
             if (auraName) {
-                let playerAura = OvaleAura.GetAura("player", auraId, "HELPFUL", true);
+                let playerAura = OvaleAura.GetAura("player", auraId, undefined, "HELPFUL", true);
                 [this.start, this.ending] = [playerAura.start, playerAura.ending];
                 this.stacks = this.stacks + 1;
                 this.Debug(event, auraName, this.stacks);
@@ -117,7 +118,7 @@ class OvaleBanditsGuile extends OvaleBanditsGuileBase {
         OvaleAura.GainedAuraOnGUID(self_playerGUID, atTime, this.spellId, self_playerGUID, "HELPFUL", undefined, undefined, this.stacks, undefined, this.duration, this.ending, undefined, this.spellName, undefined, undefined, undefined);
     }
     DebugBanditsGuile() {
-        let playerAura = OvaleAura.GetAuraByGUID(self_playerGUID, this.spellId, "HELPFUL", true);
+        let playerAura = OvaleAura.GetAuraByGUID(self_playerGUID, tostring(this.spellId), "HELPFUL", true, undefined);
         if (playerAura) {
             this.Print("Player has Bandit's Guile aura with start=%s, end=%s, stacks=%d.", playerAura.start, playerAura.ending, playerAura.stacks);
         }

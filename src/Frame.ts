@@ -3,13 +3,12 @@ import Masque, { MasqueSkinGroup } from "@wowts/masque";
 import { OvaleBestAction } from "./BestAction";
 import { OvaleCompile } from "./Compile";
 import { OvaleDebug } from "./Debug";
-import { futureState } from "./FutureState";
 import { OvaleGUID } from "./GUID";
 import { OvaleSpellFlash } from "./SpellFlash";
-import { OvaleState, baseState, BaseState } from "./State";
+import { OvaleState } from "./State";
 import { Ovale } from "./Ovale";
 import { OvaleIcon } from "./Icon";
-import { EnemiesState } from "./Enemies";
+import { OvaleEnemies } from "./Enemies";
 import { lists, checkBoxes } from "./Controls";
 import aceEvent from "@wowts/ace_event-3.0";
 import { lualength, LuaArray, ipairs, next, pairs, wipe, type, LuaObj } from "@wowts/lua";
@@ -17,10 +16,14 @@ import { match } from "@wowts/string";
 import { CreateFrame, GetItemInfo, GetTime, RegisterStateDriver, UnitHasVehicleUI, UnitExists, UnitIsDead, UnitCanAttack, UIParent, UIFrame, UITexture } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
 import { AceGUIRegisterAsContainer } from "./acegui-helpers";
+import { OvaleFuture } from "./Future";
+import { baseState } from "./BaseState";
 
 let strmatch = match;
 let INFINITY = huge;
 let MIN_REFRESH_TIME = 0.05;
+
+type BaseState = {};
 
 interface Action {
     secure?: boolean;
@@ -158,33 +161,33 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             let iconNodes = OvaleCompile.GetIconNodes();
             for (const [k, node] of ipairs(iconNodes)) {
                 if (node.namedParams && node.namedParams.target) {
-                    baseState.defaultTarget = <string>node.namedParams.target;
+                    baseState.current.defaultTarget = <string>node.namedParams.target;
                 } else {
-                    baseState.defaultTarget = "target";
+                    baseState.current.defaultTarget = "target";
                 }
                 if (node.namedParams && node.namedParams.enemies) {
-                    EnemiesState.enemies = node.namedParams.enemies;
+                    OvaleEnemies.next.enemies = node.namedParams.enemies;
                 } else {
-                    EnemiesState.enemies = undefined;
+                    OvaleEnemies.next.enemies = undefined;
                 }
                 OvaleState.Log("+++ Icon %d", k);
                 OvaleBestAction.StartNewAction();
-                let atTime = futureState.nextCast;
-                if (futureState.lastSpellId != futureState.lastGCDSpellId) {
-                    atTime = baseState.currentTime;
+                let atTime = OvaleFuture.next.nextCast;
+                if (OvaleFuture.next.currentCast.spellId == undefined || OvaleFuture.next.currentCast.spellId != OvaleFuture.next.lastGCDSpellId) {
+                    atTime = baseState.next.currentTime;
                 }
-                let [timeSpan, element] = OvaleBestAction.GetAction(node, baseState, atTime);
+                let [timeSpan, element] = OvaleBestAction.GetAction(node, undefined, atTime);
                 let start;
                 if (element && element.offgcd) {
-                    start = timeSpan.NextTime(baseState.currentTime);
+                    start = timeSpan.NextTime(baseState.next.currentTime);
                 } else {
                     start = timeSpan.NextTime(atTime);
                 }
                 if (profile.apparence.enableIcons) {
-                    this.UpdateActionIcon(baseState, node, this.actions[k], element, start);
+                    this.UpdateActionIcon(undefined, node, this.actions[k], element, start);
                 }
                 if (profile.apparence.spellFlash.enabled && OvaleSpellFlash) {
-                    OvaleSpellFlash.Flash(baseState, node, element, start);
+                    OvaleSpellFlash.Flash(undefined, node, element, start);
                 }
             }
             wipe(Ovale.refreshNeeded);
@@ -202,7 +205,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             if (element.value && element.origin && element.rate) {
                 value = element.value + (now - element.origin) * element.rate;
             }
-            state.Log("GetAction: start=%s, value=%f", start, value);
+            OvaleBestAction.Log("GetAction: start=%s, value=%f", start, value);
             let actionTexture;
             if (node.namedParams && node.namedParams.texture) {
                 actionTexture = node.namedParams.texture;
@@ -215,16 +218,17 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             let [actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget, actionResourceExtend] = OvaleBestAction.GetActionInfo(element, state, now);
             if (actionResourceExtend && actionResourceExtend > 0) {
                 if (actionCooldownDuration > 0) {
-                    state.Log("Extending cooldown of spell ID '%s' for primary resource by %fs.", actionId, actionResourceExtend);
+                    OvaleBestAction.Log("Extending cooldown of spell ID '%s' for primary resource by %fs.", actionId, actionResourceExtend);
                     actionCooldownDuration = actionCooldownDuration + actionResourceExtend;
                 } else if (element.namedParams.pool_resource && element.namedParams.pool_resource == 1) {
-                    state.Log("Delaying spell ID '%s' for primary resource by %fs.", actionId, actionResourceExtend);
+                    OvaleBestAction.Log("Delaying spell ID '%s' for primary resource by %fs.", actionId, actionResourceExtend);
                     start = start + actionResourceExtend;
                 }
             }
-            state.Log("GetAction: start=%s, id=%s", start, actionId);
-            if (actionType == "spell" && actionId == futureState.currentSpellId && start && futureState.nextCast && start < futureState.nextCast) {
-                start = futureState.nextCast;
+
+            OvaleBestAction.Log("GetAction: start=%s, id=%s", start, actionId);
+            if (actionType == "spell" && actionId == OvaleFuture.next.currentCast.spellId && start && OvaleFuture.next.nextCast && start < OvaleFuture.next.nextCast) {
+                start = OvaleFuture.next.nextCast;
             }
             if (start && node.namedParams.nocd && now < start - node.namedParams.nocd) {
                 icons[1].Update(element, undefined);
@@ -255,15 +259,15 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             }
             if ((node.namedParams.size != "small" && !node.namedParams.nocd && profile.apparence.predictif)) {
                 if (start) {
-                    state.Log("****Second icon %s", start);
-                    futureState.ApplySpell(actionId, OvaleGUID.UnitGUID(actionTarget), start);
-                    let atTime = futureState.nextCast;
-                    if (actionId != futureState.lastGCDSpellId) {
-                        atTime = state.currentTime;
+                    OvaleBestAction.Log("****Second icon %s", start);
+                    OvaleFuture.ApplySpell(actionId, OvaleGUID.UnitGUID(actionTarget), start);
+                    let atTime = OvaleFuture.next.nextCast;
+                    if (actionId != OvaleFuture.next.lastGCDSpellId) {
+                        atTime = baseState.next.currentTime;
                     }
                     let [timeSpan, nextElement] = OvaleBestAction.GetAction(node, state, atTime);
                     if (nextElement && nextElement.offgcd) {
-                        start = timeSpan.NextTime(state.currentTime);
+                        start = timeSpan.NextTime(baseState.next.currentTime);
                     } else {
                         start = timeSpan.NextTime(atTime);
                     }

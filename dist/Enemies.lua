@@ -24,7 +24,6 @@ local COMBATLOG_OBJECT_AFFILIATION_MINE = COMBATLOG_OBJECT_AFFILIATION_MINE
 local COMBATLOG_OBJECT_AFFILIATION_PARTY = COMBATLOG_OBJECT_AFFILIATION_PARTY
 local COMBATLOG_OBJECT_AFFILIATION_RAID = COMBATLOG_OBJECT_AFFILIATION_RAID
 local COMBATLOG_OBJECT_REACTION_FRIENDLY = COMBATLOG_OBJECT_REACTION_FRIENDLY
-local OvaleEnemiesBase = OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvaleEnemies", aceEvent, AceTimer)))
 local GROUP_MEMBER = bor(COMBATLOG_OBJECT_AFFILIATION_MINE, COMBATLOG_OBJECT_AFFILIATION_PARTY, COMBATLOG_OBJECT_AFFILIATION_RAID)
 local CLEU_TAG_SUFFIXES = {
     [1] = "_DAMAGE",
@@ -75,11 +74,16 @@ local IsFriendly = function(unitFlags, isGroupMember)
     return band(unitFlags, COMBATLOG_OBJECT_REACTION_FRIENDLY) > 0 and ( not isGroupMember or band(unitFlags, GROUP_MEMBER) > 0)
 end
 
-local OvaleEnemiesClass = __class(OvaleEnemiesBase, {
+local EnemiesData = __class(nil, {
     constructor = function(self)
         self.activeEnemies = 0
         self.taggedEnemies = 0
-        OvaleEnemiesBase.constructor(self)
+        self.enemies = nil
+    end
+})
+local OvaleEnemiesBase = OvaleState:RegisterHasState(OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvaleEnemies", aceEvent, AceTimer))), EnemiesData)
+local OvaleEnemiesClass = __class(OvaleEnemiesBase, {
+    OnInitialize = function(self)
         if  not self_reaperTimer then
             self_reaperTimer = self:ScheduleRepeatingTimer("RemoveInactiveEnemies", REAP_INTERVAL)
         end
@@ -115,8 +119,8 @@ local OvaleEnemiesClass = __class(OvaleEnemiesBase, {
         wipe(self_enemyName)
         wipe(self_enemyLastSeen)
         wipe(self_taggedEnemyLastSeen)
-        self.activeEnemies = 0
-        self.taggedEnemies = 0
+        self.current.activeEnemies = 0
+        self.current.taggedEnemies = 0
     end,
     RemoveInactiveEnemies = function(self)
         self:StartProfiling("OvaleEnemies_RemoveInactiveEnemies")
@@ -140,20 +144,20 @@ local OvaleEnemiesClass = __class(OvaleEnemiesBase, {
             local changed = false
             do
                 if  not self_enemyLastSeen[guid] then
-                    self.activeEnemies = self.activeEnemies + 1
+                    self.current.activeEnemies = self.current.activeEnemies + 1
                     changed = true
                 end
                 self_enemyLastSeen[guid] = timestamp
             end
             if isTagged then
                 if  not self_taggedEnemyLastSeen[guid] then
-                    self.taggedEnemies = self.taggedEnemies + 1
+                    self.current.taggedEnemies = self.current.taggedEnemies + 1
                     changed = true
                 end
                 self_taggedEnemyLastSeen[guid] = timestamp
             end
             if changed then
-                self:DebugTimestamp("%s: %d/%d enemy seen: %s (%s)", cleuEvent, self.taggedEnemies, self.activeEnemies, guid, name)
+                self:DebugTimestamp("%s: %d/%d enemy seen: %s (%s)", cleuEvent, self.current.taggedEnemies, self.current.activeEnemies, guid, name)
                 Ovale:needRefresh()
             end
         end
@@ -166,20 +170,20 @@ local OvaleEnemiesClass = __class(OvaleEnemiesBase, {
             local changed = false
             if self_enemyLastSeen[guid] then
                 self_enemyLastSeen[guid] = nil
-                if self.activeEnemies > 0 then
-                    self.activeEnemies = self.activeEnemies - 1
+                if self.current.activeEnemies > 0 then
+                    self.current.activeEnemies = self.current.activeEnemies - 1
                     changed = true
                 end
             end
             if self_taggedEnemyLastSeen[guid] then
                 self_taggedEnemyLastSeen[guid] = nil
-                if self.taggedEnemies > 0 then
-                    self.taggedEnemies = self.taggedEnemies - 1
+                if self.current.taggedEnemies > 0 then
+                    self.current.taggedEnemies = self.current.taggedEnemies - 1
                     changed = true
                 end
             end
             if changed then
-                self:DebugTimestamp("%s: %d/%d enemy %s: %s (%s)", cleuEvent, self.taggedEnemies, self.activeEnemies, isDead and "died" or "removed", guid, name)
+                self:DebugTimestamp("%s: %d/%d enemy %s: %s (%s)", cleuEvent, self.current.taggedEnemies, self.current.activeEnemies, isDead and "died" or "removed", guid, name)
                 Ovale:needRefresh()
                 self:SendMessage("Ovale_InactiveUnit", guid, isDead)
             end
@@ -193,10 +197,10 @@ local OvaleEnemiesClass = __class(OvaleEnemiesBase, {
             local tagged = self_taggedEnemyLastSeen[guid]
             if tagged then
                 self_taggedEnemyLastSeen[guid] = nil
-                if self.taggedEnemies > 0 then
-                    self.taggedEnemies = self.taggedEnemies - 1
+                if self.current.taggedEnemies > 0 then
+                    self.current.taggedEnemies = self.current.taggedEnemies - 1
                 end
-                self:DebugTimestamp("%s: %d/%d enemy removed: %s (%s), last tagged at %f", cleuEvent, self.taggedEnemies, self.activeEnemies, guid, name, tagged)
+                self:DebugTimestamp("%s: %d/%d enemy removed: %s (%s), last tagged at %f", cleuEvent, self.current.taggedEnemies, self.current.activeEnemies, guid, name, tagged)
                 Ovale:needRefresh()
             end
         end
@@ -212,31 +216,23 @@ local OvaleEnemiesClass = __class(OvaleEnemiesBase, {
                 self:Print("Enemy %s (%s) last seen at %f", guid, name, seen)
             end
         end
-        self:Print("Total enemies: %d", self.activeEnemies)
-        self:Print("Total tagged enemies: %d", self.taggedEnemies)
+        self:Print("Total enemies: %d", self.current.activeEnemies)
+        self:Print("Total tagged enemies: %d", self.current.taggedEnemies)
     end,
-})
-local EnemiesStateClass = __class(nil, {
     InitializeState = function(self)
-        self.enemies = nil
+        self.next.enemies = nil
     end,
     ResetState = function(self)
-        __exports.OvaleEnemies:StartProfiling("OvaleEnemies_ResetState")
-        self.activeEnemies = __exports.OvaleEnemies.activeEnemies
-        self.taggedEnemies = __exports.OvaleEnemies.taggedEnemies
-        __exports.OvaleEnemies:StopProfiling("OvaleEnemies_ResetState")
+        self:StartProfiling("OvaleEnemies_ResetState")
+        self.next.activeEnemies = self.current.activeEnemies
+        self.next.taggedEnemies = self.current.taggedEnemies
+        self:StopProfiling("OvaleEnemies_ResetState")
     end,
     CleanState = function(self)
-        self.activeEnemies = nil
-        self.taggedEnemies = nil
-        self.enemies = nil
+        self.next.activeEnemies = nil
+        self.next.taggedEnemies = nil
+        self.next.enemies = nil
     end,
-    constructor = function(self)
-        self.activeEnemies = nil
-        self.taggedEnemies = nil
-        self.enemies = nil
-    end
 })
 __exports.OvaleEnemies = OvaleEnemiesClass()
-__exports.EnemiesState = EnemiesStateClass()
-OvaleState:RegisterState(__exports.EnemiesState)
+OvaleState:RegisterState(__exports.OvaleEnemies)

@@ -38,7 +38,9 @@ class OvaleArtifactClass extends OvaleArtifactBase {
         for (const [k, v] of pairs(this.debugOptions)) {
             OvaleDebug.options.args[k] = v;
         }
-    
+    }
+
+    OnInitialize() {
         this.RegisterEvent("SPELLS_CHANGED", (message) => this.UpdateTraits(message));
         RegisterCallback(this, "ARTIFACT_ADDED", message => this.UpdateTraits(message));
         RegisterCallback(this, "ARTIFACT_EQUIPPED_CHANGED", m => this.UpdateTraits(m));

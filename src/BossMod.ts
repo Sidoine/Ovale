@@ -1,9 +1,9 @@
 import { OvaleDebug } from "./Debug";
 import { OvaleProfiler } from "./Profiler";
 import { Ovale } from "./Ovale";
-import { BaseState } from "./State";
 import { GetNumGroupMembers, IsInGroup, IsInInstance, IsInRaid, UnitExists, UnitLevel, LE_PARTY_CATEGORY_INSTANCE, LE_PARTY_CATEGORY_HOME, UnitName } from "@wowts/wow-mock";
 import { _G, hooksecurefunc } from "@wowts/lua";
+import { baseState } from "./BaseState";
 let OvaleBossModBase = OvaleProfiler.RegisterProfiling(OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleBossMod")));
 let _BigWigsLoader: { RegisterMessage: any } = _G["BigWigsLoader"];
 let _DBM = _G["DBM"];
@@ -11,8 +11,7 @@ class OvaleBossModClass extends OvaleBossModBase {
     EngagedDBM = undefined;
     EngagedBigWigs = undefined;
 
-    constructor() {
-        super();
+    OnInitialize() {
         if (_DBM) {
             this.Debug("DBM is loaded");
             hooksecurefunc(_DBM, "StartCombat", (_DBM, mod, delay, event, ...__args) => {
@@ -36,8 +35,8 @@ class OvaleBossModClass extends OvaleBossModBase {
     }
     OnDisable() {
     }
-    IsBossEngaged(state: BaseState) {
-        if (!state.inCombat) {
+    IsBossEngaged(atTime: number) {
+        if (!baseState.IsInCombat(atTime)) {
             return false;
         }
         let dbmEngaged = (_DBM != undefined && this.EngagedDBM != undefined && this.EngagedDBM.inCombat);

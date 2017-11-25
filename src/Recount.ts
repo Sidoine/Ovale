@@ -28,8 +28,7 @@ const TooltipFuncs = function(self, name, data) {
     GameTooltip.AddLine(name);
 }
 class OvaleRecountClass extends OvaleRecountBase {
-    constructor() {
-        super();
+    OnInitialize() {
         if (Recount) {
             let aceLocale = AceLocale && AceLocale.GetLocale("Recount", true);
             if (!aceLocale) {

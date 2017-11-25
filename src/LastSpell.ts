@@ -52,14 +52,14 @@ export interface PaperDollSnapshot {
 
 export interface SpellCastModule {
     CopySpellcastInfo: (mod: SpellCastModule, spellcast: SpellCast, dest: SpellCast) => void;
-    SaveSpellcastInfo: (mod: SpellCastModule, spellcast: SpellCast, atTime: number, future?: {}) => void;
+    SaveSpellcastInfo: (mod: SpellCastModule, spellcast: SpellCast, atTime: number, future?: PaperDollSnapshot) => void;
 }
 
 export const self_pool = new OvalePool<SpellCast>("OvaleFuture_pool");
 
 
 class LastSpell {
-    lastSpellcast = undefined;
+    lastSpellcast: SpellCast = undefined;
     lastGCDSpellcast: SpellCast = {}
     queue: LuaArray<SpellCast> = {}
     modules: LuaObj<SpellCastModule> = {}
@@ -115,7 +115,7 @@ class LastSpell {
                     spellcast = sc;
                 }
             } else if (!sc.start && !sc.stop) {
-                if (spellcast.success && spellcast.success < sc.queued) {
+                if (!spellcast || (spellcast.success && spellcast.success < sc.queued)) {
                     spellcast = sc;
                 } else if (spellcast.queued < sc.queued) {
                     spellcast = sc;

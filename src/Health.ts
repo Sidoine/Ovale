@@ -2,13 +2,14 @@ import { OvaleDebug } from "./Debug";
 import { OvaleProfiler } from "./Profiler";
 import { Ovale } from "./Ovale";
 import { OvaleGUID } from "./GUID";
-import { OvaleState, baseState, StateModule } from "./State";
+import { OvaleState } from "./State";
 import { RegisterRequirement, UnregisterRequirement } from "./Requirement";
 import aceEvent from "@wowts/ace_event-3.0";
 import { sub } from "@wowts/string";
 import { tonumber, wipe } from "@wowts/lua";
 import { UnitHealth, UnitHealthMax } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
+import { baseState } from "./BaseState";
 
 let OvaleHealthBase = Ovale.NewModule("OvaleHealth", aceEvent);
 export let OvaleHealth: OvaleHealthClass;
@@ -38,16 +39,15 @@ class OvaleHealthClass extends OvaleHealthClassBase {
     firstSeen = {    }
     lastUpdated = {    }
 
-    constructor() {
-        super();
+    OnInitialize() {
         this.RegisterEvent("PLAYER_REGEN_DISABLED");
         this.RegisterEvent("PLAYER_REGEN_ENABLED");
         this.RegisterEvent("UNIT_HEALTH_FREQUENT", "UpdateHealth");
         this.RegisterEvent("UNIT_MAXHEALTH", "UpdateHealth");
         this.RegisterMessage("Ovale_UnitChanged");
-        RegisterRequirement("health_pct", "RequireHealthPercentHandler", this);
-        RegisterRequirement("pet_health_pct", "RequireHealthPercentHandler", this);
-        RegisterRequirement("target_health_pct", "RequireHealthPercentHandler", this);
+        RegisterRequirement("health_pct", this.RequireHealthPercentHandler);
+        RegisterRequirement("pet_health_pct", this.RequireHealthPercentHandler);
+        RegisterRequirement("target_health_pct", this.RequireHealthPercentHandler);
     }
     OnDisable() {
         UnregisterRequirement("health_pct");
@@ -197,7 +197,7 @@ class OvaleHealthClass extends OvaleHealthClassBase {
         this.StopProfiling("OvaleHealth_UnitTimeToDie");
         return timeToDie;
     }
-    RequireHealthPercentHandler(spellId, atTime, requirement, tokens, index, targetGUID) {
+    RequireHealthPercentHandler = (spellId, atTime, requirement, tokens, index, targetGUID): [boolean, string, number] => {
         let verified = false;
         let threshold = tokens;
         if (index) {
@@ -217,7 +217,7 @@ class OvaleHealthClass extends OvaleHealthClassBase {
                     guid = targetGUID;
                     unitId = OvaleGUID.GUIDUnit(guid);
                 } else {
-                    unitId = baseState.defaultTarget || "target";
+                    unitId = baseState.next.defaultTarget || "target";
                 }
             } else if (sub(requirement, 1, 4) == "pet_") {
                 unitId = "pet";
@@ -242,21 +242,13 @@ class OvaleHealthClass extends OvaleHealthClassBase {
         }
         return [verified, requirement, index];
     }
-}
-
-class HealthState implements StateModule{
     CleanState(): void {
     }
     InitializeState(): void {
     }
     ResetState(): void {
     }
-    RequireHealthPercentHandler(spellId, atTime, requirement, tokens, index, targetGUID) {
-        return OvaleHealth.RequireHealthPercentHandler(spellId, atTime, requirement, tokens, index, targetGUID);
-    }
 }
 
-export const healthState = new HealthState();
-OvaleState.RegisterState(healthState);
-
 OvaleHealth = new OvaleHealthClass();
+OvaleState.RegisterState(OvaleHealth);

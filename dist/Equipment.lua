@@ -1368,6 +1368,8 @@ local OvaleEquipmentClass = __class(OvaleEquipmentBase, {
         self.mainHandWeaponSpeed = nil
         self.offHandWeaponSpeed = nil
         OvaleEquipmentBase.constructor(self)
+    end,
+    OnInitialize = function(self)
         self_tooltip = CreateFrame("GameTooltip", "OvaleEquipment_ScanningTooltip", nil, "GameTooltipTemplate")
         self_tooltip:SetOwner(UIParent, "ANCHOR_NONE")
         self:RegisterEvent("GET_ITEM_INFO_RECEIVED")

@@ -1,8 +1,8 @@
-import { BaseState } from "./State";
 import { Ovale } from "./Ovale";
 import { OvaleDebug } from "./Debug";
 import { next, LuaObj, LuaArray } from "@wowts/lua";
 import { huge } from "@wowts/math";
+import { baseState } from "./BaseState";
 let OvaleConditionBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleCondition"));
 export let OvaleCondition: OvaleConditionClass;
 let INFINITY = huge;
@@ -15,6 +15,7 @@ let self_spellBookCondition = {
 }
 
 export type ConditionResult = number[];
+type BaseState = {};
 export type ConditionFunction = (positionalParams: LuaArray<string>, namedParams: LuaObj<string>, state: BaseState, atTime: number) => ConditionResult;
 
 class OvaleConditionClass extends OvaleConditionBase {
@@ -64,7 +65,7 @@ export function ParseCondition(positionalParams, namedParams, state: BaseState, 
     let target = namedParams.target || defaultTarget || "player";
     namedParams.target = namedParams.target || target;
     if (target == "target") {
-        target = state.defaultTarget;
+        target = baseState.next.defaultTarget;
     }
     let filter: "HARMFUL" | "HELPFUL";
     if (namedParams.filter) {

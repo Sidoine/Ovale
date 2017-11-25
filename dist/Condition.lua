@@ -7,6 +7,8 @@ local __Debug = LibStub:GetLibrary("ovale/Debug")
 local OvaleDebug = __Debug.OvaleDebug
 local next = next
 local huge = math.huge
+local __BaseState = LibStub:GetLibrary("ovale/BaseState")
+local baseState = __BaseState.baseState
 local OvaleConditionBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleCondition"))
 local INFINITY = huge
 local self_condition = {}
@@ -52,7 +54,7 @@ __exports.ParseCondition = function(positionalParams, namedParams, state, defaul
     local target = namedParams.target or defaultTarget or "player"
     namedParams.target = namedParams.target or target
     if target == "target" then
-        target = state.defaultTarget
+        target = baseState.next.defaultTarget
     end
     local filter
     if namedParams.filter then

@@ -9,21 +9,18 @@ local __Compile = LibStub:GetLibrary("ovale/Compile")
 local OvaleCompile = __Compile.OvaleCompile
 local __Debug = LibStub:GetLibrary("ovale/Debug")
 local OvaleDebug = __Debug.OvaleDebug
-local __FutureState = LibStub:GetLibrary("ovale/FutureState")
-local futureState = __FutureState.futureState
 local __GUID = LibStub:GetLibrary("ovale/GUID")
 local OvaleGUID = __GUID.OvaleGUID
 local __SpellFlash = LibStub:GetLibrary("ovale/SpellFlash")
 local OvaleSpellFlash = __SpellFlash.OvaleSpellFlash
 local __State = LibStub:GetLibrary("ovale/State")
 local OvaleState = __State.OvaleState
-local baseState = __State.baseState
 local __Ovale = LibStub:GetLibrary("ovale/Ovale")
 local Ovale = __Ovale.Ovale
 local __Icon = LibStub:GetLibrary("ovale/Icon")
 local OvaleIcon = __Icon.OvaleIcon
 local __Enemies = LibStub:GetLibrary("ovale/Enemies")
-local EnemiesState = __Enemies.EnemiesState
+local OvaleEnemies = __Enemies.OvaleEnemies
 local __Controls = LibStub:GetLibrary("ovale/Controls")
 local lists = __Controls.lists
 local checkBoxes = __Controls.checkBoxes
@@ -46,6 +43,10 @@ local UIParent = UIParent
 local huge = math.huge
 local __aceguihelpers = LibStub:GetLibrary("ovale/acegui-helpers")
 local AceGUIRegisterAsContainer = __aceguihelpers.AceGUIRegisterAsContainer
+local __Future = LibStub:GetLibrary("ovale/Future")
+local OvaleFuture = __Future.OvaleFuture
+local __BaseState = LibStub:GetLibrary("ovale/BaseState")
+local baseState = __BaseState.baseState
 local strmatch = match
 local INFINITY = huge
 local MIN_REFRESH_TIME = 0.05
@@ -135,33 +136,33 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
             local iconNodes = OvaleCompile:GetIconNodes()
             for k, node in ipairs(iconNodes) do
                 if node.namedParams and node.namedParams.target then
-                    baseState.defaultTarget = node.namedParams.target
+                    baseState.current.defaultTarget = node.namedParams.target
                 else
-                    baseState.defaultTarget = "target"
+                    baseState.current.defaultTarget = "target"
                 end
                 if node.namedParams and node.namedParams.enemies then
-                    EnemiesState.enemies = node.namedParams.enemies
+                    OvaleEnemies.next.enemies = node.namedParams.enemies
                 else
-                    EnemiesState.enemies = nil
+                    OvaleEnemies.next.enemies = nil
                 end
                 OvaleState:Log("+++ Icon %d", k)
                 OvaleBestAction:StartNewAction()
-                local atTime = futureState.nextCast
-                if futureState.lastSpellId ~= futureState.lastGCDSpellId then
-                    atTime = baseState.currentTime
+                local atTime = OvaleFuture.next.nextCast
+                if OvaleFuture.next.currentCast.spellId == nil or OvaleFuture.next.currentCast.spellId ~= OvaleFuture.next.lastGCDSpellId then
+                    atTime = baseState.next.currentTime
                 end
-                local timeSpan, element = OvaleBestAction:GetAction(node, baseState, atTime)
+                local timeSpan, element = OvaleBestAction:GetAction(node, nil, atTime)
                 local start
                 if element and element.offgcd then
-                    start = timeSpan:NextTime(baseState.currentTime)
+                    start = timeSpan:NextTime(baseState.next.currentTime)
                 else
                     start = timeSpan:NextTime(atTime)
                 end
                 if profile.apparence.enableIcons then
-                    self:UpdateActionIcon(baseState, node, self.actions[k], element, start)
+                    self:UpdateActionIcon(nil, node, self.actions[k], element, start)
                 end
                 if profile.apparence.spellFlash.enabled and OvaleSpellFlash then
-                    OvaleSpellFlash:Flash(baseState, node, element, start)
+                    OvaleSpellFlash:Flash(nil, node, element, start)
                 end
             end
             wipe(Ovale.refreshNeeded)
@@ -179,7 +180,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
             if element.value and element.origin and element.rate then
                 value = element.value + (now - element.origin) * element.rate
             end
-            state:Log("GetAction: start=%s, value=%f", start, value)
+            OvaleBestAction:Log("GetAction: start=%s, value=%f", start, value)
             local actionTexture
             if node.namedParams and node.namedParams.texture then
                 actionTexture = node.namedParams.texture
@@ -192,16 +193,16 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
             local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget, actionResourceExtend = OvaleBestAction:GetActionInfo(element, state, now)
             if actionResourceExtend and actionResourceExtend > 0 then
                 if actionCooldownDuration > 0 then
-                    state:Log("Extending cooldown of spell ID '%s' for primary resource by %fs.", actionId, actionResourceExtend)
+                    OvaleBestAction:Log("Extending cooldown of spell ID '%s' for primary resource by %fs.", actionId, actionResourceExtend)
                     actionCooldownDuration = actionCooldownDuration + actionResourceExtend
                 elseif element.namedParams.pool_resource and element.namedParams.pool_resource == 1 then
-                    state:Log("Delaying spell ID '%s' for primary resource by %fs.", actionId, actionResourceExtend)
+                    OvaleBestAction:Log("Delaying spell ID '%s' for primary resource by %fs.", actionId, actionResourceExtend)
                     start = start + actionResourceExtend
                 end
             end
-            state:Log("GetAction: start=%s, id=%s", start, actionId)
-            if actionType == "spell" and actionId == futureState.currentSpellId and start and futureState.nextCast and start < futureState.nextCast then
-                start = futureState.nextCast
+            OvaleBestAction:Log("GetAction: start=%s, id=%s", start, actionId)
+            if actionType == "spell" and actionId == OvaleFuture.next.currentCast.spellId and start and OvaleFuture.next.nextCast and start < OvaleFuture.next.nextCast then
+                start = OvaleFuture.next.nextCast
             end
             if start and node.namedParams.nocd and now < start - node.namedParams.nocd then
                 icons[1]:Update(element, nil)
@@ -232,15 +233,15 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
             end
             if (node.namedParams.size ~= "small" and  not node.namedParams.nocd and profile.apparence.predictif) then
                 if start then
-                    state:Log("****Second icon %s", start)
-                    futureState:ApplySpell(actionId, OvaleGUID:UnitGUID(actionTarget), start)
-                    local atTime = futureState.nextCast
-                    if actionId ~= futureState.lastGCDSpellId then
-                        atTime = state.currentTime
+                    OvaleBestAction:Log("****Second icon %s", start)
+                    OvaleFuture:ApplySpell(actionId, OvaleGUID:UnitGUID(actionTarget), start)
+                    local atTime = OvaleFuture.next.nextCast
+                    if actionId ~= OvaleFuture.next.lastGCDSpellId then
+                        atTime = baseState.next.currentTime
                     end
                     local timeSpan, nextElement = OvaleBestAction:GetAction(node, state, atTime)
                     if nextElement and nextElement.offgcd then
-                        start = timeSpan:NextTime(state.currentTime)
+                        start = timeSpan:NextTime(baseState.next.currentTime)
                     else
                         start = timeSpan:NextTime(atTime)
                     end

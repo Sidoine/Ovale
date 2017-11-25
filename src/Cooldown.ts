@@ -3,14 +3,17 @@ import { OvaleProfiler } from "./Profiler";
 import { OvaleData } from "./Data";
 import { OvaleSpellBook } from "./SpellBook";
 import { Ovale } from "./Ovale";
-import { lastSpell, SpellCast } from "./LastSpell";
+import { lastSpell, SpellCast, SpellCastModule } from "./LastSpell";
 import { RegisterRequirement, UnregisterRequirement } from "./Requirement";
-import { DataState } from "./DataState";
 import aceEvent from "@wowts/ace_event-3.0";
-import { next, pairs } from "@wowts/lua";
-import { GetSpellCooldown, GetTime } from "@wowts/wow-mock";
+import { next, pairs, LuaObj } from "@wowts/lua";
+import { GetSpellCooldown, GetTime, GetSpellCharges } from "@wowts/wow-mock";
+import { sub } from "@wowts/string";
+import { OvaleState } from "./State";
+import { OvalePaperDoll } from "./PaperDoll";
+import { OvaleAura } from "./Aura";
+import { LuaArray } from "@wowts/lua";
 
-let OvaleCooldownBase = OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleCooldown", aceEvent)));
 export let OvaleCooldown: OvaleCooldownClass;
 let GLOBAL_COOLDOWN = 61304;
 let COOLDOWN_THRESHOLD = 0.10;
@@ -65,10 +68,27 @@ let BASE_GCD = {
     }
 }
 
-class OvaleCooldownClass extends OvaleCooldownBase {
+export interface Cooldown {
+    serial?: number;
+    start?: number;
+    charges?: number;
+    duration?: number;
+    enable?: number;
+    maxCharges?: number;
+    chargeStart?: number;
+    chargeDuration?: number;
+}
 
+export class CooldownData {
+    cd: LuaObj<Cooldown> = undefined;
+}
+
+const OvaleCooldownBase = OvaleState.RegisterHasState(OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleCooldown", aceEvent))), CooldownData);
+
+class OvaleCooldownClass extends OvaleCooldownBase implements SpellCastModule {
+    
     serial = 0;
-    sharedCooldown = {}
+    sharedCooldown:LuaObj<LuaArray<boolean>> = {}
     gcd = {
         serial: 0,
         start: 0,
@@ -88,7 +108,7 @@ class OvaleCooldownClass extends OvaleCooldownBase {
         this.RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", "Update");
         this.RegisterEvent("UPDATE_SHAPESHIFT_COOLDOWN", "Update");
         lastSpell.RegisterSpellcastInfo(this);
-        RegisterRequirement("oncooldown", "RequireCooldownHandler", this);
+        RegisterRequirement("oncooldown", this.RequireCooldownHandler);
     }
     OnDisable() {
        lastSpell.UnregisterSpellcastInfo(this);
@@ -116,6 +136,9 @@ class OvaleCooldownClass extends OvaleCooldownBase {
     }
     Update(event, unit) {
         if (!unit || unit == "player" || unit == "pet") {
+            // Increments the serial: cooldowns stored in this.next.cd will be refreshed
+            // TODO as ACTIONBAR_UPDATE_COOLDOWN is sent some time before UNIT_SPELLCAST_SUCCEEDED
+            // it refreshes the cooldown before power updates
             this.serial = this.serial + 1;
             Ovale.needRefresh();
             this.Debug(event, this.serial);
@@ -147,11 +170,15 @@ class OvaleCooldownClass extends OvaleCooldownBase {
         }
         return [cd.start, cd.duration];
     }
-    GetSpellCooldown(spellId):[number, number, number] {
+    GetSpellCooldown(spellId: number, atTime: number | undefined):[number, number, number] {
+        if (atTime) {
+            let cd = this.GetCD(spellId, atTime);
+            return [cd.start, cd.duration, cd.enable];
+        }
         let [cdStart, cdDuration, cdEnable] = [0, 0, 1];
         if (this.sharedCooldown[spellId]) {
             for (const [id] of pairs(this.sharedCooldown[spellId])) {
-                let [start, duration, enable] = this.GetSpellCooldown(id);
+                let [start, duration, enable] = this.GetSpellCooldown(id, atTime);
                 if (start) {
                     [cdStart, cdDuration, cdEnable] = [start, duration, enable];
                     break;
@@ -165,8 +192,10 @@ class OvaleCooldownClass extends OvaleCooldownBase {
             } else {
                 [start, duration, enable] = GetSpellCooldown(spellId);
             }
+            this.Log("Call GetSpellCooldown which returned %f, %f, %d", start, duration, enable);
             if (start && start > 0) {
                 let [gcdStart, gcdDuration] = this.GetGlobalCooldown();
+                this.Log("GlobalCooldown is %d, %d", gcdStart, gcdDuration);
                 if (start + duration > gcdStart + gcdDuration) {
                     [cdStart, cdDuration, cdEnable] = [start, duration, enable];
                 } else {
@@ -190,27 +219,142 @@ class OvaleCooldownClass extends OvaleCooldownBase {
         }
         return [gcd, haste];
     }
-    CopySpellcastInfo = (mod: this, spellcast: SpellCast, dest: SpellCast) => {
+    CopySpellcastInfo = (mod: SpellCastModule, spellcast: SpellCast, dest: SpellCast) => {
         if (spellcast.offgcd) {
             dest.offgcd = spellcast.offgcd;
         }
     }
-    SaveSpellcastInfo= (mod: this, spellcast: SpellCast, atTime, state: DataState) => {
+    SaveSpellcastInfo= (mod: SpellCastModule, spellcast: SpellCast, atTime, state: {}) => {
         let spellId = spellcast.spellId;
         if (spellId) {
             let gcd:number| string;
-            if (state) {
-                gcd = state.GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target);
-            } 
-            else{
-                gcd = OvaleData.GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target);
-            }
+            gcd = OvaleData.GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target);
             if (gcd && gcd == 0) {
                 spellcast.offgcd = true;
             }
         }
     }
     
+    GetCD(spellId: number, atTime: number) {
+        OvaleCooldown.StartProfiling("OvaleCooldown_state_GetCD");
+        let cdName = spellId;
+        let si = OvaleData.spellInfo[spellId];
+        if (si && si.sharedcd) {
+            cdName = si.sharedcd;
+        }
+        if (!this.next.cd[cdName]) {
+            this.next.cd[cdName] = {}
+        }
+        let cd = this.next.cd[cdName];
+        if (!cd.start || !cd.serial || cd.serial < this.serial) {
+            this.Log("Didn't find an existing cd in next, look for one in current")
+            let [start, duration, enable] = this.GetSpellCooldown(spellId, undefined);
+            if (si && si.forcecd) {
+                [start, duration] = this.GetSpellCooldown(si.forcecd, undefined);
+            }
+            this.Log("It returned %f, %f", start, duration);
+            cd.serial = this.serial;
+            cd.start = start - COOLDOWN_THRESHOLD;
+            cd.duration = duration;
+            cd.enable = enable;
+            let [charges, maxCharges, chargeStart, chargeDuration] = GetSpellCharges(spellId);
+            if (charges) {
+                cd.charges = charges;
+                cd.maxCharges = maxCharges;
+                cd.chargeStart = chargeStart;
+                cd.chargeDuration = chargeDuration;
+            }
+        }
+        let now = atTime;
+        if (cd.start) {
+            if (cd.start + cd.duration <= now) {
+                this.Log("Spell cooldown is in the past");
+                cd.start = 0;
+                cd.duration = 0;
+            }
+        }
+        if (cd.charges) {
+            let [charges, maxCharges, chargeStart, chargeDuration] = [cd.charges, cd.maxCharges, cd.chargeStart, cd.chargeDuration];
+            while (chargeStart + chargeDuration <= now && charges < maxCharges) {
+                chargeStart = chargeStart + chargeDuration;
+                charges = charges + 1;
+            }
+            cd.charges = charges;
+            cd.chargeStart = chargeStart;
+        }
+        this.Log("Cooldown of spell %d is %f + %f", spellId, cd.start, cd.duration);
+        this.StopProfiling("OvaleCooldown_state_GetCD");
+        return cd;
+    }
+
+    GetSpellCooldownDuration(spellId: number, atTime: number, targetGUID: string) {
+        let [start, duration] = this.GetSpellCooldown(spellId, atTime);
+        if (duration > 0 && start + duration > atTime) {
+            OvaleCooldown.Log("Spell %d is on cooldown for %fs starting at %s.", spellId, duration, start);
+        } else {
+            let si = OvaleData.spellInfo[spellId];
+            duration = <number>OvaleData.GetSpellInfoProperty(spellId, atTime, "cd", targetGUID);
+            if (duration) {
+                if (si && si.addcd) {
+                    duration = duration + si.addcd;
+                }
+                if (duration < 0) {
+                    duration = 0;
+                }
+            } else {
+                duration = 0;
+            }
+            OvaleCooldown.Log("Spell %d has a base cooldown of %fs.", spellId, duration);
+            if (duration > 0) {
+                let haste = OvaleData.GetSpellInfoProperty(spellId, atTime, "cd_haste", targetGUID);
+                let multiplier = OvalePaperDoll.GetHasteMultiplier(<string>haste, OvalePaperDoll.next);
+                duration = duration / multiplier;
+                if (si && si.buff_cdr) {
+                    let aura = OvaleAura.GetAura("player", si.buff_cdr, atTime);
+                    if (OvaleAura.IsActiveAura(aura, atTime)) {
+                        duration = duration * aura.value1;
+                    }
+                }
+            }
+        }
+        return duration;
+    }
+    GetSpellCharges(spellId: number, atTime: number) {
+        let cd = this.GetCD(spellId, atTime);
+        let [charges, maxCharges, chargeStart, chargeDuration] = [cd.charges, cd.maxCharges, cd.chargeStart, cd.chargeDuration];
+        if (charges) {
+            while (chargeStart + chargeDuration <= atTime && charges < maxCharges) {
+                chargeStart = chargeStart + chargeDuration;
+                charges = charges + 1;
+            }
+        }
+        return [charges, maxCharges, chargeStart, chargeDuration];
+    }    
+
+    
+    RequireCooldownHandler = (spellId, atTime, requirement, tokens, index, targetGUID):[boolean, string, number] => {
+        let cdSpellId = tokens;
+        let verified = false;
+        if (index) {
+            cdSpellId = tokens[index];
+            index = index + 1;
+        }
+        if (cdSpellId) {
+            let isBang = false;
+            if (sub(cdSpellId, 1, 1) == "!") {
+                isBang = true;
+                cdSpellId = sub(cdSpellId, 2);
+            }
+            let cd = this.GetCD(cdSpellId, atTime);
+            verified = !isBang && cd.duration > 0 || isBang && cd.duration <= 0;
+            let result = verified && "passed" || "FAILED";
+            this.Log("    Require spell %s %s cooldown at time=%f: %s (duration = %f)", cdSpellId, isBang && "OFF" || !isBang && "ON", atTime, result, cd.duration);
+        } else {
+            Ovale.OneTimeMessage("Warning: requirement '%s' is missing a spell argument.", requirement);
+        }
+        return [verified, requirement, index];
+    }
+
 }
 
 OvaleCooldown = new OvaleCooldownClass();
