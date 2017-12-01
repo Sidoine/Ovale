@@ -287,7 +287,7 @@ Define(frozen_soul 189184)
 
 # Legendary
 Define(cold_heart 151796)
-Define(cold_heart_buff 248406)
+Define(cold_heart_buff 235599)
 Define(consorts_cold_core 144293)
 Define(koltiras_newfound_will 132366)
 Define(perseverance_of_the_ebon_martyr 132459)
