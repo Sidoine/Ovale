@@ -153,19 +153,19 @@ Define(wind_shear 57994)
 	SpellInfo(wind_shear cd=12 gcd=0 offgcd=1 interrupt=1)
 	
 # Talents
+Define(aftershock_talent 10)
 Define(ascendance_talent 19)
-Define(boulderfist_talent 3)
+Define(boulderfist_talent 20)
 Define(crashing_storm_talent 16)
 Define(echo_of_the_elements_talent 18)
 Define(fury_of_air_talent 17)
 Define(hailstorm_talent 12)
 Define(hot_hand_talent 2)
 Define(icefury_talent 21)
-Define(landslide_talent 20)
+Define(landslide_talent 3)
 Define(lightning_rod_talent 20)
 Define(overcharge_talent 14)
 Define(storm_elemental_talent 17)
-Define(aftershock_talent 10)
 
 # Artifact traits
 Define(alpha_wolf 198434)
