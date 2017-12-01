@@ -59,7 +59,6 @@ local OvaleClass = __class(OvaleBase, {
         self.playerGUID = nil
         self.db = nil
         self.refreshNeeded = {}
-        self.inCombat = false
         self.MSG_PREFIX = "Ovale"
         OvaleBase.constructor(self)
         _G["BINDING_HEADER_OVALE"] = "Ovale"

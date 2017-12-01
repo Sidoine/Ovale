@@ -122,7 +122,6 @@ class OvaleClass extends OvaleBase {
     playerGUID: string = undefined;
     db: AceDatabase & OvaleDb = undefined;
     refreshNeeded:LuaObj<boolean> = {}
-    inCombat = false;
     MSG_PREFIX = "Ovale";
 
 

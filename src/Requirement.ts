@@ -40,4 +40,5 @@ export function CheckRequirements(spellId: number, atTime: number, tokens: LuaAr
     return [true, undefined, undefined];
 }
 
-
+// TODO to avoid circular dependencies
+RegisterRequirement("combat", baseState.CombatRequirement);

@@ -106,7 +106,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
             if profile.apparence.avecCible and  not UnitExists("target") then
                 visible = false
             end
-            if profile.apparence.enCombat and  not Ovale.inCombat then
+            if profile.apparence.enCombat and  not baseState.current.inCombat then
                 visible = false
             end
             if profile.apparence.targetHostileOnly and (UnitIsDead("target") or  not UnitCanAttack("player", "target")) then

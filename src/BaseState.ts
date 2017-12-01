@@ -2,6 +2,8 @@ import { OvaleState, StateModule } from "./State";
 import { Ovale } from "./Ovale";
 import aceEvent from "@wowts/ace_event-3.0";
 import { GetTime } from "@wowts/wow-mock";
+import { LuaArray } from "@wowts/lua";
+import { OvaleDebug } from "./Debug";
 
 class BaseStateData {
     currentTime: number|undefined = undefined;
@@ -10,7 +12,7 @@ class BaseStateData {
     defaultTarget: string;
 }
 
-const BaseStateBase = OvaleState.RegisterHasState(Ovale.NewModule("BaseState", aceEvent), BaseStateData);
+const BaseStateBase = OvaleDebug.RegisterDebugging(OvaleState.RegisterHasState(Ovale.NewModule("BaseState", aceEvent), BaseStateData));
 
 class BaseState extends BaseStateBase implements StateModule {    
     IsInCombat(atTime: number | undefined) {
@@ -30,6 +32,11 @@ class BaseState extends BaseStateBase implements StateModule {
     }
 
     CleanState() {}
+
+    CombatRequirement = (spellId: number, atTime: number, name: string, tokens: LuaArray<string> | string | number, index: number, targetGUID: string):[boolean, string, number] => {
+        return [this.next.inCombat, name, index];
+    }
+
 }
 
 export const baseState = new BaseState();

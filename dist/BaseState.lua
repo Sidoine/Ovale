@@ -7,6 +7,8 @@ local __Ovale = LibStub:GetLibrary("ovale/Ovale")
 local Ovale = __Ovale.Ovale
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local GetTime = GetTime
+local __Debug = LibStub:GetLibrary("ovale/Debug")
+local OvaleDebug = __Debug.OvaleDebug
 local BaseStateData = __class(nil, {
     constructor = function(self)
         self.currentTime = nil
@@ -14,7 +16,7 @@ local BaseStateData = __class(nil, {
         self.combatStartTime = nil
     end
 })
-local BaseStateBase = OvaleState:RegisterHasState(Ovale:NewModule("BaseState", aceEvent), BaseStateData)
+local BaseStateBase = OvaleDebug:RegisterDebugging(OvaleState:RegisterHasState(Ovale:NewModule("BaseState", aceEvent), BaseStateData))
 local BaseState = __class(BaseStateBase, {
     IsInCombat = function(self, atTime)
         return self:GetState(atTime).inCombat
@@ -31,6 +33,12 @@ local BaseState = __class(BaseStateBase, {
     end,
     CleanState = function(self)
     end,
+    constructor = function(self, ...)
+        BaseStateBase.constructor(self, ...)
+        self.CombatRequirement = function(spellId, atTime, name, tokens, index, targetGUID)
+            return self.next.inCombat, name, index
+        end
+    end
 })
 __exports.baseState = BaseState()
 OvaleState:RegisterState(__exports.baseState)

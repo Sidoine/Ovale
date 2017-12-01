@@ -299,7 +299,7 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
         self:StartProfiling("OvaleFuture_PLAYER_REGEN_DISABLED")
         self:Debug(event, "Entering combat.")
         local now = GetTime()
-        Ovale.inCombat = true
+        baseState.current.inCombat = true
         baseState.current.combatStartTime = now
         Ovale:needRefresh()
         self:SendMessage("Ovale_CombatStarted", now)
@@ -309,7 +309,7 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
         self:StartProfiling("OvaleFuture_PLAYER_REGEN_ENABLED")
         self:Debug(event, "Leaving combat.")
         local now = GetTime()
-        Ovale.inCombat = false
+        baseState.current.inCombat = false
         Ovale:needRefresh()
         self:SendMessage("Ovale_CombatEnded", now)
         self:StopProfiling("OvaleFuture_PLAYER_REGEN_ENABLED")

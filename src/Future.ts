@@ -285,7 +285,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
         this.StartProfiling("OvaleFuture_PLAYER_REGEN_DISABLED");
         this.Debug(event, "Entering combat.");
         let now = GetTime();
-        Ovale.inCombat = true;
+        baseState.current.inCombat = true;
         baseState.current.combatStartTime = now;
         Ovale.needRefresh();
         this.SendMessage("Ovale_CombatStarted", now);
@@ -295,7 +295,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
         this.StartProfiling("OvaleFuture_PLAYER_REGEN_ENABLED");
         this.Debug(event, "Leaving combat.");
         let now = GetTime();
-        Ovale.inCombat = false;
+        baseState.current.inCombat = false;
         Ovale.needRefresh();
         this.SendMessage("Ovale_CombatEnded", now);
         this.StopProfiling("OvaleFuture_PLAYER_REGEN_ENABLED");
