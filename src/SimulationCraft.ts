@@ -3757,7 +3757,7 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
         code = format("SpellCooldown(%s) > SpellCooldownDuration(%s) - 10", name, name);
         AddSymbol(annotation, name);
     } else if (className == "MAGE" && operand == "firestarter.active") {
-        code = "HasTalent(firestarter_talent) and target.HealthPercent() >= 90";
+        code = "Talent(firestarter_talent) and target.HealthPercent() >= 90";
         AddSymbol(annotation, "firestarter_talent");
     } else if (className == "MONK" && sub(operand, 1, 35) == "debuff.storm_earth_and_fire_target.") {
         let property = sub(operand, 36);
