@@ -836,6 +836,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
             } else if (spellId == "helpful" && OvaleSpellBook.IsHelpfulSpell(spellId)) {
                 return [start, ending];
             } else if (spellId == castSpellId) {
+                Ovale.Print("%f %f %d %s => %d (%f)", start, ending, castSpellId, castSpellName, spellId, baseState.next.currentTime);
                 return [start, ending];
             } else if (type(spellId) == "number" && OvaleSpellBook.GetSpellName(spellId) == castSpellName) {
                 return [start, ending];
@@ -3350,7 +3351,11 @@ l    */
         let aura = OvaleAura.GetAura(target, auraId, atTime, filter, mine);
         if (aura) {
             let baseDuration = OvaleAura.GetBaseDuration(auraId);
+            if (baseDuration === INFINITY) {
+                baseDuration = aura.ending - aura.start;
+            }
             let extensionDuration = 0.3 * baseDuration;
+            OvaleAura.Log("ending = %s extensionDuration = %s", aura.ending, extensionDuration);
             return [aura.ending - extensionDuration, INFINITY];
         }
         return [0, INFINITY];

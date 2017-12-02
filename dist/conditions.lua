@@ -519,6 +519,7 @@ local function Casting(positionalParams, namedParams, state, atTime)
             elseif spellId == "helpful" and OvaleSpellBook:IsHelpfulSpell(spellId) then
                 return start, ending
             elseif spellId == castSpellId then
+                Ovale:Print("%f %f %d %s => %d (%f)", start, ending, castSpellId, castSpellName, spellId, baseState.next.currentTime)
                 return start, ending
             elseif type(spellId) == "number" and OvaleSpellBook:GetSpellName(spellId) == castSpellName then
                 return start, ending
@@ -1699,7 +1700,11 @@ local function Refreshable(positionalParams, namedParams, state, atTime)
         local aura = OvaleAura:GetAura(target, auraId, atTime, filter, mine)
         if aura then
             local baseDuration = OvaleAura:GetBaseDuration(auraId)
+            if baseDuration == INFINITY then
+                baseDuration = aura.ending - aura.start
+            end
             local extensionDuration = 0.3 * baseDuration
+            OvaleAura:Log("ending = %s extensionDuration = %s", aura.ending, extensionDuration)
             return aura.ending - extensionDuration, INFINITY
         end
         return 0, INFINITY
