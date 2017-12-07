@@ -38,14 +38,14 @@
     "@wowts/lib_range_check-2.0": "^1.0.0",
     "@wowts/lib_text_dump-1.0": "^1.0.0",
     "@wowts/lib_data_broker-1.1": "^1.0.0",
-    "@wowts/masque": "^1.0.0",
+    "@wowts/masque": "^1.0.1",
     "@wowts/recount": "^1.0.0",
     "@types/node": "^8.0.44"
   },
   "devDependencies": {
     "typescript": "^2.5.3",
     "tslint": "^5.7.0",
-    "@wowts/tstolua": "^1.0.10"
+    "@wowts/tstolua": "^1.1.0"
   },
   "repository": {
     "type": "git",

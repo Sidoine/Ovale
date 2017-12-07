@@ -2,7 +2,7 @@ local __exports = LibStub:NewLibrary("ovale/Frame", 10000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local AceGUI = LibStub:GetLibrary("AceGUI-3.0", true)
-local Masque = LibStub:GetLibrary("masque", true)
+local Masque = LibStub:GetLibrary("Masque", true)
 local __BestAction = LibStub:GetLibrary("ovale/BestAction")
 local OvaleBestAction = __BestAction.OvaleBestAction
 local __Compile = LibStub:GetLibrary("ovale/Compile")
