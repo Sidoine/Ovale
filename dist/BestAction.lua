@@ -407,6 +407,10 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
                     m = t
                     n = A * z + B * c
                 elseif operator == "/" then
+                    if B == 0 then
+                        self:Error("[%d] Division by 0", element.nodeId)
+                        B = 0.00001
+                    end
                     l = A / B
                     m = t
                     local numerator = B * c - A * z
@@ -701,7 +705,7 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
     GetActionInfo = function(self, element, state, atTime)
         if element and element.type == "action" then
             if element.serial and element.serial >= self_serial then
-                OvaleSpellBook:Log("[%d]    using cached result (age = %d)", element.nodeId, element.serial)
+                OvaleSpellBook:Log("[%d]    using cached result (age = %d/%d)", element.nodeId, element.serial, self_serial)
                 return element.actionTexture, element.actionInRange, element.actionCooldownStart, element.actionCooldownDuration, element.actionUsable, element.actionShortcut, element.actionIsCurrent, element.actionEnable, element.actionType, element.actionId, element.actionTarget, element.actionResourceExtend, element.actionCharges
             else
                 local target = element.namedParams.target or baseState.next.defaultTarget
@@ -777,7 +781,10 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
         self:StartProfiling("OvaleBestAction_Compute")
         local timeSpan, result
         if element then
-            if element.serial and element.serial >= self_serial then
+            if element.serial == -1 then
+                Ovale:OneTimeMessage("Recursive call is not supported. This is a known bug with arcane mage script")
+                return EMPTY_SET, element.result
+            elseif element.serial and element.serial >= self_serial then
                 timeSpan = element.timeSpan
                 result = element.result
             else
@@ -786,6 +793,7 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
                 else
                     __exports.OvaleBestAction:Log("[%d] >>> Computing '%s' at time=%f", element.nodeId, element.type, atTime)
                 end
+                element.serial = -1
                 local visitor = self.COMPUTE_VISITOR[element.type]
                 if visitor then
                     timeSpan, result = visitor(element, state, atTime)

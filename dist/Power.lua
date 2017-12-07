@@ -605,6 +605,7 @@ local OvalePowerClass = __class(OvalePowerBase, {
         __exports.OvalePower:StartProfiling("OvalePower_ResetState")
         for powerType in pairs(__exports.OvalePower.POWER_INFO) do
             self.next.power[powerType] = self.current.power[powerType] or 0
+            self.next.maxPower[powerType] = self.current.maxPower[powerType] or 0
         end
         for powerType in pairs(__exports.OvalePower.POWER_INFO) do
             self.next.powerRate[powerType] = 0

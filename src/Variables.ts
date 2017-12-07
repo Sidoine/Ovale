@@ -48,8 +48,8 @@ export class Variables implements StateModule {
         return this.futureVariable[name] || this.variable[name] || 0;
     }
     GetStateDuration(name) {
-        let lastEnable = this.futureLastEnable[name] || this.lastEnable[name] || baseState.current.currentTime;
-        return baseState.current.currentTime - lastEnable;
+        let lastEnable = this.futureLastEnable[name] || this.lastEnable[name] || baseState.next.currentTime;
+        return baseState.next.currentTime - lastEnable;
     }
     PutState (name: string, value: string, isFuture: boolean, atTime: number) {
         if (isFuture) {
@@ -76,3 +76,4 @@ export class Variables implements StateModule {
 }
 
 export const variables = new Variables();
+OvaleState.RegisterState(variables);

@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "tstolua -p tsconfig.lua.json"
+    "prepare": "tstolua -p tsconfig.lua.json",
+    "simc": "tsc && node dist/utils/importsimc.js ../../simc/profiles/Tier19P"
   },
   "author": "",
   "license": "ISC",

@@ -1195,7 +1195,7 @@ const GetPerClassSpecialization = function(tbl: LuaObj<LuaObj<LuaObj<{1: string,
 const AddDisambiguation = function(name: string, info: string, className?: string, specialization?: string, _type?: string) {
     AddPerClassSpecialization(EMIT_DISAMBIGUATION, name, info, className, specialization, _type);
 }
-const Disambiguate = function(name: string, className: string, specialization: string, _type?: string) {
+function Disambiguate(name: string, className: string, specialization: string, _type?: string): [string, string] {
     let [disname, distype] = GetPerClassSpecialization(EMIT_DISAMBIGUATION, name, className, specialization);
     if (!disname) {
         return [name, _type];
@@ -1269,6 +1269,12 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("blood_fury", "blood_fury_sp", "MAGE");
     AddDisambiguation("legendary_ring", "legendary_ring_intellect", "MAGE", undefined, "Item");
     AddDisambiguation("water_jet", "water_elemental_water_jet", "MAGE", "frost");
+    AddDisambiguation("potion", "deadly_grace_potion", "MAGE", "arcane", "Item");
+    AddDisambiguation("potion", "prolonged_power_potion", "MAGE", "fire", "Item");
+    AddDisambiguation("potion", "prolonged_power_potion", "MAGE", "frost", "Item");
+    AddDisambiguation("potion_buff", "deadly_grace_potion_buff", "MAGE", "arcane");
+    AddDisambiguation("potion_buff", "prolonged_power_buff", "MAGE", "fire");
+    AddDisambiguation("potion_buff", "prolonged_power_buff", "MAGE", "frost");
     AddDisambiguation("arcane_torrent", "arcane_torrent_chi", "MONK");
     AddDisambiguation("blood_fury", "blood_fury_apsp", "MONK");
     AddDisambiguation("chi_explosion", "chi_explosion_heal", "MONK", "mistweaver");
@@ -1947,13 +1953,10 @@ function EmitVariableMax(name: string, nodeList: LuaArray<AstNode>, annotation: 
 }
 
 function EmitVariableAdd(name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifier: ChildParseNode, parseNode: ParseNode, action: string) {
-    // EmitNamedVariable(`${name}_add`, nodeList, annotation, modifier, parseNode, action);
-    // let valueNode = annotation.variable[name];
-    // valueNode.name = `${name}_value`;
-    // annotation.variable[valueNode.name] = valueNode;
-    // let bodyCode = format("AddFunction %s { %s_value() + %s_add() }", name, name, name, name, name);
-    // let [node] = OvaleAST.ParseCode("add_function", bodyCode, nodeList, annotation.astAnnotation);
-    // annotation.variable[name] = node;
+    // TODO
+    let valueNode = annotation.variable[name];
+    if (valueNode) return;
+    EmitNamedVariable(name, nodeList, annotation, modifier, parseNode, action);
 }
 
 function EmitVariableIf(name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifier: ChildParseNode, parseNode: ParseNode, action: string) {
@@ -2032,7 +2035,7 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
     let specialization = annotation.specialization;
     let camelSpecialization = CamelSpecialization(annotation);
     let role = annotation.role;
-    let [action] = Disambiguate(canonicalizedName, className, specialization);
+    let [action, type] = Disambiguate(canonicalizedName, className, specialization, "Spell");
     let bodyNode: AstNode;
     let conditionNode: AstNode;
     if (action == "auto_attack" && !annotation.melee) {
@@ -2415,10 +2418,10 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
                     actionTarget = "other";
                 }
                 if (actionTarget != "1") {
-                    bodyCode = format("Spell(%s text=%s)", action, actionTarget);
+                    bodyCode = format("%s(%s text=%s)", type, action, actionTarget);
                 }
             }
-            bodyCode = bodyCode || `Spell(${action})`;
+            bodyCode = bodyCode || `${type}(${action})`;
         }
         annotation.astAnnotation = annotation.astAnnotation || {
         }

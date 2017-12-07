@@ -57,6 +57,7 @@ Define(deadly_grace_potion 127843)
 Define(old_war_potion 127844)
 Define(prolonged_power_potion 142117)
 Define(unbending_potion 127845)
+Define(deadly_grace_potion_buff 188027)
 Define(potion_of_prolonged_power_potion 142117)
 
 Define(prolonged_power_buff 229206)

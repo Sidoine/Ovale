@@ -44,8 +44,8 @@ __exports.Variables = __class(nil, {
         return self.futureVariable[name] or self.variable[name] or 0
     end,
     GetStateDuration = function(self, name)
-        local lastEnable = self.futureLastEnable[name] or self.lastEnable[name] or baseState.current.currentTime
-        return baseState.current.currentTime - lastEnable
+        local lastEnable = self.futureLastEnable[name] or self.lastEnable[name] or baseState.next.currentTime
+        return baseState.next.currentTime - lastEnable
     end,
     PutState = function(self, name, value, isFuture, atTime)
         if isFuture then
@@ -78,3 +78,4 @@ __exports.Variables = __class(nil, {
     end
 })
 __exports.variables = __exports.Variables()
+OvaleState:RegisterState(__exports.variables)

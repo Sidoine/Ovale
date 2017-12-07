@@ -20,6 +20,11 @@ AddFunction average_burn_length
  { 0 * total_burns() - 0 + GetStateDuration() } / total_burns()
 }
 
+AddFunction total_burns
+{
+ if not GetState(burn_phase) > 0 1
+}
+
 AddFunction time_until_burn_value
 {
  if time_until_burn_value() < time_until_burn_max() time_until_burn_value()
@@ -45,7 +50,6 @@ AddFunction arcane_missiles_procs
 }
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=arcane)
-AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=arcane)
 AddCheckBox(opt_arcane_mage_burn_phase L(arcane_mage_burn_phase) default specialization=arcane)
 AddCheckBox(opt_time_warp SpellName(time_warp) specialization=arcane)
 
@@ -130,7 +134,7 @@ AddFunction ArcanePrecombatCdActions
   #mirror_image
   Spell(mirror_image)
   #potion
-  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(deadly_grace_potion usable=1)
+  Item(deadly_grace_potion)
  }
 }
 
@@ -333,7 +337,7 @@ AddFunction ArcaneBurnCdActions
    #arcane_torrent
    Spell(arcane_torrent_mana)
    #potion,if=buff.arcane_power.up&(buff.berserking.up|buff.blood_fury.up|!(race.troll|race.orc))
-   if BuffPresent(arcane_power_buff) and { BuffPresent(berserking_buff) or BuffPresent(blood_fury_sp_buff) or not { Race(Troll) or Race(Orc) } } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(deadly_grace_potion usable=1)
+   if BuffPresent(arcane_power_buff) and { BuffPresent(berserking_buff) or BuffPresent(blood_fury_sp_buff) or not { Race(Troll) or Race(Orc) } } Item(deadly_grace_potion)
    #use_items,if=buff.arcane_power.up|target.time_to_die<cooldown.arcane_power.remains
    if BuffPresent(arcane_power_buff) or target.TimeToDie() < SpellCooldown(arcane_power) ArcaneUseItemActions()
 
@@ -457,7 +461,7 @@ AddFunction ArcaneDefaultCdActions
  #counterspell,if=target.debuff.casting.react
  if target.IsInterruptible() ArcaneInterruptActions()
  #time_warp,if=buff.bloodlust.down&(time=0|(buff.arcane_power.up&(buff.potion.up|!action.potion.usable))|target.time_to_die<=buff.bloodlust.duration)
- if BuffExpires(burst_haste_buff any=1) and { TimeInCombat() == 0 or BuffPresent(arcane_power_buff) and { BuffPresent(potion_buff) or not CanCast(potion) } or target.TimeToDie() <= BaseDuration(burst_haste_buff) } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
+ if BuffExpires(burst_haste_buff any=1) and { TimeInCombat() == 0 or BuffPresent(arcane_power_buff) and { BuffPresent(deadly_grace_potion_buff) or not CanCast(deadly_grace_potion) } or target.TimeToDie() <= BaseDuration(burst_haste_buff) } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
  #call_action_list,name=variables
  ArcaneVariablesCdActions()
 
@@ -576,7 +580,7 @@ AddIcon checkbox=opt_mage_arcane_aoe help=cd specialization=arcane
 # arcane_charge_debuff
 # charged_up
 # time_warp
-# potion_buff
+# deadly_grace_potion_buff
 # quaking_palm
 # counterspell
 ]]
@@ -597,7 +601,6 @@ Include(ovale_trinkets_wod)
 Include(ovale_mage_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=fire)
-AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=fire)
 AddCheckBox(opt_time_warp SpellName(time_warp) specialization=fire)
 
 AddFunction FireInterruptActions
@@ -795,7 +798,7 @@ AddFunction FirePrecombatCdActions
  #mirror_image
  Spell(mirror_image)
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
+ Item(prolonged_power_potion)
 }
 
 AddFunction FirePrecombatCdPostConditions
@@ -865,7 +868,7 @@ AddFunction FireCombustionphaseCdActions
    #combustion
    Spell(combustion)
    #potion
-   if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
+   Item(prolonged_power_potion)
    #blood_fury
    Spell(blood_fury_sp)
    #berserking
@@ -1146,7 +1149,6 @@ AddFunction iv_start
 }
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=frost)
-AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=frost)
 AddCheckBox(opt_time_warp SpellName(time_warp) specialization=frost)
 
 AddFunction FrostInterruptActions
@@ -1306,7 +1308,7 @@ AddFunction FrostPrecombatCdActions
   #mirror_image
   Spell(mirror_image)
   #potion
-  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
+  Item(prolonged_power_potion)
  }
 }
 
@@ -1371,7 +1373,7 @@ AddFunction FrostCooldownsCdActions
  unless { SpellCooldown(icy_veins) < CastTime(rune_of_power) or Charges(rune_of_power count=0) > 1 and SpellCooldown(icy_veins) > 10 or BuffPresent(icy_veins_buff) or target.TimeToDie() + 5 < Charges(rune_of_power count=0) * 10 } and Spell(rune_of_power)
  {
   #potion,if=cooldown.icy_veins.remains<1|target.time_to_die<70
-  if { SpellCooldown(icy_veins) < 1 or target.TimeToDie() < 70 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
+  if SpellCooldown(icy_veins) < 1 or target.TimeToDie() < 70 Item(prolonged_power_potion)
   #icy_veins
   Spell(icy_veins)
   #mirror_image

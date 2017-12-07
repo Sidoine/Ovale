@@ -1094,14 +1094,13 @@ local AddDisambiguation = function(name, info, className, specialization, _type)
     AddPerClassSpecialization(EMIT_DISAMBIGUATION, name, info, className, specialization, _type)
 end
 
-local Disambiguate = function(name, className, specialization, _type)
+local function Disambiguate(name, className, specialization, _type)
     local disname, distype = GetPerClassSpecialization(EMIT_DISAMBIGUATION, name, className, specialization)
     if  not disname then
         return name, _type
     end
     return disname, distype
 end
-
 local InitializeDisambiguation = function()
     AddDisambiguation("bloodlust_buff", "burst_haste_buff")
     AddDisambiguation("trinket_proc_all_buff", "trinket_proc_any_buff")
@@ -1169,6 +1168,12 @@ local InitializeDisambiguation = function()
     AddDisambiguation("blood_fury", "blood_fury_sp", "MAGE")
     AddDisambiguation("legendary_ring", "legendary_ring_intellect", "MAGE", nil, "Item")
     AddDisambiguation("water_jet", "water_elemental_water_jet", "MAGE", "frost")
+    AddDisambiguation("potion", "deadly_grace_potion", "MAGE", "arcane", "Item")
+    AddDisambiguation("potion", "prolonged_power_potion", "MAGE", "fire", "Item")
+    AddDisambiguation("potion", "prolonged_power_potion", "MAGE", "frost", "Item")
+    AddDisambiguation("potion_buff", "deadly_grace_potion_buff", "MAGE", "arcane")
+    AddDisambiguation("potion_buff", "prolonged_power_buff", "MAGE", "fire")
+    AddDisambiguation("potion_buff", "prolonged_power_buff", "MAGE", "frost")
     AddDisambiguation("arcane_torrent", "arcane_torrent_chi", "MONK")
     AddDisambiguation("blood_fury", "blood_fury_apsp", "MONK")
     AddDisambiguation("chi_explosion", "chi_explosion_heal", "MONK", "mistweaver")
@@ -1848,6 +1853,11 @@ local function EmitVariableMax(name, nodeList, annotation, modifier, parseNode, 
     annotation.variable[name] = node
 end
 local function EmitVariableAdd(name, nodeList, annotation, modifier, parseNode, action)
+    local valueNode = annotation.variable[name]
+    if valueNode then
+        return 
+    end
+    EmitNamedVariable(name, nodeList, annotation, modifier, parseNode, action)
 end
 local function EmitVariableIf(name, nodeList, annotation, modifier, parseNode, action)
     local node = annotation.variable[name]
@@ -1921,7 +1931,7 @@ EmitAction = function(parseNode, nodeList, annotation)
     local specialization = annotation.specialization
     local camelSpecialization = CamelSpecialization(annotation)
     local role = annotation.role
-    local action = Disambiguate(canonicalizedName, className, specialization)
+    local action, type = Disambiguate(canonicalizedName, className, specialization, "Spell")
     local bodyNode
     local conditionNode
     if action == "auto_attack" and  not annotation.melee then
@@ -2300,10 +2310,10 @@ EmitAction = function(parseNode, nodeList, annotation)
                     actionTarget = "other"
                 end
                 if actionTarget ~= "1" then
-                    bodyCode = format("Spell(%s text=%s)", action, actionTarget)
+                    bodyCode = format("%s(%s text=%s)", type, action, actionTarget)
                 end
             end
-            bodyCode = bodyCode or "Spell(" .. action .. ")"
+            bodyCode = bodyCode or type .. "(" .. action .. ")"
         end
         annotation.astAnnotation = annotation.astAnnotation or {}
         if  not bodyNode and bodyCode then

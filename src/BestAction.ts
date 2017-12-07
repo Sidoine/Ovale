@@ -267,10 +267,10 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         OvaleFuture.ApplyInFlightSpells();
         self_serial = self_serial + 1;
     }
-    GetActionInfo(element, state: BaseState, atTime: number) {
+    GetActionInfo(element: Element, state: BaseState, atTime: number) {
         if (element && element.type == "action") {
             if (element.serial && element.serial >= self_serial) {
-                OvaleSpellBook.Log("[%d]    using cached result (age = %d)", element.nodeId, element.serial);
+                OvaleSpellBook.Log("[%d]    using cached result (age = %d/%d)", element.nodeId, element.serial, self_serial);
                 return [element.actionTexture, element.actionInRange, element.actionCooldownStart, element.actionCooldownDuration, element.actionUsable, element.actionShortcut, element.actionIsCurrent, element.actionEnable, element.actionType, element.actionId, element.actionTarget, element.actionResourceExtend, element.actionCharges];
             } else {
                 let target = element.namedParams.target || baseState.next.defaultTarget;
@@ -346,7 +346,11 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         this.StartProfiling("OvaleBestAction_Compute");
         let timeSpan: OvaleTimeSpan, result: Element;
         if (element) {
-            if (element.serial && element.serial >= self_serial) {
+            if (element.serial == -1) {
+                Ovale.OneTimeMessage("Recursive call is not supported. This is a known bug with arcane mage script");
+                return [EMPTY_SET, element.result];
+            }
+            else if (element.serial && element.serial >= self_serial) {
                 timeSpan = element.timeSpan;
                 result = element.result;
             } else {
@@ -355,6 +359,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
                 } else {
                     OvaleBestAction.Log("[%d] >>> Computing '%s' at time=%f", element.nodeId, element.type, atTime);
                 }
+                element.serial = -1;
                 let visitor = this.COMPUTE_VISITOR[element.type];
                 if (visitor) {
                     [timeSpan, result] = visitor(element, state, atTime);
@@ -530,6 +535,10 @@ class OvaleBestActionClass extends OvaleBestActionBase {
                 m = t;
                 n = A * z + B * c;
             } else if (operator == "/") {
+                if (B === 0) {
+                    this.Error("[%d] Division by 0", element.nodeId);
+                    B = 0.00001;
+                }
                 l = A / B;
                 m = t;
                 let numerator = B * c - A * z;

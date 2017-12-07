@@ -581,6 +581,7 @@ class OvalePowerClass extends OvalePowerBase {
         OvalePower.StartProfiling("OvalePower_ResetState");
         for (const [powerType] of pairs(OvalePower.POWER_INFO)) {
             this.next.power[powerType] = this.current.power[powerType] || 0;
+            this.next.maxPower[powerType] = this.current.maxPower[powerType] || 0;
         }
         for (const [powerType] of pairs(OvalePower.POWER_INFO)) {
             this.next.powerRate[powerType] = 0;
