@@ -10,10 +10,10 @@ import { GetTime, UnitHasVehicleUI, UnitExists, UnitIsDead, UnitCanAttack } from
 import { baseState } from "./BaseState";
 
 interface SpellFlashCoreClass {
-    FlashForm(spellId, color, size, brightness):void;   
-    FlashPet(spellId, color, size, brightness):void;
-    FlashAction(spellId, color, size, brightness):void;
-    FlashItem(spellId, color, size, brightness):void;
+    FlashForm: (spellId, color, size, brightness) => void;   
+    FlashPet: (spellId, color, size, brightness) => void;
+    FlashAction: (spellId, color, size, brightness) => void;
+    FlashItem: (spellId, color, size, brightness) => void;
 }
 
 let OvaleSpellFlashBase = Ovale.NewModule("OvaleSpellFlash", aceEvent);
@@ -354,3 +354,5 @@ class OvaleSpellFlashClass extends OvaleSpellFlashBase {
         }
     }
 }
+
+OvaleSpellFlash = new OvaleSpellFlashClass()
