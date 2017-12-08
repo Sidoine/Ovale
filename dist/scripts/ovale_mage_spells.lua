@@ -231,7 +231,7 @@ Define(quickening_buff 198924)
 	SpellAddBuff(arcane_barrage quickening_buff=0)
 Define(ray_of_frost 205021)
 	SpellInfo(ray_of_frost cd=60 channel=10 tag=main)
-Define(ray_of_frost_talent 1)
+	SpellInfo(ray_of_frost unusable=1 talent=!ray_of_frost_talent)
 Define(rune_of_power 116011)
 	SpellInfo(rune_of_power buff_totem=rune_of_power_buff duration=180 max_totems=2 totem=1)
 	SpellAddBuff(rune_of_power ice_floes_buff=0 if_spell=ice_floes)
@@ -281,7 +281,8 @@ Define(summon_arcane_familiar 205022)
 	SpellInfo(summon_arcane_familiar cd=10)
 Define(unstable_magic_talent 17)
 Define(firestarter_talent 3)
-	
+Define(ray_of_frost_talent 1)
+
 # Artifacts
 Define(mark_of_aluneth 210726)
 	SpellInfo(mark_of_aluneth cd=60)
