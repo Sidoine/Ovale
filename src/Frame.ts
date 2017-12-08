@@ -572,7 +572,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         newFrame.SetScript("OnHide", () => this.Hide());
         newFrame.SetAlpha(profile.apparence.alpha);
         this.updateFrame.SetScript("OnUpdate", (updateFrame, elapsed) => this.OnUpdate(elapsed));
-        this.barre.SetTexture(0, 0.8, 0);
+        this.barre.SetColorTexture(0.8, 0.8, 0.8, 0.5);
         this.barre.SetPoint("TOPLEFT", 0, 0);
         this.barre.Hide();
         let content = this.content;
