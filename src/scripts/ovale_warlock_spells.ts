@@ -320,7 +320,6 @@ Define(writhe_in_agony_talent 2)
 
 # Legendary items
 Define(deadwind_harvester_buff 216708)
-	SpellAddBuff(reap_souls tormented_souls_buff=0)
 Define(sindorei_spite_icd 208871) # TODO should be the internal cooldown of the spell
 Define(tormented_souls_buff 216695)
 SpellList(concordance_of_the_legionfall_buff 243096 242583 242584 242586)
@@ -329,6 +328,10 @@ SpellList(concordance_of_the_legionfall_buff 243096 242583 242584 242586)
 Define(thalkiels_consumption 211714)
 	SpellInfo(thalkiels_consumption cd=45)
 Define(reap_souls 216698)
+	SpellInfo(reap_souls unusable=1)
+	SpellAddBuff(reap_souls deadwind_harvester=1)
+	SpellAddBuff(reap_souls tormented_souls_buff=0)
+	SpellRequire(reap_souls unusable 0=buff,tormented_souls_buff)
 
 # Legion traits
 Define(thalkiels_ascendance 238145)
