@@ -437,6 +437,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
                 icon:SetHelp((node.namedParams ~= nil and node.namedParams.help) or nil)
                 icon:SetRangeIndicator(profile.apparence.targetText)
                 icon:EnableMouse( not profile.apparence.clickThru)
+                icon.frame:SetAlpha(profile.apparence.alpha)
                 icon.cdShown = (l == 1)
                 if Masque then
                     self.skinGroup:AddButton(icon.frame)
@@ -453,6 +454,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
                 maxWidth = left + width
             end
         end
+        self.content:SetAlpha(profile.apparence.optionsAlpha)
         if (profile.apparence.vertical) then
             self.barre:SetWidth(maxHeight - margin)
             self.barre:SetHeight(BARRE)
@@ -488,7 +490,6 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
         local newFrame = CreateFrame("Frame", nil, hider)
         hider:SetAllPoints(UIParent)
         RegisterStateDriver(hider, "visibility", "[petbattle] hide; show")
-        local profile = Ovale.db.profile
         self.frame = newFrame
         self.hider = hider
         self.updateFrame = CreateFrame("Frame", Ovale:GetName() .. "UpdateFrame")
@@ -528,7 +529,6 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
         newFrame:SetScript("OnHide", function()
             return self:Hide()
         end)
-        newFrame:SetAlpha(profile.apparence.alpha)
         self.updateFrame:SetScript("OnUpdate", function(updateFrame, elapsed)
             return self:OnUpdate(elapsed)
         end)
@@ -539,7 +539,6 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
         content:SetWidth(200)
         content:SetHeight(100)
         content:Hide()
-        content:SetAlpha(profile.apparence.optionsAlpha)
         AceGUIRegisterAsContainer(self)
         self:UpdateFrame()
     end,
@@ -556,9 +555,6 @@ local OvaleFrameModuleClass = __class(OvaleFrameBase, {
         if eventType == "visibility" then
             self.frame:UpdateVisibility()
         else
-            if eventType == "layout" then
-                self.frame:UpdateFrame()
-            end
             self.frame:UpdateFrame()
         end
     end,

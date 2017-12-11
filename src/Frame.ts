@@ -278,6 +278,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             }
         }
     }
+
     UpdateFrame() {
         const profile = Ovale.db.profile;
         this.frame.SetPoint("CENTER", this.hider, "CENTER", profile.apparence.offsetX, profile.apparence.offsetY);
@@ -287,8 +288,6 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         this.UpdateControls();
         this.UpdateVisibility();
     }
-
-    
     
     GetCheckBox(name: number|string) {
         let widget: AceGUIWidgetCheckBox;
@@ -482,6 +481,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                 icon.SetHelp((node.namedParams != undefined && node.namedParams.help) || undefined);
                 icon.SetRangeIndicator(profile.apparence.targetText);
                 icon.EnableMouse(!profile.apparence.clickThru);
+                icon.frame.SetAlpha(profile.apparence.alpha);    
                 icon.cdShown = (l == 1);
                 if (Masque) {
                     this.skinGroup.AddButton(icon.frame);
@@ -497,7 +497,10 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             if ((left + width > maxWidth)) {
                 maxWidth = left + width;
             }
-        }
+        }    
+
+        this.content.SetAlpha(profile.apparence.optionsAlpha);
+        
         if ((profile.apparence.vertical)) {
             this.barre.SetWidth(maxHeight - margin);
             this.barre.SetHeight(BARRE);
@@ -530,8 +533,6 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         let newFrame = CreateFrame("Frame", undefined, hider);
         hider.SetAllPoints(UIParent);
         RegisterStateDriver(hider, "visibility", "[petbattle] hide; show");
-        
-        const profile = Ovale.db.profile;
         
         this.frame = newFrame;
         this.hider = hider;
@@ -570,7 +571,6 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             this.barre.Hide();
         });
         newFrame.SetScript("OnHide", () => this.Hide());
-        newFrame.SetAlpha(profile.apparence.alpha);
         this.updateFrame.SetScript("OnUpdate", (updateFrame, elapsed) => this.OnUpdate(elapsed));
         this.barre.SetColorTexture(0.8, 0.8, 0.8, 0.5);
         this.barre.SetPoint("TOPLEFT", 0, 0);
@@ -579,7 +579,6 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         content.SetWidth(200);
         content.SetHeight(100);
         content.Hide();
-        content.SetAlpha(profile.apparence.optionsAlpha);        
         AceGUIRegisterAsContainer(this);
         this.UpdateFrame();        
     }
@@ -599,9 +598,9 @@ class OvaleFrameModuleClass extends OvaleFrameBase {
             this.frame.UpdateVisibility();
         }
         else {
-            if (eventType == "layout") {
-                this.frame.UpdateFrame(); // TODO
-            }
+            // if (eventType == "layout") {
+            //     this.frame.UpdateFrame(); // TODO
+            // }
             this.frame.UpdateFrame();
         }    
     }
