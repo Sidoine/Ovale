@@ -224,3 +224,4 @@ class OvaleStanceClass extends OvaleStanceBase {
 }
 
 OvaleStance = new OvaleStanceClass();
+OvaleState.RegisterState(OvaleStance);

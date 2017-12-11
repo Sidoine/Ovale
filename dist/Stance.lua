@@ -232,3 +232,4 @@ local OvaleStanceClass = __class(OvaleStanceBase, {
     end
 })
 __exports.OvaleStance = OvaleStanceClass()
+OvaleState:RegisterState(__exports.OvaleStance)
