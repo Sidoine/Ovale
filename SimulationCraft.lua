@@ -227,7 +227,6 @@ local POTION_STAT = {
 
 local OPTIONAL_SKILLS = {
 	["volley"] = { class = "HUNTER", default = true },
-	["trap_launcher"] = { class = "HUNTER", default = true },
 	["time_warp"] = { class = "MAGE" },
 	["blink"] = { class = "MAGE" },
 	["storm_earth_and_fire"] = { class = "MONK" },
@@ -1923,9 +1922,6 @@ EmitAction = function(parseNode, nodeList, annotation)
 		elseif class == "HUNTER" and action == "kill_command" then
 			-- Kill Command requires that a pet that can move freely.
 			conditionCode = "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()"
-		elseif class == "HUNTER" and strsub(action, -5) == "_trap" then
-			annotation.trap_launcher = class
-			conditionCode = "CheckBoxOn(opt_trap_launcher)"
 		elseif class == "MAGE" and action == "arcane_brilliance" then
 			-- Only cast Arcane Brilliance if not already raid-buffed.
 			conditionCode = "BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1)"
