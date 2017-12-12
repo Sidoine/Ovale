@@ -227,6 +227,7 @@ local POTION_STAT = {
 
 local OPTIONAL_SKILLS = {
 	["volley"] = { class = "HUNTER", default = true },
+	["harpoon"] = { class = "HUNTER", specialization = "Survival", default = true },
 	["time_warp"] = { class = "MAGE" },
 	["blink"] = { class = "MAGE" },
 	["storm_earth_and_fire"] = { class = "MONK" },
