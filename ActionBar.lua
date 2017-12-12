@@ -146,8 +146,14 @@ end
 
 function OvaleActionBar:ACTIONBAR_SLOT_CHANGED(event, slot)
 	slot = tonumber(slot)
+	--self:Debug("event ACTIONBAR_SLOT_CHANGED with slot=%s", slot)
 	if slot == 0 then
 		self:UpdateActionSlots(event)
+	elseif ElvUI and slot then
+		for button in next, LibStub('LibActionButton-1.0-ElvUI').buttonRegistry do
+			local s = button:GetAttribute("action")
+			if (s == slot) then self:UpdateActionSlot(slot) end
+        end
 	elseif slot then
 	    -- Don't update the slot if this is an inactive bonus slot
 		local bonus = tonumber(API_GetBonusBarIndex()) * 12
@@ -176,16 +182,23 @@ function OvaleActionBar:UpdateActionSlots(event)
 	wipe(self.macro)
 	wipe(self.spell)
 
-	local start = 1
-	local bonus = tonumber(API_GetBonusBarIndex()) * 12
-	if bonus > 0 then
-		start = 13
-		for slot = bonus - 11, bonus do
+	if ElvUI then
+		for button in next, LibStub('LibActionButton-1.0-ElvUI').buttonRegistry do
+			local slot = button:GetAttribute("action")
+			self:UpdateActionSlot(slot)
+        end
+	else
+		local start = 1
+		local bonus = tonumber(API_GetBonusBarIndex()) * 12
+		if bonus > 0 then
+			start = 13
+			for slot = bonus - 11, bonus do
+				self:UpdateActionSlot(slot)
+			end
+		end
+		for slot = start, 72 do
 			self:UpdateActionSlot(slot)
 		end
-	end
-	for slot = start, 72 do
-		self:UpdateActionSlot(slot)
 	end
 	-- If a spell changes ID due to a stance change, the new ID hasn't taken
     -- effect when the UPDATE_BONUS_ACTIONBAR event occurs. Fire a timer so
