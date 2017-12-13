@@ -528,7 +528,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                     local baseTick, lastTickTime = aura.baseTick, aura.lastTickTime
                     local tick = baseTick
                     if lastTickTime then
-                        tick = timestamp - lastTickTime
+                        tick = now - lastTickTime
                     elseif  not baseTick then
                         self:Debug("    First tick seen of unknown periodic aura %s (%d) on %s.", name, spellId, destGUID)
                         local si = OvaleData.spellInfo[spellId]
@@ -536,7 +536,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                         tick = self:GetTickLength(spellId)
                     end
                     aura.baseTick = baseTick
-                    aura.lastTickTime = timestamp
+                    aura.lastTickTime = now
                     aura.tick = tick
                     self:Debug("    Updating %s (%s) on %s, tick=%s, lastTickTime=%s", name, spellId, destGUID, tick, lastTickTime)
                     Ovale.refreshNeeded[destGUID] = true

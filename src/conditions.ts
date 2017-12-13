@@ -4344,8 +4344,26 @@ l    */
         }
         return Compare(0, comparator, limit);
     }
+
+    /** Gets the remaining time until the next tick */
+    function TickTimeRemaining(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
+        let [auraId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
+        let [target, filter, mine] = ParseCondition(positionalParams, namedParams, state);
+        let aura = OvaleAura.GetAura(target, auraId, atTime, filter, mine);
+        if (OvaleAura.IsActiveAura(aura, atTime)) {
+            const lastTickTime = aura.lastTickTime || aura.start;
+            const tick = aura.tick || OvaleAura.GetTickLength(auraId, OvalePaperDoll.next);
+            let remainingTime = tick - (atTime - lastTickTime);
+            if (remainingTime && remainingTime > 0) {
+                return Compare(remainingTime, comparator, limit);
+            }
+        } 
+        return undefined;
+    }
+
     OvaleCondition.RegisterCondition("ticksremaining", false, TicksRemaining);
     OvaleCondition.RegisterCondition("ticksremain", false, TicksRemaining);
+    OvaleCondition.RegisterCondition("ticktimeremaining", false, TickTimeRemaining);
 }
 {
     /** Get the number of seconds elapsed since the player entered combat.

@@ -2148,8 +2148,23 @@ local function TicksRemaining(positionalParams, namedParams, state, atTime)
         end
         return Compare(0, comparator, limit)
     end
+local function TickTimeRemaining(positionalParams, namedParams, state, atTime)
+        local auraId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+        local target, filter, mine = ParseCondition(positionalParams, namedParams, state)
+        local aura = OvaleAura:GetAura(target, auraId, atTime, filter, mine)
+        if OvaleAura:IsActiveAura(aura, atTime) then
+            local lastTickTime = aura.lastTickTime or aura.start
+            local tick = aura.tick or OvaleAura:GetTickLength(auraId, OvalePaperDoll.next)
+            local remainingTime = tick - (atTime - lastTickTime)
+            if remainingTime and remainingTime > 0 then
+                return Compare(remainingTime, comparator, limit)
+            end
+        end
+        return nil
+    end
     OvaleCondition:RegisterCondition("ticksremaining", false, TicksRemaining)
     OvaleCondition:RegisterCondition("ticksremain", false, TicksRemaining)
+    OvaleCondition:RegisterCondition("ticktimeremaining", false, TickTimeRemaining)
 end
 do
 local function TimeInCombat(positionalParams, namedParams, state, atTime)

@@ -469,7 +469,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
                     let [baseTick, lastTickTime] = [aura.baseTick, aura.lastTickTime];
                     let tick = baseTick;
                     if (lastTickTime) {
-                        tick = timestamp - lastTickTime;
+                        tick = now - lastTickTime;
                     } else if (!baseTick) {
                         this.Debug("    First tick seen of unknown periodic aura %s (%d) on %s.", name, spellId, destGUID);
                         let si = OvaleData.spellInfo[spellId];
@@ -477,7 +477,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
                         tick = this.GetTickLength(spellId);
                     }
                     aura.baseTick = baseTick;
-                    aura.lastTickTime = timestamp;
+                    aura.lastTickTime = now;
                     aura.tick = tick;
                     this.Debug("    Updating %s (%s) on %s, tick=%s, lastTickTime=%s", name, spellId, destGUID, tick, lastTickTime);
                     Ovale.refreshNeeded[destGUID] = true;
