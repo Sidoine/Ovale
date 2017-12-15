@@ -51,7 +51,7 @@ local self_serial = 0
 local self_timesEvaluated = 0
 local self_icon = {}
 local NUMBER_PATTERN = "^%-?%d+%.?%d*$"
-local HasTalent = function(talentId)
+local function HasTalent(talentId)
     if OvaleSpellBook:IsKnownTalent(talentId) then
         return OvaleSpellBook:GetTalentPoints(talentId) > 0
     else
@@ -59,8 +59,7 @@ local HasTalent = function(talentId)
         return false
     end
 end
-
-local RequireValue = function(value)
+local function RequireValue(value)
     local required = (sub(tostring(value), 1, 1) ~= "!")
     if  not required then
         value = sub(value, 2)
@@ -70,52 +69,43 @@ local RequireValue = function(value)
     end
     return value, required
 end
-
-local TestConditionLevel = function(value)
+local function TestConditionLevel(value)
     return OvalePaperDoll.level >= value
 end
-
-local TestConditionMaxLevel = function(value)
+local function TestConditionMaxLevel(value)
     return OvalePaperDoll.level <= value
 end
-
-local TestConditionSpecialization = function(value)
+local function TestConditionSpecialization(value)
     local spec, required = RequireValue(value)
     local isSpec = OvalePaperDoll:IsSpecialization(spec)
     return (required and isSpec) or ( not required and  not isSpec)
 end
-
-local TestConditionStance = function(value)
+local function TestConditionStance(value)
     self_compileOnStances = true
     local stance, required = RequireValue(value)
     local isStance = OvaleStance:IsStance(stance, nil)
     return (required and isStance) or ( not required and  not isStance)
 end
-
-local TestConditionSpell = function(value)
+local function TestConditionSpell(value)
     local spell, required = RequireValue(value)
     local hasSpell = OvaleSpellBook:IsKnownSpell(spell)
     return (required and hasSpell) or ( not required and  not hasSpell)
 end
-
-local TestConditionTalent = function(value)
+local function TestConditionTalent(value)
     local talent, required = RequireValue(value)
     local hasTalent = HasTalent(talent)
     return (required and hasTalent) or ( not required and  not hasTalent)
 end
-
-local TestConditionEquipped = function(value)
+local function TestConditionEquipped(value)
     local item, required = RequireValue(value)
     local hasItemEquipped = OvaleEquipment:HasEquippedItem(item)
     return (required and hasItemEquipped) or ( not required and  not hasItemEquipped)
 end
-
-local TestConditionTrait = function(value)
+local function TestConditionTrait(value)
     local trait, required = RequireValue(value)
     local hasTrait = OvaleArtifact:HasTrait(trait)
     return (required and hasTrait) or ( not required and  not hasTrait)
 end
-
 local TEST_CONDITION_DISPATCH = {
     if_spell = TestConditionSpell,
     if_equipped = TestConditionEquipped,
@@ -127,7 +117,7 @@ local TEST_CONDITION_DISPATCH = {
     trait = TestConditionTrait,
     pertrait = TestConditionTrait
 }
-local TestConditions = function(positionalParams, namedParams)
+local function TestConditions(positionalParams, namedParams)
     __exports.OvaleCompile:StartProfiling("OvaleCompile_TestConditions")
     local boolean = true
     for param, dispatch in pairs(TEST_CONDITION_DISPATCH) do
@@ -184,8 +174,7 @@ local TestConditions = function(positionalParams, namedParams)
     __exports.OvaleCompile:StopProfiling("OvaleCompile_TestConditions")
     return boolean
 end
-
-local EvaluateAddCheckBox = function(node)
+local function EvaluateAddCheckBox(node)
     local ok = true
     local name, positionalParams, namedParams = node.name, node.positionalParams, node.namedParams
     if TestConditions(positionalParams, namedParams) then
@@ -206,8 +195,7 @@ local EvaluateAddCheckBox = function(node)
     end
     return ok
 end
-
-local EvaluateAddIcon = function(node)
+local function EvaluateAddIcon(node)
     local ok = true
     local positionalParams, namedParams = node.positionalParams, node.namedParams
     if TestConditions(positionalParams, namedParams) then
@@ -215,8 +203,7 @@ local EvaluateAddIcon = function(node)
     end
     return ok
 end
-
-local EvaluateAddListItem = function(node)
+local function EvaluateAddListItem(node)
     local ok = true
     local name, item, positionalParams, namedParams = node.name, node.item, node.positionalParams, node.namedParams
     if TestConditions(positionalParams, namedParams) then
@@ -240,8 +227,7 @@ local EvaluateAddListItem = function(node)
     end
     return ok
 end
-
-local EvaluateItemInfo = function(node)
+local function EvaluateItemInfo(node)
     local ok = true
     local itemId, positionalParams, namedParams = node.itemId, node.positionalParams, node.namedParams
     if itemId and TestConditions(positionalParams, namedParams) then
@@ -266,8 +252,7 @@ local EvaluateItemInfo = function(node)
     end
     return ok
 end
-
-local EvaluateItemRequire = function(node)
+local function EvaluateItemRequire(node)
     local ok = true
     local itemId, positionalParams, namedParams = node.itemId, node.positionalParams, node.namedParams
     if TestConditions(positionalParams, namedParams) then
@@ -287,8 +272,7 @@ local EvaluateItemRequire = function(node)
     end
     return ok
 end
-
-local EvaluateList = function(node)
+local function EvaluateList(node)
     local ok = true
     local name, positionalParams = node.name, node.positionalParams, node.namedParams
     local listDB
@@ -310,8 +294,7 @@ local EvaluateList = function(node)
     OvaleData[listDB][name] = list
     return ok
 end
-
-local EvaluateScoreSpells = function(node)
+local function EvaluateScoreSpells(node)
     local ok = true
     local positionalParams = node.positionalParams, node.namedParams
     for _, _spellId in ipairs(positionalParams) do
@@ -325,8 +308,7 @@ local EvaluateScoreSpells = function(node)
     end
     return ok
 end
-
-local EvaluateSpellAuraList = function(node)
+local function EvaluateSpellAuraList(node)
     local ok = true
     local spellId, positionalParams, namedParams = node.spellId, node.positionalParams, node.namedParams
     if  not spellId then
@@ -361,8 +343,7 @@ local EvaluateSpellAuraList = function(node)
     end
     return ok
 end
-
-local EvaluateSpellInfo = function(node)
+local function EvaluateSpellInfo(node)
     local addpower = {}
     for powertype in pairs(OvalePower.POWER_INFO) do
         local key = "add" .. powertype
@@ -428,8 +409,7 @@ local EvaluateSpellInfo = function(node)
     end
     return ok
 end
-
-local EvaluateSpellRequire = function(node)
+local function EvaluateSpellRequire(node)
     local ok = true
     local spellId, positionalParams, namedParams = node.spellId, node.positionalParams, node.namedParams
     if TestConditions(positionalParams, namedParams) then
@@ -449,8 +429,7 @@ local EvaluateSpellRequire = function(node)
     end
     return ok
 end
-
-local AddMissingVariantSpells = function(annotation)
+local function AddMissingVariantSpells(annotation)
     if annotation.functionReference then
         for _, node in ipairs(annotation.functionReference) do
             local positionalParams = node.positionalParams, node.namedParams
@@ -479,8 +458,7 @@ local AddMissingVariantSpells = function(annotation)
         end
     end
 end
-
-local AddToBuffList = function(buffId, statName, isStacking)
+local function AddToBuffList(buffId, statName, isStacking)
     if statName then
         for _, useName in pairs(OvaleData.STAT_USE_NAMES) do
             if isStacking or  not find(useName, "_stacking_") then
@@ -516,7 +494,6 @@ local AddToBuffList = function(buffId, statName, isStacking)
         end
     end
 end
-
 local function isTable(t)
     return type(t) == "table"
 end

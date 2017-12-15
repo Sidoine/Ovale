@@ -27,7 +27,7 @@ let self_timesEvaluated = 0;
 let self_icon: LuaArray<AstNode> = {
 }
 let NUMBER_PATTERN = "^%-?%d+%.?%d*$";
-const HasTalent = function(talentId) {
+function HasTalent(talentId) {
     if (OvaleSpellBook.IsKnownTalent(talentId)) {
         return OvaleSpellBook.GetTalentPoints(talentId) > 0;
     } else {
@@ -35,7 +35,7 @@ const HasTalent = function(talentId) {
         return false;
     }
 }
-const RequireValue = function(value) {
+function RequireValue(value) {
     let required = (sub(tostring(value), 1, 1) != "!");
     if (!required) {
         value = sub(value, 2);
@@ -45,39 +45,39 @@ const RequireValue = function(value) {
     }
     return [value, required];
 }
-const TestConditionLevel = function(value) {
+function TestConditionLevel(value) {
     return OvalePaperDoll.level >= value;
 }
-const TestConditionMaxLevel = function(value) {
+function TestConditionMaxLevel(value) {
     return OvalePaperDoll.level <= value;
 }
-const TestConditionSpecialization = function(value) {
+function TestConditionSpecialization(value) {
     let [spec, required] = RequireValue(value);
     let isSpec = OvalePaperDoll.IsSpecialization(spec);
     return (required && isSpec) || (!required && !isSpec);
 }
-const TestConditionStance = function(value) {
+function TestConditionStance(value) {
     self_compileOnStances = true;
     let [stance, required] = RequireValue(value);
     let isStance = OvaleStance.IsStance(stance, undefined);
     return (required && isStance) || (!required && !isStance);
 }
-const TestConditionSpell = function(value) {
+function TestConditionSpell(value) {
     let [spell, required] = RequireValue(value);
     let hasSpell = OvaleSpellBook.IsKnownSpell(spell);
     return (required && hasSpell) || (!required && !hasSpell);
 }
-const TestConditionTalent = function(value) {
+function TestConditionTalent(value) {
     let [talent, required] = RequireValue(value);
     let hasTalent = HasTalent(talent);
     return (required && hasTalent) || (!required && !hasTalent);
 }
-const TestConditionEquipped = function(value) {
+function TestConditionEquipped(value) {
     let [item, required] = RequireValue(value);
     let hasItemEquipped = OvaleEquipment.HasEquippedItem(item);
     return (required && hasItemEquipped) || (!required && !hasItemEquipped);
 }
-const TestConditionTrait = function(value) {
+function TestConditionTrait(value) {
     let [trait, required] = RequireValue(value);
     let hasTrait = OvaleArtifact.HasTrait(trait);
     return (required && hasTrait) || (!required && !hasTrait);
@@ -93,7 +93,7 @@ let TEST_CONDITION_DISPATCH = {
     trait: TestConditionTrait,
     pertrait: TestConditionTrait
 }
-const TestConditions = function(positionalParams, namedParams) {
+function TestConditions(positionalParams, namedParams) {
     OvaleCompile.StartProfiling("OvaleCompile_TestConditions");
     let boolean = true;
     for (const [param, dispatch] of pairs(TEST_CONDITION_DISPATCH)) {
@@ -147,7 +147,7 @@ const TestConditions = function(positionalParams, namedParams) {
     OvaleCompile.StopProfiling("OvaleCompile_TestConditions");
     return boolean;
 }
-const EvaluateAddCheckBox = function(node) {
+function EvaluateAddCheckBox(node) {
     let ok = true;
     let [name, positionalParams, namedParams] = [node.name, node.positionalParams, node.namedParams];
     if (TestConditions(positionalParams, namedParams)) {
@@ -169,7 +169,7 @@ const EvaluateAddCheckBox = function(node) {
     }
     return ok;
 }
-const EvaluateAddIcon = function(node) {
+function EvaluateAddIcon(node) {
     let ok = true;
     let [positionalParams, namedParams] = [node.positionalParams, node.namedParams];
     if (TestConditions(positionalParams, namedParams)) {
@@ -177,7 +177,7 @@ const EvaluateAddIcon = function(node) {
     }
     return ok;
 }
-const EvaluateAddListItem = function(node) {
+function EvaluateAddListItem(node) {
     let ok = true;
     let [name, item, positionalParams, namedParams] = [node.name, node.item, node.positionalParams, node.namedParams];
     if (TestConditions(positionalParams, namedParams)) {
@@ -202,7 +202,7 @@ const EvaluateAddListItem = function(node) {
     }
     return ok;
 }
-const EvaluateItemInfo = function(node) {
+function EvaluateItemInfo(node) {
     let ok = true;
     let [itemId, positionalParams, namedParams] = [node.itemId, node.positionalParams, node.namedParams];
     if (itemId && TestConditions(positionalParams, namedParams)) {
@@ -228,7 +228,7 @@ const EvaluateItemInfo = function(node) {
     }
     return ok;
 }
-const EvaluateItemRequire = function(node) {
+function EvaluateItemRequire(node) {
     let ok = true;
     let [itemId, positionalParams, namedParams] = [node.itemId, node.positionalParams, node.namedParams];
     if (TestConditions(positionalParams, namedParams)) {
@@ -249,7 +249,7 @@ const EvaluateItemRequire = function(node) {
     }
     return ok;
 }
-const EvaluateList = function(node) {
+function EvaluateList(node) {
     let ok = true;
     let [name, positionalParams, ] = [node.name, node.positionalParams, node.namedParams];
     let listDB;
@@ -272,7 +272,7 @@ const EvaluateList = function(node) {
     OvaleData[listDB][name] = list;
     return ok;
 }
-const EvaluateScoreSpells = function(node) {
+function EvaluateScoreSpells(node) {
     let ok = true;
     let [positionalParams,] = [node.positionalParams, node.namedParams];
     for (const [, _spellId] of ipairs(positionalParams)) {
@@ -286,7 +286,7 @@ const EvaluateScoreSpells = function(node) {
     }
     return ok;
 }
-const EvaluateSpellAuraList = function(node) {
+function EvaluateSpellAuraList(node) {
     let ok = true;
     let [spellId, positionalParams, namedParams] = [node.spellId, node.positionalParams, node.namedParams];
     if (!spellId) {
@@ -322,7 +322,7 @@ const EvaluateSpellAuraList = function(node) {
     }
     return ok;
 }
-const EvaluateSpellInfo = function(node) {
+function EvaluateSpellInfo(node) {
     let addpower = {
     }
     for (const [powertype,] of pairs(OvalePower.POWER_INFO)) {
@@ -390,7 +390,7 @@ const EvaluateSpellInfo = function(node) {
     }
     return ok;
 }
-const EvaluateSpellRequire = function(node) {
+function EvaluateSpellRequire(node) {
     let ok = true;
     let [spellId, positionalParams, namedParams] = [node.spellId, node.positionalParams, node.namedParams];
     if (TestConditions(positionalParams, namedParams)) {
@@ -411,7 +411,7 @@ const EvaluateSpellRequire = function(node) {
     }
     return ok;
 }
-const AddMissingVariantSpells = function(annotation: AstAnnotation) {
+function AddMissingVariantSpells(annotation: AstAnnotation) {
     if (annotation.functionReference) {
         for (const [, node] of ipairs(annotation.functionReference)) {
             let [positionalParams,] = [node.positionalParams, node.namedParams];
@@ -440,7 +440,7 @@ const AddMissingVariantSpells = function(annotation: AstAnnotation) {
         }
     }
 }
-const AddToBuffList = function(buffId, statName?, isStacking?) {
+function AddToBuffList(buffId, statName?, isStacking?) {
     if (statName) {
         for (const [, useName] of pairs(OvaleData.STAT_USE_NAMES)) {
             if (isStacking || !truthy(find(useName, "_stacking_"))) {
