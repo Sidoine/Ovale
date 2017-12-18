@@ -86,7 +86,7 @@ local function SetValue(node, value, origin, rate)
     result.rate = rate or 0
     return result
 end
-local AsValue = function(atTime, timeSpan, node)
+local function AsValue(atTime, timeSpan, node)
     local value, origin, rate
     if node and isValueNode(node) then
         value, origin, rate = node.value, node.origin, node.rate
@@ -97,7 +97,6 @@ local AsValue = function(atTime, timeSpan, node)
     end
     return value, origin, rate, timeSpan
 end
-
 local GetTimeSpan = function(node, defaultTimeSpan)
     local timeSpan = self_timeSpan[node]
     if timeSpan then
@@ -379,10 +378,10 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
             self:StartProfiling("OvaleBestAction_Compute")
             local timeSpan = GetTimeSpan(element)
             local result
-            local rawTimeSpanA = self:Compute(element.child[1], state, atTime)
-            local a, b, c, timeSpanA = AsValue(atTime, rawTimeSpanA)
-            local rawTimeSpanB = self:Compute(element.child[2], state, atTime)
-            local x, y, z, timeSpanB = AsValue(atTime, rawTimeSpanB)
+            local rawTimeSpanA, nodeA = self:Compute(element.child[1], state, atTime)
+            local a, b, c, timeSpanA = AsValue(atTime, rawTimeSpanA, nodeA)
+            local rawTimeSpanB, nodeB = self:Compute(element.child[2], state, atTime)
+            local x, y, z, timeSpanB = AsValue(atTime, rawTimeSpanB, nodeB)
             timeSpanA:Intersect(timeSpanB, timeSpan)
             if timeSpan:Measure() == 0 then
                 __exports.OvaleBestAction:Log("[%d]    arithmetic '%s' returns %s with zero measure", element.nodeId, element.operator, timeSpan)

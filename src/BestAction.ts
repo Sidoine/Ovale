@@ -73,7 +73,7 @@ function SetValue(node, value?, origin?, rate?): Element {
     result.rate = rate || 0;
     return result;
 }
-const AsValue = function(atTime: number, timeSpan: OvaleTimeSpan, node?: AstNode):[number, number, number, OvaleTimeSpan] {
+function AsValue(atTime: number, timeSpan: OvaleTimeSpan, node?: AstNode):[number, number, number, OvaleTimeSpan] {
     let value: number, origin: number, rate: number;
     if (node && isValueNode(node)) {
         [value, origin, rate] = [<number>node.value, node.origin, node.rate];
@@ -507,10 +507,10 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         this.StartProfiling("OvaleBestAction_Compute");
         let timeSpan = GetTimeSpan(element);
         let result: Element;
-        const [rawTimeSpanA] = this.Compute(element.child[1], state, atTime);
-        let [a, b, c, timeSpanA] = AsValue(atTime, rawTimeSpanA);
-        const [rawTimeSpanB] = this.Compute(element.child[2], state, atTime);
-        let [x, y, z, timeSpanB] = AsValue(atTime, rawTimeSpanB);
+        const [rawTimeSpanA, nodeA] = this.Compute(element.child[1], state, atTime);
+        let [a, b, c, timeSpanA] = AsValue(atTime, rawTimeSpanA, nodeA);
+        const [rawTimeSpanB, nodeB] = this.Compute(element.child[2], state, atTime);
+        let [x, y, z, timeSpanB] = AsValue(atTime, rawTimeSpanB, nodeB);
         timeSpanA.Intersect(timeSpanB, timeSpan);
         if (timeSpan.Measure() == 0) {
             OvaleBestAction.Log("[%d]    arithmetic '%s' returns %s with zero measure", element.nodeId, element.operator, timeSpan);
