@@ -407,7 +407,7 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
                     n = A * z + B * c
                 elseif operator == "/" then
                     if B == 0 then
-                        self:Error("[%d] Division by 0", element.nodeId)
+                        Ovale:OneTimeMessage("[%d] Division by 0 in %s", element.nodeId, element.asString)
                         B = 0.00001
                     end
                     l = A / B

@@ -692,7 +692,7 @@ do
     # REASON: To make shred show up if Rake is not on a target about to die.
     AddFunction Generators_Shred
     {
-        target.DebuffRemaining(rake_debuff) > { PowerCost(shred) + PowerCost(rake) - Energy() } / EnergyRegenRate() 
+        Stance(druid_cat_form) and target.DebuffRemaining(rake_debuff) > { PowerCost(shred) + PowerCost(rake) - Energy() } / EnergyRegenRate() 
             or BuffPresent(clearcasting_buff)
             or target.TimeToDie() <= 6 + target.DebuffRemaining(rake_debuff)
     }

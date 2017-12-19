@@ -536,7 +536,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
                 n = A * z + B * c;
             } else if (operator == "/") {
                 if (B === 0) {
-                    this.Error("[%d] Division by 0", element.nodeId);
+                    Ovale.OneTimeMessage("[%d] Division by 0 in %s", element.nodeId, element.asString);
                     B = 0.00001;
                 }
                 l = A / B;
