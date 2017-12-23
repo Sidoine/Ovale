@@ -108,8 +108,8 @@ class OvaleActionBarClass extends OvaleActionBarBase {
             this.UpdateActionSlots(event);
 		} else if (ElvUI) {
 			let elvUIButtons = LibStub('LibActionButton-1.0-ElvUI').buttonRegistry;
-			for (const [, v] of ipairs(elvUIButtons)) {
-				let s = v.GetAttribute("action");
+			for (const btn of pairs(elvUIButtons)) {
+				let s = btn.GetAttribute("action");
 				if (s == slot) {
 					this.UpdateActionSlot(slot);
 				}
@@ -139,8 +139,8 @@ class OvaleActionBarClass extends OvaleActionBarBase {
         wipe(this.spell);
         if (ElvUI) {
 			let elvUIButtons = LibStub('LibActionButton-1.0-ElvUI').buttonRegistry;
-			for (const [, v] of ipairs(elvUIButtons)) {
-				let s = v.GetAttribute("action");
+			for (const btn of ipairs(elvUIButtons)) {
+				let s = btn.GetAttribute("action");
 				this.UpdateActionSlot(s);
 			}
 		} else {
