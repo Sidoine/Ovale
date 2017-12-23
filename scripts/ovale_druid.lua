@@ -59,6 +59,14 @@ AddFunction GuardianDefaultShortCDActions
 AddFunction GuardianDefaultMainActions
 {
 	if not Stance(druid_bear_form) Spell(bear_form)
+	if not BuffExpires(incarnation_guardian_of_ursoc_buff) 
+	{
+		if (BuffRefreshable(pulverize_buff)) Spell(pulverize)
+		if target.DebuffStacks(thrash_bear_debuff) < SpellData(thrash_bear_debuff max_stacks) Spell(thrash_bear)
+		if Talent(soul_of_the_forest_talent) Spell(mangle)
+		Spell(thrash_bear)
+	}
+	
 	Spell(mangle)
 	if not BuffExpires(galactic_guardian_buff) Spell(moonfire)
 	Spell(thrash_bear)
@@ -76,7 +84,15 @@ AddFunction GuardianDefaultAoEActions
 {
 	if not Stance(druid_bear_form) Spell(bear_form)
 	if Enemies() >= 4 and HealthPercent() <= 80 Spell(lunar_beam)
-	if not BuffExpires(galactic_guardian_buff) Spell(moonfire)
+	
+	if not BuffExpires(incarnation_guardian_of_ursoc_buff) 
+	{
+		if (BuffRefreshable(pulverize_buff)) Spell(pulverize)
+		if target.DebuffStacks(thrash_bear_debuff) < SpellData(thrash_bear_debuff max_stacks) Spell(thrash_bear)
+		if Talent(soul_of_the_forest_talent) and Enemies() <= 3 Spell(mangle)
+		Spell(thrash_bear)
+	}
+	
 	Spell(thrash_bear)
 	Spell(mangle)
 	if (target.DebuffStacks(thrash_bear_debuff) >= 2 and BuffRefreshable(pulverize_buff) or target.DebuffStacks(thrash_bear_debuff) >= 5) Spell(pulverize)
