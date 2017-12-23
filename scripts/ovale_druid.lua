@@ -132,9 +132,9 @@ AddFunction GuardianDefaultCdActions
 		if (HasEquippedItem(shifting_cosmic_sliver)) Spell(survival_instincts)
 		Item(Trinket0Slot usable=1 text=13)
 		Item(Trinket1Slot usable=1 text=14)
-		Spell(barkskin)
-		Spell(rage_of_the_sleeper)
 		Spell(survival_instincts)
+		Spell(rage_of_the_sleeper)
+		Spell(barkskin)
 		if CheckBoxOn(opt_use_consumables) Item(unbending_potion usable=1)
 	}
 }
