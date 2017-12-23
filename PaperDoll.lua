@@ -25,6 +25,7 @@ local select = select
 local tonumber = tonumber
 local type = type
 local API_GetCombatRating = GetCombatRating
+local API_GetCombatRatingBonus = GetCombatRatingBonus
 local API_GetCritChance = GetCritChance
 local API_GetMastery = GetMastery
 local API_GetMasteryEffect = GetMasteryEffect
@@ -47,6 +48,7 @@ local API_UnitSpellHaste = UnitSpellHaste
 local API_UnitStat = UnitStat
 local CR_CRIT_MELEE = CR_CRIT_MELEE
 local CR_HASTE_MELEE = CR_HASTE_MELEE
+local CR_VERSATILITY_DAMAGE_DONE = CR_VERSATILITY_DAMAGE_DONE
 
 -- Register for debugging messages.
 OvaleDebug:RegisterDebugging(OvalePaperDoll)
@@ -131,6 +133,9 @@ OvalePaperDoll.STAT_NAME = {
 	hasteRating = true,
 	masteryRating = true,
 	multistrikeRating = true,
+	versatilityRating = true,
+-- Percent chance to versatility.
+	versatility = true,
 -- Normalized weapon damage of mainhand and offhand weapons.
 	mainHandWeaponDamage = true,
 	offHandWeaponDamage = true,
@@ -166,6 +171,8 @@ OvalePaperDoll.critRating = 0
 OvalePaperDoll.hasteRating = 0
 OvalePaperDoll.masteryRating = 0
 OvalePaperDoll.multistrikeRating = 0
+OvalePaperDoll.versatilityRating = 0
+OvalePaperDoll.versatility = 0
 OvalePaperDoll.mainHandWeaponDamage = 0
 OvalePaperDoll.offHandWeaponDamage = 0
 OvalePaperDoll.baseDamageMultiplier = 1
@@ -234,6 +241,8 @@ function OvalePaperDoll:COMBAT_RATING_UPDATE(event)
 	self.spellCrit = API_GetSpellCritChance(OVALE_SPELLDAMAGE_SCHOOL[self.class])
 	self.critRating = API_GetCombatRating(CR_CRIT_MELEE)
 	self.hasteRating = API_GetCombatRating(CR_HASTE_MELEE)
+	self.versatilityRating = API_GetCombatRating(CR_VERSATILITY_DAMAGE_DONE)
+	self.versatility = API_GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_DONE)
 	self.snapshotTime = API_GetTime()
 	Ovale.refreshNeeded[self_playerGUID] = true
 	self:StopProfiling("OvalePaperDoll_UpdateStats")
@@ -561,6 +570,8 @@ statePrototype.critRating = nil
 statePrototype.hasteRating = nil
 statePrototype.masteryRating = nil
 statePrototype.multistrikeRating = nil
+statePrototype.versatilityRating = nil
+statePrototype.versatility = nil
 statePrototype.mainHandWeaponDamage = nil
 statePrototype.offHandWeaponDamage = nil
 statePrototype.baseDamageMultiplier = nil
@@ -594,6 +605,8 @@ function OvalePaperDoll:InitializeState(state)
 	state.hasteRating = 0
 	state.masteryRating = 0
 	state.multistrikeRating = 0
+	state.versatilityRating = 0
+	state.versatility = 0
 	state.mainHandWeaponDamage = 0
 	state.offHandWeaponDamage = 0
 	state.baseDamageMultiplier = 1
