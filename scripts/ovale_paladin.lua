@@ -26,8 +26,11 @@ AddFunction ProtectionSelfHealCondition
 
 AddFunction PaladinHealMe
 {
-	if ProtectionSelfHealCondition() Spell(light_of_the_protector)
-	if (HealthPercent() < 35) UseHealthPotions()
+	unless(DebuffPresent(healing_immunity_debuff)) 
+	{
+		if ProtectionSelfHealCondition() Spell(light_of_the_protector)
+		if (HealthPercent() < 35) UseHealthPotions()
+	}
 }
 
 AddFunction ProtectionHasProtectiveCooldown

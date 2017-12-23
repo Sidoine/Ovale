@@ -16,13 +16,16 @@ AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=ve
 
 AddFunction VengeanceHealMe
 {
-	if (HealthPercent() < 70) 
+	unless(DebuffPresent(healing_immunity_debuff)) 
 	{
-		Spell(fel_devastation)
-		if (SoulFragments() >= 4) Spell(spirit_bomb)
-		if (HealthPercent() < 50) Spell(soul_cleave)
+		if (HealthPercent() < 70) 
+		{
+			Spell(fel_devastation)
+			if (SoulFragments() >= 4) Spell(spirit_bomb)
+			if (HealthPercent() < 50) Spell(soul_cleave)
+		}
+		if (HealthPercent() < 35) UseHealthPotions()
 	}
-	if (HealthPercent() < 35) UseHealthPotions()
 }
 
 AddFunction VengeanceInfernalStrike

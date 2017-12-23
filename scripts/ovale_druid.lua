@@ -23,15 +23,17 @@ AddFunction FrenziedRegenHealTotal
 
 AddFunction GuardianHealMe
 {
-	if BuffExpires(frenzied_regeneration_buff) 
+	unless(DebuffPresent(healing_immunity_debuff)) 
 	{
-		if (FrenziedRegenHealTotal() >= MaxHealth() * 0.25) Spell(frenzied_regeneration)
-		if (SpellCharges(frenzied_regeneration) >= 2 and (FrenziedRegenHealTotal() <= HealthMissing()) and (FrenziedRegenHealTotal() > MaxHealth() * 0.10)) Spell(frenzied_regeneration)
+		if BuffExpires(frenzied_regeneration_buff) and HealthPercent() <= 70 
+		{
+			if (FrenziedRegenHealTotal() >= MaxHealth() * 0.20) Spell(frenzied_regeneration)
+		}
+		
+		if HealthPercent() <= 50 Spell(lunar_beam)
+		if HealthPercent() <= 80 and not InCombat() Spell(regrowth)
+		if HealthPercent() < 35 UseHealthPotions()
 	}
-	
-	if HealthPercent() <= 50 Spell(lunar_beam)
-	if HealthPercent() <= 80 and not InCombat() Spell(regrowth)
-	if (HealthPercent() < 35) UseHealthPotions()
 }
 
 AddFunction GuardianGetInMeleeRange

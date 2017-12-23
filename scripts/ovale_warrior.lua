@@ -17,9 +17,12 @@ AddCheckBox(opt_warrior_protection_aoe L(AOE) default specialization=protection)
 
 AddFunction ProtectionHealMe
 {
-	if HealthPercent() < 70 Spell(victory_rush)
-	if HealthPercent() < 85 Spell(impending_victory)
-	if (HealthPercent() < 35) UseHealthPotions()
+	unless(DebuffPresent(healing_immunity_debuff)) 
+	{
+		if HealthPercent() < 70 Spell(victory_rush)
+		if HealthPercent() < 85 Spell(impending_victory)
+		if (HealthPercent() < 35) UseHealthPotions()
+	}
 }
 
 AddFunction ProtectionGetInMeleeRange

@@ -18,10 +18,16 @@ AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=br
 
 AddFunction BrewmasterHealMe
 {
-	if (HealthPercent() < 35) Spell(healing_elixir)
-	if (HealthPercent() < 35) Spell(expel_harm)
-	if (HealthPercent() <= 100 - (15 * 2.6)) Spell(healing_elixir)
-	if (HealthPercent() < 35) UseHealthPotions()
+	unless(DebuffPresent(healing_immunity_debuff)) 
+	{
+		if (HealthPercent() < 35) 
+		{
+			Spell(healing_elixir)
+			Spell(expel_harm)
+		}
+		if (HealthPercent() <= 100 - (15 * 2.6)) Spell(healing_elixir)
+		if (HealthPercent() < 35) UseHealthPotions()
+	}
 }
 
 AddFunction StaggerPercentage

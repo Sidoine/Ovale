@@ -56,11 +56,14 @@ AddFunction BloodDefaultAoEActions
 
 AddFunction BloodHealMe
 {
-	if HealthPercent() <= 70 Spell(death_strike)
-	if (DamageTaken(5) * 0.2) > (Health() / 100 * 25) Spell(death_strike)
-	if (BuffStacks(bone_shield_buff) * 3) > (100 - HealthPercent()) Spell(tombstone)
-	if HealthPercent() <= 70 Spell(consumption)
-	if (HealthPercent() < 35) UseHealthPotions()
+	unless(DebuffPresent(healing_immunity_debuff)) 
+	{
+		if HealthPercent() <= 70 Spell(death_strike)
+		if (DamageTaken(5) * 0.2) > (Health() / 100 * 25) Spell(death_strike)
+		if (BuffStacks(bone_shield_buff) * 3) > (100 - HealthPercent()) Spell(tombstone)
+		if HealthPercent() <= 70 Spell(consumption)
+		if (HealthPercent() < 35) UseHealthPotions()
+	}
 }
 
 AddFunction BloodDefaultCdActions
