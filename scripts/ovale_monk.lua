@@ -51,10 +51,10 @@ AddFunction BrewmasterDefaultShortCDActions
 	# keep ISB up always when taking dmg
 	if BuffRemaining(ironskin_brew_buff) < BrewMasterIronskinMin() Spell(ironskin_brew text=min)
 	
-	# keep stagger below 100% (or 60% when BOB is up)
-	if (StaggerPercentage() >= 100 or (StaggerPercentage() >= 60 and SpellCooldown(black_ox_brew) <= 0)) Spell(purifying_brew)
+	# keep stagger below 100% (or 30% when BOB is up)
+	if (StaggerPercentage() >= 100 or (StaggerPercentage() >= 30 and Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 0)) Spell(purifying_brew)
 	# use black_ox_brew when at 0 charges and low energy (or in an emergency)
-	if ((SpellCharges(purifying_brew) == 0) and (Energy() < 40 or StaggerPercentage() >= 60)) Spell(black_ox_brew)
+	if ((SpellCharges(purifying_brew) == 0) and (Energy() < 40 or StaggerPercentage() >= 60 or BuffRemaining(ironskin_brew_buff) < BrewMasterIronskinMin())) Spell(black_ox_brew)
 
 	# heal mean
 	BrewmasterHealMe()
@@ -66,8 +66,8 @@ AddFunction BrewmasterDefaultShortCDActions
 		# purify heavy stagger when we have enough ISB
 		if (StaggerPercentage() >= 60 and (BuffRemaining(ironskin_brew_buff) >= 2*BaseDuration(ironskin_brew_buff))) Spell(purifying_brew)
 
-		# always bank 1 charge (means we need to have at least 2 charges)
-		unless (SpellCharges(ironskin_brew count=0) <= 2)
+		# always bank 1 charge (or bank 2 with light_brewing)
+		unless (SpellCharges(ironskin_brew count=0) <= SpellData(ironskin_brew charges)-2)
 		{
 			# never be at (almost) max charges 
 			unless (SpellFullRecharge(ironskin_brew) > 3)
