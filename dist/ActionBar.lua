@@ -72,6 +72,9 @@ local OvaleActionBarClass = __class(OvaleActionBarBase, {
         self:RegisterEvent("UPDATE_BONUS_ACTIONBAR", function(event)
             return self:UpdateActionSlots(event)
         end)
+        self:RegisterEvent("SPELLS_CHANGED", function(event)
+            return self:UpdateActionSlots(event)
+        end)
         self:RegisterMessage("Ovale_StanceChanged", function(event)
             return self:UpdateActionSlots(event)
         end)
@@ -108,6 +111,7 @@ local OvaleActionBarClass = __class(OvaleActionBarBase, {
             key = gsub(key, "MINUS", "-")
             key = gsub(key, "MULTIPLY", "*")
             key = gsub(key, "DIVIDE", "/")
+            key = gsub(key, "BUTTON", "B")
         end
         return key
     end,
@@ -120,6 +124,7 @@ local OvaleActionBarClass = __class(OvaleActionBarBase, {
         self:UnregisterEvent("PLAYER_ENTERING_WORLD")
         self:UnregisterEvent("UPDATE_BINDINGS")
         self:UnregisterEvent("UPDATE_BONUS_ACTIONBAR")
+        self:UnregisterEvent("SPELLS_CHANGED")
         self:UnregisterMessage("Ovale_StanceChanged")
         self:UnregisterMessage("Ovale_TalentsChanged")
     end,
@@ -127,6 +132,14 @@ local OvaleActionBarClass = __class(OvaleActionBarBase, {
         slot = tonumber(slot)
         if slot == 0 then
             self:UpdateActionSlots(event)
+        elseif ElvUI then
+            local elvUIButtons = LibStub("LibActionButton-1.0-ElvUI").buttonRegistry
+            for _, v in ipairs(elvUIButtons) do
+                local s = v.GetAttribute("action")
+                if s == slot then
+                    self:UpdateActionSlot(slot)
+                end
+            end
         elseif slot then
             local bonus = tonumber(GetBonusBarIndex()) * 12
             local bonusStart = (bonus > 0) and (bonus - 11) or 1
@@ -150,19 +163,27 @@ local OvaleActionBarClass = __class(OvaleActionBarBase, {
         wipe(self.item)
         wipe(self.macro)
         wipe(self.spell)
-        local start = 1
-        local bonus = tonumber(GetBonusBarIndex()) * 12
-        if bonus > 0 then
-            start = 13
-            for slot = bonus - 11, bonus, 1 do
+        if ElvUI then
+            local elvUIButtons = LibStub("LibActionButton-1.0-ElvUI").buttonRegistry
+            for _, v in ipairs(elvUIButtons) do
+                local s = v.GetAttribute("action")
+                self:UpdateActionSlot(s)
+            end
+        else
+            local start = 1
+            local bonus = tonumber(GetBonusBarIndex()) * 12
+            if bonus > 0 then
+                start = 13
+                for slot = bonus - 11, bonus, 1 do
+                    self:UpdateActionSlot(slot)
+                end
+            end
+            for slot = start, 72, 1 do
                 self:UpdateActionSlot(slot)
             end
-        end
-        for slot = start, 72, 1 do
-            self:UpdateActionSlot(slot)
-        end
-        if event ~= "TimerUpdateActionSlots" then
-            self:ScheduleTimer("TimerUpdateActionSlots", 1)
+            if event ~= "TimerUpdateActionSlots" then
+                self:ScheduleTimer("TimerUpdateActionSlots", 1)
+            end
         end
         self:StopProfiling("OvaleActionBar_UpdateActionSlots")
     end,

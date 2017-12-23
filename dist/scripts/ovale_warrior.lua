@@ -2,9 +2,8 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
     local name = "icyveins_warrior_protection"
-    local desc = "[7.2.5] Icy-Veins: Warrior Protection"
+    local desc = "[7.3.2] Icy-Veins: Warrior Protection"
     local code = [[
-
 Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
@@ -16,8 +15,12 @@ AddCheckBox(opt_warrior_protection_aoe L(AOE) default specialization=protection)
 
 AddFunction ProtectionHealMe
 {
-	if HealthPercent() < 70 Spell(victory_rush)
-	if HealthPercent() < 85 Spell(impending_victory)
+	unless(DebuffPresent(healing_immunity_debuff)) 
+	{
+		if HealthPercent() < 70 Spell(victory_rush)
+		if HealthPercent() < 85 Spell(impending_victory)
+		if (HealthPercent() < 35) UseHealthPotions()
+	}
 }
 
 AddFunction ProtectionGetInMeleeRange
@@ -62,7 +65,7 @@ AddFunction ProtectionDefaultShortCDActions
 	if ArmorSetBonus(T20 2) and RageDeficit() >= 26 Spell(berserker_rage)
 	if IncomingDamage(5 physical=1) 
 	{
-		if not BuffPresent(shield_block_buff) and SpellCharges(shield_block) < SpellMaxCharges(shield_block) Spell(neltharions_fury)
+		if not BuffPresent(shield_block_buff) and SpellFullRecharge(shield_block) > 3 Spell(neltharions_fury)
 		if not BuffPresent(neltharions_fury_buff) and (SpellCooldown(neltharions_fury)>0 or SpellCharges(shield_block) == SpellMaxCharges(shield_block)) Spell(shield_block)
 	}
 	if ((not BuffPresent(renewed_fury_buff) and Talent(renewed_fury_talent)) or Rage() >= 60) Spell(ignore_pain)
@@ -140,7 +143,6 @@ AddIcon help=cd specialization=protection
 {
 	ProtectionDefaultCdActions()
 }
-	
 ]]
     OvaleScripts:RegisterScript("WARRIOR", "protection", name, desc, code, "script")
 end

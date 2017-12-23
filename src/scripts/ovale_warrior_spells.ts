@@ -1,9 +1,8 @@
 import { OvaleScripts } from "../Scripts";
 export function register() {
     let name = "ovale_warrior_spells";
-    let desc = "[7.0] Ovale: Warrior spells";
+    let desc = "[7.3.2] Ovale: Warrior spells";
     let code = `
-
 ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!shield_wall,buff,!shield_wall_buff)	
 	
 # Warrior spells and functions.
@@ -77,8 +76,8 @@ Define(demoralizing_shout 1160)
 Define(demoralizing_shout_debuff 1160)
 	SpellInfo(demoralizing_shout_debuff duration=8)
 Define(devastate 20243)
+	SpellInfo(devastate unusable=1 talent=devastatator_talent)
 	SpellAddTargetDebuff(devastate deep_wounds_debuff=1 if_spell=deep_wounds)
-	SpellInfo(devastate unusable=1 if_talent=devastator)
 Define(dragon_roar 118000)
 	SpellInfo(dragon_roar cd=25)
 	SpellAddBuff(dragon_roar dragon_roar_buff=1)
@@ -292,13 +291,10 @@ Define(stone_heart_buff 225947)
 	SpellAddBuff(execute stone_heart_buff=0)
 Define(the_great_storms_eye 151823)
 Define(weight_of_the_earth 137077)
-Define(kazzalax_fujiedas_fury 137053)
-Define(umbral_moonglaives 147012)
 
 # Talents
 Define(anger_management_talent 19)
 Define(avatar_talent 9)
-Define(bladestorm_talent 19)
 Define(bloodbath_talent 16)
 Define(booming_voice_talent 18)
 Define(bounding_stride_talent 11)
@@ -319,7 +315,6 @@ Define(massacre_talent 13)
 Define(mortal_combo_talent 14)
 Define(outburst_talent 8)
 Define(ravager_talent 21)
-Define(reckless_abandon_talent 20)
 Define(rend_talent 8)
 Define(renewed_fury_talent 7)
 Define(sweeping_strikes_talent 3)

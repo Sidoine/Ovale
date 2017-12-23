@@ -263,8 +263,9 @@ local OPTIONAL_SKILLS = {
         class = "HUNTER",
         default = true
     },
-    ["trap_launcher"] = {
+    ["harpoon"] = {
         class = "HUNTER",
+        specialization = "survival",
         default = true
     },
     ["time_warp"] = {
@@ -1998,9 +1999,6 @@ EmitAction = function(parseNode, nodeList, annotation)
             end
         elseif className == "HUNTER" and action == "kill_command" then
             conditionCode = "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()"
-        elseif className == "HUNTER" and sub(action, -5) == "_trap" then
-            annotation.trap_launcher = className
-            conditionCode = "CheckBoxOn(opt_trap_launcher)"
         elseif className == "MAGE" and action == "arcane_brilliance" then
             conditionCode = "BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1)"
         elseif className == "MAGE" and action == "counterspell" then

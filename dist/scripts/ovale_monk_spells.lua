@@ -4,9 +4,8 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 __exports.register = function()
     local name = "ovale_monk_spells"
-    local desc = "[7.0] Ovale: Monk spells"
+    local desc = "[7.3.2] Ovale: Monk spells"
     local code = [[
-
 ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!fortifying_brew,buff,!fortifying_brew_buff)
 
 # Monk spells and functions.
@@ -109,6 +108,7 @@ Define(enveloping_mist_buff 132120)
 Define(expel_harm 115072)
 	SpellInfo(expel_harm energy=15 specialization=brewmaster)
 	SpellRequire(expel_harm unusable 1=spellcount_max,0)
+	SpellRequire(expel_harm unusable 1=debuff,healing_immunity_debuff)
 Define(exploding_keg 214326)
 Define(extend_life_buff 185158)
 	SpellInfo(extend_life_buff duration=12)
@@ -133,6 +133,7 @@ Define(gale_burst 195399)
 Define(gale_burst_buff 195403)
 Define(healing_elixir 122281)
 	SpellInfo(healing_elixir charges=2 cd=30 talent=healing_elixir_talent)
+	SpellRequire(healing_elixir unusable 1=debuff,healing_immunity_debuff)
 Define(healing_elixir_talent 13)
 Define(heavy_stagger_debuff 124273)
 	SpellInfo(heavy_stagger_debuff duration=10 tick=1)
