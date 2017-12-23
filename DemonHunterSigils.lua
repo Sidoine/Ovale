@@ -47,6 +47,7 @@ end
 
 local sigil_start = {
 	[204596] = { type="flame"}, -- Sigil of flame
+	[204513] = { type="flame"}, -- Sigil of flame (with concentrated sigils)
 	[189110] = { type="flame", talent=8}, -- Infernal strike
 	[202137] = { type="silence"}, -- Sigil of Silence
 	[207684] = { type="misery"}, -- Sigil of Misery
@@ -67,9 +68,9 @@ function OvaleSigil:UNIT_SPELLCAST_SUCCEEDED(event, unitId, spellName, spellRank
 	if (unitId == nil or unitId ~= "player") then return end
 
 	local id = tonumber(spellId)
-	--print(event .. " " .. spellName .. " " .. id)
 	-- queue all the sigils when they are cast
 	if (sigil_start[id] ~= nil) then
+		--print(event .. " " .. spellName .. " " .. id)
 		local s = sigil_start[id];
 		local t = s.type
 		local tal = s.talent or nil;
@@ -80,6 +81,7 @@ function OvaleSigil:UNIT_SPELLCAST_SUCCEEDED(event, unitId, spellName, spellRank
 	
 	-- unqueue all the sigils when they finished charging
 	if(sigil_end[id] ~= nil) then
+		--print(event .. " " .. spellName .. " " .. id)
 		local s = sigil_end[id];
 		local t = s.type
 		tremove(activated_sigils[t], 1)
