@@ -104,6 +104,7 @@ AddFunction BrewmasterDefaultMainActions
 		if (EnergyDeficit() <= 35 or (Talent(black_ox_talent) and SpellCooldown(black_ox_brew) <= 0)) Spell(tiger_palm)
 		Spell(chi_burst)
 		Spell(chi_wave)
+		Spell(exploding_keg)
 	}
 }
 
