@@ -157,14 +157,14 @@
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/@wowts/lua/-/lua-1.0.6.tgz#0162358e8f89ecc936cc5b1d91944aae8afab57e"
 
-"@wowts/masque@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@wowts/masque/-/masque-1.0.0.tgz#5f66b1cbefb09c81424bbfb9e3e0a3234dd91c76"
+"@wowts/masque@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@wowts/masque/-/masque-1.0.1.tgz#1ecb425cf62cd414c05f83bd0c38e03b021c51ee"
   dependencies:
-    "@wowts/lua" "^1.0.3"
-    "@wowts/tsaddon" "^1.0.0"
-    "@wowts/tslib" "^1.0.0"
-    "@wowts/wow-mock" "^1.0.1"
+    "@wowts/lua" "^1.0.6"
+    "@wowts/tsaddon" "^1.1.2"
+    "@wowts/tslib" "^1.0.1"
+    "@wowts/wow-mock" "^1.0.8"
 
 "@wowts/math@^1.0.0":
   version "1.0.0"
@@ -200,15 +200,24 @@
     "@wowts/tslib" "^1.0.0"
     "@wowts/wow-mock" "^1.0.1"
 
-"@wowts/tslib@^1.0.0":
+"@wowts/tsaddon@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@wowts/tsaddon/-/tsaddon-1.1.2.tgz#d6907a4f25e49889ebc68d9502bb1c86bc050ab8"
+  dependencies:
+    "@wowts/lua" "^1.0.3"
+    "@wowts/table" "^1.0.0"
+    "@wowts/tslib" "^1.0.0"
+    "@wowts/wow-mock" "^1.0.8"
+
+"@wowts/tslib@^1.0.0", "@wowts/tslib@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@wowts/tslib/-/tslib-1.0.1.tgz#330eb661750126b1f4afb94c680569b1562424cc"
   dependencies:
     "@wowts/lua" "^1.0.3"
 
-"@wowts/tstolua@^1.0.10":
-  version "1.0.10"
-  resolved "https://registry.yarnpkg.com/@wowts/tstolua/-/tstolua-1.0.10.tgz#eb4f83d3fd2893fa1081beed1b5d0bdac50a774d"
+"@wowts/tstolua@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@wowts/tstolua/-/tstolua-1.1.0.tgz#7e6df7b2aa13f025f993d92eb0ebc61cc245dcfc"
   dependencies:
     commander "^2.11.0"
     typescript "^2.5.3"
