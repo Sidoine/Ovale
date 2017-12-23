@@ -16,6 +16,25 @@ AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=guardian)
 AddCheckBox(opt_druid_guardian_aoe L(AOE) default specialization=guardian)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=guardian)
 
+AddFunction FrenziedRegenHealModifier
+{
+	(1+Versatility()/100) * 
+	(1+0.20*BuffPresent(guardian_of_elune_buff)) * 
+	(1+0.05*ArtifactTraitRank(wildflesh_trait)) *
+	(1+0.12*HasEquippedItem(skysecs_hold)) * 
+	# Guardian Spirit
+	(1+0.40*BuffPresent(47788)) *
+	# Divine Hymn
+	(1+0.1*BuffPresent(64844)) *
+	# Protection of Tyr
+	(1+0.15*BuffPresent(211210)) *
+	# Life Cocoon 
+	(1+0.5*BuffPresent(116849)) *
+	# T21
+	(1+0.1*BuffPresent(253575)) *
+	1
+}
+
 AddFunction FrenziedRegenHealTotal
 {
 	IncomingDamage(5) / 2
