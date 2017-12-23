@@ -228,6 +228,12 @@
   dependencies:
     "@wowts/lua" "^1.0.5"
 
+"@wowts/wow-mock@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.1.0.tgz#679d50e99619dbe403a96e5aaf2b4579134ff53f"
+  dependencies:
+    "@wowts/lua" "^1.0.5"
+
 ansi-regex@^2.0.0:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-2.1.1.tgz#c3b33ab5ee360d86e0e628f0468ae7ef27d654df"

@@ -19,7 +19,7 @@
     "@wowts/bit": "^1.0.0",
     "@wowts/tslib": "^1.0.0",
     "@wowts/tsaddon": "^1.1.0",
-    "@wowts/wow-mock": "^1.0.8",
+    "@wowts/wow-mock": "^1.1.0",
     "@wowts/ace_comm-3.0": "^1.0.0",
     "@wowts/ace_config-3.0": "^1.0.1",
     "@wowts/ace_config_dialog-3.0": "^1.0.3",

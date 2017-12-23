@@ -532,7 +532,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
         self.updateFrame:SetScript("OnUpdate", function(updateFrame, elapsed)
             return self:OnUpdate(elapsed)
         end)
-        self.barre.SetColorTexture(0.8, 0.8, 0.8, 0.5)
+        self.barre:SetColorTexture(0.8, 0.8, 0.8, 0.5)
         self.barre:SetPoint("TOPLEFT", 0, 0)
         self.barre:Hide()
         local content = self.content
