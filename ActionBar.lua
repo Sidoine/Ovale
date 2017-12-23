@@ -114,6 +114,8 @@ local function GetKeyBinding(slot)
 		key = gsub(key, "MINUS", "-")
 		key = gsub(key, "MULTIPLY", "*")
 		key = gsub(key, "DIVIDE", "/")
+		-- Shorten mouse buttons
+		key = gsub(key, "BUTTON", "B")
 	end
 	return key
 end
