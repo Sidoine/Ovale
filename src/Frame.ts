@@ -1,6 +1,6 @@
 import AceGUI, { AceGUIWidgetCheckBox, AceGUIWidgetDropDown } from "@wowts/ace_gui-3.0";
 import Masque, { MasqueSkinGroup } from "@wowts/masque";
-import { OvaleBestAction } from "./BestAction";
+import { OvaleBestAction, Element } from "./BestAction";
 import { OvaleCompile } from "./Compile";
 import { OvaleDebug } from "./Debug";
 import { OvaleGUID } from "./GUID";
@@ -18,6 +18,7 @@ import { huge } from "@wowts/math";
 import { AceGUIRegisterAsContainer } from "./acegui-helpers";
 import { OvaleFuture } from "./Future";
 import { baseState } from "./BaseState";
+import { AstNode } from "./AST";
 
 let strmatch = match;
 let INFINITY = huge;
@@ -66,7 +67,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
     OnRelease() {
     }
 
-    OnWidthSet(width) {
+    OnWidthSet(width: number) {
         let content = this.content;
         let contentwidth = width - 34;
         if (contentwidth < 0) {
@@ -75,7 +76,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         content.SetWidth(contentwidth);
     }
 
-    OnHeightSet(height) {
+    OnHeightSet(height: number) {
         let content = this.content;
         let contentheight = height - 57;
         if (contentheight < 0) {
@@ -84,7 +85,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         content.SetHeight(contentheight);
     }
 
-    OnLayoutFinished(width, height) {
+    OnLayoutFinished(width: number, height: number) {
         if ((!width)) {
             width = this.content.GetWidth();
         }
@@ -144,7 +145,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         }
     }
 
-    OnUpdate(elapsed) {
+    OnUpdate(elapsed: number) {
         let guid = OvaleGUID.UnitGUID("target") || OvaleGUID.UnitGUID("focus");
         if (guid) {
             Ovale.refreshNeeded[guid] = true;
@@ -196,7 +197,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             this.timeSinceLastUpdate = 0;
         }
     }
-    UpdateActionIcon(state: BaseState, node, action: Action, element, start, now?) {
+    UpdateActionIcon(state: BaseState, node: AstNode, action: Action, element: Element, start: number, now?: number) {
         const profile = Ovale.db.profile;
         let icons = action.secure && action.secureIcons || action.icons;
         now = now || GetTime();
@@ -305,15 +306,15 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         }
         return widget;
     }
-    IsChecked(name) {
+    IsChecked(name: string) {
         let widget = this.GetCheckBox(name);
         return widget && widget.GetValue();
     }
-    GetListValue(name) {
+    GetListValue(name: string) {
         let widget = this.listWidget[name];
         return widget && widget.GetValue();
     }
-    SetCheckBox(name, on) {
+    SetCheckBox(name: string, on: boolean) {
         let widget = this.GetCheckBox(name);
         if (widget) {
             let oldValue = widget.GetValue();
@@ -323,7 +324,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             }
         }
     }
-    ToggleCheckBox(name) {
+    ToggleCheckBox(name: string) {
         let widget = this.GetCheckBox(name);
         if (widget) {
             let on = !widget.GetValue();
@@ -338,15 +339,15 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         OvaleFrameModule.SendMessage("Ovale_CheckBoxValueChanged", name);
     }
 
-    OnDropDownValueChanged = (widget: AceGUIWidgetCheckBox) => {
+    OnDropDownValueChanged = (widget: AceGUIWidgetDropDown) => {
         let name = widget.GetUserData<string>("name");
         Ovale.db.profile.list[name] = widget.GetValue();
         OvaleFrameModule.SendMessage("Ovale_ListValueChanged", name);
     }
-    FinalizeString(s) {
+    FinalizeString(s: string) {
         let [item, id] = strmatch(s, "^(item:)(.+)");
         if (item) {
-            s = GetItemInfo(id);
+            [s] = GetItemInfo(id);
         }
         return s;
     }
@@ -592,7 +593,7 @@ class OvaleFrameModuleClass extends OvaleFrameBase {
        this.frame = new OvaleFrame();
     }
 
-    Ovale_OptionChanged(event, eventType) {
+    Ovale_OptionChanged(event: string, eventType: string) {
         if (!this.frame) return;
         if (eventType == "visibility") {
             this.frame.UpdateVisibility();
@@ -608,10 +609,10 @@ class OvaleFrameModuleClass extends OvaleFrameBase {
     PLAYER_TARGET_CHANGED() {
         this.frame.UpdateVisibility();
     }
-    Ovale_CombatStarted(event, atTime) {
+    Ovale_CombatStarted(event: string, atTime: number) {
         this.frame.UpdateVisibility();
     }
-    Ovale_CombatEnded(event, atTime) {
+    Ovale_CombatEnded(event: string, atTime: number) {
         this.frame.UpdateVisibility();
     }
     

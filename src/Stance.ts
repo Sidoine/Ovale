@@ -217,7 +217,7 @@ class OvaleStanceClass extends OvaleStanceBase {
             if (type(stance) == "string") {
                 stance = OvaleStance.stanceId[stance];
             }
-            this.next.stance = <number>stance;
+            this.next.stance = stance;
         }
         OvaleStance.StopProfiling("OvaleStance_ApplySpellAfterCast");
     }

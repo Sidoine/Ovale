@@ -6,6 +6,7 @@ import { type, pairs, tonumber, wipe, truthy, LuaArray, LuaObj } from "@wowts/lu
 import { find } from "@wowts/string";
 import { floor, ceil } from "@wowts/math";
 import { baseState } from "./BaseState";
+import { isNumber, isLuaArray, isString } from "./tools";
 
 let OvaleDataBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleData"));
 
@@ -81,7 +82,8 @@ let STAT_USE_NAMES: LuaArray<string> = {
 
 type Requirements = LuaObj<LuaArray<string>>;
 
-interface SpellInfo {
+export interface SpellInfo {
+    [key:string]: LuaObj<Requirements> | number | string | LuaArray<string> | LuaArray<number>;
     require: LuaObj<Requirements>;
     aura?: {
         player: LuaObj<{}>;
@@ -99,6 +101,7 @@ interface SpellInfo {
     bonusap?: number;
     bonusapcp?:number;
     bonussp?:number;
+    damage?: number;
     sharedcd?:number;
     stacking?:number;
     forcecd?:number;
@@ -134,7 +137,17 @@ interface SpellInfo {
     adddurationholy?:number;
     tick?:number;
     duration?:number;
+    inccounter?:number;
+    refund_combo?:number | "cost";
+    to_stance?:number;
+    unusable?:number;
+    cd_haste?:string;
+    gcd_haste?:number;
+    resetcounter?:number;
 }
+
+
+const tempTokens: LuaArray<string> = {};
 
 class OvaleDataClass extends OvaleDataBase {
     STAT_NAMES = STAT_NAMES;
@@ -351,7 +364,7 @@ class OvaleDataClass extends OvaleDataBase {
             }
         }
     }
-    SpellInfo(spellId) {
+    SpellInfo(spellId: number) {
         let si = this.spellInfo[spellId];
         if (!si) {
             si = {
@@ -372,7 +385,7 @@ class OvaleDataClass extends OvaleDataBase {
         }
         return si;
     }
-    GetSpellInfo(spellId) {
+    GetSpellInfo(spellId: number) {
         if (type(spellId) == "number") {
             return this.spellInfo[spellId];
         } else if (this.buffSpellList[spellId]) {
@@ -383,7 +396,7 @@ class OvaleDataClass extends OvaleDataBase {
             }
         }
     }
-    ItemInfo(itemId) {
+    ItemInfo(itemId: number) {
         let ii = this.itemInfo[itemId];
         if (!ii) {
             ii = {
@@ -394,10 +407,10 @@ class OvaleDataClass extends OvaleDataBase {
         }
         return ii;
     }
-    GetItemTagInfo(spellId): [string, boolean] {
+    GetItemTagInfo(spellId: number): [string, boolean] {
         return ["cd", false];
     }
-    GetSpellTagInfo(spellId): [string, boolean] {
+    GetSpellTagInfo(spellId: number): [string, boolean] {
         let tag = "main";
         let invokesGCD = true;
         let si = this.spellInfo[spellId];
@@ -463,15 +476,21 @@ class OvaleDataClass extends OvaleDataBase {
         }
         return [verified, value, data];
     }
-    CheckSpellInfo(spellId, atTime, targetGUID) {
+
+    CheckSpellInfo(spellId: number, atTime: number, targetGUID: string) {
         targetGUID = targetGUID || OvaleGUID.UnitGUID(baseState.next.defaultTarget || "target");
         let verified = true;
         let requirement;
         for (const [name, handler] of pairs(nowRequirements)) {
-            let value = this.GetSpellInfoProperty(spellId, atTime, name, targetGUID);
+            let value = this.GetSpellInfoProperty(spellId, atTime, <any>name, targetGUID);
             if (value) {
-                let index = (type(value) == "table") && 1 || undefined;
-                [verified, requirement] = handler(spellId, atTime, name, value, index, targetGUID);
+                if (!isString(value) && isLuaArray<string>(value)) {
+                    [verified, requirement] = handler(spellId, atTime, name, value, 1, targetGUID);
+                }
+                else {
+                    tempTokens[1] = <string>value;
+                    [verified, requirement] = handler(spellId, atTime, name, tempTokens, 1, targetGUID);
+                }
                 if (!verified) {
                     break;
                 }
@@ -479,7 +498,7 @@ class OvaleDataClass extends OvaleDataBase {
         }
         return [verified, requirement];
     }
-    GetItemInfoProperty(itemId, atTime, property) {
+    GetItemInfoProperty(itemId: number, atTime: number, property: keyof SpellInfo) {
         const targetGUID = OvaleGUID.UnitGUID("player");
         let ii = this.ItemInfo(itemId);
         let value = ii && ii[property];
@@ -496,7 +515,7 @@ class OvaleDataClass extends OvaleDataBase {
         return value;
     }
     //GetSpellInfoProperty(spellId, atTime, property:"gcd"|"duration"|"combo"|"inccounter"|"resetcounter", targetGUID):number;
-    GetSpellInfoProperty(spellId, atTime, property:string, targetGUID: string|undefined): string|number {
+    GetSpellInfoProperty<T extends keyof SpellInfo>(spellId: number, atTime: number, property:T, targetGUID: string|undefined): SpellInfo[T] {
         targetGUID = targetGUID || OvaleGUID.UnitGUID(baseState.next.defaultTarget || "target");
         let si = this.spellInfo[spellId];
         let value = si && si[property];
@@ -510,32 +529,35 @@ class OvaleDataClass extends OvaleDataBase {
                 }
             }
         }
-        if (!value || !tonumber(value)) {
-            return value;
-        }
-        let addpower = si && si[`add${property}`];
-        if (addpower) {
-            value = value + addpower;
-        }
-        let ratio = si && si[`${property}_percent`];
-        if (ratio) {
-            ratio = ratio / 100;
-        } else {
-            ratio = 1;
-        }
-        let multipliers = si && si.require[`${property}_percent`];
-        if (multipliers) {
-            for (const [v, requirement] of pairs(multipliers)) {
-                let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
-                if (verified) {
-                    ratio = ratio * (tonumber(v) || 0) / 100;
+
+        if (value && isNumber(value)){
+            let num = value;
+            let addpower = si && <number>si[`add${property}`];
+            if (addpower) {
+                num = num + addpower;
+            }
+            let ratio = si && <number>si[`${property}_percent`];
+            if (ratio) {
+                ratio = ratio / 100;
+            } else {
+                ratio = 1;
+            }
+            let multipliers = si && si.require[`${property}_percent`];
+            if (multipliers) {
+                for (const [v, requirement] of pairs(multipliers)) {
+                    let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
+                    if (verified) {
+                        ratio = ratio * (tonumber(v) || 0) / 100;
+                    }
                 }
             }
+            let actual = (num > 0 && floor(num * ratio)) || ceil(num * ratio);
+            return actual;
         }
-        let actual = (value > 0 && floor(value * ratio)) || ceil(value * ratio);
-        return actual;
+        return value;
     }
-    GetDamage(spellId, attackpower, spellpower, mainHandWeaponDamage, offHandWeaponDamage, combo) {
+
+    GetDamage(spellId: number, attackpower: number, spellpower: number, mainHandWeaponDamage: number, offHandWeaponDamage: number, combo: number) {
         let si = this.spellInfo[spellId];
         if (!si) {
             return undefined;

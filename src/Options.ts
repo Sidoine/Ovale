@@ -7,7 +7,7 @@ import { OvaleDb, Ovale } from "./Ovale";
 import aceConsole from "@wowts/ace_console-3.0";
 import aceEvent from "@wowts/ace_event-3.0";
 import { InterfaceOptionsFrame_OpenToCategory } from "@wowts/wow-mock";
-import { ipairs, LuaObj, lualength } from "@wowts/lua";
+import { ipairs, LuaObj, lualength, LuaArray } from "@wowts/lua";
 let OvaleOptionsBase = Ovale.NewModule("OvaleOptions", aceConsole, aceEvent);
 interface OptionModule {
     UpgradeSavedVariables():void;
@@ -73,16 +73,16 @@ class OvaleOptionsClass extends OvaleOptionsBase {
         global:undefined
     }
 
-    options = {
+    options: any = {
         type: "group",
         args: {
             apparence: {
                 name: Ovale.GetName(),
                 type: "group",
-                get: (info) => {
+                get: (info: LuaArray<string>) => {
                     return Ovale.db.profile.apparence[info[lualength(info)]];
                 },
-                set: (info, value) => {
+                set: (info: LuaArray<string>, value: string) => {
                     Ovale.db.profile.apparence[info[lualength(info)]] = value;
                     this.SendMessage("Ovale_OptionChanged", info[lualength(info) - 1]);
                 },
@@ -92,10 +92,10 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                         name: L["Standalone options"],
                         desc: L["Open configuration panel in a separate, movable window."],
                         type: "toggle",
-                        get: function (info) {
+                        get: function (info: LuaArray<string>) {
                             return Ovale.db.profile.standaloneOptions;
                         },
-                        set: function (info, value) {
+                        set: function (info: LuaArray<string>, value: boolean) {
                             Ovale.db.profile.standaloneOptions = value;
                         }
                     },
@@ -109,7 +109,7 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                                 type: "toggle",
                                 name: L["Enabled"],
                                 width: "full",
-                                set: (info, value) => {
+                                set: (info: LuaArray<string>, value: boolean) => {
                                     Ovale.db.profile.apparence.enableIcons = value;
                                     this.SendMessage("Ovale_OptionChanged", "visibility");
                                 }
@@ -249,11 +249,11 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                                 type: "color",
                                 order: 25,
                                 name: L["Remaining time font color"],
-                                get: function (info) {
+                                get: function (info: LuaArray<string>) {
                                     const t = Ovale.db.profile.apparence.remainsFontColor;
                                     return [t.r, t.g, t.b];
                                 },
-                                set: function (info, r, g, b) {
+                                set: function (info: LuaArray<string>, r: number, g: number, b: number) {
                                     const t = Ovale.db.profile.apparence.remainsFontColor;
                                     [t.r, t.g, t.b] = [r, g, b];
                                     Ovale.db.profile.apparence.remainsFontColor = t;
@@ -452,7 +452,7 @@ class OvaleOptionsClass extends OvaleOptionsBase {
         AceConfigDialog.AddToBlizOptions(`${ovale} Profiles`, "Profiles", ovale);
         this.HandleProfileChanges();
     }
-    RegisterOptions(addon) {
+    RegisterOptions(addon: {}) {
         // tinsert(self_register, addon);
     }
     UpgradeSavedVariables() {

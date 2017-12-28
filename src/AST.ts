@@ -13,6 +13,7 @@ import { LuaArray, LuaObj, ipairs, next, pairs, tonumber, tostring, type, wipe, 
 import { format, gsub, lower, sub } from "@wowts/string";
 import { concat, insert, sort } from "@wowts/table";
 import { GetItemInfo } from "@wowts/wow-mock";
+import { isLuaArray, isNumber, isString } from "./tools";
 
 let OvaleASTBase = OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleAST")));
 
@@ -457,7 +458,10 @@ type Value = SimpleValue | ControlParameters;
 type FlattenListParameters = LuaObj<FlattenParameterValue>;
 type FlattenCheckBoxParameters = LuaArray<FlattenParameterValue>;
 
-type NamedParameters = LuaObj<FlattenParameterValue | FlattenListParameters | FlattenCheckBoxParameters>;
+interface NamedParameters extends LuaObj<FlattenParameterValue | FlattenListParameters | FlattenCheckBoxParameters> {
+    nocd?: number;
+}
+
 type PositionalParameters = LuaArray<FlattenParameterValue>;
 type RawNamedParameters = LuaObj<Value>;
 type RawPositionalParameters = LuaArray<AstNode>;
@@ -469,18 +473,6 @@ type ParserFunction<T = AstNode> = (tokenStream: OvaleLexer, nodeList: LuaArray<
 type UnparserFunction = (node: AstNode) => string;
 
 function isAstNode(a: any): a is AstNode {
-    return type(a) === "table";
-}
-
-function isString(s: any): s is string {
-    return type(s) === "string";
-}
-
-function isNumber(s: any): s is number {
-    return type(s) === "number";
-}
-
-function isLuaArray<T>(a: any): a is LuaArray<T> {
     return type(a) === "table";
 }
 

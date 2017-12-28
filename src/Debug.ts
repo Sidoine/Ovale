@@ -6,7 +6,7 @@ import { OvaleOptions } from "./Options";
 import { Constructor, MakeString, Ovale } from "./Ovale";
 import aceTimer from "@wowts/ace_timer-3.0";
 import { format } from "@wowts/string";
-import { pairs, lualength } from "@wowts/lua";
+import { pairs, lualength, LuaArray } from "@wowts/lua";
 import { GetTime, DEFAULT_CHAT_FRAME } from "@wowts/wow-mock";
 import { AceModule } from "@wowts/tsaddon";
 let OvaleDebugBase = Ovale.NewModule("OvaleDebug", aceTimer);
@@ -15,7 +15,7 @@ let self_traceLog: TextDump = undefined;
 let OVALE_TRACELOG_MAXLINES = 4096;
 
 class OvaleDebugClass extends OvaleDebugBase {
-    options = {
+    options: any = {
         name: `${Ovale.GetName()} ${L["Debug"]}`,
         type: "group",
         args: {
@@ -25,11 +25,11 @@ class OvaleDebugClass extends OvaleDebugBase {
                 order: 10,
                 args: {
                 },
-                get: function (info) {
+                get: function (info: LuaArray<string>) {
                     const value = Ovale.db.global.debug[info[lualength(info)]];
                     return (value != undefined);
                 },
-                set: function (info, value) {
+                set: function (info: LuaArray<string>, value: string) {
                     value = value || undefined;
                     Ovale.db.global.debug[info[lualength(info)]] = value;
                 }
@@ -77,6 +77,7 @@ class OvaleDebugClass extends OvaleDebugBase {
                 }
             }
         }
+
         for (const [k, v] of pairs(actions)) {
             OvaleOptions.options.args.actions.args[k] = v;
         }
@@ -92,7 +93,7 @@ class OvaleDebugClass extends OvaleDebugBase {
     
         self_traceLog = LibTextDump.New(`${Ovale.GetName()} - ${L["Trace Log"]}`, 750, 500);
     }
-    DoTrace(displayLog) {
+    DoTrace(displayLog: boolean) {
         self_traceLog.Clear();
         this.trace = true;
         DEFAULT_CHAT_FRAME.AddMessage(format("=== Trace @%f", GetTime()));
@@ -131,13 +132,13 @@ class OvaleDebugClass extends OvaleDebugBase {
                 };
             }
 
-            Debug(...__args) {
+            Debug(...__args:any[]) {
                 let name = this.GetName();
                 if (Ovale.db.global.debug[name]) {
                     DEFAULT_CHAT_FRAME.AddMessage(format("|cff33ff99%s|r: %s", name, MakeString(...__args)));
                 }
             }
-            DebugTimestamp(...__args) {
+            DebugTimestamp(...__args:any[]) {
                 let name = this.GetName();
                 if (Ovale.db.global.debug[name]) {
                     let now = GetTime();
@@ -145,7 +146,7 @@ class OvaleDebugClass extends OvaleDebugBase {
                     DEFAULT_CHAT_FRAME.AddMessage(format("|cff33ff99%s|r: %s", name, s));
                 }
             }
-            Log(...__args) {
+            Log(...__args:any[]) {
                 if (debug.trace) {
                     let N = self_traceLog.Lines();
                     if (N < OVALE_TRACELOG_MAXLINES - 1) {
@@ -155,12 +156,12 @@ class OvaleDebugClass extends OvaleDebugBase {
                     }
                 }
             }
-            Error(...__args) {
+            Error(...__args:any[]) {
                 let s = MakeString(...__args);
                 this.Print("Fatal error: %s", s);
                 OvaleDebug.bug = true;
             }
-            Print(...__args) {
+            Print(...__args:any[]) {
                 let name = this.GetName();
                 let s = MakeString(...__args);
                 DEFAULT_CHAT_FRAME.AddMessage(format("|cff33ff99%s|r: %s", name, s));

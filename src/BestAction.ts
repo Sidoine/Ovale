@@ -15,7 +15,7 @@ import aceEvent from "@wowts/ace_event-3.0";
 import { abs, huge, floor } from "@wowts/math";
 import { assert, ipairs, loadstring, pairs, tonumber, type, wipe, LuaObj, lualength } from "@wowts/lua";
 import { GetActionCooldown, GetActionTexture, GetItemIcon, GetItemCooldown, GetItemSpell, GetSpellTexture, IsActionInRange, IsCurrentAction, IsItemInRange, IsUsableAction, IsUsableItem } from "@wowts/wow-mock";
-import { AstNode, isValueNode, ValueNode } from "./AST";
+import { AstNode, isValueNode } from "./AST";
 import { OvaleFuture } from "./Future";
 import { OvaleCooldown } from "./Cooldown";
 import { variables } from "./Variables";
@@ -28,14 +28,15 @@ let INFINITY = huge;
 
 let self_serial = 0;
 let self_timeSpan: LuaObj<OvaleTimeSpan> = {}
-let self_valuePool = new OvalePool<ValueNode>("OvaleBestAction_valuePool");
-let self_value: LuaObj<ValueNode> = {}
+let self_valuePool = new OvalePool<Element>("OvaleBestAction_valuePool");
+let self_value: LuaObj<Element> = {}
 
 
-interface Element extends AstNode {
+export interface Element extends AstNode {
     serial?: number;
     timeSpan?: OvaleTimeSpan;
     result?: Element;
+    value?: number;
 
     actionTexture?: string;
     actionInRange?:boolean;
@@ -767,7 +768,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         this.StopProfiling("OvaleBestAction_Compute");
         return [timeSpan, element];
     }
-    ComputeLua: ComputerFunction = (element, state: BaseState, atTime) => {
+    ComputeLua: ComputerFunction = (element:Element, state: BaseState, atTime) => {
         this.StartProfiling("OvaleBestAction_ComputeLua");
         let value = loadstring(element.lua)();
         OvaleBestAction.Log("[%d]    lua returns %s", element.nodeId, value);
@@ -779,7 +780,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         this.StopProfiling("OvaleBestAction_ComputeLua");
         return [timeSpan, result];
     }
-    ComputeState: ComputerFunction = (element, state: BaseState, atTime):[OvaleTimeSpan, any] => {
+    ComputeState: ComputerFunction = (element:Element, state: BaseState, atTime):[OvaleTimeSpan, any] => {
         this.StartProfiling("OvaleBestAction_Compute");
         let result = element;
         assert(element.func == "setstate");
@@ -788,7 +789,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         this.StopProfiling("OvaleBestAction_Compute");
         return [timeSpan, result];
     }
-    ComputeValue: ComputerFunction = (element:ValueNode, state: BaseState, atTime):[OvaleTimeSpan, any] => {
+    ComputeValue: ComputerFunction = (element:Element, state: BaseState, atTime):[OvaleTimeSpan, any] => {
         this.StartProfiling("OvaleBestAction_Compute");
         OvaleBestAction.Log("[%d]    value is %s", element.nodeId, element.value);
         let timeSpan = GetTimeSpan(element, UNIVERSE);

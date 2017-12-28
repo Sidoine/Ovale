@@ -50,7 +50,7 @@ local tconcat = concat
 local self_playerGUID = nil
 local self_petGUID = nil
 local self_pool = OvalePool("OvaleAura_pool")
-local UNKNOWN_GUID = 0
+local UNKNOWN_GUID = "0"
 do
     local output = {}
     local debugOptions = {
@@ -173,7 +173,7 @@ __exports.GetAura = function(auraDB, guid, auraId, casterGUID)
         return auraDB[guid][auraId][casterGUID]
     end
 end
-local GetAuraAnyCaster = function(auraDB, guid, auraId)
+local function GetAuraAnyCaster(auraDB, guid, auraId)
     local auraFound
     if auraDB[guid] and auraDB[guid][auraId] then
         for _, aura in pairs(auraDB[guid][auraId]) do
@@ -184,8 +184,7 @@ local GetAuraAnyCaster = function(auraDB, guid, auraId)
     end
     return auraFound
 end
-
-local GetDebuffType = function(auraDB, guid, debuffType, filter, casterGUID)
+local function GetDebuffType(auraDB, guid, debuffType, filter, casterGUID)
     local auraFound
     if auraDB[guid] then
         for _, whoseTable in pairs(auraDB[guid]) do
@@ -199,8 +198,7 @@ local GetDebuffType = function(auraDB, guid, debuffType, filter, casterGUID)
     end
     return auraFound
 end
-
-local GetDebuffTypeAnyCaster = function(auraDB, guid, debuffType, filter)
+local function GetDebuffTypeAnyCaster(auraDB, guid, debuffType, filter)
     local auraFound
     if auraDB[guid] then
         for _, whoseTable in pairs(auraDB[guid]) do
@@ -215,7 +213,6 @@ local GetDebuffTypeAnyCaster = function(auraDB, guid, debuffType, filter)
     end
     return auraFound
 end
-
 local function GetAuraOnGUID(auraDB, guid, auraId, filter, mine)
     local auraFound
     if __exports.DEBUFF_TYPE[auraId] then
@@ -264,7 +261,6 @@ __exports.RemoveAurasOnGUID = function(auraDB, guid)
         auraDB[guid] = nil
     end
 end
-
 __exports.IsWithinAuraLag = function(time1, time2, factor)
     factor = factor or 1
     local auraLag = Ovale.db.profile.apparence.auraLag
@@ -301,16 +297,13 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
     constructor = function(self)
         self.RequireBuffHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
             local verified = false
-            local buffName = tokens
             local stacks = 1
-            if index then
-                buffName = tokens[index]
+            local buffName = tokens[index]
+            index = index + 1
+            local count = tonumber(tokens[index])
+            if count then
+                stacks = count
                 index = index + 1
-                local count = tonumber(tokens[index])
-                if count then
-                    stacks = count
-                    index = index + 1
-                end
             end
             if buffName then
                 local isBang = false
@@ -318,7 +311,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                     isBang = true
                     buffName = strsub(buffName, 2)
                 end
-                buffName = tonumber(buffName) or buffName
+                local buffId = tonumber(buffName) or buffName
                 local guid, unitId, filter, mine
                 if strsub(requirement, 1, 7) == "target_" then
                     if targetGUID then
@@ -339,7 +332,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                     mine =  not (strsub(requirement, -4) == "_any")
                 end
                 guid = guid or OvaleGUID:UnitGUID(unitId)
-                local aura = self:GetAuraByGUID(guid, buffName, filter, mine, atTime)
+                local aura = self:GetAuraByGUID(guid, buffId, filter, mine, atTime)
                 local isActiveAura = self:IsActiveAura(aura, atTime) and aura.stacks >= stacks
                 if  not isBang and isActiveAura or isBang and  not isActiveAura then
                     verified = true
@@ -436,7 +429,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         if mine and cleuEvent == "SPELL_MISSED" then
             local spellId, _ = arg12, arg13, arg14
             local si = OvaleData.spellInfo[spellId]
-            local bypassState = __exports.OvaleAura.current.bypassState
+            local bypassState = self.current.bypassState
             if si and si.aura and si.aura.player then
                 for _, auraTable in pairs(si.aura.player) do
                     for auraId in pairs(auraTable) do
@@ -777,7 +770,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                     for casterGUID, aura in pairs(whoseTable) do
                         if aura.serial == serial - 1 then
                             if aura.visible then
-                                self:LostAuraOnGUID(guid, now, auraId, casterGUID)
+                                self:LostAuraOnGUID(guid, now, tonumber(auraId), casterGUID)
                             else
                                 aura.serial = serial
                                 self:Debug("    Preserving aura %s (%d), start=%s, ending=%s, aura.serial=%d", aura.name, aura.spellId, aura.start, aura.ending, aura.serial)

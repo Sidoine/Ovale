@@ -54,23 +54,22 @@ let CLEU_SPELLCAST_EVENT = {
         CLEU_SPELLCAST_EVENT[cleuEvent] = true;
     }
 }
-let SPELLCAST_AURA_ORDER = {
+let SPELLCAST_AURA_ORDER: LuaArray<string> = {
     1: "target",
     2: "pet"
-}
+};
 let SPELLAURALIST_AURA_VALUE = {
     count: true,
     extend: true,
     refresh: true,
     refresh_keep_snapshot: true
-}
-let WHITE_ATTACK = {
+};
+let WHITE_ATTACK: LuaArray<boolean> = {
     [75]: true,
     [5019]: true,
     [6603]: true
-}
-let WHITE_ATTACK_NAME = {
-}
+};
+let WHITE_ATTACK_NAME: LuaObj<boolean> = {};
 {
     for (const [spellId] of pairs(WHITE_ATTACK)) {
         let [name] = GetSpellInfo(spellId);
@@ -80,7 +79,7 @@ let WHITE_ATTACK_NAME = {
     }
 }
 
-const IsSameSpellcast = function(a, b) {
+const IsSameSpellcast = function(a: SpellCast, b: SpellCast) {
     let boolean = (a.spellId == b.spellId && a.queued == b.queued);
     if (boolean) {
         if (a.channel || b.channel) {
@@ -106,7 +105,7 @@ export class OvaleFutureData {
     currentCast: SpellCast = {}
     nextCast: number;
     
-    PushGCDSpellId(spellId) {
+    PushGCDSpellId(spellId: number) {
         if (this.lastGCDSpellId) {
             insert(this.lastGCDSpellIds, this.lastGCDSpellId);
             if (lualength(this.lastGCDSpellIds) > 5) {
@@ -116,7 +115,7 @@ export class OvaleFutureData {
         this.lastGCDSpellId = spellId;
     }
     
-    UpdateCounters(spellId, atTime, targetGUID) {
+    UpdateCounters(spellId: number, atTime: number, targetGUID: string) {
         let inccounter = OvaleData.GetSpellInfoProperty(spellId, atTime, "inccounter", targetGUID);
         if (inccounter) {
             let value = this.counter[inccounter] && this.counter[inccounter] || 0;
@@ -549,14 +548,14 @@ export class OvaleFutureClass extends OvaleFutureBase {
             this.StopProfiling("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED");
         }
     }
-    Ovale_AuraAdded(event, atTime, guid, auraId, caster) {
+    Ovale_AuraAdded(event: string, atTime: number, guid: string, auraId: string, caster: string) {
         if (guid == Ovale.playerGUID) {
             self_timeAuraAdded = atTime;
             this.UpdateSpellcastSnapshot(lastSpell.lastGCDSpellcast, atTime);
             this.UpdateSpellcastSnapshot(this.current.lastOffGCDSpellcast, atTime);
         }
     }
-    UnitSpellcastEnded(event, unitId, spell, rank, lineId, spellId) {
+    UnitSpellcastEnded(event: string, unitId: string, spell: string, rank: number, lineId: number, spellId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
             this.StartProfiling("OvaleFuture_UnitSpellcastEnded");
             this.DebugTimestamp(event, unitId, spell, rank, lineId, spellId);
@@ -576,7 +575,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
             this.StopProfiling("OvaleFuture_UnitSpellcastEnded");
         }
     }
-    GetSpellcast(spell, spellId, lineId, atTime):[SpellCast, number] {
+    GetSpellcast(spell: string, spellId: number, lineId: number | undefined | string, atTime: number):[SpellCast, number] {
         this.StartProfiling("OvaleFuture_GetSpellcast");
         let spellcast: SpellCast, index: number;
         if (!lineId || lineId != "") {
@@ -608,7 +607,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
         this.StopProfiling("OvaleFuture_GetSpellcast");
         return [spellcast, index];
     }
-    GetAuraFinish(spell, spellId, targetGUID, atTime) {
+    GetAuraFinish(spell: string, spellId: number, targetGUID: string, atTime: number) {
         this.StartProfiling("OvaleFuture_GetAuraFinish");
         let auraId, auraGUID;
         let si = OvaleData.spellInfo[spellId];

@@ -11,7 +11,7 @@ import { OvalePower } from "./Power";
 import { OvaleScore } from "./Score";
 import { OvaleSpellBook } from "./SpellBook";
 import { OvaleStance } from "./Stance";
-import { RegisterPrinter, Ovale } from "./Ovale";
+import { Ovale } from "./Ovale";
 import { checkBoxes, lists, ResetControls } from "./Controls";
 import aceEvent from "@wowts/ace_event-3.0";
 import { ipairs, pairs, tonumber, tostring, type, wipe, LuaArray, lualength, truthy, LuaObj } from "@wowts/lua";
@@ -286,7 +286,7 @@ function EvaluateScoreSpells(node) {
     }
     return ok;
 }
-function EvaluateSpellAuraList(node) {
+function EvaluateSpellAuraList(node: AstNode) {
     let ok = true;
     let [spellId, positionalParams, namedParams] = [node.spellId, node.positionalParams, node.namedParams];
     if (!spellId) {
@@ -377,7 +377,7 @@ function EvaluateSpellInfo(node) {
                     if (namedParams.pertrait != undefined) {
                         realValue = value * OvaleArtifact.TraitRank(namedParams.pertrait);
                     }
-                    let power = si[k] || 0;
+                    let power = <number>si[k] || 0;
                     si[k] = power + realValue;
                 } else {
                     ok = false;
@@ -507,7 +507,7 @@ let UpdateTrinketInfo = undefined;
     }
 }
 
-const OvaleCompileClassBase = RegisterPrinter(OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(OvaleCompileBase)));
+const OvaleCompileClassBase = OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(OvaleCompileBase));
 class OvaleCompileClass extends OvaleCompileClassBase {
     serial = undefined;
     ast = undefined;

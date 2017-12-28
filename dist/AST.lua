@@ -36,6 +36,10 @@ local concat = table.concat
 local insert = table.insert
 local sort = table.sort
 local GetItemInfo = GetItemInfo
+local __tools = LibStub:GetLibrary("ovale/tools")
+local isLuaArray = __tools.isLuaArray
+local isNumber = __tools.isNumber
+local isString = __tools.isString
 local OvaleASTBase = OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvaleAST")))
 local KEYWORD = {
     ["and"] = true,
@@ -339,15 +343,6 @@ local SelfPool = __class(OvalePool, {
     end,
 })
 local function isAstNode(a)
-    return type(a) == "table"
-end
-local function isString(s)
-    return type(s) == "string"
-end
-local function isNumber(s)
-    return type(s) == "number"
-end
-local function isLuaArray(a)
     return type(a) == "table"
 end
 local OvaleASTClass = __class(OvaleASTBase, {

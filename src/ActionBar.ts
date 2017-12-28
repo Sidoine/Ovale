@@ -7,9 +7,9 @@ import aceEvent from "@wowts/ace_event-3.0";
 import aceTimer from "@wowts/ace_timer-3.0";
 import { gsub, len, match, upper } from "@wowts/string";
 import { concat, sort, insert } from "@wowts/table";
-import { tonumber, wipe, pairs, tostring, ipairs, lualength, _G } from "@wowts/lua";
+import { tonumber, wipe, pairs, tostring, ipairs, lualength, _G, LuaArray, LuaObj } from "@wowts/lua";
 import { GetActionInfo, GetActionText, GetBindingKey, GetBonusBarIndex, GetMacroItem, GetMacroSpell } from "@wowts/wow-mock";
-
+import ElvUI from "@wowts/libactionbutton-1.0-elvui";
 
 const OvaleActionBarBase = OvaleProfiler.RegisterProfiling(OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleActionBar", aceEvent, aceTimer)));
 class OvaleActionBarClass extends OvaleActionBarBase {
@@ -23,19 +23,19 @@ class OvaleActionBarClass extends OvaleActionBarBase {
                     type: "input",
                     multiline: 25,
                     width: "full",
-                    get: (info) => {
+                    get: (info: string) => {
                         return this.DebugActions();
                     }
                 }
             }
         }
     }
-    action = {}
-    keybind = {}
-    spell = {}
-    macro = {}
+    action: LuaArray<number | string> = {}
+    keybind: LuaObj<string> = {}
+    spell: LuaObj<number> = {}
+    macro: LuaObj<number> = {}
+    item: LuaObj<number> = {}
 
-    item = {}
     constructor(){
         super();
         for (const [k, v] of pairs(this.debugOptions)) {
@@ -53,7 +53,7 @@ class OvaleActionBarClass extends OvaleActionBarBase {
         this.RegisterMessage("Ovale_TalentsChanged", event => this.UpdateActionSlots(event));
     }
 
-    GetKeyBinding(slot) {
+    GetKeyBinding(slot: number) {
         let name;
         if (_G["Bartender4"]) {
             name = `CLICK BT4Button ${slot}:LeftButton`;
@@ -87,7 +87,7 @@ class OvaleActionBarClass extends OvaleActionBarBase {
         return key;
     }
 
-    ParseHyperlink(hyperlink) {
+    ParseHyperlink(hyperlink: string) {
         let [color, linkType, linkData, text] = match(hyperlink, "|?c?f?f?(%x*)|?H?([^:]*):?(%d+)|?h?%[?([^%[%]]*)%]?|?h?|?r?");
         return [color, linkType, linkData, text];
     }
@@ -102,13 +102,13 @@ class OvaleActionBarClass extends OvaleActionBarBase {
         this.UnregisterMessage("Ovale_TalentsChanged");
     }
 
-    ACTIONBAR_SLOT_CHANGED(event, slot) {
+    ACTIONBAR_SLOT_CHANGED(event: string, slot: number) {
         slot = tonumber(slot);
         if (slot == 0) {
             this.UpdateActionSlots(event);
 		} else if (ElvUI) {
-			let elvUIButtons = LibStub('LibActionButton-1.0-ElvUI').buttonRegistry;
-			for (const btn of pairs(elvUIButtons)) {
+			let elvUIButtons = ElvUI.buttonRegistry;
+			for (const [,btn] of pairs(elvUIButtons)) {
 				let s = btn.GetAttribute("action");
 				if (s == slot) {
 					this.UpdateActionSlot(slot);
@@ -123,14 +123,14 @@ class OvaleActionBarClass extends OvaleActionBarBase {
             }
         }
     }
-    UPDATE_BINDINGS(event) {
+    UPDATE_BINDINGS(event: string) {
         this.Debug("%s: Updating key bindings.", event);
         this.UpdateKeyBindings();
     }
     TimerUpdateActionSlots() {
         this.UpdateActionSlots("TimerUpdateActionSlots");
     }
-    UpdateActionSlots(event) {
+    UpdateActionSlots(event: string) {
         this.StartProfiling("OvaleActionBar_UpdateActionSlots");
         this.Debug("%s: Updating all action slot mappings.", event);
         wipe(this.action);
@@ -138,8 +138,8 @@ class OvaleActionBarClass extends OvaleActionBarBase {
         wipe(this.macro);
         wipe(this.spell);
         if (ElvUI) {
-			let elvUIButtons = LibStub('LibActionButton-1.0-ElvUI').buttonRegistry;
-			for (const btn of ipairs(elvUIButtons)) {
+			let elvUIButtons = ElvUI.buttonRegistry;
+			for (const [,btn] of ipairs(elvUIButtons)) {
 				let s = btn.GetAttribute("action");
 				this.UpdateActionSlot(s);
 			}
@@ -161,7 +161,7 @@ class OvaleActionBarClass extends OvaleActionBarBase {
 		}
         this.StopProfiling("OvaleActionBar_UpdateActionSlots");
     }
-    UpdateActionSlot(slot) {
+    UpdateActionSlot(slot: number) {
         this.StartProfiling("OvaleActionBar_UpdateActionSlot");
         let action = this.action[slot];
         if (this.spell[action] == slot) {
@@ -238,26 +238,26 @@ class OvaleActionBarClass extends OvaleActionBarBase {
         }
         this.StopProfiling("OvaleActionBar_UpdateKeyBindings");
     }
-    GetForSpell(spellId) {
+    GetForSpell(spellId: number) {
         return this.spell[spellId];
     }
-    GetForMacro(macroName) {
+    GetForMacro(macroName: string) {
         return this.macro[macroName];
     }
-    GetForItem(itemId) {
+    GetForItem(itemId: string) {
         return this.item[itemId];
     }
-    GetBinding(slot) {
+    GetBinding(slot: number) {
         return this.keybind[slot];
     }
 
-    output = {}
-    OutputTableValues(output, tbl) {}
+    output: LuaArray<string> = {}
+    OutputTableValues(output: string, tbl: any) {}
 
     DebugActions() {
         wipe(this.output);
-        let array = {
-        }
+        let array: LuaArray<string> = {}
+        
         for (const [k, v] of pairs(this.spell)) {
             insert(array, `${tostring(this.GetKeyBinding(v))}: ${tostring(k)} ${tostring(OvaleSpellBook.GetSpellName(k))}`);
         }
