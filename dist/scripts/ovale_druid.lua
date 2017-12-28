@@ -2,9 +2,8 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
     local name = "icyveins_druid_guardian"
-    local desc = "[7.1.5] Icy-Veins: Druid Guardian"
+    local desc = "[7.3.2] Icy-Veins: Druid Guardian"
     local code = [[
-
 Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
@@ -13,19 +12,50 @@ Include(ovale_druid_spells)
 AddCheckBox(opt_interrupt L(interrupt) default specialization=guardian)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=guardian)
 AddCheckBox(opt_druid_guardian_aoe L(AOE) default specialization=guardian)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=guardian)
+
+AddFunction FrenziedRegenHealModifier
+{
+	(1+Versatility()/100) * 
+	(1+0.20*BuffPresent(guardian_of_elune_buff)) * 
+	(1+0.05*ArtifactTraitRank(wildflesh_trait)) *
+	(1+0.12*HasEquippedItem(skysecs_hold)) * 
+	# Guardian Spirit
+	(1+0.40*BuffPresent(47788)) *
+	# Divine Hymn
+	(1+0.1*BuffPresent(64844)) *
+	# Protection of Tyr
+	(1+0.15*BuffPresent(211210)) *
+	# Life Cocoon 
+	(1+0.5*BuffPresent(116849)) *
+	# T21
+	(1+0.1*BuffPresent(253575)) *
+	1
+}
+
+AddFunction FrenziedRegenHealTotal
+{
+	IncomingDamage(5) / 2
+}
 
 AddFunction GuardianHealMe
 {
-	if IncomingDamage(5) >= MaxHealth() * 0.5 Spell(frenzied_regeneration)
-	if ((IncomingDamage(5) / 2 <= HealthMissing()) and (IncomingDamage(5) / 2 > MaxHealth() * 0.1) and SpellCharges(frenzied_regeneration) >= 2) Spell(frenzied_regeneration)
-	if HealthPercent() <= 50 Spell(lunar_beam)
-	if HealthPercent() <= 50 and IncomingDamage(5 physical=1) == 0 Spell(regrowth)
-	if HealthPercent() <= 80 and not InCombat() Spell(regrowth)
+	unless(DebuffPresent(healing_immunity_debuff)) 
+	{
+		if BuffExpires(frenzied_regeneration_buff) and HealthPercent() <= 70 
+		{
+			if (FrenziedRegenHealTotal() >= MaxHealth() * 0.20) Spell(frenzied_regeneration)
+		}
+		
+		if HealthPercent() <= 50 Spell(lunar_beam)
+		if HealthPercent() <= 80 and not InCombat() Spell(regrowth)
+		if HealthPercent() < 35 UseHealthPotions()
+	}
 }
 
 AddFunction GuardianGetInMeleeRange
 {
-	if CheckBoxOn(opt_melee_range) and Stance(druid_bear_form) and not target.InRange(mangle) or { Stance(druid_cat_form) or Stance(druid_claws_of_shirvallah) } and not target.InRange(shred)
+	if CheckBoxOn(opt_melee_range) and (Stance(druid_bear_form) and not target.InRange(mangle) or { Stance(druid_cat_form) or Stance(druid_claws_of_shirvallah) } and not target.InRange(shred))
 	{
 		if target.InRange(wild_charge) Spell(wild_charge)
 		Texture(misc_arrowlup help=L(not_in_melee_range))
@@ -35,12 +65,7 @@ AddFunction GuardianGetInMeleeRange
 AddFunction GuardianDefaultShortCDActions
 {
 	GuardianHealMe()
-	if InCombat() and BuffExpires(bristling_fur_buff)
-	{
-		if IncomingDamage(5 physical=1) Spell(ironfur)
-	}
-	if BuffExpires(survival_instincts_buff) and BuffExpires(rage_of_the_sleeper_buff) and BuffExpires(barkskin_buff) Spell(bristling_fur)
-	# range check
+	if IncomingDamage(5 physical=1) Spell(ironfur)
 	GuardianGetInMeleeRange()
 }
 
@@ -51,10 +76,18 @@ AddFunction GuardianDefaultShortCDActions
 AddFunction GuardianDefaultMainActions
 {
 	if not Stance(druid_bear_form) Spell(bear_form)
-	if not BuffExpires(galactic_guardian_buff) Spell(moonfire)
+	if not BuffExpires(incarnation_guardian_of_ursoc_buff) 
+	{
+		if (BuffRefreshable(pulverize_buff)) Spell(pulverize)
+		if target.DebuffStacks(thrash_bear_debuff) < SpellData(thrash_bear_debuff max_stacks) Spell(thrash_bear)
+		if Talent(soul_of_the_forest_talent) Spell(mangle)
+		Spell(thrash_bear)
+	}
+	
 	Spell(mangle)
+	if not BuffExpires(galactic_guardian_buff) Spell(moonfire)
 	Spell(thrash_bear)
-	if target.DebuffStacks(thrash_bear_debuff) >= 2 Spell(pulverize)
+	if (BuffRefreshable(pulverize_buff) or target.DebuffStacks(thrash_bear_debuff) >= 5) Spell(pulverize)
 	if target.DebuffRefreshable(moonfire_debuff) Spell(moonfire)
 	if RageDeficit() <= 20 Spell(maul)
 	Spell(swipe_bear)
@@ -68,12 +101,21 @@ AddFunction GuardianDefaultAoEActions
 {
 	if not Stance(druid_bear_form) Spell(bear_form)
 	if Enemies() >= 4 and HealthPercent() <= 80 Spell(lunar_beam)
-	if not BuffExpires(galactic_guardian_buff) Spell(moonfire)
+	
+	if not BuffExpires(incarnation_guardian_of_ursoc_buff) 
+	{
+		if (BuffRefreshable(pulverize_buff)) Spell(pulverize)
+		if target.DebuffStacks(thrash_bear_debuff) < SpellData(thrash_bear_debuff max_stacks) Spell(thrash_bear)
+		if Talent(soul_of_the_forest_talent) and Enemies() <= 3 Spell(mangle)
+		Spell(thrash_bear)
+	}
+	
 	Spell(thrash_bear)
 	Spell(mangle)
-	if target.DebuffStacks(thrash_bear_debuff) >= 2 Spell(pulverize)
+	if not BuffExpires(galactic_guardian_buff) Spell(moonfire)
+	if (BuffRefreshable(pulverize_buff) or target.DebuffStacks(thrash_bear_debuff) >= 5) Spell(pulverize)
 	if Enemies() <= 3 and target.DebuffRefreshable(moonfire_debuff) Spell(moonfire)
-	if RageDeficit() <= 20 Spell(maul)
+	if Enemies() <= 3 and RageDeficit() <= 20 Spell(maul)
 	Spell(swipe_bear)
 }
 
@@ -84,13 +126,14 @@ AddFunction GuardianDefaultCdActions
 	if HasArtifactTrait(embrace_of_the_nightmare) Spell(rage_of_the_sleeper)
 	if BuffExpires(bristling_fur_buff) and BuffExpires(survival_instincts_buff) and BuffExpires(rage_of_the_sleeper_buff) and BuffExpires(barkskin_buff) and BuffExpires(potion_buff)
 	{
+		Spell(bristling_fur)
 		if (HasEquippedItem(shifting_cosmic_sliver)) Spell(survival_instincts)
 		Item(Trinket0Slot usable=1 text=13)
 		Item(Trinket1Slot usable=1 text=14)
-		Spell(barkskin)
-		Spell(rage_of_the_sleeper)
 		Spell(survival_instincts)
-		Item(unbending_potion usable=1)
+		Spell(rage_of_the_sleeper)
+		Spell(barkskin)
+		if CheckBoxOn(opt_use_consumables) Item(unbending_potion usable=1)
 	}
 }
 
@@ -128,7 +171,6 @@ AddIcon help=cd specialization=guardian
 {
 	GuardianDefaultCdActions()
 }
-	
 ]]
     OvaleScripts:RegisterScript("DRUID", "guardian", name, desc, code, "script")
 end

@@ -3699,6 +3699,15 @@ l    */
     function Strength(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         return Snapshot("strength", 0, positionalParams, namedParams, state, atTime);
     }
+    
+    function Versatility(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
+        return Snapshot("versatility", 0, positionalParams, namedParams, state, atTime);
+    }
+    
+    function VersatilityRating(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
+        return Snapshot("versatilityRating", 0, positionalParams, namedParams, state, atTime);
+    }
+    
     OvaleCondition.RegisterCondition("agility", false, Agility);
     OvaleCondition.RegisterCondition("attackpower", false, AttackPower);
     OvaleCondition.RegisterCondition("critrating", false, CritRating);
@@ -3717,6 +3726,8 @@ l    */
     OvaleCondition.RegisterCondition("spirit", false, Spirit);
     OvaleCondition.RegisterCondition("stamina", false, Stamina);
     OvaleCondition.RegisterCondition("strength", false, Strength);
+    OvaleCondition.RegisterCondition("versatility", false, Versatility);
+    OvaleCondition.RegisterCondition("versatilityRating", false, VersatilityRating);
 }
 {
     /** Get the current speed of the target.
@@ -4211,6 +4222,7 @@ l    */
         return TestBoolean(boolean, yesno);
     }
     OvaleCondition.RegisterCondition("talent", false, Talent);
+    OvaleCondition.RegisterCondition("hastalent", false, Talent);
 }
 {
     /** Get the number of points spent in a talent (0 or 1)

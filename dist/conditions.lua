@@ -1825,6 +1825,12 @@ local function Stamina(positionalParams, namedParams, state, atTime)
 local function Strength(positionalParams, namedParams, state, atTime)
         return Snapshot("strength", 0, positionalParams, namedParams, state, atTime)
     end
+local function Versatility(positionalParams, namedParams, state, atTime)
+        return Snapshot("versatility", 0, positionalParams, namedParams, state, atTime)
+    end
+local function VersatilityRating(positionalParams, namedParams, state, atTime)
+        return Snapshot("versatilityRating", 0, positionalParams, namedParams, state, atTime)
+    end
     OvaleCondition:RegisterCondition("agility", false, Agility)
     OvaleCondition:RegisterCondition("attackpower", false, AttackPower)
     OvaleCondition:RegisterCondition("critrating", false, CritRating)
@@ -1843,6 +1849,8 @@ local function Strength(positionalParams, namedParams, state, atTime)
     OvaleCondition:RegisterCondition("spirit", false, Spirit)
     OvaleCondition:RegisterCondition("stamina", false, Stamina)
     OvaleCondition:RegisterCondition("strength", false, Strength)
+    OvaleCondition:RegisterCondition("versatility", false, Versatility)
+    OvaleCondition:RegisterCondition("versatilityRating", false, VersatilityRating)
 end
 do
 local function Speed(positionalParams, namedParams, state, atTime)
@@ -2089,6 +2097,7 @@ local function Talent(positionalParams, namedParams, state, atTime)
         return TestBoolean(boolean, yesno)
     end
     OvaleCondition:RegisterCondition("talent", false, Talent)
+    OvaleCondition:RegisterCondition("hastalent", false, Talent)
 end
 do
 local function TalentPoints(positionalParams, namedParams, state, atTime)

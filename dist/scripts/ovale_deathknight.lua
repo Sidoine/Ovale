@@ -2,7 +2,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
     local name = "icyveins_deathknight_blood"
-    local desc = "[7.0] Icy-Veins: DeathKnight Blood"
+    local desc = "[7.3.2] Icy-Veins: DeathKnight Blood"
     local code = [[
 
 Include(ovale_common)
@@ -53,12 +53,16 @@ AddFunction BloodDefaultAoEActions
 	Spell(blood_boil)
 }
 
-AddFunction BloodHealMe
-{
-	if HealthPercent() <= 70 Spell(death_strike)
-	if (DamageTaken(5) * 0.2) > (Health() / 100 * 25) Spell(death_strike)
-	if (BuffStacks(bone_shield_buff) * 3) > (100 - HealthPercent()) Spell(tombstone)
-	if HealthPercent() <= 70 Spell(consumption)
+ AddFunction BloodHealMe
+ {
+	unless(DebuffPresent(healing_immunity_debuff)) 
+	{
+		if HealthPercent() <= 70 Spell(death_strike)
+		if (DamageTaken(5) * 0.2) > (Health() / 100 * 25) Spell(death_strike)
+		if (BuffStacks(bone_shield_buff) * 3) > (100 - HealthPercent()) Spell(tombstone)
+		if HealthPercent() <= 70 Spell(consumption)
+		if (HealthPercent() < 35) UseHealthPotions()
+	}
 }
 
 AddFunction BloodDefaultCdActions

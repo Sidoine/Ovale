@@ -48,6 +48,7 @@ class OvaleActionBarClass extends OvaleActionBarBase {
         this.RegisterEvent("PLAYER_ENTERING_WORLD", event => this.UpdateActionSlots(event));
         this.RegisterEvent("UPDATE_BINDINGS");
         this.RegisterEvent("UPDATE_BONUS_ACTIONBAR", event => this.UpdateActionSlots(event));
+        this.RegisterEvent("SPELLS_CHANGED", event => this.UpdateActionSlots(event));
         this.RegisterMessage("Ovale_StanceChanged", event => this.UpdateActionSlots(event));
         this.RegisterMessage("Ovale_TalentsChanged", event => this.UpdateActionSlots(event));
     }
@@ -81,6 +82,7 @@ class OvaleActionBarClass extends OvaleActionBarBase {
             key = gsub(key, "MINUS", "-");
             key = gsub(key, "MULTIPLY", "*");
             key = gsub(key, "DIVIDE", "/");
+            key = gsub(key, "BUTTON", "B")
         }
         return key;
     }
@@ -95,6 +97,7 @@ class OvaleActionBarClass extends OvaleActionBarBase {
         this.UnregisterEvent("PLAYER_ENTERING_WORLD");
         this.UnregisterEvent("UPDATE_BINDINGS");
         this.UnregisterEvent("UPDATE_BONUS_ACTIONBAR");
+        this.UnregisterEvent("SPELLS_CHANGED");
         this.UnregisterMessage("Ovale_StanceChanged");
         this.UnregisterMessage("Ovale_TalentsChanged");
     }
@@ -103,6 +106,14 @@ class OvaleActionBarClass extends OvaleActionBarBase {
         slot = tonumber(slot);
         if (slot == 0) {
             this.UpdateActionSlots(event);
+		} else if (ElvUI) {
+			let elvUIButtons = LibStub('LibActionButton-1.0-ElvUI').buttonRegistry;
+			for (const btn of pairs(elvUIButtons)) {
+				let s = btn.GetAttribute("action");
+				if (s == slot) {
+					this.UpdateActionSlot(slot);
+				}
+			}
         } else if (slot) {
             let bonus = tonumber(GetBonusBarIndex()) * 12;
             let bonusStart = (bonus > 0) && (bonus - 11) || 1;
@@ -126,20 +137,28 @@ class OvaleActionBarClass extends OvaleActionBarBase {
         wipe(this.item);
         wipe(this.macro);
         wipe(this.spell);
-        let start = 1;
-        let bonus = tonumber(GetBonusBarIndex()) * 12;
-        if (bonus > 0) {
-            start = 13;
-            for (let slot = bonus - 11; slot <= bonus; slot += 1) {
-                this.UpdateActionSlot(slot);
-            }
-        }
-        for (let slot = start; slot <= 72; slot += 1) {
-            this.UpdateActionSlot(slot);
-        }
-        if (event != "TimerUpdateActionSlots") {
-            this.ScheduleTimer("TimerUpdateActionSlots", 1);
-        }
+        if (ElvUI) {
+			let elvUIButtons = LibStub('LibActionButton-1.0-ElvUI').buttonRegistry;
+			for (const btn of ipairs(elvUIButtons)) {
+				let s = btn.GetAttribute("action");
+				this.UpdateActionSlot(s);
+			}
+		} else {
+			let start = 1;
+			let bonus = tonumber(GetBonusBarIndex()) * 12;
+			if (bonus > 0) {
+				start = 13;
+				for (let slot = bonus - 11; slot <= bonus; slot += 1) {
+					this.UpdateActionSlot(slot);
+				}
+			}
+			for (let slot = start; slot <= 72; slot += 1) {
+				this.UpdateActionSlot(slot);
+			}
+			if (event != "TimerUpdateActionSlots") {
+				this.ScheduleTimer("TimerUpdateActionSlots", 1);
+			}
+		}
         this.StopProfiling("OvaleActionBar_UpdateActionSlots");
     }
     UpdateActionSlot(slot) {

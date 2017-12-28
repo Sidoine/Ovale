@@ -23,6 +23,9 @@ local UPDATE_DELAY = 0.5
 local SIGIL_ACTIVATION_TIME = huge
 local activated_sigils = {}
 local sigil_start = {
+    [204513] = {
+        type = "flame"
+    },
     [204596] = {
         type = "flame"
     },

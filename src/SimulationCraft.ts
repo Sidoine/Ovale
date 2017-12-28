@@ -374,8 +374,9 @@ let OPTIONAL_SKILLS: LuaObj<{class: string, default?: boolean, specialization?: 
         class: "HUNTER",
         default: true
     },
-    ["trap_launcher"]: {
+    ["harpoon"]: {
         class: "HUNTER",
+        specialization: "survival",
         default: true
     },
     ["time_warp"]: {
@@ -2102,9 +2103,6 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             }
         } else if (className == "HUNTER" && action == "kill_command") {
             conditionCode = "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()";
-        } else if (className == "HUNTER" && sub(action, -5) == "_trap") {
-            annotation.trap_launcher = className;
-            conditionCode = "CheckBoxOn(opt_trap_launcher)";
         } else if (className == "MAGE" && action == "arcane_brilliance") {
             conditionCode = "BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1)";
         } else if (className == "MAGE" && action == "counterspell") {

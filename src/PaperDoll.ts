@@ -7,7 +7,7 @@ import { OvaleState } from "./State";
 import { lastSpell, SpellCast, PaperDollSnapshot, SpellCastModule } from "./LastSpell";
 import aceEvent from "@wowts/ace_event-3.0";
 import { pairs, tonumber, type } from "@wowts/lua";
-import { GetCombatRating, GetCritChance, GetMastery, GetMasteryEffect, GetMeleeHaste, GetMultistrike, GetMultistrikeEffect, GetRangedCritChance, GetRangedHaste, GetSpecialization, GetSpellBonusDamage, GetSpellBonusHealing, GetSpellCritChance, GetTime, UnitAttackPower, UnitAttackSpeed, UnitDamage, UnitLevel, UnitRangedAttackPower, UnitSpellHaste, UnitStat, CR_CRIT_MELEE, CR_HASTE_MELEE } from "@wowts/wow-mock";
+import { GetCombatRating, GetCombatRatingBonus, GetCritChance, GetMastery, GetMasteryEffect, GetMeleeHaste, GetMultistrike, GetMultistrikeEffect, GetRangedCritChance, GetRangedHaste, GetSpecialization, GetSpellBonusDamage, GetSpellBonusHealing, GetSpellCritChance, GetTime, UnitAttackPower, UnitAttackSpeed, UnitDamage, UnitLevel, UnitRangedAttackPower, UnitSpellHaste, UnitStat, CR_CRIT_MELEE, CR_HASTE_MELEE, CR_VERSATILITY_DAMAGE_DONE } from "@wowts/wow-mock";
 
 export let OvalePaperDoll: OvalePaperDollClass;
 let OVALE_SPELLDAMAGE_SCHOOL = {
@@ -117,6 +117,8 @@ export class PaperDollData implements PaperDollSnapshot {
     hasteRating = 0;
     masteryRating = 0;
     multistrikeRating = 0;
+    versatilityRating = 0;
+    versatility = 0;
     mainHandWeaponDamage = 0;
     offHandWeaponDamage = 0;
     baseDamageMultiplier = 1;
@@ -151,6 +153,8 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
         hasteRating: true,
         masteryRating: true,
         multistrikeRating: true,
+        versatilityRating: true,
+        versatility: true,
         mainHandWeaponDamage: true,
         offHandWeaponDamage: true,
         baseDamageMultiplier: true
@@ -211,6 +215,8 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
         this.current.spellCrit = GetSpellCritChance(OVALE_SPELLDAMAGE_SCHOOL[this.class]);
         this.current.critRating = GetCombatRating(CR_CRIT_MELEE);
         this.current.hasteRating = GetCombatRating(CR_HASTE_MELEE);
+        this.current.versatilityRating = GetCombatRating(CR_VERSATILITY_DAMAGE_DONE);
+        this.current.versatility = GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_DONE);
         this.current.snapshotTime = GetTime();
         Ovale.needRefresh();
         this.StopProfiling("OvalePaperDoll_UpdateStats");
@@ -475,6 +481,8 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
         this.next.hasteRating = 0;
         this.next.masteryRating = 0;
         this.next.multistrikeRating = 0;
+        this.next.versatilityRating = 0;
+        this.next.versatility = 0;
         this.next.mainHandWeaponDamage = 0;
         this.next.offHandWeaponDamage = 0;
         this.next.baseDamageMultiplier = 1;

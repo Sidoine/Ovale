@@ -16,6 +16,9 @@ let SIGIL_ACTIVATION_TIME = huge;
 let activated_sigils: LuaObj<LuaArray<number>> = {
 }
 let sigil_start = {
+    [204513]: {
+        type: "flame"
+    },
     [204596]: {
         type: "flame"
     },

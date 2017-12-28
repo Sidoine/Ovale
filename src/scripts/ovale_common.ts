@@ -1,7 +1,7 @@
 import { OvaleScripts } from "../Scripts";
 export function register() {
     let name = "ovale_common";
-    let desc = "[7.3.0] Ovale: Common spell definitions";
+    let desc = "[7.3.2] Ovale: Common spell definitions";
     let code = `
 # Common spell definitions shared by all classes and specializations.
 
@@ -60,6 +60,16 @@ Define(potion_of_prolonged_power_potion 142117)
 Define(prolonged_power_buff 229206)
 Define(unbending_potion_buff 188029)
 SpellList(potion_buff unbending_potion_buff)
+
+Define(astral_healing_potion 152615)
+    ItemRequire(astral_healing_potion unusable 1=debuff,healing_immunity_debuff)
+Define(ancient_healing_potion 127834)
+    ItemRequire(ancient_healing_potion unusable 1=debuff,healing_immunity_debuff)
+Define(aged_healing_potion 136569)
+    ItemRequire(aged_healing_potion unusable 1=debuff,healing_immunity_debuff)
+Define(healthstone 5512)
+    ItemRequire(healthstone unusable 1=debuff,healing_immunity_debuff)
+
 
 SpellList(trinket_proc_spell_power_buff)
 SpellList(trinket_stacking_proc_spell_power_buff)
@@ -196,6 +206,18 @@ Define(stoneform_buff 20594)
 	SpellInfo(stoneform_buff duration=8)
 Define(war_stomp 20549)
 	SpellInfo(war_stomp cd=120 interrupt=1)
+    
+	
+###
+### Boss Spells
+###
+Define(misery_debuff 243961)
+	SpellInfo(misery_debuff duration=7)
+	
+###
+### Healing
+###
+SpellList(healing_immunity_debuff misery_debuff)
 
 AddFunction UseRacialSurvivalActions
 {
