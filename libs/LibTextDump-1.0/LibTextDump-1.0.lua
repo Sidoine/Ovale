@@ -1,8 +1,6 @@
 -----------------------------------------------------------------------
 -- Upvalued Lua API.
 -----------------------------------------------------------------------
-local _G = getfenv(0)
-
 -- Functions
 local date = _G.date
 local error = _G.error
@@ -19,7 +17,7 @@ local MAJOR = "LibTextDump-1.0"
 
 _G.assert(LibStub, MAJOR .. " requires LibStub")
 
-local MINOR = 2 -- Should be manually increased
+local MINOR = 3 -- Should be manually increased
 local lib, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then
@@ -54,78 +52,36 @@ local DEFAULT_FRAME_HEIGHT = 600
 -----------------------------------------------------------------------
 -- Helper functions.
 -----------------------------------------------------------------------
-local function CreateBorder(parent, width, height, left, right, top, bottom)
-	local border = parent:CreateTexture(nil, "BORDER")
-	border:SetTexture([[Interface\PaperDollInfoFrame\UI-GearManager-Border]])
-	border:SetWidth(width)
-	border:SetHeight(height)
-	border:SetTexCoord(left, right, top, bottom)
-
-	return border
+local function round(number, places)
+	local mult = 10 ^ (places or 0)
+	return _G.floor(number * mult + 0.5) / mult
 end
 
-local function NewInstance(width, height)
+local function NewInstance(width, height, useFauxScroll)
 	lib.num_frames = lib.num_frames + 1
 
 	local frameName = ("%s_CopyFrame%d"):format(MAJOR, lib.num_frames)
-	local copyFrame = _G.CreateFrame("Frame", frameName, _G.UIParent)
+	local copyFrame = _G.CreateFrame("Frame", frameName, _G.UIParent, "ButtonFrameTemplate")
 	copyFrame:SetSize(width, height)
 	copyFrame:SetPoint("CENTER", _G.UIParent, "CENTER")
 	copyFrame:SetFrameStrata("DIALOG")
 	copyFrame:EnableMouse(true)
 	copyFrame:SetMovable(true)
+	copyFrame:SetToplevel(true)
+
+	_G.ButtonFrameTemplate_HidePortrait(copyFrame)
+	_G.ButtonFrameTemplate_HideAttic(copyFrame)
+	_G.ButtonFrameTemplate_HideButtonBar(copyFrame)
 
 	table.insert(_G.UISpecialFrames, frameName)
 	_G.HideUIPanel(copyFrame)
 
-	local titleBackground = copyFrame:CreateTexture(nil, "BACKGROUND")
-	titleBackground:SetTexture([[Interface\PaperDollInfoFrame\UI-GearManager-Title-Background]])
-	titleBackground:SetPoint("TOPLEFT", 9, -6)
-	titleBackground:SetPoint("BOTTOMRIGHT", copyFrame, "TOPRIGHT", -28, -24)
+	copyFrame.title = copyFrame.TitleText
 
-	local dialogBackground = copyFrame:CreateTexture(nil, "BACKGROUND")
-	dialogBackground:SetTexture([[Interface\Tooltips\UI-Tooltip-Background]])
-	dialogBackground:SetVertexColor(0, 0, 0, 0.75)
-	dialogBackground:SetPoint("TOPLEFT", 8, -24)
-	dialogBackground:SetPoint("BOTTOMRIGHT", -6, 8)
-
-	local topLeftBorder = CreateBorder(copyFrame, 64, 64, 0.501953125, 0.625, 0, 1)
-	topLeftBorder:SetPoint("TOPLEFT")
-
-	local topRightBorder = CreateBorder(copyFrame, 64, 64, 0.625, 0.75, 0, 1)
-	topRightBorder:SetPoint("TOPRIGHT")
-
-	local topBorder = CreateBorder(copyFrame, 0, 64, 0.25, 0.369140625, 0, 1)
-	topBorder:SetPoint("TOPLEFT", topLeftBorder, "TOPRIGHT", 0, 0)
-	topBorder:SetPoint("TOPRIGHT", topRightBorder, "TOPLEFT", 0, 0)
-
-	local bottomLeftBorder = CreateBorder(copyFrame, 64, 64, 0.751953125, 0.875, 0, 1)
-	bottomLeftBorder:SetPoint("BOTTOMLEFT")
-
-	local bottomRightBorder = CreateBorder(copyFrame, 64, 64, 0.875, 1, 0, 1)
-	bottomRightBorder:SetPoint("BOTTOMRIGHT")
-
-	local bottomBorder = CreateBorder(copyFrame, 0, 64, 0.37695312, 0.498046875, 0, 1)
-	bottomBorder:SetPoint("BOTTOMLEFT", bottomLeftBorder, "BOTTOMRIGHT", 0, 0)
-	bottomBorder:SetPoint("BOTTOMRIGHT", bottomRightBorder, "BOTTOMLEFT", 0, 0)
-
-	local leftBorder = CreateBorder(copyFrame, 64, 0, 0.001953125, 0.125, 0, 1)
-	leftBorder:SetPoint("TOPLEFT", topLeftBorder, "BOTTOMLEFT", 0, 0)
-	leftBorder:SetPoint("BOTTOMLEFT", bottomLeftBorder, "TOPLEFT", 0, 0)
-
-	local rightBorder = CreateBorder(copyFrame, 64, 0, 0.1171875, 0.2421875, 0, 1)
-	rightBorder:SetPoint("TOPRIGHT", topRightBorder, "BOTTOMRIGHT", 0, 0)
-	rightBorder:SetPoint("BOTTOMRIGHT", bottomRightBorder, "TOPRIGHT", 0, 0)
-
-	local titleFontString = copyFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	titleFontString:SetPoint("TOPLEFT", 12, -8)
-	titleFontString:SetPoint("TOPRIGHT", -32, -8)
-
-	copyFrame.title = titleFontString
-
+	local titleBackground = _G[frameName .. "TitleBg"]
 	local dragFrame = _G.CreateFrame("Frame", nil, copyFrame)
-	dragFrame:SetPoint("TOPLEFT", titleFontString)
-	dragFrame:SetPoint("BOTTOMRIGHT", titleFontString)
+	dragFrame:SetPoint("TOPLEFT", titleBackground, 16, 0)
+	dragFrame:SetPoint("BOTTOMRIGHT", titleBackground)
 	dragFrame:EnableMouse(true)
 
 	dragFrame:SetScript("OnMouseDown", function(self, button)
@@ -136,29 +92,97 @@ local function NewInstance(width, height)
 		copyFrame:StopMovingOrSizing()
 	end)
 
-	local closeButton = _G.CreateFrame("Button", nil, copyFrame, "UIPanelCloseButton")
-	closeButton:SetSize(32, 32)
-	closeButton:SetPoint("TOPRIGHT", 2, 1)
+	local scrollArea
 
-	local footerFrame = _G.CreateFrame("Frame", nil, copyFrame, "InsetFrameTemplate")
-	footerFrame:SetHeight(23)
-	footerFrame:SetPoint("BOTTOMLEFT", copyFrame, "BOTTOMLEFT", 8, 8)
-	footerFrame:SetPoint("BOTTOMRIGHT", copyFrame, "BOTTOMRIGHT", -5, 8)
+	if useFauxScroll then
+		scrollArea = _G.CreateFrame("ScrollFrame", ("%sScroll"):format(frameName), copyFrame, "FauxScrollFrameTemplate")
 
-	local footerFontString = footerFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
-	footerFontString:SetPoint("CENTER", footerFrame, "CENTER", 0, 0)
+		function scrollArea:Update(start, wrappedLines, maxDisplayLines, lineHeight)
+			local lineIndex = start - 1
+			local linesToDisplay = 0
 
-	local scrollArea = _G.CreateFrame("ScrollFrame", ("%sScroll"):format(frameName), copyFrame, "UIPanelScrollFrameTemplate")
-	scrollArea:SetPoint("TOPLEFT", copyFrame, "TOPLEFT", 10, -28)
-	scrollArea:SetPoint("BOTTOMRIGHT", copyFrame, "BOTTOMRIGHT", -28, 31)
+			repeat
+				lineIndex = lineIndex + 1
+				linesToDisplay = linesToDisplay + (wrappedLines[lineIndex] or 0)
+			until linesToDisplay > maxDisplayLines or not wrappedLines[lineIndex]
 
-	scrollArea:SetScript("OnMouseWheel", function(self, delta)
-		_G.ScrollFrameTemplate_OnMouseWheel(self, delta, self.ScrollBar)
-	end)
+			local stop = lineIndex - 1
 
-	scrollArea.ScrollBar:SetScript("OnMouseWheel", function(self, delta)
-		_G.ScrollFrameTemplate_OnMouseWheel(self, delta, self)
-	end)
+			self:Show()
+
+			local name = self:GetName()
+			local scrollBar = _G[name .. "ScrollBar"]
+
+			scrollBar:SetStepsPerPage(linesToDisplay - 1)
+
+			-- This block should only be run when the buffer is changed.
+			-- Possible variations in linesToDisplay from scroll to scroll will affect the height of the scroll frame.
+			-- This will then result in inconsistent scrolling behaviour.
+			if lineHeight then
+				local scrollChildFrame = _G[name .. "ScrollChildFrame"]
+
+				local scrollFrameHeight = (wrappedLines.all - linesToDisplay) * lineHeight
+				local scrollChildHeight = wrappedLines.all * lineHeight
+
+				if scrollFrameHeight < 0 then
+					scrollFrameHeight = 0
+				end
+
+				self.height = scrollFrameHeight
+
+				scrollChildFrame:Show()
+				scrollChildFrame:SetHeight(scrollChildHeight)
+
+				scrollBar:SetMinMaxValues(0, scrollFrameHeight)
+				scrollBar:SetValueStep(lineHeight)
+			end
+
+			-- Arrow button handling
+			local scrollUpButton = _G[name .. "ScrollBarScrollUpButton"]
+			local scrollDownButton = _G[name .. "ScrollBarScrollDownButton"]
+
+			if scrollBar:GetValue() == 0 then
+				scrollUpButton:Disable()
+			else
+				scrollUpButton:Enable()
+			end
+
+			if scrollBar:GetValue() - self.height == 0 then
+				scrollDownButton:Disable()
+			else
+				scrollDownButton:Enable()
+			end
+
+			return start, stop
+		end
+
+		-- lineDummy is used to get the height of a line *after* word wrap to calculate the proper scroll position of the FauxScrollFrame.
+		local lineDummy = copyFrame:CreateFontString()
+		lineDummy:SetJustifyH("LEFT")
+		lineDummy:SetNonSpaceWrap(true)
+		lineDummy:SetFontObject("ChatFontNormal")
+		lineDummy:SetPoint("TOPLEFT", 5, 100)
+		lineDummy:SetPoint("BOTTOMRIGHT", copyFrame, "TOPRIGHT", -28, 0)
+		lineDummy:Hide()
+
+		copyFrame.lineDummy = lineDummy
+	else
+		scrollArea = _G.CreateFrame("ScrollFrame", ("%sScroll"):format(frameName), copyFrame, "UIPanelScrollFrameTemplate")
+
+		scrollArea:SetScript("OnMouseWheel", function(self, delta)
+			_G.ScrollFrameTemplate_OnMouseWheel(self, delta, self.ScrollBar)
+		end)
+
+		scrollArea.ScrollBar:SetScript("OnMouseWheel", function(self, delta)
+			_G.ScrollFrameTemplate_OnMouseWheel(self, delta, self)
+		end)
+	end
+
+	scrollArea:SetPoint("TOPLEFT", copyFrame.Inset, 5, -5)
+	scrollArea:SetPoint("BOTTOMRIGHT", copyFrame.Inset, -27, 6)
+
+	copyFrame.scrollArea = scrollArea
+
 
 	local editBox = _G.CreateFrame("EditBox", nil, copyFrame)
 	editBox:SetMultiLine(true)
@@ -166,18 +190,25 @@ local function NewInstance(width, height)
 	editBox:EnableMouse(true)
 	editBox:SetAutoFocus(false)
 	editBox:SetFontObject("ChatFontNormal")
-	editBox:SetSize(650, 270)
 
 	editBox:SetScript("OnEscapePressed", function()
 		_G.HideUIPanel(copyFrame)
 	end)
 
 	copyFrame.edit_box = editBox
-	scrollArea:SetScrollChild(editBox)
+
+	-- While using a standard scroll frame, editBox will be positioned automatcialy when set as its scrollChild.
+	-- With the faux scroll, we have to position it ourself.
+	if useFauxScroll then
+		editBox:SetAllPoints(scrollArea)
+	else
+		editBox:SetSize(scrollArea:GetSize())
+		scrollArea:SetScrollChild(editBox)
+	end
 
 	local highlightButton = _G.CreateFrame("Button", nil, copyFrame)
 	highlightButton:SetSize(16, 16)
-	highlightButton:SetPoint("BOTTOMRIGHT", -10, 10)
+	highlightButton:SetPoint("TOPLEFT", titleBackground)
 
 	highlightButton:SetScript("OnMouseUp", function(self, button)
 		self.texture:ClearAllPoints()
@@ -185,6 +216,8 @@ local function NewInstance(width, height)
 
 		editBox:HighlightText(0)
 		editBox:SetFocus()
+
+		copyFrame:RegisterEvent("PLAYER_LOGOUT")
 	end)
 
 	highlightButton:SetScript("OnMouseDown", function(self, button)
@@ -207,7 +240,9 @@ local function NewInstance(width, height)
 
 	local instance = _G.setmetatable({}, metatable)
 	frames[instance] = copyFrame
-	buffers[instance] = {}
+	buffers[instance] = {
+		wrappedLines = {}
+	}
 
 	return instance
 end
@@ -216,7 +251,13 @@ end
 -----------------------------------------------------------------------
 -- Library methods.
 -----------------------------------------------------------------------
-function lib:New(frameTitle, width, height)
+--- Create a new dump frame.
+-- @param frameTitle The title text of the frame.
+-- @param width (optional) The width of the frame.
+-- @param height (optional) The height of the frame.
+-- @param save (optional) A function that will be called when the copy button is clicked.
+-- @return A handle for the dump frame.
+function lib:New(frameTitle, width, height, save)
 	local titleType = type(frameTitle)
 
 	if titleType ~= "nil" and titleType ~= "string" then
@@ -235,8 +276,22 @@ function lib:New(frameTitle, width, height)
 		error(METHOD_USAGE_FORMAT:format("New", "frame height must be nil or a number."))
 	end
 
-	local instance = NewInstance(width or DEFAULT_FRAME_WIDTH, height or DEFAULT_FRAME_HEIGHT)
-	frames[instance].title:SetText(frameTitle)
+	local saveType = type(save)
+
+	if saveType ~= "nil" and saveType ~= "function" then
+		error(METHOD_USAGE_FORMAT:format("New", "save must be nil or a function."))
+	end
+
+	local instance = NewInstance(width or DEFAULT_FRAME_WIDTH, height or DEFAULT_FRAME_HEIGHT, not not save)
+	local frame = frames[instance]
+	frame.TitleText:SetText(frameTitle)
+
+	if save then
+		frame:SetScript("OnEvent", function(event, ...)
+			buffers[instance].wrappedLines = nil
+			save(buffers[instance])
+		end)
+	end
 
 	return instance
 end
@@ -255,17 +310,25 @@ end
 
 function prototype:Clear()
 	table.wipe(buffers[self])
+	buffers[self].wrappedLines = {}
 end
 
 function prototype:Display(separator)
-	local display_text = self:String(separator)
-
-	if display_text == "" then
-		error(METHOD_USAGE_FORMAT:format("Display", "buffer must be non-empty"), 2)
-	end
 	local frame = frames[self]
-	frame.edit_box:SetText(display_text)
-	frame.edit_box:SetCursorPosition(0)
+
+	if frame.UpdateText then
+		frame:UpdateText("Display")
+	else
+		local displayText = self:String(separator)
+
+		if displayText == "" then
+			error(METHOD_USAGE_FORMAT:format("Display", "buffer must be non-empty"), 2)
+		end
+
+		frame.edit_box:SetText(displayText)
+		frame.edit_box:SetCursorPosition(0)
+	end
+
 	_G.ShowUIPanel(frame)
 end
 
@@ -278,10 +341,20 @@ function prototype:InsertLine(position, text, dateFormat)
 		error(METHOD_USAGE_FORMAT:format("InsertLine", "text must be a non-empty string."), 2)
 	end
 
+	local buffer = buffers[self]
+
 	if dateFormat and dateFormat ~= "" then
-		table.insert(buffers[self], position, ("[%s] %s"):format(date(dateFormat), text))
+		table.insert(buffer, position, ("[%s] %s"):format(date(dateFormat), text))
 	else
-		table.insert(buffers[self], position, text)
+		table.insert(buffer, position, text)
+	end
+
+	local lineDummy = frames[self].lineDummy
+
+	if lineDummy then
+		lineDummy:SetText(buffer[position])
+		table.insert(buffer.wrappedLines, position, lineDummy:GetNumLines())
+		buffer.wrappedLines.all = (buffer.wrappedLines.all or 0) + buffer.wrappedLines[position]
 	end
 end
 
@@ -290,10 +363,49 @@ function prototype:Lines()
 end
 
 function prototype:String(separator)
-	local sep_type = type(separator)
+	local separatorType = type(separator)
 
-	if sep_type ~= "nil" and sep_type ~= "string" then
+	if separatorType ~= "nil" and separatorType ~= "string" then
 		error(METHOD_USAGE_FORMAT:format("String", "separator must be nil or a string."), 2)
 	end
-	return table.concat(buffers[self], separator or "\n")
+
+	separator = separator or "\n"
+
+	local buffer = buffers[self]
+	local frame = frames[self]
+	local lineDummy = frame.lineDummy
+
+	if lineDummy then
+		local _, lineHeight = lineDummy:GetFont()
+		local maxDisplayLines = round(frame.edit_box:GetHeight() / lineHeight)
+		local allWrappedLines = buffer.wrappedLines.all
+		local offset = 1
+		local start, stop = frame.scrollArea:Update(offset, buffer.wrappedLines, maxDisplayLines, lineHeight)
+
+		function frame:UpdateText()
+			local newWrappedLines = buffer.wrappedLines.all
+
+			if newWrappedLines > allWrappedLines then
+				allWrappedLines = newWrappedLines
+				start, stop = frame.scrollArea:Update(offset, buffer.wrappedLines, maxDisplayLines, lineHeight)
+			else
+				start, stop = frame.scrollArea:Update(offset, buffer.wrappedLines, maxDisplayLines)
+			end
+
+			frame.edit_box:SetText(table.concat(buffer, separator, start, stop))
+		end
+
+		frame.scrollArea:SetScript("OnVerticalScroll", function(scrollArea, value)
+			local scrollbar = scrollArea.ScrollBar
+			local _, scrollMax = scrollbar:GetMinMaxValues()
+			local scrollPer = round(value / scrollMax, 2)
+			offset = round((1 - scrollPer) * 1 + scrollPer * #buffer)
+
+			frame:UpdateText()
+		end)
+
+		return table.concat(buffer, separator, start, stop)
+	else
+		return table.concat(buffer, separator)
+	end
 end

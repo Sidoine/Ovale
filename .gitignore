@@ -1,8 +1,3 @@
-ChangeLog*
-CHANGELOG*
-*.tmp
-release/**
-tmp/**
-luac.out
-/tests
-/utils
+/node_modules
+/dist/**/*.js
+dist/**/*.js.map

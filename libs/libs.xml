@@ -20,5 +20,7 @@
 	<Script file="LibArtifactData-1.0\LibArtifactData-1.0.lua"/>
 	<Script file="LibRangeCheck-2.0\LibRangeCheck-2.0\LibRangeCheck-2.0.lua"/>
 	<Include file="LibInterrupt-1.0\lib.xml" />
+	<Include file="tslib\files.xml"/>
+	<Include file="tsaddon\files.xml"/>
 <!--@end-no-lib-strip@-->
 </Ui>

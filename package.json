@@ -1,0 +1,54 @@
+{
+  "name": "ovale",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "tstolua -p tsconfig.lua.json",
+    "simc": "tsc && node dist/utils/importsimc.js ../../simc/profiles/Tier19P"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@wowts/lua": "^1.0.6",
+    "@wowts/table": "^1.0.1",
+    "@wowts/coroutine": "^1.0.1",
+    "@wowts/math": "^1.0.0",
+    "@wowts/string": "^1.0.5",
+    "@wowts/bit": "^1.0.0",
+    "@wowts/tslib": "^1.0.0",
+    "@wowts/tsaddon": "^1.1.0",
+    "@wowts/wow-mock": "^1.1.0",
+    "@wowts/ace_comm-3.0": "^1.0.0",
+    "@wowts/ace_config-3.0": "^1.0.1",
+    "@wowts/ace_config_dialog-3.0": "^1.0.3",
+    "@wowts/ace_console-3.0": "^1.0.0",
+    "@wowts/ace_db-3.0": "^1.0.0",
+    "@wowts/ace_db_options-3.0": "^1.0.0",
+    "@wowts/ace_event-3.0": "^1.0.0",
+    "@wowts/ace_gui-3.0": "^1.0.0",
+    "@wowts/ace_locale-3.0": "^1.0.0",
+    "@wowts/ace_serializer-3.0": "^1.0.0",
+    "@wowts/ace_timer-3.0": "^1.0.0",
+    "@wowts/lib_artifact_data-1.0": "^1.0.0",
+    "@wowts/lib_babble-creature_type-3.0": "^1.0.0",
+    "@wowts/lib_d_b_icon-1.0": "^1.0.0",
+    "@wowts/lib_dual_spec-1.0": "^1.0.0",
+    "@wowts/lib_range_check-2.0": "^1.0.0",
+    "@wowts/lib_text_dump-1.0": "^1.0.0",
+    "@wowts/lib_data_broker-1.1": "^1.0.0",
+    "@wowts/masque": "^1.0.1",
+    "@wowts/recount": "^1.0.0",
+    "@types/node": "^8.0.44"
+  },
+  "devDependencies": {
+    "typescript": "^2.5.3",
+    "tslint": "^5.7.0",
+    "@wowts/tstolua": "^1.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Sidoine/Ovale.git"
+  }
+}
