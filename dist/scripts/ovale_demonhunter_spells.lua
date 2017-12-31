@@ -197,6 +197,8 @@ Define(vengeful_retreat 198793)
 Define(vengeful_retreat_debuff 198813)
 	SpellInfo(vengeful_retreat_debuff duration=3)
 Define(wide_eyes_trait 238045)
+Define(havoc_t21_4pc_buff 251769)
+	SpellInfo(havoc_t21_4pc_buff duration=8)
 
 ]]
     OvaleScripts:RegisterScript("DEMONHUNTER", nil, name, desc, code, "include")
