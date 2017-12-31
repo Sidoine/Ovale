@@ -177,6 +177,8 @@ AddFunction CurrentInsanityDrain {
 #Legendary
 Define(mangazas_madness 132864)
 Define(buff_sephuzs_secret 208052)
+Define(zeks_exterminatus 144438)
+Define(zeks_exterminatus_buff 236545)
 
 #Artifact traits
 Define(to_the_pain 193644)
