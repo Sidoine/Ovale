@@ -187,6 +187,8 @@ Define(echoes_of_the_great_sundering_buff 208723)
 	SpellAddBuff(earthquake echoes_of_the_great_sundering_buff=0)
 Define(smoldering_heart 151819)
 Define(the_deceivers_blood_pact 137035)
+Define(earthen_strength_buff 252141)
+	SpellInfo(earthen_strength_buff duration=15)
 	
 ]]
     OvaleScripts:RegisterScript("SHAMAN", nil, name, desc, code, "include")
