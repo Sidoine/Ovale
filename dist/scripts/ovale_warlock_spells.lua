@@ -335,6 +335,8 @@ Define(reap_souls 216698)
 	SpellAddBuff(reap_souls deadwind_harvester=1)
 	SpellAddBuff(reap_souls tormented_souls_buff=0)
 	SpellRequire(reap_souls unusable 0=buff,tormented_souls_buff)
+Define(tormented_agony_debuff 256807)
+	SpellInfo(tormented_agony_debuff duration=8)
 
 # Legion traits
 Define(thalkiels_ascendance 238145)
