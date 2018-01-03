@@ -296,7 +296,7 @@ Define(surge_of_toxins 192424)
 Define(surge_of_toxins_debuff 192425)
 	SpellInfo(surge_of_toxins_debuff duration=5)
 Define(symbols_of_death 212283)
-	SpellInfo(symbols_of_death cd=30 energy=35 tag=shortcd)
+	SpellInfo(symbols_of_death cd=30 energy=-40 tag=shortcd)
 	SpellAddBuff(symbols_of_death symbols_of_death_buff=1)
 	SpellAddBuff(symbols_of_death death_buff=1)
 Define(symbols_of_death_buff 212283)
@@ -347,6 +347,7 @@ Define(loaded_dice_buff 240837)
 
 #Legendaries
 Define(the_first_of_the_dead 151818)
+Define(shadow_gestures_buff 257945)
 
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(vanish tag=shortcd)
