@@ -1,5 +1,6 @@
 local LibBabbleCreatureType = LibStub:GetLibrary("LibBabble-creatureType-3.0", true)
 local LibRangeCheck = LibStub:GetLibrary("LibRangeCheck-2.0", true)
+local LibInterrupt = LibStub:GetLibrary("LibInterrupt-1.0", true)
 local __BestAction = LibStub:GetLibrary("ovale/BestAction")
 local OvaleBestAction = __BestAction.OvaleBestAction
 local __Compile = LibStub:GetLibrary("ovale/Compile")
@@ -1182,7 +1183,7 @@ local function IsInterruptible(positionalParams, namedParams, state, atTime)
         if  not name then
             name, _1, _2, _3, _4, _5, _6, notInterruptible = UnitChannelInfo(target)
         end
-        local boolean = notInterruptible ~= nil and  not notInterruptible
+        local boolean = notInterruptible ~= nil and  not notInterruptible and LibInterrupt:MustInterrupt()
         return TestBoolean(boolean, yesno)
     end
     OvaleCondition:RegisterCondition("isinterruptible", false, IsInterruptible)
