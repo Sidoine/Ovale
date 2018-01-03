@@ -2966,6 +2966,7 @@ do
         ["demonic_fury"] = "DemonicFury()",
         ["desired_targets"] = "Enemies(tagged=1)",
         ["doomguard_no_de"] = "NotDeDemons(doomguard)",
+        ["dreadstalker_count"] = "Demons(dreadstalker)",
         ["dreadstalker_no_de"] = "NotDeDemons(dreadstalker)",
         ["dreadstalker_remaining_duration"] = "DemonDuration(dreadstalker)",
         ["eclipse_change"] = "TimeToEclipse()",
