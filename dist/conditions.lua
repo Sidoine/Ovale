@@ -85,6 +85,7 @@ local UnitPower = UnitPower
 local UnitPowerMax = UnitPowerMax
 local UnitRace = UnitRace
 local UnitStagger = UnitStagger
+local UnitGUID = UnitGUID
 local huge = math.huge
 local __AST = LibStub:GetLibrary("ovale/AST")
 local isValueNode = __AST.isValueNode
@@ -2122,19 +2123,28 @@ do
 	local function IsFocus(positionalParams, namedParams, state, atTime)
 		local yesno = positionalParams[1]
 		local target = ParseCondition(positionalParams, namedParams, state)
-		local boolean = API_UnitIsUnit("focus", target)
+		local boolean = UnitIsUnit("focus", target)
 		return TestBoolean(boolean, yesno)
 	end
 	OvaleCondition:RegisterCondition("isfocus", false, IsFocus)
 end
 do
+	local function IsTarget(positionalParams, namedParams, state, atTime)
+		local yesno = positionalParams[1]
+		local target = ParseCondition(positionalParams, namedParams, state)
+		local boolean = UnitIsUnit("target", target)
+		return TestBoolean(boolean, yesno)
+	end
+	OvaleCondition:RegisterCondition("istarget", false, IsTarget)
+end
+do
 	local function IsMouseover(positionalParams, namedParams, state, atTime)
 		local yesno = positionalParams[1]
 		local target = ParseCondition(positionalParams, namedParams, state)
-		local boolean = API_UnitIsUnit("mouseover", target)
+		local boolean = UnitIsUnit("mouseover", target)
 		return TestBoolean(boolean, yesno)
 	end
-	OvaleCondition:RegisterCondition("ismouseover", false, IsFocus)
+	OvaleCondition:RegisterCondition("ismouseover", false, IsMouseover)
 end
 do
 local function Threat(positionalParams, namedParams, state, atTime)
