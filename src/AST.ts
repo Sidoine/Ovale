@@ -458,7 +458,7 @@ type Value = SimpleValue | ControlParameters;
 type FlattenListParameters = LuaObj<FlattenParameterValue>;
 type FlattenCheckBoxParameters = LuaArray<FlattenParameterValue>;
 
-interface NamedParameters extends LuaObj<FlattenParameterValue | FlattenListParameters | FlattenCheckBoxParameters> {
+export interface NamedParameters extends LuaObj<FlattenParameterValue | FlattenListParameters | FlattenCheckBoxParameters> {
     nocd?: number;
 }
 

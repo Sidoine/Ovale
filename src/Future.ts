@@ -703,7 +703,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
         return this.IsActive(spellId);
     }
     
-    UpdateLastSpellcast(atTime, spellcast) {
+    UpdateLastSpellcast(atTime: number, spellcast: SpellCast) {
         this.StartProfiling("OvaleFuture_UpdateLastSpellcast");
         this.current.lastCastTime[spellcast.spellId] = atTime;
         if (spellcast.offgcd) {

@@ -63,7 +63,6 @@
    <Script file="Artifact.lua"/>
    <Script file="SpellBook.lua"/>
    <Script file="DemonHunterSigils.lua"/>
-   <Script file="Icon.lua"/>
    <Script file="SpellFlash.lua"/>
    <Script file="Aura.lua"/>
    <Script file="WarriorCharge.lua"/>
@@ -84,6 +83,7 @@
    <Script file="Spells.lua"/>
    <Script file="BanditsGuile.lua"/>
    <Script file="AST.lua"/>
+   <Script file="Icon.lua"/>
    <Script file="Compile.lua"/>
    <Script file="SimulationCraft.lua"/>
    <Script file="ActionBar.lua"/>
