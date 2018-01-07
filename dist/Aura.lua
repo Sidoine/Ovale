@@ -1351,16 +1351,14 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
     end,
     GetBaseDuration = function(self, auraId, spellcast)
         spellcast = spellcast or OvalePaperDoll.current
-        local combo = spellcast.combo or 0
+        local combopoints = spellcast.combopoints or 0
         local duration = INFINITY
         local si = OvaleData.spellInfo[auraId]
         if si and si.duration then
             local value, ratio = OvaleData:GetSpellInfoPropertyNumber(auraId, nil, "duration", nil, true) or 15
-            if si.add_duration_combopoints and combo then
-                duration = (value + si.add_duration_combopoints * combo) * ratio
+            if si.add_duration_combopoints and combopoints then
+                duration = (value + si.add_duration_combopoints * combopoints) * ratio
             end
-        else
-            {EmptyStatement}
         end
         return duration
     end,

@@ -208,7 +208,7 @@ local function BuffComboPoints(positionalParams, namedParams, state, atTime)
         local aura = OvaleAura:GetAura(target, auraId, atTime, filter, mine)
         if OvaleAura:IsActiveAura(aura, atTime) then
             local gain, start, ending = aura.gain, aura.start, aura.ending
-            local value = aura and aura.combo or 0
+            local value = aura and aura.combopoints or 0
             return TestValue(gain, ending, value, start, 0, comparator, limit)
         end
         return Compare(0, comparator, limit)

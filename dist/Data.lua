@@ -514,7 +514,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
         end
         return value * ratio
     end,
-    GetDamage = function(self, spellId, attackpower, spellpower, mainHandWeaponDamage, offHandWeaponDamage, combo)
+    GetDamage = function(self, spellId, attackpower, spellpower, mainHandWeaponDamage, offHandWeaponDamage, combopoints)
         local si = self.spellInfo[spellId]
         if  not si then
             return nil
@@ -524,7 +524,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
         spellpower = spellpower or 0
         mainHandWeaponDamage = mainHandWeaponDamage or 0
         offHandWeaponDamage = offHandWeaponDamage or 0
-        combo = combo or 0
+        combopoints = combopoints or 0
         if si.bonusmainhand then
             damage = damage + si.bonusmainhand * mainHandWeaponDamage
         end
@@ -532,13 +532,13 @@ local OvaleDataClass = __class(OvaleDataBase, {
             damage = damage + si.bonusoffhand * offHandWeaponDamage
         end
         if si.bonuscp then
-            damage = damage + si.bonuscp * combo
+            damage = damage + si.bonuscp * combopoints
         end
         if si.bonusap then
             damage = damage + si.bonusap * attackpower
         end
         if si.bonusapcp then
-            damage = damage + si.bonusapcp * attackpower * combo
+            damage = damage + si.bonusapcp * attackpower * combopoints
         end
         if si.bonussp then
             damage = damage + si.bonussp * spellpower

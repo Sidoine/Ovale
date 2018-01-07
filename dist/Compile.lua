@@ -360,8 +360,8 @@ local function EvaluateSpellInfo(node)
                     if namedParams.pertrait ~= nil then
                         realValue = value * OvaleArtifact:TraitRank(namedParams.pertrait)
                     end
-                    local add_duration = si.add_duration or 0
-                    si.add_duration = add_duration + realValue
+                    local addDuration = si.add_duration or 0
+                    si.add_duration = addDuration + realValue
                 else
                     ok = false
                     break
@@ -369,8 +369,8 @@ local function EvaluateSpellInfo(node)
             elseif k == "add_cd" then
                 local value = tonumber(v)
                 if value then
-                    local add_cd = si.add_cd or 0
-                    si.add_cd = add_cd + value
+                    local addCd = si.add_cd or 0
+                    si.add_cd = addCd + value
                 else
                     ok = false
                     break
