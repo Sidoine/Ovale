@@ -102,7 +102,7 @@ Define(kill_command 34026)
 	SpellInfo(kill_command cd=7.5 cd_haste=ranged focus=30)
 	# Unsure of right syntax for following line.  
 	# cobra_shot resets kill_command upon impact with the target when bestial_wrath_buff is up
-	# SpellRequire(kill_command cd 0=spell,cobra_shot if_buff=bestial_wrath_buff)
+	# SpellRequire(kill_command cd_percent 0=spell,cobra_shot if_buff=bestial_wrath_buff)
 Define(lacerate 185855)
 	SpellInfo(lacerate focus=35 cd=10)
 	SpellAddTargetDebuff(lacerate lacerate_debuff=1)

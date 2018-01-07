@@ -265,7 +265,7 @@ local OvaleCooldownClass = __class(OvaleCooldownBase, {
             __exports.OvaleCooldown:Log("Spell %d is on cooldown for %fs starting at %s.", spellId, duration, start)
         else
             local si = OvaleData.spellInfo[spellId]
-            duration = OvaleData:GetSpellInfoProperty(spellId, atTime, "cd", targetGUID)
+            duration = OvaleData:GetSpellInfoPropertyNumber(spellId, atTime, "cd", targetGUID)
             if duration then
                 if duration < 0 then
                     duration = 0

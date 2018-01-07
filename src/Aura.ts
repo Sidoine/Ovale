@@ -1411,7 +1411,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
                 duration = (value + si.add_duration_combopoints * combopoints) * ratio;
             }
         } 
-        /* Most buff durations are no longer reduced by haste
+        /* Most aura durations are no longer reduced by haste
         if (si && si.haste && spellcast) {
             let hasteMultiplier = OvalePaperDoll.GetHasteMultiplier(si.haste, spellcast);
             duration = duration / hasteMultiplier;
