@@ -249,38 +249,6 @@ AddFunction CanMove
 	if BuffPresent(ice_floes_buff) 1
     0
 }
-
-# Party auto target system
-AddFunction Party_Auto_Target
-{
-	unless UnitInRaid()
-	{
-		if HealthPercent() < target.HealthPercent() and target.Present() or not target.Present() and HealthPercent() < 100
-		{
-			unless player.IsTarget() Texture(misc_arrowdown)
-		}
-		
-		if { party1.HealthPercent() < target.HealthPercent() and target.Present() or not target.Present() and party1.HealthPercent() < 100 } and party1.Present() and party1.Distance() < 40
-		{
-			unless party1.IsTarget() Texture(ships_ability_boardingparty)
-		}
-		
-		if { party2.HealthPercent() < target.HealthPercent() and target.Present() or not target.Present() and party2.HealthPercent() < 100 } and party2.Present() and party2.Distance() < 40
-		{
-			unless party2.IsTarget() Texture(ships_ability_boardingpartyalliance)
-		}
-		
-		if { party3.HealthPercent() < target.HealthPercent() and target.Present() or not target.Present() and party3.HealthPercent() < 100 } and party3.Present() and party3.Distance() < 40
-		{
-			unless party3.IsTarget() Texture(ships_ability_boardingpartyhorde)
-		}
-		
-		if { party4.HealthPercent() < target.HealthPercent() and target.Present() or not target.Present() and party4.HealthPercent() < 100 } and party4.Present() and party4.Distance() < 40
-		{
-			unless party4.IsTarget() Texture(inv_helm_misc_starpartyhat)
-		}
-	}
-}
 ]]
     OvaleScripts:RegisterScript(nil, nil, name, desc, code, "include")
 end
