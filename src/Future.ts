@@ -116,12 +116,12 @@ export class OvaleFutureData {
     }
     
     UpdateCounters(spellId: number, atTime: number, targetGUID: string) {
-        let inccounter = OvaleData.GetSpellInfoProperty(spellId, atTime, "inccounter", targetGUID);
+        let inccounter = OvaleData.GetSpellInfoProperty(spellId, atTime, "inccounter", targetGUID, true);
         if (inccounter) {
             let value = this.counter[inccounter] && this.counter[inccounter] || 0;
             this.counter[inccounter] = value + 1;
         }
-        let resetcounter = OvaleData.GetSpellInfoProperty(spellId, atTime, "resetcounter", targetGUID);
+        let resetcounter = OvaleData.GetSpellInfoProperty(spellId, atTime, "resetcounter", targetGUID, true);
         if (resetcounter) {
             this.counter[resetcounter] = 0;
         }
@@ -774,7 +774,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
             }
         }
         targetGUID = targetGUID || OvaleGUID.UnitGUID(baseState.next.defaultTarget);
-        let gcd = spellId && <number>OvaleData.GetSpellInfoProperty(spellId, atTime, "gcd", targetGUID);
+        let gcd = spellId && <number>OvaleData.GetSpellInfoProperty(spellId, atTime, "gcd", targetGUID, true);
         if (!gcd) {
             let haste;
             [gcd, haste] = OvaleCooldown.GetBaseGCD();
@@ -787,11 +787,11 @@ export class OvaleFutureClass extends OvaleFutureBase {
                     haste = false;
                 }
             }
-            let gcdHaste = spellId && OvaleData.GetSpellInfoProperty(spellId, atTime, "gcd_haste", targetGUID);
+            let gcdHaste = spellId && OvaleData.GetSpellInfoProperty(spellId, atTime, "gcd_haste", targetGUID, true);
             if (gcdHaste) {
                 haste = gcdHaste;
             } else {
-                let siHaste = spellId && OvaleData.GetSpellInfoProperty(spellId, atTime, "haste", targetGUID);
+                let siHaste = spellId && OvaleData.GetSpellInfoProperty(spellId, atTime, "haste", targetGUID, true);
                 if (siHaste) {
                     haste = siHaste;
                 }

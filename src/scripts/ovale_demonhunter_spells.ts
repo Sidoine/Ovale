@@ -69,7 +69,7 @@ Define(empower_wards_buff 218256)
 	SpellInfo(empower_wards_buff duration=6)
 Define(eye_beam 198013)
 	SpellInfo(eye_beam fury=50)
-	SpellInfo(eye_beam addfury=-5 pertrait=wide_eyes_trait)
+	SpellInfo(eye_beam add_fury=-5 pertrait=wide_eyes_trait)
 Define(extended_by_demonic_buff -22547) # OvaleDemonHunterDemonic
 Define(felblade 232893)
 	SpellInfo(felblade cd=15 tag=main cd_haste=melee fury=-30 pain=-20)

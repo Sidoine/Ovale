@@ -127,12 +127,12 @@ __exports.OvaleFutureData = __class(nil, {
         self.lastGCDSpellId = spellId
     end,
     UpdateCounters = function(self, spellId, atTime, targetGUID)
-        local inccounter = OvaleData:GetSpellInfoProperty(spellId, atTime, "inccounter", targetGUID)
+        local inccounter = OvaleData:GetSpellInfoProperty(spellId, atTime, "inccounter", targetGUID, true)
         if inccounter then
             local value = self.counter[inccounter] and self.counter[inccounter] or 0
             self.counter[inccounter] = value + 1
         end
-        local resetcounter = OvaleData:GetSpellInfoProperty(spellId, atTime, "resetcounter", targetGUID)
+        local resetcounter = OvaleData:GetSpellInfoProperty(spellId, atTime, "resetcounter", targetGUID, true)
         if resetcounter then
             self.counter[resetcounter] = 0
         end
@@ -780,7 +780,7 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
             end
         end
         targetGUID = targetGUID or OvaleGUID:UnitGUID(baseState.next.defaultTarget)
-        local gcd = spellId and OvaleData:GetSpellInfoProperty(spellId, atTime, "gcd", targetGUID)
+        local gcd = spellId and OvaleData:GetSpellInfoProperty(spellId, atTime, "gcd", targetGUID, true)
         if  not gcd then
             local haste
             gcd, haste = OvaleCooldown:GetBaseGCD()
@@ -793,11 +793,11 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
                     haste = false
                 end
             end
-            local gcdHaste = spellId and OvaleData:GetSpellInfoProperty(spellId, atTime, "gcd_haste", targetGUID)
+            local gcdHaste = spellId and OvaleData:GetSpellInfoProperty(spellId, atTime, "gcd_haste", targetGUID, true)
             if gcdHaste then
                 haste = gcdHaste
             else
-                local siHaste = spellId and OvaleData:GetSpellInfoProperty(spellId, atTime, "haste", targetGUID)
+                local siHaste = spellId and OvaleData:GetSpellInfoProperty(spellId, atTime, "haste", targetGUID, true)
                 if siHaste then
                     haste = siHaste
                 end

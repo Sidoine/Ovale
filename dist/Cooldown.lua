@@ -212,8 +212,8 @@ local OvaleCooldownClass = __class(OvaleCooldownBase, {
         __exports.OvaleCooldown:StartProfiling("OvaleCooldown_state_GetCD")
         local cdName = spellId
         local si = OvaleData.spellInfo[spellId]
-        if si and si.sharedcd then
-            cdName = si.sharedcd
+        if si and si.shared_cd then
+            cdName = si.shared_cd
         end
         if  not self.next.cd[cdName] then
             self.next.cd[cdName] = {}
@@ -267,9 +267,6 @@ local OvaleCooldownClass = __class(OvaleCooldownBase, {
             local si = OvaleData.spellInfo[spellId]
             duration = OvaleData:GetSpellInfoProperty(spellId, atTime, "cd", targetGUID)
             if duration then
-                if si and si.addcd then
-                    duration = duration + si.addcd
-                end
                 if duration < 0 then
                     duration = 0
                 end
@@ -278,7 +275,7 @@ local OvaleCooldownClass = __class(OvaleCooldownBase, {
             end
             __exports.OvaleCooldown:Log("Spell %d has a base cooldown of %fs.", spellId, duration)
             if duration > 0 then
-                local haste = OvaleData:GetSpellInfoProperty(spellId, atTime, "cd_haste", targetGUID)
+                local haste = OvaleData:GetSpellInfoProperty(spellId, atTime, "cd_haste", targetGUID, true)
                 local multiplier = OvalePaperDoll:GetHasteMultiplier(haste, OvalePaperDoll.next)
                 duration = duration / multiplier
                 if si and si.buff_cdr then
@@ -320,7 +317,7 @@ local OvaleCooldownClass = __class(OvaleCooldownBase, {
             local spellId = spellcast.spellId
             if spellId then
                 local gcd
-                gcd = OvaleData:GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target)
+                gcd = OvaleData:GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target, true)
                 if gcd and gcd == 0 then
                     spellcast.offgcd = true
                 end

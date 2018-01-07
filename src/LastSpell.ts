@@ -18,8 +18,7 @@ export interface SpellCast extends PaperDollSnapshot {
     caster?: string;
     offgcd?:boolean;
     damageMultiplier?: number;
-    combo?: number;
-    holy?:number;
+    combopoints?: number;
 }
 
 export interface PaperDollSnapshot {

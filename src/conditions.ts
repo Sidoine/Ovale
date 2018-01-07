@@ -32,7 +32,6 @@ import { OvaleCooldown } from "./Cooldown";
 import { variables } from "./Variables";
 import { OvaleStance } from "./Stance";
 import { OvaleSigil } from "./DemonHunterSigils";
-import { OvaleComboPoints } from "./ComboPoints";
 import { baseState } from "./BaseState";
 import { OvaleSpells } from "./Spells";
 let INFINITY = huge;
@@ -46,7 +45,7 @@ function BossArmorDamageReduction(target, state: BaseState) {
 
 // Return the value of a parameter from the named spell's information.  If the value is the name of a
 // function in the script, then return the compute the value of that function instead.
-function ComputeParameter<T extends keyof SpellInfo>(spellId, paramName: T, state: BaseState, atTime):SpellInfo[T] {
+function ComputeParameter<T extends keyof SpellInfo>(spellId, paramName: T, state: BaseState, atTime): SpellInfo[T] {
     let si = OvaleData.GetSpellInfo(spellId);
     if (si && si[paramName]) {
         let name = si[paramName];
@@ -181,7 +180,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
 	 @usage
 	 if DebuffAmount(stagger) >10000 Spell(purifying_brew)
 	 if DebuffAmount(stagger more 10000) Spell(purifying_brew) */
-	function BuffAmount(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
+    function BuffAmount(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [auraId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
         let [target, filter, mine] = ParseCondition(positionalParams, namedParams, state);
         let value = namedParams.value || 1;
@@ -226,7 +225,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
         let aura = OvaleAura.GetAura(target, auraId, atTime, filter, mine);
         if (OvaleAura.IsActiveAura(aura, atTime)) {
             let [gain, start, ending] = [aura.gain, aura.start, aura.ending];
-            let value = aura && aura.combo || 0;
+            let value = aura && aura.combopoints || 0;
             return TestValue(gain, ending, value, start, 0, comparator, limit);
         }
         return Compare(0, comparator, limit);
@@ -348,7 +347,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
         let [, filter, mine] = ParseCondition(positionalParams, namedParams, state);
         let excludeUnitId = (namedParams.excludeTarget == 1) && baseState.next.defaultTarget || undefined;
         let fractional = (namedParams.count == 0) && true || false;
-        let [count,, startChangeCount, endingChangeCount, startFirst, endingLast] = OvaleAura.AuraCount(auraId, filter, mine, namedParams.stacks, atTime, excludeUnitId);
+        let [count, , startChangeCount, endingChangeCount, startFirst, endingLast] = OvaleAura.AuraCount(auraId, filter, mine, namedParams.stacks, atTime, excludeUnitId);
         if (count > 0 && startChangeCount < INFINITY && fractional) {
             let origin = startChangeCount;
             let rate = -1 / (endingChangeCount - startChangeCount);
@@ -461,30 +460,30 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     }
     OvaleCondition.RegisterCondition("buffexpires", false, BuffExpires);
     OvaleCondition.RegisterCondition("debuffexpires", false, BuffExpires);
-   
-   /** Test if an aura is present or if the remaining time on the aura is more than the given number of seconds.
-	 @name BuffPresent
-	 @paramsig boolean
-	 @param id The spell ID of the aura or the name of a spell list.
-	 @param seconds Optional. The mininum number of seconds before the buff should expire.
-	     Defaults to 0 (zero).
-	 @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
-	     Defaults to any=0.
-	     Valid values: 0, 1.
-	 @param haste Optional. Sets whether "seconds" should be lengthened or shortened due to haste.
-	     Defaults to haste=none.
-	     Valid values: melee, spell, none.
-	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	     Defaults to target=player.
-	     Valid values: player, target, focus, pet.
-	 @return A boolean value.
-	 @see DebuffPresent
-	 @usage
-	 if not BuffPresent(stamina any=1)
-	     Spell(power_word_fortitude)
-	 if not target.DebuffPresent(rake 2)
-	     Spell(rake)
-     */
+
+    /** Test if an aura is present or if the remaining time on the aura is more than the given number of seconds.
+      @name BuffPresent
+      @paramsig boolean
+      @param id The spell ID of the aura or the name of a spell list.
+      @param seconds Optional. The mininum number of seconds before the buff should expire.
+          Defaults to 0 (zero).
+      @param any Optional. Sets by whom the aura was applied. If the aura can be applied by anyone, then set any=1.
+          Defaults to any=0.
+          Valid values: 0, 1.
+      @param haste Optional. Sets whether "seconds" should be lengthened or shortened due to haste.
+          Defaults to haste=none.
+          Valid values: melee, spell, none.
+      @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+          Defaults to target=player.
+          Valid values: player, target, focus, pet.
+      @return A boolean value.
+      @see DebuffPresent
+      @usage
+      if not BuffPresent(stamina any=1)
+          Spell(power_word_fortitude)
+      if not target.DebuffPresent(rake 2)
+          Spell(rake)
+      */
     function BuffPresent(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [auraId, seconds] = [positionalParams[1], positionalParams[2]];
         let [target, filter, mine] = ParseCondition(positionalParams, namedParams, state);
@@ -534,7 +533,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
 {
     function BuffImproved(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
-        let [, , ] = ParseCondition(positionalParams, namedParams, state);
+        let [, ,] = ParseCondition(positionalParams, namedParams, state);
         // TODO Not implemented
         return Compare(0, comparator, limit);
     }
@@ -700,7 +699,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
         let [auraId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
         let [, filter, mine] = ParseCondition(positionalParams, namedParams, state);
         let excludeUnitId = (namedParams.excludeTarget == 1) && baseState.next.defaultTarget || undefined;
-        let [count, stacks, , endingChangeCount, startFirst, ] = OvaleAura.AuraCount(auraId, filter, mine, 1, atTime, excludeUnitId);
+        let [count, stacks, , endingChangeCount, startFirst,] = OvaleAura.AuraCount(auraId, filter, mine, 1, atTime, excludeUnitId);
         if (count > 0) {
             let [start, ending] = [startFirst, endingChangeCount];
             return TestValue(start, ending, stacks, start, 0, comparator, limit);
@@ -960,24 +959,6 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     OvaleCondition.RegisterCondition("classification", false, Classification);
 }
 {
-    /**  Get the number of combo points for a feral druid or a rogue.
-	 @name ComboPoints
-	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
-	 @return The number of combo points.
-	 @return A boolean value for the result of the comparison.
-	 @usage
-	 if ComboPoints() >=1 Spell(savage_roar)
-     */
-    function ComboPoints(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        let [comparator, limit] = [positionalParams[1], positionalParams[2]];
-        let value = OvaleComboPoints.next.combo;
-        return Compare(value, comparator, limit);
-    }
-    OvaleCondition.RegisterCondition("combopoints", false, ComboPoints);
-}
-{
     /**  Get the current value of a script counter.
 	 @name Counter
 	 @paramsig number or boolean
@@ -1097,7 +1078,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
         return Compare(value, comparator, limit);
     }
     OvaleCondition.RegisterCondition("critdamage", false, CritDamage);
-    
+
     /**  Get the current estimated damage of a spell on the target.
 	 The script must provide a function to calculate the damage of the spell and assign it to the "damage" SpellInfo() parameter.
 	 @name Damage
@@ -1215,7 +1196,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
      */
     function DiseasesRemaining(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
-        let [target, , ] = ParseCondition(positionalParams, namedParams, state);
+        let [target, ,] = ParseCondition(positionalParams, namedParams, state);
         let [talented, npAura, bpAura, ffAura] = GetDiseases(target, state, atTime);
         let aura;
         if (talented && OvaleAura.IsActiveAura(npAura, atTime)) {
@@ -1239,7 +1220,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
 	 @return A boolean value.
      */
     function DiseasesTicking(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        let [target, , ] = ParseCondition(positionalParams, namedParams, state);
+        let [target, ,] = ParseCondition(positionalParams, namedParams, state);
         let [talented, npAura, bpAura, ffAura] = GetDiseases(target, state, atTime);
         let gain, start, ending;
         if (talented && npAura) {
@@ -1264,7 +1245,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
 	 @return A boolean value.
      */
     function DiseasesAnyTicking(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        let [target, , ] = ParseCondition(positionalParams, namedParams, state);
+        let [target, ,] = ParseCondition(positionalParams, namedParams, state);
         let [talented, npAura, bpAura, ffAura] = GetDiseases(target, state, atTime);
         let aura;
         if (talented && npAura) {
@@ -1360,7 +1341,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
      */
     function EnergyRegenRate(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [comparator, limit] = [positionalParams[1], positionalParams[2]];
-        let value = OvalePower.next.powerRate.energy;
+        let value = OvalePower.next.GetPowerRate("energy");
         return Compare(value, comparator, limit);
     }
     OvaleCondition.RegisterCondition("energyregen", false, EnergyRegenRate);
@@ -1440,7 +1421,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
      */
     function FocusRegenRate(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [comparator, limit] = [positionalParams[1], positionalParams[2]];
-        let value = OvalePower.next.powerRate.focus;
+        let value = OvalePower.next.GetPowerRate("focus");
         return Compare(value, comparator, limit);
     }
     OvaleCondition.RegisterCondition("focusregen", false, FocusRegenRate);
@@ -1459,7 +1440,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
      */
     function FocusCastingRegen(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [spellId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
-        let regenRate = OvalePower.next.powerRate.focus;
+        let regenRate = OvalePower.next.GetPowerRate("focus");
         let power = 0;
         let castTime = OvaleSpellBook.GetCastTime(spellId) || 0;
         let gcd = OvaleFuture.GetGCD();
@@ -1808,7 +1789,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     }
     OvaleCondition.RegisterCondition("healthpercent", false, HealthPercent);
     OvaleCondition.RegisterCondition("lifepercent", false, HealthPercent);
-    
+
     /** Get the amount of health points of the target when it is at full health.
 	 @name MaxHealth
 	 @paramsig number or boolean
@@ -1830,7 +1811,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
         return Compare(value, comparator, limit);
     }
     OvaleCondition.RegisterCondition("maxhealth", false, MaxHealth);
-    
+
     /**  Get the estimated number of seconds remaining before the target is dead.
 	 @name TimeToDie
 	 @paramsig number or boolean
@@ -1856,7 +1837,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     }
     OvaleCondition.RegisterCondition("deadin", false, TimeToDie);
     OvaleCondition.RegisterCondition("timetodie", false, TimeToDie);
-    
+
     /** Get the estimated number of seconds remaining before the target reaches the given percent of max health.
 	 @name TimeToHealthPercent
 	 @paramsig number or boolean
@@ -2347,7 +2328,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
      */
     function PTR(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [comparator, limit] = [positionalParams[1], positionalParams[2]];
-        let [,,, uiVersion] = GetBuildInfo();
+        let [, , , uiVersion] = GetBuildInfo();
         let value = (uiVersion > 70300) && 1 || 0;
         return Compare(value, comparator, limit);
     }
@@ -2425,7 +2406,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
         let [comparator, limit] = [positionalParams[1], positionalParams[2]];
         let [target] = ParseCondition(positionalParams, namedParams, state);
         if (target == "player") {
-            let [value, origin, rate] = [OvalePower.next.power[powerType], atTime, OvalePower.next.powerRate[powerType]];
+            let [value, origin, rate] = [OvalePower.next.power[powerType], atTime, OvalePower.next.GetPowerRate(powerType)];
             let [start, ending] = [atTime, INFINITY];
             return TestValue(start, ending, value, origin, rate, comparator, limit);
         } else {
@@ -2442,7 +2423,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
         if (target == "player") {
             let powerMax = OvalePower.current.maxPower[powerType] || 0;
             if (powerMax > 0) {
-                let [value, origin, rate] = [powerMax - OvalePower.next.power[powerType], atTime, -1 * OvalePower.next.powerRate[powerType]];
+                let [value, origin, rate] = [powerMax - OvalePower.next.power[powerType], atTime, -1 * OvalePower.next.GetPowerRate(powerType)];
                 let [start, ending] = [atTime, INFINITY];
                 return TestValue(start, ending, value, origin, rate, comparator, limit);
             }
@@ -2467,7 +2448,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
             let powerMax = OvalePower.current.maxPower[powerType] || 0;
             if (powerMax > 0) {
                 let conversion = 100 / powerMax;
-                let [value, origin, rate] = [OvalePower.next.power[powerType] * conversion, atTime, OvalePower.next.powerRate[powerType] * conversion];
+                let [value, origin, rate] = [OvalePower.next.power[powerType] * conversion, atTime, OvalePower.next.GetPowerRate(powerType) * conversion];
                 if (rate > 0 && value >= 100 || rate < 0 && value == 0) {
                     rate = 0;
                 }
@@ -2514,7 +2495,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
             }
         }
         if (primaryPowerType) {
-            let [value, origin, rate] = [OvalePower.next.power[primaryPowerType], atTime, OvalePower.next.powerRate[primaryPowerType]];
+            let [value, origin, rate] = [OvalePower.next.power[primaryPowerType], atTime, OvalePower.next.GetPowerRate(primaryPowerType)];
             let [start, ending] = [atTime, INFINITY];
             return TestValue(start, ending, value, origin, rate, comparator, limit);
         }
@@ -2534,7 +2515,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
         return Power("alternate", positionalParams, namedParams, state, atTime);
     }
     /** Get the current amount of astral power for balance druids.
-	 @name AstraPower
+	 @name AstralPower
 	 @paramsig number or boolean
 	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	 @param number Optional. The number to compare against.
@@ -2545,7 +2526,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
 	 if AstraPower(more 70) Spell(frost_strike)
      */
     function AstralPower(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        return Power("astralpower", positionalParams, namedParams, state, atTime);
+        return Power("lunarpower", positionalParams, namedParams, state, atTime);
     }
 
     /**Get the current amount of stored Chi for monks.
@@ -2562,7 +2543,19 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     function Chi(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         return Power("chi", positionalParams, namedParams, state, atTime);
     }
-
+    /**  Get the number of combo points for a feral druid or a rogue.
+     @name ComboPoints
+     @paramsig number or boolean
+     @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+     @param number Optional. The number to compare against.
+     @return The number of combo points.
+     @return A boolean value for the result of the comparison.
+     @usage
+     if ComboPoints() >=1 Spell(savage_roar)
+     */
+    function ComboPoints(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
+        return Power("combopoints", positionalParams, namedParams, state, atTime);
+    }
     /**Get the current amount of energy for feral druids, non-mistweaver monks, and rogues.
 	 @name Energy
 	 @paramsig number or boolean
@@ -2592,6 +2585,14 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     function Focus(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         return Power("focus", positionalParams, namedParams, state, atTime);
     }
+
+    /**
+     * 
+     * @param positionalParams 
+     * @param namedParams 
+     * @param state 
+     * @param atTime 
+     */
     function Fury(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         return Power("fury", positionalParams, namedParams, state, atTime);
     }
@@ -2610,6 +2611,14 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     function HolyPower(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         return Power("holy", positionalParams, namedParams, state, atTime);
     }
+
+    /**
+     * 
+     * @param positionalParams 
+     * @param namedParams 
+     * @param state 
+     * @param atTime 
+     */
     function Insanity(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         return Power("insanity", positionalParams, namedParams, state, atTime);
     }
@@ -2630,9 +2639,25 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     function Mana(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         return Power("mana", positionalParams, namedParams, state, atTime);
     }
+
+    /**
+     * 
+     * @param positionalParams 
+     * @param namedParams 
+     * @param state 
+     * @param atTime 
+     */
     function Maelstrom(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         return Power("maelstrom", positionalParams, namedParams, state, atTime);
     }
+
+    /**
+     * 
+     * @param positionalParams 
+     * @param namedParams 
+     * @param state 
+     * @param atTime 
+     */
     function Pain(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         return Power("pain", positionalParams, namedParams, state, atTime);
     }
@@ -2703,6 +2728,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     OvaleCondition.RegisterCondition("arcanecharges", false, ArcaneCharges);
     OvaleCondition.RegisterCondition("astralpower", false, AstralPower);
     OvaleCondition.RegisterCondition("chi", false, Chi);
+    OvaleCondition.RegisterCondition("combopoints", false, ComboPoints);
     OvaleCondition.RegisterCondition("energy", false, Energy);
     OvaleCondition.RegisterCondition("focus", false, Focus);
     OvaleCondition.RegisterCondition("fury", false, Fury);
@@ -2715,7 +2741,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     OvaleCondition.RegisterCondition("runicpower", false, RunicPower);
     OvaleCondition.RegisterCondition("shadoworbs", false, ShadowOrbs);
     OvaleCondition.RegisterCondition("soulshards", false, SoulShards);
-   
+
     /** Get the number of lacking resource points for a full alternate power bar, between 0 and maximum alternate power, of the target.
 	 @name AlternatePowerDeficit
 	 @paramsig number or boolean
@@ -2763,6 +2789,13 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     function ChiDeficit(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         return PowerDeficit("chi", positionalParams, namedParams, state, atTime);
     }
+    /**
+     * @name ComboPointsDeficit
+     * @param positionalParams 
+     * @param namedParams 
+     * @param state 
+     * @param atTime 
+     */
     function ComboPointsDeficit(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         return PowerDeficit("combopoints", positionalParams, namedParams, state, atTime);
     }
@@ -2911,7 +2944,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     OvaleCondition.RegisterCondition("runicpowerdeficit", false, RunicPowerDeficit);
     OvaleCondition.RegisterCondition("shadoworbsdeficit", false, ShadowOrbsDeficit);
     OvaleCondition.RegisterCondition("soulshardsdeficit", false, SoulShardsDeficit);
-    
+
     /** Get the current percent level of mana (between 0 and 100) of the target.
 	 @name ManaPercent
 	 @paramsig number or boolean
@@ -2930,7 +2963,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
         return PowerPercent("mana", positionalParams, namedParams, state, atTime);
     }
     OvaleCondition.RegisterCondition("manapercent", false, ManaPercent);
-    
+
     /** Get the maximum amount of alternate power of the target.
 	 Alternate power is the resource tracked by the alternate power bar in certain boss fights.
 	 @name MaxAlternatePower
@@ -3214,9 +3247,25 @@ l    */
     function RunicPowerCost(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         return PowerCost("runicpower", positionalParams, namedParams, state, atTime);
     }
+
+    /**
+     * 
+     * @param positionalParams 
+     * @param namedParams 
+     * @param state 
+     * @param atTime 
+     */
     function AstralPowerCost(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         return PowerCost("astralpower", positionalParams, namedParams, state, atTime);
     }
+
+    /**
+     * 
+     * @param positionalParams 
+     * @param namedParams 
+     * @param state 
+     * @param atTime 
+     */
     function MainPowerCost(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         return PowerCost(OvalePower.current.powerType, positionalParams, namedParams, state, atTime);
     }
@@ -3699,15 +3748,15 @@ l    */
     function Strength(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         return Snapshot("strength", 0, positionalParams, namedParams, state, atTime);
     }
-    
+
     function Versatility(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         return Snapshot("versatility", 0, positionalParams, namedParams, state, atTime);
     }
-    
+
     function VersatilityRating(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         return Snapshot("versatilityRating", 0, positionalParams, namedParams, state, atTime);
     }
-    
+
     OvaleCondition.RegisterCondition("agility", false, Agility);
     OvaleCondition.RegisterCondition("attackpower", false, AttackPower);
     OvaleCondition.RegisterCondition("critrating", false, CritRating);
@@ -3822,20 +3871,20 @@ l    */
 	* @usage
 	* if SpellFullRecharge(dire_frenzy) < GCD()
 	*     Spell(dire_frenzy) */
-	function SpellFullRecharge(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
+    function SpellFullRecharge(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         const spellId = positionalParams[1];
         const comparator = positionalParams[2];
         const limit = positionalParams[3];
-		const [charges, maxCharges, start, dur] = OvaleCooldown.GetSpellCharges(spellId, atTime);
-		if (charges && charges < maxCharges) {
-			const duration = (maxCharges - charges) * dur;
-			const ending = start + duration;
-			return TestValue(start, ending, ending - start, start, -1, comparator, limit);
+        const [charges, maxCharges, start, dur] = OvaleCooldown.GetSpellCharges(spellId, atTime);
+        if (charges && charges < maxCharges) {
+            const duration = (maxCharges - charges) * dur;
+            const ending = start + duration;
+            return TestValue(start, ending, ending - start, start, -1, comparator, limit);
         }
-		return Compare(0, comparator, limit);
+        return Compare(0, comparator, limit);
     }
 
-	OvaleCondition.RegisterCondition("spellfullrecharge", true, SpellFullRecharge)
+    OvaleCondition.RegisterCondition("spellfullrecharge", true, SpellFullRecharge)
 }
 
 {
@@ -4037,7 +4086,7 @@ l    */
      */
     function SpellMaxCharges(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [spellId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
-        let [, maxCharges, , ] = OvaleCooldown.GetSpellCharges(spellId, atTime);
+        let [, maxCharges, ,] = OvaleCooldown.GetSpellCharges(spellId, atTime);
         if (!maxCharges) {
             return undefined;
         }
@@ -4369,7 +4418,7 @@ l    */
             if (remainingTime && remainingTime > 0) {
                 return Compare(remainingTime, comparator, limit);
             }
-        } 
+        }
         return undefined;
     }
 
@@ -4449,7 +4498,7 @@ l    */
     function TimeToPower(powerType, level, comparator, limit, state: BaseState, atTime) {
         level = level || 0;
         let power = OvalePower.next.power[powerType] || 0;
-        let powerRegen = OvalePower.next.powerRate[powerType] || 1;
+        let powerRegen = OvalePower.next.GetPowerRate(powerType) || 1;
         if (powerRegen == 0) {
             if (power == level) {
                 return Compare(0, comparator, limit);
@@ -4698,7 +4747,7 @@ l    */
     }
     OvaleCondition.RegisterCondition("totemexpires", false, TotemExpires);
     OvaleCondition.RegisterCondition("totempresent", false, TotemPresent);
-    
+
     /** Get the remaining time in seconds before a totem expires.
 	 @name TotemRemaining
 	 @paramsig number or boolean

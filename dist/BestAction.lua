@@ -173,7 +173,7 @@ local function GetActionSpellInfo(element, state, atTime, target)
     local si = OvaleData.spellInfo[spellId]
     local replacedSpellId = nil
     if si and si.replace then
-        local replacement = OvaleData:GetSpellInfoProperty(spellId, atTime, "replace", targetGUID)
+        local replacement = OvaleData:GetSpellInfoProperty(spellId, atTime, "replace", targetGUID, true)
         if replacement then
             replacedSpellId = spellId
             spellId = replacement

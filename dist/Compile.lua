@@ -353,24 +353,24 @@ local function EvaluateSpellInfo(node)
     if spellId and TestConditions(positionalParams, namedParams) then
         local si = OvaleData:SpellInfo(spellId)
         for k, v in pairs(namedParams) do
-            if k == "addduration" then
+            if k == "add_duration" then
                 local value = tonumber(v)
                 if value then
                     local realValue = value
                     if namedParams.pertrait ~= nil then
                         realValue = value * OvaleArtifact:TraitRank(namedParams.pertrait)
                     end
-                    local addDuration = si.addduration or 0
-                    si.addduration = addDuration + realValue
+                    local add_duration = si.add_duration or 0
+                    si.add_duration = add_duration + realValue
                 else
                     ok = false
                     break
                 end
-            elseif k == "addcd" then
+            elseif k == "add_cd" then
                 local value = tonumber(v)
                 if value then
-                    local addCd = si.addcd or 0
-                    si.addcd = addCd + value
+                    local add_cd = si.add_cd or 0
+                    si.add_cd = add_cd + value
                 else
                     ok = false
                     break
@@ -385,7 +385,7 @@ local function EvaluateSpellInfo(node)
             elseif k == "learn" and v == 1 then
                 local spellName = GetSpellInfo(spellId)
                 OvaleSpellBook:AddSpell(spellId, spellName)
-            elseif k == "sharedcd" then
+            elseif k == "shared_cd" then
                 si[k] = v
                 OvaleCooldown:AddSharedCooldown(v, spellId)
             elseif addpower[k] ~= nil then

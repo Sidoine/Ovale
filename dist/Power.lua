@@ -20,8 +20,7 @@ local OvaleState = __State.OvaleState
 local __Requirement = LibStub:GetLibrary("ovale/Requirement")
 local RegisterRequirement = __Requirement.RegisterRequirement
 local UnregisterRequirement = __Requirement.UnregisterRequirement
-local __LastSpell = LibStub:GetLibrary("ovale/LastSpell")
-local lastSpell = __LastSpell.lastSpell
+local CheckRequirements = __Requirement.CheckRequirements
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local ceil = math.ceil
 local INFINITY = math.huge
@@ -29,49 +28,25 @@ local floor = math.floor
 local pairs = pairs
 local type = type
 local tostring = tostring
+local tonumber = tonumber
+local lower = string.lower
+local concat = table.concat
+local insert = table.insert
 local GetPowerRegen = GetPowerRegen
+local GetManaRegen = GetManaRegen
 local GetSpellPowerCost = GetSpellPowerCost
 local UnitPower = UnitPower
 local UnitPowerMax = UnitPowerMax
 local UnitPowerType = UnitPowerType
-local SPELL_POWER_ALTERNATE_POWER = SPELL_POWER_ALTERNATE_POWER
-local SPELL_POWER_CHI = SPELL_POWER_CHI
-local CHI_COST = CHI_COST
-local SPELL_POWER_COMBO_POINTS = SPELL_POWER_COMBO_POINTS
-local COMBO_POINTS_COST = COMBO_POINTS_COST
-local SPELL_POWER_ENERGY = SPELL_POWER_ENERGY
-local ENERGY_COST = ENERGY_COST
-local SPELL_POWER_FOCUS = SPELL_POWER_FOCUS
-local FOCUS_COST = FOCUS_COST
-local SPELL_POWER_HOLY_POWER = SPELL_POWER_HOLY_POWER
-local HOLY_POWER_COST = HOLY_POWER_COST
-local SPELL_POWER_MANA = SPELL_POWER_MANA
-local MANA_COST = MANA_COST
-local SPELL_POWER_RAGE = SPELL_POWER_RAGE
-local RAGE_COST = RAGE_COST
-local SPELL_POWER_RUNIC_POWER = SPELL_POWER_RUNIC_POWER
-local RUNIC_POWER_COST = RUNIC_POWER_COST
-local SPELL_POWER_SOUL_SHARDS = SPELL_POWER_SOUL_SHARDS
-local SOUL_SHARDS_COST = SOUL_SHARDS_COST
-local SPELL_POWER_LUNAR_POWER = SPELL_POWER_LUNAR_POWER
-local LUNAR_POWER_COST = LUNAR_POWER_COST
-local SPELL_POWER_INSANITY = SPELL_POWER_INSANITY
-local INSANITY_COST = INSANITY_COST
-local SPELL_POWER_MAELSTROM = SPELL_POWER_MAELSTROM
-local MAELSTROM_COST = MAELSTROM_COST
-local SPELL_POWER_ARCANE_CHARGES = SPELL_POWER_ARCANE_CHARGES
-local ARCANE_CHARGES_COST = ARCANE_CHARGES_COST
-local SPELL_POWER_PAIN = SPELL_POWER_PAIN
-local PAIN_COST = PAIN_COST
-local SPELL_POWER_FURY = SPELL_POWER_FURY
-local FURY_COST = FURY_COST
+local Enum = Enum
+local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 local __PaperDoll = LibStub:GetLibrary("ovale/PaperDoll")
 local OvalePaperDoll = __PaperDoll.OvalePaperDoll
 local __BaseState = LibStub:GetLibrary("ovale/BaseState")
 local baseState = __BaseState.baseState
-local function isString(s)
-    return type(s) == "string"
-end
+local __tools = LibStub:GetLibrary("ovale/tools")
+local isNumber = __tools.isNumber
+local strlower = lower
 local self_SpellcastInfoPowerTypes = {
     [1] = "chi",
     [2] = "holy"
@@ -100,18 +75,20 @@ do
     end
 end
 local PowerModule = __class(nil, {
+    GetPowerRate = function(self, powerType)
+        if baseState.next.inCombat then
+            return self.activeRegen[powerType]
+        else
+            return self.inactiveRegen[powerType]
+        end
+    end,
     GetPower = function(self, powerType, atTime)
         local power = self.power[powerType] or 0
-        local powerRate = 0
-        if self.powerType and self.powerType == powerType and self.activeRegen then
-            powerRate = self.activeRegen
-        elseif self.powerRate and self.powerRate[powerType] then
-            powerRate = self.powerRate[powerType]
-        end
         if atTime then
             local now = baseState.next.currentTime
             local seconds = atTime - now
             if seconds > 0 then
+                local powerRate = self:GetPowerRate(powerType) or 0
                 power = power + powerRate * seconds
             end
         end
@@ -119,81 +96,55 @@ local PowerModule = __class(nil, {
     end,
     PowerCost = function(self, spellId, powerType, atTime, targetGUID, maximumCost)
         self:StartProfiling("OvalePower_PowerCost")
-        local buffParam = "buff_" .. powerType
         local spellCost = 0
         local spellRefund = 0
         local si = OvaleData.spellInfo[spellId]
         if si and si[powerType] then
-            local cost = OvaleData:GetSpellInfoProperty(spellId, atTime, powerType, targetGUID)
-            local costNumber
-            if isString(cost) then
-                if cost == "finisher" then
-                    cost = self:GetPower(powerType, atTime)
-                    local minCostParam = "min_" .. powerType
-                    local maxCostParam = "max_" .. powerType
-                    local minCost = si[minCostParam] or 1
-                    local maxCost = si[maxCostParam]
-                    if cost < minCost then
-                        costNumber = minCost
+            local cost, ratio = OvaleData:GetSpellInfoPropertyNumber(spellId, atTime, powerType, targetGUID, true)
+            if ratio and ratio ~= 0 then
+                local maxCostParam = "max_" .. powerType
+                local maxCost = si[maxCostParam]
+                if maxCost then
+                    local power = self:GetPower(powerType, atTime)
+                    if power > (maxCost or maximumCost) then
+                        cost = maxCost
+                    elseif power > cost then
+                        cost = power
                     end
-                    if maxCost and cost > maxCost then
-                        costNumber = maxCost
-                    end
-                elseif cost == "refill" then
-                    costNumber = self:GetPower(powerType, atTime) - self.maxPower[powerType]
-                end
-                costNumber = 0
-            else
-                local buffExtraParam = buffParam
-                local buffAmountParam = buffParam .. "_amount"
-                local buffExtra = si[buffExtraParam]
-                if buffExtra then
-                    local aura = OvaleAura:GetAura("player", buffExtra, atTime, nil, true)
-                    local isActiveAura = OvaleAura:IsActiveAura(aura, atTime)
-                    if isActiveAura then
-                        local buffAmount = 0
-                        if type(buffAmountParam) == "number" then
-                            buffAmount = si[buffAmountParam] or -1
-                        elseif si[buffAmountParam] == "value3" then
-                            buffAmount = aura.value3 or -1
-                        elseif si[buffAmountParam] == "value2" then
-                            buffAmount = aura.value2 or -1
-                        elseif si[buffAmountParam] == "value1" then
-                            buffAmount = aura.value1 or -1
-                        else
-                            buffAmount = -1
+                else
+                    local addRequirements = si and si.require["add_" .. powerType .. "_from_aura"]
+                    if addRequirements then
+                        for v, requirement in pairs(addRequirements) do
+                            local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                            if verified then
+                                local aura = OvaleAura:GetAura("player", requirement[2], atTime, nil, true)
+                                if aura[v] then
+                                    cost = cost + aura[v]
+                                end
+                            end
                         end
-                        local siAura = OvaleData.spellInfo[buffExtra]
-                        if siAura and siAura.stacking == 1 then
-                            buffAmount = buffAmount * aura.stacks
-                        end
-                        cost = cost + buffAmount
-                        self:Log("Spell ID '%d' had %f %s added from aura ID '%d'.", spellId, buffAmount, powerType, aura.spellId)
                     end
                 end
-                costNumber = cost
-            end
-            local extraPowerParam = "extra_" .. powerType
-            local extraPower = OvaleData:GetSpellInfoProperty(spellId, atTime, extraPowerParam, targetGUID)
-            if extraPower and  not isString(extraPower) then
-                if  not maximumCost then
-                    local power = floor(self:GetPower(powerType, atTime))
-                    power = power > cost and power - costNumber or 0
-                    if extraPower >= power then
-                        extraPower = power
-                    end
-                end
-                costNumber = costNumber + extraPower
-            end
-            spellCost = ceil(costNumber)
-            local refundParam = "refund_" .. powerType
-            local refund = OvaleData:GetSpellInfoProperty(spellId, atTime, refundParam, targetGUID)
-            if isString(refund) then
+                spellCost = (cost > 0 and floor(cost * ratio)) or ceil(cost * ratio)
+                local refund = si["refund_" .. powerType] or 0
                 if refund == "cost" then
-                    spellRefund = ceil(spellCost)
+                    spellRefund = spellCost
+                else
+                    local refundRequirements = si and si.require["refund_" .. powerType]
+                    if refundRequirements then
+                        for v, requirement in pairs(refundRequirements) do
+                            local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                            if verified then
+                                if v == "cost" then
+                                    spellRefund = spellCost
+                                elseif isNumber(v) then
+                                end
+                                refund = refund + (tonumber(v) or 0)
+                                break
+                            end
+                        end
+                    end
                 end
-            else
-                spellRefund = ceil(refund or 0)
             end
         else
             local cost = __exports.OvalePower:GetSpellCost(spellId, powerType)
@@ -218,16 +169,18 @@ local PowerModule = __class(nil, {
         powerType = powerType or __exports.OvalePower.POOLED_RESOURCE[OvalePaperDoll.class]
         if powerType then
             local cost = self:PowerCost(spellId, powerType, atTime, targetGUID)
-            local power = self:GetPower(powerType, atTime)
-            local powerRate = self.powerRate[powerType] or 0
-            if extraPower then
-                cost = cost + extraPower
-            end
-            if power < cost then
-                if powerRate > 0 then
-                    seconds = (cost - power) / powerRate
-                else
-                    seconds = INFINITY
+            if cost > 0 then
+                local power = self:GetPower(powerType, atTime)
+                if extraPower then
+                    cost = cost + extraPower
+                end
+                if power < cost then
+                    local powerRate = self:GetPowerRate(powerType) or 0
+                    if powerRate > 0 then
+                        seconds = (cost - power) / powerRate
+                    else
+                        seconds = INFINITY
+                    end
                 end
             end
         end
@@ -235,9 +188,8 @@ local PowerModule = __class(nil, {
     end,
     constructor = function(self)
         self.powerType = nil
-        self.activeRegen = 0
-        self.inactiveRegen = 0
-        self.powerRate = {}
+        self.activeRegen = {}
+        self.inactiveRegen = {}
         self.maxPower = {}
         self.power = {}
         self.RequirePowerHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
@@ -279,102 +231,24 @@ local PowerModule = __class(nil, {
 local OvalePowerBase = OvaleState:RegisterHasState(OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvalePower", aceEvent))), PowerModule)
 local OvalePowerClass = __class(OvalePowerBase, {
     constructor = function(self)
-        self.POWER_INFO = {
-            alternate = {
-                id = SPELL_POWER_ALTERNATE_POWER,
-                token = "ALTERNATE_RESOURCE_TEXT",
-                mini = 0
-            },
-            chi = {
-                id = SPELL_POWER_CHI,
-                token = "CHI",
-                mini = 0,
-                costString = CHI_COST
-            },
-            combopoints = {
-                id = SPELL_POWER_COMBO_POINTS,
-                token = "COMBO_POINTS",
-                mini = 0,
-                costString = COMBO_POINTS_COST
-            },
-            energy = {
-                id = SPELL_POWER_ENERGY,
-                token = "ENERGY",
-                mini = 0,
-                costString = ENERGY_COST
-            },
-            focus = {
-                id = SPELL_POWER_FOCUS,
-                token = "FOCUS",
-                mini = 0,
-                costString = FOCUS_COST
-            },
-            holy = {
-                id = SPELL_POWER_HOLY_POWER,
-                token = "HOLY_POWER",
-                mini = 0,
-                costString = HOLY_POWER_COST
-            },
-            mana = {
-                id = SPELL_POWER_MANA,
-                token = "MANA",
-                mini = 0,
-                costString = MANA_COST
-            },
-            rage = {
-                id = SPELL_POWER_RAGE,
-                token = "RAGE",
-                mini = 0,
-                costString = RAGE_COST
-            },
-            runicpower = {
-                id = SPELL_POWER_RUNIC_POWER,
-                token = "RUNIC_POWER",
-                mini = 0,
-                costString = RUNIC_POWER_COST
-            },
-            soulshards = {
-                id = SPELL_POWER_SOUL_SHARDS,
-                token = "SOUL_SHARDS",
-                mini = 0,
-                costString = SOUL_SHARDS_COST
-            },
-            astralpower = {
-                id = SPELL_POWER_LUNAR_POWER,
-                token = "LUNAR_POWER",
-                mini = 0,
-                costString = LUNAR_POWER_COST
-            },
-            insanity = {
-                id = SPELL_POWER_INSANITY,
-                token = "INSANITY",
-                mini = 0,
-                costString = INSANITY_COST
-            },
-            maelstrom = {
-                id = SPELL_POWER_MAELSTROM,
-                token = "MAELSTROM",
-                mini = 0,
-                costString = MAELSTROM_COST
-            },
-            arcanecharges = {
-                id = SPELL_POWER_ARCANE_CHARGES,
-                token = "ARCANE_CHARGES",
-                mini = 0,
-                costString = ARCANE_CHARGES_COST
-            },
-            pain = {
-                id = SPELL_POWER_PAIN,
-                token = "PAIN",
-                mini = 0,
-                costString = PAIN_COST
-            },
-            fury = {
-                id = SPELL_POWER_FURY,
-                token = "FURY",
-                mini = 0,
-                costString = FURY_COST
-            }
+        self.POWER_INFO = {}
+        self.POWER_TOKEN = {
+            mana = "MANA",
+            rage = "RAGE",
+            focus = "FOCUS",
+            energy = "ENERGY",
+            combopoints = "COMBO_POINTS",
+            runicpower = "RUNIC_POWER",
+            soulshards = "SOUL_SHARDS",
+            lunarpower = "LUNAR_POWER",
+            holypower = "HOLY_POWER",
+            alternate = "ALTERNATE_RESOURCE_TEXT",
+            maelstrom = "MAELSTROM",
+            chi = "CHI",
+            insanity = "INSANITY",
+            arcanecharges = "ARCANE_CHARGES",
+            pain = "PAIN",
+            fury = "FURY"
         }
         self.PRIMARY_POWER = {
             energy = true,
@@ -398,36 +272,21 @@ local OvalePowerClass = __class(OvalePowerBase, {
                 end
             end
         end
-        self.SaveSpellcastInfo = function(mod, spellcast, atTime, snapshot)
-            local spellId = spellcast.spellId
-            if spellId then
-                local si = OvaleData.spellInfo[spellId]
-                if si then
-                    local state = self:GetState(atTime)
-                    for _, powerType in pairs(self_SpellcastInfoPowerTypes) do
-                        if si[powerType] == "finisher" then
-                            local maxCostParam = "max_" .. powerType
-                            local maxCost = si[maxCostParam] or 1
-                            local cost = OvaleData:GetSpellInfoProperty(spellId, atTime, powerType, spellcast.target)
-                            if isString(cost) then
-                                if cost == "finisher" then
-                                    local power = state:GetPower(powerType, atTime)
-                                    if power > maxCost then
-                                        spellcast[powerType] = maxCost
-                                    else
-                                        spellcast[powerType] = power
-                                    end
-                                end
-                            elseif cost == 0 then
-                                spellcast[powerType] = maxCost
-                            end
-                            spellcast[powerType] = cost
-                        end
-                    end
-                end
+        OvalePowerBase.constructor(self)
+        for powerType, powerId in pairs(Enum.PowerType) do
+            local powerTypeLower = strlower(powerType)
+            local powerToken = self.POWER_TOKEN[powerTypeLower]
+            if powerToken then
+                self.POWER_TYPE[powerId] = powerTypeLower
+                self.POWER_TYPE[powerToken] = powerTypeLower
+                self.POWER_INFO[powerTypeLower] = {
+                    id = powerId,
+                    token = powerToken,
+                    mini = 0,
+                    maxCost = (powerTypeLower == "combopoints" and MAX_COMBO_POINTS) or 0
+                }
             end
         end
-        OvalePowerBase.constructor(self)
         for powerType, v in pairs(self.POWER_INFO) do
             if v.id == nil then
                 self:Print("Unknown resource %s", v.token)
@@ -451,10 +310,8 @@ local OvalePowerClass = __class(OvalePowerBase, {
         for powerType in pairs(self.POWER_INFO) do
             RegisterRequirement(powerType, self.RequirePowerHandler)
         end
-        lastSpell:RegisterSpellcastInfo(self)
     end,
     OnDisable = function(self)
-        lastSpell:UnregisterSpellcastInfo(self)
         for powerType in pairs(self.POWER_INFO) do
             UnregisterRequirement(powerType)
         end
@@ -522,6 +379,10 @@ local OvalePowerClass = __class(OvalePowerBase, {
                 local maxPower = UnitPowerMax("player", powerInfo.id, powerInfo.segments)
                 if self.current.maxPower[powerType] ~= maxPower then
                     self.current.maxPower[powerType] = maxPower
+                    if maxPower == 0 then
+                        self.POWER_INFO[powerType] = nil
+                        UnregisterRequirement(powerType)
+                    end
                     Ovale:needRefresh()
                 end
             end
@@ -553,22 +414,35 @@ local OvalePowerClass = __class(OvalePowerBase, {
     end,
     UpdatePowerRegen = function(self, event)
         self:StartProfiling("OvalePower_UpdatePowerRegen")
-        local inactiveRegen, activeRegen = GetPowerRegen()
-        if self.current.inactiveRegen ~= inactiveRegen or self.current.activeRegen ~= activeRegen then
-            self.current.inactiveRegen, self.current.activeRegen = inactiveRegen, activeRegen
-            Ovale:needRefresh()
+        for powerType in pairs(self.POWER_INFO) do
+            local currentType = self.current.powerType
+            if powerType == currentType then
+                local inactiveRegen, activeRegen = GetPowerRegen()
+                self.current.inactiveRegen[powerType], self.current.activeRegen[powerType] = inactiveRegen, activeRegen
+                Ovale:needRefresh()
+            elseif powerType == "mana" then
+                local inactiveRegen, activeRegen = GetManaRegen()
+                self.current.inactiveRegen[powerType], self.current.activeRegen[powerType] = inactiveRegen, activeRegen
+                Ovale:needRefresh()
+            elseif self.current.activeRegen[powerType] == nil then
+                local inactiveRegen, activeRegen = 0, 0
+                if powerType == "energy" then
+                    inactiveRegen, activeRegen = 10, 10
+                end
+                self.current.inactiveRegen[powerType], self.current.activeRegen[powerType] = inactiveRegen, activeRegen
+                Ovale:needRefresh()
+            end
         end
         self:StopProfiling("OvalePower_UpdatePowerRegen")
     end,
     UpdatePowerType = function(self, event)
         self:StartProfiling("OvalePower_UpdatePowerType")
-        local currentType = UnitPowerType("player")
-        local powerType = self.POWER_TYPE[currentType]
+        local powerId = UnitPowerType("player")
+        local powerType = self.POWER_TYPE[powerId]
         if self.current.powerType ~= powerType then
             self.current.powerType = powerType
             Ovale:needRefresh()
         end
-        Ovale:needRefresh()
         self:StopProfiling("OvalePower_UpdatePowerType")
     end,
     GetSpellCost = function(self, spellId, powerType)
@@ -585,12 +459,15 @@ local OvalePowerClass = __class(OvalePowerBase, {
         return nil, nil
     end,
     DebugPower = function(self)
-        self:Print("Power type: %s", self.current.powerType)
+        local array = {}
+        insert(array, "Current Power Type: " .. self.current.powerType)
         for powerType, v in pairs(self.current.power) do
-            self:Print("Power (%s): %d / %d", powerType, v, self.current.maxPower[powerType])
+            insert(array, "\nPower Type: " .. powerType)
+            insert(array, "Power: " .. v .. " / " .. self.current.maxPower[powerType])
+            insert(array, "Active Regen: / " .. self.current.activeRegen[powerType])
+            insert(array, "Inactive Regen: / " .. self.current.inactiveRegen[powerType])
         end
-        self:Print("Active regen: %f", self.current.activeRegen)
-        self:Print("Inactive regen: %f", self.current.inactiveRegen)
+        return concat(array, "\n")
     end,
     TimeToPower = function(self, spellId, atTime, targetGUID, powerType, extraPower)
         return self:GetState(atTime):TimeToPower(spellId, atTime, targetGUID, powerType, extraPower)
@@ -598,22 +475,16 @@ local OvalePowerClass = __class(OvalePowerBase, {
     InitializeState = function(self)
         for powerType in pairs(__exports.OvalePower.POWER_INFO) do
             self.next.power[powerType] = 0
+            self.next.inactiveRegen[powerType], self.next.activeRegen[powerType] = 0, 0
         end
-        self.next.powerRate = {}
     end,
     ResetState = function(self)
         __exports.OvalePower:StartProfiling("OvalePower_ResetState")
         for powerType in pairs(__exports.OvalePower.POWER_INFO) do
             self.next.power[powerType] = self.current.power[powerType] or 0
             self.next.maxPower[powerType] = self.current.maxPower[powerType] or 0
-        end
-        for powerType in pairs(__exports.OvalePower.POWER_INFO) do
-            self.next.powerRate[powerType] = 0
-        end
-        if baseState.current.inCombat then
-            self.next.powerRate[self.current.powerType] = self.current.activeRegen
-        else
-            self.next.powerRate[self.current.powerType] = self.current.inactiveRegen
+            self.next.activeRegen[powerType] = self.current.activeRegen[powerType] or 0
+            self.next.inactiveRegen[powerType] = self.current.inactiveRegen[powerType] or 0
         end
         __exports.OvalePower:StopProfiling("OvalePower_ResetState")
     end,
@@ -621,16 +492,10 @@ local OvalePowerClass = __class(OvalePowerBase, {
         for powerType in pairs(__exports.OvalePower.POWER_INFO) do
             self.next.power[powerType] = nil
         end
-        for k in pairs(self.current.powerRate) do
-            self.next.powerRate[k] = nil
-        end
     end,
     ApplySpellStartCast = function(self, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
         __exports.OvalePower:StartProfiling("OvalePower_ApplySpellStartCast")
         if isChanneled then
-            if baseState.next.inCombat then
-                self.next.powerRate[self.current.powerType] = self.current.activeRegen
-            end
             self:ApplyPowerCost(spellId, targetGUID, startCast, spellcast)
         end
         __exports.OvalePower:StopProfiling("OvalePower_ApplySpellStartCast")
@@ -638,9 +503,6 @@ local OvalePowerClass = __class(OvalePowerBase, {
     ApplySpellAfterCast = function(self, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
         __exports.OvalePower:StartProfiling("OvalePower_ApplySpellAfterCast")
         if  not isChanneled then
-            if baseState.next.inCombat then
-                self.next.powerRate[self.current.powerType] = self.current.activeRegen
-            end
             self:ApplyPowerCost(spellId, targetGUID, endCast, spellcast)
         end
         __exports.OvalePower:StopProfiling("OvalePower_ApplySpellAfterCast")
@@ -659,22 +521,25 @@ local OvalePowerClass = __class(OvalePowerBase, {
                 local cost, refund = self.next:PowerCost(spellId, powerType, atTime, targetGUID)
                 local power = self[powerType] or 0
                 if cost then
-                    power = power - cost + refund
-                    local seconds = OvaleFuture.next.nextCast - atTime
-                    if seconds > 0 then
-                        local powerRate = self.next.powerRate[powerType] or 0
-                        power = power + powerRate * seconds
-                    end
-                    local mini = powerInfo.mini or 0
-                    local maxi = self.current.maxPower[powerType]
-                    if mini and power < mini then
-                        power = mini
-                    end
-                    if maxi and power > maxi then
-                        power = maxi
-                    end
-                    self[powerType] = power
+                    power = power - cost
                 end
+                if refund then
+                    power = power + refund
+                end
+                local seconds = OvaleFuture.next.nextCast - atTime
+                if seconds > 0 then
+                    local powerRate = self.next:GetPowerRate(powerType) or 0
+                    power = power + powerRate * seconds
+                end
+                local mini = powerInfo.mini or 0
+                if mini and power < mini then
+                    power = mini
+                end
+                local maxi = self.current.maxPower[powerType]
+                if maxi and power > maxi then
+                    power = maxi
+                end
+                self[powerType] = power
             end
         end
         __exports.OvalePower:StopProfiling("OvalePower_state_ApplyPowerCost")

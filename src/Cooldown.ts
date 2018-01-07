@@ -228,7 +228,7 @@ class OvaleCooldownClass extends OvaleCooldownBase implements SpellCastModule {
         let spellId = spellcast.spellId;
         if (spellId) {
             let gcd:number| string;
-            gcd = OvaleData.GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target);
+            gcd = OvaleData.GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target, true);
             if (gcd && gcd == 0) {
                 spellcast.offgcd = true;
             }
@@ -239,8 +239,8 @@ class OvaleCooldownClass extends OvaleCooldownBase implements SpellCastModule {
         OvaleCooldown.StartProfiling("OvaleCooldown_state_GetCD");
         let cdName = spellId;
         let si = OvaleData.spellInfo[spellId];
-        if (si && si.sharedcd) {
-            cdName = si.sharedcd;
+        if (si && si.shared_cd) {
+            cdName = si.shared_cd;
         }
         if (!this.next.cd[cdName]) {
             this.next.cd[cdName] = {}
@@ -295,9 +295,6 @@ class OvaleCooldownClass extends OvaleCooldownBase implements SpellCastModule {
             let si = OvaleData.spellInfo[spellId];
             duration = <number>OvaleData.GetSpellInfoProperty(spellId, atTime, "cd", targetGUID);
             if (duration) {
-                if (si && si.addcd) {
-                    duration = duration + si.addcd;
-                }
                 if (duration < 0) {
                     duration = 0;
                 }
@@ -306,7 +303,7 @@ class OvaleCooldownClass extends OvaleCooldownBase implements SpellCastModule {
             }
             OvaleCooldown.Log("Spell %d has a base cooldown of %fs.", spellId, duration);
             if (duration > 0) {
-                let haste = OvaleData.GetSpellInfoProperty(spellId, atTime, "cd_haste", targetGUID);
+                let haste = OvaleData.GetSpellInfoProperty(spellId, atTime, "cd_haste", targetGUID, true);
                 let multiplier = OvalePaperDoll.GetHasteMultiplier(haste, OvalePaperDoll.next);
                 duration = duration / multiplier;
                 if (si && si.buff_cdr) {
