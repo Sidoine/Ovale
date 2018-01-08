@@ -2,13 +2,13 @@ import { OvaleDebug } from "./Debug";
 import { OvalePool } from "./Pool";
 import { OvaleProfiler } from "./Profiler";
 import { OvaleQueue } from "./Queue";
-import { Ovale, RegisterPrinter } from "./Ovale";
+import { Ovale } from "./Ovale";
 import aceEvent from "@wowts/ace_event-3.0";
 import { band, bor } from "@wowts/bit";
 import { sub } from "@wowts/string";
 import { GetTime, SCHOOL_MASK_ARCANE, SCHOOL_MASK_FIRE, SCHOOL_MASK_FROST, SCHOOL_MASK_HOLY, SCHOOL_MASK_NATURE, SCHOOL_MASK_SHADOW } from "@wowts/wow-mock";
 
-let OvaleDamageTakenBase = RegisterPrinter(OvaleProfiler.RegisterProfiling(OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleDamageTaken", aceEvent))));
+let OvaleDamageTakenBase = OvaleProfiler.RegisterProfiling(OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleDamageTaken", aceEvent)));
 export let OvaleDamageTaken: OvaleDamageTakenClass;
 
 interface Event{

@@ -1,22 +1,20 @@
 import { L } from "./Localization";
-import { NewAddon, AceModule } from "@wowts/tsaddon";
+import { NewAddon } from "@wowts/tsaddon";
 import aceEvent from "@wowts/ace_event-3.0";
-import { assert, ipairs, pairs, select, strjoin, tostring, tostringall, wipe, LuaArray, LuaObj, _G, truthy } from "@wowts/lua";
+import { ipairs, pairs, select, strjoin, tostring, tostringall, wipe, LuaArray, LuaObj, _G, truthy } from "@wowts/lua";
 import { format, find, len } from "@wowts/string";
 import { UnitClass, UnitGUID, DEFAULT_CHAT_FRAME } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
 import { AceDatabase } from "@wowts/ace_db-3.0";
 
-let self_oneTimeMessage = {
-}
+let self_oneTimeMessage: LuaObj<boolean | "printed"> = {}
 let MAX_REFRESH_INTERVALS = 500;
-let self_refreshIntervals:LuaArray<number> = {
-}
+let self_refreshIntervals:LuaArray<number> = {}
 let self_refreshIndex = 1;
 
 export type Constructor<T> = new(...args: any[]) => T;
 
-export function MakeString(s?, ...__args) {
+export function MakeString(s?: string, ...__args: any[]) {
     if (s && len(s) > 0) {
         if (__args) {
             if (truthy(find(s, "%%%.%d")) || truthy(find(s, "%%[%w]"))) {
@@ -31,19 +29,6 @@ export function MakeString(s?, ...__args) {
     return s;
 }
 
-export function RegisterPrinter<T extends Constructor<AceModule>>(base: T) {
-    return class extends base {
-        GetMethod(methodName, subModule) {
-            let [func, arg] = [this[methodName], this];
-            if (!func) {
-                [func, arg] = [subModule[methodName], subModule];
-            }
-            assert(func != undefined);
-            return [func, arg];
-        }    
-    }    
-}
-
 interface Color {
     r:number;
     g:number;
@@ -54,12 +39,13 @@ export interface OvaleDb {
     profile: {
         source: string;
         code: string,
-        check: {},
-        list: {},
+        check: LuaObj<boolean>,
+        list: LuaObj<string>,
         standaloneOptions: boolean,
         showHiddenScripts: boolean;
         overrideCode: string;
         apparence: {
+            [k: string]: any,
             avecCible: boolean,
             clickThru: boolean,
             enCombat: boolean,
@@ -157,7 +143,7 @@ class OvaleClass extends OvaleBase {
         }
     }
     
-    AddRefreshInterval(milliseconds) {
+    AddRefreshInterval(milliseconds: number) {
         if (milliseconds < huge) {
             self_refreshIntervals[self_refreshIndex] = milliseconds;
             self_refreshIndex = (self_refreshIndex < MAX_REFRESH_INTERVALS) && (self_refreshIndex + 1) || 1;
@@ -182,7 +168,7 @@ class OvaleClass extends OvaleBase {
     }
     
     
-    OneTimeMessage(...__args) {
+    OneTimeMessage(...__args: any[]) {
         let s = MakeString(...__args);
         if (!self_oneTimeMessage[s]) {
             self_oneTimeMessage[s] = true;
@@ -200,7 +186,7 @@ class OvaleClass extends OvaleBase {
         }
     }
 
-    Print(...__args) {
+    Print(...__args: any[]) {
         let s = MakeString(...__args);
         DEFAULT_CHAT_FRAME.AddMessage(format("|cff33ff99%s|r: %s", this.GetName(), s));
     }

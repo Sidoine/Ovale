@@ -6,7 +6,6 @@ local L = __Localization.L
 local __tsaddon = LibStub:GetLibrary("tsaddon", true)
 local NewAddon = __tsaddon.NewAddon
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
-local assert = assert
 local ipairs = ipairs
 local pairs = pairs
 local select = select
@@ -39,18 +38,6 @@ __exports.MakeString = function(s, ...)
         s = tostring(nil)
     end
     return s
-end
-__exports.RegisterPrinter = function(base)
-    return __class(base, {
-        GetMethod = function(self, methodName, subModule)
-            local func, arg = self[methodName], self
-            if  not func then
-                func, arg = subModule[methodName], subModule
-            end
-            assert(func ~= nil)
-            return func, arg
-        end,
-    })
 end
 local OvaleBase = NewAddon("Ovale", aceEvent)
 local OvaleClass = __class(OvaleBase, {

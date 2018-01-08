@@ -73,12 +73,14 @@ setmetatable(UNIT_AURA_UNIT, {
     end
 
 })
-local compareDefault = function(a, b)
+local function compareDefault(a, b)
     return a < b
 end
-
+local function isCompareFunction(a)
+    return type(a) == "function"
+end
 local function BinaryInsert(t, value, unique, compare)
-    if type(unique) == "function" then
+    if isCompareFunction(unique) then
         unique, compare = nil, unique
     end
     compare = compare or compareDefault

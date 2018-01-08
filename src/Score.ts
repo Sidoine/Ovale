@@ -3,7 +3,7 @@ import { OvaleDebug } from "./Debug";
 import { OvaleFuture } from "./Future";
 import aceEvent from "@wowts/ace_event-3.0";
 import AceSerializer from "@wowts/ace_serializer-3.0";
-import { pairs, type } from "@wowts/lua";
+import { pairs, type, LuaObj } from "@wowts/lua";
 import { IsInGroup, SendAddonMessage, LE_PARTY_CATEGORY_INSTANCE, GetTime, UnitCastingInfo, UnitChannelInfo } from "@wowts/wow-mock";
 
 let OvaleScoreBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleScore", aceEvent, AceSerializer));
@@ -14,8 +14,7 @@ let self_playerGUID = undefined;
 class OvaleScoreClass extends OvaleScoreBase {
     damageMeter = {
     }
-    damageMeterMethod = {
-    }
+    damageMeterMethod:LuaObj<string> = {}
     score = 0;
     maxScore = 0;
     scoredSpell = {}
@@ -87,7 +86,7 @@ class OvaleScoreClass extends OvaleScoreBase {
             if (addon) {
                 addon[method](addon, name, guid, scored, scoreMax);
             } else if (type(method) == "function") {
-                method(name, guid, scored, scoreMax);
+             //   method(name, guid, scored, scoreMax);
             }
         }
     }

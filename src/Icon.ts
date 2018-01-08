@@ -5,6 +5,7 @@ import { format, find, sub } from "@wowts/string";
 import { next, pairs, tostring, _G } from "@wowts/lua";
 import { GetTime, PlaySoundFile, UIFrame, UIFontString, UITexture, UICooldown, UICheckButton, CreateFrame, GameTooltip, UIPosition } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
+import { NamedParameters } from "./AST";
 let INFINITY = huge;
 let COOLDOWN_THRESHOLD = 0.1;
 
@@ -218,7 +219,7 @@ export class OvaleIcon {
     SetHelp(help) {
         this.help = help;
     }
-    SetParams(positionalParams, namedParams, secure?) {
+    SetParams(positionalParams, namedParams: NamedParameters, secure?) {
         this.positionalParams = positionalParams;
         this.namedParams = namedParams;
         this.actionButton = false;

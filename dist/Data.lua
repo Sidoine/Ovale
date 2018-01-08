@@ -19,6 +19,10 @@ local floor = math.floor
 local ceil = math.ceil
 local __BaseState = LibStub:GetLibrary("ovale/BaseState")
 local baseState = __BaseState.baseState
+local __tools = LibStub:GetLibrary("ovale/tools")
+local isNumber = __tools.isNumber
+local isLuaArray = __tools.isLuaArray
+local isString = __tools.isString
 local OvaleDataBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleData"))
 local BLOODELF_CLASSES = {
     ["DEATHKNIGHT"] = true,
@@ -89,6 +93,7 @@ local STAT_USE_NAMES = {
     [4] = "trinket_stat",
     [5] = "trinket_stack_proc"
 }
+local tempTokens = {}
 local OvaleDataClass = __class(OvaleDataBase, {
     constructor = function(self)
         self.STAT_NAMES = STAT_NAMES
@@ -411,8 +416,12 @@ local OvaleDataClass = __class(OvaleDataBase, {
         for name, handler in pairs(nowRequirements) do
             local value = self:GetSpellInfoProperty(spellId, atTime, name, targetGUID)
             if value then
-                local index = (type(value) == "table") and 1 or nil
-                verified, requirement = handler(spellId, atTime, name, value, index, targetGUID)
+                if  not isString(value) and isLuaArray(value) then
+                    verified, requirement = handler(spellId, atTime, name, value, 1, targetGUID)
+                else
+                    tempTokens[1] = value
+                    verified, requirement = handler(spellId, atTime, name, tempTokens, 1, targetGUID)
+                end
                 if  not verified then
                     break
                 end
@@ -450,30 +459,31 @@ local OvaleDataClass = __class(OvaleDataBase, {
                 end
             end
         end
-        if  not value or  not tonumber(value) then
-            return value
-        end
-        local addpower = si and si["add" .. property]
-        if addpower then
-            value = value + addpower
-        end
-        local ratio = si and si[property .. "_percent"]
-        if ratio then
-            ratio = ratio / 100
-        else
-            ratio = 1
-        end
-        local multipliers = si and si.require[property .. "_percent"]
-        if multipliers then
-            for v, requirement in pairs(multipliers) do
-                local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
-                if verified then
-                    ratio = ratio * (tonumber(v) or 0) / 100
+        if value and isNumber(value) then
+            local num = value
+            local addpower = si and si["add" .. property]
+            if addpower then
+                num = num + addpower
+            end
+            local ratio = si and si[property .. "_percent"]
+            if ratio then
+                ratio = ratio / 100
+            else
+                ratio = 1
+            end
+            local multipliers = si and si.require[property .. "_percent"]
+            if multipliers then
+                for v, requirement in pairs(multipliers) do
+                    local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                    if verified then
+                        ratio = ratio * (tonumber(v) or 0) / 100
+                    end
                 end
             end
+            local actual = (num > 0 and floor(num * ratio)) or ceil(num * ratio)
+            return actual
         end
-        local actual = (value > 0 and floor(value * ratio)) or ceil(value * ratio)
-        return actual
+        return value
     end,
     GetDamage = function(self, spellId, attackpower, spellpower, mainHandWeaponDamage, offHandWeaponDamage, combo)
         local si = self.spellInfo[spellId]

@@ -6,7 +6,7 @@ import { OvaleState } from "./State";
 import aceEvent from "@wowts/ace_event-3.0";
 import AceTimer from "@wowts/ace_timer-3.0";
 import { band, bor } from "@wowts/bit";
-import { ipairs, pairs, wipe, truthy } from "@wowts/lua";
+import { ipairs, pairs, wipe, truthy, LuaObj } from "@wowts/lua";
 import { find } from "@wowts/string";
 import { GetTime, COMBATLOG_OBJECT_AFFILIATION_MINE, COMBATLOG_OBJECT_AFFILIATION_PARTY, COMBATLOG_OBJECT_AFFILIATION_RAID, COMBATLOG_OBJECT_REACTION_FRIENDLY } from "@wowts/wow-mock";
 
@@ -37,12 +37,9 @@ let CLEU_UNIT_REMOVED = {
     UNIT_DIED: true,
     UNIT_DISSIPATES: true
 }
-let self_enemyName = {
-}
-let self_enemyLastSeen = {
-}
-let self_taggedEnemyLastSeen = {
-}
+let self_enemyName: LuaObj<string> = {}
+let self_enemyLastSeen: LuaObj<number> = {}
+let self_taggedEnemyLastSeen: LuaObj<number> = {}
 let self_reaperTimer = undefined;
 let REAP_INTERVAL = 3;
 const IsTagEvent = function(cleuEvent) {

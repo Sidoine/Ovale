@@ -7,8 +7,7 @@ import { insert, remove } from "@wowts/table";
 import { GetTime, UnitGUID, UnitName } from "@wowts/wow-mock";
 
 let OvaleGUIDBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleGUID", aceEvent));
-let PET_UNIT = {
-}
+let PET_UNIT:LuaObj<string> = {}
 {
     PET_UNIT["player"] = "pet";
     for (let i = 1; i <= 5; i += 1) {
@@ -55,7 +54,7 @@ let UNIT_AURA_UNITS: LuaArray<string> = {
     insert(UNIT_AURA_UNITS, "npc");
 }
 
-let UNIT_AURA_UNIT = {}
+let UNIT_AURA_UNIT: LuaObj<number> = {}
 
 for (const [i, unitId] of ipairs(UNIT_AURA_UNITS)) {
     UNIT_AURA_UNIT[unitId] = i;
@@ -66,11 +65,18 @@ setmetatable(UNIT_AURA_UNIT, {
     }
 });
 
-const compareDefault = function(a, b) {
+type CompareFunction<T> = (a:T, b:T) => boolean;
+
+function compareDefault<T>(a: T, b: T) {
     return a < b;
 }
-function BinaryInsert<T>(t: LuaArray<T>, value:T, unique, compare?) {
-    if (type(unique) == "function") {
+
+function isCompareFunction<T>(a: any): a is CompareFunction<T> {
+    return type(a) === "function";
+}
+
+function BinaryInsert<T>(t: LuaArray<T>, value:T, unique: boolean | CompareFunction<T>, compare?: CompareFunction<T>) {
+    if (isCompareFunction<T>(unique)) {
         [unique, compare] = [undefined, unique];
     }
     compare = compare || compareDefault;
@@ -88,7 +94,7 @@ function BinaryInsert<T>(t: LuaArray<T>, value:T, unique, compare?) {
     insert(t, low, value);
     return low;
 }
-function BinarySearch<T>(t: LuaArray<T>, value:T, compare) {
+function BinarySearch<T>(t: LuaArray<T>, value:T, compare: CompareFunction<T>) {
     compare = compare || compareDefault;
     let [low, high] = [1, lualength(t)];
     while (low <= high) {
@@ -104,14 +110,14 @@ function BinarySearch<T>(t: LuaArray<T>, value:T, compare) {
     return undefined;
 }
 
-function BinaryRemove<T>(t: LuaArray<T>, value:T, compare) {
+function BinaryRemove<T>(t: LuaArray<T>, value:T, compare: CompareFunction<T>) {
     let index = BinarySearch(t, value, compare);
     if (index) {
         remove(t, index);
     }
     return index;
 }
-const CompareUnit = function(a, b) {
+const CompareUnit = function(a: string, b: string) {
     return UNIT_AURA_UNIT[a] < UNIT_AURA_UNIT[b];
 }
 class OvaleGUIDClass extends OvaleGUIDBase {
@@ -147,36 +153,36 @@ class OvaleGUIDClass extends OvaleGUIDBase {
         this.UnregisterEvent("UNIT_PET");
         this.UnregisterEvent("UNIT_TARGET");
     }
-    ARENA_OPPONENT_UPDATE(event, unitId, eventType) {
+    ARENA_OPPONENT_UPDATE(event: string, unitId: string, eventType: string) {
         if (eventType != "cleared" || this.unitGUID[unitId]) {
             this.Debug(event, unitId, eventType);
             this.UpdateUnitWithTarget(unitId);
         }
     }
-    GROUP_ROSTER_UPDATE(event) {
+    GROUP_ROSTER_UPDATE(event: string) {
         this.Debug(event);
         this.UpdateAllUnits();
         this.SendMessage("Ovale_GroupChanged");
     }
-    INSTANCE_ENCOUNTER_ENGAGE_UNIT(event) {
+    INSTANCE_ENCOUNTER_ENGAGE_UNIT(event: string) {
         this.Debug(event);
         for (let i = 1; i <= 4; i += 1) {
             this.UpdateUnitWithTarget(`boss${i}`);
         }
     }
-    PLAYER_FOCUS_CHANGED(event) {
+    PLAYER_FOCUS_CHANGED(event: string) {
         this.Debug(event);
         this.UpdateUnitWithTarget("focus");
     }
-    PLAYER_TARGET_CHANGED(event, cause) {
+    PLAYER_TARGET_CHANGED(event: string, cause: string) {
         this.Debug(event, cause);
         this.UpdateUnit("target");
     }
-    UNIT_NAME_UPDATE(event, unitId) {
+    UNIT_NAME_UPDATE(event: string, unitId: string) {
         this.Debug(event, unitId);
         this.UpdateUnit(unitId);
     }
-    UNIT_PET(event, unitId) {
+    UNIT_PET(event: string, unitId: string) {
         this.Debug(event, unitId);
         let pet = PET_UNIT[unitId];
         this.UpdateUnitWithTarget(pet);
@@ -189,7 +195,7 @@ class OvaleGUIDClass extends OvaleGUIDBase {
         }
         this.SendMessage("Ovale_GroupChanged");
     }
-    UNIT_TARGET(event, unitId) {
+    UNIT_TARGET(event: string, unitId: string) {
         if (unitId != "player") {
             this.Debug(event, unitId);
             let target = `${unitId}target`;
@@ -201,7 +207,7 @@ class OvaleGUIDClass extends OvaleGUIDBase {
             this.UpdateUnitWithTarget(unitId);
         }
     }
-    UpdateUnit(unitId) {
+    UpdateUnit(unitId: string) {
         let guid = UnitGUID(unitId);
         let name = UnitName(unitId);
         let previousGUID = this.unitGUID[unitId];
@@ -264,11 +270,11 @@ class OvaleGUIDClass extends OvaleGUIDBase {
             this.SendMessage("Ovale_UnitChanged", unitId, guid);
         }
     }
-    UpdateUnitWithTarget(unitId) {
+    UpdateUnitWithTarget(unitId: string) {
         this.UpdateUnit(unitId);
         this.UpdateUnit(`${unitId}target`);
     }
-    IsPlayerPet(guid) {
+    IsPlayerPet(guid: string) {
         let atTime = this.petGUID[guid];
         return [(!!atTime), atTime];
     }
@@ -278,31 +284,31 @@ class OvaleGUIDClass extends OvaleGUIDBase {
         }
         return undefined;
     }
-    GUIDUnit(guid) {
+    GUIDUnit(guid: string) {
         if (guid && this.guidUnit[guid]) {
             return unpack(this.guidUnit[guid]);
         }
         return undefined;
     }
-    UnitName(unitId) {
+    UnitName(unitId: string) {
         if (unitId) {
             return this.unitName[unitId] || UnitName(unitId);
         }
         return undefined;
     }
-    NameUnit(name) {
+    NameUnit(name: string) {
         if (name && this.nameUnit[name]) {
             return unpack(this.nameUnit[name]);
         }
         return undefined;
     }
-    GUIDName(guid) {
+    GUIDName(guid: string) {
         if (guid) {
             return this.guidName[guid];
         }
         return undefined;
     }
-    NameGUID(name) {
+    NameGUID(name: string) {
         if (name && this.nameGUID[name]) {
             return unpack(this.nameGUID[name]);
         }

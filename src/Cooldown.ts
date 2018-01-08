@@ -307,7 +307,7 @@ class OvaleCooldownClass extends OvaleCooldownBase implements SpellCastModule {
             OvaleCooldown.Log("Spell %d has a base cooldown of %fs.", spellId, duration);
             if (duration > 0) {
                 let haste = OvaleData.GetSpellInfoProperty(spellId, atTime, "cd_haste", targetGUID);
-                let multiplier = OvalePaperDoll.GetHasteMultiplier(<string>haste, OvalePaperDoll.next);
+                let multiplier = OvalePaperDoll.GetHasteMultiplier(haste, OvalePaperDoll.next);
                 duration = duration / multiplier;
                 if (si && si.buff_cdr) {
                     let aura = OvaleAura.GetAura("player", si.buff_cdr, atTime);

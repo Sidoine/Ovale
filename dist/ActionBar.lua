@@ -32,6 +32,7 @@ local GetBindingKey = GetBindingKey
 local GetBonusBarIndex = GetBonusBarIndex
 local GetMacroItem = GetMacroItem
 local GetMacroSpell = GetMacroSpell
+local ElvUI = LibStub:GetLibrary("LibActionButton-1.0-ElvUI", true)
 local OvaleActionBarBase = OvaleProfiler:RegisterProfiling(OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleActionBar", aceEvent, aceTimer)))
 local OvaleActionBarClass = __class(OvaleActionBarBase, {
     constructor = function(self)
@@ -133,7 +134,7 @@ local OvaleActionBarClass = __class(OvaleActionBarBase, {
         if slot == 0 then
             self:UpdateActionSlots(event)
         elseif ElvUI then
-            local elvUIButtons = LibStub("LibActionButton-1.0-ElvUI").buttonRegistry
+            local elvUIButtons = ElvUI.buttonRegistry
             for btn in pairs(elvUIButtons) do
                 local s = btn:GetAttribute("action")
                 if s == slot then
@@ -164,8 +165,8 @@ local OvaleActionBarClass = __class(OvaleActionBarBase, {
         wipe(self.macro)
         wipe(self.spell)
         if ElvUI then
-            local elvUIButtons = LibStub("LibActionButton-1.0-ElvUI").buttonRegistry
-            for btn in ipairs(elvUIButtons) do
+            local elvUIButtons = ElvUI.buttonRegistry
+            for btn in pairs(elvUIButtons) do
                 local s = btn:GetAttribute("action")
                 self:UpdateActionSlot(s)
             end

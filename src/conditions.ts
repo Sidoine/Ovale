@@ -4,7 +4,7 @@ import { OvaleBestAction } from "./BestAction";
 import { OvaleCompile } from "./Compile";
 import { OvaleCondition, TestValue, Compare, TestBoolean, ParseCondition } from "./Condition";
 import { OvaleDamageTaken } from "./DamageTaken";
-import { OvaleData } from "./Data";
+import { OvaleData, SpellInfo } from "./Data";
 import { OvaleEquipment } from "./Equipment";
 import { OvaleFuture } from "./Future";
 import { OvaleGUID } from "./GUID";
@@ -46,7 +46,7 @@ function BossArmorDamageReduction(target, state: BaseState) {
 
 // Return the value of a parameter from the named spell's information.  If the value is the name of a
 // function in the script, then return the compute the value of that function instead.
-function ComputeParameter(spellId, paramName, state: BaseState, atTime) {
+function ComputeParameter<T extends keyof SpellInfo>(spellId, paramName: T, state: BaseState, atTime):SpellInfo[T] {
     let si = OvaleData.GetSpellInfo(spellId);
     if (si && si[paramName]) {
         let name = si[paramName];
@@ -1851,8 +1851,8 @@ function GetHastedTime(seconds, haste, state: BaseState) {
         let now = GetTime();
         let timeToDie = OvaleHealth.UnitTimeToDie(target);
         let [value, origin, rate] = [timeToDie, now, -1];
-        let [start, ending] = [now, now + timeToDie];
-        return TestValue(start, ending, value, origin, rate, comparator, limit);
+        let [start] = [now, now + timeToDie];
+        return TestValue(start, INFINITY, value, origin, rate, comparator, limit);
     }
     OvaleCondition.RegisterCondition("deadin", false, TimeToDie);
     OvaleCondition.RegisterCondition("timetodie", false, TimeToDie);

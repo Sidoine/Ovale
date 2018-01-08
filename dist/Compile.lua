@@ -28,7 +28,6 @@ local OvaleSpellBook = __SpellBook.OvaleSpellBook
 local __Stance = LibStub:GetLibrary("ovale/Stance")
 local OvaleStance = __Stance.OvaleStance
 local __Ovale = LibStub:GetLibrary("ovale/Ovale")
-local RegisterPrinter = __Ovale.RegisterPrinter
 local Ovale = __Ovale.Ovale
 local __Controls = LibStub:GetLibrary("ovale/Controls")
 local checkBoxes = __Controls.checkBoxes
@@ -519,7 +518,7 @@ do
     end
 
 end
-local OvaleCompileClassBase = RegisterPrinter(OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(OvaleCompileBase)))
+local OvaleCompileClassBase = OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(OvaleCompileBase))
 local OvaleCompileClass = __class(OvaleCompileClassBase, {
     OnInitialize = function(self)
         self:RegisterMessage("Ovale_CheckBoxValueChanged", "ScriptControlChanged")

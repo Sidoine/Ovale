@@ -6,7 +6,7 @@ import { OvalePaperDoll } from "./PaperDoll";
 import { Ovale } from "./Ovale";
 import aceEvent from "@wowts/ace_event-3.0";
 import { format, gsub, lower } from "@wowts/string";
-import { pairs } from "@wowts/lua";
+import { pairs, LuaObj } from "@wowts/lua";
 
 let OvaleScriptsBase = Ovale.NewModule("OvaleScripts", aceEvent);
 export let OvaleScripts: OvaleScriptsClass;
@@ -67,8 +67,7 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
     Ovale_StanceChanged(event, newStance, oldStance) {
     }
     GetDescriptions(scriptType) {
-        let descriptionsTable = {
-        }
+        let descriptionsTable: LuaObj<string> = {}
         for (const [name, script] of pairs(this.script)) {
             if ((!scriptType || script.type == scriptType) && (!script.specialization || OvalePaperDoll.IsSpecialization(script.specialization))) {
                 if (name == DEFAULT_NAME) {

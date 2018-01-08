@@ -1,7 +1,7 @@
 import { OvaleState } from "./State";
 import { Ovale } from "./Ovale";
 import aceEvent from "@wowts/ace_event-3.0";
-import { LuaArray, tonumber, pairs } from "@wowts/lua";
+import { LuaArray, tonumber, pairs, LuaObj } from "@wowts/lua";
 import { GetTime } from "@wowts/wow-mock";
 import { find } from "@wowts/string";
 
@@ -24,7 +24,15 @@ let demonData: LuaArray<{duration: number}> = {
         duration: 25
     }
 }
-let self_demons = {
+
+interface Demon {
+    finish: number;
+    id: number;
+    timestamp: number;
+    de?: boolean;
+}
+
+let self_demons: LuaObj<Demon> = {
 }
 let self_serial = 1;
 class OvaleWildImpsClass extends OvaleWildImpsBase {

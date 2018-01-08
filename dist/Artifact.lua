@@ -84,7 +84,7 @@ local OvaleArtifactClass = __class(OvaleArtifactBase, {
         end
     end,
     HasTrait = function(self, spellId)
-        return self.self_traits[spellId] and self.self_traits[spellId].currentRank
+        return self.self_traits[spellId] and self.self_traits[spellId].currentRank > 0
     end,
     TraitRank = function(self, spellId)
         if  not self.self_traits[spellId] then

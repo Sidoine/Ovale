@@ -13,7 +13,7 @@ import { AceModule } from "@wowts/tsaddon";
 let OvaleProfilerBase = Ovale.NewModule("OvaleProfiler");
 
 let self_timestamp = debugprofilestop();
-let self_timeSpent = {}
+let self_timeSpent: LuaObj<number> = {}
 let self_timesInvoked = {}
 let self_stack = {}
 let self_stackSize = 0;

@@ -78,7 +78,6 @@ local OvaleScoreClass = __class(OvaleScoreBase, {
             if addon then
                 addon[method](addon, name, guid, scored, scoreMax)
             elseif type(method) == "function" then
-                method(name, guid, scored, scoreMax)
             end
         end
     end,

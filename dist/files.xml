@@ -1,6 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
    <Script file="Controls.lua"/>
    <Script file="TimeSpan.lua"/>
+   <Script file="tools.lua"/>
    <Script file="Localization.lua"/>
    <Script file="Ovale.lua"/>
    <Script file="PoolGC.lua"/>
@@ -62,7 +63,6 @@
    <Script file="Artifact.lua"/>
    <Script file="SpellBook.lua"/>
    <Script file="DemonHunterSigils.lua"/>
-   <Script file="Icon.lua"/>
    <Script file="SpellFlash.lua"/>
    <Script file="Aura.lua"/>
    <Script file="WarriorCharge.lua"/>
@@ -83,6 +83,7 @@
    <Script file="Spells.lua"/>
    <Script file="BanditsGuile.lua"/>
    <Script file="AST.lua"/>
+   <Script file="Icon.lua"/>
    <Script file="Compile.lua"/>
    <Script file="SimulationCraft.lua"/>
    <Script file="ActionBar.lua"/>

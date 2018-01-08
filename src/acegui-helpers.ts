@@ -1,7 +1,7 @@
 import { UIFrame } from "@wowts/wow-mock";
 
 
-export function AceGUIRegisterAsContainer(widget: { frame: UIFrame & { obj?: any}, children?: any, userdata?: any, events?: any, base?: any, content: UIFrame & {obj?:any}, SetLayout(list:string) }) {
+export function AceGUIRegisterAsContainer(widget: { frame: UIFrame & { obj?: any}, children?: any, userdata?: any, events?: any, base?: any, content: UIFrame & {obj?:any}, SetLayout(list:string):void }) {
     widget.children = {}
     widget.userdata = {}
     widget.events = {}

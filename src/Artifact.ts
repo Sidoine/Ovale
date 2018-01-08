@@ -4,16 +4,21 @@ import { L } from "./Localization";
 import { Ovale } from "./Ovale";
 import aceEvent from "@wowts/ace_event-3.0";
 import { sort, insert, concat } from "@wowts/table";
-import { pairs, ipairs, wipe, tostring, lualength } from "@wowts/lua";
+import { pairs, ipairs, wipe, tostring, lualength, LuaObj } from "@wowts/lua";
 
 let tsort = sort;
 let tinsert = insert;
 let tconcat = concat;
 
+interface Trait {
+    name?: string;
+    spellID: string;
+    currentRank?: number;
+}
 
 let OvaleArtifactBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleArtifact", aceEvent));
 class OvaleArtifactClass extends OvaleArtifactBase {
-    self_traits = {}
+    self_traits: LuaObj<Trait> = {}
 
     debugOptions = {
         artifacttraits: {
@@ -65,7 +70,7 @@ class OvaleArtifactClass extends OvaleArtifactBase {
         }
     }
     HasTrait(spellId) {
-        return this.self_traits[spellId] && this.self_traits[spellId].currentRank;
+        return this.self_traits[spellId] && this.self_traits[spellId].currentRank > 0;
     }
     TraitRank(spellId) {
         if (!this.self_traits[spellId]) {

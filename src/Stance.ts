@@ -23,7 +23,7 @@ const [druid_flight_form] = GetSpellInfo(33943);
 const [druid_swift_flight_form] = GetSpellInfo(40120);
 const [rogue_stealth] = GetSpellInfo(1784);
 
-let SPELL_NAME_TO_STANCE = {
+let SPELL_NAME_TO_STANCE: LuaObj<string> = {
     [druidCatForm]: "druid_cat_form",
     [druidTravelForm]: "druid_travel_form",
     [druidAquaticForm]: "druid_aquatic_form",
@@ -217,7 +217,7 @@ class OvaleStanceClass extends OvaleStanceBase {
             if (type(stance) == "string") {
                 stance = OvaleStance.stanceId[stance];
             }
-            this.next.stance = <number>stance;
+            this.next.stance = stance;
         }
         OvaleStance.StopProfiling("OvaleStance_ApplySpellAfterCast");
     }
