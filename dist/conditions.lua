@@ -1072,7 +1072,7 @@ local function TimeToDie(positionalParams, namedParams, state, atTime)
         local timeToDie = OvaleHealth:UnitTimeToDie(target)
         local value, origin, rate = timeToDie, now, -1
         local start, ending = now, now + timeToDie
-        return TestValue(start, ending, value, origin, rate, comparator, limit)
+        return TestValue(start, INFINITY, value, origin, rate, comparator, limit)
     end
     OvaleCondition:RegisterCondition("deadin", false, TimeToDie)
     OvaleCondition:RegisterCondition("timetodie", false, TimeToDie)
