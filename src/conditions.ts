@@ -1851,7 +1851,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
         let now = GetTime();
         let timeToDie = OvaleHealth.UnitTimeToDie(target);
         let [value, origin, rate] = [timeToDie, now, -1];
-        let [start, ending] = [now, now + timeToDie];
+        let [start] = [now, now + timeToDie];
         return TestValue(start, INFINITY, value, origin, rate, comparator, limit);
     }
     OvaleCondition.RegisterCondition("deadin", false, TimeToDie);

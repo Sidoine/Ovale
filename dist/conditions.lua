@@ -1071,7 +1071,7 @@ local function TimeToDie(positionalParams, namedParams, state, atTime)
         local now = GetTime()
         local timeToDie = OvaleHealth:UnitTimeToDie(target)
         local value, origin, rate = timeToDie, now, -1
-        local start, ending = now, now + timeToDie
+        local start = now, now + timeToDie
         return TestValue(start, INFINITY, value, origin, rate, comparator, limit)
     end
     OvaleCondition:RegisterCondition("deadin", false, TimeToDie)
