@@ -18,7 +18,6 @@ local find = string.find
 local __BaseState = LibStub:GetLibrary("ovale/BaseState")
 local baseState = __BaseState.baseState
 local __tools = LibStub:GetLibrary("ovale/tools")
-local isNumber = __tools.isNumber
 local isLuaArray = __tools.isLuaArray
 local isString = __tools.isString
 local OvaleDataBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleData"))
@@ -412,7 +411,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
         local verified = true
         local requirement
         for name, handler in pairs(nowRequirements) do
-            local value = self:GetSpellInfoProperty(spellId, atTime, name, targetGUID, true)
+            local value = self:GetSpellInfoProperty(spellId, atTime, name, targetGUID)
             if value then
                 if  not isString(value) and isLuaArray(value) then
                     verified, requirement = handler(spellId, atTime, name, value, 1, targetGUID)
@@ -443,7 +442,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
         end
         return value
     end,
-    GetSpellInfoProperty = function(self, spellId, atTime, property, targetGUID, noCalculation)
+    GetSpellInfoProperty = function(self, spellId, atTime, property, targetGUID)
         targetGUID = targetGUID or OvaleGUID:UnitGUID(baseState.next.defaultTarget or "target")
         local si = self.spellInfo[spellId]
         local value = si and si[property]
@@ -456,9 +455,6 @@ local OvaleDataClass = __class(OvaleDataBase, {
                     break
                 end
             end
-        end
-        if  not noCalculation and value and isNumber(value) then
-            return self:GetSpellInfoPropertyNumber(spellId, atTime, property, targetGUID)
         end
         return value
     end,

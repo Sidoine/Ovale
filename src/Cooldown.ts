@@ -228,7 +228,7 @@ class OvaleCooldownClass extends OvaleCooldownBase implements SpellCastModule {
         let spellId = spellcast.spellId;
         if (spellId) {
             let gcd:number| string;
-            gcd = OvaleData.GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target, true);
+            gcd = OvaleData.GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target);
             if (gcd && gcd == 0) {
                 spellcast.offgcd = true;
             }
@@ -303,7 +303,7 @@ class OvaleCooldownClass extends OvaleCooldownBase implements SpellCastModule {
             }
             OvaleCooldown.Log("Spell %d has a base cooldown of %fs.", spellId, duration);
             if (duration > 0) {
-                let haste = OvaleData.GetSpellInfoProperty(spellId, atTime, "cd_haste", targetGUID, true);
+                let haste = OvaleData.GetSpellInfoProperty(spellId, atTime, "cd_haste", targetGUID);
                 let multiplier = OvalePaperDoll.GetHasteMultiplier(haste, OvalePaperDoll.next);
                 duration = duration / multiplier;
                 if (si && si.buff_cdr) {

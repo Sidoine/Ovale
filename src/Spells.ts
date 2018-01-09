@@ -121,7 +121,7 @@ class OvaleSpellsClass extends OvaleSpellsBase {
         let si = OvaleData.spellInfo[spellId];
         if (si) {
             if (isUsable) {
-                let unusable = OvaleData.GetSpellInfoProperty(spellId, atTime, "unusable", targetGUID, true);
+                let unusable = OvaleData.GetSpellInfoProperty(spellId, atTime, "unusable", targetGUID);
                 if (unusable && unusable > 0) {
                     OvaleSpells.Log("Spell ID '%s' is flagged as unusable.", spellId);
                     isUsable = false;
@@ -172,7 +172,7 @@ class OvaleSpellsClass extends OvaleSpellsBase {
             }
         }
         {
-            let runes = OvaleData.GetSpellInfoProperty(spellId, atTime, "runes", targetGUID, true);
+            let runes = OvaleData.GetSpellInfoProperty(spellId, atTime, "runes", targetGUID);
             if (runes) {
                 let seconds = OvaleRunes.GetRunesCooldown(atTime, <number>runes);
                 if (timeToSpell < seconds) {

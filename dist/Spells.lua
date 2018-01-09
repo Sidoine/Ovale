@@ -116,7 +116,7 @@ local OvaleSpellsClass = __class(OvaleSpellsBase, {
         local si = OvaleData.spellInfo[spellId]
         if si then
             if isUsable then
-                local unusable = OvaleData:GetSpellInfoProperty(spellId, atTime, "unusable", targetGUID, true)
+                local unusable = OvaleData:GetSpellInfoProperty(spellId, atTime, "unusable", targetGUID)
                 if unusable and unusable > 0 then
                     __exports.OvaleSpells:Log("Spell ID '%s' is flagged as unusable.", spellId)
                     isUsable = false
@@ -167,7 +167,7 @@ local OvaleSpellsClass = __class(OvaleSpellsBase, {
             end
         end
         do
-            local runes = OvaleData:GetSpellInfoProperty(spellId, atTime, "runes", targetGUID, true)
+            local runes = OvaleData:GetSpellInfoProperty(spellId, atTime, "runes", targetGUID)
             if runes then
                 local seconds = OvaleRunes:GetRunesCooldown(atTime, runes)
                 if timeToSpell < seconds then

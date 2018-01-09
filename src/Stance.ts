@@ -212,7 +212,7 @@ class OvaleStanceClass extends OvaleStanceBase {
     }
     ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast: SpellCast) {
         OvaleStance.StartProfiling("OvaleStance_ApplySpellAfterCast");
-        let stance = OvaleData.GetSpellInfoProperty(spellId, endCast, "to_stance", targetGUID, true);
+        let stance = OvaleData.GetSpellInfoProperty(spellId, endCast, "to_stance", targetGUID);
         if (stance) {
             if (type(stance) == "string") {
                 stance = OvaleStance.stanceId[stance];

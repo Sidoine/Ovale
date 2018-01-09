@@ -275,7 +275,7 @@ local OvaleCooldownClass = __class(OvaleCooldownBase, {
             end
             __exports.OvaleCooldown:Log("Spell %d has a base cooldown of %fs.", spellId, duration)
             if duration > 0 then
-                local haste = OvaleData:GetSpellInfoProperty(spellId, atTime, "cd_haste", targetGUID, true)
+                local haste = OvaleData:GetSpellInfoProperty(spellId, atTime, "cd_haste", targetGUID)
                 local multiplier = OvalePaperDoll:GetHasteMultiplier(haste, OvalePaperDoll.next)
                 duration = duration / multiplier
                 if si and si.buff_cdr then
@@ -317,7 +317,7 @@ local OvaleCooldownClass = __class(OvaleCooldownBase, {
             local spellId = spellcast.spellId
             if spellId then
                 local gcd
-                gcd = OvaleData:GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target, true)
+                gcd = OvaleData:GetSpellInfoProperty(spellId, spellcast.start, "gcd", spellcast.target)
                 if gcd and gcd == 0 then
                     spellcast.offgcd = true
                 end

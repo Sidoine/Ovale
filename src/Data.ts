@@ -5,7 +5,7 @@ import { nowRequirements, CheckRequirements } from "./Requirement";
 import { type, pairs, tonumber, wipe, truthy, LuaArray, LuaObj } from "@wowts/lua";
 import { find } from "@wowts/string";
 import { baseState } from "./BaseState";
-import { isNumber, isLuaArray, isString } from "./tools";
+import { isLuaArray, isString } from "./tools";
 
 let OvaleDataBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleData"));
 
@@ -485,7 +485,7 @@ class OvaleDataClass extends OvaleDataBase {
         let verified = true;
         let requirement;
         for (const [name, handler] of pairs(nowRequirements)) {
-            let value = this.GetSpellInfoProperty(spellId, atTime, <any>name, targetGUID, true);
+            let value = this.GetSpellInfoProperty(spellId, atTime, <any>name, targetGUID);
             if (value) {
                 if (!isString(value) && isLuaArray<string>(value)) {
                     [verified, requirement] = handler(spellId, atTime, name, value, 1, targetGUID);
@@ -527,7 +527,7 @@ class OvaleDataClass extends OvaleDataBase {
      * @param noCalculation Checks only SpellInfo and SpellRequire for the property itself.  No `add_${property}` or `${property}_percent`
      * @returns value or [value, ratio]
      */
-    GetSpellInfoProperty<T extends keyof SpellInfo>(spellId: number, atTime: number|undefined, property:T, targetGUID: string|undefined, noCalculation?: boolean) {
+    GetSpellInfoProperty<T extends keyof SpellInfo>(spellId: number, atTime: number|undefined, property:T, targetGUID: string|undefined): SpellInfo[T] {
         targetGUID = targetGUID || OvaleGUID.UnitGUID(baseState.next.defaultTarget || "target");
         let si = this.spellInfo[spellId];
         let value = si && si[property];
@@ -541,13 +541,10 @@ class OvaleDataClass extends OvaleDataBase {
                 }
             }
         }
-        if (!noCalculation && value && isNumber(value)) {
-            return this.GetSpellInfoPropertyNumber(spellId, atTime, property, targetGUID)
-        }
         return value;
     }
     /**
-     * @name GetSpellInfoPropertyNumber Calling this directly instead of GetSpellInfoProperty will skip the requirement check for the property itself and only check add or percent modifiers.
+     * @name GetSpellInfoPropertyNumber
      * @param spellId 
      * @param atTime If undefined, will not check SpellRequire
      * @param property 

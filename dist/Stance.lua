@@ -185,7 +185,7 @@ local OvaleStanceClass = __class(OvaleStanceBase, {
     end,
     ApplySpellAfterCast = function(self, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
         __exports.OvaleStance:StartProfiling("OvaleStance_ApplySpellAfterCast")
-        local stance = OvaleData:GetSpellInfoProperty(spellId, endCast, "to_stance", targetGUID, true)
+        local stance = OvaleData:GetSpellInfoProperty(spellId, endCast, "to_stance", targetGUID)
         if stance then
             if type(stance) == "string" then
                 stance = __exports.OvaleStance.stanceId[stance]
