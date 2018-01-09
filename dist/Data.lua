@@ -412,7 +412,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
         local verified = true
         local requirement
         for name, handler in pairs(nowRequirements) do
-            local value = self:GetSpellInfoProperty(spellId, atTime, name, targetGUID)
+            local value = self:GetSpellInfoProperty(spellId, atTime, name, targetGUID, true)
             if value then
                 if  not isString(value) and isLuaArray(value) then
                     verified, requirement = handler(spellId, atTime, name, value, 1, targetGUID)
@@ -487,7 +487,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
                 end
             end
         end
-        local value = si and si[property]
+        local value = si and si[property] or 0
         if ratio ~= 0 then
             local addParam = "add_" .. property
             local addProperty = si and si[addParam]

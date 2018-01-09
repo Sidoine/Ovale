@@ -163,26 +163,30 @@ class PowerModule {
 
     RequirePowerHandler = (spellId, atTime, requirement, tokens, index, targetGUID): [boolean, string, number] => {
         let verified = false;
-        let cost: number = tokens;
+        let baseCost: number = tokens;
         if (index) {
-            cost = tokens[index];
+            baseCost = tokens[index];
             index = index + 1;
         }
-        if (cost) {
-            let powerType = requirement;
-            [cost] = this.PowerCost(spellId, powerType, atTime, targetGUID);
-            if (cost > 0) {
-                let power = this.GetPower(powerType, atTime);
-                if (power >= cost) {
+        if (baseCost) {
+            if (baseCost > 0) { // Don't check power requirements for abilities that generate power
+                let powerType = requirement;
+                let [cost] = this.PowerCost(spellId, powerType, atTime, targetGUID);
+                if (cost > 0) {
+                    let power = this.GetPower(powerType, atTime);
+                    if (power >= cost) {
+                        verified = true;
+                    }
+                    this.Log("   Has power %f %s", power, powerType);
+                } else {
                     verified = true;
                 }
-                this.Log("   Has power %f %s", power, powerType);
+                if (cost > 0) {
+                    let result = verified && "passed" || "FAILED";
+                    this.Log("    Require %f %s at time=%f: %s", cost, powerType, atTime, result);
+                }
             } else {
                 verified = true;
-            }
-            if (cost > 0) {
-                let result = verified && "passed" || "FAILED";
-                this.Log("    Require %f %s at time=%f: %s", cost, powerType, atTime, result);
             }
         } else {
             Ovale.OneTimeMessage("Warning: requirement '%s' power is missing a cost argument.", requirement);

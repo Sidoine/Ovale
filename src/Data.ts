@@ -485,7 +485,7 @@ class OvaleDataClass extends OvaleDataBase {
         let verified = true;
         let requirement;
         for (const [name, handler] of pairs(nowRequirements)) {
-            let value = this.GetSpellInfoProperty(spellId, atTime, <any>name, targetGUID);
+            let value = this.GetSpellInfoProperty(spellId, atTime, <any>name, targetGUID, true);
             if (value) {
                 if (!isString(value) && isLuaArray<string>(value)) {
                     [verified, requirement] = handler(spellId, atTime, name, value, 1, targetGUID);
@@ -581,7 +581,7 @@ class OvaleDataClass extends OvaleDataBase {
                 }
             }
         }
-        let value = si && <number>si[property];
+        let value = si && <number>si[property] || 0;
         if (ratio != 0) {
             let addParam = `add_${property}`;
             let addProperty = si && <number>si[addParam];

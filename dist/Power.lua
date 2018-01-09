@@ -194,26 +194,30 @@ local PowerModule = __class(nil, {
         self.power = {}
         self.RequirePowerHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
             local verified = false
-            local cost = tokens
+            local baseCost = tokens
             if index then
-                cost = tokens[index]
+                baseCost = tokens[index]
                 index = index + 1
             end
-            if cost then
-                local powerType = requirement
-                cost = self:PowerCost(spellId, powerType, atTime, targetGUID)
-                if cost > 0 then
-                    local power = self:GetPower(powerType, atTime)
-                    if power >= cost then
+            if baseCost then
+                if baseCost > 0 then
+                    local powerType = requirement
+                    local cost = self:PowerCost(spellId, powerType, atTime, targetGUID)
+                    if cost > 0 then
+                        local power = self:GetPower(powerType, atTime)
+                        if power >= cost then
+                            verified = true
+                        end
+                        self:Log("   Has power %f %s", power, powerType)
+                    else
                         verified = true
                     end
-                    self:Log("   Has power %f %s", power, powerType)
+                    if cost > 0 then
+                        local result = verified and "passed" or "FAILED"
+                        self:Log("    Require %f %s at time=%f: %s", cost, powerType, atTime, result)
+                    end
                 else
                     verified = true
-                end
-                if cost > 0 then
-                    local result = verified and "passed" or "FAILED"
-                    self:Log("    Require %f %s at time=%f: %s", cost, powerType, atTime, result)
                 end
             else
                 Ovale:OneTimeMessage("Warning: requirement '%s' power is missing a cost argument.", requirement)
