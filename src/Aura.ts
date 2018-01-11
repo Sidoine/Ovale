@@ -1409,6 +1409,8 @@ export class OvaleAuraClass extends OvaleAuraBase {
             let value, ratio = OvaleData.GetSpellInfoPropertyNumber(auraId, undefined, "duration", undefined, true) || 15;
             if (si.add_duration_combopoints && combopoints) {
                 duration = (value + si.add_duration_combopoints * combopoints) * ratio;
+            } else {
+                duration = value * ratio;
             }
         } 
         /* Most aura durations are no longer reduced by haste
