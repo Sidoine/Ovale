@@ -81,8 +81,7 @@ let STAT_USE_NAMES: LuaArray<string> = {
 
 type Requirements = LuaObj<LuaArray<string>>;
 
-/** Number modifiers
- *  Any <number> in SpellInfo or SpellRequire can include:
+/** Any <number> in SpellInfo or SpellRequire can include:
  *      `add_${property}`
  *      `${property}_percent`
  */
@@ -519,7 +518,7 @@ class OvaleDataClass extends OvaleDataBase {
     }
     //GetSpellInfoProperty(spellId, atTime, property:"gcd"|"duration"|"combopoints"|"inccounter"|"resetcounter", targetGUID):number;
     /**
-     * @name GetSpellInfoProperty
+     * 
      * @param spellId 
      * @param atTime 
      * @param property 
@@ -527,7 +526,7 @@ class OvaleDataClass extends OvaleDataBase {
      * @param noCalculation Checks only SpellInfo and SpellRequire for the property itself.  No `add_${property}` or `${property}_percent`
      * @returns value or [value, ratio]
      */
-    GetSpellInfoProperty<T extends keyof SpellInfo>(spellId: number, atTime: number|undefined, property:T, targetGUID: string|undefined): SpellInfo[T] {
+    GetSpellInfoProperty<T extends keyof SpellInfo>(spellId: number, atTime: number, property:T, targetGUID: string|undefined): SpellInfo[T] {
         targetGUID = targetGUID || OvaleGUID.UnitGUID(baseState.next.defaultTarget || "target");
         let si = this.spellInfo[spellId];
         let value = si && si[property];
@@ -544,7 +543,7 @@ class OvaleDataClass extends OvaleDataBase {
         return value;
     }
     /**
-     * @name GetSpellInfoPropertyNumber
+     * 
      * @param spellId 
      * @param atTime If undefined, will not check SpellRequire
      * @param property 
@@ -552,7 +551,7 @@ class OvaleDataClass extends OvaleDataBase {
      * @param splitRatio Split the value and ratio into separate return values instead of multiplying them together
      * @returns value or [value, ratio]
      */
-    GetSpellInfoPropertyNumber<T extends keyof SpellInfo>(spellId: number, atTime: number|undefined, property:T, targetGUID: string|undefined, splitRatio?: boolean): any {
+    GetSpellInfoPropertyNumber<T extends keyof SpellInfo>(spellId: number, atTime: number|undefined, property:T, targetGUID: string|undefined, splitRatio?: boolean): number[] {
         targetGUID = targetGUID || OvaleGUID.UnitGUID(baseState.next.defaultTarget || "target");
         let si = this.spellInfo[spellId];
         
@@ -592,7 +591,6 @@ class OvaleDataClass extends OvaleDataBase {
                         let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
                         if (verified) {
                             value = value + (tonumber(v) || 0);
-                            break;
                         }
                     }
                 }
@@ -604,10 +602,10 @@ class OvaleDataClass extends OvaleDataBase {
         if (splitRatio) {
             return [value, ratio];
         }
-        return value * ratio;
+        return [value * ratio];
     }
 
-    GetDamage(spellId: number, attackpower: number, spellpower: number, mainHandWeaponDamage: number, offHandWeaponDamage: number, combopoints: number) {
+    GetDamage(spellId: number, attackpower: number, spellpower: number, mainHandWeaponDamage: number, offHandWeaponDamage: number, combopoints: number): number {
         let si = this.spellInfo[spellId];
         if (!si) {
             return undefined;

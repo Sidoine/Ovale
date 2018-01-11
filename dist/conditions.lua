@@ -1385,32 +1385,6 @@ local function PowerPercent(powerType, positionalParams, namedParams, state, atT
         end
         return Compare(0, comparator, limit)
     end
-local function PrimaryResource(positionalParams, namedParams, state, atTime)
-        local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-        local primaryPowerType
-        local si = OvaleData:GetSpellInfo(spellId)
-        if si then
-            for powerType in pairs(OvalePower.PRIMARY_POWER) do
-                if si[powerType] then
-                    primaryPowerType = powerType
-                    break
-                end
-            end
-        end
-        if  not primaryPowerType then
-            local _, powerType = OvalePower:GetSpellCost(spellId)
-            if powerType then
-                primaryPowerType = powerType
-            end
-        end
-        if primaryPowerType then
-            local value, origin, rate = OvalePower.next.power[primaryPowerType], atTime, OvalePower.next:GetPowerRate(primaryPowerType)
-            local start, ending = atTime, INFINITY
-            return TestValue(start, ending, value, origin, rate, comparator, limit)
-        end
-        return Compare(0, comparator, limit)
-    end
-    OvaleCondition:RegisterCondition("primaryresource", true, PrimaryResource)
 local function AlternatePower(positionalParams, namedParams, state, atTime)
         return Power("alternate", positionalParams, namedParams, state, atTime)
     end
@@ -2277,16 +2251,9 @@ local function TimeToFocusFor(positionalParams, namedParams, state, atTime)
 end
 do
 local function TimeToSpell(positionalParams, namedParams, state, atTime)
-        local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-        local target = ParseCondition(positionalParams, namedParams, state, "target")
-        local seconds = OvaleSpells:GetTimeToSpell(spellId, atTime, OvaleGUID:UnitGUID(target))
-        if seconds == 0 then
-            return Compare(0, comparator, limit)
-        elseif seconds < INFINITY then
-            return TestValue(0, atTime + seconds, seconds, atTime, -1, comparator, limit)
-        else
-            return Compare(INFINITY, comparator, limit)
-        end
+        local _, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+        Ovale:OneTimeMessage("Warning: 'TimeToSpell()' is not implemented.")
+        return TestValue(0, INFINITY, 0, atTime, -1, comparator, limit)
     end
     OvaleCondition:RegisterCondition("timetospell", true, TimeToSpell)
 end

@@ -497,7 +497,6 @@ local OvaleDataClass = __class(OvaleDataBase, {
                         local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
                         if verified then
                             value = value + (tonumber(v) or 0)
-                            break
                         end
                     end
                 end

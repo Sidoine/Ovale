@@ -12,7 +12,6 @@ local RegisterRequirement = __Requirement.RegisterRequirement
 local UnregisterRequirement = __Requirement.UnregisterRequirement
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local tonumber = tonumber
-local type = type
 local GetSpellCount = GetSpellCount
 local IsSpellInRange = IsSpellInRange
 local IsUsableItem = IsUsableItem
@@ -24,10 +23,6 @@ local __Data = LibStub:GetLibrary("ovale/Data")
 local OvaleData = __Data.OvaleData
 local __Power = LibStub:GetLibrary("ovale/Power")
 local OvalePower = __Power.OvalePower
-local __Cooldown = LibStub:GetLibrary("ovale/Cooldown")
-local OvaleCooldown = __Cooldown.OvaleCooldown
-local __Runes = LibStub:GetLibrary("ovale/Runes")
-local OvaleRunes = __Runes.OvaleRunes
 local __SpellBook = LibStub:GetLibrary("ovale/SpellBook")
 local OvaleSpellBook = __SpellBook.OvaleSpellBook
 local WARRIOR_INCERCEPT_SPELLID = 198304
@@ -108,9 +103,6 @@ local OvaleSpellsClass = __class(OvaleSpellsBase, {
     end,
     IsUsableSpell = function(self, spellId, atTime, targetGUID)
         __exports.OvaleSpells:StartProfiling("OvaleSpellBook_state_IsUsableSpell")
-        if type(atTime) == "string" and  not targetGUID then
-            atTime, targetGUID = nil, atTime
-        end
         local isUsable = OvaleSpellBook:IsKnownSpell(spellId)
         local noMana = false
         local si = OvaleData.spellInfo[spellId]
@@ -126,9 +118,7 @@ local OvaleSpellsClass = __class(OvaleSpellsBase, {
                 local requirement
                 isUsable, requirement = OvaleData:CheckSpellInfo(spellId, atTime, targetGUID)
                 if  not isUsable then
-                    if OvalePower.PRIMARY_POWER[requirement] then
-                        noMana = true
-                    end
+                    noMana = OvalePower.PRIMARY_POWER[requirement]
                     if noMana then
                         __exports.OvaleSpells:Log("Spell ID '%s' does not have enough %s.", spellId, requirement)
                     else
@@ -148,46 +138,17 @@ local OvaleSpellsClass = __class(OvaleSpellsBase, {
         __exports.OvaleSpells:StopProfiling("OvaleSpellBook_state_IsUsableSpell")
         return isUsable, noMana
     end,
-    GetTimeToSpell = function(self, spellId, atTime, targetGUID, extraPower)
-        if type(atTime) == "string" and  not targetGUID then
-            atTime, targetGUID = nil, atTime
-        end
-        local timeToSpell = 0
-        do
-            local start, duration = OvaleCooldown:GetSpellCooldown(spellId, atTime)
-            local seconds = (duration > 0) and (start + duration - atTime) or 0
-            if timeToSpell < seconds then
-                timeToSpell = seconds
-            end
-        end
-        do
-            local seconds = OvalePower:TimeToPower(spellId, atTime, targetGUID, nil, extraPower)
-            if timeToSpell < seconds then
-                timeToSpell = seconds
-            end
-        end
-        do
-            local runes = OvaleData:GetSpellInfoProperty(spellId, atTime, "runes", targetGUID)
-            if runes then
-                local seconds = OvaleRunes:GetRunesCooldown(atTime, runes)
-                if timeToSpell < seconds then
-                    timeToSpell = seconds
-                end
-            end
-        end
-        return timeToSpell
-    end,
     constructor = function(self, ...)
         OvaleSpellsBase.constructor(self, ...)
         self.RequireSpellCountHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
             local verified = false
-            local count = tokens
+            local countString
             if index then
-                count = tokens[index]
+                countString = tokens[index]
                 index = index + 1
             end
-            if count then
-                count = tonumber(count) or 1
+            if countString then
+                local count = tonumber(countString) or 1
                 local actualCount = __exports.OvaleSpells:GetSpellCount(spellId)
                 verified = (requirement == "spellcount_min" and count <= actualCount) or (requirement == "spellcount_max" and count >= actualCount)
             else

@@ -1927,7 +1927,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
      */
     function InRange(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [spellId, yesno] = [positionalParams[1], positionalParams[2]];
-        let target = ParseCondition(positionalParams, namedParams, state);
+        let [target] = ParseCondition(positionalParams, namedParams, state);
         let boolean = (OvaleSpells.IsSpellInRange(spellId, target) == 1);
         return TestBoolean(boolean, yesno);
     }
@@ -2467,41 +2467,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
         return Compare(0, comparator, limit);
     }
 
-    /** Get the current amount of the player's primary resource for the given spell.
-	 @name PrimaryResource
-	 @paramsig number or boolean
-	 @param id The spell ID.
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
-	 @return The amount of the primary resource.
-	 @return A boolean value for the result of the comparison.
-     */
-    function PrimaryResource(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        let [spellId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
-        let primaryPowerType;
-        let si = OvaleData.GetSpellInfo(spellId);
-        if (si) {
-            for (const [powerType] of pairs(OvalePower.PRIMARY_POWER)) {
-                if (si[powerType]) {
-                    primaryPowerType = powerType;
-                    break;
-                }
-            }
-        }
-        if (!primaryPowerType) {
-            let [, powerType] = OvalePower.GetSpellCost(spellId);
-            if (powerType) {
-                primaryPowerType = powerType;
-            }
-        }
-        if (primaryPowerType) {
-            let [value, origin, rate] = [OvalePower.next.power[primaryPowerType], atTime, OvalePower.next.GetPowerRate(primaryPowerType)];
-            let [start, ending] = [atTime, INFINITY];
-            return TestValue(start, ending, value, origin, rate, comparator, limit);
-        }
-        return Compare(0, comparator, limit);
-    }
-    OvaleCondition.RegisterCondition("primaryresource", true, PrimaryResource);
+    
     /**
      Get the current amount of alternate power displayed on the alternate power bar.
 	 @name AlternatePower
@@ -4652,7 +4618,8 @@ l    */
 	 @return A boolean value for the result of the comparison.
      */
     function TimeToSpell(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        let [spellId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
+        let [, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
+        /*
         let [target] = ParseCondition(positionalParams, namedParams, state, "target");
         let seconds = OvaleSpells.GetTimeToSpell(spellId, atTime, OvaleGUID.UnitGUID(target));
         if (seconds == 0) {
@@ -4662,6 +4629,9 @@ l    */
         } else {
             return Compare(INFINITY, comparator, limit);
         }
+        */
+        Ovale.OneTimeMessage("Warning: 'TimeToSpell()' is not implemented.");
+        return TestValue(0, INFINITY, 0, atTime, -1, comparator, limit);
     }
     OvaleCondition.RegisterCondition("timetospell", true, TimeToSpell);
 }

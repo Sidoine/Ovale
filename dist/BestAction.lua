@@ -57,8 +57,12 @@ local __AST = LibStub:GetLibrary("ovale/AST")
 local isValueNode = __AST.isValueNode
 local __Future = LibStub:GetLibrary("ovale/Future")
 local OvaleFuture = __Future.OvaleFuture
+local __Power = LibStub:GetLibrary("ovale/Power")
+local OvalePower = __Power.OvalePower
 local __Cooldown = LibStub:GetLibrary("ovale/Cooldown")
 local OvaleCooldown = __Cooldown.OvaleCooldown
+local __Runes = LibStub:GetLibrary("ovale/Runes")
+local OvaleRunes = __Runes.OvaleRunes
 local __Variables = LibStub:GetLibrary("ovale/Variables")
 local variables = __Variables.variables
 local __PaperDoll = LibStub:GetLibrary("ovale/PaperDoll")
@@ -218,13 +222,17 @@ local function GetActionSpellInfo(element, state, atTime, target)
                 end
                 if actionCooldownStart and actionCooldownDuration then
                     local extraPower = element.namedParams.extra_amount or 0
-                    local seconds = OvaleSpells:GetTimeToSpell(spellId, atTime, targetGUID, extraPower)
-                    if seconds > 0 and seconds > actionCooldownDuration then
-                        if actionCooldownDuration > 0 then
-                            actionResourceExtend = seconds - actionCooldownDuration
-                        else
-                            actionResourceExtend = seconds
+                    local timeToCd = (actionCooldownDuration > 0) and (actionCooldownStart + actionCooldownDuration - atTime) or 0
+                    local timeToPower = OvalePower:TimeToPower(spellId, atTime, targetGUID, nil, extraPower)
+                    local runes = OvaleData:GetSpellInfoProperty(spellId, atTime, "runes", targetGUID)
+                    if runes then
+                        local timeToRunes = OvaleRunes:GetRunesCooldown(atTime, runes)
+                        if timeToPower < timeToRunes then
+                            timeToPower = timeToRunes
                         end
+                    end
+                    if timeToPower > timeToCd then
+                        actionResourceExtend = timeToPower - timeToCd
                         __exports.OvaleBestAction:Log("Spell ID '%s' requires an extra %fs for primary resource.", spellId, actionResourceExtend)
                     end
                 end

@@ -83,7 +83,7 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
     talentPoints = {    }
 
     
-    OnInitialize() {
+    OnInitialize(): void {
         this.RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "Update");
         this.RegisterEvent("CHARACTER_POINTS_CHANGED", "UpdateTalents");
         this.RegisterEvent("PLAYER_ENTERING_WORLD", "Update");
@@ -91,7 +91,7 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
         this.RegisterEvent("SPELLS_CHANGED", "UpdateSpells");
         this.RegisterEvent("UNIT_PET");
     }
-    OnDisable() {
+    OnDisable(): void {
         this.UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED");
         this.UnregisterEvent("CHARACTER_POINTS_CHANGED");
         this.UnregisterEvent("PLAYER_ENTERING_WORLD");
@@ -99,17 +99,18 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
         this.UnregisterEvent("SPELLS_CHANGED");
         this.UnregisterEvent("UNIT_PET");
     }
-    UNIT_PET(unitId) {
+    UNIT_PET(unitId: string): void {
         if (unitId == "player") {
             this.UpdateSpells();
         }
     }
-    Update() {
+    Update(): void
+     {
         this.UpdateTalents();
         this.UpdateSpells();
         this.ready = true;
     }
-    UpdateTalents() {
+    UpdateTalents(): void {
         this.Debug("Updating talents.");
         wipe(this.talent);
         wipe(this.talentPoints);
@@ -135,7 +136,7 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
         Ovale.needRefresh();
         this.SendMessage("Ovale_TalentsChanged");
     }
-    UpdateSpells() {
+    UpdateSpells(): void {
         wipe(this.spell);
         wipe(this.spellbookId[BOOKTYPE_PET]);
         wipe(this.spellbookId[BOOKTYPE_SPELL]);
@@ -155,7 +156,7 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
         Ovale.needRefresh();
         this.SendMessage("Ovale_SpellsChanged");
     }
-    ScanSpellBook(bookType, numSpells, offset?) {
+    ScanSpellBook(bookType: string, numSpells: number, offset?: number) {
         offset = offset || 0;
         this.Debug("Updating '%s' spellbook starting at offset %d.", bookType, offset);
         for (let index = offset + 1; index <= offset + numSpells; index += 1) {
@@ -210,7 +211,7 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
             }
         }
     }
-    GetCastTime(spellId) {
+    GetCastTime(spellId: number): number {
         if (spellId) {
             let [name, , , castTime] = this.GetSpellInfo(spellId);
             if (name) {
@@ -225,7 +226,7 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
             return castTime;
         }
     }
-    GetSpellInfo(spellId) {
+    GetSpellInfo(spellId: number): [string, string, string, number, number, number, number] {
         let [index, bookType] = this.GetSpellBookIndex(spellId);
         if (index && bookType) {
             return GetSpellInfo(index, bookType);
@@ -233,7 +234,7 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
             return GetSpellInfo(spellId);
         }
     }
-    GetSpellName(spellId) {
+    GetSpellName(spellId: number): string {
         if (spellId) {
             let spellName = this.spell[spellId];
             if (!spellName) {
@@ -242,34 +243,34 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
             return spellName;
         }
     }
-    GetSpellTexture(spellId) {
+    GetSpellTexture(spellId: number): string {
         return this.texture[spellId];
     }
-    GetTalentPoints(talentId) {
+    GetTalentPoints(talentId: number): number {
         let points = 0;
         if (talentId && this.talentPoints[talentId]) {
             points = this.talentPoints[talentId];
         }
         return points;
     }
-    AddSpell(spellId, name) {
+    AddSpell(spellId: number, name) {
         if (spellId && name) {
             this.spell[spellId] = name;
         }
     }
-    IsHarmfulSpell(spellId) {
+    IsHarmfulSpell(spellId: number): boolean {
         return (spellId && this.isHarmful[spellId]) && true || false;
     }
-    IsHelpfulSpell(spellId) {
+    IsHelpfulSpell(spellId: number): boolean {
         return (spellId && this.isHelpful[spellId]) && true || false;
     }
-    IsKnownSpell(spellId) {
+    IsKnownSpell(spellId: number): boolean {
         return (spellId && this.spell[spellId]) && true || false;
     }
-    IsKnownTalent(talentId) {
+    IsKnownTalent(talentId: number): boolean {
         return (talentId && this.talentPoints[talentId]) && true || false;
     }
-    GetSpellBookIndex(spellId): [number, string] {
+    GetSpellBookIndex(spellId: number): [number, string] {
         let bookType = BOOKTYPE_SPELL;
         while (true) {
             let index = this.spellbookId[bookType][spellId];
@@ -283,12 +284,12 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
         }
         return [undefined, undefined];
     }
-    IsPetSpell(spellId) {
+    IsPetSpell(spellId: number): boolean {
         let [, bookType] = this.GetSpellBookIndex(spellId);
         return bookType == BOOKTYPE_PET;
     }
 
-    DebugSpells() {
+    DebugSpells() { // TODO return type
         wipe(output);
         OutputTableValues(output, this.spell);
         let total = 0;
@@ -298,7 +299,7 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
         output[lualength(output) + 1] = `Total spells: ${total}`;
         return concat(output, "\n");
     }
-    DebugTalents() {
+    DebugTalents() { // TODO return type
         wipe(output);
         OutputTableValues(output, this.talent);
         return concat(output, "\n");

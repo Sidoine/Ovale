@@ -49,7 +49,7 @@ local isNumber = __tools.isNumber
 local strlower = lower
 local self_SpellcastInfoPowerTypes = {
     [1] = "chi",
-    [2] = "holy"
+    [2] = "holypower"
 }
 do
     local debugOptions = {
@@ -236,7 +236,30 @@ local OvalePowerBase = OvaleState:RegisterHasState(OvaleDebug:RegisterDebugging(
 local OvalePowerClass = __class(OvalePowerBase, {
     constructor = function(self)
         self.POWER_INFO = {}
-        self.POWER_TOKEN = {
+        self.POWER_TYPE = {}
+        self.POOLED_RESOURCE = {
+            ["DRUID"] = "energy",
+            ["HUNTER"] = "focus",
+            ["MONK"] = "energy",
+            ["ROGUE"] = "energy"
+        }
+        self.PRIMARY_POWER = {
+            energy = true,
+            focus = true,
+            mana = true
+        }
+        self.RequirePowerHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
+            return self:GetState(atTime).RequirePowerHandler(spellId, atTime, requirement, tokens, index, targetGUID)
+        end
+        self.CopySpellcastInfo = function(mod, spellcast, dest)
+            for _, powerType in pairs(self_SpellcastInfoPowerTypes) do
+                if spellcast[powerType] then
+                    dest[powerType] = spellcast[powerType]
+                end
+            end
+        end
+        OvalePowerBase.constructor(self)
+        local powerTokens = {
             mana = "MANA",
             rage = "RAGE",
             focus = "FOCUS",
@@ -254,32 +277,9 @@ local OvalePowerClass = __class(OvalePowerBase, {
             pain = "PAIN",
             fury = "FURY"
         }
-        self.PRIMARY_POWER = {
-            energy = true,
-            focus = true,
-            mana = true
-        }
-        self.POWER_TYPE = {}
-        self.POOLED_RESOURCE = {
-            ["DRUID"] = "energy",
-            ["HUNTER"] = "focus",
-            ["MONK"] = "energy",
-            ["ROGUE"] = "energy"
-        }
-        self.RequirePowerHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
-            return self:GetState(atTime).RequirePowerHandler(spellId, atTime, requirement, tokens, index, targetGUID)
-        end
-        self.CopySpellcastInfo = function(mod, spellcast, dest)
-            for _, powerType in pairs(self_SpellcastInfoPowerTypes) do
-                if spellcast[powerType] then
-                    dest[powerType] = spellcast[powerType]
-                end
-            end
-        end
-        OvalePowerBase.constructor(self)
         for powerType, powerId in pairs(Enum.PowerType) do
             local powerTypeLower = strlower(powerType)
-            local powerToken = self.POWER_TOKEN[powerTypeLower]
+            local powerToken = powerTokens[powerTypeLower]
             if powerToken then
                 self.POWER_TYPE[powerId] = powerTypeLower
                 self.POWER_TYPE[powerToken] = powerTypeLower
@@ -290,13 +290,6 @@ local OvalePowerClass = __class(OvalePowerBase, {
                     maxCost = (powerTypeLower == "combopoints" and MAX_COMBO_POINTS) or 0
                 }
             end
-        end
-        for powerType, v in pairs(self.POWER_INFO) do
-            if v.id == nil then
-                self:Print("Unknown resource %s", v.token)
-            end
-            self.POWER_TYPE[v.id] = powerType
-            self.POWER_TYPE[v.token] = powerType
         end
     end,
     OnInitialize = function(self)

@@ -435,7 +435,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
                     if (aura) {
                         duration = aura.duration;
                     } else if (si && si.duration) {
-                        duration = <number>OvaleData.GetSpellInfoPropertyNumber(spellId, now, "duration", destGUID) || 15;
+                        [duration] = OvaleData.GetSpellInfoPropertyNumber(spellId, now, "duration", destGUID) || [15];
                     }
                     let expirationTime = now + duration;
                     let count;
@@ -1406,7 +1406,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
         let duration = INFINITY
         let si = OvaleData.spellInfo[auraId];
         if (si && si.duration) {
-            let value, ratio = OvaleData.GetSpellInfoPropertyNumber(auraId, undefined, "duration", undefined, true) || 15;
+            let [value, ratio] = OvaleData.GetSpellInfoPropertyNumber(auraId, undefined, "duration", undefined, true) || [15, 1];
             if (si.add_duration_combopoints && combopoints) {
                 duration = (value + si.add_duration_combopoints * combopoints) * ratio;
             } else {

@@ -1355,7 +1355,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         local duration = INFINITY
         local si = OvaleData.spellInfo[auraId]
         if si and si.duration then
-            local value, ratio = OvaleData:GetSpellInfoPropertyNumber(auraId, nil, "duration", nil, true) or 15
+            local value, ratio = OvaleData:GetSpellInfoPropertyNumber(auraId, nil, "duration", nil, true) or 15, 1
             if si.add_duration_combopoints and combopoints then
                 duration = (value + si.add_duration_combopoints * combopoints) * ratio
             else

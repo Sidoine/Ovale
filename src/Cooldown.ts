@@ -293,7 +293,7 @@ class OvaleCooldownClass extends OvaleCooldownBase implements SpellCastModule {
             OvaleCooldown.Log("Spell %d is on cooldown for %fs starting at %s.", spellId, duration, start);
         } else {
             let si = OvaleData.spellInfo[spellId];
-            duration = <number>OvaleData.GetSpellInfoPropertyNumber(spellId, atTime, "cd", targetGUID);
+            [duration] = OvaleData.GetSpellInfoPropertyNumber(spellId, atTime, "cd", targetGUID);
             if (duration) {
                 if (duration < 0) {
                     duration = 0;

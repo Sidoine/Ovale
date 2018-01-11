@@ -6,7 +6,7 @@ import { OvaleAura } from "./Aura";
 import { OvaleFuture } from "./Future";
 import { OvaleData } from "./Data";
 import { OvaleState } from "./State";
-import { RegisterRequirement, UnregisterRequirement, CheckRequirements } from "./Requirement";
+import { RegisterRequirement, UnregisterRequirement, CheckRequirements, Tokens } from "./Requirement";
 import { SpellCast } from "./LastSpell";
 import aceEvent from "@wowts/ace_event-3.0";
 import { ceil, huge as INFINITY, floor } from "@wowts/math";
@@ -22,7 +22,7 @@ let strlower = lower;
 
 let self_SpellcastInfoPowerTypes = {
     1: "chi",
-    2: "holy"
+    2: "holypower"
 }
 // let self_button = undefined;
 {
@@ -53,26 +53,32 @@ interface PowerInfo {
     token: string;
     mini?: number;
     maxCost?: number;
-    costString?: string;
     segments?: number;
 }
 
 class PowerModule {
-    powerType = undefined;
+    powerType: string = undefined;
     activeRegen: LuaObj<number> = {};
     inactiveRegen: LuaObj<number> = {};
-    //  powerRate:LuaObj<number> = {};
     maxPower: LuaObj<number> = {};
     power: LuaObj<number> = {};
-
-    GetPowerRate(powerType) {
+    /**
+     * Power regeneration rate for the given powerType.
+     * @param powerType
+     */
+    GetPowerRate(powerType: string) {
         if (baseState.next.inCombat) {
             return this.activeRegen[powerType]
         } else {
             return this.inactiveRegen[powerType]
         }
     }
-    GetPower(powerType, atTime) {
+    /**
+     * Power atTime for the given powerType.
+     * @param powerType 
+     * @param atTime 
+     */
+    GetPower(powerType: string, atTime: number): number {
         let power = this.power[powerType] || 0;
         if (atTime) {
             let now = baseState.next.currentTime;
@@ -84,16 +90,25 @@ class PowerModule {
         }
         return power;
     }
-    PowerCost(spellId, powerType, atTime, targetGUID, maximumCost?) {
+    /**
+     * Returns the power cost of a spell atTime for the given powerType
+     * @param spellId 
+     * @param powerType 
+     * @param atTime 
+     * @param targetGUID TODO: Necessary?
+     * @param maximumCost Force using the maximum cost of the spell for spells that can vary in cost.
+     * @return [spellCost, spellRefund]
+     */
+    PowerCost(spellId: number, powerType: string, atTime:number, targetGUID:string, maximumCost?:boolean): [number, number] {
         this.StartProfiling("OvalePower_PowerCost");
         let spellCost = 0;
         let spellRefund = 0;
         let si = OvaleData.spellInfo[spellId];
         if (si && si[powerType]) {
-            let cost, ratio = OvaleData.GetSpellInfoPropertyNumber(spellId, atTime, powerType, targetGUID, true);
+            let [cost, ratio] = OvaleData.GetSpellInfoPropertyNumber(spellId, atTime, powerType, targetGUID, true);
             if (ratio && ratio != 0) {
                 let maxCostParam = `max_${powerType}`;
-                let maxCost = si[maxCostParam];
+                let maxCost = <number>si[maxCostParam];
                 if (maxCost) {
                     let power = this.GetPower(powerType, atTime);
                     if (power > (maxCost || maximumCost)) {
@@ -148,19 +163,24 @@ class PowerModule {
         this.StopProfiling("OvalePower_PowerCost");
         return [spellCost, spellRefund];
     }
-
     StartProfiling(name: string) {
         OvalePower.StartProfiling(name);
     }
-
     StopProfiling(name: string) {
         OvalePower.StopProfiling(name);
     }
-
     Log(...__args): void {
         OvalePower.Log(...__args);
     }
-
+    /**
+     * @name RequirePowerHandler
+     * @param spellId
+     * @param atTime
+     * @param requirement
+     * @param index
+     * @param targetGUID
+     * @return [verified, requirement, index] <[boolean, string, number]>
+     */
     RequirePowerHandler = (spellId, atTime, requirement, tokens, index, targetGUID): [boolean, string, number] => {
         let verified = false;
         let baseCost: number = tokens;
@@ -199,8 +219,15 @@ class PowerModule {
         }
         return [verified, requirement, index];
     }
-
-    TimeToPower(spellId, atTime, targetGUID, powerType, extraPower?) {
+    /**
+     * How many seconds until there is enough power to use the ability.
+     * @param spellId 
+     * @param atTime 
+     * @param targetGUID 
+     * @param powerType 
+     * @param extraPower If true, will add this to the cost
+     */
+    TimeToPower(spellId:number, atTime:number, targetGUID:string, powerType:string, extraPower?:number) {
         let seconds = 0;
         powerType = powerType || OvalePower.POOLED_RESOURCE[OvalePaperDoll.class];
         if (powerType) {
@@ -230,34 +257,7 @@ export let OvalePower: OvalePowerClass;
 
 class OvalePowerClass extends OvalePowerBase {
     POWER_INFO: LuaObj<PowerInfo> = {}
-    POWER_TOKEN: LuaObj<string> = {
-        mana: "MANA",
-        rage: "RAGE",
-        focus: "FOCUS",
-        energy: "ENERGY",
-        combopoints: "COMBO_POINTS",
-        // runes: "RUNES",
-        runicpower: "RUNIC_POWER",
-        soulshards: "SOUL_SHARDS",
-        lunarpower: "LUNAR_POWER",
-        holypower: "HOLY_POWER",
-        alternate: "ALTERNATE_RESOURCE_TEXT",
-        maelstrom: "MAELSTROM",
-        chi: "CHI",
-        insanity: "INSANITY",
-        // obsolete: "OBSOLETE",
-        // obsolete2: "OBSOLETE2",
-        arcanecharges: "ARCANE_CHARGES",
-        pain: "PAIN",
-        fury: "FURY"
-    }
-
-    PRIMARY_POWER = {
-        energy: true,
-        focus: true,
-        mana: true
-    }
-    POWER_TYPE = {}
+    POWER_TYPE: LuaObj<string> = {}
 
     POOLED_RESOURCE: LuaObj<string> = {
         ["DRUID"]: "energy",
@@ -266,11 +266,37 @@ class OvalePowerClass extends OvalePowerBase {
         ["ROGUE"]: "energy"
     }
 
+    PRIMARY_POWER = {
+        energy: true,
+        focus: true,
+        mana: true
+    }
     constructor() {
         super();
+        let powerTokens: LuaObj<string> = {
+            mana: "MANA",
+            rage: "RAGE",
+            focus: "FOCUS",
+            energy: "ENERGY",
+            combopoints: "COMBO_POINTS",
+            // runes: "RUNES",
+            runicpower: "RUNIC_POWER",
+            soulshards: "SOUL_SHARDS",
+            lunarpower: "LUNAR_POWER",
+            holypower: "HOLY_POWER",
+            alternate: "ALTERNATE_RESOURCE_TEXT",
+            maelstrom: "MAELSTROM",
+            chi: "CHI",
+            insanity: "INSANITY",
+            // obsolete: "OBSOLETE",
+            // obsolete2: "OBSOLETE2",
+            arcanecharges: "ARCANE_CHARGES",
+            pain: "PAIN",
+            fury: "FURY"
+        }
         for (const [powerType, powerId] of pairs(Enum.PowerType)) {
             let powerTypeLower = strlower(powerType);
-            let powerToken = this.POWER_TOKEN[powerTypeLower];
+            let powerToken = powerTokens[powerTypeLower];
             if (powerToken) {
                 this.POWER_TYPE[powerId] = powerTypeLower;
                 this.POWER_TYPE[powerToken] = powerTypeLower;
@@ -278,16 +304,9 @@ class OvalePowerClass extends OvalePowerBase {
                     id: powerId,
                     token: powerToken,
                     mini: 0,
-                    maxCost: (powerTypeLower == "combopoints" && MAX_COMBO_POINTS) || 0
+                    maxCost: (powerTypeLower == "combopoints" && MAX_COMBO_POINTS) || 0 // Not currently used.
                 }
             }
-        }
-        for (const [powerType, v] of pairs(this.POWER_INFO)) {
-            if (v.id === undefined) {
-                this.Print("Unknown resource %s", v.token);
-            }
-            this.POWER_TYPE[v.id] = powerType;
-            this.POWER_TYPE[v.token] = powerType;
         }
     }
 
@@ -361,7 +380,7 @@ class OvalePowerClass extends OvalePowerBase {
             this.UpdatePowerRegen(event);
         }
     }
-    UpdateMaxPower(event, powerType?) {
+    UpdateMaxPower(event, powerType?: string) {
         this.StartProfiling("OvalePower_UpdateMaxPower");
         if (powerType) {
             let powerInfo = this.POWER_INFO[powerType];
@@ -375,7 +394,7 @@ class OvalePowerClass extends OvalePowerBase {
                 let maxPower = UnitPowerMax("player", powerInfo.id, powerInfo.segments);
                 if (this.current.maxPower[powerType] != maxPower) {
                     this.current.maxPower[powerType] = maxPower;
-                    if (maxPower == 0) {
+                    if (maxPower == 0) { // Don't track anything related to a powerType with maxPower of 0.
                         this.POWER_INFO[powerType] = undefined;
                         UnregisterRequirement(powerType);
                     }
@@ -385,7 +404,7 @@ class OvalePowerClass extends OvalePowerBase {
         }
         this.StopProfiling("OvalePower_UpdateMaxPower");
     }
-    UpdatePower(event, powerType?) {
+    UpdatePower(event, powerType?: string) {
         this.StartProfiling("OvalePower_UpdatePower");
         if (powerType) {
             let powerInfo = this.POWER_INFO[powerType];
@@ -441,7 +460,7 @@ class OvalePowerClass extends OvalePowerBase {
         }
         this.StopProfiling("OvalePower_UpdatePowerType");
     }
-    GetSpellCost(spellId, powerType?: string): [number, string] {
+    GetSpellCost(spellId: number, powerType?: string): [number, string] {
         let spellPowerCost = GetSpellPowerCost(spellId)[1];
         if (spellPowerCost) {
             let cost = spellPowerCost.cost;
@@ -455,7 +474,7 @@ class OvalePowerClass extends OvalePowerBase {
         return [undefined, undefined];
     }
 
-    RequirePowerHandler = (spellId, atTime, requirement, tokens, index, targetGUID): [boolean, string, number] => {
+    RequirePowerHandler = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string): [boolean, string, number] => {
         return this.GetState(atTime).RequirePowerHandler(spellId, atTime, requirement, tokens, index, targetGUID);
     }
 
@@ -479,7 +498,7 @@ class OvalePowerClass extends OvalePowerBase {
     }
 
 
-    TimeToPower(spellId, atTime, targetGUID, powerType, extraPower?) {
+    TimeToPower(spellId: number, atTime: number, targetGUID: string, powerType: string, extraPower?: number) {
         return this.GetState(atTime).TimeToPower(spellId, atTime, targetGUID, powerType, extraPower);
     }
 
@@ -504,14 +523,14 @@ class OvalePowerClass extends OvalePowerBase {
             this.next.power[powerType] = undefined;
         }
     }
-    ApplySpellStartCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast: SpellCast) {
+    ApplySpellStartCast(spellId: number, targetGUID: string, startCast: number, endCast: number, isChanneled: boolean, spellcast: SpellCast) {
         OvalePower.StartProfiling("OvalePower_ApplySpellStartCast");
         if (isChanneled) {
             this.ApplyPowerCost(spellId, targetGUID, startCast, spellcast);
         }
         OvalePower.StopProfiling("OvalePower_ApplySpellStartCast");
     }
-    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast: SpellCast) {
+    ApplySpellAfterCast(spellId: number, targetGUID: string, startCast: number, endCast: number, isChanneled: boolean, spellcast: SpellCast) {
         OvalePower.StartProfiling("OvalePower_ApplySpellAfterCast");
         if (!isChanneled) {
             this.ApplyPowerCost(spellId, targetGUID, endCast, spellcast);
@@ -519,7 +538,7 @@ class OvalePowerClass extends OvalePowerBase {
         OvalePower.StopProfiling("OvalePower_ApplySpellAfterCast");
     }
 
-    ApplyPowerCost(spellId, targetGUID, atTime, spellcast: SpellCast) {
+    ApplyPowerCost(spellId: number, targetGUID: string, atTime:number , spellcast: SpellCast) {
         OvalePower.StartProfiling("OvalePower_state_ApplyPowerCost");
         let si = OvaleData.spellInfo[spellId];
         {
