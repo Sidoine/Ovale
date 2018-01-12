@@ -40,7 +40,6 @@ local ipairs = ipairs
 local loadstring = loadstring
 local pairs = pairs
 local tonumber = tonumber
-local type = type
 local wipe = wipe
 local GetActionCooldown = GetActionCooldown
 local GetActionTexture = GetActionTexture
@@ -71,6 +70,8 @@ local __BaseState = LibStub:GetLibrary("ovale/BaseState")
 local baseState = __BaseState.baseState
 local __Spells = LibStub:GetLibrary("ovale/Spells")
 local OvaleSpells = __Spells.OvaleSpells
+local __tools = LibStub:GetLibrary("ovale/tools")
+local isNumber = __tools.isNumber
 local OvaleBestActionBase = OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvaleBestAction", aceEvent)))
 local INFINITY = huge
 local self_serial = 0
@@ -79,10 +80,10 @@ local self_valuePool = OvalePool("OvaleBestAction_valuePool")
 local self_value = {}
 __exports.OvaleBestAction = nil
 local function SetValue(node, value, origin, rate)
-    local result = self_value[node]
+    local result = self_value[node.nodeId]
     if  not result then
         result = self_valuePool:Get()
-        self_value[node] = result
+        self_value[node.nodeId] = result
     end
     result.type = "value"
     result.value = value or 0
@@ -101,24 +102,23 @@ local function AsValue(atTime, timeSpan, node)
     end
     return value, origin, rate, timeSpan
 end
-local GetTimeSpan = function(node, defaultTimeSpan)
-    local timeSpan = self_timeSpan[node]
+local function GetTimeSpan(node, defaultTimeSpan)
+    local timeSpan = self_timeSpan[node.nodeId]
     if timeSpan then
         if defaultTimeSpan then
             timeSpan:copyFromArray(defaultTimeSpan)
         end
     else
-        self_timeSpan[node] = newTimeSpanFromArray(defaultTimeSpan)
-        timeSpan = self_timeSpan[node]
+        self_timeSpan[node.nodeId] = newTimeSpanFromArray(defaultTimeSpan)
+        timeSpan = self_timeSpan[node.nodeId]
     end
     return timeSpan
 end
-
-local GetActionItemInfo = function(element, state, atTime, target)
+local function GetActionItemInfo(element, state, atTime, target)
     __exports.OvaleBestAction:StartProfiling("OvaleBestAction_GetActionItemInfo")
     local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId
     local itemId = element.positionalParams[1]
-    if type(itemId) ~= "number" then
+    if  not isNumber(itemId) then
         itemId = OvaleEquipment:GetEquippedItem(itemId)
     end
     if  not itemId then
@@ -144,8 +144,7 @@ local GetActionItemInfo = function(element, state, atTime, target)
     __exports.OvaleBestAction:StopProfiling("OvaleBestAction_GetActionItemInfo")
     return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target
 end
-
-local GetActionMacroInfo = function(element, state, atTime, target)
+local function GetActionMacroInfo(element, state, atTime, target)
     __exports.OvaleBestAction:StartProfiling("OvaleBestAction_GetActionMacroInfo")
     local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId
     local macro = element.positionalParams[1]
@@ -168,7 +167,6 @@ local GetActionMacroInfo = function(element, state, atTime, target)
     __exports.OvaleBestAction:StopProfiling("OvaleBestAction_GetActionMacroInfo")
     return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target
 end
-
 local function GetActionSpellInfo(element, state, atTime, target)
     __exports.OvaleBestAction:StartProfiling("OvaleBestAction_GetActionSpellInfo")
     local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionResourceExtend, actionCharges

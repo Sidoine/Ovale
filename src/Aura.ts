@@ -10,13 +10,14 @@ import { Ovale } from "./Ovale";
 import { lastSpell, SpellCast, PaperDollSnapshot } from "./LastSpell";
 import { RegisterRequirement, UnregisterRequirement, CheckRequirements, Tokens } from "./Requirement";
 import aceEvent from "@wowts/ace_event-3.0";
-import { pairs, tonumber, type, wipe, lualength, LuaObj, next, LuaArray } from "@wowts/lua";
+import { pairs, tonumber, wipe, lualength, LuaObj, next, LuaArray } from "@wowts/lua";
 import { lower, sub } from "@wowts/string";
 import { concat, insert, sort } from "@wowts/table";
 import { GetTime, UnitAura } from "@wowts/wow-mock";
 import { huge as INFINITY, huge } from "@wowts/math";
 import { OvalePaperDoll } from "./PaperDoll";
 import { baseState } from "./BaseState";
+import { isLuaArray } from "./tools";
 
 export let OvaleAura: OvaleAuraClass;
 let strlower = lower;
@@ -602,7 +603,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
                             let spellData = auraTable[filter][auraId];
                             if (spellData == "refresh_keep_snapshot") {
                                 keepSnapshot = true;
-                            } else if (type(spellData) == "table" && spellData[1] == "refresh_keep_snapshot") {
+                            } else if (isLuaArray(spellData) && spellData[1] == "refresh_keep_snapshot") {
                                 [keepSnapshot] = CheckRequirements(spellId, atTime, spellData, 2, guid);
                             }
                         }
@@ -733,7 +734,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
     RequireBuffHandler = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string):[boolean, string, number] => {
         let verified = false;
         let stacks = 1;
-        let buffName = tokens[index];
+        let buffName = <string>tokens[index];
         index = index + 1;
         let count = tonumber(tokens[index]);
         if (count) {

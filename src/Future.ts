@@ -16,14 +16,16 @@ import { OvaleState } from "./State";
 import { OvaleCooldown } from "./Cooldown";
 import { OvaleStance } from "./Stance";
 import { baseState } from "./BaseState";
+import { isLuaArray } from "./tools";
+import { CheckRequirements } from "./Requirement";
 
 let strsub = sub;
 let tremove = remove;
-let self_timeAuraAdded = undefined;
+let self_timeAuraAdded: undefined|number = undefined;
 
 // let SIMULATOR_LAG = 0.005;
 
-let CLEU_AURA_EVENT = {
+let CLEU_AURA_EVENT: LuaObj<"hit"> = {
     SPELL_AURA_APPLIED: "hit",
     SPELL_AURA_APPLIED_DOSE: "hit",
     SPELL_AURA_BROKEN: "hit",
@@ -32,7 +34,7 @@ let CLEU_AURA_EVENT = {
     SPELL_AURA_REMOVED: "hit",
     SPELL_AURA_REMOVED_DOSE: "hit"
 }
-let CLEU_SPELLCAST_FINISH_EVENT = {
+let CLEU_SPELLCAST_FINISH_EVENT: LuaObj<"hit" | "miss"> = {
     SPELL_DAMAGE: "hit",
     SPELL_DISPEL: "hit",
     SPELL_DISPEL_FAILED: "miss",
@@ -41,7 +43,7 @@ let CLEU_SPELLCAST_FINISH_EVENT = {
     SPELL_MISSED: "miss",
     SPELL_STOLEN: "hit"
 }
-let CLEU_SPELLCAST_EVENT = {
+let CLEU_SPELLCAST_EVENT: LuaObj<boolean> = {
     SPELL_CAST_FAILED: true,
     SPELL_CAST_START: true,
     SPELL_CAST_SUCCESS: true
@@ -58,7 +60,7 @@ let SPELLCAST_AURA_ORDER: LuaArray<string> = {
     1: "target",
     2: "pet"
 };
-let SPELLAURALIST_AURA_VALUE = {
+let SPELLAURALIST_AURA_VALUE: LuaObj<boolean> = {
     count: true,
     extend: true,
     refresh: true,
@@ -95,12 +97,12 @@ const IsSameSpellcast = function(a: SpellCast, b: SpellCast) {
 let eventDebug = false;
 
 export class OvaleFutureData {
-    lastCastTime = {}
+    lastCastTime: LuaObj<number> = {}
     lastOffGCDSpellcast: SpellCast = {}
     lastGCDSpellcast: SpellCast = {}
     lastGCDSpellIds: LuaArray<number> = {}
     lastGCDSpellId: number;
-    counter = {}
+    counter: LuaArray<number> = {}
     lastCast: LuaObj<number> = {};
     currentCast: SpellCast = {}
     nextCast: number;
@@ -127,10 +129,10 @@ export class OvaleFutureData {
         }
     }
 
-    GetCounter (id) {
+    GetCounter (id: number) {
         return this.counter[id] || 0;
     }
-    IsChanneling(atTime) {
+    IsChanneling(atTime: number) {
         return this.currentCast.channel && (atTime < this.currentCast.stop);
     }
 }
@@ -180,7 +182,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
         this.UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED");
         this.UnregisterMessage("Ovale_AuraAdded");
     }
-    COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...__args) {
+    COMBAT_LOG_EVENT_UNFILTERED(event: string, timestamp: number, cleuEvent: string, hideCaster: boolean, sourceGUID: string, sourceName: string, sourceFlags: number, sourceRaidFlags: number, destGUID: string, destName: string, destFlags: number, destRaidFlags: number, ...__args: any[]) {
         let [arg12, arg13, , , , , , , , , , , arg24, arg25] = __args;
         if (sourceGUID == Ovale.playerGUID || OvaleGUID.IsPlayerPet(sourceGUID)) {
             this.StartProfiling("OvaleFuture_COMBAT_LOG_EVENT_UNFILTERED");
@@ -236,7 +238,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
             this.StopProfiling("OvaleFuture_COMBAT_LOG_EVENT_UNFILTERED");
         }
     }
-    FinishSpell(spellcast, cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName, delta, finish, i) {
+    FinishSpell(spellcast: SpellCast, cleuEvent: string, sourceName: string, sourceGUID: string, destName: string, destGUID: string, spellId: number, spellName: string, delta: number, finish: "hit"|"miss", i: number) {
         let finished = false;
         if (!spellcast.auraId) {
             if (!eventDebug) {
@@ -275,12 +277,12 @@ export class OvaleFutureClass extends OvaleFutureBase {
         }
         return finished;
     }
-    PLAYER_ENTERING_WORLD(event) {
+    PLAYER_ENTERING_WORLD(event: string) {
         this.StartProfiling("OvaleFuture_PLAYER_ENTERING_WORLD");
         this.Debug(event);
         this.StopProfiling("OvaleFuture_PLAYER_ENTERING_WORLD");
     }
-    PLAYER_REGEN_DISABLED(event) {
+    PLAYER_REGEN_DISABLED(event: string) {
         this.StartProfiling("OvaleFuture_PLAYER_REGEN_DISABLED");
         this.Debug(event, "Entering combat.");
         let now = GetTime();
@@ -290,7 +292,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
         this.SendMessage("Ovale_CombatStarted", now);
         this.StopProfiling("OvaleFuture_PLAYER_REGEN_DISABLED");
     }
-    PLAYER_REGEN_ENABLED(event) {
+    PLAYER_REGEN_ENABLED(event: string) {
         this.StartProfiling("OvaleFuture_PLAYER_REGEN_ENABLED");
         this.Debug(event, "Leaving combat.");
         let now = GetTime();
@@ -299,7 +301,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
         this.SendMessage("Ovale_CombatEnded", now);
         this.StopProfiling("OvaleFuture_PLAYER_REGEN_ENABLED");
     }
-    UNIT_SPELLCAST_CHANNEL_START(event, unitId, spell, rank, lineId, spellId) {
+    UNIT_SPELLCAST_CHANNEL_START(event: string, unitId: string, spell: string, rank: number, lineId: number, spellId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
             this.StartProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_START");
             this.DebugTimestamp(event, unitId, spell, rank, lineId, spellId);
@@ -332,7 +334,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
             this.StopProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_START");
         }
     }
-    UNIT_SPELLCAST_CHANNEL_STOP(event, unitId, spell, rank, lineId, spellId) {
+    UNIT_SPELLCAST_CHANNEL_STOP(event: string, unitId: string, spell: string, rank: number, lineId: number, spellId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
             this.StartProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_STOP");
             this.DebugTimestamp(event, unitId, spell, rank, lineId, spellId);
@@ -351,7 +353,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
             this.StopProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_STOP");
         }
     }
-    UNIT_SPELLCAST_CHANNEL_UPDATE(event, unitId, spell, rank, lineId, spellId) {
+    UNIT_SPELLCAST_CHANNEL_UPDATE(event: string, unitId: string, spell: string, rank: number, lineId: number, spellId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
             this.StartProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_UPDATE");
             this.DebugTimestamp(event, unitId, spell, rank, lineId, spellId);
@@ -378,7 +380,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
             this.StopProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_UPDATE");
         }
     }
-    UNIT_SPELLCAST_DELAYED(event, unitId, spell, rank, lineId, spellId) {
+    UNIT_SPELLCAST_DELAYED(event: string, unitId: string, spell: string, rank: number, lineId: number, spellId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
             this.StartProfiling("OvaleFuture_UNIT_SPELLCAST_DELAYED");
             this.DebugTimestamp(event, unitId, spell, rank, lineId, spellId);
@@ -405,7 +407,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
             this.StopProfiling("OvaleFuture_UNIT_SPELLCAST_DELAYED");
         }
     }
-    UNIT_SPELLCAST_SENT(event, unitId, spell, rank, targetName, lineId) {
+    UNIT_SPELLCAST_SENT(event: string, unitId: string, spell: string, rank: number, targetName: string, lineId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK_NAME[spell]) {
             this.StartProfiling("OvaleFuture_UNIT_SPELLCAST_SENT");
             this.DebugTimestamp(event, unitId, spell, rank, targetName, lineId);
@@ -448,7 +450,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
             this.StopProfiling("OvaleFuture_UNIT_SPELLCAST_SENT");
         }
     }
-    UNIT_SPELLCAST_START(event, unitId, spell, rank, lineId, spellId) {
+    UNIT_SPELLCAST_START(event: string, unitId: string, spell: string, rank: number, lineId: number, spellId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
             this.StartProfiling("OvaleFuture_UNIT_SPELLCAST_START");
             this.DebugTimestamp(event, unitId, spell, rank, lineId, spellId);
@@ -484,7 +486,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
             this.StopProfiling("OvaleFuture_UNIT_SPELLCAST_START");
         }
     }
-    UNIT_SPELLCAST_SUCCEEDED(event, unitId, spell, rank, lineId, spellId) {
+    UNIT_SPELLCAST_SUCCEEDED(event: string, unitId: string, spell: string, rank: number, lineId: number, spellId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
             this.StartProfiling("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED");
             this.DebugTimestamp(event, unitId, spell, rank, lineId, spellId);
@@ -607,7 +609,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
         this.StopProfiling("OvaleFuture_GetSpellcast");
         return [spellcast, index];
     }
-    GetAuraFinish(spell: string, spellId: number, targetGUID: string, atTime: number) {
+    GetAuraFinish(spell: string, spellId: number, targetGUID: string, atTime: number): [number, string] {
         this.StartProfiling("OvaleFuture_GetAuraFinish");
         let auraId, auraGUID;
         let si = OvaleData.spellInfo[spellId];
@@ -616,7 +618,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
                 for (const [, auraList] of pairs(si.aura[unitId])) {
                     for (const [id, spellData] of pairs(auraList)) {
                         let [verified, value, ] = OvaleData.CheckSpellAuraData(id, spellData, atTime, targetGUID);
-                        if (verified && (SPELLAURALIST_AURA_VALUE[value] || type(value) == "number" && value > 0)) {
+                        if (verified && (SPELLAURALIST_AURA_VALUE[<string>value] || type(value) == "number" && value > 0)) {
                             auraId = id;
                             auraGUID = OvaleGUID.UnitGUID(unitId);
                             break;
@@ -635,7 +637,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
         return [auraId, auraGUID];
     }
     
-    SaveSpellcastInfo(spellcast, atTime) {
+    SaveSpellcastInfo(spellcast: SpellCast, atTime: number) {
         this.StartProfiling("OvaleFuture_SaveSpellcastInfo");
         this.Debug("    Saving information from %s to the spellcast for %s.", atTime, spellcast.spellName);
         if (spellcast.spellId) {
@@ -649,25 +651,20 @@ export class OvaleFutureClass extends OvaleFutureBase {
         }
         this.StopProfiling("OvaleFuture_SaveSpellcastInfo");
     }
-    GetDamageMultiplier(spellId, targetGUID, atTime) {
-        atTime = atTime || this["currentTime"] || GetTime();
+    GetDamageMultiplier(spellId: number, targetGUID: string, atTime: number) {
         let damageMultiplier = 1;
         let si = OvaleData.spellInfo[spellId];
         if (si && si.aura && si.aura.damage) {
-            let CheckRequirements;
             for (const [filter, auraList] of pairs(si.aura.damage)) {
                 for (const [auraId, spellData] of pairs(auraList)) {
-                    let index, multiplier;
-                    if (type(spellData) == "table") {
-                        multiplier = spellData[1];
-                        index = 2;
-                    } else {
-                        multiplier = spellData;
-                    }
+                    let index, multiplier: number;
                     let verified;
-                    if (index) {
+                    if (isLuaArray(spellData)) {
+                        multiplier = <number>spellData[1];
+                        index = 2;
                         verified = CheckRequirements(spellId, atTime, spellData, index, targetGUID);
                     } else {
+                        multiplier = spellData;
                         verified = true;
                     }
                     if (verified) {
@@ -686,11 +683,11 @@ export class OvaleFutureClass extends OvaleFutureBase {
         }
         return damageMultiplier;
     }
-    UpdateCounters(spellId, atTime, targetGUID) {
+    UpdateCounters(spellId: number, atTime: number, targetGUID: string) {
         return this.GetState(atTime).UpdateCounters(spellId, atTime, targetGUID);
     }
     
-    IsActive(spellId) {
+    IsActive(spellId: number) {
         for (const [, spellcast] of ipairs(lastSpell.queue)) {
             if (spellcast.spellId == spellId && spellcast.start) {
                 return true;
@@ -699,7 +696,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
         return false;
     }
 
-    InFlight(spellId) {
+    InFlight(spellId: number) {
         return this.IsActive(spellId);
     }
     
@@ -739,20 +736,20 @@ export class OvaleFutureClass extends OvaleFutureBase {
         }
     }
     
-    GetCounter(id, atTime) {
+    GetCounter(id: number, atTime: number) {
         return this.GetState(atTime).counter[id] || 0;
     }
     
-    TimeOfLastCast(spellId, atTime) {
+    TimeOfLastCast(spellId: number, atTime: number) {
         if (!atTime) return this.current.lastCastTime[spellId];
         return this.next.lastCastTime[spellId] || this.current.lastCastTime[spellId] || 0;
     }
     
-    IsChanneling(atTime) {
+    IsChanneling(atTime: number) {
         return this.GetState(atTime).IsChanneling(atTime);
     }
 
-    GetCurrentCast(atTime) {
+    GetCurrentCast(atTime: number) {
         if (atTime && this.next.currentCast && this.next.currentCast.start <= atTime && this.next.currentCast.stop >= atTime) {
             return this.next.currentCast;
         }
@@ -764,7 +761,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
         }
     }
 
-    GetGCD(spellId?, atTime?, targetGUID?) {
+    GetGCD(spellId?: number, atTime?: number, targetGUID?: string) {
         spellId = spellId || this.next.currentCast.spellId;
         if (!atTime) {
             if (this.next.currentCast.stop && this.next.currentCast.stop > baseState.next.currentTime) {
@@ -890,14 +887,14 @@ export class OvaleFutureClass extends OvaleFutureBase {
             this.next.counter[k] = undefined;
         }
     }
-    ApplySpellStartCast(spellId, targetGUID, startCast, endCast, channel, spellcast) {
+    ApplySpellStartCast(spellId: number, targetGUID: string, startCast: number, endCast: number, channel: boolean, spellcast: SpellCast) {
         OvaleFuture.StartProfiling("OvaleFuture_ApplySpellStartCast");
         if (channel) {
             OvaleFuture.UpdateCounters(spellId, startCast, targetGUID);
         }
         OvaleFuture.StopProfiling("OvaleFuture_ApplySpellStartCast");
     }
-    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, channel, spellcast) {
+    ApplySpellAfterCast(spellId: number, targetGUID: string, startCast: number, endCast: number, channel: boolean, spellcast: SpellCast) {
         OvaleFuture.StartProfiling("OvaleFuture_ApplySpellAfterCast");
         if (!channel) {
             OvaleFuture.UpdateCounters(spellId, endCast, targetGUID);

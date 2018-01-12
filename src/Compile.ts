@@ -415,7 +415,7 @@ function AddMissingVariantSpells(annotation: AstAnnotation) {
     if (annotation.functionReference) {
         for (const [, node] of ipairs(annotation.functionReference)) {
             let [positionalParams,] = [node.positionalParams, node.namedParams];
-            let spellId = positionalParams[1];
+            let spellId = <number>positionalParams[1];
             if (spellId && OvaleCondition.IsSpellBookCondition(node.func)) {
                 if (!OvaleSpellBook.IsKnownSpell(spellId) && !OvaleCooldown.IsSharedCooldown(spellId)) {
                     let spellName;

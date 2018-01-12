@@ -75,7 +75,7 @@ class OvaleSpellsClass extends OvaleSpellsBase {
         let verified = false;
         let countString: string;
         if (index) {
-            countString = tokens[index];
+            countString = <string>tokens[index];
             index = index + 1;
         }
         if (countString) {

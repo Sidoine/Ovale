@@ -79,22 +79,19 @@ let STAT_USE_NAMES: LuaArray<string> = {
     5: "trinket_stack_proc"
 }
 
+type SpellData = number | string | LuaArray<number | string>;
 type Requirements = LuaObj<LuaArray<string>>;
+type Auras = LuaObj<LuaObj<LuaArray<SpellData>>>;
 
 /** Any <number> in SpellInfo or SpellRequire can include:
  *      `add_${property}`
  *      `${property}_percent`
  */
 export interface SpellInfo {
-    [key:string]: LuaObj<Requirements> | number | string | LuaArray<string> | LuaArray<number>;
+    [key:string]: LuaObj<Requirements> | number | string | LuaArray<string> | LuaArray<number> | Auras;
     require: LuaObj<Requirements>;
     // Aura
-    aura?: {
-        player: LuaObj<{}>;
-        target: LuaObj<{}>;
-        pet: LuaObj<{}>;
-        damage: LuaObj<{}>;
-    };
+    aura?: Auras;
     duration?:number;   
     add_duration_combopoints?:number;
     tick?:number;
@@ -437,10 +434,12 @@ class OvaleDataClass extends OvaleDataBase {
         return [tag, invokesGCD];
     }
     
-    CheckSpellAuraData(auraId: number | string, spellData, atTime: number, guid: string) {
+    CheckSpellAuraData(auraId: number | string, spellData: SpellData, atTime: number, guid: string) {
         guid = guid || OvaleGUID.UnitGUID("player");
         let index, value, data;
-        if (type(spellData) == "table") {
+        let spellDataArray: LuaArray<string | number>;
+        if (isLuaArray(spellData)) {
+            spellDataArray = spellData;
             value = spellData[1];
             index = 2;
         } else {
@@ -449,7 +448,7 @@ class OvaleDataClass extends OvaleDataBase {
         if (value == "count") {
             let N;
             if (index) {
-                N = spellData[index];
+                N = spellDataArray[index];
                 index = index + 1;
             }
             if (N) {
@@ -460,7 +459,7 @@ class OvaleDataClass extends OvaleDataBase {
         } else if (value == "extend") {
             let seconds;
             if (index) {
-                seconds = spellData[index];
+                seconds = spellDataArray[index];
                 index = index + 1;
             }
             if (seconds) {
@@ -474,7 +473,7 @@ class OvaleDataClass extends OvaleDataBase {
         }
         let verified = true;
         if (index) {
-            [verified] = CheckRequirements(<number>auraId, atTime, spellData, index, guid);
+            [verified] = CheckRequirements(<number>auraId, atTime, spellDataArray, index, guid);
         }
         return [verified, value, data];
     }

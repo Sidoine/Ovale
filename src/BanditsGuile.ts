@@ -3,23 +3,29 @@ import { Ovale } from "./Ovale";
 import { OvaleAura } from "./Aura";
 import aceEvent from "@wowts/ace_event-3.0";
 import { GetSpellInfo, GetTime } from "@wowts/wow-mock";
-import { tostring } from "@wowts/lua";
+import { tostring, LuaArray } from "@wowts/lua";
 
 let OvaleBanditsGuileBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleBanditsGuile", aceEvent));
 let API_GetSpellInfo = GetSpellInfo;
 let API_GetTime = GetTime;
-let self_playerGUID = undefined;
+let self_playerGUID: string = undefined;
 let SHALLOW_INSIGHT = 84745;
 let MODERATE_INSIGHT = 84746;
 let DEEP_INSIGHT = 84747;
-let INSIGHT_BUFF = {
-    [SHALLOW_INSIGHT]: API_GetSpellInfo(SHALLOW_INSIGHT),
-    [MODERATE_INSIGHT]: API_GetSpellInfo(MODERATE_INSIGHT),
-    [DEEP_INSIGHT]: API_GetSpellInfo(DEEP_INSIGHT)
+
+function GetSpellName(id: number) {
+    const [ name ] = API_GetSpellInfo(id);
+    return name;
+}
+
+let INSIGHT_BUFF: LuaArray<string> = {
+    [SHALLOW_INSIGHT]: GetSpellName(SHALLOW_INSIGHT),
+    [MODERATE_INSIGHT]: GetSpellName(MODERATE_INSIGHT),
+    [DEEP_INSIGHT]: GetSpellName(DEEP_INSIGHT)
 }
 let BANDITS_GUILE = 84654;
-let BANDITS_GUILE_ATTACK = {
-    [1752]: API_GetSpellInfo(1752)
+let BANDITS_GUILE_ATTACK: LuaArray<string> = {
+    [1752]: GetSpellName(1752)
 }
 
 class OvaleBanditsGuile extends OvaleBanditsGuileBase {
@@ -41,7 +47,7 @@ class OvaleBanditsGuile extends OvaleBanditsGuileBase {
             this.UnregisterMessage("Ovale_SpecializationChanged");
         }
     }
-    Ovale_SpecializationChanged(event, specialization, previousSpecialization) {
+    Ovale_SpecializationChanged(event: string, specialization: string, previousSpecialization: string) {
         this.Debug(event, specialization, previousSpecialization);
         if (specialization == "combat") {
             this.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
@@ -55,7 +61,7 @@ class OvaleBanditsGuile extends OvaleBanditsGuileBase {
             this.UnregisterMessage("Ovale_AuraRemoved");
         }
     }
-    COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...__args) {
+    COMBAT_LOG_EVENT_UNFILTERED(event: string, timestamp: number, cleuEvent: string, hideCaster: boolean, sourceGUID: string, sourceName: string, sourceFlags: number, sourceRaidFlags: number, destGUID: string, destName: string, destFlags: number, destRaidFlags: number, ...__args: any[]) {
         let [arg12, arg13, , , , , , , , , , , , arg25] = __args;
         if (sourceGUID == self_playerGUID && cleuEvent == "SPELL_DAMAGE") {
             let [spellId, spellName, multistrike] = [arg12, arg13, arg25];
@@ -74,7 +80,7 @@ class OvaleBanditsGuile extends OvaleBanditsGuileBase {
             }
         }
     }
-    Ovale_AuraAdded(event, timestamp, target, auraId, caster) {
+    Ovale_AuraAdded(event: string, timestamp: number, target: string, auraId: number, caster: string) {
         if (target == self_playerGUID) {
             let auraName = INSIGHT_BUFF[auraId];
             if (auraName) {
@@ -92,7 +98,7 @@ class OvaleBanditsGuile extends OvaleBanditsGuileBase {
             }
         }
     }
-    Ovale_AuraChanged(event, timestamp, target, auraId, caster) {
+    Ovale_AuraChanged(event: string, timestamp: number, target: string, auraId: number, caster: string) {
         if (target == self_playerGUID) {
             let auraName = INSIGHT_BUFF[auraId];
             if (auraName) {
@@ -104,7 +110,7 @@ class OvaleBanditsGuile extends OvaleBanditsGuileBase {
             }
         }
     }
-    Ovale_AuraRemoved(event, timestamp, target, auraId, caster) {
+    Ovale_AuraRemoved(event: string, timestamp: number, target: string, auraId: number, caster: string) {
         if (target == self_playerGUID) {
             if (((auraId == SHALLOW_INSIGHT && this.stacks < 8) || (auraId == MODERATE_INSIGHT && this.stacks < 12) || auraId == DEEP_INSIGHT) && timestamp < this.ending) {
                 this.ending = timestamp;
@@ -114,7 +120,7 @@ class OvaleBanditsGuile extends OvaleBanditsGuileBase {
             }
         }
     }
-    GainedAura(atTime) {
+    GainedAura(atTime: number) {
         OvaleAura.GainedAuraOnGUID(self_playerGUID, atTime, this.spellId, self_playerGUID, "HELPFUL", undefined, undefined, this.stacks, undefined, this.duration, this.ending, undefined, this.spellName, undefined, undefined, undefined);
     }
     DebugBanditsGuile() {

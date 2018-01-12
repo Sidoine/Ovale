@@ -43,6 +43,10 @@ local __Stance = LibStub:GetLibrary("ovale/Stance")
 local OvaleStance = __Stance.OvaleStance
 local __BaseState = LibStub:GetLibrary("ovale/BaseState")
 local baseState = __BaseState.baseState
+local __tools = LibStub:GetLibrary("ovale/tools")
+local isLuaArray = __tools.isLuaArray
+local __Requirement = LibStub:GetLibrary("ovale/Requirement")
+local CheckRequirements = __Requirement.CheckRequirements
 local strsub = sub
 local tremove = remove
 local self_timeAuraAdded = nil
@@ -664,24 +668,19 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
         self:StopProfiling("OvaleFuture_SaveSpellcastInfo")
     end,
     GetDamageMultiplier = function(self, spellId, targetGUID, atTime)
-        atTime = atTime or self["currentTime"] or GetTime()
         local damageMultiplier = 1
         local si = OvaleData.spellInfo[spellId]
         if si and si.aura and si.aura.damage then
-            local CheckRequirements
             for filter, auraList in pairs(si.aura.damage) do
                 for auraId, spellData in pairs(auraList) do
                     local index, multiplier
-                    if type(spellData) == "table" then
+                    local verified
+                    if isLuaArray(spellData) then
                         multiplier = spellData[1]
                         index = 2
-                    else
-                        multiplier = spellData
-                    end
-                    local verified
-                    if index then
                         verified = CheckRequirements(spellId, atTime, spellData, index, targetGUID)
                     else
+                        multiplier = spellData
                         verified = true
                     end
                     if verified then

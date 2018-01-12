@@ -78,8 +78,8 @@
    <Script file="Score.lua"/>
    <Script file="Recount.lua"/>
    <Script file="Power.lua"/>
-   <Script file="Runes.lua"/>
    <Script file="Spells.lua"/>
+   <Script file="Runes.lua"/>
    <Script file="BanditsGuile.lua"/>
    <Script file="AST.lua"/>
    <Script file="Icon.lua"/>

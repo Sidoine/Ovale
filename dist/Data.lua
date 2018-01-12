@@ -368,7 +368,9 @@ local OvaleDataClass = __class(OvaleDataBase, {
     CheckSpellAuraData = function(self, auraId, spellData, atTime, guid)
         guid = guid or OvaleGUID:UnitGUID("player")
         local index, value, data
-        if type(spellData) == "table" then
+        local spellDataArray
+        if isLuaArray(spellData) then
+            spellDataArray = spellData
             value = spellData[1]
             index = 2
         else
@@ -377,7 +379,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
         if value == "count" then
             local N
             if index then
-                N = spellData[index]
+                N = spellDataArray[index]
                 index = index + 1
             end
             if N then
@@ -388,7 +390,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
         elseif value == "extend" then
             local seconds
             if index then
-                seconds = spellData[index]
+                seconds = spellDataArray[index]
                 index = index + 1
             end
             if seconds then
@@ -402,7 +404,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
         end
         local verified = true
         if index then
-            verified = CheckRequirements(auraId, atTime, spellData, index, guid)
+            verified = CheckRequirements(auraId, atTime, spellDataArray, index, guid)
         end
         return verified, value, data
     end,

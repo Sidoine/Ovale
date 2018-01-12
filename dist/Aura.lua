@@ -28,7 +28,6 @@ local CheckRequirements = __Requirement.CheckRequirements
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local pairs = pairs
 local tonumber = tonumber
-local type = type
 local wipe = wipe
 local next = next
 local lower = string.lower
@@ -44,6 +43,8 @@ local __PaperDoll = LibStub:GetLibrary("ovale/PaperDoll")
 local OvalePaperDoll = __PaperDoll.OvalePaperDoll
 local __BaseState = LibStub:GetLibrary("ovale/BaseState")
 local baseState = __BaseState.baseState
+local __tools = LibStub:GetLibrary("ovale/tools")
+local isLuaArray = __tools.isLuaArray
 local strlower = lower
 local strsub = sub
 local tconcat = concat
@@ -651,7 +652,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                             local spellData = auraTable[filter][auraId]
                             if spellData == "refresh_keep_snapshot" then
                                 keepSnapshot = true
-                            elseif type(spellData) == "table" and spellData[1] == "refresh_keep_snapshot" then
+                            elseif isLuaArray(spellData) and spellData[1] == "refresh_keep_snapshot" then
                                 keepSnapshot = CheckRequirements(spellId, atTime, spellData, 2, guid)
                             end
                         end

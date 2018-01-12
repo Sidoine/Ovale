@@ -32,7 +32,7 @@ class OvaleActionBarClass extends OvaleActionBarBase {
     }
     action: LuaArray<number | string> = {}
     keybind: LuaObj<string> = {}
-    spell: LuaObj<number> = {}
+    spell: LuaArray<number> = {}
     macro: LuaObj<number> = {}
     item: LuaObj<number> = {}
 
@@ -244,7 +244,7 @@ class OvaleActionBarClass extends OvaleActionBarBase {
     GetForMacro(macroName: string) {
         return this.macro[macroName];
     }
-    GetForItem(itemId: string) {
+    GetForItem(itemId: number) {
         return this.item[itemId];
     }
     GetBinding(slot: number) {

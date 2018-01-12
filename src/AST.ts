@@ -1797,7 +1797,7 @@ class OvaleASTClass extends OvaleASTBase {
                     tokenStream.Consume();
                     [ok, node] = this.ParseNumber(tokenStream, nodeList, annotation);
                     if (ok) {
-                        let value = -1 * node.value;
+                        let value = -1 * <number>node.value;
                         node = this.GetNumberNode(value, nodeList, annotation);
                         name = tostring(value);
                     }
@@ -2594,7 +2594,7 @@ class OvaleASTClass extends OvaleASTBase {
                         } else if (name == "L") {
                             value = L[stringKey];
                         } else if (name == "SpellName") {
-                            value = OvaleSpellBook.GetSpellName(stringKey) || "spell:" + stringKey;
+                            value = OvaleSpellBook.GetSpellName(tonumber(stringKey)) || "spell:" + stringKey;
                         }
                     }
                     if (value) {

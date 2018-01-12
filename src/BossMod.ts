@@ -8,8 +8,8 @@ let OvaleBossModBase = OvaleProfiler.RegisterProfiling(OvaleDebug.RegisterDebugg
 let _BigWigsLoader: { RegisterMessage: any } = _G["BigWigsLoader"];
 let _DBM = _G["DBM"];
 class OvaleBossModClass extends OvaleBossModBase {
-    EngagedDBM = undefined;
-    EngagedBigWigs = undefined;
+    EngagedDBM: any = undefined;
+    EngagedBigWigs: any = undefined;
 
     OnInitialize() {
         if (_DBM) {
@@ -25,10 +25,10 @@ class OvaleBossModClass extends OvaleBossModBase {
         }
         if (_BigWigsLoader) {
             this.Debug("BigWigs is loaded");
-            _BigWigsLoader.RegisterMessage(OvaleBossMod, "BigWigs_OnBossEngage", (_, mod, diff) => {
+            _BigWigsLoader.RegisterMessage(OvaleBossMod, "BigWigs_OnBossEngage", (_: any, mod: any, diff: any) => {
                 this.EngagedBigWigs = mod;
             });
-            _BigWigsLoader.RegisterMessage(OvaleBossMod, "BigWigs_OnBossDisable", (_, mod) => {
+            _BigWigsLoader.RegisterMessage(OvaleBossMod, "BigWigs_OnBossDisable", (_: any, mod: any) => {
                 this.EngagedBigWigs = undefined;
             });
         }
@@ -52,7 +52,7 @@ class OvaleBossModClass extends OvaleBossModBase {
     }
     ScanTargets() {
         this.StartProfiling("OvaleBossMod:ScanTargets");
-        const RecursiveScanTargets = (target, depth?) => {
+        const RecursiveScanTargets = (target: string, depth?: number):boolean => {
             let isWorldBoss = false;
             let dep = depth || 1;
             isWorldBoss = target != undefined && UnitExists(target) && UnitLevel(target) < 0;
