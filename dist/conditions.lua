@@ -95,8 +95,6 @@ local __Stance = LibStub:GetLibrary("ovale/Stance")
 local OvaleStance = __Stance.OvaleStance
 local __DemonHunterSigils = LibStub:GetLibrary("ovale/DemonHunterSigils")
 local OvaleSigil = __DemonHunterSigils.OvaleSigil
-local __ComboPoints = LibStub:GetLibrary("ovale/ComboPoints")
-local OvaleComboPoints = __ComboPoints.OvaleComboPoints
 local __BaseState = LibStub:GetLibrary("ovale/BaseState")
 local baseState = __BaseState.baseState
 local __Spells = LibStub:GetLibrary("ovale/Spells")
@@ -210,7 +208,7 @@ local function BuffComboPoints(positionalParams, namedParams, state, atTime)
         local aura = OvaleAura:GetAura(target, auraId, atTime, filter, mine)
         if OvaleAura:IsActiveAura(aura, atTime) then
             local gain, start, ending = aura.gain, aura.start, aura.ending
-            local value = aura and aura.combo or 0
+            local value = aura and aura.combopoints or 0
             return TestValue(gain, ending, value, start, 0, comparator, limit)
         end
         return Compare(0, comparator, limit)
@@ -588,14 +586,6 @@ local function Classification(positionalParams, namedParams, state, atTime)
     OvaleCondition:RegisterCondition("classification", false, Classification)
 end
 do
-local function ComboPoints(positionalParams, namedParams, state, atTime)
-        local comparator, limit = positionalParams[1], positionalParams[2]
-        local value = OvaleComboPoints.next.combo
-        return Compare(value, comparator, limit)
-    end
-    OvaleCondition:RegisterCondition("combopoints", false, ComboPoints)
-end
-do
 local function Counter(positionalParams, namedParams, state, atTime)
         local counter, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
         local value = OvaleFuture:GetCounter(counter, atTime)
@@ -813,7 +803,7 @@ end
 do
 local function EnergyRegenRate(positionalParams, namedParams, state, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
-        local value = OvalePower.next.powerRate.energy
+        local value = OvalePower.next:GetPowerRate("energy")
         return Compare(value, comparator, limit)
     end
     OvaleCondition:RegisterCondition("energyregen", false, EnergyRegenRate)
@@ -849,7 +839,7 @@ end
 do
 local function FocusRegenRate(positionalParams, namedParams, state, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
-        local value = OvalePower.next.powerRate.focus
+        local value = OvalePower.next:GetPowerRate("focus")
         return Compare(value, comparator, limit)
     end
     OvaleCondition:RegisterCondition("focusregen", false, FocusRegenRate)
@@ -859,7 +849,7 @@ do
     local STEADY_FOCUS = 177668
 local function FocusCastingRegen(positionalParams, namedParams, state, atTime)
         local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-        local regenRate = OvalePower.next.powerRate.focus
+        local regenRate = OvalePower.next:GetPowerRate("focus")
         local power = 0
         local castTime = OvaleSpellBook:GetCastTime(spellId) or 0
         local gcd = OvaleFuture:GetGCD()
@@ -1340,7 +1330,7 @@ local function Power(powerType, positionalParams, namedParams, state, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
         local target = ParseCondition(positionalParams, namedParams, state)
         if target == "player" then
-            local value, origin, rate = OvalePower.next.power[powerType], atTime, OvalePower.next.powerRate[powerType]
+            local value, origin, rate = OvalePower.next.power[powerType], atTime, OvalePower.next:GetPowerRate(powerType)
             local start, ending = atTime, INFINITY
             return TestValue(start, ending, value, origin, rate, comparator, limit)
         else
@@ -1355,7 +1345,7 @@ local function PowerDeficit(powerType, positionalParams, namedParams, state, atT
         if target == "player" then
             local powerMax = OvalePower.current.maxPower[powerType] or 0
             if powerMax > 0 then
-                local value, origin, rate = powerMax - OvalePower.next.power[powerType], atTime, -1 * OvalePower.next.powerRate[powerType]
+                local value, origin, rate = powerMax - OvalePower.next.power[powerType], atTime, -1 * OvalePower.next:GetPowerRate(powerType)
                 local start, ending = atTime, INFINITY
                 return TestValue(start, ending, value, origin, rate, comparator, limit)
             end
@@ -1377,7 +1367,7 @@ local function PowerPercent(powerType, positionalParams, namedParams, state, atT
             local powerMax = OvalePower.current.maxPower[powerType] or 0
             if powerMax > 0 then
                 local conversion = 100 / powerMax
-                local value, origin, rate = OvalePower.next.power[powerType] * conversion, atTime, OvalePower.next.powerRate[powerType] * conversion
+                local value, origin, rate = OvalePower.next.power[powerType] * conversion, atTime, OvalePower.next:GetPowerRate(powerType) * conversion
                 if rate > 0 and value >= 100 or rate < 0 and value == 0 then
                     rate = 0
                 end
@@ -1395,40 +1385,17 @@ local function PowerPercent(powerType, positionalParams, namedParams, state, atT
         end
         return Compare(0, comparator, limit)
     end
-local function PrimaryResource(positionalParams, namedParams, state, atTime)
-        local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-        local primaryPowerType
-        local si = OvaleData:GetSpellInfo(spellId)
-        if si then
-            for powerType in pairs(OvalePower.PRIMARY_POWER) do
-                if si[powerType] then
-                    primaryPowerType = powerType
-                    break
-                end
-            end
-        end
-        if  not primaryPowerType then
-            local _, powerType = OvalePower:GetSpellCost(spellId)
-            if powerType then
-                primaryPowerType = powerType
-            end
-        end
-        if primaryPowerType then
-            local value, origin, rate = OvalePower.next.power[primaryPowerType], atTime, OvalePower.next.powerRate[primaryPowerType]
-            local start, ending = atTime, INFINITY
-            return TestValue(start, ending, value, origin, rate, comparator, limit)
-        end
-        return Compare(0, comparator, limit)
-    end
-    OvaleCondition:RegisterCondition("primaryresource", true, PrimaryResource)
 local function AlternatePower(positionalParams, namedParams, state, atTime)
         return Power("alternate", positionalParams, namedParams, state, atTime)
     end
 local function AstralPower(positionalParams, namedParams, state, atTime)
-        return Power("astralpower", positionalParams, namedParams, state, atTime)
+        return Power("lunarpower", positionalParams, namedParams, state, atTime)
     end
 local function Chi(positionalParams, namedParams, state, atTime)
         return Power("chi", positionalParams, namedParams, state, atTime)
+    end
+local function ComboPoints(positionalParams, namedParams, state, atTime)
+        return Power("combopoints", positionalParams, namedParams, state, atTime)
     end
 local function Energy(positionalParams, namedParams, state, atTime)
         return Power("energy", positionalParams, namedParams, state, atTime)
@@ -1473,6 +1440,7 @@ local function ArcaneCharges(positionalParams, namedParams, state, atTime)
     OvaleCondition:RegisterCondition("arcanecharges", false, ArcaneCharges)
     OvaleCondition:RegisterCondition("astralpower", false, AstralPower)
     OvaleCondition:RegisterCondition("chi", false, Chi)
+    OvaleCondition:RegisterCondition("combopoints", false, ComboPoints)
     OvaleCondition:RegisterCondition("energy", false, Energy)
     OvaleCondition:RegisterCondition("focus", false, Focus)
     OvaleCondition:RegisterCondition("fury", false, Fury)
@@ -2215,7 +2183,7 @@ do
 local function TimeToPower(powerType, level, comparator, limit, state, atTime)
         level = level or 0
         local power = OvalePower.next.power[powerType] or 0
-        local powerRegen = OvalePower.next.powerRate[powerType] or 1
+        local powerRegen = OvalePower.next:GetPowerRate(powerType) or 1
         if powerRegen == 0 then
             if power == level then
                 return Compare(0, comparator, limit)
@@ -2283,16 +2251,9 @@ local function TimeToFocusFor(positionalParams, namedParams, state, atTime)
 end
 do
 local function TimeToSpell(positionalParams, namedParams, state, atTime)
-        local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-        local target = ParseCondition(positionalParams, namedParams, state, "target")
-        local seconds = OvaleSpells:GetTimeToSpell(spellId, atTime, OvaleGUID:UnitGUID(target))
-        if seconds == 0 then
-            return Compare(0, comparator, limit)
-        elseif seconds < INFINITY then
-            return TestValue(0, atTime + seconds, seconds, atTime, -1, comparator, limit)
-        else
-            return Compare(INFINITY, comparator, limit)
-        end
+        local _, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+        Ovale:OneTimeMessage("Warning: 'TimeToSpell()' is not implemented.")
+        return TestValue(0, INFINITY, 0, atTime, -1, comparator, limit)
     end
     OvaleCondition:RegisterCondition("timetospell", true, TimeToSpell)
 end

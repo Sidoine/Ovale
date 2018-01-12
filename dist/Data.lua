@@ -15,12 +15,9 @@ local pairs = pairs
 local tonumber = tonumber
 local wipe = wipe
 local find = string.find
-local floor = math.floor
-local ceil = math.ceil
 local __BaseState = LibStub:GetLibrary("ovale/BaseState")
 local baseState = __BaseState.baseState
 local __tools = LibStub:GetLibrary("ovale/tools")
-local isNumber = __tools.isNumber
 local isLuaArray = __tools.isLuaArray
 local isString = __tools.isString
 local OvaleDataBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleData"))
@@ -459,33 +456,60 @@ local OvaleDataClass = __class(OvaleDataBase, {
                 end
             end
         end
-        if value and isNumber(value) then
-            local num = value
-            local addpower = si and si["add" .. property]
-            if addpower then
-                num = num + addpower
-            end
-            local ratio = si and si[property .. "_percent"]
-            if ratio then
-                ratio = ratio / 100
-            else
-                ratio = 1
-            end
-            local multipliers = si and si.require[property .. "_percent"]
-            if multipliers then
-                for v, requirement in pairs(multipliers) do
+        return value
+    end,
+    GetSpellInfoPropertyNumber = function(self, spellId, atTime, property, targetGUID, splitRatio)
+        targetGUID = targetGUID or OvaleGUID:UnitGUID(baseState.next.defaultTarget or "target")
+        local si = self.spellInfo[spellId]
+        local ratioParam = property .. "_percent"
+        local ratio = si and si[ratioParam]
+        if ratio then
+            ratio = ratio / 100
+        else
+            ratio = 1
+        end
+        if atTime then
+            local ratioRequirements = si and si.require[ratioParam]
+            if ratioRequirements then
+                for v, requirement in pairs(ratioRequirements) do
                     local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
                     if verified then
-                        ratio = ratio * (tonumber(v) or 0) / 100
+                        if ratio ~= 0 then
+                            ratio = ratio * ((tonumber(v) / 100) or 1)
+                        else
+                            break
+                        end
                     end
                 end
             end
-            local actual = (num > 0 and floor(num * ratio)) or ceil(num * ratio)
-            return actual
         end
-        return value
+        local value = si and si[property] or 0
+        if ratio ~= 0 then
+            local addParam = "add_" .. property
+            local addProperty = si and si[addParam]
+            if addProperty then
+                value = value + addProperty
+            end
+            if atTime then
+                local addRequirements = si and si.require[addParam]
+                if addRequirements then
+                    for v, requirement in pairs(addRequirements) do
+                        local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                        if verified then
+                            value = value + (tonumber(v) or 0)
+                        end
+                    end
+                end
+            end
+        else
+            value = 0
+        end
+        if splitRatio then
+            return value, ratio
+        end
+        return value * ratio
     end,
-    GetDamage = function(self, spellId, attackpower, spellpower, mainHandWeaponDamage, offHandWeaponDamage, combo)
+    GetDamage = function(self, spellId, attackpower, spellpower, mainHandWeaponDamage, offHandWeaponDamage, combopoints)
         local si = self.spellInfo[spellId]
         if  not si then
             return nil
@@ -495,7 +519,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
         spellpower = spellpower or 0
         mainHandWeaponDamage = mainHandWeaponDamage or 0
         offHandWeaponDamage = offHandWeaponDamage or 0
-        combo = combo or 0
+        combopoints = combopoints or 0
         if si.bonusmainhand then
             damage = damage + si.bonusmainhand * mainHandWeaponDamage
         end
@@ -503,13 +527,13 @@ local OvaleDataClass = __class(OvaleDataBase, {
             damage = damage + si.bonusoffhand * offHandWeaponDamage
         end
         if si.bonuscp then
-            damage = damage + si.bonuscp * combo
+            damage = damage + si.bonuscp * combopoints
         end
         if si.bonusap then
             damage = damage + si.bonusap * attackpower
         end
         if si.bonusapcp then
-            damage = damage + si.bonusapcp * attackpower * combo
+            damage = damage + si.bonusapcp * attackpower * combopoints
         end
         if si.bonussp then
             damage = damage + si.bonussp * spellpower

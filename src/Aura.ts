@@ -154,7 +154,7 @@ export interface Aura {
     stealable: boolean;
     snapshotTime: number;
     cooldownEnding: number;
-    combo?:number;
+    combopoints?:number;
     damageMultiplier?:number;
 }
 
@@ -431,16 +431,11 @@ export class OvaleAuraClass extends OvaleAuraBase {
                     let filter = (auraType == "BUFF") && "HELPFUL" || "HARMFUL";
                     let si = OvaleData.spellInfo[spellId];
                     let aura = GetAuraOnGUID(this.current.aura, destGUID, spellId, filter, true);
-                    let duration;
+                    let duration = 15;
                     if (aura) {
                         duration = aura.duration;
                     } else if (si && si.duration) {
-                        duration = OvaleData.GetSpellInfoProperty(spellId, now, "duration", destGUID);
-                        if (si.addduration) {
-                            duration = duration + si.addduration;
-                        }
-                    } else {
-                        duration = 15;
+                        [duration] = OvaleData.GetSpellInfoPropertyNumber(spellId, now, "duration", destGUID) || [15];
                     }
                     let expirationTime = now + duration;
                     let count;
@@ -1407,26 +1402,23 @@ export class OvaleAuraClass extends OvaleAuraBase {
     
     GetBaseDuration(auraId, spellcast?: SpellCast) {
         spellcast = spellcast || OvalePaperDoll.current;
-        let combo = spellcast.combo || 0;
-        let holy = spellcast.holy || 0;
-        let duration = INFINITY;
+        let combopoints = spellcast.combopoints || 0;
+        let duration = INFINITY
         let si = OvaleData.spellInfo[auraId];
         if (si && si.duration) {
-            duration = si.duration;
-            if (si.addduration) {
-                duration = duration + si.addduration;
+            let [value, ratio] = OvaleData.GetSpellInfoPropertyNumber(auraId, undefined, "duration", undefined, true) || [15, 1];
+            if (si.add_duration_combopoints && combopoints) {
+                duration = (value + si.add_duration_combopoints * combopoints) * ratio;
+            } else {
+                duration = value * ratio;
             }
-            if (si.adddurationcp && combo) {
-                duration = duration + si.adddurationcp * combo;
-            }
-            if (si.adddurationholy && holy) {
-                duration = duration + si.adddurationholy * (holy - 1);
-            }
-        }
+        } 
+        /* Most aura durations are no longer reduced by haste
         if (si && si.haste && spellcast) {
             let hasteMultiplier = OvalePaperDoll.GetHasteMultiplier(si.haste, spellcast);
             duration = duration / hasteMultiplier;
         }
+        */
         return duration;
     }
     GetTickLength(auraId, snapshot?: PaperDollSnapshot) {

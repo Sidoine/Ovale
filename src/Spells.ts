@@ -1,15 +1,15 @@
 import { OvaleDebug } from "./Debug";
 import { OvaleProfiler } from "./Profiler";
 import { Ovale } from "./Ovale";
-import { RegisterRequirement, UnregisterRequirement } from "./Requirement";
+import { RegisterRequirement, UnregisterRequirement, Tokens } from "./Requirement";
 import aceEvent from "@wowts/ace_event-3.0";
-import { tonumber, type } from "@wowts/lua";
+import { tonumber } from "@wowts/lua";
 import { GetSpellCount, IsSpellInRange, IsUsableItem, IsUsableSpell, UnitIsFriend } from "@wowts/wow-mock";
 import { OvaleState } from "./State";
 import { OvaleData } from "./Data";
 import { OvalePower } from "./Power";
-import { OvaleCooldown } from "./Cooldown";
-import { OvaleRunes } from "./Runes";
+// import { OvaleCooldown } from "./Cooldown";
+// import { OvaleRunes } from "./Runes";
 import { OvaleSpellBook } from "./SpellBook";
 
 let WARRIOR_INCERCEPT_SPELLID = 198304;
@@ -18,15 +18,15 @@ let WARRIOR_HEROICTHROW_SPELLID = 57755;
 export let OvaleSpells:OvaleSpellsClass;
 const OvaleSpellsBase = OvaleProfiler.RegisterProfiling(OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleSpellBook", aceEvent)))
 class OvaleSpellsClass extends OvaleSpellsBase {
-    OnInitialize() {
+    OnInitialize(): void {
         RegisterRequirement("spellcount_min", this.RequireSpellCountHandler);
         RegisterRequirement("spellcount_max", this.RequireSpellCountHandler);
     }
-    OnDisable() {
+    OnDisable(): void {
         UnregisterRequirement("spellcount_max");
         UnregisterRequirement("spellcount_min");
    }
-    GetCastTime(spellId) {
+    GetCastTime(spellId: number): number {
         if (spellId) {
             let [name, , , castTime] = OvaleSpellBook.GetSpellInfo(spellId);
             if (name) {
@@ -42,7 +42,7 @@ class OvaleSpellsClass extends OvaleSpellsBase {
         }
     }
 
-    GetSpellCount(spellId) {
+    GetSpellCount(spellId: number): number {
         let [index, bookType] = OvaleSpellBook.GetSpellBookIndex(spellId);
         if (index && bookType) {
             let spellCount = GetSpellCount(index, bookType);
@@ -56,9 +56,9 @@ class OvaleSpellsClass extends OvaleSpellsBase {
         }
     }
 
-    IsSpellInRange(spellId, unitId) {
+    IsSpellInRange(spellId: number, unitId: string): number {
         let [index, bookType] = OvaleSpellBook.GetSpellBookIndex(spellId);
-        let returnValue = undefined;
+        let returnValue: number = undefined;
         if (index && bookType) {
             returnValue = IsSpellInRange(index, bookType, unitId);
         } else if (OvaleSpellBook.IsKnownSpell(spellId)) {
@@ -71,15 +71,15 @@ class OvaleSpellsClass extends OvaleSpellsBase {
         return returnValue;
     }
     
-    RequireSpellCountHandler = (spellId, atTime, requirement, tokens, index, targetGUID):[boolean, string, number] => {
+    RequireSpellCountHandler = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string):[boolean, string, number] => {
         let verified = false;
-        let count = tokens;
+        let countString: string;
         if (index) {
-            count = tokens[index];
+            countString = tokens[index];
             index = index + 1;
         }
-        if (count) {
-            count = tonumber(count) || 1;
+        if (countString) {
+            let count = tonumber(countString) || 1;
             let actualCount = OvaleSpells.GetSpellCount(spellId);
             verified = (requirement == "spellcount_min" && count <= actualCount) || (requirement == "spellcount_max" && count >= actualCount);
         } else {
@@ -94,8 +94,7 @@ class OvaleSpellsClass extends OvaleSpellsBase {
     }
     ResetState(): void {
     }
-
-    IsUsableItem(itemId, atTime) {
+    IsUsableItem(itemId: number, atTime: number): boolean {
         OvaleSpells.StartProfiling("OvaleSpellBook_state_IsUsableItem");
         let isUsable = IsUsableItem(itemId);
         let ii = OvaleData.ItemInfo(itemId);
@@ -111,11 +110,8 @@ class OvaleSpellsClass extends OvaleSpellsBase {
         OvaleSpells.StopProfiling("OvaleSpellBook_state_IsUsableItem");
         return isUsable;
     }
-    IsUsableSpell(spellId, atTime, targetGUID) {
+    IsUsableSpell(spellId: number, atTime: number, targetGUID: string): [boolean, boolean] {
         OvaleSpells.StartProfiling("OvaleSpellBook_state_IsUsableSpell");
-        if (type(atTime) == "string" && !targetGUID) {
-            [atTime, targetGUID] = [undefined, atTime];
-        }
         let isUsable = OvaleSpellBook.IsKnownSpell(spellId);
         let noMana = false;
         let si = OvaleData.spellInfo[spellId];
@@ -131,9 +127,7 @@ class OvaleSpellsClass extends OvaleSpellsBase {
                 let requirement;
                 [isUsable, requirement] = OvaleData.CheckSpellInfo(spellId, atTime, targetGUID);
                 if (!isUsable) {
-                    if (OvalePower.PRIMARY_POWER[requirement]) {
-                        noMana = true;
-                    }
+                    noMana = OvalePower.PRIMARY_POWER[requirement];
                     if (noMana) {
                         OvaleSpells.Log("Spell ID '%s' does not have enough %s.", spellId, requirement);
                     } else {
@@ -153,7 +147,8 @@ class OvaleSpellsClass extends OvaleSpellsBase {
         OvaleSpells.StopProfiling("OvaleSpellBook_state_IsUsableSpell");
         return [isUsable, noMana];
     }
-    GetTimeToSpell(spellId, atTime, targetGUID, extraPower?) {
+    /*
+    GetTimeToSpell(spellId: number, atTime: number, targetGUID: string, extraPower?: number) {
         if (type(atTime) == "string" && !targetGUID) {
             [atTime, targetGUID] = [undefined, atTime];
         }
@@ -182,6 +177,7 @@ class OvaleSpellsClass extends OvaleSpellsBase {
         }
         return timeToSpell;
     }
+    */
 }
 
 OvaleSpells = new OvaleSpellsClass();
