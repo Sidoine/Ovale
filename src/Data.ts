@@ -4,9 +4,8 @@ import { OvaleDebug } from "./Debug";
 import { nowRequirements, CheckRequirements } from "./Requirement";
 import { type, pairs, tonumber, wipe, truthy, LuaArray, LuaObj } from "@wowts/lua";
 import { find } from "@wowts/string";
-import { floor, ceil } from "@wowts/math";
 import { baseState } from "./BaseState";
-import { isNumber, isLuaArray, isString } from "./tools";
+import { isLuaArray, isString } from "./tools";
 
 let OvaleDataBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleData"));
 
@@ -80,21 +79,39 @@ let STAT_USE_NAMES: LuaArray<string> = {
     5: "trinket_stack_proc"
 }
 
+type SpellData = number | string | LuaArray<number | string>;
 type Requirements = LuaObj<LuaArray<string>>;
+type Auras = LuaObj<LuaObj<LuaArray<SpellData>>>;
 
+/** Any <number> in SpellInfo or SpellRequire can include:
+ *      `add_${property}`
+ *      `${property}_percent`
+ */
 export interface SpellInfo {
-    [key:string]: LuaObj<Requirements> | number | string | LuaArray<string> | LuaArray<number>;
+    [key:string]: LuaObj<Requirements> | number | string | LuaArray<string> | LuaArray<number> | Auras;
     require: LuaObj<Requirements>;
-    aura?: {
-        player: LuaObj<{}>;
-        target: LuaObj<{}>;
-        pet: LuaObj<{}>;
-        damage: LuaObj<{}>;
-    };
+    // Aura
+    aura?: Auras;
+    duration?:number;   
+    add_duration_combopoints?:number;
+    tick?:number;
+    stacking?:number;
+    max_stacks?:number;
+    maxstacks?:number;
+    stat?:string | LuaArray<string>;
+    buff?:number | LuaArray<number>;
+    // Cooldown
     gcd?: number;
-    tag?:string;
+    shared_cd?:number;
     cd?: number;
-    base?:number;
+    forcecd?:number;
+    buff_cd?:number; // Internal cooldown, rename?
+    buff_cdr?:number; // Cooldown reduction TODO
+    // Haste
+    haste?:string;
+    cd_haste?:string;
+    gcd_haste?:number;
+    // Damage Calculations
     bonusmainhand?:number;
     bonusoffhand?:number;
     bonuscp?: number;
@@ -102,48 +119,30 @@ export interface SpellInfo {
     bonusapcp?:number;
     bonussp?:number;
     damage?: number;
-    sharedcd?:number;
-    stacking?:number;
-    forcecd?:number;
-    addcd?:number;
-    max_travel_time?:number;
+    base?:number; // base damage
     physical?:number;
+    // Icon
+    tag?:string;
+    texture?:string;
+    // Spells
+    replace?:number;
+    max_travel_time?:number;
     travel_time?:number;
-    buff_cd?:number;
-    buff_cdr?:number;
-    haste?:string;
     canStopChannelling?:number;
     channel?:number;
-    replace?:number;
-    texture?:string;
-    runes?:number;
+    unusable?:number;
+    to_stance?:number;
+    // Totems
     totem?:number;
     buff_totem?:number;
     max_totems?:number;
-    addduration?:number;
-    max_stacks?:number;
-    maxstacks?:number;
-    stat?:string | LuaArray<string>;
-    buff?:number | LuaArray<number>;
-    combo?:number | "finisher";
-    mincombo?:number;
-    min_combo?:number;
-    maxcombo?:number;
-    max_combo?:number;
-    temp_combo?:number;
-    buff_combo?:number;
-    buff_combo_amount?:number;
-    adddurationcp?:number;
-    adddurationholy?:number;
-    tick?:number;
-    duration?:number;
+    // (custom) Counter
     inccounter?:number;
-    refund_combo?:number | "cost";
-    to_stance?:number;
-    unusable?:number;
-    cd_haste?:string;
-    gcd_haste?:number;
     resetcounter?:number;
+    /** Power
+     * ${powerType}: number; // Cost of a spell.  ${powerType} = energy, focus, rage, etc.
+     */
+    runes?:number;
 }
 
 
@@ -435,10 +434,12 @@ class OvaleDataClass extends OvaleDataBase {
         return [tag, invokesGCD];
     }
     
-    CheckSpellAuraData(auraId: number | string, spellData, atTime: number, guid: string) {
+    CheckSpellAuraData(auraId: number | string, spellData: SpellData, atTime: number, guid: string) {
         guid = guid || OvaleGUID.UnitGUID("player");
         let index, value, data;
-        if (type(spellData) == "table") {
+        let spellDataArray: LuaArray<string | number>;
+        if (isLuaArray(spellData)) {
+            spellDataArray = spellData;
             value = spellData[1];
             index = 2;
         } else {
@@ -447,7 +448,7 @@ class OvaleDataClass extends OvaleDataBase {
         if (value == "count") {
             let N;
             if (index) {
-                N = spellData[index];
+                N = spellDataArray[index];
                 index = index + 1;
             }
             if (N) {
@@ -458,7 +459,7 @@ class OvaleDataClass extends OvaleDataBase {
         } else if (value == "extend") {
             let seconds;
             if (index) {
-                seconds = spellData[index];
+                seconds = spellDataArray[index];
                 index = index + 1;
             }
             if (seconds) {
@@ -472,7 +473,7 @@ class OvaleDataClass extends OvaleDataBase {
         }
         let verified = true;
         if (index) {
-            [verified] = CheckRequirements(<number>auraId, atTime, spellData, index, guid);
+            [verified] = CheckRequirements(<number>auraId, atTime, spellDataArray, index, guid);
         }
         return [verified, value, data];
     }
@@ -514,7 +515,16 @@ class OvaleDataClass extends OvaleDataBase {
         }
         return value;
     }
-    //GetSpellInfoProperty(spellId, atTime, property:"gcd"|"duration"|"combo"|"inccounter"|"resetcounter", targetGUID):number;
+    //GetSpellInfoProperty(spellId, atTime, property:"gcd"|"duration"|"combopoints"|"inccounter"|"resetcounter", targetGUID):number;
+    /**
+     * 
+     * @param spellId 
+     * @param atTime 
+     * @param property 
+     * @param targetGUID 
+     * @param noCalculation Checks only SpellInfo and SpellRequire for the property itself.  No `add_${property}` or `${property}_percent`
+     * @returns value or [value, ratio]
+     */
     GetSpellInfoProperty<T extends keyof SpellInfo>(spellId: number, atTime: number, property:T, targetGUID: string|undefined): SpellInfo[T] {
         targetGUID = targetGUID || OvaleGUID.UnitGUID(baseState.next.defaultTarget || "target");
         let si = this.spellInfo[spellId];
@@ -529,35 +539,72 @@ class OvaleDataClass extends OvaleDataBase {
                 }
             }
         }
-
-        if (value && isNumber(value)){
-            let num = value;
-            let addpower = si && <number>si[`add${property}`];
-            if (addpower) {
-                num = num + addpower;
-            }
-            let ratio = si && <number>si[`${property}_percent`];
-            if (ratio) {
-                ratio = ratio / 100;
-            } else {
-                ratio = 1;
-            }
-            let multipliers = si && si.require[`${property}_percent`];
-            if (multipliers) {
-                for (const [v, requirement] of pairs(multipliers)) {
+        return value;
+    }
+    /**
+     * 
+     * @param spellId 
+     * @param atTime If undefined, will not check SpellRequire
+     * @param property 
+     * @param targetGUID 
+     * @param splitRatio Split the value and ratio into separate return values instead of multiplying them together
+     * @returns value or [value, ratio]
+     */
+    GetSpellInfoPropertyNumber<T extends keyof SpellInfo>(spellId: number, atTime: number|undefined, property:T, targetGUID: string|undefined, splitRatio?: boolean): number[] {
+        targetGUID = targetGUID || OvaleGUID.UnitGUID(baseState.next.defaultTarget || "target");
+        let si = this.spellInfo[spellId];
+        
+        let ratioParam = `${property}_percent`
+        let ratio = si && <number>si[ratioParam];
+        if (ratio) {
+            ratio = ratio / 100;
+        } else {
+            ratio = 1;
+        }
+        if (atTime) {  
+            let ratioRequirements = si && si.require[ratioParam];
+            if (ratioRequirements) {
+                for (const [v, requirement] of pairs(ratioRequirements)) {
                     let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
                     if (verified) {
-                        ratio = ratio * (tonumber(v) || 0) / 100;
+                        if (ratio != 0) {
+                            ratio = ratio * ((tonumber(v) / 100) || 1);
+                        } else {
+                            break;
+                        }
                     }
                 }
             }
-            let actual = (num > 0 && floor(num * ratio)) || ceil(num * ratio);
-            return actual;
         }
-        return value;
+        let value = si && <number>si[property] || 0;
+        if (ratio != 0) {
+            let addParam = `add_${property}`;
+            let addProperty = si && <number>si[addParam];
+            if (addProperty) {
+                value = value + addProperty;
+            }
+            if (atTime) {
+                let addRequirements = si && si.require[addParam];
+                if (addRequirements) {
+                    for (const [v, requirement] of pairs(addRequirements)) {
+                        let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
+                        if (verified) {
+                            value = value + (tonumber(v) || 0);
+                        }
+                    }
+                }
+            }
+            
+        } else { // If ratio is 0, value must be 0.
+            value = 0;
+        }
+        if (splitRatio) {
+            return [value, ratio];
+        }
+        return [value * ratio];
     }
 
-    GetDamage(spellId: number, attackpower: number, spellpower: number, mainHandWeaponDamage: number, offHandWeaponDamage: number, combo: number) {
+    GetDamage(spellId: number, attackpower: number, spellpower: number, mainHandWeaponDamage: number, offHandWeaponDamage: number, combopoints: number): number {
         let si = this.spellInfo[spellId];
         if (!si) {
             return undefined;
@@ -567,7 +614,7 @@ class OvaleDataClass extends OvaleDataBase {
         spellpower = spellpower || 0;
         mainHandWeaponDamage = mainHandWeaponDamage || 0;
         offHandWeaponDamage = offHandWeaponDamage || 0;
-        combo = combo || 0;
+        combopoints = combopoints || 0;
         if (si.bonusmainhand) {
             damage = damage + si.bonusmainhand * mainHandWeaponDamage;
         }
@@ -575,13 +622,13 @@ class OvaleDataClass extends OvaleDataBase {
             damage = damage + si.bonusoffhand * offHandWeaponDamage;
         }
         if (si.bonuscp) {
-            damage = damage + si.bonuscp * combo;
+            damage = damage + si.bonuscp * combopoints;
         }
         if (si.bonusap) {
             damage = damage + si.bonusap * attackpower;
         }
         if (si.bonusapcp) {
-            damage = damage + si.bonusapcp * attackpower * combo;
+            damage = damage + si.bonusapcp * attackpower * combopoints;
         }
         if (si.bonussp) {
             damage = damage + si.bonussp * spellpower;

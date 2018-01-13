@@ -212,8 +212,8 @@ local OvaleCooldownClass = __class(OvaleCooldownBase, {
         __exports.OvaleCooldown:StartProfiling("OvaleCooldown_state_GetCD")
         local cdName = spellId
         local si = OvaleData.spellInfo[spellId]
-        if si and si.sharedcd then
-            cdName = si.sharedcd
+        if si and si.shared_cd then
+            cdName = si.shared_cd
         end
         if  not self.next.cd[cdName] then
             self.next.cd[cdName] = {}
@@ -265,11 +265,8 @@ local OvaleCooldownClass = __class(OvaleCooldownBase, {
             __exports.OvaleCooldown:Log("Spell %d is on cooldown for %fs starting at %s.", spellId, duration, start)
         else
             local si = OvaleData.spellInfo[spellId]
-            duration = OvaleData:GetSpellInfoProperty(spellId, atTime, "cd", targetGUID)
+            duration = OvaleData:GetSpellInfoPropertyNumber(spellId, atTime, "cd", targetGUID)
             if duration then
-                if si and si.addcd then
-                    duration = duration + si.addcd
-                end
                 if duration < 0 then
                     duration = 0
                 end

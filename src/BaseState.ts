@@ -2,13 +2,13 @@ import { OvaleState, StateModule } from "./State";
 import { Ovale } from "./Ovale";
 import aceEvent from "@wowts/ace_event-3.0";
 import { GetTime } from "@wowts/wow-mock";
-import { LuaArray } from "@wowts/lua";
 import { OvaleDebug } from "./Debug";
+import { LuaArray } from "@wowts/lua";
 
 class BaseStateData {
     currentTime: number|undefined = undefined;
-    inCombat = undefined;
-    combatStartTime = undefined;    
+    inCombat: boolean = undefined;
+    combatStartTime: number = undefined;    
     defaultTarget: string;
 }
 
@@ -33,7 +33,7 @@ class BaseState extends BaseStateBase implements StateModule {
 
     CleanState() {}
 
-    CombatRequirement = (spellId: number, atTime: number, name: string, tokens: LuaArray<string> | string | number, index: number, targetGUID: string):[boolean, string, number] => {
+    CombatRequirement = (spellId: number, atTime: number, name: string, tokens: LuaArray<string | number>, index: number, targetGUID: string):[boolean, string, number] => {
         return [this.next.inCombat, name, index];
     }
 

@@ -231,7 +231,7 @@ export class OvaleIcon {
                     let suffix = sub(k, index + 5);
                     this.frame.SetAttribute(`${prefix}type${suffix}`, "spell");
                     this.frame.SetAttribute("unit", this.namedParams.target || "target");
-                    this.frame.SetAttribute(k, OvaleSpellBook.GetSpellName(v));
+                    this.frame.SetAttribute(k, OvaleSpellBook.GetSpellName(<number>v));
                     this.actionButton = true;
                 }
             }

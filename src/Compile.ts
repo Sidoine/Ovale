@@ -334,24 +334,24 @@ function EvaluateSpellInfo(node) {
     if (spellId && TestConditions(positionalParams, namedParams)) {
         let si = OvaleData.SpellInfo(spellId);
         for (const [k, v] of pairs(namedParams)) {
-            if (k == "addduration") {
+            if (k == "add_duration") {
                 let value = tonumber(v);
                 if (value) {
                     let realValue = value;
                     if (namedParams.pertrait != undefined) {
                         realValue = value * OvaleArtifact.TraitRank(namedParams.pertrait);
                     }
-                    let addDuration = si.addduration || 0;
-                    si.addduration = addDuration + realValue;
+                    let addDuration = <number>si.add_duration || 0;
+                    si.add_duration = addDuration + realValue;
                 } else {
                     ok = false;
                     break;
                 }
-            } else if (k == "addcd") {
+            } else if (k == "add_cd") {
                 let value = tonumber(v);
                 if (value) {
-                    let addCd = si.addcd || 0;
-                    si.addcd = addCd + value;
+                    let addCd = <number>si.add_cd || 0;
+                    si.add_cd = addCd + value;
                 } else {
                     ok = false;
                     break;
@@ -367,7 +367,7 @@ function EvaluateSpellInfo(node) {
             } else if (k == "learn" && v == 1) {
                 let spellName = GetSpellInfo(spellId);
                 OvaleSpellBook.AddSpell(spellId, spellName);
-            } else if (k == "sharedcd") {
+            } else if (k == "shared_cd") {
                 si[k] = v;
                 OvaleCooldown.AddSharedCooldown(v, spellId);
             } else if (addpower[k] != undefined) {
@@ -415,7 +415,7 @@ function AddMissingVariantSpells(annotation: AstAnnotation) {
     if (annotation.functionReference) {
         for (const [, node] of ipairs(annotation.functionReference)) {
             let [positionalParams,] = [node.positionalParams, node.namedParams];
-            let spellId = positionalParams[1];
+            let spellId = <number>positionalParams[1];
             if (spellId && OvaleCondition.IsSpellBookCondition(node.func)) {
                 if (!OvaleSpellBook.IsKnownSpell(spellId) && !OvaleCooldown.IsSharedCooldown(spellId)) {
                     let spellName;

@@ -929,7 +929,7 @@ local OvaleASTClass = __class(OvaleASTBase, {
                         elseif name == "L" then
                             value = L[stringKey]
                         elseif name == "SpellName" then
-                            value = OvaleSpellBook:GetSpellName(stringKey) or "spell:" .. stringKey
+                            value = OvaleSpellBook:GetSpellName(tonumber(stringKey)) or "spell:" .. stringKey
                         end
                     end
                     if value then

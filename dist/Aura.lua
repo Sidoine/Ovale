@@ -28,7 +28,6 @@ local CheckRequirements = __Requirement.CheckRequirements
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local pairs = pairs
 local tonumber = tonumber
-local type = type
 local wipe = wipe
 local next = next
 local lower = string.lower
@@ -44,6 +43,8 @@ local __PaperDoll = LibStub:GetLibrary("ovale/PaperDoll")
 local OvalePaperDoll = __PaperDoll.OvalePaperDoll
 local __BaseState = LibStub:GetLibrary("ovale/BaseState")
 local baseState = __BaseState.baseState
+local __tools = LibStub:GetLibrary("ovale/tools")
+local isLuaArray = __tools.isLuaArray
 local strlower = lower
 local strsub = sub
 local tconcat = concat
@@ -481,16 +482,11 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                     local filter = (auraType == "BUFF") and "HELPFUL" or "HARMFUL"
                     local si = OvaleData.spellInfo[spellId]
                     local aura = GetAuraOnGUID(self.current.aura, destGUID, spellId, filter, true)
-                    local duration
+                    local duration = 15
                     if aura then
                         duration = aura.duration
                     elseif si and si.duration then
-                        duration = OvaleData:GetSpellInfoProperty(spellId, now, "duration", destGUID)
-                        if si.addduration then
-                            duration = duration + si.addduration
-                        end
-                    else
-                        duration = 15
+                        duration = OvaleData:GetSpellInfoPropertyNumber(spellId, now, "duration", destGUID) or 15
                     end
                     local expirationTime = now + duration
                     local count
@@ -656,7 +652,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                             local spellData = auraTable[filter][auraId]
                             if spellData == "refresh_keep_snapshot" then
                                 keepSnapshot = true
-                            elseif type(spellData) == "table" and spellData[1] == "refresh_keep_snapshot" then
+                            elseif isLuaArray(spellData) and spellData[1] == "refresh_keep_snapshot" then
                                 keepSnapshot = CheckRequirements(spellId, atTime, spellData, 2, guid)
                             end
                         end
@@ -1356,25 +1352,16 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
     end,
     GetBaseDuration = function(self, auraId, spellcast)
         spellcast = spellcast or OvalePaperDoll.current
-        local combo = spellcast.combo or 0
-        local holy = spellcast.holy or 0
+        local combopoints = spellcast.combopoints or 0
         local duration = INFINITY
         local si = OvaleData.spellInfo[auraId]
         if si and si.duration then
-            duration = si.duration
-            if si.addduration then
-                duration = duration + si.addduration
+            local value, ratio = OvaleData:GetSpellInfoPropertyNumber(auraId, nil, "duration", nil, true) or 15, 1
+            if si.add_duration_combopoints and combopoints then
+                duration = (value + si.add_duration_combopoints * combopoints) * ratio
+            else
+                duration = value * ratio
             end
-            if si.adddurationcp and combo then
-                duration = duration + si.adddurationcp * combo
-            end
-            if si.adddurationholy and holy then
-                duration = duration + si.adddurationholy * (holy - 1)
-            end
-        end
-        if si and si.haste and spellcast then
-            local hasteMultiplier = OvalePaperDoll:GetHasteMultiplier(si.haste, spellcast)
-            duration = duration / hasteMultiplier
         end
         return duration
     end,

@@ -4,7 +4,7 @@ import { L } from "./Localization";
 import { Ovale } from "./Ovale";
 import aceEvent from "@wowts/ace_event-3.0";
 import { sort, insert, concat } from "@wowts/table";
-import { pairs, ipairs, wipe, tostring, lualength, LuaObj } from "@wowts/lua";
+import { pairs, ipairs, wipe, tostring, lualength, LuaObj, LuaArray } from "@wowts/lua";
 
 let tsort = sort;
 let tinsert = insert;
@@ -30,7 +30,7 @@ class OvaleArtifactClass extends OvaleArtifactBase {
                     type: "input",
                     multiline: 25,
                     width: "full",
-                    get: (info) => {
+                    get: (info: LuaArray<string>) => {
                         return this.DebugTraits();
                     }
                 }
@@ -47,10 +47,10 @@ class OvaleArtifactClass extends OvaleArtifactBase {
 
     OnInitialize() {
         this.RegisterEvent("SPELLS_CHANGED", (message) => this.UpdateTraits(message));
-        RegisterCallback(this, "ARTIFACT_ADDED", message => this.UpdateTraits(message));
-        RegisterCallback(this, "ARTIFACT_EQUIPPED_CHANGED", m => this.UpdateTraits(m));
-        RegisterCallback(this, "ARTIFACT_ACTIVE_CHANGED", m => this.UpdateTraits(m));
-        RegisterCallback(this, "ARTIFACT_TRAITS_CHANGED", m => this.UpdateTraits(m));
+        RegisterCallback(this, "ARTIFACT_ADDED", (message:string) => this.UpdateTraits(message));
+        RegisterCallback(this, "ARTIFACT_EQUIPPED_CHANGED", (m: string) => this.UpdateTraits(m));
+        RegisterCallback(this, "ARTIFACT_ACTIVE_CHANGED", (m: string) => this.UpdateTraits(m));
+        RegisterCallback(this, "ARTIFACT_TRAITS_CHANGED", (m: string) => this.UpdateTraits(m));
     }
     OnDisable() {
         UnregisterCallback(this, "ARTIFACT_ADDED");
@@ -59,7 +59,7 @@ class OvaleArtifactClass extends OvaleArtifactBase {
         UnregisterCallback(this, "ARTIFACT_TRAITS_CHANGED");
         this.UnregisterEvent("SPELLS_CHANGED");
     }
-    UpdateTraits(message) {
+    UpdateTraits(message: string) {
         let [, traits] = GetArtifactTraits();
         this.self_traits = {}
         if (!traits) {
@@ -69,20 +69,19 @@ class OvaleArtifactClass extends OvaleArtifactBase {
             this.self_traits[v.spellID] = v;
         }
     }
-    HasTrait(spellId) {
+    HasTrait(spellId: number) {
         return this.self_traits[spellId] && this.self_traits[spellId].currentRank > 0;
     }
-    TraitRank(spellId) {
+    TraitRank(spellId: number) {
         if (!this.self_traits[spellId]) {
             return 0;
         }
         return this.self_traits[spellId].currentRank;
     }
-    output = {}
+    output: LuaArray<string> = {}
     DebugTraits() {
         wipe(this.output);
-        let array = {
-        }
+        let array: LuaArray<string> = {}
         for (const [k, v] of pairs(this.self_traits)) {
             tinsert(array, `${tostring(v.name)}: ${tostring(k)}`);
         }

@@ -18,14 +18,18 @@ local self_playerGUID = nil
 local SHALLOW_INSIGHT = 84745
 local MODERATE_INSIGHT = 84746
 local DEEP_INSIGHT = 84747
+local function GetSpellName(id)
+    local name = API_GetSpellInfo(id)
+    return name
+end
 local INSIGHT_BUFF = {
-    [SHALLOW_INSIGHT] = API_GetSpellInfo(SHALLOW_INSIGHT),
-    [MODERATE_INSIGHT] = API_GetSpellInfo(MODERATE_INSIGHT),
-    [DEEP_INSIGHT] = API_GetSpellInfo(DEEP_INSIGHT)
+    [SHALLOW_INSIGHT] = GetSpellName(SHALLOW_INSIGHT),
+    [MODERATE_INSIGHT] = GetSpellName(MODERATE_INSIGHT),
+    [DEEP_INSIGHT] = GetSpellName(DEEP_INSIGHT)
 }
 local BANDITS_GUILE = 84654
 local BANDITS_GUILE_ATTACK = {
-    [1752] = API_GetSpellInfo(1752)
+    [1752] = GetSpellName(1752)
 }
 local OvaleBanditsGuile = __class(OvaleBanditsGuileBase, {
     OnInitialize = function(self)

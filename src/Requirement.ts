@@ -4,7 +4,7 @@ import { LuaObj, LuaArray } from "@wowts/lua";
 import { baseState } from "./BaseState";
 import { isLuaArray } from "./tools";
 
-export type Tokens = LuaArray<string>;
+export type Tokens = LuaArray<string | number>;
 export type RequirementMethod = (spellId: number, atTime: number, name: string, tokens: Tokens, index: number, targetGUID: string) => [boolean, string, number];
 
 export const nowRequirements:LuaObj<RequirementMethod> = {}
@@ -28,7 +28,7 @@ export function CheckRequirements(spellId: number, atTime: number, tokens: Token
     let requirements = nowRequirements;
 
     targetGUID = targetGUID || OvaleGUID.UnitGUID(baseState.next.defaultTarget || "target");
-    let name = tokens[index];
+    let name = <string>tokens[index];
     index = index + 1;
     if (name) {
         // this.Log("Checking requirements:");
@@ -38,7 +38,7 @@ export function CheckRequirements(spellId: number, atTime: number, tokens: Token
             let handler = requirements[name];
             if (handler) {
                 [verified, requirement, index] = handler(spellId, atTime, name, tokens, index, targetGUID);
-                name = tokens[index];
+                name = <string>tokens[index];
                 index = index + 1;
             } else {
                 Ovale.OneTimeMessage("Warning: requirement '%s' has no registered handler; FAILING requirement.", name);

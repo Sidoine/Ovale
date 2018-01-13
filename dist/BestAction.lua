@@ -40,7 +40,6 @@ local ipairs = ipairs
 local loadstring = loadstring
 local pairs = pairs
 local tonumber = tonumber
-local type = type
 local wipe = wipe
 local GetActionCooldown = GetActionCooldown
 local GetActionTexture = GetActionTexture
@@ -57,8 +56,12 @@ local __AST = LibStub:GetLibrary("ovale/AST")
 local isValueNode = __AST.isValueNode
 local __Future = LibStub:GetLibrary("ovale/Future")
 local OvaleFuture = __Future.OvaleFuture
+local __Power = LibStub:GetLibrary("ovale/Power")
+local OvalePower = __Power.OvalePower
 local __Cooldown = LibStub:GetLibrary("ovale/Cooldown")
 local OvaleCooldown = __Cooldown.OvaleCooldown
+local __Runes = LibStub:GetLibrary("ovale/Runes")
+local OvaleRunes = __Runes.OvaleRunes
 local __Variables = LibStub:GetLibrary("ovale/Variables")
 local variables = __Variables.variables
 local __PaperDoll = LibStub:GetLibrary("ovale/PaperDoll")
@@ -67,6 +70,8 @@ local __BaseState = LibStub:GetLibrary("ovale/BaseState")
 local baseState = __BaseState.baseState
 local __Spells = LibStub:GetLibrary("ovale/Spells")
 local OvaleSpells = __Spells.OvaleSpells
+local __tools = LibStub:GetLibrary("ovale/tools")
+local isNumber = __tools.isNumber
 local OvaleBestActionBase = OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvaleBestAction", aceEvent)))
 local INFINITY = huge
 local self_serial = 0
@@ -75,10 +80,10 @@ local self_valuePool = OvalePool("OvaleBestAction_valuePool")
 local self_value = {}
 __exports.OvaleBestAction = nil
 local function SetValue(node, value, origin, rate)
-    local result = self_value[node]
+    local result = self_value[node.nodeId]
     if  not result then
         result = self_valuePool:Get()
-        self_value[node] = result
+        self_value[node.nodeId] = result
     end
     result.type = "value"
     result.value = value or 0
@@ -97,24 +102,23 @@ local function AsValue(atTime, timeSpan, node)
     end
     return value, origin, rate, timeSpan
 end
-local GetTimeSpan = function(node, defaultTimeSpan)
-    local timeSpan = self_timeSpan[node]
+local function GetTimeSpan(node, defaultTimeSpan)
+    local timeSpan = self_timeSpan[node.nodeId]
     if timeSpan then
         if defaultTimeSpan then
             timeSpan:copyFromArray(defaultTimeSpan)
         end
     else
-        self_timeSpan[node] = newTimeSpanFromArray(defaultTimeSpan)
-        timeSpan = self_timeSpan[node]
+        self_timeSpan[node.nodeId] = newTimeSpanFromArray(defaultTimeSpan)
+        timeSpan = self_timeSpan[node.nodeId]
     end
     return timeSpan
 end
-
-local GetActionItemInfo = function(element, state, atTime, target)
+local function GetActionItemInfo(element, state, atTime, target)
     __exports.OvaleBestAction:StartProfiling("OvaleBestAction_GetActionItemInfo")
     local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId
     local itemId = element.positionalParams[1]
-    if type(itemId) ~= "number" then
+    if  not isNumber(itemId) then
         itemId = OvaleEquipment:GetEquippedItem(itemId)
     end
     if  not itemId then
@@ -140,8 +144,7 @@ local GetActionItemInfo = function(element, state, atTime, target)
     __exports.OvaleBestAction:StopProfiling("OvaleBestAction_GetActionItemInfo")
     return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target
 end
-
-local GetActionMacroInfo = function(element, state, atTime, target)
+local function GetActionMacroInfo(element, state, atTime, target)
     __exports.OvaleBestAction:StartProfiling("OvaleBestAction_GetActionMacroInfo")
     local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId
     local macro = element.positionalParams[1]
@@ -164,7 +167,6 @@ local GetActionMacroInfo = function(element, state, atTime, target)
     __exports.OvaleBestAction:StopProfiling("OvaleBestAction_GetActionMacroInfo")
     return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target
 end
-
 local function GetActionSpellInfo(element, state, atTime, target)
     __exports.OvaleBestAction:StartProfiling("OvaleBestAction_GetActionSpellInfo")
     local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionResourceExtend, actionCharges
@@ -218,13 +220,17 @@ local function GetActionSpellInfo(element, state, atTime, target)
                 end
                 if actionCooldownStart and actionCooldownDuration then
                     local extraPower = element.namedParams.extra_amount or 0
-                    local seconds = OvaleSpells:GetTimeToSpell(spellId, atTime, targetGUID, extraPower)
-                    if seconds > 0 and seconds > actionCooldownDuration then
-                        if actionCooldownDuration > 0 then
-                            actionResourceExtend = seconds - actionCooldownDuration
-                        else
-                            actionResourceExtend = seconds
+                    local timeToCd = (actionCooldownDuration > 0) and (actionCooldownStart + actionCooldownDuration - atTime) or 0
+                    local timeToPower = OvalePower:TimeToPower(spellId, atTime, targetGUID, nil, extraPower)
+                    local runes = OvaleData:GetSpellInfoProperty(spellId, atTime, "runes", targetGUID)
+                    if runes then
+                        local timeToRunes = OvaleRunes:GetRunesCooldown(atTime, runes)
+                        if timeToPower < timeToRunes then
+                            timeToPower = timeToRunes
                         end
+                    end
+                    if timeToPower > timeToCd then
+                        actionResourceExtend = timeToPower - timeToCd
                         __exports.OvaleBestAction:Log("Spell ID '%s' requires an extra %fs for primary resource.", spellId, actionResourceExtend)
                     end
                 end

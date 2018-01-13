@@ -234,13 +234,13 @@ class OvaleCooldownClass extends OvaleCooldownBase implements SpellCastModule {
             }
         }
     }
-    
+     
     GetCD(spellId: number, atTime: number) {
         OvaleCooldown.StartProfiling("OvaleCooldown_state_GetCD");
         let cdName = spellId;
         let si = OvaleData.spellInfo[spellId];
-        if (si && si.sharedcd) {
-            cdName = si.sharedcd;
+        if (si && si.shared_cd) {
+            cdName = si.shared_cd;
         }
         if (!this.next.cd[cdName]) {
             this.next.cd[cdName] = {}
@@ -293,11 +293,8 @@ class OvaleCooldownClass extends OvaleCooldownBase implements SpellCastModule {
             OvaleCooldown.Log("Spell %d is on cooldown for %fs starting at %s.", spellId, duration, start);
         } else {
             let si = OvaleData.spellInfo[spellId];
-            duration = <number>OvaleData.GetSpellInfoProperty(spellId, atTime, "cd", targetGUID);
+            [duration] = OvaleData.GetSpellInfoPropertyNumber(spellId, atTime, "cd", targetGUID);
             if (duration) {
-                if (si && si.addcd) {
-                    duration = duration + si.addcd;
-                }
                 if (duration < 0) {
                     duration = 0;
                 }
