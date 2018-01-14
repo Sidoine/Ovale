@@ -66,10 +66,8 @@
    <Script file="SpellFlash.lua"/>
    <Script file="Aura.lua"/>
    <Script file="WarriorCharge.lua"/>
-   <Script file="SteadyFocus.lua"/>
    <Script file="ShadowWordDeath.lua"/>
    <Script file="PassiveAura.lua"/>
-   <Script file="HonorAmongThieves.lua"/>
    <Script file="DemonHunterDemonic.lua"/>
    <Script file="Totem.lua"/>
    <Script file="Cooldown.lua"/>
