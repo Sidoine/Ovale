@@ -382,7 +382,7 @@ Define(wild_charge_bear 16979)
 Define(wild_charge_cat 49376)
 	SpellInfo(wild_charge_cat cd=15 stance=druid_cat_form)
 Define(wildflesh_trait 200400)
-		
+
 # Legendary items
 Define(ailuro_pouncers 137024)
 Define(elizes_everlasting_encasement 137067)
@@ -394,7 +394,7 @@ Define(skysecs_hold 137025)
 Define(oneths_overconfidence_buff 209407)
 	SpellRequire(starfall astralpower_percent 0=buff,oneths_overconfidence_buff)
 	SpellAddBuff(starfall oneths_overconfidence_buff=-1)
-	
+
 # Talents
 Define(astral_communion_talent 17)
 Define(balance_affinity_talent 7)
