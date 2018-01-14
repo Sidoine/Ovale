@@ -425,7 +425,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         self_pool:Drain()
     end,
     COMBAT_LOG_EVENT_UNFILTERED = function(self, event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
-        local arg12, arg13, arg14, arg15, arg16, _, _, arg19, _, _, _, _, _, arg25 = ...
+        local arg12, arg13, arg14, arg15, arg16, _, _, _, _, _, _, _ = ...
         local mine = (sourceGUID == self_playerGUID or OvaleGUID:IsPlayerPet(sourceGUID))
         if mine and cleuEvent == "SPELL_MISSED" then
             local spellId, _ = arg12, arg13, arg14
@@ -502,34 +502,26 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
             end
         elseif mine and CLEU_TICK_EVENTS[cleuEvent] then
             local spellId, _ = arg12, arg13, arg14
-            local multistrike
-            if strsub(cleuEvent, -7) == "_DAMAGE" then
-                multistrike = arg25
-            elseif strsub(cleuEvent, -5) == "_HEAL" then
-                multistrike = arg19
-            end
-            if  not multistrike then
-                self:DebugTimestamp("%s: %s", cleuEvent, destGUID)
-                local aura = __exports.GetAura(self.current.aura, destGUID, spellId, self_playerGUID)
-                local now = GetTime()
-                if self:IsActiveAura(aura, now) then
-                    local name = aura.name or "Unknown spell"
-                    local baseTick, lastTickTime = aura.baseTick, aura.lastTickTime
-                    local tick = baseTick
-                    if lastTickTime then
-                        tick = now - lastTickTime
-                    elseif  not baseTick then
-                        self:Debug("    First tick seen of unknown periodic aura %s (%d) on %s.", name, spellId, destGUID)
-                        local si = OvaleData.spellInfo[spellId]
-                        baseTick = (si and si.tick) and si.tick or 3
-                        tick = self:GetTickLength(spellId)
-                    end
-                    aura.baseTick = baseTick
-                    aura.lastTickTime = now
-                    aura.tick = tick
-                    self:Debug("    Updating %s (%s) on %s, tick=%s, lastTickTime=%s", name, spellId, destGUID, tick, lastTickTime)
-                    Ovale.refreshNeeded[destGUID] = true
+            self:DebugTimestamp("%s: %s", cleuEvent, destGUID)
+            local aura = __exports.GetAura(self.current.aura, destGUID, spellId, self_playerGUID)
+            local now = GetTime()
+            if self:IsActiveAura(aura, now) then
+                local name = aura.name or "Unknown spell"
+                local baseTick, lastTickTime = aura.baseTick, aura.lastTickTime
+                local tick = baseTick
+                if lastTickTime then
+                    tick = now - lastTickTime
+                elseif  not baseTick then
+                    self:Debug("    First tick seen of unknown periodic aura %s (%d) on %s.", name, spellId, destGUID)
+                    local si = OvaleData.spellInfo[spellId]
+                    baseTick = (si and si.tick) and si.tick or 3
+                    tick = self:GetTickLength(spellId)
                 end
+                aura.baseTick = baseTick
+                aura.lastTickTime = now
+                aura.tick = tick
+                self:Debug("    Updating %s (%s) on %s, tick=%s, lastTickTime=%s", name, spellId, destGUID, tick, lastTickTime)
+                Ovale.refreshNeeded[destGUID] = true
             end
         end
     end,

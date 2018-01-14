@@ -3613,18 +3613,6 @@ l    */
         return Snapshot("meleeHaste", 0, positionalParams, namedParams, state, atTime);
     }
 
-    /** Get the current multistrike chance of the player.
-	 @name MultistrikeChance
-	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
-	 @return The current multistrike chance (in percent).
-	 @return A boolean value for the result of the comparison.
-     */
-    function MultistrikeChance(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        return Snapshot("multistrike", 0, positionalParams, namedParams, state, atTime);
-    }
-
     /** Get the current ranged critical strike chance of the player.
 	 @name RangedCritChance
 	 @paramsig number or boolean
@@ -3733,7 +3721,6 @@ l    */
     OvaleCondition.RegisterCondition("masteryrating", false, MasteryRating);
     OvaleCondition.RegisterCondition("meleecritchance", false, MeleeCritChance);
     OvaleCondition.RegisterCondition("meleehaste", false, MeleeHaste);
-    OvaleCondition.RegisterCondition("multistrikechance", false, MultistrikeChance);
     OvaleCondition.RegisterCondition("rangedcritchance", false, RangedCritChance);
     OvaleCondition.RegisterCondition("spellcritchance", false, SpellCritChance);
     OvaleCondition.RegisterCondition("spellhaste", false, SpellHaste);

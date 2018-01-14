@@ -7,7 +7,7 @@ import { OvaleState } from "./State";
 import { lastSpell, SpellCast, PaperDollSnapshot, SpellCastModule } from "./LastSpell";
 import aceEvent from "@wowts/ace_event-3.0";
 import { pairs, tonumber, type } from "@wowts/lua";
-import { GetCombatRating, GetCombatRatingBonus, GetCritChance, GetMastery, GetMasteryEffect, GetMeleeHaste, GetMultistrike, GetMultistrikeEffect, GetRangedCritChance, GetRangedHaste, GetSpecialization, GetSpellBonusDamage, GetSpellBonusHealing, GetSpellCritChance, GetTime, UnitAttackPower, UnitAttackSpeed, UnitDamage, UnitLevel, UnitRangedAttackPower, UnitSpellHaste, UnitStat, CR_CRIT_MELEE, CR_HASTE_MELEE, CR_VERSATILITY_DAMAGE_DONE } from "@wowts/wow-mock";
+import { GetCombatRating, GetCombatRatingBonus, GetCritChance, GetMastery, GetMasteryEffect, GetMeleeHaste, GetRangedCritChance, GetRangedHaste, GetSpecialization, GetSpellBonusDamage, GetSpellBonusHealing, GetSpellCritChance, GetTime, UnitAttackPower, UnitAttackSpeed, UnitDamage, UnitLevel, UnitRangedAttackPower, UnitSpellHaste, UnitStat, CR_CRIT_MELEE, CR_HASTE_MELEE, CR_VERSATILITY_DAMAGE_DONE } from "@wowts/wow-mock";
 
 export let OvalePaperDoll: OvalePaperDollClass;
 let OVALE_SPELLDAMAGE_SCHOOL = {
@@ -112,11 +112,9 @@ export class PaperDollData implements PaperDollSnapshot {
     rangedHaste = 0;
     spellCrit = 0;
     spellHaste = 0;
-    multistrike = 0;
     critRating = 0;
     hasteRating = 0;
     masteryRating = 0;
-    multistrikeRating = 0;
     versatilityRating = 0;
     versatility = 0;
     mainHandWeaponDamage = 0;
@@ -148,11 +146,9 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
         rangedHaste: true,
         spellCrit: true,
         spellHaste: true,
-        multistrike: true,
         critRating: true,
         hasteRating: true,
         masteryRating: true,
-        multistrikeRating: true,
         versatilityRating: true,
         versatility: true,
         mainHandWeaponDamage: true,
@@ -169,7 +165,6 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
     OnInitialize() {
         this.RegisterEvent("COMBAT_RATING_UPDATE");
         this.RegisterEvent("MASTERY_UPDATE");
-        this.RegisterEvent("MULTISTRIKE_UPDATE");
         this.RegisterEvent("PLAYER_ALIVE", "UpdateStats");
         this.RegisterEvent("PLAYER_DAMAGE_DONE_MODS");
         this.RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateStats");
@@ -191,7 +186,6 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
         lastSpell.UnregisterSpellcastInfo(this);
         this.UnregisterEvent("COMBAT_RATING_UPDATE");
         this.UnregisterEvent("MASTERY_UPDATE");
-        this.UnregisterEvent("MULTISTRIKE_UPDATE");
         this.UnregisterEvent("PLAYER_ALIVE");
         this.UnregisterEvent("PLAYER_DAMAGE_DONE_MODS");
         this.UnregisterEvent("PLAYER_ENTERING_WORLD");
@@ -231,14 +225,6 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
             Ovale.needRefresh();
         }
         this.current.snapshotTime = GetTime();
-        this.StopProfiling("OvalePaperDoll_UpdateStats");
-    }
-    MULTISTRIKE_UPDATE(event) {
-        this.StartProfiling("OvalePaperDoll_UpdateStats");
-        this.current.multistrikeRating = GetMultistrike();
-        this.current.multistrike = GetMultistrikeEffect();
-        this.current.snapshotTime = GetTime();
-        Ovale.needRefresh();
         this.StopProfiling("OvalePaperDoll_UpdateStats");
     }
     PLAYER_LEVEL_UP(event, level, ...__args) {
@@ -476,11 +462,9 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
         this.next.rangedHaste = 0;
         this.next.spellCrit = 0;
         this.next.spellHaste = 0;
-        this.next.multistrike = 0;
         this.next.critRating = 0;
         this.next.hasteRating = 0;
         this.next.masteryRating = 0;
-        this.next.multistrikeRating = 0;
         this.next.versatilityRating = 0;
         this.next.versatility = 0;
         this.next.mainHandWeaponDamage = 0;

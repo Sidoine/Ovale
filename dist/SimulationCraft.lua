@@ -3022,7 +3022,6 @@ do
         ["soul_fragments"] = "SoulFragments()",
         ["ssw_refund_offset"] = "target.Distance() % 3 - 1",
         ["stat.mastery_rating"] = "MasteryRating()",
-        ["stat.multistrike_pct"] = "MultistrikeChance()",
         ["stealthed"] = "Stealthed()",
         ["stealthed.all"] = "Stealthed()",
         ["stealthed.rogue"] = "Stealthed()",
