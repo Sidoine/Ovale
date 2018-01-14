@@ -77,7 +77,6 @@
    <Script file="Power.lua"/>
    <Script file="Spells.lua"/>
    <Script file="Runes.lua"/>
-   <Script file="BanditsGuile.lua"/>
    <Script file="AST.lua"/>
    <Script file="Icon.lua"/>
    <Script file="Compile.lua"/>
