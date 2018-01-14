@@ -8,7 +8,6 @@ import { Ovale, MakeString } from "./Ovale";
 import { OvaleAST, AstNode, OperatorType, AstAnnotation, NodeType, isValueNode, FunctionNode, StringNode, ValueNode } from "./AST";
 import { OvaleCompile } from "./Compile";
 import { OvaleData } from "./Data";
-import { OvaleHonorAmongThieves } from "./HonorAmongThieves";
 import { OvaleLexer, TokenizerDefinition, Tokenizer } from "./Lexer";
 import { OvalePower } from "./Power";
 import { ResetControls } from "./Controls";
@@ -65,8 +64,6 @@ interface Annotation {
     muzzle?: string;
     counter_shot?: string;
     counterspell?: string;
-    honor_among_thieves?: string;
-    honor_among_thieves_cooldown_buff?: string;
     use_legendary_ring?:string;
     opt_touch_of_death_on_elite_only?:string;
     opt_arcane_mage_burn_phase?:string;
@@ -2190,13 +2187,6 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             conditionCode = "CheckBoxOn(opt_blade_flurry)";
         } else if (className == "ROGUE" && action == "cancel_autoattack") {
             isSpellAction = false;
-        } else if (className == "ROGUE" && action == "honor_among_thieves") {
-            if (modifier.cooldown) {
-                let cooldown = Unparse(modifier.cooldown);
-                annotation["honor_among_thieves_cooldown_buff"] = cooldown;
-                annotation[action] = className;
-            }
-            isSpellAction = false;
         } else if (className == "ROGUE" && action == "kick") {
             bodyCode = `${camelSpecialization}InterruptActions()`;
             annotation[action] = className;
@@ -3820,20 +3810,6 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
     } else if (className == "ROGUE" && operand == "exsanguinated") {
         code = "target.DebuffPresent(exsanguinated)";
         AddSymbol(annotation, "exsanguinated");
-    } else if (className == "ROGUE" && specialization == "subtlety" && sub(operand, 1, 29) == "cooldown.honor_among_thieves.") {
-        let property = sub(operand, 30);
-        let buffName = "honor_among_thieves_cooldown_buff";
-        AddSymbol(annotation, buffName);
-        annotation.honor_among_thieves = className;
-        if (property == "down") {
-            code = format("BuffPresent(%s)", buffName);
-        } else if (property == "remains") {
-            code = format("BuffRemaining(%s)", buffName);
-        } else if (property == "up") {
-            code = format("BuffExpires(%s)", buffName);
-        } else {
-            ok = false;
-        }
     } else if (className == "SHAMAN" && operand == "buff.resonance_totem.remains") {
         code = "TotemRemaining(totem_mastery)";
         ok = true;
@@ -5073,6 +5049,7 @@ const InsertSupportingControls = function(child: LuaArray<AstNode>, annotation: 
     }
     return count;
 }
+/* Honor Among Thieves is now a PvP talent and is no longer supported in simcraft.
 const InsertSupportingDefines = function(child: LuaArray<AstNode>, annotation: Annotation) {
     let count = 0;
     let nodeList = annotation.astAnnotation.nodeList;
@@ -5094,6 +5071,7 @@ const InsertSupportingDefines = function(child: LuaArray<AstNode>, annotation: A
     }
     return count;
 }
+*/
 const InsertVariables = function(child: LuaArray<AstNode>, annotation: Annotation) {
     if (annotation.variable) {
         for (const [, v] of pairs(annotation.variable)) {
@@ -5364,7 +5342,7 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
             annotation.supportingFunctionCount = InsertSupportingFunctions(child, annotation);
             annotation.supportingInterruptCount = InsertInterruptFunctions(child, annotation);
             annotation.supportingControlCount = InsertSupportingControls(child, annotation);
-            annotation.supportingDefineCount = InsertSupportingDefines(child, annotation);
+            // annotation.supportingDefineCount = InsertSupportingDefines(child, annotation);
             InsertVariables(child, annotation);
             let [className, specialization] = [annotation.class, annotation.specialization];
             let lowerclass = lower(className);
