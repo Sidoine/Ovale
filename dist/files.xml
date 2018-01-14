@@ -65,7 +65,6 @@
    <Script file="DemonHunterSigils.lua"/>
    <Script file="SpellFlash.lua"/>
    <Script file="Aura.lua"/>
-   <Script file="ShadowWordDeath.lua"/>
    <Script file="PassiveAura.lua"/>
    <Script file="DemonHunterDemonic.lua"/>
    <Script file="Totem.lua"/>

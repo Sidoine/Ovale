@@ -100,8 +100,6 @@ Define(shadow_word_death 32379)
 	SpellInfo(shadow_word_death target_health_pct=35 insanity=-30 talent=reaper_of_souls_talent)
 	SpellRequire(shadow_word_death insanity_percent 125=buff,power_infusion_buff)
 	SpellRequire(shadow_word_death insanity_percent 200=buff,surrender_to_madness_buff)
-Define(shadow_word_death_reset_cooldown_buff 125927)	# OvaleShadowWordDeath
-	SpellInfo(shadow_word_death_reset_cooldown_buff duration=9)
 Define(shadow_word_pain 589)
 	SpellInfo(shadow_word_pain insanity=-4)
 	SpellAddTargetDebuff(shadow_word_pain shadow_word_pain_debuff=1)
