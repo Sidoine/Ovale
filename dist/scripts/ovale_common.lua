@@ -249,6 +249,48 @@ AddFunction CanMove
 	if BuffPresent(ice_floes_buff) 1
     0
 }
+
+# Party checks
+AddFunction PartyMemberCount
+{
+	player.Present() + party1.Present() + party2.Present() + party3.Present() + party4.Present()
+}
+
+AddFunction PartyHealth
+{
+	player.Health() + party1.Health() + party2.Health() + party3.Health() + party4.Health()
+}
+
+AddFunction PartyMaxHealth
+{
+	player.MaxHealth() + party1.MaxHealth() + party2.MaxHealth() + party3.MaxHealth() + party4.MaxHealth()
+}
+
+AddFunction PartyHealthPercent
+{
+	{ PartyHealth() / PartyMaxHealth() } * 100
+}
+
+# Raid checks
+AddFunction RaidMemberCount
+{
+	player.Present() + raid1.Present() + raid2.Present() + raid3.Present() + raid4.Present() + raid5.Present() + raid6.Present() + raid7.Present() + raid8.Present() + raid9.Present() + raid10.Present() + raid11.Present() + raid12.Present() + raid13.Present() + raid14.Present() + raid15.Present() + raid16.Present() + raid17.Present() + raid18.Present() + raid19.Present() + raid20.Present() + raid21.Present() + raid22.Present() + raid23.Present() + raid24.Present() + raid25.Present()
+}
+
+AddFunction RaidHealth
+{
+	player.Health() + raid1.Health() + raid2.Health() + raid3.Health() + raid4.Health() + raid5.Health() + raid6.Health() + raid7.Health() + raid8.Health() + raid9.Health() + raid10.Health() + raid11.Health() + raid12.Health() + raid13.Health() + raid14.Health() + raid15.Health() + raid16.Health() + raid17.Health() + raid18.Health() + raid19.Health() + raid20.Health() + raid21.Health() + raid22.Health() + raid23.Health() + raid24.Health() + raid25.Health()
+}
+
+AddFunction RaidMaxHealth
+{
+	player.MaxHealth() + raid1.MaxHealth() + raid2.MaxHealth() + raid3.MaxHealth() + raid4.MaxHealth() + raid5.MaxHealth() + raid6.MaxHealth() + raid7.MaxHealth() + raid8.MaxHealth() + raid9.MaxHealth() + raid10.MaxHealth() + raid11.MaxHealth() + raid12.MaxHealth() + raid13.MaxHealth() + raid14.MaxHealth() + raid15.MaxHealth() + raid16.MaxHealth() + raid17.MaxHealth() + raid18.MaxHealth() + raid19.MaxHealth() + raid20.MaxHealth() + raid21.MaxHealth() + raid22.MaxHealth() + raid23.MaxHealth() + raid24.MaxHealth() + raid25.MaxHealth()
+}
+
+AddFunction RaidHealthPercent
+{
+	{ RaidHealth() / RaidMaxHealth() } * 100
+}
 ]]
     OvaleScripts:RegisterScript(nil, nil, name, desc, code, "include")
 end
