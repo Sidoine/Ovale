@@ -294,7 +294,6 @@ class AuraInterface {
     aura: AuraDB = {}
     serial: LuaObj<number> = {};
     auraSerial: number;
-    bypassState: LuaObj<LuaObj<boolean>> = {}
 }
 
 let count: number;
@@ -377,41 +376,10 @@ export class OvaleAuraClass extends OvaleAuraBase {
         let [arg12, arg13, arg14, arg15, arg16, , , , , , , , ] = __args;
         let mine = (sourceGUID == self_playerGUID || OvaleGUID.IsPlayerPet(sourceGUID));
         if (mine && cleuEvent == "SPELL_MISSED") {
-            let [spellId, ,] = [arg12, arg13, arg14];
-            let si = OvaleData.spellInfo[spellId];
-            let bypassState = this.current.bypassState;
-            if (si && si.aura && si.aura.player) {
-                for (const [, auraTable] of pairs(si.aura.player)) {
-                    for (const [auraId] of pairs(auraTable)) {
-                        if (!bypassState[auraId]) {
-                            bypassState[auraId] = {};
-                        }
-                        bypassState[auraId][self_playerGUID] = true;
-                    }
-                }
-            }
-            if (si && si.aura && si.aura.target) {
-                for (const [, auraTable] of pairs(si.aura.target)) {
-                    for (const [auraId] of pairs(auraTable)) {
-                        if (!bypassState[auraId]) {
-                            bypassState[auraId] = {};
-                        }
-                        bypassState[auraId][destGUID] = true;
-                    }
-                }
-            }
-            if (si && si.aura && si.aura.pet) {
-                for (const [, auraTable] of pairs(si.aura.pet)) {
-                    for (const [auraId,] of pairs(auraTable)) {
-                        for (const [petGUID] of pairs(self_petGUID)) {
-                            if (!bypassState[petGUID]) {
-                                bypassState[auraId] = {
-                                }
-                            }
-                            bypassState[auraId][petGUID] = true;
-                        }
-                    }
-                }
+            let [unitId] = OvaleGUID.GUIDUnit(destGUID);
+            if (unitId) {
+                    this.DebugTimestamp("%s: %s (%s)", cleuEvent, destGUID, unitId);
+                    this.ScanAuras(unitId, destGUID);
             }
         }
         if (CLEU_AURA_EVENTS[cleuEvent]) {
@@ -996,23 +964,6 @@ export class OvaleAuraClass extends OvaleAuraBase {
 
     GetAura(unitId: string, auraId: AuraId, atTime?: number, filter?: string, mine?: boolean) {
         const guid = OvaleGUID.UnitGUID(unitId);
-        if (atTime) {
-            const bypassState = this.next.bypassState;
-            if (!bypassState[auraId]) {
-                bypassState[auraId] = {}
-            }
-
-            if (bypassState[auraId][guid]) {
-                let stateAura = this.GetAuraByGUID(guid, auraId, filter, mine, atTime);
-                let aura = this.GetAuraByGUID(guid, auraId, filter, mine, undefined);
-                if (aura && aura.start && aura.ending && stateAura && stateAura.start && stateAura.ending && aura.start == stateAura.start && aura.ending == stateAura.ending) {
-                    bypassState[auraId][guid] = false;
-                    return stateAura;
-                } else {
-                    return aura;
-                }
-            }
-        }
         return this.GetAuraByGUID(guid, auraId, filter, mine, atTime);
     }
 
