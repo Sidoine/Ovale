@@ -331,6 +331,9 @@ Define(wound_poison 8679)
 Define(wound_poison_buff 8679)
 	SpellInfo(wound_poison_buff duration=3600)
 
+# Tier
+Define(shadow_gestures_buff 257945)	
+
 # Talents
 Define(dark_shadow_talent 16)
 Define(deeper_strategem_talent 7)

@@ -1158,6 +1158,14 @@ local function IsFriend(positionalParams, namedParams, state, atTime)
     OvaleCondition:RegisterCondition("isfriend", false, IsFriend)
 end
 do
+local function PlayerIsResting(positionalParams, namedParams, state, atTime)
+		local yesno = positionalParams[1]
+        local boolean = IsResting()
+        return TestBoolean(boolean, yesno)
+    end
+    OvaleCondition:RegisterCondition("playerisresting", false, PlayerIsResting)
+end
+do
 local function IsIncapacitated(positionalParams, namedParams, state, atTime)
         local yesno = positionalParams[1]
         local aura = OvaleAura:GetAura("player", "incapacitate_debuff", atTime, "HARMFUL")
