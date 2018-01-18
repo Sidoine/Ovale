@@ -391,19 +391,19 @@ local OvalePowerClass = __class(OvalePowerBase, {
         if powerType then
             local powerInfo = self.POWER_INFO[powerType]
             local power = UnitPower("player", powerInfo.id, powerInfo.segments)
+            self:DebugTimestamp("%s: %d -> %d (%s).", event, self.current.power[powerType], power, powerType)
             if self.current.power[powerType] ~= power then
                 self.current.power[powerType] = power
                 Ovale:needRefresh()
             end
-            self:DebugTimestamp("%s: %d -> %d (%s).", event, self.current.power[powerType], power, powerType)
         else
             for powerType, powerInfo in pairs(self.POWER_INFO) do
                 local power = UnitPower("player", powerInfo.id, powerInfo.segments)
+                self:DebugTimestamp("%s: %d -> %d (%s).", event, self.current.power[powerType], power, powerType)
                 if self.current.power[powerType] ~= power then
                     self.current.power[powerType] = power
                     Ovale:needRefresh()
                 end
-                self:DebugTimestamp("%s: %d -> %d (%s).", event, self.current.power[powerType], power, powerType)
             end
         end
         Ovale:needRefresh()
