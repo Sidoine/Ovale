@@ -25,8 +25,6 @@ local GetCritChance = GetCritChance
 local GetMastery = GetMastery
 local GetMasteryEffect = GetMasteryEffect
 local GetMeleeHaste = GetMeleeHaste
-local GetMultistrike = GetMultistrike
-local GetMultistrikeEffect = GetMultistrikeEffect
 local GetRangedCritChance = GetRangedCritChance
 local GetRangedHaste = GetRangedHaste
 local GetSpecialization = GetSpecialization
@@ -139,11 +137,9 @@ __exports.PaperDollData = __class(nil, {
         self.rangedHaste = 0
         self.spellCrit = 0
         self.spellHaste = 0
-        self.multistrike = 0
         self.critRating = 0
         self.hasteRating = 0
         self.masteryRating = 0
-        self.multistrikeRating = 0
         self.versatilityRating = 0
         self.versatility = 0
         self.mainHandWeaponDamage = 0
@@ -156,7 +152,6 @@ local OvalePaperDollClass = __class(OvalePaperDollBase, {
     OnInitialize = function(self)
         self:RegisterEvent("COMBAT_RATING_UPDATE")
         self:RegisterEvent("MASTERY_UPDATE")
-        self:RegisterEvent("MULTISTRIKE_UPDATE")
         self:RegisterEvent("PLAYER_ALIVE", "UpdateStats")
         self:RegisterEvent("PLAYER_DAMAGE_DONE_MODS")
         self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateStats")
@@ -178,7 +173,6 @@ local OvalePaperDollClass = __class(OvalePaperDollBase, {
         lastSpell:UnregisterSpellcastInfo(self)
         self:UnregisterEvent("COMBAT_RATING_UPDATE")
         self:UnregisterEvent("MASTERY_UPDATE")
-        self:UnregisterEvent("MULTISTRIKE_UPDATE")
         self:UnregisterEvent("PLAYER_ALIVE")
         self:UnregisterEvent("PLAYER_DAMAGE_DONE_MODS")
         self:UnregisterEvent("PLAYER_ENTERING_WORLD")
@@ -218,14 +212,6 @@ local OvalePaperDollClass = __class(OvalePaperDollBase, {
             Ovale:needRefresh()
         end
         self.current.snapshotTime = GetTime()
-        self:StopProfiling("OvalePaperDoll_UpdateStats")
-    end,
-    MULTISTRIKE_UPDATE = function(self, event)
-        self:StartProfiling("OvalePaperDoll_UpdateStats")
-        self.current.multistrikeRating = GetMultistrike()
-        self.current.multistrike = GetMultistrikeEffect()
-        self.current.snapshotTime = GetTime()
-        Ovale:needRefresh()
         self:StopProfiling("OvalePaperDoll_UpdateStats")
     end,
     PLAYER_LEVEL_UP = function(self, event, level, ...)
@@ -453,11 +439,9 @@ local OvalePaperDollClass = __class(OvalePaperDollBase, {
         self.next.rangedHaste = 0
         self.next.spellCrit = 0
         self.next.spellHaste = 0
-        self.next.multistrike = 0
         self.next.critRating = 0
         self.next.hasteRating = 0
         self.next.masteryRating = 0
-        self.next.multistrikeRating = 0
         self.next.versatilityRating = 0
         self.next.versatility = 0
         self.next.mainHandWeaponDamage = 0
@@ -492,11 +476,9 @@ local OvalePaperDollClass = __class(OvalePaperDollBase, {
             rangedHaste = true,
             spellCrit = true,
             spellHaste = true,
-            multistrike = true,
             critRating = true,
             hasteRating = true,
             masteryRating = true,
-            multistrikeRating = true,
             versatilityRating = true,
             versatility = true,
             mainHandWeaponDamage = true,

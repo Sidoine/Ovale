@@ -65,11 +65,7 @@
    <Script file="DemonHunterSigils.lua"/>
    <Script file="SpellFlash.lua"/>
    <Script file="Aura.lua"/>
-   <Script file="WarriorCharge.lua"/>
-   <Script file="SteadyFocus.lua"/>
-   <Script file="ShadowWordDeath.lua"/>
    <Script file="PassiveAura.lua"/>
-   <Script file="HonorAmongThieves.lua"/>
    <Script file="DemonHunterDemonic.lua"/>
    <Script file="Totem.lua"/>
    <Script file="Cooldown.lua"/>
@@ -80,7 +76,6 @@
    <Script file="Power.lua"/>
    <Script file="Spells.lua"/>
    <Script file="Runes.lua"/>
-   <Script file="BanditsGuile.lua"/>
    <Script file="AST.lua"/>
    <Script file="Icon.lua"/>
    <Script file="Compile.lua"/>

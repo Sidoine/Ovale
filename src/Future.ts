@@ -183,7 +183,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
         this.UnregisterMessage("Ovale_AuraAdded");
     }
     COMBAT_LOG_EVENT_UNFILTERED(event: string, timestamp: number, cleuEvent: string, hideCaster: boolean, sourceGUID: string, sourceName: string, sourceFlags: number, sourceRaidFlags: number, destGUID: string, destName: string, destFlags: number, destRaidFlags: number, ...__args: any[]) {
-        let [arg12, arg13, , , , , , , , , , , arg24, arg25] = __args;
+        let [arg12, arg13, , , , , , , , , , , arg24] = __args;
         if (sourceGUID == Ovale.playerGUID || OvaleGUID.IsPlayerPet(sourceGUID)) {
             this.StartProfiling("OvaleFuture_COMBAT_LOG_EVENT_UNFILTERED");
             if (CLEU_SPELLCAST_EVENT[cleuEvent]) {
@@ -204,8 +204,8 @@ export class OvaleFutureClass extends OvaleFutureBase {
                 }
                 let finish = CLEU_SPELLCAST_FINISH_EVENT[cleuEvent];
                 if (cleuEvent == "SPELL_DAMAGE" || cleuEvent == "SPELL_HEAL") {
-                    let [isOffHand, multistrike] = [arg24, arg25];
-                    if (isOffHand || multistrike) {
+                    let [isOffHand] = [arg24];
+                    if (isOffHand) {
                         finish = undefined;
                     }
                 }

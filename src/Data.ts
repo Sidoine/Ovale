@@ -58,11 +58,10 @@ let STAT_NAMES: LuaArray<string> = {
     4: "haste",
     5: "intellect",
     6: "mastery",
-    7: "multistrike",
-    8: "spirit",
-    9: "spellpower",
-    10: "strength",
-    11: "versatility"
+    7: "spirit",
+    8: "spellpower",
+    9: "strength",
+    10: "versatility"
 }
 let STAT_SHORTNAME: LuaObj<string> = {
     agility: "agi",
@@ -221,17 +220,6 @@ class OvaleDataClass extends OvaleDataBase {
             [155522]: true,
             [160073]: true,
             [160198]: true
-        },
-        multistrike_buff: {
-            [24844]: true,
-            [34889]: true,
-            [49868]: true,
-            [57386]: true,
-            [58604]: true,
-            [109773]: true,
-            [113742]: true,
-            [166916]: true,
-            [172968]: true
         },
         spell_power_multiplier_buff: {
             [1459]: true,

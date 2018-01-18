@@ -272,7 +272,6 @@ local AuraInterface = __class(nil, {
     constructor = function(self)
         self.aura = {}
         self.serial = {}
-        self.bypassState = {}
     end
 })
 local count
@@ -425,43 +424,13 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         self_pool:Drain()
     end,
     COMBAT_LOG_EVENT_UNFILTERED = function(self, event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
-        local arg12, arg13, arg14, arg15, arg16, _, _, arg19, _, _, _, _, _, arg25 = ...
+        local arg12, arg13, arg14, arg15, arg16, _, _, _, _, _, _, _ = ...
         local mine = (sourceGUID == self_playerGUID or OvaleGUID:IsPlayerPet(sourceGUID))
         if mine and cleuEvent == "SPELL_MISSED" then
-            local spellId, _ = arg12, arg13, arg14
-            local si = OvaleData.spellInfo[spellId]
-            local bypassState = self.current.bypassState
-            if si and si.aura and si.aura.player then
-                for _, auraTable in pairs(si.aura.player) do
-                    for auraId in pairs(auraTable) do
-                        if  not bypassState[auraId] then
-                            bypassState[auraId] = {}
-                        end
-                        bypassState[auraId][self_playerGUID] = true
-                    end
-                end
-            end
-            if si and si.aura and si.aura.target then
-                for _, auraTable in pairs(si.aura.target) do
-                    for auraId in pairs(auraTable) do
-                        if  not bypassState[auraId] then
-                            bypassState[auraId] = {}
-                        end
-                        bypassState[auraId][destGUID] = true
-                    end
-                end
-            end
-            if si and si.aura and si.aura.pet then
-                for _, auraTable in pairs(si.aura.pet) do
-                    for auraId in pairs(auraTable) do
-                        for petGUID in pairs(self_petGUID) do
-                            if  not bypassState[petGUID] then
-                                bypassState[auraId] = {}
-                            end
-                            bypassState[auraId][petGUID] = true
-                        end
-                    end
-                end
+            local unitId = OvaleGUID:GUIDUnit(destGUID)
+            if unitId then
+                self:DebugTimestamp("%s: %s (%s)", cleuEvent, destGUID, unitId)
+                self:ScanAuras(unitId, destGUID)
             end
         end
         if CLEU_AURA_EVENTS[cleuEvent] then
@@ -502,34 +471,26 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
             end
         elseif mine and CLEU_TICK_EVENTS[cleuEvent] then
             local spellId, _ = arg12, arg13, arg14
-            local multistrike
-            if strsub(cleuEvent, -7) == "_DAMAGE" then
-                multistrike = arg25
-            elseif strsub(cleuEvent, -5) == "_HEAL" then
-                multistrike = arg19
-            end
-            if  not multistrike then
-                self:DebugTimestamp("%s: %s", cleuEvent, destGUID)
-                local aura = __exports.GetAura(self.current.aura, destGUID, spellId, self_playerGUID)
-                local now = GetTime()
-                if self:IsActiveAura(aura, now) then
-                    local name = aura.name or "Unknown spell"
-                    local baseTick, lastTickTime = aura.baseTick, aura.lastTickTime
-                    local tick = baseTick
-                    if lastTickTime then
-                        tick = now - lastTickTime
-                    elseif  not baseTick then
-                        self:Debug("    First tick seen of unknown periodic aura %s (%d) on %s.", name, spellId, destGUID)
-                        local si = OvaleData.spellInfo[spellId]
-                        baseTick = (si and si.tick) and si.tick or 3
-                        tick = self:GetTickLength(spellId)
-                    end
-                    aura.baseTick = baseTick
-                    aura.lastTickTime = now
-                    aura.tick = tick
-                    self:Debug("    Updating %s (%s) on %s, tick=%s, lastTickTime=%s", name, spellId, destGUID, tick, lastTickTime)
-                    Ovale.refreshNeeded[destGUID] = true
+            self:DebugTimestamp("%s: %s", cleuEvent, destGUID)
+            local aura = __exports.GetAura(self.current.aura, destGUID, spellId, self_playerGUID)
+            local now = GetTime()
+            if self:IsActiveAura(aura, now) then
+                local name = aura.name or "Unknown spell"
+                local baseTick, lastTickTime = aura.baseTick, aura.lastTickTime
+                local tick = baseTick
+                if lastTickTime then
+                    tick = now - lastTickTime
+                elseif  not baseTick then
+                    self:Debug("    First tick seen of unknown periodic aura %s (%d) on %s.", name, spellId, destGUID)
+                    local si = OvaleData.spellInfo[spellId]
+                    baseTick = (si and si.tick) and si.tick or 3
+                    tick = self:GetTickLength(spellId)
                 end
+                aura.baseTick = baseTick
+                aura.lastTickTime = now
+                aura.tick = tick
+                self:Debug("    Updating %s (%s) on %s, tick=%s, lastTickTime=%s", name, spellId, destGUID, tick, lastTickTime)
+                Ovale.refreshNeeded[destGUID] = true
             end
         end
     end,
@@ -962,22 +923,6 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
     end,
     GetAura = function(self, unitId, auraId, atTime, filter, mine)
         local guid = OvaleGUID:UnitGUID(unitId)
-        if atTime then
-            local bypassState = self.next.bypassState
-            if  not bypassState[auraId] then
-                bypassState[auraId] = {}
-            end
-            if bypassState[auraId][guid] then
-                local stateAura = self:GetAuraByGUID(guid, auraId, filter, mine, atTime)
-                local aura = self:GetAuraByGUID(guid, auraId, filter, mine, nil)
-                if aura and aura.start and aura.ending and stateAura and stateAura.start and stateAura.ending and aura.start == stateAura.start and aura.ending == stateAura.ending then
-                    bypassState[auraId][guid] = false
-                    return stateAura
-                else
-                    return aura
-                end
-            end
-        end
         return self:GetAuraByGUID(guid, auraId, filter, mine, atTime)
     end,
     GetAuraWithProperty = function(self, unitId, propertyName, filter, atTime)

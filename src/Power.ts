@@ -409,19 +409,19 @@ class OvalePowerClass extends OvalePowerBase {
         if (powerType) {
             let powerInfo = this.POWER_INFO[powerType];
             let power = UnitPower("player", powerInfo.id, powerInfo.segments);
+            this.DebugTimestamp("%s: %d -> %d (%s).", event, this.current.power[powerType], power, powerType);
             if (this.current.power[powerType] != power) {
                 this.current.power[powerType] = power;
                 Ovale.needRefresh();
             }
-            this.DebugTimestamp("%s: %d -> %d (%s).", event, this.current.power[powerType], power, powerType);
         } else {
             for (const [powerType, powerInfo] of pairs(this.POWER_INFO)) {
                 let power = UnitPower("player", powerInfo.id, powerInfo.segments);
+                this.DebugTimestamp("%s: %d -> %d (%s).", event, this.current.power[powerType], power, powerType);
                 if (this.current.power[powerType] != power) {
                     this.current.power[powerType] = power;
                     Ovale.needRefresh();
                 }
-                this.DebugTimestamp("%s: %d -> %d (%s).", event, this.current.power[powerType], power, powerType);
             }
         }
         Ovale.needRefresh();

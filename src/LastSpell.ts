@@ -39,11 +39,9 @@ export interface PaperDollSnapshot {
     rangedHaste?: number;
     spellCrit?: number;
     spellHaste?: number;
-    multistrike?: number;
     critRating?: number;
     hasteRating?: number;
     masteryRating?: number;
-    multistrikeRating?: number;
     mainHandWeaponDamage?: number;
     offHandWeaponDamage?: number;
     baseDamageMultiplier?: number;
