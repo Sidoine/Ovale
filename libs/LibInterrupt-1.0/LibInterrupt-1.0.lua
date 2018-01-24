@@ -10,14 +10,14 @@ end
 local InterruptTable = {}
 _G["InterruptTable"] = InterruptTable
 
-function lib:MustInterrupt()
+function lib:MustInterrupt(target)
 	-- Get target info.
-	local targetName = UnitName("target")
+	local targetName = UnitName(target)
 	
 	-- Get cast / channel info.
-	local spellName, _, _, _, _, _, _, _, notInterruptible = UnitCastingInfo("target")
+	local spellName, _, _, _, _, _, _, _, notInterruptible = UnitCastingInfo(target)
 	if not spellName then
-		spellName, _, _, _, _, _, _, notInterruptible = UnitChannelInfo("target")
+		spellName, _, _, _, _, _, _, notInterruptible = UnitChannelInfo(target)
 	end
 	
 	-- Do we stop it?

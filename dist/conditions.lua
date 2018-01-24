@@ -1182,10 +1182,19 @@ local function IsInterruptible(positionalParams, namedParams, state, atTime)
         if  not name then
             name, _1, _2, _3, _4, _5, _6, notInterruptible = UnitChannelInfo(target)
         end
-        local boolean = notInterruptible ~= nil and  not notInterruptible and LibInterrupt:MustInterrupt()
+        local boolean = notInterruptible ~= nil and  not notInterruptible
         return TestBoolean(boolean, yesno)
     end
     OvaleCondition:RegisterCondition("isinterruptible", false, IsInterruptible)
+end
+do
+local function MustBeInterrupted(positionalParams, namedParams, state, atTime)
+        local yesno = positionalParams[1]
+        local target = ParseCondition(positionalParams, namedParams, state)
+        local boolean = LibInterrupt:MustInterrupt(target)
+        return TestBoolean(boolean, yesno)
+    end
+    OvaleCondition:RegisterCondition("mustbeinterrupted", false, MustBeInterrupted)
 end
 do
 local function IsPVP(positionalParams, namedParams, state, atTime)
