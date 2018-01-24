@@ -162,7 +162,49 @@ InterruptTable["Maiden of Vigilance"] = {
 }
 
 -- Antorus, the Burning Throne
+-- Antoran High Command
+InterruptTable["Fanatical Pyromancer"] = {
+    ["Pyroblast"] = true
+}
+
 -- Portal Keeper Hasabel
 InterruptTable["Vulcanar"] = {
-    ["Flames of Xoroth"] = true
+    ["Flames of Xoroth"] = true,
+    ["Unstable Portal"] = true
 }
+
+InterruptTable["Lord Eilgar"] = {
+    ["Unstable Portal"] = true
+}
+
+InterruptTable["Lady Dacidion"] = {
+    ["Unstable Portal"] = true
+}
+
+InterruptTable["Felblaze Imp"] = {
+    ["Fiery Detonation"] = true
+}
+
+InterruptTable["Feltouched Skitterer"] = {
+    ["Acidic Web"] = true
+}
+
+-- Eonar
+InterruptTable["Fel-Infused Destructor"] = {
+    ["Artillery Strike"] = true
+}
+
+-- Coven of Shivarra
+InterruptTable["Thu'raya, Mother of the Cosmos"] = {
+    ["Touch of the Cosmos"] = true
+}
+
+-- Argus the Unmaker
+InterruptTable["Constellar Designate"] = {
+    ["Cosmic Beacon"] = true
+}
+
+InterruptTable["Argus the Unmaker"] = {
+    ["End of All Things"] = true
+}
+
