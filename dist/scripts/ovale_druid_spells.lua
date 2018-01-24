@@ -6,8 +6,8 @@ __exports.register = function()
     local name = "ovale_druid_spells"
     local desc = "[7.3] Ovale: Druid spells"
     local code = [[
-ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!survival_instincts,buff,!survival_instincts_buff)	
-	
+ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!survival_instincts,buff,!survival_instincts_buff)
+
 # Druid spells and functions.
 Define(astralpower "lunarpower") # Astral Power is named LunarPower in Enum.PowerType
 Define(ashamanes_bite 210702)
@@ -92,7 +92,8 @@ Define(ferocious_bite 22568)
 	SpellRequire(ferocious_bite energy_percent 50=buff,berserk_cat_buff)
 	SpellRequire(ferocious_bite energy_percent 50=buff,incarnation_king_of_the_jungle_buff)
 	SpellAddBuff(ferocious_bite bloodtalons_buff=-1 talent=bloodtalons_talent)
-	SpellAddTargetDebuff(ferocious_bite rip_debuff=refresh_keep_snapshot)
+	SpellAddTargetDebuff(ferocious_bite rip_debuff=refresh_keep_snapshot,target_health_pct,25)
+	SpellAddTargetDebuff(ferocious_bite rip_debuff=refresh_keep_snapshot talent=sabertooth_talent)
 Define(fiery_red_maimers 144354)
 Define(fiery_red_maimers_buff 236757)
 Define(force_of_nature 205636)
@@ -203,7 +204,7 @@ Define(moonfire_dmg_debuff 164812)
 Define(moonkin_form 24858)
 	SpellInfo(moonkin_form to_stance=druid_moonkin_form)
 	SpellInfo(moonkin_form unusable=1 if_stance=druid_moonkin_form)
-#TODO affinity moonkin form has a different spellId
+	#TODO affinity moonkin form has a different spellId
 Define(new_moon 202767)
 	SpellInfo(new_moon cd=15 charges=3 astralpower=-10)
 Define(omen_of_clarity 16864)
@@ -227,13 +228,15 @@ Define(rage_of_the_sleeper 200851)
 	SpellAddBuff(rage_of_the_sleeper rage_of_the_sleeper_buff=1)
 Define(rage_of_the_sleeper_buff 200851)
 	SpellInfo(rage_of_the_sleeper_buff duration=10)
-SpellList(improved_rake prowl_buff incarnation_king_of_the_jungle_buff shadowmeld_buff)
+	SpellList(improved_rake prowl_buff incarnation_king_of_the_jungle_buff shadowmeld_buff)
 Define(rake 1822)
 	SpellInfo(rake combopoints=-1 energy=35 stance=druid_cat_form)
 	SpellRequire(rake energy_percent 50=buff,berserk_cat_buff)
 	SpellRequire(rake energy_percent 50=buff,incarnation_king_of_the_jungle_buff)
 	SpellAddBuff(rake bloodtalons_buff=-1 talent=bloodtalons_talent)
-#	SpellAddTargetDebuff(rake rake_debuff=1)
+	SpellAddBuff(rake prowl_buff=0)
+	SpellAddBuff(rake shadowmeld_buff=0)
+	SpellAddTargetDebuff(rake rake_debuff=1)
 	SpellDamageBuff(rake bloodtalons_buff=1.2 talent=bloodtalons_talent)
 	SpellDamageBuff(rake improved_rake=2)
 	#SpellDamageBuff(rake savage_roar_buff=1.15 talent=savage_roar_talent)
@@ -247,7 +250,7 @@ Define(rake_debuff 155722)
 	SpellDamageBuff(rake_debuff tigers_fury_buff=1.15 if_spell=tigers_fury)
 Define(rake_stun 163505)
 Define(rebirth 20484) 
-    # Rebirth removing PS buff is a bug since Rebirth is instant for Feral now.  Remove when fixed.
+	# Rebirth removing PS buff is a bug since Rebirth is instant for Feral now.  Remove when fixed.
 	SpellAddBuff(rebirth predatory_swiftness_buff=-1 if_spell=predatory_swiftness)
 Define(regrowth 8936)
 	SpellAddBuff(regrowth bloodtalons_buff=1 talent=bloodtalons_talent specialization=feral)
@@ -264,7 +267,7 @@ Define(rip 1079)
 	SpellInfo(rip combopoints=1 max_combopoints=5 energy=30 stance=druid_cat_form)
 	SpellRequire(rip energy_percent 50=buff,berserk_cat_buff)
 	SpellRequire(rip energy_percent 50=buff,incarnation_king_of_the_jungle_buff)
-#	SpellAddTargetDebuff(rip rip_debuff=1)
+	SpellAddTargetDebuff(rip rip_debuff=1)
 Define(rip_debuff 1079)
 	SpellInfo(rip_debuff duration=24 tick=2 talent=!jagged_wounds_talent)
 	SpellInfo(rip_debuff duration=19.2 tick=1.6 talent=jagged_wounds_talent)
@@ -384,7 +387,7 @@ Define(wild_charge_bear 16979)
 Define(wild_charge_cat 49376)
 	SpellInfo(wild_charge_cat cd=15 stance=druid_cat_form)
 Define(wildflesh_trait 200400)
-	
+
 # Legendary items
 Define(ailuro_pouncers 137024)
 Define(elizes_everlasting_encasement 137067)
@@ -444,6 +447,6 @@ Define(survival_of_the_fittest 18)
 Define(typhoon_talent 12)
 Define(warrior_of_elune_talent 2)
 Define(wild_charge_talent 6)
-	]]
+]]
     OvaleScripts:RegisterScript("DRUID", nil, name, desc, code, "include")
 end

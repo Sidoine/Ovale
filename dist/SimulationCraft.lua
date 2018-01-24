@@ -21,8 +21,6 @@ local __Compile = LibStub:GetLibrary("ovale/Compile")
 local OvaleCompile = __Compile.OvaleCompile
 local __Data = LibStub:GetLibrary("ovale/Data")
 local OvaleData = __Data.OvaleData
-local __HonorAmongThieves = LibStub:GetLibrary("ovale/HonorAmongThieves")
-local OvaleHonorAmongThieves = __HonorAmongThieves.OvaleHonorAmongThieves
 local __Lexer = LibStub:GetLibrary("ovale/Lexer")
 local OvaleLexer = __Lexer.OvaleLexer
 local __Power = LibStub:GetLibrary("ovale/Power")
@@ -2086,13 +2084,6 @@ EmitAction = function(parseNode, nodeList, annotation)
             conditionCode = "CheckBoxOn(opt_blade_flurry)"
         elseif className == "ROGUE" and action == "cancel_autoattack" then
             isSpellAction = false
-        elseif className == "ROGUE" and action == "honor_among_thieves" then
-            if modifier.cooldown then
-                local cooldown = Unparse(modifier.cooldown)
-                annotation["honor_among_thieves_cooldown_buff"] = cooldown
-                annotation[action] = className
-            end
-            isSpellAction = false
         elseif className == "ROGUE" and action == "kick" then
             bodyCode = camelSpecialization .. "InterruptActions()"
             annotation[action] = className
@@ -3023,7 +3014,6 @@ do
         ["soul_fragments"] = "SoulFragments()",
         ["ssw_refund_offset"] = "target.Distance() % 3 - 1",
         ["stat.mastery_rating"] = "MasteryRating()",
-        ["stat.multistrike_pct"] = "MultistrikeChance()",
         ["stealthed"] = "Stealthed()",
         ["stealthed.all"] = "Stealthed()",
         ["stealthed.rogue"] = "Stealthed()",
@@ -3723,20 +3713,6 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
     elseif className == "ROGUE" and operand == "exsanguinated" then
         code = "target.DebuffPresent(exsanguinated)"
         AddSymbol(annotation, "exsanguinated")
-    elseif className == "ROGUE" and specialization == "subtlety" and sub(operand, 1, 29) == "cooldown.honor_among_thieves." then
-        local property = sub(operand, 30)
-        local buffName = "honor_among_thieves_cooldown_buff"
-        AddSymbol(annotation, buffName)
-        annotation.honor_among_thieves = className
-        if property == "down" then
-            code = format("BuffPresent(%s)", buffName)
-        elseif property == "remains" then
-            code = format("BuffRemaining(%s)", buffName)
-        elseif property == "up" then
-            code = format("BuffExpires(%s)", buffName)
-        else
-            ok = false
-        end
     elseif className == "SHAMAN" and operand == "buff.resonance_totem.remains" then
         code = "TotemRemaining(totem_mastery)"
         ok = true
@@ -4964,28 +4940,6 @@ local InsertSupportingControls = function(child, annotation)
     return count
 end
 
-local InsertSupportingDefines = function(child, annotation)
-    local count = 0
-    local nodeList = annotation.astAnnotation.nodeList
-    if annotation.honor_among_thieves == "ROGUE" then
-        local buffName = "honor_among_thieves_cooldown_buff"
-        do
-            local code = format("SpellInfo(%s duration=%f)", buffName, annotation[buffName])
-            local node = OvaleAST:ParseCode("spell_info", code, nodeList, annotation.astAnnotation)
-            insert(child, 1, node)
-            count = count + 1
-        end
-        do
-            local code = format("Define(%s %d)", buffName, OvaleHonorAmongThieves.spellId)
-            local node = OvaleAST:ParseCode("define", code, nodeList, annotation.astAnnotation)
-            insert(child, 1, node)
-            count = count + 1
-        end
-        AddSymbol(annotation, buffName)
-    end
-    return count
-end
-
 local InsertVariables = function(child, annotation)
     if annotation.variable then
         for _, v in pairs(annotation.variable) do
@@ -5252,7 +5206,6 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
             annotation.supportingFunctionCount = InsertSupportingFunctions(child, annotation)
             annotation.supportingInterruptCount = InsertInterruptFunctions(child, annotation)
             annotation.supportingControlCount = InsertSupportingControls(child, annotation)
-            annotation.supportingDefineCount = InsertSupportingDefines(child, annotation)
             InsertVariables(child, annotation)
             local className, specialization = annotation.class, annotation.specialization
             local lowerclass = lower(className)

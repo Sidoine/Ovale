@@ -1779,9 +1779,6 @@ local function MeleeCritChance(positionalParams, namedParams, state, atTime)
 local function MeleeHaste(positionalParams, namedParams, state, atTime)
         return Snapshot("meleeHaste", 0, positionalParams, namedParams, state, atTime)
     end
-local function MultistrikeChance(positionalParams, namedParams, state, atTime)
-        return Snapshot("multistrike", 0, positionalParams, namedParams, state, atTime)
-    end
 local function RangedCritChance(positionalParams, namedParams, state, atTime)
         return SnapshotCritChance("rangedCrit", 0, positionalParams, namedParams, state, atTime)
     end
@@ -1819,7 +1816,6 @@ local function VersatilityRating(positionalParams, namedParams, state, atTime)
     OvaleCondition:RegisterCondition("masteryrating", false, MasteryRating)
     OvaleCondition:RegisterCondition("meleecritchance", false, MeleeCritChance)
     OvaleCondition:RegisterCondition("meleehaste", false, MeleeHaste)
-    OvaleCondition:RegisterCondition("multistrikechance", false, MultistrikeChance)
     OvaleCondition:RegisterCondition("rangedcritchance", false, RangedCritChance)
     OvaleCondition:RegisterCondition("spellcritchance", false, SpellCritChance)
     OvaleCondition:RegisterCondition("spellhaste", false, SpellHaste)
