@@ -294,6 +294,8 @@ Define(stone_heart_buff 225947)
 	SpellAddBuff(execute stone_heart_buff=0)
 Define(the_great_storms_eye 151823)
 Define(weight_of_the_earth 137077)
+Define(umbral_moonglaives 242553)
+Define(kazzalax_fujiedas_fury 137053)
 
 # Talents
 Define(anger_management_talent 19)
@@ -325,6 +327,8 @@ Define(titanic_might_talent 15)
 Define(vengeance_talent 16)
 Define(warbringer_talent 3)
 Define(warlords_challenge_talent 10)
+Define(bladestorm_talent 19)
+Define(reckless_abandon_talent 20)
 
 
 # Non-default tags for OvaleSimulationCraft.

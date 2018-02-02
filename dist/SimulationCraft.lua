@@ -5333,9 +5333,9 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
                 output[#output + 1] = "# Overrides."
                 output[#output + 1] = overrideCode
             end
-            if annotation.supportingDefineCount + annotation.supportingControlCount > 0 then
-                output[#output + 1] = ""
-            end
+            -- if annotation.supportingDefineCount + annotation.supportingControlCount > 0 then
+                -- output[#output + 1] = ""
+            -- end
         end
         output[#output + 1] = OvaleAST:Unparse(ast)
         if profile.annotation.symbolTable then
