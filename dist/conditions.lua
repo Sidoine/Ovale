@@ -575,11 +575,11 @@ local function Classification(positionalParams, namedParams, state, atTime)
                 targetClassification = "worldboss"
             else
                 targetClassification = UnitClassification(target)
-                if targetClassification == "rareelite" then
-                    targetClassification = "elite"
-                elseif targetClassification == "rare" then
-                    targetClassification = "normal"
-                end
+                -- if targetClassification == "rareelite" then
+                    -- targetClassification = "elite"
+                -- elseif targetClassification == "rare" then
+                    -- targetClassification = "normal"
+                -- end
             end
         end
         local boolean = (targetClassification == classification)
