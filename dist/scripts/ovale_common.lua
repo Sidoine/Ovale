@@ -255,17 +255,17 @@ AddFunction CanMove
 # Party checks
 AddFunction PartyMemberCount
 {
-	player.Present() + party1.Present() + party2.Present() + party3.Present() + party4.Present()
+	Present() + party1.Present() + party2.Present() + party3.Present() + party4.Present()
 }
 
 AddFunction PartyHealth
 {
-	player.Health() + party1.Health() + party2.Health() + party3.Health() + party4.Health()
+	Health() + party1.Health() + party2.Health() + party3.Health() + party4.Health()
 }
 
 AddFunction PartyMaxHealth
 {
-	player.MaxHealth() + party1.MaxHealth() + party2.MaxHealth() + party3.MaxHealth() + party4.MaxHealth()
+	MaxHealth() + party1.MaxHealth() + party2.MaxHealth() + party3.MaxHealth() + party4.MaxHealth()
 }
 
 AddFunction PartyHealthPercent
@@ -276,62 +276,22 @@ AddFunction PartyHealthPercent
 # Raid checks
 AddFunction RaidMemberCount
 {
-	player.Present() + raid1.Present() + raid2.Present() + raid3.Present() + raid4.Present() + raid5.Present() + raid6.Present() + raid7.Present() + raid8.Present() + raid9.Present() + raid10.Present() + raid11.Present() + raid12.Present() + raid13.Present() + raid14.Present() + raid15.Present() + raid16.Present() + raid17.Present() + raid18.Present() + raid19.Present() + raid20.Present() + raid21.Present() + raid22.Present() + raid23.Present() + raid24.Present() + raid25.Present()
+	Present() + raid1.Present() + raid2.Present() + raid3.Present() + raid4.Present() + raid5.Present() + raid6.Present() + raid7.Present() + raid8.Present() + raid9.Present() + raid10.Present() + raid11.Present() + raid12.Present() + raid13.Present() + raid14.Present() + raid15.Present() + raid16.Present() + raid17.Present() + raid18.Present() + raid19.Present() + raid20.Present() + raid21.Present() + raid22.Present() + raid23.Present() + raid24.Present() + raid25.Present()
 }
 
 AddFunction RaidHealth
 {
-	player.Health() + raid1.Health() + raid2.Health() + raid3.Health() + raid4.Health() + raid5.Health() + raid6.Health() + raid7.Health() + raid8.Health() + raid9.Health() + raid10.Health() + raid11.Health() + raid12.Health() + raid13.Health() + raid14.Health() + raid15.Health() + raid16.Health() + raid17.Health() + raid18.Health() + raid19.Health() + raid20.Health() + raid21.Health() + raid22.Health() + raid23.Health() + raid24.Health() + raid25.Health()
+	Health() + raid1.Health() + raid2.Health() + raid3.Health() + raid4.Health() + raid5.Health() + raid6.Health() + raid7.Health() + raid8.Health() + raid9.Health() + raid10.Health() + raid11.Health() + raid12.Health() + raid13.Health() + raid14.Health() + raid15.Health() + raid16.Health() + raid17.Health() + raid18.Health() + raid19.Health() + raid20.Health() + raid21.Health() + raid22.Health() + raid23.Health() + raid24.Health() + raid25.Health()
 }
 
 AddFunction RaidMaxHealth
 {
-	player.MaxHealth() + raid1.MaxHealth() + raid2.MaxHealth() + raid3.MaxHealth() + raid4.MaxHealth() + raid5.MaxHealth() + raid6.MaxHealth() + raid7.MaxHealth() + raid8.MaxHealth() + raid9.MaxHealth() + raid10.MaxHealth() + raid11.MaxHealth() + raid12.MaxHealth() + raid13.MaxHealth() + raid14.MaxHealth() + raid15.MaxHealth() + raid16.MaxHealth() + raid17.MaxHealth() + raid18.MaxHealth() + raid19.MaxHealth() + raid20.MaxHealth() + raid21.MaxHealth() + raid22.MaxHealth() + raid23.MaxHealth() + raid24.MaxHealth() + raid25.MaxHealth()
+	MaxHealth() + raid1.MaxHealth() + raid2.MaxHealth() + raid3.MaxHealth() + raid4.MaxHealth() + raid5.MaxHealth() + raid6.MaxHealth() + raid7.MaxHealth() + raid8.MaxHealth() + raid9.MaxHealth() + raid10.MaxHealth() + raid11.MaxHealth() + raid12.MaxHealth() + raid13.MaxHealth() + raid14.MaxHealth() + raid15.MaxHealth() + raid16.MaxHealth() + raid17.MaxHealth() + raid18.MaxHealth() + raid19.MaxHealth() + raid20.MaxHealth() + raid21.MaxHealth() + raid22.MaxHealth() + raid23.MaxHealth() + raid24.MaxHealth() + raid25.MaxHealth()
 }
 
 AddFunction RaidHealthPercent
 {
 	{ RaidHealth() / RaidMaxHealth() } * 100
-}
-
-AddFunction PartyMembersBelowEighty
-{
-	player.HealthPercent() < 80 + party1.HealthPercent() < 80 + party2.HealthPercent() < 80 + party3.HealthPercent() < 80 + party4.HealthPercent() < 80
-}
-
-AddFunction RaidMembersBelowEighty
-{
-	player.HealthPercent() < 80 + raid1.HealthPercent() < 80 + raid2.HealthPercent() < 80 + raid3.HealthPercent() < 80 + raid4.HealthPercent() < 80 + raid5.HealthPercent() < 80 + raid6.HealthPercent() < 80 + raid7.HealthPercent() < 80 + raid8.HealthPercent() < 80 + raid9.HealthPercent() < 80 + raid10.HealthPercent() < 80 + raid11.HealthPercent() < 80 + raid12.HealthPercent() < 80 + raid13.HealthPercent() < 80 + raid14.HealthPercent() < 80 + raid15.HealthPercent() < 80 + raid16.HealthPercent() < 80 + raid17.HealthPercent() < 80 + raid18.HealthPercent() < 80 + raid19.HealthPercent() < 80 + raid20.HealthPercent() < 80 + raid21.HealthPercent() < 80 + raid22.HealthPercent() < 80 + raid23.HealthPercent() < 80 + raid24.HealthPercent() < 80 + raid25.HealthPercent() < 80
-}
-
-AddFunction PartyMembersBelowSixty
-{
-	player.HealthPercent() < 60 + party1.HealthPercent() < 60 + party2.HealthPercent() < 60 + party3.HealthPercent() < 60 + party4.HealthPercent() < 60
-}
-
-AddFunction RaidMembersBelowSixty
-{
-	player.HealthPercent() < 60 + raid1.HealthPercent() < 60 + raid2.HealthPercent() < 60 + raid3.HealthPercent() < 60 + raid4.HealthPercent() < 60 + raid5.HealthPercent() < 60 + raid6.HealthPercent() < 60 + raid7.HealthPercent() < 60 + raid8.HealthPercent() < 60 + raid9.HealthPercent() < 60 + raid10.HealthPercent() < 60 + raid11.HealthPercent() < 60 + raid12.HealthPercent() < 60 + raid13.HealthPercent() < 60 + raid14.HealthPercent() < 60 + raid15.HealthPercent() < 60 + raid16.HealthPercent() < 60 + raid17.HealthPercent() < 60 + raid18.HealthPercent() < 60 + raid19.HealthPercent() < 60 + raid20.HealthPercent() < 60 + raid21.HealthPercent() < 60 + raid22.HealthPercent() < 60 + raid23.HealthPercent() < 60 + raid24.HealthPercent() < 60 + raid25.HealthPercent() < 60
-}
-
-AddFunction PartyMembersBelowFourty
-{
-	player.HealthPercent() < 40 + party1.HealthPercent() < 40 + party2.HealthPercent() < 40 + party3.HealthPercent() < 40 + party4.HealthPercent() < 40
-}
-
-AddFunction RaidMembersBelowFourty
-{
-	player.HealthPercent() < 40 + raid1.HealthPercent() < 40 + raid2.HealthPercent() < 40 + raid3.HealthPercent() < 40 + raid4.HealthPercent() < 40 + raid5.HealthPercent() < 40 + raid6.HealthPercent() < 40 + raid7.HealthPercent() < 40 + raid8.HealthPercent() < 40 + raid9.HealthPercent() < 40 + raid10.HealthPercent() < 40 + raid11.HealthPercent() < 40 + raid12.HealthPercent() < 40 + raid13.HealthPercent() < 40 + raid14.HealthPercent() < 40 + raid15.HealthPercent() < 40 + raid16.HealthPercent() < 40 + raid17.HealthPercent() < 40 + raid18.HealthPercent() < 40 + raid19.HealthPercent() < 40 + raid20.HealthPercent() < 40 + raid21.HealthPercent() < 40 + raid22.HealthPercent() < 40 + raid23.HealthPercent() < 40 + raid24.HealthPercent() < 40 + raid25.HealthPercent() < 40
-}
-
-AddFunction PartyMembersBelowTwentyFive
-{
-	player.HealthPercent() < 25 + party1.HealthPercent() < 25 + party2.HealthPercent() < 25 + party3.HealthPercent() < 25 + party4.HealthPercent() < 25
-}
-
-AddFunction RaidMembersBelowTwentyFive
-{
-	player.HealthPercent() < 25 + raid1.HealthPercent() < 25 + raid2.HealthPercent() < 25 + raid3.HealthPercent() < 25 + raid4.HealthPercent() < 25 + raid5.HealthPercent() < 25 + raid6.HealthPercent() < 25 + raid7.HealthPercent() < 25 + raid8.HealthPercent() < 25 + raid9.HealthPercent() < 25 + raid10.HealthPercent() < 25 + raid11.HealthPercent() < 25 + raid12.HealthPercent() < 25 + raid13.HealthPercent() < 25 + raid14.HealthPercent() < 25 + raid15.HealthPercent() < 25 + raid16.HealthPercent() < 25 + raid17.HealthPercent() < 25 + raid18.HealthPercent() < 25 + raid19.HealthPercent() < 25 + raid20.HealthPercent() < 25 + raid21.HealthPercent() < 25 + raid22.HealthPercent() < 25 + raid23.HealthPercent() < 25 + raid24.HealthPercent() < 25 + raid25.HealthPercent() < 25
 }
 ]]
     OvaleScripts:RegisterScript(nil, nil, name, desc, code, "include")

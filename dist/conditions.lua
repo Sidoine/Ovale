@@ -2488,3 +2488,67 @@ local function SoulFragments(positionalParams, namedParams, state, atTime)
     end
     OvaleCondition:RegisterCondition("soulfragments", false, SoulFragments)
 end
+do
+local function RaidMembersWithHealthPercent(positionalParams, namedParams, state, atTime)
+        local healthComparator, healthLimit, countComparator, countLimit = positionalParams[1], positionalParams[2], positionalParams[3], positionalParams[4]
+		local value = 0
+		for _, uid in pairs(OvaleData.RAID_UIDS) do
+			local health = OvaleHealth:UnitHealth(uid) or 0
+			if health > 0 then
+				local maxHealth = OvaleHealth:UnitHealthMax(uid) or 1
+				local healthPercent = health / maxHealth * 100
+				if Compare(healthPercent, healthComparator, healthLimit) then
+					value = value + 1
+				end
+			end
+		end
+        return Compare(value, countComparator, countLimit)
+    end
+    OvaleCondition:RegisterCondition("raidmemberswithhealthpercent", false, RaidMembersWithHealthPercent)
+end
+do
+local function RaidMembersInRange(positionalParams, namedParams, state, atTime)
+        local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local value = 0
+		for _, uid in pairs(OvaleData.RAID_UIDS) do
+			local boolean = (OvaleSpells:IsSpellInRange(spellId, uid) == 1)
+			if boolean then
+				value = value + 1
+			end
+		end
+        return Compare(value, comparator, limit)
+    end
+    OvaleCondition:RegisterCondition("raidmembersinrange", false, RaidMembersInRange)
+end
+do
+local function PartyMembersWithHealthPercent(positionalParams, namedParams, state, atTime)
+        local healthComparator, healthLimit, countComparator, countLimit = positionalParams[1], positionalParams[2], positionalParams[3], positionalParams[4]
+		local value = 0
+		for _, uid in pairs(OvaleData.PARTY_UIDS) do
+			local health = OvaleHealth:UnitHealth(uid) or 0
+			if health > 0 then
+				local maxHealth = OvaleHealth:UnitHealthMax(uid) or 1
+				local healthPercent = health / maxHealth * 100
+				if Compare(healthPercent, healthComparator, healthLimit) then
+					value = value + 1
+				end
+			end
+		end
+        return Compare(value, countComparator, countLimit)
+    end
+    OvaleCondition:RegisterCondition("partymemberswithhealthpercent", false, PartyMembersWithHealthPercent)
+end
+do
+local function PartyMembersInRange(positionalParams, namedParams, state, atTime)
+        local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local value = 0
+		for _, uid in pairs(OvaleData.PARTY_UIDS) do
+			local boolean = (OvaleSpells:IsSpellInRange(spellId, uid) == 1)
+			if boolean then
+				value = value + 1
+			end
+		end
+        return Compare(value, comparator, limit)
+    end
+    OvaleCondition:RegisterCondition("partymembersinrange", false, PartyMembersInRange)
+end
