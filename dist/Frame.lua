@@ -49,7 +49,7 @@ local __BaseState = LibStub:GetLibrary("ovale/BaseState")
 local baseState = __BaseState.baseState
 local strmatch = match
 local INFINITY = huge
-local MIN_REFRESH_TIME = 0.05
+local MIN_REFRESH_TIME = 0.1
 local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
     ToggleOptions = function(self)
         if (self.content:IsShown()) then

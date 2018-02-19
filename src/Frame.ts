@@ -22,7 +22,7 @@ import { AstNode } from "./AST";
 
 let strmatch = match;
 let INFINITY = huge;
-let MIN_REFRESH_TIME = 0.05;
+let MIN_REFRESH_TIME = 0.1;
 
 type BaseState = {};
 
