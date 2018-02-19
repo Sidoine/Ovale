@@ -2735,7 +2735,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
 	 @return A boolean value for the result of the comparison.
      */
     function AstralPowerDeficit(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        return PowerDeficit("astralpower", positionalParams, namedParams, state, atTime);
+        return PowerDeficit("lunarpower", positionalParams, namedParams, state, atTime);
     }
 
     /**  Get the number of lacking resource points for full chi, between 0 and maximum chi, of the target.
@@ -3222,7 +3222,7 @@ l    */
      * @param atTime 
      */
     function AstralPowerCost(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        return PowerCost("astralpower", positionalParams, namedParams, state, atTime);
+        return PowerCost("lunarpower", positionalParams, namedParams, state, atTime);
     }
 
     /**
