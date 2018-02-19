@@ -173,7 +173,7 @@ local OvaleActionBarClass = __class(OvaleActionBarBase, {
         else
             local start = 1
             local bonus = tonumber(GetBonusBarIndex()) * 12
-            if bonus > 0 then
+            if bonus > 0 and not _G["Bartender4"] then
                 start = 13
                 for slot = bonus - 11, bonus, 1 do
                     self:UpdateActionSlot(slot)

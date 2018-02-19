@@ -146,7 +146,7 @@ class OvaleActionBarClass extends OvaleActionBarBase {
 		} else {
 			let start = 1;
 			let bonus = tonumber(GetBonusBarIndex()) * 12;
-			if (bonus > 0) {
+			if (bonus > 0 && !_G["Bartender4"]) {
 				start = 13;
 				for (let slot = bonus - 11; slot <= bonus; slot += 1) {
 					this.UpdateActionSlot(slot);
