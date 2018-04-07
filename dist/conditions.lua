@@ -2483,8 +2483,13 @@ end
 do
 local function SoulFragments(positionalParams, namedParams, state, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
-        local value = OvaleDemonHunterSoulFragments:SoulFragments(atTime)
-        return Compare(value, comparator, limit)
+		local value = nil
+		if OvaleDemonHunterSoulFragments:SoulFragments(atTime) ~= nil then
+			value = OvaleDemonHunterSoulFragments:SoulFragments(atTime)
+			return Compare(value, comparator, limit)
+		else
+			return false
+		end
     end
     OvaleCondition:RegisterCondition("soulfragments", false, SoulFragments)
 end
