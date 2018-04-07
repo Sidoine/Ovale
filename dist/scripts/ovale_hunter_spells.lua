@@ -225,6 +225,7 @@ Define(qapla_eredun_war_order 137227)
 Define(call_of_the_wild 137101)
 Define(parsels_tongue 151805)
 Define(parsels_tongue_buff 248085)
+Define(buff_sephuzs_secret 208051)
 
 # Item set
 Define(t20_2p_critical_aimed_damage_buff 242242) # TODO
