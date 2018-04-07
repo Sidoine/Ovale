@@ -26,7 +26,10 @@ local demonData = {
     },
     [89] = {
         duration = 25
-    }
+    },
+	[17252] = {
+		duration = 25
+	}
 }
 local self_demons = {}
 local self_serial = 1
@@ -52,6 +55,9 @@ local OvaleWildImpsClass = __class(OvaleWildImpsBase, {
             local _, _, _, _, _, _, _, creatureId = find(destGUID, "(%S+)-(%d+)-(%d+)-(%d+)-(%d+)-(%d+)-(%S+)")
             creatureId = tonumber(creatureId)
             local now = GetTime()
+			if creatureId == 17252 and not spellId == 111898 then
+				return
+			end
             for id, v in pairs(demonData) do
                 if id == creatureId then
                     self_demons[destGUID] = {

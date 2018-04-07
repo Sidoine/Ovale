@@ -3006,7 +3006,7 @@ do
         ["rtb_list.any.6"] = "BuffCount(roll_the_bones_buff more 5)",
         ["runic_power"] = "RunicPower()",
         ["runic_power.deficit"] = "RunicPowerDeficit()",
-        ["service_no_de"] = "0",
+        ["service_no_de"] = "NotDeDemons(felguard)",
         ["shadow_orb"] = "ShadowOrbs()",
         ["sigil_placed"] = "SigilCharging(flame)",
         ["solar_max"] = "TimeToEclipse(solar)",
