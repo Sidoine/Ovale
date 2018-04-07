@@ -100,6 +100,7 @@ local OvaleSigilClass = __class(OvaleSigilBase, {
     end,
     IsSigilCharging = function(self, type, atTime)
         if (#activated_sigils[type] == 0) then
+			Ovale:OneTimeMessage("No sigils on the floor at start")
             return false
         end
         local charging = false
@@ -108,6 +109,11 @@ local OvaleSigilClass = __class(OvaleSigilBase, {
             if (OvaleSpellBook:GetTalentPoints(QUICKENED_SIGILS_TALENT) > 0) then
                 activation_time = activation_time - 1
             end
+			if charging == false then
+				Ovale:OneTimeMessage("No sigils active after check")
+			else
+				Ovale:OneTimeMessage("Sigil active")
+			end
             charging = charging or atTime < v + activation_time
         end
         return charging
