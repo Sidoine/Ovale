@@ -1349,12 +1349,13 @@ local function Power(powerType, positionalParams, namedParams, state, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
         local target = ParseCondition(positionalParams, namedParams, state)
         if target == "player" then
-            local value, origin, rate = OvalePower.next.power[powerType], atTime, OvalePower.next:GetPowerRate(powerType)
-            local start, ending = atTime, INFINITY
-            return TestValue(start, ending, value, origin, rate, comparator, limit)
-        else
+            -- local value, origin, rate = OvalePower.next.power[powerType], atTime, OvalePower.next:GetPowerRate(powerType)
+            -- local start, ending = atTime, INFINITY
+            -- return TestValue(start, ending, value, origin, rate, comparator, limit)
+        -- else
             local powerInfo = OvalePower.POWER_INFO[powerType]
             local value = UnitPower(target, powerInfo.id)
+			-- Ovale:OneTimeMessage("Test energy: %s %s %s %s %s", value, origin, rate, comparator, limit)
             return Compare(value, comparator, limit)
         end
     end

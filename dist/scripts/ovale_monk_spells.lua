@@ -100,7 +100,7 @@ Define(energizing_brew_buff 115288)
 	SpellInfo(energizing_brew_buff duration=6 tick=1)
 	SpellInfo(energizing_brew_buff add_duration=5 itemset=T14_melee itemcount=4)
 Define(energizing_elixir 115288)
-	SpellInfo(energizing_elixir chi=refill energy=refill)
+	SpellInfo(energizing_elixir cd=60 gcd=0 offgcd=1)
 Define(energizing_elixir_talent 7)
 Define(enveloping_mist 124682)
 	SpellInfo(enveloping_mist chi=3)
@@ -337,6 +337,9 @@ Define(zen_sphere_talent 5)
 
 # Stagger
 SpellList(any_stagger_debuff light_stagger_debuff moderate_stagger_debuff heavy_stagger_debuff)
+
+# Artifact
+Define(inner_peace 195243)
 
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(chi_brew tag=main)
