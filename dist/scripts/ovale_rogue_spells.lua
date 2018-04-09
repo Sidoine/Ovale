@@ -329,6 +329,8 @@ Define(wound_poison 8679)
 	SpellAddBuff(wound_poison wound_poison_buff=1)
 Define(wound_poison_buff 8679)
 	SpellInfo(wound_poison_buff duration=3600)
+Define(virulent_poisons_buff 252277)
+	SpellInfo(virulent_poisons_buff duration=6)
 
 # Tier
 Define(shadow_gestures_buff 257945)	
@@ -343,9 +345,11 @@ Define(master_poisoner_talent 1)
 Define(venom_rush_talent 19)
 Define(vigor_talent 9)
 Define(gloomblade_talent 3)
+Define(toxic_blade_talent 16)
 
 #Artifact traits
 Define(loaded_dice_buff 240837)
+Define(poison_knives 192376)
 
 #Legendaries
 Define(the_first_of_the_dead 151818)

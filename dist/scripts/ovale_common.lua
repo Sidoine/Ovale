@@ -209,6 +209,11 @@ Define(stoneform_buff 20594)
 	SpellInfo(stoneform_buff duration=8)
 Define(war_stomp 20549)
 	SpellInfo(war_stomp cd=120 interrupt=1)
+Define(arcane_pulse 260364)
+	SpellInfo(arcane_pulse cd=180)
+	SpellAddTargetDebuff(arcane_pulse arcane_pulse_debuff=1)
+Define(arcane_pulse_debuff 260369)
+	SpellInfo(arcane_pulse_debuff duration=12)
     
 	
 ###
