@@ -387,7 +387,13 @@ Define(wild_charge_bear 16979)
 Define(wild_charge_cat 49376)
 	SpellInfo(wild_charge_cat cd=15 stance=druid_cat_form)
 Define(wildflesh_trait 200400)
+Define(jungle_stalker_buff 252071)
+	SpellInfo(jungle_stalker_buff duration=30)
 
+# Tier
+Define(apex_predator_buff 252752)
+	SpellInfo(apex_predator_buff duration=25)
+	
 # Legendary items
 Define(ailuro_pouncers 137024)
 Define(elizes_everlasting_encasement 137067)
@@ -418,6 +424,10 @@ Define(brutal_slash_talent 17)
 Define(displacer_beast_talent 5)
 Define(elunes_guidance_talent 21)
 Define(feral_affinity_talent 8)
+Define(rend_and_tear_talent 19)
+Define(survival_of_the_fittest_talent 18)
+Define(galactic_guardian_talent 15)
+Define(brambles_talent 1)
 # Define(feral_affinity_talent 7) specialization=balance
 Define(force_of_nature_talent 1)
 Define(fury_of_elune_talent 19)
@@ -447,6 +457,12 @@ Define(survival_of_the_fittest 18)
 Define(typhoon_talent 12)
 Define(warrior_of_elune_talent 2)
 Define(wild_charge_talent 6)
+
+# Legendary
+Define(fury_of_nature 151802)
+
+# Artifact
+Define(jagged_claws 200409)
 ]]
     OvaleScripts:RegisterScript("DRUID", nil, name, desc, code, "include")
 end

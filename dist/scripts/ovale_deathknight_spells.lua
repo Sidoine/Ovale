@@ -283,6 +283,7 @@ Define(rapid_decomposition_talent 4)
 Define(shadow_infusion_talent 16)
 Define(shattering_strikes_talent 1)
 Define(blooddrinker_talent 3)
+Define(frostscythe_talent 16)
 
 # Artifact traits
 Define(apocalypse 220143)

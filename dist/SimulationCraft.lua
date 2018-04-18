@@ -2902,6 +2902,8 @@ EmitOperandBuff = function(operand, parseNode, nodeList, annotation, action, tar
             code = format("BaseDuration(%s)", buffName)
         elseif property == "max_stack" then
             code = format("SpellData(%s max_stacks)", buffName)
+		elseif property == "max_stacks" then
+            code = format("SpellData(%s max_stacks)", buffName)
         elseif property == "react" or property == "stack" then
             if parseNode.asType == "boolean" then
                 code = format("%s%sPresent(%s%s)", target, prefix, buffName, any)
@@ -2936,7 +2938,7 @@ end
 
 do
     local CHARACTER_PROPERTY = {
-        ["active_enemies"] = "Enemies()",
+        ["active_enemies"] = "Enemies(tagged=1)",
         ["astral_power"] = "AstralPower()",
         ["astral_power.deficit"] = "AstralPowerDeficit()",
         ["blade_dance_worth_using"] = "0",
@@ -3239,6 +3241,8 @@ EmitOperandDot = function(operand, parseNode, nodeList, annotation, action, targ
             code = format("%s%sRemaining(%s)", target, prefix, dotName)
         elseif property == "stack" then
             code = format("%s%sStacks(%s)", target, prefix, dotName)
+        elseif property == "max_stacks" then
+			code = format("SpellData(%s max_stacks)", dotName)
         elseif property == "tick_dmg" then
             code = format("%sTickValue(%s)", target, prefix, dotName)
         elseif property == "ticking" then
