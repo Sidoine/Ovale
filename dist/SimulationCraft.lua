@@ -2675,6 +2675,10 @@ EmitOperand = function(parseNode, nodeList, annotation, action)
     return node
 end
 
+local function isempty(s)
+  return s == nil or s == ''
+end
+
 EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, target)
     local ok = true
     local node
@@ -2692,6 +2696,9 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
     local className, specialization = annotation.class, annotation.specialization
     name = Disambiguate(name, className, specialization)
     target = target and (target .. ".") or ""
+	if isempty(name) then
+		name = "brokenshit"
+	end
     local buffName = name .. "_debuff"
     buffName = Disambiguate(buffName, className, specialization)
     local prefix = find(buffName, "_buff$") and "Buff" or "Debuff"
@@ -2719,6 +2726,8 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
         code = format("Charges(%s count=0)", name)
     elseif property == "cooldown" then
         code = format("SpellCooldown(%s)", name)
+    elseif property == "vuln_casts" then
+        code = format("CastTime(aimed_shot) / target.DebuffRemaining(vulnerability_debuff)", name)
     elseif property == "cooldown_react" then
         code = format("not SpellCooldown(%s) > 0", name)
     elseif property == "cost" then
