@@ -3155,6 +3155,8 @@ EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
             code = format("%sCharges(%s count=0)", prefix, name)
         elseif property == "full_recharge_time" then
             code = format("%sCooldown(%s)", prefix, name)
+		elseif property == "recharge_time" then
+			code = format("SpellChargeCooldown(%s)", name)
         else
             ok = false
         end
