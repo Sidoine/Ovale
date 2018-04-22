@@ -1477,7 +1477,7 @@ local function AlternatePowerDeficit(positionalParams, namedParams, state, atTim
         return PowerDeficit("alternatepower", positionalParams, namedParams, state, atTime)
     end
 local function AstralPowerDeficit(positionalParams, namedParams, state, atTime)
-        return PowerDeficit("astralpower", positionalParams, namedParams, state, atTime)
+        return PowerDeficit("lunarpower", positionalParams, namedParams, state, atTime)
     end
 local function ChiDeficit(positionalParams, namedParams, state, atTime)
         return PowerDeficit("chi", positionalParams, namedParams, state, atTime)
@@ -1610,7 +1610,7 @@ local function RunicPowerCost(positionalParams, namedParams, state, atTime)
         return PowerCost("runicpower", positionalParams, namedParams, state, atTime)
     end
 local function AstralPowerCost(positionalParams, namedParams, state, atTime)
-        return PowerCost("astralpower", positionalParams, namedParams, state, atTime)
+        return PowerCost("lunarpower", positionalParams, namedParams, state, atTime)
     end
 local function MainPowerCost(positionalParams, namedParams, state, atTime)
         return PowerCost(OvalePower.current.powerType, positionalParams, namedParams, state, atTime)
