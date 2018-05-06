@@ -101,6 +101,9 @@ local PowerModule = __class(nil, {
         local si = OvaleData.spellInfo[spellId]
         if si and si[powerType] then
             local cost, ratio = OvaleData:GetSpellInfoPropertyNumber(spellId, atTime, powerType, targetGUID, true)
+            if cost == "refill" then
+                cost = self:GetPower(powerType, atTime) - LibStub:GetLibrary("ovale/Power").OvalePower.current.maxPower[powerType]
+            end
             if ratio and ratio ~= 0 then
                 local maxCostParam = "max_" .. powerType
                 local maxCost = si[maxCostParam]
@@ -199,7 +202,7 @@ local PowerModule = __class(nil, {
                 baseCost = tokens[index]
                 index = index + 1
             end
-            if baseCost then
+            if baseCost and type(baseCost) == "number" then
                 if baseCost > 0 then
                     local powerType = requirement
                     local cost = self:PowerCost(spellId, powerType, atTime, targetGUID)
@@ -219,6 +222,8 @@ local PowerModule = __class(nil, {
                 else
                     verified = true
                 end
+            elseif type(baseCost) ~= "number" then
+                Ovale:OneTimeMessage("Warning: expect number for baseCost; got %s (%s)", type(baseCost), baseCost)
             else
                 Ovale:OneTimeMessage("Warning: requirement '%s' power is missing a cost argument.", requirement)
                 Ovale:OneTimeMessage(tostring(index))
@@ -447,6 +452,9 @@ local OvalePowerClass = __class(OvalePowerBase, {
         if spellPowerCost then
             local cost = spellPowerCost.cost
             local typeId = spellPowerCost.type
+            if cost == "refill" then
+                cost = self:GetPower(powerType, atTime) - self.current.maxPower[powerType]
+            end
             for pt, p in pairs(self.POWER_INFO) do
                 if p.id == typeId and (powerType == nil or pt == powerType) then
                     return cost, pt
