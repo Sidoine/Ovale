@@ -5,12 +5,20 @@ InterruptTable["Ghostly Councilor"] = {
     ["Dark Mending"] = true
 }
 
+InterruptTable["Ghostly Protector"] = {
+    ["Sacrifice Soul"] = true
+}
+
 InterruptTable["Lord Etheldrin Ravencrest"] = {
     ["Spirit Blast"] = true
 }
 
 InterruptTable["Risen Arcanist"] = {
     ["Arcane Blitz"] = true
+}
+
+InterruptTable["Felspite Dominator"] = {
+    ["Felfrenzy"] = true
 }
 
 -- Court of Stars
@@ -87,7 +95,12 @@ InterruptTable["Hatecoil Oracle"] = {
 }
 
 InterruptTable["Hatecoil Crestrider"] = {
-    ["Restoration"] = true
+    ["Restoration"] = true,
+    ["Bellowing Roar"] = true
+}
+
+InterruptTable["Hatecoil Shellbreaker"] = {
+    ["Bellowing Roar"] = true
 }
 
 InterruptTable["Hatecoil Arcanist"] = {
@@ -105,6 +118,10 @@ InterruptTable["Serpentrix"] = {
 
 InterruptTable["Blazing Hydra Spawn"] = {
     ["Blazing Nova"] = true
+}
+
+InterruptTable["Arcane Hydra Spawn"] = {
+    ["Arcane Blast"] = true
 }
 
 InterruptTable["Ritualist Lesha"] = {
@@ -202,6 +219,10 @@ InterruptTable["Rockback Gnasher"] = {
 
 InterruptTable["Rockbound Trapper"] = {
     ["Bound"] = true
+}
+
+InterruptTable["Blightshard Shaper"] = {
+    ["Stone Bolt"] = true
 }
 
 -- The Arcway
@@ -312,12 +333,29 @@ InterruptTable["Forlorn Spirit"] = {
     ["Soul Leech"] = true
 }
 
+InterruptTable["Ancient Tome"] = {
+    ["Consume Magic"] = true
+}
+
+InterruptTable["Mana Confluence"] = {
+    ["Arcane Barrage"] = true
+}
+
+InterruptTable["Infused Pyromancer"] = {
+    ["Fel Fireball"] = true
+}
+
 InterruptTable["Shrieking Terror"] = {
     ["Terrifying Wail"] = true
 }
 
 InterruptTable["Luminore"] = {
+    ["Burning Blaze"] = true,
     ["Heat Wave"] = true
+}
+
+InterruptTable["Coggleston"] = {
+    ["Dinner Bell!"] = true
 }
 
 InterruptTable["Mrs. Cauldrons"] = {
@@ -332,12 +370,24 @@ InterruptTable["Galindre"] = {
     ["Flashy Bolt"] = true
 }
 
+InterruptTable["Ghostly Understudy"] = {
+    ["Poetry Slam"] = true
+}
+
 InterruptTable["Backup Singer"] = {
     ["Firelands Portal"] = true
 }
 
+InterruptTable["Spectral Attendant"] = {
+    ["Shadow Rejuvenation"] = true
+}
+
 InterruptTable["Spectral Retainer"] = {
     ["Oath of Fealty"] = true
+}
+
+InterruptTable["Undying Servant"] = {
+    ["Shackles of Servitude"] = true
 }
 
 InterruptTable["Virtuous Lady"] = {
@@ -362,6 +412,7 @@ InterruptTable["Lady Keira Berrybuck"] = {
 }
 
 InterruptTable["Lady Catriona"] = {
+    ["Healing Stream"] = true,
     ["Smite"] = true
 }
 
@@ -374,11 +425,34 @@ InterruptTable["Nightbane"] = {
 }
 
 InterruptTable["Shade of Medivh"] = {
+    ["Piercing Missiles"] = true,
     ["Frostbite"] = true
 }
 
 InterruptTable["Viz'aduum the Watcher"] = {
+    ["Stabilize Rift"] = true,
     ["Burning Blast"] = true
+}
+
+-- Vault of the Wardens
+InterruptTable["Fel-Infused Fury"] = {
+    ["Unleash Fury"] = true
+}
+
+InterruptTable["Tirathon Saltheril"] = {
+    ["Furious Blast"] = true
+}
+
+InterruptTable["Deranged Mindflayer"] = {
+    ["Frightening Shout"] = true
+}
+
+InterruptTable["Ember"] = {
+    ["Sear"] = true
+}
+
+InterruptTable["Malignant Defiler"] = {
+    ["Drain"] = true
 }
 
 -- Cathedral of Eternal Night
