@@ -203,8 +203,3 @@ InterruptTable["Thu'raya, Mother of the Cosmos"] = {
 InterruptTable["Constellar Designate"] = {
     ["Cosmic Beacon"] = true
 }
-
-InterruptTable["Argus the Unmaker"] = {
-    ["End of All Things"] = true
-}
-
