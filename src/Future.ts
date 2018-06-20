@@ -382,8 +382,9 @@ export class OvaleFutureClass extends OvaleFutureBase {
     }
     UNIT_SPELLCAST_DELAYED(event: string, unitId: string, spell: string, rank: number, lineId: number, spellId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
+            let [spell] = GetSpellInfo(spellId);
             this.StartProfiling("OvaleFuture_UNIT_SPELLCAST_DELAYED");
-            this.DebugTimestamp(event, unitId, spell, rank, lineId, spellId);
+            this.DebugTimestamp(event, unitId, spell, lineId, spellId);
             let now = GetTime();
             let [spellcast] = this.GetSpellcast(spell, spellId, lineId, now);
             if (spellcast) {
