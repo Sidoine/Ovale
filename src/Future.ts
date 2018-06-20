@@ -558,10 +558,11 @@ export class OvaleFutureClass extends OvaleFutureBase {
             this.UpdateSpellcastSnapshot(this.current.lastOffGCDSpellcast, atTime);
         }
     }
-    UnitSpellcastEnded(event: string, unitId: string, spell: string, rank: number, lineId: number, spellId: number) {
+    UnitSpellcastEnded(event: string, unitId: string, lineId: number, spellId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
+            let [spell] = GetSpellInfo(spellId);
             this.StartProfiling("OvaleFuture_UnitSpellcastEnded");
-            this.DebugTimestamp(event, unitId, spell, rank, lineId, spellId);
+            this.DebugTimestamp(event, unitId, spell, lineId, spellId);
             let now = GetTime();
             let [spellcast, index] = this.GetSpellcast(spell, spellId, lineId, now);
             if (spellcast) {
