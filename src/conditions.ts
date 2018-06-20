@@ -2575,7 +2575,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
 	 if HolyPower(more 2) Spell(word_of_glory)
      */
     function HolyPower(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        return Power("holy", positionalParams, namedParams, state, atTime);
+        return Power("holypower", positionalParams, namedParams, state, atTime);
     }
 
     /**
