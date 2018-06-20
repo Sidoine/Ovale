@@ -387,7 +387,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
             let now = GetTime();
             let [spellcast] = this.GetSpellcast(spell, spellId, lineId, now);
             if (spellcast) {
-                let [name, , , , startTime, endTime, , castId] = UnitCastingInfo(unitId);
+                let [name, , , startTime, endTime, , castId] = UnitCastingInfo(unitId);
                 if (lineId == castId && name == spell) {
                     startTime = startTime / 1000;
                     endTime = endTime / 1000;
@@ -457,7 +457,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
             let now = GetTime();
             let [spellcast] = this.GetSpellcast(spell, spellId, lineId, now);
             if (spellcast) {
-                let [name, ,, , startTime, endTime, , castId] = UnitCastingInfo(unitId);
+                let [name, , , startTime, endTime, , castId] = UnitCastingInfo(unitId);
                 if (lineId == castId && name == spell) {
                     startTime = startTime / 1000;
                     endTime = endTime / 1000;

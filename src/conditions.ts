@@ -811,7 +811,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
             castSpellId = OvaleFuture.next.currentCast.spellId;
             castSpellName = OvaleSpellBook.GetSpellName(castSpellId);
         } else {
-            let [spellName, _1, _2, _3, startTime, endTime] = UnitCastingInfo(target);
+            let [spellName, _1, _2, startTime, endTime] = UnitCastingInfo(target);
             if (!spellName) {
                 [spellName, _1, _2, _3, startTime, endTime] = UnitChannelInfo(target);
             }
@@ -2076,7 +2076,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     function IsInterruptible(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let yesno = positionalParams[1];
         let [target] = ParseCondition(positionalParams, namedParams, state);
-        let [name, _1, _2, _3, _4, _5, _6, , notInterruptible] = UnitCastingInfo(target);
+        let [name, _1, _2, _3, _4, _5, , notInterruptible] = UnitCastingInfo(target);
         if (!name) {
             [name, _1, _2, _3, _4, _5, _6, notInterruptible] = UnitChannelInfo(target);
         }
@@ -3398,7 +3398,7 @@ l    */
     function RemainingCastTime(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [comparator, limit] = [positionalParams[1], positionalParams[2]];
         let [target] = ParseCondition(positionalParams, namedParams, state);
-        let [, , , , startTime, endTime] = UnitCastingInfo(target);
+        let [, , , startTime, endTime] = UnitCastingInfo(target);
         if (startTime && endTime) {
             startTime = startTime / 1000;
             endTime = endTime / 1000;

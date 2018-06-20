@@ -109,7 +109,7 @@ class OvaleScoreClass extends OvaleScoreBase {
             let now = GetTime();
             let [spellcast] = OvaleFuture.GetSpellcast(spell, spellId, lineId, now);
             if (spellcast) {
-                let [name, ,, ,,, , castId] = UnitCastingInfo(unitId);
+                let [name, , , , , , castId] = UnitCastingInfo(unitId);
                 if (lineId == castId && name == spell) {
                     this.ScoreSpell(spellId);
                 } 
