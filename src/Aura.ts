@@ -654,7 +654,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
             let filter = "HELPFUL";
             let now = GetTime();
             while (true) {
-                let [name, , icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, , spellId, , , , value1, value2, value3] = UnitAura(unitId, i, filter);
+                let [name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, , spellId, , , , value1, value2, value3] = UnitAura(unitId, i, filter);
                 if (!name) {
                     if (filter == "HELPFUL") {
                         filter = "HARMFUL";
