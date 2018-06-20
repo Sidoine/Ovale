@@ -316,8 +316,8 @@ class OvalePowerClass extends OvalePowerBase {
         this.RegisterEvent("UNIT_DISPLAYPOWER");
         this.RegisterEvent("UNIT_LEVEL");
         this.RegisterEvent("UNIT_MAXPOWER");
-        this.RegisterEvent("UNIT_POWER");
-        this.RegisterEvent("UNIT_POWER_FREQUENT", "UNIT_POWER");
+        this.RegisterEvent("UNIT_POWER_UPDATE");
+        this.RegisterEvent("UNIT_POWER_FREQUENT", "UNIT_POWER_UPDATE");
         this.RegisterEvent("UNIT_RANGEDDAMAGE");
         this.RegisterEvent("UNIT_SPELL_HASTE", "UNIT_RANGEDDAMAGE");
         this.RegisterMessage("Ovale_StanceChanged", "EventHandler");
@@ -335,7 +335,7 @@ class OvalePowerClass extends OvalePowerBase {
         this.UnregisterEvent("UNIT_DISPLAYPOWER");
         this.UnregisterEvent("UNIT_LEVEL");
         this.UnregisterEvent("UNIT_MAXPOWER");
-        this.UnregisterEvent("UNIT_POWER");
+        this.UnregisterEvent("UNIT_POWER_UPDATE");
         this.UnregisterEvent("UNIT_POWER_FREQUENT");
         this.UnregisterEvent("UNIT_RANGEDDAMAGE");
         this.UnregisterEvent("UNIT_SPELL_HASTE");
@@ -367,7 +367,7 @@ class OvalePowerClass extends OvalePowerBase {
             }
         }
     }
-    UNIT_POWER(event, unitId, powerToken) {
+    UNIT_POWER_UPDATE(event, unitId, powerToken) {
         if (unitId == "player") {
             let powerType = this.POWER_TYPE[powerToken];
             if (powerType) {
