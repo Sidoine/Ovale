@@ -91,9 +91,10 @@ class OvaleScoreClass extends OvaleScoreBase {
         }
     }
 
-    UNIT_SPELLCAST_CHANNEL_START(event, unitId, spell, rank, lineId, spellId) {
+    UNIT_SPELLCAST_CHANNEL_START(event, unitId, lineId, spellId) {
         if (unitId == "player" || unitId == "pet") {
             let now = GetTime();
+            let [spell] = GetSpellInfo(spellId);
             let [spellcast] = OvaleFuture.GetSpellcast(spell, spellId, undefined, now);
             if (spellcast) {
                 let [name] = UnitChannelInfo(unitId);
@@ -104,9 +105,10 @@ class OvaleScoreClass extends OvaleScoreBase {
         }
     }
 
-    UNIT_SPELLCAST_START(event, unitId, spell, rank, lineId, spellId) {
+    UNIT_SPELLCAST_START(event, unitId, lineId, spellId) {
         if (unitId == "player" || unitId == "pet") {
             let now = GetTime();
+            let [spell] = GetSpellInfo(spellId);
             let [spellcast] = OvaleFuture.GetSpellcast(spell, spellId, lineId, now);
             if (spellcast) {
                 let [name, , , , , , castId] = UnitCastingInfo(unitId);
