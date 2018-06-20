@@ -813,7 +813,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
         } else {
             let [spellName, _1, _2, startTime, endTime] = UnitCastingInfo(target);
             if (!spellName) {
-                [spellName, _1, _2, _3, startTime, endTime] = UnitChannelInfo(target);
+                [spellName, _1, _2, startTime, endTime] = UnitChannelInfo(target);
             }
             if (spellName) {
                 castSpellName = spellName;
@@ -2078,7 +2078,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
         let [target] = ParseCondition(positionalParams, namedParams, state);
         let [name, _1, _2, _3, _4, _5, , notInterruptible] = UnitCastingInfo(target);
         if (!name) {
-            [name, _1, _2, _3, _4, _5, _6, notInterruptible] = UnitChannelInfo(target);
+            [name, _1, _2, _3, _4, _5, notInterruptible] = UnitChannelInfo(target);
         }
         let boolean = notInterruptible != undefined && !notInterruptible;
         return TestBoolean(boolean, yesno);

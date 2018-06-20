@@ -308,7 +308,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
             let now = GetTime();
             let [spellcast] = this.GetSpellcast(spell, spellId, undefined, now);
             if (spellcast) {
-                let [name, , , , startTime, endTime] = UnitChannelInfo(unitId);
+                let [name, , , startTime, endTime] = UnitChannelInfo(unitId);
                 if (name == spell) {
                     startTime = startTime / 1000;
                     endTime = endTime / 1000;
@@ -360,7 +360,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
             let now = GetTime();
             let [spellcast] = this.GetSpellcast(spell, spellId, undefined, now);
             if (spellcast && spellcast.channel) {
-                let [name, , , , startTime, endTime] = UnitChannelInfo(unitId);
+                let [name, , , startTime, endTime] = UnitChannelInfo(unitId);
                 if (name == spell) {
                     startTime = startTime / 1000;
                     endTime = endTime / 1000;
