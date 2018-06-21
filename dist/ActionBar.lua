@@ -136,7 +136,7 @@ local OvaleActionBarClass = __class(OvaleActionBarBase, {
         elseif ElvUI then
             local elvUIButtons = ElvUI.buttonRegistry
             for btn in pairs(elvUIButtons) do
-                local s = btn.GetAttribute("action")
+                local s = btn:GetAttribute("action")
                 if s == slot then
                     self:UpdateActionSlot(slot)
                 end
@@ -167,7 +167,7 @@ local OvaleActionBarClass = __class(OvaleActionBarBase, {
         if ElvUI then
             local elvUIButtons = ElvUI.buttonRegistry
             for btn in pairs(elvUIButtons) do
-                local s = btn.GetAttribute("action")
+                local s = btn:GetAttribute("action")
                 self:UpdateActionSlot(s)
             end
         else
