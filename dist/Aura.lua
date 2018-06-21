@@ -704,7 +704,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
             local filter = "HELPFUL"
             local now = GetTime()
             while true do
-                local name, _, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, _, spellId, _, _, _, value1, value2, value3 = UnitAura(unitId, i, filter)
+                local name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, _, spellId, _, _, _, value1, value2, value3 = UnitAura(unitId, i, filter)
                 if  not name then
                     if filter == "HELPFUL" then
                         filter = "HARMFUL"

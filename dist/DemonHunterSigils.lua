@@ -76,7 +76,7 @@ local OvaleSigilClass = __class(OvaleSigilBase, {
             self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
         end
     end,
-    UNIT_SPELLCAST_SUCCEEDED = function(self, event, unitId, spellName, spellRank, guid, spellId, ...)
+    UNIT_SPELLCAST_SUCCEEDED = function(self, event, unitId, guid, spellId, ...)
         if ( not OvalePaperDoll:IsSpecialization("vengeance")) then
             return 
         end
