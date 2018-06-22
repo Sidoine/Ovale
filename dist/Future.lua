@@ -320,7 +320,7 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
     end,
     UNIT_SPELLCAST_CHANNEL_START = function(self, event, unitId, lineId, spellId)
         if (unitId == "player" or unitId == "pet") and  not WHITE_ATTACK[spellId] then
-            local spell = GetSpellInfo(spellId)
+            local spell = OvaleSpellBook:GetSpellName(spellId)
             self:StartProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_START")
             self:DebugTimestamp(event, unitId, spell, lineId, spellId)
             local now = GetTime()
@@ -354,7 +354,7 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
     end,
     UNIT_SPELLCAST_CHANNEL_STOP = function(self, event, unitId, lineId, spellId)
         if (unitId == "player" or unitId == "pet") and  not WHITE_ATTACK[spellId] then
-            local spell = GetSpellInfo(spellId)
+            local spell = OvaleSpellBook:GetSpellName(spellId)
             self:StartProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_STOP")
             self:DebugTimestamp(event, unitId, spell, lineId, spellId)
             local now = GetTime()
@@ -374,7 +374,7 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
     end,
     UNIT_SPELLCAST_CHANNEL_UPDATE = function(self, event, unitId, lineId, spellId)
         if (unitId == "player" or unitId == "pet") and  not WHITE_ATTACK[spellId] then
-            local spell = GetSpellInfo(spellId)
+            local spell = OvaleSpellBook:GetSpellName(spellId)
             self:StartProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_UPDATE")
             self:DebugTimestamp(event, unitId, spell, lineId, spellId)
             local now = GetTime()
@@ -402,7 +402,7 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
     end,
     UNIT_SPELLCAST_DELAYED = function(self, event, unitId, spell, rank, lineId, spellId)
         if (unitId == "player" or unitId == "pet") and  not WHITE_ATTACK[spellId] then
-            local spell = GetSpellInfo(spellId)
+            local spell = OvaleSpellBook:GetSpellName(spellId)
             self:StartProfiling("OvaleFuture_UNIT_SPELLCAST_DELAYED")
             self:DebugTimestamp(event, unitId, spell, lineId, spellId)
             local now = GetTime()
@@ -473,7 +473,7 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
     end,
     UNIT_SPELLCAST_START = function(self, event, unitId, lineId, spellId)
         if (unitId == "player" or unitId == "pet") and  not WHITE_ATTACK[spellId] then
-            local spell = GetSpellInfo(spellId)
+            local spell = OvaleSpellBook:GetSpellName(spellId)
             self:StartProfiling("OvaleFuture_UNIT_SPELLCAST_START")
             self:DebugTimestamp(event, unitId, spell, lineId, spellId)
             local now = GetTime()
@@ -510,7 +510,7 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
     end,
     UNIT_SPELLCAST_SUCCEEDED = function(self, event, unitId, lineId, spellId)
         if (unitId == "player" or unitId == "pet") and  not WHITE_ATTACK[spellId] then
-            local spell = GetSpellInfo(spellId)
+            local spell = OvaleSpellBook:GetSpellName(spellId)
             self:StartProfiling("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED")
             self:DebugTimestamp(event, unitId, spell, lineId, spellId)
             local now = GetTime()
@@ -582,7 +582,7 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
     end,
     UnitSpellcastEnded = function(self, event, unitId, lineId, spellId)
         if (unitId == "player" or unitId == "pet") and  not WHITE_ATTACK[spellId] then
-            local spell = GetSpellInfo(spellId)
+            local spell = OvaleSpellBook:GetSpellName(spellId)
             self:StartProfiling("OvaleFuture_UnitSpellcastEnded")
             self:DebugTimestamp(event, unitId, spell, lineId, spellId)
             local now = GetTime()

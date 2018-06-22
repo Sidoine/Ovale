@@ -303,7 +303,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
     }
     UNIT_SPELLCAST_CHANNEL_START(event: string, unitId: string, lineId: number, spellId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
-            let [spell] = GetSpellInfo(spellId);
+            let spell = OvaleSpellBook.GetSpellName(spellId);
             this.StartProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_START");
             this.DebugTimestamp(event, unitId, spell, lineId, spellId);
             let now = GetTime();
@@ -337,7 +337,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
     }
     UNIT_SPELLCAST_CHANNEL_STOP(event: string, unitId: string, lineId: number, spellId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
-            let [spell] = GetSpellInfo(spellId);
+            let spell = OvaleSpellBook.GetSpellName(spellId);
             this.StartProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_STOP");
             this.DebugTimestamp(event, unitId, spell, lineId, spellId);
             let now = GetTime();
@@ -357,7 +357,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
     }
     UNIT_SPELLCAST_CHANNEL_UPDATE(event: string, unitId: string, lineId: number, spellId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
-            let [spell] = GetSpellInfo(spellId);
+            let spell = OvaleSpellBook.GetSpellName(spellId);
             this.StartProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_UPDATE");
             this.DebugTimestamp(event, unitId, spell, lineId, spellId);
             let now = GetTime();
@@ -385,7 +385,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
     }
     UNIT_SPELLCAST_DELAYED(event: string, unitId: string, spell: string, rank: number, lineId: number, spellId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
-            let [spell] = GetSpellInfo(spellId);
+            let spell = OvaleSpellBook.GetSpellName(spellId);
             this.StartProfiling("OvaleFuture_UNIT_SPELLCAST_DELAYED");
             this.DebugTimestamp(event, unitId, spell, lineId, spellId);
             let now = GetTime();
@@ -456,7 +456,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
     }
     UNIT_SPELLCAST_START(event: string, unitId: string, lineId: number, spellId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
-            let [spell] = GetSpellInfo(spellId);
+            let spell = OvaleSpellBook.GetSpellName(spellId);
             this.StartProfiling("OvaleFuture_UNIT_SPELLCAST_START");
             this.DebugTimestamp(event, unitId, spell, lineId, spellId);
             let now = GetTime();
@@ -493,7 +493,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
     }
     UNIT_SPELLCAST_SUCCEEDED(event: string, unitId: string, lineId: number, spellId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
-            let [spell] = GetSpellInfo(spellId);
+            let spell = OvaleSpellBook.GetSpellName(spellId);
             this.StartProfiling("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED");
             this.DebugTimestamp(event, unitId, spell, lineId, spellId);
             let now = GetTime();
@@ -565,7 +565,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
     }
     UnitSpellcastEnded(event: string, unitId: string, lineId: number, spellId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
-            let [spell] = GetSpellInfo(spellId);
+            let spell = OvaleSpellBook.GetSpellName(spellId);
             this.StartProfiling("OvaleFuture_UnitSpellcastEnded");
             this.DebugTimestamp(event, unitId, spell, lineId, spellId);
             let now = GetTime();

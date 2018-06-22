@@ -4,7 +4,8 @@ import { OvaleFuture } from "./Future";
 import aceEvent from "@wowts/ace_event-3.0";
 import AceSerializer from "@wowts/ace_serializer-3.0";
 import { pairs, type, LuaObj } from "@wowts/lua";
-import { IsInGroup, SendAddonMessage, LE_PARTY_CATEGORY_INSTANCE, GetTime, UnitCastingInfo, UnitChannelInfo, GetSpellInfo } from "@wowts/wow-mock";
+import { IsInGroup, SendAddonMessage, LE_PARTY_CATEGORY_INSTANCE, GetTime, UnitCastingInfo, UnitChannelInfo } from "@wowts/wow-mock";
+import { OvaleSpellBook } from "./SpellBook";
 
 let OvaleScoreBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleScore", aceEvent, AceSerializer));
 export let OvaleScore: OvaleScoreClass;
@@ -94,7 +95,7 @@ class OvaleScoreClass extends OvaleScoreBase {
     UNIT_SPELLCAST_CHANNEL_START(event, unitId, lineId, spellId) {
         if (unitId == "player" || unitId == "pet") {
             let now = GetTime();
-            let [spell] = GetSpellInfo(spellId);
+            let spell = OvaleSpellBook.GetSpellName(spellId);
             let [spellcast] = OvaleFuture.GetSpellcast(spell, spellId, undefined, now);
             if (spellcast) {
                 let [name] = UnitChannelInfo(unitId);
@@ -108,7 +109,7 @@ class OvaleScoreClass extends OvaleScoreBase {
     UNIT_SPELLCAST_START(event, unitId, lineId, spellId) {
         if (unitId == "player" || unitId == "pet") {
             let now = GetTime();
-            let [spell] = GetSpellInfo(spellId);
+            let spell = OvaleSpellBook.GetSpellName(spellId);
             let [spellcast] = OvaleFuture.GetSpellcast(spell, spellId, lineId, now);
             if (spellcast) {
                 let [name, , , , , , castId] = UnitCastingInfo(unitId);
@@ -122,7 +123,7 @@ class OvaleScoreClass extends OvaleScoreBase {
     UNIT_SPELLCAST_SUCCEEDED(event, unitId, lineId, spellId) {
         if (unitId == "player" || unitId == "pet") {
             let now = GetTime();
-            let [spell] = GetSpellInfo(spellId);
+            let spell = OvaleSpellBook.GetSpellName(spellId);
             let [spellcast] = OvaleFuture.GetSpellcast(spell, spellId, lineId, now);
             if (spellcast) {
                 if (spellcast.success || (!spellcast.start) || (!spellcast.stop) || spellcast.channel) {
