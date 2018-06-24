@@ -82,7 +82,6 @@ local OvaleDemonHunterSoulFragmentsClass = __class(OvaleDemonHunterSoulFragments
                 timestamp = now,
                 fragments = count
             }
-            self:Debug("Setting current soul fragment count to '%d' (at: %s)", entry.fragments, entry.timestamp)
             self.last_soul_fragment_count = entry
             insert(self.soul_fragments, entry)
         end
@@ -112,5 +111,6 @@ local DemonHunterSoulFragmentsState = __class(nil, {
     ResetState = function(self)
     end,
 })
+__exports.OvaleDemonHunterSoulFragments = OvaleDemonHunterSoulFragmentsClass()
 __exports.demonHunterSoulFragmentsState = DemonHunterSoulFragmentsState()
 OvaleState:RegisterState(__exports.demonHunterSoulFragmentsState)

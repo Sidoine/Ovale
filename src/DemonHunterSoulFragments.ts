@@ -93,7 +93,6 @@ class OvaleDemonHunterSoulFragmentsClass extends OvaleDemonHunterSoulFragmentsBa
                 timestamp: now,
                 fragments: count
             }
-            this.Debug("Setting current soul fragment count to '%d' (at: %s)", entry.fragments, entry.timestamp);
             this.last_soul_fragment_count = entry;
             insert(this.soul_fragments, entry);
         }
@@ -124,5 +123,6 @@ class DemonHunterSoulFragmentsState implements StateModule {
     }
 }
 
+OvaleDemonHunterSoulFragments = new OvaleDemonHunterSoulFragmentsClass();
 export const demonHunterSoulFragmentsState = new DemonHunterSoulFragmentsState();
 OvaleState.RegisterState(demonHunterSoulFragmentsState);
