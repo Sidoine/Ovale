@@ -411,10 +411,11 @@ export class OvaleFutureClass extends OvaleFutureBase {
             this.StopProfiling("OvaleFuture_UNIT_SPELLCAST_DELAYED");
         }
     }
-    UNIT_SPELLCAST_SENT(event: string, unitId: string, spell: string, rank: number, targetName: string, lineId: number) {
-        if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK_NAME[spell]) {
+    UNIT_SPELLCAST_SENT(event: string, unitId: string, targetName: string, lineId: number, spellId: number) {
+        if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK_NAME[spellId]) {
+            let spell = OvaleSpellBook.GetSpellName(spellId);
             this.StartProfiling("OvaleFuture_UNIT_SPELLCAST_SENT");
-            this.DebugTimestamp(event, unitId, spell, rank, targetName, lineId);
+            this.DebugTimestamp(event, unitId, spell, targetName, lineId);
             let now = GetTime();
             let caster = OvaleGUID.UnitGUID(unitId);
             let spellcast = self_pool.Get();

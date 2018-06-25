@@ -428,10 +428,11 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
             self:StopProfiling("OvaleFuture_UNIT_SPELLCAST_DELAYED")
         end
     end,
-    UNIT_SPELLCAST_SENT = function(self, event, unitId, spell, rank, targetName, lineId)
-        if (unitId == "player" or unitId == "pet") and  not WHITE_ATTACK_NAME[spell] then
+    UNIT_SPELLCAST_SENT = function(self, event, unitId, targetName, lineId, spellId)
+        if (unitId == "player" or unitId == "pet") and  not WHITE_ATTACK_NAME[spellId] then
+            local spell = OvaleSpellBook:GetSpellName(spellId)
             self:StartProfiling("OvaleFuture_UNIT_SPELLCAST_SENT")
-            self:DebugTimestamp(event, unitId, spell, rank, targetName, lineId)
+            self:DebugTimestamp(event, unitId, spell, targetName, lineId)
             local now = GetTime()
             local caster = OvaleGUID:UnitGUID(unitId)
             local spellcast = self_pool:Get()
