@@ -400,7 +400,7 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
             self:StopProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_UPDATE")
         end
     end,
-    UNIT_SPELLCAST_DELAYED = function(self, event, unitId, spell, rank, lineId, spellId)
+    UNIT_SPELLCAST_DELAYED = function(self, event, unitId, lineId, spellId)
         if (unitId == "player" or unitId == "pet") and  not WHITE_ATTACK[spellId] then
             local spell = OvaleSpellBook:GetSpellName(spellId)
             self:StartProfiling("OvaleFuture_UNIT_SPELLCAST_DELAYED")
