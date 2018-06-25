@@ -199,8 +199,8 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
         self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
         self:UnregisterMessage("Ovale_AuraAdded")
     end,
-    COMBAT_LOG_EVENT_UNFILTERED = function(self, event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
-        local arg12, arg13, _, _, _, _, _, _, _, _, _, _, arg24 = ...
+    COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
+        local timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, arg12, arg13, _, _, _, _, _, _, _, _, _, _, arg24 = CombatLogGetCurrentEventInfo()
         if sourceGUID == Ovale.playerGUID or OvaleGUID:IsPlayerPet(sourceGUID) then
             self:StartProfiling("OvaleFuture_COMBAT_LOG_EVENT_UNFILTERED")
             if CLEU_SPELLCAST_EVENT[cleuEvent] then
