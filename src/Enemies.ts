@@ -85,7 +85,7 @@ class OvaleEnemiesClass extends OvaleEnemiesBase {
         this.UnregisterEvent("PLAYER_REGEN_DISABLED");
     }
     COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
-        let [timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags] = CombatLogGetCurrentEventInfo();
+        let [, cleuEvent, , sourceGUID, sourceName, sourceFlags, , destGUID, destName, destFlags] = CombatLogGetCurrentEventInfo();
         if (CLEU_UNIT_REMOVED[cleuEvent]) {
             let now = GetTime();
             this.RemoveEnemy(cleuEvent, destGUID, now, true);

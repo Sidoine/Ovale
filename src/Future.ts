@@ -183,7 +183,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
         this.UnregisterMessage("Ovale_AuraAdded");
     }
     COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
-        let [timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, arg12, arg13, , , , , , , , , , , arg24] = CombatLogGetCurrentEventInfo();
+        let [, cleuEvent, , sourceGUID, sourceName, , , destGUID, destName, , , arg12, arg13, , , , , , , , , , , arg24] = CombatLogGetCurrentEventInfo();
         if (sourceGUID == Ovale.playerGUID || OvaleGUID.IsPlayerPet(sourceGUID)) {
             this.StartProfiling("OvaleFuture_COMBAT_LOG_EVENT_UNFILTERED");
             if (CLEU_SPELLCAST_EVENT[cleuEvent]) {

@@ -55,7 +55,7 @@ local OvaleDemonHunterDemonicClass = __class(OvaleDemonHunterDemonicBase, {
         end
     end,
     COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
-        local timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, arg12, arg13 = CombatLogGetCurrentEventInfo()
+        local _, cleuEvent, _, sourceGUID, _, _, _, _, _, _, _, arg12, arg13 = CombatLogGetCurrentEventInfo()
         if sourceGUID == self.playerGUID and cleuEvent == "SPELL_CAST_SUCCESS" then
             local spellId, spellName = arg12, arg13
             if HAVOC_EYE_BEAM_SPELL_ID == spellId then

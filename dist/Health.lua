@@ -62,7 +62,7 @@ local OvaleHealthClass = __class(OvaleHealthClassBase, {
         self:UnregisterMessage("Ovale_UnitChanged")
     end,
     COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
-        local timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, arg12, arg13, _, arg15, _, _, _, _, _, _, _, _, _ = CombatLogGetCurrentEventInfo()
+        local timestamp, cleuEvent, _, _, _, _, _, destGUID, _, _, _, arg12, arg13, _, arg15 = CombatLogGetCurrentEventInfo()
         self:StartProfiling("OvaleHealth_COMBAT_LOG_EVENT_UNFILTERED")
         local healthUpdate = false
         if CLEU_DAMAGE_EVENT[cleuEvent] then

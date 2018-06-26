@@ -19,7 +19,7 @@ local OvaleSpellDamageClass = __class(OvaleSpellDamageBase, {
         self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     end,
     COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
-        local timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, arg12, _, _, arg15, _, _, _, _, _, _, _, _, _ = CombatLogGetCurrentEventInfo()
+        local _, cleuEvent, _, sourceGUID, _, _, _, _, _, _, _, arg12, _, _, arg15 = CombatLogGetCurrentEventInfo()
         if sourceGUID == Ovale.playerGUID then
             self:StartProfiling("OvaleSpellDamage_COMBAT_LOG_EVENT_UNFILTERED")
             if CLEU_DAMAGE_EVENT[cleuEvent] then

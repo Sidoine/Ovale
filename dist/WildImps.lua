@@ -43,7 +43,7 @@ local OvaleWildImpsClass = __class(OvaleWildImpsBase, {
         end
     end,
     COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
-        local timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId = CombatLogGetCurrentEventInfo()
+        local _, cleuEvent, _, sourceGUID, _, _, _, destGUID, _, _, _, spellId = CombatLogGetCurrentEventInfo()
         self_serial = self_serial + 1
         Ovale:needRefresh()
         if sourceGUID ~= Ovale.playerGUID then

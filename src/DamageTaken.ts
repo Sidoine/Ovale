@@ -34,7 +34,7 @@ class OvaleDamageTakenClass extends OvaleDamageTakenBase {
         self_pool.Drain();
     }
     COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
-        let [timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, arg12, arg13, arg14, arg15, , , , , , , , , , ] = CombatLogGetCurrentEventInfo();
+        let [, cleuEvent, , , , , , destGUID, , , , arg12, arg13, arg14, arg15] = CombatLogGetCurrentEventInfo();
         if (destGUID == Ovale.playerGUID && sub(cleuEvent, -7) == "_DAMAGE") {
             this.StartProfiling("OvaleDamageTaken_COMBAT_LOG_EVENT_UNFILTERED");
             let now = GetTime();
