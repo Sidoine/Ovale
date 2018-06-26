@@ -16,8 +16,8 @@ class OvaleSpellDamageClass extends OvaleSpellDamageBase {
     OnDisable() {
         this.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
     }
-    COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...__args) {
-        let [arg12, , , arg15, , , , , , , , , , ] = __args;
+    COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
+        let [timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, arg12, , , arg15, , , , , , , , , , ] = CombatLogGetCurrentEventInfo();
         if (sourceGUID == Ovale.playerGUID) {
             this.StartProfiling("OvaleSpellDamage_COMBAT_LOG_EVENT_UNFILTERED");
             if (CLEU_DAMAGE_EVENT[cleuEvent]) {

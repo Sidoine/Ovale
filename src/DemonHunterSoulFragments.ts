@@ -58,7 +58,8 @@ class OvaleDemonHunterSoulFragmentsClass extends OvaleDemonHunterSoulFragmentsBa
         this.SetCurrentSoulFragments();
     }
 
-    COMBAT_LOG_EVENT_UNFILTERED(event, _2, subtype, _4, sourceGUID, _6, _7, _8, _9, _10, _11, _12, spellID, spellName) {
+    COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
+        let [_2, subtype, _4, sourceGUID, _6, _7, _8, _9, _10, _11, _12, spellID, spellName] = CombatLogGetCurrentEventInfo();
         let me = Ovale.playerGUID;
         if (sourceGUID == me) {
             //let current_sould_fragment_count = this.last_soul_fragment_count;

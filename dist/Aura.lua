@@ -423,8 +423,8 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         end
         self_pool:Drain()
     end,
-    COMBAT_LOG_EVENT_UNFILTERED = function(self, event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
-        local arg12, arg13, arg14, arg15, arg16, _, _, _, _, _, _, _ = ...
+    COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
+        local timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, arg12, arg13, arg14, arg15, arg16, _, _, _, _, _, _, _ = CombatLogGetCurrentEventInfo()
         local mine = (sourceGUID == self_playerGUID or OvaleGUID:IsPlayerPet(sourceGUID))
         if mine and cleuEvent == "SPELL_MISSED" then
             local unitId = OvaleGUID:GUIDUnit(destGUID)

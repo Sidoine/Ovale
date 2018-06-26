@@ -49,7 +49,8 @@ local OvaleDemonHunterSoulFragmentsClass = __class(OvaleDemonHunterSoulFragments
         self.last_checked = nil
         self:SetCurrentSoulFragments()
     end,
-    COMBAT_LOG_EVENT_UNFILTERED = function(self, event, _2, subtype, _4, sourceGUID, _6, _7, _8, _9, _10, _11, _12, spellID, spellName)
+    COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
+        local _2, subtype, _4, sourceGUID, _6, _7, _8, _9, _10, _11, _12, spellID, spellName = CombatLogGetCurrentEventInfo()
         local me = Ovale.playerGUID
         if sourceGUID == me then
             if subtype == "SPELL_HEAL" and spellID == SOUL_FRAGMENTS_SPELL_HEAL_ID then

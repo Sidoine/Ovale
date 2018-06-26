@@ -98,7 +98,8 @@ local OvaleEnemiesClass = __class(OvaleEnemiesBase, {
         self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
         self:UnregisterEvent("PLAYER_REGEN_DISABLED")
     end,
-    COMBAT_LOG_EVENT_UNFILTERED = function(self, event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
+    COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
+        local timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = CombatLogGetCurrentEventInfo()
         if CLEU_UNIT_REMOVED[cleuEvent] then
             local now = GetTime()
             self:RemoveEnemy(cleuEvent, destGUID, now, true)
