@@ -5470,7 +5470,7 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
                 output[lualength(output) + 1] = "# Overrides.";
                 output[lualength(output) + 1] = overrideCode;
             }
-            if (annotation.supportingDefineCount + annotation.supportingControlCount > 0) {
+            if (annotation.supportingControlCount > 0) {
                 output[lualength(output) + 1] = "";
             }
         }

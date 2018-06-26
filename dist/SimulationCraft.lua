@@ -5332,7 +5332,7 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
                 output[#output + 1] = "# Overrides."
                 output[#output + 1] = overrideCode
             end
-            if annotation.supportingDefineCount + annotation.supportingControlCount > 0 then
+            if annotation.supportingControlCount > 0 then
                 output[#output + 1] = ""
             end
         end
