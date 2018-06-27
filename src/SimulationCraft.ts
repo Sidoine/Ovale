@@ -1356,6 +1356,10 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("shield_barrier", "shield_barrier_tank", "WARRIOR", "protection");
     AddDisambiguation("exhaustion_buff", "burst_haste_debuff");
 
+    //Druid
+    AddDisambiguation("feral_affinity_talent", "feral_affinity_talent_balance", "DRUID", "balance");
+    AddDisambiguation("guardian_affinity_talent", "guardian_affinity_talent_restoration", "DRUID", "restoration");
+
     //Hunter
     AddDisambiguation("a_murder_of_crows_talent", "a_murder_of_crows_talent_marksman", "HUNTER", "marksman");
 
