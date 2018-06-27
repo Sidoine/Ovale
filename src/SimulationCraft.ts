@@ -1355,6 +1355,14 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("shield_barrier", "shield_barrier_melee", "WARRIOR", "fury");
     AddDisambiguation("shield_barrier", "shield_barrier_tank", "WARRIOR", "protection");
     AddDisambiguation("exhaustion_buff", "burst_haste_debuff");
+
+    // Warrior Talents
+    AddDisambiguation("anger_management_talent", "anger_management_talent_fury", "WARRIOR", "fury");
+    AddDisambiguation("bounding_stride_talent", "bounding_stride_talent_protection", "WARRIOR", "protection");
+    AddDisambiguation("dragon_roar_talent", "dragon_roar_talent_protection", "WARRIOR", "protection");
+    AddDisambiguation("massacre_talent", "massacre_talent_arms", "WARRIOR", "arms");
+    AddDisambiguation("storm_bolt_talent", "storm_bolt_talent_protection", "WARRIOR", "protection");
+    AddDisambiguation("sudden_death_talent", "sudden_death_talent_fury", "WARRIOR", "fury");
 }
 const IsTotem = function(name: string) {
     if (sub(name, 1, 13) == "wild_mushroom") {
