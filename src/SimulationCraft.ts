@@ -1356,6 +1356,9 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("shield_barrier", "shield_barrier_tank", "WARRIOR", "protection");
     AddDisambiguation("exhaustion_buff", "burst_haste_debuff");
 
+    //Demon Hunter
+    AddDisambiguation("felblade_talent", "felblade_talent_havoc", "DEMONHUNTER", "havoc");
+
     //Druid
     AddDisambiguation("feral_affinity_talent", "feral_affinity_talent_balance", "DRUID", "balance");
     AddDisambiguation("guardian_affinity_talent", "guardian_affinity_talent_restoration", "DRUID", "restoration");
@@ -1370,18 +1373,18 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("judgment_of_light_talent", "judgment_of_light_talent_holy", "PALADIN", "holy");
     AddDisambiguation("unbreakable_spirit_talent", "unbreakable_spirit_talent_holy", "PALADIN", "holy");
 
-    // Priest Talents
+    //Priest
     AddDisambiguation("mindbender_talent", "mindbender_talent_discipline", "PRIEST", "discipline");
     AddDisambiguation("twist_of_fate_talent", "twist_of_fate_talent_discipline", "PRIEST", "discipline");
     
-    // Shaman Talents
+    //Shaman
     AddDisambiguation("earth_shield_talent", "earth_shield_talent_restoration", "SHAMAN", "restoration");
     AddDisambiguation("echo_of_the_elements_talent", "echo_of_the_elements_talent_restoration", "SHAMAN", "restoration");
 
-    // Warlock Talents
+    //Warlock
     AddDisambiguation("soul_conduit_talent", "soul_conduit_talent_demonology", "WARLOCK", "demonology");
 
-    // Warrior Talents
+    //Warrior
     AddDisambiguation("anger_management_talent", "anger_management_talent_fury", "WARRIOR", "fury");
     AddDisambiguation("bounding_stride_talent", "bounding_stride_talent_protection", "WARRIOR", "protection");
     AddDisambiguation("dragon_roar_talent", "dragon_roar_talent_protection", "WARRIOR", "protection");
