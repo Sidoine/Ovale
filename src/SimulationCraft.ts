@@ -1356,6 +1356,9 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("shield_barrier", "shield_barrier_tank", "WARRIOR", "protection");
     AddDisambiguation("exhaustion_buff", "burst_haste_debuff");
 
+    //Hunter
+    AddDisambiguation("a_murder_of_crows_talent", "a_murder_of_crows_talent_marksman", "HUNTER", "marksman");
+
     //Monk
     AddDisambiguation("healing_elixir_talent", "healing_elixir_talent_mistweaver", "MONK", "mistweaver");
 
