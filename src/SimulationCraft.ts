@@ -1356,6 +1356,10 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("shield_barrier", "shield_barrier_tank", "WARRIOR", "protection");
     AddDisambiguation("exhaustion_buff", "burst_haste_debuff");
 
+    //Paladin
+    AddDisambiguation("judgment_of_light_talent", "judgment_of_light_talent_holy", "PALADIN", "holy");
+    AddDisambiguation("unbreakable_spirit_talent", "unbreakable_spirit_talent_holy", "PALADIN", "holy");
+
     // Priest Talents
     AddDisambiguation("mindbender_talent", "mindbender_talent_discipline", "PRIEST", "discipline");
     AddDisambiguation("twist_of_fate_talent", "twist_of_fate_talent_discipline", "PRIEST", "discipline");
