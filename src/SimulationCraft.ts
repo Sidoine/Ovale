@@ -1355,6 +1355,10 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("shield_barrier", "shield_barrier_melee", "WARRIOR", "fury");
     AddDisambiguation("shield_barrier", "shield_barrier_tank", "WARRIOR", "protection");
     AddDisambiguation("exhaustion_buff", "burst_haste_debuff");
+
+    // Priest Talents
+    AddDisambiguation("mindbender_talent", "mindbender_talent_discipline", "PRIEST", "discipline");
+    AddDisambiguation("twist_of_fate_talent", "twist_of_fate_talent_discipline", "PRIEST", "discipline");
     
     // Shaman Talents
     AddDisambiguation("earth_shield_talent", "earth_shield_talent_restoration", "SHAMAN", "restoration");
