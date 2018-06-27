@@ -1355,6 +1355,9 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("shield_barrier", "shield_barrier_melee", "WARRIOR", "fury");
     AddDisambiguation("shield_barrier", "shield_barrier_tank", "WARRIOR", "protection");
     AddDisambiguation("exhaustion_buff", "burst_haste_debuff");
+    
+    // Warlock Talents
+    AddDisambiguation("soul_conduit_talent", "soul_conduit_talent_demonology", "WARLOCK", "demonology");
 
     // Warrior Talents
     AddDisambiguation("anger_management_talent", "anger_management_talent_fury", "WARRIOR", "fury");
