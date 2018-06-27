@@ -1356,6 +1356,10 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("shield_barrier", "shield_barrier_tank", "WARRIOR", "protection");
     AddDisambiguation("exhaustion_buff", "burst_haste_debuff");
     
+    // Shaman Talents
+    AddDisambiguation("earth_shield_talent", "earth_shield_talent_restoration", "SHAMAN", "restoration");
+    AddDisambiguation("echo_of_the_elements_talent", "echo_of_the_elements_talent_restoration", "SHAMAN", "restoration");
+
     // Warlock Talents
     AddDisambiguation("soul_conduit_talent", "soul_conduit_talent_demonology", "WARLOCK", "demonology");
 
