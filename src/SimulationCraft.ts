@@ -1356,6 +1356,11 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("shield_barrier", "shield_barrier_tank", "WARRIOR", "protection");
     AddDisambiguation("exhaustion_buff", "burst_haste_debuff");
 
+    //Death Knight
+    AddDisambiguation("deaths_reach_talent", "deaths_reach_talent_unholy", "DEATHKNIGHT", "unholy");
+    AddDisambiguation("grip_of_the_dead_talent", "grip_of_the_dead_talent_unholy", "DEATHKNIGHT", "unholy");
+    AddDisambiguation("wraith_walk_talent", "wraith_walk_talent_blood", "DEATHKNIGHT", "blood");
+
     //Demon Hunter
     AddDisambiguation("felblade_talent", "felblade_talent_havoc", "DEMONHUNTER", "havoc");
 
