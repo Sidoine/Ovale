@@ -1344,10 +1344,7 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("unstable_affliction_5_debuff", "unstable_affliction_debuff", "WARLOCK", "affliction");
     AddDisambiguation("active_havoc_buff", "havoc_buff", "WARLOCK", "destruction");
     AddDisambiguation("arcane_torrent", "arcane_torrent_rage", "WARRIOR");
-    AddDisambiguation("bladestorm", "bladestorm_arms", "WARRIOR", "arms");
-    AddDisambiguation("bladestorm", "bladestorm_fury", "WARRIOR", "fury");
     AddDisambiguation("blood_fury", "blood_fury_ap", "WARRIOR");
-    AddDisambiguation("execute", "execute_arms", "WARRIOR", "arms");
     AddDisambiguation("legendary_ring", "legendary_ring_bonus_armor", "WARRIOR", "protection");
     AddDisambiguation("legendary_ring", "legendary_ring_strength", "WARRIOR", "arms", "Item");
     AddDisambiguation("legendary_ring", "legendary_ring_strength", "WARRIOR", "fury", "Item");
@@ -1396,6 +1393,10 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("massacre_talent", "massacre_talent_arms", "WARRIOR", "arms");
     AddDisambiguation("storm_bolt_talent", "storm_bolt_talent_protection", "WARRIOR", "protection");
     AddDisambiguation("sudden_death_talent", "sudden_death_talent_fury", "WARRIOR", "fury");
+    AddDisambiguation("bladestorm", "bladestorm_arms", "WARRIOR", "arms");
+    AddDisambiguation("bladestorm", "bladestorm_fury", "WARRIOR", "fury");
+    AddDisambiguation("execute", "execute_arms", "WARRIOR", "arms");
+    AddDisambiguation("whirlwind", "whirlwind_arms", "WARRIOR", "arms");
 }
 const IsTotem = function(name: string) {
     if (sub(name, 1, 13) == "wild_mushroom") {
