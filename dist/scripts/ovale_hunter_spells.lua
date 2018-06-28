@@ -103,6 +103,8 @@ Define(heart_of_the_phoenix_debuff 55711)
 	SpellInfo(heart_of_the_phoenix_debuff duration=480)
 Define(hunters_mark_debuff 185365)
 	SpellInfo(hunters_mark_debuff duration=12)
+Define(intimidation 19577)
+	SpellInfo(intimidation cd=60)
 Define(kill_command 34026)
 	SpellInfo(kill_command cd=7.5 cd_haste=ranged focus=30)
 	# Unsure of right syntax for following line.  
