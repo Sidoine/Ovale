@@ -373,7 +373,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
         self_pool.Drain();
     }
     COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
-        let [, cleuEvent, , sourceGUID, , , , destGUID, , , , arg12, arg13, arg14, arg15, arg16] = CombatLogGetCurrentEventInfo();
+        let [, cleuEvent, , sourceGUID, , , , destGUID, , , , spellId, spellName, , auraType, amount] = CombatLogGetCurrentEventInfo();
         let mine = (sourceGUID == self_playerGUID || OvaleGUID.IsPlayerPet(sourceGUID));
         if (mine && cleuEvent == "SPELL_MISSED") {
             let [unitId] = OvaleGUID.GUIDUnit(destGUID);
@@ -390,13 +390,11 @@ export class OvaleAuraClass extends OvaleAuraBase {
                     this.ScanAuras(unitId, destGUID);
                 }
             } else if (mine) {
-                let [spellId, spellName,] = [arg12, arg13, arg14];
                 this.DebugTimestamp("%s: %s (%d) on %s", cleuEvent, spellName, spellId, destGUID);
                 let now = GetTime();
                 if (cleuEvent == "SPELL_AURA_REMOVED" || cleuEvent == "SPELL_AURA_BROKEN" || cleuEvent == "SPELL_AURA_BROKEN_SPELL") {
                     this.LostAuraOnGUID(destGUID, now, spellId, sourceGUID);
                 } else {
-                    let [auraType, amount] = [arg15, arg16];
                     let filter = (auraType == "BUFF") && "HELPFUL" || "HARMFUL";
                     let si = OvaleData.spellInfo[spellId];
                     let aura = GetAuraOnGUID(this.current.aura, destGUID, spellId, filter, true);
@@ -419,7 +417,6 @@ export class OvaleAuraClass extends OvaleAuraBase {
                 }
             }
         } else if (mine && CLEU_TICK_EVENTS[cleuEvent]) {
-            let [spellId, ,] = [arg12, arg13, arg14];
             this.DebugTimestamp("%s: %s", cleuEvent, destGUID);
             let aura = GetAura(this.current.aura, destGUID, spellId, self_playerGUID);
             let now = GetTime();
@@ -451,8 +448,10 @@ export class OvaleAuraClass extends OvaleAuraBase {
         self_pool.Drain();
     }
     UNIT_AURA(event: string, unitId: string) {
-        this.Debug("%s: %s", event, unitId);
-        this.ScanAuras(unitId);
+        if(unitId == 'player' || unitId == 'target' || unitId == 'pet'){
+            this.Debug("%s: %s", event, unitId);
+            this.ScanAuras(unitId);
+        }
     }
     Ovale_UnitChanged(event: string, unitId: string, guid: string) {
         if ((unitId == "pet" || unitId == "target") && guid) {
@@ -651,13 +650,13 @@ export class OvaleAuraClass extends OvaleAuraBase {
             this.Debug("    Advancing age of auras for %s (%s) to %d.", guid, unitId, serial);
             this.current.serial[guid] = serial;
             let i = 1;
-            let filter = "HELPFUL";
+            let filter = "HELPFUL|PLAYER";
             let now = GetTime();
             while (true) {
                 let [name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, , spellId, , , , value1, value2, value3] = UnitAura(unitId, i, filter);
                 if (!name) {
-                    if (filter == "HELPFUL") {
-                        filter = "HARMFUL";
+                    if (filter == "HELPFUL|PLAYER") {
+                        filter = "HARMFUL|PLAYER";
                         i = 1;
                     } else {
                         break;

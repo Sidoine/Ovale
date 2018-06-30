@@ -424,7 +424,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         self_pool:Drain()
     end,
     COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
-        local _, cleuEvent, _, sourceGUID, _, _, _, destGUID, _, _, _, arg12, arg13, arg14, arg15, arg16 = CombatLogGetCurrentEventInfo()
+        local _, cleuEvent, _, sourceGUID, _, _, _, destGUID, _, _, _, spellId, spellName, _, auraType, amount = CombatLogGetCurrentEventInfo()
         local mine = (sourceGUID == self_playerGUID or OvaleGUID:IsPlayerPet(sourceGUID))
         if mine and cleuEvent == "SPELL_MISSED" then
             local unitId = OvaleGUID:GUIDUnit(destGUID)
@@ -441,13 +441,11 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                     self:ScanAuras(unitId, destGUID)
                 end
             elseif mine then
-                local spellId, spellName = arg12, arg13, arg14
                 self:DebugTimestamp("%s: %s (%d) on %s", cleuEvent, spellName, spellId, destGUID)
                 local now = GetTime()
                 if cleuEvent == "SPELL_AURA_REMOVED" or cleuEvent == "SPELL_AURA_BROKEN" or cleuEvent == "SPELL_AURA_BROKEN_SPELL" then
                     self:LostAuraOnGUID(destGUID, now, spellId, sourceGUID)
                 else
-                    local auraType, amount = arg15, arg16
                     local filter = (auraType == "BUFF") and "HELPFUL" or "HARMFUL"
                     local si = OvaleData.spellInfo[spellId]
                     local aura = GetAuraOnGUID(self.current.aura, destGUID, spellId, filter, true)
@@ -470,7 +468,6 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                 end
             end
         elseif mine and CLEU_TICK_EVENTS[cleuEvent] then
-            local spellId, _ = arg12, arg13, arg14
             self:DebugTimestamp("%s: %s", cleuEvent, destGUID)
             local aura = __exports.GetAura(self.current.aura, destGUID, spellId, self_playerGUID)
             local now = GetTime()
@@ -502,8 +499,10 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         self_pool:Drain()
     end,
     UNIT_AURA = function(self, event, unitId)
-        self:Debug("%s: %s", event, unitId)
-        self:ScanAuras(unitId)
+        if unitId == "player" or unitId == "target" or unitId == "pet" then
+            self:Debug("%s: %s", event, unitId)
+            self:ScanAuras(unitId)
+        end
     end,
     Ovale_UnitChanged = function(self, event, unitId, guid)
         if (unitId == "pet" or unitId == "target") and guid then
@@ -701,13 +700,13 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
             self:Debug("    Advancing age of auras for %s (%s) to %d.", guid, unitId, serial)
             self.current.serial[guid] = serial
             local i = 1
-            local filter = "HELPFUL"
+            local filter = "HELPFUL|PLAYER"
             local now = GetTime()
             while true do
                 local name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, _, spellId, _, _, _, value1, value2, value3 = UnitAura(unitId, i, filter)
                 if  not name then
-                    if filter == "HELPFUL" then
-                        filter = "HARMFUL"
+                    if filter == "HELPFUL|PLAYER" then
+                        filter = "HARMFUL|PLAYER"
                         i = 1
                     else
                         break
