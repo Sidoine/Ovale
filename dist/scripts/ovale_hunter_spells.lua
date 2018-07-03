@@ -231,6 +231,7 @@ Define(parsels_tongue 151805)
 Define(parsels_tongue_buff 248085)
 Define(buff_sephuzs_secret 208051)
 Define(roar_of_the_seven_lions 137080)
+Define(zevrims_hunger 137055)
 
 # Item set
 Define(t20_2p_critical_aimed_damage_buff 242242) # TODO

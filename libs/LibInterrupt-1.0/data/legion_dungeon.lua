@@ -59,6 +59,10 @@ InterruptTable["Vigilant Duskwatch"] = {
     ["Hinder"] = true
 }
 
+InterruptTable["Watchful Inquisitor"] = {
+    ["Eye Storm"] = true
+}
+
 -- Darkheart Thicket
 InterruptTable["Dreadsoul Ruiner"] = {
     ["Star Shower"] = true
@@ -223,6 +227,10 @@ InterruptTable["Rockbound Trapper"] = {
 
 InterruptTable["Blightshard Shaper"] = {
     ["Stone Bolt"] = true
+}
+
+InterruptTable["Understone Drummers"] = {
+    ["War Drums"] = true
 }
 
 -- The Arcway
