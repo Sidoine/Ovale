@@ -583,7 +583,7 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
     UnitSpellcastEnded = function(self, event, unitId, lineId, spellId)
         if (unitId == "player" or unitId == "pet") and  not WHITE_ATTACK[spellId] then
             if event == "UNIT_SPELLCAST_INTERRUPTED" then
-                self.next.lastGCDSpellId = false
+                self.next.lastGCDSpellId = nil
             end
             local spell = OvaleSpellBook:GetSpellName(spellId)
             self:StartProfiling("OvaleFuture_UnitSpellcastEnded")

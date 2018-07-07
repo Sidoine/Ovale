@@ -566,7 +566,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
     UnitSpellcastEnded(event: string, unitId: string, lineId: number, spellId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
             if(event == 'UNIT_SPELLCAST_INTERRUPTED'){
-                this.next.lastGCDSpellId = false
+                this.next.lastGCDSpellId = undefined;
             }
             let spell = OvaleSpellBook.GetSpellName(spellId);
             this.StartProfiling("OvaleFuture_UnitSpellcastEnded");
