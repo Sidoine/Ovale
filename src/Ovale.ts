@@ -78,6 +78,9 @@ export interface OvaleDb {
             predictif: boolean,
             secondIconScale: number,
             taggedEnemies: boolean,
+            playerOnlyBuffs: boolean,
+            playerOnlyDebuffs: boolean,
+            laptopMode: boolean,
             auraLag: number,
             moving: boolean,
             spellFlash: {

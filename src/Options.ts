@@ -60,6 +60,9 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                 predictif: false,
                 secondIconScale: 1,
                 taggedEnemies: false,
+                playerOnlyBuffs: false,
+                playerOnlyDebuffs: false,
+                laptopMode: false,
                 auraLag: 400,
                 moving: false,
                 spellFlash: {
