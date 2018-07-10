@@ -42,12 +42,12 @@ let UNKNOWN_GUID = "0";
                     width: "full",
                     get: function (info: LuaArray<string>) {
                         wipe(output);
-                        let helpful = OvaleAura.DebugUnitAuras("player", "HELPFUL", undefined);
+                        let helpful = OvaleAura.DebugUnitAuras("player", "HELPFUL|PLAYER", undefined);
                         if (helpful) {
                             output[lualength(output) + 1] = "== BUFFS ==";
                             output[lualength(output) + 1] = helpful;
                         }
-                        let harmful = OvaleAura.DebugUnitAuras("player", "HARMFUL", undefined);
+                        let harmful = OvaleAura.DebugUnitAuras("player", "HARMFUL|PLAYER", undefined);
                         if (harmful) {
                             output[lualength(output) + 1] = "== DEBUFFS ==";
                             output[lualength(output) + 1] = harmful;
@@ -68,12 +68,12 @@ let UNKNOWN_GUID = "0";
                     width: "full",
                     get: function (info: LuaArray<string>) {
                         wipe(output);
-                        let helpful = OvaleAura.DebugUnitAuras("target", "HELPFUL", undefined);
+                        let helpful = OvaleAura.DebugUnitAuras("target", "HELPFUL|PLAYER", undefined);
                         if (helpful) {
                             output[lualength(output) + 1] = "== BUFFS ==";
                             output[lualength(output) + 1] = helpful;
                         }
-                        let harmful = OvaleAura.DebugUnitAuras("target", "HARMFUL", undefined);
+                        let harmful = OvaleAura.DebugUnitAuras("target", "HARMFUL|PLAYER", undefined);
                         if (harmful) {
                             output[lualength(output) + 1] = "== DEBUFFS ==";
                             output[lualength(output) + 1] = harmful;

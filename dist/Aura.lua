@@ -66,12 +66,12 @@ do
                     width = "full",
                     get = function(info)
                         wipe(output)
-                        local helpful = __exports.OvaleAura:DebugUnitAuras("player", "HELPFUL", nil)
+                        local helpful = __exports.OvaleAura:DebugUnitAuras("player", "HELPFUL|PLAYER", nil)
                         if helpful then
                             output[#output + 1] = "== BUFFS =="
                             output[#output + 1] = helpful
                         end
-                        local harmful = __exports.OvaleAura:DebugUnitAuras("player", "HARMFUL", nil)
+                        local harmful = __exports.OvaleAura:DebugUnitAuras("player", "HARMFUL|PLAYER", nil)
                         if harmful then
                             output[#output + 1] = "== DEBUFFS =="
                             output[#output + 1] = harmful
@@ -93,12 +93,12 @@ do
                     width = "full",
                     get = function(info)
                         wipe(output)
-                        local helpful = __exports.OvaleAura:DebugUnitAuras("target", "HELPFUL", nil)
+                        local helpful = __exports.OvaleAura:DebugUnitAuras("target", "HELPFUL|PLAYER", nil)
                         if helpful then
                             output[#output + 1] = "== BUFFS =="
                             output[#output + 1] = helpful
                         end
-                        local harmful = __exports.OvaleAura:DebugUnitAuras("target", "HARMFUL", nil)
+                        local harmful = __exports.OvaleAura:DebugUnitAuras("target", "HARMFUL|PLAYER", nil)
                         if harmful then
                             output[#output + 1] = "== DEBUFFS =="
                             output[#output + 1] = harmful
