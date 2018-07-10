@@ -66,12 +66,14 @@ do
                     width = "full",
                     get = function(info)
                         wipe(output)
-                        local helpful = __exports.OvaleAura:DebugUnitAuras("player", "HELPFUL|PLAYER", nil)
+                        local harmfulFilter = (Ovale.db.profile.apparence.onlyPlayerDebuffs or Ovale.db.profile.apparence.laptopMode) and "HARMFUL|PLAYER" or "HARMFUL"
+                        local helpfulFilter = (Ovale.db.profile.apparence.onlyPlayerBuffs or Ovale.db.profile.apparence.laptopMode) and "HELPFUL|PLAYER" or "HELPFUL"
+                        local helpful = __exports.OvaleAura:DebugUnitAuras("player", helpfulFilter, nil)
                         if helpful then
                             output[#output + 1] = "== BUFFS =="
                             output[#output + 1] = helpful
                         end
-                        local harmful = __exports.OvaleAura:DebugUnitAuras("player", "HARMFUL|PLAYER", nil)
+                        local harmful = __exports.OvaleAura:DebugUnitAuras("player", harmfulFilter, nil)
                         if harmful then
                             output[#output + 1] = "== DEBUFFS =="
                             output[#output + 1] = harmful
@@ -93,12 +95,14 @@ do
                     width = "full",
                     get = function(info)
                         wipe(output)
-                        local helpful = __exports.OvaleAura:DebugUnitAuras("target", "HELPFUL|PLAYER", nil)
+                        local harmfulFilter = (Ovale.db.profile.apparence.onlyPlayerDebuffs or Ovale.db.profile.apparence.laptopMode) and "HARMFUL|PLAYER" or "HARMFUL"
+                        local helpfulFilter = (Ovale.db.profile.apparence.onlyPlayerBuffs or Ovale.db.profile.apparence.laptopMode) and "HELPFUL|PLAYER" or "HELPFUL"
+                        local helpful = __exports.OvaleAura:DebugUnitAuras("target", helpfulFilter, nil)
                         if helpful then
                             output[#output + 1] = "== BUFFS =="
                             output[#output + 1] = helpful
                         end
-                        local harmful = __exports.OvaleAura:DebugUnitAuras("target", "HARMFUL|PLAYER", nil)
+                        local harmful = __exports.OvaleAura:DebugUnitAuras("target", harmfulFilter, nil)
                         if harmful then
                             output[#output + 1] = "== DEBUFFS =="
                             output[#output + 1] = harmful
@@ -499,8 +503,9 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         self_pool:Drain()
     end,
     UNIT_AURA = function(self, event, unitId)
-        if unitId == "player" or unitId == "target" or unitId == "pet" then
-            self:Debug("%s: %s", event, unitId)
+        if  not Ovale.db.profile.apparence.laptopMode then
+            self:ScanAuras(unitId)
+        elseif unitId == "player" or unitId == "target" or unitId == "pet" or unitId == "focus" then
             self:ScanAuras(unitId)
         end
     end,
@@ -694,19 +699,21 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         self:StartProfiling("OvaleAura_ScanAuras")
         guid = guid or OvaleGUID:UnitGUID(unitId)
         if guid then
+            local harmfulFilter = (Ovale.db.profile.apparence.onlyPlayerDebuffs or Ovale.db.profile.apparence.laptopMode) and "HARMFUL|PLAYER" or "HARMFUL"
+            local helpfulFilter = (Ovale.db.profile.apparence.onlyPlayerBuffs or Ovale.db.profile.apparence.laptopMode) and "HELPFUL|PLAYER" or "HELPFUL"
             self:DebugTimestamp("Scanning auras on %s (%s)", guid, unitId)
             local serial = self.current.serial[guid] or 0
             serial = serial + 1
             self:Debug("    Advancing age of auras for %s (%s) to %d.", guid, unitId, serial)
             self.current.serial[guid] = serial
             local i = 1
-            local filter = "HELPFUL|PLAYER"
+            local filter = helpfulFilter
             local now = GetTime()
             while true do
                 local name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, _, spellId, _, _, _, value1, value2, value3 = UnitAura(unitId, i, filter)
                 if  not name then
-                    if filter == "HELPFUL|PLAYER" then
-                        filter = "HARMFUL|PLAYER"
+                    if filter == helpfulFilter then
+                        filter = harmfulFilter
                         i = 1
                     else
                         break

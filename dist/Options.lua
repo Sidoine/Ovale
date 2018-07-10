@@ -433,6 +433,32 @@ local OvaleOptionsClass = __class(OvaleOptionsBase, {
                                     min = 100,
                                     max = 700,
                                     step = 10
+                                },
+                                onlyPlayerBuffs = {
+                                    order = 30,
+                                    type = "toggle",
+                                    name = L["Player only buffs"],
+                                    desc = L["Scans only for buffs applied by Player on Unit"],
+                                    disabled = function()
+                                        return Ovale.db.profile.apparence.laptopMode
+                                    end
+
+                                },
+                                onlyPlayerDebuffs = {
+                                    order = 40,
+                                    type = "toggle",
+                                    name = L["Player only debuffs"],
+                                    desc = L["Scans only for debuffs applied by Player on Unit"],
+                                    disabled = function()
+                                        return Ovale.db.profile.apparence.laptopMode
+                                    end
+
+                                },
+                                laptopMode = {
+                                    order = 50,
+                                    type = "toggle",
+                                    name = L["Laptop Mode"],
+                                    desc = L["Reduces aura scans to player, target, pet, focus units and force player only filter"]
                                 }
                             }
                         }
