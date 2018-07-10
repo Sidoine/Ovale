@@ -531,6 +531,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
                 if (success) {
                     let targetGUID = spellcast.target;
                     this.UpdateLastSpellcast(now, spellcast);
+                    this.next.PushGCDSpellId(spellcast.spellId);
                     this.UpdateCounters(spellId, spellcast.stop, targetGUID);
                     let finished = false;
                     let finish = "miss";
@@ -726,7 +727,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
                 lastSpell.lastGCDSpellcast[k] = v;
             }
             lastSpell.lastSpellcast = lastSpell.lastGCDSpellcast;
-            this.next.PushGCDSpellId(lastSpell.lastGCDSpellcast.spellId)
+            this.next.lastGCDSpellId = lastSpell.lastGCDSpellcast.spellId
         }
         this.StopProfiling("OvaleFuture_UpdateLastSpellcast");
     }

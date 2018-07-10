@@ -548,6 +548,7 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
                 if success then
                     local targetGUID = spellcast.target
                     self:UpdateLastSpellcast(now, spellcast)
+                    self.next:PushGCDSpellId(spellcast.spellId)
                     self:UpdateCounters(spellId, spellcast.stop, targetGUID)
                     local finished = false
                     local finish = "miss"
@@ -739,7 +740,7 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
                 lastSpell.lastGCDSpellcast[k] = v
             end
             lastSpell.lastSpellcast = lastSpell.lastGCDSpellcast
-            self.next:PushGCDSpellId(lastSpell.lastGCDSpellcast.spellId)
+            self.next.lastGCDSpellId = lastSpell.lastGCDSpellcast.spellId
         end
         self:StopProfiling("OvaleFuture_UpdateLastSpellcast")
     end,
