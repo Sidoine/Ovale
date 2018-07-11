@@ -2,7 +2,7 @@ import { OvaleState } from "./State";
 import { Ovale } from "./Ovale";
 import aceEvent from "@wowts/ace_event-3.0";
 import { LuaArray, tonumber, pairs, LuaObj } from "@wowts/lua";
-import { GetTime } from "@wowts/wow-mock";
+import { GetTime, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { find } from "@wowts/string";
 
 let OvaleWildImpsBase = Ovale.NewModule("OvaleWildImps", aceEvent);

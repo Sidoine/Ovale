@@ -11,6 +11,7 @@ local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local insert = table.insert
 local GetTime = GetTime
 local GetSpellCount = GetSpellCount
+local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local type = type
 local pairs = pairs
 local OvaleDemonHunterSoulFragmentsBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleDemonHunterSoulFragments", aceEvent))

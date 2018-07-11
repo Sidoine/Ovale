@@ -12,6 +12,7 @@ local GetSpecialization = GetSpecialization
 local GetSpecializationInfo = GetSpecializationInfo
 local GetTime = GetTime
 local GetTalentInfoByID = GetTalentInfoByID
+local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local huge = math.huge
 local select = select
 local OvaleDemonHunterDemonicBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleDemonHunterDemonic", aceEvent))

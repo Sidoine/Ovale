@@ -37,6 +37,7 @@ local insert = table.insert
 local sort = table.sort
 local GetTime = GetTime
 local UnitAura = UnitAura
+local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local INFINITY = math.huge
 local huge = math.huge
 local __PaperDoll = LibStub:GetLibrary("ovale/PaperDoll")

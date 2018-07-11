@@ -20,6 +20,7 @@ local tonumber = tonumber
 local wipe = wipe
 local UnitHealth = UnitHealth
 local UnitHealthMax = UnitHealthMax
+local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local huge = math.huge
 local __BaseState = LibStub:GetLibrary("ovale/BaseState")
 local baseState = __BaseState.baseState

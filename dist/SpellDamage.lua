@@ -6,6 +6,7 @@ local OvaleProfiler = __Profiler.OvaleProfiler
 local __Ovale = LibStub:GetLibrary("ovale/Ovale")
 local Ovale = __Ovale.Ovale
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
+local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local CLEU_DAMAGE_EVENT = {
     SPELL_DAMAGE = true,
     SPELL_PERIODIC_AURA = true

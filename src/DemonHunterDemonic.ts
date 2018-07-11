@@ -2,7 +2,7 @@ import { Ovale } from "./Ovale";
 import { OvaleDebug } from "./Debug";
 import { OvaleAura } from "./Aura";
 import aceEvent from "@wowts/ace_event-3.0";
-import { GetSpecialization, GetSpecializationInfo, GetTime, GetTalentInfoByID } from "@wowts/wow-mock";
+import { GetSpecialization, GetSpecializationInfo, GetTime, GetTalentInfoByID, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
 import { select } from "@wowts/lua";
 

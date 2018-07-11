@@ -1,6 +1,7 @@
 import { OvaleProfiler } from "./Profiler";
 import { Ovale } from "./Ovale";
 import aceEvent from "@wowts/ace_event-3.0";
+import { CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 
 let CLEU_DAMAGE_EVENT = {
     SPELL_DAMAGE: true,
