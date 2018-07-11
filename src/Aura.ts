@@ -183,15 +183,6 @@ export function PutAura(auraDB: AuraDB, guid: string, auraId: AuraId, casterGUID
 }
 export function GetAura(auraDB: AuraDB, guid: string, auraId: AuraId, casterGUID: string) {
     if (auraDB[guid] && auraDB[guid][auraId] && auraDB[guid][auraId][casterGUID]) {
-        if (auraId == 215570) {
-            let spellcast = lastSpell.LastInFlightSpell();
-            if (spellcast && spellcast.spellId && spellcast.spellId == 190411 && spellcast.start) {
-                let aura = auraDB[guid][auraId][casterGUID];
-                if (aura.start && aura.start < spellcast.start) {
-                    aura.ending = spellcast.start;
-                }
-            }
-        }
         return auraDB[guid][auraId][casterGUID];
     }
 }
