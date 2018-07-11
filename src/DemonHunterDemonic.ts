@@ -52,8 +52,8 @@ class OvaleDemonHunterDemonicClass extends OvaleDemonHunterDemonicBase {
             this.UnregisterMessage("COMBAT_LOG_EVENT_UNFILTERED");
         }
     }
-    COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...__args) {
-        let [arg12, arg13] = __args;
+    COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
+        let [, cleuEvent, , sourceGUID, , , , , , , , arg12, arg13] = CombatLogGetCurrentEventInfo();
         if (sourceGUID == this.playerGUID && cleuEvent == "SPELL_CAST_SUCCESS") {
             let [spellId, spellName] = [arg12, arg13];
             if (HAVOC_EYE_BEAM_SPELL_ID == spellId) {

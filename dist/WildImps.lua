@@ -42,7 +42,8 @@ local OvaleWildImpsClass = __class(OvaleWildImpsBase, {
             self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
         end
     end,
-    COMBAT_LOG_EVENT_UNFILTERED = function(self, event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
+    COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
+        local _, cleuEvent, _, sourceGUID, _, _, _, destGUID, _, _, _, spellId = CombatLogGetCurrentEventInfo()
         self_serial = self_serial + 1
         Ovale:needRefresh()
         if sourceGUID ~= Ovale.playerGUID then

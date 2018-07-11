@@ -1344,10 +1344,7 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("unstable_affliction_5_debuff", "unstable_affliction_debuff", "WARLOCK", "affliction");
     AddDisambiguation("active_havoc_buff", "havoc_buff", "WARLOCK", "destruction");
     AddDisambiguation("arcane_torrent", "arcane_torrent_rage", "WARRIOR");
-    AddDisambiguation("bladestorm", "bladestorm_arms", "WARRIOR", "arms");
-    AddDisambiguation("bladestorm", "bladestorm_fury", "WARRIOR", "fury");
     AddDisambiguation("blood_fury", "blood_fury_ap", "WARRIOR");
-    AddDisambiguation("execute", "execute_arms", "WARRIOR", "arms");
     AddDisambiguation("legendary_ring", "legendary_ring_bonus_armor", "WARRIOR", "protection");
     AddDisambiguation("legendary_ring", "legendary_ring_strength", "WARRIOR", "arms", "Item");
     AddDisambiguation("legendary_ring", "legendary_ring_strength", "WARRIOR", "fury", "Item");
@@ -1355,6 +1352,51 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("shield_barrier", "shield_barrier_melee", "WARRIOR", "fury");
     AddDisambiguation("shield_barrier", "shield_barrier_tank", "WARRIOR", "protection");
     AddDisambiguation("exhaustion_buff", "burst_haste_debuff");
+
+    //Death Knight
+    AddDisambiguation("deaths_reach_talent", "deaths_reach_talent_unholy", "DEATHKNIGHT", "unholy");
+    AddDisambiguation("grip_of_the_dead_talent", "grip_of_the_dead_talent_unholy", "DEATHKNIGHT", "unholy");
+    AddDisambiguation("wraith_walk_talent", "wraith_walk_talent_blood", "DEATHKNIGHT", "blood");
+
+    //Demon Hunter
+    AddDisambiguation("felblade_talent", "felblade_talent_havoc", "DEMONHUNTER", "havoc");
+
+    //Druid
+    AddDisambiguation("feral_affinity_talent", "feral_affinity_talent_balance", "DRUID", "balance");
+    AddDisambiguation("guardian_affinity_talent", "guardian_affinity_talent_restoration", "DRUID", "restoration");
+
+    //Hunter
+    AddDisambiguation("a_murder_of_crows_talent", "a_murder_of_crows_talent_marksman", "HUNTER", "marksman");
+
+    //Monk
+    AddDisambiguation("healing_elixir_talent", "healing_elixir_talent_mistweaver", "MONK", "mistweaver");
+
+    //Paladin
+    AddDisambiguation("judgment_of_light_talent", "judgment_of_light_talent_holy", "PALADIN", "holy");
+    AddDisambiguation("unbreakable_spirit_talent", "unbreakable_spirit_talent_holy", "PALADIN", "holy");
+
+    //Priest
+    AddDisambiguation("mindbender_talent", "mindbender_talent_discipline", "PRIEST", "discipline");
+    AddDisambiguation("twist_of_fate_talent", "twist_of_fate_talent_discipline", "PRIEST", "discipline");
+    
+    //Shaman
+    AddDisambiguation("earth_shield_talent", "earth_shield_talent_restoration", "SHAMAN", "restoration");
+    AddDisambiguation("echo_of_the_elements_talent", "echo_of_the_elements_talent_restoration", "SHAMAN", "restoration");
+
+    //Warlock
+    AddDisambiguation("soul_conduit_talent", "soul_conduit_talent_demonology", "WARLOCK", "demonology");
+
+    //Warrior
+    AddDisambiguation("anger_management_talent", "anger_management_talent_fury", "WARRIOR", "fury");
+    AddDisambiguation("bounding_stride_talent", "bounding_stride_talent_protection", "WARRIOR", "protection");
+    AddDisambiguation("dragon_roar_talent", "dragon_roar_talent_protection", "WARRIOR", "protection");
+    AddDisambiguation("massacre_talent", "massacre_talent_arms", "WARRIOR", "arms");
+    AddDisambiguation("storm_bolt_talent", "storm_bolt_talent_protection", "WARRIOR", "protection");
+    AddDisambiguation("sudden_death_talent", "sudden_death_talent_fury", "WARRIOR", "fury");
+    AddDisambiguation("bladestorm", "bladestorm_arms", "WARRIOR", "arms");
+    AddDisambiguation("bladestorm", "bladestorm_fury", "WARRIOR", "fury");
+    AddDisambiguation("execute", "execute_arms", "WARRIOR", "arms");
+    AddDisambiguation("whirlwind", "whirlwind_arms", "WARRIOR", "arms");
 }
 const IsTotem = function(name: string) {
     if (sub(name, 1, 13) == "wild_mushroom") {
@@ -5470,7 +5512,7 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
                 output[lualength(output) + 1] = "# Overrides.";
                 output[lualength(output) + 1] = overrideCode;
             }
-            if (annotation.supportingDefineCount + annotation.supportingControlCount > 0) {
+            if (annotation.supportingControlCount > 0) {
                 output[lualength(output) + 1] = "";
             }
         }

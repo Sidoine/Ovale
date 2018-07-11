@@ -47,7 +47,8 @@ class OvaleWildImpsClass extends OvaleWildImpsBase {
             this.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         }
     }
-    COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId: number) {
+    COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
+        let [, cleuEvent, , sourceGUID, , , , destGUID, , , , spellId] = CombatLogGetCurrentEventInfo();
         self_serial = self_serial + 1;
         Ovale.needRefresh();
         if (sourceGUID != Ovale.playerGUID) {

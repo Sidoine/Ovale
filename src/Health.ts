@@ -59,8 +59,8 @@ class OvaleHealthClass extends OvaleHealthClassBase {
         this.UnregisterEvent("UNIT_MAXHEALTH");
         this.UnregisterMessage("Ovale_UnitChanged");
     }
-    COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...__args) {
-        let [arg12, arg13, , arg15, , , , , , , , , , ] = __args;
+    COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
+        let [timestamp, cleuEvent, , , , , , destGUID, , , , arg12, arg13, , arg15] = CombatLogGetCurrentEventInfo();
         this.StartProfiling("OvaleHealth_COMBAT_LOG_EVENT_UNFILTERED");
         let healthUpdate = false;
         if (CLEU_DAMAGE_EVENT[cleuEvent]) {
