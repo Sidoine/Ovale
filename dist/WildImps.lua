@@ -9,6 +9,7 @@ local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local tonumber = tonumber
 local pairs = pairs
 local GetTime = GetTime
+local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local find = string.find
 local OvaleWildImpsBase = Ovale:NewModule("OvaleWildImps", aceEvent)
 local demonData = {

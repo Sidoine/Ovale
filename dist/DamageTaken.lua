@@ -22,6 +22,7 @@ local SCHOOL_MASK_FROST = SCHOOL_MASK_FROST
 local SCHOOL_MASK_HOLY = SCHOOL_MASK_HOLY
 local SCHOOL_MASK_NATURE = SCHOOL_MASK_NATURE
 local SCHOOL_MASK_SHADOW = SCHOOL_MASK_SHADOW
+local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local OvaleDamageTakenBase = OvaleProfiler:RegisterProfiling(OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleDamageTaken", aceEvent)))
 local self_pool = OvalePool("OvaleDamageTaken_pool")
 local DAMAGE_TAKEN_WINDOW = 20

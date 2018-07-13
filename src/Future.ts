@@ -11,7 +11,7 @@ import aceEvent from "@wowts/ace_event-3.0";
 import { ipairs, pairs, type, lualength, LuaObj, LuaArray, wipe } from "@wowts/lua";
 import { sub } from "@wowts/string";
 import { insert, remove } from "@wowts/table";
-import { GetSpellInfo, GetTime, UnitCastingInfo, UnitChannelInfo, UnitExists, UnitGUID, UnitName } from "@wowts/wow-mock";
+import { GetSpellInfo, GetTime, UnitCastingInfo, UnitChannelInfo, UnitExists, UnitGUID, UnitName, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { OvaleState } from "./State";
 import { OvaleCooldown } from "./Cooldown";
 import { OvaleStance } from "./Stance";

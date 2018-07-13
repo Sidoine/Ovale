@@ -3,7 +3,7 @@ import { OvaleDebug } from "./Debug";
 import { OvaleState, StateModule } from "./State";
 import aceEvent from "@wowts/ace_event-3.0";
 import { insert } from "@wowts/table";
-import { GetTime, GetSpellCount } from "@wowts/wow-mock";
+import { GetTime, GetSpellCount, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { LuaArray, type, pairs } from "@wowts/lua";
 
 

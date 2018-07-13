@@ -13,7 +13,7 @@ import aceEvent from "@wowts/ace_event-3.0";
 import { pairs, tonumber, wipe, lualength, LuaObj, next, LuaArray } from "@wowts/lua";
 import { lower, sub } from "@wowts/string";
 import { concat, insert, sort } from "@wowts/table";
-import { GetTime, UnitAura } from "@wowts/wow-mock";
+import { GetTime, UnitAura, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { huge as INFINITY, huge } from "@wowts/math";
 import { OvalePaperDoll } from "./PaperDoll";
 import { baseState } from "./BaseState";

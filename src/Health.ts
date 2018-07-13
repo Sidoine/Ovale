@@ -7,7 +7,7 @@ import { RegisterRequirement, UnregisterRequirement } from "./Requirement";
 import aceEvent from "@wowts/ace_event-3.0";
 import { sub } from "@wowts/string";
 import { tonumber, wipe } from "@wowts/lua";
-import { UnitHealth, UnitHealthMax } from "@wowts/wow-mock";
+import { UnitHealth, UnitHealthMax, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
 import { baseState } from "./BaseState";
 

@@ -35,6 +35,7 @@ local UnitChannelInfo = UnitChannelInfo
 local UnitExists = UnitExists
 local UnitGUID = UnitGUID
 local UnitName = UnitName
+local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local __State = LibStub:GetLibrary("ovale/State")
 local OvaleState = __State.OvaleState
 local __Cooldown = LibStub:GetLibrary("ovale/Cooldown")
