@@ -30,6 +30,12 @@ let CLEU_HEAL_EVENT = {
     SPELL_PERIODIC_HEAL: true
 }
 
+let UNIT_HEALTH_FITLER = {
+    player: true,
+    pet: true,
+    target: true,
+}
+
 const OvaleHealthClassBase = OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(OvaleHealthBase));
 class OvaleHealthClass extends OvaleHealthClassBase {
     health = {    }
@@ -62,32 +68,35 @@ class OvaleHealthClass extends OvaleHealthClassBase {
     COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
         let [timestamp, cleuEvent, , , , , , destGUID, , , , arg12, arg13, , arg15] = CombatLogGetCurrentEventInfo();
         this.StartProfiling("OvaleHealth_COMBAT_LOG_EVENT_UNFILTERED");
-        let healthUpdate = false;
-        if (CLEU_DAMAGE_EVENT[cleuEvent]) {
-            let amount;
-            if (cleuEvent == "SWING_DAMAGE") {
-                amount = arg12;
-            } else if (cleuEvent == "ENVIRONMENTAL_DAMAGE") {
-                amount = arg13;
-            } else {
-                amount = arg15;
+        let [target] = OvaleGUID.GUIDUnit(destGUID);
+        if(UNIT_HEALTH_FITLER[target]){
+            let healthUpdate = false;
+            if (CLEU_DAMAGE_EVENT[cleuEvent]) {
+                let amount;
+                if (cleuEvent == "SWING_DAMAGE") {
+                    amount = arg12;
+                } else if (cleuEvent == "ENVIRONMENTAL_DAMAGE") {
+                    amount = arg13;
+                } else {
+                    amount = arg15;
+                }
+                this.Debug(cleuEvent, destGUID, amount);
+                let total = this.totalDamage[destGUID] || 0;
+                this.totalDamage[destGUID] = total + amount;
+                healthUpdate = true;
+            } else if (CLEU_HEAL_EVENT[cleuEvent]) {
+                let amount = arg15;
+                this.Debug(cleuEvent, destGUID, amount);
+                let total = this.totalHealing[destGUID] || 0;
+                this.totalHealing[destGUID] = total + amount;
+                healthUpdate = true;
             }
-            this.Debug(cleuEvent, destGUID, amount);
-            let total = this.totalDamage[destGUID] || 0;
-            this.totalDamage[destGUID] = total + amount;
-            healthUpdate = true;
-        } else if (CLEU_HEAL_EVENT[cleuEvent]) {
-            let amount = arg15;
-            this.Debug(cleuEvent, destGUID, amount);
-            let total = this.totalHealing[destGUID] || 0;
-            this.totalHealing[destGUID] = total + amount;
-            healthUpdate = true;
-        }
-        if (healthUpdate) {
-            if (!this.firstSeen[destGUID]) {
-                this.firstSeen[destGUID] = timestamp;
+            if (healthUpdate) {
+                if (!this.firstSeen[destGUID]) {
+                    this.firstSeen[destGUID] = timestamp;
+                }
+                this.lastUpdated[destGUID] = timestamp;
             }
-            this.lastUpdated[destGUID] = timestamp;
         }
         this.StopProfiling("OvaleHealth_COMBAT_LOG_EVENT_UNFILTERED");
     }
@@ -111,7 +120,7 @@ class OvaleHealthClass extends OvaleHealthClassBase {
         }
     }
     UpdateHealth(event, unitId) {
-        if (!unitId) {
+        if (!unitId || !UNIT_HEALTH_FITLER[unitId]) {
             return;
         }
         this.StartProfiling("OvaleHealth_UpdateHealth");

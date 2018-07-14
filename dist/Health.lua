@@ -40,6 +40,11 @@ local CLEU_HEAL_EVENT = {
     SPELL_HEAL = true,
     SPELL_PERIODIC_HEAL = true
 }
+local UNIT_HEALTH_FITLER = {
+    player = true,
+    pet = true,
+    target = true
+}
 local OvaleHealthClassBase = OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(OvaleHealthBase))
 local OvaleHealthClass = __class(OvaleHealthClassBase, {
     OnInitialize = function(self)
@@ -65,32 +70,35 @@ local OvaleHealthClass = __class(OvaleHealthClassBase, {
     COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
         local timestamp, cleuEvent, _, _, _, _, _, destGUID, _, _, _, arg12, arg13, _, arg15 = CombatLogGetCurrentEventInfo()
         self:StartProfiling("OvaleHealth_COMBAT_LOG_EVENT_UNFILTERED")
-        local healthUpdate = false
-        if CLEU_DAMAGE_EVENT[cleuEvent] then
-            local amount
-            if cleuEvent == "SWING_DAMAGE" then
-                amount = arg12
-            elseif cleuEvent == "ENVIRONMENTAL_DAMAGE" then
-                amount = arg13
-            else
-                amount = arg15
+        local target = OvaleGUID:GUIDUnit(destGUID)
+        if UNIT_HEALTH_FITLER[target] then
+            local healthUpdate = false
+            if CLEU_DAMAGE_EVENT[cleuEvent] then
+                local amount
+                if cleuEvent == "SWING_DAMAGE" then
+                    amount = arg12
+                elseif cleuEvent == "ENVIRONMENTAL_DAMAGE" then
+                    amount = arg13
+                else
+                    amount = arg15
+                end
+                self:Debug(cleuEvent, destGUID, amount)
+                local total = self.totalDamage[destGUID] or 0
+                self.totalDamage[destGUID] = total + amount
+                healthUpdate = true
+            elseif CLEU_HEAL_EVENT[cleuEvent] then
+                local amount = arg15
+                self:Debug(cleuEvent, destGUID, amount)
+                local total = self.totalHealing[destGUID] or 0
+                self.totalHealing[destGUID] = total + amount
+                healthUpdate = true
             end
-            self:Debug(cleuEvent, destGUID, amount)
-            local total = self.totalDamage[destGUID] or 0
-            self.totalDamage[destGUID] = total + amount
-            healthUpdate = true
-        elseif CLEU_HEAL_EVENT[cleuEvent] then
-            local amount = arg15
-            self:Debug(cleuEvent, destGUID, amount)
-            local total = self.totalHealing[destGUID] or 0
-            self.totalHealing[destGUID] = total + amount
-            healthUpdate = true
-        end
-        if healthUpdate then
-            if  not self.firstSeen[destGUID] then
-                self.firstSeen[destGUID] = timestamp
+            if healthUpdate then
+                if  not self.firstSeen[destGUID] then
+                    self.firstSeen[destGUID] = timestamp
+                end
+                self.lastUpdated[destGUID] = timestamp
             end
-            self.lastUpdated[destGUID] = timestamp
         end
         self:StopProfiling("OvaleHealth_COMBAT_LOG_EVENT_UNFILTERED")
     end,
@@ -114,7 +122,7 @@ local OvaleHealthClass = __class(OvaleHealthClassBase, {
         end
     end,
     UpdateHealth = function(self, event, unitId)
-        if  not unitId then
+        if  not unitId or  not UNIT_HEALTH_FITLER[unitId] then
             return 
         end
         self:StartProfiling("OvaleHealth_UpdateHealth")
