@@ -60,6 +60,8 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                 predictif: false,
                 secondIconScale: 1,
                 taggedEnemies: false,
+                minFrameRefresh: 50,
+                maxFrameRefresh: 250,
                 playerOnlyBuffs: true,
                 playerOnlyDebuffs: true,
                 laptopMode: false,
@@ -386,8 +388,26 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                                 max: 700,
                                 step: 10
                             },
-                            onlyPlayerBuffs: {
+                            minFrameRefresh: {
                                 order: 30,
+                                type: "range",
+                                name: L["Min Refresh"],
+                                desc: L["Minimum time (in milliseconds) between updates; lower values may reduce FPS."],
+                                min: 10,
+                                max: 50,
+                                step: 5
+                            },
+                            maxFrameRefresh: {
+                                order: 40,
+                                type: "range",
+                                name: L["Max Refresh"],
+                                desc: L["Minimum time (in milliseconds) between updates; lower values may reduce FPS."],
+                                min: 100,
+                                max: 400,
+                                step: 10
+                            },
+                            onlyPlayerBuffs: {
+                                order: 50,
                                 type: "toggle",
                                 name: L['Player only buffs'],
                                 desc: L['Scans only for buffs applied by Player on Unit'],
@@ -396,7 +416,7 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                                 },
                             },
                             onlyPlayerDebuffs: {
-                                order: 40,
+                                order: 60,
                                 type: "toggle",
                                 name: L['Player only debuffs'],
                                 desc: L['Scans only for debuffs applied by Player on Unit'],
@@ -405,7 +425,7 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                                 },
                             },
                             laptopMode: {
-                                order: 50,
+                                order: 70,
                                 type: "toggle",
                                 name: L['Laptop Mode'],
                                 desc: L['Reduces aura scans to player, target, pet, focus units and force player only filter']

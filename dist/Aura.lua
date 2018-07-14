@@ -167,15 +167,6 @@ __exports.PutAura = function(auraDB, guid, auraId, casterGUID, aura)
 end
 __exports.GetAura = function(auraDB, guid, auraId, casterGUID)
     if auraDB[guid] and auraDB[guid][auraId] and auraDB[guid][auraId][casterGUID] then
-        if auraId == 215570 then
-            local spellcast = lastSpell:LastInFlightSpell()
-            if spellcast and spellcast.spellId and spellcast.spellId == 190411 and spellcast.start then
-                local aura = auraDB[guid][auraId][casterGUID]
-                if aura.start and aura.start < spellcast.start then
-                    aura.ending = spellcast.start
-                end
-            end
-        end
         return auraDB[guid][auraId][casterGUID]
     end
 end

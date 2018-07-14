@@ -394,7 +394,6 @@ local OvalePowerClass = __class(OvalePowerBase, {
             self:DebugTimestamp("%s: %d -> %d (%s).", event, self.current.power[powerType], power, powerType)
             if self.current.power[powerType] ~= power then
                 self.current.power[powerType] = power
-                Ovale:needRefresh()
             end
         else
             for powerType, powerInfo in pairs(self.POWER_INFO) do
@@ -402,11 +401,12 @@ local OvalePowerClass = __class(OvalePowerBase, {
                 self:DebugTimestamp("%s: %d -> %d (%s).", event, self.current.power[powerType], power, powerType)
                 if self.current.power[powerType] ~= power then
                     self.current.power[powerType] = power
-                    Ovale:needRefresh()
                 end
             end
         end
-        Ovale:needRefresh()
+        if event == "UNIT_POWER_UPDATE" then
+            Ovale:needRefresh()
+        end
         self:StopProfiling("OvalePower_UpdatePower")
     end,
     UpdatePowerRegen = function(self, event)

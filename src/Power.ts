@@ -412,7 +412,6 @@ class OvalePowerClass extends OvalePowerBase {
             this.DebugTimestamp("%s: %d -> %d (%s).", event, this.current.power[powerType], power, powerType);
             if (this.current.power[powerType] != power) {
                 this.current.power[powerType] = power;
-                Ovale.needRefresh();
             }
         } else {
             for (const [powerType, powerInfo] of pairs(this.POWER_INFO)) {
@@ -420,11 +419,12 @@ class OvalePowerClass extends OvalePowerBase {
                 this.DebugTimestamp("%s: %d -> %d (%s).", event, this.current.power[powerType], power, powerType);
                 if (this.current.power[powerType] != power) {
                     this.current.power[powerType] = power;
-                    Ovale.needRefresh();
                 }
             }
         }
-        Ovale.needRefresh();
+        if (event == "UNIT_POWER_UPDATE") {
+            Ovale.needRefresh();
+        }
         this.StopProfiling("OvalePower_UpdatePower");
     }
     UpdatePowerRegen(event) {
