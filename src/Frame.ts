@@ -42,6 +42,7 @@ interface Action {
 class OvaleFrame extends AceGUI.WidgetContainerBase {
     checkBoxWidget: LuaObj<AceGUIWidgetCheckBox> = {}
     listWidget: LuaObj<AceGUIWidgetDropDown> = {}
+    visible = false;
         
     ToggleOptions() {
         if ((this.content.IsShown())) {
@@ -117,27 +118,27 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
     // }
 
     UpdateVisibility() {
-        let visible = true;
+        this.visible = true
         let profile = Ovale.db.profile;
         if (!profile.apparence.enableIcons) {
-            visible = false;
+            this.visible = false;
         } else if (!this.hider.IsVisible()) {
-            visible = false;
+            this.visible = false;
         } else {
             if (profile.apparence.hideVehicule && UnitHasVehicleUI("player")) {
-                visible = false;
+                this.visible = false;
             }
             if (profile.apparence.avecCible && !UnitExists("target")) {
-                visible = false;
+                this.visible = false;
             }
             if (profile.apparence.enCombat && !baseState.current.inCombat) {
-                visible = false;
+                this.visible = false;
             }
             if (profile.apparence.targetHostileOnly && (UnitIsDead("target") || !UnitCanAttack("player", "target"))) {
-                visible = false;
+                this.visible = false;
             }
         }
-        if (visible) {
+        if (this.visible) {
             this.Show();
         } else {
             this.Hide();
@@ -145,12 +146,14 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
     }
 
     OnUpdate(elapsed: number) {
-        let guid = OvaleGUID.UnitGUID("target") || OvaleGUID.UnitGUID("focus");
-        if (guid) {
-            Ovale.refreshNeeded[guid] = true;
-        }
+        let inCombat = baseState.current.inCombat;
         this.timeSinceLastUpdate = this.timeSinceLastUpdate + elapsed;
-        let refresh = OvaleDebug.trace || this.timeSinceLastUpdate > Ovale.db.profile.apparence.minFrameRefresh / 1000 && next(Ovale.refreshNeeded) || guid && this.timeSinceLastUpdate > Ovale.db.profile.apparence.maxFrameRefresh / 1000;
+        let refresh = this.visible && (
+            OvaleDebug.trace || 
+            inCombat && this.timeSinceLastUpdate > Ovale.db.profile.apparence.minFrameRefresh / 1000 && next(Ovale.refreshNeeded) || 
+            (inCombat || !inCombat && UnitCanAttack("player", "target")) && this.timeSinceLastUpdate > Ovale.db.profile.apparence.maxFrameRefresh / 1000 || 
+            !inCombat && this.timeSinceLastUpdate > 1
+        );
         if (refresh) {
             Ovale.AddRefreshInterval(this.timeSinceLastUpdate * 1000);
             OvaleState.InitializeState();
