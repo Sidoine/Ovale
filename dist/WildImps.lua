@@ -45,11 +45,10 @@ local OvaleWildImpsClass = __class(OvaleWildImpsBase, {
     end,
     COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
         local _, cleuEvent, _, sourceGUID, _, _, _, destGUID, _, _, _, spellId = CombatLogGetCurrentEventInfo()
-        self_serial = self_serial + 1
-        Ovale:needRefresh()
         if sourceGUID ~= Ovale.playerGUID then
             return 
         end
+        self_serial = self_serial + 1
         if cleuEvent == "SPELL_SUMMON" then
             local _, _, _, _, _, _, _, creatureId = find(destGUID, "(%S+)-(%d+)-(%d+)-(%d+)-(%d+)-(%d+)-(%S+)")
             creatureId = tonumber(creatureId)
@@ -69,15 +68,11 @@ local OvaleWildImpsClass = __class(OvaleWildImpsBase, {
                     self_demons[k] = nil
                 end
             end
-        elseif cleuEvent == "SPELL_INSTAKILL" then
-            if spellId == 196278 then
-                self_demons[destGUID] = nil
-            end
+            Ovale:needRefresh()
         elseif cleuEvent == "SPELL_CAST_SUCCESS" then
-            if spellId == 193396 then
-                for _, d in pairs(self_demons) do
-                    d.de = true
-                end
+            if spellId == 196277 then
+                self_demons[destGUID] = nil
+                Ovale:needRefresh()
             end
         end
     end,

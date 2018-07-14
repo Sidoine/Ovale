@@ -49,11 +49,10 @@ class OvaleWildImpsClass extends OvaleWildImpsBase {
     }
     COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
         let [, cleuEvent, , sourceGUID, , , , destGUID, , , , spellId] = CombatLogGetCurrentEventInfo();
-        self_serial = self_serial + 1;
-        Ovale.needRefresh();
         if (sourceGUID != Ovale.playerGUID) {
             return;
         }
+        self_serial = self_serial + 1;
         if (cleuEvent == "SPELL_SUMMON") {
             let [,,,, , , , creatureId] = find(destGUID, '(%S+)-(%d+)-(%d+)-(%d+)-(%d+)-(%d+)-(%S+)');
             creatureId = tonumber(creatureId);
@@ -73,15 +72,11 @@ class OvaleWildImpsClass extends OvaleWildImpsBase {
                     self_demons[k] = undefined;
                 }
             }
-        } else if (cleuEvent == 'SPELL_INSTAKILL') {
-            if (spellId == 196278) {
-                self_demons[destGUID] = undefined;
-            }
+            Ovale.needRefresh();
         } else if (cleuEvent == 'SPELL_CAST_SUCCESS') {
-            if (spellId == 193396) {
-                for (const [, d] of pairs(self_demons)) {
-                    d.de = true;
-                }
+            if (spellId == 196277) {
+                self_demons[destGUID] = undefined;
+                Ovale.needRefresh();
             }
         }
     }
