@@ -78,9 +78,9 @@ export interface OvaleDb {
             predictif: boolean,
             secondIconScale: number,
             taggedEnemies: boolean,
-            playerOnlyBuffs: boolean,
-            playerOnlyDebuffs: boolean,
-            laptopMode: boolean,
+            minFrameRefresh: number,
+            maxFrameRefresh: number,
+            fullAuraScan: false,
             auraLag: number,
             moving: boolean,
             spellFlash: {

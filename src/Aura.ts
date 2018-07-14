@@ -42,8 +42,8 @@ let UNKNOWN_GUID = "0";
                     width: "full",
                     get: function (info: LuaArray<string>) {
                         wipe(output);
-                        let harmfulFilter = (Ovale.db.profile.apparence.onlyPlayerDebuffs || Ovale.db.profile.apparence.laptopMode) && 'HARMFUL|PLAYER' || 'HARMFUL';
-                        let helpfulFilter = (Ovale.db.profile.apparence.onlyPlayerBuffs || Ovale.db.profile.apparence.laptopMode) && 'HELPFUL|PLAYER' || 'HELPFUL';
+                        let harmfulFilter = (Ovale.db.profile.apparence.fullAuraScan) && 'HARMFUL' || 'HARMFUL|PLAYER';
+                        let helpfulFilter = (Ovale.db.profile.apparence.fullAuraScan) && 'HELPFUL' || 'HELPFUL|PLAYER';
                         let helpful = OvaleAura.DebugUnitAuras("player", helpfulFilter, undefined);
                         if (helpful) {
                             output[lualength(output) + 1] = "== BUFFS ==";
@@ -70,8 +70,8 @@ let UNKNOWN_GUID = "0";
                     width: "full",
                     get: function (info: LuaArray<string>) {
                         wipe(output);
-                        let harmfulFilter = (Ovale.db.profile.apparence.onlyPlayerDebuffs || Ovale.db.profile.apparence.laptopMode) && 'HARMFUL|PLAYER' || 'HARMFUL';
-                        let helpfulFilter = (Ovale.db.profile.apparence.onlyPlayerBuffs || Ovale.db.profile.apparence.laptopMode) && 'HELPFUL|PLAYER' || 'HELPFUL';
+                        let harmfulFilter = (Ovale.db.profile.apparence.fullAuraScan) && 'HARMFUL' || 'HARMFUL|PLAYER';
+                        let helpfulFilter = (Ovale.db.profile.apparence.fullAuraScan) && 'HELPFUL' || 'HELPFUL|PLAYER';
                         let helpful = OvaleAura.DebugUnitAuras("target", helpfulFilter, undefined);
                         if (helpful) {
                             output[lualength(output) + 1] = "== BUFFS ==";
@@ -640,8 +640,8 @@ export class OvaleAuraClass extends OvaleAuraBase {
         this.StartProfiling("OvaleAura_ScanAuras");
         guid = guid || OvaleGUID.UnitGUID(unitId);
         if (guid) {
-            let harmfulFilter = (Ovale.db.profile.apparence.onlyPlayerDebuffs || Ovale.db.profile.apparence.laptopMode) && 'HARMFUL|PLAYER' || 'HARMFUL';
-            let helpfulFilter = (Ovale.db.profile.apparence.onlyPlayerBuffs || Ovale.db.profile.apparence.laptopMode) && 'HELPFUL|PLAYER' || 'HELPFUL';
+            let harmfulFilter = (Ovale.db.profile.apparence.fullAuraScan) && 'HARMFUL' || 'HARMFUL|PLAYER';
+            let helpfulFilter = (Ovale.db.profile.apparence.fullAuraScan) && 'HELPFUL' || 'HELPFUL|PLAYER';
             this.DebugTimestamp("Scanning auras on %s (%s)", guid, unitId);
             let serial = this.current.serial[guid] || 0;
             serial = serial + 1;

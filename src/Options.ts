@@ -62,9 +62,7 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                 taggedEnemies: false,
                 minFrameRefresh: 50,
                 maxFrameRefresh: 250,
-                playerOnlyBuffs: true,
-                playerOnlyDebuffs: true,
-                laptopMode: false,
+                fullAuraScan: false,
                 auraLag: 400,
                 moving: false,
                 spellFlash: {
@@ -402,33 +400,16 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                                 type: "range",
                                 name: L["Max Refresh"],
                                 desc: L["Minimum time (in milliseconds) between updates; lower values may reduce FPS."],
-                                min: 100,
+                                min: 50,
                                 max: 400,
                                 step: 10
                             },
-                            onlyPlayerBuffs: {
+                            fullAuraScan: {
                                 order: 50,
+                                width: "full",
                                 type: "toggle",
-                                name: L['Player only buffs'],
-                                desc: L['Scans only for buffs applied by Player on Unit'],
-                                disabled: function () {
-                                    return Ovale.db.profile.apparence.laptopMode;
-                                },
-                            },
-                            onlyPlayerDebuffs: {
-                                order: 60,
-                                type: "toggle",
-                                name: L['Player only debuffs'],
-                                desc: L['Scans only for debuffs applied by Player on Unit'],
-                                disabled: function () {
-                                    return Ovale.db.profile.apparence.laptopMode;
-                                },
-                            },
-                            laptopMode: {
-                                order: 70,
-                                type: "toggle",
-                                name: L['Laptop Mode'],
-                                desc: L['Reduces aura scans to player, target, pet, focus units and force player only filter']
+                                name: L['Full buffs/debuffs scan'],
+                                desc: L['Scans also buffs/debuffs casted by other players\n\nWarning!: Very CPU intensive'],
                             }
                         }
                     }

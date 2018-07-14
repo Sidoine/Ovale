@@ -67,8 +67,8 @@ do
                     width = "full",
                     get = function(info)
                         wipe(output)
-                        local harmfulFilter = (Ovale.db.profile.apparence.onlyPlayerDebuffs or Ovale.db.profile.apparence.laptopMode) and "HARMFUL|PLAYER" or "HARMFUL"
-                        local helpfulFilter = (Ovale.db.profile.apparence.onlyPlayerBuffs or Ovale.db.profile.apparence.laptopMode) and "HELPFUL|PLAYER" or "HELPFUL"
+                        local harmfulFilter = (Ovale.db.profile.apparence.fullAuraScan) and "HARMFUL" or "HARMFUL|PLAYER"
+                        local helpfulFilter = (Ovale.db.profile.apparence.fullAuraScan) and "HELPFUL" or "HELPFUL|PLAYER"
                         local helpful = __exports.OvaleAura:DebugUnitAuras("player", helpfulFilter, nil)
                         if helpful then
                             output[#output + 1] = "== BUFFS =="
@@ -96,8 +96,8 @@ do
                     width = "full",
                     get = function(info)
                         wipe(output)
-                        local harmfulFilter = (Ovale.db.profile.apparence.onlyPlayerDebuffs or Ovale.db.profile.apparence.laptopMode) and "HARMFUL|PLAYER" or "HARMFUL"
-                        local helpfulFilter = (Ovale.db.profile.apparence.onlyPlayerBuffs or Ovale.db.profile.apparence.laptopMode) and "HELPFUL|PLAYER" or "HELPFUL"
+                        local harmfulFilter = (Ovale.db.profile.apparence.fullAuraScan) and "HARMFUL" or "HARMFUL|PLAYER"
+                        local helpfulFilter = (Ovale.db.profile.apparence.fullAuraScan) and "HELPFUL" or "HELPFUL|PLAYER"
                         local helpful = __exports.OvaleAura:DebugUnitAuras("target", helpfulFilter, nil)
                         if helpful then
                             output[#output + 1] = "== BUFFS =="
@@ -691,8 +691,8 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         self:StartProfiling("OvaleAura_ScanAuras")
         guid = guid or OvaleGUID:UnitGUID(unitId)
         if guid then
-            local harmfulFilter = (Ovale.db.profile.apparence.onlyPlayerDebuffs or Ovale.db.profile.apparence.laptopMode) and "HARMFUL|PLAYER" or "HARMFUL"
-            local helpfulFilter = (Ovale.db.profile.apparence.onlyPlayerBuffs or Ovale.db.profile.apparence.laptopMode) and "HELPFUL|PLAYER" or "HELPFUL"
+            local harmfulFilter = (Ovale.db.profile.apparence.fullAuraScan) and "HARMFUL" or "HARMFUL|PLAYER"
+            local helpfulFilter = (Ovale.db.profile.apparence.fullAuraScan) and "HELPFUL" or "HELPFUL|PLAYER"
             self:DebugTimestamp("Scanning auras on %s (%s)", guid, unitId)
             local serial = self.current.serial[guid] or 0
             serial = serial + 1
