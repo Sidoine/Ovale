@@ -124,7 +124,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
             Ovale.refreshNeeded[guid] = true
         end
         self.timeSinceLastUpdate = self.timeSinceLastUpdate + elapsed
-        local refresh = OvaleDebug.trace or self.timeSinceLastUpdate > Ovale.db.profile.apparence.minFrameRefresh and next(Ovale.refreshNeeded) or guid and self.timeSinceLastUpdate > Ovale.db.profile.apparence.maxFrameRefresh
+        local refresh = OvaleDebug.trace or self.timeSinceLastUpdate > Ovale.db.profile.apparence.minFrameRefresh / 1000 and next(Ovale.refreshNeeded) or guid and self.timeSinceLastUpdate > Ovale.db.profile.apparence.maxFrameRefresh / 1000
         if refresh then
             Ovale:AddRefreshInterval(self.timeSinceLastUpdate * 1000)
             OvaleState:InitializeState()
