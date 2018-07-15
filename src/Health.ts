@@ -133,7 +133,6 @@ class OvaleHealthClass extends OvaleHealthClassBase {
                     this.firstSeen[guid] = undefined;
                     this.lastUpdated[guid] = undefined;
                 }
-                Ovale.refreshNeeded[guid] = true;
             }
         }
         this.StopProfiling("OvaleHealth_UpdateHealth");

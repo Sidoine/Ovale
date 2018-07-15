@@ -136,7 +136,6 @@ local OvaleHealthClass = __class(OvaleHealthClassBase, {
                     self.firstSeen[guid] = nil
                     self.lastUpdated[guid] = nil
                 end
-                Ovale.refreshNeeded[guid] = true
             end
         end
         self:StopProfiling("OvaleHealth_UpdateHealth")
