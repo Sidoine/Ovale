@@ -92,36 +92,39 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
         self.content:SetHeight(height + 50)
     end,
     UpdateVisibility = function(self)
-        self.visible = true
+        local visible = true
         local profile = Ovale.db.profile
         if  not profile.apparence.enableIcons then
-            self.visible = false
+            visible = false
         elseif  not self.hider:IsVisible() then
-            self.visible = false
+            visible = false
         else
             if profile.apparence.hideVehicule and UnitHasVehicleUI("player") then
-                self.visible = false
+                visible = false
             end
             if profile.apparence.avecCible and  not UnitExists("target") then
-                self.visible = false
+                visible = false
             end
             if profile.apparence.enCombat and  not baseState.current.inCombat then
-                self.visible = false
+                visible = false
             end
             if profile.apparence.targetHostileOnly and (UnitIsDead("target") or  not UnitCanAttack("player", "target")) then
-                self.visible = false
+                visible = false
             end
         end
-        if self.visible then
+        if visible then
             self:Show()
         else
             self:Hide()
         end
     end,
     OnUpdate = function(self, elapsed)
-        local inCombat = baseState.current.inCombat
+        local guid = OvaleGUID:UnitGUID("target") or OvaleGUID:UnitGUID("focus")
+        if guid then
+            Ovale.refreshNeeded[guid] = true
+        end
         self.timeSinceLastUpdate = self.timeSinceLastUpdate + elapsed
-        local refresh = self.visible and (OvaleDebug.trace or inCombat and self.timeSinceLastUpdate > Ovale.db.profile.apparence.minFrameRefresh / 1000 and next(Ovale.refreshNeeded) or (inCombat or  not inCombat and UnitCanAttack("player", "target")) and self.timeSinceLastUpdate > Ovale.db.profile.apparence.maxFrameRefresh / 1000 or  not inCombat and self.timeSinceLastUpdate > 1)
+        local refresh = OvaleDebug.trace or self.timeSinceLastUpdate > Ovale.db.profile.apparence.minFrameRefresh / 1000 and next(Ovale.refreshNeeded) or guid and self.timeSinceLastUpdate > Ovale.db.profile.apparence.maxFrameRefresh / 1000
         if refresh then
             Ovale:AddRefreshInterval(self.timeSinceLastUpdate * 1000)
             OvaleState:InitializeState()
@@ -468,7 +471,6 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
     constructor = function(self)
         self.checkBoxWidget = {}
         self.listWidget = {}
-        self.visible = false
         self.OnCheckBoxValueChanged = function(widget)
             local name = widget:GetUserData("name")
             Ovale.db.profile.check[name] = widget:GetValue()
