@@ -92,27 +92,27 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
         self.content:SetHeight(height + 50)
     end,
     UpdateVisibility = function(self)
-        local visible = true
+        self.visible = true
         local profile = Ovale.db.profile
         if  not profile.apparence.enableIcons then
-            visible = false
+            self.visible = false
         elseif  not self.hider:IsVisible() then
-            visible = false
+            self.visible = false
         else
             if profile.apparence.hideVehicule and UnitHasVehicleUI("player") then
-                visible = false
+                self.visible = false
             end
             if profile.apparence.avecCible and  not UnitExists("target") then
-                visible = false
+                self.visible = false
             end
             if profile.apparence.enCombat and  not baseState.current.inCombat then
-                visible = false
+                self.visible = false
             end
             if profile.apparence.targetHostileOnly and (UnitIsDead("target") or  not UnitCanAttack("player", "target")) then
-                visible = false
+                self.visible = false
             end
         end
-        if visible then
+        if self.visible then
             self:Show()
         else
             self:Hide()
@@ -120,11 +120,8 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
     end,
     OnUpdate = function(self, elapsed)
         local guid = OvaleGUID:UnitGUID("target") or OvaleGUID:UnitGUID("focus")
-        if guid then
-            Ovale.refreshNeeded[guid] = true
-        end
         self.timeSinceLastUpdate = self.timeSinceLastUpdate + elapsed
-        local refresh = OvaleDebug.trace or self.timeSinceLastUpdate > Ovale.db.profile.apparence.minFrameRefresh / 1000 and next(Ovale.refreshNeeded) or guid and self.timeSinceLastUpdate > Ovale.db.profile.apparence.maxFrameRefresh / 1000
+        local refresh = OvaleDebug.trace or self.visible and (self.timeSinceLastUpdate > Ovale.db.profile.apparence.minFrameRefresh / 1000 and next(Ovale.refreshNeeded) or guid and self.timeSinceLastUpdate > Ovale.db.profile.apparence.maxFrameRefresh / 1000)
         if refresh then
             Ovale:AddRefreshInterval(self.timeSinceLastUpdate * 1000)
             OvaleState:InitializeState()
