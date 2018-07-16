@@ -13,6 +13,7 @@ local aceConsole = LibStub:GetLibrary("AceConsole-3.0", true)
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local InterfaceOptionsFrame_OpenToCategory = InterfaceOptionsFrame_OpenToCategory
 local ipairs = ipairs
+local huge = math.huge
 local OvaleOptionsBase = Ovale:NewModule("OvaleOptions", aceConsole, aceEvent)
 local self_register = {}
 local OvaleOptionsClass = __class(OvaleOptionsBase, {
@@ -500,6 +501,9 @@ local OvaleOptionsClass = __class(OvaleOptionsBase, {
                             type = "execute",
                             func = function()
                                 local avgRefresh, minRefresh, maxRefresh, count = Ovale:GetRefreshIntervalStatistics()
+                                if minRefresh == huge then
+                                    avgRefresh, minRefresh, maxRefresh, count = 0, 0, 0, 0
+                                end
                                 Ovale:Print("Refresh intervals: count = %d, avg = %d, min = %d, max = %d (ms)", count, avgRefresh, minRefresh, maxRefresh)
                             end
                         }
