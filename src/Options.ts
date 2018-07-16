@@ -391,8 +391,8 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                                 type: "range",
                                 name: L["Min Refresh"],
                                 desc: L["Minimum time (in milliseconds) between updates; lower values may reduce FPS."],
-                                min: 10,
-                                max: 50,
+                                min: 50,
+                                max: 100,
                                 step: 5
                             },
                             maxFrameRefresh: {
@@ -400,7 +400,7 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                                 type: "range",
                                 name: L["Max Refresh"],
                                 desc: L["Minimum time (in milliseconds) between updates; lower values may reduce FPS."],
-                                min: 50,
+                                min: 100,
                                 max: 400,
                                 step: 10
                             },
