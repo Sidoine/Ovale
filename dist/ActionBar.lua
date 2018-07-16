@@ -224,7 +224,7 @@ local OvaleActionBarClass = __class(OvaleActionBarBase, {
                     if  not self.macro[actionText] or slot < self.macro[actionText] then
                         self.macro[actionText] = slot
                     end
-                    local _, _, spellId = GetMacroSpell(id)
+                    local spellId = GetMacroSpell(id)
                     if spellId then
                         if  not self.spell[spellId] or slot < self.spell[spellId] then
                             self.spell[spellId] = slot

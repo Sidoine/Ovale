@@ -115,9 +115,10 @@ local OvaleStanceClass = __class(OvaleStanceBase, {
         self:StartProfiling("OvaleStance_CreateStanceList")
         wipe(self.stanceList)
         wipe(self.stanceId)
-        local _, name, stanceName
+        local _, name, stanceName, spellId
         for i = 1, GetNumShapeshiftForms(), 1 do
-            _, name = GetShapeshiftFormInfo(i)
+            _, _, _, spellId = GetShapeshiftFormInfo(i)
+            name = GetSpellInfo(spellId)
             stanceName = SPELL_NAME_TO_STANCE[name]
             if stanceName then
                 self.stanceList[i] = stanceName

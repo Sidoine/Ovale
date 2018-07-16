@@ -49,7 +49,6 @@ local __BaseState = LibStub:GetLibrary("ovale/BaseState")
 local baseState = __BaseState.baseState
 local strmatch = match
 local INFINITY = huge
-local MIN_REFRESH_TIME = 0.05
 local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
     ToggleOptions = function(self)
         if (self.content:IsShown()) then
@@ -125,7 +124,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
             Ovale.refreshNeeded[guid] = true
         end
         self.timeSinceLastUpdate = self.timeSinceLastUpdate + elapsed
-        local refresh = OvaleDebug.trace or self.timeSinceLastUpdate > MIN_REFRESH_TIME and next(Ovale.refreshNeeded)
+        local refresh = OvaleDebug.trace or self.timeSinceLastUpdate > Ovale.db.profile.apparence.minFrameRefresh / 1000 and next(Ovale.refreshNeeded) or guid and self.timeSinceLastUpdate > Ovale.db.profile.apparence.maxFrameRefresh / 1000
         if refresh then
             Ovale:AddRefreshInterval(self.timeSinceLastUpdate * 1000)
             OvaleState:InitializeState()

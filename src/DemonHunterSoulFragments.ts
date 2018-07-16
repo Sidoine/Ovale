@@ -3,7 +3,7 @@ import { OvaleDebug } from "./Debug";
 import { OvaleState, StateModule } from "./State";
 import aceEvent from "@wowts/ace_event-3.0";
 import { insert } from "@wowts/table";
-import { GetTime, GetSpellCount } from "@wowts/wow-mock";
+import { GetTime, GetSpellCount, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { LuaArray, type, pairs } from "@wowts/lua";
 
 
@@ -58,7 +58,8 @@ class OvaleDemonHunterSoulFragmentsClass extends OvaleDemonHunterSoulFragmentsBa
         this.SetCurrentSoulFragments();
     }
 
-    COMBAT_LOG_EVENT_UNFILTERED(event, _2, subtype, _4, sourceGUID, _6, _7, _8, _9, _10, _11, _12, spellID, spellName) {
+    COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
+        let [, subtype, , sourceGUID, , , , , , , , spellID] = CombatLogGetCurrentEventInfo();
         let me = Ovale.playerGUID;
         if (sourceGUID == me) {
             //let current_sould_fragment_count = this.last_soul_fragment_count;
@@ -93,7 +94,6 @@ class OvaleDemonHunterSoulFragmentsClass extends OvaleDemonHunterSoulFragmentsBa
                 timestamp: now,
                 fragments: count
             }
-            this.Debug("Setting current soul fragment count to '%d' (at: %s)", entry.fragments, entry.timestamp);
             this.last_soul_fragment_count = entry;
             insert(this.soul_fragments, entry);
         }
@@ -124,5 +124,6 @@ class DemonHunterSoulFragmentsState implements StateModule {
     }
 }
 
+OvaleDemonHunterSoulFragments = new OvaleDemonHunterSoulFragmentsClass();
 export const demonHunterSoulFragmentsState = new DemonHunterSoulFragmentsState();
 OvaleState.RegisterState(demonHunterSoulFragmentsState);

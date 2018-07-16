@@ -22,7 +22,6 @@ import { AstNode } from "./AST";
 
 let strmatch = match;
 let INFINITY = huge;
-let MIN_REFRESH_TIME = 0.05;
 
 type BaseState = {};
 
@@ -151,7 +150,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             Ovale.refreshNeeded[guid] = true;
         }
         this.timeSinceLastUpdate = this.timeSinceLastUpdate + elapsed;
-        let refresh = OvaleDebug.trace || this.timeSinceLastUpdate > MIN_REFRESH_TIME && next(Ovale.refreshNeeded);
+        let refresh = OvaleDebug.trace || this.timeSinceLastUpdate > Ovale.db.profile.apparence.minFrameRefresh / 1000 && next(Ovale.refreshNeeded) || guid && this.timeSinceLastUpdate > Ovale.db.profile.apparence.maxFrameRefresh / 1000;
         if (refresh) {
             Ovale.AddRefreshInterval(this.timeSinceLastUpdate * 1000);
             OvaleState.InitializeState();

@@ -43,7 +43,6 @@ class OvaleRunesClass extends OvaleRunesBase {
             }
             this.RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateAllRunes");
             this.RegisterEvent("RUNE_POWER_UPDATE");
-            this.RegisterEvent("RUNE_TYPE_UPDATE");
             this.RegisterEvent("UNIT_RANGEDDAMAGE");
             this.RegisterEvent("UNIT_SPELL_HASTE", "UNIT_RANGEDDAMAGE");
             if (Ovale.playerGUID) this.UpdateAllRunes();
@@ -53,7 +52,6 @@ class OvaleRunesClass extends OvaleRunesBase {
         if (Ovale.playerClass == "DEATHKNIGHT") {
             this.UnregisterEvent("PLAYER_ENTERING_WORLD");
             this.UnregisterEvent("RUNE_POWER_UPDATE");
-            this.UnregisterEvent("RUNE_TYPE_UPDATE");
             this.UnregisterEvent("UNIT_RANGEDDAMAGE");
             this.UnregisterEvent("UNIT_SPELL_HASTE");
             this.current.rune = {}
