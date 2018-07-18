@@ -308,8 +308,8 @@ local OvalePowerClass = __class(OvalePowerBase, {
         self:RegisterEvent("UNIT_DISPLAYPOWER")
         self:RegisterEvent("UNIT_LEVEL")
         self:RegisterEvent("UNIT_MAXPOWER")
-        self:RegisterEvent("UNIT_POWER")
-        self:RegisterEvent("UNIT_POWER_FREQUENT", "UNIT_POWER")
+        self:RegisterEvent("UNIT_POWER_UPDATE")
+        self:RegisterEvent("UNIT_POWER_FREQUENT", "UNIT_POWER_UPDATE")
         self:RegisterEvent("UNIT_RANGEDDAMAGE")
         self:RegisterEvent("UNIT_SPELL_HASTE", "UNIT_RANGEDDAMAGE")
         self:RegisterMessage("Ovale_StanceChanged", "EventHandler")
@@ -327,7 +327,7 @@ local OvalePowerClass = __class(OvalePowerBase, {
         self:UnregisterEvent("UNIT_DISPLAYPOWER")
         self:UnregisterEvent("UNIT_LEVEL")
         self:UnregisterEvent("UNIT_MAXPOWER")
-        self:UnregisterEvent("UNIT_POWER")
+        self:UnregisterEvent("UNIT_POWER_UPDATE")
         self:UnregisterEvent("UNIT_POWER_FREQUENT")
         self:UnregisterEvent("UNIT_RANGEDDAMAGE")
         self:UnregisterEvent("UNIT_SPELL_HASTE")
@@ -359,7 +359,7 @@ local OvalePowerClass = __class(OvalePowerBase, {
             end
         end
     end,
-    UNIT_POWER = function(self, event, unitId, powerToken)
+    UNIT_POWER_UPDATE = function(self, event, unitId, powerToken)
         if unitId == "player" then
             local powerType = self.POWER_TYPE[powerToken]
             if powerType then
@@ -404,7 +404,6 @@ local OvalePowerClass = __class(OvalePowerBase, {
             self:DebugTimestamp("%s: %d -> %d (%s).", event, self.current.power[powerType], power, powerType)
             if self.current.power[powerType] ~= power then
                 self.current.power[powerType] = power
-                Ovale:needRefresh()
             end
         else
             for powerType, powerInfo in pairs(self.POWER_INFO) do
@@ -412,11 +411,12 @@ local OvalePowerClass = __class(OvalePowerBase, {
                 self:DebugTimestamp("%s: %d -> %d (%s).", event, self.current.power[powerType], power, powerType)
                 if self.current.power[powerType] ~= power then
                     self.current.power[powerType] = power
-                    Ovale:needRefresh()
                 end
             end
         end
-        Ovale:needRefresh()
+        if event == "UNIT_POWER_UPDATE" then
+            Ovale:needRefresh()
+        end
         self:StopProfiling("OvalePower_UpdatePower")
     end,
     UpdatePowerRegen = function(self, event)

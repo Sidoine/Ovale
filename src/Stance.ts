@@ -111,9 +111,10 @@ class OvaleStanceClass extends OvaleStanceBase {
         this.StartProfiling("OvaleStance_CreateStanceList");
         wipe(this.stanceList);
         wipe(this.stanceId);
-        let _, name, stanceName;
+        let _, name, stanceName, spellId;
         for (let i = 1; i <= GetNumShapeshiftForms(); i += 1) {
-            [_, name] = GetShapeshiftFormInfo(i);
+            [_, , , spellId] = GetShapeshiftFormInfo(i);
+            [name] = GetSpellInfo(spellId);
             stanceName = SPELL_NAME_TO_STANCE[name];
             if (stanceName) {
                 this.stanceList[i] = stanceName;

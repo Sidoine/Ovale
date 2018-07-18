@@ -75,7 +75,7 @@ class OvaleSigilClass extends OvaleSigilBase {
         }
     }
 
-    UNIT_SPELLCAST_SUCCEEDED(event, unitId, spellName, spellRank, guid, spellId, ...__args) {
+    UNIT_SPELLCAST_SUCCEEDED(event, unitId, guid, spellId, ...__args) {
         if ((!OvalePaperDoll.IsSpecialization("vengeance"))) {
             return;
         }

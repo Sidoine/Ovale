@@ -2,7 +2,7 @@ import { Ovale } from "./Ovale";
 import { OvaleDebug } from "./Debug";
 import { OvaleAura } from "./Aura";
 import aceEvent from "@wowts/ace_event-3.0";
-import { GetSpecialization, GetSpecializationInfo, GetTime, GetTalentInfoByID } from "@wowts/wow-mock";
+import { GetSpecialization, GetSpecializationInfo, GetTime, GetTalentInfoByID, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
 import { select } from "@wowts/lua";
 
@@ -52,8 +52,8 @@ class OvaleDemonHunterDemonicClass extends OvaleDemonHunterDemonicBase {
             this.UnregisterMessage("COMBAT_LOG_EVENT_UNFILTERED");
         }
     }
-    COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...__args) {
-        let [arg12, arg13] = __args;
+    COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
+        let [, cleuEvent, , sourceGUID, , , , , , , , arg12, arg13] = CombatLogGetCurrentEventInfo();
         if (sourceGUID == this.playerGUID && cleuEvent == "SPELL_CAST_SUCCESS") {
             let [spellId, spellName] = [arg12, arg13];
             if (HAVOC_EYE_BEAM_SPELL_ID == spellId) {

@@ -17,6 +17,8 @@ local LE_PARTY_CATEGORY_INSTANCE = LE_PARTY_CATEGORY_INSTANCE
 local GetTime = GetTime
 local UnitCastingInfo = UnitCastingInfo
 local UnitChannelInfo = UnitChannelInfo
+local __SpellBook = LibStub:GetLibrary("ovale/SpellBook")
+local OvaleSpellBook = __SpellBook.OvaleSpellBook
 local OvaleScoreBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleScore", aceEvent, AceSerializer))
 local MSG_PREFIX = Ovale.MSG_PREFIX
 local self_playerGUID = nil
@@ -81,9 +83,10 @@ local OvaleScoreClass = __class(OvaleScoreBase, {
             end
         end
     end,
-    UNIT_SPELLCAST_CHANNEL_START = function(self, event, unitId, spell, rank, lineId, spellId)
+    UNIT_SPELLCAST_CHANNEL_START = function(self, event, unitId, lineId, spellId)
         if unitId == "player" or unitId == "pet" then
             local now = GetTime()
+            local spell = OvaleSpellBook:GetSpellName(spellId)
             local spellcast = OvaleFuture:GetSpellcast(spell, spellId, nil, now)
             if spellcast then
                 local name = UnitChannelInfo(unitId)
@@ -93,21 +96,23 @@ local OvaleScoreClass = __class(OvaleScoreBase, {
             end
         end
     end,
-    UNIT_SPELLCAST_START = function(self, event, unitId, spell, rank, lineId, spellId)
+    UNIT_SPELLCAST_START = function(self, event, unitId, lineId, spellId)
         if unitId == "player" or unitId == "pet" then
             local now = GetTime()
+            local spell = OvaleSpellBook:GetSpellName(spellId)
             local spellcast = OvaleFuture:GetSpellcast(spell, spellId, lineId, now)
             if spellcast then
-                local name, _, _, _, _, _, _, castId = UnitCastingInfo(unitId)
+                local name, _, _, _, _, _, castId = UnitCastingInfo(unitId)
                 if lineId == castId and name == spell then
                     self:ScoreSpell(spellId)
                 end
             end
         end
     end,
-    UNIT_SPELLCAST_SUCCEEDED = function(self, event, unitId, spell, rank, lineId, spellId)
+    UNIT_SPELLCAST_SUCCEEDED = function(self, event, unitId, lineId, spellId)
         if unitId == "player" or unitId == "pet" then
             local now = GetTime()
+            local spell = OvaleSpellBook:GetSpellName(spellId)
             local spellcast = OvaleFuture:GetSpellcast(spell, spellId, lineId, now)
             if spellcast then
                 if spellcast.success or ( not spellcast.start) or ( not spellcast.stop) or spellcast.channel then

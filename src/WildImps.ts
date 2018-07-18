@@ -2,7 +2,7 @@ import { OvaleState } from "./State";
 import { Ovale } from "./Ovale";
 import aceEvent from "@wowts/ace_event-3.0";
 import { LuaArray, tonumber, pairs, LuaObj } from "@wowts/lua";
-import { GetTime } from "@wowts/wow-mock";
+import { GetTime, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { find } from "@wowts/string";
 
 let OvaleWildImpsBase = Ovale.NewModule("OvaleWildImps", aceEvent);
@@ -47,12 +47,12 @@ class OvaleWildImpsClass extends OvaleWildImpsBase {
             this.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         }
     }
-    COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId: number) {
-        self_serial = self_serial + 1;
-        Ovale.needRefresh();
+    COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
+        let [, cleuEvent, , sourceGUID, , , , destGUID, , , , spellId] = CombatLogGetCurrentEventInfo();
         if (sourceGUID != Ovale.playerGUID) {
             return;
         }
+        self_serial = self_serial + 1;
         if (cleuEvent == "SPELL_SUMMON") {
             let [,,,, , , , creatureId] = find(destGUID, '(%S+)-(%d+)-(%d+)-(%d+)-(%d+)-(%d+)-(%S+)');
             creatureId = tonumber(creatureId);
@@ -72,15 +72,11 @@ class OvaleWildImpsClass extends OvaleWildImpsBase {
                     self_demons[k] = undefined;
                 }
             }
-        } else if (cleuEvent == 'SPELL_INSTAKILL') {
-            if (spellId == 196278) {
-                self_demons[destGUID] = undefined;
-            }
+            Ovale.needRefresh();
         } else if (cleuEvent == 'SPELL_CAST_SUCCESS') {
-            if (spellId == 193396) {
-                for (const [, d] of pairs(self_demons)) {
-                    d.de = true;
-                }
+            if (spellId == 196277) {
+                self_demons[destGUID] = undefined;
+                Ovale.needRefresh();
             }
         }
     }

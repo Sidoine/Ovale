@@ -8,7 +8,7 @@ import AceTimer from "@wowts/ace_timer-3.0";
 import { band, bor } from "@wowts/bit";
 import { ipairs, pairs, wipe, truthy, LuaObj } from "@wowts/lua";
 import { find } from "@wowts/string";
-import { GetTime, COMBATLOG_OBJECT_AFFILIATION_MINE, COMBATLOG_OBJECT_AFFILIATION_PARTY, COMBATLOG_OBJECT_AFFILIATION_RAID, COMBATLOG_OBJECT_REACTION_FRIENDLY } from "@wowts/wow-mock";
+import { GetTime, COMBATLOG_OBJECT_AFFILIATION_MINE, COMBATLOG_OBJECT_AFFILIATION_PARTY, COMBATLOG_OBJECT_AFFILIATION_RAID, COMBATLOG_OBJECT_REACTION_FRIENDLY, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 
 export let OvaleEnemies: OvaleEnemiesClass;
 let GROUP_MEMBER = bor(COMBATLOG_OBJECT_AFFILIATION_MINE, COMBATLOG_OBJECT_AFFILIATION_PARTY, COMBATLOG_OBJECT_AFFILIATION_RAID);
@@ -84,7 +84,8 @@ class OvaleEnemiesClass extends OvaleEnemiesBase {
         this.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         this.UnregisterEvent("PLAYER_REGEN_DISABLED");
     }
-    COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...__args) {
+    COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
+        let [, cleuEvent, , sourceGUID, sourceName, sourceFlags, , destGUID, destName, destFlags] = CombatLogGetCurrentEventInfo();
         if (CLEU_UNIT_REMOVED[cleuEvent]) {
             let now = GetTime();
             this.RemoveEnemy(cleuEvent, destGUID, now, true);

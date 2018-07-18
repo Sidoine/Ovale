@@ -22,6 +22,7 @@ local SCHOOL_MASK_FROST = SCHOOL_MASK_FROST
 local SCHOOL_MASK_HOLY = SCHOOL_MASK_HOLY
 local SCHOOL_MASK_NATURE = SCHOOL_MASK_NATURE
 local SCHOOL_MASK_SHADOW = SCHOOL_MASK_SHADOW
+local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local OvaleDamageTakenBase = OvaleProfiler:RegisterProfiling(OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleDamageTaken", aceEvent)))
 local self_pool = OvalePool("OvaleDamageTaken_pool")
 local DAMAGE_TAKEN_WINDOW = 20
@@ -36,8 +37,8 @@ local OvaleDamageTakenClass = __class(OvaleDamageTakenBase, {
         self:UnregisterEvent("PLAYER_REGEN_ENABLED")
         self_pool:Drain()
     end,
-    COMBAT_LOG_EVENT_UNFILTERED = function(self, event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
-        local arg12, arg13, arg14, arg15, _, _, _, _, _, _, _, _, _ = ...
+    COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
+        local _, cleuEvent, _, _, _, _, _, destGUID, _, _, _, arg12, arg13, arg14, arg15 = CombatLogGetCurrentEventInfo()
         if destGUID == Ovale.playerGUID and sub(cleuEvent, -7) == "_DAMAGE" then
             self:StartProfiling("OvaleDamageTaken_COMBAT_LOG_EVENT_UNFILTERED")
             local now = GetTime()

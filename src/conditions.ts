@@ -811,9 +811,9 @@ function GetHastedTime(seconds, haste, state: BaseState) {
             castSpellId = OvaleFuture.next.currentCast.spellId;
             castSpellName = OvaleSpellBook.GetSpellName(castSpellId);
         } else {
-            let [spellName, _1, _2, _3, startTime, endTime] = UnitCastingInfo(target);
+            let [spellName, _1, _2, startTime, endTime] = UnitCastingInfo(target);
             if (!spellName) {
-                [spellName, _1, _2, _3, startTime, endTime] = UnitChannelInfo(target);
+                [spellName, _1, _2, startTime, endTime] = UnitChannelInfo(target);
             }
             if (spellName) {
                 castSpellName = spellName;
@@ -2076,9 +2076,9 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     function IsInterruptible(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let yesno = positionalParams[1];
         let [target] = ParseCondition(positionalParams, namedParams, state);
-        let [name, _1, _2, _3, _4, _5, _6, , notInterruptible] = UnitCastingInfo(target);
+        let [name, _1, _2, _3, _4, _5, , notInterruptible] = UnitCastingInfo(target);
         if (!name) {
-            [name, _1, _2, _3, _4, _5, _6, notInterruptible] = UnitChannelInfo(target);
+            [name, _1, _2, _3, _4, _5, notInterruptible] = UnitChannelInfo(target);
         }
         let boolean = notInterruptible != undefined && !notInterruptible;
         return TestBoolean(boolean, yesno);
@@ -2575,7 +2575,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
 	 if HolyPower(more 2) Spell(word_of_glory)
      */
     function HolyPower(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        return Power("holy", positionalParams, namedParams, state, atTime);
+        return Power("holypower", positionalParams, namedParams, state, atTime);
     }
 
     /**
@@ -3398,7 +3398,7 @@ l    */
     function RemainingCastTime(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [comparator, limit] = [positionalParams[1], positionalParams[2]];
         let [target] = ParseCondition(positionalParams, namedParams, state);
-        let [, , , , startTime, endTime] = UnitCastingInfo(target);
+        let [, , , startTime, endTime] = UnitCastingInfo(target);
         if (startTime && endTime) {
             startTime = startTime / 1000;
             endTime = endTime / 1000;

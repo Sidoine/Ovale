@@ -11,6 +11,7 @@ local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local insert = table.insert
 local GetTime = GetTime
 local GetSpellCount = GetSpellCount
+local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local type = type
 local pairs = pairs
 local OvaleDemonHunterSoulFragmentsBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleDemonHunterSoulFragments", aceEvent))
@@ -49,7 +50,8 @@ local OvaleDemonHunterSoulFragmentsClass = __class(OvaleDemonHunterSoulFragments
         self.last_checked = nil
         self:SetCurrentSoulFragments()
     end,
-    COMBAT_LOG_EVENT_UNFILTERED = function(self, event, _2, subtype, _4, sourceGUID, _6, _7, _8, _9, _10, _11, _12, spellID, spellName)
+    COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
+        local _, subtype, _, sourceGUID, _, _, _, _, _, _, _, spellID = CombatLogGetCurrentEventInfo()
         local me = Ovale.playerGUID
         if sourceGUID == me then
             if subtype == "SPELL_HEAL" and spellID == SOUL_FRAGMENTS_SPELL_HEAL_ID then
@@ -82,7 +84,6 @@ local OvaleDemonHunterSoulFragmentsClass = __class(OvaleDemonHunterSoulFragments
                 timestamp = now,
                 fragments = count
             }
-            self:Debug("Setting current soul fragment count to '%d' (at: %s)", entry.fragments, entry.timestamp)
             self.last_soul_fragment_count = entry
             insert(self.soul_fragments, entry)
         end
@@ -112,5 +113,6 @@ local DemonHunterSoulFragmentsState = __class(nil, {
     ResetState = function(self)
     end,
 })
+__exports.OvaleDemonHunterSoulFragments = OvaleDemonHunterSoulFragmentsClass()
 __exports.demonHunterSoulFragmentsState = DemonHunterSoulFragmentsState()
 OvaleState:RegisterState(__exports.demonHunterSoulFragmentsState)

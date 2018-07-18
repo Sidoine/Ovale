@@ -6,7 +6,7 @@ import { Ovale } from "./Ovale";
 import aceEvent from "@wowts/ace_event-3.0";
 import { band, bor } from "@wowts/bit";
 import { sub } from "@wowts/string";
-import { GetTime, SCHOOL_MASK_ARCANE, SCHOOL_MASK_FIRE, SCHOOL_MASK_FROST, SCHOOL_MASK_HOLY, SCHOOL_MASK_NATURE, SCHOOL_MASK_SHADOW } from "@wowts/wow-mock";
+import { GetTime, SCHOOL_MASK_ARCANE, SCHOOL_MASK_FIRE, SCHOOL_MASK_FROST, SCHOOL_MASK_HOLY, SCHOOL_MASK_NATURE, SCHOOL_MASK_SHADOW, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 
 let OvaleDamageTakenBase = OvaleProfiler.RegisterProfiling(OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleDamageTaken", aceEvent)));
 export let OvaleDamageTaken: OvaleDamageTakenClass;
@@ -33,8 +33,8 @@ class OvaleDamageTakenClass extends OvaleDamageTakenBase {
         this.UnregisterEvent("PLAYER_REGEN_ENABLED");
         self_pool.Drain();
     }
-    COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...__args) {
-        let [arg12, arg13, arg14, arg15, , , , , , , , , , ] = __args;
+    COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
+        let [, cleuEvent, , , , , , destGUID, , , , arg12, arg13, arg14, arg15] = CombatLogGetCurrentEventInfo();
         if (destGUID == Ovale.playerGUID && sub(cleuEvent, -7) == "_DAMAGE") {
             this.StartProfiling("OvaleDamageTaken_COMBAT_LOG_EVENT_UNFILTERED");
             let now = GetTime();

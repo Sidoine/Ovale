@@ -24,6 +24,7 @@ local COMBATLOG_OBJECT_AFFILIATION_MINE = COMBATLOG_OBJECT_AFFILIATION_MINE
 local COMBATLOG_OBJECT_AFFILIATION_PARTY = COMBATLOG_OBJECT_AFFILIATION_PARTY
 local COMBATLOG_OBJECT_AFFILIATION_RAID = COMBATLOG_OBJECT_AFFILIATION_RAID
 local COMBATLOG_OBJECT_REACTION_FRIENDLY = COMBATLOG_OBJECT_REACTION_FRIENDLY
+local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local GROUP_MEMBER = bor(COMBATLOG_OBJECT_AFFILIATION_MINE, COMBATLOG_OBJECT_AFFILIATION_PARTY, COMBATLOG_OBJECT_AFFILIATION_RAID)
 local CLEU_TAG_SUFFIXES = {
     [1] = "_DAMAGE",
@@ -98,7 +99,8 @@ local OvaleEnemiesClass = __class(OvaleEnemiesBase, {
         self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
         self:UnregisterEvent("PLAYER_REGEN_DISABLED")
     end,
-    COMBAT_LOG_EVENT_UNFILTERED = function(self, event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
+    COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
+        local _, cleuEvent, _, sourceGUID, sourceName, sourceFlags, _, destGUID, destName, destFlags = CombatLogGetCurrentEventInfo()
         if CLEU_UNIT_REMOVED[cleuEvent] then
             local now = GetTime()
             self:RemoveEnemy(cleuEvent, destGUID, now, true)

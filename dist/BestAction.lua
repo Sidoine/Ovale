@@ -779,7 +779,7 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
             end
         end
         timeSpan, result = self:RecursiveCompute(element, state, atTime)
-        self:StartProfiling("OvaleBestAction_Compute")
+        self:StopProfiling("OvaleBestAction_Compute")
         return timeSpan, result
     end,
     RecursiveCompute = function(self, element, state, atTime)
