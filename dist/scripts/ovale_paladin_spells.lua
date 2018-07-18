@@ -19,8 +19,10 @@ ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!guardian_of_ancient_ki
 
 # Learned spells.
 Define(aegis_of_light 204150)
-	SpellInfo(aegis_of_light cd=300 duration=6)
+	SpellInfo(aegis_of_light cd=180)
+	SpellAddBuff(aegis_of_light aegis_of_light_buff=1)
 Define(aegis_of_light_buff 204150)
+	SpellInfo(aegis_of_light_buff duration=6)
 Define(ardent_defender 31850)
 	SpellInfo(ardent_defender cd=120 gcd=0 offgcd=1)
 	SpellAddBuff(ardent_defender ardent_defender_buff=1)
