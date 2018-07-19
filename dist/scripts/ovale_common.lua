@@ -155,6 +155,8 @@ Define(sephuzs_secret_buff 208051)
 ### Racials
 ###
 
+Define(ancestral_call 274738)
+	SpellInfo(ancestral_call cd=120)
 Define(arcane_torrent_chi 129597)
 	SpellInfo(arcane_torrent_chi cd=120 chi=-1)
 Define(arcane_torrent_energy 25046)
@@ -194,6 +196,8 @@ Define(blood_fury_sp_buff 33702)
 	SpellInfo(blood_fury_sp_buff duration=15)
 Define(darkflight 68992)
 	SpellInfo(darkflight cd=120)
+Define(fireblood 265221)
+	SpellInfo(fireblood cd=120)
 Define(quaking_palm 107079)
 	SpellInfo(quaking_palm cd=120 interrupt=1)
 Define(rocket_barrage 69041)
