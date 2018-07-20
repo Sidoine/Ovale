@@ -67,14 +67,15 @@ do
                     width = "full",
                     get = function(info)
                         wipe(output)
+                        local now = GetTime()
                         local harmfulFilter = (Ovale.db.profile.apparence.fullAuraScan) and "HARMFUL" or "HARMFUL|PLAYER"
                         local helpfulFilter = (Ovale.db.profile.apparence.fullAuraScan) and "HELPFUL" or "HELPFUL|PLAYER"
-                        local helpful = __exports.OvaleAura:DebugUnitAuras("player", helpfulFilter, nil)
+                        local helpful = __exports.OvaleAura:DebugUnitAuras("player", helpfulFilter, now)
                         if helpful then
                             output[#output + 1] = "== BUFFS =="
                             output[#output + 1] = helpful
                         end
-                        local harmful = __exports.OvaleAura:DebugUnitAuras("player", harmfulFilter, nil)
+                        local harmful = __exports.OvaleAura:DebugUnitAuras("player", harmfulFilter, now)
                         if harmful then
                             output[#output + 1] = "== DEBUFFS =="
                             output[#output + 1] = harmful
@@ -96,14 +97,15 @@ do
                     width = "full",
                     get = function(info)
                         wipe(output)
+                        local now = GetTime()
                         local harmfulFilter = (Ovale.db.profile.apparence.fullAuraScan) and "HARMFUL" or "HARMFUL|PLAYER"
                         local helpfulFilter = (Ovale.db.profile.apparence.fullAuraScan) and "HELPFUL" or "HELPFUL|PLAYER"
-                        local helpful = __exports.OvaleAura:DebugUnitAuras("target", helpfulFilter, nil)
+                        local helpful = __exports.OvaleAura:DebugUnitAuras("target", helpfulFilter, now)
                         if helpful then
                             output[#output + 1] = "== BUFFS =="
                             output[#output + 1] = helpful
                         end
-                        local harmful = __exports.OvaleAura:DebugUnitAuras("target", harmfulFilter, nil)
+                        local harmful = __exports.OvaleAura:DebugUnitAuras("target", harmfulFilter, now)
                         if harmful then
                             output[#output + 1] = "== DEBUFFS =="
                             output[#output + 1] = harmful
