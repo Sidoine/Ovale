@@ -1,0 +1,8 @@
+------------------------------------------------------------------------
+r190 | stanzilla | 2018-05-15 12:24:25 +0000 (Tue, 15 May 2018) | 1 line
+Changed paths:
+   M /trunk/LibRangeCheck-2.0/LibRangeCheck-2.0.lua
+
+Glyphs no longer alter spell mechanics and the event is gone as well.
+------------------------------------------------------------------------
+
