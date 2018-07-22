@@ -445,11 +445,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
         self_pool.Drain();
     }
     UNIT_AURA(event: string, unitId: string) {
-        if (!Ovale.db.profile.apparence.laptopMode){
-            this.ScanAuras(unitId);
-        }else if(unitId == 'player' || unitId == 'target' || unitId == 'pet' || unitId == 'focus'){
-            this.ScanAuras(unitId);
-        }
+        this.ScanAuras(unitId);
     }
     Ovale_UnitChanged(event: string, unitId: string, guid: string) {
         if ((unitId == "pet" || unitId == "target") && guid) {

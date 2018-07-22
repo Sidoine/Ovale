@@ -497,11 +497,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         self_pool:Drain()
     end,
     UNIT_AURA = function(self, event, unitId)
-        if  not Ovale.db.profile.apparence.laptopMode then
-            self:ScanAuras(unitId)
-        elseif unitId == "player" or unitId == "target" or unitId == "pet" or unitId == "focus" then
-            self:ScanAuras(unitId)
-        end
+        self:ScanAuras(unitId)
     end,
     Ovale_UnitChanged = function(self, event, unitId, guid)
         if (unitId == "pet" or unitId == "target") and guid then
