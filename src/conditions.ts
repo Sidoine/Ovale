@@ -34,6 +34,7 @@ import { OvaleStance } from "./Stance";
 import { OvaleSigil } from "./DemonHunterSigils";
 import { baseState } from "./BaseState";
 import { OvaleSpells } from "./Spells";
+import { OvaleAzerite } from "./AzeriteArmor";
 let INFINITY = huge;
 
 type BaseState = {};
@@ -123,6 +124,14 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     }
     OvaleCondition.RegisterCondition("hasartifacttrait", false, HasArtifactTrait);
     OvaleCondition.RegisterCondition("artifacttraitrank", false, ArtifactTraitRank);
+}
+{
+    function HasAzeriteTrait(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number){
+        let [spellId, yesno] = [positionalParams[1], positionalParams[2]];
+        let value = OvaleAzerite.HasTrait(spellId);
+        return TestBoolean(value, yesno);
+    }
+    OvaleCondition.RegisterCondition("hasazeritetrait", false, HasAzeriteTrait);
 }
 {
     /** Get the base duration of the aura in seconds if it is applied at the current time.
