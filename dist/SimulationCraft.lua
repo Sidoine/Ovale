@@ -1645,6 +1645,7 @@ local EmitOperand = nil
 local EmitOperandAction = nil
 local EmitOperandActiveDot = nil
 local EmitOperandArtifact = nil
+local EmitOperandAzerite = nil
 local EmitOperandBuff = nil
 local EmitOperandCharacter = nil
 local EmitOperandCooldown = nil
@@ -2650,6 +2651,8 @@ EmitOperand = function(parseNode, nodeList, annotation, action)
             ok, node = EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target)
         elseif token == "artifact" then
             ok, node = EmitOperandArtifact(operand, parseNode, nodeList, annotation, action, target)
+        elseif token == "azerite" then
+            ok, node = EmitOperandAzerite(operand, parseNode, nodeList, annotation, action, target)
         elseif token == "buff" then
             ok, node = EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target)
         elseif token == "consumable" then
@@ -2853,6 +2856,31 @@ EmitOperandArtifact = function(operand, parseNode, nodeList, annotation, action,
             code = format("ArtifactTraitRank(%s)", name)
         elseif property == "enabled" then
             code = format("HasArtifactTrait(%s)", name)
+        else
+            ok = false
+        end
+        if ok and code then
+            annotation.astAnnotation = annotation.astAnnotation or {}
+            node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+            AddSymbol(annotation, name)
+        end
+    else
+        ok = false
+    end
+    return ok, node
+end
+
+EmitOperandAzerite = function(operand, parseNode, nodeList, annotation, action, target)
+    local ok = true
+    local node
+    local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
+    local token = tokenIterator()
+    if token == "azerite" then
+        local code
+        local name = tokenIterator()
+        local property = tokenIterator()
+        if property == "enabled" then
+            code = format("HasAzeriteTrait(%s)", name)
         else
             ok = false
         end
