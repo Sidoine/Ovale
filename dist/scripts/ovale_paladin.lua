@@ -241,386 +241,394 @@ AddIcon help=cd specialization=holy
     OvaleScripts:RegisterScript("PALADIN", "holy", name, desc, code, "script")
 end
 do
-    local name = "sc_paladin_protection_t19"
-    local desc = "[7.0] Simulationcraft: Paladin_Protection_T19"
+    local name = "sc_paladin_protection_t21"
+    local desc = "[8.0] Simulationcraft: Paladin_Protection_T21"
     local code = [[
-# Based on SimulationCraft profile "Paladin_Protection_T19P".
-#	class=paladin
-#	spec=protection
-#	talents=2231223
-
-Include(ovale_common)
-Include(ovale_trinkets_mop)
-Include(ovale_trinkets_wod)
-Include(ovale_paladin_spells)
-
-AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=protection)
-AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=protection)
-
-AddFunction ProtectionUseItemActions
-{
- Item(Trinket0Slot text=13 usable=1)
- Item(Trinket1Slot text=14 usable=1)
-}
-
-AddFunction ProtectionGetInMeleeRange
-{
- if CheckBoxOn(opt_melee_range) and not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
-}
-
-### actions.prot
-
-AddFunction ProtectionProtMainActions
-{
- #shield_of_the_righteous,if=(!talent.seraphim.enabled|action.shield_of_the_righteous.charges>2)&!(debuff.eye_of_tyr.up&buff.aegis_of_light.up&buff.ardent_defender.up&buff.guardian_of_ancient_kings.up&buff.divine_shield.up&buff.potion.up)
- if { not Talent(seraphim_talent) or Charges(shield_of_the_righteous) > 2 } and not { target.DebuffPresent(eye_of_tyr_debuff) and BuffPresent(aegis_of_light_buff) and BuffPresent(ardent_defender_buff) and BuffPresent(guardian_of_ancient_kings_buff) and BuffPresent(divine_shield_buff) and BuffPresent(potion_buff) } Spell(shield_of_the_righteous)
- #shield_of_the_righteous,if=(talent.bastion_of_light.enabled&talent.seraphim.enabled&buff.seraphim.up&cooldown.bastion_of_light.up)&!(debuff.eye_of_tyr.up&buff.aegis_of_light.up&buff.ardent_defender.up&buff.guardian_of_ancient_kings.up&buff.divine_shield.up&buff.potion.up)
- if Talent(bastion_of_light_talent) and Talent(seraphim_talent) and BuffPresent(seraphim_buff) and not SpellCooldown(bastion_of_light) > 0 and not { target.DebuffPresent(eye_of_tyr_debuff) and BuffPresent(aegis_of_light_buff) and BuffPresent(ardent_defender_buff) and BuffPresent(guardian_of_ancient_kings_buff) and BuffPresent(divine_shield_buff) and BuffPresent(potion_buff) } Spell(shield_of_the_righteous)
- #shield_of_the_righteous,if=(talent.bastion_of_light.enabled&!talent.seraphim.enabled&cooldown.bastion_of_light.up)&!(debuff.eye_of_tyr.up&buff.aegis_of_light.up&buff.ardent_defender.up&buff.guardian_of_ancient_kings.up&buff.divine_shield.up&buff.potion.up)
- if Talent(bastion_of_light_talent) and not Talent(seraphim_talent) and not SpellCooldown(bastion_of_light) > 0 and not { target.DebuffPresent(eye_of_tyr_debuff) and BuffPresent(aegis_of_light_buff) and BuffPresent(ardent_defender_buff) and BuffPresent(guardian_of_ancient_kings_buff) and BuffPresent(divine_shield_buff) and BuffPresent(potion_buff) } Spell(shield_of_the_righteous)
- #judgment
- Spell(judgment)
- #avengers_shield,if=talent.crusaders_judgment.enabled&buff.grand_crusader.up
- if Talent(crusaders_judgment_talent) and BuffPresent(grand_crusader_buff) Spell(avengers_shield)
- #blessed_hammer
- Spell(blessed_hammer)
- #avengers_shield
- Spell(avengers_shield)
- #consecration
- Spell(consecration)
- #hammer_of_the_righteous
- Spell(hammer_of_the_righteous)
-}
-
-AddFunction ProtectionProtMainPostConditions
-{
-}
-
-AddFunction ProtectionProtShortCdActions
-{
- #seraphim,if=talent.seraphim.enabled&action.shield_of_the_righteous.charges>=2
- if Talent(seraphim_talent) and Charges(shield_of_the_righteous) >= 2 Spell(seraphim)
-
- unless { not Talent(seraphim_talent) or Charges(shield_of_the_righteous) > 2 } and not { target.DebuffPresent(eye_of_tyr_debuff) and BuffPresent(aegis_of_light_buff) and BuffPresent(ardent_defender_buff) and BuffPresent(guardian_of_ancient_kings_buff) and BuffPresent(divine_shield_buff) and BuffPresent(potion_buff) } and Spell(shield_of_the_righteous) or Talent(bastion_of_light_talent) and Talent(seraphim_talent) and BuffPresent(seraphim_buff) and not SpellCooldown(bastion_of_light) > 0 and not { target.DebuffPresent(eye_of_tyr_debuff) and BuffPresent(aegis_of_light_buff) and BuffPresent(ardent_defender_buff) and BuffPresent(guardian_of_ancient_kings_buff) and BuffPresent(divine_shield_buff) and BuffPresent(potion_buff) } and Spell(shield_of_the_righteous) or Talent(bastion_of_light_talent) and not Talent(seraphim_talent) and not SpellCooldown(bastion_of_light) > 0 and not { target.DebuffPresent(eye_of_tyr_debuff) and BuffPresent(aegis_of_light_buff) and BuffPresent(ardent_defender_buff) and BuffPresent(guardian_of_ancient_kings_buff) and BuffPresent(divine_shield_buff) and BuffPresent(potion_buff) } and Spell(shield_of_the_righteous)
- {
-  #light_of_the_protector,if=(health.pct<40)
-  if HealthPercent() < 40 Spell(light_of_the_protector)
-  #hand_of_the_protector,if=(health.pct<40)
-  if HealthPercent() < 40 Spell(hand_of_the_protector)
-  #light_of_the_protector,if=(incoming_damage_10000ms<health.max*1.25)&health.pct<55&talent.righteous_protector.enabled
-  if IncomingDamage(10) < MaxHealth() * 1 and HealthPercent() < 55 and Talent(righteous_protector_talent) Spell(light_of_the_protector)
-  #light_of_the_protector,if=(incoming_damage_13000ms<health.max*1.6)&health.pct<55
-  if IncomingDamage(13) < MaxHealth() * 1 and HealthPercent() < 55 Spell(light_of_the_protector)
-  #hand_of_the_protector,if=(incoming_damage_6000ms<health.max*0.7)&health.pct<65&talent.righteous_protector.enabled
-  if IncomingDamage(6) < MaxHealth() * 0 and HealthPercent() < 65 and Talent(righteous_protector_talent) Spell(hand_of_the_protector)
-  #hand_of_the_protector,if=(incoming_damage_9000ms<health.max*1.2)&health.pct<55
-  if IncomingDamage(9) < MaxHealth() * 1 and HealthPercent() < 55 Spell(hand_of_the_protector)
- }
-}
-
-AddFunction ProtectionProtShortCdPostConditions
-{
- { not Talent(seraphim_talent) or Charges(shield_of_the_righteous) > 2 } and not { target.DebuffPresent(eye_of_tyr_debuff) and BuffPresent(aegis_of_light_buff) and BuffPresent(ardent_defender_buff) and BuffPresent(guardian_of_ancient_kings_buff) and BuffPresent(divine_shield_buff) and BuffPresent(potion_buff) } and Spell(shield_of_the_righteous) or Talent(bastion_of_light_talent) and Talent(seraphim_talent) and BuffPresent(seraphim_buff) and not SpellCooldown(bastion_of_light) > 0 and not { target.DebuffPresent(eye_of_tyr_debuff) and BuffPresent(aegis_of_light_buff) and BuffPresent(ardent_defender_buff) and BuffPresent(guardian_of_ancient_kings_buff) and BuffPresent(divine_shield_buff) and BuffPresent(potion_buff) } and Spell(shield_of_the_righteous) or Talent(bastion_of_light_talent) and not Talent(seraphim_talent) and not SpellCooldown(bastion_of_light) > 0 and not { target.DebuffPresent(eye_of_tyr_debuff) and BuffPresent(aegis_of_light_buff) and BuffPresent(ardent_defender_buff) and BuffPresent(guardian_of_ancient_kings_buff) and BuffPresent(divine_shield_buff) and BuffPresent(potion_buff) } and Spell(shield_of_the_righteous) or Spell(judgment) or Talent(crusaders_judgment_talent) and BuffPresent(grand_crusader_buff) and Spell(avengers_shield) or Spell(blessed_hammer) or Spell(avengers_shield) or Spell(consecration) or Spell(hammer_of_the_righteous)
-}
-
-AddFunction ProtectionProtCdActions
-{
- unless Talent(seraphim_talent) and Charges(shield_of_the_righteous) >= 2 and Spell(seraphim) or { not Talent(seraphim_talent) or Charges(shield_of_the_righteous) > 2 } and not { target.DebuffPresent(eye_of_tyr_debuff) and BuffPresent(aegis_of_light_buff) and BuffPresent(ardent_defender_buff) and BuffPresent(guardian_of_ancient_kings_buff) and BuffPresent(divine_shield_buff) and BuffPresent(potion_buff) } and Spell(shield_of_the_righteous) or Talent(bastion_of_light_talent) and Talent(seraphim_talent) and BuffPresent(seraphim_buff) and not SpellCooldown(bastion_of_light) > 0 and not { target.DebuffPresent(eye_of_tyr_debuff) and BuffPresent(aegis_of_light_buff) and BuffPresent(ardent_defender_buff) and BuffPresent(guardian_of_ancient_kings_buff) and BuffPresent(divine_shield_buff) and BuffPresent(potion_buff) } and Spell(shield_of_the_righteous) or Talent(bastion_of_light_talent) and not Talent(seraphim_talent) and not SpellCooldown(bastion_of_light) > 0 and not { target.DebuffPresent(eye_of_tyr_debuff) and BuffPresent(aegis_of_light_buff) and BuffPresent(ardent_defender_buff) and BuffPresent(guardian_of_ancient_kings_buff) and BuffPresent(divine_shield_buff) and BuffPresent(potion_buff) } and Spell(shield_of_the_righteous)
- {
-  #bastion_of_light,if=talent.bastion_of_light.enabled&action.shield_of_the_righteous.charges<1
-  if Talent(bastion_of_light_talent) and Charges(shield_of_the_righteous) < 1 Spell(bastion_of_light)
-
-  unless HealthPercent() < 40 and Spell(light_of_the_protector) or HealthPercent() < 40 and Spell(hand_of_the_protector) or IncomingDamage(10) < MaxHealth() * 1 and HealthPercent() < 55 and Talent(righteous_protector_talent) and Spell(light_of_the_protector) or IncomingDamage(13) < MaxHealth() * 1 and HealthPercent() < 55 and Spell(light_of_the_protector) or IncomingDamage(6) < MaxHealth() * 0 and HealthPercent() < 65 and Talent(righteous_protector_talent) and Spell(hand_of_the_protector) or IncomingDamage(9) < MaxHealth() * 1 and HealthPercent() < 55 and Spell(hand_of_the_protector)
-  {
-   #divine_steed,if=talent.knight_templar.enabled&incoming_damage_2500ms>health.max*0.4&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
-   if Talent(knight_templar_talent) and IncomingDamage(2) > MaxHealth() * 0 and not { target.DebuffPresent(eye_of_tyr_debuff) or BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff) } Spell(divine_steed)
-   #eye_of_tyr,if=incoming_damage_2500ms>health.max*0.4&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
-   if IncomingDamage(2) > MaxHealth() * 0 and not { target.DebuffPresent(eye_of_tyr_debuff) or BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff) } Spell(eye_of_tyr)
-   #aegis_of_light,if=incoming_damage_2500ms>health.max*0.4&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
-   if IncomingDamage(2) > MaxHealth() * 0 and not { target.DebuffPresent(eye_of_tyr_debuff) or BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff) } Spell(aegis_of_light)
-   #guardian_of_ancient_kings,if=incoming_damage_2500ms>health.max*0.4&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
-   if IncomingDamage(2) > MaxHealth() * 0 and not { target.DebuffPresent(eye_of_tyr_debuff) or BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff) } Spell(guardian_of_ancient_kings)
-   #divine_shield,if=talent.final_stand.enabled&incoming_damage_2500ms>health.max*0.4&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
-   if Talent(final_stand_talent) and IncomingDamage(2) > MaxHealth() * 0 and not { target.DebuffPresent(eye_of_tyr_debuff) or BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff) } Spell(divine_shield)
-   #ardent_defender,if=incoming_damage_2500ms>health.max*0.4&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
-   if IncomingDamage(2) > MaxHealth() * 0 and not { target.DebuffPresent(eye_of_tyr_debuff) or BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff) } Spell(ardent_defender)
-   #lay_on_hands,if=health.pct<15
-   if HealthPercent() < 15 Spell(lay_on_hands)
-   #potion,name=unbending_potion
-   if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(unbending_potion usable=1)
-   #potion,name=draenic_strength,if=incoming_damage_2500ms>health.max*0.4&&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)|target.time_to_die<=25
-   if { IncomingDamage(2) > MaxHealth() * 0 and not { target.DebuffPresent(eye_of_tyr_debuff) or BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff) } or target.TimeToDie() <= 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(draenic_strength_potion usable=1)
-   #stoneform,if=incoming_damage_2500ms>health.max*0.4&!(debuff.eye_of_tyr.up|buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
-   if IncomingDamage(2) > MaxHealth() * 0 and not { target.DebuffPresent(eye_of_tyr_debuff) or BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff) } Spell(stoneform)
-   #avenging_wrath,if=!talent.seraphim.enabled
-   if not Talent(seraphim_talent) Spell(avenging_wrath_melee)
-   #avenging_wrath,if=talent.seraphim.enabled&buff.seraphim.up
-   if Talent(seraphim_talent) and BuffPresent(seraphim_buff) Spell(avenging_wrath_melee)
-
-   unless Spell(judgment) or Talent(crusaders_judgment_talent) and BuffPresent(grand_crusader_buff) and Spell(avengers_shield) or Spell(blessed_hammer) or Spell(avengers_shield) or Spell(consecration)
-   {
-    #blinding_light
-    Spell(blinding_light)
-   }
-  }
- }
-}
-
-AddFunction ProtectionProtCdPostConditions
-{
- Talent(seraphim_talent) and Charges(shield_of_the_righteous) >= 2 and Spell(seraphim) or { not Talent(seraphim_talent) or Charges(shield_of_the_righteous) > 2 } and not { target.DebuffPresent(eye_of_tyr_debuff) and BuffPresent(aegis_of_light_buff) and BuffPresent(ardent_defender_buff) and BuffPresent(guardian_of_ancient_kings_buff) and BuffPresent(divine_shield_buff) and BuffPresent(potion_buff) } and Spell(shield_of_the_righteous) or Talent(bastion_of_light_talent) and Talent(seraphim_talent) and BuffPresent(seraphim_buff) and not SpellCooldown(bastion_of_light) > 0 and not { target.DebuffPresent(eye_of_tyr_debuff) and BuffPresent(aegis_of_light_buff) and BuffPresent(ardent_defender_buff) and BuffPresent(guardian_of_ancient_kings_buff) and BuffPresent(divine_shield_buff) and BuffPresent(potion_buff) } and Spell(shield_of_the_righteous) or Talent(bastion_of_light_talent) and not Talent(seraphim_talent) and not SpellCooldown(bastion_of_light) > 0 and not { target.DebuffPresent(eye_of_tyr_debuff) and BuffPresent(aegis_of_light_buff) and BuffPresent(ardent_defender_buff) and BuffPresent(guardian_of_ancient_kings_buff) and BuffPresent(divine_shield_buff) and BuffPresent(potion_buff) } and Spell(shield_of_the_righteous) or HealthPercent() < 40 and Spell(light_of_the_protector) or HealthPercent() < 40 and Spell(hand_of_the_protector) or IncomingDamage(10) < MaxHealth() * 1 and HealthPercent() < 55 and Talent(righteous_protector_talent) and Spell(light_of_the_protector) or IncomingDamage(13) < MaxHealth() * 1 and HealthPercent() < 55 and Spell(light_of_the_protector) or IncomingDamage(6) < MaxHealth() * 0 and HealthPercent() < 65 and Talent(righteous_protector_talent) and Spell(hand_of_the_protector) or IncomingDamage(9) < MaxHealth() * 1 and HealthPercent() < 55 and Spell(hand_of_the_protector) or Spell(judgment) or Talent(crusaders_judgment_talent) and BuffPresent(grand_crusader_buff) and Spell(avengers_shield) or Spell(blessed_hammer) or Spell(avengers_shield) or Spell(consecration) or Spell(hammer_of_the_righteous)
-}
-
-### actions.precombat
-
-AddFunction ProtectionPrecombatMainActions
-{
-}
-
-AddFunction ProtectionPrecombatMainPostConditions
-{
-}
-
-AddFunction ProtectionPrecombatShortCdActions
-{
-}
-
-AddFunction ProtectionPrecombatShortCdPostConditions
-{
-}
-
-AddFunction ProtectionPrecombatCdActions
-{
- #flask,type=flask_of_ten_thousand_scars
- #flask,type=flask_of_the_countless_armies,if=role.attack|using_apl.max_dps
- #food,type=seedbattered_fish_plate
- #food,type=azshari_salad,if=role.attack|using_apl.max_dps
- #snapshot_stats
- #potion,name=unbending_potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(unbending_potion usable=1)
-}
-
-AddFunction ProtectionPrecombatCdPostConditions
-{
-}
-
-### actions.max_survival
-
-AddFunction ProtectionMaxsurvivalMainActions
-{
-}
-
-AddFunction ProtectionMaxsurvivalMainPostConditions
-{
-}
-
-AddFunction ProtectionMaxsurvivalShortCdActions
-{
- #auto_attack
- ProtectionGetInMeleeRange()
-}
-
-AddFunction ProtectionMaxsurvivalShortCdPostConditions
-{
-}
-
-AddFunction ProtectionMaxsurvivalCdActions
-{
- #use_item,name=shivermaws_jawbone
- ProtectionUseItemActions()
- #blood_fury
- Spell(blood_fury_apsp)
- #berserking
- Spell(berserking)
-}
-
-AddFunction ProtectionMaxsurvivalCdPostConditions
-{
-}
-
-### actions.max_dps
-
-AddFunction ProtectionMaxdpsMainActions
-{
-}
-
-AddFunction ProtectionMaxdpsMainPostConditions
-{
-}
-
-AddFunction ProtectionMaxdpsShortCdActions
-{
- #auto_attack
- ProtectionGetInMeleeRange()
-}
-
-AddFunction ProtectionMaxdpsShortCdPostConditions
-{
-}
-
-AddFunction ProtectionMaxdpsCdActions
-{
- #use_item,name=shivermaws_jawbone
- ProtectionUseItemActions()
- #blood_fury
- Spell(blood_fury_apsp)
- #berserking
- Spell(berserking)
-}
-
-AddFunction ProtectionMaxdpsCdPostConditions
-{
-}
-
-### actions.default
-
-AddFunction ProtectionDefaultMainActions
-{
- #arcane_torrent
- #call_action_list,name=prot
- ProtectionProtMainActions()
-}
-
-AddFunction ProtectionDefaultMainPostConditions
-{
- ProtectionProtMainPostConditions()
-}
-
-AddFunction ProtectionDefaultShortCdActions
-{
- #auto_attack
- ProtectionGetInMeleeRange()
- #arcane_torrent
- #call_action_list,name=prot
- ProtectionProtShortCdActions()
-}
-
-AddFunction ProtectionDefaultShortCdPostConditions
-{
- ProtectionProtShortCdPostConditions()
-}
-
-AddFunction ProtectionDefaultCdActions
-{
- #use_item,name=shivermaws_jawbone
- ProtectionUseItemActions()
- #blood_fury
- Spell(blood_fury_apsp)
- #berserking
- Spell(berserking)
- #arcane_torrent
- #blood_fury
- Spell(blood_fury_apsp)
- #berserking
- Spell(berserking)
- #arcane_torrent
- #call_action_list,name=prot
- ProtectionProtCdActions()
-}
-
-AddFunction ProtectionDefaultCdPostConditions
-{
- ProtectionProtCdPostConditions()
-}
-
-### Protection icons.
-
-AddCheckBox(opt_paladin_protection_aoe L(AOE) default specialization=protection)
-
-AddIcon checkbox=!opt_paladin_protection_aoe enemies=1 help=shortcd specialization=protection
-{
- if not InCombat() ProtectionPrecombatShortCdActions()
- unless not InCombat() and ProtectionPrecombatShortCdPostConditions()
- {
-  ProtectionDefaultShortCdActions()
- }
-}
-
-AddIcon checkbox=opt_paladin_protection_aoe help=shortcd specialization=protection
-{
- if not InCombat() ProtectionPrecombatShortCdActions()
- unless not InCombat() and ProtectionPrecombatShortCdPostConditions()
- {
-  ProtectionDefaultShortCdActions()
- }
-}
-
-AddIcon enemies=1 help=main specialization=protection
-{
- if not InCombat() ProtectionPrecombatMainActions()
- unless not InCombat() and ProtectionPrecombatMainPostConditions()
- {
-  ProtectionDefaultMainActions()
- }
-}
-
-AddIcon checkbox=opt_paladin_protection_aoe help=aoe specialization=protection
-{
- if not InCombat() ProtectionPrecombatMainActions()
- unless not InCombat() and ProtectionPrecombatMainPostConditions()
- {
-  ProtectionDefaultMainActions()
- }
-}
-
-AddIcon checkbox=!opt_paladin_protection_aoe enemies=1 help=cd specialization=protection
-{
- if not InCombat() ProtectionPrecombatCdActions()
- unless not InCombat() and ProtectionPrecombatCdPostConditions()
- {
-  ProtectionDefaultCdActions()
- }
-}
-
-AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
-{
- if not InCombat() ProtectionPrecombatCdActions()
- unless not InCombat() and ProtectionPrecombatCdPostConditions()
- {
-  ProtectionDefaultCdActions()
- }
-}
-
-### Required symbols
-# seraphim
-# seraphim_talent
-# shield_of_the_righteous
-# eye_of_tyr_debuff
-# aegis_of_light_buff
-# ardent_defender_buff
-# guardian_of_ancient_kings_buff
-# divine_shield_buff
-# potion_buff
-# bastion_of_light_talent
-# seraphim_buff
-# bastion_of_light
-# light_of_the_protector
-# hand_of_the_protector
-# righteous_protector_talent
-# divine_steed
-# knight_templar_talent
-# eye_of_tyr
-# aegis_of_light
-# guardian_of_ancient_kings
-# divine_shield
-# final_stand_talent
-# ardent_defender
-# lay_on_hands
-# unbending_potion
-# draenic_strength_potion
-# stoneform
-# avenging_wrath_melee
-# judgment
-# avengers_shield
-# crusaders_judgment_talent
-# grand_crusader_buff
-# blessed_hammer
-# consecration
-# blinding_light
-# hammer_of_the_righteous
-# blood_fury_apsp
-# berserking
-# rebuke
+    # Based on SimulationCraft profile "T21_Paladin_Protection".
+    #    class=paladin
+    #    spec=protection
+    #    talents=2112132
+    
+    Include(ovale_common)
+    Include(ovale_trinkets_mop)
+    Include(ovale_trinkets_wod)
+    Include(ovale_paladin_spells)
+    
+    AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=protection)
+    AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=protection)
+    
+    AddFunction ProtectionUseItemActions
+    {
+     Item(Trinket0Slot text=13 usable=1)
+     Item(Trinket1Slot text=14 usable=1)
+    }
+    
+    AddFunction ProtectionGetInMeleeRange
+    {
+     if CheckBoxOn(opt_melee_range) and not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
+    }
+    
+    ### actions.default
+    
+    AddFunction ProtectionDefaultMainActions
+    {
+     #call_action_list,name=prot
+     ProtectionProtMainActions()
+    }
+    
+    AddFunction ProtectionDefaultMainPostConditions
+    {
+     ProtectionProtMainPostConditions()
+    }
+    
+    AddFunction ProtectionDefaultShortCdActions
+    {
+     #auto_attack
+     ProtectionGetInMeleeRange()
+     #call_action_list,name=prot
+     ProtectionProtShortCdActions()
+    }
+    
+    AddFunction ProtectionDefaultShortCdPostConditions
+    {
+     ProtectionProtShortCdPostConditions()
+    }
+    
+    AddFunction ProtectionDefaultCdActions
+    {
+     #use_item,name=diimas_glacial_aegis
+     ProtectionUseItemActions()
+     #blood_fury
+     Spell(blood_fury_apsp)
+     #berserking
+     Spell(berserking)
+     #arcane_torrent
+     #lights_judgment
+     Spell(lights_judgment)
+     #blood_fury
+     Spell(blood_fury_apsp)
+     #berserking
+     Spell(berserking)
+     #arcane_torrent
+     #lights_judgment
+     Spell(lights_judgment)
+     #call_action_list,name=prot
+     ProtectionProtCdActions()
+    }
+    
+    AddFunction ProtectionDefaultCdPostConditions
+    {
+     ProtectionProtCdPostConditions()
+    }
+    
+    ### actions.max_dps
+    
+    AddFunction ProtectionMaxDpsMainActions
+    {
+    }
+    
+    AddFunction ProtectionMaxDpsMainPostConditions
+    {
+    }
+    
+    AddFunction ProtectionMaxDpsShortCdActions
+    {
+     #auto_attack
+     ProtectionGetInMeleeRange()
+    }
+    
+    AddFunction ProtectionMaxDpsShortCdPostConditions
+    {
+    }
+    
+    AddFunction ProtectionMaxDpsCdActions
+    {
+     #use_item,name=diimas_glacial_aegis
+     ProtectionUseItemActions()
+     #blood_fury
+     Spell(blood_fury_apsp)
+     #berserking
+     Spell(berserking)
+     #arcane_torrent
+     #lights_judgment
+     Spell(lights_judgment)
+    }
+    
+    AddFunction ProtectionMaxDpsCdPostConditions
+    {
+    }
+    
+    ### actions.max_survival
+    
+    AddFunction ProtectionMaxSurvivalMainActions
+    {
+    }
+    
+    AddFunction ProtectionMaxSurvivalMainPostConditions
+    {
+    }
+    
+    AddFunction ProtectionMaxSurvivalShortCdActions
+    {
+     #auto_attack
+     ProtectionGetInMeleeRange()
+    }
+    
+    AddFunction ProtectionMaxSurvivalShortCdPostConditions
+    {
+    }
+    
+    AddFunction ProtectionMaxSurvivalCdActions
+    {
+     #use_item,name=diimas_glacial_aegis
+     ProtectionUseItemActions()
+     #blood_fury
+     Spell(blood_fury_apsp)
+     #berserking
+     Spell(berserking)
+     #arcane_torrent
+     #lights_judgment
+     Spell(lights_judgment)
+    }
+    
+    AddFunction ProtectionMaxSurvivalCdPostConditions
+    {
+    }
+    
+    ### actions.precombat
+    
+    AddFunction ProtectionPrecombatMainActions
+    {
+    }
+    
+    AddFunction ProtectionPrecombatMainPostConditions
+    {
+    }
+    
+    AddFunction ProtectionPrecombatShortCdActions
+    {
+    }
+    
+    AddFunction ProtectionPrecombatShortCdPostConditions
+    {
+    }
+    
+    AddFunction ProtectionPrecombatCdActions
+    {
+     #flask
+     #food
+     #snapshot_stats
+     #potion
+     if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(unbending_potion usable=1)
+    }
+    
+    AddFunction ProtectionPrecombatCdPostConditions
+    {
+    }
+    
+    ### actions.prot
+    
+    AddFunction ProtectionProtMainActions
+    {
+     #judgment,if=!talent.seraphim.enabled
+     if not Talent(seraphim_talent) Spell(judgment_prot)
+     #avengers_shield,if=!talent.seraphim.enabled&talent.crusaders_judgment.enabled
+     if not Talent(seraphim_talent) and Talent(crusaders_judgment_talent) Spell(avengers_shield)
+     #blessed_hammer,if=!talent.seraphim.enabled
+     if not Talent(seraphim_talent) Spell(blessed_hammer)
+     #avengers_shield,if=!talent.seraphim.enabled
+     if not Talent(seraphim_talent) Spell(avengers_shield)
+     #consecration,if=!talent.seraphim.enabled
+     if not Talent(seraphim_talent) Spell(consecration)
+     #hammer_of_the_righteous,if=!talent.seraphim.enabled
+     if not Talent(seraphim_talent) Spell(hammer_of_the_righteous)
+     #avengers_shield,if=talent.seraphim.enabled
+     if Talent(seraphim_talent) Spell(avengers_shield)
+     #judgment,if=talent.seraphim.enabled&(active_enemies<2|set_bonus.tier20_2pc)
+     if Talent(seraphim_talent) and { Enemies() < 2 or ArmorSetBonus(T20 2) } Spell(judgment_prot)
+     #consecration,if=talent.seraphim.enabled&(buff.seraphim.remains>6|buff.seraphim.down)
+     if Talent(seraphim_talent) and { BuffRemaining(seraphim_buff) > 6 or BuffExpires(seraphim_buff) } Spell(consecration)
+     #judgment,if=talent.seraphim.enabled
+     if Talent(seraphim_talent) Spell(judgment_prot)
+     #consecration,if=talent.seraphim.enabled
+     if Talent(seraphim_talent) Spell(consecration)
+     #blessed_hammer,if=talent.seraphim.enabled
+     if Talent(seraphim_talent) Spell(blessed_hammer)
+     #hammer_of_the_righteous,if=talent.seraphim.enabled
+     if Talent(seraphim_talent) Spell(hammer_of_the_righteous)
+    }
+    
+    AddFunction ProtectionProtMainPostConditions
+    {
+    }
+    
+    AddFunction ProtectionProtShortCdActions
+    {
+     #shield_of_the_righteous,if=!talent.seraphim.enabled&(action.shield_of_the_righteous.charges>2)&!(buff.aegis_of_light.up&buff.ardent_defender.up&buff.guardian_of_ancient_kings.up&buff.divine_shield.up&buff.potion.up)
+     if not Talent(seraphim_talent) and Charges(shield_of_the_righteous) > 2 and not { BuffPresent(aegis_of_light_buff) and BuffPresent(ardent_defender_buff) and BuffPresent(guardian_of_ancient_kings_buff) and BuffPresent(divine_shield_buff) and BuffPresent(potion_buff) } Spell(shield_of_the_righteous)
+     #light_of_the_protector,if=(health.pct<40)
+     if HealthPercent() < 40 Spell(light_of_the_protector)
+     #hand_of_the_protector,if=(health.pct<40)
+     if HealthPercent() < 40 Spell(hand_of_the_protector)
+     #light_of_the_protector,if=(incoming_damage_10000ms<health.max*1.25)&health.pct<55&talent.righteous_protector.enabled
+     if IncomingDamage(10) < MaxHealth() * 1.25 and HealthPercent() < 55 and Talent(righteous_protector_talent) Spell(light_of_the_protector)
+     #light_of_the_protector,if=(incoming_damage_13000ms<health.max*1.6)&health.pct<55
+     if IncomingDamage(13) < MaxHealth() * 1.6 and HealthPercent() < 55 Spell(light_of_the_protector)
+     #hand_of_the_protector,if=(incoming_damage_6000ms<health.max*0.7)&health.pct<65&talent.righteous_protector.enabled
+     if IncomingDamage(6) < MaxHealth() * 0.7 and HealthPercent() < 65 and Talent(righteous_protector_talent) Spell(hand_of_the_protector)
+     #hand_of_the_protector,if=(incoming_damage_9000ms<health.max*1.2)&health.pct<55
+     if IncomingDamage(9) < MaxHealth() * 1.2 and HealthPercent() < 55 Spell(hand_of_the_protector)
+    
+     unless not Talent(seraphim_talent) and Spell(judgment_prot) or not Talent(seraphim_talent) and Talent(crusaders_judgment_talent) and Spell(avengers_shield) or not Talent(seraphim_talent) and Spell(blessed_hammer) or not Talent(seraphim_talent) and Spell(avengers_shield) or not Talent(seraphim_talent) and Spell(consecration) or not Talent(seraphim_talent) and Spell(hammer_of_the_righteous)
+     {
+      #seraphim,if=talent.seraphim.enabled&action.shield_of_the_righteous.charges>=2
+      if Talent(seraphim_talent) and Charges(shield_of_the_righteous) >= 2 Spell(seraphim)
+      #shield_of_the_righteous,if=talent.seraphim.enabled&(cooldown.consecration.remains>=0.1&(action.shield_of_the_righteous.charges>2.5&cooldown.seraphim.remains>3)|(buff.seraphim.up))
+      if Talent(seraphim_talent) and { SpellCooldown(consecration) >= 0.1 and Charges(shield_of_the_righteous) > 2.5 and SpellCooldown(seraphim) > 3 or BuffPresent(seraphim_buff) } Spell(shield_of_the_righteous)
+     }
+    }
+    
+    AddFunction ProtectionProtShortCdPostConditions
+    {
+     not Talent(seraphim_talent) and Spell(judgment_prot) or not Talent(seraphim_talent) and Talent(crusaders_judgment_talent) and Spell(avengers_shield) or not Talent(seraphim_talent) and Spell(blessed_hammer) or not Talent(seraphim_talent) and Spell(avengers_shield) or not Talent(seraphim_talent) and Spell(consecration) or not Talent(seraphim_talent) and Spell(hammer_of_the_righteous) or Talent(seraphim_talent) and Spell(avengers_shield) or Talent(seraphim_talent) and { Enemies() < 2 or ArmorSetBonus(T20 2) } and Spell(judgment_prot) or Talent(seraphim_talent) and { BuffRemaining(seraphim_buff) > 6 or BuffExpires(seraphim_buff) } and Spell(consecration) or Talent(seraphim_talent) and Spell(judgment_prot) or Talent(seraphim_talent) and Spell(consecration) or Talent(seraphim_talent) and Spell(blessed_hammer) or Talent(seraphim_talent) and Spell(hammer_of_the_righteous)
+    }
+    
+    AddFunction ProtectionProtCdActions
+    {
+     #bastion_of_light,if=!talent.seraphim.enabled&talent.bastion_of_light.enabled&action.shield_of_the_righteous.charges<1
+     if not Talent(seraphim_talent) and Talent(bastion_of_light_talent) and Charges(shield_of_the_righteous) < 1 Spell(bastion_of_light)
+    
+     unless HealthPercent() < 40 and Spell(hand_of_the_protector) or IncomingDamage(6) < MaxHealth() * 0.7 and HealthPercent() < 65 and Talent(righteous_protector_talent) and Spell(hand_of_the_protector) or IncomingDamage(9) < MaxHealth() * 1.2 and HealthPercent() < 55 and Spell(hand_of_the_protector)
+     {
+      #aegis_of_light,if=!talent.seraphim.enabled&incoming_damage_2500ms>health.max*0.4&!(buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
+      if not Talent(seraphim_talent) and IncomingDamage(2.5) > MaxHealth() * 0.4 and not { BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff) } Spell(aegis_of_light)
+      #guardian_of_ancient_kings,if=!talent.seraphim.enabled&incoming_damage_2500ms>health.max*0.4&!(buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
+      if not Talent(seraphim_talent) and IncomingDamage(2.5) > MaxHealth() * 0.4 and not { BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff) } Spell(guardian_of_ancient_kings)
+      #divine_shield,if=!talent.seraphim.enabled&talent.final_stand.enabled&incoming_damage_2500ms>health.max*0.4&!(buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
+      if not Talent(seraphim_talent) and Talent(final_stand_talent) and IncomingDamage(2.5) > MaxHealth() * 0.4 and not { BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff) } Spell(divine_shield)
+      #ardent_defender,if=!talent.seraphim.enabled&incoming_damage_2500ms>health.max*0.4&!(buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
+      if not Talent(seraphim_talent) and IncomingDamage(2.5) > MaxHealth() * 0.4 and not { BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff) } Spell(ardent_defender)
+      #lay_on_hands,if=!talent.seraphim.enabled&health.pct<15
+      if not Talent(seraphim_talent) and HealthPercent() < 15 Spell(lay_on_hands)
+      #potion,name=old_war,if=buff.avenging_wrath.up&talent.seraphim.enabled&active_enemies<3
+      if BuffPresent(avenging_wrath_buff) and Talent(seraphim_talent) and Enemies() < 3 and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
+      #potion,name=prolonged_power,if=buff.avenging_wrath.up&talent.seraphim.enabled&active_enemies>=3
+      if BuffPresent(avenging_wrath_buff) and Talent(seraphim_talent) and Enemies() >= 3 and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
+      #potion,name=unbending_potion,if=!talent.seraphim.enabled
+      if not Talent(seraphim_talent) and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(unbending_potion usable=1)
+      #stoneform,if=!talent.seraphim.enabled&incoming_damage_2500ms>health.max*0.4&!(buff.aegis_of_light.up|buff.ardent_defender.up|buff.guardian_of_ancient_kings.up|buff.divine_shield.up|buff.potion.up)
+      if not Talent(seraphim_talent) and IncomingDamage(2.5) > MaxHealth() * 0.4 and not { BuffPresent(aegis_of_light_buff) or BuffPresent(ardent_defender_buff) or BuffPresent(guardian_of_ancient_kings_buff) or BuffPresent(divine_shield_buff) or BuffPresent(potion_buff) } Spell(stoneform)
+      #avenging_wrath,if=!talent.seraphim.enabled
+      if not Talent(seraphim_talent) Spell(avenging_wrath)
+    
+      unless not Talent(seraphim_talent) and Spell(judgment_prot) or not Talent(seraphim_talent) and Talent(crusaders_judgment_talent) and Spell(avengers_shield) or not Talent(seraphim_talent) and Spell(blessed_hammer) or not Talent(seraphim_talent) and Spell(avengers_shield) or not Talent(seraphim_talent) and Spell(consecration) or not Talent(seraphim_talent) and Spell(hammer_of_the_righteous) or Talent(seraphim_talent) and Charges(shield_of_the_righteous) >= 2 and Spell(seraphim)
+      {
+       #avenging_wrath,if=talent.seraphim.enabled&(buff.seraphim.up|cooldown.seraphim.remains<4)
+       if Talent(seraphim_talent) and { BuffPresent(seraphim_buff) or SpellCooldown(seraphim) < 4 } Spell(avenging_wrath)
+      }
+     }
+    }
+    
+    AddFunction ProtectionProtCdPostConditions
+    {
+     HealthPercent() < 40 and Spell(hand_of_the_protector) or IncomingDamage(6) < MaxHealth() * 0.7 and HealthPercent() < 65 and Talent(righteous_protector_talent) and Spell(hand_of_the_protector) or IncomingDamage(9) < MaxHealth() * 1.2 and HealthPercent() < 55 and Spell(hand_of_the_protector) or not Talent(seraphim_talent) and Spell(judgment_prot) or not Talent(seraphim_talent) and Talent(crusaders_judgment_talent) and Spell(avengers_shield) or not Talent(seraphim_talent) and Spell(blessed_hammer) or not Talent(seraphim_talent) and Spell(avengers_shield) or not Talent(seraphim_talent) and Spell(consecration) or not Talent(seraphim_talent) and Spell(hammer_of_the_righteous) or Talent(seraphim_talent) and Charges(shield_of_the_righteous) >= 2 and Spell(seraphim) or Talent(seraphim_talent) and Spell(avengers_shield) or Talent(seraphim_talent) and { Enemies() < 2 or ArmorSetBonus(T20 2) } and Spell(judgment_prot) or Talent(seraphim_talent) and { BuffRemaining(seraphim_buff) > 6 or BuffExpires(seraphim_buff) } and Spell(consecration) or Talent(seraphim_talent) and Spell(judgment_prot) or Talent(seraphim_talent) and Spell(consecration) or Talent(seraphim_talent) and Spell(blessed_hammer) or Talent(seraphim_talent) and Spell(hammer_of_the_righteous)
+    }
+    
+    ### Protection icons.
+    
+    AddCheckBox(opt_paladin_protection_aoe L(AOE) default specialization=protection)
+    
+    AddIcon checkbox=!opt_paladin_protection_aoe enemies=1 help=shortcd specialization=protection
+    {
+     if not InCombat() ProtectionPrecombatShortCdActions()
+     unless not InCombat() and ProtectionPrecombatShortCdPostConditions()
+     {
+      ProtectionDefaultShortCdActions()
+     }
+    }
+    
+    AddIcon checkbox=opt_paladin_protection_aoe help=shortcd specialization=protection
+    {
+     if not InCombat() ProtectionPrecombatShortCdActions()
+     unless not InCombat() and ProtectionPrecombatShortCdPostConditions()
+     {
+      ProtectionDefaultShortCdActions()
+     }
+    }
+    
+    AddIcon enemies=1 help=main specialization=protection
+    {
+     if not InCombat() ProtectionPrecombatMainActions()
+     unless not InCombat() and ProtectionPrecombatMainPostConditions()
+     {
+      ProtectionDefaultMainActions()
+     }
+    }
+    
+    AddIcon checkbox=opt_paladin_protection_aoe help=aoe specialization=protection
+    {
+     if not InCombat() ProtectionPrecombatMainActions()
+     unless not InCombat() and ProtectionPrecombatMainPostConditions()
+     {
+      ProtectionDefaultMainActions()
+     }
+    }
+    
+    AddIcon checkbox=!opt_paladin_protection_aoe enemies=1 help=cd specialization=protection
+    {
+     if not InCombat() ProtectionPrecombatCdActions()
+     unless not InCombat() and ProtectionPrecombatCdPostConditions()
+     {
+      ProtectionDefaultCdActions()
+     }
+    }
+    
+    AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
+    {
+     if not InCombat() ProtectionPrecombatCdActions()
+     unless not InCombat() and ProtectionPrecombatCdPostConditions()
+     {
+      ProtectionDefaultCdActions()
+     }
+    }
+    
+    ### Required symbols
+    # blood_fury_apsp
+    # berserking
+    # lights_judgment
+    # unbending_potion
+    # shield_of_the_righteous
+    # seraphim_talent
+    # aegis_of_light_buff
+    # ardent_defender_buff
+    # guardian_of_ancient_kings_buff
+    # divine_shield_buff
+    # potion_buff
+    # bastion_of_light
+    # bastion_of_light_talent
+    # light_of_the_protector
+    # hand_of_the_protector
+    # righteous_protector_talent
+    # aegis_of_light
+    # guardian_of_ancient_kings
+    # divine_shield
+    # final_stand_talent
+    # ardent_defender
+    # lay_on_hands
+    # old_war_potion
+    # avenging_wrath_buff
+    # prolonged_power_potion
+    # stoneform
+    # avenging_wrath
+    # judgment_prot
+    # avengers_shield
+    # crusaders_judgment_talent
+    # blessed_hammer
+    # consecration
+    # hammer_of_the_righteous
+    # seraphim
+    # seraphim_buff
+    # rebuke
 ]]
     OvaleScripts:RegisterScript("PALADIN", "protection", name, desc, code, "script")
 end
