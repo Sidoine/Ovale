@@ -1759,6 +1759,7 @@ let EmitOperand:EmitVisitor = undefined;
 let EmitOperandAction:EmitOperandVisitor = undefined;
 let EmitOperandActiveDot:EmitOperandVisitor = undefined;
 let EmitOperandArtifact:EmitOperandVisitor = undefined;
+let EmitOperandAzerite:EmitOperandVisitor = undefined;
 let EmitOperandBuff:EmitOperandVisitor = undefined;
 let EmitOperandCharacter:EmitOperandVisitor = undefined;
 let EmitOperandCooldown:EmitOperandVisitor = undefined;
@@ -2773,6 +2774,8 @@ EmitOperand = function (parseNode, nodeList, annotation, action) {
             [ok, node] = EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target);
         } else if (token == "artifact") {
             [ok, node] = EmitOperandArtifact(operand, parseNode, nodeList, annotation, action, target);
+        } else if (token == "azerite") {
+            [ok, node] = EmitOperandAzerite(operand, parseNode, nodeList, annotation, action, target);
         } else if (token == "buff") {
             [ok, node] = EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target);
         } else if (token == "consumable") {
@@ -2974,6 +2977,30 @@ EmitOperandArtifact = function (operand, parseNode, nodeList, annotation, action
             code = format("ArtifactTraitRank(%s)", name);
         } else if (property == "enabled") {
             code = format("HasArtifactTrait(%s)", name);
+        } else {
+            ok = false;
+        }
+        if (ok && code) {
+            annotation.astAnnotation = annotation.astAnnotation || {};
+            [node] = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation);
+            AddSymbol(annotation, name);
+        }
+    } else {
+        ok = false;
+    }
+    return [ok, node];
+}
+EmitOperandAzerite = function (operand, parseNode, nodeList, annotation, action, target) {
+    let ok = true;
+    let node;
+    let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+    let token = tokenIterator();
+    if (token == "azerite") {
+        let code:string;
+        let name = tokenIterator();
+        let property = tokenIterator();
+        if (property == "enabled") {
+            code = format("HasAzeriteTrait(%s)", name);
         } else {
             ok = false;
         }
