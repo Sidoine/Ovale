@@ -400,6 +400,11 @@ Define(zeal_debuff 269571)
 #Artifact traits
 #Define(ashes_to_ashes 179546)
 
+#Azerite Traits
+Define(divine_right 278519)
+Define(divine_right_buff 277678)
+	SpellInfo(divine_right_buff duration=15)
+
 #Talents
 Define(aegis_of_light_talent 18)
 Define(aura_of_mercy_talent 12)
