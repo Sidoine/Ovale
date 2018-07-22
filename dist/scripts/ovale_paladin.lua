@@ -625,13 +625,13 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
     OvaleScripts:RegisterScript("PALADIN", "protection", name, desc, code, "script")
 end
 do
-    local name = "sc_paladin_retribution_t19"
-    local desc = "[7.0] Simulationcraft: Paladin_Retribution_T19"
+    local name = "sc_paladin_retribution_t21"
+    local desc = "[8.0] Simulationcraft: Paladin_Retribution_T21"
     local code = [[
-# Based on SimulationCraft profile "Paladin_Retribution_T19P".
-#	class=paladin
-#	spec=retribution
-#	talents=1202102
+# Based on SimulationCraft profile "T21_Paladin_Retribution".
+#    class=paladin
+#    spec=retribution
+#    talents=2303003
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -641,7 +641,12 @@ Include(ovale_paladin_spells)
 
 AddFunction ds_castable
 {
- Enemies() >= 2 or BuffStacks(scarlet_inquisitors_expurgation_buff) >= 29 and { BuffPresent(avenging_wrath_melee_buff) or BuffPresent(crusade_buff) and BuffStacks(crusade_buff) >= 15 or SpellCooldown(crusade) > 15 and not BuffPresent(crusade_buff) or SpellCooldown(avenging_wrath_melee) > 15 }
+ Enemies() >= 3 or Talent(divine_judgment_talent) and Enemies() >= 2 or HasAzeriteTrait(divine_right) and target.HealthPercent() <= 20 and BuffExpires(divine_right_buff)
+}
+
+AddFunction HoW
+{
+ not Talent(hammer_of_wrath_talent) or target.HealthPercent() >= 20 and { BuffExpires(avenging_wrath_buff) or BuffExpires(crusade_buff) }
 }
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=retribution)
@@ -652,17 +657,11 @@ AddFunction RetributionInterruptActions
 {
  if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
  {
-  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
-  if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_holy)
-  if target.InRange(hammer_of_justice) and not target.Classification(worldboss) Spell(hammer_of_justice)
   if target.InRange(rebuke) and target.IsInterruptible() Spell(rebuke)
+  if target.InRange(hammer_of_justice) and not target.Classification(worldboss) Spell(hammer_of_justice)
+  if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_holy)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
  }
-}
-
-AddFunction RetributionUseItemActions
-{
- Item(Trinket0Slot text=13 usable=1)
- Item(Trinket1Slot text=14 usable=1)
 }
 
 AddFunction RetributionGetInMeleeRange
@@ -670,240 +669,61 @@ AddFunction RetributionGetInMeleeRange
  if CheckBoxOn(opt_melee_range) and not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
-### actions.precombat
+### actions.default
 
-AddFunction RetributionPrecombatMainActions
+AddFunction RetributionDefaultMainActions
 {
-}
+ #call_action_list,name=cooldowns
+ RetributionCooldownsMainActions()
 
-AddFunction RetributionPrecombatMainPostConditions
-{
-}
-
-AddFunction RetributionPrecombatShortCdActions
-{
-}
-
-AddFunction RetributionPrecombatShortCdPostConditions
-{
-}
-
-AddFunction RetributionPrecombatCdActions
-{
- #flask,type=flask_of_the_countless_armies
- #food,type=azshari_salad
- #augmentation,type=defiled
- #snapshot_stats
- #potion,name=old_war
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
-}
-
-AddFunction RetributionPrecombatCdPostConditions
-{
-}
-
-### actions.opener
-
-AddFunction RetributionOpenerMainActions
-{
- #judgment
- Spell(judgment)
- #blade_of_justice,if=equipped.137048|race.blood_elf|!cooldown.wake_of_ashes.up
- if HasEquippedItem(137048) or Race(BloodElf) or not { not SpellCooldown(wake_of_ashes) > 0 } Spell(blade_of_justice)
- #divine_hammer,if=equipped.137048|race.blood_elf|!cooldown.wake_of_ashes.up
- if HasEquippedItem(137048) or Race(BloodElf) or not { not SpellCooldown(wake_of_ashes) > 0 } Spell(divine_hammer)
- #wake_of_ashes
- Spell(wake_of_ashes)
-}
-
-AddFunction RetributionOpenerMainPostConditions
-{
-}
-
-AddFunction RetributionOpenerShortCdActions
-{
-}
-
-AddFunction RetributionOpenerShortCdPostConditions
-{
- Spell(judgment) or { HasEquippedItem(137048) or Race(BloodElf) or not { not SpellCooldown(wake_of_ashes) > 0 } } and Spell(blade_of_justice) or { HasEquippedItem(137048) or Race(BloodElf) or not { not SpellCooldown(wake_of_ashes) > 0 } } and Spell(divine_hammer) or Spell(wake_of_ashes)
-}
-
-AddFunction RetributionOpenerCdActions
-{
- #blood_fury
- Spell(blood_fury_apsp)
- #berserking
- Spell(berserking)
- #arcane_torrent,if=!set_bonus.tier20_2pc
- if not ArmorSetBonus(T20 2) Spell(arcane_torrent_holy)
-}
-
-AddFunction RetributionOpenerCdPostConditions
-{
- Spell(judgment) or { HasEquippedItem(137048) or Race(BloodElf) or not { not SpellCooldown(wake_of_ashes) > 0 } } and Spell(blade_of_justice) or { HasEquippedItem(137048) or Race(BloodElf) or not { not SpellCooldown(wake_of_ashes) > 0 } } and Spell(divine_hammer) or Spell(wake_of_ashes)
-}
-
-### actions.generators
-
-AddFunction RetributionGeneratorsMainActions
-{
- #variable,name=ds_castable,value=spell_targets.divine_storm>=2|(buff.scarlet_inquisitors_expurgation.stack>=29&(buff.avenging_wrath.up|(buff.crusade.up&buff.crusade.stack>=15)|(cooldown.crusade.remains>15&!buff.crusade.up)|cooldown.avenging_wrath.remains>15))
- #call_action_list,name=finishers,if=(buff.crusade.up&buff.crusade.stack<15|buff.liadrins_fury_unleashed.up)|(artifact.ashes_to_ashes.enabled&cooldown.wake_of_ashes.remains<gcd*2)
- if BuffPresent(crusade_buff) and BuffStacks(crusade_buff) < 15 or BuffPresent(liadrins_fury_unleashed_buff) or HasArtifactTrait(ashes_to_ashes) and SpellCooldown(wake_of_ashes) < GCD() * 2 RetributionFinishersMainActions()
-
- unless { BuffPresent(crusade_buff) and BuffStacks(crusade_buff) < 15 or BuffPresent(liadrins_fury_unleashed_buff) or HasArtifactTrait(ashes_to_ashes) and SpellCooldown(wake_of_ashes) < GCD() * 2 } and RetributionFinishersMainPostConditions()
+ unless RetributionCooldownsMainPostConditions()
  {
-  #call_action_list,name=finishers,if=talent.execution_sentence.enabled&(cooldown.judgment.remains<gcd*4.25|debuff.judgment.remains>gcd*4.25)&cooldown.execution_sentence.up|buff.whisper_of_the_nathrezim.up&buff.whisper_of_the_nathrezim.remains<gcd*1.5
-  if Talent(execution_sentence_talent) and { SpellCooldown(judgment) < GCD() * 4 or target.DebuffRemaining(judgment_ret_debuff) > GCD() * 4 } and not SpellCooldown(execution_sentence) > 0 or BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() * 1 RetributionFinishersMainActions()
-
-  unless { Talent(execution_sentence_talent) and { SpellCooldown(judgment) < GCD() * 4 or target.DebuffRemaining(judgment_ret_debuff) > GCD() * 4 } and not SpellCooldown(execution_sentence) > 0 or BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() * 1 } and RetributionFinishersMainPostConditions()
-  {
-   #judgment,if=dot.execution_sentence.ticking&dot.execution_sentence.remains<gcd*2&debuff.judgment.remains<gcd*2
-   if target.DebuffPresent(execution_sentence_debuff) and target.DebuffRemaining(execution_sentence_debuff) < GCD() * 2 and target.DebuffRemaining(judgment_ret_debuff) < GCD() * 2 Spell(judgment)
-   #blade_of_justice,if=holy_power<=2&(set_bonus.tier20_2pc|set_bonus.tier20_4pc)
-   if HolyPower() <= 2 and { ArmorSetBonus(T20 2) or ArmorSetBonus(T20 4) } Spell(blade_of_justice)
-   #divine_hammer,if=holy_power<=2&(set_bonus.tier20_2pc|set_bonus.tier20_4pc)
-   if HolyPower() <= 2 and { ArmorSetBonus(T20 2) or ArmorSetBonus(T20 4) } Spell(divine_hammer)
-   #wake_of_ashes,if=(!raid_event.adds.exists|raid_event.adds.in>15)&(holy_power<=0|holy_power=1&(cooldown.blade_of_justice.remains>gcd|cooldown.divine_hammer.remains>gcd)|holy_power=2&((cooldown.zeal.charges_fractional<=0.65|cooldown.crusader_strike.charges_fractional<=0.65)))
-   if { not False(raid_event_adds_exists) or 600 > 15 } and { HolyPower() <= 0 or HolyPower() == 1 and { SpellCooldown(blade_of_justice) > GCD() or SpellCooldown(divine_hammer) > GCD() } or HolyPower() == 2 and { SpellCharges(zeal count=0) <= 0 or SpellCharges(crusader_strike count=0) <= 0 } } Spell(wake_of_ashes)
-   #blade_of_justice,if=holy_power<=3&!set_bonus.tier20_4pc
-   if HolyPower() <= 3 and not ArmorSetBonus(T20 4) Spell(blade_of_justice)
-   #divine_hammer,if=holy_power<=3&!set_bonus.tier20_4pc
-   if HolyPower() <= 3 and not ArmorSetBonus(T20 4) Spell(divine_hammer)
-   #judgment
-   Spell(judgment)
-   #call_action_list,name=finishers,if=buff.divine_purpose.up
-   if BuffPresent(divine_purpose_buff) RetributionFinishersMainActions()
-
-   unless BuffPresent(divine_purpose_buff) and RetributionFinishersMainPostConditions()
-   {
-    #zeal,if=cooldown.zeal.charges_fractional>=1.65&holy_power<=4&(cooldown.blade_of_justice.remains>gcd*2|cooldown.divine_hammer.remains>gcd*2)&debuff.judgment.remains>gcd
-    if SpellCharges(zeal count=0) >= 1 and HolyPower() <= 4 and { SpellCooldown(blade_of_justice) > GCD() * 2 or SpellCooldown(divine_hammer) > GCD() * 2 } and target.DebuffRemaining(judgment_ret_debuff) > GCD() Spell(zeal)
-    #crusader_strike,if=cooldown.crusader_strike.charges_fractional>=1.65&holy_power<=4&(cooldown.blade_of_justice.remains>gcd*2|cooldown.divine_hammer.remains>gcd*2)&debuff.judgment.remains>gcd&(talent.greater_judgment.enabled|!set_bonus.tier20_4pc&talent.the_fires_of_justice.enabled)
-    if SpellCharges(crusader_strike count=0) >= 1 and HolyPower() <= 4 and { SpellCooldown(blade_of_justice) > GCD() * 2 or SpellCooldown(divine_hammer) > GCD() * 2 } and target.DebuffRemaining(judgment_ret_debuff) > GCD() and { Talent(greater_judgment_talent) or not ArmorSetBonus(T20 4) and Talent(the_fires_of_justice_talent) } Spell(crusader_strike)
-    #consecration
-    Spell(consecration)
-    #call_action_list,name=finishers
-    RetributionFinishersMainActions()
-
-    unless RetributionFinishersMainPostConditions()
-    {
-     #zeal
-     Spell(zeal)
-     #crusader_strike
-     Spell(crusader_strike)
-    }
-   }
-  }
+  #call_action_list,name=generators
+  RetributionGeneratorsMainActions()
  }
 }
 
-AddFunction RetributionGeneratorsMainPostConditions
+AddFunction RetributionDefaultMainPostConditions
 {
- { BuffPresent(crusade_buff) and BuffStacks(crusade_buff) < 15 or BuffPresent(liadrins_fury_unleashed_buff) or HasArtifactTrait(ashes_to_ashes) and SpellCooldown(wake_of_ashes) < GCD() * 2 } and RetributionFinishersMainPostConditions() or { Talent(execution_sentence_talent) and { SpellCooldown(judgment) < GCD() * 4 or target.DebuffRemaining(judgment_ret_debuff) > GCD() * 4 } and not SpellCooldown(execution_sentence) > 0 or BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() * 1 } and RetributionFinishersMainPostConditions() or BuffPresent(divine_purpose_buff) and RetributionFinishersMainPostConditions() or RetributionFinishersMainPostConditions()
+ RetributionCooldownsMainPostConditions() or RetributionGeneratorsMainPostConditions()
 }
 
-AddFunction RetributionGeneratorsShortCdActions
+AddFunction RetributionDefaultShortCdActions
 {
- #variable,name=ds_castable,value=spell_targets.divine_storm>=2|(buff.scarlet_inquisitors_expurgation.stack>=29&(buff.avenging_wrath.up|(buff.crusade.up&buff.crusade.stack>=15)|(cooldown.crusade.remains>15&!buff.crusade.up)|cooldown.avenging_wrath.remains>15))
- #call_action_list,name=finishers,if=(buff.crusade.up&buff.crusade.stack<15|buff.liadrins_fury_unleashed.up)|(artifact.ashes_to_ashes.enabled&cooldown.wake_of_ashes.remains<gcd*2)
- if BuffPresent(crusade_buff) and BuffStacks(crusade_buff) < 15 or BuffPresent(liadrins_fury_unleashed_buff) or HasArtifactTrait(ashes_to_ashes) and SpellCooldown(wake_of_ashes) < GCD() * 2 RetributionFinishersShortCdActions()
+ #auto_attack
+ RetributionGetInMeleeRange()
+ #call_action_list,name=cooldowns
+ RetributionCooldownsShortCdActions()
 
- unless { BuffPresent(crusade_buff) and BuffStacks(crusade_buff) < 15 or BuffPresent(liadrins_fury_unleashed_buff) or HasArtifactTrait(ashes_to_ashes) and SpellCooldown(wake_of_ashes) < GCD() * 2 } and RetributionFinishersShortCdPostConditions()
+ unless RetributionCooldownsShortCdPostConditions()
  {
-  #call_action_list,name=finishers,if=talent.execution_sentence.enabled&(cooldown.judgment.remains<gcd*4.25|debuff.judgment.remains>gcd*4.25)&cooldown.execution_sentence.up|buff.whisper_of_the_nathrezim.up&buff.whisper_of_the_nathrezim.remains<gcd*1.5
-  if Talent(execution_sentence_talent) and { SpellCooldown(judgment) < GCD() * 4 or target.DebuffRemaining(judgment_ret_debuff) > GCD() * 4 } and not SpellCooldown(execution_sentence) > 0 or BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() * 1 RetributionFinishersShortCdActions()
-
-  unless { Talent(execution_sentence_talent) and { SpellCooldown(judgment) < GCD() * 4 or target.DebuffRemaining(judgment_ret_debuff) > GCD() * 4 } and not SpellCooldown(execution_sentence) > 0 or BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() * 1 } and RetributionFinishersShortCdPostConditions() or target.DebuffPresent(execution_sentence_debuff) and target.DebuffRemaining(execution_sentence_debuff) < GCD() * 2 and target.DebuffRemaining(judgment_ret_debuff) < GCD() * 2 and Spell(judgment) or HolyPower() <= 2 and { ArmorSetBonus(T20 2) or ArmorSetBonus(T20 4) } and Spell(blade_of_justice) or HolyPower() <= 2 and { ArmorSetBonus(T20 2) or ArmorSetBonus(T20 4) } and Spell(divine_hammer) or { not False(raid_event_adds_exists) or 600 > 15 } and { HolyPower() <= 0 or HolyPower() == 1 and { SpellCooldown(blade_of_justice) > GCD() or SpellCooldown(divine_hammer) > GCD() } or HolyPower() == 2 and { SpellCharges(zeal count=0) <= 0 or SpellCharges(crusader_strike count=0) <= 0 } } and Spell(wake_of_ashes) or HolyPower() <= 3 and not ArmorSetBonus(T20 4) and Spell(blade_of_justice) or HolyPower() <= 3 and not ArmorSetBonus(T20 4) and Spell(divine_hammer) or Spell(judgment)
-  {
-   #call_action_list,name=finishers,if=buff.divine_purpose.up
-   if BuffPresent(divine_purpose_buff) RetributionFinishersShortCdActions()
-
-   unless BuffPresent(divine_purpose_buff) and RetributionFinishersShortCdPostConditions() or SpellCharges(zeal count=0) >= 1 and HolyPower() <= 4 and { SpellCooldown(blade_of_justice) > GCD() * 2 or SpellCooldown(divine_hammer) > GCD() * 2 } and target.DebuffRemaining(judgment_ret_debuff) > GCD() and Spell(zeal) or SpellCharges(crusader_strike count=0) >= 1 and HolyPower() <= 4 and { SpellCooldown(blade_of_justice) > GCD() * 2 or SpellCooldown(divine_hammer) > GCD() * 2 } and target.DebuffRemaining(judgment_ret_debuff) > GCD() and { Talent(greater_judgment_talent) or not ArmorSetBonus(T20 4) and Talent(the_fires_of_justice_talent) } and Spell(crusader_strike) or Spell(consecration)
-   {
-    #hammer_of_justice,if=equipped.137065&target.health.pct>=75&holy_power<=4
-    if HasEquippedItem(137065) and target.HealthPercent() >= 75 and HolyPower() <= 4 Spell(hammer_of_justice)
-    #call_action_list,name=finishers
-    RetributionFinishersShortCdActions()
-   }
-  }
+  #call_action_list,name=generators
+  RetributionGeneratorsShortCdActions()
  }
 }
 
-AddFunction RetributionGeneratorsShortCdPostConditions
+AddFunction RetributionDefaultShortCdPostConditions
 {
- { BuffPresent(crusade_buff) and BuffStacks(crusade_buff) < 15 or BuffPresent(liadrins_fury_unleashed_buff) or HasArtifactTrait(ashes_to_ashes) and SpellCooldown(wake_of_ashes) < GCD() * 2 } and RetributionFinishersShortCdPostConditions() or { Talent(execution_sentence_talent) and { SpellCooldown(judgment) < GCD() * 4 or target.DebuffRemaining(judgment_ret_debuff) > GCD() * 4 } and not SpellCooldown(execution_sentence) > 0 or BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() * 1 } and RetributionFinishersShortCdPostConditions() or target.DebuffPresent(execution_sentence_debuff) and target.DebuffRemaining(execution_sentence_debuff) < GCD() * 2 and target.DebuffRemaining(judgment_ret_debuff) < GCD() * 2 and Spell(judgment) or HolyPower() <= 2 and { ArmorSetBonus(T20 2) or ArmorSetBonus(T20 4) } and Spell(blade_of_justice) or HolyPower() <= 2 and { ArmorSetBonus(T20 2) or ArmorSetBonus(T20 4) } and Spell(divine_hammer) or { not False(raid_event_adds_exists) or 600 > 15 } and { HolyPower() <= 0 or HolyPower() == 1 and { SpellCooldown(blade_of_justice) > GCD() or SpellCooldown(divine_hammer) > GCD() } or HolyPower() == 2 and { SpellCharges(zeal count=0) <= 0 or SpellCharges(crusader_strike count=0) <= 0 } } and Spell(wake_of_ashes) or HolyPower() <= 3 and not ArmorSetBonus(T20 4) and Spell(blade_of_justice) or HolyPower() <= 3 and not ArmorSetBonus(T20 4) and Spell(divine_hammer) or Spell(judgment) or BuffPresent(divine_purpose_buff) and RetributionFinishersShortCdPostConditions() or SpellCharges(zeal count=0) >= 1 and HolyPower() <= 4 and { SpellCooldown(blade_of_justice) > GCD() * 2 or SpellCooldown(divine_hammer) > GCD() * 2 } and target.DebuffRemaining(judgment_ret_debuff) > GCD() and Spell(zeal) or SpellCharges(crusader_strike count=0) >= 1 and HolyPower() <= 4 and { SpellCooldown(blade_of_justice) > GCD() * 2 or SpellCooldown(divine_hammer) > GCD() * 2 } and target.DebuffRemaining(judgment_ret_debuff) > GCD() and { Talent(greater_judgment_talent) or not ArmorSetBonus(T20 4) and Talent(the_fires_of_justice_talent) } and Spell(crusader_strike) or Spell(consecration) or RetributionFinishersShortCdPostConditions() or Spell(zeal) or Spell(crusader_strike)
+ RetributionCooldownsShortCdPostConditions() or RetributionGeneratorsShortCdPostConditions()
 }
 
-AddFunction RetributionGeneratorsCdActions
+AddFunction RetributionDefaultCdActions
 {
- #variable,name=ds_castable,value=spell_targets.divine_storm>=2|(buff.scarlet_inquisitors_expurgation.stack>=29&(buff.avenging_wrath.up|(buff.crusade.up&buff.crusade.stack>=15)|(cooldown.crusade.remains>15&!buff.crusade.up)|cooldown.avenging_wrath.remains>15))
- #call_action_list,name=finishers,if=(buff.crusade.up&buff.crusade.stack<15|buff.liadrins_fury_unleashed.up)|(artifact.ashes_to_ashes.enabled&cooldown.wake_of_ashes.remains<gcd*2)
- if BuffPresent(crusade_buff) and BuffStacks(crusade_buff) < 15 or BuffPresent(liadrins_fury_unleashed_buff) or HasArtifactTrait(ashes_to_ashes) and SpellCooldown(wake_of_ashes) < GCD() * 2 RetributionFinishersCdActions()
+ #rebuke
+ RetributionInterruptActions()
+ #call_action_list,name=cooldowns
+ RetributionCooldownsCdActions()
 
- unless { BuffPresent(crusade_buff) and BuffStacks(crusade_buff) < 15 or BuffPresent(liadrins_fury_unleashed_buff) or HasArtifactTrait(ashes_to_ashes) and SpellCooldown(wake_of_ashes) < GCD() * 2 } and RetributionFinishersCdPostConditions()
+ unless RetributionCooldownsCdPostConditions()
  {
-  #call_action_list,name=finishers,if=talent.execution_sentence.enabled&(cooldown.judgment.remains<gcd*4.25|debuff.judgment.remains>gcd*4.25)&cooldown.execution_sentence.up|buff.whisper_of_the_nathrezim.up&buff.whisper_of_the_nathrezim.remains<gcd*1.5
-  if Talent(execution_sentence_talent) and { SpellCooldown(judgment) < GCD() * 4 or target.DebuffRemaining(judgment_ret_debuff) > GCD() * 4 } and not SpellCooldown(execution_sentence) > 0 or BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() * 1 RetributionFinishersCdActions()
-
-  unless { Talent(execution_sentence_talent) and { SpellCooldown(judgment) < GCD() * 4 or target.DebuffRemaining(judgment_ret_debuff) > GCD() * 4 } and not SpellCooldown(execution_sentence) > 0 or BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() * 1 } and RetributionFinishersCdPostConditions() or target.DebuffPresent(execution_sentence_debuff) and target.DebuffRemaining(execution_sentence_debuff) < GCD() * 2 and target.DebuffRemaining(judgment_ret_debuff) < GCD() * 2 and Spell(judgment) or HolyPower() <= 2 and { ArmorSetBonus(T20 2) or ArmorSetBonus(T20 4) } and Spell(blade_of_justice) or HolyPower() <= 2 and { ArmorSetBonus(T20 2) or ArmorSetBonus(T20 4) } and Spell(divine_hammer) or { not False(raid_event_adds_exists) or 600 > 15 } and { HolyPower() <= 0 or HolyPower() == 1 and { SpellCooldown(blade_of_justice) > GCD() or SpellCooldown(divine_hammer) > GCD() } or HolyPower() == 2 and { SpellCharges(zeal count=0) <= 0 or SpellCharges(crusader_strike count=0) <= 0 } } and Spell(wake_of_ashes) or HolyPower() <= 3 and not ArmorSetBonus(T20 4) and Spell(blade_of_justice) or HolyPower() <= 3 and not ArmorSetBonus(T20 4) and Spell(divine_hammer) or Spell(judgment)
-  {
-   #call_action_list,name=finishers,if=buff.divine_purpose.up
-   if BuffPresent(divine_purpose_buff) RetributionFinishersCdActions()
-
-   unless BuffPresent(divine_purpose_buff) and RetributionFinishersCdPostConditions() or SpellCharges(zeal count=0) >= 1 and HolyPower() <= 4 and { SpellCooldown(blade_of_justice) > GCD() * 2 or SpellCooldown(divine_hammer) > GCD() * 2 } and target.DebuffRemaining(judgment_ret_debuff) > GCD() and Spell(zeal) or SpellCharges(crusader_strike count=0) >= 1 and HolyPower() <= 4 and { SpellCooldown(blade_of_justice) > GCD() * 2 or SpellCooldown(divine_hammer) > GCD() * 2 } and target.DebuffRemaining(judgment_ret_debuff) > GCD() and { Talent(greater_judgment_talent) or not ArmorSetBonus(T20 4) and Talent(the_fires_of_justice_talent) } and Spell(crusader_strike) or Spell(consecration) or HasEquippedItem(137065) and target.HealthPercent() >= 75 and HolyPower() <= 4 and Spell(hammer_of_justice)
-   {
-    #call_action_list,name=finishers
-    RetributionFinishersCdActions()
-   }
-  }
+  #call_action_list,name=generators
+  RetributionGeneratorsCdActions()
  }
 }
 
-AddFunction RetributionGeneratorsCdPostConditions
+AddFunction RetributionDefaultCdPostConditions
 {
- { BuffPresent(crusade_buff) and BuffStacks(crusade_buff) < 15 or BuffPresent(liadrins_fury_unleashed_buff) or HasArtifactTrait(ashes_to_ashes) and SpellCooldown(wake_of_ashes) < GCD() * 2 } and RetributionFinishersCdPostConditions() or { Talent(execution_sentence_talent) and { SpellCooldown(judgment) < GCD() * 4 or target.DebuffRemaining(judgment_ret_debuff) > GCD() * 4 } and not SpellCooldown(execution_sentence) > 0 or BuffPresent(whisper_of_the_nathrezim_buff) and BuffRemaining(whisper_of_the_nathrezim_buff) < GCD() * 1 } and RetributionFinishersCdPostConditions() or target.DebuffPresent(execution_sentence_debuff) and target.DebuffRemaining(execution_sentence_debuff) < GCD() * 2 and target.DebuffRemaining(judgment_ret_debuff) < GCD() * 2 and Spell(judgment) or HolyPower() <= 2 and { ArmorSetBonus(T20 2) or ArmorSetBonus(T20 4) } and Spell(blade_of_justice) or HolyPower() <= 2 and { ArmorSetBonus(T20 2) or ArmorSetBonus(T20 4) } and Spell(divine_hammer) or { not False(raid_event_adds_exists) or 600 > 15 } and { HolyPower() <= 0 or HolyPower() == 1 and { SpellCooldown(blade_of_justice) > GCD() or SpellCooldown(divine_hammer) > GCD() } or HolyPower() == 2 and { SpellCharges(zeal count=0) <= 0 or SpellCharges(crusader_strike count=0) <= 0 } } and Spell(wake_of_ashes) or HolyPower() <= 3 and not ArmorSetBonus(T20 4) and Spell(blade_of_justice) or HolyPower() <= 3 and not ArmorSetBonus(T20 4) and Spell(divine_hammer) or Spell(judgment) or BuffPresent(divine_purpose_buff) and RetributionFinishersCdPostConditions() or SpellCharges(zeal count=0) >= 1 and HolyPower() <= 4 and { SpellCooldown(blade_of_justice) > GCD() * 2 or SpellCooldown(divine_hammer) > GCD() * 2 } and target.DebuffRemaining(judgment_ret_debuff) > GCD() and Spell(zeal) or SpellCharges(crusader_strike count=0) >= 1 and HolyPower() <= 4 and { SpellCooldown(blade_of_justice) > GCD() * 2 or SpellCooldown(divine_hammer) > GCD() * 2 } and target.DebuffRemaining(judgment_ret_debuff) > GCD() and { Talent(greater_judgment_talent) or not ArmorSetBonus(T20 4) and Talent(the_fires_of_justice_talent) } and Spell(crusader_strike) or Spell(consecration) or HasEquippedItem(137065) and target.HealthPercent() >= 75 and HolyPower() <= 4 and Spell(hammer_of_justice) or RetributionFinishersCdPostConditions() or Spell(zeal) or Spell(crusader_strike)
-}
-
-### actions.finishers
-
-AddFunction RetributionFinishersMainActions
-{
- #execution_sentence,if=spell_targets.divine_storm<=3&(cooldown.judgment.remains<gcd*4.25|debuff.judgment.remains>gcd*4.25)
- if Enemies() <= 3 and { SpellCooldown(judgment) < GCD() * 4 or target.DebuffRemaining(judgment_ret_debuff) > GCD() * 4 } Spell(execution_sentence)
- #divine_storm,if=debuff.judgment.up&variable.ds_castable&buff.divine_purpose.react
- if target.DebuffPresent(judgment_ret_debuff) and ds_castable() and BuffPresent(divine_purpose_buff) Spell(divine_storm)
- #divine_storm,if=debuff.judgment.up&variable.ds_castable&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*2)
- if target.DebuffPresent(judgment_ret_debuff) and ds_castable() and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } Spell(divine_storm)
- #justicars_vengeance,if=debuff.judgment.up&buff.divine_purpose.react&!equipped.137020
- if target.DebuffPresent(judgment_ret_debuff) and BuffPresent(divine_purpose_buff) and not HasEquippedItem(137020) Spell(justicars_vengeance)
- #templars_verdict,if=debuff.judgment.up&buff.divine_purpose.react
- if target.DebuffPresent(judgment_ret_debuff) and BuffPresent(divine_purpose_buff) Spell(templars_verdict)
- #templars_verdict,if=debuff.judgment.up&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*2)&(!talent.execution_sentence.enabled|cooldown.execution_sentence.remains>gcd)
- if target.DebuffPresent(judgment_ret_debuff) and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } and { not Talent(execution_sentence_talent) or SpellCooldown(execution_sentence) > GCD() } Spell(templars_verdict)
-}
-
-AddFunction RetributionFinishersMainPostConditions
-{
-}
-
-AddFunction RetributionFinishersShortCdActions
-{
-}
-
-AddFunction RetributionFinishersShortCdPostConditions
-{
- Enemies() <= 3 and { SpellCooldown(judgment) < GCD() * 4 or target.DebuffRemaining(judgment_ret_debuff) > GCD() * 4 } and Spell(execution_sentence) or target.DebuffPresent(judgment_ret_debuff) and ds_castable() and BuffPresent(divine_purpose_buff) and Spell(divine_storm) or target.DebuffPresent(judgment_ret_debuff) and ds_castable() and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } and Spell(divine_storm) or target.DebuffPresent(judgment_ret_debuff) and BuffPresent(divine_purpose_buff) and not HasEquippedItem(137020) and Spell(justicars_vengeance) or target.DebuffPresent(judgment_ret_debuff) and BuffPresent(divine_purpose_buff) and Spell(templars_verdict) or target.DebuffPresent(judgment_ret_debuff) and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } and { not Talent(execution_sentence_talent) or SpellCooldown(execution_sentence) > GCD() } and Spell(templars_verdict)
-}
-
-AddFunction RetributionFinishersCdActions
-{
-}
-
-AddFunction RetributionFinishersCdPostConditions
-{
- Enemies() <= 3 and { SpellCooldown(judgment) < GCD() * 4 or target.DebuffRemaining(judgment_ret_debuff) > GCD() * 4 } and Spell(execution_sentence) or target.DebuffPresent(judgment_ret_debuff) and ds_castable() and BuffPresent(divine_purpose_buff) and Spell(divine_storm) or target.DebuffPresent(judgment_ret_debuff) and ds_castable() and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } and Spell(divine_storm) or target.DebuffPresent(judgment_ret_debuff) and BuffPresent(divine_purpose_buff) and not HasEquippedItem(137020) and Spell(justicars_vengeance) or target.DebuffPresent(judgment_ret_debuff) and BuffPresent(divine_purpose_buff) and Spell(templars_verdict) or target.DebuffPresent(judgment_ret_debuff) and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } and { not Talent(execution_sentence_talent) or SpellCooldown(execution_sentence) > GCD() } and Spell(templars_verdict)
+ RetributionCooldownsCdPostConditions() or RetributionGeneratorsCdPostConditions()
 }
 
 ### actions.cooldowns
@@ -928,25 +748,17 @@ AddFunction RetributionCooldownsShortCdPostConditions
 
 AddFunction RetributionCooldownsCdActions
 {
- #use_item,name=faulty_countermeasure,if=(buff.avenging_wrath.up|buff.crusade.up)
- if BuffPresent(avenging_wrath_melee_buff) or BuffPresent(crusade_buff) RetributionUseItemActions()
- #potion,name=old_war,if=(buff.bloodlust.react|buff.avenging_wrath.up|buff.crusade.up&buff.crusade.remains<25|target.time_to_die<=40)
- if { BuffPresent(burst_haste_buff any=1) or BuffPresent(avenging_wrath_melee_buff) or BuffPresent(crusade_buff) and BuffRemaining(crusade_buff) < 25 or target.TimeToDie() <= 40 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
- #blood_fury
- Spell(blood_fury_apsp)
- #berserking
- Spell(berserking)
- #arcane_torrent,if=(buff.crusade.up|buff.avenging_wrath.up)&holy_power=2&(cooldown.blade_of_justice.remains>gcd|cooldown.divine_hammer.remains>gcd)
- if { BuffPresent(crusade_buff) or BuffPresent(avenging_wrath_melee_buff) } and HolyPower() == 2 and { SpellCooldown(blade_of_justice) > GCD() or SpellCooldown(divine_hammer) > GCD() } Spell(arcane_torrent_holy)
- #holy_wrath
- Spell(holy_wrath)
+ #potion,if=(buff.bloodlust.react|buff.avenging_wrath.up|buff.crusade.up&buff.crusade.remains<25|target.time_to_die<=40)
+ if { BuffPresent(burst_haste_buff any=1) or BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) and BuffRemaining(crusade_buff) < 25 or target.TimeToDie() <= 40 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
+ #lights_judgment,if=spell_targets.lights_judgment>=2|(!raid_event.adds.exists|raid_event.adds.in>75)
+ if Enemies() >= 2 or not False(raid_event_adds_exists) or 600 > 75 Spell(lights_judgment)
 
  unless Spell(shield_of_vengeance)
  {
-  #avenging_wrath
-  Spell(avenging_wrath_melee)
-  #crusade,if=holy_power>=3|((equipped.137048|race.blood_elf)&holy_power>=2)
-  if HolyPower() >= 3 or { HasEquippedItem(137048) or Race(BloodElf) } and HolyPower() >= 2 Spell(crusade)
+  #avenging_wrath,if=buff.inquisition.up|!talent.inquisition.enabled
+  if BuffPresent(inquisition_buff) or not Talent(inquisition_talent) Spell(avenging_wrath)
+  #crusade,if=holy_power>=4
+  if HolyPower() >= 4 Spell(crusade)
  }
 }
 
@@ -955,79 +767,175 @@ AddFunction RetributionCooldownsCdPostConditions
  Spell(shield_of_vengeance)
 }
 
-### actions.default
+### actions.finishers
 
-AddFunction RetributionDefaultMainActions
+AddFunction RetributionFinishersMainActions
 {
- #call_action_list,name=opener,if=time<2
- if TimeInCombat() < 2 RetributionOpenerMainActions()
+ #variable,name=ds_castable,value=spell_targets.divine_storm>=3|talent.divine_judgment.enabled&spell_targets.divine_storm>=2|azerite.divine_right.enabled&target.health.pct<=20&buff.divine_right.down
+ #inquisition,if=buff.inquisition.down|buff.inquisition.remains<5&holy_power>=3|talent.execution_sentence.enabled&cooldown.execution_sentence.remains<10&buff.inquisition.remains<15|cooldown.avenging_wrath.remains<15&buff.inquisition.remains<20&holy_power>=3
+ if BuffExpires(inquisition_buff) or BuffRemaining(inquisition_buff) < 5 and HolyPower() >= 3 or Talent(execution_sentence_talent) and SpellCooldown(execution_sentence) < 10 and BuffRemaining(inquisition_buff) < 15 or SpellCooldown(avenging_wrath) < 15 and BuffRemaining(inquisition_buff) < 20 and HolyPower() >= 3 Spell(inquisition)
+ #execution_sentence,if=spell_targets.divine_storm<=3&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*2)
+ if Enemies() <= 3 and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } Spell(execution_sentence)
+ #divine_storm,if=variable.ds_castable&buff.divine_purpose.react
+ if ds_castable() and BuffPresent(divine_purpose_buff) Spell(divine_storm)
+ #divine_storm,if=variable.ds_castable&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*2)
+ if ds_castable() and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } Spell(divine_storm)
+ #templars_verdict,if=buff.divine_purpose.react&(!talent.execution_sentence.enabled|cooldown.execution_sentence.remains>gcd)
+ if BuffPresent(divine_purpose_buff) and { not Talent(execution_sentence_talent) or SpellCooldown(execution_sentence) > GCD() } Spell(templars_verdict)
+ #templars_verdict,if=(!talent.crusade.enabled|cooldown.crusade.remains>gcd*2)&(!talent.execution_sentence.enabled|buff.crusade.up&buff.crusade.stack<10|cooldown.execution_sentence.remains>gcd*2)
+ if { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } and { not Talent(execution_sentence_talent) or BuffPresent(crusade_buff) and BuffStacks(crusade_buff) < 10 or SpellCooldown(execution_sentence) > GCD() * 2 } Spell(templars_verdict)
+}
 
- unless TimeInCombat() < 2 and RetributionOpenerMainPostConditions()
+AddFunction RetributionFinishersMainPostConditions
+{
+}
+
+AddFunction RetributionFinishersShortCdActions
+{
+}
+
+AddFunction RetributionFinishersShortCdPostConditions
+{
+ { BuffExpires(inquisition_buff) or BuffRemaining(inquisition_buff) < 5 and HolyPower() >= 3 or Talent(execution_sentence_talent) and SpellCooldown(execution_sentence) < 10 and BuffRemaining(inquisition_buff) < 15 or SpellCooldown(avenging_wrath) < 15 and BuffRemaining(inquisition_buff) < 20 and HolyPower() >= 3 } and Spell(inquisition) or Enemies() <= 3 and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } and Spell(execution_sentence) or ds_castable() and BuffPresent(divine_purpose_buff) and Spell(divine_storm) or ds_castable() and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } and Spell(divine_storm) or BuffPresent(divine_purpose_buff) and { not Talent(execution_sentence_talent) or SpellCooldown(execution_sentence) > GCD() } and Spell(templars_verdict) or { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } and { not Talent(execution_sentence_talent) or BuffPresent(crusade_buff) and BuffStacks(crusade_buff) < 10 or SpellCooldown(execution_sentence) > GCD() * 2 } and Spell(templars_verdict)
+}
+
+AddFunction RetributionFinishersCdActions
+{
+}
+
+AddFunction RetributionFinishersCdPostConditions
+{
+ { BuffExpires(inquisition_buff) or BuffRemaining(inquisition_buff) < 5 and HolyPower() >= 3 or Talent(execution_sentence_talent) and SpellCooldown(execution_sentence) < 10 and BuffRemaining(inquisition_buff) < 15 or SpellCooldown(avenging_wrath) < 15 and BuffRemaining(inquisition_buff) < 20 and HolyPower() >= 3 } and Spell(inquisition) or Enemies() <= 3 and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } and Spell(execution_sentence) or ds_castable() and BuffPresent(divine_purpose_buff) and Spell(divine_storm) or ds_castable() and { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } and Spell(divine_storm) or BuffPresent(divine_purpose_buff) and { not Talent(execution_sentence_talent) or SpellCooldown(execution_sentence) > GCD() } and Spell(templars_verdict) or { not Talent(crusade_talent) or SpellCooldown(crusade) > GCD() * 2 } and { not Talent(execution_sentence_talent) or BuffPresent(crusade_buff) and BuffStacks(crusade_buff) < 10 or SpellCooldown(execution_sentence) > GCD() * 2 } and Spell(templars_verdict)
+}
+
+### actions.generators
+
+AddFunction RetributionGeneratorsMainActions
+{
+ #variable,name=HoW,value=(!talent.hammer_of_wrath.enabled|target.health.pct>=20&(buff.avenging_wrath.down|buff.crusade.down))
+ #call_action_list,name=finishers,if=holy_power>=5
+ if HolyPower() >= 5 RetributionFinishersMainActions()
+
+ unless HolyPower() >= 5 and RetributionFinishersMainPostConditions()
  {
-  #call_action_list,name=cooldowns
-  RetributionCooldownsMainActions()
+  #wake_of_ashes,if=(!raid_event.adds.exists|raid_event.adds.in>20)&(holy_power<=0|holy_power=1&cooldown.blade_of_justice.remains>gcd)
+  if { not False(raid_event_adds_exists) or 600 > 20 } and { HolyPower() <= 0 or HolyPower() == 1 and SpellCooldown(blade_of_justice) > GCD() } Spell(wake_of_ashes)
+  #blade_of_justice,if=holy_power<=2|(holy_power=3&(cooldown.hammer_of_wrath.remains>gcd*2|variable.HoW))
+  if HolyPower() <= 2 or HolyPower() == 3 and { SpellCooldown(hammer_of_wrath) > GCD() * 2 or HoW() } Spell(blade_of_justice)
+  #judgment,if=holy_power<=2|(holy_power<=4&(cooldown.blade_of_justice.remains>gcd*2|variable.HoW))
+  if HolyPower() <= 2 or HolyPower() <= 4 and { SpellCooldown(blade_of_justice) > GCD() * 2 or HoW() } Spell(judgment)
+  #hammer_of_wrath,if=holy_power<=4
+  if HolyPower() <= 4 Spell(hammer_of_wrath)
+  #consecration,if=holy_power<=2|holy_power<=3&cooldown.blade_of_justice.remains>gcd*2|holy_power=4&cooldown.blade_of_justice.remains>gcd*2&cooldown.judgment.remains>gcd*2
+  if HolyPower() <= 2 or HolyPower() <= 3 and SpellCooldown(blade_of_justice) > GCD() * 2 or HolyPower() == 4 and SpellCooldown(blade_of_justice) > GCD() * 2 and SpellCooldown(judgment) > GCD() * 2 Spell(consecration)
+  #call_action_list,name=finishers,if=talent.hammer_of_wrath.enabled&(target.health.pct<=20|buff.avenging_wrath.up|buff.crusade.up)&(buff.divine_purpose.up|buff.crusade.stack<10)
+  if Talent(hammer_of_wrath_talent) and { target.HealthPercent() <= 20 or BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) } and { BuffPresent(divine_purpose_buff) or BuffStacks(crusade_buff) < 10 } RetributionFinishersMainActions()
 
-  unless RetributionCooldownsMainPostConditions()
+  unless Talent(hammer_of_wrath_talent) and { target.HealthPercent() <= 20 or BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) } and { BuffPresent(divine_purpose_buff) or BuffStacks(crusade_buff) < 10 } and RetributionFinishersMainPostConditions()
   {
-   #call_action_list,name=generators
-   RetributionGeneratorsMainActions()
+   #crusader_strike,if=cooldown.crusader_strike.charges_fractional>=1.75&(holy_power<=2|holy_power<=3&cooldown.blade_of_justice.remains>gcd*2|holy_power=4&cooldown.blade_of_justice.remains>gcd*2&cooldown.judgment.remains>gcd*2&cooldown.consecration.remains>gcd*2)
+   if SpellCharges(crusader_strike count=0) >= 1.75 and { HolyPower() <= 2 or HolyPower() <= 3 and SpellCooldown(blade_of_justice) > GCD() * 2 or HolyPower() == 4 and SpellCooldown(blade_of_justice) > GCD() * 2 and SpellCooldown(judgment) > GCD() * 2 and SpellCooldown(consecration) > GCD() * 2 } Spell(crusader_strike)
+   #call_action_list,name=finishers
+   RetributionFinishersMainActions()
+
+   unless RetributionFinishersMainPostConditions()
+   {
+    #crusader_strike,if=holy_power<=4
+    if HolyPower() <= 4 Spell(crusader_strike)
+   }
   }
  }
 }
 
-AddFunction RetributionDefaultMainPostConditions
+AddFunction RetributionGeneratorsMainPostConditions
 {
- TimeInCombat() < 2 and RetributionOpenerMainPostConditions() or RetributionCooldownsMainPostConditions() or RetributionGeneratorsMainPostConditions()
+ HolyPower() >= 5 and RetributionFinishersMainPostConditions() or Talent(hammer_of_wrath_talent) and { target.HealthPercent() <= 20 or BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) } and { BuffPresent(divine_purpose_buff) or BuffStacks(crusade_buff) < 10 } and RetributionFinishersMainPostConditions() or RetributionFinishersMainPostConditions()
 }
 
-AddFunction RetributionDefaultShortCdActions
+AddFunction RetributionGeneratorsShortCdActions
 {
- #auto_attack
- RetributionGetInMeleeRange()
- #call_action_list,name=opener,if=time<2
- if TimeInCombat() < 2 RetributionOpenerShortCdActions()
+ #variable,name=HoW,value=(!talent.hammer_of_wrath.enabled|target.health.pct>=20&(buff.avenging_wrath.down|buff.crusade.down))
+ #call_action_list,name=finishers,if=holy_power>=5
+ if HolyPower() >= 5 RetributionFinishersShortCdActions()
 
- unless TimeInCombat() < 2 and RetributionOpenerShortCdPostConditions()
+ unless HolyPower() >= 5 and RetributionFinishersShortCdPostConditions() or { not False(raid_event_adds_exists) or 600 > 20 } and { HolyPower() <= 0 or HolyPower() == 1 and SpellCooldown(blade_of_justice) > GCD() } and Spell(wake_of_ashes) or { HolyPower() <= 2 or HolyPower() == 3 and { SpellCooldown(hammer_of_wrath) > GCD() * 2 or HoW() } } and Spell(blade_of_justice) or { HolyPower() <= 2 or HolyPower() <= 4 and { SpellCooldown(blade_of_justice) > GCD() * 2 or HoW() } } and Spell(judgment) or HolyPower() <= 4 and Spell(hammer_of_wrath) or { HolyPower() <= 2 or HolyPower() <= 3 and SpellCooldown(blade_of_justice) > GCD() * 2 or HolyPower() == 4 and SpellCooldown(blade_of_justice) > GCD() * 2 and SpellCooldown(judgment) > GCD() * 2 } and Spell(consecration)
  {
-  #call_action_list,name=cooldowns
-  RetributionCooldownsShortCdActions()
+  #call_action_list,name=finishers,if=talent.hammer_of_wrath.enabled&(target.health.pct<=20|buff.avenging_wrath.up|buff.crusade.up)&(buff.divine_purpose.up|buff.crusade.stack<10)
+  if Talent(hammer_of_wrath_talent) and { target.HealthPercent() <= 20 or BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) } and { BuffPresent(divine_purpose_buff) or BuffStacks(crusade_buff) < 10 } RetributionFinishersShortCdActions()
 
-  unless RetributionCooldownsShortCdPostConditions()
+  unless Talent(hammer_of_wrath_talent) and { target.HealthPercent() <= 20 or BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) } and { BuffPresent(divine_purpose_buff) or BuffStacks(crusade_buff) < 10 } and RetributionFinishersShortCdPostConditions() or SpellCharges(crusader_strike count=0) >= 1.75 and { HolyPower() <= 2 or HolyPower() <= 3 and SpellCooldown(blade_of_justice) > GCD() * 2 or HolyPower() == 4 and SpellCooldown(blade_of_justice) > GCD() * 2 and SpellCooldown(judgment) > GCD() * 2 and SpellCooldown(consecration) > GCD() * 2 } and Spell(crusader_strike)
   {
-   #call_action_list,name=generators
-   RetributionGeneratorsShortCdActions()
+   #call_action_list,name=finishers
+   RetributionFinishersShortCdActions()
   }
  }
 }
 
-AddFunction RetributionDefaultShortCdPostConditions
+AddFunction RetributionGeneratorsShortCdPostConditions
 {
- TimeInCombat() < 2 and RetributionOpenerShortCdPostConditions() or RetributionCooldownsShortCdPostConditions() or RetributionGeneratorsShortCdPostConditions()
+ HolyPower() >= 5 and RetributionFinishersShortCdPostConditions() or { not False(raid_event_adds_exists) or 600 > 20 } and { HolyPower() <= 0 or HolyPower() == 1 and SpellCooldown(blade_of_justice) > GCD() } and Spell(wake_of_ashes) or { HolyPower() <= 2 or HolyPower() == 3 and { SpellCooldown(hammer_of_wrath) > GCD() * 2 or HoW() } } and Spell(blade_of_justice) or { HolyPower() <= 2 or HolyPower() <= 4 and { SpellCooldown(blade_of_justice) > GCD() * 2 or HoW() } } and Spell(judgment) or HolyPower() <= 4 and Spell(hammer_of_wrath) or { HolyPower() <= 2 or HolyPower() <= 3 and SpellCooldown(blade_of_justice) > GCD() * 2 or HolyPower() == 4 and SpellCooldown(blade_of_justice) > GCD() * 2 and SpellCooldown(judgment) > GCD() * 2 } and Spell(consecration) or Talent(hammer_of_wrath_talent) and { target.HealthPercent() <= 20 or BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) } and { BuffPresent(divine_purpose_buff) or BuffStacks(crusade_buff) < 10 } and RetributionFinishersShortCdPostConditions() or SpellCharges(crusader_strike count=0) >= 1.75 and { HolyPower() <= 2 or HolyPower() <= 3 and SpellCooldown(blade_of_justice) > GCD() * 2 or HolyPower() == 4 and SpellCooldown(blade_of_justice) > GCD() * 2 and SpellCooldown(judgment) > GCD() * 2 and SpellCooldown(consecration) > GCD() * 2 } and Spell(crusader_strike) or RetributionFinishersShortCdPostConditions() or HolyPower() <= 4 and Spell(crusader_strike)
 }
 
-AddFunction RetributionDefaultCdActions
+AddFunction RetributionGeneratorsCdActions
 {
- #rebuke
- RetributionInterruptActions()
- #call_action_list,name=opener,if=time<2
- if TimeInCombat() < 2 RetributionOpenerCdActions()
+ #variable,name=HoW,value=(!talent.hammer_of_wrath.enabled|target.health.pct>=20&(buff.avenging_wrath.down|buff.crusade.down))
+ #call_action_list,name=finishers,if=holy_power>=5
+ if HolyPower() >= 5 RetributionFinishersCdActions()
 
- unless TimeInCombat() < 2 and RetributionOpenerCdPostConditions()
+ unless HolyPower() >= 5 and RetributionFinishersCdPostConditions() or { not False(raid_event_adds_exists) or 600 > 20 } and { HolyPower() <= 0 or HolyPower() == 1 and SpellCooldown(blade_of_justice) > GCD() } and Spell(wake_of_ashes) or { HolyPower() <= 2 or HolyPower() == 3 and { SpellCooldown(hammer_of_wrath) > GCD() * 2 or HoW() } } and Spell(blade_of_justice) or { HolyPower() <= 2 or HolyPower() <= 4 and { SpellCooldown(blade_of_justice) > GCD() * 2 or HoW() } } and Spell(judgment) or HolyPower() <= 4 and Spell(hammer_of_wrath) or { HolyPower() <= 2 or HolyPower() <= 3 and SpellCooldown(blade_of_justice) > GCD() * 2 or HolyPower() == 4 and SpellCooldown(blade_of_justice) > GCD() * 2 and SpellCooldown(judgment) > GCD() * 2 } and Spell(consecration)
  {
-  #call_action_list,name=cooldowns
-  RetributionCooldownsCdActions()
+  #call_action_list,name=finishers,if=talent.hammer_of_wrath.enabled&(target.health.pct<=20|buff.avenging_wrath.up|buff.crusade.up)&(buff.divine_purpose.up|buff.crusade.stack<10)
+  if Talent(hammer_of_wrath_talent) and { target.HealthPercent() <= 20 or BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) } and { BuffPresent(divine_purpose_buff) or BuffStacks(crusade_buff) < 10 } RetributionFinishersCdActions()
 
-  unless RetributionCooldownsCdPostConditions()
+  unless Talent(hammer_of_wrath_talent) and { target.HealthPercent() <= 20 or BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) } and { BuffPresent(divine_purpose_buff) or BuffStacks(crusade_buff) < 10 } and RetributionFinishersCdPostConditions() or SpellCharges(crusader_strike count=0) >= 1.75 and { HolyPower() <= 2 or HolyPower() <= 3 and SpellCooldown(blade_of_justice) > GCD() * 2 or HolyPower() == 4 and SpellCooldown(blade_of_justice) > GCD() * 2 and SpellCooldown(judgment) > GCD() * 2 and SpellCooldown(consecration) > GCD() * 2 } and Spell(crusader_strike)
   {
-   #call_action_list,name=generators
-   RetributionGeneratorsCdActions()
+   #call_action_list,name=finishers
+   RetributionFinishersCdActions()
+
+   unless RetributionFinishersCdPostConditions() or HolyPower() <= 4 and Spell(crusader_strike)
+   {
+    #arcane_torrent,if=(debuff.execution_sentence.up|(talent.hammer_of_wrath.enabled&(target.health.pct>=20|buff.avenging_wrath.down|buff.crusade.down))|!talent.execution_sentence.enabled|!talent.hammer_of_wrath.enabled)&holy_power<=4
+    if { target.DebuffPresent(execution_sentence_debuff) or Talent(hammer_of_wrath_talent) and { target.HealthPercent() >= 20 or BuffExpires(avenging_wrath_buff) or BuffExpires(crusade_buff) } or not Talent(execution_sentence_talent) or not Talent(hammer_of_wrath_talent) } and HolyPower() <= 4 Spell(arcane_torrent_holy)
+   }
   }
  }
 }
 
-AddFunction RetributionDefaultCdPostConditions
+AddFunction RetributionGeneratorsCdPostConditions
 {
- TimeInCombat() < 2 and RetributionOpenerCdPostConditions() or RetributionCooldownsCdPostConditions() or RetributionGeneratorsCdPostConditions()
+ HolyPower() >= 5 and RetributionFinishersCdPostConditions() or { not False(raid_event_adds_exists) or 600 > 20 } and { HolyPower() <= 0 or HolyPower() == 1 and SpellCooldown(blade_of_justice) > GCD() } and Spell(wake_of_ashes) or { HolyPower() <= 2 or HolyPower() == 3 and { SpellCooldown(hammer_of_wrath) > GCD() * 2 or HoW() } } and Spell(blade_of_justice) or { HolyPower() <= 2 or HolyPower() <= 4 and { SpellCooldown(blade_of_justice) > GCD() * 2 or HoW() } } and Spell(judgment) or HolyPower() <= 4 and Spell(hammer_of_wrath) or { HolyPower() <= 2 or HolyPower() <= 3 and SpellCooldown(blade_of_justice) > GCD() * 2 or HolyPower() == 4 and SpellCooldown(blade_of_justice) > GCD() * 2 and SpellCooldown(judgment) > GCD() * 2 } and Spell(consecration) or Talent(hammer_of_wrath_talent) and { target.HealthPercent() <= 20 or BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) } and { BuffPresent(divine_purpose_buff) or BuffStacks(crusade_buff) < 10 } and RetributionFinishersCdPostConditions() or SpellCharges(crusader_strike count=0) >= 1.75 and { HolyPower() <= 2 or HolyPower() <= 3 and SpellCooldown(blade_of_justice) > GCD() * 2 or HolyPower() == 4 and SpellCooldown(blade_of_justice) > GCD() * 2 and SpellCooldown(judgment) > GCD() * 2 and SpellCooldown(consecration) > GCD() * 2 } and Spell(crusader_strike) or RetributionFinishersCdPostConditions() or HolyPower() <= 4 and Spell(crusader_strike)
+}
+
+### actions.precombat
+
+AddFunction RetributionPrecombatMainActions
+{
+}
+
+AddFunction RetributionPrecombatMainPostConditions
+{
+}
+
+AddFunction RetributionPrecombatShortCdActions
+{
+}
+
+AddFunction RetributionPrecombatShortCdPostConditions
+{
+}
+
+AddFunction RetributionPrecombatCdActions
+{
+ #flask
+ #food
+ #augmentation
+ #snapshot_stats
+ #potion
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
+}
+
+AddFunction RetributionPrecombatCdPostConditions
+{
 }
 
 ### Retribution icons.
@@ -1090,43 +998,36 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 
 ### Required symbols
 # old_war_potion
-# blood_fury_apsp
-# berserking
-# arcane_torrent_holy
-# judgment
-# blade_of_justice
-# 137048
-# wake_of_ashes
-# divine_hammer
-# scarlet_inquisitors_expurgation_buff
-# avenging_wrath_melee_buff
+# avenging_wrath_buff
 # crusade_buff
-# crusade
-# avenging_wrath_melee
-# liadrins_fury_unleashed_buff
-# ashes_to_ashes
-# execution_sentence_talent
-# judgment_ret_debuff
-# execution_sentence
-# whisper_of_the_nathrezim_buff
-# execution_sentence_debuff
-# zeal
-# crusader_strike
-# divine_purpose_buff
-# greater_judgment_talent
-# the_fires_of_justice_talent
-# consecration
-# hammer_of_justice
-# 137065
-# divine_storm
-# crusade_talent
-# justicars_vengeance
-# 137020
-# templars_verdict
-# holy_wrath
+# lights_judgment
 # shield_of_vengeance
+# avenging_wrath
+# inquisition_buff
+# inquisition_talent
+# crusade
+# divine_judgment_talent
+# divine_right
+# divine_right_buff
+# inquisition
+# execution_sentence_talent
+# execution_sentence
+# crusade_talent
+# divine_storm
+# divine_purpose_buff
+# templars_verdict
+# hammer_of_wrath_talent
+# wake_of_ashes
+# blade_of_justice
+# hammer_of_wrath
+# judgment
+# consecration
+# crusader_strike
+# arcane_torrent_holy
+# execution_sentence_debuff
 # rebuke
-# war_stomp
+# hammer_of_justice
+# war_stomp   
 ]]
     OvaleScripts:RegisterScript("PALADIN", "retribution", name, desc, code, "script")
 end
