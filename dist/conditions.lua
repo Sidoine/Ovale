@@ -101,6 +101,8 @@ local __BaseState = LibStub:GetLibrary("ovale/BaseState")
 local baseState = __BaseState.baseState
 local __Spells = LibStub:GetLibrary("ovale/Spells")
 local OvaleSpells = __Spells.OvaleSpells
+local __AzeriteArmor = LibStub:GetLibrary("ovale/AzeriteArmor")
+local OvaleAzerite = __AzeriteArmor.OvaleAzerite
 local INFINITY = huge
 local function BossArmorDamageReduction(target, state)
     return 0.3
@@ -156,6 +158,14 @@ local function HasArtifactTrait(positionalParams, namedParams, state, atTime)
     end
     OvaleCondition:RegisterCondition("hasartifacttrait", false, HasArtifactTrait)
     OvaleCondition:RegisterCondition("artifacttraitrank", false, ArtifactTraitRank)
+end
+do
+local function HasAzeriteTrait(positionalParams, namedParams, state, atTime)
+        local spellId, yesno = positionalParams[1], positionalParams[2]
+        local value = OvaleAzerite:HasTrait(spellId)
+        return TestBoolean(value, yesno)
+    end
+    OvaleCondition:RegisterCondition("hasazeritetrait", false, HasAzeriteTrait)
 end
 do
 local function BaseDuration(positionalParams, namedParams, state, atTime)

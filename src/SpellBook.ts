@@ -3,7 +3,7 @@ import { OvaleDebug } from "./Debug";
 import { OvaleProfiler } from "./Profiler";
 import { Ovale } from "./Ovale";
 import aceEvent from "@wowts/ace_event-3.0";
-import { ipairs, pairs, tonumber, tostring, wipe, lualength } from "@wowts/lua";
+import { ipairs, pairs, tonumber, tostring, wipe, lualength, LuaArray } from "@wowts/lua";
 import { match, gsub } from "@wowts/string";
 import { concat, insert, sort } from "@wowts/table";
 import { GetActiveSpecGroup, GetFlyoutInfo, GetFlyoutSlotInfo, GetSpellBookItemInfo, GetSpellInfo, GetSpellLink, GetSpellTabInfo, GetSpellTexture, GetTalentInfo, HasPetSpells, IsHarmfulSpell, IsHelpfulSpell, BOOKTYPE_PET, BOOKTYPE_SPELL, MAX_TALENT_TIERS, NUM_TALENT_COLUMNS } from "@wowts/wow-mock";
@@ -166,19 +166,21 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
                 if (spellLink) {
                     let [, , linkData, spellName] = ParseHyperlink(spellLink);
                     let id = tonumber(linkData);
-                    this.Debug("    %s (%d) is at offset %d (%s).", spellName, id, index, gsub(spellLink, "|", "_"));
-                    this.spell[id] = spellName;
+                    let name = GetSpellInfo(id);
+                    this.spell[id] = name;
                     this.isHarmful[id] = IsHarmfulSpell(index, bookType);
                     this.isHelpful[id] = IsHelpfulSpell(index, bookType);
                     this.texture[id] = GetSpellTexture(index, bookType);
                     this.spellbookId[bookType][id] = index;
+                    this.Debug("    %s (%d) is at offset %d (%s).", name, id, index, gsub(spellLink, "|", "_"));
                     if (spellId && id != spellId) {
-                        this.Debug("    %s (%d) is at offset %d.", spellName, spellId, index);
-                        this.spell[spellId] = spellName;
+                        let name = GetSpellInfo(spellId);
+                        this.spell[spellId] = GetSpellInfo(spellId);
                         this.isHarmful[spellId] = this.isHarmful[id];
                         this.isHelpful[spellId] = this.isHelpful[id];
                         this.texture[spellId] = this.texture[id];
                         this.spellbookId[bookType][spellId] = index;
+                        this.Debug("    %s (%d) is at offset %d.", name, spellId, index);
                     }
                 }
             } else if (skillType == "FLYOUT") {
@@ -188,19 +190,21 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
                     for (let flyoutIndex = 1; flyoutIndex <= numSlots; flyoutIndex += 1) {
                         let [id, overrideId, isKnown, spellName] = GetFlyoutSlotInfo(flyoutId, flyoutIndex);
                         if (isKnown) {
-                            this.Debug("    %s (%d) is at offset %d.", spellName, id, index);
-                            this.spell[id] = spellName;
+                            let name = GetSpellInfo(spellId);
+                            this.spell[id] = name;
                             this.isHarmful[id] = IsHarmfulSpell(spellName);
                             this.isHelpful[id] = IsHelpfulSpell(spellName);
                             this.texture[id] = GetSpellTexture(index, bookType);
                             this.spellbookId[bookType][id] = undefined;
+                            this.Debug("    %s (%d) is at offset %d.", name, id, index);
                             if (id != overrideId) {
-                                this.Debug("    %s (%d) is at offset %d.", spellName, overrideId, index);
-                                this.spell[overrideId] = spellName;
+                                let name = GetSpellInfo(spellId);
+                                this.spell[overrideId] = name;
                                 this.isHarmful[overrideId] = this.isHarmful[id];
                                 this.isHelpful[overrideId] = this.isHelpful[id];
                                 this.texture[overrideId] = this.texture[id];
                                 this.spellbookId[bookType][overrideId] = undefined;
+                                this.Debug("    %s (%d) is at offset %d.", name, overrideId, index);
                             }
                         }
                     }
