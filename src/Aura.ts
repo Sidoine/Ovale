@@ -42,14 +42,15 @@ let UNKNOWN_GUID = "0";
                     width: "full",
                     get: function (info: LuaArray<string>) {
                         wipe(output);
+                        let now = GetTime()
                         let harmfulFilter = (Ovale.db.profile.apparence.fullAuraScan) && 'HARMFUL' || 'HARMFUL|PLAYER';
                         let helpfulFilter = (Ovale.db.profile.apparence.fullAuraScan) && 'HELPFUL' || 'HELPFUL|PLAYER';
-                        let helpful = OvaleAura.DebugUnitAuras("player", helpfulFilter, undefined);
+                        let helpful = OvaleAura.DebugUnitAuras("player", helpfulFilter, now);
                         if (helpful) {
                             output[lualength(output) + 1] = "== BUFFS ==";
                             output[lualength(output) + 1] = helpful;
                         }
-                        let harmful = OvaleAura.DebugUnitAuras("player", harmfulFilter, undefined);
+                        let harmful = OvaleAura.DebugUnitAuras("player", harmfulFilter, now);
                         if (harmful) {
                             output[lualength(output) + 1] = "== DEBUFFS ==";
                             output[lualength(output) + 1] = harmful;
@@ -70,14 +71,15 @@ let UNKNOWN_GUID = "0";
                     width: "full",
                     get: function (info: LuaArray<string>) {
                         wipe(output);
+                        let now = GetTime()
                         let harmfulFilter = (Ovale.db.profile.apparence.fullAuraScan) && 'HARMFUL' || 'HARMFUL|PLAYER';
                         let helpfulFilter = (Ovale.db.profile.apparence.fullAuraScan) && 'HELPFUL' || 'HELPFUL|PLAYER';
-                        let helpful = OvaleAura.DebugUnitAuras("target", helpfulFilter, undefined);
+                        let helpful = OvaleAura.DebugUnitAuras("target", helpfulFilter, now);
                         if (helpful) {
                             output[lualength(output) + 1] = "== BUFFS ==";
                             output[lualength(output) + 1] = helpful;
                         }
-                        let harmful = OvaleAura.DebugUnitAuras("target", harmfulFilter, undefined);
+                        let harmful = OvaleAura.DebugUnitAuras("target", harmfulFilter, now);
                         if (harmful) {
                             output[lualength(output) + 1] = "== DEBUFFS ==";
                             output[lualength(output) + 1] = harmful;
@@ -443,11 +445,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
         self_pool.Drain();
     }
     UNIT_AURA(event: string, unitId: string) {
-        if (!Ovale.db.profile.apparence.laptopMode){
-            this.ScanAuras(unitId);
-        }else if(unitId == 'player' || unitId == 'target' || unitId == 'pet' || unitId == 'focus'){
-            this.ScanAuras(unitId);
-        }
+        this.ScanAuras(unitId);
     }
     Ovale_UnitChanged(event: string, unitId: string, guid: string) {
         if ((unitId == "pet" || unitId == "target") && guid) {

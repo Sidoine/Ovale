@@ -1183,9 +1183,6 @@ local InitializeDisambiguation = function()
     AddDisambiguation("legendary_ring", "legendary_ring_spirit", "MONK", "mistweaver", "Item")
     AddDisambiguation("zen_sphere_debuff", "zen_sphere_buff", "MONK")
     AddDisambiguation("arcane_torrent", "arcane_torrent_holy", "PALADIN")
-    AddDisambiguation("avenging_wrath", "avenging_wrath_heal", "PALADIN", "holy")
-    AddDisambiguation("avenging_wrath", "avenging_wrath_melee", "PALADIN", "retribution")
-    AddDisambiguation("avenging_wrath", "avenging_wrath_melee", "PALADIN", "protection")
     AddDisambiguation("blood_fury", "blood_fury_apsp", "PALADIN")
     AddDisambiguation("judgment_debuff", "judgment_ret_debuff", "PALADIN", "retribution")
     AddDisambiguation("legendary_ring", "legendary_ring_bonus_armor", "PALADIN", "protection", "Item")
@@ -1262,6 +1259,10 @@ local InitializeDisambiguation = function()
     AddDisambiguation("healing_elixir_talent", "healing_elixir_talent_mistweaver", "MONK", "mistweaver")
     AddDisambiguation("judgment_of_light_talent", "judgment_of_light_talent_holy", "PALADIN", "holy")
     AddDisambiguation("unbreakable_spirit_talent", "unbreakable_spirit_talent_holy", "PALADIN", "holy")
+    AddDisambiguation("cavalier_talent", "cavalier_talent_holy", "PALADIN", "holy")
+    AddDisambiguation("divine_purpose_buff", "divine_purpose_buff_holy", "PALADIN", "holy")
+    AddDisambiguation("judgment", "judgment_holy", "PALADIN", "holy")
+    AddDisambiguation("judgment", "judgment_prot", "PALADIN", "protection")
     AddDisambiguation("mindbender_talent", "mindbender_talent_discipline", "PRIEST", "discipline")
     AddDisambiguation("twist_of_fate_talent", "twist_of_fate_talent_discipline", "PRIEST", "discipline")
     AddDisambiguation("earth_shield_talent", "earth_shield_talent_restoration", "SHAMAN", "restoration")
@@ -1644,6 +1645,7 @@ local EmitOperand = nil
 local EmitOperandAction = nil
 local EmitOperandActiveDot = nil
 local EmitOperandArtifact = nil
+local EmitOperandAzerite = nil
 local EmitOperandBuff = nil
 local EmitOperandCharacter = nil
 local EmitOperandCooldown = nil
@@ -2649,6 +2651,8 @@ EmitOperand = function(parseNode, nodeList, annotation, action)
             ok, node = EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target)
         elseif token == "artifact" then
             ok, node = EmitOperandArtifact(operand, parseNode, nodeList, annotation, action, target)
+        elseif token == "azerite" then
+            ok, node = EmitOperandAzerite(operand, parseNode, nodeList, annotation, action, target)
         elseif token == "buff" then
             ok, node = EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target)
         elseif token == "consumable" then
@@ -2852,6 +2856,31 @@ EmitOperandArtifact = function(operand, parseNode, nodeList, annotation, action,
             code = format("ArtifactTraitRank(%s)", name)
         elseif property == "enabled" then
             code = format("HasArtifactTrait(%s)", name)
+        else
+            ok = false
+        end
+        if ok and code then
+            annotation.astAnnotation = annotation.astAnnotation or {}
+            node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+            AddSymbol(annotation, name)
+        end
+    else
+        ok = false
+    end
+    return ok, node
+end
+
+EmitOperandAzerite = function(operand, parseNode, nodeList, annotation, action, target)
+    local ok = true
+    local node
+    local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
+    local token = tokenIterator()
+    if token == "azerite" then
+        local code
+        local name = tokenIterator()
+        local property = tokenIterator()
+        if property == "enabled" then
+            code = format("HasAzeriteTrait(%s)", name)
         else
             ok = false
         end
