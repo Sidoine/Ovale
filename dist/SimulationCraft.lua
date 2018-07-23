@@ -3033,6 +3033,7 @@ do
         ["frost.frac"] = "Rune(frost)",
         ["fury"] = "Fury()",
         ["fury.deficit"] = "FuryDeficit()",
+        ["buff.grimoire_felguard.remains"] = "DemonDuration(felguard)",
         ["health"] = "Health()",
         ["health.deficit"] = "HealthMissing()",
         ["health.max"] = "MaxHealth()",
@@ -3078,8 +3079,8 @@ do
         ["time_to_die.remains"] = "TimeToDie()",
         ["time_to_sht.4"] = "100",
         ["time_to_sht.5"] = "100",
-        ["wild_imp_count"] = "Demons(wild_imp)",
-        ["buff.wild_imps.stack"] = "Demons(wild_imp)",
+        ["wild_imp_count"] = "Demons(wild_imp) + Demons(wild_imp_id)",
+        ["buff.wild_imps.stack"] = "Demons(wild_imp) + Demons(wild_imp_id)",
         ["wild_imp_no_de"] = "NotDeDemons(wild_imp)",
         ["wild_imp_remaining_duration"] = "DemonDuration(wild_imp)"
     }

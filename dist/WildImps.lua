@@ -13,23 +13,23 @@ local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local find = string.find
 local OvaleWildImpsBase = Ovale:NewModule("OvaleWildImps", aceEvent)
 local demonData = {
-    [55659] = {
+    [55659] = { -- Wild Imp
         duration = 12
     },
-    [98035] = {
+    [143622] = { -- Wild Imp Inner Demons Talent
         duration = 12
     },
-    [103673] = {
+    [98035] = { -- Dreadstalker
         duration = 12
     },
-    [11859] = {
-        duration = 25
+    [135002] = { -- Demonic Tyrant
+        duration = 15
     },
-    [89] = {
-        duration = 25
+    [135816] = { -- Vile Fiend
+        duration = 15
     },
-	[17252] = {
-		duration = 25
+	[17252] = { -- Felguard
+		duration = 15
 	}
 }
 local self_demons = {}
