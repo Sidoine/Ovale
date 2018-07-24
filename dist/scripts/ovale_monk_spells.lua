@@ -4,7 +4,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 __exports.register = function()
     local name = "ovale_monk_spells"
-    local desc = "[7.3.2] Ovale: Monk spells"
+    local desc = "[8.0.1] Ovale: Monk spells"
     local code = [[
 ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!fortifying_brew,buff,!fortifying_brew_buff)
 
@@ -221,8 +221,8 @@ Define(whirling_dragon_punch 152175)
 	SpellRequire(whirling_dragon_punch unusable 0=oncooldown,fists_of_fury)
 Define(zen_meditation 115176)
 	SpellInfo(zen_meditation cd=300 gcd=0 offgcd=1)
-	SpellInfo(zen_meditation cd=150 if_equipped=fundamental_observation)
-
+Define(zen_meditation_buff 115176)
+	SpellInfo(zen_meditation_buff duration=8)
 	
 ## Stagger
 Define(stagger 115069)
@@ -242,6 +242,7 @@ Define(convergence_of_fates 140806)
 Define(drinking_horn_cover 137097)
 Define(firestone_walkers 137027)
 Define(fundamental_observation 137063)
+	SpellInfo(zen_meditation cd=150 if_equipped=fundamental_observation)
 Define(hidden_masters_forbidden_touch 137057)
 Define(hidden_masters_forbidden_touch_buff 213114)
 	SpellInfo(hidden_masters_forbidden_touch_buff duration=5)
