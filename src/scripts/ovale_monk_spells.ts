@@ -216,6 +216,7 @@ Define(whirling_dragon_punch 152175)
 	SpellRequire(whirling_dragon_punch unusable 0=oncooldown,fists_of_fury)
 Define(zen_meditation 115176)
 	SpellInfo(zen_meditation cd=300 gcd=0 offgcd=1)
+	SpellAddBuff(zen_meditation zen_meditation_buff=1)
 Define(zen_meditation_buff 115176)
 	SpellInfo(zen_meditation_buff duration=8)
 	
