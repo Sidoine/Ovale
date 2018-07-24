@@ -148,7 +148,6 @@ Define(revival 115310)
 Define(ring_of_peace 116844)
 Define(rising_sun_kick 107428)
 	SpellInfo(rising_sun_kick cd=10 chi=2 specialization=windwalker cd_haste=melee)
-	SpellInfo(rising_sun_kick cd=7 specialization=windwalker itemset=T19 itemcount=2)
 	SpellRequire(rising_sun_kick chi_percent 0=buff,serenity_buff)
 	SpellAddBuff(rising_sun_kick thunder_focus_tea_buff=-1 if_spell=thunder_focus_tea specialization=mistweaver)
 Define(roll 109132)
@@ -265,18 +264,22 @@ Define(hidden_masters_forbidden_touch_buff 213114)
 	SpellInfo(hidden_masters_forbidden_touch_buff duration=5)
 Define(katsuos_eclipse 137029)
 	SpellInfo(fists_of_fury chi=2 if_equipped=katsuos_eclipse)
-Define(rising_fist_debuff 242259) # T20 2p bonus
-	SpellInfo(rising_fist_debuff duration=8)
-	SpellAddBuff(fists_of_fury rising_fist_debuff=1 itemset=T20 itemcount=4)
-	SpellAddTargetDebuff(rising_sun_kick rising_fist_debuff=0)
-Define(pressure_point_buff 247255) # T20 4p bonus
-	SpellInfo(pressure_point_buff duration=5)
+
 Define(salsalabims_lost_tunic 137016)
 Define(stormstouts_last_gasp 151788)
 	SpellInfo(keg_smash charges=2 if_equipped=stormstouts_last_gasp)
 Define(the_emperors_capacitor 144239)
 	SpellAddBuff(crackling_jade_lightning the_emperors_capacitor_buff=0)
 Define(the_emperors_capacitor_buff 235054)
+
+## Tiers
+SpellInfo(rising_sun_kick add_cd=-1 specialization=windwalker itemset=T19 itemcount=2)
+Define(rising_fist_debuff 242259) # T20 2p bonus
+	SpellInfo(rising_fist_debuff duration=8)
+	SpellAddBuff(fists_of_fury rising_fist_debuff=1 itemset=T20 itemcount=4)
+	SpellAddTargetDebuff(rising_sun_kick rising_fist_debuff=0)
+Define(pressure_point_buff 247255) # T20 4p bonus
+	SpellInfo(pressure_point_buff duration=5)
 
 ## Talents
 Define(ascension_talent 7)
