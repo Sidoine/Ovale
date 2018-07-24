@@ -25,7 +25,7 @@ Define(blackout_strike 205523)
 	SpellInfo(blackout_strike cd=3)
 	SpellAddBuff(blackout_strike blackout_combo_buff=1 talent=blackout_combo_talent)
 Define(black_ox_brew 115399)
-	SpellInfo(black_ox_brew cd=90 gcd=0 offgcd=1 talent=black_ox_brew_talent)
+	SpellInfo(black_ox_brew cd=120 gcd=0 offgcd=1 talent=black_ox_brew_talent)
 Define(bok_proc_buff 116768) #Alias for combo_breaker_bok_buff
 Define(breath_of_fire 115181)
 	SpellAddTargetDebuff(breath_of_fire breath_of_fire_debuff=1 if_target_debuff=keg_smash_debuff)
