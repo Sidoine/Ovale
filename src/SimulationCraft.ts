@@ -1368,6 +1368,7 @@ const InitializeDisambiguation = function() {
 
     //Monk
     AddDisambiguation("healing_elixir_talent", "healing_elixir_talent_mistweaver", "MONK", "mistweaver");
+    AddDisambiguation("bok_proc_buff", "blackout_kick_buff", "MONK", "windwalker");
 
     //Paladin
     AddDisambiguation("judgment_of_light_talent", "judgment_of_light_talent_holy", "PALADIN", "holy");
