@@ -68,6 +68,8 @@ Define(expel_harm 115072)
 	SpellInfo(expel_harm energy=15 specialization=brewmaster)
 	SpellRequire(expel_harm unusable 1=spellcount_max,0)
 	SpellRequire(expel_harm unusable 1=debuff,healing_immunity_debuff)
+Define(eye_of_the_tiger_debuff 196608)
+	SpellInfo(eye_of_the_tiger_debuff duration=8)
 Define(fists_of_fury 113656)
 	SpellInfo(fists_of_fury channel=4 cd=25)
 	SpellInfo(fists_of_fury chi=3)
@@ -310,8 +312,6 @@ Define(tiger_tail_sweep_talent 10)
 Define(tigers_lust_talent 6)
 Define(upwelling_talent 20)
 Define(whirling_dragon_punch_talent 20)
-
-
 
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(chi_brew tag=main)
