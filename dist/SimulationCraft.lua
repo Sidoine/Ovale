@@ -3192,6 +3192,8 @@ EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
             end
         elseif property == "charges_fractional" then
             code = format("%sCharges(%s count=0)", prefix, name)
+        elseif property == "max_charges" then
+            code = format("%sMaxCharges(%s)", prefix, name)
         elseif property == "full_recharge_time" then
             code = format("%sCooldown(%s)", prefix, name)
         else
