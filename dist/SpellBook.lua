@@ -185,8 +185,8 @@ local OvaleSpellBookClass = __class(OvaleSpellBookBase, {
                     self.spellbookId[bookType][id] = index
                     self:Debug("    %s (%d) is at offset %d (%s).", name, id, index, gsub(spellLink, "|", "_"))
                     if spellId and id ~= spellId then
-                        local name = GetSpellInfo(spellId)
-                        self.spell[spellId] = GetSpellInfo(spellId)
+                        local name = (skillType == "PETACTION") and spellName or GetSpellInfo(spellId)
+                        self.spell[spellId] = name
                         self.isHarmful[spellId] = self.isHarmful[id]
                         self.isHelpful[spellId] = self.isHelpful[id]
                         self.texture[spellId] = self.texture[id]
