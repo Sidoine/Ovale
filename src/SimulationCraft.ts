@@ -3316,6 +3316,8 @@ EmitOperandCooldown = function (operand, parseNode, nodeList, annotation, action
             }
         } else if (property == "charges_fractional") {
             code = format("%sCharges(%s count=0)", prefix, name);
+        } else if (property == "max_charges") {
+            code = format("%sMaxCharges(%s)", prefix, name);
         } else if (property == "full_recharge_time") {
             code = format("%sCooldown(%s)", prefix, name);
         } else {
