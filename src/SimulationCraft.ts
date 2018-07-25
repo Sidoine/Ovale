@@ -1215,10 +1215,6 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("legendary_ring", "legendary_ring_bonus_armor", "DEATHKNIGHT", "blood", "Item");
     AddDisambiguation("legendary_ring", "legendary_ring_strength", "DEATHKNIGHT", "frost", "Item");
     AddDisambiguation("legendary_ring", "legendary_ring_strength", "DEATHKNIGHT", "unholy", "Item");
-    AddDisambiguation("soul_reaper", "soul_reaper_blood", "DEATHKNIGHT", "blood");
-    AddDisambiguation("soul_reaper", "soul_reaper_frost", "DEATHKNIGHT", "frost");
-    AddDisambiguation("soul_reaper", "soul_reaper_unholy", "DEATHKNIGHT", "unholy");
-    AddDisambiguation("outbreak_debuff", "virulent_plague_debuff", "DEATHKNIGHT", "unholy");
     AddDisambiguation("arcane_torrent", "arcane_torrent_dh", "DEMONHUNTER");
     AddDisambiguation("metamorphosis", "metamorphosis_veng", "DEMONHUNTER", "vengeance");
     AddDisambiguation("metamorphosis_buff", "metamorphosis_veng_buff", "DEMONHUNTER", "vengeance");
@@ -1283,7 +1279,6 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("legendary_ring", "legendary_ring_spirit", "MONK", "mistweaver", "Item");
     AddDisambiguation("zen_sphere_debuff", "zen_sphere_buff", "MONK");
     AddDisambiguation("arcane_torrent", "arcane_torrent_holy", "PALADIN");
-
     AddDisambiguation("blood_fury", "blood_fury_apsp", "PALADIN");
     AddDisambiguation("judgment_debuff", "judgment_ret_debuff", "PALADIN", "retribution");
     AddDisambiguation("legendary_ring", "legendary_ring_bonus_armor", "PALADIN", "protection", "Item");
@@ -1358,6 +1353,9 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("asphyxiate", "asphyxiate_blood", "DEATHKNIGHT", "blood");
     AddDisambiguation("deaths_reach_talent", "deaths_reach_talent_unholy", "DEATHKNIGHT", "unholy");
     AddDisambiguation("grip_of_the_dead_talent", "grip_of_the_dead_talent_unholy", "DEATHKNIGHT", "unholy");
+    AddDisambiguation("cold_heart_talent_buff", "cold_heart_buff", "DEATHKNIGHT", "frost");
+    AddDisambiguation("outbreak_debuff", "virulent_plague_debuff", "DEATHKNIGHT", "unholy");
+    AddDisambiguation("gargoyle", "summon_gargoyle", "DEATHKNIGHT", "unholy");
 
     //Demon Hunter
     AddDisambiguation("felblade_talent", "felblade_talent_havoc", "DEMONHUNTER", "havoc");
