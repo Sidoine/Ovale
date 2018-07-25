@@ -1355,6 +1355,9 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("deaths_reach_talent", "deaths_reach_talent_unholy", "DEATHKNIGHT", "unholy");
     AddDisambiguation("grip_of_the_dead_talent", "grip_of_the_dead_talent_unholy", "DEATHKNIGHT", "unholy");
     AddDisambiguation("wraith_walk_talent", "wraith_walk_talent_blood", "DEATHKNIGHT", "blood");
+    AddDisambiguation("asphyxiate", "asphyxiate_blood", "DEATHKNIGHT", "blood");
+    AddDisambiguation("deaths_reach_talent", "deaths_reach_talent_unholy", "DEATHKNIGHT", "unholy");
+    AddDisambiguation("grip_of_the_dead_talent", "grip_of_the_dead_talent_unholy", "DEATHKNIGHT", "unholy");
 
     //Demon Hunter
     AddDisambiguation("felblade_talent", "felblade_talent_havoc", "DEMONHUNTER", "havoc");
