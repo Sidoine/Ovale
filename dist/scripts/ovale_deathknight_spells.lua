@@ -4,7 +4,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 __exports.register = function()
     local name = "ovale_deathknight_spells"
-    local desc = "[7.0] Ovale: Death Knight spells"
+    local desc = "[8.0] Ovale: Death Knight spells"
     local code = [[
 
 ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!icebound_fortitude,buff,!icebound_fortitude_buff)
@@ -14,6 +14,7 @@ ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!icebound_fortitude,buf
 # Learned spells.
 Define(antimagic_shell 48707)
 	SpellInfo(antimagic_shell cd=60 gcd=0 offgcd=1)
+	SpellInfo(antimagic_shell add_cd=-15 talent=antimagic_barrier_talent)
 Define(antimagic_shell_buff 48707)
 	SpellInfo(antimagic_shell_buff duration=5)
 Define(apocalypse 275699)
@@ -39,6 +40,7 @@ Define(blinding_sleet_debuff 207167)
 Define(blood_boil 50842)
 	SpellInfo(blood_boil cd=7.5 cd_haste=melee)
 	SpellAddTargetDebuff(blood_boil blood_plague_debuff=1)
+	SpellAddBuff(blood_boil hemostasis_buff=1 talent=hemostasis_talent)
 Define(blood_plague_debuff 55078)
 	SpellInfo(blood_plague_debuff duration=24 tick=3)
 Define(blood_shield_buff 77535)
@@ -109,6 +111,7 @@ Define(death_strike 49998)
 	SpellInfo(death_strike runicpower=45)
 	SpellRequire(death_strike add_runicpower -5=buff,death_strike_cost)
 	SpellAddBuff(death_strike blood_shield_buff=1 specialization=blood)
+	SpellAddBuff(death_strike voracius_buff=1 talent=voracious_talent specialization=blood)
 SpellList(death_strike_cost ossuary_buff gravewarden_buff)
 Define(deaths_advance 48265)
 	SpellInfo(deaths_advance cd=45 gcd=0 offgcd=1)
@@ -157,6 +160,9 @@ Define(gorefiends_grasp 108199)
 	SpellInfo(gorefiends_grasp add_cd=-30 talent=tightening_grasp_talent)
 Define(heart_strike 206930)
 	SpellInfo(heart_strike runes=1 runicpower=-10)
+	SpellInfo(heart_strike add_runicpower=-2 talent=heartbreaker_talent)
+Define(hemostasis_buff 273947)
+	SpellInfo( duration=14 max_stacks=5)
 Define(horn_of_winter 57330)
 	SpellInfo(horn_of_winter cd=45 runes=-2 runicpower=-20 tag=main)
 Define(howling_blast 49184)
@@ -256,17 +262,27 @@ Define(vampiric_blood_buff 55233)
 	SpellInfo(vampiric_blood_buff duration=10)
 Define(virulent_plague_debuff 191587)
 	SpellInfo(virulent_plague_debuff duration=30 tick=3)
+Define(voracius_buff 274009)
+	SpellInfo(voracius_buff duration=6)
 Define(wraith_walk 212552)
-	SpellInfo(wraith_walk cd=60)
+	SpellInfo(wraith_walk cd=60 unusable=1)
+	SpellInfo(wraith_walk unusable=0 talent=wraith_walk_talent specialization=!blood)
+	SpellInfo(wraith_walk unusable=0 talent=wraith_walk_talent_blood specialization=blood)
 	SpellAddBuff(wraith_walk wraith_walk_buff=1)
 Define(wraith_walk_buff 212552)
 	SpellInfo(wraith_walk_buff duration=4)
 
 ## Items
+Define(cold_heart 151796)
+Define(cold_heart_buff 235599)
+Define(consorts_cold_core 144293)
+Define(koltiras_newfound_will 132366)
 Define(lanathels_lament 133974)
 Define(lanathels_lament_buff 212975)
 	SpellAddBuff(defile lanathels_lament_buff=1 if_equipped=lanathels_lament)
 	SpellAddBuff(death_and_decay lanathels_lament_buff=1 if_equipped=lanathels_lament)
+Define(perseverance_of_the_ebon_martyr 132459)
+Define(perseverance_of_the_ebon_martyr_debuff 216059)
 
 ## Tier Items
 # T20
@@ -276,7 +292,7 @@ Define(gravewarden_buff 242010)
 
 # Talents
 Define(all_will_serve_talent 2)
-Define(anti-magic_barrier_talent 11)
+Define(antimagic_barrier_talent 11)
 Define(army_of_the_damned_talent 19)
 Define(asphyxiate_talent 8)
 Define(asphyxiate_talent_unholy 9)
@@ -336,19 +352,6 @@ Define(voracious_talent 16)
 Define(will_of_the_necropolis_talent 10)
 Define(wraith_walk_talent_blood 15)
 Define(wraith_walk_talent 14)
-
-# Artifact traits
-Define(apocalypse 220143)
-	SpellInfo(apocalypse cd=90)
-Define(frozen_soul 189184)
-
-# Legendary
-Define(cold_heart 151796)
-Define(cold_heart_buff 235599)
-Define(consorts_cold_core 144293)
-Define(koltiras_newfound_will 132366)
-Define(perseverance_of_the_ebon_martyr 132459)
-Define(perseverance_of_the_ebon_martyr_debuff 216059)
 
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(blood_tap tag=main)
