@@ -1370,7 +1370,6 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("healing_elixir_talent", "healing_elixir_talent_mistweaver", "MONK", "mistweaver");
     AddDisambiguation("bok_proc_buff", "blackout_kick_buff", "MONK", "windwalker");
     AddDisambiguation("fortifying_brew", "fortifying_brew_mistweaver", "MONK", "mistweaver");
-    AddDisambiguation("fortifying_brew_buff", "fortifying_brew_buff_mistweaver", "MONK", "mistweaver");    
     AddDisambiguation("rushing_jade_wind", "rushing_jade_wind_windwalker", "MONK", "windwalker");
 
     //Paladin
