@@ -1257,6 +1257,11 @@ local InitializeDisambiguation = function()
     AddDisambiguation("guardian_affinity_talent", "guardian_affinity_talent_restoration", "DRUID", "restoration")
     AddDisambiguation("a_murder_of_crows_talent", "a_murder_of_crows_talent_marksman", "HUNTER", "marksman")
     AddDisambiguation("healing_elixir_talent", "healing_elixir_talent_mistweaver", "MONK", "mistweaver")
+    AddDisambiguation("bok_proc_buff", "blackout_kick_buff", "MONK", "windwalker")
+    AddDisambiguation("fortifying_brew", "fortifying_brew_mistweaver", "MONK", "mistweaver")
+    AddDisambiguation("rushing_jade_wind", "rushing_jade_wind_windwalker", "MONK", "windwalker")
+    AddDisambiguation("breath_of_fire_dot_debuff", "breath_of_fire_debuff", "MONK", "brewmaster")
+    AddDisambiguation("brews", "ironskin_brew", "MONK", "brewmaster")
     AddDisambiguation("judgment_of_light_talent", "judgment_of_light_talent_holy", "PALADIN", "holy")
     AddDisambiguation("unbreakable_spirit_talent", "unbreakable_spirit_talent_holy", "PALADIN", "holy")
     AddDisambiguation("cavalier_talent", "cavalier_talent_holy", "PALADIN", "holy")
@@ -3195,6 +3200,8 @@ EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
             end
         elseif property == "charges_fractional" then
             code = format("%sCharges(%s count=0)", prefix, name)
+        elseif property == "max_charges" then
+            code = format("%sMaxCharges(%s)", prefix, name)
         elseif property == "full_recharge_time" then
             code = format("%sCooldown(%s)", prefix, name)
 		elseif property == "recharge_time" then
