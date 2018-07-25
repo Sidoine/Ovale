@@ -1368,6 +1368,11 @@ const InitializeDisambiguation = function() {
 
     //Monk
     AddDisambiguation("healing_elixir_talent", "healing_elixir_talent_mistweaver", "MONK", "mistweaver");
+    AddDisambiguation("bok_proc_buff", "blackout_kick_buff", "MONK", "windwalker");
+    AddDisambiguation("fortifying_brew", "fortifying_brew_mistweaver", "MONK", "mistweaver");
+    AddDisambiguation("rushing_jade_wind", "rushing_jade_wind_windwalker", "MONK", "windwalker");
+    AddDisambiguation("breath_of_fire_dot_debuff", "breath_of_fire_debuff", "MONK", "brewmaster");
+    AddDisambiguation("brews", "ironskin_brew", "MONK", "brewmaster");
 
     //Paladin
     AddDisambiguation("judgment_of_light_talent", "judgment_of_light_talent_holy", "PALADIN", "holy");
@@ -3282,6 +3287,7 @@ EmitOperandCooldown = function (operand, parseNode, nodeList, annotation, action
     let node;
     let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
     let token = tokenIterator();
+    
     if (token == "cooldown") {
         let name = tokenIterator();
         let property = tokenIterator();
