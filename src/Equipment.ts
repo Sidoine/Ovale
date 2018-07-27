@@ -2,9 +2,13 @@ import { OvaleProfiler } from "./Profiler";
 import { Ovale } from "./Ovale";
 import { OvaleDebug } from "./Debug";
 import aceEvent from "@wowts/ace_event-3.0";
-import { pairs, select, tonumber, type, unpack, wipe, _G, lualength } from "@wowts/lua";
+import { pairs, select, tonumber, type, unpack, wipe, _G, lualength, LuaArray, tostring, ipairs } from "@wowts/lua";
 import { gsub, match } from "@wowts/string";
 import { CreateFrame, GetAuctionItemSubClasses, GetInventoryItemID, GetItemInfo, INVSLOT_AMMO, INVSLOT_BACK, INVSLOT_BODY, INVSLOT_CHEST, INVSLOT_FEET, INVSLOT_FINGER1, INVSLOT_FINGER2, INVSLOT_FIRST_EQUIPPED, INVSLOT_HAND, INVSLOT_HEAD, INVSLOT_LAST_EQUIPPED, INVSLOT_LEGS, INVSLOT_MAINHAND, INVSLOT_NECK, INVSLOT_OFFHAND, INVSLOT_SHOULDER, INVSLOT_TABARD, INVSLOT_TRINKET1, INVSLOT_TRINKET2, INVSLOT_WAIST, INVSLOT_WRIST, UIGameTooltip, ITEM_LEVEL, UIParent } from "@wowts/wow-mock";
+import { concat, insert } from "@wowts/table";
+
+let tinsert = insert;
+let tconcat = concat;
 
 let OvaleEquipmentBase = OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleEquipment", aceEvent)));
 export let OvaleEquipment: OvaleEquipmentClass;
@@ -40,6 +44,30 @@ let OVALE_ARMORSET_SLOT_IDS = {
     5: INVSLOT_SHOULDER,
     6: INVSLOT_BACK
 }
+
+let DEBUG_SLOT_NAMES = {
+    [0]: "ammo",
+    [1]: "head",
+    [2]: "neck",
+    [3]: "shoulder",
+    [4]: "shirt",
+    [5]: "chest",
+    [6]: "belt",
+    [7]: "legs",
+    [8]: "feet",
+    [9]: "wrist",
+    [10]: "gloves",
+    [11]: "finger 1",
+    [12]: "finger 2",
+    [13]: "trinket 1",
+    [14]: "trinket 2",
+    [15]: "back",
+    [16]: "main hand",
+    [17]: "off hand",
+    [18]: "ranged",
+    [19]: "tabard",
+}
+
 let OVALE_ARMORSET = {
     [85314]: "T14_tank",
     [85315]: "T14_tank",
@@ -1334,10 +1362,32 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
     metaGem = undefined;
     mainHandWeaponSpeed = undefined;
     offHandWeaponSpeed = undefined;
-
+    lastChangedSlot:number = undefined;
+    output: LuaArray<string> = {}
     
+    debugOptions = {
+        itemsequipped: {
+            name: "Items equipped",
+            type: "group",
+            args: {
+                itemsequipped: {
+                    name: "Items equipped",
+                    type: "input",
+                    multiline: 25,
+                    width: "full",
+                    get: (info: LuaArray<string>) => {
+                        return this.DebugEquipment();
+                    }
+                }
+            }
+        }
+    }
+
     constructor() {
         super();
+        for (const [k, v] of pairs(this.debugOptions)) {
+            OvaleDebug.options.args[k] = v;
+        }
     }
 
     OnInitialize() {
@@ -1367,9 +1417,9 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
         }
         this.StopProfiling("OvaleEquipment_GET_ITEM_INFO_RECEIVED");
     }
-    PLAYER_EQUIPMENT_CHANGED(event, slotId, hasItem) {
+    PLAYER_EQUIPMENT_CHANGED(event, slotId, isEmpty) {
         this.StartProfiling("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED");
-        if (hasItem) {
+        if (!isEmpty) {
             this.equippedItems[slotId] = GetInventoryItemID("player", slotId);
             this.equippedItemLevels[slotId] = GetItemLevel(slotId);
             if (slotId == INVSLOT_MAINHAND) {
@@ -1388,6 +1438,7 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
                 this.offHandItemType = undefined;
             }
         }
+        this.lastChangedSlot = slotId;
         this.UpdateArmorSetCount();
         Ovale.needRefresh();
         this.SendMessage("Ovale_EquipmentChanged");
@@ -1601,14 +1652,23 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
         return changed;
     }
     DebugEquipment() {
+        wipe(this.output)
+        let array: LuaArray<string> = {}
         for (let slotId = INVSLOT_FIRST_EQUIPPED; slotId <= INVSLOT_LAST_EQUIPPED; slotId += 1) {
-            this.Print("Slot %d = %s (%d)", slotId, this.GetEquippedItem(slotId), this.GetEquippedItemLevel(slotId));
+            let slot = tostring(DEBUG_SLOT_NAMES[slotId])
+            let itemid = this.GetEquippedItem(slotId) != undefined && tostring(this.GetEquippedItem(slotId)) || ''
+            let ilvl = this.GetEquippedItem(slotId) != undefined && "(" + tostring(this.GetEquippedItemLevel(slotId)) + ")" || ''
+
+            tinsert(array, `${slot}: ${itemid} ${ilvl}`)
         }
-        this.Print("Main-hand item type: %s", this.mainHandItemType);
-        this.Print("Off-hand item type: %s", this.offHandItemType);
+        tinsert(array, `\n`)
         for (const [k, v] of pairs(this.armorSetCount)) {
-            this.Print("Player has %d piece(s) of %s armor set.", v, k);
+            tinsert(array, `Player has ${tonumber(v)} piece(s) of ${tostring(k)} armor set.`)
         }
+        for (const [, v] of ipairs(array)) {
+            this.output[lualength(this.output) + 1] = v;
+        }
+        return tconcat(this.output, "\n");
     }
 }
 

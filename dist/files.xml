@@ -11,7 +11,6 @@
    <Script file="Options.lua"/>
    <Script file="Debug.lua"/>
    <Script file="Version.lua"/>
-   <Script file="AzeriteArmor.lua"/>
    <Script file="Artifact.lua"/>
    <Script file="GUID.lua"/>
    <Script file="Profiler.lua"/>
@@ -19,6 +18,7 @@
    <Script file="SpellBook.lua"/>
    <Script file="ActionBar.lua"/>
    <Script file="Equipment.lua"/>
+   <Script file="AzeriteArmor.lua"/>
    <Script file="Pool.lua"/>
    <Script file="DamageTaken.lua"/>
    <Script file="LastSpell.lua"/>
