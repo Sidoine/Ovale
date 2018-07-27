@@ -1858,7 +1858,7 @@ const EmitConditionNode = function (nodeList: LuaArray<AstNode>, bodyNode: AstNo
     let extraConditionNode = conditionNode;
     conditionNode = undefined;
     for (const [modifier, expressionNode] of pairs(parseNode.child)) {
-        let rhsNode = EmitModifier(modifier, expressionNode, nodeList, annotation, action);
+        let rhsNode = EmitModifier(<string>modifier, expressionNode, nodeList, annotation, action);
         if (rhsNode) {
             if (!conditionNode) {
                 conditionNode = rhsNode;
@@ -4959,7 +4959,7 @@ const AddOptionalSkillCheckBox = function(child: LuaArray<AstNode>, annotation: 
 const InsertSupportingControls = function(child: LuaArray<AstNode>, annotation: Annotation) {
     let count = 0;
     for (const [skill, data] of pairs(OPTIONAL_SKILLS)) {
-        count = count + AddOptionalSkillCheckBox(child, annotation, data, skill);
+        count = count + AddOptionalSkillCheckBox(child, annotation, data, <string>skill);
     }
     let nodeList = annotation.astAnnotation.nodeList;
     let ifSpecialization = `specialization=${annotation.specialization}`;
@@ -5090,7 +5090,7 @@ const GenerateIconBody = function(tag: string, profile: Profile) {
         let output = self_outputPool.Get();
         output[lualength(output) + 1] = format("if List(opt_using_apl normal) %s()", defaultBodyName);
         for (const [name] of pairs(annotation.using_apl)) {
-            let aplName = OvaleFunctionName(name, annotation);
+            let aplName = OvaleFunctionName(<string>name, annotation);
             let [aplBodyName, ] = OvaleTaggedFunctionName(aplName, tag);
             output[lualength(output) + 1] = format("if List(opt_using_apl %s) %s()", name, aplBodyName);
         }
@@ -5158,7 +5158,8 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
         for (const _line of gmatch(simc, "[^\r\n]+")) {
             let [line] = match(_line, "^%s*(.-)%s*$");
             if (!(truthy(match(line, "^#.*")) || truthy(match(line, "^$")))) {
-                let [key, operator, value] = match(line, "([^%+=]+)(%+?=)(.*)");
+                let [k, operator, value] = match(line, "([^%+=]+)(%+?=)(.*)");
+                const key = <keyof Profile>k;
                 if (operator == "=") {
                     profile[key] = value;
                 } else if (operator == "+=") {
@@ -5215,9 +5216,9 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
             return a.name < b.name;
         });
         for (const [className] of pairs(RAID_CLASS_COLORS)) {
-            let lowerClass = lower(className);
+            let lowerClass = <keyof Profile>lower(<string>className);
             if (profile[lowerClass]) {
-                annotation.class = className;
+                annotation.class = <string>className;
                 annotation.name = profile[lowerClass];
             }
         }

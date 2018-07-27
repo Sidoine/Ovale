@@ -1449,7 +1449,7 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
     GetEquippedTrinkets() {
         return [this.equippedItems[INVSLOT_TRINKET1], this.equippedItems[INVSLOT_TRINKET2]];
     }
-    HasEquippedItem(itemId, slot?, ...__args) {
+    HasEquippedItem(itemId, slot?, ...__args): string | undefined {
         if ((slot != undefined)) {
             let slotId = slot;
             if (type(slotId) != "number") {

@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/SimulationCraft", 10000)
+local __exports = LibStub:NewLibrary("ovale/SimulationCraft", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local AceConfig = LibStub:GetLibrary("AceConfig-3.0", true)
@@ -5026,7 +5026,8 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
         for _line in gmatch(simc, "[^\r\n]+") do
             local line = match(_line, "^%s*(.-)%s*$")
             if  not (match(line, "^#.*") or match(line, "^$")) then
-                local key, operator, value = match(line, "([^%+=]+)(%+?=)(.*)")
+                local k, operator, value = match(line, "([^%+=]+)(%+?=)(.*)")
+                local key = k
                 if operator == "=" then
                     profile[key] = value
                 elseif operator == "+=" then

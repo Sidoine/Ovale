@@ -1161,7 +1161,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
         OvaleAura.StopProfiling("OvaleAura_ApplySpellAfterHit");
     }
 
-    private ApplySpellAuras(spellId: number, guid: string, atTime: number, auraList, spellcast: SpellCast) {
+    private ApplySpellAuras(spellId: number, guid: string, atTime: number, auraList: LuaObj<LuaObj<any>>, spellcast: SpellCast) {
         OvaleAura.StartProfiling("OvaleAura_state_ApplySpellAuras");
         for (const [filter, filterInfo] of pairs(auraList)) {
             for (const [auraId, spellData] of pairs(filterInfo)) {

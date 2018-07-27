@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Artifact", 10000)
+local __exports = LibStub:NewLibrary("ovale/Artifact", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __lib_artifact_data10 = LibStub:GetLibrary("LibArtifactData-1.0", true)

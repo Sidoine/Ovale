@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/ActionBar", 10000)
+local __exports = LibStub:NewLibrary("ovale/ActionBar", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Localization = LibStub:GetLibrary("ovale/Localization")

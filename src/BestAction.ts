@@ -40,7 +40,6 @@ export interface Element extends AstNode {
     serial?: number;
     timeSpan?: OvaleTimeSpan;
     result?: Element;
-    value?: number;
 
     actionTexture?: string;
     actionInRange?: boolean;

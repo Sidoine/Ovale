@@ -189,7 +189,7 @@ class OvaleProfilerClass extends OvaleProfilerBase {
             let width = 1;
             {
                 let tenPower = 10;
-                for (const [_, timesInvoked] of pairs(self_timesInvoked)) {
+                for (const [, timesInvoked] of pairs(self_timesInvoked)) {
                     while (timesInvoked > tenPower) {
                         width = width + 1;
                         tenPower = tenPower * 10;

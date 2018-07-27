@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/LastSpell", 10000)
+local __exports = LibStub:NewLibrary("ovale/LastSpell", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Pool = LibStub:GetLibrary("ovale/Pool")

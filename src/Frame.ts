@@ -204,7 +204,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         if (element && element.type == "value") {
             let value;
             if (element.value && element.origin && element.rate) {
-                value = element.value + (now - element.origin) * element.rate;
+                value = <number>element.value + (now - element.origin) * element.rate;
             }
             OvaleBestAction.Log("GetAction: start=%s, value=%f", start, value);
             let actionTexture;

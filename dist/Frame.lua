@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Frame", 10000)
+local __exports = LibStub:NewLibrary("ovale/Frame", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local AceGUI = LibStub:GetLibrary("AceGUI-3.0", true)

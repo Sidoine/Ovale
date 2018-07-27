@@ -964,7 +964,7 @@ end
 do
 local function HasTrinket(positionalParams, namedParams, state, atTime)
         local trinketId, yesno = positionalParams[1], positionalParams[2]
-        local boolean = false
+        local boolean = nil
         if type(trinketId) == "number" then
             boolean = OvaleEquipment:HasTrinket(trinketId)
         elseif OvaleData.itemList[trinketId] then
@@ -975,7 +975,7 @@ local function HasTrinket(positionalParams, namedParams, state, atTime)
                 end
             end
         end
-        return TestBoolean(boolean, yesno)
+        return TestBoolean(boolean ~= nil, yesno)
     end
     OvaleCondition:RegisterCondition("hastrinket", false, HasTrinket)
 end

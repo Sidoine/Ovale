@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Power", 10000)
+local __exports = LibStub:NewLibrary("ovale/Power", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Localization = LibStub:GetLibrary("ovale/Localization")
@@ -26,7 +26,6 @@ local ceil = math.ceil
 local INFINITY = math.huge
 local floor = math.floor
 local pairs = pairs
-local type = type
 local tostring = tostring
 local tonumber = tonumber
 local lower = string.lower
@@ -46,6 +45,7 @@ local __BaseState = LibStub:GetLibrary("ovale/BaseState")
 local baseState = __BaseState.baseState
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isNumber = __tools.isNumber
+local isLuaArray = __tools.isLuaArray
 local strlower = lower
 local self_SpellcastInfoPowerTypes = {
     [1] = "chi",
@@ -222,7 +222,7 @@ local PowerModule = __class(nil, {
             else
                 Ovale:OneTimeMessage("Warning: requirement '%s' power is missing a cost argument.", requirement)
                 Ovale:OneTimeMessage(tostring(index))
-                if type(tokens) == "table" then
+                if isLuaArray(tokens) then
                     for k, v in pairs(tokens) do
                         Ovale:OneTimeMessage(k .. " = " .. tostring(v))
                     end

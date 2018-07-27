@@ -1644,7 +1644,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
      */
     function HasTrinket(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [trinketId, yesno] = [positionalParams[1], positionalParams[2]];
-        let boolean = false;
+        let boolean: string | undefined  = undefined;
         if (type(trinketId) == "number") {
             boolean = OvaleEquipment.HasTrinket(trinketId);
         } else if (OvaleData.itemList[trinketId]) {
@@ -1655,7 +1655,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
                 }
             }
         }
-        return TestBoolean(boolean, yesno);
+        return TestBoolean(boolean !== undefined, yesno);
     }
     OvaleCondition.RegisterCondition("hastrinket", false, HasTrinket);
 }

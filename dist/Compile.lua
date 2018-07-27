@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Compile", 10000)
+local __exports = LibStub:NewLibrary("ovale/Compile", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Debug = LibStub:GetLibrary("ovale/Debug")
@@ -44,6 +44,8 @@ local find = string.find
 local match = string.match
 local sub = string.sub
 local GetSpellInfo = GetSpellInfo
+local __tools = LibStub:GetLibrary("ovale/tools")
+local isLuaArray = __tools.isLuaArray
 local OvaleCompileBase = Ovale:NewModule("OvaleCompile", aceEvent)
 local self_compileOnStances = false
 local self_serial = 0
@@ -63,10 +65,18 @@ local function RequireValue(value)
     if  not required then
         value = sub(value, 2)
         if match(value, NUMBER_PATTERN) then
-            value = tonumber(value)
+            return tonumber(value), required
         end
     end
     return value, required
+end
+local function RequireNumber(value)
+    local required = (sub(tostring(value), 1, 1) ~= "!")
+    if  not required then
+        value = sub(value, 2)
+        return tonumber(value), required
+    end
+    return tonumber(value), required
 end
 local function TestConditionLevel(value)
     return OvalePaperDoll.level >= value
@@ -91,17 +101,17 @@ local function TestConditionSpell(value)
     return (required and hasSpell) or ( not required and  not hasSpell)
 end
 local function TestConditionTalent(value)
-    local talent, required = RequireValue(value)
+    local talent, required = RequireNumber(value)
     local hasTalent = HasTalent(talent)
     return (required and hasTalent) or ( not required and  not hasTalent)
 end
 local function TestConditionEquipped(value)
     local item, required = RequireValue(value)
     local hasItemEquipped = OvaleEquipment:HasEquippedItem(item)
-    return (required and hasItemEquipped) or ( not required and  not hasItemEquipped)
+    return (required and hasItemEquipped and true) or ( not required and  not hasItemEquipped)
 end
 local function TestConditionTrait(value)
-    local trait, required = RequireValue(value)
+    local trait, required = RequireNumber(value)
     local hasTrait = OvaleArtifact:HasTrait(trait)
     return (required and hasTrait) or ( not required and  not hasTrait)
 end
@@ -121,7 +131,7 @@ local function TestConditions(positionalParams, namedParams)
     local boolean = true
     for param, dispatch in pairs(TEST_CONDITION_DISPATCH) do
         local value = namedParams[param]
-        if type(value) == "table" then
+        if isLuaArray(value) then
             for _, v in ipairs(value) do
                 boolean = dispatch(v)
                 if  not boolean then

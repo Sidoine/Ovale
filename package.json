@@ -1,17 +1,18 @@
 {
   "name": "ovale",
-  "version": "1.0.0",
+  "version": "8.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "tstolua -p tsconfig.lua.json",
-    "simc": "tsc && node dist/utils/importsimc.js ../../simc/profiles/Tier19P"
+    "simc": "tsc && node dist/utils/importsimc.js ../../simc/profiles/Tier19P",
+    "watch": "tstolua -p tsconfig.lua.json -w"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@wowts/lua": "^1.1.1",
+    "@wowts/lua": "^1.2.0",
     "@wowts/table": "^1.0.1",
     "@wowts/coroutine": "^1.0.1",
     "@wowts/math": "^1.0.0",
@@ -44,9 +45,9 @@
     "@types/node": "^8.0.44"
   },
   "devDependencies": {
-    "typescript": "^2.5.3",
+    "typescript": "^2.9.2",
     "tslint": "^5.7.0",
-    "@wowts/tstolua": "^1.1.0"
+    "@wowts/tstolua": "^1.2.0"
   },
   "repository": {
     "type": "git",
