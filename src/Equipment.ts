@@ -1334,6 +1334,7 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
     metaGem = undefined;
     mainHandWeaponSpeed = undefined;
     offHandWeaponSpeed = undefined;
+    lastChangedSlot:number = undefined;
 
     
     constructor() {
@@ -1388,6 +1389,7 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
                 this.offHandItemType = undefined;
             }
         }
+        this.lastChangedSlot = slotId;
         this.UpdateArmorSetCount();
         Ovale.needRefresh();
         this.SendMessage("Ovale_EquipmentChanged");

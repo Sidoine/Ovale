@@ -1367,6 +1367,7 @@ local OvaleEquipmentClass = __class(OvaleEquipmentBase, {
         self.metaGem = nil
         self.mainHandWeaponSpeed = nil
         self.offHandWeaponSpeed = nil
+        self.lastChangedSlot = nil
         OvaleEquipmentBase.constructor(self)
     end,
     OnInitialize = function(self)
@@ -1417,6 +1418,7 @@ local OvaleEquipmentClass = __class(OvaleEquipmentBase, {
                 self.offHandItemType = nil
             end
         end
+        self.lastChangedSlot = slotId
         self:UpdateArmorSetCount()
         Ovale:needRefresh()
         self:SendMessage("Ovale_EquipmentChanged")
