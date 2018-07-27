@@ -190,7 +190,7 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
                     for (let flyoutIndex = 1; flyoutIndex <= numSlots; flyoutIndex += 1) {
                         let [id, overrideId, isKnown, spellName] = GetFlyoutSlotInfo(flyoutId, flyoutIndex);
                         if (isKnown) {
-                            let name = GetSpellInfo(spellId);
+                            let name = GetSpellInfo(id);
                             this.spell[id] = name;
                             this.isHarmful[id] = IsHarmfulSpell(spellName);
                             this.isHelpful[id] = IsHelpfulSpell(spellName);
@@ -198,7 +198,7 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
                             this.spellbookId[bookType][id] = undefined;
                             this.Debug("    %s (%d) is at offset %d.", name, id, index);
                             if (id != overrideId) {
-                                let name = GetSpellInfo(spellId);
+                                let name = GetSpellInfo(overrideId);
                                 this.spell[overrideId] = name;
                                 this.isHarmful[overrideId] = this.isHarmful[id];
                                 this.isHelpful[overrideId] = this.isHelpful[id];
