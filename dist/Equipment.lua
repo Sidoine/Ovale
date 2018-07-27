@@ -1396,9 +1396,9 @@ local OvaleEquipmentClass = __class(OvaleEquipmentBase, {
         end
         self:StopProfiling("OvaleEquipment_GET_ITEM_INFO_RECEIVED")
     end,
-    PLAYER_EQUIPMENT_CHANGED = function(self, event, slotId, hasItem)
+    PLAYER_EQUIPMENT_CHANGED = function(self, event, slotId, isEmpty)
         self:StartProfiling("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED")
-        if hasItem then
+        if  not isEmpty then
             self.equippedItems[slotId] = GetInventoryItemID("player", slotId)
             self.equippedItemLevels[slotId] = GetItemLevel(slotId)
             if slotId == INVSLOT_MAINHAND then

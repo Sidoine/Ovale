@@ -1367,9 +1367,9 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
         }
         this.StopProfiling("OvaleEquipment_GET_ITEM_INFO_RECEIVED");
     }
-    PLAYER_EQUIPMENT_CHANGED(event, slotId, hasItem) {
+    PLAYER_EQUIPMENT_CHANGED(event, slotId, isEmpty) {
         this.StartProfiling("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED");
-        if (hasItem) {
+        if (!isEmpty) {
             this.equippedItems[slotId] = GetInventoryItemID("player", slotId);
             this.equippedItemLevels[slotId] = GetItemLevel(slotId);
             if (slotId == INVSLOT_MAINHAND) {
