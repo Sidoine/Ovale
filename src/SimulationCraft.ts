@@ -58,7 +58,7 @@ interface Annotation {
     skull_bash?: string;
     solar_beam?: string;
     interrupt?: string;
-    consume_magic?: string;
+    disrupt?: string;
     mind_freeze?: string;
     wild_charge?: string;
     muzzle?: string;
@@ -1216,13 +1216,6 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("legendary_ring", "legendary_ring_strength", "DEATHKNIGHT", "frost", "Item");
     AddDisambiguation("legendary_ring", "legendary_ring_strength", "DEATHKNIGHT", "unholy", "Item");
     AddDisambiguation("arcane_torrent", "arcane_torrent_dh", "DEMONHUNTER");
-    AddDisambiguation("metamorphosis", "metamorphosis_veng", "DEMONHUNTER", "vengeance");
-    AddDisambiguation("metamorphosis_buff", "metamorphosis_veng_buff", "DEMONHUNTER", "vengeance");
-    AddDisambiguation("metamorphosis", "metamorphosis_havoc", "DEMONHUNTER", "havoc");
-    AddDisambiguation("metamorphosis_buff", "metamorphosis_havoc_buff", "DEMONHUNTER", "havoc");
-    AddDisambiguation("chaos_blades_debuff", "chaos_blades_buff", "DEMONHUNTER", "havoc");
-    AddDisambiguation("throw_glaive", "throw_glaive_veng", "DEMONHUNTER", "vengeance");
-    AddDisambiguation("throw_glaive", "throw_glaive_havoc", "DEMONHUNTER", "havoc");
     AddDisambiguation("arcane_torrent", "arcane_torrent_energy", "DRUID");
     AddDisambiguation("berserk", "berserk_bear", "DRUID", "guardian");
     AddDisambiguation("berserk", "berserk_cat", "DRUID", "feral");
@@ -1359,6 +1352,14 @@ const InitializeDisambiguation = function() {
 
     //Demon Hunter
     AddDisambiguation("felblade_talent", "felblade_talent_havoc", "DEMONHUNTER", "havoc");
+    AddDisambiguation("immolation_aura", "immolation_aura_havoc", "DEMONHUNTER", "havoc");
+    AddDisambiguation("metamorphosis", "metamorphosis_veng", "DEMONHUNTER", "vengeance");
+    AddDisambiguation("metamorphosis_buff", "metamorphosis_veng_buff", "DEMONHUNTER", "vengeance");
+    AddDisambiguation("metamorphosis", "metamorphosis_havoc", "DEMONHUNTER", "havoc");
+    AddDisambiguation("metamorphosis_buff", "metamorphosis_havoc_buff", "DEMONHUNTER", "havoc");
+    AddDisambiguation("chaos_blades_debuff", "chaos_blades_buff", "DEMONHUNTER", "havoc");
+    AddDisambiguation("throw_glaive", "throw_glaive_veng", "DEMONHUNTER", "vengeance");
+    AddDisambiguation("throw_glaive", "throw_glaive_havoc", "DEMONHUNTER", "havoc");
 
     //Druid
     AddDisambiguation("feral_affinity_talent", "feral_affinity_talent_balance", "DRUID", "balance");
@@ -2104,7 +2105,7 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             annotation[action] = className;
             annotation.interrupt = className;
             isSpellAction = false;
-        } else if (className == "DEMONHUNTER" && action == "consume_magic") {
+        } else if (className == "DEMONHUNTER" && action == "disrupt") {
             bodyCode = `${camelSpecialization}InterruptActions()`;
             annotation[action] = className;
             annotation.interrupt = className;
@@ -4431,17 +4432,12 @@ const InsertInterruptFunctions = function(child: LuaArray<AstNode>, annotation: 
             });
         }
     }
-    if (annotation.consume_magic == "DEMONHUNTER") {
+    if (annotation.disrupt == "DEMONHUNTER") {
         insert(interrupts, {
-            name: "consume_magic",
+            name: "disrupt",
             interrupt: 1,
             worksOnBoss: 1,
             order: 10
-        });
-        insert(interrupts, {
-            name: "fel_eruption",
-            stun: 1,
-            order: 20
         });
         insert(interrupts, {
             name: "imprison",
@@ -4455,6 +4451,11 @@ const InsertInterruptFunctions = function(child: LuaArray<AstNode>, annotation: 
                 stun: 1,
                 range: "target.Distance(less 8)",
                 order: 100
+            });
+            insert(interrupts, {
+                name: "fel_eruption",
+                stun: 1,
+                order: 20
             });
         }
         if (annotation.specialization == "vengeance") {

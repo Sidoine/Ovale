@@ -1116,13 +1116,6 @@ local InitializeDisambiguation = function()
     AddDisambiguation("legendary_ring", "legendary_ring_strength", "DEATHKNIGHT", "frost", "Item")
     AddDisambiguation("legendary_ring", "legendary_ring_strength", "DEATHKNIGHT", "unholy", "Item")
     AddDisambiguation("arcane_torrent", "arcane_torrent_dh", "DEMONHUNTER")
-    AddDisambiguation("metamorphosis", "metamorphosis_veng", "DEMONHUNTER", "vengeance")
-    AddDisambiguation("metamorphosis_buff", "metamorphosis_veng_buff", "DEMONHUNTER", "vengeance")
-    AddDisambiguation("metamorphosis", "metamorphosis_havoc", "DEMONHUNTER", "havoc")
-    AddDisambiguation("metamorphosis_buff", "metamorphosis_havoc_buff", "DEMONHUNTER", "havoc")
-    AddDisambiguation("chaos_blades_debuff", "chaos_blades_buff", "DEMONHUNTER", "havoc")
-    AddDisambiguation("throw_glaive", "throw_glaive_veng", "DEMONHUNTER", "vengeance")
-    AddDisambiguation("throw_glaive", "throw_glaive_havoc", "DEMONHUNTER", "havoc")
     AddDisambiguation("arcane_torrent", "arcane_torrent_energy", "DRUID")
     AddDisambiguation("berserk", "berserk_bear", "DRUID", "guardian")
     AddDisambiguation("berserk", "berserk_cat", "DRUID", "feral")
@@ -1255,6 +1248,14 @@ local InitializeDisambiguation = function()
     AddDisambiguation("outbreak_debuff", "virulent_plague_debuff", "DEATHKNIGHT", "unholy")
     AddDisambiguation("gargoyle", "summon_gargoyle", "DEATHKNIGHT", "unholy")
     AddDisambiguation("felblade_talent", "felblade_talent_havoc", "DEMONHUNTER", "havoc")
+    AddDisambiguation("immolation_aura", "immolation_aura_havoc", "DEMONHUNTER", "havoc")
+    AddDisambiguation("metamorphosis", "metamorphosis_veng", "DEMONHUNTER", "vengeance")
+    AddDisambiguation("metamorphosis_buff", "metamorphosis_veng_buff", "DEMONHUNTER", "vengeance")
+    AddDisambiguation("metamorphosis", "metamorphosis_havoc", "DEMONHUNTER", "havoc")
+    AddDisambiguation("metamorphosis_buff", "metamorphosis_havoc_buff", "DEMONHUNTER", "havoc")
+    AddDisambiguation("chaos_blades_debuff", "chaos_blades_buff", "DEMONHUNTER", "havoc")
+    AddDisambiguation("throw_glaive", "throw_glaive_veng", "DEMONHUNTER", "vengeance")
+    AddDisambiguation("throw_glaive", "throw_glaive_havoc", "DEMONHUNTER", "havoc")
     AddDisambiguation("feral_affinity_talent", "feral_affinity_talent_balance", "DRUID", "balance")
     AddDisambiguation("guardian_affinity_talent", "guardian_affinity_talent_restoration", "DRUID", "restoration")
     AddDisambiguation("a_murder_of_crows_talent", "a_murder_of_crows_talent_marksman", "HUNTER", "marksman")
@@ -1981,7 +1982,7 @@ EmitAction = function(parseNode, nodeList, annotation)
             annotation[action] = className
             annotation.interrupt = className
             isSpellAction = false
-        elseif className == "DEMONHUNTER" and action == "consume_magic" then
+        elseif className == "DEMONHUNTER" and action == "disrupt" then
             bodyCode = camelSpecialization .. "InterruptActions()"
             annotation[action] = className
             annotation.interrupt = className
@@ -4297,17 +4298,12 @@ local InsertInterruptFunctions = function(child, annotation)
             })
         end
     end
-    if annotation.consume_magic == "DEMONHUNTER" then
+    if annotation.disrupt == "DEMONHUNTER" then
         insert(interrupts, {
-            name = "consume_magic",
+            name = "disrupt",
             interrupt = 1,
             worksOnBoss = 1,
             order = 10
-        })
-        insert(interrupts, {
-            name = "fel_eruption",
-            stun = 1,
-            order = 20
         })
         insert(interrupts, {
             name = "imprison",
@@ -4321,6 +4317,11 @@ local InsertInterruptFunctions = function(child, annotation)
                 stun = 1,
                 range = "target.Distance(less 8)",
                 order = 100
+            })
+            insert(interrupts, {
+                name = "fel_eruption",
+                stun = 1,
+                order = 20
             })
         end
         if annotation.specialization == "vengeance" then
