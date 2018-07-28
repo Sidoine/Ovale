@@ -7,7 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "tstolua -p tsconfig.lua.json",
     "simc": "tsc && node dist/utils/importsimc.js ../../simc/profiles/Tier19P",
-    "watch": "tstolua -p tsconfig.lua.json -w"
+    "spells": "node dist/utils/importspells.js  ../../simc",
+    "watch": "tstolua -p tsconfig.lua.json -w",
+    "watch-tools": "tsc -w"
   },
   "author": "",
   "license": "ISC",

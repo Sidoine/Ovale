@@ -7,6 +7,19 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Spells",
+            "program": "${workspaceFolder}/dist/utils/importspells.js",
+            "protocol": "inspector",
+            "args": [
+                "c:/Users/Sidoine/Git/simc/"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "SimulationCraft",
             "program": "${workspaceFolder}/dist/utils/importsimc.js",
             "protocol": "inspector",
