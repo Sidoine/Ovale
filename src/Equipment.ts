@@ -74,7 +74,6 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
     // metaGem = undefined;
     // mainHandWeaponSpeed = undefined;
     // offHandWeaponSpeed = undefined;
-    offhandHasWeapon = undefined
 
     
     constructor() {

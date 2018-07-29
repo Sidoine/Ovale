@@ -77,7 +77,6 @@ local OvaleEquipmentClass = __class(OvaleEquipmentBase, {
         self.mainHandItemType = nil
         self.offHandItemType = nil
         self.armorSetCount = {}
-        self.offhandHasWeapon = nil
         OvaleEquipmentBase.constructor(self)
     end,
     OnInitialize = function(self)
