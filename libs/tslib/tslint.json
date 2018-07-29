@@ -1,0 +1,8 @@
+{
+    "extends": "tslint:recommended",
+    "rules":{
+        "no-empty":false,
+        "interface-name": false,
+        "no-angle-bracket-type-assertion":false;
+    }
+}

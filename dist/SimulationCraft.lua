@@ -1115,18 +1115,7 @@ local InitializeDisambiguation = function()
     AddDisambiguation("legendary_ring", "legendary_ring_bonus_armor", "DEATHKNIGHT", "blood", "Item")
     AddDisambiguation("legendary_ring", "legendary_ring_strength", "DEATHKNIGHT", "frost", "Item")
     AddDisambiguation("legendary_ring", "legendary_ring_strength", "DEATHKNIGHT", "unholy", "Item")
-    AddDisambiguation("soul_reaper", "soul_reaper_blood", "DEATHKNIGHT", "blood")
-    AddDisambiguation("soul_reaper", "soul_reaper_frost", "DEATHKNIGHT", "frost")
-    AddDisambiguation("soul_reaper", "soul_reaper_unholy", "DEATHKNIGHT", "unholy")
-    AddDisambiguation("outbreak_debuff", "virulent_plague_debuff", "DEATHKNIGHT", "unholy")
     AddDisambiguation("arcane_torrent", "arcane_torrent_dh", "DEMONHUNTER")
-    AddDisambiguation("metamorphosis", "metamorphosis_veng", "DEMONHUNTER", "vengeance")
-    AddDisambiguation("metamorphosis_buff", "metamorphosis_veng_buff", "DEMONHUNTER", "vengeance")
-    AddDisambiguation("metamorphosis", "metamorphosis_havoc", "DEMONHUNTER", "havoc")
-    AddDisambiguation("metamorphosis_buff", "metamorphosis_havoc_buff", "DEMONHUNTER", "havoc")
-    AddDisambiguation("chaos_blades_debuff", "chaos_blades_buff", "DEMONHUNTER", "havoc")
-    AddDisambiguation("throw_glaive", "throw_glaive_veng", "DEMONHUNTER", "vengeance")
-    AddDisambiguation("throw_glaive", "throw_glaive_havoc", "DEMONHUNTER", "havoc")
     AddDisambiguation("moonfire", "moonfire_cat", "DRUID", "feral")
     AddDisambiguation("rejuvenation_debuff", "rejuvenation_buff", "DRUID")
     AddDisambiguation("starsurge", "starsurge_moonkin", "DRUID", "balance")
@@ -1231,11 +1220,30 @@ local InitializeDisambiguation = function()
     AddDisambiguation("deaths_reach_talent", "deaths_reach_talent_unholy", "DEATHKNIGHT", "unholy")
     AddDisambiguation("grip_of_the_dead_talent", "grip_of_the_dead_talent_unholy", "DEATHKNIGHT", "unholy")
     AddDisambiguation("wraith_walk_talent", "wraith_walk_talent_blood", "DEATHKNIGHT", "blood")
+    AddDisambiguation("asphyxiate", "asphyxiate_blood", "DEATHKNIGHT", "blood")
+    AddDisambiguation("deaths_reach_talent", "deaths_reach_talent_unholy", "DEATHKNIGHT", "unholy")
+    AddDisambiguation("grip_of_the_dead_talent", "grip_of_the_dead_talent_unholy", "DEATHKNIGHT", "unholy")
+    AddDisambiguation("cold_heart_talent_buff", "cold_heart_buff", "DEATHKNIGHT", "frost")
+    AddDisambiguation("outbreak_debuff", "virulent_plague_debuff", "DEATHKNIGHT", "unholy")
+    AddDisambiguation("gargoyle", "summon_gargoyle", "DEATHKNIGHT", "unholy")
     AddDisambiguation("felblade_talent", "felblade_talent_havoc", "DEMONHUNTER", "havoc")
+    AddDisambiguation("immolation_aura", "immolation_aura_havoc", "DEMONHUNTER", "havoc")
+    AddDisambiguation("metamorphosis", "metamorphosis_veng", "DEMONHUNTER", "vengeance")
+    AddDisambiguation("metamorphosis_buff", "metamorphosis_veng_buff", "DEMONHUNTER", "vengeance")
+    AddDisambiguation("metamorphosis", "metamorphosis_havoc", "DEMONHUNTER", "havoc")
+    AddDisambiguation("metamorphosis_buff", "metamorphosis_havoc_buff", "DEMONHUNTER", "havoc")
+    AddDisambiguation("chaos_blades_debuff", "chaos_blades_buff", "DEMONHUNTER", "havoc")
+    AddDisambiguation("throw_glaive", "throw_glaive_veng", "DEMONHUNTER", "vengeance")
+    AddDisambiguation("throw_glaive", "throw_glaive_havoc", "DEMONHUNTER", "havoc")
     AddDisambiguation("feral_affinity_talent", "feral_affinity_talent_balance", "DRUID", "balance")
     AddDisambiguation("guardian_affinity_talent", "guardian_affinity_talent_restoration", "DRUID", "restoration")
     AddDisambiguation("a_murder_of_crows_talent", "a_murder_of_crows_talent_marksman", "HUNTER", "marksman")
     AddDisambiguation("healing_elixir_talent", "healing_elixir_talent_mistweaver", "MONK", "mistweaver")
+    AddDisambiguation("bok_proc_buff", "blackout_kick_buff", "MONK", "windwalker")
+    AddDisambiguation("fortifying_brew", "fortifying_brew_mistweaver", "MONK", "mistweaver")
+    AddDisambiguation("rushing_jade_wind", "rushing_jade_wind_windwalker", "MONK", "windwalker")
+    AddDisambiguation("breath_of_fire_dot_debuff", "breath_of_fire_debuff", "MONK", "brewmaster")
+    AddDisambiguation("brews", "ironskin_brew", "MONK", "brewmaster")
     AddDisambiguation("judgment_of_light_talent", "judgment_of_light_talent_holy", "PALADIN", "holy")
     AddDisambiguation("unbreakable_spirit_talent", "unbreakable_spirit_talent_holy", "PALADIN", "holy")
     AddDisambiguation("cavalier_talent", "cavalier_talent_holy", "PALADIN", "holy")
@@ -1953,7 +1961,7 @@ EmitAction = function(parseNode, nodeList, annotation)
             annotation[action] = className
             annotation.interrupt = className
             isSpellAction = false
-        elseif className == "DEMONHUNTER" and action == "consume_magic" then
+        elseif className == "DEMONHUNTER" and action == "disrupt" then
             bodyCode = camelSpecialization .. "InterruptActions()"
             annotation[action] = className
             annotation.interrupt = className
@@ -3171,6 +3179,8 @@ EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
             end
         elseif property == "charges_fractional" then
             code = format("%sCharges(%s count=0)", prefix, name)
+        elseif property == "max_charges" then
+            code = format("%sMaxCharges(%s)", prefix, name)
         elseif property == "full_recharge_time" then
             code = format("%sCooldown(%s)", prefix, name)
         else
@@ -4267,17 +4277,12 @@ local InsertInterruptFunctions = function(child, annotation)
             })
         end
     end
-    if annotation.consume_magic == "DEMONHUNTER" then
+    if annotation.disrupt == "DEMONHUNTER" then
         insert(interrupts, {
-            name = "consume_magic",
+            name = "disrupt",
             interrupt = 1,
             worksOnBoss = 1,
             order = 10
-        })
-        insert(interrupts, {
-            name = "fel_eruption",
-            stun = 1,
-            order = 20
         })
         insert(interrupts, {
             name = "imprison",
@@ -4291,6 +4296,11 @@ local InsertInterruptFunctions = function(child, annotation)
                 stun = 1,
                 range = "target.Distance(less 8)",
                 order = 100
+            })
+            insert(interrupts, {
+                name = "fel_eruption",
+                stun = 1,
+                order = 20
             })
         end
         if annotation.specialization == "vengeance" then

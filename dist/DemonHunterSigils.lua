@@ -17,10 +17,10 @@ local tonumber = tonumber
 local insert = table.insert
 local remove = table.remove
 local GetTime = GetTime
-local huge = math.huge
+local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local OvaleSigilBase = OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvaleSigil", aceEvent))
 local UPDATE_DELAY = 0.5
-local SIGIL_ACTIVATION_TIME = huge
+local SIGIL_ACTIVATION_TIME = 2
 local activated_sigils = {}
 local sigil_start = {
     [204513] = {
@@ -31,7 +31,7 @@ local sigil_start = {
     },
     [189110] = {
         type = "flame",
-        talent = 8
+        talent = 7
     },
     [202137] = {
         type = "silence"
@@ -57,7 +57,7 @@ local sigil_end = {
         type = "chains"
     }
 }
-local QUICKENED_SIGILS_TALENT = 15
+local QUICKENED_SIGILS_TALENT = 14
 local OvaleSigilClass = __class(OvaleSigilBase, {
     constructor = function(self)
         OvaleSigilBase.constructor(self)
@@ -69,11 +69,26 @@ local OvaleSigilClass = __class(OvaleSigilBase, {
     OnInitialize = function(self)
         if Ovale.playerClass == "DEMONHUNTER" then
             self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
+            self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
         end
     end,
     OnDisable = function(self)
         if Ovale.playerClass == "DEMONHUNTER" then
             self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
+            self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+        end
+    end,
+    COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
+        if ( not OvalePaperDoll:IsSpecialization("vengeance")) then
+            return 
+        end
+        local _, cleuEvent, _, sourceGUID, _, _, _, _, _, _, _, spellid = CombatLogGetCurrentEventInfo()
+        if sourceGUID == Ovale.playerGUID and cleuEvent == "SPELL_AURA_APPLIED" then
+            if (sigil_end[spellid] ~= nil) then
+                local s = sigil_end[spellid]
+                local t = s.type
+                remove(activated_sigils[t], 1)
+            end
         end
     end,
     UNIT_SPELLCAST_SUCCEEDED = function(self, event, unitId, guid, spellId, ...)
@@ -91,11 +106,6 @@ local OvaleSigilClass = __class(OvaleSigilBase, {
             if (tal == nil or OvaleSpellBook:GetTalentPoints(tal) > 0) then
                 insert(activated_sigils[t], GetTime())
             end
-        end
-        if (sigil_end[id] ~= nil) then
-            local s = sigil_end[id]
-            local t = s.type
-            remove(activated_sigils[t], 1)
         end
     end,
     IsSigilCharging = function(self, type, atTime)

@@ -6,13 +6,12 @@ import { OvaleState } from "./State";
 import aceEvent from "@wowts/ace_event-3.0";
 import { ipairs, LuaObj, LuaArray, tonumber, lualength } from "@wowts/lua";
 import { insert, remove } from "@wowts/table";
-import { GetTime } from "@wowts/wow-mock";
-import { huge } from "@wowts/math";
+import { GetTime, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 
 let OvaleSigilBase = OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleSigil", aceEvent));
 export let OvaleSigil: OvaleSigilClass;
 let UPDATE_DELAY = 0.5;
-let SIGIL_ACTIVATION_TIME = huge;
+let SIGIL_ACTIVATION_TIME = 2;
 let activated_sigils: LuaObj<LuaArray<number>> = {
 }
 let sigil_start = {
@@ -24,7 +23,7 @@ let sigil_start = {
     },
     [189110]: {
         type: "flame",
-        talent: 8
+        talent: 7
     },
     [202137]: {
         type: "silence"
@@ -50,7 +49,7 @@ let sigil_end = {
         type: "chains"
     }
 }
-let QUICKENED_SIGILS_TALENT = 15;
+let QUICKENED_SIGILS_TALENT = 14;
 class OvaleSigilClass extends OvaleSigilBase {
     constructor() {
         super();
@@ -67,14 +66,30 @@ class OvaleSigilClass extends OvaleSigilBase {
     OnInitialize() {
         if (Ovale.playerClass == "DEMONHUNTER") {
             this.RegisterEvent("UNIT_SPELLCAST_SUCCEEDED");
+            this.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         }
     }
     OnDisable() {
         if (Ovale.playerClass == "DEMONHUNTER") {
             this.UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED");
+            this.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         }
     }
 
+    COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
+        if ((!OvalePaperDoll.IsSpecialization("vengeance"))) {
+            return;
+        }
+        let [, cleuEvent, , sourceGUID, , , , , , , , spellid] = CombatLogGetCurrentEventInfo();        
+        if (sourceGUID == Ovale.playerGUID && cleuEvent == 'SPELL_AURA_APPLIED') {
+            if ((sigil_end[spellid] != undefined)) {
+                let s = sigil_end[spellid];
+                let t = s.type;
+                remove(activated_sigils[t], 1);
+            }
+        }
+    }
+    
     UNIT_SPELLCAST_SUCCEEDED(event, unitId, guid, spellId, ...__args) {
         if ((!OvalePaperDoll.IsSpecialization("vengeance"))) {
             return;
@@ -91,13 +106,8 @@ class OvaleSigilClass extends OvaleSigilBase {
                 insert(activated_sigils[t], GetTime());
             }
         }
-        if ((sigil_end[id] != undefined)) {
-            let s = sigil_end[id];
-            let t = s.type;
-            remove(activated_sigils[t], 1);
-        }
     }
-    
+
     IsSigilCharging(type, atTime: number) {
         if ((lualength(activated_sigils[type]) == 0)) {
             return false;

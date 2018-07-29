@@ -1,0 +1,14 @@
+# Directories to ignore from release archives
+.vscode export-ignore
+src export-ignore
+
+ # Files to ignore from release archives
+.* export-ignore
+package-lock.json export-ignore
+package.json export-ignore
+pkgmeta.yaml export-ignore
+README.md export-ignore
+tsconfig.json export-ignore
+tsconfig.lua.json export-ignore
+tslint.json export-ignore
+yarn.lock export-ignore

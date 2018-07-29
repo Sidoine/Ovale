@@ -58,7 +58,7 @@ interface Annotation {
     skull_bash?: string;
     solar_beam?: string;
     interrupt?: string;
-    consume_magic?: string;
+    disrupt?: string;
     mind_freeze?: string;
     wild_charge?: string;
     muzzle?: string;
@@ -1215,18 +1215,7 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("legendary_ring", "legendary_ring_bonus_armor", "DEATHKNIGHT", "blood", "Item");
     AddDisambiguation("legendary_ring", "legendary_ring_strength", "DEATHKNIGHT", "frost", "Item");
     AddDisambiguation("legendary_ring", "legendary_ring_strength", "DEATHKNIGHT", "unholy", "Item");
-    AddDisambiguation("soul_reaper", "soul_reaper_blood", "DEATHKNIGHT", "blood");
-    AddDisambiguation("soul_reaper", "soul_reaper_frost", "DEATHKNIGHT", "frost");
-    AddDisambiguation("soul_reaper", "soul_reaper_unholy", "DEATHKNIGHT", "unholy");
-    AddDisambiguation("outbreak_debuff", "virulent_plague_debuff", "DEATHKNIGHT", "unholy");
     AddDisambiguation("arcane_torrent", "arcane_torrent_dh", "DEMONHUNTER");
-    AddDisambiguation("metamorphosis", "metamorphosis_veng", "DEMONHUNTER", "vengeance");
-    AddDisambiguation("metamorphosis_buff", "metamorphosis_veng_buff", "DEMONHUNTER", "vengeance");
-    AddDisambiguation("metamorphosis", "metamorphosis_havoc", "DEMONHUNTER", "havoc");
-    AddDisambiguation("metamorphosis_buff", "metamorphosis_havoc_buff", "DEMONHUNTER", "havoc");
-    AddDisambiguation("chaos_blades_debuff", "chaos_blades_buff", "DEMONHUNTER", "havoc");
-    AddDisambiguation("throw_glaive", "throw_glaive_veng", "DEMONHUNTER", "vengeance");
-    AddDisambiguation("throw_glaive", "throw_glaive_havoc", "DEMONHUNTER", "havoc");
     AddDisambiguation("moonfire", "moonfire_cat", "DRUID", "feral");
     AddDisambiguation("rejuvenation_debuff", "rejuvenation_buff", "DRUID");
     AddDisambiguation("starsurge", "starsurge_moonkin", "DRUID", "balance");
@@ -1262,7 +1251,6 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("legendary_ring", "legendary_ring_spirit", "MONK", "mistweaver", "Item");
     AddDisambiguation("zen_sphere_debuff", "zen_sphere_buff", "MONK");
     AddDisambiguation("arcane_torrent", "arcane_torrent_holy", "PALADIN");
-
     AddDisambiguation("blood_fury", "blood_fury_apsp", "PALADIN");
     AddDisambiguation("judgment_debuff", "judgment_ret_debuff", "PALADIN", "retribution");
     AddDisambiguation("legendary_ring", "legendary_ring_bonus_armor", "PALADIN", "protection", "Item");
@@ -1334,9 +1322,23 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("deaths_reach_talent", "deaths_reach_talent_unholy", "DEATHKNIGHT", "unholy");
     AddDisambiguation("grip_of_the_dead_talent", "grip_of_the_dead_talent_unholy", "DEATHKNIGHT", "unholy");
     AddDisambiguation("wraith_walk_talent", "wraith_walk_talent_blood", "DEATHKNIGHT", "blood");
+    AddDisambiguation("asphyxiate", "asphyxiate_blood", "DEATHKNIGHT", "blood");
+    AddDisambiguation("deaths_reach_talent", "deaths_reach_talent_unholy", "DEATHKNIGHT", "unholy");
+    AddDisambiguation("grip_of_the_dead_talent", "grip_of_the_dead_talent_unholy", "DEATHKNIGHT", "unholy");
+    AddDisambiguation("cold_heart_talent_buff", "cold_heart_buff", "DEATHKNIGHT", "frost");
+    AddDisambiguation("outbreak_debuff", "virulent_plague_debuff", "DEATHKNIGHT", "unholy");
+    AddDisambiguation("gargoyle", "summon_gargoyle", "DEATHKNIGHT", "unholy");
 
     //Demon Hunter
     AddDisambiguation("felblade_talent", "felblade_talent_havoc", "DEMONHUNTER", "havoc");
+    AddDisambiguation("immolation_aura", "immolation_aura_havoc", "DEMONHUNTER", "havoc");
+    AddDisambiguation("metamorphosis", "metamorphosis_veng", "DEMONHUNTER", "vengeance");
+    AddDisambiguation("metamorphosis_buff", "metamorphosis_veng_buff", "DEMONHUNTER", "vengeance");
+    AddDisambiguation("metamorphosis", "metamorphosis_havoc", "DEMONHUNTER", "havoc");
+    AddDisambiguation("metamorphosis_buff", "metamorphosis_havoc_buff", "DEMONHUNTER", "havoc");
+    AddDisambiguation("chaos_blades_debuff", "chaos_blades_buff", "DEMONHUNTER", "havoc");
+    AddDisambiguation("throw_glaive", "throw_glaive_veng", "DEMONHUNTER", "vengeance");
+    AddDisambiguation("throw_glaive", "throw_glaive_havoc", "DEMONHUNTER", "havoc");
 
     //Druid
     AddDisambiguation("feral_affinity_talent", "feral_affinity_talent_balance", "DRUID", "balance");
@@ -1347,6 +1349,11 @@ const InitializeDisambiguation = function() {
 
     //Monk
     AddDisambiguation("healing_elixir_talent", "healing_elixir_talent_mistweaver", "MONK", "mistweaver");
+    AddDisambiguation("bok_proc_buff", "blackout_kick_buff", "MONK", "windwalker");
+    AddDisambiguation("fortifying_brew", "fortifying_brew_mistweaver", "MONK", "mistweaver");
+    AddDisambiguation("rushing_jade_wind", "rushing_jade_wind_windwalker", "MONK", "windwalker");
+    AddDisambiguation("breath_of_fire_dot_debuff", "breath_of_fire_debuff", "MONK", "brewmaster");
+    AddDisambiguation("brews", "ironskin_brew", "MONK", "brewmaster");
 
     //Paladin
     AddDisambiguation("judgment_of_light_talent", "judgment_of_light_talent_holy", "PALADIN", "holy");
@@ -2077,7 +2084,7 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             annotation[action] = className;
             annotation.interrupt = className;
             isSpellAction = false;
-        } else if (className == "DEMONHUNTER" && action == "consume_magic") {
+        } else if (className == "DEMONHUNTER" && action == "disrupt") {
             bodyCode = `${camelSpecialization}InterruptActions()`;
             annotation[action] = className;
             annotation.interrupt = className;
@@ -3261,6 +3268,7 @@ EmitOperandCooldown = function (operand, parseNode, nodeList, annotation, action
     let node;
     let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
     let token = tokenIterator();
+    
     if (token == "cooldown") {
         let name = tokenIterator();
         let property = tokenIterator();
@@ -3289,6 +3297,8 @@ EmitOperandCooldown = function (operand, parseNode, nodeList, annotation, action
             }
         } else if (property == "charges_fractional") {
             code = format("%sCharges(%s count=0)", prefix, name);
+        } else if (property == "max_charges") {
+            code = format("%sMaxCharges(%s)", prefix, name);
         } else if (property == "full_recharge_time") {
             code = format("%sCooldown(%s)", prefix, name);
         } else {
@@ -4401,17 +4411,12 @@ const InsertInterruptFunctions = function(child: LuaArray<AstNode>, annotation: 
             });
         }
     }
-    if (annotation.consume_magic == "DEMONHUNTER") {
+    if (annotation.disrupt == "DEMONHUNTER") {
         insert(interrupts, {
-            name: "consume_magic",
+            name: "disrupt",
             interrupt: 1,
             worksOnBoss: 1,
             order: 10
-        });
-        insert(interrupts, {
-            name: "fel_eruption",
-            stun: 1,
-            order: 20
         });
         insert(interrupts, {
             name: "imprison",
@@ -4425,6 +4430,11 @@ const InsertInterruptFunctions = function(child: LuaArray<AstNode>, annotation: 
                 stun: 1,
                 range: "target.Distance(less 8)",
                 order: 100
+            });
+            insert(interrupts, {
+                name: "fel_eruption",
+                stun: 1,
+                order: 20
             });
         }
         if (annotation.specialization == "vengeance") {

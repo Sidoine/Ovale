@@ -1,5 +1,4 @@
 .idea
 /node_modules
 /dist/**/*.js
-/libs
 dist/**/*.js.map

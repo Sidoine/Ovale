@@ -10,9 +10,12 @@ local OvaleDebug = __Debug.OvaleDebug
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local pairs = pairs
 local select = select
+local tonumber = tonumber
 local type = type
 local unpack = unpack
 local wipe = wipe
+local tostring = tostring
+local ipairs = ipairs
 local GetInventoryItemID = GetInventoryItemID
 local GetItemInfoInstant = GetItemInfoInstant
 local INVSLOT_AMMO = INVSLOT_AMMO
@@ -35,6 +38,10 @@ local INVSLOT_TRINKET1 = INVSLOT_TRINKET1
 local INVSLOT_TRINKET2 = INVSLOT_TRINKET2
 local INVSLOT_WAIST = INVSLOT_WAIST
 local INVSLOT_WRIST = INVSLOT_WRIST
+local concat = table.concat
+local insert = table.insert
+local tinsert = insert
+local tconcat = concat
 local OvaleEquipmentBase = OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvaleEquipment", aceEvent)))
 local OVALE_SLOTNAME = {
     AmmoSlot = INVSLOT_AMMO,
@@ -66,6 +73,28 @@ local OVALE_ARMORSET_SLOT_IDS = {
     [6] = INVSLOT_BACK
 }
 local OVALE_ARMORSET = {}
+local DEBUG_SLOT_NAMES = {
+    [0] = "ammo",
+    [1] = "head",
+    [2] = "neck",
+    [3] = "shoulder",
+    [4] = "shirt",
+    [5] = "chest",
+    [6] = "belt",
+    [7] = "legs",
+    [8] = "feet",
+    [9] = "wrist",
+    [10] = "gloves",
+    [11] = "finger 1",
+    [12] = "finger 2",
+    [13] = "trinket 1",
+    [14] = "trinket 2",
+    [15] = "back",
+    [16] = "main hand",
+    [17] = "off hand",
+    [18] = "ranged",
+    [19] = "tabard"
+}
 local result = {}
 local count = 0
 local armorSetName = {}
@@ -77,7 +106,29 @@ local OvaleEquipmentClass = __class(OvaleEquipmentBase, {
         self.mainHandItemType = nil
         self.offHandItemType = nil
         self.armorSetCount = {}
+        self.lastChangedSlot = nil
+        self.output = {}
+        self.debugOptions = {
+            itemsequipped = {
+                name = "Items equipped",
+                type = "group",
+                args = {
+                    itemsequipped = {
+                        name = "Items equipped",
+                        type = "input",
+                        multiline = 25,
+                        width = "full",
+                        get = function(info)
+                            return self:DebugEquipment()
+                        end
+                    }
+                }
+            }
+        }
         OvaleEquipmentBase.constructor(self)
+        for k, v in pairs(self.debugOptions) do
+            OvaleDebug.options.args[k] = v
+        end
     end,
     OnInitialize = function(self)
         self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateEquippedItems")
@@ -206,14 +257,22 @@ local OvaleEquipmentClass = __class(OvaleEquipmentBase, {
         self:StopProfiling("OvaleEquipment_UpdateEquippedItems")
     end,
     DebugEquipment = function(self)
+        wipe(self.output)
+        local array = {}
         for slotId = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED, 1 do
-            self:Print("Slot %d = %s", slotId, self:GetEquippedItem(slotId))
+            local slot = tostring(DEBUG_SLOT_NAMES[slotId])
+            local itemid = self:GetEquippedItem(slotId) ~= nil and tostring(self:GetEquippedItem(slotId)) or ""
+            tinsert(array, slot .. ": " .. itemid)
         end
-        self:Print("Main-hand item type: %s", self.mainHandItemType)
-        self:Print("Off-hand item type: %s", self.offHandItemType)
+        tinsert(array, [[
+]])
         for k, v in pairs(self.armorSetCount) do
-            self:Print("Player has %d piece(s) of %s armor set.", v, k)
+            tinsert(array, "Player has " .. tonumber(v) .. " piece(s) of " .. tostring(k) .. " armor set.")
         end
+        for _, v in ipairs(array) do
+            self.output[#self.output + 1] = v
+        end
+        return tconcat(self.output, "\n")
     end,
 })
 __exports.OvaleEquipment = OvaleEquipmentClass()
