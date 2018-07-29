@@ -592,7 +592,7 @@ class OvaleDataClass extends OvaleDataBase {
         return [value * ratio];
     }
 
-    GetDamage(spellId: number, attackpower: number, spellpower: number, mainHandWeaponDamage: number, offHandWeaponDamage: number, combopoints: number): number {
+    GetDamage(spellId: number, attackpower: number, spellpower: number, mainHandWeaponDPS: number, offHandWeaponDPS: number, combopoints: number): number {
         let si = this.spellInfo[spellId];
         if (!si) {
             return undefined;
@@ -600,14 +600,14 @@ class OvaleDataClass extends OvaleDataBase {
         let damage = si.base || 0;
         attackpower = attackpower || 0;
         spellpower = spellpower || 0;
-        mainHandWeaponDamage = mainHandWeaponDamage || 0;
-        offHandWeaponDamage = offHandWeaponDamage || 0;
+        mainHandWeaponDPS = mainHandWeaponDPS || 0;
+        offHandWeaponDPS = offHandWeaponDPS || 0;
         combopoints = combopoints || 0;
         if (si.bonusmainhand) {
-            damage = damage + si.bonusmainhand * mainHandWeaponDamage;
+            damage = damage + si.bonusmainhand * mainHandWeaponDPS;
         }
         if (si.bonusoffhand) {
-            damage = damage + si.bonusoffhand * offHandWeaponDamage;
+            damage = damage + si.bonusoffhand * offHandWeaponDPS;
         }
         if (si.bonuscp) {
             damage = damage + si.bonuscp * combopoints;

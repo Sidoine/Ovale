@@ -38,7 +38,6 @@
    <Script file="DemonHunterSigils.lua"/>
    <Script file="Aura.lua"/>
    <Script file="Totem.lua"/>
-   <Script file="PassiveAura.lua"/>
    <Script file="DemonHunterDemonic.lua"/>
    <Script file="Cooldown.lua"/>
    <Script file="CooldownState.lua"/>
