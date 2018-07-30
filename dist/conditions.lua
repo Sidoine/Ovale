@@ -99,6 +99,8 @@ local __BaseState = LibStub:GetLibrary("ovale/BaseState")
 local baseState = __BaseState.baseState
 local __Spells = LibStub:GetLibrary("ovale/Spells")
 local OvaleSpells = __Spells.OvaleSpells
+local __AzeriteArmor = LibStub:GetLibrary("ovale/AzeriteArmor")
+local OvaleAzerite = __AzeriteArmor.OvaleAzerite
 local INFINITY = huge
 local function BossArmorDamageReduction(target, state)
     return 0.3
@@ -154,6 +156,14 @@ local function HasArtifactTrait(positionalParams, namedParams, state, atTime)
     end
     OvaleCondition:RegisterCondition("hasartifacttrait", false, HasArtifactTrait)
     OvaleCondition:RegisterCondition("artifacttraitrank", false, ArtifactTraitRank)
+end
+do
+local function HasAzeriteTrait(positionalParams, namedParams, state, atTime)
+        local spellId, yesno = positionalParams[1], positionalParams[2]
+        local value = OvaleAzerite:HasTrait(spellId)
+        return TestBoolean(value, yesno)
+    end
+    OvaleCondition:RegisterCondition("hasazeritetrait", false, HasAzeriteTrait)
 end
 do
 local function BaseDuration(positionalParams, namedParams, state, atTime)
@@ -493,9 +503,9 @@ local function Casting(positionalParams, namedParams, state, atTime)
             castSpellId = OvaleFuture.next.currentCast.spellId
             castSpellName = OvaleSpellBook:GetSpellName(castSpellId)
         else
-            local spellName, _1, _2, _3, startTime, endTime = UnitCastingInfo(target)
+            local spellName, _1, _2, startTime, endTime = UnitCastingInfo(target)
             if  not spellName then
-                spellName, _1, _2, _3, startTime, endTime = UnitChannelInfo(target)
+                spellName, _1, _2, startTime, endTime = UnitChannelInfo(target)
             end
             if spellName then
                 castSpellName = spellName
@@ -1168,9 +1178,9 @@ do
 local function IsInterruptible(positionalParams, namedParams, state, atTime)
         local yesno = positionalParams[1]
         local target = ParseCondition(positionalParams, namedParams, state)
-        local name, _1, _2, _3, _4, _5, _6, _, notInterruptible = UnitCastingInfo(target)
+        local name, _1, _2, _3, _4, _5, _, notInterruptible = UnitCastingInfo(target)
         if  not name then
-            name, _1, _2, _3, _4, _5, _6, notInterruptible = UnitChannelInfo(target)
+            name, _1, _2, _3, _4, _5, notInterruptible = UnitChannelInfo(target)
         end
         local boolean = notInterruptible ~= nil and  not notInterruptible
         return TestBoolean(boolean, yesno)
@@ -1407,7 +1417,7 @@ local function Fury(positionalParams, namedParams, state, atTime)
         return Power("fury", positionalParams, namedParams, state, atTime)
     end
 local function HolyPower(positionalParams, namedParams, state, atTime)
-        return Power("holy", positionalParams, namedParams, state, atTime)
+        return Power("holypower", positionalParams, namedParams, state, atTime)
     end
 local function Insanity(positionalParams, namedParams, state, atTime)
         return Power("insanity", positionalParams, namedParams, state, atTime)
@@ -1685,7 +1695,7 @@ do
 local function RemainingCastTime(positionalParams, namedParams, state, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
         local target = ParseCondition(positionalParams, namedParams, state)
-        local _, _, _, _, startTime, endTime = UnitCastingInfo(target)
+        local _, _, _, startTime, endTime = UnitCastingInfo(target)
         if startTime and endTime then
             startTime = startTime / 1000
             endTime = endTime / 1000

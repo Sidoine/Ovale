@@ -209,6 +209,8 @@ Define(stoneform_buff 20594)
 	SpellInfo(stoneform_buff duration=8)
 Define(war_stomp 20549)
 	SpellInfo(war_stomp cd=120 interrupt=1)
+Define(lights_judgment 255647)
+	SpellInfo(lights_judgment cd=150)
     
 	
 ###

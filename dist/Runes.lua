@@ -44,7 +44,6 @@ local OvaleRunesClass = __class(OvaleRunesBase, {
             end
             self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateAllRunes")
             self:RegisterEvent("RUNE_POWER_UPDATE")
-            self:RegisterEvent("RUNE_TYPE_UPDATE")
             self:RegisterEvent("UNIT_RANGEDDAMAGE")
             self:RegisterEvent("UNIT_SPELL_HASTE", "UNIT_RANGEDDAMAGE")
             if Ovale.playerGUID then
@@ -56,7 +55,6 @@ local OvaleRunesClass = __class(OvaleRunesBase, {
         if Ovale.playerClass == "DEATHKNIGHT" then
             self:UnregisterEvent("PLAYER_ENTERING_WORLD")
             self:UnregisterEvent("RUNE_POWER_UPDATE")
-            self:UnregisterEvent("RUNE_TYPE_UPDATE")
             self:UnregisterEvent("UNIT_RANGEDDAMAGE")
             self:UnregisterEvent("UNIT_SPELL_HASTE")
             self.current.rune = {}

@@ -177,19 +177,21 @@ local OvaleSpellBookClass = __class(OvaleSpellBookBase, {
                 if spellLink then
                     local _, _, linkData, spellName = ParseHyperlink(spellLink)
                     local id = tonumber(linkData)
-                    self:Debug("    %s (%d) is at offset %d (%s).", spellName, id, index, gsub(spellLink, "|", "_"))
-                    self.spell[id] = spellName
+                    local name = GetSpellInfo(id)
+                    self.spell[id] = name
                     self.isHarmful[id] = IsHarmfulSpell(index, bookType)
                     self.isHelpful[id] = IsHelpfulSpell(index, bookType)
                     self.texture[id] = GetSpellTexture(index, bookType)
                     self.spellbookId[bookType][id] = index
+                    self:Debug("    %s (%d) is at offset %d (%s).", name, id, index, gsub(spellLink, "|", "_"))
                     if spellId and id ~= spellId then
-                        self:Debug("    %s (%d) is at offset %d.", spellName, spellId, index)
-                        self.spell[spellId] = spellName
+                        local name = (skillType == "PETACTION") and spellName or GetSpellInfo(spellId)
+                        self.spell[spellId] = name
                         self.isHarmful[spellId] = self.isHarmful[id]
                         self.isHelpful[spellId] = self.isHelpful[id]
                         self.texture[spellId] = self.texture[id]
                         self.spellbookId[bookType][spellId] = index
+                        self:Debug("    %s (%d) is at offset %d.", name, spellId, index)
                     end
                 end
             elseif skillType == "FLYOUT" then
@@ -199,19 +201,21 @@ local OvaleSpellBookClass = __class(OvaleSpellBookBase, {
                     for flyoutIndex = 1, numSlots, 1 do
                         local id, overrideId, isKnown, spellName = GetFlyoutSlotInfo(flyoutId, flyoutIndex)
                         if isKnown then
-                            self:Debug("    %s (%d) is at offset %d.", spellName, id, index)
-                            self.spell[id] = spellName
+                            local name = GetSpellInfo(id)
+                            self.spell[id] = name
                             self.isHarmful[id] = IsHarmfulSpell(spellName)
                             self.isHelpful[id] = IsHelpfulSpell(spellName)
                             self.texture[id] = GetSpellTexture(index, bookType)
                             self.spellbookId[bookType][id] = nil
+                            self:Debug("    %s (%d) is at offset %d.", name, id, index)
                             if id ~= overrideId then
-                                self:Debug("    %s (%d) is at offset %d.", spellName, overrideId, index)
-                                self.spell[overrideId] = spellName
+                                local name = GetSpellInfo(overrideId)
+                                self.spell[overrideId] = name
                                 self.isHarmful[overrideId] = self.isHarmful[id]
                                 self.isHelpful[overrideId] = self.isHelpful[id]
                                 self.texture[overrideId] = self.texture[id]
                                 self.spellbookId[bookType][overrideId] = nil
+                                self:Debug("    %s (%d) is at offset %d.", name, overrideId, index)
                             end
                         end
                     end

@@ -350,7 +350,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
             }
         }
         [timeSpan, result] = this.RecursiveCompute(element, state, atTime);
-        this.StartProfiling("OvaleBestAction_Compute");
+        this.StopProfiling("OvaleBestAction_Compute");
         return [timeSpan, result];
     }
     RecursiveCompute(element: Element, state: BaseState, atTime: number): [OvaleTimeSpan, any] {

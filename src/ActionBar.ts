@@ -197,7 +197,7 @@ class OvaleActionBarClass extends OvaleActionBarBase {
                     if (!this.macro[actionText] || slot < this.macro[actionText]) {
                         this.macro[actionText] = slot;
                     }
-                    let [, , spellId] = GetMacroSpell(id);
+                    let spellId = GetMacroSpell(id);
                     if (spellId) {
                         if (!this.spell[spellId] || slot < this.spell[spellId]) {
                             this.spell[spellId] = slot;

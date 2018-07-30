@@ -125,7 +125,7 @@ class OvaleCooldownClass extends OvaleCooldownBase implements SpellCastModule {
         this.UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED");
         this.UnregisterEvent("UPDATE_SHAPESHIFT_COOLDOWN");
     }
-    UNIT_SPELLCAST_INTERRUPTED(event, unit, name, rank, lineId, spellId) {
+    UNIT_SPELLCAST_INTERRUPTED(event, unit, lineId, spellId) {
         if (unit == "player" || unit == "pet") {
             this.Update(event, unit);
             this.Debug("Resetting global cooldown.");

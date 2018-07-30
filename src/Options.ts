@@ -8,6 +8,7 @@ import aceConsole from "@wowts/ace_console-3.0";
 import aceEvent from "@wowts/ace_event-3.0";
 import { InterfaceOptionsFrame_OpenToCategory } from "@wowts/wow-mock";
 import { ipairs, LuaObj, lualength, LuaArray } from "@wowts/lua";
+import { huge } from "@wowts/math";
 let OvaleOptionsBase = Ovale.NewModule("OvaleOptions", aceConsole, aceEvent);
 interface OptionModule {
     UpgradeSavedVariables():void;
@@ -60,6 +61,9 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                 predictif: false,
                 secondIconScale: 1,
                 taggedEnemies: false,
+                minFrameRefresh: 50,
+                maxFrameRefresh: 250,
+                fullAuraScan: false,
                 auraLag: 400,
                 moving: false,
                 spellFlash: {
@@ -382,6 +386,31 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                                 min: 100,
                                 max: 700,
                                 step: 10
+                            },
+                            minFrameRefresh: {
+                                order: 30,
+                                type: "range",
+                                name: L["Min Refresh"],
+                                desc: L["Minimum time (in milliseconds) between updates; lower values may reduce FPS."],
+                                min: 50,
+                                max: 100,
+                                step: 5
+                            },
+                            maxFrameRefresh: {
+                                order: 40,
+                                type: "range",
+                                name: L["Max Refresh"],
+                                desc: L["Minimum time (in milliseconds) between updates; lower values may reduce FPS."],
+                                min: 100,
+                                max: 400,
+                                step: 10
+                            },
+                            fullAuraScan: {
+                                order: 50,
+                                width: "full",
+                                type: "toggle",
+                                name: L['Full buffs/debuffs scan'],
+                                desc: L['Scans also buffs/debuffs casted by other players\n\nWarning!: Very CPU intensive'],
                             }
                         }
                     }
@@ -421,6 +450,9 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                         type: "execute",
                         func: () => {
                             let [avgRefresh, minRefresh, maxRefresh, count] = Ovale.GetRefreshIntervalStatistics();
+                            if(minRefresh == huge){
+                                [avgRefresh, minRefresh, maxRefresh, count] = [0,0,0,0]
+                            }
                             Ovale.Print("Refresh intervals: count = %d, avg = %d, min = %d, max = %d (ms)", count, avgRefresh, minRefresh, maxRefresh);
                         }
                     }

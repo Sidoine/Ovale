@@ -18,6 +18,7 @@
    <Script file="SpellBook.lua"/>
    <Script file="ActionBar.lua"/>
    <Script file="Equipment.lua"/>
+   <Script file="AzeriteArmor.lua"/>
    <Script file="Pool.lua"/>
    <Script file="DamageTaken.lua"/>
    <Script file="LastSpell.lua"/>

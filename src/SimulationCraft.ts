@@ -58,7 +58,7 @@ export interface Annotation {
     skull_bash?: string;
     solar_beam?: string;
     interrupt?: string;
-    consume_magic?: string;
+    disrupt?: string;
     mind_freeze?: string;
     wild_charge?: string;
     muzzle?: string;
@@ -1209,6 +1209,74 @@ function Disambiguate(annotation: Annotation, name: string, className: string, s
 }
 const InitializeDisambiguation = function() {
     AddDisambiguation("none", "none");
+
+    //Death Knight
+    AddDisambiguation("deaths_reach_talent", "deaths_reach_talent_unholy", "DEATHKNIGHT", "unholy");
+    AddDisambiguation("grip_of_the_dead_talent", "grip_of_the_dead_talent_unholy", "DEATHKNIGHT", "unholy");
+    AddDisambiguation("wraith_walk_talent", "wraith_walk_talent_blood", "DEATHKNIGHT", "blood");
+    AddDisambiguation("asphyxiate", "asphyxiate_blood", "DEATHKNIGHT", "blood");
+    AddDisambiguation("deaths_reach_talent", "deaths_reach_talent_unholy", "DEATHKNIGHT", "unholy");
+    AddDisambiguation("grip_of_the_dead_talent", "grip_of_the_dead_talent_unholy", "DEATHKNIGHT", "unholy");
+    AddDisambiguation("cold_heart_talent_buff", "cold_heart_buff", "DEATHKNIGHT", "frost");
+    AddDisambiguation("outbreak_debuff", "virulent_plague_debuff", "DEATHKNIGHT", "unholy");
+    AddDisambiguation("gargoyle", "summon_gargoyle", "DEATHKNIGHT", "unholy");
+
+    //Demon Hunter
+    AddDisambiguation("felblade_talent", "felblade_talent_havoc", "DEMONHUNTER", "havoc");
+    AddDisambiguation("immolation_aura", "immolation_aura_havoc", "DEMONHUNTER", "havoc");
+    AddDisambiguation("metamorphosis", "metamorphosis_veng", "DEMONHUNTER", "vengeance");
+    AddDisambiguation("metamorphosis_buff", "metamorphosis_veng_buff", "DEMONHUNTER", "vengeance");
+    AddDisambiguation("metamorphosis", "metamorphosis_havoc", "DEMONHUNTER", "havoc");
+    AddDisambiguation("metamorphosis_buff", "metamorphosis_havoc_buff", "DEMONHUNTER", "havoc");
+    AddDisambiguation("chaos_blades_debuff", "chaos_blades_buff", "DEMONHUNTER", "havoc");
+    AddDisambiguation("throw_glaive", "throw_glaive_veng", "DEMONHUNTER", "vengeance");
+    AddDisambiguation("throw_glaive", "throw_glaive_havoc", "DEMONHUNTER", "havoc");
+
+    //Druid
+    AddDisambiguation("feral_affinity_talent", "feral_affinity_talent_balance", "DRUID", "balance");
+    AddDisambiguation("guardian_affinity_talent", "guardian_affinity_talent_restoration", "DRUID", "restoration");
+
+    //Hunter
+    AddDisambiguation("a_murder_of_crows_talent", "a_murder_of_crows_talent_marksman", "HUNTER", "marksman");
+
+    //Monk
+    AddDisambiguation("healing_elixir_talent", "healing_elixir_talent_mistweaver", "MONK", "mistweaver");
+    AddDisambiguation("bok_proc_buff", "blackout_kick_buff", "MONK", "windwalker");
+    AddDisambiguation("fortifying_brew", "fortifying_brew_mistweaver", "MONK", "mistweaver");
+    AddDisambiguation("rushing_jade_wind", "rushing_jade_wind_windwalker", "MONK", "windwalker");
+    AddDisambiguation("breath_of_fire_dot_debuff", "breath_of_fire_debuff", "MONK", "brewmaster");
+    AddDisambiguation("brews", "ironskin_brew", "MONK", "brewmaster");
+
+    //Paladin
+    AddDisambiguation("judgment_of_light_talent", "judgment_of_light_talent_holy", "PALADIN", "holy");
+    AddDisambiguation("unbreakable_spirit_talent", "unbreakable_spirit_talent_holy", "PALADIN", "holy");
+    AddDisambiguation("cavalier_talent", "cavalier_talent_holy", "PALADIN", "holy");
+    AddDisambiguation("divine_purpose_buff", "divine_purpose_buff_holy", "PALADIN", "holy");
+    AddDisambiguation("judgment", "judgment_holy", "PALADIN", "holy");
+    AddDisambiguation("judgment", "judgment_prot", "PALADIN", "protection");
+
+    //Priest
+    AddDisambiguation("mindbender_talent", "mindbender_talent_discipline", "PRIEST", "discipline");
+    AddDisambiguation("twist_of_fate_talent", "twist_of_fate_talent_discipline", "PRIEST", "discipline");
+    
+    //Shaman
+    AddDisambiguation("earth_shield_talent", "earth_shield_talent_restoration", "SHAMAN", "restoration");
+    AddDisambiguation("echo_of_the_elements_talent", "echo_of_the_elements_talent_restoration", "SHAMAN", "restoration");
+
+    //Warlock
+    AddDisambiguation("soul_conduit_talent", "soul_conduit_talent_demonology", "WARLOCK", "demonology");
+
+    //Warrior
+    AddDisambiguation("anger_management_talent", "anger_management_talent_fury", "WARRIOR", "fury");
+    AddDisambiguation("bounding_stride_talent", "bounding_stride_talent_protection", "WARRIOR", "protection");
+    AddDisambiguation("dragon_roar_talent", "dragon_roar_talent_protection", "WARRIOR", "protection");
+    AddDisambiguation("massacre_talent", "massacre_talent_arms", "WARRIOR", "arms");
+    AddDisambiguation("storm_bolt_talent", "storm_bolt_talent_protection", "WARRIOR", "protection");
+    AddDisambiguation("sudden_death_talent", "sudden_death_talent_fury", "WARRIOR", "fury");
+    AddDisambiguation("bladestorm", "bladestorm_arms", "WARRIOR", "arms");
+    AddDisambiguation("bladestorm", "bladestorm_fury", "WARRIOR", "fury");
+    AddDisambiguation("execute", "execute_arms", "WARRIOR", "arms");
+    AddDisambiguation("whirlwind", "whirlwind_arms", "WARRIOR", "arms");
 }
 const IsTotem = function(name: string) {
     if (sub(name, 1, 13) == "wild_mushroom") {
@@ -1571,6 +1639,7 @@ let EmitOperand:EmitVisitor = undefined;
 let EmitOperandAction:EmitOperandVisitor = undefined;
 let EmitOperandActiveDot:EmitOperandVisitor = undefined;
 let EmitOperandArtifact:EmitOperandVisitor = undefined;
+let EmitOperandAzerite:EmitOperandVisitor = undefined;
 let EmitOperandBuff:EmitOperandVisitor = undefined;
 let EmitOperandCharacter:EmitOperandVisitor = undefined;
 let EmitOperandCooldown:EmitOperandVisitor = undefined;
@@ -1907,7 +1976,7 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             annotation[action] = className;
             annotation.interrupt = className;
             isSpellAction = false;
-        } else if (className == "DEMONHUNTER" && action == "consume_magic") {
+        } else if (className == "DEMONHUNTER" && action == "disrupt") {
             bodyCode = `${camelSpecialization}InterruptActions()`;
             annotation[action] = className;
             annotation.interrupt = className;
@@ -2585,6 +2654,8 @@ EmitOperand = function (parseNode, nodeList, annotation, action) {
             [ok, node] = EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target);
         } else if (token == "artifact") {
             [ok, node] = EmitOperandArtifact(operand, parseNode, nodeList, annotation, action, target);
+        } else if (token == "azerite") {
+            [ok, node] = EmitOperandAzerite(operand, parseNode, nodeList, annotation, action, target);
         } else if (token == "buff") {
             [ok, node] = EmitOperandBuff(operand, parseNode, nodeList, annotation, action, target);
         } else if (token == "consumable") {
@@ -2786,6 +2857,30 @@ EmitOperandArtifact = function (operand, parseNode, nodeList, annotation, action
             code = format("ArtifactTraitRank(%s)", name);
         } else if (property == "enabled") {
             code = format("HasArtifactTrait(%s)", name);
+        } else {
+            ok = false;
+        }
+        if (ok && code) {
+            annotation.astAnnotation = annotation.astAnnotation || {};
+            [node] = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation);
+            AddSymbol(annotation, name);
+        }
+    } else {
+        ok = false;
+    }
+    return [ok, node];
+}
+EmitOperandAzerite = function (operand, parseNode, nodeList, annotation, action, target) {
+    let ok = true;
+    let node;
+    let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+    let token = tokenIterator();
+    if (token == "azerite") {
+        let code:string;
+        let name = tokenIterator();
+        let property = tokenIterator();
+        if (property == "enabled") {
+            code = format("HasAzeriteTrait(%s)", name);
         } else {
             ok = false;
         }
@@ -3065,6 +3160,7 @@ EmitOperandCooldown = function (operand, parseNode, nodeList, annotation, action
     let node;
     let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
     let token = tokenIterator();
+    
     if (token == "cooldown") {
         let name = tokenIterator();
         let property = tokenIterator();
@@ -3093,6 +3189,8 @@ EmitOperandCooldown = function (operand, parseNode, nodeList, annotation, action
             }
         } else if (property == "charges_fractional") {
             code = format("%sCharges(%s count=0)", prefix, name);
+        } else if (property == "max_charges") {
+            code = format("%sMaxCharges(%s)", prefix, name);
         } else if (property == "full_recharge_time") {
             code = format("%sCooldown(%s)", prefix, name);
         } else {
@@ -4205,17 +4303,12 @@ const InsertInterruptFunctions = function(child: LuaArray<AstNode>, annotation: 
             });
         }
     }
-    if (annotation.consume_magic == "DEMONHUNTER") {
+    if (annotation.disrupt == "DEMONHUNTER") {
         insert(interrupts, {
-            name: "consume_magic",
+            name: "disrupt",
             interrupt: 1,
             worksOnBoss: 1,
             order: 10
-        });
-        insert(interrupts, {
-            name: "fel_eruption",
-            stun: 1,
-            order: 20
         });
         insert(interrupts, {
             name: "imprison",
@@ -4229,6 +4322,11 @@ const InsertInterruptFunctions = function(child: LuaArray<AstNode>, annotation: 
                 stun: 1,
                 range: "target.Distance(less 8)",
                 order: 100
+            });
+            insert(interrupts, {
+                name: "fel_eruption",
+                stun: 1,
+                order: 20
             });
         }
         if (annotation.specialization == "vengeance") {
@@ -5325,7 +5423,7 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
                 output[lualength(output) + 1] = "# Overrides.";
                 output[lualength(output) + 1] = overrideCode;
             }
-            if (annotation.supportingDefineCount + annotation.supportingControlCount > 0) {
+            if (annotation.supportingControlCount > 0) {
                 output[lualength(output) + 1] = "";
             }
         }

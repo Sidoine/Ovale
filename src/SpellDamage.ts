@@ -1,6 +1,7 @@
 import { OvaleProfiler } from "./Profiler";
 import { Ovale } from "./Ovale";
 import aceEvent from "@wowts/ace_event-3.0";
+import { CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 
 let CLEU_DAMAGE_EVENT = {
     SPELL_DAMAGE: true,
@@ -16,8 +17,8 @@ class OvaleSpellDamageClass extends OvaleSpellDamageBase {
     OnDisable() {
         this.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
     }
-    COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...__args) {
-        let [arg12, , , arg15, , , , , , , , , , ] = __args;
+    COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
+        let [, cleuEvent, , sourceGUID, , , , , , , , arg12, , , arg15] = CombatLogGetCurrentEventInfo();
         if (sourceGUID == Ovale.playerGUID) {
             this.StartProfiling("OvaleSpellDamage_COMBAT_LOG_EVENT_UNFILTERED");
             if (CLEU_DAMAGE_EVENT[cleuEvent]) {

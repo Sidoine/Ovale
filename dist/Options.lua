@@ -13,6 +13,7 @@ local aceConsole = LibStub:GetLibrary("AceConsole-3.0", true)
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local InterfaceOptionsFrame_OpenToCategory = InterfaceOptionsFrame_OpenToCategory
 local ipairs = ipairs
+local huge = math.huge
 local OvaleOptionsBase = Ovale:NewModule("OvaleOptions", aceConsole, aceEvent)
 local self_register = {}
 local OvaleOptionsClass = __class(OvaleOptionsBase, {
@@ -106,6 +107,9 @@ local OvaleOptionsClass = __class(OvaleOptionsBase, {
                     predictif = false,
                     secondIconScale = 1,
                     taggedEnemies = false,
+                    minFrameRefresh = 50,
+                    maxFrameRefresh = 250,
+                    fullAuraScan = false,
                     auraLag = 400,
                     moving = false,
                     spellFlash = {
@@ -433,6 +437,31 @@ local OvaleOptionsClass = __class(OvaleOptionsBase, {
                                     min = 100,
                                     max = 700,
                                     step = 10
+                                },
+                                minFrameRefresh = {
+                                    order = 30,
+                                    type = "range",
+                                    name = L["Min Refresh"],
+                                    desc = L["Minimum time (in milliseconds) between updates; lower values may reduce FPS."],
+                                    min = 50,
+                                    max = 100,
+                                    step = 5
+                                },
+                                maxFrameRefresh = {
+                                    order = 40,
+                                    type = "range",
+                                    name = L["Max Refresh"],
+                                    desc = L["Minimum time (in milliseconds) between updates; lower values may reduce FPS."],
+                                    min = 100,
+                                    max = 400,
+                                    step = 10
+                                },
+                                fullAuraScan = {
+                                    order = 50,
+                                    width = "full",
+                                    type = "toggle",
+                                    name = L["Full buffs/debuffs scan"],
+                                    desc = L["Scans also buffs/debuffs casted by other players\n\nWarning!: Very CPU intensive"]
                                 }
                             }
                         }
@@ -472,6 +501,9 @@ local OvaleOptionsClass = __class(OvaleOptionsBase, {
                             type = "execute",
                             func = function()
                                 local avgRefresh, minRefresh, maxRefresh, count = Ovale:GetRefreshIntervalStatistics()
+                                if minRefresh == huge then
+                                    avgRefresh, minRefresh, maxRefresh, count = 0, 0, 0, 0
+                                end
                                 Ovale:Print("Refresh intervals: count = %d, avg = %d, min = %d, max = %d (ms)", count, avgRefresh, minRefresh, maxRefresh)
                             end
                         }
