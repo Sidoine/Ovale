@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Controls", 10000)
+local __exports = LibStub:NewLibrary("ovale/Controls", 80000)
 if not __exports then return end
 local wipe = wipe
 __exports.checkBoxes = {}

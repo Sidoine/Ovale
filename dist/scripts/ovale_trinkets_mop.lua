@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/scripts/ovale_trinkets_mop", 10000)
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_trinkets_mop", 80000)
 if not __exports then return end
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
