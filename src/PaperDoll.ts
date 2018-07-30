@@ -7,7 +7,7 @@ import { OvaleState } from "./State";
 import { lastSpell, SpellCast, PaperDollSnapshot, SpellCastModule } from "./LastSpell";
 import aceEvent from "@wowts/ace_event-3.0";
 import { pairs, tonumber, type } from "@wowts/lua";
-import { GetCombatRating, GetCombatRatingBonus, GetCritChance, GetMastery, GetMasteryEffect, GetMeleeHaste, GetRangedCritChance, GetRangedHaste, GetSpecialization, GetSpellBonusDamage, GetSpellBonusHealing, GetSpellCritChance, GetTime, UnitAttackPower, UnitAttackSpeed, UnitDamage, UnitLevel, UnitRangedAttackPower, UnitSpellHaste, UnitStat, CR_CRIT_MELEE, CR_HASTE_MELEE, CR_VERSATILITY_DAMAGE_DONE } from "@wowts/wow-mock";
+import { GetCombatRating, GetCombatRatingBonus, GetCritChance, GetMastery, GetMasteryEffect, GetMeleeHaste, GetRangedCritChance, GetRangedHaste, GetSpecialization, GetSpellBonusDamage, GetSpellCritChance, GetTime, UnitAttackPower, UnitAttackSpeed, UnitDamage, UnitRangedDamage, UnitLevel, UnitRangedAttackPower, UnitSpellHaste, UnitStat, CR_CRIT_MELEE, CR_HASTE_MELEE, CR_VERSATILITY_DAMAGE_DONE } from "@wowts/wow-mock";
 
 export let OvalePaperDoll: OvalePaperDollClass;
 let OVALE_SPELLDAMAGE_SCHOOL = {
@@ -94,31 +94,50 @@ let OVALE_SPECIALIZATION_NAME = {
     }
 }
 
+const GetAppropriateDamage = function(unit)
+{
+	if (OvaleEquipment.HasRangedWeapon()) {
+		let [, minDamage, maxDamage, , , percent] = UnitRangedDamage(unit);
+        return [minDamage, maxDamage, undefined, undefined, 0, 0, percent];
+    }
+	else {
+        return UnitDamage(unit);
+    }
+}
+
 export class PaperDollData implements PaperDollSnapshot {
     snapshotTime = 0;
-    agility = 0;
-    intellect = 0;
-    spirit = 0;
-    stamina = 0;
+
     strength = 0;
+    agility = 0;
+    stamina = 0;
+    intellect = 0;
+    // spirit = 0;
+
     attackPower = 0;
-    rangedAttackPower = 0;
-    spellBonusDamage = 0;
-    spellBonusHealing = 0;
-    masteryEffect = 0;
-    meleeCrit = 0;
-    meleeHaste = 0;
-    rangedCrit = 0;
-    rangedHaste = 0;
-    spellCrit = 0;
-    spellHaste = 0;
+    spellPower = 0;
+    // rangedAttackPower = 0;
+    // spellBonusDamage = 0;
+    // spellBonusHealing = 0;
+    
     critRating = 0;
+    meleeCrit = 0;
+    rangedCrit = 0;
+    spellCrit = 0;
+
     hasteRating = 0;
+    meleeHaste = 0;
+    rangedHaste = 0;
+    spellHaste = 0;
+
     masteryRating = 0;
+    masteryEffect = 0;
+
     versatilityRating = 0;
     versatility = 0;
-    mainHandWeaponDamage = 0;
-    offHandWeaponDamage = 0;
+
+    mainHandWeaponDPS = 0;
+    offHandWeaponDPS = 0;
     baseDamageMultiplier = 1;
 }
 
@@ -130,29 +149,37 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
     specialization = undefined;
     STAT_NAME = {
         snapshotTime: true,
-        agility: true,
-        intellect: true,
-        spirit: true,
-        stamina: true,
+
         strength: true,
+        agility: true,
+        stamina: true,
+        intellect: true,
+        // spirit: true,
+
         attackPower: true,
-        rangedAttackPower: true,
-        spellBonusDamage: true,
-        spellBonusHealing: true,
-        masteryEffect: true,
-        meleeCrit: true,
-        meleeHaste: true,
-        rangedCrit: true,
-        rangedHaste: true,
-        spellCrit: true,
-        spellHaste: true,
+        spellPower: true,
+        // rangedAttackPower: true,
+        // spellBonusDamage: true,
+        // spellBonusHealing: true,
+        
         critRating: true,
+        meleeCrit: true,
+        rangedCrit: true,
+        spellCrit: true,
+        
         hasteRating: true,
+        meleeHaste: true,
+        rangedHaste: true,
+        spellHaste: true,
+
         masteryRating: true,
+        masteryEffect: true,
+
         versatilityRating: true,
         versatility: true,
-        mainHandWeaponDamage: true,
-        offHandWeaponDamage: true,
+
+        mainHandWeaponDPS: true,
+        offHandWeaponDPS: true,
         baseDamageMultiplier: true
     }
     SNAPSHOT_STAT_NAME = {
@@ -237,22 +264,20 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
     }
     PLAYER_DAMAGE_DONE_MODS(event, unitId) {
         this.StartProfiling("OvalePaperDoll_UpdateStats");
-        this.current.spellBonusDamage = GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[this.class]);
-        this.current.spellBonusHealing = GetSpellBonusHealing();
+        this.current.spellPower = GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[this.class]);
         this.current.snapshotTime = GetTime();
         Ovale.needRefresh();
         this.StopProfiling("OvalePaperDoll_UpdateStats");
     }
     SPELL_POWER_CHANGED(event) {
         this.StartProfiling("OvalePaperDoll_UpdateStats");
-        this.current.spellBonusDamage = GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[this.class]);
-        this.current.spellBonusDamage = GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[this.class]);
+        this.current.spellPower = GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[this.class]);
         this.current.snapshotTime = GetTime();
         Ovale.needRefresh();
         this.StopProfiling("OvalePaperDoll_UpdateStats");
     }
     UNIT_ATTACK_POWER(event, unitId) {
-        if (unitId == "player") {
+        if (unitId == "player" && !OvaleEquipment.HasRangedWeapon()) {
             this.StartProfiling("OvalePaperDoll_UpdateStats");
             let [base, posBuff, negBuff] = UnitAttackPower(unitId);
             this.current.attackPower = base + posBuff + negBuff;
@@ -286,7 +311,7 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
             this.StartProfiling("OvalePaperDoll_UpdateStats");
             let [base, posBuff, negBuff] = UnitRangedAttackPower(unitId);
             Ovale.needRefresh();
-            this.current.rangedAttackPower = base + posBuff + negBuff;
+            this.current.attackPower = base + posBuff + negBuff;
             this.current.snapshotTime = GetTime();
             this.StopProfiling("OvalePaperDoll_UpdateStats");
         }
@@ -309,52 +334,30 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
             this.current.agility = UnitStat(unitId, 2);
             this.current.stamina = UnitStat(unitId, 3);
             this.current.intellect = UnitStat(unitId, 4);
-            this.current.spirit = 0;
+            // this.current.spirit = 0;
             this.current.snapshotTime = GetTime();
             Ovale.needRefresh();
             this.StopProfiling("OvalePaperDoll_UpdateStats");
         }
     }
-    UpdateDamage(event) {
+    UpdateDamage(event) { // Might need a better method?
         this.StartProfiling("OvalePaperDoll_UpdateDamage");
-        let [minDamage, maxDamage, minOffHandDamage, maxOffHandDamage, , , damageMultiplier] = UnitDamage("player");
+        let [minDamage, maxDamage, minOffHandDamage, maxOffHandDamage, , , damageMultiplier] = GetAppropriateDamage("player");
         let [mainHandAttackSpeed, offHandAttackSpeed] = UnitAttackSpeed("player");
 
         // Appartently, if the character is not loaded, it returns 0
         if (damageMultiplier == 0 || mainHandAttackSpeed == 0) return;
         this.current.baseDamageMultiplier = damageMultiplier;
+
         if (this.class == "DRUID" && OvaleStance.IsStance("druid_cat_form", undefined)) {
-            damageMultiplier = damageMultiplier * 2;
-        } else if (this.class == "MONK" && OvaleEquipment.HasOneHandedWeapon()) {
-            damageMultiplier = damageMultiplier * 1.25;
-        }
-        let avgDamage = (minDamage + maxDamage) / 2 / damageMultiplier;
-        let mainHandWeaponSpeed = mainHandAttackSpeed * this.GetMeleeHasteMultiplier();
-        let normalizedMainHandWeaponSpeed = OvaleEquipment.mainHandWeaponSpeed || 1.5;
-        if (this.class == "DRUID") {
-            if (OvaleStance.IsStance("druid_cat_form", undefined)) {
-                normalizedMainHandWeaponSpeed = 1;
-            } else if (OvaleStance.IsStance("druid_bear_form", undefined)) {
-                normalizedMainHandWeaponSpeed = 2.5;
-            }
-        }
-        this.current.mainHandWeaponDamage = avgDamage / mainHandWeaponSpeed * normalizedMainHandWeaponSpeed;
-        if (OvaleEquipment.HasOffHandWeapon()) {
-            let avgOffHandDamage = (minOffHandDamage + maxOffHandDamage) / 2 / damageMultiplier;
-            offHandAttackSpeed = offHandAttackSpeed || mainHandAttackSpeed;
-            let offHandWeaponSpeed = offHandAttackSpeed * this.GetMeleeHasteMultiplier();
-            let normalizedOffHandWeaponSpeed = OvaleEquipment.offHandWeaponSpeed || 1.5;
-            if (this.class == "DRUID") {
-                if (OvaleStance.IsStance("druid_cat_form", undefined)) {
-                    normalizedOffHandWeaponSpeed = 1;
-                } else if (OvaleStance.IsStance("druid_bear_form", undefined)) {
-                    normalizedOffHandWeaponSpeed = 2.5;
-                }
-            }
-            this.current.offHandWeaponDamage = avgOffHandDamage / offHandWeaponSpeed * normalizedOffHandWeaponSpeed;
+            damageMultiplier = damageMultiplier * 1.4;
+        } 
+        this.current.mainHandWeaponDPS = (minDamage + maxDamage) * 0.5 / damageMultiplier / mainHandAttackSpeed;
+        if (offHandAttackSpeed) {
+            this.current.offHandWeaponDPS = (minOffHandDamage + maxOffHandDamage) * 0.5 / damageMultiplier / offHandAttackSpeed;
         } else {
-            this.current.offHandWeaponDamage = 0;
-        }
+            this.current.offHandWeaponDPS = 0;
+        } 
         this.current.snapshotTime = GetTime();
         Ovale.needRefresh();
         this.StopProfiling("OvalePaperDoll_UpdateDamage");
@@ -401,27 +404,27 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
     GetMasteryMultiplier(snapshot?:PaperDollSnapshot) {
         snapshot = snapshot || this.current;
         return 1 + snapshot.masteryEffect / 100;
-    }
+    } 
     GetMeleeHasteMultiplier(snapshot?:PaperDollSnapshot) {
         snapshot = snapshot || this.current;
         return 1 + snapshot.meleeHaste / 100;
-    }
+    } 
     GetRangedHasteMultiplier(snapshot?:PaperDollSnapshot) {
         snapshot = snapshot || this.current;
         return 1 + snapshot.rangedHaste / 100;
-    }
+    } 
     GetSpellHasteMultiplier(snapshot?:PaperDollSnapshot) {
         snapshot = snapshot || this.current;
         return 1 + snapshot.spellHaste / 100;
-    }
+    } 
     GetHasteMultiplier(haste: string, snapshot:PaperDollSnapshot) {
         snapshot = snapshot || this.current;
         let multiplier = 1;
         if (haste == "melee") {
             multiplier = this.GetMeleeHasteMultiplier(snapshot);
-        } else if (haste == "ranged") {
+        }  else if (haste == "ranged") {
             multiplier = this.GetRangedHasteMultiplier(snapshot);
-        } else if (haste == "spell") {
+        }  else if (haste == "spell") {
             multiplier = this.GetSpellHasteMultiplier(snapshot);
         }
         return multiplier;
@@ -445,30 +448,37 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
         // this.level = undefined;
         // this.specialization = undefined;
         this.next.snapshotTime = 0;
-        this.next.agility = 0;
-        this.next.agility = 0;
-        this.next.intellect = 0;
-        this.next.spirit = 0;
-        this.next.stamina = 0;
+
         this.next.strength = 0;
+        this.next.agility = 0;
+        this.next.stamina = 0;
+        this.next.intellect = 0;
+        // this.next.spirit = 0;
+
         this.next.attackPower = 0;
-        this.next.rangedAttackPower = 0;
-        this.next.spellBonusDamage = 0;
-        this.next.spellBonusHealing = 0;
-        this.next.masteryEffect = 0;
-        this.next.meleeCrit = 0;
-        this.next.meleeHaste = 0;
-        this.next.rangedCrit = 0;
-        this.next.rangedHaste = 0;
-        this.next.spellCrit = 0;
-        this.next.spellHaste = 0;
+        this.next.spellPower = 0;
+        // this.next.rangedAttackPower = 0;
+        // this.next.spellBonusDamage = 0;
+        // this.next.spellBonusHealing = 0;
+        
         this.next.critRating = 0;
+        this.next.meleeCrit = 0;
+        this.next.rangedCrit = 0;
+        this.next.spellCrit = 0;
+
         this.next.hasteRating = 0;
+        this.next.meleeHaste = 0;
+        this.next.rangedHaste = 0;
+        this.next.spellHaste = 0;
+
         this.next.masteryRating = 0;
+        this.next.masteryEffect = 0;
+
         this.next.versatilityRating = 0;
         this.next.versatility = 0;
-        this.next.mainHandWeaponDamage = 0;
-        this.next.offHandWeaponDamage = 0;
+
+        this.next.mainHandWeaponDPS = 0;
+        this.next.offHandWeaponDPS = 0;
         this.next.baseDamageMultiplier = 1;
     }
     CleanState(): void {
