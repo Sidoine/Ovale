@@ -1,4 +1,8 @@
 .idea
 /node_modules
 /dist/**/*.js
+/libs
 dist/**/*.js.map
+/yarn-error.log
+*.orig
+/package-lock.json

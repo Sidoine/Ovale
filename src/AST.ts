@@ -260,6 +260,7 @@ export interface AstNode {
     description: AstNode;
     item?: string;
     precedence: number;
+    value?: string | number;
 
     // ?
     annotation?: AstAnnotation;
@@ -289,19 +290,19 @@ export function isStringNode(node: AstNode): node is StringNode {
     return node.type === "string";
 }
 
-function isCheckBoxParameter(key: string, value: Value): value is LuaArray<AstNode> {
+function isCheckBoxParameter(key: string | number, value: Value): value is LuaArray<AstNode> {
     return key === "checkbox";
 }
 
-function isListItemParameter(key: string, value: Value): value is LuaObj<AstNode> {
+function isListItemParameter(key: string | number, value: Value): value is LuaObj<AstNode> {
     return key === "listitem";
 }
 
-function isCheckBoxFlattenParameters(key: string, value: FlattenParameterValue | FlattenListParameters | FlattenCheckBoxParameters): value is FlattenCheckBoxParameters {
+function isCheckBoxFlattenParameters(key: string | number, value: FlattenParameterValue | FlattenListParameters | FlattenCheckBoxParameters): value is FlattenCheckBoxParameters {
     return key === "checkbox";
 }
 
-function isListItemFlattenParameters(key: string, value: FlattenParameterValue | FlattenListParameters | FlattenCheckBoxParameters): value is FlattenListParameters {
+function isListItemFlattenParameters(key: string | number, value: FlattenParameterValue | FlattenListParameters | FlattenCheckBoxParameters): value is FlattenListParameters {
     return key === "listitem";
 }
 
@@ -460,9 +461,12 @@ type FlattenCheckBoxParameters = LuaArray<FlattenParameterValue>;
 
 export interface NamedParameters extends LuaObj<FlattenParameterValue | FlattenListParameters | FlattenCheckBoxParameters> {
     nocd?: number;
+    checkbox?: LuaArray<string>;
+    pertrait?: number;
+    listitem?: LuaObj<string>;
 }
 
-type PositionalParameters = LuaArray<FlattenParameterValue>;
+export type PositionalParameters = LuaArray<FlattenParameterValue>;
 type RawNamedParameters = LuaObj<Value>;
 type RawPositionalParameters = LuaArray<AstNode>;
 
@@ -2101,7 +2105,7 @@ class OvaleASTClass extends OvaleASTBase {
                 ok = false;
             }
         }
-        let node;
+        let node: AstNode;
         if (ok) {
             node = this.NewNode(nodeList);
             node.type = "spell_aura_list";
@@ -2110,12 +2114,10 @@ class OvaleASTClass extends OvaleASTBase {
             node.name = name;
             node.rawPositionalParams = positionalParams;
             node.rawNamedParams = namedParams;
-            annotation.parametersReference = annotation.parametersReference || {
-            }
+            annotation.parametersReference = annotation.parametersReference || {};
             annotation.parametersReference[lualength(annotation.parametersReference) + 1] = node;
             if (name) {
-                annotation.nameReference = annotation.nameReference || {
-                }
+                annotation.nameReference = annotation.nameReference || {};
                 annotation.nameReference[lualength(annotation.nameReference) + 1] = node;
             }
         }

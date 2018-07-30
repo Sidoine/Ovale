@@ -4,7 +4,7 @@ import { OvaleData } from "./Data";
 import { OvaleSpellBook }from "./SpellBook";
 import { OvaleState } from "./State";
 import aceEvent from "@wowts/ace_event-3.0";
-import { ipairs, pairs } from "@wowts/lua";
+import { ipairs, pairs, LuaObj, LuaArray } from "@wowts/lua";
 import { GetTotemInfo, AIR_TOTEM_SLOT, EARTH_TOTEM_SLOT, FIRE_TOTEM_SLOT, MAX_TOTEMS, WATER_TOTEM_SLOT } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
 import { SpellCast } from "./LastSpell";
@@ -16,13 +16,13 @@ export let OvaleTotem: OvaleTotemClass;
 const INFINITY = huge;
 
 let self_serial = 0;
-let TOTEM_CLASS = {
+let TOTEM_CLASS: LuaObj<boolean> = {
     DRUID: true,
     MAGE: true,
     MONK: true,
     SHAMAN: true
 }
-let TOTEM_SLOT = {
+let TOTEM_SLOT: LuaObj<number> = {
     air: AIR_TOTEM_SLOT,
     earth: EARTH_TOTEM_SLOT,
     fire: FIRE_TOTEM_SLOT,
@@ -31,8 +31,16 @@ let TOTEM_SLOT = {
 }
 let TOTEMIC_RECALL = 36936;
 
+interface Totem {
+    duration?: number;
+    start?: number;
+    serial?: number;
+    name?: string;
+    icon?: string;
+}
+
 class TotemData {
-    totem = {}
+    totem: LuaArray<Totem> = {}
 }
 
 let OvaleTotemBase = OvaleState.RegisterHasState(OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleTotem", aceEvent)), TotemData);

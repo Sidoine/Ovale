@@ -23,7 +23,7 @@ type ClassRole = "tank" | "spell" | "attack";
 type ClassType = string;
 
 
-interface Annotation {
+export interface Annotation {
     class?: ClassType;
     name?: string;
     specialization?: string;
@@ -39,7 +39,7 @@ interface Annotation {
     
     astAnnotation?: any;
     dictionaryAST?: any;
-    dictionary?: any;
+    dictionary?: LuaObj<number>;
     supportingFunctionCount?: number;
     supportingInterruptCount?: number;
     supportingControlCount?: number;
@@ -1144,7 +1144,7 @@ const OvaleFunctionName = function(name: string, annotation: Annotation) {
     }
     return functionName;
 }
-const AddSymbol = function(annotation: Annotation, symbol: string) {
+function AddSymbol(annotation: Annotation, symbol: string) {
     let symbolTable = annotation.symbolTable || {}
     let symbolList = annotation.symbolList || {};
     if (!symbolTable[symbol] && !OvaleData.DEFAULT_SPELL_LIST[symbol]) {
@@ -1193,130 +1193,22 @@ const GetPerClassSpecialization = function(tbl: LuaObj<LuaObj<LuaObj<{1: string,
 const AddDisambiguation = function(name: string, info: string, className?: string, specialization?: string, _type?: string) {
     AddPerClassSpecialization(EMIT_DISAMBIGUATION, name, info, className, specialization, _type);
 }
-function Disambiguate(name: string, className: string, specialization: string, _type?: string): [string, string] {
+function Disambiguate(annotation: Annotation, name: string, className: string, specialization: string, _type?: string): [string, string] {
     let [disname, distype] = GetPerClassSpecialization(EMIT_DISAMBIGUATION, name, className, specialization);
     if (!disname) {
+        if (!annotation.dictionary[name]) {
+            const otherName = name.replace("_buff", "").replace("_debuff", "");
+            if (annotation.dictionary[otherName]) {
+                return [otherName, _type];
+            }
+        }
         return [name, _type];
     }
+
     return [disname, distype];
 }
 const InitializeDisambiguation = function() {
-    AddDisambiguation("bloodlust_buff", "burst_haste_buff");
-    AddDisambiguation("trinket_proc_all_buff", "trinket_proc_any_buff");
-    AddDisambiguation("trinket_stack_proc_all_buff", "trinket_proc_any_buff");
-    AddDisambiguation("etheralus_the_eternal_reward", "legendary_ring_spirit", undefined, undefined, "Item");
-    AddDisambiguation("maalus_the_blood_drinker", "legendary_ring_agility", undefined, undefined, "Item");
-    AddDisambiguation("nithramus_the_allseer", "legendary_ring_intellect", undefined, undefined, "Item");
-    AddDisambiguation("sanctus_sigil_of_the_unbroken", "legendary_ring_bonus_armor", undefined, undefined, "Item");
-    AddDisambiguation("thorasus_the_stone_heart_of_draenor", "legendary_ring_strength", undefined, undefined, "Item");
-    AddDisambiguation("arcane_torrent", "arcane_torrent_runicpower", "DEATHKNIGHT");
-    AddDisambiguation("blood_fury", "blood_fury_ap", "DEATHKNIGHT");
-    AddDisambiguation("breath_of_sindragosa_debuff", "breath_of_sindragosa_buff", "DEATHKNIGHT");
-    AddDisambiguation("legendary_ring", "legendary_ring_bonus_armor", "DEATHKNIGHT", "blood", "Item");
-    AddDisambiguation("legendary_ring", "legendary_ring_strength", "DEATHKNIGHT", "frost", "Item");
-    AddDisambiguation("legendary_ring", "legendary_ring_strength", "DEATHKNIGHT", "unholy", "Item");
-    AddDisambiguation("arcane_torrent", "arcane_torrent_dh", "DEMONHUNTER");
-    AddDisambiguation("moonfire", "moonfire_cat", "DRUID", "feral");
-    AddDisambiguation("rejuvenation_debuff", "rejuvenation_buff", "DRUID");
-    AddDisambiguation("starsurge", "starsurge_moonkin", "DRUID", "balance");
-    AddDisambiguation("starfall_debuff", "starfall_buff", "DRUID", "balance");
-    AddDisambiguation("frenzied_regeneration_debuff", "frenzied_regeneration_buff", "DRUID", "guardian");
-    AddDisambiguation("thrash_debuff", "thrash_bear_debuff", "DRUID", "guardian");
-    AddDisambiguation("arcane_torrent", "arcane_torrent_focus", "HUNTER");
-    AddDisambiguation("beast_cleave", "pet_beast_cleave", "HUNTER", "beast_mastery");
-    AddDisambiguation("blood_fury", "blood_fury_ap", "HUNTER");
-    AddDisambiguation("cat_dire_frenzy", "pet_dire_frenzy", "HUNTER");
-    AddDisambiguation("focusing_shot", "focusing_shot_marksmanship", "HUNTER", "marksmanship");
-    AddDisambiguation("frenzy", "pet_frenzy", "HUNTER", "beast_mastery");
-    AddDisambiguation("legendary_ring", "legendary_ring_agility", "HUNTER", undefined, "Item");
-    AddDisambiguation("trueshot_debuff", "trueshot_buff", "HUNTER");
-    AddDisambiguation("arcane_torrent", "arcane_torrent_mana", "MAGE");
-    AddDisambiguation("arcane_charge_buff", "arcane_charge_debuff", "MAGE", "arcane");
-    AddDisambiguation("blood_fury", "blood_fury_sp", "MAGE");
-    AddDisambiguation("legendary_ring", "legendary_ring_intellect", "MAGE", undefined, "Item");
-    AddDisambiguation("water_jet", "water_elemental_water_jet", "MAGE", "frost");
-    AddDisambiguation("potion", "deadly_grace_potion", "MAGE", "arcane", "Item");
-    AddDisambiguation("potion", "prolonged_power_potion", "MAGE", "fire", "Item");
-    AddDisambiguation("potion", "prolonged_power_potion", "MAGE", "frost", "Item");
-    AddDisambiguation("potion_buff", "deadly_grace_potion_buff", "MAGE", "arcane");
-    AddDisambiguation("potion_buff", "prolonged_power_buff", "MAGE", "fire");
-    AddDisambiguation("potion_buff", "prolonged_power_buff", "MAGE", "frost");
-    AddDisambiguation("arcane_torrent", "arcane_torrent_chi", "MONK");
-    AddDisambiguation("blood_fury", "blood_fury_apsp", "MONK");
-    AddDisambiguation("chi_explosion", "chi_explosion_heal", "MONK", "mistweaver");
-    AddDisambiguation("chi_explosion", "chi_explosion_melee", "MONK", "windwalker");
-    AddDisambiguation("chi_explosion", "chi_explosion_tank", "MONK", "brewmaster");
-    AddDisambiguation("legendary_ring", "legendary_ring_agility", "MONK", "windwalker", "Item");
-    AddDisambiguation("legendary_ring", "legendary_ring_bonus_armor", "MONK", "brewmaster", "Item");
-    AddDisambiguation("legendary_ring", "legendary_ring_spirit", "MONK", "mistweaver", "Item");
-    AddDisambiguation("zen_sphere_debuff", "zen_sphere_buff", "MONK");
-    AddDisambiguation("arcane_torrent", "arcane_torrent_holy", "PALADIN");
-    AddDisambiguation("blood_fury", "blood_fury_apsp", "PALADIN");
-    AddDisambiguation("judgment_debuff", "judgment_ret_debuff", "PALADIN", "retribution");
-    AddDisambiguation("legendary_ring", "legendary_ring_bonus_armor", "PALADIN", "protection", "Item");
-    AddDisambiguation("legendary_ring", "legendary_ring_spirit", "PALADIN", "holy", "Item");
-    AddDisambiguation("legendary_ring", "legendary_ring_strength", "PALADIN", "retribution", "Item");
-    AddDisambiguation("sacred_shield_debuff", "sacred_shield_buff", "PALADIN");
-    AddDisambiguation("arcane_torrent", "arcane_torrent_mana", "PRIEST");
-    AddDisambiguation("blood_fury", "blood_fury_sp", "PRIEST");
-    AddDisambiguation("cascade", "cascade_caster", "PRIEST", "shadow");
-    AddDisambiguation("cascade", "cascade_heal", "PRIEST", "discipline");
-    AddDisambiguation("cascade", "cascade_heal", "PRIEST", "holy");
-    AddDisambiguation("devouring_plague_tick", "devouring_plague", "PRIEST");
-    AddDisambiguation("divine_star", "divine_star_caster", "PRIEST", "shadow");
-    AddDisambiguation("divine_star", "divine_star_heal", "PRIEST", "discipline");
-    AddDisambiguation("divine_star", "divine_star_heal", "PRIEST", "holy");
-    AddDisambiguation("halo", "halo_caster", "PRIEST", "shadow");
-    AddDisambiguation("halo", "halo_heal", "PRIEST", "discipline");
-    AddDisambiguation("halo", "halo_heal", "PRIEST", "holy");
-    AddDisambiguation("legendary_ring", "legendary_ring_intellect", "PRIEST", "shadow", "Item");
-    AddDisambiguation("legendary_ring", "legendary_ring_spirit", "PRIEST", "discipline", "Item");
-    AddDisambiguation("legendary_ring", "legendary_ring_spirit", "PRIEST", "holy", "Item");
-    AddDisambiguation("renew_debuff", "renew_buff", "PRIEST");
-    AddDisambiguation("arcane_torrent", "arcane_torrent_energy", "ROGUE");
-    AddDisambiguation("blood_fury", "blood_fury_ap", "ROGUE");
-    AddDisambiguation("legendary_ring", "legendary_ring_agility", "ROGUE", undefined, "Item");
-    AddDisambiguation("stealth_buff", "stealthed_buff", "ROGUE");
-    AddDisambiguation("roll_the_bones_debuff", "roll_the_bones_buff", "ROGUE");
-    AddDisambiguation("envenom_debuff", "envenom_buff", "ROGUE");
-    AddDisambiguation("vendetta_buff", "vendetta_debuff", "ROGUE", "assassination");
-    AddDisambiguation("exanguinate", "exsanguinate", "ROGUE", "assassination");
-    AddDisambiguation("deeper_strategem_talent", "deeper_stratagem_talent", "ROGUE", "subtlety");
-    AddDisambiguation("symbols_of_death_debuff","symbols_of_death_buff", 		"ROGUE")
-    AddDisambiguation("arcane_torrent", "arcane_torrent_mana", "SHAMAN");
-    AddDisambiguation("ascendance", "ascendance_elemental", "SHAMAN", "elemental");
-    AddDisambiguation("ascendance", "ascendance_enhancement", "SHAMAN", "enhancement");
-    AddDisambiguation("blood_fury", "blood_fury_apsp", "SHAMAN");
-    AddDisambiguation("legendary_ring", "legendary_ring_agility", "SHAMAN", "enhancement", "Item");
-    AddDisambiguation("legendary_ring", "legendary_ring_intellect", "SHAMAN", "elemental", "Item");
-    AddDisambiguation("legendary_ring", "legendary_ring_spirit", "SHAMAN", "restoration", "Item");
-    AddDisambiguation("lightning_bolt", "lightning_bolt_elemental", "SHAMAN", "elemental");
-    AddDisambiguation("lightning_bolt", "lightning_bolt_enhancement", "SHAMAN", "enhancement");
-    AddDisambiguation("unleashed_fury", "unleashed_fury_melee", "SHAMAN", "enhancement", "Item");
-    AddDisambiguation("strike", "stormstrike", "SHAMAN", "enhancement");
-    AddDisambiguation("arcane_torrent", "arcane_torrent_mana", "WARLOCK");
-    AddDisambiguation("blood_fury", "blood_fury_sp", "WARLOCK");
-    AddDisambiguation("dark_soul", "dark_soul_instability", "WARLOCK", "destruction");
-    AddDisambiguation("dark_soul", "dark_soul_knowledge", "WARLOCK", "demonology");
-    AddDisambiguation("dark_soul", "dark_soul_misery", "WARLOCK", "affliction");
-    AddDisambiguation("legendary_ring", "legendary_ring_intellect", "WARLOCK", undefined, "Item");
-    AddDisambiguation("life_tap_debuff", "empowered_life_tap_buff", "WARLOCK");
-    AddDisambiguation("soul_effigy_agony", "agony", "WARLOCK", "affliction");
-    AddDisambiguation("unstable_affliction_1_debuff", "unstable_affliction_debuff", "WARLOCK", "affliction");
-    AddDisambiguation("unstable_affliction_2_debuff", "unstable_affliction_debuff", "WARLOCK", "affliction");
-    AddDisambiguation("unstable_affliction_3_debuff", "unstable_affliction_debuff", "WARLOCK", "affliction");
-    AddDisambiguation("unstable_affliction_4_debuff", "unstable_affliction_debuff", "WARLOCK", "affliction");
-    AddDisambiguation("unstable_affliction_5_debuff", "unstable_affliction_debuff", "WARLOCK", "affliction");
-    AddDisambiguation("active_havoc_buff", "havoc_buff", "WARLOCK", "destruction");
-    AddDisambiguation("arcane_torrent", "arcane_torrent_rage", "WARRIOR");
-    AddDisambiguation("blood_fury", "blood_fury_ap", "WARRIOR");
-    AddDisambiguation("legendary_ring", "legendary_ring_bonus_armor", "WARRIOR", "protection");
-    AddDisambiguation("legendary_ring", "legendary_ring_strength", "WARRIOR", "arms", "Item");
-    AddDisambiguation("legendary_ring", "legendary_ring_strength", "WARRIOR", "fury", "Item");
-    AddDisambiguation("shield_barrier", "shield_barrier_melee", "WARRIOR", "arms");
-    AddDisambiguation("shield_barrier", "shield_barrier_melee", "WARRIOR", "fury");
-    AddDisambiguation("shield_barrier", "shield_barrier_tank", "WARRIOR", "protection");
-    AddDisambiguation("exhaustion_buff", "burst_haste_debuff");
+    AddDisambiguation("none", "none");
 
     //Death Knight
     AddDisambiguation("deaths_reach_talent", "deaths_reach_talent_unholy", "DEATHKNIGHT", "unholy");
@@ -1484,7 +1376,7 @@ SplitByTagAction = function (tag, node: FunctionNode, nodeList, annotation) {
     let actionType = node.func;
     if (actionType == "item" || actionType == "spell") {
         let firstParamNode = node.rawPositionalParams[1];
-        let id, name;
+        let id: number, name;
         if (firstParamNode.type == "variable") {
             name = firstParamNode.name;
             id = annotation.dictionary && annotation.dictionary[name];
@@ -1864,7 +1756,7 @@ const EmitModifier = function (modifier: string, parseNode: ParseNode, nodeList:
                     node = andNode;
                 } else {
                     OvaleSimulationCraft.Print("Warning: Unable to emit action for 'sync=%s'.", name);
-                    [name] = Disambiguate(name, className, specialization);
+                    [name] = Disambiguate(annotation, name, className, specialization);
                     AddSymbol(annotation, name);
                     code = format("Spell(%s)", name);
                 }
@@ -1889,7 +1781,7 @@ const EmitConditionNode = function (nodeList: LuaArray<AstNode>, bodyNode: AstNo
     let extraConditionNode = conditionNode;
     conditionNode = undefined;
     for (const [modifier, expressionNode] of pairs(parseNode.child)) {
-        let rhsNode = EmitModifier(modifier, expressionNode, nodeList, annotation, action);
+        let rhsNode = EmitModifier(<string>modifier, expressionNode, nodeList, annotation, action);
         if (rhsNode) {
             if (!conditionNode) {
                 conditionNode = rhsNode;
@@ -2064,7 +1956,7 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
     let specialization = annotation.specialization;
     let camelSpecialization = CamelSpecialization(annotation);
     let role = annotation.role;
-    let [action, type] = Disambiguate(canonicalizedName, className, specialization, "Spell");
+    let [action, type] = Disambiguate(annotation, canonicalizedName, className, specialization, "Spell");
     let bodyNode: AstNode;
     let conditionNode: AstNode;
     if (action == "auto_attack" && !annotation.melee) {
@@ -2392,11 +2284,11 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             if (modifier.slot) {
                 let slot = Unparse(modifier.slot);
                 if (truthy(match(slot, "finger"))) {
-                    [legendaryRing] = Disambiguate("legendary_ring", className, specialization);
+                    [legendaryRing] = Disambiguate(annotation, "legendary_ring", className, specialization);
                 }
             } else if (modifier.name) {
                 let name = Unparse(modifier.name);
-                [name] = Disambiguate(name, className, specialization);
+                [name] = Disambiguate(annotation, name, className, specialization);
                 if (truthy(match(name, "legendary_ring"))) {
                     legendaryRing = name;
                 }
@@ -2827,14 +2719,14 @@ EmitOperandAction = function (operand, parseNode, nodeList, annotation, action, 
     }
 
     let [className, specialization] = [annotation.class, annotation.specialization];
-    [name] = Disambiguate(name, className, specialization);
+    [name] = Disambiguate(annotation, name, className, specialization);
     target = target && (`${target}.`) || "";
     let buffName = `${name}_debuff`;
-    [buffName] = Disambiguate(buffName, className, specialization);
+    [buffName] = Disambiguate(annotation, buffName, className, specialization);
     let prefix = truthy(find(buffName, "_buff$")) && "Buff" || "Debuff";
     let buffTarget = (prefix == "Debuff") && "target." || target;
     let talentName = `${name}_talent`;
-    [talentName] = Disambiguate(talentName, className, specialization);
+    [talentName] = Disambiguate(annotation, talentName, className, specialization);
     let symbol = name;
     let code;
     if (property == "active") {
@@ -2936,9 +2828,9 @@ EmitOperandActiveDot = function (operand, parseNode, nodeList, annotation, actio
     let token = tokenIterator();
     if (token == "active_dot") {
         let name = tokenIterator();
-        [name] = Disambiguate(name, annotation.class, annotation.specialization);
+        [name] = Disambiguate(annotation, name, annotation.class, annotation.specialization);
         let dotName = `${name}_debuff`;
-        [dotName] = Disambiguate(dotName, annotation.class, annotation.specialization);
+        [dotName] = Disambiguate(annotation, dotName, annotation.class, annotation.specialization);
         let prefix = truthy(find(dotName, "_buff$")) && "Buff" || "Debuff";
         target = target && (`${target}.`) || "";
         let code = format("%sCountOnAny(%s)", prefix, dotName);
@@ -3009,7 +2901,7 @@ EmitOperandRefresh = function (operand, parseNode, nodeList, annotation, action,
     let token = tokenIterator();
     if (token == "refreshable") {
         let buffName = `${action}_debuff`;
-        [buffName] = Disambiguate(buffName, annotation.class, annotation.specialization);
+        [buffName] = Disambiguate(annotation, buffName, annotation.class, annotation.specialization);
         let target;
         let prefix = truthy(find(buffName, "_buff$")) && "Buff" || "Debuff";
         if (prefix == "Debuff") {
@@ -3035,9 +2927,9 @@ EmitOperandBuff = function (operand, parseNode, nodeList, annotation, action, ta
         if ((token == "consumable" && property == undefined)) {
             property = "remains";
         }
-        [name] = Disambiguate(name, annotation.class, annotation.specialization);
+        [name] = Disambiguate(annotation, name, annotation.class, annotation.specialization);
         let buffName = (token == "debuff") && `${name}_debuff` || `${name}_buff`;
-        [buffName] = Disambiguate(buffName, annotation.class, annotation.specialization);
+        [buffName] = Disambiguate(annotation, buffName, annotation.class, annotation.specialization);
         let prefix = truthy(find(buffName, "_buff$")) && "Buff" || "Debuff";
         let any = OvaleData.DEFAULT_SPELL_LIST[buffName] && " any=1" || "";
         target = target && (`${target}.`) || "";
@@ -3273,7 +3165,7 @@ EmitOperandCooldown = function (operand, parseNode, nodeList, annotation, action
         let name = tokenIterator();
         let property = tokenIterator();
         let prefix;
-        [name, prefix] = Disambiguate(name, annotation.class, annotation.specialization, "Spell");
+        [name, prefix] = Disambiguate(annotation, name, annotation.class, annotation.specialization, "Spell");
         let code;
         if (property == "execute_time") {
             code = format("ExecuteTime(%s)", name);
@@ -3352,9 +3244,9 @@ function EmitOperandGroundAoe(operand, parseNode, nodeList, annotation, action) 
     if (token == "ground_aoe") {
         let name = tokenIterator();
         let property = tokenIterator();
-        [name] = Disambiguate(name, annotation.class, annotation.specialization);
+        [name] = Disambiguate(annotation, name, annotation.class, annotation.specialization);
         let dotName = `${name}_debuff`;
-        [dotName] = Disambiguate(dotName, annotation.class, annotation.specialization);
+        [dotName] = Disambiguate(annotation, dotName, annotation.class, annotation.specialization);
         let prefix = truthy(find(dotName, "_buff$")) && "Buff" || "Debuff";
         const target = "";
         let code;
@@ -3382,9 +3274,9 @@ EmitOperandDot = function (operand, parseNode, nodeList, annotation, action, tar
     if (token == "dot") {
         let name = tokenIterator();
         let property = tokenIterator();
-        [name] = Disambiguate(name, annotation.class, annotation.specialization);
+        [name] = Disambiguate(annotation, name, annotation.class, annotation.specialization);
         let dotName = `${name}_debuff`;
-        [dotName] = Disambiguate(dotName, annotation.class, annotation.specialization);
+        [dotName] = Disambiguate(annotation, dotName, annotation.class, annotation.specialization);
         let prefix = truthy(find(dotName, "_buff$")) && "Buff" || "Debuff";
         target = target && (`${target}.`) || "";
         let code;
@@ -3429,9 +3321,9 @@ EmitOperandGlyph = function (operand, parseNode, nodeList, annotation, action) {
     if (token == "glyph") {
         let name = tokenIterator();
         let property = tokenIterator();
-        [name] = Disambiguate(name, annotation.class, annotation.specialization);
+        [name] = Disambiguate(annotation, name, annotation.class, annotation.specialization);
         let glyphName = `glyph_of_${name}`;
-        [glyphName] = Disambiguate(glyphName, annotation.class, annotation.specialization);
+        [glyphName] = Disambiguate(annotation, glyphName, annotation.class, annotation.specialization);
         let code;
         if (property == "disabled") {
             code = format("not Glyph(%s)", glyphName);
@@ -3458,7 +3350,7 @@ EmitOperandPet = function (operand, parseNode, nodeList, annotation, action) {
     if (token == "pet") {
         let name = tokenIterator();
         let property = tokenIterator();
-        [name] = Disambiguate(name, annotation.class, annotation.specialization);
+        [name] = Disambiguate(annotation, name, annotation.class, annotation.specialization);
         let isTotem = IsTotem(name);
         let code;
         if (isTotem && property == "active") {
@@ -3485,7 +3377,7 @@ EmitOperandPet = function (operand, parseNode, nodeList, annotation, action) {
                 }
                 if (!ok) {
                     let [petAbilityName] = match(petOperand, "^[%w_]+%.([^.]+)");
-                    [petAbilityName] = Disambiguate(petAbilityName, annotation.class, annotation.specialization);
+                    [petAbilityName] = Disambiguate(annotation, petAbilityName, annotation.class, annotation.specialization);
                     if (sub(petAbilityName, 1, 4) != "pet_") {
                         petOperand = gsub(petOperand, "^([%w_]+)%.", `%1.${name}_`);
                     }
@@ -3527,7 +3419,7 @@ EmitOperandPreviousSpell = function (operand, parseNode, nodeList, annotation, a
             howMany = tonumber(name);
             name = tokenIterator();
         }
-        [name] = Disambiguate(name, annotation.class, annotation.specialization);
+        [name] = Disambiguate(annotation, name, annotation.class, annotation.specialization);
         let code;
         if (token == "prev") {
             code = format("PreviousSpell(%s)", name);
@@ -3919,14 +3811,14 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
         code = `${target}Distance()`;
     } else if (sub(operand, 1, 9) == "equipped.") {
         let name = sub(operand, 10);
-        code = format("HasEquippedItem(%s)", name);
+        code = format("HasEquippedItem(%s_item)", name);
         AddSymbol(annotation, name);
     } else if (operand == "gcd.max") {
         code = "GCD()";
     } else if (operand == "gcd.remains") {
         code = "GCDRemaining()";
     } else if (sub(operand, 1, 15) == "legendary_ring.") {
-        let [name] = Disambiguate("legendary_ring", className, specialization);
+        let [name] = Disambiguate(annotation, "legendary_ring", className, specialization);
         let buffName = `${name}_buff`;
         let properties = sub(operand, 16);
         let tokenIterator = gmatch(properties, OPERAND_TOKEN_PATTERN);
@@ -3991,7 +3883,7 @@ EmitOperandTalent = function (operand, parseNode, nodeList, annotation, action) 
         let name = lower(tokenIterator());
         let property = tokenIterator();
         let talentName = `${name}_talent`;
-        [talentName] = Disambiguate(talentName, annotation.class, annotation.specialization);
+        [talentName] = Disambiguate(annotation, talentName, annotation.class, annotation.specialization);
         let code;
         if (property == "disabled") {
             if (parseNode.asType == "boolean") {
@@ -4089,7 +3981,7 @@ EmitOperandTrinket = function (operand, parseNode, nodeList, annotation, action)
         } else {
             let property = tokenIterator();
             let buffName = format("trinket_%s_%s_buff", procType, statName);
-            [buffName] = Disambiguate(buffName, annotation.class, annotation.specialization);
+            [buffName] = Disambiguate(annotation, buffName, annotation.class, annotation.specialization);
             if (property == "cooldown") {
                 code = format("BuffCooldownDuration(%s)", buffName);
             } else if (property == "cooldown_remains") {
@@ -4314,7 +4206,7 @@ const InsertInterruptFunction = function(child: LuaArray<AstNode>, annotation: A
     let camelSpecialization = CamelSpecialization(annotation);
     let spells = interrupts || {}
     if (OvaleData.BLOODELF_CLASSES[className]) {
-        const [name] = Disambiguate("arcane_torrent", className, specialization);
+        const [name] = Disambiguate(annotation, "arcane_torrent", className, specialization);
         insert(spells, {
             name: name,
             interrupt: 1,
@@ -5019,7 +4911,7 @@ const AddOptionalSkillCheckBox = function(child: LuaArray<AstNode>, annotation: 
 const InsertSupportingControls = function(child: LuaArray<AstNode>, annotation: Annotation) {
     let count = 0;
     for (const [skill, data] of pairs(OPTIONAL_SKILLS)) {
-        count = count + AddOptionalSkillCheckBox(child, annotation, data, skill);
+        count = count + AddOptionalSkillCheckBox(child, annotation, data, <string>skill);
     }
     let nodeList = annotation.astAnnotation.nodeList;
     let ifSpecialization = `specialization=${annotation.specialization}`;
@@ -5150,7 +5042,7 @@ const GenerateIconBody = function(tag: string, profile: Profile) {
         let output = self_outputPool.Get();
         output[lualength(output) + 1] = format("if List(opt_using_apl normal) %s()", defaultBodyName);
         for (const [name] of pairs(annotation.using_apl)) {
-            let aplName = OvaleFunctionName(name, annotation);
+            let aplName = OvaleFunctionName(<string>name, annotation);
             let [aplBodyName, ] = OvaleTaggedFunctionName(aplName, tag);
             output[lualength(output) + 1] = format("if List(opt_using_apl %s) %s()", name, aplBodyName);
         }
@@ -5213,12 +5105,13 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
         }
         profile.actionList = undefined;
     }
-    ParseProfile(simc: string) {
+    ParseProfile(simc: string, annotation?: Annotation) {
         let profile:Profile = {}
         for (const _line of gmatch(simc, "[^\r\n]+")) {
             let [line] = match(_line, "^%s*(.-)%s*$");
             if (!(truthy(match(line, "^#.*")) || truthy(match(line, "^$")))) {
-                let [key, operator, value] = match(line, "([^%+=]+)(%+?=)(.*)");
+                let [k, operator, value] = match(line, "([^%+=]+)(%+?=)(.*)");
+                const key = <keyof Profile>k;
                 if (operator == "=") {
                     profile[key] = value;
                 } else if (operator == "+=") {
@@ -5245,10 +5138,9 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
             }
         }
         let ok = true;
-        let annotation: Annotation = {}
-        let nodeList: ChildParseNode = {}
-        let actionList: LuaArray<ScNode> = {
-        }
+        annotation = annotation || {};
+        let nodeList: ChildParseNode = {};
+        let actionList: LuaArray<ScNode> = {};
         for (const [k, _v] of pairs(profile)) {
             let v = _v;
             if (ok && truthy(match(k, "^actions"))) {
@@ -5275,9 +5167,9 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
             return a.name < b.name;
         });
         for (const [className] of pairs(RAID_CLASS_COLORS)) {
-            let lowerClass = lower(className);
+            let lowerClass = <keyof Profile>lower(<string>className);
             if (profile[lowerClass]) {
-                annotation.class = className;
+                annotation.class = <string>className;
                 annotation.name = profile[lowerClass];
             }
         }
@@ -5357,7 +5249,8 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
                 OvaleDebug.ResetTrace();
                 let dictionaryAnnotation: AstAnnotation = {
                     nodeList: {
-                    }
+                    },
+                    definition: profile.annotation.dictionary
                 }
                 let dictionaryFormat = `
 				Include(ovale_common)
@@ -5538,7 +5431,7 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
         if (profile.annotation.symbolTable) {
             output[lualength(output) + 1] = "";
             output[lualength(output) + 1] = "### Required symbols";
-            sort(profile.annotation.symbolTable);
+            sort(profile.annotation.symbolList);
 
             for (const [, symbol] of ipairs(profile.annotation.symbolList)) {
                 if (!tonumber(symbol) && profile.annotation.dictionary && !profile.annotation.dictionary[symbol] && !OvaleData.buffSpellList[symbol]) {
