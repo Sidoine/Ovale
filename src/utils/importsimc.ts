@@ -122,7 +122,7 @@ for (const filename of files) {
                 dictionary: Object.assign({}, spellData.identifiers)
             };
             let profile = OvaleSimulationCraft.ParseProfile(simc, annotation);
-            let profileName = profile.annotation.name.substring(1, profile.annotation.name.length - 2);
+            let profileName = profile.annotation.name.substring(1, profile.annotation.name.length - 1);
             let name: string, desc: string;
             if (source) {
                 desc = format("%s: %s", source, profileName);
@@ -247,8 +247,8 @@ for (const [className, spellIds] of spellsByClass) {
     let output = `import { OvaleScripts } from "../Scripts";
 
     export function register() {
-        let name = "ovale_deathknight_spells";
-        let desc = "[8.0] Ovale: Death Knight spells";
+        let name = "ovale_${className.toLowerCase()}_spells";
+        let desc = "[8.0] Ovale: ${className} spells";
         let code = \`
 `;        
     for (const spellId of spellIds) {
@@ -275,6 +275,7 @@ for (const [className, spellIds] of spellsByClass) {
                         console.log(`Can't find spell ${effect.trigger_spell_id}`);
                         continue;
                     }
+                    if (spellIds.indexOf(triggerSpell.id) < 0) continue;
                     if (effect.targeting_1 > 1) {
                         output += `  SpellAddTargetDebuff(${spell.identifier} ${triggerSpell.identifier})\n`;
                     } else {
@@ -302,7 +303,7 @@ for (const [className, spellIds] of spellsByClass) {
     }
 
     output+=`    \`;
-        OvaleScripts.RegisterScript("DEATHKNIGHT", undefined, name, desc, code, "include");
+        OvaleScripts.RegisterScript("${className.toUpperCase()}", undefined, name, desc, code, "include");
     }
     `;
 
