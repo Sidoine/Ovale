@@ -24,7 +24,7 @@
             "program": "${workspaceFolder}/dist/utils/importsimc.js",
             "protocol": "inspector",
             "args": [
-                "c:/Users/Sidoine/Git/simc/profiles/Tier19P"
+                "c:/Users/Sidoine/Git/simc/"
             ],
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"

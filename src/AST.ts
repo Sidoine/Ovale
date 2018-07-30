@@ -2105,7 +2105,7 @@ class OvaleASTClass extends OvaleASTBase {
                 ok = false;
             }
         }
-        let node;
+        let node: AstNode;
         if (ok) {
             node = this.NewNode(nodeList);
             node.type = "spell_aura_list";
@@ -2114,12 +2114,10 @@ class OvaleASTClass extends OvaleASTBase {
             node.name = name;
             node.rawPositionalParams = positionalParams;
             node.rawNamedParams = namedParams;
-            annotation.parametersReference = annotation.parametersReference || {
-            }
+            annotation.parametersReference = annotation.parametersReference || {};
             annotation.parametersReference[lualength(annotation.parametersReference) + 1] = node;
             if (name) {
-                annotation.nameReference = annotation.nameReference || {
-                }
+                annotation.nameReference = annotation.nameReference || {};
                 annotation.nameReference[lualength(annotation.nameReference) + 1] = node;
             }
         }
