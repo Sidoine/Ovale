@@ -42,9 +42,10 @@ export interface PaperDollSnapshot {
     spellCrit?: number;
 
     hasteRating?: number;
-    meleeHaste?: number;
-    rangedHaste?: number;
-    spellHaste?: number;
+    hastePercent?: number;
+    meleeAttackSpeedPercent?: number;
+    rangedAttackSpeedPercent?: number;
+    spellCastSpeedPercent?: number;
 
     masteryRating?: number;
     masteryEffect?: number;

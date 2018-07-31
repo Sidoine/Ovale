@@ -24,6 +24,7 @@ local GetCombatRatingBonus = GetCombatRatingBonus
 local GetCritChance = GetCritChance
 local GetMastery = GetMastery
 local GetMasteryEffect = GetMasteryEffect
+local GetHaste = GetHaste
 local GetMeleeHaste = GetMeleeHaste
 local GetRangedCritChance = GetRangedCritChance
 local GetRangedHaste = GetRangedHaste
@@ -141,9 +142,10 @@ __exports.PaperDollData = __class(nil, {
         self.rangedCrit = 0
         self.spellCrit = 0
         self.hasteRating = 0
-        self.meleeHaste = 0
-        self.rangedHaste = 0
-        self.spellHaste = 0
+        self.hastePercent = 0
+        self.meleeAttackSpeedPercent = 0
+        self.rangedAttackSpeedPercent = 0
+        self.spellCastSpeedPercent = 0
         self.masteryRating = 0
         self.masteryEffect = 0
         self.versatilityRating = 0
@@ -202,6 +204,7 @@ local OvalePaperDollClass = __class(OvalePaperDollBase, {
         self.current.spellCrit = GetSpellCritChance(OVALE_SPELLDAMAGE_SCHOOL[self.class])
         self.current.critRating = GetCombatRating(CR_CRIT_MELEE)
         self.current.hasteRating = GetCombatRating(CR_HASTE_MELEE)
+        self.current.hastePercent = GetHaste()
         self.current.versatilityRating = GetCombatRating(CR_VERSATILITY_DAMAGE_DONE)
         self.current.versatility = GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_DONE)
         self.current.snapshotTime = GetTime()
@@ -266,7 +269,7 @@ local OvalePaperDollClass = __class(OvalePaperDollBase, {
     UNIT_RANGEDDAMAGE = function(self, event, unitId)
         if unitId == "player" then
             self:StartProfiling("OvalePaperDoll_UpdateStats")
-            self.current.rangedHaste = GetRangedHaste()
+            self.current.rangedAttackSpeedPercent = GetRangedHaste()
             self.current.snapshotTime = GetTime()
             Ovale:needRefresh()
             self:StopProfiling("OvalePaperDoll_UpdateStats")
@@ -285,8 +288,8 @@ local OvalePaperDollClass = __class(OvalePaperDollBase, {
     UNIT_SPELL_HASTE = function(self, event, unitId)
         if unitId == "player" then
             self:StartProfiling("OvalePaperDoll_UpdateStats")
-            self.current.meleeHaste = GetMeleeHaste()
-            self.current.spellHaste = UnitSpellHaste(unitId)
+            self.current.meleeAttackSpeedPercent = GetMeleeHaste()
+            self.current.spellCastSpeedPercent = UnitSpellHaste(unitId)
             self.current.snapshotTime = GetTime()
             Ovale:needRefresh()
             self:UpdateDamage(event)
@@ -369,27 +372,31 @@ local OvalePaperDollClass = __class(OvalePaperDollBase, {
         snapshot = snapshot or self.current
         return 1 + snapshot.masteryEffect / 100
     end,
-    GetMeleeHasteMultiplier = function(self, snapshot)
+    GetBaseHasteMultiplier = function(self, snapshot)
         snapshot = snapshot or self.current
-        return 1 + snapshot.meleeHaste / 100
+        return 1 + snapshot.hastePercent / 100
     end,
-    GetRangedHasteMultiplier = function(self, snapshot)
+    GetMeleeAttackSpeedPercentMultiplier = function(self, snapshot)
         snapshot = snapshot or self.current
-        return 1 + snapshot.rangedHaste / 100
+        return 1 + snapshot.meleeAttackSpeedPercent / 100
     end,
-    GetSpellHasteMultiplier = function(self, snapshot)
+    GetRangedAttackSpeedPercentMultiplier = function(self, snapshot)
         snapshot = snapshot or self.current
-        return 1 + snapshot.spellHaste / 100
+        return 1 + snapshot.rangedAttackSpeedPercent / 100
+    end,
+    GetSpellCastSpeedPercentMultiplier = function(self, snapshot)
+        snapshot = snapshot or self.current
+        return 1 + snapshot.spellCastSpeedPercent / 100
     end,
     GetHasteMultiplier = function(self, haste, snapshot)
         snapshot = snapshot or self.current
-        local multiplier = 1
+        local multiplier = self:GetBaseHasteMultiplier(snapshot) or 1
         if haste == "melee" then
-            multiplier = self:GetMeleeHasteMultiplier(snapshot)
+            multiplier = self:GetMeleeAttackSpeedPercentMultiplier(snapshot)
         elseif haste == "ranged" then
-            multiplier = self:GetRangedHasteMultiplier(snapshot)
+            multiplier = self:GetRangedAttackSpeedPercentMultiplier(snapshot)
         elseif haste == "spell" then
-            multiplier = self:GetSpellHasteMultiplier(snapshot)
+            multiplier = self:GetSpellCastSpeedPercentMultiplier(snapshot)
         end
         return multiplier
     end,
@@ -413,9 +420,10 @@ local OvalePaperDollClass = __class(OvalePaperDollBase, {
         self.next.rangedCrit = 0
         self.next.spellCrit = 0
         self.next.hasteRating = 0
-        self.next.meleeHaste = 0
-        self.next.rangedHaste = 0
-        self.next.spellHaste = 0
+        self.next.hastePercent = 0
+        self.next.meleeAttackSpeedPercent = 0
+        self.next.rangedAttackSpeedPercent = 0
+        self.next.spellCastSpeedPercent = 0
         self.next.masteryRating = 0
         self.next.masteryEffect = 0
         self.next.versatilityRating = 0
@@ -447,9 +455,10 @@ local OvalePaperDollClass = __class(OvalePaperDollBase, {
             rangedCrit = true,
             spellCrit = true,
             hasteRating = true,
-            meleeHaste = true,
-            rangedHaste = true,
-            spellHaste = true,
+            hastePercent = true,
+            meleeAttackSpeedPercent = true,
+            rangedAttackSpeedPercent = true,
+            spellCastSpeedPercent = true,
             masteryRating = true,
             masteryEffect = true,
             versatilityRating = true,
