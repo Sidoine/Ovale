@@ -1210,6 +1210,30 @@ function Disambiguate(annotation: Annotation, name: string, className: string, s
 const InitializeDisambiguation = function() {
     AddDisambiguation("none", "none");
 
+    //Arcane Torrent
+    AddDisambiguation("arcane_torrent", "arcane_torrent_runicpower", "DEATHKNIGHT");
+    AddDisambiguation("arcane_torrent", "arcane_torrent_dh", "DEMONHUNTER");
+    AddDisambiguation("arcane_torrent", "arcane_torrent_energy", "DRUID");
+    AddDisambiguation("arcane_torrent", "arcane_torrent_focus", "HUNTER");
+    AddDisambiguation("arcane_torrent", "arcane_torrent_mana", "MAGE");
+    AddDisambiguation("arcane_torrent", "arcane_torrent_chi", "MONK");
+    AddDisambiguation("arcane_torrent", "arcane_torrent_holy", "PALADIN");
+    AddDisambiguation("arcane_torrent", "arcane_torrent_mana", "PRIEST");
+    AddDisambiguation("arcane_torrent", "arcane_torrent_energy", "ROGUE");
+    AddDisambiguation("arcane_torrent", "arcane_torrent_mana", "SHAMAN");
+    AddDisambiguation("arcane_torrent", "arcane_torrent_mana", "WARLOCK");
+    AddDisambiguation("arcane_torrent", "arcane_torrent_rage", "WARRIOR");
+
+    //Blood Fury
+    AddDisambiguation("blood_fury", "blood_fury_ap", "DEATHKNIGHT");
+    AddDisambiguation("blood_fury", "blood_fury_ap", "HUNTER");
+    AddDisambiguation("blood_fury", "blood_fury_sp", "MAGE");
+    AddDisambiguation("blood_fury", "blood_fury_apsp", "MONK");
+    AddDisambiguation("blood_fury", "blood_fury_ap", "ROGUE");
+    AddDisambiguation("blood_fury", "blood_fury_apsp", "SHAMAN");
+    AddDisambiguation("blood_fury", "blood_fury_sp", "WARLOCK");
+    AddDisambiguation("blood_fury", "blood_fury_ap", "WARRIOR");
+
     //Death Knight
     AddDisambiguation("deaths_reach_talent", "deaths_reach_talent_unholy", "DEATHKNIGHT", "unholy");
     AddDisambiguation("grip_of_the_dead_talent", "grip_of_the_dead_talent_unholy", "DEATHKNIGHT", "unholy");
@@ -1267,16 +1291,22 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("soul_conduit_talent", "soul_conduit_talent_demonology", "WARLOCK", "demonology");
 
     //Warrior
-    AddDisambiguation("anger_management_talent", "anger_management_talent_fury", "WARRIOR", "fury");
-    AddDisambiguation("bounding_stride_talent", "bounding_stride_talent_protection", "WARRIOR", "protection");
-    AddDisambiguation("dragon_roar_talent", "dragon_roar_talent_protection", "WARRIOR", "protection");
-    AddDisambiguation("massacre_talent", "massacre_talent_arms", "WARRIOR", "arms");
-    AddDisambiguation("storm_bolt_talent", "storm_bolt_talent_protection", "WARRIOR", "protection");
-    AddDisambiguation("sudden_death_talent", "sudden_death_talent_fury", "WARRIOR", "fury");
+    AddDisambiguation("anger_management_talent", "fury_anger_management_talent", "WARRIOR", "fury");
     AddDisambiguation("bladestorm", "bladestorm_arms", "WARRIOR", "arms");
     AddDisambiguation("bladestorm", "bladestorm_fury", "WARRIOR", "fury");
+    AddDisambiguation("bounding_stride_talent", "prot_bounding_stride_talent", "WARRIOR", "protection");
+    AddDisambiguation("deep_wounds_debuff", "deep_wounds_arms_debuff", "WARRIOR", "arms")
+    AddDisambiguation("deep_wounds_debuff", "deep_wounds_prot_debuff", "WARRIOR", "protection")
+    AddDisambiguation("dragon_roar_talent", "prot_dragon_roar_talent", "WARRIOR", "protection");
     AddDisambiguation("execute", "execute_arms", "WARRIOR", "arms");
+    AddDisambiguation("ravager", "ravager_prot", "WARRIOR", "protection");
+    AddDisambiguation("massacre_talent", "arms_massacre_talent", "WARRIOR", "arms");
+    AddDisambiguation("storm_bolt_talent", "prot_storm_bolt_talent", "WARRIOR", "protection");
+    AddDisambiguation("sudden_death_buff","sudden_death_arms_buff", "WARRIOR", "arms")
+    AddDisambiguation("sudden_death_buff","sudden_death_fury_buff", "WARRIOR", "fury")
+    AddDisambiguation("sudden_death_talent", "fury_sudden_death_talent", "WARRIOR", "fury");
     AddDisambiguation("whirlwind", "whirlwind_arms", "WARRIOR", "arms");
+    AddDisambiguation("meat_cleaver", "whirlwind", "WARRIOR", "fury")
 }
 const IsTotem = function(name: string) {
     if (sub(name, 1, 13) == "wild_mushroom") {
