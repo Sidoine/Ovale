@@ -1096,7 +1096,7 @@ local function Disambiguate(annotation, name, className, specialization, _type)
     local disname, distype = GetPerClassSpecialization(EMIT_DISAMBIGUATION, name, className, specialization)
     if  not disname then
         if  not annotation.dictionary[name] then
-            local otherName = name:replace("_buff", ""):replace("_debuff", "")
+            local otherName = name:match("_buff$") and gsub(name, "_buff$", "") or gsub(name, "_debuff$", "")
             if annotation.dictionary[otherName] then
                 return otherName, _type
             end

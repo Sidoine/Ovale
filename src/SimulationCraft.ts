@@ -1197,7 +1197,7 @@ function Disambiguate(annotation: Annotation, name: string, className: string, s
     let [disname, distype] = GetPerClassSpecialization(EMIT_DISAMBIGUATION, name, className, specialization);
     if (!disname) {
         if (!annotation.dictionary[name]) {
-            const otherName = name.replace("_buff", "").replace("_debuff", "");
+            let otherName = name.match("_buff$") && gsub(name, "_buff$", "") || gsub(name, "_debuff$", "")
             if (annotation.dictionary[otherName]) {
                 return [otherName, _type];
             }
