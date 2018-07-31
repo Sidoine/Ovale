@@ -3812,7 +3812,7 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
     } else if (sub(operand, 1, 9) == "equipped.") {
         let name = sub(operand, 10);
         code = format("HasEquippedItem(%s_item)", name);
-        AddSymbol(annotation, name);
+        AddSymbol(annotation, `${name}_item`);
     } else if (operand == "gcd.max") {
         code = "GCD()";
     } else if (operand == "gcd.remains") {

@@ -3692,7 +3692,7 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
     elseif sub(operand, 1, 9) == "equipped." then
         local name = sub(operand, 10)
         code = format("HasEquippedItem(%s_item)", name)
-        AddSymbol(annotation, name)
+        AddSymbol(annotation, name .. "_item")
     elseif operand == "gcd.max" then
         code = "GCD()"
     elseif operand == "gcd.remains" then
