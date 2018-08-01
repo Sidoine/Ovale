@@ -4094,16 +4094,6 @@ local InsertInterruptFunction = function(child, annotation, interrupts)
     local specialization = annotation.specialization
     local camelSpecialization = CamelSpecialization(annotation)
     local spells = interrupts or {}
-    if OvaleData.BLOODELF_CLASSES[className] then
-        local name = Disambiguate(annotation, "arcane_torrent", className, specialization)
-        insert(spells, {
-            name = name,
-            interrupt = 1,
-            worksOnBoss = 1,
-            order = 97,
-            range = "target.Distance(less 8)"
-        })
-    end
     if OvaleData.PANDAREN_CLASSES[className] then
         insert(spells, {
             name = "quaking_palm",

@@ -4235,16 +4235,6 @@ const InsertInterruptFunction = function(child: LuaArray<AstNode>, annotation: A
     let specialization = annotation.specialization;
     let camelSpecialization = CamelSpecialization(annotation);
     let spells = interrupts || {}
-    if (OvaleData.BLOODELF_CLASSES[className]) {
-        const [name] = Disambiguate(annotation, "arcane_torrent", className, specialization);
-        insert(spells, {
-            name: name,
-            interrupt: 1,
-            worksOnBoss: 1,
-            order: 97,
-            range: "target.Distance(less 8)"
-        });
-    }
     if (OvaleData.PANDAREN_CLASSES[className]) {
         insert(spells, {
             name: "quaking_palm",

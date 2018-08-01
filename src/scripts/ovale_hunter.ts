@@ -26,7 +26,6 @@ AddFunction BeastmasteryInterruptActions
  {
   if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
   if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
-  if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_focus)
   if target.InRange(counter_shot) and target.IsInterruptible() Spell(counter_shot)
  }
 }
@@ -325,7 +324,6 @@ AddFunction MarksmanshipInterruptActions
  {
   if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
   if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
-  if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_focus)
   if target.InRange(counter_shot) and target.IsInterruptible() Spell(counter_shot)
  }
 }
@@ -858,7 +856,6 @@ AddFunction SurvivalInterruptActions
  {
   if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
   if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
-  if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_focus)
   if target.InRange(muzzle) and target.IsInterruptible() Spell(muzzle)
  }
 }

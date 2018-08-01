@@ -134,7 +134,6 @@ AddFunction ShadowInterruptActions
  {
   if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
   if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
-  if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_mana)
   if target.InRange(mind_bomb) and not target.Classification(worldboss) and target.RemainingCastTime() > 2 Spell(mind_bomb)
   if target.InRange(silence) and target.IsInterruptible() Spell(silence)
  }
@@ -749,7 +748,6 @@ AddFunction ShadowInterruptActions
  {
   if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
   if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
-  if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_mana)
   if target.InRange(mind_bomb) and not target.Classification(worldboss) and target.RemainingCastTime() > 2 Spell(mind_bomb)
   if target.InRange(silence) and target.IsInterruptible() Spell(silence)
  }

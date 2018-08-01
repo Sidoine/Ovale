@@ -86,7 +86,6 @@ AddFunction BloodInterruptActions
 	{
 		if target.InRange(mind_freeze) and target.IsInterruptible() Spell(mind_freeze)
 		if target.InRange(asphyxiate) and not target.Classification(worldboss) Spell(asphyxiate)
-		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_runicpower)
 		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
 	}
 }
@@ -143,7 +142,6 @@ AddFunction FrostInterruptActions
  {
   if target.InRange(mind_freeze) and target.IsInterruptible() Spell(mind_freeze)
   if target.Distance(less 12) and not target.Classification(worldboss) Spell(blinding_sleet)
-  if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_runicpower)
   if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
  }
 }
@@ -813,7 +811,6 @@ AddFunction UnholyInterruptActions
  {
   if target.InRange(mind_freeze) and target.IsInterruptible() Spell(mind_freeze)
   if target.InRange(asphyxiate) and not target.Classification(worldboss) Spell(asphyxiate)
-  if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_runicpower)
   if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
  }
 }
@@ -1291,7 +1288,6 @@ AddFunction BloodInterruptActions
  {
   if target.InRange(mind_freeze) and target.IsInterruptible() Spell(mind_freeze)
   if target.InRange(asphyxiate) and not target.Classification(worldboss) Spell(asphyxiate)
-  if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_runicpower)
   if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
  }
 }
