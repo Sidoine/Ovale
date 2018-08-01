@@ -183,7 +183,7 @@ local OvaleRunesClass = __class(OvaleRunesBase, {
                     start = rune.endCooldown
                 end
             end
-            local duration = 10 / OvalePaperDoll:GetSpellHasteMultiplier(snapshot)
+            local duration = 10 / OvalePaperDoll:GetSpellCastSpeedPercentMultiplier(snapshot)
             consumedRune.startCooldown = start
             consumedRune.endCooldown = start + duration
             local runicpower = self.next.runicpower

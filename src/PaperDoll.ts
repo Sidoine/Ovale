@@ -7,7 +7,7 @@ import { OvaleState } from "./State";
 import { lastSpell, SpellCast, PaperDollSnapshot, SpellCastModule } from "./LastSpell";
 import aceEvent from "@wowts/ace_event-3.0";
 import { pairs, tonumber, type } from "@wowts/lua";
-import { GetCombatRating, GetCombatRatingBonus, GetCritChance, GetMastery, GetMasteryEffect, GetMeleeHaste, GetRangedCritChance, GetRangedHaste, GetSpecialization, GetSpellBonusDamage, GetSpellCritChance, GetTime, UnitAttackPower, UnitAttackSpeed, UnitDamage, UnitRangedDamage, UnitLevel, UnitRangedAttackPower, UnitSpellHaste, UnitStat, CR_CRIT_MELEE, CR_HASTE_MELEE, CR_VERSATILITY_DAMAGE_DONE } from "@wowts/wow-mock";
+import { GetCombatRating, GetCombatRatingBonus, GetCritChance, GetMastery, GetMasteryEffect, GetHaste, GetMeleeHaste, GetRangedCritChance, GetRangedHaste, GetSpecialization, GetSpellBonusDamage, GetSpellCritChance, GetTime, UnitAttackPower, UnitAttackSpeed, UnitDamage, UnitRangedDamage, UnitLevel, UnitRangedAttackPower, UnitSpellHaste, UnitStat, CR_CRIT_MELEE, CR_HASTE_MELEE, CR_VERSATILITY_DAMAGE_DONE } from "@wowts/wow-mock";
 
 export let OvalePaperDoll: OvalePaperDollClass;
 let OVALE_SPELLDAMAGE_SCHOOL = {
@@ -126,9 +126,10 @@ export class PaperDollData implements PaperDollSnapshot {
     spellCrit = 0;
 
     hasteRating = 0;
-    meleeHaste = 0;
-    rangedHaste = 0;
-    spellHaste = 0;
+    hastePercent = 0;
+    meleeAttackSpeedPercent = 0;
+    rangedAttackSpeedPercent = 0;
+    spellCastSpeedPercent = 0;
 
     masteryRating = 0;
     masteryEffect = 0;
@@ -168,9 +169,10 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
         spellCrit: true,
         
         hasteRating: true,
-        meleeHaste: true,
-        rangedHaste: true,
-        spellHaste: true,
+        hastePercent: true,
+        meleeAttackSpeedPercent: true,
+        rangedAttackSpeedPercent: true,
+        spellCastSpeedPercent: true,
 
         masteryRating: true,
         masteryEffect: true,
@@ -236,6 +238,7 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
         this.current.spellCrit = GetSpellCritChance(OVALE_SPELLDAMAGE_SCHOOL[this.class]);
         this.current.critRating = GetCombatRating(CR_CRIT_MELEE);
         this.current.hasteRating = GetCombatRating(CR_HASTE_MELEE);
+        this.current.hastePercent = GetHaste();
         this.current.versatilityRating = GetCombatRating(CR_VERSATILITY_DAMAGE_DONE);
         this.current.versatility = GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_DONE);
         this.current.snapshotTime = GetTime();
@@ -300,7 +303,7 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
     UNIT_RANGEDDAMAGE(event, unitId) {
         if (unitId == "player") {
             this.StartProfiling("OvalePaperDoll_UpdateStats");
-            this.current.rangedHaste = GetRangedHaste();
+            this.current.rangedAttackSpeedPercent = GetRangedHaste();
             this.current.snapshotTime = GetTime();
             Ovale.needRefresh();
             this.StopProfiling("OvalePaperDoll_UpdateStats");
@@ -319,8 +322,8 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
     UNIT_SPELL_HASTE(event, unitId) {
         if (unitId == "player") {
             this.StartProfiling("OvalePaperDoll_UpdateStats");
-            this.current.meleeHaste = GetMeleeHaste();
-            this.current.spellHaste = UnitSpellHaste(unitId);
+            this.current.meleeAttackSpeedPercent = GetMeleeHaste();
+            this.current.spellCastSpeedPercent = UnitSpellHaste(unitId);
             this.current.snapshotTime = GetTime();
             Ovale.needRefresh();
             this.UpdateDamage(event);
@@ -405,27 +408,31 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
         snapshot = snapshot || this.current;
         return 1 + snapshot.masteryEffect / 100;
     } 
-    GetMeleeHasteMultiplier(snapshot?:PaperDollSnapshot) {
+    GetBaseHasteMultiplier(snapshot?:PaperDollSnapshot) {
         snapshot = snapshot || this.current;
-        return 1 + snapshot.meleeHaste / 100;
+        return 1 + snapshot.hastePercent / 100;
     } 
-    GetRangedHasteMultiplier(snapshot?:PaperDollSnapshot) {
+    GetMeleeAttackSpeedPercentMultiplier(snapshot?:PaperDollSnapshot) {
         snapshot = snapshot || this.current;
-        return 1 + snapshot.rangedHaste / 100;
+        return 1 + snapshot.meleeAttackSpeedPercent / 100;
     } 
-    GetSpellHasteMultiplier(snapshot?:PaperDollSnapshot) {
+    GetRangedAttackSpeedPercentMultiplier(snapshot?:PaperDollSnapshot) {
         snapshot = snapshot || this.current;
-        return 1 + snapshot.spellHaste / 100;
+        return 1 + snapshot.rangedAttackSpeedPercent / 100;
+    } 
+    GetSpellCastSpeedPercentMultiplier(snapshot?:PaperDollSnapshot) {
+        snapshot = snapshot || this.current;
+        return 1 + snapshot.spellCastSpeedPercent / 100;
     } 
     GetHasteMultiplier(haste: string, snapshot:PaperDollSnapshot) {
         snapshot = snapshot || this.current;
-        let multiplier = 1;
+        let multiplier = this.GetBaseHasteMultiplier(snapshot) || 1;
         if (haste == "melee") {
-            multiplier = this.GetMeleeHasteMultiplier(snapshot);
+            multiplier = this.GetMeleeAttackSpeedPercentMultiplier(snapshot);
         }  else if (haste == "ranged") {
-            multiplier = this.GetRangedHasteMultiplier(snapshot);
+            multiplier = this.GetRangedAttackSpeedPercentMultiplier(snapshot);
         }  else if (haste == "spell") {
-            multiplier = this.GetSpellHasteMultiplier(snapshot);
+            multiplier = this.GetSpellCastSpeedPercentMultiplier(snapshot);
         }
         return multiplier;
     }
@@ -467,9 +474,10 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
         this.next.spellCrit = 0;
 
         this.next.hasteRating = 0;
-        this.next.meleeHaste = 0;
-        this.next.rangedHaste = 0;
-        this.next.spellHaste = 0;
+        this.next.hastePercent = 0;
+        this.next.meleeAttackSpeedPercent = 0;
+        this.next.rangedAttackSpeedPercent = 0;
+        this.next.spellCastSpeedPercent = 0;
 
         this.next.masteryRating = 0;
         this.next.masteryEffect = 0;
