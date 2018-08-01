@@ -930,24 +930,19 @@ end
 do
 local function HasEquippedItem(positionalParams, namedParams, state, atTime)
         local itemId, yesno = positionalParams[1], positionalParams[2]
-        local ilevel, slot = namedParams.ilevel, namedParams.slot
         local boolean = false
         local slotId
         if type(itemId) == "number" then
-            slotId = OvaleEquipment:HasEquippedItem(itemId, slot)
+            slotId = OvaleEquipment:HasEquippedItem(itemId)
             if slotId then
-                if  not ilevel or (ilevel and ilevel == OvaleEquipment:GetEquippedItemLevel(slotId)) then
-                    boolean = true
-                end
+                boolean = true
             end
         elseif OvaleData.itemList[itemId] then
             for _, v in pairs(OvaleData.itemList[itemId]) do
-                slotId = OvaleEquipment:HasEquippedItem(v, slot)
+                slotId = OvaleEquipment:HasEquippedItem(v)
                 if slotId then
-                    if  not ilevel or (ilevel and ilevel == OvaleEquipment:GetEquippedItemLevel(slotId)) then
-                        boolean = true
-                        break
-                    end
+                    boolean = true
+                    break
                 end
             end
         end
@@ -988,25 +983,6 @@ local function HasTrinket(positionalParams, namedParams, state, atTime)
         return TestBoolean(boolean ~= nil, yesno)
     end
     OvaleCondition:RegisterCondition("hastrinket", false, HasTrinket)
-end
-do
-local function HasWeapon(positionalParams, namedParams, state, atTime)
-        local hand, yesno = positionalParams[1], positionalParams[2]
-        local weaponType = namedParams.type
-        local boolean = false
-        if weaponType == "one_handed" then
-            weaponType = 1
-        elseif weaponType == "two_handed" then
-            weaponType = 2
-        end
-        if hand == "offhand" or hand == "off" then
-            boolean = OvaleEquipment:HasOffHandWeapon(weaponType)
-        elseif hand == "mainhand" or hand == "main" then
-            boolean = OvaleEquipment:HasMainHandWeapon(weaponType)
-        end
-        return TestBoolean(boolean, yesno)
-    end
-    OvaleCondition:RegisterCondition("hasweapon", false, HasWeapon)
 end
 do
 local function Health(positionalParams, namedParams, state, atTime)
@@ -1789,7 +1765,7 @@ local function SpellHaste(positionalParams, namedParams, state, atTime)
         return Snapshot("spellHaste", 0, positionalParams, namedParams, state, atTime)
     end
 local function Spellpower(positionalParams, namedParams, state, atTime)
-        return Snapshot("spellBonusDamage", 0, positionalParams, namedParams, state, atTime)
+        return Snapshot("spellPower", 0, positionalParams, namedParams, state, atTime)
     end
 local function Spirit(positionalParams, namedParams, state, atTime)
         return Snapshot("spirit", 0, positionalParams, namedParams, state, atTime)
@@ -2368,23 +2344,23 @@ local function True(positionalParams, namedParams, state, atTime)
     OvaleCondition:RegisterCondition("true", false, True)
 end
 do
-local function WeaponDamage(positionalParams, namedParams, state, atTime)
+local function WeaponDPS(positionalParams, namedParams, state, atTime)
         local hand = positionalParams[1]
         local comparator, limit
         local value = 0
         if hand == "offhand" or hand == "off" then
             comparator, limit = positionalParams[2], positionalParams[3]
-            value = OvalePaperDoll.next.offHandWeaponDamage
+            value = OvalePaperDoll.next.offHandWeaponDPS
         elseif hand == "mainhand" or hand == "main" then
             comparator, limit = positionalParams[2], positionalParams[3]
-            value = OvalePaperDoll.next.mainHandWeaponDamage
+            value = OvalePaperDoll.next.mainHandWeaponDPS
         else
             comparator, limit = positionalParams[1], positionalParams[2]
-            value = OvalePaperDoll.next.mainHandWeaponDamage
+            value = OvalePaperDoll.next.mainHandWeaponDPS
         end
         return Compare(value, comparator, limit)
     end
-    OvaleCondition:RegisterCondition("weapondamage", false, WeaponDamage)
+    OvaleCondition:RegisterCondition("weapondps", false, WeaponDPS)
 end
 do
 local function WeaponEnchantExpires(positionalParams, namedParams, state, atTime)

@@ -3,7 +3,7 @@ import { OvaleDebug } from "./Debug";
 import { OvaleProfiler } from "./Profiler";
 import { Ovale } from "./Ovale";
 import aceEvent from "@wowts/ace_event-3.0";
-import { ipairs, pairs, tonumber, tostring, wipe, lualength } from "@wowts/lua";
+import { ipairs, pairs, tonumber, tostring, wipe, lualength, LuaArray } from "@wowts/lua";
 import { match, gsub } from "@wowts/string";
 import { concat, insert, sort } from "@wowts/table";
 import { GetActiveSpecGroup, GetFlyoutInfo, GetFlyoutSlotInfo, GetSpellBookItemInfo, GetSpellInfo, GetSpellLink, GetSpellTabInfo, GetSpellTexture, GetTalentInfo, HasPetSpells, IsHarmfulSpell, IsHelpfulSpell, BOOKTYPE_PET, BOOKTYPE_SPELL, MAX_TALENT_TIERS, NUM_TALENT_COLUMNS } from "@wowts/wow-mock";

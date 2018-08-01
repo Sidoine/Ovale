@@ -23,27 +23,37 @@ export interface SpellCast extends PaperDollSnapshot {
 
 export interface PaperDollSnapshot {
     snapshotTime?: number;
+
+    strength?: number;
     agility?: number;
     intellect?: number;
-    spirit?: number;
     stamina?: number;
-    strength?: number;
+    // spirit?: number;
+
     attackPower?: number;
-    rangedAttackPower?: number;
-    spellBonusDamage?: number;
-    spellBonusHealing?: number;
-    masteryEffect?: number;
-    meleeCrit?: number;
-    meleeHaste?: number;
-    rangedCrit?: number;
-    rangedHaste?: number;
-    spellCrit?: number;
-    spellHaste?: number;
+    spellPower?: number;
+    //rangedAttackPower?: number;
+    //spellBonusDamage?: number;
+    //spellBonusHealing?: number;
+
     critRating?: number;
+    meleeCrit?: number;
+    rangedCrit?: number;
+    spellCrit?: number;
+
     hasteRating?: number;
+    meleeHaste?: number;
+    rangedHaste?: number;
+    spellHaste?: number;
+
     masteryRating?: number;
-    mainHandWeaponDamage?: number;
-    offHandWeaponDamage?: number;
+    masteryEffect?: number;
+
+    versatilityRating?: number;
+    versatility?: number;
+
+    mainHandWeaponDPS?: number;
+    offHandWeaponDPS?: number;
     baseDamageMultiplier?: number;
 }
 

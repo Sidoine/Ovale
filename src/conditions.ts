@@ -1567,33 +1567,22 @@ function GetHastedTime(seconds, haste, state: BaseState) {
 	 @param yesno Optional. If yes, then return true if the item is equipped. If no, then return true if it isn't equipped.
 	     Default is yes.
 	     Valid values: yes, no.
-	 @param ilevel Optional.  Checks the item level of the equipped item.  If not specified, then any item level is valid.
-	     Defaults to not specified.
-	     Valid values: ilevel=N, where N is any number.
-	 @param slot Optional. Sets the inventory slot to check.  If not specified, then all slots are checked.
-	     Defaults to not specified.
-	     Valid values: slot=SLOTNAME, where SLOTNAME is a valid slot name, e.g., HandSlot.
      */
     function HasEquippedItem(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [itemId, yesno] = [positionalParams[1], positionalParams[2]];
-        let [ilevel, slot] = [namedParams.ilevel, namedParams.slot];
         let boolean = false;
         let slotId;
         if (type(itemId) == "number") {
-            slotId = OvaleEquipment.HasEquippedItem(itemId, slot);
+            slotId = OvaleEquipment.HasEquippedItem(itemId);
             if (slotId) {
-                if (!ilevel || (ilevel && ilevel == OvaleEquipment.GetEquippedItemLevel(slotId))) {
-                    boolean = true;
-                }
+                boolean = true;
             }
         } else if (OvaleData.itemList[itemId]) {
             for (const [, v] of pairs(OvaleData.itemList[itemId])) {
-                slotId = OvaleEquipment.HasEquippedItem(v, slot);
+                slotId = OvaleEquipment.HasEquippedItem(v);
                 if (slotId) {
-                    if (!ilevel || (ilevel && ilevel == OvaleEquipment.GetEquippedItemLevel(slotId))) {
-                        boolean = true;
-                        break;
-                    }
+                    boolean = true;
+                    break;
                 }
             }
         }
@@ -1668,6 +1657,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     }
     OvaleCondition.RegisterCondition("hastrinket", false, HasTrinket);
 }
+/* Should no longer be necessary
 {
     /**  Test if the player has a weapon equipped.
 	 @name HasWeapon
@@ -1683,7 +1673,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
 	 @return A boolean value.
 	 @usage
 	 if HasWeapon(offhand) and BuffStacks(killing_machine) Spell(frost_strike)
-     */
+     */ /*
     function HasWeapon(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [hand, yesno] = [positionalParams[1], positionalParams[2]];
         let weaponType = namedParams.type;
@@ -1702,6 +1692,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     }
     OvaleCondition.RegisterCondition("hasweapon", false, HasWeapon);
 }
+*/
 {
     /** Get the current amount of health points of the target.
 	 @name Health
@@ -3673,7 +3664,7 @@ l    */
 	 @return A boolean value for the result of the comparison.
      */
     function Spellpower(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        return Snapshot("spellBonusDamage", 0, positionalParams, namedParams, state, atTime);
+        return Snapshot("spellPower", 0, positionalParams, namedParams, state, atTime);
     }
 
     /** Get the current spirit of the player.
@@ -4813,38 +4804,38 @@ l    */
     OvaleCondition.RegisterCondition("true", false, True);
 }
 {
-    /** The normalized weapon damage of the weapon in the given hand.
-	 @name WeaponDamage
+    /** The weapon DPS of the weapon in the given hand.
+	 @name WeaponDPS
 	 @paramsig number or boolean
 	 @param hand Optional. Sets which hand weapon.
 	     Defaults to main.
 	     Valid values: main, off
 	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	 @param number Optional. The number to compare against.
-	 @return The normalized weapon damage.
+	 @return The weapon DPS.
 	 @return A boolean value for the result of the comparison.
 	 @usage
-	 AddFunction MangleDamage {
-	     WeaponDamage() * 5 + 78
+	 AddFunction AbilityAttackPower {
+	    (AttackPower() + WeaponDPS() * 7)
 	 }
      */
-    function WeaponDamage(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
+    function WeaponDPS(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let hand = positionalParams[1];
         let comparator, limit;
         let value = 0;
         if (hand == "offhand" || hand == "off") {
             [comparator, limit] = [positionalParams[2], positionalParams[3]];
-            value = OvalePaperDoll.next.offHandWeaponDamage;
+            value = OvalePaperDoll.next.offHandWeaponDPS;
         } else if (hand == "mainhand" || hand == "main") {
             [comparator, limit] = [positionalParams[2], positionalParams[3]];
-            value = OvalePaperDoll.next.mainHandWeaponDamage;
+            value = OvalePaperDoll.next.mainHandWeaponDPS;
         } else {
             [comparator, limit] = [positionalParams[1], positionalParams[2]];
-            value = OvalePaperDoll.next.mainHandWeaponDamage;
+            value = OvalePaperDoll.next.mainHandWeaponDPS;
         }
         return Compare(value, comparator, limit);
     }
-    OvaleCondition.RegisterCondition("weapondamage", false, WeaponDamage);
+    OvaleCondition.RegisterCondition("weapondps", false, WeaponDPS);
 }
 {
     /** Test if the weapon imbue on the given weapon has expired or will expire after a given number of seconds.
