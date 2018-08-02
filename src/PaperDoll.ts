@@ -94,15 +94,16 @@ let OVALE_SPECIALIZATION_NAME = {
     }
 }
 
-const GetAppropriateDamage = function(unit)
+const GetAppropriateDamageMultiplier = function(unit)
 {
+    let damageMultiplier = 1;
 	if (OvaleEquipment.HasRangedWeapon()) {
-		let [, minDamage, maxDamage, , , percent] = UnitRangedDamage(unit);
-        return [minDamage, maxDamage, undefined, undefined, 0, 0, percent];
+		[, , , , , damageMultiplier] = UnitRangedDamage(unit);
     }
 	else {
-        return UnitDamage(unit);
+        [, , , , , damageMultiplier] = UnitDamage(unit);
     }
+    return damageMultiplier;
 }
 
 export class PaperDollData implements PaperDollSnapshot {
@@ -192,55 +193,77 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
    
     
     OnInitialize() {
-        this.RegisterEvent("COMBAT_RATING_UPDATE");
-        this.RegisterEvent("MASTERY_UPDATE");
-        this.RegisterEvent("PLAYER_ALIVE", "UpdateStats");
-        this.RegisterEvent("PLAYER_DAMAGE_DONE_MODS");
+        this.RegisterEvent("UNIT_STATS"); // Primary Stats (str, agi, sta, int)
+        this.RegisterEvent("COMBAT_RATING_UPDATE"); // Secondary Stats (crit, haste, vers)
+        this.RegisterEvent("MASTERY_UPDATE"); // Mastery
+        this.RegisterEvent("UNIT_ATTACK_POWER"); // Attack Power
+        this.RegisterEvent("UNIT_RANGED_ATTACK_POWER"); // Ranged Attack Power
+        this.RegisterEvent("SPELL_POWER_CHANGED"); // Spell Power
+        this.RegisterEvent("UNIT_DAMAGE", "UpdateDamage"); // Damage Multiplier
         this.RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateStats");
+        this.RegisterEvent("PLAYER_ALIVE", "UpdateStats");
         this.RegisterEvent("PLAYER_LEVEL_UP");
-        this.RegisterEvent("SPELL_POWER_CHANGED");
-        this.RegisterEvent("UNIT_ATTACK_POWER");
-        this.RegisterEvent("UNIT_DAMAGE", "UpdateDamage");
         this.RegisterEvent("UNIT_LEVEL");
-        this.RegisterEvent("UNIT_RANGEDDAMAGE");
-        this.RegisterEvent("UNIT_RANGED_ATTACK_POWER");
-        this.RegisterEvent("UNIT_SPELL_HASTE");
-        this.RegisterEvent("UNIT_STATS");
+        // this.RegisterEvent("UNIT_ATTACK_SPEED"); // Melee Haste (covered by COMBAT_RATING_UPDATE)
+        // this.RegisterEvent("UNIT_RANGEDDAMAGE"); // Ranged Haste (covered by COMBAT_RATING_UPDATE)
+        // this.RegisterEvent("UNIT_SPELL_HASTE"); // Spell Haste (covered by COMBAT_RATING_UPDATE)
+        // this.RegisterEvent("PLAYER_DAMAGE_DONE_MODS"); // SpellBonusHealing (not really needed; spell power covered by SPELL_POWER_CHANGED)
         this.RegisterMessage("Ovale_EquipmentChanged", "UpdateDamage");
-        this.RegisterMessage("Ovale_StanceChanged", "UpdateDamage");
+        // this.RegisterMessage("Ovale_StanceChanged", "UpdateDamage"); // Shouldn't be needed anymore, UNIT_DAMAGE covers it
         this.RegisterMessage("Ovale_TalentsChanged", "UpdateStats");
         lastSpell.RegisterSpellcastInfo(this);
     }
     OnDisable() {
         lastSpell.UnregisterSpellcastInfo(this);
+        this.UnregisterEvent("UNIT_STATS");
         this.UnregisterEvent("COMBAT_RATING_UPDATE");
         this.UnregisterEvent("MASTERY_UPDATE");
-        this.UnregisterEvent("PLAYER_ALIVE");
-        this.UnregisterEvent("PLAYER_DAMAGE_DONE_MODS");
-        this.UnregisterEvent("PLAYER_ENTERING_WORLD");
-        this.UnregisterEvent("PLAYER_LEVEL_UP");
-        this.UnregisterEvent("SPELL_POWER_CHANGED");
         this.UnregisterEvent("UNIT_ATTACK_POWER");
-        this.UnregisterEvent("UNIT_DAMAGE");
-        this.UnregisterEvent("UNIT_LEVEL");
-        this.UnregisterEvent("UNIT_RANGEDDAMAGE");
         this.UnregisterEvent("UNIT_RANGED_ATTACK_POWER");
-        this.UnregisterEvent("UNIT_SPELL_HASTE");
-        this.UnregisterEvent("UNIT_STATS");
+        this.UnregisterEvent("SPELL_POWER_CHANGED");
+        this.UnregisterEvent("UNIT_DAMAGE");
+        this.UnregisterEvent("PLAYER_ENTERING_WORLD");
+        this.UnregisterEvent("PLAYER_ALIVE");
+        this.UnregisterEvent("PLAYER_LEVEL_UP");
+        this.UnregisterEvent("UNIT_LEVEL");
+        // this.UnregisterEvent("UNIT_ATTACK_SPEED");
+        // this.UnregisterEvent("UNIT_RANGEDDAMAGE");
+        // this.UnregisterEvent("UNIT_SPELL_HASTE");
+        // this.UnregisterEvent("PLAYER_DAMAGE_DONE_MODS");
         this.UnregisterMessage("Ovale_EquipmentChanged");
         this.UnregisterMessage("Ovale_StanceChanged");
         this.UnregisterMessage("Ovale_TalentsChanged");
     }
+    UNIT_STATS(event, unitId) {
+        if (unitId == "player") {
+            this.StartProfiling("OvalePaperDoll_UpdateStats");
+            this.current.strength = UnitStat(unitId, 1);
+            this.current.agility = UnitStat(unitId, 2);
+            this.current.stamina = UnitStat(unitId, 3);
+            this.current.intellect = UnitStat(unitId, 4);
+            // this.current.spirit = 0;
+            this.current.snapshotTime = GetTime();
+            Ovale.needRefresh();
+            this.StopProfiling("OvalePaperDoll_UpdateStats");
+        }
+    }
     COMBAT_RATING_UPDATE(event) {
         this.StartProfiling("OvalePaperDoll_UpdateStats");
+        // Crit
+        this.current.critRating = GetCombatRating(CR_CRIT_MELEE);
         this.current.meleeCrit = GetCritChance();
         this.current.rangedCrit = GetRangedCritChance();
         this.current.spellCrit = GetSpellCritChance(OVALE_SPELLDAMAGE_SCHOOL[this.class]);
-        this.current.critRating = GetCombatRating(CR_CRIT_MELEE);
+        // Haste
         this.current.hasteRating = GetCombatRating(CR_HASTE_MELEE);
         this.current.hastePercent = GetHaste();
+        this.current.meleeAttackSpeedPercent = GetMeleeHaste();
+        this.current.rangedAttackSpeedPercent = GetRangedHaste();
+        this.current.spellCastSpeedPercent = UnitSpellHaste("player");
+        // Versatility
         this.current.versatilityRating = GetCombatRating(CR_VERSATILITY_DAMAGE_DONE);
         this.current.versatility = GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_DONE);
+
         this.current.snapshotTime = GetTime();
         Ovale.needRefresh();
         this.StopProfiling("OvalePaperDoll_UpdateStats");
@@ -257,28 +280,6 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
         this.current.snapshotTime = GetTime();
         this.StopProfiling("OvalePaperDoll_UpdateStats");
     }
-    PLAYER_LEVEL_UP(event, level, ...__args) {
-        this.StartProfiling("OvalePaperDoll_UpdateStats");
-        this.level = tonumber(level) || UnitLevel("player");
-        this.current.snapshotTime = GetTime();
-        Ovale.needRefresh();
-        this.DebugTimestamp("%s: level = %d", event, this.level);
-        this.StopProfiling("OvalePaperDoll_UpdateStats");
-    }
-    PLAYER_DAMAGE_DONE_MODS(event, unitId) {
-        this.StartProfiling("OvalePaperDoll_UpdateStats");
-        this.current.spellPower = GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[this.class]);
-        this.current.snapshotTime = GetTime();
-        Ovale.needRefresh();
-        this.StopProfiling("OvalePaperDoll_UpdateStats");
-    }
-    SPELL_POWER_CHANGED(event) {
-        this.StartProfiling("OvalePaperDoll_UpdateStats");
-        this.current.spellPower = GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[this.class]);
-        this.current.snapshotTime = GetTime();
-        Ovale.needRefresh();
-        this.StopProfiling("OvalePaperDoll_UpdateStats");
-    }
     UNIT_ATTACK_POWER(event, unitId) {
         if (unitId == "player" && !OvaleEquipment.HasRangedWeapon()) {
             this.StartProfiling("OvalePaperDoll_UpdateStats");
@@ -290,6 +291,31 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
             this.StopProfiling("OvalePaperDoll_UpdateStats");
         }
     }
+    UNIT_RANGED_ATTACK_POWER(event, unitId) {
+        if (unitId == "player" && OvaleEquipment.HasRangedWeapon()) {
+            this.StartProfiling("OvalePaperDoll_UpdateStats");
+            let [base, posBuff, negBuff] = UnitRangedAttackPower(unitId);
+            Ovale.needRefresh();
+            this.current.attackPower = base + posBuff + negBuff;
+            this.current.snapshotTime = GetTime();
+            this.StopProfiling("OvalePaperDoll_UpdateStats");
+        }
+    }
+    SPELL_POWER_CHANGED(event) {
+        this.StartProfiling("OvalePaperDoll_UpdateStats");
+        this.current.spellPower = GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[this.class]);
+        this.current.snapshotTime = GetTime();
+        Ovale.needRefresh();
+        this.StopProfiling("OvalePaperDoll_UpdateStats");
+    }
+    PLAYER_LEVEL_UP(event, level, ...__args) {
+        this.StartProfiling("OvalePaperDoll_UpdateStats");
+        this.level = tonumber(level) || UnitLevel("player");
+        this.current.snapshotTime = GetTime();
+        Ovale.needRefresh();
+        this.DebugTimestamp("%s: level = %d", event, this.level);
+        this.StopProfiling("OvalePaperDoll_UpdateStats");
+    }
     UNIT_LEVEL(event, unitId) {
         Ovale.refreshNeeded[unitId] = true;
         if (unitId == "player") {
@@ -297,6 +323,17 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
             this.level = UnitLevel(unitId);
             this.DebugTimestamp("%s: level = %d", event, this.level);
             this.current.snapshotTime = GetTime();
+            this.StopProfiling("OvalePaperDoll_UpdateStats");
+        }
+    }
+    /*
+    UNIT_ATTACK_SPEED(event, unitId) {
+        if (unitId == "player") {
+            this.StartProfiling("OvalePaperDoll_UpdateStats");
+            this.current.meleeAttackSpeedPercent = GetMeleeHaste();
+            this.current.snapshotTime = GetTime();
+            Ovale.needRefresh();
+            this.UpdateDamage(event);
             this.StopProfiling("OvalePaperDoll_UpdateStats");
         }
     }
@@ -309,20 +346,9 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
             this.StopProfiling("OvalePaperDoll_UpdateStats");
         }
     }
-    UNIT_RANGED_ATTACK_POWER(event, unitId) {
-        if (unitId == "player") {
-            this.StartProfiling("OvalePaperDoll_UpdateStats");
-            let [base, posBuff, negBuff] = UnitRangedAttackPower(unitId);
-            Ovale.needRefresh();
-            this.current.attackPower = base + posBuff + negBuff;
-            this.current.snapshotTime = GetTime();
-            this.StopProfiling("OvalePaperDoll_UpdateStats");
-        }
-    }
     UNIT_SPELL_HASTE(event, unitId) {
         if (unitId == "player") {
             this.StartProfiling("OvalePaperDoll_UpdateStats");
-            this.current.meleeAttackSpeedPercent = GetMeleeHaste();
             this.current.spellCastSpeedPercent = UnitSpellHaste(unitId);
             this.current.snapshotTime = GetTime();
             Ovale.needRefresh();
@@ -330,37 +356,24 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
             this.StopProfiling("OvalePaperDoll_UpdateStats");
         }
     }
-    UNIT_STATS(event, unitId) {
-        if (unitId == "player") {
-            this.StartProfiling("OvalePaperDoll_UpdateStats");
-            this.current.strength = UnitStat(unitId, 1);
-            this.current.agility = UnitStat(unitId, 2);
-            this.current.stamina = UnitStat(unitId, 3);
-            this.current.intellect = UnitStat(unitId, 4);
-            // this.current.spirit = 0;
-            this.current.snapshotTime = GetTime();
-            Ovale.needRefresh();
-            this.StopProfiling("OvalePaperDoll_UpdateStats");
-        }
+    PLAYER_DAMAGE_DONE_MODS(event, unitId) {
+        this.StartProfiling("OvalePaperDoll_UpdateStats");
+        this.current.spellPower = GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[this.class]);
+        this.current.snapshotTime = GetTime();
+        Ovale.needRefresh();
+        this.StopProfiling("OvalePaperDoll_UpdateStats");
     }
-    UpdateDamage(event) { // Might need a better method?
+    */
+    UpdateDamage(event) {
         this.StartProfiling("OvalePaperDoll_UpdateDamage");
-        let [minDamage, maxDamage, minOffHandDamage, maxOffHandDamage, , , damageMultiplier] = GetAppropriateDamage("player");
-        let [mainHandAttackSpeed, offHandAttackSpeed] = UnitAttackSpeed("player");
+        let damageMultiplier = GetAppropriateDamageMultiplier("player");
+        // let [mainHandAttackSpeed, offHandAttackSpeed] = UnitAttackSpeed("player"); // Could add back if we need something like calculating next swing
 
         // Appartently, if the character is not loaded, it returns 0
-        if (damageMultiplier == 0 || mainHandAttackSpeed == 0) return;
+        if (damageMultiplier == 0) return;
         this.current.baseDamageMultiplier = damageMultiplier;
-
-        if (this.class == "DRUID" && OvaleStance.IsStance("druid_cat_form", undefined)) {
-            damageMultiplier = damageMultiplier * 1.4;
-        } 
-        this.current.mainHandWeaponDPS = (minDamage + maxDamage) * 0.5 / damageMultiplier / mainHandAttackSpeed;
-        if (offHandAttackSpeed) {
-            this.current.offHandWeaponDPS = (minOffHandDamage + maxOffHandDamage) * 0.5 / damageMultiplier / offHandAttackSpeed;
-        } else {
-            this.current.offHandWeaponDPS = 0;
-        } 
+        this.current.mainHandWeaponDPS = OvaleEquipment.mainHandDPS || 0;
+        this.current.offHandWeaponDPS = OvaleEquipment.offHandDPS || 0;
         this.current.snapshotTime = GetTime();
         Ovale.needRefresh();
         this.StopProfiling("OvalePaperDoll_UpdateDamage");
@@ -379,15 +392,16 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
     }
     UpdateStats(event) {
         this.UpdateSpecialization(event);
+        this.UNIT_STATS(event, "player");
         this.COMBAT_RATING_UPDATE(event);
         this.MASTERY_UPDATE(event);
-        this.PLAYER_DAMAGE_DONE_MODS(event, "player");
-        this.SPELL_POWER_CHANGED(event);
         this.UNIT_ATTACK_POWER(event, "player");
-        this.UNIT_RANGEDDAMAGE(event, "player");
         this.UNIT_RANGED_ATTACK_POWER(event, "player");
-        this.UNIT_SPELL_HASTE(event, "player");
-        this.UNIT_STATS(event, "player");
+        this.SPELL_POWER_CHANGED(event);
+        //this.PLAYER_DAMAGE_DONE_MODS(event, "player");
+        //this.UNIT_ATTACK_SPEED(event, "player");
+        //this.UNIT_RANGEDDAMAGE(event, "player");
+        //this.UNIT_SPELL_HASTE(event, "player");
         this.UpdateDamage(event);
     }
     GetSpecialization(specialization?) {

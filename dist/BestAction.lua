@@ -119,7 +119,7 @@ local function GetActionItemInfo(element, state, atTime, target)
     local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId
     local itemId = element.positionalParams[1]
     if  not isNumber(itemId) then
-        itemId = OvaleEquipment:GetEquippedItem(itemId)
+        itemId = OvaleEquipment:GetEquippedItemBySlotName(itemId)
     end
     if  not itemId then
         __exports.OvaleBestAction:Log("Unknown item '%s'.", element.positionalParams[1])

@@ -82,8 +82,8 @@ function GetHastedTime(seconds, haste, state: BaseState) {
 	@usage
 	if ArmorSetBonus(T16_melee 2) == 1 Spell(unleash_elements) */
     function ArmorSetBonus(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        let [armorSet, count] = [positionalParams[1], positionalParams[2]];
-        let value = (OvaleEquipment.GetArmorSetCount(armorSet) >= count) && 1 || 0;
+        Ovale.OneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0");
+        let value = 0;
         return [0, INFINITY, value, 0, 0];
     }
     OvaleCondition.RegisterCondition("armorsetbonus", false, ArmorSetBonus);
@@ -105,8 +105,9 @@ function GetHastedTime(seconds, haste, state: BaseState) {
 	if ArmorSetParts(T13 more 1) and TargetHealthPercent(less 60)
 	    Spell(ferocious_bite) */
     function ArmorSetParts(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        let [armorSet, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
-        let value = OvaleEquipment.GetArmorSetCount(armorSet);
+        let [, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
+        let value = 0;
+        Ovale.OneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0");
         return Compare(value, comparator, limit);
     }
     OvaleCondition.RegisterCondition("armorsetparts", false, ArmorSetParts);
@@ -2184,7 +2185,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     function ItemCooldown(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [itemId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
         if (itemId && type(itemId) != "number") {
-            itemId = OvaleEquipment.GetEquippedItem(itemId);
+            itemId = OvaleEquipment.GetEquippedItemBySlotName(itemId);
         }
         if (itemId) {
             let [start, duration] = GetItemCooldown(itemId);
