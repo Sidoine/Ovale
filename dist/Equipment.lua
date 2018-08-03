@@ -221,7 +221,10 @@ local OvaleEquipmentClass = __class(OvaleEquipmentBase, {
         local dps = 0
         local itemLink = GetInventoryItemLink("player", slotId)
         if itemLink then
-            dps = GetItemStats(itemLink)["ITEM_MOD_DAMAGE_PER_SECOND_SHORT"] or 0
+            local stats = GetItemStats(itemLink)
+            if stats then
+                dps = stats["ITEM_MOD_DAMAGE_PER_SECOND_SHORT"]
+            end
         end
         return itemEquipLoc, dps
     end,

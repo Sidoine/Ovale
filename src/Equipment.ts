@@ -260,7 +260,10 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
         let dps = 0;
         let itemLink = GetInventoryItemLink("player", slotId);
         if (itemLink) {
-            dps = GetItemStats(itemLink)["ITEM_MOD_DAMAGE_PER_SECOND_SHORT"] || 0;
+            let stats = GetItemStats(itemLink);
+            if (stats) {
+                dps = stats["ITEM_MOD_DAMAGE_PER_SECOND_SHORT"];
+            }
         }
         return [itemEquipLoc, dps]
     }
