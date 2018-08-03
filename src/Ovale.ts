@@ -107,7 +107,7 @@ export interface OvaleDb {
 
 const OvaleBase = NewAddon("Ovale", aceEvent);
 class OvaleClass extends OvaleBase {
-    playerClass = select(2, UnitClass("player"));
+    playerClass: string = select(2, UnitClass("player"));
     playerGUID: string = undefined;
     db: AceDatabase & OvaleDb = undefined;
     refreshNeeded:LuaObj<boolean> = {}

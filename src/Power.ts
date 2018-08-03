@@ -10,13 +10,13 @@ import { RegisterRequirement, UnregisterRequirement, CheckRequirements, Tokens }
 import { SpellCast } from "./LastSpell";
 import aceEvent from "@wowts/ace_event-3.0";
 import { ceil, huge as INFINITY, floor } from "@wowts/math";
-import { pairs, type, LuaObj, tostring, tonumber } from "@wowts/lua";
+import { pairs, LuaObj, tostring, tonumber } from "@wowts/lua";
 import { lower } from "@wowts/string";
 import { concat, insert } from "@wowts/table";
 import { GetPowerRegen, GetManaRegen, GetSpellPowerCost, UnitPower, UnitPowerMax, UnitPowerType, Enum, MAX_COMBO_POINTS } from "@wowts/wow-mock";
 import { OvalePaperDoll } from "./PaperDoll";
 import { baseState } from "./BaseState";
-import { isNumber } from "./tools";
+import { isNumber, isLuaArray } from "./tools";
 
 let strlower = lower;
 
@@ -211,7 +211,7 @@ class PowerModule {
         } else {
             Ovale.OneTimeMessage("Warning: requirement '%s' power is missing a cost argument.", requirement);
             Ovale.OneTimeMessage(tostring(index));
-            if (type(tokens) == "table") {
+            if (isLuaArray(tokens)) {
                 for (const [k, v] of pairs(tokens)) {
                     Ovale.OneTimeMessage(`${k} = ${tostring(v)}`);
                 }

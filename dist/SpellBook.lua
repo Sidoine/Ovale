@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/SpellBook", 10000)
+local __exports = LibStub:NewLibrary("ovale/SpellBook", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Localization = LibStub:GetLibrary("ovale/Localization")
@@ -185,8 +185,8 @@ local OvaleSpellBookClass = __class(OvaleSpellBookBase, {
                     self.spellbookId[bookType][id] = index
                     self:Debug("    %s (%d) is at offset %d (%s).", name, id, index, gsub(spellLink, "|", "_"))
                     if spellId and id ~= spellId then
-                        local name = GetSpellInfo(spellId)
-                        self.spell[spellId] = GetSpellInfo(spellId)
+                        local name = (skillType == "PETACTION") and spellName or GetSpellInfo(spellId)
+                        self.spell[spellId] = name
                         self.isHarmful[spellId] = self.isHarmful[id]
                         self.isHelpful[spellId] = self.isHelpful[id]
                         self.texture[spellId] = self.texture[id]
@@ -201,7 +201,7 @@ local OvaleSpellBookClass = __class(OvaleSpellBookBase, {
                     for flyoutIndex = 1, numSlots, 1 do
                         local id, overrideId, isKnown, spellName = GetFlyoutSlotInfo(flyoutId, flyoutIndex)
                         if isKnown then
-                            local name = GetSpellInfo(spellId)
+                            local name = GetSpellInfo(id)
                             self.spell[id] = name
                             self.isHarmful[id] = IsHarmfulSpell(spellName)
                             self.isHelpful[id] = IsHelpfulSpell(spellName)
@@ -209,7 +209,7 @@ local OvaleSpellBookClass = __class(OvaleSpellBookBase, {
                             self.spellbookId[bookType][id] = nil
                             self:Debug("    %s (%d) is at offset %d.", name, id, index)
                             if id ~= overrideId then
-                                local name = GetSpellInfo(spellId)
+                                local name = GetSpellInfo(overrideId)
                                 self.spell[overrideId] = name
                                 self.isHarmful[overrideId] = self.isHarmful[id]
                                 self.isHelpful[overrideId] = self.isHelpful[id]

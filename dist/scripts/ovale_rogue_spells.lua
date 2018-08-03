@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/scripts/ovale_rogue_spells", 10000)
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_rogue_spells", 80000)
 if not __exports then return end
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
@@ -52,8 +52,6 @@ Define(blade_flurry 13877)
 	SpellInfo(blade_flurry cd=10 gcd=0 offgcd=1)
 	SpellAddBuff(blade_flurry blade_flurry_buff=toggle)
 Define(blade_flurry_buff 13877)
-Define(blind 2094)
-	SpellInfo(blind cd=120 interrupt=1)
 Define(blunderbuss_buff 202895)
 Define(broadsides_buff 193356)
 Define(cannonball_barrage 185767)
@@ -64,8 +62,6 @@ Define(crippling_poison 3408)
 	SpellAddBuff(crippling_poison crippling_poison_buff=1)
 Define(crippling_poison_buff 3408)
 	SpellInfo(crippling_poison_buff duration=3600)
-Define(crimson_vial 185311)
-	SpellInfo(crimson_vial cd=30 gcd=0 offgcd=1 energy=30)
 Define(curse_of_the_dreadblades 202665)
 	SpellInfo(curse_of_the_dreadblades cd=90 tag=cd)
 Define(curse_of_the_dreadblades_buff 202665)
@@ -225,7 +221,7 @@ Define(shadow_blades 121471)
 Define(shadow_blades_buff 121471)
 	SpellInfo(shadow_blades_buff duration=15)
 Define(shadow_dance 185313)
-	SpellInfo(shadow_dance cd=60 gcd=0 charges=2)
+	SpellInfo(shadow_dance cd=60 gcd=0)
 	SpellInfo(shadow_dance energy=-60 itemset=T17 itemcount=2 specialization=subtlety)
 	SpellInfo(shadow_dance buff_cdr=cooldown_reduction_agility_buff)
 	SpellAddBuff(shadow_dance shadow_dance_buff=1)
@@ -333,11 +329,6 @@ Define(wound_poison 8679)
 	SpellAddBuff(wound_poison wound_poison_buff=1)
 Define(wound_poison_buff 8679)
 	SpellInfo(wound_poison_buff duration=3600)
-Define(virulent_poisons_buff 252277)
-	SpellInfo(virulent_poisons_buff duration=6)
-
-# Tier
-Define(shadow_gestures_buff 257945)	
 
 # Talents
 Define(acrobatic_strikes_talent 4)
@@ -387,11 +378,9 @@ Define(toxic_blade_talent 17)
 Define(venom_rush_talent 16)
 Define(vigor_talent 7)
 Define(weaponmaster_talent 1)
-Define(toxic_blade_talent 16)
 
 #Artifact traits
 Define(loaded_dice_buff 240837)
-Define(poison_knives 192376)
 
 #Legendaries
 Define(the_first_of_the_dead 151818)

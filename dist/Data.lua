@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Data", 10000)
+local __exports = LibStub:NewLibrary("ovale/Data", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Ovale = LibStub:GetLibrary("ovale/Ovale")
@@ -550,7 +550,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
         end
         return value * ratio
     end,
-    GetDamage = function(self, spellId, attackpower, spellpower, mainHandWeaponDamage, offHandWeaponDamage, combopoints)
+    GetDamage = function(self, spellId, attackpower, spellpower, mainHandWeaponDPS, offHandWeaponDPS, combopoints)
         local si = self.spellInfo[spellId]
         if  not si then
             return nil
@@ -558,14 +558,14 @@ local OvaleDataClass = __class(OvaleDataBase, {
         local damage = si.base or 0
         attackpower = attackpower or 0
         spellpower = spellpower or 0
-        mainHandWeaponDamage = mainHandWeaponDamage or 0
-        offHandWeaponDamage = offHandWeaponDamage or 0
+        mainHandWeaponDPS = mainHandWeaponDPS or 0
+        offHandWeaponDPS = offHandWeaponDPS or 0
         combopoints = combopoints or 0
         if si.bonusmainhand then
-            damage = damage + si.bonusmainhand * mainHandWeaponDamage
+            damage = damage + si.bonusmainhand * mainHandWeaponDPS
         end
         if si.bonusoffhand then
-            damage = damage + si.bonusoffhand * offHandWeaponDamage
+            damage = damage + si.bonusoffhand * offHandWeaponDPS
         end
         if si.bonuscp then
             damage = damage + si.bonuscp * combopoints

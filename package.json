@@ -1,12 +1,15 @@
 {
   "name": "ovale",
-  "version": "1.0.0",
+  "version": "8.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "tstolua -p tsconfig.lua.json",
-    "simc": "tsc && node dist/utils/importsimc.js ../../simc/profiles/Tier19P"
+    "simc": "node dist/utils/importsimc.js ../../simc",
+    "spells": "node dist/utils/importspells.js  ../../simc",
+    "watch": "tstolua -p tsconfig.lua.json -w",
+    "watch-tools": "tsc -w"
   },
   "author": "",
   "license": "ISC",
@@ -33,6 +36,7 @@
     "@wowts/lib_range_check-2.0": "^1.0.0",
     "@wowts/lib_text_dump-1.0": "^1.0.0",
     "@wowts/libactionbutton-1.0-elvui": "^1.0.1",
+    "@wowts/lua": "^1.2.0",
     "@wowts/masque": "^1.0.1",
     "@wowts/math": "^1.0.0",
     "@wowts/recount": "^1.0.0",
@@ -40,12 +44,11 @@
     "@wowts/table": "^1.0.1",
     "@wowts/tsaddon": "^1.1.2",
     "@wowts/tslib": "^1.0.1",
-    "@wowts/lua": "https://github.com/mwojtkowski/lua/tarball/master",
-    "@wowts/wow-mock": "https://github.com/mwojtkowski/wow-mock/tarball/master"
+    "@wowts/wow-mock": "^1.4.0"
   },
   "devDependencies": {
-    "@wowts/tstolua": "^1.1.0",
-    "tslint": "^5.10.0",
+    "@wowts/tstolua": "^1.2.0",
+    "tslint": "^5.7.0",
     "typescript": "^2.9.2"
   },
   "repository": {
