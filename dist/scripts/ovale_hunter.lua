@@ -377,7 +377,7 @@ AddFunction MarksmanshipDefaultCdPostConditions
 AddFunction MarksmanshipPrecombatMainActions
 {
  #hunters_mark
- Spell(hunters_mark)
+ if target.DebuffExpires(hunters_mark_debuff) Spell(hunters_mark)
  #aimed_shot,if=active_enemies<3
  if Enemies() < 3 Spell(aimed_shot)
 }
