@@ -11,20 +11,22 @@ import { GetSpellCooldown, GetTime, GetSpellCharges } from "@wowts/wow-mock";
 import { sub } from "@wowts/string";
 import { OvaleState } from "./State";
 import { OvalePaperDoll } from "./PaperDoll";
-import { OvaleAura } from "./Aura";
 import { LuaArray } from "@wowts/lua";
 
 export let OvaleCooldown: OvaleCooldownClass;
 let GLOBAL_COOLDOWN = 61304;
 let COOLDOWN_THRESHOLD = 0.10;
+// "Spell Haste" affects cast speed and spell GCD (spells, not melee abilities), but not hasted cooldowns (cd_haste in Ovale's SpellInfo)
+// "Melee Haste" is in game as "Attack Speed" and affects white swing speed only, not the GCD
+// "Ranged Haste" looks to be no longer used and matches "Melee Haste" usually, DK talent Icy Talons for example;  Suppression Aura in BWL does not affect Ranged Haste but does Melee Haste as of 7/29/18
 let BASE_GCD = {
     ["DEATHKNIGHT"]: {
         1: 1.5,
-        2: "melee"
+        2: "base"
     },
     ["DEMONHUNTER"]: {
         1: 1.5,
-        2: "melee"
+        2: "base"
     },
     ["DRUID"]: {
         1: 1.5,
@@ -32,7 +34,7 @@ let BASE_GCD = {
     },
     ["HUNTER"]: {
         1: 1.5,
-        2: "ranged"
+        2: "base"
     },
     ["MAGE"]: {
         1: 1.5,
@@ -64,7 +66,7 @@ let BASE_GCD = {
     },
     ["WARRIOR"]: {
         1: 1.5,
-        2: "melee"
+        2: "base"
     }
 }
 
@@ -292,7 +294,6 @@ class OvaleCooldownClass extends OvaleCooldownBase implements SpellCastModule {
         if (duration > 0 && start + duration > atTime) {
             OvaleCooldown.Log("Spell %d is on cooldown for %fs starting at %s.", spellId, duration, start);
         } else {
-            let si = OvaleData.spellInfo[spellId];
             [duration] = OvaleData.GetSpellInfoPropertyNumber(spellId, atTime, "cd", targetGUID);
             if (duration) {
                 if (duration < 0) {
@@ -304,13 +305,9 @@ class OvaleCooldownClass extends OvaleCooldownBase implements SpellCastModule {
             OvaleCooldown.Log("Spell %d has a base cooldown of %fs.", spellId, duration);
             if (duration > 0) {
                 let haste = OvaleData.GetSpellInfoProperty(spellId, atTime, "cd_haste", targetGUID);
-                let multiplier = OvalePaperDoll.GetHasteMultiplier(haste, OvalePaperDoll.next);
-                duration = duration / multiplier;
-                if (si && si.buff_cdr) {
-                    let aura = OvaleAura.GetAura("player", si.buff_cdr, atTime);
-                    if (OvaleAura.IsActiveAura(aura, atTime)) {
-                        duration = duration * aura.value1;
-                    }
+                if (haste) {
+                    let multiplier = OvalePaperDoll.GetBaseHasteMultiplier(OvalePaperDoll.next);
+                    duration = duration / multiplier;
                 }
             }
         }

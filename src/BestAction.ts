@@ -106,7 +106,7 @@ function GetActionItemInfo(element: Element, state: BaseState, atTime: number, t
     let actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId;
     let itemId = element.positionalParams[1];
     if (!isNumber(itemId)) {
-        [itemId] = OvaleEquipment.GetEquippedItem(itemId);
+        itemId = OvaleEquipment.GetEquippedItemBySlotName(itemId);
     }
     if (!itemId) {
         OvaleBestAction.Log("Unknown item '%s'.", element.positionalParams[1]);

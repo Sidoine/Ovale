@@ -2969,7 +2969,7 @@ do
         ["rage.deficit"] = "RageDeficit()",
         ["rage.max"] = "MaxRage()",
         ["raid_event.adds.remains"] = "0",
-        ["raw_haste_pct"] = "SpellHaste()",
+        ["raw_haste_pct"] = "SpellCastSpeedPercent()",
         ["rtb_list.any.5"] = "BuffCount(roll_the_bones_buff more 4)",
         ["rtb_list.any.6"] = "BuffCount(roll_the_bones_buff more 5)",
         ["runic_power"] = "RunicPower()",
@@ -3058,9 +3058,9 @@ do
                 code = format("False(role_%s)", role)
             end
         elseif operand == "spell_haste" or operand == "stat.spell_haste" then
-            code = "100 / { 100 + SpellHaste() }"
+            code = "100 / { 100 + SpellCastSpeedPercent() }"
         elseif operand == "attack_haste" or operand == "stat.attack_haste" then
-            code = "100 / { 100 + MeleeHaste() }"
+            code = "100 / { 100 + MeleeAttackSpeedPercent() }"
         elseif sub(operand, 1, 13) == "spell_targets" then
             code = "Enemies()"
         elseif operand == "t18_class_trinket" then

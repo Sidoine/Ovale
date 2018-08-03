@@ -3097,7 +3097,7 @@ EmitOperandBuff = function (operand, parseNode, nodeList, annotation, action, ta
         ["rage.deficit"]: "RageDeficit()",
         ["rage.max"]: "MaxRage()",
         ["raid_event.adds.remains"]: "0", // TODO
-        ["raw_haste_pct"]: "SpellHaste()",
+        ["raw_haste_pct"]: "SpellCastSpeedPercent()",
         ["rtb_list.any.5"]: "BuffCount(roll_the_bones_buff more 4)",
         ["rtb_list.any.6"]: "BuffCount(roll_the_bones_buff more 5)",
         ["runic_power"]: "RunicPower()",
@@ -3186,9 +3186,9 @@ EmitOperandBuff = function (operand, parseNode, nodeList, annotation, action, ta
                 code = format("False(role_%s)", role);
             }
         } else if (operand == "spell_haste" || operand == "stat.spell_haste") {
-            code = "100 / { 100 + SpellHaste() }";
+            code = "100 / { 100 + SpellCastSpeedPercent() }";
         } else if (operand == "attack_haste" || operand == "stat.attack_haste") {
-            code = "100 / { 100 + MeleeHaste() }";
+            code = "100 / { 100 + MeleeAttackSpeedPercent() }";
         } else if (sub(operand, 1, 13) == "spell_targets") {
             code = "Enemies()";
         } else if (operand == "t18_class_trinket") {
