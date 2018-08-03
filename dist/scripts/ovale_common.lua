@@ -83,6 +83,14 @@ Define(aged_healing_potion 136569)
 Define(healthstone 5512)
 Define(umbral_glaive_storm 242553)
 
+# Battle for Azeroth
+Define(battle_scarred 160053)
+
+Define(battle_potion_of_agility 163223)
+Define(battle_potion_of_intellect 163222)
+Define(battle_potion_of_strength 163224)
+Define(battle_potion_of_stamina 163225)
+
 ###
 ### Trinkets & OnUse Rings
 ###
@@ -147,7 +155,7 @@ Define(archmages_incandescence_str_buff 177160)
 ### Legendary Shared legiondaries
 ###
 
-Define(sephuzs_secret 132452)
+Define(sephuzs_secret_item 132452)
 Define(sephuzs_secret_buff 208051)
 	SpellInfo(sephuzs_secret_buff buff_cd=30 duration=10)
 
@@ -211,6 +219,10 @@ Define(war_stomp 20549)
 	SpellInfo(war_stomp cd=120 interrupt=1)
 Define(lights_judgment 255647)
 	SpellInfo(lights_judgment cd=150)
+Define(fireblood 265221)
+	SpellInfo(fireblood cd=120)
+Define(ancestral_call 274738)
+	SpellInfo(ancestral_call cd=120)
     
 	
 ###

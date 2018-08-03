@@ -83,6 +83,7 @@ local MODIFIER_KEYWORD = {
     ["op"] = true,
     ["pct_health"] = true,
     ["precombat"] = true,
+    ["precast_time"] = true,
     ["range"] = true,
     ["sec"] = true,
     ["slot"] = true,
@@ -1107,6 +1108,8 @@ local function Disambiguate(annotation, name, className, specialization, _type)
 end
 local InitializeDisambiguation = function()
     AddDisambiguation("none", "none")
+    AddDisambiguation("bloodlust", "burst_haste")
+    AddDisambiguation("buff_sephuzs_secret", "sephuzs_secret_buff")
     AddDisambiguation("arcane_torrent", "arcane_torrent_runicpower", "DEATHKNIGHT")
     AddDisambiguation("arcane_torrent", "arcane_torrent_dh", "DEMONHUNTER")
     AddDisambiguation("arcane_torrent", "arcane_torrent_energy", "DRUID")
@@ -1147,7 +1150,17 @@ local InitializeDisambiguation = function()
     AddDisambiguation("throw_glaive", "throw_glaive_havoc", "DEMONHUNTER", "havoc")
     AddDisambiguation("feral_affinity_talent", "feral_affinity_talent_balance", "DRUID", "balance")
     AddDisambiguation("guardian_affinity_talent", "guardian_affinity_talent_restoration", "DRUID", "restoration")
-    AddDisambiguation("a_murder_of_crows_talent", "a_murder_of_crows_talent_marksman", "HUNTER", "marksman")
+    AddDisambiguation("a_murder_of_crows_talent", "mm_a_murder_of_crows_talent", "HUNTER", "marksmanship")
+    AddDisambiguation("cat_beast_cleave", "pet_beast_cleave", "HUNTER", "beast_mastery")
+    AddDisambiguation("cat_frenzy", "pet_frenzy", "HUNTER", "beast_mastery")
+    AddDisambiguation("kill_command", "kill_command_sv", "HUNTER", "survival")
+    AddDisambiguation("kill_command", "kill_command_sv", "HUNTER", "survival")
+    AddDisambiguation("mongoose_bite_eagle", "mongoose_bite", "HUNTER", "survival")
+    AddDisambiguation("multishot", "multishot_bm", "HUNTER", "beast_mastery")
+    AddDisambiguation("multishot", "multishot_mm", "HUNTER", "marksmanship")
+    AddDisambiguation("raptor_strike_eagle", "raptor_strike", "HUNTER", "survival")
+    AddDisambiguation("serpent_sting", "serpent_sting_mm", "HUNTER", "marksmanship")
+    AddDisambiguation("serpent_sting", "serpent_sting_sv", "HUNTER", "survival")
     AddDisambiguation("healing_elixir_talent", "healing_elixir_talent_mistweaver", "MONK", "mistweaver")
     AddDisambiguation("bok_proc_buff", "blackout_kick_buff", "MONK", "windwalker")
     AddDisambiguation("fortifying_brew", "fortifying_brew_mistweaver", "MONK", "mistweaver")
@@ -2149,14 +2162,16 @@ EmitAction = function(parseNode, nodeList, annotation)
             isSpellAction = false
         elseif action == "potion" then
             local name = (modifier.name and Unparse(modifier.name)) or annotation.consumables["potion"]
-            if match(name, "^(%w+)_potion") then
-                name = match(name, "^(%w+)_potion")
+            if match(name, "^battle_potion_of_%w+") then
+                name = match(name, "^battle_potion_of_%w+")
+            elseif match(name, "^%w+_potion") then
+                name = match(name, "^%w+_potion")
             end
             if name then
-                bodyCode = format("Item(%s_potion usable=1)", name)
+                bodyCode = format("Item(%s usable=1)", name)
                 conditionCode = "CheckBoxOn(opt_use_consumables) and target.Classification(worldboss)"
                 annotation.opt_use_consumables = className
-                AddSymbol(annotation, format("%s_potion", name))
+                AddSymbol(annotation, format("%s", name))
                 isSpellAction = false
             end
         elseif action == "stance" then
@@ -4562,35 +4577,17 @@ local InsertSupportingFunctions = function(child, annotation)
     end
     if annotation.summon_pet == "HUNTER" then
         local fmt
-        if annotation.specialization == "beast_mastery" then
-            fmt = [[
-				AddFunction %sSummonPet
+        fmt = [[
+			AddFunction %sSummonPet
+			{
+				if pet.IsDead()
 				{
-					if pet.IsDead()
-					{
-						if not DebuffPresent(heart_of_the_phoenix_debuff) Spell(heart_of_the_phoenix)
-						Spell(revive_pet)
-					}
-					if not pet.Present() and not pet.IsDead() and not PreviousSpell(revive_pet) Texture(ability_hunter_beastcall help=L(summon_pet))
+					if not DebuffPresent(heart_of_the_phoenix_debuff) Spell(heart_of_the_phoenix)
+					Spell(revive_pet)
 				}
-			]]
-        else
-            fmt = [[
-				AddFunction %sSummonPet
-				{
-					if not Talent(lone_wolf_talent)
-					{
-						if pet.IsDead()
-						{
-							if not DebuffPresent(heart_of_the_phoenix_debuff) Spell(heart_of_the_phoenix)
-							Spell(revive_pet)
-						}
-						if not pet.Present() and not pet.IsDead() and not PreviousSpell(revive_pet) Texture(ability_hunter_beastcall help=L(summon_pet))
-					}
-				}
-			]]
-            AddSymbol(annotation, "lone_wolf_talent")
-        end
+				if not pet.Present() and not pet.IsDead() and not PreviousSpell(revive_pet) Texture(ability_hunter_beastcall help=L(summon_pet))
+			}
+		]]
         local code = format(fmt, camelSpecialization)
         local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
