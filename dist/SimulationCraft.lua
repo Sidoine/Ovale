@@ -1108,7 +1108,7 @@ local function Disambiguate(annotation, name, className, specialization, _type)
 end
 local InitializeDisambiguation = function()
     AddDisambiguation("none", "none")
-    AddDisambiguation("bloodlust", "burst_haste")
+    AddDisambiguation("bloodlust_buff", "burst_haste_buff")
     AddDisambiguation("buff_sephuzs_secret", "sephuzs_secret_buff")
     AddDisambiguation("arcane_torrent", "arcane_torrent_runicpower", "DEATHKNIGHT")
     AddDisambiguation("arcane_torrent", "arcane_torrent_dh", "DEMONHUNTER")
@@ -1175,8 +1175,19 @@ local InitializeDisambiguation = function()
     AddDisambiguation("judgment", "judgment_prot", "PALADIN", "protection")
     AddDisambiguation("mindbender_talent", "mindbender_talent_discipline", "PRIEST", "discipline")
     AddDisambiguation("twist_of_fate_talent", "twist_of_fate_talent_discipline", "PRIEST", "discipline")
+    AddDisambiguation("ascendance", "ascendance_elemental", "SHAMAN", "elemental")
+    AddDisambiguation("ascendance", "ascendance_enhancement", "SHAMAN", "enhancement")
+    AddDisambiguation("ascendance", "ascendance_restoration", "SHAMAN", "restoration")
+    AddDisambiguation("chain_lightning", "chain_lightning_restoration", "SHAMAN", "restoration")
     AddDisambiguation("earth_shield_talent", "earth_shield_talent_restoration", "SHAMAN", "restoration")
-    AddDisambiguation("echo_of_the_elements_talent", "echo_of_the_elements_talent_restoration", "SHAMAN", "restoration")
+    AddDisambiguation("echo_of_the_elements_talent", "resto_echo_of_the_elements_talent", "SHAMAN", "restoration")
+    AddDisambiguation("flame_shock", "flame_shock_restoration", "SHAMAN", "restoration")
+    AddDisambiguation("healing_surge", "healing_surge_restoration", "SHAMAN", "restoration")
+    AddDisambiguation("lightning_bolt", "lightning_bolt_elemental", "SHAMAN", "elemental")
+    AddDisambiguation("lightning_bolt", "lightning_bolt_enhancement", "SHAMAN", "enhancement")
+    AddDisambiguation("strike", "windstrike", "SHAMAN", "enhancement")
+    AddDisambiguation("totem_mastery", "totem_mastery_elemental", "SHAMAN", "elemental")
+    AddDisambiguation("totem_mastery", "totem_mastery_enhancement", "SHAMAN", "enhancement")
     AddDisambiguation("soul_conduit_talent", "soul_conduit_talent_demonology", "WARLOCK", "demonology")
     AddDisambiguation("anger_management_talent", "fury_anger_management_talent", "WARRIOR", "fury")
     AddDisambiguation("bladestorm", "bladestorm_arms", "WARRIOR", "arms")
@@ -4426,7 +4437,7 @@ local InsertInterruptFunctions = function(child, annotation)
             })
         end
         insert(interrupts, {
-            name = "lightning_surge_totem",
+            name = "capacitor_totem",
             stun = 1,
             order = 30,
             range = "",
