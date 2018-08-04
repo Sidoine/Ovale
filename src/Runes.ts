@@ -182,7 +182,7 @@ class OvaleRunesClass extends OvaleRunesBase {
                     start = rune.endCooldown;
                 }
             }
-            let duration = 10 / OvalePaperDoll.GetSpellHasteMultiplier(snapshot);
+            let duration = 10 / OvalePaperDoll.GetSpellCastSpeedPercentMultiplier(snapshot);
             consumedRune.startCooldown = start;
             consumedRune.endCooldown = start + duration;
             let runicpower = this.next.runicpower;

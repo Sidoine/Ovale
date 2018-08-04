@@ -129,16 +129,17 @@ local function GetHastedTime(seconds, haste, state)
 end
 do
 local function ArmorSetBonus(positionalParams, namedParams, state, atTime)
-        local armorSet, count = positionalParams[1], positionalParams[2]
-        local value = (OvaleEquipment:GetArmorSetCount(armorSet) >= count) and 1 or 0
+        Ovale:OneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0")
+        local value = 0
         return 0, INFINITY, value, 0, 0
     end
     OvaleCondition:RegisterCondition("armorsetbonus", false, ArmorSetBonus)
 end
 do
 local function ArmorSetParts(positionalParams, namedParams, state, atTime)
-        local armorSet, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-        local value = OvaleEquipment:GetArmorSetCount(armorSet)
+        local _, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+        local value = 0
+        Ovale:OneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0")
         return Compare(value, comparator, limit)
     end
     OvaleCondition:RegisterCondition("armorsetparts", false, ArmorSetParts)
@@ -1202,7 +1203,7 @@ do
 local function ItemCooldown(positionalParams, namedParams, state, atTime)
         local itemId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
         if itemId and type(itemId) ~= "number" then
-            itemId = OvaleEquipment:GetEquippedItem(itemId)
+            itemId = OvaleEquipment:GetEquippedItemBySlotName(itemId)
         end
         if itemId then
             local start, duration = GetItemCooldown(itemId)
@@ -1752,8 +1753,8 @@ local function MasteryRating(positionalParams, namedParams, state, atTime)
 local function MeleeCritChance(positionalParams, namedParams, state, atTime)
         return SnapshotCritChance("meleeCrit", 0, positionalParams, namedParams, state, atTime)
     end
-local function MeleeHaste(positionalParams, namedParams, state, atTime)
-        return Snapshot("meleeHaste", 0, positionalParams, namedParams, state, atTime)
+local function MeleeAttackSpeedPercent(positionalParams, namedParams, state, atTime)
+        return Snapshot("meleeAttackSpeedPercent", 0, positionalParams, namedParams, state, atTime)
     end
 local function RangedCritChance(positionalParams, namedParams, state, atTime)
         return SnapshotCritChance("rangedCrit", 0, positionalParams, namedParams, state, atTime)
@@ -1761,8 +1762,8 @@ local function RangedCritChance(positionalParams, namedParams, state, atTime)
 local function SpellCritChance(positionalParams, namedParams, state, atTime)
         return SnapshotCritChance("spellCrit", 0, positionalParams, namedParams, state, atTime)
     end
-local function SpellHaste(positionalParams, namedParams, state, atTime)
-        return Snapshot("spellHaste", 0, positionalParams, namedParams, state, atTime)
+local function SpellCastSpeedPercent(positionalParams, namedParams, state, atTime)
+        return Snapshot("spellCastSpeedPercent", 0, positionalParams, namedParams, state, atTime)
     end
 local function Spellpower(positionalParams, namedParams, state, atTime)
         return Snapshot("spellPower", 0, positionalParams, namedParams, state, atTime)
@@ -1791,10 +1792,10 @@ local function VersatilityRating(positionalParams, namedParams, state, atTime)
     OvaleCondition:RegisterCondition("masteryeffect", false, MasteryEffect)
     OvaleCondition:RegisterCondition("masteryrating", false, MasteryRating)
     OvaleCondition:RegisterCondition("meleecritchance", false, MeleeCritChance)
-    OvaleCondition:RegisterCondition("meleehaste", false, MeleeHaste)
+    OvaleCondition:RegisterCondition("meleeattackspeedpercent", false, MeleeAttackSpeedPercent)
     OvaleCondition:RegisterCondition("rangedcritchance", false, RangedCritChance)
     OvaleCondition:RegisterCondition("spellcritchance", false, SpellCritChance)
-    OvaleCondition:RegisterCondition("spellhaste", false, SpellHaste)
+    OvaleCondition:RegisterCondition("spellcastspeedpercent", false, SpellCastSpeedPercent)
     OvaleCondition:RegisterCondition("spellpower", false, Spellpower)
     OvaleCondition:RegisterCondition("spirit", false, Spirit)
     OvaleCondition:RegisterCondition("stamina", false, Stamina)

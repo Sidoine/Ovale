@@ -82,8 +82,8 @@ function GetHastedTime(seconds, haste, state: BaseState) {
 	@usage
 	if ArmorSetBonus(T16_melee 2) == 1 Spell(unleash_elements) */
     function ArmorSetBonus(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        let [armorSet, count] = [positionalParams[1], positionalParams[2]];
-        let value = (OvaleEquipment.GetArmorSetCount(armorSet) >= count) && 1 || 0;
+        Ovale.OneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0");
+        let value = 0;
         return [0, INFINITY, value, 0, 0];
     }
     OvaleCondition.RegisterCondition("armorsetbonus", false, ArmorSetBonus);
@@ -105,8 +105,9 @@ function GetHastedTime(seconds, haste, state: BaseState) {
 	if ArmorSetParts(T13 more 1) and TargetHealthPercent(less 60)
 	    Spell(ferocious_bite) */
     function ArmorSetParts(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        let [armorSet, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
-        let value = OvaleEquipment.GetArmorSetCount(armorSet);
+        let [, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
+        let value = 0;
+        Ovale.OneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0");
         return Compare(value, comparator, limit);
     }
     OvaleCondition.RegisterCondition("armorsetparts", false, ArmorSetParts);
@@ -2184,7 +2185,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     function ItemCooldown(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [itemId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
         if (itemId && type(itemId) != "number") {
-            itemId = OvaleEquipment.GetEquippedItem(itemId);
+            itemId = OvaleEquipment.GetEquippedItemBySlotName(itemId);
         }
         if (itemId) {
             let [start, duration] = GetItemCooldown(itemId);
@@ -3602,15 +3603,15 @@ l    */
     }
 
     /**  Get the current percent increase to melee haste of the player.
-	 @name MeleeHaste
+	 @name MeleeAttackSpeedPercent
 	 @paramsig number or boolean
 	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	 @param number Optional. The number to compare against.
 	 @return The current percent increase to melee haste.
 	 @return A boolean value for the result of the comparison.
      */
-    function MeleeHaste(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        return Snapshot("meleeHaste", 0, positionalParams, namedParams, state, atTime);
+    function MeleeAttackSpeedPercent(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
+        return Snapshot("meleeAttackSpeedPercent", 0, positionalParams, namedParams, state, atTime);
     }
 
     /** Get the current ranged critical strike chance of the player.
@@ -3644,15 +3645,15 @@ l    */
     }
 
     /**  Get the current percent increase to spell haste of the player.
-	 @name SpellHaste
+	 @name SpellCastSpeedPercent
 	 @paramsig number or boolean
 	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	 @param number Optional. The number to compare against.
 	 @return The current percent increase to spell haste.
 	 @return A boolean value for the result of the comparison.
      */
-    function SpellHaste(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        return Snapshot("spellHaste", 0, positionalParams, namedParams, state, atTime);
+    function SpellCastSpeedPercent(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
+        return Snapshot("spellCastSpeedPercent", 0, positionalParams, namedParams, state, atTime);
     }
 
     /** Get the current spellpower of the player.
@@ -3720,10 +3721,10 @@ l    */
     OvaleCondition.RegisterCondition("masteryeffect", false, MasteryEffect);
     OvaleCondition.RegisterCondition("masteryrating", false, MasteryRating);
     OvaleCondition.RegisterCondition("meleecritchance", false, MeleeCritChance);
-    OvaleCondition.RegisterCondition("meleehaste", false, MeleeHaste);
+    OvaleCondition.RegisterCondition("meleeattackspeedpercent", false, MeleeAttackSpeedPercent);
     OvaleCondition.RegisterCondition("rangedcritchance", false, RangedCritChance);
     OvaleCondition.RegisterCondition("spellcritchance", false, SpellCritChance);
-    OvaleCondition.RegisterCondition("spellhaste", false, SpellHaste);
+    OvaleCondition.RegisterCondition("spellcastspeedpercent", false, SpellCastSpeedPercent);
     OvaleCondition.RegisterCondition("spellpower", false, Spellpower);
     OvaleCondition.RegisterCondition("spirit", false, Spirit);
     OvaleCondition.RegisterCondition("stamina", false, Stamina);
