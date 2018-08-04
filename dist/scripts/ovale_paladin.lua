@@ -130,7 +130,6 @@ AddFunction ProtectionInterruptActions
 		{
 			if target.InRange(hammer_of_justice) Spell(hammer_of_justice)
 			if target.Distance(less 10) Spell(blinding_light)
-			if target.Distance(less 8) Spell(arcane_torrent_holy)
 			if target.Distance(less 8) Spell(war_stomp)
 			if target.InRange(quaking_palm) Spell(quaking_palm)
 		}
@@ -667,7 +666,6 @@ AddFunction RetributionInterruptActions
  {
   if target.InRange(rebuke) and target.IsInterruptible() Spell(rebuke)
   if target.InRange(hammer_of_justice) and not target.Classification(worldboss) Spell(hammer_of_justice)
-  if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_holy)
   if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
  }
 }

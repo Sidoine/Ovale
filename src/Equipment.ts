@@ -110,6 +110,7 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
         this.StartProfiling("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED");
         let changed = this.UpdateItemBySlot(slotId)
         if (changed) {
+            this.lastChangedSlot = slotId
             //this.UpdateArmorSetCount();
             Ovale.needRefresh();
             this.SendMessage("Ovale_EquipmentChanged");

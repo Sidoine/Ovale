@@ -60,7 +60,6 @@ AddFunction ArcaneInterruptActions
  if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
  {
   if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
-  if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_mana)
   if target.InRange(counterspell) and target.IsInterruptible() Spell(counterspell)
  }
 }
@@ -612,7 +611,6 @@ AddFunction FireInterruptActions
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
 	{
 		if target.InRange(counterspell) and target.IsInterruptible() Spell(counterspell)
-		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_mana)
 		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
 	}
 }
@@ -1177,7 +1175,6 @@ AddFunction FrostInterruptActions
  if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
  {
   if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
-  if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_mana)
   if target.InRange(counterspell) and target.IsInterruptible() Spell(counterspell)
  }
 }

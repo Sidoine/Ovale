@@ -109,6 +109,7 @@ local OvaleEquipmentClass = __class(OvaleEquipmentBase, {
         self:StartProfiling("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED")
         local changed = self:UpdateItemBySlot(slotId)
         if changed then
+            self.lastChangedSlot = slotId
             Ovale:needRefresh()
             self:SendMessage("Ovale_EquipmentChanged")
         end
