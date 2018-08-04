@@ -6,7 +6,7 @@
     "outDir": "dist",
     "rootDir": "src",
     "sourceMap": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": false
   },
   "exclude": [
     "node_modules",

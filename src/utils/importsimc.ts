@@ -251,6 +251,7 @@ for (const [className, spellIds] of spellsByClass) {
         let desc = "[8.0] Ovale: ${className} spells";
         let code = \`
 `;        
+    const talentIds = talentsByClass.get(className) || [];
     for (const spellId of spellIds) {
         const spell = spellData.spellDataById.get(spellId);
         output += `Define(${spell.identifier} ${spellId})\n`;
@@ -266,6 +267,17 @@ for (const [className, spellIds] of spellsByClass) {
         if (spell.cooldown) {
             output += ` cd=${spell.cooldown / 1000}`;
         }
+        if (spell.replace_spell_id && spellIds.indexOf(spell.replace_spell_id) >= 0) {
+            const replacedSpell = spellData.spellDataById.get(spell.replace_spell_id);
+            if (replacedSpell) {
+                output += ` replace=${replacedSpell.identifier}`;
+            }
+        }
+        if (spell.talent) {
+            output += ` talent=${spell.talent.identifier}`;
+            if (talentIds.indexOf(spell.talent.id) <= 0) talentIds.push(spell.talent.id);
+        }
+
         output += `)\n`;
         if (spell.spellEffects) {
             for (const effect of spell.spellEffects) {
@@ -277,23 +289,24 @@ for (const [className, spellIds] of spellsByClass) {
                     }
                     if (spellIds.indexOf(triggerSpell.id) < 0) continue;
                     if (effect.targeting_1 > 1) {
-                        output += `  SpellAddTargetDebuff(${spell.identifier} ${triggerSpell.identifier})\n`;
+                        output += `  SpellAddTargetDebuff(${spell.identifier} ${triggerSpell.identifier}=1)\n`;
                     } else {
-                        output += `  SpellAddBuff(${spell.identifier} ${triggerSpell.identifier})\n`;
+                        output += `  SpellAddBuff(${spell.identifier} ${triggerSpell.identifier}=1)\n`;
                     }
                 }
             }
         }
-    }
 
-    const talentIds = talentsByClass.get(className);
-    if (talentIds) {
-        for (const talentId of talentIds) {
-            const talent = spellData.talentsById.get(talentId);
-            output += `Define(${talent.identifier} ${talentId})\n`;
+        if (spell.tooltip) {
+            output += `  SpellAddBuff(${spell.identifier} ${spell.identifier}=1)\n`;
         }
     }
 
+    for (const talentId of talentIds) {
+        const talent = spellData.talentsById.get(talentId);
+        output += `Define(${talent.identifier} ${talentId})\n`;
+    }
+    
     const itemIds = itemsByClass.get(className);
     if (itemIds) {
         for (const itemId of itemIds) {
