@@ -179,7 +179,8 @@ let MODIFIER_KEYWORD: LuaObj<boolean> = {
     ["op"]: true,
     ["pct_health"]: true,
     ["precombat"]: true,
-    ["precast_time"]: true,
+    ["precombat_seconds"]: true, //todo
+    ["precast_time"]: true, //todo
     ["range"]: true,
     ["sec"]: true,
     ["slot"]: true,
@@ -1299,7 +1300,19 @@ const InitializeDisambiguation = function() {
     //Priest
     AddDisambiguation("mindbender_talent", "mindbender_talent_discipline", "PRIEST", "discipline");
     AddDisambiguation("twist_of_fate_talent", "twist_of_fate_talent_discipline", "PRIEST", "discipline");
-    
+
+    //Rogue
+    AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_assassination_buff", "ROGUE", "assassination");
+    AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_outlaw_buff", "ROGUE", "outlaw");
+    AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_subtlety_buff", "ROGUE", "subtlety");
+    // 
+    // AddDisambiguation("roll_the_bones_debuff", "roll_the_bones_buff", "ROGUE");
+    // AddDisambiguation("envenom_debuff", "envenom_buff", "ROGUE");
+    // AddDisambiguation("vendetta_buff", "vendetta_debuff", "ROGUE", "assassination");
+    // AddDisambiguation("exanguinate", "exsanguinate", "ROGUE", "assassination");
+    // AddDisambiguation("deeper_strategem_talent", "deeper_stratagem_talent", "ROGUE", "subtlety");
+    // AddDisambiguation("symbols_of_death_debuff","symbols_of_death_buff", 		"ROGUE")
+
     //Shaman
     AddDisambiguation("ascendance", "ascendance_elemental", "SHAMAN", "elemental")
     AddDisambiguation("ascendance", "ascendance_enhancement", "SHAMAN", "enhancement")
@@ -2940,14 +2953,14 @@ EmitOperandAzerite = function (operand, parseNode, nodeList, annotation, action,
         let name = tokenIterator();
         let property = tokenIterator();
         if (property == "enabled") {
-            code = format("HasAzeriteTrait(%s)", name);
+            code = format("HasAzeriteTrait(%s_trait)", name);
         } else {
             ok = false;
         }
         if (ok && code) {
             annotation.astAnnotation = annotation.astAnnotation || {};
             [node] = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation);
-            AddSymbol(annotation, name);
+            AddSymbol(annotation, `${name}_trait`);
         }
     } else {
         ok = false;
@@ -3822,6 +3835,12 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
     } else if (className == "ROGUE" && operand == "exsanguinated") {
         code = "target.DebuffPresent(exsanguinated)";
         AddSymbol(annotation, "exsanguinated");
+    } else if (className == "ROGUE" && operand == "master_assassin_remains") {
+        code = "BuffRemaining(master_assassin_buff)";
+        AddSymbol(annotation, "master_assassin_buff");
+    } else if (className == "ROGUE" && operand == "buff.roll_the_bones.remains"){
+        code = "BuffRemaining(roll_the_bones_buff)";
+        AddSymbol(annotation, "roll_the_bones_buff");
     } else if (className == "SHAMAN" && operand == "buff.resonance_totem.remains") {
         code = "TotemRemaining(totem_mastery)";
         ok = true;

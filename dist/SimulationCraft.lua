@@ -83,6 +83,7 @@ local MODIFIER_KEYWORD = {
     ["op"] = true,
     ["pct_health"] = true,
     ["precombat"] = true,
+    ["precombat_seconds"] = true,
     ["precast_time"] = true,
     ["range"] = true,
     ["sec"] = true,
@@ -1175,6 +1176,9 @@ local InitializeDisambiguation = function()
     AddDisambiguation("judgment", "judgment_prot", "PALADIN", "protection")
     AddDisambiguation("mindbender_talent", "mindbender_talent_discipline", "PRIEST", "discipline")
     AddDisambiguation("twist_of_fate_talent", "twist_of_fate_talent_discipline", "PRIEST", "discipline")
+    AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_assassination_buff", "ROGUE", "assassination")
+    AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_outlaw_buff", "ROGUE", "outlaw")
+    AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_subtlety_buff", "ROGUE", "subtlety")
     AddDisambiguation("ascendance", "ascendance_elemental", "SHAMAN", "elemental")
     AddDisambiguation("ascendance", "ascendance_enhancement", "SHAMAN", "enhancement")
     AddDisambiguation("ascendance", "ascendance_restoration", "SHAMAN", "restoration")
@@ -2809,14 +2813,14 @@ EmitOperandAzerite = function(operand, parseNode, nodeList, annotation, action, 
         local name = tokenIterator()
         local property = tokenIterator()
         if property == "enabled" then
-            code = format("HasAzeriteTrait(%s)", name)
+            code = format("HasAzeriteTrait(%s_trait)", name)
         else
             ok = false
         end
         if ok and code then
             annotation.astAnnotation = annotation.astAnnotation or {}
             node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
-            AddSymbol(annotation, name)
+            AddSymbol(annotation, name .. "_trait")
         end
     else
         ok = false
@@ -3694,6 +3698,12 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
     elseif className == "ROGUE" and operand == "exsanguinated" then
         code = "target.DebuffPresent(exsanguinated)"
         AddSymbol(annotation, "exsanguinated")
+    elseif className == "ROGUE" and operand == "master_assassin_remains" then
+        code = "BuffRemaining(master_assassin_buff)"
+        AddSymbol(annotation, "master_assassin_buff")
+    elseif className == "ROGUE" and operand == "buff.roll_the_bones.remains" then
+        code = "BuffRemaining(roll_the_bones_buff)"
+        AddSymbol(annotation, "roll_the_bones_buff")
     elseif className == "SHAMAN" and operand == "buff.resonance_totem.remains" then
         code = "TotemRemaining(totem_mastery)"
         ok = true
