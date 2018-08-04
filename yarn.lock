@@ -219,9 +219,15 @@
     commander "^2.11.0"
     typescript "^2.9.1"
 
-"@wowts/wow-mock@^1.0.1", "@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.4.0":
+"@wowts/wow-mock@^1.0.1", "@wowts/wow-mock@^1.0.8":
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.4.0.tgz#c03502e45511fc5996097e972fdd0dd0ab24ab8a"
+  dependencies:
+    "@wowts/lua" "^1.2.0"
+
+"@wowts/wow-mock@^1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.5.0.tgz#6c2aaac60658056a1186fc3053635ca4d0a2b5df"
   dependencies:
     "@wowts/lua" "^1.2.0"
 

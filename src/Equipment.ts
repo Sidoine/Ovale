@@ -87,7 +87,7 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
             OvaleDebug.options.args[k] = v;
         }
         for (const [slotName, ] of pairs(OVALE_SLOTID_BY_SLOTNAME)) {
-            let invSlotId = GetInventorySlotInfo(slotName)
+            let [invSlotId] = GetInventorySlotInfo(slotName)
             OVALE_SLOTID_BY_SLOTNAME[slotName] = invSlotId; // Should already match but in case Blizzard ever changes the slotIds
             OVALE_SLOTNAME_BY_SLOTID[invSlotId] = slotName;
         }

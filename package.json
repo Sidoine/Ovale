@@ -44,7 +44,7 @@
     "@wowts/table": "^1.0.1",
     "@wowts/tsaddon": "^1.1.2",
     "@wowts/tslib": "^1.0.1",
-    "@wowts/wow-mock": "^1.4.0"
+    "@wowts/wow-mock": "^1.5.0"
   },
   "devDependencies": {
     "@wowts/tstolua": "^1.2.0",
