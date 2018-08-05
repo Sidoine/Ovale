@@ -279,7 +279,7 @@ AddFunction AssassinationPrecombatMainActions
  #snapshot_stats
  #apply_poison
  #stealth
- Spell(stealth)
+ if not Stealthed() Spell(stealth)
 }
 
 AddFunction AssassinationPrecombatMainPostConditions
@@ -761,7 +761,7 @@ AddFunction OutlawPrecombatMainActions
  #food
  #snapshot_stats
  #stealth
- Spell(stealth)
+ if not Stealthed() Spell(stealth)
  #roll_the_bones,precombat_seconds=2
  Spell(roll_the_bones)
  #slice_and_dice,precombat_seconds=2
@@ -1232,7 +1232,7 @@ AddFunction SubtletyPrecombatMainActions
  #snapshot_stats
  #variable,name=stealth_threshold,value=60+talent.vigor.enabled*35+talent.master_of_shadows.enabled*10
  #stealth
- Spell(stealth)
+ if not Stealthed() Spell(stealth)
 }
 
 AddFunction SubtletyPrecombatMainPostConditions
@@ -1315,7 +1315,7 @@ AddFunction SubtletyStealthCdsCdPostConditions
 AddFunction SubtletyStealthedMainActions
 {
  #shadowstrike,if=buff.stealth.up
- if BuffPresent(stealth_buff) Spell(shadowstrike)
+ if BuffPresent(stealthed_buff any=1) Spell(shadowstrike)
  #call_action_list,name=finish,if=combo_points.deficit<=1-(talent.deeper_stratagem.enabled&buff.vanish.up)
  if ComboPointsDeficit() <= 1 - { Talent(deeper_stratagem_talent) and BuffPresent(vanish_buff) } SubtletyFinishMainActions()
 
@@ -1337,7 +1337,7 @@ AddFunction SubtletyStealthedMainPostConditions
 
 AddFunction SubtletyStealthedShortCdActions
 {
- unless BuffPresent(stealth_buff) and Spell(shadowstrike)
+ unless BuffPresent(stealthed_buff any=1) and Spell(shadowstrike)
  {
   #call_action_list,name=finish,if=combo_points.deficit<=1-(talent.deeper_stratagem.enabled&buff.vanish.up)
   if ComboPointsDeficit() <= 1 - { Talent(deeper_stratagem_talent) and BuffPresent(vanish_buff) } SubtletyFinishShortCdActions()
@@ -1346,12 +1346,12 @@ AddFunction SubtletyStealthedShortCdActions
 
 AddFunction SubtletyStealthedShortCdPostConditions
 {
- BuffPresent(stealth_buff) and Spell(shadowstrike) or ComboPointsDeficit() <= 1 - { Talent(deeper_stratagem_talent) and BuffPresent(vanish_buff) } and SubtletyFinishShortCdPostConditions() or Talent(secret_technique_talent) and Talent(find_weakness_talent) and target.DebuffRemaining(find_weakness_debuff) < 1 and Enemies() == 2 and target.TimeToDie() - target.DebuffRemaining(shadowstrike) > 6 and Spell(shadowstrike) or Enemies() >= 3 and Spell(shuriken_storm) or Spell(shadowstrike)
+ BuffPresent(stealthed_buff any=1) and Spell(shadowstrike) or ComboPointsDeficit() <= 1 - { Talent(deeper_stratagem_talent) and BuffPresent(vanish_buff) } and SubtletyFinishShortCdPostConditions() or Talent(secret_technique_talent) and Talent(find_weakness_talent) and target.DebuffRemaining(find_weakness_debuff) < 1 and Enemies() == 2 and target.TimeToDie() - target.DebuffRemaining(shadowstrike) > 6 and Spell(shadowstrike) or Enemies() >= 3 and Spell(shuriken_storm) or Spell(shadowstrike)
 }
 
 AddFunction SubtletyStealthedCdActions
 {
- unless BuffPresent(stealth_buff) and Spell(shadowstrike)
+ unless BuffPresent(stealthed_buff any=1) and Spell(shadowstrike)
  {
   #call_action_list,name=finish,if=combo_points.deficit<=1-(talent.deeper_stratagem.enabled&buff.vanish.up)
   if ComboPointsDeficit() <= 1 - { Talent(deeper_stratagem_talent) and BuffPresent(vanish_buff) } SubtletyFinishCdActions()
@@ -1360,7 +1360,7 @@ AddFunction SubtletyStealthedCdActions
 
 AddFunction SubtletyStealthedCdPostConditions
 {
- BuffPresent(stealth_buff) and Spell(shadowstrike) or ComboPointsDeficit() <= 1 - { Talent(deeper_stratagem_talent) and BuffPresent(vanish_buff) } and SubtletyFinishCdPostConditions() or Talent(secret_technique_talent) and Talent(find_weakness_talent) and target.DebuffRemaining(find_weakness_debuff) < 1 and Enemies() == 2 and target.TimeToDie() - target.DebuffRemaining(shadowstrike) > 6 and Spell(shadowstrike) or Enemies() >= 3 and Spell(shuriken_storm) or Spell(shadowstrike)
+ BuffPresent(stealthed_buff any=1) and Spell(shadowstrike) or ComboPointsDeficit() <= 1 - { Talent(deeper_stratagem_talent) and BuffPresent(vanish_buff) } and SubtletyFinishCdPostConditions() or Talent(secret_technique_talent) and Talent(find_weakness_talent) and target.DebuffRemaining(find_weakness_debuff) < 1 and Enemies() == 2 and target.TimeToDie() - target.DebuffRemaining(shadowstrike) > 6 and Spell(shadowstrike) or Enemies() >= 3 and Spell(shuriken_storm) or Spell(shadowstrike)
 }
 
 ### Subtlety icons.
@@ -1455,7 +1455,6 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 # shuriken_storm
 # shuriken_tornado
 # stealth
-# stealth_buff
 # subterfuge_talent
 # symbols_of_death
 # symbols_of_death_buff

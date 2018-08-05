@@ -1302,16 +1302,10 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("twist_of_fate_talent", "twist_of_fate_talent_discipline", "PRIEST", "discipline");
 
     //Rogue
+    AddDisambiguation("stealth_buff", "stealthed_buff", "ROGUE");
     AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_assassination_buff", "ROGUE", "assassination");
     AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_outlaw_buff", "ROGUE", "outlaw");
     AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_subtlety_buff", "ROGUE", "subtlety");
-    // 
-    // AddDisambiguation("roll_the_bones_debuff", "roll_the_bones_buff", "ROGUE");
-    // AddDisambiguation("envenom_debuff", "envenom_buff", "ROGUE");
-    // AddDisambiguation("vendetta_buff", "vendetta_debuff", "ROGUE", "assassination");
-    // AddDisambiguation("exanguinate", "exsanguinate", "ROGUE", "assassination");
-    // AddDisambiguation("deeper_strategem_talent", "deeper_stratagem_talent", "ROGUE", "subtlety");
-    // AddDisambiguation("symbols_of_death_debuff","symbols_of_death_buff", 		"ROGUE")
 
     //Shaman
     AddDisambiguation("ascendance", "ascendance_elemental", "SHAMAN", "elemental")
