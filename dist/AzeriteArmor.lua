@@ -91,10 +91,17 @@ local OvaleAzeriteArmor = __class(OvaleAzeriteArmorBase, {
                         if isEnabled then
                             local powerInfo = azeriteItem.GetPowerInfo(powerId)
                             local name = GetSpellInfo(powerInfo.spellID)
-                            self.self_traits[powerInfo.spellID] = {
-                                spellID = powerInfo.spellID,
-                                name = name
-                            }
+                            if self.self_traits[powerInfo.spellID] then
+                                local rank = self.self_traits[powerInfo.spellID].rank
+                                self.self_traits[powerInfo.spellID].rank = rank + 1
+                            else
+                                self.self_traits[powerInfo.spellID] = {
+                                    spellID = powerInfo.spellID,
+                                    name = name,
+                                    rank = 1
+                                }
+                            end
+                            break
                         end
                     end
                 end
@@ -104,11 +111,17 @@ local OvaleAzeriteArmor = __class(OvaleAzeriteArmorBase, {
     HasTrait = function(self, spellId)
         return (self.self_traits[spellId]) and true or false
     end,
+    TraitRank = function(self, spellId)
+        if  not self.self_traits[spellId] then
+            return 0
+        end
+        return self.self_traits[spellId].rank
+    end,
     DebugTraits = function(self)
         wipe(self.output)
         local array = {}
         for k, v in pairs(self.self_traits) do
-            tinsert(array, tostring(v.name) .. ": " .. tostring(k))
+            tinsert(array, tostring(v.name) .. ": " .. tostring(k) .. " (" .. v.rank .. ")")
         end
         tsort(array)
         for _, v in ipairs(array) do

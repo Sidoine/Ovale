@@ -2946,7 +2946,9 @@ EmitOperandAzerite = function (operand, parseNode, nodeList, annotation, action,
         let code:string;
         let name = tokenIterator();
         let property = tokenIterator();
-        if (property == "enabled") {
+        if (property == "rank") {
+            code = format("AzeriteTraitRank(%s_trait)", name);
+        } else if (property == "enabled") {
             code = format("HasAzeriteTrait(%s_trait)", name);
         } else {
             ok = false;

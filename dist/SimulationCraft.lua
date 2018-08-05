@@ -2813,7 +2813,9 @@ EmitOperandAzerite = function(operand, parseNode, nodeList, annotation, action, 
         local code
         local name = tokenIterator()
         local property = tokenIterator()
-        if property == "enabled" then
+        if property == "rank" then
+            code = format("AzeriteTraitRank(%s_trait)", name)
+        elseif property == "enabled" then
             code = format("HasAzeriteTrait(%s_trait)", name)
         else
             ok = false
