@@ -3422,6 +3422,8 @@ EmitOperandRaidEvent = function(operand, parseNode, nodeList, annotation, action
             code = "False(raid_event_adds_exists)"
         elseif property == "in" then
             code = "600"
+        elseif property == "duration" then
+            code = "10"
         else
             ok = false
         end

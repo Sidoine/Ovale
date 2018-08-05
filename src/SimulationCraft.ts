@@ -3548,6 +3548,8 @@ EmitOperandRaidEvent = function (operand, parseNode, nodeList, annotation, actio
             code = "False(raid_event_adds_exists)";
         } else if (property == "in") {
             code = "600";
+        } else if (property == "duration") {
+            code = "10"  //TODO
         } else {
             ok = false;
         }
