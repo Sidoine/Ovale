@@ -36,11 +36,11 @@
    <Script file="SpellFlash.lua"/>
    <Script file="PaperDoll.lua"/>
    <Script file="DemonHunterSigils.lua"/>
+   <Script file="Cooldown.lua"/>
+   <Script file="CooldownState.lua"/>
    <Script file="Aura.lua"/>
    <Script file="Totem.lua"/>
    <Script file="DemonHunterDemonic.lua"/>
-   <Script file="Cooldown.lua"/>
-   <Script file="CooldownState.lua"/>
    <Script file="Future.lua"/>
    <Script file="Score.lua"/>
    <Script file="Recount.lua"/>

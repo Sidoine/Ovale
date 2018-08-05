@@ -40,7 +40,6 @@ AddFunction ProtectionInterruptActions
 		if target.InRange(storm_bolt) and not target.Classification(worldboss) Spell(storm_bolt)
 		if target.InRange(intercept) and not target.Classification(worldboss) and Talent(warbringer_talent) Spell(intercept)
 		if target.Distance(less 10) and not target.Classification(worldboss) Spell(shockwave)
-		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_rage)
 		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
 		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
 		if target.InRange(intimidating_shout) and not target.Classification(worldboss) Spell(intimidating_shout)

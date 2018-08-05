@@ -9,8 +9,6 @@ local __Ovale = LibStub:GetLibrary("ovale/Ovale")
 local Ovale = __Ovale.Ovale
 local __Equipment = LibStub:GetLibrary("ovale/Equipment")
 local OvaleEquipment = __Equipment.OvaleEquipment
-local __Stance = LibStub:GetLibrary("ovale/Stance")
-local OvaleStance = __Stance.OvaleStance
 local __State = LibStub:GetLibrary("ovale/State")
 local OvaleState = __State.OvaleState
 local __LastSpell = LibStub:GetLibrary("ovale/LastSpell")
@@ -24,6 +22,7 @@ local GetCombatRatingBonus = GetCombatRatingBonus
 local GetCritChance = GetCritChance
 local GetMastery = GetMastery
 local GetMasteryEffect = GetMasteryEffect
+local GetHaste = GetHaste
 local GetMeleeHaste = GetMeleeHaste
 local GetRangedCritChance = GetRangedCritChance
 local GetRangedHaste = GetRangedHaste
@@ -32,7 +31,6 @@ local GetSpellBonusDamage = GetSpellBonusDamage
 local GetSpellCritChance = GetSpellCritChance
 local GetTime = GetTime
 local UnitAttackPower = UnitAttackPower
-local UnitAttackSpeed = UnitAttackSpeed
 local UnitDamage = UnitDamage
 local UnitRangedDamage = UnitRangedDamage
 local UnitLevel = UnitLevel
@@ -118,13 +116,14 @@ local OVALE_SPECIALIZATION_NAME = {
         [3] = "protection"
     }
 }
-local GetAppropriateDamage = function(unit)
+local GetAppropriateDamageMultiplier = function(unit)
+    local damageMultiplier = 1
     if OvaleEquipment:HasRangedWeapon() then
-        local _, minDamage, maxDamage, _, _, percent = UnitRangedDamage(unit)
-        return minDamage, maxDamage, nil, nil, 0, 0, percent
+        _, _, _, _, _, damageMultiplier = UnitRangedDamage(unit)
     else
-        return UnitDamage(unit)
+        _, _, _, _, _, damageMultiplier = UnitDamage(unit)
     end
+    return damageMultiplier
 end
 
 __exports.PaperDollData = __class(nil, {
@@ -141,9 +140,10 @@ __exports.PaperDollData = __class(nil, {
         self.rangedCrit = 0
         self.spellCrit = 0
         self.hasteRating = 0
-        self.meleeHaste = 0
-        self.rangedHaste = 0
-        self.spellHaste = 0
+        self.hastePercent = 0
+        self.meleeAttackSpeedPercent = 0
+        self.rangedAttackSpeedPercent = 0
+        self.spellCastSpeedPercent = 0
         self.masteryRating = 0
         self.masteryEffect = 0
         self.versatilityRating = 0
@@ -156,52 +156,61 @@ __exports.PaperDollData = __class(nil, {
 local OvalePaperDollBase = OvaleState:RegisterHasState(OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvalePaperDoll", aceEvent))), __exports.PaperDollData)
 local OvalePaperDollClass = __class(OvalePaperDollBase, {
     OnInitialize = function(self)
+        self:RegisterEvent("UNIT_STATS")
         self:RegisterEvent("COMBAT_RATING_UPDATE")
         self:RegisterEvent("MASTERY_UPDATE")
-        self:RegisterEvent("PLAYER_ALIVE", "UpdateStats")
-        self:RegisterEvent("PLAYER_DAMAGE_DONE_MODS")
-        self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateStats")
-        self:RegisterEvent("PLAYER_LEVEL_UP")
-        self:RegisterEvent("SPELL_POWER_CHANGED")
         self:RegisterEvent("UNIT_ATTACK_POWER")
-        self:RegisterEvent("UNIT_DAMAGE", "UpdateDamage")
-        self:RegisterEvent("UNIT_LEVEL")
-        self:RegisterEvent("UNIT_RANGEDDAMAGE")
         self:RegisterEvent("UNIT_RANGED_ATTACK_POWER")
-        self:RegisterEvent("UNIT_SPELL_HASTE")
-        self:RegisterEvent("UNIT_STATS")
+        self:RegisterEvent("SPELL_POWER_CHANGED")
+        self:RegisterEvent("UNIT_DAMAGE", "UpdateDamage")
+        self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateStats")
+        self:RegisterEvent("PLAYER_ALIVE", "UpdateStats")
+        self:RegisterEvent("PLAYER_LEVEL_UP")
+        self:RegisterEvent("UNIT_LEVEL")
         self:RegisterMessage("Ovale_EquipmentChanged", "UpdateDamage")
-        self:RegisterMessage("Ovale_StanceChanged", "UpdateDamage")
         self:RegisterMessage("Ovale_TalentsChanged", "UpdateStats")
         lastSpell:RegisterSpellcastInfo(self)
     end,
     OnDisable = function(self)
         lastSpell:UnregisterSpellcastInfo(self)
+        self:UnregisterEvent("UNIT_STATS")
         self:UnregisterEvent("COMBAT_RATING_UPDATE")
         self:UnregisterEvent("MASTERY_UPDATE")
-        self:UnregisterEvent("PLAYER_ALIVE")
-        self:UnregisterEvent("PLAYER_DAMAGE_DONE_MODS")
-        self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-        self:UnregisterEvent("PLAYER_LEVEL_UP")
-        self:UnregisterEvent("SPELL_POWER_CHANGED")
         self:UnregisterEvent("UNIT_ATTACK_POWER")
-        self:UnregisterEvent("UNIT_DAMAGE")
-        self:UnregisterEvent("UNIT_LEVEL")
-        self:UnregisterEvent("UNIT_RANGEDDAMAGE")
         self:UnregisterEvent("UNIT_RANGED_ATTACK_POWER")
-        self:UnregisterEvent("UNIT_SPELL_HASTE")
-        self:UnregisterEvent("UNIT_STATS")
+        self:UnregisterEvent("SPELL_POWER_CHANGED")
+        self:UnregisterEvent("UNIT_DAMAGE")
+        self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+        self:UnregisterEvent("PLAYER_ALIVE")
+        self:UnregisterEvent("PLAYER_LEVEL_UP")
+        self:UnregisterEvent("UNIT_LEVEL")
         self:UnregisterMessage("Ovale_EquipmentChanged")
         self:UnregisterMessage("Ovale_StanceChanged")
         self:UnregisterMessage("Ovale_TalentsChanged")
     end,
+    UNIT_STATS = function(self, event, unitId)
+        if unitId == "player" then
+            self:StartProfiling("OvalePaperDoll_UpdateStats")
+            self.current.strength = UnitStat(unitId, 1)
+            self.current.agility = UnitStat(unitId, 2)
+            self.current.stamina = UnitStat(unitId, 3)
+            self.current.intellect = UnitStat(unitId, 4)
+            self.current.snapshotTime = GetTime()
+            Ovale:needRefresh()
+            self:StopProfiling("OvalePaperDoll_UpdateStats")
+        end
+    end,
     COMBAT_RATING_UPDATE = function(self, event)
         self:StartProfiling("OvalePaperDoll_UpdateStats")
+        self.current.critRating = GetCombatRating(CR_CRIT_MELEE)
         self.current.meleeCrit = GetCritChance()
         self.current.rangedCrit = GetRangedCritChance()
         self.current.spellCrit = GetSpellCritChance(OVALE_SPELLDAMAGE_SCHOOL[self.class])
-        self.current.critRating = GetCombatRating(CR_CRIT_MELEE)
         self.current.hasteRating = GetCombatRating(CR_HASTE_MELEE)
+        self.current.hastePercent = GetHaste()
+        self.current.meleeAttackSpeedPercent = GetMeleeHaste()
+        self.current.rangedAttackSpeedPercent = GetRangedHaste()
+        self.current.spellCastSpeedPercent = UnitSpellHaste("player")
         self.current.versatilityRating = GetCombatRating(CR_VERSATILITY_DAMAGE_DONE)
         self.current.versatility = GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_DONE)
         self.current.snapshotTime = GetTime()
@@ -220,28 +229,6 @@ local OvalePaperDollClass = __class(OvalePaperDollBase, {
         self.current.snapshotTime = GetTime()
         self:StopProfiling("OvalePaperDoll_UpdateStats")
     end,
-    PLAYER_LEVEL_UP = function(self, event, level, ...)
-        self:StartProfiling("OvalePaperDoll_UpdateStats")
-        self.level = tonumber(level) or UnitLevel("player")
-        self.current.snapshotTime = GetTime()
-        Ovale:needRefresh()
-        self:DebugTimestamp("%s: level = %d", event, self.level)
-        self:StopProfiling("OvalePaperDoll_UpdateStats")
-    end,
-    PLAYER_DAMAGE_DONE_MODS = function(self, event, unitId)
-        self:StartProfiling("OvalePaperDoll_UpdateStats")
-        self.current.spellPower = GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[self.class])
-        self.current.snapshotTime = GetTime()
-        Ovale:needRefresh()
-        self:StopProfiling("OvalePaperDoll_UpdateStats")
-    end,
-    SPELL_POWER_CHANGED = function(self, event)
-        self:StartProfiling("OvalePaperDoll_UpdateStats")
-        self.current.spellPower = GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[self.class])
-        self.current.snapshotTime = GetTime()
-        Ovale:needRefresh()
-        self:StopProfiling("OvalePaperDoll_UpdateStats")
-    end,
     UNIT_ATTACK_POWER = function(self, event, unitId)
         if unitId == "player" and  not OvaleEquipment:HasRangedWeapon() then
             self:StartProfiling("OvalePaperDoll_UpdateStats")
@@ -253,6 +240,31 @@ local OvalePaperDollClass = __class(OvalePaperDollBase, {
             self:StopProfiling("OvalePaperDoll_UpdateStats")
         end
     end,
+    UNIT_RANGED_ATTACK_POWER = function(self, event, unitId)
+        if unitId == "player" and OvaleEquipment:HasRangedWeapon() then
+            self:StartProfiling("OvalePaperDoll_UpdateStats")
+            local base, posBuff, negBuff = UnitRangedAttackPower(unitId)
+            Ovale:needRefresh()
+            self.current.attackPower = base + posBuff + negBuff
+            self.current.snapshotTime = GetTime()
+            self:StopProfiling("OvalePaperDoll_UpdateStats")
+        end
+    end,
+    SPELL_POWER_CHANGED = function(self, event)
+        self:StartProfiling("OvalePaperDoll_UpdateStats")
+        self.current.spellPower = GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[self.class])
+        self.current.snapshotTime = GetTime()
+        Ovale:needRefresh()
+        self:StopProfiling("OvalePaperDoll_UpdateStats")
+    end,
+    PLAYER_LEVEL_UP = function(self, event, level, ...)
+        self:StartProfiling("OvalePaperDoll_UpdateStats")
+        self.level = tonumber(level) or UnitLevel("player")
+        self.current.snapshotTime = GetTime()
+        Ovale:needRefresh()
+        self:DebugTimestamp("%s: level = %d", event, self.level)
+        self:StopProfiling("OvalePaperDoll_UpdateStats")
+    end,
     UNIT_LEVEL = function(self, event, unitId)
         Ovale.refreshNeeded[unitId] = true
         if unitId == "player" then
@@ -263,65 +275,15 @@ local OvalePaperDollClass = __class(OvalePaperDollBase, {
             self:StopProfiling("OvalePaperDoll_UpdateStats")
         end
     end,
-    UNIT_RANGEDDAMAGE = function(self, event, unitId)
-        if unitId == "player" then
-            self:StartProfiling("OvalePaperDoll_UpdateStats")
-            self.current.rangedHaste = GetRangedHaste()
-            self.current.snapshotTime = GetTime()
-            Ovale:needRefresh()
-            self:StopProfiling("OvalePaperDoll_UpdateStats")
-        end
-    end,
-    UNIT_RANGED_ATTACK_POWER = function(self, event, unitId)
-        if unitId == "player" then
-            self:StartProfiling("OvalePaperDoll_UpdateStats")
-            local base, posBuff, negBuff = UnitRangedAttackPower(unitId)
-            Ovale:needRefresh()
-            self.current.attackPower = base + posBuff + negBuff
-            self.current.snapshotTime = GetTime()
-            self:StopProfiling("OvalePaperDoll_UpdateStats")
-        end
-    end,
-    UNIT_SPELL_HASTE = function(self, event, unitId)
-        if unitId == "player" then
-            self:StartProfiling("OvalePaperDoll_UpdateStats")
-            self.current.meleeHaste = GetMeleeHaste()
-            self.current.spellHaste = UnitSpellHaste(unitId)
-            self.current.snapshotTime = GetTime()
-            Ovale:needRefresh()
-            self:UpdateDamage(event)
-            self:StopProfiling("OvalePaperDoll_UpdateStats")
-        end
-    end,
-    UNIT_STATS = function(self, event, unitId)
-        if unitId == "player" then
-            self:StartProfiling("OvalePaperDoll_UpdateStats")
-            self.current.strength = UnitStat(unitId, 1)
-            self.current.agility = UnitStat(unitId, 2)
-            self.current.stamina = UnitStat(unitId, 3)
-            self.current.intellect = UnitStat(unitId, 4)
-            self.current.snapshotTime = GetTime()
-            Ovale:needRefresh()
-            self:StopProfiling("OvalePaperDoll_UpdateStats")
-        end
-    end,
     UpdateDamage = function(self, event)
         self:StartProfiling("OvalePaperDoll_UpdateDamage")
-        local minDamage, maxDamage, minOffHandDamage, maxOffHandDamage, _, _, damageMultiplier = GetAppropriateDamage("player")
-        local mainHandAttackSpeed, offHandAttackSpeed = UnitAttackSpeed("player")
-        if damageMultiplier == 0 or mainHandAttackSpeed == 0 then
+        local damageMultiplier = GetAppropriateDamageMultiplier("player")
+        if damageMultiplier == 0 then
             return 
         end
         self.current.baseDamageMultiplier = damageMultiplier
-        if self.class == "DRUID" and OvaleStance:IsStance("druid_cat_form", nil) then
-            damageMultiplier = damageMultiplier * 1.4
-        end
-        self.current.mainHandWeaponDPS = (minDamage + maxDamage) * 0.5 / damageMultiplier / mainHandAttackSpeed
-        if offHandAttackSpeed then
-            self.current.offHandWeaponDPS = (minOffHandDamage + maxOffHandDamage) * 0.5 / damageMultiplier / offHandAttackSpeed
-        else
-            self.current.offHandWeaponDPS = 0
-        end
+        self.current.mainHandWeaponDPS = OvaleEquipment.mainHandDPS or 0
+        self.current.offHandWeaponDPS = OvaleEquipment.offHandDPS or 0
         self.current.snapshotTime = GetTime()
         Ovale:needRefresh()
         self:StopProfiling("OvalePaperDoll_UpdateDamage")
@@ -340,15 +302,12 @@ local OvalePaperDollClass = __class(OvalePaperDollBase, {
     end,
     UpdateStats = function(self, event)
         self:UpdateSpecialization(event)
+        self:UNIT_STATS(event, "player")
         self:COMBAT_RATING_UPDATE(event)
         self:MASTERY_UPDATE(event)
-        self:PLAYER_DAMAGE_DONE_MODS(event, "player")
-        self:SPELL_POWER_CHANGED(event)
         self:UNIT_ATTACK_POWER(event, "player")
-        self:UNIT_RANGEDDAMAGE(event, "player")
         self:UNIT_RANGED_ATTACK_POWER(event, "player")
-        self:UNIT_SPELL_HASTE(event, "player")
-        self:UNIT_STATS(event, "player")
+        self:SPELL_POWER_CHANGED(event)
         self:UpdateDamage(event)
     end,
     GetSpecialization = function(self, specialization)
@@ -369,27 +328,31 @@ local OvalePaperDollClass = __class(OvalePaperDollBase, {
         snapshot = snapshot or self.current
         return 1 + snapshot.masteryEffect / 100
     end,
-    GetMeleeHasteMultiplier = function(self, snapshot)
+    GetBaseHasteMultiplier = function(self, snapshot)
         snapshot = snapshot or self.current
-        return 1 + snapshot.meleeHaste / 100
+        return 1 + snapshot.hastePercent / 100
     end,
-    GetRangedHasteMultiplier = function(self, snapshot)
+    GetMeleeAttackSpeedPercentMultiplier = function(self, snapshot)
         snapshot = snapshot or self.current
-        return 1 + snapshot.rangedHaste / 100
+        return 1 + snapshot.meleeAttackSpeedPercent / 100
     end,
-    GetSpellHasteMultiplier = function(self, snapshot)
+    GetRangedAttackSpeedPercentMultiplier = function(self, snapshot)
         snapshot = snapshot or self.current
-        return 1 + snapshot.spellHaste / 100
+        return 1 + snapshot.rangedAttackSpeedPercent / 100
+    end,
+    GetSpellCastSpeedPercentMultiplier = function(self, snapshot)
+        snapshot = snapshot or self.current
+        return 1 + snapshot.spellCastSpeedPercent / 100
     end,
     GetHasteMultiplier = function(self, haste, snapshot)
         snapshot = snapshot or self.current
-        local multiplier = 1
+        local multiplier = self:GetBaseHasteMultiplier(snapshot) or 1
         if haste == "melee" then
-            multiplier = self:GetMeleeHasteMultiplier(snapshot)
+            multiplier = self:GetMeleeAttackSpeedPercentMultiplier(snapshot)
         elseif haste == "ranged" then
-            multiplier = self:GetRangedHasteMultiplier(snapshot)
+            multiplier = self:GetRangedAttackSpeedPercentMultiplier(snapshot)
         elseif haste == "spell" then
-            multiplier = self:GetSpellHasteMultiplier(snapshot)
+            multiplier = self:GetSpellCastSpeedPercentMultiplier(snapshot)
         end
         return multiplier
     end,
@@ -413,9 +376,10 @@ local OvalePaperDollClass = __class(OvalePaperDollBase, {
         self.next.rangedCrit = 0
         self.next.spellCrit = 0
         self.next.hasteRating = 0
-        self.next.meleeHaste = 0
-        self.next.rangedHaste = 0
-        self.next.spellHaste = 0
+        self.next.hastePercent = 0
+        self.next.meleeAttackSpeedPercent = 0
+        self.next.rangedAttackSpeedPercent = 0
+        self.next.spellCastSpeedPercent = 0
         self.next.masteryRating = 0
         self.next.masteryEffect = 0
         self.next.versatilityRating = 0
@@ -447,9 +411,10 @@ local OvalePaperDollClass = __class(OvalePaperDollBase, {
             rangedCrit = true,
             spellCrit = true,
             hasteRating = true,
-            meleeHaste = true,
-            rangedHaste = true,
-            spellHaste = true,
+            hastePercent = true,
+            meleeAttackSpeedPercent = true,
+            rangedAttackSpeedPercent = true,
+            spellCastSpeedPercent = true,
             masteryRating = true,
             masteryEffect = true,
             versatilityRating = true,

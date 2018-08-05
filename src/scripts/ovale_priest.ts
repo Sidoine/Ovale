@@ -102,7 +102,7 @@ AddFunction actors_fight_time_mod
 
 AddFunction s2msetup_time
 {
- if Talent(surrender_to_madness_talent) 0 * { 83 + { 20 + 20 * TalentPoints(fortress_of_the_mind_talent) } * ArmorSetBonus(T20 4) - 5 * TalentPoints(sanlayn_talent) + { 33 - 13 * ArmorSetBonus(T20 4) } * TalentPoints(reaper_of_souls_talent) + ArmorSetBonus(T19 2) * 4 + 8 * HasEquippedItem(mangazas_madness) + SpellHaste() * 10 * { 1 + 0 * ArmorSetBonus(T20 4) } * { 2 + 0 * ArmorSetBonus(T19 2) + 1 * TalentPoints(reaper_of_souls_talent) + 2 * ArtifactTraitRank(mass_hysteria) - 1 * TalentPoints(sanlayn_talent) } }
+ if Talent(surrender_to_madness_talent) 0 * { 83 + { 20 + 20 * TalentPoints(fortress_of_the_mind_talent) } * ArmorSetBonus(T20 4) - 5 * TalentPoints(sanlayn_talent) + { 33 - 13 * ArmorSetBonus(T20 4) } * TalentPoints(reaper_of_souls_talent) + ArmorSetBonus(T19 2) * 4 + 8 * HasEquippedItem(mangazas_madness) + SpellCastSpeedPercent() * 10 * { 1 + 0 * ArmorSetBonus(T20 4) } * { 2 + 0 * ArmorSetBonus(T19 2) + 1 * TalentPoints(reaper_of_souls_talent) + 2 * ArtifactTraitRank(mass_hysteria) - 1 * TalentPoints(sanlayn_talent) } }
 }
 
 AddFunction sear_dpgcd
@@ -134,7 +134,6 @@ AddFunction ShadowInterruptActions
  {
   if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
   if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
-  if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_mana)
   if target.InRange(mind_bomb) and not target.Classification(worldboss) and target.RemainingCastTime() > 2 Spell(mind_bomb)
   if target.InRange(silence) and target.IsInterruptible() Spell(silence)
  }
@@ -717,7 +716,7 @@ AddFunction actors_fight_time_mod
 
 AddFunction s2msetup_time
 {
- if Talent(surrender_to_madness_talent) 0 * { 83 + { 20 + 20 * TalentPoints(fortress_of_the_mind_talent) } * ArmorSetBonus(T20 4) - 5 * TalentPoints(sanlayn_talent) + { 33 - 13 * ArmorSetBonus(T20 4) } * TalentPoints(reaper_of_souls_talent) + ArmorSetBonus(T19 2) * 4 + 8 * HasEquippedItem(mangazas_madness) + SpellHaste() * 10 * { 1 + 0 * ArmorSetBonus(T20 4) } * { 2 + 0 * ArmorSetBonus(T19 2) + 1 * TalentPoints(reaper_of_souls_talent) + 2 * ArtifactTraitRank(mass_hysteria) - 1 * TalentPoints(sanlayn_talent) } }
+ if Talent(surrender_to_madness_talent) 0 * { 83 + { 20 + 20 * TalentPoints(fortress_of_the_mind_talent) } * ArmorSetBonus(T20 4) - 5 * TalentPoints(sanlayn_talent) + { 33 - 13 * ArmorSetBonus(T20 4) } * TalentPoints(reaper_of_souls_talent) + ArmorSetBonus(T19 2) * 4 + 8 * HasEquippedItem(mangazas_madness) + SpellCastSpeedPercent() * 10 * { 1 + 0 * ArmorSetBonus(T20 4) } * { 2 + 0 * ArmorSetBonus(T19 2) + 1 * TalentPoints(reaper_of_souls_talent) + 2 * ArtifactTraitRank(mass_hysteria) - 1 * TalentPoints(sanlayn_talent) } }
 }
 
 AddFunction sear_dpgcd
@@ -749,7 +748,6 @@ AddFunction ShadowInterruptActions
  {
   if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
   if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
-  if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_mana)
   if target.InRange(mind_bomb) and not target.Classification(worldboss) and target.RemainingCastTime() > 2 Spell(mind_bomb)
   if target.InRange(silence) and target.IsInterruptible() Spell(silence)
  }

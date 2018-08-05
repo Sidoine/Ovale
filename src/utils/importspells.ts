@@ -1,4 +1,4 @@
-import { readFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
 import { LuaObj } from "@wowts/lua";
 
 export interface SpellPowerData {
@@ -773,6 +773,7 @@ export interface SpellData {
     spellPowers?: SpellPowerData[];
     identifier?: string;
     identifierScore?: number;
+    talent?: TalentData;
 }
 
 export interface SpellEffectData {
@@ -1136,6 +1137,12 @@ export function getSpellData(directory: string) {
         };
         identifiers[talent.identifier] = talent.id;
         talentsById.set(talent.id, talent);
+        if (talent.spell_id) {
+            const spell = spellDataById.get(talent.spell_id);
+            if (spell) {
+                spell.talent = talent;
+            }
+        }
     }
 
     const itemsById = new Map<number, ItemData>();
@@ -1180,6 +1187,8 @@ export function getSpellData(directory: string) {
         itemsById.set(item.id, item);
         identifiers[item.identifier] = item.id;
     }
+
+writeFileSync("sample.json", JSON.stringify(spellData), { encoding: "utf8"});
 
     return { spellData, spellDataById, identifiers, talentsById, itemsById };
 }

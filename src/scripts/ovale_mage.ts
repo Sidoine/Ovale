@@ -60,7 +60,6 @@ AddFunction ArcaneInterruptActions
  if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
  {
   if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
-  if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_mana)
   if target.InRange(counterspell) and target.IsInterruptible() Spell(counterspell)
  }
 }
@@ -612,7 +611,6 @@ AddFunction FireInterruptActions
 	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
 	{
 		if target.InRange(counterspell) and target.IsInterruptible() Spell(counterspell)
-		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_mana)
 		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
 	}
 }
@@ -715,7 +713,7 @@ AddFunction FireActiveTalentsMainActions
 	#blast_wave,if=(buff.combustion.down)|(buff.combustion.up&action.fire_blast.charges<1&action.phoenixs_flames.charges<1)
 	if BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 and Charges(phoenixs_flames) < 1 Spell(blast_wave)
 	#cinderstorm,if=cooldown.combustion.remains<cast_time&(buff.rune_of_power.up|!talent.rune_on_power.enabled)|cooldown.combustion.remains>10*spell_haste&!buff.combustion.up
-	if SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_on_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellHaste() } } and not BuffPresent(combustion_buff) Spell(cinderstorm)
+	if SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_on_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellCastSpeedPercent() } } and not BuffPresent(combustion_buff) Spell(cinderstorm)
 	#living_bomb,if=active_enemies>1&buff.combustion.down
 	if Enemies() > 1 and BuffExpires(combustion_buff) Spell(living_bomb)
 }
@@ -731,7 +729,7 @@ AddFunction FireActiveTalentsShortCdActions
 		#meteor,if=cooldown.combustion.remains>40|(cooldown.combustion.remains>target.time_to_die)|buff.rune_of_power.up|firestarter.active
 		if SpellCooldown(combustion) > 40 or SpellCooldown(combustion) > target.TimeToDie() or BuffPresent(rune_of_power_buff) or HasTalent(firestarter_talent) and target.HealthPercent() >= 90 Spell(meteor)
 
-		unless { SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_on_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellHaste() } } and not BuffPresent(combustion_buff) } and Spell(cinderstorm)
+		unless { SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_on_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellCastSpeedPercent() } } and not BuffPresent(combustion_buff) } and Spell(cinderstorm)
 		{
 			#dragons_breath,if=equipped.132863|(talent.alexstraszas_fury.enabled&buff.hot_streak.down)
 			if HasEquippedItem(132863) or Talent(alexstraszas_fury_talent) and BuffExpires(hot_streak_buff) Spell(dragons_breath)
@@ -741,7 +739,7 @@ AddFunction FireActiveTalentsShortCdActions
 
 AddFunction FireActiveTalentsShortCdPostConditions
 {
-	{ BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 and Charges(phoenixs_flames) < 1 } and Spell(blast_wave) or { SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_on_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellHaste() } } and not BuffPresent(combustion_buff) } and Spell(cinderstorm) or Enemies() > 1 and BuffExpires(combustion_buff) and Spell(living_bomb)
+	{ BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 and Charges(phoenixs_flames) < 1 } and Spell(blast_wave) or { SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_on_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellCastSpeedPercent() } } and not BuffPresent(combustion_buff) } and Spell(cinderstorm) or Enemies() > 1 and BuffExpires(combustion_buff) and Spell(living_bomb)
 }
 
 AddFunction FireActiveTalentsCdActions
@@ -750,7 +748,7 @@ AddFunction FireActiveTalentsCdActions
 
 AddFunction FireActiveTalentsCdPostConditions
 {
-	{ BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 and Charges(phoenixs_flames) < 1 } and Spell(blast_wave) or { SpellCooldown(combustion) > 40 or SpellCooldown(combustion) > target.TimeToDie() or BuffPresent(rune_of_power_buff) or HasTalent(firestarter_talent) and target.HealthPercent() >= 90 } and Spell(meteor) or { SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_on_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellHaste() } } and not BuffPresent(combustion_buff) } and Spell(cinderstorm) or { HasEquippedItem(132863) or Talent(alexstraszas_fury_talent) and BuffExpires(hot_streak_buff) } and Spell(dragons_breath) or Enemies() > 1 and BuffExpires(combustion_buff) and Spell(living_bomb)
+	{ BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 and Charges(phoenixs_flames) < 1 } and Spell(blast_wave) or { SpellCooldown(combustion) > 40 or SpellCooldown(combustion) > target.TimeToDie() or BuffPresent(rune_of_power_buff) or HasTalent(firestarter_talent) and target.HealthPercent() >= 90 } and Spell(meteor) or { SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_on_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellCastSpeedPercent() } } and not BuffPresent(combustion_buff) } and Spell(cinderstorm) or { HasEquippedItem(132863) or Talent(alexstraszas_fury_talent) and BuffExpires(hot_streak_buff) } and Spell(dragons_breath) or Enemies() > 1 and BuffExpires(combustion_buff) and Spell(living_bomb)
 }
 
 ### actions.combustion_phase
@@ -1010,9 +1008,9 @@ AddFunction FireStandardRotationShortCdActions
 		unless FireActiveTalentsShortCdPostConditions()
 		{
 			#fire_blast,if=!talent.kindling.enabled&buff.heating_up.up&(!talent.rune_of_power.enabled|charges_fractional>1.4|cooldown.combustion.remains<40)&(3-charges_fractional)*(12*spell_haste)<cooldown.combustion.remains+3|target.time_to_die<4
-			if not Talent(kindling_talent) and BuffPresent(heating_up_buff) and { not Talent(rune_of_power_talent) or Charges(fire_blast count=0) > 1.4 or SpellCooldown(combustion) < 40 } and { 3 - Charges(fire_blast count=0) } * 12 * { 100 / { 100 + SpellHaste() } } < SpellCooldown(combustion) + 3 or target.TimeToDie() < 4 Spell(fire_blast)
+			if not Talent(kindling_talent) and BuffPresent(heating_up_buff) and { not Talent(rune_of_power_talent) or Charges(fire_blast count=0) > 1.4 or SpellCooldown(combustion) < 40 } and { 3 - Charges(fire_blast count=0) } * 12 * { 100 / { 100 + SpellCastSpeedPercent() } } < SpellCooldown(combustion) + 3 or target.TimeToDie() < 4 Spell(fire_blast)
 			#fire_blast,if=talent.kindling.enabled&buff.heating_up.up&(!talent.rune_of_power.enabled|charges_fractional>1.5|cooldown.combustion.remains<40)&(3-charges_fractional)*(18*spell_haste)<cooldown.combustion.remains+3|target.time_to_die<4
-			if Talent(kindling_talent) and BuffPresent(heating_up_buff) and { not Talent(rune_of_power_talent) or Charges(fire_blast count=0) > 1.5 or SpellCooldown(combustion) < 40 } and { 3 - Charges(fire_blast count=0) } * 18 * { 100 / { 100 + SpellHaste() } } < SpellCooldown(combustion) + 3 or target.TimeToDie() < 4 Spell(fire_blast)
+			if Talent(kindling_talent) and BuffPresent(heating_up_buff) and { not Talent(rune_of_power_talent) or Charges(fire_blast count=0) > 1.5 or SpellCooldown(combustion) < 40 } and { 3 - Charges(fire_blast count=0) } * 18 * { 100 / { 100 + SpellCastSpeedPercent() } } < SpellCooldown(combustion) + 3 or target.TimeToDie() < 4 Spell(fire_blast)
 		}
 	}
 }
@@ -1177,7 +1175,6 @@ AddFunction FrostInterruptActions
  if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
  {
   if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
-  if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_mana)
   if target.InRange(counterspell) and target.IsInterruptible() Spell(counterspell)
  }
 }
