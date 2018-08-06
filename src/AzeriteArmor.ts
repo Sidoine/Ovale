@@ -22,6 +22,7 @@ let azeriteSlots: LuaArray<boolean> = {
 interface Trait {
     name?: string;
     spellID: number;
+    rank: number
 }
 
 let OvaleAzeriteArmorBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleAzerite", aceEvent));
@@ -94,10 +95,17 @@ class OvaleAzeriteArmor extends OvaleAzeriteArmorBase {
                         if(isEnabled){
                             let powerInfo = azeriteItem.GetPowerInfo(powerId)
                             let [name] = GetSpellInfo(powerInfo.spellID);
-                            this.self_traits[powerInfo.spellID] = {
-                                spellID: powerInfo.spellID,
-                                name: name
-                            };
+                            if(this.self_traits[powerInfo.spellID]){
+                                let rank = this.self_traits[powerInfo.spellID].rank
+                                this.self_traits[powerInfo.spellID].rank = rank + 1
+                            }else{
+                                this.self_traits[powerInfo.spellID] = {
+                                    spellID: powerInfo.spellID,
+                                    name: name,
+                                    rank: 1
+                                };
+                            }                            
+                            break
                         }
                     }
                 }
@@ -109,11 +117,18 @@ class OvaleAzeriteArmor extends OvaleAzeriteArmorBase {
         return (this.self_traits[spellId]) && true || false;
     }
 
+    TraitRank(spellId: number) {
+        if (!this.self_traits[spellId]) {
+            return 0;
+        }
+        return this.self_traits[spellId].rank;
+    }
+
     DebugTraits(){
         wipe(this.output);
         let array: LuaArray<string> = {}
         for (const [k, v] of pairs(this.self_traits)) {
-            tinsert(array, `${tostring(v.name)}: ${tostring(k)}`);
+            tinsert(array, `${tostring(v.name)}: ${tostring(k)} (${v.rank})`);
         }
         tsort(array);
         for (const [, v] of ipairs(array)) {

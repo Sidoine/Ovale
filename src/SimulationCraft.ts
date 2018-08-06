@@ -179,7 +179,8 @@ let MODIFIER_KEYWORD: LuaObj<boolean> = {
     ["op"]: true,
     ["pct_health"]: true,
     ["precombat"]: true,
-    ["precast_time"]: true,
+    ["precombat_seconds"]: true, //todo
+    ["precast_time"]: true, //todo
     ["range"]: true,
     ["sec"]: true,
     ["slot"]: true,
@@ -1212,7 +1213,7 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("none", "none");
 
     //Bloodlust
-    AddDisambiguation("bloodlust", "burst_haste")
+    AddDisambiguation("bloodlust_buff", "burst_haste_buff")
 
     //Items
     AddDisambiguation("buff_sephuzs_secret", "sephuzs_secret_buff")
@@ -1299,10 +1300,27 @@ const InitializeDisambiguation = function() {
     //Priest
     AddDisambiguation("mindbender_talent", "mindbender_talent_discipline", "PRIEST", "discipline");
     AddDisambiguation("twist_of_fate_talent", "twist_of_fate_talent_discipline", "PRIEST", "discipline");
-    
+
+    //Rogue
+    AddDisambiguation("stealth_buff", "stealthed_buff", "ROGUE");
+    AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_assassination_buff", "ROGUE", "assassination");
+    AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_outlaw_buff", "ROGUE", "outlaw");
+    AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_subtlety_buff", "ROGUE", "subtlety");
+
     //Shaman
+    AddDisambiguation("ascendance", "ascendance_elemental", "SHAMAN", "elemental")
+    AddDisambiguation("ascendance", "ascendance_enhancement", "SHAMAN", "enhancement")
+    AddDisambiguation("ascendance", "ascendance_restoration", "SHAMAN", "restoration")
+    AddDisambiguation("chain_lightning", "chain_lightning_restoration", "SHAMAN", "restoration")
     AddDisambiguation("earth_shield_talent", "earth_shield_talent_restoration", "SHAMAN", "restoration");
-    AddDisambiguation("echo_of_the_elements_talent", "echo_of_the_elements_talent_restoration", "SHAMAN", "restoration");
+    AddDisambiguation("echo_of_the_elements_talent", "resto_echo_of_the_elements_talent", "SHAMAN", "restoration");
+    AddDisambiguation("flame_shock", "flame_shock_restoration", "SHAMAN", "restoration")
+    AddDisambiguation("healing_surge", "healing_surge_restoration", "SHAMAN", "restoration")
+    AddDisambiguation("lightning_bolt", "lightning_bolt_elemental", "SHAMAN", "elemental")
+    AddDisambiguation("lightning_bolt", "lightning_bolt_enhancement", "SHAMAN", "enhancement")
+    AddDisambiguation("strike", "windstrike", "SHAMAN", "enhancement")
+    AddDisambiguation("totem_mastery", "totem_mastery_elemental", "SHAMAN", "elemental")
+    AddDisambiguation("totem_mastery", "totem_mastery_enhancement", "SHAMAN", "enhancement")
 
     //Warlock
     AddDisambiguation("soul_conduit_talent", "soul_conduit_talent_demonology", "WARLOCK", "demonology");
@@ -2928,15 +2946,17 @@ EmitOperandAzerite = function (operand, parseNode, nodeList, annotation, action,
         let code:string;
         let name = tokenIterator();
         let property = tokenIterator();
-        if (property == "enabled") {
-            code = format("HasAzeriteTrait(%s)", name);
+        if (property == "rank") {
+            code = format("AzeriteTraitRank(%s_trait)", name);
+        } else if (property == "enabled") {
+            code = format("HasAzeriteTrait(%s_trait)", name);
         } else {
             ok = false;
         }
         if (ok && code) {
             annotation.astAnnotation = annotation.astAnnotation || {};
             [node] = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation);
-            AddSymbol(annotation, name);
+            AddSymbol(annotation, `${name}_trait`);
         }
     } else {
         ok = false;
@@ -3528,6 +3548,8 @@ EmitOperandRaidEvent = function (operand, parseNode, nodeList, annotation, actio
             code = "False(raid_event_adds_exists)";
         } else if (property == "in") {
             code = "600";
+        } else if (property == "duration") {
+            code = "10"  //TODO
         } else {
             ok = false;
         }
@@ -3811,6 +3833,12 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
     } else if (className == "ROGUE" && operand == "exsanguinated") {
         code = "target.DebuffPresent(exsanguinated)";
         AddSymbol(annotation, "exsanguinated");
+    } else if (className == "ROGUE" && operand == "master_assassin_remains") {
+        code = "BuffRemaining(master_assassin_buff)";
+        AddSymbol(annotation, "master_assassin_buff");
+    } else if (className == "ROGUE" && operand == "buff.roll_the_bones.remains"){
+        code = "BuffRemaining(roll_the_bones_buff)";
+        AddSymbol(annotation, "roll_the_bones_buff");
     } else if (className == "SHAMAN" && operand == "buff.resonance_totem.remains") {
         code = "TotemRemaining(totem_mastery)";
         ok = true;
@@ -4570,7 +4598,7 @@ const InsertInterruptFunctions = function(child: LuaArray<AstNode>, annotation: 
             });
         }
         insert(interrupts, {
-            name: "lightning_surge_totem",
+            name: "capacitor_totem",
             stun: 1,
             order: 30,
             range: "",
