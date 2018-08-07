@@ -1450,7 +1450,7 @@ local function AlternatePowerDeficit(positionalParams, namedParams, state, atTim
         return PowerDeficit("alternatepower", positionalParams, namedParams, state, atTime)
     end
 local function AstralPowerDeficit(positionalParams, namedParams, state, atTime)
-        return PowerDeficit("astralpower", positionalParams, namedParams, state, atTime)
+        return PowerDeficit("lunarpower", positionalParams, namedParams, state, atTime)
     end
 local function ChiDeficit(positionalParams, namedParams, state, atTime)
         return PowerDeficit("chi", positionalParams, namedParams, state, atTime)
