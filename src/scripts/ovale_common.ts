@@ -220,7 +220,8 @@ Define(fireblood 265221)
 	SpellInfo(fireblood cd=120)
 Define(ancestral_call 274738)
 	SpellInfo(ancestral_call cd=120)
-    
+Define(arcane_pulse 260364)  
+	SpellInfo(arcane_pulse cd=180)
 	
 ###
 ### Boss Spells

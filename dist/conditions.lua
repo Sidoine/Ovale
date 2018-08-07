@@ -161,12 +161,18 @@ local function HasArtifactTrait(positionalParams, namedParams, state, atTime)
     OvaleCondition:RegisterCondition("artifacttraitrank", false, ArtifactTraitRank)
 end
 do
+local function AzeriteTraitRank(positionalParams, namedParams, state, atTime)
+        local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+        local value = OvaleAzerite:TraitRank(spellId)
+        return Compare(value, comparator, limit)
+    end
 local function HasAzeriteTrait(positionalParams, namedParams, state, atTime)
         local spellId, yesno = positionalParams[1], positionalParams[2]
         local value = OvaleAzerite:HasTrait(spellId)
         return TestBoolean(value, yesno)
     end
     OvaleCondition:RegisterCondition("hasazeritetrait", false, HasAzeriteTrait)
+    OvaleCondition:RegisterCondition("azeritetraitrank", false, AzeriteTraitRank)
 end
 do
 local function BaseDuration(positionalParams, namedParams, state, atTime)
