@@ -291,11 +291,11 @@ SpellList(any_stagger_debuff light_stagger_debuff moderate_stagger_debuff heavy_
 
 ## Items
 Define(convergence_of_fates 140806)
-Define(drinking_horn_cover 137097)
+Define(drinking_horn_cover_item 137097)
 Define(firestone_walkers 137027)
 Define(fundamental_observation 137063)
 	SpellInfo(zen_meditation cd=150 if_equipped=fundamental_observation)
-Define(hidden_masters_forbidden_touch 137057)
+Define(hidden_masters_forbidden_touch_item 137057)
 Define(hidden_masters_forbidden_touch_buff 213114)
 	SpellInfo(hidden_masters_forbidden_touch_buff duration=5)
 Define(katsuos_eclipse 137029)
@@ -303,7 +303,7 @@ Define(katsuos_eclipse 137029)
 Define(salsalabims_lost_tunic 137016)
 Define(stormstouts_last_gasp 151788)
 	SpellInfo(keg_smash charges=2 if_equipped=stormstouts_last_gasp)
-Define(the_emperors_capacitor 144239)
+Define(the_emperors_capacitor_item 144239)
 	SpellAddBuff(crackling_jade_lightning the_emperors_capacitor_buff=0)
 Define(the_emperors_capacitor_buff 235054)
 
