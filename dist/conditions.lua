@@ -1545,7 +1545,7 @@ local function MaxFury(positionalParams, namedParams, state, atTime)
         return MaxPower("fury", positionalParams, namedParams, state, atTime)
     end
 local function MaxHolyPower(positionalParams, namedParams, state, atTime)
-        return MaxPower("holy", positionalParams, namedParams, state, atTime)
+        return MaxPower("holypower", positionalParams, namedParams, state, atTime)
     end
 local function MaxMana(positionalParams, namedParams, state, atTime)
         return MaxPower("mana", positionalParams, namedParams, state, atTime)
