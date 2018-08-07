@@ -3017,7 +3017,7 @@ l    */
 	 @return A boolean value for the result of the comparison.
      */
     function MaxHolyPower(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        return MaxPower("holy", positionalParams, namedParams, state, atTime);
+        return MaxPower("holypower", positionalParams, namedParams, state, atTime);
     }
 
     /** Get the maximum amount of mana of the target.
