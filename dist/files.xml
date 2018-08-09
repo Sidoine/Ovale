@@ -23,7 +23,7 @@
    <Script file="DamageTaken.lua"/>
    <Script file="LastSpell.lua"/>
    <Script file="State.lua"/>
-   <Script file="WildImps.lua"/>
+   <Script file="Warlock.lua"/>
    <Script file="DemonHunterSoulFragments.lua"/>
    <Script file="Enemies.lua"/>
    <Script file="BaseState.lua"/>

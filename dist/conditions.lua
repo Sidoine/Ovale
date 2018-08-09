@@ -40,8 +40,6 @@ local __PaperDoll = LibStub:GetLibrary("ovale/PaperDoll")
 local OvalePaperDoll = __PaperDoll.OvalePaperDoll
 local __Aura = LibStub:GetLibrary("ovale/Aura")
 local OvaleAura = __Aura.OvaleAura
-local __WildImps = LibStub:GetLibrary("ovale/WildImps")
-local OvaleWildImps = __WildImps.OvaleWildImps
 local __Enemies = LibStub:GetLibrary("ovale/Enemies")
 local OvaleEnemies = __Enemies.OvaleEnemies
 local __Totem = LibStub:GetLibrary("ovale/Totem")
@@ -101,6 +99,8 @@ local __Spells = LibStub:GetLibrary("ovale/Spells")
 local OvaleSpells = __Spells.OvaleSpells
 local __AzeriteArmor = LibStub:GetLibrary("ovale/AzeriteArmor")
 local OvaleAzerite = __AzeriteArmor.OvaleAzerite
+local __Warlock = LibStub:GetLibrary("ovale/Warlock")
+local OvaleWarlock = __Warlock.OvaleWarlock
 local INFINITY = huge
 local function BossArmorDamageReduction(target, state)
     return 0.3
@@ -699,17 +699,17 @@ end
 do
 local function Demons(positionalParams, namedParams, state, atTime)
         local creatureId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-        local value = OvaleWildImps:GetDemonsCount(creatureId, atTime)
+        local value = OvaleWarlock:GetDemonsCount(creatureId, atTime)
         return Compare(value, comparator, limit)
     end
 local function NotDeDemons(positionalParams, namedParams, state, atTime)
         local creatureId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-        local value = OvaleWildImps:GetNotDemonicEmpoweredDemonsCount(creatureId, atTime)
+        local value = OvaleWarlock:GetNotDemonicEmpoweredDemonsCount(creatureId, atTime)
         return Compare(value, comparator, limit)
     end
 local function DemonDuration(positionalParams, namedParams, state, atTime)
         local creatureId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-        local value = OvaleWildImps:GetRemainingDemonDuration(creatureId, atTime)
+        local value = OvaleWarlock:GetRemainingDemonDuration(creatureId, atTime)
         return Compare(value, comparator, limit)
     end
     OvaleCondition:RegisterCondition("demons", false, Demons)

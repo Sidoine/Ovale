@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/WildImps", 80000)
+local __exports = LibStub:NewLibrary("ovale/Warlock", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __State = LibStub:GetLibrary("ovale/State")
@@ -11,7 +11,7 @@ local pairs = pairs
 local GetTime = GetTime
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local find = string.find
-local OvaleWildImpsBase = Ovale:NewModule("OvaleWildImps", aceEvent)
+local OvaleWarlockBase = Ovale:NewModule("OvaleWarlock", aceEvent)
 local demonData = {
     [55659] = {
         duration = 12
@@ -27,11 +27,20 @@ local demonData = {
     },
     [89] = {
         duration = 25
+    },
+    [143622] = {
+        duration = 12
+    },
+    [135002] = {
+        duration = 15
+    },
+    [17252] = {
+        duration = 15
     }
 }
 local self_demons = {}
 local self_serial = 1
-local OvaleWildImpsClass = __class(OvaleWildImpsBase, {
+local OvaleWarlockClass = __class(OvaleWarlockBase, {
     OnInitialize = function(self)
         if Ovale.playerClass == "WARLOCK" then
             self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -55,6 +64,7 @@ local OvaleWildImpsClass = __class(OvaleWildImpsBase, {
             local now = GetTime()
             for id, v in pairs(demonData) do
                 if id == creatureId then
+                    creatureId = (creatureId == 143622) and 55659 or creatureId
                     self_demons[destGUID] = {
                         id = creatureId,
                         timestamp = now,
@@ -113,5 +123,5 @@ local OvaleWildImpsClass = __class(OvaleWildImpsBase, {
         return max
     end,
 })
-__exports.OvaleWildImps = OvaleWildImpsClass()
-OvaleState:RegisterState(__exports.OvaleWildImps)
+__exports.OvaleWarlock = OvaleWarlockClass()
+OvaleState:RegisterState(__exports.OvaleWarlock)
