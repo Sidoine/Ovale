@@ -2435,3 +2435,11 @@ local function SoulFragments(positionalParams, namedParams, state, atTime)
     end
     OvaleCondition:RegisterCondition("soulfragments", false, SoulFragments)
 end
+do
+local function TimeToShard(positionalParams, namedParams, state, atTime)
+        local comparator, limit = positionalParams[1], positionalParams[2]
+        local value = OvaleWarlock:TimeToShard()
+        return Compare(value, comparator, limit)
+    end
+    OvaleCondition:RegisterCondition("timetoshard", false, TimeToShard)
+end

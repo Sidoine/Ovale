@@ -4957,3 +4957,11 @@ l    */
     }
     OvaleCondition.RegisterCondition("soulfragments", false, SoulFragments);
 }
+{
+    function TimeToShard(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number){
+        let [comparator, limit] = [positionalParams[1], positionalParams[2]];
+        let value = OvaleWarlock.TimeToShard()
+        return Compare(value, comparator, limit);
+    }
+    OvaleCondition.RegisterCondition("timetoshard", false, TimeToShard);
+}

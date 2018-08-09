@@ -15,6 +15,11 @@ local __Options = LibStub:GetLibrary("ovale/Options")
 local OvaleOptions = __Options.OvaleOptions
 local __Aura = LibStub:GetLibrary("ovale/Aura")
 local OvaleAura = __Aura.OvaleAura
+local __PaperDoll = LibStub:GetLibrary("ovale/PaperDoll")
+local OvalePaperDoll = __PaperDoll.OvalePaperDoll
+local pow = math.pow
+local __SpellBook = LibStub:GetLibrary("ovale/SpellBook")
+local OvaleSpellBook = __SpellBook.OvaleSpellBook
 local OvaleWarlockBase = Ovale:NewModule("OvaleWarlock", aceEvent)
 local CUSTOM_AURAS = {
     [80240] = {
@@ -143,6 +148,21 @@ local OvaleWarlockClass = __class(OvaleWarlockBase, {
         local expire = now + duration
         local filter = OvaleOptions.defaultDB.profile.apparence.fullAuraScan and "HELPFUL" or "HELPFUL|PLAYER"
         OvaleAura:GainedAuraOnGUID(Ovale.playerGUID, now, customId, Ovale.playerGUID, filter, nil, nil, stacks, nil, duration, expire, nil, buffName, nil, nil, nil)
+    end,
+    TimeToShard = function(self)
+        local now = GetTime()
+        local filter = OvaleOptions.defaultDB.profile.apparence.fullAuraScan and "HARMFUL" or "HARMFUL|PLAYER"
+        local value = 3600
+        local creepingDeathTalent = 20
+        local tickTime = 2 / OvalePaperDoll:GetHasteMultiplier("spell", OvalePaperDoll.next)
+        local activeAgonies = OvaleAura:AuraCount(980, filter, true, nil, now, nil)
+        if activeAgonies > 0 then
+            value = 1 / (0.184 * pow(activeAgonies, -2 / 3)) * tickTime / activeAgonies
+            if OvaleSpellBook:IsKnownTalent(creepingDeathTalent) then
+                value = value * 0.85
+            end
+        end
+        return value
     end,
 })
 __exports.OvaleWarlock = OvaleWarlockClass()

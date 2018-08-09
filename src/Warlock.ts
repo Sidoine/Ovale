@@ -6,6 +6,9 @@ import { GetTime, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { find } from "@wowts/string";
 import { OvaleOptions } from "./Options";
 import { OvaleAura } from "./Aura";
+import { OvalePaperDoll } from "./PaperDoll";
+import { pow } from "@wowts/math";
+import { OvaleSpellBook } from "./SpellBook";
 
 let OvaleWarlockBase = Ovale.NewModule("OvaleWarlock", aceEvent);
 export let OvaleWarlock: OvaleWarlockClass;
@@ -157,6 +160,26 @@ class OvaleWarlockClass extends OvaleWarlockBase {
         let expire = now + duration;
         let filter = OvaleOptions.defaultDB.profile.apparence.fullAuraScan && 'HELPFUL' || 'HELPFUL|PLAYER';
         OvaleAura.GainedAuraOnGUID(Ovale.playerGUID, now, customId, Ovale.playerGUID, filter, undefined, undefined, stacks, undefined, duration, expire, undefined, buffName, undefined, undefined, undefined);
+    }
+
+    /**
+     * Based on SimulationCraft function time_to_shard
+     * Seeks to return the average expected time for the player to generate a single soul shard.
+     */
+    TimeToShard(){
+        let now = GetTime();
+        let filter = OvaleOptions.defaultDB.profile.apparence.fullAuraScan && 'HARMFUL' || 'HARMFUL|PLAYER';
+        let value = 3600;
+        let creepingDeathTalent = 20;
+        let tickTime = 2 / OvalePaperDoll.GetHasteMultiplier("spell", OvalePaperDoll.next);
+        let [activeAgonies] = OvaleAura.AuraCount(980, filter, true, undefined, now, undefined)
+        if(activeAgonies > 0){
+            value = 1 / ( 0.184 * pow( activeAgonies, -2/3 ) ) * tickTime / activeAgonies;
+            if(OvaleSpellBook.IsKnownTalent(creepingDeathTalent)){
+                value = value * 0.85;
+            }
+        }
+        return value;
     }
 }
 
