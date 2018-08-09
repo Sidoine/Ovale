@@ -4,9 +4,27 @@ import aceEvent from "@wowts/ace_event-3.0";
 import { LuaArray, tonumber, pairs, LuaObj } from "@wowts/lua";
 import { GetTime, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { find } from "@wowts/string";
+import { OvaleOptions } from "./Options";
+import { OvaleAura } from "./Aura";
 
 let OvaleWarlockBase = Ovale.NewModule("OvaleWarlock", aceEvent);
 export let OvaleWarlock: OvaleWarlockClass;
+
+interface customAura {
+    customId: number;
+    duration: number;
+    stacks: number;
+    auraName: string;
+}
+
+let CUSTOM_AURAS: LuaArray<customAura> = {
+    [80240] :{
+        customId: -80240,
+        duration: 10,
+        stacks: 1,
+        auraName: "active_havoc"
+    }
+}
 
 let demonData: LuaArray<{duration: number}> = {
     [55659]: { // Wild Imp
@@ -89,6 +107,11 @@ class OvaleWarlockClass extends OvaleWarlockBase {
                 self_demons[destGUID] = undefined;
                 Ovale.needRefresh();
             }
+
+            if(CUSTOM_AURAS[spellId]){
+                let aura = CUSTOM_AURAS[spellId];
+                this.AddCustomAura(aura.customId, aura.stacks, aura.duration, aura.auraName);
+            }
         }
     }
 
@@ -127,6 +150,13 @@ class OvaleWarlockClass extends OvaleWarlockBase {
             }
         }
         return max;
+    }
+
+    AddCustomAura(customId: number, stacks: number, duration: number, buffName: string){
+        let now = GetTime()
+        let expire = now + duration;
+        let filter = OvaleOptions.defaultDB.profile.apparence.fullAuraScan && 'HELPFUL' || 'HELPFUL|PLAYER';
+        OvaleAura.GainedAuraOnGUID(Ovale.playerGUID, now, customId, Ovale.playerGUID, filter, undefined, undefined, stacks, undefined, duration, expire, undefined, buffName, undefined, undefined, undefined);
     }
 }
 

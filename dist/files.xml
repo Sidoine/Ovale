@@ -23,7 +23,6 @@
    <Script file="DamageTaken.lua"/>
    <Script file="LastSpell.lua"/>
    <Script file="State.lua"/>
-   <Script file="Warlock.lua"/>
    <Script file="DemonHunterSoulFragments.lua"/>
    <Script file="Enemies.lua"/>
    <Script file="BaseState.lua"/>
@@ -39,6 +38,7 @@
    <Script file="Cooldown.lua"/>
    <Script file="CooldownState.lua"/>
    <Script file="Aura.lua"/>
+   <Script file="Warlock.lua"/>
    <Script file="Totem.lua"/>
    <Script file="DemonHunterDemonic.lua"/>
    <Script file="Future.lua"/>

@@ -9,6 +9,11 @@ __exports.register = function()
 # Aliases
 SpellList(unstable_affliction_debuff unstable_affliction_1_debuff unstable_affliction_2_debuff unstable_affliction_3_debuff unstable_affliction_4_debuff unstable_affliction_5_debuff)
 
+# Dummy buff
+# Warlock.ts
+Define(active_havoc_buff -80240)
+	SpellInfo(active_havoc_buff duration=10)
+
 # Warlock spells and functions.
 Define(agony 980)
 	SpellAddTargetDebuff(agony agony_debuff=1)

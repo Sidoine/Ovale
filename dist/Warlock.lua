@@ -11,7 +11,19 @@ local pairs = pairs
 local GetTime = GetTime
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local find = string.find
+local __Options = LibStub:GetLibrary("ovale/Options")
+local OvaleOptions = __Options.OvaleOptions
+local __Aura = LibStub:GetLibrary("ovale/Aura")
+local OvaleAura = __Aura.OvaleAura
 local OvaleWarlockBase = Ovale:NewModule("OvaleWarlock", aceEvent)
+local CUSTOM_AURAS = {
+    [80240] = {
+        customId = -80240,
+        duration = 10,
+        stacks = 1,
+        auraName = "active_havoc"
+    }
+}
 local demonData = {
     [55659] = {
         duration = 12
@@ -84,6 +96,10 @@ local OvaleWarlockClass = __class(OvaleWarlockBase, {
                 self_demons[destGUID] = nil
                 Ovale:needRefresh()
             end
+            if CUSTOM_AURAS[spellId] then
+                local aura = CUSTOM_AURAS[spellId]
+                self:AddCustomAura(aura.customId, aura.stacks, aura.duration, aura.auraName)
+            end
         end
     end,
     CleanState = function(self)
@@ -121,6 +137,12 @@ local OvaleWarlockClass = __class(OvaleWarlockBase, {
             end
         end
         return max
+    end,
+    AddCustomAura = function(self, customId, stacks, duration, buffName)
+        local now = GetTime()
+        local expire = now + duration
+        local filter = OvaleOptions.defaultDB.profile.apparence.fullAuraScan and "HELPFUL" or "HELPFUL|PLAYER"
+        OvaleAura:GainedAuraOnGUID(Ovale.playerGUID, now, customId, Ovale.playerGUID, filter, nil, nil, stacks, nil, duration, expire, nil, buffName, nil, nil, nil)
     end,
 })
 __exports.OvaleWarlock = OvaleWarlockClass()
