@@ -816,7 +816,6 @@ AddFunction DemonologyNetherPortalBuildingCdPostConditions
 
 AddFunction DemonologyPrecombatMainActions
 {
- #inner_demons,if=talent.inner_demons.enabled
  #demonbolt
  Spell(demonbolt)
 }
@@ -836,12 +835,12 @@ AddFunction DemonologyPrecombatShortCdActions
 
 AddFunction DemonologyPrecombatShortCdPostConditions
 {
- Talent(inner_demons_talent) and Spell(inner_demons) or Spell(demonbolt)
+ Spell(demonbolt)
 }
 
 AddFunction DemonologyPrecombatCdActions
 {
- unless not pet.Present() and Spell(summon_felguard) or Talent(inner_demons_talent) and Spell(inner_demons)
+ unless not pet.Present() and Spell(summon_felguard)
  {
   #snapshot_stats
   #potion
@@ -851,7 +850,7 @@ AddFunction DemonologyPrecombatCdActions
 
 AddFunction DemonologyPrecombatCdPostConditions
 {
- not pet.Present() and Spell(summon_felguard) or Talent(inner_demons_talent) and Spell(inner_demons) or Spell(demonbolt)
+ not pet.Present() and Spell(summon_felguard) or Spell(demonbolt)
 }
 
 ### Demonology icons.
@@ -934,7 +933,6 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 # grimoire_felguard
 # hand_of_guldan
 # implosion
-# inner_demons_talent
 # nether_portal
 # nether_portal_buff
 # nether_portal_talent
