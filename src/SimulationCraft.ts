@@ -2316,11 +2316,7 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             isSpellAction = false;
         } else if (action == "potion") {
             let name = (modifier.name && Unparse(modifier.name)) || annotation.consumables["potion"];
-            if(truthy(match(name, "^battle_potion_of_%w+"))){
-                [name] = match(name, "^battle_potion_of_%w+");
-            }else if (truthy(match(name, "^%w+_potion"))) {
-                [name] = match(name, "^%w+_potion");
-            }
+            [name] = Disambiguate(annotation, name, className, specialization, "item");
             if (name) {
                 bodyCode = format("Item(%s usable=1)", name);
                 conditionCode = "CheckBoxOn(opt_use_consumables) and target.Classification(worldboss)";
@@ -2404,8 +2400,7 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             }
             bodyCode = bodyCode || `${type}(${action})`;
         }
-        annotation.astAnnotation = annotation.astAnnotation || {
-        }
+        annotation.astAnnotation = annotation.astAnnotation || {};
         if (!bodyNode && bodyCode) {
             [bodyNode] = OvaleAST.ParseCode(expressionType, bodyCode, nodeList, annotation.astAnnotation);
         }
@@ -3124,6 +3119,7 @@ EmitOperandBuff = function (operand, parseNode, nodeList, annotation, action, ta
         ["raw_haste_pct"]: "SpellCastSpeedPercent()",
         ["rtb_list.any.5"]: "BuffCount(roll_the_bones_buff more 4)",
         ["rtb_list.any.6"]: "BuffCount(roll_the_bones_buff more 5)",
+        ["rune.deficit"]: "RuneDeficit()",
         ["runic_power"]: "RunicPower()",
         ["runic_power.deficit"]: "RunicPowerDeficit()",
         ["service_no_de"]: "0",

@@ -135,7 +135,7 @@ export class OvaleTimeSpan implements LuaArray<number> {
         }
         return false;
     }
-    NextTime(atTime):number {
+    NextTime(atTime: number):number {
         let A = this;
         for (let i = 1; i <= lualength(A); i += 2) {
             if (atTime < A[i]) {

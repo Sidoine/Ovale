@@ -4,19 +4,17 @@ import { OvaleOptions } from "./Options";
 import { Ovale } from "./Ovale";
 import AceComm from "@wowts/ace_comm-3.0";
 import AceSerializer from "@wowts/ace_serializer-3.0";
-import AceTimer from "@wowts/ace_timer-3.0";
+import AceTimer, { Timer } from "@wowts/ace_timer-3.0";
 import { format } from "@wowts/string";
-import { ipairs, next, pairs, wipe } from "@wowts/lua";
+import { ipairs, next, pairs, wipe, LuaObj } from "@wowts/lua";
 import { insert, sort } from "@wowts/table";
 import { IsInGroup, IsInGuild, IsInRaid, LE_PARTY_CATEGORY_INSTANCE } from "@wowts/wow-mock";
 
 let OvaleVersionBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleVersion", AceComm, AceSerializer, AceTimer));
 export let OvaleVersion: OvaleVersionClass;
-let self_printTable = {
-}
-let self_userVersion = {
-}
-let self_timer;
+let self_printTable: LuaObj<string> = {};
+let self_userVersion: LuaObj<string> = {};
+let self_timer: Timer | undefined;
 let MSG_PREFIX = Ovale.MSG_PREFIX;
 let OVALE_VERSION = "@project-version@";
 let REPOSITORY_KEYWORD = `@${"project-version"}@`;
@@ -50,7 +48,7 @@ class OvaleVersionClass extends OvaleVersionBase {
         super();
         this.RegisterComm(MSG_PREFIX);
     }
-    OnCommReceived(prefix, message, channel, sender) {
+    OnCommReceived(prefix: string, message: string, channel: string, sender: string) {
         if (prefix == MSG_PREFIX) {
             let [ok, msgType, version] = this.Deserialize(message);
             if (ok) {

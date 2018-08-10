@@ -9,7 +9,7 @@ import { OvaleEquipment } from "./Equipment";
 import { OvaleFuture } from "./Future";
 import { OvaleGUID } from "./GUID";
 import { OvaleHealth } from "./Health";
-import { OvalePower } from "./Power";
+import { OvalePower, PowerType } from "./Power";
 import { OvaleRunes } from "./Runes";
 import { OvaleSpellBook } from "./SpellBook";
 import { OvaleSpellDamage } from "./SpellDamage";
@@ -2409,7 +2409,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     }
     /** Return the amount of power of the given power type on the target.
 	 */
-    function Power(powerType, positionalParams, namedParams, state: BaseState, atTime: number) {
+    function Power(powerType: PowerType, positionalParams, namedParams, state: BaseState, atTime: number) {
         let [comparator, limit] = [positionalParams[1], positionalParams[2]];
         let [target] = ParseCondition(positionalParams, namedParams, state);
         if (target == "player") {
@@ -2424,7 +2424,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     }
     /**Return the current deficit of power from max power on the target.
 	 */
-    function PowerDeficit(powerType, positionalParams, namedParams, state: BaseState, atTime) {
+    function PowerDeficit(powerType: PowerType, positionalParams, namedParams, state: BaseState, atTime) {
         let [comparator, limit] = [positionalParams[1], positionalParams[2]];
         let [target] = ParseCondition(positionalParams, namedParams, state);
         if (target == "player") {
@@ -2448,7 +2448,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
 
     /**Return the current percent level of power (between 0 and 100) on the target.
      */
-    function PowerPercent(powerType, positionalParams, namedParams, state: BaseState, atTime) {
+    function PowerPercent(powerType: PowerType, positionalParams, namedParams, state: BaseState, atTime) {
         let [comparator, limit] = [positionalParams[1], positionalParams[2]];
         let [target] = ParseCondition(positionalParams, namedParams, state);
         if (target == "player") {
@@ -2665,21 +2665,6 @@ function GetHastedTime(seconds, haste, state: BaseState) {
         return Power("runicpower", positionalParams, namedParams, state, atTime);
     }
 
-    /** Get the current number of Shadow Orbs for shadow priests.
-	 @name ShadowOrbs
-	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
-	 @return The number of Shadow Orbs.
-	 @return A boolean value for the result of the comparison.
-	 @usage
-	 if ShadowOrbs() >2 Spell(mind_blast)
-	 if ShadowOrbs(more 2) Spell(mind_blast)
-     */
-    function ShadowOrbs(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        return Power("shadoworbs", positionalParams, namedParams, state, atTime);
-    }
-
     /** Get the current number of Soul Shards for warlocks.
 	 @name SoulShards
 	 @paramsig number or boolean
@@ -2712,7 +2697,6 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     OvaleCondition.RegisterCondition("pain", false, Pain);
     OvaleCondition.RegisterCondition("rage", false, Rage);
     OvaleCondition.RegisterCondition("runicpower", false, RunicPower);
-    OvaleCondition.RegisterCondition("shadoworbs", false, ShadowOrbs);
     OvaleCondition.RegisterCondition("soulshards", false, SoulShards);
 
     /** Get the number of lacking resource points for a full alternate power bar, between 0 and maximum alternate power, of the target.
@@ -2727,7 +2711,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
 	 @return A boolean value for the result of the comparison.
      */
     function AlternatePowerDeficit(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        return PowerDeficit("alternatepower", positionalParams, namedParams, state, atTime);
+        return PowerDeficit("alternate", positionalParams, namedParams, state, atTime);
     }
 
     /** Get the number of lacking resource points for a full runic power bar, between 0 and maximum runic power, of the target.
@@ -2874,20 +2858,6 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     function RunicPowerDeficit(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         return PowerDeficit("runicpower", positionalParams, namedParams, state, atTime);
     }
-    /** Get the number of lacking resource points for full shadow orbs, between 0 and maximum shadow orbs, of the target.
-	 @name ShadowOrbsDeficit
-	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
-	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	     Defaults to target=player.
-	     Valid values: player, target, focus, pet.
-	 @return The current shadow orbs deficit.
-	 @return A boolean value for the result of the comparison.
-     */
-    function ShadowOrbsDeficit(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        return PowerDeficit("shadoworbs", positionalParams, namedParams, state, atTime);
-    }
 
     /**  Get the number of lacking resource points for full soul shards, between 0 and maximum soul shards, of the target.
 	 @name SoulShardsDeficit
@@ -2915,7 +2885,6 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     OvaleCondition.RegisterCondition("paindeficit", false, PainDeficit);
     OvaleCondition.RegisterCondition("ragedeficit", false, RageDeficit);
     OvaleCondition.RegisterCondition("runicpowerdeficit", false, RunicPowerDeficit);
-    OvaleCondition.RegisterCondition("shadoworbsdeficit", false, ShadowOrbsDeficit);
     OvaleCondition.RegisterCondition("soulshardsdeficit", false, SoulShardsDeficit);
 
     /** Get the current percent level of mana (between 0 and 100) of the target.
@@ -3118,7 +3087,7 @@ l    */
 	 */
     function PowerCost(powerType, positionalParams, namedParams, state: BaseState, atTime) {
         let [spellId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
-        let target = ParseCondition(positionalParams, namedParams, state, "target");
+        let [target] = ParseCondition(positionalParams, namedParams, state, "target");
         let maxCost = (namedParams.max == 1);
         let value = OvalePower.PowerCost(spellId, powerType, atTime, target, maxCost) || 0;
         return Compare(value, comparator, limit);
@@ -3439,6 +3408,18 @@ l    */
         return Compare(count, comparator, limit);
     }
 
+    function RuneDeficit(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
+        let [comparator, limit] = [positionalParams[1], positionalParams[2]];
+        let [count, startCooldown, endCooldown] = OvaleRunes.RuneDeficit(atTime);
+        if (startCooldown < INFINITY) {
+            let origin = startCooldown;
+            let rate =  -1 / (endCooldown - startCooldown);
+            let [start, ending] = [startCooldown, INFINITY];
+            return TestValue(start, ending, count, origin, rate, comparator, limit);
+        }
+        return Compare(count, comparator, limit);
+    }
+
     /**  Get the current number of active runes of the given type for death knights.
 	 @name RuneCount
 	 @paramsig number or boolean
@@ -3486,6 +3467,7 @@ l    */
     OvaleCondition.RegisterCondition("rune", false, Rune);
     OvaleCondition.RegisterCondition("runecount", false, RuneCount);
     OvaleCondition.RegisterCondition("timetorunes", false, TimeToRunes);
+    OvaleCondition.RegisterCondition("runedeficit", false, RuneDeficit);
 }
 {
     /**  Returns the value of the given snapshot stat.
@@ -4960,7 +4942,7 @@ l    */
 {
     function TimeToShard(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number){
         let [comparator, limit] = [positionalParams[1], positionalParams[2]];
-        let value = OvaleWarlock.TimeToShard()
+        let value = OvaleWarlock.TimeToShard(atTime);
         return Compare(value, comparator, limit);
     }
     OvaleCondition.RegisterCondition("timetoshard", false, TimeToShard);

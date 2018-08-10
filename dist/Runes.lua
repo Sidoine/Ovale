@@ -209,6 +209,23 @@ local OvaleRunesClass = __class(OvaleRunesBase, {
         self:StopProfiling("OvaleRunes_state_RuneCount")
         return count, startCooldown, endCooldown
     end,
+    RuneDeficit = function(self, atTime)
+        self:StartProfiling("OvaleRunes_state_RuneDeficit")
+        local state = self:GetState(atTime)
+        local count = 0
+        local startCooldown, endCooldown = huge, huge
+        for slot = 1, RUNE_SLOTS, 1 do
+            local rune = state.rune[slot]
+            if  not IsActiveRune(rune, atTime) then
+                count = count + 1
+                if rune.endCooldown < endCooldown then
+                    startCooldown, endCooldown = rune.startCooldown, rune.endCooldown
+                end
+            end
+        end
+        self:StopProfiling("OvaleRunes_state_RuneDeficit")
+        return count, startCooldown, endCooldown
+    end,
     GetRunesCooldown = function(self, atTime, runes)
         if runes <= 0 then
             return 0

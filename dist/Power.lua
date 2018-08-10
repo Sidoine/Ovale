@@ -194,11 +194,8 @@ local PowerModule = __class(nil, {
         self.power = {}
         self.RequirePowerHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
             local verified = false
-            local baseCost = tokens
-            if index then
-                baseCost = tokens[index]
-                index = index + 1
-            end
+            local baseCost = tokens[index]
+            index = index + 1
             if baseCost then
                 if baseCost > 0 then
                     local powerType = requirement

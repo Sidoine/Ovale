@@ -464,6 +464,8 @@ export interface NamedParameters extends LuaObj<FlattenParameterValue | FlattenL
     checkbox?: LuaArray<string>;
     pertrait?: number;
     listitem?: LuaObj<string>;
+    flash?: string;
+    help?: string;
 }
 
 export type PositionalParameters = LuaArray<FlattenParameterValue>;

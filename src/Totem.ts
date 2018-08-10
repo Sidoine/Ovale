@@ -9,6 +9,7 @@ import { GetTotemInfo, AIR_TOTEM_SLOT, EARTH_TOTEM_SLOT, FIRE_TOTEM_SLOT, MAX_TO
 import { huge } from "@wowts/math";
 import { SpellCast } from "./LastSpell";
 import { OvaleAura } from "./Aura";
+import { isString } from "./tools";
 
 export let OvaleTotem: OvaleTotemClass;
 
@@ -29,6 +30,7 @@ let TOTEM_SLOT: LuaObj<number> = {
     water: WATER_TOTEM_SLOT,
     spirit_wolf: 1
 }
+export type TotemSlot = "air" | "earth" | "fire" | "water" | "spirit_wolf";
 let TOTEMIC_RECALL = 36936;
 
 interface Totem {
@@ -84,7 +86,7 @@ class OvaleTotemClass extends OvaleTotemBase {
             this.next.totem[slot] = undefined;
         }
     }
-    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast: SpellCast ) {
+    ApplySpellAfterCast(spellId: number, targetGUID: string, startCast: number, endCast: number, isChanneled: boolean, spellcast: SpellCast) {
         OvaleTotem.StartProfiling("OvaleTotem_ApplySpellAfterCast");
         if (Ovale.playerClass == "SHAMAN" && spellId == TOTEMIC_RECALL) {
             for (const [slot] of ipairs(this.next.totem)) {
@@ -100,16 +102,16 @@ class OvaleTotemClass extends OvaleTotemBase {
         OvaleTotem.StopProfiling("OvaleTotem_ApplySpellAfterCast");
     }
 
-    IsActiveTotem(totem, atTime?) {
+    IsActiveTotem(totem: Totem, atTime?: number) {
         let boolean = false;
         if (totem && (totem.serial == self_serial) && totem.start && totem.duration && totem.start < atTime && atTime < totem.start + totem.duration) {
             boolean = true;
         }
         return boolean;
     }
-    GetTotem(slot) {
+    GetTotem(slot: TotemSlot | number) {
         OvaleTotem.StartProfiling("OvaleTotem_state_GetTotem");
-        slot = TOTEM_SLOT[slot] || slot;
+        if (isString(slot)) slot = TOTEM_SLOT[slot];
         let totem = this.next.totem[slot];
         if (totem && (!totem.serial || totem.serial < self_serial)) {
             let [haveTotem, name, startTime, duration, icon] = GetTotemInfo(slot);
@@ -129,9 +131,9 @@ class OvaleTotemClass extends OvaleTotemBase {
         OvaleTotem.StopProfiling("OvaleTotem_state_GetTotem");
         return totem;
     }
-    GetTotemInfo(slot) {
+    GetTotemInfo(slot: TotemSlot | number) {
         let haveTotem, name, startTime, duration, icon;
-        slot = TOTEM_SLOT[slot] || slot;
+        if (isString(slot)) slot = TOTEM_SLOT[slot];
         let totem = this.GetTotem(slot);
         if (totem) {
             haveTotem = this.IsActiveTotem(totem);
@@ -142,7 +144,7 @@ class OvaleTotemClass extends OvaleTotemBase {
         }
         return [haveTotem, name, startTime, duration, icon];
     }
-    GetTotemCount(spellId, atTime) {
+    GetTotemCount(spellId: number, atTime: number) {
         let start, ending;
         let count = 0;
         let si = OvaleData.spellInfo[spellId];
@@ -174,7 +176,7 @@ class OvaleTotemClass extends OvaleTotemBase {
         }
         return [count, start, ending];
     }
-    GetTotemSlot(spellId, atTime) {
+    GetTotemSlot(spellId: number, atTime: number) {
         OvaleTotem.StartProfiling("OvaleTotem_state_GetTotemSlot");
         let totemSlot;
         let si = OvaleData.spellInfo[spellId];
@@ -212,9 +214,9 @@ class OvaleTotemClass extends OvaleTotemBase {
         OvaleTotem.StopProfiling("OvaleTotem_state_GetTotemSlot");
         return totemSlot;
     }
-    SummonTotem(spellId, slot, atTime) {
+    SummonTotem(spellId: number, slot: TotemSlot | number, atTime: number) {
         OvaleTotem.StartProfiling("OvaleTotem_state_SummonTotem");
-        slot = TOTEM_SLOT[slot] || slot;
+        if (isString(slot)) slot = TOTEM_SLOT[slot];
         let [name, , icon] = OvaleSpellBook.GetSpellInfo(spellId);
         let duration = OvaleData.GetSpellInfoProperty(spellId, atTime, "duration", undefined);
         let totem = this.next.totem[slot];
@@ -224,9 +226,9 @@ class OvaleTotemClass extends OvaleTotemBase {
         totem.icon = icon;
         OvaleTotem.StopProfiling("OvaleTotem_state_SummonTotem");
     }
-    DestroyTotem(slot, atTime) {
+    DestroyTotem(slot: TotemSlot | number, atTime: number) {
         OvaleTotem.StartProfiling("OvaleTotem_state_DestroyTotem");
-        slot = TOTEM_SLOT[slot] || slot;
+        if (isString(slot)) slot = TOTEM_SLOT[slot];
         let totem = this.next.totem[slot];
         let duration = atTime - totem.start;
         if (duration < 0) {

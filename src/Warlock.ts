@@ -124,7 +124,7 @@ class OvaleWarlockClass extends OvaleWarlockBase {
     }
     ResetState(): void {
     }
-    GetNotDemonicEmpoweredDemonsCount(creatureId, atTime) {
+    GetNotDemonicEmpoweredDemonsCount(creatureId: number, atTime: number) {
         let count = 0;
         for (const [, d] of pairs(self_demons)) {
             if (d.finish >= atTime && d.id == creatureId && !d.de) {
@@ -133,7 +133,7 @@ class OvaleWarlockClass extends OvaleWarlockBase {
         }
         return count;
     }
-    GetDemonsCount(creatureId, atTime) {
+    GetDemonsCount(creatureId: number, atTime: number) {
         let count = 0;
         for (const [, d] of pairs(self_demons)) {
             if (d.finish >= atTime && d.id == creatureId) {
@@ -142,7 +142,7 @@ class OvaleWarlockClass extends OvaleWarlockBase {
         }
         return count;
     }
-    GetRemainingDemonDuration(creatureId, atTime) {
+    GetRemainingDemonDuration(creatureId: number, atTime: number) {
         let max = 0;
         for (const [, d] of pairs(self_demons)) {
             if (d.finish >= atTime && d.id == creatureId) {
@@ -166,8 +166,7 @@ class OvaleWarlockClass extends OvaleWarlockBase {
      * Based on SimulationCraft function time_to_shard
      * Seeks to return the average expected time for the player to generate a single soul shard.
      */
-    TimeToShard(){
-        let now = GetTime();
+    TimeToShard(now: number){
         let filter = OvaleOptions.defaultDB.profile.apparence.fullAuraScan && 'HARMFUL' || 'HARMFUL|PLAYER';
         let value = 3600;
         let creepingDeathTalent = 20;

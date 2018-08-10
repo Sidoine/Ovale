@@ -149,8 +149,7 @@ local OvaleWarlockClass = __class(OvaleWarlockBase, {
         local filter = OvaleOptions.defaultDB.profile.apparence.fullAuraScan and "HELPFUL" or "HELPFUL|PLAYER"
         OvaleAura:GainedAuraOnGUID(Ovale.playerGUID, now, customId, Ovale.playerGUID, filter, nil, nil, stacks, nil, duration, expire, nil, buffName, nil, nil, nil)
     end,
-    TimeToShard = function(self)
-        local now = GetTime()
+    TimeToShard = function(self, now)
         local filter = OvaleOptions.defaultDB.profile.apparence.fullAuraScan and "HARMFUL" or "HARMFUL|PLAYER"
         local value = 3600
         local creepingDeathTalent = 20

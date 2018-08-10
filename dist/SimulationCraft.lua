@@ -2181,11 +2181,7 @@ EmitAction = function(parseNode, nodeList, annotation)
             isSpellAction = false
         elseif action == "potion" then
             local name = (modifier.name and Unparse(modifier.name)) or annotation.consumables["potion"]
-            if match(name, "^battle_potion_of_%w+") then
-                name = match(name, "^battle_potion_of_%w+")
-            elseif match(name, "^%w+_potion") then
-                name = match(name, "^%w+_potion")
-            end
+            name = Disambiguate(annotation, name, className, specialization, "item")
             if name then
                 bodyCode = format("Item(%s usable=1)", name)
                 conditionCode = "CheckBoxOn(opt_use_consumables) and target.Classification(worldboss)"
@@ -2994,6 +2990,7 @@ do
         ["raw_haste_pct"] = "SpellCastSpeedPercent()",
         ["rtb_list.any.5"] = "BuffCount(roll_the_bones_buff more 4)",
         ["rtb_list.any.6"] = "BuffCount(roll_the_bones_buff more 5)",
+        ["rune.deficit"] = "RuneDeficit()",
         ["runic_power"] = "RunicPower()",
         ["runic_power.deficit"] = "RunicPowerDeficit()",
         ["service_no_de"] = "0",

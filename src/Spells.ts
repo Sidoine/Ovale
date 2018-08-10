@@ -124,8 +124,7 @@ class OvaleSpellsClass extends OvaleSpellsBase {
                 }
             }
             if (isUsable) {
-                let requirement;
-                [isUsable, requirement] = OvaleData.CheckSpellInfo(spellId, atTime, targetGUID);
+                let [isUsable, requirement] = OvaleData.CheckSpellInfo(spellId, atTime, targetGUID);
                 if (!isUsable) {
                     noMana = OvalePower.PRIMARY_POWER[requirement];
                     if (noMana) {

@@ -209,6 +209,25 @@ class OvaleRunesClass extends OvaleRunesBase {
         this.StopProfiling("OvaleRunes_state_RuneCount");
         return [count, startCooldown, endCooldown];
     }
+
+    RuneDeficit(atTime?: number) {
+        this.StartProfiling("OvaleRunes_state_RuneDeficit");
+        const state = this.GetState(atTime);
+        let count = 0;
+        let [startCooldown, endCooldown] = [huge, huge];
+        for (let slot = 1; slot <= RUNE_SLOTS; slot += 1) {
+            let rune = state.rune[slot];
+            if (!IsActiveRune(rune, atTime)) {
+                count = count + 1;
+                if (rune.endCooldown < endCooldown) {
+                   [startCooldown, endCooldown] = [rune.startCooldown, rune.endCooldown];
+                }
+            }
+        }
+        this.StopProfiling("OvaleRunes_state_RuneDeficit");
+        return [count, startCooldown, endCooldown];
+    }
+
     GetRunesCooldown(atTime: number, runes: number) {
         if (runes <= 0) {
             return 0;
