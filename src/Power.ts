@@ -576,7 +576,7 @@ class OvalePowerClass extends OvalePowerBase {
         if (si) {
             for (const [powerType, powerInfo] of pairs(OvalePower.POWER_INFO)) {
                 let [cost, refund] = this.next.PowerCost(spellId, powerType, atTime, targetGUID);
-                let power = this[powerType] || 0;
+                let power = this.next.power[powerType] || 0;
                 if (cost) {
                     power = power - cost
                 }
@@ -596,7 +596,7 @@ class OvalePowerClass extends OvalePowerBase {
                 if (maxi && power > maxi) {
                     power = maxi;
                 }
-                this[powerType] = power;
+                this.next.power[powerType] = power;
             }
         }
         OvalePower.StopProfiling("OvalePower_state_ApplyPowerCost");

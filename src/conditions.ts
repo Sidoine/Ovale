@@ -18,7 +18,6 @@ import { OvaleBossMod } from "./BossMod";
 import { Ovale } from "./Ovale";
 import { OvalePaperDoll } from "./PaperDoll";
 import { OvaleAura } from "./Aura";
-import { OvaleWildImps } from "./WildImps";
 import { OvaleEnemies } from "./Enemies";
 import { OvaleTotem } from "./Totem";
 import { OvaleDemonHunterSoulFragments } from "./DemonHunterSoulFragments";
@@ -35,6 +34,7 @@ import { OvaleSigil } from "./DemonHunterSigils";
 import { baseState } from "./BaseState";
 import { OvaleSpells } from "./Spells";
 import { OvaleAzerite } from "./AzeriteArmor";
+import { OvaleWarlock } from "./Warlock";
 let INFINITY = huge;
 
 type BaseState = {};
@@ -1165,17 +1165,17 @@ function GetHastedTime(seconds, haste, state: BaseState) {
 {
     function Demons(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [creatureId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
-        let value = OvaleWildImps.GetDemonsCount(creatureId, atTime);
+        let value = OvaleWarlock.GetDemonsCount(creatureId, atTime);
         return Compare(value, comparator, limit);
     }
     function NotDeDemons(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [creatureId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
-        let value = OvaleWildImps.GetNotDemonicEmpoweredDemonsCount(creatureId, atTime);
+        let value = OvaleWarlock.GetNotDemonicEmpoweredDemonsCount(creatureId, atTime);
         return Compare(value, comparator, limit);
     }
     function DemonDuration(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [creatureId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
-        let value = OvaleWildImps.GetRemainingDemonDuration(creatureId, atTime);
+        let value = OvaleWarlock.GetRemainingDemonDuration(creatureId, atTime);
         return Compare(value, comparator, limit);
     }
     OvaleCondition.RegisterCondition("demons", false, Demons);
@@ -4956,4 +4956,12 @@ l    */
         return Compare(value, comparator, limit);
     }
     OvaleCondition.RegisterCondition("soulfragments", false, SoulFragments);
+}
+{
+    function TimeToShard(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number){
+        let [comparator, limit] = [positionalParams[1], positionalParams[2]];
+        let value = OvaleWarlock.TimeToShard()
+        return Compare(value, comparator, limit);
+    }
+    OvaleCondition.RegisterCondition("timetoshard", false, TimeToShard);
 }

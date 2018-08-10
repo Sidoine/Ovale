@@ -4,24 +4,55 @@ import aceEvent from "@wowts/ace_event-3.0";
 import { LuaArray, tonumber, pairs, LuaObj } from "@wowts/lua";
 import { GetTime, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { find } from "@wowts/string";
+import { OvaleOptions } from "./Options";
+import { OvaleAura } from "./Aura";
+import { OvalePaperDoll } from "./PaperDoll";
+import { pow } from "@wowts/math";
+import { OvaleSpellBook } from "./SpellBook";
 
-let OvaleWildImpsBase = Ovale.NewModule("OvaleWildImps", aceEvent);
-export let OvaleWildImps: OvaleWildImpsClass;
+let OvaleWarlockBase = Ovale.NewModule("OvaleWarlock", aceEvent);
+export let OvaleWarlock: OvaleWarlockClass;
+
+interface customAura {
+    customId: number;
+    duration: number;
+    stacks: number;
+    auraName: string;
+}
+
+let CUSTOM_AURAS: LuaArray<customAura> = {
+    [80240] :{
+        customId: -80240,
+        duration: 10,
+        stacks: 1,
+        auraName: "active_havoc"
+    }
+}
+
 let demonData: LuaArray<{duration: number}> = {
-    [55659]: {
+    [55659]: { // Wild Imp
         duration: 12
     },
-    [98035]: {
+    [98035]: { // Dreadstalkers
         duration: 12
     },
-    [103673]: {
+    [103673]: { // Darkglare
         duration: 12
     },
-    [11859]: {
+    [11859]: { // Doomguard
         duration: 25
     },
-    [89]: {
+    [89]: { // Infernal
         duration: 25
+    },
+    [143622]: { // Inner Demons
+        duration: 12
+    },
+    [135002]:{ // Demonic Tyrant
+        duration: 15
+    },
+    [17252]: { // Grimoire Felguard
+        duration: 15
     }
 }
 
@@ -35,7 +66,7 @@ interface Demon {
 let self_demons: LuaObj<Demon> = {
 }
 let self_serial = 1;
-class OvaleWildImpsClass extends OvaleWildImpsBase {
+class OvaleWarlockClass extends OvaleWarlockBase {
     OnInitialize() {
         if (Ovale.playerClass == "WARLOCK") {
             this.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
@@ -59,6 +90,7 @@ class OvaleWildImpsClass extends OvaleWildImpsBase {
             let now = GetTime();
             for (const [id, v] of pairs(demonData)) {
                 if (id == creatureId) {
+                    creatureId = (creatureId == 143622) && 55659 || creatureId
                     self_demons[destGUID] = {
                         id: creatureId,
                         timestamp: now,
@@ -77,6 +109,11 @@ class OvaleWildImpsClass extends OvaleWildImpsBase {
             if (spellId == 196277) {
                 self_demons[destGUID] = undefined;
                 Ovale.needRefresh();
+            }
+
+            if(CUSTOM_AURAS[spellId]){
+                let aura = CUSTOM_AURAS[spellId];
+                this.AddCustomAura(aura.customId, aura.stacks, aura.duration, aura.auraName);
             }
         }
     }
@@ -117,7 +154,34 @@ class OvaleWildImpsClass extends OvaleWildImpsBase {
         }
         return max;
     }
+
+    AddCustomAura(customId: number, stacks: number, duration: number, buffName: string){
+        let now = GetTime()
+        let expire = now + duration;
+        let filter = OvaleOptions.defaultDB.profile.apparence.fullAuraScan && 'HELPFUL' || 'HELPFUL|PLAYER';
+        OvaleAura.GainedAuraOnGUID(Ovale.playerGUID, now, customId, Ovale.playerGUID, filter, undefined, undefined, stacks, undefined, duration, expire, undefined, buffName, undefined, undefined, undefined);
+    }
+
+    /**
+     * Based on SimulationCraft function time_to_shard
+     * Seeks to return the average expected time for the player to generate a single soul shard.
+     */
+    TimeToShard(){
+        let now = GetTime();
+        let filter = OvaleOptions.defaultDB.profile.apparence.fullAuraScan && 'HARMFUL' || 'HARMFUL|PLAYER';
+        let value = 3600;
+        let creepingDeathTalent = 20;
+        let tickTime = 2 / OvalePaperDoll.GetHasteMultiplier("spell", OvalePaperDoll.next);
+        let [activeAgonies] = OvaleAura.AuraCount(980, filter, true, undefined, now, undefined)
+        if(activeAgonies > 0){
+            value = 1 / ( 0.184 * pow( activeAgonies, -2/3 ) ) * tickTime / activeAgonies;
+            if(OvaleSpellBook.IsKnownTalent(creepingDeathTalent)){
+                value = value * 0.85;
+            }
+        }
+        return value;
+    }
 }
 
-OvaleWildImps = new OvaleWildImpsClass();
-OvaleState.RegisterState(OvaleWildImps);
+OvaleWarlock = new OvaleWarlockClass();
+OvaleState.RegisterState(OvaleWarlock);
