@@ -112,7 +112,7 @@ Define(grimoire_of_supremacy_buff 266091)
 Define(hand_of_guldan 105174)
 	SpellInfo(hand_of_guldan max_travel_time=1.5 soulshards=1 max_soulshards=3) # maximum observed travel time with a bit of padding
 Define(haunt 48181)
-	SpellInfo(haunt travel_time=2.3) # maximum observed travel time with a bit of padding
+	SpellInfo(haunt cd=15 travel_time=2.3) # maximum observed travel time with a bit of padding
 	SpellAddTargetDebuff(haunt haunt_debuff=1)
 Define(haunt_debuff 48181)
 	SpellInfo(haunt_debuff duration=15)
