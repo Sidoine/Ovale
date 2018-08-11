@@ -16,7 +16,7 @@ import { checkBoxes, lists, ResetControls } from "./Controls";
 import aceEvent from "@wowts/ace_event-3.0";
 import { ipairs, pairs, tonumber, tostring, type, wipe, LuaArray, lualength, truthy, LuaObj } from "@wowts/lua";
 import { find, match, sub } from "@wowts/string";
-import { GetSpellInfo } from "@wowts/wow-mock";
+import { GetSpellInfo, GetSpecialization } from "@wowts/wow-mock";
 import { isLuaArray } from "./tools";
 
 let OvaleCompileBase = Ovale.NewModule("OvaleCompile", aceEvent);
@@ -547,7 +547,8 @@ class OvaleCompileClass extends OvaleCompileClassBase {
         this.UnregisterMessage("Ovale_TalentsChanged");
     }
     Ovale_ScriptChanged(event) {
-        this.CompileScript(Ovale.db.profile.source);
+        let specName = OvalePaperDoll.GetSpecialization()
+        this.CompileScript(Ovale.db.profile.source[specName]);
         this.EventHandler(event);
     }
     Ovale_StanceChanged(event) {

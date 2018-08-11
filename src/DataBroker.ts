@@ -10,7 +10,8 @@ import { OvaleFrameModule } from "./Frame";
 import aceEvent from "@wowts/ace_event-3.0";
 import { pairs, LuaArray } from "@wowts/lua";
 import { insert } from "@wowts/table";
-import { CreateFrame, EasyMenu, IsShiftKeyDown, UIParent, UIGameTooltip } from "@wowts/wow-mock";
+import { CreateFrame, EasyMenu, IsShiftKeyDown, UIParent, UIGameTooltip, GetSpecialization } from "@wowts/wow-mock";
+import { OvalePaperDoll } from "./PaperDoll";
 
 let OvaleDataBrokerBase = Ovale.NewModule("OvaleDataBroker", aceEvent);
 export let OvaleDataBroker: OvaleDataBrokerClass;
@@ -147,7 +148,8 @@ class OvaleDataBrokerClass extends OvaleDataBrokerBase {
         }
     }
     Ovale_ScriptChanged() {
-        this.broker.text = Ovale.db.profile.source;
+        let specName = OvalePaperDoll.GetSpecialization()
+        this.broker.text = Ovale.db.profile.source[specName];
     }
 }
 

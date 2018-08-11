@@ -37,7 +37,7 @@ interface Color {
 
 export interface OvaleDb {
     profile: {
-        source: string;
+        source: LuaObj<string>;
         code: string,
         check: LuaObj<boolean>,
         list: LuaObj<string>,
