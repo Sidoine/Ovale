@@ -335,13 +335,17 @@ Define(enh_ember_totem_buff 262399)
 Define(enh_strom_totem_buff 262397)
 	SpellInfo(strom_totem_buff duration=120)
 
+# Azerite Traits
+Define(lightning_conduit_trait 275391)
+Define(lightning_conduit_debuff 275391)
+
 # Legendary items
 Define(echoes_of_the_great_sundering_item 137074)
 Define(echoes_of_the_great_sundering_buff 208723)
 	SpellAddBuff(earthquake echoes_of_the_great_sundering_buff=0)
 	SpellRequire(earthquake maelstrom_percent 0=buff,echoes_of_the_great_sundering_buff)
-Define(smoldering_heart 151819)
-Define(the_deceivers_blood_pact 137035)
+Define(smoldering_heart_item 151819)
+Define(the_deceivers_blood_pact_item 137035)
 
 # Talents
 Define(aftershock_talent 4)

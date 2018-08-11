@@ -168,7 +168,7 @@ Define(gorefiends_grasp 108199)
 Define(heart_strike 206930)
 	SpellInfo(heart_strike runes=1 runicpower=-10)
 	SpellInfo(heart_strike add_runicpower=-2 talent=heartbreaker_talent)
-Define(haemostasis_buff 273947)
+Define(hemostasis_buff 273947)
 	SpellInfo(haemostasis_buff duration=14 max_stacks=5)
 Define(horn_of_winter 57330)
 	SpellInfo(horn_of_winter cd=45 runes=-2 runicpower=-20 tag=main)
@@ -284,24 +284,30 @@ Define(wraith_walk 212552)
 Define(wraith_walk_buff 212552)
 	SpellInfo(wraith_walk_buff duration=4)
 
+# Weapon Enchant
+Define(unholy_strength_buff 53365)
+	SpellInfo(unholy_strength_buff duration=15)
+
 ## Items
-Define(cold_heart 151796)
-Define(cold_heart_item_buff 235592)
-	SpellInfo(cold_heart_item_buff max_stacks=20)
+Define(cold_heart_item 151796)
+Define(cold_heart_buff 235592)
+	SpellInfo(cold_heart_buff max_stacks=20)
 Define(consorts_cold_core 144293)
 Define(koltiras_newfound_will 132366)
-Define(lanathels_lament 133974)
+Define(lanathels_lament_item 133974)
 Define(lanathels_lament_buff 212975)
 	SpellAddBuff(defile lanathels_lament_buff=1 if_equipped=lanathels_lament)
 	SpellAddBuff(death_and_decay lanathels_lament_buff=1 if_equipped=lanathels_lament)
-Define(perseverance_of_the_ebon_martyr 132459)
+Define(perseverance_of_the_ebon_martyr_item 132459)
 Define(perseverance_of_the_ebon_martyr_debuff 216059)
+Define(taktheritrixs_shoulderpads_item 137075)
 
 ## Tier Items
 # T20
 SpellAddBuff(blood_boil gravewarden_buff=1 itemset=T20 itemcount=2)
 Define(gravewarden_buff 242010) 
 	SpellInfo(gravewarden_buff duration=10)
+Define(master_of_ghouls_buff 246995)
 
 # Talents
 Define(all_will_serve_talent 2)

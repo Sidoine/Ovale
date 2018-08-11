@@ -1245,6 +1245,7 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("blood_fury", "blood_fury_ap", "WARRIOR");
 
     //Death Knight
+    AddDisambiguation("137075", "taktheritrixs_shoulderpads", "DEATHKNIGHT");
     AddDisambiguation("deaths_reach_talent", "deaths_reach_talent_unholy", "DEATHKNIGHT", "unholy");
     AddDisambiguation("grip_of_the_dead_talent", "grip_of_the_dead_talent_unholy", "DEATHKNIGHT", "unholy");
     AddDisambiguation("wraith_walk_talent", "wraith_walk_talent_blood", "DEATHKNIGHT", "blood");
@@ -1299,6 +1300,7 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("brews", "ironskin_brew", "MONK", "brewmaster");
 
     //Paladin
+    AddDisambiguation("avenger_shield", "avengers_shield", "PALADIN", "protection");
     AddDisambiguation("judgment_of_light_talent", "judgment_of_light_talent_holy", "PALADIN", "holy");
     AddDisambiguation("unbreakable_spirit_talent", "unbreakable_spirit_talent_holy", "PALADIN", "holy");
     AddDisambiguation("cavalier_talent", "cavalier_talent_holy", "PALADIN", "holy");
@@ -3088,6 +3090,7 @@ EmitOperandBuff = function (operand, parseNode, nodeList, annotation, action, ta
         ["combo_points"]: "ComboPoints()",
         ["combo_points.deficit"]: "ComboPointsDeficit()",
         ["combo_points.max"]: "MaxComboPoints()",
+        ["consecration.remains"]: "target.DebuffRemaining(consecration_debuff)",
         ["cp_max_spend"]: "MaxComboPoints()",
         ["crit_pct_current"]: "SpellCritChance()",
         ["current_insanity_drain"]: "CurrentInsanityDrain()",
@@ -3095,6 +3098,7 @@ EmitOperandBuff = function (operand, parseNode, nodeList, annotation, action, ta
         ["death_sweep_worth_using"]: "0",
         ["delay"]: "0",
         ["demonic_fury"]: "DemonicFury()",
+        ["death_and_decay.ticking"]: "SpellCooldown(death_and_decay) > 20",
         ["desired_targets"]: "Enemies(tagged=1)",
         ["doomguard_no_de"]: "NotDeDemons(doomguard)",
         ["dreadstalker_no_de"]: "NotDeDemons(dreadstalker)",
@@ -3143,6 +3147,7 @@ EmitOperandBuff = function (operand, parseNode, nodeList, annotation, action, ta
         ["raw_haste_pct"]: "SpellCastSpeedPercent()",
         ["rtb_list.any.5"]: "BuffCount(roll_the_bones_buff more 4)",
         ["rtb_list.any.6"]: "BuffCount(roll_the_bones_buff more 5)",
+        ["rune.deficit"]: "{6 - RuneCount()}",
         ["runic_power"]: "RunicPower()",
         ["runic_power.deficit"]: "RunicPowerDeficit()",
         ["service_no_de"]: "0",

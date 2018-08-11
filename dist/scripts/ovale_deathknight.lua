@@ -117,13 +117,13 @@ AddIcon help=cd specialization=blood
     OvaleScripts:RegisterScript("DEATHKNIGHT", "blood", name, desc, code, "script")
 end
 do
-    local name = "sc_death_knight_frost_t21"
-    local desc = "[8.0] Simulationcraft: Death_Knight_Frost_T21"
+    local name = "sc_death_knight_frost_pr"
+    local desc = "[8.0] Simulationcraft: Death_Knight_Frost_PreRaid"
     local code = [[
-# Based on SimulationCraft profile "T21_Death_Knight_Frost".
+# Based on SimulationCraft profile "PR_Death_Knight_Frost".
 #    class=deathknight
 #    spec=frost
-#    talents=3202013
+#    talents=3302013
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -459,7 +459,7 @@ AddFunction FrostBosTickingCdPostConditions
 AddFunction FrostColdHeartMainActions
 {
  #chains_of_ice,if=(buff.cold_heart_item.stack>5|buff.cold_heart_talent.stack>5)&target.time_to_die<gcd
- if { BuffStacks(cold_heart_item_buff) > 5 or BuffStacks(cold_heart_buff) > 5 } and target.TimeToDie() < GCD() Spell(chains_of_ice)
+ if { DebuffStacks(cold_heart_item) > 5 or BuffStacks(cold_heart_buff) > 5 } and target.TimeToDie() < GCD() Spell(chains_of_ice)
  #chains_of_ice,if=(buff.pillar_of_frost.remains<=gcd*(1+cooldown.frostwyrms_fury.ready)|buff.pillar_of_frost.remains<rune.time_to_3)&buff.pillar_of_frost.up
  if { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) Spell(chains_of_ice)
 }
@@ -474,7 +474,7 @@ AddFunction FrostColdHeartShortCdActions
 
 AddFunction FrostColdHeartShortCdPostConditions
 {
- { BuffStacks(cold_heart_item_buff) > 5 or BuffStacks(cold_heart_buff) > 5 } and target.TimeToDie() < GCD() and Spell(chains_of_ice) or { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and Spell(chains_of_ice)
+ { DebuffStacks(cold_heart_item) > 5 or BuffStacks(cold_heart_buff) > 5 } and target.TimeToDie() < GCD() and Spell(chains_of_ice) or { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and Spell(chains_of_ice)
 }
 
 AddFunction FrostColdHeartCdActions
@@ -483,7 +483,7 @@ AddFunction FrostColdHeartCdActions
 
 AddFunction FrostColdHeartCdPostConditions
 {
- { BuffStacks(cold_heart_item_buff) > 5 or BuffStacks(cold_heart_buff) > 5 } and target.TimeToDie() < GCD() and Spell(chains_of_ice) or { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and Spell(chains_of_ice)
+ { DebuffStacks(cold_heart_item) > 5 or BuffStacks(cold_heart_buff) > 5 } and target.TimeToDie() < GCD() and Spell(chains_of_ice) or { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and Spell(chains_of_ice)
 }
 
 ### actions.cooldowns
@@ -491,12 +491,12 @@ AddFunction FrostColdHeartCdPostConditions
 AddFunction FrostCooldownsMainActions
 {
  #call_action_list,name=cold_heart,if=(equipped.cold_heart|talent.cold_heart.enabled)&(((buff.cold_heart_item.stack>=10|buff.cold_heart_talent.stack>=10)&debuff.razorice.stack=5)|target.time_to_die<=gcd)
- if { HasEquippedItem(cold_heart) or Talent(cold_heart_talent) } and { { BuffStacks(cold_heart_item_buff) >= 10 or BuffStacks(cold_heart_buff) >= 10 } and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } FrostColdHeartMainActions()
+ if { HasEquippedItem(cold_heart_item) or Talent(cold_heart_talent) } and { { DebuffStacks(cold_heart_item) >= 10 or BuffStacks(cold_heart_buff) >= 10 } and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } FrostColdHeartMainActions()
 }
 
 AddFunction FrostCooldownsMainPostConditions
 {
- { HasEquippedItem(cold_heart) or Talent(cold_heart_talent) } and { { BuffStacks(cold_heart_item_buff) >= 10 or BuffStacks(cold_heart_buff) >= 10 } and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } and FrostColdHeartMainPostConditions()
+ { HasEquippedItem(cold_heart_item) or Talent(cold_heart_talent) } and { { DebuffStacks(cold_heart_item) >= 10 or BuffStacks(cold_heart_buff) >= 10 } and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } and FrostColdHeartMainPostConditions()
 }
 
 AddFunction FrostCooldownsShortCdActions
@@ -504,12 +504,12 @@ AddFunction FrostCooldownsShortCdActions
  #pillar_of_frost,if=cooldown.empower_rune_weapon.remains
  if SpellCooldown(empower_rune_weapon) > 0 Spell(pillar_of_frost)
  #call_action_list,name=cold_heart,if=(equipped.cold_heart|talent.cold_heart.enabled)&(((buff.cold_heart_item.stack>=10|buff.cold_heart_talent.stack>=10)&debuff.razorice.stack=5)|target.time_to_die<=gcd)
- if { HasEquippedItem(cold_heart) or Talent(cold_heart_talent) } and { { BuffStacks(cold_heart_item_buff) >= 10 or BuffStacks(cold_heart_buff) >= 10 } and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } FrostColdHeartShortCdActions()
+ if { HasEquippedItem(cold_heart_item) or Talent(cold_heart_talent) } and { { DebuffStacks(cold_heart_item) >= 10 or BuffStacks(cold_heart_buff) >= 10 } and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } FrostColdHeartShortCdActions()
 }
 
 AddFunction FrostCooldownsShortCdPostConditions
 {
- { HasEquippedItem(cold_heart) or Talent(cold_heart_talent) } and { { BuffStacks(cold_heart_item_buff) >= 10 or BuffStacks(cold_heart_buff) >= 10 } and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } and FrostColdHeartShortCdPostConditions()
+ { HasEquippedItem(cold_heart_item) or Talent(cold_heart_talent) } and { { DebuffStacks(cold_heart_item) >= 10 or BuffStacks(cold_heart_buff) >= 10 } and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } and FrostColdHeartShortCdPostConditions()
 }
 
 AddFunction FrostCooldownsCdActions
@@ -519,7 +519,7 @@ AddFunction FrostCooldownsCdActions
  #use_item,name=horn_of_valor,if=buff.pillar_of_frost.up&(!talent.breath_of_sindragosa.enabled|!cooldown.breath_of_sindragosa.remains)
  if BuffPresent(pillar_of_frost_buff) and { not Talent(breath_of_sindragosa_talent) or not SpellCooldown(breath_of_sindragosa) > 0 } FrostUseItemActions()
  #potion,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
- if BuffPresent(pillar_of_frost_buff) and BuffPresent(empower_rune_weapon_buff) and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
+ if BuffPresent(pillar_of_frost_buff) and BuffPresent(empower_rune_weapon_buff) and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
  #blood_fury,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
  if BuffPresent(pillar_of_frost_buff) and BuffPresent(empower_rune_weapon_buff) Spell(blood_fury_ap)
  #berserking,if=buff.pillar_of_frost.up
@@ -532,9 +532,9 @@ AddFunction FrostCooldownsCdActions
   #empower_rune_weapon,if=cooldown.pillar_of_frost.ready&talent.breath_of_sindragosa.enabled&rune>=3&runic_power>60
   if SpellCooldown(pillar_of_frost) == 0 and Talent(breath_of_sindragosa_talent) and Rune() >= 3 and RunicPower() > 60 Spell(empower_rune_weapon)
   #call_action_list,name=cold_heart,if=(equipped.cold_heart|talent.cold_heart.enabled)&(((buff.cold_heart_item.stack>=10|buff.cold_heart_talent.stack>=10)&debuff.razorice.stack=5)|target.time_to_die<=gcd)
-  if { HasEquippedItem(cold_heart) or Talent(cold_heart_talent) } and { { BuffStacks(cold_heart_item_buff) >= 10 or BuffStacks(cold_heart_buff) >= 10 } and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } FrostColdHeartCdActions()
+  if { HasEquippedItem(cold_heart_item) or Talent(cold_heart_talent) } and { { DebuffStacks(cold_heart_item) >= 10 or BuffStacks(cold_heart_buff) >= 10 } and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } FrostColdHeartCdActions()
 
-  unless { HasEquippedItem(cold_heart) or Talent(cold_heart_talent) } and { { BuffStacks(cold_heart_item_buff) >= 10 or BuffStacks(cold_heart_buff) >= 10 } and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } and FrostColdHeartCdPostConditions()
+  unless { HasEquippedItem(cold_heart_item) or Talent(cold_heart_talent) } and { { DebuffStacks(cold_heart_item) >= 10 or BuffStacks(cold_heart_buff) >= 10 } and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } and FrostColdHeartCdPostConditions()
   {
    #frostwyrms_fury,if=(buff.pillar_of_frost.remains<=gcd&buff.pillar_of_frost.up)
    if BuffRemaining(pillar_of_frost_buff) <= GCD() and BuffPresent(pillar_of_frost_buff) Spell(frostwyrms_fury)
@@ -544,7 +544,7 @@ AddFunction FrostCooldownsCdActions
 
 AddFunction FrostCooldownsCdPostConditions
 {
- SpellCooldown(empower_rune_weapon) > 0 and Spell(pillar_of_frost) or { HasEquippedItem(cold_heart) or Talent(cold_heart_talent) } and { { BuffStacks(cold_heart_item_buff) >= 10 or BuffStacks(cold_heart_buff) >= 10 } and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } and FrostColdHeartCdPostConditions()
+ SpellCooldown(empower_rune_weapon) > 0 and Spell(pillar_of_frost) or { HasEquippedItem(cold_heart_item) or Talent(cold_heart_talent) } and { { DebuffStacks(cold_heart_item) >= 10 or BuffStacks(cold_heart_buff) >= 10 } and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } and FrostColdHeartCdPostConditions()
 }
 
 ### actions.obliteration
@@ -618,7 +618,7 @@ AddFunction FrostPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
 }
 
 AddFunction FrostPrecombatCdPostConditions
@@ -735,57 +735,56 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 }
 
 ### Required symbols
-# howling_blast
-# frost_fever_debuff
-# breath_of_sindragosa_talent
-# breath_of_sindragosa
-# glacial_advance
-# icy_talons_buff
-# frost_strike
-# empower_rune_weapon
-# pillar_of_frost
-# breath_of_sindragosa_buff
-# pillar_of_frost_buff
-# obliteration_talent
-# remorseless_winter
-# gathering_storm_talent
-# frostscythe_talent
-# rime_buff
-# frostscythe
-# killing_machine_buff
-# runic_attenuation_talent
-# obliterate
-# horn_of_winter
 # arcane_torrent_runicpower
-# chains_of_ice
-# cold_heart_item_buff
-# cold_heart_buff
-# frostwyrms_fury
-# prolonged_power_potion
-# empower_rune_weapon_buff
-# blood_fury_ap
+# battle_potion_of_strength
 # berserking
-# cold_heart
+# blinding_sleet
+# blood_fury_ap
+# breath_of_sindragosa
+# breath_of_sindragosa_buff
+# breath_of_sindragosa_talent
+# chains_of_ice
+# cold_heart_buff
+# cold_heart_item
 # cold_heart_talent
-# razorice_debuff
+# death_strike
+# empower_rune_weapon
+# empower_rune_weapon_buff
+# frost_fever_debuff
+# frost_strike
+# frostscythe
+# frostscythe_talent
+# frostwyrms_fury
 # frozen_pulse_buff
 # frozen_pulse_talent
-# death_strike
+# gathering_storm_talent
+# glacial_advance
+# horn_of_winter
+# howling_blast
+# icy_talons_buff
+# killing_machine_buff
 # mind_freeze
-# blinding_sleet
+# obliterate
+# obliteration_talent
+# pillar_of_frost
+# pillar_of_frost_buff
+# razorice_debuff
+# remorseless_winter
+# rime_buff
+# runic_attenuation_talent
 # war_stomp
 
 ]]
     OvaleScripts:RegisterScript("DEATHKNIGHT", "frost", name, desc, code, "script")
 end
 do
-    local name = "sc_death_knight_unholy_t21"
-    local desc = "[8.0] Simulationcraft: Death_Knight_Unholy_T21"
+    local name = "sc_death_knight_unholy_pr"
+    local desc = "[8.0] Simulationcraft: Death_Knight_Unholy_PreRaid"
     local code = [[
-# Based on SimulationCraft profile "T21_Death_Knight_Unholy".
+# Based on SimulationCraft profile "PR_Death_Knight_Unholy".
 #    class=deathknight
 #    spec=unholy
-#    talents=3203002
+#    talents=2203022
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -795,7 +794,7 @@ Include(ovale_deathknight_spells)
 
 AddFunction pooling_for_gargoyle
 {
- SpellCooldown(summon_gargoyle) < 5 and { SpellCooldown(dark_transformation) < 5 or not HasEquippedItem(137075) } and Talent(summon_gargoyle_talent)
+ SpellCooldown(summon_gargoyle) < 5 and { SpellCooldown(dark_transformation) < 5 or not HasEquippedItem(taktheritrixs_shoulderpads_item) } and Talent(summon_gargoyle_talent)
 }
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=unholy)
@@ -834,7 +833,7 @@ AddFunction UnholyDefaultMainActions
 
  unless UnholyCooldownsMainPostConditions()
  {
-  #call_action_list,name=aoe,if=active_enemies>=2
+  #run_action_list,name=aoe,if=active_enemies>=2
   if Enemies() >= 2 UnholyAoeMainActions()
 
   unless Enemies() >= 2 and UnholyAoeMainPostConditions()
@@ -862,7 +861,7 @@ AddFunction UnholyDefaultShortCdActions
 
   unless UnholyCooldownsShortCdPostConditions()
   {
-   #call_action_list,name=aoe,if=active_enemies>=2
+   #run_action_list,name=aoe,if=active_enemies>=2
    if Enemies() >= 2 UnholyAoeShortCdActions()
 
    unless Enemies() >= 2 and UnholyAoeShortCdPostConditions()
@@ -885,7 +884,7 @@ AddFunction UnholyDefaultCdActions
  UnholyInterruptActions()
  #variable,name=pooling_for_gargoyle,value=(cooldown.summon_gargoyle.remains<5&(cooldown.dark_transformation.remains<5|!equipped.137075))&talent.summon_gargoyle.enabled
  #arcane_torrent,if=runic_power.deficit>65&(pet.gargoyle.active|!talent.summon_gargoyle.enabled)&rune.deficit>=5
- if RunicPowerDeficit() > 65 and { pet.Present() or not Talent(summon_gargoyle_talent) } and Rune() <= 1 Spell(arcane_torrent_runicpower)
+ if RunicPowerDeficit() > 65 and { pet.Present() or not Talent(summon_gargoyle_talent) } and 6 - RuneCount() >= 5 Spell(arcane_torrent_runicpower)
  #blood_fury,if=pet.gargoyle.active|!talent.summon_gargoyle.enabled
  if pet.Present() or not Talent(summon_gargoyle_talent) Spell(blood_fury_ap)
  #berserking,if=pet.gargoyle.active|!talent.summon_gargoyle.enabled
@@ -897,7 +896,7 @@ AddFunction UnholyDefaultCdActions
  #use_item,name=ring_of_collapsing_futures,if=(buff.temptation.stack=0&target.time_to_die>60)|target.time_to_die<60
  if BuffStacks(temptation_buff) == 0 and target.TimeToDie() > 60 or target.TimeToDie() < 60 UnholyUseItemActions()
  #potion,if=cooldown.army_of_the_dead.ready|pet.gargoyle.active|buff.unholy_frenzy.up
- if { SpellCooldown(army_of_the_dead) == 0 or pet.Present() or BuffPresent(unholy_frenzy_buff) } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
+ if { SpellCooldown(army_of_the_dead) == 0 or pet.Present() or BuffPresent(unholy_frenzy_buff) } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
 
  unless target.TickTimeRemaining(virulent_plague_debuff) + target.TickTime(virulent_plague_debuff) <= target.DebuffRemaining(virulent_plague_debuff) and target.DebuffRemaining(virulent_plague_debuff) <= GCD() and Spell(outbreak)
  {
@@ -906,7 +905,7 @@ AddFunction UnholyDefaultCdActions
 
   unless UnholyCooldownsCdPostConditions()
   {
-   #call_action_list,name=aoe,if=active_enemies>=2
+   #run_action_list,name=aoe,if=active_enemies>=2
    if Enemies() >= 2 UnholyAoeCdActions()
 
    unless Enemies() >= 2 and UnholyAoeCdPostConditions()
@@ -927,22 +926,38 @@ AddFunction UnholyDefaultCdPostConditions
 
 AddFunction UnholyAoeMainActions
 {
+ #death_and_decay,if=cooldown.apocalypse.remains
+ if SpellCooldown(apocalypse) > 0 Spell(death_and_decay)
  #defile
  Spell(defile)
  #epidemic,if=death_and_decay.ticking&rune<2&!variable.pooling_for_gargoyle
- if target.DebuffPresent(death_and_decay_debuff) and Rune() < 2 and not pooling_for_gargoyle() Spell(epidemic)
- #death_coil,if=death_and_decay.ticking&rune<2&!talent.epidemic.enabled&!variable.pooling_for_gargoyle
- if target.DebuffPresent(death_and_decay_debuff) and Rune() < 2 and not Talent(epidemic_talent) and not pooling_for_gargoyle() Spell(death_coil)
+ if SpellCooldown(death_and_decay) > 20 and Rune() < 2 and not pooling_for_gargoyle() Spell(epidemic)
+ #death_coil,if=death_and_decay.ticking&rune<2&!variable.pooling_for_gargoyle
+ if SpellCooldown(death_and_decay) > 20 and Rune() < 2 and not pooling_for_gargoyle() Spell(death_coil)
  #scourge_strike,if=death_and_decay.ticking&cooldown.apocalypse.remains
- if target.DebuffPresent(death_and_decay_debuff) and SpellCooldown(apocalypse) > 0 Spell(scourge_strike)
+ if SpellCooldown(death_and_decay) > 20 and SpellCooldown(apocalypse) > 0 Spell(scourge_strike)
  #clawing_shadows,if=death_and_decay.ticking&cooldown.apocalypse.remains
- if target.DebuffPresent(death_and_decay_debuff) and SpellCooldown(apocalypse) > 0 Spell(clawing_shadows)
+ if SpellCooldown(death_and_decay) > 20 and SpellCooldown(apocalypse) > 0 Spell(clawing_shadows)
  #epidemic,if=!variable.pooling_for_gargoyle
  if not pooling_for_gargoyle() Spell(epidemic)
  #festering_strike,if=talent.bursting_sores.enabled&spell_targets.bursting_sores>=2&debuff.festering_wound.stack<=1
  if Talent(bursting_sores_talent) and Enemies() >= 2 and target.DebuffStacks(festering_wound_debuff) <= 1 Spell(festering_strike)
  #death_coil,if=buff.sudden_doom.react&rune.deficit>=4
- if BuffPresent(sudden_doom_buff) and Rune() <= 2 Spell(death_coil)
+ if BuffPresent(sudden_doom_buff) and 6 - RuneCount() >= 4 Spell(death_coil)
+ #death_coil,if=buff.sudden_doom.react&!variable.pooling_for_gargoyle|pet.gargoyle.active
+ if BuffPresent(sudden_doom_buff) and not pooling_for_gargoyle() or pet.Present() Spell(death_coil)
+ #death_coil,if=runic_power.deficit<14&(cooldown.apocalypse.remains>5|debuff.festering_wound.stack>4)&!variable.pooling_for_gargoyle
+ if RunicPowerDeficit() < 14 and { SpellCooldown(apocalypse) > 5 or target.DebuffStacks(festering_wound_debuff) > 4 } and not pooling_for_gargoyle() Spell(death_coil)
+ #scourge_strike,if=((debuff.festering_wound.up&cooldown.apocalypse.remains>5)|debuff.festering_wound.stack>4)&cooldown.army_of_the_dead.remains>5
+ if { target.DebuffPresent(festering_wound_debuff) and SpellCooldown(apocalypse) > 5 or target.DebuffStacks(festering_wound_debuff) > 4 } and SpellCooldown(army_of_the_dead) > 5 Spell(scourge_strike)
+ #clawing_shadows,if=((debuff.festering_wound.up&cooldown.apocalypse.remains>5)|debuff.festering_wound.stack>4)&cooldown.army_of_the_dead.remains>5
+ if { target.DebuffPresent(festering_wound_debuff) and SpellCooldown(apocalypse) > 5 or target.DebuffStacks(festering_wound_debuff) > 4 } and SpellCooldown(army_of_the_dead) > 5 Spell(clawing_shadows)
+ #death_coil,if=runic_power.deficit<20&!variable.pooling_for_gargoyle
+ if RunicPowerDeficit() < 20 and not pooling_for_gargoyle() Spell(death_coil)
+ #festering_strike,if=((((debuff.festering_wound.stack<4&!buff.unholy_frenzy.up)|debuff.festering_wound.stack<3)&cooldown.apocalypse.remains<3)|debuff.festering_wound.stack<1)&cooldown.army_of_the_dead.remains>5
+ if { { target.DebuffStacks(festering_wound_debuff) < 4 and not BuffPresent(unholy_frenzy_buff) or target.DebuffStacks(festering_wound_debuff) < 3 } and SpellCooldown(apocalypse) < 3 or target.DebuffStacks(festering_wound_debuff) < 1 } and SpellCooldown(army_of_the_dead) > 5 Spell(festering_strike)
+ #death_coil,if=!variable.pooling_for_gargoyle
+ if not pooling_for_gargoyle() Spell(death_coil)
 }
 
 AddFunction UnholyAoeMainPostConditions
@@ -951,13 +966,11 @@ AddFunction UnholyAoeMainPostConditions
 
 AddFunction UnholyAoeShortCdActions
 {
- #death_and_decay,if=cooldown.apocalypse.remains
- if SpellCooldown(apocalypse) > 0 Spell(death_and_decay)
 }
 
 AddFunction UnholyAoeShortCdPostConditions
 {
- Spell(defile) or target.DebuffPresent(death_and_decay_debuff) and Rune() < 2 and not pooling_for_gargoyle() and Spell(epidemic) or target.DebuffPresent(death_and_decay_debuff) and Rune() < 2 and not Talent(epidemic_talent) and not pooling_for_gargoyle() and Spell(death_coil) or target.DebuffPresent(death_and_decay_debuff) and SpellCooldown(apocalypse) > 0 and Spell(scourge_strike) or target.DebuffPresent(death_and_decay_debuff) and SpellCooldown(apocalypse) > 0 and Spell(clawing_shadows) or not pooling_for_gargoyle() and Spell(epidemic) or Talent(bursting_sores_talent) and Enemies() >= 2 and target.DebuffStacks(festering_wound_debuff) <= 1 and Spell(festering_strike) or BuffPresent(sudden_doom_buff) and Rune() <= 2 and Spell(death_coil)
+ SpellCooldown(apocalypse) > 0 and Spell(death_and_decay) or Spell(defile) or SpellCooldown(death_and_decay) > 20 and Rune() < 2 and not pooling_for_gargoyle() and Spell(epidemic) or SpellCooldown(death_and_decay) > 20 and Rune() < 2 and not pooling_for_gargoyle() and Spell(death_coil) or SpellCooldown(death_and_decay) > 20 and SpellCooldown(apocalypse) > 0 and Spell(scourge_strike) or SpellCooldown(death_and_decay) > 20 and SpellCooldown(apocalypse) > 0 and Spell(clawing_shadows) or not pooling_for_gargoyle() and Spell(epidemic) or Talent(bursting_sores_talent) and Enemies() >= 2 and target.DebuffStacks(festering_wound_debuff) <= 1 and Spell(festering_strike) or BuffPresent(sudden_doom_buff) and 6 - RuneCount() >= 4 and Spell(death_coil) or { BuffPresent(sudden_doom_buff) and not pooling_for_gargoyle() or pet.Present() } and Spell(death_coil) or RunicPowerDeficit() < 14 and { SpellCooldown(apocalypse) > 5 or target.DebuffStacks(festering_wound_debuff) > 4 } and not pooling_for_gargoyle() and Spell(death_coil) or { target.DebuffPresent(festering_wound_debuff) and SpellCooldown(apocalypse) > 5 or target.DebuffStacks(festering_wound_debuff) > 4 } and SpellCooldown(army_of_the_dead) > 5 and Spell(scourge_strike) or { target.DebuffPresent(festering_wound_debuff) and SpellCooldown(apocalypse) > 5 or target.DebuffStacks(festering_wound_debuff) > 4 } and SpellCooldown(army_of_the_dead) > 5 and Spell(clawing_shadows) or RunicPowerDeficit() < 20 and not pooling_for_gargoyle() and Spell(death_coil) or { { target.DebuffStacks(festering_wound_debuff) < 4 and not BuffPresent(unholy_frenzy_buff) or target.DebuffStacks(festering_wound_debuff) < 3 } and SpellCooldown(apocalypse) < 3 or target.DebuffStacks(festering_wound_debuff) < 1 } and SpellCooldown(army_of_the_dead) > 5 and Spell(festering_strike) or not pooling_for_gargoyle() and Spell(death_coil)
 }
 
 AddFunction UnholyAoeCdActions
@@ -966,7 +979,7 @@ AddFunction UnholyAoeCdActions
 
 AddFunction UnholyAoeCdPostConditions
 {
- SpellCooldown(apocalypse) > 0 and Spell(death_and_decay) or Spell(defile) or target.DebuffPresent(death_and_decay_debuff) and Rune() < 2 and not pooling_for_gargoyle() and Spell(epidemic) or target.DebuffPresent(death_and_decay_debuff) and Rune() < 2 and not Talent(epidemic_talent) and not pooling_for_gargoyle() and Spell(death_coil) or target.DebuffPresent(death_and_decay_debuff) and SpellCooldown(apocalypse) > 0 and Spell(scourge_strike) or target.DebuffPresent(death_and_decay_debuff) and SpellCooldown(apocalypse) > 0 and Spell(clawing_shadows) or not pooling_for_gargoyle() and Spell(epidemic) or Talent(bursting_sores_talent) and Enemies() >= 2 and target.DebuffStacks(festering_wound_debuff) <= 1 and Spell(festering_strike) or BuffPresent(sudden_doom_buff) and Rune() <= 2 and Spell(death_coil)
+ SpellCooldown(apocalypse) > 0 and Spell(death_and_decay) or Spell(defile) or SpellCooldown(death_and_decay) > 20 and Rune() < 2 and not pooling_for_gargoyle() and Spell(epidemic) or SpellCooldown(death_and_decay) > 20 and Rune() < 2 and not pooling_for_gargoyle() and Spell(death_coil) or SpellCooldown(death_and_decay) > 20 and SpellCooldown(apocalypse) > 0 and Spell(scourge_strike) or SpellCooldown(death_and_decay) > 20 and SpellCooldown(apocalypse) > 0 and Spell(clawing_shadows) or not pooling_for_gargoyle() and Spell(epidemic) or Talent(bursting_sores_talent) and Enemies() >= 2 and target.DebuffStacks(festering_wound_debuff) <= 1 and Spell(festering_strike) or BuffPresent(sudden_doom_buff) and 6 - RuneCount() >= 4 and Spell(death_coil) or { BuffPresent(sudden_doom_buff) and not pooling_for_gargoyle() or pet.Present() } and Spell(death_coil) or RunicPowerDeficit() < 14 and { SpellCooldown(apocalypse) > 5 or target.DebuffStacks(festering_wound_debuff) > 4 } and not pooling_for_gargoyle() and Spell(death_coil) or { target.DebuffPresent(festering_wound_debuff) and SpellCooldown(apocalypse) > 5 or target.DebuffStacks(festering_wound_debuff) > 4 } and SpellCooldown(army_of_the_dead) > 5 and Spell(scourge_strike) or { target.DebuffPresent(festering_wound_debuff) and SpellCooldown(apocalypse) > 5 or target.DebuffStacks(festering_wound_debuff) > 4 } and SpellCooldown(army_of_the_dead) > 5 and Spell(clawing_shadows) or RunicPowerDeficit() < 20 and not pooling_for_gargoyle() and Spell(death_coil) or { { target.DebuffStacks(festering_wound_debuff) < 4 and not BuffPresent(unholy_frenzy_buff) or target.DebuffStacks(festering_wound_debuff) < 3 } and SpellCooldown(apocalypse) < 3 or target.DebuffStacks(festering_wound_debuff) < 1 } and SpellCooldown(army_of_the_dead) > 5 and Spell(festering_strike) or not pooling_for_gargoyle() and Spell(death_coil)
 }
 
 ### actions.cold_heart
@@ -974,11 +987,11 @@ AddFunction UnholyAoeCdPostConditions
 AddFunction UnholyColdHeartMainActions
 {
  #chains_of_ice,if=buff.unholy_strength.remains<gcd&buff.unholy_strength.react&buff.cold_heart_item.stack>16
- if BuffRemaining(unholy_strength_buff) < GCD() and BuffPresent(unholy_strength_buff) and BuffStacks(cold_heart_item_buff) > 16 Spell(chains_of_ice)
+ if BuffRemaining(unholy_strength_buff) < GCD() and BuffPresent(unholy_strength_buff) and DebuffStacks(cold_heart_item) > 16 Spell(chains_of_ice)
  #chains_of_ice,if=buff.master_of_ghouls.remains<gcd&buff.master_of_ghouls.up&buff.cold_heart_item.stack>17
- if BuffRemaining(master_of_ghouls_buff) < GCD() and BuffPresent(master_of_ghouls_buff) and BuffStacks(cold_heart_item_buff) > 17 Spell(chains_of_ice)
+ if BuffRemaining(master_of_ghouls_buff) < GCD() and BuffPresent(master_of_ghouls_buff) and DebuffStacks(cold_heart_item) > 17 Spell(chains_of_ice)
  #chains_of_ice,if=buff.cold_heart_item.stack=20&buff.unholy_strength.react
- if BuffStacks(cold_heart_item_buff) == 20 and BuffPresent(unholy_strength_buff) Spell(chains_of_ice)
+ if DebuffStacks(cold_heart_item) == 20 and BuffPresent(unholy_strength_buff) Spell(chains_of_ice)
 }
 
 AddFunction UnholyColdHeartMainPostConditions
@@ -991,7 +1004,7 @@ AddFunction UnholyColdHeartShortCdActions
 
 AddFunction UnholyColdHeartShortCdPostConditions
 {
- BuffRemaining(unholy_strength_buff) < GCD() and BuffPresent(unholy_strength_buff) and BuffStacks(cold_heart_item_buff) > 16 and Spell(chains_of_ice) or BuffRemaining(master_of_ghouls_buff) < GCD() and BuffPresent(master_of_ghouls_buff) and BuffStacks(cold_heart_item_buff) > 17 and Spell(chains_of_ice) or BuffStacks(cold_heart_item_buff) == 20 and BuffPresent(unholy_strength_buff) and Spell(chains_of_ice)
+ BuffRemaining(unholy_strength_buff) < GCD() and BuffPresent(unholy_strength_buff) and DebuffStacks(cold_heart_item) > 16 and Spell(chains_of_ice) or BuffRemaining(master_of_ghouls_buff) < GCD() and BuffPresent(master_of_ghouls_buff) and DebuffStacks(cold_heart_item) > 17 and Spell(chains_of_ice) or DebuffStacks(cold_heart_item) == 20 and BuffPresent(unholy_strength_buff) and Spell(chains_of_ice)
 }
 
 AddFunction UnholyColdHeartCdActions
@@ -1000,7 +1013,7 @@ AddFunction UnholyColdHeartCdActions
 
 AddFunction UnholyColdHeartCdPostConditions
 {
- BuffRemaining(unholy_strength_buff) < GCD() and BuffPresent(unholy_strength_buff) and BuffStacks(cold_heart_item_buff) > 16 and Spell(chains_of_ice) or BuffRemaining(master_of_ghouls_buff) < GCD() and BuffPresent(master_of_ghouls_buff) and BuffStacks(cold_heart_item_buff) > 17 and Spell(chains_of_ice) or BuffStacks(cold_heart_item_buff) == 20 and BuffPresent(unholy_strength_buff) and Spell(chains_of_ice)
+ BuffRemaining(unholy_strength_buff) < GCD() and BuffPresent(unholy_strength_buff) and DebuffStacks(cold_heart_item) > 16 and Spell(chains_of_ice) or BuffRemaining(master_of_ghouls_buff) < GCD() and BuffPresent(master_of_ghouls_buff) and DebuffStacks(cold_heart_item) > 17 and Spell(chains_of_ice) or DebuffStacks(cold_heart_item) == 20 and BuffPresent(unholy_strength_buff) and Spell(chains_of_ice)
 }
 
 ### actions.cooldowns
@@ -1008,25 +1021,25 @@ AddFunction UnholyColdHeartCdPostConditions
 AddFunction UnholyCooldownsMainActions
 {
  #call_action_list,name=cold_heart,if=equipped.cold_heart&buff.cold_heart_item.stack>10
- if HasEquippedItem(cold_heart) and BuffStacks(cold_heart_item_buff) > 10 UnholyColdHeartMainActions()
+ if HasEquippedItem(cold_heart_item) and DebuffStacks(cold_heart_item) > 10 UnholyColdHeartMainActions()
 }
 
 AddFunction UnholyCooldownsMainPostConditions
 {
- HasEquippedItem(cold_heart) and BuffStacks(cold_heart_item_buff) > 10 and UnholyColdHeartMainPostConditions()
+ HasEquippedItem(cold_heart_item) and DebuffStacks(cold_heart_item) > 10 and UnholyColdHeartMainPostConditions()
 }
 
 AddFunction UnholyCooldownsShortCdActions
 {
  #call_action_list,name=cold_heart,if=equipped.cold_heart&buff.cold_heart_item.stack>10
- if HasEquippedItem(cold_heart) and BuffStacks(cold_heart_item_buff) > 10 UnholyColdHeartShortCdActions()
+ if HasEquippedItem(cold_heart_item) and DebuffStacks(cold_heart_item) > 10 UnholyColdHeartShortCdActions()
 
- unless HasEquippedItem(cold_heart) and BuffStacks(cold_heart_item_buff) > 10 and UnholyColdHeartShortCdPostConditions()
+ unless HasEquippedItem(cold_heart_item) and DebuffStacks(cold_heart_item) > 10 and UnholyColdHeartShortCdPostConditions()
  {
   #apocalypse,if=debuff.festering_wound.stack>=4
   if target.DebuffStacks(festering_wound_debuff) >= 4 Spell(apocalypse)
   #dark_transformation,if=(equipped.137075&cooldown.summon_gargoyle.remains>40)|(!equipped.137075|!talent.summon_gargoyle.enabled)
-  if HasEquippedItem(137075) and SpellCooldown(summon_gargoyle) > 40 or not HasEquippedItem(137075) or not Talent(summon_gargoyle_talent) Spell(dark_transformation)
+  if HasEquippedItem(taktheritrixs_shoulderpads_item) and SpellCooldown(summon_gargoyle) > 40 or not HasEquippedItem(taktheritrixs_shoulderpads_item) or not Talent(summon_gargoyle_talent) Spell(dark_transformation)
   #unholy_frenzy,if=debuff.festering_wound.stack<4
   if target.DebuffStacks(festering_wound_debuff) < 4 Spell(unholy_frenzy)
   #unholy_frenzy,if=active_enemies>=2&((cooldown.death_and_decay.remains<=gcd&!talent.defile.enabled)|(cooldown.defile.remains<=gcd&talent.defile.enabled))
@@ -1040,20 +1053,20 @@ AddFunction UnholyCooldownsShortCdActions
 
 AddFunction UnholyCooldownsShortCdPostConditions
 {
- HasEquippedItem(cold_heart) and BuffStacks(cold_heart_item_buff) > 10 and UnholyColdHeartShortCdPostConditions()
+ HasEquippedItem(cold_heart_item) and DebuffStacks(cold_heart_item) > 10 and UnholyColdHeartShortCdPostConditions()
 }
 
 AddFunction UnholyCooldownsCdActions
 {
  #call_action_list,name=cold_heart,if=equipped.cold_heart&buff.cold_heart_item.stack>10
- if HasEquippedItem(cold_heart) and BuffStacks(cold_heart_item_buff) > 10 UnholyColdHeartCdActions()
+ if HasEquippedItem(cold_heart_item) and DebuffStacks(cold_heart_item) > 10 UnholyColdHeartCdActions()
 
- unless HasEquippedItem(cold_heart) and BuffStacks(cold_heart_item_buff) > 10 and UnholyColdHeartCdPostConditions()
+ unless HasEquippedItem(cold_heart_item) and DebuffStacks(cold_heart_item) > 10 and UnholyColdHeartCdPostConditions()
  {
   #army_of_the_dead
   Spell(army_of_the_dead)
 
-  unless target.DebuffStacks(festering_wound_debuff) >= 4 and Spell(apocalypse) or { HasEquippedItem(137075) and SpellCooldown(summon_gargoyle) > 40 or not HasEquippedItem(137075) or not Talent(summon_gargoyle_talent) } and Spell(dark_transformation)
+  unless target.DebuffStacks(festering_wound_debuff) >= 4 and Spell(apocalypse) or { HasEquippedItem(taktheritrixs_shoulderpads_item) and SpellCooldown(summon_gargoyle) > 40 or not HasEquippedItem(taktheritrixs_shoulderpads_item) or not Talent(summon_gargoyle_talent) } and Spell(dark_transformation)
   {
    #summon_gargoyle,if=runic_power.deficit<14
    if RunicPowerDeficit() < 14 Spell(summon_gargoyle)
@@ -1063,7 +1076,7 @@ AddFunction UnholyCooldownsCdActions
 
 AddFunction UnholyCooldownsCdPostConditions
 {
- HasEquippedItem(cold_heart) and BuffStacks(cold_heart_item_buff) > 10 and UnholyColdHeartCdPostConditions() or target.DebuffStacks(festering_wound_debuff) >= 4 and Spell(apocalypse) or { HasEquippedItem(137075) and SpellCooldown(summon_gargoyle) > 40 or not HasEquippedItem(137075) or not Talent(summon_gargoyle_talent) } and Spell(dark_transformation) or target.DebuffStacks(festering_wound_debuff) < 4 and Spell(unholy_frenzy) or Enemies() >= 2 and { SpellCooldown(death_and_decay) <= GCD() and not Talent(defile_talent) or SpellCooldown(defile) <= GCD() and Talent(defile_talent) } and Spell(unholy_frenzy) or { target.TimeToDie() < 8 or Rune() < 3 } and not BuffPresent(unholy_frenzy_buff) and Spell(soul_reaper) or Spell(unholy_blight)
+ HasEquippedItem(cold_heart_item) and DebuffStacks(cold_heart_item) > 10 and UnholyColdHeartCdPostConditions() or target.DebuffStacks(festering_wound_debuff) >= 4 and Spell(apocalypse) or { HasEquippedItem(taktheritrixs_shoulderpads_item) and SpellCooldown(summon_gargoyle) > 40 or not HasEquippedItem(taktheritrixs_shoulderpads_item) or not Talent(summon_gargoyle_talent) } and Spell(dark_transformation) or target.DebuffStacks(festering_wound_debuff) < 4 and Spell(unholy_frenzy) or Enemies() >= 2 and { SpellCooldown(death_and_decay) <= GCD() and not Talent(defile_talent) or SpellCooldown(defile) <= GCD() and Talent(defile_talent) } and Spell(unholy_frenzy) or { target.TimeToDie() < 8 or Rune() < 3 } and not BuffPresent(unholy_frenzy_buff) and Spell(soul_reaper) or Spell(unholy_blight)
 }
 
 ### actions.generic
@@ -1074,16 +1087,18 @@ AddFunction UnholyGenericMainActions
  if BuffPresent(sudden_doom_buff) and not pooling_for_gargoyle() or pet.Present() Spell(death_coil)
  #death_coil,if=runic_power.deficit<14&(cooldown.apocalypse.remains>5|debuff.festering_wound.stack>4)&!variable.pooling_for_gargoyle
  if RunicPowerDeficit() < 14 and { SpellCooldown(apocalypse) > 5 or target.DebuffStacks(festering_wound_debuff) > 4 } and not pooling_for_gargoyle() Spell(death_coil)
+ #death_and_decay,if=talent.pestilence.enabled&cooldown.apocalypse.remains
+ if Talent(pestilence_talent) and SpellCooldown(apocalypse) > 0 Spell(death_and_decay)
  #defile,if=cooldown.apocalypse.remains
  if SpellCooldown(apocalypse) > 0 Spell(defile)
  #scourge_strike,if=((debuff.festering_wound.up&cooldown.apocalypse.remains>5)|debuff.festering_wound.stack>4)&cooldown.army_of_the_dead.remains>5
- if { target.DebuffPresent(festering_wound_debuff) and SpellCooldown(apocalypse) > 5 or target.DebuffStacks(festering_wound_debuff) > 4 } Spell(scourge_strike)
+ if { target.DebuffPresent(festering_wound_debuff) and SpellCooldown(apocalypse) > 5 or target.DebuffStacks(festering_wound_debuff) > 4 } and SpellCooldown(army_of_the_dead) > 5 Spell(scourge_strike)
  #clawing_shadows,if=((debuff.festering_wound.up&cooldown.apocalypse.remains>5)|debuff.festering_wound.stack>4)&cooldown.army_of_the_dead.remains>5
- if { target.DebuffPresent(festering_wound_debuff) and SpellCooldown(apocalypse) > 5 or target.DebuffStacks(festering_wound_debuff) > 4 } Spell(clawing_shadows)
+ if { target.DebuffPresent(festering_wound_debuff) and SpellCooldown(apocalypse) > 5 or target.DebuffStacks(festering_wound_debuff) > 4 } and SpellCooldown(army_of_the_dead) > 5 Spell(clawing_shadows)
  #death_coil,if=runic_power.deficit<20&!variable.pooling_for_gargoyle
  if RunicPowerDeficit() < 20 and not pooling_for_gargoyle() Spell(death_coil)
  #festering_strike,if=((((debuff.festering_wound.stack<4&!buff.unholy_frenzy.up)|debuff.festering_wound.stack<3)&cooldown.apocalypse.remains<3)|debuff.festering_wound.stack<1)&cooldown.army_of_the_dead.remains>5
- if { { target.DebuffStacks(festering_wound_debuff) < 4 and not BuffPresent(unholy_frenzy_buff) or target.DebuffStacks(festering_wound_debuff) < 3 } and SpellCooldown(apocalypse) < 3 or target.DebuffStacks(festering_wound_debuff) < 1 } Spell(festering_strike)
+ if { { target.DebuffStacks(festering_wound_debuff) < 4 and not BuffPresent(unholy_frenzy_buff) or target.DebuffStacks(festering_wound_debuff) < 3 } and SpellCooldown(apocalypse) < 3 or target.DebuffStacks(festering_wound_debuff) < 1 } and SpellCooldown(army_of_the_dead) > 5 Spell(festering_strike)
  #death_coil,if=!variable.pooling_for_gargoyle
  if not pooling_for_gargoyle() Spell(death_coil)
 }
@@ -1094,16 +1109,11 @@ AddFunction UnholyGenericMainPostConditions
 
 AddFunction UnholyGenericShortCdActions
 {
- unless { BuffPresent(sudden_doom_buff) and not pooling_for_gargoyle() or pet.Present() } and Spell(death_coil) or RunicPowerDeficit() < 14 and { SpellCooldown(apocalypse) > 5 or target.DebuffStacks(festering_wound_debuff) > 4 } and not pooling_for_gargoyle() and Spell(death_coil)
- {
-  #death_and_decay,if=talent.pestilence.enabled&cooldown.apocalypse.remains
-  if Talent(pestilence_talent) and SpellCooldown(apocalypse) > 0 Spell(death_and_decay)
- }
 }
 
 AddFunction UnholyGenericShortCdPostConditions
 {
- { BuffPresent(sudden_doom_buff) and not pooling_for_gargoyle() or pet.Present() } and Spell(death_coil) or RunicPowerDeficit() < 14 and { SpellCooldown(apocalypse) > 5 or target.DebuffStacks(festering_wound_debuff) > 4 } and not pooling_for_gargoyle() and Spell(death_coil) or SpellCooldown(apocalypse) > 0 and Spell(defile) or { target.DebuffPresent(festering_wound_debuff) and SpellCooldown(apocalypse) > 5 or target.DebuffStacks(festering_wound_debuff) > 4 } and SpellCooldown(army_of_the_dead) > 5 and Spell(scourge_strike) or { target.DebuffPresent(festering_wound_debuff) and SpellCooldown(apocalypse) > 5 or target.DebuffStacks(festering_wound_debuff) > 4 } and SpellCooldown(army_of_the_dead) > 5 and Spell(clawing_shadows) or RunicPowerDeficit() < 20 and not pooling_for_gargoyle() and Spell(death_coil) or { { target.DebuffStacks(festering_wound_debuff) < 4 and not BuffPresent(unholy_frenzy_buff) or target.DebuffStacks(festering_wound_debuff) < 3 } and SpellCooldown(apocalypse) < 3 or target.DebuffStacks(festering_wound_debuff) < 1 } and SpellCooldown(army_of_the_dead) > 5 and Spell(festering_strike) or not pooling_for_gargoyle() and Spell(death_coil)
+ { BuffPresent(sudden_doom_buff) and not pooling_for_gargoyle() or pet.Present() } and Spell(death_coil) or RunicPowerDeficit() < 14 and { SpellCooldown(apocalypse) > 5 or target.DebuffStacks(festering_wound_debuff) > 4 } and not pooling_for_gargoyle() and Spell(death_coil) or Talent(pestilence_talent) and SpellCooldown(apocalypse) > 0 and Spell(death_and_decay) or SpellCooldown(apocalypse) > 0 and Spell(defile) or { target.DebuffPresent(festering_wound_debuff) and SpellCooldown(apocalypse) > 5 or target.DebuffStacks(festering_wound_debuff) > 4 } and SpellCooldown(army_of_the_dead) > 5 and Spell(scourge_strike) or { target.DebuffPresent(festering_wound_debuff) and SpellCooldown(apocalypse) > 5 or target.DebuffStacks(festering_wound_debuff) > 4 } and SpellCooldown(army_of_the_dead) > 5 and Spell(clawing_shadows) or RunicPowerDeficit() < 20 and not pooling_for_gargoyle() and Spell(death_coil) or { { target.DebuffStacks(festering_wound_debuff) < 4 and not BuffPresent(unholy_frenzy_buff) or target.DebuffStacks(festering_wound_debuff) < 3 } and SpellCooldown(apocalypse) < 3 or target.DebuffStacks(festering_wound_debuff) < 1 } and SpellCooldown(army_of_the_dead) > 5 and Spell(festering_strike) or not pooling_for_gargoyle() and Spell(death_coil)
 }
 
 AddFunction UnholyGenericCdActions
@@ -1142,7 +1152,7 @@ AddFunction UnholyPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
 
  unless Spell(raise_dead)
  {
@@ -1215,59 +1225,56 @@ AddIcon checkbox=opt_deathknight_unholy_aoe help=cd specialization=unholy
 }
 
 ### Required symbols
-# summon_gargoyle
-# dark_transformation
-# 137075
-# summon_gargoyle_talent
-# arcane_torrent_runicpower
-# gargoyle
-# blood_fury_ap
-# berserking
-# temptation_buff
-# prolonged_power_potion
-# army_of_the_dead
-# unholy_frenzy_buff
-# outbreak
-# virulent_plague_debuff
-# death_and_decay
 # apocalypse
-# defile
-# epidemic
-# death_coil
-# epidemic_talent
-# scourge_strike
-# clawing_shadows
-# festering_strike
+# arcane_torrent_runicpower
+# army_of_the_dead
+# asphyxiate
+# battle_potion_of_strength
+# berserking
+# blood_fury_ap
 # bursting_sores_talent
-# festering_wound_debuff
-# sudden_doom_buff
 # chains_of_ice
-# unholy_strength_buff
-# cold_heart_item_buff
-# master_of_ghouls_buff
-# cold_heart
-# unholy_frenzy
+# clawing_shadows
+# cold_heart_item
+# dark_transformation
+# death_and_decay
+# death_coil
+# death_strike
+# defile
 # defile_talent
-# soul_reaper
-# unholy_blight
+# epidemic
+# festering_strike
+# festering_wound_debuff
+# master_of_ghouls_buff
+# mind_freeze
+# outbreak
 # pestilence_talent
 # raise_dead
-# death_strike
-# mind_freeze
-# asphyxiate
+# scourge_strike
+# soul_reaper
+# sudden_doom_buff
+# summon_gargoyle
+# summon_gargoyle_talent
+# taktheritrixs_shoulderpads_item
+# temptation_buff
+# unholy_blight
+# unholy_frenzy
+# unholy_frenzy_buff
+# unholy_strength_buff
+# virulent_plague_debuff
 # war_stomp
 
 ]]
     OvaleScripts:RegisterScript("DEATHKNIGHT", "unholy", name, desc, code, "script")
 end
 do
-    local name = "sc_death_knight_blood_t21"
-    local desc = "[8.0] Simulationcraft: Death_Knight_Blood_T21"
+    local name = "sc_death_knight_blood_pr"
+    local desc = "[8.0] Simulationcraft: Death_Knight_Blood_PreRaid"
     local code = [[
-    # Based on SimulationCraft profile "T21_Death_Knight_Blood".
+# Based on SimulationCraft profile "PR_Death_Knight_Blood".
 #    class=deathknight
 #    spec=blood
-#    talents=3112033
+#    talents=3222022
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -1331,17 +1338,15 @@ AddFunction BloodDefaultCdActions
 {
  #mind_freeze
  BloodInterruptActions()
- #arcane_torrent,if=runic_power.deficit>20
- if RunicPowerDeficit() > 20 Spell(arcane_torrent_runicpower)
- #blood_fury
- Spell(blood_fury_ap)
- #berserking,if=buff.dancing_rune_weapon.up
- if BuffPresent(dancing_rune_weapon_buff) Spell(berserking)
+ #blood_fury,if=cooldown.dancing_rune_weapon.ready&(!cooldown.blooddrinker.ready|!talent.blooddrinker.enabled)
+ if SpellCooldown(dancing_rune_weapon) == 0 and { not SpellCooldown(blooddrinker) == 0 or not Talent(blooddrinker_talent) } Spell(blood_fury_ap)
+ #berserking
+ Spell(berserking)
  #use_items
  BloodUseItemActions()
  #potion,if=buff.dancing_rune_weapon.up
- if BuffPresent(dancing_rune_weapon_buff) and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
- #dancing_rune_weapon,if=(!talent.blooddrinker.enabled|!cooldown.blooddrinker.ready)
+ if BuffPresent(dancing_rune_weapon_buff) and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
+ #dancing_rune_weapon,if=!talent.blooddrinker.enabled|!cooldown.blooddrinker.ready
  if not Talent(blooddrinker_talent) or not SpellCooldown(blooddrinker) == 0 Spell(dancing_rune_weapon)
 
  unless BuffStacks(bone_shield_buff) >= 7 and Spell(tombstone)
@@ -1381,7 +1386,7 @@ AddFunction BloodPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
 }
 
 AddFunction BloodPrecombatCdPostConditions
@@ -1392,22 +1397,26 @@ AddFunction BloodPrecombatCdPostConditions
 
 AddFunction BloodStandardMainActions
 {
- #death_strike,if=runic_power.deficit<10
- if RunicPowerDeficit() < 10 Spell(death_strike)
- #marrowrend,if=buff.bone_shield.remains<=gcd*2
- if BuffRemaining(bone_shield_buff) <= GCD() * 2 Spell(marrowrend)
- #blood_boil,if=charges_fractional>=1.8&buff.haemostasis.stack<5&(buff.haemostasis.stack<3|!buff.dancing_rune_weapon.up)
- if Charges(blood_boil count=0) >= 1.8 and BuffStacks(haemostasis_buff) < 5 and { BuffStacks(haemostasis_buff) < 3 or not BuffPresent(dancing_rune_weapon_buff) } Spell(blood_boil)
- #marrowrend,if=(buff.bone_shield.stack<5&talent.ossuary.enabled)|buff.bone_shield.remains<gcd*3
- if BuffStacks(bone_shield_buff) < 5 and Talent(ossuary_talent) or BuffRemaining(bone_shield_buff) < GCD() * 3 Spell(marrowrend)
- #death_strike,if=buff.blood_shield.up|(runic_power.deficit<15&(runic_power.deficit<25|!buff.dancing_rune_weapon.up))
- if BuffPresent(blood_shield_buff) or RunicPowerDeficit() < 15 and { RunicPowerDeficit() < 25 or not BuffPresent(dancing_rune_weapon_buff) } Spell(death_strike)
- #heart_strike,if=buff.dancing_rune_weapon.up
- if BuffPresent(dancing_rune_weapon_buff) Spell(heart_strike)
- #death_and_decay,if=buff.crimson_scourge.up
- if BuffPresent(crimson_scourge_buff) Spell(death_and_decay)
- #death_and_decay
- Spell(death_and_decay)
+ #death_strike,if=runic_power.deficit<=10
+ if RunicPowerDeficit() <= 10 Spell(death_strike)
+ #marrowrend,if=(buff.bone_shield.remains<=rune.time_to_3|buff.bone_shield.remains<=(gcd+cooldown.blooddrinker.ready*talent.blooddrinker.enabled*2)|buff.bone_shield.stack<3)&runic_power.deficit>=20
+ if { BuffRemaining(bone_shield_buff) <= TimeToRunes(3) or BuffRemaining(bone_shield_buff) <= GCD() + { SpellCooldown(blooddrinker) == 0 } * TalentPoints(blooddrinker_talent) * 2 or BuffStacks(bone_shield_buff) < 3 } and RunicPowerDeficit() >= 20 Spell(marrowrend)
+ #blood_boil,if=charges_fractional>=1.8&(buff.hemostasis.stack<=(5-spell_targets.blood_boil)|spell_targets.blood_boil>2)
+ if Charges(blood_boil count=0) >= 1.8 and { BuffStacks(hemostasis_buff) <= 5 - Enemies() or Enemies() > 2 } Spell(blood_boil)
+ #marrowrend,if=buff.bone_shield.stack<5&talent.ossuary.enabled&runic_power.deficit>=15
+ if BuffStacks(bone_shield_buff) < 5 and Talent(ossuary_talent) and RunicPowerDeficit() >= 15 Spell(marrowrend)
+ #death_strike,if=runic_power.deficit<=(15+buff.dancing_rune_weapon.up*5+spell_targets.heart_strike*talent.heartbreaker.enabled*2)|target.time_to_die<10
+ if RunicPowerDeficit() <= 15 + BuffPresent(dancing_rune_weapon_buff) * 5 + Enemies() * TalentPoints(heartbreaker_talent) * 2 or target.TimeToDie() < 10 Spell(death_strike)
+ #death_and_decay,if=spell_targets.death_and_decay>=3
+ if Enemies() >= 3 Spell(death_and_decay)
+ #heart_strike,if=buff.dancing_rune_weapon.up|rune.time_to_4<gcd
+ if BuffPresent(dancing_rune_weapon_buff) or TimeToRunes(4) < GCD() Spell(heart_strike)
+ #blood_boil,if=buff.dancing_rune_weapon.up
+ if BuffPresent(dancing_rune_weapon_buff) Spell(blood_boil)
+ #death_and_decay,if=buff.crimson_scourge.up|talent.rapid_decomposition.enabled|spell_targets.death_and_decay>=2
+ if BuffPresent(crimson_scourge_buff) or Talent(rapid_decomposition_talent) or Enemies() >= 2 Spell(death_and_decay)
+ #blood_boil
+ Spell(blood_boil)
  #heart_strike,if=rune.time_to_3<gcd|buff.bone_shield.stack>6
  if TimeToRunes(3) < GCD() or BuffStacks(bone_shield_buff) > 6 Spell(heart_strike)
 }
@@ -1418,31 +1427,54 @@ AddFunction BloodStandardMainPostConditions
 
 AddFunction BloodStandardShortCdActions
 {
- unless RunicPowerDeficit() < 10 and Spell(death_strike)
+ unless RunicPowerDeficit() <= 10 and Spell(death_strike)
  {
   #blooddrinker,if=!buff.dancing_rune_weapon.up
   if not BuffPresent(dancing_rune_weapon_buff) Spell(blooddrinker)
 
-  unless BuffRemaining(bone_shield_buff) <= GCD() * 2 and Spell(marrowrend) or Charges(blood_boil count=0) >= 1.8 and BuffStacks(haemostasis_buff) < 5 and { BuffStacks(haemostasis_buff) < 3 or not BuffPresent(dancing_rune_weapon_buff) } and Spell(blood_boil) or { BuffStacks(bone_shield_buff) < 5 and Talent(ossuary_talent) or BuffRemaining(bone_shield_buff) < GCD() * 3 } and Spell(marrowrend)
+  unless { BuffRemaining(bone_shield_buff) <= TimeToRunes(3) or BuffRemaining(bone_shield_buff) <= GCD() + { SpellCooldown(blooddrinker) == 0 } * TalentPoints(blooddrinker_talent) * 2 or BuffStacks(bone_shield_buff) < 3 } and RunicPowerDeficit() >= 20 and Spell(marrowrend) or Charges(blood_boil count=0) >= 1.8 and { BuffStacks(hemostasis_buff) <= 5 - Enemies() or Enemies() > 2 } and Spell(blood_boil) or BuffStacks(bone_shield_buff) < 5 and Talent(ossuary_talent) and RunicPowerDeficit() >= 15 and Spell(marrowrend)
   {
-   #bonestorm,if=runic_power>=100&spell_targets.bonestorm>=3
-   if RunicPower() >= 100 and Enemies() >= 3 Spell(bonestorm)
+   #bonestorm,if=runic_power>=100&!buff.dancing_rune_weapon.up
+   if RunicPower() >= 100 and not BuffPresent(dancing_rune_weapon_buff) Spell(bonestorm)
+
+   unless { RunicPowerDeficit() <= 15 + BuffPresent(dancing_rune_weapon_buff) * 5 + Enemies() * TalentPoints(heartbreaker_talent) * 2 or target.TimeToDie() < 10 } and Spell(death_strike) or Enemies() >= 3 and Spell(death_and_decay)
+   {
+    #rune_strike,if=(charges_fractional>=1.8|buff.dancing_rune_weapon.up)&rune.time_to_3>=gcd
+    if { Charges(rune_strike count=0) >= 1.8 or BuffPresent(dancing_rune_weapon_buff) } and TimeToRunes(3) >= GCD() Spell(rune_strike)
+
+    unless { BuffPresent(dancing_rune_weapon_buff) or TimeToRunes(4) < GCD() } and Spell(heart_strike) or BuffPresent(dancing_rune_weapon_buff) and Spell(blood_boil) or { BuffPresent(crimson_scourge_buff) or Talent(rapid_decomposition_talent) or Enemies() >= 2 } and Spell(death_and_decay)
+    {
+     #consumption
+     Spell(consumption)
+
+     unless Spell(blood_boil) or { TimeToRunes(3) < GCD() or BuffStacks(bone_shield_buff) > 6 } and Spell(heart_strike)
+     {
+      #rune_strike
+      Spell(rune_strike)
+     }
+    }
+   }
   }
  }
 }
 
 AddFunction BloodStandardShortCdPostConditions
 {
- RunicPowerDeficit() < 10 and Spell(death_strike) or BuffRemaining(bone_shield_buff) <= GCD() * 2 and Spell(marrowrend) or Charges(blood_boil count=0) >= 1.8 and BuffStacks(haemostasis_buff) < 5 and { BuffStacks(haemostasis_buff) < 3 or not BuffPresent(dancing_rune_weapon_buff) } and Spell(blood_boil) or { BuffStacks(bone_shield_buff) < 5 and Talent(ossuary_talent) or BuffRemaining(bone_shield_buff) < GCD() * 3 } and Spell(marrowrend) or { BuffPresent(blood_shield_buff) or RunicPowerDeficit() < 15 and { RunicPowerDeficit() < 25 or not BuffPresent(dancing_rune_weapon_buff) } } and Spell(death_strike) or BuffPresent(dancing_rune_weapon_buff) and Spell(heart_strike) or BuffPresent(crimson_scourge_buff) and Spell(death_and_decay) or Spell(death_and_decay) or { TimeToRunes(3) < GCD() or BuffStacks(bone_shield_buff) > 6 } and Spell(heart_strike)
+ RunicPowerDeficit() <= 10 and Spell(death_strike) or { BuffRemaining(bone_shield_buff) <= TimeToRunes(3) or BuffRemaining(bone_shield_buff) <= GCD() + { SpellCooldown(blooddrinker) == 0 } * TalentPoints(blooddrinker_talent) * 2 or BuffStacks(bone_shield_buff) < 3 } and RunicPowerDeficit() >= 20 and Spell(marrowrend) or Charges(blood_boil count=0) >= 1.8 and { BuffStacks(hemostasis_buff) <= 5 - Enemies() or Enemies() > 2 } and Spell(blood_boil) or BuffStacks(bone_shield_buff) < 5 and Talent(ossuary_talent) and RunicPowerDeficit() >= 15 and Spell(marrowrend) or { RunicPowerDeficit() <= 15 + BuffPresent(dancing_rune_weapon_buff) * 5 + Enemies() * TalentPoints(heartbreaker_talent) * 2 or target.TimeToDie() < 10 } and Spell(death_strike) or Enemies() >= 3 and Spell(death_and_decay) or { BuffPresent(dancing_rune_weapon_buff) or TimeToRunes(4) < GCD() } and Spell(heart_strike) or BuffPresent(dancing_rune_weapon_buff) and Spell(blood_boil) or { BuffPresent(crimson_scourge_buff) or Talent(rapid_decomposition_talent) or Enemies() >= 2 } and Spell(death_and_decay) or Spell(blood_boil) or { TimeToRunes(3) < GCD() or BuffStacks(bone_shield_buff) > 6 } and Spell(heart_strike)
 }
 
 AddFunction BloodStandardCdActions
 {
+ unless RunicPowerDeficit() <= 10 and Spell(death_strike) or not BuffPresent(dancing_rune_weapon_buff) and Spell(blooddrinker) or { BuffRemaining(bone_shield_buff) <= TimeToRunes(3) or BuffRemaining(bone_shield_buff) <= GCD() + { SpellCooldown(blooddrinker) == 0 } * TalentPoints(blooddrinker_talent) * 2 or BuffStacks(bone_shield_buff) < 3 } and RunicPowerDeficit() >= 20 and Spell(marrowrend) or Charges(blood_boil count=0) >= 1.8 and { BuffStacks(hemostasis_buff) <= 5 - Enemies() or Enemies() > 2 } and Spell(blood_boil) or BuffStacks(bone_shield_buff) < 5 and Talent(ossuary_talent) and RunicPowerDeficit() >= 15 and Spell(marrowrend) or RunicPower() >= 100 and not BuffPresent(dancing_rune_weapon_buff) and Spell(bonestorm) or { RunicPowerDeficit() <= 15 + BuffPresent(dancing_rune_weapon_buff) * 5 + Enemies() * TalentPoints(heartbreaker_talent) * 2 or target.TimeToDie() < 10 } and Spell(death_strike) or Enemies() >= 3 and Spell(death_and_decay) or { Charges(rune_strike count=0) >= 1.8 or BuffPresent(dancing_rune_weapon_buff) } and TimeToRunes(3) >= GCD() and Spell(rune_strike) or { BuffPresent(dancing_rune_weapon_buff) or TimeToRunes(4) < GCD() } and Spell(heart_strike) or BuffPresent(dancing_rune_weapon_buff) and Spell(blood_boil) or { BuffPresent(crimson_scourge_buff) or Talent(rapid_decomposition_talent) or Enemies() >= 2 } and Spell(death_and_decay) or Spell(consumption) or Spell(blood_boil) or { TimeToRunes(3) < GCD() or BuffStacks(bone_shield_buff) > 6 } and Spell(heart_strike) or Spell(rune_strike)
+ {
+  #arcane_torrent,if=runic_power.deficit>20
+  if RunicPowerDeficit() > 20 Spell(arcane_torrent_runicpower)
+ }
 }
 
 AddFunction BloodStandardCdPostConditions
 {
- RunicPowerDeficit() < 10 and Spell(death_strike) or not BuffPresent(dancing_rune_weapon_buff) and Spell(blooddrinker) or BuffRemaining(bone_shield_buff) <= GCD() * 2 and Spell(marrowrend) or Charges(blood_boil count=0) >= 1.8 and BuffStacks(haemostasis_buff) < 5 and { BuffStacks(haemostasis_buff) < 3 or not BuffPresent(dancing_rune_weapon_buff) } and Spell(blood_boil) or { BuffStacks(bone_shield_buff) < 5 and Talent(ossuary_talent) or BuffRemaining(bone_shield_buff) < GCD() * 3 } and Spell(marrowrend) or RunicPower() >= 100 and Enemies() >= 3 and Spell(bonestorm) or { BuffPresent(blood_shield_buff) or RunicPowerDeficit() < 15 and { RunicPowerDeficit() < 25 or not BuffPresent(dancing_rune_weapon_buff) } } and Spell(death_strike) or BuffPresent(dancing_rune_weapon_buff) and Spell(heart_strike) or BuffPresent(crimson_scourge_buff) and Spell(death_and_decay) or Spell(death_and_decay) or { TimeToRunes(3) < GCD() or BuffStacks(bone_shield_buff) > 6 } and Spell(heart_strike)
+ RunicPowerDeficit() <= 10 and Spell(death_strike) or not BuffPresent(dancing_rune_weapon_buff) and Spell(blooddrinker) or { BuffRemaining(bone_shield_buff) <= TimeToRunes(3) or BuffRemaining(bone_shield_buff) <= GCD() + { SpellCooldown(blooddrinker) == 0 } * TalentPoints(blooddrinker_talent) * 2 or BuffStacks(bone_shield_buff) < 3 } and RunicPowerDeficit() >= 20 and Spell(marrowrend) or Charges(blood_boil count=0) >= 1.8 and { BuffStacks(hemostasis_buff) <= 5 - Enemies() or Enemies() > 2 } and Spell(blood_boil) or BuffStacks(bone_shield_buff) < 5 and Talent(ossuary_talent) and RunicPowerDeficit() >= 15 and Spell(marrowrend) or RunicPower() >= 100 and not BuffPresent(dancing_rune_weapon_buff) and Spell(bonestorm) or { RunicPowerDeficit() <= 15 + BuffPresent(dancing_rune_weapon_buff) * 5 + Enemies() * TalentPoints(heartbreaker_talent) * 2 or target.TimeToDie() < 10 } and Spell(death_strike) or Enemies() >= 3 and Spell(death_and_decay) or { Charges(rune_strike count=0) >= 1.8 or BuffPresent(dancing_rune_weapon_buff) } and TimeToRunes(3) >= GCD() and Spell(rune_strike) or { BuffPresent(dancing_rune_weapon_buff) or TimeToRunes(4) < GCD() } and Spell(heart_strike) or BuffPresent(dancing_rune_weapon_buff) and Spell(blood_boil) or { BuffPresent(crimson_scourge_buff) or Talent(rapid_decomposition_talent) or Enemies() >= 2 } and Spell(death_and_decay) or Spell(consumption) or Spell(blood_boil) or { TimeToRunes(3) < GCD() or BuffStacks(bone_shield_buff) > 6 } and Spell(heart_strike) or Spell(rune_strike)
 }
 
 ### Blood icons.
@@ -1505,27 +1537,30 @@ AddIcon checkbox=opt_deathknight_blood_aoe help=cd specialization=blood
 
 ### Required symbols
 # arcane_torrent_runicpower
-# blood_fury_ap
-# berserking
-# dancing_rune_weapon_buff
-# old_war_potion
-# dancing_rune_weapon
-# blooddrinker_talent
-# blooddrinker
-# tombstone
-# bone_shield_buff
-# death_strike
-# marrowrend
-# blood_boil
-# haemostasis_buff
-# ossuary_talent
-# bonestorm
-# blood_shield_buff
-# heart_strike
-# death_and_decay
-# crimson_scourge_buff
-# mind_freeze
 # asphyxiate
+# battle_potion_of_strength
+# berserking
+# blood_boil
+# blood_fury_ap
+# blooddrinker
+# blooddrinker_talent
+# bone_shield_buff
+# bonestorm
+# consumption
+# crimson_scourge_buff
+# dancing_rune_weapon
+# dancing_rune_weapon_buff
+# death_and_decay
+# death_strike
+# heart_strike
+# heartbreaker_talent
+# hemostasis_buff
+# marrowrend
+# mind_freeze
+# ossuary_talent
+# rapid_decomposition_talent
+# rune_strike
+# tombstone
 # war_stomp
 
     ]]
