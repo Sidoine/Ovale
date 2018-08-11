@@ -273,30 +273,60 @@ class OvalePowerClass extends OvalePowerBase {
     }
     constructor() {
         super();
-        let powerTokens: LuaObj<string> = {
-            mana: "MANA",
-            rage: "RAGE",
-            focus: "FOCUS",
-            energy: "ENERGY",
-            combopoints: "COMBO_POINTS",
-            // runes: "RUNES",
-            runicpower: "RUNIC_POWER",
-            soulshards: "SOUL_SHARDS",
-            lunarpower: "LUNAR_POWER",
+        let possiblePowerTypes: LuaObj<LuaObj<string>> = {
+            DEATHKNIGHT:{
+                runicpower: "RUNIC_POWER",
+            },
+            DEMONHUNTER:{
+                pain: "PAIN",
+                fury: "FURY"
+            },
+            DRUID:{
+                mana: "MANA",
+                rage: "RAGE",
+                energy: "ENERGY",
+                combopoints: "COMBO_POINTS",
+                lunarpower: "LUNAR_POWER",
+            },
+            HUNTER:{
+                focus: "FOCUS",
+            },
+            MAGE:{
+                mana: "MANA",
+                arcanecharges: "ARCANE_CHARGES",
+            },
+            MONK:{
+                mana: "MANA",
+                energy: "ENERGY",
+                chi: "CHI",
+            },
+            PALADIN:{
+                mana: "MANA",
             holypower: "HOLY_POWER",
-            alternate: "ALTERNATE_RESOURCE_TEXT",
+            },
+            PRIEST:{
+                mana: "MANA",
+                insanity: "INSANITY",
+            },
+            ROGUE:{
+                energy: "ENERGY",
+                combopoints: "COMBO_POINTS",
+            },
+            SHAMAN:{
+                mana: "MANA",
             maelstrom: "MAELSTROM",
-            chi: "CHI",
-            insanity: "INSANITY",
-            // obsolete: "OBSOLETE",
-            // obsolete2: "OBSOLETE2",
-            arcanecharges: "ARCANE_CHARGES",
-            pain: "PAIN",
-            fury: "FURY"
+            },
+            WARLOCK:{
+                mana: "MANA",
+                soulshards: "SOUL_SHARDS",
+            },
+            WARRIOR:{
+                rage: "RAGE",
+            },
         }
         for (const [powerType, powerId] of pairs(Enum.PowerType)) {
             let powerTypeLower = strlower(powerType);
-            let powerToken = powerTokens[powerTypeLower];
+            let powerToken = possiblePowerTypes[Ovale.playerClass][powerTypeLower];
             if (powerToken) {
                 this.POWER_TYPE[powerId] = powerTypeLower;
                 this.POWER_TYPE[powerToken] = powerTypeLower;
@@ -394,10 +424,6 @@ class OvalePowerClass extends OvalePowerBase {
                 let maxPower = UnitPowerMax("player", powerInfo.id, powerInfo.segments);
                 if (this.current.maxPower[powerType] != maxPower) {
                     this.current.maxPower[powerType] = maxPower;
-                    if (maxPower == 0) { // Don't track anything related to a powerType with maxPower of 0.
-                        this.POWER_INFO[powerType] = undefined;
-                        UnregisterRequirement(powerType);
-                    }
                     Ovale.needRefresh();
                 }
             }
@@ -550,7 +576,7 @@ class OvalePowerClass extends OvalePowerBase {
         if (si) {
             for (const [powerType, powerInfo] of pairs(OvalePower.POWER_INFO)) {
                 let [cost, refund] = this.next.PowerCost(spellId, powerType, atTime, targetGUID);
-                let power = this[powerType] || 0;
+                let power = this.next.power[powerType] || 0;
                 if (cost) {
                     power = power - cost
                 }
@@ -570,7 +596,7 @@ class OvalePowerClass extends OvalePowerBase {
                 if (maxi && power > maxi) {
                     power = maxi;
                 }
-                this[powerType] = power;
+                this.next.power[powerType] = power;
             }
         }
         OvalePower.StopProfiling("OvalePower_state_ApplyPowerCost");

@@ -206,7 +206,7 @@ local OvaleEnemiesClass = __class(OvaleEnemiesBase, {
                 Ovale:needRefresh()
             end
         end
-        self:StopProfiling("OvaleEnemies_RemoveEnemy")
+        self:StopProfiling("OvaleEnemies_RemoveTaggedEnemy")
     end,
     DebugEnemies = function(self)
         for guid, seen in pairs(self_enemyLastSeen) do

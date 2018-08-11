@@ -69,6 +69,7 @@ local MODIFIER_KEYWORD = {
     ["for_next"] = true,
     ["if"] = true,
     ["interrupt"] = true,
+    ["interrupt_global"] = true,
     ["interrupt_if"] = true,
     ["interrupt_immediate"] = true,
     ["interval"] = true,
@@ -1193,7 +1194,9 @@ local InitializeDisambiguation = function()
     AddDisambiguation("strike", "windstrike", "SHAMAN", "enhancement")
     AddDisambiguation("totem_mastery", "totem_mastery_elemental", "SHAMAN", "elemental")
     AddDisambiguation("totem_mastery", "totem_mastery_enhancement", "SHAMAN", "enhancement")
-    AddDisambiguation("soul_conduit_talent", "soul_conduit_talent_demonology", "WARLOCK", "demonology")
+    AddDisambiguation("132369", "wilfreds_sigil_of_superior_summoning", "WARLOCK", "demonology")
+    AddDisambiguation("dark_soul", "dark_soul_misery", "WARLOCK", "affliction")
+    AddDisambiguation("soul_conduit_talent", "demo_soul_conduit_talent", "WARLOCK", "demonology")
     AddDisambiguation("anger_management_talent", "fury_anger_management_talent", "WARRIOR", "fury")
     AddDisambiguation("bladestorm", "bladestorm_arms", "WARRIOR", "arms")
     AddDisambiguation("bladestorm", "bladestorm_fury", "WARRIOR", "fury")
@@ -2928,6 +2931,7 @@ do
         ["astral_power.deficit"] = "AstralPowerDeficit()",
         ["blade_dance_worth_using"] = "0",
         ["blood.frac"] = "Rune(blood)",
+        ["buff.movement.up"] = "Speed() > 0",
         ["buff.out_of_range.up"] = "not target.InRange()",
         ["bugs"] = "0",
         ["chi"] = "Chi()",
@@ -3007,6 +3011,7 @@ do
         ["time_to_20pct"] = "TimeToHealthPercent(20)",
         ["time_to_die"] = "TimeToDie()",
         ["time_to_die.remains"] = "TimeToDie()",
+        ["time_to_shard"] = "TimeToShard()",
         ["time_to_sht.4"] = "100",
         ["time_to_sht.5"] = "100",
         ["wild_imp_count"] = "Demons(wild_imp)",
@@ -3728,6 +3733,21 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
         code = format("target.DebuffStacks(unstable_affliction_debuff) >= %s", num)
     elseif className == "WARLOCK" and operand == "buff.active_uas.stack" then
         code = "target.DebuffStacks(unstable_affliction_debuff)"
+    elseif className == "WARLOCK" and match(operand, "pet%.[a-z_]+%..+") then
+        local spellName, property = match(operand, "pet%.([a-z_]+)%.(.+)")
+        if property == "remains" then
+            code = format("DemonDuration(%s)", spellName)
+        elseif property == "active" then
+            code = format("DemonDuration(%s) > 0", spellName)
+        end
+    elseif className == "WARLOCK" and operand == "contagion" then
+        code = "BuffRemaining(unstable_affliction_buff)"
+    elseif className == "WARLOCK" and operand == "buff.wild_imps.stack" then
+        code = "Demons(wild_imp)"
+    elseif className == "WARLOCK" and operand == "buff.dreadstalkers.remains" then
+        code = "DemonDuration(dreadstalker)"
+    elseif className == "WARLOCK" and match(operand, "prev_gcd.%d.hand_of_guldan") then
+        code = "PreviousGCDSpell(hand_of_guldan)"
     elseif className == "WARRIOR" and sub(operand, 1, 23) == "buff.colossus_smash_up." then
         local property = sub(operand, 24)
         local debuffName = "colossus_smash_debuff"
@@ -3757,7 +3777,7 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
     elseif operand == "distance" then
         code = target .. "Distance()"
     elseif sub(operand, 1, 9) == "equipped." then
-        local name = sub(operand, 10)
+        local name = Disambiguate(annotation, sub(operand, 10), className, specialization)
         code = format("HasEquippedItem(%s_item)", name)
         AddSymbol(annotation, name .. "_item")
     elseif operand == "gcd.max" then

@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/WildImps", 80000)
+local __exports = LibStub:NewLibrary("ovale/Warlock", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __State = LibStub:GetLibrary("ovale/State")
@@ -11,7 +11,24 @@ local pairs = pairs
 local GetTime = GetTime
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local find = string.find
-local OvaleWildImpsBase = Ovale:NewModule("OvaleWildImps", aceEvent)
+local __Options = LibStub:GetLibrary("ovale/Options")
+local OvaleOptions = __Options.OvaleOptions
+local __Aura = LibStub:GetLibrary("ovale/Aura")
+local OvaleAura = __Aura.OvaleAura
+local __PaperDoll = LibStub:GetLibrary("ovale/PaperDoll")
+local OvalePaperDoll = __PaperDoll.OvalePaperDoll
+local pow = math.pow
+local __SpellBook = LibStub:GetLibrary("ovale/SpellBook")
+local OvaleSpellBook = __SpellBook.OvaleSpellBook
+local OvaleWarlockBase = Ovale:NewModule("OvaleWarlock", aceEvent)
+local CUSTOM_AURAS = {
+    [80240] = {
+        customId = -80240,
+        duration = 10,
+        stacks = 1,
+        auraName = "active_havoc"
+    }
+}
 local demonData = {
     [55659] = {
         duration = 12
@@ -27,11 +44,20 @@ local demonData = {
     },
     [89] = {
         duration = 25
+    },
+    [143622] = {
+        duration = 12
+    },
+    [135002] = {
+        duration = 15
+    },
+    [17252] = {
+        duration = 15
     }
 }
 local self_demons = {}
 local self_serial = 1
-local OvaleWildImpsClass = __class(OvaleWildImpsBase, {
+local OvaleWarlockClass = __class(OvaleWarlockBase, {
     OnInitialize = function(self)
         if Ovale.playerClass == "WARLOCK" then
             self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -55,6 +81,7 @@ local OvaleWildImpsClass = __class(OvaleWildImpsBase, {
             local now = GetTime()
             for id, v in pairs(demonData) do
                 if id == creatureId then
+                    creatureId = (creatureId == 143622) and 55659 or creatureId
                     self_demons[destGUID] = {
                         id = creatureId,
                         timestamp = now,
@@ -73,6 +100,10 @@ local OvaleWildImpsClass = __class(OvaleWildImpsBase, {
             if spellId == 196277 then
                 self_demons[destGUID] = nil
                 Ovale:needRefresh()
+            end
+            if CUSTOM_AURAS[spellId] then
+                local aura = CUSTOM_AURAS[spellId]
+                self:AddCustomAura(aura.customId, aura.stacks, aura.duration, aura.auraName)
             end
         end
     end,
@@ -112,6 +143,27 @@ local OvaleWildImpsClass = __class(OvaleWildImpsBase, {
         end
         return max
     end,
+    AddCustomAura = function(self, customId, stacks, duration, buffName)
+        local now = GetTime()
+        local expire = now + duration
+        local filter = OvaleOptions.defaultDB.profile.apparence.fullAuraScan and "HELPFUL" or "HELPFUL|PLAYER"
+        OvaleAura:GainedAuraOnGUID(Ovale.playerGUID, now, customId, Ovale.playerGUID, filter, nil, nil, stacks, nil, duration, expire, nil, buffName, nil, nil, nil)
+    end,
+    TimeToShard = function(self)
+        local now = GetTime()
+        local filter = OvaleOptions.defaultDB.profile.apparence.fullAuraScan and "HARMFUL" or "HARMFUL|PLAYER"
+        local value = 3600
+        local creepingDeathTalent = 20
+        local tickTime = 2 / OvalePaperDoll:GetHasteMultiplier("spell", OvalePaperDoll.next)
+        local activeAgonies = OvaleAura:AuraCount(980, filter, true, nil, now, nil)
+        if activeAgonies > 0 then
+            value = 1 / (0.184 * pow(activeAgonies, -2 / 3)) * tickTime / activeAgonies
+            if OvaleSpellBook:IsKnownTalent(creepingDeathTalent) then
+                value = value * 0.85
+            end
+        end
+        return value
+    end,
 })
-__exports.OvaleWildImps = OvaleWildImpsClass()
-OvaleState:RegisterState(__exports.OvaleWildImps)
+__exports.OvaleWarlock = OvaleWarlockClass()
+OvaleState:RegisterState(__exports.OvaleWarlock)

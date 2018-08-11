@@ -165,6 +165,7 @@ let MODIFIER_KEYWORD: LuaObj<boolean> = {
     ["for_next"]: true,
     ["if"]: true,
     ["interrupt"]: true,
+    ["interrupt_global"]: true,
     ["interrupt_if"]: true,
     ["interrupt_immediate"]: true,
     ["interval"]: true,
@@ -1323,7 +1324,9 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("totem_mastery", "totem_mastery_enhancement", "SHAMAN", "enhancement")
 
     //Warlock
-    AddDisambiguation("soul_conduit_talent", "soul_conduit_talent_demonology", "WARLOCK", "demonology");
+    AddDisambiguation("132369", "wilfreds_sigil_of_superior_summoning", "WARLOCK", "demonology");
+    AddDisambiguation("dark_soul", "dark_soul_misery", "WARLOCK", "affliction");
+    AddDisambiguation("soul_conduit_talent", "demo_soul_conduit_talent", "WARLOCK", "demonology");
 
     //Warrior
     AddDisambiguation("anger_management_talent", "fury_anger_management_talent", "WARRIOR", "fury");
@@ -3058,6 +3061,7 @@ EmitOperandBuff = function (operand, parseNode, nodeList, annotation, action, ta
         ["astral_power.deficit"]: "AstralPowerDeficit()",
         ["blade_dance_worth_using"]: "0",
         ["blood.frac"]: "Rune(blood)",
+        ["buff.movement.up"]: "Speed() > 0",
         ["buff.out_of_range.up"]: "not target.InRange()",
         ["bugs"]: "0",
         ["chi"]: "Chi()",
@@ -3137,6 +3141,7 @@ EmitOperandBuff = function (operand, parseNode, nodeList, annotation, action, ta
         ["time_to_20pct"]: "TimeToHealthPercent(20)",
         ["time_to_die"]: "TimeToDie()",
         ["time_to_die.remains"]: "TimeToDie()",
+        ["time_to_shard"]: "TimeToShard()",
         ["time_to_sht.4"]: "100", // TODO
         ["time_to_sht.5"]: "100",
         ["wild_imp_count"]: "Demons(wild_imp)",
@@ -3858,6 +3863,21 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
         code = format("target.DebuffStacks(unstable_affliction_debuff) >= %s", num);
     } else if (className == "WARLOCK" && operand == "buff.active_uas.stack") {
         code = "target.DebuffStacks(unstable_affliction_debuff)";
+    } else if (className == "WARLOCK" && truthy(match(operand, "pet%.[a-z_]+%..+"))) {
+        let [spellName, property] = match(operand, "pet%.([a-z_]+)%.(.+)");
+        if(property == "remains"){
+            code = format("DemonDuration(%s)", spellName)
+        }else if(property == "active"){
+            code = format("DemonDuration(%s) > 0", spellName)
+        }
+    } else if (className == "WARLOCK" && operand == "contagion") {
+        code = "BuffRemaining(unstable_affliction_buff)";
+    } else if (className == "WARLOCK" && operand == "buff.wild_imps.stack") {
+        code = "Demons(wild_imp)";
+    } else if (className == "WARLOCK" && operand == "buff.dreadstalkers.remains") {
+        code = "DemonDuration(dreadstalker)";
+    } else if (className == "WARLOCK" && truthy(match(operand, "prev_gcd.%d.hand_of_guldan"))) { // TODO improve PreviousGCDSpell(spell count=number)
+        code = "PreviousGCDSpell(hand_of_guldan)";
     } else if (className == "WARRIOR" && sub(operand, 1, 23) == "buff.colossus_smash_up.") {
         let property = sub(operand, 24);
         let debuffName = "colossus_smash_debuff";
@@ -3887,7 +3907,7 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
     } else if (operand == "distance") {
         code = `${target}Distance()`;
     } else if (sub(operand, 1, 9) == "equipped.") {
-        let name = sub(operand, 10);
+        let [name] = Disambiguate(annotation, sub(operand, 10), className, specialization);
         code = format("HasEquippedItem(%s_item)", name);
         AddSymbol(annotation, `${name}_item`);
     } else if (operand == "gcd.max") {

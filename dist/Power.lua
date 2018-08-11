@@ -259,27 +259,60 @@ local OvalePowerClass = __class(OvalePowerBase, {
             end
         end
         OvalePowerBase.constructor(self)
-        local powerTokens = {
-            mana = "MANA",
-            rage = "RAGE",
-            focus = "FOCUS",
-            energy = "ENERGY",
-            combopoints = "COMBO_POINTS",
-            runicpower = "RUNIC_POWER",
-            soulshards = "SOUL_SHARDS",
-            lunarpower = "LUNAR_POWER",
-            holypower = "HOLY_POWER",
-            alternate = "ALTERNATE_RESOURCE_TEXT",
-            maelstrom = "MAELSTROM",
-            chi = "CHI",
-            insanity = "INSANITY",
-            arcanecharges = "ARCANE_CHARGES",
-            pain = "PAIN",
-            fury = "FURY"
+        local possiblePowerTypes = {
+            DEATHKNIGHT = {
+                runicpower = "RUNIC_POWER"
+            },
+            DEMONHUNTER = {
+                pain = "PAIN",
+                fury = "FURY"
+            },
+            DRUID = {
+                mana = "MANA",
+                rage = "RAGE",
+                energy = "ENERGY",
+                combopoints = "COMBO_POINTS",
+                lunarpower = "LUNAR_POWER"
+            },
+            HUNTER = {
+                focus = "FOCUS"
+            },
+            MAGE = {
+                mana = "MANA",
+                arcanecharges = "ARCANE_CHARGES"
+            },
+            MONK = {
+                mana = "MANA",
+                energy = "ENERGY",
+                chi = "CHI"
+            },
+            PALADIN = {
+                mana = "MANA",
+                holypower = "HOLY_POWER"
+            },
+            PRIEST = {
+                mana = "MANA",
+                insanity = "INSANITY"
+            },
+            ROGUE = {
+                energy = "ENERGY",
+                combopoints = "COMBO_POINTS"
+            },
+            SHAMAN = {
+                mana = "MANA",
+                maelstrom = "MAELSTROM"
+            },
+            WARLOCK = {
+                mana = "MANA",
+                soulshards = "SOUL_SHARDS"
+            },
+            WARRIOR = {
+                rage = "RAGE"
+            }
         }
         for powerType, powerId in pairs(Enum.PowerType) do
             local powerTypeLower = strlower(powerType)
-            local powerToken = powerTokens[powerTypeLower]
+            local powerToken = possiblePowerTypes[Ovale.playerClass][powerTypeLower]
             if powerToken then
                 self.POWER_TYPE[powerId] = powerTypeLower
                 self.POWER_TYPE[powerToken] = powerTypeLower
@@ -376,10 +409,6 @@ local OvalePowerClass = __class(OvalePowerBase, {
                 local maxPower = UnitPowerMax("player", powerInfo.id, powerInfo.segments)
                 if self.current.maxPower[powerType] ~= maxPower then
                     self.current.maxPower[powerType] = maxPower
-                    if maxPower == 0 then
-                        self.POWER_INFO[powerType] = nil
-                        UnregisterRequirement(powerType)
-                    end
                     Ovale:needRefresh()
                 end
             end
@@ -516,7 +545,7 @@ local OvalePowerClass = __class(OvalePowerBase, {
         if si then
             for powerType, powerInfo in pairs(__exports.OvalePower.POWER_INFO) do
                 local cost, refund = self.next:PowerCost(spellId, powerType, atTime, targetGUID)
-                local power = self[powerType] or 0
+                local power = self.next.power[powerType] or 0
                 if cost then
                     power = power - cost
                 end
@@ -536,7 +565,7 @@ local OvalePowerClass = __class(OvalePowerBase, {
                 if maxi and power > maxi then
                     power = maxi
                 end
-                self[powerType] = power
+                self.next.power[powerType] = power
             end
         end
         __exports.OvalePower:StopProfiling("OvalePower_state_ApplyPowerCost")

@@ -107,8 +107,8 @@ class OvaleHealthClass extends OvaleHealthClassBase {
             this.Debug(event, unitId, guid);
             this.UpdateHealth("UNIT_HEALTH_FREQUENT", unitId);
             this.UpdateHealth("UNIT_MAXHEALTH", unitId);
-            this.StopProfiling("Ovale_UnitChanged");
         }
+        this.StopProfiling("Ovale_UnitChanged");
     }
     UpdateHealth(event, unitId) {
         if (!unitId) {

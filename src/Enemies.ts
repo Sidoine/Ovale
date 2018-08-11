@@ -191,7 +191,7 @@ class OvaleEnemiesClass extends OvaleEnemiesBase {
                 Ovale.needRefresh();
             }
         }
-        this.StopProfiling("OvaleEnemies_RemoveEnemy");
+        this.StopProfiling("OvaleEnemies_RemoveTaggedEnemy");
     }
     DebugEnemies() {
         for (const [guid, seen] of pairs(self_enemyLastSeen)) {

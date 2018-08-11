@@ -18,7 +18,6 @@ import { OvaleBossMod } from "./BossMod";
 import { Ovale } from "./Ovale";
 import { OvalePaperDoll } from "./PaperDoll";
 import { OvaleAura } from "./Aura";
-import { OvaleWildImps } from "./WildImps";
 import { OvaleEnemies } from "./Enemies";
 import { OvaleTotem } from "./Totem";
 import { OvaleDemonHunterSoulFragments } from "./DemonHunterSoulFragments";
@@ -35,6 +34,7 @@ import { OvaleSigil } from "./DemonHunterSigils";
 import { baseState } from "./BaseState";
 import { OvaleSpells } from "./Spells";
 import { OvaleAzerite } from "./AzeriteArmor";
+import { OvaleWarlock } from "./Warlock";
 let INFINITY = huge;
 
 type BaseState = {};
@@ -1165,17 +1165,17 @@ function GetHastedTime(seconds, haste, state: BaseState) {
 {
     function Demons(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [creatureId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
-        let value = OvaleWildImps.GetDemonsCount(creatureId, atTime);
+        let value = OvaleWarlock.GetDemonsCount(creatureId, atTime);
         return Compare(value, comparator, limit);
     }
     function NotDeDemons(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [creatureId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
-        let value = OvaleWildImps.GetNotDemonicEmpoweredDemonsCount(creatureId, atTime);
+        let value = OvaleWarlock.GetNotDemonicEmpoweredDemonsCount(creatureId, atTime);
         return Compare(value, comparator, limit);
     }
     function DemonDuration(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [creatureId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
-        let value = OvaleWildImps.GetRemainingDemonDuration(creatureId, atTime);
+        let value = OvaleWarlock.GetRemainingDemonDuration(creatureId, atTime);
         return Compare(value, comparator, limit);
     }
     OvaleCondition.RegisterCondition("demons", false, Demons);
@@ -2742,7 +2742,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
 	 @return A boolean value for the result of the comparison.
      */
     function AstralPowerDeficit(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        return PowerDeficit("astralpower", positionalParams, namedParams, state, atTime);
+        return PowerDeficit("lunarpower", positionalParams, namedParams, state, atTime);
     }
 
     /**  Get the number of lacking resource points for full chi, between 0 and maximum chi, of the target.
@@ -3017,7 +3017,7 @@ l    */
 	 @return A boolean value for the result of the comparison.
      */
     function MaxHolyPower(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        return MaxPower("holy", positionalParams, namedParams, state, atTime);
+        return MaxPower("holypower", positionalParams, namedParams, state, atTime);
     }
 
     /** Get the maximum amount of mana of the target.
@@ -4956,4 +4956,12 @@ l    */
         return Compare(value, comparator, limit);
     }
     OvaleCondition.RegisterCondition("soulfragments", false, SoulFragments);
+}
+{
+    function TimeToShard(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number){
+        let [comparator, limit] = [positionalParams[1], positionalParams[2]];
+        let value = OvaleWarlock.TimeToShard()
+        return Compare(value, comparator, limit);
+    }
+    OvaleCondition.RegisterCondition("timetoshard", false, TimeToShard);
 }
