@@ -98,7 +98,11 @@ local OvaleWarlockClass = __class(OvaleWarlockBase, {
             Ovale:needRefresh()
         elseif cleuEvent == "SPELL_CAST_SUCCESS" then
             if spellId == 196277 then
-                self_demons[destGUID] = nil
+				for k, d in pairs(self_demons) do
+					if d.id == 143622 or d.id == 55659 then
+						self_demons[k] = nil
+					end
+				end
                 Ovale:needRefresh()
             end
             if CUSTOM_AURAS[spellId] then
