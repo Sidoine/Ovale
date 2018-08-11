@@ -1545,7 +1545,11 @@ local function MaxShadowOrbs(positionalParams, namedParams, state, atTime)
 local function MaxSoulShards(positionalParams, namedParams, state, atTime)
         return MaxPower("soulshards", positionalParams, namedParams, state, atTime)
     end
+local function MaxArcaneCharges(positionalParams, namedParams, state, atTime)
+        return MaxPower("arcanecharges", positionalParams, namedParams, state, atTime)
+    end
     OvaleCondition:RegisterCondition("maxalternatepower", false, MaxAlternatePower)
+    OvaleCondition:RegisterCondition("maxarcanecharges", false, MaxArcaneCharges)
     OvaleCondition:RegisterCondition("maxchi", false, MaxChi)
     OvaleCondition:RegisterCondition("maxcombopoints", false, MaxComboPoints)
     OvaleCondition:RegisterCondition("maxenergy", false, MaxEnergy)
