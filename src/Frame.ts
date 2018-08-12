@@ -148,7 +148,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
     OnUpdate(elapsed: number) {
         OvaleFrameModule.SendMessage("Ovale_OnUpdate");
         this.timeSinceLastUpdate = this.timeSinceLastUpdate + elapsed;
-        let refresh = OvaleDebug.trace || ( this.visible || (Ovale.db.profile.apparence.spellFlash.enabled && OvaleSpellFlash)) && (this.timeSinceLastUpdate > Ovale.db.profile.apparence.minFrameRefresh / 1000 && next(Ovale.refreshNeeded) || this.timeSinceLastUpdate > Ovale.db.profile.apparence.maxFrameRefresh / 1000);
+        let refresh = OvaleDebug.trace || ( this.visible || OvaleSpellFlash.IsSpellFlashEnabled()) && (this.timeSinceLastUpdate > Ovale.db.profile.apparence.minFrameRefresh / 1000 && next(Ovale.refreshNeeded) || this.timeSinceLastUpdate > Ovale.db.profile.apparence.maxFrameRefresh / 1000);
         if (refresh) {
             Ovale.AddRefreshInterval(this.timeSinceLastUpdate * 1000);
             OvaleState.InitializeState();
