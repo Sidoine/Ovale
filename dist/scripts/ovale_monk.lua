@@ -135,37 +135,15 @@ AddFunction BrewmasterBlackoutComboMainActions
 AddFunction BrewmasterDefaultAoEActions
 {
     BrewmasterHealMeMain()
-	if(Talent(blackout_combo_talent) and not BuffPresent(blackout_combo_buff)) Spell(blackout_strike)
-	Spell(keg_smash)
+    if (Talent(blackout_combo_talent) and not BuffPresent(blackout_combo_buff)) Spell(blackout_strike)
+	if (not Talent(blackout_combo_talent) or (BuffPresent(blackout_combo_buff) and SpellCharges(ironskin_brew) <= SpellData(ironskin_brew charges)-2) or SpellFullRecharge(keg_smash) == 0) Spell(keg_smash)
 	Spell(chi_burst)
 	Spell(chi_wave)
-	if (target.DebuffPresent(keg_smash_debuff) and (not HasEquippedItem(salsalabims_lost_tunic) or not BuffPresent(blackout_combo_buff))) Spell(breath_of_fire)
+	if (target.DebuffPresent(keg_smash_debuff) and not BuffPresent(blackout_combo_buff)) Spell(breath_of_fire)
 	if (BuffRefreshable(rushing_jade_wind_buff)) Spell(rushing_jade_wind)
     Spell(arcane_pulse)
-	if (EnergyDeficit() <= 35 or (Talent(black_ox_talent) and SpellCooldown(black_ox_brew) <= 0)) Spell(tiger_palm)
+	if (EnergyDeficit() <= 35 or (Talent(black_ox_talent) and SpellCooldown(black_ox_brew) <= 0) or BuffPresent(blackout_combo_buff)) Spell(tiger_palm)
 	if (not BuffPresent(blackout_combo_buff)) Spell(blackout_strike)	
-    
-}
-
-AddFunction BrewmasterBlackoutComboAoEActions
-{
-	if(not BuffPresent(blackout_combo_buff)) Spell(blackout_strike)
-	if(BuffPresent(blackout_combo_buff)) 
-	{
-		Spell(keg_smash)
-		if not HasEquippedItem(salsalabims_lost_tunic) and not ArmorSetBonus(T21 4) Spell(breath_of_fire)
-		Spell(tiger_palm)
-	}
-	
-	unless (BuffPresent(blackout_combo_buff)) 
-	{
-        if HasEquippedItem(salsalabims_lost_tunic) or ArmorSetBonus(T21 4) Spell(breath_of_fire)
-		Spell(rushing_jade_wind)
-		Spell(chi_burst)
-		Spell(chi_wave)
-        Spell(arcane_pulse)
-		if EnergyDeficit() <= 35 Spell(tiger_palm)
-	}
 }
 
 AddFunction BrewmasterDefaultCdActions 
