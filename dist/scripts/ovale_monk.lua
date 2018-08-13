@@ -1,9 +1,10 @@
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
-    local name = "icyveins_monk_brewmaster"
-    local desc = "[7.3.2] Icy-Veins: Monk Brewmaster"
-    local code = [[
+	local name = "icyveins_monk_brewmaster"
+	local desc = "[8.0.1] Icy-Veins: Monk Brewmaster"
+	local code = [[
+
 Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
@@ -14,7 +15,7 @@ AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=brewmaster)
 AddCheckBox(opt_monk_bm_aoe L(AOE) default specialization=brewmaster)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=brewmaster)
 
-AddFunction BrewmasterHealMe
+AddFunction BrewmasterHealMeShortCd
 {
 	unless(DebuffPresent(healing_immunity_debuff)) 
 	{
@@ -25,6 +26,13 @@ AddFunction BrewmasterHealMe
 		}
 		if (HealthPercent() <= 100 - (15 * 2.6)) Spell(healing_elixir)
 		if (HealthPercent() < 35) UseHealthPotions()
+	}
+}
+
+AddFunction BrewmasterHealMeMain
+{
+	unless(DebuffPresent(healing_immunity_debuff)) 
+	{
 	}
 }
 
@@ -40,26 +48,25 @@ AddFunction BrewmasterRangeCheck
 
 AddFunction BrewMasterIronskinMin
 {
-	if(DebuffRemaining(any_stagger_debuff) > BaseDuration(ironskin_brew_buff)) BaseDuration(ironskin_brew_buff)
 	DebuffRemaining(any_stagger_debuff)
 }
 
 AddFunction BrewmasterDefaultShortCDActions
 {
 	# keep ISB up always when taking dmg
-	if BuffRemaining(ironskin_brew_buff) < BrewMasterIronskinMin() Spell(ironskin_brew text=min)
+	if BuffRemaining(ironskin_brew_buff) < BrewMasterIronskinMin() and BuffExpires(blackout_combo_buff) Spell(ironskin_brew text=min)
 	
 	# keep stagger below 100% (or 30% when BOB is up)
 	if (StaggerPercentage() >= 100 or (StaggerPercentage() >= 30 and Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 0)) Spell(purifying_brew)
 	# use black_ox_brew when at 0 charges and low energy (or in an emergency)
 	if ((SpellCharges(purifying_brew) == 0) and (Energy() < 40 or StaggerPercentage() >= 60 or BuffRemaining(ironskin_brew_buff) < BrewMasterIronskinMin())) Spell(black_ox_brew)
 
-	# heal mean
-	BrewmasterHealMe()
+	# heal me
+	BrewmasterHealMeShortCd()
 	# range check
 	BrewmasterRangeCheck()
 
-	unless StaggerPercentage() > 100 or BrewmasterHealMe()
+	unless StaggerPercentage() > 100 or BuffPresent(blackout_combo_buff) or BuffPresent(brew_stache_buff)
 	{
 		# purify heavy stagger when we have enough ISB
 		if (StaggerPercentage() >= 60 and (BuffRemaining(ironskin_brew_buff) >= 2*BaseDuration(ironskin_brew_buff))) Spell(purifying_brew)
@@ -80,8 +87,6 @@ AddFunction BrewmasterDefaultShortCDActions
 				if (BuffRemaining(ironskin_brew_buff) < 2*BaseDuration(ironskin_brew_buff)) Spell(ironskin_brew text=stache)
 				if (StaggerPercentage() > 30) Spell(purifying_brew text=stache)
 			}
-			# purify stagger when talent elusive dance 
-			if (Talent(elusive_dance_talent) and BuffExpires(elusive_dance_buff)) Spell(purifying_brew)
 		}
 	}
 }
@@ -92,6 +97,7 @@ AddFunction BrewmasterDefaultShortCDActions
 
 AddFunction BrewmasterDefaultMainActions
 {
+    BrewmasterHealMeMain()
 	if Talent(blackout_combo_talent) BrewmasterBlackoutComboMainActions()
 	unless Talent(blackout_combo_talent) 
 	{
@@ -102,13 +108,13 @@ AddFunction BrewmasterDefaultMainActions
 		if (EnergyDeficit() <= 35 or (Talent(black_ox_talent) and SpellCooldown(black_ox_brew) <= 0)) Spell(tiger_palm)
 		Spell(chi_burst)
 		Spell(chi_wave)
-		Spell(exploding_keg)
+        Spell(arcane_pulse)
 	}
 }
 
 AddFunction BrewmasterBlackoutComboMainActions
 {
-	if(not BuffPresent(blackout_combo_buff) or SpellCharges(ironskin_brew) == 0) Spell(keg_smash)
+	if(not BuffPresent(blackout_combo_buff) or SpellCharges(ironskin_brew) < SpellData(ironskin_brew charges)-2) Spell(keg_smash)
 	if(not BuffPresent(blackout_combo_buff)) Spell(blackout_strike)
 	if(BuffPresent(blackout_combo_buff)) Spell(tiger_palm)
 	
@@ -118,7 +124,7 @@ AddFunction BrewmasterBlackoutComboMainActions
 		if BuffRefreshable(rushing_jade_wind_buff) Spell(rushing_jade_wind)
 		Spell(chi_burst)
 		Spell(chi_wave)
-		Spell(exploding_keg)
+        Spell(arcane_pulse)
 	}
 }
 
@@ -128,15 +134,17 @@ AddFunction BrewmasterBlackoutComboMainActions
 
 AddFunction BrewmasterDefaultAoEActions
 {
+    BrewmasterHealMeMain()
 	if(Talent(blackout_combo_talent) and not BuffPresent(blackout_combo_buff)) Spell(blackout_strike)
-	Spell(exploding_keg)
 	Spell(keg_smash)
 	Spell(chi_burst)
 	Spell(chi_wave)
 	if (target.DebuffPresent(keg_smash_debuff) and (not HasEquippedItem(salsalabims_lost_tunic) or not BuffPresent(blackout_combo_buff))) Spell(breath_of_fire)
 	if (BuffRefreshable(rushing_jade_wind_buff)) Spell(rushing_jade_wind)
+    Spell(arcane_pulse)
 	if (EnergyDeficit() <= 35 or (Talent(black_ox_talent) and SpellCooldown(black_ox_brew) <= 0)) Spell(tiger_palm)
 	if (not BuffPresent(blackout_combo_buff)) Spell(blackout_strike)	
+    
 }
 
 AddFunction BrewmasterBlackoutComboAoEActions
@@ -145,16 +153,17 @@ AddFunction BrewmasterBlackoutComboAoEActions
 	if(BuffPresent(blackout_combo_buff)) 
 	{
 		Spell(keg_smash)
-		Spell(breath_of_fire)
+		if not HasEquippedItem(salsalabims_lost_tunic) and not ArmorSetBonus(T21 4) Spell(breath_of_fire)
 		Spell(tiger_palm)
 	}
 	
 	unless (BuffPresent(blackout_combo_buff)) 
 	{
-		Spell(exploding_keg)
+        if HasEquippedItem(salsalabims_lost_tunic) or ArmorSetBonus(T21 4) Spell(breath_of_fire)
 		Spell(rushing_jade_wind)
 		Spell(chi_burst)
 		Spell(chi_wave)
+        Spell(arcane_pulse)
 		if EnergyDeficit() <= 35 Spell(tiger_palm)
 	}
 }
@@ -162,7 +171,8 @@ AddFunction BrewmasterBlackoutComboAoEActions
 AddFunction BrewmasterDefaultCdActions 
 {
 	BrewmasterInterruptActions()
-	if not PetPresent(name=Niuzao) Spell(invoke_niuzao)
+    Spell(guard)
+	if not PetPresent(name=Niuzao) Spell(invoke_niuzao_the_black_ox)
 	if (HasEquippedItem(firestone_walkers)) Spell(fortifying_brew)
 	if (HasEquippedItem(shifting_cosmic_sliver)) Spell(fortifying_brew)
 	if (HasEquippedItem(fundamental_observation)) Spell(zen_meditation text=FO)
@@ -206,8 +216,9 @@ AddIcon help=cd specialization=brewmaster
 {
 	BrewmasterDefaultCdActions()
 }
+	
 ]]
-    OvaleScripts:RegisterScript("MONK", "brewmaster", name, desc, code, "script")
+	OvaleScripts:RegisterScript("MONK", "brewmaster", name, desc, code, "script")
 end
 do
     local name = "sc_monk_windwalker_t21"
