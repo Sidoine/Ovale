@@ -319,6 +319,9 @@ Define(true_bearing_buff 193359)
 # Azerite Traits
 Define(ace_up_your_sleeve_trait 278676)
 Define(deadshot_trait 272935)
+Define(sharpened_blades_trait 272916)
+Define(sharpened_blades_buff 272916)
+	SpellInfo(sharpened_blades_buff max_stacks=30)
 
 # Leegendary items
 Define(the_dreadlords_deceit_item 137021)

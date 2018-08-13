@@ -3,8 +3,8 @@ import { OvaleScripts } from "../Scripts";
 // ANY CHANGES MADE BELOW THIS POINT WILL BE LOST.
 
 {
-	const name = "pr_warlock_affliction"
-	const desc = "[8.0] Simulationcraft: Warlock_Affliction"
+	const name = "sc_warlock_affliction_pr"
+	const desc = "[8.0] Simulationcraft: Warlock_Affliction_PreRaid"
 	const code = `
 # Based on SimulationCraft profile "PR_Warlock_Affliction".
 #    class=warlock
@@ -185,8 +185,8 @@ AddFunction AfflictionFillersMainActions
  if Speed() > 0 and not { PreviousGCDSpell(siphon_life) and PreviousGCDSpell(siphon_life count=2) and PreviousGCDSpell(siphon_life count=3) } Spell(siphon_life)
  #corruption,if=buff.movement.up&!prev_gcd.1.corruption&!talent.absolute_corruption.enabled
  if Speed() > 0 and not PreviousGCDSpell(corruption) and not Talent(absolute_corruption_talent) Spell(corruption)
- #drain_life,if=(buff.inevitable_demise.stack>=90&(cooldown.deathbolt.remains>execute_time|!talent.deathbolt.enabled)&(cooldown.phantom_singularity.remains>execute_time|!talent.phantom_singularity.enabled)&(cooldown.dark_soul.remains>execute_time|!talent.dark_soul_misery.enabled)&(cooldown.vile_taint.remains>execute_time|!talent.vile_taint.enabled)&cooldown.summon_darkglare.remains>execute_time+10|buff.inevitable_demise.stack>30&target.time_to_die<=10)&(target.health.pct>=20|!talent.drain_soul.enabled)
- if { BuffStacks(inevitable_demise_buff) >= 90 and { SpellCooldown(deathbolt) > ExecuteTime(drain_life) or not Talent(deathbolt_talent) } and { SpellCooldown(phantom_singularity) > ExecuteTime(drain_life) or not Talent(phantom_singularity_talent) } and { SpellCooldown(dark_soul_misery) > ExecuteTime(drain_life) or not Talent(dark_soul_misery_talent) } and { SpellCooldown(vile_taint) > ExecuteTime(drain_life) or not Talent(vile_taint_talent) } and SpellCooldown(summon_darkglare) > ExecuteTime(drain_life) + 10 or BuffStacks(inevitable_demise_buff) > 30 and target.TimeToDie() <= 10 } and { target.HealthPercent() >= 20 or not Talent(drain_soul_talent) } Spell(drain_life)
+ #drain_life,if=(buff.inevitable_demise.stack>=90&(cooldown.deathbolt.remains>execute_time|!talent.deathbolt.enabled)&(cooldown.phantom_singularity.remains>execute_time|!talent.phantom_singularity.enabled)&(cooldown.dark_soul.remains>execute_time|!talent.dark_soul_misery.enabled)&(cooldown.vile_taint.remains>execute_time|!talent.vile_taint.enabled)&cooldown.summon_darkglare.remains>execute_time+10|buff.inevitable_demise.stack>30&target.time_to_die<=10)
+ if BuffStacks(inevitable_demise_buff) >= 90 and { SpellCooldown(deathbolt) > ExecuteTime(drain_life) or not Talent(deathbolt_talent) } and { SpellCooldown(phantom_singularity) > ExecuteTime(drain_life) or not Talent(phantom_singularity_talent) } and { SpellCooldown(dark_soul_misery) > ExecuteTime(drain_life) or not Talent(dark_soul_misery_talent) } and { SpellCooldown(vile_taint) > ExecuteTime(drain_life) or not Talent(vile_taint_talent) } and SpellCooldown(summon_darkglare) > ExecuteTime(drain_life) + 10 or BuffStacks(inevitable_demise_buff) > 30 and target.TimeToDie() <= 10 Spell(drain_life)
  #drain_soul,interrupt_global=1,chain=1,cycle_targets=1,if=target.time_to_die<=gcd
  if target.TimeToDie() <= GCD() Spell(drain_soul)
  #drain_soul,interrupt_global=1,chain=1
@@ -211,7 +211,7 @@ AddFunction AfflictionFillersShortCdActions
 
 AddFunction AfflictionFillersShortCdPostConditions
 {
- Speed() > 0 and BuffPresent(nightfall_buff) and Spell(shadow_bolt) or Speed() > 0 and not { Talent(siphon_life_talent) and PreviousGCDSpell(agony) and PreviousGCDSpell(agony count=2) and PreviousGCDSpell(agony count=3) or PreviousGCDSpell(agony) } and Spell(agony) or Speed() > 0 and not { PreviousGCDSpell(siphon_life) and PreviousGCDSpell(siphon_life count=2) and PreviousGCDSpell(siphon_life count=3) } and Spell(siphon_life) or Speed() > 0 and not PreviousGCDSpell(corruption) and not Talent(absolute_corruption_talent) and Spell(corruption) or { BuffStacks(inevitable_demise_buff) >= 90 and { SpellCooldown(deathbolt) > ExecuteTime(drain_life) or not Talent(deathbolt_talent) } and { SpellCooldown(phantom_singularity) > ExecuteTime(drain_life) or not Talent(phantom_singularity_talent) } and { SpellCooldown(dark_soul_misery) > ExecuteTime(drain_life) or not Talent(dark_soul_misery_talent) } and { SpellCooldown(vile_taint) > ExecuteTime(drain_life) or not Talent(vile_taint_talent) } and SpellCooldown(summon_darkglare) > ExecuteTime(drain_life) + 10 or BuffStacks(inevitable_demise_buff) > 30 and target.TimeToDie() <= 10 } and { target.HealthPercent() >= 20 or not Talent(drain_soul_talent) } and Spell(drain_life) or target.TimeToDie() <= GCD() and Spell(drain_soul) or Spell(drain_soul) or Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() == 2 and not target.DebuffPresent(shadow_embrace_debuff) and not InFlightToTarget(shadow_bolt) and Spell(shadow_bolt) or Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() == 2 and Spell(shadow_bolt) or Spell(shadow_bolt)
+ Speed() > 0 and BuffPresent(nightfall_buff) and Spell(shadow_bolt) or Speed() > 0 and not { Talent(siphon_life_talent) and PreviousGCDSpell(agony) and PreviousGCDSpell(agony count=2) and PreviousGCDSpell(agony count=3) or PreviousGCDSpell(agony) } and Spell(agony) or Speed() > 0 and not { PreviousGCDSpell(siphon_life) and PreviousGCDSpell(siphon_life count=2) and PreviousGCDSpell(siphon_life count=3) } and Spell(siphon_life) or Speed() > 0 and not PreviousGCDSpell(corruption) and not Talent(absolute_corruption_talent) and Spell(corruption) or { BuffStacks(inevitable_demise_buff) >= 90 and { SpellCooldown(deathbolt) > ExecuteTime(drain_life) or not Talent(deathbolt_talent) } and { SpellCooldown(phantom_singularity) > ExecuteTime(drain_life) or not Talent(phantom_singularity_talent) } and { SpellCooldown(dark_soul_misery) > ExecuteTime(drain_life) or not Talent(dark_soul_misery_talent) } and { SpellCooldown(vile_taint) > ExecuteTime(drain_life) or not Talent(vile_taint_talent) } and SpellCooldown(summon_darkglare) > ExecuteTime(drain_life) + 10 or BuffStacks(inevitable_demise_buff) > 30 and target.TimeToDie() <= 10 } and Spell(drain_life) or target.TimeToDie() <= GCD() and Spell(drain_soul) or Spell(drain_soul) or Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() == 2 and not target.DebuffPresent(shadow_embrace_debuff) and not InFlightToTarget(shadow_bolt) and Spell(shadow_bolt) or Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() == 2 and Spell(shadow_bolt) or Spell(shadow_bolt)
 }
 
 AddFunction AfflictionFillersCdActions
@@ -220,7 +220,7 @@ AddFunction AfflictionFillersCdActions
 
 AddFunction AfflictionFillersCdPostConditions
 {
- Spell(deathbolt) or Speed() > 0 and BuffPresent(nightfall_buff) and Spell(shadow_bolt) or Speed() > 0 and not { Talent(siphon_life_talent) and PreviousGCDSpell(agony) and PreviousGCDSpell(agony count=2) and PreviousGCDSpell(agony count=3) or PreviousGCDSpell(agony) } and Spell(agony) or Speed() > 0 and not { PreviousGCDSpell(siphon_life) and PreviousGCDSpell(siphon_life count=2) and PreviousGCDSpell(siphon_life count=3) } and Spell(siphon_life) or Speed() > 0 and not PreviousGCDSpell(corruption) and not Talent(absolute_corruption_talent) and Spell(corruption) or { BuffStacks(inevitable_demise_buff) >= 90 and { SpellCooldown(deathbolt) > ExecuteTime(drain_life) or not Talent(deathbolt_talent) } and { SpellCooldown(phantom_singularity) > ExecuteTime(drain_life) or not Talent(phantom_singularity_talent) } and { SpellCooldown(dark_soul_misery) > ExecuteTime(drain_life) or not Talent(dark_soul_misery_talent) } and { SpellCooldown(vile_taint) > ExecuteTime(drain_life) or not Talent(vile_taint_talent) } and SpellCooldown(summon_darkglare) > ExecuteTime(drain_life) + 10 or BuffStacks(inevitable_demise_buff) > 30 and target.TimeToDie() <= 10 } and { target.HealthPercent() >= 20 or not Talent(drain_soul_talent) } and Spell(drain_life) or target.TimeToDie() <= GCD() and Spell(drain_soul) or Spell(drain_soul) or Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() == 2 and not target.DebuffPresent(shadow_embrace_debuff) and not InFlightToTarget(shadow_bolt) and Spell(shadow_bolt) or Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() == 2 and Spell(shadow_bolt) or Spell(shadow_bolt)
+ Spell(deathbolt) or Speed() > 0 and BuffPresent(nightfall_buff) and Spell(shadow_bolt) or Speed() > 0 and not { Talent(siphon_life_talent) and PreviousGCDSpell(agony) and PreviousGCDSpell(agony count=2) and PreviousGCDSpell(agony count=3) or PreviousGCDSpell(agony) } and Spell(agony) or Speed() > 0 and not { PreviousGCDSpell(siphon_life) and PreviousGCDSpell(siphon_life count=2) and PreviousGCDSpell(siphon_life count=3) } and Spell(siphon_life) or Speed() > 0 and not PreviousGCDSpell(corruption) and not Talent(absolute_corruption_talent) and Spell(corruption) or { BuffStacks(inevitable_demise_buff) >= 90 and { SpellCooldown(deathbolt) > ExecuteTime(drain_life) or not Talent(deathbolt_talent) } and { SpellCooldown(phantom_singularity) > ExecuteTime(drain_life) or not Talent(phantom_singularity_talent) } and { SpellCooldown(dark_soul_misery) > ExecuteTime(drain_life) or not Talent(dark_soul_misery_talent) } and { SpellCooldown(vile_taint) > ExecuteTime(drain_life) or not Talent(vile_taint_talent) } and SpellCooldown(summon_darkglare) > ExecuteTime(drain_life) + 10 or BuffStacks(inevitable_demise_buff) > 30 and target.TimeToDie() <= 10 } and Spell(drain_life) or target.TimeToDie() <= GCD() and Spell(drain_soul) or Spell(drain_soul) or Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() == 2 and not target.DebuffPresent(shadow_embrace_debuff) and not InFlightToTarget(shadow_bolt) and Spell(shadow_bolt) or Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() == 2 and Spell(shadow_bolt) or Spell(shadow_bolt)
 }
 
 ### actions.precombat
@@ -345,7 +345,6 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 # deathbolt_talent
 # drain_life
 # drain_soul
-# drain_soul_talent
 # fireblood
 # grimoire_of_sacrifice
 # grimoire_of_sacrifice_talent
@@ -376,8 +375,8 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 }
 
 {
-	const name = "pr_warlock_demonology"
-	const desc = "[8.0] Simulationcraft: Warlock_Demonology"
+	const name = "sc_warlock_demonology_pr"
+	const desc = "[8.0] Simulationcraft: Warlock_Demonology_PreRaid"
 	const code = `
 # Based on SimulationCraft profile "PR_Warlock_Demonology".
 #    class=warlock
@@ -819,6 +818,8 @@ AddFunction DemonologyNetherPortalBuildingCdPostConditions
 
 AddFunction DemonologyPrecombatMainActions
 {
+ #inner_demons,if=talent.inner_demons.enabled
+ if Talent(inner_demons_talent) Spell(inner_demons)
  #demonbolt
  Spell(demonbolt)
 }
@@ -838,12 +839,12 @@ AddFunction DemonologyPrecombatShortCdActions
 
 AddFunction DemonologyPrecombatShortCdPostConditions
 {
- Spell(demonbolt)
+ Talent(inner_demons_talent) and Spell(inner_demons) or Spell(demonbolt)
 }
 
 AddFunction DemonologyPrecombatCdActions
 {
- unless not pet.Present() and Spell(summon_felguard)
+ unless not pet.Present() and Spell(summon_felguard) or Talent(inner_demons_talent) and Spell(inner_demons)
  {
   #snapshot_stats
   #potion
@@ -853,7 +854,7 @@ AddFunction DemonologyPrecombatCdActions
 
 AddFunction DemonologyPrecombatCdPostConditions
 {
- not pet.Present() and Spell(summon_felguard) or Spell(demonbolt)
+ not pet.Present() and Spell(summon_felguard) or Talent(inner_demons_talent) and Spell(inner_demons) or Spell(demonbolt)
 }
 
 ### Demonology icons.
@@ -936,6 +937,8 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 # grimoire_felguard
 # hand_of_guldan
 # implosion
+# inner_demons
+# inner_demons_talent
 # nether_portal
 # nether_portal_buff
 # nether_portal_talent
@@ -954,8 +957,8 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 }
 
 {
-	const name = "pr_warlock_destruction"
-	const desc = "[8.0] Simulationcraft: Warlock_Destruction"
+	const name = "sc_warlock_destruction_pr"
+	const desc = "[8.0] Simulationcraft: Warlock_Destruction_PreRaid"
 	const code = `
 # Based on SimulationCraft profile "PR_Warlock_Destruction".
 #    class=warlock
@@ -1237,6 +1240,8 @@ AddFunction DestructionFnbMainActions
   Spell(channel_demonfire)
   #chaos_bolt,cycle_targets=1,if=!debuff.havoc.remains&talent.grimoire_of_supremacy.enabled&pet.infernal.remains>execute_time&active_enemies<=4&((108*spell_targets.rain_of_fire%3)<(240*(1+0.08*buff.grimoire_of_supremacy.stack)%2*(1+buff.active_havoc.remains>execute_time)))
   if not target.DebuffPresent(havoc_debuff) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > ExecuteTime(chaos_bolt) and Enemies() <= 4 and 108 * Enemies() / 3 < 240 * { 1 + 0.08 * BuffStacks(grimoire_of_supremacy_buff) } / 2 * { 1 + BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) } Spell(chaos_bolt)
+  #chaos_bolt,cycle_targets=1,if=!debuff.havoc.remains&buff.active_havoc.remains>execute_time&spell_targets.rain_of_fire<=4
+  if not target.DebuffPresent(havoc_debuff) and BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) and Enemies() <= 4 Spell(chaos_bolt)
   #immolate,cycle_targets=1,if=!debuff.havoc.remains&refreshable&spell_targets.incinerate<=8
   if not target.DebuffPresent(havoc_debuff) and target.Refreshable(immolate_debuff) and Enemies() <= 8 Spell(immolate)
   #rain_of_fire
@@ -1266,12 +1271,20 @@ AddFunction DestructionFnbShortCdActions
   if not True(target_is_sim_target) and target.TimeToDie() > 10 and Enemies() <= 4 and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 and DemonDuration(infernal) <= 10 and Enemies() > 1 Spell(havoc)
   #havoc,if=spell_targets.rain_of_fire<=4&talent.grimoire_of_supremacy.enabled&pet.infernal.active&pet.infernal.remains<=10
   if Enemies() <= 4 and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 and DemonDuration(infernal) <= 10 and Enemies() > 1 Spell(havoc)
+
+  unless not target.DebuffPresent(havoc_debuff) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > ExecuteTime(chaos_bolt) and Enemies() <= 4 and 108 * Enemies() / 3 < 240 * { 1 + 0.08 * BuffStacks(grimoire_of_supremacy_buff) } / 2 * { 1 + BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) } and Spell(chaos_bolt)
+  {
+   #havoc,cycle_targets=1,if=!(target=sim.target)&target.time_to_die>10&spell_targets.rain_of_fire<=4
+   if not True(target_is_sim_target) and target.TimeToDie() > 10 and Enemies() <= 4 and Enemies() > 1 Spell(havoc)
+   #havoc,if=spell_targets.rain_of_fire<=4
+   if Enemies() <= 4 and Enemies() > 1 Spell(havoc)
+  }
  }
 }
 
 AddFunction DestructionFnbShortCdPostConditions
 {
- DestructionCdsShortCdPostConditions() or SoulShards() >= 4.5 and Spell(rain_of_fire) or Talent(channel_demonfire_talent) and not target.DebuffRemaining(immolate_debuff) and SpellCooldown(channel_demonfire) <= ExecuteTime(chaos_bolt) and Spell(immolate) or Spell(channel_demonfire) or not target.DebuffPresent(havoc_debuff) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > ExecuteTime(chaos_bolt) and Enemies() <= 4 and 108 * Enemies() / 3 < 240 * { 1 + 0.08 * BuffStacks(grimoire_of_supremacy_buff) } / 2 * { 1 + BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) } and Spell(chaos_bolt) or not target.DebuffPresent(havoc_debuff) and target.Refreshable(immolate_debuff) and Enemies() <= 8 and Spell(immolate) or Spell(rain_of_fire) or not target.DebuffPresent(havoc_debuff) and Enemies() == 3 and Spell(soul_fire) or not target.DebuffPresent(havoc_debuff) and { Talent(flashover_talent) and BuffStacks(backdraft_buff) <= 2 or Enemies() <= 7 or Talent(roaring_blaze_talent) and Enemies() <= 9 } and Spell(conflagrate) or not target.DebuffPresent(havoc_debuff) and Spell(incinerate)
+ DestructionCdsShortCdPostConditions() or SoulShards() >= 4.5 and Spell(rain_of_fire) or Talent(channel_demonfire_talent) and not target.DebuffRemaining(immolate_debuff) and SpellCooldown(channel_demonfire) <= ExecuteTime(chaos_bolt) and Spell(immolate) or Spell(channel_demonfire) or not target.DebuffPresent(havoc_debuff) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > ExecuteTime(chaos_bolt) and Enemies() <= 4 and 108 * Enemies() / 3 < 240 * { 1 + 0.08 * BuffStacks(grimoire_of_supremacy_buff) } / 2 * { 1 + BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) } and Spell(chaos_bolt) or not target.DebuffPresent(havoc_debuff) and BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) and Enemies() <= 4 and Spell(chaos_bolt) or not target.DebuffPresent(havoc_debuff) and target.Refreshable(immolate_debuff) and Enemies() <= 8 and Spell(immolate) or Spell(rain_of_fire) or not target.DebuffPresent(havoc_debuff) and Enemies() == 3 and Spell(soul_fire) or not target.DebuffPresent(havoc_debuff) and { Talent(flashover_talent) and BuffStacks(backdraft_buff) <= 2 or Enemies() <= 7 or Talent(roaring_blaze_talent) and Enemies() <= 9 } and Spell(conflagrate) or not target.DebuffPresent(havoc_debuff) and Spell(incinerate)
 }
 
 AddFunction DestructionFnbCdActions
@@ -1282,7 +1295,7 @@ AddFunction DestructionFnbCdActions
 
 AddFunction DestructionFnbCdPostConditions
 {
- DestructionCdsCdPostConditions() or SoulShards() >= 4.5 and Spell(rain_of_fire) or Talent(channel_demonfire_talent) and not target.DebuffRemaining(immolate_debuff) and SpellCooldown(channel_demonfire) <= ExecuteTime(chaos_bolt) and Spell(immolate) or Spell(channel_demonfire) or not True(target_is_sim_target) and target.TimeToDie() > 10 and Enemies() <= 4 and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 and DemonDuration(infernal) <= 10 and Enemies() > 1 and Spell(havoc) or Enemies() <= 4 and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 and DemonDuration(infernal) <= 10 and Enemies() > 1 and Spell(havoc) or not target.DebuffPresent(havoc_debuff) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > ExecuteTime(chaos_bolt) and Enemies() <= 4 and 108 * Enemies() / 3 < 240 * { 1 + 0.08 * BuffStacks(grimoire_of_supremacy_buff) } / 2 * { 1 + BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) } and Spell(chaos_bolt) or not target.DebuffPresent(havoc_debuff) and target.Refreshable(immolate_debuff) and Enemies() <= 8 and Spell(immolate) or Spell(rain_of_fire) or not target.DebuffPresent(havoc_debuff) and Enemies() == 3 and Spell(soul_fire) or not target.DebuffPresent(havoc_debuff) and { Talent(flashover_talent) and BuffStacks(backdraft_buff) <= 2 or Enemies() <= 7 or Talent(roaring_blaze_talent) and Enemies() <= 9 } and Spell(conflagrate) or not target.DebuffPresent(havoc_debuff) and Spell(incinerate)
+ DestructionCdsCdPostConditions() or SoulShards() >= 4.5 and Spell(rain_of_fire) or Talent(channel_demonfire_talent) and not target.DebuffRemaining(immolate_debuff) and SpellCooldown(channel_demonfire) <= ExecuteTime(chaos_bolt) and Spell(immolate) or Spell(channel_demonfire) or not True(target_is_sim_target) and target.TimeToDie() > 10 and Enemies() <= 4 and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 and DemonDuration(infernal) <= 10 and Enemies() > 1 and Spell(havoc) or Enemies() <= 4 and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 and DemonDuration(infernal) <= 10 and Enemies() > 1 and Spell(havoc) or not target.DebuffPresent(havoc_debuff) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > ExecuteTime(chaos_bolt) and Enemies() <= 4 and 108 * Enemies() / 3 < 240 * { 1 + 0.08 * BuffStacks(grimoire_of_supremacy_buff) } / 2 * { 1 + BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) } and Spell(chaos_bolt) or not True(target_is_sim_target) and target.TimeToDie() > 10 and Enemies() <= 4 and Enemies() > 1 and Spell(havoc) or Enemies() <= 4 and Enemies() > 1 and Spell(havoc) or not target.DebuffPresent(havoc_debuff) and BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) and Enemies() <= 4 and Spell(chaos_bolt) or not target.DebuffPresent(havoc_debuff) and target.Refreshable(immolate_debuff) and Enemies() <= 8 and Spell(immolate) or Spell(rain_of_fire) or not target.DebuffPresent(havoc_debuff) and Enemies() == 3 and Spell(soul_fire) or not target.DebuffPresent(havoc_debuff) and { Talent(flashover_talent) and BuffStacks(backdraft_buff) <= 2 or Enemies() <= 7 or Talent(roaring_blaze_talent) and Enemies() <= 9 } and Spell(conflagrate) or not target.DebuffPresent(havoc_debuff) and Spell(incinerate)
 }
 
 ### actions.inf

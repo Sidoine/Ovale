@@ -24,6 +24,8 @@ local CreateFrame = CreateFrame
 local EasyMenu = EasyMenu
 local IsShiftKeyDown = IsShiftKeyDown
 local UIParent = UIParent
+local __PaperDoll = LibStub:GetLibrary("ovale/PaperDoll")
+local OvalePaperDoll = __PaperDoll.OvalePaperDoll
 local OvaleDataBrokerBase = Ovale:NewModule("OvaleDataBroker", aceEvent)
 local CLASS_ICONS = {
     ["DEATHKNIGHT"] = "Interface\\Icons\\ClassIcon_DeathKnight",
@@ -151,7 +153,8 @@ local OvaleDataBrokerClass = __class(OvaleDataBrokerBase, {
         end
     end,
     Ovale_ScriptChanged = function(self)
-        self.broker.text = Ovale.db.profile.source
+        local specName = OvalePaperDoll:GetSpecialization()
+        self.broker.text = Ovale.db.profile.source[specName]
     end,
     constructor = function(self, ...)
         OvaleDataBrokerBase.constructor(self, ...)

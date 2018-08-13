@@ -155,10 +155,10 @@ AddIcon help=cd specialization=vengeance
 // ANY CHANGES MADE BELOW THIS POINT WILL BE LOST.
 
 {
-	const name = "sc_demon_hunter_havoc_t21"
-	const desc = "[8.0] Simulationcraft: Demon_Hunter_Havoc_T21"
+	const name = "sc_demon_hunter_havoc_pr"
+	const desc = "[8.0] Simulationcraft: Demon_Hunter_Havoc_PreRaid"
 	const code = `
-# Based on SimulationCraft profile "T21_Demon_Hunter_Havoc".
+# Based on SimulationCraft profile "PR_Demon_Hunter_Havoc".
 #    class=demonhunter
 #    spec=havoc
 #    talents=3210223
@@ -215,6 +215,12 @@ AddFunction HavocInterruptActions
   if target.Distance(less 8) and not target.Classification(worldboss) Spell(chaos_nova)
   if target.InRange(imprison) and not target.Classification(worldboss) and target.CreatureType(Demon Humanoid Beast) Spell(imprison)
  }
+}
+
+AddFunction HavocUseItemActions
+{
+ Item(Trinket0Slot text=13 usable=1)
+ Item(Trinket1Slot text=14 usable=1)
 }
 
 AddFunction HavocGetInMeleeRange
@@ -356,7 +362,11 @@ AddFunction HavocCooldownCdActions
  #nemesis,if=!raid_event.adds.exists
  if not False(raid_event_adds_exists) Spell(nemesis)
  #potion,if=buff.metamorphosis.remains>25|target.time_to_die<60
- if { BuffRemaining(metamorphosis_havoc_buff) > 25 or target.TimeToDie() < 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
+ if { BuffRemaining(metamorphosis_havoc_buff) > 25 or target.TimeToDie() < 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_agility usable=1)
+ #use_item,name=galecallers_boon
+ HavocUseItemActions()
+ #use_item,name=lustrous_golden_plumage
+ HavocUseItemActions()
 }
 
 AddFunction HavocCooldownCdPostConditions
@@ -560,7 +570,7 @@ AddFunction HavocPrecombatCdActions
  #food
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_agility usable=1)
  #metamorphosis
  if not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight() Spell(metamorphosis_havoc)
 }
@@ -628,52 +638,51 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 }
 
 ### Required symbols
-# first_blood_talent
-# trail_of_ruin_talent
-# nemesis_talent
-# nemesis
-# demonic_talent
-# metamorphosis_havoc
-# dark_slash_talent
-# dark_slash
-# momentum_talent
-# momentum_buff
-# pick_up_fragment
-# dark_slash_debuff
-# metamorphosis_havoc_buff
-# nemesis_debuff
-# prolonged_power_potion
-# blade_dance
 # annihilation
-# chaos_strike
-# fel_barrage
-# death_sweep
-# eye_beam
-# immolation_aura_havoc
-# felblade
+# battle_potion_of_agility
+# blade_dance
 # blind_fury_talent
-# fel_rush
-# demon_blades_talent
-# demons_bite
-# throw_glaive_havoc
-# vengeful_retreat
-# prepared_buff
-# fel_mastery_talent
-# disrupt
-# fel_eruption
-# arcane_torrent_dh
 # chaos_nova
+# chaos_strike
+# dark_slash
+# dark_slash_debuff
+# dark_slash_talent
+# death_sweep
+# demon_blades_talent
+# demonic_talent
+# demons_bite
+# disrupt
+# eye_beam
+# fel_barrage
+# fel_eruption
+# fel_mastery_talent
+# fel_rush
+# felblade
+# first_blood_talent
+# immolation_aura_havoc
 # imprison
+# metamorphosis_havoc
+# metamorphosis_havoc_buff
+# momentum_buff
+# momentum_talent
+# nemesis
+# nemesis_debuff
+# nemesis_talent
+# pick_up_fragment
+# prepared_buff
+# throw_glaive_havoc
+# trail_of_ruin_talent
+# vengeful_retreat
 
 `
 	OvaleScripts.RegisterScript("DEMONHUNTER", "havoc", name, desc, code, "script")
 }
 
 {
-	const name = "sc_demon_hunter_vengeance_t21"
-	const desc = "[8.0] Simulationcraft: Demon_Hunter_Vengeance_T21"
+	const name = "sc_demon_hunter_vengeance_pr"
+	const desc = "[8.0] Simulationcraft: Demon_Hunter_Vengeance_PreRaid"
 	const code = `
-# Based on SimulationCraft profile "T21_Demon_Hunter_Vengeance".
+# Based on SimulationCraft profile "PR_Demon_Hunter_Vengeance".
 #    class=demonhunter
 #    spec=vengeance
 #    talents=1213121
@@ -683,21 +692,8 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_demonhunter_spells)
 
-AddCheckBox(opt_interrupt L(interrupt) default specialization=vengeance)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=vengeance)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=vengeance)
-
-AddFunction VengeanceInterruptActions
-{
- if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
- {
-  if target.InRange(disrupt) and target.IsInterruptible() Spell(disrupt)
-  if target.IsInterruptible() and not target.Classification(worldboss) and not SigilCharging(silence misery chains) and target.RemainingCastTime() >= 2 - Talent(quickened_sigils_talent) + GCDRemaining() Spell(sigil_of_silence)
-  if not target.Classification(worldboss) and not SigilCharging(silence misery chains) and target.RemainingCastTime() >= 2 - Talent(quickened_sigils_talent) + GCDRemaining() Spell(sigil_of_misery)
-  if not target.Classification(worldboss) and not SigilCharging(silence misery chains) and target.RemainingCastTime() >= 2 - Talent(quickened_sigils_talent) + GCDRemaining() Spell(sigil_of_chains)
-  if target.InRange(imprison) and not target.Classification(worldboss) and target.CreatureType(Demon Humanoid Beast) Spell(imprison)
- }
-}
 
 AddFunction VengeanceUseItemActions
 {
@@ -714,6 +710,8 @@ AddFunction VengeanceGetInMeleeRange
 
 AddFunction VengeanceDefaultMainActions
 {
+ #consume_magic
+ Spell(consume_magic)
  #call_action_list,name=brand,if=talent.charred_flesh.enabled
  if Talent(charred_flesh_talent) VengeanceBrandMainActions()
 
@@ -739,52 +737,59 @@ AddFunction VengeanceDefaultShortCdActions
 {
  #auto_attack
  VengeanceGetInMeleeRange()
- #call_action_list,name=brand,if=talent.charred_flesh.enabled
- if Talent(charred_flesh_talent) VengeanceBrandShortCdActions()
 
- unless Talent(charred_flesh_talent) and VengeanceBrandShortCdPostConditions()
+ unless Spell(consume_magic)
  {
-  #call_action_list,name=defensives
-  VengeanceDefensivesShortCdActions()
+  #call_action_list,name=brand,if=talent.charred_flesh.enabled
+  if Talent(charred_flesh_talent) VengeanceBrandShortCdActions()
 
-  unless VengeanceDefensivesShortCdPostConditions()
+  unless Talent(charred_flesh_talent) and VengeanceBrandShortCdPostConditions()
   {
-   #call_action_list,name=normal
-   VengeanceNormalShortCdActions()
+   #call_action_list,name=defensives
+   VengeanceDefensivesShortCdActions()
+
+   unless VengeanceDefensivesShortCdPostConditions()
+   {
+    #call_action_list,name=normal
+    VengeanceNormalShortCdActions()
+   }
   }
  }
 }
 
 AddFunction VengeanceDefaultShortCdPostConditions
 {
- Talent(charred_flesh_talent) and VengeanceBrandShortCdPostConditions() or VengeanceDefensivesShortCdPostConditions() or VengeanceNormalShortCdPostConditions()
+ Spell(consume_magic) or Talent(charred_flesh_talent) and VengeanceBrandShortCdPostConditions() or VengeanceDefensivesShortCdPostConditions() or VengeanceNormalShortCdPostConditions()
 }
 
 AddFunction VengeanceDefaultCdActions
 {
- #disrupt
- VengeanceInterruptActions()
- #use_item,slot=trinket1
- VengeanceUseItemActions()
- #call_action_list,name=brand,if=talent.charred_flesh.enabled
- if Talent(charred_flesh_talent) VengeanceBrandCdActions()
-
- unless Talent(charred_flesh_talent) and VengeanceBrandCdPostConditions()
+ unless Spell(consume_magic)
  {
-  #call_action_list,name=defensives
-  VengeanceDefensivesCdActions()
+  #use_item,slot=trinket1
+  VengeanceUseItemActions()
+  #use_item,slot=trinket2
+  VengeanceUseItemActions()
+  #call_action_list,name=brand,if=talent.charred_flesh.enabled
+  if Talent(charred_flesh_talent) VengeanceBrandCdActions()
 
-  unless VengeanceDefensivesCdPostConditions()
+  unless Talent(charred_flesh_talent) and VengeanceBrandCdPostConditions()
   {
-   #call_action_list,name=normal
-   VengeanceNormalCdActions()
+   #call_action_list,name=defensives
+   VengeanceDefensivesCdActions()
+
+   unless VengeanceDefensivesCdPostConditions()
+   {
+    #call_action_list,name=normal
+    VengeanceNormalCdActions()
+   }
   }
  }
 }
 
 AddFunction VengeanceDefaultCdPostConditions
 {
- Talent(charred_flesh_talent) and VengeanceBrandCdPostConditions() or VengeanceDefensivesCdPostConditions() or VengeanceNormalCdPostConditions()
+ Spell(consume_magic) or Talent(charred_flesh_talent) and VengeanceBrandCdPostConditions() or VengeanceDefensivesCdPostConditions() or VengeanceNormalCdPostConditions()
 }
 
 ### actions.brand
@@ -876,18 +881,18 @@ AddFunction VengeanceNormalMainActions
  Spell(infernal_strike)
  #spirit_bomb,if=soul_fragments>=4
  if SoulFragments() >= 4 Spell(spirit_bomb)
- #immolation_aura,if=pain<=90
- if Pain() <= 90 Spell(immolation_aura)
- #felblade,if=pain<=70
- if Pain() <= 70 Spell(felblade)
- #soul_cleave,if=talent.spirit_bomb.enabled&talent.fracture.enabled&soul_fragments=0&cooldown.fracture.charges_fractional<1.75
- if Talent(spirit_bomb_talent) and Talent(fracture_talent) and SoulFragments() == 0 and SpellCharges(fracture count=0) < 1.75 Spell(soul_cleave)
- #fracture,if=soul_fragments<=3
- if SoulFragments() <= 3 Spell(fracture)
  #soul_cleave,if=!talent.spirit_bomb.enabled
  if not Talent(spirit_bomb_talent) Spell(soul_cleave)
  #soul_cleave,if=talent.spirit_bomb.enabled&soul_fragments=0
  if Talent(spirit_bomb_talent) and SoulFragments() == 0 Spell(soul_cleave)
+ #immolation_aura,if=pain<=90
+ if Pain() <= 90 Spell(immolation_aura)
+ #felblade,if=pain<=70
+ if Pain() <= 70 Spell(felblade)
+ #fracture,if=soul_fragments<=3
+ if SoulFragments() <= 3 Spell(fracture)
+ #soul_cleave
+ Spell(soul_cleave)
  #sigil_of_flame
  Spell(sigil_of_flame)
  #shear
@@ -902,7 +907,7 @@ AddFunction VengeanceNormalMainPostConditions
 
 AddFunction VengeanceNormalShortCdActions
 {
- unless Spell(infernal_strike) or SoulFragments() >= 4 and Spell(spirit_bomb) or Pain() <= 90 and Spell(immolation_aura) or Pain() <= 70 and Spell(felblade) or Talent(spirit_bomb_talent) and Talent(fracture_talent) and SoulFragments() == 0 and SpellCharges(fracture count=0) < 1.75 and Spell(soul_cleave) or SoulFragments() <= 3 and Spell(fracture)
+ unless Spell(infernal_strike) or SoulFragments() >= 4 and Spell(spirit_bomb) or not Talent(spirit_bomb_talent) and Spell(soul_cleave) or Talent(spirit_bomb_talent) and SoulFragments() == 0 and Spell(soul_cleave) or Pain() <= 90 and Spell(immolation_aura) or Pain() <= 70 and Spell(felblade) or SoulFragments() <= 3 and Spell(fracture)
  {
   #fel_devastation
   Spell(fel_devastation)
@@ -911,7 +916,7 @@ AddFunction VengeanceNormalShortCdActions
 
 AddFunction VengeanceNormalShortCdPostConditions
 {
- Spell(infernal_strike) or SoulFragments() >= 4 and Spell(spirit_bomb) or Pain() <= 90 and Spell(immolation_aura) or Pain() <= 70 and Spell(felblade) or Talent(spirit_bomb_talent) and Talent(fracture_talent) and SoulFragments() == 0 and SpellCharges(fracture count=0) < 1.75 and Spell(soul_cleave) or SoulFragments() <= 3 and Spell(fracture) or not Talent(spirit_bomb_talent) and Spell(soul_cleave) or Talent(spirit_bomb_talent) and SoulFragments() == 0 and Spell(soul_cleave) or Spell(sigil_of_flame) or Spell(shear) or Spell(throw_glaive_veng)
+ Spell(infernal_strike) or SoulFragments() >= 4 and Spell(spirit_bomb) or not Talent(spirit_bomb_talent) and Spell(soul_cleave) or Talent(spirit_bomb_talent) and SoulFragments() == 0 and Spell(soul_cleave) or Pain() <= 90 and Spell(immolation_aura) or Pain() <= 70 and Spell(felblade) or SoulFragments() <= 3 and Spell(fracture) or Spell(soul_cleave) or Spell(sigil_of_flame) or Spell(shear) or Spell(throw_glaive_veng)
 }
 
 AddFunction VengeanceNormalCdActions
@@ -920,7 +925,7 @@ AddFunction VengeanceNormalCdActions
 
 AddFunction VengeanceNormalCdPostConditions
 {
- Spell(infernal_strike) or SoulFragments() >= 4 and Spell(spirit_bomb) or Pain() <= 90 and Spell(immolation_aura) or Pain() <= 70 and Spell(felblade) or Talent(spirit_bomb_talent) and Talent(fracture_talent) and SoulFragments() == 0 and SpellCharges(fracture count=0) < 1.75 and Spell(soul_cleave) or SoulFragments() <= 3 and Spell(fracture) or Spell(fel_devastation) or not Talent(spirit_bomb_talent) and Spell(soul_cleave) or Talent(spirit_bomb_talent) and SoulFragments() == 0 and Spell(soul_cleave) or Spell(sigil_of_flame) or Spell(shear) or Spell(throw_glaive_veng)
+ Spell(infernal_strike) or SoulFragments() >= 4 and Spell(spirit_bomb) or not Talent(spirit_bomb_talent) and Spell(soul_cleave) or Talent(spirit_bomb_talent) and SoulFragments() == 0 and Spell(soul_cleave) or Pain() <= 90 and Spell(immolation_aura) or Pain() <= 70 and Spell(felblade) or SoulFragments() <= 3 and Spell(fracture) or Spell(fel_devastation) or Spell(soul_cleave) or Spell(sigil_of_flame) or Spell(shear) or Spell(throw_glaive_veng)
 }
 
 ### actions.precombat
@@ -948,7 +953,7 @@ AddFunction VengeancePrecombatCdActions
  #food
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(unbending_potion usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(steelskin_potion usable=1)
 }
 
 AddFunction VengeancePrecombatCdPostConditions
@@ -1015,29 +1020,23 @@ AddIcon checkbox=opt_demonhunter_vengeance_aoe help=cd specialization=vengeance
 
 ### Required symbols
 # charred_flesh_talent
-# sigil_of_flame
-# fiery_brand
-# infernal_strike
-# immolation_aura
-# fiery_brand_debuff
-# fel_devastation
+# consume_magic
 # demon_spikes
-# metamorphosis_veng
-# spirit_bomb
+# fel_devastation
 # felblade
-# soul_cleave
-# spirit_bomb_talent
-# fracture_talent
+# fiery_brand
+# fiery_brand_debuff
 # fracture
+# immolation_aura
+# infernal_strike
+# metamorphosis_veng
 # shear
+# sigil_of_flame
+# soul_cleave
+# spirit_bomb
+# spirit_bomb_talent
+# steelskin_potion
 # throw_glaive_veng
-# unbending_potion
-# disrupt
-# arcane_torrent_dh
-# sigil_of_silence
-# sigil_of_misery
-# sigil_of_chains
-# imprison
 
 `
 	OvaleScripts.RegisterScript("DEMONHUNTER", "vengeance", name, desc, code, "script")

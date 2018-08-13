@@ -148,13 +148,13 @@ AddIcon help=cd specialization=protection
 // ANY CHANGES MADE BELOW THIS POINT WILL BE LOST.
 
 {
-	const name = "sc_warrior_arms_t21"
-	const desc = "[8.0] Simulationcraft: Warrior_Arms_T21"
+	const name = "sc_warrior_arms_pr"
+	const desc = "[8.0] Simulationcraft: Warrior_Arms_PreRaid"
 	const code = `
-# Based on SimulationCraft profile "T21_Warrior_Arms".
+# Based on SimulationCraft profile "PR_Warrior_Arms".
 #    class=warrior
 #    spec=arms
-#    talents=3132311
+#    talents=3312211
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -235,7 +235,7 @@ AddFunction ArmsDefaultShortCdPostConditions
 AddFunction ArmsDefaultCdActions
 {
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
  #blood_fury,if=debuff.colossus_smash.up
  if target.DebuffPresent(colossus_smash_debuff) Spell(blood_fury_ap)
  #berserking,if=debuff.colossus_smash.up
@@ -244,6 +244,10 @@ AddFunction ArmsDefaultCdActions
  if target.DebuffExpires(colossus_smash_debuff) and SpellCooldown(mortal_strike) > 1.5 and Rage() < 50 Spell(arcane_torrent_rage)
  #lights_judgment,if=debuff.colossus_smash.down
  if target.DebuffExpires(colossus_smash_debuff) Spell(lights_judgment)
+ #fireblood,if=debuff.colossus_smash.up
+ if target.DebuffPresent(colossus_smash_debuff) Spell(fireblood)
+ #ancestral_call,if=debuff.colossus_smash.up
+ if target.DebuffPresent(colossus_smash_debuff) Spell(ancestral_call)
  #avatar,if=cooldown.colossus_smash.remains<8|(talent.warbreaker.enabled&cooldown.warbreaker.remains<8)
  if SpellCooldown(colossus_smash) < 8 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 8 Spell(avatar)
 
@@ -283,6 +287,8 @@ AddFunction ArmsExecuteMainActions
  if target.DebuffExpires(colossus_smash_debuff) Spell(colossus_smash)
  #warbreaker,if=debuff.colossus_smash.down
  if target.DebuffExpires(colossus_smash_debuff) Spell(warbreaker)
+ #cleave,if=spell_targets.whirlwind>2
+ if Enemies() > 2 Spell(cleave)
  #mortal_strike,if=buff.overpower.stack=2&(talent.dreadnaught.enabled|equipped.archavons_heavy_hand)
  if BuffStacks(overpower_buff) == 2 and { Talent(dreadnaught_talent) or HasEquippedItem(archavons_heavy_hand_item) } Spell(mortal_strike)
  #overpower
@@ -316,7 +322,7 @@ AddFunction ArmsExecuteShortCdActions
 
 AddFunction ArmsExecuteShortCdPostConditions
 {
- target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 70 and { SpellCooldown(deadly_calm) > 3 and not BuffPresent(deadly_calm_buff) or not Talent(deadly_calm_talent) } and Spell(skullsplitter) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or BuffStacks(overpower_buff) == 2 and { Talent(dreadnaught_talent) or HasEquippedItem(archavons_heavy_hand_item) } and Spell(mortal_strike) or Spell(overpower) or { Rage() >= 40 or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(sudden_death_arms_buff) or BuffPresent(stone_heart_buff) } and Spell(execute_arms)
+ target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 70 and { SpellCooldown(deadly_calm) > 3 and not BuffPresent(deadly_calm_buff) or not Talent(deadly_calm_talent) } and Spell(skullsplitter) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or Enemies() > 2 and Spell(cleave) or BuffStacks(overpower_buff) == 2 and { Talent(dreadnaught_talent) or HasEquippedItem(archavons_heavy_hand_item) } and Spell(mortal_strike) or Spell(overpower) or { Rage() >= 40 or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(sudden_death_arms_buff) or BuffPresent(stone_heart_buff) } and Spell(execute_arms)
 }
 
 AddFunction ArmsExecuteCdActions
@@ -325,7 +331,7 @@ AddFunction ArmsExecuteCdActions
 
 AddFunction ArmsExecuteCdPostConditions
 {
- target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 70 and { SpellCooldown(deadly_calm) > 3 and not BuffPresent(deadly_calm_buff) or not Talent(deadly_calm_talent) } and Spell(skullsplitter) or SpellCooldown(bladestorm_arms) > 6 and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 or HasEquippedItem(weight_of_the_earth_item) and SpellCooldown(heroic_leap) < 2 } and Spell(deadly_calm) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or target.DebuffRemaining(colossus_smash_debuff) > 4.5 and Rage() < 70 and { not BuffPresent(deadly_calm_buff) or not Talent(deadly_calm_talent) } and Spell(bladestorm_arms) or target.DebuffPresent(colossus_smash_debuff) and { SpellCooldown(deadly_calm) > 6 or not Talent(deadly_calm_talent) } and Spell(ravager) or BuffStacks(overpower_buff) == 2 and { Talent(dreadnaught_talent) or HasEquippedItem(archavons_heavy_hand_item) } and Spell(mortal_strike) or Spell(overpower) or { Rage() >= 40 or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(sudden_death_arms_buff) or BuffPresent(stone_heart_buff) } and Spell(execute_arms)
+ target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 70 and { SpellCooldown(deadly_calm) > 3 and not BuffPresent(deadly_calm_buff) or not Talent(deadly_calm_talent) } and Spell(skullsplitter) or SpellCooldown(bladestorm_arms) > 6 and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 or HasEquippedItem(weight_of_the_earth_item) and SpellCooldown(heroic_leap) < 2 } and Spell(deadly_calm) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or target.DebuffRemaining(colossus_smash_debuff) > 4.5 and Rage() < 70 and { not BuffPresent(deadly_calm_buff) or not Talent(deadly_calm_talent) } and Spell(bladestorm_arms) or target.DebuffPresent(colossus_smash_debuff) and { SpellCooldown(deadly_calm) > 6 or not Talent(deadly_calm_talent) } and Spell(ravager) or Enemies() > 2 and Spell(cleave) or BuffStacks(overpower_buff) == 2 and { Talent(dreadnaught_talent) or HasEquippedItem(archavons_heavy_hand_item) } and Spell(mortal_strike) or Spell(overpower) or { Rage() >= 40 or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(sudden_death_arms_buff) or BuffPresent(stone_heart_buff) } and Spell(execute_arms)
 }
 
 ### actions.five_target
@@ -338,6 +344,8 @@ AddFunction ArmsFiveTargetMainActions
  if target.DebuffExpires(colossus_smash_debuff) Spell(colossus_smash)
  #warbreaker,if=debuff.colossus_smash.down
  if target.DebuffExpires(colossus_smash_debuff) Spell(warbreaker)
+ #cleave
+ Spell(cleave)
  #execute,if=(!talent.cleave.enabled&dot.deep_wounds.remains<2)|(buff.sudden_death.react|buff.stone_heart.react)&(buff.sweeping_strikes.up|cooldown.sweeping_strikes.remains>8)
  if not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or { BuffPresent(sudden_death_arms_buff) or BuffPresent(stone_heart_buff) } and { BuffPresent(sweeping_strikes_buff) or SpellCooldown(sweeping_strikes) > 8 } Spell(execute_arms)
  #mortal_strike,if=(!talent.cleave.enabled&dot.deep_wounds.remains<2)|buff.sweeping_strikes.up&buff.overpower.stack=2&(talent.dreadnaught.enabled|equipped.archavons_heavy_hand)
@@ -375,7 +383,7 @@ AddFunction ArmsFiveTargetShortCdActions
 
 AddFunction ArmsFiveTargetShortCdPostConditions
 {
- Rage() < 70 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } and Spell(skullsplitter) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or { not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or { BuffPresent(sudden_death_arms_buff) or BuffPresent(stone_heart_buff) } and { BuffPresent(sweeping_strikes_buff) or SpellCooldown(sweeping_strikes) > 8 } } and Spell(execute_arms) or { not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or BuffPresent(sweeping_strikes_buff) and BuffStacks(overpower_buff) == 2 and { Talent(dreadnaught_talent) or HasEquippedItem(archavons_heavy_hand_item) } } and Spell(mortal_strike) or target.DebuffPresent(colossus_smash_debuff) and Spell(whirlwind_arms) or Spell(overpower) or Spell(whirlwind_arms)
+ Rage() < 70 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } and Spell(skullsplitter) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or Spell(cleave) or { not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or { BuffPresent(sudden_death_arms_buff) or BuffPresent(stone_heart_buff) } and { BuffPresent(sweeping_strikes_buff) or SpellCooldown(sweeping_strikes) > 8 } } and Spell(execute_arms) or { not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or BuffPresent(sweeping_strikes_buff) and BuffStacks(overpower_buff) == 2 and { Talent(dreadnaught_talent) or HasEquippedItem(archavons_heavy_hand_item) } } and Spell(mortal_strike) or target.DebuffPresent(colossus_smash_debuff) and Spell(whirlwind_arms) or Spell(overpower) or Spell(whirlwind_arms)
 }
 
 AddFunction ArmsFiveTargetCdActions
@@ -384,7 +392,7 @@ AddFunction ArmsFiveTargetCdActions
 
 AddFunction ArmsFiveTargetCdPostConditions
 {
- Rage() < 70 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } and Spell(skullsplitter) or SpellCooldown(bladestorm_arms) > 6 and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 or HasEquippedItem(weight_of_the_earth_item) and SpellCooldown(heroic_leap) < 2 } and Spell(deadly_calm) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or BuffExpires(sweeping_strikes_buff) and target.DebuffRemaining(colossus_smash_debuff) > 4.5 and { PreviousGCDSpell(mortal_strike) or Enemies() > 1 } and { not BuffPresent(deadly_calm_buff) or not Talent(deadly_calm_talent) } and Spell(bladestorm_arms) or target.DebuffPresent(colossus_smash_debuff) and { SpellCooldown(deadly_calm) > 6 or not Talent(deadly_calm_talent) } and Spell(ravager) or { not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or { BuffPresent(sudden_death_arms_buff) or BuffPresent(stone_heart_buff) } and { BuffPresent(sweeping_strikes_buff) or SpellCooldown(sweeping_strikes) > 8 } } and Spell(execute_arms) or { not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or BuffPresent(sweeping_strikes_buff) and BuffStacks(overpower_buff) == 2 and { Talent(dreadnaught_talent) or HasEquippedItem(archavons_heavy_hand_item) } } and Spell(mortal_strike) or target.DebuffPresent(colossus_smash_debuff) and Spell(whirlwind_arms) or Spell(overpower) or Spell(whirlwind_arms)
+ Rage() < 70 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } and Spell(skullsplitter) or SpellCooldown(bladestorm_arms) > 6 and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 or HasEquippedItem(weight_of_the_earth_item) and SpellCooldown(heroic_leap) < 2 } and Spell(deadly_calm) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or BuffExpires(sweeping_strikes_buff) and target.DebuffRemaining(colossus_smash_debuff) > 4.5 and { PreviousGCDSpell(mortal_strike) or Enemies() > 1 } and { not BuffPresent(deadly_calm_buff) or not Talent(deadly_calm_talent) } and Spell(bladestorm_arms) or target.DebuffPresent(colossus_smash_debuff) and { SpellCooldown(deadly_calm) > 6 or not Talent(deadly_calm_talent) } and Spell(ravager) or Spell(cleave) or { not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or { BuffPresent(sudden_death_arms_buff) or BuffPresent(stone_heart_buff) } and { BuffPresent(sweeping_strikes_buff) or SpellCooldown(sweeping_strikes) > 8 } } and Spell(execute_arms) or { not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or BuffPresent(sweeping_strikes_buff) and BuffStacks(overpower_buff) == 2 and { Talent(dreadnaught_talent) or HasEquippedItem(archavons_heavy_hand_item) } } and Spell(mortal_strike) or target.DebuffPresent(colossus_smash_debuff) and Spell(whirlwind_arms) or Spell(overpower) or Spell(whirlwind_arms)
 }
 
 ### actions.precombat
@@ -412,7 +420,7 @@ AddFunction ArmsPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
 }
 
 AddFunction ArmsPrecombatCdPostConditions
@@ -433,6 +441,8 @@ AddFunction ArmsSingleTargetMainActions
  if target.DebuffExpires(colossus_smash_debuff) Spell(warbreaker)
  #execute,if=buff.sudden_death.react|buff.stone_heart.react
  if BuffPresent(sudden_death_arms_buff) or BuffPresent(stone_heart_buff) Spell(execute_arms)
+ #cleave,if=spell_targets.whirlwind>2
+ if Enemies() > 2 Spell(cleave)
  #mortal_strike
  Spell(mortal_strike)
  #overpower
@@ -472,7 +482,7 @@ AddFunction ArmsSingleTargetShortCdActions
 
 AddFunction ArmsSingleTargetShortCdPostConditions
 {
- target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 70 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } and Spell(skullsplitter) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or { BuffPresent(sudden_death_arms_buff) or BuffPresent(stone_heart_buff) } and Spell(execute_arms) or Spell(mortal_strike) or Spell(overpower) or Talent(fervor_of_battle_talent) and { Rage() >= 50 or target.DebuffPresent(colossus_smash_debuff) } and Spell(whirlwind_arms) or not Talent(fervor_of_battle_talent) and { Rage() >= 40 or target.DebuffPresent(colossus_smash_debuff) } and Spell(slam)
+ target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 70 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } and Spell(skullsplitter) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or { BuffPresent(sudden_death_arms_buff) or BuffPresent(stone_heart_buff) } and Spell(execute_arms) or Enemies() > 2 and Spell(cleave) or Spell(mortal_strike) or Spell(overpower) or Talent(fervor_of_battle_talent) and { Rage() >= 50 or target.DebuffPresent(colossus_smash_debuff) } and Spell(whirlwind_arms) or not Talent(fervor_of_battle_talent) and { Rage() >= 40 or target.DebuffPresent(colossus_smash_debuff) } and Spell(slam)
 }
 
 AddFunction ArmsSingleTargetCdActions
@@ -481,7 +491,7 @@ AddFunction ArmsSingleTargetCdActions
 
 AddFunction ArmsSingleTargetCdPostConditions
 {
- target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 70 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } and Spell(skullsplitter) or SpellCooldown(bladestorm_arms) > 6 and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 or HasEquippedItem(weight_of_the_earth_item) and SpellCooldown(heroic_leap) < 2 } and Spell(deadly_calm) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or { BuffPresent(sudden_death_arms_buff) or BuffPresent(stone_heart_buff) } and Spell(execute_arms) or BuffExpires(sweeping_strikes_buff) and target.DebuffRemaining(colossus_smash_debuff) > 4.5 and { PreviousGCDSpell(mortal_strike) or Enemies() > 1 } and { not BuffPresent(deadly_calm_buff) or not Talent(deadly_calm_talent) } and Spell(bladestorm_arms) or target.DebuffPresent(colossus_smash_debuff) and { SpellCooldown(deadly_calm) > 6 or not Talent(deadly_calm_talent) } and Spell(ravager) or Spell(mortal_strike) or Spell(overpower) or Talent(fervor_of_battle_talent) and { Rage() >= 50 or target.DebuffPresent(colossus_smash_debuff) } and Spell(whirlwind_arms) or not Talent(fervor_of_battle_talent) and { Rage() >= 40 or target.DebuffPresent(colossus_smash_debuff) } and Spell(slam)
+ target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 70 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } and Spell(skullsplitter) or SpellCooldown(bladestorm_arms) > 6 and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 or HasEquippedItem(weight_of_the_earth_item) and SpellCooldown(heroic_leap) < 2 } and Spell(deadly_calm) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or { BuffPresent(sudden_death_arms_buff) or BuffPresent(stone_heart_buff) } and Spell(execute_arms) or BuffExpires(sweeping_strikes_buff) and target.DebuffRemaining(colossus_smash_debuff) > 4.5 and { PreviousGCDSpell(mortal_strike) or Enemies() > 1 } and { not BuffPresent(deadly_calm_buff) or not Talent(deadly_calm_talent) } and Spell(bladestorm_arms) or target.DebuffPresent(colossus_smash_debuff) and { SpellCooldown(deadly_calm) > 6 or not Talent(deadly_calm_talent) } and Spell(ravager) or Enemies() > 2 and Spell(cleave) or Spell(mortal_strike) or Spell(overpower) or Talent(fervor_of_battle_talent) and { Rage() >= 50 or target.DebuffPresent(colossus_smash_debuff) } and Spell(whirlwind_arms) or not Talent(fervor_of_battle_talent) and { Rage() >= 40 or target.DebuffPresent(colossus_smash_debuff) } and Spell(slam)
 }
 
 ### Arms icons.
@@ -543,14 +553,17 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 }
 
 ### Required symbols
+# ancestral_call
 # arcane_torrent_rage
-# archavons_heavy_hand
+# archavons_heavy_hand_item
 # arms_massacre_talent
 # avatar
+# battle_potion_of_strength
 # berserking
 # bladestorm_arms
 # blood_fury_ap
 # charge
+# cleave
 # cleave_talent
 # colossus_smash
 # colossus_smash_debuff
@@ -561,10 +574,10 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # dreadnaught_talent
 # execute_arms
 # fervor_of_battle_talent
+# fireblood
 # heroic_leap
 # lights_judgment
 # mortal_strike
-# old_war_potion
 # overpower
 # overpower_buff
 # pummel
@@ -579,7 +592,7 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # sweeping_strikes_buff
 # warbreaker
 # warbreaker_talent
-# weight_of_the_earth
+# weight_of_the_earth_item
 # whirlwind_arms
 
 `
@@ -587,13 +600,13 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 }
 
 {
-	const name = "sc_warrior_fury_t21"
-	const desc = "[8.0] Simulationcraft: Warrior_Fury_T21"
+	const name = "sc_warrior_fury_pr"
+	const desc = "[8.0] Simulationcraft: Warrior_Fury_PreRaid"
 	const code = `
-# Based on SimulationCraft profile "T21_Warrior_Fury".
+# Based on SimulationCraft profile "PR_Warrior_Fury".
 #    class=warrior
 #    spec=fury
-#    talents=2132122
+#    talents=2122122
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -675,7 +688,7 @@ AddFunction FuryDefaultCdActions
  unless target.Distance() > 5 and FuryMovementCdPostConditions()
  {
   #potion
-  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
+  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
 
   unless Talent(furious_slash_talent) and { DebuffStacks(furious_slash) < 3 or DebuffRemaining(furious_slash) < 3 or SpellCooldown(recklessness) < 3 and DebuffRemaining(furious_slash) < 9 } and Spell(furious_slash) or HasEquippedItem(kazzalax_fujiedas_fury_item) and { BuffExpires(fujiedas_fury_buff) or target.DebuffRemaining(bloodthirst) < 2 } and Spell(bloodthirst) or SpellCooldown(recklessness) < 3 and Spell(rampage)
   {
@@ -692,6 +705,10 @@ AddFunction FuryDefaultCdActions
     if Rage() < 40 and not BuffPresent(recklessness_buff) Spell(arcane_torrent_rage)
     #lights_judgment,if=cooldown.recklessness.remains<3
     if SpellCooldown(recklessness) < 3 Spell(lights_judgment)
+    #fireblood,if=buff.recklessness.up
+    if BuffPresent(recklessness_buff) Spell(fireblood)
+    #ancestral_call,if=buff.recklessness.up
+    if BuffPresent(recklessness_buff) Spell(ancestral_call)
     #run_action_list,name=single_target
     FurySingleTargetCdActions()
    }
@@ -757,7 +774,7 @@ AddFunction FuryPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(old_war_potion usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
 }
 
 AddFunction FuryPrecombatCdPostConditions
@@ -877,7 +894,9 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 }
 
 ### Required symbols
+# ancestral_call
 # arcane_torrent_rage
+# battle_potion_of_strength
 # berserking
 # bladestorm_fury
 # blood_fury_ap
@@ -886,6 +905,7 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # charge
 # dragon_roar
 # execute
+# fireblood
 # frothing_berserker_talent
 # fujiedas_fury_buff
 # furious_slash
@@ -894,7 +914,6 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # kazzalax_fujiedas_fury_item
 # lights_judgment
 # massacre_talent
-# old_war_potion
 # pummel
 # raging_blow
 # rampage

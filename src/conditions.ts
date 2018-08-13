@@ -3099,7 +3099,23 @@ l    */
     function MaxSoulShards(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         return MaxPower("soulshards", positionalParams, namedParams, state, atTime);
     }
+
+    /** Get the maximum amount of Arcane Charges of the target.
+	 @name MaxArcaneCharges
+	 @paramsig number or boolean
+	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	 @param number Optional. The number to compare against.
+	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	     Defaults to target=player.
+	     Valid values: player, target, focus, pet.
+	 @return The maximum value.
+	 @return A boolean value for the result of the comparison.
+     */
+    function MaxArcaneCharges(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
+        return MaxPower("arcanecharges", positionalParams, namedParams, state, atTime);
+    }
     OvaleCondition.RegisterCondition("maxalternatepower", false, MaxAlternatePower);
+    OvaleCondition.RegisterCondition("maxarcanecharges", false, MaxArcaneCharges);
     OvaleCondition.RegisterCondition("maxchi", false, MaxChi);
     OvaleCondition.RegisterCondition("maxcombopoints", false, MaxComboPoints);
     OvaleCondition.RegisterCondition("maxenergy", false, MaxEnergy);

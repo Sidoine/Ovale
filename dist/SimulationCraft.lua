@@ -1111,6 +1111,7 @@ end
 local InitializeDisambiguation = function()
     AddDisambiguation("none", "none")
     AddDisambiguation("bloodlust_buff", "burst_haste_buff")
+    AddDisambiguation("exhaustion_buff", "burst_haste_debuff")
     AddDisambiguation("buff_sephuzs_secret", "sephuzs_secret_buff")
     AddDisambiguation("arcane_torrent", "arcane_torrent_runicpower", "DEATHKNIGHT")
     AddDisambiguation("arcane_torrent", "arcane_torrent_dh", "DEMONHUNTER")
@@ -1132,6 +1133,7 @@ local InitializeDisambiguation = function()
     AddDisambiguation("blood_fury", "blood_fury_apsp", "SHAMAN")
     AddDisambiguation("blood_fury", "blood_fury_sp", "WARLOCK")
     AddDisambiguation("blood_fury", "blood_fury_ap", "WARRIOR")
+    AddDisambiguation("137075", "taktheritrixs_shoulderpads", "DEATHKNIGHT")
     AddDisambiguation("deaths_reach_talent", "deaths_reach_talent_unholy", "DEATHKNIGHT", "unholy")
     AddDisambiguation("grip_of_the_dead_talent", "grip_of_the_dead_talent_unholy", "DEATHKNIGHT", "unholy")
     AddDisambiguation("wraith_walk_talent", "wraith_walk_talent_blood", "DEATHKNIGHT", "blood")
@@ -1163,12 +1165,18 @@ local InitializeDisambiguation = function()
     AddDisambiguation("raptor_strike_eagle", "raptor_strike", "HUNTER", "survival")
     AddDisambiguation("serpent_sting", "serpent_sting_mm", "HUNTER", "marksmanship")
     AddDisambiguation("serpent_sting", "serpent_sting_sv", "HUNTER", "survival")
+    AddDisambiguation("132410", "shard_of_the_exodar", "MAGE")
+    AddDisambiguation("132454", "koralons_burning_touch", "MAGE", "fire")
+    AddDisambiguation("132863", "darcklis_dragonfire_diadem", "MAGE", "fire")
+    AddDisambiguation("summon_arcane_familiar", "arcane_familiar", "MAGE", "arcane")
+    AddDisambiguation("water_elemental", "summon_water_elemental", "MAGE", "frost")
     AddDisambiguation("healing_elixir_talent", "healing_elixir_talent_mistweaver", "MONK", "mistweaver")
     AddDisambiguation("bok_proc_buff", "blackout_kick_buff", "MONK", "windwalker")
     AddDisambiguation("fortifying_brew", "fortifying_brew_mistweaver", "MONK", "mistweaver")
     AddDisambiguation("rushing_jade_wind", "rushing_jade_wind_windwalker", "MONK", "windwalker")
     AddDisambiguation("breath_of_fire_dot_debuff", "breath_of_fire_debuff", "MONK", "brewmaster")
     AddDisambiguation("brews", "ironskin_brew", "MONK", "brewmaster")
+    AddDisambiguation("avenger_shield", "avengers_shield", "PALADIN", "protection")
     AddDisambiguation("judgment_of_light_talent", "judgment_of_light_talent_holy", "PALADIN", "holy")
     AddDisambiguation("unbreakable_spirit_talent", "unbreakable_spirit_talent_holy", "PALADIN", "holy")
     AddDisambiguation("cavalier_talent", "cavalier_talent_holy", "PALADIN", "holy")
@@ -1587,6 +1595,7 @@ local EmitOperandCooldown = nil
 local EmitOperandDisease = nil
 local EmitOperandDot = nil
 local EmitOperandGlyph = nil
+local EmitOperandGroundAoe = nil
 local EmitOperandPet = nil
 local EmitOperandPreviousSpell = nil
 local EmitOperandRefresh = nil
@@ -1978,8 +1987,16 @@ EmitAction = function(parseNode, nodeList, annotation)
         elseif className == "MAGE" and action == "time_warp" then
             conditionCode = "CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1)"
             annotation[action] = className
-        elseif className == "MAGE" and action == "water_elemental" then
+        elseif className == "MAGE" and action == "summon_water_elemental" then
             conditionCode = "not pet.Present()"
+        elseif className == "MAGE" and action == "ice_floes" then
+            conditionCode = "Speed() > 0"
+        elseif className == "MAGE" and action == "blast_wave" then
+            conditionCode = "target.Distance(less 8)"
+        elseif className == "MAGE" and action == "dragons_breath" then
+            conditionCode = "target.Distance(less 12)"
+        elseif className == "MAGE" and action == "arcane_blast" then
+            conditionCode = "Mana() > ManaCost(arcane_blast)"
         elseif className == "MONK" and action == "chi_sphere" then
             isSpellAction = false
         elseif className == "MONK" and action == "gift_of_the_ox" then
@@ -2933,6 +2950,8 @@ do
         ["astral_power.deficit"] = "AstralPowerDeficit()",
         ["blade_dance_worth_using"] = "0",
         ["blood.frac"] = "Rune(blood)",
+        ["buff.arcane_charge.stack"] = "ArcaneCharges()",
+        ["buff.arcane_charge.max_stack"] = "MaxArcaneCharges()",
         ["buff.movement.up"] = "Speed() > 0",
         ["buff.out_of_range.up"] = "not target.InRange()",
         ["bugs"] = "0",
@@ -2941,6 +2960,7 @@ do
         ["combo_points"] = "ComboPoints()",
         ["combo_points.deficit"] = "ComboPointsDeficit()",
         ["combo_points.max"] = "MaxComboPoints()",
+        ["consecration.remains"] = "target.DebuffRemaining(consecration_debuff)",
         ["cp_max_spend"] = "MaxComboPoints()",
         ["crit_pct_current"] = "SpellCritChance()",
         ["current_insanity_drain"] = "CurrentInsanityDrain()",
@@ -2949,6 +2969,7 @@ do
         ["delay"] = "0",
         ["pet.demonic_tyrant.active"] = "Demons(demonic_tyrant)",
         ["demonic_fury"] = "DemonicFury()",
+        ["death_and_decay.ticking"] = "SpellCooldown(death_and_decay) > 20",
         ["desired_targets"] = "Enemies(tagged=1)",
         ["doomguard_no_de"] = "NotDeDemons(doomguard)",
         ["dreadstalker_count"] = "Demons(dreadstalker)",
@@ -3000,6 +3021,7 @@ do
         ["raw_haste_pct"] = "SpellCastSpeedPercent()",
         ["rtb_list.any.5"] = "BuffCount(roll_the_bones_buff more 4)",
         ["rtb_list.any.6"] = "BuffCount(roll_the_bones_buff more 5)",
+        ["rune.deficit"] = "{6 - RuneCount()}",
         ["runic_power"] = "RunicPower()",
         ["runic_power.deficit"] = "RunicPowerDeficit()",
         ["service_no_de"] = "NotDeDemons(felguard)",
@@ -3190,7 +3212,7 @@ EmitOperandDisease = function(operand, parseNode, nodeList, annotation, action, 
     return ok, node
 end
 
-local function EmitOperandGroundAoe(operand, parseNode, nodeList, annotation, action)
+EmitOperandGroundAoe = function(operand, parseNode, nodeList, annotation, action)
     local ok = true
     local node
     local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
@@ -3219,6 +3241,7 @@ local function EmitOperandGroundAoe(operand, parseNode, nodeList, annotation, ac
     end
     return ok, node
 end
+
 EmitOperandDot = function(operand, parseNode, nodeList, annotation, action, target)
     local ok = true
     local node
@@ -3660,6 +3683,9 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
     elseif className == "MAGE" and operand == "firestarter.active" then
         code = "Talent(firestarter_talent) and target.HealthPercent() >= 90"
         AddSymbol(annotation, "firestarter_talent")
+    elseif className == "MAGE" and operand == "brain_freeze_active" then
+        code = "target.DebuffPresent(winters_chill_debuff)"
+        AddSymbol(annotation, "winters_chill_debuff")
     elseif className == "MONK" and sub(operand, 1, 35) == "debuff.storm_earth_and_fire_target." then
         local property = sub(operand, 36)
         if target == "" then

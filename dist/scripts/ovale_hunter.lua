@@ -284,60 +284,48 @@ AddFunction MarksmanshipUseItemActions
 
 AddFunction MarksmanshipDefaultMainActions
 {
- #hunters_mark,if=debuff.hunters_mark.down
- if target.DebuffExpires(hunters_mark_debuff) Spell(hunters_mark)
- #multishot,if=active_enemies>2&buff.precise_shots.up&cooldown.aimed_shot.full_recharge_time<gcd*buff.precise_shots.stack+action.aimed_shot.cast_time
- if Enemies() > 2 and BuffPresent(precise_shots_buff) and SpellCooldown(aimed_shot) < GCD() * BuffStacks(precise_shots_buff) + CastTime(aimed_shot) Spell(multishot_mm)
- #arcane_shot,if=active_enemies<3&buff.precise_shots.up&cooldown.aimed_shot.full_recharge_time<gcd*buff.precise_shots.stack+action.aimed_shot.cast_time
- if Enemies() < 3 and BuffPresent(precise_shots_buff) and SpellCooldown(aimed_shot) < GCD() * BuffStacks(precise_shots_buff) + CastTime(aimed_shot) Spell(arcane_shot)
- #aimed_shot,if=buff.precise_shots.down&buff.double_tap.down&(active_enemies>2&buff.trick_shots.up|active_enemies<3&full_recharge_time<cast_time+gcd)
- if BuffExpires(precise_shots_buff) and BuffExpires(double_tap_buff) and { Enemies() > 2 and BuffPresent(trick_shots_buff) or Enemies() < 3 and SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) + GCD() } Spell(aimed_shot)
- #rapid_fire,if=active_enemies<3|buff.trick_shots.up
- if Enemies() < 3 or BuffPresent(trick_shots_buff) Spell(rapid_fire)
- #multishot,if=active_enemies>2&buff.trick_shots.down
- if Enemies() > 2 and BuffExpires(trick_shots_buff) Spell(multishot_mm)
- #aimed_shot,if=buff.precise_shots.down&(focus>70|buff.steady_focus.down)
- if BuffExpires(precise_shots_buff) and { Focus() > 70 or BuffExpires(steady_focus_buff) } Spell(aimed_shot)
- #multishot,if=active_enemies>2&(focus>90|buff.precise_shots.up&(focus>70|buff.steady_focus.down&focus>45))
- if Enemies() > 2 and { Focus() > 90 or BuffPresent(precise_shots_buff) and { Focus() > 70 or BuffExpires(steady_focus_buff) and Focus() > 45 } } Spell(multishot_mm)
- #arcane_shot,if=active_enemies<3&(focus>70|buff.steady_focus.down&(focus>60|buff.precise_shots.up))
- if Enemies() < 3 and { Focus() > 70 or BuffExpires(steady_focus_buff) and { Focus() > 60 or BuffPresent(precise_shots_buff) } } Spell(arcane_shot)
- #serpent_sting,if=refreshable
- if target.Refreshable(serpent_sting_mm_debuff) Spell(serpent_sting_mm)
- #steady_shot
- Spell(steady_shot)
+ #call_action_list,name=cds
+ MarksmanshipCdsMainActions()
+
+ unless MarksmanshipCdsMainPostConditions()
+ {
+  #call_action_list,name=st,if=active_enemies<3
+  if Enemies() < 3 MarksmanshipStMainActions()
+
+  unless Enemies() < 3 and MarksmanshipStMainPostConditions()
+  {
+   #call_action_list,name=trickshots,if=active_enemies>2
+   if Enemies() > 2 MarksmanshipTrickshotsMainActions()
+  }
+ }
 }
 
 AddFunction MarksmanshipDefaultMainPostConditions
 {
+ MarksmanshipCdsMainPostConditions() or Enemies() < 3 and MarksmanshipStMainPostConditions() or Enemies() > 2 and MarksmanshipTrickshotsMainPostConditions()
 }
 
 AddFunction MarksmanshipDefaultShortCdActions
 {
- unless target.DebuffExpires(hunters_mark_debuff) and Spell(hunters_mark)
- {
-  #double_tap,if=cooldown.rapid_fire.remains<gcd
-  if SpellCooldown(rapid_fire) < GCD() Spell(double_tap)
-  #barrage,if=active_enemies>1
-  if Enemies() > 1 Spell(barrage)
-  #explosive_shot,if=active_enemies>1
-  if Enemies() > 1 Spell(explosive_shot)
+ #call_action_list,name=cds
+ MarksmanshipCdsShortCdActions()
 
-  unless Enemies() > 2 and BuffPresent(precise_shots_buff) and SpellCooldown(aimed_shot) < GCD() * BuffStacks(precise_shots_buff) + CastTime(aimed_shot) and Spell(multishot_mm) or Enemies() < 3 and BuffPresent(precise_shots_buff) and SpellCooldown(aimed_shot) < GCD() * BuffStacks(precise_shots_buff) + CastTime(aimed_shot) and Spell(arcane_shot) or BuffExpires(precise_shots_buff) and BuffExpires(double_tap_buff) and { Enemies() > 2 and BuffPresent(trick_shots_buff) or Enemies() < 3 and SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) + GCD() } and Spell(aimed_shot) or { Enemies() < 3 or BuffPresent(trick_shots_buff) } and Spell(rapid_fire)
+ unless MarksmanshipCdsShortCdPostConditions()
+ {
+  #call_action_list,name=st,if=active_enemies<3
+  if Enemies() < 3 MarksmanshipStShortCdActions()
+
+  unless Enemies() < 3 and MarksmanshipStShortCdPostConditions()
   {
-   #explosive_shot
-   Spell(explosive_shot)
-   #piercing_shot
-   Spell(piercing_shot)
-   #a_murder_of_crows
-   Spell(a_murder_of_crows)
+   #call_action_list,name=trickshots,if=active_enemies>2
+   if Enemies() > 2 MarksmanshipTrickshotsShortCdActions()
   }
  }
 }
 
 AddFunction MarksmanshipDefaultShortCdPostConditions
 {
- target.DebuffExpires(hunters_mark_debuff) and Spell(hunters_mark) or Enemies() > 2 and BuffPresent(precise_shots_buff) and SpellCooldown(aimed_shot) < GCD() * BuffStacks(precise_shots_buff) + CastTime(aimed_shot) and Spell(multishot_mm) or Enemies() < 3 and BuffPresent(precise_shots_buff) and SpellCooldown(aimed_shot) < GCD() * BuffStacks(precise_shots_buff) + CastTime(aimed_shot) and Spell(arcane_shot) or BuffExpires(precise_shots_buff) and BuffExpires(double_tap_buff) and { Enemies() > 2 and BuffPresent(trick_shots_buff) or Enemies() < 3 and SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) + GCD() } and Spell(aimed_shot) or { Enemies() < 3 or BuffPresent(trick_shots_buff) } and Spell(rapid_fire) or Enemies() > 2 and BuffExpires(trick_shots_buff) and Spell(multishot_mm) or BuffExpires(precise_shots_buff) and { Focus() > 70 or BuffExpires(steady_focus_buff) } and Spell(aimed_shot) or Enemies() > 2 and { Focus() > 90 or BuffPresent(precise_shots_buff) and { Focus() > 70 or BuffExpires(steady_focus_buff) and Focus() > 45 } } and Spell(multishot_mm) or Enemies() < 3 and { Focus() > 70 or BuffExpires(steady_focus_buff) and { Focus() > 60 or BuffPresent(precise_shots_buff) } } and Spell(arcane_shot) or target.Refreshable(serpent_sting_mm_debuff) and Spell(serpent_sting_mm) or Spell(steady_shot)
+ MarksmanshipCdsShortCdPostConditions() or Enemies() < 3 and MarksmanshipStShortCdPostConditions() or Enemies() > 2 and MarksmanshipTrickshotsShortCdPostConditions()
 }
 
 AddFunction MarksmanshipDefaultCdActions
@@ -347,7 +335,55 @@ AddFunction MarksmanshipDefaultCdActions
  if HasEquippedItem(sephuzs_secret_item) and target.IsInterruptible() and not SpellCooldown(sephuzs_secret_buff) > 0 and not BuffPresent(sephuzs_secret_buff) MarksmanshipInterruptActions()
  #use_items
  MarksmanshipUseItemActions()
+ #call_action_list,name=cds
+ MarksmanshipCdsCdActions()
 
+ unless MarksmanshipCdsCdPostConditions()
+ {
+  #call_action_list,name=st,if=active_enemies<3
+  if Enemies() < 3 MarksmanshipStCdActions()
+
+  unless Enemies() < 3 and MarksmanshipStCdPostConditions()
+  {
+   #call_action_list,name=trickshots,if=active_enemies>2
+   if Enemies() > 2 MarksmanshipTrickshotsCdActions()
+  }
+ }
+}
+
+AddFunction MarksmanshipDefaultCdPostConditions
+{
+ MarksmanshipCdsCdPostConditions() or Enemies() < 3 and MarksmanshipStCdPostConditions() or Enemies() > 2 and MarksmanshipTrickshotsCdPostConditions()
+}
+
+### actions.cds
+
+AddFunction MarksmanshipCdsMainActions
+{
+ #hunters_mark,if=debuff.hunters_mark.down
+ if target.DebuffExpires(hunters_mark_debuff) Spell(hunters_mark)
+}
+
+AddFunction MarksmanshipCdsMainPostConditions
+{
+}
+
+AddFunction MarksmanshipCdsShortCdActions
+{
+ unless target.DebuffExpires(hunters_mark_debuff) and Spell(hunters_mark)
+ {
+  #double_tap,if=cooldown.rapid_fire.remains<gcd
+  if SpellCooldown(rapid_fire) < GCD() Spell(double_tap)
+ }
+}
+
+AddFunction MarksmanshipCdsShortCdPostConditions
+{
+ target.DebuffExpires(hunters_mark_debuff) and Spell(hunters_mark)
+}
+
+AddFunction MarksmanshipCdsCdActions
+{
  unless target.DebuffExpires(hunters_mark_debuff) and Spell(hunters_mark) or SpellCooldown(rapid_fire) < GCD() and Spell(double_tap)
  {
   #berserking,if=cooldown.trueshot.remains>30
@@ -362,14 +398,14 @@ AddFunction MarksmanshipDefaultCdActions
   Spell(lights_judgment)
   #potion,if=(buff.trueshot.react&buff.bloodlust.react)|((consumable.prolonged_power&target.time_to_die<62)|target.time_to_die<31)
   if { BuffPresent(trueshot_buff) and BuffPresent(burst_haste_buff any=1) or BuffPresent(prolonged_power_buff) and target.TimeToDie() < 62 or target.TimeToDie() < 31 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_agility usable=1)
-  #trueshot,if=cooldown.aimed_shot.charges<1
-  if SpellCharges(aimed_shot) < 1 Spell(trueshot)
+  #trueshot,if=cooldown.aimed_shot.charges<1|talent.barrage.enabled&cooldown.aimed_shot.charges_fractional<1.3
+  if SpellCharges(aimed_shot) < 1 or Talent(barrage_talent) and SpellCharges(aimed_shot count=0) < 1.3 Spell(trueshot)
  }
 }
 
-AddFunction MarksmanshipDefaultCdPostConditions
+AddFunction MarksmanshipCdsCdPostConditions
 {
- target.DebuffExpires(hunters_mark_debuff) and Spell(hunters_mark) or SpellCooldown(rapid_fire) < GCD() and Spell(double_tap) or Enemies() > 1 and Spell(barrage) or Enemies() > 1 and Spell(explosive_shot) or Enemies() > 2 and BuffPresent(precise_shots_buff) and SpellCooldown(aimed_shot) < GCD() * BuffStacks(precise_shots_buff) + CastTime(aimed_shot) and Spell(multishot_mm) or Enemies() < 3 and BuffPresent(precise_shots_buff) and SpellCooldown(aimed_shot) < GCD() * BuffStacks(precise_shots_buff) + CastTime(aimed_shot) and Spell(arcane_shot) or BuffExpires(precise_shots_buff) and BuffExpires(double_tap_buff) and { Enemies() > 2 and BuffPresent(trick_shots_buff) or Enemies() < 3 and SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) + GCD() } and Spell(aimed_shot) or { Enemies() < 3 or BuffPresent(trick_shots_buff) } and Spell(rapid_fire) or Spell(explosive_shot) or Spell(piercing_shot) or Spell(a_murder_of_crows) or Enemies() > 2 and BuffExpires(trick_shots_buff) and Spell(multishot_mm) or BuffExpires(precise_shots_buff) and { Focus() > 70 or BuffExpires(steady_focus_buff) } and Spell(aimed_shot) or Enemies() > 2 and { Focus() > 90 or BuffPresent(precise_shots_buff) and { Focus() > 70 or BuffExpires(steady_focus_buff) and Focus() > 45 } } and Spell(multishot_mm) or Enemies() < 3 and { Focus() > 70 or BuffExpires(steady_focus_buff) and { Focus() > 60 or BuffPresent(precise_shots_buff) } } and Spell(arcane_shot) or target.Refreshable(serpent_sting_mm_debuff) and Spell(serpent_sting_mm) or Spell(steady_shot)
+ target.DebuffExpires(hunters_mark_debuff) and Spell(hunters_mark) or SpellCooldown(rapid_fire) < GCD() and Spell(double_tap)
 }
 
 ### actions.precombat
@@ -377,7 +413,7 @@ AddFunction MarksmanshipDefaultCdPostConditions
 AddFunction MarksmanshipPrecombatMainActions
 {
  #hunters_mark
- if target.DebuffExpires(hunters_mark_debuff) Spell(hunters_mark)
+ Spell(hunters_mark)
  #aimed_shot,if=active_enemies<3
  if Enemies() < 3 Spell(aimed_shot)
 }
@@ -419,6 +455,116 @@ AddFunction MarksmanshipPrecombatCdActions
 AddFunction MarksmanshipPrecombatCdPostConditions
 {
  Spell(hunters_mark) or Spell(double_tap) or Enemies() < 3 and Spell(aimed_shot) or Enemies() > 2 and Spell(explosive_shot)
+}
+
+### actions.st
+
+AddFunction MarksmanshipStMainActions
+{
+ #arcane_shot,if=buff.precise_shots.up&(cooldown.aimed_shot.full_recharge_time<gcd*buff.precise_shots.stack+action.aimed_shot.cast_time|buff.lethal_shots.up)
+ if BuffPresent(precise_shots_buff) and { SpellCooldown(aimed_shot) < GCD() * BuffStacks(precise_shots_buff) + CastTime(aimed_shot) or BuffPresent(lethal_shots_buff) } Spell(arcane_shot)
+ #rapid_fire,if=(!talent.lethal_shots.enabled|buff.lethal_shots.up)&azerite.focused_fire.enabled|azerite.in_the_rhythm.enabled
+ if { not Talent(lethal_shots_talent) or BuffPresent(lethal_shots_buff) } and HasAzeriteTrait(focused_fire_trait) or HasAzeriteTrait(in_the_rhythm_trait) Spell(rapid_fire)
+ #aimed_shot,if=buff.precise_shots.down&(buff.double_tap.down&full_recharge_time<cast_time+gcd|buff.lethal_shots.up)
+ if BuffExpires(precise_shots_buff) and { BuffExpires(double_tap_buff) and SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) + GCD() or BuffPresent(lethal_shots_buff) } Spell(aimed_shot)
+ #rapid_fire,if=!talent.lethal_shots.enabled|buff.lethal_shots.up
+ if not Talent(lethal_shots_talent) or BuffPresent(lethal_shots_buff) Spell(rapid_fire)
+ #serpent_sting,if=refreshable
+ if target.Refreshable(serpent_sting_mm_debuff) Spell(serpent_sting_mm)
+ #aimed_shot,if=buff.precise_shots.down&(!talent.steady_focus.enabled&focus>70|!talent.lethal_shots.enabled|buff.lethal_shots.up)
+ if BuffExpires(precise_shots_buff) and { not Talent(steady_focus_talent) and Focus() > 70 or not Talent(lethal_shots_talent) or BuffPresent(lethal_shots_buff) } Spell(aimed_shot)
+ #arcane_shot,if=buff.precise_shots.up|focus>60&(!talent.lethal_shots.enabled|buff.lethal_shots.up)
+ if BuffPresent(precise_shots_buff) or Focus() > 60 and { not Talent(lethal_shots_talent) or BuffPresent(lethal_shots_buff) } Spell(arcane_shot)
+ #steady_shot,if=focus+cast_regen<focus.max|(talent.lethal_shots.enabled&buff.lethal_shots.down)
+ if Focus() + FocusCastingRegen(steady_shot) < MaxFocus() or Talent(lethal_shots_talent) and BuffExpires(lethal_shots_buff) Spell(steady_shot)
+ #arcane_shot
+ Spell(arcane_shot)
+}
+
+AddFunction MarksmanshipStMainPostConditions
+{
+}
+
+AddFunction MarksmanshipStShortCdActions
+{
+ #explosive_shot
+ Spell(explosive_shot)
+ #barrage,if=active_enemies>1
+ if Enemies() > 1 Spell(barrage)
+
+ unless BuffPresent(precise_shots_buff) and { SpellCooldown(aimed_shot) < GCD() * BuffStacks(precise_shots_buff) + CastTime(aimed_shot) or BuffPresent(lethal_shots_buff) } and Spell(arcane_shot) or { { not Talent(lethal_shots_talent) or BuffPresent(lethal_shots_buff) } and HasAzeriteTrait(focused_fire_trait) or HasAzeriteTrait(in_the_rhythm_trait) } and Spell(rapid_fire) or BuffExpires(precise_shots_buff) and { BuffExpires(double_tap_buff) and SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) + GCD() or BuffPresent(lethal_shots_buff) } and Spell(aimed_shot) or { not Talent(lethal_shots_talent) or BuffPresent(lethal_shots_buff) } and Spell(rapid_fire)
+ {
+  #piercing_shot
+  Spell(piercing_shot)
+  #a_murder_of_crows
+  Spell(a_murder_of_crows)
+ }
+}
+
+AddFunction MarksmanshipStShortCdPostConditions
+{
+ BuffPresent(precise_shots_buff) and { SpellCooldown(aimed_shot) < GCD() * BuffStacks(precise_shots_buff) + CastTime(aimed_shot) or BuffPresent(lethal_shots_buff) } and Spell(arcane_shot) or { { not Talent(lethal_shots_talent) or BuffPresent(lethal_shots_buff) } and HasAzeriteTrait(focused_fire_trait) or HasAzeriteTrait(in_the_rhythm_trait) } and Spell(rapid_fire) or BuffExpires(precise_shots_buff) and { BuffExpires(double_tap_buff) and SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) + GCD() or BuffPresent(lethal_shots_buff) } and Spell(aimed_shot) or { not Talent(lethal_shots_talent) or BuffPresent(lethal_shots_buff) } and Spell(rapid_fire) or target.Refreshable(serpent_sting_mm_debuff) and Spell(serpent_sting_mm) or BuffExpires(precise_shots_buff) and { not Talent(steady_focus_talent) and Focus() > 70 or not Talent(lethal_shots_talent) or BuffPresent(lethal_shots_buff) } and Spell(aimed_shot) or { BuffPresent(precise_shots_buff) or Focus() > 60 and { not Talent(lethal_shots_talent) or BuffPresent(lethal_shots_buff) } } and Spell(arcane_shot) or { Focus() + FocusCastingRegen(steady_shot) < MaxFocus() or Talent(lethal_shots_talent) and BuffExpires(lethal_shots_buff) } and Spell(steady_shot) or Spell(arcane_shot)
+}
+
+AddFunction MarksmanshipStCdActions
+{
+}
+
+AddFunction MarksmanshipStCdPostConditions
+{
+ Spell(explosive_shot) or Enemies() > 1 and Spell(barrage) or BuffPresent(precise_shots_buff) and { SpellCooldown(aimed_shot) < GCD() * BuffStacks(precise_shots_buff) + CastTime(aimed_shot) or BuffPresent(lethal_shots_buff) } and Spell(arcane_shot) or { { not Talent(lethal_shots_talent) or BuffPresent(lethal_shots_buff) } and HasAzeriteTrait(focused_fire_trait) or HasAzeriteTrait(in_the_rhythm_trait) } and Spell(rapid_fire) or BuffExpires(precise_shots_buff) and { BuffExpires(double_tap_buff) and SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) + GCD() or BuffPresent(lethal_shots_buff) } and Spell(aimed_shot) or { not Talent(lethal_shots_talent) or BuffPresent(lethal_shots_buff) } and Spell(rapid_fire) or Spell(piercing_shot) or Spell(a_murder_of_crows) or target.Refreshable(serpent_sting_mm_debuff) and Spell(serpent_sting_mm) or BuffExpires(precise_shots_buff) and { not Talent(steady_focus_talent) and Focus() > 70 or not Talent(lethal_shots_talent) or BuffPresent(lethal_shots_buff) } and Spell(aimed_shot) or { BuffPresent(precise_shots_buff) or Focus() > 60 and { not Talent(lethal_shots_talent) or BuffPresent(lethal_shots_buff) } } and Spell(arcane_shot) or { Focus() + FocusCastingRegen(steady_shot) < MaxFocus() or Talent(lethal_shots_talent) and BuffExpires(lethal_shots_buff) } and Spell(steady_shot) or Spell(arcane_shot)
+}
+
+### actions.trickshots
+
+AddFunction MarksmanshipTrickshotsMainActions
+{
+ #rapid_fire,if=buff.trick_shots.up&!talent.barrage.enabled
+ if BuffPresent(trick_shots_buff) and not Talent(barrage_talent) Spell(rapid_fire)
+ #aimed_shot,if=buff.trick_shots.up&buff.precise_shots.down&buff.double_tap.down&(!talent.lethal_shots.enabled|buff.lethal_shots.up|focus>60)
+ if BuffPresent(trick_shots_buff) and BuffExpires(precise_shots_buff) and BuffExpires(double_tap_buff) and { not Talent(lethal_shots_talent) or BuffPresent(lethal_shots_buff) or Focus() > 60 } Spell(aimed_shot)
+ #rapid_fire,if=buff.trick_shots.up
+ if BuffPresent(trick_shots_buff) Spell(rapid_fire)
+ #multishot,if=buff.trick_shots.down|(buff.precise_shots.up|buff.lethal_shots.up)&(!talent.barrage.enabled&buff.steady_focus.down&focus>45|focus>70)
+ if BuffExpires(trick_shots_buff) or { BuffPresent(precise_shots_buff) or BuffPresent(lethal_shots_buff) } and { not Talent(barrage_talent) and BuffExpires(steady_focus_buff) and Focus() > 45 or Focus() > 70 } Spell(multishot_mm)
+ #serpent_sting,if=refreshable
+ if target.Refreshable(serpent_sting_mm_debuff) Spell(serpent_sting_mm)
+ #steady_shot,if=focus+cast_regen<focus.max|(talent.lethal_shots.enabled&buff.lethal_shots.down)
+ if Focus() + FocusCastingRegen(steady_shot) < MaxFocus() or Talent(lethal_shots_talent) and BuffExpires(lethal_shots_buff) Spell(steady_shot)
+}
+
+AddFunction MarksmanshipTrickshotsMainPostConditions
+{
+}
+
+AddFunction MarksmanshipTrickshotsShortCdActions
+{
+ #barrage
+ Spell(barrage)
+ #explosive_shot
+ Spell(explosive_shot)
+
+ unless BuffPresent(trick_shots_buff) and not Talent(barrage_talent) and Spell(rapid_fire) or BuffPresent(trick_shots_buff) and BuffExpires(precise_shots_buff) and BuffExpires(double_tap_buff) and { not Talent(lethal_shots_talent) or BuffPresent(lethal_shots_buff) or Focus() > 60 } and Spell(aimed_shot) or BuffPresent(trick_shots_buff) and Spell(rapid_fire) or { BuffExpires(trick_shots_buff) or { BuffPresent(precise_shots_buff) or BuffPresent(lethal_shots_buff) } and { not Talent(barrage_talent) and BuffExpires(steady_focus_buff) and Focus() > 45 or Focus() > 70 } } and Spell(multishot_mm)
+ {
+  #piercing_shot
+  Spell(piercing_shot)
+  #a_murder_of_crows
+  Spell(a_murder_of_crows)
+ }
+}
+
+AddFunction MarksmanshipTrickshotsShortCdPostConditions
+{
+ BuffPresent(trick_shots_buff) and not Talent(barrage_talent) and Spell(rapid_fire) or BuffPresent(trick_shots_buff) and BuffExpires(precise_shots_buff) and BuffExpires(double_tap_buff) and { not Talent(lethal_shots_talent) or BuffPresent(lethal_shots_buff) or Focus() > 60 } and Spell(aimed_shot) or BuffPresent(trick_shots_buff) and Spell(rapid_fire) or { BuffExpires(trick_shots_buff) or { BuffPresent(precise_shots_buff) or BuffPresent(lethal_shots_buff) } and { not Talent(barrage_talent) and BuffExpires(steady_focus_buff) and Focus() > 45 or Focus() > 70 } } and Spell(multishot_mm) or target.Refreshable(serpent_sting_mm_debuff) and Spell(serpent_sting_mm) or { Focus() + FocusCastingRegen(steady_shot) < MaxFocus() or Talent(lethal_shots_talent) and BuffExpires(lethal_shots_buff) } and Spell(steady_shot)
+}
+
+AddFunction MarksmanshipTrickshotsCdActions
+{
+}
+
+AddFunction MarksmanshipTrickshotsCdPostConditions
+{
+ Spell(barrage) or Spell(explosive_shot) or BuffPresent(trick_shots_buff) and not Talent(barrage_talent) and Spell(rapid_fire) or BuffPresent(trick_shots_buff) and BuffExpires(precise_shots_buff) and BuffExpires(double_tap_buff) and { not Talent(lethal_shots_talent) or BuffPresent(lethal_shots_buff) or Focus() > 60 } and Spell(aimed_shot) or BuffPresent(trick_shots_buff) and Spell(rapid_fire) or { BuffExpires(trick_shots_buff) or { BuffPresent(precise_shots_buff) or BuffPresent(lethal_shots_buff) } and { not Talent(barrage_talent) and BuffExpires(steady_focus_buff) and Focus() > 45 or Focus() > 70 } } and Spell(multishot_mm) or Spell(piercing_shot) or Spell(a_murder_of_crows) or target.Refreshable(serpent_sting_mm_debuff) and Spell(serpent_sting_mm) or { Focus() + FocusCastingRegen(steady_shot) < MaxFocus() or Talent(lethal_shots_talent) and BuffExpires(lethal_shots_buff) } and Spell(steady_shot)
 }
 
 ### Marksmanship icons.
@@ -485,6 +631,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # ancestral_call
 # arcane_shot
 # barrage
+# barrage_talent
 # battle_potion_of_agility
 # berserking
 # blood_fury_ap
@@ -493,8 +640,12 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # double_tap_buff
 # explosive_shot
 # fireblood
+# focused_fire_trait
 # hunters_mark
 # hunters_mark_debuff
+# in_the_rhythm_trait
+# lethal_shots_buff
+# lethal_shots_talent
 # lights_judgment
 # multishot_mm
 # piercing_shot
@@ -507,6 +658,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # serpent_sting_mm
 # serpent_sting_mm_debuff
 # steady_focus_buff
+# steady_focus_talent
 # steady_shot
 # trick_shots_buff
 # trueshot
@@ -523,7 +675,7 @@ do
 # Based on SimulationCraft profile "PR_Hunter_Survival".
 #    class=hunter
 #    spec=survival
-#    talents=1101011
+#    talents=1101021
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)

@@ -326,7 +326,7 @@ class OvalePowerClass extends OvalePowerBase {
         }
         for (const [powerType, powerId] of pairs(Enum.PowerType)) {
             let powerTypeLower = strlower(powerType);
-            let powerToken = possiblePowerTypes[Ovale.playerClass][powerTypeLower];
+            let powerToken = Ovale.playerClass != undefined && possiblePowerTypes[Ovale.playerClass][powerTypeLower];
             if (powerToken) {
                 this.POWER_TYPE[powerId] = powerTypeLower;
                 this.POWER_TYPE[powerToken] = powerTypeLower;

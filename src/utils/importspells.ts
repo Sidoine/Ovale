@@ -953,7 +953,7 @@ function readFile(directory:string, fileName: string, zone: any[][], output: { [
     }
 
     for (let $line of spellDataFile.split("\n")) {
-        $line = $line.replace(/\/\/.*/, '');
+        $line = $line.replace(/\/\/.*/, '').replace('nullptr', '');
         let match: RegExpMatchArray;
         if (match = $line.match(/static struct (\w+)/)) {
             zone = [];
