@@ -110,8 +110,8 @@ local OvaleHealthClass = __class(OvaleHealthClassBase, {
             self:Debug(event, unitId, guid)
             self:UpdateHealth("UNIT_HEALTH_FREQUENT", unitId)
             self:UpdateHealth("UNIT_MAXHEALTH", unitId)
-            self:StopProfiling("Ovale_UnitChanged")
         end
+        self:StopProfiling("Ovale_UnitChanged")
     end,
     UpdateHealth = function(self, event, unitId)
         if  not unitId then
