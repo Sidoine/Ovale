@@ -15,11 +15,13 @@ local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local type = type
 local pairs = pairs
 local OvaleDemonHunterSoulFragmentsBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleDemonHunterSoulFragments", aceEvent))
+local SOUL_CLEAVE_SPELL_ID = 228477
 local SOUL_FRAGMENTS_BUFF_ID = 228477
 local SOUL_FRAGMENTS_SPELL_HEAL_ID = 203794
+local SOUL_FRAGMENTS_NEARBY_ID = 203981
 local SOUL_FRAGMENTS_SPELL_CAST_SUCCESS_ID = 204255
 local SOUL_FRAGMENT_FINISHERS = {
-    [228477] = true,
+    [SOUL_CLEAVE_SPELL_ID] = true,
     [247454] = true,
     [227225] = true
 }
@@ -51,23 +53,44 @@ local OvaleDemonHunterSoulFragmentsClass = __class(OvaleDemonHunterSoulFragments
         self:SetCurrentSoulFragments()
     end,
     COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
-        local _, subtype, _, sourceGUID, _, _, _, _, _, _, _, spellID = CombatLogGetCurrentEventInfo()
-        local me = Ovale.playerGUID
-        if sourceGUID == me then
-            if subtype == "SPELL_HEAL" and spellID == SOUL_FRAGMENTS_SPELL_HEAL_ID then
-                self:SetCurrentSoulFragments(self.last_soul_fragment_count.fragments - 1)
-            end
-            if subtype == "SPELL_CAST_SUCCESS" and spellID == SOUL_FRAGMENTS_SPELL_CAST_SUCCESS_ID then
-                self:SetCurrentSoulFragments(self.last_soul_fragment_count.fragments + 1)
-            end
-            if subtype == "SPELL_CAST_SUCCESS" and SOUL_FRAGMENT_FINISHERS[spellID] then
-                self:SetCurrentSoulFragments(0)
-            end
-            local now = GetTime()
-            if self.last_checked == nil or now - self.last_checked >= 1.5 then
-                self:SetCurrentSoulFragments()
+        local _, _2, _, _4, _, _, _, _8, _, _, _, _12 = CombatLogGetCurrentEventInfo()
+        local me  = UnitGUID("player")
+        
+        --if (_2 ~= nil) then print(_2, _4, _8, _12, me) end
+    
+        if _2 == "UNIT_DIED" and _8 == me then
+           self:SetCurrentSoulFragments(0)
+        end
+    
+        if _2 == "SPELL_CAST_SUCCESS" and _4 == me and _12 == SOUL_FRAGMENTS_SPELL_CAST_SUCCESS_ID then
+            self:SetCurrentSoulFragments(self:SoulFragments() + 1)
+        end
+    
+        if _2 == "SPELL_HEAL" and _4 == me and _12 == SOUL_FRAGMENTS_SPELL_HEAL_ID then
+            buffStacks = GetSpellCount(SOUL_CLEAVE_SPELL_ID) or 0
+        
+            if buffStacks < self.last_soul_fragment_count.fragments then
+                self:SetCurrentSoulFragments(buffStacks)
             end
         end
+    
+        if (_2 == "SPELL_AURA_APPLIED_DOSE" or _2 == "SPELL_AURA_APPLIED") and _4 == me and _12 == SOUL_FRAGMENTS_NEARBY_ID then
+            buffStacks = GetSpellCount(SOUL_CLEAVE_SPELL_ID) or 0
+        
+            if buffStacks > self:SoulFragments() then
+                self:SetCurrentSoulFragments(buffStacks)
+            end
+        end
+    
+        if _2 == "SPELL_AURA_REMOVED_DOSE" and _4 == me and _12 == SOUL_FRAGMENTS_NEARBY_ID then
+            self:SetCurrentSoulFragments(self:SoulFragments() - 1)      
+        end
+    
+        if _2 == "SPELL_AURA_REMOVED" and _4 == me and _12 == SOUL_FRAGMENTS_NEARBY_ID then
+            self:SetCurrentSoulFragments(0)      
+        end  
+    
+        return true
     end,
     SetCurrentSoulFragments = function(self, count)
         local now = GetTime()
@@ -84,6 +107,7 @@ local OvaleDemonHunterSoulFragmentsClass = __class(OvaleDemonHunterSoulFragments
                 timestamp = now,
                 fragments = count
             }
+            --print(now, count)
             self.last_soul_fragment_count = entry
             insert(self.soul_fragments, entry)
         end
@@ -91,6 +115,7 @@ local OvaleDemonHunterSoulFragmentsClass = __class(OvaleDemonHunterSoulFragments
     DebugSoulFragments = function(self)
     end,
     SoulFragments = function(self, atTime)
+        atTime = atTime or GetTime()
         local currentTime = nil
         local count = nil
         for _, v in pairs(self.soul_fragments) do
