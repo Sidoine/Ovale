@@ -115,6 +115,7 @@ class OvaleSpellsClass extends OvaleSpellsBase {
         let isUsable = OvaleSpellBook.IsKnownSpell(spellId);
         let noMana = false;
         let si = OvaleData.spellInfo[spellId];
+        let requirement: string;
         if (si) {
             if (isUsable) {
                 let unusable = OvaleData.GetSpellInfoProperty(spellId, atTime, "unusable", targetGUID);
@@ -124,7 +125,7 @@ class OvaleSpellsClass extends OvaleSpellsBase {
                 }
             }
             if (isUsable) {
-                let [isUsable, requirement] = OvaleData.CheckSpellInfo(spellId, atTime, targetGUID);
+                [isUsable, requirement] = OvaleData.CheckSpellInfo(spellId, atTime, targetGUID);
                 if (!isUsable) {
                     noMana = OvalePower.PRIMARY_POWER[requirement];
                     if (noMana) {

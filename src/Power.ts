@@ -285,10 +285,10 @@ class OvalePowerClass extends OvalePowerBase {
         this.RegisterEvent("UNIT_SPELL_HASTE", "UNIT_RANGEDDAMAGE");
         this.RegisterMessage("Ovale_StanceChanged", "EventHandler");
         this.RegisterMessage("Ovale_TalentsChanged", "EventHandler");
+        this.initializePower();
         for (const [powerType] of pairs(this.POWER_INFO)) {
             RegisterRequirement(powerType, this.RequirePowerHandler);
         }
-        this.initializePower();
     }
 
     initializePower() {

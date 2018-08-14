@@ -106,6 +106,7 @@ local OvaleSpellsClass = __class(OvaleSpellsBase, {
         local isUsable = OvaleSpellBook:IsKnownSpell(spellId)
         local noMana = false
         local si = OvaleData.spellInfo[spellId]
+        local requirement
         if si then
             if isUsable then
                 local unusable = OvaleData:GetSpellInfoProperty(spellId, atTime, "unusable", targetGUID)
@@ -115,7 +116,7 @@ local OvaleSpellsClass = __class(OvaleSpellsBase, {
                 end
             end
             if isUsable then
-                local isUsable, requirement = OvaleData:CheckSpellInfo(spellId, atTime, targetGUID)
+                isUsable, requirement = OvaleData:CheckSpellInfo(spellId, atTime, targetGUID)
                 if  not isUsable then
                     noMana = OvalePower.PRIMARY_POWER[requirement]
                     if noMana then
