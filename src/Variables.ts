@@ -44,10 +44,10 @@ export class Variables implements StateModule {
         }      
     }
 
-    GetState(name) {
+    GetState(name: string) {
         return this.futureVariable[name] || this.variable[name] || 0;
     }
-    GetStateDuration(name) {
+    GetStateDuration(name: string) {
         let lastEnable = this.futureLastEnable[name] || this.lastEnable[name] || baseState.next.currentTime;
         return baseState.next.currentTime - lastEnable;
     }
@@ -70,7 +70,7 @@ export class Variables implements StateModule {
         }
     }
 
-    Log(...__args) {
+    Log(...__args: any[]) {
         OvaleState.Log(...__args);
     }
 }

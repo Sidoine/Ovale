@@ -42,7 +42,7 @@ end
 local OvaleBase = NewAddon("Ovale", aceEvent)
 local OvaleClass = __class(OvaleBase, {
     constructor = function(self)
-        self.playerClass = select(2, UnitClass("player"))
+        self.playerClass = nil
         self.playerGUID = nil
         self.db = nil
         self.refreshNeeded = {}
@@ -58,6 +58,7 @@ local OvaleClass = __class(OvaleBase, {
     end,
     OnInitialize = function(self)
         self.playerGUID = UnitGUID("player")
+        self.playerClass = select(2, UnitClass("player"))
         wipe(self_refreshIntervals)
         self_refreshIndex = 1
         self:ClearOneTimeMessages()

@@ -194,11 +194,8 @@ local PowerModule = __class(nil, {
         self.power = {}
         self.RequirePowerHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
             local verified = false
-            local baseCost = tokens
-            if index then
-                baseCost = tokens[index]
-                index = index + 1
-            end
+            local baseCost = tokens[index]
+            index = index + 1
             if baseCost then
                 if baseCost > 0 then
                     local powerType = requirement
@@ -234,31 +231,24 @@ local PowerModule = __class(nil, {
 })
 local OvalePowerBase = OvaleState:RegisterHasState(OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvalePower", aceEvent))), PowerModule)
 local OvalePowerClass = __class(OvalePowerBase, {
-    constructor = function(self)
-        self.POWER_INFO = {}
-        self.POWER_TYPE = {}
-        self.POOLED_RESOURCE = {
-            ["DRUID"] = "energy",
-            ["HUNTER"] = "focus",
-            ["MONK"] = "energy",
-            ["ROGUE"] = "energy"
-        }
-        self.PRIMARY_POWER = {
-            energy = true,
-            focus = true,
-            mana = true
-        }
-        self.RequirePowerHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
-            return self:GetState(atTime).RequirePowerHandler(spellId, atTime, requirement, tokens, index, targetGUID)
+    OnInitialize = function(self)
+        self:RegisterEvent("PLAYER_ENTERING_WORLD", "EventHandler")
+        self:RegisterEvent("PLAYER_LEVEL_UP", "EventHandler")
+        self:RegisterEvent("UNIT_DISPLAYPOWER")
+        self:RegisterEvent("UNIT_LEVEL")
+        self:RegisterEvent("UNIT_MAXPOWER")
+        self:RegisterEvent("UNIT_POWER_UPDATE")
+        self:RegisterEvent("UNIT_POWER_FREQUENT", "UNIT_POWER_UPDATE")
+        self:RegisterEvent("UNIT_RANGEDDAMAGE")
+        self:RegisterEvent("UNIT_SPELL_HASTE", "UNIT_RANGEDDAMAGE")
+        self:RegisterMessage("Ovale_StanceChanged", "EventHandler")
+        self:RegisterMessage("Ovale_TalentsChanged", "EventHandler")
+        for powerType in pairs(self.POWER_INFO) do
+            RegisterRequirement(powerType, self.RequirePowerHandler)
         end
-        self.CopySpellcastInfo = function(mod, spellcast, dest)
-            for _, powerType in pairs(self_SpellcastInfoPowerTypes) do
-                if spellcast[powerType] then
-                    dest[powerType] = spellcast[powerType]
-                end
-            end
-        end
-        OvalePowerBase.constructor(self)
+        self:initializePower()
+    end,
+    initializePower = function(self)
         local possiblePowerTypes = {
             DEATHKNIGHT = {
                 runicpower = "RUNIC_POWER"
@@ -323,22 +313,6 @@ local OvalePowerClass = __class(OvalePowerBase, {
                     maxCost = (powerTypeLower == "combopoints" and MAX_COMBO_POINTS) or 0
                 }
             end
-        end
-    end,
-    OnInitialize = function(self)
-        self:RegisterEvent("PLAYER_ENTERING_WORLD", "EventHandler")
-        self:RegisterEvent("PLAYER_LEVEL_UP", "EventHandler")
-        self:RegisterEvent("UNIT_DISPLAYPOWER")
-        self:RegisterEvent("UNIT_LEVEL")
-        self:RegisterEvent("UNIT_MAXPOWER")
-        self:RegisterEvent("UNIT_POWER_UPDATE")
-        self:RegisterEvent("UNIT_POWER_FREQUENT", "UNIT_POWER_UPDATE")
-        self:RegisterEvent("UNIT_RANGEDDAMAGE")
-        self:RegisterEvent("UNIT_SPELL_HASTE", "UNIT_RANGEDDAMAGE")
-        self:RegisterMessage("Ovale_StanceChanged", "EventHandler")
-        self:RegisterMessage("Ovale_TalentsChanged", "EventHandler")
-        for powerType in pairs(self.POWER_INFO) do
-            RegisterRequirement(powerType, self.RequirePowerHandler)
         end
     end,
     OnDisable = function(self)
@@ -573,6 +547,32 @@ local OvalePowerClass = __class(OvalePowerBase, {
     PowerCost = function(self, spellId, powerType, atTime, targetGUID, maximumCost)
         return self:GetState(atTime):PowerCost(spellId, powerType, atTime, targetGUID, maximumCost)
     end,
+    constructor = function(self, ...)
+        OvalePowerBase.constructor(self, ...)
+        self.POWER_INFO = {}
+        self.POWER_TYPE = {}
+        self.POOLED_RESOURCE = {
+            ["DRUID"] = "energy",
+            ["HUNTER"] = "focus",
+            ["MONK"] = "energy",
+            ["ROGUE"] = "energy"
+        }
+        self.PRIMARY_POWER = {
+            energy = true,
+            focus = true,
+            mana = true
+        }
+        self.RequirePowerHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
+            return self:GetState(atTime).RequirePowerHandler(spellId, atTime, requirement, tokens, index, targetGUID)
+        end
+        self.CopySpellcastInfo = function(mod, spellcast, dest)
+            for _, powerType in pairs(self_SpellcastInfoPowerTypes) do
+                if spellcast[powerType] then
+                    dest[powerType] = spellcast[powerType]
+                end
+            end
+        end
+    end
 })
 __exports.OvalePower = OvalePowerClass()
 OvaleState:RegisterState(__exports.OvalePower)

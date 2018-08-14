@@ -2,7 +2,7 @@ import { L } from "./Localization";
 import { OvaleDebug } from "./Debug";
 import { OvaleProfiler } from "./Profiler";
 import { Ovale } from "./Ovale";
-import { RegisterRequirement, UnregisterRequirement } from "./Requirement";
+import { RegisterRequirement, UnregisterRequirement, Tokens } from "./Requirement";
 import aceEvent from "@wowts/ace_event-3.0";
 import { pairs, tonumber, type, wipe, LuaObj, LuaArray } from "@wowts/lua";
 import { sub } from "@wowts/string";
@@ -11,6 +11,7 @@ import { GetNumShapeshiftForms, GetShapeshiftForm, GetShapeshiftFormInfo, GetSpe
 import { OvaleState } from "./State";
 import { SpellCast } from "./LastSpell";
 import { OvaleData } from "./Data";
+import { isString } from "./tools";
 
 export let OvaleStance: OvaleStanceClass;
 
@@ -51,7 +52,7 @@ let STANCE_NAME: LuaObj<boolean> = {
                     type: "input",
                     multiline: 25,
                     width: "full",
-                    get: function (info) {
+                    get: function (info: any) {
                         return OvaleStance.DebugStances();
                     }
                 }
@@ -75,8 +76,7 @@ let OvaleStanceBase = OvaleState.RegisterHasState(OvaleDebug.RegisterDebugging(O
 class OvaleStanceClass extends OvaleStanceBase {
     ready = false;
     stanceList: LuaArray<string> = {}
-    stanceId = {
-    }
+    stanceId: LuaObj<number> = {};
     STANCE_NAME = STANCE_NAME;
 
     
@@ -97,14 +97,14 @@ class OvaleStanceClass extends OvaleStanceBase {
         this.UnregisterMessage("Ovale_SpellsChanged");
         this.UnregisterMessage("Ovale_TalentsChanged");
     }
-    PLAYER_TALENT_UPDATE(event) {
+    PLAYER_TALENT_UPDATE(event: string) {
         this.current.stance = undefined;
         this.UpdateStances();
     }
-    UPDATE_SHAPESHIFT_FORM(event) {
+    UPDATE_SHAPESHIFT_FORM(event: string) {
         this.ShapeshiftEventHandler();
     }
-    UPDATE_SHAPESHIFT_FORMS(event) {
+    UPDATE_SHAPESHIFT_FORMS(event: string) {
         this.ShapeshiftEventHandler();
     }
     CreateStanceList() {
@@ -136,7 +136,7 @@ class OvaleStanceClass extends OvaleStanceBase {
         return concat(array, "\n");
     }
 
-    GetStance(stanceId) {
+    GetStance(stanceId?: number) {
         stanceId = stanceId || this.current.stance;
         return this.stanceList[stanceId];
     }
@@ -151,7 +151,7 @@ class OvaleStanceClass extends OvaleStanceBase {
         }
         return false;
     }
-    IsStanceSpell(spellId) {
+    IsStanceSpell(spellId: number) {
         let [name] = GetSpellInfo(spellId);
         return !!(name && SPELL_NAME_TO_STANCE[name]);
     }
@@ -171,16 +171,14 @@ class OvaleStanceClass extends OvaleStanceBase {
         this.ShapeshiftEventHandler();
         this.ready = true;
     }
-    RequireStanceHandler = (spellId, atTime, requirement:string, tokens, index: number, targetGUID):[boolean, string, number] => {
+    RequireStanceHandler = (spellId: number, atTime: number, requirement:string, tokens: Tokens, index: number, targetGUID: string):[boolean, string, number] => {
         let verified = false;
-        let stance = tokens;
-        if (index) {
-            stance = tokens[index];
-            index = index + 1;
-        }
+        let stance = tokens[index];
+        index = index + 1;
+        
         if (stance) {
             let isBang = false;
-            if (sub(stance, 1, 1) == "!") {
+            if (isString(stance) && sub(stance, 1, 1) === "!") {
                 isBang = true;
                 stance = sub(stance, 2);
             }
@@ -211,7 +209,7 @@ class OvaleStanceClass extends OvaleStanceBase {
         this.next.stance = this.current.stance || 0;
         OvaleStance.StopProfiling("OvaleStance_ResetState");
     }
-    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast: SpellCast) {
+    ApplySpellAfterCast(spellId: number, targetGUID: string, startCast: number, endCast: number, isChanneled: boolean, spellcast: SpellCast) {
         OvaleStance.StartProfiling("OvaleStance_ApplySpellAfterCast");
         let stance = OvaleData.GetSpellInfoProperty(spellId, endCast, "to_stance", targetGUID);
         if (stance) {

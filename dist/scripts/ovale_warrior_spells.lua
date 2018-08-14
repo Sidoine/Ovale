@@ -5,13 +5,174 @@ local OvaleScripts = __Scripts.OvaleScripts
 __exports.register = function()
     local name = "ovale_warrior_spells"
     local desc = "[8.0.1] Ovale: Warrior spells"
-    local code = [[
+    local code = [[Define(ancestral_call 274738)
+# Invoke the spirits of your ancestors, granting you their power for 274739d.
+  SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
+  SpellAddBuff(ancestral_call ancestral_call=1)
+Define(avatar 107574)
+# Transform into a colossus for d, causing you to deal s1 increased damage and removing all roots and snares.rnrn|cFFFFFFFFGenerates s5/10 Rage.|r
+  SpellInfo(avatar cd=90 duration=20 talent=avatar_talent rage=-20)
+  # Damage done increased by s1.
+  SpellAddBuff(avatar avatar=1)
+Define(battle_potion_of_strength 279170)
+# Chance to create multiple potions.
+  SpellInfo(battle_potion_of_strength gcd=0 offgcd=1)
+Define(berserking 26297)
+# Increases your haste by s1 for d.
+  SpellInfo(berserking cd=180 duration=10 gcd=0 offgcd=1)
+  # Haste increased by s1.
+  SpellAddBuff(berserking berserking=1)
+Define(bloodthirst 23881)
+# Assault the target in a bloodthirsty craze, dealing s*<mult> Physical damage and restoring 117313s1 of your health.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
+  SpellInfo(bloodthirst cd=4.5 rage=-8)
+Define(charge 126664)
+# @spelldesc100
+  SpellInfo(charge gcd=0 offgcd=1)
+Define(cleave 148233)
+# Your heals have a m1/100.2 chance to Cleave, dealing the same healing to up to 5 other nearby targets. Reduced effectiveness at level 91 and higher.
+  SpellInfo(cleave channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(cleave cleave=1)
+Define(colossus_smash 208086)
+# @spelldesc167105
+  SpellInfo(colossus_smash duration=10 gcd=0 offgcd=1)
+  # Taking w1 additional damage from the Warrior.
+  SpellAddTargetDebuff(colossus_smash colossus_smash=1)
+Define(deadly_calm 262228)
+# Reduces the Rage cost of your abilities by s1 for d.
+  SpellInfo(deadly_calm cd=60 duration=6 talent=deadly_calm_talent gcd=0 offgcd=1)
+  # Your abilities cost s1 less Rage.
+  SpellAddBuff(deadly_calm deadly_calm=1)
+Define(dragon_roar 118000)
+# Roar explosively, dealing m1 Physical damage to all enemies within A1 yds and reducing their movement speed by s3 for d.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
+  SpellInfo(dragon_roar cd=35 duration=6 talent=dragon_roar_talent rage=-10)
+  # Movement slowed by s3.
+  SpellAddTargetDebuff(dragon_roar dragon_roar=1)
+Define(execute 163201)
+# Attempts to finish off a foe, causing up to <damage> Physical damage based on Rage spent. Only usable on enemies that have less than 20 health.?s231830[rnrnIf your foe survives, s2 of the Rage spent is refunded.][]
+  SpellInfo(execute rage=20)
+Define(fireblood 265226)
+# Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by s1.
+  SpellInfo(fireblood duration=8 max_stacks=6 gcd=0 offgcd=1)
+  # Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by w1.
+  SpellAddBuff(fireblood fireblood=1)
+Define(fujiedas_fury_buff 207776)
+# @spelldesc207775
+  SpellInfo(fujiedas_fury_buff duration=10 max_stacks=4 gcd=0 offgcd=1)
+  # All damage done increased by s1.rnAll healing taken increased by s2.
+  SpellAddBuff(fujiedas_fury_buff fujiedas_fury_buff=1)
+Define(furious_slash 100130)
+# Aggressively strike with your off-hand weapon for s1*<mult> Physical damage, and increases your Haste by 202539s3 for 202539d, stacking up to 202539u times.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
+  SpellInfo(furious_slash talent=furious_slash_talent rage=-4)
+  # Haste increased by s2.
+  SpellAddBuff(furious_slash furious_slash_buff=1)
+Define(furious_slash_buff 202539)
+# @spelldesc100130
+  SpellInfo(furious_slash_buff duration=15 max_stacks=3 gcd=0 offgcd=1)
+  # Haste increased by s2.
+  SpellAddBuff(furious_slash_buff furious_slash_buff=1)
+Define(heroic_leap 52174)
+# @spelldesc6544
+  SpellInfo(heroic_leap gcd=0 offgcd=1)
+Define(lights_judgment 255647)
+# Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
+  SpellInfo(lights_judgment cd=150)
+Define(mortal_strike 12294)
+# A vicious strike that deals s1 Physical damage and reduces the effectiveness of healing on the target by 115804s1 for 115804d.
+  SpellInfo(mortal_strike rage=30 cd=6)
+Define(overpower 7384)
+# Overpower the enemy, dealing s1 Physical damage. Cannot be blocked, dodged, or parried.rnrnIncreases the damage of your next Mortal Strike by s2, stacking up to u times.
+  SpellInfo(overpower cd=12 duration=15 max_stacks=2)
+  # Your next Mortal Strike will deal w2 increased damage.
+  SpellAddBuff(overpower overpower=1)
+Define(pummel 13491)
+# Pummel the target for s2 damage and interrupt the spell being cast for d.
+  SpellInfo(pummel rage=10 cd=10 duration=5 channel=5 interrupt=1)
+Define(raging_blow 85288)
+# A mighty blow with both weapons that deals a total of (96103sw1+85384sw1)*<mult> Physical damage.rnrnRaging Blow has a s1 chance to instantly reset its own cooldown.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
+  SpellInfo(raging_blow cd=8 rage=-12)
+Define(rampage 184367)
+# Enrages you and unleashes a series of s1 brutal strikes for a total of <damage> Physical damage.
+  SpellInfo(rampage rage=85)
+Define(ravager 228920)
+# Throws a whirling weapon at the target location that inflicts 7*156287s1 damage to all enemies within 156287A1 yards over d. ?s23922[rnrnAlso increases your Parry chance by 227744s1 for 227744d.][]
+  SpellInfo(ravager cd=60 duration=7 talent=ravager_talent tick=1)
+  # ?s23922[Chance to Parry increased by s1.][Ravager is currently active.]
+  SpellAddBuff(ravager ravager=1)
+Define(recklessness 1719)
+# Go berserk, increasing all Rage generation by s4 and granting your abilities s1 increased critical strike chance for d.?a202751[rnrn|cFFFFFFFFGenerates 202751s2/10 Rage.|r][]
+  SpellInfo(recklessness cd=90 duration=10 rage=0)
+  # Rage generation increased by s5.rnCritical strike chance of all abilities increased by w1.
+  SpellAddBuff(recklessness recklessness=1)
+Define(rend 772)
+# Wounds the target, causing s1 Physical damage instantly and an additional o2 Bleed damage over d.
+  SpellInfo(rend rage=30 duration=12 talent=rend_talent tick=3)
+  # Bleeding for w2 damage every t2 sec.
+  SpellAddTargetDebuff(rend rend=1)
+Define(siegebreaker 280773)
+# @spelldesc280772
+  SpellInfo(siegebreaker duration=10 gcd=0 offgcd=1)
+  # Taking w1 increased damage from the Warrior.
+  SpellAddTargetDebuff(siegebreaker siegebreaker=1)
+Define(skullsplitter 260643)
+# Bash an enemy's skull, dealing s1 Physical damage.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
+  SpellInfo(skullsplitter cd=21 talent=skullsplitter_talent rage=-20)
+Define(slam 1464)
+# Slams an opponent, causing s1 Physical damage.
+  SpellInfo(slam rage=20)
+Define(sweeping_strikes 260708)
+# For d your single-target damaging abilities hit s1 additional Ltarget:targets; within 8 yds for s2 damage.
+  SpellInfo(sweeping_strikes cd=30 duration=12)
+  # Your single-target damaging abilities hit s1 additional Ltarget:targets; within 8 yds for s2 damage.
+  SpellAddBuff(sweeping_strikes sweeping_strikes=1)
+Define(warbreaker 262161)
+# Smash the ground and shatter the armor of all enemies within A1 yds, dealing s1 Physical damage and increasing damage you deal to them by 208086s1 for 208086d.
+  SpellInfo(warbreaker cd=45 talent=warbreaker_talent)
+Define(whirlwind_buff 199850)
+# @spelldesc1680
+  SpellInfo(whirlwind_buff gcd=0 offgcd=1)
+Define(whirlwind 190411)
+# Unleashes a whirlwind of steel, striking all enemies within 199658A1 yards for 3*(199667sw2+44949sw2) Physical damage.?a12950[rnrnCauses your next s7 single-target lattack:attacks; to strike up to 85739s1 additional targets for 85739s3 damage.][]rnrn|cFFFFFFFFGenerates m8 Rage, plus an additional m9 per target hit. Maximum m10 Rage.|r
+  SpellInfo(whirlwind)
+Define(cleave_talent 15)
+# Strikes all enemies in front of you with a sweeping attack for s1 Physical damage. Hitting s2 or more targets inflicts Deep Wounds.
+Define(deadly_calm_talent 18)
+# Reduces the Rage cost of your abilities by s1 for d.
+Define(dreadnaught_talent 20)
+# Overpower has 1+s1 charges, and it increases the damage of your next Mortal Strike by an additional s2.
+Define(fervor_of_battle_talent 8)
+# Whirlwind deals s1 increased damage, and Slams your primary target.
+Define(warbreaker_talent 14)
+# Smash the ground and shatter the armor of all enemies within A1 yds, dealing s1 Physical damage and increasing damage you deal to them by 208086s1 for 208086d.
+Define(carnage_talent 13)
+# Rampage costs s1/-10 less Rage and deals s4 increased damage.
+Define(frothing_berserker_talent 15)
+# Rampage now costs s1/10 Rage and increases your damage done by 215572s1 and Haste by 215572s2 for 215572d.
+Define(furious_slash_talent 9)
+# Aggressively strike with your off-hand weapon for s1*<mult> Physical damage, and increases your Haste by 202539s3 for 202539d, stacking up to 202539u times.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
+Define(massacre_talent 14)
+# Execute is now usable on targets below s2 health.
+Define(siegebreaker_talent 21)
+# Break the enemy's defenses, dealing s1 Physical damage, and increasing your damage done to the target by 280773s1 for 280773d.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
+Define(avatar_talent 17)
+# Transform into a colossus for d, causing you to deal s1 increased damage and removing all roots and snares.rnrn|cFFFFFFFFGenerates s5/10 Rage.|r
+Define(dragon_roar_talent 9)
+# Roar explosively, dealing m1 Physical damage to all enemies within A1 yds and reducing their movement speed by s3 for d.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
+Define(ravager_talent 21)
+# Throws a whirling weapon at the target location that inflicts 7*156287s1 damage to all enemies within 156287A1 yards over d. ?s23922[rnrnAlso increases your Parry chance by 227744s1 for 227744d.][]
+Define(rend_talent 9)
+# Wounds the target, causing s1 Physical damage instantly and an additional o2 Bleed damage over d.
+Define(skullsplitter_talent 3)
+# Bash an enemy's skull, dealing s1 Physical damage.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
+Define(archavons_heavy_hand_item 137060)
+Define(weight_of_the_earth_item 137077)
+    ]]
+    code = code .. [[
 ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!shield_wall,buff,!shield_wall_buff)	
 	
 # Warrior spells and functions.
 
 # Learned spells.
-Define(avatar 107574)
+
 	SpellInfo(avatar rage=-20 cd=90)
 	SpellAddBuff(avatar avatar_buff=1)
 Define(avatar_buff 107574)
@@ -29,7 +190,7 @@ Define(bladestorm_arms 227847)
 	SpellInfo(bladestorm_arms cd=90 channel=6 haste=melee replace=ravager)
 Define(bladestorm_fury 46924)
 	SpellInfo(bladestorm_fury cd=60 channel=4 haste=melee)
-Define(bloodthirst 23881)
+
 	SpellInfo(bloodthirst cd=4.5 rage=-8 cd_haste=melee)
 	SpellAddBuff(bloodthirst whirlwind_buff=-1)
 Define(charge 100) 
@@ -47,7 +208,7 @@ Define(colossus_smash 167105)
 	SpellAddBuff(colossus_smash in_for_the_kill_buff=1 talent=in_for_the_kill_talent)
 Define(colossus_smash_debuff 208086)
 	SpellInfo(colossus_smash_debuff duration=10)
-Define(deadly_calm 262228)
+
 	SpellInfo(deadly_calm cd=60)
     SpellAddBuff(deadly_calm deadly_calm_buff=1)
 Define(deadly_calm_buff 262228)
@@ -74,7 +235,7 @@ Define(die_by_the_sword 118038)
 	SpellAddBuff(die_by_the_sword die_by_the_sword_buff=1)
 Define(die_by_the_sword_buff 118038)
 	SpellInfo(die_by_the_sword_buff duration=8)
-Define(dragon_roar 118000)
+
 	SpellInfo(dragon_roar cd=35 rage=-10)
 	SpellAddBuff(dragon_roar dragon_roar_buff=1)
 Define(dragon_roar_buff 118000)
@@ -103,7 +264,7 @@ Define(frothing_berserker_buff 215572)
 	SpellInfo(frothing_berserker_buff duration=6)
 Define(frenzy_buff 202539)
 	SpellInfo(frenzy_buff duration=15 max_stacks=3)
-Define(furious_slash 100130)
+
 	SpellAddBuff(furious_slash frenzy_buff=1)
 Define(hamstring 1715)
 	SpellInfo(hamstring cd=1 rage=10)
@@ -145,14 +306,14 @@ Define(last_stand 12975)
 	SpellAddBuff(last_stand last_stand_buff=1)
 Define(last_stand_buff 12975)
 	SpellInfo(last_stand_buff duration=15)
-Define(mortal_strike 12294)
+
 	SpellInfo(mortal_strike cd=6 cd_haste=melee rage=30)
 	SpellRequire(mortal_strike rage_percent 0=buff,deadly_calm_buff talent=deadly_calm_talent specialization=arms)
 	SpellAddTargetDebuff(mortal_strike mortal_wounds_debuff=1)
 	SpellAddBuff(mortal_strike overpower_buff=0)
 Define(mortal_wounds_debuff 115804)
 	SpellInfo(mortal_wounds_debuff duration=10)
-Define(overpower 7384)
+
 	SpellInfo(overpower cd=12)
 	SpellInfo(overpower charges=2 talent=dreadnaught_talent)
 	SpellAddBuff(overpower overpower_buff=1)
@@ -167,7 +328,7 @@ Define(pummel 6552)
 	SpellInfo(pummel cd=15 gcd=0 interrupt=1 offgcd=1)
 Define(punish_debuff 275335)
 	SpellInfo(punish_debuff duration=9)
-Define(raging_blow 85288)
+
 	SpellInfo(raging_blow rage=-12 cd=7 charges=2 cd_haste=melee)
 	SpellInfo(raging_blow add_cd=-1 talent=inner_rage_talent)
 Define(rallying_cry 97462)
@@ -175,7 +336,7 @@ Define(rallying_cry 97462)
 	SpellAddBuff(rallying_cry rallying_cry_buff=1)
 Define(rallying_cry_buff 97462)
 	SpellInfo(rallying_cry_buff duration=10)
-Define(rampage 184367)
+
 	SpellInfo(rampage gcd=1.5 cd_haste=none rage=85)
 	SpellInfo(rampage add_rage=-15 talent=carnage_talent)
 	SpellInfo(rampage add_rage=15 talent=frothing_berserker_talent)
@@ -191,13 +352,13 @@ Define(ravager_prot 228920)
 	SpellAddBuff(ravager_prot ravager_prot_buff=1)
 Define(ravager_prot_buff 227744)
 	SpellInfo(ravager_prot_buff duration=12)
-Define(recklessness 1719)
+
 	SpellInfo(recklessness cd=90 tag=cd)
 	SpellAddBuff(recklessness recklessness_buff=1)
 Define(recklessness_buff 1719)
 	SpellInfo(recklessness_buff duration=10)
 	SpellInfo(recklessness_buff add_rage=-100 add_duration=4 talent=reckless_abandon_talent)
-Define(rend 772)
+
 	SpellInfo(rend rage=30)
 	SpellRequire(rend rage_percent 0=buff,deadly_calm_buff talent=deadly_calm_talent specialization=arms)
 Define(rend_debuff 772)
@@ -233,10 +394,10 @@ Define(siegebreaker 280772)
 	SpellAddTargetDebuff(siegebreaker siegebreaker_debuff=1)
 Define(siegebreaker_debuff 280773)
 	SpellInfo(siegebreaker_debuff duration=10)
-Define(skullsplitter 260643)
+
 	SpellInfo(skullsplitter cd=21 rage=-20 cd_haste=melee)
-Define(slam 1464)
-	SpellInfo(slam rage=20)
+
+	
 	SpellRequire(slam rage_percent 0=buff,deadly_calm_buff talent=deadly_calm_talent specialization=arms)
 Define(spell_reflection 23920)
 	SpellInfo(spell_reflection cd=25)
@@ -248,7 +409,7 @@ Define(sudden_death_arms_buff 52437)
 	SpellInfo(sudden_death_arms_buff duration=10)
 Define(sudden_death_fury_buff 280776)
 	SpellInfo(sudden_death_fury_buff duration=10)
-Define(sweeping_strikes 260708)
+
 	SpellInfo(sweeping_strikes cd=25)
 	SpellAddBuff(sweeping_strikes sweeping_strikes_buff=1)
 Define(sweeping_strikes_buff 260708)
@@ -267,11 +428,11 @@ Define(victorious_buff 32216)
 Define(victory_rush 34428)
 	SpellRequire(victory_rush unusable 1=buff,!victorious_buff)
 	SpellAddBuff(victory_rush victorious_buff=0)
-Define(warbreaker 262161)
+
 	SpellInfo(warbreaker cd=45 tag=main)
 	SpellAddTargetDebuff(warbreaker colossus_smash_debuff=1)
 	SpellAddBuff(warbreaker in_for_the_kill_buff=1 talent=in_for_the_kill_talent)
-Define(whirlwind 190411)
+
 	SpellAddBuff(whirlwind whirlwind_buff=2)
 Define(whirlwind_arms 1680)
 	SpellInfo(whirlwind_arms rage=30)
@@ -279,44 +440,44 @@ Define(whirlwind_buff 85739)
 	SpellInfo(whirlwind_buff duration=20)
 
 # Legion legendary items
-Define(archavons_heavy_hand_item 137060)
+
 Define(archavons_heavy_hand_spell 205144)
 	# TODO Mortal strike refunds 15 rage
 Define(kazzalax_fujiedas_fury_item 137053)
 	SpellAddBuff(bloodthirst fujiedas_fury_buff=1 if_spell=fujiedas_fury_buff)
-Define(fujiedas_fury_buff 207776)
+
 Define(ayalas_stone_heart_item 137052)
 Define(stone_heart_buff 225947)
 	SpellAddBuff(execute_arms stone_heart_buff=0)
 	SpellAddBuff(execute stone_heart_buff=0)
 Define(the_great_storms_eye_item 151823)
-Define(weight_of_the_earth_item 137077)
+
 
 # Talents
 Define(anger_management_talent 19)
 Define(arms_massacre_talent 7)
-Define(avatar_talent 17)
+
 Define(best_served_cold_talent 7)
 Define(bladestorm_talent 18)
 Define(bolster_talent 12)
 Define(booming_voice_talent 16)
 Define(bounding_stride_talent 11)
-Define(carnage_talent 13)
-Define(cleave_talent 15)
+
+
 Define(collateral_damage_talent 13)
 Define(crackling_thunder_talent 4)
-Define(deadly_calm_talent 18)
+
 Define(defensive_stance_talent 12)
 Define(devastator_talent 18)
 Define(double_time_talent 4)
 Define(dragon_roar_talent 17)
-Define(dreadnaught_talent 20)
+
 Define(endless_rage_talent 2)
-Define(fervor_of_battle_talent 8)
+
 Define(fresh_meat_talent 3)
-Define(frothing_berserker_talent 15)
+
 Define(furious_charge_talent 10)
-Define(furious_slash_talent 9)
+
 Define(fury_anger_management_talent 20)
 Define(fury_sudden_death_talent 8)
 Define(heavy_repercussions_talent 20)
@@ -326,7 +487,7 @@ Define(in_for_the_kill_talent 16)
 Define(indomitable_talent 10)
 Define(inner_rage_talent 7)
 Define(into_the_fray_talent 1)
-Define(massacre_talent 14)
+
 Define(meat_cleaver_talent 16)
 Define(menace_talent 13)
 Define(never_surrender_talent 11)
@@ -334,20 +495,20 @@ Define(prot_bounding_stride_talent 5)
 Define(prot_dragon_roar_talent 9)
 Define(prot_storm_bolt_talent 15)
 Define(punish_talent 2)
-Define(ravager_talent 21)
+
 Define(reckless_abandon_talent 19)
-Define(rend_talent 9)
+
 Define(rumbling_earth_talent 14)
 Define(safeguard_talent 6)
 Define(second_wind_talent 10)
-Define(siegebreaker_talent 21)
-Define(skullsplitter_talent 3)
+
+
 Define(storm_bolt_talent 6)
 Define(sudden_death_talent 2)
 Define(unstoppable_force_talent 8)
 Define(vengeance_talent 17)
 Define(war_machine_talent 1)
-Define(warbreaker_talent 14)
+
 Define(warpaint_talent 12)
 
 # Non-default tags for OvaleSimulationCraft.

@@ -69,7 +69,7 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
     GetDescriptions = function(self, scriptType)
         local descriptionsTable = {}
         for name, script in pairs(self.script) do
-            if ( not scriptType or script.type == scriptType) and ( not script.specialization or OvalePaperDoll:IsSpecialization(script.specialization)) then
+            if ( not scriptType or script.type == scriptType) and ( not script.className or script.className == Ovale.playerClass) and ( not script.specialization or OvalePaperDoll:IsSpecialization(script.specialization)) then
                 if name == DEFAULT_NAME then
                     descriptionsTable[name] = script.desc .. " (" .. self:GetScriptName(name) .. ")"
                 else
@@ -80,14 +80,13 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
         return descriptionsTable
     end,
     RegisterScript = function(self, className, specialization, name, description, code, scriptType)
-        if  not className or className == Ovale.playerClass then
-            self.script[name] = self.script[name] or {}
-            local script = self.script[name]
-            script.type = scriptType or "script"
-            script.desc = description or name
-            script.specialization = specialization
-            script.code = code or ""
-        end
+        self.script[name] = self.script[name] or {}
+        local script = self.script[name]
+        script.type = scriptType or "script"
+        script.desc = description or name
+        script.specialization = specialization
+        script.code = code or ""
+        script.className = className
     end,
     UnregisterScript = function(self, name)
         self.script[name] = nil
@@ -105,15 +104,15 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
             if specialization == "blood" then
                 name = "icyveins_deathknight_blood"
             elseif specialization == "frost" then
-                name = "sc_death_knight_frost_t19"
+                name = "sc_pr_death_knight_frost"
             elseif specialization == "unholy" then
-                name = "sc_death_knight_unholy_t19"
+                name = "sc_pr_death_knight_unholy"
             end
         elseif className == "DEMONHUNTER" then
             if specialization == "vengeance" then
                 name = "icyveins_demonhunter_vengeance"
             elseif specialization == "havoc" then
-                name = "sc_demon_hunter_havoc_t19"
+                name = "sc_pr_demon_hunter_havoc"
             end
         elseif className == "DRUID" then
             if specialization == "restoration" then
@@ -151,7 +150,7 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
             end
         end
         if  not name and specialization then
-            name = format("sc_%s_%s_t19", lower(className), specialization)
+            name = format("sc_pr_%s_%s", lower(className), specialization)
         end
         if  not (name and self.script[name]) then
             name = DISABLED_NAME

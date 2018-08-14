@@ -1420,9 +1420,6 @@ local function Rage(positionalParams, namedParams, state, atTime)
 local function RunicPower(positionalParams, namedParams, state, atTime)
         return Power("runicpower", positionalParams, namedParams, state, atTime)
     end
-local function ShadowOrbs(positionalParams, namedParams, state, atTime)
-        return Power("shadoworbs", positionalParams, namedParams, state, atTime)
-    end
 local function SoulShards(positionalParams, namedParams, state, atTime)
         return Power("soulshards", positionalParams, namedParams, state, atTime)
     end
@@ -1444,10 +1441,9 @@ local function ArcaneCharges(positionalParams, namedParams, state, atTime)
     OvaleCondition:RegisterCondition("pain", false, Pain)
     OvaleCondition:RegisterCondition("rage", false, Rage)
     OvaleCondition:RegisterCondition("runicpower", false, RunicPower)
-    OvaleCondition:RegisterCondition("shadoworbs", false, ShadowOrbs)
     OvaleCondition:RegisterCondition("soulshards", false, SoulShards)
 local function AlternatePowerDeficit(positionalParams, namedParams, state, atTime)
-        return PowerDeficit("alternatepower", positionalParams, namedParams, state, atTime)
+        return PowerDeficit("alternate", positionalParams, namedParams, state, atTime)
     end
 local function AstralPowerDeficit(positionalParams, namedParams, state, atTime)
         return PowerDeficit("lunarpower", positionalParams, namedParams, state, atTime)
@@ -1482,9 +1478,6 @@ local function RageDeficit(positionalParams, namedParams, state, atTime)
 local function RunicPowerDeficit(positionalParams, namedParams, state, atTime)
         return PowerDeficit("runicpower", positionalParams, namedParams, state, atTime)
     end
-local function ShadowOrbsDeficit(positionalParams, namedParams, state, atTime)
-        return PowerDeficit("shadoworbs", positionalParams, namedParams, state, atTime)
-    end
 local function SoulShardsDeficit(positionalParams, namedParams, state, atTime)
         return PowerDeficit("soulshards", positionalParams, namedParams, state, atTime)
     end
@@ -1500,7 +1493,6 @@ local function SoulShardsDeficit(positionalParams, namedParams, state, atTime)
     OvaleCondition:RegisterCondition("paindeficit", false, PainDeficit)
     OvaleCondition:RegisterCondition("ragedeficit", false, RageDeficit)
     OvaleCondition:RegisterCondition("runicpowerdeficit", false, RunicPowerDeficit)
-    OvaleCondition:RegisterCondition("shadoworbsdeficit", false, ShadowOrbsDeficit)
     OvaleCondition:RegisterCondition("soulshardsdeficit", false, SoulShardsDeficit)
 local function ManaPercent(positionalParams, namedParams, state, atTime)
         return PowerPercent("mana", positionalParams, namedParams, state, atTime)
@@ -1700,6 +1692,17 @@ local function Rune(positionalParams, namedParams, state, atTime)
         end
         return Compare(count, comparator, limit)
     end
+local function RuneDeficit(positionalParams, namedParams, state, atTime)
+        local comparator, limit = positionalParams[1], positionalParams[2]
+        local count, startCooldown, endCooldown = OvaleRunes:RuneDeficit(atTime)
+        if startCooldown < INFINITY then
+            local origin = startCooldown
+            local rate = -1 / (endCooldown - startCooldown)
+            local start, ending = startCooldown, INFINITY
+            return TestValue(start, ending, count, origin, rate, comparator, limit)
+        end
+        return Compare(count, comparator, limit)
+    end
 local function RuneCount(positionalParams, namedParams, state, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
         local count, startCooldown, endCooldown = OvaleRunes:RuneCount(atTime)
@@ -1720,6 +1723,7 @@ local function TimeToRunes(positionalParams, namedParams, state, atTime)
     OvaleCondition:RegisterCondition("rune", false, Rune)
     OvaleCondition:RegisterCondition("runecount", false, RuneCount)
     OvaleCondition:RegisterCondition("timetorunes", false, TimeToRunes)
+    OvaleCondition:RegisterCondition("runedeficit", false, RuneDeficit)
 end
 do
 local function Snapshot(statName, defaultValue, positionalParams, namedParams, state, atTime)
@@ -2438,7 +2442,7 @@ end
 do
 local function TimeToShard(positionalParams, namedParams, state, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
-        local value = OvaleWarlock:TimeToShard()
+        local value = OvaleWarlock:TimeToShard(atTime)
         return Compare(value, comparator, limit)
     end
     OvaleCondition:RegisterCondition("timetoshard", false, TimeToShard)

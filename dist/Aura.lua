@@ -348,11 +348,8 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         end
         self.RequireStealthHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
             local verified = false
-            local stealthed = tokens
-            if index then
-                stealthed = tokens[index]
-                index = index + 1
-            end
+            local stealthed = tokens[index]
+            index = index + 1
             if stealthed then
                 stealthed = tonumber(stealthed)
                 local aura = self:GetAura("player", "stealthed_buff", atTime, "HELPFUL", true)
@@ -888,11 +885,6 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         end
         return auraFound
     end,
-    CanApplySpellAura = function(self, spellData)
-        if spellData["if_target_debuff"] then
-        elseif spellData["if_buff"] then
-        end
-    end,
     GetAuraByGUID = function(self, guid, auraId, filter, mine, atTime)
         local auraFound
         if OvaleData.buffSpellList[auraId] then
@@ -1114,7 +1106,8 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
     ApplySpellAuras = function(self, spellId, guid, atTime, auraList, spellcast)
         __exports.OvaleAura:StartProfiling("OvaleAura_state_ApplySpellAuras")
         for filter, filterInfo in pairs(auraList) do
-            for auraId, spellData in pairs(filterInfo) do
+            for auraIdKey, spellData in pairs(filterInfo) do
+                local auraId = tonumber(auraIdKey)
                 local duration = self:GetBaseDuration(auraId, spellcast)
                 local stacks = 1
                 local count = nil

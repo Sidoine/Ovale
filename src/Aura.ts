@@ -707,7 +707,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
             if (strsub(requirement, 1, 7) == "target_") {
                 if (targetGUID) {
                     guid = targetGUID;
-                    unitId = OvaleGUID.GUIDUnit(guid);
+                    [unitId] = OvaleGUID.GUIDUnit(guid);
                 } else {
                     unitId = baseState.next.defaultTarget || "target";
                 }
@@ -740,13 +740,11 @@ export class OvaleAuraClass extends OvaleAuraBase {
         return [verified, requirement, index];
     }
 
-    RequireStealthHandler = (spellId: number, atTime: number, requirement: string, tokens, index, targetGUID): [boolean, string, number] => {
+    RequireStealthHandler = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string): [boolean, string, number] => {
         let verified = false;
-        let stealthed = tokens;
-        if (index) {
-            stealthed = tokens[index];
-            index = index + 1;
-        }
+        let stealthed = tokens[index];
+        index = index + 1;
+        
         if (stealthed) {
             stealthed = tonumber(stealthed);
             let aura = this.GetAura("player", "stealthed_buff", atTime, "HELPFUL", true);
@@ -923,13 +921,6 @@ export class OvaleAuraClass extends OvaleAuraBase {
         }
         return auraFound;
     }
-
-    CanApplySpellAura(spellData) {
-        if (spellData["if_target_debuff"]) {
-        } else if (spellData["if_buff"]) {
-        }
-    }
-
 
     GetAuraByGUID(guid: string, auraId: AuraId, filter: string, mine: boolean, atTime: number | undefined) {
         let auraFound: Aura;
@@ -1159,10 +1150,11 @@ export class OvaleAuraClass extends OvaleAuraBase {
     private ApplySpellAuras(spellId: number, guid: string, atTime: number, auraList: LuaObj<LuaObj<any>>, spellcast: SpellCast) {
         OvaleAura.StartProfiling("OvaleAura_state_ApplySpellAuras");
         for (const [filter, filterInfo] of pairs(auraList)) {
-            for (const [auraId, spellData] of pairs(filterInfo)) {
+            for (const [auraIdKey, spellData] of pairs(filterInfo)) {
+                const auraId = tonumber(auraIdKey);
                 let duration = this.GetBaseDuration(auraId, spellcast);
                 let stacks = 1;
-                let count = undefined;
+                let count: number = undefined;
                 let extend = 0;
                 let toggle = undefined;
                 let refresh = false;
@@ -1176,9 +1168,9 @@ export class OvaleAuraClass extends OvaleAuraBase {
                 } else if (value == "toggle") {
                     toggle = true;
                 } else if (value == "count") {
-                    count = data;
+                    count = <number>data;
                 } else if (value == "extend") {
-                    extend = data;
+                    extend = <number>data;
                 } else if (tonumber(value)) {
                     stacks = tonumber(value);
                 } else {
@@ -1339,7 +1331,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
     }
 
 
-    GetBaseDuration(auraId, spellcast?: SpellCast) {
+    GetBaseDuration(auraId: number, spellcast?: SpellCast) {
         spellcast = spellcast || OvalePaperDoll.current;
         let combopoints = spellcast.combopoints || 0;
         let duration = INFINITY
@@ -1360,7 +1352,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
         */
         return duration;
     }
-    GetTickLength(auraId, snapshot?: PaperDollSnapshot) {
+    GetTickLength(auraId: number, snapshot?: PaperDollSnapshot) {
         let tick = 3;
         let si = OvaleData.spellInfo[auraId];
         if (si) {

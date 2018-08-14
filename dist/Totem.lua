@@ -22,6 +22,8 @@ local WATER_TOTEM_SLOT = WATER_TOTEM_SLOT
 local huge = math.huge
 local __Aura = LibStub:GetLibrary("ovale/Aura")
 local OvaleAura = __Aura.OvaleAura
+local __tools = LibStub:GetLibrary("ovale/tools")
+local isString = __tools.isString
 local INFINITY = huge
 local self_serial = 0
 local TOTEM_CLASS = {
@@ -105,7 +107,9 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
     end,
     GetTotem = function(self, slot)
         __exports.OvaleTotem:StartProfiling("OvaleTotem_state_GetTotem")
-        slot = TOTEM_SLOT[slot] or slot
+        if isString(slot) then
+            slot = TOTEM_SLOT[slot]
+        end
         local totem = self.next.totem[slot]
         if totem and ( not totem.serial or totem.serial < self_serial) then
             local haveTotem, name, startTime, duration, icon = GetTotemInfo(slot)
@@ -127,7 +131,9 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
     end,
     GetTotemInfo = function(self, slot)
         local haveTotem, name, startTime, duration, icon
-        slot = TOTEM_SLOT[slot] or slot
+        if isString(slot) then
+            slot = TOTEM_SLOT[slot]
+        end
         local totem = self:GetTotem(slot)
         if totem then
             haveTotem = self:IsActiveTotem(totem)
@@ -210,7 +216,9 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
     end,
     SummonTotem = function(self, spellId, slot, atTime)
         __exports.OvaleTotem:StartProfiling("OvaleTotem_state_SummonTotem")
-        slot = TOTEM_SLOT[slot] or slot
+        if isString(slot) then
+            slot = TOTEM_SLOT[slot]
+        end
         local name, _, icon = OvaleSpellBook:GetSpellInfo(spellId)
         local duration = OvaleData:GetSpellInfoProperty(spellId, atTime, "duration", nil)
         local totem = self.next.totem[slot]
@@ -222,7 +230,9 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
     end,
     DestroyTotem = function(self, slot, atTime)
         __exports.OvaleTotem:StartProfiling("OvaleTotem_state_DestroyTotem")
-        slot = TOTEM_SLOT[slot] or slot
+        if isString(slot) then
+            slot = TOTEM_SLOT[slot]
+        end
         local totem = self.next.totem[slot]
         local duration = atTime - totem.start
         if duration < 0 then

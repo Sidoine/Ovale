@@ -466,7 +466,7 @@ class OvaleDataClass extends OvaleDataBase {
         return [verified, value, data];
     }
 
-    CheckSpellInfo(spellId: number, atTime: number, targetGUID: string) {
+    CheckSpellInfo(spellId: number, atTime: number, targetGUID: string): [boolean, string] {
         targetGUID = targetGUID || OvaleGUID.UnitGUID(baseState.next.defaultTarget || "target");
         let verified = true;
         let requirement;
