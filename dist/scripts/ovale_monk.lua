@@ -98,6 +98,8 @@ AddFunction BrewmasterDefaultShortCDActions
 AddFunction BrewmasterDefaultMainActions
 {
     BrewmasterHealMeMain()
+    if (not InCombat()) Spell(keg_smash)
+
 	if Talent(blackout_combo_talent) BrewmasterBlackoutComboMainActions()
 	unless Talent(blackout_combo_talent) 
 	{
@@ -135,6 +137,8 @@ AddFunction BrewmasterBlackoutComboMainActions
 AddFunction BrewmasterDefaultAoEActions
 {
     BrewmasterHealMeMain()
+    if (not InCombat()) Spell(keg_smash)
+ 
     if (Talent(blackout_combo_talent) and not BuffPresent(blackout_combo_buff)) Spell(blackout_strike)
 	if (not Talent(blackout_combo_talent) or (BuffPresent(blackout_combo_buff) and SpellCharges(ironskin_brew) <= SpellData(ironskin_brew charges)-2) or SpellFullRecharge(keg_smash) == 0) Spell(keg_smash)
 	Spell(chi_burst)
