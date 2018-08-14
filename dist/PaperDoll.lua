@@ -156,6 +156,7 @@ __exports.PaperDollData = __class(nil, {
 local OvalePaperDollBase = OvaleState:RegisterHasState(OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvalePaperDoll", aceEvent))), __exports.PaperDollData)
 local OvalePaperDollClass = __class(OvalePaperDollBase, {
     OnInitialize = function(self)
+        self.class = Ovale.playerClass
         self:RegisterEvent("UNIT_STATS")
         self:RegisterEvent("COMBAT_RATING_UPDATE")
         self:RegisterEvent("MASTERY_UPDATE")
@@ -395,7 +396,6 @@ local OvalePaperDollClass = __class(OvalePaperDollBase, {
     end,
     constructor = function(self, ...)
         OvalePaperDollBase.constructor(self, ...)
-        self.class = Ovale.playerClass
         self.level = UnitLevel("player")
         self.specialization = nil
         self.STAT_NAME = {

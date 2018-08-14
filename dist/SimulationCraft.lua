@@ -425,7 +425,7 @@ end
 
 local MATCHES = {
     [1] = {
-        [1] = "^%d+%a[%w_]*[.:]?[%w_.]*",
+        [1] = "^%d+%a[%w_]*([.:]?[%w_.]*)*",
         [2] = TokenizeName
     },
     [2] = {
@@ -433,7 +433,7 @@ local MATCHES = {
         [2] = TokenizeNumber
     },
     [3] = {
-        [1] = "^[%a_][%w_]*[.:]?[%w_.]*",
+        [1] = "^[%a_][%w_]*([.:]?[%w_.]*)*",
         [2] = TokenizeName
     },
     [4] = {
@@ -1099,9 +1099,13 @@ local function Disambiguate(annotation, name, className, specialization, _type)
     local disname, distype = GetPerClassSpecialization(EMIT_DISAMBIGUATION, name, className, specialization)
     if  not disname then
         if  not annotation.dictionary[name] then
-            local otherName = name:match("_buff$") and gsub(name, "_buff$", "") or gsub(name, "_debuff$", "")
+            local otherName = match(name, "_buff$") and gsub(name, "_buff$", "") or gsub(name, "_debuff$", "")
             if annotation.dictionary[otherName] then
                 return otherName, _type
+            end
+            local potionName = gsub(name, "potion_of_", "")
+            if annotation.dictionary[potionName] then
+                return potionName, _type
             end
         end
         return name, _type
@@ -2181,8 +2185,8 @@ EmitAction = function(parseNode, nodeList, annotation)
             isSpellAction = false
         elseif action == "potion" then
             local name = (modifier.name and Unparse(modifier.name)) or annotation.consumables["potion"]
-            name = Disambiguate(annotation, name, className, specialization, "item")
             if name then
+                name = Disambiguate(annotation, name, className, specialization, "item")
                 bodyCode = format("Item(%s usable=1)", name)
                 conditionCode = "CheckBoxOn(opt_use_consumables) and target.Classification(worldboss)"
                 annotation.opt_use_consumables = className
@@ -2648,6 +2652,9 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
         name = action
         property = operand
     end
+    if  not name then
+        return false, nil
+    end
     local className, specialization = annotation.class, annotation.specialization
     name = Disambiguate(annotation, name, className, specialization)
     target = target and (target .. ".") or ""
@@ -2939,6 +2946,7 @@ do
         ["crit_pct_current"] = "SpellCritChance()",
         ["current_insanity_drain"] = "CurrentInsanityDrain()",
         ["darkglare_no_de"] = "NotDeDemons(darkglare)",
+        ["death_and_decay.ticking"] = "BuffPresent(death_and_decay)",
         ["death_sweep_worth_using"] = "0",
         ["delay"] = "0",
         ["demonic_fury"] = "DemonicFury()",

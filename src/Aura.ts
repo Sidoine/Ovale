@@ -18,7 +18,6 @@ import { huge as INFINITY, huge } from "@wowts/math";
 import { OvalePaperDoll } from "./PaperDoll";
 import { baseState } from "./BaseState";
 import { isLuaArray } from "./tools";
-import { SpellData } from "./utils/importspells";
 
 export let OvaleAura: OvaleAuraClass;
 let strlower = lower;
@@ -921,13 +920,6 @@ export class OvaleAuraClass extends OvaleAuraBase {
             }
         }
         return auraFound;
-    }
-
-    CanApplySpellAura(spellData: SpellData) {
-        // TODO
-        // if (spellData["if_target_debuff"]) {
-        // } else if (spellData["if_buff"]) {
-        // }
     }
 
     GetAuraByGUID(guid: string, auraId: AuraId, filter: string, mine: boolean, atTime: number | undefined) {

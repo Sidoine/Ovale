@@ -43,12 +43,16 @@ let DISABLED_DESCRIPTION = L["Disabled"];
 }
 
 interface Script {
-
+    type?: string;
+    desc?: string;
+    className?: string;
+    specialization?: string;
+    code?: string;
 }
 
 class OvaleScriptsClass  extends OvaleScriptsBase {
 
-    script:Script = {}
+    script:LuaObj<Script> = {}
 
     constructor() {
         super();
@@ -69,7 +73,9 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
     GetDescriptions(scriptType) {
         let descriptionsTable: LuaObj<string> = {}
         for (const [name, script] of pairs(this.script)) {
-            if ((!scriptType || script.type == scriptType) && (!script.specialization || OvalePaperDoll.IsSpecialization(script.specialization))) {
+            if ((!scriptType || script.type == scriptType) 
+            && (!script.className || script.className === Ovale.playerClass)
+            && (!script.specialization || OvalePaperDoll.IsSpecialization(script.specialization))) {
                 if (name == DEFAULT_NAME) {
                     descriptionsTable[name] = `${script.desc} (${this.GetScriptName(name)})`;
                 } else {
@@ -80,15 +86,13 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
         return descriptionsTable;
     }
     RegisterScript(className: string, specialization: string, name: string, description: string, code: string, scriptType: "script" | "include") {
-        if (!className || className == Ovale.playerClass) {
-            this.script[name] = this.script[name] || {
-            }
-            let script = this.script[name];
-            script.type = scriptType || "script";
-            script.desc = description || name;
-            script.specialization = specialization;
-            script.code = code || "";
-        }
+        this.script[name] = this.script[name] || {};
+        let script = this.script[name];
+        script.type = scriptType || "script";
+        script.desc = description || name;
+        script.specialization = specialization;
+        script.code = code || "";
+        script.className = className;
     }
     UnregisterScript(name) {
         this.script[name] = undefined;
@@ -106,15 +110,15 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
             if (specialization == "blood") {
                 name = "icyveins_deathknight_blood";
             } else if (specialization == "frost") {
-                name = "sc_death_knight_frost_t19";
+                name = "sc_pr_death_knight_frost";
             } else if (specialization == "unholy") {
-                name = "sc_death_knight_unholy_t19";
+                name = "sc_pr_death_knight_unholy";
             }
         } else if (className == "DEMONHUNTER") {
             if (specialization == "vengeance") {
                 name = "icyveins_demonhunter_vengeance";
             } else if (specialization == "havoc") {
-                name = "sc_demon_hunter_havoc_t19";
+                name = "sc_pr_demon_hunter_havoc";
             }
         } else if (className == "DRUID") {
             if (specialization == "restoration") {
@@ -152,7 +156,7 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
             }
         }
         if (!name && specialization) {
-            name = format("sc_%s_%s_t19", lower(className), specialization);
+            name = format("sc_pr_%s_%s", lower(className), specialization);
         }
         if (!(name && this.script[name])) {
             name = DISABLED_NAME;
@@ -162,7 +166,7 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
     GetScriptName(name) {
         return (name == DEFAULT_NAME) && this.GetDefaultScriptName(Ovale.playerClass, OvalePaperDoll.GetSpecialization()) || name;
     }
-    GetScript(name) {
+    GetScript(name: string) {
         name = this.GetScriptName(name);
         if (name && this.script[name]) {
             return this.script[name].code;

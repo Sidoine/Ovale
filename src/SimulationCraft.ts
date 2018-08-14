@@ -540,7 +540,7 @@ const NoToken:Tokenizer = function() {
 }
 const MATCHES:LuaArray<TokenizerDefinition> = {
     1: {
-        1: "^%d+%a[%w_]*[.:]?[%w_.]*",
+        1: "^%d+%a[%w_]*([.:]?[%w_.]*)*",
         2: TokenizeName
     },
     2: {
@@ -548,7 +548,7 @@ const MATCHES:LuaArray<TokenizerDefinition> = {
         2: TokenizeNumber
     },
     3: {
-        1: "^[%a_][%w_]*[.:]?[%w_.]*",
+        1: "^[%a_][%w_]*([.:]?[%w_.]*)*",
         2: TokenizeName
     },
     4: {
@@ -1200,9 +1200,13 @@ function Disambiguate(annotation: Annotation, name: string, className: string, s
     let [disname, distype] = GetPerClassSpecialization(EMIT_DISAMBIGUATION, name, className, specialization);
     if (!disname) {
         if (!annotation.dictionary[name]) {
-            let otherName = name.match("_buff$") && gsub(name, "_buff$", "") || gsub(name, "_debuff$", "")
+            let otherName = truthy(match(name, "_buff$")) && gsub(name, "_buff$", "") || gsub(name, "_debuff$", "")
             if (annotation.dictionary[otherName]) {
                 return [otherName, _type];
+            }
+            let potionName = gsub(name, "potion_of_", "");
+            if (annotation.dictionary[potionName]) {
+                return [potionName, _type];
             }
         }
         return [name, _type];
@@ -2316,8 +2320,8 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             isSpellAction = false;
         } else if (action == "potion") {
             let name = (modifier.name && Unparse(modifier.name)) || annotation.consumables["potion"];
-            [name] = Disambiguate(annotation, name, className, specialization, "item");
             if (name) {
+                [name] = Disambiguate(annotation, name, className, specialization, "item");
                 bodyCode = format("Item(%s usable=1)", name);
                 conditionCode = "CheckBoxOn(opt_use_consumables) and target.Classification(worldboss)";
                 annotation.opt_use_consumables = className;
@@ -2783,6 +2787,10 @@ EmitOperandAction = function (operand, parseNode, nodeList, annotation, action, 
         property = operand;
     }
 
+    if (!name) {
+        return [false, undefined];
+    }
+
     let [className, specialization] = [annotation.class, annotation.specialization];
     [name] = Disambiguate(annotation, name, className, specialization);
     target = target && (`${target}.`) || "";
@@ -3068,6 +3076,7 @@ EmitOperandBuff = function (operand, parseNode, nodeList, annotation, action, ta
         ["crit_pct_current"]: "SpellCritChance()",
         ["current_insanity_drain"]: "CurrentInsanityDrain()",
         ["darkglare_no_de"]: "NotDeDemons(darkglare)",
+        ["death_and_decay.ticking"]: "BuffPresent(death_and_decay)",
         ["death_sweep_worth_using"]: "0",
         ["delay"]: "0",
         ["demonic_fury"]: "DemonicFury()",

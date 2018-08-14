@@ -657,6 +657,11 @@ export const enum PowerType {
   POWER_PAIN          = 18,
 }
 
+export const enum SpellAttributes {
+    Channeled = 1 << 34,
+    Channeled2 = 1 << 38
+}
+
 export interface SpellData {
     name: string;
     id: number;
@@ -774,6 +779,7 @@ export interface SpellData {
     identifier?: string;
     identifierScore?: number;
     talent?: TalentData;
+    azeriteTrait?: AzeriteTrait;
 }
 
 export interface SpellEffectData {
@@ -906,6 +912,13 @@ export interface ItemData {
     identifier: string;
 }
 
+export interface AzeriteTrait {
+    id: number;
+    spellId: number;
+    name: string;
+    identifier: string;
+}
+
 export function isFriendlyTarget(targetId: number) {
     switch (targetId) {
         case 1:
@@ -978,8 +991,10 @@ function readFile(directory:string, fileName: string, zone: any[][], output: { [
         let match: RegExpMatchArray;
         if (match = $line.match(/static struct (\w+)/)) {
             zone = [];
-            output[match[1]] = zone;
-            
+            output[match[1]] = zone;            
+        } else if (match = $line.match(/static constexpr std::array<(\w+)/)) {
+            zone = [];
+            output[match[1]] = zone;            
         }
         else if (match = $line.match(/{(.*)}/)) {
             let $data = match[1];
@@ -1000,6 +1015,7 @@ export function getSpellData(directory: string) {
     readFile(directory, "sc_spell_data", zone, output);
     readFile(directory, "sc_talent_data", zone, output);
     readFile(directory, "sc_item_data", zone, output);
+    readFile(directory, "azerite", zone, output);
 
     const identifiers: LuaObj<number> = {};
     
@@ -1163,12 +1179,30 @@ export function getSpellData(directory: string) {
             identifier: getIdentifier(row[0]) + "_talent",
             talentId: 3 * row[6] + row[5] + 1
         };
-        identifiers[talent.identifier] = talent.talentId;
-        talentsById.set(talent.talentId, talent);
+        identifiers[talent.identifier] = talent.id;
+        talentsById.set(talent.id, talent);
         if (talent.spell_id) {
             const spell = spellDataById.get(talent.spell_id);
             if (spell) {
                 spell.talent = talent;
+            }
+        }
+    }
+
+    const azeriteTraitById = new Map<number, AzeriteTrait>();
+    for (const row of output.azerite_power_entry_t) {
+        const talent: AzeriteTrait = {
+            id: row[0],
+            spellId: row[1],
+            name: row[2],
+            identifier: getIdentifier(row[2]) + "_trait"
+        };
+        identifiers[talent.identifier] = talent.id;
+        azeriteTraitById.set(talent.id, talent);
+        if (talent.spellId) {
+            const spell = spellDataById.get(talent.spellId);
+            if (spell) {
+                spell.azeriteTrait = talent;
             }
         }
     }
@@ -1218,5 +1252,5 @@ export function getSpellData(directory: string) {
 
 writeFileSync("sample.json", JSON.stringify(spellData, undefined, 2), { encoding: "utf8"});
 
-    return { spellData, spellDataById, identifiers, talentsById, itemsById };
+    return { spellData, spellDataById, identifiers, talentsById, itemsById, azeriteTraitById };
 }

@@ -885,8 +885,6 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         end
         return auraFound
     end,
-    CanApplySpellAura = function(self, spellData)
-    end,
     GetAuraByGUID = function(self, guid, auraId, filter, mine, atTime)
         local auraFound
         if OvaleData.buffSpellList[auraId] then

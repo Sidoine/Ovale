@@ -4,8 +4,136 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 __exports.register = function()
     local name = "ovale_paladin_spells"
-    local desc = "[7.0] Ovale: Paladin spells"
-    local code = [[
+    local desc = "[8.0] Ovale: Paladin spells"
+    local code = [[Define(avengers_shield 31935)
+# Hurls your shield at an enemy target, dealing s1 Holy damage?a231665[, interrupting and silencing the non-Player target for d][], and then jumping to x1-1 additional nearby enemies.rnrnIncreases the effects of your next Shield of the Righteous by 197561s2.
+  SpellInfo(avengers_shield cd=15 duration=3 interrupt=1)
+  # Silenced.
+  SpellAddTargetDebuff(avengers_shield avengers_shield=1)
+Define(avenging_wrath 31884)
+# Call upon the Light to become an avatar of retribution, increasing your damage, healing, and critical strike chance by s1 for d. 
+  SpellInfo(avenging_wrath cd=120 duration=20)
+  # Damage, healing, and critical strike chance increased by w1.
+  SpellAddBuff(avenging_wrath avenging_wrath=1)
+Define(battle_potion_of_strength 279170)
+# Chance to create multiple potions.
+  SpellInfo(battle_potion_of_strength gcd=0 offgcd=1)
+Define(blade_of_justice 184575)
+# Pierces an enemy with a blade of light, dealing s2*<mult> Physical damage.rnrn|cFFFFFFFFGenerates s3 Holy Power.|r
+  SpellInfo(blade_of_justice cd=10.5 holypower=-2)
+Define(blessed_hammer 229976)
+# @spelldesc204019
+  SpellInfo(blessed_hammer channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(blessed_hammer blessed_hammer=1)
+Define(consecration 205228)
+# Consecrates the land beneath you, causing <totaldmg> Holy damage over d to enemies who enter the area.rnrn|cFFFFFFFFGenerates s3 Holy Power.
+  SpellInfo(consecration cd=20 duration=6 talent=consecration_talent holypower=-1 tick=1)
+  # Damage every t1 lsecond:seconds;.
+  SpellAddBuff(consecration consecration=1)
+Define(crusade 231895)
+# Call upon the Light and begin a crusade, increasing your damage done and Haste by <damage> for d.rnrnEach Holy Power spent during Crusade increases damage done and Haste by an additional <damage>.rnrnMaximum u stacks.
+  SpellInfo(crusade cd=20 cd=120 duration=25 max_stacks=10 talent=crusade_talent)
+  # ?a206338[Damage done increased by w1.rnHaste increased by w3.][Damage done and Haste increased by <damage>.]
+  SpellAddBuff(crusade crusade=1)
+Define(crusader_strike 35395)
+# Strike the target for s1 Physical damage.?s137027[rnrn|cFFFFFFFFGenerates s2 Holy Power.][]
+  SpellInfo(crusader_strike cd=6 holypower=0)
+Define(divine_right_buff 278519)
+# @spelldesc277678
+  SpellInfo(divine_right_buff channel=-0.001 gcd=0 offgcd=1)
+Define(divine_storm 224239)
+# @spelldesc53385
+  SpellInfo(divine_storm gcd=0 offgcd=1)
+Define(execution_sentence_debuff 267799)
+# @spelldesc267798
+  SpellInfo(execution_sentence_debuff duration=12 channel=12 gcd=0 offgcd=1)
+  # s1 increased Holy damage taken from the casting Paladin.
+  SpellAddTargetDebuff(execution_sentence_debuff execution_sentence_debuff=1)
+Define(execution_sentence 267798)
+# Calls down the Light's punishment upon an enemy target, dealing s1 Holy damage and increasing the target's Holy damage taken from your attacks by 267799s1 for 267799d.
+  SpellInfo(execution_sentence holypower=3 cd=30 talent=execution_sentence_talent)
+  # s1 increased Holy damage taken from the casting Paladin.
+  SpellAddTargetDebuff(execution_sentence execution_sentence_debuff=1)
+Define(fireblood 265226)
+# Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by s1.
+  SpellInfo(fireblood duration=8 max_stacks=6 gcd=0 offgcd=1)
+  # Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by w1.
+  SpellAddBuff(fireblood fireblood=1)
+Define(hammer_of_justice 211561)
+# @spelldesc211557
+  SpellInfo(hammer_of_justice gcd=0 offgcd=1)
+Define(hammer_of_wrath 24275)
+# Hurls a divine hammer that strikes an enemy for s1 Holy damage. Only usable on enemies that have less than 20 health, or while you are empowered by ?s231895[Crusade][Avenging Wrath].rnrn|cFFFFFFFFGenerates s2 Holy Power.
+  SpellInfo(hammer_of_wrath cd=7.5 talent=hammer_of_wrath_talent holypower=-1)
+Define(hammer_of_the_righteous 88263)
+# @spelldesc53595
+  SpellInfo(hammer_of_the_righteous gcd=0 offgcd=1)
+Define(inquisition 84963)
+# Consumes up to 3 Holy Power to increase your damage done and Haste by s1.rnrnLasts d per Holy Power consumed.
+  SpellInfo(inquisition holypower=1 duration=15 talent=inquisition_talent tick=15)
+  # Damage done increased by w1.rnHaste increased by w3.
+  SpellAddBuff(inquisition inquisition=1)
+Define(judgment 275779)
+# Judges the target, dealing s1 Holy damage?a231657[, and reducing the remaining cooldown on Shield of the Righteous by 231657s1 sec, or 231657s1*2 sec on a critical strike][].
+  SpellInfo(judgment cd=12)
+Define(lights_judgment 255647)
+# Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
+  SpellInfo(lights_judgment cd=150)
+Define(bursting_blood 252343)
+# Chance to create multiple potions.
+  SpellInfo(bursting_blood gcd=0 offgcd=1)
+Define(rebuke 96231)
+# Interrupts spellcasting and prevents any spell in that school from being cast for d.
+  SpellInfo(rebuke cd=15 duration=4 gcd=0 offgcd=1 interrupt=1)
+Define(seraphim 152262)
+# The Light temporarily magnifies your power, increasing your Haste, Critical Strike, Mastery, and Versatility by s1.rnrnConsumes up to s2 charges of Shield of the Righteous, and lasts d per charge.
+  SpellInfo(seraphim cd=45 duration=8 talent=seraphim_talent)
+  # Haste, Critical Strike, Mastery, and Versatility increased by s1.
+  SpellAddBuff(seraphim seraphim=1)
+Define(shield_of_vengeance 184662)
+# Creates a barrier of holy light that absorbs s2/100*MHP damage for d.rnrnWhen the shield expires, it bursts to inflict Holy damage equal to the total amount absorbed, divided among all nearby enemies.
+  SpellInfo(shield_of_vengeance cd=120 duration=15)
+  # Absorbs w1 damage and deals damage when the barrier fades or is fully consumed.
+  SpellAddBuff(shield_of_vengeance shield_of_vengeance=1)
+Define(shield_of_the_righteous 53600)
+# Slams enemies in front of you with your shield, causing s1 Holy damage, and increasing your Armor by 132403s1*STR/100 for 132403d.
+  SpellInfo(shield_of_the_righteous cd=1 cd=18 gcd=0 offgcd=1)
+Define(templars_verdict 224266)
+# A powerful weapon strike that deals s1 Holy damage.
+  SpellInfo(templars_verdict gcd=0 offgcd=1)
+Define(wake_of_ashes 255941)
+# @spelldesc255937
+  SpellInfo(wake_of_ashes duration=5 gcd=0 offgcd=1)
+  # Stunned.
+  SpellAddTargetDebuff(wake_of_ashes wake_of_ashes=1)
+Define(war_stomp 20549)
+# Stuns up to i enemies within A1 yds for d.
+  SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
+  # Stunned.
+  SpellAddTargetDebuff(war_stomp war_stomp=1)
+Define(crusaders_judgment_talent 5)
+# Judgment now has 1+s1 charges, and Grand Crusader now also grants a charge of Judgment.
+Define(seraphim_talent 21)
+# The Light temporarily magnifies your power, increasing your Haste, Critical Strike, Mastery, and Versatility by s1.rnrnConsumes up to s2 charges of Shield of the Righteous, and lasts d per charge.
+Define(crusade_talent 20)
+# Call upon the Light and begin a crusade, increasing your damage done and Haste by <damage> for d.rnrnEach Holy Power spent during Crusade increases damage done and Haste by an additional <damage>.rnrnMaximum u stacks.
+Define(divine_judgment_talent 10)
+# Each enemy hit by an ability that consumes Holy Power increases the damage of your next Judgment by 271581s1, stacking up to 271581u times.
+Define(execution_sentence_talent 3)
+# Calls down the Light's punishment upon an enemy target, dealing s1 Holy damage and increasing the target's Holy damage taken from your attacks by 267799s1 for 267799d.
+Define(hammer_of_wrath_talent 6)
+# Hurls a divine hammer that strikes an enemy for s1 Holy damage. Only usable on enemies that have less than 20 health, or while you are empowered by ?s231895[Crusade][Avenging Wrath].rnrn|cFFFFFFFFGenerates s2 Holy Power.
+Define(inquisition_talent 21)
+# Consumes up to 3 Holy Power to increase your damage done and Haste by s1.rnrnLasts d per Holy Power consumed.
+Define(righteous_verdict_talent 2)
+# Templar's Verdict increases the damage of your next Templar's Verdict by 267611s1 for 267611d.
+Define(wake_of_ashes_talent 12)
+# Lash out at your enemies, dealing sw1 Radiant damage to all enemies within a1 yd in front of you and reducing their movement speed by s2 for d.rnrnDemon and Undead enemies are also stunned for 255941d.rnrn|cFFFFFFFFGenerates s3 Holy Power.
+Define(consecration_talent 11)
+# Consecrates the land beneath you, causing <totaldmg> Holy damage over d to enemies who enter the area.rnrn|cFFFFFFFFGenerates s3 Holy Power.
+Define(divine_right_trait 277678)
+    ]]
+    code = code .. [[
 # Items
 Define(heathcliffs_immortality 137047)
 Define(pillars_of_inmost_light 151812)
@@ -46,7 +174,7 @@ Define(avenging_crusader 216331)
 Define(avenging_crusader_buff 216331)
 	SpellInfo(avenging_crusader_buff duration=20)
 	SpellAddBuff(avenging_crusader avenging_crusader_buff=1)
-Define(avenging_wrath 31884)
+
 	SpellInfo(avenging_wrath cd=120)
 	SpellInfo(avenging_wrath replace=crusade talent=crusade_talent specialization=retribution)
 	SpellInfo(avenging_wrath replace=avenging_crusader talent=avenging_crusader_talent specialization=holy)
@@ -70,7 +198,7 @@ Define(beacon_of_virtue 200025)
 	SpellInfo(beacon_of_virtue cd=15)
 Define(bestow_faith 223306)
 	SpellInfo(bestow_faith cd=12)
-Define(blade_of_justice 184575)
+
 	SpellInfo(blade_of_justice holypower=-2 cd=11 cd_haste=melee)
 	SpellInfo(blade_of_justice add_holypower=-1 itemset=T20 itemcount=4)
 	SpellRequire(blade_of_justice cd 0=buff,blade_of_wrath_buff)
@@ -115,12 +243,12 @@ Define(consecration_debuff 204242)
 	SpellInfo(consecration_debuff duration=12)
 Define(consecration_retribution 205228)
 	SpellInfo(consecration cd=20 holypower=-1 talent=consecration_talent)
-Define(crusade 231895)
+
 	SpellInfo(crusade cd=120)
 	SpellAddBuff(crusade crusade_buff=1)
 Define(crusade_buff 231895)
 	SpellInfo(crusade_buff duration=30 max_stacks=15)
-Define(crusader_strike 35395)
+
 	SpellInfo(crusader_strike cd=6 max_charges=2)
 	SpellInfo(crusader_strike cd_haste=melee specialization=retribution)
 	SpellInfo(crusader_strike cd_haste=spell specialization=holy)
@@ -171,11 +299,11 @@ Define(divine_storm 53385)
 	SpellAddBuff(divine_storm final_verdict_buff=0 if_spell=final_verdict)
 	SpellAddBuff(divine_storm divine_judgment_buff=1 talent=divine_judgment_talent)
 SpellList(divine_storm_no_holy_buff divine_crusader_buff divine_purpose_buff)
-Define(execution_sentence 267798)
+
 	SpellInfo(execution_sentence cd=30 holypower=3 tag=main)
 	SpellInfo(execution_sentence add_holypower -1=buff,hp_cost_reductino_buff)
 	SpellAddBuff(execution_sentence selfless_healer_buff=1 talent=selfless_healer_talent)
-	SpellAddTargetDebuff(execution_sentence execution_sentence_debuff=1)
+	
 	SpellAddBuff(execution_sentence divine_judgment_buff=1 talent=divine_judgment_talent)
 Define(execution_sentence_debuff 267798)
 	SpellInfo(execution_sentence_debuff duration=7)
@@ -225,7 +353,7 @@ Define(hammer_of_justice 853)
 Define(hammer_of_the_righteous 53595)
 	SpellInfo(hammer_of_the_righteous max_charges=2 cd=4.5 cd_haste=melee)
 	SpellInfo(hammer_of_the_righteous replace=blessed_hammer talent=blessed_hammer_talent)
-Define(hammer_of_wrath 24275)
+
 	SpellInfo(hammer_of_wrath holypower=-1 cd=7.5 target_health_pct=20)
 	SpellRequire(hammer_of_wrath target_health_pct 100=buff,hammer_of_wrath_usable_buff)
 SpellList(hammer_of_wrath_usable_buff avenging_wrath crusade)
@@ -272,7 +400,7 @@ Define(holy_wrath 210220)
 Define(improved_forbearance 157482)
 Define(infusion_of_light_buff 54149)
 	SpellInfo(infusion_of_light_buff duration=15)
-Define(inquisition 84963)
+
 	SpellInfo(inquisition holypower=1 max_holypower=3)
 Define(inquisition_buff 84963)
 	SpellInfo(inquisition_buff duration=15)
@@ -327,7 +455,7 @@ Define(lights_hammer 114158)
 	SpellInfo(lights_hammer cd=60)
 Define(maraads_truth_buff 156990)
 	SpellInfo(maraads_truth_buff duration=20)
-Define(rebuke 96231)
+
 	SpellInfo(rebuke cd=15 gcd=0 interrupt=1 offgcd=1)
 Define(redemption 7328)
 Define(repentance 20066)
@@ -348,16 +476,16 @@ Define(saruans_resolve 144275)
 Define(selfless_healer 85804)
 Define(selfless_healer_buff 114250)
 	SpellInfo(selfless_healer_buff duration=15 max_stacks=3)
-Define(seraphim 152262)
+
 	SpellInfo(seraphim cd=45)
 Define(seraphim_buff 152262)
 	SpellInfo(seraphim_buff duration=16)
-Define(shield_of_the_righteous 53600)
+
 	SpellInfo(shield_of_the_righteous cd=18 max_charges=3 cd_haste=melee gcd=0 offgcd=1)
 	SpellAddBuff(shield_of_the_righteous shield_of_the_righteous_buff=1)
 Define(shield_of_the_righteous_buff 132403)
 	SpellInfo(shield_of_the_righteous_buff duration=4.5)
-Define(shield_of_vengeance 184662)
+
 	SpellInfo(shield_of_vengeance cd=120 tag=shortcd)
 Define(speed_of_light 85499)
 	SpellInfo(speed_of_light cd=45 gcd=0 offgcd=1)
@@ -434,25 +562,25 @@ Define(blinding_light_talent 9)
 Define(cavalier_talent_holy 4)
 Define(cavalier_talent 13)
 Define(consecrated_ground_talent 17)
-Define(consecration_talent 11)
-Define(crusade_talent 20)
-Define(crusaders_judgment_talent 5)
+
+
+
 Define(crusaders_might_talent 1)
 Define(devotion_aura_talent 10)
-Define(divine_judgment_talent 10)
+
 Define(divine_purpose_talent 19)
-Define(execution_sentence_talent 3)
+
 Define(eye_for_an_eye_talent 15)
 Define(final_stand_talent 13)
 Define(fires_of_justice_talent 4)
 Define(first_avenger_talent 4)
 Define(fist_of_justice_talent 7)
-Define(hammer_of_wrath_talent 6)
+
 Define(hand_of_the_protector_talent 15)
 Define(holy_avenger_talent 15)
 Define(holy_prism_talent 14)
 Define(holy_shield_talent 1)
-Define(inquisition_talent 21)
+
 Define(judgment_of_light_talent_holy 13)
 Define(judgment_of_light_talent 16)
 Define(justicars_vengeance_talent 17)
@@ -462,14 +590,14 @@ Define(redoubt_talent 2)
 Define(repentance_talent 8)
 Define(retribution_aura_talent 10)
 Define(righteous_protector_talent 20)
-Define(righteous_verdict_talent 2)
+
 Define(rule_of_law_talent 6)
 Define(sanctified_wrath_talent 16)
 Define(selfless_healer_talent 16)
-Define(seraphim_talent 21)
+
 Define(unbreakable_spirit_talent_holy 5)
 Define(unbreakable_spirit_talent 14)
-Define(wake_of_ashes_talent 12)
+
 Define(word_of_glory_talent 18)
 Define(zeal_talent 1)
 

@@ -272,8 +272,26 @@ class OvalePowerClass extends OvalePowerBase {
         focus: true,
         mana: true
     }
-    constructor() {
-        super();
+
+    OnInitialize() {
+        this.RegisterEvent("PLAYER_ENTERING_WORLD", "EventHandler");
+        this.RegisterEvent("PLAYER_LEVEL_UP", "EventHandler");
+        this.RegisterEvent("UNIT_DISPLAYPOWER");
+        this.RegisterEvent("UNIT_LEVEL");
+        this.RegisterEvent("UNIT_MAXPOWER");
+        this.RegisterEvent("UNIT_POWER_UPDATE");
+        this.RegisterEvent("UNIT_POWER_FREQUENT", "UNIT_POWER_UPDATE");
+        this.RegisterEvent("UNIT_RANGEDDAMAGE");
+        this.RegisterEvent("UNIT_SPELL_HASTE", "UNIT_RANGEDDAMAGE");
+        this.RegisterMessage("Ovale_StanceChanged", "EventHandler");
+        this.RegisterMessage("Ovale_TalentsChanged", "EventHandler");
+        for (const [powerType] of pairs(this.POWER_INFO)) {
+            RegisterRequirement(powerType, this.RequirePowerHandler);
+        }
+        this.initializePower();
+    }
+
+    initializePower() {
         let possiblePowerTypes: LuaObj<LuaObj<string>> = {
             DEATHKNIGHT:{
                 runicpower: "RUNIC_POWER",
@@ -325,6 +343,7 @@ class OvalePowerClass extends OvalePowerBase {
                 rage: "RAGE",
             },
         }
+
         for (const [powerType, powerId] of pairs(Enum.PowerType)) {
             let powerTypeLower = strlower(powerType);
             let powerToken = possiblePowerTypes[Ovale.playerClass][powerTypeLower];
@@ -338,23 +357,6 @@ class OvalePowerClass extends OvalePowerBase {
                     maxCost: (powerTypeLower == "combopoints" && MAX_COMBO_POINTS) || 0 // Not currently used.
                 }
             }
-        }
-    }
-
-    OnInitialize() {
-        this.RegisterEvent("PLAYER_ENTERING_WORLD", "EventHandler");
-        this.RegisterEvent("PLAYER_LEVEL_UP", "EventHandler");
-        this.RegisterEvent("UNIT_DISPLAYPOWER");
-        this.RegisterEvent("UNIT_LEVEL");
-        this.RegisterEvent("UNIT_MAXPOWER");
-        this.RegisterEvent("UNIT_POWER_UPDATE");
-        this.RegisterEvent("UNIT_POWER_FREQUENT", "UNIT_POWER_UPDATE");
-        this.RegisterEvent("UNIT_RANGEDDAMAGE");
-        this.RegisterEvent("UNIT_SPELL_HASTE", "UNIT_RANGEDDAMAGE");
-        this.RegisterMessage("Ovale_StanceChanged", "EventHandler");
-        this.RegisterMessage("Ovale_TalentsChanged", "EventHandler");
-        for (const [powerType] of pairs(this.POWER_INFO)) {
-            RegisterRequirement(powerType, this.RequirePowerHandler);
         }
     }
     OnDisable() {

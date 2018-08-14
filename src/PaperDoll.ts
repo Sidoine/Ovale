@@ -146,7 +146,7 @@ export class PaperDollData implements PaperDollSnapshot {
 let OvalePaperDollBase = OvaleState.RegisterHasState(OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvalePaperDoll", aceEvent))), PaperDollData);
 
 class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule {
-    class = Ovale.playerClass;
+    class: string;
     level = UnitLevel("player");
     specialization = undefined;
     STAT_NAME = {
@@ -193,6 +193,7 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
    
     
     OnInitialize() {
+        this.class = Ovale.playerClass;
         this.RegisterEvent("UNIT_STATS"); // Primary Stats (str, agi, sta, int)
         this.RegisterEvent("COMBAT_RATING_UPDATE"); // Secondary Stats (crit, haste, vers)
         this.RegisterEvent("MASTERY_UPDATE"); // Mastery

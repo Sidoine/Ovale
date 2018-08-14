@@ -1,19 +1,24 @@
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
-    local name = "sc_mage_arcane_t19"
-    local desc = "[7.0] Simulationcraft: Mage_Arcane_T19"
+    local name = "sc_pr_mage_arcane"
+    local desc = "[8.0] Simulationcraft: PR_Mage_Arcane"
     local code = [[
-# Based on SimulationCraft profile "Mage_Arcane_T19P".
+# Based on SimulationCraft profile "PR_Mage_Arcane".
 #	class=mage
 #	spec=arcane
-#	talents=1021012
+#	talents=2032021
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_mage_spells)
 
+
+AddFunction pressure_rotation
+{
+ { AzeriteTraitRank(arcane_pressure_trait) >= 2 or Talent(resonance_talent) and Enemies() >= 2 } and target.HealthPercent() <= 35
+}
 
 AddFunction average_burn_length
 {
@@ -25,31 +30,14 @@ AddFunction total_burns
  if not GetState(burn_phase) > 0 1
 }
 
-AddFunction time_until_burn_value
+AddFunction conserve_mana
 {
- if time_until_burn_value() < time_until_burn_max() time_until_burn_value()
- time_until_burn_max()
-}
-
-AddFunction time_until_burn_max
-{
- if Talent(rune_of_power_talent) SpellCooldown(rune_of_power)
- if ArmorSetBonus(T20 2) SpellCooldown(presence_of_mind) > 0
- SpellCooldown(evocation) - average_burn_length()
-}
-
-AddFunction time_until_burn
-{
- if time_until_burn_value() < time_until_burn_max() time_until_burn_value()
- time_until_burn_max()
-}
-
-AddFunction arcane_missiles_procs
-{
- BuffPresent(arcane_missiles_buff)
+ if not Talent(overpowered_talent) 45
+ if Talent(overpowered_talent) 35
 }
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=arcane)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=arcane)
 AddCheckBox(opt_arcane_mage_burn_phase L(arcane_mage_burn_phase) default specialization=arcane)
 AddCheckBox(opt_time_warp SpellName(time_warp) specialization=arcane)
 
@@ -68,32 +56,6 @@ AddFunction ArcaneUseItemActions
  Item(Trinket1Slot text=14 usable=1)
 }
 
-### actions.variables
-
-AddFunction ArcaneVariablesMainActions
-{
-}
-
-AddFunction ArcaneVariablesMainPostConditions
-{
-}
-
-AddFunction ArcaneVariablesShortCdActions
-{
-}
-
-AddFunction ArcaneVariablesShortCdPostConditions
-{
-}
-
-AddFunction ArcaneVariablesCdActions
-{
-}
-
-AddFunction ArcaneVariablesCdPostConditions
-{
-}
-
 ### actions.precombat
 
 AddFunction ArcanePrecombatMainActions
@@ -101,10 +63,12 @@ AddFunction ArcanePrecombatMainActions
  #flask
  #food
  #augmentation
+ #arcane_intellect
+ Spell(arcane_intellect)
  #summon_arcane_familiar
  Spell(summon_arcane_familiar)
- #arcane_blast,if=!(set_bonus.tier20_2pc|talent.charged_up.enabled)
- if not { ArmorSetBonus(T20 2) or Talent(charged_up_talent) } Spell(arcane_blast)
+ #arcane_blast
+ Spell(arcane_blast)
 }
 
 AddFunction ArcanePrecombatMainPostConditions
@@ -113,148 +77,139 @@ AddFunction ArcanePrecombatMainPostConditions
 
 AddFunction ArcanePrecombatShortCdActions
 {
- unless Spell(summon_arcane_familiar)
- {
-  #mark_of_aluneth,if=set_bonus.tier20_2pc|talent.charged_up.enabled
-  if ArmorSetBonus(T20 2) or Talent(charged_up_talent) Spell(mark_of_aluneth)
- }
 }
 
 AddFunction ArcanePrecombatShortCdPostConditions
 {
- Spell(summon_arcane_familiar) or not { ArmorSetBonus(T20 2) or Talent(charged_up_talent) } and Spell(arcane_blast)
+ Spell(arcane_intellect) or Spell(summon_arcane_familiar) or Spell(arcane_blast)
 }
 
 AddFunction ArcanePrecombatCdActions
 {
- unless Spell(summon_arcane_familiar)
+ unless Spell(arcane_intellect) or Spell(summon_arcane_familiar)
  {
+  #variable,name=conserve_mana,op=set,value=35,if=talent.overpowered.enabled
+  #variable,name=conserve_mana,op=set,value=45,if=!talent.overpowered.enabled
   #snapshot_stats
   #mirror_image
   Spell(mirror_image)
   #potion
-  Item(deadly_grace_potion)
+  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_intellect usable=1)
  }
 }
 
 AddFunction ArcanePrecombatCdPostConditions
 {
- Spell(summon_arcane_familiar) or { ArmorSetBonus(T20 2) or Talent(charged_up_talent) } and Spell(mark_of_aluneth) or not { ArmorSetBonus(T20 2) or Talent(charged_up_talent) } and Spell(arcane_blast)
+ Spell(arcane_intellect) or Spell(summon_arcane_familiar) or Spell(arcane_blast)
 }
 
-### actions.miniburn_init
+### actions.movement
 
-AddFunction ArcaneMiniburninitMainActions
+AddFunction ArcaneMovementMainActions
 {
- #arcane_barrage
- Spell(arcane_barrage)
- #swap_action_list,name=default
- ArcaneDefaultMainActions()
+ #shimmer,if=movement.distance>=10
+ if target.Distance() >= 10 Spell(shimmer)
+ #arcane_missiles
+ Spell(arcane_missiles)
+ #supernova
+ Spell(supernova)
 }
 
-AddFunction ArcaneMiniburninitMainPostConditions
+AddFunction ArcaneMovementMainPostConditions
 {
- ArcaneDefaultMainPostConditions()
 }
 
-AddFunction ArcaneMiniburninitShortCdActions
+AddFunction ArcaneMovementShortCdActions
 {
- #rune_of_power
- Spell(rune_of_power)
-
- unless Spell(arcane_barrage)
+ unless target.Distance() >= 10 and Spell(shimmer)
  {
+  #blink,if=movement.distance>=10
+  if target.Distance() >= 10 Spell(blink)
   #presence_of_mind
   Spell(presence_of_mind)
-  #swap_action_list,name=default
-  ArcaneDefaultShortCdActions()
+
+  unless Spell(arcane_missiles)
+  {
+   #arcane_orb
+   Spell(arcane_orb)
+  }
  }
 }
 
-AddFunction ArcaneMiniburninitShortCdPostConditions
+AddFunction ArcaneMovementShortCdPostConditions
 {
- Spell(arcane_barrage) or ArcaneDefaultShortCdPostConditions()
+ target.Distance() >= 10 and Spell(shimmer) or Spell(arcane_missiles) or Spell(supernova)
 }
 
-AddFunction ArcaneMiniburninitCdActions
+AddFunction ArcaneMovementCdActions
 {
- unless Spell(rune_of_power) or Spell(arcane_barrage) or Spell(presence_of_mind)
- {
-  #swap_action_list,name=default
-  ArcaneDefaultCdActions()
- }
 }
 
-AddFunction ArcaneMiniburninitCdPostConditions
+AddFunction ArcaneMovementCdPostConditions
 {
- Spell(rune_of_power) or Spell(arcane_barrage) or Spell(presence_of_mind) or ArcaneDefaultCdPostConditions()
+ target.Distance() >= 10 and Spell(shimmer) or target.Distance() >= 10 and Spell(blink) or Spell(presence_of_mind) or Spell(arcane_missiles) or Spell(arcane_orb) or Spell(supernova)
 }
 
 ### actions.conserve
 
 AddFunction ArcaneConserveMainActions
 {
- #swap_action_list,name=miniburn_init,if=set_bonus.tier20_4pc&cooldown.presence_of_mind.up&cooldown.arcane_power.remains>20&(action.rune_of_power.usable|!talent.rune_of_power.enabled)
- if ArmorSetBonus(T20 4) and not SpellCooldown(presence_of_mind) > 0 and SpellCooldown(arcane_power) > 20 and { CanCast(rune_of_power) or not Talent(rune_of_power_talent) } ArcaneMiniburninitMainActions()
-
- unless ArmorSetBonus(T20 4) and not SpellCooldown(presence_of_mind) > 0 and SpellCooldown(arcane_power) > 20 and { CanCast(rune_of_power) or not Talent(rune_of_power_talent) } and ArcaneMiniburninitMainPostConditions()
- {
-  #arcane_missiles,if=variable.arcane_missiles_procs=buff.arcane_missiles.max_stack&active_enemies<3
-  if arcane_missiles_procs() == SpellData(arcane_missiles_buff max_stacks) and Enemies() < 3 Spell(arcane_missiles)
-  #supernova
-  Spell(supernova)
-  #nether_tempest,if=refreshable|!ticking
-  if target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) Spell(nether_tempest)
-  #arcane_explosion,if=active_enemies>1&(mana.pct>=70-(10*equipped.mystic_kilt_of_the_rune_master))
-  if Enemies() > 1 and ManaPercent() >= 70 - 10 * HasEquippedItem(mystic_kilt_of_the_rune_master) Spell(arcane_explosion)
-  #arcane_blast,if=mana.pct>=90|buff.rhonins_assaulting_armwraps.up|(buff.rune_of_power.remains>=cast_time&equipped.mystic_kilt_of_the_rune_master)
-  if ManaPercent() >= 90 or BuffPresent(rhonins_assaulting_armwraps_buff) or TotemRemaining(rune_of_power) >= CastTime(arcane_blast) and HasEquippedItem(mystic_kilt_of_the_rune_master) Spell(arcane_blast)
-  #arcane_missiles,if=variable.arcane_missiles_procs
-  if arcane_missiles_procs() Spell(arcane_missiles)
-  #arcane_barrage
-  Spell(arcane_barrage)
-  #arcane_explosion,if=active_enemies>1
-  if Enemies() > 1 Spell(arcane_explosion)
-  #arcane_blast
-  Spell(arcane_blast)
- }
+ #nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.rune_of_power.down&buff.arcane_power.down
+ if { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) } and BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) and BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) Spell(nether_tempest)
+ #arcane_blast,if=buff.rule_of_threes.up&buff.arcane_charge.stack>=3
+ if DebuffPresent(rule_of_threes) and BuffStacks(arcane_charge_buff) >= 3 Spell(arcane_blast)
+ #arcane_missiles,if=mana.pct<=95&buff.clearcasting.react&variable.pressure_rotation=0,chain=1
+ if ManaPercent() <= 95 and DebuffPresent(clearcasting) and pressure_rotation() == 0 Spell(arcane_missiles)
+ #arcane_barrage,if=((buff.arcane_charge.stack=buff.arcane_charge.max_stack)&(mana.pct<=variable.conserve_mana|variable.pressure_rotation)|(talent.arcane_orb.enabled&cooldown.arcane_orb.remains<=gcd&cooldown.arcane_power.remains>10))|mana.pct<=(variable.conserve_mana-10)
+ if BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) and { ManaPercent() <= conserve_mana() or pressure_rotation() } or Talent(arcane_orb_talent) and SpellCooldown(arcane_orb) <= GCD() and SpellCooldown(arcane_power) > 10 or ManaPercent() <= conserve_mana() - 10 Spell(arcane_barrage)
+ #supernova,if=mana.pct<=95
+ if ManaPercent() <= 95 Spell(supernova)
+ #arcane_explosion,if=active_enemies>=3&(mana.pct>=variable.conserve_mana|buff.arcane_charge.stack=3)
+ if Enemies() >= 3 and { ManaPercent() >= conserve_mana() or BuffStacks(arcane_charge_buff) == 3 } Spell(arcane_explosion)
+ #arcane_blast
+ Spell(arcane_blast)
+ #arcane_barrage
+ Spell(arcane_barrage)
 }
 
 AddFunction ArcaneConserveMainPostConditions
 {
- ArmorSetBonus(T20 4) and not SpellCooldown(presence_of_mind) > 0 and SpellCooldown(arcane_power) > 20 and { CanCast(rune_of_power) or not Talent(rune_of_power_talent) } and ArcaneMiniburninitMainPostConditions()
 }
 
 AddFunction ArcaneConserveShortCdActions
 {
- #mark_of_aluneth
- Spell(mark_of_aluneth)
- #rune_of_power,if=full_recharge_time<=execute_time|(prev_gcd.1.mark_of_aluneth&!set_bonus.tier20_4pc)
- if SpellFullRecharge(rune_of_power) <= ExecuteTime(rune_of_power) or PreviousGCDSpell(mark_of_aluneth) and not ArmorSetBonus(T20 4) Spell(rune_of_power)
- #swap_action_list,name=miniburn_init,if=set_bonus.tier20_4pc&cooldown.presence_of_mind.up&cooldown.arcane_power.remains>20&(action.rune_of_power.usable|!talent.rune_of_power.enabled)
- if ArmorSetBonus(T20 4) and not SpellCooldown(presence_of_mind) > 0 and SpellCooldown(arcane_power) > 20 and { CanCast(rune_of_power) or not Talent(rune_of_power_talent) } ArcaneMiniburninitShortCdActions()
+ #charged_up,if=buff.arcane_charge.stack=0
+ if BuffStacks(arcane_charge_buff) == 0 Spell(charged_up)
+ #presence_of_mind,if=set_bonus.tier20_2pc&buff.arcane_charge.stack=0
+ if ArmorSetBonus(T20 2) and BuffStacks(arcane_charge_buff) == 0 Spell(presence_of_mind)
+
+ unless { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) } and BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) and BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and Spell(nether_tempest)
+ {
+  #arcane_orb,if=buff.arcane_charge.stack<=2&(cooldown.arcane_power.remains>10|active_enemies<=2)
+  if BuffStacks(arcane_charge_buff) <= 2 and { SpellCooldown(arcane_power) > 10 or Enemies() <= 2 } Spell(arcane_orb)
+
+  unless DebuffPresent(rule_of_threes) and BuffStacks(arcane_charge_buff) >= 3 and Spell(arcane_blast)
+  {
+   #rune_of_power,if=buff.arcane_charge.stack=buff.arcane_charge.max_stack&(full_recharge_time<=execute_time|recharge_time<=cooldown.arcane_power.remains|target.time_to_die<=cooldown.arcane_power.remains)
+   if BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) and { SpellFullRecharge(rune_of_power) <= ExecuteTime(rune_of_power) or SpellChargeCooldown(rune_of_power) <= SpellCooldown(arcane_power) or target.TimeToDie() <= SpellCooldown(arcane_power) } Spell(rune_of_power)
+  }
+ }
 }
 
 AddFunction ArcaneConserveShortCdPostConditions
 {
- ArmorSetBonus(T20 4) and not SpellCooldown(presence_of_mind) > 0 and SpellCooldown(arcane_power) > 20 and { CanCast(rune_of_power) or not Talent(rune_of_power_talent) } and ArcaneMiniburninitShortCdPostConditions() or arcane_missiles_procs() == SpellData(arcane_missiles_buff max_stacks) and Enemies() < 3 and Spell(arcane_missiles) or Spell(supernova) or { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) } and Spell(nether_tempest) or Enemies() > 1 and ManaPercent() >= 70 - 10 * HasEquippedItem(mystic_kilt_of_the_rune_master) and Spell(arcane_explosion) or { ManaPercent() >= 90 or BuffPresent(rhonins_assaulting_armwraps_buff) or TotemRemaining(rune_of_power) >= CastTime(arcane_blast) and HasEquippedItem(mystic_kilt_of_the_rune_master) } and Spell(arcane_blast) or arcane_missiles_procs() and Spell(arcane_missiles) or Spell(arcane_barrage) or Enemies() > 1 and Spell(arcane_explosion) or Spell(arcane_blast)
+ { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) } and BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) and BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and Spell(nether_tempest) or DebuffPresent(rule_of_threes) and BuffStacks(arcane_charge_buff) >= 3 and Spell(arcane_blast) or ManaPercent() <= 95 and DebuffPresent(clearcasting) and pressure_rotation() == 0 and Spell(arcane_missiles) or { BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) and { ManaPercent() <= conserve_mana() or pressure_rotation() } or Talent(arcane_orb_talent) and SpellCooldown(arcane_orb) <= GCD() and SpellCooldown(arcane_power) > 10 or ManaPercent() <= conserve_mana() - 10 } and Spell(arcane_barrage) or ManaPercent() <= 95 and Spell(supernova) or Enemies() >= 3 and { ManaPercent() >= conserve_mana() or BuffStacks(arcane_charge_buff) == 3 } and Spell(arcane_explosion) or Spell(arcane_blast) or Spell(arcane_barrage)
 }
 
 AddFunction ArcaneConserveCdActions
 {
- #mirror_image,if=variable.time_until_burn>recharge_time|variable.time_until_burn>target.time_to_die
- if time_until_burn() > SpellChargeCooldown(mirror_image) or time_until_burn() > target.TimeToDie() Spell(mirror_image)
-
- unless Spell(mark_of_aluneth) or { SpellFullRecharge(rune_of_power) <= ExecuteTime(rune_of_power) or PreviousGCDSpell(mark_of_aluneth) and not ArmorSetBonus(T20 4) } and Spell(rune_of_power)
- {
-  #swap_action_list,name=miniburn_init,if=set_bonus.tier20_4pc&cooldown.presence_of_mind.up&cooldown.arcane_power.remains>20&(action.rune_of_power.usable|!talent.rune_of_power.enabled)
-  if ArmorSetBonus(T20 4) and not SpellCooldown(presence_of_mind) > 0 and SpellCooldown(arcane_power) > 20 and { CanCast(rune_of_power) or not Talent(rune_of_power_talent) } ArcaneMiniburninitCdActions()
- }
+ #mirror_image
+ Spell(mirror_image)
 }
 
 AddFunction ArcaneConserveCdPostConditions
 {
- Spell(mark_of_aluneth) or { SpellFullRecharge(rune_of_power) <= ExecuteTime(rune_of_power) or PreviousGCDSpell(mark_of_aluneth) and not ArmorSetBonus(T20 4) } and Spell(rune_of_power) or ArmorSetBonus(T20 4) and not SpellCooldown(presence_of_mind) > 0 and SpellCooldown(arcane_power) > 20 and { CanCast(rune_of_power) or not Talent(rune_of_power_talent) } and ArcaneMiniburninitCdPostConditions() or arcane_missiles_procs() == SpellData(arcane_missiles_buff max_stacks) and Enemies() < 3 and Spell(arcane_missiles) or Spell(supernova) or { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) } and Spell(nether_tempest) or Enemies() > 1 and ManaPercent() >= 70 - 10 * HasEquippedItem(mystic_kilt_of_the_rune_master) and Spell(arcane_explosion) or { ManaPercent() >= 90 or BuffPresent(rhonins_assaulting_armwraps_buff) or TotemRemaining(rune_of_power) >= CastTime(arcane_blast) and HasEquippedItem(mystic_kilt_of_the_rune_master) } and Spell(arcane_blast) or arcane_missiles_procs() and Spell(arcane_missiles) or Spell(arcane_barrage) or Enemies() > 1 and Spell(arcane_explosion) or Spell(arcane_blast)
+ BuffStacks(arcane_charge_buff) == 0 and Spell(charged_up) or ArmorSetBonus(T20 2) and BuffStacks(arcane_charge_buff) == 0 and Spell(presence_of_mind) or { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) } and BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) and BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and Spell(nether_tempest) or BuffStacks(arcane_charge_buff) <= 2 and { SpellCooldown(arcane_power) > 10 or Enemies() <= 2 } and Spell(arcane_orb) or DebuffPresent(rule_of_threes) and BuffStacks(arcane_charge_buff) >= 3 and Spell(arcane_blast) or BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) and { SpellFullRecharge(rune_of_power) <= ExecuteTime(rune_of_power) or SpellChargeCooldown(rune_of_power) <= SpellCooldown(arcane_power) or target.TimeToDie() <= SpellCooldown(arcane_power) } and Spell(rune_of_power) or ManaPercent() <= 95 and DebuffPresent(clearcasting) and pressure_rotation() == 0 and Spell(arcane_missiles) or { BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) and { ManaPercent() <= conserve_mana() or pressure_rotation() } or Talent(arcane_orb_talent) and SpellCooldown(arcane_orb) <= GCD() and SpellCooldown(arcane_power) > 10 or ManaPercent() <= conserve_mana() - 10 } and Spell(arcane_barrage) or ManaPercent() <= 95 and Spell(supernova) or Enemies() >= 3 and { ManaPercent() >= conserve_mana() or BuffStacks(arcane_charge_buff) == 3 } and Spell(arcane_explosion) or Spell(arcane_blast) or Spell(arcane_barrage)
 }
 
 ### actions.burn
@@ -264,22 +219,22 @@ AddFunction ArcaneBurnMainActions
  #variable,name=total_burns,op=add,value=1,if=!burn_phase
  #start_burn_phase,if=!burn_phase
  if not GetState(burn_phase) > 0 and not GetState(burn_phase) > 0 SetState(burn_phase 1)
- #stop_burn_phase,if=prev_gcd.1.evocation&cooldown.evocation.charges=0&burn_phase_duration>0
- if PreviousGCDSpell(evocation) and SpellCharges(evocation) == 0 and GetStateDuration() > 0 and GetState(burn_phase) > 0 SetState(burn_phase 0)
- #nether_tempest,if=refreshable|!ticking
- if target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) Spell(nether_tempest)
- #arcane_barrage,if=active_enemies>4&equipped.mantle_of_the_first_kirin_tor&buff.arcane_charge.stack=buff.arcane_charge.max_stack
- if Enemies() > 4 and HasEquippedItem(mantle_of_the_first_kirin_tor) and DebuffStacks(arcane_charge_debuff) == SpellData(arcane_charge_debuff max_stacks) Spell(arcane_barrage)
- #arcane_missiles,if=variable.arcane_missiles_procs=buff.arcane_missiles.max_stack&active_enemies<3
- if arcane_missiles_procs() == SpellData(arcane_missiles_buff max_stacks) and Enemies() < 3 Spell(arcane_missiles)
- #arcane_blast,if=buff.presence_of_mind.up
- if BuffPresent(presence_of_mind_buff) Spell(arcane_blast)
- #arcane_explosion,if=active_enemies>1
- if Enemies() > 1 Spell(arcane_explosion)
- #arcane_missiles,if=variable.arcane_missiles_procs
- if arcane_missiles_procs() Spell(arcane_missiles)
+ #stop_burn_phase,if=burn_phase&prev_gcd.1.evocation&target.time_to_die>variable.average_burn_length&burn_phase_duration>0
+ if GetState(burn_phase) > 0 and PreviousGCDSpell(evocation) and target.TimeToDie() > average_burn_length() and GetStateDuration() > 0 and GetState(burn_phase) > 0 SetState(burn_phase 0)
+ #nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.rune_of_power.down&buff.arcane_power.down
+ if { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) } and BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) and BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) Spell(nether_tempest)
+ #arcane_barrage,if=(active_enemies>=3|(active_enemies>=2&talent.resonance.enabled))&(buff.arcane_charge.stack=buff.arcane_charge.max_stack)
+ if { Enemies() >= 3 or Enemies() >= 2 and Talent(resonance_talent) } and BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) Spell(arcane_barrage)
+ #arcane_explosion,if=active_enemies>=3|(active_enemies>=2&talent.resonance.enabled)
+ if Enemies() >= 3 or Enemies() >= 2 and Talent(resonance_talent) Spell(arcane_explosion)
+ #arcane_barrage,if=variable.pressure_rotation&buff.arcane_charge.stack=buff.arcane_charge.max_stack
+ if pressure_rotation() and BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) Spell(arcane_barrage)
+ #arcane_missiles,if=(buff.clearcasting.react&mana.pct<=95)&variable.pressure_rotation=0,chain=1
+ if DebuffPresent(clearcasting) and ManaPercent() <= 95 and pressure_rotation() == 0 Spell(arcane_missiles)
  #arcane_blast
  Spell(arcane_blast)
+ #arcane_barrage
+ Spell(arcane_barrage)
 }
 
 AddFunction ArcaneBurnMainPostConditions
@@ -291,25 +246,25 @@ AddFunction ArcaneBurnShortCdActions
  #variable,name=total_burns,op=add,value=1,if=!burn_phase
  #start_burn_phase,if=!burn_phase
  if not GetState(burn_phase) > 0 and not GetState(burn_phase) > 0 SetState(burn_phase 1)
- #stop_burn_phase,if=prev_gcd.1.evocation&cooldown.evocation.charges=0&burn_phase_duration>0
- if PreviousGCDSpell(evocation) and SpellCharges(evocation) == 0 and GetStateDuration() > 0 and GetState(burn_phase) > 0 SetState(burn_phase 0)
+ #stop_burn_phase,if=burn_phase&prev_gcd.1.evocation&target.time_to_die>variable.average_burn_length&burn_phase_duration>0
+ if GetState(burn_phase) > 0 and PreviousGCDSpell(evocation) and target.TimeToDie() > average_burn_length() and GetStateDuration() > 0 and GetState(burn_phase) > 0 SetState(burn_phase 0)
+ #charged_up,if=buff.arcane_charge.stack<=1&(!set_bonus.tier20_2pc|cooldown.presence_of_mind.remains>5)
+ if BuffStacks(arcane_charge_buff) <= 1 and { not ArmorSetBonus(T20 2) or SpellCooldown(presence_of_mind) > 5 } Spell(charged_up)
 
- unless { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) } and Spell(nether_tempest)
+ unless { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) } and BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) and BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and Spell(nether_tempest)
  {
-  #mark_of_aluneth
-  Spell(mark_of_aluneth)
-  #rune_of_power,if=mana.pct>30|(buff.arcane_power.up|cooldown.arcane_power.up)
-  if ManaPercent() > 30 or BuffPresent(arcane_power_buff) or not SpellCooldown(arcane_power) > 0 Spell(rune_of_power)
-  #presence_of_mind,if=((mana.pct>30|buff.arcane_power.up)&set_bonus.tier20_2pc)|buff.rune_of_power.remains<=buff.presence_of_mind.max_stack*action.arcane_blast.execute_time|buff.arcane_power.remains<=buff.presence_of_mind.max_stack*action.arcane_blast.execute_time
-  if { ManaPercent() > 30 or BuffPresent(arcane_power_buff) } and ArmorSetBonus(T20 2) or TotemRemaining(rune_of_power) <= SpellData(presence_of_mind_buff max_stacks) * ExecuteTime(arcane_blast) or BuffRemaining(arcane_power_buff) <= SpellData(presence_of_mind_buff max_stacks) * ExecuteTime(arcane_blast) Spell(presence_of_mind)
-  #arcane_orb
-  Spell(arcane_orb)
+  #rune_of_power,if=!buff.arcane_power.up&(mana.pct>=50|cooldown.arcane_power.remains=0)&(buff.arcane_charge.stack=buff.arcane_charge.max_stack)
+  if not BuffPresent(arcane_power_buff) and { ManaPercent() >= 50 or not SpellCooldown(arcane_power) > 0 } and BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) Spell(rune_of_power)
+  #presence_of_mind
+  Spell(presence_of_mind)
+  #arcane_orb,if=buff.arcane_charge.stack=0|(active_enemies<3|(active_enemies<2&talent.resonance.enabled))
+  if BuffStacks(arcane_charge_buff) == 0 or Enemies() < 3 or Enemies() < 2 and Talent(resonance_talent) Spell(arcane_orb)
  }
 }
 
 AddFunction ArcaneBurnShortCdPostConditions
 {
- { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) } and Spell(nether_tempest) or Enemies() > 4 and HasEquippedItem(mantle_of_the_first_kirin_tor) and DebuffStacks(arcane_charge_debuff) == SpellData(arcane_charge_debuff max_stacks) and Spell(arcane_barrage) or arcane_missiles_procs() == SpellData(arcane_missiles_buff max_stacks) and Enemies() < 3 and Spell(arcane_missiles) or BuffPresent(presence_of_mind_buff) and Spell(arcane_blast) or Enemies() > 1 and Spell(arcane_explosion) or arcane_missiles_procs() and Spell(arcane_missiles) or Spell(arcane_blast)
+ { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) } and BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) and BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and Spell(nether_tempest) or { Enemies() >= 3 or Enemies() >= 2 and Talent(resonance_talent) } and BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) and Spell(arcane_barrage) or { Enemies() >= 3 or Enemies() >= 2 and Talent(resonance_talent) } and Spell(arcane_explosion) or pressure_rotation() and BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) and Spell(arcane_barrage) or DebuffPresent(clearcasting) and ManaPercent() <= 95 and pressure_rotation() == 0 and Spell(arcane_missiles) or Spell(arcane_blast) or Spell(arcane_barrage)
 }
 
 AddFunction ArcaneBurnCdActions
@@ -317,33 +272,35 @@ AddFunction ArcaneBurnCdActions
  #variable,name=total_burns,op=add,value=1,if=!burn_phase
  #start_burn_phase,if=!burn_phase
  if not GetState(burn_phase) > 0 and not GetState(burn_phase) > 0 SetState(burn_phase 1)
- #stop_burn_phase,if=prev_gcd.1.evocation&cooldown.evocation.charges=0&burn_phase_duration>0
- if PreviousGCDSpell(evocation) and SpellCharges(evocation) == 0 and GetStateDuration() > 0 and GetState(burn_phase) > 0 SetState(burn_phase 0)
+ #stop_burn_phase,if=burn_phase&prev_gcd.1.evocation&target.time_to_die>variable.average_burn_length&burn_phase_duration>0
+ if GetState(burn_phase) > 0 and PreviousGCDSpell(evocation) and target.TimeToDie() > average_burn_length() and GetStateDuration() > 0 and GetState(burn_phase) > 0 SetState(burn_phase 0)
+ #mirror_image
+ Spell(mirror_image)
 
- unless { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) } and Spell(nether_tempest) or Spell(mark_of_aluneth)
+ unless BuffStacks(arcane_charge_buff) <= 1 and { not ArmorSetBonus(T20 2) or SpellCooldown(presence_of_mind) > 5 } and Spell(charged_up) or { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) } and BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) and BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and Spell(nether_tempest)
  {
-  #mirror_image
-  Spell(mirror_image)
+  #lights_judgment,if=buff.arcane_power.down
+  if BuffExpires(arcane_power_buff) Spell(lights_judgment)
 
-  unless { ManaPercent() > 30 or BuffPresent(arcane_power_buff) or not SpellCooldown(arcane_power) > 0 } and Spell(rune_of_power)
+  unless not BuffPresent(arcane_power_buff) and { ManaPercent() >= 50 or not SpellCooldown(arcane_power) > 0 } and BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) and Spell(rune_of_power)
   {
    #arcane_power
    Spell(arcane_power)
+   #use_items,if=buff.arcane_power.up|target.time_to_die<cooldown.arcane_power.remains
+   if BuffPresent(arcane_power_buff) or target.TimeToDie() < SpellCooldown(arcane_power) ArcaneUseItemActions()
    #blood_fury
    Spell(blood_fury_sp)
    #berserking
    Spell(berserking)
-   #arcane_torrent
-   Spell(arcane_torrent_mana)
-   #potion,if=buff.arcane_power.up&(buff.berserking.up|buff.blood_fury.up|!(race.troll|race.orc))
-   if BuffPresent(arcane_power_buff) and { BuffPresent(berserking_buff) or BuffPresent(blood_fury_sp_buff) or not { Race(Troll) or Race(Orc) } } Item(deadly_grace_potion)
-   #use_items,if=buff.arcane_power.up|target.time_to_die<cooldown.arcane_power.remains
-   if BuffPresent(arcane_power_buff) or target.TimeToDie() < SpellCooldown(arcane_power) ArcaneUseItemActions()
+   #fireblood
+   Spell(fireblood)
+   #ancestral_call
+   Spell(ancestral_call)
 
-   unless { { ManaPercent() > 30 or BuffPresent(arcane_power_buff) } and ArmorSetBonus(T20 2) or TotemRemaining(rune_of_power) <= SpellData(presence_of_mind_buff max_stacks) * ExecuteTime(arcane_blast) or BuffRemaining(arcane_power_buff) <= SpellData(presence_of_mind_buff max_stacks) * ExecuteTime(arcane_blast) } and Spell(presence_of_mind) or Spell(arcane_orb) or Enemies() > 4 and HasEquippedItem(mantle_of_the_first_kirin_tor) and DebuffStacks(arcane_charge_debuff) == SpellData(arcane_charge_debuff max_stacks) and Spell(arcane_barrage) or arcane_missiles_procs() == SpellData(arcane_missiles_buff max_stacks) and Enemies() < 3 and Spell(arcane_missiles) or BuffPresent(presence_of_mind_buff) and Spell(arcane_blast) or Enemies() > 1 and Spell(arcane_explosion) or arcane_missiles_procs() and Spell(arcane_missiles) or Spell(arcane_blast)
+   unless Spell(presence_of_mind) or { BuffStacks(arcane_charge_buff) == 0 or Enemies() < 3 or Enemies() < 2 and Talent(resonance_talent) } and Spell(arcane_orb) or { Enemies() >= 3 or Enemies() >= 2 and Talent(resonance_talent) } and BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) and Spell(arcane_barrage) or { Enemies() >= 3 or Enemies() >= 2 and Talent(resonance_talent) } and Spell(arcane_explosion) or pressure_rotation() and BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) and Spell(arcane_barrage) or DebuffPresent(clearcasting) and ManaPercent() <= 95 and pressure_rotation() == 0 and Spell(arcane_missiles) or Spell(arcane_blast)
    {
-    #variable,name=average_burn_length,op=set,value=(variable.average_burn_length*variable.total_burns-variable.average_burn_length+burn_phase_duration)%variable.total_burns
-    #evocation,interrupt_if=ticks=2|mana.pct>=85,interrupt_immediate=1
+    #variable,name=average_burn_length,op=set,value=(variable.average_burn_length*variable.total_burns-variable.average_burn_length+(burn_phase_duration))%variable.total_burns
+    #evocation,interrupt_if=mana.pct>=97|(buff.clearcasting.react&mana.pct>=92)
     Spell(evocation)
    }
   }
@@ -352,140 +309,85 @@ AddFunction ArcaneBurnCdActions
 
 AddFunction ArcaneBurnCdPostConditions
 {
- { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) } and Spell(nether_tempest) or Spell(mark_of_aluneth) or { ManaPercent() > 30 or BuffPresent(arcane_power_buff) or not SpellCooldown(arcane_power) > 0 } and Spell(rune_of_power) or { { ManaPercent() > 30 or BuffPresent(arcane_power_buff) } and ArmorSetBonus(T20 2) or TotemRemaining(rune_of_power) <= SpellData(presence_of_mind_buff max_stacks) * ExecuteTime(arcane_blast) or BuffRemaining(arcane_power_buff) <= SpellData(presence_of_mind_buff max_stacks) * ExecuteTime(arcane_blast) } and Spell(presence_of_mind) or Spell(arcane_orb) or Enemies() > 4 and HasEquippedItem(mantle_of_the_first_kirin_tor) and DebuffStacks(arcane_charge_debuff) == SpellData(arcane_charge_debuff max_stacks) and Spell(arcane_barrage) or arcane_missiles_procs() == SpellData(arcane_missiles_buff max_stacks) and Enemies() < 3 and Spell(arcane_missiles) or BuffPresent(presence_of_mind_buff) and Spell(arcane_blast) or Enemies() > 1 and Spell(arcane_explosion) or arcane_missiles_procs() and Spell(arcane_missiles) or Spell(arcane_blast)
-}
-
-### actions.build
-
-AddFunction ArcaneBuildMainActions
-{
- #charged_up,if=equipped.mystic_kilt_of_the_rune_master|(variable.arcane_missiles_procs=buff.arcane_missiles.max_stack&active_enemies<3)
- if HasEquippedItem(mystic_kilt_of_the_rune_master) or arcane_missiles_procs() == SpellData(arcane_missiles_buff max_stacks) and Enemies() < 3 Spell(charged_up)
- #arcane_missiles,if=variable.arcane_missiles_procs=buff.arcane_missiles.max_stack&active_enemies<3
- if arcane_missiles_procs() == SpellData(arcane_missiles_buff max_stacks) and Enemies() < 3 Spell(arcane_missiles)
- #arcane_explosion,if=active_enemies>1
- if Enemies() > 1 Spell(arcane_explosion)
- #arcane_blast
- Spell(arcane_blast)
-}
-
-AddFunction ArcaneBuildMainPostConditions
-{
-}
-
-AddFunction ArcaneBuildShortCdActions
-{
- #arcane_orb
- Spell(arcane_orb)
-}
-
-AddFunction ArcaneBuildShortCdPostConditions
-{
- { HasEquippedItem(mystic_kilt_of_the_rune_master) or arcane_missiles_procs() == SpellData(arcane_missiles_buff max_stacks) and Enemies() < 3 } and Spell(charged_up) or arcane_missiles_procs() == SpellData(arcane_missiles_buff max_stacks) and Enemies() < 3 and Spell(arcane_missiles) or Enemies() > 1 and Spell(arcane_explosion) or Spell(arcane_blast)
-}
-
-AddFunction ArcaneBuildCdActions
-{
-}
-
-AddFunction ArcaneBuildCdPostConditions
-{
- Spell(arcane_orb) or { HasEquippedItem(mystic_kilt_of_the_rune_master) or arcane_missiles_procs() == SpellData(arcane_missiles_buff max_stacks) and Enemies() < 3 } and Spell(charged_up) or arcane_missiles_procs() == SpellData(arcane_missiles_buff max_stacks) and Enemies() < 3 and Spell(arcane_missiles) or Enemies() > 1 and Spell(arcane_explosion) or Spell(arcane_blast)
+ BuffStacks(arcane_charge_buff) <= 1 and { not ArmorSetBonus(T20 2) or SpellCooldown(presence_of_mind) > 5 } and Spell(charged_up) or { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) } and BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) and BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and Spell(nether_tempest) or not BuffPresent(arcane_power_buff) and { ManaPercent() >= 50 or not SpellCooldown(arcane_power) > 0 } and BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) and Spell(rune_of_power) or Spell(presence_of_mind) or { BuffStacks(arcane_charge_buff) == 0 or Enemies() < 3 or Enemies() < 2 and Talent(resonance_talent) } and Spell(arcane_orb) or { Enemies() >= 3 or Enemies() >= 2 and Talent(resonance_talent) } and BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) and Spell(arcane_barrage) or { Enemies() >= 3 or Enemies() >= 2 and Talent(resonance_talent) } and Spell(arcane_explosion) or pressure_rotation() and BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) and Spell(arcane_barrage) or DebuffPresent(clearcasting) and ManaPercent() <= 95 and pressure_rotation() == 0 and Spell(arcane_missiles) or Spell(arcane_blast) or Spell(arcane_barrage)
 }
 
 ### actions.default
 
 AddFunction ArcaneDefaultMainActions
 {
- #call_action_list,name=variables
- ArcaneVariablesMainActions()
+ #variable,name=pressure_rotation,op=set,value=(azerite.arcane_pressure.rank>=2|(talent.resonance.enabled&active_enemies>=2))&target.health.pct<=35
+ #call_action_list,name=burn,if=burn_phase|target.time_to_die<variable.average_burn_length|(cooldown.arcane_power.remains=0&cooldown.evocation.remains<=variable.average_burn_length&(buff.arcane_charge.stack=buff.arcane_charge.max_stack|(talent.charged_up.enabled&cooldown.charged_up.remains=0)))
+ if { GetState(burn_phase) > 0 or target.TimeToDie() < average_burn_length() or not SpellCooldown(arcane_power) > 0 and SpellCooldown(evocation) <= average_burn_length() and { BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) or Talent(charged_up_talent) and not SpellCooldown(charged_up) > 0 } } and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneBurnMainActions()
 
- unless ArcaneVariablesMainPostConditions()
+ unless { GetState(burn_phase) > 0 or target.TimeToDie() < average_burn_length() or not SpellCooldown(arcane_power) > 0 and SpellCooldown(evocation) <= average_burn_length() and { BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) or Talent(charged_up_talent) and not SpellCooldown(charged_up) > 0 } } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnMainPostConditions()
  {
-  #call_action_list,name=build,if=buff.arcane_charge.stack<buff.arcane_charge.max_stack&!burn_phase&time>0
-  if DebuffStacks(arcane_charge_debuff) < SpellData(arcane_charge_debuff max_stacks) and not GetState(burn_phase) > 0 and TimeInCombat() > 0 ArcaneBuildMainActions()
+  #call_action_list,name=conserve,if=!burn_phase
+  if not GetState(burn_phase) > 0 ArcaneConserveMainActions()
 
-  unless DebuffStacks(arcane_charge_debuff) < SpellData(arcane_charge_debuff max_stacks) and not GetState(burn_phase) > 0 and TimeInCombat() > 0 and ArcaneBuildMainPostConditions()
+  unless not GetState(burn_phase) > 0 and ArcaneConserveMainPostConditions()
   {
-   #call_action_list,name=burn,if=variable.time_until_burn=0|burn_phase
-   if { time_until_burn() == 0 or GetState(burn_phase) > 0 } and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneBurnMainActions()
-
-   unless { time_until_burn() == 0 or GetState(burn_phase) > 0 } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnMainPostConditions()
-   {
-    #call_action_list,name=conserve
-    ArcaneConserveMainActions()
-   }
+   #call_action_list,name=movement
+   ArcaneMovementMainActions()
   }
  }
 }
 
 AddFunction ArcaneDefaultMainPostConditions
 {
- ArcaneVariablesMainPostConditions() or DebuffStacks(arcane_charge_debuff) < SpellData(arcane_charge_debuff max_stacks) and not GetState(burn_phase) > 0 and TimeInCombat() > 0 and ArcaneBuildMainPostConditions() or { time_until_burn() == 0 or GetState(burn_phase) > 0 } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnMainPostConditions() or ArcaneConserveMainPostConditions()
+ { GetState(burn_phase) > 0 or target.TimeToDie() < average_burn_length() or not SpellCooldown(arcane_power) > 0 and SpellCooldown(evocation) <= average_burn_length() and { BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) or Talent(charged_up_talent) and not SpellCooldown(charged_up) > 0 } } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnMainPostConditions() or not GetState(burn_phase) > 0 and ArcaneConserveMainPostConditions() or ArcaneMovementMainPostConditions()
 }
 
 AddFunction ArcaneDefaultShortCdActions
 {
- #call_action_list,name=variables
- ArcaneVariablesShortCdActions()
+ #variable,name=pressure_rotation,op=set,value=(azerite.arcane_pressure.rank>=2|(talent.resonance.enabled&active_enemies>=2))&target.health.pct<=35
+ #call_action_list,name=burn,if=burn_phase|target.time_to_die<variable.average_burn_length|(cooldown.arcane_power.remains=0&cooldown.evocation.remains<=variable.average_burn_length&(buff.arcane_charge.stack=buff.arcane_charge.max_stack|(talent.charged_up.enabled&cooldown.charged_up.remains=0)))
+ if { GetState(burn_phase) > 0 or target.TimeToDie() < average_burn_length() or not SpellCooldown(arcane_power) > 0 and SpellCooldown(evocation) <= average_burn_length() and { BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) or Talent(charged_up_talent) and not SpellCooldown(charged_up) > 0 } } and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneBurnShortCdActions()
 
- unless ArcaneVariablesShortCdPostConditions()
+ unless { GetState(burn_phase) > 0 or target.TimeToDie() < average_burn_length() or not SpellCooldown(arcane_power) > 0 and SpellCooldown(evocation) <= average_burn_length() and { BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) or Talent(charged_up_talent) and not SpellCooldown(charged_up) > 0 } } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnShortCdPostConditions()
  {
-  #cancel_buff,name=presence_of_mind,if=active_enemies>1&set_bonus.tier20_2pc
-  if Enemies() > 1 and ArmorSetBonus(T20 2) and BuffPresent(presence_of_mind_buff) Texture(presence_of_mind text=cancel)
-  #call_action_list,name=build,if=buff.arcane_charge.stack<buff.arcane_charge.max_stack&!burn_phase&time>0
-  if DebuffStacks(arcane_charge_debuff) < SpellData(arcane_charge_debuff max_stacks) and not GetState(burn_phase) > 0 and TimeInCombat() > 0 ArcaneBuildShortCdActions()
+  #call_action_list,name=conserve,if=!burn_phase
+  if not GetState(burn_phase) > 0 ArcaneConserveShortCdActions()
 
-  unless DebuffStacks(arcane_charge_debuff) < SpellData(arcane_charge_debuff max_stacks) and not GetState(burn_phase) > 0 and TimeInCombat() > 0 and ArcaneBuildShortCdPostConditions()
+  unless not GetState(burn_phase) > 0 and ArcaneConserveShortCdPostConditions()
   {
-   #call_action_list,name=burn,if=variable.time_until_burn=0|burn_phase
-   if { time_until_burn() == 0 or GetState(burn_phase) > 0 } and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneBurnShortCdActions()
-
-   unless { time_until_burn() == 0 or GetState(burn_phase) > 0 } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnShortCdPostConditions()
-   {
-    #call_action_list,name=conserve
-    ArcaneConserveShortCdActions()
-   }
+   #call_action_list,name=movement
+   ArcaneMovementShortCdActions()
   }
  }
 }
 
 AddFunction ArcaneDefaultShortCdPostConditions
 {
- ArcaneVariablesShortCdPostConditions() or DebuffStacks(arcane_charge_debuff) < SpellData(arcane_charge_debuff max_stacks) and not GetState(burn_phase) > 0 and TimeInCombat() > 0 and ArcaneBuildShortCdPostConditions() or { time_until_burn() == 0 or GetState(burn_phase) > 0 } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnShortCdPostConditions() or ArcaneConserveShortCdPostConditions()
+ { GetState(burn_phase) > 0 or target.TimeToDie() < average_burn_length() or not SpellCooldown(arcane_power) > 0 and SpellCooldown(evocation) <= average_burn_length() and { BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) or Talent(charged_up_talent) and not SpellCooldown(charged_up) > 0 } } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnShortCdPostConditions() or not GetState(burn_phase) > 0 and ArcaneConserveShortCdPostConditions() or ArcaneMovementShortCdPostConditions()
 }
 
 AddFunction ArcaneDefaultCdActions
 {
  #counterspell,if=target.debuff.casting.react
  if target.IsInterruptible() ArcaneInterruptActions()
- #time_warp,if=buff.bloodlust.down&(time=0|(buff.arcane_power.up&(buff.potion.up|!action.potion.usable))|target.time_to_die<=buff.bloodlust.duration)
- if BuffExpires(burst_haste_buff any=1) and { TimeInCombat() == 0 or BuffPresent(arcane_power_buff) and { BuffPresent(deadly_grace_potion_buff) or not CanCast(deadly_grace_potion) } or target.TimeToDie() <= BaseDuration(burst_haste_buff) } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
- #call_action_list,name=variables
- ArcaneVariablesCdActions()
+ #time_warp,if=time=0&buff.bloodlust.down
+ if TimeInCombat() == 0 and BuffExpires(burst_haste_buff any=1) and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
+ #variable,name=pressure_rotation,op=set,value=(azerite.arcane_pressure.rank>=2|(talent.resonance.enabled&active_enemies>=2))&target.health.pct<=35
+ #call_action_list,name=burn,if=burn_phase|target.time_to_die<variable.average_burn_length|(cooldown.arcane_power.remains=0&cooldown.evocation.remains<=variable.average_burn_length&(buff.arcane_charge.stack=buff.arcane_charge.max_stack|(talent.charged_up.enabled&cooldown.charged_up.remains=0)))
+ if { GetState(burn_phase) > 0 or target.TimeToDie() < average_burn_length() or not SpellCooldown(arcane_power) > 0 and SpellCooldown(evocation) <= average_burn_length() and { BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) or Talent(charged_up_talent) and not SpellCooldown(charged_up) > 0 } } and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneBurnCdActions()
 
- unless ArcaneVariablesCdPostConditions() or Enemies() > 1 and ArmorSetBonus(T20 2) and BuffPresent(presence_of_mind_buff) and Texture(presence_of_mind text=cancel)
+ unless { GetState(burn_phase) > 0 or target.TimeToDie() < average_burn_length() or not SpellCooldown(arcane_power) > 0 and SpellCooldown(evocation) <= average_burn_length() and { BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) or Talent(charged_up_talent) and not SpellCooldown(charged_up) > 0 } } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnCdPostConditions()
  {
-  #call_action_list,name=build,if=buff.arcane_charge.stack<buff.arcane_charge.max_stack&!burn_phase&time>0
-  if DebuffStacks(arcane_charge_debuff) < SpellData(arcane_charge_debuff max_stacks) and not GetState(burn_phase) > 0 and TimeInCombat() > 0 ArcaneBuildCdActions()
+  #call_action_list,name=conserve,if=!burn_phase
+  if not GetState(burn_phase) > 0 ArcaneConserveCdActions()
 
-  unless DebuffStacks(arcane_charge_debuff) < SpellData(arcane_charge_debuff max_stacks) and not GetState(burn_phase) > 0 and TimeInCombat() > 0 and ArcaneBuildCdPostConditions()
+  unless not GetState(burn_phase) > 0 and ArcaneConserveCdPostConditions()
   {
-   #call_action_list,name=burn,if=variable.time_until_burn=0|burn_phase
-   if { time_until_burn() == 0 or GetState(burn_phase) > 0 } and CheckBoxOn(opt_arcane_mage_burn_phase) ArcaneBurnCdActions()
-
-   unless { time_until_burn() == 0 or GetState(burn_phase) > 0 } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnCdPostConditions()
-   {
-    #call_action_list,name=conserve
-    ArcaneConserveCdActions()
-   }
+   #call_action_list,name=movement
+   ArcaneMovementCdActions()
   }
  }
 }
 
 AddFunction ArcaneDefaultCdPostConditions
 {
- ArcaneVariablesCdPostConditions() or Enemies() > 1 and ArmorSetBonus(T20 2) and BuffPresent(presence_of_mind_buff) and Texture(presence_of_mind text=cancel) or DebuffStacks(arcane_charge_debuff) < SpellData(arcane_charge_debuff max_stacks) and not GetState(burn_phase) > 0 and TimeInCombat() > 0 and ArcaneBuildCdPostConditions() or { time_until_burn() == 0 or GetState(burn_phase) > 0 } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnCdPostConditions() or ArcaneConserveCdPostConditions()
+ { GetState(burn_phase) > 0 or target.TimeToDie() < average_burn_length() or not SpellCooldown(arcane_power) > 0 and SpellCooldown(evocation) <= average_burn_length() and { BuffStacks(arcane_charge_buff) == SpellData(arcane_charge_buff max_stacks) or Talent(charged_up_talent) and not SpellCooldown(charged_up) > 0 } } and CheckBoxOn(opt_arcane_mage_burn_phase) and ArcaneBurnCdPostConditions() or not GetState(burn_phase) > 0 and ArcaneConserveCdPostConditions() or ArcaneMovementCdPostConditions()
 }
 
 ### Arcane icons.
@@ -547,52 +449,54 @@ AddIcon checkbox=opt_mage_arcane_aoe help=cd specialization=arcane
 }
 
 ### Required symbols
-# arcane_missiles_buff
-# arcane_power
-# evocation
-# presence_of_mind
-# rune_of_power
-# rune_of_power_talent
-# summon_arcane_familiar
-# mirror_image
-# deadly_grace_potion
-# mark_of_aluneth
-# charged_up_talent
-# arcane_blast
+# ancestral_call
 # arcane_barrage
+# arcane_blast
+# arcane_charge_buff
+# arcane_explosion
+# arcane_intellect
 # arcane_missiles
-# supernova
+# arcane_orb
+# arcane_orb_talent
+# arcane_power
+# arcane_power_buff
+# arcane_pressure_trait
+# battle_potion_of_intellect
+# berserking
+# blink
+# blood_fury_sp
+# charged_up
+# charged_up_talent
+# clearcasting
+# counterspell
+# evocation
+# fireblood
+# lights_judgment
+# mirror_image
 # nether_tempest
 # nether_tempest_debuff
-# arcane_explosion
-# mystic_kilt_of_the_rune_master
-# rhonins_assaulting_armwraps_buff
-# arcane_power_buff
-# blood_fury_sp
-# berserking
-# arcane_torrent_mana
-# berserking_buff
-# blood_fury_sp_buff
-# presence_of_mind_buff
-# arcane_orb
-# mantle_of_the_first_kirin_tor
-# arcane_charge_debuff
-# charged_up
-# time_warp
-# deadly_grace_potion_buff
+# overpowered_talent
+# presence_of_mind
 # quaking_palm
-# counterspell
+# resonance_talent
+# rule_of_threes
+# rune_of_power
+# rune_of_power_buff
+# shimmer
+# summon_arcane_familiar
+# supernova
+# time_warp
 ]]
     OvaleScripts:RegisterScript("MAGE", "arcane", name, desc, code, "script")
 end
 do
-    local name = "sc_mage_fire_t19"
-    local desc = "[7.0] Simulationcraft: Mage_Fire_T19"
+    local name = "sc_pr_mage_fire"
+    local desc = "[8.0] Simulationcraft: PR_Mage_Fire"
     local code = [[
-# Based on SimulationCraft profile "Mage_Fire_T19P".
+# Based on SimulationCraft profile "PR_Mage_Fire".
 #	class=mage
 #	spec=fire
-#	talents=3022023
+#	talents=1031023
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -605,239 +509,179 @@ AddCheckBox(opt_time_warp SpellName(time_warp) specialization=fire)
 
 AddFunction FireInterruptActions
 {
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
-	{
-		if target.InRange(counterspell) and target.IsInterruptible() Spell(counterspell)
-		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
-	}
+ if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+ {
+  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+  if target.InRange(counterspell) and target.IsInterruptible() Spell(counterspell)
+ }
 }
 
 AddFunction FireUseItemActions
 {
-	Item(Trinket0Slot text=13 usable=1)
-	Item(Trinket1Slot text=14 usable=1)
+ Item(Trinket0Slot text=13 usable=1)
+ Item(Trinket1Slot text=14 usable=1)
 }
 
-### actions.default
+### actions.standard_rotation
 
-AddFunction FireDefaultMainActions
+AddFunction FireStandardrotationMainActions
 {
-	#call_action_list,name=combustion_phase,if=cooldown.combustion.remains<=action.rune_of_power.cast_time+(!talent.kindling.enabled*gcd)&(!talent.firestarter.enabled|!firestarter.active|active_enemies>=4|active_enemies>=2&talent.flame_patch.enabled)|buff.combustion.up
-	if SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() and { not Talent(firestarter_talent) or not { HasTalent(firestarter_talent) and target.HealthPercent() >= 90 } or Enemies() >= 4 or Enemies() >= 2 and Talent(flame_patch_talent) } or BuffPresent(combustion_buff) FireCombustionPhaseMainActions()
+ #flamestrike,if=((talent.flame_patch.enabled&active_enemies>1)|active_enemies>4)&buff.hot_streak.react
+ if { Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 4 } and BuffPresent(hot_streak_buff) Spell(flamestrike)
+ #pyroblast,if=buff.hot_streak.react&buff.hot_streak.remains<action.fireball.execute_time
+ if BuffPresent(hot_streak_buff) and BuffRemaining(hot_streak_buff) < ExecuteTime(fireball) Spell(pyroblast)
+ #pyroblast,if=buff.hot_streak.react&firestarter.active&!talent.rune_of_power.enabled
+ if BuffPresent(hot_streak_buff) and Talent(firestarter_talent) and target.HealthPercent() >= 90 and not Talent(rune_of_power_talent) Spell(pyroblast)
+ #phoenix_flames,if=charges_fractional>2.7&active_enemies>2
+ if Charges(phoenix_flames count=0) > 2 and Enemies() > 2 Spell(phoenix_flames)
+ #pyroblast,if=buff.hot_streak.react&(!prev_gcd.1.pyroblast|action.pyroblast.in_flight)
+ if BuffPresent(hot_streak_buff) and { not PreviousGCDSpell(pyroblast) or InFlightToTarget(pyroblast) } Spell(pyroblast)
+ #pyroblast,if=buff.hot_streak.react&target.health.pct<=30&talent.searing_touch.enabled
+ if BuffPresent(hot_streak_buff) and target.HealthPercent() <= 30 and Talent(searing_touch_talent) Spell(pyroblast)
+ #pyroblast,if=buff.pyroclasm.react&execute_time<buff.pyroclasm.remains
+ if DebuffPresent(pyroclasm) and ExecuteTime(pyroblast) < DebuffRemaining(pyroclasm) Spell(pyroblast)
+ #call_action_list,name=active_talents
+ FireActivetalentsMainActions()
 
-	unless { SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() and { not Talent(firestarter_talent) or not { HasTalent(firestarter_talent) and target.HealthPercent() >= 90 } or Enemies() >= 4 or Enemies() >= 2 and Talent(flame_patch_talent) } or BuffPresent(combustion_buff) } and FireCombustionPhaseMainPostConditions()
-	{
-		#call_action_list,name=rop_phase,if=buff.rune_of_power.up&buff.combustion.down
-		if BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) FireRopPhaseMainActions()
-
-		unless BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopPhaseMainPostConditions()
-		{
-			#call_action_list,name=standard_rotation
-			FireStandardRotationMainActions()
-		}
-	}
+ unless FireActivetalentsMainPostConditions()
+ {
+  #fire_blast,if=!talent.kindling.enabled&buff.heating_up.react&(!talent.rune_of_power.enabled|charges_fractional>1.4|cooldown.combustion.remains<40)&(3-charges_fractional)*(12*spell_haste)<cooldown.combustion.remains+3|target.time_to_die<4
+  if not Talent(kindling_talent) and BuffPresent(heating_up_buff) and { not Talent(rune_of_power_talent) or Charges(fire_blast count=0) > 1 or SpellCooldown(combustion) < 40 } and { 3 - Charges(fire_blast count=0) } * 12 * { 100 / { 100 + SpellCastSpeedPercent() } } < SpellCooldown(combustion) + 3 or target.TimeToDie() < 4 Spell(fire_blast)
+  #fire_blast,if=talent.kindling.enabled&buff.heating_up.react&(!talent.rune_of_power.enabled|charges_fractional>1.5|cooldown.combustion.remains<40)&(3-charges_fractional)*(18*spell_haste)<cooldown.combustion.remains+3|target.time_to_die<4
+  if Talent(kindling_talent) and BuffPresent(heating_up_buff) and { not Talent(rune_of_power_talent) or Charges(fire_blast count=0) > 1 or SpellCooldown(combustion) < 40 } and { 3 - Charges(fire_blast count=0) } * 18 * { 100 / { 100 + SpellCastSpeedPercent() } } < SpellCooldown(combustion) + 3 or target.TimeToDie() < 4 Spell(fire_blast)
+  #phoenix_flames,if=(buff.combustion.up|buff.rune_of_power.up|buff.incanters_flow.stack>3|talent.mirror_image.enabled)&(4-charges_fractional)*13<cooldown.combustion.remains+5|target.time_to_die<10
+  if { BuffPresent(combustion_buff) or BuffPresent(rune_of_power_buff) or BuffStacks(incanters_flow_buff) > 3 or Talent(mirror_image_talent) } and { 4 - Charges(phoenix_flames count=0) } * 13 < SpellCooldown(combustion) + 5 or target.TimeToDie() < 10 Spell(phoenix_flames)
+  #phoenix_flames,if=(buff.combustion.up|buff.rune_of_power.up)&(4-charges_fractional)*30<cooldown.combustion.remains+5
+  if { BuffPresent(combustion_buff) or BuffPresent(rune_of_power_buff) } and { 4 - Charges(phoenix_flames count=0) } * 30 < SpellCooldown(combustion) + 5 Spell(phoenix_flames)
+  #phoenix_flames,if=charges_fractional>2.5&cooldown.combustion.remains>23
+  if Charges(phoenix_flames count=0) > 2 and SpellCooldown(combustion) > 23 Spell(phoenix_flames)
+  #scorch,if=(target.health.pct<=30&talent.searing_touch.enabled)|(azerite.preheat.enabled&debuff.preheat.down)
+  if target.HealthPercent() <= 30 and Talent(searing_touch_talent) or HasAzeriteTrait(preheat_trait) and target.DebuffExpires(preheat) Spell(scorch)
+  #fireball
+  Spell(fireball)
+  #scorch
+  Spell(scorch)
+ }
 }
 
-AddFunction FireDefaultMainPostConditions
+AddFunction FireStandardrotationMainPostConditions
 {
-	{ SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() and { not Talent(firestarter_talent) or not { HasTalent(firestarter_talent) and target.HealthPercent() >= 90 } or Enemies() >= 4 or Enemies() >= 2 and Talent(flame_patch_talent) } or BuffPresent(combustion_buff) } and FireCombustionPhaseMainPostConditions() or BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopPhaseMainPostConditions() or FireStandardRotationMainPostConditions()
+ FireActivetalentsMainPostConditions()
 }
 
-AddFunction FireDefaultShortCdActions
+AddFunction FireStandardrotationShortCdActions
 {
-	#rune_of_power,if=firestarter.active&action.rune_of_power.charges=2|cooldown.combustion.remains>40&buff.combustion.down&!talent.kindling.enabled|target.time_to_die<11|talent.kindling.enabled&(charges_fractional>1.8|time<40)&cooldown.combustion.remains>40
-	if HasTalent(firestarter_talent) and target.HealthPercent() >= 90 and Charges(rune_of_power) == 2 or SpellCooldown(combustion) > 40 and BuffExpires(combustion_buff) and not Talent(kindling_talent) or target.TimeToDie() < 11 or Talent(kindling_talent) and { Charges(rune_of_power count=0) > 1.8 or TimeInCombat() < 40 } and SpellCooldown(combustion) > 40 Spell(rune_of_power)
-	#rune_of_power,if=(buff.kaelthas_ultimate_ability.react&(cooldown.combustion.remains>40|action.rune_of_power.charges>1))|(buff.erupting_infernal_core.up&(cooldown.combustion.remains>40|action.rune_of_power.charges>1))
-	if BuffPresent(kaelthas_ultimate_ability_buff) and { SpellCooldown(combustion) > 40 or Charges(rune_of_power) > 1 } or BuffPresent(erupting_infernal_core_buff) and { SpellCooldown(combustion) > 40 or Charges(rune_of_power) > 1 } Spell(rune_of_power)
-	#call_action_list,name=combustion_phase,if=cooldown.combustion.remains<=action.rune_of_power.cast_time+(!talent.kindling.enabled*gcd)&(!talent.firestarter.enabled|!firestarter.active|active_enemies>=4|active_enemies>=2&talent.flame_patch.enabled)|buff.combustion.up
-	if SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() and { not Talent(firestarter_talent) or not { HasTalent(firestarter_talent) and target.HealthPercent() >= 90 } or Enemies() >= 4 or Enemies() >= 2 and Talent(flame_patch_talent) } or BuffPresent(combustion_buff) FireCombustionPhaseShortCdActions()
-
-	unless { SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() and { not Talent(firestarter_talent) or not { HasTalent(firestarter_talent) and target.HealthPercent() >= 90 } or Enemies() >= 4 or Enemies() >= 2 and Talent(flame_patch_talent) } or BuffPresent(combustion_buff) } and FireCombustionPhaseShortCdPostConditions()
-	{
-		#call_action_list,name=rop_phase,if=buff.rune_of_power.up&buff.combustion.down
-		if BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) FireRopPhaseShortCdActions()
-
-		unless BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopPhaseShortCdPostConditions()
-		{
-			#call_action_list,name=standard_rotation
-			FireStandardRotationShortCdActions()
-		}
-	}
+ unless { Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 4 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(hot_streak_buff) and BuffRemaining(hot_streak_buff) < ExecuteTime(fireball) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Talent(firestarter_talent) and target.HealthPercent() >= 90 and not Talent(rune_of_power_talent) and Spell(pyroblast) or Charges(phoenix_flames count=0) > 2 and Enemies() > 2 and Spell(phoenix_flames) or BuffPresent(hot_streak_buff) and { not PreviousGCDSpell(pyroblast) or InFlightToTarget(pyroblast) } and Spell(pyroblast) or BuffPresent(hot_streak_buff) and target.HealthPercent() <= 30 and Talent(searing_touch_talent) and Spell(pyroblast) or DebuffPresent(pyroclasm) and ExecuteTime(pyroblast) < DebuffRemaining(pyroclasm) and Spell(pyroblast)
+ {
+  #call_action_list,name=active_talents
+  FireActivetalentsShortCdActions()
+ }
 }
 
-AddFunction FireDefaultShortCdPostConditions
+AddFunction FireStandardrotationShortCdPostConditions
 {
-	{ SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() and { not Talent(firestarter_talent) or not { HasTalent(firestarter_talent) and target.HealthPercent() >= 90 } or Enemies() >= 4 or Enemies() >= 2 and Talent(flame_patch_talent) } or BuffPresent(combustion_buff) } and FireCombustionPhaseShortCdPostConditions() or BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopPhaseShortCdPostConditions() or FireStandardRotationShortCdPostConditions()
+ { Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 4 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(hot_streak_buff) and BuffRemaining(hot_streak_buff) < ExecuteTime(fireball) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Talent(firestarter_talent) and target.HealthPercent() >= 90 and not Talent(rune_of_power_talent) and Spell(pyroblast) or Charges(phoenix_flames count=0) > 2 and Enemies() > 2 and Spell(phoenix_flames) or BuffPresent(hot_streak_buff) and { not PreviousGCDSpell(pyroblast) or InFlightToTarget(pyroblast) } and Spell(pyroblast) or BuffPresent(hot_streak_buff) and target.HealthPercent() <= 30 and Talent(searing_touch_talent) and Spell(pyroblast) or DebuffPresent(pyroclasm) and ExecuteTime(pyroblast) < DebuffRemaining(pyroclasm) and Spell(pyroblast) or FireActivetalentsShortCdPostConditions() or { not Talent(kindling_talent) and BuffPresent(heating_up_buff) and { not Talent(rune_of_power_talent) or Charges(fire_blast count=0) > 1 or SpellCooldown(combustion) < 40 } and { 3 - Charges(fire_blast count=0) } * 12 * { 100 / { 100 + SpellCastSpeedPercent() } } < SpellCooldown(combustion) + 3 or target.TimeToDie() < 4 } and Spell(fire_blast) or { Talent(kindling_talent) and BuffPresent(heating_up_buff) and { not Talent(rune_of_power_talent) or Charges(fire_blast count=0) > 1 or SpellCooldown(combustion) < 40 } and { 3 - Charges(fire_blast count=0) } * 18 * { 100 / { 100 + SpellCastSpeedPercent() } } < SpellCooldown(combustion) + 3 or target.TimeToDie() < 4 } and Spell(fire_blast) or { { BuffPresent(combustion_buff) or BuffPresent(rune_of_power_buff) or BuffStacks(incanters_flow_buff) > 3 or Talent(mirror_image_talent) } and { 4 - Charges(phoenix_flames count=0) } * 13 < SpellCooldown(combustion) + 5 or target.TimeToDie() < 10 } and Spell(phoenix_flames) or { BuffPresent(combustion_buff) or BuffPresent(rune_of_power_buff) } and { 4 - Charges(phoenix_flames count=0) } * 30 < SpellCooldown(combustion) + 5 and Spell(phoenix_flames) or Charges(phoenix_flames count=0) > 2 and SpellCooldown(combustion) > 23 and Spell(phoenix_flames) or { target.HealthPercent() <= 30 and Talent(searing_touch_talent) or HasAzeriteTrait(preheat_trait) and target.DebuffExpires(preheat) } and Spell(scorch) or Spell(fireball) or Spell(scorch)
 }
 
-AddFunction FireDefaultCdActions
+AddFunction FireStandardrotationCdActions
 {
-	#counterspell,if=target.debuff.casting.react
-	if target.IsInterruptible() FireInterruptActions()
-	#time_warp,if=(time=0&buff.bloodlust.down)|(buff.bloodlust.down&equipped.132410&(cooldown.combustion.remains<1|target.time_to_die<50))
-	if { TimeInCombat() == 0 and BuffExpires(burst_haste_buff any=1) or BuffExpires(burst_haste_buff any=1) and HasEquippedItem(132410) and { SpellCooldown(combustion) < 1 or target.TimeToDie() < 50 } } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
-	#mirror_image,if=buff.combustion.down
-	if BuffExpires(combustion_buff) Spell(mirror_image)
-
-	unless { HasTalent(firestarter_talent) and target.HealthPercent() >= 90 and Charges(rune_of_power) == 2 or SpellCooldown(combustion) > 40 and BuffExpires(combustion_buff) and not Talent(kindling_talent) or target.TimeToDie() < 11 or Talent(kindling_talent) and { Charges(rune_of_power count=0) > 1.8 or TimeInCombat() < 40 } and SpellCooldown(combustion) > 40 } and Spell(rune_of_power) or { BuffPresent(kaelthas_ultimate_ability_buff) and { SpellCooldown(combustion) > 40 or Charges(rune_of_power) > 1 } or BuffPresent(erupting_infernal_core_buff) and { SpellCooldown(combustion) > 40 or Charges(rune_of_power) > 1 } } and Spell(rune_of_power)
-	{
-		#call_action_list,name=combustion_phase,if=cooldown.combustion.remains<=action.rune_of_power.cast_time+(!talent.kindling.enabled*gcd)&(!talent.firestarter.enabled|!firestarter.active|active_enemies>=4|active_enemies>=2&talent.flame_patch.enabled)|buff.combustion.up
-		if SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() and { not Talent(firestarter_talent) or not { HasTalent(firestarter_talent) and target.HealthPercent() >= 90 } or Enemies() >= 4 or Enemies() >= 2 and Talent(flame_patch_talent) } or BuffPresent(combustion_buff) FireCombustionPhaseCdActions()
-
-		unless { SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() and { not Talent(firestarter_talent) or not { HasTalent(firestarter_talent) and target.HealthPercent() >= 90 } or Enemies() >= 4 or Enemies() >= 2 and Talent(flame_patch_talent) } or BuffPresent(combustion_buff) } and FireCombustionPhaseCdPostConditions()
-		{
-			#call_action_list,name=rop_phase,if=buff.rune_of_power.up&buff.combustion.down
-			if BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) FireRopPhaseCdActions()
-
-			unless BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopPhaseCdPostConditions()
-			{
-				#call_action_list,name=standard_rotation
-				FireStandardRotationCdActions()
-			}
-		}
-	}
+ unless { Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 4 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(hot_streak_buff) and BuffRemaining(hot_streak_buff) < ExecuteTime(fireball) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Talent(firestarter_talent) and target.HealthPercent() >= 90 and not Talent(rune_of_power_talent) and Spell(pyroblast) or Charges(phoenix_flames count=0) > 2 and Enemies() > 2 and Spell(phoenix_flames) or BuffPresent(hot_streak_buff) and { not PreviousGCDSpell(pyroblast) or InFlightToTarget(pyroblast) } and Spell(pyroblast) or BuffPresent(hot_streak_buff) and target.HealthPercent() <= 30 and Talent(searing_touch_talent) and Spell(pyroblast) or DebuffPresent(pyroclasm) and ExecuteTime(pyroblast) < DebuffRemaining(pyroclasm) and Spell(pyroblast)
+ {
+  #call_action_list,name=active_talents
+  FireActivetalentsCdActions()
+ }
 }
 
-AddFunction FireDefaultCdPostConditions
+AddFunction FireStandardrotationCdPostConditions
 {
-	{ HasTalent(firestarter_talent) and target.HealthPercent() >= 90 and Charges(rune_of_power) == 2 or SpellCooldown(combustion) > 40 and BuffExpires(combustion_buff) and not Talent(kindling_talent) or target.TimeToDie() < 11 or Talent(kindling_talent) and { Charges(rune_of_power count=0) > 1.8 or TimeInCombat() < 40 } and SpellCooldown(combustion) > 40 } and Spell(rune_of_power) or { BuffPresent(kaelthas_ultimate_ability_buff) and { SpellCooldown(combustion) > 40 or Charges(rune_of_power) > 1 } or BuffPresent(erupting_infernal_core_buff) and { SpellCooldown(combustion) > 40 or Charges(rune_of_power) > 1 } } and Spell(rune_of_power) or { SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() and { not Talent(firestarter_talent) or not { HasTalent(firestarter_talent) and target.HealthPercent() >= 90 } or Enemies() >= 4 or Enemies() >= 2 and Talent(flame_patch_talent) } or BuffPresent(combustion_buff) } and FireCombustionPhaseCdPostConditions() or BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopPhaseCdPostConditions() or FireStandardRotationCdPostConditions()
+ { Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 4 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(hot_streak_buff) and BuffRemaining(hot_streak_buff) < ExecuteTime(fireball) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Talent(firestarter_talent) and target.HealthPercent() >= 90 and not Talent(rune_of_power_talent) and Spell(pyroblast) or Charges(phoenix_flames count=0) > 2 and Enemies() > 2 and Spell(phoenix_flames) or BuffPresent(hot_streak_buff) and { not PreviousGCDSpell(pyroblast) or InFlightToTarget(pyroblast) } and Spell(pyroblast) or BuffPresent(hot_streak_buff) and target.HealthPercent() <= 30 and Talent(searing_touch_talent) and Spell(pyroblast) or DebuffPresent(pyroclasm) and ExecuteTime(pyroblast) < DebuffRemaining(pyroclasm) and Spell(pyroblast) or FireActivetalentsCdPostConditions() or { not Talent(kindling_talent) and BuffPresent(heating_up_buff) and { not Talent(rune_of_power_talent) or Charges(fire_blast count=0) > 1 or SpellCooldown(combustion) < 40 } and { 3 - Charges(fire_blast count=0) } * 12 * { 100 / { 100 + SpellCastSpeedPercent() } } < SpellCooldown(combustion) + 3 or target.TimeToDie() < 4 } and Spell(fire_blast) or { Talent(kindling_talent) and BuffPresent(heating_up_buff) and { not Talent(rune_of_power_talent) or Charges(fire_blast count=0) > 1 or SpellCooldown(combustion) < 40 } and { 3 - Charges(fire_blast count=0) } * 18 * { 100 / { 100 + SpellCastSpeedPercent() } } < SpellCooldown(combustion) + 3 or target.TimeToDie() < 4 } and Spell(fire_blast) or { { BuffPresent(combustion_buff) or BuffPresent(rune_of_power_buff) or BuffStacks(incanters_flow_buff) > 3 or Talent(mirror_image_talent) } and { 4 - Charges(phoenix_flames count=0) } * 13 < SpellCooldown(combustion) + 5 or target.TimeToDie() < 10 } and Spell(phoenix_flames) or { BuffPresent(combustion_buff) or BuffPresent(rune_of_power_buff) } and { 4 - Charges(phoenix_flames count=0) } * 30 < SpellCooldown(combustion) + 5 and Spell(phoenix_flames) or Charges(phoenix_flames count=0) > 2 and SpellCooldown(combustion) > 23 and Spell(phoenix_flames) or { target.HealthPercent() <= 30 and Talent(searing_touch_talent) or HasAzeriteTrait(preheat_trait) and target.DebuffExpires(preheat) } and Spell(scorch) or Spell(fireball) or Spell(scorch)
 }
 
-### actions.active_talents
+### actions.rop_phase
 
-AddFunction FireActiveTalentsMainActions
+AddFunction FireRopphaseMainActions
 {
-	#blast_wave,if=(buff.combustion.down)|(buff.combustion.up&action.fire_blast.charges<1&action.phoenixs_flames.charges<1)
-	if BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 and Charges(phoenixs_flames) < 1 Spell(blast_wave)
-	#cinderstorm,if=cooldown.combustion.remains<cast_time&(buff.rune_of_power.up|!talent.rune_on_power.enabled)|cooldown.combustion.remains>10*spell_haste&!buff.combustion.up
-	if SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_on_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellCastSpeedPercent() } } and not BuffPresent(combustion_buff) Spell(cinderstorm)
-	#living_bomb,if=active_enemies>1&buff.combustion.down
-	if Enemies() > 1 and BuffExpires(combustion_buff) Spell(living_bomb)
+ #flamestrike,if=((talent.flame_patch.enabled&active_enemies>1)|active_enemies>4)&buff.hot_streak.react
+ if { Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 4 } and BuffPresent(hot_streak_buff) Spell(flamestrike)
+ #pyroblast,if=buff.hot_streak.react
+ if BuffPresent(hot_streak_buff) Spell(pyroblast)
+ #call_action_list,name=active_talents
+ FireActivetalentsMainActions()
+
+ unless FireActivetalentsMainPostConditions()
+ {
+  #pyroblast,if=buff.pyroclasm.react&execute_time<buff.pyroclasm.remains&buff.rune_of_power.remains>cast_time
+  if DebuffPresent(pyroclasm) and ExecuteTime(pyroblast) < DebuffRemaining(pyroclasm) and TotemRemaining(rune_of_power) > CastTime(pyroblast) Spell(pyroblast)
+  #fire_blast,if=!prev_off_gcd.fire_blast&buff.heating_up.react&firestarter.active&charges_fractional>1.7
+  if not PreviousOffGCDSpell(fire_blast) and BuffPresent(heating_up_buff) and Talent(firestarter_talent) and target.HealthPercent() >= 90 and Charges(fire_blast count=0) > 1 Spell(fire_blast)
+  #phoenix_flames,if=!prev_gcd.1.phoenix_flames&charges_fractional>2.7&firestarter.active
+  if not PreviousGCDSpell(phoenix_flames) and Charges(phoenix_flames count=0) > 2 and Talent(firestarter_talent) and target.HealthPercent() >= 90 Spell(phoenix_flames)
+  #fire_blast,if=!prev_off_gcd.fire_blast&!firestarter.active
+  if not PreviousOffGCDSpell(fire_blast) and not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } Spell(fire_blast)
+  #phoenix_flames,if=!prev_gcd.1.phoenix_flames
+  if not PreviousGCDSpell(phoenix_flames) Spell(phoenix_flames)
+  #scorch,if=target.health.pct<=30&talent.searing_touch.enabled
+  if target.HealthPercent() <= 30 and Talent(searing_touch_talent) Spell(scorch)
+  #flamestrike,if=(talent.flame_patch.enabled&active_enemies>2)|active_enemies>5
+  if Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 5 Spell(flamestrike)
+  #fireball
+  Spell(fireball)
+ }
 }
 
-AddFunction FireActiveTalentsMainPostConditions
+AddFunction FireRopphaseMainPostConditions
 {
+ FireActivetalentsMainPostConditions()
 }
 
-AddFunction FireActiveTalentsShortCdActions
+AddFunction FireRopphaseShortCdActions
 {
-	unless { BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 and Charges(phoenixs_flames) < 1 } and Spell(blast_wave)
-	{
-		#meteor,if=cooldown.combustion.remains>40|(cooldown.combustion.remains>target.time_to_die)|buff.rune_of_power.up|firestarter.active
-		if SpellCooldown(combustion) > 40 or SpellCooldown(combustion) > target.TimeToDie() or BuffPresent(rune_of_power_buff) or HasTalent(firestarter_talent) and target.HealthPercent() >= 90 Spell(meteor)
+ #rune_of_power
+ Spell(rune_of_power)
 
-		unless { SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_on_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellCastSpeedPercent() } } and not BuffPresent(combustion_buff) } and Spell(cinderstorm)
-		{
-			#dragons_breath,if=equipped.132863|(talent.alexstraszas_fury.enabled&buff.hot_streak.down)
-			if HasEquippedItem(132863) or Talent(alexstraszas_fury_talent) and BuffExpires(hot_streak_buff) Spell(dragons_breath)
-		}
-	}
+ unless { Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 4 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(hot_streak_buff) and Spell(pyroblast)
+ {
+  #call_action_list,name=active_talents
+  FireActivetalentsShortCdActions()
+
+  unless FireActivetalentsShortCdPostConditions() or DebuffPresent(pyroclasm) and ExecuteTime(pyroblast) < DebuffRemaining(pyroclasm) and TotemRemaining(rune_of_power) > CastTime(pyroblast) and Spell(pyroblast) or not PreviousOffGCDSpell(fire_blast) and BuffPresent(heating_up_buff) and Talent(firestarter_talent) and target.HealthPercent() >= 90 and Charges(fire_blast count=0) > 1 and Spell(fire_blast) or not PreviousGCDSpell(phoenix_flames) and Charges(phoenix_flames count=0) > 2 and Talent(firestarter_talent) and target.HealthPercent() >= 90 and Spell(phoenix_flames) or not PreviousOffGCDSpell(fire_blast) and not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } and Spell(fire_blast) or not PreviousGCDSpell(phoenix_flames) and Spell(phoenix_flames) or target.HealthPercent() <= 30 and Talent(searing_touch_talent) and Spell(scorch)
+  {
+   #dragons_breath,if=active_enemies>2
+   if Enemies() > 2 Spell(dragons_breath)
+  }
+ }
 }
 
-AddFunction FireActiveTalentsShortCdPostConditions
+AddFunction FireRopphaseShortCdPostConditions
 {
-	{ BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 and Charges(phoenixs_flames) < 1 } and Spell(blast_wave) or { SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_on_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellCastSpeedPercent() } } and not BuffPresent(combustion_buff) } and Spell(cinderstorm) or Enemies() > 1 and BuffExpires(combustion_buff) and Spell(living_bomb)
+ { Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 4 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(hot_streak_buff) and Spell(pyroblast) or FireActivetalentsShortCdPostConditions() or DebuffPresent(pyroclasm) and ExecuteTime(pyroblast) < DebuffRemaining(pyroclasm) and TotemRemaining(rune_of_power) > CastTime(pyroblast) and Spell(pyroblast) or not PreviousOffGCDSpell(fire_blast) and BuffPresent(heating_up_buff) and Talent(firestarter_talent) and target.HealthPercent() >= 90 and Charges(fire_blast count=0) > 1 and Spell(fire_blast) or not PreviousGCDSpell(phoenix_flames) and Charges(phoenix_flames count=0) > 2 and Talent(firestarter_talent) and target.HealthPercent() >= 90 and Spell(phoenix_flames) or not PreviousOffGCDSpell(fire_blast) and not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } and Spell(fire_blast) or not PreviousGCDSpell(phoenix_flames) and Spell(phoenix_flames) or target.HealthPercent() <= 30 and Talent(searing_touch_talent) and Spell(scorch) or { Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 5 } and Spell(flamestrike) or Spell(fireball)
 }
 
-AddFunction FireActiveTalentsCdActions
+AddFunction FireRopphaseCdActions
 {
+ unless Spell(rune_of_power) or { Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 4 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(hot_streak_buff) and Spell(pyroblast)
+ {
+  #call_action_list,name=active_talents
+  FireActivetalentsCdActions()
+ }
 }
 
-AddFunction FireActiveTalentsCdPostConditions
+AddFunction FireRopphaseCdPostConditions
 {
-	{ BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 and Charges(phoenixs_flames) < 1 } and Spell(blast_wave) or { SpellCooldown(combustion) > 40 or SpellCooldown(combustion) > target.TimeToDie() or BuffPresent(rune_of_power_buff) or HasTalent(firestarter_talent) and target.HealthPercent() >= 90 } and Spell(meteor) or { SpellCooldown(combustion) < CastTime(cinderstorm) and { BuffPresent(rune_of_power_buff) or not Talent(rune_on_power_talent) } or SpellCooldown(combustion) > 10 * { 100 / { 100 + SpellCastSpeedPercent() } } and not BuffPresent(combustion_buff) } and Spell(cinderstorm) or { HasEquippedItem(132863) or Talent(alexstraszas_fury_talent) and BuffExpires(hot_streak_buff) } and Spell(dragons_breath) or Enemies() > 1 and BuffExpires(combustion_buff) and Spell(living_bomb)
-}
-
-### actions.combustion_phase
-
-AddFunction FireCombustionPhaseMainActions
-{
-	#call_action_list,name=active_talents
-	FireActiveTalentsMainActions()
-
-	unless FireActiveTalentsMainPostConditions()
-	{
-		#flamestrike,if=(talent.flame_patch.enabled&active_enemies>2|active_enemies>4)&buff.hot_streak.up
-		if { Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 4 } and BuffPresent(hot_streak_buff) Spell(flamestrike)
-		#pyroblast,if=buff.kaelthas_ultimate_ability.react&buff.combustion.remains>execute_time
-		if BuffPresent(kaelthas_ultimate_ability_buff) and BuffRemaining(combustion_buff) > ExecuteTime(pyroblast) Spell(pyroblast)
-		#pyroblast,if=buff.hot_streak.up
-		if BuffPresent(hot_streak_buff) Spell(pyroblast)
-		#phoenixs_flames
-		Spell(phoenixs_flames)
-		#scorch,if=buff.combustion.remains>cast_time
-		if BuffRemaining(combustion_buff) > CastTime(scorch) Spell(scorch)
-		#scorch,if=target.health.pct<=30&equipped.132454
-		if target.HealthPercent() <= 30 and HasEquippedItem(132454) Spell(scorch)
-	}
-}
-
-AddFunction FireCombustionPhaseMainPostConditions
-{
-	FireActiveTalentsMainPostConditions()
-}
-
-AddFunction FireCombustionPhaseShortCdActions
-{
-	#rune_of_power,if=buff.combustion.down
-	if BuffExpires(combustion_buff) Spell(rune_of_power)
-	#call_action_list,name=active_talents
-	FireActiveTalentsShortCdActions()
-
-	unless FireActiveTalentsShortCdPostConditions() or { Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 4 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(kaelthas_ultimate_ability_buff) and BuffRemaining(combustion_buff) > ExecuteTime(pyroblast) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Spell(pyroblast)
-	{
-		#fire_blast,if=buff.heating_up.up
-		if BuffPresent(heating_up_buff) Spell(fire_blast)
-
-		unless Spell(phoenixs_flames) or BuffRemaining(combustion_buff) > CastTime(scorch) and Spell(scorch)
-		{
-			#dragons_breath,if=buff.hot_streak.down&action.fire_blast.charges<1&action.phoenixs_flames.charges<1
-			if BuffExpires(hot_streak_buff) and Charges(fire_blast) < 1 and Charges(phoenixs_flames) < 1 Spell(dragons_breath)
-		}
-	}
-}
-
-AddFunction FireCombustionPhaseShortCdPostConditions
-{
-	FireActiveTalentsShortCdPostConditions() or { Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 4 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(kaelthas_ultimate_ability_buff) and BuffRemaining(combustion_buff) > ExecuteTime(pyroblast) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Spell(pyroblast) or Spell(phoenixs_flames) or BuffRemaining(combustion_buff) > CastTime(scorch) and Spell(scorch) or target.HealthPercent() <= 30 and HasEquippedItem(132454) and Spell(scorch)
-}
-
-AddFunction FireCombustionPhaseCdActions
-{
-	unless BuffExpires(combustion_buff) and Spell(rune_of_power)
-	{
-		#call_action_list,name=active_talents
-		FireActiveTalentsCdActions()
-
-		unless FireActiveTalentsCdPostConditions()
-		{
-			#combustion
-			Spell(combustion)
-			#potion
-			if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
-			#blood_fury
-			Spell(blood_fury_sp)
-			#berserking
-			Spell(berserking)
-			#arcane_torrent
-			Spell(arcane_torrent_mana)
-			#use_items
-			FireUseItemActions()
-		}
-	}
-}
-
-AddFunction FireCombustionPhaseCdPostConditions
-{
-	BuffExpires(combustion_buff) and Spell(rune_of_power) or FireActiveTalentsCdPostConditions() or { Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 4 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(kaelthas_ultimate_ability_buff) and BuffRemaining(combustion_buff) > ExecuteTime(pyroblast) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Spell(pyroblast) or Spell(phoenixs_flames) or BuffRemaining(combustion_buff) > CastTime(scorch) and Spell(scorch) or BuffExpires(hot_streak_buff) and Charges(fire_blast) < 1 and Charges(phoenixs_flames) < 1 and Spell(dragons_breath) or target.HealthPercent() <= 30 and HasEquippedItem(132454) and Spell(scorch)
+ Spell(rune_of_power) or { Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 4 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(hot_streak_buff) and Spell(pyroblast) or FireActivetalentsCdPostConditions() or DebuffPresent(pyroclasm) and ExecuteTime(pyroblast) < DebuffRemaining(pyroclasm) and TotemRemaining(rune_of_power) > CastTime(pyroblast) and Spell(pyroblast) or not PreviousOffGCDSpell(fire_blast) and BuffPresent(heating_up_buff) and Talent(firestarter_talent) and target.HealthPercent() >= 90 and Charges(fire_blast count=0) > 1 and Spell(fire_blast) or not PreviousGCDSpell(phoenix_flames) and Charges(phoenix_flames count=0) > 2 and Talent(firestarter_talent) and target.HealthPercent() >= 90 and Spell(phoenix_flames) or not PreviousOffGCDSpell(fire_blast) and not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } and Spell(fire_blast) or not PreviousGCDSpell(phoenix_flames) and Spell(phoenix_flames) or target.HealthPercent() <= 30 and Talent(searing_touch_talent) and Spell(scorch) or Enemies() > 2 and Spell(dragons_breath) or { Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 5 } and Spell(flamestrike) or Spell(fireball)
 }
 
 ### actions.precombat
 
 AddFunction FirePrecombatMainActions
 {
-	#pyroblast
-	Spell(pyroblast)
+ #flask
+ #food
+ #augmentation
+ #arcane_intellect
+ Spell(arcane_intellect)
+ #pyroblast
+ Spell(pyroblast)
 }
 
 AddFunction FirePrecombatMainPostConditions
@@ -850,185 +694,233 @@ AddFunction FirePrecombatShortCdActions
 
 AddFunction FirePrecombatShortCdPostConditions
 {
-	Spell(pyroblast)
+ Spell(arcane_intellect) or Spell(pyroblast)
 }
 
 AddFunction FirePrecombatCdActions
 {
-	#flask
-	#food
-	#augmentation
-	#snapshot_stats
-	#mirror_image
-	Spell(mirror_image)
-	#potion
-	if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power_potion usable=1)
+ unless Spell(arcane_intellect)
+ {
+  #snapshot_stats
+  #mirror_image
+  Spell(mirror_image)
+  #potion
+  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_intellect usable=1)
+ }
 }
 
 AddFunction FirePrecombatCdPostConditions
 {
-	Spell(pyroblast)
+ Spell(arcane_intellect) or Spell(pyroblast)
 }
 
-### actions.rop_phase
+### actions.combustion_phase
 
-AddFunction FireRopPhaseMainActions
+AddFunction FireCombustionphaseMainActions
 {
-	#flamestrike,if=((talent.flame_patch.enabled&active_enemies>1)|active_enemies>3)&buff.hot_streak.up
-	if { Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 3 } and BuffPresent(hot_streak_buff) Spell(flamestrike)
-	#pyroblast,if=buff.hot_streak.up
-	if BuffPresent(hot_streak_buff) Spell(pyroblast)
-	#call_action_list,name=active_talents
-	FireActiveTalentsMainActions()
+ #call_action_list,name=active_talents
+ FireActivetalentsMainActions()
 
-	unless FireActiveTalentsMainPostConditions()
-	{
-		#pyroblast,if=buff.kaelthas_ultimate_ability.react&execute_time<buff.kaelthas_ultimate_ability.remains
-		if BuffPresent(kaelthas_ultimate_ability_buff) and ExecuteTime(pyroblast) < BuffRemaining(kaelthas_ultimate_ability_buff) Spell(pyroblast)
-		#phoenixs_flames,if=!prev_gcd.1.phoenixs_flames&charges_fractional>2.7&firestarter.active
-		if not PreviousGCDSpell(phoenixs_flames) and Charges(phoenixs_flames count=0) > 2.7 and HasTalent(firestarter_talent) and target.HealthPercent() >= 90 Spell(phoenixs_flames)
-		#phoenixs_flames,if=!prev_gcd.1.phoenixs_flames
-		if not PreviousGCDSpell(phoenixs_flames) Spell(phoenixs_flames)
-		#scorch,if=target.health.pct<=30&equipped.132454
-		if target.HealthPercent() <= 30 and HasEquippedItem(132454) Spell(scorch)
-		#flamestrike,if=(talent.flame_patch.enabled&active_enemies>2)|active_enemies>5
-		if Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 5 Spell(flamestrike)
-		#fireball
-		Spell(fireball)
-	}
+ unless FireActivetalentsMainPostConditions()
+ {
+  #flamestrike,if=((talent.flame_patch.enabled&active_enemies>2)|active_enemies>6)&buff.hot_streak.react
+  if { Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 6 } and BuffPresent(hot_streak_buff) Spell(flamestrike)
+  #pyroblast,if=buff.pyroclasm.react&buff.combustion.remains>execute_time
+  if DebuffPresent(pyroclasm) and BuffRemaining(combustion_buff) > ExecuteTime(pyroblast) Spell(pyroblast)
+  #pyroblast,if=buff.hot_streak.react
+  if BuffPresent(hot_streak_buff) Spell(pyroblast)
+  #fire_blast,if=buff.heating_up.react
+  if BuffPresent(heating_up_buff) Spell(fire_blast)
+  #phoenix_flames
+  Spell(phoenix_flames)
+  #scorch,if=buff.combustion.remains>cast_time
+  if BuffRemaining(combustion_buff) > CastTime(scorch) Spell(scorch)
+  #scorch,if=target.health.pct<=30&talent.searing_touch.enabled
+  if target.HealthPercent() <= 30 and Talent(searing_touch_talent) Spell(scorch)
+ }
 }
 
-AddFunction FireRopPhaseMainPostConditions
+AddFunction FireCombustionphaseMainPostConditions
 {
-	FireActiveTalentsMainPostConditions()
+ FireActivetalentsMainPostConditions()
 }
 
-AddFunction FireRopPhaseShortCdActions
+AddFunction FireCombustionphaseShortCdActions
 {
-	#rune_of_power
-	Spell(rune_of_power)
+ #rune_of_power,if=buff.combustion.down
+ if BuffExpires(combustion_buff) Spell(rune_of_power)
+ #call_action_list,name=active_talents
+ FireActivetalentsShortCdActions()
 
-	unless { Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 3 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(hot_streak_buff) and Spell(pyroblast)
-	{
-		#call_action_list,name=active_talents
-		FireActiveTalentsShortCdActions()
-
-		unless FireActiveTalentsShortCdPostConditions() or BuffPresent(kaelthas_ultimate_ability_buff) and ExecuteTime(pyroblast) < BuffRemaining(kaelthas_ultimate_ability_buff) and Spell(pyroblast)
-		{
-			#fire_blast,if=!prev_off_gcd.fire_blast&buff.heating_up.up&firestarter.active&charges_fractional>1.7
-			if not PreviousOffGCDSpell(fire_blast) and BuffPresent(heating_up_buff) and HasTalent(firestarter_talent) and target.HealthPercent() >= 90 and Charges(fire_blast count=0) > 1.7 Spell(fire_blast)
-
-			unless not PreviousGCDSpell(phoenixs_flames) and Charges(phoenixs_flames count=0) > 2.7 and HasTalent(firestarter_talent) and target.HealthPercent() >= 90 and Spell(phoenixs_flames)
-			{
-				#fire_blast,if=!prev_off_gcd.fire_blast&!firestarter.active
-				if not PreviousOffGCDSpell(fire_blast) and not { HasTalent(firestarter_talent) and target.HealthPercent() >= 90 } Spell(fire_blast)
-
-				unless not PreviousGCDSpell(phoenixs_flames) and Spell(phoenixs_flames) or target.HealthPercent() <= 30 and HasEquippedItem(132454) and Spell(scorch)
-				{
-					#dragons_breath,if=active_enemies>2
-					if Enemies() > 2 Spell(dragons_breath)
-				}
-			}
-		}
-	}
+ unless FireActivetalentsShortCdPostConditions() or { Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 6 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or DebuffPresent(pyroclasm) and BuffRemaining(combustion_buff) > ExecuteTime(pyroblast) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Spell(pyroblast) or BuffPresent(heating_up_buff) and Spell(fire_blast) or Spell(phoenix_flames) or BuffRemaining(combustion_buff) > CastTime(scorch) and Spell(scorch)
+ {
+  #dragons_breath,if=!buff.hot_streak.react&action.fire_blast.charges<1
+  if not BuffPresent(hot_streak_buff) and Charges(fire_blast) < 1 Spell(dragons_breath)
+ }
 }
 
-AddFunction FireRopPhaseShortCdPostConditions
+AddFunction FireCombustionphaseShortCdPostConditions
 {
-	{ Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 3 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(hot_streak_buff) and Spell(pyroblast) or FireActiveTalentsShortCdPostConditions() or BuffPresent(kaelthas_ultimate_ability_buff) and ExecuteTime(pyroblast) < BuffRemaining(kaelthas_ultimate_ability_buff) and Spell(pyroblast) or not PreviousGCDSpell(phoenixs_flames) and Charges(phoenixs_flames count=0) > 2.7 and HasTalent(firestarter_talent) and target.HealthPercent() >= 90 and Spell(phoenixs_flames) or not PreviousGCDSpell(phoenixs_flames) and Spell(phoenixs_flames) or target.HealthPercent() <= 30 and HasEquippedItem(132454) and Spell(scorch) or { Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 5 } and Spell(flamestrike) or Spell(fireball)
+ FireActivetalentsShortCdPostConditions() or { Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 6 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or DebuffPresent(pyroclasm) and BuffRemaining(combustion_buff) > ExecuteTime(pyroblast) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Spell(pyroblast) or BuffPresent(heating_up_buff) and Spell(fire_blast) or Spell(phoenix_flames) or BuffRemaining(combustion_buff) > CastTime(scorch) and Spell(scorch) or target.HealthPercent() <= 30 and Talent(searing_touch_talent) and Spell(scorch)
 }
 
-AddFunction FireRopPhaseCdActions
+AddFunction FireCombustionphaseCdActions
 {
-	unless Spell(rune_of_power) or { Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 3 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(hot_streak_buff) and Spell(pyroblast)
-	{
-		#call_action_list,name=active_talents
-		FireActiveTalentsCdActions()
-	}
+ #lights_judgment,if=buff.combustion.down
+ if BuffExpires(combustion_buff) Spell(lights_judgment)
+
+ unless BuffExpires(combustion_buff) and Spell(rune_of_power)
+ {
+  #call_action_list,name=active_talents
+  FireActivetalentsCdActions()
+
+  unless FireActivetalentsCdPostConditions()
+  {
+   #combustion
+   Spell(combustion)
+   #potion
+   if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_intellect usable=1)
+   #blood_fury
+   Spell(blood_fury_sp)
+   #berserking
+   Spell(berserking)
+   #fireblood
+   Spell(fireblood)
+   #ancestral_call
+   Spell(ancestral_call)
+   #use_items
+   FireUseItemActions()
+  }
+ }
 }
 
-AddFunction FireRopPhaseCdPostConditions
+AddFunction FireCombustionphaseCdPostConditions
 {
-	Spell(rune_of_power) or { Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 3 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(hot_streak_buff) and Spell(pyroblast) or FireActiveTalentsCdPostConditions() or BuffPresent(kaelthas_ultimate_ability_buff) and ExecuteTime(pyroblast) < BuffRemaining(kaelthas_ultimate_ability_buff) and Spell(pyroblast) or not PreviousGCDSpell(phoenixs_flames) and Charges(phoenixs_flames count=0) > 2.7 and HasTalent(firestarter_talent) and target.HealthPercent() >= 90 and Spell(phoenixs_flames) or not PreviousGCDSpell(phoenixs_flames) and Spell(phoenixs_flames) or target.HealthPercent() <= 30 and HasEquippedItem(132454) and Spell(scorch) or Enemies() > 2 and Spell(dragons_breath) or { Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 5 } and Spell(flamestrike) or Spell(fireball)
+ BuffExpires(combustion_buff) and Spell(rune_of_power) or FireActivetalentsCdPostConditions() or { Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 6 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or DebuffPresent(pyroclasm) and BuffRemaining(combustion_buff) > ExecuteTime(pyroblast) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Spell(pyroblast) or BuffPresent(heating_up_buff) and Spell(fire_blast) or Spell(phoenix_flames) or BuffRemaining(combustion_buff) > CastTime(scorch) and Spell(scorch) or not BuffPresent(hot_streak_buff) and Charges(fire_blast) < 1 and Spell(dragons_breath) or target.HealthPercent() <= 30 and Talent(searing_touch_talent) and Spell(scorch)
 }
 
-### actions.standard_rotation
+### actions.active_talents
 
-AddFunction FireStandardRotationMainActions
+AddFunction FireActivetalentsMainActions
 {
-	#flamestrike,if=((talent.flame_patch.enabled&active_enemies>1)|active_enemies>3)&buff.hot_streak.up
-	if { Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 3 } and BuffPresent(hot_streak_buff) Spell(flamestrike)
-	#pyroblast,if=buff.hot_streak.up&buff.hot_streak.remains<action.fireball.execute_time
-	if BuffPresent(hot_streak_buff) and BuffRemaining(hot_streak_buff) < ExecuteTime(fireball) Spell(pyroblast)
-	#pyroblast,if=buff.hot_streak.up&firestarter.active&!talent.rune_of_power.enabled
-	if BuffPresent(hot_streak_buff) and HasTalent(firestarter_talent) and target.HealthPercent() >= 90 and not Talent(rune_of_power_talent) Spell(pyroblast)
-	#phoenixs_flames,if=charges_fractional>2.7&active_enemies>2
-	if Charges(phoenixs_flames count=0) > 2.7 and Enemies() > 2 Spell(phoenixs_flames)
-	#pyroblast,if=buff.hot_streak.up&!prev_gcd.1.pyroblast
-	if BuffPresent(hot_streak_buff) and not PreviousGCDSpell(pyroblast) Spell(pyroblast)
-	#pyroblast,if=buff.hot_streak.react&target.health.pct<=30&equipped.132454
-	if BuffPresent(hot_streak_buff) and target.HealthPercent() <= 30 and HasEquippedItem(132454) Spell(pyroblast)
-	#pyroblast,if=buff.kaelthas_ultimate_ability.react&execute_time<buff.kaelthas_ultimate_ability.remains
-	if BuffPresent(kaelthas_ultimate_ability_buff) and ExecuteTime(pyroblast) < BuffRemaining(kaelthas_ultimate_ability_buff) Spell(pyroblast)
-	#call_action_list,name=active_talents
-	FireActiveTalentsMainActions()
-
-	unless FireActiveTalentsMainPostConditions()
-	{
-		#phoenixs_flames,if=(buff.combustion.up|buff.rune_of_power.up|buff.incanters_flow.stack>3|talent.mirror_image.enabled)&artifact.phoenix_reborn.enabled&(4-charges_fractional)*13<cooldown.combustion.remains+5|target.time_to_die<10
-		if { BuffPresent(combustion_buff) or BuffPresent(rune_of_power_buff) or BuffStacks(incanters_flow_buff) > 3 or Talent(mirror_image_talent) } and HasArtifactTrait(phoenix_reborn) and { 4 - Charges(phoenixs_flames count=0) } * 13 < SpellCooldown(combustion) + 5 or target.TimeToDie() < 10 Spell(phoenixs_flames)
-		#phoenixs_flames,if=(buff.combustion.up|buff.rune_of_power.up)&(4-charges_fractional)*30<cooldown.combustion.remains+5
-		if { BuffPresent(combustion_buff) or BuffPresent(rune_of_power_buff) } and { 4 - Charges(phoenixs_flames count=0) } * 30 < SpellCooldown(combustion) + 5 Spell(phoenixs_flames)
-		#phoenixs_flames,if=charges_fractional>2.5&cooldown.combustion.remains>23
-		if Charges(phoenixs_flames count=0) > 2.5 and SpellCooldown(combustion) > 23 Spell(phoenixs_flames)
-		#flamestrike,if=(talent.flame_patch.enabled&active_enemies>3)|active_enemies>5
-		if Talent(flame_patch_talent) and Enemies() > 3 or Enemies() > 5 Spell(flamestrike)
-		#scorch,if=target.health.pct<=30&equipped.132454
-		if target.HealthPercent() <= 30 and HasEquippedItem(132454) Spell(scorch)
-		#fireball
-		Spell(fireball)
-	}
+ #blast_wave,if=(buff.combustion.down)|(buff.combustion.up&action.fire_blast.charges<1)
+ if BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 Spell(blast_wave)
+ #living_bomb,if=active_enemies>1&buff.combustion.down
+ if Enemies() > 1 and BuffExpires(combustion_buff) Spell(living_bomb)
 }
 
-AddFunction FireStandardRotationMainPostConditions
+AddFunction FireActivetalentsMainPostConditions
 {
-	FireActiveTalentsMainPostConditions()
 }
 
-AddFunction FireStandardRotationShortCdActions
+AddFunction FireActivetalentsShortCdActions
 {
-	unless { Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 3 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(hot_streak_buff) and BuffRemaining(hot_streak_buff) < ExecuteTime(fireball) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and HasTalent(firestarter_talent) and target.HealthPercent() >= 90 and not Talent(rune_of_power_talent) and Spell(pyroblast) or Charges(phoenixs_flames count=0) > 2.7 and Enemies() > 2 and Spell(phoenixs_flames) or BuffPresent(hot_streak_buff) and not PreviousGCDSpell(pyroblast) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and target.HealthPercent() <= 30 and HasEquippedItem(132454) and Spell(pyroblast) or BuffPresent(kaelthas_ultimate_ability_buff) and ExecuteTime(pyroblast) < BuffRemaining(kaelthas_ultimate_ability_buff) and Spell(pyroblast)
-	{
-		#call_action_list,name=active_talents
-		FireActiveTalentsShortCdActions()
-
-		unless FireActiveTalentsShortCdPostConditions()
-		{
-			#fire_blast,if=!talent.kindling.enabled&buff.heating_up.up&(!talent.rune_of_power.enabled|charges_fractional>1.4|cooldown.combustion.remains<40)&(3-charges_fractional)*(12*spell_haste)<cooldown.combustion.remains+3|target.time_to_die<4
-			if not Talent(kindling_talent) and BuffPresent(heating_up_buff) and { not Talent(rune_of_power_talent) or Charges(fire_blast count=0) > 1.4 or SpellCooldown(combustion) < 40 } and { 3 - Charges(fire_blast count=0) } * 12 * { 100 / { 100 + SpellCastSpeedPercent() } } < SpellCooldown(combustion) + 3 or target.TimeToDie() < 4 Spell(fire_blast)
-			#fire_blast,if=talent.kindling.enabled&buff.heating_up.up&(!talent.rune_of_power.enabled|charges_fractional>1.5|cooldown.combustion.remains<40)&(3-charges_fractional)*(18*spell_haste)<cooldown.combustion.remains+3|target.time_to_die<4
-			if Talent(kindling_talent) and BuffPresent(heating_up_buff) and { not Talent(rune_of_power_talent) or Charges(fire_blast count=0) > 1.5 or SpellCooldown(combustion) < 40 } and { 3 - Charges(fire_blast count=0) } * 18 * { 100 / { 100 + SpellCastSpeedPercent() } } < SpellCooldown(combustion) + 3 or target.TimeToDie() < 4 Spell(fire_blast)
-		}
-	}
+ unless { BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 } and Spell(blast_wave)
+ {
+  #meteor,if=cooldown.combustion.remains>40|(cooldown.combustion.remains>target.time_to_die)|buff.rune_of_power.up|firestarter.active
+  if SpellCooldown(combustion) > 40 or SpellCooldown(combustion) > target.TimeToDie() or BuffPresent(rune_of_power_buff) or Talent(firestarter_talent) and target.HealthPercent() >= 90 Spell(meteor)
+  #dragons_breath,if=talent.alexstraszas_fury.enabled&!buff.hot_streak.react
+  if Talent(alexstraszas_fury_talent) and not BuffPresent(hot_streak_buff) Spell(dragons_breath)
+ }
 }
 
-AddFunction FireStandardRotationShortCdPostConditions
+AddFunction FireActivetalentsShortCdPostConditions
 {
-	{ Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 3 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(hot_streak_buff) and BuffRemaining(hot_streak_buff) < ExecuteTime(fireball) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and HasTalent(firestarter_talent) and target.HealthPercent() >= 90 and not Talent(rune_of_power_talent) and Spell(pyroblast) or Charges(phoenixs_flames count=0) > 2.7 and Enemies() > 2 and Spell(phoenixs_flames) or BuffPresent(hot_streak_buff) and not PreviousGCDSpell(pyroblast) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and target.HealthPercent() <= 30 and HasEquippedItem(132454) and Spell(pyroblast) or BuffPresent(kaelthas_ultimate_ability_buff) and ExecuteTime(pyroblast) < BuffRemaining(kaelthas_ultimate_ability_buff) and Spell(pyroblast) or FireActiveTalentsShortCdPostConditions() or { { BuffPresent(combustion_buff) or BuffPresent(rune_of_power_buff) or BuffStacks(incanters_flow_buff) > 3 or Talent(mirror_image_talent) } and HasArtifactTrait(phoenix_reborn) and { 4 - Charges(phoenixs_flames count=0) } * 13 < SpellCooldown(combustion) + 5 or target.TimeToDie() < 10 } and Spell(phoenixs_flames) or { BuffPresent(combustion_buff) or BuffPresent(rune_of_power_buff) } and { 4 - Charges(phoenixs_flames count=0) } * 30 < SpellCooldown(combustion) + 5 and Spell(phoenixs_flames) or Charges(phoenixs_flames count=0) > 2.5 and SpellCooldown(combustion) > 23 and Spell(phoenixs_flames) or { Talent(flame_patch_talent) and Enemies() > 3 or Enemies() > 5 } and Spell(flamestrike) or target.HealthPercent() <= 30 and HasEquippedItem(132454) and Spell(scorch) or Spell(fireball)
+ { BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 } and Spell(blast_wave) or Enemies() > 1 and BuffExpires(combustion_buff) and Spell(living_bomb)
 }
 
-AddFunction FireStandardRotationCdActions
+AddFunction FireActivetalentsCdActions
 {
-	unless { Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 3 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(hot_streak_buff) and BuffRemaining(hot_streak_buff) < ExecuteTime(fireball) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and HasTalent(firestarter_talent) and target.HealthPercent() >= 90 and not Talent(rune_of_power_talent) and Spell(pyroblast) or Charges(phoenixs_flames count=0) > 2.7 and Enemies() > 2 and Spell(phoenixs_flames) or BuffPresent(hot_streak_buff) and not PreviousGCDSpell(pyroblast) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and target.HealthPercent() <= 30 and HasEquippedItem(132454) and Spell(pyroblast) or BuffPresent(kaelthas_ultimate_ability_buff) and ExecuteTime(pyroblast) < BuffRemaining(kaelthas_ultimate_ability_buff) and Spell(pyroblast)
-	{
-		#call_action_list,name=active_talents
-		FireActiveTalentsCdActions()
-	}
 }
 
-AddFunction FireStandardRotationCdPostConditions
+AddFunction FireActivetalentsCdPostConditions
 {
-	{ Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 3 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(hot_streak_buff) and BuffRemaining(hot_streak_buff) < ExecuteTime(fireball) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and HasTalent(firestarter_talent) and target.HealthPercent() >= 90 and not Talent(rune_of_power_talent) and Spell(pyroblast) or Charges(phoenixs_flames count=0) > 2.7 and Enemies() > 2 and Spell(phoenixs_flames) or BuffPresent(hot_streak_buff) and not PreviousGCDSpell(pyroblast) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and target.HealthPercent() <= 30 and HasEquippedItem(132454) and Spell(pyroblast) or BuffPresent(kaelthas_ultimate_ability_buff) and ExecuteTime(pyroblast) < BuffRemaining(kaelthas_ultimate_ability_buff) and Spell(pyroblast) or FireActiveTalentsCdPostConditions() or { { BuffPresent(combustion_buff) or BuffPresent(rune_of_power_buff) or BuffStacks(incanters_flow_buff) > 3 or Talent(mirror_image_talent) } and HasArtifactTrait(phoenix_reborn) and { 4 - Charges(phoenixs_flames count=0) } * 13 < SpellCooldown(combustion) + 5 or target.TimeToDie() < 10 } and Spell(phoenixs_flames) or { BuffPresent(combustion_buff) or BuffPresent(rune_of_power_buff) } and { 4 - Charges(phoenixs_flames count=0) } * 30 < SpellCooldown(combustion) + 5 and Spell(phoenixs_flames) or Charges(phoenixs_flames count=0) > 2.5 and SpellCooldown(combustion) > 23 and Spell(phoenixs_flames) or { Talent(flame_patch_talent) and Enemies() > 3 or Enemies() > 5 } and Spell(flamestrike) or target.HealthPercent() <= 30 and HasEquippedItem(132454) and Spell(scorch) or Spell(fireball)
+ { BuffExpires(combustion_buff) or BuffPresent(combustion_buff) and Charges(fire_blast) < 1 } and Spell(blast_wave) or { SpellCooldown(combustion) > 40 or SpellCooldown(combustion) > target.TimeToDie() or BuffPresent(rune_of_power_buff) or Talent(firestarter_talent) and target.HealthPercent() >= 90 } and Spell(meteor) or Talent(alexstraszas_fury_talent) and not BuffPresent(hot_streak_buff) and Spell(dragons_breath) or Enemies() > 1 and BuffExpires(combustion_buff) and Spell(living_bomb)
+}
+
+### actions.default
+
+AddFunction FireDefaultMainActions
+{
+ #call_action_list,name=combustion_phase,if=cooldown.combustion.remains<=action.rune_of_power.cast_time+(!talent.kindling.enabled*gcd)&(!talent.firestarter.enabled|!firestarter.active|active_enemies>=4|active_enemies>=2&talent.flame_patch.enabled)|buff.combustion.up
+ if SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() and { not Talent(firestarter_talent) or not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } or Enemies() >= 4 or Enemies() >= 2 and Talent(flame_patch_talent) } or BuffPresent(combustion_buff) FireCombustionphaseMainActions()
+
+ unless { SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() and { not Talent(firestarter_talent) or not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } or Enemies() >= 4 or Enemies() >= 2 and Talent(flame_patch_talent) } or BuffPresent(combustion_buff) } and FireCombustionphaseMainPostConditions()
+ {
+  #call_action_list,name=rop_phase,if=buff.rune_of_power.up&buff.combustion.down
+  if BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) FireRopphaseMainActions()
+
+  unless BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopphaseMainPostConditions()
+  {
+   #call_action_list,name=standard_rotation
+   FireStandardrotationMainActions()
+  }
+ }
+}
+
+AddFunction FireDefaultMainPostConditions
+{
+ { SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() and { not Talent(firestarter_talent) or not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } or Enemies() >= 4 or Enemies() >= 2 and Talent(flame_patch_talent) } or BuffPresent(combustion_buff) } and FireCombustionphaseMainPostConditions() or BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopphaseMainPostConditions() or FireStandardrotationMainPostConditions()
+}
+
+AddFunction FireDefaultShortCdActions
+{
+ #rune_of_power,if=firestarter.active&action.rune_of_power.charges=2|cooldown.combustion.remains>40&buff.combustion.down&!talent.kindling.enabled|target.time_to_die<11|talent.kindling.enabled&(charges_fractional>1.8|time<40)&cooldown.combustion.remains>40
+ if Talent(firestarter_talent) and target.HealthPercent() >= 90 and Charges(rune_of_power) == 2 or SpellCooldown(combustion) > 40 and BuffExpires(combustion_buff) and not Talent(kindling_talent) or target.TimeToDie() < 11 or Talent(kindling_talent) and { Charges(rune_of_power count=0) > 1 or TimeInCombat() < 40 } and SpellCooldown(combustion) > 40 Spell(rune_of_power)
+ #rune_of_power,if=buff.pyroclasm.react&(cooldown.combustion.remains>40|action.rune_of_power.charges>1)
+ if DebuffPresent(pyroclasm) and { SpellCooldown(combustion) > 40 or Charges(rune_of_power) > 1 } Spell(rune_of_power)
+ #call_action_list,name=combustion_phase,if=cooldown.combustion.remains<=action.rune_of_power.cast_time+(!talent.kindling.enabled*gcd)&(!talent.firestarter.enabled|!firestarter.active|active_enemies>=4|active_enemies>=2&talent.flame_patch.enabled)|buff.combustion.up
+ if SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() and { not Talent(firestarter_talent) or not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } or Enemies() >= 4 or Enemies() >= 2 and Talent(flame_patch_talent) } or BuffPresent(combustion_buff) FireCombustionphaseShortCdActions()
+
+ unless { SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() and { not Talent(firestarter_talent) or not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } or Enemies() >= 4 or Enemies() >= 2 and Talent(flame_patch_talent) } or BuffPresent(combustion_buff) } and FireCombustionphaseShortCdPostConditions()
+ {
+  #call_action_list,name=rop_phase,if=buff.rune_of_power.up&buff.combustion.down
+  if BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) FireRopphaseShortCdActions()
+
+  unless BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopphaseShortCdPostConditions()
+  {
+   #call_action_list,name=standard_rotation
+   FireStandardrotationShortCdActions()
+  }
+ }
+}
+
+AddFunction FireDefaultShortCdPostConditions
+{
+ { SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() and { not Talent(firestarter_talent) or not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } or Enemies() >= 4 or Enemies() >= 2 and Talent(flame_patch_talent) } or BuffPresent(combustion_buff) } and FireCombustionphaseShortCdPostConditions() or BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopphaseShortCdPostConditions() or FireStandardrotationShortCdPostConditions()
+}
+
+AddFunction FireDefaultCdActions
+{
+ #counterspell,if=target.debuff.casting.react
+ if target.IsInterruptible() FireInterruptActions()
+ #time_warp,if=time=0&buff.bloodlust.down
+ if TimeInCombat() == 0 and BuffExpires(burst_haste_buff any=1) and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
+ #mirror_image,if=buff.combustion.down
+ if BuffExpires(combustion_buff) Spell(mirror_image)
+
+ unless { Talent(firestarter_talent) and target.HealthPercent() >= 90 and Charges(rune_of_power) == 2 or SpellCooldown(combustion) > 40 and BuffExpires(combustion_buff) and not Talent(kindling_talent) or target.TimeToDie() < 11 or Talent(kindling_talent) and { Charges(rune_of_power count=0) > 1 or TimeInCombat() < 40 } and SpellCooldown(combustion) > 40 } and Spell(rune_of_power) or DebuffPresent(pyroclasm) and { SpellCooldown(combustion) > 40 or Charges(rune_of_power) > 1 } and Spell(rune_of_power)
+ {
+  #call_action_list,name=combustion_phase,if=cooldown.combustion.remains<=action.rune_of_power.cast_time+(!talent.kindling.enabled*gcd)&(!talent.firestarter.enabled|!firestarter.active|active_enemies>=4|active_enemies>=2&talent.flame_patch.enabled)|buff.combustion.up
+  if SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() and { not Talent(firestarter_talent) or not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } or Enemies() >= 4 or Enemies() >= 2 and Talent(flame_patch_talent) } or BuffPresent(combustion_buff) FireCombustionphaseCdActions()
+
+  unless { SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() and { not Talent(firestarter_talent) or not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } or Enemies() >= 4 or Enemies() >= 2 and Talent(flame_patch_talent) } or BuffPresent(combustion_buff) } and FireCombustionphaseCdPostConditions()
+  {
+   #call_action_list,name=rop_phase,if=buff.rune_of_power.up&buff.combustion.down
+   if BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) FireRopphaseCdActions()
+
+   unless BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopphaseCdPostConditions()
+   {
+    #call_action_list,name=standard_rotation
+    FireStandardrotationCdActions()
+   }
+  }
+ }
+}
+
+AddFunction FireDefaultCdPostConditions
+{
+ { Talent(firestarter_talent) and target.HealthPercent() >= 90 and Charges(rune_of_power) == 2 or SpellCooldown(combustion) > 40 and BuffExpires(combustion_buff) and not Talent(kindling_talent) or target.TimeToDie() < 11 or Talent(kindling_talent) and { Charges(rune_of_power count=0) > 1 or TimeInCombat() < 40 } and SpellCooldown(combustion) > 40 } and Spell(rune_of_power) or DebuffPresent(pyroclasm) and { SpellCooldown(combustion) > 40 or Charges(rune_of_power) > 1 } and Spell(rune_of_power) or { SpellCooldown(combustion) <= CastTime(rune_of_power) + Talent(kindling_talent no) * GCD() and { not Talent(firestarter_talent) or not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } or Enemies() >= 4 or Enemies() >= 2 and Talent(flame_patch_talent) } or BuffPresent(combustion_buff) } and FireCombustionphaseCdPostConditions() or BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopphaseCdPostConditions() or FireStandardrotationCdPostConditions()
 }
 
 ### Fire icons.
@@ -1037,133 +929,116 @@ AddCheckBox(opt_mage_fire_aoe L(AOE) default specialization=fire)
 
 AddIcon checkbox=!opt_mage_fire_aoe enemies=1 help=shortcd specialization=fire
 {
-	if not InCombat() FirePrecombatShortCdActions()
-	unless not InCombat() and FirePrecombatShortCdPostConditions()
-	{
-		FireDefaultShortCdActions()
-	}
+ if not InCombat() FirePrecombatShortCdActions()
+ unless not InCombat() and FirePrecombatShortCdPostConditions()
+ {
+  FireDefaultShortCdActions()
+ }
 }
 
 AddIcon checkbox=opt_mage_fire_aoe help=shortcd specialization=fire
 {
-	if not InCombat() FirePrecombatShortCdActions()
-	unless not InCombat() and FirePrecombatShortCdPostConditions()
-	{
-		FireDefaultShortCdActions()
-	}
+ if not InCombat() FirePrecombatShortCdActions()
+ unless not InCombat() and FirePrecombatShortCdPostConditions()
+ {
+  FireDefaultShortCdActions()
+ }
 }
 
 AddIcon enemies=1 help=main specialization=fire
 {
-	if not InCombat() FirePrecombatMainActions()
-	unless not InCombat() and FirePrecombatMainPostConditions()
-	{
-		FireDefaultMainActions()
-	}
+ if not InCombat() FirePrecombatMainActions()
+ unless not InCombat() and FirePrecombatMainPostConditions()
+ {
+  FireDefaultMainActions()
+ }
 }
 
 AddIcon checkbox=opt_mage_fire_aoe help=aoe specialization=fire
 {
-	if not InCombat() FirePrecombatMainActions()
-	unless not InCombat() and FirePrecombatMainPostConditions()
-	{
-		FireDefaultMainActions()
-	}
+ if not InCombat() FirePrecombatMainActions()
+ unless not InCombat() and FirePrecombatMainPostConditions()
+ {
+  FireDefaultMainActions()
+ }
 }
 
 AddIcon checkbox=!opt_mage_fire_aoe enemies=1 help=cd specialization=fire
 {
-	if not InCombat() FirePrecombatCdActions()
-	unless not InCombat() and FirePrecombatCdPostConditions()
-	{
-		FireDefaultCdActions()
-	}
+ if not InCombat() FirePrecombatCdActions()
+ unless not InCombat() and FirePrecombatCdPostConditions()
+ {
+  FireDefaultCdActions()
+ }
 }
 
 AddIcon checkbox=opt_mage_fire_aoe help=cd specialization=fire
 {
-	if not InCombat() FirePrecombatCdActions()
-	unless not InCombat() and FirePrecombatCdPostConditions()
-	{
-		FireDefaultCdActions()
-	}
+ if not InCombat() FirePrecombatCdActions()
+ unless not InCombat() and FirePrecombatCdPostConditions()
+ {
+  FireDefaultCdActions()
+ }
 }
 
 ### Required symbols
-# 132410
-# 132454
-# 132863
 # alexstraszas_fury_talent
-# arcane_torrent_mana
+# ancestral_call
+# arcane_intellect
+# battle_potion_of_intellect
 # berserking
 # blast_wave
 # blood_fury_sp
-# cinderstorm
 # combustion
 # combustion_buff
 # counterspell
 # dragons_breath
-# erupting_infernal_core_buff
 # fire_blast
 # fireball
+# fireblood
 # firestarter_talent
 # flame_patch_talent
 # flamestrike
 # heating_up_buff
 # hot_streak_buff
 # incanters_flow_buff
-# kaelthas_ultimate_ability_buff
 # kindling_talent
+# lights_judgment
 # living_bomb
 # meteor
 # mirror_image
 # mirror_image_talent
-# phoenix_reborn
-# phoenixs_flames
-# prolonged_power_potion
+# phoenix_flames
+# preheat
+# preheat_trait
 # pyroblast
+# pyroclasm
 # quaking_palm
 # rune_of_power
 # rune_of_power_buff
 # rune_of_power_talent
-# rune_on_power_talent
 # scorch
+# searing_touch_talent
 # time_warp
 ]]
     OvaleScripts:RegisterScript("MAGE", "fire", name, desc, code, "script")
 end
 do
-    local name = "sc_mage_frost_t19"
-    local desc = "[7.0] Simulationcraft: Mage_Frost_T19"
+    local name = "sc_pr_mage_frost"
+    local desc = "[8.0] Simulationcraft: PR_Mage_Frost"
     local code = [[
-# Based on SimulationCraft profile "Mage_Frost_T19P".
+# Based on SimulationCraft profile "PR_Mage_Frost".
 #	class=mage
 #	spec=frost
-#	talents=3122111
+#	talents=1013033
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_mage_spells)
 
-
-AddFunction fof_react
-{
- if HasEquippedItem(lady_vashjs_grasp) and BuffPresent(icy_veins_buff) and time_until_fof() > 9 or PreviousOffGCDSpell(freeze) or DebuffRemaining(frozen_orb_debuff) > 8 BuffPresent(fingers_of_frost_buff)
- BuffPresent(fingers_of_frost_buff)
-}
-
-AddFunction time_until_fof
-{
- 10 - { TimeInCombat() - iv_start() - { TimeInCombat() - iv_start() } / 10 * 10 }
-}
-
-AddFunction iv_start
-{
- if PreviousOffGCDSpell(icy_veins) TimeInCombat()
-}
-
 AddCheckBox(opt_interrupt L(interrupt) default specialization=frost)
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=frost)
 AddCheckBox(opt_time_warp SpellName(time_warp) specialization=frost)
 
 AddFunction FrostInterruptActions
@@ -1181,94 +1056,65 @@ AddFunction FrostUseItemActions
  Item(Trinket1Slot text=14 usable=1)
 }
 
-### actions.variables
-
-AddFunction FrostVariablesMainActions
-{
-}
-
-AddFunction FrostVariablesMainPostConditions
-{
-}
-
-AddFunction FrostVariablesShortCdActions
-{
-}
-
-AddFunction FrostVariablesShortCdPostConditions
-{
-}
-
-AddFunction FrostVariablesCdActions
-{
-}
-
-AddFunction FrostVariablesCdPostConditions
-{
-}
-
 ### actions.single
 
 AddFunction FrostSingleMainActions
 {
- #ice_nova,if=debuff.winters_chill.up
- if target.DebuffPresent(winters_chill_debuff) Spell(ice_nova)
- #frostbolt,if=prev_off_gcd.water_jet
- if PreviousOffGCDSpell(water_elemental_water_jet) Spell(frostbolt)
- #water_jet,if=prev_gcd.1.frostbolt&buff.fingers_of_frost.stack<3&buff.brain_freeze.react=0
- if PreviousGCDSpell(frostbolt) and BuffStacks(fingers_of_frost_buff) < 3 and BuffStacks(brain_freeze_buff) == 0 Spell(water_elemental_water_jet)
- #ray_of_frost,if=buff.icy_veins.up|cooldown.icy_veins.remains>action.ray_of_frost.cooldown&buff.rune_of_power.down
- if BuffPresent(icy_veins_buff) or SpellCooldown(icy_veins) > SpellCooldown(ray_of_frost) and BuffExpires(rune_of_power_buff) Spell(ray_of_frost)
- #flurry,if=prev_gcd.1.ebonbolt|buff.brain_freeze.react&(prev_gcd.1.glacial_spike|prev_gcd.1.frostbolt&(!talent.glacial_spike.enabled|buff.icicles.stack<=3|cooldown.frozen_orb.remains<=10&set_bonus.tier20_2pc))
- if PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(frostbolt) and { not Talent(glacial_spike_talent) or BuffStacks(icicles_buff) <= 3 or SpellCooldown(frozen_orb) <= 10 and ArmorSetBonus(T20 2) } } Spell(flurry)
- #blizzard,if=cast_time=0&active_enemies>1&variable.fof_react<3
- if CastTime(blizzard) == 0 and Enemies() > 1 and fof_react() < 3 Spell(blizzard)
- #ice_lance,if=variable.fof_react
- if fof_react() Spell(ice_lance)
- #ebonbolt
- Spell(ebonbolt)
+ #ice_nova,if=cooldown.ice_nova.ready&debuff.winters_chill.up
+ if SpellCooldown(ice_nova) == 0 and target.DebuffPresent(winters_chill_debuff) Spell(ice_nova)
+ #flurry,if=!talent.glacial_spike.enabled&(prev_gcd.1.ebonbolt|buff.brain_freeze.react&prev_gcd.1.frostbolt)
+ if not Talent(glacial_spike_talent) and { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and PreviousGCDSpell(frostbolt) } Spell(flurry)
+ #flurry,if=talent.glacial_spike.enabled&buff.brain_freeze.react&(prev_gcd.1.frostbolt&buff.icicles.stack<4|prev_gcd.1.glacial_spike|prev_gcd.1.ebonbolt)
+ if Talent(glacial_spike_talent) and BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(frostbolt) and BuffStacks(icicles_buff) < 4 or PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(ebonbolt) } Spell(flurry)
+ #blizzard,if=active_enemies>2|active_enemies>1&cast_time=0&buff.fingers_of_frost.react<2
+ if Enemies() > 2 or Enemies() > 1 and CastTime(blizzard) == 0 and BuffStacks(fingers_of_frost_buff) < 2 Spell(blizzard)
+ #ice_lance,if=buff.fingers_of_frost.react
+ if BuffPresent(fingers_of_frost_buff) Spell(ice_lance)
+ #ebonbolt,if=!talent.glacial_spike.enabled|buff.icicles.stack=5&!buff.brain_freeze.react
+ if not Talent(glacial_spike_talent) or BuffStacks(icicles_buff) == 5 and not BuffPresent(brain_freeze_buff) Spell(ebonbolt)
+ #ray_of_frost,if=!action.frozen_orb.in_flight&ground_aoe.frozen_orb.remains=0
+ if not InFlightToTarget(frozen_orb) and not DebuffRemaining(frozen_orb_debuff) > 0 Spell(ray_of_frost)
+ #blizzard,if=cast_time=0|active_enemies>1
+ if CastTime(blizzard) == 0 or Enemies() > 1 Spell(blizzard)
+ #glacial_spike,if=buff.brain_freeze.react|prev_gcd.1.ebonbolt|active_enemies>1&talent.splitting_ice.enabled
+ if BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) or Enemies() > 1 and Talent(splitting_ice_talent) Spell(glacial_spike)
  #ice_nova
  Spell(ice_nova)
- #blizzard,if=active_enemies>1|buff.zannesu_journey.stack=5&buff.zannesu_journey.remains>cast_time
- if Enemies() > 1 or BuffStacks(zannesu_journey_buff) == 5 and BuffRemaining(zannesu_journey_buff) > CastTime(blizzard) Spell(blizzard)
- #frostbolt,if=buff.frozen_mass.remains>execute_time+action.glacial_spike.execute_time+action.glacial_spike.travel_time&buff.brain_freeze.react=0&talent.glacial_spike.enabled
- if BuffRemaining(frozen_mass_buff) > ExecuteTime(frostbolt) + ExecuteTime(glacial_spike) + TravelTime(glacial_spike) and BuffStacks(brain_freeze_buff) == 0 and Talent(glacial_spike_talent) Spell(frostbolt)
- #glacial_spike,if=cooldown.frozen_orb.remains>10|!set_bonus.tier20_2pc
- if SpellCooldown(frozen_orb) > 10 or not ArmorSetBonus(T20 2) Spell(glacial_spike)
+ #flurry,if=azerite.winters_reach.enabled&!buff.brain_freeze.react&buff.winters_reach.react
+ if HasAzeriteTrait(winters_reach_trait) and not BuffPresent(brain_freeze_buff) and DebuffPresent(winters_reach) Spell(flurry)
  #frostbolt
  Spell(frostbolt)
- #blizzard
- Spell(blizzard)
- #ice_lance
- Spell(ice_lance)
+ #call_action_list,name=movement
+ FrostMovementMainActions()
+
+ unless FrostMovementMainPostConditions()
+ {
+  #ice_lance
+  Spell(ice_lance)
+ }
 }
 
 AddFunction FrostSingleMainPostConditions
 {
+ FrostMovementMainPostConditions()
 }
 
 AddFunction FrostSingleShortCdActions
 {
- unless target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or PreviousGCDSpell(frostbolt) and BuffStacks(fingers_of_frost_buff) < 3 and BuffStacks(brain_freeze_buff) == 0 and Spell(water_elemental_water_jet) or { BuffPresent(icy_veins_buff) or SpellCooldown(icy_veins) > SpellCooldown(ray_of_frost) and BuffExpires(rune_of_power_buff) } and Spell(ray_of_frost) or { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(frostbolt) and { not Talent(glacial_spike_talent) or BuffStacks(icicles_buff) <= 3 or SpellCooldown(frozen_orb) <= 10 and ArmorSetBonus(T20 2) } } } and Spell(flurry)
+ unless SpellCooldown(ice_nova) == 0 and target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or not Talent(glacial_spike_talent) and { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and PreviousGCDSpell(frostbolt) } and Spell(flurry) or Talent(glacial_spike_talent) and BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(frostbolt) and BuffStacks(icicles_buff) < 4 or PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(ebonbolt) } and Spell(flurry)
  {
-  #frozen_orb,if=set_bonus.tier20_2pc&variable.fof_react<3
-  if ArmorSetBonus(T20 2) and fof_react() < 3 Spell(frozen_orb)
+  #frozen_orb
+  Spell(frozen_orb)
 
-  unless CastTime(blizzard) == 0 and Enemies() > 1 and fof_react() < 3 and Spell(blizzard)
+  unless { Enemies() > 2 or Enemies() > 1 and CastTime(blizzard) == 0 and BuffStacks(fingers_of_frost_buff) < 2 } and Spell(blizzard) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance)
   {
-   #frost_bomb,if=debuff.frost_bomb.remains<action.ice_lance.travel_time&variable.fof_react
-   if target.DebuffRemaining(frost_bomb_debuff) < TravelTime(ice_lance) and fof_react() Spell(frost_bomb)
+   #comet_storm
+   Spell(comet_storm)
 
-   unless fof_react() and Spell(ice_lance) or Spell(ebonbolt)
+   unless { not Talent(glacial_spike_talent) or BuffStacks(icicles_buff) == 5 and not BuffPresent(brain_freeze_buff) } and Spell(ebonbolt) or not InFlightToTarget(frozen_orb) and not DebuffRemaining(frozen_orb_debuff) > 0 and Spell(ray_of_frost) or { CastTime(blizzard) == 0 or Enemies() > 1 } and Spell(blizzard) or { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) or Enemies() > 1 and Talent(splitting_ice_talent) } and Spell(glacial_spike) or Spell(ice_nova) or HasAzeriteTrait(winters_reach_trait) and not BuffPresent(brain_freeze_buff) and DebuffPresent(winters_reach) and Spell(flurry) or Spell(frostbolt)
    {
-    #frozen_orb
-    Spell(frozen_orb)
-
-    unless Spell(ice_nova)
-    {
-     #comet_storm
-     Spell(comet_storm)
-    }
+    #call_action_list,name=movement
+    FrostMovementShortCdActions()
    }
   }
  }
@@ -1276,22 +1122,32 @@ AddFunction FrostSingleShortCdActions
 
 AddFunction FrostSingleShortCdPostConditions
 {
- target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or PreviousGCDSpell(frostbolt) and BuffStacks(fingers_of_frost_buff) < 3 and BuffStacks(brain_freeze_buff) == 0 and Spell(water_elemental_water_jet) or { BuffPresent(icy_veins_buff) or SpellCooldown(icy_veins) > SpellCooldown(ray_of_frost) and BuffExpires(rune_of_power_buff) } and Spell(ray_of_frost) or { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(frostbolt) and { not Talent(glacial_spike_talent) or BuffStacks(icicles_buff) <= 3 or SpellCooldown(frozen_orb) <= 10 and ArmorSetBonus(T20 2) } } } and Spell(flurry) or CastTime(blizzard) == 0 and Enemies() > 1 and fof_react() < 3 and Spell(blizzard) or fof_react() and Spell(ice_lance) or Spell(ebonbolt) or Spell(ice_nova) or { Enemies() > 1 or BuffStacks(zannesu_journey_buff) == 5 and BuffRemaining(zannesu_journey_buff) > CastTime(blizzard) } and Spell(blizzard) or BuffRemaining(frozen_mass_buff) > ExecuteTime(frostbolt) + ExecuteTime(glacial_spike) + TravelTime(glacial_spike) and BuffStacks(brain_freeze_buff) == 0 and Talent(glacial_spike_talent) and Spell(frostbolt) or { SpellCooldown(frozen_orb) > 10 or not ArmorSetBonus(T20 2) } and Spell(glacial_spike) or Spell(frostbolt) or Spell(blizzard) or Spell(ice_lance)
+ SpellCooldown(ice_nova) == 0 and target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or not Talent(glacial_spike_talent) and { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and PreviousGCDSpell(frostbolt) } and Spell(flurry) or Talent(glacial_spike_talent) and BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(frostbolt) and BuffStacks(icicles_buff) < 4 or PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(ebonbolt) } and Spell(flurry) or { Enemies() > 2 or Enemies() > 1 and CastTime(blizzard) == 0 and BuffStacks(fingers_of_frost_buff) < 2 } and Spell(blizzard) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or { not Talent(glacial_spike_talent) or BuffStacks(icicles_buff) == 5 and not BuffPresent(brain_freeze_buff) } and Spell(ebonbolt) or not InFlightToTarget(frozen_orb) and not DebuffRemaining(frozen_orb_debuff) > 0 and Spell(ray_of_frost) or { CastTime(blizzard) == 0 or Enemies() > 1 } and Spell(blizzard) or { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) or Enemies() > 1 and Talent(splitting_ice_talent) } and Spell(glacial_spike) or Spell(ice_nova) or HasAzeriteTrait(winters_reach_trait) and not BuffPresent(brain_freeze_buff) and DebuffPresent(winters_reach) and Spell(flurry) or Spell(frostbolt) or FrostMovementShortCdPostConditions() or Spell(ice_lance)
 }
 
 AddFunction FrostSingleCdActions
 {
+ unless SpellCooldown(ice_nova) == 0 and target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or not Talent(glacial_spike_talent) and { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and PreviousGCDSpell(frostbolt) } and Spell(flurry) or Talent(glacial_spike_talent) and BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(frostbolt) and BuffStacks(icicles_buff) < 4 or PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(ebonbolt) } and Spell(flurry) or Spell(frozen_orb) or { Enemies() > 2 or Enemies() > 1 and CastTime(blizzard) == 0 and BuffStacks(fingers_of_frost_buff) < 2 } and Spell(blizzard) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or Spell(comet_storm) or { not Talent(glacial_spike_talent) or BuffStacks(icicles_buff) == 5 and not BuffPresent(brain_freeze_buff) } and Spell(ebonbolt) or not InFlightToTarget(frozen_orb) and not DebuffRemaining(frozen_orb_debuff) > 0 and Spell(ray_of_frost) or { CastTime(blizzard) == 0 or Enemies() > 1 } and Spell(blizzard) or { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) or Enemies() > 1 and Talent(splitting_ice_talent) } and Spell(glacial_spike) or Spell(ice_nova) or HasAzeriteTrait(winters_reach_trait) and not BuffPresent(brain_freeze_buff) and DebuffPresent(winters_reach) and Spell(flurry) or Spell(frostbolt)
+ {
+  #call_action_list,name=movement
+  FrostMovementCdActions()
+ }
 }
 
 AddFunction FrostSingleCdPostConditions
 {
- target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or PreviousGCDSpell(frostbolt) and BuffStacks(fingers_of_frost_buff) < 3 and BuffStacks(brain_freeze_buff) == 0 and Spell(water_elemental_water_jet) or { BuffPresent(icy_veins_buff) or SpellCooldown(icy_veins) > SpellCooldown(ray_of_frost) and BuffExpires(rune_of_power_buff) } and Spell(ray_of_frost) or { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(frostbolt) and { not Talent(glacial_spike_talent) or BuffStacks(icicles_buff) <= 3 or SpellCooldown(frozen_orb) <= 10 and ArmorSetBonus(T20 2) } } } and Spell(flurry) or ArmorSetBonus(T20 2) and fof_react() < 3 and Spell(frozen_orb) or CastTime(blizzard) == 0 and Enemies() > 1 and fof_react() < 3 and Spell(blizzard) or target.DebuffRemaining(frost_bomb_debuff) < TravelTime(ice_lance) and fof_react() and Spell(frost_bomb) or fof_react() and Spell(ice_lance) or Spell(ebonbolt) or Spell(frozen_orb) or Spell(ice_nova) or Spell(comet_storm) or { Enemies() > 1 or BuffStacks(zannesu_journey_buff) == 5 and BuffRemaining(zannesu_journey_buff) > CastTime(blizzard) } and Spell(blizzard) or BuffRemaining(frozen_mass_buff) > ExecuteTime(frostbolt) + ExecuteTime(glacial_spike) + TravelTime(glacial_spike) and BuffStacks(brain_freeze_buff) == 0 and Talent(glacial_spike_talent) and Spell(frostbolt) or { SpellCooldown(frozen_orb) > 10 or not ArmorSetBonus(T20 2) } and Spell(glacial_spike) or Spell(frostbolt) or Spell(blizzard) or Spell(ice_lance)
+ SpellCooldown(ice_nova) == 0 and target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or not Talent(glacial_spike_talent) and { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and PreviousGCDSpell(frostbolt) } and Spell(flurry) or Talent(glacial_spike_talent) and BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(frostbolt) and BuffStacks(icicles_buff) < 4 or PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(ebonbolt) } and Spell(flurry) or Spell(frozen_orb) or { Enemies() > 2 or Enemies() > 1 and CastTime(blizzard) == 0 and BuffStacks(fingers_of_frost_buff) < 2 } and Spell(blizzard) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or Spell(comet_storm) or { not Talent(glacial_spike_talent) or BuffStacks(icicles_buff) == 5 and not BuffPresent(brain_freeze_buff) } and Spell(ebonbolt) or not InFlightToTarget(frozen_orb) and not DebuffRemaining(frozen_orb_debuff) > 0 and Spell(ray_of_frost) or { CastTime(blizzard) == 0 or Enemies() > 1 } and Spell(blizzard) or { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) or Enemies() > 1 and Talent(splitting_ice_talent) } and Spell(glacial_spike) or Spell(ice_nova) or HasAzeriteTrait(winters_reach_trait) and not BuffPresent(brain_freeze_buff) and DebuffPresent(winters_reach) and Spell(flurry) or Spell(frostbolt) or FrostMovementCdPostConditions() or Spell(ice_lance)
 }
 
 ### actions.precombat
 
 AddFunction FrostPrecombatMainActions
 {
+ #flask
+ #food
+ #augmentation
+ #arcane_intellect
+ Spell(arcane_intellect)
  #frostbolt
  Spell(frostbolt)
 }
@@ -1302,33 +1158,33 @@ AddFunction FrostPrecombatMainPostConditions
 
 AddFunction FrostPrecombatShortCdActions
 {
- #flask
- #food
- #augmentation
- #water_elemental
- if not pet.Present() Spell(water_elemental)
+ unless Spell(arcane_intellect)
+ {
+  #water_elemental
+  if not pet.Present() Spell(water_elemental)
+ }
 }
 
 AddFunction FrostPrecombatShortCdPostConditions
 {
- Spell(frostbolt)
+ Spell(arcane_intellect) or Spell(frostbolt)
 }
 
 AddFunction FrostPrecombatCdActions
 {
- unless not pet.Present() and Spell(water_elemental)
+ unless Spell(arcane_intellect) or not pet.Present() and Spell(water_elemental)
  {
   #snapshot_stats
   #mirror_image
   Spell(mirror_image)
   #potion
-  Item(prolonged_power_potion)
+  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(rising_death usable=1)
  }
 }
 
 AddFunction FrostPrecombatCdPostConditions
 {
- not pet.Present() and Spell(water_elemental) or Spell(frostbolt)
+ Spell(arcane_intellect) or not pet.Present() and Spell(water_elemental) or Spell(frostbolt)
 }
 
 ### actions.movement
@@ -1345,8 +1201,8 @@ AddFunction FrostMovementShortCdActions
 {
  #blink,if=movement.distance>10
  if target.Distance() > 10 Spell(blink)
- #ice_floes,if=buff.ice_floes.down&variable.fof_react=0
- if BuffExpires(ice_floes_buff) and fof_react() == 0 Spell(ice_floes)
+ #ice_floes,if=buff.ice_floes.down
+ if BuffExpires(ice_floes_buff) Spell(ice_floes)
 }
 
 AddFunction FrostMovementShortCdPostConditions
@@ -1359,7 +1215,7 @@ AddFunction FrostMovementCdActions
 
 AddFunction FrostMovementCdPostConditions
 {
- target.Distance() > 10 and Spell(blink) or BuffExpires(ice_floes_buff) and fof_react() == 0 and Spell(ice_floes)
+ target.Distance() > 10 and Spell(blink) or BuffExpires(ice_floes_buff) and Spell(ice_floes)
 }
 
 ### actions.cooldowns
@@ -1374,8 +1230,14 @@ AddFunction FrostCooldownsMainPostConditions
 
 AddFunction FrostCooldownsShortCdActions
 {
- #rune_of_power,if=cooldown.icy_veins.remains<cast_time|charges_fractional>1.9&cooldown.icy_veins.remains>10|buff.icy_veins.up|target.time_to_die+5<charges_fractional*10
- if SpellCooldown(icy_veins) < CastTime(rune_of_power) or Charges(rune_of_power count=0) > 1 and SpellCooldown(icy_veins) > 10 or BuffPresent(icy_veins_buff) or target.TimeToDie() + 5 < Charges(rune_of_power count=0) * 10 Spell(rune_of_power)
+ #rune_of_power,if=time_to_die>10+cast_time&time_to_die<25
+ if target.TimeToDie() > 10 + CastTime(rune_of_power) and target.TimeToDie() < 25 Spell(rune_of_power)
+ #rune_of_power,if=active_enemies=1&talent.glacial_spike.enabled&buff.icicles.stack=5&(buff.brain_freeze.react|talent.ebonbolt.enabled&cooldown.ebonbolt.remains<cast_time)
+ if Enemies() == 1 and Talent(glacial_spike_talent) and BuffStacks(icicles_buff) == 5 and { BuffPresent(brain_freeze_buff) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) } Spell(rune_of_power)
+ #rune_of_power,if=active_enemies=1&!talent.glacial_spike.enabled&(prev_gcd.1.frozen_orb|talent.ebonbolt.enabled&cooldown.ebonbolt.remains<cast_time|talent.comet_storm.enabled&cooldown.comet_storm.remains<cast_time|talent.ray_of_frost.enabled&cooldown.ray_of_frost.remains<cast_time|charges_fractional>1.9)
+ if Enemies() == 1 and not Talent(glacial_spike_talent) and { PreviousGCDSpell(frozen_orb) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) or Talent(comet_storm_talent) and SpellCooldown(comet_storm) < CastTime(rune_of_power) or Talent(ray_of_frost_talent) and SpellCooldown(ray_of_frost) < CastTime(rune_of_power) or Charges(rune_of_power count=0) > 1 } Spell(rune_of_power)
+ #rune_of_power,if=active_enemies>1&prev_gcd.1.frozen_orb
+ if Enemies() > 1 and PreviousGCDSpell(frozen_orb) Spell(rune_of_power)
 }
 
 AddFunction FrostCooldownsShortCdPostConditions
@@ -1384,82 +1246,91 @@ AddFunction FrostCooldownsShortCdPostConditions
 
 AddFunction FrostCooldownsCdActions
 {
- unless { SpellCooldown(icy_veins) < CastTime(rune_of_power) or Charges(rune_of_power count=0) > 1 and SpellCooldown(icy_veins) > 10 or BuffPresent(icy_veins_buff) or target.TimeToDie() + 5 < Charges(rune_of_power count=0) * 10 } and Spell(rune_of_power)
+ #time_warp
+ if CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
+ #icy_veins
+ Spell(icy_veins)
+ #mirror_image
+ Spell(mirror_image)
+
+ unless target.TimeToDie() > 10 + CastTime(rune_of_power) and target.TimeToDie() < 25 and Spell(rune_of_power) or Enemies() == 1 and Talent(glacial_spike_talent) and BuffStacks(icicles_buff) == 5 and { BuffPresent(brain_freeze_buff) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) } and Spell(rune_of_power) or Enemies() == 1 and not Talent(glacial_spike_talent) and { PreviousGCDSpell(frozen_orb) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) or Talent(comet_storm_talent) and SpellCooldown(comet_storm) < CastTime(rune_of_power) or Talent(ray_of_frost_talent) and SpellCooldown(ray_of_frost) < CastTime(rune_of_power) or Charges(rune_of_power count=0) > 1 } and Spell(rune_of_power) or Enemies() > 1 and PreviousGCDSpell(frozen_orb) and Spell(rune_of_power)
  {
-  #potion,if=cooldown.icy_veins.remains<1|target.time_to_die<70
-  if SpellCooldown(icy_veins) < 1 or target.TimeToDie() < 70 Item(prolonged_power_potion)
-  #icy_veins
-  Spell(icy_veins)
-  #mirror_image
-  Spell(mirror_image)
+  #potion,if=prev_gcd.1.icy_veins|target.time_to_die<70
+  if { PreviousGCDSpell(icy_veins) or target.TimeToDie() < 70 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(rising_death usable=1)
   #use_items
   FrostUseItemActions()
   #blood_fury
   Spell(blood_fury_sp)
   #berserking
   Spell(berserking)
-  #arcane_torrent
-  Spell(arcane_torrent_mana)
+  #lights_judgment
+  Spell(lights_judgment)
+  #fireblood
+  Spell(fireblood)
+  #ancestral_call
+  Spell(ancestral_call)
  }
 }
 
 AddFunction FrostCooldownsCdPostConditions
 {
- { SpellCooldown(icy_veins) < CastTime(rune_of_power) or Charges(rune_of_power count=0) > 1 and SpellCooldown(icy_veins) > 10 or BuffPresent(icy_veins_buff) or target.TimeToDie() + 5 < Charges(rune_of_power count=0) * 10 } and Spell(rune_of_power)
+ target.TimeToDie() > 10 + CastTime(rune_of_power) and target.TimeToDie() < 25 and Spell(rune_of_power) or Enemies() == 1 and Talent(glacial_spike_talent) and BuffStacks(icicles_buff) == 5 and { BuffPresent(brain_freeze_buff) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) } and Spell(rune_of_power) or Enemies() == 1 and not Talent(glacial_spike_talent) and { PreviousGCDSpell(frozen_orb) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) or Talent(comet_storm_talent) and SpellCooldown(comet_storm) < CastTime(rune_of_power) or Talent(ray_of_frost_talent) and SpellCooldown(ray_of_frost) < CastTime(rune_of_power) or Charges(rune_of_power count=0) > 1 } and Spell(rune_of_power) or Enemies() > 1 and PreviousGCDSpell(frozen_orb) and Spell(rune_of_power)
 }
 
 ### actions.aoe
 
 AddFunction FrostAoeMainActions
 {
- #frostbolt,if=prev_off_gcd.water_jet
- if PreviousOffGCDSpell(water_elemental_water_jet) Spell(frostbolt)
  #blizzard
  Spell(blizzard)
  #ice_nova
  Spell(ice_nova)
- #water_jet,if=prev_gcd.1.frostbolt&buff.fingers_of_frost.stack<3&buff.brain_freeze.react=0
- if PreviousGCDSpell(frostbolt) and BuffStacks(fingers_of_frost_buff) < 3 and BuffStacks(brain_freeze_buff) == 0 Spell(water_elemental_water_jet)
- #flurry,if=prev_gcd.1.ebonbolt|buff.brain_freeze.react&(prev_gcd.1.glacial_spike|prev_gcd.1.frostbolt)
- if PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(frostbolt) } Spell(flurry)
- #ice_lance,if=variable.fof_react
- if fof_react() Spell(ice_lance)
+ #flurry,if=prev_gcd.1.ebonbolt|buff.brain_freeze.react&(prev_gcd.1.frostbolt&(buff.icicles.stack<4|!talent.glacial_spike.enabled)|prev_gcd.1.glacial_spike)
+ if PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(frostbolt) and { BuffStacks(icicles_buff) < 4 or not Talent(glacial_spike_talent) } or PreviousGCDSpell(glacial_spike) } Spell(flurry)
+ #ice_lance,if=buff.fingers_of_frost.react
+ if BuffPresent(fingers_of_frost_buff) Spell(ice_lance)
+ #ray_of_frost
+ Spell(ray_of_frost)
  #ebonbolt
  Spell(ebonbolt)
  #glacial_spike
  Spell(glacial_spike)
  #frostbolt
  Spell(frostbolt)
- #ice_lance
- Spell(ice_lance)
+ #call_action_list,name=movement
+ FrostMovementMainActions()
+
+ unless FrostMovementMainPostConditions()
+ {
+  #ice_lance
+  Spell(ice_lance)
+ }
 }
 
 AddFunction FrostAoeMainPostConditions
 {
+ FrostMovementMainPostConditions()
 }
 
 AddFunction FrostAoeShortCdActions
 {
- unless PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt)
+ #frozen_orb
+ Spell(frozen_orb)
+
+ unless Spell(blizzard)
  {
-  #frozen_orb
-  Spell(frozen_orb)
+  #comet_storm
+  Spell(comet_storm)
 
-  unless Spell(blizzard)
+  unless Spell(ice_nova) or { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(frostbolt) and { BuffStacks(icicles_buff) < 4 or not Talent(glacial_spike_talent) } or PreviousGCDSpell(glacial_spike) } } and Spell(flurry) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or Spell(ray_of_frost) or Spell(ebonbolt) or Spell(glacial_spike)
   {
-   #comet_storm
-   Spell(comet_storm)
+   #cone_of_cold
+   Spell(cone_of_cold)
 
-   unless Spell(ice_nova) or PreviousGCDSpell(frostbolt) and BuffStacks(fingers_of_frost_buff) < 3 and BuffStacks(brain_freeze_buff) == 0 and Spell(water_elemental_water_jet) or { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(frostbolt) } } and Spell(flurry)
+   unless Spell(frostbolt)
    {
-    #frost_bomb,if=debuff.frost_bomb.remains<action.ice_lance.travel_time&variable.fof_react
-    if target.DebuffRemaining(frost_bomb_debuff) < TravelTime(ice_lance) and fof_react() Spell(frost_bomb)
-
-    unless fof_react() and Spell(ice_lance) or Spell(ebonbolt) or Spell(glacial_spike) or Spell(frostbolt)
-    {
-     #cone_of_cold
-     Spell(cone_of_cold)
-    }
+    #call_action_list,name=movement
+    FrostMovementShortCdActions()
    }
   }
  }
@@ -1467,82 +1338,66 @@ AddFunction FrostAoeShortCdActions
 
 AddFunction FrostAoeShortCdPostConditions
 {
- PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or Spell(blizzard) or Spell(ice_nova) or PreviousGCDSpell(frostbolt) and BuffStacks(fingers_of_frost_buff) < 3 and BuffStacks(brain_freeze_buff) == 0 and Spell(water_elemental_water_jet) or { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(frostbolt) } } and Spell(flurry) or fof_react() and Spell(ice_lance) or Spell(ebonbolt) or Spell(glacial_spike) or Spell(frostbolt) or Spell(ice_lance)
+ Spell(blizzard) or Spell(ice_nova) or { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(frostbolt) and { BuffStacks(icicles_buff) < 4 or not Talent(glacial_spike_talent) } or PreviousGCDSpell(glacial_spike) } } and Spell(flurry) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or Spell(ray_of_frost) or Spell(ebonbolt) or Spell(glacial_spike) or Spell(frostbolt) or FrostMovementShortCdPostConditions() or Spell(ice_lance)
 }
 
 AddFunction FrostAoeCdActions
 {
+ unless Spell(frozen_orb) or Spell(blizzard) or Spell(comet_storm) or Spell(ice_nova) or { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(frostbolt) and { BuffStacks(icicles_buff) < 4 or not Talent(glacial_spike_talent) } or PreviousGCDSpell(glacial_spike) } } and Spell(flurry) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or Spell(ray_of_frost) or Spell(ebonbolt) or Spell(glacial_spike) or Spell(cone_of_cold) or Spell(frostbolt)
+ {
+  #call_action_list,name=movement
+  FrostMovementCdActions()
+ }
 }
 
 AddFunction FrostAoeCdPostConditions
 {
- PreviousOffGCDSpell(water_elemental_water_jet) and Spell(frostbolt) or Spell(frozen_orb) or Spell(blizzard) or Spell(comet_storm) or Spell(ice_nova) or PreviousGCDSpell(frostbolt) and BuffStacks(fingers_of_frost_buff) < 3 and BuffStacks(brain_freeze_buff) == 0 and Spell(water_elemental_water_jet) or { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(frostbolt) } } and Spell(flurry) or target.DebuffRemaining(frost_bomb_debuff) < TravelTime(ice_lance) and fof_react() and Spell(frost_bomb) or fof_react() and Spell(ice_lance) or Spell(ebonbolt) or Spell(glacial_spike) or Spell(frostbolt) or Spell(cone_of_cold) or Spell(ice_lance)
+ Spell(frozen_orb) or Spell(blizzard) or Spell(comet_storm) or Spell(ice_nova) or { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(frostbolt) and { BuffStacks(icicles_buff) < 4 or not Talent(glacial_spike_talent) } or PreviousGCDSpell(glacial_spike) } } and Spell(flurry) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or Spell(ray_of_frost) or Spell(ebonbolt) or Spell(glacial_spike) or Spell(cone_of_cold) or Spell(frostbolt) or FrostMovementCdPostConditions() or Spell(ice_lance)
 }
 
 ### actions.default
 
 AddFunction FrostDefaultMainActions
 {
- #call_action_list,name=variables
- FrostVariablesMainActions()
+ #ice_lance,if=prev_gcd.1.flurry&brain_freeze_active&!buff.fingers_of_frost.react
+ if PreviousGCDSpell(flurry) and FIXME_brain_freeze_active and not BuffPresent(fingers_of_frost_buff) Spell(ice_lance)
+ #call_action_list,name=cooldowns
+ FrostCooldownsMainActions()
 
- unless FrostVariablesMainPostConditions()
+ unless FrostCooldownsMainPostConditions()
  {
-  #ice_lance,if=variable.fof_react=0&prev_gcd.1.flurry
-  if fof_react() == 0 and PreviousGCDSpell(flurry) Spell(ice_lance)
-  #call_action_list,name=movement,moving=1
-  if Speed() > 0 FrostMovementMainActions()
+  #call_action_list,name=aoe,if=active_enemies>3&talent.freezing_rain.enabled|active_enemies>4
+  if Enemies() > 3 and Talent(freezing_rain_talent) or Enemies() > 4 FrostAoeMainActions()
 
-  unless Speed() > 0 and FrostMovementMainPostConditions()
+  unless { Enemies() > 3 and Talent(freezing_rain_talent) or Enemies() > 4 } and FrostAoeMainPostConditions()
   {
-   #call_action_list,name=cooldowns
-   FrostCooldownsMainActions()
-
-   unless FrostCooldownsMainPostConditions()
-   {
-    #call_action_list,name=aoe,if=active_enemies>=3
-    if Enemies() >= 3 FrostAoeMainActions()
-
-    unless Enemies() >= 3 and FrostAoeMainPostConditions()
-    {
-     #call_action_list,name=single
-     FrostSingleMainActions()
-    }
-   }
+   #call_action_list,name=single
+   FrostSingleMainActions()
   }
  }
 }
 
 AddFunction FrostDefaultMainPostConditions
 {
- FrostVariablesMainPostConditions() or Speed() > 0 and FrostMovementMainPostConditions() or FrostCooldownsMainPostConditions() or Enemies() >= 3 and FrostAoeMainPostConditions() or FrostSingleMainPostConditions()
+ FrostCooldownsMainPostConditions() or { Enemies() > 3 and Talent(freezing_rain_talent) or Enemies() > 4 } and FrostAoeMainPostConditions() or FrostSingleMainPostConditions()
 }
 
 AddFunction FrostDefaultShortCdActions
 {
- #call_action_list,name=variables
- FrostVariablesShortCdActions()
-
- unless FrostVariablesShortCdPostConditions() or fof_react() == 0 and PreviousGCDSpell(flurry) and Spell(ice_lance)
+ unless PreviousGCDSpell(flurry) and FIXME_brain_freeze_active and not BuffPresent(fingers_of_frost_buff) and Spell(ice_lance)
  {
-  #call_action_list,name=movement,moving=1
-  if Speed() > 0 FrostMovementShortCdActions()
+  #call_action_list,name=cooldowns
+  FrostCooldownsShortCdActions()
 
-  unless Speed() > 0 and FrostMovementShortCdPostConditions()
+  unless FrostCooldownsShortCdPostConditions()
   {
-   #call_action_list,name=cooldowns
-   FrostCooldownsShortCdActions()
+   #call_action_list,name=aoe,if=active_enemies>3&talent.freezing_rain.enabled|active_enemies>4
+   if Enemies() > 3 and Talent(freezing_rain_talent) or Enemies() > 4 FrostAoeShortCdActions()
 
-   unless FrostCooldownsShortCdPostConditions()
+   unless { Enemies() > 3 and Talent(freezing_rain_talent) or Enemies() > 4 } and FrostAoeShortCdPostConditions()
    {
-    #call_action_list,name=aoe,if=active_enemies>=3
-    if Enemies() >= 3 FrostAoeShortCdActions()
-
-    unless Enemies() >= 3 and FrostAoeShortCdPostConditions()
-    {
-     #call_action_list,name=single
-     FrostSingleShortCdActions()
-    }
+    #call_action_list,name=single
+    FrostSingleShortCdActions()
    }
   }
  }
@@ -1550,42 +1405,28 @@ AddFunction FrostDefaultShortCdActions
 
 AddFunction FrostDefaultShortCdPostConditions
 {
- FrostVariablesShortCdPostConditions() or fof_react() == 0 and PreviousGCDSpell(flurry) and Spell(ice_lance) or Speed() > 0 and FrostMovementShortCdPostConditions() or FrostCooldownsShortCdPostConditions() or Enemies() >= 3 and FrostAoeShortCdPostConditions() or FrostSingleShortCdPostConditions()
+ PreviousGCDSpell(flurry) and FIXME_brain_freeze_active and not BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or FrostCooldownsShortCdPostConditions() or { Enemies() > 3 and Talent(freezing_rain_talent) or Enemies() > 4 } and FrostAoeShortCdPostConditions() or FrostSingleShortCdPostConditions()
 }
 
 AddFunction FrostDefaultCdActions
 {
- #call_action_list,name=variables
- FrostVariablesCdActions()
+ #counterspell
+ FrostInterruptActions()
 
- unless FrostVariablesCdPostConditions()
+ unless PreviousGCDSpell(flurry) and FIXME_brain_freeze_active and not BuffPresent(fingers_of_frost_buff) and Spell(ice_lance)
  {
-  #counterspell
-  FrostInterruptActions()
+  #call_action_list,name=cooldowns
+  FrostCooldownsCdActions()
 
-  unless fof_react() == 0 and PreviousGCDSpell(flurry) and Spell(ice_lance)
+  unless FrostCooldownsCdPostConditions()
   {
-   #time_warp,if=buff.bloodlust.down&(buff.exhaustion.down|equipped.shard_of_the_exodar)&(cooldown.icy_veins.remains<1|target.time_to_die<50)
-   if BuffExpires(burst_haste_buff any=1) and { DebuffExpires(burst_haste_debuff any=1) or HasEquippedItem(shard_of_the_exodar) } and { SpellCooldown(icy_veins) < 1 or target.TimeToDie() < 50 } and CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1) Spell(time_warp)
-   #call_action_list,name=movement,moving=1
-   if Speed() > 0 FrostMovementCdActions()
+   #call_action_list,name=aoe,if=active_enemies>3&talent.freezing_rain.enabled|active_enemies>4
+   if Enemies() > 3 and Talent(freezing_rain_talent) or Enemies() > 4 FrostAoeCdActions()
 
-   unless Speed() > 0 and FrostMovementCdPostConditions()
+   unless { Enemies() > 3 and Talent(freezing_rain_talent) or Enemies() > 4 } and FrostAoeCdPostConditions()
    {
-    #call_action_list,name=cooldowns
-    FrostCooldownsCdActions()
-
-    unless FrostCooldownsCdPostConditions()
-    {
-     #call_action_list,name=aoe,if=active_enemies>=3
-     if Enemies() >= 3 FrostAoeCdActions()
-
-     unless Enemies() >= 3 and FrostAoeCdPostConditions()
-     {
-      #call_action_list,name=single
-      FrostSingleCdActions()
-     }
-    }
+    #call_action_list,name=single
+    FrostSingleCdActions()
    }
   }
  }
@@ -1593,7 +1434,7 @@ AddFunction FrostDefaultCdActions
 
 AddFunction FrostDefaultCdPostConditions
 {
- FrostVariablesCdPostConditions() or fof_react() == 0 and PreviousGCDSpell(flurry) and Spell(ice_lance) or Speed() > 0 and FrostMovementCdPostConditions() or FrostCooldownsCdPostConditions() or Enemies() >= 3 and FrostAoeCdPostConditions() or FrostSingleCdPostConditions()
+ PreviousGCDSpell(flurry) and FIXME_brain_freeze_active and not BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or FrostCooldownsCdPostConditions() or { Enemies() > 3 and Talent(freezing_rain_talent) or Enemies() > 4 } and FrostAoeCdPostConditions() or FrostSingleCdPostConditions()
 }
 
 ### Frost icons.
@@ -1655,47 +1496,47 @@ AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 }
 
 ### Required symbols
-# icy_veins
-# fingers_of_frost_buff
-# lady_vashjs_grasp
-# icy_veins_buff
-# freeze
-# frozen_orb_debuff
-# ice_nova
-# winters_chill_debuff
-# frostbolt
-# water_elemental_water_jet
+# ancestral_call
+# arcane_intellect
+# berserking
+# blink
+# blizzard
+# blood_fury_sp
 # brain_freeze_buff
-# ray_of_frost
-# rune_of_power_buff
-# flurry
+# comet_storm
+# comet_storm_talent
+# cone_of_cold
+# counterspell
 # ebonbolt
+# ebonbolt_talent
+# fingers_of_frost_buff
+# fireblood
+# flurry
+# freezing_rain_talent
+# frostbolt
+# frozen_orb
+# frozen_orb_debuff
 # glacial_spike
 # glacial_spike_talent
-# icicles_buff
-# frozen_orb
-# blizzard
-# frost_bomb
-# frost_bomb_debuff
-# ice_lance
-# comet_storm
-# zannesu_journey_buff
-# frozen_mass_buff
-# water_elemental
-# mirror_image
-# prolonged_power_potion
-# blink
 # ice_floes
 # ice_floes_buff
-# rune_of_power
-# blood_fury_sp
-# berserking
-# arcane_torrent_mana
-# cone_of_cold
-# time_warp
-# shard_of_the_exodar
+# ice_lance
+# ice_nova
+# icicles_buff
+# icy_veins
+# lights_judgment
+# mirror_image
 # quaking_palm
-# counterspell
+# ray_of_frost
+# ray_of_frost_talent
+# rising_death
+# rune_of_power
+# splitting_ice_talent
+# time_warp
+# water_elemental
+# winters_chill_debuff
+# winters_reach
+# winters_reach_trait
 ]]
     OvaleScripts:RegisterScript("MAGE", "frost", name, desc, code, "script")
 end
