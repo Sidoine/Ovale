@@ -46,15 +46,10 @@ AddFunction BrewmasterRangeCheck
 	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
-AddFunction BrewMasterIronskinMin
-{
-	DebuffRemaining(any_stagger_debuff)
-}
-
 AddFunction BrewmasterDefaultShortCDActions
 {
 	# keep ISB up always when taking dmg
-	if BuffRemaining(ironskin_brew_buff) < BrewMasterIronskinMin() and BuffExpires(blackout_combo_buff) Spell(ironskin_brew)
+    if BuffExpires(ironskin_brew_buff 2) and BuffExpires(blackout_combo_buff) Spell(ironskin_brew)
 	
 	# keep stagger below 100% (or 30% when BOB is up)
 	if (StaggerPercentage() >= 100 or (StaggerPercentage() >= 30 and Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 0)) Spell(purifying_brew)
@@ -81,18 +76,14 @@ AddFunction BrewmasterDefaultShortCDActions
 		# always bank 1 charge (or bank 2 with light_brewing)
 		unless (SpellCharges(ironskin_brew count=0) <= SpellData(ironskin_brew charges)-2)
 		{
-			# never be at (almost) max charges 
+            # keep ISB rolling
+            if BuffRemaining(ironskin_brew_buff) < DebuffRemaining(any_stagger_debuff) and BuffExpires(blackout_combo_buff) Spell(ironskin_brew)
+			
+            # never be at (almost) max charges 
 			unless (SpellFullRecharge(ironskin_brew) > 3)
 			{
-				if (BuffRemaining(ironskin_brew_buff) < 2*BaseDuration(ironskin_brew_buff)) Spell(ironskin_brew text=max)
+				if (BuffRemaining(ironskin_brew_buff) < 2*BaseDuration(ironskin_brew_buff) and BuffExpires(blackout_combo_buff)) Spell(ironskin_brew text=max)
 				if (StaggerPercentage() > 30 or Talent(special_delivery_talent)) Spell(purifying_brew text=max)
-			}
-			
-			# keep brew-stache rolling
-			if (IncomingDamage(4 physical=1)>0 and HasArtifactTrait(brew_stache_trait) and BuffExpires(brew_stache_buff)) 
-			{
-				if (BuffRemaining(ironskin_brew_buff) < 2*BaseDuration(ironskin_brew_buff)) Spell(ironskin_brew text=stache)
-				if (StaggerPercentage() > 30) Spell(purifying_brew text=stache)
 			}
 		}
 	}
