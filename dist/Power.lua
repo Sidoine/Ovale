@@ -243,10 +243,10 @@ local OvalePowerClass = __class(OvalePowerBase, {
         self:RegisterEvent("UNIT_SPELL_HASTE", "UNIT_RANGEDDAMAGE")
         self:RegisterMessage("Ovale_StanceChanged", "EventHandler")
         self:RegisterMessage("Ovale_TalentsChanged", "EventHandler")
+        self:initializePower()
         for powerType in pairs(self.POWER_INFO) do
             RegisterRequirement(powerType, self.RequirePowerHandler)
         end
-        self:initializePower()
     end,
     initializePower = function(self)
         local possiblePowerTypes = {

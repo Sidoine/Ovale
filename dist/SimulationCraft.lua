@@ -2942,6 +2942,7 @@ do
         ["combo_points"] = "ComboPoints()",
         ["combo_points.deficit"] = "ComboPointsDeficit()",
         ["combo_points.max"] = "MaxComboPoints()",
+        ["consecration.remains"] = "BuffRemaining(consecration)",
         ["cp_max_spend"] = "MaxComboPoints()",
         ["crit_pct_current"] = "SpellCritChance()",
         ["current_insanity_drain"] = "CurrentInsanityDrain()",

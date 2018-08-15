@@ -282,6 +282,8 @@ Define(winters_reach_trait 273346)
     ]]
     code = code .. [[
 # Mage spells and functions.
+SpellRequire(arcane_intellect unusable 1=buff,arcane_intellect)
+
 
 Define(arcane_affinity 166871)
 	SpellInfo(arcane_affinity duration=15)
