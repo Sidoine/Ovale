@@ -54,7 +54,7 @@ AddFunction BrewMasterIronskinMin
 AddFunction BrewmasterDefaultShortCDActions
 {
 	# keep ISB up always when taking dmg
-	if BuffRemaining(ironskin_brew_buff) < BrewMasterIronskinMin() and BuffExpires(blackout_combo_buff) Spell(ironskin_brew text=min)
+	if BuffRemaining(ironskin_brew_buff) < BrewMasterIronskinMin() and BuffExpires(blackout_combo_buff) Spell(ironskin_brew)
 	
 	# keep stagger below 100% (or 30% when BOB is up)
 	if (StaggerPercentage() >= 100 or (StaggerPercentage() >= 30 and Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 0)) Spell(purifying_brew)
