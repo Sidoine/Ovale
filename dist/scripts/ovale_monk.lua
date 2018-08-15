@@ -49,7 +49,7 @@ AddFunction BrewmasterRangeCheck
 AddFunction BrewmasterDefaultShortCDActions
 {
 	# keep ISB up always when taking dmg
-    if BuffExpires(ironskin_brew_buff 2) and BuffExpires(blackout_combo_buff) Spell(ironskin_brew)
+    if (BaseDuration(light_stagger_debuff)-DebuffRemaining(any_stagger_debuff)<3 and BuffExpires(ironskin_brew_buff 3) and BuffExpires(blackout_combo_buff)) Spell(ironskin_brew text=min)
 	
 	# keep stagger below 100% (or 30% when BOB is up)
 	if (StaggerPercentage() >= 100 or (StaggerPercentage() >= 30 and Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 0)) Spell(purifying_brew)
@@ -68,13 +68,13 @@ AddFunction BrewmasterDefaultShortCDActions
 	# range check
 	BrewmasterRangeCheck()
 
-	unless StaggerPercentage() > 100 or BuffPresent(blackout_combo_buff) or BuffPresent(brew_stache_buff)
+	unless StaggerPercentage() > 100
 	{
 		# purify heavy stagger when we have enough ISB
 		if (StaggerPercentage() >= 60 and (BuffRemaining(ironskin_brew_buff) >= 2*BaseDuration(ironskin_brew_buff))) Spell(purifying_brew)
 
 		# always bank 1 charge (or bank 2 with light_brewing)
-		unless (SpellCharges(ironskin_brew count=0) <= SpellData(ironskin_brew charges)-2)
+		if (SpellCharges(ironskin_brew) > SpellMaxCharges(ironskin_brew)-2)
 		{
             # keep ISB rolling
             if BuffRemaining(ironskin_brew_buff) < DebuffRemaining(any_stagger_debuff) and BuffExpires(blackout_combo_buff) Spell(ironskin_brew)
