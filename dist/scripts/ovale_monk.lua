@@ -49,7 +49,7 @@ AddFunction BrewmasterRangeCheck
 AddFunction BrewmasterDefaultShortCDActions
 {
 	# keep ISB up always when taking dmg
-    if ((BaseDuration(light_stagger_debuff)-DebuffRemaining(any_stagger_debuff)<5 or target.TargetIsPlayer()) and BuffExpires(ironskin_brew_buff 3) and BuffExpires(blackout_combo_buff)) Spell(ironskin_brew text=min)
+    if ((BaseDuration(light_stagger_debuff)-DebuffRemaining(any_stagger_debuff)<5 or target.IsTargetingPlayer()) and BuffExpires(ironskin_brew_buff 3) and BuffExpires(blackout_combo_buff)) Spell(ironskin_brew text=min)
 	
 	# keep stagger below 100% (or 30% when BOB is up)
 	if (StaggerPercentage() >= 100 or (StaggerPercentage() >= 30 and Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 0)) Spell(purifying_brew)
