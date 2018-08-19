@@ -196,7 +196,7 @@ Define(demon_spikes_buff 203819)
 Define(disrupt 183752)
 	SpellInfo(disrupt cd=15 gcd=0 interrupt=1 offgcd=1)
 Define(eye_beam 198013)
-	SpellInfo(eye_beam fury=30 cd=30 channel=1.8)
+	SpellInfo(eye_beam fury=30 cd=30 channel=1.8 tag=main)
 	SpellInfo(eye_beam channel=2.8 talent=blind_fury_talent)
 Define(extended_by_demonic_buff -22547) # OvaleDemonHunterDemonic
 Define(feast_of_souls_buff 207693)
@@ -370,12 +370,14 @@ Define(unleashed_power_talent 16)
 Define(void_reaver_talent 20)
 
 # Tags
+SpellInfo(eye_beam tag=main)
 SpellInfo(dark_slash tag=main)
 SpellInfo(demon_spikes tag=shortcd)
 SpellInfo(fel_barrage tag=main)
 SpellInfo(fel_eruption tag=main)
 SpellInfo(fel_rush tag=main)
 SpellInfo(felblade tag=main)
+SpellInfo(immolation_aura_havoc tag=main)
 SpellInfo(sigil_of_flame tag=main)
 SpellInfo(vengeful_retreat tag=main)
 
