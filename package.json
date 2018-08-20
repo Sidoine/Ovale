@@ -48,7 +48,7 @@
     "@wowts/wow-mock": "^1.7.0"
   },
   "devDependencies": {
-    "@wowts/tstolua": "^1.4.1",
+    "@wowts/tstolua": "^1.4.2",
     "ava": "^0.25.0",
     "tslint": "^5.7.0",
     "typescript": "^3.0.1"
