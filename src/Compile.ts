@@ -538,7 +538,8 @@ class OvaleCompileClass extends OvaleCompileClassBase {
         this.UnregisterMessage("Ovale_TalentsChanged");
     }
     Ovale_ScriptChanged(event: string) {
-        this.CompileScript(Ovale.db.profile.source);
+        let specName = OvalePaperDoll.GetSpecialization()
+        this.CompileScript(Ovale.db.profile.source[specName]);
         this.EventHandler(event);
     }
     Ovale_StanceChanged(event: string) {

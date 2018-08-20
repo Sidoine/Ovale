@@ -121,7 +121,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
     OnUpdate = function(self, elapsed)
         __exports.OvaleFrameModule:SendMessage("Ovale_OnUpdate")
         self.timeSinceLastUpdate = self.timeSinceLastUpdate + elapsed
-        local refresh = OvaleDebug.trace or self.visible and (self.timeSinceLastUpdate > Ovale.db.profile.apparence.minFrameRefresh / 1000 and next(Ovale.refreshNeeded) or self.timeSinceLastUpdate > Ovale.db.profile.apparence.maxFrameRefresh / 1000)
+        local refresh = OvaleDebug.trace or (self.visible or OvaleSpellFlash:IsSpellFlashEnabled()) and (self.timeSinceLastUpdate > Ovale.db.profile.apparence.minFrameRefresh / 1000 and next(Ovale.refreshNeeded) or self.timeSinceLastUpdate > Ovale.db.profile.apparence.maxFrameRefresh / 1000)
         if refresh then
             Ovale:AddRefreshInterval(self.timeSinceLastUpdate * 1000)
             OvaleState:InitializeState()

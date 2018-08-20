@@ -17,7 +17,12 @@ local gsub = string.gsub
 local lower = string.lower
 local pairs = pairs
 local kpairs = pairs
-local OvaleScriptsBase = Ovale:NewModule("OvaleScripts", aceEvent)
+local __tools = LibStub:GetLibrary("ovale/tools")
+local isLuaArray = __tools.isLuaArray
+local GetNumSpecializations = GetNumSpecializations
+local __Debug = LibStub:GetLibrary("ovale/Debug")
+local OvaleDebug = __Debug.OvaleDebug
+local OvaleScriptsBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleScripts", aceEvent))
 local DEFAULT_NAME = "Ovale"
 local DEFAULT_DESCRIPTION = L["Script défaut"]
 local CUSTOM_NAME = "custom"
@@ -27,7 +32,7 @@ local DISABLED_DESCRIPTION = L["Disabled"]
 do
     local defaultDB = {
         code = "",
-        source = "Ovale",
+        source = {},
         showHiddenScripts = false
     }
     local actions = {
@@ -61,9 +66,11 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
         self:RegisterScript(Ovale.playerClass, nil, CUSTOM_NAME, CUSTOM_DESCRIPTION, Ovale.db.profile.code, "script")
         self:RegisterScript(nil, nil, DISABLED_NAME, DISABLED_DESCRIPTION, nil, "script")
         self:RegisterMessage("Ovale_StanceChanged")
+        self:RegisterMessage("Ovale_ScriptChanged", "InitScriptProfiles")
     end,
     OnDisable = function(self)
         self:UnregisterMessage("Ovale_StanceChanged")
+        self:UnregisterMessage("Ovale_ScriptChanged")
     end,
     Ovale_StanceChanged = function(self, event, newStance, oldStance)
     end,
@@ -93,61 +100,40 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
         self.script[name] = nil
     end,
     SetScript = function(self, name)
-        local oldSource = Ovale.db.profile.source
+        local specName = OvalePaperDoll:GetSpecialization()
+        local oldSource = Ovale.db.profile.source[specName]
         if oldSource ~= name then
-            Ovale.db.profile.source = name
+            Ovale.db.profile.source[specName] = name
             self:SendMessage("Ovale_ScriptChanged")
         end
     end,
     GetDefaultScriptName = function(self, className, specialization)
-        local name
-        if className == "DEATHKNIGHT" then
-            if specialization == "blood" then
-                name = "icyveins_deathknight_blood"
-            elseif specialization == "frost" then
-                name = "sc_pr_death_knight_frost"
-            elseif specialization == "unholy" then
-                name = "sc_pr_death_knight_unholy"
-            end
-        elseif className == "DEMONHUNTER" then
-            if specialization == "vengeance" then
-                name = "icyveins_demonhunter_vengeance"
-            elseif specialization == "havoc" then
-                name = "sc_pr_demon_hunter_havoc"
-            end
-        elseif className == "DRUID" then
-            if specialization == "restoration" then
-                name = DISABLED_NAME
-            elseif specialization == "guardian" then
-                name = "icyveins_druid_guardian"
-            elseif specialization == "feral" then
+        local name = nil
+        if className == "DRUID" then
+            if specialization == "feral" then
                 name = "shmoodude_druid_feral"
             end
         elseif className == "MONK" then
             if specialization == "mistweaver" then
-                name = DISABLED_NAME
-            elseif specialization == "brewmaster" then
-                name = "icyveins_monk_brewmaster"
+                name = "Disabled"
             end
         elseif className == "PALADIN" then
             if specialization == "holy" then
-                name = "icyveins_paladin_holy"
-            elseif specialization == "protection" then
-                name = "icyveins_paladin_protection"
+                name = "Disabled"
             end
         elseif className == "PRIEST" then
-            if specialization == "discipline" then
-                name = "icyveins_priest_discipline"
-            elseif specialization == "holy" then
-                name = DISABLED_NAME
+            if specialization == "holy" then
+                name = "Disabled"
+            elseif specialization == "discipline" then
+                name = "Disabled"
             end
         elseif className == "SHAMAN" then
             if specialization == "restoration" then
-                name = DISABLED_NAME
+                name = "Disabled"
             end
         elseif className == "WARRIOR" then
             if specialization == "protection" then
-                name = "icyveins_warrior_protection"
+                name = "Disabled"
             end
         end
         if  not name and specialization then
@@ -182,7 +168,8 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
                         return __exports.OvaleScripts:GetDescriptions(scriptType)
                     end,
                     get = function(info)
-                        return Ovale.db.profile.source
+                        local specName = OvalePaperDoll:GetSpecialization()
+                        return Ovale.db.profile.source[specName]
                     end,
                     set = function(info, v)
                         self:SetScript(v)
@@ -195,10 +182,12 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
                     name = L["Script"],
                     width = "full",
                     disabled = function()
-                        return Ovale.db.profile.source ~= CUSTOM_NAME
+                        local specName = OvalePaperDoll:GetSpecialization()
+                        return Ovale.db.profile.source[specName] ~= CUSTOM_NAME
                     end,
                     get = function(info)
-                        local code = __exports.OvaleScripts:GetScript(Ovale.db.profile.source)
+                        local specName = OvalePaperDoll:GetSpecialization()
+                        local code = __exports.OvaleScripts:GetScript(Ovale.db.profile.source[specName])
                         code = code or ""
                         return gsub(code, "	", "    ")
                     end,
@@ -213,15 +202,17 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
                     type = "execute",
                     name = L["Copier sur Script personnalisé"],
                     disabled = function()
-                        return Ovale.db.profile.source == CUSTOM_NAME
+                        local specName = OvalePaperDoll:GetSpecialization()
+                        return Ovale.db.profile.source[specName] == CUSTOM_NAME
                     end,
                     confirm = function()
                         return L["Ecraser le Script personnalisé préexistant?"]
                     end,
                     func = function()
-                        local code = __exports.OvaleScripts:GetScript(Ovale.db.profile.source)
+                        local specName = OvalePaperDoll:GetSpecialization()
+                        local code = __exports.OvaleScripts:GetScript(Ovale.db.profile.source[specName])
                         __exports.OvaleScripts:RegisterScript(Ovale.playerClass, nil, CUSTOM_NAME, CUSTOM_DESCRIPTION, code, "script")
-                        Ovale.db.profile.source = CUSTOM_NAME
+                        Ovale.db.profile.source[specName] = CUSTOM_NAME
                         Ovale.db.profile.code = __exports.OvaleScripts:GetScript(CUSTOM_NAME)
                         self:SendMessage("Ovale_ScriptChanged")
                     end
@@ -242,6 +233,16 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
         local appName = self:GetName()
         AceConfig:RegisterOptionsTable(appName, options)
         AceConfigDialog:AddToBlizOptions(appName, L["Script"], Ovale:GetName())
+    end,
+    InitScriptProfiles = function(self)
+        local countSpecializations = GetNumSpecializations(false, false)
+        if  not isLuaArray(Ovale.db.profile.source) then
+            Ovale.db.profile.source = {}
+        end
+        for i = 1, countSpecializations, 1 do
+            local specName = OvalePaperDoll:GetSpecialization(i)
+            Ovale.db.profile.source[specName] = Ovale.db.profile.source[specName] or self:GetDefaultScriptName(Ovale.playerClass, specName)
+        end
     end,
 })
 __exports.OvaleScripts = OvaleScriptsClass()

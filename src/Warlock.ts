@@ -107,7 +107,11 @@ class OvaleWarlockClass extends OvaleWarlockBase {
             Ovale.needRefresh();
         } else if (cleuEvent == 'SPELL_CAST_SUCCESS') {
             if (spellId == 196277) {
-                delete self_demons[destGUID];
+                for (const [k, d] of pairs(self_demons)) {
+                    if (d.id == 55659) {
+                        delete self_demons[k];
+                    }
+                }
                 Ovale.needRefresh();
             }
 

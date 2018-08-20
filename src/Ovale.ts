@@ -32,7 +32,7 @@ export function MakeString(s?: string, ...__args: any[]) {
 
 export interface OvaleDb {
     profile: {
-        source: string;
+        source: LuaObj<string>;
         code: string,
         check: LuaObj<boolean>,
         list: LuaObj<string>,

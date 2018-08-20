@@ -320,7 +320,7 @@ Define(vengeful_retreat_debuff 198813)
 	SpellInfo(vengeful_retreat_debuff duration=3)
 
 #items
-Define(oblivions_embrace 151799)
+Define(oblivions_embrace_item 151799)
 	SpellInfo(demon_spikes charges=3 if_equipped=oblivions_embrace)
 
 # Tier set

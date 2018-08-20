@@ -87,6 +87,7 @@ Define(battle_potion_of_agility 163223)
 Define(battle_potion_of_intellect 163222)
 Define(battle_potion_of_strength 163224)
 Define(battle_potion_of_stamina 163225)
+Define(steelskin_potion 152557)
 
 ###
 ### Trinkets & OnUse Rings

@@ -16,11 +16,13 @@ Define(arcane_barrage 231564)
 Define(arcane_blast 222321)
 # Deal s1 Arcane damage.
   SpellInfo(arcane_blast channel=0 gcd=0 offgcd=1)
-Define(arcane_charge_buff 195302)
-  SpellInfo(arcane_charge_buff max_stacks=4 gcd=0 offgcd=1)
 Define(arcane_explosion 1449)
 # Causes an explosion of magic around the caster, dealing s2 Arcane damage to all enemies within A2 yards.rnrn|cFFFFFFFFGenerates s1 Arcane Charge if any targets are hit.|r
   SpellInfo(arcane_explosion undefined=-1 undefined=-1)
+Define(arcane_familiar 205022)
+# Summon a Familiar that attacks your enemies and increases your maximum mana by 210126s1 for d.
+  SpellInfo(arcane_familiar cd=10 duration=3600 talent=arcane_familiar_talent)
+  SpellAddTargetDebuff(arcane_familiar arcane_familiar=1)
 Define(arcane_intellect 1459)
 # Infuses the target with brilliance, increasing their Intellect by s1 for d.  rnrnIf target is in your party or raid, all party and raid members will be affected.
   SpellInfo(arcane_intellect duration=3600)
@@ -42,6 +44,11 @@ Define(arcane_power 12042)
 Define(battle_potion_of_intellect 279164)
 # Chance to create multiple potions.
   SpellInfo(battle_potion_of_intellect gcd=0 offgcd=1)
+Define(berserking_buff 200953)
+# @spelldesc200845
+  SpellInfo(berserking_buff duration=3 max_stacks=12 gcd=0 offgcd=1)
+  # Attack speed and critical strike chance increased by s1.
+  SpellAddBuff(berserking_buff berserking_buff=1)
 Define(berserking 26297)
 # Increases your haste by s1 for d.
   SpellInfo(berserking cd=180 duration=10 gcd=0 offgcd=1)
@@ -219,6 +226,9 @@ Define(shimmer 212653)
   SpellInfo(shimmer cd=0.5 cd=20 duration=0.65 channel=0.65 talent=shimmer_talent gcd=0 offgcd=1)
   # Shimmering.
   SpellAddBuff(shimmer shimmer=1)
+Define(summon_water_elemental 31687)
+# Summons a Water Elemental to follow and fight for you.
+  SpellInfo(summon_water_elemental cd=30)
 Define(supernova 157980)
 # Pulses arcane energy around the target enemy or ally, dealing s2 Arcane damage to all enemies within A2 yards, and knocking them upward. A primary enemy target will take s1 increased damage.
   SpellInfo(supernova cd=25 talent=supernova_talent)
@@ -232,6 +242,8 @@ Define(winters_reach 273347)
   SpellInfo(winters_reach duration=15 channel=15 gcd=0 offgcd=1)
   # Damage of your next non-instant Flurry increased by w1 per hit.
   SpellAddBuff(winters_reach winters_reach=1)
+Define(amplification_talent 1)
+# When Clearcast, Arcane Missiles fires s2 additional lmissile:missiles;.
 Define(arcane_orb_talent 21)
 # Launches an Arcane Orb forward from your position, traveling up to 40 yards, dealing 153640s1 Arcane damage to enemies it passes through.rnrn|cFFFFFFFFGrants 1 Arcane Charge when cast and every time it deals damage.|r
 Define(charged_up_talent 11)
@@ -266,6 +278,8 @@ Define(ray_of_frost_talent 20)
 # Channel an icy beam at the enemy for d, dealing s2 Frost damage every t2 sec and slowing movement by s4. Each time Ray of Frost deals damage, its damage and snare increases by 208141s1.rnrnGenerates s3 charges of Fingers of Frost over its duration.
 Define(splitting_ice_talent 17)
 # Your Ice Lance and Icicles now deal s3 increased damage, and hit a second nearby target for s2 of their damage.rnrnYour Ebonbolt and Glacial Spike also hit a second nearby target for s2 of its damage.
+Define(arcane_familiar_talent 3)
+# Summon a Familiar that attacks your enemies and increases your maximum mana by 210126s1 for d.
 Define(blast_wave_talent 6)
 # Causes an explosion around yourself, dealing s1 Fire damage to all enemies within A1 yards, knocking them back, and reducing movement speed by s2 for d.
 Define(ice_floes_talent 6)
@@ -276,7 +290,7 @@ Define(shimmer_talent 5)
 # Teleports you A1 yards forward, unless something is in the way. Unaffected by the global cooldown and castable while casting.
 Define(supernova_talent 12)
 # Pulses arcane energy around the target enemy or ally, dealing s2 Arcane damage to all enemies within A2 yards, and knocking them upward. A primary enemy target will take s1 increased damage.
-Define(arcane_pressure_trait 274594)
+Define(arcane_pummeling_trait 270669)
 Define(preheat_trait 273331)
 Define(winters_reach_trait 273346)
     ]]
@@ -537,8 +551,8 @@ Define(winters_chill_debuff 157997) # TODO ???
 
 # Talents
 
-Define(amplification_talent 1)
-Define(arcane_familiar_talent 3)
+
+
 
 
 Define(blazing_soul_talent 4)

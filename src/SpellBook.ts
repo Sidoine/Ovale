@@ -77,12 +77,11 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
         [BOOKTYPE_SPELL]: {
         }
     }
-    isHarmful: LuaArray<boolean> = {    }
-    isHelpful: LuaArray<boolean> = {    }
-    texture: LuaArray<string> = {    }
-    talent: LuaArray<string> = {    }
-    talentPoints: LuaArray<number> = {    }
-
+    isHarmful: LuaArray<boolean> = {}
+    isHelpful: LuaArray<boolean> = {}
+    texture: LuaArray<string> = {}
+    talent: LuaArray<string> = {}
+    talentPoints: LuaArray<number> = {}
     
     OnInitialize(): void {
         this.RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "Update");
@@ -105,8 +104,7 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
             this.UpdateSpells();
         }
     }
-    Update(): void
-     {
+    Update(): void {
         this.UpdateTalents();
         this.UpdateSpells();
         this.ready = true;

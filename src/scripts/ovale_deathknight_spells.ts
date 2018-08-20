@@ -137,11 +137,6 @@ Define(killing_machine_buff 51124)
 Define(marrowrend 195182)
 # Smash the target, dealing s2 Physical damage and generating s3 charges of Bone Shield.rnrn|Tinterfaceiconsability_deathknight_boneshield.blp:24|t |cFFFFFFFFBone Shield|rrn@spelldesc195181
   SpellInfo(marrowrend runes=2 runicpower=-20)
-Define(master_of_ghouls 246995)
-# @spelldesc242064
-  SpellInfo(master_of_ghouls duration=3 max_stacks=1 gcd=0 offgcd=1)
-  # Damage dealt increased s1.
-  SpellAddBuff(master_of_ghouls master_of_ghouls=1)
 Define(mind_freeze 47528)
 # Smash the target's mind with cold, interrupting spellcasting and preventing any spell in that school from being cast for d.
   SpellInfo(mind_freeze cd=15 duration=3 gcd=0 offgcd=1 interrupt=1)
@@ -203,11 +198,6 @@ Define(unholy_frenzy 207289)
   SpellInfo(unholy_frenzy cd=75 duration=12 talent=unholy_frenzy_talent)
   # Haste increased by s1.rnAuto attacks infect the target with a Festering Wound.
   SpellAddBuff(unholy_frenzy unholy_frenzy=1)
-Define(unholy_strength 53365)
-# Affixes your rune weapon with a rune that has a chance to heal you for 53365s2 and increase total Strength by 53365s1 for 53365d.
-  SpellInfo(unholy_strength duration=15 max_stacks=1 gcd=0 offgcd=1)
-  # Strength increased by s1.
-  SpellAddBuff(unholy_strength unholy_strength=1)
 Define(war_stomp 20549)
 # Stuns up to i enemies within A1 yds for d.
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
@@ -265,7 +255,7 @@ Define(unholy_blight_talent 6)
 # Surrounds yourself with a vile swarm of insects for d, stinging all nearby enemies and infecting them with an unholy disease that deals 115994o1 damage over 115994d.
 Define(unholy_frenzy_talent 20)
 # Incites you into a killing frenzy for d, increasing Haste by s1 and causing your auto attacks to infect the target with a Festering Wound.
-Define(cold_heart_item 151796)
+Define(taktheritrixs_shoulderpads_item 137075)
     `;
 // END
 
@@ -421,7 +411,7 @@ Define(gorefiends_grasp 108199)
 
 	SpellInfo(heart_strike runes=1 runicpower=-10)
 	SpellInfo(heart_strike add_runicpower=-2 talent=heartbreaker_talent)
-Define(haemostasis_buff 273947)
+
 	SpellInfo(haemostasis_buff duration=14 max_stacks=5)
 
 	SpellInfo(horn_of_winter cd=45 runes=-2 runicpower=-20 tag=main)
@@ -537,24 +527,30 @@ Define(wraith_walk 212552)
 Define(wraith_walk_buff 212552)
 	SpellInfo(wraith_walk_buff duration=4)
 
+# Weapon Enchant
+Define(unholy_strength_buff 53365)
+	SpellInfo(unholy_strength_buff duration=15)
+
 ## Items
-Define(cold_heart 151796)
-Define(cold_heart_item_buff 235592)
-	SpellInfo(cold_heart_item_buff max_stacks=20)
+Define(cold_heart_item 151796)
+Define(cold_heart_buff 235592)
+	SpellInfo(cold_heart_buff max_stacks=20)
 Define(consorts_cold_core 144293)
 Define(koltiras_newfound_will 132366)
-Define(lanathels_lament 133974)
+Define(lanathels_lament_item 133974)
 Define(lanathels_lament_buff 212975)
 	SpellAddBuff(defile lanathels_lament_buff=1 if_equipped=lanathels_lament)
 	SpellAddBuff(death_and_decay lanathels_lament_buff=1 if_equipped=lanathels_lament)
-Define(perseverance_of_the_ebon_martyr 132459)
+Define(perseverance_of_the_ebon_martyr_item 132459)
 Define(perseverance_of_the_ebon_martyr_debuff 216059)
+
 
 ## Tier Items
 # T20
 SpellAddBuff(blood_boil gravewarden_buff=1 itemset=T20 itemcount=2)
 Define(gravewarden_buff 242010) 
 	SpellInfo(gravewarden_buff duration=10)
+Define(master_of_ghouls_buff 246995)
 
 # Talents
 Define(all_will_serve_talent 2)

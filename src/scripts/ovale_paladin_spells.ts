@@ -531,13 +531,13 @@ Define(zeal_debuff 269571)
 #Define(ashes_to_ashes 179546)
 
 #Legendaries
-Define(sacred_judgment 253806)
+Define(sacred_judgment_item 253806)
 Define(sacred_judgment_buff 253806)
 	SpellInfo(sacred_judgment_buff duration=15)
 	
 
 #Azerite Traits
-Define(divine_right 278519)
+Define(divine_right_trait 278519)
 Define(divine_right_buff 277678)
 	SpellInfo(divine_right_buff duration=15)
 

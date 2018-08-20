@@ -6,6 +6,7 @@
   "scripts": {
     "test": "ava",
     "prepare": "tstolua -p tsconfig.lua.json",
+    "prepare-tools": "tsc",
     "simc": "node dist/utils/importsimc.js ../../simc",
     "watch": "tstolua -p tsconfig.lua.json -w",
     "watch-tools": "tsc -w",

@@ -321,7 +321,7 @@ local OvalePowerClass = __class(OvalePowerBase, {
         }
         for powerType, powerId in pairs(Enum.PowerType) do
             local powerTypeLower = strlower(powerType)
-            local powerToken = possiblePowerTypes[Ovale.playerClass][powerTypeLower]
+            local powerToken = Ovale.playerClass ~= nil and possiblePowerTypes[Ovale.playerClass][powerTypeLower]
             if powerToken then
                 self.POWER_TYPE[powerId] = powerTypeLower
                 self.POWER_TYPE[powerToken] = powerTypeLower
