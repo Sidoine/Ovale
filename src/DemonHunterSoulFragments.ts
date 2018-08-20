@@ -13,7 +13,7 @@ export let OvaleDemonHunterSoulFragments: OvaleDemonHunterSoulFragmentsClass;
 let SOUL_FRAGMENTS_BUFF_ID = 228477;
 let SOUL_FRAGMENTS_SPELL_HEAL_ID = 203794;
 let SOUL_FRAGMENTS_SPELL_CAST_SUCCESS_ID = 204255;
-let SOUL_FRAGMENT_FINISHERS = {
+let SOUL_FRAGMENT_FINISHERS:LuaArray<boolean> = {
     [228477]: true,
     [247454]: true,
     [227225]: true
@@ -78,7 +78,7 @@ class OvaleDemonHunterSoulFragmentsClass extends OvaleDemonHunterSoulFragmentsBa
             }
         }
     }
-    SetCurrentSoulFragments(count?) {
+    SetCurrentSoulFragments(count?: number) {
         let now = GetTime();
         this.last_checked = now;
         this.soul_fragments = this.soul_fragments || {

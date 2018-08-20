@@ -101,18 +101,18 @@ class OvaleWarlockClass extends OvaleWarlockBase {
             }
             for (const [k, d] of pairs(self_demons)) {
                 if (d.finish < now) {
-                    self_demons[k] = undefined;
+                    delete self_demons[k];
                 }
             }
             Ovale.needRefresh();
         } else if (cleuEvent == 'SPELL_CAST_SUCCESS') {
             if (spellId == 196277) {
-                self_demons[destGUID] = undefined;
+                delete self_demons[destGUID];
                 Ovale.needRefresh();
             }
 
-            if(CUSTOM_AURAS[spellId]){
-                let aura = CUSTOM_AURAS[spellId];
+            const aura = CUSTOM_AURAS[spellId];
+            if (aura){
                 this.AddCustomAura(aura.customId, aura.stacks, aura.duration, aura.auraName);
             }
         }
@@ -158,8 +158,8 @@ class OvaleWarlockClass extends OvaleWarlockBase {
     AddCustomAura(customId: number, stacks: number, duration: number, buffName: string){
         let now = GetTime()
         let expire = now + duration;
-        let filter = OvaleOptions.defaultDB.profile.apparence.fullAuraScan && 'HELPFUL' || 'HELPFUL|PLAYER';
-        OvaleAura.GainedAuraOnGUID(Ovale.playerGUID, now, customId, Ovale.playerGUID, filter, undefined, undefined, stacks, undefined, duration, expire, undefined, buffName, undefined, undefined, undefined);
+        const filter = OvaleOptions.defaultDB.profile.apparence.fullAuraScan && 'HELPFUL' || 'HELPFUL|PLAYER';
+        OvaleAura.GainedAuraOnGUID(Ovale.playerGUID, now, customId, Ovale.playerGUID, filter, false, undefined, stacks, undefined, duration, expire, false, buffName, undefined, undefined, undefined);
     }
 
     /**

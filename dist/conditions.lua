@@ -10,6 +10,7 @@ local TestValue = __Condition.TestValue
 local Compare = __Condition.Compare
 local TestBoolean = __Condition.TestBoolean
 local ParseCondition = __Condition.ParseCondition
+local isComparator = __Condition.isComparator
 local __DamageTaken = LibStub:GetLibrary("ovale/DamageTaken")
 local OvaleDamageTaken = __DamageTaken.OvaleDamageTaken
 local __Data = LibStub:GetLibrary("ovale/Data")
@@ -848,7 +849,7 @@ local function Exists(positionalParams, namedParams, state, atTime)
     OvaleCondition:RegisterCondition("exists", false, Exists)
 end
 do
-local function False(positionalParams, namedParams, state, atTime)
+    local False = function(positionalParams, namedParams, state, atTime)
         return nil
     end
     OvaleCondition:RegisterCondition("false", false, False)
@@ -1100,7 +1101,7 @@ do
 local function InRange(positionalParams, namedParams, state, atTime)
         local spellId, yesno = positionalParams[1], positionalParams[2]
         local target = ParseCondition(positionalParams, namedParams, state)
-        local boolean = (OvaleSpells:IsSpellInRange(spellId, target) == 1)
+        local boolean = OvaleSpells:IsSpellInRange(spellId, target)
         return TestBoolean(boolean, yesno)
     end
     OvaleCondition:RegisterCondition("inrange", false, InRange)
@@ -1531,9 +1532,6 @@ local function MaxRage(positionalParams, namedParams, state, atTime)
 local function MaxRunicPower(positionalParams, namedParams, state, atTime)
         return MaxPower("runicpower", positionalParams, namedParams, state, atTime)
     end
-local function MaxShadowOrbs(positionalParams, namedParams, state, atTime)
-        return MaxPower("shadoworbs", positionalParams, namedParams, state, atTime)
-    end
 local function MaxSoulShards(positionalParams, namedParams, state, atTime)
         return MaxPower("soulshards", positionalParams, namedParams, state, atTime)
     end
@@ -1548,7 +1546,6 @@ local function MaxSoulShards(positionalParams, namedParams, state, atTime)
     OvaleCondition:RegisterCondition("maxpain", false, MaxPain)
     OvaleCondition:RegisterCondition("maxrage", false, MaxRage)
     OvaleCondition:RegisterCondition("maxrunicpower", false, MaxRunicPower)
-    OvaleCondition:RegisterCondition("maxshadoworbs", false, MaxShadowOrbs)
     OvaleCondition:RegisterCondition("maxsoulshards", false, MaxSoulShards)
 end
 do
@@ -1575,7 +1572,7 @@ local function RunicPowerCost(positionalParams, namedParams, state, atTime)
         return PowerCost("runicpower", positionalParams, namedParams, state, atTime)
     end
 local function AstralPowerCost(positionalParams, namedParams, state, atTime)
-        return PowerCost("astralpower", positionalParams, namedParams, state, atTime)
+        return PowerCost("lunarpower", positionalParams, namedParams, state, atTime)
     end
 local function MainPowerCost(positionalParams, namedParams, state, atTime)
         return PowerCost(OvalePower.current.powerType, positionalParams, namedParams, state, atTime)
@@ -1728,12 +1725,12 @@ end
 do
 local function Snapshot(statName, defaultValue, positionalParams, namedParams, state, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
-        local value = OvalePaperDoll[statName] or defaultValue
+        local value = OvalePaperDoll:GetState(atTime)[statName] or defaultValue
         return Compare(value, comparator, limit)
     end
 local function SnapshotCritChance(statName, defaultValue, positionalParams, namedParams, state, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
-        local value = OvalePaperDoll[statName] or defaultValue
+        local value = OvalePaperDoll:GetState(atTime)[statName] or defaultValue
         if namedParams.unlimited ~= 1 and value > 100 then
             value = 100
         end
@@ -1778,9 +1775,6 @@ local function SpellCastSpeedPercent(positionalParams, namedParams, state, atTim
 local function Spellpower(positionalParams, namedParams, state, atTime)
         return Snapshot("spellPower", 0, positionalParams, namedParams, state, atTime)
     end
-local function Spirit(positionalParams, namedParams, state, atTime)
-        return Snapshot("spirit", 0, positionalParams, namedParams, state, atTime)
-    end
 local function Stamina(positionalParams, namedParams, state, atTime)
         return Snapshot("stamina", 0, positionalParams, namedParams, state, atTime)
     end
@@ -1807,7 +1801,6 @@ local function VersatilityRating(positionalParams, namedParams, state, atTime)
     OvaleCondition:RegisterCondition("spellcritchance", false, SpellCritChance)
     OvaleCondition:RegisterCondition("spellcastspeedpercent", false, SpellCastSpeedPercent)
     OvaleCondition:RegisterCondition("spellpower", false, Spellpower)
-    OvaleCondition:RegisterCondition("spirit", false, Spirit)
     OvaleCondition:RegisterCondition("stamina", false, Stamina)
     OvaleCondition:RegisterCondition("strength", false, Strength)
     OvaleCondition:RegisterCondition("versatility", false, Versatility)
@@ -1872,7 +1865,7 @@ local function SpellCooldown(positionalParams, namedParams, state, atTime)
         local target = ParseCondition(positionalParams, namedParams, state, "target")
         local earliest = INFINITY
         for i, spellId in ipairs(positionalParams) do
-            if OvaleCondition.COMPARATOR[spellId] then
+            if isComparator(spellId) then
                 comparator, limit = spellId, positionalParams[i + 1]
                 break
             elseif  not usable or OvaleSpells:IsUsableSpell(spellId, atTime, OvaleGUID:UnitGUID(target)) then
@@ -2013,7 +2006,7 @@ end
 do
 local function Stealthed(positionalParams, namedParams, state, atTime)
         local yesno = positionalParams[1]
-        local boolean = OvaleAura:GetAura("player", "stealthed_buff") ~= nil or IsStealthed()
+        local boolean = OvaleAura:GetAura("player", "stealthed_buff", atTime, "HELPFUL") ~= nil or IsStealthed()
         return TestBoolean(boolean, yesno)
     end
     OvaleCondition:RegisterCondition("isstealthed", false, Stealthed)

@@ -81,7 +81,7 @@ local function isCompareFunction(a)
 end
 local function BinaryInsert(t, value, unique, compare)
     if isCompareFunction(unique) then
-        unique, compare = nil, unique
+        unique, compare = false, unique
     end
     compare = compare or compareDefault
     local low, high = 1, #t
@@ -275,10 +275,7 @@ local OvaleGUIDClass = __class(OvaleGUIDBase, {
         return ( not  not atTime), atTime
     end,
     UnitGUID = function(self, unitId)
-        if unitId then
-            return self.unitGUID[unitId] or UnitGUID(unitId)
-        end
-        return nil
+        return self.unitGUID[unitId] or UnitGUID(unitId)
     end,
     GUIDUnit = function(self, guid)
         if guid and self.guidUnit[guid] then

@@ -12,3 +12,8 @@ export function isNumber(s: any): s is number {
 export function isLuaArray<T>(a: any): a is LuaArray<T> {
     return type(a) === "table";
 }
+
+export type TypeCheck<T> = { [K in keyof T]: boolean};
+export function checkToken<T>(type: TypeCheck<T>, token: any): token is keyof T {
+    return type[<keyof T>token];
+}

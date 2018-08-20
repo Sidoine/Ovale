@@ -1,6 +1,7 @@
 import { OvalePool } from "./Pool";
 import { lualength, LuaObj, LuaArray, pairs } from "@wowts/lua";
 import { remove, insert } from "@wowts/table";
+import { Powers } from "./Power";
 
 export interface SpellCast extends PaperDollSnapshot {
     stop?: number;
@@ -21,7 +22,7 @@ export interface SpellCast extends PaperDollSnapshot {
     combopoints?: number;
 }
 
-export interface PaperDollSnapshot {
+export interface PaperDollSnapshot extends Powers {
     snapshotTime?: number;
 
     strength?: number;
@@ -67,20 +68,20 @@ export const self_pool = new OvalePool<SpellCast>("OvaleFuture_pool");
 
 
 class LastSpell {
-    lastSpellcast: SpellCast = undefined;
-    lastGCDSpellcast: SpellCast = {}
+    lastSpellcast: SpellCast | undefined = undefined;
+    lastGCDSpellcast: SpellCast = { spellId: 0 }
     queue: LuaArray<SpellCast> = {}
     modules: LuaObj<SpellCastModule> = {}
     
     LastInFlightSpell() {
-        let spellcast: SpellCast;
+        let spellcast: SpellCast | undefined = undefined;
         if (this.lastGCDSpellcast.success) {
             spellcast = this.lastGCDSpellcast;
         }
         for (let i = lualength(this.queue); i >= 1; i += -1) {
             let sc = this.queue[i];
             if (sc.success) {
-                if (!spellcast || spellcast.success < sc.success) {
+                if (spellcast === undefined || (spellcast.success! < sc.success)) {
                     spellcast = sc;
                 }
                 break;
@@ -112,20 +113,20 @@ class LastSpell {
     }
 
     LastSpellSent() {
-        let spellcast: SpellCast = undefined;
+        let spellcast: SpellCast | undefined = undefined;
         if (this.lastGCDSpellcast.success) {
             spellcast = this.lastGCDSpellcast;
         }
         for (let i = lualength(this.queue); i >= 1; i += -1) {
             let sc = this.queue[i];
             if (sc.success) {
-                if (!spellcast || (spellcast.success && spellcast.success < sc.success) || (!spellcast.success && spellcast.queued < sc.success)) {
+                if (!spellcast || (spellcast.success && spellcast.success < sc.success) || (!spellcast.success && spellcast.queued && spellcast.queued < sc.success)) {
                     spellcast = sc;
                 }
-            } else if (!sc.start && !sc.stop) {
+            } else if (!sc.start && !sc.stop && sc.queued) {
                 if (!spellcast || (spellcast.success && spellcast.success < sc.queued)) {
                     spellcast = sc;
-                } else if (spellcast.queued < sc.queued) {
+                } else if (spellcast.queued && spellcast.queued < sc.queued) {
                     spellcast = sc;
                 }
             }

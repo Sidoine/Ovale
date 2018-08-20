@@ -234,7 +234,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                 icons[1].Update(element, start, actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget, actionResourceExtend);
             }
             if (actionType == "spell") {
-                action.spellId = actionId;
+                action.spellId = <number>actionId;
             } else {
                 action.spellId = undefined;
             }
@@ -258,7 +258,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             if ((node.namedParams.size != "small" && !node.namedParams.nocd && profile.apparence.predictif)) {
                 if (start) {
                     OvaleBestAction.Log("****Second icon %s", start);
-                    OvaleFuture.ApplySpell(actionId, OvaleGUID.UnitGUID(actionTarget), start);
+                    OvaleFuture.ApplySpell(<number>actionId, OvaleGUID.UnitGUID(actionTarget), start);
                     let atTime = OvaleFuture.next.nextCast;
                     if (actionId != OvaleFuture.next.lastGCDSpellId) {
                         atTime = baseState.next.currentTime;
@@ -269,7 +269,8 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                     } else {
                         start = timeSpan.NextTime(atTime);
                     }
-                    icons[2].Update(nextElement, start, OvaleBestAction.GetActionInfo(nextElement, state, start));
+                    const [actionTexture2, actionInRange2, actionCooldownStart2, actionCooldownDuration2, actionUsable2, actionShortcut2, actionIsCurrent2, actionEnable2, actionType2, actionId2, actionTarget2, actionResourceExtend2]= OvaleBestAction.GetActionInfo(nextElement, state, start);
+                    icons[2].Update(nextElement, start, actionTexture2, actionInRange2, actionCooldownStart2, actionCooldownDuration2, actionUsable2, actionShortcut2, actionIsCurrent2, actionEnable2, actionType2, actionId2, actionTarget2, actionResourceExtend2);
                 } else {
                     icons[2].Update(element, undefined);
                 }

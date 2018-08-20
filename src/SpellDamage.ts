@@ -2,15 +2,16 @@ import { OvaleProfiler } from "./Profiler";
 import { Ovale } from "./Ovale";
 import aceEvent from "@wowts/ace_event-3.0";
 import { CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
+import { LuaArray, LuaObj } from "../../node_modules/@wowts/lua";
 
-let CLEU_DAMAGE_EVENT = {
+let CLEU_DAMAGE_EVENT: LuaObj<boolean> = {
     SPELL_DAMAGE: true,
     SPELL_PERIODIC_AURA: true
 }
 
 const OvaleSpellDamageBase = OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleSpellDamage", aceEvent));
 class OvaleSpellDamageClass extends OvaleSpellDamageBase {
-    value = {}
+    value: LuaArray<number> = {}
     OnInitialize() {
         this.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
     }
@@ -29,7 +30,7 @@ class OvaleSpellDamageClass extends OvaleSpellDamageBase {
             this.StopProfiling("OvaleSpellDamage_COMBAT_LOG_EVENT_UNFILTERED");
         }
     }
-    Get(spellId) {
+    Get(spellId: number) {
         return this.value[spellId];
     }
 }

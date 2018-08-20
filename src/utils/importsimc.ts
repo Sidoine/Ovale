@@ -1,7 +1,7 @@
 import { format } from "@wowts/string";
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "fs";
 import { Ovale } from "../Ovale";
-import { eventDispatcher } from "@wowts/wow-mock";
+import { eventDispatcher, ClassId } from "@wowts/wow-mock";
 import { OvaleEquipment } from "../Equipment";
 import { OvaleSpellBook } from "../SpellBook";
 import { OvaleStance } from "../Stance";
@@ -48,7 +48,6 @@ const limitLine2 = "// ANY CHANGES MADE BELOW THIS POINT WILL BE LOST";
 function truncateFile(fileName: string) {
     const file = readFileSync(fileName, { encoding: "utf8" });
     const lines = file.split("\n");
-    let passthrough = true;
     let output: string[] = []
     for (const line of lines) {
         if (line.indexOf(limitLine1) >= 0) {
@@ -116,7 +115,7 @@ for (const filename of files) {
             
             console.log(filename);
             Ovale.playerGUID = "player";
-            Ovale.playerClass = className;
+            Ovale.playerClass = <ClassId>className;
             eventDispatcher.DispatchEvent("ADDON_LOADED", "Ovale");
             OvaleEquipment.UpdateEquippedItems();
             OvaleSpellBook.Update();

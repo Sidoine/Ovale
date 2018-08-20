@@ -101,8 +101,8 @@ local OvaleWarlockClass = __class(OvaleWarlockBase, {
                 self_demons[destGUID] = nil
                 Ovale:needRefresh()
             end
-            if CUSTOM_AURAS[spellId] then
-                local aura = CUSTOM_AURAS[spellId]
+            local aura = CUSTOM_AURAS[spellId]
+            if aura then
                 self:AddCustomAura(aura.customId, aura.stacks, aura.duration, aura.auraName)
             end
         end
@@ -147,7 +147,7 @@ local OvaleWarlockClass = __class(OvaleWarlockBase, {
         local now = GetTime()
         local expire = now + duration
         local filter = OvaleOptions.defaultDB.profile.apparence.fullAuraScan and "HELPFUL" or "HELPFUL|PLAYER"
-        OvaleAura:GainedAuraOnGUID(Ovale.playerGUID, now, customId, Ovale.playerGUID, filter, nil, nil, stacks, nil, duration, expire, nil, buffName, nil, nil, nil)
+        OvaleAura:GainedAuraOnGUID(Ovale.playerGUID, now, customId, Ovale.playerGUID, filter, false, nil, stacks, nil, duration, expire, false, buffName, nil, nil, nil)
     end,
     TimeToShard = function(self, now)
         local filter = OvaleOptions.defaultDB.profile.apparence.fullAuraScan and "HARMFUL" or "HARMFUL|PLAYER"

@@ -215,18 +215,15 @@ local OvaleHealthClass = __class(OvaleHealthClassBase, {
         self.lastUpdated = {}
         self.RequireHealthPercentHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
             local verified = false
-            local threshold = tokens
-            if index then
-                threshold = tokens[index]
-                index = index + 1
-            end
+            local threshold = tokens[index]
+            index = index + 1
             if threshold then
                 local isBang = false
                 if sub(threshold, 1, 1) == "!" then
                     isBang = true
                     threshold = sub(threshold, 2)
                 end
-                threshold = tonumber(threshold) or 0
+                local thresholdValue = tonumber(threshold) or 0
                 local guid, unitId
                 if sub(requirement, 1, 7) == "target_" then
                     if targetGUID then
@@ -244,7 +241,7 @@ local OvaleHealthClass = __class(OvaleHealthClassBase, {
                 local health = __exports.OvaleHealth:UnitHealth(unitId, guid) or 0
                 local maxHealth = __exports.OvaleHealth:UnitHealthMax(unitId, guid) or 0
                 local healthPercent = (maxHealth > 0) and (health / maxHealth * 100) or 100
-                if  not isBang and healthPercent <= threshold or isBang and healthPercent > threshold then
+                if  not isBang and healthPercent <= thresholdValue or isBang and healthPercent > thresholdValue then
                     verified = true
                 end
                 local result = verified and "passed" or "FAILED"

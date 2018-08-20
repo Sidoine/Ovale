@@ -3,7 +3,7 @@ import { OvaleDebug } from "./Debug";
 import { OvaleProfiler } from "./Profiler";
 import { Ovale } from "./Ovale";
 import aceEvent from "@wowts/ace_event-3.0";
-import { ipairs, pairs, tonumber, tostring, wipe, lualength } from "@wowts/lua";
+import { ipairs, pairs, tonumber, tostring, wipe, lualength, LuaArray } from "@wowts/lua";
 import { match, gsub } from "@wowts/string";
 import { concat, insert, sort } from "@wowts/table";
 import { GetActiveSpecGroup, GetFlyoutInfo, GetFlyoutSlotInfo, GetSpellBookItemInfo, GetSpellInfo, GetSpellLink, GetSpellTabInfo, GetSpellTexture, GetTalentInfo, HasPetSpells, IsHarmfulSpell, IsHelpfulSpell, BOOKTYPE_PET, BOOKTYPE_SPELL, MAX_TALENT_TIERS, NUM_TALENT_COLUMNS } from "@wowts/wow-mock";
@@ -22,7 +22,7 @@ let MAX_NUM_TALENTS = NUM_TALENT_COLUMNS * MAX_TALENT_TIERS;
                     type: "input",
                     multiline: 25,
                     width: "full",
-                    get: function (info) {
+                    get: function (info: any) {
                         return OvaleSpellBook.DebugSpells();
                     }
                 }
@@ -37,7 +37,7 @@ let MAX_NUM_TALENTS = NUM_TALENT_COLUMNS * MAX_TALENT_TIERS;
                     type: "input",
                     multiline: 25,
                     width: "full",
-                    get: function (info) {
+                    get: function (info: any) {
                         return OvaleSpellBook.DebugTalents();
                     }
                 }
@@ -48,13 +48,12 @@ let MAX_NUM_TALENTS = NUM_TALENT_COLUMNS * MAX_TALENT_TIERS;
         OvaleDebug.options.args[k] = v;
     }
 }
-const ParseHyperlink = function(hyperlink) {
+const ParseHyperlink = function(hyperlink: string) {
     let [color, linkType, linkData, text] = match(hyperlink, "|?c?f?f?(%x*)|?H?([^:]*):?(%d*):?%d?|?h?%[?([^%[%]]*)%]?|?h?|?r?");
     return [color, linkType, linkData, text];
 }
-const OutputTableValues = function(output, tbl) {
-    let array = {
-    }
+const OutputTableValues = function(output: LuaArray<string>, tbl: any) {
+    let array: LuaArray<string> = {}
     for (const [k, v] of pairs(tbl)) {
         insert(array, `${tostring(v)}: ${tostring(k)}`);
     }
@@ -64,23 +63,25 @@ const OutputTableValues = function(output, tbl) {
     }
 }
 
-let output = {}
+let output: LuaArray<string> = {}
+
+type BookType = "pet" | "spell";
 
 const OvaleSpellBookBase = OvaleProfiler.RegisterProfiling(OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleSpellBook", aceEvent)))
 class OvaleSpellBookClass extends OvaleSpellBookBase {
     ready = false;
-    spell = {    }
-    spellbookId = {
+    spell: LuaArray<string> = {    }
+    spellbookId: {[key in BookType]: LuaArray<number>} = {
         [BOOKTYPE_PET]: {
         },
         [BOOKTYPE_SPELL]: {
         }
     }
-    isHarmful = {    }
-    isHelpful = {    }
-    texture = {    }
-    talent = {    }
-    talentPoints = {    }
+    isHarmful: LuaArray<boolean> = {    }
+    isHelpful: LuaArray<boolean> = {    }
+    texture: LuaArray<string> = {    }
+    talent: LuaArray<string> = {    }
+    talentPoints: LuaArray<number> = {    }
 
     
     OnInitialize(): void {
@@ -156,7 +157,7 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
         Ovale.needRefresh();
         this.SendMessage("Ovale_SpellsChanged");
     }
-    ScanSpellBook(bookType: string, numSpells: number, offset?: number) {
+    ScanSpellBook(bookType: BookType, numSpells: number, offset?: number) {
         offset = offset || 0;
         this.Debug("Updating '%s' spellbook starting at offset %d.", bookType, offset);
         for (let index = offset + 1; index <= offset + numSpells; index += 1) {
@@ -166,7 +167,7 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
                 if (spellLink) {
                     let [, , linkData, spellName] = ParseHyperlink(spellLink);
                     let id = tonumber(linkData);
-                    let name = GetSpellInfo(id);
+                    let [name] = GetSpellInfo(id);
                     this.spell[id] = name;
                     this.isHarmful[id] = IsHarmfulSpell(index, bookType);
                     this.isHelpful[id] = IsHelpfulSpell(index, bookType);
@@ -174,7 +175,12 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
                     this.spellbookId[bookType][id] = index;
                     this.Debug("    %s (%d) is at offset %d (%s).", name, id, index, gsub(spellLink, "|", "_"));
                     if (spellId && id != spellId) {
-                        let name = (skillType == "PETACTION") && spellName || GetSpellInfo(spellId);
+                        let name;
+                        if (skillType == "PETACTION" && spellName) {
+                            name = spellName;
+                        } else {
+                            [name] = GetSpellInfo(spellId);
+                        }
                         this.spell[spellId] = name;
                         this.isHarmful[spellId] = this.isHarmful[id];
                         this.isHelpful[spellId] = this.isHelpful[id];
@@ -190,7 +196,7 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
                     for (let flyoutIndex = 1; flyoutIndex <= numSlots; flyoutIndex += 1) {
                         let [id, overrideId, isKnown, spellName] = GetFlyoutSlotInfo(flyoutId, flyoutIndex);
                         if (isKnown) {
-                            let name = GetSpellInfo(id);
+                            let [name] = GetSpellInfo(id);
                             this.spell[id] = name;
                             this.isHarmful[id] = IsHarmfulSpell(spellName);
                             this.isHelpful[id] = IsHelpfulSpell(spellName);
@@ -198,7 +204,7 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
                             this.spellbookId[bookType][id] = undefined;
                             this.Debug("    %s (%d) is at offset %d.", name, id, index);
                             if (id != overrideId) {
-                                let name = GetSpellInfo(overrideId);
+                                let [name] = GetSpellInfo(overrideId);
                                 this.spell[overrideId] = name;
                                 this.isHarmful[overrideId] = this.isHarmful[id];
                                 this.isHelpful[overrideId] = this.isHelpful[id];
@@ -242,7 +248,7 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
         if (spellId) {
             let spellName = this.spell[spellId];
             if (!spellName) {
-                spellName = this.GetSpellInfo(spellId);
+                [spellName] = this.GetSpellInfo(spellId);
             }
             return spellName;
         }
@@ -257,7 +263,7 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
         }
         return points;
     }
-    AddSpell(spellId: number, name) {
+    AddSpell(spellId: number, name: string) {
         if (spellId && name) {
             this.spell[spellId] = name;
         }
@@ -274,8 +280,8 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
     IsKnownTalent(talentId: number): boolean {
         return (talentId && this.talentPoints[talentId]) && true || false;
     }
-    GetSpellBookIndex(spellId: number): [number, string] {
-        let bookType = BOOKTYPE_SPELL;
+    GetSpellBookIndex(spellId: number): [number, BookType] {
+        let bookType: BookType = BOOKTYPE_SPELL;
         while (true) {
             let index = this.spellbookId[bookType][spellId];
             if (index) {

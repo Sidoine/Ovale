@@ -112,7 +112,12 @@ local OvaleEnemiesClass = __class(OvaleEnemiesBase, {
                 end
             elseif IsFriendly(sourceFlags, true) and  not IsFriendly(destFlags) and IsTagEvent(cleuEvent) then
                 local now = GetTime()
-                local isPlayerTag = (sourceGUID == Ovale.playerGUID) or OvaleGUID:IsPlayerPet(sourceGUID)
+                local isPlayerTag
+                if sourceGUID == Ovale.playerGUID then
+                    isPlayerTag = true
+                else
+                    isPlayerTag = OvaleGUID:IsPlayerPet(sourceGUID)
+                end
                 self:AddEnemy(cleuEvent, destGUID, destName, now, isPlayerTag)
             end
         end

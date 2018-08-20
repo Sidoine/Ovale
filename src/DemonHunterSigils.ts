@@ -12,9 +12,15 @@ let OvaleSigilBase = OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleSigil
 export let OvaleSigil: OvaleSigilClass;
 let UPDATE_DELAY = 0.5;
 let SIGIL_ACTIVATION_TIME = 2;
-let activated_sigils: LuaObj<LuaArray<number>> = {
+type SigilType = "flame" | "silence" | "misery" | "chains";
+let activated_sigils: LuaObj<LuaArray<number>> = {}
+
+interface Sigil {
+    type: SigilType;
+    talent?: number;
 }
-let sigil_start = {
+
+let sigil_start: LuaArray<Sigil> = {
     [204513]: {
         type: "flame"
     },
@@ -35,7 +41,7 @@ let sigil_start = {
         type: "chains"
     }
 }
-let sigil_end = {
+let sigil_end: LuaArray<Sigil> = {
     [204598]: {
         type: "flame"
     },
@@ -90,7 +96,7 @@ class OvaleSigilClass extends OvaleSigilBase {
         }
     }
     
-    UNIT_SPELLCAST_SUCCEEDED(event, unitId, guid, spellId, ...__args) {
+    UNIT_SPELLCAST_SUCCEEDED(event: string, unitId: string, guid: string, spellId: number, ...__args: any[]) {
         if ((!OvalePaperDoll.IsSpecialization("vengeance"))) {
             return;
         }
@@ -108,7 +114,7 @@ class OvaleSigilClass extends OvaleSigilBase {
         }
     }
 
-    IsSigilCharging(type, atTime: number) {
+    IsSigilCharging(type: SigilType, atTime: number) {
         if ((lualength(activated_sigils[type]) == 0)) {
             return false;
         }

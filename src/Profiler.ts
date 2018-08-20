@@ -6,7 +6,7 @@ import { OvaleOptions } from "./Options";
 import { Constructor, Ovale } from "./Ovale";
 import { debugprofilestop, GetTime } from "@wowts/wow-mock";
 import { format } from "@wowts/string";
-import { pairs, next, wipe, LuaObj, lualength } from "@wowts/lua";
+import { pairs, next, wipe, LuaObj, lualength, LuaArray } from "@wowts/lua";
 import { insert, sort, concat } from "@wowts/table";
 import { AceModule } from "@wowts/tsaddon";
 
@@ -14,8 +14,8 @@ let OvaleProfilerBase = Ovale.NewModule("OvaleProfiler");
 
 let self_timestamp = debugprofilestop();
 let self_timeSpent: LuaObj<number> = {}
-let self_timesInvoked = {}
-let self_stack = {}
+let self_timesInvoked: LuaObj<number> = {}
+let self_stack: LuaArray<string> = {}
 let self_stackSize = 0;
 
 class OvaleProfilerClass extends OvaleProfilerBase {
@@ -49,12 +49,12 @@ class OvaleProfilerClass extends OvaleProfilerBase {
                         order: 10,
                         args: {
                         },
-                        get: (info) => {
+                        get: (info: any) => {
                             let name = info[lualength(info)];
                             const value = Ovale.db.global.profiler[name];
                             return (value != undefined);
                         },
-                        set: (info, value) => {
+                        set: (info: any, value: string) => {
                             value = value || undefined;
                             let name = info[lualength(info)];
                             Ovale.db.global.profiler[name] = value;
@@ -124,7 +124,7 @@ class OvaleProfilerClass extends OvaleProfilerBase {
             constructor(...__args:any[]) {
                 super(...__args);
                 name = name || this.GetName();
-                profiler.options.args.profiling.args.modules.args[name] = {
+                (profiler.options.args.profiling.args.modules.args as any)[name] = {
                     name: name,
                     desc: format(L["Enable profiling for the %s module."], name),
                     type: "toggle"
@@ -134,7 +134,7 @@ class OvaleProfilerClass extends OvaleProfilerBase {
 
             enabled = false;
             
-            StartProfiling(tag) {
+            StartProfiling(tag: string) {
                 if (!this.enabled) return;
                 let newTimestamp = debugprofilestop();
                 if (self_stackSize > 0) {
@@ -154,7 +154,7 @@ class OvaleProfilerClass extends OvaleProfilerBase {
                 }
             }
         
-            StopProfiling(tag) {
+            StopProfiling(tag: string) {
                 if (!this.enabled) return;
                 if (self_stackSize > 0) {
                     let currentTag = self_stack[self_stackSize];

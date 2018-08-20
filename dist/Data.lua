@@ -294,10 +294,22 @@ local OvaleDataClass = __class(OvaleDataBase, {
         if  not si then
             si = {
                 aura = {
-                    player = {},
-                    target = {},
-                    pet = {},
-                    damage = {}
+                    player = {
+                        HELPFUL = {},
+                        HARMFUL = {}
+                    },
+                    target = {
+                        HELPFUL = {},
+                        HARMFUL = {}
+                    },
+                    pet = {
+                        HELPFUL = {},
+                        HARMFUL = {}
+                    },
+                    damage = {
+                        HELPFUL = {},
+                        HARMFUL = {}
+                    }
                 },
                 require = {}
             }
@@ -356,7 +368,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
     CheckSpellAuraData = function(self, auraId, spellData, atTime, guid)
         guid = guid or OvaleGUID:UnitGUID("player")
         local index, value, data
-        local spellDataArray
+        local spellDataArray = nil
         if isLuaArray(spellData) then
             spellDataArray = spellData
             value = spellData[1]

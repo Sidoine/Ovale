@@ -6,6 +6,9 @@ import { type, pairs, tonumber, wipe, truthy, LuaArray, LuaObj } from "@wowts/lu
 import { find } from "@wowts/string";
 import { baseState } from "./BaseState";
 import { isLuaArray, isString } from "./tools";
+import { HasteType } from "./PaperDoll";
+import { Powers } from "./Power";
+
 
 let OvaleDataBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleData"));
 
@@ -80,15 +83,33 @@ let STAT_USE_NAMES: LuaArray<string> = {
 
 type SpellData = number | string | LuaArray<number | string>;
 type Requirements = LuaObj<LuaArray<string>>;
-type Auras = LuaObj<LuaObj<LuaArray<SpellData>>>;
+
+export interface AuraByType {
+    HARMFUL: LuaArray<SpellData>;
+    HELPFUL: LuaArray<SpellData>;
+    ["HARMFUL|PLAYER"]?: LuaArray<SpellData>;
+    ["HELPFUL|PLAYER"]?: LuaArray<SpellData>;
+}
+
+export type AuraType = keyof AuraByType;
+
+interface Auras
+{
+    damage: AuraByType;
+    pet: AuraByType;
+    target: AuraByType;
+    player: AuraByType;
+}
+
+//type Auras = LuaObj<LuaObj<LuaArray<SpellData>>>;
 
 /** Any <number> in SpellInfo or SpellRequire can include:
  *      `add_${property}`
  *      `${property}_percent`
  */
-export interface SpellInfo {
-    [key:string]: LuaObj<Requirements> | number | string | LuaArray<string> | LuaArray<number> | Auras;
-    require: LuaObj<Requirements>;
+export interface SpellInfo extends Powers {
+    //[key:string]: LuaObj<Requirements> | number | string | LuaArray<string> | LuaArray<number> | Auras;
+    require?: {[key in keyof SpellInfo]: Requirements };
     // Aura
     aura?: Auras;
     duration?:number;   
@@ -107,9 +128,9 @@ export interface SpellInfo {
     buff_cd?:number; // Internal cooldown, rename?
     buff_cdr?:number; // Cooldown reduction TODO
     // Haste
-    haste?:string;
+    haste?:HasteType;
     cd_haste?:string;
-    gcd_haste?:number;
+    gcd_haste?:HasteType;
     // Damage Calculations
     bonusmainhand?:number;
     bonusoffhand?:number;
@@ -142,8 +163,17 @@ export interface SpellInfo {
      * ${powerType}: number; // Cost of a spell.  ${powerType} = energy, focus, rage, etc.
      */
     runes?:number;
+    interrupt?: number;
+    add_duration?:number;
+    add_cd?:number;
+    // nocd?:number;
+    // flash?:boolean;
+    // target?:string;
+    // soundtime?:number;
+    // enemies?:number;
+    offgcd?: number;
+    casttime?: number;
 }
-
 
 const tempTokens: LuaArray<string> = {};
 
@@ -155,7 +185,7 @@ class OvaleDataClass extends OvaleDataBase {
     PANDAREN_CLASSES = PANDAREN_CLASSES;
     TAUREN_CLASSES = TAUREN_CLASSES;
     itemInfo: LuaArray<SpellInfo> = {}
-    itemList = {}
+    itemList: LuaObj<LuaArray<number>> = {}
     spellInfo: LuaObj<SpellInfo> = {}
     buffSpellList: LuaObj<LuaArray<boolean>> = {
         fear_debuff: {
@@ -357,12 +387,20 @@ class OvaleDataClass extends OvaleDataBase {
             si = {
                 aura: {
                     player: {
+                        HELPFUL: {},
+                        HARMFUL: {}
                     },
                     target: {
+                        HELPFUL: {},
+                        HARMFUL: {}
                     },
                     pet: {
+                        HELPFUL: {},
+                        HARMFUL: {}
                     },
                     damage: {
+                        HELPFUL: {},
+                        HARMFUL: {}
                     }
                 },
                 require: {
@@ -422,10 +460,10 @@ class OvaleDataClass extends OvaleDataBase {
         return [tag, invokesGCD];
     }
     
-    CheckSpellAuraData(auraId: number | string, spellData: SpellData, atTime: number, guid: string) {
+    CheckSpellAuraData(auraId: number | string, spellData: SpellData, atTime: number, guid: string): [boolean, string | number, number | undefined] {
         guid = guid || OvaleGUID.UnitGUID("player");
-        let index, value, data;
-        let spellDataArray: LuaArray<string | number>;
+        let index, value: string | number, data;
+        let spellDataArray: LuaArray<string | number> | undefined = undefined;
         if (isLuaArray(spellData)) {
             spellDataArray = spellData;
             value = spellData[1];
@@ -436,7 +474,7 @@ class OvaleDataClass extends OvaleDataBase {
         if (value == "count") {
             let N;
             if (index) {
-                N = spellDataArray[index];
+                N = spellDataArray![index];
                 index = index + 1;
             }
             if (N) {
@@ -447,7 +485,7 @@ class OvaleDataClass extends OvaleDataBase {
         } else if (value == "extend") {
             let seconds;
             if (index) {
-                seconds = spellDataArray[index];
+                seconds = spellDataArray![index];
                 index = index + 1;
             }
             if (seconds) {
@@ -461,7 +499,7 @@ class OvaleDataClass extends OvaleDataBase {
         }
         let verified = true;
         if (index) {
-            [verified] = CheckRequirements(<number>auraId, atTime, spellDataArray, index, guid);
+            [verified] = CheckRequirements(<number>auraId, atTime, spellDataArray!, index, guid);
         }
         return [verified, value, data];
     }
@@ -538,11 +576,11 @@ class OvaleDataClass extends OvaleDataBase {
      * @param splitRatio Split the value and ratio into separate return values instead of multiplying them together
      * @returns value or [value, ratio]
      */
-    GetSpellInfoPropertyNumber<T extends keyof SpellInfo>(spellId: number, atTime: number|undefined, property:T, targetGUID: string|undefined, splitRatio?: boolean): number[] {
+    GetSpellInfoPropertyNumber(spellId: number, atTime: number|undefined, property:keyof SpellInfo, targetGUID: string|undefined, splitRatio?: boolean): number[] {
         targetGUID = targetGUID || OvaleGUID.UnitGUID(baseState.next.defaultTarget || "target");
         let si = this.spellInfo[spellId];
         
-        let ratioParam = `${property}_percent`
+        let ratioParam = `${property}_percent` as keyof SpellInfo;
         let ratio = si && <number>si[ratioParam];
         if (ratio) {
             ratio = ratio / 100;
@@ -566,7 +604,7 @@ class OvaleDataClass extends OvaleDataBase {
         }
         let value = si && <number>si[property] || 0;
         if (ratio != 0) {
-            let addParam = `add_${property}`;
+            let addParam = `add_${property}` as keyof SpellInfo;
             let addProperty = si && <number>si[addParam];
             if (addProperty) {
                 value = value + addProperty;

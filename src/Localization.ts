@@ -1,18 +1,15 @@
-import { setmetatable, rawset, tostring } from "@wowts/lua";
+import { setmetatable, rawset, tostring, LuaObj } from "@wowts/lua";
 import { GetLocale } from "@wowts/wow-mock";
 
-export let L = undefined;
-{
-    let MT = {
-        __index: function (self, key) {
-            let value = tostring(key);
-            rawset(this, key, value);
-            return value;
-        }
+let MT = {
+    __index: function (self: any, key: any) {
+        let value = tostring(key);
+        rawset(this, key, value);
+        return value;
     }
-    L = setmetatable({
-    }, MT);
 }
+export const L = setmetatable({} as LuaObj<string>, MT);
+
 let locale = GetLocale();
 if (locale == "deDE") {
     L["Affichage numérique"] = "Numerische Anzeige";

@@ -16,6 +16,7 @@ local format = string.format
 local gsub = string.gsub
 local lower = string.lower
 local pairs = pairs
+local kpairs = pairs
 local OvaleScriptsBase = Ovale:NewModule("OvaleScripts", aceEvent)
 local DEFAULT_NAME = "Ovale"
 local DEFAULT_DESCRIPTION = L["Script défaut"]
@@ -41,7 +42,7 @@ do
 
         }
     }
-    for k, v in pairs(defaultDB) do
+    for k, v in kpairs(defaultDB) do
         OvaleOptions.defaultDB.profile[k] = v
     end
     for k, v in pairs(actions) do

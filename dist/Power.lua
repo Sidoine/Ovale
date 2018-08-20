@@ -230,6 +230,25 @@ local PowerModule = __class(nil, {
     end
 })
 local OvalePowerBase = OvaleState:RegisterHasState(OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvalePower", aceEvent))), PowerModule)
+local POWERS = {
+    mana = true,
+    rage = true,
+    focus = true,
+    energy = true,
+    combopoints = true,
+    runicpower = true,
+    soulshards = true,
+    lunarpower = true,
+    holypower = true,
+    alternate = true,
+    maelstrom = true,
+    chi = true,
+    insanity = true,
+    arcanecharges = true,
+    pain = true,
+    fury = true
+}
+__exports.POWER_TYPES = {}
 local OvalePowerClass = __class(OvalePowerBase, {
     OnInitialize = function(self)
         self:RegisterEvent("PLAYER_ENTERING_WORLD", "EventHandler")
@@ -310,8 +329,10 @@ local OvalePowerClass = __class(OvalePowerBase, {
                     id = powerId,
                     token = powerToken,
                     mini = 0,
+                    type = powerTypeLower,
                     maxCost = (powerTypeLower == "combopoints" and MAX_COMBO_POINTS) or 0
                 }
+                insert(__exports.POWER_TYPES, powerTypeLower)
             end
         end
     end,
@@ -452,7 +473,7 @@ local OvalePowerClass = __class(OvalePowerBase, {
             local typeId = spellPowerCost.type
             for pt, p in pairs(self.POWER_INFO) do
                 if p.id == typeId and (powerType == nil or pt == powerType) then
-                    return cost, pt
+                    return cost, p.type
                 end
             end
         end
@@ -518,7 +539,7 @@ local OvalePowerClass = __class(OvalePowerBase, {
         end
         if si then
             for powerType, powerInfo in pairs(__exports.OvalePower.POWER_INFO) do
-                local cost, refund = self.next:PowerCost(spellId, powerType, atTime, targetGUID)
+                local cost, refund = self.next:PowerCost(spellId, powerInfo.type, atTime, targetGUID)
                 local power = self.next.power[powerType] or 0
                 if cost then
                     power = power - cost

@@ -12,9 +12,10 @@ import { OvaleLexer, TokenizerDefinition, Tokenizer } from "./Lexer";
 import { OvalePower } from "./Power";
 import { ResetControls } from "./Controls";
 import { format, gmatch, gsub, find, len, lower, match, sub, upper } from "@wowts/string";
-import { ipairs, next, pairs, rawset, tonumber, tostring, type, wipe, LuaObj, LuaArray, setmetatable, lualength, truthy } from "@wowts/lua";
+import { ipairs, next, pairs, rawset, tonumber, tostring, type, wipe, LuaObj, LuaArray, setmetatable, lualength, truthy, kpairs } from "@wowts/lua";
 import { concat, insert, remove, sort } from "@wowts/table";
 import { RAID_CLASS_COLORS } from "@wowts/wow-mock";
+import { isLuaArray } from "./tools";
 
 let OvaleSimulationCraftBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleSimulationCraft"));
 export let OvaleSimulationCraft: OvaleSimulationCraftClass;
@@ -88,6 +89,12 @@ export interface Annotation {
     blade_flurry?: string;
     time_warp?:string;
     vanish?: string;
+    volley?: string;
+    harpoon?: string;
+    chi_burst?: string;
+    touch_of_karma?: string;
+    fel_rush?: string;
+    vengeful_retreat?:string;
 }
 
 interface ChildParseNode extends LuaArray<ParseNode> {
@@ -132,22 +139,27 @@ interface ParseNode {
     precedence: number;
 }
 
-interface Profile {
-    templates?: any;
+interface ProfileStrings {
     spec?: string;
     level?: string;
     default_pet?: string;
     role?: ClassRole;
-    position?: "ranged_back";
-    actionList?:LuaArray<ParseNode>;
-    annotation?: Annotation;
     talents?: string;
     glyphs?: string;
+}
+
+interface ProfileLists {
     ["actions.precombat"]?:string;
 }
 
-let KEYWORD: LuaObj<boolean> = {
+interface Profile extends ProfileStrings, ProfileLists {
+    templates?: LuaArray<keyof Profile>;
+    position?: "ranged_back";
+    actionList?:LuaArray<ParseNode>;
+    annotation?: Annotation;
 }
+
+let KEYWORD: LuaObj<boolean> = {}
 let MODIFIER_KEYWORD: LuaObj<boolean> = {
     ["ammo_type"]: true,
     ["animation_cancel"]: true,
@@ -369,51 +381,58 @@ let OPERAND_TOKEN_PATTERN = "[^.]+";
 //     ["tolvir"]: "agility",
 //     ["virmens_bite"]: "agility"
 // }
-let OPTIONAL_SKILLS: LuaObj<{class: string, default?: boolean, specialization?: string}> = {
-    ["volley"]: {
+
+interface OptionalSkill {
+    class: string;
+    default?: boolean;
+    specialization?: string;
+}
+
+let OPTIONAL_SKILLS = {
+    ["volley"]: <OptionalSkill> {
         class: "HUNTER",
         default: true
     },
-    ["harpoon"]: {
+    ["harpoon"]: <OptionalSkill>{
         class: "HUNTER",
         specialization: "survival",
         default: true
     },
-    ["time_warp"]: {
+    ["time_warp"]: <OptionalSkill>{
         class: "MAGE"
     },
-    ["storm_earth_and_fire"]: {
+    ["storm_earth_and_fire"]: <OptionalSkill>{
         class: "MONK"
     },
-    ["chi_burst"]: {
+    ["chi_burst"]: <OptionalSkill>{
         class: "MONK",
         default: true
     },
-    ["touch_of_karma"]: {
+    ["touch_of_karma"]: <OptionalSkill>{
         class: "MONK",
         default: false
     },
-    ["vanish"]: {
+    ["vanish"]: <OptionalSkill>{
         class: "ROGUE",
         specialization: "assassination",
         default: true
     },
-    ["blade_flurry"]: {
+    ["blade_flurry"]: <OptionalSkill>{
         class: "ROGUE",
         specialization: "outlaw",
         default: true
     },
-    ["bloodlust"]: {
+    ["bloodlust"]: <OptionalSkill>{
         class: "SHAMAN"
     },
-    ["righteous_fury"]: {
+    ["righteous_fury"]: <OptionalSkill>{
         class: "PALADIN"
     },
-    ["fel_rush"]: {
+    ["fel_rush"]: <OptionalSkill>{
         class: "DEMONHUNTER",
         default: true
     },
-    ["vengeful_retreat"]: {
+    ["vengeful_retreat"]: <OptionalSkill>{
         class: "DEMONHUNTER",
         default: true
     }
@@ -476,11 +495,11 @@ let OVALE_TAG_PRIORITY: LuaObj<number> = {}
         overrideCode: ""
     }
     for (const [k, v] of pairs(defaultDB)) {
-        OvaleOptions.defaultDB.profile[k] = v;
+        (<any>OvaleOptions.defaultDB.profile)[k] = v;
     }
     OvaleOptions.RegisterOptions(OvaleSimulationCraft);
 }
-const print_r = function(node: any, indent?: string, done?: LuaObj<boolean>, output?: LuaArray<string>) {
+const print_r = function(node: AstNode, indent?: string, done?: LuaObj<boolean>, output?: LuaArray<string>) {
     done = done || {}
     output = output || {}
     indent = indent || '';
@@ -489,14 +508,14 @@ const print_r = function(node: any, indent?: string, done?: LuaObj<boolean>, out
     } else if (type(node) != "table") {
         insert(output, `${indent}${node}`);
     } else {
-        for (const [key, value] of pairs(node)) {
+        for (const [key, value] of kpairs(node)) {
             if (type(value) == "table") {
-                if (done[value]) {
+                if (done[<any>value]) {
                     insert(output, `${indent}[${tostring(key)}] => (self_reference)`);
                 } else {
-                    done[value] = true;
+                    done[<any>value] = true;
                     insert(output, `${indent}[${tostring(key)}] => {`);
-                    print_r(value, `${indent}    `, done, output);
+                    print_r(<any>value, `${indent}    `, done, output);
                     insert(output, `${indent}}`);
                 }
             } else {
@@ -1454,7 +1473,7 @@ SplitByTagAction = function (tag, node: FunctionNode, nodeList, annotation) {
             id = annotation.dictionary && annotation.dictionary[name];
         } else if (isValueNode(firstParamNode)) {
             name = firstParamNode.value;
-            id = name;
+            id = <number>firstParamNode.value;
         }
         if (id) {
             if (actionType == "item") {
@@ -1467,13 +1486,13 @@ SplitByTagAction = function (tag, node: FunctionNode, nodeList, annotation) {
         }
     } else if (actionType == "texture") {
         let firstParamNode = node.rawPositionalParams[1];
-        let id, name;
+        let id: number, name;
         if (firstParamNode.type == "variable") {
             name = firstParamNode.name;
             id = annotation.dictionary && annotation.dictionary[name];
         } else if (isValueNode(firstParamNode)) {
             name = firstParamNode.value;
-            id = name;
+            id = <number>name;
         }
         if (actionTag == undefined) {
             [actionTag, invokesGCD] = OvaleData.GetSpellTagInfo(id);
@@ -2008,8 +2027,8 @@ function EmitVariable(nodeList: LuaArray<AstNode>, annotation: Annotation, modif
         OvaleSimulationCraft.Error("Unknown variable operator '%s'.", op);
     }
 }
-const checkOptionalSkill = function(action: string, className: string, specialization: string) {
-    let data = OPTIONAL_SKILLS[action];
+const checkOptionalSkill = function(action: string, className: string, specialization: string) : action is keyof typeof OPTIONAL_SKILLS {
+    let data = OPTIONAL_SKILLS[<keyof typeof OPTIONAL_SKILLS>action];
     if (!data) {
         return false;
     }
@@ -2685,7 +2704,7 @@ EmitNumber = function (parseNode, nodeList, annotation, action) {
 }
 EmitOperand = function (parseNode, nodeList, annotation, action) {
     let ok = false;
-    let node;
+    let node : AstNode;
     let operand = parseNode.name;
     let [token] = match(operand, OPERAND_TOKEN_PATTERN);
     let target;
@@ -3316,7 +3335,7 @@ EmitOperandDisease = function (operand, parseNode, nodeList, annotation, action,
     return [ok, node];
 }
 
-function EmitOperandGroundAoe(operand, parseNode, nodeList, annotation, action) {
+function EmitOperandGroundAoe(operand: string, parseNode: ParseNode, nodeList: LuaArray<AstNode>, annotation: Annotation, action: string): [boolean, AstNode] {
     let ok = true;
     let node;
     let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
@@ -4305,7 +4324,7 @@ interface Spell {
 const InsertInterruptFunction = function(child: LuaArray<AstNode>, annotation: Annotation, interrupts: LuaArray<Spell>) {
     let nodeList = annotation.astAnnotation.nodeList;
     let className = annotation.class;
-    let specialization = annotation.specialization;
+    // let specialization = annotation.specialization;
     let camelSpecialization = CamelSpecialization(annotation);
     let spells = interrupts || {}
     if (OvaleData.PANDAREN_CLASSES[className]) {
@@ -4963,7 +4982,7 @@ const InsertSupportingFunctions = function(child: LuaArray<AstNode>, annotation:
     }
     return count;
 }
-const AddOptionalSkillCheckBox = function(child: LuaArray<AstNode>, annotation: Annotation, data:any, skill: string) {
+const AddOptionalSkillCheckBox = function(child: LuaArray<AstNode>, annotation: Annotation, data:any, skill: keyof Annotation) {
     let nodeList = annotation.astAnnotation.nodeList;
     if (data.class != annotation[skill]) {
         return 0;
@@ -4986,7 +5005,7 @@ const AddOptionalSkillCheckBox = function(child: LuaArray<AstNode>, annotation: 
 const InsertSupportingControls = function(child: LuaArray<AstNode>, annotation: Annotation) {
     let count = 0;
     for (const [skill, data] of pairs(OPTIONAL_SKILLS)) {
-        count = count + AddOptionalSkillCheckBox(child, annotation, data, <string>skill);
+        count = count + AddOptionalSkillCheckBox(child, annotation, data, <keyof typeof OPTIONAL_SKILLS>skill);
     }
     let nodeList = annotation.astAnnotation.nodeList;
     let ifSpecialization = `specialization=${annotation.specialization}`;
@@ -5155,8 +5174,8 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
         self_childrenPool.DebuggingInfo();
         self_outputPool.DebuggingInfo();
     }
-    ToString(tbl) {
-        let output = print_r(tbl);
+    ToString(tbl: AstNode) {
+        const output = print_r(tbl);
         return concat(output, "\n");
     }
     Release(profile: Profile) {
@@ -5170,7 +5189,7 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
                     self_pool.Release(node);
                 }
             }
-            for (const [key, value] of pairs(annotation)) {
+            for (const [key, value] of kpairs(annotation)) {
                 if (type(value) == "table") {
                     wipe(value);
                 }
@@ -5191,23 +5210,21 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
                     profile[key] = value;
                 } else if (operator == "+=") {
                     if (type(profile[key]) != "table") {
-                        let oldValue = profile[key];
-                        profile[key] = {
-                        }
-                        insert(profile[key], oldValue);
+                        const oldValue = profile[key];
+                        profile[key] = {}
+                        insert(<LuaArray<any>> profile[key], oldValue);
                     }
-                    insert(profile[key], value);
+                    insert(<LuaArray<any>> profile[key], value);
                 }
             }
         }
-        for (const [k, v] of pairs(profile)) {
-            if (type(v) == "table") {
-                profile[k] = concat(v);
+        for (const [k, v] of kpairs(profile)) {
+            if (isLuaArray(v)) {
+                profile[k] = concat(<any>v);
             }
         }
-        profile.templates = {
-        }
-        for (const [k, ] of pairs(profile)) {
+        profile.templates = {}
+        for (const [k, ] of kpairs(profile)) {
             if (sub(k, 1, 2) == "$(" && sub(k, -1) == ")") {
                 insert(profile.templates, k);
             }
@@ -5216,7 +5233,7 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
         annotation = annotation || {};
         let nodeList: ChildParseNode = {};
         let actionList: LuaArray<ScNode> = {};
-        for (const [k, _v] of pairs(profile)) {
+        for (const [k, _v] of kpairs(profile)) {
             let v = _v;
             if (ok && truthy(match(k, "^actions"))) {
                 let [name] = match(k, "^actions%.([%w_]+)");
@@ -5227,10 +5244,10 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
                     let template = profile.templates[index];
                     let variable = sub(template, 3, -2);
                     let pattern = `%$%(${variable}%)`;
-                    v = gsub(v, pattern, profile[template]);
+                    v = gsub(<string>v, pattern, <string>profile[template]);
                 }
                 let node;
-                [ok, node] = ParseActionList(name, v, nodeList, annotation);
+                [ok, node] = ParseActionList(name, <string>v, nodeList, annotation);
                 if (ok) {
                     actionList[lualength(actionList) + 1] = node;
                 } else {
@@ -5245,7 +5262,7 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
             let lowerClass = <keyof Profile>lower(<string>className);
             if (profile[lowerClass]) {
                 annotation.class = <string>className;
-                annotation.name = profile[lowerClass];
+                annotation.name = <string>profile[lowerClass];
             }
         }
         annotation.specialization = profile.spec;
@@ -5255,8 +5272,8 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
         let consumables:LuaObj<string> = {}
         for (const [k, v] of pairs(CONSUMABLE_ITEMS)) {
             if (v) {
-                if (profile[k] != undefined) {
-                    consumables[k] = profile[k];
+                if (profile[<keyof Profile>k] != undefined) {
+                    consumables[k] = <string>profile[<keyof Profile>k];
                 }
             }
         }

@@ -45,11 +45,14 @@ local tostring = tostring
 local type = type
 local wipe = wipe
 local setmetatable = setmetatable
+local kpairs = pairs
 local concat = table.concat
 local insert = table.insert
 local remove = table.remove
 local sort = table.sort
 local RAID_CLASS_COLORS = RAID_CLASS_COLORS
+local __tools = LibStub:GetLibrary("ovale/tools")
+local isLuaArray = __tools.isLuaArray
 local OvaleSimulationCraftBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleSimulationCraft"))
 local KEYWORD = {}
 local MODIFIER_KEYWORD = {
@@ -359,7 +362,7 @@ do
         overrideCode = ""
     }
     for k, v in pairs(defaultDB) do
-        OvaleOptions.defaultDB.profile[k] = v
+        (OvaleOptions.defaultDB.profile)[k] = v
     end
     OvaleOptions:RegisterOptions(__exports.OvaleSimulationCraft)
 end
@@ -372,7 +375,7 @@ local print_r = function(node, indent, done, output)
     elseif type(node) ~= "table" then
         insert(output, indent .. node)
     else
-        for key, value in pairs(node) do
+        for key, value in kpairs(node) do
             if type(value) == "table" then
                 if done[value] then
                     insert(output, indent .. "[" .. tostring(key) .. "] => (self_reference)")
@@ -1328,7 +1331,7 @@ SplitByTagAction = function(tag, node, nodeList, annotation)
             id = annotation.dictionary and annotation.dictionary[name]
         elseif isValueNode(firstParamNode) then
             name = firstParamNode.value
-            id = name
+            id = firstParamNode.value
         end
         if id then
             if actionType == "item" then
@@ -4158,7 +4161,6 @@ end
 local InsertInterruptFunction = function(child, annotation, interrupts)
     local nodeList = annotation.astAnnotation.nodeList
     local className = annotation.class
-    local specialization = annotation.specialization
     local camelSpecialization = CamelSpecialization(annotation)
     local spells = interrupts or {}
     if OvaleData.PANDAREN_CLASSES[className] then
@@ -5006,7 +5008,7 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
                     self_pool:Release(node)
                 end
             end
-            for key, value in pairs(annotation) do
+            for key, value in kpairs(annotation) do
                 if type(value) == "table" then
                     wipe(value)
                 end
@@ -5035,13 +5037,13 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
                 end
             end
         end
-        for k, v in pairs(profile) do
-            if type(v) == "table" then
+        for k, v in kpairs(profile) do
+            if isLuaArray(v) then
                 profile[k] = concat(v)
             end
         end
         profile.templates = {}
-        for k in pairs(profile) do
+        for k in kpairs(profile) do
             if sub(k, 1, 2) == "$(" and sub(k, -1) == ")" then
                 insert(profile.templates, k)
             end
@@ -5050,7 +5052,7 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
         annotation = annotation or {}
         local nodeList = {}
         local actionList = {}
-        for k, _v in pairs(profile) do
+        for k, _v in kpairs(profile) do
             local v = _v
             if ok and match(k, "^actions") then
                 local name = match(k, "^actions%.([%w_]+)")

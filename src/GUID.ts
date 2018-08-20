@@ -77,7 +77,7 @@ function isCompareFunction<T>(a: any): a is CompareFunction<T> {
 
 function BinaryInsert<T>(t: LuaArray<T>, value:T, unique: boolean | CompareFunction<T>, compare?: CompareFunction<T>) {
     if (isCompareFunction<T>(unique)) {
-        [unique, compare] = [undefined, unique];
+        [unique, compare] = [false, unique];
     }
     compare = compare || compareDefault;
     let [low, high] = [1, lualength(t)];
@@ -213,7 +213,7 @@ class OvaleGUIDClass extends OvaleGUIDBase {
         let previousGUID = this.unitGUID[unitId];
         let previousName = this.unitName[unitId];
         if (!guid || guid != previousGUID) {
-            this.unitGUID[unitId] = undefined;
+            delete this.unitGUID[unitId];
             if (previousGUID) {
                 if (this.guidUnit[previousGUID]) {
                     BinaryRemove(this.guidUnit[previousGUID], unitId, CompareUnit);
@@ -222,13 +222,13 @@ class OvaleGUIDClass extends OvaleGUIDBase {
             }
         }
         if (!name || name != previousName) {
-            this.unitName[unitId] = undefined;
+            delete this.unitName[unitId];
             if (previousName && this.nameUnit[previousName]) {
                 BinaryRemove(this.nameUnit[previousName], unitId, CompareUnit);
             }
         }
         if (guid && guid == previousGUID && name && name != previousName) {
-            this.guidName[guid] = undefined;
+            delete this.guidName[guid];
             if (previousName && this.nameGUID[previousName]) {
                 BinaryRemove(this.nameGUID[previousName], guid, CompareUnit);
             }
@@ -274,21 +274,18 @@ class OvaleGUIDClass extends OvaleGUIDBase {
         this.UpdateUnit(unitId);
         this.UpdateUnit(`${unitId}target`);
     }
-    IsPlayerPet(guid: string) {
+    IsPlayerPet(guid: string): [boolean, number] {
         let atTime = this.petGUID[guid];
         return [(!!atTime), atTime];
     }
-    UnitGUID(unitId: string) {
-        if (unitId) {
-            return this.unitGUID[unitId] || UnitGUID(unitId);
-        }
-        return undefined;
+    UnitGUID(unitId: string): string {
+        return this.unitGUID[unitId] || UnitGUID(unitId);
     }
     GUIDUnit(guid: string) {
         if (guid && this.guidUnit[guid]) {
             return unpack(this.guidUnit[guid]);
         }
-        return undefined;
+        return [undefined];
     }
     UnitName(unitId: string) {
         if (unitId) {

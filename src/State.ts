@@ -23,7 +23,7 @@ class OvaleStateClass extends OvaleStateBaseClass {
         return class extends Base {
             current = new ctor();
             next = new ctor();
-            GetState(atTime: number) {
+            GetState(atTime: number | undefined) {
                 if (!atTime) return this.current;
                 return this.next;
             }

@@ -4,13 +4,13 @@ import { OvaleData } from "./Data";
 import { OvaleSpellBook } from "./SpellBook";
 import { Ovale } from "./Ovale";
 import { lastSpell, SpellCast, SpellCastModule } from "./LastSpell";
-import { RegisterRequirement, UnregisterRequirement } from "./Requirement";
+import { RegisterRequirement, UnregisterRequirement, RequirementMethod } from "./Requirement";
 import aceEvent from "@wowts/ace_event-3.0";
-import { next, pairs, LuaObj } from "@wowts/lua";
+import { next, pairs, LuaObj, tonumber } from "@wowts/lua";
 import { GetSpellCooldown, GetTime, GetSpellCharges } from "@wowts/wow-mock";
 import { sub } from "@wowts/string";
 import { OvaleState } from "./State";
-import { OvalePaperDoll } from "./PaperDoll";
+import { OvalePaperDoll, HasteType } from "./PaperDoll";
 import { LuaArray } from "@wowts/lua";
 
 export let OvaleCooldown: OvaleCooldownClass;
@@ -19,52 +19,58 @@ let COOLDOWN_THRESHOLD = 0.10;
 // "Spell Haste" affects cast speed and spell GCD (spells, not melee abilities), but not hasted cooldowns (cd_haste in Ovale's SpellInfo)
 // "Melee Haste" is in game as "Attack Speed" and affects white swing speed only, not the GCD
 // "Ranged Haste" looks to be no longer used and matches "Melee Haste" usually, DK talent Icy Talons for example;  Suppression Aura in BWL does not affect Ranged Haste but does Melee Haste as of 7/29/18
-let BASE_GCD = {
-    ["DEATHKNIGHT"]: {
+
+interface GcdInfo {
+    [1]: number;
+    [2]: HasteType;
+}
+
+const BASE_GCD = {
+    ["DEATHKNIGHT"]: <GcdInfo>{
         1: 1.5,
         2: "base"
     },
-    ["DEMONHUNTER"]: {
+    ["DEMONHUNTER"]: <GcdInfo> {
         1: 1.5,
         2: "base"
     },
-    ["DRUID"]: {
+    ["DRUID"]: <GcdInfo> {
         1: 1.5,
         2: "spell"
     },
-    ["HUNTER"]: {
+    ["HUNTER"]: <GcdInfo>{
         1: 1.5,
         2: "base"
     },
-    ["MAGE"]: {
+    ["MAGE"]: <GcdInfo>{
         1: 1.5,
         2: "spell"
     },
-    ["MONK"]: {
+    ["MONK"]: <GcdInfo>{
         1: 1.0,
-        2: false
+        2: "none"
     },
-    ["PALADIN"]: {
+    ["PALADIN"]: <GcdInfo>{
         1: 1.5,
         2: "spell"
     },
-    ["PRIEST"]: {
+    ["PRIEST"]: <GcdInfo>{
         1: 1.5,
         2: "spell"
     },
-    ["ROGUE"]: {
+    ["ROGUE"]: <GcdInfo>{
         1: 1.0,
-        2: false
+        2: "none"
     },
-    ["SHAMAN"]: {
+    ["SHAMAN"]: <GcdInfo>{
         1: 1.5,
         2: "spell"
     },
-    ["WARLOCK"]: {
+    ["WARLOCK"]: <GcdInfo>{
         1: 1.5,
         2: "spell"
     },
-    ["WARRIOR"]: {
+    ["WARRIOR"]: <GcdInfo>{
         1: 1.5,
         2: "base"
     }
@@ -75,7 +81,7 @@ export interface Cooldown {
     start?: number;
     charges?: number;
     duration?: number;
-    enable?: number;
+    enable?: boolean;
     maxCharges?: number;
     chargeStart?: number;
     chargeDuration?: number;
@@ -127,7 +133,7 @@ class OvaleCooldownClass extends OvaleCooldownBase implements SpellCastModule {
         this.UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED");
         this.UnregisterEvent("UPDATE_SHAPESHIFT_COOLDOWN");
     }
-    UNIT_SPELLCAST_INTERRUPTED(event, unit, lineId, spellId) {
+    UNIT_SPELLCAST_INTERRUPTED(event: string, unit: string, lineId: number, spellId: number) {
         if (unit == "player" || unit == "pet") {
             this.Update(event, unit);
             this.Debug("Resetting global cooldown.");
@@ -136,7 +142,7 @@ class OvaleCooldownClass extends OvaleCooldownBase implements SpellCastModule {
             cd.duration = 0;
         }
     }
-    Update(event, unit) {
+    Update(event: string, unit: string) {
         if (!unit || unit == "player" || unit == "pet") {
             // Increments the serial: cooldowns stored in this.next.cd will be refreshed
             // TODO as ACTIONBAR_UPDATE_COOLDOWN is sent some time before UNIT_SPELLCAST_SUCCEEDED
@@ -153,16 +159,16 @@ class OvaleCooldownClass extends OvaleCooldownBase implements SpellCastModule {
             }
         }
     }
-    IsSharedCooldown(name) {
+    IsSharedCooldown(name: string | number) {
         let spellTable = this.sharedCooldown[name];
         return (spellTable && next(spellTable) != undefined);
     }
-    AddSharedCooldown(name, spellId) {
+    AddSharedCooldown(name: string, spellId: number) {
         this.sharedCooldown[name] = this.sharedCooldown[name] || {
         }
         this.sharedCooldown[name][spellId] = true;
     }
-    GetGlobalCooldown(now?) {
+    GetGlobalCooldown(now?: number) {
         let cd = this.gcd;
         if (!cd.start || !cd.serial || cd.serial < this.serial) {
             now = now || GetTime();
@@ -172,12 +178,12 @@ class OvaleCooldownClass extends OvaleCooldownBase implements SpellCastModule {
         }
         return [cd.start, cd.duration];
     }
-    GetSpellCooldown(spellId: number, atTime: number | undefined):[number, number, number] {
+    GetSpellCooldown(spellId: number, atTime: number | undefined):[number, number, boolean] {
         if (atTime) {
             let cd = this.GetCD(spellId, atTime);
             return [cd.start, cd.duration, cd.enable];
         }
-        let [cdStart, cdDuration, cdEnable] = [0, 0, 1];
+        let [cdStart, cdDuration, cdEnable] = [0, 0, true];
         if (this.sharedCooldown[spellId]) {
             for (const [id] of pairs(this.sharedCooldown[spellId])) {
                 let [start, duration, enable] = this.GetSpellCooldown(id, atTime);
@@ -211,8 +217,8 @@ class OvaleCooldownClass extends OvaleCooldownBase implements SpellCastModule {
         }
         return [cdStart - COOLDOWN_THRESHOLD, cdDuration, cdEnable];
     }
-    GetBaseGCD() {
-        let gcd, haste;
+    GetBaseGCD():[number, HasteType] {
+        let gcd: number, haste: HasteType;
         let baseGCD = BASE_GCD[Ovale.playerClass];
         if (baseGCD) {
             [gcd, haste] = [baseGCD[1], baseGCD[2]];
@@ -226,7 +232,7 @@ class OvaleCooldownClass extends OvaleCooldownBase implements SpellCastModule {
             dest.offgcd = spellcast.offgcd;
         }
     }
-    SaveSpellcastInfo= (mod: SpellCastModule, spellcast: SpellCast, atTime, state: {}) => {
+    SaveSpellcastInfo= (mod: SpellCastModule, spellcast: SpellCast, atTime: number, state: {}) => {
         let spellId = spellcast.spellId;
         if (spellId) {
             let gcd:number| string;
@@ -326,20 +332,17 @@ class OvaleCooldownClass extends OvaleCooldownBase implements SpellCastModule {
     }    
 
     
-    RequireCooldownHandler = (spellId, atTime, requirement, tokens, index, targetGUID):[boolean, string, number] => {
-        let cdSpellId = tokens;
+    RequireCooldownHandler: RequirementMethod = (spellId, atTime, requirement, tokens, index, targetGUID):[boolean, string, number] => {
         let verified = false;
-        if (index) {
-            cdSpellId = tokens[index];
-            index = index + 1;
-        }
+        let cdSpellId = <string>tokens[index];
+        index = index + 1;
         if (cdSpellId) {
             let isBang = false;
             if (sub(cdSpellId, 1, 1) == "!") {
                 isBang = true;
                 cdSpellId = sub(cdSpellId, 2);
             }
-            let cd = this.GetCD(cdSpellId, atTime);
+            let cd = this.GetCD(tonumber(cdSpellId), atTime);
             verified = !isBang && cd.duration > 0 || isBang && cd.duration <= 0;
             let result = verified && "passed" || "FAILED";
             this.Log("    Require spell %s %s cooldown at time=%f: %s (duration = %f)", cdSpellId, isBang && "OFF" || !isBang && "ON", atTime, result, cd.duration);
