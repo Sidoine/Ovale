@@ -2,7 +2,7 @@ import { OvaleProfiler } from "./Profiler";
 import { Ovale } from "./Ovale";
 import aceEvent from "@wowts/ace_event-3.0";
 import { CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
-import { LuaArray, LuaObj } from "../../node_modules/@wowts/lua";
+import { LuaArray, LuaObj } from "@wowts/lua";
 
 let CLEU_DAMAGE_EVENT: LuaObj<boolean> = {
     SPELL_DAMAGE: true,
