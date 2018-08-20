@@ -5,7 +5,7 @@
       "noImplicitAny": true,
       "outDir": "dist",
       "rootDir": "src",
-      "noUnusedLocals": false
+      "noUnusedLocals": true
     },
     "exclude": [
       "node_modules",
