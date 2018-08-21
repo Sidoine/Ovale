@@ -73,8 +73,8 @@ AddFunction BrewmasterDefaultShortCDActions
 		# purify heavy stagger when we have enough ISB
 		if (StaggerPercentage() >= 60 and (BuffRemaining(ironskin_brew_buff) >= 2*BaseDuration(ironskin_brew_buff))) Spell(purifying_brew)
 
-		# always bank 1 charge (or bank 2 with light_brewing)
-		unless (SpellCharges(ironskin_brew) <= SpellMaxCharges(ironskin_brew)-2)
+		# always bank 1 charge
+		unless (SpellCharges(ironskin_brew) <= 1)
 		{
             # keep ISB rolling
             if BuffRemaining(ironskin_brew_buff) < DebuffRemaining(any_stagger_debuff) and BuffExpires(blackout_combo_buff) Spell(ironskin_brew)
