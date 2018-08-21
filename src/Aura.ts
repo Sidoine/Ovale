@@ -1214,8 +1214,8 @@ export class OvaleAuraClass extends OvaleAuraBase {
                                 OvaleAura.Log("Aura %d is extended by %f seconds, preserving %d stack(s).", auraId, extend, aura.stacks);
                             } else {
                                 let maxStacks = 1;
-                                if (si && (si.max_stacks || si.maxstacks)) {
-                                    maxStacks = si.max_stacks || si.maxstacks;
+                                if (si && si.max_stacks) {
+                                    maxStacks = si.max_stacks;
                                 }
                                 aura.stacks = aura.stacks + stacks;
                                 if (aura.stacks > maxStacks) {

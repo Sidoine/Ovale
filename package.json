@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "ava",
-    "prepare": "tstolua -j -p tsconfig.lua.json",
+    "test": "tsc && ava",
+    "prepare": "tstolua -p tsconfig.lua.json",
     "prepare-tools": "tsc",
     "simc": "node dist/utils/importsimc.js ../../simc",
     "watch": "tstolua -p tsconfig.lua.json -w",

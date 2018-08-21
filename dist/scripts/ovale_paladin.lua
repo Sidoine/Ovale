@@ -546,16 +546,6 @@ AddFunction RetributionPrecombatCdPostConditions
 
 AddFunction RetributionOpenerMainActions
 {
- #sequence,if=talent.wake_of_ashes.enabled&talent.crusade.enabled&talent.execution_sentence.enabled&!talent.hammer_of_wrath.enabled,name=wake_opener_ES_CS:shield_of_vengeance:blade_of_justice:judgment:crusade:templars_verdict:wake_of_ashes:templars_verdict:crusader_strike:execution_sentence
- if Talent(wake_of_ashes_talent) and Talent(crusade_talent) and Talent(execution_sentence_talent) and not Talent(hammer_of_wrath_talent) Spell(sequence)
- #sequence,if=talent.wake_of_ashes.enabled&talent.crusade.enabled&!talent.execution_sentence.enabled&!talent.hammer_of_wrath.enabled,name=wake_opener_CS:shield_of_vengeance:blade_of_justice:judgment:crusade:templars_verdict:wake_of_ashes:templars_verdict:crusader_strike:templars_verdict
- if Talent(wake_of_ashes_talent) and Talent(crusade_talent) and not Talent(execution_sentence_talent) and not Talent(hammer_of_wrath_talent) Spell(sequence)
- #sequence,if=talent.wake_of_ashes.enabled&talent.crusade.enabled&talent.execution_sentence.enabled&talent.hammer_of_wrath.enabled,name=wake_opener_ES_HoW:shield_of_vengeance:blade_of_justice:judgment:crusade:templars_verdict:wake_of_ashes:templars_verdict:hammer_of_wrath:execution_sentence
- if Talent(wake_of_ashes_talent) and Talent(crusade_talent) and Talent(execution_sentence_talent) and Talent(hammer_of_wrath_talent) Spell(sequence)
- #sequence,if=talent.wake_of_ashes.enabled&talent.crusade.enabled&!talent.execution_sentence.enabled&talent.hammer_of_wrath.enabled,name=wake_opener_HoW:shield_of_vengeance:blade_of_justice:judgment:crusade:templars_verdict:wake_of_ashes:templars_verdict:hammer_of_wrath:templars_verdict
- if Talent(wake_of_ashes_talent) and Talent(crusade_talent) and not Talent(execution_sentence_talent) and Talent(hammer_of_wrath_talent) Spell(sequence)
- #sequence,if=talent.wake_of_ashes.enabled&talent.inquisition.enabled,name=wake_opener_Inq:shield_of_vengeance:blade_of_justice:judgment:inquisition:avenging_wrath:wake_of_ashes
- if Talent(wake_of_ashes_talent) and Talent(inquisition_talent) Spell(sequence)
 }
 
 AddFunction RetributionOpenerMainPostConditions
@@ -568,7 +558,6 @@ AddFunction RetributionOpenerShortCdActions
 
 AddFunction RetributionOpenerShortCdPostConditions
 {
- Talent(wake_of_ashes_talent) and Talent(crusade_talent) and Talent(execution_sentence_talent) and not Talent(hammer_of_wrath_talent) and Spell(sequence) or Talent(wake_of_ashes_talent) and Talent(crusade_talent) and not Talent(execution_sentence_talent) and not Talent(hammer_of_wrath_talent) and Spell(sequence) or Talent(wake_of_ashes_talent) and Talent(crusade_talent) and Talent(execution_sentence_talent) and Talent(hammer_of_wrath_talent) and Spell(sequence) or Talent(wake_of_ashes_talent) and Talent(crusade_talent) and not Talent(execution_sentence_talent) and Talent(hammer_of_wrath_talent) and Spell(sequence) or Talent(wake_of_ashes_talent) and Talent(inquisition_talent) and Spell(sequence)
 }
 
 AddFunction RetributionOpenerCdActions
@@ -577,7 +566,6 @@ AddFunction RetributionOpenerCdActions
 
 AddFunction RetributionOpenerCdPostConditions
 {
- Talent(wake_of_ashes_talent) and Talent(crusade_talent) and Talent(execution_sentence_talent) and not Talent(hammer_of_wrath_talent) and Spell(sequence) or Talent(wake_of_ashes_talent) and Talent(crusade_talent) and not Talent(execution_sentence_talent) and not Talent(hammer_of_wrath_talent) and Spell(sequence) or Talent(wake_of_ashes_talent) and Talent(crusade_talent) and Talent(execution_sentence_talent) and Talent(hammer_of_wrath_talent) and Spell(sequence) or Talent(wake_of_ashes_talent) and Talent(crusade_talent) and not Talent(execution_sentence_talent) and Talent(hammer_of_wrath_talent) and Spell(sequence) or Talent(wake_of_ashes_talent) and Talent(inquisition_talent) and Spell(sequence)
 }
 
 ### actions.generators
@@ -927,11 +915,9 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 # lights_judgment
 # rebuke
 # righteous_verdict_talent
-# sequence
 # shield_of_vengeance
 # templars_verdict
 # wake_of_ashes
-# wake_of_ashes_talent
 # war_stomp
 ]]
     OvaleScripts:RegisterScript("PALADIN", "retribution", name, desc, code, "script")

@@ -124,7 +124,8 @@ class OvaleProfilerClass extends OvaleProfilerBase {
             constructor(...__args:any[]) {
                 super(...__args);
                 name = name || this.GetName();
-                (profiler.options.args.profiling.args.modules.args as any)[name] = {
+                const args = profiler.options.args.profiling.args.modules.args as any;
+                args[name] = {
                     name: name,
                     desc: format(L["Enable profiling for the %s module."], name),
                     type: "toggle"

@@ -693,6 +693,13 @@ function GetHastedTime(seconds: number, haste: HasteType, state: BaseState) {
     }
     OvaleCondition.RegisterCondition("buffstacks", false, BuffStacks);
     OvaleCondition.RegisterCondition("debuffstacks", false, BuffStacks);
+
+    function maxStacks(positionalParams: PositionalParameters, namedParameters: NamedParameters, state: BaseState, atTime: number) {
+        const [auraId, comparator, limit] = [positionalParams[1] as number, positionalParams[2] as string, positionalParams[3] as number];
+        const maxStacks = OvaleData.GetSpellInfo(auraId).max_stacks;
+        return Compare(maxStacks, comparator, limit);
+    }
+    OvaleCondition.RegisterCondition("maxstacks", true, maxStacks);
 }
 {
     /** Get the total number of stacks of the given aura across all targets.

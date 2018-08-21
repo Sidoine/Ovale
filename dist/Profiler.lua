@@ -127,7 +127,8 @@ local OvaleProfilerClass = __class(OvaleProfilerBase, {
                 self.enabled = false
                 module.constructor(self, ...)
                 name = name or self:GetName()
-                (profiler.options.args.profiling.args.modules.args)[name] = {
+                local args = profiler.options.args.profiling.args.modules.args
+                args[name] = {
                     name = name,
                     desc = format(L["Enable profiling for the %s module."], name),
                     type = "toggle"

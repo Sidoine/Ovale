@@ -453,6 +453,12 @@ local function BuffStacks(positionalParams, namedParams, state, atTime)
     end
     OvaleCondition:RegisterCondition("buffstacks", false, BuffStacks)
     OvaleCondition:RegisterCondition("debuffstacks", false, BuffStacks)
+local function maxStacks(positionalParams, namedParameters, state, atTime)
+        local auraId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+        local maxStacks = OvaleData:GetSpellInfo(auraId).max_stacks
+        return Compare(maxStacks, comparator, limit)
+    end
+    OvaleCondition:RegisterCondition("maxstacks", true, maxStacks)
 end
 do
 local function BuffStacksOnAny(positionalParams, namedParams, state, atTime)

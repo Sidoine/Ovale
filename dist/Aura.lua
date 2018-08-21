@@ -1172,8 +1172,8 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                                 __exports.OvaleAura:Log("Aura %d is extended by %f seconds, preserving %d stack(s).", auraId, extend, aura.stacks)
                             else
                                 local maxStacks = 1
-                                if si and (si.max_stacks or si.maxstacks) then
-                                    maxStacks = si.max_stacks or si.maxstacks
+                                if si and si.max_stacks then
+                                    maxStacks = si.max_stacks
                                 end
                                 aura.stacks = aura.stacks + stacks
                                 if aura.stacks > maxStacks then

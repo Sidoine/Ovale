@@ -255,6 +255,7 @@ Define(unholy_blight_talent 6)
 # Surrounds yourself with a vile swarm of insects for d, stinging all nearby enemies and infecting them with an unholy disease that deals 115994o1 damage over 115994d.
 Define(unholy_frenzy_talent 20)
 # Incites you into a killing frenzy for d, increasing Haste by s1 and causing your auto attacks to infect the target with a Festering Wound.
+Define(cold_heart_item 151796)
 Define(taktheritrixs_shoulderpads_item 137075)
     `;
 // END
@@ -532,7 +533,7 @@ Define(unholy_strength_buff 53365)
 	SpellInfo(unholy_strength_buff duration=15)
 
 ## Items
-Define(cold_heart_item 151796)
+
 Define(cold_heart_buff 235592)
 	SpellInfo(cold_heart_buff max_stacks=20)
 Define(consorts_cold_core 144293)

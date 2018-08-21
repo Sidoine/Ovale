@@ -3161,6 +3161,7 @@ EmitOperandBuff = function (operand, parseNode, nodeList, annotation, action, ta
         ["mana.max"]: "MaxMana()",
         ["mana.pct"]: "ManaPercent()",
         ["maelstrom"]: "Maelstrom()",
+        ["next_wi_bomb.shrapnel"]: "IsSpellEnable(270335)",
         ["nonexecute_actors_pct"]: "0",
         ["pain"]: "Pain()",
         ["pain.deficit"]: "PainDeficit()",
@@ -3423,6 +3424,8 @@ EmitOperandDot = function (operand, parseNode, nodeList, annotation, action, tar
             code = format("TargetDebuffRemaining(%s_exsanguinated)", dotName);
         } else if (property == "refreshable") {
             code = format("%s%sRefreshable(%s)", target, prefix, dotName);
+        } else if (property === "max_stacks") {
+            code = format("MaxStacks(%s)", dotName);
         } else {
             ok = false;
         }

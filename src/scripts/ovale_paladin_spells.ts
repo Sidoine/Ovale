@@ -126,8 +126,6 @@ Define(inquisition_talent 21)
 # Consumes up to 3 Holy Power to increase your damage done and Haste by s1.rnrnLasts d per Holy Power consumed.
 Define(righteous_verdict_talent 2)
 # Templar's Verdict increases the damage of your next Templar's Verdict by 267611s1 for 267611d.
-Define(wake_of_ashes_talent 12)
-# Lash out at your enemies, dealing sw1 Radiant damage to all enemies within a1 yd in front of you and reducing their movement speed by s2 for d.rnrnDemon and Undead enemies are also stunned for 255941d.rnrn|cFFFFFFFFGenerates s3 Holy Power.
 Define(consecration_talent 11)
 # Consecrates the land beneath you, causing <totaldmg> Holy damage over d to enemies who enter the area.rnrn|cFFFFFFFFGenerates s3 Holy Power.
 Define(divine_right_trait 277678)

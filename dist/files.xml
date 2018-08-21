@@ -67,7 +67,6 @@
    <Script file="Data.lua"/>
    <Script file="Stance.lua"/>
    <Script file="AST.lua"/>
-   <Script file="tests\ast.spec.lua"/>
    <Script file="SpellFlash.lua"/>
    <Script file="Cooldown.lua"/>
    <Script file="CooldownState.lua"/>

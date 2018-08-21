@@ -285,10 +285,6 @@ AddFunction ElementalDefaultCdActions
   if not Talent(ascendance_talent) or BuffPresent(ascendance_elemental_buff) or SpellCooldown(ascendance_elemental) > 50 Spell(blood_fury_apsp)
   #berserking,if=!talent.ascendance.enabled|buff.ascendance.up
   if not Talent(ascendance_talent) or BuffPresent(ascendance_elemental_buff) Spell(berserking)
-  #fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-  if not Talent(ascendance_talent) or BuffPresent(ascendance_elemental_buff) or SpellCooldown(ascendance_elemental) > 50 Spell(fireblood)
-  #ancestral_call,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-  if not Talent(ascendance_talent) or BuffPresent(ascendance_elemental_buff) or SpellCooldown(ascendance_elemental) > 50 Spell(ancestral_call)
   #run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
   if Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } ElementalAoeCdActions()
 
@@ -364,7 +360,6 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 }
 
 ### Required symbols
-# ancestral_call
 # ascendance_elemental
 # ascendance_elemental_buff
 # ascendance_talent
@@ -382,7 +377,6 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 # exposed_elements_debuff
 # exposed_elements_talent
 # fire_elemental
-# fireblood
 # flame_shock
 # flame_shock_debuff
 # frost_shock

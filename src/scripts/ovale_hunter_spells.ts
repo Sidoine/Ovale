@@ -201,8 +201,6 @@ Define(steel_trap_talent 11)
 # Hurls a Steel Trap to the target location that snaps shut on the first enemy that approaches, immobilizing them for 162480d and causing them to bleed for 162487o1 damage over 162487d. rnrnDamage other than Steel Trap may break the immobilization effect. Trap will exist for 162496d. Limit 1.
 Define(focused_fire_trait 278531)
 Define(in_the_rhythm_trait 264198)
-Define(up_close_and_personal_trait 278533)
-Define(venomous_fangs_trait 274590)
     `;
 // END
     code += `

@@ -128,6 +128,7 @@ local SPECIAL_ACTION = {
     ["pool_resource"] = true,
     ["potion"] = true,
     ["run_action_list"] = true,
+    ["sequence"] = true,
     ["snapshot_stats"] = true,
     ["stance"] = true,
     ["start_moving"] = true,
@@ -2213,6 +2214,8 @@ EmitAction = function(parseNode, nodeList, annotation)
                 AddSymbol(annotation, format("%s", name))
                 isSpellAction = false
             end
+        elseif action == "sequence" then
+            isSpellAction = false
         elseif action == "stance" then
             if modifier.choose then
                 local name = Unparse(modifier.choose)
@@ -3010,6 +3013,7 @@ do
         ["mana.max"] = "MaxMana()",
         ["mana.pct"] = "ManaPercent()",
         ["maelstrom"] = "Maelstrom()",
+        ["next_wi_bomb.shrapnel"] = "IsSpellEnable(270335)",
         ["nonexecute_actors_pct"] = "0",
         ["pain"] = "Pain()",
         ["pain.deficit"] = "PainDeficit()",
@@ -3272,6 +3276,8 @@ EmitOperandDot = function(operand, parseNode, nodeList, annotation, action, targ
             code = format("TargetDebuffRemaining(%s_exsanguinated)", dotName)
         elseif property == "refreshable" then
             code = format("%s%sRefreshable(%s)", target, prefix, dotName)
+        elseif property == "max_stacks" then
+            code = format("MaxStacks(%s)", dotName)
         else
             ok = false
         end

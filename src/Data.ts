@@ -117,7 +117,6 @@ export interface SpellInfo extends Powers {
     tick?:number;
     stacking?:number;
     max_stacks?:number;
-    maxstacks?:number;
     stat?:string | LuaArray<string>;
     buff?:number | LuaArray<number>;
     // Cooldown
