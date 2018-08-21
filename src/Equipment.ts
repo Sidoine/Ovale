@@ -173,7 +173,7 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
         return [this.equippedItemBySlot[OVALE_SLOTID_BY_SLOTNAME["Trinket0Slot"]], this.equippedItemBySlot[OVALE_SLOTID_BY_SLOTNAME["Trinket1Slot"]]];
     }
     HasEquippedItem(itemId: number) {
-        return this.equippedItemById[itemId] > 0;
+        return this.equippedItemById[itemId] && true || false;
     } 
     HasMainHandWeapon(handedness?: number) {
         if (handedness) {

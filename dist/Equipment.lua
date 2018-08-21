@@ -131,7 +131,7 @@ local OvaleEquipmentClass = __class(OvaleEquipmentBase, {
         return self.equippedItemBySlot[OVALE_SLOTID_BY_SLOTNAME["Trinket0Slot"]], self.equippedItemBySlot[OVALE_SLOTID_BY_SLOTNAME["Trinket1Slot"]]
     end,
     HasEquippedItem = function(self, itemId)
-        return self.equippedItemById[itemId] > 0
+        return self.equippedItemById[itemId] and true or false
     end,
     HasMainHandWeapon = function(self, handedness)
         if handedness then
