@@ -44,6 +44,11 @@ Define(arcane_power 12042)
 Define(battle_potion_of_intellect 279164)
 # Chance to create multiple potions.
   SpellInfo(battle_potion_of_intellect gcd=0 offgcd=1)
+Define(berserking_buff 200953)
+# @spelldesc200845
+  SpellInfo(berserking_buff duration=3 max_stacks=12 gcd=0 offgcd=1)
+  # Attack speed and critical strike chance increased by s1.
+  SpellAddBuff(berserking_buff berserking_buff=1)
 Define(berserking 26297)
 # Increases your haste by s1 for d.
   SpellInfo(berserking cd=180 duration=10 gcd=0 offgcd=1)
@@ -237,6 +242,8 @@ Define(winters_reach 273347)
   SpellInfo(winters_reach duration=15 channel=15 gcd=0 offgcd=1)
   # Damage of your next non-instant Flurry increased by w1 per hit.
   SpellAddBuff(winters_reach winters_reach=1)
+Define(amplification_talent 1)
+# When Clearcast, Arcane Missiles fires s2 additional lmissile:missiles;.
 Define(arcane_orb_talent 21)
 # Launches an Arcane Orb forward from your position, traveling up to 40 yards, dealing 153640s1 Arcane damage to enemies it passes through.rnrn|cFFFFFFFFGrants 1 Arcane Charge when cast and every time it deals damage.|r
 Define(charged_up_talent 11)
@@ -283,7 +290,7 @@ Define(shimmer_talent 5)
 # Teleports you A1 yards forward, unless something is in the way. Unaffected by the global cooldown and castable while casting.
 Define(supernova_talent 12)
 # Pulses arcane energy around the target enemy or ally, dealing s2 Arcane damage to all enemies within A2 yards, and knocking them upward. A primary enemy target will take s1 increased damage.
-Define(arcane_pressure_trait 274594)
+Define(arcane_pummeling_trait 270669)
 Define(preheat_trait 273331)
 Define(winters_reach_trait 273346)
     ]]

@@ -25,8 +25,7 @@ let self_compileOnStances = false;
  
 let self_serial = 0;
 let self_timesEvaluated = 0;
-let self_icon: LuaArray<AstNode> = {
-}
+let self_icon: LuaArray<AstNode> = {}
 let NUMBER_PATTERN = "^%-?%d+%.?%d*$";
 function HasTalent(talentId: number) {
     if (OvaleSpellBook.IsKnownTalent(talentId)) {
@@ -582,6 +581,7 @@ class OvaleCompileClass extends OvaleCompileClassBase {
     EvaluateScript(ast?: AstNode, forceEvaluation?: boolean) {
         this.StartProfiling("OvaleCompile_EvaluateScript");
         let changed = false;
+        ast = ast || this.ast;
         if (ast && (forceEvaluation || !this.serial || this.serial < self_serial)) {
             this.Debug("Evaluating script.");
             changed = true;

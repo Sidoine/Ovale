@@ -156,7 +156,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                 this.UpdateFrame();
             }
             const profile = Ovale.db.profile;
-            let iconNodes = OvaleCompile.GetIconNodes();
+            const iconNodes = OvaleCompile.GetIconNodes();
             for (const [k, node] of ipairs(iconNodes)) {
                 if (node.namedParams && node.namedParams.target) {
                     baseState.current.defaultTarget = <string>node.namedParams.target;

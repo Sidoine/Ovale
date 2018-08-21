@@ -168,7 +168,7 @@ class OvaleCooldownClass extends OvaleCooldownBase implements SpellCastModule {
         }
         this.sharedCooldown[name][spellId] = true;
     }
-    GetGlobalCooldown(now?: number) {
+    GetGlobalCooldown(now?: number): [number, number] {
         let cd = this.gcd;
         if (!cd.start || !cd.serial || cd.serial < this.serial) {
             now = now || GetTime();

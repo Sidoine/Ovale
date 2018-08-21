@@ -7,8 +7,7 @@ import { PositionalParameters, NamedParameters } from "./AST";
 let OvaleConditionBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleCondition"));
 export let OvaleCondition: OvaleConditionClass;
 let INFINITY = huge;
-let self_condition: LuaObj<ConditionFunction> = {
-}
+let self_condition: LuaObj<ConditionFunction> = {}
 let self_spellBookCondition: LuaObj<boolean> = {};
 self_spellBookCondition["spell"] = true;
 
@@ -31,18 +30,8 @@ export function isComparator(token: string): token is ComparatorId {
 }
 
 class OvaleConditionClass extends OvaleConditionBase {
-
-    RegisterCondition(name: string, isSpellBookCondition: boolean, func: ConditionFunction) { //, arg?: LuaObj<ConditionFunction>) {
-        // if (arg) {
-        //     if (isString(func)) {
-        //         func = arg[func];
-        //     }
-        //     self_condition[name] = function (...__args) {
-        //         func(arg, ...__args);
-        //     }
-        // } else {
-            self_condition[name] = func;
-        // }
+    RegisterCondition(name: string, isSpellBookCondition: boolean, func: ConditionFunction) {
+        self_condition[name] = func;
         if (isSpellBookCondition) {
             self_spellBookCondition[name] = true;
         }

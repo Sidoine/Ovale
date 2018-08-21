@@ -599,6 +599,7 @@ local OvaleCompileClass = __class(OvaleCompileClassBase, {
     EvaluateScript = function(self, ast, forceEvaluation)
         self:StartProfiling("OvaleCompile_EvaluateScript")
         local changed = false
+        ast = ast or self.ast
         if ast and (forceEvaluation or  not self.serial or self.serial < self_serial) then
             self:Debug("Evaluating script.")
             changed = true
