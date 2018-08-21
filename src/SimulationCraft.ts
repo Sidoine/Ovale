@@ -233,6 +233,7 @@ let SPECIAL_ACTION: LuaObj<boolean> = {
     ["pool_resource"]: true,
     ["potion"]: true,
     ["run_action_list"]: true,
+    ["sequence"]: true,
     ["snapshot_stats"]: true,
     ["stance"]: true,
     ["start_moving"]: true,
@@ -2366,6 +2367,8 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
                 AddSymbol(annotation, format("%s", name));
                 isSpellAction = false;
             }
+        } else if (action === "sequence") {
+            isSpellAction = false;
         } else if (action == "stance") {
             if (modifier.choose) {
                 let name = Unparse(modifier.choose);
