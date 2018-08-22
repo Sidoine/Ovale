@@ -30,7 +30,7 @@ Define(mind_sear 48045)
   SpellInfo(mind_sear duration=3 channel=3 tick=0.75)
 Define(mindbender 123040)
 # Summons a Mindbender to attack the target for d. You regenerate 123051m1/100.1 of maximum mana each time the Mindbender attacks.
-  SpellInfo(mindbender cd=60 duration=12 talent=mindbender_talent)
+  SpellInfo(mindbender cd=60 duration=12 talent=mindbender_talent_priest)
 Define(rising_death 252346)
 # Chance to create multiple potions.
   SpellInfo(rising_death gcd=0 offgcd=1)
@@ -65,10 +65,10 @@ Define(vampiric_touch 34914)
   SpellInfo(vampiric_touch duration=21 insanity=-600 tick=3)
   # Suffering w2 Shadow damage every t2 sec.
   SpellAddTargetDebuff(vampiric_touch vampiric_touch=1)
-Define(void_bolt 228266)
-# For the duration of Voidform, your Void Eruption ability is replaced by Void Bolt:rnrn@spelltooltip205448
-  SpellInfo(void_bolt channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(void_bolt void_bolt=1)
+Define(void_bolt_shadow 231688)
+# Void Bolt extends the duration of your Shadow Word: Pain and Vampiric Touch on all nearby targets by @switch<s2>[s1/1000][s1/1000.1] sec.
+  SpellInfo(void_bolt_shadow channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(void_bolt_shadow void_bolt_shadow=1)
 Define(void_eruption 228260)
 # Releases an explosive blast of pure void energy, activating Voidform and causing 228360s1*2 Shadow damage to all enemies within a1 yds of your target.rnrnDuring Voidform, this ability is replaced by Void Bolt.rnrn|cFFFFFFFFRequires C/100 Insanity to activate.|r
   SpellInfo(void_eruption insanity=9000)
@@ -79,10 +79,10 @@ Define(void_torrent 205065)
   SpellAddTargetDebuff(void_torrent void_torrent=1)
   # Dealing s1 Shadow damage to the target every t sec.rnrnInsanity drain temporarily stopped.
   SpellAddBuff(void_torrent void_torrent=1)
-Define(voidform_buff 218413)
-# @spelldesc194249
-  SpellInfo(voidform_buff gcd=0 offgcd=1)
-  SpellAddBuff(voidform_buff voidform_buff=1)
+Define(voidform_shadow 228264)
+# Activated by casting Void Eruption. Twists your Shadowform with the powers of the Void, increasing spell damage you deal by 194249s1?s8092[, reducing the cooldown on Mind Blast by 194249m6/-1000.1 sec,][] and granting an additional s2/10.1 Haste every 194249t5 sec.rnrnYour Insanity will drain increasingly fast until it reaches 0 and Voidform ends.
+  SpellInfo(voidform_shadow channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(voidform_shadow voidform_shadow=1)
 Define(dark_void_talent 9)
 # Unleashes an explosion of dark energy around the target, dealing s1 Shadow damage and applying Shadow Word: Pain to all nearby enemies.rnrn|cFFFFFFFFGenerates s2/100 Insanity.|r
 Define(misery_talent 8)
@@ -91,7 +91,7 @@ Define(dark_ascension_talent 20)
 # Immediately activates a new Voidform, then releases an explosive blast of pure void energy, causing 280800s1*2 Shadow damage to all enemies within a1 yds of your target.rnrn|cFFFFFFFFGenerates s2/100 Insanity.|r
 Define(dark_void_talent 9)
 # Unleashes an explosion of dark energy around the target, dealing s1 Shadow damage and applying Shadow Word: Pain to all nearby enemies.rnrn|cFFFFFFFFGenerates s2/100 Insanity.|r
-Define(mindbender_talent 8)
+Define(mindbender_talent_priest 8)
 # Summons a Mindbender to attack the target for d. You regenerate 123051m1/100.1 of maximum mana each time the Mindbender attacks.
 Define(shadow_crash_talent 15)
 # Hurl a bolt of slow-moving Shadow energy at the destination, dealing 205386s1 Shadow damage to all targets within 205386A1 yards.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r

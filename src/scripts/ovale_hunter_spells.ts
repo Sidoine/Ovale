@@ -6,7 +6,7 @@ export function register() {
 // ANY CHANGES MADE BELOW THIS POINT WILL BE LOST
     let code = `Define(a_murder_of_crows 131894)
 # Summons a flock of crows to attack your target, dealing 131900s1*16 Physical damage over d. If the target dies while under attack, A Murder of Crows' cooldown is reset.
-  SpellInfo(a_murder_of_crows focus=30 cd=60 duration=15 talent=a_murder_of_crows_talent tick=1)
+  SpellInfo(a_murder_of_crows focus=30 cd=60 duration=15 talent=a_murder_of_crows_talent_hunter tick=1)
   # Under attack by a flock of crows.
   SpellAddTargetDebuff(a_murder_of_crows a_murder_of_crows=1)
 Define(aimed_shot 19434)
@@ -36,7 +36,7 @@ Define(barbed_shot 217200)
   SpellAddTargetDebuff(barbed_shot barbed_shot=1)
 Define(barrage 120360)
 # Rapidly fires a spray of shots for 120360d, dealing an average of <damageSec> Physical damage to all enemies in front of you. Usable while moving.
-  SpellInfo(barrage focus=60 cd=20 duration=3 channel=3 talent=barrage_talent tick=0.2)
+  SpellInfo(barrage focus=60 cd=20 duration=3 channel=3 talent=barrage_talent_hunter tick=0.2)
 Define(berserking 26297)
 # Increases your haste by s1 for d.
   SpellInfo(berserking cd=180 duration=10 gcd=0 offgcd=1)
@@ -102,6 +102,9 @@ Define(hunters_mark 257284)
 Define(kill_command 34026)
 # Give the command to kill, causing your pet to savagely deal <damage> Physical damage to the enemy.
   SpellInfo(kill_command focus=30 cd=7.5 channel=0)
+Define(kill_command_survival 259489)
+# Give the command to kill, causing your pet to savagely deal <damage> Physical damage to the enemy.?s263186[rnrnHas a s2 chance to immediately reset its cooldown.][]rnrn|cFFFFFFFFGenerates s3 Focus.|r
+  SpellInfo(kill_command_survival cd=6 channel=0 focus=-15)
 Define(lethal_shots_buff 260395)
 # @spelldesc260393
   SpellInfo(lethal_shots_buff duration=15 gcd=0 offgcd=1)
@@ -169,8 +172,6 @@ Define(wildfire_bomb 259495)
 # Hurl a bomb at the target, exploding for 265157s1 Fire damage in a cone and coating enemies in wildfire, scorching them for 269747o1 Fire damage over 269747d.
   SpellInfo(wildfire_bomb cd=18)
   SpellAddTargetDebuff(wildfire_bomb wildfire_bomb_debuff=1)
-Define(barrage_talent 17)
-# Rapidly fires a spray of shots for 120360d, dealing an average of <damageSec> Physical damage to all enemies in front of you. Usable while moving.
 Define(lethal_shots_talent 16)
 # Steady Shot has a h chance to cause your next Aimed Shot or Rapid Fire to be guaranteed critical strikes.
 Define(steady_focus_talent 10)
@@ -187,9 +188,9 @@ Define(vipers_venom_talent 1)
 # ?s259387[Mongoose Bite][Raptor Strike] has a chance to make your next Serpent Sting cost no Focus and deal an additional 268552s1 initial damage.
 Define(wildfire_infusion_talent 20)
 # Lace your Wildfire Bomb with extra reagents, randomly giving it one of the following enhancements each time you throw it:rnrn|cFFFFFFFFShrapnel Bomb: |rShrapnel pierces the targets, causing ?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] to apply a bleed for 270343d that stacks up to 270343u times.rnrn|cFFFFFFFFPheromone Bomb: |rKill Command has a 270323s2 chance to reset against targets coated with Pheromones.rnrn|cFFFFFFFFVolatile Bomb: |rReacts violently with poison, causing an extra explosion against enemies suffering from your Serpent Sting and refreshes your Serpent Stings.
-Define(a_murder_of_crows_talent 12)
+Define(a_murder_of_crows_talent_hunter 12)
 # Summons a flock of crows to attack your target, dealing 131900s1*16 Physical damage over d. If the target dies while under attack, A Murder of Crows' cooldown is reset.
-Define(barrage_talent 17)
+Define(barrage_talent_hunter 17)
 # Rapidly fires a spray of shots for 120360d, dealing an average of <damageSec> Physical damage to all enemies in front of you. Usable while moving.
 Define(butchery_talent 6)
 # Strike all nearby enemies in a flurry of strikes, inflicting s1 Physical damage to each.rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit, up to s3.

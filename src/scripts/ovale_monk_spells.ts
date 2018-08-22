@@ -26,12 +26,13 @@ Define(blackout_combo_buff 228563)
   SpellInfo(blackout_combo_buff duration=15 gcd=0 offgcd=1)
   # Your next ability is empowered.
   SpellAddBuff(blackout_combo_buff blackout_combo_buff=1)
-Define(blackout_kick 100784)
-# Kick with a blast of Chi energy, dealing ?s137025[s1*<CAP>/AP][s1] Physical damage.?c3[rnrnReduces the cooldown of Rising Sun Kick and Fists of Fury by m3/1000.1 sec when used.][]
-  SpellInfo(blackout_kick chi=3 cd=3)
+Define(blackout_kick_windwalker 261917)
+# Blackout Kick costs s1 fewer Chi.
+  SpellInfo(blackout_kick_windwalker channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(blackout_kick_windwalker blackout_kick_windwalker=1)
 Define(blackout_strike 205523)
 # Strike with a blast of Chi energy, dealing s1 Physical damage?s117906[ and generating a stack of Elusive Brawler][].
-  SpellInfo(blackout_strike cd=3 replace=blackout_kick)
+  SpellInfo(blackout_strike cd=3)
 Define(breath_of_fire 115181)
 # Breathe fire on targets in front of you, causing s1 Fire damage.rnrnTargets affected by Keg Smash will also burn, taking 123725o1 Fire damage and dealing 123725s2 reduced damage to you for 123725d.
   SpellInfo(breath_of_fire cd=15 gcd=1)
@@ -154,7 +155,7 @@ Define(fist_of_the_white_tiger_talent 8)
 Define(good_karma_talent 11)
 # Touch of Karma can now redirect an additional s1 of your maximum health.
 Define(rushing_jade_wind_talent 17)
-# Summons a whirling tornado around you, causing (1+d/t1)*148187s1 damage every t1 sec to all enemies within 107270A1 yards.
+# Summons a whirling tornado around you, causing (1+d/t1)*148187s1 damage over d to enemies within 107270A1 yards.?s220357[ Applies Mark of the Crane to up to s2 nearby targets.][]
 Define(serenity_talent 21)
 # Enter an elevated state of mental and physical serenity for ?s115069[s1 sec][d]. While in this state, you deal s2 increased damage and healing, and all Chi consumers are free and cool down s4 more quickly.
 Define(black_ox_brew_talent 9)
@@ -165,8 +166,6 @@ Define(chi_wave_talent 2)
 # A wave of Chi energy flows through friends and foes, dealing 132467s1 Nature damage or 132463s1 healing. Bounces up to s1 times to targets within 132466a2 yards.
 Define(dampen_harm_talent 15)
 # Reduces all damage you take by m2 to m3 for d, with larger attacks being reduced by more.
-Define(rushing_jade_wind_talent 17)
-# Summons a whirling tornado around you, causing (1+d/t1)*148187s1 damage over d to enemies within 107270A1 yards.?s220357[ Applies Mark of the Crane to up to s2 nearby targets.][]
 Define(whirling_dragon_punch_talent 20)
 # Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
 Define(drinking_horn_cover_item 137097)

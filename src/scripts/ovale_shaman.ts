@@ -72,7 +72,7 @@ AddFunction ElementalSingletargetMainActions
  #lava_beam,if=talent.ascendance.enabled&active_enemies>1&spell_targets.lava_beam>1
  if Talent(ascendance_talent) and Enemies() > 1 and Enemies() > 1 Spell(lava_beam)
  #chain_lightning,if=active_enemies>1&spell_targets.chain_lightning>1
- if Enemies() > 1 and Enemies() > 1 Spell(chain_lightning)
+ if Enemies() > 1 and Enemies() > 1 Spell(chain_lightning_elemental)
  #lightning_bolt
  Spell(lightning_bolt_elemental)
  #flame_shock,moving=1,target_if=refreshable
@@ -106,7 +106,7 @@ AddFunction ElementalSingletargetShortCdActions
 
 AddFunction ElementalSingletargetShortCdPostConditions
 {
- { not target.DebuffPresent(flame_shock_debuff) or target.DebuffRemaining(flame_shock_debuff) <= GCD() } and Spell(flame_shock) or Talent(elemental_blast_talent) and { Talent(master_of_the_elements_talent) and BuffPresent(master_of_the_elements_buff) and Maelstrom() < 60 or not Talent(master_of_the_elements_talent) } and Spell(elemental_blast) or Enemies() > 1 and Enemies() > 1 and not Talent(exposed_elements_talent) and Spell(earthquake) or Talent(exposed_elements_talent) and target.DebuffPresent(exposed_elements_debuff) and Maelstrom() >= 60 and not BuffPresent(ascendance_elemental_buff) and Spell(lightning_bolt_elemental) or { Talent(master_of_the_elements_talent) and { BuffPresent(master_of_the_elements_buff) or Maelstrom() >= 92 } or not Talent(master_of_the_elements_talent) } and Spell(earth_shock) or { not SpellCooldown(lava_burst) > 0 or BuffPresent(ascendance_elemental_buff) } and Spell(lava_burst) or target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Talent(totem_mastery_talent) and { TotemRemaining(totem_mastery) < 6 or TotemRemaining(totem_mastery) < BaseDuration(ascendance_elemental_buff) + SpellCooldown(ascendance_elemental) and SpellCooldown(ascendance_elemental) < 15 } and Spell(totem_mastery_elemental) or Talent(icefury_talent) and BuffPresent(icefury_buff) and Spell(frost_shock) or Talent(ascendance_talent) and Enemies() > 1 and Enemies() > 1 and Spell(lava_beam) or Enemies() > 1 and Enemies() > 1 and Spell(chain_lightning) or Spell(lightning_bolt_elemental) or Speed() > 0 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Speed() > 0 and target.Distance() > 6 and Spell(flame_shock) or Speed() > 0 and Spell(frost_shock)
+ { not target.DebuffPresent(flame_shock_debuff) or target.DebuffRemaining(flame_shock_debuff) <= GCD() } and Spell(flame_shock) or Talent(elemental_blast_talent) and { Talent(master_of_the_elements_talent) and BuffPresent(master_of_the_elements_buff) and Maelstrom() < 60 or not Talent(master_of_the_elements_talent) } and Spell(elemental_blast) or Enemies() > 1 and Enemies() > 1 and not Talent(exposed_elements_talent) and Spell(earthquake) or Talent(exposed_elements_talent) and target.DebuffPresent(exposed_elements_debuff) and Maelstrom() >= 60 and not BuffPresent(ascendance_elemental_buff) and Spell(lightning_bolt_elemental) or { Talent(master_of_the_elements_talent) and { BuffPresent(master_of_the_elements_buff) or Maelstrom() >= 92 } or not Talent(master_of_the_elements_talent) } and Spell(earth_shock) or { not SpellCooldown(lava_burst) > 0 or BuffPresent(ascendance_elemental_buff) } and Spell(lava_burst) or target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Talent(totem_mastery_talent) and { TotemRemaining(totem_mastery) < 6 or TotemRemaining(totem_mastery) < BaseDuration(ascendance_elemental_buff) + SpellCooldown(ascendance_elemental) and SpellCooldown(ascendance_elemental) < 15 } and Spell(totem_mastery_elemental) or Talent(icefury_talent) and BuffPresent(icefury_buff) and Spell(frost_shock) or Talent(ascendance_talent) and Enemies() > 1 and Enemies() > 1 and Spell(lava_beam) or Enemies() > 1 and Enemies() > 1 and Spell(chain_lightning_elemental) or Spell(lightning_bolt_elemental) or Speed() > 0 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Speed() > 0 and target.Distance() > 6 and Spell(flame_shock) or Speed() > 0 and Spell(frost_shock)
 }
 
 AddFunction ElementalSingletargetCdActions
@@ -122,7 +122,7 @@ AddFunction ElementalSingletargetCdActions
 
 AddFunction ElementalSingletargetCdPostConditions
 {
- { not target.DebuffPresent(flame_shock_debuff) or target.DebuffRemaining(flame_shock_debuff) <= GCD() } and Spell(flame_shock) or Talent(elemental_blast_talent) and { Talent(master_of_the_elements_talent) and BuffPresent(master_of_the_elements_buff) and Maelstrom() < 60 or not Talent(master_of_the_elements_talent) } and Spell(elemental_blast) or Talent(stormkeeper_talent) and { 0 < 3 or 600 > 50 } and Spell(stormkeeper) or Talent(liquid_magma_totem_talent) and { 0 < 3 or 600 > 50 } and Spell(liquid_magma_totem) or Enemies() > 1 and Enemies() > 1 and not Talent(exposed_elements_talent) and Spell(earthquake) or Talent(exposed_elements_talent) and target.DebuffPresent(exposed_elements_debuff) and Maelstrom() >= 60 and not BuffPresent(ascendance_elemental_buff) and Spell(lightning_bolt_elemental) or { Talent(master_of_the_elements_talent) and { BuffPresent(master_of_the_elements_buff) or Maelstrom() >= 92 } or not Talent(master_of_the_elements_talent) } and Spell(earth_shock) or { not SpellCooldown(lava_burst) > 0 or BuffPresent(ascendance_elemental_buff) } and Spell(lava_burst) or target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Talent(totem_mastery_talent) and { TotemRemaining(totem_mastery) < 6 or TotemRemaining(totem_mastery) < BaseDuration(ascendance_elemental_buff) + SpellCooldown(ascendance_elemental) and SpellCooldown(ascendance_elemental) < 15 } and Spell(totem_mastery_elemental) or Talent(icefury_talent) and BuffPresent(icefury_buff) and Spell(frost_shock) or Talent(icefury_talent) and Spell(icefury) or Talent(ascendance_talent) and Enemies() > 1 and Enemies() > 1 and Spell(lava_beam) or Enemies() > 1 and Enemies() > 1 and Spell(chain_lightning) or Spell(lightning_bolt_elemental) or Speed() > 0 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Speed() > 0 and target.Distance() > 6 and Spell(flame_shock) or Speed() > 0 and Spell(frost_shock)
+ { not target.DebuffPresent(flame_shock_debuff) or target.DebuffRemaining(flame_shock_debuff) <= GCD() } and Spell(flame_shock) or Talent(elemental_blast_talent) and { Talent(master_of_the_elements_talent) and BuffPresent(master_of_the_elements_buff) and Maelstrom() < 60 or not Talent(master_of_the_elements_talent) } and Spell(elemental_blast) or Talent(stormkeeper_talent) and { 0 < 3 or 600 > 50 } and Spell(stormkeeper) or Talent(liquid_magma_totem_talent) and { 0 < 3 or 600 > 50 } and Spell(liquid_magma_totem) or Enemies() > 1 and Enemies() > 1 and not Talent(exposed_elements_talent) and Spell(earthquake) or Talent(exposed_elements_talent) and target.DebuffPresent(exposed_elements_debuff) and Maelstrom() >= 60 and not BuffPresent(ascendance_elemental_buff) and Spell(lightning_bolt_elemental) or { Talent(master_of_the_elements_talent) and { BuffPresent(master_of_the_elements_buff) or Maelstrom() >= 92 } or not Talent(master_of_the_elements_talent) } and Spell(earth_shock) or { not SpellCooldown(lava_burst) > 0 or BuffPresent(ascendance_elemental_buff) } and Spell(lava_burst) or target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Talent(totem_mastery_talent) and { TotemRemaining(totem_mastery) < 6 or TotemRemaining(totem_mastery) < BaseDuration(ascendance_elemental_buff) + SpellCooldown(ascendance_elemental) and SpellCooldown(ascendance_elemental) < 15 } and Spell(totem_mastery_elemental) or Talent(icefury_talent) and BuffPresent(icefury_buff) and Spell(frost_shock) or Talent(icefury_talent) and Spell(icefury) or Talent(ascendance_talent) and Enemies() > 1 and Enemies() > 1 and Spell(lava_beam) or Enemies() > 1 and Enemies() > 1 and Spell(chain_lightning_elemental) or Spell(lightning_bolt_elemental) or Speed() > 0 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Speed() > 0 and target.Distance() > 6 and Spell(flame_shock) or Speed() > 0 and Spell(frost_shock)
 }
 
 ### actions.precombat
@@ -183,7 +183,7 @@ AddFunction ElementalAoeMainActions
  #lava_beam,if=talent.ascendance.enabled
  if Talent(ascendance_talent) Spell(lava_beam)
  #chain_lightning
- Spell(chain_lightning)
+ Spell(chain_lightning_elemental)
  #lava_burst,moving=1,if=talent.ascendance.enabled
  if Speed() > 0 and Talent(ascendance_talent) Spell(lava_burst)
  #flame_shock,moving=1,target_if=refreshable
@@ -206,7 +206,7 @@ AddFunction ElementalAoeShortCdActions
 
 AddFunction ElementalAoeShortCdPostConditions
 {
- Enemies() < 4 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Spell(earthquake) or { BuffPresent(lava_surge_buff) or BuffPresent(ascendance_elemental_buff) } and Enemies() < 4 and Spell(lava_burst) or Talent(elemental_blast_talent) and Enemies() < 4 and Spell(elemental_blast) or Talent(ascendance_talent) and Spell(lava_beam) or Spell(chain_lightning) or Speed() > 0 and Talent(ascendance_talent) and Spell(lava_burst) or Speed() > 0 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Speed() > 0 and Spell(frost_shock)
+ Enemies() < 4 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Spell(earthquake) or { BuffPresent(lava_surge_buff) or BuffPresent(ascendance_elemental_buff) } and Enemies() < 4 and Spell(lava_burst) or Talent(elemental_blast_talent) and Enemies() < 4 and Spell(elemental_blast) or Talent(ascendance_talent) and Spell(lava_beam) or Spell(chain_lightning_elemental) or Speed() > 0 and Talent(ascendance_talent) and Spell(lava_burst) or Speed() > 0 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Speed() > 0 and Spell(frost_shock)
 }
 
 AddFunction ElementalAoeCdActions
@@ -220,7 +220,7 @@ AddFunction ElementalAoeCdActions
 
 AddFunction ElementalAoeCdPostConditions
 {
- Talent(stormkeeper_talent) and Spell(stormkeeper) or Talent(liquid_magma_totem_talent) and Spell(liquid_magma_totem) or Enemies() < 4 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Spell(earthquake) or { BuffPresent(lava_surge_buff) or BuffPresent(ascendance_elemental_buff) } and Enemies() < 4 and Spell(lava_burst) or Talent(elemental_blast_talent) and Enemies() < 4 and Spell(elemental_blast) or Talent(ascendance_talent) and Spell(lava_beam) or Spell(chain_lightning) or Speed() > 0 and Talent(ascendance_talent) and Spell(lava_burst) or Speed() > 0 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Speed() > 0 and Spell(frost_shock)
+ Talent(stormkeeper_talent) and Spell(stormkeeper) or Talent(liquid_magma_totem_talent) and Spell(liquid_magma_totem) or Enemies() < 4 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Spell(earthquake) or { BuffPresent(lava_surge_buff) or BuffPresent(ascendance_elemental_buff) } and Enemies() < 4 and Spell(lava_burst) or Talent(elemental_blast_talent) and Enemies() < 4 and Spell(elemental_blast) or Talent(ascendance_talent) and Spell(lava_beam) or Spell(chain_lightning_elemental) or Speed() > 0 and Talent(ascendance_talent) and Spell(lava_burst) or Speed() > 0 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Speed() > 0 and Spell(frost_shock)
 }
 
 ### actions.default
@@ -375,7 +375,7 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 # blood_fury_apsp
 # bloodlust
 # capacitor_totem
-# chain_lightning
+# chain_lightning_elemental
 # earth_elemental
 # earth_shock
 # earthquake

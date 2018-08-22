@@ -31,9 +31,9 @@ Define(bloodlust 2825)
 Define(capacitor_totem 192058)
 # Summons a totem at the target location that gathers electrical energy from the surrounding air and explodes after s2 sec, stunning all enemies within 118905A1 yards for 118905d.
   SpellInfo(capacitor_totem cd=60 duration=3 gcd=1)
-Define(chain_lightning 421)
-# Hurls a lightning bolt at the enemy, dealing s1 Nature damage and then jumping to additional nearby enemies. Affects x1 total targets.
-  SpellInfo(chain_lightning)
+Define(chain_lightning_elemental 188443)
+# Hurls a lightning bolt at the enemy, dealing s1 Nature damage and then jumping to additional nearby enemies. Affects x1 total targets.rnrn|cFFFFFFFFGenerates s2 Maelstrom per target hit.|r 
+  SpellInfo(chain_lightning_elemental)
 Define(crash_lightning 187874)
 # Electrocutes all enemies in front of you, dealing s1*<CAP>/AP Nature damage. Hitting 2 or more targets enhances your weapons for 187878d, causing Stormstrike and Lava Lash to also deal 195592s1*<CAP>/AP Nature damage to all targets in front of you.  rnrnEach target hit by Crash Lightning increases the damage of your next Stormstrike by s2.
   SpellInfo(crash_lightning maelstrom=20 cd=6)
@@ -129,6 +129,12 @@ Define(lava_burst 51505)
 Define(lava_lash 60103)
 # Charges your off-hand weapon with lava and burns your target, dealing s1 Fire damage.
   SpellInfo(lava_lash maelstrom=40)
+Define(lightning_bolt_enhancement 187837)
+# Fires a bolt of lightning at the target, dealing ?s210727[up to (1+210727m2/100)*s1][s1] Nature damage.
+  SpellInfo(lightning_bolt_enhancement)
+Define(lightning_bolt_elemental 188196)
+# Hurls a bolt of lightning at the target, dealing s1 Nature damage.?a187828[rnrn|cFFFFFFFFGenerates 190493s1 Maelstrom.|r ][]
+  SpellInfo(lightning_bolt_elemental)
 Define(lightning_conduit_debuff 275388)
 # Stormstrike marks the target as a Lightning Conduit for 275391d. Stormstrike deals s1 Nature damage to all enemies you've marked as Conduits.
   SpellInfo(lightning_conduit_debuff channel=0 gcd=0 offgcd=1)
@@ -182,7 +188,7 @@ Define(windstrike 115356)
 # Hurl a staggering blast of wind at an enemy, dealing a total of 115357sw1+115360sw1 Physical damage, bypassing armor.
   SpellInfo(windstrike maelstrom=30 cd=9)
 Define(ascendance_talent 21)
-# Transform into a Water Ascendant for 114051d, causing all healing you deal to be duplicated and distributed evenly among nearby allies.
+# Transform into a Flame Ascendant for d, replacing Chain Lightning with Lava Beam, removing the cooldown on Lava Burst, and increasing the damage of Lava Burst by an amount equal to your critical strike chance.
 Define(elemental_blast_talent 3)
 # Harnesses the raw power of the elements, dealing s1 Elemental damage and increasing your Critical Strike, Haste, or Mastery by 118522s1 for 118522d.
 Define(exposed_elements_talent 1)
@@ -198,7 +204,7 @@ Define(storm_elemental_talent 11)
 Define(stormkeeper_talent 20)
 # Charge yourself with lightning, causing your next n Lightning Bolts or Chain Lightnings to be instant cast and trigger an Elemental Overload on every target.
 Define(totem_mastery_talent 6)
-# Summons four totems that increase your combat capabilities for 202188d.rnrn|cFFFFFFFFResonance Totem|rrnGenerates 202192s1 Maelstrom every 202192t1 sec.rnrn|cFFFFFFFFStorm Totem|rrnIncreases the chance for Lightning Bolt and Chain Lightning to trigger Elemental Overload by 210651s1.rnrn|cFFFFFFFFEmber Totem|rrnIncreases Flame Shock damage over time by 210658s1.rnrn|cFFFFFFFFTailwind Totem|rrnIncreases your Haste by 210659s1.
+# Summons four totems that increase your combat capabilities for 202188d.rnrn|cFFFFFFFFResonance Totem|rrnGenerates 262417s1 Maelstrom every 262417t1 sec.rnrn|cFFFFFFFFStorm Totem|rrnIncreases the damage of Stormstrike by 262397s1.rnrn|cFFFFFFFFEmber Totem|rrnIncreases Lava Lash damage by 262399s1.rnrn|cFFFFFFFFTailwind Totem|rrnIncreases your chance to trigger Windfury by 262400s1.
 Define(crashing_storm_talent 16)
 # Crash Lightning also electrifies the ground, leaving an electrical field behind which damages enemies within it for 7*210801s1 Nature damage over 210797d. 
 Define(elemental_spirits_talent 19)
@@ -430,12 +436,12 @@ Define(icy_edge_buff 224126)
 	SpellRequire(lava_lash maelstrom_percent 0=buff,hot_hand_buff)
 Define(lava_surge_buff 77762)
 	SpellInfo(lava_surge_buff duration=10)
-Define(lightning_bolt_elemental 188196)
+
 	SpellInfo(lightning_bolt_elemental maelstrom=-8 cd=0)
 	SpellAddBuff(lightning_bolt_elemental stormkeeper_buff=-1 talent=stormkeeper_talent)
 	SpellAddTargetDebuff(lightning_bolt_elemental exposed_elements_debuff=0 talent=exposed_elements_talent)
 	SpellAddBuff(lightning_bolt_elemental master_of_the_elements_buff=-1 talent=master_of_the_elements_talent specialization=elemental)
-Define(lightning_bolt_enhancement 187837)
+
 	SpellInfo(lightning_bolt_enhancement cd=12 cd_haste=melee)
 	SpellInfo(lightning_bolt_enhancement maelstrom=0 max_maelstrom=40 talent=overcharge_talent)
 Define(lightning_bolt 403)

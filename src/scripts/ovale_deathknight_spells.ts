@@ -572,7 +572,7 @@ Define(bloodworms_talent 17)
 
 
 
-Define(consumption_talent 6)
+
 Define(death_pact_talent 15)
 Define(deaths_reach_talent 7)
 Define(deaths_reach_talent_unholy 8)
