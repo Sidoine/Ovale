@@ -14,10 +14,10 @@ Define(arcane_barrage 44425)
   SpellInfo(arcane_barrage cd=3)
 Define(arcane_blast 30451)
 # Blasts the target with energy, dealing 30451s1 Arcane damage.rnrnEach Arcane Charge increases damage by 36032s1 and mana cost by 36032s5, and reduces cast time by 36032s4.rnrn|cFFFFFFFFGenerates 1 Arcane Charge.|r
-  SpellInfo(arcane_blast undefined=-1)
+  SpellInfo(arcane_blast arcanecharges=-1)
 Define(arcane_explosion 1449)
 # Causes an explosion of magic around the caster, dealing s2 Arcane damage to all enemies within A2 yards.rnrn|cFFFFFFFFGenerates s1 Arcane Charge if any targets are hit.|r
-  SpellInfo(arcane_explosion undefined=-1 undefined=-1)
+  SpellInfo(arcane_explosion arcanecharges=-1 arcanecharges=-1)
 Define(arcane_familiar 205022)
 # Summon a Familiar that attacks your enemies and increases your maximum mana by 210126s1 for d.
   SpellInfo(arcane_familiar cd=10 duration=3600 talent=arcane_familiar_talent)
@@ -34,7 +34,7 @@ Define(arcane_missiles 5143)
   SpellAddBuff(arcane_missiles arcane_missiles=1)
 Define(arcane_orb 153626)
 # Launches an Arcane Orb forward from your position, traveling up to 40 yards, dealing 153640s1 Arcane damage to enemies it passes through.rnrn|cFFFFFFFFGrants 1 Arcane Charge when cast and every time it deals damage.|r
-  SpellInfo(arcane_orb cd=20 duration=2.5 talent=arcane_orb_talent undefined=-1)
+  SpellInfo(arcane_orb cd=20 duration=2.5 talent=arcane_orb_talent arcanecharges=-1)
 Define(arcane_power 12042)
 # For d, you deal s1 more spell damage and your spells cost s2 less mana.
   SpellInfo(arcane_power cd=90 duration=10)
@@ -70,7 +70,7 @@ Define(blizzard 190356)
   SpellInfo(blizzard cd=8 duration=8)
 Define(charged_up 205032)
 # Immediately grants s1 Arcane Charges.
-  SpellInfo(charged_up cd=40 duration=10 talent=charged_up_talent undefined=-4)
+  SpellInfo(charged_up cd=40 duration=10 talent=charged_up_talent arcanecharges=-4)
   SpellAddBuff(charged_up charged_up=1)
 Define(clearcasting 79684)
 # For each c*100/s1 mana you spend, you have a 1 chance to gain Clearcasting, making your next Arcane Missiles or Arcane Explosion free and channel 277726s1 faster.
@@ -296,9 +296,7 @@ SpellRequire(arcane_intellect unusable 1=buff,arcane_intellect)
 Define(arcane_affinity 166871)
 	SpellInfo(arcane_affinity duration=15)
 
-	SpellInfo(arcane_barrage cd=3 travel_time=1 arcanecharges=finisher)
-
-	SpellAddBuff(arcane_blast presence_of_mind_buff=0 if_spell=presence_of_mind arcanecharges=-1)
+	SpellAddBuff(arcane_blast presence_of_mind_buff=0 if_spell=presence_of_mind)
 	SpellAddBuff(arcane_blast profound_magic_buff=0 itemset=T16_caster itemcount=2 specialization=arcane)
 	SpellAddBuff(arcane_blast ice_floes_buff=0 if_spell=ice_floes)
 Define(arcane_brilliance 1459)

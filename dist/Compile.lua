@@ -345,8 +345,13 @@ local function EvaluateSpellAuraList(node)
         local count = 0
         for k, v in kpairs(namedParams) do
             if  not checkToken(PARAMETER_KEYWORD, k) then
-                tbl[tonumber(k)] = v
-                count = count + 1
+                local id = tonumber(k)
+                if id == nil then
+                    __exports.OvaleCompile:Print("Info: " .. k .. " is not a parameter keyword in '" .. node.name .. "' " .. node.type)
+                else
+                    tbl[tonumber(k)] = v
+                    count = count + 1
+                end
             end
         end
         if count > 0 then

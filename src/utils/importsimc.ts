@@ -9,6 +9,7 @@ import { OvaleSimulationCraft, Annotation } from "../SimulationCraft";
 import  { registerScripts } from "../scripts/index";
 import { getSpellData, PowerType, SpellPowerData, isFriendlyTarget, EffectType, SpellData, SpellAttributes } from "./importspells";
 import { ipairs } from "@wowts/lua";
+import { PowerType as OvalePowerType } from "../Power";
 
 let outputDirectory = "src/scripts";
 const simcDirectory = process.argv[2];
@@ -194,18 +195,14 @@ for (const filename of files) {
     }
 }
 
-function getPowerName(power: PowerType) {
+function getPowerName(power: PowerType): OvalePowerType | "runes" | "health" {
     switch (power) {
         case PowerType.POWER_ASTRAL_POWER:
-            return "astral_power";
-        case PowerType.POWER_BURNING_EMBER:
-            return "burning_ember";
+            return "lunarpower";
         case PowerType.POWER_CHI:
             return "chi";
         case PowerType.POWER_COMBO_POINT:
-            return "combo_points";
-        case PowerType.POWER_DEMONIC_FURY:
-            return "demonic_fury";
+            return "combopoints";
         case PowerType.POWER_ENERGY:
             return "energy";
         case PowerType.POWER_FOCUS:
@@ -232,8 +229,10 @@ function getPowerName(power: PowerType) {
             return "runicpower";
         case PowerType.POWER_SOUL_SHARDS:
             return "soulshards";
+        case PowerType.POWER_ARCANE_CHARGES:
+            return "arcanecharges";
         default:
-            return undefined;
+            throw Error(`Unknown power type ${power}`);
     }
 }
 

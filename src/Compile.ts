@@ -319,8 +319,13 @@ function EvaluateSpellAuraList(node: AstNode) {
         let count = 0;
         for (const [k, v] of kpairs(namedParams)) {
             if (!checkToken(PARAMETER_KEYWORD, k)) {
-                tbl[tonumber(k)] = <any>v;
-                count = count + 1;
+                const id = tonumber(k);
+                if (id === undefined) {
+                    OvaleCompile.Print(`Info: ${k} is not a parameter keyword in '${node.name}' ${node.type}`);
+                } else {
+                    tbl[tonumber(k)] = <any>v;
+                    count = count + 1;
+                }
             }
         }
         if (count > 0) {

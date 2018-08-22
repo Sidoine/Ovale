@@ -73,22 +73,22 @@ Define(feral_frenzy 274837)
   SpellAddBuff(feral_frenzy feral_frenzy=1)
 Define(ferocious_bite 22568)
 # Finishing move that causes Physical damage per combo point and consumes up to ?a106951[25*106951s1/-100.1]?a102543[25*102543s1/-100.1][25] additional Energy to increase damage by up to 100.rnrn?s202031[]?s231056[When used on targets below 25 health, ][]?s231056[Ferocious Bite will also refresh the duration of your Rip on your target.rnrn][]   1 point  : m1*1/5 damagern   2 points: m1*2/5 damagern   3 points: m1*3/5 damagern   4 points: m1*4/5 damagern   5 points: m1*5/5 damage
-  SpellInfo(ferocious_bite energy=25 combo_points=1 gcd=1)
+  SpellInfo(ferocious_bite energy=25 combopoints=1 gcd=1)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 265226d. 
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
 Define(force_of_nature 205636)
 # Summons a stand of s1 Treants for 248280d which immediately taunt and attack enemies in the targeted area.rnrn|cFFFFFFFFGenerates m5/10 Astral Power.|r
-  SpellInfo(force_of_nature cd=60 talent=force_of_nature_talent astral_power=-20)
+  SpellInfo(force_of_nature cd=60 talent=force_of_nature_talent lunarpower=-20)
 Define(full_moon 202771)
 # Deals m1 Arcane damage to the target and reduced damage to all other nearby enemies, and resets Full Moon to become New Moon.rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r
-  SpellInfo(full_moon cd=15 astral_power=-40)
+  SpellInfo(full_moon cd=15 lunarpower=-40)
 Define(fury_of_elune 211547)
 # @spelldesc202770
   SpellInfo(fury_of_elune cd=0.5 gcd=0 offgcd=1)
 Define(half_moon 202768)
 # Deals m1 Arcane damage to the target and empowers Half Moon to become Full Moon.rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
-  SpellInfo(half_moon cd=15 astral_power=-20)
+  SpellInfo(half_moon cd=15 lunarpower=-20)
 Define(incarnation 117679)
 # Activates a superior shapeshifting form appropriate to your specialization for d.  You may freely shapeshift in and out of this form for its duration.
   SpellInfo(incarnation duration=30 gcd=0 offgcd=1)
@@ -110,7 +110,7 @@ Define(lunar_beam 204066)
   SpellInfo(lunar_beam cd=75 duration=8.5 talent=lunar_beam_talent)
 Define(lunar_strike 194153)
 # Call down a strike of lunar energy, causing s1 Arcane damage to the target, and m1*m3/100 Arcane damage to all other enemies within A1 yards.rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r
-  SpellInfo(lunar_strike astral_power=-12)
+  SpellInfo(lunar_strike lunarpower=-12)
 Define(mangle 33917)
 # Mangle the target for s2 Physical damage.?a231064[ Deals s3 additional damage against bleeding targets.][]rnrn|cFFFFFFFFGenerates m4/10 Rage.|r
   SpellInfo(mangle cd=6 rage=-8)
@@ -119,7 +119,7 @@ Define(maul 6807)
   SpellInfo(maul rage=45)
 Define(moonfire 8921)
 # A quick beam of lunar light burns the enemy for 164812s1 Arcane damage and then an additional 164812o2 Arcane damage over 164812d.?s5487[ Usable while in Bear Form.][]?s197911[rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r][]
-  SpellInfo(moonfire rage=0 astral_power=0)
+  SpellInfo(moonfire rage=0 lunarpower=0)
 Define(moonkin_form 24858)
 # Shapeshift into ?s114301[Astral Form][Moonkin Form], increasing the damage of your spells by s9 and your armor by m3, and granting protection from Polymorph effects.?a231042[rnrnWhile in this form, single-target attacks against you have a h chance to make your next Lunar Strike instant.][]rnrnThe act of shapeshifting frees you from movement impairing effects.
   SpellInfo(moonkin_form)
@@ -127,7 +127,7 @@ Define(moonkin_form 24858)
   SpellAddBuff(moonkin_form moonkin_form=1)
 Define(new_moon 202767)
 # Deals m1 Arcane damage to the target and empowers New Moon to become Half Moon. rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
-  SpellInfo(new_moon cd=15 astral_power=-10)
+  SpellInfo(new_moon cd=15 lunarpower=-10)
 Define(prolonged_power 229206)
 # Drink to increase all stats by s1 for d.
   SpellInfo(prolonged_power cd=1 duration=60 gcd=0 offgcd=1)
@@ -158,7 +158,7 @@ Define(rake_debuff 155722)
   SpellAddTargetDebuff(rake_debuff rake_debuff=1)
 Define(rake 1822)
 # Rake the target for s1 Bleed damage and an additional 155722o1 Bleed damage over 155722d.?s48484[ Reduces the target's movement speed by 58180s1 for 58180d.][]?a231052[ rnrnWhile stealthed, Rake will also stun the target for 163505d, and deal s4 increased damage.][]rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
-  SpellInfo(rake energy=35 gcd=1 combo_points=-1)
+  SpellInfo(rake energy=35 gcd=1 combopoints=-1)
   # Bleeding for w1 damage every t1 seconds.
   SpellAddTargetDebuff(rake rake_debuff=1)
 Define(regrowth 8936)
@@ -168,12 +168,12 @@ Define(regrowth 8936)
   SpellAddBuff(regrowth regrowth=1)
 Define(rip 1079)
 # Finishing move that causes Bleed damage over d. Damage increases per combo point:rnrn   1 point : floor(1*<rip>*12) damagern   2 points: floor(2*<rip>*12) damagern   3 points: floor(3*<rip>*12) damagern   4 points: floor(4*<rip>*12) damagern   5 points: floor(5*<rip>*12) damage
-  SpellInfo(rip energy=30 combo_points=1 duration=24 gcd=1 tick=2)
+  SpellInfo(rip energy=30 combopoints=1 duration=24 gcd=1 tick=2)
   # Bleeding for w1 damage every t1 sec.
   SpellAddTargetDebuff(rip rip=1)
 Define(savage_roar 52610)
 # Finishing move that increases damage by 62071s1 while in Cat Form. Lasts longer per combo point:rnrn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds
-  SpellInfo(savage_roar energy=30 combo_points=1 duration=6 channel=6 talent=savage_roar_talent gcd=1 tick=2)
+  SpellInfo(savage_roar energy=30 combopoints=1 duration=6 channel=6 talent=savage_roar_talent gcd=1 tick=2)
   # Damage increased w2 while in Cat Form.
   SpellAddBuff(savage_roar savage_roar=1)
 Define(shadowmeld 58984)
@@ -183,21 +183,21 @@ Define(shadowmeld 58984)
   SpellAddBuff(shadowmeld shadowmeld=1)
 Define(shred 5221)
 # Shred the target, causing s1*<mult> Physical damage to the target.?a231063[ Deals s4 increased damage against bleeding targets.][]?a231057[rnrnWhile stealthed, Shred deals m3 increased damage, and has double the chance to critically strike.][]rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
-  SpellInfo(shred energy=40 gcd=1 combo_points=0)
+  SpellInfo(shred energy=40 gcd=1 combopoints=0)
 Define(solar_wrath 5176)
 # Causes s1 Nature damage to the target.
   SpellInfo(solar_wrath)
 Define(starfall 191034)
 # Calls down waves of falling stars at the targeted area, dealing 9*191037m1 Astral damage over 191034d.
-  SpellInfo(starfall astral_power=50 duration=8 channel=8)
+  SpellInfo(starfall lunarpower=50 duration=8 channel=8)
   # Calling down falling stars at the targeted area.
   SpellAddBuff(starfall starfall=1)
 Define(starsurge 78674)
 # Launch a surge of stellar energies at the target, dealing 78674s1 Astral damage.rnrnAlso grants you Lunar and Solar Empowerment.
-  SpellInfo(starsurge astral_power=40)
+  SpellInfo(starsurge lunarpower=40)
 Define(stellar_flare 202347)
 # Burns the target for s1 Astral damage, and then an additional o2 damage over d.rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
-  SpellInfo(stellar_flare duration=24 talent=stellar_flare_talent astral_power=-8 tick=2)
+  SpellInfo(stellar_flare duration=24 talent=stellar_flare_talent lunarpower=-8 tick=2)
   # Suffering w2 Astral damage every t2 sec.
   SpellAddTargetDebuff(stellar_flare stellar_flare=1)
 Define(sunblaze_buff 274398)
@@ -205,7 +205,7 @@ Define(sunblaze_buff 274398)
   SpellInfo(sunblaze_buff channel=-0.001 gcd=0 offgcd=1)
 Define(sunfire 93402)
 # A quick beam of solar light burns the enemy for 164815s1 Nature damage and then an additional 164815o2 Nature damage over 164815d?s231050[ to the primary target and all enemies within 164815A2 yards][].?s137013[rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r][]
-  SpellInfo(sunfire astral_power=0)
+  SpellInfo(sunfire lunarpower=0)
 Define(swipe 213764)
 # Swipe nearby enemies, inflicting Physical damage. Damage varies by shapeshift form.
   SpellInfo(swipe gcd=1)
@@ -509,9 +509,6 @@ Define(warrior_of_elune_buff 202425)
 	SpellInfo(sunfire_debuff add_duration=6 specialization=balance)
 
 # Balance Legendaries
-Define(the_emerald_dreamcatcher 137062)
-
-	SpellAddBuff(starsurge the_emerald_dreamcatcher_buff=-1)
 Define(oneths_intuition_buff 209406)
 Define(oneths_overconfidence_buff 209407)
 	SpellRequire(starfall astralpower_percent 0=buff,oneths_overconfidence_buff)

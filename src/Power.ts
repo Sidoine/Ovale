@@ -13,7 +13,7 @@ import { ceil, huge as INFINITY, floor } from "@wowts/math";
 import { pairs, LuaObj, tostring, tonumber, LuaArray } from "@wowts/lua";
 import { lower } from "@wowts/string";
 import { concat, insert } from "@wowts/table";
-import { GetPowerRegen, GetManaRegen, GetSpellPowerCost, UnitPower, UnitPowerMax, UnitPowerType, Enum, MAX_COMBO_POINTS } from "@wowts/wow-mock";
+import { GetPowerRegen, GetManaRegen, GetSpellPowerCost, UnitPower, UnitPowerMax, UnitPowerType, Enum, MAX_COMBO_POINTS, ClassId } from "@wowts/wow-mock";
 import { OvalePaperDoll } from "./PaperDoll";
 import { baseState } from "./BaseState";
 import { isNumber, isLuaArray } from "./tools";
@@ -315,7 +315,7 @@ class OvalePowerClass extends OvalePowerBase {
     }
 
     initializePower() {
-        let possiblePowerTypes: LuaObj<LuaObj<string>> = {
+        let possiblePowerTypes: {[k in ClassId]: {[k in PowerType]?: string}} = {
             DEATHKNIGHT:{
                 runicpower: "RUNIC_POWER",
             },
@@ -344,7 +344,7 @@ class OvalePowerClass extends OvalePowerBase {
             },
             PALADIN:{
                 mana: "MANA",
-            holypower: "HOLY_POWER",
+                holypower: "HOLY_POWER",
             },
             PRIEST:{
                 mana: "MANA",

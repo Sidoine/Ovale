@@ -652,7 +652,7 @@ export const enum PowerType {
   POWER_INSANITY      = 13,
   POWER_BURNING_EMBER = 14,
   POWER_DEMONIC_FURY  = 15,
-  // Not yet used?
+  POWER_ARCANE_CHARGES = 16,
   POWER_FURY          = 17,
   POWER_PAIN          = 18,
 }
