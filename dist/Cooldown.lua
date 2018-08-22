@@ -19,6 +19,7 @@ local UnregisterRequirement = __Requirement.UnregisterRequirement
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local next = next
 local pairs = pairs
+local tonumber = tonumber
 local GetSpellCooldown = GetSpellCooldown
 local GetTime = GetTime
 local GetSpellCharges = GetSpellCharges
@@ -52,7 +53,7 @@ local BASE_GCD = {
     },
     ["MONK"] = {
         [1] = 1,
-        [2] = false
+        [2] = "none"
     },
     ["PALADIN"] = {
         [1] = 1.5,
@@ -64,7 +65,7 @@ local BASE_GCD = {
     },
     ["ROGUE"] = {
         [1] = 1,
-        [2] = false
+        [2] = "none"
     },
     ["SHAMAN"] = {
         [1] = 1.5,
@@ -162,7 +163,7 @@ local OvaleCooldownClass = __class(OvaleCooldownBase, {
             local cd = self:GetCD(spellId, atTime)
             return cd.start, cd.duration, cd.enable
         end
-        local cdStart, cdDuration, cdEnable = 0, 0, 1
+        local cdStart, cdDuration, cdEnable = 0, 0, true
         if self.sharedCooldown[spellId] then
             for id in pairs(self.sharedCooldown[spellId]) do
                 local start, duration, enable = self:GetSpellCooldown(id, atTime)
@@ -317,19 +318,16 @@ local OvaleCooldownClass = __class(OvaleCooldownBase, {
             end
         end
         self.RequireCooldownHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
-            local cdSpellId = tokens
             local verified = false
-            if index then
-                cdSpellId = tokens[index]
-                index = index + 1
-            end
+            local cdSpellId = tokens[index]
+            index = index + 1
             if cdSpellId then
                 local isBang = false
                 if sub(cdSpellId, 1, 1) == "!" then
                     isBang = true
                     cdSpellId = sub(cdSpellId, 2)
                 end
-                local cd = self:GetCD(cdSpellId, atTime)
+                local cd = self:GetCD(tonumber(cdSpellId), atTime)
                 verified =  not isBang and cd.duration > 0 or isBang and cd.duration <= 0
                 local result = verified and "passed" or "FAILED"
                 self:Log("    Require spell %s %s cooldown at time=%f: %s (duration = %f)", cdSpellId, isBang and "OFF" or  not isBang and "ON", atTime, result, cd.duration)

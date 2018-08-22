@@ -12,9 +12,9 @@ let OvaleDamageTakenBase = OvaleProfiler.RegisterProfiling(OvaleDebug.RegisterDe
 export let OvaleDamageTaken: OvaleDamageTakenClass;
 
 interface Event{
-    timestamp;
-    damage;
-    magic;
+    timestamp: number;
+    damage: number;
+    magic: boolean;
 }
 let self_pool = new OvalePool<Event>("OvaleDamageTaken_pool");
 let DAMAGE_TAKEN_WINDOW = 20;
@@ -56,10 +56,10 @@ class OvaleDamageTakenClass extends OvaleDamageTakenBase {
             this.StopProfiling("OvaleDamageTaken_COMBAT_LOG_EVENT_UNFILTERED");
         }
     }
-    PLAYER_REGEN_ENABLED(event) {
+    PLAYER_REGEN_ENABLED(event: string) {
         self_pool.Drain();
     }
-    AddDamageTaken(timestamp, damage, isMagicDamage?) {
+    AddDamageTaken(timestamp: number, damage: number, isMagicDamage?: boolean) {
         this.StartProfiling("OvaleDamageTaken_AddDamageTaken");
         let event = self_pool.Get();
         event.timestamp = timestamp;
@@ -70,7 +70,7 @@ class OvaleDamageTakenClass extends OvaleDamageTakenBase {
         Ovale.needRefresh();
         this.StopProfiling("OvaleDamageTaken_AddDamageTaken");
     }
-    GetRecentDamage(interval) {
+    GetRecentDamage(interval: number) {
         let now = GetTime();
         let lowerBound = now - interval;
         this.RemoveExpiredEvents(now);
@@ -88,7 +88,7 @@ class OvaleDamageTakenClass extends OvaleDamageTakenBase {
         }
         return [total, totalMagic];
     }
-    RemoveExpiredEvents(timestamp) {
+    RemoveExpiredEvents(timestamp: number) {
         this.StartProfiling("OvaleDamageTaken_RemoveExpiredEvents");
         while (true) {
             let event = this.damageEvent.Back();

@@ -10,3 +10,6 @@ end
 __exports.isLuaArray = function(a)
     return type(a) == "table"
 end
+__exports.checkToken = function(type, token)
+    return type[token]
+end

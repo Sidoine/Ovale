@@ -308,7 +308,7 @@ AddFunction ProtectionDefaultMainActions
  #shield_of_the_righteous,if=(buff.avengers_valor.up&cooldown.shield_of_the_righteous.charges_fractional>=2.5)&(cooldown.seraphim.remains>gcd|!talent.seraphim.enabled)
  if BuffPresent(avengers_valor_buff) and SpellCharges(shield_of_the_righteous count=0) >= 2 and { SpellCooldown(seraphim) > GCD() or not Talent(seraphim_talent) } Spell(shield_of_the_righteous)
  #shield_of_the_righteous,if=(cooldown.shield_of_the_righteous.charges_fractional=3&cooldown.avenger_shield.remains>(2*gcd))
- if SpellCharges(shield_of_the_righteous count=0) == 3 and SpellCooldown(avenger_shield) > 2 * GCD() Spell(shield_of_the_righteous)
+ if SpellCharges(shield_of_the_righteous count=0) == 3 and SpellCooldown(avengers_shield) > 2 * GCD() Spell(shield_of_the_righteous)
  #shield_of_the_righteous,if=(buff.avenging_wrath.up&!talent.seraphim.enabled)|buff.seraphim.up&buff.avengers_valor.up
  if BuffPresent(avenging_wrath_buff) and not Talent(seraphim_talent) or BuffPresent(seraphim_buff) and BuffPresent(avengers_valor_buff) Spell(shield_of_the_righteous)
  #shield_of_the_righteous,if=(buff.avenging_wrath.up&buff.avenging_wrath.remains<4&!talent.seraphim.enabled)|(buff.seraphim.remains<4&buff.seraphim.up)
@@ -320,7 +320,7 @@ AddFunction ProtectionDefaultMainActions
  #avengers_shield,,if=cooldown_react
  if not SpellCooldown(avengers_shield) > 0 Spell(avengers_shield)
  #consecration,if=(cooldown.judgment.remains<=gcd&!talent.crusaders_judgment.enabled)|cooldown.avenger_shield.remains<=gcd&consecration.remains<gcd
- if SpellCooldown(judgment_prot) <= GCD() and not Talent(crusaders_judgment_talent) or SpellCooldown(avenger_shield) <= GCD() and BuffRemaining(consecration) < GCD() Spell(consecration)
+ if SpellCooldown(judgment_prot) <= GCD() and not Talent(crusaders_judgment_talent) or SpellCooldown(avengers_shield) <= GCD() and BuffRemaining(consecration) < GCD() Spell(consecration)
  #consecration,if=!talent.crusaders_judgment.enabled&consecration.remains<(cooldown.judgment.remains+cooldown.avengers_shield.remains)&consecration.remains<3*gcd
  if not Talent(crusaders_judgment_talent) and BuffRemaining(consecration) < SpellCooldown(judgment_prot) + SpellCooldown(avengers_shield) and BuffRemaining(consecration) < 3 * GCD() Spell(consecration)
  #judgment,if=cooldown_react|!talent.crusaders_judgment.enabled
@@ -347,7 +347,7 @@ AddFunction ProtectionDefaultShortCdActions
 
 AddFunction ProtectionDefaultShortCdPostConditions
 {
- BuffPresent(avengers_valor_buff) and SpellCharges(shield_of_the_righteous count=0) >= 2 and { SpellCooldown(seraphim) > GCD() or not Talent(seraphim_talent) } and Spell(shield_of_the_righteous) or SpellCharges(shield_of_the_righteous count=0) == 3 and SpellCooldown(avenger_shield) > 2 * GCD() and Spell(shield_of_the_righteous) or { BuffPresent(avenging_wrath_buff) and not Talent(seraphim_talent) or BuffPresent(seraphim_buff) and BuffPresent(avengers_valor_buff) } and Spell(shield_of_the_righteous) or { BuffPresent(avenging_wrath_buff) and BuffRemaining(avenging_wrath_buff) < 4 and not Talent(seraphim_talent) or BuffRemaining(seraphim_buff) < 4 and BuffPresent(seraphim_buff) } and Spell(shield_of_the_righteous) or { SpellCharges(shield_of_the_righteous count=0) > 2 and not BuffPresent(avengers_valor_buff) or Enemies() >= 2 } and not SpellCooldown(avengers_shield) > 0 and Spell(avengers_shield) or { SpellCooldown(judgment_prot) < GCD() and SpellCharges(judgment_prot count=0) > 1 and not SpellCooldown(judgment_prot) > 0 or not Talent(crusaders_judgment_talent) } and Spell(judgment_prot) or not SpellCooldown(avengers_shield) > 0 and Spell(avengers_shield) or { SpellCooldown(judgment_prot) <= GCD() and not Talent(crusaders_judgment_talent) or SpellCooldown(avenger_shield) <= GCD() and BuffRemaining(consecration) < GCD() } and Spell(consecration) or not Talent(crusaders_judgment_talent) and BuffRemaining(consecration) < SpellCooldown(judgment_prot) + SpellCooldown(avengers_shield) and BuffRemaining(consecration) < 3 * GCD() and Spell(consecration) or { not SpellCooldown(judgment_prot) > 0 or not Talent(crusaders_judgment_talent) } and Spell(judgment_prot) or Spell(blessed_hammer) or Spell(hammer_of_the_righteous) or Spell(consecration)
+ BuffPresent(avengers_valor_buff) and SpellCharges(shield_of_the_righteous count=0) >= 2 and { SpellCooldown(seraphim) > GCD() or not Talent(seraphim_talent) } and Spell(shield_of_the_righteous) or SpellCharges(shield_of_the_righteous count=0) == 3 and SpellCooldown(avengers_shield) > 2 * GCD() and Spell(shield_of_the_righteous) or { BuffPresent(avenging_wrath_buff) and not Talent(seraphim_talent) or BuffPresent(seraphim_buff) and BuffPresent(avengers_valor_buff) } and Spell(shield_of_the_righteous) or { BuffPresent(avenging_wrath_buff) and BuffRemaining(avenging_wrath_buff) < 4 and not Talent(seraphim_talent) or BuffRemaining(seraphim_buff) < 4 and BuffPresent(seraphim_buff) } and Spell(shield_of_the_righteous) or { SpellCharges(shield_of_the_righteous count=0) > 2 and not BuffPresent(avengers_valor_buff) or Enemies() >= 2 } and not SpellCooldown(avengers_shield) > 0 and Spell(avengers_shield) or { SpellCooldown(judgment_prot) < GCD() and SpellCharges(judgment_prot count=0) > 1 and not SpellCooldown(judgment_prot) > 0 or not Talent(crusaders_judgment_talent) } and Spell(judgment_prot) or not SpellCooldown(avengers_shield) > 0 and Spell(avengers_shield) or { SpellCooldown(judgment_prot) <= GCD() and not Talent(crusaders_judgment_talent) or SpellCooldown(avengers_shield) <= GCD() and BuffRemaining(consecration) < GCD() } and Spell(consecration) or not Talent(crusaders_judgment_talent) and BuffRemaining(consecration) < SpellCooldown(judgment_prot) + SpellCooldown(avengers_shield) and BuffRemaining(consecration) < 3 * GCD() and Spell(consecration) or { not SpellCooldown(judgment_prot) > 0 or not Talent(crusaders_judgment_talent) } and Spell(judgment_prot) or Spell(blessed_hammer) or Spell(hammer_of_the_righteous) or Spell(consecration)
 }
 
 AddFunction ProtectionDefaultCdActions
@@ -362,14 +362,14 @@ AddFunction ProtectionDefaultCdActions
   #potion,if=buff.avenging_wrath.up
   if BuffPresent(avenging_wrath_buff) and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
 
-  unless BuffPresent(avengers_valor_buff) and SpellCharges(shield_of_the_righteous count=0) >= 2 and { SpellCooldown(seraphim) > GCD() or not Talent(seraphim_talent) } and Spell(shield_of_the_righteous) or SpellCharges(shield_of_the_righteous count=0) == 3 and SpellCooldown(avenger_shield) > 2 * GCD() and Spell(shield_of_the_righteous) or { BuffPresent(avenging_wrath_buff) and not Talent(seraphim_talent) or BuffPresent(seraphim_buff) and BuffPresent(avengers_valor_buff) } and Spell(shield_of_the_righteous) or { BuffPresent(avenging_wrath_buff) and BuffRemaining(avenging_wrath_buff) < 4 and not Talent(seraphim_talent) or BuffRemaining(seraphim_buff) < 4 and BuffPresent(seraphim_buff) } and Spell(shield_of_the_righteous)
+  unless BuffPresent(avengers_valor_buff) and SpellCharges(shield_of_the_righteous count=0) >= 2 and { SpellCooldown(seraphim) > GCD() or not Talent(seraphim_talent) } and Spell(shield_of_the_righteous) or SpellCharges(shield_of_the_righteous count=0) == 3 and SpellCooldown(avengers_shield) > 2 * GCD() and Spell(shield_of_the_righteous) or { BuffPresent(avenging_wrath_buff) and not Talent(seraphim_talent) or BuffPresent(seraphim_buff) and BuffPresent(avengers_valor_buff) } and Spell(shield_of_the_righteous) or { BuffPresent(avenging_wrath_buff) and BuffRemaining(avenging_wrath_buff) < 4 and not Talent(seraphim_talent) or BuffRemaining(seraphim_buff) < 4 and BuffPresent(seraphim_buff) } and Spell(shield_of_the_righteous)
   {
    #use_items,if=buff.seraphim.up|!talent.seraphim.enabled
    if BuffPresent(seraphim_buff) or not Talent(seraphim_talent) ProtectionUseItemActions()
    #lights_judgment,if=buff.seraphim.up&buff.seraphim.remains<3
    if BuffPresent(seraphim_buff) and BuffRemaining(seraphim_buff) < 3 Spell(lights_judgment)
 
-   unless { SpellCharges(shield_of_the_righteous count=0) > 2 and not BuffPresent(avengers_valor_buff) or Enemies() >= 2 } and not SpellCooldown(avengers_shield) > 0 and Spell(avengers_shield) or { SpellCooldown(judgment_prot) < GCD() and SpellCharges(judgment_prot count=0) > 1 and not SpellCooldown(judgment_prot) > 0 or not Talent(crusaders_judgment_talent) } and Spell(judgment_prot) or not SpellCooldown(avengers_shield) > 0 and Spell(avengers_shield) or { SpellCooldown(judgment_prot) <= GCD() and not Talent(crusaders_judgment_talent) or SpellCooldown(avenger_shield) <= GCD() and BuffRemaining(consecration) < GCD() } and Spell(consecration) or not Talent(crusaders_judgment_talent) and BuffRemaining(consecration) < SpellCooldown(judgment_prot) + SpellCooldown(avengers_shield) and BuffRemaining(consecration) < 3 * GCD() and Spell(consecration) or { not SpellCooldown(judgment_prot) > 0 or not Talent(crusaders_judgment_talent) } and Spell(judgment_prot)
+   unless { SpellCharges(shield_of_the_righteous count=0) > 2 and not BuffPresent(avengers_valor_buff) or Enemies() >= 2 } and not SpellCooldown(avengers_shield) > 0 and Spell(avengers_shield) or { SpellCooldown(judgment_prot) < GCD() and SpellCharges(judgment_prot count=0) > 1 and not SpellCooldown(judgment_prot) > 0 or not Talent(crusaders_judgment_talent) } and Spell(judgment_prot) or not SpellCooldown(avengers_shield) > 0 and Spell(avengers_shield) or { SpellCooldown(judgment_prot) <= GCD() and not Talent(crusaders_judgment_talent) or SpellCooldown(avengers_shield) <= GCD() and BuffRemaining(consecration) < GCD() } and Spell(consecration) or not Talent(crusaders_judgment_talent) and BuffRemaining(consecration) < SpellCooldown(judgment_prot) + SpellCooldown(avengers_shield) and BuffRemaining(consecration) < 3 * GCD() and Spell(consecration) or { not SpellCooldown(judgment_prot) > 0 or not Talent(crusaders_judgment_talent) } and Spell(judgment_prot)
    {
     #lights_judgment,if=!talent.seraphim.enabled|buff.seraphim.up
     if not Talent(seraphim_talent) or BuffPresent(seraphim_buff) Spell(lights_judgment)
@@ -380,7 +380,7 @@ AddFunction ProtectionDefaultCdActions
 
 AddFunction ProtectionDefaultCdPostConditions
 {
- SpellCharges(shield_of_the_righteous count=0) >= 2 and Spell(seraphim) or BuffPresent(avengers_valor_buff) and SpellCharges(shield_of_the_righteous count=0) >= 2 and { SpellCooldown(seraphim) > GCD() or not Talent(seraphim_talent) } and Spell(shield_of_the_righteous) or SpellCharges(shield_of_the_righteous count=0) == 3 and SpellCooldown(avenger_shield) > 2 * GCD() and Spell(shield_of_the_righteous) or { BuffPresent(avenging_wrath_buff) and not Talent(seraphim_talent) or BuffPresent(seraphim_buff) and BuffPresent(avengers_valor_buff) } and Spell(shield_of_the_righteous) or { BuffPresent(avenging_wrath_buff) and BuffRemaining(avenging_wrath_buff) < 4 and not Talent(seraphim_talent) or BuffRemaining(seraphim_buff) < 4 and BuffPresent(seraphim_buff) } and Spell(shield_of_the_righteous) or { SpellCharges(shield_of_the_righteous count=0) > 2 and not BuffPresent(avengers_valor_buff) or Enemies() >= 2 } and not SpellCooldown(avengers_shield) > 0 and Spell(avengers_shield) or { SpellCooldown(judgment_prot) < GCD() and SpellCharges(judgment_prot count=0) > 1 and not SpellCooldown(judgment_prot) > 0 or not Talent(crusaders_judgment_talent) } and Spell(judgment_prot) or not SpellCooldown(avengers_shield) > 0 and Spell(avengers_shield) or { SpellCooldown(judgment_prot) <= GCD() and not Talent(crusaders_judgment_talent) or SpellCooldown(avenger_shield) <= GCD() and BuffRemaining(consecration) < GCD() } and Spell(consecration) or not Talent(crusaders_judgment_talent) and BuffRemaining(consecration) < SpellCooldown(judgment_prot) + SpellCooldown(avengers_shield) and BuffRemaining(consecration) < 3 * GCD() and Spell(consecration) or { not SpellCooldown(judgment_prot) > 0 or not Talent(crusaders_judgment_talent) } and Spell(judgment_prot) or Spell(blessed_hammer) or Spell(hammer_of_the_righteous) or Spell(consecration)
+ SpellCharges(shield_of_the_righteous count=0) >= 2 and Spell(seraphim) or BuffPresent(avengers_valor_buff) and SpellCharges(shield_of_the_righteous count=0) >= 2 and { SpellCooldown(seraphim) > GCD() or not Talent(seraphim_talent) } and Spell(shield_of_the_righteous) or SpellCharges(shield_of_the_righteous count=0) == 3 and SpellCooldown(avengers_shield) > 2 * GCD() and Spell(shield_of_the_righteous) or { BuffPresent(avenging_wrath_buff) and not Talent(seraphim_talent) or BuffPresent(seraphim_buff) and BuffPresent(avengers_valor_buff) } and Spell(shield_of_the_righteous) or { BuffPresent(avenging_wrath_buff) and BuffRemaining(avenging_wrath_buff) < 4 and not Talent(seraphim_talent) or BuffRemaining(seraphim_buff) < 4 and BuffPresent(seraphim_buff) } and Spell(shield_of_the_righteous) or { SpellCharges(shield_of_the_righteous count=0) > 2 and not BuffPresent(avengers_valor_buff) or Enemies() >= 2 } and not SpellCooldown(avengers_shield) > 0 and Spell(avengers_shield) or { SpellCooldown(judgment_prot) < GCD() and SpellCharges(judgment_prot count=0) > 1 and not SpellCooldown(judgment_prot) > 0 or not Talent(crusaders_judgment_talent) } and Spell(judgment_prot) or not SpellCooldown(avengers_shield) > 0 and Spell(avengers_shield) or { SpellCooldown(judgment_prot) <= GCD() and not Talent(crusaders_judgment_talent) or SpellCooldown(avengers_shield) <= GCD() and BuffRemaining(consecration) < GCD() } and Spell(consecration) or not Talent(crusaders_judgment_talent) and BuffRemaining(consecration) < SpellCooldown(judgment_prot) + SpellCooldown(avengers_shield) and BuffRemaining(consecration) < 3 * GCD() and Spell(consecration) or { not SpellCooldown(judgment_prot) > 0 or not Talent(crusaders_judgment_talent) } and Spell(judgment_prot) or Spell(blessed_hammer) or Spell(hammer_of_the_righteous) or Spell(consecration)
 }
 
 ### Protection icons.
@@ -442,7 +442,6 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 }
 
 ### Required symbols
-# avenger_shield
 # avengers_shield
 # avengers_valor_buff
 # avenging_wrath
@@ -550,16 +549,6 @@ AddFunction RetributionPrecombatCdPostConditions
 
 AddFunction RetributionOpenerMainActions
 {
- #sequence,if=talent.wake_of_ashes.enabled&talent.crusade.enabled&talent.execution_sentence.enabled&!talent.hammer_of_wrath.enabled,name=wake_opener_ES_CS:shield_of_vengeance:blade_of_justice:judgment:crusade:templars_verdict:wake_of_ashes:templars_verdict:crusader_strike:execution_sentence
- if Talent(wake_of_ashes_talent) and Talent(crusade_talent) and Talent(execution_sentence_talent) and not Talent(hammer_of_wrath_talent) Spell(sequence)
- #sequence,if=talent.wake_of_ashes.enabled&talent.crusade.enabled&!talent.execution_sentence.enabled&!talent.hammer_of_wrath.enabled,name=wake_opener_CS:shield_of_vengeance:blade_of_justice:judgment:crusade:templars_verdict:wake_of_ashes:templars_verdict:crusader_strike:templars_verdict
- if Talent(wake_of_ashes_talent) and Talent(crusade_talent) and not Talent(execution_sentence_talent) and not Talent(hammer_of_wrath_talent) Spell(sequence)
- #sequence,if=talent.wake_of_ashes.enabled&talent.crusade.enabled&talent.execution_sentence.enabled&talent.hammer_of_wrath.enabled,name=wake_opener_ES_HoW:shield_of_vengeance:blade_of_justice:judgment:crusade:templars_verdict:wake_of_ashes:templars_verdict:hammer_of_wrath:execution_sentence
- if Talent(wake_of_ashes_talent) and Talent(crusade_talent) and Talent(execution_sentence_talent) and Talent(hammer_of_wrath_talent) Spell(sequence)
- #sequence,if=talent.wake_of_ashes.enabled&talent.crusade.enabled&!talent.execution_sentence.enabled&talent.hammer_of_wrath.enabled,name=wake_opener_HoW:shield_of_vengeance:blade_of_justice:judgment:crusade:templars_verdict:wake_of_ashes:templars_verdict:hammer_of_wrath:templars_verdict
- if Talent(wake_of_ashes_talent) and Talent(crusade_talent) and not Talent(execution_sentence_talent) and Talent(hammer_of_wrath_talent) Spell(sequence)
- #sequence,if=talent.wake_of_ashes.enabled&talent.inquisition.enabled,name=wake_opener_Inq:shield_of_vengeance:blade_of_justice:judgment:inquisition:avenging_wrath:wake_of_ashes
- if Talent(wake_of_ashes_talent) and Talent(inquisition_talent) Spell(sequence)
 }
 
 AddFunction RetributionOpenerMainPostConditions
@@ -572,7 +561,6 @@ AddFunction RetributionOpenerShortCdActions
 
 AddFunction RetributionOpenerShortCdPostConditions
 {
- Talent(wake_of_ashes_talent) and Talent(crusade_talent) and Talent(execution_sentence_talent) and not Talent(hammer_of_wrath_talent) and Spell(sequence) or Talent(wake_of_ashes_talent) and Talent(crusade_talent) and not Talent(execution_sentence_talent) and not Talent(hammer_of_wrath_talent) and Spell(sequence) or Talent(wake_of_ashes_talent) and Talent(crusade_talent) and Talent(execution_sentence_talent) and Talent(hammer_of_wrath_talent) and Spell(sequence) or Talent(wake_of_ashes_talent) and Talent(crusade_talent) and not Talent(execution_sentence_talent) and Talent(hammer_of_wrath_talent) and Spell(sequence) or Talent(wake_of_ashes_talent) and Talent(inquisition_talent) and Spell(sequence)
 }
 
 AddFunction RetributionOpenerCdActions
@@ -581,7 +569,6 @@ AddFunction RetributionOpenerCdActions
 
 AddFunction RetributionOpenerCdPostConditions
 {
- Talent(wake_of_ashes_talent) and Talent(crusade_talent) and Talent(execution_sentence_talent) and not Talent(hammer_of_wrath_talent) and Spell(sequence) or Talent(wake_of_ashes_talent) and Talent(crusade_talent) and not Talent(execution_sentence_talent) and not Talent(hammer_of_wrath_talent) and Spell(sequence) or Talent(wake_of_ashes_talent) and Talent(crusade_talent) and Talent(execution_sentence_talent) and Talent(hammer_of_wrath_talent) and Spell(sequence) or Talent(wake_of_ashes_talent) and Talent(crusade_talent) and not Talent(execution_sentence_talent) and Talent(hammer_of_wrath_talent) and Spell(sequence) or Talent(wake_of_ashes_talent) and Talent(inquisition_talent) and Spell(sequence)
 }
 
 ### actions.generators
@@ -931,11 +918,9 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 # lights_judgment
 # rebuke
 # righteous_verdict_talent
-# sequence
 # shield_of_vengeance
 # templars_verdict
 # wake_of_ashes
-# wake_of_ashes_talent
 # war_stomp
 `
 	OvaleScripts.RegisterScript("PALADIN", "retribution", name, desc, code, "script")

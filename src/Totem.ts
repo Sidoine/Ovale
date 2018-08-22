@@ -4,7 +4,7 @@ import { OvaleData } from "./Data";
 import { OvaleSpellBook }from "./SpellBook";
 import { OvaleState } from "./State";
 import aceEvent from "@wowts/ace_event-3.0";
-import { ipairs, pairs, LuaObj, LuaArray } from "@wowts/lua";
+import { ipairs, pairs, LuaObj, LuaArray, kpairs } from "@wowts/lua";
 import { GetTotemInfo, AIR_TOTEM_SLOT, EARTH_TOTEM_SLOT, FIRE_TOTEM_SLOT, MAX_TOTEMS, WATER_TOTEM_SLOT } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
 import { SpellCast } from "./LastSpell";
@@ -80,7 +80,7 @@ class OvaleTotemClass extends OvaleTotemBase {
     }
     CleanState() {
         for (const [slot, totem] of pairs(this.next.totem)) {
-            for (const [k] of pairs(totem)) {
+            for (const [k] of kpairs(totem)) {
                 totem[k] = undefined;
             }
             this.next.totem[slot] = undefined;
@@ -131,7 +131,7 @@ class OvaleTotemClass extends OvaleTotemBase {
         OvaleTotem.StopProfiling("OvaleTotem_state_GetTotem");
         return totem;
     }
-    GetTotemInfo(slot: TotemSlot | number) {
+    GetTotemInfo(slot: TotemSlot | number): [boolean, string, number, number, string] {
         let haveTotem, name, startTime, duration, icon;
         if (isString(slot)) slot = TOTEM_SLOT[slot];
         let totem = this.GetTotem(slot);
@@ -151,7 +151,7 @@ class OvaleTotemClass extends OvaleTotemBase {
         if (si && si.totem) {
             let buffPresent = true;
             if (si.buff_totem) {
-                let aura = OvaleAura.GetAura("player", si.buff_totem, atTime);
+                let aura = OvaleAura.GetAura("player", si.buff_totem, atTime, "HELPFUL");
                 buffPresent = OvaleAura.IsActiveAura(aura, atTime);
             }
             if (buffPresent) {

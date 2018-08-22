@@ -8,15 +8,13 @@ import { GetSpellCount, IsSpellInRange, IsUsableItem, IsUsableSpell, UnitIsFrien
 import { OvaleState } from "./State";
 import { OvaleData } from "./Data";
 import { OvalePower } from "./Power";
-// import { OvaleCooldown } from "./Cooldown";
-// import { OvaleRunes } from "./Runes";
 import { OvaleSpellBook } from "./SpellBook";
 
 let WARRIOR_INCERCEPT_SPELLID = 198304;
 let WARRIOR_HEROICTHROW_SPELLID = 57755;
 
 export let OvaleSpells:OvaleSpellsClass;
-const OvaleSpellsBase = OvaleProfiler.RegisterProfiling(OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleSpellBook", aceEvent)))
+const OvaleSpellsBase = OvaleProfiler.RegisterProfiling(OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleSpells", aceEvent)))
 class OvaleSpellsClass extends OvaleSpellsBase {
     OnInitialize(): void {
         RegisterRequirement("spellcount_min", this.RequireSpellCountHandler);
@@ -25,7 +23,7 @@ class OvaleSpellsClass extends OvaleSpellsBase {
     OnDisable(): void {
         UnregisterRequirement("spellcount_max");
         UnregisterRequirement("spellcount_min");
-   }
+    }
     GetCastTime(spellId: number): number {
         if (spellId) {
             let [name, , , castTime] = OvaleSpellBook.GetSpellInfo(spellId);
@@ -56,7 +54,7 @@ class OvaleSpellsClass extends OvaleSpellsBase {
         }
     }
 
-    IsSpellInRange(spellId: number, unitId: string): number {
+    IsSpellInRange(spellId: number, unitId: string): boolean {
         let [index, bookType] = OvaleSpellBook.GetSpellBookIndex(spellId);
         let returnValue: number = undefined;
         if (index && bookType) {
@@ -66,9 +64,9 @@ class OvaleSpellsClass extends OvaleSpellsBase {
             returnValue = IsSpellInRange(name, unitId);
         }
         if ((returnValue == 1 && spellId == WARRIOR_INCERCEPT_SPELLID)) {
-            return (UnitIsFriend("player", unitId) == 1 || OvaleSpells.IsSpellInRange(WARRIOR_HEROICTHROW_SPELLID, unitId) == 1) && 1 || 0;
+            return (UnitIsFriend("player", unitId) == 1 || OvaleSpells.IsSpellInRange(WARRIOR_HEROICTHROW_SPELLID, unitId));
         }
-        return returnValue;
+        return returnValue === 1;
     }
     
     RequireSpellCountHandler = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string):[boolean, string, number] => {

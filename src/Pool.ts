@@ -8,7 +8,7 @@ export class OvalePool<T> {
     unused = 0;
     name: string;
     
-    constructor(name) {
+    constructor(name: string) {
         this.name = name || "OvalePool";
         this.Drain();
     }

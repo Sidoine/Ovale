@@ -14,6 +14,7 @@ local OvaleState = __State.OvaleState
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local ipairs = ipairs
 local pairs = pairs
+local kpairs = pairs
 local GetTotemInfo = GetTotemInfo
 local AIR_TOTEM_SLOT = AIR_TOTEM_SLOT
 local EARTH_TOTEM_SLOT = EARTH_TOTEM_SLOT
@@ -77,7 +78,7 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
     end,
     CleanState = function(self)
         for slot, totem in pairs(self.next.totem) do
-            for k in pairs(totem) do
+            for k in kpairs(totem) do
                 totem[k] = nil
             end
             self.next.totem[slot] = nil
@@ -151,7 +152,7 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
         if si and si.totem then
             local buffPresent = true
             if si.buff_totem then
-                local aura = OvaleAura:GetAura("player", si.buff_totem, atTime)
+                local aura = OvaleAura:GetAura("player", si.buff_totem, atTime, "HELPFUL")
                 buffPresent = OvaleAura:IsActiveAura(aura, atTime)
             end
             if buffPresent then

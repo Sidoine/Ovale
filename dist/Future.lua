@@ -25,6 +25,7 @@ local ipairs = ipairs
 local pairs = pairs
 local type = type
 local wipe = wipe
+local kpairs = pairs
 local sub = string.sub
 local insert = table.insert
 local remove = table.remove
@@ -608,7 +609,8 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
     end,
     GetSpellcast = function(self, spell, spellId, lineId, atTime)
         self:StartProfiling("OvaleFuture_GetSpellcast")
-        local spellcast, index
+        local spellcast = nil
+        local index = 0
         if  not lineId or lineId ~= "" then
             for i, sc in ipairs(lastSpell.queue) do
                 if  not lineId or sc.lineId == lineId then
@@ -644,7 +646,7 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
         local si = OvaleData.spellInfo[spellId]
         if si and si.aura then
             for _, unitId in ipairs(SPELLCAST_AURA_ORDER) do
-                for _, auraList in pairs(si.aura[unitId]) do
+                for _, auraList in kpairs(si.aura[unitId]) do
                     for id, spellData in pairs(auraList) do
                         local verified, value = OvaleData:CheckSpellAuraData(id, spellData, atTime, targetGUID)
                         if verified and (SPELLAURALIST_AURA_VALUE[value] or type(value) == "number" and value > 0) then
@@ -683,7 +685,7 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
         local damageMultiplier = 1
         local si = OvaleData.spellInfo[spellId]
         if si and si.aura and si.aura.damage then
-            for filter, auraList in pairs(si.aura.damage) do
+            for filter, auraList in kpairs(si.aura.damage) do
                 for auraId, spellData in pairs(auraList) do
                     local index, multiplier
                     local verified
@@ -730,14 +732,14 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
         self.current.lastCastTime[spellcast.spellId] = atTime
         if spellcast.offgcd then
             self:Debug("    Caching spell %s (%d) as most recent off-GCD spellcast.", spellcast.spellName, spellcast.spellId)
-            for k, v in pairs(spellcast) do
+            for k, v in kpairs(spellcast) do
                 self.current.lastOffGCDSpellcast[k] = v
             end
             lastSpell.lastSpellcast = self.current.lastOffGCDSpellcast
             self.next.lastOffGCDSpellcast = self.current.lastOffGCDSpellcast
         else
             self:Debug("    Caching spell %s (%d) as most recent GCD spellcast.", spellcast.spellName, spellcast.spellId)
-            for k, v in pairs(spellcast) do
+            for k, v in kpairs(spellcast) do
                 lastSpell.lastGCDSpellcast[k] = v
             end
             lastSpell.lastSpellcast = lastSpell.lastGCDSpellcast
@@ -803,7 +805,7 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
             elseif Ovale.playerClass == "DRUID" then
                 if OvaleStance:IsStance("druid_cat_form", atTime) then
                     gcd = 1
-                    haste = false
+                    haste = "none"
                 end
             end
             local gcdHaste = spellId and OvaleData:GetSpellInfoProperty(spellId, atTime, "gcd_haste", targetGUID)

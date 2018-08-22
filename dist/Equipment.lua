@@ -9,9 +9,9 @@ local __Debug = LibStub:GetLibrary("ovale/Debug")
 local OvaleDebug = __Debug.OvaleDebug
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local pairs = pairs
-local type = type
 local wipe = wipe
 local ipairs = ipairs
+local kpairs = pairs
 local sub = string.sub
 local GetInventoryItemID = GetInventoryItemID
 local GetInventoryItemLink = GetInventoryItemLink
@@ -21,6 +21,8 @@ local GetInventorySlotInfo = GetInventorySlotInfo
 local INVSLOT_FIRST_EQUIPPED = INVSLOT_FIRST_EQUIPPED
 local concat = table.concat
 local insert = table.insert
+local __tools = LibStub:GetLibrary("ovale/tools")
+local isNumber = __tools.isNumber
 local strsub = sub
 local tinsert = insert
 local tconcat = concat
@@ -56,8 +58,6 @@ local OVALE_RANGED_WEAPON = {
     INVTYPE_RANGEDRIGHT = true,
     INVTYPE_RANGED = true
 }
-local result = {}
-local count = 0
 local OvaleEquipmentClass = __class(OvaleEquipmentBase, {
     constructor = function(self)
         self.ready = false
@@ -91,7 +91,7 @@ local OvaleEquipmentClass = __class(OvaleEquipmentBase, {
         for k, v in pairs(self.debugOptions) do
             OvaleDebug.options.args[k] = v
         end
-        for slotName in pairs(OVALE_SLOTID_BY_SLOTNAME) do
+        for slotName in kpairs(OVALE_SLOTID_BY_SLOTNAME) do
             local invSlotId = GetInventorySlotInfo(slotName)
             OVALE_SLOTID_BY_SLOTNAME[slotName] = invSlotId
             OVALE_SLOTNAME_BY_SLOTID[invSlotId] = slotName
@@ -131,7 +131,7 @@ local OvaleEquipmentClass = __class(OvaleEquipmentBase, {
         return self.equippedItemBySlot[OVALE_SLOTID_BY_SLOTNAME["Trinket0Slot"]], self.equippedItemBySlot[OVALE_SLOTID_BY_SLOTNAME["Trinket1Slot"]]
     end,
     HasEquippedItem = function(self, itemId)
-        return self.equippedItemById[itemId]
+        return self.equippedItemById[itemId] and true or false
     end,
     HasMainHandWeapon = function(self, handedness)
         if handedness then
@@ -170,7 +170,7 @@ local OvaleEquipmentClass = __class(OvaleEquipmentBase, {
         return self.mainHandItemType == "INVTYPE_2HWEAPON" or self.offHandItemType == "INVTYPE_2HWEAPON"
     end,
     HasOneHandedWeapon = function(self, slotId)
-        if slotId and type(slotId) ~= "number" then
+        if slotId and  not isNumber(slotId) then
             slotId = OVALE_SLOTID_BY_SLOTNAME[slotId]
         end
         if slotId then

@@ -2,10 +2,10 @@ import { L } from "./Localization";
 import { OvaleSpellBook } from "./SpellBook";
 import { Ovale } from "./Ovale";
 import { format, find, sub } from "@wowts/string";
-import { next, pairs, tostring, _G } from "@wowts/lua";
+import { next, tostring, _G, kpairs } from "@wowts/lua";
 import { GetTime, PlaySoundFile, UIFrame, UIFontString, UITexture, UICooldown, UICheckButton, CreateFrame, GameTooltip, UIPosition } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
-import { NamedParameters } from "./AST";
+import { NamedParameters, PositionalParameters, AstNode } from "./AST";
 let INFINITY = huge;
 let COOLDOWN_THRESHOLD = 0.1;
 
@@ -13,7 +13,7 @@ interface IconParent {
     checkBoxWidget: any;
     listWidget: any;
     frame: UIFrame;
-    ToggleOptions(); 
+    ToggleOptions(): void; 
 }
 
 export class OvaleIcon {
@@ -58,7 +58,7 @@ export class OvaleIcon {
         this.OvaleIcon_OnLoad();
     }
 
-    SetValue(value, actionTexture) {
+    SetValue(value: number, actionTexture: string) {
         this.icone.Show();
         this.icone.SetTexture(actionTexture);
         this.icone.SetAlpha(Ovale.db.profile.apparence.alpha);
@@ -83,7 +83,7 @@ export class OvaleIcon {
         }
         this.frame.Show();
     }
-    Update(element, startTime, actionTexture?, actionInRange?, actionCooldownStart?, actionCooldownDuration?, actionUsable?, actionShortcut?, actionIsCurrent?, actionEnable?, actionType?, actionId?, actionTarget?, actionResourceExtend?) {
+    Update(element: AstNode, startTime: number, actionTexture?: string, actionInRange?: boolean, actionCooldownStart?: number, actionCooldownDuration?: number, actionUsable?: boolean, actionShortcut?: string, actionIsCurrent?: boolean, actionEnable?: boolean, actionType?: string, actionId?: string | number, actionTarget?: string, actionResourceExtend?: number) {
         this.actionType = actionType;
         this.actionId = actionId;
         this.value = undefined;
@@ -179,10 +179,10 @@ export class OvaleIcon {
             } else {
                 this.shortcut.Hide();
             }
-            if (actionInRange == 1) {
+            if (actionInRange) {
                 this.rangeIndicator.SetVertexColor(0.6, 0.6, 0.6);
                 this.rangeIndicator.Show();
-            } else if (actionInRange == 0) {
+            } else if (!actionInRange) {
                 this.rangeIndicator.SetVertexColor(1.0, 0.1, 0.1);
                 this.rangeIndicator.Show();
             } else {
@@ -216,15 +216,15 @@ export class OvaleIcon {
         }
         return [startTime, element];
     }
-    SetHelp(help) {
+    SetHelp(help: string) {
         this.help = help;
     }
-    SetParams(positionalParams, namedParams: NamedParameters, secure?) {
+    SetParams(positionalParams: PositionalParameters, namedParams: NamedParameters, secure?: boolean) {
         this.positionalParams = positionalParams;
         this.namedParams = namedParams;
         this.actionButton = false;
         if (secure) {
-            for (const [k, v] of pairs(namedParams)) {
+            for (const [k, v] of kpairs(namedParams)) {
                 let [index] = find(k, "spell");
                 if (index) {
                     let prefix = sub(k, 1, index - 1);
@@ -237,19 +237,19 @@ export class OvaleIcon {
             }
         }
     }
-    SetRemainsFont(color) {
+    SetRemainsFont(color: {r: number, g: number; b: number }) {
         this.remains.SetTextColor(color.r, color.g, color.b, 1.0);
         this.remains.SetJustifyH("left");
         this.remains.SetPoint("BOTTOMLEFT", 2, 2);
     }
-    SetFontScale(scale) {
+    SetFontScale(scale: number) {
         this.fontScale = scale;
         this.remains.SetFont(this.fontName, this.fontHeight * this.fontScale, this.fontFlags);
         this.shortcut.SetFont(this.fontName, this.fontHeight * this.fontScale, this.fontFlags);
         this.rangeIndicator.SetFont(this.fontName, this.fontHeight * this.fontScale, this.fontFlags);
         this.focusText.SetFont(this.fontName, this.fontHeight * this.fontScale, this.fontFlags);
     }
-    SetRangeIndicator(text) {
+    SetRangeIndicator(text: string) {
         this.rangeIndicator.SetText(text);
     }
     OvaleIcon_OnMouseUp() {
@@ -343,7 +343,7 @@ export class OvaleIcon {
         this.frame.Hide();
     }
 
-    SetScale(scale) {
+    SetScale(scale: number) {
         this.frame.SetScale(scale);
     }
 

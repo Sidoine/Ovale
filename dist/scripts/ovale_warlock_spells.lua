@@ -402,6 +402,8 @@ Define(implosion 196277)
 Define(incinerate 29722)
 	SpellInfo(incinerate travel_time=1 soulshards=-0.2)
 	SpellAddBuff(incinerate backdraft_buff=-1)
+
+	SpellInfo(inner_demons unusable=1)
 Define(mortal_coil 6789)
 
 	SpellInfo(nether_portal cd=180 soulshards=3)

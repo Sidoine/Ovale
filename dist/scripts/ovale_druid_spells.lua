@@ -59,6 +59,9 @@ Define(dash 61684)
   SpellInfo(dash cd=20 duration=10 gcd=0 offgcd=1)
   # Increases movement speed by s1.
   SpellAddBuff(dash dash=1)
+Define(dawning_sun_buff 276153)
+# @spelldesc276152
+  SpellInfo(dawning_sun_buff channel=-0.001 gcd=0 offgcd=1)
 Define(feral_frenzy 274838)
 # @spelldesc274837
   SpellInfo(feral_frenzy duration=6 gcd=0 offgcd=1 combo_points=-1 tick=2)
@@ -145,15 +148,15 @@ Define(pulverize 158792)
   SpellInfo(pulverize duration=20 gcd=0 offgcd=1 tick=2)
   # Damage taken reduced by s4.
   SpellAddBuff(pulverize pulverize=1)
-Define(rake 231052)
-# While stealthed, Rake will also stun the target for 163505d, and deal 1822s4 increased damage.
-  SpellInfo(rake channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(rake rake=1)
 Define(rake_debuff 155722)
 # @spelldesc1822
   SpellInfo(rake_debuff duration=15 gcd=0 offgcd=1 tick=3)
   # Bleeding for w1 damage every t1 seconds.
   SpellAddTargetDebuff(rake_debuff rake_debuff=1)
+Define(rake 231052)
+# While stealthed, Rake will also stun the target for 163505d, and deal 1822s4 increased damage.
+  SpellInfo(rake channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(rake rake=1)
 Define(regrowth 8936)
 # Heals a friendly target for s1 and another o2*<mult> over d.?s231032[ Regrowth's initial heal has a 231032s1 increased chance for a critical effect.][]?s24858|s197625[ Usable while in Moonkin Form.][]?s33891[rnrn|C0033AA11Tree of Life: Instant cast.|R][]
   SpellInfo(regrowth duration=12 tick=2)
@@ -193,6 +196,9 @@ Define(stellar_flare 202347)
   SpellInfo(stellar_flare duration=24 talent=stellar_flare_talent astral_power=-8 tick=2)
   # Suffering w2 Astral damage every t2 sec.
   SpellAddTargetDebuff(stellar_flare stellar_flare=1)
+Define(sunblaze_buff 274398)
+# @spelldesc274397
+  SpellInfo(sunblaze_buff channel=-0.001 gcd=0 offgcd=1)
 Define(sunfire 231050)
 # Sunfire now applies its damage over time effect to all enemies within 164815A2 yards.
   SpellInfo(sunfire channel=0 gcd=0 offgcd=1)
@@ -201,11 +207,6 @@ Define(swipe 231283)
 # Swipe deals 106785s2 increased damage against bleeding targets.
   SpellInfo(swipe channel=0 gcd=0 offgcd=1)
   SpellAddBuff(swipe swipe=1)
-Define(the_emerald_dreamcatcher_buff 224706)
-# Reduces the Astral Power cost of Starsurge by s1/-10. Stacks up to u times.
-  SpellInfo(the_emerald_dreamcatcher_buff duration=5 max_stacks=2 gcd=0 offgcd=1)
-  # Reduces the Astral Power cost of Starsurge by s1/-10.
-  SpellAddBuff(the_emerald_dreamcatcher_buff the_emerald_dreamcatcher_buff=1)
 Define(thrash 211141)
 # @spelldesc106830
   SpellInfo(thrash channel=0 max_stacks=3 gcd=0 offgcd=1 combo_points=-1)
@@ -223,6 +224,10 @@ Define(wild_charge 102401)
   SpellInfo(wild_charge cd=15 duration=0.5 talent=wild_charge_talent gcd=0.5)
   # Flying to an ally's position.
   SpellAddBuff(wild_charge wild_charge=1)
+Define(stellar_flare_talent 18)
+# Burns the target for s1 Astral damage, and then an additional o2 damage over d.rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
+Define(twin_moons_talent 17)
+# Moonfire deals s2 increased damage and also hits another nearby enemy within 279621A1 yds of the target.
 Define(bloodtalons_talent 20)
 # Casting Regrowth or Entangling Roots causes your next two melee abilities to deal 145152s1 increased damage for their full duration.
 Define(brutal_slash_talent 17)
@@ -245,10 +250,14 @@ Define(warrior_of_elune_talent 2)
 # Your next u Lunar Strikes are instant cast and generate s2 additional Astral Power.
 Define(wild_charge_talent 6)
 # Fly to a nearby ally's position.
-Define(the_emerald_dreamcatcher_item 137062)
 Define(ailuro_pouncers_item 137024)
 Define(luffa_wrappings_item 137056)
+Define(dawning_sun_trait 276152)
+Define(high_noon_trait 278505)
 Define(lively_spirit_trait 279642)
+Define(power_of_the_moon_trait 273367)
+Define(streaking_stars_trait 272871)
+Define(sunblaze_trait 274397)
     ]]
     code = code .. [[
 Define(astralpower "lunarpower") # Astral Power is named LunarPower in Enum.PowerType

@@ -2,7 +2,7 @@ import LibBabbleCreatureType from "@wowts/lib_babble-creature_type-3.0";
 import LibRangeCheck from "@wowts/lib_range_check-2.0";
 import { OvaleBestAction } from "./BestAction";
 import { OvaleCompile } from "./Compile";
-import { OvaleCondition, TestValue, Compare, TestBoolean, ParseCondition } from "./Condition";
+import { OvaleCondition, TestValue, Compare, TestBoolean, ParseCondition, ConditionFunction, isComparator } from "./Condition";
 import { OvaleDamageTaken } from "./DamageTaken";
 import { OvaleData, SpellInfo } from "./Data";
 import { OvaleEquipment } from "./Equipment";
@@ -16,8 +16,8 @@ import { OvaleSpellDamage } from "./SpellDamage";
 import { OvaleArtifact } from "./Artifact";
 import { OvaleBossMod } from "./BossMod";
 import { Ovale } from "./Ovale";
-import { OvalePaperDoll } from "./PaperDoll";
-import { OvaleAura } from "./Aura";
+import { OvalePaperDoll, HasteType, PaperDollData } from "./PaperDoll";
+import { OvaleAura, Aura } from "./Aura";
 import { OvaleEnemies } from "./Enemies";
 import { OvaleTotem } from "./Totem";
 import { OvaleDemonHunterSoulFragments } from "./DemonHunterSoulFragments";
@@ -26,7 +26,7 @@ import { lastSpell } from "./LastSpell";
 import { ipairs, pairs, type, LuaArray, LuaObj, lualength } from "@wowts/lua";
 import { GetBuildInfo, GetItemCooldown, GetItemCount, GetNumTrackingTypes, GetTime, GetTrackingInfo, GetUnitSpeed, GetWeaponEnchantInfo, HasFullControl, IsStealthed, UnitCastingInfo, UnitChannelInfo, UnitClass, UnitClassification, UnitCreatureFamily, UnitCreatureType, UnitDetailedThreatSituation, UnitExists, UnitInRaid, UnitIsDead, UnitIsFriend, UnitIsPVP, UnitIsUnit, UnitLevel, UnitName, UnitPower, UnitPowerMax, UnitRace, UnitStagger } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
-import { isValueNode } from "./AST";
+import { isValueNode, PositionalParameters, NamedParameters } from "./AST";
 import { OvaleCooldown } from "./Cooldown";
 import { variables } from "./Variables";
 import { OvaleStance } from "./Stance";
@@ -40,17 +40,17 @@ let INFINITY = huge;
 type BaseState = {};
 
 // Return the target's damage reduction from armor, which seems to be 30% with most bosses
-function BossArmorDamageReduction(target, state: BaseState) {
+function BossArmorDamageReduction(target: string, state: BaseState) {
     return 0.3;
 }
 
 // Return the value of a parameter from the named spell's information.  If the value is the name of a
 // function in the script, then return the compute the value of that function instead.
-function ComputeParameter<T extends keyof SpellInfo>(spellId, paramName: T, state: BaseState, atTime): SpellInfo[T] {
+function ComputeParameter<T extends keyof SpellInfo>(spellId: number, paramName: T, state: BaseState, atTime: number): SpellInfo[T] {
     let si = OvaleData.GetSpellInfo(spellId);
     if (si && si[paramName]) {
         let name = si[paramName];
-        let node = OvaleCompile.GetFunctionNode(name);
+        let node = OvaleCompile.GetFunctionNode(<string>name);
         if (node) {
             let [, element] = OvaleBestAction.Compute(node.child[1], state, atTime);
             if (element && isValueNode(element)) {
@@ -65,7 +65,7 @@ function ComputeParameter<T extends keyof SpellInfo>(spellId, paramName: T, stat
 }
 
 // Return the time in seconds, adjusted by the named haste effect.
-function GetHastedTime(seconds, haste, state: BaseState) {
+function GetHastedTime(seconds: number, haste: HasteType, state: BaseState) {
     seconds = seconds || 0;
     let multiplier = OvalePaperDoll.GetHasteMultiplier(haste, OvalePaperDoll.next);
     return seconds / multiplier;
@@ -200,7 +200,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
         let [auraId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
         let [target, filter, mine] = ParseCondition(positionalParams, namedParams, state);
         let value = namedParams.value || 1;
-        let statName = "value1";
+        let statName: "value1" | "value2" | "value3" = "value1";
         if (value == 1) {
             statName = "value1";
         } else if (value == 2) {
@@ -693,6 +693,13 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     }
     OvaleCondition.RegisterCondition("buffstacks", false, BuffStacks);
     OvaleCondition.RegisterCondition("debuffstacks", false, BuffStacks);
+
+    function maxStacks(positionalParams: PositionalParameters, namedParameters: NamedParameters, state: BaseState, atTime: number) {
+        const [auraId, comparator, limit] = [positionalParams[1] as number, positionalParams[2] as string, positionalParams[3] as number];
+        const maxStacks = OvaleData.GetSpellInfo(auraId).max_stacks;
+        return Compare(maxStacks, comparator, limit);
+    }
+    OvaleCondition.RegisterCondition("maxstacks", true, maxStacks);
 }
 {
     /** Get the total number of stacks of the given aura across all targets.
@@ -1013,8 +1020,8 @@ function GetHastedTime(seconds, haste, state: BaseState) {
 	 if target.CreatureFamily(Dragonkin)
 	     Spell(hibernate)
      */
-    function CreatureFamily(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        let [name, yesno] = [positionalParams[1], positionalParams[2]];
+    function CreatureFamily(positionalParams: PositionalParameters, namedParams: NamedParameters, state: BaseState, atTime: number) {
+        let [name, yesno] = [<string>positionalParams[1], <"yes"|"no">positionalParams[2]];
         let [target] = ParseCondition(positionalParams, namedParams, state);
         let family = UnitCreatureFamily(target);
         let lookupTable = LibBabbleCreatureType && LibBabbleCreatureType.GetLookupTable();
@@ -1071,7 +1078,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
      */
     function CritDamage(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [spellId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
-        let target = ParseCondition(positionalParams, namedParams, state, "target");
+        let [target] = ParseCondition(positionalParams, namedParams, state, "target");
         let value = ComputeParameter(spellId, "damage", state, atTime) || 0;
         let si = OvaleData.spellInfo[spellId];
         if (si && si.physical == 1) {
@@ -1114,7 +1121,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
      */
     function Damage(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [spellId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
-        let target = ParseCondition(positionalParams, namedParams, state, "target");
+        let [target] = ParseCondition(positionalParams, namedParams, state, "target");
         let value = ComputeParameter(spellId, "damage", state, atTime) || 0;
         let si = OvaleData.spellInfo[spellId];
         if (si && si.physical == 1) {
@@ -1187,7 +1194,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     let NECROTIC_PLAGUE_DEBUFF = 155159;
     let BLOOD_PLAGUE_DEBUFF = 55078;
     let FROST_FEVER_DEBUFF = 55095;
-    function GetDiseases(target: string, state: BaseState, atTime: number) {
+    function GetDiseases(target: string, state: BaseState, atTime: number): [boolean, Aura, Aura, Aura] {
         let npAura, bpAura, ffAura;
         let talented = (OvaleSpellBook.GetTalentPoints(NECROTIC_PLAGUE_TALENT) > 0);
         if (talented) {
@@ -1418,7 +1425,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
 	 @paramsig boolean
 	 @return A boolean value.
      */
-    function False(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
+    const False:ConditionFunction = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) => {
         return undefined;
     }
     OvaleCondition.RegisterCondition("false", false, False);
@@ -1649,7 +1656,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
      */
     function HasTrinket(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [trinketId, yesno] = [positionalParams[1], positionalParams[2]];
-        let boolean: string | undefined  = undefined;
+        let boolean: boolean | undefined  = undefined;
         if (type(trinketId) == "number") {
             boolean = OvaleEquipment.HasTrinket(trinketId);
         } else if (OvaleData.itemList[trinketId]) {
@@ -1935,7 +1942,7 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     function InRange(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [spellId, yesno] = [positionalParams[1], positionalParams[2]];
         let [target] = ParseCondition(positionalParams, namedParams, state);
-        let boolean = (OvaleSpells.IsSpellInRange(spellId, target) == 1);
+        let boolean = OvaleSpells.IsSpellInRange(spellId, target);
         return TestBoolean(boolean, yesno);
     }
     OvaleCondition.RegisterCondition("inrange", false, InRange);
@@ -2395,8 +2402,8 @@ function GetHastedTime(seconds, haste, state: BaseState) {
 {
     /**  Return the maximum power of the given power type on the target.
 	 */
-    function MaxPower(powerType, positionalParams, namedParams, state: BaseState, atTime: number) {
-        let [comparator, limit] = [positionalParams[1], positionalParams[2]];
+    function MaxPower(powerType: PowerType, positionalParams: PositionalParameters, namedParams: NamedParameters, state: BaseState, atTime: number) {
+        let [comparator, limit] = [<string>positionalParams[1], <number>positionalParams[2]];
         let [target] = ParseCondition(positionalParams, namedParams, state);
         let value;
         if (target == "player") {
@@ -2409,8 +2416,8 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     }
     /** Return the amount of power of the given power type on the target.
 	 */
-    function Power(powerType: PowerType, positionalParams, namedParams, state: BaseState, atTime: number) {
-        let [comparator, limit] = [positionalParams[1], positionalParams[2]];
+    function Power(powerType: PowerType, positionalParams: PositionalParameters, namedParams: NamedParameters, state: BaseState, atTime: number) {
+        let [comparator, limit] = [<string>positionalParams[1], <number>positionalParams[2]];
         let [target] = ParseCondition(positionalParams, namedParams, state);
         if (target == "player") {
             let [value, origin, rate] = [OvalePower.next.power[powerType], atTime, OvalePower.next.GetPowerRate(powerType)];
@@ -2424,8 +2431,8 @@ function GetHastedTime(seconds, haste, state: BaseState) {
     }
     /**Return the current deficit of power from max power on the target.
 	 */
-    function PowerDeficit(powerType: PowerType, positionalParams, namedParams, state: BaseState, atTime) {
-        let [comparator, limit] = [positionalParams[1], positionalParams[2]];
+    function PowerDeficit(powerType: PowerType, positionalParams: PositionalParameters, namedParams: NamedParameters, state: BaseState, atTime: number) {
+        let [comparator, limit] = [<string>positionalParams[1], <number>positionalParams[2]];
         let [target] = ParseCondition(positionalParams, namedParams, state);
         if (target == "player") {
             let powerMax = OvalePower.current.maxPower[powerType] || 0;
@@ -2448,8 +2455,8 @@ function GetHastedTime(seconds, haste, state: BaseState) {
 
     /**Return the current percent level of power (between 0 and 100) on the target.
      */
-    function PowerPercent(powerType: PowerType, positionalParams, namedParams, state: BaseState, atTime) {
-        let [comparator, limit] = [positionalParams[1], positionalParams[2]];
+    function PowerPercent(powerType: PowerType, positionalParams: PositionalParameters, namedParams: NamedParameters, state: BaseState, atTime: number) {
+        let [comparator, limit] = [<string>positionalParams[1], <number>positionalParams[2]];
         let [target] = ParseCondition(positionalParams, namedParams, state);
         if (target == "player") {
             let powerMax = OvalePower.current.maxPower[powerType] || 0;
@@ -3039,21 +3046,6 @@ l    */
         return MaxPower("runicpower", positionalParams, namedParams, state, atTime);
     }
 
-    /** Get the maximum amount of Shadow Orbs of the target.
-	 @name MaxShadowOrbs
-	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
-	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
-	     Defaults to target=player.
-	     Valid values: player, target, focus, pet.
-	 @return The maximum value.
-	 @return A boolean value for the result of the comparison.
-     */
-    function MaxShadowOrbs(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        return MaxPower("shadoworbs", positionalParams, namedParams, state, atTime);
-    }
-
     /** Get the maximum amount of Soul Shards of the target.
 	 @name MaxSoulShards
 	 @paramsig number or boolean
@@ -3068,7 +3060,23 @@ l    */
     function MaxSoulShards(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         return MaxPower("soulshards", positionalParams, namedParams, state, atTime);
     }
+
+    /** Get the maximum amount of Arcane Charges of the target.
+	 @name MaxArcaneCharges
+	 @paramsig number or boolean
+	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	 @param number Optional. The number to compare against.
+	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	     Defaults to target=player.
+	     Valid values: player, target, focus, pet.
+	 @return The maximum value.
+	 @return A boolean value for the result of the comparison.
+     */
+    function MaxArcaneCharges(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
+        return MaxPower("arcanecharges", positionalParams, namedParams, state, atTime);
+    }
     OvaleCondition.RegisterCondition("maxalternatepower", false, MaxAlternatePower);
+    OvaleCondition.RegisterCondition("maxarcanecharges", false, MaxArcaneCharges);
     OvaleCondition.RegisterCondition("maxchi", false, MaxChi);
     OvaleCondition.RegisterCondition("maxcombopoints", false, MaxComboPoints);
     OvaleCondition.RegisterCondition("maxenergy", false, MaxEnergy);
@@ -3079,17 +3087,16 @@ l    */
     OvaleCondition.RegisterCondition("maxpain", false, MaxPain);
     OvaleCondition.RegisterCondition("maxrage", false, MaxRage);
     OvaleCondition.RegisterCondition("maxrunicpower", false, MaxRunicPower);
-    OvaleCondition.RegisterCondition("maxshadoworbs", false, MaxShadowOrbs);
     OvaleCondition.RegisterCondition("maxsoulshards", false, MaxSoulShards);
 }
 {
     /**  Return the amount of power of the given power type required to cast the given spell.
 	 */
-    function PowerCost(powerType, positionalParams, namedParams, state: BaseState, atTime) {
-        let [spellId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
+    function PowerCost(powerType: PowerType, positionalParams: PositionalParameters, namedParams: NamedParameters, state: BaseState, atTime: number) {
+        let [spellId, comparator, limit] = [<number>positionalParams[1], <string>positionalParams[2], <number>positionalParams[3]];
         let [target] = ParseCondition(positionalParams, namedParams, state, "target");
         let maxCost = (namedParams.max == 1);
-        let value = OvalePower.PowerCost(spellId, powerType, atTime, target, maxCost) || 0;
+        let [value] = OvalePower.PowerCost(spellId, powerType, atTime, target, maxCost) || [0];
         return Compare(value, comparator, limit);
     }
 
@@ -3198,7 +3205,7 @@ l    */
      * @param atTime 
      */
     function AstralPowerCost(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        return PowerCost("astralpower", positionalParams, namedParams, state, atTime);
+        return PowerCost("lunarpower", positionalParams, namedParams, state, atTime);
     }
 
     /**
@@ -3472,17 +3479,17 @@ l    */
 {
     /**  Returns the value of the given snapshot stat.
 	 */
-    function Snapshot(statName, defaultValue, positionalParams, namedParams, state: BaseState, atTime) {
-        let [comparator, limit] = [positionalParams[1], positionalParams[2]];
-        let value = OvalePaperDoll[statName] || defaultValue;
+    function Snapshot(statName: keyof PaperDollData, defaultValue: number, positionalParams: PositionalParameters, namedParams: NamedParameters, state: BaseState, atTime: number) {
+        let [comparator, limit] = [<string>positionalParams[1], <number>positionalParams[2]];
+        let value = OvalePaperDoll.GetState(atTime)[statName] || defaultValue;
         return Compare(value, comparator, limit);
     }
 
     /**  Returns the critical strike chance of the given snapshot stat.
 	 */
-    function SnapshotCritChance(statName, defaultValue, positionalParams, namedParams, state: BaseState, atTime) {
-        let [comparator, limit] = [positionalParams[1], positionalParams[2]];
-        let value = OvalePaperDoll[statName] || defaultValue;
+    function SnapshotCritChance(statName: keyof PaperDollData, defaultValue: number, positionalParams: PositionalParameters, namedParams: NamedParameters, state: BaseState, atTime: number) {
+        const [comparator, limit] = [<string>positionalParams[1], <number>positionalParams[2]];
+        let value = OvalePaperDoll.GetState(atTime)[statName] || defaultValue;
         if (namedParams.unlimited != 1 && value > 100) {
             value = 100;
         }
@@ -3656,18 +3663,6 @@ l    */
         return Snapshot("spellPower", 0, positionalParams, namedParams, state, atTime);
     }
 
-    /** Get the current spirit of the player.
-	 @name Spirit
-	 @paramsig number or boolean
-	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
-	 @param number Optional. The number to compare against.
-	 @return The current spirit.
-	 @return A boolean value for the result of the comparison.
-     */
-    function Spirit(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        return Snapshot("spirit", 0, positionalParams, namedParams, state, atTime);
-    }
-
     /** Get the current stamina of the player.
 	 @name Stamina
 	 @paramsig number or boolean
@@ -3714,7 +3709,6 @@ l    */
     OvaleCondition.RegisterCondition("spellcritchance", false, SpellCritChance);
     OvaleCondition.RegisterCondition("spellcastspeedpercent", false, SpellCastSpeedPercent);
     OvaleCondition.RegisterCondition("spellpower", false, Spellpower);
-    OvaleCondition.RegisterCondition("spirit", false, Spirit);
     OvaleCondition.RegisterCondition("stamina", false, Stamina);
     OvaleCondition.RegisterCondition("strength", false, Strength);
     OvaleCondition.RegisterCondition("versatility", false, Versatility);
@@ -3845,12 +3839,12 @@ l    */
 	     Spell(devouring_plague)
      */
     function SpellCooldown(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        let comparator, limit;
+        let comparator: string, limit: number;
         let usable = (namedParams.usable == 1);
         let [target] = ParseCondition(positionalParams, namedParams, state, "target");
         let earliest = INFINITY;
-        for (const [i, spellId] of ipairs<number>(positionalParams)) {
-            if (OvaleCondition.COMPARATOR[spellId]) {
+        for (const [i, spellId] of ipairs(positionalParams)) {
+            if (isComparator(spellId)) {
                 [comparator, limit] = [spellId, positionalParams[i + 1]];
                 break;
             } else if (!usable || OvaleSpells.IsUsableSpell(spellId, atTime, OvaleGUID.UnitGUID(target))) {
@@ -3931,13 +3925,13 @@ l    */
 	 if BuffRemaining(slice_and_dice) >= SpellData(shadow_blades duration)
 	     Spell(shadow_blades)
      */
-    function SpellData(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        let [spellId, key, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3], positionalParams[4]];
+    function SpellData(positionalParams: PositionalParameters, namedParams: NamedParameters, state: BaseState, atTime: number) {
+        let [spellId, key, comparator, limit] = [<number>positionalParams[1], <keyof SpellInfo>positionalParams[2], <string>positionalParams[3], <number>positionalParams[4]];
         let si = OvaleData.spellInfo[spellId];
         if (si) {
             let value = si[key];
             if (value) {
-                return Compare(value, comparator, limit);
+                return Compare(<number>value, comparator, limit);
             }
         }
         return undefined;
@@ -3959,11 +3953,11 @@ l    */
 	 if Insanity() + SpellInfoProperty(mind_blast insanity) < 100
 	     Spell(mind_blast)
      */
-    function SpellInfoProperty(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        let [spellId, key, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3], positionalParams[4]];
+    function SpellInfoProperty(positionalParams: PositionalParameters, namedParams: NamedParameters, state: BaseState, atTime: number) {
+        let [spellId, key, comparator, limit] = [<number>positionalParams[1], <keyof SpellInfo>positionalParams[2], <string>positionalParams[3], <number>positionalParams[4]];
         let value = OvaleData.GetSpellInfoProperty(spellId, atTime, key, undefined);
         if (value) {
-            return Compare(value, comparator, limit);
+            return Compare(<number>value, comparator, limit);
         }
         return undefined;
     }
@@ -4132,7 +4126,7 @@ l    */
      */
     function Stealthed(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let yesno = positionalParams[1];
-        let boolean = OvaleAura.GetAura("player", "stealthed_buff") !== undefined || IsStealthed();
+        let boolean = OvaleAura.GetAura("player", "stealthed_buff", atTime, "HELPFUL") !== undefined || IsStealthed();
         return TestBoolean(boolean, yesno);
     }
     OvaleCondition.RegisterCondition("isstealthed", false, Stealthed);
@@ -4437,7 +4431,7 @@ l    */
 {
     /** Get the number of seconds before the player reaches the given power level.
 	*/
-    function TimeToPower(powerType, level, comparator, limit, state: BaseState, atTime) {
+    function TimeToPower(powerType: PowerType, level: number, comparator: string, limit: number, state: BaseState, atTime: number) {
         level = level || 0;
         let power = OvalePower.next.power[powerType] || 0;
         let powerRegen = OvalePower.next.GetPowerRate(powerType) || 1;
@@ -4485,7 +4479,7 @@ l    */
 	 if TimeToMaxEnergy() < 1.2 Spell(sinister_strike)
      */
     function TimeToMaxEnergy(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        let powerType = "energy";
+        const powerType = "energy";
         let [comparator, limit] = [positionalParams[1], positionalParams[2]];
         let level = OvalePower.current.maxPower[powerType] || 0;
         return TimeToPower(powerType, level, comparator, limit, state, atTime);
@@ -4520,7 +4514,7 @@ l    */
 	 if TimeToMaxFocus() < 1.2 Spell(cobra_shot)
      */
     function TimeToMaxFocus(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        let powerType = "focus";
+        let powerType: PowerType = "focus";
         let [comparator, limit] = [positionalParams[1], positionalParams[2]];
         let level = OvalePower.current.maxPower[powerType] || 0;
         return TimeToPower(powerType, level, comparator, limit, state, atTime);
@@ -4531,11 +4525,11 @@ l    */
     OvaleCondition.RegisterCondition("timetomaxfocus", false, TimeToMaxFocus);
 }
 {
-    function TimeToPowerFor(powerType, positionalParams, namedParams, state: BaseState, atTime) {
-        let [spellId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
+    function TimeToPowerFor(powerType: PowerType, positionalParams: PositionalParameters, namedParams: NamedParameters, state: BaseState, atTime: number) {
+        let [spellId, comparator, limit] = [<number>positionalParams[1], <string>positionalParams[2], <number>positionalParams[3]];
         let [target] = ParseCondition(positionalParams, namedParams, state, "target");
         if (!powerType) {
-            let [, pt] = OvalePower.GetSpellCost(spellId);
+            let [, pt] = OvalePower.GetSpellCost(<number>spellId);
             powerType = pt;
         }
         let seconds = OvalePower.TimeToPower(spellId, atTime, OvaleGUID.UnitGUID(target), powerType);
@@ -4707,7 +4701,7 @@ l    */
 	 if TotemRemaining(healing_stream_totem) <2 Spell(totemic_recall)
      */
     function TotemRemaining(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
-        let [id, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
+        let [id, comparator, limit] = [positionalParams[1], positionalParams[2], <number>positionalParams[3]];
         if (type(id) == "string") {
             let [, , startTime, duration] = OvaleTotem.GetTotemInfo(id);
             if (startTime && duration > 0) {

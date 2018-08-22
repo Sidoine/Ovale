@@ -9,6 +9,7 @@ local __Artifact = LibStub:GetLibrary("ovale/Artifact")
 local OvaleArtifact = __Artifact.OvaleArtifact
 local __AST = LibStub:GetLibrary("ovale/AST")
 local OvaleAST = __AST.OvaleAST
+local PARAMETER_KEYWORD = __AST.PARAMETER_KEYWORD
 local __Condition = LibStub:GetLibrary("ovale/Condition")
 local OvaleCondition = __Condition.OvaleCondition
 local __Cooldown = LibStub:GetLibrary("ovale/Cooldown")
@@ -20,7 +21,7 @@ local OvaleEquipment = __Equipment.OvaleEquipment
 local __PaperDoll = LibStub:GetLibrary("ovale/PaperDoll")
 local OvalePaperDoll = __PaperDoll.OvalePaperDoll
 local __Power = LibStub:GetLibrary("ovale/Power")
-local OvalePower = __Power.OvalePower
+local POWER_TYPES = __Power.POWER_TYPES
 local __Score = LibStub:GetLibrary("ovale/Score")
 local OvaleScore = __Score.OvaleScore
 local __SpellBook = LibStub:GetLibrary("ovale/SpellBook")
@@ -40,12 +41,14 @@ local tonumber = tonumber
 local tostring = tostring
 local type = type
 local wipe = wipe
+local kpairs = pairs
 local find = string.find
 local match = string.match
 local sub = string.sub
 local GetSpellInfo = GetSpellInfo
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isLuaArray = __tools.isLuaArray
+local checkToken = __tools.checkToken
 local OvaleCompileBase = Ovale:NewModule("OvaleCompile", aceEvent)
 local self_compileOnStances = false
 local self_serial = 0
@@ -129,7 +132,7 @@ local TEST_CONDITION_DISPATCH = {
 local function TestConditions(positionalParams, namedParams)
     __exports.OvaleCompile:StartProfiling("OvaleCompile_TestConditions")
     local boolean = true
-    for param, dispatch in pairs(TEST_CONDITION_DISPATCH) do
+    for param, dispatch in kpairs(TEST_CONDITION_DISPATCH) do
         local value = namedParams[param]
         if isLuaArray(value) then
             for _, v in ipairs(value) do
@@ -241,7 +244,7 @@ local function EvaluateItemInfo(node)
     local itemId, positionalParams, namedParams = node.itemId, node.positionalParams, node.namedParams
     if itemId and TestConditions(positionalParams, namedParams) then
         local ii = OvaleData:ItemInfo(itemId)
-        for k, v in pairs(namedParams) do
+        for k, v in kpairs(namedParams) do
             if k == "proc" then
                 local buff = tonumber(namedParams.buff)
                 if buff then
@@ -253,7 +256,7 @@ local function EvaluateItemInfo(node)
                     ok = false
                     break
                 end
-            elseif  not OvaleAST.PARAMETER_KEYWORD[k] then
+            elseif  not checkToken(PARAMETER_KEYWORD, k) then
                 ii[k] = v
             end
         end
@@ -269,8 +272,8 @@ local function EvaluateItemRequire(node)
         local count = 0
         local ii = OvaleData:ItemInfo(itemId)
         local tbl = ii.require[property] or {}
-        for k, v in pairs(namedParams) do
-            if  not OvaleAST.PARAMETER_KEYWORD[k] then
+        for k, v in kpairs(namedParams) do
+            if  not checkToken(PARAMETER_KEYWORD, k) then
                 tbl[k] = v
                 count = count + 1
             end
@@ -340,9 +343,9 @@ local function EvaluateSpellAuraList(node)
         local filter = find(node.keyword, "Debuff") and "HARMFUL" or "HELPFUL"
         local tbl = auraTable[filter] or {}
         local count = 0
-        for k, v in pairs(namedParams) do
-            if  not OvaleAST.PARAMETER_KEYWORD[k] then
-                tbl[k] = v
+        for k, v in kpairs(namedParams) do
+            if  not checkToken(PARAMETER_KEYWORD, k) then
+                tbl[tonumber(k)] = v
                 count = count + 1
             end
         end
@@ -354,7 +357,7 @@ local function EvaluateSpellAuraList(node)
 end
 local function EvaluateSpellInfo(node)
     local addpower = {}
-    for powertype in pairs(OvalePower.POWER_INFO) do
+    for _, powertype in ipairs(POWER_TYPES) do
         local key = "add" .. powertype
         addpower[key] = powertype
     end
@@ -362,7 +365,7 @@ local function EvaluateSpellInfo(node)
     local spellId, positionalParams, namedParams = node.spellId, node.positionalParams, node.namedParams
     if spellId and TestConditions(positionalParams, namedParams) then
         local si = OvaleData:SpellInfo(spellId)
-        for k, v in pairs(namedParams) do
+        for k, v in kpairs(namedParams) do
             if k == "add_duration" then
                 local value = tonumber(v)
                 if value then
@@ -390,7 +393,10 @@ local function EvaluateSpellInfo(node)
                 list[spellId] = true
                 OvaleData.buffSpellList[v] = list
             elseif k == "dummy_replace" then
-                local spellName = GetSpellInfo(v) or v
+                local spellName = GetSpellInfo(v)
+                if  not spellName then
+                    spellName = v
+                end
                 OvaleSpellBook:AddSpell(spellId, spellName)
             elseif k == "learn" and v == 1 then
                 local spellName = GetSpellInfo(spellId)
@@ -411,7 +417,7 @@ local function EvaluateSpellInfo(node)
                     ok = false
                     break
                 end
-            elseif  not OvaleAST.PARAMETER_KEYWORD[k] then
+            elseif  not checkToken(PARAMETER_KEYWORD, k) then
                 si[k] = v
             end
         end
@@ -426,8 +432,8 @@ local function EvaluateSpellRequire(node)
         local count = 0
         local si = OvaleData:SpellInfo(spellId)
         local tbl = si.require[property] or {}
-        for k, v in pairs(namedParams) do
-            if  not OvaleAST.PARAMETER_KEYWORD[k] then
+        for k, v in kpairs(namedParams) do
+            if  not checkToken(PARAMETER_KEYWORD, k) then
                 tbl[k] = v
                 count = count + 1
             end
@@ -490,10 +496,10 @@ local function AddToBuffList(buffId, statName, isStacking)
         end
     else
         local si = OvaleData.spellInfo[buffId]
-        isStacking = si and (si.stacking == 1 or si.max_stacks)
+        isStacking = si and (si.stacking == 1 or si.max_stacks > 0)
         if si and si.stat then
             local stat = si.stat
-            if type(stat) == "table" then
+            if isTable(stat) then
                 for _, name in ipairs(stat) do
                     AddToBuffList(buffId, name, isStacking)
                 end
@@ -506,28 +512,25 @@ end
 local function isTable(t)
     return type(t) == "table"
 end
-local UpdateTrinketInfo = nil
-do
-    local trinket = {}
-    UpdateTrinketInfo = function()
-        trinket[1], trinket[2] = OvaleEquipment:GetEquippedTrinkets()
-        for i = 1, 2, 1 do
-            local itemId = trinket[i]
-            local ii = itemId and OvaleData:ItemInfo(itemId)
-            local buffId = ii and ii.buff
-            if buffId then
-                if isTable(buffId) then
-                    for _, id in ipairs(buffId) do
-                        AddToBuffList(id)
-                    end
-                else
-                    AddToBuffList(buffId)
+local trinket = {}
+local UpdateTrinketInfo = function()
+    trinket[1], trinket[2] = OvaleEquipment:GetEquippedTrinkets()
+    for i = 1, 2, 1 do
+        local itemId = trinket[i]
+        local ii = itemId and OvaleData:ItemInfo(itemId)
+        local buffId = ii and ii.buff
+        if buffId then
+            if isTable(buffId) then
+                for _, id in ipairs(buffId) do
+                    AddToBuffList(id)
                 end
+            else
+                AddToBuffList(buffId)
             end
         end
     end
-
 end
+
 local OvaleCompileClassBase = OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(OvaleCompileBase))
 local OvaleCompileClass = __class(OvaleCompileClassBase, {
     OnInitialize = function(self)
@@ -552,7 +555,8 @@ local OvaleCompileClass = __class(OvaleCompileClassBase, {
         self:UnregisterMessage("Ovale_TalentsChanged")
     end,
     Ovale_ScriptChanged = function(self, event)
-        self:CompileScript(Ovale.db.profile.source)
+        local specName = OvalePaperDoll:GetSpecialization()
+        self:CompileScript(Ovale.db.profile.source[specName])
         self:EventHandler(event)
     end,
     Ovale_StanceChanged = function(self, event)
@@ -594,11 +598,8 @@ local OvaleCompileClass = __class(OvaleCompileClassBase, {
     end,
     EvaluateScript = function(self, ast, forceEvaluation)
         self:StartProfiling("OvaleCompile_EvaluateScript")
-        if type(ast) ~= "table" then
-            forceEvaluation = ast
-            ast = self.ast
-        end
         local changed = false
+        ast = ast or self.ast
         if ast and (forceEvaluation or  not self.serial or self.serial < self_serial) then
             self:Debug("Evaluating script.")
             changed = true

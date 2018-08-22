@@ -27,7 +27,7 @@ local DataModes = function(self, data, num)
     return score, nil
 end
 
-local TooltipFuncs = function(self, name, data)
+local TooltipFuncs = function(self, name)
     GameTooltip:ClearLines()
     GameTooltip:AddLine(name)
 end

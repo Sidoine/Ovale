@@ -6,10 +6,10 @@ import { OvaleDebug } from "./Debug";
 import { LuaArray } from "@wowts/lua";
 
 class BaseStateData {
-    currentTime: number|undefined = undefined;
-    inCombat: boolean = undefined;
-    combatStartTime: number = undefined;    
-    defaultTarget: string;
+    currentTime: number = 0;
+    inCombat: boolean = false;
+    combatStartTime: number = 0;    
+    defaultTarget: string = "target";
 }
 
 const BaseStateBase = OvaleDebug.RegisterDebugging(OvaleState.RegisterHasState(Ovale.NewModule("BaseState", aceEvent), BaseStateData));

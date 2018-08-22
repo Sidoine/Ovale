@@ -121,7 +121,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
     OnUpdate = function(self, elapsed)
         __exports.OvaleFrameModule:SendMessage("Ovale_OnUpdate")
         self.timeSinceLastUpdate = self.timeSinceLastUpdate + elapsed
-        local refresh = OvaleDebug.trace or self.visible and (self.timeSinceLastUpdate > Ovale.db.profile.apparence.minFrameRefresh / 1000 and next(Ovale.refreshNeeded) or self.timeSinceLastUpdate > Ovale.db.profile.apparence.maxFrameRefresh / 1000)
+        local refresh = OvaleDebug.trace or (self.visible or OvaleSpellFlash:IsSpellFlashEnabled()) and (self.timeSinceLastUpdate > Ovale.db.profile.apparence.minFrameRefresh / 1000 and next(Ovale.refreshNeeded) or self.timeSinceLastUpdate > Ovale.db.profile.apparence.maxFrameRefresh / 1000)
         if refresh then
             Ovale:AddRefreshInterval(self.timeSinceLastUpdate * 1000)
             OvaleState:InitializeState()
@@ -241,7 +241,8 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
                     else
                         start = timeSpan:NextTime(atTime)
                     end
-                    icons[2]:Update(nextElement, start, OvaleBestAction:GetActionInfo(nextElement, state, start))
+                    local actionTexture2, actionInRange2, actionCooldownStart2, actionCooldownDuration2, actionUsable2, actionShortcut2, actionIsCurrent2, actionEnable2, actionType2, actionId2, actionTarget2, actionResourceExtend2 = OvaleBestAction:GetActionInfo(nextElement, state, start)
+                    icons[2]:Update(nextElement, start, actionTexture2, actionInRange2, actionCooldownStart2, actionCooldownDuration2, actionUsable2, actionShortcut2, actionIsCurrent2, actionEnable2, actionType2, actionId2, actionTarget2, actionResourceExtend2)
                 else
                     icons[2]:Update(element, nil)
                 end

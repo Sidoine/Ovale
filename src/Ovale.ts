@@ -1,11 +1,12 @@
 import { L } from "./Localization";
 import { NewAddon } from "@wowts/tsaddon";
 import aceEvent from "@wowts/ace_event-3.0";
-import { ipairs, pairs, select, strjoin, tostring, tostringall, wipe, LuaArray, LuaObj, _G, truthy } from "@wowts/lua";
+import { ipairs, pairs, strjoin, tostring, tostringall, wipe, LuaArray, LuaObj, _G, truthy } from "@wowts/lua";
 import { format, find, len } from "@wowts/string";
-import { UnitClass, UnitGUID, DEFAULT_CHAT_FRAME } from "@wowts/wow-mock";
+import { UnitClass, UnitGUID, DEFAULT_CHAT_FRAME, ClassId } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
 import { AceDatabase } from "@wowts/ace_db-3.0";
+import { Color } from "./SpellFlash";
 
 let self_oneTimeMessage: LuaObj<boolean | "printed"> = {}
 let MAX_REFRESH_INTERVALS = 500;
@@ -29,15 +30,9 @@ export function MakeString(s?: string, ...__args: any[]) {
     return s;
 }
 
-interface Color {
-    r:number;
-    g:number;
-    b:number;
-}
-
 export interface OvaleDb {
     profile: {
-        source: string;
+        source: LuaObj<string>;
         code: string,
         check: LuaObj<boolean>,
         list: LuaObj<string>,
@@ -107,7 +102,7 @@ export interface OvaleDb {
 
 const OvaleBase = NewAddon("Ovale", aceEvent);
 class OvaleClass extends OvaleBase {
-    playerClass: string = undefined;
+    playerClass: ClassId = undefined;
     playerGUID: string = undefined;
     db: AceDatabase & OvaleDb = undefined;
     refreshNeeded:LuaObj<boolean> = {}
@@ -135,7 +130,8 @@ class OvaleClass extends OvaleBase {
     // }
     OnInitialize() {
         this.playerGUID = UnitGUID("player");
-        this.playerClass = select(2, UnitClass("player"));
+        const [, classId] = UnitClass("player");
+        this.playerClass = classId;
         wipe(self_refreshIntervals);
         self_refreshIndex = 1;
         this.ClearOneTimeMessages();

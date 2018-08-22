@@ -126,8 +126,6 @@ Define(inquisition_talent 21)
 # Consumes up to 3 Holy Power to increase your damage done and Haste by s1.rnrnLasts d per Holy Power consumed.
 Define(righteous_verdict_talent 2)
 # Templar's Verdict increases the damage of your next Templar's Verdict by 267611s1 for 267611d.
-Define(wake_of_ashes_talent 12)
-# Lash out at your enemies, dealing sw1 Radiant damage to all enemies within a1 yd in front of you and reducing their movement speed by s2 for d.rnrnDemon and Undead enemies are also stunned for 255941d.rnrn|cFFFFFFFFGenerates s3 Holy Power.
 Define(consecration_talent 11)
 # Consecrates the land beneath you, causing <totaldmg> Holy damage over d to enemies who enter the area.rnrn|cFFFFFFFFGenerates s3 Holy Power.
 Define(divine_right_trait 277678)
@@ -517,8 +515,6 @@ Define(wings_of_liberty_buff 185647)
 Define(word_of_glory 85673)
 	SpellInfo(word_of_glory cd=1 holypower=3)
 	SpellRequire(word_of_glory holypower_percent 0=buff,word_of_glory_no_holy_buff)
-	SpellAddBuff(word_of_glory bastion_of_glory_buff=0 if_spell=shield_of_the_righteous)
-	SpellAddBuff(word_of_glory bastion_of_power_buff=0 if_spell=shield_of_the_righteous itemset=T16_tank itemcount=4)
 	SpellAddBuff(word_of_glory divine_purpose_buff=0 if_spell=divine_purpose)
 	SpellAddBuff(word_of_glory lawful_words_buff=0 itemset=T17 itemcount=4 specialization=holy)
 SpellList(word_of_glory_no_holy_buff bastion_of_power_buff divine_purpose_buff lawful_words_buff)
@@ -531,13 +527,13 @@ Define(zeal_debuff 269571)
 #Define(ashes_to_ashes 179546)
 
 #Legendaries
-Define(sacred_judgment 253806)
+Define(sacred_judgment_item 253806)
 Define(sacred_judgment_buff 253806)
 	SpellInfo(sacred_judgment_buff duration=15)
 	
 
 #Azerite Traits
-Define(divine_right 278519)
+Define(divine_right_trait 278519)
 Define(divine_right_buff 277678)
 	SpellInfo(divine_right_buff duration=15)
 

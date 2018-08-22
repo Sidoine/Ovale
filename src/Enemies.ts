@@ -4,7 +4,7 @@ import { Ovale } from "./Ovale";
 import { OvaleGUID } from "./GUID";
 import { OvaleState } from "./State";
 import aceEvent from "@wowts/ace_event-3.0";
-import AceTimer from "@wowts/ace_timer-3.0";
+import AceTimer, { Timer } from "@wowts/ace_timer-3.0";
 import { band, bor } from "@wowts/bit";
 import { ipairs, pairs, wipe, truthy, LuaObj } from "@wowts/lua";
 import { find } from "@wowts/string";
@@ -26,13 +26,13 @@ let CLEU_TAG_SUFFIXES = {
     11: "_DRAIN",
     12: "_LEECH"
 }
-let CLEU_AUTOATTACK = {
+let CLEU_AUTOATTACK: LuaObj<boolean> = {
     RANGED_DAMAGE: true,
     RANGED_MISSED: true,
     SWING_DAMAGE: true,
     SWING_MISSED: true
 }
-let CLEU_UNIT_REMOVED = {
+let CLEU_UNIT_REMOVED: LuaObj<boolean> = {
     UNIT_DESTROYED: true,
     UNIT_DIED: true,
     UNIT_DISSIPATES: true
@@ -40,9 +40,9 @@ let CLEU_UNIT_REMOVED = {
 let self_enemyName: LuaObj<string> = {}
 let self_enemyLastSeen: LuaObj<number> = {}
 let self_taggedEnemyLastSeen: LuaObj<number> = {}
-let self_reaperTimer = undefined;
+let self_reaperTimer: Timer = undefined;
 let REAP_INTERVAL = 3;
-const IsTagEvent = function(cleuEvent) {
+const IsTagEvent = function(cleuEvent: string) {
     let isTagEvent = false;
     if (CLEU_AUTOATTACK[cleuEvent]) {
         isTagEvent = true;
@@ -56,14 +56,14 @@ const IsTagEvent = function(cleuEvent) {
     }
     return isTagEvent;
 }
-const IsFriendly = function(unitFlags, isGroupMember?) {
+const IsFriendly = function(unitFlags: number, isGroupMember?: boolean) {
     return band(unitFlags, COMBATLOG_OBJECT_REACTION_FRIENDLY) > 0 && (!isGroupMember || band(unitFlags, GROUP_MEMBER) > 0);
 }
 
 class EnemiesData {
     activeEnemies = 0;
     taggedEnemies = 0;
-    enemies = undefined;
+    enemies: number | undefined = undefined;
 }
 let OvaleEnemiesBase = OvaleState.RegisterHasState(OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleEnemies", aceEvent, AceTimer))), EnemiesData);
 
@@ -97,7 +97,12 @@ class OvaleEnemiesClass extends OvaleEnemiesBase {
                 }
             } else if (IsFriendly(sourceFlags, true) && !IsFriendly(destFlags) && IsTagEvent(cleuEvent)) {
                 let now = GetTime();
-                let isPlayerTag = (sourceGUID == Ovale.playerGUID) || OvaleGUID.IsPlayerPet(sourceGUID);
+                let isPlayerTag;
+                if (sourceGUID == Ovale.playerGUID) {
+                    isPlayerTag = true;
+                } else {
+                    [isPlayerTag] =  OvaleGUID.IsPlayerPet(sourceGUID);
+                }
                 this.AddEnemy(cleuEvent, destGUID, destName, now, isPlayerTag);
             }
         }
@@ -124,7 +129,7 @@ class OvaleEnemiesClass extends OvaleEnemiesBase {
         }
         this.StopProfiling("OvaleEnemies_RemoveInactiveEnemies");
     }
-    private AddEnemy(cleuEvent, guid, name, timestamp, isTagged?) {
+    private AddEnemy(cleuEvent: string, guid: string, name: string, timestamp: number, isTagged?: boolean) {
         this.StartProfiling("OvaleEnemies_AddEnemy");
         if (guid) {
             self_enemyName[guid] = name;
@@ -150,7 +155,7 @@ class OvaleEnemiesClass extends OvaleEnemiesBase {
         }
         this.StopProfiling("OvaleEnemies_AddEnemy");
     }
-    private RemoveEnemy(cleuEvent, guid, timestamp, isDead?) {
+    private RemoveEnemy(cleuEvent: string, guid: string, timestamp: number, isDead?: boolean) {
         this.StartProfiling("OvaleEnemies_RemoveEnemy");
         if (guid) {
             let name = self_enemyName[guid];
@@ -177,7 +182,7 @@ class OvaleEnemiesClass extends OvaleEnemiesBase {
         }
         this.StopProfiling("OvaleEnemies_RemoveEnemy");
     }
-    private RemoveTaggedEnemy(cleuEvent, guid, timestamp) {
+    private RemoveTaggedEnemy(cleuEvent: string, guid: string, timestamp: number) {
         this.StartProfiling("OvaleEnemies_RemoveTaggedEnemy");
         if (guid) {
             let name = self_enemyName[guid];

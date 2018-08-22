@@ -202,6 +202,8 @@ Define(steel_trap_talent 11)
 # Hurls a Steel Trap to the target location that snaps shut on the first enemy that approaches, immobilizing them for 162480d and causing them to bleed for 162487o1 damage over 162487d. rnrnDamage other than Steel Trap may break the immobilization effect. Trap will exist for 162496d. Limit 1.
 Define(focused_fire_trait 278531)
 Define(in_the_rhythm_trait 264198)
+Define(up_close_and_personal_trait 278533)
+Define(venomous_fangs_trait 274590)
     ]]
     code = code .. [[
 # Hunter spells and functions.
@@ -470,13 +472,17 @@ Define(pet_coordinated_assault_buff 266779)
 Define(pet_frenzy_buff 272790)
 	SpellInfo(pet_frenzy_buff duration=8 max_stacks=3)
 
+# Azerite Traits
+
+
+
 #Items
 Define(frizzos_fingertrap_item 137043)
 Define(the_mantle_of_command_item 144326)
 Define(qapla_eredun_war_order_item 137227)
 Define(call_of_the_wild_item 137101)
 Define(parsels_tongue_item 151805)
-Define(parsels_tongue_item_buff 248085)
+Define(parsels_tongue_buff 248085)
 
 # Talents
 Define(a_murder_of_crows_talent 12)

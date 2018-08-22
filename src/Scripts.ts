@@ -2,13 +2,17 @@ import AceConfig from "@wowts/ace_config-3.0";
 import AceConfigDialog from "@wowts/ace_config_dialog-3.0";
 import { OvaleOptions } from "./Options";
 import { L } from "./Localization";
-import { OvalePaperDoll } from "./PaperDoll";
+import { OvalePaperDoll, SpecializationName } from "./PaperDoll";
 import { Ovale } from "./Ovale";
 import aceEvent from "@wowts/ace_event-3.0";
 import { format, gsub, lower } from "@wowts/string";
-import { pairs, LuaObj } from "@wowts/lua";
+import { pairs, LuaObj, kpairs } from "@wowts/lua";
+import { ClassId, SpecializationIndex } from "@wowts/wow-mock";
+import { isLuaArray } from "./tools";
+import { GetNumSpecializations } from "@wowts/wow-mock";
+import { OvaleDebug } from "./Debug";
 
-let OvaleScriptsBase = Ovale.NewModule("OvaleScripts", aceEvent);
+let OvaleScriptsBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleScripts", aceEvent));
 export let OvaleScripts: OvaleScriptsClass;
 let DEFAULT_NAME = "Ovale";
 let DEFAULT_DESCRIPTION = L["Script défaut"];
@@ -19,7 +23,7 @@ let DISABLED_DESCRIPTION = L["Disabled"];
 {
     let defaultDB = {
         code: "",
-        source: "Ovale",
+        source: {},
         showHiddenScripts: false
     }
     let actions = {
@@ -33,7 +37,7 @@ let DISABLED_DESCRIPTION = L["Disabled"];
             }
         }
     }
-    for (const [k, v] of pairs(defaultDB)) {
+    for (const [k, v] of kpairs(defaultDB)) {
         OvaleOptions.defaultDB.profile[k] = v;
     }
     for (const [k, v] of pairs(actions)) {
@@ -64,13 +68,15 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
         this.RegisterScript(Ovale.playerClass, undefined, CUSTOM_NAME, CUSTOM_DESCRIPTION, Ovale.db.profile.code, "script");
         this.RegisterScript(undefined, undefined, DISABLED_NAME, DISABLED_DESCRIPTION, undefined, "script");
         this.RegisterMessage("Ovale_StanceChanged");
+        this.RegisterMessage("Ovale_ScriptChanged", "InitScriptProfiles");
     }
     OnDisable() {
         this.UnregisterMessage("Ovale_StanceChanged");
+        this.UnregisterMessage("Ovale_ScriptChanged");
     }
-    Ovale_StanceChanged(event, newStance, oldStance) {
+    Ovale_StanceChanged(event: string, newStance: string, oldStance: string) {
     }
-    GetDescriptions(scriptType) {
+    GetDescriptions(scriptType: string) {
         let descriptionsTable: LuaObj<string> = {}
         for (const [name, script] of pairs(this.script)) {
             if ((!scriptType || script.type == scriptType) 
@@ -94,67 +100,48 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
         script.code = code || "";
         script.className = className;
     }
-    UnregisterScript(name) {
+    UnregisterScript(name: string) {
         this.script[name] = undefined;
     }
-    SetScript(name) {
-        const oldSource = Ovale.db.profile.source;
+    SetScript(name: string) {
+        let specName = OvalePaperDoll.GetSpecialization();
+        const oldSource = Ovale.db.profile.source[specName];
         if (oldSource != name) {
-            Ovale.db.profile.source = name;
+            Ovale.db.profile.source[specName] = name;
             this.SendMessage("Ovale_ScriptChanged");
         }
     }
-    GetDefaultScriptName(className, specialization) {
-        let name;
-        if (className == "DEATHKNIGHT") {
-            if (specialization == "blood") {
-                name = "icyveins_deathknight_blood";
-            } else if (specialization == "frost") {
-                name = "sc_pr_death_knight_frost";
-            } else if (specialization == "unholy") {
-                name = "sc_pr_death_knight_unholy";
-            }
-        } else if (className == "DEMONHUNTER") {
-            if (specialization == "vengeance") {
-                name = "icyveins_demonhunter_vengeance";
-            } else if (specialization == "havoc") {
-                name = "sc_pr_demon_hunter_havoc";
-            }
-        } else if (className == "DRUID") {
-            if (specialization == "restoration") {
-                name = DISABLED_NAME;
-            } else if (specialization == "guardian") {
-                name = "icyveins_druid_guardian";
-            } else if (specialization == "feral") {
+    GetDefaultScriptName(className: ClassId, specialization: SpecializationName) {
+        let name = undefined;
+
+        if(className == "DRUID"){
+            if(specialization == "feral"){
                 name = "shmoodude_druid_feral";
             }
-        } else if (className == "MONK") {
-            if (specialization == "mistweaver") {
-                name = DISABLED_NAME;
-            } else if (specialization == "brewmaster") {
-                name = "icyveins_monk_brewmaster";
+        }else if(className == "MONK"){
+            if(specialization == "mistweaver"){
+                name = "Disabled";
             }
-        } else if (className == "PALADIN") {
-            if (specialization == "holy") {
-                name = "icyveins_paladin_holy";
-            } else if (specialization == "protection") {
-                name = "icyveins_paladin_protection";
+        } else if(className == "PALADIN"){
+            if(specialization == "holy"){
+                name = "Disabled";
             }
-        } else if (className == "PRIEST") {
-            if (specialization == "discipline") {
-                name = "icyveins_priest_discipline";
-            } else if (specialization == "holy") {
-                name = DISABLED_NAME;
+        }else if(className == "PRIEST"){
+            if(specialization == "holy"){
+                name = "Disabled";
+            }else if(specialization == "discipline"){
+                name = "Disabled";
             }
-        } else if (className == "SHAMAN") {
-            if (specialization == "restoration") {
-                name = DISABLED_NAME;
+        } else if(className == "SHAMAN"){
+            if(specialization == "restoration"){
+                name = "Disabled";
             }
-        } else if (className == "WARRIOR") {
-            if (specialization == "protection") {
-                name = "icyveins_warrior_protection";
+        } else if(className == "WARRIOR"){
+            if(specialization == "protection"){
+                name = "Disabled";
             }
         }
+
         if (!name && specialization) {
             name = format("sc_pr_%s_%s", lower(className), specialization);
         }
@@ -163,7 +150,7 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
         }
         return name;
     }
-    GetScriptName(name) {
+    GetScriptName(name: string) {
         return (name == DEFAULT_NAME) && this.GetDefaultScriptName(Ovale.playerClass, OvalePaperDoll.GetSpecialization()) || name;
     }
     GetScript(name: string) {
@@ -182,14 +169,15 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
                     type: "select",
                     name: L["Script"],
                     width: "double",
-                    values: (info) => {
+                    values: (info: any) => {
                         let scriptType = !Ovale.db.profile.showHiddenScripts && "script";
                         return OvaleScripts.GetDescriptions(scriptType);
                     },
-                    get: (info) => {
-                        return Ovale.db.profile.source;
+                    get: (info: any) => {
+                        let specName = OvalePaperDoll.GetSpecialization();
+                        return Ovale.db.profile.source[specName];
                     },
-                    set: (info, v) => {
+                    set: (info: any, v: string) => {
                         this.SetScript(v);
                     }
                 },
@@ -200,14 +188,16 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
                     name: L["Script"],
                     width: "full",
                     disabled: () => {
-                        return Ovale.db.profile.source != CUSTOM_NAME;
+                        let specName = OvalePaperDoll.GetSpecialization();
+                        return Ovale.db.profile.source[specName] != CUSTOM_NAME;
                     },
-                    get: (info)  => {
-                        let code = OvaleScripts.GetScript(Ovale.db.profile.source);
+                    get: (info: any)  => {
+                        let specName = OvalePaperDoll.GetSpecialization();
+                        let code = OvaleScripts.GetScript(Ovale.db.profile.source[specName]);
                         code = code || "";
                         return gsub(code, "\t", "    ");
                     },
-                    set: (info, v) => {
+                    set: (info: any, v: string) => {
                         OvaleScripts.RegisterScript(Ovale.playerClass, undefined, CUSTOM_NAME, CUSTOM_DESCRIPTION, v, "script");
                         Ovale.db.profile.code = v;
                         this.SendMessage("Ovale_ScriptChanged");
@@ -218,15 +208,17 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
                     type: "execute",
                     name: L["Copier sur Script personnalisé"],
                     disabled: () => {
-                        return Ovale.db.profile.source == CUSTOM_NAME;
+                        let specName = OvalePaperDoll.GetSpecialization();
+                        return Ovale.db.profile.source[specName] == CUSTOM_NAME;
                     },
                     confirm: () => {
                         return L["Ecraser le Script personnalisé préexistant?"];
                     },
                     func: () => {
-                        let code = OvaleScripts.GetScript(Ovale.db.profile.source);
+                        let specName = OvalePaperDoll.GetSpecialization();
+                        let code = OvaleScripts.GetScript(Ovale.db.profile.source[specName]);
                         OvaleScripts.RegisterScript(Ovale.playerClass, undefined, CUSTOM_NAME, CUSTOM_DESCRIPTION, code, "script");
-                        Ovale.db.profile.source = CUSTOM_NAME;
+                        Ovale.db.profile.source[specName] = CUSTOM_NAME;
                         Ovale.db.profile.code = OvaleScripts.GetScript(CUSTOM_NAME);
                         this.SendMessage("Ovale_ScriptChanged");
                     }
@@ -235,10 +227,10 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
                     order: 40,
                     type: "toggle",
                     name: L["Show hidden"],
-                    get: (info) => {
+                    get: (info: any) => {
                         return Ovale.db.profile.showHiddenScripts;
                     },
-                    set: (info, value) => {
+                    set: (info: any, value: boolean) => {
                         Ovale.db.profile.showHiddenScripts = value;
                     }
                 }
@@ -247,6 +239,17 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
         let appName = this.GetName();
         AceConfig.RegisterOptionsTable(appName, options);
         AceConfigDialog.AddToBlizOptions(appName, L["Script"], Ovale.GetName());
+    }
+
+    InitScriptProfiles(){
+        let countSpecializations = GetNumSpecializations(false, false);
+        if(!isLuaArray(Ovale.db.profile.source)){
+            Ovale.db.profile.source = {}
+        }
+        for(let i=1; i < countSpecializations; i += 1){
+            let specName = OvalePaperDoll.GetSpecialization(i as SpecializationIndex)
+            Ovale.db.profile.source[specName] = Ovale.db.profile.source[specName] || this.GetDefaultScriptName(Ovale.playerClass, specName);
+        }
     }
 }
 

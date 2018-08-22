@@ -14,9 +14,6 @@ Define(avatar 107574)
   SpellInfo(avatar cd=90 duration=20 talent=avatar_talent rage=-20)
   # Damage done increased by s1.
   SpellAddBuff(avatar avatar=1)
-Define(battle_potion_of_strength 279170)
-# Chance to create multiple potions.
-  SpellInfo(battle_potion_of_strength gcd=0 offgcd=1)
 Define(berserking 26297)
 # Increases your haste by s1 for d.
   SpellInfo(berserking cd=180 duration=10 gcd=0 offgcd=1)
@@ -37,6 +34,9 @@ Define(colossus_smash 208086)
   SpellInfo(colossus_smash duration=10 gcd=0 offgcd=1)
   # Taking w1 additional damage from the Warrior.
   SpellAddTargetDebuff(colossus_smash colossus_smash=1)
+Define(crushing_assault_buff 278824)
+# @spelldesc278751
+  SpellInfo(crushing_assault_buff channel=-0.001 gcd=0 offgcd=1)
 Define(deadly_calm 262228)
 # Reduces the Rage cost of your abilities by s1 for d.
   SpellInfo(deadly_calm cd=60 duration=6 talent=deadly_calm_talent gcd=0 offgcd=1)
@@ -50,6 +50,9 @@ Define(dragon_roar 118000)
 Define(execute 163201)
 # Attempts to finish off a foe, causing up to <damage> Physical damage based on Rage spent. Only usable on enemies that have less than 20 health.?s231830[rnrnIf your foe survives, s2 of the Rage spent is refunded.][]
   SpellInfo(execute rage=20)
+Define(executioners_precision_buff 272867)
+# @spelldesc272866
+  SpellInfo(executioners_precision_buff channel=-0.001 gcd=0 offgcd=1)
 Define(fireblood 265226)
 # Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by s1.
   SpellInfo(fireblood duration=8 max_stacks=6 gcd=0 offgcd=1)
@@ -84,6 +87,9 @@ Define(overpower 7384)
   SpellInfo(overpower cd=12 duration=15 max_stacks=2)
   # Your next Mortal Strike will deal w2 increased damage.
   SpellAddBuff(overpower overpower=1)
+Define(bursting_blood 252343)
+# Chance to create multiple potions.
+  SpellInfo(bursting_blood gcd=0 offgcd=1)
 Define(pummel 13491)
 # Pummel the target for s2 damage and interrupt the spell being cast for d.
   SpellInfo(pummel rage=10 cd=10 duration=5 channel=5 interrupt=1)
@@ -124,6 +130,9 @@ Define(sweeping_strikes 260708)
   SpellInfo(sweeping_strikes cd=30 duration=12)
   # Your single-target damaging abilities hit s1 additional Ltarget:targets; within 8 yds for s2 damage.
   SpellAddBuff(sweeping_strikes sweeping_strikes=1)
+Define(test_of_might_buff 275531)
+# @spelldesc275529
+  SpellInfo(test_of_might_buff channel=-0.001 gcd=0 offgcd=1)
 Define(warbreaker 262161)
 # Smash the ground and shatter the armor of all enemies within A1 yds, dealing s1 Physical damage and increasing damage you deal to them by 208086s1 for 208086d.
   SpellInfo(warbreaker cd=45 talent=warbreaker_talent)
@@ -163,8 +172,7 @@ Define(rend_talent 9)
 # Wounds the target, causing s1 Physical damage instantly and an additional o2 Bleed damage over d.
 Define(skullsplitter_talent 3)
 # Bash an enemy's skull, dealing s1 Physical damage.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
-Define(archavons_heavy_hand_item 137060)
-Define(weight_of_the_earth_item 137077)
+Define(test_of_might_trait 275529)
     ]]
     code = code .. [[
 ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!shield_wall,buff,!shield_wall_buff)	
@@ -338,8 +346,8 @@ Define(rallying_cry_buff 97462)
 	SpellInfo(rallying_cry_buff duration=10)
 
 	SpellInfo(rampage gcd=1.5 cd_haste=none rage=85)
-	SpellInfo(rampage add_rage=-15 talent=carnage_talent)
-	SpellInfo(rampage add_rage=15 talent=frothing_berserker_talent)
+	SpellInfo(rampage add_rage=-10 talent=carnage_talent)
+	SpellInfo(rampage add_rage=10 talent=frothing_berserker_talent)
 	SpellAddBuff(rampage enrage_buff=1)
 	SpellAddBuff(rampage frothing_berserker_buff=1 talent=frothing_berserker_talent)
 	SpellAddBuff(rampage whirlwind_buff=-1)

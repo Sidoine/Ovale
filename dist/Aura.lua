@@ -30,6 +30,7 @@ local pairs = pairs
 local tonumber = tonumber
 local wipe = wipe
 local next = next
+local kpairs = pairs
 local lower = string.lower
 local sub = string.sub
 local concat = table.concat
@@ -49,8 +50,8 @@ local isLuaArray = __tools.isLuaArray
 local strlower = lower
 local strsub = sub
 local tconcat = concat
-local self_playerGUID = nil
-local self_petGUID = nil
+local self_playerGUID = "fake_guid"
+local self_petGUID = {}
 local self_pool = OvalePool("OvaleAura_pool")
 local UNKNOWN_GUID = "0"
 do
@@ -153,16 +154,21 @@ local CLEU_TICK_EVENTS = {
 }
 local array = {}
 __exports.PutAura = function(auraDB, guid, auraId, casterGUID, aura)
-    if  not auraDB[guid] then
-        auraDB[guid] = self_pool:Get()
+    local auraForGuid = auraDB[guid]
+    if  not auraForGuid then
+        auraForGuid = self_pool:Get()
+        auraDB[guid] = auraForGuid
     end
-    if  not auraDB[guid][auraId] then
-        auraDB[guid][auraId] = self_pool:Get()
+    local auraForId = auraForGuid[auraId]
+    if  not auraForId then
+        auraForId = self_pool:Get()
+        auraForGuid[auraId] = auraForId
     end
-    if auraDB[guid][auraId][casterGUID] then
-        self_pool:Release(auraDB[guid][auraId][casterGUID])
+    local previousAura = auraForId[casterGUID]
+    if previousAura then
+        self_pool:Release(previousAura)
     end
-    auraDB[guid][auraId][casterGUID] = aura
+    auraForId[casterGUID] = aura
     aura.guid = guid
     aura.spellId = auraId
     aura.source = casterGUID
@@ -215,7 +221,7 @@ end
 local function GetAuraOnGUID(auraDB, guid, auraId, filter, mine)
     local auraFound
     if __exports.DEBUFF_TYPE[auraId] then
-        if mine then
+        if mine and self_playerGUID then
             auraFound = GetDebuffType(auraDB, guid, auraId, filter, self_playerGUID)
             if  not auraFound then
                 for petGUID in pairs(self_petGUID) do
@@ -229,7 +235,7 @@ local function GetAuraOnGUID(auraDB, guid, auraId, filter, mine)
             auraFound = GetDebuffTypeAnyCaster(auraDB, guid, auraId, filter)
         end
     else
-        if mine then
+        if mine and self_playerGUID then
             auraFound = __exports.GetAura(auraDB, guid, auraId, self_playerGUID)
             if  not auraFound then
                 for petGUID in pairs(self_petGUID) do
@@ -270,6 +276,7 @@ local AuraInterface = __class(nil, {
     constructor = function(self)
         self.aura = {}
         self.serial = {}
+        self.auraSerial = 0
     end
 })
 local count
@@ -314,7 +321,8 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                 if strsub(requirement, 1, 7) == "target_" then
                     if targetGUID then
                         guid = targetGUID
-                        unitId = OvaleGUID:GUIDUnit(guid)
+                        local unitIdForGuid = OvaleGUID:GUIDUnit(guid)
+                        unitId = unitIdForGuid
                     else
                         unitId = baseState.next.defaultTarget or "target"
                     end
@@ -459,17 +467,17 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                     elseif cleuEvent == "SPELL_AURA_REFRESH" then
                         count = aura and aura.stacks or 1
                     end
-                    self:GainedAuraOnGUID(destGUID, now, spellId, sourceGUID, filter, true, nil, count, nil, duration, expirationTime, nil, spellName)
+                    self:GainedAuraOnGUID(destGUID, now, spellId, sourceGUID, filter, true, nil, count, nil, duration, expirationTime, false, spellName)
                 end
             end
-        elseif mine and CLEU_TICK_EVENTS[cleuEvent] then
+        elseif mine and CLEU_TICK_EVENTS[cleuEvent] and self_playerGUID then
             self:DebugTimestamp("%s: %s", cleuEvent, destGUID)
             local aura = __exports.GetAura(self.current.aura, destGUID, spellId, self_playerGUID)
             local now = GetTime()
-            if self:IsActiveAura(aura, now) then
+            if aura and self:IsActiveAura(aura, now) then
                 local name = aura.name or "Unknown spell"
                 local baseTick, lastTickTime = aura.baseTick, aura.lastTickTime
-                local tick = baseTick
+                local tick
                 if lastTickTime then
                     tick = now - lastTickTime
                 elseif  not baseTick then
@@ -477,6 +485,8 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                     local si = OvaleData.spellInfo[spellId]
                     baseTick = (si and si.tick) and si.tick or 3
                     tick = self:GetTickLength(spellId)
+                else
+                    tick = baseTick
                 end
                 aura.baseTick = baseTick
                 aura.lastTickTime = now
@@ -576,12 +586,12 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
             end
             aura.direction = direction
             aura.stacks = count
-            aura.consumed = nil
+            aura.consumed = false
             aura.filter = filter
             aura.visible = visible
             aura.icon = icon
             aura.debuffType = debuffType
-            aura.enrage = (debuffType == "Enrage") or nil
+            aura.enrage = (debuffType == "Enrage")
             aura.stealable = isStealable
             aura.value1, aura.value2, aura.value3 = value1, value2, value3
             local mine = (casterGUID == self_playerGUID or OvaleGUID:IsPlayerPet(casterGUID))
@@ -792,7 +802,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         return auraFound
     end,
     GetStateDebuffType = function(self, guid, debuffType, filter, casterGUID, atTime)
-        local auraFound
+        local auraFound = nil
         if self.current.aura[guid] then
             for _, whoseTable in pairs(self.current.aura[guid]) do
                 local aura = whoseTable[casterGUID]
@@ -850,7 +860,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         return auraFound
     end,
     GetStateAuraOnGUID = function(self, guid, auraId, filter, mine, atTime)
-        local auraFound
+        local auraFound = nil
         if __exports.DEBUFF_TYPE[auraId] then
             if mine then
                 auraFound = self:GetStateDebuffType(guid, auraId, filter, self_playerGUID, atTime)
@@ -886,7 +896,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         return auraFound
     end,
     GetAuraByGUID = function(self, guid, auraId, filter, mine, atTime)
-        local auraFound
+        local auraFound = nil
         if OvaleData.buffSpellList[auraId] then
             for id in pairs(OvaleData.buffSpellList[auraId]) do
                 local aura = self:GetStateAuraOnGUID(guid, id, filter, mine, atTime)
@@ -916,7 +926,8 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
     GetAuraWithProperty = function(self, unitId, propertyName, filter, atTime)
         local count = 0
         local guid = OvaleGUID:UnitGUID(unitId)
-        local start, ending = huge, 0
+        local start = huge
+        local ending = 0
         if self.current.aura[guid] then
             for _, whoseTable in pairs(self.current.aura[guid]) do
                 for _, aura in pairs(whoseTable) do
@@ -962,7 +973,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         local excludeGUID = excludeUnitId and OvaleGUID:UnitGUID(excludeUnitId) or nil
         for guid, auraTable in pairs(self.current.aura) do
             if guid ~= excludeGUID and auraTable[auraId] then
-                if mine then
+                if mine and self_playerGUID then
                     local aura = self:GetStateAura(guid, auraId, self_playerGUID, atTime)
                     if self:IsActiveAura(aura, atTime) and aura.filter == filter and aura.stacks >= minStacks and  not aura.state then
                         CountMatchingActiveAura(aura)
@@ -1105,7 +1116,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
     end,
     ApplySpellAuras = function(self, spellId, guid, atTime, auraList, spellcast)
         __exports.OvaleAura:StartProfiling("OvaleAura_state_ApplySpellAuras")
-        for filter, filterInfo in pairs(auraList) do
+        for filter, filterInfo in kpairs(auraList) do
             for auraIdKey, spellData in pairs(filterInfo) do
                 local auraId = tonumber(auraIdKey)
                 local duration = self:GetBaseDuration(auraId, spellcast)
@@ -1141,7 +1152,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                             aura = auraFound
                         else
                             aura = self:AddAuraToGUID(guid, auraId, auraFound.source, filter, nil, 0, huge, atTime)
-                            for k, v in pairs(auraFound) do
+                            for k, v in kpairs(auraFound) do
                                 aura[k] = v
                             end
                             aura.serial = self.next.auraSerial
@@ -1161,8 +1172,8 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                                 __exports.OvaleAura:Log("Aura %d is extended by %f seconds, preserving %d stack(s).", auraId, extend, aura.stacks)
                             else
                                 local maxStacks = 1
-                                if si and (si.max_stacks or si.maxstacks) then
-                                    maxStacks = si.max_stacks or si.maxstacks
+                                if si and si.max_stacks then
+                                    maxStacks = si.max_stacks
                                 end
                                 aura.stacks = aura.stacks + stacks
                                 if aura.stacks > maxStacks then
@@ -1261,7 +1272,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         aura.gain = aura.start
         aura.stacks = 1
         aura.debuffType = debuffType
-        aura.enrage = (debuffType == "Enrage") or nil
+        aura.enrage = debuffType == "Enrage"
         OvalePaperDoll:UpdateSnapshot(aura, snapshot)
         __exports.PutAura(self.next.aura, guid, auraId, casterGUID, aura)
         return aura
@@ -1274,7 +1285,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                 aura = auraFound
             else
                 aura = self:AddAuraToGUID(guid, auraId, auraFound.source, filter, nil, 0, huge, atTime)
-                for k, v in pairs(auraFound) do
+                for k, v in kpairs(auraFound) do
                     aura[k] = v
                 end
                 aura.serial = self.next.auraSerial

@@ -163,9 +163,9 @@ class OvaleActionBarClass extends OvaleActionBarBase {
     }
     UpdateActionSlot(slot: number) {
         this.StartProfiling("OvaleActionBar_UpdateActionSlot");
-        let action = this.action[slot];
-        if (this.spell[action] == slot) {
-            this.spell[action] = undefined;
+        const action = this.action[slot];
+        if (this.spell[<number>action] == slot) {
+            this.spell[<number>action] = undefined;
         } else if (this.item[action] == slot) {
             this.item[action] = undefined;
         } else if (this.macro[action] == slot) {

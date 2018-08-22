@@ -2,14 +2,15 @@
     "compilerOptions": {
       "target": "es2015",    
       "module": "commonjs",
-      "noImplicitAny": false,
+      "noImplicitAny": true,
       "outDir": "dist",
       "rootDir": "src",
-      "noUnusedLocals": false
+      "noUnusedLocals": true
     },
     "exclude": [
       "node_modules",
       "libs",
-      "src/utils"
+      "src/utils",
+      "src/tests"
     ]
   }

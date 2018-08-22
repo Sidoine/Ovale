@@ -147,6 +147,7 @@ Define(fracture_talent 12)
 # Rapidly slash your target for 225919sw1+225921sw1 Physical damage, and shatter s1 Lesser Soul Fragments from them.rnrn|cFFFFFFFFGenerates s4/10 Pain.|r
 Define(immolation_aura_talent 6)
 # Engulf yourself in flames, instantly causing 258921s1 Fire damage to enemies within 258921A1 yards and radiating 258922s1 Fire damage every sec.  Lasts d.rnrn|cFFFFFFFFGenerates s3+(258922s2*d) Fury over d.|r
+Define(unbound_chaos_trait 275144)
     ]]
     code = code .. [[
 
@@ -319,7 +320,7 @@ Define(vengeful_retreat_debuff 198813)
 	SpellInfo(vengeful_retreat_debuff duration=3)
 
 #items
-Define(oblivions_embrace 151799)
+Define(oblivions_embrace_item 151799)
 	SpellInfo(demon_spikes charges=3 if_equipped=oblivions_embrace)
 
 # Tier set

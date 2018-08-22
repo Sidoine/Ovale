@@ -27,7 +27,7 @@ local __SpellBook = LibStub:GetLibrary("ovale/SpellBook")
 local OvaleSpellBook = __SpellBook.OvaleSpellBook
 local WARRIOR_INCERCEPT_SPELLID = 198304
 local WARRIOR_HEROICTHROW_SPELLID = 57755
-local OvaleSpellsBase = OvaleProfiler:RegisterProfiling(OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleSpellBook", aceEvent)))
+local OvaleSpellsBase = OvaleProfiler:RegisterProfiling(OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleSpells", aceEvent)))
 local OvaleSpellsClass = __class(OvaleSpellsBase, {
     OnInitialize = function(self)
         RegisterRequirement("spellcount_min", self.RequireSpellCountHandler)
@@ -75,9 +75,9 @@ local OvaleSpellsClass = __class(OvaleSpellsBase, {
             returnValue = IsSpellInRange(name, unitId)
         end
         if (returnValue == 1 and spellId == WARRIOR_INCERCEPT_SPELLID) then
-            return (UnitIsFriend("player", unitId) == 1 or __exports.OvaleSpells:IsSpellInRange(WARRIOR_HEROICTHROW_SPELLID, unitId) == 1) and 1 or 0
+            return (UnitIsFriend("player", unitId) == 1 or __exports.OvaleSpells:IsSpellInRange(WARRIOR_HEROICTHROW_SPELLID, unitId))
         end
-        return returnValue
+        return returnValue == 1
     end,
     CleanState = function(self)
     end,

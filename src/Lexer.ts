@@ -1,5 +1,5 @@
 import { OvaleQueue } from "./Queue";
-import { pairs, ipairs, LuaArray, lualength } from "@wowts/lua";
+import { ipairs, LuaArray, lualength, kpairs } from "@wowts/lua";
 import { wrap, LuaIterable } from "@wowts/coroutine";
 import { find, sub } from "@wowts/string";
 
@@ -17,7 +17,7 @@ export type TokenizerDefinition = { [1]: string, [2]: Tokenizer };
 export class OvaleLexer {
     typeQueue = new OvaleQueue<string>("typeQueue");
     tokenQueue = new OvaleQueue<string>("tokenQueue");
-    endOfStream = undefined;
+    endOfStream: boolean | undefined = undefined;
     iterator: LuaIterable<[string, string]>;
     
     constructor(public name: string, stream: string, matches: LuaArray<TokenizerDefinition>, filter?: LexerFilter) {
@@ -56,7 +56,7 @@ export class OvaleLexer {
     }
 
     Release() {
-        for (const [key] of pairs(this)) {
+        for (const [key] of kpairs(this)) {
             this[key] = undefined;
         }
     }
