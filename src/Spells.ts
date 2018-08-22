@@ -54,7 +54,7 @@ class OvaleSpellsClass extends OvaleSpellsBase {
         }
     }
 
-    IsSpellInRange(spellId: number, unitId: string): boolean {
+    IsSpellInRange(spellId: number, unitId: string): boolean | undefined {
         let [index, bookType] = OvaleSpellBook.GetSpellBookIndex(spellId);
         let returnValue: number = undefined;
         if (index && bookType) {
@@ -66,7 +66,7 @@ class OvaleSpellsClass extends OvaleSpellsBase {
         if ((returnValue == 1 && spellId == WARRIOR_INCERCEPT_SPELLID)) {
             return (UnitIsFriend("player", unitId) == 1 || OvaleSpells.IsSpellInRange(WARRIOR_HEROICTHROW_SPELLID, unitId));
         }
-        return returnValue === 1;
+        return (returnValue == 1 && true) || (returnValue == 0 && false) || (returnValue === undefined && undefined);
     }
     
     RequireSpellCountHandler = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string):[boolean, string, number] => {
