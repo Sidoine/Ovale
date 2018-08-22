@@ -2,7 +2,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
     local name = "icyveins_paladin_protection"
-    local desc = "[7.3.2] Icy-Veins: Paladin Protection"
+    local desc = "[8.0.1] Icy-Veins: Paladin Protection"
     local code = [[
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -44,7 +44,7 @@ AddFunction ProtectionCooldownTreshold
 
 AddFunction ProtectionGetInMeleeRange
 {
-	if CheckBoxOn(opt_melee_range) and not target.InRange(shield_of_the_righteous) Texture(misc_arrowlup help=L(not_in_melee_range))
+	if CheckBoxOn(opt_melee_range) and not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
 AddFunction ProtectionDefaultShortCDActions
@@ -78,7 +78,7 @@ AddFunction ProtectionDefaultMainActions
 {
 	if Speed() == 0 and HasEquippedItem(heathcliffs_immortality) and not BuffPresent(consecration_buff) Spell(consecration)
 	if Talent(blessed_hammer_talent) and (not PreviousGCDSpell(blessed_hammer) or Charges(blessed_hammer) == SpellMaxCharges(blessed_hammer)) Spell(blessed_hammer)
-	Spell(judgment)
+	Spell(judgment_prot)
 	if Talent(crusaders_judgment_talent) and BuffPresent(grand_crusader_buff) Spell(avengers_shield)
 	if Speed() == 0 and not Talent(consecrated_hammer_talent) and not BuffPresent(consecration_buff) Spell(consecration)
 	Spell(avengers_shield)
@@ -92,16 +92,16 @@ AddFunction ProtectionDefaultAoEActions
 	Spell(avengers_shield)
 	if Speed() == 0 and not Talent(consecrated_hammer_talent) and not BuffPresent(consecration_buff) Spell(consecration)
 	if Talent(blessed_hammer_talent) Spell(blessed_hammer)
-	Spell(judgment)
+	Spell(judgment_prot)
 	if Speed() == 0 Spell(consecration)
 	Spell(hammer_of_the_righteous)
 }
 
-AddCheckBox(opt_avenging_wrath SpellName(avenging_wrath_melee) default specialization=protection)
+AddCheckBox(opt_avenging_wrath SpellName(avenging_wrath) default specialization=protection)
 AddFunction ProtectionDefaultCdActions
 {
 	ProtectionInterruptActions()
-	if CheckBoxOn(opt_avenging_wrath) and (not Talent(seraphim_talent) or BuffPresent(seraphim_buff)) Spell(avenging_wrath_melee)
+	if CheckBoxOn(opt_avenging_wrath) and (not Talent(seraphim_talent) or BuffPresent(seraphim_buff)) Spell(avenging_wrath)
 	
 	if (ProtectionCooldownTreshold() and HasEquippedItem(shifting_cosmic_sliver)) Spell(guardian_of_ancient_kings)
 	Item(Trinket0Slot usable=1 text=13)

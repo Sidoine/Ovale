@@ -1,7 +1,7 @@
 import { OvaleScripts } from "../Scripts";
 {
     let name = "icyveins_monk_brewmaster";
-    let desc = "[7.3.2] Icy-Veins: Monk Brewmaster";
+    let desc = "[8.0.1] Icy-Veins: Monk Brewmaster";
     let code = `
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -13,7 +13,7 @@ AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=brewmaster)
 AddCheckBox(opt_monk_bm_aoe L(AOE) default specialization=brewmaster)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=brewmaster)
 
-AddFunction BrewmasterHealMe
+AddFunction BrewmasterHealMeShortCd
 {
 	unless(DebuffPresent(healing_immunity_debuff)) 
 	{
@@ -27,6 +27,13 @@ AddFunction BrewmasterHealMe
 	}
 }
 
+AddFunction BrewmasterHealMeMain
+{
+	unless(DebuffPresent(healing_immunity_debuff)) 
+	{
+	}
+}
+
 AddFunction StaggerPercentage
 {
 	StaggerRemaining() / MaxHealth() * 100
@@ -37,50 +44,44 @@ AddFunction BrewmasterRangeCheck
 	if CheckBoxOn(opt_melee_range) and not target.InRange(tiger_palm) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
-AddFunction BrewMasterIronskinMin
-{
-	if(DebuffRemaining(any_stagger_debuff) > BaseDuration(ironskin_brew_buff)) BaseDuration(ironskin_brew_buff)
-	DebuffRemaining(any_stagger_debuff)
-}
-
 AddFunction BrewmasterDefaultShortCDActions
 {
 	# keep ISB up always when taking dmg
-	if BuffRemaining(ironskin_brew_buff) < BrewMasterIronskinMin() Spell(ironskin_brew text=min)
+    if ((BaseDuration(light_stagger_debuff)-DebuffRemaining(any_stagger_debuff)<5 or target.IsTargetingPlayer()) and BuffExpires(ironskin_brew_buff 3) and BuffExpires(blackout_combo_buff)) Spell(ironskin_brew text=min)
 	
 	# keep stagger below 100% (or 30% when BOB is up)
 	if (StaggerPercentage() >= 100 or (StaggerPercentage() >= 30 and Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 0)) Spell(purifying_brew)
 	# use black_ox_brew when at 0 charges and low energy (or in an emergency)
-	if ((SpellCharges(purifying_brew) == 0) and (Energy() < 40 or StaggerPercentage() >= 60 or BuffRemaining(ironskin_brew_buff) < BrewMasterIronskinMin())) Spell(black_ox_brew)
-
-	# heal mean
-	BrewmasterHealMe()
+    if (SpellCharges(ironskin_brew count=0) <= 0.75)
+    {
+        #black_ox_brew,if=incoming_damage_1500ms&stagger.heavy&cooldown.brews.charges_fractional<=0.75
+        if IncomingDamage(1.5) > 0 and DebuffPresent(heavy_stagger_debuff) Spell(black_ox_brew)
+        #black_ox_brew,if=(energy+(energy.regen*cooldown.keg_smash.remains))<40&buff.blackout_combo.down&cooldown.keg_smash.up
+        if Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) < 40 and BuffExpires(blackout_combo_buff) and not SpellCooldown(keg_smash) > 0 Spell(black_ox_brew)
+    }
+	
+	# heal me
+	BrewmasterHealMeShortCd()
 	# range check
 	BrewmasterRangeCheck()
 
-	unless StaggerPercentage() > 100 or BrewmasterHealMe()
+	unless StaggerPercentage() > 100
 	{
 		# purify heavy stagger when we have enough ISB
 		if (StaggerPercentage() >= 60 and (BuffRemaining(ironskin_brew_buff) >= 2*BaseDuration(ironskin_brew_buff))) Spell(purifying_brew)
 
-		# always bank 1 charge (or bank 2 with light_brewing)
-		unless (SpellCharges(ironskin_brew count=0) <= SpellData(ironskin_brew charges)-2)
+		# always bank 1 charge
+		unless (SpellCharges(ironskin_brew) <= 1)
 		{
-			# never be at (almost) max charges 
+            # keep ISB rolling
+            if BuffRemaining(ironskin_brew_buff) < DebuffRemaining(any_stagger_debuff) and BuffExpires(blackout_combo_buff) Spell(ironskin_brew)
+			
+            # never be at (almost) max charges 
 			unless (SpellFullRecharge(ironskin_brew) > 3)
 			{
-				if (BuffRemaining(ironskin_brew_buff) < 2*BaseDuration(ironskin_brew_buff)) Spell(ironskin_brew text=max)
+				if (BuffRemaining(ironskin_brew_buff) < 2*BaseDuration(ironskin_brew_buff) and BuffExpires(blackout_combo_buff)) Spell(ironskin_brew text=max)
 				if (StaggerPercentage() > 30 or Talent(special_delivery_talent)) Spell(purifying_brew text=max)
 			}
-			
-			# keep brew-stache rolling
-			if (IncomingDamage(4 physical=1)>0 and HasArtifactTrait(brew_stache_trait) and BuffExpires(brew_stache_buff)) 
-			{
-				if (BuffRemaining(ironskin_brew_buff) < 2*BaseDuration(ironskin_brew_buff)) Spell(ironskin_brew text=stache)
-				if (StaggerPercentage() > 30) Spell(purifying_brew text=stache)
-			}
-			# purify stagger when talent elusive dance 
-			if (Talent(elusive_dance_talent) and BuffExpires(elusive_dance_buff)) Spell(purifying_brew)
 		}
 	}
 }
@@ -91,6 +92,9 @@ AddFunction BrewmasterDefaultShortCDActions
 
 AddFunction BrewmasterDefaultMainActions
 {
+    BrewmasterHealMeMain()
+    if (not InCombat()) Spell(keg_smash)
+        
 	if Talent(blackout_combo_talent) BrewmasterBlackoutComboMainActions()
 	unless Talent(blackout_combo_talent) 
 	{
@@ -98,16 +102,16 @@ AddFunction BrewmasterDefaultMainActions
 		Spell(blackout_strike)
 		if (target.DebuffPresent(keg_smash_debuff)) Spell(breath_of_fire)
 		if (BuffRefreshable(rushing_jade_wind_buff)) Spell(rushing_jade_wind)
-		if (EnergyDeficit() <= 35 or (Talent(black_ox_talent) and SpellCooldown(black_ox_brew) <= 0)) Spell(tiger_palm)
+		if (Energy() >= 65 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 0)) Spell(tiger_palm)
 		Spell(chi_burst)
 		Spell(chi_wave)
-		Spell(exploding_keg)
+		Spell(arcane_pulse)
 	}
 }
 
 AddFunction BrewmasterBlackoutComboMainActions
 {
-	if(not BuffPresent(blackout_combo_buff) or SpellCharges(ironskin_brew) == 0) Spell(keg_smash)
+	if(not BuffPresent(blackout_combo_buff) or (SpellCharges(ironskin_brew) <= 1) and BuffRemaining(ironskin_brew_buff) < BaseDuration(ironskin_brew)) Spell(keg_smash)
 	if(not BuffPresent(blackout_combo_buff)) Spell(blackout_strike)
 	if(BuffPresent(blackout_combo_buff)) Spell(tiger_palm)
 	
@@ -117,7 +121,7 @@ AddFunction BrewmasterBlackoutComboMainActions
 		if BuffRefreshable(rushing_jade_wind_buff) Spell(rushing_jade_wind)
 		Spell(chi_burst)
 		Spell(chi_wave)
-		Spell(exploding_keg)
+		Spell(arcane_pulse)
 	}
 }
 
@@ -127,41 +131,25 @@ AddFunction BrewmasterBlackoutComboMainActions
 
 AddFunction BrewmasterDefaultAoEActions
 {
-	if(Talent(blackout_combo_talent) and not BuffPresent(blackout_combo_buff)) Spell(blackout_strike)
-	Spell(exploding_keg)
-	Spell(keg_smash)
+    BrewmasterHealMeMain()
+    if (not InCombat()) Spell(keg_smash)
+ 
+    if (Talent(blackout_combo_talent) and not BuffPresent(blackout_combo_buff)) Spell(blackout_strike)
+	if (not Talent(blackout_combo_talent) or (BuffPresent(blackout_combo_buff) and SpellCharges(ironskin_brew) <= SpellData(ironskin_brew charges)-2) or SpellFullRecharge(keg_smash) == 0) Spell(keg_smash)
 	Spell(chi_burst)
 	Spell(chi_wave)
-	if (target.DebuffPresent(keg_smash_debuff) and (not HasEquippedItem(salsalabims_lost_tunic) or not BuffPresent(blackout_combo_buff))) Spell(breath_of_fire)
+	if (target.DebuffPresent(keg_smash_debuff) and not BuffPresent(blackout_combo_buff)) Spell(breath_of_fire)
 	if (BuffRefreshable(rushing_jade_wind_buff)) Spell(rushing_jade_wind)
-	if (EnergyDeficit() <= 35 or (Talent(black_ox_talent) and SpellCooldown(black_ox_brew) <= 0)) Spell(tiger_palm)
+    Spell(arcane_pulse)
+	if (Energy() >= 65 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 0)) Spell(tiger_palm)
 	if (not BuffPresent(blackout_combo_buff)) Spell(blackout_strike)	
-}
-
-AddFunction BrewmasterBlackoutComboAoEActions
-{
-	if(not BuffPresent(blackout_combo_buff)) Spell(blackout_strike)
-	if(BuffPresent(blackout_combo_buff)) 
-	{
-		Spell(keg_smash)
-		Spell(breath_of_fire)
-		Spell(tiger_palm)
-	}
-	
-	unless (BuffPresent(blackout_combo_buff)) 
-	{
-		Spell(exploding_keg)
-		Spell(rushing_jade_wind)
-		Spell(chi_burst)
-		Spell(chi_wave)
-		if EnergyDeficit() <= 35 Spell(tiger_palm)
-	}
 }
 
 AddFunction BrewmasterDefaultCdActions 
 {
 	BrewmasterInterruptActions()
-	if not PetPresent(name=Niuzao) Spell(invoke_niuzao)
+	Spell(guard)
+	if not PetPresent(name=Niuzao) Spell(invoke_niuzao_the_black_ox)
 	if (HasEquippedItem(firestone_walkers)) Spell(fortifying_brew)
 	if (HasEquippedItem(shifting_cosmic_sliver)) Spell(fortifying_brew)
 	if (HasEquippedItem(fundamental_observation)) Spell(zen_meditation text=FO)

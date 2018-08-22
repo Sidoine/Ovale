@@ -220,7 +220,6 @@ Define(felblade 232893)
 Define(fiery_brand_debuff 207771)
 	SpellInfo(fiery_brand_debuff duration=8)
 	
-	SpellInfo(fracture pain=25 charges=2 cd=4.5 cd_haste=melee)
 Define(frailty_debuff 247456)
 	SpellInfo(frailty_debuff duration=20)
 

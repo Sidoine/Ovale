@@ -2,7 +2,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
     local name = "icyveins_druid_guardian"
-    local desc = "[7.3.2] Icy-Veins: Druid Guardian"
+    local desc = "[8.0.1] Icy-Veins: Druid Guardian"
     local code = [[
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -38,18 +38,25 @@ AddFunction FrenziedRegenHealTotal
 	IncomingDamage(5) / 2
 }
 
-AddFunction GuardianHealMe
+AddFunction GuardianHealMeShortCd
 {
 	unless(DebuffPresent(healing_immunity_debuff)) 
 	{
 		if BuffExpires(frenzied_regeneration_buff) and HealthPercent() <= 70 
 		{
-			if (FrenziedRegenHealTotal() >= MaxHealth() * 0.20) Spell(frenzied_regeneration)
+            if (SpellCharges(frenzied_regeneration)>=2 or HealthPercent() <= 50) Spell(frenzied_regeneration)
 		}
 		
+		if HealthPercent() < 35 UseHealthPotions()
+	}
+}
+
+AddFunction GuardianHealMeMain
+{
+	unless(DebuffPresent(healing_immunity_debuff)) 
+	{
 		if HealthPercent() <= 50 Spell(lunar_beam)
 		if HealthPercent() <= 80 and not InCombat() Spell(regrowth)
-		if HealthPercent() < 35 UseHealthPotions()
 	}
 }
 
@@ -64,7 +71,7 @@ AddFunction GuardianGetInMeleeRange
 
 AddFunction GuardianDefaultShortCDActions
 {
-	GuardianHealMe()
+	GuardianHealMeShortCd()
 	if IncomingDamage(5 physical=1) Spell(ironfur)
 	GuardianGetInMeleeRange()
 }
@@ -75,21 +82,17 @@ AddFunction GuardianDefaultShortCDActions
 
 AddFunction GuardianDefaultMainActions
 {
+    GuardianHealMeMain()
 	if not Stance(druid_bear_form) Spell(bear_form)
-	if not BuffExpires(incarnation_guardian_of_ursoc_buff) 
-	{
-		if (BuffRefreshable(pulverize_buff)) Spell(pulverize)
-		if target.DebuffStacks(thrash_bear_debuff) < SpellData(thrash_bear_debuff max_stacks) Spell(thrash_bear)
-		if Talent(soul_of_the_forest_talent) Spell(mangle)
-		Spell(thrash_bear)
-	}
-	
+
+    if (RageDeficit() <= 20 and (IncomingDamage(5) == 0 or (SpellCharges(ironfur)==0 and SpellCharges(frenzied_regeneration) == 0))) Spell(maul)
+    if (target.DebuffRefreshable(moonfire_debuff)) Spell(moonfire)
+    if (target.DebuffStacks(thrash_bear_debuff) < 3) Spell(thrash_bear)
+    if (BuffRefreshable(pulverize_buff)) Spell(pulverize)
 	Spell(mangle)
-	if not BuffExpires(galactic_guardian_buff) Spell(moonfire)
 	Spell(thrash_bear)
-	if (BuffRefreshable(pulverize_buff) or target.DebuffStacks(thrash_bear_debuff) >= 5) Spell(pulverize)
-	if target.DebuffRefreshable(moonfire_debuff) Spell(moonfire)
-	if RageDeficit() <= 20 Spell(maul)
+    if not BuffExpires(galactic_guardian_buff) Spell(moonfire)
+	if (RageDeficit() <= 20 or IncomingDamage(5) == 0) Spell(maul)
 	Spell(swipe_bear)
 }
 
@@ -99,40 +102,41 @@ AddFunction GuardianDefaultMainActions
 
 AddFunction GuardianDefaultAoEActions
 {
+    GuardianHealMeMain()
 	if not Stance(druid_bear_form) Spell(bear_form)
 	if Enemies() >= 4 and HealthPercent() <= 80 Spell(lunar_beam)
-	
-	if not BuffExpires(incarnation_guardian_of_ursoc_buff) 
+    
+    if not BuffExpires(incarnation_guardian_of_ursoc_buff) 
 	{
+        if (DebuffCountOnAny(moonfire_debuff) < 1) Spell(moonfire)
 		if (BuffRefreshable(pulverize_buff)) Spell(pulverize)
-		if target.DebuffStacks(thrash_bear_debuff) < SpellData(thrash_bear_debuff max_stacks) Spell(thrash_bear)
-		if Talent(soul_of_the_forest_talent) and Enemies() <= 3 Spell(mangle)
-		Spell(thrash_bear)
+        if (Enemies() <= 3) Spell(mangle)
+        Spell(thrash_bear)
 	}
-	
-	Spell(thrash_bear)
-	Spell(mangle)
-	if not BuffExpires(galactic_guardian_buff) Spell(moonfire)
-	if (BuffRefreshable(pulverize_buff) or target.DebuffStacks(thrash_bear_debuff) >= 5) Spell(pulverize)
-	if Enemies() <= 3 and target.DebuffRefreshable(moonfire_debuff) Spell(moonfire)
-	if Enemies() <= 3 and RageDeficit() <= 20 Spell(maul)
-	Spell(swipe_bear)
+    
+    if (RageDeficit() <= 20 and (IncomingDamage(5) == 0 or (SpellCharges(ironfur)==0 and SpellCharges(frenzied_regeneration) == 0))) Spell(maul)
+    if (DebuffCountOnAny(moonfire_debuff) < 2) Spell(moonfire)
+    Spell(thrash_bear)
+    if (Enemies() <= 2 and BuffRefreshable(pulverize_buff)) Spell(pulverize)
+    if (Enemies() <= 4) Spell(mangle)
+    if (Enemies() <= 3 and not BuffExpires(galactic_guardian_buff)) Spell(moonfire)
+    if (Enemies() <= 3 and (RageDeficit() <= 20 or IncomingDamage(5) == 0)) Spell(maul)
+    Spell(swipe_bear)
 }
 
 AddFunction GuardianDefaultCdActions 
 {
 	GuardianInterruptActions()
 	Spell(incarnation_guardian_of_ursoc)
-	if HasArtifactTrait(embrace_of_the_nightmare) Spell(rage_of_the_sleeper)
-	if BuffExpires(bristling_fur_buff) and BuffExpires(survival_instincts_buff) and BuffExpires(rage_of_the_sleeper_buff) and BuffExpires(barkskin_buff) and BuffExpires(potion_buff)
+	if BuffExpires(bristling_fur_buff) and BuffExpires(survival_instincts_buff) and BuffExpires(barkskin_buff) and BuffExpires(potion_buff)
 	{
 		Spell(bristling_fur)
-		if (HasEquippedItem(shifting_cosmic_sliver)) Spell(survival_instincts)
+        if (HasEquippedItem(shifting_cosmic_sliver)) Spell(survival_instincts)
+        if (Talent(brambles_talent) and (not HasEquippedItem(oakhearts_puny_quods) or RageDeficit() > 75)) Spell(barkskin)
 		Item(Trinket0Slot usable=1 text=13)
 		Item(Trinket1Slot usable=1 text=14)
 		Spell(survival_instincts)
-		Spell(rage_of_the_sleeper)
-		Spell(barkskin)
+		if (not HasEquippedItem(oakhearts_puny_quods) or RageDeficit() > 75) Spell(barkskin)
 		if CheckBoxOn(opt_use_consumables) Item(unbending_potion usable=1)
 	}
 }
