@@ -30,7 +30,7 @@ AddFunction DisciplineDefaultMainActions
 
 AddFunction DisciplineDefaultCdActions
 {
-	if Talent(mindbender_talent) Spell(mindbender)
+	if Talent(disc_mindbender_talent) Spell(mindbender)
 	Item(Trinket0Slot usable=1 text=13)
 	Item(Trinket1Slot usable=1 text=14)
 	Spell(shadowfiend)

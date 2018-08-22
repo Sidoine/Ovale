@@ -146,27 +146,29 @@ Define(whirling_dragon_punch 152175)
 # Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
   SpellInfo(whirling_dragon_punch cd=24 duration=1 talent=whirling_dragon_punch_talent gcd=1 tick=0.25)
   SpellAddBuff(whirling_dragon_punch whirling_dragon_punch=1)
-Define(blackout_combo_talent 21)
-# Blackout Strike also empowers your next ability:rnrnTiger Palm: Damage increased by s1.rnBreath of Fire: Cooldown reduced by s2 sec.rnKeg Smash: Reduces the remaining cooldown on your Brews by s3 additional sec.rnIronskin Brew: Pauses Stagger damage for s4 sec.
-Define(energizing_elixir_talent 9)
-# Chug an Energizing Elixir, refilling all your Energy and instantly generate s2 Chi.
-Define(fist_of_the_white_tiger_talent 8)
-# Strike with the technique of the White Tiger, dealing s1+261977s1 Physical damage.rnrn|cFFFFFFFFGenerates 261978s1 Chi.
-Define(good_karma_talent 11)
-# Touch of Karma can now redirect an additional s1 of your maximum health.
-Define(rushing_jade_wind_talent 17)
-# Summons a whirling tornado around you, causing (1+d/t1)*148187s1 damage over d to enemies within 107270A1 yards.?s220357[ Applies Mark of the Crane to up to s2 nearby targets.][]
-Define(serenity_talent 21)
-# Enter an elevated state of mental and physical serenity for ?s115069[s1 sec][d]. While in this state, you deal s2 increased damage and healing, and all Chi consumers are free and cool down s4 more quickly.
-Define(black_ox_brew_talent 9)
+Define(black_ox_brew_talent 9) #19992
 # Chug some Black Ox Brew, which instantly refills your Energy, and your Ironskin Brew and Purifying Brew charges.
-Define(chi_burst_talent 3)
+Define(blackout_combo_talent 21) #22108
+# Blackout Strike also empowers your next ability:rnrnTiger Palm: Damage increased by s1.rnBreath of Fire: Cooldown reduced by s2 sec.rnKeg Smash: Reduces the remaining cooldown on your Brews by s3 additional sec.rnIronskin Brew: Pauses Stagger damage for s4 sec.
+Define(chi_burst_talent 3) #20185
 # Hurls a torrent of Chi energy up to 40 yds forward, dealing 148135s1 Nature damage to all enemies, and 130654s1 healing to the Monk and all allies in its path.?c1[rnrnCasting Chi Burst does not prevent avoiding attacks.][]?c3[rnrnChi Burst generates 1 Chi per enemy target damaged, up to a maximum of s3.][]
-Define(chi_wave_talent 2)
+Define(chi_wave_talent 2) #19820
 # A wave of Chi energy flows through friends and foes, dealing 132467s1 Nature damage or 132463s1 healing. Bounces up to s1 times to targets within 132466a2 yards.
-Define(dampen_harm_talent 15)
+Define(dampen_harm_talent 15) #20175
 # Reduces all damage you take by m2 to m3 for d, with larger attacks being reduced by more.
-Define(whirling_dragon_punch_talent 20)
+Define(energizing_elixir_talent 9) #22096
+# Chug an Energizing Elixir, refilling all your Energy and instantly generate s2 Chi.
+Define(fist_of_the_white_tiger_talent 8) #19771
+# Strike with the technique of the White Tiger, dealing s1+261977s1 Physical damage.rnrn|cFFFFFFFFGenerates 261978s1 Chi.
+Define(good_karma_talent 11) #23364
+# Touch of Karma can now redirect an additional s1 of your maximum health.
+Define(rushing_jade_wind_talent_windwalker 17) #23122
+# Summons a whirling tornado around you, causing (1+d/t1)*148187s1 damage every t1 sec to all enemies within 107270A1 yards.
+Define(rushing_jade_wind_talent 17) #20184
+# Summons a whirling tornado around you, causing (1+d/t1)*148187s1 damage over d to enemies within 107270A1 yards.?s220357[ Applies Mark of the Crane to up to s2 nearby targets.][]
+Define(serenity_talent 21) #21191
+# Enter an elevated state of mental and physical serenity for ?s115069[s1 sec][d]. While in this state, you deal s2 increased damage and healing, and all Chi consumers are free and cool down s4 more quickly.
+Define(whirling_dragon_punch_talent 20) #22105
 # Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
 Define(drinking_horn_cover_item 137097)
 Define(hidden_masters_forbidden_touch_item 137057)

@@ -23,6 +23,10 @@ Define(chaos_nova 179057)
   SpellInfo(chaos_nova fury=30 cd=60 duration=2)
   # Stunned.
   SpellAddTargetDebuff(chaos_nova chaos_nova=1)
+Define(chaos_strike_havoc 197125)
+# @spelldesc162794
+  SpellInfo(chaos_strike_havoc channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(chaos_strike_havoc chaos_strike_havoc=1)
 Define(chaos_strike 162794)
 # Slice your target for 222031s1+199547s1 Chaos damage. Chaos Strike has a 197125h chance to refund 193840s1 Fury.
   SpellInfo(chaos_strike fury=40)
@@ -121,32 +125,32 @@ Define(vengeful_retreat 198793)
 # Remove all snares and vault away. Nearby enemies take 198813s2 Physical damage and have their movement speed reduced by 198813s1 for 198813d.?a203551[rnrn|cFFFFFFFFGenerates (203650s1/5)*203650d Fury over 203650d if you damage an enemy.|r][]
   SpellInfo(vengeful_retreat cd=25 duration=1 channel=1 gcd=0.5)
   SpellAddBuff(vengeful_retreat vengeful_retreat=1)
-Define(blind_fury_talent 1)
+Define(blind_fury_talent 1) #21854
 # Eye Beam generates s3/5 Fury every sec. and its duration is increased by s1.
-Define(dark_slash_talent 15)
-# Slash an enemy for s2 Physical damage, and increase the damage your Chaos Strike deals to them by s3 for d.
-Define(demon_blades_talent 5)
-# Your auto attacks have a s1 chance to deal additional Shadow damage and generate Fury.
-Define(demonic_talent 19)
-# Eye Beam causes you to enter demon form for 8 sec after it finishes dealing damage.
-Define(fel_mastery_talent 8)
-# Increases Fel Rush damage by s1.
-Define(first_blood_talent 14)
-# Reduces the Fury cost of Blade Dance by s2 and increases its damage to <firstbloodDmg> against the first target struck.
-Define(momentum_talent 20)
-# Fel Rush increases your damage done by 208628s1 for 208628d.rnrnVengeful Retreat's cooldown is reduced by s1/-1000 sec, and it generates (203650s1/5)*203650d Fury over 203650d if it damages at least one enemy.
-Define(nemesis_talent 21)
-# Increases damage you inflict against the target by s1 for d. rnrnWhen the target is slain, you will inflict s1 additional damage against all creature types matching the original target (Humanoid, Dragonkin, etc.) for the remaining duration.
-Define(trail_of_ruin_talent 7)
-# The final slash of Blade Dance inflicts an additional 258883o1 Chaos damage over 258883d.
-Define(charred_flesh_talent 8)
+Define(charred_flesh_talent 8) #22541
 # Fiery Brand increases the Fire damage your abilities deal to the target by s1.
-Define(spirit_bomb_talent 17)
-# Consume up to s2 Soul Fragments within s1 yds and then explode, afflicting nearby enemies with Frailty for 247456d and damaging them for 247455s1 Fire per fragment.rnrnYou heal for 247456s1 of all damage you deal to enemies with Frailty.
-Define(fel_devastation_talent 18)
+Define(dark_slash_talent 15) #21868
+# Slash an enemy for s2 Physical damage, and increase the damage your Chaos Strike deals to them by s3 for d.
+Define(demon_blades_talent 5) #22765
+# Your auto attacks have a s1 chance to deal additional Shadow damage and generate Fury.
+Define(demonic_talent 19) #21900
+# Eye Beam causes you to enter demon form for 8 sec after it finishes dealing damage.
+Define(fel_devastation_talent 18) #22768
 # Unleash the fel within you, damaging enemies directly in front of you for 212105s1*(2/t1) Fire damage over d. Causing damage also heals you for up to 212106s1*(2/t1) health.
-Define(fel_eruption_talent 18)
+Define(fel_eruption_talent 18) #22767
 # Impales the target for s1 Chaos damage and stuns them for d.
+Define(fel_mastery_talent 8) #22494
+# Increases Fel Rush damage by s1.
+Define(first_blood_talent 14) #21867
+# Reduces the Fury cost of Blade Dance by s2 and increases its damage to <firstbloodDmg> against the first target struck.
+Define(momentum_talent 20) #21901
+# Fel Rush increases your damage done by 208628s1 for 208628d.rnrnVengeful Retreat's cooldown is reduced by s1/-1000 sec, and it generates (203650s1/5)*203650d Fury over 203650d if it damages at least one enemy.
+Define(nemesis_talent 21) #22547
+# Increases damage you inflict against the target by s1 for d. rnrnWhen the target is slain, you will inflict s1 additional damage against all creature types matching the original target (Humanoid, Dragonkin, etc.) for the remaining duration.
+Define(spirit_bomb_talent 17) #22513
+# Consume up to s2 Soul Fragments within s1 yds and then explode, afflicting nearby enemies with Frailty for 247456d and damaging them for 247455s1 Fire per fragment.rnrnYou heal for 247456s1 of all damage you deal to enemies with Frailty.
+Define(trail_of_ruin_talent 7) #22909
+# The final slash of Blade Dance inflicts an additional 258883o1 Chaos damage over 258883d.
 Define(unbound_chaos_trait 275144)
     ]]
     code = code .. [[

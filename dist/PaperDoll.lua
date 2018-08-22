@@ -56,7 +56,7 @@ local OVALE_SPELLDAMAGE_SCHOOL = {
     WARLOCK = 6,
     WARRIOR = 4
 }
-local OVALE_SPECIALIZATION_NAME = {
+__exports.OVALE_SPECIALIZATION_NAME = {
     DEATHKNIGHT = {
         [1] = "blood",
         [2] = "frost",
@@ -359,14 +359,14 @@ local OvalePaperDollClass = __class(OvalePaperDollBase, {
     end,
     GetSpecialization = function(self, specialization)
         specialization = specialization or self.specialization or 1
-        return OVALE_SPECIALIZATION_NAME[self.class][specialization]
+        return __exports.OVALE_SPECIALIZATION_NAME[self.class][specialization]
     end,
     IsSpecialization = function(self, name)
         if name and self.specialization then
             if isNumber(name) then
                 return name == self.specialization
             else
-                return name == OVALE_SPECIALIZATION_NAME[self.class][self.specialization]
+                return name == __exports.OVALE_SPECIALIZATION_NAME[self.class][self.specialization]
             end
         end
         return false

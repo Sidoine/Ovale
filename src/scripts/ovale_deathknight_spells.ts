@@ -206,59 +206,57 @@ Define(war_stomp 20549)
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
   # Stunned.
   SpellAddTargetDebuff(war_stomp war_stomp=1)
-Define(blooddrinker_talent 2)
-# Drains o1 health from the target over d.rnrnYou can move, parry, dodge, and use defensive abilities while channeling this ability.
-Define(heartbreaker_talent 1)
-# Heart Strike generates 210738s1/10 additional Runic Power per target hit.
-Define(ossuary_talent 8)
-# While you have at least s1 Bone Shield charges, the cost of Death Strike is reduced by 219788m1/-10 Runic Power.rnrnAdditionally, your maximum Runic Power is increased by m2/10.
-Define(rapid_decomposition_talent 4)
-# Your Blood Plague and Death and Decay deal damage s2 more often.
-Define(breath_of_sindragosa_talent 21)
-# Continuously deal 155166s2*<CAP>/AP Frost damage every t1 sec to enemies in a cone in front of you. Deals reduced damage to secondary targets. You will continue breathing until your Runic Power is exhausted or you cancel the effect.
-Define(cold_heart_talent 3)
-# Every t1 sec, gain a stack of Cold Heart, causing your next Chains of Ice to deal 281210s1 Frost damage. Stacks up to 281209u times.
-Define(frostscythe_talent 12)
-# A sweeping attack that strikes all enemies in front of you for s2 Frost damage. This attack benefits from Killing Machine. Critical strikes with Frostscythe deal s3 times normal damage.
-Define(frozen_pulse_talent 11)
-# While you have fewer than m2 full LRune:Runes;, your auto attacks radiate intense cold, inflicting 195750s1 Frost damage on all nearby enemies.
-Define(gathering_storm_talent 16)
-# Each Rune spent during Remorseless Winter increases its damage by 211805s1, and extends its duration by m1/10.1 sec.
-Define(obliteration_talent 20)
-# While Pillar of Frost is active, Frost Strike?s194913[, Glacial Advance,][] and Howling Blast always grant Killing Machine and have a s2 chance to generate a Rune.
-Define(runic_attenuation_talent 4)
-# Auto attacks have a chance to generate s1 Runic Power.
-Define(bursting_sores_talent 4)
-# Festering Wounds deal s1 more damage when burst, and all enemies within 207267A1 yds of a burst Festering Wound suffer 207267s1 Shadow damage.
-Define(defile_talent 17)
-# Defile the targeted ground, dealing (156000s1*(d+1)/t3) Shadow damage to all enemies over d.rnrnWhile you remain within your Defile, your ?s207311[Clawing Shadows][Scourge Strike] will hit all enemies near the target.rnrnIf any enemies are standing in the Defile, it grows in size every sec.
-Define(pestilence_talent 16)
-# Death and Decay damage has a s1 chance to apply a Festering Wound to the enemy.
-Define(summon_gargoyle_talent 21)
-# Summon a Gargoyle into the area to bombard the target for 61777d.rnrnThe Gargoyle gains 211947s1 increased damage for every s4 Runic Power you spend.
-Define(blinding_sleet_talent 9)
+Define(blinding_sleet_talent 9) #22519
 # Targets in a cone in front of you are blinded, causing them to wander disoriented for d. Damage may cancel the effect.
-Define(blooddrinker_talent 2)
+Define(blooddrinker_talent 2) #19166
 # Drains o1 health from the target over d.rnrnYou can move, parry, dodge, and use defensive abilities while channeling this ability.
-Define(bonestorm_talent 21)
+Define(bonestorm_talent 21) #21209
 # A whirl of bone and gore batters nearby enemies, dealing 196528s1 Shadow damage every t3 sec, and healing you for 196545s1 of your maximum health every time it deals damage. Lasts t3 sec per s3 Runic Power spent.
-Define(clawing_shadows_talent 3)
+Define(breath_of_sindragosa_talent 21) #22537
+# Continuously deal 155166s2*<CAP>/AP Frost damage every t1 sec to enemies in a cone in front of you. Deals reduced damage to secondary targets. You will continue breathing until your Runic Power is exhausted or you cancel the effect.
+Define(bursting_sores_talent 4) #22027
+# Festering Wounds deal s1 more damage when burst, and all enemies within 207267A1 yds of a burst Festering Wound suffer 207267s1 Shadow damage.
+Define(clawing_shadows_talent 3) #22026
 # Deals s2 Shadow damage and causes 1 Festering Wound to burst.
-Define(frostwyrms_fury_talent 18)
+Define(cold_heart_talent 3) #22018
+# Every t1 sec, gain a stack of Cold Heart, causing your next Chains of Ice to deal 281210s1 Frost damage. Stacks up to 281209u times.
+Define(defile_talent 17) #22534
+# Defile the targeted ground, dealing (156000s1*(d+1)/t3) Shadow damage to all enemies over d.rnrnWhile you remain within your Defile, your ?s207311[Clawing Shadows][Scourge Strike] will hit all enemies near the target.rnrnIf any enemies are standing in the Defile, it grows in size every sec.
+Define(frostscythe_talent 12) #22525
+# A sweeping attack that strikes all enemies in front of you for s2 Frost damage. This attack benefits from Killing Machine. Critical strikes with Frostscythe deal s3 times normal damage.
+Define(frostwyrms_fury_talent 18) #22535
 # Summons a frostwyrm who breathes on all enemies within s1 yd in front of you, dealing 279303s1 Frost damage and slowing movement speed by 279303s2 for 279303d.
-Define(glacial_advance_talent 17)
+Define(frozen_pulse_talent 11) #22523
+# While you have fewer than m2 full LRune:Runes;, your auto attacks radiate intense cold, inflicting 195750s1 Frost damage on all nearby enemies.
+Define(gathering_storm_talent 16) #22531
+# Each Rune spent during Remorseless Winter increases its damage by 211805s1, and extends its duration by m1/10.1 sec.
+Define(glacial_advance_talent 17) #22533
 # Summon glacial spikes from the ground that advance forward, each dealing 195975s1*<CAP>/AP Frost damage and applying Razorice to enemies near their eruption point.
-Define(horn_of_winter_talent 6)
+Define(heartbreaker_talent 1) #19165
+# Heart Strike generates 210738s1/10 additional Runic Power per target hit.
+Define(horn_of_winter_talent 6) #22021
 # Blow the Horn of Winter, gaining s1 LRune:Runes; and generating s2/10 Runic Power.
-Define(rune_strike_talent 3)
+Define(obliteration_talent 20) #22109
+# While Pillar of Frost is active, Frost Strike?s194913[, Glacial Advance,][] and Howling Blast always grant Killing Machine and have a s2 chance to generate a Rune.
+Define(ossuary_talent 8) #22134
+# While you have at least s1 Bone Shield charges, the cost of Death Strike is reduced by 219788m1/-10 Runic Power.rnrnAdditionally, your maximum Runic Power is increased by m2/10.
+Define(pestilence_talent 16) #22532
+# Death and Decay damage has a s1 chance to apply a Festering Wound to the enemy.
+Define(rapid_decomposition_talent 4) #19218
+# Your Blood Plague and Death and Decay deal damage s2 more often.
+Define(rune_strike_talent 3) #19217
 # Strike the target for s1 Physical damage.rnrnCooldown reduced by s2 sec for every Rune you spend.rnrn|cFFFFFFFFGenerates s2 Rune.|r
-Define(soul_reaper_talent 12)
+Define(runic_attenuation_talent 4) #22019
+# Auto attacks have a chance to generate s1 Runic Power.
+Define(soul_reaper_talent 12) #22526
 # Rip out an enemy's soul, dealing <dmg> Shadow damage over d.rnrnIf the enemy that yields experience or honor dies while afflicted by Soul Reaper, you gain 215711s1 Haste for 215711d.rnrn|cFFFFFFFFGenerates s2 lRune:Runes;.|r
-Define(tombstone_talent 9)
+Define(summon_gargoyle_talent 21) #22538
+# Summon a Gargoyle into the area to bombard the target for 61777d.rnrnThe Gargoyle gains 211947s1 increased damage for every s4 Runic Power you spend.
+Define(tombstone_talent 9) #22135
 # Consume up to s5 Bone Shield charges. For each charge consumed, you gain s3 Runic Power and absorb damage equal to s4 of your maximum health for d.
-Define(unholy_blight_talent 6)
+Define(unholy_blight_talent 6) #22029
 # Surrounds yourself with a vile swarm of insects for d, stinging all nearby enemies and infecting them with an unholy disease that deals 115994o1 damage over 115994d.
-Define(unholy_frenzy_talent 20)
+Define(unholy_frenzy_talent 20) #22110
 # Incites you into a killing frenzy for d, increasing Haste by s1 and causing your auto attacks to infect the target with a Festering Wound.
 Define(taktheritrixs_shoulderpads_item 137075)
     `;

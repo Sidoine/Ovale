@@ -6,7 +6,7 @@ export function register() {
 // ANY CHANGES MADE BELOW THIS POINT WILL BE LOST
     let code = `Define(a_murder_of_crows 131894)
 # Summons a flock of crows to attack your target, dealing 131900s1*16 Physical damage over d. If the target dies while under attack, A Murder of Crows' cooldown is reset.
-  SpellInfo(a_murder_of_crows focus=30 cd=60 duration=15 talent=a_murder_of_crows_talent_hunter tick=1)
+  SpellInfo(a_murder_of_crows focus=30 cd=60 duration=15 talent=a_murder_of_crows_talent_survival tick=1)
   # Under attack by a flock of crows.
   SpellAddTargetDebuff(a_murder_of_crows a_murder_of_crows=1)
 Define(aimed_shot 19434)
@@ -36,7 +36,7 @@ Define(barbed_shot 217200)
   SpellAddTargetDebuff(barbed_shot barbed_shot=1)
 Define(barrage 120360)
 # Rapidly fires a spray of shots for 120360d, dealing an average of <damageSec> Physical damage to all enemies in front of you. Usable while moving.
-  SpellInfo(barrage focus=60 cd=20 duration=3 channel=3 talent=barrage_talent_hunter tick=0.2)
+  SpellInfo(barrage focus=60 cd=20 duration=3 channel=3 talent=barrage_talent_marksmanship tick=0.2)
 Define(berserking 26297)
 # Increases your haste by s1 for d.
   SpellInfo(berserking cd=180 duration=10 gcd=0 offgcd=1)
@@ -172,42 +172,42 @@ Define(wildfire_bomb 259495)
 # Hurl a bomb at the target, exploding for 265157s1 Fire damage in a cone and coating enemies in wildfire, scorching them for 269747o1 Fire damage over 269747d.
   SpellInfo(wildfire_bomb cd=18)
   SpellAddTargetDebuff(wildfire_bomb wildfire_bomb_debuff=1)
-Define(lethal_shots_talent 16)
-# Steady Shot has a h chance to cause your next Aimed Shot or Rapid Fire to be guaranteed critical strikes.
-Define(steady_focus_talent 10)
-# Using Steady Shot reduces the cast time of Steady Shot by 193534s1, stacking up to 193534u times.  Using any other shot removes this effect.
-Define(birds_of_prey_talent 19)
-# Attacking your pet's target with ?s259387[Mongoose Bite][Raptor Strike] or ?s212436[Butchery][Carve] extends the duration of Coordinated Assault by <duration> sec.
-Define(guerrilla_tactics_talent 4)
-# Wildfire Bomb now has s1+1 charges, and the initial explosion deals s2 increased damage.
-Define(mongoose_bite_talent 17)
-# A brutal attack that deals s1 Physical damage and grants you Mongoose Fury.rnrn|cFFFFFFFFMongoose Fury|rrnIncreases the damage of Mongoose Bite by 259388s1 for 259388d, stacking up to 259388u times. Successive attacks do not increase duration.
-Define(terms_of_engagement_talent 2)
-# Harpoon deals 271625s1 Physical damage and generates (265898s1/5)*265898d Focus over 265898d. Killing an enemy resets the cooldown of Harpoon.
-Define(vipers_venom_talent 1)
-# ?s259387[Mongoose Bite][Raptor Strike] has a chance to make your next Serpent Sting cost no Focus and deal an additional 268552s1 initial damage.
-Define(wildfire_infusion_talent 20)
-# Lace your Wildfire Bomb with extra reagents, randomly giving it one of the following enhancements each time you throw it:rnrn|cFFFFFFFFShrapnel Bomb: |rShrapnel pierces the targets, causing ?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] to apply a bleed for 270343d that stacks up to 270343u times.rnrn|cFFFFFFFFPheromone Bomb: |rKill Command has a 270323s2 chance to reset against targets coated with Pheromones.rnrn|cFFFFFFFFVolatile Bomb: |rReacts violently with poison, causing an extra explosion against enemies suffering from your Serpent Sting and refreshes your Serpent Stings.
-Define(a_murder_of_crows_talent_hunter 12)
+Define(a_murder_of_crows_talent_survival 12) #22299
 # Summons a flock of crows to attack your target, dealing 131900s1*16 Physical damage over d. If the target dies while under attack, A Murder of Crows' cooldown is reset.
-Define(barrage_talent_hunter 17)
+Define(barrage_talent_marksmanship 17) #23104
 # Rapidly fires a spray of shots for 120360d, dealing an average of <damageSec> Physical damage to all enemies in front of you. Usable while moving.
-Define(butchery_talent 6)
+Define(birds_of_prey_talent 19) #22272
+# Attacking your pet's target with ?s259387[Mongoose Bite][Raptor Strike] or ?s212436[Butchery][Carve] extends the duration of Coordinated Assault by <duration> sec.
+Define(butchery_talent 6) #22297
 # Strike all nearby enemies in a flurry of strikes, inflicting s1 Physical damage to each.rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit, up to s3.
-Define(dire_beast_talent 3)
+Define(dire_beast_talent 3) #22282
 # Summons a powerful wild beast that attacks the target and roars, increasing your Haste by 281036s1 for d.
-Define(double_tap_talent 18)
+Define(double_tap_talent 18) #22287
 # Your next Aimed Shot will fire a second time instantly at s4 power without consuming Focus, or your next Rapid Fire will shoot s3 additional shots during its channel.
-Define(explosive_shot_talent 6)
+Define(explosive_shot_talent 6) #22498
 # Fires a slow-moving munition directly forward. Activating this ability a second time detonates the Shot, dealing up to 212680s1 Fire damage to all enemies within 212680A1 yds.rnrnIf you do not detonate Explosive Shot, 269850s1 Focus and some of the cooldown will be refunded.
-Define(hunters_mark_talent 12)
+Define(guerrilla_tactics_talent 4) #21997
+# Wildfire Bomb now has s1+1 charges, and the initial explosion deals s2 increased damage.
+Define(hunters_mark_talent 12) #21998
 # Apply Hunter's Mark to the target, increasing all damage you deal to the marked target by s1.  If the target dies while affected by Hunter's Mark, you instantly gain 259558s1 Focus. The target can always be seen and tracked by the Hunter.rnrnOnly one Hunter's Mark can be applied at a time.
-Define(piercing_shot_talent 21)
+Define(lethal_shots_talent 16) #23063
+# Steady Shot has a h chance to cause your next Aimed Shot or Rapid Fire to be guaranteed critical strikes.
+Define(mongoose_bite_talent 17) #22278
+# A brutal attack that deals s1 Physical damage and grants you Mongoose Fury.rnrn|cFFFFFFFFMongoose Fury|rrnIncreases the damage of Mongoose Bite by 259388s1 for 259388d, stacking up to 259388u times. Successive attacks do not increase duration.
+Define(piercing_shot_talent 21) #22288
 # A powerful shot which deals sw3 Physical damage to the target and up to sw3/(s1/10) Physical damage to all enemies between you and the target. 
-Define(spitting_cobra_talent 21)
+Define(spitting_cobra_talent 21) #22295
 # Summons a Spitting Cobra for d that attacks your target for 206685s1 Nature damage every 2 sec. rnrnWhile the Cobra is active you gain s2 Focus every sec.
-Define(stampede_talent 18)
+Define(stampede_talent 18) #23044
 # Summon a herd of stampeding animals from the wilds around you that deal damage to your enemies for d.
+Define(steady_focus_talent 10) #22267
+# Using Steady Shot reduces the cast time of Steady Shot by 193534s1, stacking up to 193534u times.  Using any other shot removes this effect.
+Define(terms_of_engagement_talent 2) #22283
+# Harpoon deals 271625s1 Physical damage and generates (265898s1/5)*265898d Focus over 265898d. Killing an enemy resets the cooldown of Harpoon.
+Define(vipers_venom_talent 1) #22275
+# ?s259387[Mongoose Bite][Raptor Strike] has a chance to make your next Serpent Sting cost no Focus and deal an additional 268552s1 initial damage.
+Define(wildfire_infusion_talent 20) #22301
+# Lace your Wildfire Bomb with extra reagents, randomly giving it one of the following enhancements each time you throw it:rnrn|cFFFFFFFFShrapnel Bomb: |rShrapnel pierces the targets, causing ?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] to apply a bleed for 270343d that stacks up to 270343u times.rnrn|cFFFFFFFFPheromone Bomb: |rKill Command has a 270323s2 chance to reset against targets coated with Pheromones.rnrn|cFFFFFFFFVolatile Bomb: |rReacts violently with poison, causing an extra explosion against enemies suffering from your Serpent Sting and refreshes your Serpent Stings.
 Define(focused_fire_trait 278531)
 Define(in_the_rhythm_trait 264198)
 Define(up_close_and_personal_trait 278533)

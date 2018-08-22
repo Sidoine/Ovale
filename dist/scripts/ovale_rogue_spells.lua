@@ -110,7 +110,7 @@ Define(marked_for_death 137619)
   SpellAddTargetDebuff(marked_for_death marked_for_death=1)
 Define(mutilate 1329)
 # Attack with both weapons, dealing a total of <dmg> Physical damage.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
-  SpellInfo(mutilate energy=50 replace=sinister_strike gcd=1 combopoints=-2)
+  SpellInfo(mutilate energy=50 gcd=1 combopoints=-2)
 Define(nightblade 195452)
 # Finishing move that infects the target with shadowy energy, dealing Shadow damage over time and reduces the effectiveness of healing on the target by s7. Lasts longer per combo point.rn   1 point  : <damage>*8/6 over 8 secrn   2 points: <damage>*10/6 over 10 secrn   3 points: <damage>*12/6 over 12 secrn   4 points: <damage>*14/6 over 14 secrn   5 points: <damage>*16/6 over 16 sec?s193531[rn   6 points: <damage>*18/6 over 18 sec][]rnrnYou deal s6 increased damage to enemies afflicted by your Nightblade.
   SpellInfo(nightblade energy=25 combopoints=1 duration=6 gcd=1 tick=2)
@@ -178,9 +178,9 @@ Define(shuriken_tornado 277925)
 Define(shuriken_toss 114014)
 # Throws a shuriken at an enemy target for s1*<CAP>/AP Physical damage.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
   SpellInfo(shuriken_toss energy=40 gcd=1 combopoints=-1)
-Define(sinister_strike 1752)
-# Viciously strike an enemy, causing s1 Physical damage.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
-  SpellInfo(sinister_strike energy=45 gcd=1 combopoints=-1)
+Define(sinister_strike_outlaw 193315)
+# Viciously strike an enemy, causing s1*<mult> Physical damage.?s279876[rnrnHas a s3 chance to hit an additional time, making your next Pistol Shot half cost and double damage.][]rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
+  SpellInfo(sinister_strike_outlaw energy=45 gcd=1 combopoints=-1)
 Define(slice_and_dice 5171)
 # Finishing move that consumes combo points to increase attack speed by s1 and Energy regeneration rate by s3. Lasts longer per combo point.rn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds?s193531[rn   6 points: 42 seconds][]
   SpellInfo(slice_and_dice energy=25 combopoints=1 duration=6 channel=6 talent=slice_and_dice_talent gcd=1 tick=2)
@@ -214,56 +214,56 @@ Define(vendetta 79140)
   SpellInfo(vendetta cd=120 duration=20 gcd=1)
   # Marked for death, increasing damage taken from the Rogue's attacks, and always visible to the Rogue.
   SpellAddTargetDebuff(vendetta vendetta=1)
-Define(deeper_stratagem_talent 8)
-# You may have a maximum of s3 combo points, your finishing moves consume up to s3 combo points, and your finishing moves deal s4 increased damage.
-Define(exsanguinate_talent 18)
-# Twist your blades into the target's wounds, causing your Bleed effects on them to bleed out s1 faster.
-Define(internal_bleeding_talent 13)
-# Kidney Shot also deals up to ?s193531[6*154953o1][5*154953o1] Bleed damage over 154953d, based on combo points spent.
-Define(master_assassin_talent 6)
-# While Stealth is active and for s1 sec after breaking Stealth, your critical strike chance is increased by 256735s1.
-Define(nightstalker_talent 4)
-# While Stealth?c3[ or Shadow Dance][] is active, you move s1 faster and your abilities deal s2 more damage.
-Define(subterfuge_talent 5)
-# Your abilities requiring Stealth can still be used for 115192d after Stealth breaks.?c3[rnrnAlso increases the duration of Shadow Dance by m2/1000 sec.][rnrnAlso causes Garrote to deal 115192s2 increased damage and have no cooldown when used from Stealth and for 115192d after breaking Stealth.]
-Define(venom_rush_talent 16)
-# Mutilate refunds s1 Energy when used against a poisoned target.
-Define(ghostly_strike_talent 3)
-# Strikes an enemy, dealing s1 Physical damage and causing the target to take s3 increased damage from your abilities for d.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
-Define(marked_for_death_talent 9)
-# Marks the target, instantly generating s1 combo points. Cooldown reset if the target dies within d.
-Define(quick_draw_talent 2)
-# Half-cost uses of Pistol Shot granted by Sinister Strike now generate s2 additional combo point, and deal s1 additional damage.
-Define(alacrity_talent 17)
+Define(alacrity_talent 17) #19249
 # Your finishing moves have a s2 chance per combo point to grant 193538s1 Haste for 193538d, stacking up to 193538u times.
-Define(dark_shadow_talent 16)
-# While Shadow Dance is active, all damage you deal is increased by s1.
-Define(find_weakness_talent 2)
-# Your Shadowstrike and Cheap Shot reveal a flaw in your target's defenses, causing all your attacks to bypass 91021s1 of that enemy's armor for 91021d.
-Define(master_of_shadows_talent 19)
-# Gain 196980s1*196980d/196980t1+196980s2 Energy over 196980d when you enter Stealth or activate Shadow Dance.
-Define(secret_technique_talent 20)
-# Finishing move that creates shadow clones of yourself. You and your shadow clones each perform a piercing attack on all enemies near your target, dealing Physical damage to the primary target and reduced damage to other targets.rn   1 point  : 280720m1*1*<mult> total damagern   2 points: 280720m1*2*<mult> total damagern   3 points: 280720m1*3*<mult> total damagern   4 points: 280720m1*4*<mult> total damagern   5 points: 280720m1*5*<mult> total damage?s193531[rn   6 points: 280720m1*6*<mult> total damage][]rnrnCooldown is reduced by by s5 sec for every combo point you spend.
-Define(shadow_focus_talent 6)
-# ?c3[Abilities cost 112942m1 less Energy while Stealth or Shadow Dance is active.][Abilities cost 112942s1 less Energy while Stealth is active.]
-Define(vigor_talent 7)
-# Increases your maximum Energy by s1 and your Energy regeneration by s2.
-Define(blade_rush_talent 20)
+Define(blade_rush_talent 20) #23075
 # Charge to your target with your blades out, dealing 271881sw1*271881s2/100 Physical damage to the target and 271881sw1 to all other nearby enemies.rnrnWhile Blade Flurry is active, damage to non-primary targets is increased by s1.rnrn|cFFFFFFFFGenerates 271896s1*271896d/271896t1 Energy over 271896d.
-Define(blindside_talent 3)
+Define(blindside_talent 3) #22339
 # Exploits the vulnerability of foes with less than s4 health, dealing s2 Physical damage to the target.rnrnMutilate has a s5 chance to make your next Blindside free and usable on any target, regardless of their health.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|r
-Define(crimson_tempest_talent 21)
+Define(crimson_tempest_talent 21) #23174
 # Finishing move that slashes at all enemies within A1 yards, dealing instant damage and causing victims to bleed for additional damage. Lasts longer per combo point.rnrn   1 point  : s2*2 plus o1*2 over 4 secrn   2 points: s2*3 plus o1*3 over 6 secrn   3 points: s2*4 plus o1*4 over 8 secrn   4 points: s2*5 plus o1*5 over 10 secrn   5 points: s2*6 plus o1*6 over 12 sec?s193531[rn   6 points: s2*7 plus o1*7 over 14 sec][]
-Define(gloomblade_talent 3)
+Define(dark_shadow_talent 16) #22335
+# While Shadow Dance is active, all damage you deal is increased by s1.
+Define(deeper_stratagem_talent 8) #19240
+# You may have a maximum of s3 combo points, your finishing moves consume up to s3 combo points, and your finishing moves deal s4 increased damage.
+Define(exsanguinate_talent 18) #22344
+# Twist your blades into the target's wounds, causing your Bleed effects on them to bleed out s1 faster.
+Define(find_weakness_talent 2) #19234
+# Your Shadowstrike and Cheap Shot reveal a flaw in your target's defenses, causing all your attacks to bypass 91021s1 of that enemy's armor for 91021d.
+Define(ghostly_strike_talent 3) #22120
+# Strikes an enemy, dealing s1 Physical damage and causing the target to take s3 increased damage from your abilities for d.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
+Define(gloomblade_talent 3) #19235
 # Punctures your target with your shadow-infused blade for s1 Shadow damage, bypassing armor.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
-Define(killing_spree_talent 21)
+Define(internal_bleeding_talent 13) #19245
+# Kidney Shot also deals up to ?s193531[6*154953o1][5*154953o1] Bleed damage over 154953d, based on combo points spent.
+Define(killing_spree_talent 21) #23175
 # Teleport to an enemy within 10 yards, attacking with both weapons for a total of <dmg> Physical damage over d.rnrnWhile Blade Flurry is active, also hits all nearby enemies for s2 damage.
-Define(shuriken_tornado_talent 21)
+Define(marked_for_death_talent 9) #19241
+# Marks the target, instantly generating s1 combo points. Cooldown reset if the target dies within d.
+Define(master_assassin_talent 6) #23022
+# While Stealth is active and for s1 sec after breaking Stealth, your critical strike chance is increased by 256735s1.
+Define(master_of_shadows_talent 19) #22132
+# Gain 196980s1*196980d/196980t1+196980s2 Energy over 196980d when you enter Stealth or activate Shadow Dance.
+Define(nightstalker_talent 4) #22331
+# While Stealth?c3[ or Shadow Dance][] is active, you move s1 faster and your abilities deal s2 more damage.
+Define(quick_draw_talent 2) #22119
+# Half-cost uses of Pistol Shot granted by Sinister Strike now generate s2 additional combo point, and deal s1 additional damage.
+Define(secret_technique_talent 20) #23183
+# Finishing move that creates shadow clones of yourself. You and your shadow clones each perform a piercing attack on all enemies near your target, dealing Physical damage to the primary target and reduced damage to other targets.rn   1 point  : 280720m1*1*<mult> total damagern   2 points: 280720m1*2*<mult> total damagern   3 points: 280720m1*3*<mult> total damagern   4 points: 280720m1*4*<mult> total damagern   5 points: 280720m1*5*<mult> total damage?s193531[rn   6 points: 280720m1*6*<mult> total damage][]rnrnCooldown is reduced by by s5 sec for every combo point you spend.
+Define(shadow_focus_talent 6) #22333
+# ?c3[Abilities cost 112942m1 less Energy while Stealth or Shadow Dance is active.][Abilities cost 112942s1 less Energy while Stealth is active.]
+Define(shuriken_tornado_talent 21) #21188
 # Focus intently, then release a Shuriken Storm every sec for the next d. 
-Define(slice_and_dice_talent 18)
+Define(slice_and_dice_talent 18) #19250
 # Finishing move that consumes combo points to increase attack speed by s1 and Energy regeneration rate by s3. Lasts longer per combo point.rn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds?s193531[rn   6 points: 42 seconds][]
-Define(toxic_blade_talent 17)
+Define(subterfuge_talent 5) #22332
+# Your abilities requiring Stealth can still be used for 115192d after Stealth breaks.?c3[rnrnAlso increases the duration of Shadow Dance by m2/1000 sec.][rnrnAlso causes Garrote to deal 115192s2 increased damage and have no cooldown when used from Stealth and for 115192d after breaking Stealth.]
+Define(toxic_blade_talent 17) #23015
 # Stab your enemy with a toxic poisoned blade, dealing s2 Nature damage.rnrnYour Nature damage done against the target is increased by 245389s1 for 245389d.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|r
+Define(venom_rush_talent 16) #22343
+# Mutilate refunds s1 Energy when used against a poisoned target.
+Define(vigor_talent 7) #19239
+# Increases your maximum Energy by s1 and your Energy regeneration by s2.
 Define(sharpened_blades_trait 272911)
 Define(ace_up_your_sleeve_trait 278676)
 Define(deadshot_trait 272935)

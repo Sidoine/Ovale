@@ -1100,6 +1100,12 @@ local AddDisambiguation = function(name, info, className, specialization, _type)
 end
 
 local function Disambiguate(annotation, name, className, specialization, _type)
+    if className and annotation.dictionary[name .. "_" .. className] then
+        return name .. "_" .. className, _type
+    end
+    if specialization and annotation.dictionary[name .. "_" .. specialization] then
+        return name .. "_" .. specialization, _type
+    end
     local disname, distype = GetPerClassSpecialization(EMIT_DISAMBIGUATION, name, className, specialization)
     if  not disname then
         if  not annotation.dictionary[name] then

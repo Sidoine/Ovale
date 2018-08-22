@@ -217,35 +217,33 @@ Define(wild_charge 102401)
   SpellInfo(wild_charge cd=15 duration=0.5 talent=wild_charge_talent gcd=0.5)
   # Flying to an ally's position.
   SpellAddBuff(wild_charge wild_charge=1)
-Define(stellar_flare_talent 18)
-# Burns the target for s1 Astral damage, and then an additional o2 damage over d.rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
-Define(twin_moons_talent 17)
-# Moonfire deals s2 increased damage and also hits another nearby enemy within 279621A1 yds of the target.
-Define(bloodtalons_talent 20)
+Define(bloodtalons_talent 20) #21649
 # Casting Regrowth or Entangling Roots causes your next two melee abilities to deal 145152s1 increased damage for their full duration.
-Define(brutal_slash_talent 17)
-# Strikes all nearby enemies with a massive slash, inflicting s1 Physical damage.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
-Define(lunar_inspiration_talent 3)
-# Moonfire is now usable while in Cat Form, generates 1 combo point, deals damage based on attack power, and costs 30 energy.
-Define(moment_of_clarity_talent 19)
-# Omen of Clarity now triggers s2 more often, can accumulate up to s135700u+s1 charges, and increases the damage of your next Shred, Thrash, or ?s202028[Brutal Slash][Swipe] by s4.rnrnYour maximum Energy is increased by s3.
-Define(sabertooth_talent 16)
-# Ferocious Bite deals s1 increased damage and always refreshes the duration of Rip.
-Define(bristling_fur_talent 3)
+Define(bristling_fur_talent 3) #22420
 # Bristle your fur, causing you to generate Rage based on damage taken for d.
-Define(feral_frenzy_talent 21)
+Define(brutal_slash_talent 17) #21711
+# Strikes all nearby enemies with a massive slash, inflicting s1 Physical damage.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
+Define(feral_frenzy_talent 21) #21653
 # Unleash a furious frenzy, clawing your target m2 times for 274838s1*m2 Physical damage and an additional m2*274838s3*274838d/274838t3 Bleed damage over 274838d.rnrn|cFFFFFFFFAwards s1 combo points.|r
-Define(force_of_nature_talent 3)
+Define(force_of_nature_talent 3) #22387
 # Summons a stand of s1 Treants for 248280d which immediately taunt and attack enemies in the targeted area.rnrn|cFFFFFFFFGenerates m5/10 Astral Power.|r
-Define(lunar_beam_talent 20)
+Define(lunar_beam_talent 20) #22427
 # Summons a beam of lunar light at your location, dealing 204069s2*8 Arcane damage and healing you for 204069s1*8 over m1 sec.
-Define(savage_roar_talent 18)
+Define(lunar_inspiration_talent 3) #22365
+# Moonfire is now usable while in Cat Form, generates 1 combo point, deals damage based on attack power, and costs 30 energy.
+Define(moment_of_clarity_talent 19) #21646
+# Omen of Clarity now triggers s2 more often, can accumulate up to s135700u+s1 charges, and increases the damage of your next Shred, Thrash, or ?s202028[Brutal Slash][Swipe] by s4.rnrnYour maximum Energy is increased by s3.
+Define(sabertooth_talent 16) #21714
+# Ferocious Bite deals s1 increased damage and always refreshes the duration of Rip.
+Define(savage_roar_talent 18) #22370
 # Finishing move that increases damage by 62071s1 while in Cat Form. Lasts longer per combo point:rnrn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds
-Define(stellar_flare_talent 18)
+Define(stellar_flare_talent 18) #22165
 # Burns the target for s1 Astral damage, and then an additional o2 damage over d.rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
-Define(warrior_of_elune_talent 2)
+Define(twin_moons_talent 17) #21712
+# Moonfire deals s2 increased damage and also hits another nearby enemy within 279621A1 yds of the target.
+Define(warrior_of_elune_talent 2) #22386
 # Your next u Lunar Strikes are instant cast and generate s2 additional Astral Power.
-Define(wild_charge_talent 6)
+Define(wild_charge_talent 6) #18571
 # Fly to a nearby ally's position.
 Define(ailuro_pouncers_item 137024)
 Define(luffa_wrappings_item 137056)
