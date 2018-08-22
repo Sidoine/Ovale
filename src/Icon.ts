@@ -179,15 +179,15 @@ export class OvaleIcon {
             } else {
                 this.shortcut.Hide();
             }
-            if (actionInRange) {
+            if (actionInRange === undefined) {
+                this.rangeIndicator.Hide();   
+            } else if (actionInRange) {
                 this.rangeIndicator.SetVertexColor(0.6, 0.6, 0.6);
                 this.rangeIndicator.Show();
-            } else if (!actionInRange) {
+            } else {
                 this.rangeIndicator.SetVertexColor(1.0, 0.1, 0.1);
                 this.rangeIndicator.Show();
-            } else {
-                this.rangeIndicator.Hide();
-            }
+            } 
             if (element.namedParams.text) {
                 this.focusText.SetText(tostring(element.namedParams.text));
                 this.focusText.Show();

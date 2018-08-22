@@ -156,14 +156,14 @@ __exports.OvaleIcon = __class(nil, {
             else
                 self.shortcut:Hide()
             end
-            if actionInRange then
+            if actionInRange == nil then
+                self.rangeIndicator:Hide()
+            elseif actionInRange then
                 self.rangeIndicator:SetVertexColor(0.6, 0.6, 0.6)
                 self.rangeIndicator:Show()
-            elseif  not actionInRange then
+            else
                 self.rangeIndicator:SetVertexColor(1, 0.1, 0.1)
                 self.rangeIndicator:Show()
-            else
-                self.rangeIndicator:Hide()
             end
             if element.namedParams.text then
                 self.focusText:SetText(tostring(element.namedParams.text))
