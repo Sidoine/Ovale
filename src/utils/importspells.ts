@@ -1051,7 +1051,7 @@ function readFile(directory:string, fileName: string, zone: any[][], output: { [
 }
 
 function getIdentifier(name: string) {
-    if (!name) return name;
+    if (!name || typeof name !== 'string') return name;
     return name.toLowerCase().replace(/^potion of (the )?/, "").replace(/ /g, '_').replace("!", "_aura").replace(/[:'()]/g, "").replace(/-/g, "_")
 }
 
