@@ -1,7 +1,7 @@
 import { OvaleScripts } from "../Scripts";
 {
     let name = "icyveins_paladin_protection";
-    let desc = "[7.3.2] Icy-Veins: Paladin Protection";
+    let desc = "[8.0.1] Icy-Veins: Paladin Protection";
     let code = `
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -43,7 +43,7 @@ AddFunction ProtectionCooldownTreshold
 
 AddFunction ProtectionGetInMeleeRange
 {
-	if CheckBoxOn(opt_melee_range) and not target.InRange(shield_of_the_righteous) Texture(misc_arrowlup help=L(not_in_melee_range))
+	if CheckBoxOn(opt_melee_range) and not target.InRange(rebuke) Texture(misc_arrowlup help=L(not_in_melee_range))
 }
 
 AddFunction ProtectionDefaultShortCDActions
@@ -96,11 +96,11 @@ AddFunction ProtectionDefaultAoEActions
 	Spell(hammer_of_the_righteous)
 }
 
-AddCheckBox(opt_avenging_wrath SpellName(avenging_wrath_melee) default specialization=protection)
+AddCheckBox(opt_avenging_wrath SpellName(avenging_wrath) default specialization=protection)
 AddFunction ProtectionDefaultCdActions
 {
 	ProtectionInterruptActions()
-	if CheckBoxOn(opt_avenging_wrath) and (not Talent(seraphim_talent) or BuffPresent(seraphim_buff)) Spell(avenging_wrath_melee)
+	if CheckBoxOn(opt_avenging_wrath) and (not Talent(seraphim_talent) or BuffPresent(seraphim_buff)) Spell(avenging_wrath)
 	
 	if (ProtectionCooldownTreshold() and HasEquippedItem(shifting_cosmic_sliver)) Spell(guardian_of_ancient_kings)
 	Item(Trinket0Slot usable=1 text=13)

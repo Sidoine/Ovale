@@ -1,10 +1,9 @@
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
-	local name = "icyveins_monk_brewmaster"
-	local desc = "[8.0.1] Icy-Veins: Monk Brewmaster"
-	local code = [[
-
+    local name = "icyveins_monk_brewmaster"
+    local desc = "[8.0.1] Icy-Veins: Monk Brewmaster"
+    local code = [[
 Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
@@ -53,7 +52,6 @@ AddFunction BrewmasterDefaultShortCDActions
 	
 	# keep stagger below 100% (or 30% when BOB is up)
 	if (StaggerPercentage() >= 100 or (StaggerPercentage() >= 30 and Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 0)) Spell(purifying_brew)
-
 	# use black_ox_brew when at 0 charges and low energy (or in an emergency)
     if (SpellCharges(ironskin_brew count=0) <= 0.75)
     {
@@ -62,7 +60,7 @@ AddFunction BrewmasterDefaultShortCDActions
         #black_ox_brew,if=(energy+(energy.regen*cooldown.keg_smash.remains))<40&buff.blackout_combo.down&cooldown.keg_smash.up
         if Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) < 40 and BuffExpires(blackout_combo_buff) and not SpellCooldown(keg_smash) > 0 Spell(black_ox_brew)
     }
-
+	
 	# heal me
 	BrewmasterHealMeShortCd()
 	# range check
@@ -97,7 +95,7 @@ AddFunction BrewmasterDefaultMainActions
 {
     BrewmasterHealMeMain()
     if (not InCombat()) Spell(keg_smash)
-
+        
 	if Talent(blackout_combo_talent) BrewmasterBlackoutComboMainActions()
 	unless Talent(blackout_combo_talent) 
 	{
@@ -108,7 +106,7 @@ AddFunction BrewmasterDefaultMainActions
 		if (Energy() >= 65 or (Talent(black_ox_brew_talent) and SpellCooldown(black_ox_brew) <= 0)) Spell(tiger_palm)
 		Spell(chi_burst)
 		Spell(chi_wave)
-        Spell(arcane_pulse)
+		Spell(arcane_pulse)
 	}
 }
 
@@ -124,7 +122,7 @@ AddFunction BrewmasterBlackoutComboMainActions
 		if BuffRefreshable(rushing_jade_wind_buff) Spell(rushing_jade_wind)
 		Spell(chi_burst)
 		Spell(chi_wave)
-        Spell(arcane_pulse)
+		Spell(arcane_pulse)
 	}
 }
 
@@ -151,7 +149,7 @@ AddFunction BrewmasterDefaultAoEActions
 AddFunction BrewmasterDefaultCdActions 
 {
 	BrewmasterInterruptActions()
-    Spell(guard)
+	Spell(guard)
 	if not PetPresent(name=Niuzao) Spell(invoke_niuzao_the_black_ox)
 	if (HasEquippedItem(firestone_walkers)) Spell(fortifying_brew)
 	if (HasEquippedItem(shifting_cosmic_sliver)) Spell(fortifying_brew)
@@ -196,9 +194,8 @@ AddIcon help=cd specialization=brewmaster
 {
 	BrewmasterDefaultCdActions()
 }
-	
 ]]
-	OvaleScripts:RegisterScript("MONK", "brewmaster", name, desc, code, "script")
+    OvaleScripts:RegisterScript("MONK", "brewmaster", name, desc, code, "script")
 end
 do
     local name = "sc_pr_monk_brewmaster"

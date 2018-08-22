@@ -1,10 +1,9 @@
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
-	local name = "icyveins_druid_guardian"
-	local desc = "[8.0.1] Icy-Veins: Druid Guardian"
-	local code = [[
-
+    local name = "icyveins_druid_guardian"
+    local desc = "[8.0.1] Icy-Veins: Druid Guardian"
+    local code = [[
 Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
@@ -176,9 +175,8 @@ AddIcon help=cd specialization=guardian
 {
 	GuardianDefaultCdActions()
 }
-	
 ]]
-	OvaleScripts:RegisterScript("DRUID", "guardian", name, desc, code, "script")
+    OvaleScripts:RegisterScript("DRUID", "guardian", name, desc, code, "script")
 end
 do
     local name = "shmoodude_druid_feral"

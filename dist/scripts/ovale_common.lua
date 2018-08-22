@@ -80,13 +80,10 @@ Define(healthstone 5512)
     ItemInfo(healthstone offgcd=1 gcd=0)
     ItemRequire(healthstone unusable 1=debuff,healing_immunity_debuff)
 
+
 SpellList(trinket_proc_spell_power_buff)
 SpellList(trinket_stacking_proc_spell_power_buff)
 
-Define(astral_healing_potion 152615)
-Define(ancient_healing_potion 127834)
-Define(aged_healing_potion 136569)
-Define(healthstone 5512)
 Define(umbral_glaive_storm 242553)
 
 # Battle for Azeroth
@@ -253,7 +250,7 @@ AddFunction UseHealthPotions
 	Item(healthstone usable=1)
 	if CheckBoxOn(opt_use_consumables) 
 	{
-		Item(coastal_healing_potion usable=1)
+        Item(coastal_healing_potion usable=1)
         Item(astral_healing_potion usable=1)
 		Item(ancient_healing_potion usable=1)
 		Item(aged_healing_potion usable=1)

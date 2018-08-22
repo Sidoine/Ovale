@@ -1,10 +1,9 @@
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
-
 do
-	local name = "icyveins_demonhunter_vengeance"
-	local desc = "[8.0.1] Icy-Veins: DemonHunter Vengeance"
-	local code = [[
+    local name = "icyveins_demonhunter_vengeance"
+    local desc = "[8.0.1] Icy-Veins: DemonHunter Vengeance"
+    local code = [[
 Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
@@ -158,7 +157,7 @@ AddIcon help=cd specialization=vengeance
 	VengeanceDefaultCdActions()
 }
 	]]
-	OvaleScripts:RegisterScript("DEMONHUNTER", "vengeance", name, desc, code, "script")
+    OvaleScripts:RegisterScript("DEMONHUNTER", "vengeance", name, desc, code, "script")
 end
 do
     local name = "sc_pr_demon_hunter_havoc"
