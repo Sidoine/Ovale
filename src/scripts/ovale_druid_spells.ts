@@ -13,16 +13,21 @@ Define(barkskin 22812)
   SpellInfo(barkskin cd=60 duration=12 gcd=0 offgcd=1 tick=1)
   # All damage taken reduced by s2.
   SpellAddBuff(barkskin barkskin=1)
-Define(battle_potion_of_agility 279161)
-# Chance to create multiple potions.
-  SpellInfo(battle_potion_of_agility gcd=0 offgcd=1)
-Define(bear_form 270100)
-# Bear Form gives an additional s1 Stamina.rn
-  SpellInfo(bear_form channel=0 gcd=0 offgcd=1)
+Define(battle_potion_of_agility 279152)
+# Increases your Agility by s1 for d.
+  SpellInfo(battle_potion_of_agility cd=1 duration=25 gcd=0 offgcd=1)
+  # Agility increased by w1.
+  SpellAddBuff(battle_potion_of_agility battle_potion_of_agility=1)
+Define(bear_form 5487)
+# Shapeshift into Bear Form, increasing armor by m3 and Stamina by 1178s2, granting protection from Polymorph effects, and increasing threat generation.rnrnThe act of shapeshifting frees you from movement impairing effects.
+  SpellInfo(bear_form)
+  # Armor increased by w3.rnStamina increased by 1178s2.rnImmune to Polymorph effects.
   SpellAddBuff(bear_form bear_form=1)
-Define(berserk 279526)
+  # Armor increased by w3.rnStamina increased by 1178s2.rnImmune to Polymorph effects.
+  SpellAddTargetDebuff(bear_form bear_form=1)
+Define(berserk 106951)
 # Reduces the energy cost of all Cat Form abilities by s1 and increases maximum Energy by s3 for d.
-  SpellInfo(berserk cd=180 duration=5 gcd=1)
+  SpellInfo(berserk cd=180 duration=15 gcd=1)
   # Reduces the energy cost of all Cat Form abilities by s1 and increases maximum Energy by s3.
   SpellAddBuff(berserk berserk=1)
 Define(berserking 26297)
@@ -30,10 +35,10 @@ Define(berserking 26297)
   SpellInfo(berserking cd=180 duration=10 gcd=0 offgcd=1)
   # Haste increased by s1.
   SpellAddBuff(berserking berserking=1)
-Define(blood_fury 33702)
-# Increases your Intellect by s1 for d.
+Define(blood_fury 20572)
+# Increases your attack power by s1 for d.
   SpellInfo(blood_fury cd=120 duration=15 gcd=0 offgcd=1)
-  # Intellect increased by w1.
+  # Attack power increased by w1.
   SpellAddBuff(blood_fury blood_fury=1)
 Define(bristling_fur 155835)
 # Bristle your fur, causing you to generate Rage based on damage taken for d.
@@ -53,40 +58,36 @@ Define(celestial_alignment 194223)
   SpellInfo(celestial_alignment cd=180 duration=20)
   # Spell damage increased by s1.rnHaste increased by s3.
   SpellAddBuff(celestial_alignment celestial_alignment=1)
-Define(dash 61684)
-# Increases your pet's movement speed by s1 for d.
-  SpellInfo(dash cd=20 duration=10 gcd=0 offgcd=1)
-  # Increases movement speed by s1.
+Define(dash 1850)
+# Activates Cat Form and increases movement speed by s1 while in Cat Form for d.
+  SpellInfo(dash cd=120 duration=10)
+  # Increased movement speed by s1 while in Cat Form.
   SpellAddBuff(dash dash=1)
 Define(dawning_sun_buff 276153)
 # @spelldesc276152
   SpellInfo(dawning_sun_buff channel=-0.001 gcd=0 offgcd=1)
-Define(feral_frenzy 274838)
-# @spelldesc274837
-  SpellInfo(feral_frenzy duration=6 gcd=0 offgcd=1 combo_points=-1 tick=2)
-  # Bleeding for w2 damage every t2 sec.
-  SpellAddTargetDebuff(feral_frenzy feral_frenzy=1)
-Define(ferocious_bite 231056)
-# When used on a target below 25 health, Ferocious Bite will refresh the duration of your Rip on your target.
-  SpellInfo(ferocious_bite channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(ferocious_bite ferocious_bite=1)
-Define(fireblood 265226)
-# Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by s1.
-  SpellInfo(fireblood duration=8 max_stacks=6 gcd=0 offgcd=1)
-  # Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by w1.
-  SpellAddBuff(fireblood fireblood=1)
+Define(feral_frenzy 274837)
+# Unleash a furious frenzy, clawing your target m2 times for 274838s1*m2 Physical damage and an additional m2*274838s3*274838d/274838t3 Bleed damage over 274838d.rnrn|cFFFFFFFFAwards s1 combo points.|r
+  SpellInfo(feral_frenzy energy=25 cd=45 duration=1 talent=feral_frenzy_talent gcd=1 tick=0.2)
+  SpellAddBuff(feral_frenzy feral_frenzy=1)
+Define(ferocious_bite 22568)
+# Finishing move that causes Physical damage per combo point and consumes up to ?a106951[25*106951s1/-100.1]?a102543[25*102543s1/-100.1][25] additional Energy to increase damage by up to 100.rnrn?s202031[]?s231056[When used on targets below 25 health, ][]?s231056[Ferocious Bite will also refresh the duration of your Rip on your target.rnrn][]   1 point  : m1*1/5 damagern   2 points: m1*2/5 damagern   3 points: m1*3/5 damagern   4 points: m1*4/5 damagern   5 points: m1*5/5 damage
+  SpellInfo(ferocious_bite energy=25 combo_points=1 gcd=1)
+Define(fireblood 265221)
+# Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 265226d. 
+  SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
 Define(force_of_nature 205636)
 # Summons a stand of s1 Treants for 248280d which immediately taunt and attack enemies in the targeted area.rnrn|cFFFFFFFFGenerates m5/10 Astral Power.|r
   SpellInfo(force_of_nature cd=60 talent=force_of_nature_talent astral_power=-20)
-Define(full_moon 274283)
+Define(full_moon 202771)
 # Deals m1 Arcane damage to the target and reduced damage to all other nearby enemies, and resets Full Moon to become New Moon.rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r
-  SpellInfo(full_moon cd=25 astral_power=-40)
+  SpellInfo(full_moon cd=15 astral_power=-40)
 Define(fury_of_elune 211547)
 # @spelldesc202770
   SpellInfo(fury_of_elune cd=0.5 gcd=0 offgcd=1)
-Define(half_moon 274282)
+Define(half_moon 202768)
 # Deals m1 Arcane damage to the target and empowers Half Moon to become Full Moon.rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
-  SpellInfo(half_moon cd=25 astral_power=-20)
+  SpellInfo(half_moon cd=15 astral_power=-20)
 Define(incarnation 117679)
 # Activates a superior shapeshifting form appropriate to your specialization for d.  You may freely shapeshift in and out of this form for its duration.
   SpellInfo(incarnation duration=30 gcd=0 offgcd=1)
@@ -103,59 +104,62 @@ Define(lights_judgment 255647)
 Define(lively_spirit_buff 279646)
 # @spelldesc279642
   SpellInfo(lively_spirit_buff channel=-0.001 gcd=0 offgcd=1)
-Define(lunar_beam 204069)
-# @spelldesc204066
-  SpellInfo(lunar_beam gcd=0 offgcd=1)
-Define(lunar_strike 197628)
-# Call down a strike of lunar energy, causing s1 Arcane damage to the target, and m1*m2/100 Arcane damage to all other enemies within A1 yards.
-  SpellInfo(lunar_strike)
-Define(mangle 231064)
-# Mangle deals 33917s3 additional damage against bleeding targets.
-  SpellInfo(mangle channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(mangle mangle=1)
+Define(lunar_beam 204066)
+# Summons a beam of lunar light at your location, dealing 204069s2*8 Arcane damage and healing you for 204069s1*8 over m1 sec.
+  SpellInfo(lunar_beam cd=75 duration=8.5 talent=lunar_beam_talent)
+Define(lunar_strike 194153)
+# Call down a strike of lunar energy, causing s1 Arcane damage to the target, and m1*m3/100 Arcane damage to all other enemies within A1 yards.rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r
+  SpellInfo(lunar_strike astral_power=-12)
+Define(mangle 33917)
+# Mangle the target for s2 Physical damage.?a231064[ Deals s3 additional damage against bleeding targets.][]rnrn|cFFFFFFFFGenerates m4/10 Rage.|r
+  SpellInfo(mangle cd=6 rage=-8)
 Define(maul 6807)
 # Maul the target for s2 Physical damage.
   SpellInfo(maul rage=45)
-Define(moonfire 164812)
-# @spelldesc8921
-  SpellInfo(moonfire duration=16 gcd=0 offgcd=1 tick=2)
-  # Suffering w2 Arcane damage every t2 seconds.
-  SpellAddTargetDebuff(moonfire moonfire=1)
-Define(moonkin_form 231042)
-# While in Moonkin Form, single-target attacks against you have a s1 chance make your next Lunar Strike instant.rn
-  SpellInfo(moonkin_form channel=0 gcd=0 offgcd=1)
+Define(moonfire 8921)
+# A quick beam of lunar light burns the enemy for 164812s1 Arcane damage and then an additional 164812o2 Arcane damage over 164812d.?s5487[ Usable while in Bear Form.][]?s197911[rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r][]
+  SpellInfo(moonfire rage=0 astral_power=0)
+Define(moonkin_form 24858)
+# Shapeshift into ?s114301[Astral Form][Moonkin Form], increasing the damage of your spells by s9 and your armor by m3, and granting protection from Polymorph effects.?a231042[rnrnWhile in this form, single-target attacks against you have a h chance to make your next Lunar Strike instant.][]rnrnThe act of shapeshifting frees you from movement impairing effects.
+  SpellInfo(moonkin_form)
+  # Spell damage increased by s9.rnImmune to Polymorph effects.?w3>0[rnArmor increased by w3.][]
   SpellAddBuff(moonkin_form moonkin_form=1)
-Define(new_moon 274281)
+Define(new_moon 202767)
 # Deals m1 Arcane damage to the target and empowers New Moon to become Half Moon. rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
-  SpellInfo(new_moon cd=25 talent=new_moon_talent gcd=1 astral_power=-10)
-Define(prolonged_power 229220)
-# Chance to create more than s1 potions.
-  SpellInfo(prolonged_power gcd=0 offgcd=1)
-Define(rising_death 269853)
-# Empowers you with shadow magic for d, giving your ranged attacks a chance to send out a death bolt that grows in intensity as it travels, dealing up to 271292s1 Shadow damage.
-  SpellInfo(rising_death duration=25 channel=25 gcd=0 offgcd=1)
-Define(old_war 188330)
+  SpellInfo(new_moon cd=15 astral_power=-10)
+Define(prolonged_power 229206)
+# Drink to increase all stats by s1 for d.
+  SpellInfo(prolonged_power cd=1 duration=60 gcd=0 offgcd=1)
+  # All stats increased by s1.
+  SpellAddBuff(prolonged_power prolonged_power=1)
+Define(rising_death 252346)
 # Chance to create multiple potions.
-  SpellInfo(old_war gcd=0 offgcd=1)
-Define(prowl 102547)
-# Allows the Druid to vanish from sight, entering an improved stealth mode.  Lasts until cancelled.
+  SpellInfo(rising_death gcd=0 offgcd=1)
+Define(old_war 188028)
+# Summons a pair of ghostly fallen warriors that will join you in combat. They may echo your melee attacks and abilities, dealing 233150s1 damage.
+  SpellInfo(old_war cd=1 duration=25 gcd=0 offgcd=1)
+Define(prowl 5215)
+# Activates Cat Form and places you into stealth until cancelled.
   SpellInfo(prowl cd=6 gcd=0 offgcd=1)
   # Stealthed.
   SpellAddBuff(prowl prowl=1)
-Define(pulverize 158792)
-# @spelldesc80313
-  SpellInfo(pulverize duration=20 gcd=0 offgcd=1 tick=2)
-  # Damage taken reduced by s4.
-  SpellAddBuff(pulverize pulverize=1)
+  # Stealthed.
+  SpellAddTargetDebuff(prowl prowl=1)
+Define(pulverize 118345)
+# Smashes an enemy with a rocky fist, stunning the target for d.
+  SpellInfo(pulverize cd=40 duration=4 gcd=0 offgcd=1)
+  # Stunned.
+  SpellAddTargetDebuff(pulverize pulverize=1)
 Define(rake_debuff 155722)
 # @spelldesc1822
   SpellInfo(rake_debuff duration=15 gcd=0 offgcd=1 tick=3)
   # Bleeding for w1 damage every t1 seconds.
   SpellAddTargetDebuff(rake_debuff rake_debuff=1)
-Define(rake 231052)
-# While stealthed, Rake will also stun the target for 163505d, and deal 1822s4 increased damage.
-  SpellInfo(rake channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(rake rake=1)
+Define(rake 1822)
+# Rake the target for s1 Bleed damage and an additional 155722o1 Bleed damage over 155722d.?s48484[ Reduces the target's movement speed by 58180s1 for 58180d.][]?a231052[ rnrnWhile stealthed, Rake will also stun the target for 163505d, and deal s4 increased damage.][]rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
+  SpellInfo(rake energy=35 gcd=1 combo_points=-1)
+  # Bleeding for w1 damage every t1 seconds.
+  SpellAddTargetDebuff(rake rake_debuff=1)
 Define(regrowth 8936)
 # Heals a friendly target for s1 and another o2*<mult> over d.?s231032[ Regrowth's initial heal has a 231032s1 increased chance for a critical effect.][]?s24858|s197625[ Usable while in Moonkin Form.][]?s33891[rnrn|C0033AA11Tree of Life: Instant cast.|R][]
   SpellInfo(regrowth duration=12 tick=2)
@@ -166,30 +170,30 @@ Define(rip 1079)
   SpellInfo(rip energy=30 combo_points=1 duration=24 gcd=1 tick=2)
   # Bleeding for w1 damage every t1 sec.
   SpellAddTargetDebuff(rip rip=1)
-Define(savage_roar 62071)
-# @spelldesc52610
-  SpellInfo(savage_roar gcd=0 offgcd=1)
-  # Damage increased w1.
+Define(savage_roar 52610)
+# Finishing move that increases damage by 62071s1 while in Cat Form. Lasts longer per combo point:rnrn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds
+  SpellInfo(savage_roar energy=30 combo_points=1 duration=6 channel=6 talent=savage_roar_talent gcd=1 tick=2)
+  # Damage increased w2 while in Cat Form.
   SpellAddBuff(savage_roar savage_roar=1)
 Define(shadowmeld 58984)
 # Activate to slip into the shadows, reducing the chance for enemies to detect your presence. Lasts until cancelled or upon moving. Any threat is restored versus enemies still in combat upon cancellation of this effect.
   SpellInfo(shadowmeld cd=120 channel=-0.001 gcd=0 offgcd=1)
   # Shadowmelded.
   SpellAddBuff(shadowmeld shadowmeld=1)
-Define(shred 231063)
-# Shred deals 5221s5 increased damage against bleeding targets.
-  SpellInfo(shred channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(shred shred=1)
-Define(solar_wrath 197629)
+Define(shred 5221)
+# Shred the target, causing s1*<mult> Physical damage to the target.?a231063[ Deals s4 increased damage against bleeding targets.][]?a231057[rnrnWhile stealthed, Shred deals m3 increased damage, and has double the chance to critically strike.][]rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
+  SpellInfo(shred energy=40 gcd=1 combo_points=0)
+Define(solar_wrath 5176)
 # Causes s1 Nature damage to the target.
   SpellInfo(solar_wrath)
-Define(starfall 191037)
-# @spelldesc191034
-  SpellInfo(starfall channel=0 gcd=0 offgcd=1)
-Define(starsurge 231021)
-# The Lunar and Solar Empowerments granted by Starsurge now stack up to s1+1 times.
-  SpellInfo(starsurge channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(starsurge starsurge=1)
+Define(starfall 191034)
+# Calls down waves of falling stars at the targeted area, dealing 9*191037m1 Astral damage over 191034d.
+  SpellInfo(starfall astral_power=50 duration=8 channel=8)
+  # Calling down falling stars at the targeted area.
+  SpellAddBuff(starfall starfall=1)
+Define(starsurge 78674)
+# Launch a surge of stellar energies at the target, dealing 78674s1 Astral damage.rnrnAlso grants you Lunar and Solar Empowerment.
+  SpellInfo(starsurge astral_power=40)
 Define(stellar_flare 202347)
 # Burns the target for s1 Astral damage, and then an additional o2 damage over d.rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
   SpellInfo(stellar_flare duration=24 talent=stellar_flare_talent astral_power=-8 tick=2)
@@ -198,20 +202,19 @@ Define(stellar_flare 202347)
 Define(sunblaze_buff 274398)
 # @spelldesc274397
   SpellInfo(sunblaze_buff channel=-0.001 gcd=0 offgcd=1)
-Define(sunfire 231050)
-# Sunfire now applies its damage over time effect to all enemies within 164815A2 yards.
-  SpellInfo(sunfire channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(sunfire sunfire=1)
-Define(swipe 231283)
-# Swipe deals 106785s2 increased damage against bleeding targets.
-  SpellInfo(swipe channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(swipe swipe=1)
-Define(thrash 211141)
-# @spelldesc106830
-  SpellInfo(thrash channel=0 max_stacks=3 gcd=0 offgcd=1 combo_points=-1)
-Define(tigers_fury 231055)
-# Tiger's Fury generates an additional s1 energy.
-  SpellInfo(tigers_fury channel=0 gcd=0 offgcd=1)
+Define(sunfire 93402)
+# A quick beam of solar light burns the enemy for 164815s1 Nature damage and then an additional 164815o2 Nature damage over 164815d?s231050[ to the primary target and all enemies within 164815A2 yards][].?s137013[rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r][]
+  SpellInfo(sunfire astral_power=0)
+Define(swipe 213764)
+# Swipe nearby enemies, inflicting Physical damage. Damage varies by shapeshift form.
+  SpellInfo(swipe gcd=1)
+Define(thrash 106832)
+# Thrash all nearby enemies, dealing immediate physical damage and periodic bleed damage. Damage varies by shapeshift form.
+  SpellInfo(thrash gcd=0 offgcd=1)
+Define(tigers_fury 5217)
+# Instantly restores s2 Energy, and increases the damage of all your attacks by s1 for their full duration. Lasts d.
+  SpellInfo(tigers_fury cd=30 duration=10 gcd=0 offgcd=1 energy=-20)
+  # Attacks deal s1 additional damage for their full duration.
   SpellAddBuff(tigers_fury tigers_fury=1)
 Define(warrior_of_elune 202425)
 # Your next u Lunar Strikes are instant cast and generate s2 additional Astral Power.
@@ -239,10 +242,14 @@ Define(sabertooth_talent 16)
 # Ferocious Bite deals s1 increased damage and always refreshes the duration of Rip.
 Define(bristling_fur_talent 3)
 # Bristle your fur, causing you to generate Rage based on damage taken for d.
+Define(feral_frenzy_talent 21)
+# Unleash a furious frenzy, clawing your target m2 times for 274838s1*m2 Physical damage and an additional m2*274838s3*274838d/274838t3 Bleed damage over 274838d.rnrn|cFFFFFFFFAwards s1 combo points.|r
 Define(force_of_nature_talent 3)
 # Summons a stand of s1 Treants for 248280d which immediately taunt and attack enemies in the targeted area.rnrn|cFFFFFFFFGenerates m5/10 Astral Power.|r
-Define(new_moon_talent 21)
-# Deals m1 Arcane damage to the target and empowers New Moon to become Half Moon. rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
+Define(lunar_beam_talent 20)
+# Summons a beam of lunar light at your location, dealing 204069s2*8 Arcane damage and healing you for 204069s1*8 over m1 sec.
+Define(savage_roar_talent 18)
+# Finishing move that increases damage by 62071s1 while in Cat Form. Lasts longer per combo point:rnrn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds
 Define(stellar_flare_talent 18)
 # Burns the target for s1 Astral damage, and then an additional o2 damage over d.rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
 Define(warrior_of_elune_talent 2)
@@ -263,7 +270,7 @@ Define(sunblaze_trait 274397)
 Define(astralpower "lunarpower") # Astral Power is named LunarPower in Enum.PowerType
 
 # Baseline spells common to all Druid specs
-Define(bear_form 5487)
+
 	SpellInfo(bear_form to_stance=druid_bear_form)
 	SpellInfo(bear_form unusable=1 if_stance=druid_bear_form)
 
@@ -271,7 +278,7 @@ Define(bear_form 5487)
 	SpellInfo(cat_form unusable=1 if_stance=druid_cat_form)
 	SpellAddBuff(cat_form cat_form_buff=1)
 Define(cat_form_buff 768)
-Define(dash 1850)
+
 	SpellInfo(dash cd=120)
 	SpellInfo(dash gcd=0 offgcd=1 if_stance=druid_cat_form)
 	SpellInfo(dash to_stance=druid_cat_form if_stance=!druid_cat_form)
@@ -279,18 +286,18 @@ Define(entangling_roots 339)
 Define(growl 6795)
 	SpellInfo(growl cd=8)
 Define(hibernate 2637)
-Define(shred 5221)
+
 	SpellInfo(shred energy=40 combopoints=-1)
 	SpellInfo(shred physical=1)
-Define(mangle 33917)
+
 	SpellInfo(mangle rage=-8 cd=6 cd_haste=melee)
-Define(moonfire 8921)
+
 	SpellInfo(moonfire mana=6)
 	SpellInfo(moonfire unusable=1 if_stance=druid_cat_form)
 	SpellAddBuff(moonfire moonfire_debuff=1)
 Define(moonfire_debuff 164812)
 	SpellInfo(moonfire_debuff duration=16)
-Define(prowl 5215)
+
 	SpellInfo(prowl cd=10 gcd=0 offgcd=1 to_stance=druid_cat_form)
 	SpellAddBuff(prowl prowl_buff=1)
 Define(prowl_buff 5215)
@@ -370,11 +377,11 @@ Define(sunfire_debuff 164815)
 	SpellInfo(sunfire_debuff duration=12)
 
 # Feral Affinity
-Define(ferocious_bite 22568)
+
 	SpellInfo(ferocious_bite energy=25 max_energy=50 combopoints=1 max_combopoints=5)
 	SpellInfo(ferocious_bite physical=1)
-Define(rake 1822)
-	SpellAddTargetDebuff(rake rake_debuff=1)
+
+	
 
 
 	SpellInfo(rip energy=30 combopoints=1 max_combopoints=5)
@@ -426,14 +433,14 @@ const registerSpec1 = function() {
 	SpellAddBuff(celestial_alignment celestial_alignment_buff=1)
 Define(celestial_alignment_buff 194223)
 
-Define(fury_of_elune 202770)
+
 	SpellInfo(fury_of_elune cd=90 astralpower=6)
 	SpellAddBuff(fury_of_elune fury_of_elune_up_buff=1)
 Define(fury_of_elune_up_buff 202770)
 	#TODO 12 astralpower per s
-Define(full_moon 202771)	
+	
 	SpellInfo(full_moon cd=15 charges=3 astralpower=-40 shared_cd=new_moon)
-Define(half_moon 202768)
+
 	SpellInfo(half_moon cd=15 charges=3 astralpower=-20 shared_cd=new_moon)
 Define(incarnation_chosen_of_elune 102560)
 	SpellInfo(incarnation replace=incarnation_chosen_of_elune specialization=balance)
@@ -443,7 +450,7 @@ Define(incarnation_chosen_of_elune 102560)
 	SpellAddBuff(incarnation_chosen_of_elune incarnation_chosen_of_elune_buff=1)
 Define(incarnation_chosen_of_elune_buff 102560)
 	SpellInfo(incarnation_chosen_of_elune_buff duration=30)
-Define(lunar_beam 204066)
+
 	SpellInfo(lunar_beam cd=90)
 Define(lunar_empowerment_buff 164547)
 Define(lunar_strike_balance 194153)
@@ -461,7 +468,7 @@ Define(moonkin_form_balance 24858)
 	SpellInfo(moonkin_form_balance to_stance=druid_moonkin_form)
 	SpellInfo(moonkin_form_balance unusable=1 if_stance=druid_moonkin_form)
 	#TODO affinity moonkin form has a different spellId
-Define(new_moon 202767)
+
 	SpellInfo(new_moon cd=15 charges=3 astralpower=-10)
 Define(solar_empowerment_buff 164545)
 Define(solar_beam 78675)
@@ -471,7 +478,7 @@ Define(solar_beam 78675)
 	SpellRequire(solar_wrath astralpower_percent 125=buff,blessing_of_elune_buff)
 	SpellRequire(solar_wrath astralpower_percent 150=buff,celestial_alignment_buff)
 	SpellAddBuff(solar_wrath solar_empowerment_buff=-1)
-Define(starfall 191034)
+
 	SpellInfo(starfall astralpower=60)
 	SpellInfo(starfall astralpower=40 talent=soul_of_the_forest_talent)
 	SpellAddBuff(starfall starfall_buff=1)
@@ -549,12 +556,12 @@ Define(intimidating_roar 236748)
 #Define(ironfur 192081)
 	SpellAddBuff(ironfur guardian_of_elune_buff=0)
 #Define(ironfur_buff 192081)
-#Define(mangle 33917)
+#
 	SpellInfo(mangle addrage=-4 talent=soul_of_the_forest_talent specialization=guardian)
 	SpellAddBuff(mangle guardian_of_elune_buff=1 talent=guardian_of_elune_talent)
 
 	SpellInfo(maul rage=45 stance=druid_bear_form)
-Define(pulverize 80313)
+
 	SpellRequire(pulverize unusable 1=target_debuff,!thrash_bear_debuff,2)
 	SpellAddBuff(pulverize pulverize_buff=1)
 	SpellAddTargetDebuff(pulverize thrash_bear_debuff=-2)
@@ -593,7 +600,7 @@ Define(bloodtalons_value 1.25)
 Define(tigers_fury_buff_value 1.15)
 
 # Feral spells
-Define(berserk 106951)
+
 	SpellInfo(berserk cd=180)
 	SpellInfo(berserk replace=incarnation_king_of_the_jungle talent=incarnation_talent specialization=feral)
 	SpellAddBuff(berserk berserk_buff=1)
@@ -646,9 +653,9 @@ Define(clearcasting_buff 135700)
 	SpellRequire(swipe_cat energy_percent 0=buff,clearcasting_buff if_spell=omen_of_clarity)
 	SpellRequire(brutal_slash energy_percent 0=buff,clearcasting_buff if_spell=omen_of_clarity)
 	SpellRequire(thrash_cat energy_percent 0=buff,clearcasting_buff if_spell=omen_of_clarity)
-Define(feral_frenzy 274837)
+
 	SpellInfo(feral_frenzy energy=25 combopoints=-5 cd=45)
-#Define(ferocious_bite 22568)
+#
 	SpellAddTargetDebuff(ferocious_bite rip_debuff=refresh_keep_snapshot,target_health_pct,25)
 	SpellAddTargetDebuff(ferocious_bite rip_debuff=refresh_keep_snapshot talent=sabertooth_talent)
 Define(maim 22570)
@@ -662,7 +669,7 @@ Define(moonfire_cat_debuff 155625)
 Define(predatory_swiftness_buff 69369)
 	SpellInfo(predatory_swiftness_buff duration=12)
 SpellList(improved_rake prowl_buff shadowmeld_buff incarnation_king_of_the_jungle_buff)
-#Define(rake 1822)
+#
 	SpellInfo(rake energy=35 combopoints=-1)
 	SpellAddBuff(rake prowl_buff=0)
 	SpellAddBuff(rake shadowmeld_buff=0)
@@ -675,7 +682,7 @@ SpellList(improved_rake prowl_buff shadowmeld_buff incarnation_king_of_the_jungl
 #Define(rip_debuff 1079)
 	SpellInfo(rip_debuff duration=24 haste=melee tick=2 talent=!jagged_wounds_talent)
 	SpellInfo(rip_debuff duration=19.2 haste=melee tick=1.6 talent=jagged_wounds_talent)
-Define(savage_roar 52610)
+
 	SpellInfo(savage_roar energy=30 combopoints=1 max_combopoints=5)
 	SpellAddBuff(savage_roar savage_roar_buff=1)
 Define(savage_roar_buff 52610)
@@ -686,7 +693,7 @@ Define(thrash_cat 106830)
 	SpellInfo(thrash_cat energy=45 combopoints=-1)
 	SpellAddTargetDebuff(thrash_cat thrash_cat_debuff=1)
 Define(thrash_cat_debuff 106830)
-Define(tigers_fury 5217)
+
 	SpellInfo(tigers_fury energy=-50 cd=30 gcd=0 offgcd=1)
 	SpellAddBuff(tigers_fury tigers_fury_buff=1)
 Define(tigers_fury_buff 5217)

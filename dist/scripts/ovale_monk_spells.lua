@@ -9,9 +9,11 @@ __exports.register = function()
 # Invoke the spirits of your ancestors, granting you their power for 274739d.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
   SpellAddBuff(ancestral_call ancestral_call=1)
-Define(battle_potion_of_agility 279161)
-# Chance to create multiple potions.
-  SpellInfo(battle_potion_of_agility gcd=0 offgcd=1)
+Define(battle_potion_of_agility 279152)
+# Increases your Agility by s1 for d.
+  SpellInfo(battle_potion_of_agility cd=1 duration=25 gcd=0 offgcd=1)
+  # Agility increased by w1.
+  SpellAddBuff(battle_potion_of_agility battle_potion_of_agility=1)
 Define(berserking 26297)
 # Increases your haste by s1 for d.
   SpellInfo(berserking cd=180 duration=10 gcd=0 offgcd=1)
@@ -25,28 +27,26 @@ Define(blackout_combo_buff 228563)
   SpellInfo(blackout_combo_buff duration=15 gcd=0 offgcd=1)
   # Your next ability is empowered.
   SpellAddBuff(blackout_combo_buff blackout_combo_buff=1)
-Define(blackout_kick 261917)
-# Blackout Kick costs s1 fewer Chi.
-  SpellInfo(blackout_kick channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(blackout_kick blackout_kick=1)
+Define(blackout_kick 100784)
+# Kick with a blast of Chi energy, dealing ?s137025[s1*<CAP>/AP][s1] Physical damage.?c3[rnrnReduces the cooldown of Rising Sun Kick and Fists of Fury by m3/1000.1 sec when used.][]
+  SpellInfo(blackout_kick chi=3 cd=3)
 Define(blackout_strike 205523)
 # Strike with a blast of Chi energy, dealing s1 Physical damage?s117906[ and generating a stack of Elusive Brawler][].
-  SpellInfo(blackout_strike cd=3)
-Define(breath_of_fire 123725)
-# @spelldesc115181
-  SpellInfo(breath_of_fire duration=12 gcd=1 tick=2)
-  # Burning for w1 Fire damage every t1 sec.  Dealing w2 reduced damage to the Monk.
-  SpellAddTargetDebuff(breath_of_fire breath_of_fire=1)
-Define(chi_burst 261682)
-# @spelldesc123986
-  SpellInfo(chi_burst gcd=0 offgcd=1 chi=-1)
-Define(chi_wave 132467)
-# @spelldesc115098
-  SpellInfo(chi_wave duration=0.1 channel=0.1 gcd=0 offgcd=1)
-  SpellAddTargetDebuff(chi_wave chi_wave=1)
-Define(crackling_jade_lightning 117959)
-  SpellInfo(crackling_jade_lightning channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(crackling_jade_lightning crackling_jade_lightning=1)
+  SpellInfo(blackout_strike cd=3 replace=blackout_kick)
+Define(breath_of_fire 115181)
+# Breathe fire on targets in front of you, causing s1 Fire damage.rnrnTargets affected by Keg Smash will also burn, taking 123725o1 Fire damage and dealing 123725s2 reduced damage to you for 123725d.
+  SpellInfo(breath_of_fire cd=15 gcd=1)
+Define(chi_burst 123986)
+# Hurls a torrent of Chi energy up to 40 yds forward, dealing 148135s1 Nature damage to all enemies, and 130654s1 healing to the Monk and all allies in its path.?c1[rnrnCasting Chi Burst does not prevent avoiding attacks.][]?c3[rnrnChi Burst generates 1 Chi per enemy target damaged, up to a maximum of s3.][]
+  SpellInfo(chi_burst cd=30 duration=1 talent=chi_burst_talent)
+Define(chi_wave 115098)
+# A wave of Chi energy flows through friends and foes, dealing 132467s1 Nature damage or 132463s1 healing. Bounces up to s1 times to targets within 132466a2 yards.
+  SpellInfo(chi_wave cd=15 talent=chi_wave_talent)
+Define(crackling_jade_lightning 117952)
+# Channel Jade lightning, causing o1 Nature damage over 117952d to the target?a154436[, generating 1 Chi each time it deals damage,][] and sometimes knocking back melee attackers.
+  SpellInfo(crackling_jade_lightning energy=20 energy=20 duration=4 channel=4 tick=1)
+  # Taking w1 damage every t1 sec.
+  SpellAddTargetDebuff(crackling_jade_lightning crackling_jade_lightning=1)
 Define(dampen_harm 122278)
 # Reduces all damage you take by m2 to m3 for d, with larger attacks being reduced by more.
   SpellInfo(dampen_harm cd=120 duration=10 talent=dampen_harm_talent gcd=0 offgcd=1)
@@ -55,11 +55,9 @@ Define(dampen_harm 122278)
 Define(energizing_elixir 115288)
 # Chug an Energizing Elixir, refilling all your Energy and instantly generate s2 Chi.
   SpellInfo(energizing_elixir cd=60 max_stacks=3 talent=energizing_elixir_talent gcd=1 energy=-200 chi=-2)
-Define(fireblood 265226)
-# Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by s1.
-  SpellInfo(fireblood duration=8 max_stacks=6 gcd=0 offgcd=1)
-  # Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by w1.
-  SpellAddBuff(fireblood fireblood=1)
+Define(fireblood 265221)
+# Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 265226d. 
+  SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
 Define(fist_of_the_white_tiger 261947)
 # Strike with the technique of the White Tiger, dealing s1+261977s1 Physical damage.rnrn|cFFFFFFFFGenerates 261978s1 Chi.
   SpellInfo(fist_of_the_white_tiger energy=40 cd=30 talent=fist_of_the_white_tiger_talent gcd=1)
@@ -68,16 +66,12 @@ Define(fists_of_fury 113656)
   SpellInfo(fists_of_fury chi=3 cd=24 duration=4 channel=4 gcd=1 tick=0.166)
   # w3 damage every t3 sec. ?s125671[Parrying all attacks.][]
   SpellAddBuff(fists_of_fury fists_of_fury=1)
-Define(fortifying_brew 243435)
-# Turns your skin to stone, increasing your current and maximum health by s1, and reducing damage taken by s2 for d.
-  SpellInfo(fortifying_brew cd=90 duration=15 gcd=0 offgcd=1)
-  # Maximum health increased by w1.rnDamage taken reduced by w2.
-  SpellAddBuff(fortifying_brew fortifying_brew=1)
-Define(ironskin_brew 215479)
-# @spelldesc115308
-  SpellInfo(ironskin_brew duration=7 gcd=0 offgcd=1)
-  # Your Stagger is s3 more effective.
-  SpellAddBuff(ironskin_brew ironskin_brew=1)
+Define(fortifying_brew 115203)
+# Turns your skin to stone for 120954d, increasing your current and maximum health by <health>, increasing the effectiveness of Stagger by s1, and reducing all damage you take by <damage>.
+  SpellInfo(fortifying_brew cd=420 gcd=0 offgcd=1)
+Define(ironskin_brew 115308)
+# A swig of strong brew allows you to Stagger substantially more damage for 215479d. rnrnShares charges with Purifying Brew.
+  SpellInfo(ironskin_brew cd=1 cd=15 gcd=0 offgcd=1)
 Define(keg_smash 121253)
 # Smash a keg of brew on the target, dealing s2 damage to all enemies within A2 yds and reducing their movement speed by m3 for d.rnrnReduces the remaining cooldown on your Brews by s4 sec.
   SpellInfo(keg_smash energy=40 cd=1 cd=8 duration=15 gcd=1)
@@ -104,13 +98,12 @@ Define(quaking_palm 107079)
   SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
   # Incapacitated.
   SpellAddTargetDebuff(quaking_palm quaking_palm=1)
-Define(rising_sun_kick 262840)
-# Rising Sun Kick deals s1 increased damage.rn
-  SpellInfo(rising_sun_kick channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(rising_sun_kick rising_sun_kick=1)
-Define(rushing_jade_wind 261715)
-# Summons a whirling tornado around you, causing (1+d/t1)*148187s1 damage every t1 sec to all enemies within 107270A1 yards.
-  SpellInfo(rushing_jade_wind energy=3 cd=6 duration=60 talent=rushing_jade_wind_talent tick=0.75)
+Define(rising_sun_kick 107428)
+# Kick upwards, dealing ?s137025[185099s1*<CAP>/AP][185099s1] Physical damage?s128595[, and reducing the effectiveness of healing on the target for 115804d][].
+  SpellInfo(rising_sun_kick chi=2 cd=10)
+Define(rushing_jade_wind 116847)
+# Summons a whirling tornado around you, causing (1+d/t1)*148187s1 damage over d to enemies within 107270A1 yards.?s220357[ Applies Mark of the Crane to up to s2 nearby targets.][]
+  SpellInfo(rushing_jade_wind chi=1 cd=6 duration=6 talent=rushing_jade_wind_talent tick=0.75)
 Define(serenity 152173)
 # Enter an elevated state of mental and physical serenity for ?s115069[s1 sec][d]. While in this state, you deal s2 increased damage and healing, and all Chi consumers are free and cool down s4 more quickly.
   SpellInfo(serenity cd=90 duration=12 talent=serenity_talent gcd=1)
@@ -137,19 +130,22 @@ Define(touch_of_death 115080)
   SpellInfo(touch_of_death cd=120 duration=8 tick=8)
   # Taking w1 damage when this effect expires.
   SpellAddTargetDebuff(touch_of_death touch_of_death=1)
-Define(touch_of_karma 125174)
-# @spelldesc122470
-  SpellInfo(touch_of_karma duration=10 gcd=0 offgcd=1)
-  # All damage received is redirected to the victim afflicted by Touch of Karma.
+Define(touch_of_karma 122470)
+# All damage you take is redirected to the enemy target as Nature damage over 124280d. Damage cannot exceed s3 of your maximum health. Lasts d.
+  SpellInfo(touch_of_karma cd=90 duration=10 gcd=0 offgcd=1)
+  # All damage dealt to the Monk is redirected to you as Nature damage over 124280d.
+  SpellAddTargetDebuff(touch_of_karma touch_of_karma=1)
+  # All damage dealt to the Monk is redirected to you as Nature damage over 124280d.
   SpellAddBuff(touch_of_karma touch_of_karma=1)
 Define(war_stomp 20549)
 # Stuns up to i enemies within A1 yds for d.
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
   # Stunned.
   SpellAddTargetDebuff(war_stomp war_stomp=1)
-Define(whirling_dragon_punch 158221)
-# @spelldesc152175
-  SpellInfo(whirling_dragon_punch gcd=0 offgcd=1)
+Define(whirling_dragon_punch 152175)
+# Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
+  SpellInfo(whirling_dragon_punch cd=24 duration=1 talent=whirling_dragon_punch_talent gcd=1 tick=0.25)
+  SpellAddBuff(whirling_dragon_punch whirling_dragon_punch=1)
 Define(blackout_combo_talent 21)
 # Blackout Strike also empowers your next ability:rnrnTiger Palm: Damage increased by s1.rnBreath of Fire: Cooldown reduced by s2 sec.rnKeg Smash: Reduces the remaining cooldown on your Brews by s3 additional sec.rnIronskin Brew: Pauses Stagger damage for s4 sec.
 Define(energizing_elixir_talent 9)
@@ -164,8 +160,16 @@ Define(serenity_talent 21)
 # Enter an elevated state of mental and physical serenity for ?s115069[s1 sec][d]. While in this state, you deal s2 increased damage and healing, and all Chi consumers are free and cool down s4 more quickly.
 Define(black_ox_brew_talent 9)
 # Chug some Black Ox Brew, which instantly refills your Energy, and your Ironskin Brew and Purifying Brew charges.
+Define(chi_burst_talent 3)
+# Hurls a torrent of Chi energy up to 40 yds forward, dealing 148135s1 Nature damage to all enemies, and 130654s1 healing to the Monk and all allies in its path.?c1[rnrnCasting Chi Burst does not prevent avoiding attacks.][]?c3[rnrnChi Burst generates 1 Chi per enemy target damaged, up to a maximum of s3.][]
+Define(chi_wave_talent 2)
+# A wave of Chi energy flows through friends and foes, dealing 132467s1 Nature damage or 132463s1 healing. Bounces up to s1 times to targets within 132466a2 yards.
 Define(dampen_harm_talent 15)
 # Reduces all damage you take by m2 to m3 for d, with larger attacks being reduced by more.
+Define(rushing_jade_wind_talent 17)
+# Summons a whirling tornado around you, causing (1+d/t1)*148187s1 damage over d to enemies within 107270A1 yards.?s220357[ Applies Mark of the Crane to up to s2 nearby targets.][]
+Define(whirling_dragon_punch_talent 20)
+# Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
 Define(drinking_horn_cover_item 137097)
 Define(hidden_masters_forbidden_touch_item 137057)
 Define(the_emperors_capacitor_item 144239)
@@ -176,7 +180,7 @@ ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!fortifying_brew,buff,!
 ## Spells
 
 	SpellInfo(blackout_combo_buff duration=15)
-Define(blackout_kick 100784)
+
 	SpellInfo(blackout_kick cd=3)
 	SpellInfo(blackout_kick chi=1 specialization=windwalker)
 	SpellRequire(blackout_kick chi_percent 0=buff,blackout_kick_free specialization=windwalker)
@@ -191,13 +195,13 @@ SpellList(blackout_kick_free blackout_kick_buff serenity_buff)
 	SpellAddBuff(blackout_strike blackout_combo_buff=1 talent=blackout_combo_talent)
 
 	SpellInfo(black_ox_brew cd=120 gcd=0 offgcd=1 talent=black_ox_brew_talent)
-Define(breath_of_fire 115181)
+
 	SpellInfo(breath_of_fire cd=15)
 	SpellAddTargetDebuff(breath_of_fire breath_of_fire_debuff=1 if_target_debuff=keg_smash_debuff)
 	SpellAddBuff(breath_of_fire blackout_combo_buff=0)
 Define(breath_of_fire_debuff 123725)
 	SpellInfo(breath_of_fire_debuff duration=12 tick=2)
-Define(chi_burst 123986)
+
 	SpellInfo(chi_burst cd=30 travel_time=1 tag=main)
 	SpellInfo(chi_burst chi=-1 max_chi=-2 specialization=windwalker)
 Define(chi_torpedo 115008)
@@ -205,9 +209,9 @@ Define(chi_torpedo 115008)
 	SpellAddBuff(chi_torpedo )
 Define(chi_torpedo_buff 119085)
 	SpellInfo(chi_torpedo_buff duration=10)
-Define(chi_wave 115098)
+
 	SpellInfo(chi_wave cd=15)
-Define(crackling_jade_lightning 117952)
+
 	SpellInfo(crackling_jade_lightning channel=4)
 	SpellInfo(crackling_jade_lightning haste=melee specialization=!mistweaver)
 	SpellInfo(crackling_jade_lightning haste=spell specialization=mistweaver)
@@ -261,8 +265,8 @@ Define(eye_of_the_tiger_debuff 196608)
 	SpellRequire(fists_of_fury chi_percent 0=buff,serenity_buff)
 Define(flying_serpent_kick 101545)
 	SpellInfo(flying_serpent_kick cd=25)
-Define(fortifying_brew 115203)
-	SpellInfo(fortifying_brew cd=420 gcd=0 offgcd=1)
+
+	
 	SpellAddBuff(fortifying_brew fortifying_brew_buff=1)
 Define(fortifying_brew_buff 120954)
 	SpellInfo(fortifying_brew_buff duration=15)
@@ -286,7 +290,7 @@ Define(invoke_niuzao_the_black_ox 132578)
 	SpellInfo(invoke_niuzao_the_black_ox cd=180 talent=invoke_niuzao_talent)
 Define(invoke_xuen_the_white_tiger 123904)
 	SpellInfo(invoke_xuen_the_white_tiger cd=180 talent=invoke_xuen_talent)
-Define(ironskin_brew 115308)
+
 	SpellInfo(ironskin_brew cd=15 charges=3 gcd=0 offgcd=1 cd_haste=melee)
 	SpellInfo(ironskin_brew add_cd=-3 charges=4 talent=light_brewing_talent)
 	SpellAddBuff(ironskin_brew ironskin_brew_buff=1)
@@ -345,7 +349,7 @@ Define(revival 115310)
 	SpellInfo(revival cd=180)
 Define(ring_of_peace 116844)
 	SpellInfo(ring_of_peace cd=45)
-Define(rising_sun_kick 107428)
+
 	SpellInfo(rising_sun_kick cd=10 chi=2 specialization=windwalker cd_haste=melee)
 	SpellRequire(rising_sun_kick chi_percent 0=buff,serenity_buff)
 	SpellAddBuff(rising_sun_kick thunder_focus_tea_buff=-1 if_spell=thunder_focus_tea specialization=mistweaver)
@@ -354,7 +358,7 @@ Define(roll 109132)
 	SpellInfo(roll cd=20 charges=2)
 	SpellInfo(roll charges=3 talent=celerity_talent)
 	SpellInfo(roll replace=chi_torpedo talent=chi_torpedo_talent)
-Define(rushing_jade_wind 116847)
+
 	SpellInfo(rushing_jade_wind cd=6 cd_haste=melee talent=rushing_jade_wind_talent)
 	SpellAddBuff(rushing_jade_wind rushing_jade_wind_buff=1)
 Define(rushing_jade_wind_buff 116847)
@@ -422,7 +426,7 @@ Define(tigers_lust_buff 116841)
 	SpellRequire(touch_of_death unusable 1=target_debuff,touch_of_death_debuff)
 Define(touch_of_death_debuff 115080)
 	SpellInfo(touch_of_death_debuff duration=8)
-Define(touch_of_karma 122470)
+
 	SpellInfo(touch_of_karma cd=90 tag=cd gcd=0 offgcd=1)
 	SpellAddTargetDebuff(touch_of_karma touch_of_karma_debuff=1)
 Define(touch_of_karma_debuff 122470)
@@ -431,7 +435,7 @@ Define(transcendence 101643)
 Define(transcendence_transfer 119996)
 Define(vivify 116670)
 	SpellAddBuff(vivify thunder_focus_tea_buff=-1 if_spell=thunder_focus_tea)
-Define(whirling_dragon_punch 152175)
+
 	SpellInfo(whirling_dragon_punch cd=24 unusable=1 cd_haste=melee)
 	SpellRequire(whirling_dragon_punch unusable 0=oncooldown,rising_sun_kick)
 	SpellRequire(whirling_dragon_punch unusable 0=oncooldown,fists_of_fury)
@@ -487,9 +491,9 @@ Define(ascension_talent 7)
 
 Define(bob_and_weave_talent 13)
 Define(celerity_talent 4)
-Define(chi_burst_talent 3)
+
 Define(chi_torpedo_talent 5)
-Define(chi_wave_talent 2)
+
 
 Define(diffuse_magic_talent 14)
 
@@ -526,7 +530,7 @@ Define(summon_jade_serpent_statue_talent 16)
 Define(tiger_tail_sweep_talent 10)
 Define(tigers_lust_talent 6)
 Define(upwelling_talent 20)
-Define(whirling_dragon_punch_talent 20)
+
 
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(chi_brew tag=main)

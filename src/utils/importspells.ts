@@ -935,18 +935,41 @@ export function isFriendlyTarget(targetId: number) {
     }  
 }
 
+function isSpace(char: string) {
+    return char === ' ' || char === '\r' || char === '\n' || char === '\t';
+}
+
+function skipComments(data: string, index: number): number {
+    while (isSpace(data[index]) && index < data.length) index++;
+    if (data[index] === '/' && data[index + 1] === '*') {
+        index += 2;
+        while (index < data.length) {
+            while (index < data.length && data[index] !== '*') index++;
+            if (data[index] === '*' && data[index + 1] === '/') {
+                return skipComments(data, index + 2);
+            }
+        }
+    } else if (data[index] === '/' && data[index + 1] === '/') {
+        index += 2;
+        while (index < data.length && data[index] !== '\n') index++;
+        return skipComments(data, index + 1);
+    }
+    return index;
+}
+
 function readFile(directory:string, fileName: string, zone: any[][], output: { [key: string]: any[][] }) {
     const spellDataFile = readFileSync(`${directory}/engine/dbc/generated/${fileName}.inc`, { encoding: "utf8" });
 
-    function getColumns($data: string): [any[], number] {
+    function getColumns($data: string, start: number): [any[], number] {
         const columns = [];
-        let i = 0;
+        let i = start;
         for (; i < $data.length; i++) {
-            while ($data[i] === ' ') i++;
+            i = skipComments($data, i);
             const c = $data[i];
+            // const blabla = $data.substr(i, 20);
             if (c === '"') {
                 let start = ++i;
-                while ($data[i] !== '"') {
+                while ($data[i] !== '"' && i < $data.length) {
                     if ($data[i] === '\\') {
                         i++;
                     }
@@ -958,7 +981,7 @@ function readFile(directory:string, fileName: string, zone: any[][], output: { [
             } else if (c === "n") {
                 const nullptr = "nullptr";
                 if ($data.substr(i, nullptr.length) !== nullptr) throw Error("Excepted nullptr");
-                i+=nullptr.length;
+                i += nullptr.length;
             } else if (c >= '0' && c <= '9' || c === '-') {
                 let start = i++;
                 while (($data[i] >= '0' && $data[i] <= '9') || ($data[i] >= 'a' && $data[i] <= 'f')
@@ -968,40 +991,59 @@ function readFile(directory:string, fileName: string, zone: any[][], output: { [
                 const number = $data.substring(start, i);
                 columns.push(parseInt(number));
             } else if (c === '{') {
-                const innerData = getColumns($data.substr(i + 1));
+                const innerData = getColumns($data, i + 1);
                 columns.push(<(number | string)[]>innerData[0]);
-                i += innerData[1] + 2;
+                i = innerData[1];
             } else if (c === '}') {
                 break;
-            }
-            while ($data[i] === ' ') i++;
+            } 
+            // const next = $data.substr(i, 20);
+            i = skipComments($data, i);
             if ($data[i] === ',') {
                 i++;
             } else if ($data[i] === '}' || $data[i] === undefined) {
                 break;
             } else {
-                throw new Error(`${fileName}: Unexcepted ${$data[i]} character at ${$data.substring(i - 3)} in ${$data}`);
+                throw new Error(`${fileName}: Unexcepted ${$data[i]} character at ${$data.substr(i - 3, 50)} in ${$data.substr(start, 20)}...`);
             }
         }
-        return [columns, i];
+        return [columns, i + 1];
     }
 
-    for (let $line of spellDataFile.split("\n")) {
-        $line = $line.replace(/\/\/.*/, '').replace('nullptr', '');
-        let match: RegExpMatchArray;
-        if (match = $line.match(/static struct (\w+)/)) {
-            zone = [];
-            output[match[1]] = zone;            
-        } else if (match = $line.match(/static constexpr std::array<(\w+)/)) {
-            zone = [];
-            output[match[1]] = zone;            
-        }
-        else if (match = $line.match(/{(.*)}/)) {
-            let $data = match[1];
-            const [columns] = getColumns($data);
-            zone.push(columns);
+    let index = 0;
+    while (index < spellDataFile.length) {
+        index = spellDataFile.indexOf("static", index);
+        if (index < 0) break;
+        const endLine = spellDataFile.indexOf("\n", index);
+        const line = spellDataFile.substring(index, endLine);
+        const match = line.match(/struct (\w+)/) || line.match(/constexpr std::array<(\w+)/) || line.match(/unsigned (\w+)/);
+        if (match) {
+            const name = match[1];
+            console.log(name);
+            const [columns, end] = getColumns(spellDataFile, endLine);
+            output[name] = columns;
+            index = end;
+        } else {
+            index += 6;
         }
     }
+
+    // for (let $line of spellDataFile.split("\n")) {
+    //     $line = $line.replace(/\/\/.*/, '').replace('nullptr', '');
+    //     let match: RegExpMatchArray;
+    //     if (match = $line.match(/static struct (\w+)/)) {
+    //         zone = [];
+    //         output[match[1]] = zone;            
+    //     } else if (match = $line.match(/static constexpr std::array<(\w+)/)) {
+    //         zone = [];
+    //         output[match[1]] = zone;            
+    //     }
+    //     else if (match = $line.match(/{(.*)}/)) {
+    //         let $data = match[1];
+    //         const [columns] = getColumns($data);
+    //         zone.push(columns);
+    //     }
+    // }
 }
 
 function getIdentifier(name: string) {
@@ -1016,6 +1058,7 @@ export function getSpellData(directory: string) {
     readFile(directory, "sc_talent_data", zone, output);
     readFile(directory, "sc_item_data", zone, output);
     readFile(directory, "azerite", zone, output);
+    readFile(directory, "sc_spell_lists", zone, output);
 
     const identifiers: LuaObj<number> = {};
     
@@ -1085,6 +1128,32 @@ export function getSpellData(directory: string) {
         if (spell.rank_str === "Racial") spell.identifierScore += 3;
     }
 
+    for (const classData of output.__class_ability_data) {
+        for (const category of classData) {
+            for (const spellId of category) {
+                const spell = spellDataById.get(spellId);
+                if (spell) {
+                    spell.identifierScore += 10;
+                } else {
+                    console.error(`Unknown spell ${spellId}`);
+                }
+            }
+        }
+    }
+
+    for (const classData of output.__tree_specialization_data) {
+        for (const category of classData) {
+            for (const spellId of category) {
+                const spell = spellDataById.get(spellId);
+                if (spell) {
+                    spell.identifierScore += 10;
+                } else {
+                    console.error(`Unknown spell ${spellId}`);
+                }
+            }
+        }
+    }
+
     for (const row of output.spelleffect_data_t) {
         const spellEffect: SpellEffectData = {
             id: row[0],
@@ -1140,7 +1209,7 @@ export function getSpellData(directory: string) {
     for (const spell of spellData) {
         if (identifiers[spell.identifier]) {
             const other = spellDataById.get(identifiers[spell.identifier]);
-            if (other.identifierScore > spell.identifierScore) continue;
+            if (other.identifierScore >= spell.identifierScore) continue;
         } 
         identifiers[spell.identifier] = spell.id;
     }

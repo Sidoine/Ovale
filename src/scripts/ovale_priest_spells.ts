@@ -18,26 +18,28 @@ Define(dark_void 263346)
 Define(mind_blast 8092)
 # Blasts the target's mind for s1 Shadow damage.?a185916[rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r][]
   SpellInfo(mind_blast cd=7.5 insanity=-1200)
-Define(mind_flay 193473)
-# Assaults the target's mind with Shadow energy, causing o1 Shadow damage over d and slowing their movement speed by s2.
-  SpellInfo(mind_flay cd=1 duration=10 channel=10 gcd=0 offgcd=1 tick=1)
-  # ?w2=0[Taking][Movement speed slowed and taking] Shadow damage every t1 sec.
+Define(mind_flay 15407)
+# Assaults the target's mind with Shadow energy, causing o1 Shadow damage over d and slowing their movement speed by s2.?a185916[rnrn|cFFFFFFFFGenerates s4*m3/100 Insanity over the duration.|r][]
+  SpellInfo(mind_flay duration=3 channel=3 tick=0.75)
+  # Movement speed slowed by s2 and taking Shadow damage every t1 sec.
   SpellAddTargetDebuff(mind_flay mind_flay=1)
-Define(mind_sear 208232)
-# @spelldesc48045
-  SpellInfo(mind_sear gcd=0 offgcd=1 insanity=-125)
-Define(mindbender 200174)
-# Summons a Mindbender to attack the target for d.rnrn|cFFFFFFFFGenerates 200010s1/100 Insanity each time the Mindbender attacks.|r
-  SpellInfo(mindbender cd=60 duration=15 talent=mindbender_talent)
-Define(rising_death 269853)
-# Empowers you with shadow magic for d, giving your ranged attacks a chance to send out a death bolt that grows in intensity as it travels, dealing up to 271292s1 Shadow damage.
-  SpellInfo(rising_death duration=25 channel=25 gcd=0 offgcd=1)
+  # Movement speed slowed by s2 and taking Shadow damage every t1 sec.
+  SpellAddBuff(mind_flay mind_flay=1)
+Define(mind_sear 48045)
+# Corrosive shadow energy radiates from the target, dealing 49821m2*s2 Shadow damage over 48045d to all enemies within 49821a2 yards of the target.rnrn|cFFFFFFFFGenerates s2*208232m1/100 Insanity over the duration per target hit.|r
+  SpellInfo(mind_sear duration=3 channel=3 tick=0.75)
+Define(mindbender 123040)
+# Summons a Mindbender to attack the target for d. You regenerate 123051m1/100.1 of maximum mana each time the Mindbender attacks.
+  SpellInfo(mindbender cd=60 duration=12 talent=mindbender_talent)
+Define(rising_death 252346)
+# Chance to create multiple potions.
+  SpellInfo(rising_death gcd=0 offgcd=1)
 Define(shadow_crash 205385)
 # Hurl a bolt of slow-moving Shadow energy at the destination, dealing 205386s1 Shadow damage to all targets within 205386A1 yards.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r
   SpellInfo(shadow_crash cd=20 talent=shadow_crash_talent insanity=-2000)
-Define(shadow_word_death 199911)
-# A word of dark binding that inflicts s1 Shadow damage to the target. Only usable on enemies that have less than s2 health.rnrn|cFFFFFFFFGenerates /100;190714s1 Insanity.|r
-  SpellInfo(shadow_word_death cd=9)
+Define(shadow_word_death 190719)
+  SpellInfo(shadow_word_death channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(shadow_word_death shadow_word_death=1)
 Define(shadow_word_pain 589)
 # A word of darkness that causes s1 Shadow damage instantly, and an additional o2 Shadow damage over d.?a185916[rnrn|cFFFFFFFFGenerates m3/100 Insanity.|r][]
   SpellInfo(shadow_word_pain duration=16 insanity=-400 tick=2)
@@ -63,16 +65,16 @@ Define(vampiric_touch 34914)
   SpellInfo(vampiric_touch duration=21 insanity=-600 tick=3)
   # Suffering w2 Shadow damage every t2 sec.
   SpellAddTargetDebuff(vampiric_touch vampiric_touch=1)
-Define(void_bolt 231688)
-# Void Bolt extends the duration of your Shadow Word: Pain and Vampiric Touch on all nearby targets by @switch<s2>[s1/1000][s1/1000.1] sec.
+Define(void_bolt 228266)
+# For the duration of Voidform, your Void Eruption ability is replaced by Void Bolt:rnrn@spelltooltip205448
   SpellInfo(void_bolt channel=0 gcd=0 offgcd=1)
   SpellAddBuff(void_bolt void_bolt=1)
-Define(void_eruption 228360)
-# @spelldesc228260
-  SpellInfo(void_eruption channel=0 gcd=0 offgcd=1)
-Define(void_torrent 263165)
-# Channel a torrent of void energy into the target, dealing o Shadow damage over d. Insanity does not drain during this channel.rnrnRequires Voidform.
-  SpellInfo(void_torrent cd=45 duration=4 channel=4 talent=void_torrent_talent tick=1)
+Define(void_eruption 228260)
+# Releases an explosive blast of pure void energy, activating Voidform and causing 228360s1*2 Shadow damage to all enemies within a1 yds of your target.rnrnDuring Voidform, this ability is replaced by Void Bolt.rnrn|cFFFFFFFFRequires C/100 Insanity to activate.|r
+  SpellInfo(void_eruption insanity=9000)
+Define(void_torrent 205065)
+# Raise your dagger into the sky, channeling a torrent of void energy into the target for o Shadow damage over d. Insanity does not drain during this channel.rnrnRequires Voidform.
+  SpellInfo(void_torrent cd=60 duration=4 channel=4 tick=1)
   # Dealing s1 Shadow damage to the target every t sec.rnrnInsanity drain temporarily stopped.
   SpellAddTargetDebuff(void_torrent void_torrent=1)
   # Dealing s1 Shadow damage to the target every t sec.rnrnInsanity drain temporarily stopped.
@@ -89,16 +91,14 @@ Define(dark_ascension_talent 20)
 # Immediately activates a new Voidform, then releases an explosive blast of pure void energy, causing 280800s1*2 Shadow damage to all enemies within a1 yds of your target.rnrn|cFFFFFFFFGenerates s2/100 Insanity.|r
 Define(dark_void_talent 9)
 # Unleashes an explosion of dark energy around the target, dealing s1 Shadow damage and applying Shadow Word: Pain to all nearby enemies.rnrn|cFFFFFFFFGenerates s2/100 Insanity.|r
-Define(mindbender_talent 17)
-# Summons a Mindbender to attack the target for d.rnrn|cFFFFFFFFGenerates 200010s1/100 Insanity each time the Mindbender attacks.|r
+Define(mindbender_talent 8)
+# Summons a Mindbender to attack the target for d. You regenerate 123051m1/100.1 of maximum mana each time the Mindbender attacks.
 Define(shadow_crash_talent 15)
 # Hurl a bolt of slow-moving Shadow energy at the destination, dealing 205386s1 Shadow damage to all targets within 205386A1 yards.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r
 Define(shadow_word_void_talent 3)
 # Blasts the target with a word of void for s1 Shadow damage.?a185916[rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r][]
 Define(surrender_to_madness_talent 21)
 # All your Insanity-generating abilities generate s1 more Insanity and you can cast while moving for d.rnrnThen, you take damage equal to s3 of your maximum health and cannot generate Insanity for 263406d.
-Define(void_torrent_talent 18)
-# Channel a torrent of void energy into the target, dealing o Shadow damage over d. Insanity does not drain during this channel.rnrnRequires Voidform.
     `;
 // END
     code += `
@@ -139,11 +139,11 @@ Define(mind_bomb 205369)
 Define(mind_bomb_debuff 205369)
 	SpellInfo(mind_bomb_debuff duration=2)
 Define(mind_control 605)
-Define(mind_flay 15407)
+
 	SpellInfo(mind_flay channel=3 insanity=-4 haste=spell)
 	SpellInfo(mind_flay insanity_percent=120 talent=fortress_of_the_mind_talent)
 	SpellRequire(mind_flay insanity_percent 200=buff,surrender_to_madness_buff)
-Define(mind_sear 48045)
+
 	SpellInfo(mind_sear channel=3 haste=spell)
 Define(mind_vision 2096)
 
@@ -187,7 +187,7 @@ Define(shackle_undead 9484)
 	SpellInfo(shadow_crash cd=20 insanity=-20 tag=shortcd)
 	SpellRequire(shadow_crash insanity_percent 200=buff,surrender_to_madness_buff)
 Define(shadow_mend 186263)
-Define(shadow_word_death 32379)
+
 	SpellInfo(shadow_word_death target_health_pct=20 insanity=-15 cd=9 charges=2)
 	SpellRequire(shadow_word_death insanity_percent 200=buff,surrender_to_madness_buff)
 
@@ -231,13 +231,13 @@ Define(vampiric_embrace_buff 15286)
 	SpellAddTargetDebuff(vampiric_touch shadow_word_pain_debuff=1 talent=misery_talent)
 Define(vampiric_touch_debuff 34914)
 	SpellInfo(vampiric_touch_debuff duration=21 haste=spell tick=3)
-Define(void_bolt 205448)
+
 	SpellInfo(void_bolt cd=4.5 insanity=-16 cd_haste=spell)
 	SpellRequire(void_bolt unusable 1=buff,!voidform_buff)
 	SpellRequire(void_bolt insanity_percent 200=buff,surrender_to_madness_buff)
 	SpellAddTargetDebuff(void_bolt shadow_word_pain_debuff=refresh)
 	SpellAddTargetDebuff(void_bolt vampiric_touch_debuff=refresh)
-Define(void_eruption 228260)
+
 	SpellInfo(void_eruption insanity=90 shared_cd=void_bolt tag=main)
 	SpellInfo(void_eruption insanity=60 talent=legacy_of_the_void_talent)
 	SpellAddBuff(void_eruption voidform_buff=1)
@@ -308,7 +308,7 @@ Define(sanlayn_talent 5)
 Define(schism_talent 3)
 Define(shadow_covenant_talent 15)
 
-Define(shadow_word_death_talent 14)
+
 
 Define(shadowy_insight_talent 2)
 Define(shield_discipline_talent 7)

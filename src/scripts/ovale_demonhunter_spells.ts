@@ -7,9 +7,11 @@ export function register() {
     let code = `Define(annihilation 201427)
 # Slice your target for 227518s1+201428s1 Chaos damage. Annihilation has a 197125h chance to refund 193840s1 Fury.
   SpellInfo(annihilation fury=40)
-Define(battle_potion_of_agility 279161)
-# Chance to create multiple potions.
-  SpellInfo(battle_potion_of_agility gcd=0 offgcd=1)
+Define(battle_potion_of_agility 279152)
+# Increases your Agility by s1 for d.
+  SpellInfo(battle_potion_of_agility cd=1 duration=25 gcd=0 offgcd=1)
+  # Agility increased by w1.
+  SpellAddBuff(battle_potion_of_agility battle_potion_of_agility=1)
 Define(blade_dance 188499)
 # Strike ?a206416[your primary target for <firstbloodDmg> Physical damage, ][]all nearby enemies for <baseDmg> Physical damage, and increase your chance to dodge by s2 for d.
   SpellInfo(blade_dance fury=35 cd=9 duration=1)
@@ -20,10 +22,9 @@ Define(chaos_nova 179057)
   SpellInfo(chaos_nova fury=30 cd=60 duration=2)
   # Stunned.
   SpellAddTargetDebuff(chaos_nova chaos_nova=1)
-Define(chaos_strike 197125)
-# @spelldesc162794
-  SpellInfo(chaos_strike channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(chaos_strike chaos_strike=1)
+Define(chaos_strike 162794)
+# Slice your target for 222031s1+199547s1 Chaos damage. Chaos Strike has a 197125h chance to refund 193840s1 Fury.
+  SpellInfo(chaos_strike fury=40)
 Define(consume_magic 278326)
 # Consume m1 beneficial Magic effect from the target, removing it and granting you ?c1[s2 Fury][s3/10 Pain].
   SpellInfo(consume_magic cd=10 fury=-20 pain=-20)
@@ -37,27 +38,27 @@ Define(death_sweep 210152)
   SpellInfo(death_sweep fury=35 cd=9 duration=1)
   # Dodge chance increased by s3.
   SpellAddBuff(death_sweep death_sweep=1)
-Define(demon_spikes 203819)
-# @spelldesc203720
-  SpellInfo(demon_spikes duration=6 gcd=0 offgcd=1)
-  # Armor increased by W2*AGI/100.rnParry chance increased by w1.
-  SpellAddBuff(demon_spikes demon_spikes=1)
+Define(demon_spikes 203720)
+# Surge with fel power, increasing your Armor by 203819s2*AGI/100, and your Parry chance by 203819s1, for 203819d.
+  SpellInfo(demon_spikes cd=1.5 cd=20 replace=vengeful_retreat gcd=0 offgcd=1)
 Define(demons_bite 162243)
 # Quickly attack for s2 Physical damage.rnrn|cFFFFFFFFGenerates m3 to ?a258876[M3+258876s1][M3] Fury.|r
   SpellInfo(demons_bite fury=-25)
-Define(disrupt 183782)
-  SpellInfo(disrupt channel=0 gcd=0 offgcd=1)
-Define(eye_beam 205231)
-# Fires an eye beam that deals s1 Shadow damage.
-  SpellInfo(eye_beam gcd=0 offgcd=1)
-Define(fel_barrage 258925)
-# Unleash a torrent of Fel energy over d, inflicting ((d/t1)+1)*258926s1 Chaos damage to all enemies within 258926A1 yds.
-  SpellInfo(fel_barrage cd=60 duration=3 channel=3 talent=fel_barrage_talent tick=0.25)
-  # Unleashing Fel.
+Define(disrupt 183752)
+# Interrupts the enemy's spellcasting and locks them from that school of magic for d.|cFFFFFFFF?s178940[rnrnGenerates 218903s1 Fury on a successful interrupt.][rnrnGenerates 218903s2/10 Pain on a successful interrupt.]|r
+  SpellInfo(disrupt cd=15 duration=3 gcd=0 offgcd=1 interrupt=1)
+Define(eye_beam 198013)
+# Blasts all enemies in front of you, dealing guaranteed critical strikes for a total of <dmg> Chaos damage over d. Your primary target takes s3 increased damage.
+  SpellInfo(eye_beam fury=30 cd=30 duration=2 channel=2 tick=0.2)
+  SpellAddBuff(eye_beam eye_beam=1)
+Define(fel_barrage 222703)
+# You shouldn't see this.
+  SpellInfo(fel_barrage channel=0 gcd=0 offgcd=1)
   SpellAddBuff(fel_barrage fel_barrage=1)
-Define(fel_devastation 212106)
-# @spelldesc212084
-  SpellInfo(fel_devastation gcd=0 offgcd=1)
+Define(fel_devastation 212084)
+# Unleash the fel within you, damaging enemies directly in front of you for 212105s1*(2/t1) Fire damage over d. Causing damage also heals you for up to 212106s1*(2/t1) health.
+  SpellInfo(fel_devastation cd=60 duration=2 channel=2 talent=fel_devastation_talent tick=0.2)
+  SpellAddBuff(fel_devastation fel_devastation=1)
 Define(fel_eruption 211881)
 # Impales the target for s1 Chaos damage and stuns them for d.
   SpellInfo(fel_eruption fury=10 pain=10 cd=30 duration=4 talent=fel_eruption_talent)
@@ -72,20 +73,22 @@ Define(felblade 213243)
 Define(fiery_brand 204021)
 # Brand an enemy with a demonic symbol, instantly dealing sw2 Fire damage and reducing the damage they deal to you by s1 for 207744d.
   SpellInfo(fiery_brand cd=60 replace=chaos_nova)
-Define(fracture 263642)
-# Rapidly slash your target for 225919sw1+225921sw1 Physical damage, and shatter s1 Lesser Soul Fragments from them.rnrn|cFFFFFFFFGenerates s4/10 Pain.|r
-  SpellInfo(fracture cd=4.5 talent=fracture_talent pain=-25)
-Define(immolation_aura 258920)
-# Engulf yourself in flames, instantly causing 258921s1 Fire damage to enemies within 258921A1 yards and radiating 258922s1 Fire damage every sec.  Lasts d.rnrn|cFFFFFFFFGenerates s3+(258922s2*d) Fury over d.|r
-  SpellInfo(immolation_aura cd=30 duration=10 talent=immolation_aura_talent fury=-10 tick=1)
+Define(fracture 209795)
+# Brutally slam your target for 225919sw1+225921sw1 Physical damage, and shatter two Lesser Soul Fragments from them.
+  SpellInfo(fracture pain=30)
+Define(immolation_aura 178740)
+# Engulf yourself in flames, instantly causing 187727s1 Fire damage to enemies within 187727A1 yards and radiating 178741s1 Fire damage every sec for d.rnrn|cFFFFFFFFGenerates s3/10+178741s2/10*d Pain over d.|r
+  SpellInfo(immolation_aura cd=15 duration=6 replace=eye_beam pain=-8 tick=1)
+  # Burns nearby enemies for 178741s1 Fire damage every 178740t1 sec.?a207548[rnrnMovement speed increased by w4.][]
+  SpellAddBuff(immolation_aura immolation_aura=1)
 Define(imprison 217832)
 # Imprisons a demon, beast, or humanoid, incapacitating them for d. Damage will cancel the effect. Limit 1.
   SpellInfo(imprison cd=45 duration=60)
   # Incapacitated.
   SpellAddTargetDebuff(imprison imprison=1)
-Define(infernal_strike 189112)
-# @spelldesc189110
-  SpellInfo(infernal_strike gcd=0 offgcd=1)
+Define(infernal_strike 189110)
+# Leap through the air toward a targeted location, dealing 189112s1 Fire damage to all enemies within 189112a1 yards.
+  SpellInfo(infernal_strike cd=0.8 cd=20 replace=fel_rush gcd=0 offgcd=1)
 Define(nemesis 208605)
 # Increases damage against Humanoids by s1.
   SpellInfo(nemesis duration=60 gcd=0 offgcd=1)
@@ -96,22 +99,23 @@ Define(prepared_buff 203650)
   SpellInfo(prepared_buff duration=10 gcd=0 offgcd=1)
   # Generating m1/5 Fury every sec.
   SpellAddBuff(prepared_buff prepared_buff=1)
-Define(shear 203783)
-# Shear shatters the target's soul, leaving a Lesser Soul Fragment behind for 204255d.rnrnConsuming a Lesser Soul Fragment heals you for s2 of all damage taken in the last s4 sec, minimum s3 of maximum health.
-  SpellInfo(shear channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(shear shear=1)
+Define(shear 203782)
+# Shears an enemy for s2 Physical damage, and shatters a Lesser Soul Fragment from your target.rnrn|cFFFFFFFFGenerates m3/10 Pain.|r
+  SpellInfo(shear pain=-10)
 Define(sigil_of_flame 204596)
 # Place a Sigil of Flame at the target location that activates after d.rnrnDeals 204598s1 Fire damage, and an additional 204598o3 Fire damage over 204598d, to all enemies affected by the sigil.
   SpellInfo(sigil_of_flame cd=30 duration=2 replace=blade_dance)
 Define(soul_cleave 228477)
 # Viciously strike all enemies in front of you for 228478s1 Physical damage and heal yourself for s4.rnrnConsumes up to s3 Soul Fragments within s1 yds.
-  SpellInfo(soul_cleave pain=30)
-Define(spirit_bomb 247455)
-# @spelldesc247454
-  SpellInfo(spirit_bomb channel=0 gcd=0 offgcd=1)
-Define(steelskin_potion 252336)
-# Chance to create multiple potions.
-  SpellInfo(steelskin_potion gcd=0 offgcd=1)
+  SpellInfo(soul_cleave pain=30 replace=chaos_strike)
+Define(spirit_bomb 198455)
+# Deals s1 damage to all targets within A1.
+  SpellInfo(spirit_bomb gcd=0 offgcd=1)
+Define(steelskin_potion 251231)
+# Infuses your body with resilient energy, increasing your Armor by s1 for d.
+  SpellInfo(steelskin_potion cd=1 duration=25 gcd=0 offgcd=1)
+  # Armor increased by w1.
+  SpellAddBuff(steelskin_potion steelskin_potion=1)
 Define(vengeful_retreat 198793)
 # Remove all snares and vault away. Nearby enemies take 198813s2 Physical damage and have their movement speed reduced by 198813s1 for 198813d.?a203551[rnrn|cFFFFFFFFGenerates (203650s1/5)*203650d Fury over 203650d if you damage an enemy.|r][]
   SpellInfo(vengeful_retreat cd=25 duration=1 channel=1 gcd=0.5)
@@ -138,14 +142,10 @@ Define(charred_flesh_talent 8)
 # Fiery Brand increases the Fire damage your abilities deal to the target by s1.
 Define(spirit_bomb_talent 17)
 # Consume up to s2 Soul Fragments within s1 yds and then explode, afflicting nearby enemies with Frailty for 247456d and damaging them for 247455s1 Fire per fragment.rnrnYou heal for 247456s1 of all damage you deal to enemies with Frailty.
-Define(fel_barrage_talent 9)
-# Unleash a torrent of Fel energy over d, inflicting ((d/t1)+1)*258926s1 Chaos damage to all enemies within 258926A1 yds.
+Define(fel_devastation_talent 18)
+# Unleash the fel within you, damaging enemies directly in front of you for 212105s1*(2/t1) Fire damage over d. Causing damage also heals you for up to 212106s1*(2/t1) health.
 Define(fel_eruption_talent 18)
 # Impales the target for s1 Chaos damage and stuns them for d.
-Define(fracture_talent 12)
-# Rapidly slash your target for 225919sw1+225921sw1 Physical damage, and shatter s1 Lesser Soul Fragments from them.rnrn|cFFFFFFFFGenerates s4/10 Pain.|r
-Define(immolation_aura_talent 6)
-# Engulf yourself in flames, instantly causing 258921s1 Fire damage to enemies within 258921A1 yards and radiating 258922s1 Fire damage every sec.  Lasts d.rnrn|cFFFFFFFFGenerates s3+(258922s2*d) Fury over d.|r
 Define(unbound_chaos_trait 275144)
     `;
 // END
@@ -171,9 +171,9 @@ Define(chaos_brand_debuff 1490)
 	SpellAddBuff(chaos_nova chaos_nova_debuff=1)
 Define(chaos_nova_debuff 179057)
 	SpellInfo(chaos_nova_debuff duration=2)
-Define(chaos_strike 162794)
+
 	SpellInfo(chaos_strike replace annihilation=buff,metamorphosis_havoc_buff)
-	SpellInfo(chaos_strike fury=40)
+	
 
 	SpellInfo(consume_magic cd=10)
 
@@ -186,7 +186,7 @@ Define(darkness 196718)
 
 	SpellInfo(death_sweep fury=35 cd=9 cd_haste=melee)
 	SpellInfo(death_sweep add_fury=-20 talent=first_blood_talent)
-Define(demon_spikes 203720)
+
 	SpellInfo(demon_spikes cd_haste=melee haste=melee specialization=vengeance cd=20 gcd=0 offgcd=1 charges=2)
 	SpellAddBuff(demon_spikes demon_spikes_buff=1)
 Define(demon_spikes_buff 203819)
@@ -194,9 +194,9 @@ Define(demon_spikes_buff 203819)
 
 	SpellInfo(demons_bite fury=-20)
 	SpellInfo(demons_bite unusable=1 talent=demon_blades_talent)
-Define(disrupt 183752)
+
 	SpellInfo(disrupt cd=15 gcd=0 interrupt=1 offgcd=1)
-Define(eye_beam 198013)
+
 	SpellInfo(eye_beam fury=30 cd=30 channel=1.8)
 	SpellInfo(eye_beam channel=2.8 talent=blind_fury_talent)
 Define(extended_by_demonic_buff -22547) # OvaleDemonHunterDemonic
@@ -204,7 +204,7 @@ Define(feast_of_souls_buff 207693)
 	SpellInfo(feast_of_souls_buff duration=6)
 
 	SpellInfo(fel_barrage cd=60 channel=3)
-Define(fel_devastation 212084)
+
 	SpellInfo(fel_devastation cd=60 channel=2)
 
 	SpellInfo(fel_eruption cd=30 interrupt=1)
@@ -223,7 +223,7 @@ Define(fiery_brand_debuff 207771)
 	SpellInfo(fracture pain=25 charges=2 cd=4.5 cd_haste=melee)
 Define(frailty_debuff 247456)
 	SpellInfo(frailty_debuff duration=20)
-Define(immolation_aura 178740)
+
 	SpellInfo(immolation_aura cd=15 cd_haste=melee)
 	SpellAddBuff(immolation_aura immolation_aura_buff=1)
 Define(immolation_aura_buff 178740)
@@ -235,7 +235,7 @@ Define(immolation_aura_havoc_buff 258920)
 	SpellInfo(immolation_aura_buff duration=10)
 
 	SpellInfo(imprison cd=45 interrupt=1)
-Define(infernal_strike 189110)
+
 	SpellInfo(infernal_strike cd=20 charges=2 offgcd=1)
 	SpellInfo(infernal_strike add_cd=8 talent=abyssal_strike_talent)
 Define(metamorphosis_havoc 191427)
@@ -250,7 +250,7 @@ Define(metamorphosis_veng_buff 187827)
 	SpellInfo(metamorphosis_veng_buff duration=15)
 Define(momentum_buff 208628)
 	SpellInfo(momentum_buff duration=6)
-Define(nemesis 206491)
+
 	SpellInfo(nemesis cd=120)
 	SpellAddTargetDebuff(nemesis nemesis_debuff=1)
 Define(nemesis_debuff 206491)
@@ -265,9 +265,7 @@ Define(pick_up_fragment 210788)
 	SpellInfo(prepared_buff duration=10)
 Define(razor_spikes_debuff 210003)
 	SpellInfo(razor_spikes_debuff duration=6)
-Define(shear 203782)
-	SpellInfo(shear pain=-10)
-	SpellInfo(shear replace=fracture talent=fracture_talent)
+
 Define(sigil_of_chains 202138)
 	SpellInfo(sigil_of_chains cd=90)
 
@@ -345,7 +343,7 @@ Define(fallout_talent 5)
 Define(feast_of_souls_talent 4)
 Define(feed_the_demon_talent 11)
 
-Define(fel_devastation_talent 18)
+
 
 
 Define(felblade_talent_havoc 3)

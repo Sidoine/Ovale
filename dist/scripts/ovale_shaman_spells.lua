@@ -9,12 +9,16 @@ __exports.register = function()
 # Invoke the spirits of your ancestors, granting you their power for 274739d.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
   SpellAddBuff(ancestral_call ancestral_call=1)
-Define(battle_potion_of_agility 279161)
-# Chance to create multiple potions.
-  SpellInfo(battle_potion_of_agility gcd=0 offgcd=1)
-Define(battle_potion_of_intellect 279164)
-# Chance to create multiple potions.
-  SpellInfo(battle_potion_of_intellect gcd=0 offgcd=1)
+Define(battle_potion_of_agility 279152)
+# Increases your Agility by s1 for d.
+  SpellInfo(battle_potion_of_agility cd=1 duration=25 gcd=0 offgcd=1)
+  # Agility increased by w1.
+  SpellAddBuff(battle_potion_of_agility battle_potion_of_agility=1)
+Define(battle_potion_of_intellect 279151)
+# Increases your Intellect by s1 for d.
+  SpellInfo(battle_potion_of_intellect cd=1 duration=25 gcd=0 offgcd=1)
+  # Intellect increased by w1.
+  SpellAddBuff(battle_potion_of_intellect battle_potion_of_intellect=1)
 Define(berserking 26297)
 # Increases your haste by s1 for d.
   SpellInfo(berserking cd=180 duration=10 gcd=0 offgcd=1)
@@ -28,10 +32,9 @@ Define(bloodlust 2825)
 Define(capacitor_totem 192058)
 # Summons a totem at the target location that gathers electrical energy from the surrounding air and explodes after s2 sec, stunning all enemies within 118905A1 yards for 118905d.
   SpellInfo(capacitor_totem cd=60 duration=3 gcd=1)
-Define(chain_lightning 231722)
-# Chain Lightning jumps to s1 additional targets.
-  SpellInfo(chain_lightning channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(chain_lightning chain_lightning=1)
+Define(chain_lightning 421)
+# Hurls a lightning bolt at the enemy, dealing s1 Nature damage and then jumping to additional nearby enemies. Affects x1 total targets.
+  SpellInfo(chain_lightning)
 Define(crash_lightning 187874)
 # Electrocutes all enemies in front of you, dealing s1*<CAP>/AP Nature damage. Hitting 2 or more targets enhances your weapons for 187878d, causing Stormstrike and Lava Lash to also deal 195592s1*<CAP>/AP Nature damage to all targets in front of you.  rnrnEach target hit by Crash Lightning increases the damage of your next Stormstrike by s2.
   SpellInfo(crash_lightning maelstrom=20 cd=6)
@@ -46,30 +49,28 @@ Define(earthen_spike 188089)
   SpellInfo(earthen_spike maelstrom=20 cd=20 duration=10 talent=earthen_spike_talent)
   # Suffering s2 increased Nature and Physical damage from the Shaman.
   SpellAddTargetDebuff(earthen_spike earthen_spike=1)
-Define(earthquake 77478)
-# @spelldesc61882
-  SpellInfo(earthquake gcd=0 offgcd=1)
+Define(earthquake 61882)
+# Causes the earth within a1 yards of the target location to tremble and break, dealing <damage> Physical damage over d and sometimes knocking down enemies.
+  SpellInfo(earthquake maelstrom=60 duration=6 tick=1)
+  SpellAddBuff(earthquake earthquake=1)
 Define(elemental_blast 117014)
 # Harnesses the raw power of the elements, dealing s1 Elemental damage and increasing your Critical Strike, Haste, or Mastery by 118522s1 for 118522d.
   SpellInfo(elemental_blast cd=12 talent=elemental_blast_talent)
-Define(feral_lunge 215802)
-# @spelldesc196884
-  SpellInfo(feral_lunge gcd=0 offgcd=1)
-Define(feral_spirit 231723)
-# Feral Spirits grant you 190185s1 Maelstrom each time they attack.
-  SpellInfo(feral_spirit channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(feral_spirit feral_spirit=1)
-Define(fire_elemental 263819)
-# @spelldesc198067
-  SpellInfo(fire_elemental gcd=1 maelstrom=-3)
-Define(fireblood 265226)
-# Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by s1.
-  SpellInfo(fireblood duration=8 max_stacks=6 gcd=0 offgcd=1)
-  # Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by w1.
-  SpellAddBuff(fireblood fireblood=1)
-Define(flame_shock 188838)
+Define(feral_lunge 196884)
+# Lunge at your enemy as a ghostly wolf, biting them to deal 215802s1 Physical damage.
+  SpellInfo(feral_lunge cd=30 talent=feral_lunge_talent gcd=0.5)
+Define(feral_spirit 51533)
+# Summons two Spirit ?s147783[Raptors][Wolves] that aid you in battle for 228562d. They are immune to movement-impairing effects?a231723[ and grant you 190185s1 Maelstrom each time they attack][].
+  SpellInfo(feral_spirit cd=120)
+Define(fire_elemental 198067)
+# Calls forth a Greater Fire Elemental to rain destruction on your enemies for 188592d.rnrnWhile the Greater Fire Elemental is active, Flame Shock generates 263819s1 Maelstrom when it deals damage over time.
+  SpellInfo(fire_elemental cd=150)
+Define(fireblood 265221)
+# Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 265226d. 
+  SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
+Define(flame_shock 188389)
 # Sears the target with fire, causing s1 Fire damage and then an additional o2 Fire damage over d.
-  SpellInfo(flame_shock cd=6 duration=21 tick=3)
+  SpellInfo(flame_shock cd=6 duration=18 tick=2)
   # Suffering w2 Fire damage every t2 sec.
   SpellAddTargetDebuff(flame_shock flame_shock=1)
 Define(flametongue 193796)
@@ -100,8 +101,8 @@ Define(heroism 32182)
   SpellInfo(heroism cd=300 duration=40 channel=40 gcd=0 offgcd=1)
   # Haste increased by s1.
   SpellAddBuff(heroism heroism=1)
-Define(hex 277784)
-# Transforms the enemy into a wicker mongrel for d. While hexed, the victim is incapacitated, and cannot attack or cast spells. Damage may cancel the effect. Limit 1. Only works on Humanoids and Beasts.
+Define(hex 51514)
+# Transforms the enemy into a frog for d. While hexed, the victim is incapacitated, and cannot attack or cast spells. Damage may cancel the effect. Limit 1. Only works on Humanoids and Beasts.
   SpellInfo(hex cd=30 duration=60 channel=60)
   # Incapacitated.
   SpellAddTargetDebuff(hex hex=1)
@@ -123,19 +124,20 @@ Define(landslide_buff 202004)
 Define(lava_beam 114074)
 # Unleashes a blast of superheated flame at the enemy, dealing s1 Fire damage and then jumping to additional nearby enemies. Damage is increased by s2 after each jump. Affects x1 total targets.  rnrn|cFFFFFFFFGenerates s3 Maelstrom per target hit.|r 
   SpellInfo(lava_beam)
-Define(lava_burst 231721)
-# Lava Burst will always critically strike if the target is affected by Flame Shock.
-  SpellInfo(lava_burst channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(lava_burst lava_burst=1)
+Define(lava_burst 51505)
+# Hurls molten lava at the target, dealing s1 Fire damage.?a231721[ Lava Burst will always critically strike if the target is affected by Flame Shock.][]?s137039[][rnrn|cFFFFFFFFGenerates 190493s2 Maelstrom.|r ]
+  SpellInfo(lava_burst cd=8 maelstrom=0)
 Define(lava_lash 60103)
 # Charges your off-hand weapon with lava and burns your target, dealing s1 Fire damage.
   SpellInfo(lava_lash maelstrom=40)
 Define(lightning_conduit_debuff 275388)
 # Stormstrike marks the target as a Lightning Conduit for 275391d. Stormstrike deals s1 Nature damage to all enemies you've marked as Conduits.
   SpellInfo(lightning_conduit_debuff channel=0 gcd=0 offgcd=1)
-Define(lightning_shield 273324)
-# @spelldesc192106
-  SpellInfo(lightning_shield channel=0 gcd=0 offgcd=1)
+Define(lightning_shield 192106)
+# Surround yourself with a shield of lightning for d.rnrnMelee attackers have a chance to suffer 192109s1 Nature damage, and add a charge to your shield.rnWhen you Stormstrike, it gains s1 charges.rnrnAt 192106u charges, the shield overcharges, causing you to deal 273324s1 Nature damage with each attack and generate 273323s2*10 Maelstrom over 273323d.
+  SpellInfo(lightning_shield duration=3600 channel=3600 max_stacks=20 talent=lightning_shield_talent)
+  # Chance to deal 192109s1 Nature damage when you take melee damage.
+  SpellAddBuff(lightning_shield lightning_shield=1)
 Define(liquid_magma_totem 192222)
 # Summons a totem at the target location for d that hurls liquid magma at a random nearby target every 192226t1 sec, dealing 192231s1*(1+(137040s3/100)) Fire damage to all enemies within 192223A1 yards.
   SpellInfo(liquid_magma_totem cd=60 duration=15 talent=liquid_magma_totem_talent gcd=1)
@@ -152,12 +154,14 @@ Define(quaking_palm 107079)
 Define(rockbiter 193786)
 # Assaults your target with earthen power, dealing s1 Nature damage.rnrn|cFFFFFFFFGenerates s2 Maelstrom.|r
   SpellInfo(rockbiter cd=6 maelstrom=-25)
-Define(storm_elemental 192249)
-# Calls forth a Greater Storm Elemental to hurl gusts of wind that damage the Shaman's enemies for 157299d.rnrnWhile the Storm Elemental is active, each time you cast Lightning Bolt or Chain Lightning, the cast time of Lightning Bolt and Chain Lightning is reduced by 263806s1, stacking up to 263806u times.
-  SpellInfo(storm_elemental cd=150 talent=storm_elemental_talent)
-Define(stormkeeper 214864)
-# Grants the Stormkeeper ability, which massively empowers your Lightning Bolts or Chain Lightnings.
-  SpellInfo(stormkeeper channel=0 gcd=0 offgcd=1)
+Define(storm_elemental 157299)
+# @spelldesc192249
+  SpellInfo(storm_elemental duration=30 gcd=0 offgcd=1)
+  SpellAddBuff(storm_elemental storm_elemental=1)
+Define(stormkeeper 205495)
+# Raises |cFFFFCC99The Fist of Ra-den|r to the sky and absorbs all nearby electric energy, causing your next n casts of Lightning Bolt or Chain Lightning to be instant and deal s1 increased damage.
+  SpellInfo(stormkeeper cd=60 duration=15)
+  # Your next Lightning Bolt or Chain Lightning will be instant and deal w1 additional damage.
   SpellAddBuff(stormkeeper stormkeeper=1)
 Define(stormstrike 17364)
 # Energizes both your weapons with lightning and delivers a massive blow to your target, dealing a total of 32175sw1+32176sw1 Physical damage.
@@ -216,6 +220,10 @@ Define(searing_assault_talent 10)
 # Flametongue now causes the target to burn for 268429o1 Fire damage over 268429d.
 Define(earthen_spike_talent 20)
 # Summons an Earthen Spike under an enemy, dealing s1 Physical damage and increasing Physical and Nature damage you deal to the target by s2 for d.
+Define(feral_lunge_talent 14)
+# Lunge at your enemy as a ghostly wolf, biting them to deal 215802s1 Physical damage.
+Define(lightning_shield_talent 3)
+# Surround yourself with a shield of lightning for d.rnrnMelee attackers have a chance to suffer 192109s1 Nature damage, and add a charge to your shield.rnWhen you Stormstrike, it gains s1 charges.rnrnAt 192106u charges, the shield overcharges, causing you to deal 273324s1 Nature damage with each attack and generate 273323s2*10 Maelstrom over 273323d.
 Define(sundering_talent 18)
 # Shatters a line of earth in front of you with your main hand weapon, causing s1 Flamestrike damage and Incapacitating any enemy hit for d.
 Define(lightning_conduit_trait 275388)
@@ -306,7 +314,7 @@ Define(earthen_spike_debuff 188089)
 Define(earthen_wall_totem 198838)
 Define(earthgrab_totem 51485)
 	SpellInfo(earthgrab_totem cd=30)
-Define(earthquake 61882)
+
 	SpellInfo(earthquake maelstrom=60)
 Define(earthquake_debuff 182387)
   
@@ -321,17 +329,17 @@ Define(elemental_blast_mastery_buff 173184)
 Define(exposed_elements_debuff 269808)
 	SpellInfo(exposed_elements_debuff duration=15)
 Define(far_sight 6196)
-Define(feral_lunge 196884)
+
 	SpellInfo(feral_lunge cd=30)
-Define(feral_spirit 51533)
+
 	SpellInfo(feral_spirit cd=120 duration=15)
 	SpellInfo(feral_spirit add_cd=-30 talent=elemental_spirits_talent)
 	SpellAddBuff(feral_spirit icy_edge_buff=1)
 	SpellAddBuff(feral_spirit molten_weapon_buff=1)
-Define(fire_elemental 198067)
-	SpellInfo(fire_elemental cd=150)
+
+	
 	SpellInfo(fire_elemental replace=storm_elemental talent=storm_elemental_talent)
-Define(flame_shock 188389)
+
 	SpellInfo(flame_shock cd=6)
 	SpellAddTargetDebuff(flame_shock flame_shock_debuff=1)
 Define(flame_shock_debuff 188389)
@@ -391,7 +399,7 @@ Define(healing_wave 77472)
 	SpellAddBuff(heroism heroism_buff=1)
 Define(heroism_buff 32182)
 	SpellInfo(heroism_buff duration=40)
-Define(hex 51514)
+
 	SpellInfo(hex cd=30)
 	SpellAddTargetDebuff(hex hex_debuff=1)
 Define(hex_debuff 51514)
@@ -411,7 +419,7 @@ Define(icy_edge_buff 224126)
 
 	SpellInfo(lava_beam maelstrom=-3)
 	SpellRequire(lava_beam unusable 1=buff,!ascendance_elemental_buff)
-Define(lava_burst 51505)
+
 	SpellInfo(lava_burst cd=8 travel_time=1 maelstrom=-10 charges=1)
 	SpellInfo(lava_burst charges=2 talent=echo_of_the_elements_talent specialization=elemental)
 	SpellInfo(lava_burst charges=2 talent=resto_echo_of_the_elements_talent specialization=restoration)
@@ -433,7 +441,7 @@ Define(lightning_bolt_enhancement 187837)
 Define(lightning_bolt 403)
 Define(lightning_crash_buff 187874)
 Define(lightning_rod_debuff 197209)
-Define(lightning_shield 192106)
+
 	SpellAddBuff(lightning_shield lightning_shield_buff=1)
 	SpellRequire(lightning_shield unusable 1=buff,lightning_shield_buff)
 Define(lightning_shield_buff 192106)
@@ -477,7 +485,7 @@ Define(spiritwalkers_grace_buff 79206)
 Define(stormbringer 201845)
 Define(stormbringer_buff 201846)
 	SpellInfo(stormbringer_buff duration=12)
-Define(stormkeeper 191634)
+
 	SpellInfo(stormkeeper cd=60)
 	SpellAddBuff(stormkeeper stormkeeper_buff=2)
 Define(stormkeeper_buff 191634)
@@ -587,7 +595,7 @@ Define(resto_echo_of_the_elements_talent 4)
 
 
 
-Define(feral_lunge_talent 14)
+
 Define(flash_flood_talent 16)
 
 
@@ -598,7 +606,7 @@ Define(high_voltage_talent 10)
 
 
 
-Define(lightning_shield_talent 3)
+
 
 
 Define(natures_guardian_talent 13)

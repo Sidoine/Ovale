@@ -8,13 +8,12 @@ export function register() {
 # Invoke the spirits of your ancestors, granting you their power for 274739d.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
   SpellAddBuff(ancestral_call ancestral_call=1)
-Define(arcane_barrage 231564)
-# Arcane Barrage hits s1 additional Ltarget:targets; within 44425s3 yds per Arcane Charge for 44425s2 damage.
-  SpellInfo(arcane_barrage channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(arcane_barrage arcane_barrage=1)
-Define(arcane_blast 222321)
-# Deal s1 Arcane damage.
-  SpellInfo(arcane_blast channel=0 gcd=0 offgcd=1)
+Define(arcane_barrage 44425)
+# Launches bolts of arcane energy at the enemy target, causing s1 Arcane damage. rnrnFor each Arcane Charge, deals 36032s2 additional damage?a231564[ and hits 36032s3 additional nearby Ltarget:targets; for s2 of its damage][].rnrn|cFFFFFFFFConsumes all Arcane Charges.|r
+  SpellInfo(arcane_barrage cd=3)
+Define(arcane_blast 30451)
+# Blasts the target with energy, dealing 30451s1 Arcane damage.rnrnEach Arcane Charge increases damage by 36032s1 and mana cost by 36032s5, and reduces cast time by 36032s4.rnrn|cFFFFFFFFGenerates 1 Arcane Charge.|r
+  SpellInfo(arcane_blast undefined=-1)
 Define(arcane_explosion 1449)
 # Causes an explosion of magic around the caster, dealing s2 Arcane damage to all enemies within A2 yards.rnrn|cFFFFFFFFGenerates s1 Arcane Charge if any targets are hit.|r
   SpellInfo(arcane_explosion undefined=-1 undefined=-1)
@@ -32,17 +31,19 @@ Define(arcane_missiles 5143)
   SpellInfo(arcane_missiles duration=2.5 channel=2.5 tick=0.625)
   SpellAddTargetDebuff(arcane_missiles arcane_missiles=1)
   SpellAddBuff(arcane_missiles arcane_missiles=1)
-Define(arcane_orb 153640)
-# @spelldesc153626
-  SpellInfo(arcane_orb channel=0 gcd=0 offgcd=1 undefined=-1)
+Define(arcane_orb 153626)
+# Launches an Arcane Orb forward from your position, traveling up to 40 yards, dealing 153640s1 Arcane damage to enemies it passes through.rnrn|cFFFFFFFFGrants 1 Arcane Charge when cast and every time it deals damage.|r
+  SpellInfo(arcane_orb cd=20 duration=2.5 talent=arcane_orb_talent undefined=-1)
 Define(arcane_power 12042)
 # For d, you deal s1 more spell damage and your spells cost s2 less mana.
   SpellInfo(arcane_power cd=90 duration=10)
   # Spell damage increased by w1.rnMana costs of your damaging spells reduced by w2.
   SpellAddBuff(arcane_power arcane_power=1)
-Define(battle_potion_of_intellect 279164)
-# Chance to create multiple potions.
-  SpellInfo(battle_potion_of_intellect gcd=0 offgcd=1)
+Define(battle_potion_of_intellect 279151)
+# Increases your Intellect by s1 for d.
+  SpellInfo(battle_potion_of_intellect cd=1 duration=25 gcd=0 offgcd=1)
+  # Intellect increased by w1.
+  SpellAddBuff(battle_potion_of_intellect battle_potion_of_intellect=1)
 Define(berserking_buff 200953)
 # @spelldesc200845
   SpellInfo(berserking_buff duration=3 max_stacks=12 gcd=0 offgcd=1)
@@ -63,32 +64,28 @@ Define(blink 1953)
   SpellInfo(blink cd=0.5 cd=15 duration=0.3 channel=0.3)
   # Blinking.
   SpellAddBuff(blink blink=1)
-Define(blizzard 236662)
-# Each time Blizzard deals damage, the cooldown of Frozen Orb is reduced by s1/100.1 sec.
-  SpellInfo(blizzard channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(blizzard blizzard=1)
+Define(blizzard 190356)
+# Ice shards pelt the target area, dealing 190357m1*8 Frost damage over d and reducing movement speed by 205708s1 for 205708d.?a236662[rnrnEach time Blizzard deals damage, the cooldown of Frozen Orb is reduced by 236662s1/100.1 sec.][]
+  SpellInfo(blizzard cd=8 duration=8)
 Define(charged_up 205032)
 # Immediately grants s1 Arcane Charges.
   SpellInfo(charged_up cd=40 duration=10 talent=charged_up_talent undefined=-4)
   SpellAddBuff(charged_up charged_up=1)
-Define(clearcasting 277726)
-# @spelldesc236628
-  SpellInfo(clearcasting duration=15 gcd=0 offgcd=1)
-  # Arcane Missiles fires 236628s1 additional lmissile:missiles;.
+Define(clearcasting 79684)
+# For each c*100/s1 mana you spend, you have a 1 chance to gain Clearcasting, making your next Arcane Missiles or Arcane Explosion free and channel 277726s1 faster.
+  SpellInfo(clearcasting channel=0 gcd=0 offgcd=1)
   SpellAddBuff(clearcasting clearcasting=1)
 Define(combustion 190319)
 # Engulfs you in flames for d, increasing your spells' critical strike chance by s1 and granting you Mastery equal to s3 your Critical Strike stat. Castable while casting other spells.
   SpellInfo(combustion cd=120 duration=10 gcd=0 offgcd=1 tick=0.5)
   # Critical Strike chance of your spells increased by w1.?a231630[rnMastery increased by w2.][]
   SpellAddBuff(combustion combustion=1)
-Define(comet_storm 228601)
-# @spelldesc153595
-  SpellInfo(comet_storm gcd=0 offgcd=1)
-Define(cone_of_cold 212792)
-# Slowed by s1 for d.
-  SpellInfo(cone_of_cold duration=5 gcd=0 offgcd=1)
-  # Slowed by s1 for d.
-  SpellAddTargetDebuff(cone_of_cold cone_of_cold=1)
+Define(comet_storm 153595)
+# Calls down a series of 7 icy comets on and around the target, that deals up to 7*153596s1 Frost damage to all enemies within 228601A1 yds of its impacts.
+  SpellInfo(comet_storm cd=30 talent=comet_storm_talent)
+Define(cone_of_cold 120)
+# Targets in a cone in front of you take s1 Frost damage and have movement slowed by 212792m1 for 212792d.
+  SpellInfo(cone_of_cold cd=12)
 Define(counterspell 2139)
 # Counters the enemy's spellcast, preventing any spell from that school of magic from being cast for d?s12598[ and silencing the target for 55021d][].
   SpellInfo(counterspell cd=24 duration=6 gcd=0 offgcd=1 interrupt=1)
@@ -97,27 +94,23 @@ Define(dragons_breath 31661)
   SpellInfo(dragons_breath cd=20 duration=4)
   # Disoriented.
   SpellAddTargetDebuff(dragons_breath dragons_breath=1)
-Define(ebonbolt 257538)
-# @spelldesc214634
-  SpellInfo(ebonbolt channel=0 gcd=0 offgcd=1)
-Define(evocation 231565)
-# Evocation's cooldown is reduced by s1.
-  SpellInfo(evocation channel=0 gcd=0 offgcd=1)
+Define(ebonbolt 214634)
+# Deals 228599s1 Shadowfrost damage and causes Brain Freeze.
+  SpellInfo(ebonbolt cd=45)
+Define(evocation 12051)
+# Increases your mana regeneration by s1 for d.
+  SpellInfo(evocation cd=180 duration=6 channel=6)
+  # Mana regeneration increased by s1.
   SpellAddBuff(evocation evocation=1)
-Define(fire_blast 231568)
-# Fire Blast always deals a critical strike.
-  SpellInfo(fire_blast channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(fire_blast fire_blast=1)
-Define(fireball 222305)
-# Deal sw1 Fire damage and an additional sw2 Fire damage over d.
-  SpellInfo(fireball duration=5 channel=5 gcd=0 offgcd=1 tick=1)
-  # Taking sw2 Fire damage every t2 sec.
-  SpellAddTargetDebuff(fireball fireball=1)
-Define(fireblood 265226)
-# Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by s1.
-  SpellInfo(fireblood duration=8 max_stacks=6 gcd=0 offgcd=1)
-  # Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by w1.
-  SpellAddBuff(fireblood fireblood=1)
+Define(fire_blast 108853)
+# Blasts the enemy for s1 Fire damage. Castable while casting other spells.?a231568[ Always deals a critical strike.][]
+  SpellInfo(fire_blast cd=0.5 cd=12 gcd=0 offgcd=1)
+Define(fireball 133)
+# Throws a fiery ball that causes s1 Fire damage.
+  SpellInfo(fireball)
+Define(fireblood 265221)
+# Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 265226d. 
+  SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
 Define(flamestrike 2120)
 # Calls down a pillar of fire, burning all enemies within the area for s1 Fire damage and reducing their movement speed by s2 for d.
   SpellInfo(flamestrike duration=8)
@@ -126,27 +119,23 @@ Define(flamestrike 2120)
 Define(flurry 44614)
 # Unleash a flurry of ice, striking the target s1 times for a total of 228354s2*m1 Frost damage. Each hit reduces the target's movement speed by 228354s1 for 228354d.rnrnWhile Brain Freeze is active, Flurry applies Winter's Chill, causing your target to take damage from your spells as if it were frozen.
   SpellInfo(flurry)
-Define(frostbolt 222320)
-# Deal s1 Frost damage and reduces the target's movement speed by s2 for d.
-  SpellInfo(frostbolt duration=5 channel=5 gcd=0 offgcd=1)
-  # Movement speed reduced by s2 for d.
-  SpellAddTargetDebuff(frostbolt frostbolt=1)
+Define(frostbolt 116)
+# Launches a bolt of frost at the enemy, causing 228597s1 Frost damage and slowing movement speed by 205708s1 for 205708d.
+  SpellInfo(frostbolt)
 Define(frozen_orb 84714)
 # Launches an orb of swirling ice up to s1 yards forward which deals up to 20*84721s2 Frost damage to all enemies it passes through. Grants 1 charge of Fingers of Frost when it first damages an enemy.rnrnEnemies damaged by the Frozen Orb are slowed by 205708s1 for 205708d.
   SpellInfo(frozen_orb cd=60 duration=15 channel=15)
-Define(glacial_spike 228600)
-# @spelldesc199786
-  SpellInfo(glacial_spike duration=4 channel=4 gcd=0 offgcd=1)
-  # Frozen in place.
-  SpellAddTargetDebuff(glacial_spike glacial_spike=1)
+Define(glacial_spike 199786)
+# Conjures a massive spike of ice, and merges your current Icicles into it. It impales your target, dealing 228600s1 damage plus all of the damage stored in your Icicles, and freezes the target in place for 228600d. Damage may interrupt the freeze effect.rnrnRequires 5 Icicles to cast.rnrn|cFFFFFFFFPassive:|r Ice Lance no longer launches Icicles.
+  SpellInfo(glacial_spike talent=glacial_spike_talent)
 Define(ice_floes 108839)
 # Makes your next Mage spell with a cast time shorter than s2 sec castable while moving. Unaffected by the global cooldown and castable while casting.
   SpellInfo(ice_floes cd=20 duration=15 max_stacks=3 talent=ice_floes_talent gcd=0 offgcd=1)
   # Able to move while casting spells.
   SpellAddBuff(ice_floes ice_floes=1)
-Define(ice_lance 228598)
-# @spelldesc30455
-  SpellInfo(ice_lance channel=0)
+Define(ice_lance 30455)
+# Quickly fling a shard of ice at the target, dealing 228598s1 Frost damage?s56377[, and 228598s1*56377m2/100 Frost damage to a second nearby target][].rnrnIce Lance damage is tripled against frozen targets.
+  SpellInfo(ice_lance replace=fire_blast)
 Define(ice_nova 157997)
 # Causes a whirl of icy wind around the enemy, dealing s1*s3/100 Frost damage to the target and s1 Frost damage to all other enemies within a2 yards, and freezing them in place for d.
   SpellInfo(ice_nova cd=25 duration=2 talent=ice_nova_talent)
@@ -160,32 +149,30 @@ Define(icy_veins 12472)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
-Define(living_bomb 217694)
-# @spelldesc44457
-  SpellInfo(living_bomb duration=4 gcd=0 offgcd=1 tick=1)
-  # Causes w1 Fire damage every t1 sec. After d, the target explodes, causing w2 Fire damage to the target and all other enemies within 44461A2 yards, and spreading Living Bomb.
-  SpellAddTargetDebuff(living_bomb living_bomb=1)
-Define(meteor 245728)
-# Blasts a target for s1 Fire damage.
-  SpellInfo(meteor channel=0 gcd=0 offgcd=1)
+Define(living_bomb 44457)
+# The target becomes a Living Bomb, taking 217694o1 Fire damage over 217694d, and then exploding to deal an additional 44461s2 Fire damage to the target and all other enemies within 44461A2 yards.rnrnOther enemies hit by this explosion also become a Living Bomb, but this effect cannot spread further.
+  SpellInfo(living_bomb cd=12 talent=living_bomb_talent)
+Define(meteor 117588)
+# Call down a molten meteor on your target, dealing s1 damage to all enemies within A1 yards of your target.
+  SpellInfo(meteor cd=60 gcd=0 offgcd=1)
 Define(mirror_image 55342)
 # Creates s2 copies of you nearby for 55342d, which cast spells and attack your enemies.
   SpellInfo(mirror_image cd=120 duration=40 talent=mirror_image_talent)
   SpellAddBuff(mirror_image mirror_image=1)
-Define(nether_tempest 114954)
-# @spelldesc114923
-  SpellInfo(nether_tempest channel=0 gcd=0 offgcd=1)
-Define(phoenix_flames 257542)
-# @spelldesc257541
-  SpellInfo(phoenix_flames gcd=0 offgcd=1)
-Define(rising_death 269853)
-# Empowers you with shadow magic for d, giving your ranged attacks a chance to send out a death bolt that grows in intensity as it travels, dealing up to 271292s1 Shadow damage.
-  SpellInfo(rising_death duration=25 channel=25 gcd=0 offgcd=1)
-Define(preheat 273333)
-# @spelldesc273331
-  SpellInfo(preheat duration=30 channel=30 gcd=0 offgcd=1)
-  # The Mage's Fire Blast will deal increased damage to you.
-  SpellAddTargetDebuff(preheat preheat=1)
+Define(nether_tempest 114923)
+# Places a Nether Tempest on the target which deals 114923o1 Arcane damage over 114923d to the target and 114954m1*12/t1 to all enemies within 10 yards. Limit 1 target.rnrnDamage increased by 36032s1 per Arcane Charge.
+  SpellInfo(nether_tempest duration=12 talent=nether_tempest_talent tick=1)
+  # Deals w1 Arcane damage and an additional w1 Arcane damage to all enemies within 114954A1 yards every t sec.
+  SpellAddTargetDebuff(nether_tempest nether_tempest=1)
+Define(phoenix_flames 257541)
+# Hurls a Phoenix that deals s1 Fire damage to the target and splashes 257542s2 Fire damage to other nearby enemies. Always deals a critical strike.
+  SpellInfo(phoenix_flames cd=30 talent=phoenix_flames_talent)
+Define(rising_death 252346)
+# Chance to create multiple potions.
+  SpellInfo(rising_death gcd=0 offgcd=1)
+Define(preheat 273331)
+# Scorch increases the damage the target takes from your Fire Blast by s1 for 273333d.
+  SpellInfo(preheat channel=0 gcd=0 offgcd=1)
 Define(presence_of_mind 205025)
 # Causes your next n Arcane Blasts to be instant cast.
   SpellInfo(presence_of_mind cd=60 gcd=0 offgcd=1)
@@ -194,25 +181,24 @@ Define(presence_of_mind 205025)
 Define(pyroblast 11366)
 # Hurls an immense fiery boulder that causes s1 Fire damage.
   SpellInfo(pyroblast)
-Define(pyroclasm 269651)
-# @spelldesc269650
-  SpellInfo(pyroclasm duration=15 max_stacks=2 gcd=0 offgcd=1)
-  # Damage done by your next non-instant Pyroblast increased by s1.
+Define(pyroclasm 269650)
+# Consuming Hot Streak has a s1 chance to make your next non-instant Pyroblast cast within 269651d deal 269651s1 additional damage.rnrnMaximum 2 charges.
+  SpellInfo(pyroclasm channel=0 talent=pyroclasm_talent gcd=0 offgcd=1)
   SpellAddBuff(pyroclasm pyroclasm=1)
 Define(quaking_palm 107079)
 # Strikes the target with lightning speed, incapacitating them for d, and turns off your attack.
   SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
   # Incapacitated.
   SpellAddTargetDebuff(quaking_palm quaking_palm=1)
-Define(ray_of_frost 208141)
-# @spelldesc205021
-  SpellInfo(ray_of_frost duration=10 max_stacks=6 gcd=0 offgcd=1)
-  # Ray of Frost's damage increased by s1.rnRay of Frost's snare increased by s2.
-  SpellAddBuff(ray_of_frost ray_of_frost=1)
-Define(rule_of_threes 264774)
-# @spelldesc264354
-  SpellInfo(rule_of_threes duration=15 gcd=0 offgcd=1)
-  # The cost of your next Arcane Blast or Arcane Missiles is reduced by s1.
+Define(ray_of_frost 205021)
+# Channel an icy beam at the enemy for d, dealing s2 Frost damage every t2 sec and slowing movement by s4. Each time Ray of Frost deals damage, its damage and snare increases by 208141s1.rnrnGenerates s3 charges of Fingers of Frost over its duration.
+  SpellInfo(ray_of_frost cd=75 duration=5 channel=5 talent=ray_of_frost_talent tick=1)
+  # Movement slowed by w1.rnTaking w2 Frost damage every t2 sec.
+  SpellAddTargetDebuff(ray_of_frost ray_of_frost=1)
+Define(rule_of_threes 187292)
+# Arcane Missiles now fires m2 additional Missiles. 
+  SpellInfo(rule_of_threes duration=10 gcd=0 offgcd=1)
+  # Arcane Missiles now fires m2 additional Missiles.
   SpellAddBuff(rule_of_threes rule_of_threes=1)
 Define(rune_of_power 116011)
 # Places a Rune of Power on the ground for 116011d which increases your spell damage by 116014s1 while you stand within 8 yds.
@@ -285,6 +271,14 @@ Define(ice_floes_talent 6)
 # Makes your next Mage spell with a cast time shorter than s2 sec castable while moving. Unaffected by the global cooldown and castable while casting.
 Define(ice_nova_talent 3)
 # Causes a whirl of icy wind around the enemy, dealing s1*s3/100 Frost damage to the target and s1 Frost damage to all other enemies within a2 yards, and freezing them in place for d.
+Define(living_bomb_talent 18)
+# The target becomes a Living Bomb, taking 217694o1 Fire damage over 217694d, and then exploding to deal an additional 44461s2 Fire damage to the target and all other enemies within 44461A2 yards.rnrnOther enemies hit by this explosion also become a Living Bomb, but this effect cannot spread further.
+Define(nether_tempest_talent 18)
+# Places a Nether Tempest on the target which deals 114923o1 Arcane damage over 114923d to the target and 114954m1*12/t1 to all enemies within 10 yards. Limit 1 target.rnrnDamage increased by 36032s1 per Arcane Charge.
+Define(phoenix_flames_talent 12)
+# Hurls a Phoenix that deals s1 Fire damage to the target and splashes 257542s2 Fire damage to other nearby enemies. Always deals a critical strike.
+Define(pyroclasm_talent 20)
+# Consuming Hot Streak has a s1 chance to make your next non-instant Pyroblast cast within 269651d deal 269651s1 additional damage.rnrnMaximum 2 charges.
 Define(shimmer_talent 5)
 # Teleports you A1 yards forward, unless something is in the way. Unaffected by the global cooldown and castable while casting.
 Define(supernova_talent 12)
@@ -301,9 +295,9 @@ SpellRequire(arcane_intellect unusable 1=buff,arcane_intellect)
 
 Define(arcane_affinity 166871)
 	SpellInfo(arcane_affinity duration=15)
-Define(arcane_barrage 44425)
+
 	SpellInfo(arcane_barrage cd=3 travel_time=1 arcanecharges=finisher)
-Define(arcane_blast 30451)
+
 	SpellAddBuff(arcane_blast presence_of_mind_buff=0 if_spell=presence_of_mind arcanecharges=-1)
 	SpellAddBuff(arcane_blast profound_magic_buff=0 itemset=T16_caster itemcount=2 specialization=arcane)
 	SpellAddBuff(arcane_blast ice_floes_buff=0 if_spell=ice_floes)
@@ -326,7 +320,7 @@ Define(arcane_instability_buff 166872)
 	SpellAddBuff(arcane_missiles arcane_power_buff=extend,2 if_spell=overpowered)
 Define(arcane_missiles_buff 79683)
 	SpellInfo(arcane_missiles_buff duration=20 max_stacks=3)
-Define(arcane_orb 153626)
+
 	SpellInfo(arcane_orb cd=15)
 
 	SpellInfo(arcane_power cd=90 gcd=0)
@@ -338,7 +332,7 @@ Define(blazing_speed 108843)
 	SpellInfo(blazing_speed cd=25 gcd=0 offgcd=1)
 
 	SpellInfo(blink cd=15)
-Define(blizzard 190356)
+
 	SpellInfo(blizzard cd=8 haste=spell)
 	SpellAddBuff(blizzard ice_floes_buff=0 if_spell=ice_floes)
 Define(brain_freeze 44549)
@@ -355,10 +349,10 @@ Define(cold_snap 11958)
 	SpellAddBuff(combustion combustion_buff=1)
 Define(combustion_buff 190319)
 	SpellInfo(combustion_buff duration=10)
-Define(comet_storm 153595)
+
 	SpellInfo(comet_storm cd=30 travel_time=1)
-Define(cone_of_cold 120)
-	SpellInfo(cone_of_cold cd=12)
+
+	
 
 	SpellInfo(counterspell cd=24 gcd=0 interrupt=1)
 Define(deep_freeze 44572)
@@ -366,12 +360,12 @@ Define(deep_freeze 44572)
 	SpellAddBuff(deep_freeze fingers_of_frost_buff=-1 if_spell=fingers_of_frost)
 
 	SpellInfo(dragons_breath cd=20)
-Define(ebonbolt 214634)
+
 	SpellInfo(ebonbolt cd=45 tag=main)
 	SpellAddBuff(ebonbolt brain_freeze_buff=1)
 Define(erupting_infernal_core_buff 248147)
 	SpellInfo(erupting_infernal_core_buff duration=30)
-Define(evocation 12051)
+
 	SpellInfo(evocation cd=120 channel=3 haste=spell)
 	SpellInfo(evocation add_cd=-30 if_spell=improved_evocation)
 	SpellAddBuff(evocation ice_floes_buff=0 if_spell=ice_floes)
@@ -379,10 +373,10 @@ Define(fingers_of_frost 112965)
 Define(fingers_of_frost_buff 44544)
 	SpellInfo(fingers_of_frost_buff duration=15 max_stacks=2)
 	SpellInfo(fingers_of_frost_buff max_stacks=4 itemset=T18 itemcount=4)
-Define(fire_blast 108853)
+
 	SpellInfo(fire_blast gcd=0 offgcd=1 cd=12 charges=1)
 	SpellInfo(fire_blast cd=10 charges=2 talent=flame_on_talent)
-Define(fireball 133)
+
 	SpellAddBuff(fireball erupting_infernal_core_buff=0)
 
 	SpellInfo(flamestrike cd=12)
@@ -400,7 +394,7 @@ Define(frost_bomb 112948)
 Define(frost_bomb_debuff 112948)
 	SpellInfo(frost_bomb_debuff duration=12)
 Define(frost_nova 122)
-Define(frostbolt 116)
+
 	SpellInfo(frostbolt travel_time=1)
 	SpellAddBuff(frostbolt ice_floes_buff=0 if_spell=ice_floes)
 Define(frostfire_bolt 44614)
@@ -417,7 +411,7 @@ Define(frozen_mass_buff 242253)
 Define(frozen_touch 205030)
 	SpellInfo(frozen_touch cd=30)
 	SpellAddBuff(frozen_touch fingers_of_frost_buff=2)
-Define(glacial_spike 199786)
+
 	SpellInfo(glacial_spike mana=1 unusable=1)
 	SpellRequire(glacial_spike unusable 0=buff,icicles_buff,5)
 	SpellAddBuff(glacial_spike icicles_buff=0)
@@ -430,7 +424,7 @@ Define(ice_barrier 11426)
 	SpellAddBuff(ice_floes ice_floes_buff=1)
 Define(ice_floes_buff 108839)
 	SpellInfo(ice_floes_buff duration=15)
-Define(ice_lance 30455)
+
 	SpellInfo(ice_lance travel_time=1.3) # maximum observed travel time with a bit of padding
 	SpellAddBuff(ice_lance fingers_of_frost_buff=-1 if_spell=fingers_of_frost)
 	SpellAddBuff(ice_lance icy_veins_buff=extend,2 if_spell=thermal_void)
@@ -457,7 +451,7 @@ Define(inferno_blast 108853)
 	SpellInfo(inferno_blast cd=8)
 	SpellInfo(inferno_blast add_cd=-2 itemset=T17 itemcount=2)
 Define(kaelthas_ultimate_ability_buff 209455)
-Define(living_bomb 44457)
+
 	SpellInfo(living_bomb gcd=1)
 	SpellAddTargetDebuff(living_bomb living_bomb_debuff=1)
 Define(living_bomb_debuff 44457)
@@ -468,7 +462,7 @@ Define(meteor 153561)
 	SpellInfo(meteor cd=45 travel_time=1)
 
 	SpellInfo(mirror_image cd=120)
-Define(nether_tempest 114923)
+
 	SpellAddTargetDebuff(nether_tempest nether_tempest_debuff=1)
 Define(nether_tempest_debuff 114923)
 	SpellInfo(nether_tempest_debuff duration=12 haste=spell tick=1)
@@ -508,7 +502,7 @@ Define(pyromaniac_buff 166868)
 	SpellInfo(pyromaniac_buff duration=4)
 Define(quickening_buff 198924)
 	SpellAddBuff(arcane_barrage quickening_buff=0)
-Define(ray_of_frost 205021)
+
 	SpellInfo(ray_of_frost cd=60 channel=10 tag=main)
 
 	SpellInfo(rune_of_power buff_totem=rune_of_power_buff duration=180 max_totems=2 totem=1)
@@ -577,15 +571,15 @@ Define(glacial_insulation_talent 4)
 Define(ice_ward_talent 14)
 Define(incanters_flow_talent 7)
 
-Define(living_bomb_talent 18)
+
 Define(lonely_winter_talent 2)
 Define(mana_shield_talent 4)
 Define(meteor_talent 21)
 
-Define(nether_tempest_talent 18)
 
-Define(phoenix_flames_talent 12)
-Define(pyroclasm_talent 20)
+
+
+
 Define(pyromaniac_talent 2)
 
 
