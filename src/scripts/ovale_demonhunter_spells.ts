@@ -22,6 +22,10 @@ Define(chaos_nova 179057)
   SpellInfo(chaos_nova fury=30 cd=60 duration=2)
   # Stunned.
   SpellAddTargetDebuff(chaos_nova chaos_nova=1)
+Define(chaos_strike_havoc 197125)
+# @spelldesc162794
+  SpellInfo(chaos_strike_havoc channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(chaos_strike_havoc chaos_strike_havoc=1)
 Define(chaos_strike 162794)
 # Slice your target for 222031s1+199547s1 Chaos damage. Chaos Strike has a 197125h chance to refund 193840s1 Fury.
   SpellInfo(chaos_strike fury=40)

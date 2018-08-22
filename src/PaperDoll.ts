@@ -34,7 +34,7 @@ export type SpecializationName = "blood" | "frost" | "unholy" | "havoc"
     "arcane" | "subtlety" | "outlaw" | "assassination" | "balance" |
     "enhancement" | "elemental" | "fury" | "arms" | "windwalker";
 
-let OVALE_SPECIALIZATION_NAME: {[key in ClassId]: {[key in 1 | 2 | 3 | 4]?: SpecializationName}} = {
+export let OVALE_SPECIALIZATION_NAME: {[key in ClassId]: {[key in 1 | 2 | 3 | 4]?: SpecializationName}} = {
     DEATHKNIGHT: {
         1: "blood",
         2: "frost",

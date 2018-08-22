@@ -1217,6 +1217,13 @@ const AddDisambiguation = function(name: string, info: string, className?: strin
     AddPerClassSpecialization(EMIT_DISAMBIGUATION, name, info, className, specialization, _type);
 }
 function Disambiguate(annotation: Annotation, name: string, className: string, specialization: string, _type?: string): [string, string] {
+    if (className && annotation.dictionary[`${name}_${className}`]) {
+        return [`${name}_${className}`, _type];
+    }
+    if (specialization && annotation.dictionary[`${name}_${specialization}`]) {
+        return [`${name}_${specialization}`, _type];
+    }
+    
     let [disname, distype] = GetPerClassSpecialization(EMIT_DISAMBIGUATION, name, className, specialization);
     if (!disname) {
         if (!annotation.dictionary[name]) {

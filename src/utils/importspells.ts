@@ -1,5 +1,7 @@
 import { readFileSync, writeFileSync } from "fs";
 import { LuaObj } from "@wowts/lua";
+import { ClassId } from "@wowts/wow-mock";
+import { SpecializationName, OVALE_SPECIALIZATION_NAME } from "../PaperDoll";
 
 export interface SpellPowerData {
     id: number;
@@ -780,6 +782,8 @@ export interface SpellData {
     identifierScore?: number;
     talent?: TalentData;
     azeriteTrait?: AzeriteTrait;
+    className?: ClassId | "PET";
+    specializationName?: SpecializationName;
 }
 
 export interface SpellEffectData {
@@ -1051,6 +1055,27 @@ function getIdentifier(name: string) {
     return name.toLowerCase().replace(/^potion of (the )?/, "").replace(/ /g, '_').replace("!", "_aura").replace(/[:'()]/g, "").replace(/-/g, "_")
 }
 
+const classNames: (ClassId | "PET") [] =  [
+    "PET",
+    "WARRIOR",
+    "PALADIN",
+    "HUNTER",
+    "ROGUE",
+    "PRIEST",
+    "DEATHKNIGHT",
+    "SHAMAN",
+    "MAGE",
+    "WARLOCK",
+    "MONK",
+    "DRUID",
+    "DEMONHUNTER"
+];
+
+const classNameLength = classNames.length;
+for (let i = 1; i< classNameLength; i++) {
+    classNames[1 << (i-1)] = classNames[i];
+}
+
 export function getSpellData(directory: string) {
     let output: { [key: string]: any[][] } = {};
     let zone: any[][];
@@ -1128,12 +1153,14 @@ export function getSpellData(directory: string) {
         if (spell.rank_str === "Racial") spell.identifierScore += 3;
     }
 
-    for (const classData of output.__class_ability_data) {
+    for (let classIndex = 0; classIndex  <  output.__tree_specialization_data.length; classIndex++) {
+        const classData = output.__class_ability_data[classIndex];
         for (const category of classData) {
             for (const spellId of category) {
                 const spell = spellDataById.get(spellId);
                 if (spell) {
                     spell.identifierScore += 10;
+                    spell.className = classNames[classIndex];
                 } else {
                     console.error(`Unknown spell ${spellId}`);
                 }
@@ -1141,12 +1168,18 @@ export function getSpellData(directory: string) {
         }
     }
 
-    for (const classData of output.__tree_specialization_data) {
-        for (const category of classData) {
-            for (const spellId of category) {
+    for (let classIndex = 0; classIndex  <  output.__tree_specialization_data.length; classIndex++) {
+        const specializations = output.__tree_specialization_data[classIndex];
+        for (let specIndex = 0; specIndex < specializations.length; specIndex++) {
+            const specialization = specializations[specIndex];
+            for (const spellId of specialization) {
                 const spell = spellDataById.get(spellId);
                 if (spell) {
                     spell.identifierScore += 10;
+                    spell.className = classNames[classIndex];
+                    if (spell.className !== "PET") {
+                        spell.specializationName = OVALE_SPECIALIZATION_NAME[spell.className][<1|2|3|4>(specIndex + 1)];
+                    }
                 } else {
                     console.error(`Unknown spell ${spellId}`);
                 }
@@ -1209,7 +1242,17 @@ export function getSpellData(directory: string) {
     for (const spell of spellData) {
         if (identifiers[spell.identifier]) {
             const other = spellDataById.get(identifiers[spell.identifier]);
-            if (other.identifierScore >= spell.identifierScore) continue;
+            if (other.identifierScore === spell.identifierScore) {
+                if (other.className === spell.className && spell.specializationName) {
+                    spell.identifier += "_" + spell.specializationName.toLowerCase();
+                } else if (spell.className && spell.className !== other.className) {
+                    spell.identifier += "_" + spell.className.toLowerCase();
+                } else {
+                    continue;
+                }
+            } else if (other.identifierScore > spell.identifierScore) {
+                continue;
+            }
         } 
         identifiers[spell.identifier] = spell.id;
     }
@@ -1248,6 +1291,9 @@ export function getSpellData(directory: string) {
             identifier: getIdentifier(row[0]) + "_talent",
             talentId: 3 * row[6] + row[5] + 1
         };
+        // if (identifiers[talent.identifier]) {
+        //     talent.identifier += "_" + classNames[talent.m_class].toLowerCase();
+        // }
         identifiers[talent.identifier] = talent.id;
         talentsById.set(talent.id, talent);
         if (talent.spell_id) {

@@ -46,16 +46,16 @@ Define(divine_right_buff 278519)
 Define(divine_storm 53385)
 # Unleashes a whirl of divine energy, dealing 224239sw1 Holy damage to all nearby enemies.
   SpellInfo(divine_storm holypower=3)
-Define(execution_sentence_debuff 267799)
-# @spelldesc267798
-  SpellInfo(execution_sentence_debuff duration=12 channel=12 gcd=0 offgcd=1)
-  # s1 increased Holy damage taken from the casting Paladin.
-  SpellAddTargetDebuff(execution_sentence_debuff execution_sentence_debuff=1)
 Define(execution_sentence 267798)
 # Calls down the Light's punishment upon an enemy target, dealing s1 Holy damage and increasing the target's Holy damage taken from your attacks by 267799s1 for 267799d.
   SpellInfo(execution_sentence holypower=3 cd=30 talent=execution_sentence_talent)
   # s1 increased Holy damage taken from the casting Paladin.
   SpellAddTargetDebuff(execution_sentence execution_sentence_debuff=1)
+Define(execution_sentence_debuff 267799)
+# @spelldesc267798
+  SpellInfo(execution_sentence_debuff duration=12 channel=12 gcd=0 offgcd=1)
+  # s1 increased Holy damage taken from the casting Paladin.
+  SpellAddTargetDebuff(execution_sentence_debuff execution_sentence_debuff=1)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 265226d. 
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
@@ -75,6 +75,9 @@ Define(inquisition 84963)
   SpellInfo(inquisition holypower=1 duration=15 talent=inquisition_talent tick=15)
   # Damage done increased by w1.rnHaste increased by w3.
   SpellAddBuff(inquisition inquisition=1)
+Define(judgment_protection 275779)
+# Judges the target, dealing s1 Holy damage?a231657[, and reducing the remaining cooldown on Shield of the Righteous by 231657s1 sec, or 231657s1*2 sec on a critical strike][].
+  SpellInfo(judgment_protection cd=12)
 Define(judgment 20271)
 # Judges the target, dealing s1 Holy damage?s231663[, and causing them to take 197277s1 increased damage from your next ability that costs Holy Power.][]?s137027[rnrn|cFFFFFFFFGenerates 220637s1 Holy Power.][]
   SpellInfo(judgment cd=12)
@@ -160,7 +163,7 @@ Define(aura_mastery 31821)
 	SpellInfo(aura_mastery cd=180)
 Define(avengers_reprieve_buff 185676)
 	SpellInfo(avengers_reprieve_buff duration=10)
-Define(avengers_shield 31935)
+
 	SpellInfo(avengers_shield cd=15 cd_haste=melee travel_time=1)
 	SpellAddBuff(avengers_shield avengers_valor_buff=1)
 	SpellAddBuff(avengers_shield avengers_reprieve_buff=1 itemset=T18 itemcount=2 specialization=protection)
