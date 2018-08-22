@@ -10,20 +10,18 @@ __exports.Variables = __class(nil, {
     InitializeState = function(self)
         self.futureVariable = {}
         self.futureLastEnable = {}
-        self.variable = {}
-        self.lastEnable = {}
-    end,
-    ResetState = function(self)
-        for k in pairs(self.futureVariable) do
-            self.futureVariable[k] = nil
-            self.futureLastEnable[k] = nil
-        end
         if  not baseState.current.inCombat then
             for k in pairs(self.variable) do
                 self:Log("Resetting state variable '%s'.", k)
                 self.variable[k] = nil
                 self.lastEnable[k] = nil
             end
+        end
+    end,
+    ResetState = function(self)
+        for k in pairs(self.futureVariable) do
+            self.futureVariable[k] = nil
+            self.futureLastEnable[k] = nil
         end
     end,
     CleanState = function(self)
@@ -73,8 +71,8 @@ __exports.Variables = __class(nil, {
         self.isInitialized = false
         self.futureVariable = nil
         self.futureLastEnable = nil
-        self.variable = nil
-        self.lastEnable = nil
+        self.variable = {}
+        self.lastEnable = {}
     end
 })
 __exports.variables = __exports.Variables()

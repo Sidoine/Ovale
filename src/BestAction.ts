@@ -305,7 +305,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         if (element && element.type == "state") {
             let [variable, value] = [element.positionalParams[1], element.positionalParams[2]];
             let isFuture = !timeSpan.HasTime(atTime);
-            variables.PutState(<string>variable, <string>value, isFuture, atTime);
+            variables.PutState(<string>variable, <number>value, isFuture, atTime);
         }
         this.StopProfiling("OvaleBestAction_GetAction");
         return [timeSpan, element];
@@ -794,8 +794,16 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         this.StartProfiling("OvaleBestAction_Compute");
         let result = element;
         assert(element.func == "setstate");
+        const name = element.positionalParams[1] as string;
+        const value = element.positionalParams[2] as number;
         OvaleBestAction.Log("[%d]    %s: %s = %s", element.nodeId, element.name, element.positionalParams[1], element.positionalParams[2]);
-        let timeSpan = GetTimeSpan(element, UNIVERSE);
+        const currentValue = variables.GetState(name);
+        let timeSpan;
+        if (currentValue !== value) {
+            timeSpan = GetTimeSpan(element, UNIVERSE);
+        } else {
+            timeSpan = EMPTY_SET;
+        }
         this.StopProfiling("OvaleBestAction_Compute");
         return [timeSpan, result];
     }

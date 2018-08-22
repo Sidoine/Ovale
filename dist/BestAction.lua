@@ -660,8 +660,16 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
             self:StartProfiling("OvaleBestAction_Compute")
             local result = element
             assert(element.func == "setstate")
+            local name = element.positionalParams[1]
+            local value = element.positionalParams[2]
             __exports.OvaleBestAction:Log("[%d]    %s: %s = %s", element.nodeId, element.name, element.positionalParams[1], element.positionalParams[2])
-            local timeSpan = GetTimeSpan(element, UNIVERSE)
+            local currentValue = variables:GetState(name)
+            local timeSpan
+            if currentValue ~= value then
+                timeSpan = GetTimeSpan(element, UNIVERSE)
+            else
+                timeSpan = EMPTY_SET
+            end
             self:StopProfiling("OvaleBestAction_Compute")
             return timeSpan, result
         end

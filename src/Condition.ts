@@ -124,6 +124,6 @@ export function TestValue(start: number, ending: number, value: number, origin: 
     return undefined;
 }
 
-export function Compare(value: number, comparator: string, limit: number) {
+export function Compare(value: number, comparator: string, limit: number): ConditionResult {
     return TestValue(0, INFINITY, value, 0, 0, comparator, limit);
 }

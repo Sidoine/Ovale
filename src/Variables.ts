@@ -5,28 +5,26 @@ import { baseState } from "./BaseState";
 export class Variables implements StateModule {
     isState = true;
     isInitialized = false;
-    futureVariable: LuaObj<any> = undefined;
+    futureVariable: LuaObj<number> = undefined;
     futureLastEnable: LuaObj<number> = undefined;
-    variable:LuaObj<any> = undefined;
-    lastEnable: LuaObj<number> = undefined;
+    variable:LuaObj<number> = {};
+    lastEnable: LuaObj<number> = {}
     
     InitializeState() {
         this.futureVariable = {}
         this.futureLastEnable = {}
-        this.variable = {}
-        this.lastEnable = {}
-    }
-    ResetState() {
-        for (const [k] of pairs(this.futureVariable)) {
-            this.futureVariable[k] = undefined;
-            this.futureLastEnable[k] = undefined;
-        }
         if (!baseState.current.inCombat) {
             for (const [k] of pairs(this.variable)) {
                 this.Log("Resetting state variable '%s'.", k);
                 this.variable[k] = undefined;
                 this.lastEnable[k] = undefined;
             }
+        }
+    }
+    ResetState() {
+        for (const [k] of pairs(this.futureVariable)) {
+            this.futureVariable[k] = undefined;
+            this.futureLastEnable[k] = undefined;
         }
     }
     CleanState() {
@@ -51,7 +49,7 @@ export class Variables implements StateModule {
         let lastEnable = this.futureLastEnable[name] || this.lastEnable[name] || baseState.next.currentTime;
         return baseState.next.currentTime - lastEnable;
     }
-    PutState (name: string, value: string, isFuture: boolean, atTime: number) {
+    PutState(name: string, value: number, isFuture: boolean, atTime: number) {
         if (isFuture) {
             let oldValue = this.GetState(name);
             if (value != oldValue) {

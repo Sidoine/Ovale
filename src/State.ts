@@ -44,12 +44,16 @@ class OvaleStateClass extends OvaleStateBaseClass {
         self_stateAddons = stateModules;
         stateAddon.CleanState();
     }
+    
+    /** Called each time the script is executed */
     InitializeState() {
         const iterator = self_stateAddons.Iterator();
         while (iterator.Next()) {
             iterator.value.InitializeState();
         }
     }
+
+    /** Called at the start of each AddIcon command */
     ResetState() {
         const iterator = self_stateAddons.Iterator();
         while (iterator.Next()) {
