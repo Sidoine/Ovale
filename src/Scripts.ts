@@ -46,8 +46,10 @@ let DISABLED_DESCRIPTION = L["Disabled"];
     OvaleOptions.RegisterOptions(OvaleScripts);
 }
 
+export type ScriptType = "script" | "include";
+
 interface Script {
-    type?: string;
+    type?: ScriptType;
     desc?: string;
     className?: string;
     specialization?: string;
@@ -76,10 +78,10 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
     }
     Ovale_StanceChanged(event: string, newStance: string, oldStance: string) {
     }
-    GetDescriptions(scriptType: string) {
+    GetDescriptions(scriptType: ScriptType | undefined) {
         let descriptionsTable: LuaObj<string> = {}
         for (const [name, script] of pairs(this.script)) {
-            if ((!scriptType || script.type == scriptType) 
+            if ((!scriptType || script.type === scriptType) 
             && (!script.className || script.className === Ovale.playerClass)
             && (!script.specialization || OvalePaperDoll.IsSpecialization(script.specialization))) {
                 if (name == DEFAULT_NAME) {
@@ -91,7 +93,7 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
         }
         return descriptionsTable;
     }
-    RegisterScript(className: string, specialization: string, name: string, description: string, code: string, scriptType: "script" | "include") {
+    RegisterScript(className: string, specialization: string, name: string, description: string, code: string, scriptType: ScriptType) {
         this.script[name] = this.script[name] || {};
         let script = this.script[name];
         script.type = scriptType || "script";
@@ -170,7 +172,7 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
                     name: L["Script"],
                     width: "double",
                     values: (info: any) => {
-                        let scriptType = !Ovale.db.profile.showHiddenScripts && "script";
+                        const scriptType = (!Ovale.db.profile.showHiddenScripts && "script") || undefined;
                         return OvaleScripts.GetDescriptions(scriptType);
                     },
                     get: (info: any) => {

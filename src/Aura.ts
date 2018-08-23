@@ -665,7 +665,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
                         break;
                     }
                 } else {
-                    let casterGUID = OvaleGUID.UnitGUID(unitCaster);
+                    const casterGUID = unitCaster && OvaleGUID.UnitGUID(unitCaster);
                     if (debuffType == "") {
                         debuffType = "Enrage";
                     }
@@ -715,7 +715,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
                 if (targetGUID) {
                     guid = targetGUID;
                     const [unitIdForGuid] = OvaleGUID.GUIDUnit(guid);
-                    unitId = unitIdForGuid!;
+                    unitId = unitIdForGuid;
                 } else {
                     unitId = baseState.next.defaultTarget || "target";
                 }
@@ -730,7 +730,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
                 filter = (strsub(requirement, 1, 4) == "buff") && "HELPFUL" || "HARMFUL";
                 mine = !(strsub(requirement, -4) == "_any");
             }
-            guid = guid || OvaleGUID.UnitGUID(unitId)!;
+            guid = guid || OvaleGUID.UnitGUID(unitId);
             let aura = this.GetAuraByGUID(guid, buffId, filter, mine, atTime);
             let isActiveAura = this.IsActiveAura(aura, atTime) && aura.stacks >= stacks;
             if (!isBang && isActiveAura || isBang && !isActiveAura) {

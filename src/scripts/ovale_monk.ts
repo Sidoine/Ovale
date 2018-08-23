@@ -576,7 +576,7 @@ AddFunction WindwalkerSerenityMainActions
  unless WindwalkerCdMainPostConditions()
  {
   #rushing_jade_wind,if=talent.rushing_jade_wind.enabled&!prev_gcd.1.rushing_jade_wind&buff.rushing_jade_wind.down
-  if Talent(rushing_jade_wind_talent) and not PreviousGCDSpell(rushing_jade_wind_windwalker) and BuffExpires(rushing_jade_wind_windwalker_buff) Spell(rushing_jade_wind_windwalker)
+  if Talent(rushing_jade_wind_talent_windwalker) and not PreviousGCDSpell(rushing_jade_wind_windwalker) and BuffExpires(rushing_jade_wind_windwalker_buff) Spell(rushing_jade_wind_windwalker)
   #rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains
   Spell(rising_sun_kick)
   #fists_of_fury,if=prev_gcd.1.rising_sun_kick&prev_gcd.2.serenity
@@ -613,7 +613,7 @@ AddFunction WindwalkerSerenityShortCdActions
   #call_action_list,name=cd
   WindwalkerCdShortCdActions()
 
-  unless WindwalkerCdShortCdPostConditions() or Talent(rushing_jade_wind_talent) and not PreviousGCDSpell(rushing_jade_wind_windwalker) and BuffExpires(rushing_jade_wind_windwalker_buff) and Spell(rushing_jade_wind_windwalker)
+  unless WindwalkerCdShortCdPostConditions() or Talent(rushing_jade_wind_talent_windwalker) and not PreviousGCDSpell(rushing_jade_wind_windwalker) and BuffExpires(rushing_jade_wind_windwalker_buff) and Spell(rushing_jade_wind_windwalker)
   {
    #serenity
    Spell(serenity)
@@ -623,7 +623,7 @@ AddFunction WindwalkerSerenityShortCdActions
 
 AddFunction WindwalkerSerenityShortCdPostConditions
 {
- not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and not BuffPresent(serenity_buff) and Spell(tiger_palm) or WindwalkerCdShortCdPostConditions() or Talent(rushing_jade_wind_talent) and not PreviousGCDSpell(rushing_jade_wind_windwalker) and BuffExpires(rushing_jade_wind_windwalker_buff) and Spell(rushing_jade_wind_windwalker) or Spell(rising_sun_kick) or PreviousGCDSpell(rising_sun_kick) and PreviousGCDSpell(serenity count=2) and Spell(fists_of_fury) or Spell(rising_sun_kick) or not PreviousGCDSpell(blackout_kick_windwalker) and SpellCooldown(rising_sun_kick) >= 2 and SpellCooldown(fists_of_fury) >= 2 and Spell(blackout_kick_windwalker) or { not HasEquippedItem(drinking_horn_cover_item) or BuffPresent(burst_haste_buff any=1) or BuffRemaining(serenity_buff) < 1 } and { SpellCooldown(rising_sun_kick) > 1 or Enemies() > 1 } and Spell(fists_of_fury) or Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or Enemies() >= 3 and Spell(rising_sun_kick) or not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or not PreviousGCDSpell(blackout_kick_windwalker) and Spell(blackout_kick_windwalker)
+ not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and not BuffPresent(serenity_buff) and Spell(tiger_palm) or WindwalkerCdShortCdPostConditions() or Talent(rushing_jade_wind_talent_windwalker) and not PreviousGCDSpell(rushing_jade_wind_windwalker) and BuffExpires(rushing_jade_wind_windwalker_buff) and Spell(rushing_jade_wind_windwalker) or Spell(rising_sun_kick) or PreviousGCDSpell(rising_sun_kick) and PreviousGCDSpell(serenity count=2) and Spell(fists_of_fury) or Spell(rising_sun_kick) or not PreviousGCDSpell(blackout_kick_windwalker) and SpellCooldown(rising_sun_kick) >= 2 and SpellCooldown(fists_of_fury) >= 2 and Spell(blackout_kick_windwalker) or { not HasEquippedItem(drinking_horn_cover_item) or BuffPresent(burst_haste_buff any=1) or BuffRemaining(serenity_buff) < 1 } and { SpellCooldown(rising_sun_kick) > 1 or Enemies() > 1 } and Spell(fists_of_fury) or Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or Enemies() >= 3 and Spell(rising_sun_kick) or not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or not PreviousGCDSpell(blackout_kick_windwalker) and Spell(blackout_kick_windwalker)
 }
 
 AddFunction WindwalkerSerenityCdActions
@@ -637,7 +637,7 @@ AddFunction WindwalkerSerenityCdActions
 
 AddFunction WindwalkerSerenityCdPostConditions
 {
- BuffPresent(burst_haste_buff any=1) and not BuffPresent(serenity_buff) and Spell(fist_of_the_white_tiger) or not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and not BuffPresent(serenity_buff) and Spell(tiger_palm) or WindwalkerCdCdPostConditions() or Talent(rushing_jade_wind_talent) and not PreviousGCDSpell(rushing_jade_wind_windwalker) and BuffExpires(rushing_jade_wind_windwalker_buff) and Spell(rushing_jade_wind_windwalker) or Spell(serenity) or Spell(rising_sun_kick) or PreviousGCDSpell(rising_sun_kick) and PreviousGCDSpell(serenity count=2) and Spell(fists_of_fury) or Spell(rising_sun_kick) or not PreviousGCDSpell(blackout_kick_windwalker) and SpellCooldown(rising_sun_kick) >= 2 and SpellCooldown(fists_of_fury) >= 2 and Spell(blackout_kick_windwalker) or { not HasEquippedItem(drinking_horn_cover_item) or BuffPresent(burst_haste_buff any=1) or BuffRemaining(serenity_buff) < 1 } and { SpellCooldown(rising_sun_kick) > 1 or Enemies() > 1 } and Spell(fists_of_fury) or Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or Enemies() >= 3 and Spell(rising_sun_kick) or not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or not PreviousGCDSpell(blackout_kick_windwalker) and Spell(blackout_kick_windwalker)
+ BuffPresent(burst_haste_buff any=1) and not BuffPresent(serenity_buff) and Spell(fist_of_the_white_tiger) or not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and not BuffPresent(serenity_buff) and Spell(tiger_palm) or WindwalkerCdCdPostConditions() or Talent(rushing_jade_wind_talent_windwalker) and not PreviousGCDSpell(rushing_jade_wind_windwalker) and BuffExpires(rushing_jade_wind_windwalker_buff) and Spell(rushing_jade_wind_windwalker) or Spell(serenity) or Spell(rising_sun_kick) or PreviousGCDSpell(rising_sun_kick) and PreviousGCDSpell(serenity count=2) and Spell(fists_of_fury) or Spell(rising_sun_kick) or not PreviousGCDSpell(blackout_kick_windwalker) and SpellCooldown(rising_sun_kick) >= 2 and SpellCooldown(fists_of_fury) >= 2 and Spell(blackout_kick_windwalker) or { not HasEquippedItem(drinking_horn_cover_item) or BuffPresent(burst_haste_buff any=1) or BuffRemaining(serenity_buff) < 1 } and { SpellCooldown(rising_sun_kick) > 1 or Enemies() > 1 } and Spell(fists_of_fury) or Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or Enemies() >= 3 and Spell(rising_sun_kick) or not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or not PreviousGCDSpell(blackout_kick_windwalker) and Spell(blackout_kick_windwalker)
 }
 
 ### actions.sef
@@ -1147,7 +1147,7 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # paralysis
 # quaking_palm
 # rising_sun_kick
-# rushing_jade_wind_talent
+# rushing_jade_wind_talent_windwalker
 # rushing_jade_wind_windwalker
 # rushing_jade_wind_windwalker_buff
 # serenity

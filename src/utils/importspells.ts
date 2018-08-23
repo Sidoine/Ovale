@@ -3,6 +3,96 @@ import { LuaObj } from "@wowts/lua";
 import { ClassId } from "@wowts/wow-mock";
 import { SpecializationName, OVALE_SPECIALIZATION_NAME } from "../PaperDoll";
 
+const specIds = {
+    SPEC_NONE              : 0,
+    SPEC_PET               : 1,
+    PET_FEROCITY           : 535,
+    PET_TENACITY           : 537,
+    PET_CUNNING            : 536,
+    WARRIOR_ARMS           : 71,
+    WARRIOR_FURY           : 72,
+    WARRIOR_PROTECTION     : 73,
+    PALADIN_HOLY           : 65,
+    PALADIN_PROTECTION     : 66,
+    PALADIN_RETRIBUTION    : 70,
+    HUNTER_BEAST_MASTERY   : 253,
+    HUNTER_MARKSMANSHIP    : 254,
+    HUNTER_SURVIVAL        : 255,
+    ROGUE_ASSASSINATION    : 259,
+    ROGUE_OUTLAW           : 260,
+    ROGUE_SUBTLETY         : 261,
+    PRIEST_DISCIPLINE      : 256,
+    PRIEST_HOLY            : 257,
+    PRIEST_SHADOW          : 258,
+    DEATH_KNIGHT_BLOOD     : 250,
+    DEATH_KNIGHT_FROST     : 251,
+    DEATH_KNIGHT_UNHOLY    : 252,
+    SHAMAN_ELEMENTAL       : 262,
+    SHAMAN_ENHANCEMENT     : 263,
+    SHAMAN_RESTORATION     : 264,
+    MAGE_ARCANE            : 62,
+    MAGE_FIRE              : 63,
+    MAGE_FROST             : 64,
+    WARLOCK_AFFLICTION     : 265,
+    WARLOCK_DEMONOLOGY     : 266,
+    WARLOCK_DESTRUCTION    : 267,
+    MONK_BREWMASTER        : 268,
+    MONK_MISTWEAVER        : 270,
+    MONK_WINDWALKER        : 269,
+    DRUID_BALANCE          : 102,
+    DRUID_FERAL            : 103,
+    DRUID_GUARDIAN         : 104,
+    DRUID_RESTORATION      : 105,
+    DEMON_HUNTER_HAVOC     : 577,
+    DEMON_HUNTER_VENGEANCE : 581,
+};
+
+const specIdToName: { [k in keyof typeof specIds]?: SpecializationName } = {
+    DEATH_KNIGHT_BLOOD: "blood",
+    DEATH_KNIGHT_FROST: "frost",
+    DEATH_KNIGHT_UNHOLY: "unholy",
+    DEMON_HUNTER_HAVOC: "havoc",
+    DEMON_HUNTER_VENGEANCE: "vengeance",
+    DRUID_BALANCE: "balance",
+    DRUID_FERAL: "feral",
+    DRUID_GUARDIAN: "guardian",
+    DRUID_RESTORATION: "restoration",
+    HUNTER_BEAST_MASTERY: "beast_mastery",
+    HUNTER_MARKSMANSHIP: "marksmanship",
+    HUNTER_SURVIVAL: "survival",
+    MAGE_ARCANE: "arcane",
+    MAGE_FIRE: "fire",
+    MAGE_FROST: "frost",
+    MONK_BREWMASTER: "brewmaster",
+    MONK_MISTWEAVER: "mistweaver",
+    MONK_WINDWALKER: "windwalker",
+    PALADIN_HOLY: "holy",
+    PALADIN_PROTECTION: "protection",
+    PALADIN_RETRIBUTION: "retribution",
+    PRIEST_DISCIPLINE: "discipline",
+    PRIEST_HOLY: "holy",
+    PRIEST_SHADOW: "shadow",
+    ROGUE_ASSASSINATION: "assassination",
+    ROGUE_OUTLAW: "outlaw",
+    ROGUE_SUBTLETY: "subtlety",
+    SHAMAN_ELEMENTAL: "elemental",
+    SHAMAN_ENHANCEMENT: "enhancement",
+    SHAMAN_RESTORATION: "restoration",
+    WARLOCK_AFFLICTION: "affliction",
+    WARLOCK_DEMONOLOGY: "demonology",
+    WARLOCK_DESTRUCTION: "destruction",
+    WARRIOR_ARMS: "arms",
+    WARRIOR_FURY: "fury",
+    WARRIOR_PROTECTION: "protection"
+}
+
+
+const specIdToSpecName = new Map<number, SpecializationName>();
+for (const key in specIdToName) {
+    const k = key as keyof typeof specIds;
+    specIdToSpecName.set(specIds[k], specIdToName[k]);
+}
+
 export interface SpellPowerData {
     id: number;
     spell_id: number;
@@ -919,6 +1009,7 @@ export interface ItemData {
 export interface AzeriteTrait {
     id: number;
     spellId: number;
+    bonusId: number
     name: string;
     identifier: string;
 }
@@ -1052,6 +1143,7 @@ function readFile(directory:string, fileName: string, zone: any[][], output: { [
 
 function getIdentifier(name: string) {
     if (!name) return name;
+    if (typeof (name) !== "string") return name;
     return name.toLowerCase().replace(/^potion of (the )?/, "").replace(/ /g, '_').replace("!", "_aura").replace(/[:'()]/g, "").replace(/-/g, "_")
 }
 
@@ -1071,9 +1163,10 @@ const classNames: (ClassId | "PET") [] =  [
     "DEMONHUNTER"
 ];
 
-const classNameLength = classNames.length;
-for (let i = 1; i< classNameLength; i++) {
-    classNames[1 << (i-1)] = classNames[i];
+const classBitToNumber: ClassId[] = [];
+for (let i = 1; i < classNames.length; i++) {
+    const className = classNames[i];
+    if (className !== "PET") classBitToNumber[1 << (i-1)] = className;
 }
 
 export function getSpellData(directory: string) {
@@ -1280,7 +1373,7 @@ export function getSpellData(directory: string) {
     for (const row of output.talent_data_t) {
         const talent: TalentData = {
             name: row[0],
-            id: row[1],
+            id: parseInt(row[1]),
             flags: row[2],
             m_class: row[3],
             spec: row[4],
@@ -1291,9 +1384,14 @@ export function getSpellData(directory: string) {
             identifier: getIdentifier(row[0]) + "_talent",
             talentId: 3 * row[6] + row[5] + 1
         };
-        // if (identifiers[talent.identifier]) {
-        //     talent.identifier += "_" + classNames[talent.m_class].toLowerCase();
-        // }
+        if (identifiers[talent.identifier]) {
+            if (talent.spec) {
+                const specName = specIdToSpecName.get(talent.spec);
+                talent.identifier += "_" + specName;
+            } else {
+                talent.identifier += "_" + classBitToNumber[talent.m_class].toLowerCase();
+            }
+        }
         identifiers[talent.identifier] = talent.id;
         talentsById.set(talent.id, talent);
         if (talent.spell_id) {
@@ -1309,8 +1407,9 @@ export function getSpellData(directory: string) {
         const talent: AzeriteTrait = {
             id: row[0],
             spellId: row[1],
-            name: row[2],
-            identifier: getIdentifier(row[2]) + "_trait"
+            bonusId: row[2],
+            name: row[3],
+            identifier: getIdentifier(row[3]) + "_trait"
         };
         identifiers[talent.identifier] = talent.id;
         azeriteTraitById.set(talent.id, talent);

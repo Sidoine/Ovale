@@ -116,22 +116,22 @@ Define(war_stomp 20549)
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
   # Stunned.
   SpellAddTargetDebuff(war_stomp war_stomp=1)
-Define(crusaders_judgment_talent 5)
-# Judgment now has 1+s1 charges, and Grand Crusader now also grants a charge of Judgment.
-Define(seraphim_talent 21)
-# The Light temporarily magnifies your power, increasing your Haste, Critical Strike, Mastery, and Versatility by s1.rnrnConsumes up to s2 charges of Shield of the Righteous, and lasts d per charge.
-Define(crusade_talent 20)
+Define(crusade_talent 20) #22215
 # Call upon the Light and begin a crusade, increasing your damage done and Haste by <damage> for d.rnrnEach Holy Power spent during Crusade increases damage done and Haste by an additional <damage>.rnrnMaximum u stacks.
-Define(divine_judgment_talent 10)
+Define(crusaders_judgment_talent 5) #22604
+# Judgment now has 1+s1 charges, and Grand Crusader now also grants a charge of Judgment.
+Define(divine_judgment_talent 10) #22375
 # Each enemy hit by an ability that consumes Holy Power increases the damage of your next Judgment by 271581s1, stacking up to 271581u times.
-Define(execution_sentence_talent 3)
+Define(execution_sentence_talent 3) #22175
 # Calls down the Light's punishment upon an enemy target, dealing s1 Holy damage and increasing the target's Holy damage taken from your attacks by 267799s1 for 267799d.
-Define(hammer_of_wrath_talent 6)
+Define(hammer_of_wrath_talent 6) #22593
 # Hurls a divine hammer that strikes an enemy for s1 Holy damage. Only usable on enemies that have less than 20 health, or while you are empowered by ?s231895[Crusade][Avenging Wrath].rnrn|cFFFFFFFFGenerates s2 Holy Power.
-Define(inquisition_talent 21)
+Define(inquisition_talent 21) #22634
 # Consumes up to 3 Holy Power to increase your damage done and Haste by s1.rnrnLasts d per Holy Power consumed.
-Define(righteous_verdict_talent 2)
+Define(righteous_verdict_talent 2) #22557
 # Templar's Verdict increases the damage of your next Templar's Verdict by 267611s1 for 267611d.
+Define(seraphim_talent 21) #22645
+# The Light temporarily magnifies your power, increasing your Haste, Critical Strike, Mastery, and Versatility by s1.rnrnConsumes up to s2 charges of Shield of the Righteous, and lasts d per charge.
 Define(divine_right_trait 277678)
     `;
 // END

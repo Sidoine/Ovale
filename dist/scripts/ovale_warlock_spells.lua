@@ -207,76 +207,76 @@ Define(vile_taint 278350)
   SpellInfo(vile_taint soulshards=1 cd=20 duration=10 talent=vile_taint_talent tick=2)
   # Suffering w1 Shadow damage every t1 sec.rnMovement slowed by s2.
   SpellAddTargetDebuff(vile_taint vile_taint=1)
-Define(absolute_corruption_talent 5)
+Define(absolute_corruption_talent 5) #21180
 # Corruption is now permanent and deals s2 increased damage.rnrnDuration reduced to s1 sec against players.
-Define(creeping_death_talent 20)
-# Your Agony, Corruption, Siphon Life, and Unstable Affliction deal their full damage s1 faster.
-Define(dark_soul_misery_talent 21)
-# Infuses your soul with the misery of fallen foes, increasing haste by s1 for d.
-Define(deathbolt_talent 3)
-# Launches a bolt of death at the target, dealing s2 of the total remaining damage of your damage over time effects on the target.?s196103[rnrnCounts up to s3 sec of your Corruption's damage.][]
-Define(grimoire_of_sacrifice_talent 18)
-# Sacrifices your demon pet for power, gaining its command demon ability, and causing your spells to sometimes also deal 196100s1 additional Shadow damage.rnrnLasts 196099d or until you summon a demon pet.
-Define(haunt_talent 17)
-# A ghostly soul haunts the target, dealing s1 Shadow damage and increasing your damage dealt to the target by s2 for d.rnrnIf the target dies, Haunt's cooldown is reset.
-Define(phantom_singularity_talent 11)
-# Places a phantom singularity above the target, which consumes the life of all enemies within 205246A2 yards, dealing 8*205246s2 damage over d, healing you for 205246e2*100 of the damage done.
-Define(shadow_embrace_talent 16)
-# ?s198590[Drain Soul][Shadow Bolt] applies Shadow Embrace, increasing your damage dealt to the target by 32390s1 for 32390d. Stacks up to 32390u times.
-Define(siphon_life_talent 6)
-# Siphons the target's life essence, dealing o1 Shadow damage over d and healing you for e1*100 of the damage done.
-Define(sow_the_seeds_talent 10)
-# Seed of Corruption now @switch<s2>[][consumes a Soul Shard, if available, to ]embeds a demon seed into s1 additional nearby enemy.
-Define(vile_taint_talent 12)
-# Unleashes a vile explosion at the target location, dealing o1 Shadow damage over d to all enemies within a1 yds and reducing their movement speed by s2.
-Define(writhe_in_agony_talent 4)
-# Agony's damage may now ramp up to s2 stacks.
-Define(bilescourge_bombers_talent 3)
+Define(bilescourge_bombers_talent 3) #23138
 # Tear open a portal to the nether above the target location, from which several Bilescourge will pour out of and crash into the ground over d, dealing 267213s1 Shadow damage to all enemies within 267213A1 yards.
-Define(demonic_calling_talent 4)
-# Shadow Bolt?s264178[ and Demonbolt have][ has] a h chance to make your next Call Dreadstalkers cost s1 less Soul Shard and have no cast time.
-Define(doom_talent 6)
-# Inflicts impending doom upon the target, causing 265469s1 Shadow damage after d. rnrnIf Doom kills the target, there is a s2 chance to summon a Doomguard to fight for you for 280365d.rnrn|cFFFFFFFFGenerates 1 Soul Shard when dealing damage.|r
-Define(inner_demons_talent 17)
-# You passively summon a Wild Imp to fight for you every t1 sec, and have a s1 chance to also summon an additional Demon to fight for you for s2 sec.
-Define(nether_portal_talent 21)
-# Tear open a portal to the Twisting Nether for d. Every time you spend Soul Shards, you will also command demons from the Nether to come out and fight for you.
-Define(power_siphon_talent 5)
-# Instantly sacrifice up to s1 Wild Imps to generate s1 charges of Demonic Core.
-Define(summon_vilefiend_talent 12)
-# Summon a Vilefiend to fight for you for the next d.
-Define(cataclysm_talent 12)
+Define(cataclysm_talent 12) #23143
 # Calls forth a cataclysm at the target location, dealing s1 Shadowflame damage to all enemies within A1 yards and afflicting them with ?s980[Agony and Unstable Affliction][]?s104315[Corruption][]?s348[Immolate][]?!s980&!s104315&!s348[Agony, Unstable Affliction, Corruption, or Immolate][].
-Define(channel_demonfire_talent 20)
+Define(channel_demonfire_talent 20) #23144
 # Launches s1 bolts of felfire over d at random targets afflicted by your Immolate within 196449A1 yds. Each bolt deals 196448s1 Fire damage to the target and 196448s2 Fire damage to nearby enemies.
-Define(dark_soul_instability_talent 21)
+Define(creeping_death_talent 20) #19281
+# Your Agony, Corruption, Siphon Life, and Unstable Affliction deal their full damage s1 faster.
+Define(dark_soul_instability_talent 21) #23092
 # Infuses your soul with unstable power, increasing your critical strike chance by 113858s1 for 113858d.?s56228[rnrn|cFFFFFFFFPassive:|rrnIncreases your critical strike chance by 113858m1/56228m1. This effect is disabled while on cooldown.][]
-Define(eradication_talent 2)
-# Chaos Bolt increases the damage you deal to the target by 196414s1 for 196414d.
-Define(fire_and_brimstone_talent 11)
-# Incinerate now also hits all enemies near your target for s1 damage and generates s2 Soul Shard Fragment for each additional enemy hit.
-Define(flashover_talent 1)
-# Conflagrate deals s3 increased damage and grants an additional charge of Backdraft.
-Define(grimoire_of_supremacy_talent 17)
-# While you have an Infernal active, every Soul Shard you spend increases the damage of your Chaos Bolt by 266091s1.
-Define(inferno_talent 10)
-# Rain of Fire damage has a s1 chance to generate a Soul Shard Fragment.
-Define(internal_combustion_talent 5)
-# Chaos Bolt consumes up to s1 sec of Immolate's damage over time effect on your target, instantly dealing that much damage.
-Define(roaring_blaze_talent 16)
-# Conflagrate burns the target for an additional 265931o1 Fire damage over 265931d.
-Define(soul_fire_talent 3)
-# Burns the enemy's soul, dealing s1 Fire damage.rnrnCooldown is reduced by <cdr> sec for every Soul Shard you spend.rnrn|cFFFFFFFFGenerates 281490s1 Soul Shard Fragments.|r
-Define(demonic_strength_talent 2)
+Define(dark_soul_misery_talent 21) #19293
+# Infuses your soul with the misery of fallen foes, increasing haste by s1 for d.
+Define(deathbolt_talent 3) #23141
+# Launches a bolt of death at the target, dealing s2 of the total remaining damage of your damage over time effects on the target.?s196103[rnrnCounts up to s3 sec of your Corruption's damage.][]
+Define(demonic_calling_talent 4) #22045
+# Shadow Bolt?s264178[ and Demonbolt have][ has] a h chance to make your next Call Dreadstalkers cost s1 less Soul Shard and have no cast time.
+Define(demonic_strength_talent 2) #22048
 # Infuse your Felguard with demonic strength and command it to charge your target and unleash a Felstorm that will deal s2 increased damage.
-Define(drain_soul_talent 2)
+Define(doom_talent 6) #23158
+# Inflicts impending doom upon the target, causing 265469s1 Shadow damage after d. rnrnIf Doom kills the target, there is a s2 chance to summon a Doomguard to fight for you for 280365d.rnrn|cFFFFFFFFGenerates 1 Soul Shard when dealing damage.|r
+Define(drain_soul_talent 2) #23140
 # Drains the target's soul, causing o1 Shadow damage over d.rnrnDamage is increased by s2 against enemies below s3 health.rnrn|cFFFFFFFFGenerates 1 Soul Shard if the target dies during this effect.|r
-Define(grimoire_felguard_talent 18)
+Define(eradication_talent 2) #22090
+# Chaos Bolt increases the damage you deal to the target by 196414s1 for 196414d.
+Define(fire_and_brimstone_talent 11) #22043
+# Incinerate now also hits all enemies near your target for s1 damage and generates s2 Soul Shard Fragment for each additional enemy hit.
+Define(flashover_talent 1) #22038
+# Conflagrate deals s3 increased damage and grants an additional charge of Backdraft.
+Define(grimoire_of_sacrifice_talent 18) #19295
+# Sacrifices your demon pet for power, gaining its command demon ability, and causing your spells to sometimes also deal 196100s1 additional Shadow damage.rnrnLasts 196099d or until you summon a demon pet.
+Define(grimoire_of_supremacy_talent 17) #23156
+# While you have an Infernal active, every Soul Shard you spend increases the damage of your Chaos Bolt by 266091s1.
+Define(grimoire_felguard_talent 18) #21717
 # Summons a Felguard who attacks the target for s1 sec that deals 216187s1 increased damage.rnrnThis Felguard will stun their target when summoned.
-Define(shadowburn_talent 6)
+Define(haunt_talent 17) #23159
+# A ghostly soul haunts the target, dealing s1 Shadow damage and increasing your damage dealt to the target by s2 for d.rnrnIf the target dies, Haunt's cooldown is reset.
+Define(inferno_talent 10) #22480
+# Rain of Fire damage has a s1 chance to generate a Soul Shard Fragment.
+Define(inner_demons_talent 17) #23146
+# You passively summon a Wild Imp to fight for you every t1 sec, and have a s1 chance to also summon an additional Demon to fight for you for s2 sec.
+Define(internal_combustion_talent 5) #21695
+# Chaos Bolt consumes up to s1 sec of Immolate's damage over time effect on your target, instantly dealing that much damage.
+Define(nether_portal_talent 21) #23091
+# Tear open a portal to the Twisting Nether for d. Every time you spend Soul Shards, you will also command demons from the Nether to come out and fight for you.
+Define(phantom_singularity_talent 11) #19292
+# Places a phantom singularity above the target, which consumes the life of all enemies within 205246A2 yards, dealing 8*205246s2 damage over d, healing you for 205246e2*100 of the damage done.
+Define(power_siphon_talent 5) #21694
+# Instantly sacrifice up to s1 Wild Imps to generate s1 charges of Demonic Core.
+Define(roaring_blaze_talent 16) #23155
+# Conflagrate burns the target for an additional 265931o1 Fire damage over 265931d.
+Define(shadow_embrace_talent 16) #23139
+# ?s198590[Drain Soul][Shadow Bolt] applies Shadow Embrace, increasing your damage dealt to the target by 32390s1 for 32390d. Stacks up to 32390u times.
+Define(shadowburn_talent 6) #23157
 # Blasts a target for s1 Shadowflame damage. rnrnIf the target dies within d and yields experience or honor, Shadowburn's cooldown is reset.rnrn|cFFFFFFFFGenerates 245731s1 Soul Shard Fragments.|r
-Define(soul_strike_talent 11)
+Define(siphon_life_talent 6) #22089
+# Siphons the target's life essence, dealing o1 Shadow damage over d and healing you for e1*100 of the damage done.
+Define(soul_fire_talent 3) #22040
+# Burns the enemy's soul, dealing s1 Fire damage.rnrnCooldown is reduced by <cdr> sec for every Soul Shard you spend.rnrn|cFFFFFFFFGenerates 281490s1 Soul Shard Fragments.|r
+Define(soul_strike_talent 11) #22042
 # Command your Felguard to strike into the soul of its enemy, dealing <damage> Shadow damage.?c2[rnrn|cFFFFFFFFGenerates 1 Soul Shard.|r][]
+Define(sow_the_seeds_talent 10) #19279
+# Seed of Corruption now @switch<s2>[][consumes a Soul Shard, if available, to ]embeds a demon seed into s1 additional nearby enemy.
+Define(summon_vilefiend_talent 12) #23160
+# Summon a Vilefiend to fight for you for the next d.
+Define(vile_taint_talent 12) #22046
+# Unleashes a vile explosion at the target location, dealing o1 Shadow damage over d to all enemies within a1 yds and reducing their movement speed by s2.
+Define(writhe_in_agony_talent 4) #22044
+# Agony's damage may now ramp up to s2 stacks.
 Define(wilfreds_sigil_of_superior_summoning_item 132369)
 Define(cascading_calamity_trait 275372)
 Define(forbidden_knowledge_trait 278738)

@@ -40,7 +40,7 @@ Define(deadly_calm 262228)
   SpellAddBuff(deadly_calm deadly_calm=1)
 Define(dragon_roar 118000)
 # Roar explosively, dealing m1 Physical damage to all enemies within A1 yds and reducing their movement speed by s3 for d.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
-  SpellInfo(dragon_roar cd=35 duration=6 talent=dragon_roar_talent_warrior rage=-10)
+  SpellInfo(dragon_roar cd=35 duration=6 talent=dragon_roar_talent_protection rage=-10)
   # Movement slowed by s3.
   SpellAddTargetDebuff(dragon_roar dragon_roar=1)
 Define(execute_arms 163201)
@@ -135,36 +135,34 @@ Define(whirlwind_fury 190411)
 Define(whirlwind_buff 199658)
 # @spelldesc1680
   SpellInfo(whirlwind_buff gcd=0 offgcd=1)
-Define(cleave_talent 15)
-# Strikes all enemies in front of you with a sweeping attack for s1 Physical damage. Hitting s2 or more targets inflicts Deep Wounds.
-Define(deadly_calm_talent 18)
-# Reduces the Rage cost of your abilities by s1 for d.
-Define(dreadnaught_talent 20)
-# Overpower has 1+s1 charges, and it increases the damage of your next Mortal Strike by an additional s2.
-Define(fervor_of_battle_talent 8)
-# Whirlwind deals s1 increased damage, and Slams your primary target.
-Define(warbreaker_talent 14)
-# Smash the ground and shatter the armor of all enemies within A1 yds, dealing s1 Physical damage and increasing damage you deal to them by 208086s1 for 208086d.
-Define(carnage_talent 13)
-# Rampage costs s1/-10 less Rage and deals s4 increased damage.
-Define(frothing_berserker_talent 15)
-# Rampage now costs s1/10 Rage and increases your damage done by 215572s1 and Haste by 215572s2 for 215572d.
-Define(furious_slash_talent 9)
-# Aggressively strike with your off-hand weapon for s1*<mult> Physical damage, and increases your Haste by 202539s3 for 202539d, stacking up to 202539u times.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
-Define(massacre_talent 7)
-# Execute is now usable on targets below s2 health.
-Define(siegebreaker_talent 21)
-# Break the enemy's defenses, dealing s1 Physical damage, and increasing your damage done to the target by 280773s1 for 280773d.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
-Define(avatar_talent 17)
+Define(avatar_talent 17) #22397
 # Transform into a colossus for d, causing you to deal s1 increased damage and removing all roots and snares.rnrn|cFFFFFFFFGenerates s5/10 Rage.|r
-Define(cleave_talent 15)
+Define(carnage_talent 13) #22383
+# Rampage costs s1/-10 less Rage and deals s4 increased damage.
+Define(cleave_talent 15) #22362
 # Strikes all enemies in front of you with a sweeping attack for s1 Physical damage. Hitting s2 or more targets inflicts Deep Wounds.
-Define(dragon_roar_talent_warrior 9)
+Define(deadly_calm_talent 18) #22399
+# Reduces the Rage cost of your abilities by s1 for d.
+Define(dragon_roar_talent_protection 9) #23260
 # Roar explosively, dealing m1 Physical damage to all enemies within A1 yds and reducing their movement speed by s3 for d.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
-Define(rend_talent 9)
+Define(dreadnaught_talent 20) #22407
+# Overpower has 1+s1 charges, and it increases the damage of your next Mortal Strike by an additional s2.
+Define(fervor_of_battle_talent 8) #22489
+# Whirlwind deals s1 increased damage, and Slams your primary target.
+Define(frothing_berserker_talent 15) #19140
+# Rampage now costs s1/10 Rage and increases your damage done by 215572s1 and Haste by 215572s2 for 215572d.
+Define(furious_slash_talent 9) #23372
+# Aggressively strike with your off-hand weapon for s1*<mult> Physical damage, and increases your Haste by 202539s3 for 202539d, stacking up to 202539u times.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
+Define(massacre_talent_fury 14) #22393
+# Execute is now usable on targets below s2 health.
+Define(rend_talent 9) #19138
 # Wounds the target, causing s1 Physical damage instantly and an additional o2 Bleed damage over d.
-Define(skullsplitter_talent 3)
+Define(siegebreaker_talent 21) #16037
+# Break the enemy's defenses, dealing s1 Physical damage, and increasing your damage done to the target by 280773s1 for 280773d.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
+Define(skullsplitter_talent 3) #22371
 # Bash an enemy's skull, dealing s1 Physical damage.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
+Define(warbreaker_talent 14) #22391
+# Smash the ground and shatter the armor of all enemies within A1 yds, dealing s1 Physical damage and increasing damage you deal to them by 208086s1 for 208086d.
 Define(test_of_might_trait 275529)
     `;
 // END
@@ -258,7 +256,7 @@ SpellList(execute_arms_norage sudden_death_arms_buff stone_heart_buff deadly_cal
 SpellList(execute_arms_nohp sudden_death_arms_buff stone_heart_buff)
 
 	SpellInfo(execute rage=-20 target_health_pct=20)
-	SpellInfo(execute target_health_pct=35 talent=massacre_talent)
+	SpellInfo(execute target_health_pct=35 talent=massacre_talent_fury)
 	SpellRequire(execute target_health_pct 100=buff,execute_free)
 	SpellRequire(execute cd_percent 0=buff,execute_free)
 SpellList(execute_free sudden_death_fury_buff stone_heart_buff)
@@ -435,7 +433,7 @@ Define(victory_rush 34428)
 	SpellAddTargetDebuff(warbreaker colossus_smash_debuff=1)
 	SpellAddBuff(warbreaker in_for_the_kill_buff=1 talent=in_for_the_kill_talent)
 
-	SpellAddBuff(whirlwind whirlwind_buff=2)
+	SpellAddBuff(whirlwind_fury whirlwind_buff=2)
 Define(whirlwind_arms 1680)
 	SpellInfo(whirlwind_arms rage=30)
 Define(whirlwind_buff 85739)

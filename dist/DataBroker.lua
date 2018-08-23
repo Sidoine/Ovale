@@ -79,7 +79,7 @@ local OnClick = function(fr, button)
                 isTitle = true
             }
         }
-        local scriptType =  not Ovale.db.profile.showHiddenScripts and "script"
+        local scriptType = ( not Ovale.db.profile.showHiddenScripts and "script") or nil
         local descriptions = OvaleScripts:GetDescriptions(scriptType)
         for name, description in pairs(descriptions) do
             local menuItem = {

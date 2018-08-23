@@ -74,7 +74,7 @@ const OnClick = function(fr: any, button: "LeftButton") {
                 isTitle: true
             }
         }
-        let scriptType = !Ovale.db.profile.showHiddenScripts && "script";
+        const scriptType = (!Ovale.db.profile.showHiddenScripts && "script") || undefined;
         let descriptions = OvaleScripts.GetDescriptions(scriptType);
         for (const [name, description] of pairs(descriptions)) {
             let menuItem = {

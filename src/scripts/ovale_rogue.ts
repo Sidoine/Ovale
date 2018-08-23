@@ -1203,7 +1203,7 @@ AddFunction OutlawBuildMainActions
  #pistol_shot,if=combo_points.deficit>=1+buff.broadside.up+talent.quick_draw.enabled&buff.opportunity.up
  if ComboPointsDeficit() >= 1 + BuffPresent(broadside_buff) + TalentPoints(quick_draw_talent) and BuffPresent(opportunity_buff) Spell(pistol_shot text=PS)
  #sinister_strike
- Spell(sinister_strike)
+ Spell(sinister_strike_outlaw)
 }
 
 AddFunction OutlawBuildMainPostConditions
@@ -1216,7 +1216,7 @@ AddFunction OutlawBuildShortCdActions
 
 AddFunction OutlawBuildShortCdPostConditions
 {
- ComboPointsDeficit() >= 1 + BuffPresent(broadside_buff) + TalentPoints(quick_draw_talent) and BuffPresent(opportunity_buff) and Spell(pistol_shot text=PS) or Spell(sinister_strike)
+ ComboPointsDeficit() >= 1 + BuffPresent(broadside_buff) + TalentPoints(quick_draw_talent) and BuffPresent(opportunity_buff) and Spell(pistol_shot text=PS) or Spell(sinister_strike_outlaw)
 }
 
 AddFunction OutlawBuildCdActions
@@ -1225,7 +1225,7 @@ AddFunction OutlawBuildCdActions
 
 AddFunction OutlawBuildCdPostConditions
 {
- ComboPointsDeficit() >= 1 + BuffPresent(broadside_buff) + TalentPoints(quick_draw_talent) and BuffPresent(opportunity_buff) and Spell(pistol_shot text=PS) or Spell(sinister_strike)
+ ComboPointsDeficit() >= 1 + BuffPresent(broadside_buff) + TalentPoints(quick_draw_talent) and BuffPresent(opportunity_buff) and Spell(pistol_shot text=PS) or Spell(sinister_strike_outlaw)
 }
 
 ### actions.default
@@ -1430,7 +1430,7 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # ruthless_precision_buff
 # shadowmeld
 # shadowstep
-# sinister_strike
+# sinister_strike_outlaw
 # skull_and_crossbones_buff
 # slice_and_dice
 # slice_and_dice_buff
@@ -1690,7 +1690,7 @@ AddFunction OutlawBuildMainActions
  #pistol_shot,if=combo_points.deficit>=1+buff.broadside.up+talent.quick_draw.enabled&buff.opportunity.up
  if ComboPointsDeficit() >= 1 + BuffPresent(broadside_buff) + TalentPoints(quick_draw_talent) and BuffPresent(opportunity_buff) Spell(pistol_shot text=PS)
  #sinister_strike
- Spell(sinister_strike)
+ Spell(sinister_strike_outlaw)
 }
 
 AddFunction OutlawBuildMainPostConditions
@@ -1703,7 +1703,7 @@ AddFunction OutlawBuildShortCdActions
 
 AddFunction OutlawBuildShortCdPostConditions
 {
- ComboPointsDeficit() >= 1 + BuffPresent(broadside_buff) + TalentPoints(quick_draw_talent) and BuffPresent(opportunity_buff) and Spell(pistol_shot text=PS) or Spell(sinister_strike)
+ ComboPointsDeficit() >= 1 + BuffPresent(broadside_buff) + TalentPoints(quick_draw_talent) and BuffPresent(opportunity_buff) and Spell(pistol_shot text=PS) or Spell(sinister_strike_outlaw)
 }
 
 AddFunction OutlawBuildCdActions
@@ -1712,7 +1712,7 @@ AddFunction OutlawBuildCdActions
 
 AddFunction OutlawBuildCdPostConditions
 {
- ComboPointsDeficit() >= 1 + BuffPresent(broadside_buff) + TalentPoints(quick_draw_talent) and BuffPresent(opportunity_buff) and Spell(pistol_shot text=PS) or Spell(sinister_strike)
+ ComboPointsDeficit() >= 1 + BuffPresent(broadside_buff) + TalentPoints(quick_draw_talent) and BuffPresent(opportunity_buff) and Spell(pistol_shot text=PS) or Spell(sinister_strike_outlaw)
 }
 
 ### actions.default
@@ -1917,7 +1917,7 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # ruthless_precision_buff
 # shadowmeld
 # shadowstep
-# sinister_strike
+# sinister_strike_outlaw
 # skull_and_crossbones_buff
 # slice_and_dice
 # slice_and_dice_buff
@@ -1978,7 +1978,7 @@ AddFunction SubtletyStealthedMainActions
  {
   #shadowstrike,cycle_targets=1,if=talent.secret_technique.enabled&talent.find_weakness.enabled&debuff.find_weakness.remains<1&spell_targets.shuriken_storm=2&target.time_to_die-remains>6
   if Talent(secret_technique_talent) and Talent(find_weakness_talent) and target.DebuffRemaining(find_weakness_debuff) < 1 and Enemies() == 2 and target.TimeToDie() - target.DebuffRemaining(shadowstrike) > 6 Spell(shadowstrike)
-  #shuriken_storm,if=spell_targets.shuriken_storm>=3
+  #shuriken_storm,if=spell_targets>=3
   if Enemies() >= 3 Spell(shuriken_storm)
   #shadowstrike
   Spell(shadowstrike)
@@ -2037,7 +2037,7 @@ AddFunction SubtletyStealthcdsShortCdActions
  #shadowmeld,if=energy>=40&energy.deficit>=10&!variable.shd_threshold&debuff.find_weakness.remains<1
  unless True(pool_energy 40) and EnergyDeficit() >= 10 and not shd_threshold() and target.DebuffRemaining(find_weakness_debuff) < 1 and SpellUsable(shadowmeld) and SpellCooldown(shadowmeld) < TimeToEnergy(40)
  {
-  #shadow_dance,if=(!talent.dark_shadow.enabled|dot.nightblade.remains>=5+talent.subterfuge.enabled)&(variable.shd_threshold|buff.symbols_of_death.remains>=1.2|spell_targets>=4&cooldown.symbols_of_death.remains>10)
+  #shadow_dance,if=(!talent.dark_shadow.enabled|dot.nightblade.remains>=5+talent.subterfuge.enabled)&(variable.shd_threshold|buff.symbols_of_death.remains>=1.2|spell_targets.shuriken_storm>=4&cooldown.symbols_of_death.remains>10)
   if { not Talent(dark_shadow_talent) or target.DebuffRemaining(nightblade_debuff) >= 5 + TalentPoints(subterfuge_talent) } and { shd_threshold() or BuffRemaining(symbols_of_death_buff) >= 1 or Enemies() >= 4 and SpellCooldown(symbols_of_death) > 10 } Spell(shadow_dance)
   #shadow_dance,if=target.time_to_die<cooldown.symbols_of_death.remains
   if target.TimeToDie() < SpellCooldown(symbols_of_death) Spell(shadow_dance)
@@ -2212,7 +2212,7 @@ AddFunction SubtletyBuildMainActions
 {
  #shuriken_toss,if=buff.sharpened_blades.stack>=29&spell_targets.shuriken_storm<=1+3*azerite.sharpened_blades.rank=2+4*azerite.sharpened_blades.rank=3
  if BuffStacks(sharpened_blades_buff) >= 29 and Enemies() <= 1 + 3 * AzeriteTraitRank(sharpened_blades_trait) == 2 + 4 * AzeriteTraitRank(sharpened_blades_trait) == 3 Spell(shuriken_toss)
- #shuriken_storm,if=spell_targets.shuriken_storm>=2|buff.the_dreadlords_deceit.stack>=29
+ #shuriken_storm,if=spell_targets>=2|buff.the_dreadlords_deceit.stack>=29
  if Enemies() >= 2 or BuffStacks(the_dreadlords_deceit_subtlety_buff) >= 29 Spell(shuriken_storm)
  #gloomblade
  Spell(gloomblade)
@@ -2268,8 +2268,14 @@ AddFunction SubtletyDefaultMainActions
 
     unless { ComboPoints() >= 4 + TalentPoints(deeper_stratagem_talent) or target.TimeToDie() <= 1 and ComboPoints() >= 3 } and SubtletyFinishMainPostConditions()
     {
-     #call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold-40*!(talent.alacrity.enabled|talent.shadow_focus.enabled|talent.master_of_shadows.enabled)
-     if EnergyDeficit() <= stealth_threshold() - 40 * { not { Talent(alacrity_talent) or Talent(shadow_focus_talent) or Talent(master_of_shadows_talent) } } SubtletyBuildMainActions()
+     #call_action_list,name=finish,if=spell_targets.shuriken_storm=4&combo_points>=4
+     if Enemies() == 4 and ComboPoints() >= 4 SubtletyFinishMainActions()
+
+     unless Enemies() == 4 and ComboPoints() >= 4 and SubtletyFinishMainPostConditions()
+     {
+      #call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold-40*!(talent.alacrity.enabled|talent.shadow_focus.enabled|talent.master_of_shadows.enabled)
+      if EnergyDeficit() <= stealth_threshold() - 40 * { not { Talent(alacrity_talent) or Talent(shadow_focus_talent) or Talent(master_of_shadows_talent) } } SubtletyBuildMainActions()
+     }
     }
    }
   }
@@ -2278,7 +2284,7 @@ AddFunction SubtletyDefaultMainActions
 
 AddFunction SubtletyDefaultMainPostConditions
 {
- SubtletyCdsMainPostConditions() or Stealthed() and SubtletyStealthedMainPostConditions() or EnergyDeficit() <= stealth_threshold() and ComboPointsDeficit() >= 4 and SubtletyStealthcdsMainPostConditions() or { ComboPoints() >= 4 + TalentPoints(deeper_stratagem_talent) or target.TimeToDie() <= 1 and ComboPoints() >= 3 } and SubtletyFinishMainPostConditions() or EnergyDeficit() <= stealth_threshold() - 40 * { not { Talent(alacrity_talent) or Talent(shadow_focus_talent) or Talent(master_of_shadows_talent) } } and SubtletyBuildMainPostConditions()
+ SubtletyCdsMainPostConditions() or Stealthed() and SubtletyStealthedMainPostConditions() or EnergyDeficit() <= stealth_threshold() and ComboPointsDeficit() >= 4 and SubtletyStealthcdsMainPostConditions() or { ComboPoints() >= 4 + TalentPoints(deeper_stratagem_talent) or target.TimeToDie() <= 1 and ComboPoints() >= 3 } and SubtletyFinishMainPostConditions() or Enemies() == 4 and ComboPoints() >= 4 and SubtletyFinishMainPostConditions() or EnergyDeficit() <= stealth_threshold() - 40 * { not { Talent(alacrity_talent) or Talent(shadow_focus_talent) or Talent(master_of_shadows_talent) } } and SubtletyBuildMainPostConditions()
 }
 
 AddFunction SubtletyDefaultShortCdActions
@@ -2303,8 +2309,14 @@ AddFunction SubtletyDefaultShortCdActions
 
     unless { ComboPoints() >= 4 + TalentPoints(deeper_stratagem_talent) or target.TimeToDie() <= 1 and ComboPoints() >= 3 } and SubtletyFinishShortCdPostConditions()
     {
-     #call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold-40*!(talent.alacrity.enabled|talent.shadow_focus.enabled|talent.master_of_shadows.enabled)
-     if EnergyDeficit() <= stealth_threshold() - 40 * { not { Talent(alacrity_talent) or Talent(shadow_focus_talent) or Talent(master_of_shadows_talent) } } SubtletyBuildShortCdActions()
+     #call_action_list,name=finish,if=spell_targets.shuriken_storm=4&combo_points>=4
+     if Enemies() == 4 and ComboPoints() >= 4 SubtletyFinishShortCdActions()
+
+     unless Enemies() == 4 and ComboPoints() >= 4 and SubtletyFinishShortCdPostConditions()
+     {
+      #call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold-40*!(talent.alacrity.enabled|talent.shadow_focus.enabled|talent.master_of_shadows.enabled)
+      if EnergyDeficit() <= stealth_threshold() - 40 * { not { Talent(alacrity_talent) or Talent(shadow_focus_talent) or Talent(master_of_shadows_talent) } } SubtletyBuildShortCdActions()
+     }
     }
    }
   }
@@ -2313,7 +2325,7 @@ AddFunction SubtletyDefaultShortCdActions
 
 AddFunction SubtletyDefaultShortCdPostConditions
 {
- SubtletyCdsShortCdPostConditions() or Stealthed() and SubtletyStealthedShortCdPostConditions() or target.TimeToDie() > 6 and target.DebuffRemaining(nightblade_debuff) < GCD() and ComboPoints() >= 4 - { TimeInCombat() < 10 } * 2 and Spell(nightblade) or EnergyDeficit() <= stealth_threshold() and ComboPointsDeficit() >= 4 and SubtletyStealthcdsShortCdPostConditions() or { ComboPoints() >= 4 + TalentPoints(deeper_stratagem_talent) or target.TimeToDie() <= 1 and ComboPoints() >= 3 } and SubtletyFinishShortCdPostConditions() or EnergyDeficit() <= stealth_threshold() - 40 * { not { Talent(alacrity_talent) or Talent(shadow_focus_talent) or Talent(master_of_shadows_talent) } } and SubtletyBuildShortCdPostConditions()
+ SubtletyCdsShortCdPostConditions() or Stealthed() and SubtletyStealthedShortCdPostConditions() or target.TimeToDie() > 6 and target.DebuffRemaining(nightblade_debuff) < GCD() and ComboPoints() >= 4 - { TimeInCombat() < 10 } * 2 and Spell(nightblade) or EnergyDeficit() <= stealth_threshold() and ComboPointsDeficit() >= 4 and SubtletyStealthcdsShortCdPostConditions() or { ComboPoints() >= 4 + TalentPoints(deeper_stratagem_talent) or target.TimeToDie() <= 1 and ComboPoints() >= 3 } and SubtletyFinishShortCdPostConditions() or Enemies() == 4 and ComboPoints() >= 4 and SubtletyFinishShortCdPostConditions() or EnergyDeficit() <= stealth_threshold() - 40 * { not { Talent(alacrity_talent) or Talent(shadow_focus_talent) or Talent(master_of_shadows_talent) } } and SubtletyBuildShortCdPostConditions()
 }
 
 AddFunction SubtletyDefaultCdActions
@@ -2338,17 +2350,23 @@ AddFunction SubtletyDefaultCdActions
 
     unless { ComboPoints() >= 4 + TalentPoints(deeper_stratagem_talent) or target.TimeToDie() <= 1 and ComboPoints() >= 3 } and SubtletyFinishCdPostConditions()
     {
-     #call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold-40*!(talent.alacrity.enabled|talent.shadow_focus.enabled|talent.master_of_shadows.enabled)
-     if EnergyDeficit() <= stealth_threshold() - 40 * { not { Talent(alacrity_talent) or Talent(shadow_focus_talent) or Talent(master_of_shadows_talent) } } SubtletyBuildCdActions()
+     #call_action_list,name=finish,if=spell_targets.shuriken_storm=4&combo_points>=4
+     if Enemies() == 4 and ComboPoints() >= 4 SubtletyFinishCdActions()
 
-     unless EnergyDeficit() <= stealth_threshold() - 40 * { not { Talent(alacrity_talent) or Talent(shadow_focus_talent) or Talent(master_of_shadows_talent) } } and SubtletyBuildCdPostConditions()
+     unless Enemies() == 4 and ComboPoints() >= 4 and SubtletyFinishCdPostConditions()
      {
-      #arcane_torrent,if=energy.deficit>=15+energy.regen
-      if EnergyDeficit() >= 15 + EnergyRegenRate() Spell(arcane_torrent_energy)
-      #arcane_pulse
-      Spell(arcane_pulse)
-      #lights_judgment
-      Spell(lights_judgment)
+      #call_action_list,name=build,if=energy.deficit<=variable.stealth_threshold-40*!(talent.alacrity.enabled|talent.shadow_focus.enabled|talent.master_of_shadows.enabled)
+      if EnergyDeficit() <= stealth_threshold() - 40 * { not { Talent(alacrity_talent) or Talent(shadow_focus_talent) or Talent(master_of_shadows_talent) } } SubtletyBuildCdActions()
+
+      unless EnergyDeficit() <= stealth_threshold() - 40 * { not { Talent(alacrity_talent) or Talent(shadow_focus_talent) or Talent(master_of_shadows_talent) } } and SubtletyBuildCdPostConditions()
+      {
+       #arcane_torrent,if=energy.deficit>=15+energy.regen
+       if EnergyDeficit() >= 15 + EnergyRegenRate() Spell(arcane_torrent_energy)
+       #arcane_pulse
+       Spell(arcane_pulse)
+       #lights_judgment
+       Spell(lights_judgment)
+      }
      }
     }
    }
@@ -2358,7 +2376,7 @@ AddFunction SubtletyDefaultCdActions
 
 AddFunction SubtletyDefaultCdPostConditions
 {
- SubtletyCdsCdPostConditions() or Stealthed() and SubtletyStealthedCdPostConditions() or target.TimeToDie() > 6 and target.DebuffRemaining(nightblade_debuff) < GCD() and ComboPoints() >= 4 - { TimeInCombat() < 10 } * 2 and Spell(nightblade) or EnergyDeficit() <= stealth_threshold() and ComboPointsDeficit() >= 4 and SubtletyStealthcdsCdPostConditions() or { ComboPoints() >= 4 + TalentPoints(deeper_stratagem_talent) or target.TimeToDie() <= 1 and ComboPoints() >= 3 } and SubtletyFinishCdPostConditions() or EnergyDeficit() <= stealth_threshold() - 40 * { not { Talent(alacrity_talent) or Talent(shadow_focus_talent) or Talent(master_of_shadows_talent) } } and SubtletyBuildCdPostConditions()
+ SubtletyCdsCdPostConditions() or Stealthed() and SubtletyStealthedCdPostConditions() or target.TimeToDie() > 6 and target.DebuffRemaining(nightblade_debuff) < GCD() and ComboPoints() >= 4 - { TimeInCombat() < 10 } * 2 and Spell(nightblade) or EnergyDeficit() <= stealth_threshold() and ComboPointsDeficit() >= 4 and SubtletyStealthcdsCdPostConditions() or { ComboPoints() >= 4 + TalentPoints(deeper_stratagem_talent) or target.TimeToDie() <= 1 and ComboPoints() >= 3 } and SubtletyFinishCdPostConditions() or Enemies() == 4 and ComboPoints() >= 4 and SubtletyFinishCdPostConditions() or EnergyDeficit() <= stealth_threshold() - 40 * { not { Talent(alacrity_talent) or Talent(shadow_focus_talent) or Talent(master_of_shadows_talent) } } and SubtletyBuildCdPostConditions()
 }
 
 ### Subtlety icons.

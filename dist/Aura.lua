@@ -716,7 +716,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                         break
                     end
                 else
-                    local casterGUID = OvaleGUID:UnitGUID(unitCaster)
+                    local casterGUID = unitCaster and OvaleGUID:UnitGUID(unitCaster)
                     if debuffType == "" then
                         debuffType = "Enrage"
                     end

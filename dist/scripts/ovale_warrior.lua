@@ -50,7 +50,7 @@ AddFunction ProtectionInterruptActions
 AddFunction ProtectionOffensiveCooldowns
 {
 	Spell(avatar)
-	Spell(battle_cry)
+	# Spell(battle_cry)
 	if (Talent(booming_voice_talent) and RageDeficit() >= Talent(booming_voice_talent)*60) Spell(demoralizing_shout)
 }
 
@@ -64,8 +64,7 @@ AddFunction ProtectionDefaultShortCDActions
 	if ArmorSetBonus(T20 2) and RageDeficit() >= 26 Spell(berserker_rage)
 	if IncomingDamage(5 physical=1) 
 	{
-		if not BuffPresent(shield_block_buff) and SpellFullRecharge(shield_block) > 3 Spell(neltharions_fury)
-		if not BuffPresent(neltharions_fury_buff) and (SpellCooldown(neltharions_fury)>0 or SpellCharges(shield_block) == SpellMaxCharges(shield_block)) Spell(shield_block)
+		if SpellCharges(shield_block) == SpellMaxCharges(shield_block) Spell(shield_block)
 	}
 	if ((not BuffPresent(renewed_fury_buff) and Talent(renewed_fury_talent)) or Rage() >= 60) Spell(ignore_pain)
 	# range check
@@ -625,7 +624,7 @@ AddFunction FuryGetInMeleeRange
 AddFunction FurySingletargetMainActions
 {
  #rampage,if=buff.recklessness.up|(talent.frothing_berserker.enabled|talent.carnage.enabled&(buff.enrage.remains<gcd|rage>90)|talent.massacre.enabled&(buff.enrage.remains<gcd|rage>90))
- if BuffPresent(recklessness_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } Spell(rampage)
+ if BuffPresent(recklessness_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } Spell(rampage)
  #execute,if=buff.enrage.up
  if IsEnraged() Spell(execute)
  #bloodthirst,if=buff.enrage.down
@@ -635,11 +634,11 @@ AddFunction FurySingletargetMainActions
  #bloodthirst
  Spell(bloodthirst)
  #raging_blow,if=talent.carnage.enabled|(talent.massacre.enabled&rage<80)|(talent.frothing_berserker.enabled&rage<90)
- if Talent(carnage_talent) or Talent(massacre_talent) and Rage() < 80 or Talent(frothing_berserker_talent) and Rage() < 90 Spell(raging_blow)
+ if Talent(carnage_talent) or Talent(massacre_talent_fury) and Rage() < 80 or Talent(frothing_berserker_talent) and Rage() < 90 Spell(raging_blow)
  #furious_slash,if=talent.furious_slash.enabled
  if Talent(furious_slash_talent) Spell(furious_slash)
  #whirlwind
- Spell(whirlwind)
+ Spell(whirlwind_fury)
 }
 
 AddFunction FurySingletargetMainPostConditions
@@ -651,7 +650,7 @@ AddFunction FurySingletargetShortCdActions
  #siegebreaker,if=buff.recklessness.up|cooldown.recklessness.remains>20
  if BuffPresent(recklessness_buff) or SpellCooldown(recklessness) > 20 Spell(siegebreaker)
 
- unless { BuffPresent(recklessness_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or IsEnraged() and Spell(execute) or not IsEnraged() and Spell(bloodthirst) or Charges(raging_blow) == 2 and Spell(raging_blow) or Spell(bloodthirst)
+ unless { BuffPresent(recklessness_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or IsEnraged() and Spell(execute) or not IsEnraged() and Spell(bloodthirst) or Charges(raging_blow) == 2 and Spell(raging_blow) or Spell(bloodthirst)
  {
   #bladestorm,if=prev_gcd.1.rampage&(debuff.siegebreaker.up|!talent.siegebreaker.enabled)
   if PreviousGCDSpell(rampage) and { target.DebuffPresent(siegebreaker_debuff) or not Talent(siegebreaker_talent) } Spell(bladestorm_fury)
@@ -662,7 +661,7 @@ AddFunction FurySingletargetShortCdActions
 
 AddFunction FurySingletargetShortCdPostConditions
 {
- { BuffPresent(recklessness_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or IsEnraged() and Spell(execute) or not IsEnraged() and Spell(bloodthirst) or Charges(raging_blow) == 2 and Spell(raging_blow) or Spell(bloodthirst) or { Talent(carnage_talent) or Talent(massacre_talent) and Rage() < 80 or Talent(frothing_berserker_talent) and Rage() < 90 } and Spell(raging_blow) or Talent(furious_slash_talent) and Spell(furious_slash) or Spell(whirlwind)
+ { BuffPresent(recklessness_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or IsEnraged() and Spell(execute) or not IsEnraged() and Spell(bloodthirst) or Charges(raging_blow) == 2 and Spell(raging_blow) or Spell(bloodthirst) or { Talent(carnage_talent) or Talent(massacre_talent_fury) and Rage() < 80 or Talent(frothing_berserker_talent) and Rage() < 90 } and Spell(raging_blow) or Talent(furious_slash_talent) and Spell(furious_slash) or Spell(whirlwind_fury)
 }
 
 AddFunction FurySingletargetCdActions
@@ -671,7 +670,7 @@ AddFunction FurySingletargetCdActions
 
 AddFunction FurySingletargetCdPostConditions
 {
- { BuffPresent(recklessness_buff) or SpellCooldown(recklessness) > 20 } and Spell(siegebreaker) or { BuffPresent(recklessness_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or IsEnraged() and Spell(execute) or not IsEnraged() and Spell(bloodthirst) or Charges(raging_blow) == 2 and Spell(raging_blow) or Spell(bloodthirst) or PreviousGCDSpell(rampage) and { target.DebuffPresent(siegebreaker_debuff) or not Talent(siegebreaker_talent) } and Spell(bladestorm_fury) or IsEnraged() and { target.DebuffPresent(siegebreaker_debuff) or not Talent(siegebreaker_talent) } and Spell(dragon_roar) or { Talent(carnage_talent) or Talent(massacre_talent) and Rage() < 80 or Talent(frothing_berserker_talent) and Rage() < 90 } and Spell(raging_blow) or Talent(furious_slash_talent) and Spell(furious_slash) or Spell(whirlwind)
+ { BuffPresent(recklessness_buff) or SpellCooldown(recklessness) > 20 } and Spell(siegebreaker) or { BuffPresent(recklessness_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or IsEnraged() and Spell(execute) or not IsEnraged() and Spell(bloodthirst) or Charges(raging_blow) == 2 and Spell(raging_blow) or Spell(bloodthirst) or PreviousGCDSpell(rampage) and { target.DebuffPresent(siegebreaker_debuff) or not Talent(siegebreaker_talent) } and Spell(bladestorm_fury) or IsEnraged() and { target.DebuffPresent(siegebreaker_debuff) or not Talent(siegebreaker_talent) } and Spell(dragon_roar) or { Talent(carnage_talent) or Talent(massacre_talent_fury) and Rage() < 80 or Talent(frothing_berserker_talent) and Rage() < 90 } and Spell(raging_blow) or Talent(furious_slash_talent) and Spell(furious_slash) or Spell(whirlwind_fury)
 }
 
 ### actions.precombat
@@ -753,7 +752,7 @@ AddFunction FuryDefaultMainActions
   #rampage,if=cooldown.recklessness.remains<3
   if SpellCooldown(recklessness) < 3 Spell(rampage)
   #whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up
-  if Enemies() > 1 and not BuffPresent(whirlwind_buff) Spell(whirlwind)
+  if Enemies() > 1 and not BuffPresent(whirlwind_buff) Spell(whirlwind_fury)
   #run_action_list,name=single_target
   FurySingletargetMainActions()
  }
@@ -779,7 +778,7 @@ AddFunction FuryDefaultShortCdActions
    #heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
    if { target.Distance() > 25 and 600 > 45 or not False(raid_event_movement_exists) } and CheckBoxOn(opt_melee_range) and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
 
-   unless Talent(furious_slash_talent) and { BuffStacks(furious_slash_buff) < 3 or BuffRemaining(furious_slash_buff) < 3 or SpellCooldown(recklessness) < 3 and BuffRemaining(furious_slash_buff) < 9 } and Spell(furious_slash) or HasEquippedItem(kazzalax_fujiedas_fury_item) and { BuffExpires(fujiedas_fury_buff) or target.DebuffRemaining(bloodthirst) < 2 } and Spell(bloodthirst) or SpellCooldown(recklessness) < 3 and Spell(rampage) or Enemies() > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind)
+   unless Talent(furious_slash_talent) and { BuffStacks(furious_slash_buff) < 3 or BuffRemaining(furious_slash_buff) < 3 or SpellCooldown(recklessness) < 3 and BuffRemaining(furious_slash_buff) < 9 } and Spell(furious_slash) or HasEquippedItem(kazzalax_fujiedas_fury_item) and { BuffExpires(fujiedas_fury_buff) or target.DebuffRemaining(bloodthirst) < 2 } and Spell(bloodthirst) or SpellCooldown(recklessness) < 3 and Spell(rampage) or Enemies() > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury)
    {
     #run_action_list,name=single_target
     FurySingletargetShortCdActions()
@@ -790,7 +789,7 @@ AddFunction FuryDefaultShortCdActions
 
 AddFunction FuryDefaultShortCdPostConditions
 {
- CheckBoxOn(opt_melee_range) and target.InRange(charge) and Spell(charge) or target.Distance() > 5 and FuryMovementShortCdPostConditions() or Talent(furious_slash_talent) and { BuffStacks(furious_slash_buff) < 3 or BuffRemaining(furious_slash_buff) < 3 or SpellCooldown(recklessness) < 3 and BuffRemaining(furious_slash_buff) < 9 } and Spell(furious_slash) or HasEquippedItem(kazzalax_fujiedas_fury_item) and { BuffExpires(fujiedas_fury_buff) or target.DebuffRemaining(bloodthirst) < 2 } and Spell(bloodthirst) or SpellCooldown(recklessness) < 3 and Spell(rampage) or Enemies() > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind) or FurySingletargetShortCdPostConditions()
+ CheckBoxOn(opt_melee_range) and target.InRange(charge) and Spell(charge) or target.Distance() > 5 and FuryMovementShortCdPostConditions() or Talent(furious_slash_talent) and { BuffStacks(furious_slash_buff) < 3 or BuffRemaining(furious_slash_buff) < 3 or SpellCooldown(recklessness) < 3 and BuffRemaining(furious_slash_buff) < 9 } and Spell(furious_slash) or HasEquippedItem(kazzalax_fujiedas_fury_item) and { BuffExpires(fujiedas_fury_buff) or target.DebuffRemaining(bloodthirst) < 2 } and Spell(bloodthirst) or SpellCooldown(recklessness) < 3 and Spell(rampage) or Enemies() > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury) or FurySingletargetShortCdPostConditions()
 }
 
 AddFunction FuryDefaultCdActions
@@ -810,7 +809,7 @@ AddFunction FuryDefaultCdActions
     #recklessness
     Spell(recklessness)
 
-    unless Enemies() > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind)
+    unless Enemies() > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury)
     {
      #blood_fury,if=buff.recklessness.up
      if BuffPresent(recklessness_buff) Spell(blood_fury_ap)
@@ -834,7 +833,7 @@ AddFunction FuryDefaultCdActions
 
 AddFunction FuryDefaultCdPostConditions
 {
- CheckBoxOn(opt_melee_range) and target.InRange(charge) and Spell(charge) or target.Distance() > 5 and FuryMovementCdPostConditions() or { target.Distance() > 25 and 600 > 45 or not False(raid_event_movement_exists) } and CheckBoxOn(opt_melee_range) and target.Distance(atLeast 8) and target.Distance(atMost 40) and Spell(heroic_leap) or Talent(furious_slash_talent) and { BuffStacks(furious_slash_buff) < 3 or BuffRemaining(furious_slash_buff) < 3 or SpellCooldown(recklessness) < 3 and BuffRemaining(furious_slash_buff) < 9 } and Spell(furious_slash) or HasEquippedItem(kazzalax_fujiedas_fury_item) and { BuffExpires(fujiedas_fury_buff) or target.DebuffRemaining(bloodthirst) < 2 } and Spell(bloodthirst) or SpellCooldown(recklessness) < 3 and Spell(rampage) or Enemies() > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind) or FurySingletargetCdPostConditions()
+ CheckBoxOn(opt_melee_range) and target.InRange(charge) and Spell(charge) or target.Distance() > 5 and FuryMovementCdPostConditions() or { target.Distance() > 25 and 600 > 45 or not False(raid_event_movement_exists) } and CheckBoxOn(opt_melee_range) and target.Distance(atLeast 8) and target.Distance(atMost 40) and Spell(heroic_leap) or Talent(furious_slash_talent) and { BuffStacks(furious_slash_buff) < 3 or BuffRemaining(furious_slash_buff) < 3 or SpellCooldown(recklessness) < 3 and BuffRemaining(furious_slash_buff) < 9 } and Spell(furious_slash) or HasEquippedItem(kazzalax_fujiedas_fury_item) and { BuffExpires(fujiedas_fury_buff) or target.DebuffRemaining(bloodthirst) < 2 } and Spell(bloodthirst) or SpellCooldown(recklessness) < 3 and Spell(rampage) or Enemies() > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury) or FurySingletargetCdPostConditions()
 }
 
 ### Fury icons.
@@ -916,7 +915,7 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # heroic_leap
 # kazzalax_fujiedas_fury_item
 # lights_judgment
-# massacre_talent
+# massacre_talent_fury
 # pummel
 # raging_blow
 # rampage
@@ -925,8 +924,8 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # siegebreaker
 # siegebreaker_debuff
 # siegebreaker_talent
-# whirlwind
 # whirlwind_buff
+# whirlwind_fury
 ]]
     OvaleScripts:RegisterScript("WARRIOR", "fury", name, desc, code, "script")
 end

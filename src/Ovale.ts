@@ -8,7 +8,7 @@ import { huge } from "@wowts/math";
 import { AceDatabase } from "@wowts/ace_db-3.0";
 import { Color } from "./SpellFlash";
 
-let self_oneTimeMessage: LuaObj<boolean | "printed"> = {}
+export const oneTimeMessages: LuaObj<boolean | "printed"> = {}
 let MAX_REFRESH_INTERVALS = 500;
 let self_refreshIntervals:LuaArray<number> = {}
 let self_refreshIndex = 1;
@@ -170,18 +170,18 @@ class OvaleClass extends OvaleBase {
     
     OneTimeMessage(...__args: any[]) {
         let s = MakeString(...__args);
-        if (!self_oneTimeMessage[s]) {
-            self_oneTimeMessage[s] = true;
+        if (!oneTimeMessages[s]) {
+            oneTimeMessages[s] = true;
         }
     }
     ClearOneTimeMessages() {
-        wipe(self_oneTimeMessage);
+        wipe(oneTimeMessages);
     }
     PrintOneTimeMessages() {
-        for (const [s] of pairs(self_oneTimeMessage)) {
-            if (self_oneTimeMessage[s] != "printed") {
+        for (const [s] of pairs(oneTimeMessages)) {
+            if (oneTimeMessages[s] != "printed") {
                 this.Print(s);
-                self_oneTimeMessage[s] = "printed";
+                oneTimeMessages[s] = "printed";
             }
         }
     }

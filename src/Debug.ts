@@ -61,7 +61,7 @@ class OvaleDebugClass extends OvaleDebugBase {
         }
     }
 
-    bug = false;
+    bug?: string;
     trace = false;
 
     constructor() {
@@ -102,7 +102,7 @@ class OvaleDebugClass extends OvaleDebugBase {
         }
     }
     ResetTrace() {
-        this.bug = false;
+        this.bug = undefined;
         this.trace = false;
         self_traced = false;
     }
@@ -159,7 +159,7 @@ class OvaleDebugClass extends OvaleDebugBase {
             Error(...__args:any[]) {
                 let s = MakeString(...__args);
                 this.Print("Fatal error: %s", s);
-                OvaleDebug.bug = true;
+                OvaleDebug.bug = s;
             }
             Print(...__args:any[]) {
                 let name = this.GetName();

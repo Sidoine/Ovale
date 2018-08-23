@@ -210,7 +210,6 @@ AddFunction HolyDefaultCdActions
 	Item(Trinket0Slot usable=1 text=13)
 	Item(Trinket1Slot usable=1 text=14)
 	Spell(tyrs_deliverance)
-	Spell(avenging_wrath_heal)
 	Spell(holy_avenger)
 	Spell(aura_mastery)
 }

@@ -18,7 +18,6 @@ AddFunction BloodDefaultShortCDActions
 {
 	if CheckBoxOn(opt_melee_range) and not target.InRange(death_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
 	if not BuffPresent(rune_tap_buff) Spell(rune_tap)
-	if Rune() <= 2 Spell(blood_tap)
 }
 
 AddFunction BloodDefaultMainActions
@@ -74,7 +73,6 @@ AddFunction BloodDefaultCdActions
 	Item(Trinket1Slot usable=1 text=14)
 	Spell(vampiric_blood)
 	Spell(icebound_fortitude)
-	if target.InRange(blood_mirror) Spell(blood_mirror)
 	Spell(dancing_rune_weapon)
 	if BuffStacks(bone_shield_buff) >= 5 Spell(tombstone)
 	if CheckBoxOn(opt_use_consumables) Item(unbending_potion usable=1)
