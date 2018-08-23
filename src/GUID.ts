@@ -279,7 +279,10 @@ class OvaleGUIDClass extends OvaleGUIDBase {
         return [(!!atTime), atTime];
     }
     UnitGUID(unitId: string): string {
-        return this.unitGUID[unitId] || UnitGUID(unitId);
+        if(unitId){
+            return this.unitGUID[unitId] || UnitGUID(unitId);
+        }
+        return undefined;
     }
     GUIDUnit(guid: string) {
         if (guid && this.guidUnit[guid]) {

@@ -275,7 +275,10 @@ local OvaleGUIDClass = __class(OvaleGUIDBase, {
         return ( not  not atTime), atTime
     end,
     UnitGUID = function(self, unitId)
-        return self.unitGUID[unitId] or UnitGUID(unitId)
+        if unitId then
+            return self.unitGUID[unitId] or UnitGUID(unitId)
+        end
+        return nil
     end,
     GUIDUnit = function(self, guid)
         if guid and self.guidUnit[guid] then
