@@ -1301,8 +1301,7 @@ export class OvaleASTClass extends OvaleASTBase {
             node.type = "define";
             node.name = name;
             node.value = value;
-            annotation.definition = annotation.definition || {
-            }
+            annotation.definition = annotation.definition || {}
             annotation.definition[name] = value;
         }
         return [ok, node];

@@ -616,7 +616,6 @@ Define(wraith_walk_talent_blood 15)
 Define(wraith_walk_talent 14)
 
 # Non-default tags for OvaleSimulationCraft.
-	SpellInfo(blood_tap tag=main)
 	SpellInfo(outbreak tag=main)
 ]]
     OvaleScripts:RegisterScript("DEATHKNIGHT", nil, name, desc, code, "include")

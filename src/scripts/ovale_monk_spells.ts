@@ -182,12 +182,12 @@ ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!fortifying_brew,buff,!
 
 	SpellInfo(blackout_combo_buff duration=15)
 
-	SpellInfo(blackout_kick cd=3)
-	SpellInfo(blackout_kick chi=1 specialization=windwalker)
-	SpellRequire(blackout_kick chi_percent 0=buff,blackout_kick_free specialization=windwalker)
-	SpellAddBuff(blackout_kick blackout_kick_buff=0)
-	SpellAddBuff(blackout_kick teachings_of_the_monastery_buff=0)
-	SpellAddTargetDebuff(blackout_kick mark_of_the_crane_debuff=1 specialization=!mistweaver)
+	SpellInfo(blackout_kick_windwalker cd=3)
+	SpellInfo(blackout_kick_windwalker chi=1 specialization=windwalker)
+	SpellRequire(blackout_kick_windwalker chi_percent 0=buff,blackout_kick_free specialization=windwalker)
+	SpellAddBuff(blackout_kick_windwalker blackout_kick_buff=0)
+	SpellAddBuff(blackout_kick_windwalker teachings_of_the_monastery_buff=0)
+	SpellAddTargetDebuff(blackout_kick_windwalker mark_of_the_crane_debuff=1 specialization=!mistweaver)
 Define(blackout_kick_buff 116768)
 	SpellInfo(blackout_kick_buff duration=15)
 SpellList(blackout_kick_free blackout_kick_buff serenity_buff)

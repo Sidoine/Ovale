@@ -105,6 +105,9 @@ Define(lively_spirit_buff 279646)
 Define(lunar_beam 204066)
 # Summons a beam of lunar light at your location, dealing 204069s2*8 Arcane damage and healing you for 204069s1*8 over m1 sec.
   SpellInfo(lunar_beam cd=75 duration=8.5 talent=lunar_beam_talent)
+Define(lunar_strike 194153)
+# Call down a strike of lunar energy, causing s1 Arcane damage to the target, and m1*m3/100 Arcane damage to all other enemies within A1 yards.rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r
+  SpellInfo(lunar_strike lunarpower=-12)
 Define(mangle 33917)
 # Mangle the target for s2 Physical damage.?a231064[ Deals s3 additional damage against bleeding targets.][]rnrn|cFFFFFFFFGenerates m4/10 Rage.|r
   SpellInfo(mangle cd=6 rage=-8)
@@ -144,16 +147,16 @@ Define(pulverize 118345)
   SpellInfo(pulverize cd=40 duration=4 gcd=0 offgcd=1)
   # Stunned.
   SpellAddTargetDebuff(pulverize pulverize=1)
-Define(rake 1822)
-# Rake the target for s1 Bleed damage and an additional 155722o1 Bleed damage over 155722d.?s48484[ Reduces the target's movement speed by 58180s1 for 58180d.][]?a231052[ rnrnWhile stealthed, Rake will also stun the target for 163505d, and deal s4 increased damage.][]rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
-  SpellInfo(rake energy=35 gcd=1 combopoints=-1)
-  # Bleeding for w1 damage every t1 seconds.
-  SpellAddTargetDebuff(rake rake_debuff=1)
 Define(rake_debuff 155722)
 # @spelldesc1822
   SpellInfo(rake_debuff duration=15 gcd=0 offgcd=1 tick=3)
   # Bleeding for w1 damage every t1 seconds.
   SpellAddTargetDebuff(rake_debuff rake_debuff=1)
+Define(rake 1822)
+# Rake the target for s1 Bleed damage and an additional 155722o1 Bleed damage over 155722d.?s48484[ Reduces the target's movement speed by 58180s1 for 58180d.][]?a231052[ rnrnWhile stealthed, Rake will also stun the target for 163505d, and deal s4 increased damage.][]rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
+  SpellInfo(rake energy=35 gcd=1 combopoints=-1)
+  # Bleeding for w1 damage every t1 seconds.
+  SpellAddTargetDebuff(rake rake_debuff=1)
 Define(regrowth 8936)
 # Heals a friendly target for s1 and another o2*<mult> over d.?s231032[ Regrowth's initial heal has a 231032s1 increased chance for a critical effect.][]?s24858|s197625[ Usable while in Moonkin Form.][]?s33891[rnrn|C0033AA11Tree of Life: Instant cast.|R][]
   SpellInfo(regrowth duration=12 tick=2)
@@ -442,12 +445,9 @@ Define(incarnation_chosen_of_elune_buff 102560)
 
 	SpellInfo(lunar_beam cd=90)
 Define(lunar_empowerment_buff 164547)
-Define(lunar_strike_balance 194153)
-	SpellInfo(lunar_strike replace=lunar_strike_balance specialization=balance)
-	SpellInfo(lunar_strike_balance astralpower=-12)
-	SpellRequire(lunar_strike_balance astralpower_percent 150=buff,celestial_alignment_buff)
-	SpellRequire(lunar_strike_balance astralpower_percent 125=buff,blessing_of_elune_buff)
-	SpellAddBuff(lunar_strike_balance lunar_empowerment_buff=0)
+	SpellRequire(lunar_strike astralpower_percent 150=buff,celestial_alignment_buff)
+	SpellRequire(lunar_strike astralpower_percent 125=buff,blessing_of_elune_buff)
+	SpellAddBuff(lunar_strike lunar_empowerment_buff=0)
 #Define(moonfire )
 	SpellInfo(moonfire astralpower=-3 specialization=balance)
 #Define(moonfire_debuff)

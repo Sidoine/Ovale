@@ -432,6 +432,8 @@ Define(victory_rush 34428)
 	SpellInfo(warbreaker cd=45 tag=main)
 	SpellAddTargetDebuff(warbreaker colossus_smash_debuff=1)
 	SpellAddBuff(warbreaker in_for_the_kill_buff=1 talent=in_for_the_kill_talent)
+
+	SpellAddBuff(whirlwind_fury whirlwind_buff=2)
 Define(whirlwind_arms 1680)
 	SpellInfo(whirlwind_arms rage=30)
 Define(whirlwind_buff 85739)

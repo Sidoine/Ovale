@@ -20,7 +20,7 @@ local UnitClass = UnitClass
 local UnitGUID = UnitGUID
 local DEFAULT_CHAT_FRAME = DEFAULT_CHAT_FRAME
 local huge = math.huge
-local self_oneTimeMessage = {}
+__exports.oneTimeMessages = {}
 local MAX_REFRESH_INTERVALS = 500
 local self_refreshIntervals = {}
 local self_refreshIndex = 1
@@ -93,18 +93,18 @@ local OvaleClass = __class(OvaleBase, {
     end,
     OneTimeMessage = function(self, ...)
         local s = __exports.MakeString(...)
-        if  not self_oneTimeMessage[s] then
-            self_oneTimeMessage[s] = true
+        if  not __exports.oneTimeMessages[s] then
+            __exports.oneTimeMessages[s] = true
         end
     end,
     ClearOneTimeMessages = function(self)
-        wipe(self_oneTimeMessage)
+        wipe(__exports.oneTimeMessages)
     end,
     PrintOneTimeMessages = function(self)
-        for s in pairs(self_oneTimeMessage) do
-            if self_oneTimeMessage[s] ~= "printed" then
+        for s in pairs(__exports.oneTimeMessages) do
+            if __exports.oneTimeMessages[s] ~= "printed" then
                 self:Print(s)
-                self_oneTimeMessage[s] = "printed"
+                __exports.oneTimeMessages[s] = "printed"
             end
         end
     end,

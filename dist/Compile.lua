@@ -59,7 +59,7 @@ local function HasTalent(talentId)
     if OvaleSpellBook:IsKnownTalent(talentId) then
         return OvaleSpellBook:GetTalentPoints(talentId) > 0
     else
-        __exports.OvaleCompile:Print("Warning: unknown talent ID '%s'", talentId)
+        __exports.OvaleCompile:Error("Unknown talent ID '%s'", talentId)
         return false
     end
 end
@@ -324,7 +324,7 @@ local function EvaluateSpellAuraList(node)
     local ok = true
     local spellId, positionalParams, namedParams = node.spellId, node.positionalParams, node.namedParams
     if  not spellId then
-        __exports.OvaleCompile:Print("No spellId for name %s", node.name)
+        __exports.OvaleCompile:Error("No spellId for name %s", node.name)
         return false
     end
     if TestConditions(positionalParams, namedParams) then
@@ -471,7 +471,7 @@ local function AddMissingVariantSpells(annotation)
                         if node.paramsAsString then
                             functionCall = node.name .. "(" .. node.paramsAsString .. ")"
                         end
-                        __exports.OvaleCompile:Print("Unknown spell with ID %s used in %s.", spellId, functionCall)
+                        __exports.OvaleCompile:Error("Unknown spell with ID %s used in %s.", spellId, functionCall)
                     end
                 end
             end

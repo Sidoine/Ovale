@@ -164,7 +164,7 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
                     name = L["Script"],
                     width = "double",
                     values = function(info)
-                        local scriptType =  not Ovale.db.profile.showHiddenScripts and "script"
+                        local scriptType = ( not Ovale.db.profile.showHiddenScripts and "script") or nil
                         return __exports.OvaleScripts:GetDescriptions(scriptType)
                     end,
                     get = function(info)

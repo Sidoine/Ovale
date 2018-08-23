@@ -68,7 +68,6 @@ local OvaleDebugClass = __class(OvaleDebugBase, {
                 }
             }
         }
-        self.bug = false
         self.trace = false
         OvaleDebugBase.constructor(self)
         local actions = {
@@ -104,7 +103,7 @@ local OvaleDebugClass = __class(OvaleDebugBase, {
         end
     end,
     ResetTrace = function(self)
-        self.bug = false
+        self.bug = nil
         self.trace = false
         self_traced = false
     end,
@@ -159,7 +158,7 @@ local OvaleDebugClass = __class(OvaleDebugBase, {
             Error = function(self, ...)
                 local s = MakeString(...)
                 self:Print("Fatal error: %s", s)
-                __exports.OvaleDebug.bug = true
+                __exports.OvaleDebug.bug = s
             end,
             Print = function(self, ...)
                 local name = self:GetName()
