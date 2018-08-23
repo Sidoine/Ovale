@@ -270,13 +270,7 @@
     commander "^2.11.0"
     typescript "^2.9.1"
 
-"@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.6.0":
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.7.0.tgz#fa855b8708a35163919183bf6db67cf539c50ec9"
-  dependencies:
-    "@wowts/lua" "^1.3.0"
-
-"@wowts/wow-mock@^1.8.0":
+"@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.6.0", "@wowts/wow-mock@^1.8.0":
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.8.0.tgz#e22761018273c9440c108dbf9be4641382173190"
   dependencies:
@@ -842,8 +836,8 @@ caching-transform@^1.0.0:
     write-file-atomic "^1.1.4"
 
 call-matcher@^1.0.0:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/call-matcher/-/call-matcher-1.0.1.tgz#5134d077984f712a54dad3cbf62de28dce416ca8"
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/call-matcher/-/call-matcher-1.1.0.tgz#23b2c1bc7a8394c8be28609d77ddbd5786680432"
   dependencies:
     core-js "^2.0.0"
     deep-equal "^1.0.0"
@@ -919,8 +913,8 @@ chownr@^1.0.1:
   resolved "https://registry.yarnpkg.com/chownr/-/chownr-1.0.1.tgz#e2a75042a9551908bebd25b8523d5f9769d79181"
 
 ci-info@^1.3.0:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/ci-info/-/ci-info-1.3.1.tgz#da21bc65a5f0d0d250c19a169065532b42fa048c"
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/ci-info/-/ci-info-1.4.0.tgz#4841d53cad49f11b827b648ebde27a6e189b412f"
 
 clean-stack@^1.1.1:
   version "1.3.0"
@@ -1445,8 +1439,8 @@ hullabaloo-config-manager@^1.1.0:
     safe-buffer "^5.0.1"
 
 iconv-lite@^0.4.4:
-  version "0.4.23"
-  resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.4.23.tgz#297871f63be507adcfbfca715d0cd0eed84e9a63"
+  version "0.4.24"
+  resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.4.24.tgz#2022b4b25fbddc21d2f524974a474aafe733908b"
   dependencies:
     safer-buffer ">= 2.1.2 < 3"
 
@@ -2525,8 +2519,8 @@ source-map-support@^0.4.15:
     source-map "^0.5.6"
 
 source-map-support@^0.5.0:
-  version "0.5.8"
-  resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.5.8.tgz#04f5581713a8a65612d0175fbf3a01f80a162613"
+  version "0.5.9"
+  resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.5.9.tgz#41bc953b2534267ea2d605bccfa7bfa3111ced5f"
   dependencies:
     buffer-from "^1.0.0"
     source-map "^0.6.0"
