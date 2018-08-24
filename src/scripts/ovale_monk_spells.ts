@@ -309,7 +309,7 @@ Define(invoke_niuzao_the_black_ox 132578)
 Define(invoke_xuen_the_white_tiger 123904)
 	SpellInfo(invoke_xuen_the_white_tiger cd=180 talent=invoke_xuen_the_white_tiger_talent)
 
-SpellInfo(ironskin_brew charges=3 cd_haste=melee)
+SpellInfo(ironskin_brew cd=15 charges=3 cd_haste=melee)
 SpellInfo(ironskin_brew add_cd=-3 charges=4 talent=light_brewing_talent)
 SpellAddBuff(ironskin_brew ironskin_brew_buff=1)
 SpellAddBuff(ironskin_brew blackout_combo_buff=0)
@@ -382,7 +382,7 @@ Define(roll 109132)
 	SpellInfo(roll charges=3 talent=celerity_talent)
 	SpellInfo(roll replace=chi_torpedo talent=chi_torpedo_talent)
 
-SpellInfo(rushing_jade_wind duration=9 cd_haste=melee haste=melee talent=rushing_jade_wind_talent)
+SpellInfo(rushing_jade_wind chi=0 duration=9 cd_haste=melee haste=melee talent=rushing_jade_wind_talent)
 SpellAddBuff(rushing_jade_wind rushing_jade_wind=1)
 
 Define(rushing_jade_wind_windwalker 261715)
@@ -511,8 +511,10 @@ Define(upwelling_talent 20)
 	SpellInfo(chi_burst tag=main)
 	SpellInfo(chi_torpedo tag=shortcd)
 	SpellInfo(dampen_harm tag=cd)
-	SpellInfo(diffuse_magic tag=cd)
-	SpellInfo(storm_earth_and_fire tag=cd)
+  SpellInfo(diffuse_magic tag=cd)
+  SpellInfo(ironskin_brew tag=shortcd)
+  SpellInfo(purifying_brew tag=shortcd)
+  SpellInfo(storm_earth_and_fire tag=cd)
 `;
     OvaleScripts.RegisterScript("MONK", undefined, name, desc, code, "include");
 }
