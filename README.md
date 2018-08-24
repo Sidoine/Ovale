@@ -3,6 +3,7 @@
 It displays one or more icons that show the cooldown of an action.  The action is conditionally defined through a user-defined script, e.g. you may display either [Corruption][] if the DoT is not on your target or [Shadow Bolt][] if the [Corruption][] DoT is already on your target.
 
 Default scripts are based on [SimulationCraft][].  You may also customize the default script to suit your needs (see [Documentation][]) or use scripts made by other users.
+Tank scripts based on guides from icy-veins.com are maintained by the [Ovale_TankScripts][] addon.
 
 **Please use the [Discord Server][ovale-discord] to submit scripts or discuss them. If you want to report bugs, use the [ticket manager][ovale-tickets]. You may contribute code on our [Github][] project or help with [translation][].**
 
@@ -42,6 +43,7 @@ You need to reach level 10 and choose a specialization.  However, be aware that 
   [Documentation]: http://wow.curseforge.com/projects/ovale/pages/documentation/
   [Masque]: http://www.curse.com/addons/wow/masque
   [Ovale]: http://www.curse.com/addons/wow/ovale
+  [Ovale_TankScripts]: https://www.curseforge.com/wow/addons/ovale_tankscripts
   [Recount]: http://www.curse.com/addons/wow/recount
   [Shadow Bolt]: http://www.wowhead.com/spell=686
   [SimulationCraft]: http://code.google.com/p/simulationcraft/
