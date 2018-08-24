@@ -35,6 +35,7 @@ import { baseState } from "./BaseState";
 import { OvaleSpells } from "./Spells";
 import { OvaleAzerite } from "./AzeriteArmor";
 import { OvaleWarlock } from "./Warlock";
+import { OvaleStagger } from "./Stagger";
 let INFINITY = huge;
 
 type BaseState = {};
@@ -4089,10 +4090,10 @@ l    */
         }
         return Compare(0, comparator, limit);
     }
-    /** Get the current Stagger tick damage.
+    /** Get the last Stagger tick damage.
 	 @name StaggerTick
      @paramsig number or boolean
-     @param count Optional 
+     @param count Optional. Counts n amount of previous stagger ticks.
 	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
 	 @param number Optional. The number to compare against.
 	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
@@ -4107,21 +4108,8 @@ l    */
      */
     function StaggerTick(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [count, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[2]];
-        let [target] = ParseCondition(positionalParams, namedParams, state);
-        let aura = OvaleAura.GetAura(target, HEAVY_STAGGER, atTime, "HARMFUL");
-        if (!OvaleAura.IsActiveAura(aura, atTime)) {
-            aura = OvaleAura.GetAura(target, MODERATE_STAGGER, atTime, "HARMFUL");
-        }
-        if (!OvaleAura.IsActiveAura(aura, atTime)) {
-            aura = OvaleAura.GetAura(target, LIGHT_STAGGER, atTime, "HARMFUL");
-        }
-        if(!count || count == 0) count = 1;
-        let staggerAmount = UnitStagger(target);
-        let tick = 0
-        if(staggerAmount > 0){
-            tick = staggerAmount / (aura.duration * 2) * count;
-        }
-        return Compare(tick, comparator, limit);
+        let damage = OvaleStagger.LastTickDamage(count);
+        return Compare(damage, comparator, limit);
     }
     OvaleCondition.RegisterCondition("staggerremaining", false, StaggerRemaining);
     OvaleCondition.RegisterCondition("staggerremains", false, StaggerRemaining);

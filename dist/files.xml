@@ -20,6 +20,7 @@
    <Script file="State.lua"/>
    <Script file="DemonHunterSoulFragments.lua"/>
    <Script file="BaseState.lua"/>
+   <Script file="Stagger.lua"/>
    <Script file="BossMod.lua"/>
    <Script file="Variables.lua"/>
    <Script file="Condition.lua"/>

@@ -102,6 +102,8 @@ local __AzeriteArmor = LibStub:GetLibrary("ovale/AzeriteArmor")
 local OvaleAzerite = __AzeriteArmor.OvaleAzerite
 local __Warlock = LibStub:GetLibrary("ovale/Warlock")
 local OvaleWarlock = __Warlock.OvaleWarlock
+local __Stagger = LibStub:GetLibrary("ovale/Stagger")
+local OvaleStagger = __Stagger.OvaleStagger
 local INFINITY = huge
 local function BossArmorDamageReduction(target, state)
     return 0.3
@@ -2004,23 +2006,8 @@ local function StaggerRemaining(positionalParams, namedParams, state, atTime)
     end
 local function StaggerTick(positionalParams, namedParams, state, atTime)
         local count, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[2]
-        local target = ParseCondition(positionalParams, namedParams, state)
-        local aura = OvaleAura:GetAura(target, HEAVY_STAGGER, atTime, "HARMFUL")
-        if  not OvaleAura:IsActiveAura(aura, atTime) then
-            aura = OvaleAura:GetAura(target, MODERATE_STAGGER, atTime, "HARMFUL")
-        end
-        if  not OvaleAura:IsActiveAura(aura, atTime) then
-            aura = OvaleAura:GetAura(target, LIGHT_STAGGER, atTime, "HARMFUL")
-        end
-        if  not count or count == 0 then
-            count = 1
-        end
-        local staggerAmount = UnitStagger(target)
-        local tick = 0
-        if staggerAmount > 0 then
-            tick = staggerAmount / (aura.duration * 2) * count
-        end
-        return Compare(tick, comparator, limit)
+        local damage = OvaleStagger:LastTickDamage(count)
+        return Compare(damage, comparator, limit)
     end
     OvaleCondition:RegisterCondition("staggerremaining", false, StaggerRemaining)
     OvaleCondition:RegisterCondition("staggerremains", false, StaggerRemaining)
