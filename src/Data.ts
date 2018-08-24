@@ -84,11 +84,13 @@ let STAT_USE_NAMES: LuaArray<string> = {
 type SpellData = number | string | LuaArray<number | string>;
 type Requirements = LuaObj<LuaArray<string>>;
 
+type AuraList = { [key: number]: SpellData;[key: string]: SpellData; };
+
 export interface AuraByType {
-    HARMFUL: LuaArray<SpellData>;
-    HELPFUL: LuaArray<SpellData>;
-    ["HARMFUL|PLAYER"]?: LuaArray<SpellData>;
-    ["HELPFUL|PLAYER"]?: LuaArray<SpellData>;
+    HARMFUL: AuraList;
+    HELPFUL: AuraList;
+    ["HARMFUL|PLAYER"]?: AuraList;
+    ["HELPFUL|PLAYER"]?: AuraList;
 }
 
 export type AuraType = keyof AuraByType;
@@ -346,13 +348,11 @@ class OvaleDataClass extends OvaleDataBase {
             let name;
             for (const [, statName] of pairs(STAT_NAMES)) {
                 name = `${useName}_${statName}_buff`;
-                this.buffSpellList[name] = {
-                }
+                this.buffSpellList[name] = {}
                 let shortName = STAT_SHORTNAME[statName];
                 if (shortName) {
                     name = `${useName}_${shortName}_buff`;
-                    this.buffSpellList[name] = {
-                    }
+                    this.buffSpellList[name] = {}
                 }
             }
             name = `${useName}_any_buff`;

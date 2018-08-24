@@ -345,12 +345,17 @@ local function EvaluateSpellAuraList(node)
         local count = 0
         for k, v in kpairs(namedParams) do
             if  not checkToken(PARAMETER_KEYWORD, k) then
-                local id = tonumber(k)
-                if id == nil then
-                    __exports.OvaleCompile:Warning(k .. " is not a parameter keyword in '" .. node.name .. "' " .. node.type)
-                else
-                    tbl[tonumber(k)] = v
+                if OvaleData.buffSpellList[k] then
+                    tbl[k] = v
                     count = count + 1
+                else
+                    local id = tonumber(k)
+                    if id == nil then
+                        __exports.OvaleCompile:Warning(k .. " is not a parameter keyword in '" .. node.name .. "' " .. node.type)
+                    else
+                        tbl[id] = v
+                        count = count + 1
+                    end
                 end
             end
         end

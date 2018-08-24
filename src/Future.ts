@@ -621,14 +621,14 @@ export class OvaleFutureClass extends OvaleFutureBase {
         this.StopProfiling("OvaleFuture_GetSpellcast");
         return [spellcast, index];
     }
-    GetAuraFinish(spell: string, spellId: number, targetGUID: string, atTime: number): [number, string] {
+    GetAuraFinish(spell: string, spellId: number, targetGUID: string, atTime: number): [string|number, string] {
         this.StartProfiling("OvaleFuture_GetAuraFinish");
         let auraId, auraGUID;
         let si = OvaleData.spellInfo[spellId];
         if (si && si.aura) {
             for (const [, unitId] of ipairs(SPELLCAST_AURA_ORDER)) {
                 for (const [, auraList] of kpairs(si.aura[unitId])) {
-                    for (const [id, spellData] of pairs(auraList)) {
+                    for (const [id, spellData] of kpairs(auraList)) {
                         let [verified, value, ] = OvaleData.CheckSpellAuraData(id, spellData, atTime, targetGUID);
                         if (verified && (SPELLAURALIST_AURA_VALUE[<string>value] || type(value) == "number" && value > 0)) {
                             auraId = id;
