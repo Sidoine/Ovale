@@ -164,6 +164,7 @@ Define(skullsplitter_talent 3) #22371
 # Bash an enemy's skull, dealing s1 Physical damage.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
 Define(warbreaker_talent 14) #22391
 # Smash the ground and shatter the armor of all enemies within A1 yds, dealing s1 Physical damage and increasing damage you deal to them by 208086s1 for 208086d.
+Define(kazzalax_fujiedas_fury_item 137053)
 Define(test_of_might_trait 275529)
     `;
 // END
@@ -444,7 +445,7 @@ Define(whirlwind_buff 85739)
 
 Define(archavons_heavy_hand_spell 205144)
 	# TODO Mortal strike refunds 15 rage
-Define(kazzalax_fujiedas_fury_item 137053)
+
 	SpellAddBuff(bloodthirst fujiedas_fury_buff=1 if_spell=fujiedas_fury_buff)
 
 Define(ayalas_stone_heart_item 137052)

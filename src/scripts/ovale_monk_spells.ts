@@ -52,6 +52,11 @@ Define(dampen_harm 122278)
   SpellInfo(dampen_harm cd=120 duration=10 talent=dampen_harm_talent gcd=0 offgcd=1)
   # Damage taken reduced by m2 to m3 for d, with larger attacks being reduced by more.
   SpellAddBuff(dampen_harm dampen_harm=1)
+Define(elusive_brawler 195630)
+# @spelldesc117906
+  SpellInfo(elusive_brawler duration=10 max_stacks=100 gcd=0 offgcd=1)
+  # Dodge chance increased by w1.
+  SpellAddBuff(elusive_brawler elusive_brawler=1)
 Define(energizing_elixir 115288)
 # Chug an Energizing Elixir, refilling all your Energy and instantly generate s2 Chi.
   SpellInfo(energizing_elixir cd=60 max_stacks=3 talent=energizing_elixir_talent gcd=1 energy=-200 chi=-2)
@@ -66,9 +71,19 @@ Define(fists_of_fury 113656)
   SpellInfo(fists_of_fury chi=3 cd=24 duration=4 channel=4 gcd=1 tick=0.166)
   # w3 damage every t3 sec. ?s125671[Parrying all attacks.][]
   SpellAddBuff(fists_of_fury fists_of_fury=1)
+Define(flying_serpent_kick 101545)
+# Soar forward through the air at high speed for d.rn rnIf used again while active, you will land, dealing 123586m1 damage to all enemies within 123586A1 yards and reducing movement speed by 123586m2 for 123586d.
+  SpellInfo(flying_serpent_kick cd=25 duration=1.5 gcd=1)
+  SpellAddBuff(flying_serpent_kick flying_serpent_kick=1)
 Define(fortifying_brew 115203)
 # Turns your skin to stone for 120954d, increasing your current and maximum health by <health>, increasing the effectiveness of Stagger by s1, and reducing all damage you take by <damage>.
   SpellInfo(fortifying_brew cd=420 gcd=0 offgcd=1)
+Define(invoke_niuzao_the_black_ox 132578)
+# Summons an effigy of Niuzao, the Black Ox for d. Niuzao attacks your primary target and taunts it. He also frequently Stomps, damaging all nearby enemies.
+  SpellInfo(invoke_niuzao_the_black_ox cd=180 duration=45 talent=invoke_niuzao_the_black_ox_talent)
+Define(invoke_xuen_the_white_tiger 123904)
+# Summons an effigy of Xuen, the White Tiger for d. Xuen attacks your primary target, and strikes 3 enemies within 123996A1 yards every 123999t1 sec with Tiger Lightning for 123996s1 Nature damage.
+  SpellInfo(invoke_xuen_the_white_tiger cd=120 duration=20 talent=invoke_xuen_the_white_tiger_talent gcd=1)
 Define(ironskin_brew 115308)
 # A swig of strong brew allows you to Stagger substantially more damage for 215479d. rnrnShares charges with Purifying Brew.
   SpellInfo(ironskin_brew cd=1 cd=15 gcd=0 offgcd=1)
@@ -118,6 +133,15 @@ Define(spinning_crane_kick 101546)
   SpellInfo(spinning_crane_kick chi=2 chi=3 duration=1.5 channel=1.5 tick=0.5)
   # Attacking all nearby enemies for Physical damage every 101546t1 sec.
   SpellAddBuff(spinning_crane_kick spinning_crane_kick=1)
+Define(storm_earth_and_fire 137639)
+# Split into 3 elemental spirits for d, each spirit dealing 100+m1 of normal damage and healing.rnrnYou directly control the Storm spirit, while Earth and Fire spirits mimic your attacks on nearby enemies.rnrnWhile active, casting Storm, Earth, and Fire again will cause the spirits to fixate on your target.
+# Rank 2: Storm, Earth, and Fire has s1+1 charges.
+  SpellInfo(storm_earth_and_fire cd=16 cd=90 duration=15 max_stacks=2 gcd=1)
+  # Elemental spirits summoned, mirroring all of the Monk's attacks.rnThe Monk and spirits each do 100+m1 of normal damage and healing.
+  SpellAddBuff(storm_earth_and_fire storm_earth_and_fire=1)
+Define(swift_roundhouse_buff 278707)
+# @spelldesc277669
+  SpellInfo(swift_roundhouse_buff channel=-0.001 gcd=0 offgcd=1)
 Define(the_emperors_capacitor_buff 235054)
 # @spelldesc235053
   SpellInfo(the_emperors_capacitor_buff max_stacks=20 gcd=0 offgcd=1)
@@ -163,17 +187,23 @@ Define(fist_of_the_white_tiger_talent 8) #19771
 # Strike with the technique of the White Tiger, dealing s1+261977s1 Physical damage.rnrn|cFFFFFFFFGenerates 261978s1 Chi.
 Define(good_karma_talent 11) #23364
 # Touch of Karma can now redirect an additional s1 of your maximum health.
-Define(rushing_jade_wind_talent_windwalker 17) #23122
-# Summons a whirling tornado around you, causing (1+d/t1)*148187s1 damage every t1 sec to all enemies within 107270A1 yards.
+Define(invoke_niuzao_the_black_ox_talent 18) #22103
+# Summons an effigy of Niuzao, the Black Ox for d. Niuzao attacks your primary target and taunts it. He also frequently Stomps, damaging all nearby enemies.
+Define(invoke_xuen_the_white_tiger_talent 18) #22102
+# Summons an effigy of Xuen, the White Tiger for d. Xuen attacks your primary target, and strikes 3 enemies within 123996A1 yards every 123999t1 sec with Tiger Lightning for 123996s1 Nature damage.
 Define(rushing_jade_wind_talent 17) #20184
 # Summons a whirling tornado around you, causing (1+d/t1)*148187s1 damage over d to enemies within 107270A1 yards.?s220357[ Applies Mark of the Crane to up to s2 nearby targets.][]
+Define(rushing_jade_wind_talent_windwalker 17) #23122
+# Summons a whirling tornado around you, causing (1+d/t1)*148187s1 damage every t1 sec to all enemies within 107270A1 yards.
 Define(serenity_talent 21) #21191
 # Enter an elevated state of mental and physical serenity for ?s115069[s1 sec][d]. While in this state, you deal s2 increased damage and healing, and all Chi consumers are free and cool down s4 more quickly.
+Define(special_delivery_talent 16) #19819
+# Drinking Ironskin or Purifying Brew has a h chance to toss a keg high into the air that lands nearby after s1 sec, dealing 196733s1 damage to all enemies within 196733A1 yards and reducing their movement speed by 196733m2 for 196733d.
 Define(whirling_dragon_punch_talent 20) #22105
 # Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
 Define(drinking_horn_cover_item 137097)
-Define(hidden_masters_forbidden_touch_item 137057)
 Define(the_emperors_capacitor_item 144239)
+Define(swift_roundhouse_trait 277669)
     `;
 // END
     code += `
@@ -264,7 +294,7 @@ Define(eye_of_the_tiger_debuff 196608)
 
 	SpellInfo(fists_of_fury chi=3 channel=4 cd=24 cd_haste=melee haste=melee)
 	SpellRequire(fists_of_fury chi_percent 0=buff,serenity_buff)
-Define(flying_serpent_kick 101545)
+
 	SpellInfo(flying_serpent_kick cd=25)
 
 	
@@ -288,9 +318,9 @@ Define(healing_elixir 122281)
 	SpellRequire(healing_elixir unusable 1=debuff,healing_immunity_debuff)
 Define(invoke_chiji_the_red_crane 198664)
 	SpellInfo(invoke_chiji_the_red_crane cd=180 talent=invoke_chiji_talent)
-Define(invoke_niuzao_the_black_ox 132578)
+
 	SpellInfo(invoke_niuzao_the_black_ox cd=180 talent=invoke_niuzao_talent)
-Define(invoke_xuen_the_white_tiger 123904)
+
 	SpellInfo(invoke_xuen_the_white_tiger cd=180 talent=invoke_xuen_talent)
 
 	SpellInfo(ironskin_brew cd=15 charges=3 gcd=0 offgcd=1 cd_haste=melee)
@@ -391,7 +421,7 @@ Define(soothing_mist_buff 115175)
 	SpellInfo(spinning_crane_kick chi=2 haste=melee specialization=windwalker)
 	SpellInfo(spinning_crane_kick haste=spell specialization=mistweaver)
 	SpellRequire(spinning_crane_kick chi_percent 0=buff,serenity_buff)
-Define(storm_earth_and_fire 137639)
+
 	SpellInfo(storm_earth_and_fire tag=cd gcd=0 offgcd=1 charges=2)
 	SpellInfo(storm_earth_and_fire replace=serenity talent=serenity_talent)
 	SpellAddBuff(storm_earth_and_fire storm_earth_and_fire_buff=1)

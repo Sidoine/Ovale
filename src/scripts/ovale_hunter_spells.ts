@@ -37,22 +37,25 @@ Define(barbed_shot 217200)
 Define(barrage 120360)
 # Rapidly fires a spray of shots for 120360d, dealing an average of <damageSec> Physical damage to all enemies in front of you. Usable while moving.
   SpellInfo(barrage focus=60 cd=20 duration=3 channel=3 talent=barrage_talent_marksmanship tick=0.2)
-Define(berserking 26297)
-# Increases your haste by s1 for d.
-  SpellInfo(berserking cd=180 duration=10 gcd=0 offgcd=1)
-  # Haste increased by s1.
-  SpellAddBuff(berserking berserking=1)
 Define(berserking_buff 200953)
 # @spelldesc200845
   SpellInfo(berserking_buff duration=3 max_stacks=12 gcd=0 offgcd=1)
   # Attack speed and critical strike chance increased by s1.
   SpellAddBuff(berserking_buff berserking_buff=1)
+Define(berserking 26297)
+# Increases your haste by s1 for d.
+  SpellInfo(berserking cd=180 duration=10 gcd=0 offgcd=1)
+  # Haste increased by s1.
+  SpellAddBuff(berserking berserking=1)
 Define(bestial_wrath 19574)
 # Sends you and your pet into a rage, increasing all damage you both deal by s1 for d. ?s231548&s217200[rnrnBestial Wrath's remaining cooldown is reduced by s3 sec each time you use Barbed Shot.][]
 # Rank 2: Bestial Wrath's remaining cooldown is reduced by 19574s3 sec each time you use Barbed Shot.
   SpellInfo(bestial_wrath cd=90 duration=15 channel=15)
   # Damage dealt increased by w1.
   SpellAddBuff(bestial_wrath bestial_wrath=1)
+Define(blur_of_talons_buff 277966)
+# @spelldesc277653
+  SpellInfo(blur_of_talons_buff channel=-0.001 gcd=0 offgcd=1)
 Define(butchery 212436)
 # Strike all nearby enemies in a flurry of strikes, inflicting s1 Physical damage to each.rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit, up to s3.
   SpellInfo(butchery focus=30 cd=9 talent=butchery_talent)
@@ -179,6 +182,8 @@ Define(wildfire_bomb 259495)
   SpellAddTargetDebuff(wildfire_bomb wildfire_bomb_debuff=1)
 Define(a_murder_of_crows_talent_survival 12) #22299
 # Summons a flock of crows to attack your target, dealing 131900s1*16 Physical damage over d. If the target dies while under attack, A Murder of Crows' cooldown is reset.
+Define(alpha_predator_talent 3) #22296
+# Kill Command now has s1+1 charges, and deals s2 increased damage.
 Define(barrage_talent_marksmanship 17) #23104
 # Rapidly fires a spray of shots for 120360d, dealing an average of <damageSec> Physical damage to all enemies in front of you. Usable while moving.
 Define(birds_of_prey_talent 19) #22272
@@ -215,6 +220,7 @@ Define(wildfire_infusion_talent 20) #22301
 # Lace your Wildfire Bomb with extra reagents, randomly giving it one of the following enhancements each time you throw it:rnrn|cFFFFFFFFShrapnel Bomb: |rShrapnel pierces the targets, causing ?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] to apply a bleed for 270343d that stacks up to 270343u times.rnrn|cFFFFFFFFPheromone Bomb: |rKill Command has a 270323s2 chance to reset against targets coated with Pheromones.rnrn|cFFFFFFFFVolatile Bomb: |rReacts violently with poison, causing an extra explosion against enemies suffering from your Serpent Sting and refreshes your Serpent Stings.
 Define(focused_fire_trait 278531)
 Define(in_the_rhythm_trait 264198)
+Define(latent_poison_trait 273283)
 Define(up_close_and_personal_trait 278533)
 Define(venomous_fangs_trait 274590)
     `;

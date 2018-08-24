@@ -29,6 +29,8 @@ for (const [name, script] of pairs(OvaleScripts.script)) {
     if (!script.className || script.type !== "script") continue;
 
     test(`Test ${name} script`, t => {
+        OvaleDebug.warning = undefined;
+        OvaleDebug.bug = undefined;
         Ovale.playerGUID = "player";
         // TODO
         Ovale.playerClass = script.className.toUpperCase() as ClassId;

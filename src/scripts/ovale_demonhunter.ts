@@ -768,8 +768,6 @@ AddFunction VengeanceNormalMainActions
  if Pain() <= 70 Spell(felblade)
  #fracture,if=soul_fragments<=3
  if SoulFragments() <= 3 Spell(fracture)
- #soul_cleave
- Spell(soul_cleave)
  #sigil_of_flame
  Spell(sigil_of_flame)
  #shear
@@ -793,7 +791,7 @@ AddFunction VengeanceNormalShortCdActions
 
 AddFunction VengeanceNormalShortCdPostConditions
 {
- Spell(infernal_strike) or SoulFragments() >= 4 and Spell(spirit_bomb) or not Talent(spirit_bomb_talent) and Spell(soul_cleave) or Talent(spirit_bomb_talent) and SoulFragments() == 0 and Spell(soul_cleave) or Pain() <= 90 and Spell(immolation_aura) or Pain() <= 70 and Spell(felblade) or SoulFragments() <= 3 and Spell(fracture) or Spell(soul_cleave) or Spell(sigil_of_flame) or Spell(shear) or Spell(throw_glaive_veng)
+ Spell(infernal_strike) or SoulFragments() >= 4 and Spell(spirit_bomb) or not Talent(spirit_bomb_talent) and Spell(soul_cleave) or Talent(spirit_bomb_talent) and SoulFragments() == 0 and Spell(soul_cleave) or Pain() <= 90 and Spell(immolation_aura) or Pain() <= 70 and Spell(felblade) or SoulFragments() <= 3 and Spell(fracture) or Spell(sigil_of_flame) or Spell(shear) or Spell(throw_glaive_veng)
 }
 
 AddFunction VengeanceNormalCdActions
@@ -802,7 +800,7 @@ AddFunction VengeanceNormalCdActions
 
 AddFunction VengeanceNormalCdPostConditions
 {
- Spell(infernal_strike) or SoulFragments() >= 4 and Spell(spirit_bomb) or not Talent(spirit_bomb_talent) and Spell(soul_cleave) or Talent(spirit_bomb_talent) and SoulFragments() == 0 and Spell(soul_cleave) or Pain() <= 90 and Spell(immolation_aura) or Pain() <= 70 and Spell(felblade) or SoulFragments() <= 3 and Spell(fracture) or Spell(fel_devastation) or Spell(soul_cleave) or Spell(sigil_of_flame) or Spell(shear) or Spell(throw_glaive_veng)
+ Spell(infernal_strike) or SoulFragments() >= 4 and Spell(spirit_bomb) or not Talent(spirit_bomb_talent) and Spell(soul_cleave) or Talent(spirit_bomb_talent) and SoulFragments() == 0 and Spell(soul_cleave) or Pain() <= 90 and Spell(immolation_aura) or Pain() <= 70 and Spell(felblade) or SoulFragments() <= 3 and Spell(fracture) or Spell(fel_devastation) or Spell(sigil_of_flame) or Spell(shear) or Spell(throw_glaive_veng)
 }
 
 ### actions.defensives

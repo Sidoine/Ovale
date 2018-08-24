@@ -421,7 +421,7 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 # Based on SimulationCraft profile "PR_Shaman_Enhancement".
 #	class=shaman
 #	spec=enhancement
-#	talents=3101033
+#	talents=3201033
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
