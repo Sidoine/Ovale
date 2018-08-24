@@ -977,7 +977,7 @@ export class OvaleASTClass extends OvaleASTBase {
     }
 
     SyntaxError(tokenStream: OvaleLexer , ...__args: any[]) {
-        this.Print(...__args);
+        this.Warning(...__args);
         let context: LuaArray<string> = {
             1: "Next tokens:"
         }
@@ -990,7 +990,7 @@ export class OvaleASTClass extends OvaleASTBase {
                 break;
             }
         }
-        this.Print(concat(context, " "));
+        this.Warning(concat(context, " "));
     }
 
     Parse(nodeType: string, tokenStream: OvaleLexer, nodeList: LuaArray<AstNode>, annotation: AstAnnotation) {

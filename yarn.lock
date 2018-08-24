@@ -53,9 +53,9 @@
     pretty-ms "^0.2.1"
     text-table "^0.2.0"
 
-"@types/node@^10.7.1":
-  version "10.7.1"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.7.1.tgz#b704d7c259aa40ee052eec678758a68d07132a2e"
+"@types/node@^10.9.1":
+  version "10.9.1"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.9.1.tgz#06f002136fbcf51e730995149050bb3c45ee54e6"
 
 "@wowts/ace_comm-3.0@^1.0.0":
   version "1.0.0"
@@ -210,9 +210,9 @@
   dependencies:
     "@wowts/lua" "^1.0.6"
 
-"@wowts/lua@^1.0.3", "@wowts/lua@^1.0.5", "@wowts/lua@^1.0.6", "@wowts/lua@^1.3.0":
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/@wowts/lua/-/lua-1.3.0.tgz#eb3ac622695780b6a1600c12836e1bf3ca6386ed"
+"@wowts/lua@^1.0.3", "@wowts/lua@^1.0.5", "@wowts/lua@^1.0.6", "@wowts/lua@^1.3.0", "@wowts/lua@^1.3.1":
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/@wowts/lua/-/lua-1.3.1.tgz#321d67743e9cef66c10402f9403316ee36147f8b"
 
 "@wowts/masque@^1.0.1":
   version "1.0.1"
