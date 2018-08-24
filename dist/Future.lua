@@ -647,7 +647,7 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
         if si and si.aura then
             for _, unitId in ipairs(SPELLCAST_AURA_ORDER) do
                 for _, auraList in kpairs(si.aura[unitId]) do
-                    for id, spellData in pairs(auraList) do
+                    for id, spellData in kpairs(auraList) do
                         local verified, value = OvaleData:CheckSpellAuraData(id, spellData, atTime, targetGUID)
                         if verified and (SPELLAURALIST_AURA_VALUE[value] or type(value) == "number" and value > 0) then
                             auraId = id

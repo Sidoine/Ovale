@@ -34,6 +34,7 @@ Define(berserking 26297)
   SpellAddBuff(berserking berserking=1)
 Define(between_the_eyes 199804)
 # Finishing move that deals damage with your pistol and stuns the target.?a235484[ Critical strikes with this ability deal four times normal damage.][]rn   1 point : <damage>*1 damage, 1 secrn   2 points: <damage>*2 damage, 2 secrn   3 points: <damage>*3 damage, 3 secrn   4 points: <damage>*4 damage, 4 secrn   5 points: <damage>*5 damage, 5 sec?s193531[rn   6 points: <damage>*6 damage, 6 sec][]
+# Rank 2: Critical strikes with Between the Eyes deal four times normal damage.rn
   SpellInfo(between_the_eyes energy=25 combopoints=1 cd=30 gcd=1)
   # Stunned.
   SpellAddTargetDebuff(between_the_eyes between_the_eyes=1)
@@ -63,6 +64,7 @@ Define(envenom 32645)
   SpellAddBuff(envenom envenom=1)
 Define(eviscerate 196819)
 # Finishing move that disembowels the target, causing damage per combo point.rn   1 point  : m1*1 damagern   2 points: m1*2 damagern   3 points: m1*3 damagern   4 points: m1*4 damagern   5 points: m1*5 damage?s193531[rn   6 points: m1*6 damage][]
+# Rank 2: Eviscerate's damage is increased by s1.
   SpellInfo(eviscerate energy=35 combopoints=1 gcd=1)
 Define(exsanguinate 200806)
 # Twist your blades into the target's wounds, causing your Bleed effects on them to bleed out s1 faster.
@@ -75,6 +77,7 @@ Define(fireblood 265221)
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
 Define(garrote 703)
 # Garrote the enemy, causing o1 Bleed damage over d.?a231719[ Silences the target for 1330d when used from Stealth.][]rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|r
+# Rank 2: Garrote silences the target for 1330d when used from Stealth.rn
   SpellInfo(garrote energy=45 cd=6 duration=18 gcd=1 combopoints=-1 tick=2)
   # Suffering w1 damage every t1 seconds.
   SpellAddTargetDebuff(garrote garrote=1)
@@ -162,6 +165,7 @@ Define(shadowstep 36554)
   SpellAddBuff(shadowstep shadowstep=1)
 Define(shadowstrike 185438)
 # Strike the target, dealing s1 Physical damage.?a231718[rnrnWhile Stealthed, you strike through the shadows and appear behind your target up to 5+245623s1 yds away, dealing 245623s2 additional damage.][]rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
+# Rank 2: @spelldesc231718
   SpellInfo(shadowstrike energy=40 gcd=1 combopoints=-2)
 Define(sharpened_blades_buff 272913)
 # @spelldesc272911

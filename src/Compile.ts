@@ -319,12 +319,17 @@ function EvaluateSpellAuraList(node: AstNode) {
         let count = 0;
         for (const [k, v] of kpairs(namedParams)) {
             if (!checkToken(PARAMETER_KEYWORD, k)) {
-                const id = tonumber(k);
-                if (id === undefined) {
-                    OvaleCompile.Print(`Info: ${k} is not a parameter keyword in '${node.name}' ${node.type}`);
-                } else {
-                    tbl[tonumber(k)] = <any>v;
+                if (OvaleData.buffSpellList[k]) {
+                    tbl[k] = v;
                     count = count + 1;
+                } else {
+                    const id = tonumber(k);
+                    if (id === undefined) {
+                        OvaleCompile.Warning(`${k} is not a parameter keyword in '${node.name}' ${node.type}`);
+                    } else {
+                        tbl[id] = v;
+                        count = count + 1;
+                    }
                 }
             }
         }
@@ -514,7 +519,7 @@ let UpdateTrinketInfo = function () {
     }
 
 const OvaleCompileClassBase = OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(OvaleCompileBase));
-class OvaleCompileClass extends OvaleCompileClassBase {
+export class OvaleCompileClass extends OvaleCompileClassBase {
     serial: number | undefined = undefined;
     ast: AstNode | undefined = undefined;
      

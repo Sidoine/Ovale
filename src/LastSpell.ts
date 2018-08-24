@@ -13,7 +13,7 @@ export interface SpellCast extends PaperDollSnapshot {
     target?: string;
     queued?: number;
     success?: number;
-    auraId?: number;
+    auraId?: number | string;
     auraGUID?: string;
     channel?: boolean;
     caster?: string;

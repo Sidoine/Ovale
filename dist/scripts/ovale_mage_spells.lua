@@ -11,6 +11,7 @@ __exports.register = function()
   SpellAddBuff(ancestral_call ancestral_call=1)
 Define(arcane_barrage 44425)
 # Launches bolts of arcane energy at the enemy target, causing s1 Arcane damage. rnrnFor each Arcane Charge, deals 36032s2 additional damage?a231564[ and hits 36032s3 additional nearby Ltarget:targets; for s2 of its damage][].rnrn|cFFFFFFFFConsumes all Arcane Charges.|r
+# Rank 2: Arcane Barrage hits s1 additional Ltarget:targets; within 44425s3 yds per Arcane Charge for 44425s2 damage.
   SpellInfo(arcane_barrage cd=3)
 Define(arcane_blast 30451)
 # Blasts the target with energy, dealing 30451s1 Arcane damage.rnrnEach Arcane Charge increases damage by 36032s1 and mana cost by 36032s5, and reduces cast time by 36032s4.rnrn|cFFFFFFFFGenerates 1 Arcane Charge.|r
@@ -45,16 +46,16 @@ Define(battle_potion_of_intellect 279151)
   SpellInfo(battle_potion_of_intellect cd=1 duration=25 gcd=0 offgcd=1)
   # Intellect increased by w1.
   SpellAddBuff(battle_potion_of_intellect battle_potion_of_intellect=1)
-Define(berserking 26297)
-# Increases your haste by s1 for d.
-  SpellInfo(berserking cd=180 duration=10 gcd=0 offgcd=1)
-  # Haste increased by s1.
-  SpellAddBuff(berserking berserking=1)
 Define(berserking_buff 200953)
 # @spelldesc200845
   SpellInfo(berserking_buff duration=3 max_stacks=12 gcd=0 offgcd=1)
   # Attack speed and critical strike chance increased by s1.
   SpellAddBuff(berserking_buff berserking_buff=1)
+Define(berserking 26297)
+# Increases your haste by s1 for d.
+  SpellInfo(berserking cd=180 duration=10 gcd=0 offgcd=1)
+  # Haste increased by s1.
+  SpellAddBuff(berserking berserking=1)
 Define(blast_wave 157981)
 # Causes an explosion around yourself, dealing s1 Fire damage to all enemies within A1 yards, knocking them back, and reducing movement speed by s2 for d.
   SpellInfo(blast_wave cd=25 duration=4 talent=blast_wave_talent)
@@ -67,11 +68,8 @@ Define(blink 1953)
   SpellAddBuff(blink blink=1)
 Define(blizzard 190356)
 # Ice shards pelt the target area, dealing 190357m1*8 Frost damage over d and reducing movement speed by 205708s1 for 205708d.?a236662[rnrnEach time Blizzard deals damage, the cooldown of Frozen Orb is reduced by 236662s1/100.1 sec.][]
+# Rank 2: Each time Blizzard deals damage, the cooldown of Frozen Orb is reduced by s1/100.1 sec.
   SpellInfo(blizzard cd=8 duration=8)
-Define(brain_freeze_frost 231584)
-# Brain Freeze causes your next Flurry to  apply Winter's Chill to the target. rnrnWinter's Chill causes the target to take damage from your spells as if it were frozen.
-  SpellInfo(brain_freeze_frost channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(brain_freeze_frost brain_freeze_frost=1)
 Define(charged_up 205032)
 # Immediately grants s1 Arcane Charges.
   SpellInfo(charged_up cd=40 duration=10 talent=charged_up_talent arcanecharges=-4)
@@ -104,11 +102,13 @@ Define(ebonbolt 214634)
   SpellInfo(ebonbolt cd=45)
 Define(evocation 12051)
 # Increases your mana regeneration by s1 for d.
+# Rank 2: Evocation's cooldown is reduced by s1.
   SpellInfo(evocation cd=180 duration=6 channel=6)
   # Mana regeneration increased by s1.
   SpellAddBuff(evocation evocation=1)
 Define(fire_blast 108853)
 # Blasts the enemy for s1 Fire damage. Castable while casting other spells.?a231568[ Always deals a critical strike.][]
+# Rank 2: Fire Blast always deals a critical strike.
   SpellInfo(fire_blast cd=0.5 cd=12 gcd=0 offgcd=1)
 Define(fireball 133)
 # Throws a fiery ball that causes s1 Fire damage.
@@ -371,7 +371,7 @@ Define(erupting_infernal_core_buff 248147)
 	SpellInfo(evocation cd=120 channel=3 haste=spell)
 	SpellInfo(evocation add_cd=-30 if_spell=improved_evocation)
 	SpellAddBuff(evocation ice_floes_buff=0 if_spell=ice_floes)
-Define(fingers_of_frost 112965)
+
 Define(fingers_of_frost_buff 44544)
 	SpellInfo(fingers_of_frost_buff duration=15 max_stacks=2)
 	SpellInfo(fingers_of_frost_buff max_stacks=4 itemset=T18 itemcount=4)
@@ -446,7 +446,7 @@ Define(ignite_debuff 12654)
 	SpellInfo(ignite_debuff duration=5 tick=1)
 Define(improved_evocation 157614)
 Define(improved_flamestrike 157621)
-Define(incanters_flow 1463)
+
 Define(incanters_flow_buff 116267)
 	SpellInfo(incanters_flow_buff duration=25 max_stacks=5)
 Define(inferno_blast 108853)

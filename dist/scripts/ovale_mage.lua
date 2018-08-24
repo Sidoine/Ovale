@@ -1080,25 +1080,25 @@ AddFunction FrostSingleMainActions
  #ice_nova,if=cooldown.ice_nova.ready&debuff.winters_chill.up
  if SpellCooldown(ice_nova) == 0 and target.DebuffPresent(winters_chill_debuff) Spell(ice_nova)
  #flurry,if=!talent.glacial_spike.enabled&(prev_gcd.1.ebonbolt|buff.brain_freeze.react&prev_gcd.1.frostbolt)
- if not Talent(glacial_spike_talent) and { PreviousGCDSpell(ebonbolt) or DebuffPresent(brain_freeze_frost) and PreviousGCDSpell(frostbolt) } Spell(flurry)
+ if not Talent(glacial_spike_talent) and { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and PreviousGCDSpell(frostbolt) } Spell(flurry)
  #flurry,if=talent.glacial_spike.enabled&buff.brain_freeze.react&(prev_gcd.1.frostbolt&buff.icicles.stack<4|prev_gcd.1.glacial_spike|prev_gcd.1.ebonbolt)
- if Talent(glacial_spike_talent) and DebuffPresent(brain_freeze_frost) and { PreviousGCDSpell(frostbolt) and BuffStacks(icicles_buff) < 4 or PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(ebonbolt) } Spell(flurry)
+ if Talent(glacial_spike_talent) and BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(frostbolt) and BuffStacks(icicles_buff) < 4 or PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(ebonbolt) } Spell(flurry)
  #blizzard,if=active_enemies>2|active_enemies>1&cast_time=0&buff.fingers_of_frost.react<2
  if Enemies() > 2 or Enemies() > 1 and CastTime(blizzard) == 0 and BuffStacks(fingers_of_frost_buff) < 2 Spell(blizzard)
  #ice_lance,if=buff.fingers_of_frost.react
  if BuffPresent(fingers_of_frost_buff) Spell(ice_lance)
  #ebonbolt,if=!talent.glacial_spike.enabled|buff.icicles.stack=5&!buff.brain_freeze.react
- if not Talent(glacial_spike_talent) or BuffStacks(icicles_buff) == 5 and not DebuffPresent(brain_freeze_frost) Spell(ebonbolt)
+ if not Talent(glacial_spike_talent) or BuffStacks(icicles_buff) == 5 and not BuffPresent(brain_freeze_buff) Spell(ebonbolt)
  #ray_of_frost,if=!action.frozen_orb.in_flight&ground_aoe.frozen_orb.remains=0
  if not InFlightToTarget(frozen_orb) and not DebuffRemaining(frozen_orb_debuff) > 0 Spell(ray_of_frost)
  #blizzard,if=cast_time=0|active_enemies>1
  if CastTime(blizzard) == 0 or Enemies() > 1 Spell(blizzard)
  #glacial_spike,if=buff.brain_freeze.react|prev_gcd.1.ebonbolt|active_enemies>1&talent.splitting_ice.enabled
- if DebuffPresent(brain_freeze_frost) or PreviousGCDSpell(ebonbolt) or Enemies() > 1 and Talent(splitting_ice_talent) Spell(glacial_spike)
+ if BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) or Enemies() > 1 and Talent(splitting_ice_talent) Spell(glacial_spike)
  #ice_nova
  Spell(ice_nova)
  #flurry,if=azerite.winters_reach.enabled&!buff.brain_freeze.react&buff.winters_reach.react
- if HasAzeriteTrait(winters_reach_trait) and not DebuffPresent(brain_freeze_frost) and DebuffPresent(winters_reach) Spell(flurry)
+ if HasAzeriteTrait(winters_reach_trait) and not BuffPresent(brain_freeze_buff) and DebuffPresent(winters_reach) Spell(flurry)
  #frostbolt
  Spell(frostbolt)
  #call_action_list,name=movement
@@ -1118,7 +1118,7 @@ AddFunction FrostSingleMainPostConditions
 
 AddFunction FrostSingleShortCdActions
 {
- unless SpellCooldown(ice_nova) == 0 and target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or not Talent(glacial_spike_talent) and { PreviousGCDSpell(ebonbolt) or DebuffPresent(brain_freeze_frost) and PreviousGCDSpell(frostbolt) } and Spell(flurry) or Talent(glacial_spike_talent) and DebuffPresent(brain_freeze_frost) and { PreviousGCDSpell(frostbolt) and BuffStacks(icicles_buff) < 4 or PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(ebonbolt) } and Spell(flurry)
+ unless SpellCooldown(ice_nova) == 0 and target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or not Talent(glacial_spike_talent) and { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and PreviousGCDSpell(frostbolt) } and Spell(flurry) or Talent(glacial_spike_talent) and BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(frostbolt) and BuffStacks(icicles_buff) < 4 or PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(ebonbolt) } and Spell(flurry)
  {
   #frozen_orb
   Spell(frozen_orb)
@@ -1128,7 +1128,7 @@ AddFunction FrostSingleShortCdActions
    #comet_storm
    Spell(comet_storm)
 
-   unless { not Talent(glacial_spike_talent) or BuffStacks(icicles_buff) == 5 and not DebuffPresent(brain_freeze_frost) } and Spell(ebonbolt) or not InFlightToTarget(frozen_orb) and not DebuffRemaining(frozen_orb_debuff) > 0 and Spell(ray_of_frost) or { CastTime(blizzard) == 0 or Enemies() > 1 } and Spell(blizzard) or { DebuffPresent(brain_freeze_frost) or PreviousGCDSpell(ebonbolt) or Enemies() > 1 and Talent(splitting_ice_talent) } and Spell(glacial_spike) or Spell(ice_nova) or HasAzeriteTrait(winters_reach_trait) and not DebuffPresent(brain_freeze_frost) and DebuffPresent(winters_reach) and Spell(flurry) or Spell(frostbolt)
+   unless { not Talent(glacial_spike_talent) or BuffStacks(icicles_buff) == 5 and not BuffPresent(brain_freeze_buff) } and Spell(ebonbolt) or not InFlightToTarget(frozen_orb) and not DebuffRemaining(frozen_orb_debuff) > 0 and Spell(ray_of_frost) or { CastTime(blizzard) == 0 or Enemies() > 1 } and Spell(blizzard) or { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) or Enemies() > 1 and Talent(splitting_ice_talent) } and Spell(glacial_spike) or Spell(ice_nova) or HasAzeriteTrait(winters_reach_trait) and not BuffPresent(brain_freeze_buff) and DebuffPresent(winters_reach) and Spell(flurry) or Spell(frostbolt)
    {
     #call_action_list,name=movement
     FrostMovementShortCdActions()
@@ -1139,12 +1139,12 @@ AddFunction FrostSingleShortCdActions
 
 AddFunction FrostSingleShortCdPostConditions
 {
- SpellCooldown(ice_nova) == 0 and target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or not Talent(glacial_spike_talent) and { PreviousGCDSpell(ebonbolt) or DebuffPresent(brain_freeze_frost) and PreviousGCDSpell(frostbolt) } and Spell(flurry) or Talent(glacial_spike_talent) and DebuffPresent(brain_freeze_frost) and { PreviousGCDSpell(frostbolt) and BuffStacks(icicles_buff) < 4 or PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(ebonbolt) } and Spell(flurry) or { Enemies() > 2 or Enemies() > 1 and CastTime(blizzard) == 0 and BuffStacks(fingers_of_frost_buff) < 2 } and Spell(blizzard) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or { not Talent(glacial_spike_talent) or BuffStacks(icicles_buff) == 5 and not DebuffPresent(brain_freeze_frost) } and Spell(ebonbolt) or not InFlightToTarget(frozen_orb) and not DebuffRemaining(frozen_orb_debuff) > 0 and Spell(ray_of_frost) or { CastTime(blizzard) == 0 or Enemies() > 1 } and Spell(blizzard) or { DebuffPresent(brain_freeze_frost) or PreviousGCDSpell(ebonbolt) or Enemies() > 1 and Talent(splitting_ice_talent) } and Spell(glacial_spike) or Spell(ice_nova) or HasAzeriteTrait(winters_reach_trait) and not DebuffPresent(brain_freeze_frost) and DebuffPresent(winters_reach) and Spell(flurry) or Spell(frostbolt) or FrostMovementShortCdPostConditions() or Spell(ice_lance)
+ SpellCooldown(ice_nova) == 0 and target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or not Talent(glacial_spike_talent) and { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and PreviousGCDSpell(frostbolt) } and Spell(flurry) or Talent(glacial_spike_talent) and BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(frostbolt) and BuffStacks(icicles_buff) < 4 or PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(ebonbolt) } and Spell(flurry) or { Enemies() > 2 or Enemies() > 1 and CastTime(blizzard) == 0 and BuffStacks(fingers_of_frost_buff) < 2 } and Spell(blizzard) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or { not Talent(glacial_spike_talent) or BuffStacks(icicles_buff) == 5 and not BuffPresent(brain_freeze_buff) } and Spell(ebonbolt) or not InFlightToTarget(frozen_orb) and not DebuffRemaining(frozen_orb_debuff) > 0 and Spell(ray_of_frost) or { CastTime(blizzard) == 0 or Enemies() > 1 } and Spell(blizzard) or { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) or Enemies() > 1 and Talent(splitting_ice_talent) } and Spell(glacial_spike) or Spell(ice_nova) or HasAzeriteTrait(winters_reach_trait) and not BuffPresent(brain_freeze_buff) and DebuffPresent(winters_reach) and Spell(flurry) or Spell(frostbolt) or FrostMovementShortCdPostConditions() or Spell(ice_lance)
 }
 
 AddFunction FrostSingleCdActions
 {
- unless SpellCooldown(ice_nova) == 0 and target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or not Talent(glacial_spike_talent) and { PreviousGCDSpell(ebonbolt) or DebuffPresent(brain_freeze_frost) and PreviousGCDSpell(frostbolt) } and Spell(flurry) or Talent(glacial_spike_talent) and DebuffPresent(brain_freeze_frost) and { PreviousGCDSpell(frostbolt) and BuffStacks(icicles_buff) < 4 or PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(ebonbolt) } and Spell(flurry) or Spell(frozen_orb) or { Enemies() > 2 or Enemies() > 1 and CastTime(blizzard) == 0 and BuffStacks(fingers_of_frost_buff) < 2 } and Spell(blizzard) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or Spell(comet_storm) or { not Talent(glacial_spike_talent) or BuffStacks(icicles_buff) == 5 and not DebuffPresent(brain_freeze_frost) } and Spell(ebonbolt) or not InFlightToTarget(frozen_orb) and not DebuffRemaining(frozen_orb_debuff) > 0 and Spell(ray_of_frost) or { CastTime(blizzard) == 0 or Enemies() > 1 } and Spell(blizzard) or { DebuffPresent(brain_freeze_frost) or PreviousGCDSpell(ebonbolt) or Enemies() > 1 and Talent(splitting_ice_talent) } and Spell(glacial_spike) or Spell(ice_nova) or HasAzeriteTrait(winters_reach_trait) and not DebuffPresent(brain_freeze_frost) and DebuffPresent(winters_reach) and Spell(flurry) or Spell(frostbolt)
+ unless SpellCooldown(ice_nova) == 0 and target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or not Talent(glacial_spike_talent) and { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and PreviousGCDSpell(frostbolt) } and Spell(flurry) or Talent(glacial_spike_talent) and BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(frostbolt) and BuffStacks(icicles_buff) < 4 or PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(ebonbolt) } and Spell(flurry) or Spell(frozen_orb) or { Enemies() > 2 or Enemies() > 1 and CastTime(blizzard) == 0 and BuffStacks(fingers_of_frost_buff) < 2 } and Spell(blizzard) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or Spell(comet_storm) or { not Talent(glacial_spike_talent) or BuffStacks(icicles_buff) == 5 and not BuffPresent(brain_freeze_buff) } and Spell(ebonbolt) or not InFlightToTarget(frozen_orb) and not DebuffRemaining(frozen_orb_debuff) > 0 and Spell(ray_of_frost) or { CastTime(blizzard) == 0 or Enemies() > 1 } and Spell(blizzard) or { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) or Enemies() > 1 and Talent(splitting_ice_talent) } and Spell(glacial_spike) or Spell(ice_nova) or HasAzeriteTrait(winters_reach_trait) and not BuffPresent(brain_freeze_buff) and DebuffPresent(winters_reach) and Spell(flurry) or Spell(frostbolt)
  {
   #call_action_list,name=movement
   FrostMovementCdActions()
@@ -1153,7 +1153,7 @@ AddFunction FrostSingleCdActions
 
 AddFunction FrostSingleCdPostConditions
 {
- SpellCooldown(ice_nova) == 0 and target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or not Talent(glacial_spike_talent) and { PreviousGCDSpell(ebonbolt) or DebuffPresent(brain_freeze_frost) and PreviousGCDSpell(frostbolt) } and Spell(flurry) or Talent(glacial_spike_talent) and DebuffPresent(brain_freeze_frost) and { PreviousGCDSpell(frostbolt) and BuffStacks(icicles_buff) < 4 or PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(ebonbolt) } and Spell(flurry) or Spell(frozen_orb) or { Enemies() > 2 or Enemies() > 1 and CastTime(blizzard) == 0 and BuffStacks(fingers_of_frost_buff) < 2 } and Spell(blizzard) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or Spell(comet_storm) or { not Talent(glacial_spike_talent) or BuffStacks(icicles_buff) == 5 and not DebuffPresent(brain_freeze_frost) } and Spell(ebonbolt) or not InFlightToTarget(frozen_orb) and not DebuffRemaining(frozen_orb_debuff) > 0 and Spell(ray_of_frost) or { CastTime(blizzard) == 0 or Enemies() > 1 } and Spell(blizzard) or { DebuffPresent(brain_freeze_frost) or PreviousGCDSpell(ebonbolt) or Enemies() > 1 and Talent(splitting_ice_talent) } and Spell(glacial_spike) or Spell(ice_nova) or HasAzeriteTrait(winters_reach_trait) and not DebuffPresent(brain_freeze_frost) and DebuffPresent(winters_reach) and Spell(flurry) or Spell(frostbolt) or FrostMovementCdPostConditions() or Spell(ice_lance)
+ SpellCooldown(ice_nova) == 0 and target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or not Talent(glacial_spike_talent) and { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and PreviousGCDSpell(frostbolt) } and Spell(flurry) or Talent(glacial_spike_talent) and BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(frostbolt) and BuffStacks(icicles_buff) < 4 or PreviousGCDSpell(glacial_spike) or PreviousGCDSpell(ebonbolt) } and Spell(flurry) or Spell(frozen_orb) or { Enemies() > 2 or Enemies() > 1 and CastTime(blizzard) == 0 and BuffStacks(fingers_of_frost_buff) < 2 } and Spell(blizzard) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or Spell(comet_storm) or { not Talent(glacial_spike_talent) or BuffStacks(icicles_buff) == 5 and not BuffPresent(brain_freeze_buff) } and Spell(ebonbolt) or not InFlightToTarget(frozen_orb) and not DebuffRemaining(frozen_orb_debuff) > 0 and Spell(ray_of_frost) or { CastTime(blizzard) == 0 or Enemies() > 1 } and Spell(blizzard) or { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) or Enemies() > 1 and Talent(splitting_ice_talent) } and Spell(glacial_spike) or Spell(ice_nova) or HasAzeriteTrait(winters_reach_trait) and not BuffPresent(brain_freeze_buff) and DebuffPresent(winters_reach) and Spell(flurry) or Spell(frostbolt) or FrostMovementCdPostConditions() or Spell(ice_lance)
 }
 
 ### actions.precombat
@@ -1250,7 +1250,7 @@ AddFunction FrostCooldownsShortCdActions
  #rune_of_power,if=time_to_die>10+cast_time&time_to_die<25
  if target.TimeToDie() > 10 + CastTime(rune_of_power) and target.TimeToDie() < 25 Spell(rune_of_power)
  #rune_of_power,if=active_enemies=1&talent.glacial_spike.enabled&buff.icicles.stack=5&(buff.brain_freeze.react|talent.ebonbolt.enabled&cooldown.ebonbolt.remains<cast_time)
- if Enemies() == 1 and Talent(glacial_spike_talent) and BuffStacks(icicles_buff) == 5 and { DebuffPresent(brain_freeze_frost) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) } Spell(rune_of_power)
+ if Enemies() == 1 and Talent(glacial_spike_talent) and BuffStacks(icicles_buff) == 5 and { BuffPresent(brain_freeze_buff) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) } Spell(rune_of_power)
  #rune_of_power,if=active_enemies=1&!talent.glacial_spike.enabled&(prev_gcd.1.frozen_orb|talent.ebonbolt.enabled&cooldown.ebonbolt.remains<cast_time|talent.comet_storm.enabled&cooldown.comet_storm.remains<cast_time|talent.ray_of_frost.enabled&cooldown.ray_of_frost.remains<cast_time|charges_fractional>1.9)
  if Enemies() == 1 and not Talent(glacial_spike_talent) and { PreviousGCDSpell(frozen_orb) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) or Talent(comet_storm_talent) and SpellCooldown(comet_storm) < CastTime(rune_of_power) or Talent(ray_of_frost_talent) and SpellCooldown(ray_of_frost) < CastTime(rune_of_power) or Charges(rune_of_power count=0) > 1 } Spell(rune_of_power)
  #rune_of_power,if=active_enemies>1&prev_gcd.1.frozen_orb
@@ -1270,7 +1270,7 @@ AddFunction FrostCooldownsCdActions
  #mirror_image
  Spell(mirror_image)
 
- unless target.TimeToDie() > 10 + CastTime(rune_of_power) and target.TimeToDie() < 25 and Spell(rune_of_power) or Enemies() == 1 and Talent(glacial_spike_talent) and BuffStacks(icicles_buff) == 5 and { DebuffPresent(brain_freeze_frost) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) } and Spell(rune_of_power) or Enemies() == 1 and not Talent(glacial_spike_talent) and { PreviousGCDSpell(frozen_orb) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) or Talent(comet_storm_talent) and SpellCooldown(comet_storm) < CastTime(rune_of_power) or Talent(ray_of_frost_talent) and SpellCooldown(ray_of_frost) < CastTime(rune_of_power) or Charges(rune_of_power count=0) > 1 } and Spell(rune_of_power) or Enemies() > 1 and PreviousGCDSpell(frozen_orb) and Spell(rune_of_power)
+ unless target.TimeToDie() > 10 + CastTime(rune_of_power) and target.TimeToDie() < 25 and Spell(rune_of_power) or Enemies() == 1 and Talent(glacial_spike_talent) and BuffStacks(icicles_buff) == 5 and { BuffPresent(brain_freeze_buff) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) } and Spell(rune_of_power) or Enemies() == 1 and not Talent(glacial_spike_talent) and { PreviousGCDSpell(frozen_orb) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) or Talent(comet_storm_talent) and SpellCooldown(comet_storm) < CastTime(rune_of_power) or Talent(ray_of_frost_talent) and SpellCooldown(ray_of_frost) < CastTime(rune_of_power) or Charges(rune_of_power count=0) > 1 } and Spell(rune_of_power) or Enemies() > 1 and PreviousGCDSpell(frozen_orb) and Spell(rune_of_power)
  {
   #potion,if=prev_gcd.1.icy_veins|target.time_to_die<70
   if { PreviousGCDSpell(icy_veins) or target.TimeToDie() < 70 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(rising_death usable=1)
@@ -1291,7 +1291,7 @@ AddFunction FrostCooldownsCdActions
 
 AddFunction FrostCooldownsCdPostConditions
 {
- target.TimeToDie() > 10 + CastTime(rune_of_power) and target.TimeToDie() < 25 and Spell(rune_of_power) or Enemies() == 1 and Talent(glacial_spike_talent) and BuffStacks(icicles_buff) == 5 and { DebuffPresent(brain_freeze_frost) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) } and Spell(rune_of_power) or Enemies() == 1 and not Talent(glacial_spike_talent) and { PreviousGCDSpell(frozen_orb) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) or Talent(comet_storm_talent) and SpellCooldown(comet_storm) < CastTime(rune_of_power) or Talent(ray_of_frost_talent) and SpellCooldown(ray_of_frost) < CastTime(rune_of_power) or Charges(rune_of_power count=0) > 1 } and Spell(rune_of_power) or Enemies() > 1 and PreviousGCDSpell(frozen_orb) and Spell(rune_of_power)
+ target.TimeToDie() > 10 + CastTime(rune_of_power) and target.TimeToDie() < 25 and Spell(rune_of_power) or Enemies() == 1 and Talent(glacial_spike_talent) and BuffStacks(icicles_buff) == 5 and { BuffPresent(brain_freeze_buff) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) } and Spell(rune_of_power) or Enemies() == 1 and not Talent(glacial_spike_talent) and { PreviousGCDSpell(frozen_orb) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) or Talent(comet_storm_talent) and SpellCooldown(comet_storm) < CastTime(rune_of_power) or Talent(ray_of_frost_talent) and SpellCooldown(ray_of_frost) < CastTime(rune_of_power) or Charges(rune_of_power count=0) > 1 } and Spell(rune_of_power) or Enemies() > 1 and PreviousGCDSpell(frozen_orb) and Spell(rune_of_power)
 }
 
 ### actions.aoe
@@ -1303,7 +1303,7 @@ AddFunction FrostAoeMainActions
  #ice_nova
  Spell(ice_nova)
  #flurry,if=prev_gcd.1.ebonbolt|buff.brain_freeze.react&(prev_gcd.1.frostbolt&(buff.icicles.stack<4|!talent.glacial_spike.enabled)|prev_gcd.1.glacial_spike)
- if PreviousGCDSpell(ebonbolt) or DebuffPresent(brain_freeze_frost) and { PreviousGCDSpell(frostbolt) and { BuffStacks(icicles_buff) < 4 or not Talent(glacial_spike_talent) } or PreviousGCDSpell(glacial_spike) } Spell(flurry)
+ if PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(frostbolt) and { BuffStacks(icicles_buff) < 4 or not Talent(glacial_spike_talent) } or PreviousGCDSpell(glacial_spike) } Spell(flurry)
  #ice_lance,if=buff.fingers_of_frost.react
  if BuffPresent(fingers_of_frost_buff) Spell(ice_lance)
  #ray_of_frost
@@ -1339,7 +1339,7 @@ AddFunction FrostAoeShortCdActions
   #comet_storm
   Spell(comet_storm)
 
-  unless Spell(ice_nova) or { PreviousGCDSpell(ebonbolt) or DebuffPresent(brain_freeze_frost) and { PreviousGCDSpell(frostbolt) and { BuffStacks(icicles_buff) < 4 or not Talent(glacial_spike_talent) } or PreviousGCDSpell(glacial_spike) } } and Spell(flurry) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or Spell(ray_of_frost) or Spell(ebonbolt) or Spell(glacial_spike)
+  unless Spell(ice_nova) or { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(frostbolt) and { BuffStacks(icicles_buff) < 4 or not Talent(glacial_spike_talent) } or PreviousGCDSpell(glacial_spike) } } and Spell(flurry) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or Spell(ray_of_frost) or Spell(ebonbolt) or Spell(glacial_spike)
   {
    #cone_of_cold
    Spell(cone_of_cold)
@@ -1355,12 +1355,12 @@ AddFunction FrostAoeShortCdActions
 
 AddFunction FrostAoeShortCdPostConditions
 {
- Spell(blizzard) or Spell(ice_nova) or { PreviousGCDSpell(ebonbolt) or DebuffPresent(brain_freeze_frost) and { PreviousGCDSpell(frostbolt) and { BuffStacks(icicles_buff) < 4 or not Talent(glacial_spike_talent) } or PreviousGCDSpell(glacial_spike) } } and Spell(flurry) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or Spell(ray_of_frost) or Spell(ebonbolt) or Spell(glacial_spike) or Spell(frostbolt) or FrostMovementShortCdPostConditions() or Spell(ice_lance)
+ Spell(blizzard) or Spell(ice_nova) or { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(frostbolt) and { BuffStacks(icicles_buff) < 4 or not Talent(glacial_spike_talent) } or PreviousGCDSpell(glacial_spike) } } and Spell(flurry) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or Spell(ray_of_frost) or Spell(ebonbolt) or Spell(glacial_spike) or Spell(frostbolt) or FrostMovementShortCdPostConditions() or Spell(ice_lance)
 }
 
 AddFunction FrostAoeCdActions
 {
- unless Spell(frozen_orb) or Spell(blizzard) or Spell(comet_storm) or Spell(ice_nova) or { PreviousGCDSpell(ebonbolt) or DebuffPresent(brain_freeze_frost) and { PreviousGCDSpell(frostbolt) and { BuffStacks(icicles_buff) < 4 or not Talent(glacial_spike_talent) } or PreviousGCDSpell(glacial_spike) } } and Spell(flurry) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or Spell(ray_of_frost) or Spell(ebonbolt) or Spell(glacial_spike) or Spell(cone_of_cold) or Spell(frostbolt)
+ unless Spell(frozen_orb) or Spell(blizzard) or Spell(comet_storm) or Spell(ice_nova) or { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(frostbolt) and { BuffStacks(icicles_buff) < 4 or not Talent(glacial_spike_talent) } or PreviousGCDSpell(glacial_spike) } } and Spell(flurry) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or Spell(ray_of_frost) or Spell(ebonbolt) or Spell(glacial_spike) or Spell(cone_of_cold) or Spell(frostbolt)
  {
   #call_action_list,name=movement
   FrostMovementCdActions()
@@ -1369,7 +1369,7 @@ AddFunction FrostAoeCdActions
 
 AddFunction FrostAoeCdPostConditions
 {
- Spell(frozen_orb) or Spell(blizzard) or Spell(comet_storm) or Spell(ice_nova) or { PreviousGCDSpell(ebonbolt) or DebuffPresent(brain_freeze_frost) and { PreviousGCDSpell(frostbolt) and { BuffStacks(icicles_buff) < 4 or not Talent(glacial_spike_talent) } or PreviousGCDSpell(glacial_spike) } } and Spell(flurry) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or Spell(ray_of_frost) or Spell(ebonbolt) or Spell(glacial_spike) or Spell(cone_of_cold) or Spell(frostbolt) or FrostMovementCdPostConditions() or Spell(ice_lance)
+ Spell(frozen_orb) or Spell(blizzard) or Spell(comet_storm) or Spell(ice_nova) or { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(frostbolt) and { BuffStacks(icicles_buff) < 4 or not Talent(glacial_spike_talent) } or PreviousGCDSpell(glacial_spike) } } and Spell(flurry) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or Spell(ray_of_frost) or Spell(ebonbolt) or Spell(glacial_spike) or Spell(cone_of_cold) or Spell(frostbolt) or FrostMovementCdPostConditions() or Spell(ice_lance)
 }
 
 ### actions.default
@@ -1519,7 +1519,7 @@ AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 # blink
 # blizzard
 # blood_fury_sp
-# brain_freeze_frost
+# brain_freeze_buff
 # comet_storm
 # comet_storm_talent
 # cone_of_cold

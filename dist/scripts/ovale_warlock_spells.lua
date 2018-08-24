@@ -7,6 +7,7 @@ __exports.register = function()
     local desc = "[8.0] Ovale: Warlock spells"
     local code = [[Define(agony 980)
 # Inflicts increasing agony on the target, causing up to o1*u Shadow damage over d. Damage starts low and increases over the duration. Refreshing Agony maintains its current damage level.rnrn|cFFFFFFFFAgony damage sometimes generates 1 Soul Shard.|r
+# Rank 2: Agony may now ramp up to s1+6 stacks.
   SpellInfo(agony duration=18 max_stacks=6 tick=2)
   # Suffering w1 Shadow damage every t1 sec. Damage increases over time.
   SpellAddTargetDebuff(agony agony=1)
@@ -38,6 +39,7 @@ Define(chaos_bolt 116858)
   SpellInfo(chaos_bolt soulshards=2)
 Define(conflagrate 17962)
 # Triggers an explosion on the target, dealing s1 Fire damage.?s196406[rnrnReduces the cast time of your next Incinerate or Chaos Bolt by 117828s1 for 117828d.][]rnrn|cFFFFFFFFGenerates 245330s1 Soul Shard Fragments.|r
+# Rank 2: Conflagrate has s1+1 charges.
   SpellInfo(conflagrate cd=12.96)
 Define(corruption 172)
 # Corrupts the target, causing 146739o1 Shadow damage over 146739d.
@@ -201,6 +203,7 @@ Define(summon_vilefiend 264119)
   SpellInfo(summon_vilefiend soulshards=1 cd=45 duration=15 talent=summon_vilefiend_talent)
 Define(unstable_affliction 30108)
 # Afflicts the target with 233490o1 Shadow damage over 233490d. You may afflict a target with up to s2 Unstable Afflictions at once.rnrnYou deal s3 increased damage to targets affected by your Unstable Affliction.rnrnIf dispelled, deals 233490s1*s1/100 damage to the dispeller and silences them for 196364d.?a231791[rnrn|cFFFFFFFFRefunds 231791m1 Soul LShard:Shards; if the target dies while afflicted.|r][]
+# Rank 2: Unstable Affliction refunds m1 Soul LShard:Shards; if the target dies.
   SpellInfo(unstable_affliction soulshards=1 max_stacks=10)
 Define(vile_taint 278350)
 # Unleashes a vile explosion at the target location, dealing o1 Shadow damage over d to all enemies within a1 yds and reducing their movement speed by s2.

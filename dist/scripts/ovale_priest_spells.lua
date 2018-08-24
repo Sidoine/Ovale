@@ -66,10 +66,11 @@ Define(vampiric_touch 34914)
   SpellInfo(vampiric_touch duration=21 insanity=-600 tick=3)
   # Suffering w2 Shadow damage every t2 sec.
   SpellAddTargetDebuff(vampiric_touch vampiric_touch=1)
-Define(void_bolt_shadow 231688)
-# Void Bolt extends the duration of your Shadow Word: Pain and Vampiric Touch on all nearby targets by @switch<s2>[s1/1000][s1/1000.1] sec.
-  SpellInfo(void_bolt_shadow channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(void_bolt_shadow void_bolt_shadow=1)
+Define(void_bolt 228266)
+# For the duration of Voidform, your Void Eruption ability is replaced by Void Bolt:rnrn@spelltooltip205448
+# Rank 2: Void Bolt extends the duration of your Shadow Word: Pain and Vampiric Touch on all nearby targets by @switch<s2>[s1/1000][s1/1000.1] sec.
+  SpellInfo(void_bolt channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(void_bolt void_bolt=1)
 Define(void_eruption 228260)
 # Releases an explosive blast of pure void energy, activating Voidform and causing 228360s1*2 Shadow damage to all enemies within a1 yds of your target.rnrnDuring Voidform, this ability is replaced by Void Bolt.rnrn|cFFFFFFFFRequires C/100 Insanity to activate.|r
   SpellInfo(void_eruption insanity=9000)
@@ -227,17 +228,17 @@ Define(vampiric_embrace_buff 15286)
 Define(vampiric_touch_debuff 34914)
 	SpellInfo(vampiric_touch_debuff duration=21 haste=spell tick=3)
 
-	SpellInfo(void_bolt_shadow cd=4.5 insanity=-16 cd_haste=spell)
-	SpellRequire(void_bolt_shadow unusable 1=buff,!voidform_buff)
-	SpellRequire(void_bolt_shadow insanity_percent 200=buff,surrender_to_madness_buff)
-	SpellAddTargetDebuff(void_bolt_shadow shadow_word_pain_debuff=refresh)
-	SpellAddTargetDebuff(void_bolt_shadow vampiric_touch_debuff=refresh)
+	SpellInfo(void_bolt cd=4.5 insanity=-16 cd_haste=spell)
+	SpellRequire(void_bolt unusable 1=buff,!voidform_buff)
+	SpellRequire(void_bolt insanity_percent 200=buff,surrender_to_madness_buff)
+	SpellAddTargetDebuff(void_bolt shadow_word_pain_debuff=refresh)
+	SpellAddTargetDebuff(void_bolt vampiric_touch_debuff=refresh)
 
-	SpellInfo(void_eruption insanity=90 shared_cd=void_bolt_shadow tag=main)
+	SpellInfo(void_eruption insanity=90 shared_cd=void_bolt tag=main)
 	SpellInfo(void_eruption insanity=60 talent=legacy_of_the_void_talent)
 	SpellAddBuff(void_eruption voidform_buff=1)
 	SpellRequire(void_eruption unusable 1=buff,voidform_buff)
-	SpellRequire(void_eruption replace void_bolt_shadow=buff,voidform_buff)
+	SpellRequire(void_eruption replace void_bolt=buff,voidform_buff)
 
 	SpellInfo(void_torrent cd=60 tag=main unusable=1)
 	SpellRequire(void_torrent unusable 0=buff,voidform_buff)

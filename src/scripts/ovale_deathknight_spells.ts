@@ -74,10 +74,10 @@ Define(dark_transformation 63560)
 Define(death_coil 47541)
 # Fires a blast of unholy energy at the target, causing 47632s1 Shadow damage to an enemy.?s137007[rnrnReduces the cooldown of Dark Transformation by s2 sec][].
   SpellInfo(death_coil runicpower=40)
-Define(death_strike 278223)
-# Death Strike's healing is increased by s1.
-  SpellInfo(death_strike channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(death_strike death_strike=1)
+Define(death_strike 49998)
+# Focuses dark power into a strike?s137006[ with both weapons, that deals a total of s1+66188s1][ that deals s1] Physical damage and heals you for s2 of all damage taken in the last s4 sec, minimum s3 of maximum health.
+# Rank 2: Death Strike's healing is increased by s1.
+  SpellInfo(death_strike runicpower=45)
 Define(death_and_decay 43265)
 # Corrupts the targeted ground, causing 52212m1*11 Shadow damage over d to targets within the area.rnrnWhile you remain within the area, your ?c1[Heart Strike will hit up to 188290m3 additional targets.]?s207311[Clawing Shadows will hit all enemies near the target.][Scourge Strike will hit all enemies near the target.]
   SpellInfo(death_and_decay runes=1 runicpower=-10 cd=30 duration=10 tick=1)

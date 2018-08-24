@@ -62,6 +62,7 @@ class OvaleDebugClass extends OvaleDebugBase {
     }
 
     bug?: string;
+    warning?: string;
     trace = false;
 
     constructor() {
@@ -157,9 +158,16 @@ class OvaleDebugClass extends OvaleDebugBase {
                 }
             }
             Error(...__args:any[]) {
+                const name = this.GetName();
                 let s = MakeString(...__args);
-                this.Print("Fatal error: %s", s);
+                DEFAULT_CHAT_FRAME.AddMessage(format("|cff33ff99%s|r:|cffff3333 Error:|r %s", name, s));
                 OvaleDebug.bug = s;
+            }
+            Warning(...__args:any[]) {
+                const name = this.GetName();
+                let s = MakeString(...__args);
+                DEFAULT_CHAT_FRAME.AddMessage(format("|cff33ff99%s|r: |cff999933Warning:|r %s", name, s));
+                OvaleDebug.warning = s;
             }
             Print(...__args:any[]) {
                 let name = this.GetName();

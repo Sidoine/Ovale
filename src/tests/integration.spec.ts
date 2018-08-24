@@ -40,8 +40,9 @@ for (const [name, script] of pairs(OvaleScripts.script)) {
         OvaleCompile.CompileScript(name);
         t.is(OvaleDebug.bug, undefined);
         t.truthy(OvaleCompile.ast);
-        OvaleCompile.EvaluateScript();
+        OvaleCompile.EvaluateScript(OvaleCompile.ast, true);
         t.is(OvaleDebug.bug, undefined);
+        t.is(OvaleDebug.warning, undefined);
         t.truthy(OvaleCompile.GetIconNodes());
         for (const k in oneTimeMessages) {
             t.falsy(k);

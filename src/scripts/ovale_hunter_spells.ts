@@ -49,6 +49,7 @@ Define(berserking_buff 200953)
   SpellAddBuff(berserking_buff berserking_buff=1)
 Define(bestial_wrath 19574)
 # Sends you and your pet into a rage, increasing all damage you both deal by s1 for d. ?s231548&s217200[rnrnBestial Wrath's remaining cooldown is reduced by s3 sec each time you use Barbed Shot.][]
+# Rank 2: Bestial Wrath's remaining cooldown is reduced by 19574s3 sec each time you use Barbed Shot.
   SpellInfo(bestial_wrath cd=90 duration=15 channel=15)
   # Damage dealt increased by w1.
   SpellAddBuff(bestial_wrath bestial_wrath=1)
@@ -66,6 +67,7 @@ Define(chimaera_shot 171457)
   SpellInfo(chimaera_shot gcd=0 offgcd=1)
 Define(cobra_shot 193455)
 # A quick shot causing s2*<mult> Physical damage.rnrnReduces the cooldown of Kill Command by s3 sec.
+# Rank 2: Cobra Shot's cost is reduced by s1.
   SpellInfo(cobra_shot focus=45)
 Define(coordinated_assault 266779)
 # You and your pet attack as one, increasing all damage you both deal by s1 for d.?s263186[rnrnWhile Coordinated Assault is active, Kill Command's chance to reset is increased by s4.][]
@@ -93,6 +95,7 @@ Define(flanking_strike 259516)
   SpellInfo(flanking_strike gcd=0 offgcd=1 focus=-30)
 Define(harpoon 190925)
 # Hurls a harpoon at an enemy, rooting them in place for 190927d and pulling you to them.
+# Rank 2: The cooldown of Harpoon is reduced by m1/-1000 sec.
   SpellInfo(harpoon cd=1 cd=30 gcd=0.5)
 Define(hunters_mark 257284)
 # Apply Hunter's Mark to the target, increasing all damage you deal to the marked target by s1.  If the target dies while affected by Hunter's Mark, you instantly gain 259558s1 Focus. The target can always be seen and tracked by the Hunter.rnrnOnly one Hunter's Mark can be applied at a time.
@@ -101,6 +104,7 @@ Define(hunters_mark 257284)
   SpellAddTargetDebuff(hunters_mark hunters_mark=1)
 Define(kill_command 34026)
 # Give the command to kill, causing your pet to savagely deal <damage> Physical damage to the enemy.
+# Rank 2: Kill Command has a 259489s2 chance to immediately reset its cooldown.rnrnCoordinated Assault increases this chance by another 266779s4.
   SpellInfo(kill_command focus=30 cd=7.5 channel=0)
 Define(kill_command_survival 259489)
 # Give the command to kill, causing your pet to savagely deal <damage> Physical damage to the enemy.?s263186[rnrnHas a s2 chance to immediately reset its cooldown.][]rnrn|cFFFFFFFFGenerates s3 Focus.|r
@@ -130,6 +134,7 @@ Define(rapid_fire 257044)
   SpellInfo(rapid_fire cd=20 duration=3 channel=3 tick=0.33)
 Define(raptor_strike 186270)
 # A vicious slash dealing s1 Physical damage.
+# Rank 2: Raptor Strike deals s1 increased damage.
   SpellInfo(raptor_strike focus=30)
 Define(revive_pet 982)
 # Revives your pet, returning it to life with s1 of its base health.

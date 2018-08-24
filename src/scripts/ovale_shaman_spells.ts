@@ -60,6 +60,7 @@ Define(feral_lunge 196884)
   SpellInfo(feral_lunge cd=30 talent=feral_lunge_talent gcd=0.5)
 Define(feral_spirit 51533)
 # Summons two Spirit ?s147783[Raptors][Wolves] that aid you in battle for 228562d. They are immune to movement-impairing effects?a231723[ and grant you 190185s1 Maelstrom each time they attack][].
+# Rank 2: Feral Spirits grant you 190185s1 Maelstrom each time they attack.
   SpellInfo(feral_spirit cd=120)
 Define(fire_elemental 198067)
 # Calls forth a Greater Fire Elemental to rain destruction on your enemies for 188592d.rnrnWhile the Greater Fire Elemental is active, Flame Shock generates 263819s1 Maelstrom when it deals damage over time.
@@ -125,6 +126,7 @@ Define(lava_beam 114074)
   SpellInfo(lava_beam)
 Define(lava_burst 51505)
 # Hurls molten lava at the target, dealing s1 Fire damage.?a231721[ Lava Burst will always critically strike if the target is affected by Flame Shock.][]?s137039[][rnrn|cFFFFFFFFGenerates 190493s2 Maelstrom.|r ]
+# Rank 2: Lava Burst will always critically strike if the target is affected by Flame Shock.
   SpellInfo(lava_burst cd=8 maelstrom=0)
 Define(lava_lash 60103)
 # Charges your off-hand weapon with lava and burns your target, dealing s1 Fire damage.
@@ -490,7 +492,7 @@ Define(spiritwalkers_grace_buff 79206)
 	SpellInfo(spiritwalkers_grace_buff duration=15)
 
 	SpellInfo(storm_elemental cd=150)
-Define(stormbringer 201845)
+
 Define(stormbringer_buff 201846)
 	SpellInfo(stormbringer_buff duration=12)
 
