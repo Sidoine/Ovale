@@ -201,6 +201,7 @@ Define(swift_roundhouse_trait 277669)
 ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!fortifying_brew,buff,!fortifying_brew_buff)
 
 ## Spells
+Define(blackout_kick_windwalker 100784) ## Added for now untill it is fixed in importspells
 SpellInfo(blackout_kick_windwalker cd=3 specialization=mistweaver)
 SpellInfo(blackout_kick_windwalker chi=1 specialization=windwalker)
 SpellRequire(blackout_kick_windwalker chi_percent 0=buff,blackout_kick_free specialization=windwalker)
