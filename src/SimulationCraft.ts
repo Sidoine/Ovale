@@ -712,7 +712,7 @@ const UnparseOperand = function(node: ParseNode) {
     }
 }
 const SyntaxError = function(tokenStream: OvaleLexer, ...__args: any[]) {
-    OvaleSimulationCraft.Print(...__args);
+    OvaleSimulationCraft.Warning(...__args);
     let context: LuaArray<string> = {
         1: "Next tokens:"
     }
@@ -725,7 +725,7 @@ const SyntaxError = function(tokenStream: OvaleLexer, ...__args: any[]) {
             break;
         }
     }
-    OvaleSimulationCraft.Print(concat(context, " "));
+    OvaleSimulationCraft.Warning(concat(context, " "));
 }
 
 type ParseFunction = (tokenStream: OvaleLexer, nodeList: ChildParseNode, annotation: Annotation) => [boolean, ScNode];
@@ -3192,6 +3192,9 @@ EmitOperandBuff = function (operand, parseNode, nodeList, annotation, action, ta
         ["soul_shard"]: "SoulShards()",
         ["soul_fragments"]: "SoulFragments()",
         ["ssw_refund_offset"]: "target.Distance() % 3 - 1",
+        ["stagger.last_tick_damage_1"]: "0", //TODO
+        ["stagger.last_tick_damage_4"]: "0", //TODO
+        ["stagger.last_tick_damage_30"]: "0", //TODO
         ["stat.mastery_rating"]: "MasteryRating()",
         ["stealthed"]: "Stealthed()",
         ["stealthed.all"]: "Stealthed()",

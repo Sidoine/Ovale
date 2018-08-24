@@ -125,11 +125,6 @@ Define(moonfire 8921)
 Define(new_moon 202767)
 # Deals m1 Arcane damage to the target and empowers New Moon to become Half Moon. rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
   SpellInfo(new_moon cd=15 lunarpower=-10)
-Define(prolonged_power 229206)
-# Drink to increase all stats by s1 for d.
-  SpellInfo(prolonged_power cd=1 duration=60 gcd=0 offgcd=1)
-  # All stats increased by s1.
-  SpellAddBuff(prolonged_power prolonged_power=1)
 Define(rising_death 252346)
 # Chance to create multiple potions.
   SpellInfo(rising_death gcd=0 offgcd=1)

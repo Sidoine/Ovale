@@ -1085,7 +1085,7 @@ function readFile(directory:string, fileName: string, zone: any[][], output: { [
                     i++;
                 }
                 const number = $data.substring(start, i);
-                columns.push(parseInt(number));
+                columns.push(parseFloat(number));
             } else if (c === '{') {
                 const innerData = getColumns($data, i + 1);
                 columns.push(<(number | string)[]>innerData[0]);
@@ -1145,7 +1145,8 @@ function readFile(directory:string, fileName: string, zone: any[][], output: { [
 function getIdentifier(name: string) {
     if (!name) return name;
     if (typeof (name) !== "string") return name;
-    return name.toLowerCase().replace(/^potion of (the )?/, "").replace(/ /g, '_').replace("!", "_aura").replace(/[:'()]/g, "").replace(/-/g, "_")
+    return name.toLowerCase().replace(/^potion of (the )?/, "").replace(/ /g, '_').replace("!", "_aura").replace(/[:'()]/g, "").replace(/[-,]/g, "_")
+        .replace(/_+/g, '_');
 }
 
 const classNames: (ClassId | "PET") [] =  [
@@ -1170,6 +1171,25 @@ for (let i = 1; i < classNames.length; i++) {
     if (className !== "PET") classBitToNumber[1 << (i-1)] = className;
 }
 
+function getDuration(duration: number) {
+    return `${duration/1000} second${duration > 1000 ? 's' : ''}`;
+}
+
+export function parseDescription(description: string, spell:SpellData, spellDataById: Map<number, SpellData>) {
+    description = description.replace(/\$d/g, getDuration(spell.duration))
+        .replace(/\$s(\d)/g, (s, c) => {
+            const i = parseInt(c);
+            if (spell.spellEffects && spell.spellEffects.length >= i) {
+                const spellEffect = spell.spellEffects[i - 1];
+                if (spellEffect.sp_coeff) {
+                    return spellEffect.sp_coeff * 100 + "%";
+                }
+            }
+            return s;
+        });
+    return description;
+}
+
 export function getSpellData(directory: string) {
     let output: { [key: string]: any[][] } = {};
     let zone: any[][];
@@ -1180,9 +1200,8 @@ export function getSpellData(directory: string) {
     readFile(directory, "sc_spell_lists", zone, output);
 
     const identifiers: LuaObj<number> = {};
-    
-    const spellData: SpellData[] = [];
     const spellDataById = new Map<number, SpellData>();
+    const spellData: SpellData[] = [];
     for (const row of output.spell_data_t) {
         const spell: SpellData = {
             name: row[0],
@@ -1398,7 +1417,11 @@ export function getSpellData(directory: string) {
                 const specName = specIdToSpecName.get(talent.spec);
                 talent.identifier += "_" + specName;
             } else {
-                talent.identifier += "_" + classBitToNumber[talent.m_class].toLowerCase();
+                if (classBitToNumber[talent.m_class]) {
+                    talent.identifier += "_" + classBitToNumber[talent.m_class].toLowerCase();
+                } else {
+                    talent.identifier += "_unknown";
+                }
             }
         }
         identifiers[talent.identifier] = talent.id;

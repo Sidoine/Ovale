@@ -247,7 +247,7 @@ AddIcon help=cd specialization=holy
 # Based on SimulationCraft profile "PR_Paladin_Protection".
 #	class=paladin
 #	spec=protection
-#	talents=2112132
+#	talents=1200003
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
