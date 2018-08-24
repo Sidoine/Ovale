@@ -303,11 +303,11 @@ AddFunction BrewmasterDefaultShortCdActions
  #auto_attack
  BrewmasterGetInMeleeRange()
  #ironskin_brew,if=buff.blackout_combo.down&incoming_damage_1999ms>(health.max*0.1+stagger.last_tick_damage_4)&buff.elusive_brawler.stack<2&!buff.ironskin_brew.up
- if BuffExpires(blackout_combo_buff) and IncomingDamage(1) > MaxHealth() * 0.1 + StaggerTick(4) and DebuffStacks(elusive_brawler) < 2 and not BuffPresent(ironskin_brew_buff) Spell(ironskin_brew)
+ if BuffExpires(blackout_combo_buff) and IncomingDamage(1) > MaxHealth() * 0 + StaggerTick(4) and DebuffStacks(elusive_brawler) < 2 and not BuffPresent(ironskin_brew_buff) Spell(ironskin_brew)
  #ironskin_brew,if=cooldown.brews.charges_fractional>1&cooldown.black_ox_brew.remains<3
  if SpellCharges(ironskin_brew count=0) > 1 and SpellCooldown(black_ox_brew) < 3 Spell(ironskin_brew)
  #purifying_brew,if=stagger.pct>(6*(3-(cooldown.brews.charges_fractional)))&(stagger.last_tick_damage_1>((0.02+0.001*(3-cooldown.brews.charges_fractional))*stagger.last_tick_damage_30))
- if StaggerRemaining() / MaxHealth() * 100 > 6 * { 3 - SpellCharges(ironskin_brew count=0) } and StaggerTick(1) > { 0.02 + 0.001 * { 3 - SpellCharges(ironskin_brew count=0) } } * StaggerTick(30) Spell(purifying_brew)
+ if StaggerRemaining() / MaxHealth() * 100 > 6 * { 3 - SpellCharges(ironskin_brew count=0) } and StaggerTick(1) > { 0 + 0 * { 3 - SpellCharges(ironskin_brew count=0) } } * StaggerTick(30) Spell(purifying_brew)
 }
 
 AddFunction BrewmasterDefaultShortCdPostConditions
@@ -342,7 +342,7 @@ AddFunction BrewmasterDefaultCdActions
  unless BuffExpires(blackout_combo_buff) and IncomingDamage(1) > MaxHealth() * 0 + StaggerTick(4) and DebuffStacks(elusive_brawler) < 2 and not BuffPresent(ironskin_brew_buff) and Spell(ironskin_brew) or SpellCharges(ironskin_brew count=0) > 1 and SpellCooldown(black_ox_brew) < 3 and Spell(ironskin_brew) or StaggerRemaining() / MaxHealth() * 100 > 6 * { 3 - SpellCharges(ironskin_brew count=0) } and StaggerTick(1) > { 0 + 0 * { 3 - SpellCharges(ironskin_brew count=0) } } * StaggerTick(30) and Spell(purifying_brew)
  {
   #black_ox_brew,if=cooldown.brews.charges_fractional<0.5
-  if SpellCharges(ironskin_brew count=0) < 0.5 Spell(black_ox_brew)
+  if SpellCharges(ironskin_brew count=0) < 0 Spell(black_ox_brew)
   #black_ox_brew,if=(energy+(energy.regen*cooldown.keg_smash.remains))<40&buff.blackout_combo.down&cooldown.keg_smash.up
   if Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) < 40 and BuffExpires(blackout_combo_buff) and not SpellCooldown(keg_smash) > 0 Spell(black_ox_brew)
 
@@ -1036,7 +1036,7 @@ AddFunction WindwalkerCdCdActions
  #berserking
  Spell(berserking)
  #arcane_torrent,if=chi.max-chi>=1&energy.time_to_max>=0.5
- if MaxChi() - Chi() >= 1 and TimeToMaxEnergy() >= 0.5 Spell(arcane_torrent_chi)
+ if MaxChi() - Chi() >= 1 and TimeToMaxEnergy() >= 0 Spell(arcane_torrent_chi)
  #lights_judgment
  Spell(lights_judgment)
  #fireblood
@@ -1131,7 +1131,7 @@ AddFunction WindwalkerAoeCdActions
  unless WindwalkerCdCdPostConditions() or not PreviousGCDSpell(tiger_palm) and Chi() <= 1 and { not SpellCooldown(rising_sun_kick) > 0 or Talent(fist_of_the_white_tiger_talent) and not SpellCooldown(fist_of_the_white_tiger) > 0 or Energy() < 50 } and Spell(energizing_elixir)
  {
   #arcane_torrent,if=chi.max-chi>=1&energy.time_to_max>=0.5
-  if MaxChi() - Chi() >= 1 and TimeToMaxEnergy() >= 0.5 Spell(arcane_torrent_chi)
+  if MaxChi() - Chi() >= 1 and TimeToMaxEnergy() >= 0 Spell(arcane_torrent_chi)
  }
 }
 

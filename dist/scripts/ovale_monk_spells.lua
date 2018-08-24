@@ -84,6 +84,12 @@ Define(flying_serpent_kick 101545)
 Define(fortifying_brew 115203)
 # Turns your skin to stone for 120954d, increasing your current and maximum health by <health>, increasing the effectiveness of Stagger by s1, and reducing all damage you take by <damage>.
   SpellInfo(fortifying_brew cd=420 gcd=0 offgcd=1)
+Define(invoke_niuzao_the_black_ox 132578)
+# Summons an effigy of Niuzao, the Black Ox for d. Niuzao attacks your primary target and taunts it. He also frequently Stomps, damaging all nearby enemies.
+  SpellInfo(invoke_niuzao_the_black_ox cd=180 duration=45 talent=invoke_niuzao_the_black_ox_talent)
+Define(invoke_xuen_the_white_tiger 123904)
+# Summons an effigy of Xuen, the White Tiger for d. Xuen attacks your primary target, and strikes 3 enemies within 123996A1 yards every 123999t1 sec with Tiger Lightning for 123996s1 Nature damage.
+  SpellInfo(invoke_xuen_the_white_tiger cd=120 duration=20 talent=invoke_xuen_the_white_tiger_talent gcd=1)
 Define(ironskin_brew 115308)
 # A swig of strong brew allows you to Stagger substantially more damage for 215479d. rnrnShares charges with Purifying Brew.
   SpellInfo(ironskin_brew cd=1 cd=15 gcd=0 offgcd=1)
@@ -133,6 +139,12 @@ Define(spinning_crane_kick 101546)
   SpellInfo(spinning_crane_kick chi=2 chi=3 duration=1.5 channel=1.5 tick=0.5)
   # Attacking all nearby enemies for Physical damage every 101546t1 sec.
   SpellAddBuff(spinning_crane_kick spinning_crane_kick=1)
+Define(storm_earth_and_fire 137639)
+# Split into 3 elemental spirits for d, each spirit dealing 100+m1 of normal damage and healing.rnrnYou directly control the Storm spirit, while Earth and Fire spirits mimic your attacks on nearby enemies.rnrnWhile active, casting Storm, Earth, and Fire again will cause the spirits to fixate on your target.
+# Rank 2: Storm, Earth, and Fire has s1+1 charges.
+  SpellInfo(storm_earth_and_fire cd=16 cd=90 duration=15 max_stacks=2 gcd=1)
+  # Elemental spirits summoned, mirroring all of the Monk's attacks.rnThe Monk and spirits each do 100+m1 of normal damage and healing.
+  SpellAddBuff(storm_earth_and_fire storm_earth_and_fire=1)
 Define(swift_roundhouse_buff 278707)
 # @spelldesc277669
   SpellInfo(swift_roundhouse_buff channel=-0.001 gcd=0 offgcd=1)
@@ -183,6 +195,10 @@ Define(fist_of_the_white_tiger_talent 8) #19771
 # Strike with the technique of the White Tiger, dealing s1+261977s1 Physical damage.rnrn|cFFFFFFFFGenerates 261978s1 Chi.
 Define(good_karma_talent 11) #23364
 # Touch of Karma can now redirect an additional s1 of your maximum health.
+Define(invoke_niuzao_the_black_ox_talent 18) #22103
+# Summons an effigy of Niuzao, the Black Ox for d. Niuzao attacks your primary target and taunts it. He also frequently Stomps, damaging all nearby enemies.
+Define(invoke_xuen_the_white_tiger_talent 18) #22102
+# Summons an effigy of Xuen, the White Tiger for d. Xuen attacks your primary target, and strikes 3 enemies within 123996A1 yards every 123999t1 sec with Tiger Lightning for 123996s1 Nature damage.
 Define(rushing_jade_wind_talent 17) #20184
 # Summons a whirling tornado around you, causing (1+d/t1)*148187s1 damage over d to enemies within 107270A1 yards.?s220357[ Applies Mark of the Crane to up to s2 nearby targets.][]
 Define(rushing_jade_wind_talent_windwalker 17) #23122
@@ -305,10 +321,10 @@ Define(healing_elixir 122281)
 Define(invoke_chiji_the_red_crane 198664)
 	SpellInfo(invoke_chiji_the_red_crane cd=180 talent=invoke_chiji_the_red_crane_talent)
 
-Define(invoke_niuzao_the_black_ox 132578)
+
 	SpellInfo(invoke_niuzao_the_black_ox cd=180 talent=invoke_niuzao_the_black_ox_talent)
 
-Define(invoke_xuen_the_white_tiger 123904)
+
 	SpellInfo(invoke_xuen_the_white_tiger cd=180 talent=invoke_xuen_the_white_tiger_talent)
 
 SpellInfo(ironskin_brew cd=15 charges=3 cd_haste=melee)
@@ -407,10 +423,10 @@ SpellInfo(spinning_crane_kick chi=2 haste=melee specialization=windwalker)
 SpellInfo(spinning_crane_kick chi=0 haste=spell specialization=mistweaver)
 SpellRequire(spinning_crane_kick chi_percent 0=buff,serenity)
 
-Define(storm_earth_and_fire 137639)
+
 	SpellInfo(storm_earth_and_fire gcd=0 offgcd=1 charges=2 duration=15)
 	SpellInfo(storm_earth_and_fire replace=serenity talent=serenity_talent)
-	SpellAddBuff(storm_earth_and_fire storm_earth_and_fire=1)
+	
 
 	Define(summon_black_ox_statue 115315)
 	SpellInfo(summon_black_ox_statue cd=10 duration=900 totem=1)

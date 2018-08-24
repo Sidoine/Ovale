@@ -1101,10 +1101,16 @@ AddFunction OutlawFinishMainPostConditions
 
 AddFunction OutlawFinishShortCdActions
 {
- unless BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1 and Spell(slice_and_dice) or { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and Spell(roll_the_bones)
+ unless BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1 and Spell(slice_and_dice)
  {
-  #between_the_eyes,if=buff.ruthless_precision.up|azerite.ace_up_your_sleeve.enabled|azerite.deadshot.enabled
-  if BuffPresent(ruthless_precision_buff) or HasAzeriteTrait(ace_up_your_sleeve_trait) or HasAzeriteTrait(deadshot_trait) Spell(between_the_eyes text=BTE)
+  #between_the_eyes,if=azerite.deadshot.rank>=2&buff.roll_the_bones.up
+  if AzeriteTraitRank(deadshot_trait) >= 2 and DebuffPresent(roll_the_bones) Spell(between_the_eyes text=BTE)
+
+  unless { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and Spell(roll_the_bones)
+  {
+   #between_the_eyes,if=buff.ruthless_precision.up|azerite.ace_up_your_sleeve.enabled|azerite.deadshot.enabled
+   if BuffPresent(ruthless_precision_buff) or HasAzeriteTrait(ace_up_your_sleeve_trait) or HasAzeriteTrait(deadshot_trait) Spell(between_the_eyes text=BTE)
+  }
  }
 }
 
@@ -1119,7 +1125,7 @@ AddFunction OutlawFinishCdActions
 
 AddFunction OutlawFinishCdPostConditions
 {
- BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1 and Spell(slice_and_dice) or { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and Spell(roll_the_bones) or { BuffPresent(ruthless_precision_buff) or HasAzeriteTrait(ace_up_your_sleeve_trait) or HasAzeriteTrait(deadshot_trait) } and Spell(between_the_eyes text=BTE) or Spell(dispatch)
+ BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1 and Spell(slice_and_dice) or AzeriteTraitRank(deadshot_trait) >= 2 and DebuffPresent(roll_the_bones) and Spell(between_the_eyes text=BTE) or { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and Spell(roll_the_bones) or { BuffPresent(ruthless_precision_buff) or HasAzeriteTrait(ace_up_your_sleeve_trait) or HasAzeriteTrait(deadshot_trait) } and Spell(between_the_eyes text=BTE) or Spell(dispatch)
 }
 
 ### actions.cds
@@ -1159,8 +1165,6 @@ AddFunction OutlawCdsCdActions
 {
  #potion,if=buff.bloodlust.react|target.time_to_die<=60|buff.adrenaline_rush.up
  if { BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 or BuffPresent(adrenaline_rush_buff) } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_agility usable=1)
- #use_item,name=galecallers_boon,if=buff.bloodlust.react|target.time_to_die<=20|combo_points.deficit<=2
- if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 20 or ComboPointsDeficit() <= 2 OutlawUseItemActions()
  #use_item,name=lustrous_golden_plumage,if=buff.bloodlust.react|target.time_to_die<=20|combo_points.deficit<=2
  if BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 20 or ComboPointsDeficit() <= 2 OutlawUseItemActions()
  #blood_fury
@@ -1587,10 +1591,16 @@ AddFunction OutlawFinishMainPostConditions
 
 AddFunction OutlawFinishShortCdActions
 {
- unless BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1 and Spell(slice_and_dice) or { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and Spell(roll_the_bones)
+ unless BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1 and Spell(slice_and_dice)
  {
-  #between_the_eyes,if=buff.ruthless_precision.up|azerite.ace_up_your_sleeve.enabled|azerite.deadshot.enabled
-  if BuffPresent(ruthless_precision_buff) or HasAzeriteTrait(ace_up_your_sleeve_trait) or HasAzeriteTrait(deadshot_trait) Spell(between_the_eyes text=BTE)
+  #between_the_eyes,if=azerite.deadshot.rank>=2&buff.roll_the_bones.up
+  if AzeriteTraitRank(deadshot_trait) >= 2 and DebuffPresent(roll_the_bones) Spell(between_the_eyes text=BTE)
+
+  unless { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and Spell(roll_the_bones)
+  {
+   #between_the_eyes,if=buff.ruthless_precision.up|azerite.ace_up_your_sleeve.enabled|azerite.deadshot.enabled
+   if BuffPresent(ruthless_precision_buff) or HasAzeriteTrait(ace_up_your_sleeve_trait) or HasAzeriteTrait(deadshot_trait) Spell(between_the_eyes text=BTE)
+  }
  }
 }
 
@@ -1605,7 +1615,7 @@ AddFunction OutlawFinishCdActions
 
 AddFunction OutlawFinishCdPostConditions
 {
- BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1 and Spell(slice_and_dice) or { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and Spell(roll_the_bones) or { BuffPresent(ruthless_precision_buff) or HasAzeriteTrait(ace_up_your_sleeve_trait) or HasAzeriteTrait(deadshot_trait) } and Spell(between_the_eyes text=BTE) or Spell(dispatch)
+ BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1 and Spell(slice_and_dice) or AzeriteTraitRank(deadshot_trait) >= 2 and DebuffPresent(roll_the_bones) and Spell(between_the_eyes text=BTE) or { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and Spell(roll_the_bones) or { BuffPresent(ruthless_precision_buff) or HasAzeriteTrait(ace_up_your_sleeve_trait) or HasAzeriteTrait(deadshot_trait) } and Spell(between_the_eyes text=BTE) or Spell(dispatch)
 }
 
 ### actions.cds

@@ -1073,6 +1073,37 @@ AddFunction FrostUseItemActions
  Item(Trinket1Slot text=14 usable=1)
 }
 
+### actions.talent_rop
+
+AddFunction FrostTalentropMainActions
+{
+}
+
+AddFunction FrostTalentropMainPostConditions
+{
+}
+
+AddFunction FrostTalentropShortCdActions
+{
+ #rune_of_power,if=talent.glacial_spike.enabled&buff.icicles.stack=5&(buff.brain_freeze.react|talent.ebonbolt.enabled&cooldown.ebonbolt.remains<cast_time)
+ if Talent(glacial_spike_talent) and BuffStacks(icicles_buff) == 5 and { BuffPresent(brain_freeze_buff) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) } Spell(rune_of_power)
+ #rune_of_power,if=!talent.glacial_spike.enabled&(talent.ebonbolt.enabled&cooldown.ebonbolt.remains<cast_time|talent.comet_storm.enabled&cooldown.comet_storm.remains<cast_time|talent.ray_of_frost.enabled&cooldown.ray_of_frost.remains<cast_time|charges_fractional>1.9)
+ if not Talent(glacial_spike_talent) and { Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) or Talent(comet_storm_talent) and SpellCooldown(comet_storm) < CastTime(rune_of_power) or Talent(ray_of_frost_talent) and SpellCooldown(ray_of_frost) < CastTime(rune_of_power) or Charges(rune_of_power count=0) > 1 } Spell(rune_of_power)
+}
+
+AddFunction FrostTalentropShortCdPostConditions
+{
+}
+
+AddFunction FrostTalentropCdActions
+{
+}
+
+AddFunction FrostTalentropCdPostConditions
+{
+ Talent(glacial_spike_talent) and BuffStacks(icicles_buff) == 5 and { BuffPresent(brain_freeze_buff) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) } and Spell(rune_of_power) or not Talent(glacial_spike_talent) and { Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) or Talent(comet_storm_talent) and SpellCooldown(comet_storm) < CastTime(rune_of_power) or Talent(ray_of_frost_talent) and SpellCooldown(ray_of_frost) < CastTime(rune_of_power) or Charges(rune_of_power count=0) > 1 } and Spell(rune_of_power)
+}
+
 ### actions.single
 
 AddFunction FrostSingleMainActions
@@ -1239,26 +1270,26 @@ AddFunction FrostMovementCdPostConditions
 
 AddFunction FrostCooldownsMainActions
 {
+ #call_action_list,name=talent_rop,if=talent.rune_of_power.enabled&active_enemies=1&cooldown.rune_of_power.full_recharge_time<cooldown.frozen_orb.remains
+ if Talent(rune_of_power_talent) and Enemies() == 1 and SpellCooldown(rune_of_power) < SpellCooldown(frozen_orb) FrostTalentropMainActions()
 }
 
 AddFunction FrostCooldownsMainPostConditions
 {
+ Talent(rune_of_power_talent) and Enemies() == 1 and SpellCooldown(rune_of_power) < SpellCooldown(frozen_orb) and FrostTalentropMainPostConditions()
 }
 
 AddFunction FrostCooldownsShortCdActions
 {
- #rune_of_power,if=time_to_die>10+cast_time&time_to_die<25
- if target.TimeToDie() > 10 + CastTime(rune_of_power) and target.TimeToDie() < 25 Spell(rune_of_power)
- #rune_of_power,if=active_enemies=1&talent.glacial_spike.enabled&buff.icicles.stack=5&(buff.brain_freeze.react|talent.ebonbolt.enabled&cooldown.ebonbolt.remains<cast_time)
- if Enemies() == 1 and Talent(glacial_spike_talent) and BuffStacks(icicles_buff) == 5 and { BuffPresent(brain_freeze_buff) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) } Spell(rune_of_power)
- #rune_of_power,if=active_enemies=1&!talent.glacial_spike.enabled&(prev_gcd.1.frozen_orb|talent.ebonbolt.enabled&cooldown.ebonbolt.remains<cast_time|talent.comet_storm.enabled&cooldown.comet_storm.remains<cast_time|talent.ray_of_frost.enabled&cooldown.ray_of_frost.remains<cast_time|charges_fractional>1.9)
- if Enemies() == 1 and not Talent(glacial_spike_talent) and { PreviousGCDSpell(frozen_orb) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) or Talent(comet_storm_talent) and SpellCooldown(comet_storm) < CastTime(rune_of_power) or Talent(ray_of_frost_talent) and SpellCooldown(ray_of_frost) < CastTime(rune_of_power) or Charges(rune_of_power count=0) > 1 } Spell(rune_of_power)
- #rune_of_power,if=active_enemies>1&prev_gcd.1.frozen_orb
- if Enemies() > 1 and PreviousGCDSpell(frozen_orb) Spell(rune_of_power)
+ #rune_of_power,if=prev_gcd.1.frozen_orb|time_to_die>10+cast_time&time_to_die<20
+ if PreviousGCDSpell(frozen_orb) or target.TimeToDie() > 10 + CastTime(rune_of_power) and target.TimeToDie() < 20 Spell(rune_of_power)
+ #call_action_list,name=talent_rop,if=talent.rune_of_power.enabled&active_enemies=1&cooldown.rune_of_power.full_recharge_time<cooldown.frozen_orb.remains
+ if Talent(rune_of_power_talent) and Enemies() == 1 and SpellCooldown(rune_of_power) < SpellCooldown(frozen_orb) FrostTalentropShortCdActions()
 }
 
 AddFunction FrostCooldownsShortCdPostConditions
 {
+ Talent(rune_of_power_talent) and Enemies() == 1 and SpellCooldown(rune_of_power) < SpellCooldown(frozen_orb) and FrostTalentropShortCdPostConditions()
 }
 
 AddFunction FrostCooldownsCdActions
@@ -1270,28 +1301,34 @@ AddFunction FrostCooldownsCdActions
  #mirror_image
  Spell(mirror_image)
 
- unless target.TimeToDie() > 10 + CastTime(rune_of_power) and target.TimeToDie() < 25 and Spell(rune_of_power) or Enemies() == 1 and Talent(glacial_spike_talent) and BuffStacks(icicles_buff) == 5 and { BuffPresent(brain_freeze_buff) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) } and Spell(rune_of_power) or Enemies() == 1 and not Talent(glacial_spike_talent) and { PreviousGCDSpell(frozen_orb) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) or Talent(comet_storm_talent) and SpellCooldown(comet_storm) < CastTime(rune_of_power) or Talent(ray_of_frost_talent) and SpellCooldown(ray_of_frost) < CastTime(rune_of_power) or Charges(rune_of_power count=0) > 1 } and Spell(rune_of_power) or Enemies() > 1 and PreviousGCDSpell(frozen_orb) and Spell(rune_of_power)
+ unless { PreviousGCDSpell(frozen_orb) or target.TimeToDie() > 10 + CastTime(rune_of_power) and target.TimeToDie() < 20 } and Spell(rune_of_power)
  {
-  #potion,if=prev_gcd.1.icy_veins|target.time_to_die<70
-  if { PreviousGCDSpell(icy_veins) or target.TimeToDie() < 70 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(rising_death usable=1)
-  #use_items
-  FrostUseItemActions()
-  #blood_fury
-  Spell(blood_fury_sp)
-  #berserking
-  Spell(berserking)
-  #lights_judgment
-  Spell(lights_judgment)
-  #fireblood
-  Spell(fireblood)
-  #ancestral_call
-  Spell(ancestral_call)
+  #call_action_list,name=talent_rop,if=talent.rune_of_power.enabled&active_enemies=1&cooldown.rune_of_power.full_recharge_time<cooldown.frozen_orb.remains
+  if Talent(rune_of_power_talent) and Enemies() == 1 and SpellCooldown(rune_of_power) < SpellCooldown(frozen_orb) FrostTalentropCdActions()
+
+  unless Talent(rune_of_power_talent) and Enemies() == 1 and SpellCooldown(rune_of_power) < SpellCooldown(frozen_orb) and FrostTalentropCdPostConditions()
+  {
+   #potion,if=prev_gcd.1.icy_veins|target.time_to_die<70
+   if { PreviousGCDSpell(icy_veins) or target.TimeToDie() < 70 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(rising_death usable=1)
+   #use_items
+   FrostUseItemActions()
+   #blood_fury
+   Spell(blood_fury_sp)
+   #berserking
+   Spell(berserking)
+   #lights_judgment
+   Spell(lights_judgment)
+   #fireblood
+   Spell(fireblood)
+   #ancestral_call
+   Spell(ancestral_call)
+  }
  }
 }
 
 AddFunction FrostCooldownsCdPostConditions
 {
- target.TimeToDie() > 10 + CastTime(rune_of_power) and target.TimeToDie() < 25 and Spell(rune_of_power) or Enemies() == 1 and Talent(glacial_spike_talent) and BuffStacks(icicles_buff) == 5 and { BuffPresent(brain_freeze_buff) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) } and Spell(rune_of_power) or Enemies() == 1 and not Talent(glacial_spike_talent) and { PreviousGCDSpell(frozen_orb) or Talent(ebonbolt_talent) and SpellCooldown(ebonbolt) < CastTime(rune_of_power) or Talent(comet_storm_talent) and SpellCooldown(comet_storm) < CastTime(rune_of_power) or Talent(ray_of_frost_talent) and SpellCooldown(ray_of_frost) < CastTime(rune_of_power) or Charges(rune_of_power count=0) > 1 } and Spell(rune_of_power) or Enemies() > 1 and PreviousGCDSpell(frozen_orb) and Spell(rune_of_power)
+ { PreviousGCDSpell(frozen_orb) or target.TimeToDie() > 10 + CastTime(rune_of_power) and target.TimeToDie() < 20 } and Spell(rune_of_power) or Talent(rune_of_power_talent) and Enemies() == 1 and SpellCooldown(rune_of_power) < SpellCooldown(frozen_orb) and FrostTalentropCdPostConditions()
 }
 
 ### actions.aoe
@@ -1548,6 +1585,7 @@ AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 # ray_of_frost_talent
 # rising_death
 # rune_of_power
+# rune_of_power_talent
 # splitting_ice_talent
 # summon_water_elemental
 # time_warp

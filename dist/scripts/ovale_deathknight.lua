@@ -305,7 +305,11 @@ AddFunction BloodDefaultCdActions
  if SpellCooldown(dancing_rune_weapon) == 0 and { not SpellCooldown(blooddrinker) == 0 or not Talent(blooddrinker_talent) } Spell(blood_fury_ap)
  #berserking
  Spell(berserking)
- #use_items
+ #use_items,if=cooldown.dancing_rune_weapon.remains>90
+ if SpellCooldown(dancing_rune_weapon) > 90 BloodUseItemActions()
+ #use_item,name=razdunks_big_red_button
+ BloodUseItemActions()
+ #use_item,name=merekthas_fang
  BloodUseItemActions()
  #potion,if=buff.dancing_rune_weapon.up
  if BuffPresent(dancing_rune_weapon_buff) and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
@@ -419,7 +423,7 @@ do
 # Based on SimulationCraft profile "PR_Death_Knight_Frost".
 #	class=deathknight
 #	spec=frost
-#	talents=3302013
+#	talents=3302033
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -608,10 +612,12 @@ AddFunction FrostCooldownsShortCdPostConditions
 
 AddFunction FrostCooldownsCdActions
 {
- #use_items
+ #use_items,if=buff.pillar_of_frost.up&(!talent.breath_of_sindragosa.enabled|!dot.breath_of_sindragosa.ticking|cooldown.breath_of_sindragosa.remains>90)
+ if BuffPresent(pillar_of_frost_buff) and { not Talent(breath_of_sindragosa_talent) or not BuffPresent(breath_of_sindragosa_buff) or SpellCooldown(breath_of_sindragosa) > 90 } FrostUseItemActions()
+ #use_item,name=razdunks_big_red_button
  FrostUseItemActions()
- #use_item,name=horn_of_valor,if=buff.pillar_of_frost.up&(!talent.breath_of_sindragosa.enabled|!cooldown.breath_of_sindragosa.remains)
- if BuffPresent(pillar_of_frost_buff) and { not Talent(breath_of_sindragosa_talent) or not SpellCooldown(breath_of_sindragosa) > 0 } FrostUseItemActions()
+ #use_item,name=merekthas_fang
+ FrostUseItemActions()
  #potion,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
  if BuffPresent(pillar_of_frost_buff) and BuffPresent(empower_rune_weapon_buff) and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
  #blood_fury,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
@@ -621,6 +627,8 @@ AddFunction FrostCooldownsCdActions
 
  unless SpellCooldown(empower_rune_weapon) > 0 and Spell(pillar_of_frost)
  {
+  #breath_of_sindragosa,if=cooldown.empower_rune_weapon.remains&cooldown.pillar_of_frost.remains
+  if SpellCooldown(empower_rune_weapon) > 0 and SpellCooldown(pillar_of_frost) > 0 Spell(breath_of_sindragosa)
   #empower_rune_weapon,if=cooldown.pillar_of_frost.ready&!talent.breath_of_sindragosa.enabled&rune.time_to_5>gcd&runic_power.deficit>=10
   if SpellCooldown(pillar_of_frost) == 0 and not Talent(breath_of_sindragosa_talent) and TimeToRunes(5) > GCD() and RunicPowerDeficit() >= 10 Spell(empower_rune_weapon)
   #empower_rune_weapon,if=cooldown.pillar_of_frost.ready&talent.breath_of_sindragosa.enabled&rune>=3&runic_power>60
@@ -930,8 +938,6 @@ AddFunction FrostDefaultCdActions
 
  unless not target.DebuffPresent(frost_fever_debuff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(howling_blast) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and Enemies() >= 2 and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(glacial_advance) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(frost_strike)
  {
-  #breath_of_sindragosa,if=cooldown.empower_rune_weapon.remains&cooldown.pillar_of_frost.remains
-  if SpellCooldown(empower_rune_weapon) > 0 and SpellCooldown(pillar_of_frost) > 0 Spell(breath_of_sindragosa)
   #call_action_list,name=cooldowns
   FrostCooldownsCdActions()
 

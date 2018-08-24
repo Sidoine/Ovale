@@ -350,7 +350,7 @@ local function EvaluateSpellAuraList(node)
                     count = count + 1
                 else
                     local id = tonumber(k)
-                    if id == nil then
+                    if  not id then
                         __exports.OvaleCompile:Warning(k .. " is not a parameter keyword in '" .. node.name .. "' " .. node.type)
                     else
                         tbl[id] = v

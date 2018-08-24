@@ -500,7 +500,7 @@ __exports.OvaleASTClass = __class(OvaleASTBase, {
         return outputString
     end,
     SyntaxError = function(self, tokenStream, ...)
-        self:Print(...)
+        self:Warning(...)
         local context = {
             [1] = "Next tokens:"
         }
@@ -513,7 +513,7 @@ __exports.OvaleASTClass = __class(OvaleASTBase, {
                 break
             end
         end
-        self:Print(concat(context, " "))
+        self:Warning(concat(context, " "))
     end,
     Parse = function(self, nodeType, tokenStream, nodeList, annotation)
         local visitor = self.PARSE_VISITOR[nodeType]
