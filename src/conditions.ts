@@ -4102,7 +4102,7 @@ l    */
 	     Valid values: yes, no.
 	 @return A boolean value.
 	 @usage
-	 unless Stance(druid_bear_form) Spell(bear_form_guardian)
+	 unless Stance(druid_bear_form) Spell(bear_form)
      */
     function Stance(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
         let [stance, yesno] = [positionalParams[1], positionalParams[2]];

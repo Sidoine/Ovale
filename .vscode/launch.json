@@ -26,6 +26,17 @@
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
             ]
-        }
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug tests",
+            "program": "${workspaceRoot}/node_modules/ava/profile.js",
+            "args": ["${workspaceRoot}/dist/tests/integration.spec.js"],
+            "outFiles": [
+                "${workspaceRoot}/dist/**/*.js"
+            ],
+            "protocol": "inspector"
+        },
     ]
 }

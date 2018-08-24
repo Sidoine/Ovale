@@ -19,10 +19,14 @@ Define(battle_potion_of_agility 279152)
   SpellInfo(battle_potion_of_agility cd=1 duration=25 gcd=0 offgcd=1)
   # Agility increased by w1.
   SpellAddBuff(battle_potion_of_agility battle_potion_of_agility=1)
-Define(bear_form_guardian 270100)
-# Bear Form gives an additional s1 Stamina.rn
-  SpellInfo(bear_form_guardian channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(bear_form_guardian bear_form_guardian=1)
+Define(bear_form 5487)
+# Shapeshift into Bear Form, increasing armor by m3 and Stamina by 1178s2, granting protection from Polymorph effects, and increasing threat generation.rnrnThe act of shapeshifting frees you from movement impairing effects.
+# Rank 2: Bear Form gives an additional s1 Stamina.rn
+  SpellInfo(bear_form)
+  # Armor increased by w3.rnStamina increased by 1178s2.rnImmune to Polymorph effects.
+  SpellAddBuff(bear_form bear_form=1)
+  # Armor increased by w3.rnStamina increased by 1178s2.rnImmune to Polymorph effects.
+  SpellAddTargetDebuff(bear_form bear_form=1)
 Define(berserk 106951)
 # Reduces the energy cost of all Cat Form abilities by s1 and increases maximum Energy by s3 for d.
   SpellInfo(berserk cd=180 duration=15 gcd=1)
@@ -70,6 +74,7 @@ Define(feral_frenzy 274837)
   SpellAddBuff(feral_frenzy feral_frenzy=1)
 Define(ferocious_bite 22568)
 # Finishing move that causes Physical damage per combo point and consumes up to ?a106951[25*106951s1/-100.1]?a102543[25*102543s1/-100.1][25] additional Energy to increase damage by up to 100.rnrn?s202031[]?s231056[When used on targets below 25 health, ][]?s231056[Ferocious Bite will also refresh the duration of your Rip on your target.rnrn][]   1 point  : m1*1/5 damagern   2 points: m1*2/5 damagern   3 points: m1*3/5 damagern   4 points: m1*4/5 damagern   5 points: m1*5/5 damage
+# Rank 2: When used on a target below 25 health, Ferocious Bite will refresh the duration of your Rip on your target.
   SpellInfo(ferocious_bite energy=25 combopoints=1 gcd=1)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 265226d. 
@@ -110,11 +115,8 @@ Define(lunar_strike 194153)
   SpellInfo(lunar_strike lunarpower=-12)
 Define(mangle 33917)
 # Mangle the target for s2 Physical damage.?a231064[ Deals s3 additional damage against bleeding targets.][]rnrn|cFFFFFFFFGenerates m4/10 Rage.|r
+# Rank 2: Mangle deals 33917s3 additional damage against bleeding targets.
   SpellInfo(mangle cd=6 rage=-8)
-Define(mangle_guardian 231064)
-# Mangle deals 33917s3 additional damage against bleeding targets.
-  SpellInfo(mangle_guardian channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(mangle_guardian mangle_guardian=1)
 Define(maul 6807)
 # Maul the target for s2 Physical damage.
   SpellInfo(maul rage=45)
@@ -147,16 +149,17 @@ Define(pulverize 118345)
   SpellInfo(pulverize cd=40 duration=4 gcd=0 offgcd=1)
   # Stunned.
   SpellAddTargetDebuff(pulverize pulverize=1)
+Define(rake 1822)
+# Rake the target for s1 Bleed damage and an additional 155722o1 Bleed damage over 155722d.?s48484[ Reduces the target's movement speed by 58180s1 for 58180d.][]?a231052[ rnrnWhile stealthed, Rake will also stun the target for 163505d, and deal s4 increased damage.][]rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
+# Rank 2: While stealthed, Rake will also stun the target for 163505d, and deal 1822s4 increased damage.
+  SpellInfo(rake energy=35 gcd=1 combopoints=-1)
+  # Bleeding for w1 damage every t1 seconds.
+  SpellAddTargetDebuff(rake rake_debuff=1)
 Define(rake_debuff 155722)
 # @spelldesc1822
   SpellInfo(rake_debuff duration=15 gcd=0 offgcd=1 tick=3)
   # Bleeding for w1 damage every t1 seconds.
   SpellAddTargetDebuff(rake_debuff rake_debuff=1)
-Define(rake 1822)
-# Rake the target for s1 Bleed damage and an additional 155722o1 Bleed damage over 155722d.?s48484[ Reduces the target's movement speed by 58180s1 for 58180d.][]?a231052[ rnrnWhile stealthed, Rake will also stun the target for 163505d, and deal s4 increased damage.][]rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
-  SpellInfo(rake energy=35 gcd=1 combopoints=-1)
-  # Bleeding for w1 damage every t1 seconds.
-  SpellAddTargetDebuff(rake rake_debuff=1)
 Define(regrowth 8936)
 # Heals a friendly target for s1 and another o2*<mult> over d.?s231032[ Regrowth's initial heal has a 231032s1 increased chance for a critical effect.][]?s24858|s197625[ Usable while in Moonkin Form.][]?s33891[rnrn|C0033AA11Tree of Life: Instant cast.|R][]
   SpellInfo(regrowth duration=12 tick=2)
@@ -179,9 +182,10 @@ Define(shadowmeld 58984)
   SpellAddBuff(shadowmeld shadowmeld=1)
 Define(shred 5221)
 # Shred the target, causing s1*<mult> Physical damage to the target.?a231063[ Deals s4 increased damage against bleeding targets.][]?a231057[rnrnWhile stealthed, Shred deals m3 increased damage, and has double the chance to critically strike.][]rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
+# Rank 2: Shred deals 5221s5 increased damage against bleeding targets.
   SpellInfo(shred energy=40 gcd=1 combopoints=0)
-Define(shred_feral 231063)
-# Shred deals 5221s5 increased damage against bleeding targets.
+Define(shred_feral 231057)
+# While stealthed, Shred deals 5221m4 increased damage, and has double the chance to critically strike.
   SpellInfo(shred_feral channel=0 gcd=0 offgcd=1)
   SpellAddBuff(shred_feral shred_feral=1)
 Define(solar_wrath_balance 190984)
@@ -202,12 +206,14 @@ Define(sunblaze_buff 274398)
   SpellInfo(sunblaze_buff channel=-0.001 gcd=0 offgcd=1)
 Define(swipe 213764)
 # Swipe nearby enemies, inflicting Physical damage. Damage varies by shapeshift form.
+# Rank 2: Swipe deals 106785s2 increased damage against bleeding targets.
   SpellInfo(swipe gcd=1)
 Define(thrash 106832)
 # Thrash all nearby enemies, dealing immediate physical damage and periodic bleed damage. Damage varies by shapeshift form.
   SpellInfo(thrash gcd=0 offgcd=1)
 Define(tigers_fury 5217)
 # Instantly restores s2 Energy, and increases the damage of all your attacks by s1 for their full duration. Lasts d.
+# Rank 2: Tiger's Fury generates an additional s1 energy.
   SpellInfo(tigers_fury cd=30 duration=10 gcd=0 offgcd=1 energy=-20)
   # Attacks deal s1 additional damage for their full duration.
   SpellAddBuff(tigers_fury tigers_fury=1)
@@ -718,7 +724,7 @@ __exports.register = function()
     registerSpec2()
     registerSpec3()
     local name = "ovale_druid_spells"
-    local desc = "[7.3] Ovale: Druid spells"
+    local desc = "[8.0] Ovale: Druid spells"
     local code = [[
 Include(ovale_druid_base_spells)
 Include(ovale_druid_balance_spells)

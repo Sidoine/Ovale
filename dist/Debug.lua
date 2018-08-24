@@ -156,9 +156,16 @@ local OvaleDebugClass = __class(OvaleDebugBase, {
                 end
             end,
             Error = function(self, ...)
+                local name = self:GetName()
                 local s = MakeString(...)
-                self:Print("Fatal error: %s", s)
+                DEFAULT_CHAT_FRAME:AddMessage(format("|cff33ff99%s|r:|cffff3333 Error:|r %s", name, s))
                 __exports.OvaleDebug.bug = s
+            end,
+            Warning = function(self, ...)
+                local name = self:GetName()
+                local s = MakeString(...)
+                DEFAULT_CHAT_FRAME:AddMessage(format("|cff33ff99%s|r: |cff999933Warning:|r %s", name, s))
+                __exports.OvaleDebug.warning = s
             end,
             Print = function(self, ...)
                 local name = self:GetName()

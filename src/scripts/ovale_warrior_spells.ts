@@ -48,6 +48,7 @@ Define(execute_arms 163201)
   SpellInfo(execute_arms rage=20)
 Define(execute 5308)
 # Attempt to finish off a wounded foe, causing 280849sw1+163558sw1 Physical damage. Only usable on enemies that have less than 20 health.rnrn|cFFFFFFFFGenerates m3/10 Rage.|r
+# Rank 2: If your foe survives your Execute, 163201s2 of the Rage spent is refunded.
   SpellInfo(execute cd=6 rage=-20)
 Define(executioners_precision_buff 272867)
 # @spelldesc272866

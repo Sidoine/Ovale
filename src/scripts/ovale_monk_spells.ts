@@ -100,6 +100,7 @@ Define(quaking_palm 107079)
   SpellAddTargetDebuff(quaking_palm quaking_palm=1)
 Define(rising_sun_kick 107428)
 # Kick upwards, dealing ?s137025[185099s1*<CAP>/AP][185099s1] Physical damage?s128595[, and reducing the effectiveness of healing on the target for 115804d][].
+# Rank 2: Rising Sun Kick deals s1 increased damage.rn
   SpellInfo(rising_sun_kick chi=2 cd=10)
 Define(rushing_jade_wind 116847)
 # Summons a whirling tornado around you, causing (1+d/t1)*148187s1 damage over d to enemies within 107270A1 yards.?s220357[ Applies Mark of the Crane to up to s2 nearby targets.][]
@@ -225,7 +226,7 @@ Define(detox_mistweaver 115450)
 	SpellInfo(detox_mistweaver cd=8)
 Define(detox 218164)
 	SpellInfo(detox energy=20 cd=8)
-Define(diffuse_magic 122783)
+
 	SpellInfo(diffuse_magic cd=90 gcd=0 offgcd=1)
 Define(diffuse_magic_buff 122783)
 	SpellInfo(diffuse_magic_buff duration=6)

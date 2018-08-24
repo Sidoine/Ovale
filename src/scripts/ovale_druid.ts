@@ -82,7 +82,7 @@ AddFunction GuardianDefaultShortCDActions
 AddFunction GuardianDefaultMainActions
 {
     GuardianHealMeMain()
-	if not Stance(druid_bear_form) Spell(bear_form_guardian)
+	if not Stance(druid_bear_form) Spell(bear_form)
 
     if (RageDeficit() <= 20 and (IncomingDamage(5) == 0 or (SpellCharges(ironfur)==0 and SpellCharges(frenzied_regeneration) == 0))) Spell(maul)
     if (target.DebuffRefreshable(moonfire_debuff)) Spell(moonfire)
@@ -102,7 +102,7 @@ AddFunction GuardianDefaultMainActions
 AddFunction GuardianDefaultAoEActions
 {
     GuardianHealMeMain()
-	if not Stance(druid_bear_form) Spell(bear_form_guardian)
+	if not Stance(druid_bear_form) Spell(bear_form)
 	if Enemies() >= 4 and HealthPercent() <= 80 Spell(lunar_beam)
     
     if not BuffExpires(incarnation_guardian_of_ursoc_buff) 
@@ -2097,7 +2097,7 @@ AddFunction GuardianPrecombatMainActions
  #food
  #augmentation
  #bear_form
- Spell(bear_form_guardian)
+ Spell(bear_form)
 }
 
 AddFunction GuardianPrecombatMainPostConditions
@@ -2110,12 +2110,12 @@ AddFunction GuardianPrecombatShortCdActions
 
 AddFunction GuardianPrecombatShortCdPostConditions
 {
- Spell(bear_form_guardian)
+ Spell(bear_form)
 }
 
 AddFunction GuardianPrecombatCdActions
 {
- unless Spell(bear_form_guardian)
+ unless Spell(bear_form)
  {
   #snapshot_stats
   #potion
@@ -2125,7 +2125,7 @@ AddFunction GuardianPrecombatCdActions
 
 AddFunction GuardianPrecombatCdPostConditions
 {
- Spell(bear_form_guardian)
+ Spell(bear_form)
 }
 
 ### actions.cooldowns
@@ -2141,11 +2141,11 @@ AddFunction GuardianCooldownsMainPostConditions
 AddFunction GuardianCooldownsShortCdActions
 {
  #barkskin,if=buff.bear_form.up
- if DebuffPresent(bear_form_guardian) Spell(barkskin)
+ if DebuffPresent(bear_form) Spell(barkskin)
  #lunar_beam,if=buff.bear_form.up
- if DebuffPresent(bear_form_guardian) Spell(lunar_beam)
+ if DebuffPresent(bear_form) Spell(lunar_beam)
  #bristling_fur,if=buff.bear_form.up
- if DebuffPresent(bear_form_guardian) Spell(bristling_fur)
+ if DebuffPresent(bear_form) Spell(bristling_fur)
 }
 
 AddFunction GuardianCooldownsShortCdPostConditions
@@ -2169,7 +2169,7 @@ AddFunction GuardianCooldownsCdActions
  #ancestral_call
  Spell(ancestral_call)
 
- unless DebuffPresent(bear_form_guardian) and Spell(barkskin) or DebuffPresent(bear_form_guardian) and Spell(lunar_beam) or DebuffPresent(bear_form_guardian) and Spell(bristling_fur)
+ unless DebuffPresent(bear_form) and Spell(barkskin) or DebuffPresent(bear_form) and Spell(lunar_beam) or DebuffPresent(bear_form) and Spell(bristling_fur)
  {
   #use_items
   GuardianUseItemActions()
@@ -2178,7 +2178,7 @@ AddFunction GuardianCooldownsCdActions
 
 AddFunction GuardianCooldownsCdPostConditions
 {
- DebuffPresent(bear_form_guardian) and Spell(barkskin) or DebuffPresent(bear_form_guardian) and Spell(lunar_beam) or DebuffPresent(bear_form_guardian) and Spell(bristling_fur)
+ DebuffPresent(bear_form) and Spell(barkskin) or DebuffPresent(bear_form) and Spell(lunar_beam) or DebuffPresent(bear_form) and Spell(bristling_fur)
 }
 
 ### actions.default
@@ -2201,7 +2201,7 @@ AddFunction GuardianDefaultMainActions
   #swipe,if=buff.incarnation.down&active_enemies>4
   if DebuffExpires(incarnation) and Enemies() > 4 Spell(swipe)
   #mangle,if=dot.thrash_bear.ticking
-  if target.DebuffPresent(thrash_bear_debuff) Spell(mangle_guardian)
+  if target.DebuffPresent(thrash_bear_debuff) Spell(mangle)
   #moonfire,target_if=buff.galactic_guardian.up&active_enemies<2
   if BuffPresent(galactic_guardian_buff) and Enemies() < 2 Spell(moonfire)
   #thrash
@@ -2234,7 +2234,7 @@ AddFunction GuardianDefaultShortCdActions
 
 AddFunction GuardianDefaultShortCdPostConditions
 {
- GuardianCooldownsShortCdPostConditions() or RageDeficit() < 10 and Enemies() < 4 and Spell(maul) or target.DebuffRefreshable(moonfire_debuff) and Enemies() < 2 and Spell(moonfire) or Spell(incarnation) or { DebuffExpires(incarnation) and Enemies() > 1 or DebuffPresent(incarnation) and Enemies() > 4 } and Spell(thrash) or DebuffExpires(incarnation) and Enemies() > 4 and Spell(swipe) or target.DebuffPresent(thrash_bear_debuff) and Spell(mangle_guardian) or BuffPresent(galactic_guardian_buff) and Enemies() < 2 and Spell(moonfire) or Spell(thrash) or Spell(maul) or Spell(swipe)
+ GuardianCooldownsShortCdPostConditions() or RageDeficit() < 10 and Enemies() < 4 and Spell(maul) or target.DebuffRefreshable(moonfire_debuff) and Enemies() < 2 and Spell(moonfire) or Spell(incarnation) or { DebuffExpires(incarnation) and Enemies() > 1 or DebuffPresent(incarnation) and Enemies() > 4 } and Spell(thrash) or DebuffExpires(incarnation) and Enemies() > 4 and Spell(swipe) or target.DebuffPresent(thrash_bear_debuff) and Spell(mangle) or BuffPresent(galactic_guardian_buff) and Enemies() < 2 and Spell(moonfire) or Spell(thrash) or Spell(maul) or Spell(swipe)
 }
 
 AddFunction GuardianDefaultCdActions
@@ -2245,7 +2245,7 @@ AddFunction GuardianDefaultCdActions
 
 AddFunction GuardianDefaultCdPostConditions
 {
- GuardianCooldownsCdPostConditions() or RageDeficit() < 10 and Enemies() < 4 and Spell(maul) or target.DebuffStacks(thrash_bear_debuff) == MaxStacks(thrash_bear_debuff) and target.DebuffGain(thrash_bear_debuff) <= BaseDuration(thrash_bear_debuff) and Spell(pulverize) or target.DebuffRefreshable(moonfire_debuff) and Enemies() < 2 and Spell(moonfire) or Spell(incarnation) or { DebuffExpires(incarnation) and Enemies() > 1 or DebuffPresent(incarnation) and Enemies() > 4 } and Spell(thrash) or DebuffExpires(incarnation) and Enemies() > 4 and Spell(swipe) or target.DebuffPresent(thrash_bear_debuff) and Spell(mangle_guardian) or BuffPresent(galactic_guardian_buff) and Enemies() < 2 and Spell(moonfire) or Spell(thrash) or Spell(maul) or Spell(swipe)
+ GuardianCooldownsCdPostConditions() or RageDeficit() < 10 and Enemies() < 4 and Spell(maul) or target.DebuffStacks(thrash_bear_debuff) == MaxStacks(thrash_bear_debuff) and target.DebuffGain(thrash_bear_debuff) <= BaseDuration(thrash_bear_debuff) and Spell(pulverize) or target.DebuffRefreshable(moonfire_debuff) and Enemies() < 2 and Spell(moonfire) or Spell(incarnation) or { DebuffExpires(incarnation) and Enemies() > 1 or DebuffPresent(incarnation) and Enemies() > 4 } and Spell(thrash) or DebuffExpires(incarnation) and Enemies() > 4 and Spell(swipe) or target.DebuffPresent(thrash_bear_debuff) and Spell(mangle) or BuffPresent(galactic_guardian_buff) and Enemies() < 2 and Spell(moonfire) or Spell(thrash) or Spell(maul) or Spell(swipe)
 }
 
 ### Guardian icons.
@@ -2310,7 +2310,7 @@ AddIcon checkbox=opt_druid_guardian_aoe help=cd specialization=guardian
 # ancestral_call
 # arcane_torrent_energy
 # barkskin
-# bear_form_guardian
+# bear_form
 # berserking
 # blood_fury
 # bristling_fur
@@ -2320,7 +2320,6 @@ AddIcon checkbox=opt_druid_guardian_aoe help=cd specialization=guardian
 # lights_judgment
 # lunar_beam
 # mangle
-# mangle_guardian
 # maul
 # moonfire
 # moonfire_debuff

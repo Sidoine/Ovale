@@ -347,7 +347,7 @@ local function EvaluateSpellAuraList(node)
             if  not checkToken(PARAMETER_KEYWORD, k) then
                 local id = tonumber(k)
                 if id == nil then
-                    __exports.OvaleCompile:Print("Info: " .. k .. " is not a parameter keyword in '" .. node.name .. "' " .. node.type)
+                    __exports.OvaleCompile:Warning(k .. " is not a parameter keyword in '" .. node.name .. "' " .. node.type)
                 else
                     tbl[tonumber(k)] = v
                     count = count + 1
@@ -537,7 +537,7 @@ local UpdateTrinketInfo = function()
 end
 
 local OvaleCompileClassBase = OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(OvaleCompileBase))
-local OvaleCompileClass = __class(OvaleCompileClassBase, {
+__exports.OvaleCompileClass = __class(OvaleCompileClassBase, {
     OnInitialize = function(self)
         self:RegisterMessage("Ovale_CheckBoxValueChanged", "ScriptControlChanged")
         self:RegisterMessage("Ovale_EquipmentChanged", "EventHandler")
@@ -670,4 +670,4 @@ local OvaleCompileClass = __class(OvaleCompileClassBase, {
         self.ast = nil
     end
 })
-__exports.OvaleCompile = OvaleCompileClass()
+__exports.OvaleCompile = __exports.OvaleCompileClass()

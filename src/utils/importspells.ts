@@ -874,6 +874,7 @@ export interface SpellData {
     azeriteTrait?: AzeriteTrait;
     className?: ClassId | "PET";
     specializationName?: SpecializationName;
+    nextRank?: SpellData;
 }
 
 export interface SpellEffectData {
@@ -1333,6 +1334,7 @@ export function getSpellData(directory: string) {
     }
 
     for (const spell of spellData) {
+        if (spell.rank_str === "Rank 2") continue;
         if (identifiers[spell.identifier]) {
             const other = spellDataById.get(identifiers[spell.identifier]);
             if (other.identifierScore === spell.identifierScore) {
@@ -1348,6 +1350,13 @@ export function getSpellData(directory: string) {
             }
         } 
         identifiers[spell.identifier] = spell.id;
+    }
+
+    for (const spell of spellData) {
+        if (spell.rank_str === "Rank 2" && identifiers[spell.identifier]) {
+            const currentSpell = spellDataById.get(identifiers[spell.identifier]);
+            currentSpell.nextRank = spell;
+        }
     }
 
     for (const row of output.spellpower_data_t) {
