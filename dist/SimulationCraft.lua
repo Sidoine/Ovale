@@ -3720,6 +3720,9 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
             AddSymbol(annotation, buffName)
         elseif property == "pct" then
             code = format("%sStaggerRemaining() / %sMaxHealth() * 100", target, target)
+        elseif match(property, "last_tick_damage_(%d+)") then
+            local ticks = match(property, "last_tick_damage_(%d+)")
+            code = format("StaggerTick(%d)", ticks)
         else
             ok = false
         end
