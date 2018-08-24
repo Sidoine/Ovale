@@ -1,120 +1,6 @@
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
-    local name = "icyveins_deathknight_blood"
-    local desc = "[7.3.2] Icy-Veins: DeathKnight Blood"
-    local code = [[
-
-Include(ovale_common)
-Include(ovale_trinkets_mop)
-Include(ovale_trinkets_wod)
-Include(ovale_deathknight_spells)
-
-AddCheckBox(opt_interrupt L(interrupt) default specialization=blood)
-AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=blood)
-AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=blood)
-
-AddFunction BloodDefaultShortCDActions
-{
-	if CheckBoxOn(opt_melee_range) and not target.InRange(death_strike) Texture(misc_arrowlup help=L(not_in_melee_range))
-	if not BuffPresent(rune_tap_buff) Spell(rune_tap)
-}
-
-AddFunction BloodDefaultMainActions
-{
-	BloodHealMe()
-	if InCombat() and BuffExpires(bone_shield_buff 3) Spell(marrowrend)
-	if target.DebuffRefreshable(blood_plague_debuff) Spell(blood_boil)
-	if not BuffPresent(death_and_decay_buff) and BuffPresent(crimson_scourge_buff) and Talent(rapid_decomposition_talent) Spell(death_and_decay)
-	if RunicPower() >= 100 and target.TimeToDie() >= 10 Spell(bonestorm)
-	if RunicPowerDeficit() <= 20 Spell(death_strike)
-	if BuffStacks(bone_shield_buff) <= 2+4*Talent(ossuary_talent) Spell(marrowrend)
-	if not BuffPresent(death_and_decay_buff) and Rune() >= 3 and Talent(rapid_decomposition_talent) Spell(death_and_decay)
-	if not target.DebuffPresent(mark_of_blood_debuff) Spell(mark_of_blood)
-	if Rune() >= 3 or RunicPower() < 45 Spell(heart_strike)
-	Spell(consumption)
-	Spell(blood_boil)
-}
-
-AddFunction BloodDefaultAoEActions
-{
-	BloodHealMe()
-	if RunicPower() >= 100 Spell(bonestorm)
-	if InCombat() and BuffExpires(bone_shield_buff 3) Spell(marrowrend)
-	if DebuffCountOnAny(blood_plague_debuff) < Enemies(tagged=1) Spell(blood_boil)
-	if not BuffPresent(death_and_decay_buff) and BuffPresent(crimson_scourge_buff) Spell(death_and_decay)
-	if RunicPowerDeficit() <= 20 Spell(death_strike)
-	if BuffStacks(bone_shield_buff) <= 2+4*Talent(ossuary_talent) Spell(marrowrend)
-	if not BuffPresent(death_and_decay_buff) and Enemies() >= 3 Spell(death_and_decay)
-	if not target.DebuffPresent(mark_of_blood_debuff) Spell(mark_of_blood)
-	if Rune() >= 3 or RunicPower() < 45 Spell(heart_strike)
-	Spell(consumption)
-	Spell(blood_boil)
-}
-
- AddFunction BloodHealMe
- {
-	unless(DebuffPresent(healing_immunity_debuff)) 
-	{
-		if HealthPercent() <= 70 Spell(death_strike)
-		if (DamageTaken(5) * 0.2) > (Health() / 100 * 25) Spell(death_strike)
-		if (BuffStacks(bone_shield_buff) * 3) > (100 - HealthPercent()) Spell(tombstone)
-		if HealthPercent() <= 70 Spell(consumption)
-		if (HealthPercent() < 35) UseHealthPotions()
-	}
-}
-
-AddFunction BloodDefaultCdActions
-{
-	BloodInterruptActions()
-	if IncomingDamage(1.5 magic=1) > 0 spell(antimagic_shell)
-	if (HasEquippedItem(shifting_cosmic_sliver)) Spell(icebound_fortitude)
-	Item(Trinket0Slot usable=1 text=13)
-	Item(Trinket1Slot usable=1 text=14)
-	Spell(vampiric_blood)
-	Spell(icebound_fortitude)
-	Spell(dancing_rune_weapon)
-	if BuffStacks(bone_shield_buff) >= 5 Spell(tombstone)
-	if CheckBoxOn(opt_use_consumables) Item(unbending_potion usable=1)
-	UseRacialSurvivalActions()
-}
-
-AddFunction BloodInterruptActions
-{
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
-	{
-		if target.InRange(mind_freeze) and target.IsInterruptible() Spell(mind_freeze)
-		if target.InRange(asphyxiate) and not target.Classification(worldboss) Spell(asphyxiate)
-		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
-	}
-}
-
-AddCheckBox(opt_deathknight_blood_aoe L(AOE) default specialization=blood)
-
-AddIcon help=shortcd specialization=blood
-{
-	BloodDefaultShortCDActions()
-}
-
-AddIcon enemies=1 help=main specialization=blood
-{
-	BloodDefaultMainActions()
-}
-
-AddIcon checkbox=opt_deathknight_blood_aoe help=aoe specialization=blood
-{
-	BloodDefaultAoEActions()
-}
-
-AddIcon help=cd specialization=blood
-{
-	#if not InCombat() ProtectionPrecombatCdActions()
-	BloodDefaultCdActions()
-}
-]]
-    OvaleScripts:RegisterScript("DEATHKNIGHT", "blood", name, desc, code, "script")
-end
-do
     local name = "sc_pr_death_knight_blood"
     local desc = "[8.0] Simulationcraft: PR_Death_Knight_Blood"
     local code = [[
@@ -305,7 +191,11 @@ AddFunction BloodDefaultCdActions
  if SpellCooldown(dancing_rune_weapon) == 0 and { not SpellCooldown(blooddrinker) == 0 or not Talent(blooddrinker_talent) } Spell(blood_fury_ap)
  #berserking
  Spell(berserking)
- #use_items
+ #use_items,if=cooldown.dancing_rune_weapon.remains>90
+ if SpellCooldown(dancing_rune_weapon) > 90 BloodUseItemActions()
+ #use_item,name=razdunks_big_red_button
+ BloodUseItemActions()
+ #use_item,name=merekthas_fang
  BloodUseItemActions()
  #potion,if=buff.dancing_rune_weapon.up
  if BuffPresent(dancing_rune_weapon_buff) and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
@@ -419,7 +309,7 @@ do
 # Based on SimulationCraft profile "PR_Death_Knight_Frost".
 #	class=deathknight
 #	spec=frost
-#	talents=3302013
+#	talents=3302033
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -608,10 +498,12 @@ AddFunction FrostCooldownsShortCdPostConditions
 
 AddFunction FrostCooldownsCdActions
 {
- #use_items
+ #use_items,if=buff.pillar_of_frost.up&(!talent.breath_of_sindragosa.enabled|!dot.breath_of_sindragosa.ticking|cooldown.breath_of_sindragosa.remains>90)
+ if BuffPresent(pillar_of_frost_buff) and { not Talent(breath_of_sindragosa_talent) or not BuffPresent(breath_of_sindragosa_buff) or SpellCooldown(breath_of_sindragosa) > 90 } FrostUseItemActions()
+ #use_item,name=razdunks_big_red_button
  FrostUseItemActions()
- #use_item,name=horn_of_valor,if=buff.pillar_of_frost.up&(!talent.breath_of_sindragosa.enabled|!cooldown.breath_of_sindragosa.remains)
- if BuffPresent(pillar_of_frost_buff) and { not Talent(breath_of_sindragosa_talent) or not SpellCooldown(breath_of_sindragosa) > 0 } FrostUseItemActions()
+ #use_item,name=merekthas_fang
+ FrostUseItemActions()
  #potion,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
  if BuffPresent(pillar_of_frost_buff) and BuffPresent(empower_rune_weapon_buff) and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
  #blood_fury,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
@@ -621,6 +513,8 @@ AddFunction FrostCooldownsCdActions
 
  unless SpellCooldown(empower_rune_weapon) > 0 and Spell(pillar_of_frost)
  {
+  #breath_of_sindragosa,if=cooldown.empower_rune_weapon.remains&cooldown.pillar_of_frost.remains
+  if SpellCooldown(empower_rune_weapon) > 0 and SpellCooldown(pillar_of_frost) > 0 Spell(breath_of_sindragosa)
   #empower_rune_weapon,if=cooldown.pillar_of_frost.ready&!talent.breath_of_sindragosa.enabled&rune.time_to_5>gcd&runic_power.deficit>=10
   if SpellCooldown(pillar_of_frost) == 0 and not Talent(breath_of_sindragosa_talent) and TimeToRunes(5) > GCD() and RunicPowerDeficit() >= 10 Spell(empower_rune_weapon)
   #empower_rune_weapon,if=cooldown.pillar_of_frost.ready&talent.breath_of_sindragosa.enabled&rune>=3&runic_power>60
@@ -930,8 +824,6 @@ AddFunction FrostDefaultCdActions
 
  unless not target.DebuffPresent(frost_fever_debuff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(howling_blast) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and Enemies() >= 2 and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(glacial_advance) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(frost_strike)
  {
-  #breath_of_sindragosa,if=cooldown.empower_rune_weapon.remains&cooldown.pillar_of_frost.remains
-  if SpellCooldown(empower_rune_weapon) > 0 and SpellCooldown(pillar_of_frost) > 0 Spell(breath_of_sindragosa)
   #call_action_list,name=cooldowns
   FrostCooldownsCdActions()
 
