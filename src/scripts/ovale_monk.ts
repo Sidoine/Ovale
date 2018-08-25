@@ -517,16 +517,16 @@ AddFunction WindwalkerStMainActions
  if MaxChi() - Chi() >= 2 and BuffExpires(serenity_buff) and SpellCooldown(fist_of_the_white_tiger) > TimeToMaxEnergy() Spell(tiger_palm)
  #whirling_dragon_punch
  if SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 Spell(whirling_dragon_punch)
- #fists_of_fury,if=chi>=3&energy.time_to_max>2.5&azerite.swift_roundhouse.rank<2
- if Chi() >= 3 and TimeToMaxEnergy() > 2 and AzeriteTraitRank(swift_roundhouse_trait) < 2 Spell(fists_of_fury)
+ #fists_of_fury,if=chi>=3&energy.time_to_max>2.5&azerite.swift_roundhouse.rank<3
+ if Chi() >= 3 and TimeToMaxEnergy() > 2 and AzeriteTraitRank(swift_roundhouse_trait) < 3 Spell(fists_of_fury)
  #rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=((chi>=3&energy>=40)|chi>=5)&(talent.serenity.enabled|cooldown.serenity.remains>=6)&!azerite.swift_roundhouse.enabled
  if { Chi() >= 3 and Energy() >= 40 or Chi() >= 5 } and { Talent(serenity_talent) or SpellCooldown(serenity) >= 6 } and not HasAzeriteTrait(swift_roundhouse_trait) Spell(rising_sun_kick)
- #fists_of_fury,if=!talent.serenity.enabled&(azerite.swift_roundhouse.rank<2|cooldown.whirling_dragon_punch.remains<13)
- if not Talent(serenity_talent) and { AzeriteTraitRank(swift_roundhouse_trait) < 2 or SpellCooldown(whirling_dragon_punch) < 13 } Spell(fists_of_fury)
+ #fists_of_fury,if=!talent.serenity.enabled&(azerite.swift_roundhouse.rank<3|cooldown.whirling_dragon_punch.remains<13)
+ if not Talent(serenity_talent) and { AzeriteTraitRank(swift_roundhouse_trait) < 3 or SpellCooldown(whirling_dragon_punch) < 13 } Spell(fists_of_fury)
  #rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=cooldown.serenity.remains>=5|(!talent.serenity.enabled)&!azerite.swift_roundhouse.enabled
  if SpellCooldown(serenity) >= 5 or not Talent(serenity_talent) and not HasAzeriteTrait(swift_roundhouse_trait) Spell(rising_sun_kick)
- #blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=cooldown.fists_of_fury.remains>2&!prev_gcd.1.blackout_kick&energy.time_to_max>1&azerite.swift_roundhouse.rank>1
- if SpellCooldown(fists_of_fury) > 2 and not PreviousGCDSpell(blackout_kick_windwalker) and TimeToMaxEnergy() > 1 and AzeriteTraitRank(swift_roundhouse_trait) > 1 Spell(blackout_kick_windwalker)
+ #blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=cooldown.fists_of_fury.remains>2&!prev_gcd.1.blackout_kick&energy.time_to_max>1&azerite.swift_roundhouse.rank>2
+ if SpellCooldown(fists_of_fury) > 2 and not PreviousGCDSpell(blackout_kick_windwalker) and TimeToMaxEnergy() > 1 and AzeriteTraitRank(swift_roundhouse_trait) > 2 Spell(blackout_kick_windwalker)
  #flying_serpent_kick,if=prev_gcd.1.blackout_kick&energy.time_to_max>2&chi>1,interrupt=1
  if PreviousGCDSpell(blackout_kick_windwalker) and TimeToMaxEnergy() > 2 and Chi() > 1 Spell(flying_serpent_kick)
  #blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=buff.swift_roundhouse.stack<2&!prev_gcd.1.blackout_kick
@@ -568,7 +568,7 @@ AddFunction WindwalkerStShortCdActions
 
 AddFunction WindwalkerStShortCdPostConditions
 {
- { not CheckBoxOn(opt_touch_of_death_on_elite_only) or not UnitInRaid() and target.Classification(elite) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff) } and Spell(touch_of_death) or HasAzeriteTrait(swift_roundhouse_trait) and BuffStacks(swift_roundhouse_buff) == 2 and Spell(rising_sun_kick) or BuffExpires(rushing_jade_wind_windwalker_buff) and not PreviousGCDSpell(rushing_jade_wind_windwalker) and Spell(rushing_jade_wind_windwalker) or not PreviousGCDSpell(blackout_kick_windwalker) and MaxChi() - Chi() >= 1 and ArmorSetBonus(T21 4) and BuffPresent(blackout_kick_buff) and Spell(blackout_kick_windwalker) or Chi() <= 3 and TimeToMaxEnergy() < 2 and Spell(tiger_palm) or MaxChi() - Chi() >= 2 and BuffExpires(serenity_buff) and SpellCooldown(fist_of_the_white_tiger) > TimeToMaxEnergy() and Spell(tiger_palm) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Chi() >= 3 and TimeToMaxEnergy() > 2 and AzeriteTraitRank(swift_roundhouse_trait) < 2 and Spell(fists_of_fury) or { Chi() >= 3 and Energy() >= 40 or Chi() >= 5 } and { Talent(serenity_talent) or SpellCooldown(serenity) >= 6 } and not HasAzeriteTrait(swift_roundhouse_trait) and Spell(rising_sun_kick) or not Talent(serenity_talent) and { AzeriteTraitRank(swift_roundhouse_trait) < 2 or SpellCooldown(whirling_dragon_punch) < 13 } and Spell(fists_of_fury) or { SpellCooldown(serenity) >= 5 or not Talent(serenity_talent) and not HasAzeriteTrait(swift_roundhouse_trait) } and Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 2 and not PreviousGCDSpell(blackout_kick_windwalker) and TimeToMaxEnergy() > 1 and AzeriteTraitRank(swift_roundhouse_trait) > 1 and Spell(blackout_kick_windwalker) or PreviousGCDSpell(blackout_kick_windwalker) and TimeToMaxEnergy() > 2 and Chi() > 1 and Spell(flying_serpent_kick) or BuffStacks(swift_roundhouse_buff) < 2 and not PreviousGCDSpell(blackout_kick_windwalker) and Spell(blackout_kick_windwalker) or HasEquippedItem(the_emperors_capacitor_item) and BuffStacks(the_emperors_capacitor_buff) >= 19 and TimeToMaxEnergy() > 3 and Spell(crackling_jade_lightning) or HasEquippedItem(the_emperors_capacitor_item) and BuffStacks(the_emperors_capacitor_buff) >= 14 and SpellCooldown(serenity) < 13 and Talent(serenity_talent) and TimeToMaxEnergy() > 3 and Spell(crackling_jade_lightning) or not PreviousGCDSpell(blackout_kick_windwalker) and Spell(blackout_kick_windwalker) or Spell(chi_wave) or TimeToMaxEnergy() > 1 and Talent(serenity_talent) and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and { MaxChi() - Chi() >= 2 or TimeToMaxEnergy() < 3 } and not BuffPresent(serenity_buff) and Spell(tiger_palm) or MaxChi() - Chi() >= 3 and TimeToMaxEnergy() > 1 and not Talent(serenity_talent) and CheckBoxOn(opt_chi_burst) and Spell(chi_burst)
+ { not CheckBoxOn(opt_touch_of_death_on_elite_only) or not UnitInRaid() and target.Classification(elite) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff) } and Spell(touch_of_death) or HasAzeriteTrait(swift_roundhouse_trait) and BuffStacks(swift_roundhouse_buff) == 2 and Spell(rising_sun_kick) or BuffExpires(rushing_jade_wind_windwalker_buff) and not PreviousGCDSpell(rushing_jade_wind_windwalker) and Spell(rushing_jade_wind_windwalker) or not PreviousGCDSpell(blackout_kick_windwalker) and MaxChi() - Chi() >= 1 and ArmorSetBonus(T21 4) and BuffPresent(blackout_kick_buff) and Spell(blackout_kick_windwalker) or Chi() <= 3 and TimeToMaxEnergy() < 2 and Spell(tiger_palm) or MaxChi() - Chi() >= 2 and BuffExpires(serenity_buff) and SpellCooldown(fist_of_the_white_tiger) > TimeToMaxEnergy() and Spell(tiger_palm) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Chi() >= 3 and TimeToMaxEnergy() > 2 and AzeriteTraitRank(swift_roundhouse_trait) < 3 and Spell(fists_of_fury) or { Chi() >= 3 and Energy() >= 40 or Chi() >= 5 } and { Talent(serenity_talent) or SpellCooldown(serenity) >= 6 } and not HasAzeriteTrait(swift_roundhouse_trait) and Spell(rising_sun_kick) or not Talent(serenity_talent) and { AzeriteTraitRank(swift_roundhouse_trait) < 3 or SpellCooldown(whirling_dragon_punch) < 13 } and Spell(fists_of_fury) or { SpellCooldown(serenity) >= 5 or not Talent(serenity_talent) and not HasAzeriteTrait(swift_roundhouse_trait) } and Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 2 and not PreviousGCDSpell(blackout_kick_windwalker) and TimeToMaxEnergy() > 1 and AzeriteTraitRank(swift_roundhouse_trait) > 2 and Spell(blackout_kick_windwalker) or PreviousGCDSpell(blackout_kick_windwalker) and TimeToMaxEnergy() > 2 and Chi() > 1 and Spell(flying_serpent_kick) or BuffStacks(swift_roundhouse_buff) < 2 and not PreviousGCDSpell(blackout_kick_windwalker) and Spell(blackout_kick_windwalker) or HasEquippedItem(the_emperors_capacitor_item) and BuffStacks(the_emperors_capacitor_buff) >= 19 and TimeToMaxEnergy() > 3 and Spell(crackling_jade_lightning) or HasEquippedItem(the_emperors_capacitor_item) and BuffStacks(the_emperors_capacitor_buff) >= 14 and SpellCooldown(serenity) < 13 and Talent(serenity_talent) and TimeToMaxEnergy() > 3 and Spell(crackling_jade_lightning) or not PreviousGCDSpell(blackout_kick_windwalker) and Spell(blackout_kick_windwalker) or Spell(chi_wave) or TimeToMaxEnergy() > 1 and Talent(serenity_talent) and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and { MaxChi() - Chi() >= 2 or TimeToMaxEnergy() < 3 } and not BuffPresent(serenity_buff) and Spell(tiger_palm) or MaxChi() - Chi() >= 3 and TimeToMaxEnergy() > 1 and not Talent(serenity_talent) and CheckBoxOn(opt_chi_burst) and Spell(chi_burst)
 }
 
 AddFunction WindwalkerStCdActions
@@ -585,15 +585,15 @@ AddFunction WindwalkerStCdActions
 
 AddFunction WindwalkerStCdPostConditions
 {
- { not CheckBoxOn(opt_touch_of_death_on_elite_only) or not UnitInRaid() and target.Classification(elite) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff) } and Spell(touch_of_death) or HasAzeriteTrait(swift_roundhouse_trait) and BuffStacks(swift_roundhouse_buff) == 2 and Spell(rising_sun_kick) or BuffExpires(rushing_jade_wind_windwalker_buff) and not PreviousGCDSpell(rushing_jade_wind_windwalker) and Spell(rushing_jade_wind_windwalker) or not PreviousGCDSpell(tiger_palm) and Spell(energizing_elixir) or not PreviousGCDSpell(blackout_kick_windwalker) and MaxChi() - Chi() >= 1 and ArmorSetBonus(T21 4) and BuffPresent(blackout_kick_buff) and Spell(blackout_kick_windwalker) or Chi() <= 2 and Spell(fist_of_the_white_tiger) or Chi() <= 3 and TimeToMaxEnergy() < 2 and Spell(tiger_palm) or MaxChi() - Chi() >= 2 and BuffExpires(serenity_buff) and SpellCooldown(fist_of_the_white_tiger) > TimeToMaxEnergy() and Spell(tiger_palm) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Chi() >= 3 and TimeToMaxEnergy() > 2 and AzeriteTraitRank(swift_roundhouse_trait) < 2 and Spell(fists_of_fury) or { Chi() >= 3 and Energy() >= 40 or Chi() >= 5 } and { Talent(serenity_talent) or SpellCooldown(serenity) >= 6 } and not HasAzeriteTrait(swift_roundhouse_trait) and Spell(rising_sun_kick) or not Talent(serenity_talent) and { AzeriteTraitRank(swift_roundhouse_trait) < 2 or SpellCooldown(whirling_dragon_punch) < 13 } and Spell(fists_of_fury) or { SpellCooldown(serenity) >= 5 or not Talent(serenity_talent) and not HasAzeriteTrait(swift_roundhouse_trait) } and Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 2 and not PreviousGCDSpell(blackout_kick_windwalker) and TimeToMaxEnergy() > 1 and AzeriteTraitRank(swift_roundhouse_trait) > 1 and Spell(blackout_kick_windwalker) or PreviousGCDSpell(blackout_kick_windwalker) and TimeToMaxEnergy() > 2 and Chi() > 1 and Spell(flying_serpent_kick) or BuffStacks(swift_roundhouse_buff) < 2 and not PreviousGCDSpell(blackout_kick_windwalker) and Spell(blackout_kick_windwalker) or HasEquippedItem(the_emperors_capacitor_item) and BuffStacks(the_emperors_capacitor_buff) >= 19 and TimeToMaxEnergy() > 3 and Spell(crackling_jade_lightning) or HasEquippedItem(the_emperors_capacitor_item) and BuffStacks(the_emperors_capacitor_buff) >= 14 and SpellCooldown(serenity) < 13 and Talent(serenity_talent) and TimeToMaxEnergy() > 3 and Spell(crackling_jade_lightning) or not PreviousGCDSpell(blackout_kick_windwalker) and Spell(blackout_kick_windwalker) or Spell(chi_wave) or TimeToMaxEnergy() > 1 and Talent(serenity_talent) and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and { MaxChi() - Chi() >= 2 or TimeToMaxEnergy() < 3 } and not BuffPresent(serenity_buff) and Spell(tiger_palm) or MaxChi() - Chi() >= 3 and TimeToMaxEnergy() > 1 and not Talent(serenity_talent) and CheckBoxOn(opt_chi_burst) and Spell(chi_burst)
+ { not CheckBoxOn(opt_touch_of_death_on_elite_only) or not UnitInRaid() and target.Classification(elite) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff) } and Spell(touch_of_death) or HasAzeriteTrait(swift_roundhouse_trait) and BuffStacks(swift_roundhouse_buff) == 2 and Spell(rising_sun_kick) or BuffExpires(rushing_jade_wind_windwalker_buff) and not PreviousGCDSpell(rushing_jade_wind_windwalker) and Spell(rushing_jade_wind_windwalker) or not PreviousGCDSpell(tiger_palm) and Spell(energizing_elixir) or not PreviousGCDSpell(blackout_kick_windwalker) and MaxChi() - Chi() >= 1 and ArmorSetBonus(T21 4) and BuffPresent(blackout_kick_buff) and Spell(blackout_kick_windwalker) or Chi() <= 2 and Spell(fist_of_the_white_tiger) or Chi() <= 3 and TimeToMaxEnergy() < 2 and Spell(tiger_palm) or MaxChi() - Chi() >= 2 and BuffExpires(serenity_buff) and SpellCooldown(fist_of_the_white_tiger) > TimeToMaxEnergy() and Spell(tiger_palm) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Chi() >= 3 and TimeToMaxEnergy() > 2 and AzeriteTraitRank(swift_roundhouse_trait) < 3 and Spell(fists_of_fury) or { Chi() >= 3 and Energy() >= 40 or Chi() >= 5 } and { Talent(serenity_talent) or SpellCooldown(serenity) >= 6 } and not HasAzeriteTrait(swift_roundhouse_trait) and Spell(rising_sun_kick) or not Talent(serenity_talent) and { AzeriteTraitRank(swift_roundhouse_trait) < 3 or SpellCooldown(whirling_dragon_punch) < 13 } and Spell(fists_of_fury) or { SpellCooldown(serenity) >= 5 or not Talent(serenity_talent) and not HasAzeriteTrait(swift_roundhouse_trait) } and Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 2 and not PreviousGCDSpell(blackout_kick_windwalker) and TimeToMaxEnergy() > 1 and AzeriteTraitRank(swift_roundhouse_trait) > 2 and Spell(blackout_kick_windwalker) or PreviousGCDSpell(blackout_kick_windwalker) and TimeToMaxEnergy() > 2 and Chi() > 1 and Spell(flying_serpent_kick) or BuffStacks(swift_roundhouse_buff) < 2 and not PreviousGCDSpell(blackout_kick_windwalker) and Spell(blackout_kick_windwalker) or HasEquippedItem(the_emperors_capacitor_item) and BuffStacks(the_emperors_capacitor_buff) >= 19 and TimeToMaxEnergy() > 3 and Spell(crackling_jade_lightning) or HasEquippedItem(the_emperors_capacitor_item) and BuffStacks(the_emperors_capacitor_buff) >= 14 and SpellCooldown(serenity) < 13 and Talent(serenity_talent) and TimeToMaxEnergy() > 3 and Spell(crackling_jade_lightning) or not PreviousGCDSpell(blackout_kick_windwalker) and Spell(blackout_kick_windwalker) or Spell(chi_wave) or TimeToMaxEnergy() > 1 and Talent(serenity_talent) and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and { MaxChi() - Chi() >= 2 or TimeToMaxEnergy() < 3 } and not BuffPresent(serenity_buff) and Spell(tiger_palm) or MaxChi() - Chi() >= 3 and TimeToMaxEnergy() > 1 and not Talent(serenity_talent) and CheckBoxOn(opt_chi_burst) and Spell(chi_burst)
 }
 
 ### actions.serenity_openerSR
 
 AddFunction WindwalkerSerenityopenersrMainActions
 {
- #tiger_palm,target_if=debuff.mark_of_the_crane.down,if=buff.serenity.down&chi<4
- if target.DebuffExpires(mark_of_the_crane_debuff) and BuffExpires(serenity_buff) and Chi() < 4 Spell(tiger_palm)
+ #tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=buff.serenity.down&chi<4
+ if BuffExpires(serenity_buff) and Chi() < 4 Spell(tiger_palm)
  #call_action_list,name=cd,if=buff.serenity.down
  if BuffExpires(serenity_buff) WindwalkerCdMainActions()
 
@@ -626,7 +626,7 @@ AddFunction WindwalkerSerenityopenersrShortCdActions
  #fist_of_the_white_tiger,if=buff.serenity.down
  if BuffExpires(serenity_buff) Spell(fist_of_the_white_tiger)
 
- unless target.DebuffExpires(mark_of_the_crane_debuff) and BuffExpires(serenity_buff) and Chi() < 4 and Spell(tiger_palm)
+ unless BuffExpires(serenity_buff) and Chi() < 4 and Spell(tiger_palm)
  {
   #call_action_list,name=cd,if=buff.serenity.down
   if BuffExpires(serenity_buff) WindwalkerCdShortCdActions()
@@ -647,12 +647,12 @@ AddFunction WindwalkerSerenityopenersrShortCdActions
 
 AddFunction WindwalkerSerenityopenersrShortCdPostConditions
 {
- target.DebuffExpires(mark_of_the_crane_debuff) and BuffExpires(serenity_buff) and Chi() < 4 and Spell(tiger_palm) or BuffExpires(serenity_buff) and WindwalkerCdShortCdPostConditions() or BuffExpires(burst_haste_buff any=1) and WindwalkerSerenityShortCdPostConditions() or Spell(rising_sun_kick) or BuffRemaining(serenity_buff) < 1 and Spell(fists_of_fury) or not PreviousGCDSpell(blackout_kick_windwalker) and SpellCooldown(rising_sun_kick) >= 2 and SpellCooldown(fists_of_fury) >= 2 and Spell(blackout_kick_windwalker) or Spell(blackout_kick_windwalker)
+ BuffExpires(serenity_buff) and Chi() < 4 and Spell(tiger_palm) or BuffExpires(serenity_buff) and WindwalkerCdShortCdPostConditions() or BuffExpires(burst_haste_buff any=1) and WindwalkerSerenityShortCdPostConditions() or Spell(rising_sun_kick) or BuffRemaining(serenity_buff) < 1 and Spell(fists_of_fury) or not PreviousGCDSpell(blackout_kick_windwalker) and SpellCooldown(rising_sun_kick) >= 2 and SpellCooldown(fists_of_fury) >= 2 and Spell(blackout_kick_windwalker) or Spell(blackout_kick_windwalker)
 }
 
 AddFunction WindwalkerSerenityopenersrCdActions
 {
- unless BuffExpires(serenity_buff) and Spell(fist_of_the_white_tiger) or target.DebuffExpires(mark_of_the_crane_debuff) and BuffExpires(serenity_buff) and Chi() < 4 and Spell(tiger_palm)
+ unless BuffExpires(serenity_buff) and Spell(fist_of_the_white_tiger) or BuffExpires(serenity_buff) and Chi() < 4 and Spell(tiger_palm)
  {
   #call_action_list,name=cd,if=buff.serenity.down
   if BuffExpires(serenity_buff) WindwalkerCdCdActions()
@@ -667,15 +667,15 @@ AddFunction WindwalkerSerenityopenersrCdActions
 
 AddFunction WindwalkerSerenityopenersrCdPostConditions
 {
- BuffExpires(serenity_buff) and Spell(fist_of_the_white_tiger) or target.DebuffExpires(mark_of_the_crane_debuff) and BuffExpires(serenity_buff) and Chi() < 4 and Spell(tiger_palm) or BuffExpires(serenity_buff) and WindwalkerCdCdPostConditions() or BuffExpires(burst_haste_buff any=1) and WindwalkerSerenityCdPostConditions() or Spell(serenity) or Spell(rising_sun_kick) or BuffRemaining(serenity_buff) < 1 and Spell(fists_of_fury) or not PreviousGCDSpell(blackout_kick_windwalker) and SpellCooldown(rising_sun_kick) >= 2 and SpellCooldown(fists_of_fury) >= 2 and Spell(blackout_kick_windwalker) or Spell(blackout_kick_windwalker)
+ BuffExpires(serenity_buff) and Spell(fist_of_the_white_tiger) or BuffExpires(serenity_buff) and Chi() < 4 and Spell(tiger_palm) or BuffExpires(serenity_buff) and WindwalkerCdCdPostConditions() or BuffExpires(burst_haste_buff any=1) and WindwalkerSerenityCdPostConditions() or Spell(serenity) or Spell(rising_sun_kick) or BuffRemaining(serenity_buff) < 1 and Spell(fists_of_fury) or not PreviousGCDSpell(blackout_kick_windwalker) and SpellCooldown(rising_sun_kick) >= 2 and SpellCooldown(fists_of_fury) >= 2 and Spell(blackout_kick_windwalker) or Spell(blackout_kick_windwalker)
 }
 
 ### actions.serenity_opener
 
 AddFunction WindwalkerSerenityopenerMainActions
 {
- #tiger_palm,target_if=debuff.mark_of_the_crane.down,if=!prev_gcd.1.tiger_palm&buff.serenity.down&chi<4
- if target.DebuffExpires(mark_of_the_crane_debuff) and not PreviousGCDSpell(tiger_palm) and BuffExpires(serenity_buff) and Chi() < 4 Spell(tiger_palm)
+ #tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.tiger_palm&buff.serenity.down&chi<4
+ if not PreviousGCDSpell(tiger_palm) and BuffExpires(serenity_buff) and Chi() < 4 Spell(tiger_palm)
  #call_action_list,name=cd,if=buff.serenity.down
  if BuffExpires(serenity_buff) WindwalkerCdMainActions()
 
@@ -710,7 +710,7 @@ AddFunction WindwalkerSerenityopenerShortCdActions
  #fist_of_the_white_tiger,if=buff.serenity.down
  if BuffExpires(serenity_buff) Spell(fist_of_the_white_tiger)
 
- unless target.DebuffExpires(mark_of_the_crane_debuff) and not PreviousGCDSpell(tiger_palm) and BuffExpires(serenity_buff) and Chi() < 4 and Spell(tiger_palm)
+ unless not PreviousGCDSpell(tiger_palm) and BuffExpires(serenity_buff) and Chi() < 4 and Spell(tiger_palm)
  {
   #call_action_list,name=cd,if=buff.serenity.down
   if BuffExpires(serenity_buff) WindwalkerCdShortCdActions()
@@ -731,12 +731,12 @@ AddFunction WindwalkerSerenityopenerShortCdActions
 
 AddFunction WindwalkerSerenityopenerShortCdPostConditions
 {
- target.DebuffExpires(mark_of_the_crane_debuff) and not PreviousGCDSpell(tiger_palm) and BuffExpires(serenity_buff) and Chi() < 4 and Spell(tiger_palm) or BuffExpires(serenity_buff) and WindwalkerCdShortCdPostConditions() or BuffExpires(burst_haste_buff any=1) and WindwalkerSerenityShortCdPostConditions() or Spell(rising_sun_kick) or PreviousGCDSpell(rising_sun_kick) and PreviousGCDSpell(serenity count=2) and Spell(fists_of_fury) or PreviousGCDSpell(rising_sun_kick) and PreviousGCDSpell(blackout_kick_windwalker count=2) and Spell(fists_of_fury) or not PreviousGCDSpell(blackout_kick_windwalker) and SpellCooldown(rising_sun_kick) >= 2 and SpellCooldown(fists_of_fury) >= 2 and Spell(blackout_kick_windwalker) or not PreviousGCDSpell(blackout_kick_windwalker) and Spell(blackout_kick_windwalker)
+ not PreviousGCDSpell(tiger_palm) and BuffExpires(serenity_buff) and Chi() < 4 and Spell(tiger_palm) or BuffExpires(serenity_buff) and WindwalkerCdShortCdPostConditions() or BuffExpires(burst_haste_buff any=1) and WindwalkerSerenityShortCdPostConditions() or Spell(rising_sun_kick) or PreviousGCDSpell(rising_sun_kick) and PreviousGCDSpell(serenity count=2) and Spell(fists_of_fury) or PreviousGCDSpell(rising_sun_kick) and PreviousGCDSpell(blackout_kick_windwalker count=2) and Spell(fists_of_fury) or not PreviousGCDSpell(blackout_kick_windwalker) and SpellCooldown(rising_sun_kick) >= 2 and SpellCooldown(fists_of_fury) >= 2 and Spell(blackout_kick_windwalker) or not PreviousGCDSpell(blackout_kick_windwalker) and Spell(blackout_kick_windwalker)
 }
 
 AddFunction WindwalkerSerenityopenerCdActions
 {
- unless BuffExpires(serenity_buff) and Spell(fist_of_the_white_tiger) or target.DebuffExpires(mark_of_the_crane_debuff) and not PreviousGCDSpell(tiger_palm) and BuffExpires(serenity_buff) and Chi() < 4 and Spell(tiger_palm)
+ unless BuffExpires(serenity_buff) and Spell(fist_of_the_white_tiger) or not PreviousGCDSpell(tiger_palm) and BuffExpires(serenity_buff) and Chi() < 4 and Spell(tiger_palm)
  {
   #call_action_list,name=cd,if=buff.serenity.down
   if BuffExpires(serenity_buff) WindwalkerCdCdActions()
@@ -751,15 +751,15 @@ AddFunction WindwalkerSerenityopenerCdActions
 
 AddFunction WindwalkerSerenityopenerCdPostConditions
 {
- BuffExpires(serenity_buff) and Spell(fist_of_the_white_tiger) or target.DebuffExpires(mark_of_the_crane_debuff) and not PreviousGCDSpell(tiger_palm) and BuffExpires(serenity_buff) and Chi() < 4 and Spell(tiger_palm) or BuffExpires(serenity_buff) and WindwalkerCdCdPostConditions() or BuffExpires(burst_haste_buff any=1) and WindwalkerSerenityCdPostConditions() or Spell(serenity) or Spell(rising_sun_kick) or PreviousGCDSpell(rising_sun_kick) and PreviousGCDSpell(serenity count=2) and Spell(fists_of_fury) or PreviousGCDSpell(rising_sun_kick) and PreviousGCDSpell(blackout_kick_windwalker count=2) and Spell(fists_of_fury) or not PreviousGCDSpell(blackout_kick_windwalker) and SpellCooldown(rising_sun_kick) >= 2 and SpellCooldown(fists_of_fury) >= 2 and Spell(blackout_kick_windwalker) or not PreviousGCDSpell(blackout_kick_windwalker) and Spell(blackout_kick_windwalker)
+ BuffExpires(serenity_buff) and Spell(fist_of_the_white_tiger) or not PreviousGCDSpell(tiger_palm) and BuffExpires(serenity_buff) and Chi() < 4 and Spell(tiger_palm) or BuffExpires(serenity_buff) and WindwalkerCdCdPostConditions() or BuffExpires(burst_haste_buff any=1) and WindwalkerSerenityCdPostConditions() or Spell(serenity) or Spell(rising_sun_kick) or PreviousGCDSpell(rising_sun_kick) and PreviousGCDSpell(serenity count=2) and Spell(fists_of_fury) or PreviousGCDSpell(rising_sun_kick) and PreviousGCDSpell(blackout_kick_windwalker count=2) and Spell(fists_of_fury) or not PreviousGCDSpell(blackout_kick_windwalker) and SpellCooldown(rising_sun_kick) >= 2 and SpellCooldown(fists_of_fury) >= 2 and Spell(blackout_kick_windwalker) or not PreviousGCDSpell(blackout_kick_windwalker) and Spell(blackout_kick_windwalker)
 }
 
 ### actions.serenitySR
 
 AddFunction WindwalkerSerenitysrMainActions
 {
- #tiger_palm,target_if=debuff.mark_of_the_crane.down,if=!prev_gcd.1.tiger_palm&!prev_gcd.1.energizing_elixir&energy=energy.max&chi<1&!buff.serenity.up
- if target.DebuffExpires(mark_of_the_crane_debuff) and not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and not BuffPresent(serenity_buff) Spell(tiger_palm)
+ #tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.tiger_palm&!prev_gcd.1.energizing_elixir&energy=energy.max&chi<1&!buff.serenity.up
+ if not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and not BuffPresent(serenity_buff) Spell(tiger_palm)
  #call_action_list,name=cd
  WindwalkerCdMainActions()
 
@@ -767,12 +767,12 @@ AddFunction WindwalkerSerenitysrMainActions
  {
   #fists_of_fury,if=buff.serenity.remains<=1.05
   if BuffRemaining(serenity_buff) <= 1 Spell(fists_of_fury)
-  #rising_sun_kick,target_if=debuff.mark_of_the_crane.down
-  if target.DebuffExpires(mark_of_the_crane_debuff) Spell(rising_sun_kick)
-  #blackout_kick,target_if=debuff.mark_of_the_crane.down,if=!prev_gcd.1.blackout_kick&cooldown.rising_sun_kick.remains>=2&cooldown.fists_of_fury.remains>=2
-  if target.DebuffExpires(mark_of_the_crane_debuff) and not PreviousGCDSpell(blackout_kick_windwalker) and SpellCooldown(rising_sun_kick) >= 2 and SpellCooldown(fists_of_fury) >= 2 Spell(blackout_kick_windwalker)
-  #blackout_kick,target_if=debuff.mark_of_the_crane.down
-  if target.DebuffExpires(mark_of_the_crane_debuff) Spell(blackout_kick_windwalker)
+  #rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains
+  Spell(rising_sun_kick)
+  #blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.blackout_kick&cooldown.rising_sun_kick.remains>=2&cooldown.fists_of_fury.remains>=2
+  if not PreviousGCDSpell(blackout_kick_windwalker) and SpellCooldown(rising_sun_kick) >= 2 and SpellCooldown(fists_of_fury) >= 2 Spell(blackout_kick_windwalker)
+  #blackout_kick,target_if=min:debuff.mark_of_the_crane.remains
+  Spell(blackout_kick_windwalker)
  }
 }
 
@@ -783,7 +783,7 @@ AddFunction WindwalkerSerenitysrMainPostConditions
 
 AddFunction WindwalkerSerenitysrShortCdActions
 {
- unless target.DebuffExpires(mark_of_the_crane_debuff) and not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and not BuffPresent(serenity_buff) and Spell(tiger_palm)
+ unless not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and not BuffPresent(serenity_buff) and Spell(tiger_palm)
  {
   #call_action_list,name=cd
   WindwalkerCdShortCdActions()
@@ -798,12 +798,12 @@ AddFunction WindwalkerSerenitysrShortCdActions
 
 AddFunction WindwalkerSerenitysrShortCdPostConditions
 {
- target.DebuffExpires(mark_of_the_crane_debuff) and not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and not BuffPresent(serenity_buff) and Spell(tiger_palm) or WindwalkerCdShortCdPostConditions() or BuffRemaining(serenity_buff) <= 1 and Spell(fists_of_fury) or target.DebuffExpires(mark_of_the_crane_debuff) and Spell(rising_sun_kick) or target.DebuffExpires(mark_of_the_crane_debuff) and not PreviousGCDSpell(blackout_kick_windwalker) and SpellCooldown(rising_sun_kick) >= 2 and SpellCooldown(fists_of_fury) >= 2 and Spell(blackout_kick_windwalker) or target.DebuffExpires(mark_of_the_crane_debuff) and Spell(blackout_kick_windwalker)
+ not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and not BuffPresent(serenity_buff) and Spell(tiger_palm) or WindwalkerCdShortCdPostConditions() or BuffRemaining(serenity_buff) <= 1 and Spell(fists_of_fury) or Spell(rising_sun_kick) or not PreviousGCDSpell(blackout_kick_windwalker) and SpellCooldown(rising_sun_kick) >= 2 and SpellCooldown(fists_of_fury) >= 2 and Spell(blackout_kick_windwalker) or Spell(blackout_kick_windwalker)
 }
 
 AddFunction WindwalkerSerenitysrCdActions
 {
- unless target.DebuffExpires(mark_of_the_crane_debuff) and not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and not BuffPresent(serenity_buff) and Spell(tiger_palm)
+ unless not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and not BuffPresent(serenity_buff) and Spell(tiger_palm)
  {
   #call_action_list,name=cd
   WindwalkerCdCdActions()
@@ -812,7 +812,7 @@ AddFunction WindwalkerSerenitysrCdActions
 
 AddFunction WindwalkerSerenitysrCdPostConditions
 {
- target.DebuffExpires(mark_of_the_crane_debuff) and not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and not BuffPresent(serenity_buff) and Spell(tiger_palm) or WindwalkerCdCdPostConditions() or SpellCooldown(rising_sun_kick) <= 2 and Spell(serenity) or BuffRemaining(serenity_buff) <= 1 and Spell(fists_of_fury) or target.DebuffExpires(mark_of_the_crane_debuff) and Spell(rising_sun_kick) or target.DebuffExpires(mark_of_the_crane_debuff) and not PreviousGCDSpell(blackout_kick_windwalker) and SpellCooldown(rising_sun_kick) >= 2 and SpellCooldown(fists_of_fury) >= 2 and Spell(blackout_kick_windwalker) or target.DebuffExpires(mark_of_the_crane_debuff) and Spell(blackout_kick_windwalker)
+ not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and not BuffPresent(serenity_buff) and Spell(tiger_palm) or WindwalkerCdCdPostConditions() or SpellCooldown(rising_sun_kick) <= 2 and Spell(serenity) or BuffRemaining(serenity_buff) <= 1 and Spell(fists_of_fury) or Spell(rising_sun_kick) or not PreviousGCDSpell(blackout_kick_windwalker) and SpellCooldown(rising_sun_kick) >= 2 and SpellCooldown(fists_of_fury) >= 2 and Spell(blackout_kick_windwalker) or Spell(blackout_kick_windwalker)
 }
 
 ### actions.serenity
@@ -898,8 +898,8 @@ AddFunction WindwalkerSerenityCdPostConditions
 
 AddFunction WindwalkerSefMainActions
 {
- #tiger_palm,target_if=debuff.mark_of_the_crane.down,if=!prev_gcd.1.tiger_palm&!prev_gcd.1.energizing_elixir&energy=energy.max&chi<1
- if target.DebuffExpires(mark_of_the_crane_debuff) and not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 Spell(tiger_palm)
+ #tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.tiger_palm&!prev_gcd.1.energizing_elixir&energy=energy.max&chi<1
+ if not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 Spell(tiger_palm)
  #call_action_list,name=cd
  WindwalkerCdMainActions()
 
@@ -923,7 +923,7 @@ AddFunction WindwalkerSefMainPostConditions
 
 AddFunction WindwalkerSefShortCdActions
 {
- unless target.DebuffExpires(mark_of_the_crane_debuff) and not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and Spell(tiger_palm)
+ unless not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and Spell(tiger_palm)
  {
   #call_action_list,name=cd
   WindwalkerCdShortCdActions()
@@ -944,12 +944,12 @@ AddFunction WindwalkerSefShortCdActions
 
 AddFunction WindwalkerSefShortCdPostConditions
 {
- target.DebuffExpires(mark_of_the_crane_debuff) and not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and Spell(tiger_palm) or WindwalkerCdShortCdPostConditions() or Enemies() > 3 and WindwalkerAoeShortCdPostConditions() or Enemies() <= 3 and WindwalkerStShortCdPostConditions()
+ not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and Spell(tiger_palm) or WindwalkerCdShortCdPostConditions() or Enemies() > 3 and WindwalkerAoeShortCdPostConditions() or Enemies() <= 3 and WindwalkerStShortCdPostConditions()
 }
 
 AddFunction WindwalkerSefCdActions
 {
- unless target.DebuffExpires(mark_of_the_crane_debuff) and not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and Spell(tiger_palm)
+ unless not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and Spell(tiger_palm)
  {
   #call_action_list,name=cd
   WindwalkerCdCdActions()
@@ -972,7 +972,7 @@ AddFunction WindwalkerSefCdActions
 
 AddFunction WindwalkerSefCdPostConditions
 {
- target.DebuffExpires(mark_of_the_crane_debuff) and not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and Spell(tiger_palm) or WindwalkerCdCdPostConditions() or Enemies() > 3 and WindwalkerAoeCdPostConditions() or Enemies() <= 3 and WindwalkerStCdPostConditions()
+ not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and Spell(tiger_palm) or WindwalkerCdCdPostConditions() or Enemies() > 3 and WindwalkerAoeCdPostConditions() or Enemies() <= 3 and WindwalkerStCdPostConditions()
 }
 
 ### actions.precombat
@@ -1154,25 +1154,25 @@ AddFunction WindwalkerDefaultMainActions
 {
  #touch_of_death,if=target.time_to_die<=9
  if target.TimeToDie() <= 9 and { not CheckBoxOn(opt_touch_of_death_on_elite_only) or not UnitInRaid() and target.Classification(elite) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff) } Spell(touch_of_death)
- #call_action_list,name=serenitySR,if=((talent.serenity.enabled&cooldown.serenity.remains<=0)|buff.serenity.up)&azerite.swift_roundhouse.rank>1&time>30
- if { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and AzeriteTraitRank(swift_roundhouse_trait) > 1 and TimeInCombat() > 30 WindwalkerSerenitysrMainActions()
+ #call_action_list,name=serenitySR,if=((talent.serenity.enabled&cooldown.serenity.remains<=0)|buff.serenity.up)&azerite.swift_roundhouse.enabled&time>30
+ if { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and HasAzeriteTrait(swift_roundhouse_trait) and TimeInCombat() > 30 WindwalkerSerenitysrMainActions()
 
- unless { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and AzeriteTraitRank(swift_roundhouse_trait) > 1 and TimeInCombat() > 30 and WindwalkerSerenitysrMainPostConditions()
+ unless { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and HasAzeriteTrait(swift_roundhouse_trait) and TimeInCombat() > 30 and WindwalkerSerenitysrMainPostConditions()
  {
-  #call_action_list,name=serenity,if=((talent.serenity.enabled&cooldown.serenity.remains<=0)|buff.serenity.up)&time>30
-  if { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() > 30 WindwalkerSerenityMainActions()
+  #call_action_list,name=serenity,if=((!azerite.swift_roundhouse.enabled&talent.serenity.enabled&cooldown.serenity.remains<=0)|buff.serenity.up)&time>30
+  if { not HasAzeriteTrait(swift_roundhouse_trait) and Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() > 30 WindwalkerSerenityMainActions()
 
-  unless { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() > 30 and WindwalkerSerenityMainPostConditions()
+  unless { not HasAzeriteTrait(swift_roundhouse_trait) and Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() > 30 and WindwalkerSerenityMainPostConditions()
   {
    #call_action_list,name=serenity_openerSR,if=(talent.serenity.enabled&cooldown.serenity.remains<=0|buff.serenity.up)&time<30&azerite.swift_roundhouse.enabled
    if { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 and HasAzeriteTrait(swift_roundhouse_trait) WindwalkerSerenityopenersrMainActions()
 
    unless { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 and HasAzeriteTrait(swift_roundhouse_trait) and WindwalkerSerenityopenersrMainPostConditions()
    {
-    #call_action_list,name=serenity_opener,if=(talent.serenity.enabled&cooldown.serenity.remains<=0|buff.serenity.up)&time<30
-    if { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 WindwalkerSerenityopenerMainActions()
+    #call_action_list,name=serenity_opener,if=(!azerite.swift_roundhouse.enabled&talent.serenity.enabled&cooldown.serenity.remains<=0|buff.serenity.up)&time<30
+    if { not HasAzeriteTrait(swift_roundhouse_trait) and Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 WindwalkerSerenityopenerMainActions()
 
-    unless { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 and WindwalkerSerenityopenerMainPostConditions()
+    unless { not HasAzeriteTrait(swift_roundhouse_trait) and Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 and WindwalkerSerenityopenerMainPostConditions()
     {
      #call_action_list,name=sef,if=!talent.serenity.enabled&(buff.storm_earth_and_fire.up|cooldown.storm_earth_and_fire.charges=2)
      if not Talent(serenity_talent) and { BuffPresent(storm_earth_and_fire_buff) or SpellCharges(storm_earth_and_fire) == 2 } WindwalkerSefMainActions()
@@ -1214,7 +1214,7 @@ AddFunction WindwalkerDefaultMainActions
 
 AddFunction WindwalkerDefaultMainPostConditions
 {
- { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and AzeriteTraitRank(swift_roundhouse_trait) > 1 and TimeInCombat() > 30 and WindwalkerSerenitysrMainPostConditions() or { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() > 30 and WindwalkerSerenityMainPostConditions() or { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 and HasAzeriteTrait(swift_roundhouse_trait) and WindwalkerSerenityopenersrMainPostConditions() or { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 and WindwalkerSerenityopenerMainPostConditions() or not Talent(serenity_talent) and { BuffPresent(storm_earth_and_fire_buff) or SpellCharges(storm_earth_and_fire) == 2 } and WindwalkerSefMainPostConditions() or { not Talent(serenity_talent) and SpellCooldown(fists_of_fury) <= 12 and Chi() >= 3 and SpellCooldown(rising_sun_kick) <= 1 or target.TimeToDie() <= 25 or SpellCooldown(touch_of_death) > 112 } and WindwalkerSefMainPostConditions() or { not Talent(serenity_talent) and not HasEquippedItem(drinking_horn_cover_item) and SpellCooldown(fists_of_fury) <= 6 and Chi() >= 3 and SpellCooldown(rising_sun_kick) <= 1 or target.TimeToDie() <= 15 or SpellCooldown(touch_of_death) > 112 and SpellCharges(storm_earth_and_fire) == 1 } and WindwalkerSefMainPostConditions() or { not Talent(serenity_talent) and SpellCooldown(fists_of_fury) <= 12 and Chi() >= 3 and SpellCooldown(rising_sun_kick) <= 1 or target.TimeToDie() <= 25 or SpellCooldown(touch_of_death) > 112 and SpellCharges(storm_earth_and_fire) == 1 } and WindwalkerSefMainPostConditions() or Enemies() > 3 and WindwalkerAoeMainPostConditions() or Enemies() <= 3 and WindwalkerStMainPostConditions()
+ { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and HasAzeriteTrait(swift_roundhouse_trait) and TimeInCombat() > 30 and WindwalkerSerenitysrMainPostConditions() or { not HasAzeriteTrait(swift_roundhouse_trait) and Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() > 30 and WindwalkerSerenityMainPostConditions() or { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 and HasAzeriteTrait(swift_roundhouse_trait) and WindwalkerSerenityopenersrMainPostConditions() or { not HasAzeriteTrait(swift_roundhouse_trait) and Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 and WindwalkerSerenityopenerMainPostConditions() or not Talent(serenity_talent) and { BuffPresent(storm_earth_and_fire_buff) or SpellCharges(storm_earth_and_fire) == 2 } and WindwalkerSefMainPostConditions() or { not Talent(serenity_talent) and SpellCooldown(fists_of_fury) <= 12 and Chi() >= 3 and SpellCooldown(rising_sun_kick) <= 1 or target.TimeToDie() <= 25 or SpellCooldown(touch_of_death) > 112 } and WindwalkerSefMainPostConditions() or { not Talent(serenity_talent) and not HasEquippedItem(drinking_horn_cover_item) and SpellCooldown(fists_of_fury) <= 6 and Chi() >= 3 and SpellCooldown(rising_sun_kick) <= 1 or target.TimeToDie() <= 15 or SpellCooldown(touch_of_death) > 112 and SpellCharges(storm_earth_and_fire) == 1 } and WindwalkerSefMainPostConditions() or { not Talent(serenity_talent) and SpellCooldown(fists_of_fury) <= 12 and Chi() >= 3 and SpellCooldown(rising_sun_kick) <= 1 or target.TimeToDie() <= 25 or SpellCooldown(touch_of_death) > 112 and SpellCharges(storm_earth_and_fire) == 1 } and WindwalkerSefMainPostConditions() or Enemies() > 3 and WindwalkerAoeMainPostConditions() or Enemies() <= 3 and WindwalkerStMainPostConditions()
 }
 
 AddFunction WindwalkerDefaultShortCdActions
@@ -1224,25 +1224,25 @@ AddFunction WindwalkerDefaultShortCdActions
 
  unless target.TimeToDie() <= 9 and { not CheckBoxOn(opt_touch_of_death_on_elite_only) or not UnitInRaid() and target.Classification(elite) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff) } and Spell(touch_of_death)
  {
-  #call_action_list,name=serenitySR,if=((talent.serenity.enabled&cooldown.serenity.remains<=0)|buff.serenity.up)&azerite.swift_roundhouse.rank>1&time>30
-  if { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and AzeriteTraitRank(swift_roundhouse_trait) > 1 and TimeInCombat() > 30 WindwalkerSerenitysrShortCdActions()
+  #call_action_list,name=serenitySR,if=((talent.serenity.enabled&cooldown.serenity.remains<=0)|buff.serenity.up)&azerite.swift_roundhouse.enabled&time>30
+  if { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and HasAzeriteTrait(swift_roundhouse_trait) and TimeInCombat() > 30 WindwalkerSerenitysrShortCdActions()
 
-  unless { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and AzeriteTraitRank(swift_roundhouse_trait) > 1 and TimeInCombat() > 30 and WindwalkerSerenitysrShortCdPostConditions()
+  unless { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and HasAzeriteTrait(swift_roundhouse_trait) and TimeInCombat() > 30 and WindwalkerSerenitysrShortCdPostConditions()
   {
-   #call_action_list,name=serenity,if=((talent.serenity.enabled&cooldown.serenity.remains<=0)|buff.serenity.up)&time>30
-   if { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() > 30 WindwalkerSerenityShortCdActions()
+   #call_action_list,name=serenity,if=((!azerite.swift_roundhouse.enabled&talent.serenity.enabled&cooldown.serenity.remains<=0)|buff.serenity.up)&time>30
+   if { not HasAzeriteTrait(swift_roundhouse_trait) and Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() > 30 WindwalkerSerenityShortCdActions()
 
-   unless { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() > 30 and WindwalkerSerenityShortCdPostConditions()
+   unless { not HasAzeriteTrait(swift_roundhouse_trait) and Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() > 30 and WindwalkerSerenityShortCdPostConditions()
    {
     #call_action_list,name=serenity_openerSR,if=(talent.serenity.enabled&cooldown.serenity.remains<=0|buff.serenity.up)&time<30&azerite.swift_roundhouse.enabled
     if { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 and HasAzeriteTrait(swift_roundhouse_trait) WindwalkerSerenityopenersrShortCdActions()
 
     unless { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 and HasAzeriteTrait(swift_roundhouse_trait) and WindwalkerSerenityopenersrShortCdPostConditions()
     {
-     #call_action_list,name=serenity_opener,if=(talent.serenity.enabled&cooldown.serenity.remains<=0|buff.serenity.up)&time<30
-     if { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 WindwalkerSerenityopenerShortCdActions()
+     #call_action_list,name=serenity_opener,if=(!azerite.swift_roundhouse.enabled&talent.serenity.enabled&cooldown.serenity.remains<=0|buff.serenity.up)&time<30
+     if { not HasAzeriteTrait(swift_roundhouse_trait) and Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 WindwalkerSerenityopenerShortCdActions()
 
-     unless { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 and WindwalkerSerenityopenerShortCdPostConditions()
+     unless { not HasAzeriteTrait(swift_roundhouse_trait) and Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 and WindwalkerSerenityopenerShortCdPostConditions()
      {
       #call_action_list,name=sef,if=!talent.serenity.enabled&(buff.storm_earth_and_fire.up|cooldown.storm_earth_and_fire.charges=2)
       if not Talent(serenity_talent) and { BuffPresent(storm_earth_and_fire_buff) or SpellCharges(storm_earth_and_fire) == 2 } WindwalkerSefShortCdActions()
@@ -1285,7 +1285,7 @@ AddFunction WindwalkerDefaultShortCdActions
 
 AddFunction WindwalkerDefaultShortCdPostConditions
 {
- target.TimeToDie() <= 9 and { not CheckBoxOn(opt_touch_of_death_on_elite_only) or not UnitInRaid() and target.Classification(elite) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff) } and Spell(touch_of_death) or { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and AzeriteTraitRank(swift_roundhouse_trait) > 1 and TimeInCombat() > 30 and WindwalkerSerenitysrShortCdPostConditions() or { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() > 30 and WindwalkerSerenityShortCdPostConditions() or { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 and HasAzeriteTrait(swift_roundhouse_trait) and WindwalkerSerenityopenersrShortCdPostConditions() or { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 and WindwalkerSerenityopenerShortCdPostConditions() or not Talent(serenity_talent) and { BuffPresent(storm_earth_and_fire_buff) or SpellCharges(storm_earth_and_fire) == 2 } and WindwalkerSefShortCdPostConditions() or { not Talent(serenity_talent) and SpellCooldown(fists_of_fury) <= 12 and Chi() >= 3 and SpellCooldown(rising_sun_kick) <= 1 or target.TimeToDie() <= 25 or SpellCooldown(touch_of_death) > 112 } and WindwalkerSefShortCdPostConditions() or { not Talent(serenity_talent) and not HasEquippedItem(drinking_horn_cover_item) and SpellCooldown(fists_of_fury) <= 6 and Chi() >= 3 and SpellCooldown(rising_sun_kick) <= 1 or target.TimeToDie() <= 15 or SpellCooldown(touch_of_death) > 112 and SpellCharges(storm_earth_and_fire) == 1 } and WindwalkerSefShortCdPostConditions() or { not Talent(serenity_talent) and SpellCooldown(fists_of_fury) <= 12 and Chi() >= 3 and SpellCooldown(rising_sun_kick) <= 1 or target.TimeToDie() <= 25 or SpellCooldown(touch_of_death) > 112 and SpellCharges(storm_earth_and_fire) == 1 } and WindwalkerSefShortCdPostConditions() or Enemies() > 3 and WindwalkerAoeShortCdPostConditions() or Enemies() <= 3 and WindwalkerStShortCdPostConditions()
+ target.TimeToDie() <= 9 and { not CheckBoxOn(opt_touch_of_death_on_elite_only) or not UnitInRaid() and target.Classification(elite) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff) } and Spell(touch_of_death) or { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and HasAzeriteTrait(swift_roundhouse_trait) and TimeInCombat() > 30 and WindwalkerSerenitysrShortCdPostConditions() or { not HasAzeriteTrait(swift_roundhouse_trait) and Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() > 30 and WindwalkerSerenityShortCdPostConditions() or { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 and HasAzeriteTrait(swift_roundhouse_trait) and WindwalkerSerenityopenersrShortCdPostConditions() or { not HasAzeriteTrait(swift_roundhouse_trait) and Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 and WindwalkerSerenityopenerShortCdPostConditions() or not Talent(serenity_talent) and { BuffPresent(storm_earth_and_fire_buff) or SpellCharges(storm_earth_and_fire) == 2 } and WindwalkerSefShortCdPostConditions() or { not Talent(serenity_talent) and SpellCooldown(fists_of_fury) <= 12 and Chi() >= 3 and SpellCooldown(rising_sun_kick) <= 1 or target.TimeToDie() <= 25 or SpellCooldown(touch_of_death) > 112 } and WindwalkerSefShortCdPostConditions() or { not Talent(serenity_talent) and not HasEquippedItem(drinking_horn_cover_item) and SpellCooldown(fists_of_fury) <= 6 and Chi() >= 3 and SpellCooldown(rising_sun_kick) <= 1 or target.TimeToDie() <= 15 or SpellCooldown(touch_of_death) > 112 and SpellCharges(storm_earth_and_fire) == 1 } and WindwalkerSefShortCdPostConditions() or { not Talent(serenity_talent) and SpellCooldown(fists_of_fury) <= 12 and Chi() >= 3 and SpellCooldown(rising_sun_kick) <= 1 or target.TimeToDie() <= 25 or SpellCooldown(touch_of_death) > 112 and SpellCharges(storm_earth_and_fire) == 1 } and WindwalkerSefShortCdPostConditions() or Enemies() > 3 and WindwalkerAoeShortCdPostConditions() or Enemies() <= 3 and WindwalkerStShortCdPostConditions()
 }
 
 AddFunction WindwalkerDefaultCdActions
@@ -1303,25 +1303,25 @@ AddFunction WindwalkerDefaultCdActions
 
  unless target.TimeToDie() <= 9 and { not CheckBoxOn(opt_touch_of_death_on_elite_only) or not UnitInRaid() and target.Classification(elite) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff) } and Spell(touch_of_death)
  {
-  #call_action_list,name=serenitySR,if=((talent.serenity.enabled&cooldown.serenity.remains<=0)|buff.serenity.up)&azerite.swift_roundhouse.rank>1&time>30
-  if { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and AzeriteTraitRank(swift_roundhouse_trait) > 1 and TimeInCombat() > 30 WindwalkerSerenitysrCdActions()
+  #call_action_list,name=serenitySR,if=((talent.serenity.enabled&cooldown.serenity.remains<=0)|buff.serenity.up)&azerite.swift_roundhouse.enabled&time>30
+  if { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and HasAzeriteTrait(swift_roundhouse_trait) and TimeInCombat() > 30 WindwalkerSerenitysrCdActions()
 
-  unless { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and AzeriteTraitRank(swift_roundhouse_trait) > 1 and TimeInCombat() > 30 and WindwalkerSerenitysrCdPostConditions()
+  unless { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and HasAzeriteTrait(swift_roundhouse_trait) and TimeInCombat() > 30 and WindwalkerSerenitysrCdPostConditions()
   {
-   #call_action_list,name=serenity,if=((talent.serenity.enabled&cooldown.serenity.remains<=0)|buff.serenity.up)&time>30
-   if { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() > 30 WindwalkerSerenityCdActions()
+   #call_action_list,name=serenity,if=((!azerite.swift_roundhouse.enabled&talent.serenity.enabled&cooldown.serenity.remains<=0)|buff.serenity.up)&time>30
+   if { not HasAzeriteTrait(swift_roundhouse_trait) and Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() > 30 WindwalkerSerenityCdActions()
 
-   unless { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() > 30 and WindwalkerSerenityCdPostConditions()
+   unless { not HasAzeriteTrait(swift_roundhouse_trait) and Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() > 30 and WindwalkerSerenityCdPostConditions()
    {
     #call_action_list,name=serenity_openerSR,if=(talent.serenity.enabled&cooldown.serenity.remains<=0|buff.serenity.up)&time<30&azerite.swift_roundhouse.enabled
     if { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 and HasAzeriteTrait(swift_roundhouse_trait) WindwalkerSerenityopenersrCdActions()
 
     unless { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 and HasAzeriteTrait(swift_roundhouse_trait) and WindwalkerSerenityopenersrCdPostConditions()
     {
-     #call_action_list,name=serenity_opener,if=(talent.serenity.enabled&cooldown.serenity.remains<=0|buff.serenity.up)&time<30
-     if { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 WindwalkerSerenityopenerCdActions()
+     #call_action_list,name=serenity_opener,if=(!azerite.swift_roundhouse.enabled&talent.serenity.enabled&cooldown.serenity.remains<=0|buff.serenity.up)&time<30
+     if { not HasAzeriteTrait(swift_roundhouse_trait) and Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 WindwalkerSerenityopenerCdActions()
 
-     unless { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 and WindwalkerSerenityopenerCdPostConditions()
+     unless { not HasAzeriteTrait(swift_roundhouse_trait) and Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 and WindwalkerSerenityopenerCdPostConditions()
      {
       #call_action_list,name=sef,if=!talent.serenity.enabled&(buff.storm_earth_and_fire.up|cooldown.storm_earth_and_fire.charges=2)
       if not Talent(serenity_talent) and { BuffPresent(storm_earth_and_fire_buff) or SpellCharges(storm_earth_and_fire) == 2 } WindwalkerSefCdActions()
@@ -1364,7 +1364,7 @@ AddFunction WindwalkerDefaultCdActions
 
 AddFunction WindwalkerDefaultCdPostConditions
 {
- target.TimeToDie() <= 9 and { not CheckBoxOn(opt_touch_of_death_on_elite_only) or not UnitInRaid() and target.Classification(elite) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff) } and Spell(touch_of_death) or { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and AzeriteTraitRank(swift_roundhouse_trait) > 1 and TimeInCombat() > 30 and WindwalkerSerenitysrCdPostConditions() or { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() > 30 and WindwalkerSerenityCdPostConditions() or { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 and HasAzeriteTrait(swift_roundhouse_trait) and WindwalkerSerenityopenersrCdPostConditions() or { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 and WindwalkerSerenityopenerCdPostConditions() or not Talent(serenity_talent) and { BuffPresent(storm_earth_and_fire_buff) or SpellCharges(storm_earth_and_fire) == 2 } and WindwalkerSefCdPostConditions() or { not Talent(serenity_talent) and SpellCooldown(fists_of_fury) <= 12 and Chi() >= 3 and SpellCooldown(rising_sun_kick) <= 1 or target.TimeToDie() <= 25 or SpellCooldown(touch_of_death) > 112 } and WindwalkerSefCdPostConditions() or { not Talent(serenity_talent) and not HasEquippedItem(drinking_horn_cover_item) and SpellCooldown(fists_of_fury) <= 6 and Chi() >= 3 and SpellCooldown(rising_sun_kick) <= 1 or target.TimeToDie() <= 15 or SpellCooldown(touch_of_death) > 112 and SpellCharges(storm_earth_and_fire) == 1 } and WindwalkerSefCdPostConditions() or { not Talent(serenity_talent) and SpellCooldown(fists_of_fury) <= 12 and Chi() >= 3 and SpellCooldown(rising_sun_kick) <= 1 or target.TimeToDie() <= 25 or SpellCooldown(touch_of_death) > 112 and SpellCharges(storm_earth_and_fire) == 1 } and WindwalkerSefCdPostConditions() or Enemies() > 3 and WindwalkerAoeCdPostConditions() or Enemies() <= 3 and WindwalkerStCdPostConditions()
+ target.TimeToDie() <= 9 and { not CheckBoxOn(opt_touch_of_death_on_elite_only) or not UnitInRaid() and target.Classification(elite) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff) } and Spell(touch_of_death) or { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and HasAzeriteTrait(swift_roundhouse_trait) and TimeInCombat() > 30 and WindwalkerSerenitysrCdPostConditions() or { not HasAzeriteTrait(swift_roundhouse_trait) and Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() > 30 and WindwalkerSerenityCdPostConditions() or { Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 and HasAzeriteTrait(swift_roundhouse_trait) and WindwalkerSerenityopenersrCdPostConditions() or { not HasAzeriteTrait(swift_roundhouse_trait) and Talent(serenity_talent) and SpellCooldown(serenity) <= 0 or BuffPresent(serenity_buff) } and TimeInCombat() < 30 and WindwalkerSerenityopenerCdPostConditions() or not Talent(serenity_talent) and { BuffPresent(storm_earth_and_fire_buff) or SpellCharges(storm_earth_and_fire) == 2 } and WindwalkerSefCdPostConditions() or { not Talent(serenity_talent) and SpellCooldown(fists_of_fury) <= 12 and Chi() >= 3 and SpellCooldown(rising_sun_kick) <= 1 or target.TimeToDie() <= 25 or SpellCooldown(touch_of_death) > 112 } and WindwalkerSefCdPostConditions() or { not Talent(serenity_talent) and not HasEquippedItem(drinking_horn_cover_item) and SpellCooldown(fists_of_fury) <= 6 and Chi() >= 3 and SpellCooldown(rising_sun_kick) <= 1 or target.TimeToDie() <= 15 or SpellCooldown(touch_of_death) > 112 and SpellCharges(storm_earth_and_fire) == 1 } and WindwalkerSefCdPostConditions() or { not Talent(serenity_talent) and SpellCooldown(fists_of_fury) <= 12 and Chi() >= 3 and SpellCooldown(rising_sun_kick) <= 1 or target.TimeToDie() <= 25 or SpellCooldown(touch_of_death) > 112 and SpellCharges(storm_earth_and_fire) == 1 } and WindwalkerSefCdPostConditions() or Enemies() > 3 and WindwalkerAoeCdPostConditions() or Enemies() <= 3 and WindwalkerStCdPostConditions()
 }
 
 ### Windwalker icons.
@@ -1449,7 +1449,6 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # invoke_xuen_the_white_tiger
 # leg_sweep
 # lights_judgment
-# mark_of_the_crane_debuff
 # paralysis
 # quaking_palm
 # rising_sun_kick

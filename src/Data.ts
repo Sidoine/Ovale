@@ -174,6 +174,7 @@ export interface SpellInfo extends Powers {
     // enemies?:number;
     offgcd?: number;
     casttime?: number;
+    health?: number;
 }
 
 const tempTokens: LuaArray<string> = {};

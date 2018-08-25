@@ -588,7 +588,7 @@ do
     }
 end
 local SyntaxError = function(tokenStream, ...)
-    __exports.OvaleSimulationCraft:Print(...)
+    __exports.OvaleSimulationCraft:Warning(...)
     local context = {
         [1] = "Next tokens:"
     }
@@ -601,7 +601,7 @@ local SyntaxError = function(tokenStream, ...)
             break
         end
     end
-    __exports.OvaleSimulationCraft:Print(concat(context, " "))
+    __exports.OvaleSimulationCraft:Warning(concat(context, " "))
 end
 
 local ParseFunction = nil
@@ -3043,6 +3043,9 @@ do
         ["soul_shard"] = "SoulShards()",
         ["soul_fragments"] = "SoulFragments()",
         ["ssw_refund_offset"] = "target.Distance() % 3 - 1",
+        ["stagger.last_tick_damage_1"] = "0",
+        ["stagger.last_tick_damage_4"] = "0",
+        ["stagger.last_tick_damage_30"] = "0",
         ["stat.mastery_rating"] = "MasteryRating()",
         ["stealthed"] = "Stealthed()",
         ["stealthed.all"] = "Stealthed()",
