@@ -122,9 +122,7 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
                 name = "Disabled"
             end
         elseif className == "PRIEST" then
-            if specialization == "holy" then
-                name = "Disabled"
-            elseif specialization == "discipline" then
+            if specialization == "discipline" then
                 name = "Disabled"
             end
         elseif className == "SHAMAN" then

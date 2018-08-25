@@ -53,8 +53,8 @@ Define(dampen_harm 122278)
   # Damage taken reduced by m2 to m3 for d, with larger attacks being reduced by more.
   SpellAddBuff(dampen_harm dampen_harm=1)
 Define(diffuse_magic 122783)
-# Reduces magic damage you take by m1 for d, and transfers all currently active harmful magical effects on you back to their original caster if possible.
-  SpellInfo(diffuse_magic cd=90 duration=6 talent=diffuse_magic_talent gcd=0 offgcd=1)
+# Reduces magic damage you take by m1 for 6 seconds, and transfers all currently active harmful magical effects on you back to their original caster if possible.
+  SpellInfo(diffuse_magic cd=90 duration=6 gcd=0 offgcd=1 talent=diffuse_magic_talent)
   # Spell damage taken reduced by m1.
   SpellAddBuff(diffuse_magic diffuse_magic=1)
 Define(elusive_brawler 195630)
@@ -192,7 +192,7 @@ Define(chi_wave_talent 2) #19820
 Define(dampen_harm_talent 15) #20175
 # Reduces all damage you take by m2 to m3 for 10 seconds, with larger attacks being reduced by more.
 Define(diffuse_magic_talent 14) #20173
-# Reduces magic damage you take by m1 for d, and transfers all currently active harmful magical effects on you back to their original caster if possible.
+# Reduces magic damage you take by m1 for 6 seconds, and transfers all currently active harmful magical effects on you back to their original caster if possible.
 Define(energizing_elixir_talent 9) #22096
 # Chug an Energizing Elixir, refilling all your Energy and instantly generate s2 Chi.
 Define(fist_of_the_white_tiger_talent 8) #19771

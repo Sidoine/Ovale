@@ -1,6 +1,194 @@
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
+    local name = "sc_pr_priest_holy"
+    local desc = "[8.0] Simulationcraft: PR_Priest_Holy"
+    local code = [[
+# Based on SimulationCraft profile "PR_Priest_Holy".
+#	class=priest
+#	spec=holy
+#	talents=1300021
+
+Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
+Include(ovale_priest_spells)
+
+AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=holy)
+
+AddFunction HolyUseItemActions
+{
+ Item(Trinket0Slot text=13 usable=1)
+ Item(Trinket1Slot text=14 usable=1)
+}
+
+### actions.precombat
+
+AddFunction HolyPrecombatMainActions
+{
+ #smite
+ Spell(smite)
+}
+
+AddFunction HolyPrecombatMainPostConditions
+{
+}
+
+AddFunction HolyPrecombatShortCdActions
+{
+}
+
+AddFunction HolyPrecombatShortCdPostConditions
+{
+ Spell(smite)
+}
+
+AddFunction HolyPrecombatCdActions
+{
+ #flask
+ #food
+ #augmentation
+ #snapshot_stats
+ #potion
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_intellect usable=1)
+}
+
+AddFunction HolyPrecombatCdPostConditions
+{
+ Spell(smite)
+}
+
+### actions.default
+
+AddFunction HolyDefaultMainActions
+{
+ #holy_fire,if=refreshable&dot.holy_fire.ticking&dot.holy_fire.stack>1|dot.holy_fire.stack<2
+ if target.Refreshable(holy_fire) and target.DebuffPresent(holy_fire) and target.DebuffStacks(holy_fire) > 1 or target.DebuffStacks(holy_fire) < 2 Spell(holy_fire)
+ #divine_star
+ Spell(divine_star)
+ #holy_nova,if=active_enemies>2
+ if Enemies() > 2 Spell(holy_nova)
+ #smite
+ Spell(smite)
+}
+
+AddFunction HolyDefaultMainPostConditions
+{
+}
+
+AddFunction HolyDefaultShortCdActions
+{
+ unless { target.Refreshable(holy_fire) and target.DebuffPresent(holy_fire) and target.DebuffStacks(holy_fire) > 1 or target.DebuffStacks(holy_fire) < 2 } and Spell(holy_fire)
+ {
+  #holy_word_chastise
+  Spell(holy_word_chastise)
+
+  unless Spell(divine_star)
+  {
+   #halo
+   Spell(halo)
+  }
+ }
+}
+
+AddFunction HolyDefaultShortCdPostConditions
+{
+ { target.Refreshable(holy_fire) and target.DebuffPresent(holy_fire) and target.DebuffStacks(holy_fire) > 1 or target.DebuffStacks(holy_fire) < 2 } and Spell(holy_fire) or Spell(divine_star) or Enemies() > 2 and Spell(holy_nova) or Spell(smite)
+}
+
+AddFunction HolyDefaultCdActions
+{
+ #use_item,slot=trinket2
+ HolyUseItemActions()
+ #potion,if=buff.bloodlust.react|target.time_to_die<=80
+ if { BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 80 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_intellect usable=1)
+ #berserking
+ Spell(berserking)
+
+ unless { target.Refreshable(holy_fire) and target.DebuffPresent(holy_fire) and target.DebuffStacks(holy_fire) > 1 or target.DebuffStacks(holy_fire) < 2 } and Spell(holy_fire) or Spell(holy_word_chastise)
+ {
+  #apotheosis
+  Spell(apotheosis)
+ }
+}
+
+AddFunction HolyDefaultCdPostConditions
+{
+ { target.Refreshable(holy_fire) and target.DebuffPresent(holy_fire) and target.DebuffStacks(holy_fire) > 1 or target.DebuffStacks(holy_fire) < 2 } and Spell(holy_fire) or Spell(holy_word_chastise) or Spell(divine_star) or Spell(halo) or Enemies() > 2 and Spell(holy_nova) or Spell(smite)
+}
+
+### Holy icons.
+
+AddCheckBox(opt_priest_holy_aoe L(AOE) default specialization=holy)
+
+AddIcon checkbox=!opt_priest_holy_aoe enemies=1 help=shortcd specialization=holy
+{
+ if not InCombat() HolyPrecombatShortCdActions()
+ unless not InCombat() and HolyPrecombatShortCdPostConditions()
+ {
+  HolyDefaultShortCdActions()
+ }
+}
+
+AddIcon checkbox=opt_priest_holy_aoe help=shortcd specialization=holy
+{
+ if not InCombat() HolyPrecombatShortCdActions()
+ unless not InCombat() and HolyPrecombatShortCdPostConditions()
+ {
+  HolyDefaultShortCdActions()
+ }
+}
+
+AddIcon enemies=1 help=main specialization=holy
+{
+ if not InCombat() HolyPrecombatMainActions()
+ unless not InCombat() and HolyPrecombatMainPostConditions()
+ {
+  HolyDefaultMainActions()
+ }
+}
+
+AddIcon checkbox=opt_priest_holy_aoe help=aoe specialization=holy
+{
+ if not InCombat() HolyPrecombatMainActions()
+ unless not InCombat() and HolyPrecombatMainPostConditions()
+ {
+  HolyDefaultMainActions()
+ }
+}
+
+AddIcon checkbox=!opt_priest_holy_aoe enemies=1 help=cd specialization=holy
+{
+ if not InCombat() HolyPrecombatCdActions()
+ unless not InCombat() and HolyPrecombatCdPostConditions()
+ {
+  HolyDefaultCdActions()
+ }
+}
+
+AddIcon checkbox=opt_priest_holy_aoe help=cd specialization=holy
+{
+ if not InCombat() HolyPrecombatCdActions()
+ unless not InCombat() and HolyPrecombatCdPostConditions()
+ {
+  HolyDefaultCdActions()
+ }
+}
+
+### Required symbols
+# apotheosis
+# battle_potion_of_intellect
+# berserking
+# divine_star
+# halo
+# holy_fire
+# holy_nova
+# holy_word_chastise
+# smite
+]]
+    OvaleScripts:RegisterScript("PRIEST", "holy", name, desc, code, "script")
+end
+do
     local name = "sc_pr_priest_shadow"
     local desc = "[8.0] Simulationcraft: PR_Priest_Shadow"
     local code = [[
