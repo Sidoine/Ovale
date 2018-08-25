@@ -1,184 +1,6 @@
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
-    local name = "icyveins_druid_guardian"
-    local desc = "[8.0.1] Icy-Veins: Druid Guardian"
-    local code = [[
-Include(ovale_common)
-Include(ovale_trinkets_mop)
-Include(ovale_trinkets_wod)
-Include(ovale_druid_spells)
-
-AddCheckBox(opt_interrupt L(interrupt) default specialization=guardian)
-AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=guardian)
-AddCheckBox(opt_druid_guardian_aoe L(AOE) default specialization=guardian)
-AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=guardian)
-
-AddFunction FrenziedRegenHealModifier
-{
-	(1+Versatility()/100) * 
-	(1+0.20*BuffPresent(guardian_of_elune_buff)) * 
-	(1+0.05*ArtifactTraitRank(wildflesh_trait)) *
-	(1+0.12*HasEquippedItem(skysecs_hold)) * 
-	# Guardian Spirit
-	(1+0.40*BuffPresent(47788)) *
-	# Divine Hymn
-	(1+0.1*BuffPresent(64844)) *
-	# Protection of Tyr
-	(1+0.15*BuffPresent(211210)) *
-	# Life Cocoon 
-	(1+0.5*BuffPresent(116849)) *
-	# T21
-	(1+0.1*BuffPresent(253575)) *
-	1
-}
-
-AddFunction FrenziedRegenHealTotal
-{
-	IncomingDamage(5) / 2
-}
-
-AddFunction GuardianHealMeShortCd
-{
-	unless(DebuffPresent(healing_immunity_debuff)) 
-	{
-		if BuffExpires(frenzied_regeneration_buff) and HealthPercent() <= 70 
-		{
-            if (SpellCharges(frenzied_regeneration)>=2 or HealthPercent() <= 50) Spell(frenzied_regeneration)
-		}
-		
-		if HealthPercent() < 35 UseHealthPotions()
-	}
-}
-
-AddFunction GuardianHealMeMain
-{
-	unless(DebuffPresent(healing_immunity_debuff)) 
-	{
-		if HealthPercent() <= 50 Spell(lunar_beam)
-		if HealthPercent() <= 80 and not InCombat() Spell(regrowth)
-	}
-}
-
-AddFunction GuardianGetInMeleeRange
-{
-	if CheckBoxOn(opt_melee_range) and (Stance(druid_bear_form) and not target.InRange(mangle) or { Stance(druid_cat_form) or Stance(druid_claws_of_shirvallah) } and not target.InRange(shred))
-	{
-		if target.InRange(wild_charge) Spell(wild_charge)
-		Texture(misc_arrowlup help=L(not_in_melee_range))
-	}
-}
-
-AddFunction GuardianDefaultShortCDActions
-{
-	GuardianHealMeShortCd()
-	if IncomingDamage(5 physical=1) Spell(ironfur)
-	GuardianGetInMeleeRange()
-}
-
-#
-# Single-Target
-#
-
-AddFunction GuardianDefaultMainActions
-{
-    GuardianHealMeMain()
-	if not Stance(druid_bear_form) Spell(bear_form)
-
-    if (RageDeficit() <= 20 and (IncomingDamage(5) == 0 or (SpellCharges(ironfur)==0 and SpellCharges(frenzied_regeneration) == 0))) Spell(maul)
-    if (target.DebuffRefreshable(moonfire_debuff)) Spell(moonfire)
-    if (target.DebuffStacks(thrash_bear_debuff) < 3) Spell(thrash_bear)
-    if (BuffRefreshable(pulverize_buff)) Spell(pulverize)
-	Spell(mangle)
-	Spell(thrash_bear)
-    if not BuffExpires(galactic_guardian_buff) Spell(moonfire)
-	if (RageDeficit() <= 20 or IncomingDamage(5) == 0) Spell(maul)
-	Spell(swipe_bear)
-}
-
-#
-# AOE
-#
-
-AddFunction GuardianDefaultAoEActions
-{
-    GuardianHealMeMain()
-	if not Stance(druid_bear_form) Spell(bear_form)
-	if Enemies() >= 4 and HealthPercent() <= 80 Spell(lunar_beam)
-    
-    if not BuffExpires(incarnation_guardian_of_ursoc_buff) 
-	{
-        if (DebuffCountOnAny(moonfire_debuff) < 1) Spell(moonfire)
-		if (BuffRefreshable(pulverize_buff)) Spell(pulverize)
-        if (Enemies() <= 3) Spell(mangle)
-        Spell(thrash_bear)
-	}
-    
-    if (RageDeficit() <= 20 and (IncomingDamage(5) == 0 or (SpellCharges(ironfur)==0 and SpellCharges(frenzied_regeneration) == 0))) Spell(maul)
-    if (DebuffCountOnAny(moonfire_debuff) < 2) Spell(moonfire)
-    Spell(thrash_bear)
-    if (Enemies() <= 2 and BuffRefreshable(pulverize_buff)) Spell(pulverize)
-    if (Enemies() <= 4) Spell(mangle)
-    if (Enemies() <= 3 and not BuffExpires(galactic_guardian_buff)) Spell(moonfire)
-    if (Enemies() <= 3 and (RageDeficit() <= 20 or IncomingDamage(5) == 0)) Spell(maul)
-    Spell(swipe_bear)
-}
-
-AddFunction GuardianDefaultCdActions 
-{
-	GuardianInterruptActions()
-	Spell(incarnation_guardian_of_ursoc)
-	if BuffExpires(bristling_fur_buff) and BuffExpires(survival_instincts_buff) and BuffExpires(barkskin_buff) and BuffExpires(potion_buff)
-	{
-		Spell(bristling_fur)
-        if (HasEquippedItem(shifting_cosmic_sliver)) Spell(survival_instincts)
-        if (Talent(brambles_talent) and (not HasEquippedItem(oakhearts_puny_quods) or RageDeficit() > 75)) Spell(barkskin)
-		Item(Trinket0Slot usable=1 text=13)
-		Item(Trinket1Slot usable=1 text=14)
-		Spell(survival_instincts)
-		if (not HasEquippedItem(oakhearts_puny_quods) or RageDeficit() > 75) Spell(barkskin)
-		if CheckBoxOn(opt_use_consumables) Item(unbending_potion usable=1)
-	}
-}
-
-AddFunction GuardianInterruptActions
-{
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
-	{
-		if target.InRange(skull_bash) and target.IsInterruptible() Spell(skull_bash)
-		if not target.Classification(worldboss)
-		{
-			Spell(mighty_bash)
-			if target.Distance(less 10) Spell(incapacitating_roar)
-			if target.Distance(less 8) Spell(war_stomp)
-			if target.Distance(less 15) Spell(typhoon)
-		}
-	}
-}
-
-AddIcon help=shortcd specialization=guardian
-{
-	GuardianDefaultShortCDActions()
-}
-
-AddIcon enemies=1 help=main specialization=guardian
-{
-	GuardianDefaultMainActions()
-}
-
-AddIcon checkbox=opt_druid_guardian_aoe help=aoe specialization=guardian
-{
-	GuardianDefaultAoEActions()
-}
-
-AddIcon help=cd specialization=guardian
-{
-	GuardianDefaultCdActions()
-}
-]]
-    OvaleScripts:RegisterScript("DRUID", "guardian", name, desc, code, "script")
-end
-do
     local name = "sc_pr_druid_balance"
     local desc = "[8.0] Simulationcraft: PR_Druid_Balance"
     local code = [[
@@ -280,8 +102,8 @@ AddFunction BalanceDefaultMainActions
  if AstralPower() >= 40 and { 10 / 30 * 4 < 600 / 180 or False(raid_event_adds_exists) } Spell(incarnation)
  #fury_of_elune,if=(((raid_event.adds.duration%8)*(4)<(raid_event.adds.in%60))|(raid_event.adds.up))&((buff.celestial_alignment.up|buff.incarnation.up)|(cooldown.celestial_alignment.remains>30|cooldown.incarnation.remains>30))
  if { 10 / 8 * 4 < 600 / 60 or False(raid_event_adds_exists) } and { BuffPresent(celestial_alignment_buff) or DebuffPresent(incarnation) or SpellCooldown(celestial_alignment) > 30 or SpellCooldown(incarnation) > 30 } Spell(fury_of_elune)
- #sunfire,target_if=refreshable|(variable.az_hn=3&active_enemies<=2&(dot.moonfire.ticking|time_to_die<=6.6)&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking|time_to_die<=7.2)&astral_power<40),if=astral_power.deficit>=7&target.time_to_die>5.4&(!buff.celestial_alignment.up&!buff.incarnation.up|!variable.az_streak|!prev_gcd.1.sunfire)|variable.az_hn=3
- if { target.Refreshable(sunfire_balance) or az_hn() == 3 and Enemies() <= 2 and { target.DebuffPresent(moonfire_debuff) or target.TimeToDie() <= 6 } and { not Talent(stellar_flare_talent) or target.DebuffPresent(stellar_flare_debuff) or target.TimeToDie() <= 7 } and AstralPower() < 40 } and { AstralPowerDeficit() >= 7 and target.TimeToDie() > 5 and { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or not az_streak() or not PreviousGCDSpell(sunfire_balance) } or az_hn() == 3 } Spell(sunfire_balance)
+ #sunfire,target_if=refreshable|(variable.az_hn=3&active_enemies<=2&(dot.moonfire.ticking|time_to_die<=6.6)&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking|time_to_die<=7.2)&(astral_power<40|buff.starlord.remains<4)),if=astral_power.deficit>=7&target.time_to_die>5.4&(!buff.celestial_alignment.up&!buff.incarnation.up|!variable.az_streak|!prev_gcd.1.sunfire)|variable.az_hn=3
+ if { target.Refreshable(sunfire_balance) or az_hn() == 3 and Enemies() <= 2 and { target.DebuffPresent(moonfire_debuff) or target.TimeToDie() <= 6 } and { not Talent(stellar_flare_talent) or target.DebuffPresent(stellar_flare_debuff) or target.TimeToDie() <= 7 } and { AstralPower() < 40 or BuffRemaining(starlord_buff) < 4 } } and { AstralPowerDeficit() >= 7 and target.TimeToDie() > 5 and { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or not az_streak() or not PreviousGCDSpell(sunfire_balance) } or az_hn() == 3 } Spell(sunfire_balance)
  #moonfire,target_if=refreshable,if=astral_power.deficit>=7&target.time_to_die>6.6&(!buff.celestial_alignment.up&!buff.incarnation.up|!variable.az_streak|!prev_gcd.1.moonfire)
  if target.Refreshable(moonfire_debuff) and AstralPowerDeficit() >= 7 and target.TimeToDie() > 6 and { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or not az_streak() or not PreviousGCDSpell(moonfire) } Spell(moonfire)
  #stellar_flare,target_if=refreshable,if=astral_power.deficit>=12&target.time_to_die>7.2&(!buff.celestial_alignment.up&!buff.incarnation.up|!variable.az_streak|!prev_gcd.1.stellar_flare)
@@ -328,7 +150,7 @@ AddFunction BalanceDefaultShortCdActions
 
 AddFunction BalanceDefaultShortCdPostConditions
 {
- AstralPower() >= 40 and { 10 / 30 * 4 < 600 / 180 or False(raid_event_adds_exists) } and Spell(incarnation) or { 10 / 8 * 4 < 600 / 60 or False(raid_event_adds_exists) } and { BuffPresent(celestial_alignment_buff) or DebuffPresent(incarnation) or SpellCooldown(celestial_alignment) > 30 or SpellCooldown(incarnation) > 30 } and Spell(fury_of_elune) or { target.Refreshable(sunfire_balance) or az_hn() == 3 and Enemies() <= 2 and { target.DebuffPresent(moonfire_debuff) or target.TimeToDie() <= 6 } and { not Talent(stellar_flare_talent) or target.DebuffPresent(stellar_flare_debuff) or target.TimeToDie() <= 7 } and AstralPower() < 40 } and { AstralPowerDeficit() >= 7 and target.TimeToDie() > 5 and { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or not az_streak() or not PreviousGCDSpell(sunfire_balance) } or az_hn() == 3 } and Spell(sunfire_balance) or target.Refreshable(moonfire_debuff) and AstralPowerDeficit() >= 7 and target.TimeToDie() > 6 and { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or not az_streak() or not PreviousGCDSpell(moonfire) } and Spell(moonfire) or target.Refreshable(stellar_flare_debuff) and AstralPowerDeficit() >= 12 and target.TimeToDie() > 7 and { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or not az_streak() or not PreviousGCDSpell(stellar_flare) } and Spell(stellar_flare) or AstralPowerDeficit() >= 16 and { BuffStacks(lunar_empowerment_buff) == 3 or Enemies() < 3 and AstralPower() >= 40 and BuffStacks(lunar_empowerment_buff) == 2 and BuffStacks(solar_empowerment_buff) == 2 } and not { az_hn() == 3 and Enemies() == 1 } and not { Enemies() >= 2 and az_potm() == 3 and Enemies() == 2 } and Spell(lunar_strike) or AstralPowerDeficit() >= 12 and { BuffStacks(solar_empowerment_buff) == 3 or az_sb() > 1 and Enemies() < 3 and AstralPower() >= 32 and not BuffPresent(sunblaze_buff) } and not { az_hn() == 3 and Enemies() == 1 } and not { Enemies() >= 2 and Enemies() <= 4 and az_potm() == 3 } and Spell(solar_wrath_balance) or { Enemies() < 3 and { not BuffPresent(starlord_buff) or BuffRemaining(starlord_buff) >= 4 } or ExecuteTime(starsurge_balance) * { AstralPower() / 40 } > target.TimeToDie() } and { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or az_streak() < 2 or not PreviousGCDSpell(starsurge_balance) } and Spell(starsurge_balance) or Enemies() >= 3 and { not BuffPresent(starlord_buff) or BuffRemaining(starlord_buff) >= 4 } and Spell(starfall) or AstralPowerDeficit() > 10 + ExecuteTime(new_moon) / 1 and not SpellKnown(half_moon) and not SpellKnown(full_moon) and Spell(new_moon) or AstralPowerDeficit() > 20 + ExecuteTime(half_moon) / 1 and SpellKnown(half_moon) and Spell(half_moon) or AstralPowerDeficit() > 40 + ExecuteTime(full_moon) / 1 and SpellKnown(full_moon) and Spell(full_moon) or { { BuffPresent(warrior_of_elune_buff) or BuffPresent(lunar_empowerment_buff) or Enemies() >= 3 and not BuffPresent(solar_empowerment_buff) } and { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or az_streak() < 2 or not PreviousGCDSpell(lunar_strike) } or az_ds() and not BuffPresent(dawning_sun_buff) } and not { Enemies() >= 2 and Enemies() <= 4 and { az_potm() == 3 or az_potm() == 2 and Enemies() == 2 } } and Spell(lunar_strike) or { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or az_streak() < 2 or not PreviousGCDSpell(solar_wrath_balance) } and not { Enemies() >= 2 and Enemies() <= 4 and { az_potm() == 3 or az_potm() == 2 and Enemies() == 2 } } and Spell(solar_wrath_balance) or { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or not az_streak() or not PreviousGCDSpell(sunfire_balance) } and not { az_potm() >= 2 and Enemies() >= 2 } and Spell(sunfire_balance) or Spell(moonfire)
+ AstralPower() >= 40 and { 10 / 30 * 4 < 600 / 180 or False(raid_event_adds_exists) } and Spell(incarnation) or { 10 / 8 * 4 < 600 / 60 or False(raid_event_adds_exists) } and { BuffPresent(celestial_alignment_buff) or DebuffPresent(incarnation) or SpellCooldown(celestial_alignment) > 30 or SpellCooldown(incarnation) > 30 } and Spell(fury_of_elune) or { target.Refreshable(sunfire_balance) or az_hn() == 3 and Enemies() <= 2 and { target.DebuffPresent(moonfire_debuff) or target.TimeToDie() <= 6 } and { not Talent(stellar_flare_talent) or target.DebuffPresent(stellar_flare_debuff) or target.TimeToDie() <= 7 } and { AstralPower() < 40 or BuffRemaining(starlord_buff) < 4 } } and { AstralPowerDeficit() >= 7 and target.TimeToDie() > 5 and { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or not az_streak() or not PreviousGCDSpell(sunfire_balance) } or az_hn() == 3 } and Spell(sunfire_balance) or target.Refreshable(moonfire_debuff) and AstralPowerDeficit() >= 7 and target.TimeToDie() > 6 and { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or not az_streak() or not PreviousGCDSpell(moonfire) } and Spell(moonfire) or target.Refreshable(stellar_flare_debuff) and AstralPowerDeficit() >= 12 and target.TimeToDie() > 7 and { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or not az_streak() or not PreviousGCDSpell(stellar_flare) } and Spell(stellar_flare) or AstralPowerDeficit() >= 16 and { BuffStacks(lunar_empowerment_buff) == 3 or Enemies() < 3 and AstralPower() >= 40 and BuffStacks(lunar_empowerment_buff) == 2 and BuffStacks(solar_empowerment_buff) == 2 } and not { az_hn() == 3 and Enemies() == 1 } and not { Enemies() >= 2 and az_potm() == 3 and Enemies() == 2 } and Spell(lunar_strike) or AstralPowerDeficit() >= 12 and { BuffStacks(solar_empowerment_buff) == 3 or az_sb() > 1 and Enemies() < 3 and AstralPower() >= 32 and not BuffPresent(sunblaze_buff) } and not { az_hn() == 3 and Enemies() == 1 } and not { Enemies() >= 2 and Enemies() <= 4 and az_potm() == 3 } and Spell(solar_wrath_balance) or { Enemies() < 3 and { not BuffPresent(starlord_buff) or BuffRemaining(starlord_buff) >= 4 } or ExecuteTime(starsurge_balance) * { AstralPower() / 40 } > target.TimeToDie() } and { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or az_streak() < 2 or not PreviousGCDSpell(starsurge_balance) } and Spell(starsurge_balance) or Enemies() >= 3 and { not BuffPresent(starlord_buff) or BuffRemaining(starlord_buff) >= 4 } and Spell(starfall) or AstralPowerDeficit() > 10 + ExecuteTime(new_moon) / 1 and not SpellKnown(half_moon) and not SpellKnown(full_moon) and Spell(new_moon) or AstralPowerDeficit() > 20 + ExecuteTime(half_moon) / 1 and SpellKnown(half_moon) and Spell(half_moon) or AstralPowerDeficit() > 40 + ExecuteTime(full_moon) / 1 and SpellKnown(full_moon) and Spell(full_moon) or { { BuffPresent(warrior_of_elune_buff) or BuffPresent(lunar_empowerment_buff) or Enemies() >= 3 and not BuffPresent(solar_empowerment_buff) } and { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or az_streak() < 2 or not PreviousGCDSpell(lunar_strike) } or az_ds() and not BuffPresent(dawning_sun_buff) } and not { Enemies() >= 2 and Enemies() <= 4 and { az_potm() == 3 or az_potm() == 2 and Enemies() == 2 } } and Spell(lunar_strike) or { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or az_streak() < 2 or not PreviousGCDSpell(solar_wrath_balance) } and not { Enemies() >= 2 and Enemies() <= 4 and { az_potm() == 3 or az_potm() == 2 and Enemies() == 2 } } and Spell(solar_wrath_balance) or { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or not az_streak() or not PreviousGCDSpell(sunfire_balance) } and not { az_potm() >= 2 and Enemies() >= 2 } and Spell(sunfire_balance) or Spell(moonfire)
 }
 
 AddFunction BalanceDefaultCdActions
@@ -365,7 +187,7 @@ AddFunction BalanceDefaultCdActions
 
 AddFunction BalanceDefaultCdPostConditions
 {
- Spell(warrior_of_elune) or AstralPower() >= 40 and { 10 / 30 * 4 < 600 / 180 or False(raid_event_adds_exists) } and Spell(incarnation) or { 10 / 8 * 4 < 600 / 60 or False(raid_event_adds_exists) } and { BuffPresent(celestial_alignment_buff) or DebuffPresent(incarnation) or SpellCooldown(celestial_alignment) > 30 or SpellCooldown(incarnation) > 30 } and Spell(fury_of_elune) or { BuffPresent(celestial_alignment_buff) or DebuffPresent(incarnation) or SpellCooldown(celestial_alignment) > 30 or SpellCooldown(incarnation) > 30 } and Spell(force_of_nature) or { target.Refreshable(sunfire_balance) or az_hn() == 3 and Enemies() <= 2 and { target.DebuffPresent(moonfire_debuff) or target.TimeToDie() <= 6 } and { not Talent(stellar_flare_talent) or target.DebuffPresent(stellar_flare_debuff) or target.TimeToDie() <= 7 } and AstralPower() < 40 } and { AstralPowerDeficit() >= 7 and target.TimeToDie() > 5 and { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or not az_streak() or not PreviousGCDSpell(sunfire_balance) } or az_hn() == 3 } and Spell(sunfire_balance) or target.Refreshable(moonfire_debuff) and AstralPowerDeficit() >= 7 and target.TimeToDie() > 6 and { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or not az_streak() or not PreviousGCDSpell(moonfire) } and Spell(moonfire) or target.Refreshable(stellar_flare_debuff) and AstralPowerDeficit() >= 12 and target.TimeToDie() > 7 and { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or not az_streak() or not PreviousGCDSpell(stellar_flare) } and Spell(stellar_flare) or AstralPowerDeficit() >= 16 and { BuffStacks(lunar_empowerment_buff) == 3 or Enemies() < 3 and AstralPower() >= 40 and BuffStacks(lunar_empowerment_buff) == 2 and BuffStacks(solar_empowerment_buff) == 2 } and not { az_hn() == 3 and Enemies() == 1 } and not { Enemies() >= 2 and az_potm() == 3 and Enemies() == 2 } and Spell(lunar_strike) or AstralPowerDeficit() >= 12 and { BuffStacks(solar_empowerment_buff) == 3 or az_sb() > 1 and Enemies() < 3 and AstralPower() >= 32 and not BuffPresent(sunblaze_buff) } and not { az_hn() == 3 and Enemies() == 1 } and not { Enemies() >= 2 and Enemies() <= 4 and az_potm() == 3 } and Spell(solar_wrath_balance) or { Enemies() < 3 and { not BuffPresent(starlord_buff) or BuffRemaining(starlord_buff) >= 4 } or ExecuteTime(starsurge_balance) * { AstralPower() / 40 } > target.TimeToDie() } and { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or az_streak() < 2 or not PreviousGCDSpell(starsurge_balance) } and Spell(starsurge_balance) or Enemies() >= 3 and { not BuffPresent(starlord_buff) or BuffRemaining(starlord_buff) >= 4 } and Spell(starfall) or AstralPowerDeficit() > 10 + ExecuteTime(new_moon) / 1 and not SpellKnown(half_moon) and not SpellKnown(full_moon) and Spell(new_moon) or AstralPowerDeficit() > 20 + ExecuteTime(half_moon) / 1 and SpellKnown(half_moon) and Spell(half_moon) or AstralPowerDeficit() > 40 + ExecuteTime(full_moon) / 1 and SpellKnown(full_moon) and Spell(full_moon) or { { BuffPresent(warrior_of_elune_buff) or BuffPresent(lunar_empowerment_buff) or Enemies() >= 3 and not BuffPresent(solar_empowerment_buff) } and { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or az_streak() < 2 or not PreviousGCDSpell(lunar_strike) } or az_ds() and not BuffPresent(dawning_sun_buff) } and not { Enemies() >= 2 and Enemies() <= 4 and { az_potm() == 3 or az_potm() == 2 and Enemies() == 2 } } and Spell(lunar_strike) or { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or az_streak() < 2 or not PreviousGCDSpell(solar_wrath_balance) } and not { Enemies() >= 2 and Enemies() <= 4 and { az_potm() == 3 or az_potm() == 2 and Enemies() == 2 } } and Spell(solar_wrath_balance) or { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or not az_streak() or not PreviousGCDSpell(sunfire_balance) } and not { az_potm() >= 2 and Enemies() >= 2 } and Spell(sunfire_balance) or Spell(moonfire)
+ Spell(warrior_of_elune) or AstralPower() >= 40 and { 10 / 30 * 4 < 600 / 180 or False(raid_event_adds_exists) } and Spell(incarnation) or { 10 / 8 * 4 < 600 / 60 or False(raid_event_adds_exists) } and { BuffPresent(celestial_alignment_buff) or DebuffPresent(incarnation) or SpellCooldown(celestial_alignment) > 30 or SpellCooldown(incarnation) > 30 } and Spell(fury_of_elune) or { BuffPresent(celestial_alignment_buff) or DebuffPresent(incarnation) or SpellCooldown(celestial_alignment) > 30 or SpellCooldown(incarnation) > 30 } and Spell(force_of_nature) or { target.Refreshable(sunfire_balance) or az_hn() == 3 and Enemies() <= 2 and { target.DebuffPresent(moonfire_debuff) or target.TimeToDie() <= 6 } and { not Talent(stellar_flare_talent) or target.DebuffPresent(stellar_flare_debuff) or target.TimeToDie() <= 7 } and { AstralPower() < 40 or BuffRemaining(starlord_buff) < 4 } } and { AstralPowerDeficit() >= 7 and target.TimeToDie() > 5 and { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or not az_streak() or not PreviousGCDSpell(sunfire_balance) } or az_hn() == 3 } and Spell(sunfire_balance) or target.Refreshable(moonfire_debuff) and AstralPowerDeficit() >= 7 and target.TimeToDie() > 6 and { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or not az_streak() or not PreviousGCDSpell(moonfire) } and Spell(moonfire) or target.Refreshable(stellar_flare_debuff) and AstralPowerDeficit() >= 12 and target.TimeToDie() > 7 and { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or not az_streak() or not PreviousGCDSpell(stellar_flare) } and Spell(stellar_flare) or AstralPowerDeficit() >= 16 and { BuffStacks(lunar_empowerment_buff) == 3 or Enemies() < 3 and AstralPower() >= 40 and BuffStacks(lunar_empowerment_buff) == 2 and BuffStacks(solar_empowerment_buff) == 2 } and not { az_hn() == 3 and Enemies() == 1 } and not { Enemies() >= 2 and az_potm() == 3 and Enemies() == 2 } and Spell(lunar_strike) or AstralPowerDeficit() >= 12 and { BuffStacks(solar_empowerment_buff) == 3 or az_sb() > 1 and Enemies() < 3 and AstralPower() >= 32 and not BuffPresent(sunblaze_buff) } and not { az_hn() == 3 and Enemies() == 1 } and not { Enemies() >= 2 and Enemies() <= 4 and az_potm() == 3 } and Spell(solar_wrath_balance) or { Enemies() < 3 and { not BuffPresent(starlord_buff) or BuffRemaining(starlord_buff) >= 4 } or ExecuteTime(starsurge_balance) * { AstralPower() / 40 } > target.TimeToDie() } and { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or az_streak() < 2 or not PreviousGCDSpell(starsurge_balance) } and Spell(starsurge_balance) or Enemies() >= 3 and { not BuffPresent(starlord_buff) or BuffRemaining(starlord_buff) >= 4 } and Spell(starfall) or AstralPowerDeficit() > 10 + ExecuteTime(new_moon) / 1 and not SpellKnown(half_moon) and not SpellKnown(full_moon) and Spell(new_moon) or AstralPowerDeficit() > 20 + ExecuteTime(half_moon) / 1 and SpellKnown(half_moon) and Spell(half_moon) or AstralPowerDeficit() > 40 + ExecuteTime(full_moon) / 1 and SpellKnown(full_moon) and Spell(full_moon) or { { BuffPresent(warrior_of_elune_buff) or BuffPresent(lunar_empowerment_buff) or Enemies() >= 3 and not BuffPresent(solar_empowerment_buff) } and { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or az_streak() < 2 or not PreviousGCDSpell(lunar_strike) } or az_ds() and not BuffPresent(dawning_sun_buff) } and not { Enemies() >= 2 and Enemies() <= 4 and { az_potm() == 3 or az_potm() == 2 and Enemies() == 2 } } and Spell(lunar_strike) or { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or az_streak() < 2 or not PreviousGCDSpell(solar_wrath_balance) } and not { Enemies() >= 2 and Enemies() <= 4 and { az_potm() == 3 or az_potm() == 2 and Enemies() == 2 } } and Spell(solar_wrath_balance) or { not BuffPresent(celestial_alignment_buff) and not DebuffPresent(incarnation) or not az_streak() or not PreviousGCDSpell(sunfire_balance) } and not { az_potm() >= 2 and Enemies() >= 2 } and Spell(sunfire_balance) or Spell(moonfire)
 }
 
 ### Balance icons.
@@ -820,8 +642,8 @@ AddFunction FeralCooldownsCdActions
 
    unless ComboPoints() == 0 and Spell(feral_frenzy) or Energy() >= 30 and { SpellCooldown(tigers_fury) > 15 or BuffPresent(tigers_fury_buff) } and Spell(incarnation)
    {
-    #potion,name=prolonged_power,if=target.time_to_die<65|(time_to_die<180&(buff.berserk.up|buff.incarnation.up))
-    if { target.TimeToDie() < 65 or target.TimeToDie() < 180 and { BuffPresent(berserk_buff) or DebuffPresent(incarnation) } } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(prolonged_power usable=1)
+    #potion,name=battle_potion_of_agility,if=target.time_to_die<65|(time_to_die<180&(buff.berserk.up|buff.incarnation.up))
+    if { target.TimeToDie() < 65 or target.TimeToDie() < 180 and { BuffPresent(berserk_buff) or DebuffPresent(incarnation) } } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_agility usable=1)
     #shadowmeld,if=combo_points<5&energy>=action.rake.cost&dot.rake.pmultiplier<2.1&buff.tigers_fury.up&(buff.bloodtalons.up|!talent.bloodtalons.enabled)&(!talent.incarnation.enabled|cooldown.incarnation.remains>18)&!buff.incarnation.up
     if ComboPoints() < 5 and Energy() >= PowerCost(rake) and target.DebuffPersistentMultiplier(rake_debuff) < 2 and BuffPresent(tigers_fury_buff) and { BuffPresent(bloodtalons_buff) or not Talent(bloodtalons_talent) } and { not Talent(incarnation_talent) or SpellCooldown(incarnation) > 18 } and not DebuffPresent(incarnation) Spell(shadowmeld)
     #use_items
@@ -1000,7 +822,6 @@ AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
 # moonfire_cat
 # moonfire_cat_debuff
 # predatory_swiftness_buff
-# prolonged_power
 # prowl
 # prowl_buff
 # rake
