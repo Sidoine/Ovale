@@ -129,9 +129,7 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
                 name = "Disabled";
             }
         }else if(className == "PRIEST"){
-            if(specialization == "holy"){
-                name = "Disabled";
-            }else if(specialization == "discipline"){
+            if(specialization == "discipline"){
                 name = "Disabled";
             }
         } else if(className == "SHAMAN"){

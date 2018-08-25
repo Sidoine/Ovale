@@ -588,7 +588,7 @@ do
     }
 end
 local SyntaxError = function(tokenStream, ...)
-    __exports.OvaleSimulationCraft:Print(...)
+    __exports.OvaleSimulationCraft:Warning(...)
     local context = {
         [1] = "Next tokens:"
     }
@@ -601,7 +601,7 @@ local SyntaxError = function(tokenStream, ...)
             break
         end
     end
-    __exports.OvaleSimulationCraft:Print(concat(context, " "))
+    __exports.OvaleSimulationCraft:Warning(concat(context, " "))
 end
 
 local ParseFunction = nil
@@ -3720,6 +3720,9 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
             AddSymbol(annotation, buffName)
         elseif property == "pct" then
             code = format("%sStaggerRemaining() / %sMaxHealth() * 100", target, target)
+        elseif match(property, "last_tick_damage_(%d+)") then
+            local ticks = match(property, "last_tick_damage_(%d+)")
+            code = format("StaggerTick(%d)", ticks)
         else
             ok = false
         end

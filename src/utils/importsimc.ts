@@ -7,9 +7,10 @@ import { OvaleSpellBook } from "../SpellBook";
 import { OvaleStance } from "../Stance";
 import { OvaleSimulationCraft, Annotation } from "../SimulationCraft";
 import  { registerScripts } from "../scripts/index";
-import { getSpellData, PowerType, SpellPowerData, isFriendlyTarget, EffectType, SpellData, SpellAttributes } from "./importspells";
+import { getSpellData, SpellData } from "./importspells";
 import { ipairs } from "@wowts/lua";
-import { PowerType as OvalePowerType } from "../Power";
+import { convertFromSpellData, CustomAura, CustomAuras, CustomSpellData } from "./customspell";
+import { SpellInfo } from "../Data";
 
 let outputDirectory = "src/scripts";
 const simcDirectory = process.argv[2];
@@ -210,175 +211,64 @@ for (const filename of files) {
     }
 }
 
-function getPowerName(power: PowerType): OvalePowerType | "runes" | "health" {
-    switch (power) {
-        case PowerType.POWER_ASTRAL_POWER:
-            return "lunarpower";
-        case PowerType.POWER_CHI:
-            return "chi";
-        case PowerType.POWER_COMBO_POINT:
-            return "combopoints";
-        case PowerType.POWER_ENERGY:
-            return "energy";
-        case PowerType.POWER_FOCUS:
-            return "focus";
-        case PowerType.POWER_FURY:
-            return "fury";
-        case PowerType.POWER_HEALTH:
-            return "health";
-        case PowerType.POWER_HOLY_POWER:
-            return "holypower";
-        case PowerType.POWER_INSANITY:
-            return "insanity";
-        case PowerType.POWER_MAELSTROM:
-            return "maelstrom";
-        case PowerType.POWER_MANA:
-            return "mana";
-        case PowerType.POWER_PAIN:
-            return "pain";
-        case PowerType.POWER_RAGE:
-            return "rage";
-        case PowerType.POWER_RUNE:
-            return "runes";
-        case PowerType.POWER_RUNIC_POWER:
-            return "runicpower";
-        case PowerType.POWER_SOUL_SHARDS:
-            return "soulshards";
-        case PowerType.POWER_ARCANE_CHARGES:
-            return "arcanecharges";
-        default:
-            throw Error(`Unknown power type ${power}`);
-    }
-}
-
-function getPowerDataValue(powerData: SpellPowerData) {
-    return getPowerValue(powerData.power_type, powerData.cost);
-}
-
-function getPowerValue(powerType: PowerType, cost: number) {
-    let divisor = 1;
-    switch (powerType) {
-        case PowerType.POWER_MANA:
-            divisor = 100;
-            break;
-        case PowerType.POWER_RAGE:
-        case PowerType.POWER_RUNIC_POWER:
-        case PowerType.POWER_BURNING_EMBER:
-        case PowerType.POWER_ASTRAL_POWER:
-        case PowerType.POWER_PAIN:
-        case PowerType.POWER_SOUL_SHARDS:
-            divisor = 10;
-            break;
-        //case PowerType.POWER_DEMONIC_FURY:
-          // return percentage ? 0.1 : 1.0;  
-    }
-    return cost / divisor;
-}
-
-
-function getTooltip(spell: SpellData) {
+function getTooltip(spell: CustomSpellData | SpellData) {
     return spell.tooltip.replace(/[\$\\{}%]/g, '');
 }
 
-function getDesc(spell: SpellData) {
+function getDesc(spell: CustomSpellData | SpellData) {
     return spell.desc.replace(/[\$\\{}%]/g, '');
 }
 
-function getDefinition(spell: SpellData, spellIds: number[], talentIds: number[]) {
-    let output = (spell.desc) ? `# ${getDesc(spell)}\n` : "";
-    if (spell.nextRank && spell.nextRank.desc) {
-        output += `# ${spell.nextRank.rank_str}: ${getDesc(spell.nextRank)}\n`;
+function getBuffDefinition(identifier: string, target: keyof CustomAuras, customAura: CustomAura) {
+    const spell = spellData.spellDataById.get(customAura.id);
+    if (!spell) return `# Unknown spell id ${customAura.id}`;
+    let ret = "";
+    if (spell.tooltip) {
+        ret = `  # ${getTooltip(spell)}\n`;
     }
+    if (target === "player") {
+        return `${ret}  SpellAddBuff(${identifier} ${spell.identifier}=${customAura.stacks})`;
+    }
+    return `${ret}  SpellAddTargetDebuff(${identifier} ${spell.identifier}=${customAura.stacks})`;
+}
 
-    output += `  SpellInfo(${spell.identifier}`;
-    if (spell.spellPowers) {
-        for (const power of spell.spellPowers) {
-            const powerName = getPowerName(power.power_type);
-            if (power.cost) {
-                output += ` ${powerName}=${getPowerDataValue(power)}`
-            }
-        }
-    }
-    if (spell.cooldown) {
-        output += ` cd=${spell.cooldown / 1000}`;
-    }
-    if (spell.charge_cooldown) {
-        output += ` cd=${spell.charge_cooldown / 1000}`;
-    }
-    if (spell.duration && spell.duration > 0) {
-        output += ` duration=${spell.duration / 1000}`;
-    }
-    if (spell.attributes.some(x => (x & (SpellAttributes.Channeled | SpellAttributes.Channeled2)) > 0)) {
-        output += ` channel=${spell.duration / 1000}`;
-    }
-    if (spell.max_stack) {
-        output += ` max_stacks=${spell.max_stack}`;
-    }
-    if (spell.replace_spell_id && spellIds.indexOf(spell.replace_spell_id) >= 0) {
-        const replacedSpell = spellData.spellDataById.get(spell.replace_spell_id);
-        if (replacedSpell) {
-            output += ` replace=${replacedSpell.identifier}`;
-        }
-    }
-    if (spell.talent) {
-        output += ` talent=${spell.talent.identifier}`;
-        if (talentIds.indexOf(spell.talent.id) < 0) talentIds.push(spell.talent.id);
-    }
-    
-    if (spell.gcd !== 1500) {
-        output += ` gcd=${spell.gcd/1000}`;
-        if (spell.gcd === 0) {
-            output += ` offgcd=1`;
+function getDefinition(identifier: string, customSpellData: CustomSpellData, talentIds: number[], spellIds: number[]) {
+    let output = (customSpellData.desc) ? `# ${getDesc(customSpellData)}\n` : "";
+    if (customSpellData.nextRank) {
+        const nextRank = spellData.spellDataById.get(customSpellData.nextRank);
+        if (nextRank && nextRank.desc) {
+            output += `# ${nextRank.rank_str}: ${getDesc(nextRank)}\n`;
         }
     }
 
-    let tick = 0;
-    if (spell.spellEffects) {
-        for (const effect of spell.spellEffects) {
-            if (effect.type === EffectType.E_ENERGIZE) {
-                output += ` ${getPowerName(effect.misc_value)}=${-getPowerValue(effect.misc_value, effect.base_value)}`;
-            } else if (effect.type === EffectType.E_INTERRUPT_CAST) {
-                output += ` interrupt=1`;
-            }
-            if (effect.amplitude > 0) {
-                tick = effect.amplitude / 1000;
-            }
+    output += `  SpellInfo(${identifier}`;
+    for (const key in customSpellData.spellInfo) {
+        if (key === "replace") {
+            const spellId = customSpellData.spellInfo[key];
+            const spell = spellData.spellDataById.get(spellId);
+            output += ` ${key}=${spell.identifier}`;
+        } else {
+            output += ` ${key}=${customSpellData.spellInfo[key as keyof SpellInfo]}`;
         }
     }
-    if (tick > 0) {
-        output += ` tick=${tick}`;
-    }
 
+    for (const key in customSpellData.conditions) {
+        if (key === "talent") {
+            const talentId = customSpellData.conditions[key];
+            const talent = spellData.talentsById.get(talentId);
+            output += ` ${key}=${talent.identifier}`;
+            if (talentIds.indexOf(talentId) < 0) talentIds.push(talentId);
+        }
+    }
     output += `)\n`;
-    let buffAdded = false;
-    let debuffAdded = false;
-    if (spell.spellEffects) {
-        for (const effect of spell.spellEffects) {
-            if (effect.trigger_spell_id) {
-                const triggerSpell = spellData.spellDataById.get(effect.trigger_spell_id);
-                if (triggerSpell === undefined) {
-                    // console.log(`Can't find spell ${effect.trigger_spell_id} triggered by ${spell.name}`);
-                    continue;
-                }
-                if (spellIds.indexOf(triggerSpell.id) < 0) continue;
-                if (triggerSpell.tooltip) output += `  # ${getTooltip(triggerSpell)}\n`;
-                if (isFriendlyTarget(effect.targeting_1)) {
-                    output += `  SpellAddBuff(${spell.identifier} ${triggerSpell.identifier}=1)\n`;
-                } else {
-                    output += `  SpellAddTargetDebuff(${spell.identifier} ${triggerSpell.identifier}=1)\n`;
-                }
-            } else if (effect.type === EffectType.E_APPLY_AURA) {
-                if (isFriendlyTarget(effect.targeting_1)) {
-                    if (!buffAdded) {
-                        buffAdded = true;
-                        if (spell.tooltip) output += `  # ${getTooltip(spell)}\n`;
-                        output += `  SpellAddBuff(${spell.identifier} ${spell.identifier}=1)\n`;
-                    }
-                } else if (!debuffAdded) {
-                    debuffAdded = true;
-                    if (spell.tooltip) output += `  # ${getTooltip(spell)}\n`;
-                    output += `  SpellAddTargetDebuff(${spell.identifier} ${spell.identifier}=1)\n`;
-                }
+
+    const auras = customSpellData.auras;
+    if (auras) {
+        for (const key in auras) {
+            const k = key as keyof CustomAuras;
+            if (auras[k]) {
+                output += auras[k].filter(x => spellIds.indexOf(x.id) >=0).map(x => getBuffDefinition(identifier, k, x)).join("\n");
+                output += "\n";
             }
         }
     }
@@ -390,16 +280,30 @@ for (const [className, spellIds] of spellsByClass) {
 ${limitLine2}
     let code = \``;        
     const talentIds = talentsByClass.get(className) || [];
-    const spells: SpellData[] = [];
-    for (const spellId of spellIds) {
+    const spells: CustomSpellData[] = [];
+    const remainingsSpellIds = spellIds.concat();
+    while (remainingsSpellIds.length) {
+        const spellId = remainingsSpellIds.pop();
         const spell = spellData.spellDataById.get(spellId);
-        spells.push(spell);
+        const customSpell = convertFromSpellData(spell, spellData.spellDataById);
+        spells.push(customSpell);
+        // if (customSpell.auras) {
+        //     for (const t in customSpell.auras) {
+        //         const target = t as keyof CustomAuras;
+        //         for (const aura of customSpell.auras[target]) {
+        //             if (spells.every(x => x.id !== aura.id) && spellIds.indexOf(aura.id) < 0) {
+        //                 spellIds.push(aura.id);
+        //             }
+        //         }
+        //     }
+        // }
     }
 
-    for (const spell of spells.sort((x, y) => x.name < y.name ? -1 : 1)) {
+    const sortedSpells = spells.sort((x, y) => x.identifier < y.identifier ? -1 : 1);
+    for (const spell of sortedSpells) {
         if (!spell) continue;
         output += `Define(${spell.identifier} ${spell.id})\n`;
-        output += getDefinition(spell, spellIds, talentIds);
+        output += getDefinition(spell.identifier, spell, talentIds, spellIds);
 //         if (!buffAdded && !debuffAdded && !spell.tooltip && spell.duration) {
 //             output += `Define(${spell.identifier}_dummy -${spell.id})
 //     SpellInfo(${spell.identifier}_dummy duration=${spell.duration})
@@ -445,5 +349,7 @@ ${limitLine2}
         existing = existing.split(line.trim()).join("");
     }
     output = existing.replace(/\/\/ THIS PART OF THIS FILE IS AUTOMATICALLY GENERATED[^]*\/\/ END/, output);
-    writeFileSync(fileName, output, { encoding: 'utf8'});
+    writeFileSync(fileName, output, { encoding: 'utf8' });
+
+    // writeCustomSpell(sortedSpells, className, spellData.spellDataById);  
 }

@@ -6,78 +6,91 @@ __exports.register = function()
     local name = "ovale_hunter_spells"
     local desc = "[8.0] Ovale: Hunter spells"
     local code = [[Define(a_murder_of_crows 131894)
-# Summons a flock of crows to attack your target, dealing 131900s1*16 Physical damage over d. If the target dies while under attack, A Murder of Crows' cooldown is reset.
-  SpellInfo(a_murder_of_crows focus=30 cd=60 duration=15 talent=a_murder_of_crows_talent_survival tick=1)
+# Summons a flock of crows to attack your target, dealing 131900s1*16 Physical damage over 15 seconds. If the target dies while under attack, A Murder of Crows' cooldown is reset.
+  SpellInfo(a_murder_of_crows focus=30 cd=60 duration=15 tick=1 talent=a_murder_of_crows_talent_survival)
   # Under attack by a flock of crows.
   SpellAddTargetDebuff(a_murder_of_crows a_murder_of_crows=1)
 Define(aimed_shot 19434)
 # A powerful aimed shot that deals s1*<mult> Physical damage. Damage increased by s2 against a target you have not yet damaged. ?!s19434&c1[rnrnReplaces Cobra Shot.][]
   SpellInfo(aimed_shot focus=30 cd=12)
 Define(ancestral_call 274738)
-# Invoke the spirits of your ancestors, granting you their power for 274739d.
+# Invoke the spirits of your ancestors, granting you their power for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
   SpellAddBuff(ancestral_call ancestral_call=1)
 Define(arcane_shot 185358)
 # A quick shot that causes sw2*<mult> Arcane damage.
   SpellInfo(arcane_shot focus=15)
 Define(aspect_of_the_eagle 186289)
-# Increases the range of your ?s259387[Mongoose Bite][Raptor Strike] to 265189r yds for d.
+# Increases the range of your ?s259387[Mongoose Bite][Raptor Strike] to 265189r yds for 15 seconds.
   SpellInfo(aspect_of_the_eagle cd=90 duration=15 gcd=0 offgcd=1)
   # The range of ?s259387[Mongoose Bite][Raptor Strike] is increased to 265189r yds.
   SpellAddBuff(aspect_of_the_eagle aspect_of_the_eagle=1)
 Define(aspect_of_the_wild 193530)
-# Grants you and your pet s2 Focus per sec and s1 increased critical strike chance for d.
+# Grants you and your pet s2 Focus per sec and s1 increased critical strike chance for 20 seconds.
   SpellInfo(aspect_of_the_wild cd=120 duration=20 gcd=1.3 tick=1)
   # Gaining s2 Focus per sec.rnCritical Strike chance increased by s1.
   SpellAddBuff(aspect_of_the_wild aspect_of_the_wild=1)
 Define(barbed_shot 217200)
-# Fire a shot that tears through your enemy, causing them to bleed for s1*d/t1 damage over d.rnrnSends your pet into a frenzy, increasing attack speed by 272790s1 for 272790d, stacking up to 272790u times.rnrn|cFFFFFFFFGenerates 246152s1*246152d/246152t1 Focus over 246152d.|r
+# Fire a shot that tears through your enemy, causing them to bleed for s1*8 seconds/t1 damage over 8 seconds.rnrnSends your pet into a frenzy, increasing attack speed by 272790s1 for 8 seconds, stacking up to 272790u times.rnrn|cFFFFFFFFGenerates 246152s1*8 seconds/246152t1 Focus over 8 seconds.|r
   SpellInfo(barbed_shot cd=12 duration=8 tick=2)
   # Suffering sw1 damage every t1 sec.
   SpellAddTargetDebuff(barbed_shot barbed_shot=1)
 Define(barrage 120360)
-# Rapidly fires a spray of shots for 120360d, dealing an average of <damageSec> Physical damage to all enemies in front of you. Usable while moving.
-  SpellInfo(barrage focus=60 cd=20 duration=3 channel=3 talent=barrage_talent_marksmanship tick=0.2)
+# Rapidly fires a spray of shots for 3 seconds, dealing an average of <damageSec> Physical damage to all enemies in front of you. Usable while moving.
+  SpellInfo(barrage focus=60 cd=20 duration=3 channel=3 tick=0.3 talent=barrage_talent_marksmanship)
+
 Define(berserking 26297)
-# Increases your haste by s1 for d.
+# Increases your haste by s1 for 10 seconds.
   SpellInfo(berserking cd=180 duration=10 gcd=0 offgcd=1)
   # Haste increased by s1.
   SpellAddBuff(berserking berserking=1)
 Define(berserking_buff 200953)
-# @spelldesc200845
+# Rampage and Execute have a chance to activate Berserking, increasing your attack speed and critical strike chance by 200953s1 every 200951t1 sec for 12 seconds.
   SpellInfo(berserking_buff duration=3 max_stacks=12 gcd=0 offgcd=1)
   # Attack speed and critical strike chance increased by s1.
   SpellAddBuff(berserking_buff berserking_buff=1)
 Define(bestial_wrath 19574)
-# Sends you and your pet into a rage, increasing all damage you both deal by s1 for d. ?s231548&s217200[rnrnBestial Wrath's remaining cooldown is reduced by s3 sec each time you use Barbed Shot.][]
+# Sends you and your pet into a rage, increasing all damage you both deal by s1 for 15 seconds. ?s231548&s217200[rnrnBestial Wrath's remaining cooldown is reduced by s3 sec each time you use Barbed Shot.][]
 # Rank 2: Bestial Wrath's remaining cooldown is reduced by 19574s3 sec each time you use Barbed Shot.
   SpellInfo(bestial_wrath cd=90 duration=15 channel=15)
   # Damage dealt increased by w1.
   SpellAddBuff(bestial_wrath bestial_wrath=1)
+Define(blur_of_talons_buff 277966)
+# During Coordinated Assault, ?s259387[Mongoose Bite][Raptor Strike] increases your Agility by s1 and your Speed by s2 for 6 seconds. Stacks up to 277969u times.
+  SpellInfo(blur_of_talons_buff channel=-0.001 gcd=0 offgcd=1)
+
+Define(bursting_blood 251316)
+# Imbues your blood with heat for 25 seconds, giving your melee attacks a chance to create a burst of blood, dealing 265514s1 Physical damage split evenly amongst all nearby enemies.
+  SpellInfo(bursting_blood duration=25 channel=25 gcd=0 offgcd=1)
+
 Define(butchery 212436)
 # Strike all nearby enemies in a flurry of strikes, inflicting s1 Physical damage to each.rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit, up to s3.
   SpellInfo(butchery focus=30 cd=9 talent=butchery_talent)
 Define(carve 187708)
 # A sweeping attack that strikes all enemies in front of you for s1 Physical damage.rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit, up to s3.
   SpellInfo(carve focus=35 cd=6)
-Define(chakrams 267666)
-# @spelldesc259381
-  SpellInfo(chakrams gcd=0 offgcd=1)
+Define(chakrams 259391)
+# Throw a pair of chakrams at your target, slicing all enemies in the chakrams' path for <damage> Physical damage. The chakrams will return to you, damaging enemies again.rnrnYour primary target takes 259398s2 increased damage.
+  SpellInfo(chakrams focus=30 cd=20 talent=chakrams_talent)
+
+
 Define(chimaera_shot 171457)
-# @spelldesc53209
+# A two-headed shot that hits your primary target and another nearby target, dealing 171457sw2 Nature damage to one and 171454sw2 Frost damage to the other.rnrn|cFFFFFFFFGenerates 204304s1 Focus for each target hit.|r
   SpellInfo(chimaera_shot gcd=0 offgcd=1)
+
 Define(cobra_shot 193455)
 # A quick shot causing s2*<mult> Physical damage.rnrnReduces the cooldown of Kill Command by s3 sec.
 # Rank 2: Cobra Shot's cost is reduced by s1.
   SpellInfo(cobra_shot focus=45)
 Define(coordinated_assault 266779)
-# You and your pet attack as one, increasing all damage you both deal by s1 for d.?s263186[rnrnWhile Coordinated Assault is active, Kill Command's chance to reset is increased by s4.][]
+# You and your pet attack as one, increasing all damage you both deal by s1 for 20 seconds.?s263186[rnrnWhile Coordinated Assault is active, Kill Command's chance to reset is increased by s4.][]
   SpellInfo(coordinated_assault cd=120 duration=20)
   # Damage dealt increased by s1.?s263186[rnKill Command's chance to reset increased by s4.][]
   SpellAddBuff(coordinated_assault coordinated_assault=1)
 Define(dire_beast 120679)
-# Summons a powerful wild beast that attacks the target and roars, increasing your Haste by 281036s1 for d.
+# Summons a powerful wild beast that attacks the target and roars, increasing your Haste by 281036s1 for 8 seconds.
   SpellInfo(dire_beast focus=25 cd=20 duration=8 talent=dire_beast_talent)
+
   SpellAddTargetDebuff(dire_beast dire_beast=1)
 Define(double_tap 260402)
 # Your next Aimed Shot will fire a second time instantly at s4 power without consuming Focus, or your next Rapid Fire will shoot s3 additional shots during its channel.
@@ -89,15 +102,15 @@ Define(explosive_shot 212431)
   SpellInfo(explosive_shot focus=20 cd=30 duration=4 talent=explosive_shot_talent)
   SpellAddBuff(explosive_shot explosive_shot=1)
 Define(fireblood 265221)
-# Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 265226d. 
+# Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. 
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
 Define(flanking_strike 259516)
-# @spelldesc269751
+# You and your pet leap to the target and strike it as one, dealing a total of <damage> Physical damage.rnrn|cFFFFFFFFGenerates 269752s2 Focus for you and your pet.|r
   SpellInfo(flanking_strike gcd=0 offgcd=1 focus=-30)
 Define(harpoon 190925)
-# Hurls a harpoon at an enemy, rooting them in place for 190927d and pulling you to them.
+# Hurls a harpoon at an enemy, rooting them in place for 3 seconds and pulling you to them.
 # Rank 2: The cooldown of Harpoon is reduced by m1/-1000 sec.
-  SpellInfo(harpoon cd=1 cd=30 gcd=0.5)
+  SpellInfo(harpoon cd=1 gcd=0.5)
 Define(hunters_mark 257284)
 # Apply Hunter's Mark to the target, increasing all damage you deal to the marked target by s1.  If the target dies while affected by Hunter's Mark, you instantly gain 259558s1 Focus. The target can always be seen and tracked by the Hunter.rnrnOnly one Hunter's Mark can be applied at a time.
   SpellInfo(hunters_mark talent=hunters_mark_talent)
@@ -110,29 +123,26 @@ Define(kill_command 34026)
 Define(kill_command_survival 259489)
 # Give the command to kill, causing your pet to savagely deal <damage> Physical damage to the enemy.?s263186[rnrnHas a s2 chance to immediately reset its cooldown.][]rnrn|cFFFFFFFFGenerates s3 Focus.|r
   SpellInfo(kill_command_survival cd=6 channel=0 focus=-15)
+
 Define(lethal_shots_buff 260395)
-# @spelldesc260393
+# Steady Shot has a h chance to cause your next Aimed Shot or Rapid Fire to be guaranteed critical strikes.
   SpellInfo(lethal_shots_buff duration=15 gcd=0 offgcd=1)
   # Your next Aimed Shot will have s1 increased critical strike chance, or your next Rapid Fire will deal a critical strike with each shot.
   SpellAddBuff(lethal_shots_buff lethal_shots_buff=1)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
-Define(mongoose_bite 265888)
-# A brutal attack that deals sw1 Physical damage and grants you Mongoose Fury.rnrn|cFFFFFFFFMongoose Fury|rrnIncreases the damage of Mongoose Bite by 259388s1 for 259388d, stacking up to 259388u times. Successive attacks do not increase duration.
-  SpellInfo(mongoose_bite focus=30)
+
+Define(mongoose_bite 259387)
+# A brutal attack that deals s1 Physical damage and grants you Mongoose Fury.rnrn|cFFFFFFFFMongoose Fury|rrnIncreases the damage of Mongoose Bite by 259388s1 for 14 seconds, stacking up to 259388u times. Successive attacks do not increase duration.
+  SpellInfo(mongoose_bite focus=30 talent=mongoose_bite_talent)
 Define(piercing_shot 198670)
 # A powerful shot which deals sw3 Physical damage to the target and up to sw3/(s1/10) Physical damage to all enemies between you and the target. 
   SpellInfo(piercing_shot focus=35 cd=30 talent=piercing_shot_talent)
-Define(bursting_blood 251316)
-# Imbues your blood with heat for d, giving your melee attacks a chance to create a burst of blood, dealing 265514s1 Physical damage split evenly amongst all nearby enemies.
-  SpellInfo(bursting_blood duration=25 channel=25 gcd=0 offgcd=1)
-Define(rising_death 252346)
-# Chance to create multiple potions.
-  SpellInfo(rising_death gcd=0 offgcd=1)
 Define(rapid_fire 257044)
-# Shoot a stream of s1 shots at your target over d, dealing a total of m1*257045sw1 Physical damage. rnrnEach shot generates 263585s1 Focus.rnrnUsable while moving.
+# Shoot a stream of s1 shots at your target over 3 seconds, dealing a total of m1*257045sw1 Physical damage. rnrnEach shot generates 263585s1 Focus.rnrnUsable while moving.
   SpellInfo(rapid_fire cd=20 duration=3 channel=3 tick=0.33)
+
 Define(raptor_strike 186270)
 # A vicious slash dealing s1 Physical damage.
 # Rank 2: Raptor Strike deals s1 increased damage.
@@ -141,53 +151,59 @@ Define(revive_pet 982)
 # Revives your pet, returning it to life with s1 of its base health.
   SpellInfo(revive_pet focus=35 duration=3 channel=3)
   SpellAddBuff(revive_pet revive_pet=1)
+Define(rising_death 252346)
+# Chance to create multiple potions.
+  SpellInfo(rising_death gcd=0 offgcd=1)
 Define(shrapnel_bomb_debuff 270336)
-# @spelldesc270335
+# Hurl a bomb at the target, exploding for 270338s1 Fire damage in a cone and impaling enemies with burning shrapnel, scorching them for 270339o1 Fire damage over 6 seconds.rnrn?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] apply Internal Bleeding, causing 270343o1 damage over 9 seconds. Internal Bleeding stacks up to 270343u times.
   SpellInfo(shrapnel_bomb_debuff duration=0.5 channel=0.5 gcd=0 offgcd=1)
 Define(spitting_cobra 194407)
-# Summons a Spitting Cobra for d that attacks your target for 206685s1 Nature damage every 2 sec. rnrnWhile the Cobra is active you gain s2 Focus every sec.
-  SpellInfo(spitting_cobra cd=90 duration=20 talent=spitting_cobra_talent tick=1)
+# Summons a Spitting Cobra for 20 seconds that attacks your target for 206685s1 Nature damage every 2 sec. rnrnWhile the Cobra is active you gain s2 Focus every sec.
+  SpellInfo(spitting_cobra cd=90 duration=20 tick=1 talent=spitting_cobra_talent)
   # Generating s2 additional Focus every sec.
   SpellAddBuff(spitting_cobra spitting_cobra=1)
 Define(stampede 201430)
-# Summon a herd of stampeding animals from the wilds around you that deal damage to your enemies for d.
+# Summon a herd of stampeding animals from the wilds around you that deal damage to your enemies for 12 seconds.
   SpellInfo(stampede cd=180 duration=12 channel=12 talent=stampede_talent)
   SpellAddBuff(stampede stampede=1)
 Define(steady_shot 56641)
 # A steady shot that causes s1 Physical damage.rnrnUsable while moving.rnrn|cFFFFFFFFGenerates s2 Focus.
   SpellInfo(steady_shot)
-Define(steel_trap 162480)
-# @spelldesc162488
-  SpellInfo(steel_trap duration=20 gcd=0 offgcd=1)
-  # Immobilized.
-  SpellAddTargetDebuff(steel_trap steel_trap=1)
+Define(steel_trap 162488)
+# Hurls a Steel Trap to the target location that snaps shut on the first enemy that approaches, immobilizing them for 20 seconds and causing them to bleed for 162487o1 damage over 20 seconds. rnrnDamage other than Steel Trap may break the immobilization effect. Trap will exist for 60 seconds. Limit 1.
+  SpellInfo(steel_trap cd=30 talent=steel_trap_talent)
+
 Define(trueshot 193526)
-# Immediately gain s2 charge of Aimed Shot, and gain s1 Haste for d.
+# Immediately gain s2 charge of Aimed Shot, and gain s1 Haste for 15 seconds.
   SpellInfo(trueshot cd=180 duration=15)
   # Haste increased by s1 for d.
   SpellAddBuff(trueshot trueshot=1)
 Define(vipers_venom_buff 268552)
-# @spelldesc268501
+# ?s259387[Mongoose Bite][Raptor Strike] has a chance to make your next Serpent Sting cost no Focus and deal an additional 268552s1 initial damage.
   SpellInfo(vipers_venom_buff duration=8 channel=8 gcd=0 offgcd=1)
   # Your next Serpent Sting costs no Focus, and will deal s1 increased initial damage.
   SpellAddBuff(vipers_venom_buff vipers_venom_buff=1)
-Define(wildfire_bomb_debuff 265163)
-# @spelldesc259495
-  SpellInfo(wildfire_bomb_debuff duration=0.5 channel=0.5 gcd=0 offgcd=1)
 Define(wildfire_bomb 259495)
-# Hurl a bomb at the target, exploding for 265157s1 Fire damage in a cone and coating enemies in wildfire, scorching them for 269747o1 Fire damage over 269747d.
+# Hurl a bomb at the target, exploding for 265157s1 Fire damage in a cone and coating enemies in wildfire, scorching them for 269747o1 Fire damage over 6 seconds.
   SpellInfo(wildfire_bomb cd=18)
   SpellAddTargetDebuff(wildfire_bomb wildfire_bomb_debuff=1)
+Define(wildfire_bomb_debuff 265163)
+# Hurl a bomb at the target, exploding for 265157s1 Fire damage in a cone and coating enemies in wildfire, scorching them for 269747o1 Fire damage over 6 seconds.
+  SpellInfo(wildfire_bomb_debuff duration=0.5 channel=0.5 gcd=0 offgcd=1)
 Define(a_murder_of_crows_talent_survival 12) #22299
-# Summons a flock of crows to attack your target, dealing 131900s1*16 Physical damage over d. If the target dies while under attack, A Murder of Crows' cooldown is reset.
+# Summons a flock of crows to attack your target, dealing 131900s1*16 Physical damage over 15 seconds. If the target dies while under attack, A Murder of Crows' cooldown is reset.
+Define(alpha_predator_talent 3) #22296
+# Kill Command now has s1+1 charges, and deals s2 increased damage.
 Define(barrage_talent_marksmanship 17) #23104
-# Rapidly fires a spray of shots for 120360d, dealing an average of <damageSec> Physical damage to all enemies in front of you. Usable while moving.
+# Rapidly fires a spray of shots for 3 seconds, dealing an average of <damageSec> Physical damage to all enemies in front of you. Usable while moving.
 Define(birds_of_prey_talent 19) #22272
 # Attacking your pet's target with ?s259387[Mongoose Bite][Raptor Strike] or ?s212436[Butchery][Carve] extends the duration of Coordinated Assault by <duration> sec.
 Define(butchery_talent 6) #22297
 # Strike all nearby enemies in a flurry of strikes, inflicting s1 Physical damage to each.rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit, up to s3.
+Define(chakrams_talent 21) #23105
+# Throw a pair of chakrams at your target, slicing all enemies in the chakrams' path for <damage> Physical damage. The chakrams will return to you, damaging enemies again.rnrnYour primary target takes 259398s2 increased damage.
 Define(dire_beast_talent 3) #22282
-# Summons a powerful wild beast that attacks the target and roars, increasing your Haste by 281036s1 for d.
+# Summons a powerful wild beast that attacks the target and roars, increasing your Haste by 281036s1 for 8 seconds.
 Define(double_tap_talent 18) #22287
 # Your next Aimed Shot will fire a second time instantly at s4 power without consuming Focus, or your next Rapid Fire will shoot s3 additional shots during its channel.
 Define(explosive_shot_talent 6) #22498
@@ -199,23 +215,26 @@ Define(hunters_mark_talent 12) #21998
 Define(lethal_shots_talent 16) #23063
 # Steady Shot has a h chance to cause your next Aimed Shot or Rapid Fire to be guaranteed critical strikes.
 Define(mongoose_bite_talent 17) #22278
-# A brutal attack that deals s1 Physical damage and grants you Mongoose Fury.rnrn|cFFFFFFFFMongoose Fury|rrnIncreases the damage of Mongoose Bite by 259388s1 for 259388d, stacking up to 259388u times. Successive attacks do not increase duration.
+# A brutal attack that deals s1 Physical damage and grants you Mongoose Fury.rnrn|cFFFFFFFFMongoose Fury|rrnIncreases the damage of Mongoose Bite by 259388s1 for 14 seconds, stacking up to 259388u times. Successive attacks do not increase duration.
 Define(piercing_shot_talent 21) #22288
 # A powerful shot which deals sw3 Physical damage to the target and up to sw3/(s1/10) Physical damage to all enemies between you and the target. 
 Define(spitting_cobra_talent 21) #22295
-# Summons a Spitting Cobra for d that attacks your target for 206685s1 Nature damage every 2 sec. rnrnWhile the Cobra is active you gain s2 Focus every sec.
+# Summons a Spitting Cobra for 20 seconds that attacks your target for 206685s1 Nature damage every 2 sec. rnrnWhile the Cobra is active you gain s2 Focus every sec.
 Define(stampede_talent 18) #23044
-# Summon a herd of stampeding animals from the wilds around you that deal damage to your enemies for d.
+# Summon a herd of stampeding animals from the wilds around you that deal damage to your enemies for 12 seconds.
 Define(steady_focus_talent 10) #22267
 # Using Steady Shot reduces the cast time of Steady Shot by 193534s1, stacking up to 193534u times.  Using any other shot removes this effect.
+Define(steel_trap_talent 11) #19361
+# Hurls a Steel Trap to the target location that snaps shut on the first enemy that approaches, immobilizing them for 20 seconds and causing them to bleed for 162487o1 damage over 20 seconds. rnrnDamage other than Steel Trap may break the immobilization effect. Trap will exist for 60 seconds. Limit 1.
 Define(terms_of_engagement_talent 2) #22283
-# Harpoon deals 271625s1 Physical damage and generates (265898s1/5)*265898d Focus over 265898d. Killing an enemy resets the cooldown of Harpoon.
+# Harpoon deals 271625s1 Physical damage and generates (265898s1/5)*10 seconds Focus over 10 seconds. Killing an enemy resets the cooldown of Harpoon.
 Define(vipers_venom_talent 1) #22275
 # ?s259387[Mongoose Bite][Raptor Strike] has a chance to make your next Serpent Sting cost no Focus and deal an additional 268552s1 initial damage.
 Define(wildfire_infusion_talent 20) #22301
-# Lace your Wildfire Bomb with extra reagents, randomly giving it one of the following enhancements each time you throw it:rnrn|cFFFFFFFFShrapnel Bomb: |rShrapnel pierces the targets, causing ?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] to apply a bleed for 270343d that stacks up to 270343u times.rnrn|cFFFFFFFFPheromone Bomb: |rKill Command has a 270323s2 chance to reset against targets coated with Pheromones.rnrn|cFFFFFFFFVolatile Bomb: |rReacts violently with poison, causing an extra explosion against enemies suffering from your Serpent Sting and refreshes your Serpent Stings.
+# Lace your Wildfire Bomb with extra reagents, randomly giving it one of the following enhancements each time you throw it:rnrn|cFFFFFFFFShrapnel Bomb: |rShrapnel pierces the targets, causing ?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] to apply a bleed for 9 seconds that stacks up to 270343u times.rnrn|cFFFFFFFFPheromone Bomb: |rKill Command has a 270323s2 chance to reset against targets coated with Pheromones.rnrn|cFFFFFFFFVolatile Bomb: |rReacts violently with poison, causing an extra explosion against enemies suffering from your Serpent Sting and refreshes your Serpent Stings.
 Define(focused_fire_trait 278531)
 Define(in_the_rhythm_trait 264198)
+Define(latent_poison_trait 273283)
 Define(up_close_and_personal_trait 278533)
 Define(venomous_fangs_trait 274590)
     ]]

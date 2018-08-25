@@ -2,6 +2,7 @@ import { readFileSync, writeFileSync } from "fs";
 import { LuaObj } from "@wowts/lua";
 import { ClassId } from "@wowts/wow-mock";
 import { SpecializationName, OVALE_SPECIALIZATION_NAME } from "../PaperDoll";
+import { parseDescription } from "./spellstringparser";
 
 const specIds = {
     SPEC_NONE              : 0,
@@ -1171,25 +1172,6 @@ for (let i = 1; i < classNames.length; i++) {
     if (className !== "PET") classBitToNumber[1 << (i-1)] = className;
 }
 
-function getDuration(duration: number) {
-    return `${duration/1000} second${duration > 1000 ? 's' : ''}`;
-}
-
-export function parseDescription(description: string, spell:SpellData, spellDataById: Map<number, SpellData>) {
-    description = description.replace(/\$d/g, getDuration(spell.duration))
-        .replace(/\$s(\d)/g, (s, c) => {
-            const i = parseInt(c);
-            if (spell.spellEffects && spell.spellEffects.length >= i) {
-                const spellEffect = spell.spellEffects[i - 1];
-                if (spellEffect.sp_coeff) {
-                    return spellEffect.sp_coeff * 100 + "%";
-                }
-            }
-            return s;
-        });
-    return description;
-}
-
 export function getSpellData(directory: string) {
     let output: { [key: string]: any[][] } = {};
     let zone: any[][];
@@ -1353,29 +1335,7 @@ export function getSpellData(directory: string) {
     }
 
     for (const spell of spellData) {
-        if (spell.rank_str === "Rank 2") continue;
-        if (identifiers[spell.identifier]) {
-            const other = spellDataById.get(identifiers[spell.identifier]);
-            if (other.identifierScore === spell.identifierScore) {
-                if (other.className === spell.className && spell.specializationName) {
-                    spell.identifier += "_" + spell.specializationName.toLowerCase();
-                } else if (spell.className && spell.className !== other.className) {
-                    spell.identifier += "_" + spell.className.toLowerCase();
-                } else {
-                    continue;
-                }
-            } else if (other.identifierScore > spell.identifierScore) {
-                continue;
-            }
-        } 
-        identifiers[spell.identifier] = spell.id;
-    }
-
-    for (const spell of spellData) {
-        if (spell.rank_str === "Rank 2" && identifiers[spell.identifier]) {
-            const currentSpell = spellDataById.get(identifiers[spell.identifier]);
-            currentSpell.nextRank = spell;
-        }
+        if (spell.desc) spell.desc = parseDescription(spell.desc, spell, spellDataById);
     }
 
     for (const row of output.spellpower_data_t) {
@@ -1430,7 +1390,34 @@ export function getSpellData(directory: string) {
             const spell = spellDataById.get(talent.spell_id);
             if (spell) {
                 spell.talent = talent;
+                spell.identifierScore += 10;
             }
+        }
+    }
+
+    for (const spell of spellData) {
+        if (spell.rank_str === "Rank 2") continue;
+        if (identifiers[spell.identifier]) {
+            const other = spellDataById.get(identifiers[spell.identifier]);
+            if (other.identifierScore === spell.identifierScore) {
+                if (other.className === spell.className && spell.specializationName) {
+                    spell.identifier += "_" + spell.specializationName.toLowerCase();
+                } else if (spell.className && spell.className !== other.className) {
+                    spell.identifier += "_" + spell.className.toLowerCase();
+                } else {
+                    continue;
+                }
+            } else if (other.identifierScore > spell.identifierScore) {
+                continue;
+            }
+        } 
+        identifiers[spell.identifier] = spell.id;
+    }
+
+    for (const spell of spellData) {
+        if (spell.rank_str === "Rank 2" && identifiers[spell.identifier]) {
+            const currentSpell = spellDataById.get(identifiers[spell.identifier]);
+            currentSpell.nextRank = spell;
         }
     }
 
