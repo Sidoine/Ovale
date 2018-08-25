@@ -102,6 +102,8 @@ local __AzeriteArmor = LibStub:GetLibrary("ovale/AzeriteArmor")
 local OvaleAzerite = __AzeriteArmor.OvaleAzerite
 local __Warlock = LibStub:GetLibrary("ovale/Warlock")
 local OvaleWarlock = __Warlock.OvaleWarlock
+local __Stagger = LibStub:GetLibrary("ovale/Stagger")
+local OvaleStagger = __Stagger.OvaleStagger
 local INFINITY = huge
 local function BossArmorDamageReduction(target, state)
     return 0.3
@@ -2002,8 +2004,14 @@ local function StaggerRemaining(positionalParams, namedParams, state, atTime)
         end
         return Compare(0, comparator, limit)
     end
+local function StaggerTick(positionalParams, namedParams, state, atTime)
+        local count, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[2]
+        local damage = OvaleStagger:LastTickDamage(count)
+        return Compare(damage, comparator, limit)
+    end
     OvaleCondition:RegisterCondition("staggerremaining", false, StaggerRemaining)
     OvaleCondition:RegisterCondition("staggerremains", false, StaggerRemaining)
+    OvaleCondition:RegisterCondition("staggertick", false, StaggerTick)
 end
 do
 local function Stance(positionalParams, namedParams, state, atTime)

@@ -35,6 +35,7 @@ import { baseState } from "./BaseState";
 import { OvaleSpells } from "./Spells";
 import { OvaleAzerite } from "./AzeriteArmor";
 import { OvaleWarlock } from "./Warlock";
+import { OvaleStagger } from "./Stagger";
 let INFINITY = huge;
 
 type BaseState = {};
@@ -4089,8 +4090,30 @@ l    */
         }
         return Compare(0, comparator, limit);
     }
+    /** Get the last Stagger tick damage.
+	 @name StaggerTick
+     @paramsig number or boolean
+     @param count Optional. Counts n amount of previous stagger ticks.
+	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	 @param number Optional. The number to compare against.
+	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	     Defaults to target=player.
+	     Valid values: player, target, focus, pet.
+	 @return Stagger tick damage.
+	 @return A boolean value for the result of the comparison.
+	 @usage
+     if StaggerTick() > 1000 Spell(purifying_brew) #return current tick of stagger
+     or 
+     if StaggerTick(2) > 1000 Spell(purifying_brew) #return two ticks of current stagger
+     */
+    function StaggerTick(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, state: BaseState, atTime: number) {
+        let [count, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[2]];
+        let damage = OvaleStagger.LastTickDamage(count);
+        return Compare(damage, comparator, limit);
+    }
     OvaleCondition.RegisterCondition("staggerremaining", false, StaggerRemaining);
     OvaleCondition.RegisterCondition("staggerremains", false, StaggerRemaining);
+    OvaleCondition.RegisterCondition("staggertick", false, StaggerTick);
 }
 {
     /** Test if the player is in a given stance.

@@ -3872,6 +3872,9 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
             AddSymbol(annotation, buffName);
         } else if (property == "pct") {
             code = format("%sStaggerRemaining() / %sMaxHealth() * 100", target, target);
+        } else if (truthy(match(property, "last_tick_damage_(%d+)"))){
+            let ticks = match(property, "last_tick_damage_(%d+)");
+            code = format("StaggerTick(%d)", ticks);
         } else {
             ok = false;
         }
