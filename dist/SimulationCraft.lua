@@ -429,7 +429,7 @@ end
 
 local MATCHES = {
     [1] = {
-        [1] = "^%d+%a[%w_]*([.:]?[%w_.]*)*",
+        [1] = "^%d+%a[%w_]*[.:]?[%w_.:]*",
         [2] = TokenizeName
     },
     [2] = {
@@ -437,7 +437,7 @@ local MATCHES = {
         [2] = TokenizeNumber
     },
     [3] = {
-        [1] = "^[%a_][%w_]*([.:]?[%w_.]*)*",
+        [1] = "^[%a_][%w_]*[.:]?[%w_.:]*",
         [2] = TokenizeName
     },
     [4] = {
@@ -467,6 +467,10 @@ local MATCHES = {
     [10] = {
         [1] = "^$",
         [2] = NoToken
+    },
+    [11] = {
+        [1] = "^:",
+        [2] = Tokenize
     }
 }
 local GetPrecedence = function(node)

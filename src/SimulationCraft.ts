@@ -109,7 +109,7 @@ interface ChildParseNode extends LuaArray<ParseNode> {
     choose?: ParseNode;
     slot?: ParseNode;
     sec?: ParseNode;
-
+    if?: ParseNode;
     op?: ParseNode;
     name?: ParseNode;
     value?: ParseNode;
@@ -560,7 +560,7 @@ const NoToken:Tokenizer = function() {
 }
 const MATCHES:LuaArray<TokenizerDefinition> = {
     1: {
-        1: "^%d+%a[%w_]*([.:]?[%w_.]*)*",
+        1: "^%d+%a[%w_]*[.:]?[%w_.:]*",
         2: TokenizeName
     },
     2: {
@@ -568,7 +568,7 @@ const MATCHES:LuaArray<TokenizerDefinition> = {
         2: TokenizeNumber
     },
     3: {
-        1: "^[%a_][%w_]*([.:]?[%w_.]*)*",
+        1: "^[%a_][%w_]*[.:]?[%w_.:]*",
         2: TokenizeName
     },
     4: {
@@ -598,6 +598,10 @@ const MATCHES:LuaArray<TokenizerDefinition> = {
     10: {
         1: "^$",
         2: NoToken
+    },
+    11: {
+        1: "^:",
+        2: Tokenize
     }
 }
 
@@ -736,7 +740,6 @@ let ParseNumber: ParseFunction = undefined;
 let ParseOperand: ParseFunction = undefined;
 let ParseParentheses: ParseFunction = undefined;
 let ParseSimpleExpression: ParseFunction = undefined;
-// let ParseIdentifer: ParseFunction = undefined;
 
 const TicksRemainTranslationHelper = function(p1: string, p2: string, p3: string, p4: string) {
     if (p4) {
@@ -801,7 +804,7 @@ const ParseAction = function (action: string, nodeList: ChildParseNode, annotati
         while (ok && tokenType) {
             if (tokenType == ",") {
                 tokenStream.Consume();
-                let modifier: any, expressionNode: ScNode;
+                let modifier: string, expressionNode: ScNode;
                 [ok, modifier, expressionNode] = ParseModifier(tokenStream, nodeList, annotation);
                 if (ok) {
                     child[modifier] = expressionNode;
@@ -981,11 +984,11 @@ const ParseIdentifier = function (tokenStream: OvaleLexer, nodeList: ChildParseN
     let node = NewNode(nodeList);
     node.type = "operand";
     node.name = token;
-    annotation.operand = annotation.operand || {
-    }
+    annotation.operand = annotation.operand || {};
     annotation.operand[lualength(annotation.operand) + 1] = node;
     return [true, node];
 }
+
 ParseModifier = function (tokenStream: OvaleLexer, nodeList, annotation) {
     let ok = true;
     let name: string;

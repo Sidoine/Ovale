@@ -265,7 +265,7 @@ AddFunction ElementalDefaultShortCdPostConditions
 AddFunction ElementalDefaultCdActions
 {
  #bloodlust,if=target.health.pct<25|time>0.500
- if target.HealthPercent() < 25 or TimeInCombat() > 0 ElementalBloodlust()
+ if target.HealthPercent() < 25 or TimeInCombat() > 0.5 ElementalBloodlust()
  #potion
  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_intellect usable=1)
  #wind_shear
@@ -675,7 +675,7 @@ AddFunction EnhancementCdsShortCdPostConditions
 AddFunction EnhancementCdsCdActions
 {
  #bloodlust,if=target.health.pct<25|time>0.500
- if target.HealthPercent() < 25 or TimeInCombat() > 0 EnhancementBloodlust()
+ if target.HealthPercent() < 25 or TimeInCombat() > 0.5 EnhancementBloodlust()
  #berserking,if=(talent.ascendance.enabled&buff.ascendance.up)|(talent.elemental_spirits.enabled&feral_spirit.remains>5)|(!talent.ascendance.enabled&!talent.elemental_spirits.enabled)
  if Talent(ascendance_talent_enhancement) and BuffPresent(ascendance_enhancement_buff) or Talent(elemental_spirits_talent) and TotemRemaining(sprit_wolf) > 5 or not Talent(ascendance_talent_enhancement) and not Talent(elemental_spirits_talent) Spell(berserking)
  #blood_fury,if=(talent.ascendance.enabled&(buff.ascendance.up|cooldown.ascendance.remains>50))|(!talent.ascendance.enabled&(feral_spirit.remains>5|cooldown.feral_spirit.remains>50))
@@ -705,7 +705,7 @@ AddFunction EnhancementBuffsMainActions
  #crash_lightning,if=!buff.crash_lightning.up&active_enemies>1&variable.furyCheck25
  if not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck25() Spell(crash_lightning)
  #rockbiter,if=talent.landslide.enabled&!buff.landslide.up&charges_fractional>1.7
- if Talent(landslide_talent) and not BuffPresent(landslide_buff) and Charges(rockbiter count=0) > 1 Spell(rockbiter)
+ if Talent(landslide_talent) and not BuffPresent(landslide_buff) and Charges(rockbiter count=0) > 1.7 Spell(rockbiter)
  #fury_of_air,if=!ticking&maelstrom>=20
  if not target.DebuffPresent(fury_of_air_debuff) and Maelstrom() >= 20 Spell(fury_of_air)
  #flametongue,if=!buff.flametongue.up
@@ -713,9 +713,9 @@ AddFunction EnhancementBuffsMainActions
  #frostbrand,if=talent.hailstorm.enabled&!buff.frostbrand.up&variable.furyCheck25
  if Talent(hailstorm_talent) and not BuffPresent(frostbrand_buff) and furyCheck25() Spell(frostbrand)
  #flametongue,if=buff.flametongue.remains<4.8+gcd
- if BuffRemaining(flametongue_buff) < 4 + GCD() Spell(flametongue)
+ if BuffRemaining(flametongue_buff) < 4.8 + GCD() Spell(flametongue)
  #frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<4.8+gcd&variable.furyCheck25
- if Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4 + GCD() and furyCheck25() Spell(frostbrand)
+ if Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 + GCD() and furyCheck25() Spell(frostbrand)
  #totem_mastery,if=buff.resonance_totem.remains<2
  if TotemRemaining(totem_mastery) < 2 Spell(totem_mastery_enhancement)
 }
@@ -730,7 +730,7 @@ AddFunction EnhancementBuffsShortCdActions
 
 AddFunction EnhancementBuffsShortCdPostConditions
 {
- not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck25() and Spell(crash_lightning) or Talent(landslide_talent) and not BuffPresent(landslide_buff) and Charges(rockbiter count=0) > 1 and Spell(rockbiter) or not target.DebuffPresent(fury_of_air_debuff) and Maelstrom() >= 20 and Spell(fury_of_air) or not BuffPresent(flametongue_buff) and Spell(flametongue) or Talent(hailstorm_talent) and not BuffPresent(frostbrand_buff) and furyCheck25() and Spell(frostbrand) or BuffRemaining(flametongue_buff) < 4 + GCD() and Spell(flametongue) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4 + GCD() and furyCheck25() and Spell(frostbrand) or TotemRemaining(totem_mastery) < 2 and Spell(totem_mastery_enhancement)
+ not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck25() and Spell(crash_lightning) or Talent(landslide_talent) and not BuffPresent(landslide_buff) and Charges(rockbiter count=0) > 1.7 and Spell(rockbiter) or not target.DebuffPresent(fury_of_air_debuff) and Maelstrom() >= 20 and Spell(fury_of_air) or not BuffPresent(flametongue_buff) and Spell(flametongue) or Talent(hailstorm_talent) and not BuffPresent(frostbrand_buff) and furyCheck25() and Spell(frostbrand) or BuffRemaining(flametongue_buff) < 4.8 + GCD() and Spell(flametongue) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 + GCD() and furyCheck25() and Spell(frostbrand) or TotemRemaining(totem_mastery) < 2 and Spell(totem_mastery_enhancement)
 }
 
 AddFunction EnhancementBuffsCdActions
@@ -739,7 +739,7 @@ AddFunction EnhancementBuffsCdActions
 
 AddFunction EnhancementBuffsCdPostConditions
 {
- not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck25() and Spell(crash_lightning) or Talent(landslide_talent) and not BuffPresent(landslide_buff) and Charges(rockbiter count=0) > 1 and Spell(rockbiter) or not target.DebuffPresent(fury_of_air_debuff) and Maelstrom() >= 20 and Spell(fury_of_air) or not BuffPresent(flametongue_buff) and Spell(flametongue) or Talent(hailstorm_talent) and not BuffPresent(frostbrand_buff) and furyCheck25() and Spell(frostbrand) or BuffRemaining(flametongue_buff) < 4 + GCD() and Spell(flametongue) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4 + GCD() and furyCheck25() and Spell(frostbrand) or TotemRemaining(totem_mastery) < 2 and Spell(totem_mastery_enhancement)
+ not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck25() and Spell(crash_lightning) or Talent(landslide_talent) and not BuffPresent(landslide_buff) and Charges(rockbiter count=0) > 1.7 and Spell(rockbiter) or not target.DebuffPresent(fury_of_air_debuff) and Maelstrom() >= 20 and Spell(fury_of_air) or not BuffPresent(flametongue_buff) and Spell(flametongue) or Talent(hailstorm_talent) and not BuffPresent(frostbrand_buff) and furyCheck25() and Spell(frostbrand) or BuffRemaining(flametongue_buff) < 4.8 + GCD() and Spell(flametongue) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 + GCD() and furyCheck25() and Spell(frostbrand) or TotemRemaining(totem_mastery) < 2 and Spell(totem_mastery_enhancement)
 }
 
 ### actions.asc
@@ -749,7 +749,7 @@ AddFunction EnhancementAscMainActions
  #crash_lightning,if=!buff.crash_lightning.up&active_enemies>1&variable.furyCheck25
  if not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck25() Spell(crash_lightning)
  #rockbiter,if=talent.landslide.enabled&!buff.landslide.up&charges_fractional>1.7
- if Talent(landslide_talent) and not BuffPresent(landslide_buff) and Charges(rockbiter count=0) > 1 Spell(rockbiter)
+ if Talent(landslide_talent) and not BuffPresent(landslide_buff) and Charges(rockbiter count=0) > 1.7 Spell(rockbiter)
  #windstrike
  Spell(windstrike)
 }
@@ -764,7 +764,7 @@ AddFunction EnhancementAscShortCdActions
 
 AddFunction EnhancementAscShortCdPostConditions
 {
- not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck25() and Spell(crash_lightning) or Talent(landslide_talent) and not BuffPresent(landslide_buff) and Charges(rockbiter count=0) > 1 and Spell(rockbiter) or Spell(windstrike)
+ not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck25() and Spell(crash_lightning) or Talent(landslide_talent) and not BuffPresent(landslide_buff) and Charges(rockbiter count=0) > 1.7 and Spell(rockbiter) or Spell(windstrike)
 }
 
 AddFunction EnhancementAscCdActions
@@ -773,7 +773,7 @@ AddFunction EnhancementAscCdActions
 
 AddFunction EnhancementAscCdPostConditions
 {
- not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck25() and Spell(crash_lightning) or Talent(landslide_talent) and not BuffPresent(landslide_buff) and Charges(rockbiter count=0) > 1 and Spell(rockbiter) or Spell(windstrike)
+ not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck25() and Spell(crash_lightning) or Talent(landslide_talent) and not BuffPresent(landslide_buff) and Charges(rockbiter count=0) > 1.7 and Spell(rockbiter) or Spell(windstrike)
 }
 
 ### actions.default
