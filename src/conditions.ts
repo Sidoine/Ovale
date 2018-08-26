@@ -965,7 +965,7 @@ function GetHastedTime(seconds: number, haste: HasteType, state: BaseState) {
         } else if (UnitExists("boss1") && OvaleGUID.UnitGUID(target) == OvaleGUID.UnitGUID("boss1")) {
             targetClassification = "worldboss";
         } else {
-            let aura = OvaleAura.GetAura(target, IMBUED_BUFF_ID, atTime, "debuff", false);
+            let aura = OvaleAura.GetAura(target, IMBUED_BUFF_ID, atTime, "HARMFUL", false);
             if (OvaleAura.IsActiveAura(aura, atTime)) {
                 targetClassification = "worldboss";
             } else {

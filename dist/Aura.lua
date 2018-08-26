@@ -69,14 +69,12 @@ do
                     get = function(info)
                         wipe(output)
                         local now = GetTime()
-                        local harmfulFilter = (Ovale.db.profile.apparence.fullAuraScan) and "HARMFUL" or "HARMFUL|PLAYER"
-                        local helpfulFilter = (Ovale.db.profile.apparence.fullAuraScan) and "HELPFUL" or "HELPFUL|PLAYER"
-                        local helpful = __exports.OvaleAura:DebugUnitAuras("player", helpfulFilter, now)
+                        local helpful = __exports.OvaleAura:DebugUnitAuras("player", "HELPFUL", now)
                         if helpful then
                             output[#output + 1] = "== BUFFS =="
                             output[#output + 1] = helpful
                         end
-                        local harmful = __exports.OvaleAura:DebugUnitAuras("player", harmfulFilter, now)
+                        local harmful = __exports.OvaleAura:DebugUnitAuras("player", "HARMFUL", now)
                         if harmful then
                             output[#output + 1] = "== DEBUFFS =="
                             output[#output + 1] = harmful
@@ -99,14 +97,12 @@ do
                     get = function(info)
                         wipe(output)
                         local now = GetTime()
-                        local harmfulFilter = (Ovale.db.profile.apparence.fullAuraScan) and "HARMFUL" or "HARMFUL|PLAYER"
-                        local helpfulFilter = (Ovale.db.profile.apparence.fullAuraScan) and "HELPFUL" or "HELPFUL|PLAYER"
-                        local helpful = __exports.OvaleAura:DebugUnitAuras("target", helpfulFilter, now)
+                        local helpful = __exports.OvaleAura:DebugUnitAuras("target", "HELPFUL", now)
                         if helpful then
                             output[#output + 1] = "== BUFFS =="
                             output[#output + 1] = helpful
                         end
-                        local harmful = __exports.OvaleAura:DebugUnitAuras("target", harmfulFilter, now)
+                        local harmful = __exports.OvaleAura:DebugUnitAuras("target", "HARMFUL", now)
                         if harmful then
                             output[#output + 1] = "== DEBUFFS =="
                             output[#output + 1] = harmful
@@ -720,7 +716,8 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                     if debuffType == "" then
                         debuffType = "Enrage"
                     end
-                    self:GainedAuraOnGUID(guid, now, spellId, casterGUID, filter, true, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3)
+                    local auraType = (filter == "HARMFUL|PLAYER" and "HARMFUL") or "HELPFUL"
+                    self:GainedAuraOnGUID(guid, now, spellId, casterGUID, auraType, true, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3)
                     i = i + 1
                 end
             end
@@ -759,7 +756,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                 for _, aura in pairs(whoseTable) do
                     if self:IsActiveAura(aura, atTime) and aura.filter == filter and  not aura.state then
                         local name = aura.name or "Unknown spell"
-                        insert(array, name .. ": " .. auraId)
+                        insert(array, name .. ": " .. auraId .. " " .. (aura.debuffType or "nil") .. " enrage=" .. (aura.enrage and 1 or 0))
                     end
                 end
             end
@@ -769,7 +766,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                 for _, aura in pairs(whoseTable) do
                     if self:IsActiveAura(aura, atTime) and aura.filter == filter then
                         local name = aura.name or "Unknown spell"
-                        insert(array, name .. ": " .. auraId)
+                        insert(array, name .. ": " .. auraId .. " " .. (aura.debuffType or "nil") .. " enrage=" .. (aura.enrage and 1 or 0))
                     end
                 end
             end

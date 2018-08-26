@@ -4,6 +4,7 @@ import { next, LuaObj } from "@wowts/lua";
 import { huge } from "@wowts/math";
 import { baseState } from "./BaseState";
 import { PositionalParameters, NamedParameters } from "./AST";
+import { AuraType } from "./Data";
 let OvaleConditionBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleCondition"));
 export let OvaleCondition: OvaleConditionClass;
 let INFINITY = huge;
@@ -55,13 +56,13 @@ class OvaleConditionClass extends OvaleConditionBase {
 
 OvaleCondition = new OvaleConditionClass();
 
-export function ParseCondition(positionalParams: PositionalParameters, namedParams: NamedParameters, state: BaseState, defaultTarget?: string):[string, "HARMFUL" | "HELPFUL", boolean] {
+export function ParseCondition(positionalParams: PositionalParameters, namedParams: NamedParameters, state: BaseState, defaultTarget?: string):[string, AuraType, boolean] {
     let target = namedParams.target || defaultTarget || "player";
     namedParams.target = namedParams.target || target;
     if (target == "target") {
         target = baseState.next.defaultTarget;
     }
-    let filter: "HARMFUL" | "HELPFUL";
+    let filter: AuraType;
     if (namedParams.filter) {
         if (namedParams.filter == "debuff") {
             filter = "HARMFUL";

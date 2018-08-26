@@ -11,8 +11,6 @@ local pairs = pairs
 local GetTime = GetTime
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local find = string.find
-local __Options = LibStub:GetLibrary("ovale/Options")
-local OvaleOptions = __Options.OvaleOptions
 local __Aura = LibStub:GetLibrary("ovale/Aura")
 local OvaleAura = __Aura.OvaleAura
 local __PaperDoll = LibStub:GetLibrary("ovale/PaperDoll")
@@ -150,15 +148,13 @@ local OvaleWarlockClass = __class(OvaleWarlockBase, {
     AddCustomAura = function(self, customId, stacks, duration, buffName)
         local now = GetTime()
         local expire = now + duration
-        local filter = OvaleOptions.defaultDB.profile.apparence.fullAuraScan and "HELPFUL" or "HELPFUL|PLAYER"
-        OvaleAura:GainedAuraOnGUID(Ovale.playerGUID, now, customId, Ovale.playerGUID, filter, false, nil, stacks, nil, duration, expire, false, buffName, nil, nil, nil)
+        OvaleAura:GainedAuraOnGUID(Ovale.playerGUID, now, customId, Ovale.playerGUID, "HELPFUL", false, nil, stacks, nil, duration, expire, false, buffName, nil, nil, nil)
     end,
     TimeToShard = function(self, now)
-        local filter = OvaleOptions.defaultDB.profile.apparence.fullAuraScan and "HARMFUL" or "HARMFUL|PLAYER"
         local value = 3600
         local creepingDeathTalent = 20
         local tickTime = 2 / OvalePaperDoll:GetHasteMultiplier("spell", OvalePaperDoll.next)
-        local activeAgonies = OvaleAura:AuraCount(980, filter, true, nil, now, nil)
+        local activeAgonies = OvaleAura:AuraCount(980, "HARMFUL", true, nil, now, nil)
         if activeAgonies > 0 then
             value = 1 / (0.184 * pow(activeAgonies, -2 / 3)) * tickTime / activeAgonies
             if OvaleSpellBook:IsKnownTalent(creepingDeathTalent) then
