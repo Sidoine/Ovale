@@ -83,7 +83,7 @@ AddFunction BeastmasteryDefaultMainActions
  #dire_beast
  Spell(dire_beast)
  #barbed_shot,if=pet.cat.buff.frenzy.down&charges_fractional>1.8|target.time_to_die<9
- if pet.BuffExpires(pet_frenzy_buff) and Charges(barbed_shot count=0) > 1 or target.TimeToDie() < 9 Spell(barbed_shot)
+ if pet.BuffExpires(pet_frenzy_buff) and Charges(barbed_shot count=0) > 1.8 or target.TimeToDie() < 9 Spell(barbed_shot)
  #multishot,if=spell_targets>1&(pet.cat.buff.beast_cleave.remains<gcd.max|pet.cat.buff.beast_cleave.down)
  if Enemies() > 1 and { pet.BuffRemaining(pet_beast_cleave_buff) < GCD() or pet.BuffExpires(pet_beast_cleave_buff) } Spell(multishot_bm)
  #cobra_shot,if=(active_enemies<2|cooldown.kill_command.remains>focus.time_to_max)&(focus-cost+focus.regen*(cooldown.kill_command.remains-1)>action.kill_command.cost|cooldown.kill_command.remains>1+gcd)&cooldown.kill_command.remains>1
@@ -109,7 +109,7 @@ AddFunction BeastmasteryDefaultShortCdActions
 
 AddFunction BeastmasteryDefaultShortCdPostConditions
 {
- { SpellFullRecharge(barbed_shot) < GCD() or pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() } and Spell(barbed_shot) or Enemies() > 2 and { pet.BuffRemaining(pet_beast_cleave_buff) < GCD() or pet.BuffExpires(pet_beast_cleave_buff) } and Spell(multishot_bm) or Spell(chimaera_shot) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and Charges(barbed_shot count=0) > 1 or target.TimeToDie() < 9 } and Spell(barbed_shot) or Enemies() > 1 and { pet.BuffRemaining(pet_beast_cleave_buff) < GCD() or pet.BuffExpires(pet_beast_cleave_buff) } and Spell(multishot_bm) or { Enemies() < 2 or SpellCooldown(kill_command) > TimeToMaxFocus() } and { Focus() - PowerCost(cobra_shot) + FocusRegenRate() * { SpellCooldown(kill_command) - 1 } > PowerCost(kill_command) or SpellCooldown(kill_command) > 1 + GCD() } and SpellCooldown(kill_command) > 1 and Spell(cobra_shot)
+ { SpellFullRecharge(barbed_shot) < GCD() or pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() } and Spell(barbed_shot) or Enemies() > 2 and { pet.BuffRemaining(pet_beast_cleave_buff) < GCD() or pet.BuffExpires(pet_beast_cleave_buff) } and Spell(multishot_bm) or Spell(chimaera_shot) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and Charges(barbed_shot count=0) > 1.8 or target.TimeToDie() < 9 } and Spell(barbed_shot) or Enemies() > 1 and { pet.BuffRemaining(pet_beast_cleave_buff) < GCD() or pet.BuffExpires(pet_beast_cleave_buff) } and Spell(multishot_bm) or { Enemies() < 2 or SpellCooldown(kill_command) > TimeToMaxFocus() } and { Focus() - PowerCost(cobra_shot) + FocusRegenRate() * { SpellCooldown(kill_command) - 1 } > PowerCost(kill_command) or SpellCooldown(kill_command) > 1 + GCD() } and SpellCooldown(kill_command) > 1 and Spell(cobra_shot)
 }
 
 AddFunction BeastmasteryDefaultCdActions
@@ -137,7 +137,7 @@ AddFunction BeastmasteryDefaultCdActions
   #aspect_of_the_wild
   Spell(aspect_of_the_wild)
 
-  unless not BuffPresent(bestial_wrath_buff) and Spell(bestial_wrath) or Enemies() > 2 and { pet.BuffRemaining(pet_beast_cleave_buff) < GCD() or pet.BuffExpires(pet_beast_cleave_buff) } and Spell(multishot_bm) or Spell(chimaera_shot) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and Charges(barbed_shot count=0) > 1 or target.TimeToDie() < 9 } and Spell(barbed_shot) or Enemies() > 1 and { pet.BuffRemaining(pet_beast_cleave_buff) < GCD() or pet.BuffExpires(pet_beast_cleave_buff) } and Spell(multishot_bm) or { Enemies() < 2 or SpellCooldown(kill_command) > TimeToMaxFocus() } and { Focus() - PowerCost(cobra_shot) + FocusRegenRate() * { SpellCooldown(kill_command) - 1 } > PowerCost(kill_command) or SpellCooldown(kill_command) > 1 + GCD() } and SpellCooldown(kill_command) > 1 and Spell(cobra_shot)
+  unless not BuffPresent(bestial_wrath_buff) and Spell(bestial_wrath) or Enemies() > 2 and { pet.BuffRemaining(pet_beast_cleave_buff) < GCD() or pet.BuffExpires(pet_beast_cleave_buff) } and Spell(multishot_bm) or Spell(chimaera_shot) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and Charges(barbed_shot count=0) > 1.8 or target.TimeToDie() < 9 } and Spell(barbed_shot) or Enemies() > 1 and { pet.BuffRemaining(pet_beast_cleave_buff) < GCD() or pet.BuffExpires(pet_beast_cleave_buff) } and Spell(multishot_bm) or { Enemies() < 2 or SpellCooldown(kill_command) > TimeToMaxFocus() } and { Focus() - PowerCost(cobra_shot) + FocusRegenRate() * { SpellCooldown(kill_command) - 1 } > PowerCost(kill_command) or SpellCooldown(kill_command) > 1 + GCD() } and SpellCooldown(kill_command) > 1 and Spell(cobra_shot)
   {
    #arcane_torrent
    Spell(arcane_torrent_focus)
@@ -147,7 +147,7 @@ AddFunction BeastmasteryDefaultCdActions
 
 AddFunction BeastmasteryDefaultCdPostConditions
 {
- { SpellFullRecharge(barbed_shot) < GCD() or pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() } and Spell(barbed_shot) or Spell(a_murder_of_crows) or Spell(spitting_cobra) or not BuffPresent(bestial_wrath_buff) and Spell(bestial_wrath) or Enemies() > 2 and { pet.BuffRemaining(pet_beast_cleave_buff) < GCD() or pet.BuffExpires(pet_beast_cleave_buff) } and Spell(multishot_bm) or Spell(chimaera_shot) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and Charges(barbed_shot count=0) > 1 or target.TimeToDie() < 9 } and Spell(barbed_shot) or Enemies() > 1 and { pet.BuffRemaining(pet_beast_cleave_buff) < GCD() or pet.BuffExpires(pet_beast_cleave_buff) } and Spell(multishot_bm) or { Enemies() < 2 or SpellCooldown(kill_command) > TimeToMaxFocus() } and { Focus() - PowerCost(cobra_shot) + FocusRegenRate() * { SpellCooldown(kill_command) - 1 } > PowerCost(kill_command) or SpellCooldown(kill_command) > 1 + GCD() } and SpellCooldown(kill_command) > 1 and Spell(cobra_shot)
+ { SpellFullRecharge(barbed_shot) < GCD() or pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() } and Spell(barbed_shot) or Spell(a_murder_of_crows) or Spell(spitting_cobra) or not BuffPresent(bestial_wrath_buff) and Spell(bestial_wrath) or Enemies() > 2 and { pet.BuffRemaining(pet_beast_cleave_buff) < GCD() or pet.BuffExpires(pet_beast_cleave_buff) } and Spell(multishot_bm) or Spell(chimaera_shot) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and Charges(barbed_shot count=0) > 1.8 or target.TimeToDie() < 9 } and Spell(barbed_shot) or Enemies() > 1 and { pet.BuffRemaining(pet_beast_cleave_buff) < GCD() or pet.BuffExpires(pet_beast_cleave_buff) } and Spell(multishot_bm) or { Enemies() < 2 or SpellCooldown(kill_command) > TimeToMaxFocus() } and { Focus() - PowerCost(cobra_shot) + FocusRegenRate() * { SpellCooldown(kill_command) - 1 } > PowerCost(kill_command) or SpellCooldown(kill_command) > 1 + GCD() } and SpellCooldown(kill_command) > 1 and Spell(cobra_shot)
 }
 
 ### Beastmastery icons.
@@ -472,7 +472,7 @@ AddFunction MarksmanshipCdsCdActions
   #potion,if=(buff.trueshot.react&buff.bloodlust.react)|((consumable.prolonged_power&target.time_to_die<62)|target.time_to_die<31)
   if { BuffPresent(trueshot_buff) and BuffPresent(burst_haste_buff any=1) or BuffPresent(prolonged_power_buff) and target.TimeToDie() < 62 or target.TimeToDie() < 31 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(rising_death usable=1)
   #trueshot,if=cooldown.aimed_shot.charges<1|talent.barrage.enabled&cooldown.aimed_shot.charges_fractional<1.3
-  if SpellCharges(aimed_shot) < 1 or Talent(barrage_talent_marksmanship) and SpellCharges(aimed_shot count=0) < 1 Spell(trueshot)
+  if SpellCharges(aimed_shot) < 1 or Talent(barrage_talent_marksmanship) and SpellCharges(aimed_shot count=0) < 1.3 Spell(trueshot)
  }
 }
 

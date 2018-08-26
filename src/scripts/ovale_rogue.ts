@@ -226,7 +226,7 @@ AddFunction AssassinationCdsMainPostConditions
 AddFunction AssassinationCdsShortCdActions
 {
  #marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit*1.5|(raid_event.adds.in>40&combo_points.deficit>=cp_max_spend)
- if target.TimeToDie() < ComboPointsDeficit() * 1 or 600 > 40 and ComboPointsDeficit() >= MaxComboPoints() Spell(marked_for_death)
+ if target.TimeToDie() < ComboPointsDeficit() * 1.5 or 600 > 40 and ComboPointsDeficit() >= MaxComboPoints() Spell(marked_for_death)
  #vanish,if=talent.exsanguinate.enabled&(talent.nightstalker.enabled|talent.subterfuge.enabled&spell_targets.fan_of_knives<2)&combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1
  if Talent(exsanguinate_talent) and { Talent(nightstalker_talent) or Talent(subterfuge_talent) and Enemies() < 2 } and ComboPoints() >= MaxComboPoints() and SpellCooldown(exsanguinate) < 1 and CheckBoxOn(opt_vanish) Spell(vanish)
  #vanish,if=talent.nightstalker.enabled&!talent.exsanguinate.enabled&combo_points>=cp_max_spend&debuff.vendetta.up
@@ -257,7 +257,7 @@ AddFunction AssassinationCdsCdActions
  #ancestral_call,if=debuff.vendetta.up
  if target.DebuffPresent(vendetta_debuff) Spell(ancestral_call)
 
- unless { target.TimeToDie() < ComboPointsDeficit() * 1 or 600 > 40 and ComboPointsDeficit() >= MaxComboPoints() } and Spell(marked_for_death)
+ unless { target.TimeToDie() < ComboPointsDeficit() * 1.5 or 600 > 40 and ComboPointsDeficit() >= MaxComboPoints() } and Spell(marked_for_death)
  {
   #vendetta,if=dot.rupture.ticking
   if target.DebuffPresent(rupture_debuff) Spell(vendetta)
@@ -266,7 +266,7 @@ AddFunction AssassinationCdsCdActions
 
 AddFunction AssassinationCdsCdPostConditions
 {
- { target.TimeToDie() < ComboPointsDeficit() * 1 or 600 > 40 and ComboPointsDeficit() >= MaxComboPoints() } and Spell(marked_for_death) or Talent(exsanguinate_talent) and { Talent(nightstalker_talent) or Talent(subterfuge_talent) and Enemies() < 2 } and ComboPoints() >= MaxComboPoints() and SpellCooldown(exsanguinate) < 1 and CheckBoxOn(opt_vanish) and Spell(vanish) or Talent(nightstalker_talent) and not Talent(exsanguinate_talent) and ComboPoints() >= MaxComboPoints() and target.DebuffPresent(vendetta_debuff) and CheckBoxOn(opt_vanish) and Spell(vanish) or Talent(subterfuge_talent) and { not Talent(exsanguinate_talent) or Enemies() >= 2 } and not Stealthed() and not SpellCooldown(garrote) > 0 and target.DebuffRefreshable(garrote_debuff) and { Enemies() <= 3 and ComboPointsDeficit() >= 1 + Enemies() or Enemies() >= 4 and ComboPointsDeficit() >= 4 } and CheckBoxOn(opt_vanish) and Spell(vanish) or Talent(master_assassin_talent) and not Stealthed() and BuffRemaining(master_assassin_buff) <= 0 and not target.DebuffRefreshable(rupture_debuff) and CheckBoxOn(opt_vanish) and Spell(vanish) or target.DebuffRemaining(rupture_debuff) > 4 + 4 * MaxComboPoints() and not target.DebuffRefreshable(garrote_debuff) and Spell(exsanguinate) or target.DebuffPresent(rupture_debuff) and Spell(toxic_blade)
+ { target.TimeToDie() < ComboPointsDeficit() * 1.5 or 600 > 40 and ComboPointsDeficit() >= MaxComboPoints() } and Spell(marked_for_death) or Talent(exsanguinate_talent) and { Talent(nightstalker_talent) or Talent(subterfuge_talent) and Enemies() < 2 } and ComboPoints() >= MaxComboPoints() and SpellCooldown(exsanguinate) < 1 and CheckBoxOn(opt_vanish) and Spell(vanish) or Talent(nightstalker_talent) and not Talent(exsanguinate_talent) and ComboPoints() >= MaxComboPoints() and target.DebuffPresent(vendetta_debuff) and CheckBoxOn(opt_vanish) and Spell(vanish) or Talent(subterfuge_talent) and { not Talent(exsanguinate_talent) or Enemies() >= 2 } and not Stealthed() and not SpellCooldown(garrote) > 0 and target.DebuffRefreshable(garrote_debuff) and { Enemies() <= 3 and ComboPointsDeficit() >= 1 + Enemies() or Enemies() >= 4 and ComboPointsDeficit() >= 4 } and CheckBoxOn(opt_vanish) and Spell(vanish) or Talent(master_assassin_talent) and not Stealthed() and BuffRemaining(master_assassin_buff) <= 0 and not target.DebuffRefreshable(rupture_debuff) and CheckBoxOn(opt_vanish) and Spell(vanish) or target.DebuffRemaining(rupture_debuff) > 4 + 4 * MaxComboPoints() and not target.DebuffRefreshable(garrote_debuff) and Spell(exsanguinate) or target.DebuffPresent(rupture_debuff) and Spell(toxic_blade)
 }
 
 ### actions.default
@@ -702,7 +702,7 @@ AddFunction AssassinationCdsMainPostConditions
 AddFunction AssassinationCdsShortCdActions
 {
  #marked_for_death,target_if=min:target.time_to_die,if=target.time_to_die<combo_points.deficit*1.5|(raid_event.adds.in>40&combo_points.deficit>=cp_max_spend)
- if target.TimeToDie() < ComboPointsDeficit() * 1 or 600 > 40 and ComboPointsDeficit() >= MaxComboPoints() Spell(marked_for_death)
+ if target.TimeToDie() < ComboPointsDeficit() * 1.5 or 600 > 40 and ComboPointsDeficit() >= MaxComboPoints() Spell(marked_for_death)
  #vanish,if=talent.exsanguinate.enabled&(talent.nightstalker.enabled|talent.subterfuge.enabled&spell_targets.fan_of_knives<2)&combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1
  if Talent(exsanguinate_talent) and { Talent(nightstalker_talent) or Talent(subterfuge_talent) and Enemies() < 2 } and ComboPoints() >= MaxComboPoints() and SpellCooldown(exsanguinate) < 1 and CheckBoxOn(opt_vanish) Spell(vanish)
  #vanish,if=talent.nightstalker.enabled&!talent.exsanguinate.enabled&combo_points>=cp_max_spend&debuff.vendetta.up
@@ -733,7 +733,7 @@ AddFunction AssassinationCdsCdActions
  #ancestral_call,if=debuff.vendetta.up
  if target.DebuffPresent(vendetta_debuff) Spell(ancestral_call)
 
- unless { target.TimeToDie() < ComboPointsDeficit() * 1 or 600 > 40 and ComboPointsDeficit() >= MaxComboPoints() } and Spell(marked_for_death)
+ unless { target.TimeToDie() < ComboPointsDeficit() * 1.5 or 600 > 40 and ComboPointsDeficit() >= MaxComboPoints() } and Spell(marked_for_death)
  {
   #vendetta,if=dot.rupture.ticking
   if target.DebuffPresent(rupture_debuff) Spell(vendetta)
@@ -742,7 +742,7 @@ AddFunction AssassinationCdsCdActions
 
 AddFunction AssassinationCdsCdPostConditions
 {
- { target.TimeToDie() < ComboPointsDeficit() * 1 or 600 > 40 and ComboPointsDeficit() >= MaxComboPoints() } and Spell(marked_for_death) or Talent(exsanguinate_talent) and { Talent(nightstalker_talent) or Talent(subterfuge_talent) and Enemies() < 2 } and ComboPoints() >= MaxComboPoints() and SpellCooldown(exsanguinate) < 1 and CheckBoxOn(opt_vanish) and Spell(vanish) or Talent(nightstalker_talent) and not Talent(exsanguinate_talent) and ComboPoints() >= MaxComboPoints() and target.DebuffPresent(vendetta_debuff) and CheckBoxOn(opt_vanish) and Spell(vanish) or Talent(subterfuge_talent) and { not Talent(exsanguinate_talent) or Enemies() >= 2 } and not Stealthed() and not SpellCooldown(garrote) > 0 and target.DebuffRefreshable(garrote_debuff) and { Enemies() <= 3 and ComboPointsDeficit() >= 1 + Enemies() or Enemies() >= 4 and ComboPointsDeficit() >= 4 } and CheckBoxOn(opt_vanish) and Spell(vanish) or Talent(master_assassin_talent) and not Stealthed() and BuffRemaining(master_assassin_buff) <= 0 and not target.DebuffRefreshable(rupture_debuff) and CheckBoxOn(opt_vanish) and Spell(vanish) or target.DebuffRemaining(rupture_debuff) > 4 + 4 * MaxComboPoints() and not target.DebuffRefreshable(garrote_debuff) and Spell(exsanguinate) or target.DebuffPresent(rupture_debuff) and Spell(toxic_blade)
+ { target.TimeToDie() < ComboPointsDeficit() * 1.5 or 600 > 40 and ComboPointsDeficit() >= MaxComboPoints() } and Spell(marked_for_death) or Talent(exsanguinate_talent) and { Talent(nightstalker_talent) or Talent(subterfuge_talent) and Enemies() < 2 } and ComboPoints() >= MaxComboPoints() and SpellCooldown(exsanguinate) < 1 and CheckBoxOn(opt_vanish) and Spell(vanish) or Talent(nightstalker_talent) and not Talent(exsanguinate_talent) and ComboPoints() >= MaxComboPoints() and target.DebuffPresent(vendetta_debuff) and CheckBoxOn(opt_vanish) and Spell(vanish) or Talent(subterfuge_talent) and { not Talent(exsanguinate_talent) or Enemies() >= 2 } and not Stealthed() and not SpellCooldown(garrote) > 0 and target.DebuffRefreshable(garrote_debuff) and { Enemies() <= 3 and ComboPointsDeficit() >= 1 + Enemies() or Enemies() >= 4 and ComboPointsDeficit() >= 4 } and CheckBoxOn(opt_vanish) and Spell(vanish) or Talent(master_assassin_talent) and not Stealthed() and BuffRemaining(master_assassin_buff) <= 0 and not target.DebuffRefreshable(rupture_debuff) and CheckBoxOn(opt_vanish) and Spell(vanish) or target.DebuffRemaining(rupture_debuff) > 4 + 4 * MaxComboPoints() and not target.DebuffRefreshable(garrote_debuff) and Spell(exsanguinate) or target.DebuffPresent(rupture_debuff) and Spell(toxic_blade)
 }
 
 ### actions.default
@@ -1092,7 +1092,7 @@ AddFunction OutlawPrecombatCdPostConditions
 AddFunction OutlawFinishMainActions
 {
  #slice_and_dice,if=buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<(1+combo_points)*1.8
- if BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1 Spell(slice_and_dice)
+ if BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 Spell(slice_and_dice)
  #roll_the_bones,if=(buff.roll_the_bones.remains<=3|variable.rtb_reroll)&(target.time_to_die>20|buff.roll_the_bones.remains<target.time_to_die)
  if { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } Spell(roll_the_bones)
  #dispatch
@@ -1108,7 +1108,7 @@ AddFunction OutlawFinishShortCdActions
  #between_the_eyes,if=azerite.deadshot.rank>=2&buff.roll_the_bones.up
  if AzeriteTraitRank(deadshot_trait) >= 2 and DebuffPresent(roll_the_bones) Spell(between_the_eyes text=BTE)
 
- unless BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1 and Spell(slice_and_dice) or { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and Spell(roll_the_bones)
+ unless BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 and Spell(slice_and_dice) or { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and Spell(roll_the_bones)
  {
   #between_the_eyes,if=buff.ruthless_precision.up|azerite.ace_up_your_sleeve.enabled|azerite.deadshot.enabled
   if BuffPresent(ruthless_precision_buff) or HasAzeriteTrait(ace_up_your_sleeve_trait) or HasAzeriteTrait(deadshot_trait) Spell(between_the_eyes text=BTE)
@@ -1117,7 +1117,7 @@ AddFunction OutlawFinishShortCdActions
 
 AddFunction OutlawFinishShortCdPostConditions
 {
- BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1 and Spell(slice_and_dice) or { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and Spell(roll_the_bones) or Spell(dispatch)
+ BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 and Spell(slice_and_dice) or { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and Spell(roll_the_bones) or Spell(dispatch)
 }
 
 AddFunction OutlawFinishCdActions
@@ -1126,7 +1126,7 @@ AddFunction OutlawFinishCdActions
 
 AddFunction OutlawFinishCdPostConditions
 {
- AzeriteTraitRank(deadshot_trait) >= 2 and DebuffPresent(roll_the_bones) and Spell(between_the_eyes text=BTE) or BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1 and Spell(slice_and_dice) or { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and Spell(roll_the_bones) or { BuffPresent(ruthless_precision_buff) or HasAzeriteTrait(ace_up_your_sleeve_trait) or HasAzeriteTrait(deadshot_trait) } and Spell(between_the_eyes text=BTE) or Spell(dispatch)
+ AzeriteTraitRank(deadshot_trait) >= 2 and DebuffPresent(roll_the_bones) and Spell(between_the_eyes text=BTE) or BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 and Spell(slice_and_dice) or { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and Spell(roll_the_bones) or { BuffPresent(ruthless_precision_buff) or HasAzeriteTrait(ace_up_your_sleeve_trait) or HasAzeriteTrait(deadshot_trait) } and Spell(between_the_eyes text=BTE) or Spell(dispatch)
 }
 
 ### actions.cds
@@ -1580,7 +1580,7 @@ AddFunction OutlawPrecombatCdPostConditions
 AddFunction OutlawFinishMainActions
 {
  #slice_and_dice,if=buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<(1+combo_points)*1.8
- if BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1 Spell(slice_and_dice)
+ if BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 Spell(slice_and_dice)
  #roll_the_bones,if=(buff.roll_the_bones.remains<=3|variable.rtb_reroll)&(target.time_to_die>20|buff.roll_the_bones.remains<target.time_to_die)
  if { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } Spell(roll_the_bones)
  #dispatch
@@ -1596,7 +1596,7 @@ AddFunction OutlawFinishShortCdActions
  #between_the_eyes,if=azerite.deadshot.rank>=2&buff.roll_the_bones.up
  if AzeriteTraitRank(deadshot_trait) >= 2 and DebuffPresent(roll_the_bones) Spell(between_the_eyes text=BTE)
 
- unless BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1 and Spell(slice_and_dice) or { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and Spell(roll_the_bones)
+ unless BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 and Spell(slice_and_dice) or { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and Spell(roll_the_bones)
  {
   #between_the_eyes,if=buff.ruthless_precision.up|azerite.ace_up_your_sleeve.enabled|azerite.deadshot.enabled
   if BuffPresent(ruthless_precision_buff) or HasAzeriteTrait(ace_up_your_sleeve_trait) or HasAzeriteTrait(deadshot_trait) Spell(between_the_eyes text=BTE)
@@ -1605,7 +1605,7 @@ AddFunction OutlawFinishShortCdActions
 
 AddFunction OutlawFinishShortCdPostConditions
 {
- BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1 and Spell(slice_and_dice) or { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and Spell(roll_the_bones) or Spell(dispatch)
+ BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 and Spell(slice_and_dice) or { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and Spell(roll_the_bones) or Spell(dispatch)
 }
 
 AddFunction OutlawFinishCdActions
@@ -1614,7 +1614,7 @@ AddFunction OutlawFinishCdActions
 
 AddFunction OutlawFinishCdPostConditions
 {
- AzeriteTraitRank(deadshot_trait) >= 2 and DebuffPresent(roll_the_bones) and Spell(between_the_eyes text=BTE) or BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1 and Spell(slice_and_dice) or { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and Spell(roll_the_bones) or { BuffPresent(ruthless_precision_buff) or HasAzeriteTrait(ace_up_your_sleeve_trait) or HasAzeriteTrait(deadshot_trait) } and Spell(between_the_eyes text=BTE) or Spell(dispatch)
+ AzeriteTraitRank(deadshot_trait) >= 2 and DebuffPresent(roll_the_bones) and Spell(between_the_eyes text=BTE) or BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 and Spell(slice_and_dice) or { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and { target.TimeToDie() > 20 or BuffRemaining(roll_the_bones_buff) < target.TimeToDie() } and Spell(roll_the_bones) or { BuffPresent(ruthless_precision_buff) or HasAzeriteTrait(ace_up_your_sleeve_trait) or HasAzeriteTrait(deadshot_trait) } and Spell(between_the_eyes text=BTE) or Spell(dispatch)
 }
 
 ### actions.cds
@@ -1954,7 +1954,7 @@ AddFunction stealth_threshold
 
 AddFunction shd_threshold
 {
- SpellCharges(shadow_dance count=0) >= 1
+ SpellCharges(shadow_dance count=0) >= 1.75
 }
 
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=subtlety)
@@ -2042,7 +2042,7 @@ AddFunction SubtletyStealthcdsShortCdActions
  unless True(pool_energy 40) and EnergyDeficit() >= 10 and not shd_threshold() and target.DebuffRemaining(find_weakness_debuff) < 1 and SpellUsable(shadowmeld) and SpellCooldown(shadowmeld) < TimeToEnergy(40)
  {
   #shadow_dance,if=(!talent.dark_shadow.enabled|dot.nightblade.remains>=5+talent.subterfuge.enabled)&(variable.shd_threshold|buff.symbols_of_death.remains>=1.2|spell_targets.shuriken_storm>=4&cooldown.symbols_of_death.remains>10)
-  if { not Talent(dark_shadow_talent) or target.DebuffRemaining(nightblade_debuff) >= 5 + TalentPoints(subterfuge_talent) } and { shd_threshold() or BuffRemaining(symbols_of_death_buff) >= 1 or Enemies() >= 4 and SpellCooldown(symbols_of_death) > 10 } Spell(shadow_dance)
+  if { not Talent(dark_shadow_talent) or target.DebuffRemaining(nightblade_debuff) >= 5 + TalentPoints(subterfuge_talent) } and { shd_threshold() or BuffRemaining(symbols_of_death_buff) >= 1.2 or Enemies() >= 4 and SpellCooldown(symbols_of_death) > 10 } Spell(shadow_dance)
   #shadow_dance,if=target.time_to_die<cooldown.symbols_of_death.remains
   if target.TimeToDie() < SpellCooldown(symbols_of_death) Spell(shadow_dance)
  }
@@ -2064,7 +2064,7 @@ AddFunction SubtletyStealthcdsCdActions
 
 AddFunction SubtletyStealthcdsCdPostConditions
 {
- not shd_threshold() and target.DebuffRemaining(find_weakness_debuff) < 1 and Spell(vanish) or not { True(pool_energy 40) and EnergyDeficit() >= 10 and not shd_threshold() and target.DebuffRemaining(find_weakness_debuff) < 1 and SpellUsable(shadowmeld) and SpellCooldown(shadowmeld) < TimeToEnergy(40) } and { { not Talent(dark_shadow_talent) or target.DebuffRemaining(nightblade_debuff) >= 5 + TalentPoints(subterfuge_talent) } and { shd_threshold() or BuffRemaining(symbols_of_death_buff) >= 1 or Enemies() >= 4 and SpellCooldown(symbols_of_death) > 10 } and Spell(shadow_dance) or target.TimeToDie() < SpellCooldown(symbols_of_death) and Spell(shadow_dance) }
+ not shd_threshold() and target.DebuffRemaining(find_weakness_debuff) < 1 and Spell(vanish) or not { True(pool_energy 40) and EnergyDeficit() >= 10 and not shd_threshold() and target.DebuffRemaining(find_weakness_debuff) < 1 and SpellUsable(shadowmeld) and SpellCooldown(shadowmeld) < TimeToEnergy(40) } and { { not Talent(dark_shadow_talent) or target.DebuffRemaining(nightblade_debuff) >= 5 + TalentPoints(subterfuge_talent) } and { shd_threshold() or BuffRemaining(symbols_of_death_buff) >= 1.2 or Enemies() >= 4 and SpellCooldown(symbols_of_death) > 10 } and Spell(shadow_dance) or target.TimeToDie() < SpellCooldown(symbols_of_death) and Spell(shadow_dance) }
 }
 
 ### actions.precombat

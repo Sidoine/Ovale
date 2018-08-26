@@ -176,7 +176,7 @@ AddFunction ArmsGetInMeleeRange
 AddFunction ArmsSingletargetMainActions
 {
  #rend,if=remains<=duration*0.3&debuff.colossus_smash.down
- if target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0 and target.DebuffExpires(colossus_smash_debuff) Spell(rend)
+ if target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and target.DebuffExpires(colossus_smash_debuff) Spell(rend)
  #skullsplitter,if=rage<60&(cooldown.deadly_calm.remains>3|!talent.deadly_calm.enabled)
  if Rage() < 60 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } Spell(skullsplitter)
  #colossus_smash,if=debuff.colossus_smash.down
@@ -203,7 +203,7 @@ AddFunction ArmsSingletargetMainPostConditions
 
 AddFunction ArmsSingletargetShortCdActions
 {
- unless target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 60 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } and Spell(skullsplitter)
+ unless target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 60 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } and Spell(skullsplitter)
  {
   #deadly_calm,if=cooldown.bladestorm.remains>6&(cooldown.colossus_smash.remains<2|(talent.warbreaker.enabled&cooldown.warbreaker.remains<2))
   if SpellCooldown(bladestorm_arms) > 6 and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } Spell(deadly_calm)
@@ -213,14 +213,14 @@ AddFunction ArmsSingletargetShortCdActions
   unless target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or BuffPresent(sudden_death_arms_buff) and Spell(execute_arms)
   {
    #bladestorm,if=buff.sweeping_strikes.down&!buff.deadly_calm.up&((debuff.colossus_smash.remains>4.5&!azerite.test_of_might.enabled)|buff.test_of_might.up)
-   if BuffExpires(sweeping_strikes_buff) and not BuffPresent(deadly_calm_buff) and { target.DebuffRemaining(colossus_smash_debuff) > 4 and not HasAzeriteTrait(test_of_might_trait) or BuffPresent(test_of_might_buff) } Spell(bladestorm_arms)
+   if BuffExpires(sweeping_strikes_buff) and not BuffPresent(deadly_calm_buff) and { target.DebuffRemaining(colossus_smash_debuff) > 4.5 and not HasAzeriteTrait(test_of_might_trait) or BuffPresent(test_of_might_buff) } Spell(bladestorm_arms)
   }
  }
 }
 
 AddFunction ArmsSingletargetShortCdPostConditions
 {
- target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 60 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } and Spell(skullsplitter) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or BuffPresent(sudden_death_arms_buff) and Spell(execute_arms) or Enemies() > 2 and Spell(cleave) or Spell(mortal_strike) or Spell(overpower) or Talent(fervor_of_battle_talent) and { not HasAzeriteTrait(test_of_might_trait) or Rage() >= 60 or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(deadly_calm_buff) } and Spell(whirlwind_arms) or not Talent(fervor_of_battle_talent) and { not HasAzeriteTrait(test_of_might_trait) or Rage() >= 60 or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(deadly_calm_buff) } and Spell(slam)
+ target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 60 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } and Spell(skullsplitter) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or BuffPresent(sudden_death_arms_buff) and Spell(execute_arms) or Enemies() > 2 and Spell(cleave) or Spell(mortal_strike) or Spell(overpower) or Talent(fervor_of_battle_talent) and { not HasAzeriteTrait(test_of_might_trait) or Rage() >= 60 or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(deadly_calm_buff) } and Spell(whirlwind_arms) or not Talent(fervor_of_battle_talent) and { not HasAzeriteTrait(test_of_might_trait) or Rage() >= 60 or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(deadly_calm_buff) } and Spell(slam)
 }
 
 AddFunction ArmsSingletargetCdActions
@@ -229,7 +229,7 @@ AddFunction ArmsSingletargetCdActions
 
 AddFunction ArmsSingletargetCdPostConditions
 {
- target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 60 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } and Spell(skullsplitter) or SpellCooldown(bladestorm_arms) > 6 and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } and Spell(deadly_calm) or not BuffPresent(deadly_calm_buff) and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } and Spell(ravager) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or BuffPresent(sudden_death_arms_buff) and Spell(execute_arms) or BuffExpires(sweeping_strikes_buff) and not BuffPresent(deadly_calm_buff) and { target.DebuffRemaining(colossus_smash_debuff) > 4 and not HasAzeriteTrait(test_of_might_trait) or BuffPresent(test_of_might_buff) } and Spell(bladestorm_arms) or Enemies() > 2 and Spell(cleave) or Spell(mortal_strike) or Spell(overpower) or Talent(fervor_of_battle_talent) and { not HasAzeriteTrait(test_of_might_trait) or Rage() >= 60 or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(deadly_calm_buff) } and Spell(whirlwind_arms) or not Talent(fervor_of_battle_talent) and { not HasAzeriteTrait(test_of_might_trait) or Rage() >= 60 or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(deadly_calm_buff) } and Spell(slam)
+ target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 60 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } and Spell(skullsplitter) or SpellCooldown(bladestorm_arms) > 6 and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } and Spell(deadly_calm) or not BuffPresent(deadly_calm_buff) and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } and Spell(ravager) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or BuffPresent(sudden_death_arms_buff) and Spell(execute_arms) or BuffExpires(sweeping_strikes_buff) and not BuffPresent(deadly_calm_buff) and { target.DebuffRemaining(colossus_smash_debuff) > 4.5 and not HasAzeriteTrait(test_of_might_trait) or BuffPresent(test_of_might_buff) } and Spell(bladestorm_arms) or Enemies() > 2 and Spell(cleave) or Spell(mortal_strike) or Spell(overpower) or Talent(fervor_of_battle_talent) and { not HasAzeriteTrait(test_of_might_trait) or Rage() >= 60 or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(deadly_calm_buff) } and Spell(whirlwind_arms) or not Talent(fervor_of_battle_talent) and { not HasAzeriteTrait(test_of_might_trait) or Rage() >= 60 or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(deadly_calm_buff) } and Spell(slam)
 }
 
 ### actions.precombat
@@ -304,7 +304,7 @@ AddFunction ArmsFivetargetShortCdActions
   unless target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker)
   {
    #bladestorm,if=buff.sweeping_strikes.down&!buff.deadly_calm.up&((debuff.colossus_smash.remains>4.5&!azerite.test_of_might.enabled)|buff.test_of_might.up)
-   if BuffExpires(sweeping_strikes_buff) and not BuffPresent(deadly_calm_buff) and { target.DebuffRemaining(colossus_smash_debuff) > 4 and not HasAzeriteTrait(test_of_might_trait) or BuffPresent(test_of_might_buff) } Spell(bladestorm_arms)
+   if BuffExpires(sweeping_strikes_buff) and not BuffPresent(deadly_calm_buff) and { target.DebuffRemaining(colossus_smash_debuff) > 4.5 and not HasAzeriteTrait(test_of_might_trait) or BuffPresent(test_of_might_buff) } Spell(bladestorm_arms)
   }
  }
 }
@@ -320,7 +320,7 @@ AddFunction ArmsFivetargetCdActions
 
 AddFunction ArmsFivetargetCdPostConditions
 {
- Rage() < 60 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } and Spell(skullsplitter) or SpellCooldown(bladestorm_arms) > 6 and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } and Spell(deadly_calm) or not BuffPresent(deadly_calm_buff) and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } and Spell(ravager) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or BuffExpires(sweeping_strikes_buff) and not BuffPresent(deadly_calm_buff) and { target.DebuffRemaining(colossus_smash_debuff) > 4 and not HasAzeriteTrait(test_of_might_trait) or BuffPresent(test_of_might_buff) } and Spell(bladestorm_arms) or Spell(cleave) or { not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or { BuffPresent(sudden_death_arms_buff) or BuffPresent(stone_heart_buff) } and { BuffPresent(sweeping_strikes_buff) or SpellCooldown(sweeping_strikes) > 8 } } and Spell(execute_arms) or { not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or BuffPresent(sweeping_strikes_buff) and BuffStacks(overpower_buff) == 2 and { Talent(dreadnaught_talent) or BuffStacks(executioners_precision_buff) == 2 } } and Spell(mortal_strike) or { target.DebuffPresent(colossus_smash_debuff) or BuffPresent(crushing_assault_buff) and Talent(fervor_of_battle_talent) } and Spell(whirlwind_arms) or Spell(overpower) or Spell(whirlwind_arms)
+ Rage() < 60 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } and Spell(skullsplitter) or SpellCooldown(bladestorm_arms) > 6 and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } and Spell(deadly_calm) or not BuffPresent(deadly_calm_buff) and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } and Spell(ravager) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or BuffExpires(sweeping_strikes_buff) and not BuffPresent(deadly_calm_buff) and { target.DebuffRemaining(colossus_smash_debuff) > 4.5 and not HasAzeriteTrait(test_of_might_trait) or BuffPresent(test_of_might_buff) } and Spell(bladestorm_arms) or Spell(cleave) or { not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or { BuffPresent(sudden_death_arms_buff) or BuffPresent(stone_heart_buff) } and { BuffPresent(sweeping_strikes_buff) or SpellCooldown(sweeping_strikes) > 8 } } and Spell(execute_arms) or { not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or BuffPresent(sweeping_strikes_buff) and BuffStacks(overpower_buff) == 2 and { Talent(dreadnaught_talent) or BuffStacks(executioners_precision_buff) == 2 } } and Spell(mortal_strike) or { target.DebuffPresent(colossus_smash_debuff) or BuffPresent(crushing_assault_buff) and Talent(fervor_of_battle_talent) } and Spell(whirlwind_arms) or Spell(overpower) or Spell(whirlwind_arms)
 }
 
 ### actions.execute
@@ -452,7 +452,7 @@ AddFunction ArmsDefaultCdActions
   #berserking,if=debuff.colossus_smash.up
   if target.DebuffPresent(colossus_smash_debuff) Spell(berserking)
   #arcane_torrent,if=debuff.colossus_smash.down&cooldown.mortal_strike.remains>1.5&rage<50
-  if target.DebuffExpires(colossus_smash_debuff) and SpellCooldown(mortal_strike) > 1 and Rage() < 50 Spell(arcane_torrent_rage)
+  if target.DebuffExpires(colossus_smash_debuff) and SpellCooldown(mortal_strike) > 1.5 and Rage() < 50 Spell(arcane_torrent_rage)
   #lights_judgment,if=debuff.colossus_smash.down
   if target.DebuffExpires(colossus_smash_debuff) Spell(lights_judgment)
   #fireblood,if=debuff.colossus_smash.up
