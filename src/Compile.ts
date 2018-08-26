@@ -484,7 +484,7 @@ function AddToBuffList(buffId: number, statName?: string, isStacking?: boolean) 
         isStacking = si && (si.stacking == 1 || si.max_stacks > 0);
         if (si && si.stat) {
             let stat = si.stat;
-            if (isTable(stat)) {
+            if (isLuaArray(stat)) {
                 for (const [, name] of ipairs(stat)) {
                     AddToBuffList(buffId, name, isStacking);
                 }
@@ -495,10 +495,6 @@ function AddToBuffList(buffId: number, statName?: string, isStacking?: boolean) 
     }
 }
 
-function isTable(t: any): t is LuaObj<any> {
-    return type(t) === "table";
-}
-
 let trinket: LuaArray<number> = {};
 let UpdateTrinketInfo = function () {
         [trinket[1], trinket[2]] = OvaleEquipment.GetEquippedTrinkets();
@@ -507,7 +503,7 @@ let UpdateTrinketInfo = function () {
             let ii = itemId && OvaleData.ItemInfo(itemId);
             let buffId = ii && ii.buff;
             if (buffId) {
-                if (isTable(buffId)) {
+                if (isLuaArray(buffId)) {
                     for (const [, id] of ipairs(buffId)) {
                         AddToBuffList(id);
                     }
