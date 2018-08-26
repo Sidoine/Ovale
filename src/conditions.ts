@@ -2051,7 +2051,7 @@ function GetHastedTime(seconds: number, haste: HasteType, state: BaseState) {
         let yesno = positionalParams[1];
         let [target] = ParseCondition(positionalParams, namedParams, state);
         let boolean = UnitIsFriend("player", target);
-        return TestBoolean(boolean == 1, yesno);
+        return TestBoolean(boolean, yesno);
     }
     OvaleCondition.RegisterCondition("isfriend", false, IsFriend);
 }

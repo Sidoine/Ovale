@@ -64,7 +64,7 @@ class OvaleSpellsClass extends OvaleSpellsBase {
             returnValue = IsSpellInRange(name, unitId);
         }
         if ((returnValue == 1 && spellId == WARRIOR_INCERCEPT_SPELLID)) {
-            return (UnitIsFriend("player", unitId) == 1 || OvaleSpells.IsSpellInRange(WARRIOR_HEROICTHROW_SPELLID, unitId));
+            return (UnitIsFriend("player", unitId) || OvaleSpells.IsSpellInRange(WARRIOR_HEROICTHROW_SPELLID, unitId));
         }
         return (returnValue == 1 && true) || (returnValue == 0 && false) || (returnValue === undefined && undefined);
     }

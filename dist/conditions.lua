@@ -1153,7 +1153,7 @@ local function IsFriend(positionalParams, namedParams, state, atTime)
         local yesno = positionalParams[1]
         local target = ParseCondition(positionalParams, namedParams, state)
         local boolean = UnitIsFriend("player", target)
-        return TestBoolean(boolean == 1, yesno)
+        return TestBoolean(boolean, yesno)
     end
     OvaleCondition:RegisterCondition("isfriend", false, IsFriend)
 end
