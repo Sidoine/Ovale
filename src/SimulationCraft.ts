@@ -1304,7 +1304,11 @@ const InitializeDisambiguation = function() {
     //Druid
     AddDisambiguation("feral_affinity_talent", "feral_affinity_talent_balance", "DRUID", "balance");
     AddDisambiguation("guardian_affinity_talent", "guardian_affinity_talent_restoration", "DRUID", "restoration");
-
+    AddDisambiguation("incarnation", "incarnation_chosen_of_elune", "DRUID", "balance");
+    AddDisambiguation("incarnation", "incarnation_tree_of_life", "DRUID", "restoration");
+    AddDisambiguation("incarnation", "incarnation_king_of_the_jungle", "DRUID", "feral");
+    AddDisambiguation("incarnation", "incarnation_guardian_of_ursoc", "DRUID", "guardian");
+    
     //Hunter
     AddDisambiguation("a_murder_of_crows_talent", "mm_a_murder_of_crows_talent", "HUNTER", "marksmanship");
     AddDisambiguation("cat_beast_cleave", "pet_beast_cleave", "HUNTER", "beast_mastery");
@@ -1371,7 +1375,7 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("132369", "wilfreds_sigil_of_superior_summoning", "WARLOCK", "demonology");
     AddDisambiguation("dark_soul", "dark_soul_misery", "WARLOCK", "affliction");
     AddDisambiguation("soul_conduit_talent", "demo_soul_conduit_talent", "WARLOCK", "demonology");
-
+    
     //Warrior
     AddDisambiguation("anger_management_talent", "fury_anger_management_talent", "WARRIOR", "fury");
     AddDisambiguation("bladestorm", "bladestorm_arms", "WARRIOR", "arms");

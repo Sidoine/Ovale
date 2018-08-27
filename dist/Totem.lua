@@ -101,16 +101,29 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
     end,
     IsActiveTotem = function(self, totem, atTime)
         local boolean = false
+        if  not atTime then
+            return totem ~= nil
+        end
         if totem and (totem.serial == self_serial) and totem.start and totem.duration and totem.start < atTime and atTime < totem.start + totem.duration then
             boolean = true
         end
         return boolean
     end,
+    GetTotemNumber = function(self, slot)
+        if slot == "totem_mastery" then
+            return 1
+        end
+        if isString(slot) then
+            if  not TOTEM_SLOT[slot] then
+                Ovale:OneTimeMessage("Unknown totem %s", slot)
+                return AIR_TOTEM_SLOT
+            end
+            return TOTEM_SLOT[slot]
+        end
+        return slot
+    end,
     GetTotem = function(self, slot)
         __exports.OvaleTotem:StartProfiling("OvaleTotem_state_GetTotem")
-        if isString(slot) then
-            slot = TOTEM_SLOT[slot]
-        end
         local totem = self.next.totem[slot]
         if totem and ( not totem.serial or totem.serial < self_serial) then
             local haveTotem, name, startTime, duration, icon = GetTotemInfo(slot)
@@ -130,14 +143,12 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
         __exports.OvaleTotem:StopProfiling("OvaleTotem_state_GetTotem")
         return totem
     end,
-    GetTotemInfo = function(self, slot)
+    GetTotemInfo = function(self, slot, atTime)
         local haveTotem, name, startTime, duration, icon
-        if isString(slot) then
-            slot = TOTEM_SLOT[slot]
-        end
+        slot = self:GetTotemNumber(slot)
         local totem = self:GetTotem(slot)
         if totem then
-            haveTotem = self:IsActiveTotem(totem)
+            haveTotem = self:IsActiveTotem(totem, atTime)
             name = totem.name
             startTime = totem.start
             duration = totem.duration

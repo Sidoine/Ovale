@@ -46,7 +46,7 @@ Define(death_sweep 210152)
   SpellAddBuff(death_sweep death_sweep=1)
 Define(demon_spikes 203720)
 # Surge with fel power, increasing your Armor by 203819s2*AGI/100, and your Parry chance by 203819s1, for 6 seconds.
-  SpellInfo(demon_spikes cd=1.5 replace=vengeful_retreat gcd=0 offgcd=1)
+  SpellInfo(demon_spikes cd=1.5 charge_cd=20 replace=vengeful_retreat gcd=0 offgcd=1)
 Define(demons_bite 162243)
 # Quickly attack for s2 Physical damage.rnrn|cFFFFFFFFGenerates m3 to ?a258876[M3+258876s1][M3] Fury.|r
   SpellInfo(demons_bite fury=-25)
@@ -73,7 +73,7 @@ Define(fel_eruption 211881)
   SpellAddTargetDebuff(fel_eruption fel_eruption=1)
 Define(fel_rush 195072)
 # Rush forward, incinerating anything in your path for 192611s1 Chaos damage.
-  SpellInfo(fel_rush cd=1 gcd=0.25)
+  SpellInfo(fel_rush cd=1 charge_cd=10 gcd=0.25)
 Define(felblade 232893)
 # Charge to your target and deal 213243sw2 Fire damage.rnrn?s203513[Shear has a chance to reset the cooldown of Felblade.rnrn|cFFFFFFFFGenerates 213243s3/10 Pain.|r]?a203555[Demon Blades has a chance to reset the cooldown of Felblade.rnrn|cFFFFFFFFGenerates 213243s4 Fury.|r][Demon's Bite has a chance to reset the cooldown of Felblade.rnrn|cFFFFFFFFGenerates 213243s4 Fury.|r]
   SpellInfo(felblade cd=15 talent=felblade_talent_vengeance)
@@ -96,7 +96,7 @@ Define(imprison 217832)
   SpellAddTargetDebuff(imprison imprison=1)
 Define(infernal_strike 189110)
 # Leap through the air toward a targeted location, dealing 189112s1 Fire damage to all enemies within 189112a1 yards.
-  SpellInfo(infernal_strike cd=0.8 replace=fel_rush gcd=0 offgcd=1)
+  SpellInfo(infernal_strike cd=0.8 charge_cd=20 replace=fel_rush gcd=0 offgcd=1)
 Define(nemesis 206491)
 # Increases damage you inflict against the target by s1 for 60 seconds. rnrnWhen the target is slain, you will inflict s1 additional damage against all creature types matching the original target (Humanoid, Dragonkin, etc.) for the remaining duration.
   SpellInfo(nemesis cd=120 duration=60 talent=nemesis_talent)

@@ -28,7 +28,7 @@ Define(bursting_blood 251316)
 
 Define(charge 100)
 # Charge to an enemy, dealing 126664s2 Physical damage, rooting it for 1 second?s103828[, and stunning it for 0 second][].rnrn|cFFFFFFFFGenerates /10;s2 Rage.|r
-  SpellInfo(charge cd=1.5 gcd=0.5 rage=-20)
+  SpellInfo(charge cd=1.5 charge_cd=20 gcd=0.5 rage=-20)
 Define(cleave 845)
 # Strikes all enemies in front of you with a sweeping attack for s1 Physical damage. Hitting s2 or more targets inflicts Deep Wounds.
   SpellInfo(cleave rage=20 cd=9 talent=cleave_talent)
@@ -82,7 +82,7 @@ Define(furious_slash_buff 202539)
   SpellAddBuff(furious_slash_buff furious_slash_buff=1)
 Define(heroic_leap 6544)
 # Leap through the air toward a target location, slamming down with destructive force to deal 52174s1 Physical damage to all enemies within 52174a1 yards?s23922[, and resetting the remaining cooldown on Taunt][].
-  SpellInfo(heroic_leap cd=0.8 gcd=0 offgcd=1)
+  SpellInfo(heroic_leap cd=0.8 charge_cd=45 gcd=0 offgcd=1)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
@@ -97,6 +97,7 @@ Define(overpower 7384)
   SpellAddBuff(overpower overpower=1)
 Define(pummel 6552)
 # Pummels the target, interrupting spellcasting and preventing any spell in that school from being cast for 4 seconds.
+# Rank 1: Pummel the target for s2 damage and interrupt the spell being cast for 5 seconds.
   SpellInfo(pummel cd=15 duration=4 gcd=0 offgcd=1 interrupt=1)
 Define(raging_blow 85288)
 # A mighty blow with both weapons that deals a total of (96103sw1+85384sw1)*<mult> Physical damage.rnrnRaging Blow has a s1 chance to instantly reset its own cooldown.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r

@@ -95,11 +95,21 @@ Define(fury_of_elune 202770)
 Define(half_moon 202768)
 # Deals m1 Arcane damage to the target and empowers Half Moon to become Full Moon.rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
   SpellInfo(half_moon cd=15 lunarpower=-20)
-Define(incarnation 117679)
-# Activates a superior shapeshifting form appropriate to your specialization for 30 seconds.  You may freely shapeshift in and out of this form for its duration.
-  SpellInfo(incarnation duration=30 gcd=0 offgcd=1)
-  # Incarnation: Tree of Life activated.
-  SpellAddBuff(incarnation incarnation=1)
+Define(incarnation_chosen_of_elune 102560)
+# An improved Moonkin Form that increases the damage of all your spells by s1 and grants you s3 Haste.rnrnLasts 30 seconds. You may shapeshift in and out of this improved Moonkin Form for its duration.
+  SpellInfo(incarnation_chosen_of_elune cd=180 duration=30 talent=incarnation_chosen_of_elune_talent)
+  # Spell damage increased by s1.rnHaste increased by s3.
+  SpellAddBuff(incarnation_chosen_of_elune incarnation_chosen_of_elune=1)
+Define(incarnation_guardian_of_ursoc 102558)
+# An improved Bear Form that reduces the cooldown on all melee damage abilities and Growl to 1.5 sec, causes Mangle to hit up to (25 of Spell Power) targets, and increases armor by (25 of Spell Power).rnrnLasts 30 seconds. You may freely shapeshift in and out of this improved Bear Form for its duration.
+  SpellInfo(incarnation_guardian_of_ursoc cd=180 duration=30 talent=incarnation_guardian_of_ursoc_talent)
+  # Incarnation: Guardian of Ursoc activated.
+  SpellAddBuff(incarnation_guardian_of_ursoc incarnation_guardian_of_ursoc=1)
+Define(incarnation_king_of_the_jungle 102543)
+# An improved Cat Form that allows the use of Prowl once while in combat, causes Shred and Rake to deal damage as if stealth were active, reduces the cost of all Cat Form abilities by (25 of Spell Power), and increases maximum Energy by (25 of Spell Power).rnrnLasts 30 seconds. You may shapeshift in and out of this improved Cat Form for its duration.
+  SpellInfo(incarnation_king_of_the_jungle cd=180 duration=30 gcd=1 talent=incarnation_king_of_the_jungle_talent)
+  # Reduces the energy cost of all Cat Form abilities by s1 and increases maximum Energy by s2.
+  SpellAddBuff(incarnation_king_of_the_jungle incarnation_king_of_the_jungle=1)
 Define(innervate 29166)
 # Infuse a friendly healer with energy, allowing them to cast spells without spending mana for 12 seconds.
   SpellInfo(innervate cd=180 duration=12)
@@ -184,10 +194,6 @@ Define(shred 5221)
 # Shred the target, causing s1*<mult> Physical damage to the target.?a231063[ Deals s4 increased damage against bleeding targets.][]?a231057[rnrnWhile stealthed, Shred deals m3 increased damage, and has double the chance to critically strike.][]rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
 # Rank 2: Shred deals 5221s5 increased damage against bleeding targets.
   SpellInfo(shred energy=40 gcd=1 combopoints=0)
-Define(shred_feral 231057)
-# While stealthed, Shred deals 5221m4 increased damage, and has double the chance to critically strike.
-  SpellInfo(shred_feral channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(shred_feral shred_feral=1)
 Define(solar_wrath_balance 190984)
 # Hurl a ball of solar energy at the target, dealing (60 of Spell Power) Nature damage.?a197911[rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r][]
   SpellInfo(solar_wrath_balance lunarpower=0)
@@ -205,6 +211,10 @@ Define(sunblaze_buff 274398)
 # Solar Wrath increases the damage of your next Starsurge by s1.
   SpellInfo(sunblaze_buff channel=-0.001 gcd=0 offgcd=1)
 
+Define(sunfire 93402)
+# A quick beam of solar light burns the enemy for (20 of Spell Power) Nature damage and then an additional 164815o2 Nature damage over 12 seconds?s231050[ to the primary target and all enemies within 164815A2 yards][].?s137013[rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r][]
+# Rank 2: Sunfire now applies its damage over time effect to all enemies within 164815A2 yards.
+  SpellInfo(sunfire lunarpower=0)
 Define(swipe 213764)
 # Swipe nearby enemies, inflicting Physical damage. Damage varies by shapeshift form.
 # Rank 2: Swipe deals 106785s2 increased damage against bleeding targets.
@@ -240,6 +250,12 @@ Define(force_of_nature_talent 3) #22387
 # Summons a stand of s1 Treants for 10 seconds which immediately taunt and attack enemies in the targeted area.rnrn|cFFFFFFFFGenerates m5/10 Astral Power.|r
 Define(fury_of_elune_talent 20) #21193
 # Calls down a beam of pure celestial energy that follows the enemy, dealing <dmg> Astral damage over 8 seconds to all nearby targets.rnrn|cFFFFFFFFGenerates m3/10/t3*8 seconds Astral Power over its duration.|r
+Define(incarnation_chosen_of_elune_talent 15) #21702
+# An improved Moonkin Form that increases the damage of all your spells by s1 and grants you s3 Haste.rnrnLasts 30 seconds. You may shapeshift in and out of this improved Moonkin Form for its duration.
+Define(incarnation_guardian_of_ursoc_talent 15) #22388
+# An improved Bear Form that reduces the cooldown on all melee damage abilities and Growl to 1.5 sec, causes Mangle to hit up to (25 of Spell Power) targets, and increases armor by (25 of Spell Power).rnrnLasts 30 seconds. You may freely shapeshift in and out of this improved Bear Form for its duration.
+Define(incarnation_king_of_the_jungle_talent 15) #21704
+# An improved Cat Form that allows the use of Prowl once while in combat, causes Shred and Rake to deal damage as if stealth were active, reduces the cost of all Cat Form abilities by (25 of Spell Power), and increases maximum Energy by (25 of Spell Power).rnrnLasts 30 seconds. You may shapeshift in and out of this improved Cat Form for its duration.
 Define(lunar_beam_talent 20) #22427
 # Summons a beam of lunar light at your location, dealing 204069s2*8 Arcane damage and healing you for 204069s1*8 over m1 sec.
 Define(lunar_inspiration_talent 3) #22365
@@ -263,7 +279,6 @@ Define(wild_charge_talent 6) #18571
 Define(ailuro_pouncers_item 137024)
 Define(luffa_wrappings_item 137056)
 Define(dawning_sun_trait 276152)
-Define(high_noon_trait 278505)
 Define(lively_spirit_trait 279642)
 Define(power_of_the_moon_trait 273367)
 Define(streaking_stars_trait 272871)
@@ -445,7 +460,7 @@ Define(fury_of_elune_up_buff 202770)
 	SpellInfo(full_moon cd=15 charges=3 astralpower=-40 shared_cd=new_moon)
 
 	SpellInfo(half_moon cd=15 charges=3 astralpower=-20 shared_cd=new_moon)
-Define(incarnation_chosen_of_elune 102560)
+
 	SpellInfo(incarnation replace=incarnation_chosen_of_elune specialization=balance)
 	SpellInfo(incarnation_chosen_of_elune cd=180 shared_cd=celestial_alignment_cd)
 	SpellInfo(incarnation_chosen_of_elune unusable=1)
@@ -497,11 +512,11 @@ Define(stellar_empowerment_debuff 197637)
 	SpellAddTargetDebuff(stellar_flare stellar_flare_debuff=1)
 Define(stellar_flare_debuff 202347)
 	SpellInfo(stellar_flare_debuff duration=24 haste=spell tick=2)
-Define(sunfire_balance 93402)
-	SpellInfo(sunfire replace=sunfire_balance specialization=balance)
-	SpellAddTargetDebuff(sunfire_balance sunfire_debuff=1)
+#Define(sunfire_balance 93402)
+#	SpellInfo(sunfire replace=sunfire_balance specialization=balance)
+#	SpellAddTargetDebuff(sunfire_balance sunfire_debuff=1)
 #Define(sunfire_debuff 164815)
-	SpellInfo(sunfire_debuff add_duration=6 specialization=balance)
+#	SpellInfo(sunfire_debuff add_duration=6 specialization=balance)
 
 	SpellInfo(warrior_of_elune gcd=0 cd=45 offgcd=1)
 Define(warrior_of_elune_buff 202425)
@@ -541,7 +556,7 @@ Define(guardian_of_elune_buff 213680)
 Define(incapacitating_roar 99)
 	SpellInfo(incapacitating_roar cd=30)
 	SpellInfo(incapacitating_roar replace=intimidating_roar talent=intimidating_roar_talent)
-Define(incarnation_guardian_of_ursoc 102558)
+
 	SpellInfo(incarnation replace=incarnation_guardian_of_ursoc specialization=guardian)
 	SpellInfo(incarnation_guardian_of_ursoc cd=180 unusable=1)
 	SpellInfo(incarnation_guardian_of_ursoc unusable=0 talent=incarnation_talent specialization=guardian)
@@ -603,7 +618,7 @@ Define(tigers_fury_buff_value 1.15)
 	SpellAddBuff(berserk berserk_buff=1)
 Define(berserk_buff 106951)
 	SpellInfo(berserk_buff duration=15)
-Define(incarnation_king_of_the_jungle 102543)
+
 	SpellInfo(incarnation replace=incarnation_king_of_the_jungle specialization=feral)
 	SpellInfo(incarnation_king_of_the_jungle cd=180)
 	SpellAddBuff(incarnation_king_of_the_jungle incarnation_king_of_the_jungle_buff=1)
