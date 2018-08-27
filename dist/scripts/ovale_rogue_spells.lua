@@ -42,7 +42,7 @@ Define(between_the_eyes 199804)
   SpellAddTargetDebuff(between_the_eyes between_the_eyes=1)
 Define(blade_flurry 13877)
 # Causes your single target attacks to also strike all nearby enemies for s2 of normal damage for 12 seconds.
-  SpellInfo(blade_flurry energy=15 cd=12 duration=12 gcd=1)
+  SpellInfo(blade_flurry energy=15 cd=12 charge_cd=25 duration=12 gcd=1)
   # Attacks striking nearby enemies.
   SpellAddBuff(blade_flurry blade_flurry=1)
 Define(blade_rush 271877)
@@ -158,7 +158,7 @@ Define(shadow_blades_buff 255857)
 
 Define(shadow_dance 185313)
 # Allows use of all Stealth abilities and grants all the combat benefits of Stealth for 5 seconds. Effect not broken from taking damage or attacking. ?s14062[Movement speed while active is increased by 1784s3 and damage dealt is increased by 1784s4. ]?s108209[Abilities cost 112942s1 less while active. ][]?s31223[Attacks from Shadow Dance and for 31223s1 sec after deal 31665s1 more damage.  ][]
-  SpellInfo(shadow_dance cd=1 duration=5 gcd=0 offgcd=1 tick=1)
+  SpellInfo(shadow_dance cd=1 charge_cd=60 duration=5 gcd=0 offgcd=1 tick=1)
   SpellAddBuff(shadow_dance shadow_dance=1)
 Define(shadowmeld 58984)
 # Activate to slip into the shadows, reducing the chance for enemies to detect your presence. Lasts until cancelled or upon moving. Any threat is restored versus enemies still in combat upon cancellation of this effect.
@@ -167,7 +167,7 @@ Define(shadowmeld 58984)
   SpellAddBuff(shadowmeld shadowmeld=1)
 Define(shadowstep 36554)
 # Step through the shadows to appear behind your target and gain s2 increased movement speed for 2 seconds.
-  SpellInfo(shadowstep cd=1 duration=2 channel=2 gcd=0 offgcd=1)
+  SpellInfo(shadowstep cd=1 charge_cd=30 duration=2 channel=2 gcd=0 offgcd=1)
   # Movement speed increased by s2.
   SpellAddBuff(shadowstep shadowstep=1)
 

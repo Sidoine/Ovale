@@ -39,7 +39,7 @@ Define(consecration 26573)
   SpellAddBuff(consecration consecration=1)
 Define(crusade 231895)
 # Call upon the Light and begin a crusade, increasing your damage done and Haste by <damage> for 25 seconds.rnrnEach Holy Power spent during Crusade increases damage done and Haste by an additional <damage>.rnrnMaximum u stacks.
-  SpellInfo(crusade cd=20 duration=25 max_stacks=10 talent=crusade_talent)
+  SpellInfo(crusade cd=20 charge_cd=120 duration=25 max_stacks=10 talent=crusade_talent)
   # ?a206338[Damage done increased by w1.rnHaste increased by w3.][Damage done and Haste increased by <damage>.]
   SpellAddBuff(crusade crusade=1)
 Define(crusader_strike 35395)
@@ -103,7 +103,7 @@ Define(seraphim 152262)
   SpellAddBuff(seraphim seraphim=1)
 Define(shield_of_the_righteous 53600)
 # Slams enemies in front of you with your shield, causing s1 Holy damage, and increasing your Armor by 132403s1*STR/100 for 4.5 seconds.
-  SpellInfo(shield_of_the_righteous cd=1 gcd=0 offgcd=1)
+  SpellInfo(shield_of_the_righteous cd=1 charge_cd=18 gcd=0 offgcd=1)
 Define(shield_of_vengeance 184662)
 # Creates a barrier of holy light that absorbs s2/100*MHP damage for 15 seconds.rnrnWhen the shield expires, it bursts to inflict Holy damage equal to the total amount absorbed, divided among all nearby enemies.
   SpellInfo(shield_of_vengeance cd=120 duration=15)
@@ -510,7 +510,7 @@ Define(tyrs_deliverance 200652)
 	SpellInfo(tyrs_deliverance cd=90)
 Define(uthers_insight_buff 156988)
 	SpellInfo(uthers_insight_buff duration=21 haste=spell tick=3)
-Define(wake_of_ashes 255937)
+
 	SpellInfo(wake_of_ashes cd=45 holypower=-5 tag=main)
 	SpellAddTargetDebuff(wake_of_ashes wake_of_ashes_debuff=1)
 Define(wake_of_ashes_debuff 255937)

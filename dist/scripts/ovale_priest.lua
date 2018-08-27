@@ -85,8 +85,8 @@ AddFunction HolyDefaultShortCdActions
 
   unless Spell(divine_star)
   {
-   #halo
-   Spell(halo)
+   #halo,if=!dot.holy_fire.stack=2
+   if not target.DebuffStacks(holy_fire) == 2 Spell(halo)
   }
  }
 }
@@ -114,7 +114,7 @@ AddFunction HolyDefaultCdActions
 
 AddFunction HolyDefaultCdPostConditions
 {
- { target.Refreshable(holy_fire) and target.DebuffPresent(holy_fire) and target.DebuffStacks(holy_fire) > 1 or target.DebuffStacks(holy_fire) < 2 } and Spell(holy_fire) or Spell(holy_word_chastise) or Spell(divine_star) or Spell(halo) or Enemies() > 2 and Spell(holy_nova) or Spell(smite)
+ { target.Refreshable(holy_fire) and target.DebuffPresent(holy_fire) and target.DebuffStacks(holy_fire) > 1 or target.DebuffStacks(holy_fire) < 2 } and Spell(holy_fire) or Spell(holy_word_chastise) or Spell(divine_star) or not target.DebuffStacks(holy_fire) == 2 and Spell(halo) or Enemies() > 2 and Spell(holy_nova) or Spell(smite)
 }
 
 ### Holy icons.

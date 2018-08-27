@@ -80,7 +80,7 @@ Define(chimaera_shot 171457)
 
 Define(cobra_shot 193455)
 # A quick shot causing s2*<mult> Physical damage.rnrnReduces the cooldown of Kill Command by s3 sec.
-# Rank 2: Cobra Shot's cost is reduced by s1.
+# Rank 3: Cobra Shot deals s1 increased damage.
   SpellInfo(cobra_shot focus=45)
 Define(coordinated_assault 266779)
 # You and your pet attack as one, increasing all damage you both deal by s1 for 20 seconds.?s263186[rnrnWhile Coordinated Assault is active, Kill Command's chance to reset is increased by s4.][]
@@ -110,7 +110,7 @@ Define(flanking_strike 259516)
 Define(harpoon 190925)
 # Hurls a harpoon at an enemy, rooting them in place for 3 seconds and pulling you to them.
 # Rank 2: The cooldown of Harpoon is reduced by m1/-1000 sec.
-  SpellInfo(harpoon cd=1 gcd=0.5)
+  SpellInfo(harpoon cd=1 charge_cd=30 gcd=0.5)
 Define(hunters_mark 257284)
 # Apply Hunter's Mark to the target, increasing all damage you deal to the marked target by s1.  If the target dies while affected by Hunter's Mark, you instantly gain 259558s1 Focus. The target can always be seen and tracked by the Hunter.rnrnOnly one Hunter's Mark can be applied at a time.
   SpellInfo(hunters_mark talent=hunters_mark_talent)
@@ -237,6 +237,7 @@ Define(in_the_rhythm_trait 264198)
 Define(latent_poison_trait 273283)
 Define(up_close_and_personal_trait 278533)
 Define(venomous_fangs_trait 274590)
+Define(wilderness_survival_trait 278532)
     ]]
     code = code .. [[
 # Hunter spells and functions.

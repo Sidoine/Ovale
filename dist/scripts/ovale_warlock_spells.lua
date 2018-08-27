@@ -53,7 +53,7 @@ Define(corruption_debuff 146739)
   SpellAddTargetDebuff(corruption_debuff corruption_debuff=1)
 Define(dark_soul_instability 113858)
 # Infuses your soul with unstable power, increasing your critical strike chance by 113858s1 for 20 seconds.?s56228[rnrn|cFFFFFFFFPassive:|rrnIncreases your critical strike chance by 113858m1/56228m1. This effect is disabled while on cooldown.][]
-  SpellInfo(dark_soul_instability cd=120 duration=20 talent=dark_soul_instability_talent)
+  SpellInfo(dark_soul_instability cd=120 charge_cd=120 duration=20 talent=dark_soul_instability_talent)
   # Critical strike chance increased by w1.
   SpellAddBuff(dark_soul_instability dark_soul_instability=1)
 Define(dark_soul_misery 113860)

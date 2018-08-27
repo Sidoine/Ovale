@@ -64,7 +64,7 @@ Define(blast_wave 157981)
   SpellAddTargetDebuff(blast_wave blast_wave=1)
 Define(blink 1953)
 # Teleports you forward A1 yds or until reaching an obstacle, and frees you from all stuns and bonds.
-  SpellInfo(blink cd=0.5 duration=0.3 channel=0.3)
+  SpellInfo(blink cd=0.5 charge_cd=15 duration=0.3 channel=0.3)
   # Blinking.
   SpellAddBuff(blink blink=1)
 Define(blizzard 190356)
@@ -111,7 +111,7 @@ Define(evocation 12051)
 Define(fire_blast 108853)
 # Blasts the enemy for (72 of Spell Power) Fire damage. Castable while casting other spells.?a231568[ Always deals a critical strike.][]
 # Rank 2: Fire Blast always deals a critical strike.
-  SpellInfo(fire_blast cd=0.5 gcd=0 offgcd=1)
+  SpellInfo(fire_blast cd=0.5 charge_cd=12 gcd=0 offgcd=1)
 Define(fireball 133)
 # Throws a fiery ball that causes (59 of Spell Power) Fire damage.
   SpellInfo(fireball)
@@ -212,13 +212,13 @@ Define(rule_of_threes 264354)
   SpellAddBuff(rule_of_threes rule_of_threes=1)
 Define(rune_of_power 116011)
 # Places a Rune of Power on the ground for 10 seconds which increases your spell damage by 116014s1 while you stand within 8 yds.
-  SpellInfo(rune_of_power cd=10 duration=10 talent=rune_of_power_talent)
+  SpellInfo(rune_of_power cd=10 charge_cd=40 duration=10 talent=rune_of_power_talent)
 Define(scorch 2948)
 # Scorches an enemy for (17.7 of Spell Power) Fire damage. Castable while moving.
   SpellInfo(scorch)
 Define(shimmer 212653)
 # Teleports you A1 yards forward, unless something is in the way. Unaffected by the global cooldown and castable while casting.
-  SpellInfo(shimmer cd=0.5 duration=0.65 channel=0.65 gcd=0 offgcd=1 talent=shimmer_talent)
+  SpellInfo(shimmer cd=0.5 charge_cd=20 duration=0.65 channel=0.65 gcd=0 offgcd=1 talent=shimmer_talent)
   # Shimmering.
   SpellAddBuff(shimmer shimmer=1)
 Define(summon_water_elemental 31687)

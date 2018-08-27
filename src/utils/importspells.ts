@@ -1172,6 +1172,10 @@ for (let i = 1; i < classNames.length; i++) {
     if (className !== "PET") classBitToNumber[1 << (i-1)] = className;
 }
 
+function isRankSpell(spell: SpellData) {
+    return spell.rank_str && spell.rank_str.indexOf("Rank") === 0;
+}
+
 export function getSpellData(directory: string) {
     let output: { [key: string]: any[][] } = {};
     let zone: any[][];
@@ -1396,7 +1400,7 @@ export function getSpellData(directory: string) {
     }
 
     for (const spell of spellData) {
-        if (spell.rank_str) continue;
+        if (isRankSpell(spell)) continue;
         if (identifiers[spell.identifier]) {
             const other = spellDataById.get(identifiers[spell.identifier]);
             if (other.identifierScore === spell.identifierScore) {
@@ -1415,7 +1419,7 @@ export function getSpellData(directory: string) {
     }
 
     for (const spell of spellData) {
-        if (spell.rank_str && identifiers[spell.identifier]) {
+        if (isRankSpell(spell) && identifiers[spell.identifier]) {
             const currentSpell = spellDataById.get(identifiers[spell.identifier]);
             currentSpell.nextRank = spell;
         }
