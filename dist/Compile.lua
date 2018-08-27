@@ -509,7 +509,7 @@ local function AddToBuffList(buffId, statName, isStacking)
         isStacking = si and (si.stacking == 1 or si.max_stacks > 0)
         if si and si.stat then
             local stat = si.stat
-            if isTable(stat) then
+            if isLuaArray(stat) then
                 for _, name in ipairs(stat) do
                     AddToBuffList(buffId, name, isStacking)
                 end
@@ -519,9 +519,6 @@ local function AddToBuffList(buffId, statName, isStacking)
         end
     end
 end
-local function isTable(t)
-    return type(t) == "table"
-end
 local trinket = {}
 local UpdateTrinketInfo = function()
     trinket[1], trinket[2] = OvaleEquipment:GetEquippedTrinkets()
@@ -530,7 +527,7 @@ local UpdateTrinketInfo = function()
         local ii = itemId and OvaleData:ItemInfo(itemId)
         local buffId = ii and ii.buff
         if buffId then
-            if isTable(buffId) then
+            if isLuaArray(buffId) then
                 for _, id in ipairs(buffId) do
                     AddToBuffList(id)
                 end

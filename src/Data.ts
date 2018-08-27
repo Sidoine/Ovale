@@ -89,8 +89,6 @@ type AuraList = { [key: number]: SpellData;[key: string]: SpellData; };
 export interface AuraByType {
     HARMFUL: AuraList;
     HELPFUL: AuraList;
-    ["HARMFUL|PLAYER"]?: AuraList;
-    ["HELPFUL|PLAYER"]?: AuraList;
 }
 
 export type AuraType = keyof AuraByType;
@@ -125,6 +123,7 @@ export interface SpellInfo extends Powers {
     gcd?: number;
     shared_cd?:number;
     cd?: number;
+    charge_cd?: number;
     forcecd?:number;
     buff_cd?:number; // Internal cooldown, rename?
     buff_cdr?:number; // Cooldown reduction TODO

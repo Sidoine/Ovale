@@ -75,7 +75,7 @@ local OvaleSpellsClass = __class(OvaleSpellsBase, {
             returnValue = IsSpellInRange(name, unitId)
         end
         if (returnValue == 1 and spellId == WARRIOR_INCERCEPT_SPELLID) then
-            return (UnitIsFriend("player", unitId) == 1 or __exports.OvaleSpells:IsSpellInRange(WARRIOR_HEROICTHROW_SPELLID, unitId))
+            return (UnitIsFriend("player", unitId) or __exports.OvaleSpells:IsSpellInRange(WARRIOR_HEROICTHROW_SPELLID, unitId))
         end
         return (returnValue == 1 and true) or (returnValue == 0 and false) or (returnValue == nil and nil)
     end,

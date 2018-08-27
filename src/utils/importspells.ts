@@ -1396,7 +1396,7 @@ export function getSpellData(directory: string) {
     }
 
     for (const spell of spellData) {
-        if (spell.rank_str === "Rank 2") continue;
+        if (spell.rank_str) continue;
         if (identifiers[spell.identifier]) {
             const other = spellDataById.get(identifiers[spell.identifier]);
             if (other.identifierScore === spell.identifierScore) {
@@ -1415,7 +1415,7 @@ export function getSpellData(directory: string) {
     }
 
     for (const spell of spellData) {
-        if (spell.rank_str === "Rank 2" && identifiers[spell.identifier]) {
+        if (spell.rank_str && identifiers[spell.identifier]) {
             const currentSpell = spellDataById.get(identifiers[spell.identifier]);
             currentSpell.nextRank = spell;
         }

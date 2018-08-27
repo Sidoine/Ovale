@@ -594,7 +594,7 @@ local function Classification(positionalParams, namedParams, state, atTime)
         elseif UnitExists("boss1") and OvaleGUID:UnitGUID(target) == OvaleGUID:UnitGUID("boss1") then
             targetClassification = "worldboss"
         else
-            local aura = OvaleAura:GetAura(target, IMBUED_BUFF_ID, atTime, "debuff", false)
+            local aura = OvaleAura:GetAura(target, IMBUED_BUFF_ID, atTime, "HARMFUL", false)
             if OvaleAura:IsActiveAura(aura, atTime) then
                 targetClassification = "worldboss"
             else
@@ -1153,7 +1153,7 @@ local function IsFriend(positionalParams, namedParams, state, atTime)
         local yesno = positionalParams[1]
         local target = ParseCondition(positionalParams, namedParams, state)
         local boolean = UnitIsFriend("player", target)
-        return TestBoolean(boolean == 1, yesno)
+        return TestBoolean(boolean, yesno)
     end
     OvaleCondition:RegisterCondition("isfriend", false, IsFriend)
 end

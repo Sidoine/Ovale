@@ -319,7 +319,8 @@ class OvaleCooldownClass extends OvaleCooldownBase implements SpellCastModule {
         }
         return duration;
     }
-    GetSpellCharges(spellId: number, atTime: number) {
+
+    GetSpellCharges(spellId: number, atTime: number): [number, number, number, number] {
         let cd = this.GetCD(spellId, atTime);
         let [charges, maxCharges, chargeStart, chargeDuration] = [cd.charges, cd.maxCharges, cd.chargeStart, cd.chargeDuration];
         if (charges) {
@@ -329,8 +330,7 @@ class OvaleCooldownClass extends OvaleCooldownBase implements SpellCastModule {
             }
         }
         return [charges, maxCharges, chargeStart, chargeDuration];
-    }    
-
+    }
     
     RequireCooldownHandler: RequirementMethod = (spellId, atTime, requirement, tokens, index, targetGUID):[boolean, string, number] => {
         let verified = false;

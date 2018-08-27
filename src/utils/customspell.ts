@@ -106,7 +106,7 @@ export function convertFromSpellData(spell: SpellData, spellDataById: Map<number
         spellInfo.cd = spell.cooldown / 1000;
     }
     else if (spell.charge_cooldown) {
-        spellInfo.cd = spell.charge_cooldown / 1000;
+        spellInfo.charge_cd = spell.charge_cooldown / 1000;
     }
     if (spell.duration && spell.duration > 0) {
         spellInfo.duration = spell.duration / 1000;
