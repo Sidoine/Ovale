@@ -2275,7 +2275,7 @@ local function TotemExpires(positionalParams, namedParams, state, atTime)
         local id, seconds = positionalParams[1], positionalParams[2]
         seconds = seconds or 0
         if type(id) == "string" then
-            local _, _, startTime, duration = OvaleTotem:GetTotemInfo(id)
+            local _, _, startTime, duration = OvaleTotem:GetTotemInfo(id, atTime)
             if startTime then
                 return startTime + duration - seconds, INFINITY
             end
@@ -2290,7 +2290,7 @@ local function TotemExpires(positionalParams, namedParams, state, atTime)
 local function TotemPresent(positionalParams, namedParams, state, atTime)
         local id = positionalParams[1]
         if type(id) == "string" then
-            local _, _, startTime, duration = OvaleTotem:GetTotemInfo(id)
+            local _, _, startTime, duration = OvaleTotem:GetTotemInfo(id, atTime)
             if startTime and duration > 0 then
                 return startTime, startTime + duration
             end
@@ -2307,7 +2307,7 @@ local function TotemPresent(positionalParams, namedParams, state, atTime)
 local function TotemRemaining(positionalParams, namedParams, state, atTime)
         local id, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
         if type(id) == "string" then
-            local _, _, startTime, duration = OvaleTotem:GetTotemInfo(id)
+            local _, _, startTime, duration = OvaleTotem:GetTotemInfo(id, atTime)
             if startTime and duration > 0 then
                 local start, ending = startTime, startTime + duration
                 return TestValue(start, ending, 0, ending, -1, comparator, limit)

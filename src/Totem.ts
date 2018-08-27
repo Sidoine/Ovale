@@ -30,7 +30,7 @@ let TOTEM_SLOT: LuaObj<number> = {
     water: WATER_TOTEM_SLOT,
     spirit_wolf: 1
 }
-export type TotemSlot = "air" | "earth" | "fire" | "water" | "spirit_wolf";
+export type TotemSlot = "air" | "earth" | "fire" | "water" | "spirit_wolf" | "totem_mastery";
 let TOTEMIC_RECALL = 36936;
 
 interface Totem {
@@ -104,14 +104,27 @@ class OvaleTotemClass extends OvaleTotemBase {
 
     IsActiveTotem(totem: Totem, atTime?: number) {
         let boolean = false;
+        if (!atTime) {
+            return totem !== undefined;
+        }
         if (totem && (totem.serial == self_serial) && totem.start && totem.duration && totem.start < atTime && atTime < totem.start + totem.duration) {
             boolean = true;
         }
         return boolean;
     }
-    GetTotem(slot: TotemSlot | number) {
+    GetTotemNumber(slot: TotemSlot | number) {
+        if (slot === "totem_mastery") return 1;
+        if (isString(slot)) {
+            if (!TOTEM_SLOT[slot]) {
+                Ovale.OneTimeMessage("Unknown totem %s", slot)
+                return AIR_TOTEM_SLOT;
+            }
+            return TOTEM_SLOT[slot];
+        }
+        return slot;
+    }
+    GetTotem(slot: number) {
         OvaleTotem.StartProfiling("OvaleTotem_state_GetTotem");
-        if (isString(slot)) slot = TOTEM_SLOT[slot];
         let totem = this.next.totem[slot];
         if (totem && (!totem.serial || totem.serial < self_serial)) {
             let [haveTotem, name, startTime, duration, icon] = GetTotemInfo(slot);
@@ -131,12 +144,12 @@ class OvaleTotemClass extends OvaleTotemBase {
         OvaleTotem.StopProfiling("OvaleTotem_state_GetTotem");
         return totem;
     }
-    GetTotemInfo(slot: TotemSlot | number): [boolean, string, number, number, string] {
+    GetTotemInfo(slot: TotemSlot | number, atTime: number): [boolean, string, number, number, string] {
         let haveTotem, name, startTime, duration, icon;
-        if (isString(slot)) slot = TOTEM_SLOT[slot];
+        slot = this.GetTotemNumber(slot);
         let totem = this.GetTotem(slot);
         if (totem) {
-            haveTotem = this.IsActiveTotem(totem);
+            haveTotem = this.IsActiveTotem(totem, atTime);
             name = totem.name;
             startTime = totem.start;
             duration = totem.duration;
