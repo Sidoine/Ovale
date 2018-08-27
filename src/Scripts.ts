@@ -115,12 +115,18 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
     }
     GetDefaultScriptName(className: ClassId, specialization: SpecializationName) {
         let name = undefined;
+        let scClassName = lower(className);
 
-        if(className == "DRUID"){
+        if (className === "DEMONHUNTER") {
+            scClassName = "demon_hunter";
+        } else if (className === "DEATHKNIGHT") {
+            scClassName = "death_knight";
+        }
+        else if(className == "DRUID"){
             if(specialization == "feral"){
                 name = "shmoodude_druid_feral";
             }
-        }else if(className == "MONK"){
+        } else if(className == "MONK"){
             if(specialization == "mistweaver"){
                 name = "Disabled";
             }
@@ -143,7 +149,7 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
         }
 
         if (!name && specialization) {
-            name = format("sc_pr_%s_%s", lower(className), specialization);
+            name = format("sc_pr_%s_%s", scClassName, specialization);
         }
         if (!(name && this.script[name])) {
             name = DISABLED_NAME;

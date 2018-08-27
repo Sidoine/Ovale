@@ -109,7 +109,12 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
     end,
     GetDefaultScriptName = function(self, className, specialization)
         local name = nil
-        if className == "DRUID" then
+        local scClassName = lower(className)
+        if className == "DEMONHUNTER" then
+            scClassName = "demon_hunter"
+        elseif className == "DEATHKNIGHT" then
+            scClassName = "death_knight"
+        elseif className == "DRUID" then
             if specialization == "feral" then
                 name = "shmoodude_druid_feral"
             end
@@ -135,7 +140,7 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
             end
         end
         if  not name and specialization then
-            name = format("sc_pr_%s_%s", lower(className), specialization)
+            name = format("sc_pr_%s_%s", scClassName, specialization)
         end
         if  not (name and self.script[name]) then
             name = DISABLED_NAME
