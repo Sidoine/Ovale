@@ -10,14 +10,30 @@ end
 local InterruptTable = {}
 _G["InterruptTable"] = InterruptTable
 
+function lib:HasManagedInterrupts(target)
+	-- Get target name.
+	local targetName = UnitName(target)
+	
+	-- Is the target on the interrupt table?
+	local boolean = InterruptTable[targetName] ~= nil and InterruptTable[targetName]
+	
+	if boolean then
+		-- Yes.
+		return true
+	else
+		-- No.
+		return false
+	end
+end
+
 function lib:MustInterrupt(target)
-	-- Get target info.
+	-- Get target name.
 	local targetName = UnitName(target)
 	
 	-- Get cast / channel info.
-	local spellName, _, _, _, _, _, _, _, notInterruptible = UnitCastingInfo(target)
+	local spellName, _, _, _, _, _, _, notInterruptible, _ = UnitCastingInfo(target)
 	if not spellName then
-		spellName, _, _, _, _, _, _, notInterruptible = UnitChannelInfo(target)
+		spellName, _, _, _, _, _, notInterruptible = UnitChannelInfo(target)
 	end
 	
 	-- Do we stop it?
