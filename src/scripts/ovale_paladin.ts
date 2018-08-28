@@ -17,8 +17,21 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_paladin_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=protection)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=protection)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=protection)
+
+AddFunction ProtectionInterruptActions
+{
+ if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+ {
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+  if target.Distance(less 10) and not target.Classification(worldboss) Spell(blinding_light)
+  if target.InRange(hammer_of_justice) and not target.Classification(worldboss) Spell(hammer_of_justice)
+  if target.InRange(avengers_shield) and target.IsInterruptible() Spell(avengers_shield)
+  if target.InRange(rebuke) and target.IsInterruptible() Spell(rebuke)
+ }
+}
 
 AddFunction ProtectionUseItemActions
 {
@@ -114,6 +127,7 @@ AddFunction ProtectionDefaultShortCdPostConditions
 
 AddFunction ProtectionDefaultCdActions
 {
+ ProtectionInterruptActions()
  #fireblood,if=buff.avenging_wrath.up
  if BuffPresent(avenging_wrath_buff) Spell(fireblood)
 
@@ -210,9 +224,11 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 # avenging_wrath_buff
 # battle_potion_of_strength
 # blessed_hammer
+# blinding_light
 # consecration
 # crusaders_judgment_talent
 # fireblood
+# hammer_of_justice
 # hammer_of_the_righteous
 # judgment_protection
 # lights_judgment
@@ -221,6 +237,7 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 # seraphim_buff
 # seraphim_talent
 # shield_of_the_righteous
+# war_stomp
 `
 	OvaleScripts.RegisterScript("PALADIN", "protection", name, desc, code, "script")
 }

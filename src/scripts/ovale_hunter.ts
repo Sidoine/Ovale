@@ -16,7 +16,18 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_hunter_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=beast_mastery)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=beast_mastery)
+
+AddFunction BeastmasteryInterruptActions
+{
+ if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+ {
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+  if target.InRange(counter_shot) and target.IsInterruptible() Spell(counter_shot)
+ }
+}
 
 AddFunction BeastmasteryUseItemActions
 {
@@ -122,6 +133,7 @@ AddFunction BeastmasteryDefaultShortCdPostConditions
 
 AddFunction BeastmasteryDefaultCdActions
 {
+ BeastmasteryInterruptActions()
  #auto_shot
  #use_items
  BeastmasteryUseItemActions()
@@ -230,6 +242,7 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # blood_fury_ap
 # chimaera_shot
 # cobra_shot
+# counter_shot
 # dire_beast
 # fireblood
 # kill_command
@@ -237,10 +250,12 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # multishot_bm
 # pet_beast_cleave_buff
 # pet_frenzy_buff
+# quaking_palm
 # revive_pet
 # rising_death
 # spitting_cobra
 # stampede
+# war_stomp
 `
 	OvaleScripts.RegisterScript("HUNTER", "beast_mastery", name, desc, code, "script")
 }
@@ -259,7 +274,18 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_hunter_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=marksmanship)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=marksmanship)
+
+AddFunction MarksmanshipInterruptActions
+{
+ if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+ {
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+  if target.InRange(counter_shot) and target.IsInterruptible() Spell(counter_shot)
+ }
+}
 
 AddFunction MarksmanshipUseItemActions
 {
@@ -541,6 +567,7 @@ AddFunction MarksmanshipDefaultShortCdPostConditions
 
 AddFunction MarksmanshipDefaultCdActions
 {
+ MarksmanshipInterruptActions()
  #auto_shot
  #use_items
  MarksmanshipUseItemActions()
@@ -632,6 +659,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # barrage_talent_marksmanship
 # berserking
 # blood_fury_ap
+# counter_shot
 # double_tap
 # double_tap_buff
 # explosive_shot
@@ -647,6 +675,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # piercing_shot
 # precise_shots_buff
 # prolonged_power_buff
+# quaking_palm
 # rapid_fire
 # revive_pet
 # rising_death
@@ -658,6 +687,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # trick_shots_buff
 # trueshot
 # trueshot_buff
+# war_stomp
 `
 	OvaleScripts.RegisterScript("HUNTER", "marksmanship", name, desc, code, "script")
 }
@@ -683,9 +713,20 @@ AddFunction carve_cdr
  unless Enemies() < 5 5
 }
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=survival)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=survival)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=survival)
 AddCheckBox(opt_harpoon SpellName(harpoon) default specialization=survival)
+
+AddFunction SurvivalInterruptActions
+{
+ if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+ {
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+  if target.InRange(muzzle) and target.IsInterruptible() Spell(muzzle)
+ }
+}
 
 AddFunction SurvivalUseItemActions
 {
@@ -1070,6 +1111,7 @@ AddFunction SurvivalDefaultShortCdPostConditions
 
 AddFunction SurvivalDefaultCdActions
 {
+ SurvivalInterruptActions()
  #use_items
  SurvivalUseItemActions()
  #call_action_list,name=cds
@@ -1192,6 +1234,8 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # mongoose_bite
 # mongoose_bite_talent
 # mongoose_fury_buff
+# muzzle
+# quaking_palm
 # raptor_strike
 # revive_pet
 # serpent_sting_sv
@@ -1204,6 +1248,7 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # venomous_fangs_trait
 # vipers_venom_buff
 # vipers_venom_talent
+# war_stomp
 # wilderness_survival_trait
 # wildfire_bomb
 # wildfire_bomb_debuff

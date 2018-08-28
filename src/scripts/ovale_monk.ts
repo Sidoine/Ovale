@@ -17,9 +17,22 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_monk_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=brewmaster)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=brewmaster)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=brewmaster)
 AddCheckBox(opt_chi_burst SpellName(chi_burst) default specialization=brewmaster)
+
+AddFunction BrewmasterInterruptActions
+{
+ if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+ {
+  if target.InRange(paralysis) and not target.Classification(worldboss) Spell(paralysis)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(leg_sweep)
+  if target.InRange(spear_hand_strike) and target.IsInterruptible() Spell(spear_hand_strike)
+ }
+}
 
 AddFunction BrewmasterUseItemActions
 {
@@ -121,6 +134,7 @@ AddFunction BrewmasterDefaultShortCdPostConditions
 
 AddFunction BrewmasterDefaultCdActions
 {
+ BrewmasterInterruptActions()
  #gift_of_the_ox,if=health<health.max*0.65
  #dampen_harm,if=incoming_damage_1500ms&buff.fortifying_brew.down
  if IncomingDamage(1.5) > 0 and BuffExpires(fortifying_brew_buff) Spell(dampen_harm)
@@ -246,12 +260,17 @@ AddIcon checkbox=opt_monk_brewmaster_aoe help=cd specialization=brewmaster
 # ironskin_brew
 # ironskin_brew_buff
 # keg_smash
+# leg_sweep
 # lights_judgment
+# paralysis
 # purifying_brew
+# quaking_palm
 # rushing_jade_wind
 # rushing_jade_wind_talent
+# spear_hand_strike
 # special_delivery_talent
 # tiger_palm
+# war_stomp
 `
 	OvaleScripts.RegisterScript("MONK", "brewmaster", name, desc, code, "script")
 }

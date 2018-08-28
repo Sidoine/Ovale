@@ -158,8 +158,22 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_warrior_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=arms)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=arms)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=arms)
+
+AddFunction ArmsInterruptActions
+{
+ if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+ {
+  if target.InRange(intimidating_shout) and not target.Classification(worldboss) Spell(intimidating_shout)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+  if target.Distance(less 10) and not target.Classification(worldboss) Spell(shockwave)
+  if target.InRange(storm_bolt) and not target.Classification(worldboss) Spell(storm_bolt)
+  if target.InRange(pummel) and target.IsInterruptible() Spell(pummel)
+ }
+}
 
 AddFunction ArmsGetInMeleeRange
 {
@@ -443,6 +457,8 @@ AddFunction ArmsDefaultShortCdPostConditions
 
 AddFunction ArmsDefaultCdActions
 {
+ ArmsInterruptActions()
+
  unless CheckBoxOn(opt_melee_range) and target.InRange(charge) and Spell(charge)
  {
   #potion
@@ -570,22 +586,27 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # fervor_of_battle_talent
 # fireblood
 # heroic_leap
+# intimidating_shout
 # lights_judgment
 # mortal_strike
 # overpower
 # overpower_buff
 # pummel
+# quaking_palm
 # ravager
 # rend
 # rend_debuff
+# shockwave
 # skullsplitter
 # slam
 # stone_heart_buff
+# storm_bolt
 # sudden_death_arms_buff
 # sweeping_strikes
 # sweeping_strikes_buff
 # test_of_might_buff
 # test_of_might_trait
+# war_stomp
 # warbreaker
 # warbreaker_talent
 # whirlwind_arms
@@ -606,8 +627,22 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_warrior_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=fury)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=fury)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=fury)
+
+AddFunction FuryInterruptActions
+{
+ if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+ {
+  if target.InRange(intimidating_shout) and not target.Classification(worldboss) Spell(intimidating_shout)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+  if target.Distance(less 10) and not target.Classification(worldboss) Spell(shockwave)
+  if target.InRange(storm_bolt) and not target.Classification(worldboss) Spell(storm_bolt)
+  if target.InRange(pummel) and target.IsInterruptible() Spell(pummel)
+ }
+}
 
 AddFunction FuryGetInMeleeRange
 {
@@ -794,6 +829,8 @@ AddFunction FuryDefaultShortCdPostConditions
 
 AddFunction FuryDefaultCdActions
 {
+ FuryInterruptActions()
+
  unless CheckBoxOn(opt_melee_range) and target.InRange(charge) and Spell(charge)
  {
   #run_action_list,name=movement,if=movement.distance>5
@@ -913,17 +950,22 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # furious_slash_buff
 # furious_slash_talent
 # heroic_leap
+# intimidating_shout
 # kazzalax_fujiedas_fury_item
 # lights_judgment
 # massacre_talent_fury
 # pummel
+# quaking_palm
 # raging_blow
 # rampage
 # recklessness
 # recklessness_buff
+# shockwave
 # siegebreaker
 # siegebreaker_debuff
 # siegebreaker_talent
+# storm_bolt
+# war_stomp
 # whirlwind_buff
 # whirlwind_fury
 ]]

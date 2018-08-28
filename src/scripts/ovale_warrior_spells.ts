@@ -82,6 +82,11 @@ Define(furious_slash_buff 202539)
 Define(heroic_leap 6544)
 # Leap through the air toward a target location, slamming down with destructive force to deal 52174s1 Physical damage to all enemies within 52174a1 yards?s23922[, and resetting the remaining cooldown on Taunt][].
   SpellInfo(heroic_leap cd=0.8 charge_cd=45 gcd=0 offgcd=1)
+Define(intimidating_shout 5246)
+# ?s275338[Causes the targeted enemy and up to s1 additional enemies within 5246A3 yards to cower in fear.][Causes the targeted enemy to cower in fear, and up to s1 additional enemies within 5246A3 yards to flee.] Targets are disoriented for 8 seconds.
+  SpellInfo(intimidating_shout cd=90 duration=8)
+  # Disoriented.
+  SpellAddTargetDebuff(intimidating_shout intimidating_shout=1)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
@@ -98,6 +103,11 @@ Define(pummel 6552)
 # Pummels the target, interrupting spellcasting and preventing any spell in that school from being cast for 4 seconds.
 # Rank 1: Pummel the target for s2 damage and interrupt the spell being cast for 5 seconds.
   SpellInfo(pummel cd=15 duration=4 gcd=0 offgcd=1 interrupt=1)
+Define(quaking_palm 107079)
+# Strikes the target with lightning speed, incapacitating them for 4 seconds, and turns off your attack.
+  SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
+  # Incapacitated.
+  SpellAddTargetDebuff(quaking_palm quaking_palm=1)
 Define(raging_blow 85288)
 # A mighty blow with both weapons that deals a total of (96103sw1+85384sw1)*<mult> Physical damage.rnrnRaging Blow has a s1 chance to instantly reset its own cooldown.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
   SpellInfo(raging_blow cd=8 rage=-12)
@@ -121,6 +131,9 @@ Define(rend 772)
   SpellInfo(rend rage=30 duration=12 tick=3 talent=rend_talent)
   # Bleeding for w2 damage every t2 sec.
   SpellAddTargetDebuff(rend rend=1)
+Define(shockwave 46968)
+# Sends a wave of force in a frontal cone, causing m2 damage and stunning all enemies within a1 yards for 2 seconds.
+  SpellInfo(shockwave cd=40)
 Define(siegebreaker 280772)
 # Break the enemy's defenses, dealing s1 Physical damage, and increasing your damage done to the target by 280773s1 for 10 seconds.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
   SpellInfo(siegebreaker cd=30 rage=-10 talent=siegebreaker_talent)
@@ -130,6 +143,9 @@ Define(skullsplitter 260643)
 Define(slam 1464)
 # Slams an opponent, causing s1 Physical damage.
   SpellInfo(slam rage=20)
+Define(storm_bolt 107570)
+# Hurls your weapon at an enemy, causing s1 Physical damage and stunning for 4 seconds.
+  SpellInfo(storm_bolt cd=30 talent=storm_bolt_talent_fury)
 Define(sweeping_strikes 260708)
 # For 12 seconds your single-target damaging abilities hit s1 additional Ltarget:targets; within 8 yds for s2 damage.
   SpellInfo(sweeping_strikes cd=30 duration=12)
@@ -139,6 +155,11 @@ Define(test_of_might_buff 275531)
 # When ?s262161[Warbreaker][Colossus Smash] expires, your Strength is increased by s1 for every s2 Rage you spent during ?s262161[Warbreaker][Colossus Smash]. Lasts 12 seconds.
   SpellInfo(test_of_might_buff channel=-0.001 gcd=0 offgcd=1)
 
+Define(war_stomp 20549)
+# Stuns up to i enemies within A1 yds for 2 seconds.
+  SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
+  # Stunned.
+  SpellAddTargetDebuff(war_stomp war_stomp=1)
 Define(warbreaker 262161)
 # Smash the ground and shatter the armor of all enemies within A1 yds, dealing s1 Physical damage and increasing damage you deal to them by 208086s1 for 10 seconds.
   SpellInfo(warbreaker cd=45 talent=warbreaker_talent)
@@ -177,6 +198,8 @@ Define(siegebreaker_talent 21) #16037
 # Break the enemy's defenses, dealing s1 Physical damage, and increasing your damage done to the target by 280773s1 for 10 seconds.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
 Define(skullsplitter_talent 3) #22371
 # Bash an enemy's skull, dealing s1 Physical damage.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
+Define(storm_bolt_talent_fury 6) #23093
+# Hurls your weapon at an enemy, causing s1 Physical damage and stunning for 4 seconds.
 Define(warbreaker_talent 14) #22391
 # Smash the ground and shatter the armor of all enemies within A1 yds, dealing s1 Physical damage and increasing damage you deal to them by 208086s1 for 10 seconds.
 Define(kazzalax_fujiedas_fury_item 137053)
@@ -315,7 +338,7 @@ Define(intercept 198304)
 	SpellInfo(intercept cd=15 rage=-20 charges=2)
 	SpellAddTargetDebuff(intercept charge_debuff=1)
 	SpellAddTargetBuff(intercept safeguard_buff=1)
-Define(intimidating_shout 5246)
+
 Define(into_the_fray_buff 202602)
 Define(last_stand 12975)
 	SpellInfo(last_stand cd=180)
@@ -404,8 +427,8 @@ Define(shield_wall 871)
 	SpellAddBuff(shield_wall shield_wall_buff=1)
 Define(shield_wall_buff 871)
 	SpellInfo(shield_wall duration=8)
-Define(shockwave 46968)
-	SpellInfo(shockwave cd=40)
+
+	
 
 	SpellInfo(siegebreaker cd=30 rage=-10)
 	SpellAddTargetDebuff(siegebreaker siegebreaker_debuff=1)
@@ -420,7 +443,7 @@ Define(spell_reflection 23920)
 	SpellInfo(spell_reflection cd=25)
 	SpellAddBuff(spell_reflection spell_reflection_buff=1)
 Define(spell_reflection_buff 23920)
-Define(storm_bolt 107570)
+
 	SpellInfo(storm_bolt cd=30)
 Define(sudden_death_arms_buff 52437)
 	SpellInfo(sudden_death_arms_buff duration=10)

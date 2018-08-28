@@ -208,7 +208,19 @@ AddFunction dots_up
  target.DebuffPresent(shadow_word_pain_debuff) and target.DebuffPresent(vampiric_touch_debuff)
 }
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=shadow)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=shadow)
+
+AddFunction ShadowInterruptActions
+{
+ if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+ {
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+  if target.InRange(mind_bomb) and not target.Classification(worldboss) and target.RemainingCastTime() > 2 Spell(mind_bomb)
+  if target.InRange(silence) and target.IsInterruptible() Spell(silence)
+ }
+}
 
 AddFunction ShadowUseItemActions
 {
@@ -512,6 +524,7 @@ AddFunction ShadowDefaultShortCdPostConditions
 
 AddFunction ShadowDefaultCdActions
 {
+ ShadowInterruptActions()
  #use_item,slot=trinket2
  ShadowUseItemActions()
  #potion,if=buff.bloodlust.react|target.time_to_die<=80|target.health.pct<35
@@ -604,10 +617,12 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # dark_void
 # dark_void_talent
 # mind_blast
+# mind_bomb
 # mind_flay
 # mind_sear
 # mindbender
 # misery_talent
+# quaking_palm
 # rising_death
 # shadow_crash
 # shadow_word_death
@@ -616,6 +631,7 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # shadow_word_void
 # shadowform
 # shadowform_buff
+# silence
 # surrender_to_madness
 # vampiric_touch
 # vampiric_touch_debuff
@@ -623,6 +639,7 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # void_eruption
 # void_torrent
 # voidform_shadow
+# war_stomp
 ]]
     OvaleScripts:RegisterScript("PRIEST", "shadow", name, desc, code, "script")
 end

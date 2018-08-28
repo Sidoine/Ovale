@@ -29,6 +29,10 @@ Define(blessed_hammer 229976)
 # Throws a Blessed Hammer that spirals outward, dealing 204301s1 Holy damage to enemies and weakening them, reducing the damage you take from their next auto attack by 204301s2.
   SpellInfo(blessed_hammer channel=0 gcd=0 offgcd=1)
   SpellAddBuff(blessed_hammer blessed_hammer=1)
+Define(blinding_light 115750)
+# Emits dazzling light in all directions, blinding enemies within 105421A1 yards, causing them to wander disoriented for 105421d. Non-Holy damage will break the disorient effect.
+  SpellInfo(blinding_light cd=90 duration=6 talent=blinding_light_talent)
+  SpellAddBuff(blinding_light blinding_light=1)
 Define(bursting_blood 251316)
 # Imbues your blood with heat for 25 seconds, giving your melee attacks a chance to create a burst of blood, dealing 265514s1 Physical damage split evenly amongst all nearby enemies.
   SpellInfo(bursting_blood duration=25 channel=25 gcd=0 offgcd=1)
@@ -123,6 +127,8 @@ Define(war_stomp 20549)
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
   # Stunned.
   SpellAddTargetDebuff(war_stomp war_stomp=1)
+Define(blinding_light_talent 9) #21811
+# Emits dazzling light in all directions, blinding enemies within 105421A1 yards, causing them to wander disoriented for 105421d. Non-Holy damage will break the disorient effect.
 Define(crusade_talent 20) #22215
 # Call upon the Light and begin a crusade, increasing your damage done and Haste by <damage> for 25 seconds.rnrnEach Holy Power spent during Crusade increases damage done and Haste by an additional <damage>.rnrnMaximum u stacks.
 Define(crusaders_judgment_talent 5) #22604
@@ -238,7 +244,7 @@ Define(blessing_of_spellwarding 204018)
 	SpellRequire(blessing_of_spellwarding unusable 1=debuff,forbearance_debuff)
 Define(blessing_of_spellwarding_buff 204018)
 	SpellInfo(blessing_of_spellwarding_buff duration=10)
-Define(blinding_light 115750)
+
 	SpellInfo(blinding_light cd=90 interrupt=1 tag=cd)
 Define(cleanse 4987)
 	SpellInfo(cleanse cd=8)

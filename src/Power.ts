@@ -283,7 +283,7 @@ class OvalePowerClass extends OvalePowerBase {
     POWER_INFO: LuaObj<PowerInfo> = {}
     POWER_TYPE: LuaObj<PowerType> = {}
 
-    POOLED_RESOURCE: LuaObj<PowerType> = {
+    POOLED_RESOURCE: { [key in ClassId]?: PowerType} = {
         ["DRUID"]: "energy",
         ["HUNTER"]: "focus",
         ["MONK"]: "energy",

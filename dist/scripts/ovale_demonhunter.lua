@@ -542,8 +542,21 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_demonhunter_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=vengeance)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=vengeance)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=vengeance)
+
+AddFunction VengeanceInterruptActions
+{
+ if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+ {
+  if target.InRange(imprison) and not target.Classification(worldboss) and target.CreatureType(Demon Humanoid Beast) Spell(imprison)
+  if not target.Classification(worldboss) and not SigilCharging(silence misery chains) and target.RemainingCastTime() >= 2 - Talent(quickened_sigils_talent) + GCDRemaining() Spell(sigil_of_chains)
+  if not target.Classification(worldboss) and not SigilCharging(silence misery chains) and target.RemainingCastTime() >= 2 - Talent(quickened_sigils_talent) + GCDRemaining() Spell(sigil_of_misery)
+  if target.IsInterruptible() and not target.Classification(worldboss) and not SigilCharging(silence misery chains) and target.RemainingCastTime() >= 2 - Talent(quickened_sigils_talent) + GCDRemaining() Spell(sigil_of_silence)
+  if target.InRange(disrupt) and target.IsInterruptible() Spell(disrupt)
+ }
+}
 
 AddFunction VengeanceUseItemActions
 {
@@ -784,6 +797,8 @@ AddFunction VengeanceDefaultShortCdPostConditions
 
 AddFunction VengeanceDefaultCdActions
 {
+ VengeanceInterruptActions()
+
  unless Spell(consume_magic)
  {
   #use_item,slot=trinket1
@@ -874,16 +889,21 @@ AddIcon checkbox=opt_demonhunter_vengeance_aoe help=cd specialization=vengeance
 # charred_flesh_talent
 # consume_magic
 # demon_spikes
+# disrupt
 # fel_devastation
 # felblade
 # fiery_brand
 # fiery_brand_debuff
 # fracture
 # immolation_aura
+# imprison
 # infernal_strike
 # metamorphosis_veng
 # shear
+# sigil_of_chains
 # sigil_of_flame
+# sigil_of_misery
+# sigil_of_silence
 # soul_cleave
 # spirit_bomb
 # spirit_bomb_talent

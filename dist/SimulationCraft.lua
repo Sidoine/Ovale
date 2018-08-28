@@ -54,6 +54,128 @@ local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isLuaArray = __tools.isLuaArray
 local OvaleSimulationCraftBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleSimulationCraft"))
+local interruptsClasses = {
+    "mind_freeze" = "DEATHKNIGHT",
+    "pummel" = "WARRIOR",
+    "disrupt" = "DEMONHUNTER",
+    "skull_bash" = "DRUID",
+    "solar_beam" = "DRUID",
+    "rebuke" = "PALADIN",
+    "silence" = "PRIEST",
+    "mind_bomb" = "PRIEST",
+    "kick" = "ROGUE",
+    "wind_shear" = "SHAMAN",
+    "counter_shot" = "HUNTER",
+    counterspell = "MAGE",
+    muzzle = "HUNTER",
+    spear_hand_strike = "MONK"
+}
+local classInfos = {
+    DEATHKNIGHT = {
+        "frost" = {
+            interrupt = "mind_freeze"
+        },
+        "blood" = {
+            interrupt = "mind_freeze"
+        },
+        "unholy" = {
+            interrupt = "mind_freeze"
+        }
+    },
+    DEMONHUNTER = {
+        "havoc" = {
+            interrupt = "disrupt"
+        },
+        "vengeance" = {
+            interrupt = "disrupt"
+        }
+    },
+    DRUID = {
+        "guardian" = {
+            interrupt = "skull_bash"
+        },
+        "feral" = {
+            interrupt = "skull_bash"
+        },
+        "balance" = {
+            interrupt = "solar_beam"
+        }
+    },
+    HUNTER = {
+        "beast_mastery" = {
+            interrupt = "counter_shot"
+        },
+        "survival" = {
+            interrupt = "muzzle"
+        },
+        "marksmanship" = {
+            interrupt = "counter_shot"
+        }
+    },
+    MAGE = {
+        "frost" = {
+            interrupt = "counterspell"
+        },
+        "fire" = {
+            interrupt = "counterspell"
+        },
+        "arcane" = {
+            interrupt = "counterspell"
+        }
+    },
+    MONK = {
+        brewmaster = {
+            interrupt = "spear_hand_strike"
+        },
+        windwalker = {
+            interrupt = "spear_hand_strike"
+        }
+    },
+    PALADIN = {
+        retribution = {
+            interrupt = "rebuke"
+        },
+        protection = {
+            interrupt = "rebuke"
+        }
+    },
+    PRIEST = {
+        shadow = {
+            interrupt = "silence"
+        }
+    },
+    ROGUE = {
+        assassination = {
+            interrupt = "kick"
+        },
+        outlaw = {
+            interrupt = "kick"
+        },
+        subtlety = {
+            interrupt = "kick"
+        }
+    },
+    SHAMAN = {
+        elemental = {
+            interrupt = "wind_shear"
+        },
+        enhancement = {
+            interrupt = "wind_shear"
+        }
+    },
+    WARLOCK = {},
+    WARRIOR = {
+        fury = {
+            interrupt = "pummel"
+        },
+        protection = {
+            interrupt = "pummel"
+        },
+        arms = {
+            interrupt = "pummel"
+        }
+    }
+}
 local KEYWORD = {}
 local MODIFIER_KEYWORD = {
     ["ammo_type"] = true,
@@ -1933,18 +2055,13 @@ EmitAction = function(parseNode, nodeList, annotation)
         local expressionType = "expression"
         local modifier = parseNode.child
         local isSpellAction = true
-        if className == "DEATHKNIGHT" and action == "antimagic_shell" then
+        if interruptsClasses[action] == className then
+            bodyCode = camelSpecialization .. "InterruptActions()"
+            annotation[action] = className
+            annotation.interrupt = className
+            isSpellAction = false
+        elseif className == "DEATHKNIGHT" and action == "antimagic_shell" then
             conditionCode = "IncomingDamage(1.5 magic=1) > 0"
-        elseif className == "DEATHKNIGHT" and action == "mind_freeze" then
-            bodyCode = camelSpecialization .. "InterruptActions()"
-            annotation[action] = className
-            annotation.interrupt = className
-            isSpellAction = false
-        elseif className == "DEMONHUNTER" and action == "disrupt" then
-            bodyCode = camelSpecialization .. "InterruptActions()"
-            annotation[action] = className
-            annotation.interrupt = className
-            isSpellAction = false
         elseif className == "DRUID" and action == "pulverize" then
             local debuffName = "thrash_bear_debuff"
             AddSymbol(annotation, debuffName)
@@ -1953,11 +2070,6 @@ EmitAction = function(parseNode, nodeList, annotation)
             local spellName = "enhanced_rejuvenation"
             AddSymbol(annotation, spellName)
             conditionCode = format("SpellKnown(%s)", spellName)
-        elseif className == "DRUID" and (action == "skull_bash" or action == "solar_beam") then
-            bodyCode = camelSpecialization .. "InterruptActions()"
-            annotation[action] = className
-            annotation.interrupt = className
-            isSpellAction = false
         elseif className == "DRUID" and action == "wild_charge" then
             bodyCode = camelSpecialization .. "GetInMeleeRange()"
             annotation[action] = className
@@ -1970,11 +2082,6 @@ EmitAction = function(parseNode, nodeList, annotation)
             conditionCode = "SpellKnown(half_moon)"
         elseif className == "DRUID" and action == "full_moon" then
             conditionCode = "SpellKnown(full_moon)"
-        elseif className == "HUNTER" and (action == "muzzle" or action == "counter_shot") then
-            bodyCode = camelSpecialization .. "InterruptActions()"
-            annotation[action] = className
-            annotation.interrupt = className
-            isSpellAction = false
         elseif className == "HUNTER" and action == "exotic_munitions" then
             if modifier.ammo_type then
                 local name = Unparse(modifier.ammo_type)
@@ -1989,11 +2096,6 @@ EmitAction = function(parseNode, nodeList, annotation)
             conditionCode = "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()"
         elseif className == "MAGE" and action == "arcane_brilliance" then
             conditionCode = "BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1)"
-        elseif className == "MAGE" and action == "counterspell" then
-            bodyCode = camelSpecialization .. "InterruptActions()"
-            annotation[action] = className
-            annotation.interrupt = className
-            isSpellAction = false
         elseif className == "MAGE" and find(action, "pet_") then
             conditionCode = "pet.Present()"
         elseif className == "MAGE" and (action == "start_burn_phase" or action == "start_pyro_chain" or action == "stop_burn_phase" or action == "stop_pyro_chain") then
@@ -2025,11 +2127,6 @@ EmitAction = function(parseNode, nodeList, annotation)
             isSpellAction = false
         elseif className == "MONK" and action == "nimble_brew" then
             conditionCode = "IsFeared() or IsRooted() or IsStunned()"
-        elseif className == "MONK" and action == "spear_hand_strike" then
-            bodyCode = camelSpecialization .. "InterruptActions()"
-            annotation[action] = className
-            annotation.interrupt = className
-            isSpellAction = false
         elseif className == "MONK" and action == "storm_earth_and_fire" then
             conditionCode = "CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff)"
             annotation[action] = className
@@ -2048,21 +2145,11 @@ EmitAction = function(parseNode, nodeList, annotation)
                 bodyCode = "Spell(" .. action .. " text=double)"
                 isSpellAction = false
             end
-        elseif className == "PALADIN" and action == "rebuke" then
-            bodyCode = camelSpecialization .. "InterruptActions()"
-            annotation[action] = className
-            annotation.interrupt = className
-            isSpellAction = false
         elseif className == "PALADIN" and specialization == "protection" and action == "arcane_torrent_holy" then
             isSpellAction = false
         elseif className == "PALADIN" and action == "righteous_fury" then
             conditionCode = "CheckBoxOn(opt_righteous_fury_check)"
             annotation[action] = className
-        elseif className == "PRIEST" and (action == "silence" or action == "mind_bomb") then
-            bodyCode = camelSpecialization .. "InterruptActions()"
-            annotation[action] = className
-            annotation.interrupt = className
-            isSpellAction = false
         elseif className == "ROGUE" and action == "adrenaline_rush" then
             conditionCode = "EnergyDeficit() > 1"
         elseif className == "ROGUE" and action == "apply_poison" then
@@ -2077,25 +2164,13 @@ EmitAction = function(parseNode, nodeList, annotation)
             end
         elseif className == "ROGUE" and action == "between_the_eyes" then
             bodyCode = "Spell(between_the_eyes text=BTE)"
-        elseif className == "ROGUE" and specialization == "combat" and action == "blade_flurry" then
-            annotation.blade_flurry = className
-            conditionCode = "CheckBoxOn(opt_blade_flurry)"
         elseif className == "ROGUE" and action == "cancel_autoattack" then
-            isSpellAction = false
-        elseif className == "ROGUE" and action == "kick" then
-            bodyCode = camelSpecialization .. "InterruptActions()"
-            annotation[action] = className
-            annotation.interrupt = className
             isSpellAction = false
         elseif className == "ROGUE" and action == "pistol_shot" then
             bodyCode = "Spell(pistol_shot text=PS)"
         elseif className == "ROGUE" and action == "premeditation" then
             conditionCode = "ComboPoints() < 5"
-        elseif className == "ROGUE" and specialization == "combat" and action == "slice_and_dice" then
-            local buffName = "slice_and_dice_buff"
-            AddSymbol(annotation, buffName)
-            conditionCode = format("BuffRemaining(%s) < BaseDuration(%s)", buffName, buffName)
-        elseif className == "ROGUE" and (specialization == "assassination" or specialization == "combat") and action == "vanish" then
+        elseif className == "ROGUE" and specialization == "assassination" and action == "vanish" then
             annotation.vanish = className
             conditionCode = format("CheckBoxOn(opt_vanish)", action)
         elseif className == "SHAMAN" and sub(action, 1, 11) == "ascendance_" then
@@ -2113,11 +2188,6 @@ EmitAction = function(parseNode, nodeList, annotation)
         elseif className == "SHAMAN" and action == "totem_mastery" then
             conditionCode = "(not TotemPresent(totem_mastery) or InCombat()) and Speed() == 0"
             AddSymbol(annotation, "totem_mastery")
-        elseif className == "SHAMAN" and action == "wind_shear" then
-            bodyCode = camelSpecialization .. "InterruptActions()"
-            annotation[action] = className
-            annotation.interrupt = className
-            isSpellAction = false
         elseif className == "WARLOCK" and action == "cancel_metamorphosis" then
             local spellName = "metamorphosis"
             local buffName = "metamorphosis_buff"
@@ -2172,11 +2242,6 @@ EmitAction = function(parseNode, nodeList, annotation)
             isSpellAction = false
         elseif className == "WARRIOR" and action == "heroic_leap" then
             conditionCode = "CheckBoxOn(opt_melee_range) and target.Distance(atLeast 8) and target.Distance(atMost 40)"
-        elseif className == "WARRIOR" and action == "pummel" then
-            bodyCode = camelSpecialization .. "InterruptActions()"
-            annotation[action] = className
-            annotation.interrupt = className
-            isSpellAction = false
         elseif action == "auto_attack" then
             bodyCode = camelSpecialization .. "GetInMeleeRange()"
             isSpellAction = false
@@ -4889,7 +4954,7 @@ local AddOptionalSkillCheckBox = function(child, annotation, data, skill)
     return 1
 end
 
-local InsertSupportingControls = function(child, annotation)
+local function InsertSupportingControls(child, annotation)
     local count = 0
     for skill, data in pairs(OPTIONAL_SKILLS) do
         count = count + AddOptionalSkillCheckBox(child, annotation, data, skill)
@@ -4982,7 +5047,6 @@ local InsertSupportingControls = function(child, annotation)
     end
     return count
 end
-
 local InsertVariables = function(child, annotation)
     if annotation.variable then
         for _, v in pairs(annotation.variable) do
@@ -5125,7 +5189,7 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
             return a.name < b.name
         end
 )
-        for className in pairs(RAID_CLASS_COLORS) do
+        for className in kpairs(RAID_CLASS_COLORS) do
             local lowerClass = lower(className)
             if profile[lowerClass] then
                 annotation.class = className
@@ -5231,6 +5295,17 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
             for _, node in ipairs(profile.actionList) do
                 local addFunctionNode = EmitActionList(node, nodeList, annotation)
                 if addFunctionNode then
+                    if node.name == "_default" and  not annotation.interrupt then
+                        local defaultInterrupt = classInfos[annotation.class][annotation.specialization]
+                        if defaultInterrupt and defaultInterrupt.interrupt then
+                            local interruptCall = OvaleAST:NewNode(nodeList)
+                            interruptCall.type = "custom_function"
+                            interruptCall.name = CamelSpecialization(annotation) .. "InterruptActions"
+                            annotation.interrupt = annotation.class
+                            annotation[defaultInterrupt.interrupt] = annotation.class
+                            insert(addFunctionNode.child[1].child, 1, interruptCall)
+                        end
+                    end
                     local actionListName = gsub(node.name, "^_+", "")
                     local commentNode = OvaleAST:NewNode(nodeList)
                     commentNode.type = "comment"

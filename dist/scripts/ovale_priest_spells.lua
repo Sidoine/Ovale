@@ -48,6 +48,11 @@ Define(holy_word_chastise 88625)
 Define(mind_blast 8092)
 # Blasts the target's mind for (120 of Spell Power) Shadow damage.?a185916[rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r][]
   SpellInfo(mind_blast cd=7.5 insanity=-1200)
+Define(mind_bomb 205369)
+# Inflicts the target with a Mind Bomb.rnrnAfter 2 seconds or if the target dies, it unleashes a psychic explosion, disorienting all enemies within 226943A1 yds of the target for 5 seconds.
+  SpellInfo(mind_bomb cd=30 duration=2 talent=mind_bomb_talent)
+  # About to unleash a psychic explosion, disorienting all nearby enemies.
+  SpellAddTargetDebuff(mind_bomb mind_bomb=1)
 Define(mind_flay 15407)
 # Assaults the target's mind with Shadow energy, causing o1 Shadow damage over 3 seconds and slowing their movement speed by s2.?a185916[rnrn|cFFFFFFFFGenerates s4*m3/100 Insanity over the duration.|r][]
   SpellInfo(mind_flay duration=3 channel=3 replace=smite tick=0.75)
@@ -63,6 +68,11 @@ Define(mindbender 123040)
 # Summons a Mindbender to attack the target for 12 seconds. You regenerate 123051m1/100.1 of maximum mana each time the Mindbender attacks.
   SpellInfo(mindbender cd=60 duration=12 talent=mindbender_talent_unknown)
 
+Define(quaking_palm 107079)
+# Strikes the target with lightning speed, incapacitating them for 4 seconds, and turns off your attack.
+  SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
+  # Incapacitated.
+  SpellAddTargetDebuff(quaking_palm quaking_palm=1)
 Define(rising_death 252346)
 # Chance to create multiple potions.
   SpellInfo(rising_death gcd=0 offgcd=1)
@@ -88,6 +98,12 @@ Define(shadowform 232698)
   SpellAddBuff(shadowform shadowform=1)
   # Spell damage dealt increased by s1.rnPhysical damage taken reduced by s2.
   SpellAddTargetDebuff(shadowform shadowform=1)
+Define(silence 15487)
+# Silences the target, preventing them from casting spells for 4 seconds. Against non-players, also interrupts spellcasting and prevents any spell in that school from being cast for 4 seconds.
+# Rank 1: Silences an enemy preventing it from casting spells for 6 seconds.
+  SpellInfo(silence cd=45 duration=4 gcd=0 offgcd=1)
+  # Silenced.
+  SpellAddTargetDebuff(silence silence=1)
 Define(smite 585)
 # Smites an enemy for (47 of Spell Power) Holy damage?s231682[ and absorbs the next <shield> damage dealt by the enemy]?s231687[ and has a 231687s1 chance to reset the cooldown of Holy Fire][].
 # Rank 2: Smite deals s1 increased damage.
@@ -121,6 +137,11 @@ Define(voidform_shadow 228264)
 # Activated by casting Void Eruption. Twists your Shadowform with the powers of the Void, increasing spell damage you deal by 194249s1?s8092[, reducing the cooldown on Mind Blast by 194249m6/-1000.1 sec,][] and granting an additional s2/10.1 Haste every 194249t5 sec.rnrnYour Insanity will drain increasingly fast until it reaches 0 and Voidform ends.
   SpellInfo(voidform_shadow channel=0 gcd=0 offgcd=1)
   SpellAddBuff(voidform_shadow voidform_shadow=1)
+Define(war_stomp 20549)
+# Stuns up to i enemies within A1 yds for 2 seconds.
+  SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
+  # Stunned.
+  SpellAddTargetDebuff(war_stomp war_stomp=1)
 Define(apotheosis_talent 20) #21644
 # Enter a pure Holy form for 20 seconds, increasing the cooldown reductions to your Holy Words by s1 and reducing their cost by s2.
 Define(dark_ascension_talent 20) #21978
@@ -131,6 +152,8 @@ Define(divine_star_talent 17) #19760
 # Throw a Divine Star forward 24 yds, healing allies in its path for (50 of Spell Power) and dealing (40 of Spell Power) Holy damage to enemies. After reaching its destination, the Divine Star returns to you, healing allies and damaging enemies in its path again.
 Define(halo_talent 18) #19763
 # Creates a ring of Holy energy around you that quickly expands to a 30 yd radius, healing allies for (110.00000000000001 of Spell Power) and dealing (110.00000000000001 of Spell Power) Holy damage to enemies.
+Define(mind_bomb_talent 11) #23375
+# Inflicts the target with a Mind Bomb.rnrnAfter 2 seconds or if the target dies, it unleashes a psychic explosion, disorienting all enemies within 226943A1 yds of the target for 5 seconds.
 Define(mindbender_talent_unknown 8) #22094
 # Summons a Mindbender to attack the target for 12 seconds. You regenerate 123051m1/100.1 of maximum mana each time the Mindbender attacks.
 Define(misery_talent 8) #23126
@@ -179,7 +202,7 @@ Define(mass_dispel 32375)
 	SpellRequire(mind_blast insanity_percent 200=buff,surrender_to_madness_buff)
 	SpellRequire(mind_blast cd 6=buff,voidform_buff)
 	SpellAddBuff(mind_blast shadowy_insight_buff=0 talent=shadowy_insight_talent)
-Define(mind_bomb 205369)
+
 	SpellInfo(mind_bomb cd=30)
 Define(mind_bomb_debuff 205369)
 	SpellInfo(mind_bomb_debuff duration=2)
@@ -253,7 +276,7 @@ Define(shadowfiend 34433)
 Define(shadowform_buff 232698)
 Define(shadowy_insight_buff 124430)
 	SpellInfo(shadowy_insight_buff duration=12)
-Define(silence 15487)
+
 	SpellInfo(silence cd=45 gcd=0 interrupt=1)
 
 

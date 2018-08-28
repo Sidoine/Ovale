@@ -14,8 +14,9 @@ import { ResetControls } from "./Controls";
 import { format, gmatch, gsub, find, len, lower, match, sub, upper } from "@wowts/string";
 import { ipairs, next, pairs, rawset, tonumber, tostring, type, wipe, LuaObj, LuaArray, setmetatable, lualength, truthy, kpairs } from "@wowts/lua";
 import { concat, insert, remove, sort } from "@wowts/table";
-import { RAID_CLASS_COLORS } from "@wowts/wow-mock";
+import { RAID_CLASS_COLORS, ClassId } from "@wowts/wow-mock";
 import { isLuaArray } from "./tools";
+import { SpecializationName } from "./PaperDoll";
 
 let OvaleSimulationCraftBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleSimulationCraft"));
 export let OvaleSimulationCraft: OvaleSimulationCraftClass;
@@ -23,11 +24,92 @@ export let OvaleSimulationCraft: OvaleSimulationCraftClass;
 type ClassRole = "tank" | "spell" | "attack";
 type ClassType = string;
 
+type Interrupts = "mind_freeze" | "pummel" | "disrupt" | "skull_bash" | "solar_beam" |
+    "rebuke" | "silence" | "mind_bomb" | "kick" | "wind_shear" | "counter_shot" | "muzzle" |
+    "counterspell" | "spear_hand_strike";
+const interruptsClasses: { [k in Interrupts]: ClassId } = {
+    "mind_freeze": "DEATHKNIGHT",
+    "pummel": "WARRIOR",
+    "disrupt": "DEMONHUNTER",
+    "skull_bash": "DRUID",
+    "solar_beam": "DRUID",
+    "rebuke": "PALADIN",
+    "silence": "PRIEST",
+    "mind_bomb": "PRIEST",
+    "kick": "ROGUE",
+    "wind_shear": "SHAMAN",
+    "counter_shot": "HUNTER",
+    counterspell: "MAGE",
+    muzzle: "HUNTER",
+    spear_hand_strike: "MONK"
+}
 
-export interface Annotation {
-    class?: ClassType;
+interface SpecializationInfo {
+    interrupt: Interrupts;
+}
+
+type ClassInfo = { [key in SpecializationName]?: SpecializationInfo }
+
+const classInfos: { [key in ClassId]: ClassInfo} = {
+    DEATHKNIGHT: {
+        "frost": { interrupt: "mind_freeze" },
+        "blood": { interrupt: "mind_freeze" },
+        "unholy": { interrupt: "mind_freeze"}
+    },
+    DEMONHUNTER: {
+        "havoc": { interrupt: "disrupt" },
+        "vengeance": { interrupt: "disrupt"}
+    },
+    DRUID: {
+        "guardian": { interrupt: "skull_bash" },
+        "feral": { interrupt: "skull_bash" },
+        "balance": {interrupt: "solar_beam"}
+    },
+    HUNTER: {
+        "beast_mastery": { interrupt: "counter_shot" },
+        "survival": { interrupt: "muzzle" },
+        "marksmanship": { interrupt: "counter_shot"}
+    },
+    MAGE: {
+        "frost": {interrupt: "counterspell"},
+        "fire": { interrupt: "counterspell" },
+        "arcane": {interrupt: "counterspell"}
+    },
+    MONK: {
+        brewmaster: { interrupt: "spear_hand_strike" },
+        windwalker: { interrupt: "spear_hand_strike"}
+    },
+    PALADIN: {
+        retribution: { interrupt: "rebuke" },
+        protection: { interrupt: "rebuke"}
+    },
+    PRIEST: {
+        shadow: { interrupt: "silence"}
+    },
+    ROGUE: {
+        assassination: { interrupt: "kick" },
+        outlaw: { interrupt: "kick" },
+        subtlety: {interrupt: "kick"}
+    },
+    SHAMAN: {
+        elemental: { interrupt: "wind_shear" },
+        enhancement: {interrupt: "wind_shear"}
+    },
+    WARLOCK: {
+    },
+    WARRIOR: {
+        fury: { interrupt: "pummel" },
+        protection: { interrupt: "pummel" },
+        arms: { interrupt: "pummel"}
+    }
+}
+
+export type InterruptAnnotation = { [key in Interrupts]?: ClassId };
+
+export interface Annotation extends InterruptAnnotation {
+    class?: ClassId;
     name?: string;
-    specialization?: string;
+    specialization?: SpecializationName;
     level?: string;
     pet?: string;
     consumables?: LuaObj<string>;
@@ -56,25 +138,12 @@ export interface Annotation {
     variable?: LuaObj<AstNode>;
 
     trap_launcher?: string;
-    skull_bash?: string;
-    solar_beam?: string;
     interrupt?: string;
-    disrupt?: string;
-    mind_freeze?: string;
     wild_charge?: string;
-    muzzle?: string;
-    counter_shot?: string;
-    counterspell?: string;
     use_legendary_ring?:string;
     opt_touch_of_death_on_elite_only?:string;
     opt_arcane_mage_burn_phase?:string;
     opt_meta_only_during_boss?: string;
-    pummel?: string;
-    wind_shear?: string;
-    kick?: string;
-    silence?: string;
-    rebuke?: string;
-    spear_hand_strike?: string;
     time_to_hpg_heal?: string;
     time_to_hpg_melee?: string;
     time_to_hpg_tank?: string;
@@ -85,7 +154,6 @@ export interface Annotation {
     touch_of_death?: string;
     opt_use_consumables?: string;
     righteous_fury?: string;
-    mind_bomb?: string;
     blade_flurry?: string;
     time_warp?:string;
     vanish?: string;
@@ -140,7 +208,7 @@ interface ParseNode {
 }
 
 interface ProfileStrings {
-    spec?: string;
+    spec?: SpecializationName;
     level?: string;
     default_pet?: string;
     role?: ClassRole;
@@ -1616,12 +1684,9 @@ SplitByTagCustomFunction = function (tag, node, nodeList, annotation) {
 }
 SplitByTagGroup = function (tag, node, nodeList, annotation) {
     let index = lualength(node.child);
-    let bodyList = {
-    }
-    let conditionList = {
-    }
-    let remainderList = {
-    }
+    let bodyList = {};
+    let conditionList = {};
+    let remainderList = {};
     while (index > 0) {
         let childNode = node.child[index];
         index = index - 1;
@@ -2066,6 +2131,7 @@ const checkOptionalSkill = function(action: string, className: string, specializ
     }
     return true;
 }
+
 EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
     let node: AstNode;
     let canonicalizedName = lower(gsub(parseNode.name, ":", "_"));
@@ -2086,18 +2152,14 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
         let expressionType = "expression";
         let modifier = parseNode.child;
         let isSpellAction = true;
-        if (className == "DEATHKNIGHT" && action == "antimagic_shell") {
+        if (interruptsClasses[action as keyof typeof interruptsClasses] === className) {
+            bodyCode = `${camelSpecialization}InterruptActions()`;
+            annotation[action as keyof typeof interruptsClasses] = className;
+            annotation.interrupt = className;
+            isSpellAction = false;
+        }
+        else if (className == "DEATHKNIGHT" && action == "antimagic_shell") {
             conditionCode = "IncomingDamage(1.5 magic=1) > 0";
-        } else if (className == "DEATHKNIGHT" && action == "mind_freeze") {
-            bodyCode = `${camelSpecialization}InterruptActions()`;
-            annotation[action] = className;
-            annotation.interrupt = className;
-            isSpellAction = false;
-        } else if (className == "DEMONHUNTER" && action == "disrupt") {
-            bodyCode = `${camelSpecialization}InterruptActions()`;
-            annotation[action] = className;
-            annotation.interrupt = className;
-            isSpellAction = false;
         } else if (className == "DRUID" && action == "pulverize") {
             let debuffName = "thrash_bear_debuff";
             AddSymbol(annotation, debuffName);
@@ -2106,11 +2168,6 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             let spellName = "enhanced_rejuvenation";
             AddSymbol(annotation, spellName);
             conditionCode = format("SpellKnown(%s)", spellName);
-        } else if (className == "DRUID" && (action == "skull_bash" || action == "solar_beam")) {
-            bodyCode = `${camelSpecialization}InterruptActions()`;
-            annotation[action] = className;
-            annotation.interrupt = className;
-            isSpellAction = false;
         } else if (className == "DRUID" && action == "wild_charge") {
             bodyCode = `${camelSpecialization}GetInMeleeRange()`;
             annotation[action] = className;
@@ -2123,11 +2180,6 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             conditionCode = "SpellKnown(half_moon)";
         } else if (className == "DRUID" && action == "full_moon") {
             conditionCode = "SpellKnown(full_moon)";
-        } else if (className == "HUNTER" && (action == "muzzle" || action == "counter_shot")) {
-            bodyCode = `${camelSpecialization}InterruptActions()`;
-            annotation[action] = className;
-            annotation.interrupt = className;
-            isSpellAction = false;
         } else if (className == "HUNTER" && action == "exotic_munitions") {
             if (modifier.ammo_type) {
                 let name = Unparse(modifier.ammo_type);
@@ -2142,11 +2194,6 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             conditionCode = "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()";
         } else if (className == "MAGE" && action == "arcane_brilliance") {
             conditionCode = "BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1)";
-        } else if (className == "MAGE" && action == "counterspell") {
-            bodyCode = `${camelSpecialization}InterruptActions()`;
-            annotation[action] = className;
-            annotation.interrupt = className;
-            isSpellAction = false;
         } else if (className == "MAGE" && truthy(find(action, "pet_"))) {
             conditionCode = "pet.Present()";
         } else if (className == "MAGE" && (action == "start_burn_phase" || action == "start_pyro_chain" || action == "stop_burn_phase" || action == "stop_pyro_chain")) {
@@ -2178,11 +2225,6 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             isSpellAction = false;
         } else if (className == "MONK" && action == "nimble_brew") {
             conditionCode = "IsFeared() or IsRooted() or IsStunned()";
-        } else if (className == "MONK" && action == "spear_hand_strike") {
-            bodyCode = `${camelSpecialization}InterruptActions()`;
-            annotation[action] = className;
-            annotation.interrupt = className;
-            isSpellAction = false;
         } else if (className == "MONK" && action == "storm_earth_and_fire") {
             conditionCode = "CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff)";
             annotation[action] = className;
@@ -2201,21 +2243,11 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
                 bodyCode = `Spell(${action} text=double)`;
                 isSpellAction = false;
             }
-        } else if (className == "PALADIN" && action == "rebuke") {
-            bodyCode = `${camelSpecialization}InterruptActions()`;
-            annotation[action] = className;
-            annotation.interrupt = className;
-            isSpellAction = false;
         } else if (className == "PALADIN" && specialization == "protection" && action == "arcane_torrent_holy") {
             isSpellAction = false;
         } else if (className == "PALADIN" && action == "righteous_fury") {
             conditionCode = "CheckBoxOn(opt_righteous_fury_check)";
             annotation[action] = className;
-        } else if (className == "PRIEST" && (action == "silence" || action == "mind_bomb")) {
-            bodyCode = `${camelSpecialization}InterruptActions()`;
-            annotation[action] = className;
-            annotation.interrupt = className;
-            isSpellAction = false;
         } else if (className == "ROGUE" && action == "adrenaline_rush") {
             conditionCode = "EnergyDeficit() > 1";
         } else if (className == "ROGUE" && action == "apply_poison") {
@@ -2230,25 +2262,13 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             }
         } else if (className == "ROGUE" && action == "between_the_eyes") {
             bodyCode = "Spell(between_the_eyes text=BTE)";
-        } else if (className == "ROGUE" && specialization == "combat" && action == "blade_flurry") {
-            annotation.blade_flurry = className;
-            conditionCode = "CheckBoxOn(opt_blade_flurry)";
         } else if (className == "ROGUE" && action == "cancel_autoattack") {
-            isSpellAction = false;
-        } else if (className == "ROGUE" && action == "kick") {
-            bodyCode = `${camelSpecialization}InterruptActions()`;
-            annotation[action] = className;
-            annotation.interrupt = className;
             isSpellAction = false;
         } else if (className == "ROGUE" && action == "pistol_shot") {
             bodyCode = "Spell(pistol_shot text=PS)";
         } else if (className == "ROGUE" && action == "premeditation") {
             conditionCode = "ComboPoints() < 5";
-        } else if (className == "ROGUE" && specialization == "combat" && action == "slice_and_dice") {
-            let buffName = "slice_and_dice_buff";
-            AddSymbol(annotation, buffName);
-            conditionCode = format("BuffRemaining(%s) < BaseDuration(%s)", buffName, buffName);
-        } else if (className == "ROGUE" && (specialization == "assassination" || specialization == "combat") && action == "vanish") {
+        } else if (className == "ROGUE" && specialization == "assassination" && action == "vanish") {
             annotation.vanish = className;
             conditionCode = format("CheckBoxOn(opt_vanish)", action);
         } else if (className == "SHAMAN" && sub(action, 1, 11) == "ascendance_") {
@@ -2266,11 +2286,6 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
         } else if (className == "SHAMAN" && action == "totem_mastery") {
             conditionCode = "(not TotemPresent(totem_mastery) or InCombat()) and Speed() == 0";
             AddSymbol(annotation, "totem_mastery");
-        } else if (className == "SHAMAN" && action == "wind_shear") {
-            bodyCode = `${camelSpecialization}InterruptActions()`;
-            annotation[action] = className;
-            annotation.interrupt = className;
-            isSpellAction = false;
         } else if (className == "WARLOCK" && action == "cancel_metamorphosis") {
             let spellName = "metamorphosis";
             let buffName = "metamorphosis_buff";
@@ -2325,11 +2340,6 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             isSpellAction = false;
         } else if (className == "WARRIOR" && action == "heroic_leap") {
             conditionCode = "CheckBoxOn(opt_melee_range) and target.Distance(atLeast 8) and target.Distance(atMost 40)";
-        } else if (className == "WARRIOR" && action == "pummel") {
-            bodyCode = `${camelSpecialization}InterruptActions()`;
-            annotation[action] = className;
-            annotation.interrupt = className;
-            isSpellAction = false;
         } else if (action == "auto_attack") {
             bodyCode = `${camelSpecialization}GetInMeleeRange()`;
             isSpellAction = false;
@@ -4439,8 +4449,8 @@ const InsertInterruptFunction = function(child: LuaArray<AstNode>, annotation: A
     annotation.functionTag[node.name] = "cd";
 }
 const InsertInterruptFunctions = function(child: LuaArray<AstNode>, annotation: Annotation) {
-    let interrupts = {
-    }
+    let interrupts = {};
+
     if (annotation.mind_freeze == "DEATHKNIGHT") {
         insert(interrupts, {
             name: "mind_freeze",
@@ -5051,7 +5061,7 @@ const AddOptionalSkillCheckBox = function(child: LuaArray<AstNode>, annotation: 
     AddSymbol(annotation, skill);
     return 1;
 }
-const InsertSupportingControls = function(child: LuaArray<AstNode>, annotation: Annotation) {
+function InsertSupportingControls(child: LuaArray<AstNode>, annotation: Annotation) {
     let count = 0;
     for (const [skill, data] of pairs(OPTIONAL_SKILLS)) {
         count = count + AddOptionalSkillCheckBox(child, annotation, data, <keyof typeof OPTIONAL_SKILLS>skill);
@@ -5295,7 +5305,7 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
                     let pattern = `%$%(${variable}%)`;
                     v = gsub(<string>v, pattern, <string>profile[template]);
                 }
-                let node;
+                let node: ParseNode;
                 [ok, node] = ParseActionList(name, <string>v, nodeList, annotation);
                 if (ok) {
                     actionList[lualength(actionList) + 1] = node;
@@ -5307,10 +5317,10 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
         sort(actionList, function (a, b) {
             return a.name < b.name;
         });
-        for (const [className] of pairs(RAID_CLASS_COLORS)) {
+        for (const [className] of kpairs(RAID_CLASS_COLORS)) {
             let lowerClass = <keyof Profile>lower(<string>className);
             if (profile[lowerClass]) {
-                annotation.class = <string>className;
+                annotation.class = className;
                 annotation.name = <string>profile[lowerClass];
             }
         }
@@ -5374,23 +5384,20 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
         return s;
     }
     EmitAST(profile: Profile) {
-        let nodeList = {
-        }
+        let nodeList = {};
         let ast = OvaleAST.NewNode(nodeList, true);
-        let child = ast.child;
+        const child = ast.child;
         ast.type = "script";
         let annotation = profile.annotation;
         let ok = true;
         if (profile.actionList) {
-            annotation.astAnnotation = annotation.astAnnotation || {
-            }
+            annotation.astAnnotation = annotation.astAnnotation || {};
             annotation.astAnnotation.nodeList = nodeList;
             let dictionaryAST: AstNode;
             {
                 OvaleDebug.ResetTrace();
                 let dictionaryAnnotation: AstAnnotation = {
-                    nodeList: {
-                    },
+                    nodeList: {},
                     definition: profile.annotation.dictionary
                 }
                 let dictionaryFormat = `
@@ -5416,6 +5423,19 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
             for (const [, node] of ipairs(profile.actionList)) {
                 let addFunctionNode = EmitActionList(node, nodeList, annotation);
                 if (addFunctionNode) {
+                    // Add interrupt if not already added
+                    if (node.name === "_default" && !annotation.interrupt) {
+                        const defaultInterrupt = classInfos[annotation.class][annotation.specialization];
+                        if (defaultInterrupt && defaultInterrupt.interrupt) {
+                            const interruptCall = OvaleAST.NewNode(nodeList);
+                            interruptCall.type = "custom_function";
+                            interruptCall.name = CamelSpecialization(annotation) + "InterruptActions";
+                            annotation.interrupt = annotation.class;
+                            annotation[defaultInterrupt.interrupt] = annotation.class;
+                            insert(addFunctionNode.child[1].child, 1, interruptCall);
+                        }
+                    }
+
                     let actionListName = gsub(node.name, "^_+", "");
                     let commentNode = OvaleAST.NewNode(nodeList);
                     commentNode.type = "comment";

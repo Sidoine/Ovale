@@ -95,6 +95,11 @@ Define(fury_of_elune 202770)
 Define(half_moon 274282)
 # Deals m1 Arcane damage to the target and empowers Half Moon to become Full Moon.rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
   SpellInfo(half_moon cd=25 lunarpower=-20)
+Define(incapacitating_roar 99)
+# Invokes the spirit of Ursol to let loose a deafening roar, incapacitating all enemies within A1 yards for 3 seconds. Damage will cancel the effect. Usable in all shapeshift forms.
+  SpellInfo(incapacitating_roar cd=30 duration=3)
+  # Incapacitated.
+  SpellAddTargetDebuff(incapacitating_roar incapacitating_roar=1)
 Define(incarnation_chosen_of_elune 102560)
 # An improved Moonkin Form that increases the damage of all your spells by s1 and grants you s3 Haste.rnrnLasts 30 seconds. You may shapeshift in and out of this improved Moonkin Form for its duration.
   SpellInfo(incarnation_chosen_of_elune cd=180 duration=30 talent=incarnation_chosen_of_elune_talent)
@@ -129,6 +134,9 @@ Define(lunar_beam 204066)
 Define(lunar_strike 194153)
 # Call down a strike of lunar energy, causing (76.5 of Spell Power) Arcane damage to the target, and m1*m3/100 Arcane damage to all other enemies within A1 yards.rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r
   SpellInfo(lunar_strike lunarpower=-12)
+Define(maim 22570)
+# Finishing move that causes Physical damage and stuns the target. Damage and duration increased per combo point:rnrn   1 point  : s2*1 damage, 1 secrn   2 points: s2*2 damage, 2 secrn   3 points: s2*3 damage, 3 secrn   4 points: s2*4 damage, 4 secrn   5 points: s2*5 damage, 5 sec
+  SpellInfo(maim energy=35 combopoints=1 cd=20 gcd=1)
 Define(mangle 33917)
 # Mangle the target for s2 Physical damage.?a231064[ Deals s3 additional damage against bleeding targets.][]rnrn|cFFFFFFFFGenerates m4/10 Rage.|r
 # Rank 2: Mangle deals 33917s3 additional damage against bleeding targets.
@@ -136,6 +144,11 @@ Define(mangle 33917)
 Define(maul 6807)
 # Maul the target for s2 Physical damage.
   SpellInfo(maul rage=45)
+Define(mighty_bash 5211)
+# Invokes the spirit of Ursoc to stun the target for 5 seconds. Usable in all shapeshift forms.
+  SpellInfo(mighty_bash cd=50 duration=5 talent=mighty_bash_talent)
+  # Stunned.
+  SpellAddTargetDebuff(mighty_bash mighty_bash=1)
 Define(moonfire 8921)
 # A quick beam of lunar light burns the enemy for (14.499999999999998 of Spell Power) Arcane damage and then an additional 164812o2 Arcane damage over 16 seconds.?s5487[ Usable while in Bear Form.][]?s197911[rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r][]
   SpellInfo(moonfire rage=0 lunarpower=0)
@@ -194,6 +207,13 @@ Define(shred 5221)
 # Shred the target, causing s1*<mult> Physical damage to the target.?a231063[ Deals s4 increased damage against bleeding targets.][]?a231057[rnrnWhile stealthed, Shred deals m3 increased damage, and has double the chance to critically strike.][]rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
 # Rank 2: Shred deals 5221s5 increased damage against bleeding targets.
   SpellInfo(shred energy=40 gcd=1 combopoints=0)
+Define(skull_bash 106839)
+# You charge and bash the target's skull, interrupting spellcasting and preventing any spell in that school from being cast for 4 seconds.
+  SpellInfo(skull_bash cd=15 gcd=0 offgcd=1)
+Define(solar_beam 78675)
+# Summons a beam of solar light over an enemy target's location, interrupting the target and silencing all enemies within the beam.  Lasts 8 seconds.
+  SpellInfo(solar_beam cd=60 duration=8 gcd=0 offgcd=1)
+
 Define(solar_wrath_balance 190984)
 # Hurl a ball of solar energy at the target, dealing (60 of Spell Power) Nature damage.?a197911[rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r][]
   SpellInfo(solar_wrath_balance lunarpower=0)
@@ -228,6 +248,15 @@ Define(tigers_fury 5217)
   SpellInfo(tigers_fury cd=30 duration=10 gcd=0 offgcd=1 energy=-20)
   # Attacks deal s1 additional damage for their full duration.
   SpellAddBuff(tigers_fury tigers_fury=1)
+Define(typhoon 132469)
+# Blasts targets within 61391a1 yards in front of you with a violent Typhoon, knocking them back and dazing them for 6 seconds. Usable in all shapeshift forms.
+  SpellInfo(typhoon cd=30 talent=typhoon_talent)
+
+Define(war_stomp 20549)
+# Stuns up to i enemies within A1 yds for 2 seconds.
+  SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
+  # Stunned.
+  SpellAddTargetDebuff(war_stomp war_stomp=1)
 Define(warrior_of_elune 202425)
 # Your next u Lunar Strikes are instant cast and generate s2 additional Astral Power.
   SpellInfo(warrior_of_elune cd=45 channel=-0.001 max_stacks=3 gcd=0 offgcd=1 talent=warrior_of_elune_talent)
@@ -260,6 +289,8 @@ Define(lunar_beam_talent 20) #22427
 # Summons a beam of lunar light at your location, dealing 204069s2*8 Arcane damage and healing you for 204069s1*8 over m1 sec.
 Define(lunar_inspiration_talent 3) #22365
 # Moonfire is now usable while in Cat Form, generates 1 combo point, deals damage based on attack power, and costs 30 energy.
+Define(mighty_bash_talent 10) #21778
+# Invokes the spirit of Ursoc to stun the target for 5 seconds. Usable in all shapeshift forms.
 Define(moment_of_clarity_talent 19) #21646
 # Omen of Clarity now triggers s2 more often, can accumulate up to s135700u+s1 charges, and increases the damage of your next Shred, Thrash, or ?s202028[Brutal Slash][Swipe] by s4.rnrnYour maximum Energy is increased by s3.
 Define(new_moon_talent 21) #21655
@@ -274,6 +305,8 @@ Define(stellar_flare_talent 18) #22165
 # Burns the target for (10 of Spell Power) Astral damage, and then an additional o2 damage over 24 seconds.rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
 Define(twin_moons_talent 17) #21712
 # Moonfire deals s2 increased damage and also hits another nearby enemy within 279621A1 yds of the target.
+Define(typhoon_talent 12) #18577
+# Blasts targets within 61391a1 yards in front of you with a violent Typhoon, knocking them back and dazing them for 6 seconds. Usable in all shapeshift forms.
 Define(warrior_of_elune_talent 2) #22386
 # Your next u Lunar Strikes are instant cast and generate s2 additional Astral Power.
 Define(wild_charge_talent 6) #18571
@@ -332,7 +365,7 @@ Define(soothe 2908)
 Define(travel_form 783)
 
 # Feral and Guardian shared
-Define(skull_bash 106839)
+
 	SpellInfo(skull_bash cd=15 gcd=0 offgcd=1 interrupt=1)
 Define(survival_instincts 61336)
 	SpellInfo(survival_instincts cd=120 gcd=0 offgcd=1)
@@ -376,9 +409,9 @@ Define(wild_charge_cat 49376)
 
 Define(mass_entanglement 102359)
 	SpellInfo(mass_entanglement cd=30)
-Define(mighty_bash 5211)
+
 	SpellInfo(mighty_bash cd=50 interrupt=1)
-Define(typhoon 132469)
+
 	SpellInfo(typhoon cd=30 interrupt=1)
 
 
@@ -488,7 +521,7 @@ Define(moonkin_form_balance 24858)
 
 	SpellInfo(new_moon cd=15 charges=3 astralpower=-10)
 Define(solar_empowerment_buff 164545)
-Define(solar_beam 78675)
+
 	SpellInfo(solar_beam cd=60 gcd=0 offgcd=1 interrupt=1)
 #Define(solar_wrath 190984)
 	SpellInfo(solar_wrath travel_time=1 astralpower=-8)
@@ -555,7 +588,7 @@ Define(frenzied_regeneration_buff 22842)
 Define(galactic_guardian_buff 213708)
 Define(guardian_of_elune_buff 213680)
 	SpellInfo(guardian_of_elune_buff duration=15)
-Define(incapacitating_roar 99)
+
 	SpellInfo(incapacitating_roar cd=30)
 	SpellInfo(incapacitating_roar replace=intimidating_roar talent=intimidating_roar_talent)
 
@@ -672,7 +705,7 @@ Define(clearcasting_buff 135700)
 #
 	SpellAddTargetDebuff(ferocious_bite rip_debuff=refresh_keep_snapshot,target_health_pct,25)
 	SpellAddTargetDebuff(ferocious_bite rip_debuff=refresh_keep_snapshot talent=sabertooth_talent)
-Define(maim 22570)
+
 	SpellInfo(maim energy=35 combopoints=1 max_combopoints=5 cd=20)
 Define(moonfire_cat 155625)
 	SpellInfo(moonfire_cat energy=30 combopoints=-1)

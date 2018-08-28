@@ -110,9 +110,18 @@ Define(prepared_buff 203650)
 Define(shear 203782)
 # Shears an enemy for s2 Physical damage, and shatters a Lesser Soul Fragment from your target.rnrn|cFFFFFFFFGenerates m3/10 Pain.|r
   SpellInfo(shear pain=-10)
+Define(sigil_of_chains 202138)
+# Place a Sigil of Chains at the target location that activates after 2 seconds.rnrnAll enemies affected by the sigil are pulled to its center and are snared, reducing movement speed by 204843s1 for 6 seconds.
+  SpellInfo(sigil_of_chains cd=90 duration=2 talent=sigil_of_chains_talent)
 Define(sigil_of_flame 204596)
 # Place a Sigil of Flame at the target location that activates after 2 seconds.rnrnDeals 204598s1 Fire damage, and an additional 204598o3 Fire damage over 6 seconds, to all enemies affected by the sigil.
   SpellInfo(sigil_of_flame cd=30 duration=2 replace=blade_dance)
+Define(sigil_of_misery 207684)
+# Place a Sigil of Misery at the target location that activates after 2 seconds.rnrnCauses all enemies affected by the sigil to cower in fear, disorienting them for 20 seconds.
+  SpellInfo(sigil_of_misery cd=90 duration=2)
+Define(sigil_of_silence 202137)
+# Place a Sigil of Silence at the target location that activates after 2 seconds.rnrnSilences all enemies affected by the sigil for 6 seconds.
+  SpellInfo(sigil_of_silence cd=60 duration=2)
 Define(soul_cleave 228477)
 # Viciously strike all enemies in front of you for 228478s1 Physical damage and heal yourself for s4.rnrnConsumes up to s3 Soul Fragments within s1 yds.
   SpellInfo(soul_cleave pain=30 replace=chaos_strike)
@@ -158,6 +167,8 @@ Define(momentum_talent 20) #21901
 # Fel Rush increases your damage done by 208628s1 for 6 seconds.rnrnVengeful Retreat's cooldown is reduced by s1/-1000 sec, and it generates (203650s1/5)*10 seconds Fury over 10 seconds if it damages at least one enemy.
 Define(nemesis_talent 21) #22547
 # Increases damage you inflict against the target by s1 for 60 seconds. rnrnWhen the target is slain, you will inflict s1 additional damage against all creature types matching the original target (Humanoid, Dragonkin, etc.) for the remaining duration.
+Define(sigil_of_chains_talent 15) #22511
+# Place a Sigil of Chains at the target location that activates after 2 seconds.rnrnAll enemies affected by the sigil are pulled to its center and are snared, reducing movement speed by 204843s1 for 6 seconds.
 Define(spirit_bomb_talent 17) #22513
 # Consume up to s2 Soul Fragments within s1 yds and then explode, afflicting nearby enemies with Frailty for 20 seconds and damaging them for 247455s1 Fire per fragment.rnrnYou heal for 247456s1 of all damage you deal to enemies with Frailty.
 Define(trail_of_ruin_talent 7) #22909
@@ -281,7 +292,7 @@ Define(pick_up_fragment 210788)
 Define(razor_spikes_debuff 210003)
 	SpellInfo(razor_spikes_debuff duration=6)
 
-Define(sigil_of_chains 202138)
+
 	SpellInfo(sigil_of_chains cd=90)
 
 	SpellInfo(sigil_of_flame cd=30)
@@ -289,13 +300,13 @@ Define(sigil_of_chains 202138)
 Define(sigil_of_flame_debuff 204598)
 	SpellInfo(sigil_of_flame_debuff duration=6)
 	SpellInfo(sigil_of_flame_debuff duration=8 talent=concentrated_sigils_talent)
-Define(sigil_of_misery 207684)
+
 	SpellInfo(sigil_of_misery cd=90)
 	SpellInfo(sigil_of_misery cd=72 talent=quickened_sigils_talent)
 Define(sigil_of_misery_debuff 207685)
 	SpellInfo(sigil_of_misery_debuff duration=20)
 	SpellInfo(sigil_of_misery_debuff duration=22 talent=concentrated_sigils_talent)
-Define(sigil_of_silence 202137)
+
 	SpellInfo(sigil_of_silence cd=60)
 	SpellInfo(sigil_of_silence cd=48 talent=quickened_sigils_talent)
 Define(sigil_of_silence_debuff 204490)

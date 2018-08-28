@@ -1063,7 +1063,19 @@ AddFunction az_streak
  AzeriteTraitRank(streaking_stars_trait)
 }
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=balance)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=balance)
+
+AddFunction BalanceInterruptActions
+{
+ if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+ {
+  if target.Distance(less 15) and not target.Classification(worldboss) Spell(typhoon)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+  if target.InRange(mighty_bash) and not target.Classification(worldboss) Spell(mighty_bash)
+  if target.InRange(solar_beam) and target.IsInterruptible() Spell(solar_beam)
+ }
+}
 
 AddFunction BalanceUseItemActions
 {
@@ -1171,6 +1183,7 @@ AddFunction BalanceDefaultShortCdPostConditions
 
 AddFunction BalanceDefaultCdActions
 {
+ BalanceInterruptActions()
  #potion,if=buff.celestial_alignment.up|buff.incarnation.up
  if { BuffPresent(celestial_alignment_buff) or BuffPresent(incarnation_chosen_of_elune_buff) } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(rising_death usable=1)
  #blood_fury,if=buff.celestial_alignment.up|buff.incarnation.up
@@ -1284,12 +1297,14 @@ AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
 # lively_spirit_trait
 # lunar_empowerment_buff
 # lunar_strike
+# mighty_bash
 # moonfire
 # moonfire_debuff
 # moonkin_form_balance
 # new_moon
 # power_of_the_moon_trait
 # rising_death
+# solar_beam
 # solar_empowerment_buff
 # solar_wrath_balance
 # starfall
@@ -1303,6 +1318,8 @@ AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
 # sunfire
 # sunfire_debuff
 # twin_moons_talent
+# typhoon
+# war_stomp
 # warrior_of_elune
 # warrior_of_elune_buff
 `
@@ -1330,8 +1347,21 @@ AddFunction use_thrash
  0
 }
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=feral)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=feral)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=feral)
+
+AddFunction FeralInterruptActions
+{
+ if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+ {
+  if target.Distance(less 15) and not target.Classification(worldboss) Spell(typhoon)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+  if target.InRange(maim) and not target.Classification(worldboss) Spell(maim)
+  if target.InRange(mighty_bash) and not target.Classification(worldboss) Spell(mighty_bash)
+  if target.InRange(skull_bash) and target.IsInterruptible() Spell(skull_bash)
+ }
+}
 
 AddFunction FeralUseItemActions
 {
@@ -1729,6 +1759,7 @@ AddFunction FeralDefaultShortCdPostConditions
 
 AddFunction FeralDefaultCdActions
 {
+ FeralInterruptActions()
  #run_action_list,name=single_target,if=dot.rip.ticking|time>15
  if target.DebuffPresent(rip_debuff) or TimeInCombat() > 15 FeralSingletargetCdActions()
 
@@ -1833,7 +1864,9 @@ AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
 # jungle_stalker_buff
 # luffa_wrappings_item
 # lunar_inspiration_talent
+# maim
 # mangle
+# mighty_bash
 # moment_of_clarity_talent
 # moonfire_cat
 # moonfire_cat_debuff
@@ -1851,11 +1884,14 @@ AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
 # shadowmeld
 # shadowmeld_buff
 # shred
+# skull_bash
 # swipe_cat
 # thrash_cat
 # thrash_cat_debuff
 # tigers_fury
 # tigers_fury_buff
+# typhoon
+# war_stomp
 # wild_charge
 # wild_charge_bear
 # wild_charge_cat
@@ -1877,8 +1913,21 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_druid_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=guardian)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=guardian)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=guardian)
+
+AddFunction GuardianInterruptActions
+{
+ if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+ {
+  if target.Distance(less 15) and not target.Classification(worldboss) Spell(typhoon)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+  if target.Distance(less 10) and not target.Classification(worldboss) Spell(incapacitating_roar)
+  if target.InRange(mighty_bash) and not target.Classification(worldboss) Spell(mighty_bash)
+  if target.InRange(skull_bash) and target.IsInterruptible() Spell(skull_bash)
+ }
+}
 
 AddFunction GuardianUseItemActions
 {
@@ -2039,6 +2088,7 @@ AddFunction GuardianDefaultShortCdPostConditions
 
 AddFunction GuardianDefaultCdActions
 {
+ GuardianInterruptActions()
  #call_action_list,name=cooldowns
  GuardianCooldownsCdActions()
 
@@ -2122,20 +2172,25 @@ AddIcon checkbox=opt_druid_guardian_aoe help=cd specialization=guardian
 # bristling_fur
 # fireblood
 # galactic_guardian_buff
+# incapacitating_roar
 # incarnation_guardian_of_ursoc
 # incarnation_guardian_of_ursoc_buff
 # lights_judgment
 # lunar_beam
 # mangle
 # maul
+# mighty_bash
 # moonfire
 # moonfire_debuff
 # old_war
 # pulverize
 # shred
+# skull_bash
 # swipe
 # thrash
 # thrash_bear_debuff
+# typhoon
+# war_stomp
 # wild_charge
 # wild_charge_bear
 # wild_charge_cat

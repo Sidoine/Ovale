@@ -27,9 +27,21 @@ AddFunction use_filler
  ComboPointsDeficit() > 1 or EnergyDeficit() <= 25 + energy_regen_combined() or Enemies() >= 2
 }
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=assassination)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=assassination)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=assassination)
 AddCheckBox(opt_vanish SpellName(vanish) default specialization=assassination)
+
+AddFunction AssassinationInterruptActions
+{
+ if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+ {
+  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+  if target.InRange(kidney_shot) and not target.Classification(worldboss) and ComboPoints() >= 1 Spell(kidney_shot)
+  if target.InRange(cheap_shot) and not target.Classification(worldboss) Spell(cheap_shot)
+  if target.InRange(kick) and target.IsInterruptible() Spell(kick)
+ }
+}
 
 AddFunction AssassinationUseItemActions
 {
@@ -333,6 +345,7 @@ AddFunction AssassinationDefaultShortCdPostConditions
 
 AddFunction AssassinationDefaultCdActions
 {
+ AssassinationInterruptActions()
  #variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*7%(2*spell_haste)
  #call_action_list,name=stealthed,if=stealthed.rogue
  if Stealthed() AssassinationStealthedCdActions()
@@ -438,6 +451,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # blindside
 # blindside_buff
 # blood_fury_ap
+# cheap_shot
 # crimson_tempest
 # crimson_tempest_debuff
 # deeper_stratagem_talent
@@ -453,6 +467,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # internal_bleeding_debuff
 # internal_bleeding_talent
 # kick
+# kidney_shot
 # lights_judgment
 # marked_for_death
 # master_assassin_buff
@@ -460,6 +475,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # mutilate
 # nightstalker_talent
 # poisoned_knife
+# quaking_palm
 # rupture
 # rupture_debuff
 # shadowstep
@@ -502,9 +518,21 @@ AddFunction use_filler
  ComboPointsDeficit() > 1 or EnergyDeficit() <= 25 + energy_regen_combined() or Enemies() >= 2
 }
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=assassination)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=assassination)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=assassination)
 AddCheckBox(opt_vanish SpellName(vanish) default specialization=assassination)
+
+AddFunction AssassinationInterruptActions
+{
+ if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+ {
+  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+  if target.InRange(kidney_shot) and not target.Classification(worldboss) and ComboPoints() >= 1 Spell(kidney_shot)
+  if target.InRange(cheap_shot) and not target.Classification(worldboss) Spell(cheap_shot)
+  if target.InRange(kick) and target.IsInterruptible() Spell(kick)
+ }
+}
 
 AddFunction AssassinationUseItemActions
 {
@@ -808,6 +836,7 @@ AddFunction AssassinationDefaultShortCdPostConditions
 
 AddFunction AssassinationDefaultCdActions
 {
+ AssassinationInterruptActions()
  #variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*7%(2*spell_haste)
  #call_action_list,name=stealthed,if=stealthed.rogue
  if Stealthed() AssassinationStealthedCdActions()
@@ -913,6 +942,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # blindside
 # blindside_buff
 # blood_fury_ap
+# cheap_shot
 # crimson_tempest
 # crimson_tempest_debuff
 # deeper_stratagem_talent
@@ -928,6 +958,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # internal_bleeding_debuff
 # internal_bleeding_talent
 # kick
+# kidney_shot
 # lights_judgment
 # marked_for_death
 # master_assassin_buff
@@ -935,6 +966,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # mutilate
 # nightstalker_talent
 # poisoned_knife
+# quaking_palm
 # rupture
 # rupture_debuff
 # shadowstep
@@ -982,9 +1014,22 @@ AddFunction rtb_reroll
  BuffCount(roll_the_bones_buff) < 2 and { BuffPresent(loaded_dice_buff) or not BuffPresent(grand_melee_buff) and not BuffPresent(ruthless_precision_buff) }
 }
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=outlaw)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=outlaw)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=outlaw)
 AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default specialization=outlaw)
+
+AddFunction OutlawInterruptActions
+{
+ if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+ {
+  if target.InRange(gouge) and not target.Classification(worldboss) Spell(gouge)
+  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+  if target.InRange(between_the_eyes) and not target.Classification(worldboss) and ComboPoints() >= 1 Spell(between_the_eyes)
+  if target.InRange(cheap_shot) and not target.Classification(worldboss) Spell(cheap_shot)
+  if target.InRange(kick) and target.IsInterruptible() Spell(kick)
+ }
+}
 
 AddFunction OutlawUseItemActions
 {
@@ -1297,6 +1342,7 @@ AddFunction OutlawDefaultShortCdPostConditions
 
 AddFunction OutlawDefaultCdActions
 {
+ OutlawInterruptActions()
  #variable,name=rtb_reroll,value=rtb_buffs<2&(buff.loaded_dice.up|!buff.grand_melee.up&!buff.ruthless_precision.up)
  #variable,name=rtb_reroll,op=reset,if=azerite.snake_eyes.rank>=2&buff.snake_eyes.stack>=2-buff.broadside.up
  #variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&cooldown.ghostly_strike.remains<1)+buff.broadside.up&energy>60&!buff.skull_and_crossbones.up
@@ -1412,11 +1458,13 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # blade_rush
 # blood_fury_ap
 # broadside_buff
+# cheap_shot
 # deadshot_trait
 # dispatch
 # fireblood
 # ghostly_strike
 # ghostly_strike_talent
+# gouge
 # grand_melee_buff
 # kick
 # killing_spree
@@ -1426,6 +1474,7 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # marked_for_death_talent
 # opportunity_buff
 # pistol_shot
+# quaking_palm
 # quick_draw_talent
 # roll_the_bones
 # roll_the_bones_buff
@@ -1473,9 +1522,22 @@ AddFunction rtb_reroll
  BuffCount(roll_the_bones_buff) < 2 and { BuffPresent(loaded_dice_buff) or not BuffPresent(grand_melee_buff) and not BuffPresent(ruthless_precision_buff) }
 }
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=outlaw)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=outlaw)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=outlaw)
 AddCheckBox(opt_blade_flurry SpellName(blade_flurry) default specialization=outlaw)
+
+AddFunction OutlawInterruptActions
+{
+ if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+ {
+  if target.InRange(gouge) and not target.Classification(worldboss) Spell(gouge)
+  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+  if target.InRange(between_the_eyes) and not target.Classification(worldboss) and ComboPoints() >= 1 Spell(between_the_eyes)
+  if target.InRange(cheap_shot) and not target.Classification(worldboss) Spell(cheap_shot)
+  if target.InRange(kick) and target.IsInterruptible() Spell(kick)
+ }
+}
 
 AddFunction OutlawUseItemActions
 {
@@ -1790,6 +1852,7 @@ AddFunction OutlawDefaultShortCdPostConditions
 
 AddFunction OutlawDefaultCdActions
 {
+ OutlawInterruptActions()
  #variable,name=rtb_reroll,value=rtb_buffs<2&(buff.loaded_dice.up|!buff.grand_melee.up&!buff.ruthless_precision.up)
  #variable,name=rtb_reroll,op=reset,if=azerite.snake_eyes.rank>=2&buff.snake_eyes.stack>=2-buff.broadside.up
  #variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&cooldown.ghostly_strike.remains<1)+buff.broadside.up&energy>60&!buff.skull_and_crossbones.up
@@ -1905,11 +1968,13 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # blade_rush
 # blood_fury_ap
 # broadside_buff
+# cheap_shot
 # deadshot_trait
 # dispatch
 # fireblood
 # ghostly_strike
 # ghostly_strike_talent
+# gouge
 # grand_melee_buff
 # kick
 # killing_spree
@@ -1919,6 +1984,7 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # marked_for_death_talent
 # opportunity_buff
 # pistol_shot
+# quaking_palm
 # quick_draw_talent
 # roll_the_bones
 # roll_the_bones_buff
@@ -1961,8 +2027,20 @@ AddFunction shd_threshold
  SpellCharges(shadow_dance count=0) >= 1.75
 }
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=subtlety)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=subtlety)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=subtlety)
+
+AddFunction SubtletyInterruptActions
+{
+ if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+ {
+  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+  if target.InRange(kidney_shot) and not target.Classification(worldboss) and ComboPoints() >= 1 Spell(kidney_shot)
+  if target.InRange(cheap_shot) and not target.Classification(worldboss) Spell(cheap_shot)
+  if target.InRange(kick) and target.IsInterruptible() Spell(kick)
+ }
+}
 
 AddFunction SubtletyGetInMeleeRange
 {
@@ -2338,6 +2416,7 @@ AddFunction SubtletyDefaultShortCdPostConditions
 
 AddFunction SubtletyDefaultCdActions
 {
+ SubtletyInterruptActions()
  #call_action_list,name=cds
  SubtletyCdsCdActions()
 
@@ -2454,6 +2533,7 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 # battle_potion_of_agility
 # berserking
 # blood_fury_ap
+# cheap_shot
 # dark_shadow_talent
 # deeper_stratagem_talent
 # eviscerate
@@ -2462,12 +2542,14 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 # fireblood
 # gloomblade
 # kick
+# kidney_shot
 # lights_judgment
 # marked_for_death
 # master_of_shadows_talent
 # nightblade
 # nightblade_debuff
 # nightstalker_talent
+# quaking_palm
 # secret_technique
 # secret_technique_talent
 # shadow_blades

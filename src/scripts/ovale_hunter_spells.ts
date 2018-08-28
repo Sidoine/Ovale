@@ -86,6 +86,9 @@ Define(coordinated_assault 266779)
   SpellInfo(coordinated_assault cd=120 duration=20)
   # Damage dealt increased by s1.?s263186[rnKill Command's chance to reset increased by s4.][]
   SpellAddBuff(coordinated_assault coordinated_assault=1)
+Define(counter_shot 147362)
+# Interrupts spellcasting, preventing any spell in that school from being cast for 3 seconds.
+  SpellInfo(counter_shot cd=24 duration=3 gcd=0 offgcd=1 interrupt=1)
 Define(dire_beast 120679)
 # Summons a powerful wild beast that attacks the target and roars, increasing your Haste by 281036s1 for 8 seconds.
   SpellInfo(dire_beast focus=25 cd=20 duration=8 talent=dire_beast_talent)
@@ -135,9 +138,17 @@ Define(lights_judgment 255647)
 Define(mongoose_bite 259387)
 # A brutal attack that deals s1 Physical damage and grants you Mongoose Fury.rnrn|cFFFFFFFFMongoose Fury|rrnIncreases the damage of Mongoose Bite by 259388s1 for 14 seconds, stacking up to 259388u times. Successive attacks do not increase duration.
   SpellInfo(mongoose_bite focus=30 talent=mongoose_bite_talent)
+Define(muzzle 187707)
+# Interrupts spellcasting, preventing any spell in that school from being cast for 3 seconds.
+  SpellInfo(muzzle cd=15 duration=3 gcd=0 offgcd=1 interrupt=1)
 Define(piercing_shot 198670)
 # A powerful shot which deals sw3 Physical damage to the target and up to sw3/(s1/10) Physical damage to all enemies between you and the target. 
   SpellInfo(piercing_shot focus=35 cd=30 talent=piercing_shot_talent)
+Define(quaking_palm 107079)
+# Strikes the target with lightning speed, incapacitating them for 4 seconds, and turns off your attack.
+  SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
+  # Incapacitated.
+  SpellAddTargetDebuff(quaking_palm quaking_palm=1)
 Define(rapid_fire 257044)
 # Shoot a stream of s1 shots at your target over 3 seconds, dealing a total of m1*257045sw1 Physical damage. rnrnEach shot generates 263585s1 Focus.rnrnUsable while moving.
   SpellInfo(rapid_fire cd=20 duration=3 channel=3 tick=0.33)
@@ -182,6 +193,11 @@ Define(vipers_venom_buff 268552)
   SpellInfo(vipers_venom_buff duration=8 channel=8 gcd=0 offgcd=1)
   # Your next Serpent Sting costs no Focus, and will deal s1 increased initial damage.
   SpellAddBuff(vipers_venom_buff vipers_venom_buff=1)
+Define(war_stomp 20549)
+# Stuns up to i enemies within A1 yds for 2 seconds.
+  SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
+  # Stunned.
+  SpellAddTargetDebuff(war_stomp war_stomp=1)
 Define(wildfire_bomb 259495)
 # Hurl a bomb at the target, exploding for 265157s1 Fire damage in a cone and coating enemies in wildfire, scorching them for 269747o1 Fire damage over 6 seconds.
   SpellInfo(wildfire_bomb cd=18)
@@ -332,7 +348,7 @@ Define(concussive_shot_debuff 5116)
 	SpellAddPetBuff(coordinated_assault pet_coordinated_assault_buff=1)
 Define(coordinated_assault_buff 266779)
 	SpellInfo(coordinated_assault_buff duration=20)
-Define(counter_shot 147362)
+
 	SpellInfo(counter_shot cd=24)
 
 	SpellInfo(dire_beast cd=20 cd_haste=ranged)
@@ -405,7 +421,7 @@ Define(multishot_mm 257620)
 	SpellAddBuff(multishot_mm precise_shots_buff=-1)
 	SpellAddBuff(multishot_mm trick_shots_buff=1)
 	SpellAddBuff(multishot_mm master_marksman_buff=-1 talent=master_marksman_talent)
-Define(muzzle 187707)
+
 	SpellInfo(muzzle cd=15 interrupt=1)
 Define(pheromone_bomb 270323)
 	SpellInfo(pheromone_bomb cd=18 cd_haste=ranged)

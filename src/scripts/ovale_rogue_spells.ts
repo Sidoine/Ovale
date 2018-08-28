@@ -50,6 +50,11 @@ Define(blade_rush 271877)
 Define(blindside 111240)
 # Exploits the vulnerability of foes with less than s4 health, dealing s2 Physical damage to the target.rnrnMutilate has a s5 chance to make your next Blindside free and usable on any target, regardless of their health.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|r
   SpellInfo(blindside energy=30 gcd=1 combopoints=-1 talent=blindside_talent)
+Define(cheap_shot 1833)
+# Stuns the target for 4 seconds.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
+  SpellInfo(cheap_shot energy=40 duration=4 gcd=1 combopoints=-2)
+  # Stunned.
+  SpellAddTargetDebuff(cheap_shot cheap_shot=1)
 Define(crimson_tempest 121411)
 # Finishing move that slashes at all enemies within A1 yards, dealing instant damage and causing victims to bleed for additional damage. Lasts longer per combo point.rnrn   1 point  : s2*2 plus o1*2 over 4 secrn   2 points: s2*3 plus o1*3 over 6 secrn   3 points: s2*4 plus o1*4 over 8 secrn   4 points: s2*5 plus o1*5 over 10 secrn   5 points: s2*6 plus o1*6 over 12 sec?s193531[rn   6 points: s2*7 plus o1*7 over 14 sec][]
   SpellInfo(crimson_tempest energy=35 combopoints=1 duration=2 gcd=1 tick=2 talent=crimson_tempest_talent)
@@ -90,9 +95,19 @@ Define(ghostly_strike 196937)
 Define(gloomblade 200758)
 # Punctures your target with your shadow-infused blade for s1 Shadow damage, bypassing armor.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
   SpellInfo(gloomblade energy=35 gcd=1 combopoints=-1 talent=gloomblade_talent)
+Define(gouge 1776)
+# Gouges the eyes of an enemy target, incapacitating for 4 seconds. Damage will interrupt the effect.rnrnMust be in front of your target.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
+  SpellInfo(gouge energy=25 cd=15 duration=4 gcd=1 combopoints=-1)
+  # Incapacitated.
+  SpellAddTargetDebuff(gouge gouge=1)
 Define(kick 1766)
 # A quick kick that interrupts spellcasting and prevents any spell in that school from being cast for 5 seconds.?s56805[ If you successfully interrupt a spell, Kick's cooldown is reduced by 56805m2/1000 sec.][]
   SpellInfo(kick cd=15 duration=5 gcd=0 offgcd=1 interrupt=1)
+Define(kidney_shot 408)
+# Finishing move that stuns the target. Lasts longer per combo point:rn   1 point  : 2 secondsrn   2 points: 3 secondsrn   3 points: 4 secondsrn   4 points: 5 secondsrn   5 points: 6 seconds?s193531[rn   6 points: 7 seconds][]
+  SpellInfo(kidney_shot energy=25 combopoints=1 cd=20 duration=1 gcd=1)
+  # Stunned.
+  SpellAddTargetDebuff(kidney_shot kidney_shot=1)
 Define(killing_spree 51690)
 # Teleport to an enemy within 10 yards, attacking with both weapons for a total of <dmg> Physical damage over 2 seconds.rnrnWhile Blade Flurry is active, also hits all nearby enemies for s2 damage.
   SpellInfo(killing_spree cd=120 duration=2 gcd=1 tick=0.4 talent=killing_spree_talent)
@@ -132,6 +147,11 @@ Define(pistol_shot 185763)
 Define(poisoned_knife 185565)
 # Throws a poison-coated knife, dealing s1 damage and applying your active Lethal and Non-Lethal Poisons.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
   SpellInfo(poisoned_knife energy=40 gcd=1 combopoints=-1)
+Define(quaking_palm 107079)
+# Strikes the target with lightning speed, incapacitating them for 4 seconds, and turns off your attack.
+  SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
+  # Incapacitated.
+  SpellAddTargetDebuff(quaking_palm quaking_palm=1)
 Define(roll_the_bones 193316)
 # Finishing move that rolls the dice of fate, providing a random combat enhancement. Lasts longer per combo point:rn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds?s193531[rn   6 points: 42 seconds][]
   SpellInfo(roll_the_bones energy=25 combopoints=1 duration=6 channel=6 gcd=1 tick=2)
@@ -333,7 +353,7 @@ Define(blind_debuff 2094)
 	SpellAddBuff(blindside blindside_buff=-1)
 Define(blindside_buff 121153)
 	SpellInfo(blindside_buff duration=10)
-Define(cheap_shot 1833)
+
 	SpellInfo(cheap_shot combopoints=-2 energy=40 interrupt=1 stealthed=1)
 	SpellInfo(cheap_shot energy=0 talent=dirty_tricks_talent)
 	SpellRequire(cheap_shot energy_percent 0=buff,shot_in_the_dark_buff specialization=subtlety)
@@ -416,7 +436,7 @@ Define(ghostly_strike_debuff 196937)
 	SpellInfo(gloomblade combopoints=-1 energy=35)
 	SpellInfo(gloomblade replace=backstab talent=gloomblade_talent)
 	SpellRequire(gloomblade combopoints -2=buff,shadow_blades_buff)
-Define(gouge 1776)
+
 	SpellInfo(gouge combopoints=-1 cd=15 energy=25 tag=main)
 	SpellInfo(gouge energy=0 talent=dirty_tricks_talent)
 Define(grappling_hook 195457)
@@ -428,7 +448,7 @@ Define(internal_bleeding_debuff 154953)
 	SpellInfo(internal_bleeding_debuff duration=6 tick=1 haste=melee)
 
 	SpellInfo(kick cd=15 gcd=0 interrupt=1 offgcd=1)
-Define(kidney_shot 408)
+
 	SpellInfo(kidney_shot cd=20 combopoints=1 max_combopoints=5 energy=25 interrupt=1)
 	SpellInfo(kidney_shot max_combopoints=6 talent=deeper_stratagem_talent)
 	SpellRequire(kidney_shot energy_percent 80=stealthed,1 talent=shadow_focus_talent)
