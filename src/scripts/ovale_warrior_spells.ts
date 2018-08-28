@@ -139,9 +139,9 @@ Define(test_of_might_buff 275531)
 # When ?s262161[Warbreaker][Colossus Smash] expires, your Strength is increased by s1 for every s2 Rage you spent during ?s262161[Warbreaker][Colossus Smash]. Lasts 12 seconds.
   SpellInfo(test_of_might_buff channel=-0.001 gcd=0 offgcd=1)
 
-Define(warbreaker 209577)
-# Stomp the ground, causing a ring of corrupted spikes to erupt upwards, dealing sw1 Shadow damage and applying the Colossus Smash effect to all nearby enemies.
-  SpellInfo(warbreaker cd=60)
+Define(warbreaker 262161)
+# Smash the ground and shatter the armor of all enemies within A1 yds, dealing s1 Physical damage and increasing damage you deal to them by 208086s1 for 10 seconds.
+  SpellInfo(warbreaker cd=45 talent=warbreaker_talent)
 Define(whirlwind_buff 199658)
 # Unleashes a whirlwind of steel, ?s202316[hitting your primary target with Slam and ][]striking all enemies within 199658A1 yards for <baseDmg> Physical damage.
   SpellInfo(whirlwind_buff gcd=0 offgcd=1)

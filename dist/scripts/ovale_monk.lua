@@ -636,8 +636,6 @@ AddFunction WindwalkerSerenityMainActions
   if Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) Spell(spinning_crane_kick)
   #rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains
   Spell(rising_sun_kick)
-  #spinning_crane_kick,if=!prev_gcd.1.spinning_crane_kick
-  if not PreviousGCDSpell(spinning_crane_kick) Spell(spinning_crane_kick)
   #blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.blackout_kick
   if not PreviousGCDSpell(blackout_kick_windwalker) Spell(blackout_kick_windwalker)
  }
@@ -671,7 +669,7 @@ AddFunction WindwalkerSerenityShortCdActions
 
 AddFunction WindwalkerSerenityShortCdPostConditions
 {
- not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and not DebuffPresent(serenity) and Spell(tiger_palm) or WindwalkerCdShortCdPostConditions() or Talent(rushing_jade_wind_talent_windwalker) and not PreviousGCDSpell(rushing_jade_wind_windwalker) and DebuffExpires(rushing_jade_wind_windwalker) and Spell(rushing_jade_wind_windwalker) or PreviousGCDSpell(rising_sun_kick) and PreviousGCDSpell(serenity count=2) and Spell(fists_of_fury) or DebuffRemaining(serenity) <= 1.05 and Spell(fists_of_fury) or Spell(rising_sun_kick) or PreviousGCDSpell(blackout_kick_windwalker) and PreviousGCDSpell(rising_sun_kick count=2) and MaxChi() - Chi() > 1 and Spell(tiger_palm) or not PreviousGCDSpell(blackout_kick_windwalker) and SpellCooldown(rising_sun_kick) >= 2 and SpellCooldown(fists_of_fury) >= 2 and Spell(blackout_kick_windwalker) or Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or Spell(rising_sun_kick) or not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or not PreviousGCDSpell(blackout_kick_windwalker) and Spell(blackout_kick_windwalker)
+ not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and not DebuffPresent(serenity) and Spell(tiger_palm) or WindwalkerCdShortCdPostConditions() or Talent(rushing_jade_wind_talent_windwalker) and not PreviousGCDSpell(rushing_jade_wind_windwalker) and DebuffExpires(rushing_jade_wind_windwalker) and Spell(rushing_jade_wind_windwalker) or PreviousGCDSpell(rising_sun_kick) and PreviousGCDSpell(serenity count=2) and Spell(fists_of_fury) or DebuffRemaining(serenity) <= 1.05 and Spell(fists_of_fury) or Spell(rising_sun_kick) or PreviousGCDSpell(blackout_kick_windwalker) and PreviousGCDSpell(rising_sun_kick count=2) and MaxChi() - Chi() > 1 and Spell(tiger_palm) or not PreviousGCDSpell(blackout_kick_windwalker) and SpellCooldown(rising_sun_kick) >= 2 and SpellCooldown(fists_of_fury) >= 2 and Spell(blackout_kick_windwalker) or Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or Spell(rising_sun_kick) or not PreviousGCDSpell(blackout_kick_windwalker) and Spell(blackout_kick_windwalker)
 }
 
 AddFunction WindwalkerSerenityCdActions
@@ -685,7 +683,7 @@ AddFunction WindwalkerSerenityCdActions
 
 AddFunction WindwalkerSerenityCdPostConditions
 {
- not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and not DebuffPresent(serenity) and Spell(tiger_palm) or WindwalkerCdCdPostConditions() or Talent(rushing_jade_wind_talent_windwalker) and not PreviousGCDSpell(rushing_jade_wind_windwalker) and DebuffExpires(rushing_jade_wind_windwalker) and Spell(rushing_jade_wind_windwalker) or SpellCooldown(rising_sun_kick) <= 2 and SpellCooldown(fists_of_fury) <= 4 and Spell(serenity) or PreviousGCDSpell(rising_sun_kick) and PreviousGCDSpell(serenity count=2) and Spell(fists_of_fury) or DebuffRemaining(serenity) <= 1.05 and Spell(fists_of_fury) or Spell(rising_sun_kick) or PreviousGCDSpell(blackout_kick_windwalker) and PreviousGCDSpell(rising_sun_kick count=2) and MaxChi() - Chi() > 2 and Spell(fist_of_the_white_tiger) or PreviousGCDSpell(blackout_kick_windwalker) and PreviousGCDSpell(rising_sun_kick count=2) and MaxChi() - Chi() > 1 and Spell(tiger_palm) or not PreviousGCDSpell(blackout_kick_windwalker) and SpellCooldown(rising_sun_kick) >= 2 and SpellCooldown(fists_of_fury) >= 2 and Spell(blackout_kick_windwalker) or Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or Spell(rising_sun_kick) or not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or not PreviousGCDSpell(blackout_kick_windwalker) and Spell(blackout_kick_windwalker)
+ not PreviousGCDSpell(tiger_palm) and not PreviousGCDSpell(energizing_elixir) and Energy() == MaxEnergy() and Chi() < 1 and not DebuffPresent(serenity) and Spell(tiger_palm) or WindwalkerCdCdPostConditions() or Talent(rushing_jade_wind_talent_windwalker) and not PreviousGCDSpell(rushing_jade_wind_windwalker) and DebuffExpires(rushing_jade_wind_windwalker) and Spell(rushing_jade_wind_windwalker) or SpellCooldown(rising_sun_kick) <= 2 and SpellCooldown(fists_of_fury) <= 4 and Spell(serenity) or PreviousGCDSpell(rising_sun_kick) and PreviousGCDSpell(serenity count=2) and Spell(fists_of_fury) or DebuffRemaining(serenity) <= 1.05 and Spell(fists_of_fury) or Spell(rising_sun_kick) or PreviousGCDSpell(blackout_kick_windwalker) and PreviousGCDSpell(rising_sun_kick count=2) and MaxChi() - Chi() > 2 and Spell(fist_of_the_white_tiger) or PreviousGCDSpell(blackout_kick_windwalker) and PreviousGCDSpell(rising_sun_kick count=2) and MaxChi() - Chi() > 1 and Spell(tiger_palm) or not PreviousGCDSpell(blackout_kick_windwalker) and SpellCooldown(rising_sun_kick) >= 2 and SpellCooldown(fists_of_fury) >= 2 and Spell(blackout_kick_windwalker) or Enemies() >= 3 and not PreviousGCDSpell(spinning_crane_kick) and Spell(spinning_crane_kick) or Spell(rising_sun_kick) or not PreviousGCDSpell(blackout_kick_windwalker) and Spell(blackout_kick_windwalker)
 }
 
 ### actions.sef
@@ -799,7 +797,7 @@ AddFunction WindwalkerPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_agility usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(bursting_blood usable=1)
 }
 
 AddFunction WindwalkerPrecombatCdPostConditions
@@ -1088,7 +1086,7 @@ AddFunction WindwalkerDefaultCdActions
  unless not Talent(good_karma_talent) and CheckBoxOn(opt_touch_of_karma) and Spell(touch_of_karma) or Talent(good_karma_talent) and BuffExpires(burst_haste_buff any=1) and TimeInCombat() > 1 and CheckBoxOn(opt_touch_of_karma) and Spell(touch_of_karma) or Talent(good_karma_talent) and PreviousGCDSpell(touch_of_death) and BuffPresent(burst_haste_buff any=1) and CheckBoxOn(opt_touch_of_karma) and Spell(touch_of_karma)
  {
   #potion,if=buff.serenity.up|buff.storm_earth_and_fire.up|(!talent.serenity.enabled&trinket.proc.agility.react)|buff.bloodlust.react|target.time_to_die<=60
-  if { DebuffPresent(serenity) or DebuffPresent(storm_earth_and_fire) or not Talent(serenity_talent) and BuffPresent(trinket_proc_agility_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_agility usable=1)
+  if { DebuffPresent(serenity) or DebuffPresent(storm_earth_and_fire) or not Talent(serenity_talent) and BuffPresent(trinket_proc_agility_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(bursting_blood usable=1)
   #touch_of_death,if=target.time_to_die<=9
   if target.TimeToDie() <= 9 and { not CheckBoxOn(opt_touch_of_death_on_elite_only) or not UnitInRaid() and target.Classification(elite) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff) } Spell(touch_of_death)
   #call_action_list,name=serenitySR,if=((talent.serenity.enabled&cooldown.serenity.remains<=0)|buff.serenity.up)&azerite.swift_roundhouse.enabled&time>30
@@ -1216,11 +1214,11 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 ### Required symbols
 # ancestral_call
 # arcane_torrent_chi
-# battle_potion_of_agility
 # berserking
 # blackout_kick_buff
 # blackout_kick_windwalker
 # blood_fury_apsp
+# bursting_blood
 # chi_burst
 # chi_wave
 # crackling_jade_lightning

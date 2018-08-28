@@ -84,17 +84,17 @@ Define(force_of_nature 205636)
 # Summons a stand of s1 Treants for 10 seconds which immediately taunt and attack enemies in the targeted area.rnrn|cFFFFFFFFGenerates m5/10 Astral Power.|r
   SpellInfo(force_of_nature cd=60 lunarpower=-20 talent=force_of_nature_talent)
 
-Define(full_moon 202771)
+Define(full_moon 274283)
 # Deals m1 Arcane damage to the target and reduced damage to all other nearby enemies, and resets Full Moon to become New Moon.rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r
-  SpellInfo(full_moon cd=15 lunarpower=-40)
+  SpellInfo(full_moon cd=25 lunarpower=-40)
 Define(fury_of_elune 202770)
 # Calls down a beam of pure celestial energy that follows the enemy, dealing <dmg> Astral damage over 8 seconds to all nearby targets.rnrn|cFFFFFFFFGenerates m3/10/t3*8 seconds Astral Power over its duration.|r
   SpellInfo(fury_of_elune cd=60 duration=8 tick=0.5 talent=fury_of_elune_talent)
   # Generating m3/10/t3*d Astral Power over d.
   SpellAddBuff(fury_of_elune fury_of_elune=1)
-Define(half_moon 202768)
+Define(half_moon 274282)
 # Deals m1 Arcane damage to the target and empowers Half Moon to become Full Moon.rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
-  SpellInfo(half_moon cd=15 lunarpower=-20)
+  SpellInfo(half_moon cd=25 lunarpower=-20)
 Define(incarnation_chosen_of_elune 102560)
 # An improved Moonkin Form that increases the damage of all your spells by s1 and grants you s3 Haste.rnrnLasts 30 seconds. You may shapeshift in and out of this improved Moonkin Form for its duration.
   SpellInfo(incarnation_chosen_of_elune cd=180 duration=30 talent=incarnation_chosen_of_elune_talent)
@@ -139,9 +139,9 @@ Define(maul 6807)
 Define(moonfire 8921)
 # A quick beam of lunar light burns the enemy for (14.499999999999998 of Spell Power) Arcane damage and then an additional 164812o2 Arcane damage over 16 seconds.?s5487[ Usable while in Bear Form.][]?s197911[rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r][]
   SpellInfo(moonfire rage=0 lunarpower=0)
-Define(new_moon 202767)
+Define(new_moon 274281)
 # Deals m1 Arcane damage to the target and empowers New Moon to become Half Moon. rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
-  SpellInfo(new_moon cd=15 lunarpower=-10)
+  SpellInfo(new_moon cd=25 gcd=1 lunarpower=-10 talent=new_moon_talent)
 Define(old_war 188028)
 # Summons a pair of ghostly fallen warriors that will join you in combat. They may echo your melee attacks and abilities, dealing 233150s1 damage.
   SpellInfo(old_war cd=1 duration=25 gcd=0 offgcd=1)
@@ -262,6 +262,8 @@ Define(lunar_inspiration_talent 3) #22365
 # Moonfire is now usable while in Cat Form, generates 1 combo point, deals damage based on attack power, and costs 30 energy.
 Define(moment_of_clarity_talent 19) #21646
 # Omen of Clarity now triggers s2 more often, can accumulate up to s135700u+s1 charges, and increases the damage of your next Shred, Thrash, or ?s202028[Brutal Slash][Swipe] by s4.rnrnYour maximum Energy is increased by s3.
+Define(new_moon_talent 21) #21655
+# Deals m1 Arcane damage to the target and empowers New Moon to become Half Moon. rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
 Define(pulverize_talent 21) #22425
 # A devastating blow that consumes s3 stacks of your Thrash on the target to deal s1 Physical damage, and reduces all damage you take by 158792s1 for 20 seconds.
 Define(sabertooth_talent 16) #21714
