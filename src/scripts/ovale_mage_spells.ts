@@ -97,10 +97,9 @@ Define(dragons_breath 31661)
   SpellInfo(dragons_breath cd=20 duration=4)
   # Disoriented.
   SpellAddTargetDebuff(dragons_breath dragons_breath=1)
-Define(ebonbolt 214634)
-# Deals (321.75 of Spell Power) Shadowfrost damage and causes Brain Freeze.
-  SpellInfo(ebonbolt cd=45)
-
+Define(ebonbolt 257537)
+# Launch a bolt of ice at the enemy, dealing (200 of Spell Power) Frost damage and granting you Brain Freeze.
+  SpellInfo(ebonbolt cd=45 talent=ebonbolt_talent)
 Define(evocation 12051)
 # Increases your mana regeneration by s1 for 6 seconds.
 # Rank 2: Evocation's cooldown is reduced by s1.

@@ -112,10 +112,10 @@ Define(shield_of_vengeance 184662)
 Define(templars_verdict 85256)
 # Unleashes a powerful weapon strike that deals 224266sw1*<mult> Holy damage to an enemy target.
   SpellInfo(templars_verdict holypower=3)
-Define(wake_of_ashes 205273)
-# Lash out with the |cFFFFCC99Ashbringer|r, dealing sw1 Radiant damage?a179546[, and an additional o3 Radiant damage over 6 seconds,][] to all enemies within a1 yd in front of you, and reducing movement speed by s2 for 6 seconds.rnrnDemon and Undead enemies are stunned for 6 seconds if struck by the Wake of Ashes.?a179546[rnrn|cFFFFFFFFGenerates 218001s1 Holy Power.][]
-  SpellInfo(wake_of_ashes cd=30 duration=6 tick=1)
-  # Movement speed reduced by s2.rn?w3!=0[Suffering s3 Radiant damage every t3 sec.][]
+Define(wake_of_ashes 255937)
+# Lash out at your enemies, dealing sw1 Radiant damage to all enemies within a1 yd in front of you and reducing their movement speed by s2 for 5 seconds.rnrnDemon and Undead enemies are also stunned for 5 seconds.rnrn|cFFFFFFFFGenerates s3 Holy Power.
+  SpellInfo(wake_of_ashes cd=45 duration=5 holypower=-5 talent=wake_of_ashes_talent)
+  # Movement speed reduced by s2.
   SpellAddTargetDebuff(wake_of_ashes wake_of_ashes=1)
 Define(war_stomp 20549)
 # Stuns up to i enemies within A1 yds for 2 seconds.
@@ -138,6 +138,8 @@ Define(righteous_verdict_talent 2) #22557
 # Templar's Verdict increases the damage of your next Templar's Verdict by 267611s1 for 6 seconds.
 Define(seraphim_talent 21) #22645
 # The Light temporarily magnifies your power, increasing your Haste, Critical Strike, Mastery, and Versatility by s1.rnrnConsumes up to s2 charges of Shield of the Righteous, and lasts 8 seconds per charge.
+Define(wake_of_ashes_talent 12) #22183
+# Lash out at your enemies, dealing sw1 Radiant damage to all enemies within a1 yd in front of you and reducing their movement speed by s2 for 5 seconds.rnrnDemon and Undead enemies are also stunned for 5 seconds.rnrn|cFFFFFFFFGenerates s3 Holy Power.
 Define(divine_right_trait 277678)
     `;
 // END

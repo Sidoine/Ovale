@@ -109,9 +109,9 @@ Define(void_bolt 228266)
 Define(void_eruption 228260)
 # Releases an explosive blast of pure void energy, activating Voidform and causing (95 of Spell Power)*2 Shadow damage to all enemies within a1 yds of your target.rnrnDuring Voidform, this ability is replaced by Void Bolt.rnrn|cFFFFFFFFRequires C/100 Insanity to activate.|r
   SpellInfo(void_eruption insanity=9000)
-Define(void_torrent 205065)
-# Raise your dagger into the sky, channeling a torrent of void energy into the target for o Shadow damage over 4 seconds. Insanity does not drain during this channel.rnrnRequires Voidform.
-  SpellInfo(void_torrent cd=60 duration=4 channel=4 tick=1)
+Define(void_torrent 263165)
+# Channel a torrent of void energy into the target, dealing o Shadow damage over 4 seconds. Insanity does not drain during this channel.rnrnRequires Voidform.
+  SpellInfo(void_torrent cd=45 duration=4 channel=4 tick=1 talent=void_torrent_talent)
   # Dealing s1 Shadow damage to the target every t sec.rnrnInsanity drain temporarily stopped.
   SpellAddBuff(void_torrent void_torrent=1)
   # Dealing s1 Shadow damage to the target every t sec.rnrnInsanity drain temporarily stopped.
@@ -142,6 +142,8 @@ Define(shadow_word_void_talent 3) #22314
 # Blasts the target with a word of void for (130 of Spell Power) Shadow damage.?a185916[rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r][]
 Define(surrender_to_madness_talent 21) #21979
 # All your Insanity-generating abilities generate s1 more Insanity and you can cast while moving for 60 seconds.rnrnThen, you take damage equal to s3 of your maximum health and cannot generate Insanity for 30 seconds.
+Define(void_torrent_talent 18) #21720
+# Channel a torrent of void energy into the target, dealing o Shadow damage over 4 seconds. Insanity does not drain during this channel.rnrnRequires Voidform.
     `;
 // END
     code += `

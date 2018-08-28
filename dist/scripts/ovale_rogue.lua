@@ -175,8 +175,8 @@ AddFunction AssassinationDirectMainActions
  #envenom,if=combo_points>=4+talent.deeper_stratagem.enabled&(debuff.vendetta.up|debuff.toxic_blade.up|energy.deficit<=25+variable.energy_regen_combined|spell_targets.fan_of_knives>=2)&(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)
  if ComboPoints() >= 4 + TalentPoints(deeper_stratagem_talent) and { target.DebuffPresent(vendetta_debuff) or target.DebuffPresent(toxic_blade_debuff) or EnergyDeficit() <= 25 + energy_regen_combined() or Enemies() >= 2 } and { not Talent(exsanguinate_talent) or SpellCooldown(exsanguinate) > 2 } Spell(envenom)
  #variable,name=use_filler,value=combo_points.deficit>1|energy.deficit<=25+variable.energy_regen_combined|spell_targets.fan_of_knives>=2
- #poisoned_knife,if=variable.use_filler&buff.sharpened_blades.stack>=29&(azerite.sharpened_blades.rank>=2|spell_targets.fan_of_knives<=4)
- if use_filler() and BuffStacks(sharpened_blades_buff) >= 29 and { AzeriteTraitRank(sharpened_blades_trait) >= 2 or Enemies() <= 4 } Spell(poisoned_knife)
+ #poisoned_knife,if=variable.use_filler&buff.sharpened_blades.stack>=29
+ if use_filler() and BuffStacks(sharpened_blades_buff) >= 29 Spell(poisoned_knife)
  #fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=2+stealthed.rogue|buff.the_dreadlords_deceit.stack>=29)
  if use_filler() and { BuffStacks(hidden_blades_buff) >= 19 or Enemies() >= 2 + Stealthed() or BuffStacks(the_dreadlords_deceit_assassination_buff) >= 29 } Spell(fan_of_knives)
  #blindside,if=variable.use_filler&(buff.blindside.up|!talent.venom_rush.enabled)
@@ -195,7 +195,7 @@ AddFunction AssassinationDirectShortCdActions
 
 AddFunction AssassinationDirectShortCdPostConditions
 {
- ComboPoints() >= 4 + TalentPoints(deeper_stratagem_talent) and { target.DebuffPresent(vendetta_debuff) or target.DebuffPresent(toxic_blade_debuff) or EnergyDeficit() <= 25 + energy_regen_combined() or Enemies() >= 2 } and { not Talent(exsanguinate_talent) or SpellCooldown(exsanguinate) > 2 } and Spell(envenom) or use_filler() and BuffStacks(sharpened_blades_buff) >= 29 and { AzeriteTraitRank(sharpened_blades_trait) >= 2 or Enemies() <= 4 } and Spell(poisoned_knife) or use_filler() and { BuffStacks(hidden_blades_buff) >= 19 or Enemies() >= 2 + Stealthed() or BuffStacks(the_dreadlords_deceit_assassination_buff) >= 29 } and Spell(fan_of_knives) or use_filler() and { BuffPresent(blindside_buff) or not Talent(venom_rush_talent) } and Spell(blindside) or use_filler() and Spell(mutilate)
+ ComboPoints() >= 4 + TalentPoints(deeper_stratagem_talent) and { target.DebuffPresent(vendetta_debuff) or target.DebuffPresent(toxic_blade_debuff) or EnergyDeficit() <= 25 + energy_regen_combined() or Enemies() >= 2 } and { not Talent(exsanguinate_talent) or SpellCooldown(exsanguinate) > 2 } and Spell(envenom) or use_filler() and BuffStacks(sharpened_blades_buff) >= 29 and Spell(poisoned_knife) or use_filler() and { BuffStacks(hidden_blades_buff) >= 19 or Enemies() >= 2 + Stealthed() or BuffStacks(the_dreadlords_deceit_assassination_buff) >= 29 } and Spell(fan_of_knives) or use_filler() and { BuffPresent(blindside_buff) or not Talent(venom_rush_talent) } and Spell(blindside) or use_filler() and Spell(mutilate)
 }
 
 AddFunction AssassinationDirectCdActions
@@ -204,7 +204,7 @@ AddFunction AssassinationDirectCdActions
 
 AddFunction AssassinationDirectCdPostConditions
 {
- ComboPoints() >= 4 + TalentPoints(deeper_stratagem_talent) and { target.DebuffPresent(vendetta_debuff) or target.DebuffPresent(toxic_blade_debuff) or EnergyDeficit() <= 25 + energy_regen_combined() or Enemies() >= 2 } and { not Talent(exsanguinate_talent) or SpellCooldown(exsanguinate) > 2 } and Spell(envenom) or use_filler() and BuffStacks(sharpened_blades_buff) >= 29 and { AzeriteTraitRank(sharpened_blades_trait) >= 2 or Enemies() <= 4 } and Spell(poisoned_knife) or use_filler() and { BuffStacks(hidden_blades_buff) >= 19 or Enemies() >= 2 + Stealthed() or BuffStacks(the_dreadlords_deceit_assassination_buff) >= 29 } and Spell(fan_of_knives) or use_filler() and { BuffPresent(blindside_buff) or not Talent(venom_rush_talent) } and Spell(blindside) or use_filler() and Spell(mutilate)
+ ComboPoints() >= 4 + TalentPoints(deeper_stratagem_talent) and { target.DebuffPresent(vendetta_debuff) or target.DebuffPresent(toxic_blade_debuff) or EnergyDeficit() <= 25 + energy_regen_combined() or Enemies() >= 2 } and { not Talent(exsanguinate_talent) or SpellCooldown(exsanguinate) > 2 } and Spell(envenom) or use_filler() and BuffStacks(sharpened_blades_buff) >= 29 and Spell(poisoned_knife) or use_filler() and { BuffStacks(hidden_blades_buff) >= 19 or Enemies() >= 2 + Stealthed() or BuffStacks(the_dreadlords_deceit_assassination_buff) >= 29 } and Spell(fan_of_knives) or use_filler() and { BuffPresent(blindside_buff) or not Talent(venom_rush_talent) } and Spell(blindside) or use_filler() and Spell(mutilate)
 }
 
 ### actions.cds
@@ -462,7 +462,6 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # rupture_debuff
 # shadowstep
 # sharpened_blades_buff
-# sharpened_blades_trait
 # stealth
 # subterfuge_talent
 # the_dreadlords_deceit_assassination_buff
@@ -650,8 +649,8 @@ AddFunction AssassinationDirectMainActions
  #envenom,if=combo_points>=4+talent.deeper_stratagem.enabled&(debuff.vendetta.up|debuff.toxic_blade.up|energy.deficit<=25+variable.energy_regen_combined|spell_targets.fan_of_knives>=2)&(!talent.exsanguinate.enabled|cooldown.exsanguinate.remains>2)
  if ComboPoints() >= 4 + TalentPoints(deeper_stratagem_talent) and { target.DebuffPresent(vendetta_debuff) or target.DebuffPresent(toxic_blade_debuff) or EnergyDeficit() <= 25 + energy_regen_combined() or Enemies() >= 2 } and { not Talent(exsanguinate_talent) or SpellCooldown(exsanguinate) > 2 } Spell(envenom)
  #variable,name=use_filler,value=combo_points.deficit>1|energy.deficit<=25+variable.energy_regen_combined|spell_targets.fan_of_knives>=2
- #poisoned_knife,if=variable.use_filler&buff.sharpened_blades.stack>=29&(azerite.sharpened_blades.rank>=2|spell_targets.fan_of_knives<=4)
- if use_filler() and BuffStacks(sharpened_blades_buff) >= 29 and { AzeriteTraitRank(sharpened_blades_trait) >= 2 or Enemies() <= 4 } Spell(poisoned_knife)
+ #poisoned_knife,if=variable.use_filler&buff.sharpened_blades.stack>=29
+ if use_filler() and BuffStacks(sharpened_blades_buff) >= 29 Spell(poisoned_knife)
  #fan_of_knives,if=variable.use_filler&(buff.hidden_blades.stack>=19|spell_targets.fan_of_knives>=2+stealthed.rogue|buff.the_dreadlords_deceit.stack>=29)
  if use_filler() and { BuffStacks(hidden_blades_buff) >= 19 or Enemies() >= 2 + Stealthed() or BuffStacks(the_dreadlords_deceit_assassination_buff) >= 29 } Spell(fan_of_knives)
  #blindside,if=variable.use_filler&(buff.blindside.up|!talent.venom_rush.enabled)
@@ -670,7 +669,7 @@ AddFunction AssassinationDirectShortCdActions
 
 AddFunction AssassinationDirectShortCdPostConditions
 {
- ComboPoints() >= 4 + TalentPoints(deeper_stratagem_talent) and { target.DebuffPresent(vendetta_debuff) or target.DebuffPresent(toxic_blade_debuff) or EnergyDeficit() <= 25 + energy_regen_combined() or Enemies() >= 2 } and { not Talent(exsanguinate_talent) or SpellCooldown(exsanguinate) > 2 } and Spell(envenom) or use_filler() and BuffStacks(sharpened_blades_buff) >= 29 and { AzeriteTraitRank(sharpened_blades_trait) >= 2 or Enemies() <= 4 } and Spell(poisoned_knife) or use_filler() and { BuffStacks(hidden_blades_buff) >= 19 or Enemies() >= 2 + Stealthed() or BuffStacks(the_dreadlords_deceit_assassination_buff) >= 29 } and Spell(fan_of_knives) or use_filler() and { BuffPresent(blindside_buff) or not Talent(venom_rush_talent) } and Spell(blindside) or use_filler() and Spell(mutilate)
+ ComboPoints() >= 4 + TalentPoints(deeper_stratagem_talent) and { target.DebuffPresent(vendetta_debuff) or target.DebuffPresent(toxic_blade_debuff) or EnergyDeficit() <= 25 + energy_regen_combined() or Enemies() >= 2 } and { not Talent(exsanguinate_talent) or SpellCooldown(exsanguinate) > 2 } and Spell(envenom) or use_filler() and BuffStacks(sharpened_blades_buff) >= 29 and Spell(poisoned_knife) or use_filler() and { BuffStacks(hidden_blades_buff) >= 19 or Enemies() >= 2 + Stealthed() or BuffStacks(the_dreadlords_deceit_assassination_buff) >= 29 } and Spell(fan_of_knives) or use_filler() and { BuffPresent(blindside_buff) or not Talent(venom_rush_talent) } and Spell(blindside) or use_filler() and Spell(mutilate)
 }
 
 AddFunction AssassinationDirectCdActions
@@ -679,7 +678,7 @@ AddFunction AssassinationDirectCdActions
 
 AddFunction AssassinationDirectCdPostConditions
 {
- ComboPoints() >= 4 + TalentPoints(deeper_stratagem_talent) and { target.DebuffPresent(vendetta_debuff) or target.DebuffPresent(toxic_blade_debuff) or EnergyDeficit() <= 25 + energy_regen_combined() or Enemies() >= 2 } and { not Talent(exsanguinate_talent) or SpellCooldown(exsanguinate) > 2 } and Spell(envenom) or use_filler() and BuffStacks(sharpened_blades_buff) >= 29 and { AzeriteTraitRank(sharpened_blades_trait) >= 2 or Enemies() <= 4 } and Spell(poisoned_knife) or use_filler() and { BuffStacks(hidden_blades_buff) >= 19 or Enemies() >= 2 + Stealthed() or BuffStacks(the_dreadlords_deceit_assassination_buff) >= 29 } and Spell(fan_of_knives) or use_filler() and { BuffPresent(blindside_buff) or not Talent(venom_rush_talent) } and Spell(blindside) or use_filler() and Spell(mutilate)
+ ComboPoints() >= 4 + TalentPoints(deeper_stratagem_talent) and { target.DebuffPresent(vendetta_debuff) or target.DebuffPresent(toxic_blade_debuff) or EnergyDeficit() <= 25 + energy_regen_combined() or Enemies() >= 2 } and { not Talent(exsanguinate_talent) or SpellCooldown(exsanguinate) > 2 } and Spell(envenom) or use_filler() and BuffStacks(sharpened_blades_buff) >= 29 and Spell(poisoned_knife) or use_filler() and { BuffStacks(hidden_blades_buff) >= 19 or Enemies() >= 2 + Stealthed() or BuffStacks(the_dreadlords_deceit_assassination_buff) >= 29 } and Spell(fan_of_knives) or use_filler() and { BuffPresent(blindside_buff) or not Talent(venom_rush_talent) } and Spell(blindside) or use_filler() and Spell(mutilate)
 }
 
 ### actions.cds
@@ -937,7 +936,6 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # rupture_debuff
 # shadowstep
 # sharpened_blades_buff
-# sharpened_blades_trait
 # stealth
 # subterfuge_talent
 # the_dreadlords_deceit_assassination_buff
@@ -2214,8 +2212,8 @@ AddFunction SubtletyCdsCdPostConditions
 
 AddFunction SubtletyBuildMainActions
 {
- #shuriken_toss,if=buff.sharpened_blades.stack>=29&spell_targets.shuriken_storm<=1+3*(azerite.sharpened_blades.rank=2)+4*(azerite.sharpened_blades.rank=3)
- if BuffStacks(sharpened_blades_buff) >= 29 and Enemies() <= 1 + 3 * { AzeriteTraitRank(sharpened_blades_trait) == 2 } + 4 * { AzeriteTraitRank(sharpened_blades_trait) == 3 } Spell(shuriken_toss)
+ #shuriken_toss,if=buff.sharpened_blades.stack>=29&spell_targets.shuriken_storm<=(3*azerite.sharpened_blades.rank)
+ if BuffStacks(sharpened_blades_buff) >= 29 and Enemies() <= 3 * AzeriteTraitRank(sharpened_blades_trait) Spell(shuriken_toss)
  #shuriken_storm,if=spell_targets>=2|buff.the_dreadlords_deceit.stack>=29
  if Enemies() >= 2 or BuffStacks(the_dreadlords_deceit_subtlety_buff) >= 29 Spell(shuriken_storm)
  #gloomblade
@@ -2234,7 +2232,7 @@ AddFunction SubtletyBuildShortCdActions
 
 AddFunction SubtletyBuildShortCdPostConditions
 {
- BuffStacks(sharpened_blades_buff) >= 29 and Enemies() <= 1 + 3 * { AzeriteTraitRank(sharpened_blades_trait) == 2 } + 4 * { AzeriteTraitRank(sharpened_blades_trait) == 3 } and Spell(shuriken_toss) or { Enemies() >= 2 or BuffStacks(the_dreadlords_deceit_subtlety_buff) >= 29 } and Spell(shuriken_storm) or Spell(gloomblade) or Spell(backstab)
+ BuffStacks(sharpened_blades_buff) >= 29 and Enemies() <= 3 * AzeriteTraitRank(sharpened_blades_trait) and Spell(shuriken_toss) or { Enemies() >= 2 or BuffStacks(the_dreadlords_deceit_subtlety_buff) >= 29 } and Spell(shuriken_storm) or Spell(gloomblade) or Spell(backstab)
 }
 
 AddFunction SubtletyBuildCdActions
@@ -2243,7 +2241,7 @@ AddFunction SubtletyBuildCdActions
 
 AddFunction SubtletyBuildCdPostConditions
 {
- BuffStacks(sharpened_blades_buff) >= 29 and Enemies() <= 1 + 3 * { AzeriteTraitRank(sharpened_blades_trait) == 2 } + 4 * { AzeriteTraitRank(sharpened_blades_trait) == 3 } and Spell(shuriken_toss) or { Enemies() >= 2 or BuffStacks(the_dreadlords_deceit_subtlety_buff) >= 29 } and Spell(shuriken_storm) or Spell(gloomblade) or Spell(backstab)
+ BuffStacks(sharpened_blades_buff) >= 29 and Enemies() <= 3 * AzeriteTraitRank(sharpened_blades_trait) and Spell(shuriken_toss) or { Enemies() >= 2 or BuffStacks(the_dreadlords_deceit_subtlety_buff) >= 29 } and Spell(shuriken_storm) or Spell(gloomblade) or Spell(backstab)
 }
 
 ### actions.default

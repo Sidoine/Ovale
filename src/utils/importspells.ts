@@ -1250,6 +1250,7 @@ export function getSpellData(directory: string) {
         if (spell.spell_level > 0) spell.identifierScore++;
         if (spell.equipped_class > 0) spell.identifierScore++;
         if (spell.rank_str === "Racial") spell.identifierScore += 3;
+        if (spell.rank_str === "Artifact") spell.identifierScore -= 20;
     }
 
     for (let classIndex = 0; classIndex  <  output.__tree_specialization_data.length; classIndex++) {

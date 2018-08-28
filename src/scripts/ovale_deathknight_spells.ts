@@ -62,9 +62,9 @@ Define(cold_heart_buff 281209)
   SpellInfo(cold_heart_buff max_stacks=20 gcd=0 offgcd=1)
   # Your next Chains of Ice will deal 281210s1 Fost damage.
   SpellAddBuff(cold_heart_buff cold_heart_buff=1)
-Define(consumption 205223)
-# Strikes all enemies in front of you with a hungering attack that deals sw2 Physical damage and heals you for s3 of that damage.
-  SpellInfo(consumption cd=45)
+Define(consumption 274156)
+# Strikes all enemies in front of you with a hungering attack that deals sw1 Physical damage and heals you for e1*100 of that damage.
+  SpellInfo(consumption cd=45 talent=consumption_talent)
 
 Define(dancing_rune_weapon 49028)
 # Summons a rune weapon for s4 sec that mirrors your melee attacks and bolsters your defenses.rnrnWhile active, you gain 81256s1 parry chance.
@@ -231,6 +231,8 @@ Define(clawing_shadows_talent 3) #22026
 # Deals s2 Shadow damage and causes 1 Festering Wound to burst.
 Define(cold_heart_talent 3) #22018
 # Every t1 sec, gain a stack of Cold Heart, causing your next Chains of Ice to deal 281210s1 Frost damage. Stacks up to 281209u times.
+Define(consumption_talent 6) #19220
+# Strikes all enemies in front of you with a hungering attack that deals sw1 Physical damage and heals you for e1*100 of that damage.
 Define(defile_talent 17) #22534
 # Defile the targeted ground, dealing (156000s1*(10 seconds+1)/t3) Shadow damage to all enemies over 10 seconds.rnrnWhile you remain within your Defile, your ?s207311[Clawing Shadows][Scourge Strike] will hit all enemies near the target.rnrnIf any enemies are standing in the Defile, it grows in size every sec.
 Define(epidemic_talent 18) #22536

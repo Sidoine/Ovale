@@ -216,10 +216,10 @@ AddFunction ArcaneBurnMainActions
  if GetState(burn_phase) > 0 and PreviousGCDSpell(evocation) and target.TimeToDie() > average_burn_length() and GetStateDuration() > 0 and GetState(burn_phase) > 0 SetState(burn_phase 0)
  #nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.rune_of_power.down&buff.arcane_power.down
  if { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) } and ArcaneCharges() == MaxArcaneCharges() and BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) Spell(nether_tempest)
- #arcane_barrage,if=(active_enemies>=3|(active_enemies>=2&talent.resonance.enabled))&(buff.arcane_charge.stack=buff.arcane_charge.max_stack)
- if { Enemies() >= 3 or Enemies() >= 2 and Talent(resonance_talent) } and ArcaneCharges() == MaxArcaneCharges() Spell(arcane_barrage)
- #arcane_explosion,if=active_enemies>=3|(active_enemies>=2&talent.resonance.enabled)
- if Enemies() >= 3 or Enemies() >= 2 and Talent(resonance_talent) Spell(arcane_explosion)
+ #arcane_barrage,if=active_enemies>=3&(buff.arcane_charge.stack=buff.arcane_charge.max_stack)
+ if Enemies() >= 3 and ArcaneCharges() == MaxArcaneCharges() Spell(arcane_barrage)
+ #arcane_explosion,if=active_enemies>=3
+ if Enemies() >= 3 Spell(arcane_explosion)
  #arcane_missiles,if=buff.clearcasting.react&active_enemies<3&(talent.amplification.enabled|(!talent.overpowered.enabled&azerite.arcane_pummeling.rank>=2)|buff.arcane_power.down),chain=1
  if DebuffPresent(clearcasting) and Enemies() < 3 and { Talent(amplification_talent) or not Talent(overpowered_talent) and AzeriteTraitRank(arcane_pummeling_trait) >= 2 or BuffExpires(arcane_power_buff) } Spell(arcane_missiles)
  #arcane_blast
@@ -255,7 +255,7 @@ AddFunction ArcaneBurnShortCdActions
 
 AddFunction ArcaneBurnShortCdPostConditions
 {
- { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) } and ArcaneCharges() == MaxArcaneCharges() and BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and Spell(nether_tempest) or { Enemies() >= 3 or Enemies() >= 2 and Talent(resonance_talent) } and ArcaneCharges() == MaxArcaneCharges() and Spell(arcane_barrage) or { Enemies() >= 3 or Enemies() >= 2 and Talent(resonance_talent) } and Spell(arcane_explosion) or DebuffPresent(clearcasting) and Enemies() < 3 and { Talent(amplification_talent) or not Talent(overpowered_talent) and AzeriteTraitRank(arcane_pummeling_trait) >= 2 or BuffExpires(arcane_power_buff) } and Spell(arcane_missiles) or Mana() > ManaCost(arcane_blast) and Spell(arcane_blast) or Spell(arcane_barrage)
+ { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) } and ArcaneCharges() == MaxArcaneCharges() and BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and Spell(nether_tempest) or Enemies() >= 3 and ArcaneCharges() == MaxArcaneCharges() and Spell(arcane_barrage) or Enemies() >= 3 and Spell(arcane_explosion) or DebuffPresent(clearcasting) and Enemies() < 3 and { Talent(amplification_talent) or not Talent(overpowered_talent) and AzeriteTraitRank(arcane_pummeling_trait) >= 2 or BuffExpires(arcane_power_buff) } and Spell(arcane_missiles) or Mana() > ManaCost(arcane_blast) and Spell(arcane_blast) or Spell(arcane_barrage)
 }
 
 AddFunction ArcaneBurnCdActions
@@ -293,7 +293,7 @@ AddFunction ArcaneBurnCdActions
     #potion,if=buff.arcane_power.up&(buff.berserking.up|buff.blood_fury.up|!(race.troll|race.orc))
     if BuffPresent(arcane_power_buff) and { BuffPresent(berserking_buff) or BuffPresent(blood_fury_sp_buff) or not { Race(Troll) or Race(Orc) } } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_intellect usable=1)
 
-    unless { ArcaneCharges() == 0 or Enemies() < 3 or Enemies() < 2 and Talent(resonance_talent) } and Spell(arcane_orb) or { Enemies() >= 3 or Enemies() >= 2 and Talent(resonance_talent) } and ArcaneCharges() == MaxArcaneCharges() and Spell(arcane_barrage) or { Enemies() >= 3 or Enemies() >= 2 and Talent(resonance_talent) } and Spell(arcane_explosion) or DebuffPresent(clearcasting) and Enemies() < 3 and { Talent(amplification_talent) or not Talent(overpowered_talent) and AzeriteTraitRank(arcane_pummeling_trait) >= 2 or BuffExpires(arcane_power_buff) } and Spell(arcane_missiles) or Mana() > ManaCost(arcane_blast) and Spell(arcane_blast)
+    unless { ArcaneCharges() == 0 or Enemies() < 3 or Enemies() < 2 and Talent(resonance_talent) } and Spell(arcane_orb) or Enemies() >= 3 and ArcaneCharges() == MaxArcaneCharges() and Spell(arcane_barrage) or Enemies() >= 3 and Spell(arcane_explosion) or DebuffPresent(clearcasting) and Enemies() < 3 and { Talent(amplification_talent) or not Talent(overpowered_talent) and AzeriteTraitRank(arcane_pummeling_trait) >= 2 or BuffExpires(arcane_power_buff) } and Spell(arcane_missiles) or Mana() > ManaCost(arcane_blast) and Spell(arcane_blast)
     {
      #variable,name=average_burn_length,op=set,value=(variable.average_burn_length*variable.total_burns-variable.average_burn_length+(burn_phase_duration))%variable.total_burns
      #evocation,interrupt_if=mana.pct>=85,interrupt_immediate=1
@@ -306,7 +306,7 @@ AddFunction ArcaneBurnCdActions
 
 AddFunction ArcaneBurnCdPostConditions
 {
- ArcaneCharges() <= 1 and { not ArmorSetBonus(T20 2) or SpellCooldown(presence_of_mind) > 5 } and Spell(charged_up) or { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) } and ArcaneCharges() == MaxArcaneCharges() and BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and Spell(nether_tempest) or not BuffPresent(arcane_power_buff) and { ManaPercent() >= 50 or not SpellCooldown(arcane_power) > 0 } and ArcaneCharges() == MaxArcaneCharges() and Spell(rune_of_power) or { TotemRemaining(rune_of_power) <= SpellData(presence_of_mind_buff max_stacks) * ExecuteTime(arcane_blast) or BuffRemaining(arcane_power_buff) <= SpellData(presence_of_mind_buff max_stacks) * ExecuteTime(arcane_blast) } and Spell(presence_of_mind) or { ArcaneCharges() == 0 or Enemies() < 3 or Enemies() < 2 and Talent(resonance_talent) } and Spell(arcane_orb) or { Enemies() >= 3 or Enemies() >= 2 and Talent(resonance_talent) } and ArcaneCharges() == MaxArcaneCharges() and Spell(arcane_barrage) or { Enemies() >= 3 or Enemies() >= 2 and Talent(resonance_talent) } and Spell(arcane_explosion) or DebuffPresent(clearcasting) and Enemies() < 3 and { Talent(amplification_talent) or not Talent(overpowered_talent) and AzeriteTraitRank(arcane_pummeling_trait) >= 2 or BuffExpires(arcane_power_buff) } and Spell(arcane_missiles) or Mana() > ManaCost(arcane_blast) and Spell(arcane_blast) or Spell(arcane_barrage)
+ ArcaneCharges() <= 1 and { not ArmorSetBonus(T20 2) or SpellCooldown(presence_of_mind) > 5 } and Spell(charged_up) or { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) } and ArcaneCharges() == MaxArcaneCharges() and BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and Spell(nether_tempest) or not BuffPresent(arcane_power_buff) and { ManaPercent() >= 50 or not SpellCooldown(arcane_power) > 0 } and ArcaneCharges() == MaxArcaneCharges() and Spell(rune_of_power) or { TotemRemaining(rune_of_power) <= SpellData(presence_of_mind_buff max_stacks) * ExecuteTime(arcane_blast) or BuffRemaining(arcane_power_buff) <= SpellData(presence_of_mind_buff max_stacks) * ExecuteTime(arcane_blast) } and Spell(presence_of_mind) or { ArcaneCharges() == 0 or Enemies() < 3 or Enemies() < 2 and Talent(resonance_talent) } and Spell(arcane_orb) or Enemies() >= 3 and ArcaneCharges() == MaxArcaneCharges() and Spell(arcane_barrage) or Enemies() >= 3 and Spell(arcane_explosion) or DebuffPresent(clearcasting) and Enemies() < 3 and { Talent(amplification_talent) or not Talent(overpowered_talent) and AzeriteTraitRank(arcane_pummeling_trait) >= 2 or BuffExpires(arcane_power_buff) } and Spell(arcane_missiles) or Mana() > ManaCost(arcane_blast) and Spell(arcane_blast) or Spell(arcane_barrage)
 }
 
 ### actions.default
@@ -529,8 +529,6 @@ AddFunction FireStandardrotationMainActions
  if BuffPresent(hot_streak_buff) and BuffRemaining(hot_streak_buff) < ExecuteTime(fireball) Spell(pyroblast)
  #pyroblast,if=buff.hot_streak.react&firestarter.active&!talent.rune_of_power.enabled
  if BuffPresent(hot_streak_buff) and Talent(firestarter_talent) and target.HealthPercent() >= 90 and not Talent(rune_of_power_talent) Spell(pyroblast)
- #phoenix_flames,if=charges_fractional>2.7&active_enemies>2
- if Charges(phoenix_flames count=0) > 2.7 and Enemies() > 2 Spell(phoenix_flames)
  #pyroblast,if=buff.hot_streak.react&(!prev_gcd.1.pyroblast|action.pyroblast.in_flight)
  if BuffPresent(hot_streak_buff) and { not PreviousGCDSpell(pyroblast) or InFlightToTarget(pyroblast) } Spell(pyroblast)
  #pyroblast,if=buff.hot_streak.react&target.health.pct<=30&talent.searing_touch.enabled
@@ -546,12 +544,6 @@ AddFunction FireStandardrotationMainActions
   if not Talent(kindling_talent) and BuffPresent(heating_up_buff) and { not Talent(rune_of_power_talent) or Charges(fire_blast count=0) > 1.4 or SpellCooldown(combustion) < 40 } and { 3 - Charges(fire_blast count=0) } * 12 * { 100 / { 100 + SpellCastSpeedPercent() } } < SpellCooldown(combustion) + 3 or target.TimeToDie() < 4 Spell(fire_blast)
   #fire_blast,if=talent.kindling.enabled&buff.heating_up.react&(!talent.rune_of_power.enabled|charges_fractional>1.5|cooldown.combustion.remains<40)&(3-charges_fractional)*(18*spell_haste)<cooldown.combustion.remains+3|target.time_to_die<4
   if Talent(kindling_talent) and BuffPresent(heating_up_buff) and { not Talent(rune_of_power_talent) or Charges(fire_blast count=0) > 1.5 or SpellCooldown(combustion) < 40 } and { 3 - Charges(fire_blast count=0) } * 18 * { 100 / { 100 + SpellCastSpeedPercent() } } < SpellCooldown(combustion) + 3 or target.TimeToDie() < 4 Spell(fire_blast)
-  #phoenix_flames,if=(buff.combustion.up|buff.rune_of_power.up|buff.incanters_flow.stack>3|talent.mirror_image.enabled)&(4-charges_fractional)*13<cooldown.combustion.remains+5|target.time_to_die<10
-  if { BuffPresent(combustion_buff) or BuffPresent(rune_of_power_buff) or BuffStacks(incanters_flow_buff) > 3 or Talent(mirror_image_talent) } and { 4 - Charges(phoenix_flames count=0) } * 13 < SpellCooldown(combustion) + 5 or target.TimeToDie() < 10 Spell(phoenix_flames)
-  #phoenix_flames,if=(buff.combustion.up|buff.rune_of_power.up)&(4-charges_fractional)*30<cooldown.combustion.remains+5
-  if { BuffPresent(combustion_buff) or BuffPresent(rune_of_power_buff) } and { 4 - Charges(phoenix_flames count=0) } * 30 < SpellCooldown(combustion) + 5 Spell(phoenix_flames)
-  #phoenix_flames,if=charges_fractional>2.5&cooldown.combustion.remains>23
-  if Charges(phoenix_flames count=0) > 2.5 and SpellCooldown(combustion) > 23 Spell(phoenix_flames)
   #scorch,if=(target.health.pct<=30&talent.searing_touch.enabled)|(azerite.preheat.enabled&debuff.preheat.down)
   if target.HealthPercent() <= 30 and Talent(searing_touch_talent) or HasAzeriteTrait(preheat_trait) and target.DebuffExpires(preheat) Spell(scorch)
   #fireball
@@ -568,16 +560,32 @@ AddFunction FireStandardrotationMainPostConditions
 
 AddFunction FireStandardrotationShortCdActions
 {
- unless { Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 4 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(hot_streak_buff) and BuffRemaining(hot_streak_buff) < ExecuteTime(fireball) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Talent(firestarter_talent) and target.HealthPercent() >= 90 and not Talent(rune_of_power_talent) and Spell(pyroblast) or Charges(phoenix_flames count=0) > 2.7 and Enemies() > 2 and Spell(phoenix_flames) or BuffPresent(hot_streak_buff) and { not PreviousGCDSpell(pyroblast) or InFlightToTarget(pyroblast) } and Spell(pyroblast) or BuffPresent(hot_streak_buff) and target.HealthPercent() <= 30 and Talent(searing_touch_talent) and Spell(pyroblast) or DebuffPresent(pyroclasm) and ExecuteTime(pyroblast) < DebuffRemaining(pyroclasm) and Spell(pyroblast)
+ unless { Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 4 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(hot_streak_buff) and BuffRemaining(hot_streak_buff) < ExecuteTime(fireball) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Talent(firestarter_talent) and target.HealthPercent() >= 90 and not Talent(rune_of_power_talent) and Spell(pyroblast)
  {
-  #call_action_list,name=active_talents
-  FireActivetalentsShortCdActions()
+  #phoenix_flames,if=charges_fractional>2.7&active_enemies>2
+  if Charges(phoenix_flames count=0) > 2.7 and Enemies() > 2 Spell(phoenix_flames)
+
+  unless BuffPresent(hot_streak_buff) and { not PreviousGCDSpell(pyroblast) or InFlightToTarget(pyroblast) } and Spell(pyroblast) or BuffPresent(hot_streak_buff) and target.HealthPercent() <= 30 and Talent(searing_touch_talent) and Spell(pyroblast) or DebuffPresent(pyroclasm) and ExecuteTime(pyroblast) < DebuffRemaining(pyroclasm) and Spell(pyroblast)
+  {
+   #call_action_list,name=active_talents
+   FireActivetalentsShortCdActions()
+
+   unless FireActivetalentsShortCdPostConditions() or { not Talent(kindling_talent) and BuffPresent(heating_up_buff) and { not Talent(rune_of_power_talent) or Charges(fire_blast count=0) > 1.4 or SpellCooldown(combustion) < 40 } and { 3 - Charges(fire_blast count=0) } * 12 * { 100 / { 100 + SpellCastSpeedPercent() } } < SpellCooldown(combustion) + 3 or target.TimeToDie() < 4 } and Spell(fire_blast) or { Talent(kindling_talent) and BuffPresent(heating_up_buff) and { not Talent(rune_of_power_talent) or Charges(fire_blast count=0) > 1.5 or SpellCooldown(combustion) < 40 } and { 3 - Charges(fire_blast count=0) } * 18 * { 100 / { 100 + SpellCastSpeedPercent() } } < SpellCooldown(combustion) + 3 or target.TimeToDie() < 4 } and Spell(fire_blast)
+   {
+    #phoenix_flames,if=(buff.combustion.up|buff.rune_of_power.up|buff.incanters_flow.stack>3|talent.mirror_image.enabled)&(4-charges_fractional)*13<cooldown.combustion.remains+5|target.time_to_die<10
+    if { BuffPresent(combustion_buff) or BuffPresent(rune_of_power_buff) or BuffStacks(incanters_flow_buff) > 3 or Talent(mirror_image_talent) } and { 4 - Charges(phoenix_flames count=0) } * 13 < SpellCooldown(combustion) + 5 or target.TimeToDie() < 10 Spell(phoenix_flames)
+    #phoenix_flames,if=(buff.combustion.up|buff.rune_of_power.up)&(4-charges_fractional)*30<cooldown.combustion.remains+5
+    if { BuffPresent(combustion_buff) or BuffPresent(rune_of_power_buff) } and { 4 - Charges(phoenix_flames count=0) } * 30 < SpellCooldown(combustion) + 5 Spell(phoenix_flames)
+    #phoenix_flames,if=charges_fractional>2.5&cooldown.combustion.remains>23
+    if Charges(phoenix_flames count=0) > 2.5 and SpellCooldown(combustion) > 23 Spell(phoenix_flames)
+   }
+  }
  }
 }
 
 AddFunction FireStandardrotationShortCdPostConditions
 {
- { Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 4 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(hot_streak_buff) and BuffRemaining(hot_streak_buff) < ExecuteTime(fireball) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Talent(firestarter_talent) and target.HealthPercent() >= 90 and not Talent(rune_of_power_talent) and Spell(pyroblast) or Charges(phoenix_flames count=0) > 2.7 and Enemies() > 2 and Spell(phoenix_flames) or BuffPresent(hot_streak_buff) and { not PreviousGCDSpell(pyroblast) or InFlightToTarget(pyroblast) } and Spell(pyroblast) or BuffPresent(hot_streak_buff) and target.HealthPercent() <= 30 and Talent(searing_touch_talent) and Spell(pyroblast) or DebuffPresent(pyroclasm) and ExecuteTime(pyroblast) < DebuffRemaining(pyroclasm) and Spell(pyroblast) or FireActivetalentsShortCdPostConditions() or { not Talent(kindling_talent) and BuffPresent(heating_up_buff) and { not Talent(rune_of_power_talent) or Charges(fire_blast count=0) > 1.4 or SpellCooldown(combustion) < 40 } and { 3 - Charges(fire_blast count=0) } * 12 * { 100 / { 100 + SpellCastSpeedPercent() } } < SpellCooldown(combustion) + 3 or target.TimeToDie() < 4 } and Spell(fire_blast) or { Talent(kindling_talent) and BuffPresent(heating_up_buff) and { not Talent(rune_of_power_talent) or Charges(fire_blast count=0) > 1.5 or SpellCooldown(combustion) < 40 } and { 3 - Charges(fire_blast count=0) } * 18 * { 100 / { 100 + SpellCastSpeedPercent() } } < SpellCooldown(combustion) + 3 or target.TimeToDie() < 4 } and Spell(fire_blast) or { { BuffPresent(combustion_buff) or BuffPresent(rune_of_power_buff) or BuffStacks(incanters_flow_buff) > 3 or Talent(mirror_image_talent) } and { 4 - Charges(phoenix_flames count=0) } * 13 < SpellCooldown(combustion) + 5 or target.TimeToDie() < 10 } and Spell(phoenix_flames) or { BuffPresent(combustion_buff) or BuffPresent(rune_of_power_buff) } and { 4 - Charges(phoenix_flames count=0) } * 30 < SpellCooldown(combustion) + 5 and Spell(phoenix_flames) or Charges(phoenix_flames count=0) > 2.5 and SpellCooldown(combustion) > 23 and Spell(phoenix_flames) or { target.HealthPercent() <= 30 and Talent(searing_touch_talent) or HasAzeriteTrait(preheat_trait) and target.DebuffExpires(preheat) } and Spell(scorch) or Spell(fireball) or Spell(scorch)
+ { Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 4 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(hot_streak_buff) and BuffRemaining(hot_streak_buff) < ExecuteTime(fireball) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Talent(firestarter_talent) and target.HealthPercent() >= 90 and not Talent(rune_of_power_talent) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and { not PreviousGCDSpell(pyroblast) or InFlightToTarget(pyroblast) } and Spell(pyroblast) or BuffPresent(hot_streak_buff) and target.HealthPercent() <= 30 and Talent(searing_touch_talent) and Spell(pyroblast) or DebuffPresent(pyroclasm) and ExecuteTime(pyroblast) < DebuffRemaining(pyroclasm) and Spell(pyroblast) or FireActivetalentsShortCdPostConditions() or { not Talent(kindling_talent) and BuffPresent(heating_up_buff) and { not Talent(rune_of_power_talent) or Charges(fire_blast count=0) > 1.4 or SpellCooldown(combustion) < 40 } and { 3 - Charges(fire_blast count=0) } * 12 * { 100 / { 100 + SpellCastSpeedPercent() } } < SpellCooldown(combustion) + 3 or target.TimeToDie() < 4 } and Spell(fire_blast) or { Talent(kindling_talent) and BuffPresent(heating_up_buff) and { not Talent(rune_of_power_talent) or Charges(fire_blast count=0) > 1.5 or SpellCooldown(combustion) < 40 } and { 3 - Charges(fire_blast count=0) } * 18 * { 100 / { 100 + SpellCastSpeedPercent() } } < SpellCooldown(combustion) + 3 or target.TimeToDie() < 4 } and Spell(fire_blast) or { target.HealthPercent() <= 30 and Talent(searing_touch_talent) or HasAzeriteTrait(preheat_trait) and target.DebuffExpires(preheat) } and Spell(scorch) or Spell(fireball) or Spell(scorch)
 }
 
 AddFunction FireStandardrotationCdActions
@@ -611,12 +619,8 @@ AddFunction FireRopphaseMainActions
   if DebuffPresent(pyroclasm) and ExecuteTime(pyroblast) < DebuffRemaining(pyroclasm) and TotemRemaining(rune_of_power) > CastTime(pyroblast) Spell(pyroblast)
   #fire_blast,if=!prev_off_gcd.fire_blast&buff.heating_up.react&firestarter.active&charges_fractional>1.7
   if not PreviousOffGCDSpell(fire_blast) and BuffPresent(heating_up_buff) and Talent(firestarter_talent) and target.HealthPercent() >= 90 and Charges(fire_blast count=0) > 1.7 Spell(fire_blast)
-  #phoenix_flames,if=!prev_gcd.1.phoenix_flames&charges_fractional>2.7&firestarter.active
-  if not PreviousGCDSpell(phoenix_flames) and Charges(phoenix_flames count=0) > 2.7 and Talent(firestarter_talent) and target.HealthPercent() >= 90 Spell(phoenix_flames)
   #fire_blast,if=!prev_off_gcd.fire_blast&!firestarter.active
   if not PreviousOffGCDSpell(fire_blast) and not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } Spell(fire_blast)
-  #phoenix_flames,if=!prev_gcd.1.phoenix_flames
-  if not PreviousGCDSpell(phoenix_flames) Spell(phoenix_flames)
   #scorch,if=target.health.pct<=30&talent.searing_touch.enabled
   if target.HealthPercent() <= 30 and Talent(searing_touch_talent) Spell(scorch)
   #flamestrike,if=(talent.flame_patch.enabled&active_enemies>2)|active_enemies>5
@@ -641,17 +645,29 @@ AddFunction FireRopphaseShortCdActions
   #call_action_list,name=active_talents
   FireActivetalentsShortCdActions()
 
-  unless FireActivetalentsShortCdPostConditions() or DebuffPresent(pyroclasm) and ExecuteTime(pyroblast) < DebuffRemaining(pyroclasm) and TotemRemaining(rune_of_power) > CastTime(pyroblast) and Spell(pyroblast) or not PreviousOffGCDSpell(fire_blast) and BuffPresent(heating_up_buff) and Talent(firestarter_talent) and target.HealthPercent() >= 90 and Charges(fire_blast count=0) > 1.7 and Spell(fire_blast) or not PreviousGCDSpell(phoenix_flames) and Charges(phoenix_flames count=0) > 2.7 and Talent(firestarter_talent) and target.HealthPercent() >= 90 and Spell(phoenix_flames) or not PreviousOffGCDSpell(fire_blast) and not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } and Spell(fire_blast) or not PreviousGCDSpell(phoenix_flames) and Spell(phoenix_flames) or target.HealthPercent() <= 30 and Talent(searing_touch_talent) and Spell(scorch)
+  unless FireActivetalentsShortCdPostConditions() or DebuffPresent(pyroclasm) and ExecuteTime(pyroblast) < DebuffRemaining(pyroclasm) and TotemRemaining(rune_of_power) > CastTime(pyroblast) and Spell(pyroblast) or not PreviousOffGCDSpell(fire_blast) and BuffPresent(heating_up_buff) and Talent(firestarter_talent) and target.HealthPercent() >= 90 and Charges(fire_blast count=0) > 1.7 and Spell(fire_blast)
   {
-   #dragons_breath,if=active_enemies>2
-   if Enemies() > 2 and target.Distance(less 12) Spell(dragons_breath)
+   #phoenix_flames,if=!prev_gcd.1.phoenix_flames&charges_fractional>2.7&firestarter.active
+   if not PreviousGCDSpell(phoenix_flames) and Charges(phoenix_flames count=0) > 2.7 and Talent(firestarter_talent) and target.HealthPercent() >= 90 Spell(phoenix_flames)
+
+   unless not PreviousOffGCDSpell(fire_blast) and not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } and Spell(fire_blast)
+   {
+    #phoenix_flames,if=!prev_gcd.1.phoenix_flames
+    if not PreviousGCDSpell(phoenix_flames) Spell(phoenix_flames)
+
+    unless target.HealthPercent() <= 30 and Talent(searing_touch_talent) and Spell(scorch)
+    {
+     #dragons_breath,if=active_enemies>2
+     if Enemies() > 2 and target.Distance(less 12) Spell(dragons_breath)
+    }
+   }
   }
  }
 }
 
 AddFunction FireRopphaseShortCdPostConditions
 {
- { Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 4 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(hot_streak_buff) and Spell(pyroblast) or FireActivetalentsShortCdPostConditions() or DebuffPresent(pyroclasm) and ExecuteTime(pyroblast) < DebuffRemaining(pyroclasm) and TotemRemaining(rune_of_power) > CastTime(pyroblast) and Spell(pyroblast) or not PreviousOffGCDSpell(fire_blast) and BuffPresent(heating_up_buff) and Talent(firestarter_talent) and target.HealthPercent() >= 90 and Charges(fire_blast count=0) > 1.7 and Spell(fire_blast) or not PreviousGCDSpell(phoenix_flames) and Charges(phoenix_flames count=0) > 2.7 and Talent(firestarter_talent) and target.HealthPercent() >= 90 and Spell(phoenix_flames) or not PreviousOffGCDSpell(fire_blast) and not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } and Spell(fire_blast) or not PreviousGCDSpell(phoenix_flames) and Spell(phoenix_flames) or target.HealthPercent() <= 30 and Talent(searing_touch_talent) and Spell(scorch) or { Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 5 } and Spell(flamestrike) or Spell(fireball)
+ { Talent(flame_patch_talent) and Enemies() > 1 or Enemies() > 4 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or BuffPresent(hot_streak_buff) and Spell(pyroblast) or FireActivetalentsShortCdPostConditions() or DebuffPresent(pyroclasm) and ExecuteTime(pyroblast) < DebuffRemaining(pyroclasm) and TotemRemaining(rune_of_power) > CastTime(pyroblast) and Spell(pyroblast) or not PreviousOffGCDSpell(fire_blast) and BuffPresent(heating_up_buff) and Talent(firestarter_talent) and target.HealthPercent() >= 90 and Charges(fire_blast count=0) > 1.7 and Spell(fire_blast) or not PreviousOffGCDSpell(fire_blast) and not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } and Spell(fire_blast) or target.HealthPercent() <= 30 and Talent(searing_touch_talent) and Spell(scorch) or { Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 5 } and Spell(flamestrike) or Spell(fireball)
 }
 
 AddFunction FireRopphaseCdActions
@@ -728,8 +744,6 @@ AddFunction FireCombustionphaseMainActions
   if BuffPresent(hot_streak_buff) Spell(pyroblast)
   #fire_blast,if=buff.heating_up.react
   if BuffPresent(heating_up_buff) Spell(fire_blast)
-  #phoenix_flames
-  Spell(phoenix_flames)
   #scorch,if=buff.combustion.remains>cast_time
   if BuffRemaining(combustion_buff) > CastTime(scorch) Spell(scorch)
   #scorch,if=target.health.pct<=30&talent.searing_touch.enabled
@@ -749,16 +763,22 @@ AddFunction FireCombustionphaseShortCdActions
  #call_action_list,name=active_talents
  FireActivetalentsShortCdActions()
 
- unless FireActivetalentsShortCdPostConditions() or { Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 6 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or DebuffPresent(pyroclasm) and BuffRemaining(combustion_buff) > ExecuteTime(pyroblast) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Spell(pyroblast) or BuffPresent(heating_up_buff) and Spell(fire_blast) or Spell(phoenix_flames) or BuffRemaining(combustion_buff) > CastTime(scorch) and Spell(scorch)
+ unless FireActivetalentsShortCdPostConditions() or { Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 6 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or DebuffPresent(pyroclasm) and BuffRemaining(combustion_buff) > ExecuteTime(pyroblast) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Spell(pyroblast) or BuffPresent(heating_up_buff) and Spell(fire_blast)
  {
-  #dragons_breath,if=!buff.hot_streak.react&action.fire_blast.charges<1
-  if not BuffPresent(hot_streak_buff) and Charges(fire_blast) < 1 and target.Distance(less 12) Spell(dragons_breath)
+  #phoenix_flames
+  Spell(phoenix_flames)
+
+  unless BuffRemaining(combustion_buff) > CastTime(scorch) and Spell(scorch)
+  {
+   #dragons_breath,if=!buff.hot_streak.react&action.fire_blast.charges<1
+   if not BuffPresent(hot_streak_buff) and Charges(fire_blast) < 1 and target.Distance(less 12) Spell(dragons_breath)
+  }
  }
 }
 
 AddFunction FireCombustionphaseShortCdPostConditions
 {
- FireActivetalentsShortCdPostConditions() or { Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 6 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or DebuffPresent(pyroclasm) and BuffRemaining(combustion_buff) > ExecuteTime(pyroblast) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Spell(pyroblast) or BuffPresent(heating_up_buff) and Spell(fire_blast) or Spell(phoenix_flames) or BuffRemaining(combustion_buff) > CastTime(scorch) and Spell(scorch) or target.HealthPercent() <= 30 and Talent(searing_touch_talent) and Spell(scorch)
+ FireActivetalentsShortCdPostConditions() or { Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 6 } and BuffPresent(hot_streak_buff) and Spell(flamestrike) or DebuffPresent(pyroclasm) and BuffRemaining(combustion_buff) > ExecuteTime(pyroblast) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Spell(pyroblast) or BuffPresent(heating_up_buff) and Spell(fire_blast) or BuffRemaining(combustion_buff) > CastTime(scorch) and Spell(scorch) or target.HealthPercent() <= 30 and Talent(searing_touch_talent) and Spell(scorch)
 }
 
 AddFunction FireCombustionphaseCdActions
