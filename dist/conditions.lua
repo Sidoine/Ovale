@@ -1190,6 +1190,15 @@ local function MustBeInterrupted(positionalParams, namedParams, state, atTime)
     OvaleCondition:RegisterCondition("mustbeinterrupted", false, MustBeInterrupted)
 end
 do
+local function HasManagedInterrupts(positionalParams, namedParams, state, atTime)
+        local yesno = positionalParams[1]
+        local target = ParseCondition(positionalParams, namedParams, state)
+        local boolean = LibInterrupt:HasInterrupts(target)
+        return TestBoolean(boolean, yesno)
+    end
+    OvaleCondition:RegisterCondition("hasmanagedinterrupts", false, HasManagedInterrupts)
+end
+do
 local function IsPVP(positionalParams, namedParams, state, atTime)
         local yesno = positionalParams[1]
         local target = ParseCondition(positionalParams, namedParams, state)
