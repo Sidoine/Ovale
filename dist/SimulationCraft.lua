@@ -55,71 +55,71 @@ local __tools = LibStub:GetLibrary("ovale/tools")
 local isLuaArray = __tools.isLuaArray
 local OvaleSimulationCraftBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleSimulationCraft"))
 local interruptsClasses = {
-    "mind_freeze" = "DEATHKNIGHT",
-    "pummel" = "WARRIOR",
-    "disrupt" = "DEMONHUNTER",
-    "skull_bash" = "DRUID",
-    "solar_beam" = "DRUID",
-    "rebuke" = "PALADIN",
-    "silence" = "PRIEST",
-    "mind_bomb" = "PRIEST",
-    "kick" = "ROGUE",
-    "wind_shear" = "SHAMAN",
-    "counter_shot" = "HUNTER",
+    ["mind_freeze"] = "DEATHKNIGHT",
+    ["pummel"] = "WARRIOR",
+    ["disrupt"] = "DEMONHUNTER",
+    ["skull_bash"] = "DRUID",
+    ["solar_beam"] = "DRUID",
+    ["rebuke"] = "PALADIN",
+    ["silence"] = "PRIEST",
+    ["mind_bomb"] = "PRIEST",
+    ["kick"] = "ROGUE",
+    ["wind_shear"] = "SHAMAN",
+    ["counter_shot"] = "HUNTER",
     counterspell = "MAGE",
     muzzle = "HUNTER",
     spear_hand_strike = "MONK"
 }
 local classInfos = {
     DEATHKNIGHT = {
-        "frost" = {
+        ["frost"] = {
             interrupt = "mind_freeze"
         },
-        "blood" = {
+        ["blood"] = {
             interrupt = "mind_freeze"
         },
-        "unholy" = {
+        ["unholy"] = {
             interrupt = "mind_freeze"
         }
     },
     DEMONHUNTER = {
-        "havoc" = {
+        ["havoc"] = {
             interrupt = "disrupt"
         },
-        "vengeance" = {
+        ["vengeance"] = {
             interrupt = "disrupt"
         }
     },
     DRUID = {
-        "guardian" = {
+        ["guardian"] = {
             interrupt = "skull_bash"
         },
-        "feral" = {
+        ["feral"] = {
             interrupt = "skull_bash"
         },
-        "balance" = {
+        ["balance"] = {
             interrupt = "solar_beam"
         }
     },
     HUNTER = {
-        "beast_mastery" = {
+        ["beast_mastery"] = {
             interrupt = "counter_shot"
         },
-        "survival" = {
+        ["survival"] = {
             interrupt = "muzzle"
         },
-        "marksmanship" = {
+        ["marksmanship"] = {
             interrupt = "counter_shot"
         }
     },
     MAGE = {
-        "frost" = {
+        ["frost"] = {
             interrupt = "counterspell"
         },
-        "fire" = {
+        ["fire"] = {
             interrupt = "counterspell"
         },
-        "arcane" = {
+        ["arcane"] = {
             interrupt = "counterspell"
         }
     },

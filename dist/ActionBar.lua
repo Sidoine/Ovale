@@ -89,15 +89,15 @@ local OvaleActionBarClass = __class(OvaleActionBarBase, {
             name = "CLICK BT4Button " .. slot .. ":LeftButton"
         else
             if slot <= 24 or slot > 72 then
-                name = "ACTIONBUTTON" .. ((slot - 1) % 12) + 1
+                name = "ACTIONBUTTON" .. (((slot - 1) % 12) + 1)
             elseif slot <= 36 then
-                name = "MULTIACTIONBAR3BUTTON" .. slot - 24
+                name = "MULTIACTIONBAR3BUTTON" .. (slot - 24)
             elseif slot <= 48 then
-                name = "MULTIACTIONBAR4BUTTON" .. slot - 36
+                name = "MULTIACTIONBAR4BUTTON" .. (slot - 36)
             elseif slot <= 60 then
-                name = "MULTIACTIONBAR2BUTTON" .. slot - 48
+                name = "MULTIACTIONBAR2BUTTON" .. (slot - 48)
             else
-                name = "MULTIACTIONBAR1BUTTON" .. slot - 60
+                name = "MULTIACTIONBAR1BUTTON" .. (slot - 60)
             end
         end
         local key = name and GetBindingKey(name)
