@@ -11,6 +11,7 @@ import { getSpellData, SpellData } from "./importspells";
 import { ipairs } from "@wowts/lua";
 import { convertFromSpellData, CustomAura, CustomAuras, CustomSpellData } from "./customspell";
 import { SpellInfo } from "../Data";
+import { ConditionNamedParameters } from "../AST";
 
 let outputDirectory = "src/scripts";
 const simcDirectory = process.argv[2];
@@ -232,6 +233,19 @@ function getBuffDefinition(identifier: string, target: keyof CustomAuras, custom
     return `${ret}  SpellAddTargetDebuff(${identifier} ${spell.identifier}=${customAura.stacks})`;
 }
 
+function getConditions(conditions: ConditionNamedParameters, talentIds: number[]) {
+    let output = "";
+    for (const key in conditions) {
+        if (key === "talent") {
+            const talentId = conditions[key];
+            const talent = spellData.talentsById.get(talentId);
+            output += ` ${key}=${talent.identifier}`;
+            if (talentIds.indexOf(talentId) < 0) talentIds.push(talentId);
+        }
+    }
+    return output;
+}
+
 function getDefinition(identifier: string, customSpellData: CustomSpellData, talentIds: number[], spellIds: number[]) {
     let output = (customSpellData.desc) ? `# ${getDesc(customSpellData)}\n` : "";
     if (customSpellData.nextRank) {
@@ -243,24 +257,19 @@ function getDefinition(identifier: string, customSpellData: CustomSpellData, tal
 
     output += `  SpellInfo(${identifier}`;
     for (const key in customSpellData.spellInfo) {
-        if (key === "replace") {
-            const spellId = customSpellData.spellInfo[key];
-            const spell = spellData.spellDataById.get(spellId);
-            output += ` ${key}=${spell.identifier}`;
-        } else {
-            output += ` ${key}=${customSpellData.spellInfo[key as keyof SpellInfo]}`;
-        }
+        output += ` ${key}=${customSpellData.spellInfo[key as keyof SpellInfo]}`;
     }
 
-    for (const key in customSpellData.conditions) {
-        if (key === "talent") {
-            const talentId = customSpellData.conditions[key];
-            const talent = spellData.talentsById.get(talentId);
-            output += ` ${key}=${talent.identifier}`;
-            if (talentIds.indexOf(talentId) < 0) talentIds.push(talentId);
-        }
-    }
+    if (customSpellData.conditions) output += getConditions(customSpellData.conditions, talentIds);
+    
     output += `)\n`;
+
+    if (customSpellData.replace && spellIds.indexOf(customSpellData.replace) >= 0) {
+        const replaced = spellData.spellDataById.get(customSpellData.replace);
+        output += `  SpellInfo(${replaced.identifier} replaced_by=${identifier}`;
+        if (customSpellData.conditions) output += getConditions(customSpellData.conditions, talentIds);
+        output += ")\n";
+    }
 
     const auras = customSpellData.auras;
     if (auras) {

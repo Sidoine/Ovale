@@ -98,12 +98,22 @@ AddFunction HolyDefaultShortCdPostConditions
 
 AddFunction HolyDefaultCdActions
 {
- #use_item,slot=trinket2
+ #use_items
  HolyUseItemActions()
  #potion,if=buff.bloodlust.react|target.time_to_die<=80
  if { BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 80 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_intellect usable=1)
+ #blood_fury
+ Spell(blood_fury)
  #berserking
  Spell(berserking)
+ #arcane_torrent
+ Spell(arcane_torrent_holy)
+ #lights_judgment
+ Spell(lights_judgment)
+ #fireblood
+ Spell(fireblood)
+ #ancestral_call
+ Spell(ancestral_call)
 
  unless { target.Refreshable(holy_fire) and target.DebuffPresent(holy_fire) and target.DebuffStacks(holy_fire) > 1 or target.DebuffStacks(holy_fire) < 2 } and Spell(holy_fire) or Spell(holy_word_chastise)
  {
@@ -176,14 +186,19 @@ AddIcon checkbox=opt_priest_holy_aoe help=cd specialization=holy
 }
 
 ### Required symbols
+# ancestral_call
 # apotheosis
+# arcane_torrent_holy
 # battle_potion_of_intellect
 # berserking
+# blood_fury
 # divine_star
+# fireblood
 # halo
 # holy_fire
 # holy_nova
 # holy_word_chastise
+# lights_judgment
 # smite
 ]]
     OvaleScripts:RegisterScript("PRIEST", "holy", name, desc, code, "script")

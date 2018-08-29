@@ -354,7 +354,7 @@ Define(far_sight 6196)
 	SpellAddBuff(feral_spirit molten_weapon_buff=1)
 
 	
-	SpellInfo(fire_elemental replace=storm_elemental talent=storm_elemental_talent)
+	SpellInfo(fire_elemental replaced_by=storm_elemental talent=storm_elemental_talent)
 
 	SpellInfo(flame_shock cd=6)
 	SpellAddTargetDebuff(flame_shock flame_shock_debuff=1)

@@ -66,7 +66,8 @@ Define(dispatch 2098)
   SpellInfo(dispatch energy=35 combopoints=1 gcd=1)
 Define(envenom 32645)
 # Finishing move that drives your poisoned blades in deep, dealing instant Nature damage and increasing your poison application chance by s2. Damage and duration increased per combo point.rnrn   1 point  : m1*1 damage, 2 secrn   2 points: m1*2 damage, 3 secrn   3 points: m1*3 damage, 4 secrn   4 points: m1*4 damage, 5 secrn   5 points: m1*5 damage, 6 sec?s193531[rn   6 points: m1*6 damage, 7 sec][]
-  SpellInfo(envenom energy=35 combopoints=1 duration=1 replace=eviscerate gcd=1 tick=1)
+  SpellInfo(envenom energy=35 combopoints=1 duration=1 gcd=1 tick=1)
+  SpellInfo(eviscerate replaced_by=envenom)
   # Poison application chance increased by s2.
   SpellAddBuff(envenom envenom=1)
 Define(eviscerate 196819)
@@ -131,7 +132,7 @@ Define(marked_for_death 137619)
   SpellAddTargetDebuff(marked_for_death marked_for_death=1)
 Define(mutilate 1329)
 # Attack with both weapons, dealing a total of <dmg> Physical damage.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
-  SpellInfo(mutilate energy=50 replace=sinister_strike gcd=1 combopoints=-2)
+  SpellInfo(mutilate energy=50 gcd=1 combopoints=-2)
 
 Define(nightblade 195452)
 # Finishing move that infects the target with shadowy energy, dealing Shadow damage over time and reduces the effectiveness of healing on the target by s7. Lasts longer per combo point.rn   1 point  : <damage>*8/6 over 8 secrn   2 points: <damage>*10/6 over 10 secrn   3 points: <damage>*12/6 over 12 secrn   4 points: <damage>*14/6 over 14 secrn   5 points: <damage>*16/6 over 16 sec?s193531[rn   6 points: <damage>*18/6 over 18 sec][]rnrnYou deal s6 increased damage to enemies afflicted by your Nightblade.
@@ -298,6 +299,7 @@ Define(venom_rush_talent 16) #22343
 # Mutilate refunds s1 Energy when used against a poisoned target.
 Define(vigor_talent 7) #19239
 # Increases your maximum Energy by (25 of Spell Power) and your Energy regeneration by (25 of Spell Power).
+Define(shrouded_suffocation_trait 278666)
 Define(ace_up_your_sleeve_trait 278676)
 Define(deadshot_trait 272935)
 Define(sharpened_blades_trait 272911)
@@ -323,7 +325,7 @@ Define(alacrity_buff 193538)
 	SpellInfo(ambush combopoints=-2 energy=50 stealthed=1)
 
 	SpellInfo(backstab combopoints=-1 energy=35)
-	SpellInfo(backstab replace=gloomblade talent=gloomblade_talent)
+	SpellInfo(backstab replaced_by=gloomblade talent=gloomblade_talent)
 	SpellRequire(backstab combopoints -2=buff,shadow_blades_buff)
 
 	SpellInfo(between_the_eyes combopoints=1 max_combopoints=5 energy=25 cd=30)
@@ -434,7 +436,7 @@ Define(ghostly_strike_debuff 196937)
 	SpellInfo(ghostly_strike_debuff duration=10)
 
 	SpellInfo(gloomblade combopoints=-1 energy=35)
-	SpellInfo(gloomblade replace=backstab talent=gloomblade_talent)
+	SpellInfo(gloomblade replaced_by=backstab talent=gloomblade_talent)
 	SpellRequire(gloomblade combopoints -2=buff,shadow_blades_buff)
 
 	SpellInfo(gouge combopoints=-1 cd=15 energy=25 tag=main)
@@ -498,7 +500,7 @@ Define(riposte_buff 199754)
 
 	SpellInfo(roll_the_bones energy=25 combopoints=1 max_combopoints=5)
 	SpellInfo(roll_the_bones max_combopoints=6 talent=deeper_stratagem_talent)
-	SpellInfo(roll_the_bones replace=slice_and_dice talent=slice_and_dice_talent)
+	SpellInfo(roll_the_bones replaced_by=slice_and_dice talent=slice_and_dice_talent)
 	SpellAddBuff(roll_the_bones loaded_dice_buff=0 talent=loaded_dice_talent)
 
 	SpellInfo(rupture combopoints=1 max_combopoints=5 energy=25)
@@ -550,7 +552,7 @@ Define(shuriken_combo_buff 245640)
 	SpellInfo(slice_and_dice combopoints=1 max_combopoints=5 energy=25)
 	SpellInfo(slice_and_dice max_combopoints=6 talent=deeper_stratagem_talent)
 	SpellAddBuff(slice_and_dice slice_and_dice_buff=1)
-	SpellInfo(slice_and_dice replace=roll_the_bones talent=slice_and_dice_talent)
+	SpellInfo(slice_and_dice replaced_by=roll_the_bones talent=slice_and_dice_talent)
 Define(slice_and_dice_buff 5171)
 	SpellInfo(slice_and_dice add_duration_combopoints=6 duration=6)
 Define(shot_in_the_dark_buff 257506)

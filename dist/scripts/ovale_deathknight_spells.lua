@@ -351,7 +351,7 @@ Define(dark_transformation_buff 63560)
 
 	SpellInfo(death_and_decay runes=1 runicpower=-10 cd=30 specialization=unholy)
 	SpellInfo(death_and_decay runes=1 runicpower=-10 cd=15 specialization=blood)
-	SpellInfo(death_and_decay replace=defile talent=defile_talent specialization=unholy)
+	SpellInfo(death_and_decay replaced_by=defile talent=defile_talent specialization=unholy)
 	SpellRequire(death_and_decay runes 0=buff,crimson_scourge_buff)
 	SpellRequire(death_and_decay cd_percent 0=buff,crimson_scourge_buff)
 	SpellAddTargetDebuff(death_and_decay death_and_decay_debuff=1)
@@ -497,7 +497,7 @@ Define(runic_corruption_buff 51460)
 	SpellInfo(runic_corruption_buff duration=3) #TODO Increase rune generation rate
 
 	
-	SpellInfo(scourge_strike replace=clawing_shadows talent=clawing_shadows_talent)
+	SpellInfo(scourge_strike replaced_by=clawing_shadows talent=clawing_shadows_talent)
 
 	SpellInfo(soul_reaper runes=-2 cd=45)
 	SpellAddTargetDebuff(soul_reaper soul_reaper_debuff=1)

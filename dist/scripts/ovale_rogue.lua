@@ -68,6 +68,8 @@ AddFunction AssassinationStealthedMainActions
  if Talent(subterfuge_talent) and target.Refreshable(garrote_debuff) and { not target.DebuffPresent(exsanguinated) or target.DebuffRemaining(garrote_debuff) <= target.TickTime(garrote_debuff) * 2 } and target.TimeToDie() - target.DebuffRemaining(garrote_debuff) > 2 Spell(garrote)
  #garrote,cycle_targets=1,if=talent.subterfuge.enabled&remains<=10&pmultiplier<=1&!exsanguinated&target.time_to_die-remains>2
  if Talent(subterfuge_talent) and target.DebuffRemaining(garrote_debuff) <= 10 and PersistentMultiplier(garrote_debuff) <= 1 and not target.DebuffPresent(exsanguinated) and target.TimeToDie() - target.DebuffRemaining(garrote_debuff) > 2 Spell(garrote)
+ #garrote,cycle_targets=1,if=talent.subterfuge.enabled&azerite.shrouded_suffocation.enabled&target.time_to_die>remains
+ if Talent(subterfuge_talent) and HasAzeriteTrait(shrouded_suffocation_trait) and target.TimeToDie() > target.DebuffRemaining(garrote_debuff) Spell(garrote)
  #pool_resource,for_next=1
  #garrote,if=talent.subterfuge.enabled&talent.exsanguinate.enabled&cooldown.exsanguinate.remains<1&prev_gcd.1.rupture&dot.rupture.remains>5+4*cp_max_spend
  if Talent(subterfuge_talent) and Talent(exsanguinate_talent) and SpellCooldown(exsanguinate) < 1 and PreviousGCDSpell(rupture) and target.DebuffRemaining(rupture_debuff) > 5 + 4 * MaxComboPoints() Spell(garrote)
@@ -83,7 +85,7 @@ AddFunction AssassinationStealthedShortCdActions
 
 AddFunction AssassinationStealthedShortCdPostConditions
 {
- ComboPoints() >= 4 and { Talent(nightstalker_talent) or Talent(subterfuge_talent) and Talent(exsanguinate_talent) and Enemies() < 2 or not target.DebuffPresent(rupture_debuff) } and target.TimeToDie() - target.DebuffRemaining(rupture_debuff) > 6 and Spell(rupture) or ComboPoints() >= MaxComboPoints() and Spell(envenom) or Talent(subterfuge_talent) and target.Refreshable(garrote_debuff) and { not target.DebuffPresent(exsanguinated) or target.DebuffRemaining(garrote_debuff) <= target.TickTime(garrote_debuff) * 2 } and target.TimeToDie() - target.DebuffRemaining(garrote_debuff) > 2 and Spell(garrote) or Talent(subterfuge_talent) and target.DebuffRemaining(garrote_debuff) <= 10 and PersistentMultiplier(garrote_debuff) <= 1 and not target.DebuffPresent(exsanguinated) and target.TimeToDie() - target.DebuffRemaining(garrote_debuff) > 2 and Spell(garrote) or Talent(subterfuge_talent) and Talent(exsanguinate_talent) and SpellCooldown(exsanguinate) < 1 and PreviousGCDSpell(rupture) and target.DebuffRemaining(rupture_debuff) > 5 + 4 * MaxComboPoints() and Spell(garrote)
+ ComboPoints() >= 4 and { Talent(nightstalker_talent) or Talent(subterfuge_talent) and Talent(exsanguinate_talent) and Enemies() < 2 or not target.DebuffPresent(rupture_debuff) } and target.TimeToDie() - target.DebuffRemaining(rupture_debuff) > 6 and Spell(rupture) or ComboPoints() >= MaxComboPoints() and Spell(envenom) or Talent(subterfuge_talent) and target.Refreshable(garrote_debuff) and { not target.DebuffPresent(exsanguinated) or target.DebuffRemaining(garrote_debuff) <= target.TickTime(garrote_debuff) * 2 } and target.TimeToDie() - target.DebuffRemaining(garrote_debuff) > 2 and Spell(garrote) or Talent(subterfuge_talent) and target.DebuffRemaining(garrote_debuff) <= 10 and PersistentMultiplier(garrote_debuff) <= 1 and not target.DebuffPresent(exsanguinated) and target.TimeToDie() - target.DebuffRemaining(garrote_debuff) > 2 and Spell(garrote) or Talent(subterfuge_talent) and HasAzeriteTrait(shrouded_suffocation_trait) and target.TimeToDie() > target.DebuffRemaining(garrote_debuff) and Spell(garrote) or Talent(subterfuge_talent) and Talent(exsanguinate_talent) and SpellCooldown(exsanguinate) < 1 and PreviousGCDSpell(rupture) and target.DebuffRemaining(rupture_debuff) > 5 + 4 * MaxComboPoints() and Spell(garrote)
 }
 
 AddFunction AssassinationStealthedCdActions
@@ -92,7 +94,7 @@ AddFunction AssassinationStealthedCdActions
 
 AddFunction AssassinationStealthedCdPostConditions
 {
- ComboPoints() >= 4 and { Talent(nightstalker_talent) or Talent(subterfuge_talent) and Talent(exsanguinate_talent) and Enemies() < 2 or not target.DebuffPresent(rupture_debuff) } and target.TimeToDie() - target.DebuffRemaining(rupture_debuff) > 6 and Spell(rupture) or ComboPoints() >= MaxComboPoints() and Spell(envenom) or Talent(subterfuge_talent) and target.Refreshable(garrote_debuff) and { not target.DebuffPresent(exsanguinated) or target.DebuffRemaining(garrote_debuff) <= target.TickTime(garrote_debuff) * 2 } and target.TimeToDie() - target.DebuffRemaining(garrote_debuff) > 2 and Spell(garrote) or Talent(subterfuge_talent) and target.DebuffRemaining(garrote_debuff) <= 10 and PersistentMultiplier(garrote_debuff) <= 1 and not target.DebuffPresent(exsanguinated) and target.TimeToDie() - target.DebuffRemaining(garrote_debuff) > 2 and Spell(garrote) or Talent(subterfuge_talent) and Talent(exsanguinate_talent) and SpellCooldown(exsanguinate) < 1 and PreviousGCDSpell(rupture) and target.DebuffRemaining(rupture_debuff) > 5 + 4 * MaxComboPoints() and Spell(garrote)
+ ComboPoints() >= 4 and { Talent(nightstalker_talent) or Talent(subterfuge_talent) and Talent(exsanguinate_talent) and Enemies() < 2 or not target.DebuffPresent(rupture_debuff) } and target.TimeToDie() - target.DebuffRemaining(rupture_debuff) > 6 and Spell(rupture) or ComboPoints() >= MaxComboPoints() and Spell(envenom) or Talent(subterfuge_talent) and target.Refreshable(garrote_debuff) and { not target.DebuffPresent(exsanguinated) or target.DebuffRemaining(garrote_debuff) <= target.TickTime(garrote_debuff) * 2 } and target.TimeToDie() - target.DebuffRemaining(garrote_debuff) > 2 and Spell(garrote) or Talent(subterfuge_talent) and target.DebuffRemaining(garrote_debuff) <= 10 and PersistentMultiplier(garrote_debuff) <= 1 and not target.DebuffPresent(exsanguinated) and target.TimeToDie() - target.DebuffRemaining(garrote_debuff) > 2 and Spell(garrote) or Talent(subterfuge_talent) and HasAzeriteTrait(shrouded_suffocation_trait) and target.TimeToDie() > target.DebuffRemaining(garrote_debuff) and Spell(garrote) or Talent(subterfuge_talent) and Talent(exsanguinate_talent) and SpellCooldown(exsanguinate) < 1 and PreviousGCDSpell(rupture) and target.DebuffRemaining(rupture_debuff) > 5 + 4 * MaxComboPoints() and Spell(garrote)
 }
 
 ### actions.precombat
@@ -478,6 +480,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # rupture_debuff
 # shadowstep
 # sharpened_blades_buff
+# shrouded_suffocation_trait
 # stealth
 # subterfuge_talent
 # the_dreadlords_deceit_assassination_buff
@@ -558,6 +561,8 @@ AddFunction AssassinationStealthedMainActions
  if Talent(subterfuge_talent) and target.Refreshable(garrote_debuff) and { not target.DebuffPresent(exsanguinated) or target.DebuffRemaining(garrote_debuff) <= target.TickTime(garrote_debuff) * 2 } and target.TimeToDie() - target.DebuffRemaining(garrote_debuff) > 2 Spell(garrote)
  #garrote,cycle_targets=1,if=talent.subterfuge.enabled&remains<=10&pmultiplier<=1&!exsanguinated&target.time_to_die-remains>2
  if Talent(subterfuge_talent) and target.DebuffRemaining(garrote_debuff) <= 10 and PersistentMultiplier(garrote_debuff) <= 1 and not target.DebuffPresent(exsanguinated) and target.TimeToDie() - target.DebuffRemaining(garrote_debuff) > 2 Spell(garrote)
+ #garrote,cycle_targets=1,if=talent.subterfuge.enabled&azerite.shrouded_suffocation.enabled&target.time_to_die>remains
+ if Talent(subterfuge_talent) and HasAzeriteTrait(shrouded_suffocation_trait) and target.TimeToDie() > target.DebuffRemaining(garrote_debuff) Spell(garrote)
  #pool_resource,for_next=1
  #garrote,if=talent.subterfuge.enabled&talent.exsanguinate.enabled&cooldown.exsanguinate.remains<1&prev_gcd.1.rupture&dot.rupture.remains>5+4*cp_max_spend
  if Talent(subterfuge_talent) and Talent(exsanguinate_talent) and SpellCooldown(exsanguinate) < 1 and PreviousGCDSpell(rupture) and target.DebuffRemaining(rupture_debuff) > 5 + 4 * MaxComboPoints() Spell(garrote)
@@ -573,7 +578,7 @@ AddFunction AssassinationStealthedShortCdActions
 
 AddFunction AssassinationStealthedShortCdPostConditions
 {
- ComboPoints() >= 4 and { Talent(nightstalker_talent) or Talent(subterfuge_talent) and Talent(exsanguinate_talent) and Enemies() < 2 or not target.DebuffPresent(rupture_debuff) } and target.TimeToDie() - target.DebuffRemaining(rupture_debuff) > 6 and Spell(rupture) or ComboPoints() >= MaxComboPoints() and Spell(envenom) or Talent(subterfuge_talent) and target.Refreshable(garrote_debuff) and { not target.DebuffPresent(exsanguinated) or target.DebuffRemaining(garrote_debuff) <= target.TickTime(garrote_debuff) * 2 } and target.TimeToDie() - target.DebuffRemaining(garrote_debuff) > 2 and Spell(garrote) or Talent(subterfuge_talent) and target.DebuffRemaining(garrote_debuff) <= 10 and PersistentMultiplier(garrote_debuff) <= 1 and not target.DebuffPresent(exsanguinated) and target.TimeToDie() - target.DebuffRemaining(garrote_debuff) > 2 and Spell(garrote) or Talent(subterfuge_talent) and Talent(exsanguinate_talent) and SpellCooldown(exsanguinate) < 1 and PreviousGCDSpell(rupture) and target.DebuffRemaining(rupture_debuff) > 5 + 4 * MaxComboPoints() and Spell(garrote)
+ ComboPoints() >= 4 and { Talent(nightstalker_talent) or Talent(subterfuge_talent) and Talent(exsanguinate_talent) and Enemies() < 2 or not target.DebuffPresent(rupture_debuff) } and target.TimeToDie() - target.DebuffRemaining(rupture_debuff) > 6 and Spell(rupture) or ComboPoints() >= MaxComboPoints() and Spell(envenom) or Talent(subterfuge_talent) and target.Refreshable(garrote_debuff) and { not target.DebuffPresent(exsanguinated) or target.DebuffRemaining(garrote_debuff) <= target.TickTime(garrote_debuff) * 2 } and target.TimeToDie() - target.DebuffRemaining(garrote_debuff) > 2 and Spell(garrote) or Talent(subterfuge_talent) and target.DebuffRemaining(garrote_debuff) <= 10 and PersistentMultiplier(garrote_debuff) <= 1 and not target.DebuffPresent(exsanguinated) and target.TimeToDie() - target.DebuffRemaining(garrote_debuff) > 2 and Spell(garrote) or Talent(subterfuge_talent) and HasAzeriteTrait(shrouded_suffocation_trait) and target.TimeToDie() > target.DebuffRemaining(garrote_debuff) and Spell(garrote) or Talent(subterfuge_talent) and Talent(exsanguinate_talent) and SpellCooldown(exsanguinate) < 1 and PreviousGCDSpell(rupture) and target.DebuffRemaining(rupture_debuff) > 5 + 4 * MaxComboPoints() and Spell(garrote)
 }
 
 AddFunction AssassinationStealthedCdActions
@@ -582,7 +587,7 @@ AddFunction AssassinationStealthedCdActions
 
 AddFunction AssassinationStealthedCdPostConditions
 {
- ComboPoints() >= 4 and { Talent(nightstalker_talent) or Talent(subterfuge_talent) and Talent(exsanguinate_talent) and Enemies() < 2 or not target.DebuffPresent(rupture_debuff) } and target.TimeToDie() - target.DebuffRemaining(rupture_debuff) > 6 and Spell(rupture) or ComboPoints() >= MaxComboPoints() and Spell(envenom) or Talent(subterfuge_talent) and target.Refreshable(garrote_debuff) and { not target.DebuffPresent(exsanguinated) or target.DebuffRemaining(garrote_debuff) <= target.TickTime(garrote_debuff) * 2 } and target.TimeToDie() - target.DebuffRemaining(garrote_debuff) > 2 and Spell(garrote) or Talent(subterfuge_talent) and target.DebuffRemaining(garrote_debuff) <= 10 and PersistentMultiplier(garrote_debuff) <= 1 and not target.DebuffPresent(exsanguinated) and target.TimeToDie() - target.DebuffRemaining(garrote_debuff) > 2 and Spell(garrote) or Talent(subterfuge_talent) and Talent(exsanguinate_talent) and SpellCooldown(exsanguinate) < 1 and PreviousGCDSpell(rupture) and target.DebuffRemaining(rupture_debuff) > 5 + 4 * MaxComboPoints() and Spell(garrote)
+ ComboPoints() >= 4 and { Talent(nightstalker_talent) or Talent(subterfuge_talent) and Talent(exsanguinate_talent) and Enemies() < 2 or not target.DebuffPresent(rupture_debuff) } and target.TimeToDie() - target.DebuffRemaining(rupture_debuff) > 6 and Spell(rupture) or ComboPoints() >= MaxComboPoints() and Spell(envenom) or Talent(subterfuge_talent) and target.Refreshable(garrote_debuff) and { not target.DebuffPresent(exsanguinated) or target.DebuffRemaining(garrote_debuff) <= target.TickTime(garrote_debuff) * 2 } and target.TimeToDie() - target.DebuffRemaining(garrote_debuff) > 2 and Spell(garrote) or Talent(subterfuge_talent) and target.DebuffRemaining(garrote_debuff) <= 10 and PersistentMultiplier(garrote_debuff) <= 1 and not target.DebuffPresent(exsanguinated) and target.TimeToDie() - target.DebuffRemaining(garrote_debuff) > 2 and Spell(garrote) or Talent(subterfuge_talent) and HasAzeriteTrait(shrouded_suffocation_trait) and target.TimeToDie() > target.DebuffRemaining(garrote_debuff) and Spell(garrote) or Talent(subterfuge_talent) and Talent(exsanguinate_talent) and SpellCooldown(exsanguinate) < 1 and PreviousGCDSpell(rupture) and target.DebuffRemaining(rupture_debuff) > 5 + 4 * MaxComboPoints() and Spell(garrote)
 }
 
 ### actions.precombat
@@ -968,6 +973,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # rupture_debuff
 # shadowstep
 # sharpened_blades_buff
+# shrouded_suffocation_trait
 # stealth
 # subterfuge_talent
 # the_dreadlords_deceit_assassination_buff
@@ -2056,6 +2062,8 @@ AddFunction SubtletyStealthedMainActions
 
  unless ComboPointsDeficit() <= 1 - { Talent(deeper_stratagem_talent) and BuffPresent(vanish_buff) } and SubtletyFinishMainPostConditions()
  {
+  #shuriken_toss,if=buff.sharpened_blades.stack>=29
+  if BuffStacks(sharpened_blades_buff) >= 29 Spell(shuriken_toss)
   #shadowstrike,cycle_targets=1,if=talent.secret_technique.enabled&talent.find_weakness.enabled&debuff.find_weakness.remains<1&spell_targets.shuriken_storm=2&target.time_to_die-remains>6
   if Talent(secret_technique_talent) and Talent(find_weakness_talent) and target.DebuffRemaining(find_weakness_debuff) < 1 and Enemies() == 2 and target.TimeToDie() - target.DebuffRemaining(shadowstrike) > 6 Spell(shadowstrike)
   #shuriken_storm,if=spell_targets>=3
@@ -2081,7 +2089,7 @@ AddFunction SubtletyStealthedShortCdActions
 
 AddFunction SubtletyStealthedShortCdPostConditions
 {
- BuffPresent(stealthed_buff any=1) and Spell(shadowstrike) or ComboPointsDeficit() <= 1 - { Talent(deeper_stratagem_talent) and BuffPresent(vanish_buff) } and SubtletyFinishShortCdPostConditions() or Talent(secret_technique_talent) and Talent(find_weakness_talent) and target.DebuffRemaining(find_weakness_debuff) < 1 and Enemies() == 2 and target.TimeToDie() - target.DebuffRemaining(shadowstrike) > 6 and Spell(shadowstrike) or Enemies() >= 3 and Spell(shuriken_storm) or Spell(shadowstrike)
+ BuffPresent(stealthed_buff any=1) and Spell(shadowstrike) or ComboPointsDeficit() <= 1 - { Talent(deeper_stratagem_talent) and BuffPresent(vanish_buff) } and SubtletyFinishShortCdPostConditions() or BuffStacks(sharpened_blades_buff) >= 29 and Spell(shuriken_toss) or Talent(secret_technique_talent) and Talent(find_weakness_talent) and target.DebuffRemaining(find_weakness_debuff) < 1 and Enemies() == 2 and target.TimeToDie() - target.DebuffRemaining(shadowstrike) > 6 and Spell(shadowstrike) or Enemies() >= 3 and Spell(shuriken_storm) or Spell(shadowstrike)
 }
 
 AddFunction SubtletyStealthedCdActions
@@ -2095,7 +2103,7 @@ AddFunction SubtletyStealthedCdActions
 
 AddFunction SubtletyStealthedCdPostConditions
 {
- BuffPresent(stealthed_buff any=1) and Spell(shadowstrike) or ComboPointsDeficit() <= 1 - { Talent(deeper_stratagem_talent) and BuffPresent(vanish_buff) } and SubtletyFinishCdPostConditions() or Talent(secret_technique_talent) and Talent(find_weakness_talent) and target.DebuffRemaining(find_weakness_debuff) < 1 and Enemies() == 2 and target.TimeToDie() - target.DebuffRemaining(shadowstrike) > 6 and Spell(shadowstrike) or Enemies() >= 3 and Spell(shuriken_storm) or Spell(shadowstrike)
+ BuffPresent(stealthed_buff any=1) and Spell(shadowstrike) or ComboPointsDeficit() <= 1 - { Talent(deeper_stratagem_talent) and BuffPresent(vanish_buff) } and SubtletyFinishCdPostConditions() or BuffStacks(sharpened_blades_buff) >= 29 and Spell(shuriken_toss) or Talent(secret_technique_talent) and Talent(find_weakness_talent) and target.DebuffRemaining(find_weakness_debuff) < 1 and Enemies() == 2 and target.TimeToDie() - target.DebuffRemaining(shadowstrike) > 6 and Spell(shadowstrike) or Enemies() >= 3 and Spell(shuriken_storm) or Spell(shadowstrike)
 }
 
 ### actions.stealth_cds
@@ -2290,8 +2298,8 @@ AddFunction SubtletyCdsCdPostConditions
 
 AddFunction SubtletyBuildMainActions
 {
- #shuriken_toss,if=buff.sharpened_blades.stack>=29&spell_targets.shuriken_storm<=(3*azerite.sharpened_blades.rank)
- if BuffStacks(sharpened_blades_buff) >= 29 and Enemies() <= 3 * AzeriteTraitRank(sharpened_blades_trait) Spell(shuriken_toss)
+ #shuriken_toss,if=!talent.nightstalker.enabled&(!talent.dark_shadow.enabled|cooldown.symbols_of_death.remains>10)&buff.sharpened_blades.stack>=29&spell_targets.shuriken_storm<=(3*azerite.sharpened_blades.rank)
+ if not Talent(nightstalker_talent) and { not Talent(dark_shadow_talent) or SpellCooldown(symbols_of_death) > 10 } and BuffStacks(sharpened_blades_buff) >= 29 and Enemies() <= 3 * AzeriteTraitRank(sharpened_blades_trait) Spell(shuriken_toss)
  #shuriken_storm,if=spell_targets>=2|buff.the_dreadlords_deceit.stack>=29
  if Enemies() >= 2 or BuffStacks(the_dreadlords_deceit_subtlety_buff) >= 29 Spell(shuriken_storm)
  #gloomblade
@@ -2310,7 +2318,7 @@ AddFunction SubtletyBuildShortCdActions
 
 AddFunction SubtletyBuildShortCdPostConditions
 {
- BuffStacks(sharpened_blades_buff) >= 29 and Enemies() <= 3 * AzeriteTraitRank(sharpened_blades_trait) and Spell(shuriken_toss) or { Enemies() >= 2 or BuffStacks(the_dreadlords_deceit_subtlety_buff) >= 29 } and Spell(shuriken_storm) or Spell(gloomblade) or Spell(backstab)
+ not Talent(nightstalker_talent) and { not Talent(dark_shadow_talent) or SpellCooldown(symbols_of_death) > 10 } and BuffStacks(sharpened_blades_buff) >= 29 and Enemies() <= 3 * AzeriteTraitRank(sharpened_blades_trait) and Spell(shuriken_toss) or { Enemies() >= 2 or BuffStacks(the_dreadlords_deceit_subtlety_buff) >= 29 } and Spell(shuriken_storm) or Spell(gloomblade) or Spell(backstab)
 }
 
 AddFunction SubtletyBuildCdActions
@@ -2319,7 +2327,7 @@ AddFunction SubtletyBuildCdActions
 
 AddFunction SubtletyBuildCdPostConditions
 {
- BuffStacks(sharpened_blades_buff) >= 29 and Enemies() <= 3 * AzeriteTraitRank(sharpened_blades_trait) and Spell(shuriken_toss) or { Enemies() >= 2 or BuffStacks(the_dreadlords_deceit_subtlety_buff) >= 29 } and Spell(shuriken_storm) or Spell(gloomblade) or Spell(backstab)
+ not Talent(nightstalker_talent) and { not Talent(dark_shadow_talent) or SpellCooldown(symbols_of_death) > 10 } and BuffStacks(sharpened_blades_buff) >= 29 and Enemies() <= 3 * AzeriteTraitRank(sharpened_blades_trait) and Spell(shuriken_toss) or { Enemies() >= 2 or BuffStacks(the_dreadlords_deceit_subtlety_buff) >= 29 } and Spell(shuriken_storm) or Spell(gloomblade) or Spell(backstab)
 }
 
 ### actions.default

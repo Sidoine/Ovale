@@ -329,7 +329,7 @@ Define(camouflage 199483)
 	SpellInfo(camouflage cd=60)
 
 	SpellInfo(carve focus=40 cd=6 cd_haste=melee)
-	SpellInfo(carve replace=butchery talent=butchery_talent)
+	SpellInfo(carve replaced_by=butchery talent=butchery_talent)
 	SpellAddTargetDebuff(carve internal_bleeding_debuff=1 if_target_debuff=shrapnel_bomb_debuff)
 
 	SpellInfo(chakrams focus=30 cd=20)
@@ -442,7 +442,7 @@ Define(precise_shots_buff 260242)
 	SpellAddBuff(rapid_fire lethal_shots_buff=-1 talent=lethal_shots_talent)
 
 	SpellInfo(raptor_strike focus=25)
-	SpellInfo(raptor_strike replace=mongoose_bite talent=mongoose_bite_talent)
+	SpellInfo(raptor_strike replaced_by=mongoose_bite talent=mongoose_bite_talent)
 	SpellAddBuff(raptor_strike tip_of_the_spear_buff=0 talent=tip_of_the_spear_talent)
 	SpellAddTargetDebuff(raptor_strike internal_bleeding_debuff=1 if_target_debuff=shrapnel_bomb_debuff)
 

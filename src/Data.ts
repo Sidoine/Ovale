@@ -145,7 +145,7 @@ export interface SpellInfo extends Powers {
     tag?:string;
     texture?:string;
     // Spells
-    replace?:number;
+    replaced_by?:number;
     max_travel_time?:number;
     travel_time?:number;
     canStopChannelling?:number;

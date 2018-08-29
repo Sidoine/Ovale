@@ -170,6 +170,8 @@ Define(whirlwind_fury 190411)
 # Unleashes a whirlwind of steel, striking all enemies within 199658A1 yards for 3*(199667sw2+44949sw2) Physical damage.?a12950[rnrnCauses your next s7 single-target lattack:attacks; to strike up to 85739s1 additional targets for 85739s3 damage.][]rnrn|cFFFFFFFFGenerates m8 Rage, plus an additional m9 per target hit. Maximum m10 Rage.|r
   SpellInfo(whirlwind_fury)
 
+Define(anger_management_talent 19) #21204
+# Every ?c1[s1]?c2[s3][s2] Rage you spend reduces the remaining cooldown on ?c1&s262161[Warbreaker and Bladestorm]?c1[Colossus Smash and Bladestorm]?c2[Recklessness][Avatar, Last Stand, Shield Wall, and Demoralizing Shout] by 1 sec.
 Define(avatar_talent 17) #22397
 # Transform into a colossus for 20 seconds, causing you to deal s1 increased damage and removing all roots and snares.rnrn|cFFFFFFFFGenerates s5/10 Rage.|r
 Define(carnage_talent 13) #22383
@@ -203,6 +205,7 @@ Define(storm_bolt_talent_fury 6) #23093
 Define(warbreaker_talent 14) #22391
 # Smash the ground and shatter the armor of all enemies within A1 yds, dealing s1 Physical damage and increasing damage you deal to them by 208086s1 for 10 seconds.
 Define(kazzalax_fujiedas_fury_item 137053)
+Define(seismic_wave_trait 277639)
 Define(test_of_might_trait 275529)
     `;
 // END
@@ -227,7 +230,7 @@ Define(berserker_rage 18499)
 Define(berserker_rage_buff 18499)
 	SpellInfo(berserker_rage_buff duration=6)
 Define(bladestorm_arms 227847)
-	SpellInfo(bladestorm_arms cd=90 channel=6 haste=melee replace=ravager)
+	SpellInfo(bladestorm_arms cd=90 channel=6 haste=melee replaced_by=ravager)
 Define(bladestorm_fury 46924)
 	SpellInfo(bladestorm_fury cd=60 channel=4 haste=melee)
 
@@ -243,7 +246,7 @@ Define(charge_debuff 105771)
 	SpellRequire(cleave rage_percent 0=buff,deadly_calm_buff talent=deadly_calm_talent specialization=arms)
 
 	
-	SpellInfo(colossus_smash replace=warbreaker talent=warbreaker_talent)
+	SpellInfo(colossus_smash replaced_by=warbreaker talent=warbreaker_talent)
 	SpellAddTargetDebuff(colossus_smash colossus_smash_debuff=1)
 	SpellAddBuff(colossus_smash in_for_the_kill_buff=1 talent=in_for_the_kill_talent)
 Define(colossus_smash_debuff 208086)

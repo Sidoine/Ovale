@@ -29,7 +29,7 @@ Define(blackout_combo_buff 228563)
   SpellAddBuff(blackout_combo_buff blackout_combo_buff=1)
 Define(blackout_strike 205523)
 # Strike with a blast of Chi energy, dealing s1 Physical damage?s117906[ and generating a stack of Elusive Brawler][].
-  SpellInfo(blackout_strike cd=3 replace=blackout_kick)
+  SpellInfo(blackout_strike cd=3)
 Define(breath_of_fire 115181)
 # Breathe fire on targets in front of you, causing s1 Fire damage.rnrnTargets affected by Keg Smash will also burn, taking 123725o1 Fire damage and dealing 123725s2 reduced damage to you for 12 seconds.
   SpellInfo(breath_of_fire cd=15 gcd=1)
@@ -404,7 +404,7 @@ SpellAddBuff(rising_sun_kick swift_roundhouse_buff=0)
 Define(roll 109132)
 	SpellInfo(roll cd=20 charges=2)
 	SpellInfo(roll charges=3 talent=celerity_talent)
-	SpellInfo(roll replace=chi_torpedo talent=chi_torpedo_talent)
+	SpellInfo(roll replaced_by=chi_torpedo talent=chi_torpedo_talent)
 
 SpellInfo(rushing_jade_wind chi=0 duration=9 cd_haste=melee haste=melee talent=rushing_jade_wind_talent)
 SpellAddBuff(rushing_jade_wind rushing_jade_wind=1)
@@ -430,7 +430,7 @@ SpellRequire(spinning_crane_kick chi_percent 0=buff,serenity)
 
 
 	SpellInfo(storm_earth_and_fire gcd=0 offgcd=1 charges=2 duration=15)
-	SpellInfo(storm_earth_and_fire replace=serenity talent=serenity_talent)
+	SpellInfo(storm_earth_and_fire replaced_by=serenity talent=serenity_talent)
 	
 
 	Define(summon_black_ox_statue 115315)

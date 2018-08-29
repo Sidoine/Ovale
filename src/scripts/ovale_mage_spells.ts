@@ -142,7 +142,8 @@ Define(ice_floes 108839)
   SpellAddBuff(ice_floes ice_floes=1)
 Define(ice_lance 30455)
 # Quickly fling a shard of ice at the target, dealing (35 of Spell Power) Frost damage?s56377[, and (35 of Spell Power)*56377m2/100 Frost damage to a second nearby target][].rnrnIce Lance damage is tripled against frozen targets.
-  SpellInfo(ice_lance replace=fire_blast)
+  SpellInfo(ice_lance)
+  SpellInfo(fire_blast replaced_by=ice_lance)
 Define(ice_nova 157997)
 # Causes a whirl of icy wind around the enemy, dealing (45 of Spell Power)*s3/100 Frost damage to the target and (45 of Spell Power) Frost damage to all other enemies within a2 yards, and freezing them in place for 2 seconds.
   SpellInfo(ice_nova cd=25 duration=2 talent=ice_nova_talent)

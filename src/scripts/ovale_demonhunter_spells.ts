@@ -46,7 +46,8 @@ Define(death_sweep 210152)
   SpellAddBuff(death_sweep death_sweep=1)
 Define(demon_spikes 203720)
 # Surge with fel power, increasing your Armor by 203819s2*AGI/100, and your Parry chance by 203819s1, for 6 seconds.
-  SpellInfo(demon_spikes cd=1.5 charge_cd=20 replace=vengeful_retreat gcd=0 offgcd=1)
+  SpellInfo(demon_spikes cd=1.5 charge_cd=20 gcd=0 offgcd=1)
+  SpellInfo(vengeful_retreat replaced_by=demon_spikes)
 Define(demons_bite 162243)
 # Quickly attack for s2 Physical damage.rnrn|cFFFFFFFFGenerates m3 to ?a258876[M3+258876s1][M3] Fury.|r
   SpellInfo(demons_bite fury=-25)
@@ -79,14 +80,16 @@ Define(felblade 232893)
   SpellInfo(felblade cd=15 talent=felblade_talent_vengeance)
 Define(fiery_brand 204021)
 # Brand an enemy with a demonic symbol, instantly dealing sw2 Fire damage and reducing the damage they deal to you by s1 for 8 seconds.
-  SpellInfo(fiery_brand cd=60 replace=chaos_nova)
+  SpellInfo(fiery_brand cd=60)
+  SpellInfo(chaos_nova replaced_by=fiery_brand)
 Define(fracture 263642)
 # Rapidly slash your target for 225919sw1+225921sw1 Physical damage, and shatter s1 Lesser Soul Fragments from them.rnrn|cFFFFFFFFGenerates s4/10 Pain.|r
   SpellInfo(fracture cd=4.5 pain=-25 talent=fracture_talent)
 
 Define(immolation_aura 178740)
 # Engulf yourself in flames, instantly causing 187727s1 Fire damage to enemies within 187727A1 yards and radiating 178741s1 Fire damage every sec for 6 seconds.rnrn|cFFFFFFFFGenerates s3/10+178741s2/10*6 seconds Pain over 6 seconds.|r
-  SpellInfo(immolation_aura cd=15 duration=6 replace=eye_beam pain=-8 tick=1)
+  SpellInfo(immolation_aura cd=15 duration=6 pain=-8 tick=1)
+  SpellInfo(eye_beam replaced_by=immolation_aura)
   # Burns nearby enemies for 178741s1 Fire damage every 178740t1 sec.?a207548[rnrnMovement speed increased by w4.][]
   SpellAddBuff(immolation_aura immolation_aura=1)
 Define(imprison 217832)
@@ -96,7 +99,8 @@ Define(imprison 217832)
   SpellAddTargetDebuff(imprison imprison=1)
 Define(infernal_strike 189110)
 # Leap through the air toward a targeted location, dealing 189112s1 Fire damage to all enemies within 189112a1 yards.
-  SpellInfo(infernal_strike cd=0.8 charge_cd=20 replace=fel_rush gcd=0 offgcd=1)
+  SpellInfo(infernal_strike cd=0.8 charge_cd=20 gcd=0 offgcd=1)
+  SpellInfo(fel_rush replaced_by=infernal_strike)
 Define(nemesis 206491)
 # Increases damage you inflict against the target by s1 for 60 seconds. rnrnWhen the target is slain, you will inflict s1 additional damage against all creature types matching the original target (Humanoid, Dragonkin, etc.) for the remaining duration.
   SpellInfo(nemesis cd=120 duration=60 talent=nemesis_talent)
@@ -115,7 +119,8 @@ Define(sigil_of_chains 202138)
   SpellInfo(sigil_of_chains cd=90 duration=2 talent=sigil_of_chains_talent)
 Define(sigil_of_flame 204596)
 # Place a Sigil of Flame at the target location that activates after 2 seconds.rnrnDeals 204598s1 Fire damage, and an additional 204598o3 Fire damage over 6 seconds, to all enemies affected by the sigil.
-  SpellInfo(sigil_of_flame cd=30 duration=2 replace=blade_dance)
+  SpellInfo(sigil_of_flame cd=30 duration=2)
+  SpellInfo(blade_dance replaced_by=sigil_of_flame)
 Define(sigil_of_misery 207684)
 # Place a Sigil of Misery at the target location that activates after 2 seconds.rnrnCauses all enemies affected by the sigil to cower in fear, disorienting them for 20 seconds.
   SpellInfo(sigil_of_misery cd=90 duration=2)
@@ -124,7 +129,8 @@ Define(sigil_of_silence 202137)
   SpellInfo(sigil_of_silence cd=60 duration=2)
 Define(soul_cleave 228477)
 # Viciously strike all enemies in front of you for 228478s1 Physical damage and heal yourself for s4.rnrnConsumes up to s3 Soul Fragments within s1 yds.
-  SpellInfo(soul_cleave pain=30 replace=chaos_strike)
+  SpellInfo(soul_cleave pain=30)
+  SpellInfo(chaos_strike replaced_by=soul_cleave)
 
 Define(spirit_bomb 247454)
 # Consume up to s2 Soul Fragments within s1 yds and then explode, afflicting nearby enemies with Frailty for 20 seconds and damaging them for 247455s1 Fire per fragment.rnrnYou heal for 247456s1 of all damage you deal to enemies with Frailty.

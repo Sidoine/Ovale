@@ -161,8 +161,8 @@ function GetActionSpellInfo(element: Element, state: BaseState, atTime: number, 
     let spellId = <number>element.positionalParams[1];
     let si = OvaleData.spellInfo[spellId];
     let replacedSpellId = undefined;
-    if (si && si.replace) {
-        let replacement = OvaleData.GetSpellInfoProperty(spellId, atTime, "replace", targetGUID);
+    if (si && si.replaced_by) {
+        let replacement = OvaleData.GetSpellInfoProperty(spellId, atTime, "replaced_by", targetGUID);
         if (replacement) {
             replacedSpellId = spellId;
             spellId = replacement;
