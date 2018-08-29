@@ -668,7 +668,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
                     if (debuffType == "") {
                         debuffType = "Enrage";
                     }
-                    const auraType: AuraType = (filter === "HARMFUL|PLAYER" && "HARMFUL") || "HELPFUL";
+                    const auraType: AuraType = (filter === harmfulFilter && "HARMFUL") || "HELPFUL";
                     this.GainedAuraOnGUID(guid, now, spellId, casterGUID, auraType, true, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3);
                     i = i + 1;
                 }
