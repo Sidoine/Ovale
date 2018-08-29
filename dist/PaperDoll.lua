@@ -14,9 +14,8 @@ local OvaleState = __State.OvaleState
 local __LastSpell = LibStub:GetLibrary("ovale/LastSpell")
 local lastSpell = __LastSpell.lastSpell
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
-local pairs = pairs
 local tonumber = tonumber
-local type = type
+local ipairs = ipairs
 local GetCombatRating = GetCombatRating
 local GetCombatRatingBonus = GetCombatRatingBonus
 local GetCritChance = GetCritChance
@@ -40,6 +39,9 @@ local UnitStat = UnitStat
 local CR_CRIT_MELEE = CR_CRIT_MELEE
 local CR_HASTE_MELEE = CR_HASTE_MELEE
 local CR_VERSATILITY_DAMAGE_DONE = CR_VERSATILITY_DAMAGE_DONE
+local UnitClass = UnitClass
+local __tools = LibStub:GetLibrary("ovale/tools")
+local isNumber = __tools.isNumber
 local OVALE_SPELLDAMAGE_SCHOOL = {
     DEATHKNIGHT = 4,
     DEMONHUNTER = 3,
@@ -54,7 +56,7 @@ local OVALE_SPELLDAMAGE_SCHOOL = {
     WARLOCK = 6,
     WARRIOR = 4
 }
-local OVALE_SPECIALIZATION_NAME = {
+__exports.OVALE_SPECIALIZATION_NAME = {
     DEATHKNIGHT = {
         [1] = "blood",
         [2] = "frost",
@@ -154,8 +156,53 @@ __exports.PaperDollData = __class(nil, {
     end
 })
 local OvalePaperDollBase = OvaleState:RegisterHasState(OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvalePaperDoll", aceEvent))), __exports.PaperDollData)
+local STAT_NAME = {
+    [1] = "snapshotTime",
+    [2] = "strength",
+    [3] = "agility",
+    [4] = "stamina",
+    [5] = "intellect",
+    [6] = "attackPower",
+    [7] = "spellPower",
+    [8] = "critRating",
+    [9] = "meleeCrit",
+    [10] = "rangedCrit",
+    [11] = "spellCrit",
+    [12] = "hasteRating",
+    [13] = "hastePercent",
+    [14] = "meleeAttackSpeedPercent",
+    [15] = "rangedAttackSpeedPercent",
+    [16] = "spellCastSpeedPercent",
+    [17] = "masteryRating",
+    [18] = "masteryEffect",
+    [19] = "versatilityRating",
+    [20] = "versatility",
+    [21] = "mainHandWeaponDPS",
+    [22] = "offHandWeaponDPS",
+    [23] = "baseDamageMultiplier"
+}
+local SNAPSHOT_STAT_NAME = {
+    [1] = "snapshotTime",
+    [2] = "masteryEffect",
+    [3] = "baseDamageMultiplier"
+}
 local OvalePaperDollClass = __class(OvalePaperDollBase, {
+    constructor = function(self)
+        self.level = UnitLevel("player")
+        self.specialization = nil
+        self.CopySpellcastInfo = function(module, spellcast, dest)
+            self:UpdateSnapshot(dest, spellcast, true)
+        end
+        self.SaveSpellcastInfo = function(module, spellcast, atTime, state)
+            local paperDollModule = state or self.current
+            self:UpdateSnapshot(spellcast, paperDollModule, true)
+        end
+        OvalePaperDollBase.constructor(self)
+        local _, className = UnitClass("player")
+        self.class = className
+    end,
     OnInitialize = function(self)
+        self.class = Ovale.playerClass
         self:RegisterEvent("UNIT_STATS")
         self:RegisterEvent("COMBAT_RATING_UPDATE")
         self:RegisterEvent("MASTERY_UPDATE")
@@ -311,15 +358,15 @@ local OvalePaperDollClass = __class(OvalePaperDollBase, {
         self:UpdateDamage(event)
     end,
     GetSpecialization = function(self, specialization)
-        specialization = specialization or self.specialization
-        return OVALE_SPECIALIZATION_NAME[self.class][specialization]
+        specialization = specialization or self.specialization or 1
+        return __exports.OVALE_SPECIALIZATION_NAME[self.class][specialization]
     end,
     IsSpecialization = function(self, name)
         if name and self.specialization then
-            if type(name) == "number" then
+            if isNumber(name) then
                 return name == self.specialization
             else
-                return name == OVALE_SPECIALIZATION_NAME[self.class][self.specialization]
+                return name == __exports.OVALE_SPECIALIZATION_NAME[self.class][self.specialization]
             end
         end
         return false
@@ -358,8 +405,8 @@ local OvalePaperDollClass = __class(OvalePaperDollBase, {
     end,
     UpdateSnapshot = function(self, target, snapshot, updateAllStats)
         snapshot = snapshot or self.current
-        local nameTable = updateAllStats and __exports.OvalePaperDoll.STAT_NAME or __exports.OvalePaperDoll.SNAPSHOT_STAT_NAME
-        for k in pairs(nameTable) do
+        local nameTable = (updateAllStats and STAT_NAME) or SNAPSHOT_STAT_NAME
+        for _, k in ipairs(nameTable) do
             target[k] = snapshot[k]
         end
     end,
@@ -393,49 +440,6 @@ local OvalePaperDollClass = __class(OvalePaperDollBase, {
     ResetState = function(self)
         self:UpdateSnapshot(self.next, self.current, true)
     end,
-    constructor = function(self, ...)
-        OvalePaperDollBase.constructor(self, ...)
-        self.class = Ovale.playerClass
-        self.level = UnitLevel("player")
-        self.specialization = nil
-        self.STAT_NAME = {
-            snapshotTime = true,
-            strength = true,
-            agility = true,
-            stamina = true,
-            intellect = true,
-            attackPower = true,
-            spellPower = true,
-            critRating = true,
-            meleeCrit = true,
-            rangedCrit = true,
-            spellCrit = true,
-            hasteRating = true,
-            hastePercent = true,
-            meleeAttackSpeedPercent = true,
-            rangedAttackSpeedPercent = true,
-            spellCastSpeedPercent = true,
-            masteryRating = true,
-            masteryEffect = true,
-            versatilityRating = true,
-            versatility = true,
-            mainHandWeaponDPS = true,
-            offHandWeaponDPS = true,
-            baseDamageMultiplier = true
-        }
-        self.SNAPSHOT_STAT_NAME = {
-            snapshotTime = true,
-            masteryEffect = true,
-            baseDamageMultiplier = true
-        }
-        self.CopySpellcastInfo = function(module, spellcast, dest)
-            self:UpdateSnapshot(dest, spellcast, true)
-        end
-        self.SaveSpellcastInfo = function(module, spellcast, atTime, state)
-            local paperDollModule = state or self.current
-            self:UpdateSnapshot(spellcast, paperDollModule, true)
-        end
-    end
 })
 __exports.OvalePaperDoll = OvalePaperDollClass()
 OvaleState:RegisterState(__exports.OvalePaperDoll)

@@ -1,13 +1,14 @@
 import { L } from "./Localization";
 import { NewAddon } from "@wowts/tsaddon";
 import aceEvent from "@wowts/ace_event-3.0";
-import { ipairs, pairs, select, strjoin, tostring, tostringall, wipe, LuaArray, LuaObj, _G, truthy } from "@wowts/lua";
+import { ipairs, pairs, strjoin, tostring, tostringall, wipe, LuaArray, LuaObj, _G, truthy } from "@wowts/lua";
 import { format, find, len } from "@wowts/string";
-import { UnitClass, UnitGUID, DEFAULT_CHAT_FRAME } from "@wowts/wow-mock";
+import { UnitClass, UnitGUID, DEFAULT_CHAT_FRAME, ClassId } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
 import { AceDatabase } from "@wowts/ace_db-3.0";
+import { Color } from "./SpellFlash";
 
-let self_oneTimeMessage: LuaObj<boolean | "printed"> = {}
+export const oneTimeMessages: LuaObj<boolean | "printed"> = {}
 let MAX_REFRESH_INTERVALS = 500;
 let self_refreshIntervals:LuaArray<number> = {}
 let self_refreshIndex = 1;
@@ -27,12 +28,6 @@ export function MakeString(s?: string, ...__args: any[]) {
         s = tostring(undefined);
     }
     return s;
-}
-
-interface Color {
-    r:number;
-    g:number;
-    b:number;
 }
 
 export interface OvaleDb {
@@ -107,7 +102,7 @@ export interface OvaleDb {
 
 const OvaleBase = NewAddon("Ovale", aceEvent);
 class OvaleClass extends OvaleBase {
-    playerClass: string = select(2, UnitClass("player"));
+    playerClass: ClassId = undefined;
     playerGUID: string = undefined;
     db: AceDatabase & OvaleDb = undefined;
     refreshNeeded:LuaObj<boolean> = {}
@@ -135,6 +130,8 @@ class OvaleClass extends OvaleBase {
     // }
     OnInitialize() {
         this.playerGUID = UnitGUID("player");
+        const [, classId] = UnitClass("player");
+        this.playerClass = classId;
         wipe(self_refreshIntervals);
         self_refreshIndex = 1;
         this.ClearOneTimeMessages();
@@ -173,18 +170,18 @@ class OvaleClass extends OvaleBase {
     
     OneTimeMessage(...__args: any[]) {
         let s = MakeString(...__args);
-        if (!self_oneTimeMessage[s]) {
-            self_oneTimeMessage[s] = true;
+        if (!oneTimeMessages[s]) {
+            oneTimeMessages[s] = true;
         }
     }
     ClearOneTimeMessages() {
-        wipe(self_oneTimeMessage);
+        wipe(oneTimeMessages);
     }
     PrintOneTimeMessages() {
-        for (const [s] of pairs(self_oneTimeMessage)) {
-            if (self_oneTimeMessage[s] != "printed") {
+        for (const [s] of pairs(oneTimeMessages)) {
+            if (oneTimeMessages[s] != "printed") {
                 this.Print(s);
-                self_oneTimeMessage[s] = "printed";
+                oneTimeMessages[s] = "printed";
             }
         }
     }

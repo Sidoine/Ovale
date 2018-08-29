@@ -5,30 +5,37 @@ import { OvaleData } from "./Data";
 import { OvaleSpellBook } from "./SpellBook";
 import { OvaleStance } from "./Stance";
 import aceEvent from "@wowts/ace_event-3.0";
-import { pairs, lualength, _G } from "@wowts/lua";
+import { pairs, lualength, _G, LuaArray, LuaObj } from "@wowts/lua";
 import { GetTime, UnitHasVehicleUI, UnitExists, UnitIsDead, UnitCanAttack } from "@wowts/wow-mock";
 import { baseState } from "./BaseState";
+import { AstNode } from "./AST";
+import { Element } from "./BestAction";
 
 interface SpellFlashCoreClass {
-    FlashForm: (spellId, color, size, brightness) => void;   
-    FlashPet: (spellId, color, size, brightness) => void;
-    FlashAction: (spellId, color, size, brightness) => void;
-    FlashItem: (spellId, color, size, brightness) => void;
+    FlashForm: (spellId: number, color: Color, size: number, brightness: number) => void;   
+    FlashPet: (spellId: number, color: Color, size: number, brightness: number) => void;
+    FlashAction: (spellId: number, color: Color, size: number, brightness: number) => void;
+    FlashItem: (spellId: number, color: Color, size: number, brightness: number) => void;
 }
 
 let OvaleSpellFlashBase = Ovale.NewModule("OvaleSpellFlash", aceEvent);
 export let OvaleSpellFlash: OvaleSpellFlashClass;
 let SpellFlashCore: SpellFlashCoreClass = undefined;
-let colorMain = { r: undefined, g: undefined, b: undefined }
-let colorShortCd = { r: undefined, g: undefined, b: undefined }
-let colorCd = {  r: undefined, g: undefined, b: undefined }
-let colorInterrupt = {  r: undefined, g: undefined, b: undefined }
-let FLASH_COLOR = {
+export interface Color {
+    r?: number;
+    g?: number;
+    b?: number;
+}
+let colorMain: Color = { r: undefined, g: undefined, b: undefined }
+let colorShortCd: Color = { r: undefined, g: undefined, b: undefined }
+let colorCd: Color = {  r: undefined, g: undefined, b: undefined }
+let colorInterrupt: Color = {  r: undefined, g: undefined, b: undefined }
+let FLASH_COLOR: LuaObj<Color> = {
     main: colorMain,
     cd: colorCd,
     shortcd: colorCd
 }
-let COLORTABLE = {
+let COLORTABLE: LuaObj<Color> = {
     aqua: {
         r: 0,
         g: 1,
@@ -120,10 +127,10 @@ let COLORTABLE = {
             disabled: function () {
                 return !SpellFlashCore;
             },
-            get: function (info) {
+            get: function (info: LuaArray<keyof typeof Ovale.db.profile.apparence.spellFlash>) {
                 return Ovale.db.profile.apparence.spellFlash[info[lualength(info)]];
             },
-            set: function (info, value) {
+            set: function (info: LuaArray<keyof typeof Ovale.db.profile.apparence.spellFlash>, value: number | boolean | Color) {
                 Ovale.db.profile.apparence.spellFlash[info[lualength(info)]] = value;
                 OvaleOptions.SendMessage("Ovale_OptionChanged");
             },
@@ -212,12 +219,12 @@ let COLORTABLE = {
                     disabled: function () {
                         return !SpellFlashCore || !Ovale.db.profile.apparence.spellFlash.enabled;
                     },
-                    get: function (info) {
-                        const color = Ovale.db.profile.apparence.spellFlash[info[lualength(info)]];
+                    get: function (info: LuaArray<keyof typeof Ovale.db.profile.apparence.spellFlash>) {
+                        const color = <Color>Ovale.db.profile.apparence.spellFlash[info[lualength(info)]];
                         return [color.r, color.g, color.b, 1.0];
                     },
-                    set: function (info, r, g, b, a) {
-                        const color = Ovale.db.profile.apparence.spellFlash[info[lualength(info)]];
+                    set: function (info: LuaArray<keyof typeof Ovale.db.profile.apparence.spellFlash>, r: number, g: number, b: number, a: number) {
+                        const color = <Color>Ovale.db.profile.apparence.spellFlash[info[lualength(info)]];
                         color.r = r;
                         color.g = g;
                         color.b = b;
@@ -306,14 +313,14 @@ class OvaleSpellFlashClass extends OvaleSpellFlashBase {
         }
         return enabled;
     }
-    Flash(state: {}, node, element, start, now?:number) {
+    Flash(state: {}, node: AstNode, element: Element, start: number, now?:number) {
         const db = Ovale.db.profile.apparence.spellFlash
         now = now || GetTime();
         if (this.IsSpellFlashEnabled() && start && start - now <= db.threshold / 1000) {
             if (element && element.type == "action") {
                 let spellId, spellInfo;
                 if (element.lowername == "spell") {
-                    spellId = element.positionalParams[1];
+                    spellId = <number>element.positionalParams[1];
                     spellInfo = OvaleData.spellInfo[spellId];
                 }
                 let interrupt = spellInfo && spellInfo.interrupt;
@@ -347,7 +354,7 @@ class OvaleSpellFlashClass extends OvaleSpellFlashBase {
                     }
                     SpellFlashCore.FlashAction(spellId, color, size, brightness);
                 } else if (element.lowername == "item") {
-                    let itemId = element.positionalParams[1];
+                    let itemId = <number>element.positionalParams[1];
                     SpellFlashCore.FlashItem(itemId, color, size, brightness);
                 }
             }

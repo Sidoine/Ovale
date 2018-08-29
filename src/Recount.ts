@@ -7,7 +7,7 @@ import { GameTooltip } from "@wowts/wow-mock";
 
 let OvaleRecountBase = Ovale.NewModule("OvaleRecount");
 export let OvaleRecount: OvaleRecountClass;
-const DataModes = function(self, data, num) {
+const DataModes = function(self: never, data: any, num: number) {
     if (!data) {
         return [0, 0];
     }
@@ -23,7 +23,7 @@ const DataModes = function(self, data, num) {
     }
     return [score, undefined];
 }
-const TooltipFuncs = function(self, name, data) {
+const TooltipFuncs = function(self: never, name: string) {
     GameTooltip.ClearLines();
     GameTooltip.AddLine(name);
 }
@@ -47,7 +47,7 @@ class OvaleRecountClass extends OvaleRecountBase {
     OnDisable() {
         OvaleScore.UnregisterDamageMeter("OvaleRecount");
     }
-    ReceiveScore(name, guid, scored, scoreMax) {
+    ReceiveScore(name: string, guid: string, scored: number, scoreMax: number) {
         if (Recount) {
             let source = Recount.db2.combatants[name];
             if (source) {

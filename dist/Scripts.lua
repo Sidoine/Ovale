@@ -16,6 +16,7 @@ local format = string.format
 local gsub = string.gsub
 local lower = string.lower
 local pairs = pairs
+local kpairs = pairs
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isLuaArray = __tools.isLuaArray
 local GetNumSpecializations = GetNumSpecializations
@@ -46,7 +47,7 @@ do
 
         }
     }
-    for k, v in pairs(defaultDB) do
+    for k, v in kpairs(defaultDB) do
         OvaleOptions.defaultDB.profile[k] = v
     end
     for k, v in pairs(actions) do
@@ -87,14 +88,13 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
         return descriptionsTable
     end,
     RegisterScript = function(self, className, specialization, name, description, code, scriptType)
-        if  not className or className == Ovale.playerClass then
-            self.script[name] = self.script[name] or {}
-            local script = self.script[name]
-            script.type = scriptType or "script"
-            script.desc = description or name
-            script.specialization = specialization
-            script.code = code or ""
-        end
+        self.script[name] = self.script[name] or {}
+        local script = self.script[name]
+        script.type = scriptType or "script"
+        script.desc = description or name
+        script.specialization = specialization
+        script.code = code or ""
+        script.className = className
     end,
     UnregisterScript = function(self, name)
         self.script[name] = nil
@@ -122,9 +122,7 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
                 name = "Disabled"
             end
         elseif className == "PRIEST" then
-            if specialization == "holy" then
-                name = "Disabled"
-            elseif specialization == "discipline" then
+            if specialization == "discipline" then
                 name = "Disabled"
             end
         elseif className == "SHAMAN" then
@@ -137,7 +135,7 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
             end
         end
         if  not name and specialization then
-            name = format("sc_%s_%s_pr", lower(className), specialization)
+            name = format("sc_pr_%s_%s", lower(className), specialization)
         end
         if  not (name and self.script[name]) then
             name = DISABLED_NAME
@@ -164,7 +162,7 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
                     name = L["Script"],
                     width = "double",
                     values = function(info)
-                        local scriptType =  not Ovale.db.profile.showHiddenScripts and "script"
+                        local scriptType = ( not Ovale.db.profile.showHiddenScripts and "script") or nil
                         return __exports.OvaleScripts:GetDescriptions(scriptType)
                     end,
                     get = function(info)
@@ -235,7 +233,7 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
         AceConfigDialog:AddToBlizOptions(appName, L["Script"], Ovale:GetName())
     end,
     InitScriptProfiles = function(self)
-        local countSpecializations = GetNumSpecializations()
+        local countSpecializations = GetNumSpecializations(false, false)
         if  not isLuaArray(Ovale.db.profile.source) then
             Ovale.db.profile.source = {}
         end

@@ -1,23 +1,23 @@
 import { OvaleDebug } from "./Debug";
 import { OvaleProfiler } from "./Profiler";
 import { OvaleArtifact } from "./Artifact";
-import { OvaleAST, AstNode, AstAnnotation, PositionalParameters, NamedParameters } from "./AST";
+import { OvaleAST, AstNode, AstAnnotation, PositionalParameters, NamedParameters, PARAMETER_KEYWORD, ConditionNamedParameters } from "./AST";
 import { OvaleCondition } from "./Condition";
 import { OvaleCooldown } from "./Cooldown";
-import { OvaleData } from "./Data";
+import { OvaleData, SpellInfo } from "./Data";
 import { OvaleEquipment } from "./Equipment";
 import { OvalePaperDoll } from "./PaperDoll";
-import { OvalePower } from "./Power";
+import { POWER_TYPES, PowerType } from "./Power";
 import { OvaleScore } from "./Score";
 import { OvaleSpellBook } from "./SpellBook";
 import { OvaleStance } from "./Stance";
 import { Ovale } from "./Ovale";
 import { checkBoxes, lists, ResetControls } from "./Controls";
 import aceEvent from "@wowts/ace_event-3.0";
-import { ipairs, pairs, tonumber, tostring, type, wipe, LuaArray, lualength, truthy, LuaObj } from "@wowts/lua";
+import { ipairs, pairs, tonumber, tostring, type, wipe, LuaArray, lualength, truthy, LuaObj, kpairs } from "@wowts/lua";
 import { find, match, sub } from "@wowts/string";
-import { GetSpellInfo, GetSpecialization } from "@wowts/wow-mock";
-import { isLuaArray } from "./tools";
+import { GetSpellInfo } from "@wowts/wow-mock";
+import { isLuaArray, checkToken } from "./tools";
 
 let OvaleCompileBase = Ovale.NewModule("OvaleCompile", aceEvent);
 export let OvaleCompile: OvaleCompileClass;
@@ -25,21 +25,20 @@ let self_compileOnStances = false;
  
 let self_serial = 0;
 let self_timesEvaluated = 0;
-let self_icon: LuaArray<AstNode> = {
-}
+let self_icon: LuaArray<AstNode> = {}
 let NUMBER_PATTERN = "^%-?%d+%.?%d*$";
 function HasTalent(talentId: number) {
     if (OvaleSpellBook.IsKnownTalent(talentId)) {
         return OvaleSpellBook.GetTalentPoints(talentId) > 0;
     } else {
-        OvaleCompile.Print("Warning: unknown talent ID '%s'", talentId);
+        OvaleCompile.Error("Unknown talent ID '%s'", talentId);
         return false;
     }
 }
-function RequireValue(value: string) : [ string|number, boolean] {
+function RequireValue(value: string | number) : [ string|number, boolean] {
     let required = (sub(tostring(value), 1, 1) != "!");
     if (!required) {
-        value = sub(value, 2);
+        value = sub(<string>value, 2);
         if (truthy(match(value, NUMBER_PATTERN))) {
             return [tonumber(value), required];
         }
@@ -85,7 +84,7 @@ function TestConditionTalent(value: string) {
 }
 function TestConditionEquipped(value: string) {
     let [item, required] = RequireValue(value);
-    let hasItemEquipped = OvaleEquipment.HasEquippedItem(item);
+    let hasItemEquipped = OvaleEquipment.HasEquippedItem(item as number);
     return (required && hasItemEquipped && true) || (!required && !hasItemEquipped);
 }
 function TestConditionTrait(value: string) {
@@ -93,7 +92,7 @@ function TestConditionTrait(value: string) {
     let hasTrait = OvaleArtifact.HasTrait(trait);
     return (required && hasTrait) || (!required && !hasTrait);
 }
-let TEST_CONDITION_DISPATCH:LuaObj<(value: string | number) => boolean> = {
+let TEST_CONDITION_DISPATCH: Record<keyof ConditionNamedParameters, (value: string | number) => boolean> = {
     if_spell: TestConditionSpell,
     if_equipped: TestConditionEquipped,
     if_stance: TestConditionStance,
@@ -107,7 +106,7 @@ let TEST_CONDITION_DISPATCH:LuaObj<(value: string | number) => boolean> = {
 function TestConditions(positionalParams: PositionalParameters, namedParams: NamedParameters) {
     OvaleCompile.StartProfiling("OvaleCompile_TestConditions");
     let boolean = true;
-    for (const [param, dispatch] of pairs(TEST_CONDITION_DISPATCH)) {
+    for (const [param, dispatch] of kpairs(TEST_CONDITION_DISPATCH)) {
         let value = namedParams[param];
         if (isLuaArray(value)) {
             for (const [, v] of ipairs<any>(value)) {
@@ -180,7 +179,7 @@ function EvaluateAddCheckBox(node: AstNode) {
     }
     return ok;
 }
-function EvaluateAddIcon(node) {
+function EvaluateAddIcon(node: AstNode) {
     let ok = true;
     let [positionalParams, namedParams] = [node.positionalParams, node.namedParams];
     if (TestConditions(positionalParams, namedParams)) {
@@ -188,7 +187,7 @@ function EvaluateAddIcon(node) {
     }
     return ok;
 }
-function EvaluateAddListItem(node) {
+function EvaluateAddListItem(node: AstNode) {
     let ok = true;
     let [name, item, positionalParams, namedParams] = [node.name, node.item, node.positionalParams, node.namedParams];
     if (TestConditions(positionalParams, namedParams)) {
@@ -217,22 +216,22 @@ function EvaluateItemInfo(node: AstNode) {
     let ok = true;
     let [itemId, positionalParams, namedParams] = [node.itemId, node.positionalParams, node.namedParams];
     if (itemId && TestConditions(positionalParams, namedParams)) {
-        let ii = OvaleData.ItemInfo(itemId);
-        for (const [k, v] of pairs(namedParams)) {
+        const ii = OvaleData.ItemInfo(itemId);
+        for (const [k, v] of kpairs(namedParams)) {
             if (k == "proc") {
                 let buff = tonumber(namedParams.buff);
                 if (buff) {
                     let name = "item_proc_" + namedParams.proc;
-                    let list = OvaleData.buffSpellList[name] || {
-                    }
+                    let list = OvaleData.buffSpellList[name] || {};
                     list[buff] = true;
                     OvaleData.buffSpellList[name] = list;
                 } else {
                     ok = false;
                     break;
                 }
-            } else if (!OvaleAST.PARAMETER_KEYWORD[k]) {
-                ii[k] = <any>v;
+            } else if (!checkToken(PARAMETER_KEYWORD, k)) {
+                // TODO check that is a spell info parameter
+                ii[k as keyof SpellInfo] = <any>v;
             }
         }
         OvaleData.itemInfo[itemId] = ii;
@@ -243,13 +242,12 @@ function EvaluateItemRequire(node: AstNode) {
     let ok = true;
     let [itemId, positionalParams, namedParams] = [node.itemId, node.positionalParams, node.namedParams];
     if (TestConditions(positionalParams, namedParams)) {
-        let property = node.property;
+        const property = node.property;
         let count = 0;
         let ii = OvaleData.ItemInfo(itemId);
-        let tbl = ii.require[property] || {
-        }
-        for (const [k, v] of pairs(namedParams)) {
-            if (!OvaleAST.PARAMETER_KEYWORD[k]) {
+        let tbl = ii.require[property] || {}
+        for (const [k, v] of kpairs(namedParams)) {
+            if (!checkToken(PARAMETER_KEYWORD, k)) {
                 tbl[k] = <any>v;
                 count = count + 1;
             }
@@ -260,17 +258,16 @@ function EvaluateItemRequire(node: AstNode) {
     }
     return ok;
 }
-function EvaluateList(node) {
+function EvaluateList(node: AstNode) {
     let ok = true;
     let [name, positionalParams, ] = [node.name, node.positionalParams, node.namedParams];
-    let listDB;
+    let listDB: "itemList" | "buffSpellList";
     if (node.keyword == "ItemList") {
         listDB = "itemList";
     } else {
         listDB = "buffSpellList";
     }
-    let list = OvaleData[listDB][name] || {
-    }
+    const list = OvaleData[listDB][name] || {};
     for (const [, _id] of pairs(positionalParams)) {
         let id = tonumber(_id);
         if (id) {
@@ -283,7 +280,7 @@ function EvaluateList(node) {
     OvaleData[listDB][name] = list;
     return ok;
 }
-function EvaluateScoreSpells(node) {
+function EvaluateScoreSpells(node: AstNode) {
     let ok = true;
     let [positionalParams,] = [node.positionalParams, node.namedParams];
     for (const [, _spellId] of ipairs(positionalParams)) {
@@ -301,7 +298,7 @@ function EvaluateSpellAuraList(node: AstNode) {
     let ok = true;
     let [spellId, positionalParams, namedParams] = [node.spellId, node.positionalParams, node.namedParams];
     if (!spellId) {
-        OvaleCompile.Print("No spellId for name %s", node.name);
+        OvaleCompile.Error("No spellId for name %s", node.name);
         return false;
     }
     if (TestConditions(positionalParams, namedParams)) {
@@ -317,14 +314,23 @@ function EvaluateSpellAuraList(node: AstNode) {
         } else {
             auraTable = si.aura.player;
         }
-        let filter = truthy(find(node.keyword, "Debuff")) && "HARMFUL" || "HELPFUL";
-        let tbl = auraTable[filter] || {
-        }
+        const filter = truthy(find(node.keyword, "Debuff")) && "HARMFUL" || "HELPFUL";
+        const tbl = auraTable[filter] || {};
         let count = 0;
-        for (const [k, v] of pairs(namedParams)) {
-            if (!OvaleAST.PARAMETER_KEYWORD[k]) {
-                tbl[k] = v;
-                count = count + 1;
+        for (const [k, v] of kpairs(namedParams)) {
+            if (!checkToken(PARAMETER_KEYWORD, k)) {
+                if (OvaleData.buffSpellList[k]) {
+                    tbl[k] = v;
+                    count = count + 1;
+                } else {
+                    const id = tonumber(k);
+                    if (!id) {
+                        OvaleCompile.Warning(`${k} is not a parameter keyword in '${node.name}' ${node.type}`);
+                    } else {
+                        tbl[id] = v;
+                        count = count + 1;
+                    }
+                }
             }
         }
         if (count > 0) {
@@ -334,17 +340,16 @@ function EvaluateSpellAuraList(node: AstNode) {
     return ok;
 }
 function EvaluateSpellInfo(node: AstNode) {
-    let addpower = {
-    }
-    for (const [powertype,] of pairs(OvalePower.POWER_INFO)) {
-        let key = `add${powertype}`;
+    const addpower: LuaObj<PowerType> = {}
+    for (const [,powertype] of ipairs(POWER_TYPES)) {
+        const key = `add${powertype}`;
         addpower[key] = powertype;
     }
     let ok = true;
     let [spellId, positionalParams, namedParams] = [node.spellId, node.positionalParams, node.namedParams];
     if (spellId && TestConditions(positionalParams, namedParams)) {
         let si = OvaleData.SpellInfo(spellId);
-        for (const [k, v] of pairs(namedParams)) {
+        for (const [k, v] of kpairs(namedParams)) {
             if (k == "add_duration") {
                 let value = tonumber(v);
                 if (value) {
@@ -352,7 +357,7 @@ function EvaluateSpellInfo(node: AstNode) {
                     if (namedParams.pertrait != undefined) {
                         realValue = value * OvaleArtifact.TraitRank(namedParams.pertrait);
                     }
-                    let addDuration = <number>si.add_duration || 0;
+                    let addDuration = si.add_duration || 0;
                     si.add_duration = addDuration + realValue;
                 } else {
                     ok = false;
@@ -361,7 +366,7 @@ function EvaluateSpellInfo(node: AstNode) {
             } else if (k == "add_cd") {
                 let value = tonumber(v);
                 if (value) {
-                    let addCd = <number>si.add_cd || 0;
+                    let addCd = si.add_cd || 0;
                     si.add_cd = addCd + value;
                 } else {
                     ok = false;
@@ -373,14 +378,15 @@ function EvaluateSpellInfo(node: AstNode) {
                 list[spellId] = true;
                 OvaleData.buffSpellList[<string>v] = list;
             } else if (k == "dummy_replace") {
-                let spellName = GetSpellInfo(<string>v) || v;
+                let [spellName] = GetSpellInfo(<string>v);
+                if (!spellName) spellName = v as string;
                 OvaleSpellBook.AddSpell(spellId, spellName);
             } else if (k == "learn" && v == 1) {
-                let spellName = GetSpellInfo(spellId);
+                let [spellName] = GetSpellInfo(spellId);
                 OvaleSpellBook.AddSpell(spellId, spellName);
             } else if (k == "shared_cd") {
                 si[k] = <number>v;
-                OvaleCooldown.AddSharedCooldown(v, spellId);
+                OvaleCooldown.AddSharedCooldown(<string>v, spellId);
             } else if (addpower[k] != undefined) {
                 let value = tonumber(v);
                 if (value) {
@@ -388,14 +394,14 @@ function EvaluateSpellInfo(node: AstNode) {
                     if (namedParams.pertrait != undefined) {
                         realValue = value * OvaleArtifact.TraitRank(namedParams.pertrait);
                     }
-                    let power = <number>si[k] || 0;
-                    si[k] = power + realValue;
+                    let power = <number>si[k as keyof SpellInfo] || 0;
+                    si[k as keyof SpellInfo] = power + realValue;
                 } else {
                     ok = false;
                     break;
                 }
-            } else if (!OvaleAST.PARAMETER_KEYWORD[k]) {
-                si[k] = <any>v;
+            } else if (!checkToken(PARAMETER_KEYWORD, k)) {
+                si[k as keyof SpellInfo] = <any>v;
             }
         }
     }
@@ -405,13 +411,12 @@ function EvaluateSpellRequire(node: AstNode) {
     let ok = true;
     let [spellId, positionalParams, namedParams] = [node.spellId, node.positionalParams, node.namedParams];
     if (TestConditions(positionalParams, namedParams)) {
-        let property = node.property;
+        let property = node.property as keyof SpellInfo;
         let count = 0;
         let si = OvaleData.SpellInfo(spellId);
-        let tbl = si.require[property] || {
-        }
-        for (const [k, v] of pairs(namedParams)) {
-            if (!OvaleAST.PARAMETER_KEYWORD[k]) {
+        let tbl = si.require[property] || {};
+        for (const [k, v] of kpairs(namedParams)) {
+            if (!checkToken(PARAMETER_KEYWORD, k)) {
                 tbl[k] = <any>v;
                 count = count + 1;
             }
@@ -434,7 +439,7 @@ function AddMissingVariantSpells(annotation: AstAnnotation) {
                         spellName = OvaleSpellBook.GetSpellName(spellId);
                     }
                     if (spellName) {
-                        let name = GetSpellInfo(spellName);
+                        let [name] = GetSpellInfo(spellName);
                         if (spellName == name) {
                             OvaleCompile.Debug("Learning spell %s with ID %d.", spellName, spellId);
                             OvaleSpellBook.AddSpell(spellId, spellName);
@@ -444,20 +449,19 @@ function AddMissingVariantSpells(annotation: AstAnnotation) {
                         if (node.paramsAsString) {
                             functionCall = `${node.name}(${node.paramsAsString})`;
                         }
-                        OvaleCompile.Print("Unknown spell with ID %s used in %s.", spellId, functionCall);
+                        OvaleCompile.Error("Unknown spell with ID %s used in %s.", spellId, functionCall);
                     }
                 }
             }
         }
     }
 }
-function AddToBuffList(buffId, statName?, isStacking?) {
+function AddToBuffList(buffId: number, statName?: string, isStacking?: boolean) {
     if (statName) {
         for (const [, useName] of pairs(OvaleData.STAT_USE_NAMES)) {
             if (isStacking || !truthy(find(useName, "_stacking_"))) {
                 let name = `${useName}_${statName}_buff`;
-                let list = OvaleData.buffSpellList[name] || {
-                }
+                let list = OvaleData.buffSpellList[name] || {};
                 list[buffId] = true;
                 OvaleData.buffSpellList[name] = list;
                 let shortStatName = OvaleData.STAT_SHORTNAME[statName];
@@ -477,10 +481,10 @@ function AddToBuffList(buffId, statName?, isStacking?) {
         }
     } else {
         let si = OvaleData.spellInfo[buffId];
-        isStacking = si && (si.stacking == 1 || si.max_stacks);
+        isStacking = si && (si.stacking == 1 || si.max_stacks > 0);
         if (si && si.stat) {
             let stat = si.stat;
-            if (type(stat) == "table") {
+            if (isLuaArray(stat)) {
                 for (const [, name] of ipairs(stat)) {
                     AddToBuffList(buffId, name, isStacking);
                 }
@@ -491,22 +495,15 @@ function AddToBuffList(buffId, statName?, isStacking?) {
     }
 }
 
-function isTable(t: any): t is LuaObj<any> {
-    return type(t) === "table";
-}
-
-let UpdateTrinketInfo = undefined;
-{
-    let trinket = {
-    }
-    UpdateTrinketInfo = function () {
+let trinket: LuaArray<number> = {};
+let UpdateTrinketInfo = function () {
         [trinket[1], trinket[2]] = OvaleEquipment.GetEquippedTrinkets();
         for (let i = 1; i <= 2; i += 1) {
             let itemId = trinket[i];
             let ii = itemId && OvaleData.ItemInfo(itemId);
             let buffId = ii && ii.buff;
             if (buffId) {
-                if (isTable(buffId)) {
+                if (isLuaArray(buffId)) {
                     for (const [, id] of ipairs(buffId)) {
                         AddToBuffList(id);
                     }
@@ -516,12 +513,11 @@ let UpdateTrinketInfo = undefined;
             }
         }
     }
-}
 
 const OvaleCompileClassBase = OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(OvaleCompileBase));
-class OvaleCompileClass extends OvaleCompileClassBase {
-    serial = undefined;
-    ast = undefined;
+export class OvaleCompileClass extends OvaleCompileClassBase {
+    serial: number | undefined = undefined;
+    ast: AstNode | undefined = undefined;
      
     OnInitialize() {
         this.RegisterMessage("Ovale_CheckBoxValueChanged", "ScriptControlChanged");
@@ -546,17 +542,17 @@ class OvaleCompileClass extends OvaleCompileClassBase {
         this.UnregisterMessage("Ovale_StanceChanged");
         this.UnregisterMessage("Ovale_TalentsChanged");
     }
-    Ovale_ScriptChanged(event) {
+    Ovale_ScriptChanged(event: string) {
         let specName = OvalePaperDoll.GetSpecialization()
         this.CompileScript(Ovale.db.profile.source[specName]);
         this.EventHandler(event);
     }
-    Ovale_StanceChanged(event) {
+    Ovale_StanceChanged(event: string) {
         if (self_compileOnStances) {
             this.EventHandler(event);
         }
     }
-    ScriptControlChanged(event, name) {
+    ScriptControlChanged(event: string, name: string) {
         if (!name) {
             this.EventHandler(event);
         } else {
@@ -571,12 +567,12 @@ class OvaleCompileClass extends OvaleCompileClassBase {
             }
         }
     }
-    EventHandler(event) {
+    EventHandler(event: string) {
         self_serial = self_serial + 1;
         this.Debug("%s: advance age to %d.", event, self_serial);
         Ovale.needRefresh();
     }
-    CompileScript(name) {
+    CompileScript(name: string) {
         OvaleDebug.ResetTrace();
         this.Debug("Compiling script '%s'.", name);
         if (this.ast) {
@@ -588,13 +584,10 @@ class OvaleCompileClass extends OvaleCompileClassBase {
         }
         ResetControls();
     }
-    EvaluateScript(ast?, forceEvaluation?) {
+    EvaluateScript(ast?: AstNode, forceEvaluation?: boolean) {
         this.StartProfiling("OvaleCompile_EvaluateScript");
-        if (type(ast) != "table") {
-            forceEvaluation = ast;
-            ast = this.ast;
-        }
         let changed = false;
+        ast = ast || this.ast;
         if (ast && (forceEvaluation || !this.serial || this.serial < self_serial)) {
             this.Debug("Evaluating script.");
             changed = true;
@@ -605,7 +598,7 @@ class OvaleCompileClass extends OvaleCompileClassBase {
             OvaleCooldown.ResetSharedCooldowns();
             self_timesEvaluated = self_timesEvaluated + 1;
             this.serial = self_serial;
-            for (const [, node] of ipairs<AstNode>(ast.child)) {
+            for (const [, node] of ipairs(ast.child)) {
                 let nodeType = node.type;
                 if (nodeType == "checkbox") {
                     ok = EvaluateAddCheckBox(node);
@@ -641,7 +634,7 @@ class OvaleCompileClass extends OvaleCompileClassBase {
         this.StopProfiling("OvaleCompile_EvaluateScript");
         return changed;
     }
-    GetFunctionNode(name) {
+    GetFunctionNode(name: string) {
         let node;
         if (this.ast && this.ast.annotation && this.ast.annotation.customFunction) {
             node = this.ast.annotation.customFunction[name];

@@ -9,14 +9,14 @@ local insert = table.insert
 __exports.self_pool = OvalePool("OvaleFuture_pool")
 local LastSpell = __class(nil, {
     LastInFlightSpell = function(self)
-        local spellcast
+        local spellcast = nil
         if self.lastGCDSpellcast.success then
             spellcast = self.lastGCDSpellcast
         end
         for i = #self.queue, 1, -1 do
             local sc = self.queue[i]
             if sc.success then
-                if  not spellcast or spellcast.success < sc.success then
+                if spellcast == nil or (spellcast.success < sc.success) then
                     spellcast = sc
                 end
                 break
@@ -53,13 +53,13 @@ local LastSpell = __class(nil, {
         for i = #self.queue, 1, -1 do
             local sc = self.queue[i]
             if sc.success then
-                if  not spellcast or (spellcast.success and spellcast.success < sc.success) or ( not spellcast.success and spellcast.queued < sc.success) then
+                if  not spellcast or (spellcast.success and spellcast.success < sc.success) or ( not spellcast.success and spellcast.queued and spellcast.queued < sc.success) then
                     spellcast = sc
                 end
-            elseif  not sc.start and  not sc.stop then
+            elseif  not sc.start and  not sc.stop and sc.queued then
                 if  not spellcast or (spellcast.success and spellcast.success < sc.queued) then
                     spellcast = sc
-                elseif spellcast.queued < sc.queued then
+                elseif spellcast.queued and spellcast.queued < sc.queued then
                     spellcast = sc
                 end
             end
@@ -68,7 +68,9 @@ local LastSpell = __class(nil, {
     end,
     constructor = function(self)
         self.lastSpellcast = nil
-        self.lastGCDSpellcast = {}
+        self.lastGCDSpellcast = {
+            spellId = 0
+        }
         self.queue = {}
         self.modules = {}
     end

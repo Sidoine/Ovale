@@ -1,19 +1,19 @@
 import { StateModule, OvaleState } from "./State";
 import { OvaleCooldown } from "./Cooldown";
-import { pairs } from "@wowts/lua";
+import { pairs, kpairs } from "@wowts/lua";
 import { SpellCast } from "./LastSpell";
 
 
 class CooldownState implements StateModule {
     next = OvaleCooldown.next;
-    ApplySpellStartCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast: SpellCast) {
+    ApplySpellStartCast(spellId: number, targetGUID: string, startCast: number, endCast: number, isChanneled: boolean, spellcast: SpellCast) {
         OvaleCooldown.StartProfiling("OvaleCooldown_ApplySpellStartCast");
         if (isChanneled) {
             this.ApplyCooldown(spellId, targetGUID, startCast);
         }
         OvaleCooldown.StopProfiling("OvaleCooldown_ApplySpellStartCast");
     }
-    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast: SpellCast) {
+    ApplySpellAfterCast(spellId: number, targetGUID: string, startCast: number, endCast: number, isChanneled: boolean, spellcast: SpellCast) {
         OvaleCooldown.StartProfiling("OvaleCooldown_ApplySpellAfterCast");
         if (!isChanneled) {
             this.ApplyCooldown(spellId, targetGUID, endCast);
@@ -31,25 +31,25 @@ class CooldownState implements StateModule {
     }
     CleanState() {
         for (const [spellId, cd] of pairs(this.next.cd)) {
-            for (const [k] of pairs(cd)) {
+            for (const [k] of kpairs(cd)) {
                 cd[k] = undefined;
             }
             this.next.cd[spellId] = undefined;
         }
     }
 
-    ApplyCooldown(spellId, targetGUID, atTime) {
+    ApplyCooldown(spellId: number, targetGUID: string, atTime: number) {
         OvaleCooldown.StartProfiling("OvaleCooldown_state_ApplyCooldown");
         let cd = OvaleCooldown.GetCD(spellId, atTime);
         let duration = OvaleCooldown.GetSpellCooldownDuration(spellId, atTime, targetGUID);
         if (duration == 0) {
             cd.start = 0;
             cd.duration = 0;
-            cd.enable = 1;
+            cd.enable = true;
         } else {
             cd.start = atTime;
             cd.duration = duration;
-            cd.enable = 1;
+            cd.enable = true;
         }
         if (cd.charges && cd.charges > 0) {
             cd.chargeStart = cd.start;

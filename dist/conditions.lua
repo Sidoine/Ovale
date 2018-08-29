@@ -11,6 +11,7 @@ local TestValue = __Condition.TestValue
 local Compare = __Condition.Compare
 local TestBoolean = __Condition.TestBoolean
 local ParseCondition = __Condition.ParseCondition
+local isComparator = __Condition.isComparator
 local __DamageTaken = LibStub:GetLibrary("ovale/DamageTaken")
 local OvaleDamageTaken = __DamageTaken.OvaleDamageTaken
 local __Data = LibStub:GetLibrary("ovale/Data")
@@ -103,6 +104,8 @@ local __AzeriteArmor = LibStub:GetLibrary("ovale/AzeriteArmor")
 local OvaleAzerite = __AzeriteArmor.OvaleAzerite
 local __Warlock = LibStub:GetLibrary("ovale/Warlock")
 local OvaleWarlock = __Warlock.OvaleWarlock
+local __Stagger = LibStub:GetLibrary("ovale/Stagger")
+local OvaleStagger = __Stagger.OvaleStagger
 local INFINITY = huge
 local function BossArmorDamageReduction(target, state)
     return 0.3
@@ -454,6 +457,12 @@ local function BuffStacks(positionalParams, namedParams, state, atTime)
     end
     OvaleCondition:RegisterCondition("buffstacks", false, BuffStacks)
     OvaleCondition:RegisterCondition("debuffstacks", false, BuffStacks)
+local function maxStacks(positionalParams, namedParameters, state, atTime)
+        local auraId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+        local maxStacks = OvaleData:GetSpellInfo(auraId).max_stacks
+        return Compare(maxStacks, comparator, limit)
+    end
+    OvaleCondition:RegisterCondition("maxstacks", true, maxStacks)
 end
 do
 local function BuffStacksOnAny(positionalParams, namedParams, state, atTime)
@@ -587,7 +596,7 @@ local function Classification(positionalParams, namedParams, state, atTime)
         elseif UnitExists("boss1") and OvaleGUID:UnitGUID(target) == OvaleGUID:UnitGUID("boss1") then
             targetClassification = "worldboss"
         else
-            local aura = OvaleAura:GetAura(target, IMBUED_BUFF_ID, atTime, "debuff", false)
+            local aura = OvaleAura:GetAura(target, IMBUED_BUFF_ID, atTime, "HARMFUL", false)
             if OvaleAura:IsActiveAura(aura, atTime) then
                 targetClassification = "worldboss"
             else
@@ -850,7 +859,7 @@ local function Exists(positionalParams, namedParams, state, atTime)
     OvaleCondition:RegisterCondition("exists", false, Exists)
 end
 do
-local function False(positionalParams, namedParams, state, atTime)
+    local False = function(positionalParams, namedParams, state, atTime)
         return nil
     end
     OvaleCondition:RegisterCondition("false", false, False)
@@ -1102,7 +1111,7 @@ do
 local function InRange(positionalParams, namedParams, state, atTime)
         local spellId, yesno = positionalParams[1], positionalParams[2]
         local target = ParseCondition(positionalParams, namedParams, state)
-        local boolean = (OvaleSpells:IsSpellInRange(spellId, target) == 1)
+        local boolean = OvaleSpells:IsSpellInRange(spellId, target)
         return TestBoolean(boolean, yesno)
     end
     OvaleCondition:RegisterCondition("inrange", false, InRange)
@@ -1449,9 +1458,6 @@ local function Rage(positionalParams, namedParams, state, atTime)
 local function RunicPower(positionalParams, namedParams, state, atTime)
         return Power("runicpower", positionalParams, namedParams, state, atTime)
     end
-local function ShadowOrbs(positionalParams, namedParams, state, atTime)
-        return Power("shadoworbs", positionalParams, namedParams, state, atTime)
-    end
 local function SoulShards(positionalParams, namedParams, state, atTime)
         return Power("soulshards", positionalParams, namedParams, state, atTime)
     end
@@ -1473,10 +1479,9 @@ local function ArcaneCharges(positionalParams, namedParams, state, atTime)
     OvaleCondition:RegisterCondition("pain", false, Pain)
     OvaleCondition:RegisterCondition("rage", false, Rage)
     OvaleCondition:RegisterCondition("runicpower", false, RunicPower)
-    OvaleCondition:RegisterCondition("shadoworbs", false, ShadowOrbs)
     OvaleCondition:RegisterCondition("soulshards", false, SoulShards)
 local function AlternatePowerDeficit(positionalParams, namedParams, state, atTime)
-        return PowerDeficit("alternatepower", positionalParams, namedParams, state, atTime)
+        return PowerDeficit("alternate", positionalParams, namedParams, state, atTime)
     end
 local function AstralPowerDeficit(positionalParams, namedParams, state, atTime)
         return PowerDeficit("lunarpower", positionalParams, namedParams, state, atTime)
@@ -1511,9 +1516,6 @@ local function RageDeficit(positionalParams, namedParams, state, atTime)
 local function RunicPowerDeficit(positionalParams, namedParams, state, atTime)
         return PowerDeficit("runicpower", positionalParams, namedParams, state, atTime)
     end
-local function ShadowOrbsDeficit(positionalParams, namedParams, state, atTime)
-        return PowerDeficit("shadoworbs", positionalParams, namedParams, state, atTime)
-    end
 local function SoulShardsDeficit(positionalParams, namedParams, state, atTime)
         return PowerDeficit("soulshards", positionalParams, namedParams, state, atTime)
     end
@@ -1529,7 +1531,6 @@ local function SoulShardsDeficit(positionalParams, namedParams, state, atTime)
     OvaleCondition:RegisterCondition("paindeficit", false, PainDeficit)
     OvaleCondition:RegisterCondition("ragedeficit", false, RageDeficit)
     OvaleCondition:RegisterCondition("runicpowerdeficit", false, RunicPowerDeficit)
-    OvaleCondition:RegisterCondition("shadoworbsdeficit", false, ShadowOrbsDeficit)
     OvaleCondition:RegisterCondition("soulshardsdeficit", false, SoulShardsDeficit)
 local function ManaPercent(positionalParams, namedParams, state, atTime)
         return PowerPercent("mana", positionalParams, namedParams, state, atTime)
@@ -1568,9 +1569,6 @@ local function MaxRage(positionalParams, namedParams, state, atTime)
 local function MaxRunicPower(positionalParams, namedParams, state, atTime)
         return MaxPower("runicpower", positionalParams, namedParams, state, atTime)
     end
-local function MaxShadowOrbs(positionalParams, namedParams, state, atTime)
-        return MaxPower("shadoworbs", positionalParams, namedParams, state, atTime)
-    end
 local function MaxSoulShards(positionalParams, namedParams, state, atTime)
         return MaxPower("soulshards", positionalParams, namedParams, state, atTime)
     end
@@ -1589,7 +1587,6 @@ local function MaxArcaneCharges(positionalParams, namedParams, state, atTime)
     OvaleCondition:RegisterCondition("maxpain", false, MaxPain)
     OvaleCondition:RegisterCondition("maxrage", false, MaxRage)
     OvaleCondition:RegisterCondition("maxrunicpower", false, MaxRunicPower)
-    OvaleCondition:RegisterCondition("maxshadoworbs", false, MaxShadowOrbs)
     OvaleCondition:RegisterCondition("maxsoulshards", false, MaxSoulShards)
 end
 do
@@ -1733,6 +1730,17 @@ local function Rune(positionalParams, namedParams, state, atTime)
         end
         return Compare(count, comparator, limit)
     end
+local function RuneDeficit(positionalParams, namedParams, state, atTime)
+        local comparator, limit = positionalParams[1], positionalParams[2]
+        local count, startCooldown, endCooldown = OvaleRunes:RuneDeficit(atTime)
+        if startCooldown < INFINITY then
+            local origin = startCooldown
+            local rate = -1 / (endCooldown - startCooldown)
+            local start, ending = startCooldown, INFINITY
+            return TestValue(start, ending, count, origin, rate, comparator, limit)
+        end
+        return Compare(count, comparator, limit)
+    end
 local function RuneCount(positionalParams, namedParams, state, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
         local count, startCooldown, endCooldown = OvaleRunes:RuneCount(atTime)
@@ -1753,16 +1761,17 @@ local function TimeToRunes(positionalParams, namedParams, state, atTime)
     OvaleCondition:RegisterCondition("rune", false, Rune)
     OvaleCondition:RegisterCondition("runecount", false, RuneCount)
     OvaleCondition:RegisterCondition("timetorunes", false, TimeToRunes)
+    OvaleCondition:RegisterCondition("runedeficit", false, RuneDeficit)
 end
 do
 local function Snapshot(statName, defaultValue, positionalParams, namedParams, state, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
-        local value = OvalePaperDoll[statName] or defaultValue
+        local value = OvalePaperDoll:GetState(atTime)[statName] or defaultValue
         return Compare(value, comparator, limit)
     end
 local function SnapshotCritChance(statName, defaultValue, positionalParams, namedParams, state, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
-        local value = OvalePaperDoll[statName] or defaultValue
+        local value = OvalePaperDoll:GetState(atTime)[statName] or defaultValue
         if namedParams.unlimited ~= 1 and value > 100 then
             value = 100
         end
@@ -1807,9 +1816,6 @@ local function SpellCastSpeedPercent(positionalParams, namedParams, state, atTim
 local function Spellpower(positionalParams, namedParams, state, atTime)
         return Snapshot("spellPower", 0, positionalParams, namedParams, state, atTime)
     end
-local function Spirit(positionalParams, namedParams, state, atTime)
-        return Snapshot("spirit", 0, positionalParams, namedParams, state, atTime)
-    end
 local function Stamina(positionalParams, namedParams, state, atTime)
         return Snapshot("stamina", 0, positionalParams, namedParams, state, atTime)
     end
@@ -1836,7 +1842,6 @@ local function VersatilityRating(positionalParams, namedParams, state, atTime)
     OvaleCondition:RegisterCondition("spellcritchance", false, SpellCritChance)
     OvaleCondition:RegisterCondition("spellcastspeedpercent", false, SpellCastSpeedPercent)
     OvaleCondition:RegisterCondition("spellpower", false, Spellpower)
-    OvaleCondition:RegisterCondition("spirit", false, Spirit)
     OvaleCondition:RegisterCondition("stamina", false, Stamina)
     OvaleCondition:RegisterCondition("strength", false, Strength)
     OvaleCondition:RegisterCondition("versatility", false, Versatility)
@@ -1901,7 +1906,7 @@ local function SpellCooldown(positionalParams, namedParams, state, atTime)
         local target = ParseCondition(positionalParams, namedParams, state, "target")
         local earliest = INFINITY
         for i, spellId in ipairs(positionalParams) do
-            if OvaleCondition.COMPARATOR[spellId] then
+            if isComparator(spellId) then
                 comparator, limit = spellId, positionalParams[i + 1]
                 break
             elseif  not usable or OvaleSpells:IsUsableSpell(spellId, atTime, OvaleGUID:UnitGUID(target)) then
@@ -2028,8 +2033,14 @@ local function StaggerRemaining(positionalParams, namedParams, state, atTime)
         end
         return Compare(0, comparator, limit)
     end
+local function StaggerTick(positionalParams, namedParams, state, atTime)
+        local count, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[2]
+        local damage = OvaleStagger:LastTickDamage(count)
+        return Compare(damage, comparator, limit)
+    end
     OvaleCondition:RegisterCondition("staggerremaining", false, StaggerRemaining)
     OvaleCondition:RegisterCondition("staggerremains", false, StaggerRemaining)
+    OvaleCondition:RegisterCondition("staggertick", false, StaggerTick)
 end
 do
 local function Stance(positionalParams, namedParams, state, atTime)
@@ -2042,7 +2053,7 @@ end
 do
 local function Stealthed(positionalParams, namedParams, state, atTime)
         local yesno = positionalParams[1]
-        local boolean = OvaleAura:GetAura("player", "stealthed_buff") ~= nil or IsStealthed()
+        local boolean = OvaleAura:GetAura("player", "stealthed_buff", atTime, "HELPFUL") ~= nil or IsStealthed()
         return TestBoolean(boolean, yesno)
     end
     OvaleCondition:RegisterCondition("isstealthed", false, Stealthed)
@@ -2503,7 +2514,7 @@ end
 do
 local function TimeToShard(positionalParams, namedParams, state, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
-        local value = OvaleWarlock:TimeToShard()
+        local value = OvaleWarlock:TimeToShard(atTime)
         return Compare(value, comparator, limit)
     end
     OvaleCondition:RegisterCondition("timetoshard", false, TimeToShard)

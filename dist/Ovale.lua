@@ -8,7 +8,6 @@ local NewAddon = __tsaddon.NewAddon
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local ipairs = ipairs
 local pairs = pairs
-local select = select
 local strjoin = strjoin
 local tostring = tostring
 local tostringall = tostringall
@@ -21,7 +20,7 @@ local UnitClass = UnitClass
 local UnitGUID = UnitGUID
 local DEFAULT_CHAT_FRAME = DEFAULT_CHAT_FRAME
 local huge = math.huge
-local self_oneTimeMessage = {}
+__exports.oneTimeMessages = {}
 local MAX_REFRESH_INTERVALS = 500
 local self_refreshIntervals = {}
 local self_refreshIndex = 1
@@ -42,7 +41,7 @@ end
 local OvaleBase = NewAddon("Ovale", aceEvent)
 local OvaleClass = __class(OvaleBase, {
     constructor = function(self)
-        self.playerClass = select(2, UnitClass("player"))
+        self.playerClass = nil
         self.playerGUID = nil
         self.db = nil
         self.refreshNeeded = {}
@@ -58,6 +57,8 @@ local OvaleClass = __class(OvaleBase, {
     end,
     OnInitialize = function(self)
         self.playerGUID = UnitGUID("player")
+        local _, classId = UnitClass("player")
+        self.playerClass = classId
         wipe(self_refreshIntervals)
         self_refreshIndex = 1
         self:ClearOneTimeMessages()
@@ -92,18 +93,18 @@ local OvaleClass = __class(OvaleBase, {
     end,
     OneTimeMessage = function(self, ...)
         local s = __exports.MakeString(...)
-        if  not self_oneTimeMessage[s] then
-            self_oneTimeMessage[s] = true
+        if  not __exports.oneTimeMessages[s] then
+            __exports.oneTimeMessages[s] = true
         end
     end,
     ClearOneTimeMessages = function(self)
-        wipe(self_oneTimeMessage)
+        wipe(__exports.oneTimeMessages)
     end,
     PrintOneTimeMessages = function(self)
-        for s in pairs(self_oneTimeMessage) do
-            if self_oneTimeMessage[s] ~= "printed" then
+        for s in pairs(__exports.oneTimeMessages) do
+            if __exports.oneTimeMessages[s] ~= "printed" then
                 self:Print(s)
-                self_oneTimeMessage[s] = "printed"
+                __exports.oneTimeMessages[s] = "printed"
             end
         end
     end,

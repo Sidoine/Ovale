@@ -2,10 +2,11 @@ import { OvaleProfiler } from "./Profiler";
 import { Ovale } from "./Ovale";
 import { OvaleDebug } from "./Debug";
 import aceEvent from "@wowts/ace_event-3.0";
-import { pairs, select,  type, unpack, wipe, lualength, LuaArray, ipairs } from "@wowts/lua";
+import { pairs, wipe, lualength, LuaArray, ipairs, kpairs, LuaObj } from "@wowts/lua";
 import { sub } from "@wowts/string";
 import { GetInventoryItemID, GetInventoryItemLink, GetItemStats, GetItemInfoInstant, GetInventorySlotInfo, INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED } from "@wowts/wow-mock";
 import { concat, insert } from "@wowts/table";
+import { isNumber } from "./tools";
 
 let strsub = sub;
 let tinsert = insert;
@@ -36,25 +37,31 @@ let OVALE_SLOTID_BY_SLOTNAME = {
     // RangedSlot: 18, no longer used
     TabardSlot: 19
 }
-let OVALE_SLOTNAME_BY_SLOTID: LuaArray<string> = {}
-let OVALE_ONE_HANDED_WEAPON = {
+export type SlotName = keyof typeof OVALE_SLOTID_BY_SLOTNAME;
+let OVALE_SLOTNAME_BY_SLOTID: LuaArray<SlotName> = {}
+
+type WeaponType =  "INVTYPE_WEAPON" | "INVTYPE_WEAPONOFFHAND" | "INVTYPE_WEAPONMAINHAND" | 'INVTYPE_2HWEAPON' 
+    | "INVTYPE_SHIELD" |  "INVTYPE_RANGEDRIGHT" | "INVTYPE_RANGED";
+type WeaponMap = {[key in WeaponType]?: boolean};
+
+let OVALE_ONE_HANDED_WEAPON: WeaponMap = {
     INVTYPE_WEAPON: true,
     INVTYPE_WEAPONOFFHAND: true,
-    INVTYPE_WEAPONMAINHAND: true
-}
-let OVALE_RANGED_WEAPON = {
+    INVTYPE_WEAPONMAINHAND: true,
+};
+
+let OVALE_RANGED_WEAPON:WeaponMap = {
     INVTYPE_RANGEDRIGHT: true,
     INVTYPE_RANGED: true
 }
-let result = {}
-let count = 0;
+
 class OvaleEquipmentClass extends OvaleEquipmentBase {
     ready = false;
-    equippedItemById = {}
-    equippedItemBySlot = {}
+    equippedItemById: LuaArray<number> = {}
+    equippedItemBySlot: LuaObj<number> = {}
     // equippedItemLevels = {}
-    mainHandItemType = undefined;
-    offHandItemType = undefined;
+    mainHandItemType: WeaponType = undefined;
+    offHandItemType: WeaponType = undefined;
     mainHandDPS = 0
     offHandDPS = 0
     armorSetCount = {}
@@ -86,7 +93,7 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
         for (const [k, v] of pairs(this.debugOptions)) {
             OvaleDebug.options.args[k] = v;
         }
-        for (const [slotName, ] of pairs(OVALE_SLOTID_BY_SLOTNAME)) {
+        for (const [slotName, ] of kpairs(OVALE_SLOTID_BY_SLOTNAME)) {
             let [invSlotId] = GetInventorySlotInfo(slotName)
             OVALE_SLOTID_BY_SLOTNAME[slotName] = invSlotId; // Should already match but in case Blizzard ever changes the slotIds
             OVALE_SLOTNAME_BY_SLOTID[invSlotId] = slotName;
@@ -106,7 +113,7 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
         this.UnregisterEvent("PLAYER_EQUIPMENT_CHANGED");
     }
     
-    PLAYER_EQUIPMENT_CHANGED(event, slotId, hasItem) {
+    PLAYER_EQUIPMENT_CHANGED(event: string, slotId: number, hasItem: number) {
         this.StartProfiling("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED");
         let changed = this.UpdateItemBySlot(slotId)
         if (changed) {
@@ -118,7 +125,7 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
         this.StopProfiling("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED");
     }
     // Armor sets are retiring after Legion; for now, return 0
-    GetArmorSetCount(name) {
+    GetArmorSetCount(name: string) {
         /*
         let count = this.armorSetCount[name];
         if (!count) {
@@ -131,7 +138,7 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
         */
         return 0;
     }
-    GetEquippedItemBySlotName(slotName):number {
+    GetEquippedItemBySlotName(slotName: SlotName):number {
         if (slotName) {
             let slotId = OVALE_SLOTID_BY_SLOTNAME[slotName];
             if (slotId != undefined) {
@@ -165,10 +172,10 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
     GetEquippedTrinkets() {
         return [this.equippedItemBySlot[OVALE_SLOTID_BY_SLOTNAME["Trinket0Slot"]], this.equippedItemBySlot[OVALE_SLOTID_BY_SLOTNAME["Trinket1Slot"]]];
     }
-    HasEquippedItem(itemId) {
-        return this.equippedItemById[itemId];
+    HasEquippedItem(itemId: number) {
+        return this.equippedItemById[itemId] && true || false;
     } 
-    HasMainHandWeapon(handedness?) {
+    HasMainHandWeapon(handedness?: number) {
         if (handedness) {
             if (handedness == 1) {
                 return OVALE_ONE_HANDED_WEAPON[this.mainHandItemType];
@@ -180,7 +187,7 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
         }
         return false;
     } 
-    HasOffHandWeapon(handedness?) {
+    HasOffHandWeapon(handedness?: number) {
         if (handedness) {
             if (handedness == 1) {
                 return OVALE_ONE_HANDED_WEAPON[this.offHandItemType];
@@ -198,14 +205,14 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
     HasRangedWeapon() {
         return OVALE_RANGED_WEAPON[this.mainHandItemType];
     }
-    HasTrinket(itemId) {
+    HasTrinket(itemId: number) {
         return this.HasEquippedItem(itemId);
     }
     HasTwoHandedWeapon() {
         return this.mainHandItemType == "INVTYPE_2HWEAPON" || this.offHandItemType == "INVTYPE_2HWEAPON";
     } 
-    HasOneHandedWeapon(slotId?) {
-        if (slotId && type(slotId) != "number") {
+    HasOneHandedWeapon(slotId?: number | SlotName) {
+        if (slotId && !isNumber(slotId)) {
             slotId = OVALE_SLOTID_BY_SLOTNAME[slotId];
         }
         if (slotId) {
@@ -256,7 +263,7 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
         }
         return false;
     }
-    UpdateWeapons(slotId: number, itemId: number): [string, number] {
+    UpdateWeapons(slotId: number, itemId: number): [WeaponType, number] {
         let [ , , , itemEquipLoc] = GetItemInfoInstant(itemId);
         let dps = 0;
         let itemLink = GetInventoryItemLink("player", slotId);
@@ -266,7 +273,7 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
                 dps = stats["ITEM_MOD_DAMAGE_PER_SECOND_SHORT"];
             }
         }
-        return [itemEquipLoc, dps]
+        return [<WeaponType>itemEquipLoc, dps]
     }
     UpdateEquippedItems() {
         this.StartProfiling("OvaleEquipment_UpdateEquippedItems");

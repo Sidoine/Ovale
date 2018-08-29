@@ -21,7 +21,7 @@ interface Rune {
     endCooldown?: number;
 }
 
-const IsActiveRune = function(rune: Rune, atTime) {
+const IsActiveRune = function(rune: Rune, atTime: number) {
     return (rune.startCooldown == 0 || rune.endCooldown <= atTime);
 }
 
@@ -30,7 +30,7 @@ class RuneData {
     runicpower:number = undefined;
 }
 
-let usedRune = {}
+let usedRune: LuaArray<number> = {}
 
 let OvaleRunesBase = OvaleState.RegisterHasState(OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleRunes", aceEvent))), RuneData);
 
@@ -57,21 +57,21 @@ class OvaleRunesClass extends OvaleRunesBase {
             this.current.rune = {}
         }
     }
-    RUNE_POWER_UPDATE(event, slot, usable) {
+    RUNE_POWER_UPDATE(event: string, slot: number, usable: boolean) {
         this.Debug(event, slot, usable);
         this.UpdateRune(slot);
     }
-    RUNE_TYPE_UPDATE(event, slot) {
+    RUNE_TYPE_UPDATE(event: string, slot: number) {
         this.Debug(event, slot);
         this.UpdateRune(slot);
     }
-    UNIT_RANGEDDAMAGE(event, unitId) {
+    UNIT_RANGEDDAMAGE(event: string, unitId: string) {
         if (unitId == "player") {
             this.Debug(event);
             this.UpdateAllRunes();
         }
     }
-    UpdateRune(slot) {
+    UpdateRune(slot: number) {
         this.StartProfiling("OvaleRunes_UpdateRune");
         let rune = this.current.rune[slot];
         let [start, duration] = GetRuneCooldown(slot);
@@ -127,14 +127,14 @@ class OvaleRunesClass extends OvaleRunesBase {
             this.next.rune[slot] = undefined;
         }
     }
-    ApplySpellStartCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast: SpellCast) {
+    ApplySpellStartCast(spellId: number, targetGUID: string, startCast: number, endCast: number, isChanneled: boolean, spellcast: SpellCast) {
         OvaleRunes.StartProfiling("OvaleRunes_ApplySpellStartCast");
         if (isChanneled) {
             this.ApplyRuneCost(spellId, startCast, spellcast);
         }
         OvaleRunes.StopProfiling("OvaleRunes_ApplySpellStartCast");
     }
-    ApplySpellAfterCast(spellId, targetGUID, startCast, endCast, isChanneled, spellcast: SpellCast) {
+    ApplySpellAfterCast(spellId: number, targetGUID: string, startCast: number, endCast: number, isChanneled: boolean, spellcast: SpellCast) {
         OvaleRunes.StartProfiling("OvaleRunes_ApplySpellAfterCast");
         if (!isChanneled) {
             this.ApplyRuneCost(spellId, endCast, spellcast);
@@ -147,7 +147,7 @@ class OvaleRunesClass extends OvaleRunesBase {
         OvaleRunes.StopProfiling("OvaleRunes_ApplySpellAfterCast");
     }
 
-    ApplyRuneCost(spellId, atTime, spellcast: SpellCast) {
+    ApplyRuneCost(spellId: number, atTime: number, spellcast: SpellCast) {
         let si = OvaleData.spellInfo[spellId];
         if (si) {
             let count = si.runes || 0;
@@ -157,7 +157,7 @@ class OvaleRunesClass extends OvaleRunesBase {
             }
         }
     }
-    ReactivateRune(slot, atTime) {
+    ReactivateRune(slot: number, atTime: number) {
         let rune = this.next.rune[slot];
         if (rune.startCooldown > atTime) {
             rune.startCooldown = atTime;
@@ -209,6 +209,25 @@ class OvaleRunesClass extends OvaleRunesBase {
         this.StopProfiling("OvaleRunes_state_RuneCount");
         return [count, startCooldown, endCooldown];
     }
+
+    RuneDeficit(atTime?: number) {
+        this.StartProfiling("OvaleRunes_state_RuneDeficit");
+        const state = this.GetState(atTime);
+        let count = 0;
+        let [startCooldown, endCooldown] = [huge, huge];
+        for (let slot = 1; slot <= RUNE_SLOTS; slot += 1) {
+            let rune = state.rune[slot];
+            if (!IsActiveRune(rune, atTime)) {
+                count = count + 1;
+                if (rune.endCooldown < endCooldown) {
+                   [startCooldown, endCooldown] = [rune.startCooldown, rune.endCooldown];
+                }
+            }
+        }
+        this.StopProfiling("OvaleRunes_state_RuneDeficit");
+        return [count, startCooldown, endCooldown];
+    }
+
     GetRunesCooldown(atTime: number, runes: number) {
         if (runes <= 0) {
             return 0;

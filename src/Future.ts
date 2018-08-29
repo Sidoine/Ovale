@@ -4,11 +4,11 @@ import { Ovale } from "./Ovale";
 import { OvaleAura } from "./Aura";
 import { OvaleData } from "./Data";
 import { OvaleGUID } from "./GUID";
-import { OvalePaperDoll } from "./PaperDoll";
+import { OvalePaperDoll, HasteType } from "./PaperDoll";
 import { OvaleSpellBook } from "./SpellBook";
 import { lastSpell, SpellCast, self_pool } from "./LastSpell";
 import aceEvent from "@wowts/ace_event-3.0";
-import { ipairs, pairs, type, lualength, LuaObj, LuaArray, wipe } from "@wowts/lua";
+import { ipairs, pairs, type, lualength, LuaObj, LuaArray, wipe, kpairs } from "@wowts/lua";
 import { sub } from "@wowts/string";
 import { insert, remove } from "@wowts/table";
 import { GetSpellInfo, GetTime, UnitCastingInfo, UnitChannelInfo, UnitExists, UnitGUID, UnitName, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
@@ -56,7 +56,7 @@ let CLEU_SPELLCAST_EVENT: LuaObj<boolean> = {
         CLEU_SPELLCAST_EVENT[cleuEvent] = true;
     }
 }
-let SPELLCAST_AURA_ORDER: LuaArray<string> = {
+let SPELLCAST_AURA_ORDER: LuaArray<"target" | "pet"> = {
     1: "target",
     2: "pet"
 };
@@ -588,9 +588,10 @@ export class OvaleFutureClass extends OvaleFutureBase {
             this.StopProfiling("OvaleFuture_UnitSpellcastEnded");
         }
     }
-    GetSpellcast(spell: string, spellId: number, lineId: number | undefined | string, atTime: number):[SpellCast, number] {
+    GetSpellcast(spell: string, spellId: number, lineId: number | undefined | string, atTime: number):[SpellCast | undefined, number] {
         this.StartProfiling("OvaleFuture_GetSpellcast");
-        let spellcast: SpellCast, index: number;
+        let spellcast: SpellCast | undefined = undefined;
+        let index: number = 0;
         if (!lineId || lineId != "") {
             for (const [i, sc] of ipairs(lastSpell.queue)) {
                 if (!lineId || sc.lineId == lineId) {
@@ -620,14 +621,14 @@ export class OvaleFutureClass extends OvaleFutureBase {
         this.StopProfiling("OvaleFuture_GetSpellcast");
         return [spellcast, index];
     }
-    GetAuraFinish(spell: string, spellId: number, targetGUID: string, atTime: number): [number, string] {
+    GetAuraFinish(spell: string, spellId: number, targetGUID: string, atTime: number): [string|number, string] {
         this.StartProfiling("OvaleFuture_GetAuraFinish");
         let auraId, auraGUID;
         let si = OvaleData.spellInfo[spellId];
         if (si && si.aura) {
             for (const [, unitId] of ipairs(SPELLCAST_AURA_ORDER)) {
-                for (const [, auraList] of pairs(si.aura[unitId])) {
-                    for (const [id, spellData] of pairs(auraList)) {
+                for (const [, auraList] of kpairs(si.aura[unitId])) {
+                    for (const [id, spellData] of kpairs(auraList)) {
                         let [verified, value, ] = OvaleData.CheckSpellAuraData(id, spellData, atTime, targetGUID);
                         if (verified && (SPELLAURALIST_AURA_VALUE[<string>value] || type(value) == "number" && value > 0)) {
                             auraId = id;
@@ -666,7 +667,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
         let damageMultiplier = 1;
         let si = OvaleData.spellInfo[spellId];
         if (si && si.aura && si.aura.damage) {
-            for (const [filter, auraList] of pairs(si.aura.damage)) {
+            for (const [filter, auraList] of kpairs(si.aura.damage)) {
                 for (const [auraId, spellData] of pairs(auraList)) {
                     let index, multiplier: number;
                     let verified;
@@ -716,14 +717,14 @@ export class OvaleFutureClass extends OvaleFutureBase {
         this.current.lastCastTime[spellcast.spellId] = atTime;
         if (spellcast.offgcd) {
             this.Debug("    Caching spell %s (%d) as most recent off-GCD spellcast.", spellcast.spellName, spellcast.spellId);
-            for (const [k, v] of pairs(spellcast)) {
+            for (const [k, v] of kpairs(spellcast)) {
                 this.current.lastOffGCDSpellcast[k] = v;
             }
             lastSpell.lastSpellcast = this.current.lastOffGCDSpellcast;
             this.next.lastOffGCDSpellcast = this.current.lastOffGCDSpellcast
         } else {
             this.Debug("    Caching spell %s (%d) as most recent GCD spellcast.", spellcast.spellName, spellcast.spellId);
-            for (const [k, v] of pairs(spellcast)) {
+            for (const [k, v] of kpairs(spellcast)) {
                 lastSpell.lastGCDSpellcast[k] = v;
             }
             lastSpell.lastSpellcast = lastSpell.lastGCDSpellcast;
@@ -784,9 +785,9 @@ export class OvaleFutureClass extends OvaleFutureBase {
             }
         }
         targetGUID = targetGUID || OvaleGUID.UnitGUID(baseState.next.defaultTarget);
-        let gcd = spellId && <number>OvaleData.GetSpellInfoProperty(spellId, atTime, "gcd", targetGUID);
+        let gcd = spellId && OvaleData.GetSpellInfoProperty(spellId, atTime, "gcd", targetGUID);
         if (!gcd) {
-            let haste;
+            let haste: HasteType;
             [gcd, haste] = OvaleCooldown.GetBaseGCD();
             if (Ovale.playerClass == "MONK" && OvalePaperDoll.IsSpecialization("mistweaver")) {
                 gcd = 1.5;
@@ -794,7 +795,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
             } else if (Ovale.playerClass == "DRUID") {
                 if (OvaleStance.IsStance("druid_cat_form", atTime)) {
                     gcd = 1.0;
-                    haste = false;
+                    haste = "none";
                 }
             }
             let gcdHaste = spellId && OvaleData.GetSpellInfoProperty(spellId, atTime, "gcd_haste", targetGUID);

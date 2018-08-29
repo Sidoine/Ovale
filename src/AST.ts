@@ -9,11 +9,12 @@ import { OvaleLexer, LexerFilter } from "./Lexer";
 import { OvaleScripts } from "./Scripts";
 import { OvaleSpellBook } from "./SpellBook";
 import { OvaleStance } from "./Stance";
-import { LuaArray, LuaObj, ipairs, next, pairs, tonumber, tostring, type, wipe, lualength } from "@wowts/lua";
+import { LuaArray, LuaObj, ipairs, next, pairs, tonumber, tostring, type, wipe, lualength, kpairs } from "@wowts/lua";
 import { format, gsub, lower, sub } from "@wowts/string";
 import { concat, insert, sort } from "@wowts/table";
 import { GetItemInfo } from "@wowts/wow-mock";
-import { isLuaArray, isNumber, isString } from "./tools";
+import { isLuaArray, isNumber, isString, checkToken } from "./tools";
+import { SpellInfo } from "./Data";
 
 let OvaleASTBase = OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleAST")));
 
@@ -40,7 +41,7 @@ let DECLARATION_KEYWORD: LuaObj<boolean> = {
     ["SpellList"]: true,
     ["SpellRequire"]: true
 }
-let PARAMETER_KEYWORD: LuaObj<boolean> = {
+export const PARAMETER_KEYWORD = {
     ["checkbox"]: true,
     ["help"]: true,
     ["if_buff"]: true,
@@ -69,7 +70,7 @@ let SPELL_AURA_KEYWORD: LuaObj<boolean> = {
     ["SpellDamageBuff"]: true,
     ["SpellDamageDebuff"]: true
 }
-let STANCE_KEYWORD: LuaObj<boolean> = {
+let STANCE_KEYWORD = {
     ["if_stance"]: true,
     ["stance"]: true,
     ["to_stance"]: true
@@ -229,6 +230,7 @@ export type OperatorType = "not" | "or" | "and" | "-" | "=" | "!=" |
 export interface AstNode {
     child: LuaArray<AstNode>;
     type: NodeType;
+    func: string;
     name: string;
     rune: string;
     includeDeath: boolean;
@@ -255,7 +257,7 @@ export interface AstNode {
     for_next: boolean;
     extra_amount: number;
     comment: string;
-    property: string;
+    property: keyof SpellInfo;
     keyword: string;
     description: AstNode;
     item?: string;
@@ -459,15 +461,74 @@ type Value = SimpleValue | ControlParameters;
 type FlattenListParameters = LuaObj<FlattenParameterValue>;
 type FlattenCheckBoxParameters = LuaArray<FlattenParameterValue>;
 
-export interface NamedParameters extends LuaObj<FlattenParameterValue | FlattenListParameters | FlattenCheckBoxParameters> {
-    nocd?: number;
-    checkbox?: LuaArray<string>;
+export interface ConditionNamedParameters {
+    if_spell?:number;
+    if_equipped?:number;
+    if_stance?:number;
+    level?:number;
+    maxLevel?:number;
+    specialization?:number;
+    talent?:number;
+    trait?:number;
+    pertrait?:number;
+}
+
+export interface ValuedNamedParameters extends ConditionNamedParameters {
     pertrait?: number;
-    listitem?: LuaObj<string>;
+    nocd?: number;
+    flash?: string;
+    help?: string;
+    soundtime?: number;
+    enemies?: number;
+    texture?: string;
+    itemset?: string;
+    itemcount?: number;
+    proc?: string;
+    buff?: string;
+    add_duration?:number;
+    add_cd?:number;
+    addlist?:string;
+    dummy_replace?:string;
+    learn?:number;
+    shared_cd?:number;
+    stance?:number;
+    to_stance?:number;
+    nored?: number;
+    sound?: string;
+    text?: string;
+    mine?: number;
+    offgcd?: number;
+    casttime?: number;
+    pool_resource?: number;
+    size?: string;
+    unlimited?: number;
+    wait? :number;
+    max?: number;
+    extra_amount?: number;
+    type?: string;
+    any?: number;
+    usable?: number;
+}
+
+export interface NamedParameters extends ValuedNamedParameters {
+    // TODO should not be there, see RawNamedParameters
+    target?: string;
+    filter?: string;
+    checkbox?: LuaArray<string | number>;
+    listitem?: LuaObj<string | number>;
 }
 
 export type PositionalParameters = LuaArray<FlattenParameterValue>;
-type RawNamedParameters = LuaObj<Value>;
+
+type BaseRawNamedParameters = {[key in keyof ValuedNamedParameters]: AstNode};
+
+interface RawNamedParameters extends BaseRawNamedParameters {
+    filter: AstNode | string;
+    target: AstNode | string;
+    listitem: LuaObj<AstNode>;
+    checkbox: LuaArray<AstNode>;
+}
+
 type RawPositionalParameters = LuaArray<AstNode>;
 
 type FlattenParameters = LuaArray<string | number>;
@@ -480,7 +541,7 @@ function isAstNode(a: any): a is AstNode {
     return type(a) === "table";
 }
 
-class OvaleASTClass extends OvaleASTBase {
+export class OvaleASTClass extends OvaleASTBase {
     self_indent:number = 0;
     self_outputPool = new OvalePool<LuaArray<string>>("OvaleAST_outputPool");
     self_listPool = new OvalePool<ListParameters>("OvaleAST_listPool");
@@ -496,7 +557,6 @@ class OvaleASTClass extends OvaleASTBase {
     self_postOrderPool = new OvalePool<LuaArray<AstNode>>("OvaleAST_postOrderPool");
     postOrderVisitedPool = new OvalePool<LuaObj<boolean>>("OvaleAST_postOrderVisitedPool");
     self_pool = new SelfPool(this);
-    PARAMETER_KEYWORD = PARAMETER_KEYWORD;
     
     OnInitialize(){
     }
@@ -505,12 +565,12 @@ class OvaleASTClass extends OvaleASTBase {
         done = done || {}
         output = output || {}
         indent = indent || '';
-        for (const [key, value] of pairs(node)) {
-            if (type(value) == "table") {
-                if (done[value]) {
+        for (const [key, value] of kpairs(node)) {
+            if (isAstNode(value)) {
+                if (done[value.nodeId]) {
                     insert(output, `${indent}[${ tostring(key)}] => (self_reference)`);
                 } else {
-                    done[value] = true;
+                    done[value.nodeId] = true;
                     if (value.type) {
                         insert(output, `${indent}[${tostring(key)}] =>`);
                     } else {
@@ -800,7 +860,7 @@ class OvaleASTClass extends OvaleASTBase {
     }
     UnparseParameters(positionalParams: RawPositionalParameters, namedParams: RawNamedParameters) {
         let output = this.self_outputPool.Get();
-        for (const [k, v] of pairs(namedParams)) {
+        for (const [k, v] of kpairs(namedParams)) {
             if (isListItemParameter(k, v)) {
                 for (const [list, item] of pairs(v)) {
                     output[lualength(output) + 1] = format("listitem=%s:%s", list, this.Unparse(item));
@@ -917,7 +977,7 @@ class OvaleASTClass extends OvaleASTBase {
     }
 
     SyntaxError(tokenStream: OvaleLexer , ...__args: any[]) {
-        this.Print(...__args);
+        this.Warning(...__args);
         let context: LuaArray<string> = {
             1: "Next tokens:"
         }
@@ -930,7 +990,7 @@ class OvaleASTClass extends OvaleASTBase {
                 break;
             }
         }
-        this.Print(concat(context, " "));
+        this.Warning(concat(context, " "));
     }
 
     Parse(nodeType: string, tokenStream: OvaleLexer, nodeList: LuaArray<AstNode>, annotation: AstAnnotation) {
@@ -1241,8 +1301,7 @@ class OvaleASTClass extends OvaleASTBase {
             node.type = "define";
             node.name = name;
             node.value = value;
-            annotation.definition = annotation.definition || {
-            }
+            annotation.definition = annotation.definition || {}
             annotation.definition[name] = value;
         }
         return [ok, node];
@@ -1363,7 +1422,7 @@ class OvaleASTClass extends OvaleASTBase {
                 ok = false;
             }
         }
-        let positionalParams: RawPositionalParameters, namedParams: RawNamedParameters; // LuaObj<LuaArray<AstNode>>;
+        let positionalParams: RawPositionalParameters, namedParams: RawNamedParameters;
         if (ok) {
             [ok, positionalParams, namedParams] = this.ParseParameters(tokenStream, nodeList, annotation);
         }
@@ -1418,8 +1477,7 @@ class OvaleASTClass extends OvaleASTBase {
             } else if (STRING_LOOKUP_FUNCTION[name]) {
                 node.type = "function";
                 node.func = name;
-                annotation.stringReference = annotation.stringReference || {
-                }
+                annotation.stringReference = annotation.stringReference || {}
                 annotation.stringReference[lualength(annotation.stringReference) + 1] = node;
             } else if (OvaleCondition.IsCondition(lowername)) {
                 node.type = "function";
@@ -1664,15 +1722,13 @@ class OvaleASTClass extends OvaleASTBase {
             node.type = "item_require";
             node.itemId = tonumber(itemId);
             node.name = name;
-            node.property = property;
+            node.property = property as keyof SpellInfo;
             node.rawPositionalParams = positionalParams;
             node.rawNamedParams = namedParams;
-            annotation.parametersReference = annotation.parametersReference || {
-            }
+            annotation.parametersReference = annotation.parametersReference || {}
             annotation.parametersReference[lualength(annotation.parametersReference) + 1] = node;
             if (name) {
-                annotation.nameReference = annotation.nameReference || {
-                }
+                annotation.nameReference = annotation.nameReference || {}
                 annotation.nameReference[lualength(annotation.nameReference) + 1] = node;
             }
         }
@@ -1810,7 +1866,7 @@ class OvaleASTClass extends OvaleASTBase {
                     if (ok && isStringNode(node)) {
                         name = node.value;
                     }
-                } else if (PARAMETER_KEYWORD[token]) {
+                } else if (checkToken(PARAMETER_KEYWORD, token)) {
                     if (isList) {
                         this.SyntaxError(tokenStream, "Syntax error: unexpected keyword '%s' when parsing PARAMETERS; simple expression expected.", token);
                         ok = false;
@@ -1828,8 +1884,10 @@ class OvaleASTClass extends OvaleASTBase {
                     if (tokenType == "=") {
                         // Consume the '=' token.
                         tokenStream.Consume();
-                        const np = namedParams[name];
-                        if (isListItemParameter(name, np)) {
+                        const parameterName = name as keyof RawNamedParameters;
+                        //if (isListItemParameter(name, np)) {
+                        if (parameterName === "listitem") {
+                            const np = namedParams[parameterName];
                             //  Consume the list name.
                             let control = np || this.self_listPool.Get();
                             [tokenType, token] = tokenStream.Consume();
@@ -1861,14 +1919,15 @@ class OvaleASTClass extends OvaleASTBase {
                             if (ok) {
                                 control[list] = node;
                             }
-                            if (!namedParams[name]) {
-                                namedParams[name] = control;
+                            if (!namedParams[parameterName]) {
+                                namedParams[parameterName] = control;
                                 annotation.listList = annotation.listList || {};
                                 annotation.listList[lualength(annotation.listList) + 1] = control;
                             }
                         }
-                        else if (isCheckBoxParameter(name, np)) {
+                        else if (name === "checkbox") {
                             // Get the checkbox name.
+                            const np = namedParams[name];
                             let control = np || this.self_checkboxPool.Get();
                             [ok, node] = this.ParseSimpleParameterValue(tokenStream, nodeList, annotation);
                             if (ok && node) {
@@ -1889,7 +1948,7 @@ class OvaleASTClass extends OvaleASTBase {
                         }                            
                         else {
                             [ok, node] = this.ParseParameterValue(tokenStream, nodeList, annotation);
-                            namedParams[name] = node;
+                            namedParams[parameterName] = node;
                         }
                     } else {
                         positionalParams[lualength(positionalParams) + 1] = node;
@@ -2237,7 +2296,9 @@ class OvaleASTClass extends OvaleASTBase {
             node.type = "spell_require";
             node.spellId = tonumber(spellId);
             node.name = name;
-            node.property = property;
+
+            // TODO check all the casts to property names
+            node.property = property as keyof SpellInfo;
             node.rawPositionalParams = positionalParams;
             node.rawNamedParams = namedParams;
             annotation.parametersReference = annotation.parametersReference || {
@@ -2458,7 +2519,7 @@ class OvaleASTClass extends OvaleASTBase {
                 this.self_pool.Release(node);
             }
         }
-        for (const [, value] of pairs(annotation)) {
+        for (const [, value] of kpairs(annotation)) {
             if (type(value) == "table") {
                 wipe(value);
             }
@@ -2472,7 +2533,7 @@ class OvaleASTClass extends OvaleASTBase {
         }
         this.self_pool.Release(ast);
     }
-    ParseCode(nodeType: string, code: string, nodeList: LuaArray<AstNode>, annotation: AstAnnotation): [AstNode, LuaArray<AstNode>, any] {
+    ParseCode(nodeType: string, code: string, nodeList: LuaArray<AstNode>, annotation: AstAnnotation): [AstNode, LuaArray<AstNode>, AstAnnotation] {
         nodeList = nodeList || {}
         annotation = annotation || {}
         let tokenStream = new OvaleLexer("Ovale", code, MATCHES, { comments:  TokenizeComment, space: TokenizeWhitespace });
@@ -2626,12 +2687,13 @@ class OvaleASTClass extends OvaleASTBase {
                     annotation.positionalParametersList[lualength(annotation.positionalParametersList) + 1] = parameters;
                 }
                 if (node.rawNamedParams) {
-                    let parameters: NamedParameters = this.objectPool.Get();
-                    for (let [key, value] of pairs(node.rawNamedParams)) {
-                        if (isListItemParameter(key, value)) {
-                            let control: FlattenListParameters = parameters[key] || this.objectPool.Get();
-                            for (const [list, item] of pairs(value)) {
-                                control[list] = this.FlattenParameterValue(item, annotation);
+                    const parameters: NamedParameters = this.objectPool.Get();
+                    for (const [key] of kpairs(node.rawNamedParams)) {
+                        if (key === "listitem") {
+                            const control: LuaObj<string | number> = parameters[key] || this.objectPool.Get();
+                            const listItems = node.rawNamedParams[key];
+                            for (const [list, item] of pairs(listItems)) {
+                                control[list] = this.FlattenParameterValueNotCsv(item, annotation);
                             }
                             if (!parameters[key]) {
                                 parameters[key] = control;
@@ -2639,10 +2701,11 @@ class OvaleASTClass extends OvaleASTBase {
                                 annotation.objects[lualength(annotation.objects) + 1] = control;
                             }
                         }
-                        else if (isCheckBoxParameter(key, value)) {
-                            let control: FlattenCheckBoxParameters = parameters[key] || this.objectPool.Get();
-                            for (const [i, name] of ipairs(value)) {
-                                control[i] = this.FlattenParameterValue(name, annotation);
+                        else if (key === "checkbox") {
+                            let control: LuaObj<number | string> = parameters[key] || this.objectPool.Get();
+                            const checkBoxItems = node.rawNamedParams[key];
+                            for (const [i, name] of ipairs(checkBoxItems)) {
+                                control[i] = this.FlattenParameterValueNotCsv(name, annotation);
                             }
                             if (!parameters[key]) {
                                 parameters[key] = control;
@@ -2650,10 +2713,14 @@ class OvaleASTClass extends OvaleASTBase {
                                 annotation.objects[lualength(annotation.objects) + 1] = control;
                             }
                         }  else  {
+                            const value = node.rawNamedParams[key];
+                            const flattenValue = this.FlattenParameterValue(value, annotation);
                             if (type(key) != "number" && dictionary && dictionary[key]) {
-                                key = dictionary[key];
+                                parameters[dictionary[key] as keyof NamedParameters] = flattenValue;
+                            } else {
+                                // TODO delete named parameters that are not single values
+                                parameters[key] = flattenValue as (number | string);
                             }
-                            parameters[key] = this.FlattenParameterValue(value, annotation);
                         }
                     }
                     node.namedParams = parameters;
@@ -2661,7 +2728,7 @@ class OvaleASTClass extends OvaleASTBase {
                     annotation.parametersList[lualength(annotation.parametersList) + 1] = parameters;
                 }
                 let output = this.self_outputPool.Get();
-                for (const [k, v] of pairs(node.namedParams)) {
+                for (const [k, v] of kpairs(node.namedParams)) {
                     if (isCheckBoxFlattenParameters(k, v)) {
                         for (const [, name] of ipairs(v)) {
                             output[lualength(output) + 1] = format("checkbox=%s", name);
@@ -2715,7 +2782,7 @@ class OvaleASTClass extends OvaleASTBase {
         if (annotation && annotation.verify && annotation.parametersReference) {
             for (const [, node] of ipairs(annotation.parametersReference)) {
                 if (node.rawNamedParams) {
-                    for (const [stanceKeyword] of pairs(STANCE_KEYWORD)) {
+                    for (const [stanceKeyword] of kpairs(STANCE_KEYWORD)) {
                         let valueNode = <AstNode> node.rawNamedParams[stanceKeyword];
                         if (valueNode) {
                             if (isCsvNode(valueNode)) {

@@ -36,7 +36,7 @@ class OvaleDemonHunterDemonicClass extends OvaleDemonHunterDemonicBase {
     OnDisable() {
         this.UnregisterMessage("COMBAT_LOG_EVENT_UNFILTERED");
     }
-    Ovale_TalentsChanged(event) {
+    Ovale_TalentsChanged(event: string) {
         this.isHavoc = this.isDemonHunter && GetSpecializationInfo(GetSpecialization()) == HAVOC_SPEC_ID && true || false;
         this.hasDemonic = this.isHavoc && select(10, GetTalentInfoByID(HAVOC_DEMONIC_TALENT_ID, HAVOC_SPEC_ID)) && true || false;
         if (this.isHavoc && this.hasDemonic) {

@@ -11,13 +11,12 @@ export class OvalePoolGC {
     }
     Get() {
         this.size = this.size + 1;
-        return {
-        };
+        return {};
     }
-    Release(item) {
+    Release(item: any) {
         this.Clean(item);
     }
-    Clean(item) {
+    Clean(item: any) {
     }
     Drain() {
         this.size = 0;

@@ -28,6 +28,7 @@ local tonumber = tonumber
 local tostring = tostring
 local type = type
 local wipe = wipe
+local kpairs = pairs
 local format = string.format
 local gsub = string.gsub
 local lower = string.lower
@@ -40,6 +41,7 @@ local __tools = LibStub:GetLibrary("ovale/tools")
 local isLuaArray = __tools.isLuaArray
 local isNumber = __tools.isNumber
 local isString = __tools.isString
+local checkToken = __tools.checkToken
 local OvaleASTBase = OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvaleAST")))
 local KEYWORD = {
     ["and"] = true,
@@ -64,7 +66,7 @@ local DECLARATION_KEYWORD = {
     ["SpellList"] = true,
     ["SpellRequire"] = true
 }
-local PARAMETER_KEYWORD = {
+__exports.PARAMETER_KEYWORD = {
     ["checkbox"] = true,
     ["help"] = true,
     ["if_buff"] = true,
@@ -105,7 +107,7 @@ do
     for keyword, value in pairs(DECLARATION_KEYWORD) do
         KEYWORD[keyword] = value
     end
-    for keyword, value in pairs(PARAMETER_KEYWORD) do
+    for keyword, value in pairs(__exports.PARAMETER_KEYWORD) do
         KEYWORD[keyword] = value
     end
 end
@@ -345,19 +347,19 @@ local SelfPool = __class(OvalePool, {
 local function isAstNode(a)
     return type(a) == "table"
 end
-local OvaleASTClass = __class(OvaleASTBase, {
+__exports.OvaleASTClass = __class(OvaleASTBase, {
     OnInitialize = function(self)
     end,
     print_r = function(self, node, indent, done, output)
         done = done or {}
         output = output or {}
         indent = indent or ""
-        for key, value in pairs(node) do
-            if type(value) == "table" then
-                if done[value] then
+        for key, value in kpairs(node) do
+            if isAstNode(value) then
+                if done[value.nodeId] then
                     insert(output, indent .. "[" .. tostring(key) .. "] => (self_reference)")
                 else
-                    done[value] = true
+                    done[value.nodeId] = true
                     if value.type then
                         insert(output, indent .. "[" .. tostring(key) .. "] =>")
                     else
@@ -473,7 +475,7 @@ local OvaleASTClass = __class(OvaleASTBase, {
     end,
     UnparseParameters = function(self, positionalParams, namedParams)
         local output = self.self_outputPool:Get()
-        for k, v in pairs(namedParams) do
+        for k, v in kpairs(namedParams) do
             if isListItemParameter(k, v) then
                 for list, item in pairs(v) do
                     output[#output + 1] = format("listitem=%s:%s", list, self:Unparse(item))
@@ -498,7 +500,7 @@ local OvaleASTClass = __class(OvaleASTBase, {
         return outputString
     end,
     SyntaxError = function(self, tokenStream, ...)
-        self:Print(...)
+        self:Warning(...)
         local context = {
             [1] = "Next tokens:"
         }
@@ -511,7 +513,7 @@ local OvaleASTClass = __class(OvaleASTBase, {
                 break
             end
         end
-        self:Print(concat(context, " "))
+        self:Warning(concat(context, " "))
     end,
     Parse = function(self, nodeType, tokenStream, nodeList, annotation)
         local visitor = self.PARSE_VISITOR[nodeType]
@@ -553,7 +555,7 @@ local OvaleASTClass = __class(OvaleASTBase, {
                     if ok and __exports.isStringNode(node) then
                         name = node.value
                     end
-                elseif PARAMETER_KEYWORD[token] then
+                elseif checkToken(__exports.PARAMETER_KEYWORD, token) then
                     if isList then
                         self:SyntaxError(tokenStream, "Syntax error: unexpected keyword '%s' when parsing PARAMETERS; simple expression expected.", token)
                         ok = false
@@ -568,8 +570,9 @@ local OvaleASTClass = __class(OvaleASTBase, {
                     tokenType, token = tokenStream:Peek()
                     if tokenType == "=" then
                         tokenStream:Consume()
-                        local np = namedParams[name]
-                        if isListItemParameter(name, np) then
+                        local parameterName = name
+                        if parameterName == "listitem" then
+                            local np = namedParams[parameterName]
                             local control = np or self.self_listPool:Get()
                             tokenType, token = tokenStream:Consume()
                             local list
@@ -598,12 +601,13 @@ local OvaleASTClass = __class(OvaleASTBase, {
                             if ok then
                                 control[list] = node
                             end
-                            if  not namedParams[name] then
-                                namedParams[name] = control
+                            if  not namedParams[parameterName] then
+                                namedParams[parameterName] = control
                                 annotation.listList = annotation.listList or {}
                                 annotation.listList[#annotation.listList + 1] = control
                             end
-                        elseif isCheckBoxParameter(name, np) then
+                        elseif name == "checkbox" then
+                            local np = namedParams[name]
                             local control = np or self.self_checkboxPool:Get()
                             ok, node = self.ParseSimpleParameterValue(tokenStream, nodeList, annotation)
                             if ok and node then
@@ -622,7 +626,7 @@ local OvaleASTClass = __class(OvaleASTBase, {
                             end
                         else
                             ok, node = self.ParseParameterValue(tokenStream, nodeList, annotation)
-                            namedParams[name] = node
+                            namedParams[parameterName] = node
                         end
                     else
                         positionalParams[#positionalParams + 1] = node
@@ -792,7 +796,7 @@ local OvaleASTClass = __class(OvaleASTBase, {
                 self.self_pool:Release(node)
             end
         end
-        for _, value in pairs(annotation) do
+        for _, value in kpairs(annotation) do
             if type(value) == "table" then
                 wipe(value)
             end
@@ -960,21 +964,23 @@ local OvaleASTClass = __class(OvaleASTBase, {
                 end
                 if node.rawNamedParams then
                     local parameters = self.objectPool:Get()
-                    for key, value in pairs(node.rawNamedParams) do
-                        if isListItemParameter(key, value) then
+                    for key in kpairs(node.rawNamedParams) do
+                        if key == "listitem" then
                             local control = parameters[key] or self.objectPool:Get()
-                            for list, item in pairs(value) do
-                                control[list] = self:FlattenParameterValue(item, annotation)
+                            local listItems = node.rawNamedParams[key]
+                            for list, item in pairs(listItems) do
+                                control[list] = self:FlattenParameterValueNotCsv(item, annotation)
                             end
                             if  not parameters[key] then
                                 parameters[key] = control
                                 annotation.objects = annotation.objects or {}
                                 annotation.objects[#annotation.objects + 1] = control
                             end
-                        elseif isCheckBoxParameter(key, value) then
+                        elseif key == "checkbox" then
                             local control = parameters[key] or self.objectPool:Get()
-                            for i, name in ipairs(value) do
-                                control[i] = self:FlattenParameterValue(name, annotation)
+                            local checkBoxItems = node.rawNamedParams[key]
+                            for i, name in ipairs(checkBoxItems) do
+                                control[i] = self:FlattenParameterValueNotCsv(name, annotation)
                             end
                             if  not parameters[key] then
                                 parameters[key] = control
@@ -982,10 +988,13 @@ local OvaleASTClass = __class(OvaleASTBase, {
                                 annotation.objects[#annotation.objects + 1] = control
                             end
                         else
+                            local value = node.rawNamedParams[key]
+                            local flattenValue = self:FlattenParameterValue(value, annotation)
                             if type(key) ~= "number" and dictionary and dictionary[key] then
-                                key = dictionary[key]
+                                parameters[dictionary[key]] = flattenValue
+                            else
+                                parameters[key] = flattenValue
                             end
-                            parameters[key] = self:FlattenParameterValue(value, annotation)
                         end
                     end
                     node.namedParams = parameters
@@ -993,7 +1002,7 @@ local OvaleASTClass = __class(OvaleASTBase, {
                     annotation.parametersList[#annotation.parametersList + 1] = parameters
                 end
                 local output = self.self_outputPool:Get()
-                for k, v in pairs(node.namedParams) do
+                for k, v in kpairs(node.namedParams) do
                     if isCheckBoxFlattenParameters(k, v) then
                         for _, name in ipairs(v) do
                             output[#output + 1] = format("checkbox=%s", name)
@@ -1047,7 +1056,7 @@ local OvaleASTClass = __class(OvaleASTBase, {
         if annotation and annotation.verify and annotation.parametersReference then
             for _, node in ipairs(annotation.parametersReference) do
                 if node.rawNamedParams then
-                    for stanceKeyword in pairs(STANCE_KEYWORD) do
+                    for stanceKeyword in kpairs(STANCE_KEYWORD) do
                         local valueNode = node.rawNamedParams[stanceKeyword]
                         if valueNode then
                             if isCsvNode(valueNode) then
@@ -1162,7 +1171,6 @@ local OvaleASTClass = __class(OvaleASTBase, {
         self.self_postOrderPool = OvalePool("OvaleAST_postOrderPool")
         self.postOrderVisitedPool = OvalePool("OvaleAST_postOrderVisitedPool")
         self.self_pool = SelfPool(self)
-        self.PARAMETER_KEYWORD = PARAMETER_KEYWORD
         self.UnparseAddCheckBox = function(node)
             local s
             if node.rawPositionalParams and next(node.rawPositionalParams) or node.rawNamedParams and next(node.rawNamedParams) then
@@ -2625,4 +2633,4 @@ local OvaleASTClass = __class(OvaleASTBase, {
         }
     end
 })
-__exports.OvaleAST = OvaleASTClass()
+__exports.OvaleAST = __exports.OvaleASTClass()

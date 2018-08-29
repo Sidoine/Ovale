@@ -11,9 +11,10 @@ local __Debug = LibStub:GetLibrary("ovale/Debug")
 local OvaleDebug = __Debug.OvaleDebug
 local BaseStateData = __class(nil, {
     constructor = function(self)
-        self.currentTime = nil
-        self.inCombat = nil
-        self.combatStartTime = nil
+        self.currentTime = 0
+        self.inCombat = false
+        self.combatStartTime = 0
+        self.defaultTarget = "target"
     end
 })
 local BaseStateBase = OvaleDebug:RegisterDebugging(OvaleState:RegisterHasState(Ovale:NewModule("BaseState", aceEvent), BaseStateData))

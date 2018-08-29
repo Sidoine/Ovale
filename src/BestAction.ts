@@ -6,7 +6,7 @@ import { OvaleActionBar } from "./ActionBar";
 import { OvaleCompile } from "./Compile";
 import { OvaleCondition } from "./Condition";
 import { OvaleData } from "./Data";
-import { OvaleEquipment } from "./Equipment";
+import { OvaleEquipment, SlotName } from "./Equipment";
 import { OvaleGUID } from "./GUID";
 import { OvaleSpellBook } from "./SpellBook";
 import { Ovale } from "./Ovale";
@@ -35,6 +35,7 @@ let self_timeSpan: LuaObj<OvaleTimeSpan> = {}
 let self_valuePool = new OvalePool<Element>("OvaleBestAction_valuePool");
 let self_value: LuaObj<Element> = {}
 
+type ActionInfo = [string, boolean, number, number, boolean, string, boolean, boolean, string, string | number, string, number, number];
 
 export interface Element extends AstNode {
     serial?: number;
@@ -50,13 +51,12 @@ export interface Element extends AstNode {
     actionIsCurrent?: boolean;
     actionEnable?: boolean;
     actionType?: string;
-    actionId?: string;
+    actionId?: string | number;
     actionTarget?: string;
-    actionResourceExtend?: string;
+    actionResourceExtend?: number;
     actionCharges?: number;
     castTime?: number;
     offgcd?: boolean;
-    func?: string;
     lua?: string;
 }
 
@@ -101,19 +101,19 @@ function GetTimeSpan(node: AstNode, defaultTimeSpan?: OvaleTimeSpan) {
     return timeSpan;
 }
 
-function GetActionItemInfo(element: Element, state: BaseState, atTime: number, target: string) {
+function GetActionItemInfo(element: Element, state: BaseState, atTime: number, target: string) : ActionInfo {
     OvaleBestAction.StartProfiling("OvaleBestAction_GetActionItemInfo");
     let actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId;
     let itemId = element.positionalParams[1];
     if (!isNumber(itemId)) {
-        itemId = OvaleEquipment.GetEquippedItemBySlotName(itemId);
+        itemId = OvaleEquipment.GetEquippedItemBySlotName(<SlotName>itemId);
     }
     if (!itemId) {
         OvaleBestAction.Log("Unknown item '%s'.", element.positionalParams[1]);
     } else {
         OvaleBestAction.Log("Item ID '%s'", itemId);
         let action = OvaleActionBar.GetForItem(itemId);
-        let spellName = GetItemSpell(itemId);
+        let [spellName] = GetItemSpell(itemId);
         if (element.namedParams.texture) {
             actionTexture = `Interface\\Icons\\${element.namedParams.texture}`;
         }
@@ -129,9 +129,9 @@ function GetActionItemInfo(element: Element, state: BaseState, atTime: number, t
         actionId = itemId;
     }
     OvaleBestAction.StopProfiling("OvaleBestAction_GetActionItemInfo");
-    return [actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target];
+    return [actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target, 0, 0];
 }
-function GetActionMacroInfo(element: Element, state: BaseState, atTime: number, target: string) {
+function GetActionMacroInfo(element: Element, state: BaseState, atTime: number, target: string): ActionInfo {
     OvaleBestAction.StartProfiling("OvaleBestAction_GetActionMacroInfo");
     let actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId;
     let macro = <string>element.positionalParams[1];
@@ -152,9 +152,9 @@ function GetActionMacroInfo(element: Element, state: BaseState, atTime: number, 
         actionId = macro;
     }
     OvaleBestAction.StopProfiling("OvaleBestAction_GetActionMacroInfo");
-    return [actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target];
+    return [actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target, 0, 0];
 }
-function GetActionSpellInfo(element: Element, state: BaseState, atTime: number, target: string) {
+function GetActionSpellInfo(element: Element, state: BaseState, atTime: number, target: string): ActionInfo {
     OvaleBestAction.StartProfiling("OvaleBestAction_GetActionSpellInfo");
     let actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionResourceExtend, actionCharges;
     let targetGUID = OvaleGUID.UnitGUID(target);
@@ -193,7 +193,7 @@ function GetActionSpellInfo(element: Element, state: BaseState, atTime: number, 
             [actionCooldownStart, actionCooldownDuration, actionEnable] = OvaleCooldown.GetSpellCooldown(spellId, atTime);
 
             OvaleBestAction.Log("GetSpellCooldown returned %f, %f", actionCooldownStart, actionCooldownDuration);
-            actionCharges = OvaleCooldown.GetSpellCharges(spellId, atTime);
+            [actionCharges] = OvaleCooldown.GetSpellCharges(spellId, atTime);
             actionResourceExtend = 0;
             actionUsable = isUsable;
             if (action) {
@@ -229,7 +229,7 @@ function GetActionSpellInfo(element: Element, state: BaseState, atTime: number, 
     OvaleBestAction.StopProfiling("OvaleBestAction_GetActionSpellInfo");
     return [actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target, actionResourceExtend, actionCharges];
 }
-const GetActionTextureInfo = function(element: Element, state: BaseState, atTime: number, target: string) {
+const GetActionTextureInfo = function(element: Element, state: BaseState, atTime: number, target: string): ActionInfo {
     OvaleBestAction.StartProfiling("OvaleBestAction_GetActionTextureInfo");
     let actionTexture;
     {
@@ -244,14 +244,14 @@ const GetActionTextureInfo = function(element: Element, state: BaseState, atTime
     let actionInRange = undefined;
     let actionCooldownStart = 0;
     let actionCooldownDuration = 0;
-    let actionEnable = 1;
+    let actionEnable = true;
     let actionUsable = true;
     let actionShortcut = undefined;
     let actionIsCurrent = undefined;
     let actionType = "texture";
     let actionId = actionTexture;
     OvaleBestAction.StopProfiling("OvaleBestAction_GetActionTextureInfo");
-    return [actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target];
+    return [actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target, 0, 0];
 }
 class OvaleBestActionClass extends OvaleBestActionBase {
 
@@ -278,7 +278,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         OvaleFuture.ApplyInFlightSpells();
         self_serial = self_serial + 1;
     }
-    GetActionInfo(element: Element, state: BaseState, atTime: number) {
+    GetActionInfo(element: Element, state: BaseState, atTime: number): ActionInfo {
         if (element && element.type == "action") {
             if (element.serial && element.serial >= self_serial) {
                 OvaleSpellBook.Log("[%d]    using cached result (age = %d/%d)", element.nodeId, element.serial, self_serial);
@@ -305,7 +305,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         if (element && element.type == "state") {
             let [variable, value] = [element.positionalParams[1], element.positionalParams[2]];
             let isFuture = !timeSpan.HasTime(atTime);
-            variables.PutState(<string>variable, <string>value, isFuture, atTime);
+            variables.PutState(<string>variable, <number>value, isFuture, atTime);
         }
         this.StopProfiling("OvaleBestAction_GetAction");
         return [timeSpan, element];
@@ -424,7 +424,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         if (!actionTexture) {
             OvaleBestAction.Log("[%d]    Action %s not found.", nodeId, action);
             wipe(timeSpan);
-        } else if (!(actionEnable && actionEnable > 0)) {
+        } else if (!actionEnable) {
             OvaleBestAction.Log("[%d]    Action %s not enabled.", nodeId, action);
             wipe(timeSpan);
         } else if (element.namedParams.usable == 1 && !actionUsable) {
@@ -433,7 +433,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         } else {
             let spellInfo;
             if (actionType == "spell") {
-                let spellId = actionId;
+                let spellId = <number>actionId;
                 spellInfo = spellId && OvaleData.spellInfo[spellId];
                 if (spellInfo && spellInfo.casttime) {
                     element.castTime = <number>spellInfo.casttime;
@@ -794,8 +794,16 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         this.StartProfiling("OvaleBestAction_Compute");
         let result = element;
         assert(element.func == "setstate");
+        const name = element.positionalParams[1] as string;
+        const value = element.positionalParams[2] as number;
         OvaleBestAction.Log("[%d]    %s: %s = %s", element.nodeId, element.name, element.positionalParams[1], element.positionalParams[2]);
-        let timeSpan = GetTimeSpan(element, UNIVERSE);
+        const currentValue = variables.GetState(name);
+        let timeSpan;
+        if (currentValue !== value) {
+            timeSpan = GetTimeSpan(element, UNIVERSE);
+        } else {
+            timeSpan = EMPTY_SET;
+        }
         this.StopProfiling("OvaleBestAction_Compute");
         return [timeSpan, result];
     }

@@ -3,10 +3,10 @@ import { OvaleProfiler } from "./Profiler";
 import { Ovale } from "./Ovale";
 import { OvaleGUID } from "./GUID";
 import { OvaleState } from "./State";
-import { RegisterRequirement, UnregisterRequirement } from "./Requirement";
+import { RegisterRequirement, UnregisterRequirement, Tokens } from "./Requirement";
 import aceEvent from "@wowts/ace_event-3.0";
 import { sub } from "@wowts/string";
-import { tonumber, wipe } from "@wowts/lua";
+import { tonumber, wipe, LuaObj } from "@wowts/lua";
 import { UnitHealth, UnitHealthMax, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
 import { baseState } from "./BaseState";
@@ -32,12 +32,12 @@ let CLEU_HEAL_EVENT = {
 
 const OvaleHealthClassBase = OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(OvaleHealthBase));
 class OvaleHealthClass extends OvaleHealthClassBase {
-    health = {    }
-    maxHealth = {    }
-    totalDamage = {    }
-    totalHealing = {    }
-    firstSeen = {    }
-    lastUpdated = {    }
+    health: LuaObj<number> = {}
+    maxHealth: LuaObj<number> = {}
+    totalDamage: LuaObj<number> = {}
+    totalHealing: LuaObj<number> = {}
+    firstSeen: LuaObj<number> = {}
+    lastUpdated: LuaObj<number> = {}
 
     OnInitialize() {
         this.RegisterEvent("PLAYER_REGEN_DISABLED");
@@ -63,7 +63,7 @@ class OvaleHealthClass extends OvaleHealthClassBase {
         let [timestamp, cleuEvent, , , , , , destGUID, , , , arg12, arg13, , arg15] = CombatLogGetCurrentEventInfo();
         this.StartProfiling("OvaleHealth_COMBAT_LOG_EVENT_UNFILTERED");
         let healthUpdate = false;
-        if (CLEU_DAMAGE_EVENT[cleuEvent]) {
+        if (CLEU_DAMAGE_EVENT[<keyof typeof CLEU_DAMAGE_EVENT> cleuEvent]) {
             let amount;
             if (cleuEvent == "SWING_DAMAGE") {
                 amount = arg12;
@@ -76,7 +76,7 @@ class OvaleHealthClass extends OvaleHealthClassBase {
             let total = this.totalDamage[destGUID] || 0;
             this.totalDamage[destGUID] = total + amount;
             healthUpdate = true;
-        } else if (CLEU_HEAL_EVENT[cleuEvent]) {
+        } else if (CLEU_HEAL_EVENT[<keyof typeof CLEU_HEAL_EVENT>cleuEvent]) {
             let amount = arg15;
             this.Debug(cleuEvent, destGUID, amount);
             let total = this.totalHealing[destGUID] || 0;
@@ -91,17 +91,17 @@ class OvaleHealthClass extends OvaleHealthClassBase {
         }
         this.StopProfiling("OvaleHealth_COMBAT_LOG_EVENT_UNFILTERED");
     }
-    PLAYER_REGEN_DISABLED(event) {
+    PLAYER_REGEN_DISABLED(event: string) {
         this.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
     }
-    PLAYER_REGEN_ENABLED(event) {
+    PLAYER_REGEN_ENABLED(event: string) {
         this.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         wipe(this.totalDamage);
         wipe(this.totalHealing);
         wipe(this.firstSeen);
         wipe(this.lastUpdated);
     }
-    Ovale_UnitChanged(event, unitId, guid) {
+    Ovale_UnitChanged(event: string, unitId: string, guid: string) {
         this.StartProfiling("Ovale_UnitChanged");
         if (unitId == "target" || unitId == "focus") {
             this.Debug(event, unitId, guid);
@@ -110,7 +110,7 @@ class OvaleHealthClass extends OvaleHealthClassBase {
         }
         this.StopProfiling("Ovale_UnitChanged");
     }
-    UpdateHealth(event, unitId) {
+    UpdateHealth(event: string, unitId: string) {
         if (!unitId) {
             return;
         }
@@ -196,25 +196,22 @@ class OvaleHealthClass extends OvaleHealthClassBase {
         this.StopProfiling("OvaleHealth_UnitTimeToDie");
         return timeToDie;
     }
-    RequireHealthPercentHandler = (spellId, atTime, requirement, tokens, index, targetGUID): [boolean, string, number] => {
+    RequireHealthPercentHandler = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string): [boolean, string, number] => {
         let verified = false;
-        let threshold = tokens;
-        if (index) {
-            threshold = tokens[index];
-            index = index + 1;
-        }
+        let threshold = <string>tokens[index];
+        index = index + 1;
         if (threshold) {
             let isBang = false;
             if (sub(threshold, 1, 1) == "!") {
                 isBang = true;
                 threshold = sub(threshold, 2);
             }
-            threshold = tonumber(threshold) || 0;
-            let guid, unitId;
+            const thresholdValue = tonumber(threshold) || 0;
+            let guid, unitId: string;
             if (sub(requirement, 1, 7) == "target_") {
                 if (targetGUID) {
                     guid = targetGUID;
-                    unitId = OvaleGUID.GUIDUnit(guid);
+                    [unitId] = OvaleGUID.GUIDUnit(guid);
                 } else {
                     unitId = baseState.next.defaultTarget || "target";
                 }
@@ -227,7 +224,7 @@ class OvaleHealthClass extends OvaleHealthClassBase {
             let health = OvaleHealth.UnitHealth(unitId, guid) || 0;
             let maxHealth = OvaleHealth.UnitHealthMax(unitId, guid) || 0;
             let healthPercent = (maxHealth > 0) && (health / maxHealth * 100) || 100;
-            if (!isBang && healthPercent <= threshold || isBang && healthPercent > threshold) {
+            if (!isBang && healthPercent <= thresholdValue || isBang && healthPercent > thresholdValue) {
                 verified = true;
             }
             let result = verified && "passed" || "FAILED";

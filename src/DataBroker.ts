@@ -10,7 +10,7 @@ import { OvaleFrameModule } from "./Frame";
 import aceEvent from "@wowts/ace_event-3.0";
 import { pairs, LuaArray } from "@wowts/lua";
 import { insert } from "@wowts/table";
-import { CreateFrame, EasyMenu, IsShiftKeyDown, UIParent, UIGameTooltip, GetSpecialization } from "@wowts/wow-mock";
+import { CreateFrame, EasyMenu, IsShiftKeyDown, UIParent, UIGameTooltip, UIFrame } from "@wowts/wow-mock";
 import { OvalePaperDoll } from "./PaperDoll";
 
 let OvaleDataBrokerBase = Ovale.NewModule("OvaleDataBroker", aceEvent);
@@ -30,8 +30,8 @@ let CLASS_ICONS = {
     ["WARLOCK"]: "Interface\\Icons\\ClassIcon_Warlock",
     ["WARRIOR"]: "Interface\\Icons\\ClassIcon_Warrior"
 }
-let self_menuFrame = undefined;
-let self_tooltipTitle = undefined;
+let self_menuFrame: UIFrame = undefined;
+let self_tooltipTitle: string = undefined;
 {
     let defaultDB = {
         minimap: {
@@ -42,10 +42,10 @@ let self_tooltipTitle = undefined;
             order: 25,
             type: "toggle",
             name: L["Show minimap icon"],
-            get: function (info) {
+            get: function (info: any) {
                 return !Ovale.db.profile.apparence.minimap.hide;
             },
-            set: function (info, value) {
+            set: function (info: any, value: boolean) {
                 Ovale.db.profile.apparence.minimap.hide = !value;
                 OvaleDataBroker.UpdateIcon();
             }
@@ -66,7 +66,7 @@ interface MenuItem {
     func?: () => void;
 }
 
-const OnClick = function(fr, button) {
+const OnClick = function(fr: any, button: "LeftButton") {
     if (button == "LeftButton") {
         let menu:LuaArray<MenuItem> = {
             1: {
@@ -74,7 +74,7 @@ const OnClick = function(fr, button) {
                 isTitle: true
             }
         }
-        let scriptType = !Ovale.db.profile.showHiddenScripts && "script";
+        const scriptType = (!Ovale.db.profile.showHiddenScripts && "script") || undefined;
         let descriptions = OvaleScripts.GetDescriptions(scriptType);
         for (const [name, description] of pairs(descriptions)) {
             let menuItem = {
@@ -105,8 +105,9 @@ const OnTooltipShow = function(tooltip: UIGameTooltip) {
     tooltip.AddLine(L["Right-Click for options."]);
     tooltip.AddLine(L["Shift-Right-Click for the current trace log."]);
 }
+
 class OvaleDataBrokerClass extends OvaleDataBrokerBase {
-    broker = undefined;
+    broker: any = undefined;
     OnInitialize() {    
         if (LibDataBroker) {
             let broker = {

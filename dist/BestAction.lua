@@ -142,7 +142,7 @@ local function GetActionItemInfo(element, state, atTime, target)
         actionId = itemId
     end
     __exports.OvaleBestAction:StopProfiling("OvaleBestAction_GetActionItemInfo")
-    return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target
+    return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target, 0, 0
 end
 local function GetActionMacroInfo(element, state, atTime, target)
     __exports.OvaleBestAction:StartProfiling("OvaleBestAction_GetActionMacroInfo")
@@ -165,7 +165,7 @@ local function GetActionMacroInfo(element, state, atTime, target)
         actionId = macro
     end
     __exports.OvaleBestAction:StopProfiling("OvaleBestAction_GetActionMacroInfo")
-    return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target
+    return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target, 0, 0
 end
 local function GetActionSpellInfo(element, state, atTime, target)
     __exports.OvaleBestAction:StartProfiling("OvaleBestAction_GetActionSpellInfo")
@@ -255,14 +255,14 @@ local GetActionTextureInfo = function(element, state, atTime, target)
     local actionInRange = nil
     local actionCooldownStart = 0
     local actionCooldownDuration = 0
-    local actionEnable = 1
+    local actionEnable = true
     local actionUsable = true
     local actionShortcut = nil
     local actionIsCurrent = nil
     local actionType = "texture"
     local actionId = actionTexture
     __exports.OvaleBestAction:StopProfiling("OvaleBestAction_GetActionTextureInfo")
-    return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target
+    return actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, target, 0, 0
 end
 
 local OvaleBestActionClass = __class(OvaleBestActionBase, {
@@ -291,7 +291,7 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
             if  not actionTexture then
                 __exports.OvaleBestAction:Log("[%d]    Action %s not found.", nodeId, action)
                 wipe(timeSpan)
-            elseif  not (actionEnable and actionEnable > 0) then
+            elseif  not actionEnable then
                 __exports.OvaleBestAction:Log("[%d]    Action %s not enabled.", nodeId, action)
                 wipe(timeSpan)
             elseif element.namedParams.usable == 1 and  not actionUsable then
@@ -660,8 +660,16 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
             self:StartProfiling("OvaleBestAction_Compute")
             local result = element
             assert(element.func == "setstate")
+            local name = element.positionalParams[1]
+            local value = element.positionalParams[2]
             __exports.OvaleBestAction:Log("[%d]    %s: %s = %s", element.nodeId, element.name, element.positionalParams[1], element.positionalParams[2])
-            local timeSpan = GetTimeSpan(element, UNIVERSE)
+            local currentValue = variables:GetState(name)
+            local timeSpan
+            if currentValue ~= value then
+                timeSpan = GetTimeSpan(element, UNIVERSE)
+            else
+                timeSpan = EMPTY_SET
+            end
             self:StopProfiling("OvaleBestAction_Compute")
             return timeSpan, result
         end

@@ -12,9 +12,10 @@ import { OvaleLexer, TokenizerDefinition, Tokenizer } from "./Lexer";
 import { OvalePower } from "./Power";
 import { ResetControls } from "./Controls";
 import { format, gmatch, gsub, find, len, lower, match, sub, upper } from "@wowts/string";
-import { ipairs, next, pairs, rawset, tonumber, tostring, type, wipe, LuaObj, LuaArray, setmetatable, lualength, truthy } from "@wowts/lua";
+import { ipairs, next, pairs, rawset, tonumber, tostring, type, wipe, LuaObj, LuaArray, setmetatable, lualength, truthy, kpairs } from "@wowts/lua";
 import { concat, insert, remove, sort } from "@wowts/table";
 import { RAID_CLASS_COLORS } from "@wowts/wow-mock";
+import { isLuaArray } from "./tools";
 
 let OvaleSimulationCraftBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleSimulationCraft"));
 export let OvaleSimulationCraft: OvaleSimulationCraftClass;
@@ -88,6 +89,12 @@ export interface Annotation {
     blade_flurry?: string;
     time_warp?:string;
     vanish?: string;
+    volley?: string;
+    harpoon?: string;
+    chi_burst?: string;
+    touch_of_karma?: string;
+    fel_rush?: string;
+    vengeful_retreat?:string;
 }
 
 interface ChildParseNode extends LuaArray<ParseNode> {
@@ -102,7 +109,7 @@ interface ChildParseNode extends LuaArray<ParseNode> {
     choose?: ParseNode;
     slot?: ParseNode;
     sec?: ParseNode;
-
+    if?: ParseNode;
     op?: ParseNode;
     name?: ParseNode;
     value?: ParseNode;
@@ -132,22 +139,27 @@ interface ParseNode {
     precedence: number;
 }
 
-interface Profile {
-    templates?: any;
+interface ProfileStrings {
     spec?: string;
     level?: string;
     default_pet?: string;
     role?: ClassRole;
-    position?: "ranged_back";
-    actionList?:LuaArray<ParseNode>;
-    annotation?: Annotation;
     talents?: string;
     glyphs?: string;
+}
+
+interface ProfileLists {
     ["actions.precombat"]?:string;
 }
 
-let KEYWORD: LuaObj<boolean> = {
+interface Profile extends ProfileStrings, ProfileLists {
+    templates?: LuaArray<keyof Profile>;
+    position?: "ranged_back";
+    actionList?:LuaArray<ParseNode>;
+    annotation?: Annotation;
 }
+
+let KEYWORD: LuaObj<boolean> = {}
 let MODIFIER_KEYWORD: LuaObj<boolean> = {
     ["ammo_type"]: true,
     ["animation_cancel"]: true,
@@ -221,6 +233,7 @@ let SPECIAL_ACTION: LuaObj<boolean> = {
     ["pool_resource"]: true,
     ["potion"]: true,
     ["run_action_list"]: true,
+    ["sequence"]: true,
     ["snapshot_stats"]: true,
     ["stance"]: true,
     ["start_moving"]: true,
@@ -369,51 +382,58 @@ let OPERAND_TOKEN_PATTERN = "[^.]+";
 //     ["tolvir"]: "agility",
 //     ["virmens_bite"]: "agility"
 // }
-let OPTIONAL_SKILLS: LuaObj<{class: string, default?: boolean, specialization?: string}> = {
-    ["volley"]: {
+
+interface OptionalSkill {
+    class: string;
+    default?: boolean;
+    specialization?: string;
+}
+
+let OPTIONAL_SKILLS = {
+    ["volley"]: <OptionalSkill> {
         class: "HUNTER",
         default: true
     },
-    ["harpoon"]: {
+    ["harpoon"]: <OptionalSkill>{
         class: "HUNTER",
         specialization: "survival",
         default: true
     },
-    ["time_warp"]: {
+    ["time_warp"]: <OptionalSkill>{
         class: "MAGE"
     },
-    ["storm_earth_and_fire"]: {
+    ["storm_earth_and_fire"]: <OptionalSkill>{
         class: "MONK"
     },
-    ["chi_burst"]: {
+    ["chi_burst"]: <OptionalSkill>{
         class: "MONK",
         default: true
     },
-    ["touch_of_karma"]: {
+    ["touch_of_karma"]: <OptionalSkill>{
         class: "MONK",
         default: false
     },
-    ["vanish"]: {
+    ["vanish"]: <OptionalSkill>{
         class: "ROGUE",
         specialization: "assassination",
         default: true
     },
-    ["blade_flurry"]: {
+    ["blade_flurry"]: <OptionalSkill>{
         class: "ROGUE",
         specialization: "outlaw",
         default: true
     },
-    ["bloodlust"]: {
+    ["bloodlust"]: <OptionalSkill>{
         class: "SHAMAN"
     },
-    ["righteous_fury"]: {
+    ["righteous_fury"]: <OptionalSkill>{
         class: "PALADIN"
     },
-    ["fel_rush"]: {
+    ["fel_rush"]: <OptionalSkill>{
         class: "DEMONHUNTER",
         default: true
     },
-    ["vengeful_retreat"]: {
+    ["vengeful_retreat"]: <OptionalSkill>{
         class: "DEMONHUNTER",
         default: true
     }
@@ -476,11 +496,11 @@ let OVALE_TAG_PRIORITY: LuaObj<number> = {}
         overrideCode: ""
     }
     for (const [k, v] of pairs(defaultDB)) {
-        OvaleOptions.defaultDB.profile[k] = v;
+        (<any>OvaleOptions.defaultDB.profile)[k] = v;
     }
     OvaleOptions.RegisterOptions(OvaleSimulationCraft);
 }
-const print_r = function(node: any, indent?: string, done?: LuaObj<boolean>, output?: LuaArray<string>) {
+const print_r = function(node: AstNode, indent?: string, done?: LuaObj<boolean>, output?: LuaArray<string>) {
     done = done || {}
     output = output || {}
     indent = indent || '';
@@ -489,14 +509,14 @@ const print_r = function(node: any, indent?: string, done?: LuaObj<boolean>, out
     } else if (type(node) != "table") {
         insert(output, `${indent}${node}`);
     } else {
-        for (const [key, value] of pairs(node)) {
+        for (const [key, value] of kpairs(node)) {
             if (type(value) == "table") {
-                if (done[value]) {
+                if (done[<any>value]) {
                     insert(output, `${indent}[${tostring(key)}] => (self_reference)`);
                 } else {
-                    done[value] = true;
+                    done[<any>value] = true;
                     insert(output, `${indent}[${tostring(key)}] => {`);
-                    print_r(value, `${indent}    `, done, output);
+                    print_r(<any>value, `${indent}    `, done, output);
                     insert(output, `${indent}}`);
                 }
             } else {
@@ -540,7 +560,7 @@ const NoToken:Tokenizer = function() {
 }
 const MATCHES:LuaArray<TokenizerDefinition> = {
     1: {
-        1: "^%d+%a[%w_]*[.:]?[%w_.]*",
+        1: "^%d+%a[%w_]*[.:]?[%w_.:]*",
         2: TokenizeName
     },
     2: {
@@ -548,7 +568,7 @@ const MATCHES:LuaArray<TokenizerDefinition> = {
         2: TokenizeNumber
     },
     3: {
-        1: "^[%a_][%w_]*[.:]?[%w_.]*",
+        1: "^[%a_][%w_]*[.:]?[%w_.:]*",
         2: TokenizeName
     },
     4: {
@@ -578,6 +598,10 @@ const MATCHES:LuaArray<TokenizerDefinition> = {
     10: {
         1: "^$",
         2: NoToken
+    },
+    11: {
+        1: "^:",
+        2: Tokenize
     }
 }
 
@@ -692,7 +716,7 @@ const UnparseOperand = function(node: ParseNode) {
     }
 }
 const SyntaxError = function(tokenStream: OvaleLexer, ...__args: any[]) {
-    OvaleSimulationCraft.Print(...__args);
+    OvaleSimulationCraft.Warning(...__args);
     let context: LuaArray<string> = {
         1: "Next tokens:"
     }
@@ -705,7 +729,7 @@ const SyntaxError = function(tokenStream: OvaleLexer, ...__args: any[]) {
             break;
         }
     }
-    OvaleSimulationCraft.Print(concat(context, " "));
+    OvaleSimulationCraft.Warning(concat(context, " "));
 }
 
 type ParseFunction = (tokenStream: OvaleLexer, nodeList: ChildParseNode, annotation: Annotation) => [boolean, ScNode];
@@ -716,7 +740,6 @@ let ParseNumber: ParseFunction = undefined;
 let ParseOperand: ParseFunction = undefined;
 let ParseParentheses: ParseFunction = undefined;
 let ParseSimpleExpression: ParseFunction = undefined;
-// let ParseIdentifer: ParseFunction = undefined;
 
 const TicksRemainTranslationHelper = function(p1: string, p2: string, p3: string, p4: string) {
     if (p4) {
@@ -781,7 +804,7 @@ const ParseAction = function (action: string, nodeList: ChildParseNode, annotati
         while (ok && tokenType) {
             if (tokenType == ",") {
                 tokenStream.Consume();
-                let modifier: any, expressionNode: ScNode;
+                let modifier: string, expressionNode: ScNode;
                 [ok, modifier, expressionNode] = ParseModifier(tokenStream, nodeList, annotation);
                 if (ok) {
                     child[modifier] = expressionNode;
@@ -961,11 +984,11 @@ const ParseIdentifier = function (tokenStream: OvaleLexer, nodeList: ChildParseN
     let node = NewNode(nodeList);
     node.type = "operand";
     node.name = token;
-    annotation.operand = annotation.operand || {
-    }
+    annotation.operand = annotation.operand || {};
     annotation.operand[lualength(annotation.operand) + 1] = node;
     return [true, node];
 }
+
 ParseModifier = function (tokenStream: OvaleLexer, nodeList, annotation) {
     let ok = true;
     let name: string;
@@ -1197,12 +1220,23 @@ const AddDisambiguation = function(name: string, info: string, className?: strin
     AddPerClassSpecialization(EMIT_DISAMBIGUATION, name, info, className, specialization, _type);
 }
 function Disambiguate(annotation: Annotation, name: string, className: string, specialization: string, _type?: string): [string, string] {
+    if (className && annotation.dictionary[`${name}_${className}`]) {
+        return [`${name}_${className}`, _type];
+    }
+    if (specialization && annotation.dictionary[`${name}_${specialization}`]) {
+        return [`${name}_${specialization}`, _type];
+    }
+    
     let [disname, distype] = GetPerClassSpecialization(EMIT_DISAMBIGUATION, name, className, specialization);
     if (!disname) {
         if (!annotation.dictionary[name]) {
-            let otherName = name.match("_buff$") && gsub(name, "_buff$", "") || gsub(name, "_debuff$", "")
+            let otherName = truthy(match(name, "_buff$")) && gsub(name, "_buff$", "") || gsub(name, "_debuff$", "")
             if (annotation.dictionary[otherName]) {
                 return [otherName, _type];
+            }
+            let potionName = gsub(name, "potion_of_", "");
+            if (annotation.dictionary[potionName]) {
+                return [potionName, _type];
             }
         }
         return [name, _type];
@@ -1460,7 +1494,7 @@ SplitByTagAction = function (tag, node: FunctionNode, nodeList, annotation) {
             id = annotation.dictionary && annotation.dictionary[name];
         } else if (isValueNode(firstParamNode)) {
             name = firstParamNode.value;
-            id = name;
+            id = <number>firstParamNode.value;
         }
         if (id) {
             if (actionType == "item") {
@@ -1473,13 +1507,13 @@ SplitByTagAction = function (tag, node: FunctionNode, nodeList, annotation) {
         }
     } else if (actionType == "texture") {
         let firstParamNode = node.rawPositionalParams[1];
-        let id, name;
+        let id: number, name;
         if (firstParamNode.type == "variable") {
             name = firstParamNode.name;
             id = annotation.dictionary && annotation.dictionary[name];
         } else if (isValueNode(firstParamNode)) {
             name = firstParamNode.value;
-            id = name;
+            id = <number>name;
         }
         if (actionTag == undefined) {
             [actionTag, invokesGCD] = OvaleData.GetSpellTagInfo(id);
@@ -2015,8 +2049,8 @@ function EmitVariable(nodeList: LuaArray<AstNode>, annotation: Annotation, modif
         OvaleSimulationCraft.Error("Unknown variable operator '%s'.", op);
     }
 }
-const checkOptionalSkill = function(action: string, className: string, specialization: string) {
-    let data = OPTIONAL_SKILLS[action];
+const checkOptionalSkill = function(action: string, className: string, specialization: string) : action is keyof typeof OPTIONAL_SKILLS {
+    let data = OPTIONAL_SKILLS[<keyof typeof OPTIONAL_SKILLS>action];
     if (!data) {
         return false;
     }
@@ -2335,18 +2369,16 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             isSpellAction = false;
         } else if (action == "potion") {
             let name = (modifier.name && Unparse(modifier.name)) || annotation.consumables["potion"];
-            if(truthy(match(name, "^battle_potion_of_%w+"))){
-                [name] = match(name, "^battle_potion_of_%w+");
-            }else if (truthy(match(name, "^%w+_potion"))) {
-                [name] = match(name, "^%w+_potion");
-            }
             if (name) {
+                [name] = Disambiguate(annotation, name, className, specialization, "item");
                 bodyCode = format("Item(%s usable=1)", name);
                 conditionCode = "CheckBoxOn(opt_use_consumables) and target.Classification(worldboss)";
                 annotation.opt_use_consumables = className;
                 AddSymbol(annotation, format("%s", name));
                 isSpellAction = false;
             }
+        } else if (action === "sequence") {
+            isSpellAction = false;
         } else if (action == "stance") {
             if (modifier.choose) {
                 let name = Unparse(modifier.choose);
@@ -2423,8 +2455,7 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             }
             bodyCode = bodyCode || `${type}(${action})`;
         }
-        annotation.astAnnotation = annotation.astAnnotation || {
-        }
+        annotation.astAnnotation = annotation.astAnnotation || {};
         if (!bodyNode && bodyCode) {
             [bodyNode] = OvaleAST.ParseCode(expressionType, bodyCode, nodeList, annotation.astAnnotation);
         }
@@ -2705,7 +2736,7 @@ EmitNumber = function (parseNode, nodeList, annotation, action) {
 }
 EmitOperand = function (parseNode, nodeList, annotation, action) {
     let ok = false;
-    let node;
+    let node : AstNode;
     let operand = parseNode.name;
     let [token] = match(operand, OPERAND_TOKEN_PATTERN);
     let target;
@@ -2805,6 +2836,10 @@ EmitOperandAction = function (operand, parseNode, nodeList, annotation, action, 
     } else {
         name = action;
         property = operand;
+    }
+
+    if (!name) {
+        return [false, undefined];
     }
 
     let [className, specialization] = [annotation.class, annotation.specialization];
@@ -3090,15 +3125,15 @@ EmitOperandBuff = function (operand, parseNode, nodeList, annotation, action, ta
         ["combo_points"]: "ComboPoints()",
         ["combo_points.deficit"]: "ComboPointsDeficit()",
         ["combo_points.max"]: "MaxComboPoints()",
-        ["consecration.remains"]: "target.DebuffRemaining(consecration_debuff)",
+        ["consecration.remains"]: "BuffRemaining(consecration)",
         ["cp_max_spend"]: "MaxComboPoints()",
         ["crit_pct_current"]: "SpellCritChance()",
         ["current_insanity_drain"]: "CurrentInsanityDrain()",
         ["darkglare_no_de"]: "NotDeDemons(darkglare)",
+        ["death_and_decay.ticking"]: "BuffPresent(death_and_decay)",
         ["death_sweep_worth_using"]: "0",
         ["delay"]: "0",
         ["demonic_fury"]: "DemonicFury()",
-        ["death_and_decay.ticking"]: "SpellCooldown(death_and_decay) > 20",
         ["desired_targets"]: "Enemies(tagged=1)",
         ["doomguard_no_de"]: "NotDeDemons(doomguard)",
         ["dreadstalker_no_de"]: "NotDeDemons(dreadstalker)",
@@ -3136,6 +3171,9 @@ EmitOperandBuff = function (operand, parseNode, nodeList, annotation, action, ta
         ["mana.max"]: "MaxMana()",
         ["mana.pct"]: "ManaPercent()",
         ["maelstrom"]: "Maelstrom()",
+        ["next_wi_bomb.pheromone"]: "SpellUsable(270323)",
+        ["next_wi_bomb.shrapnel"]: "SpellUsable(270335)",
+        ["next_wi_bomb.volatile"]: "SpellUsable(271045)",
         ["nonexecute_actors_pct"]: "0",
         ["pain"]: "Pain()",
         ["pain.deficit"]: "PainDeficit()",
@@ -3147,7 +3185,7 @@ EmitOperandBuff = function (operand, parseNode, nodeList, annotation, action, ta
         ["raw_haste_pct"]: "SpellCastSpeedPercent()",
         ["rtb_list.any.5"]: "BuffCount(roll_the_bones_buff more 4)",
         ["rtb_list.any.6"]: "BuffCount(roll_the_bones_buff more 5)",
-        ["rune.deficit"]: "{6 - RuneCount()}",
+        ["rune.deficit"]: "RuneDeficit()",
         ["runic_power"]: "RunicPower()",
         ["runic_power.deficit"]: "RunicPowerDeficit()",
         ["service_no_de"]: "0",
@@ -3334,7 +3372,7 @@ EmitOperandDisease = function (operand, parseNode, nodeList, annotation, action,
     return [ok, node];
 }
 
-EmitOperandGroundAoe = function(operand, parseNode, nodeList, annotation, action) {
+EmitOperandGroundAoe = (operand: string, parseNode: ParseNode, nodeList: LuaArray<AstNode>, annotation: Annotation, action: string): [boolean, AstNode] => {
     let ok = true;
     let node;
     let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
@@ -3398,6 +3436,8 @@ EmitOperandDot = function (operand, parseNode, nodeList, annotation, action, tar
             code = format("TargetDebuffRemaining(%s_exsanguinated)", dotName);
         } else if (property == "refreshable") {
             code = format("%s%sRefreshable(%s)", target, prefix, dotName);
+        } else if (property === "max_stacks") {
+            code = format("MaxStacks(%s)", dotName);
         } else {
             ok = false;
         }
@@ -3832,6 +3872,9 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
             AddSymbol(annotation, buffName);
         } else if (property == "pct") {
             code = format("%sStaggerRemaining() / %sMaxHealth() * 100", target, target);
+        } else if (truthy(match(property, "last_tick_damage_(%d+)"))){
+            let ticks = match(property, "last_tick_damage_(%d+)");
+            code = format("StaggerTick(%d)", ticks);
         } else {
             ok = false;
         }
@@ -4326,7 +4369,7 @@ interface Spell {
 const InsertInterruptFunction = function(child: LuaArray<AstNode>, annotation: Annotation, interrupts: LuaArray<Spell>) {
     let nodeList = annotation.astAnnotation.nodeList;
     let className = annotation.class;
-    let specialization = annotation.specialization;
+    // let specialization = annotation.specialization;
     let camelSpecialization = CamelSpecialization(annotation);
     let spells = interrupts || {}
     if (OvaleData.PANDAREN_CLASSES[className]) {
@@ -4984,7 +5027,7 @@ const InsertSupportingFunctions = function(child: LuaArray<AstNode>, annotation:
     }
     return count;
 }
-const AddOptionalSkillCheckBox = function(child: LuaArray<AstNode>, annotation: Annotation, data:any, skill: string) {
+const AddOptionalSkillCheckBox = function(child: LuaArray<AstNode>, annotation: Annotation, data:any, skill: keyof Annotation) {
     let nodeList = annotation.astAnnotation.nodeList;
     if (data.class != annotation[skill]) {
         return 0;
@@ -5007,7 +5050,7 @@ const AddOptionalSkillCheckBox = function(child: LuaArray<AstNode>, annotation: 
 const InsertSupportingControls = function(child: LuaArray<AstNode>, annotation: Annotation) {
     let count = 0;
     for (const [skill, data] of pairs(OPTIONAL_SKILLS)) {
-        count = count + AddOptionalSkillCheckBox(child, annotation, data, <string>skill);
+        count = count + AddOptionalSkillCheckBox(child, annotation, data, <keyof typeof OPTIONAL_SKILLS>skill);
     }
     let nodeList = annotation.astAnnotation.nodeList;
     let ifSpecialization = `specialization=${annotation.specialization}`;
@@ -5176,8 +5219,8 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
         self_childrenPool.DebuggingInfo();
         self_outputPool.DebuggingInfo();
     }
-    ToString(tbl) {
-        let output = print_r(tbl);
+    ToString(tbl: AstNode) {
+        const output = print_r(tbl);
         return concat(output, "\n");
     }
     Release(profile: Profile) {
@@ -5191,7 +5234,7 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
                     self_pool.Release(node);
                 }
             }
-            for (const [key, value] of pairs(annotation)) {
+            for (const [key, value] of kpairs(annotation)) {
                 if (type(value) == "table") {
                     wipe(value);
                 }
@@ -5212,23 +5255,21 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
                     profile[key] = value;
                 } else if (operator == "+=") {
                     if (type(profile[key]) != "table") {
-                        let oldValue = profile[key];
-                        profile[key] = {
-                        }
-                        insert(profile[key], oldValue);
+                        const oldValue = profile[key];
+                        profile[key] = {}
+                        insert(<LuaArray<any>> profile[key], oldValue);
                     }
-                    insert(profile[key], value);
+                    insert(<LuaArray<any>> profile[key], value);
                 }
             }
         }
-        for (const [k, v] of pairs(profile)) {
-            if (type(v) == "table") {
-                profile[k] = concat(v);
+        for (const [k, v] of kpairs(profile)) {
+            if (isLuaArray(v)) {
+                profile[k] = concat(<any>v);
             }
         }
-        profile.templates = {
-        }
-        for (const [k, ] of pairs(profile)) {
+        profile.templates = {}
+        for (const [k, ] of kpairs(profile)) {
             if (sub(k, 1, 2) == "$(" && sub(k, -1) == ")") {
                 insert(profile.templates, k);
             }
@@ -5237,7 +5278,7 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
         annotation = annotation || {};
         let nodeList: ChildParseNode = {};
         let actionList: LuaArray<ScNode> = {};
-        for (const [k, _v] of pairs(profile)) {
+        for (const [k, _v] of kpairs(profile)) {
             let v = _v;
             if (ok && truthy(match(k, "^actions"))) {
                 let [name] = match(k, "^actions%.([%w_]+)");
@@ -5248,10 +5289,10 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
                     let template = profile.templates[index];
                     let variable = sub(template, 3, -2);
                     let pattern = `%$%(${variable}%)`;
-                    v = gsub(v, pattern, profile[template]);
+                    v = gsub(<string>v, pattern, <string>profile[template]);
                 }
                 let node;
-                [ok, node] = ParseActionList(name, v, nodeList, annotation);
+                [ok, node] = ParseActionList(name, <string>v, nodeList, annotation);
                 if (ok) {
                     actionList[lualength(actionList) + 1] = node;
                 } else {
@@ -5266,7 +5307,7 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
             let lowerClass = <keyof Profile>lower(<string>className);
             if (profile[lowerClass]) {
                 annotation.class = <string>className;
-                annotation.name = profile[lowerClass];
+                annotation.name = <string>profile[lowerClass];
             }
         }
         annotation.specialization = profile.spec;
@@ -5276,8 +5317,8 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
         let consumables:LuaObj<string> = {}
         for (const [k, v] of pairs(CONSUMABLE_ITEMS)) {
             if (v) {
-                if (profile[k] != undefined) {
-                    consumables[k] = profile[k];
+                if (profile[<keyof Profile>k] != undefined) {
+                    consumables[k] = <string>profile[<keyof Profile>k];
                 }
             }
         }

@@ -2,11 +2,12 @@ import AceConfig from "@wowts/ace_config-3.0";
 import AceConfigDialog from "@wowts/ace_config_dialog-3.0";
 import { OvaleOptions } from "./Options";
 import { L } from "./Localization";
-import { OvalePaperDoll, PaperDollData } from "./PaperDoll";
+import { OvalePaperDoll, SpecializationName } from "./PaperDoll";
 import { Ovale } from "./Ovale";
 import aceEvent from "@wowts/ace_event-3.0";
 import { format, gsub, lower } from "@wowts/string";
-import { pairs, LuaObj } from "@wowts/lua";
+import { pairs, LuaObj, kpairs } from "@wowts/lua";
+import { ClassId, SpecializationIndex } from "@wowts/wow-mock";
 import { isLuaArray } from "./tools";
 import { GetNumSpecializations } from "@wowts/wow-mock";
 import { OvaleDebug } from "./Debug";
@@ -36,7 +37,7 @@ let DISABLED_DESCRIPTION = L["Disabled"];
             }
         }
     }
-    for (const [k, v] of pairs(defaultDB)) {
+    for (const [k, v] of kpairs(defaultDB)) {
         OvaleOptions.defaultDB.profile[k] = v;
     }
     for (const [k, v] of pairs(actions)) {
@@ -45,13 +46,19 @@ let DISABLED_DESCRIPTION = L["Disabled"];
     OvaleOptions.RegisterOptions(OvaleScripts);
 }
 
-interface Script {
+export type ScriptType = "script" | "include";
 
+interface Script {
+    type?: ScriptType;
+    desc?: string;
+    className?: string;
+    specialization?: string;
+    code?: string;
 }
 
 class OvaleScriptsClass  extends OvaleScriptsBase {
 
-    script:Script = {}
+    script:LuaObj<Script> = {}
 
     constructor() {
         super();
@@ -69,12 +76,14 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
         this.UnregisterMessage("Ovale_StanceChanged");
         this.UnregisterMessage("Ovale_ScriptChanged");
     }
-    Ovale_StanceChanged(event, newStance, oldStance) {
+    Ovale_StanceChanged(event: string, newStance: string, oldStance: string) {
     }
-    GetDescriptions(scriptType) {
+    GetDescriptions(scriptType: ScriptType | undefined) {
         let descriptionsTable: LuaObj<string> = {}
         for (const [name, script] of pairs(this.script)) {
-            if ((!scriptType || script.type == scriptType) && (!script.specialization || OvalePaperDoll.IsSpecialization(script.specialization))) {
+            if ((!scriptType || script.type === scriptType) 
+            && (!script.className || script.className === Ovale.playerClass)
+            && (!script.specialization || OvalePaperDoll.IsSpecialization(script.specialization))) {
                 if (name == DEFAULT_NAME) {
                     descriptionsTable[name] = `${script.desc} (${this.GetScriptName(name)})`;
                 } else {
@@ -84,21 +93,19 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
         }
         return descriptionsTable;
     }
-    RegisterScript(className: string, specialization: string, name: string, description: string, code: string, scriptType: "script" | "include") {
-        if (!className || className == Ovale.playerClass) {
-            this.script[name] = this.script[name] || {
-            }
-            let script = this.script[name];
-            script.type = scriptType || "script";
-            script.desc = description || name;
-            script.specialization = specialization;
-            script.code = code || "";
-        }
+    RegisterScript(className: string, specialization: string, name: string, description: string, code: string, scriptType: ScriptType) {
+        this.script[name] = this.script[name] || {};
+        let script = this.script[name];
+        script.type = scriptType || "script";
+        script.desc = description || name;
+        script.specialization = specialization;
+        script.code = code || "";
+        script.className = className;
     }
-    UnregisterScript(name) {
+    UnregisterScript(name: string) {
         this.script[name] = undefined;
     }
-    SetScript(name) {
+    SetScript(name: string) {
         let specName = OvalePaperDoll.GetSpecialization();
         const oldSource = Ovale.db.profile.source[specName];
         if (oldSource != name) {
@@ -106,7 +113,7 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
             this.SendMessage("Ovale_ScriptChanged");
         }
     }
-    GetDefaultScriptName(className, specialization) {
+    GetDefaultScriptName(className: ClassId, specialization: SpecializationName) {
         let name = undefined;
 
         if(className == "DRUID"){
@@ -122,9 +129,7 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
                 name = "Disabled";
             }
         }else if(className == "PRIEST"){
-            if(specialization == "holy"){
-                name = "Disabled";
-            }else if(specialization == "discipline"){
+            if(specialization == "discipline"){
                 name = "Disabled";
             }
         } else if(className == "SHAMAN"){
@@ -138,17 +143,17 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
         }
 
         if (!name && specialization) {
-            name = format("sc_%s_%s_pr", lower(className), specialization);
+            name = format("sc_pr_%s_%s", lower(className), specialization);
         }
         if (!(name && this.script[name])) {
             name = DISABLED_NAME;
         }
         return name;
     }
-    GetScriptName(name) {
+    GetScriptName(name: string) {
         return (name == DEFAULT_NAME) && this.GetDefaultScriptName(Ovale.playerClass, OvalePaperDoll.GetSpecialization()) || name;
     }
-    GetScript(name) {
+    GetScript(name: string) {
         name = this.GetScriptName(name);
         if (name && this.script[name]) {
             return this.script[name].code;
@@ -164,15 +169,15 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
                     type: "select",
                     name: L["Script"],
                     width: "double",
-                    values: (info) => {
-                        let scriptType = !Ovale.db.profile.showHiddenScripts && "script";
+                    values: (info: any) => {
+                        const scriptType = (!Ovale.db.profile.showHiddenScripts && "script") || undefined;
                         return OvaleScripts.GetDescriptions(scriptType);
                     },
-                    get: (info) => {
+                    get: (info: any) => {
                         let specName = OvalePaperDoll.GetSpecialization();
                         return Ovale.db.profile.source[specName];
                     },
-                    set: (info, v) => {
+                    set: (info: any, v: string) => {
                         this.SetScript(v);
                     }
                 },
@@ -186,13 +191,13 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
                         let specName = OvalePaperDoll.GetSpecialization();
                         return Ovale.db.profile.source[specName] != CUSTOM_NAME;
                     },
-                    get: (info)  => {
+                    get: (info: any)  => {
                         let specName = OvalePaperDoll.GetSpecialization();
                         let code = OvaleScripts.GetScript(Ovale.db.profile.source[specName]);
                         code = code || "";
                         return gsub(code, "\t", "    ");
                     },
-                    set: (info, v) => {
+                    set: (info: any, v: string) => {
                         OvaleScripts.RegisterScript(Ovale.playerClass, undefined, CUSTOM_NAME, CUSTOM_DESCRIPTION, v, "script");
                         Ovale.db.profile.code = v;
                         this.SendMessage("Ovale_ScriptChanged");
@@ -222,10 +227,10 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
                     order: 40,
                     type: "toggle",
                     name: L["Show hidden"],
-                    get: (info) => {
+                    get: (info: any) => {
                         return Ovale.db.profile.showHiddenScripts;
                     },
-                    set: (info, value) => {
+                    set: (info: any, value: boolean) => {
                         Ovale.db.profile.showHiddenScripts = value;
                     }
                 }
@@ -237,12 +242,12 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
     }
 
     InitScriptProfiles(){
-        let countSpecializations = GetNumSpecializations();
+        let countSpecializations = GetNumSpecializations(false, false);
         if(!isLuaArray(Ovale.db.profile.source)){
             Ovale.db.profile.source = {}
         }
         for(let i=1; i < countSpecializations; i += 1){
-            let specName = OvalePaperDoll.GetSpecialization(i)
+            let specName = OvalePaperDoll.GetSpecialization(i as SpecializationIndex)
             Ovale.db.profile.source[specName] = Ovale.db.profile.source[specName] || this.GetDefaultScriptName(Ovale.playerClass, specName);
         }
     }
