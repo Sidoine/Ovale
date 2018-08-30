@@ -102,7 +102,13 @@ let STRING_LOOKUP_FUNCTION: LuaObj<boolean> = {
     ["L"]: true,
     ["SpellName"]: true
 }
-let UNARY_OPERATOR: LuaObj<{1: "logical" | "arithmetic", 2: number}> = {
+
+
+export type OperatorType = "not" | "or" | "and" | "-" | "=" | "!=" |
+    "xor" | "^" | "|" | "==" | "/" | "!" | ">" |
+    ">=" | "<=" | "<" | "+" | "*" | "%";
+
+let UNARY_OPERATOR: {[key in OperatorType]?:{1: "logical" | "arithmetic", 2: number}} = {
     ["not"]: {
         1: "logical",
         2: 15
@@ -112,7 +118,7 @@ let UNARY_OPERATOR: LuaObj<{1: "logical" | "arithmetic", 2: number}> = {
         2: 50
     }
 }
-let BINARY_OPERATOR: LuaObj<{1: "logical" | "compare" | "arithmetic", 2: number, 3?: string}> = {
+let BINARY_OPERATOR: {[key in OperatorType]?:{1: "logical" | "compare" | "arithmetic", 2: number, 3?: string}} = {
     ["or"]: {
         1: "logical",
         2: 5,
@@ -222,10 +228,6 @@ export type NodeType = "function" | "string" | "variable" | "value" | "spell_aur
      "simc_wait" | "custom_function" | "wait" | "action" | "operand" |
      "logical" | "arithmetic" | "action_list" | "compare" | "boolean" |
      "comma_separated_values" | "bang_value" | "define" | "state";
-
-export type OperatorType = "not" | "or" | "and" | "-" | "=" | "!=" |
-    "xor" | "^" | "|" | "%" | "&" | "==" | "/" | "!" | ">" |
-    ">=" | "<=" | "<" | "+" | "*";
 
 export interface AstNode {
     child: LuaArray<AstNode>;
@@ -1313,7 +1315,7 @@ export class OvaleASTClass extends OvaleASTBase {
         {
             let [tokenType, token] = tokenStream.Peek();
             if (tokenType) {
-                let opInfo = UNARY_OPERATOR[token];
+                let opInfo = UNARY_OPERATOR[token as OperatorType];
                 if (opInfo) {
                     let [opType, precedence] = [opInfo[1], opInfo[2]];
                     tokenStream.Consume();
@@ -1342,7 +1344,7 @@ export class OvaleASTClass extends OvaleASTBase {
             let keepScanning = false;
             let [tokenType, token] = tokenStream.Peek();
             if (tokenType) {
-                let opInfo = BINARY_OPERATOR[token];
+                let opInfo = BINARY_OPERATOR[token as OperatorType];
                 if (opInfo) {
                     let [opType, precedence] = [opInfo[1], opInfo[2]];
                     if (precedence && precedence > minPrecedence) {
@@ -2333,7 +2335,7 @@ export class OvaleASTClass extends OvaleASTBase {
                     }
                 }
                 if (tokenType) {
-                    if (BINARY_OPERATOR[token]) {
+                    if (BINARY_OPERATOR[token as OperatorType]) {
                         [ok, node] = this.ParseExpression(tokenStream, nodeList, annotation);
                     } else {
                         [ok, node] = this.ParseGroup(tokenStream, nodeList, annotation);

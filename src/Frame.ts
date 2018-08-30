@@ -23,8 +23,6 @@ import { AstNode } from "./AST";
 let strmatch = match;
 let INFINITY = huge;
 
-type BaseState = {};
-
 interface Action {
     secure?: boolean;
     secureIcons: LuaArray<OvaleIcon>;
@@ -174,7 +172,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                 if (OvaleFuture.next.currentCast.spellId == undefined || OvaleFuture.next.currentCast.spellId != OvaleFuture.next.lastGCDSpellId) {
                     atTime = baseState.next.currentTime;
                 }
-                let [timeSpan, element] = OvaleBestAction.GetAction(node, undefined, atTime);
+                let [timeSpan, element] = OvaleBestAction.GetAction(node, atTime);
                 let start;
                 if (element && element.offgcd) {
                     start = timeSpan.NextTime(baseState.next.currentTime);
@@ -182,7 +180,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                     start = timeSpan.NextTime(atTime);
                 }
                 if (profile.apparence.enableIcons) {
-                    this.UpdateActionIcon(undefined, node, this.actions[k], element, start);
+                    this.UpdateActionIcon(node, this.actions[k], element, start);
                 }
                 if (profile.apparence.spellFlash.enabled && OvaleSpellFlash) {
                     OvaleSpellFlash.Flash(undefined, node, element, start);
@@ -194,7 +192,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             this.timeSinceLastUpdate = 0;
         }
     }
-    UpdateActionIcon(state: BaseState, node: AstNode, action: Action, element: Element, start: number, now?: number) {
+    UpdateActionIcon(node: AstNode, action: Action, element: Element, start: number, now?: number) {
         const profile = Ovale.db.profile;
         let icons = action.secure && action.secureIcons || action.icons;
         now = now || GetTime();
@@ -213,7 +211,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                 icons[2].Update(element, undefined);
             }
         } else {
-            let [actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget, actionResourceExtend] = OvaleBestAction.GetActionInfo(element, state, now);
+            let [actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget, actionResourceExtend] = OvaleBestAction.GetActionInfo(element, now);
             if (actionResourceExtend && actionResourceExtend > 0) {
                 if (actionCooldownDuration > 0) {
                     OvaleBestAction.Log("Extending cooldown of spell ID '%s' for primary resource by %fs.", actionId, actionResourceExtend);
@@ -263,13 +261,13 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                     if (actionId != OvaleFuture.next.lastGCDSpellId) {
                         atTime = baseState.next.currentTime;
                     }
-                    let [timeSpan, nextElement] = OvaleBestAction.GetAction(node, state, atTime);
+                    let [timeSpan, nextElement] = OvaleBestAction.GetAction(node, atTime);
                     if (nextElement && nextElement.offgcd) {
                         start = timeSpan.NextTime(baseState.next.currentTime);
                     } else {
                         start = timeSpan.NextTime(atTime);
                     }
-                    const [actionTexture2, actionInRange2, actionCooldownStart2, actionCooldownDuration2, actionUsable2, actionShortcut2, actionIsCurrent2, actionEnable2, actionType2, actionId2, actionTarget2, actionResourceExtend2]= OvaleBestAction.GetActionInfo(nextElement, state, start);
+                    const [actionTexture2, actionInRange2, actionCooldownStart2, actionCooldownDuration2, actionUsable2, actionShortcut2, actionIsCurrent2, actionEnable2, actionType2, actionId2, actionTarget2, actionResourceExtend2]= OvaleBestAction.GetActionInfo(nextElement, start);
                     icons[2].Update(nextElement, start, actionTexture2, actionInRange2, actionCooldownStart2, actionCooldownDuration2, actionUsable2, actionShortcut2, actionIsCurrent2, actionEnable2, actionType2, actionId2, actionTarget2, actionResourceExtend2);
                 } else {
                     icons[2].Update(element, undefined);

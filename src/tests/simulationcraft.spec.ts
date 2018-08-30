@@ -35,3 +35,21 @@ actions=/sequence,if=talent.wake_of_ashes.enabled&talent.crusade.enabled&talent.
     t.is(OvaleDebug.warning, undefined);
     t.not(result, undefined);
 })
+
+test("parse cycle_targets", t => {
+    // Arrange
+    const code = `deathknight="test"
+    spec=blood
+    level=120
+actions=/chaos_bolt,cycle_targets=1,if=!debuff.havoc.remains&talent.grimoire_of_supremacy.enabled`;
+
+    // Act
+    const result = OvaleSimulationCraft.ParseProfile(code);
+
+    // Assert
+    t.is(OvaleDebug.warning, undefined);
+    t.is(result.actionList[1].type, "action_list");
+    t.is(result.actionList[1].child[1].type, "action");
+    t.is(result.actionList[1].child[1].child.if.type, "logical");
+    t.is(result.actionList[1].child[1].child.if.operator, "&");
+})

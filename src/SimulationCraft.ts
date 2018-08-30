@@ -185,20 +185,28 @@ interface ChildParseNode extends LuaArray<ParseNode> {
     condition?: ParseNode;
 }
 
+type ParseNodeType = "action" | "action_list" | "arithmetic" | "compare" |
+"function" | "logical" | "number" | "operand"
+
+type SimcBinaryOperatorType = "|" | "^" |
+    "&" | "!=" | "<" | "<=" | "=" | "==" | ">" | ">=" |
+    "~" | "!~" | "+" | "%" | "*" | "-";
+type SimcUnaryOperatorType = "!" | "-" | "@";
+type SimcOperatorType = SimcUnaryOperatorType | SimcBinaryOperatorType;
+
 interface ParseNode {
     name: string;
     child: ChildParseNode;
     rune: string;
     asType: NodeType;
-    type: "action" | "action_list" | "arithmetic" | "compare" |
-    "function" | "logical" | "number" | "operand";
+    type: ParseNodeType;
 
     // Not sure
     value: number;
     expressionType: "unary" | "binary";
 
     // Dubious
-    operator: OperatorType;
+    operator: SimcOperatorType;
     includeDeath: boolean;
     left: string;
     right: string;
@@ -332,7 +340,7 @@ let CONSUMABLE_ITEMS: LuaObj<boolean> = {
         KEYWORD[keyword] = value;
     }
 }
-let UNARY_OPERATOR: LuaObj<{1: "logical" | "arithmetic", 2: number}> = {
+let UNARY_OPERATOR: {[k in SimcUnaryOperatorType]: {1: "logical" | "arithmetic", 2: number}} = {
     ["!"]: {
         1: "logical",
         2: 15
@@ -346,7 +354,7 @@ let UNARY_OPERATOR: LuaObj<{1: "logical" | "arithmetic", 2: number}> = {
         2: 50
     }
 }
-let BINARY_OPERATOR: LuaObj<{1: "logical" | "compare" | "arithmetic", 2: number, 3?: string}> = {
+let BINARY_OPERATOR: {[k in SimcBinaryOperatorType]: {1: "logical" | "compare" | "arithmetic", 2: number, 3?: string}} = {
     ["|"]: {
         1: "logical",
         2: 5,
@@ -417,8 +425,8 @@ let BINARY_OPERATOR: LuaObj<{1: "logical" | "compare" | "arithmetic", 2: number,
         3: "associative"
     }
 }
-let INDENT: LuaArray<string> = {
-}
+
+let INDENT: LuaArray<string> = {}
 {
     INDENT[0] = "";
     let metatable = {
@@ -678,10 +686,10 @@ const GetPrecedence = function(node: ScNode) {
     if (!precedence) {
         let operator = node.operator;
         if (operator) {
-            if (node.expressionType == "unary" && UNARY_OPERATOR[operator]) {
-                precedence = UNARY_OPERATOR[operator][2];
-            } else if (node.expressionType == "binary" && BINARY_OPERATOR[operator]) {
-                precedence = BINARY_OPERATOR[operator][2];
+            if (node.expressionType == "unary" && UNARY_OPERATOR[operator as SimcUnaryOperatorType]) {
+                precedence = UNARY_OPERATOR[operator as SimcUnaryOperatorType][2];
+            } else if (node.expressionType == "binary" && BINARY_OPERATOR[operator as SimcBinaryOperatorType]) {
+                precedence = BINARY_OPERATOR[operator as SimcBinaryOperatorType][2];
             }
         }
     }
@@ -750,7 +758,7 @@ const UnparseExpression = function(node: ParseNode) {
         if (rhsPrecedence && precedence > rhsPrecedence) {
             rhsExpression = `(${Unparse(rhsNode)})`;
         } else if (rhsPrecedence && precedence == rhsPrecedence) {
-            if (BINARY_OPERATOR[node.operator][3] == "associative" && node.operator == rhsNode.operator) {
+            if (BINARY_OPERATOR[node.operator as SimcBinaryOperatorType][3] == "associative" && node.operator == rhsNode.operator) {
                 rhsExpression = Unparse(rhsNode);
             } else {
                 rhsExpression = `(${Unparse(rhsNode)})`;
@@ -929,12 +937,12 @@ function  ParseExpression(tokenStream: OvaleLexer, nodeList: ChildParseNode, ann
     {
         let [tokenType, token] = tokenStream.Peek();
         if (tokenType) {
-            let opInfo: { 1: "logical" | "arithmetic", 2: number} = UNARY_OPERATOR[token];
+            let opInfo: { 1: "logical" | "arithmetic", 2: number} = UNARY_OPERATOR[token as SimcUnaryOperatorType];
             if (opInfo) {
                 let [opType, precedence] = [opInfo[1], opInfo[2]];
                 let asType: "boolean" | "value" = (opType == "logical") && "boolean" || "value";
                 tokenStream.Consume();
-                let operator = token;
+                const operator = token as SimcUnaryOperatorType;
                 let rhsNode: ParseNode;
                 [ok, rhsNode] = ParseExpression(tokenStream, nodeList, annotation, precedence);
                 if (ok) {
@@ -945,7 +953,7 @@ function  ParseExpression(tokenStream: OvaleLexer, nodeList: ChildParseNode, ann
                         node = NewNode(nodeList, true);
                         node.type = opType;
                         node.expressionType = "unary";
-                        node.operator = <OperatorType> operator;
+                        node.operator = operator;
                         node.precedence = precedence;
                         node.child[1] = rhsNode;
                         rhsNode.asType = asType;
@@ -965,14 +973,14 @@ function  ParseExpression(tokenStream: OvaleLexer, nodeList: ChildParseNode, ann
         if (!tokenType) {
             break;
         }
-        let opInfo = BINARY_OPERATOR[token];
+        let opInfo = BINARY_OPERATOR[token as SimcBinaryOperatorType];
         if (opInfo) {
             let [opType, precedence] = [opInfo[1], opInfo[2]];
             let asType: "boolean" | "value" = (opType == "logical") && "boolean" || "value";
             if (precedence && precedence > minPrecedence) {
                 keepScanning = true;
                 tokenStream.Consume();
-                let operator = token;
+                const operator = token as SimcBinaryOperatorType;
                 let lhsNode = node;
                 let rhsNode;
                 [ok, rhsNode] = ParseExpression(tokenStream, nodeList, annotation, precedence);
@@ -980,7 +988,7 @@ function  ParseExpression(tokenStream: OvaleLexer, nodeList: ChildParseNode, ann
                     node = NewNode(nodeList, true);
                     node.type = opType;
                     node.expressionType = "binary";
-                    node.operator = <OperatorType>operator;
+                    node.operator = operator;
                     node.precedence = precedence;
                     node.child[1] = lhsNode;
                     node.child[2] = rhsNode;
@@ -990,7 +998,7 @@ function  ParseExpression(tokenStream: OvaleLexer, nodeList: ChildParseNode, ann
                         return [false, undefined];
                     }
                     rhsNode.asType = asType;
-                    while (node.type == rhsNode.type && node.operator == rhsNode.operator && BINARY_OPERATOR[node.operator][3] == "associative" && rhsNode.expressionType == "binary") {
+                    while (node.type == rhsNode.type && node.operator == rhsNode.operator && BINARY_OPERATOR[node.operator as SimcBinaryOperatorType][3] == "associative" && rhsNode.expressionType == "binary") {
                         node.child[2] = rhsNode.child[1];
                         rhsNode.child[1] = node;
                         node = rhsNode;
@@ -2592,7 +2600,7 @@ EmitExpression = function (parseNode, nodeList, annotation, action) {
     let node: AstNode;
     let msg;
     if (parseNode.expressionType == "unary") {
-        let opInfo = UNARY_OPERATOR[parseNode.operator];
+        let opInfo = UNARY_OPERATOR[parseNode.operator as SimcUnaryOperatorType];
         if (opInfo) {
             let operator: OperatorType;
             if (parseNode.operator == "!") {
@@ -2617,21 +2625,24 @@ EmitExpression = function (parseNode, nodeList, annotation, action) {
             }
         }
     } else if (parseNode.expressionType == "binary") {
-        let opInfo = BINARY_OPERATOR[parseNode.operator];
+        let opInfo = BINARY_OPERATOR[parseNode.operator as SimcBinaryOperatorType];
         if (opInfo) {
+            const parseNodeOperator = parseNode.operator as SimcBinaryOperatorType;
             let operator: OperatorType;
-            if (parseNode.operator == "&") {
+            if (parseNodeOperator == "&") {
                 operator = "and";
-            } else if (parseNode.operator == "^") {
+            } else if (parseNodeOperator == "^") {
                 operator = "xor";
-            } else if (parseNode.operator == "|") {
+            } else if (parseNodeOperator == "|") {
                 operator = "or";
-            } else if (parseNode.operator == "=") {
+            } else if (parseNodeOperator == "=") {
                 operator = "==";
-            } else if (parseNode.operator == "%") {
+            } else if (parseNodeOperator == "%") {
                 operator = "/";
             } else if (parseNode.type == "compare" || parseNode.type == "arithmetic") {
-                operator = parseNode.operator;
+                if (parseNodeOperator !== "~" && parseNodeOperator !== "!~") {
+                    operator = parseNodeOperator;
+                }
             }
             if (parseNode.type == "compare" && parseNode.child[1].rune) {
                 let lhsNode = parseNode.child[1];
