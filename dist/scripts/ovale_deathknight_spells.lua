@@ -12,7 +12,7 @@ Define(army_of_the_dead 42650)
 # Summons a legion of ghouls who swarms your enemies, fighting anything they can for 30 seconds.
   SpellInfo(army_of_the_dead runes=3 runicpower=-30 cd=480 duration=4 tick=0.5)
 
-Define(asphyxiate 108194)
+Define(asphyxiate 221562)
 # Lifts the enemy target off the ground, crushing their throat with dark energy and stunning them for 4 seconds.
   SpellInfo(asphyxiate cd=45 duration=4 talent=asphyxiate_talent_unholy)
   # Stunned.
