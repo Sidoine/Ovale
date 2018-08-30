@@ -174,11 +174,13 @@ function GetActionSpellInfo(element: Element, state: BaseState, atTime: number, 
     if (!action && replacedSpellId) {
         OvaleBestAction.Log("Action not found for spell ID '%s'; checking for replaced spell ID '%s'.", spellId, replacedSpellId);
         action = OvaleActionBar.GetForSpell(replacedSpellId);
+        if (action) spellId = replacedSpellId;
     }
     let isKnownSpell = OvaleSpellBook.IsKnownSpell(spellId);
     if (!isKnownSpell && replacedSpellId) {
         OvaleBestAction.Log("Spell ID '%s' is not known; checking for replaced spell ID '%s'.", spellId, replacedSpellId);
         isKnownSpell = OvaleSpellBook.IsKnownSpell(replacedSpellId);
+        if (isKnownSpell) spellId = replacedSpellId;
     }
     if (!isKnownSpell && !action) {
         OvaleBestAction.Log("Unknown spell ID '%s'.", spellId);

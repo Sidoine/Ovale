@@ -187,11 +187,17 @@ local function GetActionSpellInfo(element, state, atTime, target)
     if  not action and replacedSpellId then
         __exports.OvaleBestAction:Log("Action not found for spell ID '%s'; checking for replaced spell ID '%s'.", spellId, replacedSpellId)
         action = OvaleActionBar:GetForSpell(replacedSpellId)
+        if action then
+            spellId = replacedSpellId
+        end
     end
     local isKnownSpell = OvaleSpellBook:IsKnownSpell(spellId)
     if  not isKnownSpell and replacedSpellId then
         __exports.OvaleBestAction:Log("Spell ID '%s' is not known; checking for replaced spell ID '%s'.", spellId, replacedSpellId)
         isKnownSpell = OvaleSpellBook:IsKnownSpell(replacedSpellId)
+        if isKnownSpell then
+            spellId = replacedSpellId
+        end
     end
     if  not isKnownSpell and  not action then
         __exports.OvaleBestAction:Log("Unknown spell ID '%s'.", spellId)
