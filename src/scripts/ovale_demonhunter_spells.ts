@@ -404,6 +404,7 @@ Define(void_reaver_talent 20)
 # Tags
 SpellInfo(dark_slash tag=main)
 SpellInfo(demon_spikes tag=shortcd)
+SpellInfo(immolation_aura_havoc tag=main)
 SpellInfo(fel_barrage tag=main)
 SpellInfo(fel_eruption tag=main)
 SpellInfo(fel_rush tag=main)
