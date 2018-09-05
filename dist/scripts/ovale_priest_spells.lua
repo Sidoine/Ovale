@@ -280,7 +280,7 @@ Define(shadow_word_pain_debuff 589)
 	SpellRequire(shadow_word_void cd 7.5=buff,voidform_buff)
 	SpellRequire(shadow_word_void insanity_percent 200=buff,surrender_to_madness_buff)
 Define(shadowfiend 34433)
-	SpellInfo(shadowfiend cd=180 tag=main)
+	SpellInfo(shadowfiend cd=180)
 	SpellInfo(shadowfiend replaced_by=mindbender_discipline talent=disc_mindbender_talent specialization=discipline)
 
 	SpellRequire(shadowform unusable 1=buff,voidform_buff)

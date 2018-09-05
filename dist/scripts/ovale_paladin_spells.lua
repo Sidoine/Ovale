@@ -567,7 +567,7 @@ Define(blessed_hammer_talent 3)
 Define(blessing_of_spellwarding_talent 12)
 Define(blinding_light_talent 9)
 Define(cavalier_talent_holy 4)
-Define(cavalier_talent 11)
+Define(cavalier_talent 13)
 Define(consecrated_ground_talent 17)
 
 
@@ -578,7 +578,7 @@ Define(devotion_aura_talent 10)
 Define(divine_purpose_talent 19)
 
 Define(eye_for_an_eye_talent 15)
-Define(final_stand_talent 14)
+Define(final_stand_talent 13)
 Define(fires_of_justice_talent 4)
 Define(first_avenger_talent 4)
 Define(fist_of_justice_talent 7)
@@ -603,7 +603,7 @@ Define(sanctified_wrath_talent 16)
 Define(selfless_healer_talent 16)
 
 Define(unbreakable_spirit_talent_holy 5)
-Define(unbreakable_spirit_talent 13)
+Define(unbreakable_spirit_talent 14)
 
 Define(word_of_glory_talent 18)
 Define(zeal_talent 1)

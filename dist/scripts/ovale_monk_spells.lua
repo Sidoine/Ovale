@@ -517,13 +517,14 @@ Define(tigers_lust_talent 6)
 Define(upwelling_talent 20)
 
 # Non-default tags for OvaleSimulationCraft.
-	SpellInfo(chi_burst tag=main)
-	SpellInfo(chi_torpedo tag=shortcd)
-	SpellInfo(dampen_harm tag=cd)
-  SpellInfo(diffuse_magic tag=cd)
-  SpellInfo(ironskin_brew tag=shortcd)
-  SpellInfo(purifying_brew tag=shortcd)
-  SpellInfo(storm_earth_and_fire tag=cd)
+SpellInfo(chi_burst tag=main)
+SpellInfo(chi_torpedo tag=shortcd)
+SpellInfo(dampen_harm tag=cd)
+SpellInfo(diffuse_magic tag=cd)
+SpellInfo(fist_of_the_white_tiger tag=main)
+SpellInfo(ironskin_brew tag=shortcd)
+SpellInfo(purifying_brew tag=shortcd)
+SpellInfo(storm_earth_and_fire tag=cd)
 ]]
     OvaleScripts:RegisterScript("MONK", nil, name, desc, code, "include")
 end
