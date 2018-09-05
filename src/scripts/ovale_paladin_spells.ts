@@ -16,11 +16,6 @@ Define(avenging_wrath 31884)
   SpellInfo(avenging_wrath cd=120 duration=20)
   # Damage, healing, and critical strike chance increased by w1.
   SpellAddBuff(avenging_wrath avenging_wrath=1)
-Define(battle_potion_of_strength 279153)
-# Increases your Strength by s1 for 25 seconds.
-  SpellInfo(battle_potion_of_strength cd=1 duration=25 gcd=0 offgcd=1)
-  # Strength increased by w1.
-  SpellAddBuff(battle_potion_of_strength battle_potion_of_strength=1)
 Define(blade_of_justice 184575)
 # Pierces an enemy with a blade of light, dealing s2*<mult> Physical damage.rnrn|cFFFFFFFFGenerates s3 Holy Power.|r
   SpellInfo(blade_of_justice cd=10.5 holypower=-2)

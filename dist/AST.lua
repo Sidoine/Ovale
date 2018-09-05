@@ -2007,7 +2007,7 @@ __exports.OvaleASTClass = __class(OvaleASTBase, {
                 end
             end
             local code = OvaleScripts:GetScript(name)
-            if  not code then
+            if code == nil then
                 self:Error("Script '%s' not found when parsing INCLUDE.", name)
                 ok = false
             end

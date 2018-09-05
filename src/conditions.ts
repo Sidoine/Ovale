@@ -2,7 +2,7 @@ import LibBabbleCreatureType from "@wowts/lib_babble-creature_type-3.0";
 import LibRangeCheck from "@wowts/lib_range_check-2.0";
 import { OvaleBestAction } from "./BestAction";
 import { OvaleCompile } from "./Compile";
-import { OvaleCondition, TestValue, Compare, TestBoolean, ParseCondition, ConditionFunction, isComparator } from "./Condition";
+import { OvaleCondition, TestValue, Compare, TestBoolean, ParseCondition, ConditionFunction, isComparator, ConditionResult } from "./Condition";
 import { OvaleDamageTaken } from "./DamageTaken";
 import { OvaleData, SpellInfo } from "./Data";
 import { OvaleEquipment } from "./Equipment";
@@ -64,7 +64,7 @@ function ComputeParameter<T extends keyof SpellInfo>(spellId: number, paramName:
 }
 
 // Return the time in seconds, adjusted by the named haste effect.
-function GetHastedTime(seconds: number, haste: HasteType) {
+function GetHastedTime(seconds: number, haste: HasteType | undefined) {
     seconds = seconds || 0;
     let multiplier = OvalePaperDoll.GetHasteMultiplier(haste, OvalePaperDoll.next);
     return seconds / multiplier;
@@ -80,7 +80,7 @@ function GetHastedTime(seconds: number, haste: HasteType) {
 	@return 1 if the set bonus is active, or 0 otherwise.
 	@usage
 	if ArmorSetBonus(T16_melee 2) == 1 Spell(unleash_elements) */
-    function ArmorSetBonus(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
+    function ArmorSetBonus(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number): ConditionResult {
         Ovale.OneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0");
         let value = 0;
         return [0, INFINITY, value, 0, 0];
@@ -292,7 +292,7 @@ function GetHastedTime(seconds: number, haste: HasteType) {
         let spellList = OvaleData.buffSpellList[auraId];
         let count = 0;
         for (const [id] of pairs(spellList)) {
-            let aura = OvaleAura.GetAura(target, id, atTime, filter, mine);
+            const aura = OvaleAura.GetAura(target, id, atTime, filter, mine);
             if (OvaleAura.IsActiveAura(aura, atTime)) {
                 count = count + 1;
             }
@@ -458,7 +458,7 @@ function GetHastedTime(seconds: number, haste: HasteType) {
 	 if target.DebuffExpires(rake 2)
 	     Spell(rake)
      */
-    function BuffExpires(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
+    function BuffExpires(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number): ConditionResult {
         let [auraId, seconds] = [positionalParams[1], positionalParams[2]];
         let [target, filter, mine] = ParseCondition(positionalParams, namedParams);
         let aura = OvaleAura.GetAura(target, auraId, atTime, filter, mine);
@@ -499,8 +499,8 @@ function GetHastedTime(seconds: number, haste: HasteType) {
       if not target.DebuffPresent(rake 2)
           Spell(rake)
       */
-    function BuffPresent(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
-        let [auraId, seconds] = [positionalParams[1], positionalParams[2]];
+    function BuffPresent(positionalParams: PositionalParameters, namedParams: NamedParameters, atTime: number): ConditionResult {
+        let [auraId, seconds] = [positionalParams[1] as number, positionalParams[2] as number];
         let [target, filter, mine] = ParseCondition(positionalParams, namedParams);
         let aura = OvaleAura.GetAura(target, auraId, atTime, filter, mine);
         if (aura) {
@@ -743,7 +743,7 @@ function GetHastedTime(seconds: number, haste: HasteType) {
 	 if target.BuffStealable()
 	     Spell(spellsteal)
      */
-    function BuffStealable(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
+    function BuffStealable(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number): ConditionResult {
         let [target] = ParseCondition(positionalParams, namedParams);
         return OvaleAura.GetAuraWithProperty(target, "stealable", "HELPFUL", atTime);
     }
@@ -756,7 +756,7 @@ function GetHastedTime(seconds: number, haste: HasteType) {
 	 @param id The spell ID to check.
 	 @return True if the spell cast be cast; otherwise, false.
      */
-    function CanCast(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
+    function CanCast(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number): ConditionResult {
         let spellId = positionalParams[1];
         let [start, duration] = OvaleCooldown.GetSpellCooldown(spellId, atTime);
         return [start + duration, INFINITY];
@@ -823,7 +823,7 @@ function GetHastedTime(seconds: number, haste: HasteType) {
 	 if target.Casting(maloriak_release_aberrations)
 	     Spell(pummel)
      */
-    function Casting(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
+    function Casting(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number): ConditionResult {
         let spellId = positionalParams[1];
         let [target] = ParseCondition(positionalParams, namedParams);
         let start, ending, castSpellId, castSpellName;
@@ -880,7 +880,7 @@ function GetHastedTime(seconds: number, haste: HasteType) {
 	 if CheckBoxOff(opt_black_arrow) Spell(explosive_trap)
 
 	 */
-    function CheckBoxOff(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
+    function CheckBoxOff(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number): ConditionResult {
         for (const [, id] of ipairs(positionalParams)) {
             if (OvaleFrameModule.frame && OvaleFrameModule.frame.IsChecked(id)) {
                 return undefined;
@@ -900,7 +900,7 @@ function GetHastedTime(seconds: number, haste: HasteType) {
 	 AddCheckBox(opt_black_arrow "Black Arrow" default)
 	 if CheckBoxOn(opt_black_arrow) Spell(black_arrow)
      */
-    function CheckBoxOn(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
+    function CheckBoxOn(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number): ConditionResult {
         for (const [, id] of ipairs(positionalParams)) {
             if (OvaleFrameModule.frame && !OvaleFrameModule.frame.IsChecked(id)) {
                 return undefined;
@@ -1044,7 +1044,7 @@ function GetHastedTime(seconds: number, haste: HasteType) {
 	 if target.CreatureType(Humanoid Critter)
 	     Spell(polymorph)
      */
-    function CreatureType(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
+    function CreatureType(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number): ConditionResult {
         let [target] = ParseCondition(positionalParams, namedParams);
         let creatureType = UnitCreatureType(target);
         let lookupTable = LibBabbleCreatureType && LibBabbleCreatureType.GetLookupTable();
@@ -1241,7 +1241,7 @@ function GetHastedTime(seconds: number, haste: HasteType) {
 	     Valid values: player, target, focus, pet.
 	 @return A boolean value.
      */
-    function DiseasesTicking(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
+    function DiseasesTicking(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number): ConditionResult {
         let [target, ,] = ParseCondition(positionalParams, namedParams);
         let [talented, npAura, bpAura, ffAura] = GetDiseases(target, atTime);
         let gain, start, ending;
@@ -1266,7 +1266,7 @@ function GetHastedTime(seconds: number, haste: HasteType) {
 	     Valid values: player, target, focus, pet.
 	 @return A boolean value.
      */
-    function DiseasesAnyTicking(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
+    function DiseasesAnyTicking(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number): ConditionResult {
         let [target, ,] = ParseCondition(positionalParams, namedParams);
         let [talented, npAura, bpAura, ffAura] = GetDiseases(target, atTime);
         let aura;
@@ -2295,7 +2295,7 @@ function GetHastedTime(seconds: number, haste: HasteType) {
 	 AddListItem(opt_curse cot "Curse of Tongues")
 	 if List(opt_curse coe) Spell(curse_of_the_elements)
      */
-    function List(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
+    function List(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number): ConditionResult {
         let [name, value] = [positionalParams[1], positionalParams[2]];
         if (name && OvaleFrameModule.frame && OvaleFrameModule.frame.GetListValue(name) == value) {
             return [0, INFINITY];
@@ -3342,7 +3342,7 @@ l    */
     OvaleCondition.RegisterCondition("relativelevel", false, RelativeLevel);
 }
 {
-    function Refreshable(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
+    function Refreshable(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number): ConditionResult {
         let auraId = positionalParams[1];
         let [target, filter, mine] = ParseCondition(positionalParams, namedParams);
         let aura = OvaleAura.GetAura(target, auraId, atTime, filter, mine);
@@ -4664,7 +4664,7 @@ l    */
 	 if TotemExpires(fire) Spell(searing_totem)
 	 if TotemPresent(healing_stream_totem) and TotemExpires(water 3) Spell(totemic_recall)
      */
-    function TotemExpires(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
+    function TotemExpires(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number): ConditionResult {
         let [id, seconds] = [positionalParams[1], positionalParams[2]];
         seconds = seconds || 0;
         if (type(id) == "string") {
@@ -4691,7 +4691,7 @@ l    */
 	 if not TotemPresent(fire) Spell(searing_totem)
 	 if TotemPresent(healing_stream_totem) and TotemExpires(water 3) Spell(totemic_recall)
      */
-    function TotemPresent(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
+    function TotemPresent(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number): ConditionResult {
         let id = positionalParams[1];
         if (type(id) == "string") {
             let [, , startTime, duration] = OvaleTotem.GetTotemInfo(id, atTime);
@@ -4802,7 +4802,7 @@ l    */
 	 @paramsig boolean
 	 @return A boolean value.
      */
-    function True(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
+    function True(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number): ConditionResult {
         return [0, INFINITY];
     }
     OvaleCondition.RegisterCondition("true", false, True);
@@ -4853,7 +4853,7 @@ l    */
 	 @usage
 	 if WeaponEnchantExpires(main) Spell(windfury_weapon)
      */
-    function WeaponEnchantExpires(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
+    function WeaponEnchantExpires(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number): ConditionResult {
         let [hand, seconds] = [positionalParams[1], positionalParams[2]];
         seconds = seconds || 0;
         let [hasMainHandEnchant, mainHandExpiration, , hasOffHandEnchant, offHandExpiration] = GetWeaponEnchantInfo();

@@ -589,7 +589,6 @@ export class OvaleCompileClass extends OvaleCompileClassBase {
         let changed = false;
         ast = ast || this.ast;
         if (ast && (forceEvaluation || !this.serial || this.serial < self_serial)) {
-            this.Debug("Evaluating script.");
             changed = true;
             let ok = true;
             self_compileOnStances = false;

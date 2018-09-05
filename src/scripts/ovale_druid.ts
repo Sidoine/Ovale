@@ -1341,6 +1341,18 @@ Include(ovale_trinkets_wod)
 Include(ovale_druid_spells)
 
 
+AddFunction delayed_tf_opener
+{
+ if Talent(sabertooth_talent) and Talent(bloodtalons_talent) and not Talent(lunar_inspiration_talent) 1
+ 0
+}
+
+AddFunction opener_done
+{
+ if target.DebuffPresent(rip_debuff) 1
+ 0
+}
+
 AddFunction use_thrash
 {
  if HasEquippedItem(luffa_wrappings_item) 1
@@ -1606,6 +1618,9 @@ AddFunction FeralPrecombatMainActions
  if Talent(bloodtalons_talent) Spell(regrowth)
  #variable,name=use_thrash,value=0
  #variable,name=use_thrash,value=1,if=equipped.luffa_wrappings
+ #variable,name=opener_done,value=0
+ #variable,name=delayed_tf_opener,value=0
+ #variable,name=delayed_tf_opener,value=1,if=talent.sabertooth.enabled&talent.bloodtalons.enabled&!talent.lunar_inspiration.enabled
  #cat_form
  Spell(cat_form)
  #prowl
@@ -1630,6 +1645,8 @@ AddFunction FeralPrecombatCdActions
  unless Talent(bloodtalons_talent) and Spell(regrowth) or Spell(cat_form) or Spell(prowl)
  {
   #snapshot_stats
+  #berserk
+  Spell(berserk)
   #potion
   if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_agility usable=1)
  }
@@ -1638,6 +1655,56 @@ AddFunction FeralPrecombatCdActions
 AddFunction FeralPrecombatCdPostConditions
 {
  Talent(bloodtalons_talent) and Spell(regrowth) or Spell(cat_form) or Spell(prowl)
+}
+
+### actions.opener
+
+AddFunction FeralOpenerMainActions
+{
+ #rake,if=!ticking|buff.prowl.up
+ if not target.DebuffPresent(rake_debuff) or BuffPresent(prowl_buff) Spell(rake)
+ #variable,name=opener_done,value=1,if=dot.rip.ticking
+ #wait,sec=0.001,if=dot.rip.ticking
+ #moonfire_cat,if=!ticking|buff.bloodtalons.stack=1&combo_points<5
+ if not target.DebuffPresent(moonfire_cat_debuff) or BuffStacks(bloodtalons_buff) == 1 and ComboPoints() < 5 Spell(moonfire_cat)
+ #thrash,if=!ticking&combo_points<5
+ if not target.DebuffPresent(thrash) and ComboPoints() < 5 Spell(thrash)
+ #shred,if=combo_points<5
+ if ComboPoints() < 5 Spell(shred)
+ #regrowth,if=combo_points=5&talent.bloodtalons.enabled&(talent.sabertooth.enabled&buff.bloodtalons.down|buff.predatory_swiftness.up)
+ if ComboPoints() == 5 and Talent(bloodtalons_talent) and { Talent(sabertooth_talent) and BuffExpires(bloodtalons_buff) or BuffPresent(predatory_swiftness_buff) } Spell(regrowth)
+ #rip,if=combo_points=5
+ if ComboPoints() == 5 Spell(rip)
+}
+
+AddFunction FeralOpenerMainPostConditions
+{
+}
+
+AddFunction FeralOpenerShortCdActions
+{
+ #tigers_fury,if=variable.delayed_tf_opener=0
+ if delayed_tf_opener() == 0 Spell(tigers_fury)
+
+ unless { not target.DebuffPresent(rake_debuff) or BuffPresent(prowl_buff) } and Spell(rake) or { not target.DebuffPresent(moonfire_cat_debuff) or BuffStacks(bloodtalons_buff) == 1 and ComboPoints() < 5 } and Spell(moonfire_cat) or not target.DebuffPresent(thrash) and ComboPoints() < 5 and Spell(thrash) or ComboPoints() < 5 and Spell(shred) or ComboPoints() == 5 and Talent(bloodtalons_talent) and { Talent(sabertooth_talent) and BuffExpires(bloodtalons_buff) or BuffPresent(predatory_swiftness_buff) } and Spell(regrowth)
+ {
+  #tigers_fury
+  Spell(tigers_fury)
+ }
+}
+
+AddFunction FeralOpenerShortCdPostConditions
+{
+ { not target.DebuffPresent(rake_debuff) or BuffPresent(prowl_buff) } and Spell(rake) or { not target.DebuffPresent(moonfire_cat_debuff) or BuffStacks(bloodtalons_buff) == 1 and ComboPoints() < 5 } and Spell(moonfire_cat) or not target.DebuffPresent(thrash) and ComboPoints() < 5 and Spell(thrash) or ComboPoints() < 5 and Spell(shred) or ComboPoints() == 5 and Talent(bloodtalons_talent) and { Talent(sabertooth_talent) and BuffExpires(bloodtalons_buff) or BuffPresent(predatory_swiftness_buff) } and Spell(regrowth) or ComboPoints() == 5 and Spell(rip)
+}
+
+AddFunction FeralOpenerCdActions
+{
+}
+
+AddFunction FeralOpenerCdPostConditions
+{
+ delayed_tf_opener() == 0 and Spell(tigers_fury) or { not target.DebuffPresent(rake_debuff) or BuffPresent(prowl_buff) } and Spell(rake) or { not target.DebuffPresent(moonfire_cat_debuff) or BuffStacks(bloodtalons_buff) == 1 and ComboPoints() < 5 } and Spell(moonfire_cat) or not target.DebuffPresent(thrash) and ComboPoints() < 5 and Spell(thrash) or ComboPoints() < 5 and Spell(shred) or ComboPoints() == 5 and Talent(bloodtalons_talent) and { Talent(sabertooth_talent) and BuffExpires(bloodtalons_buff) or BuffPresent(predatory_swiftness_buff) } and Spell(regrowth) or Spell(tigers_fury) or ComboPoints() == 5 and Spell(rip)
 }
 
 ### actions.cooldowns
@@ -1707,80 +1774,56 @@ AddFunction FeralCooldownsCdPostConditions
 
 AddFunction FeralDefaultMainActions
 {
- #run_action_list,name=single_target,if=dot.rip.ticking|time>15
- if target.DebuffPresent(rip_debuff) or TimeInCombat() > 15 FeralSingletargetMainActions()
+ #run_action_list,name=opener,if=variable.opener_done=0
+ if opener_done() == 0 FeralOpenerMainActions()
 
- unless { target.DebuffPresent(rip_debuff) or TimeInCombat() > 15 } and FeralSingletargetMainPostConditions()
+ unless opener_done() == 0 and FeralOpenerMainPostConditions()
  {
-  #rake,if=!ticking|buff.prowl.up
-  if not target.DebuffPresent(rake_debuff) or BuffPresent(prowl_buff) Spell(rake)
-  #moonfire_cat,if=talent.lunar_inspiration.enabled&!ticking
-  if Talent(lunar_inspiration_talent) and not target.DebuffPresent(moonfire_cat_debuff) Spell(moonfire_cat)
-  #savage_roar,if=!buff.savage_roar.up
-  if not BuffPresent(savage_roar_buff) Spell(savage_roar)
-  #regrowth,if=(talent.sabertooth.enabled|buff.predatory_swiftness.up)&talent.bloodtalons.enabled&buff.bloodtalons.down&combo_points=5
-  if { Talent(sabertooth_talent) or BuffPresent(predatory_swiftness_buff) } and Talent(bloodtalons_talent) and BuffExpires(bloodtalons_buff) and ComboPoints() == 5 Spell(regrowth)
-  #rip,if=combo_points=5
-  if ComboPoints() == 5 Spell(rip)
-  #thrash_cat,if=!ticking&variable.use_thrash>0
-  if not target.DebuffPresent(thrash_cat_debuff) and use_thrash() > 0 Spell(thrash_cat)
-  #shred
-  Spell(shred)
+  #run_action_list,name=single_target
+  FeralSingletargetMainActions()
  }
 }
 
 AddFunction FeralDefaultMainPostConditions
 {
- { target.DebuffPresent(rip_debuff) or TimeInCombat() > 15 } and FeralSingletargetMainPostConditions()
+ opener_done() == 0 and FeralOpenerMainPostConditions() or FeralSingletargetMainPostConditions()
 }
 
 AddFunction FeralDefaultShortCdActions
 {
- #run_action_list,name=single_target,if=dot.rip.ticking|time>15
- if target.DebuffPresent(rip_debuff) or TimeInCombat() > 15 FeralSingletargetShortCdActions()
+ #auto_attack,if=!buff.prowl.up&!buff.shadowmeld.up
+ if not BuffPresent(prowl_buff) and not BuffPresent(shadowmeld_buff) FeralGetInMeleeRange()
+ #run_action_list,name=opener,if=variable.opener_done=0
+ if opener_done() == 0 FeralOpenerShortCdActions()
 
- unless { target.DebuffPresent(rip_debuff) or TimeInCombat() > 15 } and FeralSingletargetShortCdPostConditions() or { not target.DebuffPresent(rake_debuff) or BuffPresent(prowl_buff) } and Spell(rake)
+ unless opener_done() == 0 and FeralOpenerShortCdPostConditions()
  {
-  #auto_attack
-  FeralGetInMeleeRange()
-
-  unless Talent(lunar_inspiration_talent) and not target.DebuffPresent(moonfire_cat_debuff) and Spell(moonfire_cat) or not BuffPresent(savage_roar_buff) and Spell(savage_roar)
-  {
-   #tigers_fury
-   Spell(tigers_fury)
-  }
+  #run_action_list,name=single_target
+  FeralSingletargetShortCdActions()
  }
 }
 
 AddFunction FeralDefaultShortCdPostConditions
 {
- { target.DebuffPresent(rip_debuff) or TimeInCombat() > 15 } and FeralSingletargetShortCdPostConditions() or { not target.DebuffPresent(rake_debuff) or BuffPresent(prowl_buff) } and Spell(rake) or Talent(lunar_inspiration_talent) and not target.DebuffPresent(moonfire_cat_debuff) and Spell(moonfire_cat) or not BuffPresent(savage_roar_buff) and Spell(savage_roar) or { Talent(sabertooth_talent) or BuffPresent(predatory_swiftness_buff) } and Talent(bloodtalons_talent) and BuffExpires(bloodtalons_buff) and ComboPoints() == 5 and Spell(regrowth) or ComboPoints() == 5 and Spell(rip) or not target.DebuffPresent(thrash_cat_debuff) and use_thrash() > 0 and Spell(thrash_cat) or Spell(shred)
+ opener_done() == 0 and FeralOpenerShortCdPostConditions() or FeralSingletargetShortCdPostConditions()
 }
 
 AddFunction FeralDefaultCdActions
 {
  FeralInterruptActions()
- #run_action_list,name=single_target,if=dot.rip.ticking|time>15
- if target.DebuffPresent(rip_debuff) or TimeInCombat() > 15 FeralSingletargetCdActions()
+ #run_action_list,name=opener,if=variable.opener_done=0
+ if opener_done() == 0 FeralOpenerCdActions()
 
- unless { target.DebuffPresent(rip_debuff) or TimeInCombat() > 15 } and FeralSingletargetCdPostConditions() or { not target.DebuffPresent(rake_debuff) or BuffPresent(prowl_buff) } and Spell(rake)
+ unless opener_done() == 0 and FeralOpenerCdPostConditions()
  {
-  #dash,if=!buff.cat_form.up
-  if not BuffPresent(cat_form_buff) Spell(dash)
-
-  unless Talent(lunar_inspiration_talent) and not target.DebuffPresent(moonfire_cat_debuff) and Spell(moonfire_cat) or not BuffPresent(savage_roar_buff) and Spell(savage_roar)
-  {
-   #berserk
-   Spell(berserk)
-   #incarnation
-   Spell(incarnation_king_of_the_jungle)
-  }
+  #run_action_list,name=single_target
+  FeralSingletargetCdActions()
  }
 }
 
 AddFunction FeralDefaultCdPostConditions
 {
- { target.DebuffPresent(rip_debuff) or TimeInCombat() > 15 } and FeralSingletargetCdPostConditions() or { not target.DebuffPresent(rake_debuff) or BuffPresent(prowl_buff) } and Spell(rake) or Talent(lunar_inspiration_talent) and not target.DebuffPresent(moonfire_cat_debuff) and Spell(moonfire_cat) or not BuffPresent(savage_roar_buff) and Spell(savage_roar) or Spell(tigers_fury) or { Talent(sabertooth_talent) or BuffPresent(predatory_swiftness_buff) } and Talent(bloodtalons_talent) and BuffExpires(bloodtalons_buff) and ComboPoints() == 5 and Spell(regrowth) or ComboPoints() == 5 and Spell(rip) or not target.DebuffPresent(thrash_cat_debuff) and use_thrash() > 0 and Spell(thrash_cat) or Spell(shred)
+ opener_done() == 0 and FeralOpenerCdPostConditions() or FeralSingletargetCdPostConditions()
 }
 
 ### Feral icons.
@@ -1886,6 +1929,7 @@ AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
 # shred
 # skull_bash
 # swipe_cat
+# thrash
 # thrash_cat
 # thrash_cat_debuff
 # tigers_fury

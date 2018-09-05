@@ -15,7 +15,7 @@ import { format, gmatch, gsub, find, len, lower, match, sub, upper } from "@wowt
 import { ipairs, next, pairs, rawset, tonumber, tostring, type, wipe, LuaObj, LuaArray, setmetatable, lualength, truthy, kpairs } from "@wowts/lua";
 import { concat, insert, remove, sort } from "@wowts/table";
 import { RAID_CLASS_COLORS, ClassId } from "@wowts/wow-mock";
-import { isLuaArray } from "./tools";
+import { isLuaArray, TypeCheck, checkToken } from "./tools";
 import { SpecializationName } from "./PaperDoll";
 
 let OvaleSimulationCraftBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleSimulationCraft"));
@@ -104,6 +104,109 @@ const classInfos: { [key in ClassId]: ClassInfo} = {
     }
 }
 
+const CHARACTER_PROPERTY: LuaObj<string> = {
+    ["active_enemies"]: "Enemies()",
+    ["astral_power"]: "AstralPower()",
+    ["astral_power.deficit"]: "AstralPowerDeficit()",
+    ["blade_dance_worth_using"]: "0",
+    ["blood.frac"]: "Rune(blood)",
+    ["buff.arcane_charge.stack"]: "ArcaneCharges()",
+    ["buff.arcane_charge.max_stack"]: "MaxArcaneCharges()",
+    ["buff.movement.up"]: "Speed() > 0",
+    ["buff.out_of_range.up"]: "not target.InRange()",
+    ["bugs"]: "0",
+    ["chi"]: "Chi()",
+    ["chi.max"]: "MaxChi()",
+    ["combo_points"]: "ComboPoints()",
+    ["combo_points.deficit"]: "ComboPointsDeficit()",
+    ["combo_points.max"]: "MaxComboPoints()",
+    ["consecration.remains"]: "BuffRemaining(consecration)",
+    ["consecration.up"]: "BuffPresent(consecration)",
+    ["cp_max_spend"]: "MaxComboPoints()",
+    ["crit_pct_current"]: "SpellCritChance()",
+    ["current_insanity_drain"]: "CurrentInsanityDrain()",
+    ["darkglare_no_de"]: "NotDeDemons(darkglare)",
+    ["death_and_decay.ticking"]: "BuffPresent(death_and_decay)",
+    ["death_sweep_worth_using"]: "0",
+    ["delay"]: "0",
+    ["demonic_fury"]: "DemonicFury()",
+    ["desired_targets"]: "Enemies(tagged=1)",
+    ["doomguard_no_de"]: "NotDeDemons(doomguard)",
+    ["dreadstalker_no_de"]: "NotDeDemons(dreadstalker)",
+    ["dreadstalker_remaining_duration"]: "DemonDuration(dreadstalker)",
+    ["eclipse_change"]: "TimeToEclipse()",
+    ["eclipse_energy"]: "EclipseEnergy()",
+    ["enemies"]: "Enemies()",
+    ["energy"]: "Energy()",
+    ["energy.deficit"]: "EnergyDeficit()",
+    ["energy.max"]: "MaxEnergy()",
+    ["energy.regen"]: "EnergyRegenRate()",
+    ["energy.time_to_max"]: "TimeToMaxEnergy()",
+    ["feral_spirit.remains"]: "TotemRemaining(sprit_wolf)",
+    ["finality"]: "HasArtifactTrait(finality)",
+    ["focus"]: "Focus()",
+    ["focus.deficit"]: "FocusDeficit()",
+    ["focus.max"]: "MaxFocus()",
+    ["focus.regen"]: "FocusRegenRate()",
+    ["focus.time_to_max"]: "TimeToMaxFocus()",
+    ["frost.frac"]: "Rune(frost)",
+    ["fury"]: "Fury()",
+    ["fury.deficit"]: "FuryDeficit()",
+    ["health"]: "Health()",
+    ["health.deficit"]: "HealthMissing()",
+    ["health.max"]: "MaxHealth()",
+    ["health.pct"]: "HealthPercent()",
+    ["health.percent"]: "HealthPercent()",
+    ["holy_power"]: "HolyPower()",
+    ["infernal_no_de"]: "NotDeDemons(infernal)",
+    ["insanity"]: "Insanity()",
+    ["level"]: "Level()",
+    ["lunar_max"]: "TimeToEclipse(lunar)",
+    ["mana"]: "Mana()",
+    ["mana.deficit"]: "ManaDeficit()",
+    ["mana.max"]: "MaxMana()",
+    ["mana.pct"]: "ManaPercent()",
+    ["maelstrom"]: "Maelstrom()",
+    ["next_wi_bomb.pheromone"]: "SpellUsable(270323)",
+    ["next_wi_bomb.shrapnel"]: "SpellUsable(270335)",
+    ["next_wi_bomb.volatile"]: "SpellUsable(271045)",
+    ["nonexecute_actors_pct"]: "0",
+    ["pain"]: "Pain()",
+    ["pain.deficit"]: "PainDeficit()",
+    ["pet_count"]: "Demons()",
+    ["rage"]: "Rage()",
+    ["rage.deficit"]: "RageDeficit()",
+    ["rage.max"]: "MaxRage()",
+    ["raid_event.adds.remains"]: "0", // TODO
+    ["raw_haste_pct"]: "SpellCastSpeedPercent()",
+    ["rtb_list.any.5"]: "BuffCount(roll_the_bones_buff more 4)",
+    ["rtb_list.any.6"]: "BuffCount(roll_the_bones_buff more 5)",
+    ["rune.deficit"]: "RuneDeficit()",
+    ["runic_power"]: "RunicPower()",
+    ["runic_power.deficit"]: "RunicPowerDeficit()",
+    ["service_no_de"]: "0",
+    ["shadow_orb"]: "ShadowOrbs()",
+    ["sigil_placed"]: "SigilCharging(flame)",
+    ["solar_max"]: "TimeToEclipse(solar)",
+    ["soul_shard"]: "SoulShards()",
+    ["soul_fragments"]: "SoulFragments()",
+    ["ssw_refund_offset"]: "target.Distance() % 3 - 1",
+    ["stat.mastery_rating"]: "MasteryRating()",
+    ["stealthed"]: "Stealthed()",
+    ["stealthed.all"]: "Stealthed()",
+    ["stealthed.rogue"]: "Stealthed()",
+    ["time"]: "TimeInCombat()",
+    ["time_to_20pct"]: "TimeToHealthPercent(20)",
+    ["time_to_die"]: "TimeToDie()",
+    ["time_to_die.remains"]: "TimeToDie()",
+    ["time_to_shard"]: "TimeToShard()",
+    ["time_to_sht.4"]: "100", // TODO
+    ["time_to_sht.5"]: "100",
+    ["wild_imp_count"]: "Demons(wild_imp)",
+    ["wild_imp_no_de"]: "NotDeDemons(wild_imp)",
+    ["wild_imp_remaining_duration"]: "DemonDuration(wild_imp)"
+};
+
 export type InterruptAnnotation = { [key in Interrupts]?: ClassId };
 
 export interface Annotation extends InterruptAnnotation {
@@ -118,7 +221,7 @@ export interface Annotation extends InterruptAnnotation {
     ranged?: ClassType;
     taggedFunctionName?: LuaObj<boolean>;
     functionTag?: any;
-    nodeList?: LuaArray<ScNode>;
+    nodeList?: LuaArray<ParseNode>;
     
     astAnnotation?: any;
     dictionaryAST?: any;
@@ -129,7 +232,7 @@ export interface Annotation extends InterruptAnnotation {
     supportingDefineCount?: number;
     symbolTable?: LuaObj<boolean>;
     symbolList?: LuaArray<string>;
-    operand?: LuaArray<ScNode>;
+    operand?: LuaArray<ParseNode>;
 
     sync?: LuaObj<ParseNode>; 
 
@@ -165,25 +268,63 @@ export interface Annotation extends InterruptAnnotation {
     vengeful_retreat?:string;
 }
 
-interface ChildParseNode extends LuaArray<ParseNode> {
-    [key:string]: ParseNode;
+interface Modifiers {
     ammo_type?: ParseNode;
-    cycle_targets?: ParseNode;
-    lethal?: ParseNode;
-    cooldown?: ParseNode;
-    target?: ParseNode;
-    for_next?: ParseNode;
-    extra_amount?: ParseNode;
+    animation_cancel?: ParseNode;
+    attack_speed?: ParseNode;
+    chain?: ParseNode;
     choose?: ParseNode;
-    slot?: ParseNode;
-    sec?: ParseNode;
-    if?: ParseNode;
-    op?: ParseNode;
-    name?: ParseNode;
-    value?: ParseNode;
-    value_else?: ParseNode;
-    condition?: ParseNode;
+    condition?: ParseNode,
+    cooldown?: ParseNode,
+    cooldown_stddev?: ParseNode,
+    cycle_targets?: ParseNode,
+    damage?: ParseNode,
+    delay?: ParseNode;
+    early_chain_if?: ParseNode,
+    extra_amount?: ParseNode,
+    five_stacks?: ParseNode,
+    for_next?: ParseNode,
+    if?: ParseNode,
+    interrupt?: ParseNode,
+    interrupt_global?: ParseNode,
+    interrupt_if?: ParseNode,
+    interrupt_immediate?: ParseNode,
+    interval?: ParseNode,
+    lethal?: ParseNode,
+    line_cd?: ParseNode,
+    max_cycle_targets?: ParseNode,
+    max_energy?: ParseNode,
+    min_frenzy?: ParseNode,
+    moving?: ParseNode,
+    name?: ParseNode,
+    nonlethal?: ParseNode,
+    op?: ParseNode,
+    pct_health?: ParseNode,
+    precombat?: ParseNode,
+    precombat_seconds?: ParseNode, //todo
+    precast_time?: ParseNode, //todo
+    range?: ParseNode,
+    sec?: ParseNode,
+    slot?: ParseNode,
+    strikes?: ParseNode;
+    sync?: ParseNode,
+    sync_weapons?: ParseNode,
+    target?: ParseNode,
+    target_if?: ParseNode,
+    target_if_first?: ParseNode,
+    target_if_max?: ParseNode,
+    target_if_min?: ParseNode,
+    toggle?: ParseNode,
+    travel_speed?: ParseNode,
+    type?: ParseNode,
+    value?: ParseNode,
+    value_else?: ParseNode,
+    wait?: ParseNode,
+    wait_on_ready?: ParseNode,
+    weapon?: ParseNode
 }
+
+type Modifier = keyof Modifiers;
 
 type ParseNodeType = "action" | "action_list" | "arithmetic" | "compare" |
 "function" | "logical" | "number" | "operand"
@@ -196,7 +337,8 @@ type SimcOperatorType = SimcUnaryOperatorType | SimcBinaryOperatorType;
 
 interface ParseNode {
     name: string;
-    child: ChildParseNode;
+    child: LuaArray<ParseNode>;
+    modifiers: Modifiers;
     rune: string;
     asType: NodeType;
     type: ParseNodeType;
@@ -236,7 +378,7 @@ interface Profile extends ProfileStrings, ProfileLists {
 }
 
 let KEYWORD: LuaObj<boolean> = {}
-let MODIFIER_KEYWORD: LuaObj<boolean> = {
+const MODIFIER_KEYWORD: TypeCheck<Modifiers> = {
     ["ammo_type"]: true,
     ["animation_cancel"]: true,
     ["attack_speed"]: true,
@@ -247,6 +389,7 @@ let MODIFIER_KEYWORD: LuaObj<boolean> = {
     ["cooldown_stddev"]: true,
     ["cycle_targets"]: true,
     ["damage"]: true,
+    ["delay"]: true,
     ["early_chain_if"]: true,
     ["extra_amount"]: true,
     ["five_stacks"]: true,
@@ -273,6 +416,7 @@ let MODIFIER_KEYWORD: LuaObj<boolean> = {
     ["range"]: true,
     ["sec"]: true,
     ["slot"]: true,
+    ["strikes"]: true,
     ["sync"]: true,
     ["sync_weapons"]: true,
     ["target"]: true,
@@ -442,22 +586,9 @@ let INDENT: LuaArray<string> = {}
     }
     setmetatable(INDENT, metatable);
 }
-let EMIT_DISAMBIGUATION = {
-}
-// let EMIT_EXTRA_PARAMETERS = {
-// }
-let OPERAND_TOKEN_PATTERN = "[^.]+";
-// let POTION_STAT = {
-//     ["draenic_agility"]: "agility",
-//     ["draenic_armor"]: "armor",
-//     ["draenic_intellect"]: "intellect",
-//     ["draenic_strength"]: "strength",
-//     ["jade_serpent"]: "intellect",
-//     ["mogu_power"]: "strength",
-//     ["mountains"]: "armor",
-//     ["tolvir"]: "agility",
-//     ["virmens_bite"]: "agility"
-// }
+
+const EMIT_DISAMBIGUATION = {}
+const OPERAND_TOKEN_PATTERN = "[^.]+";
 
 interface OptionalSkill {
     class: string;
@@ -465,7 +596,7 @@ interface OptionalSkill {
     specialization?: string;
 }
 
-let OPTIONAL_SKILLS = {
+const OPTIONAL_SKILLS = {
     ["volley"]: <OptionalSkill> {
         class: "HUNTER",
         default: true
@@ -515,14 +646,10 @@ let OPTIONAL_SKILLS = {
     }
 }
 
-type ScNode = ParseNode;
-
-let self_functionDefined: LuaObj<boolean> = {
-}
-let self_functionUsed: LuaObj<boolean> = {
-}
+let self_functionDefined: LuaObj<boolean> = {};
+let self_functionUsed: LuaObj<boolean> = {};
 let self_outputPool = new OvalePool<LuaArray<string>>("OvaleSimulationCraft_outputPool");
-let self_childrenPool = new OvalePool<ChildParseNode>("OvaleSimulationCraft_childrenPool");
+let self_childrenPool = new OvalePool<LuaArray<ParseNode> | Modifiers>("OvaleSimulationCraft_childrenPool");
 class SelfPool extends OvalePool<ParseNode> {
     constructor(){
         super("OvaleSimulationCraft_pool");
@@ -606,7 +733,7 @@ const print_r = function(node: AstNode, indent?: string, done?: LuaObj<boolean>,
 //     let output = print_r(tbl);
 //     OvaleSimulationCraft.Debug(tconcat(output, "\n"));
 // }
-const NewNode = function(nodeList: ChildParseNode, hasChild?: boolean) {
+const NewNode = function(nodeList: LuaArray<ParseNode>, hasChild?: boolean) {
     let node = self_pool.Get();
     if (nodeList) {
         let nodeId = lualength(nodeList) + 1;
@@ -614,7 +741,7 @@ const NewNode = function(nodeList: ChildParseNode, hasChild?: boolean) {
         nodeList[nodeId] = node;
     }
     if (hasChild) {
-        node.child = self_childrenPool.Get();
+        node.child = self_childrenPool.Get() as LuaArray<ParseNode>;
     }
     return node;
 }
@@ -681,7 +808,7 @@ const MATCHES:LuaArray<TokenizerDefinition> = {
     }
 }
 
-const GetPrecedence = function(node: ScNode) {
+const GetPrecedence = function(node: ParseNode) {
     let precedence = node.precedence;
     if (!precedence) {
         let operator = node.operator;
@@ -808,10 +935,10 @@ const SyntaxError = function(tokenStream: OvaleLexer, ...__args: any[]) {
     OvaleSimulationCraft.Warning(concat(context, " "));
 }
 
-type ParseFunction = (tokenStream: OvaleLexer, nodeList: ChildParseNode, annotation: Annotation) => [boolean, ScNode];
+type ParseFunction = (tokenStream: OvaleLexer, nodeList: LuaArray<ParseNode>, annotation: Annotation) => [boolean, ParseNode];
 
 let ParseFunction: ParseFunction = undefined;
-let ParseModifier: (tokenStream: OvaleLexer, nodeList: ChildParseNode, annotation: Annotation) => [boolean, string, ScNode] = undefined;
+let ParseModifier: (tokenStream: OvaleLexer, nodeList: LuaArray<ParseNode>, annotation: Annotation) => [boolean, Modifier, ParseNode] = undefined;
 let ParseNumber: ParseFunction = undefined;
 let ParseOperand: ParseFunction = undefined;
 let ParseParentheses: ParseFunction = undefined;
@@ -824,7 +951,20 @@ const TicksRemainTranslationHelper = function(p1: string, p2: string, p3: string
         return `${p1}<${tostring(tonumber(p3) + 1)}`;
     }
 }
-const ParseAction = function (action: string, nodeList: ChildParseNode, annotation: Annotation): [boolean, ScNode] {
+
+// function filterTargetAuraConditions(node: ParseNode) {
+//     const changed = false;
+//     for (const [k, child] of pairs(node.child)) {
+//         const n = filterTargetAuraConditions(child);
+//         if (n !== child) {
+//             changed = true;
+//         }
+//     }
+//     return node;
+// }
+
+/** Parse an action. An action may has modifiers separated by a comma */
+const ParseAction = function (action: string, nodeList: LuaArray<ParseNode>, annotation: Annotation): [boolean, ParseNode] {
     let ok = true;
     let stream = action;
     {
@@ -874,16 +1014,18 @@ const ParseAction = function (action: string, nodeList: ChildParseNode, annotati
             ok = false;
         }
     }
-    let child = self_childrenPool.Get();
+    const child = self_childrenPool.Get() as LuaArray<ParseNode>;
+    const modifiers = self_childrenPool.Get() as Modifiers;
+                    
     if (ok) {
         let [tokenType, token] = tokenStream.Peek();
         while (ok && tokenType) {
             if (tokenType == ",") {
                 tokenStream.Consume();
-                let modifier: string, expressionNode: ScNode;
+                let modifier: Modifier, expressionNode: ParseNode;
                 [ok, modifier, expressionNode] = ParseModifier(tokenStream, nodeList, annotation);
                 if (ok) {
-                    child[modifier] = expressionNode;
+                    modifiers[modifier] = expressionNode;
                     [tokenType, token] = tokenStream.Peek();
                 }
             } else {
@@ -899,21 +1041,50 @@ const ParseAction = function (action: string, nodeList: ChildParseNode, annotati
         node.action = action;
         node.name = name;
         node.child = child;
+        node.modifiers = modifiers;
         annotation.sync = annotation.sync || {}
         annotation.sync[name] = annotation.sync[name] || node;
     } else {
         self_childrenPool.Release(child);
     }
+
     return [ok, node];
 }
-const ParseActionList = function (name: string, actionList: string, nodeList: ChildParseNode, annotation: Annotation): [boolean, ParseNode] {
+
+/** Parse an action list (a series of actions separated by "/""). Returns a ParseNode of type "action_list" */
+const ParseActionList = function (name: string, actionList: string, nodeList: LuaArray<ParseNode>, annotation: Annotation): [boolean, ParseNode] {
     let ok = true;
-    let child = self_childrenPool.Get();
+    let child = self_childrenPool.Get() as LuaArray<ParseNode>;
     for (const action of gmatch(actionList, "[^/]+")) {
         let actionNode;
         [ok, actionNode] = ParseAction(action, nodeList, annotation);
         if (ok) {
             child[lualength(child) + 1] = actionNode;
+            // if (actionNode.modifiers.cycle_targets) {
+            //     // Create another action but with the condition negated
+            //     const secondNode = NewNode(nodeList);
+            //     secondNode.type = "action";
+            //     secondNode.action = actionNode.action;
+            //     secondNode.name = actionNode.name;
+            //     const modifiers = self_childrenPool.Get() as Modifiers;
+            //     for (const [k, n] of kpairs(actionNode.modifiers)) {
+            //         if (k === "if") {
+            //             const logicalNode = NewNode(nodeList, true);
+            //             logicalNode.type = "logical";
+            //             logicalNode.operator = "!";
+            //             logicalNode.expressionType = "unary";
+            //             logicalNode.child[1] = n;
+            //             modifiers[k] = logicalNode;
+            //         } else {
+            //             modifiers[k] = n;
+            //         }
+            //     }
+            //     modifiers.target = NewNode(nodeList);
+            //     modifiers.target.type = "operand";
+            //     modifiers.target.name = "cycle";
+            //     secondNode.modifiers = modifiers;
+            //     insert(child, secondNode);
+            // }
         } else {
             break;
         }
@@ -930,10 +1101,10 @@ const ParseActionList = function (name: string, actionList: string, nodeList: Ch
     return [ok, node];
 }
 
-function  ParseExpression(tokenStream: OvaleLexer, nodeList: ChildParseNode, annotation: Annotation, minPrecedence?: number):[boolean, ParseNode] {
+function  ParseExpression(tokenStream: OvaleLexer, nodeList: LuaArray<ParseNode>, annotation: Annotation, minPrecedence?: number):[boolean, ParseNode] {
     minPrecedence = minPrecedence || 0;
     let ok = true;
-    let node: ScNode;
+    let node: ParseNode;
     {
         let [tokenType, token] = tokenStream.Peek();
         if (tokenType) {
@@ -1055,7 +1226,7 @@ ParseFunction = function (tokenStream: OvaleLexer, nodeList, annotation) {
     }
     return [ok, node];
 }
-const ParseIdentifier = function (tokenStream: OvaleLexer, nodeList: ChildParseNode, annotation: Annotation): [boolean, ScNode] {
+const ParseIdentifier = function (tokenStream: OvaleLexer, nodeList: LuaArray<ParseNode>, annotation: Annotation): [boolean, ParseNode] {
     let [, token] = tokenStream.Consume();
     let node = NewNode(nodeList);
     node.type = "operand";
@@ -1067,10 +1238,10 @@ const ParseIdentifier = function (tokenStream: OvaleLexer, nodeList: ChildParseN
 
 ParseModifier = function (tokenStream: OvaleLexer, nodeList, annotation) {
     let ok = true;
-    let name: string;
+    let name: Modifier;
     {
         let [tokenType, token] = tokenStream.Consume();
-        if (tokenType == "keyword" && MODIFIER_KEYWORD[token]) {
+        if (tokenType == "keyword" && checkToken(MODIFIER_KEYWORD, token)) {
             name = token;
         } else {
             SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing action line; expression keyword expected.", token);
@@ -1084,7 +1255,7 @@ ParseModifier = function (tokenStream: OvaleLexer, nodeList, annotation) {
             ok = false;
         }
     }
-    let expressionNode: ScNode;
+    let expressionNode: ParseNode;
     if (ok) {
         if (LITTERAL_MODIFIER[name]) {
             [ok, expressionNode] = ParseIdentifier(tokenStream, nodeList, annotation);
@@ -1131,7 +1302,7 @@ ParseOperand = function (tokenStream: OvaleLexer, nodeList, annotation) {
             ok = false;
         }
     }
-    let node: ScNode;
+    let node: ParseNode;
     if (ok) {
         node = NewNode(nodeList);
         node.type = "operand";
@@ -1161,7 +1332,7 @@ ParseParentheses = function (tokenStream: OvaleLexer, nodeList, annotation) {
             ok = false;
         }
     }
-    let node: ScNode;
+    let node: ParseNode;
     if (ok) {
         [ok, node] = ParseExpression(tokenStream, nodeList, annotation);
     }
@@ -1178,7 +1349,7 @@ ParseParentheses = function (tokenStream: OvaleLexer, nodeList, annotation) {
     }
     return [ok, node];
 }
-ParseSimpleExpression = function (tokenStream: OvaleLexer, nodeList, annotation):[boolean, ScNode] {
+ParseSimpleExpression = function (tokenStream: OvaleLexer, nodeList, annotation):[boolean, ParseNode] {
     let ok = true;
     let node;
     let [tokenType, token] = tokenStream.Peek();
@@ -1409,7 +1580,6 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("healing_elixir_talent", "healing_elixir_talent_mistweaver", "MONK", "mistweaver");
     AddDisambiguation("bok_proc_buff", "blackout_kick_buff", "MONK", "windwalker");
     AddDisambiguation("fortifying_brew", "fortifying_brew_mistweaver", "MONK", "mistweaver");
-    AddDisambiguation("rushing_jade_wind", "rushing_jade_wind_windwalker", "MONK", "windwalker");
     AddDisambiguation("breath_of_fire_dot_debuff", "breath_of_fire_debuff", "MONK", "brewmaster");
     AddDisambiguation("brews", "ironskin_brew", "MONK", "brewmaster");
 
@@ -1814,11 +1984,10 @@ SplitByTagState = function (tag, node, nodeList, annotation) {
     }
 }
 
-type EmitVisitor = (parseNode: ParseNode, nodeList: LuaArray<AstNode>, annotation: Annotation, action?: string) => AstNode;
+type EmitVisitor = (parseNode: ParseNode, nodeList: LuaArray<AstNode>, annotation: Annotation, action: string | undefined) => AstNode;
 type EmitOperandVisitor = (operand: string, parseNode: ParseNode, nodeList: LuaArray<AstNode>, annotation: Annotation, action: string, target?: string) => [boolean, AstNode];
 
 let EMIT_VISITOR: LuaObj<EmitVisitor> = undefined;
-let Emit:EmitVisitor = undefined;
 let EmitAction:EmitVisitor = undefined;
 let EmitActionList:EmitVisitor = undefined;
 let EmitExpression:EmitVisitor = undefined;
@@ -1849,8 +2018,14 @@ let EmitOperandTalent:EmitOperandVisitor = undefined;
 let EmitOperandTarget:EmitOperandVisitor = undefined;
 let EmitOperandTotem:EmitOperandVisitor = undefined;
 let EmitOperandTrinket:EmitOperandVisitor = undefined;
-let EmitOperandVariable:EmitOperandVisitor = undefined;
-Emit = function (parseNode, nodeList, annotation, action) {
+let EmitOperandVariable: EmitOperandVisitor = undefined;
+
+/** Transform a ParseNode to an AstNode
+ * @param parseNode The ParseNode to transform
+ * @param nodeList The list of AstNode. Any created node will be added to this array.
+ * @param action The current Simulationcraft action, or undefined if in a condition modifier
+ */
+function Emit(parseNode: ParseNode, nodeList: LuaArray<AstNode>, annotation: Annotation, action: string | undefined) {
     let visitor = EMIT_VISITOR[parseNode.type];
     if (!visitor) {
         OvaleSimulationCraft.Error("Unable to emit node of type '%s'.", parseNode.type);
@@ -1859,7 +2034,7 @@ Emit = function (parseNode, nodeList, annotation, action) {
     }
 }
 
-const EmitModifier = function (modifier: string, parseNode: ParseNode, nodeList: LuaArray<AstNode>, annotation: Annotation, action: string) {
+const EmitModifier = function (modifier: Modifier, parseNode: ParseNode, nodeList: LuaArray<AstNode>, annotation: Annotation, action: string, modifiers: Modifiers) {
     let node: AstNode, code;
     let className = annotation.class;
     let specialization = annotation.specialization;
@@ -1967,11 +2142,11 @@ const EmitModifier = function (modifier: string, parseNode: ParseNode, nodeList:
     return node;
 }
 
-const EmitConditionNode = function (nodeList: LuaArray<AstNode>, bodyNode: AstNode, conditionNode: AstNode, parseNode: ParseNode, annotation: Annotation, action: string) {
+const EmitConditionNode = function (nodeList: LuaArray<AstNode>, bodyNode: AstNode, conditionNode: AstNode, parseNode: ParseNode, annotation: Annotation, action: string, modifiers: Modifiers) {
     let extraConditionNode = conditionNode;
     conditionNode = undefined;
-    for (const [modifier, expressionNode] of pairs(parseNode.child)) {
-        let rhsNode = EmitModifier(<string>modifier, expressionNode, nodeList, annotation, action);
+    for (const [modifier, expressionNode] of kpairs(parseNode.modifiers)) {
+        let rhsNode = EmitModifier(modifier, expressionNode, nodeList, annotation, action, modifiers);
         if (rhsNode) {
             if (!conditionNode) {
                 conditionNode = rhsNode;
@@ -2015,7 +2190,7 @@ const EmitConditionNode = function (nodeList: LuaArray<AstNode>, bodyNode: AstNo
         return bodyNode;
     }
 }
-function EmitNamedVariable(name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifier: ChildParseNode, parseNode: ParseNode, action: string, conditionNode?: AstNode) {
+function EmitNamedVariable(name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifiers: Modifiers, parseNode: ParseNode, action: string, conditionNode?: AstNode) {
     if (!annotation.variable) {
         annotation.variable = {}
     }
@@ -2033,8 +2208,8 @@ function EmitNamedVariable(name: string, nodeList: LuaArray<AstNode>, annotation
         group = node.child[1];
     }
     annotation.currentVariable = node;
-    let value = Emit(modifier.value, nodeList, annotation, action);
-    let newNode = EmitConditionNode(nodeList, value, conditionNode || undefined, parseNode, annotation, action);
+    let value = Emit(modifiers.value, nodeList, annotation, action);
+    let newNode = EmitConditionNode(nodeList, value, conditionNode || undefined, parseNode, annotation, action, modifiers);
     if (newNode.type == "if") {
         insert(group.child, 1, newNode);
     } else {
@@ -2043,7 +2218,7 @@ function EmitNamedVariable(name: string, nodeList: LuaArray<AstNode>, annotation
     annotation.currentVariable = undefined;
 }
 
-function EmitVariableMin(name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifier: ChildParseNode, parseNode: ParseNode, action: string) {
+function EmitVariableMin(name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifier: Modifiers, parseNode: ParseNode, action: string) {
     EmitNamedVariable(`${name}_min`, nodeList, annotation, modifier, parseNode, action);
     let valueNode = annotation.variable[name];
     valueNode.name = `${name}_value`;
@@ -2053,7 +2228,7 @@ function EmitVariableMin(name: string, nodeList: LuaArray<AstNode>, annotation: 
     annotation.variable[name] = node;
 }
 
-function EmitVariableMax(name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifier: ChildParseNode, parseNode: ParseNode, action: string) {
+function EmitVariableMax(name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifier: Modifiers, parseNode: ParseNode, action: string) {
     EmitNamedVariable(`${name}_max`, nodeList, annotation, modifier, parseNode, action);
     let valueNode = annotation.variable[name];
     valueNode.name = `${name}_value`;
@@ -2063,14 +2238,14 @@ function EmitVariableMax(name: string, nodeList: LuaArray<AstNode>, annotation: 
     annotation.variable[name] = node;
 }
 
-function EmitVariableAdd(name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifier: ChildParseNode, parseNode: ParseNode, action: string) {
+function EmitVariableAdd(name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifiers: Modifiers, parseNode: ParseNode, action: string) {
     // TODO
     let valueNode = annotation.variable[name];
     if (valueNode) return;
-    EmitNamedVariable(name, nodeList, annotation, modifier, parseNode, action);
+    EmitNamedVariable(name, nodeList, annotation, modifiers, parseNode, action);
 }
 
-function EmitVariableIf(name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifier: ChildParseNode, parseNode: ParseNode, action: string) {
+function EmitVariableIf(name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifiers: Modifiers, parseNode: ParseNode, action: string) {
     let node = annotation.variable[name];
     let group: AstNode;
     if (!node) {
@@ -2089,19 +2264,19 @@ function EmitVariableIf(name: string, nodeList: LuaArray<AstNode>, annotation: A
 
     const ifNode = OvaleAST.NewNode(nodeList, true);
     ifNode.type = "if";
-    ifNode.child[1] = Emit(modifier.condition, nodeList, annotation);
-    ifNode.child[2] = Emit(modifier.value, nodeList, annotation);
+    ifNode.child[1] = Emit(modifiers.condition, nodeList, annotation, undefined);
+    ifNode.child[2] = Emit(modifiers.value, nodeList, annotation, undefined);
     insert(group.child, ifNode);
     const elseNode = OvaleAST.NewNode(nodeList, true);
     elseNode.type = "unless";
     elseNode.child[1] = ifNode.child[1];
-    elseNode.child[2] = Emit(modifier.value_else, nodeList, annotation);
+    elseNode.child[2] = Emit(modifiers.value_else, nodeList, annotation, undefined);
     insert(group.child, elseNode);
 
     annotation.currentVariable = undefined;
 }
 
-function EmitVariable(nodeList: LuaArray<AstNode>, annotation: Annotation, modifier: ChildParseNode, parseNode: ParseNode, action: string, conditionNode?: AstNode) {
+function EmitVariable(nodeList: LuaArray<AstNode>, annotation: Annotation, modifier: Modifiers, parseNode: ParseNode, action: string, conditionNode?: AstNode) {
     if (!annotation.variable) {
         annotation.variable = {}
     }
@@ -2140,6 +2315,7 @@ const checkOptionalSkill = function(action: string, className: string, specializ
     return true;
 }
 
+/** Takes a ParseNode of type "action" and transforms it to an AstNode. */
 EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
     let node: AstNode;
     let canonicalizedName = lower(gsub(parseNode.name, ":", "_"));
@@ -2158,7 +2334,7 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
     } else {
         let bodyCode, conditionCode;
         let expressionType = "expression";
-        let modifier = parseNode.child;
+        const modifiers = parseNode.modifiers;
         let isSpellAction = true;
         if (interruptsClasses[action as keyof typeof interruptsClasses] === className) {
             bodyCode = `${camelSpecialization}InterruptActions()`;
@@ -2188,16 +2364,6 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             conditionCode = "SpellKnown(half_moon)";
         } else if (className == "DRUID" && action == "full_moon") {
             conditionCode = "SpellKnown(full_moon)";
-        } else if (className == "HUNTER" && action == "exotic_munitions") {
-            if (modifier.ammo_type) {
-                let name = Unparse(modifier.ammo_type);
-                action = `${name}_ammo`;
-                let buffName = "exotic_munitions_buff";
-                AddSymbol(annotation, buffName);
-                conditionCode = format("BuffRemaining(%s) < 1200", buffName);
-            } else {
-                isSpellAction = false;
-            }
         } else if (className == "HUNTER" && action == "kill_command") {
             conditionCode = "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()";
         } else if (className == "MAGE" && action == "arcane_brilliance") {
@@ -2246,7 +2412,7 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
         } else if (className == "PALADIN" && action == "blessing_of_kings") {
             conditionCode = "BuffExpires(mastery_buff)";
         } else if (className == "PALADIN" && action == "judgment") {
-            if (modifier.cycle_targets) {
+            if (modifiers.cycle_targets) {
                 AddSymbol(annotation, action);
                 bodyCode = `Spell(${action} text=double)`;
                 isSpellAction = false;
@@ -2259,8 +2425,8 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
         } else if (className == "ROGUE" && action == "adrenaline_rush") {
             conditionCode = "EnergyDeficit() > 1";
         } else if (className == "ROGUE" && action == "apply_poison") {
-            if (modifier.lethal) {
-                let name = Unparse(modifier.lethal);
+            if (modifiers.lethal) {
+                let name = Unparse(modifiers.lethal);
                 action = `${name}_poison`;
                 let buffName = "lethal_poison_buff";
                 AddSymbol(annotation, buffName);
@@ -2338,8 +2504,8 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
         } else if (className == "WARRIOR" && action == "enraged_regeneration") {
             conditionCode = "HealthPercent() < 80";
         } else if (className == "WARRIOR" && sub(action, 1, 7) == "execute") {
-            if (modifier.target) {
-                let target = tonumber(Unparse(modifier.target));
+            if (modifiers.target) {
+                let target = tonumber(Unparse(modifiers.target));
                 if (target) {
                     isSpellAction = false;
                 }
@@ -2358,11 +2524,11 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             annotation[action] = className;
             conditionCode = `CheckBoxOn(opt_${action})`;
         } else if (action == "variable") {
-            EmitVariable(nodeList, annotation, modifier, parseNode, action, conditionNode);
+            EmitVariable(nodeList, annotation, modifiers, parseNode, action, conditionNode);
             isSpellAction = false;
         } else if (action == "call_action_list" || action == "run_action_list" || action == "swap_action_list") {
-            if (modifier.name) {
-                let name = Unparse(modifier.name);
+            if (modifiers.name) {
+                let name = Unparse(modifiers.name);
                 let functionName = OvaleFunctionName(name, annotation);
                 bodyCode = `${functionName}()`;
                 if (className == "MAGE" && specialization == "arcane" && (name == "burn" || name == "init_burn")) {
@@ -2372,9 +2538,9 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             }
             isSpellAction = false;
         } else if (action == "cancel_buff") {
-            if (modifier.name) {
-                let spellName = Unparse(modifier.name);
-                let buffName = `${spellName}_buff`;
+            if (modifiers.name) {
+                let spellName = Unparse(modifiers.name);
+                let [buffName] = Disambiguate(annotation, `${spellName}_buff`, className, specialization, "spell");
                 AddSymbol(annotation, spellName);
                 AddSymbol(annotation, buffName);
                 bodyCode = format("Texture(%s text=cancel)", spellName);
@@ -2384,13 +2550,13 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
         } else if (action == "pool_resource") {
             bodyNode = OvaleAST.NewNode(nodeList);
             bodyNode.type = "simc_pool_resource";
-            bodyNode.for_next = (modifier.for_next != undefined);
-            if (modifier.extra_amount) {
-                bodyNode.extra_amount = tonumber(Unparse(modifier.extra_amount));
+            bodyNode.for_next = (modifiers.for_next != undefined);
+            if (modifiers.extra_amount) {
+                bodyNode.extra_amount = tonumber(Unparse(modifiers.extra_amount));
             }
             isSpellAction = false;
         } else if (action == "potion") {
-            let name = (modifier.name && Unparse(modifier.name)) || annotation.consumables["potion"];
+            let name = (modifiers.name && Unparse(modifiers.name)) || annotation.consumables["potion"];
             if (name) {
                 [name] = Disambiguate(annotation, name, className, specialization, "item");
                 bodyCode = format("Item(%s usable=1)", name);
@@ -2402,8 +2568,8 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
         } else if (action === "sequence") {
             isSpellAction = false;
         } else if (action == "stance") {
-            if (modifier.choose) {
-                let name = Unparse(modifier.choose);
+            if (modifiers.choose) {
+                let name = Unparse(modifiers.choose);
                 if (className == "MONK") {
                     action = `stance_of_the_${name}`;
                 } else if (className == "WARRIOR") {
@@ -2424,13 +2590,13 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             isSpellAction = false;
         } else if (action == "use_item") {
             let legendaryRing: string = undefined;
-            if (modifier.slot) {
-                let slot = Unparse(modifier.slot);
+            if (modifiers.slot) {
+                let slot = Unparse(modifiers.slot);
                 if (truthy(match(slot, "finger"))) {
                     [legendaryRing] = Disambiguate(annotation, "legendary_ring", className, specialization);
                 }
-            } else if (modifier.name) {
-                let name = Unparse(modifier.name);
+            } else if (modifiers.name) {
+                let name = Unparse(modifiers.name);
                 [name] = Disambiguate(annotation, name, className, specialization);
                 if (truthy(match(name, "legendary_ring"))) {
                     legendaryRing = name;
@@ -2451,13 +2617,13 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             }
             isSpellAction = false;
         } else if (action == "wait") {
-            if (modifier.sec) {
-                let seconds = tonumber(Unparse(modifier.sec));
+            if (modifiers.sec) {
+                let seconds = tonumber(Unparse(modifiers.sec));
                 if (seconds) {
                 } else {
                     bodyNode = OvaleAST.NewNode(nodeList);
                     bodyNode.type = "simc_wait";
-                    let expressionNode = Emit(modifier.sec, nodeList, annotation, action);
+                    let expressionNode = Emit(modifiers.sec, nodeList, annotation, action);
                     let code = OvaleAST.Unparse(expressionNode);
                     conditionCode = code + " > 0";
                 }
@@ -2466,8 +2632,8 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
         }
         if (isSpellAction) {
             AddSymbol(annotation, action);
-            if (modifier.target) {
-                let actionTarget = Unparse(modifier.target);
+            if (modifiers.target) {
+                let actionTarget = Unparse(modifiers.target);
                 if (actionTarget == "2") {
                     actionTarget = "other";
                 }
@@ -2485,7 +2651,7 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             [conditionNode] = OvaleAST.ParseCode(expressionType, conditionCode, nodeList, annotation.astAnnotation);
         }
         if (bodyNode) {
-            node = EmitConditionNode(nodeList, bodyNode, conditionNode, parseNode, annotation, action);
+            node = EmitConditionNode(nodeList, bodyNode, conditionNode, parseNode, annotation, action, modifiers);
         }
     }
     return node;
@@ -2502,7 +2668,7 @@ EmitActionList = function (parseNode, nodeList, annotation) {
         commentNode.comment = actionNode.action;
         child[lualength(child) + 1] = commentNode;
         if (emit) {
-            let statementNode = EmitAction(actionNode, nodeList, annotation);
+            let statementNode = EmitAction(actionNode, nodeList, annotation, actionNode.name);
             if (statementNode) {
                 if (statementNode.type == "simc_pool_resource") {
                     let powerType = OvalePower.POOLED_RESOURCE[annotation.class];
@@ -2764,7 +2930,7 @@ EmitOperand = function (parseNode, nodeList, annotation, action) {
     let node : AstNode;
     let operand = parseNode.name;
     let [token] = match(operand, OPERAND_TOKEN_PATTERN);
-    let target;
+    let target:string;
     if (token == "target") {
         [ok, node] = EmitOperandTarget(operand, parseNode, nodeList, annotation, action);
         if (!ok) {
@@ -2773,6 +2939,7 @@ EmitOperand = function (parseNode, nodeList, annotation, action) {
             [token] = match(operand, OPERAND_TOKEN_PATTERN);
         }
     }
+
     if (!ok) {
         [ok, node] = EmitOperandRune(operand, parseNode, nodeList, annotation, action);
     }
@@ -3133,189 +3300,88 @@ EmitOperandBuff = function (operand, parseNode, nodeList, annotation, action, ta
     }
     return [ok, node];
 }
-{
-    let CHARACTER_PROPERTY: LuaObj<string> = {
-        ["active_enemies"]: "Enemies()",
-        ["astral_power"]: "AstralPower()",
-        ["astral_power.deficit"]: "AstralPowerDeficit()",
-        ["blade_dance_worth_using"]: "0",
-        ["blood.frac"]: "Rune(blood)",
-        ["buff.arcane_charge.stack"]: "ArcaneCharges()",
-        ["buff.arcane_charge.max_stack"]: "MaxArcaneCharges()",
-        ["buff.movement.up"]: "Speed() > 0",
-        ["buff.out_of_range.up"]: "not target.InRange()",
-        ["bugs"]: "0",
-        ["chi"]: "Chi()",
-        ["chi.max"]: "MaxChi()",
-        ["combo_points"]: "ComboPoints()",
-        ["combo_points.deficit"]: "ComboPointsDeficit()",
-        ["combo_points.max"]: "MaxComboPoints()",
-        ["consecration.remains"]: "BuffRemaining(consecration)",
-        ["cp_max_spend"]: "MaxComboPoints()",
-        ["crit_pct_current"]: "SpellCritChance()",
-        ["current_insanity_drain"]: "CurrentInsanityDrain()",
-        ["darkglare_no_de"]: "NotDeDemons(darkglare)",
-        ["death_and_decay.ticking"]: "BuffPresent(death_and_decay)",
-        ["death_sweep_worth_using"]: "0",
-        ["delay"]: "0",
-        ["demonic_fury"]: "DemonicFury()",
-        ["desired_targets"]: "Enemies(tagged=1)",
-        ["doomguard_no_de"]: "NotDeDemons(doomguard)",
-        ["dreadstalker_no_de"]: "NotDeDemons(dreadstalker)",
-        ["dreadstalker_remaining_duration"]: "DemonDuration(dreadstalker)",
-        ["eclipse_change"]: "TimeToEclipse()",
-        ["eclipse_energy"]: "EclipseEnergy()",
-        ["enemies"]: "Enemies()",
-        ["energy"]: "Energy()",
-        ["energy.deficit"]: "EnergyDeficit()",
-        ["energy.max"]: "MaxEnergy()",
-        ["energy.regen"]: "EnergyRegenRate()",
-        ["energy.time_to_max"]: "TimeToMaxEnergy()",
-        ["feral_spirit.remains"]: "TotemRemaining(sprit_wolf)",
-        ["finality"]: "HasArtifactTrait(finality)",
-        ["focus"]: "Focus()",
-        ["focus.deficit"]: "FocusDeficit()",
-        ["focus.max"]: "MaxFocus()",
-        ["focus.regen"]: "FocusRegenRate()",
-        ["focus.time_to_max"]: "TimeToMaxFocus()",
-        ["frost.frac"]: "Rune(frost)",
-        ["fury"]: "Fury()",
-        ["fury.deficit"]: "FuryDeficit()",
-        ["health"]: "Health()",
-        ["health.deficit"]: "HealthMissing()",
-        ["health.max"]: "MaxHealth()",
-        ["health.pct"]: "HealthPercent()",
-        ["health.percent"]: "HealthPercent()",
-        ["holy_power"]: "HolyPower()",
-        ["infernal_no_de"]: "NotDeDemons(infernal)",
-        ["insanity"]: "Insanity()",
-        ["level"]: "Level()",
-        ["lunar_max"]: "TimeToEclipse(lunar)",
-        ["mana"]: "Mana()",
-        ["mana.deficit"]: "ManaDeficit()",
-        ["mana.max"]: "MaxMana()",
-        ["mana.pct"]: "ManaPercent()",
-        ["maelstrom"]: "Maelstrom()",
-        ["next_wi_bomb.pheromone"]: "SpellUsable(270323)",
-        ["next_wi_bomb.shrapnel"]: "SpellUsable(270335)",
-        ["next_wi_bomb.volatile"]: "SpellUsable(271045)",
-        ["nonexecute_actors_pct"]: "0",
-        ["pain"]: "Pain()",
-        ["pain.deficit"]: "PainDeficit()",
-        ["pet_count"]: "Demons()",
-        ["rage"]: "Rage()",
-        ["rage.deficit"]: "RageDeficit()",
-        ["rage.max"]: "MaxRage()",
-        ["raid_event.adds.remains"]: "0", // TODO
-        ["raw_haste_pct"]: "SpellCastSpeedPercent()",
-        ["rtb_list.any.5"]: "BuffCount(roll_the_bones_buff more 4)",
-        ["rtb_list.any.6"]: "BuffCount(roll_the_bones_buff more 5)",
-        ["rune.deficit"]: "RuneDeficit()",
-        ["runic_power"]: "RunicPower()",
-        ["runic_power.deficit"]: "RunicPowerDeficit()",
-        ["service_no_de"]: "0",
-        ["shadow_orb"]: "ShadowOrbs()",
-        ["sigil_placed"]: "SigilCharging(flame)",
-        ["solar_max"]: "TimeToEclipse(solar)",
-        ["soul_shard"]: "SoulShards()",
-        ["soul_fragments"]: "SoulFragments()",
-        ["ssw_refund_offset"]: "target.Distance() % 3 - 1",
-        ["stat.mastery_rating"]: "MasteryRating()",
-        ["stealthed"]: "Stealthed()",
-        ["stealthed.all"]: "Stealthed()",
-        ["stealthed.rogue"]: "Stealthed()",
-        ["time"]: "TimeInCombat()",
-        ["time_to_20pct"]: "TimeToHealthPercent(20)",
-        ["time_to_die"]: "TimeToDie()",
-        ["time_to_die.remains"]: "TimeToDie()",
-        ["time_to_shard"]: "TimeToShard()",
-        ["time_to_sht.4"]: "100", // TODO
-        ["time_to_sht.5"]: "100",
-        ["wild_imp_count"]: "Demons(wild_imp)",
-        ["wild_imp_no_de"]: "NotDeDemons(wild_imp)",
-        ["wild_imp_remaining_duration"]: "DemonDuration(wild_imp)"
-    }
-    EmitOperandCharacter = function (operand, parseNode, nodeList, annotation, action, target) {
-        let ok = true;
-        let node;
-        let className = annotation.class;
-        let specialization = annotation.specialization;
-        let camelSpecialization = CamelSpecialization(annotation);
-        target = target && (`${target}.`) || "";
-        let code;
-        if (CHARACTER_PROPERTY[operand]) {
-            code = `${target}${CHARACTER_PROPERTY[operand]}`;
-        } else if (className == "MAGE" && operand == "incanters_flow_dir") {
-            let name = "incanters_flow_buff";
-            code = format("BuffDirection(%s)", name);
-            AddSymbol(annotation, name);
-        } else if (className == "PALADIN" && operand == "time_to_hpg") {
-            code = `${camelSpecialization}TimeToHPG()`;
-            if (specialization == "holy") {
-                annotation.time_to_hpg_heal = className;
-            } else if (specialization == "protection") {
-                annotation.time_to_hpg_tank = className;
-            } else if (specialization == "retribution") {
-                annotation.time_to_hpg_melee = className;
-            }
-        } else if (className == "PRIEST" && operand == "shadowy_apparitions_in_flight") {
-            code = "1";
-        } else if (operand == "rtb_buffs") {
-            code = "BuffCount(roll_the_bones_buff)";
-        } else if (className == "ROGUE" && operand == "anticipation_charges") {
-            let name = "anticipation_buff";
-            code = format("BuffStacks(%s)", name);
-            AddSymbol(annotation, name);
-        } else if (sub(operand, 1, 22) == "active_enemies_within.") {
-            code = "Enemies()";
-        } else if (truthy(find(operand, "^incoming_damage_"))) {
-            let [_seconds, measure] = match(operand, "^incoming_damage_([%d]+)(m?s?)$");
-            let seconds = tonumber(_seconds);
-            if (measure == "ms") {
-                seconds = seconds / 1000;
-            }
-            if (parseNode.asType == "boolean") {
-                code = format("IncomingDamage(%f) > 0", seconds);
-            } else {
-                code = format("IncomingDamage(%f)", seconds);
-            }
-        } else if (sub(operand, 1, 10) == "main_hand.") {
-            let weaponType = sub(operand, 11);
-            if (weaponType == "1h") {
-                code = "HasWeapon(main type=one_handed)";
-            } else if (weaponType == "2h") {
-                code = "HasWeapon(main type=two_handed)";
-            }
-        } else if (operand == "mastery_value") {
-            code = format("%sMasteryEffect() / 100", target);
-        } else if (operand == "position_front") {
-            code = "False(position_front)";
-        } else if (sub(operand, 1, 5) == "role.") {
-            let [role] = match(operand, "^role%.([%w_]+)");
-            if (role && role == annotation.role) {
-                code = format("True(role_%s)", role);
-            } else {
-                code = format("False(role_%s)", role);
-            }
-        } else if (operand == "spell_haste" || operand == "stat.spell_haste") {
-            code = "100 / { 100 + SpellCastSpeedPercent() }";
-        } else if (operand == "attack_haste" || operand == "stat.attack_haste") {
-            code = "100 / { 100 + MeleeAttackSpeedPercent() }";
-        } else if (sub(operand, 1, 13) == "spell_targets") {
-            code = "Enemies()";
-        } else if (operand == "t18_class_trinket") {
-            code = format("HasTrinket(%s)", operand);
-            AddSymbol(annotation, operand);
+
+EmitOperandCharacter = function (operand, parseNode, nodeList, annotation, action, target) {
+    let ok = true;
+    let node;
+    let className = annotation.class;
+    let specialization = annotation.specialization;
+    let camelSpecialization = CamelSpecialization(annotation);
+    target = target && (`${target}.`) || "";
+    let code;
+    if (CHARACTER_PROPERTY[operand]) {
+        code = `${target}${CHARACTER_PROPERTY[operand]}`;
+    } else if (className == "MAGE" && operand == "incanters_flow_dir") {
+        let name = "incanters_flow_buff";
+        code = format("BuffDirection(%s)", name);
+        AddSymbol(annotation, name);
+    } else if (className == "PALADIN" && operand == "time_to_hpg") {
+        code = `${camelSpecialization}TimeToHPG()`;
+        if (specialization == "holy") {
+            annotation.time_to_hpg_heal = className;
+        } else if (specialization == "protection") {
+            annotation.time_to_hpg_tank = className;
+        } else if (specialization == "retribution") {
+            annotation.time_to_hpg_melee = className;
+        }
+    } else if (className == "PRIEST" && operand == "shadowy_apparitions_in_flight") {
+        code = "1";
+    } else if (operand == "rtb_buffs") {
+        code = "BuffCount(roll_the_bones_buff)";
+    } else if (className == "ROGUE" && operand == "anticipation_charges") {
+        let name = "anticipation_buff";
+        code = format("BuffStacks(%s)", name);
+        AddSymbol(annotation, name);
+    } else if (sub(operand, 1, 22) == "active_enemies_within.") {
+        code = "Enemies()";
+    } else if (truthy(find(operand, "^incoming_damage_"))) {
+        let [_seconds, measure] = match(operand, "^incoming_damage_([%d]+)(m?s?)$");
+        let seconds = tonumber(_seconds);
+        if (measure == "ms") {
+            seconds = seconds / 1000;
+        }
+        if (parseNode.asType == "boolean") {
+            code = format("IncomingDamage(%f) > 0", seconds);
         } else {
-            ok = false;
+            code = format("IncomingDamage(%f)", seconds);
         }
-        if (ok && code) {
-            annotation.astAnnotation = annotation.astAnnotation || {};
-            [node] = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation);
+    } else if (sub(operand, 1, 10) == "main_hand.") {
+        let weaponType = sub(operand, 11);
+        if (weaponType == "1h") {
+            code = "HasWeapon(main type=one_handed)";
+        } else if (weaponType == "2h") {
+            code = "HasWeapon(main type=two_handed)";
         }
-        return [ok, node];
+    } else if (operand == "mastery_value") {
+        code = format("%sMasteryEffect() / 100", target);
+    } else if (operand == "position_front") {
+        code = "False(position_front)";
+    } else if (sub(operand, 1, 5) == "role.") {
+        let [role] = match(operand, "^role%.([%w_]+)");
+        if (role && role == annotation.role) {
+            code = format("True(role_%s)", role);
+        } else {
+            code = format("False(role_%s)", role);
+        }
+    } else if (operand == "spell_haste" || operand == "stat.spell_haste") {
+        code = "100 / { 100 + SpellCastSpeedPercent() }";
+    } else if (operand == "attack_haste" || operand == "stat.attack_haste") {
+        code = "100 / { 100 + MeleeAttackSpeedPercent() }";
+    } else if (sub(operand, 1, 13) == "spell_targets") {
+        code = "Enemies()";
+    } else if (operand == "t18_class_trinket") {
+        code = format("HasTrinket(%s)", operand);
+        AddSymbol(annotation, operand);
+    } else {
+        ok = false;
     }
+    if (ok && code) {
+        annotation.astAnnotation = annotation.astAnnotation || {};
+        [node] = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation);
+    }
+    return [ok, node];
 }
+
 EmitOperandCooldown = function (operand, parseNode, nodeList, annotation, action) {
     let ok = true;
     let node;
@@ -4234,17 +4300,15 @@ EmitOperandVariable = function (operand, parseNode, nodeList, annotation, action
     }
     return [ok, node];
 }
-{
-    EMIT_VISITOR = {
-        ["action"]: EmitAction,
-        ["action_list"]: EmitActionList,
-        ["arithmetic"]: EmitExpression,
-        ["compare"]: EmitExpression,
-        ["function"]: EmitFunction,
-        ["logical"]: EmitExpression,
-        ["number"]: EmitNumber,
-        ["operand"]: EmitOperand
-    }
+EMIT_VISITOR = {
+    ["action"]: EmitAction,
+    ["action_list"]: EmitActionList,
+    ["arithmetic"]: EmitExpression,
+    ["compare"]: EmitExpression,
+    ["function"]: EmitFunction,
+    ["logical"]: EmitExpression,
+    ["number"]: EmitNumber,
+    ["operand"]: EmitOperand
 }
 function PreOrderTraversalMark(node: AstNode) {
     if (node.type == "custom_function") {
@@ -5300,9 +5364,11 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
             }
         }
         let ok = true;
-        annotation = annotation || {};
-        let nodeList: ChildParseNode = {};
-        let actionList: LuaArray<ScNode> = {};
+        annotation = annotation || { dictionary: {}};
+
+        // Parse the different "actions" commands in the script. Save them as ParseNode action_list
+        let nodeList: LuaArray<ParseNode> = {};
+        let actionList: LuaArray<ParseNode> = {};
         for (const [k, _v] of kpairs(profile)) {
             let v = _v;
             if (ok && truthy(match(k, "^actions"))) {
@@ -5418,7 +5484,7 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
 				Include(ovale_%s_spells)
 				%s
 			`;
-                let dictionaryCode = format(dictionaryFormat, lower(annotation.class), Ovale.db.profile.overrideCode || "");
+                let dictionaryCode = format(dictionaryFormat, lower(annotation.class), (Ovale.db && Ovale.db.profile.overrideCode) || "");
                 [dictionaryAST] = OvaleAST.ParseCode("script", dictionaryCode, dictionaryAnnotation.nodeList, dictionaryAnnotation);
                 if (dictionaryAST) {
                     dictionaryAST.annotation = dictionaryAnnotation;
@@ -5432,7 +5498,7 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
                 }
             }
             for (const [, node] of ipairs(profile.actionList)) {
-                let addFunctionNode = EmitActionList(node, nodeList, annotation);
+                let addFunctionNode = EmitActionList(node, nodeList, annotation, undefined);
                 if (addFunctionNode) {
                     // Add interrupt if not already added
                     if (node.name === "_default" && !annotation.interrupt) {
@@ -5589,8 +5655,8 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
             output[lualength(output) + 1] = "Include(ovale_trinkets_mop)";
             output[lualength(output) + 1] = "Include(ovale_trinkets_wod)";
             output[lualength(output) + 1] = format("Include(ovale_%s_spells)", lowerclass);
-            const overrideCode = Ovale.db.profile.overrideCode;
-            if (overrideCode != "") {
+            const overrideCode = Ovale.db && Ovale.db.profile.overrideCode;
+            if (overrideCode && overrideCode != "") {
                 output[lualength(output) + 1] = "";
                 output[lualength(output) + 1] = "# Overrides.";
                 output[lualength(output) + 1] = overrideCode;

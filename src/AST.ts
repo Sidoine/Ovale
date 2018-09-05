@@ -15,6 +15,7 @@ import { concat, insert, sort } from "@wowts/table";
 import { GetItemInfo } from "@wowts/wow-mock";
 import { isLuaArray, isNumber, isString, checkToken } from "./tools";
 import { SpellInfo } from "./Data";
+import { HasteType } from "./PaperDoll";
 
 let OvaleASTBase = OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleAST")));
 
@@ -510,6 +511,7 @@ export interface ValuedNamedParameters extends ConditionNamedParameters {
     type?: string;
     any?: number;
     usable?: number;
+    haste?: HasteType;
 }
 
 export interface NamedParameters extends ValuedNamedParameters {
@@ -1597,7 +1599,7 @@ export class OvaleASTClass extends OvaleASTBase {
             }
         }
         let code = OvaleScripts.GetScript(name);
-        if (!code) {
+        if (code === undefined) {
             this.Error("Script '%s' not found when parsing INCLUDE.", name);
             ok = false;
         }

@@ -14,21 +14,15 @@ Define(apotheosis 200183)
   SpellInfo(apotheosis cd=120 duration=20 talent=apotheosis_talent)
   # Effects that reduce Holy Word cooldowns increased by s1. Cost of Holy Words reduced by s2.
   SpellAddBuff(apotheosis apotheosis=1)
-Define(battle_potion_of_intellect 279151)
-# Increases your Intellect by s1 for 25 seconds.
-  SpellInfo(battle_potion_of_intellect cd=1 duration=25 gcd=0 offgcd=1)
-  # Intellect increased by w1.
-  SpellAddBuff(battle_potion_of_intellect battle_potion_of_intellect=1)
+Define(arcane_pulse 260364)
+# Deals <damage> Arcane damage to nearby enemies and reduces their movement speed by 260369s1. Lasts 12 seconds.
+  SpellInfo(arcane_pulse cd=180 gcd=1)
+
 Define(berserking 26297)
 # Increases your haste by s1 for 10 seconds.
   SpellInfo(berserking cd=180 duration=10 gcd=0 offgcd=1)
   # Haste increased by s1.
   SpellAddBuff(berserking berserking=1)
-Define(blood_fury 20572)
-# Increases your attack power by s1 for 15 seconds.
-  SpellInfo(blood_fury cd=120 duration=15 gcd=0 offgcd=1)
-  # Attack power increased by w1.
-  SpellAddBuff(blood_fury blood_fury=1)
 Define(dark_ascension 280711)
 # Immediately activates a new Voidform, then releases an explosive blast of pure void energy, causing (95 of Spell Power)*2 Shadow damage to all enemies within a1 yds of your target.rnrn|cFFFFFFFFGenerates s2/100 Insanity.|r
   SpellInfo(dark_ascension cd=60 talent=dark_ascension_talent)

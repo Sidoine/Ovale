@@ -138,6 +138,10 @@ Define(nightblade 195452)
   SpellInfo(nightblade energy=25 combopoints=1 duration=6 gcd=1 tick=2)
   # Suffering w1 Shadow damage every t1 sec.rnHealing effects reduced by s7.rnTaking s6 increased damage from the Rogue.
   SpellAddTargetDebuff(nightblade nightblade=1)
+Define(nights_vengeance_buff 273419)
+# Nightblade increases the damage of your next Eviscerate within 8 sec by s1. 
+  SpellInfo(nights_vengeance_buff channel=-0.001 gcd=0 offgcd=1)
+
 Define(pistol_shot 185763)
 # Draw a concealed pistol and fire a quick shot at an enemy, dealing s1*<CAP>/AP Physical damage and reducing movement speed by s3 for 6 seconds.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
   SpellInfo(pistol_shot energy=40 duration=6 gcd=1 combopoints=-1)
@@ -301,6 +305,9 @@ Define(vigor_talent 7) #19239
 Define(shrouded_suffocation_trait 278666)
 Define(ace_up_your_sleeve_trait 278676)
 Define(deadshot_trait 272935)
+Define(snake_eyes_trait 275846)
+Define(blade_in_the_shadows_trait 275896)
+Define(nights_vengeance_trait 273418)
 Define(sharpened_blades_trait 272911)
     `;
 // END

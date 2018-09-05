@@ -64,7 +64,7 @@ type ComputerFunction = (element: Element, atTime: number) => [OvaleTimeSpan, El
 
 export let OvaleBestAction: OvaleBestActionClass = undefined;
 
-function SetValue(node: Element, value?: number, origin?: number, rate?: number): Element {
+function SetValue(node: AstNode, value?: number, origin?: number, rate?: number): Element {
     let result = self_value[node.nodeId];
     if (!result) {
         result = self_valuePool.Get();
@@ -652,7 +652,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         this.StartProfiling("OvaleBestAction_ComputeFunction");
         let timeSpan = GetTimeSpan(element);
         let result;
-        let [start, ending, value, origin, rate] = OvaleCondition.EvaluateCondition(element.func, element.positionalParams, element.namedParams, atTime);
+        const [start, ending, value, origin, rate] = OvaleCondition.EvaluateCondition(element.func, element.positionalParams, element.namedParams, atTime);
         if (start && ending) {
             timeSpan.Copy(start, ending);
         } else {
@@ -775,6 +775,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         } else {
             wipe(timeSpan);
         }
+
         OvaleBestAction.Log("[%d]    logical '%s' returns %s", element.nodeId, element.operator, timeSpan);
         this.StopProfiling("OvaleBestAction_Compute");
         return [timeSpan, element];

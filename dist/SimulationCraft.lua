@@ -53,6 +53,7 @@ local sort = table.sort
 local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isLuaArray = __tools.isLuaArray
+local checkToken = __tools.checkToken
 local OvaleSimulationCraftBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleSimulationCraft"))
 local interruptsClasses = {
     ["mind_freeze"] = "DEATHKNIGHT",
@@ -176,6 +177,108 @@ local classInfos = {
         }
     }
 }
+local CHARACTER_PROPERTY = {
+    ["active_enemies"] = "Enemies()",
+    ["astral_power"] = "AstralPower()",
+    ["astral_power.deficit"] = "AstralPowerDeficit()",
+    ["blade_dance_worth_using"] = "0",
+    ["blood.frac"] = "Rune(blood)",
+    ["buff.arcane_charge.stack"] = "ArcaneCharges()",
+    ["buff.arcane_charge.max_stack"] = "MaxArcaneCharges()",
+    ["buff.movement.up"] = "Speed() > 0",
+    ["buff.out_of_range.up"] = "not target.InRange()",
+    ["bugs"] = "0",
+    ["chi"] = "Chi()",
+    ["chi.max"] = "MaxChi()",
+    ["combo_points"] = "ComboPoints()",
+    ["combo_points.deficit"] = "ComboPointsDeficit()",
+    ["combo_points.max"] = "MaxComboPoints()",
+    ["consecration.remains"] = "BuffRemaining(consecration)",
+    ["consecration.up"] = "BuffPresent(consecration)",
+    ["cp_max_spend"] = "MaxComboPoints()",
+    ["crit_pct_current"] = "SpellCritChance()",
+    ["current_insanity_drain"] = "CurrentInsanityDrain()",
+    ["darkglare_no_de"] = "NotDeDemons(darkglare)",
+    ["death_and_decay.ticking"] = "BuffPresent(death_and_decay)",
+    ["death_sweep_worth_using"] = "0",
+    ["delay"] = "0",
+    ["demonic_fury"] = "DemonicFury()",
+    ["desired_targets"] = "Enemies(tagged=1)",
+    ["doomguard_no_de"] = "NotDeDemons(doomguard)",
+    ["dreadstalker_no_de"] = "NotDeDemons(dreadstalker)",
+    ["dreadstalker_remaining_duration"] = "DemonDuration(dreadstalker)",
+    ["eclipse_change"] = "TimeToEclipse()",
+    ["eclipse_energy"] = "EclipseEnergy()",
+    ["enemies"] = "Enemies()",
+    ["energy"] = "Energy()",
+    ["energy.deficit"] = "EnergyDeficit()",
+    ["energy.max"] = "MaxEnergy()",
+    ["energy.regen"] = "EnergyRegenRate()",
+    ["energy.time_to_max"] = "TimeToMaxEnergy()",
+    ["feral_spirit.remains"] = "TotemRemaining(sprit_wolf)",
+    ["finality"] = "HasArtifactTrait(finality)",
+    ["focus"] = "Focus()",
+    ["focus.deficit"] = "FocusDeficit()",
+    ["focus.max"] = "MaxFocus()",
+    ["focus.regen"] = "FocusRegenRate()",
+    ["focus.time_to_max"] = "TimeToMaxFocus()",
+    ["frost.frac"] = "Rune(frost)",
+    ["fury"] = "Fury()",
+    ["fury.deficit"] = "FuryDeficit()",
+    ["health"] = "Health()",
+    ["health.deficit"] = "HealthMissing()",
+    ["health.max"] = "MaxHealth()",
+    ["health.pct"] = "HealthPercent()",
+    ["health.percent"] = "HealthPercent()",
+    ["holy_power"] = "HolyPower()",
+    ["infernal_no_de"] = "NotDeDemons(infernal)",
+    ["insanity"] = "Insanity()",
+    ["level"] = "Level()",
+    ["lunar_max"] = "TimeToEclipse(lunar)",
+    ["mana"] = "Mana()",
+    ["mana.deficit"] = "ManaDeficit()",
+    ["mana.max"] = "MaxMana()",
+    ["mana.pct"] = "ManaPercent()",
+    ["maelstrom"] = "Maelstrom()",
+    ["next_wi_bomb.pheromone"] = "SpellUsable(270323)",
+    ["next_wi_bomb.shrapnel"] = "SpellUsable(270335)",
+    ["next_wi_bomb.volatile"] = "SpellUsable(271045)",
+    ["nonexecute_actors_pct"] = "0",
+    ["pain"] = "Pain()",
+    ["pain.deficit"] = "PainDeficit()",
+    ["pet_count"] = "Demons()",
+    ["rage"] = "Rage()",
+    ["rage.deficit"] = "RageDeficit()",
+    ["rage.max"] = "MaxRage()",
+    ["raid_event.adds.remains"] = "0",
+    ["raw_haste_pct"] = "SpellCastSpeedPercent()",
+    ["rtb_list.any.5"] = "BuffCount(roll_the_bones_buff more 4)",
+    ["rtb_list.any.6"] = "BuffCount(roll_the_bones_buff more 5)",
+    ["rune.deficit"] = "RuneDeficit()",
+    ["runic_power"] = "RunicPower()",
+    ["runic_power.deficit"] = "RunicPowerDeficit()",
+    ["service_no_de"] = "0",
+    ["shadow_orb"] = "ShadowOrbs()",
+    ["sigil_placed"] = "SigilCharging(flame)",
+    ["solar_max"] = "TimeToEclipse(solar)",
+    ["soul_shard"] = "SoulShards()",
+    ["soul_fragments"] = "SoulFragments()",
+    ["ssw_refund_offset"] = "target.Distance() % 3 - 1",
+    ["stat.mastery_rating"] = "MasteryRating()",
+    ["stealthed"] = "Stealthed()",
+    ["stealthed.all"] = "Stealthed()",
+    ["stealthed.rogue"] = "Stealthed()",
+    ["time"] = "TimeInCombat()",
+    ["time_to_20pct"] = "TimeToHealthPercent(20)",
+    ["time_to_die"] = "TimeToDie()",
+    ["time_to_die.remains"] = "TimeToDie()",
+    ["time_to_shard"] = "TimeToShard()",
+    ["time_to_sht.4"] = "100",
+    ["time_to_sht.5"] = "100",
+    ["wild_imp_count"] = "Demons(wild_imp)",
+    ["wild_imp_no_de"] = "NotDeDemons(wild_imp)",
+    ["wild_imp_remaining_duration"] = "DemonDuration(wild_imp)"
+}
 local KEYWORD = {}
 local MODIFIER_KEYWORD = {
     ["ammo_type"] = true,
@@ -188,6 +291,7 @@ local MODIFIER_KEYWORD = {
     ["cooldown_stddev"] = true,
     ["cycle_targets"] = true,
     ["damage"] = true,
+    ["delay"] = true,
     ["early_chain_if"] = true,
     ["extra_amount"] = true,
     ["five_stacks"] = true,
@@ -214,6 +318,7 @@ local MODIFIER_KEYWORD = {
     ["range"] = true,
     ["sec"] = true,
     ["slot"] = true,
+    ["strikes"] = true,
     ["sync"] = true,
     ["sync_weapons"] = true,
     ["target"] = true,
@@ -794,6 +899,7 @@ local ParseAction = function(action, nodeList, annotation)
         end
     end
     local child = self_childrenPool:Get()
+    local modifiers = self_childrenPool:Get()
     if ok then
         local tokenType, token = tokenStream:Peek()
         while ok and tokenType do
@@ -802,7 +908,7 @@ local ParseAction = function(action, nodeList, annotation)
                 local modifier, expressionNode
                 ok, modifier, expressionNode = ParseModifier(tokenStream, nodeList, annotation)
                 if ok then
-                    child[modifier] = expressionNode
+                    modifiers[modifier] = expressionNode
                     tokenType, token = tokenStream:Peek()
                 end
             else
@@ -818,6 +924,7 @@ local ParseAction = function(action, nodeList, annotation)
         node.action = action
         node.name = name
         node.child = child
+        node.modifiers = modifiers
         annotation.sync = annotation.sync or {}
         annotation.sync[name] = annotation.sync[name] or node
     else
@@ -991,7 +1098,7 @@ ParseModifier = function(tokenStream, nodeList, annotation)
     local name
     do
         local tokenType, token = tokenStream:Consume()
-        if tokenType == "keyword" and MODIFIER_KEYWORD[token] then
+        if tokenType == "keyword" and checkToken(MODIFIER_KEYWORD, token) then
             name = token
         else
             SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing action line; expression keyword expected.", token)
@@ -1317,7 +1424,6 @@ local InitializeDisambiguation = function()
     AddDisambiguation("healing_elixir_talent", "healing_elixir_talent_mistweaver", "MONK", "mistweaver")
     AddDisambiguation("bok_proc_buff", "blackout_kick_buff", "MONK", "windwalker")
     AddDisambiguation("fortifying_brew", "fortifying_brew_mistweaver", "MONK", "mistweaver")
-    AddDisambiguation("rushing_jade_wind", "rushing_jade_wind_windwalker", "MONK", "windwalker")
     AddDisambiguation("breath_of_fire_dot_debuff", "breath_of_fire_debuff", "MONK", "brewmaster")
     AddDisambiguation("brews", "ironskin_brew", "MONK", "brewmaster")
     AddDisambiguation("avenger_shield", "avengers_shield", "PALADIN", "protection")
@@ -1722,7 +1828,6 @@ do
     }
 end
 local EMIT_VISITOR = nil
-local Emit = nil
 local EmitAction = nil
 local EmitActionList = nil
 local EmitExpression = nil
@@ -1754,7 +1859,7 @@ local EmitOperandTarget = nil
 local EmitOperandTotem = nil
 local EmitOperandTrinket = nil
 local EmitOperandVariable = nil
-Emit = function(parseNode, nodeList, annotation, action)
+local function Emit(parseNode, nodeList, annotation, action)
     local visitor = EMIT_VISITOR[parseNode.type]
     if  not visitor then
         __exports.OvaleSimulationCraft:Error("Unable to emit node of type '%s'.", parseNode.type)
@@ -1762,8 +1867,7 @@ Emit = function(parseNode, nodeList, annotation, action)
         return visitor(parseNode, nodeList, annotation, action)
     end
 end
-
-local EmitModifier = function(modifier, parseNode, nodeList, annotation, action)
+local EmitModifier = function(modifier, parseNode, nodeList, annotation, action, modifiers)
     local node, code
     local className = annotation.class
     local specialization = annotation.specialization
@@ -1869,11 +1973,11 @@ local EmitModifier = function(modifier, parseNode, nodeList, annotation, action)
     return node
 end
 
-local EmitConditionNode = function(nodeList, bodyNode, conditionNode, parseNode, annotation, action)
+local EmitConditionNode = function(nodeList, bodyNode, conditionNode, parseNode, annotation, action, modifiers)
     local extraConditionNode = conditionNode
     conditionNode = nil
-    for modifier, expressionNode in pairs(parseNode.child) do
-        local rhsNode = EmitModifier(modifier, expressionNode, nodeList, annotation, action)
+    for modifier, expressionNode in kpairs(parseNode.modifiers) do
+        local rhsNode = EmitModifier(modifier, expressionNode, nodeList, annotation, action, modifiers)
         if rhsNode then
             if  not conditionNode then
                 conditionNode = rhsNode
@@ -1918,7 +2022,7 @@ local EmitConditionNode = function(nodeList, bodyNode, conditionNode, parseNode,
     end
 end
 
-local function EmitNamedVariable(name, nodeList, annotation, modifier, parseNode, action, conditionNode)
+local function EmitNamedVariable(name, nodeList, annotation, modifiers, parseNode, action, conditionNode)
     if  not annotation.variable then
         annotation.variable = {}
     end
@@ -1936,8 +2040,8 @@ local function EmitNamedVariable(name, nodeList, annotation, modifier, parseNode
         group = node.child[1]
     end
     annotation.currentVariable = node
-    local value = Emit(modifier.value, nodeList, annotation, action)
-    local newNode = EmitConditionNode(nodeList, value, conditionNode or nil, parseNode, annotation, action)
+    local value = Emit(modifiers.value, nodeList, annotation, action)
+    local newNode = EmitConditionNode(nodeList, value, conditionNode or nil, parseNode, annotation, action, modifiers)
     if newNode.type == "if" then
         insert(group.child, 1, newNode)
     else
@@ -1963,14 +2067,14 @@ local function EmitVariableMax(name, nodeList, annotation, modifier, parseNode, 
     local node = OvaleAST:ParseCode("add_function", bodyCode, nodeList, annotation.astAnnotation)
     annotation.variable[name] = node
 end
-local function EmitVariableAdd(name, nodeList, annotation, modifier, parseNode, action)
+local function EmitVariableAdd(name, nodeList, annotation, modifiers, parseNode, action)
     local valueNode = annotation.variable[name]
     if valueNode then
         return 
     end
-    EmitNamedVariable(name, nodeList, annotation, modifier, parseNode, action)
+    EmitNamedVariable(name, nodeList, annotation, modifiers, parseNode, action)
 end
-local function EmitVariableIf(name, nodeList, annotation, modifier, parseNode, action)
+local function EmitVariableIf(name, nodeList, annotation, modifiers, parseNode, action)
     local node = annotation.variable[name]
     local group
     if  not node then
@@ -1987,13 +2091,13 @@ local function EmitVariableIf(name, nodeList, annotation, modifier, parseNode, a
     annotation.currentVariable = node
     local ifNode = OvaleAST:NewNode(nodeList, true)
     ifNode.type = "if"
-    ifNode.child[1] = Emit(modifier.condition, nodeList, annotation)
-    ifNode.child[2] = Emit(modifier.value, nodeList, annotation)
+    ifNode.child[1] = Emit(modifiers.condition, nodeList, annotation, nil)
+    ifNode.child[2] = Emit(modifiers.value, nodeList, annotation, nil)
     insert(group.child, ifNode)
     local elseNode = OvaleAST:NewNode(nodeList, true)
     elseNode.type = "unless"
     elseNode.child[1] = ifNode.child[1]
-    elseNode.child[2] = Emit(modifier.value_else, nodeList, annotation)
+    elseNode.child[2] = Emit(modifiers.value_else, nodeList, annotation, nil)
     insert(group.child, elseNode)
     annotation.currentVariable = nil
 end
@@ -2053,7 +2157,7 @@ EmitAction = function(parseNode, nodeList, annotation)
     else
         local bodyCode, conditionCode
         local expressionType = "expression"
-        local modifier = parseNode.child
+        local modifiers = parseNode.modifiers
         local isSpellAction = true
         if interruptsClasses[action] == className then
             bodyCode = camelSpecialization .. "InterruptActions()"
@@ -2082,16 +2186,6 @@ EmitAction = function(parseNode, nodeList, annotation)
             conditionCode = "SpellKnown(half_moon)"
         elseif className == "DRUID" and action == "full_moon" then
             conditionCode = "SpellKnown(full_moon)"
-        elseif className == "HUNTER" and action == "exotic_munitions" then
-            if modifier.ammo_type then
-                local name = Unparse(modifier.ammo_type)
-                action = name .. "_ammo"
-                local buffName = "exotic_munitions_buff"
-                AddSymbol(annotation, buffName)
-                conditionCode = format("BuffRemaining(%s) < 1200", buffName)
-            else
-                isSpellAction = false
-            end
         elseif className == "HUNTER" and action == "kill_command" then
             conditionCode = "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()"
         elseif className == "MAGE" and action == "arcane_brilliance" then
@@ -2140,7 +2234,7 @@ EmitAction = function(parseNode, nodeList, annotation)
         elseif className == "PALADIN" and action == "blessing_of_kings" then
             conditionCode = "BuffExpires(mastery_buff)"
         elseif className == "PALADIN" and action == "judgment" then
-            if modifier.cycle_targets then
+            if modifiers.cycle_targets then
                 AddSymbol(annotation, action)
                 bodyCode = "Spell(" .. action .. " text=double)"
                 isSpellAction = false
@@ -2153,8 +2247,8 @@ EmitAction = function(parseNode, nodeList, annotation)
         elseif className == "ROGUE" and action == "adrenaline_rush" then
             conditionCode = "EnergyDeficit() > 1"
         elseif className == "ROGUE" and action == "apply_poison" then
-            if modifier.lethal then
-                local name = Unparse(modifier.lethal)
+            if modifiers.lethal then
+                local name = Unparse(modifiers.lethal)
                 action = name .. "_poison"
                 local buffName = "lethal_poison_buff"
                 AddSymbol(annotation, buffName)
@@ -2232,8 +2326,8 @@ EmitAction = function(parseNode, nodeList, annotation)
         elseif className == "WARRIOR" and action == "enraged_regeneration" then
             conditionCode = "HealthPercent() < 80"
         elseif className == "WARRIOR" and sub(action, 1, 7) == "execute" then
-            if modifier.target then
-                local target = tonumber(Unparse(modifier.target))
+            if modifiers.target then
+                local target = tonumber(Unparse(modifiers.target))
                 if target then
                     isSpellAction = false
                 end
@@ -2252,11 +2346,11 @@ EmitAction = function(parseNode, nodeList, annotation)
             annotation[action] = className
             conditionCode = "CheckBoxOn(opt_" .. action .. ")"
         elseif action == "variable" then
-            EmitVariable(nodeList, annotation, modifier, parseNode, action, conditionNode)
+            EmitVariable(nodeList, annotation, modifiers, parseNode, action, conditionNode)
             isSpellAction = false
         elseif action == "call_action_list" or action == "run_action_list" or action == "swap_action_list" then
-            if modifier.name then
-                local name = Unparse(modifier.name)
+            if modifiers.name then
+                local name = Unparse(modifiers.name)
                 local functionName = OvaleFunctionName(name, annotation)
                 bodyCode = functionName .. "()"
                 if className == "MAGE" and specialization == "arcane" and (name == "burn" or name == "init_burn") then
@@ -2266,9 +2360,9 @@ EmitAction = function(parseNode, nodeList, annotation)
             end
             isSpellAction = false
         elseif action == "cancel_buff" then
-            if modifier.name then
-                local spellName = Unparse(modifier.name)
-                local buffName = spellName .. "_buff"
+            if modifiers.name then
+                local spellName = Unparse(modifiers.name)
+                local buffName = Disambiguate(annotation, spellName .. "_buff", className, specialization, "spell")
                 AddSymbol(annotation, spellName)
                 AddSymbol(annotation, buffName)
                 bodyCode = format("Texture(%s text=cancel)", spellName)
@@ -2278,13 +2372,13 @@ EmitAction = function(parseNode, nodeList, annotation)
         elseif action == "pool_resource" then
             bodyNode = OvaleAST:NewNode(nodeList)
             bodyNode.type = "simc_pool_resource"
-            bodyNode.for_next = (modifier.for_next ~= nil)
-            if modifier.extra_amount then
-                bodyNode.extra_amount = tonumber(Unparse(modifier.extra_amount))
+            bodyNode.for_next = (modifiers.for_next ~= nil)
+            if modifiers.extra_amount then
+                bodyNode.extra_amount = tonumber(Unparse(modifiers.extra_amount))
             end
             isSpellAction = false
         elseif action == "potion" then
-            local name = (modifier.name and Unparse(modifier.name)) or annotation.consumables["potion"]
+            local name = (modifiers.name and Unparse(modifiers.name)) or annotation.consumables["potion"]
             if name then
                 name = Disambiguate(annotation, name, className, specialization, "item")
                 bodyCode = format("Item(%s usable=1)", name)
@@ -2296,8 +2390,8 @@ EmitAction = function(parseNode, nodeList, annotation)
         elseif action == "sequence" then
             isSpellAction = false
         elseif action == "stance" then
-            if modifier.choose then
-                local name = Unparse(modifier.choose)
+            if modifiers.choose then
+                local name = Unparse(modifiers.choose)
                 if className == "MONK" then
                     action = "stance_of_the_" .. name
                 elseif className == "WARRIOR" then
@@ -2318,13 +2412,13 @@ EmitAction = function(parseNode, nodeList, annotation)
             isSpellAction = false
         elseif action == "use_item" then
             local legendaryRing = nil
-            if modifier.slot then
-                local slot = Unparse(modifier.slot)
+            if modifiers.slot then
+                local slot = Unparse(modifiers.slot)
                 if match(slot, "finger") then
                     legendaryRing = Disambiguate(annotation, "legendary_ring", className, specialization)
                 end
-            elseif modifier.name then
-                local name = Unparse(modifier.name)
+            elseif modifiers.name then
+                local name = Unparse(modifiers.name)
                 name = Disambiguate(annotation, name, className, specialization)
                 if match(name, "legendary_ring") then
                     legendaryRing = name
@@ -2341,13 +2435,13 @@ EmitAction = function(parseNode, nodeList, annotation)
             end
             isSpellAction = false
         elseif action == "wait" then
-            if modifier.sec then
-                local seconds = tonumber(Unparse(modifier.sec))
+            if modifiers.sec then
+                local seconds = tonumber(Unparse(modifiers.sec))
                 if seconds then
                 else
                     bodyNode = OvaleAST:NewNode(nodeList)
                     bodyNode.type = "simc_wait"
-                    local expressionNode = Emit(modifier.sec, nodeList, annotation, action)
+                    local expressionNode = Emit(modifiers.sec, nodeList, annotation, action)
                     local code = OvaleAST:Unparse(expressionNode)
                     conditionCode = code .. " > 0"
                 end
@@ -2356,8 +2450,8 @@ EmitAction = function(parseNode, nodeList, annotation)
         end
         if isSpellAction then
             AddSymbol(annotation, action)
-            if modifier.target then
-                local actionTarget = Unparse(modifier.target)
+            if modifiers.target then
+                local actionTarget = Unparse(modifiers.target)
                 if actionTarget == "2" then
                     actionTarget = "other"
                 end
@@ -2375,7 +2469,7 @@ EmitAction = function(parseNode, nodeList, annotation)
             conditionNode = OvaleAST:ParseCode(expressionType, conditionCode, nodeList, annotation.astAnnotation)
         end
         if bodyNode then
-            node = EmitConditionNode(nodeList, bodyNode, conditionNode, parseNode, annotation, action)
+            node = EmitConditionNode(nodeList, bodyNode, conditionNode, parseNode, annotation, action, modifiers)
         end
     end
     return node
@@ -2393,7 +2487,7 @@ EmitActionList = function(parseNode, nodeList, annotation)
         commentNode.comment = actionNode.action
         child[#child + 1] = commentNode
         if emit then
-            local statementNode = EmitAction(actionNode, nodeList, annotation)
+            local statementNode = EmitAction(actionNode, nodeList, annotation, actionNode.name)
             if statementNode then
                 if statementNode.type == "simc_pool_resource" then
                     local powerType = OvalePower.POOLED_RESOURCE[annotation.class]
@@ -2519,19 +2613,22 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
     elseif parseNode.expressionType == "binary" then
         local opInfo = BINARY_OPERATOR[parseNode.operator]
         if opInfo then
+            local parseNodeOperator = parseNode.operator
             local operator
-            if parseNode.operator == "&" then
+            if parseNodeOperator == "&" then
                 operator = "and"
-            elseif parseNode.operator == "^" then
+            elseif parseNodeOperator == "^" then
                 operator = "xor"
-            elseif parseNode.operator == "|" then
+            elseif parseNodeOperator == "|" then
                 operator = "or"
-            elseif parseNode.operator == "=" then
+            elseif parseNodeOperator == "=" then
                 operator = "=="
-            elseif parseNode.operator == "%" then
+            elseif parseNodeOperator == "%" then
                 operator = "/"
             elseif parseNode.type == "compare" or parseNode.type == "arithmetic" then
-                operator = parseNode.operator
+                if parseNodeOperator ~= "~" and parseNodeOperator ~= "!~" then
+                    operator = parseNodeOperator
+                end
             end
             if parseNode.type == "compare" and parseNode.child[1].rune then
                 local lhsNode = parseNode.child[1]
@@ -3029,190 +3126,87 @@ EmitOperandBuff = function(operand, parseNode, nodeList, annotation, action, tar
     return ok, node
 end
 
-do
-    local CHARACTER_PROPERTY = {
-        ["active_enemies"] = "Enemies()",
-        ["astral_power"] = "AstralPower()",
-        ["astral_power.deficit"] = "AstralPowerDeficit()",
-        ["blade_dance_worth_using"] = "0",
-        ["blood.frac"] = "Rune(blood)",
-        ["buff.arcane_charge.stack"] = "ArcaneCharges()",
-        ["buff.arcane_charge.max_stack"] = "MaxArcaneCharges()",
-        ["buff.movement.up"] = "Speed() > 0",
-        ["buff.out_of_range.up"] = "not target.InRange()",
-        ["bugs"] = "0",
-        ["chi"] = "Chi()",
-        ["chi.max"] = "MaxChi()",
-        ["combo_points"] = "ComboPoints()",
-        ["combo_points.deficit"] = "ComboPointsDeficit()",
-        ["combo_points.max"] = "MaxComboPoints()",
-        ["consecration.remains"] = "BuffRemaining(consecration)",
-        ["cp_max_spend"] = "MaxComboPoints()",
-        ["crit_pct_current"] = "SpellCritChance()",
-        ["current_insanity_drain"] = "CurrentInsanityDrain()",
-        ["darkglare_no_de"] = "NotDeDemons(darkglare)",
-        ["death_and_decay.ticking"] = "BuffPresent(death_and_decay)",
-        ["death_sweep_worth_using"] = "0",
-        ["delay"] = "0",
-        ["demonic_fury"] = "DemonicFury()",
-        ["desired_targets"] = "Enemies(tagged=1)",
-        ["doomguard_no_de"] = "NotDeDemons(doomguard)",
-        ["dreadstalker_no_de"] = "NotDeDemons(dreadstalker)",
-        ["dreadstalker_remaining_duration"] = "DemonDuration(dreadstalker)",
-        ["eclipse_change"] = "TimeToEclipse()",
-        ["eclipse_energy"] = "EclipseEnergy()",
-        ["enemies"] = "Enemies()",
-        ["energy"] = "Energy()",
-        ["energy.deficit"] = "EnergyDeficit()",
-        ["energy.max"] = "MaxEnergy()",
-        ["energy.regen"] = "EnergyRegenRate()",
-        ["energy.time_to_max"] = "TimeToMaxEnergy()",
-        ["feral_spirit.remains"] = "TotemRemaining(sprit_wolf)",
-        ["finality"] = "HasArtifactTrait(finality)",
-        ["focus"] = "Focus()",
-        ["focus.deficit"] = "FocusDeficit()",
-        ["focus.max"] = "MaxFocus()",
-        ["focus.regen"] = "FocusRegenRate()",
-        ["focus.time_to_max"] = "TimeToMaxFocus()",
-        ["frost.frac"] = "Rune(frost)",
-        ["fury"] = "Fury()",
-        ["fury.deficit"] = "FuryDeficit()",
-        ["health"] = "Health()",
-        ["health.deficit"] = "HealthMissing()",
-        ["health.max"] = "MaxHealth()",
-        ["health.pct"] = "HealthPercent()",
-        ["health.percent"] = "HealthPercent()",
-        ["holy_power"] = "HolyPower()",
-        ["infernal_no_de"] = "NotDeDemons(infernal)",
-        ["insanity"] = "Insanity()",
-        ["level"] = "Level()",
-        ["lunar_max"] = "TimeToEclipse(lunar)",
-        ["mana"] = "Mana()",
-        ["mana.deficit"] = "ManaDeficit()",
-        ["mana.max"] = "MaxMana()",
-        ["mana.pct"] = "ManaPercent()",
-        ["maelstrom"] = "Maelstrom()",
-        ["next_wi_bomb.pheromone"] = "SpellUsable(270323)",
-        ["next_wi_bomb.shrapnel"] = "SpellUsable(270335)",
-        ["next_wi_bomb.volatile"] = "SpellUsable(271045)",
-        ["nonexecute_actors_pct"] = "0",
-        ["pain"] = "Pain()",
-        ["pain.deficit"] = "PainDeficit()",
-        ["pet_count"] = "Demons()",
-        ["rage"] = "Rage()",
-        ["rage.deficit"] = "RageDeficit()",
-        ["rage.max"] = "MaxRage()",
-        ["raid_event.adds.remains"] = "0",
-        ["raw_haste_pct"] = "SpellCastSpeedPercent()",
-        ["rtb_list.any.5"] = "BuffCount(roll_the_bones_buff more 4)",
-        ["rtb_list.any.6"] = "BuffCount(roll_the_bones_buff more 5)",
-        ["rune.deficit"] = "RuneDeficit()",
-        ["runic_power"] = "RunicPower()",
-        ["runic_power.deficit"] = "RunicPowerDeficit()",
-        ["service_no_de"] = "0",
-        ["shadow_orb"] = "ShadowOrbs()",
-        ["sigil_placed"] = "SigilCharging(flame)",
-        ["solar_max"] = "TimeToEclipse(solar)",
-        ["soul_shard"] = "SoulShards()",
-        ["soul_fragments"] = "SoulFragments()",
-        ["ssw_refund_offset"] = "target.Distance() % 3 - 1",
-        ["stat.mastery_rating"] = "MasteryRating()",
-        ["stealthed"] = "Stealthed()",
-        ["stealthed.all"] = "Stealthed()",
-        ["stealthed.rogue"] = "Stealthed()",
-        ["time"] = "TimeInCombat()",
-        ["time_to_20pct"] = "TimeToHealthPercent(20)",
-        ["time_to_die"] = "TimeToDie()",
-        ["time_to_die.remains"] = "TimeToDie()",
-        ["time_to_shard"] = "TimeToShard()",
-        ["time_to_sht.4"] = "100",
-        ["time_to_sht.5"] = "100",
-        ["wild_imp_count"] = "Demons(wild_imp)",
-        ["wild_imp_no_de"] = "NotDeDemons(wild_imp)",
-        ["wild_imp_remaining_duration"] = "DemonDuration(wild_imp)"
-    }
-    EmitOperandCharacter = function(operand, parseNode, nodeList, annotation, action, target)
-        local ok = true
-        local node
-        local className = annotation.class
-        local specialization = annotation.specialization
-        local camelSpecialization = CamelSpecialization(annotation)
-        target = target and (target .. ".") or ""
-        local code
-        if CHARACTER_PROPERTY[operand] then
-            code = target .. CHARACTER_PROPERTY[operand]
-        elseif className == "MAGE" and operand == "incanters_flow_dir" then
-            local name = "incanters_flow_buff"
-            code = format("BuffDirection(%s)", name)
-            AddSymbol(annotation, name)
-        elseif className == "PALADIN" and operand == "time_to_hpg" then
-            code = camelSpecialization .. "TimeToHPG()"
-            if specialization == "holy" then
-                annotation.time_to_hpg_heal = className
-            elseif specialization == "protection" then
-                annotation.time_to_hpg_tank = className
-            elseif specialization == "retribution" then
-                annotation.time_to_hpg_melee = className
-            end
-        elseif className == "PRIEST" and operand == "shadowy_apparitions_in_flight" then
-            code = "1"
-        elseif operand == "rtb_buffs" then
-            code = "BuffCount(roll_the_bones_buff)"
-        elseif className == "ROGUE" and operand == "anticipation_charges" then
-            local name = "anticipation_buff"
-            code = format("BuffStacks(%s)", name)
-            AddSymbol(annotation, name)
-        elseif sub(operand, 1, 22) == "active_enemies_within." then
-            code = "Enemies()"
-        elseif find(operand, "^incoming_damage_") then
-            local _seconds, measure = match(operand, "^incoming_damage_([%d]+)(m?s?)$")
-            local seconds = tonumber(_seconds)
-            if measure == "ms" then
-                seconds = seconds / 1000
-            end
-            if parseNode.asType == "boolean" then
-                code = format("IncomingDamage(%f) > 0", seconds)
-            else
-                code = format("IncomingDamage(%f)", seconds)
-            end
-        elseif sub(operand, 1, 10) == "main_hand." then
-            local weaponType = sub(operand, 11)
-            if weaponType == "1h" then
-                code = "HasWeapon(main type=one_handed)"
-            elseif weaponType == "2h" then
-                code = "HasWeapon(main type=two_handed)"
-            end
-        elseif operand == "mastery_value" then
-            code = format("%sMasteryEffect() / 100", target)
-        elseif operand == "position_front" then
-            code = "False(position_front)"
-        elseif sub(operand, 1, 5) == "role." then
-            local role = match(operand, "^role%.([%w_]+)")
-            if role and role == annotation.role then
-                code = format("True(role_%s)", role)
-            else
-                code = format("False(role_%s)", role)
-            end
-        elseif operand == "spell_haste" or operand == "stat.spell_haste" then
-            code = "100 / { 100 + SpellCastSpeedPercent() }"
-        elseif operand == "attack_haste" or operand == "stat.attack_haste" then
-            code = "100 / { 100 + MeleeAttackSpeedPercent() }"
-        elseif sub(operand, 1, 13) == "spell_targets" then
-            code = "Enemies()"
-        elseif operand == "t18_class_trinket" then
-            code = format("HasTrinket(%s)", operand)
-            AddSymbol(annotation, operand)
+EmitOperandCharacter = function(operand, parseNode, nodeList, annotation, action, target)
+    local ok = true
+    local node
+    local className = annotation.class
+    local specialization = annotation.specialization
+    local camelSpecialization = CamelSpecialization(annotation)
+    target = target and (target .. ".") or ""
+    local code
+    if CHARACTER_PROPERTY[operand] then
+        code = target .. CHARACTER_PROPERTY[operand]
+    elseif className == "MAGE" and operand == "incanters_flow_dir" then
+        local name = "incanters_flow_buff"
+        code = format("BuffDirection(%s)", name)
+        AddSymbol(annotation, name)
+    elseif className == "PALADIN" and operand == "time_to_hpg" then
+        code = camelSpecialization .. "TimeToHPG()"
+        if specialization == "holy" then
+            annotation.time_to_hpg_heal = className
+        elseif specialization == "protection" then
+            annotation.time_to_hpg_tank = className
+        elseif specialization == "retribution" then
+            annotation.time_to_hpg_melee = className
+        end
+    elseif className == "PRIEST" and operand == "shadowy_apparitions_in_flight" then
+        code = "1"
+    elseif operand == "rtb_buffs" then
+        code = "BuffCount(roll_the_bones_buff)"
+    elseif className == "ROGUE" and operand == "anticipation_charges" then
+        local name = "anticipation_buff"
+        code = format("BuffStacks(%s)", name)
+        AddSymbol(annotation, name)
+    elseif sub(operand, 1, 22) == "active_enemies_within." then
+        code = "Enemies()"
+    elseif find(operand, "^incoming_damage_") then
+        local _seconds, measure = match(operand, "^incoming_damage_([%d]+)(m?s?)$")
+        local seconds = tonumber(_seconds)
+        if measure == "ms" then
+            seconds = seconds / 1000
+        end
+        if parseNode.asType == "boolean" then
+            code = format("IncomingDamage(%f) > 0", seconds)
         else
-            ok = false
+            code = format("IncomingDamage(%f)", seconds)
         end
-        if ok and code then
-            annotation.astAnnotation = annotation.astAnnotation or {}
-            node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+    elseif sub(operand, 1, 10) == "main_hand." then
+        local weaponType = sub(operand, 11)
+        if weaponType == "1h" then
+            code = "HasWeapon(main type=one_handed)"
+        elseif weaponType == "2h" then
+            code = "HasWeapon(main type=two_handed)"
         end
-        return ok, node
+    elseif operand == "mastery_value" then
+        code = format("%sMasteryEffect() / 100", target)
+    elseif operand == "position_front" then
+        code = "False(position_front)"
+    elseif sub(operand, 1, 5) == "role." then
+        local role = match(operand, "^role%.([%w_]+)")
+        if role and role == annotation.role then
+            code = format("True(role_%s)", role)
+        else
+            code = format("False(role_%s)", role)
+        end
+    elseif operand == "spell_haste" or operand == "stat.spell_haste" then
+        code = "100 / { 100 + SpellCastSpeedPercent() }"
+    elseif operand == "attack_haste" or operand == "stat.attack_haste" then
+        code = "100 / { 100 + MeleeAttackSpeedPercent() }"
+    elseif sub(operand, 1, 13) == "spell_targets" then
+        code = "Enemies()"
+    elseif operand == "t18_class_trinket" then
+        code = format("HasTrinket(%s)", operand)
+        AddSymbol(annotation, operand)
+    else
+        ok = false
     end
-
+    if ok and code then
+        annotation.astAnnotation = annotation.astAnnotation or {}
+        node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+    end
+    return ok, node
 end
+
 EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
     local ok = true
     local node
@@ -4130,18 +4124,16 @@ EmitOperandVariable = function(operand, parseNode, nodeList, annotation, action)
     return ok, node
 end
 
-do
-    EMIT_VISITOR = {
-        ["action"] = EmitAction,
-        ["action_list"] = EmitActionList,
-        ["arithmetic"] = EmitExpression,
-        ["compare"] = EmitExpression,
-        ["function"] = EmitFunction,
-        ["logical"] = EmitExpression,
-        ["number"] = EmitNumber,
-        ["operand"] = EmitOperand
-    }
-end
+EMIT_VISITOR = {
+    ["action"] = EmitAction,
+    ["action_list"] = EmitActionList,
+    ["arithmetic"] = EmitExpression,
+    ["compare"] = EmitExpression,
+    ["function"] = EmitFunction,
+    ["logical"] = EmitExpression,
+    ["number"] = EmitNumber,
+    ["operand"] = EmitOperand
+}
 local function PreOrderTraversalMark(node)
     if node.type == "custom_function" then
         self_functionUsed[node.name] = true
@@ -5160,7 +5152,9 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
             end
         end
         local ok = true
-        annotation = annotation or {}
+        annotation = annotation or {
+            dictionary = {}
+        }
         local nodeList = {}
         local actionList = {}
         for k, _v in kpairs(profile) do
@@ -5279,7 +5273,7 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
 				Include(ovale_%s_spells)
 				%s
 			]]
-                local dictionaryCode = format(dictionaryFormat, lower(annotation.class), Ovale.db.profile.overrideCode or "")
+                local dictionaryCode = format(dictionaryFormat, lower(annotation.class), (Ovale.db and Ovale.db.profile.overrideCode) or "")
                 dictionaryAST = OvaleAST:ParseCode("script", dictionaryCode, dictionaryAnnotation.nodeList, dictionaryAnnotation)
                 if dictionaryAST then
                     dictionaryAST.annotation = dictionaryAnnotation
@@ -5293,7 +5287,7 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
                 end
             end
             for _, node in ipairs(profile.actionList) do
-                local addFunctionNode = EmitActionList(node, nodeList, annotation)
+                local addFunctionNode = EmitActionList(node, nodeList, annotation, nil)
                 if addFunctionNode then
                     if node.name == "_default" and  not annotation.interrupt then
                         local defaultInterrupt = classInfos[annotation.class][annotation.specialization]
@@ -5447,8 +5441,8 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
             output[#output + 1] = "Include(ovale_trinkets_mop)"
             output[#output + 1] = "Include(ovale_trinkets_wod)"
             output[#output + 1] = format("Include(ovale_%s_spells)", lowerclass)
-            local overrideCode = Ovale.db.profile.overrideCode
-            if overrideCode ~= "" then
+            local overrideCode = Ovale.db and Ovale.db.profile.overrideCode
+            if overrideCode and overrideCode ~= "" then
                 output[#output + 1] = ""
                 output[#output + 1] = "# Overrides."
                 output[#output + 1] = overrideCode

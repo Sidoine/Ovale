@@ -42,11 +42,6 @@ Define(chi_burst 123986)
 Define(chi_wave 115098)
 # A wave of Chi energy flows through friends and foes, dealing 132467s1 Nature damage or 132463s1 healing. Bounces up to s1 times to targets within 132466a2 yards.
   SpellInfo(chi_wave cd=15 talent=chi_wave_talent)
-Define(crackling_jade_lightning 117952)
-# Channel Jade lightning, causing o1 Nature damage over 4 seconds to the target?a154436[, generating 1 Chi each time it deals damage,][] and sometimes knocking back melee attackers.
-  SpellInfo(crackling_jade_lightning energy=20 duration=4 channel=4 tick=1)
-  # Taking w1 damage every t1 sec.
-  SpellAddTargetDebuff(crackling_jade_lightning crackling_jade_lightning=1)
 Define(dampen_harm 122278)
 # Reduces all damage you take by m2 to m3 for 10 seconds, with larger attacks being reduced by more.
   SpellInfo(dampen_harm cd=120 duration=10 gcd=0 offgcd=1 talent=dampen_harm_talent)
@@ -152,11 +147,6 @@ Define(swift_roundhouse_buff 278707)
 # Blackout Kick increases the damage of your next Rising Sun Kick by s1, stacking up to 278710u times.
   SpellInfo(swift_roundhouse_buff channel=-0.001 gcd=0 offgcd=1)
 
-Define(the_emperors_capacitor_buff 235054)
-# Chi spenders increase the damage of your next Crackling Jade Lightning by 235054s1 and reduce its cost by 235054s2, stacking up to 235054u times.
-  SpellInfo(the_emperors_capacitor_buff max_stacks=20 gcd=0 offgcd=1)
-  # Damage of next Crackling Jade Lightning increased by s1.rnEnergy cost of next Crackling Jade Lightning reduced by s2.
-  SpellAddBuff(the_emperors_capacitor_buff the_emperors_capacitor_buff=1)
 Define(tiger_palm 100780)
 # Attack with the palm of your hand, dealing s1 damage.?a137384[rnrnTiger Palm has an 137384m1 chance to make your next Blackout Kick cost no Chi.][]?a137023[rnrnReduces the remaining cooldown on your Brews by s3 sec.][]?a137025[rnrn|cFFFFFFFFGenerates s2 Chi.][]
   SpellInfo(tiger_palm energy=50 chi=0)
@@ -203,8 +193,6 @@ Define(invoke_niuzao_the_black_ox_talent 18) #22103
 # Summons an effigy of Niuzao, the Black Ox for 45 seconds. Niuzao attacks your primary target and taunts it. He also frequently Stomps, damaging all nearby enemies.
 Define(invoke_xuen_the_white_tiger_talent 18) #22102
 # Summons an effigy of Xuen, the White Tiger for 20 seconds. Xuen attacks your primary target, and strikes 3 enemies within 123996A1 yards every 123999t1 sec with Tiger Lightning for 123996s1 Nature damage.
-Define(rushing_jade_wind_talent_windwalker 17) #23122
-# Summons a whirling tornado around you, causing (1+60 seconds/t1)*148187s1 damage every t1 sec to all enemies within 107270A1 yards.
 Define(rushing_jade_wind_talent 17) #20184
 # Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to enemies within 107270A1 yards.?s220357[ Applies Mark of the Crane to up to s2 nearby targets.][]
 Define(serenity_talent 21) #21191
@@ -213,8 +201,6 @@ Define(special_delivery_talent 16) #19819
 # Drinking Ironskin or Purifying Brew has a h chance to toss a keg high into the air that lands nearby after s1 sec, dealing 196733s1 damage to all enemies within 196733A1 yards and reducing their movement speed by 196733m2 for 15 seconds.
 Define(whirling_dragon_punch_talent 20) #22105
 # Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
-Define(drinking_horn_cover_item 137097)
-Define(the_emperors_capacitor_item 144239)
 Define(swift_roundhouse_trait 277669)
     `;
 // END
@@ -252,8 +238,8 @@ Define(chi_torpedo 115008)
 Define(chi_torpedo_buff 119085)
 	SpellInfo(chi_torpedo_buff duration=10)
 
-SpellInfo(crackling_jade_lightning haste=melee specialization=!mistweaver)
-SpellInfo(crackling_jade_lightning haste=spell specialization=mistweaver)
+# SpellInfo(crackling_jade_lightning haste=melee specialization=!mistweaver)
+# SpellInfo(crackling_jade_lightning haste=spell specialization=mistweaver)
 
 Define(detox_mistweaver 115450)
 	SpellInfo(detox_mistweaver cd=8)
@@ -409,9 +395,9 @@ Define(roll 109132)
 SpellInfo(rushing_jade_wind chi=0 duration=9 cd_haste=melee haste=melee talent=rushing_jade_wind_talent)
 SpellAddBuff(rushing_jade_wind rushing_jade_wind=1)
 
-Define(rushing_jade_wind_windwalker 261715)
-	SpellInfo(rushing_jade_wind_windwalker cd=6 cd_haste=melee tick=0.8 haste=melee talent=rushing_jade_wind_talent_windwalker)
-	SpellAddBuff(rushing_jade_wind_windwalker rushing_jade_wind_windwalker=1)
+# Define(rushing_jade_wind_windwalker 261715)
+# 	SpellInfo(rushing_jade_wind_windwalker cd=6 cd_haste=melee tick=0.8 haste=melee talent=rushing_jade_wind_talent_windwalker)
+# 	SpellAddBuff(rushing_jade_wind_windwalker rushing_jade_wind_windwalker=1)
 
 Define(song_of_chiji 198898)
 	SpellInfo(song_of_chiji cd=30)
@@ -495,7 +481,7 @@ SpellList(any_stagger_debuff light_stagger_debuff moderate_stagger_debuff heavy_
 ## Items
 Define(hidden_masters_forbidden_touch_buff 213114)
 	SpellInfo(hidden_masters_forbidden_touch_buff duration=5)
-SpellAddBuff(crackling_jade_lightning the_emperors_capacitor_buff=0)
+# SpellAddBuff(crackling_jade_lightning the_emperors_capacitor_buff=0)
 
 
 ## Talents

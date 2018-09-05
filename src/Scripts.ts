@@ -51,8 +51,8 @@ export type ScriptType = "script" | "include";
 interface Script {
     type?: ScriptType;
     desc?: string;
-    className?: string;
-    specialization?: string;
+    className?: ClassId;
+    specialization?: SpecializationName;
     code?: string;
 }
 
@@ -93,7 +93,7 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
         }
         return descriptionsTable;
     }
-    RegisterScript(className: string, specialization: string, name: string, description: string, code: string, scriptType: ScriptType) {
+    RegisterScript(className: ClassId, specialization: SpecializationName, name: string, description: string, code: string, scriptType: ScriptType) {
         this.script[name] = this.script[name] || {};
         let script = this.script[name];
         script.type = scriptType || "script";

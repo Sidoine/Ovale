@@ -147,7 +147,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
                 if OvaleFuture.next.currentCast.spellId == nil or OvaleFuture.next.currentCast.spellId ~= OvaleFuture.next.lastGCDSpellId then
                     atTime = baseState.next.currentTime
                 end
-                local timeSpan, element = OvaleBestAction:GetAction(node, nil, atTime)
+                local timeSpan, element = OvaleBestAction:GetAction(node, atTime)
                 local start
                 if element and element.offgcd then
                     start = timeSpan:NextTime(baseState.next.currentTime)
@@ -155,7 +155,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
                     start = timeSpan:NextTime(atTime)
                 end
                 if profile.apparence.enableIcons then
-                    self:UpdateActionIcon(nil, node, self.actions[k], element, start)
+                    self:UpdateActionIcon(node, self.actions[k], element, start)
                 end
                 if profile.apparence.spellFlash.enabled and OvaleSpellFlash then
                     OvaleSpellFlash:Flash(nil, node, element, start)
@@ -167,7 +167,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
             self.timeSinceLastUpdate = 0
         end
     end,
-    UpdateActionIcon = function(self, state, node, action, element, start, now)
+    UpdateActionIcon = function(self, node, action, element, start, now)
         local profile = Ovale.db.profile
         local icons = action.secure and action.secureIcons or action.icons
         now = now or GetTime()
@@ -186,7 +186,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
                 icons[2]:Update(element, nil)
             end
         else
-            local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget, actionResourceExtend = OvaleBestAction:GetActionInfo(element, state, now)
+            local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget, actionResourceExtend = OvaleBestAction:GetActionInfo(element, now)
             if actionResourceExtend and actionResourceExtend > 0 then
                 if actionCooldownDuration > 0 then
                     OvaleBestAction:Log("Extending cooldown of spell ID '%s' for primary resource by %fs.", actionId, actionResourceExtend)
@@ -235,13 +235,13 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
                     if actionId ~= OvaleFuture.next.lastGCDSpellId then
                         atTime = baseState.next.currentTime
                     end
-                    local timeSpan, nextElement = OvaleBestAction:GetAction(node, state, atTime)
+                    local timeSpan, nextElement = OvaleBestAction:GetAction(node, atTime)
                     if nextElement and nextElement.offgcd then
                         start = timeSpan:NextTime(baseState.next.currentTime)
                     else
                         start = timeSpan:NextTime(atTime)
                     end
-                    local actionTexture2, actionInRange2, actionCooldownStart2, actionCooldownDuration2, actionUsable2, actionShortcut2, actionIsCurrent2, actionEnable2, actionType2, actionId2, actionTarget2, actionResourceExtend2 = OvaleBestAction:GetActionInfo(nextElement, state, start)
+                    local actionTexture2, actionInRange2, actionCooldownStart2, actionCooldownDuration2, actionUsable2, actionShortcut2, actionIsCurrent2, actionEnable2, actionType2, actionId2, actionTarget2, actionResourceExtend2 = OvaleBestAction:GetActionInfo(nextElement, start)
                     icons[2]:Update(nextElement, start, actionTexture2, actionInRange2, actionCooldownStart2, actionCooldownDuration2, actionUsable2, actionShortcut2, actionIsCurrent2, actionEnable2, actionType2, actionId2, actionTarget2, actionResourceExtend2)
                 else
                     icons[2]:Update(element, nil)

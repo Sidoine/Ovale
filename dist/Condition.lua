@@ -40,18 +40,18 @@ local OvaleConditionClass = __class(OvaleConditionBase, {
     IsSpellBookCondition = function(self, name)
         return (self_spellBookCondition[name] ~= nil)
     end,
-    EvaluateCondition = function(self, name, positionalParams, namedParams, state, atTime)
-        return self_condition[name](positionalParams, namedParams, state, atTime)
+    EvaluateCondition = function(self, name, positionalParams, namedParams, atTime)
+        return self_condition[name](positionalParams, namedParams, atTime)
     end,
     HasAny = function(self)
         return next(self_condition) ~= nil
     end,
 })
 __exports.OvaleCondition = OvaleConditionClass()
-__exports.ParseCondition = function(positionalParams, namedParams, state, defaultTarget)
+__exports.ParseCondition = function(positionalParams, namedParams, defaultTarget)
     local target = namedParams.target or defaultTarget or "player"
     namedParams.target = namedParams.target or target
-    if target == "target" then
+    if target == "cycle" or target == "target" then
         target = baseState.next.defaultTarget
     end
     local filter

@@ -27,8 +27,8 @@ Define(bear_form 5487)
   # Armor increased by w3.rnStamina increased by 1178s2.rnImmune to Polymorph effects.
   SpellAddTargetDebuff(bear_form bear_form=1)
 Define(berserk 106951)
-# Reduces the energy cost of all Cat Form abilities by s1 and increases maximum Energy by s3 for 15 seconds.
-  SpellInfo(berserk cd=180 duration=15 gcd=1)
+# Reduces the energy cost of all Cat Form abilities by s1 and increases maximum Energy by s3 for 20 seconds.
+  SpellInfo(berserk cd=180 duration=20 gcd=1)
   # Reduces the energy cost of all Cat Form abilities by s1 and increases maximum Energy by s3.
   SpellAddBuff(berserk berserk=1)
 Define(berserking 26297)
@@ -48,7 +48,7 @@ Define(bristling_fur 155835)
   SpellAddBuff(bristling_fur bristling_fur=1)
 Define(brutal_slash 202028)
 # Strikes all nearby enemies with a massive slash, inflicting s1 Physical damage.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
-  SpellInfo(brutal_slash energy=30 cd=8 gcd=1 talent=brutal_slash_talent)
+  SpellInfo(brutal_slash energy=25 cd=8 gcd=1 talent=brutal_slash_talent)
 Define(cat_form 768)
 # Shapeshift into Cat Form, increasing auto-attack damage by (25 of Spell Power), movement speed by 113636s1, granting protection from Polymorph effects, and reducing falling damage.rnrnThe act of shapeshifting frees you from movement impairing effects.
   SpellInfo(cat_form)

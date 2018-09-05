@@ -10,7 +10,7 @@ import { OvaleScripts } from "../Scripts";
 # Based on SimulationCraft profile "PR_Demon_Hunter_Havoc".
 #	class=demonhunter
 #	spec=havoc
-#	talents=3210223
+#	talents=3210222
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -119,8 +119,8 @@ AddFunction HavocPrecombatCdPostConditions
 
 AddFunction HavocNormalMainActions
 {
- #vengeful_retreat,if=talent.momentum.enabled&buff.prepared.down
- if Talent(momentum_talent) and BuffExpires(prepared_buff) and CheckBoxOn(opt_vengeful_retreat) Spell(vengeful_retreat)
+ #vengeful_retreat,if=talent.momentum.enabled&buff.prepared.down&time>1
+ if Talent(momentum_talent) and BuffExpires(prepared_buff) and TimeInCombat() > 1 and CheckBoxOn(opt_vengeful_retreat) Spell(vengeful_retreat)
  #fel_rush,if=(variable.waiting_for_momentum|talent.fel_mastery.enabled)&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
  if { waiting_for_momentum() or Talent(fel_mastery_talent) } and { Charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and CheckBoxOn(opt_fel_rush) Spell(fel_rush)
  #fel_barrage,if=!variable.waiting_for_momentum&(active_enemies>desired_targets|raid_event.adds.in>30)
@@ -129,8 +129,8 @@ AddFunction HavocNormalMainActions
  if blade_dance() Spell(death_sweep)
  #blade_dance,if=variable.blade_dance
  if blade_dance() Spell(blade_dance)
- #fel_rush,if=!talent.momentum.enabled&!talent.demon_blades.enabled&azerite.unbound_chaos.rank>0
- if not Talent(momentum_talent) and not Talent(demon_blades_talent) and AzeriteTraitRank(unbound_chaos_trait) > 0 and CheckBoxOn(opt_fel_rush) Spell(fel_rush)
+ #fel_rush,if=!talent.momentum.enabled&!talent.demon_blades.enabled&azerite.unbound_chaos.enabled
+ if not Talent(momentum_talent) and not Talent(demon_blades_talent) and HasAzeriteTrait(unbound_chaos_trait) and CheckBoxOn(opt_fel_rush) Spell(fel_rush)
  #felblade,if=fury.deficit>=40
  if FuryDeficit() >= 40 Spell(felblade)
  #annihilation,if=(talent.demon_blades.enabled|!variable.waiting_for_momentum|fury.deficit<30|buff.metamorphosis.remains<5)&!variable.pooling_for_blade_dance&!variable.waiting_for_dark_slash
@@ -157,14 +157,14 @@ AddFunction HavocNormalMainPostConditions
 
 AddFunction HavocNormalShortCdActions
 {
- unless Talent(momentum_talent) and BuffExpires(prepared_buff) and CheckBoxOn(opt_vengeful_retreat) and Spell(vengeful_retreat) or { waiting_for_momentum() or Talent(fel_mastery_talent) } and { Charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or not waiting_for_momentum() and { Enemies() > Enemies(tagged=1) or 600 > 30 } and Spell(fel_barrage)
+ unless Talent(momentum_talent) and BuffExpires(prepared_buff) and TimeInCombat() > 1 and CheckBoxOn(opt_vengeful_retreat) and Spell(vengeful_retreat) or { waiting_for_momentum() or Talent(fel_mastery_talent) } and { Charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or not waiting_for_momentum() and { Enemies() > Enemies(tagged=1) or 600 > 30 } and Spell(fel_barrage) or blade_dance() and Spell(death_sweep)
  {
   #immolation_aura
   Spell(immolation_aura_havoc)
   #eye_beam,if=active_enemies>1&(!raid_event.adds.exists|raid_event.adds.up)&!variable.waiting_for_momentum
   if Enemies() > 1 and { not False(raid_event_adds_exists) or False(raid_event_adds_exists) } and not waiting_for_momentum() Spell(eye_beam)
 
-  unless blade_dance() and Spell(death_sweep) or blade_dance() and Spell(blade_dance) or not Talent(momentum_talent) and not Talent(demon_blades_talent) and AzeriteTraitRank(unbound_chaos_trait) > 0 and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or FuryDeficit() >= 40 and Spell(felblade)
+  unless blade_dance() and Spell(blade_dance) or not Talent(momentum_talent) and not Talent(demon_blades_talent) and HasAzeriteTrait(unbound_chaos_trait) and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or FuryDeficit() >= 40 and Spell(felblade)
   {
    #eye_beam,if=!talent.blind_fury.enabled&!variable.waiting_for_dark_slash&raid_event.adds.in>cooldown
    if not Talent(blind_fury_talent) and not waiting_for_dark_slash() and 600 > SpellCooldown(eye_beam) Spell(eye_beam)
@@ -180,7 +180,7 @@ AddFunction HavocNormalShortCdActions
 
 AddFunction HavocNormalShortCdPostConditions
 {
- Talent(momentum_talent) and BuffExpires(prepared_buff) and CheckBoxOn(opt_vengeful_retreat) and Spell(vengeful_retreat) or { waiting_for_momentum() or Talent(fel_mastery_talent) } and { Charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or not waiting_for_momentum() and { Enemies() > Enemies(tagged=1) or 600 > 30 } and Spell(fel_barrage) or blade_dance() and Spell(death_sweep) or blade_dance() and Spell(blade_dance) or not Talent(momentum_talent) and not Talent(demon_blades_talent) and AzeriteTraitRank(unbound_chaos_trait) > 0 and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or FuryDeficit() >= 40 and Spell(felblade) or { Talent(demon_blades_talent) or not waiting_for_momentum() or FuryDeficit() < 30 or BuffRemaining(metamorphosis_havoc_buff) < 5 } and not pooling_for_blade_dance() and not waiting_for_dark_slash() and Spell(annihilation) or { Talent(demon_blades_talent) or not waiting_for_momentum() or FuryDeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and not waiting_for_dark_slash() and Spell(chaos_strike_havoc) or Spell(demons_bite) or not Talent(momentum_talent) and 600 > Charges(fel_rush) * 10 and Talent(demon_blades_talent) and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or { target.Distance() > 15 or not target.InRange() } and Spell(felblade) or { target.Distance() > 15 or not target.InRange() and not Talent(momentum_talent) } and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or target.Distance() > 15 and CheckBoxOn(opt_vengeful_retreat) and Spell(vengeful_retreat) or Talent(demon_blades_talent) and Spell(throw_glaive_havoc)
+ Talent(momentum_talent) and BuffExpires(prepared_buff) and TimeInCombat() > 1 and CheckBoxOn(opt_vengeful_retreat) and Spell(vengeful_retreat) or { waiting_for_momentum() or Talent(fel_mastery_talent) } and { Charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or not waiting_for_momentum() and { Enemies() > Enemies(tagged=1) or 600 > 30 } and Spell(fel_barrage) or blade_dance() and Spell(death_sweep) or blade_dance() and Spell(blade_dance) or not Talent(momentum_talent) and not Talent(demon_blades_talent) and HasAzeriteTrait(unbound_chaos_trait) and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or FuryDeficit() >= 40 and Spell(felblade) or { Talent(demon_blades_talent) or not waiting_for_momentum() or FuryDeficit() < 30 or BuffRemaining(metamorphosis_havoc_buff) < 5 } and not pooling_for_blade_dance() and not waiting_for_dark_slash() and Spell(annihilation) or { Talent(demon_blades_talent) or not waiting_for_momentum() or FuryDeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and not waiting_for_dark_slash() and Spell(chaos_strike_havoc) or Spell(demons_bite) or not Talent(momentum_talent) and 600 > Charges(fel_rush) * 10 and Talent(demon_blades_talent) and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or { target.Distance() > 15 or not target.InRange() } and Spell(felblade) or { target.Distance() > 15 or not target.InRange() and not Talent(momentum_talent) } and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or target.Distance() > 15 and CheckBoxOn(opt_vengeful_retreat) and Spell(vengeful_retreat) or Talent(demon_blades_talent) and Spell(throw_glaive_havoc)
 }
 
 AddFunction HavocNormalCdActions
@@ -189,7 +189,7 @@ AddFunction HavocNormalCdActions
 
 AddFunction HavocNormalCdPostConditions
 {
- Talent(momentum_talent) and BuffExpires(prepared_buff) and CheckBoxOn(opt_vengeful_retreat) and Spell(vengeful_retreat) or { waiting_for_momentum() or Talent(fel_mastery_talent) } and { Charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or not waiting_for_momentum() and { Enemies() > Enemies(tagged=1) or 600 > 30 } and Spell(fel_barrage) or Spell(immolation_aura_havoc) or Enemies() > 1 and { not False(raid_event_adds_exists) or False(raid_event_adds_exists) } and not waiting_for_momentum() and Spell(eye_beam) or blade_dance() and Spell(death_sweep) or blade_dance() and Spell(blade_dance) or not Talent(momentum_talent) and not Talent(demon_blades_talent) and AzeriteTraitRank(unbound_chaos_trait) > 0 and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or FuryDeficit() >= 40 and Spell(felblade) or not Talent(blind_fury_talent) and not waiting_for_dark_slash() and 600 > SpellCooldown(eye_beam) and Spell(eye_beam) or { Talent(demon_blades_talent) or not waiting_for_momentum() or FuryDeficit() < 30 or BuffRemaining(metamorphosis_havoc_buff) < 5 } and not pooling_for_blade_dance() and not waiting_for_dark_slash() and Spell(annihilation) or { Talent(demon_blades_talent) or not waiting_for_momentum() or FuryDeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and not waiting_for_dark_slash() and Spell(chaos_strike_havoc) or Talent(blind_fury_talent) and 600 > SpellCooldown(eye_beam) and Spell(eye_beam) or Spell(demons_bite) or not Talent(momentum_talent) and 600 > Charges(fel_rush) * 10 and Talent(demon_blades_talent) and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or { target.Distance() > 15 or not target.InRange() } and Spell(felblade) or { target.Distance() > 15 or not target.InRange() and not Talent(momentum_talent) } and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or target.Distance() > 15 and CheckBoxOn(opt_vengeful_retreat) and Spell(vengeful_retreat) or Talent(demon_blades_talent) and Spell(throw_glaive_havoc)
+ Talent(momentum_talent) and BuffExpires(prepared_buff) and TimeInCombat() > 1 and CheckBoxOn(opt_vengeful_retreat) and Spell(vengeful_retreat) or { waiting_for_momentum() or Talent(fel_mastery_talent) } and { Charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or not waiting_for_momentum() and { Enemies() > Enemies(tagged=1) or 600 > 30 } and Spell(fel_barrage) or blade_dance() and Spell(death_sweep) or Spell(immolation_aura_havoc) or Enemies() > 1 and { not False(raid_event_adds_exists) or False(raid_event_adds_exists) } and not waiting_for_momentum() and Spell(eye_beam) or blade_dance() and Spell(blade_dance) or not Talent(momentum_talent) and not Talent(demon_blades_talent) and HasAzeriteTrait(unbound_chaos_trait) and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or FuryDeficit() >= 40 and Spell(felblade) or not Talent(blind_fury_talent) and not waiting_for_dark_slash() and 600 > SpellCooldown(eye_beam) and Spell(eye_beam) or { Talent(demon_blades_talent) or not waiting_for_momentum() or FuryDeficit() < 30 or BuffRemaining(metamorphosis_havoc_buff) < 5 } and not pooling_for_blade_dance() and not waiting_for_dark_slash() and Spell(annihilation) or { Talent(demon_blades_talent) or not waiting_for_momentum() or FuryDeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and not waiting_for_dark_slash() and Spell(chaos_strike_havoc) or Talent(blind_fury_talent) and 600 > SpellCooldown(eye_beam) and Spell(eye_beam) or Spell(demons_bite) or not Talent(momentum_talent) and 600 > Charges(fel_rush) * 10 and Talent(demon_blades_talent) and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or { target.Distance() > 15 or not target.InRange() } and Spell(felblade) or { target.Distance() > 15 or not target.InRange() and not Talent(momentum_talent) } and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or target.Distance() > 15 and CheckBoxOn(opt_vengeful_retreat) and Spell(vengeful_retreat) or Talent(demon_blades_talent) and Spell(throw_glaive_havoc)
 }
 
 ### actions.demonic
@@ -200,8 +200,8 @@ AddFunction HavocDemonicMainActions
  if Enemies() > Enemies(tagged=1) or 600 > 30 Spell(fel_barrage)
  #death_sweep,if=variable.blade_dance
  if blade_dance() Spell(death_sweep)
- #blade_dance,if=variable.blade_dance&cooldown.eye_beam.remains>5&!cooldown.metamorphosis.ready
- if blade_dance() and SpellCooldown(eye_beam) > 5 and not { { not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight() } and SpellCooldown(metamorphosis_havoc) == 0 } Spell(blade_dance)
+ #blade_dance,if=variable.blade_dance&!cooldown.metamorphosis.ready&(cooldown.eye_beam.remains>(5-azerite.revolving_blades.rank*3)|(raid_event.adds.in>cooldown&raid_event.adds.in<25))
+ if blade_dance() and not { { not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight() } and SpellCooldown(metamorphosis_havoc) == 0 } and { SpellCooldown(eye_beam) > 5 - AzeriteTraitRank(revolving_blades_trait) * 3 or 600 > SpellCooldown(blade_dance) and 600 < 25 } Spell(blade_dance)
  #felblade,if=fury<40|(buff.metamorphosis.down&fury.deficit>=40)
  if Fury() < 40 or BuffExpires(metamorphosis_havoc_buff) and FuryDeficit() >= 40 Spell(felblade)
  #annihilation,if=(talent.blind_fury.enabled|fury.deficit<30|buff.metamorphosis.remains<5)&!variable.pooling_for_blade_dance
@@ -230,22 +230,22 @@ AddFunction HavocDemonicMainPostConditions
 
 AddFunction HavocDemonicShortCdActions
 {
- unless { Enemies() > Enemies(tagged=1) or 600 > 30 } and Spell(fel_barrage) or blade_dance() and Spell(death_sweep) or blade_dance() and SpellCooldown(eye_beam) > 5 and not { { not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight() } and SpellCooldown(metamorphosis_havoc) == 0 } and Spell(blade_dance)
+ unless { Enemies() > Enemies(tagged=1) or 600 > 30 } and Spell(fel_barrage) or blade_dance() and Spell(death_sweep)
  {
-  #immolation_aura
-  Spell(immolation_aura_havoc)
+  #eye_beam,if=!buff.metamorphosis.extended_by_demonic&(raid_event.adds.up|raid_event.adds.in>25)
+  if not { not BuffExpires(extended_by_demonic_buff) } and { False(raid_event_adds_exists) or 600 > 25 } Spell(eye_beam)
 
-  unless { Fury() < 40 or BuffExpires(metamorphosis_havoc_buff) and FuryDeficit() >= 40 } and Spell(felblade)
+  unless blade_dance() and not { { not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight() } and SpellCooldown(metamorphosis_havoc) == 0 } and { SpellCooldown(eye_beam) > 5 - AzeriteTraitRank(revolving_blades_trait) * 3 or 600 > SpellCooldown(blade_dance) and 600 < 25 } and Spell(blade_dance)
   {
-   #eye_beam,if=(!talent.blind_fury.enabled|fury.deficit>=70)&(!buff.metamorphosis.extended_by_demonic|(set_bonus.tier21_4pc&buff.metamorphosis.remains>16))
-   if { not Talent(blind_fury_talent) or FuryDeficit() >= 70 } and { not { not BuffExpires(extended_by_demonic_buff) } or ArmorSetBonus(T21 4) and BuffRemaining(metamorphosis_havoc_buff) > 16 } Spell(eye_beam)
+   #immolation_aura
+   Spell(immolation_aura_havoc)
   }
  }
 }
 
 AddFunction HavocDemonicShortCdPostConditions
 {
- { Enemies() > Enemies(tagged=1) or 600 > 30 } and Spell(fel_barrage) or blade_dance() and Spell(death_sweep) or blade_dance() and SpellCooldown(eye_beam) > 5 and not { { not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight() } and SpellCooldown(metamorphosis_havoc) == 0 } and Spell(blade_dance) or { Fury() < 40 or BuffExpires(metamorphosis_havoc_buff) and FuryDeficit() >= 40 } and Spell(felblade) or { Talent(blind_fury_talent) or FuryDeficit() < 30 or BuffRemaining(metamorphosis_havoc_buff) < 5 } and not pooling_for_blade_dance() and Spell(annihilation) or { Talent(blind_fury_talent) or FuryDeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and Spell(chaos_strike_havoc) or Talent(demon_blades_talent) and not SpellCooldown(eye_beam) == 0 and { Charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or not Talent(demon_blades_talent) and not SpellCooldown(eye_beam) == 0 and AzeriteTraitRank(unbound_chaos_trait) > 0 and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or Spell(demons_bite) or not target.InRange() and Spell(throw_glaive_havoc) or { target.Distance() > 15 or not target.InRange() } and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or target.Distance() > 15 and CheckBoxOn(opt_vengeful_retreat) and Spell(vengeful_retreat) or Talent(demon_blades_talent) and Spell(throw_glaive_havoc)
+ { Enemies() > Enemies(tagged=1) or 600 > 30 } and Spell(fel_barrage) or blade_dance() and Spell(death_sweep) or blade_dance() and not { { not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight() } and SpellCooldown(metamorphosis_havoc) == 0 } and { SpellCooldown(eye_beam) > 5 - AzeriteTraitRank(revolving_blades_trait) * 3 or 600 > SpellCooldown(blade_dance) and 600 < 25 } and Spell(blade_dance) or { Fury() < 40 or BuffExpires(metamorphosis_havoc_buff) and FuryDeficit() >= 40 } and Spell(felblade) or { Talent(blind_fury_talent) or FuryDeficit() < 30 or BuffRemaining(metamorphosis_havoc_buff) < 5 } and not pooling_for_blade_dance() and Spell(annihilation) or { Talent(blind_fury_talent) or FuryDeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and Spell(chaos_strike_havoc) or Talent(demon_blades_talent) and not SpellCooldown(eye_beam) == 0 and { Charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or not Talent(demon_blades_talent) and not SpellCooldown(eye_beam) == 0 and AzeriteTraitRank(unbound_chaos_trait) > 0 and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or Spell(demons_bite) or not target.InRange() and Spell(throw_glaive_havoc) or { target.Distance() > 15 or not target.InRange() } and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or target.Distance() > 15 and CheckBoxOn(opt_vengeful_retreat) and Spell(vengeful_retreat) or Talent(demon_blades_talent) and Spell(throw_glaive_havoc)
 }
 
 AddFunction HavocDemonicCdActions
@@ -254,7 +254,7 @@ AddFunction HavocDemonicCdActions
 
 AddFunction HavocDemonicCdPostConditions
 {
- { Enemies() > Enemies(tagged=1) or 600 > 30 } and Spell(fel_barrage) or blade_dance() and Spell(death_sweep) or blade_dance() and SpellCooldown(eye_beam) > 5 and not { { not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight() } and SpellCooldown(metamorphosis_havoc) == 0 } and Spell(blade_dance) or Spell(immolation_aura_havoc) or { Fury() < 40 or BuffExpires(metamorphosis_havoc_buff) and FuryDeficit() >= 40 } and Spell(felblade) or { not Talent(blind_fury_talent) or FuryDeficit() >= 70 } and { not { not BuffExpires(extended_by_demonic_buff) } or ArmorSetBonus(T21 4) and BuffRemaining(metamorphosis_havoc_buff) > 16 } and Spell(eye_beam) or { Talent(blind_fury_talent) or FuryDeficit() < 30 or BuffRemaining(metamorphosis_havoc_buff) < 5 } and not pooling_for_blade_dance() and Spell(annihilation) or { Talent(blind_fury_talent) or FuryDeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and Spell(chaos_strike_havoc) or Talent(demon_blades_talent) and not SpellCooldown(eye_beam) == 0 and { Charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or not Talent(demon_blades_talent) and not SpellCooldown(eye_beam) == 0 and AzeriteTraitRank(unbound_chaos_trait) > 0 and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or Spell(demons_bite) or not target.InRange() and Spell(throw_glaive_havoc) or { target.Distance() > 15 or not target.InRange() } and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or target.Distance() > 15 and CheckBoxOn(opt_vengeful_retreat) and Spell(vengeful_retreat) or Talent(demon_blades_talent) and Spell(throw_glaive_havoc)
+ { Enemies() > Enemies(tagged=1) or 600 > 30 } and Spell(fel_barrage) or blade_dance() and Spell(death_sweep) or not { not BuffExpires(extended_by_demonic_buff) } and { False(raid_event_adds_exists) or 600 > 25 } and Spell(eye_beam) or blade_dance() and not { { not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight() } and SpellCooldown(metamorphosis_havoc) == 0 } and { SpellCooldown(eye_beam) > 5 - AzeriteTraitRank(revolving_blades_trait) * 3 or 600 > SpellCooldown(blade_dance) and 600 < 25 } and Spell(blade_dance) or Spell(immolation_aura_havoc) or { Fury() < 40 or BuffExpires(metamorphosis_havoc_buff) and FuryDeficit() >= 40 } and Spell(felblade) or { Talent(blind_fury_talent) or FuryDeficit() < 30 or BuffRemaining(metamorphosis_havoc_buff) < 5 } and not pooling_for_blade_dance() and Spell(annihilation) or { Talent(blind_fury_talent) or FuryDeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and Spell(chaos_strike_havoc) or Talent(demon_blades_talent) and not SpellCooldown(eye_beam) == 0 and { Charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or not Talent(demon_blades_talent) and not SpellCooldown(eye_beam) == 0 and AzeriteTraitRank(unbound_chaos_trait) > 0 and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or Spell(demons_bite) or not target.InRange() and Spell(throw_glaive_havoc) or { target.Distance() > 15 or not target.InRange() } and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or target.Distance() > 15 and CheckBoxOn(opt_vengeful_retreat) and Spell(vengeful_retreat) or Talent(demon_blades_talent) and Spell(throw_glaive_havoc)
 }
 
 ### actions.dark_slash
@@ -524,6 +524,7 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # nemesis_talent
 # pick_up_fragment
 # prepared_buff
+# revolving_blades_trait
 # throw_glaive_havoc
 # trail_of_ruin_talent
 # unbound_chaos_trait

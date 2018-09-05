@@ -18,6 +18,7 @@ import { huge as INFINITY, huge } from "@wowts/math";
 import { OvalePaperDoll } from "./PaperDoll";
 import { baseState } from "./BaseState";
 import { isLuaArray } from "./tools";
+import { ConditionResult } from "./Condition";
 
 export let OvaleAura: OvaleAuraClass;
 let strlower = lower;
@@ -961,7 +962,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
         return this.GetAuraByGUID(guid, auraId, filter, mine, atTime);
     }
 
-    GetAuraWithProperty(unitId: string, propertyName: keyof Aura, filter: AuraType, atTime: number) {
+    GetAuraWithProperty(unitId: string, propertyName: keyof Aura, filter: AuraType, atTime: number): ConditionResult {
         let count = 0;
         let guid = OvaleGUID.UnitGUID(unitId);
         let start: number | undefined = huge;
