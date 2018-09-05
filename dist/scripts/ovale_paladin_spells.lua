@@ -552,6 +552,7 @@ Define(sacred_judgment_buff 253806)
 Define(divine_right_trait 278519)
 Define(divine_right_buff 277678)
 	SpellInfo(divine_right_buff duration=15)
+Define(inner_light_trait 275477)
 
 #Hack
 #Seems like we can't define multiple add_holypower -1=buff
