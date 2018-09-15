@@ -716,7 +716,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                     if debuffType == "" then
                         debuffType = "Enrage"
                     end
-                    local auraType = (filter == "HARMFUL|PLAYER" and "HARMFUL") or "HELPFUL"
+                    local auraType = (filter == harmfulFilter and "HARMFUL") or "HELPFUL"
                     self:GainedAuraOnGUID(guid, now, spellId, casterGUID, auraType, true, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3)
                     i = i + 1
                 end

@@ -12,9 +12,8 @@ let self_condition: LuaObj<ConditionFunction> = {}
 let self_spellBookCondition: LuaObj<boolean> = {};
 self_spellBookCondition["spell"] = true;
 
-export type ConditionResult = number[];
-type BaseState = {};
-export type ConditionFunction = (positionalParams: PositionalParameters, namedParams: NamedParameters, state: BaseState, atTime: number) => ConditionResult;
+export type ConditionResult = [number, number, number?, number?, number?];
+export type ConditionFunction = (positionalParams: PositionalParameters, namedParams: NamedParameters, atTime: number) => ConditionResult;
 
 export type ComparatorId = "atLeast" | "atMost" | "equal" | "less" | "more";
 
@@ -46,8 +45,8 @@ class OvaleConditionClass extends OvaleConditionBase {
     IsSpellBookCondition(name: string) {
         return (self_spellBookCondition[name] != undefined);
     }
-    EvaluateCondition(name: string, positionalParams: PositionalParameters, namedParams: NamedParameters, state: BaseState, atTime: number) {
-        return self_condition[name](positionalParams, namedParams, state, atTime);
+    EvaluateCondition(name: string, positionalParams: PositionalParameters, namedParams: NamedParameters, atTime: number) {
+        return self_condition[name](positionalParams, namedParams, atTime);
     }
     HasAny(){
         return next(self_condition) !== undefined;
@@ -56,10 +55,11 @@ class OvaleConditionClass extends OvaleConditionBase {
 
 OvaleCondition = new OvaleConditionClass();
 
-export function ParseCondition(positionalParams: PositionalParameters, namedParams: NamedParameters, state: BaseState, defaultTarget?: string):[string, AuraType, boolean] {
+export function ParseCondition(positionalParams: PositionalParameters, namedParams: NamedParameters, defaultTarget?: string):[string, AuraType, boolean] {
     let target = namedParams.target || defaultTarget || "player";
     namedParams.target = namedParams.target || target;
-    if (target == "target") {
+
+    if (target === "cycle" || target === "target") {
         target = baseState.next.defaultTarget;
     }
     let filter: AuraType;

@@ -437,7 +437,7 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
         snapshot = snapshot || this.current;
         return 1 + snapshot.spellCastSpeedPercent / 100;
     } 
-    GetHasteMultiplier(haste: HasteType, snapshot:PaperDollSnapshot) {
+    GetHasteMultiplier(haste: HasteType | undefined, snapshot:PaperDollSnapshot) {
         snapshot = snapshot || this.current;
         let multiplier = this.GetBaseHasteMultiplier(snapshot) || 1;
         if (haste === "melee") {

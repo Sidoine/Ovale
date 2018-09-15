@@ -10,7 +10,7 @@ import { OvaleScripts } from "../Scripts";
 # Based on SimulationCraft profile "PR_Priest_Holy".
 #	class=priest
 #	spec=holy
-#	talents=1300021
+#	talents=1300031
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -53,7 +53,7 @@ AddFunction HolyPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_intellect usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(rising_death usable=1)
 }
 
 AddFunction HolyPrecombatCdPostConditions
@@ -65,14 +65,24 @@ AddFunction HolyPrecombatCdPostConditions
 
 AddFunction HolyDefaultMainActions
 {
- #holy_fire,if=refreshable&dot.holy_fire.ticking&dot.holy_fire.stack>1|dot.holy_fire.stack<2
- if target.Refreshable(holy_fire) and target.DebuffPresent(holy_fire) and target.DebuffStacks(holy_fire) > 1 or target.DebuffStacks(holy_fire) < 2 Spell(holy_fire)
- #divine_star
- Spell(divine_star)
- #holy_nova,if=active_enemies>2
- if Enemies() > 2 Spell(holy_nova)
+ #holy_fire,if=dot.holy_fire.ticking&(dot.holy_fire.remains<=gcd|dot.holy_fire.stack<2)&spell_targets.holy_nova<7
+ if target.DebuffPresent(holy_fire) and { target.DebuffRemaining(holy_fire) <= GCD() or target.DebuffStacks(holy_fire) < 2 } and Enemies() < 7 Spell(holy_fire)
+ #holy_fire,if=dot.holy_fire.ticking&(dot.holy_fire.refreshable|dot.holy_fire.stack<2)&spell_targets.holy_nova<7
+ if target.DebuffPresent(holy_fire) and { target.DebuffRefreshable(holy_fire) or target.DebuffStacks(holy_fire) < 2 } and Enemies() < 7 Spell(holy_fire)
+ #divine_star,if=(raid_event.adds.in>5|raid_event.adds.remains>2|raid_event.adds.duration<2)&spell_targets.divine_star>1
+ if { 600 > 5 or 0 > 2 or 10 < 2 } and Enemies() > 1 Spell(divine_star)
+ #holy_fire,if=!dot.holy_fire.ticking&spell_targets.holy_nova<7
+ if not target.DebuffPresent(holy_fire) and Enemies() < 7 Spell(holy_fire)
+ #holy_nova,if=spell_targets.holy_nova>3
+ if Enemies() > 3 Spell(holy_nova)
  #smite
  Spell(smite)
+ #holy_fire
+ Spell(holy_fire)
+ #divine_star,if=(raid_event.adds.in>5|raid_event.adds.remains>2|raid_event.adds.duration<2)&spell_targets.divine_star>0
+ if { 600 > 5 or 0 > 2 or 10 < 2 } and Enemies() > 0 Spell(divine_star)
+ #holy_nova,if=raid_event.movement.remains>gcd*0.3&spell_targets.holy_nova>0
+ if 0 > GCD() * 0.3 and Enemies() > 0 Spell(holy_nova)
 }
 
 AddFunction HolyDefaultMainPostConditions
@@ -81,43 +91,59 @@ AddFunction HolyDefaultMainPostConditions
 
 AddFunction HolyDefaultShortCdActions
 {
- unless { target.Refreshable(holy_fire) and target.DebuffPresent(holy_fire) and target.DebuffStacks(holy_fire) > 1 or target.DebuffStacks(holy_fire) < 2 } and Spell(holy_fire)
+ unless target.DebuffPresent(holy_fire) and { target.DebuffRemaining(holy_fire) <= GCD() or target.DebuffStacks(holy_fire) < 2 } and Enemies() < 7 and Spell(holy_fire)
  {
-  #holy_word_chastise
-  Spell(holy_word_chastise)
+  #holy_word_chastise,if=spell_targets.holy_nova<5
+  if Enemies() < 5 Spell(holy_word_chastise)
 
-  unless Spell(divine_star)
+  unless target.DebuffPresent(holy_fire) and { target.DebuffRefreshable(holy_fire) or target.DebuffStacks(holy_fire) < 2 } and Enemies() < 7 and Spell(holy_fire) or { 600 > 5 or 0 > 2 or 10 < 2 } and Enemies() > 1 and Spell(divine_star)
   {
-   #halo
-   Spell(halo)
+   #halo,if=(raid_event.adds.in>14|raid_event.adds.remains>2|raid_event.adds.duration<2)&spell_targets.halo>0
+   if { 600 > 14 or 0 > 2 or 10 < 2 } and Enemies() > 0 Spell(halo)
   }
  }
 }
 
 AddFunction HolyDefaultShortCdPostConditions
 {
- { target.Refreshable(holy_fire) and target.DebuffPresent(holy_fire) and target.DebuffStacks(holy_fire) > 1 or target.DebuffStacks(holy_fire) < 2 } and Spell(holy_fire) or Spell(divine_star) or Enemies() > 2 and Spell(holy_nova) or Spell(smite)
+ target.DebuffPresent(holy_fire) and { target.DebuffRemaining(holy_fire) <= GCD() or target.DebuffStacks(holy_fire) < 2 } and Enemies() < 7 and Spell(holy_fire) or target.DebuffPresent(holy_fire) and { target.DebuffRefreshable(holy_fire) or target.DebuffStacks(holy_fire) < 2 } and Enemies() < 7 and Spell(holy_fire) or { 600 > 5 or 0 > 2 or 10 < 2 } and Enemies() > 1 and Spell(divine_star) or not target.DebuffPresent(holy_fire) and Enemies() < 7 and Spell(holy_fire) or Enemies() > 3 and Spell(holy_nova) or Spell(smite) or Spell(holy_fire) or { 600 > 5 or 0 > 2 or 10 < 2 } and Enemies() > 0 and Spell(divine_star) or 0 > GCD() * 0.3 and Enemies() > 0 and Spell(holy_nova)
 }
 
 AddFunction HolyDefaultCdActions
 {
- #use_item,slot=trinket2
+ #use_items
  HolyUseItemActions()
- #potion,if=buff.bloodlust.react|target.time_to_die<=80
- if { BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 80 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_intellect usable=1)
- #berserking
- Spell(berserking)
+ #potion,if=buff.bloodlust.react|(raid_event.adds.up&(raid_event.adds.remains>20|raid_event.adds.duration<20))|target.time_to_die<=30
+ if { BuffPresent(burst_haste_buff any=1) or False(raid_event_adds_exists) and { 0 > 20 or 10 < 20 } or target.TimeToDie() <= 30 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(rising_death usable=1)
 
- unless { target.Refreshable(holy_fire) and target.DebuffPresent(holy_fire) and target.DebuffStacks(holy_fire) > 1 or target.DebuffStacks(holy_fire) < 2 } and Spell(holy_fire) or Spell(holy_word_chastise)
+ unless target.DebuffPresent(holy_fire) and { target.DebuffRemaining(holy_fire) <= GCD() or target.DebuffStacks(holy_fire) < 2 } and Enemies() < 7 and Spell(holy_fire) or Enemies() < 5 and Spell(holy_word_chastise) or target.DebuffPresent(holy_fire) and { target.DebuffRefreshable(holy_fire) or target.DebuffStacks(holy_fire) < 2 } and Enemies() < 7 and Spell(holy_fire)
  {
-  #apotheosis
-  Spell(apotheosis)
+  #berserking,if=raid_event.adds.in>30|raid_event.adds.remains>8|raid_event.adds.duration<8
+  if 600 > 30 or 0 > 8 or 10 < 8 Spell(berserking)
+  #fireblood,if=raid_event.adds.in>20|raid_event.adds.remains>6|raid_event.adds.duration<6
+  if 600 > 20 or 0 > 6 or 10 < 6 Spell(fireblood)
+  #ancestral_call,if=raid_event.adds.in>20|raid_event.adds.remains>10|raid_event.adds.duration<10
+  if 600 > 20 or 0 > 10 or 10 < 10 Spell(ancestral_call)
+
+  unless { 600 > 5 or 0 > 2 or 10 < 2 } and Enemies() > 1 and Spell(divine_star) or { 600 > 14 or 0 > 2 or 10 < 2 } and Enemies() > 0 and Spell(halo)
+  {
+   #lights_judgment,if=raid_event.adds.in>50|raid_event.adds.remains>4|raid_event.adds.duration<4
+   if 600 > 50 or 0 > 4 or 10 < 4 Spell(lights_judgment)
+   #arcane_pulse,if=(raid_event.adds.in>40|raid_event.adds.remains>2|raid_event.adds.duration<2)&spell_targets.arcane_pulse>2
+   if { 600 > 40 or 0 > 2 or 10 < 2 } and Enemies() > 2 Spell(arcane_pulse)
+
+   unless not target.DebuffPresent(holy_fire) and Enemies() < 7 and Spell(holy_fire) or Enemies() > 3 and Spell(holy_nova)
+   {
+    #apotheosis,if=active_enemies<5&(raid_event.adds.in>15|raid_event.adds.in>raid_event.adds.cooldown-5)
+    if Enemies() < 5 and { 600 > 15 or 600 > 600 - 5 } Spell(apotheosis)
+   }
+  }
  }
 }
 
 AddFunction HolyDefaultCdPostConditions
 {
- { target.Refreshable(holy_fire) and target.DebuffPresent(holy_fire) and target.DebuffStacks(holy_fire) > 1 or target.DebuffStacks(holy_fire) < 2 } and Spell(holy_fire) or Spell(holy_word_chastise) or Spell(divine_star) or Spell(halo) or Enemies() > 2 and Spell(holy_nova) or Spell(smite)
+ target.DebuffPresent(holy_fire) and { target.DebuffRemaining(holy_fire) <= GCD() or target.DebuffStacks(holy_fire) < 2 } and Enemies() < 7 and Spell(holy_fire) or Enemies() < 5 and Spell(holy_word_chastise) or target.DebuffPresent(holy_fire) and { target.DebuffRefreshable(holy_fire) or target.DebuffStacks(holy_fire) < 2 } and Enemies() < 7 and Spell(holy_fire) or { 600 > 5 or 0 > 2 or 10 < 2 } and Enemies() > 1 and Spell(divine_star) or { 600 > 14 or 0 > 2 or 10 < 2 } and Enemies() > 0 and Spell(halo) or not target.DebuffPresent(holy_fire) and Enemies() < 7 and Spell(holy_fire) or Enemies() > 3 and Spell(holy_nova) or Spell(smite) or Spell(holy_fire) or { 600 > 5 or 0 > 2 or 10 < 2 } and Enemies() > 0 and Spell(divine_star) or 0 > GCD() * 0.3 and Enemies() > 0 and Spell(holy_nova)
 }
 
 ### Holy icons.
@@ -179,14 +205,18 @@ AddIcon checkbox=opt_priest_holy_aoe help=cd specialization=holy
 }
 
 ### Required symbols
+# ancestral_call
 # apotheosis
-# battle_potion_of_intellect
+# arcane_pulse
 # berserking
 # divine_star
+# fireblood
 # halo
 # holy_fire
 # holy_nova
 # holy_word_chastise
+# lights_judgment
+# rising_death
 # smite
 `
 	OvaleScripts.RegisterScript("PRIEST", "holy", name, desc, code, "script")
@@ -212,7 +242,19 @@ AddFunction dots_up
  target.DebuffPresent(shadow_word_pain_debuff) and target.DebuffPresent(vampiric_touch_debuff)
 }
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=shadow)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=shadow)
+
+AddFunction ShadowInterruptActions
+{
+ if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+ {
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+  if target.InRange(mind_bomb) and not target.Classification(worldboss) and target.RemainingCastTime() > 2 Spell(mind_bomb)
+  if target.InRange(silence) and target.IsInterruptible() Spell(silence)
+ }
+}
 
 AddFunction ShadowUseItemActions
 {
@@ -516,6 +558,7 @@ AddFunction ShadowDefaultShortCdPostConditions
 
 AddFunction ShadowDefaultCdActions
 {
+ ShadowInterruptActions()
  #use_item,slot=trinket2
  ShadowUseItemActions()
  #potion,if=buff.bloodlust.react|target.time_to_die<=80|target.health.pct<35
@@ -608,10 +651,12 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # dark_void
 # dark_void_talent
 # mind_blast
+# mind_bomb
 # mind_flay
 # mind_sear
 # mindbender
 # misery_talent
+# quaking_palm
 # rising_death
 # shadow_crash
 # shadow_word_death
@@ -620,6 +665,7 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # shadow_word_void
 # shadowform
 # shadowform_buff
+# silence
 # surrender_to_madness
 # vampiric_touch
 # vampiric_touch_debuff
@@ -627,6 +673,7 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # void_eruption
 # void_torrent
 # voidform_shadow
+# war_stomp
 `
 	OvaleScripts.RegisterScript("PRIEST", "shadow", name, desc, code, "script")
 }

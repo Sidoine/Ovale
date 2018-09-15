@@ -45,7 +45,7 @@ export function newFromArgs(...__args:number[]){
     return newTimeSpan().Copy(...__args);
 }
 
-export function newTimeSpanFromArray(a?: LuaArray<number>) {
+export function newTimeSpanFromArray(a?: OvaleTimeSpan) {
     if (a) {
         return newTimeSpan().copyFromArray(a);
     }
@@ -69,8 +69,8 @@ export function GetPoolInfo() {
 }
 
 export class OvaleTimeSpan implements LuaArray<number> {
-    [key:number]: number;
-
+    [key: number]: number;
+    
     Release(){
         wipe(this);
         insert(self_pool, this);
@@ -85,7 +85,7 @@ export class OvaleTimeSpan implements LuaArray<number> {
         }
     }
 
-    copyFromArray(A: LuaArray<number>) {
+    copyFromArray(A: OvaleTimeSpan) {
         let count = lualength(A);
         for (let i = 1; i <= count; i += 1) {
             this[i] = A[i];

@@ -18,6 +18,7 @@ import { huge as INFINITY, huge } from "@wowts/math";
 import { OvalePaperDoll } from "./PaperDoll";
 import { baseState } from "./BaseState";
 import { isLuaArray } from "./tools";
+import { ConditionResult } from "./Condition";
 
 export let OvaleAura: OvaleAuraClass;
 let strlower = lower;
@@ -668,7 +669,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
                     if (debuffType == "") {
                         debuffType = "Enrage";
                     }
-                    const auraType: AuraType = (filter === "HARMFUL|PLAYER" && "HARMFUL") || "HELPFUL";
+                    const auraType: AuraType = (filter === harmfulFilter && "HARMFUL") || "HELPFUL";
                     this.GainedAuraOnGUID(guid, now, spellId, casterGUID, auraType, true, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3);
                     i = i + 1;
                 }
@@ -961,7 +962,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
         return this.GetAuraByGUID(guid, auraId, filter, mine, atTime);
     }
 
-    GetAuraWithProperty(unitId: string, propertyName: keyof Aura, filter: AuraType, atTime: number) {
+    GetAuraWithProperty(unitId: string, propertyName: keyof Aura, filter: AuraType, atTime: number): ConditionResult {
         let count = 0;
         let guid = OvaleGUID.UnitGUID(unitId);
         let start: number | undefined = huge;

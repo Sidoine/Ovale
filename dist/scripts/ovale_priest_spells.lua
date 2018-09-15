@@ -5,16 +5,19 @@ local OvaleScripts = __Scripts.OvaleScripts
 __exports.register = function()
     local name = "ovale_priest_spells"
     local desc = "[8.0] Ovale: Priest spells"
-    local code = [[Define(apotheosis 200183)
+    local code = [[Define(ancestral_call 274738)
+# Invoke the spirits of your ancestors, granting you their power for 15 seconds.
+  SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
+  SpellAddBuff(ancestral_call ancestral_call=1)
+Define(apotheosis 200183)
 # Enter a pure Holy form for 20 seconds, increasing the cooldown reductions to your Holy Words by s1 and reducing their cost by s2.
   SpellInfo(apotheosis cd=120 duration=20 talent=apotheosis_talent)
   # Effects that reduce Holy Word cooldowns increased by s1. Cost of Holy Words reduced by s2.
   SpellAddBuff(apotheosis apotheosis=1)
-Define(battle_potion_of_intellect 279151)
-# Increases your Intellect by s1 for 25 seconds.
-  SpellInfo(battle_potion_of_intellect cd=1 duration=25 gcd=0 offgcd=1)
-  # Intellect increased by w1.
-  SpellAddBuff(battle_potion_of_intellect battle_potion_of_intellect=1)
+Define(arcane_pulse 260364)
+# Deals <damage> Arcane damage to nearby enemies and reduces their movement speed by 260369s1. Lasts 12 seconds.
+  SpellInfo(arcane_pulse cd=180 gcd=1)
+
 Define(berserking 26297)
 # Increases your haste by s1 for 10 seconds.
   SpellInfo(berserking cd=180 duration=10 gcd=0 offgcd=1)
@@ -29,6 +32,9 @@ Define(dark_void 263346)
 Define(divine_star 110744)
 # Throw a Divine Star forward 24 yds, healing allies in its path for (50 of Spell Power) and dealing (40 of Spell Power) Holy damage to enemies. After reaching its destination, the Divine Star returns to you, healing allies and damaging enemies in its path again.
   SpellInfo(divine_star cd=15 duration=15 talent=divine_star_talent)
+Define(fireblood 265221)
+# Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. 
+  SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
 Define(halo 120517)
 # Creates a ring of Holy energy around you that quickly expands to a 30 yd radius, healing allies for (110.00000000000001 of Spell Power) and dealing (110.00000000000001 of Spell Power) Holy damage to enemies.
   SpellInfo(halo cd=40 duration=3.2 talent=halo_talent)
@@ -45,12 +51,22 @@ Define(holy_nova 132157)
 Define(holy_word_chastise 88625)
 # Chastises the target for (112.5 of Spell Power) Holy damage and ?s200199[stuns][incapacitates] them for ?s200199[4 seconds][4 seconds].?s63733[rnrn|cFFFFFFFFCooldown reduced by s2 sec when you cast Smite|r][]
   SpellInfo(holy_word_chastise cd=60)
+Define(lights_judgment 255647)
+# Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
+  SpellInfo(lights_judgment cd=150)
+
 Define(mind_blast 8092)
 # Blasts the target's mind for (120 of Spell Power) Shadow damage.?a185916[rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r][]
   SpellInfo(mind_blast cd=7.5 insanity=-1200)
+Define(mind_bomb 205369)
+# Inflicts the target with a Mind Bomb.rnrnAfter 2 seconds or if the target dies, it unleashes a psychic explosion, disorienting all enemies within 226943A1 yds of the target for 5 seconds.
+  SpellInfo(mind_bomb cd=30 duration=2 talent=mind_bomb_talent)
+  # About to unleash a psychic explosion, disorienting all nearby enemies.
+  SpellAddTargetDebuff(mind_bomb mind_bomb=1)
 Define(mind_flay 15407)
 # Assaults the target's mind with Shadow energy, causing o1 Shadow damage over 3 seconds and slowing their movement speed by s2.?a185916[rnrn|cFFFFFFFFGenerates s4*m3/100 Insanity over the duration.|r][]
-  SpellInfo(mind_flay duration=3 channel=3 replace=smite tick=0.75)
+  SpellInfo(mind_flay duration=3 channel=3 tick=0.75)
+  SpellInfo(smite replaced_by=mind_flay)
   # Movement speed slowed by s2 and taking Shadow damage every t1 sec.
   SpellAddBuff(mind_flay mind_flay=1)
   # Movement speed slowed by s2 and taking Shadow damage every t1 sec.
@@ -63,6 +79,11 @@ Define(mindbender 123040)
 # Summons a Mindbender to attack the target for 12 seconds. You regenerate 123051m1/100.1 of maximum mana each time the Mindbender attacks.
   SpellInfo(mindbender cd=60 duration=12 talent=mindbender_talent_unknown)
 
+Define(quaking_palm 107079)
+# Strikes the target with lightning speed, incapacitating them for 4 seconds, and turns off your attack.
+  SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
+  # Incapacitated.
+  SpellAddTargetDebuff(quaking_palm quaking_palm=1)
 Define(rising_death 252346)
 # Chance to create multiple potions.
   SpellInfo(rising_death gcd=0 offgcd=1)
@@ -88,6 +109,12 @@ Define(shadowform 232698)
   SpellAddBuff(shadowform shadowform=1)
   # Spell damage dealt increased by s1.rnPhysical damage taken reduced by s2.
   SpellAddTargetDebuff(shadowform shadowform=1)
+Define(silence 15487)
+# Silences the target, preventing them from casting spells for 4 seconds. Against non-players, also interrupts spellcasting and prevents any spell in that school from being cast for 4 seconds.
+# Rank 1: Silences an enemy preventing it from casting spells for 6 seconds.
+  SpellInfo(silence cd=45 duration=4 gcd=0 offgcd=1)
+  # Silenced.
+  SpellAddTargetDebuff(silence silence=1)
 Define(smite 585)
 # Smites an enemy for (47 of Spell Power) Holy damage?s231682[ and absorbs the next <shield> damage dealt by the enemy]?s231687[ and has a 231687s1 chance to reset the cooldown of Holy Fire][].
 # Rank 2: Smite deals s1 increased damage.
@@ -110,9 +137,9 @@ Define(void_bolt 228266)
 Define(void_eruption 228260)
 # Releases an explosive blast of pure void energy, activating Voidform and causing (95 of Spell Power)*2 Shadow damage to all enemies within a1 yds of your target.rnrnDuring Voidform, this ability is replaced by Void Bolt.rnrn|cFFFFFFFFRequires C/100 Insanity to activate.|r
   SpellInfo(void_eruption insanity=9000)
-Define(void_torrent 205065)
-# Raise your dagger into the sky, channeling a torrent of void energy into the target for o Shadow damage over 4 seconds. Insanity does not drain during this channel.rnrnRequires Voidform.
-  SpellInfo(void_torrent cd=60 duration=4 channel=4 tick=1)
+Define(void_torrent 263165)
+# Channel a torrent of void energy into the target, dealing o Shadow damage over 4 seconds. Insanity does not drain during this channel.rnrnRequires Voidform.
+  SpellInfo(void_torrent cd=45 duration=4 channel=4 tick=1 talent=void_torrent_talent)
   # Dealing s1 Shadow damage to the target every t sec.rnrnInsanity drain temporarily stopped.
   SpellAddBuff(void_torrent void_torrent=1)
   # Dealing s1 Shadow damage to the target every t sec.rnrnInsanity drain temporarily stopped.
@@ -121,6 +148,11 @@ Define(voidform_shadow 228264)
 # Activated by casting Void Eruption. Twists your Shadowform with the powers of the Void, increasing spell damage you deal by 194249s1?s8092[, reducing the cooldown on Mind Blast by 194249m6/-1000.1 sec,][] and granting an additional s2/10.1 Haste every 194249t5 sec.rnrnYour Insanity will drain increasingly fast until it reaches 0 and Voidform ends.
   SpellInfo(voidform_shadow channel=0 gcd=0 offgcd=1)
   SpellAddBuff(voidform_shadow voidform_shadow=1)
+Define(war_stomp 20549)
+# Stuns up to i enemies within A1 yds for 2 seconds.
+  SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
+  # Stunned.
+  SpellAddTargetDebuff(war_stomp war_stomp=1)
 Define(apotheosis_talent 20) #21644
 # Enter a pure Holy form for 20 seconds, increasing the cooldown reductions to your Holy Words by s1 and reducing their cost by s2.
 Define(dark_ascension_talent 20) #21978
@@ -131,6 +163,8 @@ Define(divine_star_talent 17) #19760
 # Throw a Divine Star forward 24 yds, healing allies in its path for (50 of Spell Power) and dealing (40 of Spell Power) Holy damage to enemies. After reaching its destination, the Divine Star returns to you, healing allies and damaging enemies in its path again.
 Define(halo_talent 18) #19763
 # Creates a ring of Holy energy around you that quickly expands to a 30 yd radius, healing allies for (110.00000000000001 of Spell Power) and dealing (110.00000000000001 of Spell Power) Holy damage to enemies.
+Define(mind_bomb_talent 11) #23375
+# Inflicts the target with a Mind Bomb.rnrnAfter 2 seconds or if the target dies, it unleashes a psychic explosion, disorienting all enemies within 226943A1 yds of the target for 5 seconds.
 Define(mindbender_talent_unknown 8) #22094
 # Summons a Mindbender to attack the target for 12 seconds. You regenerate 123051m1/100.1 of maximum mana each time the Mindbender attacks.
 Define(misery_talent 8) #23126
@@ -143,6 +177,8 @@ Define(shadow_word_void_talent 3) #22314
 # Blasts the target with a word of void for (130 of Spell Power) Shadow damage.?a185916[rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r][]
 Define(surrender_to_madness_talent 21) #21979
 # All your Insanity-generating abilities generate s1 more Insanity and you can cast while moving for 60 seconds.rnrnThen, you take damage equal to s3 of your maximum health and cannot generate Insanity for 30 seconds.
+Define(void_torrent_talent 18) #21720
+# Channel a torrent of void energy into the target, dealing o Shadow damage over 4 seconds. Insanity does not drain during this channel.rnrnRequires Voidform.
     ]]
     code = code .. [[
 # Priest spells and functions.
@@ -172,12 +208,12 @@ Define(mass_dispel 32375)
 	SpellInfo(mass_dispel cd=45)
 
 	SpellInfo(mind_blast cd=7.5 cd_haste=spell insanity=-12 charges=1)
-	SpellInfo(mind_blast replace=shadow_word_void talent=shadow_word_void_talent)
+	SpellInfo(mind_blast replaced_by=shadow_word_void talent=shadow_word_void_talent)
 	SpellInfo(mind_blast insanity_percent=120 talent=fortress_of_the_mind_talent)
 	SpellRequire(mind_blast insanity_percent 200=buff,surrender_to_madness_buff)
 	SpellRequire(mind_blast cd 6=buff,voidform_buff)
 	SpellAddBuff(mind_blast shadowy_insight_buff=0 talent=shadowy_insight_talent)
-Define(mind_bomb 205369)
+
 	SpellInfo(mind_bomb cd=30)
 Define(mind_bomb_debuff 205369)
 	SpellInfo(mind_bomb_debuff duration=2)
@@ -192,7 +228,7 @@ Define(mind_vision 2096)
 
 Define(mindbender_discipline 123040)
 	SpellInfo(mindbender cd=60 tag=main)
-	SpellInfo(mindbender replace=shadowfiend talent=!disc_mindbender_talent)
+	SpellInfo(mindbender replaced_by=shadowfiend talent=!disc_mindbender_talent)
 Define(penance 47540)
 	SpellInfo(penance cd=9 channel=2)
 Define(power_word_fortitude 21562)
@@ -208,11 +244,11 @@ Define(psychic_horror 64044)
 	SpellInfo(psychic_horror cd=45)
 Define(psychic_scream 8122)
 	SpellInfo(psychic_scream cd=60)
-	SpellInfo(psychic_scream replace=mind_bomb talent=mind_bomb_talent)
+	SpellInfo(psychic_scream replaced_by=mind_bomb talent=mind_bomb_talent)
 Define(purify_disease 213634)
 	SpellInfo(purify_disease cd=8)
 Define(purge_the_wicked 204197)
-	SpellInfo(purge_the_wicked replace=shadow_word_pain talent=purge_the_wicked_talent specialization=discipline)
+	SpellInfo(purge_the_wicked replaced_by=shadow_word_pain talent=purge_the_wicked_talent specialization=discipline)
 	SpellAddTargetDebuff(purge_the_wicked purge_the_wicked_debuff=1)
 Define(purge_the_wicked_debuff 204197)
 	SpellInfo(purge_the_wicked_debuff duration=20 haste=spell tick=2)
@@ -236,25 +272,25 @@ Define(shadow_mend 186263)
 	SpellRequire(shadow_word_death insanity_percent 200=buff,surrender_to_madness_buff)
 
 	SpellInfo(shadow_word_pain insanity=-4)
-	SpellInfo(shadow_word_pain replace=purge_the_wicked talent=!purge_the_wicked_talent specialization=discipline)
+	SpellInfo(shadow_word_pain replaced_by=purge_the_wicked talent=!purge_the_wicked_talent specialization=discipline)
 	SpellAddTargetDebuff(shadow_word_pain shadow_word_pain_debuff=1)
 	SpellRequire(shadow_word_pain insanity_percent 200=buff,surrender_to_madness_buff)
 Define(shadow_word_pain_debuff 589)
 	SpellInfo(shadow_word_pain_debuff duration=16 haste=spell tick=2)
 
 	SpellInfo(shadow_word_void cd=9 charges=2 insanity=-15 tag=main)
-	SpellInfo(shadow_word_void replace=mind_blast talent=!shadow_word_void_talent)
+	SpellInfo(shadow_word_void replaced_by=mind_blast talent=!shadow_word_void_talent)
 	SpellRequire(shadow_word_void cd 7.5=buff,voidform_buff)
 	SpellRequire(shadow_word_void insanity_percent 200=buff,surrender_to_madness_buff)
 Define(shadowfiend 34433)
-	SpellInfo(shadowfiend cd=180 tag=main)
-	SpellInfo(shadowfiend replace=mindbender_discipline talent=disc_mindbender_talent specialization=discipline)
+	SpellInfo(shadowfiend cd=180)
+	SpellInfo(shadowfiend replaced_by=mindbender_discipline talent=disc_mindbender_talent specialization=discipline)
 
 	SpellRequire(shadowform unusable 1=buff,voidform_buff)
 Define(shadowform_buff 232698)
 Define(shadowy_insight_buff 124430)
 	SpellInfo(shadowy_insight_buff duration=12)
-Define(silence 15487)
+
 	SpellInfo(silence cd=45 gcd=0 interrupt=1)
 
 

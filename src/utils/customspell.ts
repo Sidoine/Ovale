@@ -14,6 +14,11 @@ export interface CustomAuras {
     target?: CustomAura[];
 }
 
+export interface CustomSpellDataIf {
+    conditions?: ConditionNamedParameters;
+    spellInfo?: SpellInfo;
+}
+
 export interface CustomSpellData {
     id: number;
     identifier: string;
@@ -24,6 +29,8 @@ export interface CustomSpellData {
     customSpellInfo?: SpellInfo;
     conditions?: ConditionNamedParameters;
     nextRank?: number;
+    ifs?: CustomSpellDataIf[];
+    replace?: number;
 }
 
 function getPowerName(power: PowerType): OvalePowerType | "runes" | "health" {
@@ -105,8 +112,12 @@ export function convertFromSpellData(spell: SpellData, spellDataById: Map<number
     if (spell.cooldown) {
         spellInfo.cd = spell.cooldown / 1000;
     }
-    else if (spell.charge_cooldown) {
-        spellInfo.charge_cd = spell.charge_cooldown / 1000;
+    if (spell.charge_cooldown) {
+        if (spell.cooldown) {
+            spellInfo.charge_cd = spell.charge_cooldown / 1000;
+        } else {
+            spellInfo.cd = spell.charge_cooldown / 1000;
+        }
     }
     if (spell.duration && spell.duration > 0) {
         spellInfo.duration = spell.duration / 1000;
@@ -116,9 +127,6 @@ export function convertFromSpellData(spell: SpellData, spellDataById: Map<number
     }
     if (spell.max_stack) {
         spellInfo.max_stacks= spell.max_stack;
-    }
-    if (spell.replace_spell_id) {
-        spellInfo.replace = spell.replace_spell_id;
     }
     
     if (spell.gcd !== 1500) {
@@ -186,7 +194,8 @@ export function convertFromSpellData(spell: SpellData, spellDataById: Map<number
         spellInfo: spellInfo,
         auras: auras,
         tooltip: spell.tooltip ? spell.tooltip : undefined,
-        nextRank: spell.nextRank ? spell.nextRank.id : undefined
+        nextRank: spell.nextRank ? spell.nextRank.id : undefined,
+        replace: spell.replace_spell_id
     };
     if (hasConditions) {
         customSpellData.conditions = conditions;

@@ -1,165 +1,35 @@
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
-    local name = "icyveins_warrior_protection"
-    local desc = "[7.3.2] Icy-Veins: Warrior Protection"
-    local code = [[
-Include(ovale_common)
-Include(ovale_trinkets_mop)
-Include(ovale_trinkets_wod)
-Include(ovale_warrior_spells)
-
-AddCheckBox(opt_interrupt L(interrupt) default specialization=protection)
-AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=protection)
-AddCheckBox(opt_warrior_protection_aoe L(AOE) default specialization=protection)
-
-AddFunction ProtectionHealMe
-{
-	unless(DebuffPresent(healing_immunity_debuff)) 
-	{
-		if HealthPercent() < 70 Spell(victory_rush)
-		if HealthPercent() < 85 Spell(impending_victory)
-		if (HealthPercent() < 35) UseHealthPotions()
-	}
-}
-
-AddFunction ProtectionGetInMeleeRange
-{
-	if CheckBoxOn(opt_melee_range) and not InFlightToTarget(intercept) and not InFlightToTarget(heroic_leap)
-	{
-		if target.InRange(intercept) Spell(intercept)
-		if SpellCharges(intercept) == 0 and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
-		if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
-	}
-}
-
-AddFunction ProtectionInterruptActions
-{
-	if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
-	{
-		if target.InRange(pummel) and target.IsInterruptible() Spell(pummel)
-		if target.InRange(storm_bolt) and not target.Classification(worldboss) Spell(storm_bolt)
-		if target.InRange(intercept) and not target.Classification(worldboss) and Talent(warbringer_talent) Spell(intercept)
-		if target.Distance(less 10) and not target.Classification(worldboss) Spell(shockwave)
-		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
-		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
-		if target.InRange(intimidating_shout) and not target.Classification(worldboss) Spell(intimidating_shout)
-	}
-}
-
-AddFunction ProtectionOffensiveCooldowns
-{
-	Spell(avatar)
-	# Spell(battle_cry)
-	if (Talent(booming_voice_talent) and RageDeficit() >= Talent(booming_voice_talent)*60) Spell(demoralizing_shout)
-}
-
-#
-# Short
-#
-
-AddFunction ProtectionDefaultShortCDActions
-{
-	ProtectionHealMe()
-	if ArmorSetBonus(T20 2) and RageDeficit() >= 26 Spell(berserker_rage)
-	if IncomingDamage(5 physical=1) 
-	{
-		if SpellCharges(shield_block) == SpellMaxCharges(shield_block) Spell(shield_block)
-	}
-	if ((not BuffPresent(renewed_fury_buff) and Talent(renewed_fury_talent)) or Rage() >= 60) Spell(ignore_pain)
-	# range check
-	ProtectionGetInMeleeRange()
-}
-
-#
-# Single-Target
-#
-
-AddFunction ProtectionDefaultMainActions
-{
-	Spell(shield_slam)
-	if Talent(devastatator_talent) and BuffPresent(revenge_buff) Spell(revenge)
-	if BuffPresent(vengeance_revenge_buff) Spell(revenge)
-	Spell(thunder_clap)
-	if BuffPresent(revenge_buff) Spell(revenge)
-	Spell(storm_bolt)
-	Spell(devastate)
-}
-
-#
-# AOE
-#
-
-AddFunction ProtectionDefaultAoEActions
-{
-	Spell(ravager)
-	Spell(revenge)
-	Spell(thunder_clap)
-	Spell(shield_slam)
-	if Enemies() >= 3 Spell(shockwave)
-	Spell(devastate)
-}
-
-#
-# Cooldowns
-#
-
-AddFunction ProtectionDefaultCdActions 
-{
-	ProtectionInterruptActions()
-	ProtectionOffensiveCooldowns()
-	if IncomingDamage(1.5 magic=1) > 0 Spell(spell_reflection)
-	if (HasEquippedItem(shifting_cosmic_sliver)) Spell(shield_wall)
-	Item(Trinket0Slot usable=1 text=13)
-	Item(Trinket1Slot usable=1 text=14)
-	Spell(demoralizing_shout)
-	Spell(shield_wall)
-	Spell(last_stand)
-	
-}
-
-#
-# Icons
-#
-
-AddIcon help=shortcd specialization=protection
-{
-	ProtectionDefaultShortCDActions()
-}
-
-AddIcon enemies=1 help=main specialization=protection
-{
-	ProtectionDefaultMainActions()
-}
-
-AddIcon checkbox=opt_warrior_protection_aoe help=aoe specialization=protection
-{
-	ProtectionDefaultAoEActions()
-}
-
-AddIcon help=cd specialization=protection
-{
-	ProtectionDefaultCdActions()
-}
-]]
-    OvaleScripts:RegisterScript("WARRIOR", "protection", name, desc, code, "script")
-end
-do
     local name = "sc_pr_warrior_arms"
     local desc = "[8.0] Simulationcraft: PR_Warrior_Arms"
     local code = [[
 # Based on SimulationCraft profile "PR_Warrior_Arms".
 #	class=warrior
 #	spec=arms
-#	talents=3312211
+#	talents=3112211
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_warrior_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=arms)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=arms)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=arms)
+
+AddFunction ArmsInterruptActions
+{
+ if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+ {
+  if target.InRange(intimidating_shout) and not target.Classification(worldboss) Spell(intimidating_shout)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+  if target.Distance(less 10) and not target.Classification(worldboss) Spell(shockwave)
+  if target.InRange(storm_bolt) and not target.Classification(worldboss) Spell(storm_bolt)
+  if target.InRange(pummel) and target.IsInterruptible() Spell(pummel)
+ }
+}
 
 AddFunction ArmsGetInMeleeRange
 {
@@ -187,6 +57,8 @@ AddFunction ArmsSingletargetMainActions
  if BuffPresent(sudden_death_arms_buff) Spell(execute_arms)
  #cleave,if=spell_targets.whirlwind>2
  if Enemies() > 2 Spell(cleave)
+ #overpower,if=azerite.seismic_wave.rank=3
+ if AzeriteTraitRank(seismic_wave_trait) == 3 Spell(overpower)
  #mortal_strike
  Spell(mortal_strike)
  #overpower
@@ -205,22 +77,22 @@ AddFunction ArmsSingletargetShortCdActions
 {
  unless target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 60 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } and Spell(skullsplitter)
  {
-  #deadly_calm,if=cooldown.bladestorm.remains>6&(cooldown.colossus_smash.remains<2|(talent.warbreaker.enabled&cooldown.warbreaker.remains<2))
-  if SpellCooldown(bladestorm_arms) > 6 and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } Spell(deadly_calm)
+  #deadly_calm,if=(cooldown.bladestorm.remains>6|talent.ravager.enabled&cooldown.ravager.remains>6)&(cooldown.colossus_smash.remains<2|(talent.warbreaker.enabled&cooldown.warbreaker.remains<2))
+  if { SpellCooldown(bladestorm_arms) > 6 or Talent(ravager_talent) and SpellCooldown(ravager) > 6 } and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } Spell(deadly_calm)
   #ravager,if=!buff.deadly_calm.up&(cooldown.colossus_smash.remains<2|(talent.warbreaker.enabled&cooldown.warbreaker.remains<2))
   if not BuffPresent(deadly_calm_buff) and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } Spell(ravager)
 
   unless target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or BuffPresent(sudden_death_arms_buff) and Spell(execute_arms)
   {
-   #bladestorm,if=buff.sweeping_strikes.down&!buff.deadly_calm.up&((debuff.colossus_smash.remains>4.5&!azerite.test_of_might.enabled)|buff.test_of_might.up)
-   if BuffExpires(sweeping_strikes_buff) and not BuffPresent(deadly_calm_buff) and { target.DebuffRemaining(colossus_smash_debuff) > 4.5 and not HasAzeriteTrait(test_of_might_trait) or BuffPresent(test_of_might_buff) } Spell(bladestorm_arms)
+   #bladestorm,if=cooldown.mortal_strike.remains&((debuff.colossus_smash.up&!azerite.test_of_might.enabled)|buff.test_of_might.up)
+   if SpellCooldown(mortal_strike) > 0 and { target.DebuffPresent(colossus_smash_debuff) and not HasAzeriteTrait(test_of_might_trait) or BuffPresent(test_of_might_buff) } Spell(bladestorm_arms)
   }
  }
 }
 
 AddFunction ArmsSingletargetShortCdPostConditions
 {
- target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 60 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } and Spell(skullsplitter) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or BuffPresent(sudden_death_arms_buff) and Spell(execute_arms) or Enemies() > 2 and Spell(cleave) or Spell(mortal_strike) or Spell(overpower) or Talent(fervor_of_battle_talent) and { not HasAzeriteTrait(test_of_might_trait) or Rage() >= 60 or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(deadly_calm_buff) } and Spell(whirlwind_arms) or not Talent(fervor_of_battle_talent) and { not HasAzeriteTrait(test_of_might_trait) or Rage() >= 60 or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(deadly_calm_buff) } and Spell(slam)
+ target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 60 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } and Spell(skullsplitter) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or BuffPresent(sudden_death_arms_buff) and Spell(execute_arms) or Enemies() > 2 and Spell(cleave) or AzeriteTraitRank(seismic_wave_trait) == 3 and Spell(overpower) or Spell(mortal_strike) or Spell(overpower) or Talent(fervor_of_battle_talent) and { not HasAzeriteTrait(test_of_might_trait) or Rage() >= 60 or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(deadly_calm_buff) } and Spell(whirlwind_arms) or not Talent(fervor_of_battle_talent) and { not HasAzeriteTrait(test_of_might_trait) or Rage() >= 60 or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(deadly_calm_buff) } and Spell(slam)
 }
 
 AddFunction ArmsSingletargetCdActions
@@ -229,7 +101,7 @@ AddFunction ArmsSingletargetCdActions
 
 AddFunction ArmsSingletargetCdPostConditions
 {
- target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 60 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } and Spell(skullsplitter) or SpellCooldown(bladestorm_arms) > 6 and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } and Spell(deadly_calm) or not BuffPresent(deadly_calm_buff) and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } and Spell(ravager) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or BuffPresent(sudden_death_arms_buff) and Spell(execute_arms) or BuffExpires(sweeping_strikes_buff) and not BuffPresent(deadly_calm_buff) and { target.DebuffRemaining(colossus_smash_debuff) > 4.5 and not HasAzeriteTrait(test_of_might_trait) or BuffPresent(test_of_might_buff) } and Spell(bladestorm_arms) or Enemies() > 2 and Spell(cleave) or Spell(mortal_strike) or Spell(overpower) or Talent(fervor_of_battle_talent) and { not HasAzeriteTrait(test_of_might_trait) or Rage() >= 60 or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(deadly_calm_buff) } and Spell(whirlwind_arms) or not Talent(fervor_of_battle_talent) and { not HasAzeriteTrait(test_of_might_trait) or Rage() >= 60 or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(deadly_calm_buff) } and Spell(slam)
+ target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 60 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } and Spell(skullsplitter) or { SpellCooldown(bladestorm_arms) > 6 or Talent(ravager_talent) and SpellCooldown(ravager) > 6 } and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } and Spell(deadly_calm) or not BuffPresent(deadly_calm_buff) and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } and Spell(ravager) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or BuffPresent(sudden_death_arms_buff) and Spell(execute_arms) or SpellCooldown(mortal_strike) > 0 and { target.DebuffPresent(colossus_smash_debuff) and not HasAzeriteTrait(test_of_might_trait) or BuffPresent(test_of_might_buff) } and Spell(bladestorm_arms) or Enemies() > 2 and Spell(cleave) or AzeriteTraitRank(seismic_wave_trait) == 3 and Spell(overpower) or Spell(mortal_strike) or Spell(overpower) or Talent(fervor_of_battle_talent) and { not HasAzeriteTrait(test_of_might_trait) or Rage() >= 60 or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(deadly_calm_buff) } and Spell(whirlwind_arms) or not Talent(fervor_of_battle_talent) and { not HasAzeriteTrait(test_of_might_trait) or Rage() >= 60 or target.DebuffPresent(colossus_smash_debuff) or BuffPresent(deadly_calm_buff) } and Spell(slam)
 }
 
 ### actions.precombat
@@ -262,6 +134,71 @@ AddFunction ArmsPrecombatCdActions
 
 AddFunction ArmsPrecombatCdPostConditions
 {
+}
+
+### actions.hac
+
+AddFunction ArmsHacMainActions
+{
+ #rend,if=remains<=duration*0.3&(!raid_event.adds.up|buff.sweeping_strikes.up)
+ if target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and { not False(raid_event_adds_exists) or BuffPresent(sweeping_strikes_buff) } Spell(rend)
+ #skullsplitter,if=rage<60&(cooldown.deadly_calm.remains>3|!talent.deadly_calm.enabled)
+ if Rage() < 60 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } Spell(skullsplitter)
+ #colossus_smash,if=raid_event.adds.up|raid_event.adds.in>40|(raid_event.adds.in>20&talent.anger_management.enabled)
+ if False(raid_event_adds_exists) or 600 > 40 or 600 > 20 and Talent(anger_management_talent) Spell(colossus_smash)
+ #warbreaker,if=raid_event.adds.up|raid_event.adds.in>40|(raid_event.adds.in>20&talent.anger_management.enabled)
+ if False(raid_event_adds_exists) or 600 > 40 or 600 > 20 and Talent(anger_management_talent) Spell(warbreaker)
+ #overpower,if=!raid_event.adds.up|(raid_event.adds.up&azerite.seismic_wave.enabled)
+ if not False(raid_event_adds_exists) or False(raid_event_adds_exists) and HasAzeriteTrait(seismic_wave_trait) Spell(overpower)
+ #cleave,if=spell_targets.whirlwind>2
+ if Enemies() > 2 Spell(cleave)
+ #execute,if=!raid_event.adds.up|(!talent.cleave.enabled&dot.deep_wounds.remains<2)|buff.sudden_death.react
+ if not False(raid_event_adds_exists) or not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or BuffPresent(sudden_death_arms_buff) Spell(execute_arms)
+ #mortal_strike,if=!raid_event.adds.up|(!talent.cleave.enabled&dot.deep_wounds.remains<2)
+ if not False(raid_event_adds_exists) or not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 Spell(mortal_strike)
+ #whirlwind,if=raid_event.adds.up
+ if False(raid_event_adds_exists) Spell(whirlwind_arms)
+ #overpower
+ Spell(overpower)
+ #whirlwind,if=talent.fervor_of_battle.enabled
+ if Talent(fervor_of_battle_talent) Spell(whirlwind_arms)
+ #slam,if=!talent.fervor_of_battle.enabled&!raid_event.adds.up
+ if not Talent(fervor_of_battle_talent) and not False(raid_event_adds_exists) Spell(slam)
+}
+
+AddFunction ArmsHacMainPostConditions
+{
+}
+
+AddFunction ArmsHacShortCdActions
+{
+ unless target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and { not False(raid_event_adds_exists) or BuffPresent(sweeping_strikes_buff) } and Spell(rend) or Rage() < 60 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } and Spell(skullsplitter)
+ {
+  #deadly_calm,if=(cooldown.bladestorm.remains>6|talent.ravager.enabled&cooldown.ravager.remains>6)&(cooldown.colossus_smash.remains<2|(talent.warbreaker.enabled&cooldown.warbreaker.remains<2))
+  if { SpellCooldown(bladestorm_arms) > 6 or Talent(ravager_talent) and SpellCooldown(ravager) > 6 } and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } Spell(deadly_calm)
+  #ravager,if=(raid_event.adds.up|raid_event.adds.in>target.time_to_die)&(cooldown.colossus_smash.remains<2|(talent.warbreaker.enabled&cooldown.warbreaker.remains<2))
+  if { False(raid_event_adds_exists) or 600 > target.TimeToDie() } and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } Spell(ravager)
+
+  unless { False(raid_event_adds_exists) or 600 > 40 or 600 > 20 and Talent(anger_management_talent) } and Spell(colossus_smash) or { False(raid_event_adds_exists) or 600 > 40 or 600 > 20 and Talent(anger_management_talent) } and Spell(warbreaker)
+  {
+   #bladestorm,if=(debuff.colossus_smash.up&raid_event.adds.in>target.time_to_die)|raid_event.adds.up&((debuff.colossus_smash.remains>4.5&!azerite.test_of_might.enabled)|buff.test_of_might.up)
+   if target.DebuffPresent(colossus_smash_debuff) and 600 > target.TimeToDie() or False(raid_event_adds_exists) and { target.DebuffRemaining(colossus_smash_debuff) > 4.5 and not HasAzeriteTrait(test_of_might_trait) or BuffPresent(test_of_might_buff) } Spell(bladestorm_arms)
+  }
+ }
+}
+
+AddFunction ArmsHacShortCdPostConditions
+{
+ target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and { not False(raid_event_adds_exists) or BuffPresent(sweeping_strikes_buff) } and Spell(rend) or Rage() < 60 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } and Spell(skullsplitter) or { False(raid_event_adds_exists) or 600 > 40 or 600 > 20 and Talent(anger_management_talent) } and Spell(colossus_smash) or { False(raid_event_adds_exists) or 600 > 40 or 600 > 20 and Talent(anger_management_talent) } and Spell(warbreaker) or { not False(raid_event_adds_exists) or False(raid_event_adds_exists) and HasAzeriteTrait(seismic_wave_trait) } and Spell(overpower) or Enemies() > 2 and Spell(cleave) or { not False(raid_event_adds_exists) or not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or BuffPresent(sudden_death_arms_buff) } and Spell(execute_arms) or { not False(raid_event_adds_exists) or not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 } and Spell(mortal_strike) or False(raid_event_adds_exists) and Spell(whirlwind_arms) or Spell(overpower) or Talent(fervor_of_battle_talent) and Spell(whirlwind_arms) or not Talent(fervor_of_battle_talent) and not False(raid_event_adds_exists) and Spell(slam)
+}
+
+AddFunction ArmsHacCdActions
+{
+}
+
+AddFunction ArmsHacCdPostConditions
+{
+ target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and { not False(raid_event_adds_exists) or BuffPresent(sweeping_strikes_buff) } and Spell(rend) or Rage() < 60 and { SpellCooldown(deadly_calm) > 3 or not Talent(deadly_calm_talent) } and Spell(skullsplitter) or { SpellCooldown(bladestorm_arms) > 6 or Talent(ravager_talent) and SpellCooldown(ravager) > 6 } and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } and Spell(deadly_calm) or { False(raid_event_adds_exists) or 600 > target.TimeToDie() } and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } and Spell(ravager) or { False(raid_event_adds_exists) or 600 > 40 or 600 > 20 and Talent(anger_management_talent) } and Spell(colossus_smash) or { False(raid_event_adds_exists) or 600 > 40 or 600 > 20 and Talent(anger_management_talent) } and Spell(warbreaker) or { target.DebuffPresent(colossus_smash_debuff) and 600 > target.TimeToDie() or False(raid_event_adds_exists) and { target.DebuffRemaining(colossus_smash_debuff) > 4.5 and not HasAzeriteTrait(test_of_might_trait) or BuffPresent(test_of_might_buff) } } and Spell(bladestorm_arms) or { not False(raid_event_adds_exists) or False(raid_event_adds_exists) and HasAzeriteTrait(seismic_wave_trait) } and Spell(overpower) or Enemies() > 2 and Spell(cleave) or { not False(raid_event_adds_exists) or not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or BuffPresent(sudden_death_arms_buff) } and Spell(execute_arms) or { not False(raid_event_adds_exists) or not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 } and Spell(mortal_strike) or False(raid_event_adds_exists) and Spell(whirlwind_arms) or Spell(overpower) or Talent(fervor_of_battle_talent) and Spell(whirlwind_arms) or not Talent(fervor_of_battle_talent) and not False(raid_event_adds_exists) and Spell(slam)
 }
 
 ### actions.five_target
@@ -386,27 +323,33 @@ AddFunction ArmsDefaultMainActions
 {
  #charge
  if CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(charge)
- #sweeping_strikes,if=spell_targets.whirlwind>1
- if Enemies() > 1 Spell(sweeping_strikes)
- #run_action_list,name=five_target,if=spell_targets.whirlwind>4
- if Enemies() > 4 ArmsFivetargetMainActions()
+ #sweeping_strikes,if=spell_targets.whirlwind>1&(cooldown.bladestorm.remains>10|cooldown.colossus_smash.remains>8|azerite.test_of_might.enabled)
+ if Enemies() > 1 and { SpellCooldown(bladestorm_arms) > 10 or SpellCooldown(colossus_smash) > 8 or HasAzeriteTrait(test_of_might_trait) } Spell(sweeping_strikes)
+ #run_action_list,name=hac,if=raid_event.adds.exists
+ if False(raid_event_adds_exists) ArmsHacMainActions()
 
- unless Enemies() > 4 and ArmsFivetargetMainPostConditions()
+ unless False(raid_event_adds_exists) and ArmsHacMainPostConditions()
  {
-  #run_action_list,name=execute,if=(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20
-  if Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 ArmsExecuteMainActions()
+  #run_action_list,name=five_target,if=spell_targets.whirlwind>4
+  if Enemies() > 4 ArmsFivetargetMainActions()
 
-  unless { Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 } and ArmsExecuteMainPostConditions()
+  unless Enemies() > 4 and ArmsFivetargetMainPostConditions()
   {
-   #run_action_list,name=single_target
-   ArmsSingletargetMainActions()
+   #run_action_list,name=execute,if=(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20
+   if Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 ArmsExecuteMainActions()
+
+   unless { Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 } and ArmsExecuteMainPostConditions()
+   {
+    #run_action_list,name=single_target
+    ArmsSingletargetMainActions()
+   }
   }
  }
 }
 
 AddFunction ArmsDefaultMainPostConditions
 {
- Enemies() > 4 and ArmsFivetargetMainPostConditions() or { Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 } and ArmsExecuteMainPostConditions() or ArmsSingletargetMainPostConditions()
+ False(raid_event_adds_exists) and ArmsHacMainPostConditions() or Enemies() > 4 and ArmsFivetargetMainPostConditions() or { Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 } and ArmsExecuteMainPostConditions() or ArmsSingletargetMainPostConditions()
 }
 
 AddFunction ArmsDefaultShortCdActions
@@ -416,20 +359,26 @@ AddFunction ArmsDefaultShortCdActions
   #auto_attack
   ArmsGetInMeleeRange()
 
-  unless Enemies() > 1 and Spell(sweeping_strikes)
+  unless Enemies() > 1 and { SpellCooldown(bladestorm_arms) > 10 or SpellCooldown(colossus_smash) > 8 or HasAzeriteTrait(test_of_might_trait) } and Spell(sweeping_strikes)
   {
-   #run_action_list,name=five_target,if=spell_targets.whirlwind>4
-   if Enemies() > 4 ArmsFivetargetShortCdActions()
+   #run_action_list,name=hac,if=raid_event.adds.exists
+   if False(raid_event_adds_exists) ArmsHacShortCdActions()
 
-   unless Enemies() > 4 and ArmsFivetargetShortCdPostConditions()
+   unless False(raid_event_adds_exists) and ArmsHacShortCdPostConditions()
    {
-    #run_action_list,name=execute,if=(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20
-    if Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 ArmsExecuteShortCdActions()
+    #run_action_list,name=five_target,if=spell_targets.whirlwind>4
+    if Enemies() > 4 ArmsFivetargetShortCdActions()
 
-    unless { Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 } and ArmsExecuteShortCdPostConditions()
+    unless Enemies() > 4 and ArmsFivetargetShortCdPostConditions()
     {
-     #run_action_list,name=single_target
-     ArmsSingletargetShortCdActions()
+     #run_action_list,name=execute,if=(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20
+     if Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 ArmsExecuteShortCdActions()
+
+     unless { Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 } and ArmsExecuteShortCdPostConditions()
+     {
+      #run_action_list,name=single_target
+      ArmsSingletargetShortCdActions()
+     }
     }
    }
   }
@@ -438,11 +387,13 @@ AddFunction ArmsDefaultShortCdActions
 
 AddFunction ArmsDefaultShortCdPostConditions
 {
- CheckBoxOn(opt_melee_range) and target.InRange(charge) and Spell(charge) or Enemies() > 1 and Spell(sweeping_strikes) or Enemies() > 4 and ArmsFivetargetShortCdPostConditions() or { Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 } and ArmsExecuteShortCdPostConditions() or ArmsSingletargetShortCdPostConditions()
+ CheckBoxOn(opt_melee_range) and target.InRange(charge) and Spell(charge) or Enemies() > 1 and { SpellCooldown(bladestorm_arms) > 10 or SpellCooldown(colossus_smash) > 8 or HasAzeriteTrait(test_of_might_trait) } and Spell(sweeping_strikes) or False(raid_event_adds_exists) and ArmsHacShortCdPostConditions() or Enemies() > 4 and ArmsFivetargetShortCdPostConditions() or { Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 } and ArmsExecuteShortCdPostConditions() or ArmsSingletargetShortCdPostConditions()
 }
 
 AddFunction ArmsDefaultCdActions
 {
+ ArmsInterruptActions()
+
  unless CheckBoxOn(opt_melee_range) and target.InRange(charge) and Spell(charge)
  {
   #potion
@@ -462,20 +413,26 @@ AddFunction ArmsDefaultCdActions
   #avatar,if=cooldown.colossus_smash.remains<8|(talent.warbreaker.enabled&cooldown.warbreaker.remains<8)
   if SpellCooldown(colossus_smash) < 8 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 8 Spell(avatar)
 
-  unless Enemies() > 1 and Spell(sweeping_strikes)
+  unless Enemies() > 1 and { SpellCooldown(bladestorm_arms) > 10 or SpellCooldown(colossus_smash) > 8 or HasAzeriteTrait(test_of_might_trait) } and Spell(sweeping_strikes)
   {
-   #run_action_list,name=five_target,if=spell_targets.whirlwind>4
-   if Enemies() > 4 ArmsFivetargetCdActions()
+   #run_action_list,name=hac,if=raid_event.adds.exists
+   if False(raid_event_adds_exists) ArmsHacCdActions()
 
-   unless Enemies() > 4 and ArmsFivetargetCdPostConditions()
+   unless False(raid_event_adds_exists) and ArmsHacCdPostConditions()
    {
-    #run_action_list,name=execute,if=(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20
-    if Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 ArmsExecuteCdActions()
+    #run_action_list,name=five_target,if=spell_targets.whirlwind>4
+    if Enemies() > 4 ArmsFivetargetCdActions()
 
-    unless { Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 } and ArmsExecuteCdPostConditions()
+    unless Enemies() > 4 and ArmsFivetargetCdPostConditions()
     {
-     #run_action_list,name=single_target
-     ArmsSingletargetCdActions()
+     #run_action_list,name=execute,if=(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20
+     if Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 ArmsExecuteCdActions()
+
+     unless { Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 } and ArmsExecuteCdPostConditions()
+     {
+      #run_action_list,name=single_target
+      ArmsSingletargetCdActions()
+     }
     }
    }
   }
@@ -484,7 +441,7 @@ AddFunction ArmsDefaultCdActions
 
 AddFunction ArmsDefaultCdPostConditions
 {
- CheckBoxOn(opt_melee_range) and target.InRange(charge) and Spell(charge) or Enemies() > 1 and Spell(sweeping_strikes) or Enemies() > 4 and ArmsFivetargetCdPostConditions() or { Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 } and ArmsExecuteCdPostConditions() or ArmsSingletargetCdPostConditions()
+ CheckBoxOn(opt_melee_range) and target.InRange(charge) and Spell(charge) or Enemies() > 1 and { SpellCooldown(bladestorm_arms) > 10 or SpellCooldown(colossus_smash) > 8 or HasAzeriteTrait(test_of_might_trait) } and Spell(sweeping_strikes) or False(raid_event_adds_exists) and ArmsHacCdPostConditions() or Enemies() > 4 and ArmsFivetargetCdPostConditions() or { Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 } and ArmsExecuteCdPostConditions() or ArmsSingletargetCdPostConditions()
 }
 
 ### Arms icons.
@@ -547,6 +504,7 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 
 ### Required symbols
 # ancestral_call
+# anger_management_talent
 # arcane_torrent_rage
 # arms_massacre_talent
 # avatar
@@ -570,22 +528,29 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # fervor_of_battle_talent
 # fireblood
 # heroic_leap
+# intimidating_shout
 # lights_judgment
 # mortal_strike
 # overpower
 # overpower_buff
 # pummel
+# quaking_palm
 # ravager
+# ravager_talent
 # rend
 # rend_debuff
+# seismic_wave_trait
+# shockwave
 # skullsplitter
 # slam
 # stone_heart_buff
+# storm_bolt
 # sudden_death_arms_buff
 # sweeping_strikes
 # sweeping_strikes_buff
 # test_of_might_buff
 # test_of_might_trait
+# war_stomp
 # warbreaker
 # warbreaker_talent
 # whirlwind_arms
@@ -606,8 +571,22 @@ Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_warrior_spells)
 
+AddCheckBox(opt_interrupt L(interrupt) default specialization=fury)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=fury)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=fury)
+
+AddFunction FuryInterruptActions
+{
+ if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
+ {
+  if target.InRange(intimidating_shout) and not target.Classification(worldboss) Spell(intimidating_shout)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+  if target.Distance(less 10) and not target.Classification(worldboss) Spell(shockwave)
+  if target.InRange(storm_bolt) and not target.Classification(worldboss) Spell(storm_bolt)
+  if target.InRange(pummel) and target.IsInterruptible() Spell(pummel)
+ }
+}
 
 AddFunction FuryGetInMeleeRange
 {
@@ -794,6 +773,8 @@ AddFunction FuryDefaultShortCdPostConditions
 
 AddFunction FuryDefaultCdActions
 {
+ FuryInterruptActions()
+
  unless CheckBoxOn(opt_melee_range) and target.InRange(charge) and Spell(charge)
  {
   #run_action_list,name=movement,if=movement.distance>5
@@ -817,8 +798,8 @@ AddFunction FuryDefaultCdActions
      if BuffPresent(recklessness_buff) Spell(berserking)
      #arcane_torrent,if=rage<40&!buff.recklessness.up
      if Rage() < 40 and not BuffPresent(recklessness_buff) Spell(arcane_torrent_rage)
-     #lights_judgment,if=cooldown.recklessness.remains<3
-     if SpellCooldown(recklessness) < 3 Spell(lights_judgment)
+     #lights_judgment,if=buff.recklessness.down
+     if BuffExpires(recklessness_buff) Spell(lights_judgment)
      #fireblood,if=buff.recklessness.up
      if BuffPresent(recklessness_buff) Spell(fireblood)
      #ancestral_call,if=buff.recklessness.up
@@ -913,17 +894,22 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # furious_slash_buff
 # furious_slash_talent
 # heroic_leap
+# intimidating_shout
 # kazzalax_fujiedas_fury_item
 # lights_judgment
 # massacre_talent_fury
 # pummel
+# quaking_palm
 # raging_blow
 # rampage
 # recklessness
 # recklessness_buff
+# shockwave
 # siegebreaker
 # siegebreaker_debuff
 # siegebreaker_talent
+# storm_bolt
+# war_stomp
 # whirlwind_buff
 # whirlwind_fury
 ]]

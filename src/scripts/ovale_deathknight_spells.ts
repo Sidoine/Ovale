@@ -62,9 +62,9 @@ Define(cold_heart_buff 281209)
   SpellInfo(cold_heart_buff max_stacks=20 gcd=0 offgcd=1)
   # Your next Chains of Ice will deal 281210s1 Fost damage.
   SpellAddBuff(cold_heart_buff cold_heart_buff=1)
-Define(consumption 205223)
-# Strikes all enemies in front of you with a hungering attack that deals sw2 Physical damage and heals you for s3 of that damage.
-  SpellInfo(consumption cd=45)
+Define(consumption 274156)
+# Strikes all enemies in front of you with a hungering attack that deals sw1 Physical damage and heals you for e1*100 of that damage.
+  SpellInfo(consumption cd=45 talent=consumption_talent)
 
 Define(dancing_rune_weapon 49028)
 # Summons a rune weapon for s4 sec that mirrors your melee attacks and bolsters your defenses.rnrnWhile active, you gain 81256s1 parry chance.
@@ -231,6 +231,8 @@ Define(clawing_shadows_talent 3) #22026
 # Deals s2 Shadow damage and causes 1 Festering Wound to burst.
 Define(cold_heart_talent 3) #22018
 # Every t1 sec, gain a stack of Cold Heart, causing your next Chains of Ice to deal 281210s1 Frost damage. Stacks up to 281209u times.
+Define(consumption_talent 6) #19220
+# Strikes all enemies in front of you with a hungering attack that deals sw1 Physical damage and heals you for e1*100 of that damage.
 Define(defile_talent 17) #22534
 # Defile the targeted ground, dealing (156000s1*(10 seconds+1)/t3) Shadow damage to all enemies over 10 seconds.rnrnWhile you remain within your Defile, your ?s207311[Clawing Shadows][Scourge Strike] will hit all enemies near the target.rnrnIf any enemies are standing in the Defile, it grows in size every sec.
 Define(epidemic_talent 18) #22536
@@ -271,7 +273,6 @@ Define(unholy_blight_talent 6) #22029
 # Surrounds yourself with a vile swarm of insects for 6 seconds, stinging all nearby enemies and infecting them with an unholy disease that deals 115994o1 damage over 14 seconds.
 Define(unholy_frenzy_talent 20) #22110
 # Incites you into a killing frenzy for 12 seconds, increasing Haste by s1 and causing your auto attacks to infect the target with a Festering Wound.
-Define(taktheritrixs_shoulderpads_item 137075)
     `;
 // END
 
@@ -352,7 +353,7 @@ Define(dark_transformation_buff 63560)
 
 	SpellInfo(death_and_decay runes=1 runicpower=-10 cd=30 specialization=unholy)
 	SpellInfo(death_and_decay runes=1 runicpower=-10 cd=15 specialization=blood)
-	SpellInfo(death_and_decay replace=defile talent=defile_talent specialization=unholy)
+	SpellInfo(death_and_decay replaced_by=defile talent=defile_talent specialization=unholy)
 	SpellRequire(death_and_decay runes 0=buff,crimson_scourge_buff)
 	SpellRequire(death_and_decay cd_percent 0=buff,crimson_scourge_buff)
 	SpellAddTargetDebuff(death_and_decay death_and_decay_debuff=1)
@@ -498,7 +499,7 @@ Define(runic_corruption_buff 51460)
 	SpellInfo(runic_corruption_buff duration=3) #TODO Increase rune generation rate
 
 	
-	SpellInfo(scourge_strike replace=clawing_shadows talent=clawing_shadows_talent)
+	SpellInfo(scourge_strike replaced_by=clawing_shadows talent=clawing_shadows_talent)
 
 	SpellInfo(soul_reaper runes=-2 cd=45)
 	SpellAddTargetDebuff(soul_reaper soul_reaper_debuff=1)

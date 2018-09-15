@@ -51,8 +51,8 @@ export type ScriptType = "script" | "include";
 interface Script {
     type?: ScriptType;
     desc?: string;
-    className?: string;
-    specialization?: string;
+    className?: ClassId;
+    specialization?: SpecializationName;
     code?: string;
 }
 
@@ -93,7 +93,7 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
         }
         return descriptionsTable;
     }
-    RegisterScript(className: string, specialization: string, name: string, description: string, code: string, scriptType: ScriptType) {
+    RegisterScript(className: ClassId, specialization: SpecializationName, name: string, description: string, code: string, scriptType: ScriptType) {
         this.script[name] = this.script[name] || {};
         let script = this.script[name];
         script.type = scriptType || "script";
@@ -115,12 +115,18 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
     }
     GetDefaultScriptName(className: ClassId, specialization: SpecializationName) {
         let name = undefined;
+        let scClassName = lower(className);
 
-        if(className == "DRUID"){
+        if (className === "DEMONHUNTER") {
+            scClassName = "demon_hunter";
+        } else if (className === "DEATHKNIGHT") {
+            scClassName = "death_knight";
+        }
+        else if(className == "DRUID"){
             if(specialization == "feral"){
                 name = "shmoodude_druid_feral";
             }
-        }else if(className == "MONK"){
+        } else if(className == "MONK"){
             if(specialization == "mistweaver"){
                 name = "Disabled";
             }
@@ -143,7 +149,7 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
         }
 
         if (!name && specialization) {
-            name = format("sc_pr_%s_%s", lower(className), specialization);
+            name = format("sc_pr_%s_%s", scClassName, specialization);
         }
         if (!(name && this.script[name])) {
             name = DISABLED_NAME;

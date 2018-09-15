@@ -41,7 +41,7 @@ Define(between_the_eyes 199804)
   SpellAddTargetDebuff(between_the_eyes between_the_eyes=1)
 Define(blade_flurry 13877)
 # Causes your single target attacks to also strike all nearby enemies for s2 of normal damage for 12 seconds.
-  SpellInfo(blade_flurry energy=15 cd=12 duration=12 gcd=1)
+  SpellInfo(blade_flurry energy=15 cd=12 charge_cd=25 duration=12 gcd=1)
   # Attacks striking nearby enemies.
   SpellAddBuff(blade_flurry blade_flurry=1)
 Define(blade_rush 271877)
@@ -50,6 +50,11 @@ Define(blade_rush 271877)
 Define(blindside 111240)
 # Exploits the vulnerability of foes with less than s4 health, dealing s2 Physical damage to the target.rnrnMutilate has a s5 chance to make your next Blindside free and usable on any target, regardless of their health.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|r
   SpellInfo(blindside energy=30 gcd=1 combopoints=-1 talent=blindside_talent)
+Define(cheap_shot 1833)
+# Stuns the target for 4 seconds.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
+  SpellInfo(cheap_shot energy=40 duration=4 gcd=1 combopoints=-2)
+  # Stunned.
+  SpellAddTargetDebuff(cheap_shot cheap_shot=1)
 Define(crimson_tempest 121411)
 # Finishing move that slashes at all enemies within A1 yards, dealing instant damage and causing victims to bleed for additional damage. Lasts longer per combo point.rnrn   1 point  : s2*2 plus o1*2 over 4 secrn   2 points: s2*3 plus o1*3 over 6 secrn   3 points: s2*4 plus o1*4 over 8 secrn   4 points: s2*5 plus o1*5 over 10 secrn   5 points: s2*6 plus o1*6 over 12 sec?s193531[rn   6 points: s2*7 plus o1*7 over 14 sec][]
   SpellInfo(crimson_tempest energy=35 combopoints=1 duration=2 gcd=1 tick=2 talent=crimson_tempest_talent)
@@ -60,7 +65,8 @@ Define(dispatch 2098)
   SpellInfo(dispatch energy=35 combopoints=1 gcd=1)
 Define(envenom 32645)
 # Finishing move that drives your poisoned blades in deep, dealing instant Nature damage and increasing your poison application chance by s2. Damage and duration increased per combo point.rnrn   1 point  : m1*1 damage, 2 secrn   2 points: m1*2 damage, 3 secrn   3 points: m1*3 damage, 4 secrn   4 points: m1*4 damage, 5 secrn   5 points: m1*5 damage, 6 sec?s193531[rn   6 points: m1*6 damage, 7 sec][]
-  SpellInfo(envenom energy=35 combopoints=1 duration=1 replace=eviscerate gcd=1 tick=1)
+  SpellInfo(envenom energy=35 combopoints=1 duration=1 gcd=1 tick=1)
+  SpellInfo(eviscerate replaced_by=envenom)
   # Poison application chance increased by s2.
   SpellAddBuff(envenom envenom=1)
 Define(eviscerate 196819)
@@ -90,9 +96,19 @@ Define(ghostly_strike 196937)
 Define(gloomblade 200758)
 # Punctures your target with your shadow-infused blade for s1 Shadow damage, bypassing armor.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
   SpellInfo(gloomblade energy=35 gcd=1 combopoints=-1 talent=gloomblade_talent)
+Define(gouge 1776)
+# Gouges the eyes of an enemy target, incapacitating for 4 seconds. Damage will interrupt the effect.rnrnMust be in front of your target.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
+  SpellInfo(gouge energy=25 cd=15 duration=4 gcd=1 combopoints=-1)
+  # Incapacitated.
+  SpellAddTargetDebuff(gouge gouge=1)
 Define(kick 1766)
 # A quick kick that interrupts spellcasting and prevents any spell in that school from being cast for 5 seconds.?s56805[ If you successfully interrupt a spell, Kick's cooldown is reduced by 56805m2/1000 sec.][]
   SpellInfo(kick cd=15 duration=5 gcd=0 offgcd=1 interrupt=1)
+Define(kidney_shot 408)
+# Finishing move that stuns the target. Lasts longer per combo point:rn   1 point  : 2 secondsrn   2 points: 3 secondsrn   3 points: 4 secondsrn   4 points: 5 secondsrn   5 points: 6 seconds?s193531[rn   6 points: 7 seconds][]
+  SpellInfo(kidney_shot energy=25 combopoints=1 cd=20 duration=1 gcd=1)
+  # Stunned.
+  SpellAddTargetDebuff(kidney_shot kidney_shot=1)
 Define(killing_spree 51690)
 # Teleport to an enemy within 10 yards, attacking with both weapons for a total of <dmg> Physical damage over 2 seconds.rnrnWhile Blade Flurry is active, also hits all nearby enemies for s2 damage.
   SpellInfo(killing_spree cd=120 duration=2 gcd=1 tick=0.4 talent=killing_spree_talent)
@@ -115,13 +131,17 @@ Define(marked_for_death 137619)
   SpellAddTargetDebuff(marked_for_death marked_for_death=1)
 Define(mutilate 1329)
 # Attack with both weapons, dealing a total of <dmg> Physical damage.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
-  SpellInfo(mutilate energy=50 replace=sinister_strike gcd=1 combopoints=-2)
+  SpellInfo(mutilate energy=50 gcd=1 combopoints=-2)
 
 Define(nightblade 195452)
 # Finishing move that infects the target with shadowy energy, dealing Shadow damage over time and reduces the effectiveness of healing on the target by s7. Lasts longer per combo point.rn   1 point  : <damage>*8/6 over 8 secrn   2 points: <damage>*10/6 over 10 secrn   3 points: <damage>*12/6 over 12 secrn   4 points: <damage>*14/6 over 14 secrn   5 points: <damage>*16/6 over 16 sec?s193531[rn   6 points: <damage>*18/6 over 18 sec][]rnrnYou deal s6 increased damage to enemies afflicted by your Nightblade.
   SpellInfo(nightblade energy=25 combopoints=1 duration=6 gcd=1 tick=2)
   # Suffering w1 Shadow damage every t1 sec.rnHealing effects reduced by s7.rnTaking s6 increased damage from the Rogue.
   SpellAddTargetDebuff(nightblade nightblade=1)
+Define(nights_vengeance_buff 273419)
+# Nightblade increases the damage of your next Eviscerate within 8 sec by s1. 
+  SpellInfo(nights_vengeance_buff channel=-0.001 gcd=0 offgcd=1)
+
 Define(pistol_shot 185763)
 # Draw a concealed pistol and fire a quick shot at an enemy, dealing s1*<CAP>/AP Physical damage and reducing movement speed by s3 for 6 seconds.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
   SpellInfo(pistol_shot energy=40 duration=6 gcd=1 combopoints=-1)
@@ -132,6 +152,11 @@ Define(pistol_shot 185763)
 Define(poisoned_knife 185565)
 # Throws a poison-coated knife, dealing s1 damage and applying your active Lethal and Non-Lethal Poisons.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
   SpellInfo(poisoned_knife energy=40 gcd=1 combopoints=-1)
+Define(quaking_palm 107079)
+# Strikes the target with lightning speed, incapacitating them for 4 seconds, and turns off your attack.
+  SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
+  # Incapacitated.
+  SpellAddTargetDebuff(quaking_palm quaking_palm=1)
 Define(roll_the_bones 193316)
 # Finishing move that rolls the dice of fate, providing a random combat enhancement. Lasts longer per combo point:rn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds?s193531[rn   6 points: 42 seconds][]
   SpellInfo(roll_the_bones energy=25 combopoints=1 duration=6 channel=6 gcd=1 tick=2)
@@ -157,7 +182,7 @@ Define(shadow_blades_buff 255857)
 
 Define(shadow_dance 185313)
 # Allows use of all Stealth abilities and grants all the combat benefits of Stealth for 5 seconds. Effect not broken from taking damage or attacking. ?s14062[Movement speed while active is increased by 1784s3 and damage dealt is increased by 1784s4. ]?s108209[Abilities cost 112942s1 less while active. ][]?s31223[Attacks from Shadow Dance and for 31223s1 sec after deal 31665s1 more damage.  ][]
-  SpellInfo(shadow_dance cd=1 duration=5 gcd=0 offgcd=1 tick=1)
+  SpellInfo(shadow_dance cd=1 charge_cd=60 duration=5 gcd=0 offgcd=1 tick=1)
   SpellAddBuff(shadow_dance shadow_dance=1)
 Define(shadowmeld 58984)
 # Activate to slip into the shadows, reducing the chance for enemies to detect your presence. Lasts until cancelled or upon moving. Any threat is restored versus enemies still in combat upon cancellation of this effect.
@@ -166,7 +191,7 @@ Define(shadowmeld 58984)
   SpellAddBuff(shadowmeld shadowmeld=1)
 Define(shadowstep 36554)
 # Step through the shadows to appear behind your target and gain s2 increased movement speed for 2 seconds.
-  SpellInfo(shadowstep cd=1 duration=2 channel=2 gcd=0 offgcd=1)
+  SpellInfo(shadowstep cd=1 charge_cd=30 duration=2 channel=2 gcd=0 offgcd=1)
   # Movement speed increased by s2.
   SpellAddBuff(shadowstep shadowstep=1)
 
@@ -277,9 +302,13 @@ Define(venom_rush_talent 16) #22343
 # Mutilate refunds s1 Energy when used against a poisoned target.
 Define(vigor_talent 7) #19239
 # Increases your maximum Energy by (25 of Spell Power) and your Energy regeneration by (25 of Spell Power).
-Define(sharpened_blades_trait 272911)
+Define(shrouded_suffocation_trait 278666)
 Define(ace_up_your_sleeve_trait 278676)
 Define(deadshot_trait 272935)
+Define(snake_eyes_trait 275846)
+Define(blade_in_the_shadows_trait 275896)
+Define(nights_vengeance_trait 273418)
+Define(sharpened_blades_trait 272911)
     `;
 // END
     code += `
@@ -303,7 +332,7 @@ Define(alacrity_buff 193538)
 	SpellInfo(ambush combopoints=-2 energy=50 stealthed=1)
 
 	SpellInfo(backstab combopoints=-1 energy=35)
-	SpellInfo(backstab replace=gloomblade talent=gloomblade_talent)
+	SpellInfo(backstab replaced_by=gloomblade talent=gloomblade_talent)
 	SpellRequire(backstab combopoints -2=buff,shadow_blades_buff)
 
 	SpellInfo(between_the_eyes combopoints=1 max_combopoints=5 energy=25 cd=30)
@@ -333,7 +362,7 @@ Define(blind_debuff 2094)
 	SpellAddBuff(blindside blindside_buff=-1)
 Define(blindside_buff 121153)
 	SpellInfo(blindside_buff duration=10)
-Define(cheap_shot 1833)
+
 	SpellInfo(cheap_shot combopoints=-2 energy=40 interrupt=1 stealthed=1)
 	SpellInfo(cheap_shot energy=0 talent=dirty_tricks_talent)
 	SpellRequire(cheap_shot energy_percent 0=buff,shot_in_the_dark_buff specialization=subtlety)
@@ -414,9 +443,9 @@ Define(ghostly_strike_debuff 196937)
 	SpellInfo(ghostly_strike_debuff duration=10)
 
 	SpellInfo(gloomblade combopoints=-1 energy=35)
-	SpellInfo(gloomblade replace=backstab talent=gloomblade_talent)
+	SpellInfo(gloomblade replaced_by=backstab talent=gloomblade_talent)
 	SpellRequire(gloomblade combopoints -2=buff,shadow_blades_buff)
-Define(gouge 1776)
+
 	SpellInfo(gouge combopoints=-1 cd=15 energy=25 tag=main)
 	SpellInfo(gouge energy=0 talent=dirty_tricks_talent)
 Define(grappling_hook 195457)
@@ -428,7 +457,7 @@ Define(internal_bleeding_debuff 154953)
 	SpellInfo(internal_bleeding_debuff duration=6 tick=1 haste=melee)
 
 	SpellInfo(kick cd=15 gcd=0 interrupt=1 offgcd=1)
-Define(kidney_shot 408)
+
 	SpellInfo(kidney_shot cd=20 combopoints=1 max_combopoints=5 energy=25 interrupt=1)
 	SpellInfo(kidney_shot max_combopoints=6 talent=deeper_stratagem_talent)
 	SpellRequire(kidney_shot energy_percent 80=stealthed,1 talent=shadow_focus_talent)
@@ -478,7 +507,7 @@ Define(riposte_buff 199754)
 
 	SpellInfo(roll_the_bones energy=25 combopoints=1 max_combopoints=5)
 	SpellInfo(roll_the_bones max_combopoints=6 talent=deeper_stratagem_talent)
-	SpellInfo(roll_the_bones replace=slice_and_dice talent=slice_and_dice_talent)
+	SpellInfo(roll_the_bones replaced_by=slice_and_dice talent=slice_and_dice_talent)
 	SpellAddBuff(roll_the_bones loaded_dice_buff=0 talent=loaded_dice_talent)
 
 	SpellInfo(rupture combopoints=1 max_combopoints=5 energy=25)
@@ -530,7 +559,7 @@ Define(shuriken_combo_buff 245640)
 	SpellInfo(slice_and_dice combopoints=1 max_combopoints=5 energy=25)
 	SpellInfo(slice_and_dice max_combopoints=6 talent=deeper_stratagem_talent)
 	SpellAddBuff(slice_and_dice slice_and_dice_buff=1)
-	SpellInfo(slice_and_dice replace=roll_the_bones talent=slice_and_dice_talent)
+	SpellInfo(slice_and_dice replaced_by=roll_the_bones talent=slice_and_dice_talent)
 Define(slice_and_dice_buff 5171)
 	SpellInfo(slice_and_dice add_duration_combopoints=6 duration=6)
 Define(shot_in_the_dark_buff 257506)

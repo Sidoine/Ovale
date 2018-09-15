@@ -27,10 +27,6 @@ Define(chaos_strike 162794)
 # Slice your target for 222031s1+199547s1 Chaos damage. Chaos Strike has a 197125h chance to refund 193840s1 Fury.
   SpellInfo(chaos_strike fury=40)
 
-Define(chaos_strike_havoc 197125)
-# Slice your target for 222031s1+199547s1 Chaos damage. Chaos Strike has a 197125h chance to refund 193840s1 Fury.
-  SpellInfo(chaos_strike_havoc channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(chaos_strike_havoc chaos_strike_havoc=1)
 Define(consume_magic 278326)
 # Consume m1 beneficial Magic effect from the target, removing it and granting you ?c1[s2 Fury][s3/10 Pain].
   SpellInfo(consume_magic cd=10 fury=-20 pain=-20)
@@ -46,7 +42,8 @@ Define(death_sweep 210152)
   SpellAddBuff(death_sweep death_sweep=1)
 Define(demon_spikes 203720)
 # Surge with fel power, increasing your Armor by 203819s2*AGI/100, and your Parry chance by 203819s1, for 6 seconds.
-  SpellInfo(demon_spikes cd=1.5 replace=vengeful_retreat gcd=0 offgcd=1)
+  SpellInfo(demon_spikes cd=1.5 charge_cd=20 gcd=0 offgcd=1)
+  SpellInfo(vengeful_retreat replaced_by=demon_spikes)
 Define(demons_bite 162243)
 # Quickly attack for s2 Physical damage.rnrn|cFFFFFFFFGenerates m3 to ?a258876[M3+258876s1][M3] Fury.|r
   SpellInfo(demons_bite fury=-25)
@@ -73,20 +70,22 @@ Define(fel_eruption 211881)
   SpellAddTargetDebuff(fel_eruption fel_eruption=1)
 Define(fel_rush 195072)
 # Rush forward, incinerating anything in your path for 192611s1 Chaos damage.
-  SpellInfo(fel_rush cd=1 gcd=0.25)
+  SpellInfo(fel_rush cd=1 charge_cd=10 gcd=0.25)
 Define(felblade 232893)
 # Charge to your target and deal 213243sw2 Fire damage.rnrn?s203513[Shear has a chance to reset the cooldown of Felblade.rnrn|cFFFFFFFFGenerates 213243s3/10 Pain.|r]?a203555[Demon Blades has a chance to reset the cooldown of Felblade.rnrn|cFFFFFFFFGenerates 213243s4 Fury.|r][Demon's Bite has a chance to reset the cooldown of Felblade.rnrn|cFFFFFFFFGenerates 213243s4 Fury.|r]
   SpellInfo(felblade cd=15 talent=felblade_talent_vengeance)
 Define(fiery_brand 204021)
 # Brand an enemy with a demonic symbol, instantly dealing sw2 Fire damage and reducing the damage they deal to you by s1 for 8 seconds.
-  SpellInfo(fiery_brand cd=60 replace=chaos_nova)
+  SpellInfo(fiery_brand cd=60)
+  SpellInfo(chaos_nova replaced_by=fiery_brand)
 Define(fracture 263642)
 # Rapidly slash your target for 225919sw1+225921sw1 Physical damage, and shatter s1 Lesser Soul Fragments from them.rnrn|cFFFFFFFFGenerates s4/10 Pain.|r
   SpellInfo(fracture cd=4.5 pain=-25 talent=fracture_talent)
 
 Define(immolation_aura 178740)
 # Engulf yourself in flames, instantly causing 187727s1 Fire damage to enemies within 187727A1 yards and radiating 178741s1 Fire damage every sec for 6 seconds.rnrn|cFFFFFFFFGenerates s3/10+178741s2/10*6 seconds Pain over 6 seconds.|r
-  SpellInfo(immolation_aura cd=15 duration=6 replace=eye_beam pain=-8 tick=1)
+  SpellInfo(immolation_aura cd=15 duration=6 pain=-8 tick=1)
+  SpellInfo(eye_beam replaced_by=immolation_aura)
   # Burns nearby enemies for 178741s1 Fire damage every 178740t1 sec.?a207548[rnrnMovement speed increased by w4.][]
   SpellAddBuff(immolation_aura immolation_aura=1)
 Define(imprison 217832)
@@ -96,7 +95,8 @@ Define(imprison 217832)
   SpellAddTargetDebuff(imprison imprison=1)
 Define(infernal_strike 189110)
 # Leap through the air toward a targeted location, dealing 189112s1 Fire damage to all enemies within 189112a1 yards.
-  SpellInfo(infernal_strike cd=0.8 replace=fel_rush gcd=0 offgcd=1)
+  SpellInfo(infernal_strike cd=0.8 charge_cd=20 gcd=0 offgcd=1)
+  SpellInfo(fel_rush replaced_by=infernal_strike)
 Define(nemesis 206491)
 # Increases damage you inflict against the target by s1 for 60 seconds. rnrnWhen the target is slain, you will inflict s1 additional damage against all creature types matching the original target (Humanoid, Dragonkin, etc.) for the remaining duration.
   SpellInfo(nemesis cd=120 duration=60 talent=nemesis_talent)
@@ -110,12 +110,23 @@ Define(prepared_buff 203650)
 Define(shear 203782)
 # Shears an enemy for s2 Physical damage, and shatters a Lesser Soul Fragment from your target.rnrn|cFFFFFFFFGenerates m3/10 Pain.|r
   SpellInfo(shear pain=-10)
+Define(sigil_of_chains 202138)
+# Place a Sigil of Chains at the target location that activates after 2 seconds.rnrnAll enemies affected by the sigil are pulled to its center and are snared, reducing movement speed by 204843s1 for 6 seconds.
+  SpellInfo(sigil_of_chains cd=90 duration=2 talent=sigil_of_chains_talent)
 Define(sigil_of_flame 204596)
 # Place a Sigil of Flame at the target location that activates after 2 seconds.rnrnDeals 204598s1 Fire damage, and an additional 204598o3 Fire damage over 6 seconds, to all enemies affected by the sigil.
-  SpellInfo(sigil_of_flame cd=30 duration=2 replace=blade_dance)
+  SpellInfo(sigil_of_flame cd=30 duration=2)
+  SpellInfo(blade_dance replaced_by=sigil_of_flame)
+Define(sigil_of_misery 207684)
+# Place a Sigil of Misery at the target location that activates after 2 seconds.rnrnCauses all enemies affected by the sigil to cower in fear, disorienting them for 20 seconds.
+  SpellInfo(sigil_of_misery cd=90 duration=2)
+Define(sigil_of_silence 202137)
+# Place a Sigil of Silence at the target location that activates after 2 seconds.rnrnSilences all enemies affected by the sigil for 6 seconds.
+  SpellInfo(sigil_of_silence cd=60 duration=2)
 Define(soul_cleave 228477)
 # Viciously strike all enemies in front of you for 228478s1 Physical damage and heal yourself for s4.rnrnConsumes up to s3 Soul Fragments within s1 yds.
-  SpellInfo(soul_cleave pain=30 replace=chaos_strike)
+  SpellInfo(soul_cleave pain=30)
+  SpellInfo(chaos_strike replaced_by=soul_cleave)
 
 Define(spirit_bomb 247454)
 # Consume up to s2 Soul Fragments within s1 yds and then explode, afflicting nearby enemies with Frailty for 20 seconds and damaging them for 247455s1 Fire per fragment.rnrnYou heal for 247456s1 of all damage you deal to enemies with Frailty.
@@ -158,10 +169,13 @@ Define(momentum_talent 20) #21901
 # Fel Rush increases your damage done by 208628s1 for 6 seconds.rnrnVengeful Retreat's cooldown is reduced by s1/-1000 sec, and it generates (203650s1/5)*10 seconds Fury over 10 seconds if it damages at least one enemy.
 Define(nemesis_talent 21) #22547
 # Increases damage you inflict against the target by s1 for 60 seconds. rnrnWhen the target is slain, you will inflict s1 additional damage against all creature types matching the original target (Humanoid, Dragonkin, etc.) for the remaining duration.
+Define(sigil_of_chains_talent 15) #22511
+# Place a Sigil of Chains at the target location that activates after 2 seconds.rnrnAll enemies affected by the sigil are pulled to its center and are snared, reducing movement speed by 204843s1 for 6 seconds.
 Define(spirit_bomb_talent 17) #22513
 # Consume up to s2 Soul Fragments within s1 yds and then explode, afflicting nearby enemies with Frailty for 20 seconds and damaging them for 247455s1 Fire per fragment.rnrnYou heal for 247456s1 of all damage you deal to enemies with Frailty.
 Define(trail_of_ruin_talent 7) #22909
 # The final slash of Blade Dance inflicts an additional 258883o1 Chaos damage over 4 seconds.
+Define(revolving_blades_trait 279581)
 Define(unbound_chaos_trait 275144)
     `;
 // END
@@ -281,7 +295,7 @@ Define(pick_up_fragment 210788)
 Define(razor_spikes_debuff 210003)
 	SpellInfo(razor_spikes_debuff duration=6)
 
-Define(sigil_of_chains 202138)
+
 	SpellInfo(sigil_of_chains cd=90)
 
 	SpellInfo(sigil_of_flame cd=30)
@@ -289,13 +303,13 @@ Define(sigil_of_chains 202138)
 Define(sigil_of_flame_debuff 204598)
 	SpellInfo(sigil_of_flame_debuff duration=6)
 	SpellInfo(sigil_of_flame_debuff duration=8 talent=concentrated_sigils_talent)
-Define(sigil_of_misery 207684)
+
 	SpellInfo(sigil_of_misery cd=90)
 	SpellInfo(sigil_of_misery cd=72 talent=quickened_sigils_talent)
 Define(sigil_of_misery_debuff 207685)
 	SpellInfo(sigil_of_misery_debuff duration=20)
 	SpellInfo(sigil_of_misery_debuff duration=22 talent=concentrated_sigils_talent)
-Define(sigil_of_silence 202137)
+
 	SpellInfo(sigil_of_silence cd=60)
 	SpellInfo(sigil_of_silence cd=48 talent=quickened_sigils_talent)
 Define(sigil_of_silence_debuff 204490)
@@ -387,6 +401,7 @@ Define(void_reaver_talent 20)
 # Tags
 SpellInfo(dark_slash tag=main)
 SpellInfo(demon_spikes tag=shortcd)
+SpellInfo(immolation_aura_havoc tag=main)
 SpellInfo(fel_barrage tag=main)
 SpellInfo(fel_eruption tag=main)
 SpellInfo(fel_rush tag=main)

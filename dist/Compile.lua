@@ -608,7 +608,6 @@ __exports.OvaleCompileClass = __class(OvaleCompileClassBase, {
         local changed = false
         ast = ast or self.ast
         if ast and (forceEvaluation or  not self.serial or self.serial < self_serial) then
-            self:Debug("Evaluating script.")
             changed = true
             local ok = true
             self_compileOnStances = false

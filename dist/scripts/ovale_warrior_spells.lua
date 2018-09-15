@@ -28,7 +28,7 @@ Define(bursting_blood 251316)
 
 Define(charge 100)
 # Charge to an enemy, dealing 126664s2 Physical damage, rooting it for 1 second?s103828[, and stunning it for 0 second][].rnrn|cFFFFFFFFGenerates /10;s2 Rage.|r
-  SpellInfo(charge cd=1.5 gcd=0.5 rage=-20)
+  SpellInfo(charge cd=1.5 charge_cd=20 gcd=0.5 rage=-20)
 Define(cleave 845)
 # Strikes all enemies in front of you with a sweeping attack for s1 Physical damage. Hitting s2 or more targets inflicts Deep Wounds.
   SpellInfo(cleave rage=20 cd=9 talent=cleave_talent)
@@ -82,7 +82,12 @@ Define(furious_slash_buff 202539)
   SpellAddBuff(furious_slash_buff furious_slash_buff=1)
 Define(heroic_leap 6544)
 # Leap through the air toward a target location, slamming down with destructive force to deal 52174s1 Physical damage to all enemies within 52174a1 yards?s23922[, and resetting the remaining cooldown on Taunt][].
-  SpellInfo(heroic_leap cd=0.8 gcd=0 offgcd=1)
+  SpellInfo(heroic_leap cd=0.8 charge_cd=45 gcd=0 offgcd=1)
+Define(intimidating_shout 5246)
+# ?s275338[Causes the targeted enemy and up to s1 additional enemies within 5246A3 yards to cower in fear.][Causes the targeted enemy to cower in fear, and up to s1 additional enemies within 5246A3 yards to flee.] Targets are disoriented for 8 seconds.
+  SpellInfo(intimidating_shout cd=90 duration=8)
+  # Disoriented.
+  SpellAddTargetDebuff(intimidating_shout intimidating_shout=1)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
@@ -97,7 +102,13 @@ Define(overpower 7384)
   SpellAddBuff(overpower overpower=1)
 Define(pummel 6552)
 # Pummels the target, interrupting spellcasting and preventing any spell in that school from being cast for 4 seconds.
+# Rank 1: Pummel the target for s2 damage and interrupt the spell being cast for 5 seconds.
   SpellInfo(pummel cd=15 duration=4 gcd=0 offgcd=1 interrupt=1)
+Define(quaking_palm 107079)
+# Strikes the target with lightning speed, incapacitating them for 4 seconds, and turns off your attack.
+  SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
+  # Incapacitated.
+  SpellAddTargetDebuff(quaking_palm quaking_palm=1)
 Define(raging_blow 85288)
 # A mighty blow with both weapons that deals a total of (96103sw1+85384sw1)*<mult> Physical damage.rnrnRaging Blow has a s1 chance to instantly reset its own cooldown.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
   SpellInfo(raging_blow cd=8 rage=-12)
@@ -121,6 +132,9 @@ Define(rend 772)
   SpellInfo(rend rage=30 duration=12 tick=3 talent=rend_talent)
   # Bleeding for w2 damage every t2 sec.
   SpellAddTargetDebuff(rend rend=1)
+Define(shockwave 46968)
+# Sends a wave of force in a frontal cone, causing m2 damage and stunning all enemies within a1 yards for 2 seconds.
+  SpellInfo(shockwave cd=40)
 Define(siegebreaker 280772)
 # Break the enemy's defenses, dealing s1 Physical damage, and increasing your damage done to the target by 280773s1 for 10 seconds.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
   SpellInfo(siegebreaker cd=30 rage=-10 talent=siegebreaker_talent)
@@ -130,6 +144,9 @@ Define(skullsplitter 260643)
 Define(slam 1464)
 # Slams an opponent, causing s1 Physical damage.
   SpellInfo(slam rage=20)
+Define(storm_bolt 107570)
+# Hurls your weapon at an enemy, causing s1 Physical damage and stunning for 4 seconds.
+  SpellInfo(storm_bolt cd=30 talent=storm_bolt_talent_fury)
 Define(sweeping_strikes 260708)
 # For 12 seconds your single-target damaging abilities hit s1 additional Ltarget:targets; within 8 yds for s2 damage.
   SpellInfo(sweeping_strikes cd=30 duration=12)
@@ -139,9 +156,14 @@ Define(test_of_might_buff 275531)
 # When ?s262161[Warbreaker][Colossus Smash] expires, your Strength is increased by s1 for every s2 Rage you spent during ?s262161[Warbreaker][Colossus Smash]. Lasts 12 seconds.
   SpellInfo(test_of_might_buff channel=-0.001 gcd=0 offgcd=1)
 
-Define(warbreaker 209577)
-# Stomp the ground, causing a ring of corrupted spikes to erupt upwards, dealing sw1 Shadow damage and applying the Colossus Smash effect to all nearby enemies.
-  SpellInfo(warbreaker cd=60)
+Define(war_stomp 20549)
+# Stuns up to i enemies within A1 yds for 2 seconds.
+  SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
+  # Stunned.
+  SpellAddTargetDebuff(war_stomp war_stomp=1)
+Define(warbreaker 262161)
+# Smash the ground and shatter the armor of all enemies within A1 yds, dealing s1 Physical damage and increasing damage you deal to them by 208086s1 for 10 seconds.
+  SpellInfo(warbreaker cd=45 talent=warbreaker_talent)
 Define(whirlwind_buff 199658)
 # Unleashes a whirlwind of steel, ?s202316[hitting your primary target with Slam and ][]striking all enemies within 199658A1 yards for <baseDmg> Physical damage.
   SpellInfo(whirlwind_buff gcd=0 offgcd=1)
@@ -149,6 +171,8 @@ Define(whirlwind_fury 190411)
 # Unleashes a whirlwind of steel, striking all enemies within 199658A1 yards for 3*(199667sw2+44949sw2) Physical damage.?a12950[rnrnCauses your next s7 single-target lattack:attacks; to strike up to 85739s1 additional targets for 85739s3 damage.][]rnrn|cFFFFFFFFGenerates m8 Rage, plus an additional m9 per target hit. Maximum m10 Rage.|r
   SpellInfo(whirlwind_fury)
 
+Define(anger_management_talent 19) #21204
+# Every ?c1[s1]?c2[s3][s2] Rage you spend reduces the remaining cooldown on ?c1&s262161[Warbreaker and Bladestorm]?c1[Colossus Smash and Bladestorm]?c2[Recklessness][Avatar, Last Stand, Shield Wall, and Demoralizing Shout] by 1 sec.
 Define(avatar_talent 17) #22397
 # Transform into a colossus for 20 seconds, causing you to deal s1 increased damage and removing all roots and snares.rnrn|cFFFFFFFFGenerates s5/10 Rage.|r
 Define(carnage_talent 13) #22383
@@ -177,9 +201,12 @@ Define(siegebreaker_talent 21) #16037
 # Break the enemy's defenses, dealing s1 Physical damage, and increasing your damage done to the target by 280773s1 for 10 seconds.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
 Define(skullsplitter_talent 3) #22371
 # Bash an enemy's skull, dealing s1 Physical damage.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
+Define(storm_bolt_talent_fury 6) #23093
+# Hurls your weapon at an enemy, causing s1 Physical damage and stunning for 4 seconds.
 Define(warbreaker_talent 14) #22391
 # Smash the ground and shatter the armor of all enemies within A1 yds, dealing s1 Physical damage and increasing damage you deal to them by 208086s1 for 10 seconds.
 Define(kazzalax_fujiedas_fury_item 137053)
+Define(seismic_wave_trait 277639)
 Define(test_of_might_trait 275529)
     ]]
     code = code .. [[
@@ -203,7 +230,7 @@ Define(berserker_rage 18499)
 Define(berserker_rage_buff 18499)
 	SpellInfo(berserker_rage_buff duration=6)
 Define(bladestorm_arms 227847)
-	SpellInfo(bladestorm_arms cd=90 channel=6 haste=melee replace=ravager)
+	SpellInfo(bladestorm_arms cd=90 channel=6 haste=melee replaced_by=ravager)
 Define(bladestorm_fury 46924)
 	SpellInfo(bladestorm_fury cd=60 channel=4 haste=melee)
 
@@ -219,7 +246,7 @@ Define(charge_debuff 105771)
 	SpellRequire(cleave rage_percent 0=buff,deadly_calm_buff talent=deadly_calm_talent specialization=arms)
 
 	
-	SpellInfo(colossus_smash replace=warbreaker talent=warbreaker_talent)
+	SpellInfo(colossus_smash replaced_by=warbreaker talent=warbreaker_talent)
 	SpellAddTargetDebuff(colossus_smash colossus_smash_debuff=1)
 	SpellAddBuff(colossus_smash in_for_the_kill_buff=1 talent=in_for_the_kill_talent)
 Define(colossus_smash_debuff 208086)
@@ -314,7 +341,7 @@ Define(intercept 198304)
 	SpellInfo(intercept cd=15 rage=-20 charges=2)
 	SpellAddTargetDebuff(intercept charge_debuff=1)
 	SpellAddTargetBuff(intercept safeguard_buff=1)
-Define(intimidating_shout 5246)
+
 Define(into_the_fray_buff 202602)
 Define(last_stand 12975)
 	SpellInfo(last_stand cd=180)
@@ -403,8 +430,8 @@ Define(shield_wall 871)
 	SpellAddBuff(shield_wall shield_wall_buff=1)
 Define(shield_wall_buff 871)
 	SpellInfo(shield_wall duration=8)
-Define(shockwave 46968)
-	SpellInfo(shockwave cd=40)
+
+	
 
 	SpellInfo(siegebreaker cd=30 rage=-10)
 	SpellAddTargetDebuff(siegebreaker siegebreaker_debuff=1)
@@ -419,7 +446,7 @@ Define(spell_reflection 23920)
 	SpellInfo(spell_reflection cd=25)
 	SpellAddBuff(spell_reflection spell_reflection_buff=1)
 Define(spell_reflection_buff 23920)
-Define(storm_bolt 107570)
+
 	SpellInfo(storm_bolt cd=30)
 Define(sudden_death_arms_buff 52437)
 	SpellInfo(sudden_death_arms_buff duration=10)
