@@ -326,9 +326,6 @@ Define(chains_of_ice_debuff 45524)
 	SpellInfo(clawing_shadows runes=1 runicpower=-10)
 	SpellAddTargetDebuff(clawing_shadows festering_wound_debuff=-1)
 
-	SpellInfo(cold_heart_buff max_stacks=20)
-
-	
 Define(control_undead 111673)
 	SpellInfo(control_undead runes=1 runicpower=-10)
 Define(crimson_scourge_buff 81141)
@@ -546,9 +543,6 @@ Define(unholy_strength_buff 53365)
 	SpellInfo(unholy_strength_buff duration=15)
 
 ## Items
-
-Define(cold_heart_buff 235592)
-	SpellInfo(cold_heart_buff max_stacks=20)
 Define(consorts_cold_core 144293)
 Define(koltiras_newfound_will 132366)
 Define(lanathels_lament_item 133974)
