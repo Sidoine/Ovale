@@ -351,6 +351,7 @@ Define(dark_transformation_buff 63560)
 	SpellRequire(death_and_decay runes 0=buff,crimson_scourge_buff)
 	SpellRequire(death_and_decay cd_percent 0=buff,crimson_scourge_buff)
 	SpellAddTargetDebuff(death_and_decay death_and_decay_debuff=1)
+    SpellAddBuff(death_and_decay death_and_decay_buff=1)
 Define(death_and_decay_buff 188290)
 Define(death_and_decay_debuff 43265)
 
