@@ -503,7 +503,7 @@ export interface ValuedNamedParameters extends ConditionNamedParameters {
     offgcd?: number;
     casttime?: number;
     pool_resource?: number;
-    size?: string;
+    size?: "small";
     unlimited?: number;
     wait? :number;
     max?: number;
