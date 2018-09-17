@@ -326,6 +326,9 @@ Define(chains_of_ice_debuff 45524)
 	SpellInfo(clawing_shadows runes=1 runicpower=-10)
 	SpellAddTargetDebuff(clawing_shadows festering_wound_debuff=-1)
 
+	SpellInfo(cold_heart_buff max_stacks=20)
+
+	
 Define(control_undead 111673)
 	SpellInfo(control_undead runes=1 runicpower=-10)
 Define(crimson_scourge_buff 81141)
@@ -351,7 +354,7 @@ Define(dark_transformation_buff 63560)
 	SpellRequire(death_and_decay runes 0=buff,crimson_scourge_buff)
 	SpellRequire(death_and_decay cd_percent 0=buff,crimson_scourge_buff)
 	SpellAddTargetDebuff(death_and_decay death_and_decay_debuff=1)
-    SpellAddBuff(death_and_decay death_and_decay_buff=1)
+	SpellAddBuff(death_and_decay death_and_decay_buff=1)
 Define(death_and_decay_buff 188290)
 Define(death_and_decay_debuff 43265)
 

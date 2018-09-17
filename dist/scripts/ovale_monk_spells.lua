@@ -414,7 +414,6 @@ SpellInfo(spinning_crane_kick chi=2 haste=melee specialization=windwalker)
 SpellInfo(spinning_crane_kick chi=0 haste=spell specialization=mistweaver)
 SpellRequire(spinning_crane_kick chi_percent 0=buff,serenity)
 
-
     SpellRequire(storm_earth_and_fire unusable 1=buff,storm_earth_and_fire)
 	SpellInfo(storm_earth_and_fire replaced_by=serenity talent=serenity_talent)
 	

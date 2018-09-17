@@ -1,4 +1,4 @@
-local LibBabbleCreatureType = LibStub:GetLibrary("LibBabble-creatureType-3.0", true)
+local LibBabbleCreatureType = LibStub:GetLibrary("LibBabble-CreatureType-3.0", true)
 local LibRangeCheck = LibStub:GetLibrary("LibRangeCheck-2.0", true)
 local __BestAction = LibStub:GetLibrary("ovale/BestAction")
 local OvaleBestAction = __BestAction.OvaleBestAction
