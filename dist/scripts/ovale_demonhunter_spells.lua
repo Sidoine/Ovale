@@ -253,6 +253,8 @@ Define(fiery_brand_debuff 207771)
 Define(frailty_debuff 247456)
 	SpellInfo(frailty_debuff duration=20)
 
+    SpellAddBuff(fracture soul_fragments=2)
+    
 	SpellInfo(immolation_aura cd=15 cd_haste=melee)
 	SpellAddBuff(immolation_aura immolation_aura_buff=1)
 Define(immolation_aura_buff 178740)
@@ -295,7 +297,8 @@ Define(pick_up_fragment 210788)
 Define(razor_spikes_debuff 210003)
 	SpellInfo(razor_spikes_debuff duration=6)
 
-
+    SpellAddBuff(shear soul_fragments=1)
+    
 	SpellInfo(sigil_of_chains cd=90)
 
 	SpellInfo(sigil_of_flame cd=30)
@@ -325,12 +328,11 @@ Define(soul_barrier_buff 263648)
 	SpellAddBuff(soul_cleave soul_fragments=-2)
 	SpellAddBuff(soul_cleave feast_of_souls_buff=1 talent=feast_of_souls_talent)
 Define(soul_fragments 203981)
-	SpellInfo(soul_fragments duration=20)		
 Define(spectral_sight 188501)
 	SpellInfo(spectral_sight cd=30)
 
 	SpellRequire(spirit_bomb unusable 1=buff,!soul_fragments)
-	SpellAddBuff(spirit_bomb soul_fragments=-5)
+	SpellAddBuff(spirit_bomb soul_fragments=0)
 	SpellAddTargetDebuff(spirit_bomb frailty_debuff=1)
 Define(throw_glaive_veng 204157)
 	SpellInfo(throw_glaive_veng cd=3 cd_haste=melee)

@@ -18,7 +18,6 @@
    <Script file="DamageTaken.lua"/>
    <Script file="Artifact.lua"/>
    <Script file="State.lua"/>
-   <Script file="DemonHunterSoulFragments.lua"/>
    <Script file="BaseState.lua"/>
    <Script file="Stagger.lua"/>
    <Script file="BossMod.lua"/>
@@ -74,6 +73,7 @@
    <Script file="Aura.lua"/>
    <Script file="Warlock.lua"/>
    <Script file="Totem.lua"/>
+   <Script file="DemonHunterSoulFragments.lua"/>
    <Script file="DemonHunterDemonic.lua"/>
    <Script file="Future.lua"/>
    <Script file="Score.lua"/>

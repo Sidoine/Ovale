@@ -1,117 +1,72 @@
 import { Ovale } from "./Ovale";
 import { OvaleDebug } from "./Debug";
 import { OvaleState, StateModule } from "./State";
+import { OvaleAura } from "./Aura";
 import aceEvent from "@wowts/ace_event-3.0";
-import { insert } from "@wowts/table";
-import { GetTime, GetSpellCount, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
-import { LuaArray, type, pairs } from "@wowts/lua";
-
+import { GetTime, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
+import { LuaArray } from "@wowts/lua";
 
 let OvaleDemonHunterSoulFragmentsBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleDemonHunterSoulFragments", aceEvent));
 export let OvaleDemonHunterSoulFragments: OvaleDemonHunterSoulFragmentsClass;
 
-let SOUL_FRAGMENTS_BUFF_ID = 228477;
-let SOUL_FRAGMENTS_SPELL_HEAL_ID = 203794;
-let SOUL_FRAGMENTS_SPELL_CAST_SUCCESS_ID = 204255;
-let SOUL_FRAGMENT_FINISHERS:LuaArray<boolean> = {
-    [228477]: true,
-    [247454]: true,
-    [227225]: true
-}
-
-interface SoulFragments {
-    timestamp: number;
-    fragments: number;
+let SOUL_FRAGMENTS_BUFF_ID = 203981;
+let SOUL_FRAGMENT_BUILDERS:LuaArray<number> = {
+    [225919]: 2, 
+    [203782]: 1
 }
 
 class OvaleDemonHunterSoulFragmentsClass extends OvaleDemonHunterSoulFragmentsBase {
-    last_checked: number;
-    soul_fragments: LuaArray<SoulFragments>;
-    last_soul_fragment_count:SoulFragments;
+    estimatedCount: number;
+    atTime: number;
+    estimated: boolean;
 
     constructor() {
         super();
-        this.SetCurrentSoulFragments(0);
     }
 
     OnInitialize() {
         if (Ovale.playerClass == "DEMONHUNTER") {
-            this.RegisterEvent("PLAYER_REGEN_ENABLED");
             this.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
-            this.RegisterEvent("PLAYER_REGEN_DISABLED");
         }
     }
     OnDisable() {
         if (Ovale.playerClass == "DEMONHUNTER") {
             this.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
-            this.UnregisterEvent("PLAYER_REGEN_ENABLED");
-            this.UnregisterEvent("PLAYER_REGEN_DISABLED");
         }
     }
-    PLAYER_REGEN_ENABLED() {
-        this.SetCurrentSoulFragments();
-    }
-    PLAYER_REGEN_DISABLED() {
-        this.soul_fragments = {
-        }
-        this.last_checked = undefined;
-        this.SetCurrentSoulFragments();
-    }
-
     COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
         let [, subtype, , sourceGUID, , , , , , , , spellID] = CombatLogGetCurrentEventInfo();
         let me = Ovale.playerGUID;
         if (sourceGUID == me) {
-            //let current_sould_fragment_count = this.last_soul_fragment_count;
-            if (subtype == "SPELL_HEAL" && spellID == SOUL_FRAGMENTS_SPELL_HEAL_ID) {
-                this.SetCurrentSoulFragments(this.last_soul_fragment_count.fragments - 1);
-            }
-            if (subtype == "SPELL_CAST_SUCCESS" && spellID == SOUL_FRAGMENTS_SPELL_CAST_SUCCESS_ID) {
-                this.SetCurrentSoulFragments(this.last_soul_fragment_count.fragments + 1);
-            }
-            if (subtype == "SPELL_CAST_SUCCESS" && SOUL_FRAGMENT_FINISHERS[spellID]) {
-                this.SetCurrentSoulFragments(0);
-            }
-            let now = GetTime();
-            if (this.last_checked == undefined || now - this.last_checked >= 1.5) {
-                this.SetCurrentSoulFragments();
+            if (subtype == "SPELL_CAST_SUCCESS" && SOUL_FRAGMENT_BUILDERS[spellID]) {
+                this.AddPredictedSoulFragments(GetTime(), SOUL_FRAGMENT_BUILDERS[spellID]);
             }
         }
     }
-    SetCurrentSoulFragments(count?: number) {
-        let now = GetTime();
-        this.last_checked = now;
-        this.soul_fragments = this.soul_fragments || {
-        }
-        if (type(count) != "number") {
-            count = GetSpellCount(SOUL_FRAGMENTS_BUFF_ID) || 0;
-        }
-        if (count < 0) {
-            count = 0;
-        }
-        if (this.last_soul_fragment_count == undefined || this.last_soul_fragment_count.fragments != count) {
-            let entry:SoulFragments = {
-                timestamp: now,
-                fragments: count
-            }
-            this.last_soul_fragment_count = entry;
-            insert(this.soul_fragments, entry);
-        }
+    AddPredictedSoulFragments(atTime: number, added: number) {
+        let currentCount = this.GetSoulFragmentsBuffStacks(atTime) || 0;
+        this.estimatedCount = currentCount + added;
+        this.atTime = atTime;
+        this.estimated = true;
     }
-    DebugSoulFragments() {
-    }
-    
     SoulFragments(atTime: number) {
-        let currentTime:number = undefined;
-        let count: number = undefined;
-        for (const [, v] of pairs(this.soul_fragments)) {
-            if (v.timestamp >= atTime && (currentTime == undefined || v.timestamp < currentTime)) {
-                currentTime = v.timestamp;
-                count = v.fragments;
+        let stacks = this.GetSoulFragmentsBuffStacks(atTime)
+        if (this.estimated) {
+            if (atTime - (this.atTime ||0) < 1.2) {
+                if ((this.estimatedCount || 0) > stacks) {
+                    stacks = this.estimatedCount;
+                }
+            }
+            else {
+                this.estimated = false;
             }
         }
-        if (count) return count;
-        return (this.last_soul_fragment_count != undefined && this.last_soul_fragment_count.fragments) || 0;
+        return stacks;
+    }
+    GetSoulFragmentsBuffStacks(atTime: number) {
+        let aura = OvaleAura.GetAura("player", SOUL_FRAGMENTS_BUFF_ID, atTime, "HELPFUL", true);
+        let stacks = OvaleAura.IsActiveAura(aura, atTime) && aura.stacks || 0;
+        return stacks;
     }
 }
 
