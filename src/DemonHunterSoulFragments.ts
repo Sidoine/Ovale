@@ -10,9 +10,14 @@ let OvaleDemonHunterSoulFragmentsBase = OvaleDebug.RegisterDebugging(Ovale.NewMo
 export let OvaleDemonHunterSoulFragments: OvaleDemonHunterSoulFragmentsClass;
 
 let SOUL_FRAGMENTS_BUFF_ID = 203981;
-let SOUL_FRAGMENT_BUILDERS:LuaArray<number> = {
-    [225919]: 2, 
-    [203782]: 1
+let SOUL_FRAGMENT_SPELLS:LuaArray<number> = {
+    [225919]: 2,    // Fracture
+    [203782]: 1,    // Shear
+    [228477]: -2,   // Soul Cleave
+}
+let SOUL_FRAGMENT_FINISHERS:LuaArray<boolean> = {
+    [247454]: true,   // Spirit Bomb
+    [263648]: true,   // Soul Barrier
 }
 
 class OvaleDemonHunterSoulFragmentsClass extends OvaleDemonHunterSoulFragmentsBase {
@@ -38,24 +43,28 @@ class OvaleDemonHunterSoulFragmentsClass extends OvaleDemonHunterSoulFragmentsBa
         let [, subtype, , sourceGUID, , , , , , , , spellID] = CombatLogGetCurrentEventInfo();
         let me = Ovale.playerGUID;
         if (sourceGUID == me) {
-            if (subtype == "SPELL_CAST_SUCCESS" && SOUL_FRAGMENT_BUILDERS[spellID]) {
-                this.AddPredictedSoulFragments(GetTime(), SOUL_FRAGMENT_BUILDERS[spellID]);
+            if (subtype == "SPELL_CAST_SUCCESS" && SOUL_FRAGMENT_SPELLS[spellID]) {
+                this.AddPredictedSoulFragments(GetTime(), SOUL_FRAGMENT_SPELLS[spellID]);
+            }
+            if (subtype == "SPELL_CAST_SUCCESS" && SOUL_FRAGMENT_FINISHERS[spellID]) {
+                this.SetPredictedSoulFragment(GetTime(), 0);
             }
         }
     }
     AddPredictedSoulFragments(atTime: number, added: number) {
         let currentCount = this.GetSoulFragmentsBuffStacks(atTime) || 0;
-        this.estimatedCount = currentCount + added;
-        this.atTime = atTime;
-        this.estimated = true;
+        this.SetPredictedSoulFragment(atTime, currentCount + added)
+    }
+    SetPredictedSoulFragment(atTime: number, count: number) {
+        this.estimatedCount = (count < 0 && 0) || (count > 5 && 5) || count;
+        this.atTime = atTime
+        this.estimated = true
     }
     SoulFragments(atTime: number) {
         let stacks = this.GetSoulFragmentsBuffStacks(atTime)
         if (this.estimated) {
-            if (atTime - (this.atTime ||0) < 1.2) {
-                if ((this.estimatedCount || 0) > stacks) {
-                    stacks = this.estimatedCount;
-                }
+            if (atTime - (this.atTime || 0) < 1.2) {
+                stacks = this.estimatedCount;
             }
             else {
                 this.estimated = false;

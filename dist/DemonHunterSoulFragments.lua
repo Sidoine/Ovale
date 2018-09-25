@@ -14,9 +14,14 @@ local GetTime = GetTime
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local OvaleDemonHunterSoulFragmentsBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleDemonHunterSoulFragments", aceEvent))
 local SOUL_FRAGMENTS_BUFF_ID = 203981
-local SOUL_FRAGMENT_BUILDERS = {
+local SOUL_FRAGMENT_SPELLS = {
     [225919] = 2,
-    [203782] = 1
+    [203782] = 1,
+    [228477] = -2
+}
+local SOUL_FRAGMENT_FINISHERS = {
+    [247454] = true,
+    [263648] = true
 }
 local OvaleDemonHunterSoulFragmentsClass = __class(OvaleDemonHunterSoulFragmentsBase, {
     constructor = function(self)
@@ -36,14 +41,20 @@ local OvaleDemonHunterSoulFragmentsClass = __class(OvaleDemonHunterSoulFragments
         local _, subtype, _, sourceGUID, _, _, _, _, _, _, _, spellID = CombatLogGetCurrentEventInfo()
         local me = Ovale.playerGUID
         if sourceGUID == me then
-            if subtype == "SPELL_CAST_SUCCESS" and SOUL_FRAGMENT_BUILDERS[spellID] then
-                self:AddPredictedSoulFragments(GetTime(), SOUL_FRAGMENT_BUILDERS[spellID])
+            if subtype == "SPELL_CAST_SUCCESS" and SOUL_FRAGMENT_SPELLS[spellID] then
+                self:AddPredictedSoulFragments(GetTime(), SOUL_FRAGMENT_SPELLS[spellID])
+            end
+            if subtype == "SPELL_CAST_SUCCESS" and SOUL_FRAGMENT_FINISHERS[spellID] then
+                self:SetPredictedSoulFragment(GetTime(), 0)
             end
         end
     end,
     AddPredictedSoulFragments = function(self, atTime, added)
         local currentCount = self:GetSoulFragmentsBuffStacks(atTime) or 0
-        self.estimatedCount = currentCount + added
+        self:SetPredictedSoulFragment(atTime, currentCount + added)
+    end,
+    SetPredictedSoulFragment = function(self, atTime, count)
+        self.estimatedCount = (count < 0 and 0) or (count > 5 and 5) or count
         self.atTime = atTime
         self.estimated = true
     end,
@@ -51,9 +62,7 @@ local OvaleDemonHunterSoulFragmentsClass = __class(OvaleDemonHunterSoulFragments
         local stacks = self:GetSoulFragmentsBuffStacks(atTime)
         if self.estimated then
             if atTime - (self.atTime or 0) < 1.2 then
-                if (self.estimatedCount or 0) > stacks then
-                    stacks = self.estimatedCount
-                end
+                stacks = self.estimatedCount
             else
                 self.estimated = false
             end
