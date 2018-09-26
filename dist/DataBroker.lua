@@ -131,6 +131,7 @@ local OvaleDataBrokerClass = __class(OvaleDataBrokerBase, {
         if self.broker then
             self:RegisterMessage("Ovale_ProfileChanged", "UpdateIcon")
             self:RegisterMessage("Ovale_ScriptChanged")
+            self:RegisterMessage("Ovale_SpecializationChanged", "Ovale_ScriptChanged")
             self:RegisterEvent("PLAYER_ENTERING_WORLD", "Ovale_ScriptChanged")
             self:Ovale_ScriptChanged()
             self:UpdateIcon()
@@ -139,6 +140,7 @@ local OvaleDataBrokerClass = __class(OvaleDataBrokerBase, {
     OnDisable = function(self)
         if self.broker then
             self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+            self:UnregisterMessage("Ovale_SpecializationChanged")
             self:UnregisterMessage("Ovale_ProfileChanged")
             self:UnregisterMessage("Ovale_ScriptChanged")
         end

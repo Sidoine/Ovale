@@ -126,6 +126,7 @@ class OvaleDataBrokerClass extends OvaleDataBrokerBase {
         if (this.broker) {
             this.RegisterMessage("Ovale_ProfileChanged", "UpdateIcon");
             this.RegisterMessage("Ovale_ScriptChanged");
+            this.RegisterMessage("Ovale_SpecializationChanged", "Ovale_ScriptChanged");
 			this.RegisterEvent("PLAYER_ENTERING_WORLD", "Ovale_ScriptChanged");
             this.Ovale_ScriptChanged();
             this.UpdateIcon();
@@ -135,6 +136,7 @@ class OvaleDataBrokerClass extends OvaleDataBrokerBase {
     OnDisable() {
         if (this.broker) {
 			this.UnregisterEvent("PLAYER_ENTERING_WORLD");
+            this.UnregisterMessage("Ovale_SpecializationChanged");
             this.UnregisterMessage("Ovale_ProfileChanged");
             this.UnregisterMessage("Ovale_ScriptChanged");
         }
