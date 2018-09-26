@@ -2153,7 +2153,7 @@ local function TickTimeRemaining(positionalParams, namedParams, atTime)
                 return Compare(remainingTime, comparator, limit)
             end
         end
-        return nil
+        return Compare(0, comparator, limit)
     end
     OvaleCondition:RegisterCondition("ticksremaining", false, TicksRemaining)
     OvaleCondition:RegisterCondition("ticksremain", false, TicksRemaining)

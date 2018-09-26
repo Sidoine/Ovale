@@ -4388,7 +4388,7 @@ l    */
                 return Compare(remainingTime, comparator, limit);
             }
         }
-        return undefined;
+        return Compare(0, comparator, limit);
     }
 
     OvaleCondition.RegisterCondition("ticksremaining", false, TicksRemaining);
