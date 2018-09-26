@@ -343,7 +343,7 @@ Define(intercept 198304)
 	SpellInfo(intercept cd=15 rage=-20 charges=2)
 	SpellAddTargetDebuff(intercept charge_debuff=1)
 	SpellAddTargetBuff(intercept safeguard_buff=1)
-
+	SpellRequire(intercept unusable 1=lossofcontrol,root)
 Define(into_the_fray_buff 202602)
 Define(last_stand 12975)
 	SpellInfo(last_stand cd=180)
