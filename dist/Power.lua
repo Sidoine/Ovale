@@ -102,6 +102,18 @@ local PowerModule = __class(nil, {
         if si and si[powerType] then
             local cost, ratio = OvaleData:GetSpellInfoPropertyNumber(spellId, atTime, powerType, targetGUID, true)
             if ratio and ratio ~= 0 then
+                local addRequirements = si and si.require["add_" .. powerType .. "_from_aura"]
+                if addRequirements then
+                    for v, requirement in pairs(addRequirements) do
+                        local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                        if verified then
+                            local aura = OvaleAura:GetAura("player", requirement[2], atTime, nil, true)
+                            if OvaleAura:IsActiveAura(aura, atTime) then
+                                cost = cost + (tonumber(v) or 0) * aura.stacks
+                            end
+                        end
+                    end
+                end
                 local maxCostParam = "max_" .. powerType
                 local maxCost = si[maxCostParam]
                 if maxCost then
@@ -110,19 +122,6 @@ local PowerModule = __class(nil, {
                         cost = maxCost
                     elseif power > cost then
                         cost = power
-                    end
-                else
-                    local addRequirements = si and si.require["add_" .. powerType .. "_from_aura"]
-                    if addRequirements then
-                        for v, requirement in pairs(addRequirements) do
-                            local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
-                            if verified then
-                                local aura = OvaleAura:GetAura("player", requirement[2], atTime, nil, true)
-                                if aura[v] then
-                                    cost = cost + aura[v]
-                                end
-                            end
-                        end
                     end
                 end
                 spellCost = (cost > 0 and floor(cost * ratio)) or ceil(cost * ratio)
