@@ -106,10 +106,9 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
         this.script[name] = undefined;
     }
     SetScript(name: string) {
-        let specName = OvalePaperDoll.GetSpecialization();
-        const oldSource = Ovale.db.profile.source[specName];
+        const oldSource = Ovale.db.profile.source[`${Ovale.playerClass}_${OvalePaperDoll.GetSpecialization()}`];
         if (oldSource != name) {
-            Ovale.db.profile.source[specName] = name;
+            Ovale.db.profile.source[`${Ovale.playerClass}_${OvalePaperDoll.GetSpecialization()}`] = name;
             this.SendMessage("Ovale_ScriptChanged");
         }
     }
@@ -180,8 +179,7 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
                         return OvaleScripts.GetDescriptions(scriptType);
                     },
                     get: (info: any) => {
-                        let specName = OvalePaperDoll.GetSpecialization();
-                        return Ovale.db.profile.source[specName];
+                        return Ovale.db.profile.source[`${Ovale.playerClass}_${OvalePaperDoll.GetSpecialization()}`];
                     },
                     set: (info: any, v: string) => {
                         this.SetScript(v);
@@ -194,12 +192,10 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
                     name: L["Script"],
                     width: "full",
                     disabled: () => {
-                        let specName = OvalePaperDoll.GetSpecialization();
-                        return Ovale.db.profile.source[specName] != CUSTOM_NAME;
+                        return Ovale.db.profile.source[`${Ovale.playerClass}_${OvalePaperDoll.GetSpecialization()}`] != CUSTOM_NAME;
                     },
                     get: (info: any)  => {
-                        let specName = OvalePaperDoll.GetSpecialization();
-                        let code = OvaleScripts.GetScript(Ovale.db.profile.source[specName]);
+                        let code = OvaleScripts.GetScript(Ovale.db.profile.source[`${Ovale.playerClass}_${OvalePaperDoll.GetSpecialization()}`]);
                         code = code || "";
                         return gsub(code, "\t", "    ");
                     },
@@ -214,17 +210,15 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
                     type: "execute",
                     name: L["Copier sur Script personnalisé"],
                     disabled: () => {
-                        let specName = OvalePaperDoll.GetSpecialization();
-                        return Ovale.db.profile.source[specName] == CUSTOM_NAME;
+                        return Ovale.db.profile.source[`${Ovale.playerClass}_${OvalePaperDoll.GetSpecialization()}`] == CUSTOM_NAME;
                     },
                     confirm: () => {
                         return L["Ecraser le Script personnalisé préexistant?"];
                     },
                     func: () => {
-                        let specName = OvalePaperDoll.GetSpecialization();
-                        let code = OvaleScripts.GetScript(Ovale.db.profile.source[specName]);
+                        let code = OvaleScripts.GetScript(Ovale.db.profile.source[`${Ovale.playerClass}_${OvalePaperDoll.GetSpecialization()}`]);
                         OvaleScripts.RegisterScript(Ovale.playerClass, undefined, CUSTOM_NAME, CUSTOM_DESCRIPTION, code, "script");
-                        Ovale.db.profile.source[specName] = CUSTOM_NAME;
+                        Ovale.db.profile.source[`${Ovale.playerClass}_${OvalePaperDoll.GetSpecialization()}`] = CUSTOM_NAME;
                         Ovale.db.profile.code = OvaleScripts.GetScript(CUSTOM_NAME);
                         this.SendMessage("Ovale_ScriptChanged");
                     }
@@ -254,7 +248,7 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
         }
         for(let i=1; i < countSpecializations; i += 1){
             let specName = OvalePaperDoll.GetSpecialization(i as SpecializationIndex)
-            Ovale.db.profile.source[specName] = Ovale.db.profile.source[specName] || this.GetDefaultScriptName(Ovale.playerClass, specName);
+            Ovale.db.profile.source[`${Ovale.playerClass}_${specName}`] = Ovale.db.profile.source[`${Ovale.playerClass}_${specName}`] || this.GetDefaultScriptName(Ovale.playerClass, specName);
         }
     }
 }

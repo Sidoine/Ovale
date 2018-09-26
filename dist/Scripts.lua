@@ -100,10 +100,9 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
         self.script[name] = nil
     end,
     SetScript = function(self, name)
-        local specName = OvalePaperDoll:GetSpecialization()
-        local oldSource = Ovale.db.profile.source[specName]
+        local oldSource = Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()]
         if oldSource ~= name then
-            Ovale.db.profile.source[specName] = name
+            Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()] = name
             self:SendMessage("Ovale_ScriptChanged")
         end
     end,
@@ -171,8 +170,7 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
                         return __exports.OvaleScripts:GetDescriptions(scriptType)
                     end,
                     get = function(info)
-                        local specName = OvalePaperDoll:GetSpecialization()
-                        return Ovale.db.profile.source[specName]
+                        return Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()]
                     end,
                     set = function(info, v)
                         self:SetScript(v)
@@ -185,12 +183,10 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
                     name = L["Script"],
                     width = "full",
                     disabled = function()
-                        local specName = OvalePaperDoll:GetSpecialization()
-                        return Ovale.db.profile.source[specName] ~= CUSTOM_NAME
+                        return Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()] ~= CUSTOM_NAME
                     end,
                     get = function(info)
-                        local specName = OvalePaperDoll:GetSpecialization()
-                        local code = __exports.OvaleScripts:GetScript(Ovale.db.profile.source[specName])
+                        local code = __exports.OvaleScripts:GetScript(Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()])
                         code = code or ""
                         return gsub(code, "	", "    ")
                     end,
@@ -205,17 +201,15 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
                     type = "execute",
                     name = L["Copier sur Script personnalisé"],
                     disabled = function()
-                        local specName = OvalePaperDoll:GetSpecialization()
-                        return Ovale.db.profile.source[specName] == CUSTOM_NAME
+                        return Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()] == CUSTOM_NAME
                     end,
                     confirm = function()
                         return L["Ecraser le Script personnalisé préexistant?"]
                     end,
                     func = function()
-                        local specName = OvalePaperDoll:GetSpecialization()
-                        local code = __exports.OvaleScripts:GetScript(Ovale.db.profile.source[specName])
+                        local code = __exports.OvaleScripts:GetScript(Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()])
                         __exports.OvaleScripts:RegisterScript(Ovale.playerClass, nil, CUSTOM_NAME, CUSTOM_DESCRIPTION, code, "script")
-                        Ovale.db.profile.source[specName] = CUSTOM_NAME
+                        Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()] = CUSTOM_NAME
                         Ovale.db.profile.code = __exports.OvaleScripts:GetScript(CUSTOM_NAME)
                         self:SendMessage("Ovale_ScriptChanged")
                     end
@@ -244,7 +238,7 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
         end
         for i = 1, countSpecializations, 1 do
             local specName = OvalePaperDoll:GetSpecialization(i)
-            Ovale.db.profile.source[specName] = Ovale.db.profile.source[specName] or self:GetDefaultScriptName(Ovale.playerClass, specName)
+            Ovale.db.profile.source[Ovale.playerClass .. "_" .. specName] = Ovale.db.profile.source[Ovale.playerClass .. "_" .. specName] or self:GetDefaultScriptName(Ovale.playerClass, specName)
         end
     end,
 })
