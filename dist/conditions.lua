@@ -105,6 +105,8 @@ local __Warlock = LibStub:GetLibrary("ovale/Warlock")
 local OvaleWarlock = __Warlock.OvaleWarlock
 local __Stagger = LibStub:GetLibrary("ovale/Stagger")
 local OvaleStagger = __Stagger.OvaleStagger
+local __LossOfControl = LibStub:GetLibrary("ovale/LossOfControl")
+local OvaleLossOfControl = __LossOfControl.OvaleLossOfControl
 local INFINITY = huge
 local function BossArmorDamageReduction(target)
     return 0.3
@@ -1143,8 +1145,7 @@ end
 do
 local function IsFeared(positionalParams, namedParams, atTime)
         local yesno = positionalParams[1]
-        local aura = OvaleAura:GetAura("player", "fear_debuff", atTime, "HARMFUL")
-        local boolean =  not HasFullControl() and OvaleAura:IsActiveAura(aura, atTime)
+        local boolean =  not HasFullControl() and OvaleLossOfControl.HasLossOfControl("FEAR", atTime)
         return TestBoolean(boolean, yesno)
     end
     OvaleCondition:RegisterCondition("isfeared", false, IsFeared)
@@ -1161,8 +1162,7 @@ end
 do
 local function IsIncapacitated(positionalParams, namedParams, atTime)
         local yesno = positionalParams[1]
-        local aura = OvaleAura:GetAura("player", "incapacitate_debuff", atTime, "HARMFUL")
-        local boolean =  not HasFullControl() and OvaleAura:IsActiveAura(aura, atTime)
+        local boolean =  not HasFullControl() and OvaleLossOfControl.HasLossOfControl("CONFUSE", atTime)
         return TestBoolean(boolean, yesno)
     end
     OvaleCondition:RegisterCondition("isincapacitated", false, IsIncapacitated)
@@ -1192,8 +1192,7 @@ end
 do
 local function IsRooted(positionalParams, namedParams, atTime)
         local yesno = positionalParams[1]
-        local aura = OvaleAura:GetAura("player", "root_debuff", atTime, "HARMFUL")
-        local boolean = OvaleAura:IsActiveAura(aura, atTime)
+        local boolean = OvaleLossOfControl.HasLossOfControl("ROOT", atTime)
         return TestBoolean(boolean, yesno)
     end
     OvaleCondition:RegisterCondition("isrooted", false, IsRooted)
@@ -1201,8 +1200,7 @@ end
 do
 local function IsStunned(positionalParams, namedParams, atTime)
         local yesno = positionalParams[1]
-        local aura = OvaleAura:GetAura("player", "stun_debuff", atTime, "HARMFUL")
-        local boolean =  not HasFullControl() and OvaleAura:IsActiveAura(aura, atTime)
+        local boolean =  not HasFullControl() and OvaleLossOfControl.HasLossOfControl("STUN_MECHANIC", atTime)
         return TestBoolean(boolean, yesno)
     end
     OvaleCondition:RegisterCondition("isstunned", false, IsStunned)

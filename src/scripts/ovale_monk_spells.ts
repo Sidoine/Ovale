@@ -235,6 +235,7 @@ SpellInfo(chi_burst chi=-1 max_chi=-2 specialization=windwalker)
 Define(chi_torpedo 115008)
 	SpellInfo(chi_torpedo charges=2 cd=20)
 	SpellAddBuff(chi_torpedo chi_torpedo_buff=1)
+	SpellRequire(chi_torpedo unusable 1=lossofcontrol,root)
 Define(chi_torpedo_buff 119085)
 	SpellInfo(chi_torpedo_buff duration=10)
 
@@ -289,6 +290,7 @@ SpellRequire(fists_of_fury chi_percent 0=buff,serenity)
 
 
 	SpellInfo(flying_serpent_kick cd=25)
+	SpellRequire(flying_serpent_kick unusable 1=lossofcontrol,root)
 
 SpellAddBuff(fortifying_brew fortifying_brew_buff=1)
 
@@ -391,6 +393,7 @@ Define(roll 109132)
 	SpellInfo(roll cd=20 charges=2)
 	SpellInfo(roll charges=3 talent=celerity_talent)
 	SpellInfo(roll replaced_by=chi_torpedo talent=chi_torpedo_talent)
+	SpellRequire(roll unusable 1=lossofcontrol,root)
 
 SpellInfo(rushing_jade_wind chi=0 duration=9 cd_haste=melee haste=melee talent=rushing_jade_wind_talent)
 SpellAddBuff(rushing_jade_wind rushing_jade_wind=1)

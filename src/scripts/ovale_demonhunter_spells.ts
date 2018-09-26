@@ -242,8 +242,10 @@ Define(feast_of_souls_buff 207693)
 
 	SpellInfo(fel_rush cd=10 charges=2)
 	SpellAddBuff(fel_rush momentum_buff=1 talent=momentum_talent specialization=havoc)
+	SpellRequire(fel_rush unusable 1=lossofcontrol,root)
 
 	SpellInfo(felblade cd=15 cd_haste=melee fury=-40 pain=-30)
+	SpellRequire(felblade unusable 1=lossofcontrol,root)
 
 	SpellInfo(fiery_brand cd=60 gcd=0)
 	SpellAddTargetDebuff(fiery_brand fiery_brand_debuff=1)
@@ -269,9 +271,11 @@ Define(immolation_aura_havoc_buff 258920)
 
 	SpellInfo(infernal_strike cd=20 charges=2 offgcd=1)
 	SpellInfo(infernal_strike add_cd=8 talent=abyssal_strike_talent)
+	SpellRequire(infernal_strike unusable 1=lossofcontrol,root)
 Define(metamorphosis_havoc 191427)
 	SpellInfo(metamorphosis_havoc cd=240)
 	SpellAddBuff(metamorphosis_havoc metamorphosis_havoc_buff=1)
+	SpellRequire(metamorphosis_havoc unusable 1=lossofcontrol,root)
 Define(metamorphosis_havoc_buff 162264)
 	SpellInfo(metamorphosis_havoc_buff duration=30)
 Define(metamorphosis_veng 187827)
@@ -348,7 +352,8 @@ Define(throw_glaive_havoc_debuff 213405)
 	SpellAddTargetDebuff(vengeful_retreat vengeful_retreat_debuff=1)
 Define(vengeful_retreat_debuff 198813)
 	SpellInfo(vengeful_retreat_debuff duration=3)
-
+	SpellRequire(vengeful_retreat unusable 1=lossofcontrol,root)
+	
 #items
 Define(oblivions_embrace_item 151799)
 	SpellInfo(demon_spikes charges=3 if_equipped=oblivions_embrace)
