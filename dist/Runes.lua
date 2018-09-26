@@ -31,7 +31,6 @@ end
 local RuneData = __class(nil, {
     constructor = function(self)
         self.rune = {}
-        self.runicpower = nil
     end
 })
 local usedRune = {}
@@ -186,10 +185,9 @@ local OvaleRunesClass = __class(OvaleRunesBase, {
             local duration = 10 / OvalePaperDoll:GetSpellCastSpeedPercentMultiplier(snapshot)
             consumedRune.startCooldown = start
             consumedRune.endCooldown = start + duration
-            local runicpower = self.next.runicpower
-            runicpower = runicpower + 10
+            local runicpower = (OvalePower.next.power.runicpower or 0) + 10
             local maxi = OvalePower.current.maxPower.runicpower
-            self.next.runicpower = (runicpower < maxi) and runicpower or maxi
+            OvalePower.next.power.runicpower = (runicpower < maxi) and runicpower or maxi
         end
         self:StopProfiling("OvaleRunes_state_ConsumeRune")
     end,

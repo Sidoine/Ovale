@@ -28,6 +28,7 @@ local floor = math.floor
 local pairs = pairs
 local tostring = tostring
 local tonumber = tonumber
+local kpairs = pairs
 local lower = string.lower
 local concat = table.concat
 local insert = table.insert
@@ -419,7 +420,7 @@ local OvalePowerClass = __class(OvalePowerBase, {
                 self.current.power[powerType] = power
             end
         else
-            for powerType, powerInfo in pairs(self.POWER_INFO) do
+            for powerType, powerInfo in kpairs(self.POWER_INFO) do
                 local power = UnitPower("player", powerInfo.id, powerInfo.segments)
                 self:DebugTimestamp("%s: %d -> %d (%s).", event, self.current.power[powerType], power, powerType)
                 if self.current.power[powerType] ~= power then
@@ -493,14 +494,14 @@ local OvalePowerClass = __class(OvalePowerBase, {
         return self:GetState(atTime):TimeToPower(spellId, atTime, targetGUID, powerType, extraPower)
     end,
     InitializeState = function(self)
-        for powerType in pairs(__exports.OvalePower.POWER_INFO) do
+        for powerType in kpairs(__exports.OvalePower.POWER_INFO) do
             self.next.power[powerType] = 0
             self.next.inactiveRegen[powerType], self.next.activeRegen[powerType] = 0, 0
         end
     end,
     ResetState = function(self)
         __exports.OvalePower:StartProfiling("OvalePower_ResetState")
-        for powerType in pairs(__exports.OvalePower.POWER_INFO) do
+        for powerType in kpairs(__exports.OvalePower.POWER_INFO) do
             self.next.power[powerType] = self.current.power[powerType] or 0
             self.next.maxPower[powerType] = self.current.maxPower[powerType] or 0
             self.next.activeRegen[powerType] = self.current.activeRegen[powerType] or 0
@@ -509,7 +510,7 @@ local OvalePowerClass = __class(OvalePowerBase, {
         __exports.OvalePower:StopProfiling("OvalePower_ResetState")
     end,
     CleanState = function(self)
-        for powerType in pairs(__exports.OvalePower.POWER_INFO) do
+        for powerType in kpairs(__exports.OvalePower.POWER_INFO) do
             self.next.power[powerType] = nil
         end
     end,
@@ -537,7 +538,7 @@ local OvalePowerClass = __class(OvalePowerBase, {
             end
         end
         if si then
-            for powerType, powerInfo in pairs(__exports.OvalePower.POWER_INFO) do
+            for powerType, powerInfo in kpairs(__exports.OvalePower.POWER_INFO) do
                 local cost, refund = self.next:PowerCost(spellId, powerInfo.type, atTime, targetGUID)
                 local power = self.next.power[powerType] or 0
                 if cost then
