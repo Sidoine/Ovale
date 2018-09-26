@@ -102,29 +102,6 @@ local OvaleDataClass = __class(OvaleDataBase, {
         self.itemList = {}
         self.spellInfo = {}
         self.buffSpellList = {
-            fear_debuff = {
-                [5246] = true,
-                [5484] = true,
-                [5782] = true,
-                [8122] = true
-            },
-            incapacitate_debuff = {
-                [6770] = true,
-                [12540] = true,
-                [20066] = true,
-                [137460] = true
-            },
-            root_debuff = {
-                [122] = true,
-                [339] = true
-            },
-            stun_debuff = {
-                [408] = true,
-                [853] = true,
-                [1833] = true,
-                [5211] = true,
-                [46968] = true
-            },
             attack_power_multiplier_buff = {
                 [6673] = true,
                 [19506] = true,

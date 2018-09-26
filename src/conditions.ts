@@ -36,6 +36,7 @@ import { OvaleSpells } from "./Spells";
 import { OvaleAzerite } from "./AzeriteArmor";
 import { OvaleWarlock } from "./Warlock";
 import { OvaleStagger } from "./Stagger";
+import { OvaleLossOfControl } from "./LossOfControl";
 let INFINITY = huge;
 
 // Return the target's damage reduction from armor, which seems to be 30% with most bosses
@@ -2025,8 +2026,7 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
      */
     function IsFeared(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
         let yesno = positionalParams[1];
-        let aura = OvaleAura.GetAura("player", "fear_debuff", atTime, "HARMFUL");
-        let boolean = !HasFullControl() && OvaleAura.IsActiveAura(aura, atTime);
+        let boolean = !HasFullControl() && OvaleLossOfControl.HasLossOfControl("FEAR", atTime);
         return TestBoolean(boolean, yesno);
     }
     OvaleCondition.RegisterCondition("isfeared", false, IsFeared);
@@ -2066,8 +2066,7 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
      */
     function IsIncapacitated(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
         let yesno = positionalParams[1];
-        let aura = OvaleAura.GetAura("player", "incapacitate_debuff", atTime, "HARMFUL");
-        let boolean = !HasFullControl() && OvaleAura.IsActiveAura(aura, atTime);
+        let boolean = !HasFullControl() && OvaleLossOfControl.HasLossOfControl("CONFUSE", atTime);
         return TestBoolean(boolean, yesno);
     }
     OvaleCondition.RegisterCondition("isincapacitated", false, IsIncapacitated);
@@ -2133,8 +2132,7 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
      */
     function IsRooted(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
         let yesno = positionalParams[1];
-        let aura = OvaleAura.GetAura("player", "root_debuff", atTime, "HARMFUL");
-        let boolean = OvaleAura.IsActiveAura(aura, atTime);
+        let boolean = OvaleLossOfControl.HasLossOfControl("ROOT", atTime);
         return TestBoolean(boolean, yesno);
     }
     OvaleCondition.RegisterCondition("isrooted", false, IsRooted);
@@ -2152,8 +2150,7 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
      */
     function IsStunned(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
         let yesno = positionalParams[1];
-        let aura = OvaleAura.GetAura("player", "stun_debuff", atTime, "HARMFUL");
-        let boolean = !HasFullControl() && OvaleAura.IsActiveAura(aura, atTime);
+        let boolean = !HasFullControl() && OvaleLossOfControl.HasLossOfControl("STUN_MECHANIC", atTime);
         return TestBoolean(boolean, yesno);
     }
     OvaleCondition.RegisterCondition("isstunned", false, IsStunned);

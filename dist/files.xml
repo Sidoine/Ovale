@@ -64,6 +64,7 @@
    <Script file="GUID.lua"/>
    <Script file="Enemies.lua"/>
    <Script file="Requirement.lua"/>
+   <Script file="LossOfControl.lua"/>
    <Script file="Health.lua"/>
    <Script file="Data.lua"/>
    <Script file="Stance.lua"/>
