@@ -1,0 +1,1 @@
+tsc && node dist\utils\importsimc.js d:\src\simc && yarn prepare
