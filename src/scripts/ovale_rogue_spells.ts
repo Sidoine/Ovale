@@ -479,7 +479,7 @@ Define(master_of_shadows 196980)
 	SpellInfo(master_of_shadows duration=3)
 
 	SpellInfo(mutilate combopoints=-2 energy=50)
-	SpellRequire(mutilate add_energy -5=buff,lethal_poison_buff talent=venom_rush_talent)
+	SpellRequire(mutilate add_energy_from_aura -5=buff,lethal_poison_buff talent=venom_rush_talent)
 
 	SpellInfo(nightblade energy=25 combopoints=1 max_combopoints=5)
 	SpellInfo(nightblade max_combopoints=6 talent=deeper_stratagem_talent)

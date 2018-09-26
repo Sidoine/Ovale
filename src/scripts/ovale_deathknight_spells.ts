@@ -374,7 +374,7 @@ Define(death_pact_debuff 48743)
 	SpellInfo(death_pact_debuff duration=15)
 
 	
-	SpellRequire(death_strike add_runicpower -5=buff,death_strike_cost)
+	SpellRequire(death_strike add_runicpower_from_aura -5=buff,death_strike_cost)
 	SpellAddBuff(death_strike blood_shield_buff=1 specialization=blood)
 	SpellAddBuff(death_strike voracius_buff=1 talent=voracious_talent specialization=blood)
 SpellList(death_strike_cost ossuary_buff gravewarden_buff)

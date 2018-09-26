@@ -131,12 +131,14 @@ local OvaleDataBrokerClass = __class(OvaleDataBrokerBase, {
         if self.broker then
             self:RegisterMessage("Ovale_ProfileChanged", "UpdateIcon")
             self:RegisterMessage("Ovale_ScriptChanged")
+            self:RegisterEvent("PLAYER_ENTERING_WORLD", "Ovale_ScriptChanged")
             self:Ovale_ScriptChanged()
             self:UpdateIcon()
         end
     end,
     OnDisable = function(self)
         if self.broker then
+            self:UnregisterEvent("PLAYER_ENTERING_WORLD")
             self:UnregisterMessage("Ovale_ProfileChanged")
             self:UnregisterMessage("Ovale_ScriptChanged")
         end
@@ -153,8 +155,7 @@ local OvaleDataBrokerClass = __class(OvaleDataBrokerBase, {
         end
     end,
     Ovale_ScriptChanged = function(self)
-        local specName = OvalePaperDoll:GetSpecialization()
-        self.broker.text = Ovale.db.profile.source[specName]
+        self.broker.text = Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()] or "Disabled"
     end,
     constructor = function(self, ...)
         OvaleDataBrokerBase.constructor(self, ...)

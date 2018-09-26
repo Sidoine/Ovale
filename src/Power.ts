@@ -108,7 +108,20 @@ class PowerModule {
         if (si && si[powerType]) {
             let [cost, ratio] = OvaleData.GetSpellInfoPropertyNumber(spellId, atTime, powerType, targetGUID, true);
             if (ratio && ratio != 0) {
-                let maxCostParam = `max_${powerType}`;
+				let addRequirements = si && si.require[`add_${powerType}_from_aura` as keyof SpellInfo];
+				if (addRequirements) {
+					for (const [v, requirement] of pairs(addRequirements)) {
+						let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
+						if (verified) {
+							let aura = <any>OvaleAura.GetAura("player", requirement[2], atTime, undefined, true);
+							if (OvaleAura.IsActiveAura(aura, atTime)) {
+								cost = cost + (tonumber(v) || 0) * aura.stacks;
+							}
+						}
+					}
+				}
+				
+				let maxCostParam = `max_${powerType}`;
                 let maxCost = <number>si[maxCostParam as keyof SpellInfo];
                 if (maxCost) {
                     let power = this.GetPower(powerType, atTime);
@@ -117,20 +130,8 @@ class PowerModule {
                     } else if (power > cost) {
                         cost = power;
                     }
-                } else {
-                    let addRequirements = si && si.require[`add_${powerType}_from_aura` as keyof SpellInfo];
-                    if (addRequirements) {
-                        for (const [v, requirement] of pairs(addRequirements)) {
-                            let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
-                            if (verified) {
-                                let aura = <any>OvaleAura.GetAura("player", requirement[2], atTime, undefined, true);
-                                if (aura[v]) {
-                                    cost = cost + aura[v];
-                                }
-                            }
-                        }
-                    }
-                }
+                } 
+
                 spellCost = (cost > 0 && floor(cost * ratio)) || ceil(cost * ratio);
 
                 let refund = si[`refund_${powerType}` as keyof SpellInfo] || 0;

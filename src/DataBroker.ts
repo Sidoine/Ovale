@@ -126,6 +126,7 @@ class OvaleDataBrokerClass extends OvaleDataBrokerBase {
         if (this.broker) {
             this.RegisterMessage("Ovale_ProfileChanged", "UpdateIcon");
             this.RegisterMessage("Ovale_ScriptChanged");
+			this.RegisterEvent("PLAYER_ENTERING_WORLD", "Ovale_ScriptChanged");
             this.Ovale_ScriptChanged();
             this.UpdateIcon();
         }
@@ -133,6 +134,7 @@ class OvaleDataBrokerClass extends OvaleDataBrokerBase {
 
     OnDisable() {
         if (this.broker) {
+			this.UnregisterEvent("PLAYER_ENTERING_WORLD");
             this.UnregisterMessage("Ovale_ProfileChanged");
             this.UnregisterMessage("Ovale_ScriptChanged");
         }
@@ -149,8 +151,7 @@ class OvaleDataBrokerClass extends OvaleDataBrokerBase {
         }
     }
     Ovale_ScriptChanged() {
-        let specName = OvalePaperDoll.GetSpecialization()
-        this.broker.text = Ovale.db.profile.source[specName];
+        this.broker.text = Ovale.db.profile.source[`${Ovale.playerClass}_${OvalePaperDoll.GetSpecialization()}`] || "Disabled";
     }
 }
 

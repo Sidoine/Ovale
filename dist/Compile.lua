@@ -562,8 +562,7 @@ __exports.OvaleCompileClass = __class(OvaleCompileClassBase, {
         self:UnregisterMessage("Ovale_TalentsChanged")
     end,
     Ovale_ScriptChanged = function(self, event)
-        local specName = OvalePaperDoll:GetSpecialization()
-        self:CompileScript(Ovale.db.profile.source[specName])
+        self:CompileScript(Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()])
         self:EventHandler(event)
     end,
     Ovale_StanceChanged = function(self, event)
