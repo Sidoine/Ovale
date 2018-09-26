@@ -2119,9 +2119,9 @@ local function CurrentTickTime(positionalParams, namedParams, atTime)
         local aura = OvaleAura:GetAura(target, auraId, atTime, filter, mine)
         local tickTime
         if OvaleAura:IsActiveAura(aura, atTime) then
-            tickTime = 0
+            tickTime = aura.tick
         else
-            tickTime = OvaleAura:GetTickLength(auraId, OvalePaperDoll.next)
+            tickTime = 0
         end
         if tickTime and tickTime > 0 then
             return Compare(tickTime, comparator, limit)

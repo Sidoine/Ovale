@@ -4332,9 +4332,9 @@ l    */
         let aura = OvaleAura.GetAura(target, auraId, atTime, filter, mine);
         let tickTime;
         if (OvaleAura.IsActiveAura(aura, atTime)) {
-            tickTime = 0;
+            tickTime = aura.tick;
         } else {
-            tickTime = OvaleAura.GetTickLength(auraId, OvalePaperDoll.next);
+            tickTime = 0;
         }
         if (tickTime && tickTime > 0) {
             return Compare(tickTime, comparator, limit);
