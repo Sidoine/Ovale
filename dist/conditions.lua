@@ -416,7 +416,7 @@ local function BuffRemaining(positionalParams, namedParams, atTime)
         local auraId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
         local target, filter, mine = ParseCondition(positionalParams, namedParams)
         local aura = OvaleAura:GetAura(target, auraId, atTime, filter, mine)
-        if aura then
+        if aura and aura.ending >= atTime then
             local gain, _, ending = aura.gain, aura.start, aura.ending
             return TestValue(gain, INFINITY, 0, ending, -1, comparator, limit)
         end

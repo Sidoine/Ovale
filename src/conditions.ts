@@ -611,7 +611,7 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
         let [auraId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
         let [target, filter, mine] = ParseCondition(positionalParams, namedParams);
         let aura = OvaleAura.GetAura(target, auraId, atTime, filter, mine);
-        if (aura) {
+        if (aura && aura.ending >= atTime) {
             let [gain, , ending] = [aura.gain, aura.start, aura.ending];
             return TestValue(gain, INFINITY, 0, ending, -1, comparator, limit);
         }
