@@ -39,9 +39,9 @@ const interruptsClasses: { [k in Interrupts]: ClassId } = {
     "kick": "ROGUE",
     "wind_shear": "SHAMAN",
     "counter_shot": "HUNTER",
-    counterspell: "MAGE",
-    muzzle: "HUNTER",
-    spear_hand_strike: "MONK"
+    "counterspell": "MAGE",
+    "muzzle": "HUNTER",
+    "spear_hand_strike": "MONK"
 }
 
 interface SpecializationInfo {
@@ -76,31 +76,31 @@ const classInfos: { [key in ClassId]: ClassInfo} = {
         "arcane": {interrupt: "counterspell"}
     },
     MONK: {
-        brewmaster: { interrupt: "spear_hand_strike" },
-        windwalker: { interrupt: "spear_hand_strike"}
+        "brewmaster": { interrupt: "spear_hand_strike" },
+        "windwalker": { interrupt: "spear_hand_strike"}
     },
     PALADIN: {
-        retribution: { interrupt: "rebuke" },
-        protection: { interrupt: "rebuke"}
+        "retribution": { interrupt: "rebuke" },
+        "protection": { interrupt: "rebuke"}
     },
     PRIEST: {
-        shadow: { interrupt: "silence"}
+        "shadow": { interrupt: "silence"}
     },
     ROGUE: {
-        assassination: { interrupt: "kick" },
-        outlaw: { interrupt: "kick" },
-        subtlety: {interrupt: "kick"}
+        "assassination": { interrupt: "kick" },
+        "outlaw": { interrupt: "kick" },
+        "subtlety": {interrupt: "kick"}
     },
     SHAMAN: {
-        elemental: { interrupt: "wind_shear" },
-        enhancement: {interrupt: "wind_shear"}
+        "elemental": { interrupt: "wind_shear" },
+        "enhancement": {interrupt: "wind_shear"}
     },
     WARLOCK: {
     },
     WARRIOR: {
-        fury: { interrupt: "pummel" },
-        protection: { interrupt: "pummel" },
-        arms: { interrupt: "pummel"}
+        "fury": { interrupt: "pummel" },
+        "protection": { interrupt: "pummel" },
+        "arms": { interrupt: "pummel"}
     }
 }
 
@@ -1495,11 +1495,11 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("none", "none");
 
     //Bloodlust
-    AddDisambiguation("bloodlust_buff", "burst_haste_buff")
-    AddDisambiguation("exhaustion_buff", "burst_haste_debuff")
+    AddDisambiguation("bloodlust_buff", "burst_haste_buff");
+    AddDisambiguation("exhaustion_buff", "burst_haste_debuff");
 
     //Items
-    AddDisambiguation("buff_sephuzs_secret", "sephuzs_secret_buff")
+    AddDisambiguation("buff_sephuzs_secret", "sephuzs_secret_buff");
 
     //Arcane Torrent
     AddDisambiguation("arcane_torrent", "arcane_torrent_runicpower", "DEATHKNIGHT");
@@ -1603,19 +1603,19 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_subtlety_buff", "ROGUE", "subtlety");
 
     //Shaman
-    AddDisambiguation("ascendance", "ascendance_elemental", "SHAMAN", "elemental")
-    AddDisambiguation("ascendance", "ascendance_enhancement", "SHAMAN", "enhancement")
-    AddDisambiguation("ascendance", "ascendance_restoration", "SHAMAN", "restoration")
-    AddDisambiguation("chain_lightning", "chain_lightning_restoration", "SHAMAN", "restoration")
+    AddDisambiguation("ascendance", "ascendance_elemental", "SHAMAN", "elemental");
+    AddDisambiguation("ascendance", "ascendance_enhancement", "SHAMAN", "enhancement");
+    AddDisambiguation("ascendance", "ascendance_restoration", "SHAMAN", "restoration");
+    AddDisambiguation("chain_lightning", "chain_lightning_restoration", "SHAMAN", "restoration");
     AddDisambiguation("earth_shield_talent", "earth_shield_talent_restoration", "SHAMAN", "restoration");
     AddDisambiguation("echo_of_the_elements_talent", "resto_echo_of_the_elements_talent", "SHAMAN", "restoration");
-    AddDisambiguation("flame_shock", "flame_shock_restoration", "SHAMAN", "restoration")
-    AddDisambiguation("healing_surge", "healing_surge_restoration", "SHAMAN", "restoration")
-    AddDisambiguation("lightning_bolt", "lightning_bolt_elemental", "SHAMAN", "elemental")
-    AddDisambiguation("lightning_bolt", "lightning_bolt_enhancement", "SHAMAN", "enhancement")
-    AddDisambiguation("strike", "windstrike", "SHAMAN", "enhancement")
-    AddDisambiguation("totem_mastery", "totem_mastery_elemental", "SHAMAN", "elemental")
-    AddDisambiguation("totem_mastery", "totem_mastery_enhancement", "SHAMAN", "enhancement")
+    AddDisambiguation("flame_shock", "flame_shock_restoration", "SHAMAN", "restoration");
+    AddDisambiguation("healing_surge", "healing_surge_restoration", "SHAMAN", "restoration");
+    AddDisambiguation("lightning_bolt", "lightning_bolt_elemental", "SHAMAN", "elemental");
+    AddDisambiguation("lightning_bolt", "lightning_bolt_enhancement", "SHAMAN", "enhancement");
+    AddDisambiguation("strike", "windstrike", "SHAMAN", "enhancement");
+    AddDisambiguation("totem_mastery", "totem_mastery_elemental", "SHAMAN", "elemental");
+    AddDisambiguation("totem_mastery", "totem_mastery_enhancement", "SHAMAN", "enhancement");
 
     //Warlock
     AddDisambiguation("132369", "wilfreds_sigil_of_superior_summoning", "WARLOCK", "demonology");
@@ -2457,9 +2457,12 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             let spellName = "primal_strike";
             AddSymbol(annotation, spellName);
             conditionCode = format("target.InRange(%s)", spellName);
-        } else if (className == "SHAMAN" && action == "totem_mastery") {
-            conditionCode = "(not TotemPresent(totem_mastery) or InCombat()) and Speed() == 0";
-            AddSymbol(annotation, "totem_mastery");
+        } else if (className == "SHAMAN" && action == "totem_mastery_elemental") {
+            conditionCode = "(not BuffPresent(ele_resonance_totem_buff) or InCombat())";
+            AddSymbol(annotation, "ele_resonance_totem_buff");
+		} else if (className == "SHAMAN" && action == "totem_mastery_enhancement") {
+            conditionCode = "(not BuffPresent(enh_resonance_totem_buff) or InCombat())";
+            AddSymbol(annotation, "enh_resonance_totem_buff");
         } else if (className == "WARLOCK" && action == "cancel_metamorphosis") {
             let spellName = "metamorphosis";
             let buffName = "metamorphosis_buff";

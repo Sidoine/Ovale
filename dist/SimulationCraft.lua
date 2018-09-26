@@ -67,9 +67,9 @@ local interruptsClasses = {
     ["kick"] = "ROGUE",
     ["wind_shear"] = "SHAMAN",
     ["counter_shot"] = "HUNTER",
-    counterspell = "MAGE",
-    muzzle = "HUNTER",
-    spear_hand_strike = "MONK"
+    ["counterspell"] = "MAGE",
+    ["muzzle"] = "HUNTER",
+    ["spear_hand_strike"] = "MONK"
 }
 local classInfos = {
     DEATHKNIGHT = {
@@ -125,54 +125,54 @@ local classInfos = {
         }
     },
     MONK = {
-        brewmaster = {
+        ["brewmaster"] = {
             interrupt = "spear_hand_strike"
         },
-        windwalker = {
+        ["windwalker"] = {
             interrupt = "spear_hand_strike"
         }
     },
     PALADIN = {
-        retribution = {
+        ["retribution"] = {
             interrupt = "rebuke"
         },
-        protection = {
+        ["protection"] = {
             interrupt = "rebuke"
         }
     },
     PRIEST = {
-        shadow = {
+        ["shadow"] = {
             interrupt = "silence"
         }
     },
     ROGUE = {
-        assassination = {
+        ["assassination"] = {
             interrupt = "kick"
         },
-        outlaw = {
+        ["outlaw"] = {
             interrupt = "kick"
         },
-        subtlety = {
+        ["subtlety"] = {
             interrupt = "kick"
         }
     },
     SHAMAN = {
-        elemental = {
+        ["elemental"] = {
             interrupt = "wind_shear"
         },
-        enhancement = {
+        ["enhancement"] = {
             interrupt = "wind_shear"
         }
     },
     WARLOCK = {},
     WARRIOR = {
-        fury = {
+        ["fury"] = {
             interrupt = "pummel"
         },
-        protection = {
+        ["protection"] = {
             interrupt = "pummel"
         },
-        arms = {
+        ["arms"] = {
             interrupt = "pummel"
         }
     }
@@ -2279,9 +2279,12 @@ EmitAction = function(parseNode, nodeList, annotation)
             local spellName = "primal_strike"
             AddSymbol(annotation, spellName)
             conditionCode = format("target.InRange(%s)", spellName)
-        elseif className == "SHAMAN" and action == "totem_mastery" then
-            conditionCode = "(not TotemPresent(totem_mastery) or InCombat()) and Speed() == 0"
-            AddSymbol(annotation, "totem_mastery")
+        elseif className == "SHAMAN" and action == "totem_mastery_elemental" then
+            conditionCode = "(not BuffPresent(ele_resonance_totem_buff) or InCombat())"
+            AddSymbol(annotation, "ele_resonance_totem_buff")
+        elseif className == "SHAMAN" and action == "totem_mastery_enhancement" then
+            conditionCode = "(not BuffPresent(enh_resonance_totem_buff) or InCombat())"
+            AddSymbol(annotation, "enh_resonance_totem_buff")
         elseif className == "WARLOCK" and action == "cancel_metamorphosis" then
             local spellName = "metamorphosis"
             local buffName = "metamorphosis_buff"
