@@ -113,30 +113,6 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
             scClassName = "demon_hunter"
         elseif className == "DEATHKNIGHT" then
             scClassName = "death_knight"
-        elseif className == "DRUID" then
-            if specialization == "feral" then
-                name = "shmoodude_druid_feral"
-            end
-        elseif className == "MONK" then
-            if specialization == "mistweaver" then
-                name = "Disabled"
-            end
-        elseif className == "PALADIN" then
-            if specialization == "holy" then
-                name = "Disabled"
-            end
-        elseif className == "PRIEST" then
-            if specialization == "discipline" then
-                name = "Disabled"
-            end
-        elseif className == "SHAMAN" then
-            if specialization == "restoration" then
-                name = "Disabled"
-            end
-        elseif className == "WARRIOR" then
-            if specialization == "protection" then
-                name = "Disabled"
-            end
         end
         if  not name and specialization then
             name = format("sc_pr_%s_%s", scClassName, specialization)

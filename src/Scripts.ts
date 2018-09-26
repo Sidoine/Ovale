@@ -121,31 +121,6 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
         } else if (className === "DEATHKNIGHT") {
             scClassName = "death_knight";
         }
-        else if(className == "DRUID"){
-            if(specialization == "feral"){
-                name = "shmoodude_druid_feral";
-            }
-        } else if(className == "MONK"){
-            if(specialization == "mistweaver"){
-                name = "Disabled";
-            }
-        } else if(className == "PALADIN"){
-            if(specialization == "holy"){
-                name = "Disabled";
-            }
-        }else if(className == "PRIEST"){
-            if(specialization == "discipline"){
-                name = "Disabled";
-            }
-        } else if(className == "SHAMAN"){
-            if(specialization == "restoration"){
-                name = "Disabled";
-            }
-        } else if(className == "WARRIOR"){
-            if(specialization == "protection"){
-                name = "Disabled";
-            }
-        }
 
         if (!name && specialization) {
             name = format("sc_pr_%s_%s", scClassName, specialization);
