@@ -13,6 +13,7 @@ local __Ovale = LibStub:GetLibrary("ovale/Ovale")
 local Ovale = __Ovale.Ovale
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
+local DEFAULT_NAME = __Scripts.DEFAULT_NAME
 local __Version = LibStub:GetLibrary("ovale/Version")
 local OvaleVersion = __Version.OvaleVersion
 local __Frame = LibStub:GetLibrary("ovale/Frame")
@@ -157,7 +158,8 @@ local OvaleDataBrokerClass = __class(OvaleDataBrokerBase, {
         end
     end,
     Ovale_ScriptChanged = function(self)
-        self.broker.text = Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()] or "Disabled"
+        local script = Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()]
+        self.broker.text = (script == DEFAULT_NAME and OvaleScripts:GetDefaultScriptName(Ovale.playerClass, OvalePaperDoll:GetSpecialization())) or script or "Disabled"
     end,
     constructor = function(self, ...)
         OvaleDataBrokerBase.constructor(self, ...)
