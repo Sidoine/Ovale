@@ -239,8 +239,8 @@ local OvaleHealthClass = __class(OvaleHealthClassBase, {
                 end
                 guid = guid or OvaleGUID:UnitGUID(unitId)
                 local health = __exports.OvaleHealth:UnitHealth(unitId, guid) or 0
-                local maxHealth = __exports.OvaleHealth:UnitHealthMax(unitId, guid) or 0
-                local healthPercent = (maxHealth > 0) and (health / maxHealth * 100) or 100
+                local maxHealth = __exports.OvaleHealth:UnitHealthMax(unitId, guid) or 1
+                local healthPercent = (health / maxHealth * 100) or 100
                 if  not isBang and healthPercent <= thresholdValue or isBang and healthPercent > thresholdValue then
                     verified = true
                 end

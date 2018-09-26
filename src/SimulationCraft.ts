@@ -2341,8 +2341,7 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             annotation[action as keyof typeof interruptsClasses] = className;
             annotation.interrupt = className;
             isSpellAction = false;
-        }
-        else if (className == "DEATHKNIGHT" && action == "antimagic_shell") {
+        } else if (className == "DEATHKNIGHT" && action == "antimagic_shell") {
             conditionCode = "IncomingDamage(1.5 magic=1) > 0";
         } else if (className == "DRUID" && action == "pulverize") {
             let debuffName = "thrash_bear_debuff";
@@ -3854,14 +3853,6 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
         let buffName = "breath_of_sindragosa_buff";
         code = format("BuffPresent(%s)", buffName);
         AddSymbol(annotation, buffName);
-    /*
-    } else if (className == "DEATHKNIGHT" && sub(operand, -9, -1) == ".ready_in") {
-        let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
-        let spellName = tokenIterator();
-        [spellName] = Disambiguate(spellName, className, specialization);
-        code = format("TimeToSpell(%s)", spellName);
-        AddSymbol(annotation, spellName);
-    */
     } else if (className == "DEATHKNIGHT" && sub(operand, 1, 24) == "pet.dancing_rune_weapon.") {
         let petOperand = sub(operand, 25);
         let tokenIterator = gmatch(petOperand, OPERAND_TOKEN_PATTERN);

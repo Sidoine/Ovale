@@ -416,7 +416,7 @@ local function BuffRemaining(positionalParams, namedParams, atTime)
         local auraId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
         local target, filter, mine = ParseCondition(positionalParams, namedParams)
         local aura = OvaleAura:GetAura(target, auraId, atTime, filter, mine)
-        if aura then
+        if aura and aura.ending >= atTime then
             local gain, _, ending = aura.gain, aura.start, aura.ending
             return TestValue(gain, INFINITY, 0, ending, -1, comparator, limit)
         end
@@ -2123,10 +2123,7 @@ local function CurrentTickTime(positionalParams, namedParams, atTime)
         else
             tickTime = 0
         end
-        if tickTime and tickTime > 0 then
-            return Compare(tickTime, comparator, limit)
-        end
-        return Compare(INFINITY, comparator, limit)
+        return Compare(tickTime, comparator, limit)
     end
     OvaleCondition:RegisterCondition("ticktime", false, TickTime)
     OvaleCondition:RegisterCondition("currentticktime", false, CurrentTickTime)
@@ -2156,7 +2153,7 @@ local function TickTimeRemaining(positionalParams, namedParams, atTime)
                 return Compare(remainingTime, comparator, limit)
             end
         end
-        return nil
+        return Compare(0, comparator, limit)
     end
     OvaleCondition:RegisterCondition("ticksremaining", false, TicksRemaining)
     OvaleCondition:RegisterCondition("ticksremain", false, TicksRemaining)

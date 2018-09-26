@@ -477,7 +477,7 @@ Define(pillar_of_frost_buff 51271)
 	SpellInfo(pillar_of_frost duration=15)
 Define(raise_ally 61999)
 
-	
+    SpellRequire(raise_dead unusable 1=pet_health_pct,!0)
 Define(razorice_debuff 51714)
 
 	SpellInfo(remorseless_winter cd=20 runes=1 runicpower=-10)
