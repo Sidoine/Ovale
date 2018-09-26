@@ -2123,10 +2123,7 @@ local function CurrentTickTime(positionalParams, namedParams, atTime)
         else
             tickTime = 0
         end
-        if tickTime and tickTime > 0 then
-            return Compare(tickTime, comparator, limit)
-        end
-        return Compare(INFINITY, comparator, limit)
+        return Compare(tickTime, comparator, limit)
     end
     OvaleCondition:RegisterCondition("ticktime", false, TickTime)
     OvaleCondition:RegisterCondition("currentticktime", false, CurrentTickTime)

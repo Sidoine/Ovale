@@ -4336,10 +4336,7 @@ l    */
         } else {
             tickTime = 0;
         }
-        if (tickTime && tickTime > 0) {
-            return Compare(tickTime, comparator, limit);
-        }
-        return Compare(INFINITY, comparator, limit);
+        return Compare(tickTime, comparator, limit);
     }
    
     OvaleCondition.RegisterCondition("ticktime", false, TickTime);
