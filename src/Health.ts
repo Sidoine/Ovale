@@ -222,8 +222,8 @@ class OvaleHealthClass extends OvaleHealthClassBase {
             }
             guid = guid || OvaleGUID.UnitGUID(unitId);
             let health = OvaleHealth.UnitHealth(unitId, guid) || 0;
-            let maxHealth = OvaleHealth.UnitHealthMax(unitId, guid) || 0;
-            let healthPercent = (maxHealth > 0) && (health / maxHealth * 100) || 100;
+            let maxHealth = OvaleHealth.UnitHealthMax(unitId, guid) || 1;
+            let healthPercent = (health / maxHealth * 100) || 100;
             if (!isBang && healthPercent <= thresholdValue || isBang && healthPercent > thresholdValue) {
                 verified = true;
             }
