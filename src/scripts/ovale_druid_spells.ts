@@ -352,6 +352,7 @@ Define(moonfire_debuff 164812)
 	SpellInfo(moonfire_debuff duration=16)
 
 	SpellInfo(prowl cd=10 gcd=0 offgcd=1 to_stance=druid_cat_form)
+    SpellRequire(prowl unusable 1=stealthed,1)
 	SpellAddBuff(prowl prowl_buff=1)
 Define(prowl_buff 5215)
 Define(remove_corruption 2782)
