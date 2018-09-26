@@ -4,7 +4,7 @@ import LibDBIcon from "@wowts/lib_d_b_icon-1.0";
 import { OvaleDebug } from "./Debug";
 import { OvaleOptions } from "./Options";
 import { Ovale } from "./Ovale";
-import { OvaleScripts } from "./Scripts";
+import { OvaleScripts, DEFAULT_NAME } from "./Scripts";
 import { OvaleVersion } from "./Version";
 import { OvaleFrameModule } from "./Frame";
 import aceEvent from "@wowts/ace_event-3.0";
@@ -126,6 +126,7 @@ class OvaleDataBrokerClass extends OvaleDataBrokerBase {
         if (this.broker) {
             this.RegisterMessage("Ovale_ProfileChanged", "UpdateIcon");
             this.RegisterMessage("Ovale_ScriptChanged");
+            this.RegisterMessage("Ovale_SpecializationChanged", "Ovale_ScriptChanged");
 			this.RegisterEvent("PLAYER_ENTERING_WORLD", "Ovale_ScriptChanged");
             this.Ovale_ScriptChanged();
             this.UpdateIcon();
@@ -135,6 +136,7 @@ class OvaleDataBrokerClass extends OvaleDataBrokerBase {
     OnDisable() {
         if (this.broker) {
 			this.UnregisterEvent("PLAYER_ENTERING_WORLD");
+            this.UnregisterMessage("Ovale_SpecializationChanged");
             this.UnregisterMessage("Ovale_ProfileChanged");
             this.UnregisterMessage("Ovale_ScriptChanged");
         }
@@ -151,7 +153,8 @@ class OvaleDataBrokerClass extends OvaleDataBrokerBase {
         }
     }
     Ovale_ScriptChanged() {
-        this.broker.text = Ovale.db.profile.source[`${Ovale.playerClass}_${OvalePaperDoll.GetSpecialization()}`] || "Disabled";
+        const script = Ovale.db.profile.source[`${Ovale.playerClass}_${OvalePaperDoll.GetSpecialization()}`];
+        this.broker.text = (script == DEFAULT_NAME && OvaleScripts.GetDefaultScriptName(Ovale.playerClass, OvalePaperDoll.GetSpecialization())) || script || "Disabled";
     }
 }
 

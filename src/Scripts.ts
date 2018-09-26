@@ -14,7 +14,7 @@ import { OvaleDebug } from "./Debug";
 
 let OvaleScriptsBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleScripts", aceEvent));
 export let OvaleScripts: OvaleScriptsClass;
-let DEFAULT_NAME = "Ovale";
+export let DEFAULT_NAME = "Ovale";
 let DEFAULT_DESCRIPTION = L["Script défaut"];
 const CUSTOM_NAME = "custom";
 let CUSTOM_DESCRIPTION = L["Script personnalisé"];

@@ -13,6 +13,7 @@ local __Ovale = LibStub:GetLibrary("ovale/Ovale")
 local Ovale = __Ovale.Ovale
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
+local DEFAULT_NAME = __Scripts.DEFAULT_NAME
 local __Version = LibStub:GetLibrary("ovale/Version")
 local OvaleVersion = __Version.OvaleVersion
 local __Frame = LibStub:GetLibrary("ovale/Frame")
@@ -131,6 +132,7 @@ local OvaleDataBrokerClass = __class(OvaleDataBrokerBase, {
         if self.broker then
             self:RegisterMessage("Ovale_ProfileChanged", "UpdateIcon")
             self:RegisterMessage("Ovale_ScriptChanged")
+            self:RegisterMessage("Ovale_SpecializationChanged", "Ovale_ScriptChanged")
             self:RegisterEvent("PLAYER_ENTERING_WORLD", "Ovale_ScriptChanged")
             self:Ovale_ScriptChanged()
             self:UpdateIcon()
@@ -139,6 +141,7 @@ local OvaleDataBrokerClass = __class(OvaleDataBrokerBase, {
     OnDisable = function(self)
         if self.broker then
             self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+            self:UnregisterMessage("Ovale_SpecializationChanged")
             self:UnregisterMessage("Ovale_ProfileChanged")
             self:UnregisterMessage("Ovale_ScriptChanged")
         end
@@ -155,7 +158,8 @@ local OvaleDataBrokerClass = __class(OvaleDataBrokerBase, {
         end
     end,
     Ovale_ScriptChanged = function(self)
-        self.broker.text = Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()] or "Disabled"
+        local script = Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()]
+        self.broker.text = (script == DEFAULT_NAME and OvaleScripts:GetDefaultScriptName(Ovale.playerClass, OvalePaperDoll:GetSpecialization())) or script or "Disabled"
     end,
     constructor = function(self, ...)
         OvaleDataBrokerBase.constructor(self, ...)

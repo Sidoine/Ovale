@@ -23,7 +23,7 @@ local GetNumSpecializations = GetNumSpecializations
 local __Debug = LibStub:GetLibrary("ovale/Debug")
 local OvaleDebug = __Debug.OvaleDebug
 local OvaleScriptsBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleScripts", aceEvent))
-local DEFAULT_NAME = "Ovale"
+__exports.DEFAULT_NAME = "Ovale"
 local DEFAULT_DESCRIPTION = L["Script défaut"]
 local CUSTOM_NAME = "custom"
 local CUSTOM_DESCRIPTION = L["Script personnalisé"]
@@ -62,7 +62,7 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
     end,
     OnInitialize = function(self)
         self:CreateOptions()
-        self:RegisterScript(nil, nil, DEFAULT_NAME, DEFAULT_DESCRIPTION, nil, "script")
+        self:RegisterScript(nil, nil, __exports.DEFAULT_NAME, DEFAULT_DESCRIPTION, nil, "script")
         self:RegisterScript(Ovale.playerClass, nil, CUSTOM_NAME, CUSTOM_DESCRIPTION, Ovale.db.profile.code, "script")
         self:RegisterScript(nil, nil, DISABLED_NAME, DISABLED_DESCRIPTION, nil, "script")
         self:RegisterMessage("Ovale_StanceChanged")
@@ -78,7 +78,7 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
         local descriptionsTable = {}
         for name, script in pairs(self.script) do
             if ( not scriptType or script.type == scriptType) and ( not script.className or script.className == Ovale.playerClass) and ( not script.specialization or OvalePaperDoll:IsSpecialization(script.specialization)) then
-                if name == DEFAULT_NAME then
+                if name == __exports.DEFAULT_NAME then
                     descriptionsTable[name] = script.desc .. " (" .. self:GetScriptName(name) .. ")"
                 else
                     descriptionsTable[name] = script.desc
@@ -123,7 +123,7 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
         return name
     end,
     GetScriptName = function(self, name)
-        return (name == DEFAULT_NAME) and self:GetDefaultScriptName(Ovale.playerClass, OvalePaperDoll:GetSpecialization()) or name
+        return (name == __exports.DEFAULT_NAME) and self:GetDefaultScriptName(Ovale.playerClass, OvalePaperDoll:GetSpecialization()) or name
     end,
     GetScript = function(self, name)
         name = self:GetScriptName(name)
