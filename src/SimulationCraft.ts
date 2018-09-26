@@ -2363,6 +2363,11 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             conditionCode = "SpellKnown(half_moon)";
         } else if (className == "DRUID" && action == "full_moon") {
             conditionCode = "SpellKnown(full_moon)";
+        } else if (className == "DRUID" && action == "regrowth" && specialization == "feral") {
+            conditionCode = "Talent(bloodtalons_talent) and (BuffRemaining(bloodtalons_buff) < CastTime(regrowth)+GCDRemaining() or InCombat())"
+            AddSymbol(annotation, "bloodtalons_talent")
+            AddSymbol(annotation, "bloodtalons_buff")
+            AddSymbol(annotation, "regrowth")
         } else if (className == "HUNTER" && action == "kill_command") {
             conditionCode = "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()";
         } else if (className == "MAGE" && action == "arcane_brilliance") {
