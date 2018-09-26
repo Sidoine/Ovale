@@ -4310,8 +4310,8 @@ l    */
 	 @return A boolean value for the result of the comparison.
 	 @see TicksRemaining
      */
-    function TickTime(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
-        let [auraId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
+    function TickTime(positionalParams: PositionalParameters, namedParams: NamedParameters, atTime: number) {
+        let [auraId, comparator, limit] = [<number>positionalParams[1], <string>positionalParams[2], <number>positionalParams[3]];
         let [target, filter, mine] = ParseCondition(positionalParams, namedParams);
         let aura = OvaleAura.GetAura(target, auraId, atTime, filter, mine);
         let tickTime;
@@ -4325,7 +4325,25 @@ l    */
         }
         return Compare(INFINITY, comparator, limit);
     }
+
+    function CurrentTickTime(positionalParams: PositionalParameters, namedParams: NamedParameters, atTime: number) {
+        let [auraId, comparator, limit] = [<number>positionalParams[1], <string>positionalParams[2], <number>positionalParams[3]];
+        let [target, filter, mine] = ParseCondition(positionalParams, namedParams);
+        let aura = OvaleAura.GetAura(target, auraId, atTime, filter, mine);
+        let tickTime;
+        if (OvaleAura.IsActiveAura(aura, atTime)) {
+            tickTime = 0;
+        } else {
+            tickTime = OvaleAura.GetTickLength(auraId, OvalePaperDoll.next);
+        }
+        if (tickTime && tickTime > 0) {
+            return Compare(tickTime, comparator, limit);
+        }
+        return Compare(INFINITY, comparator, limit);
+    }
+   
     OvaleCondition.RegisterCondition("ticktime", false, TickTime);
+    OvaleCondition.RegisterCondition("currentticktime", false, CurrentTickTime);
 }
 {
     /** Get the remaining number of ticks of a periodic aura on a target.

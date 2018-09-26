@@ -3109,7 +3109,7 @@ EmitOperandAction = function (operand, parseNode, nodeList, annotation, action, 
     } else if (property == "shard_react") {
         code = "SoulShards() >= 1";
     } else if (property == "tick_time") {
-        code = format("%sTickTime(%s)", buffTarget, buffName);
+        code = format("%sCurrentTickTime(%s)", buffTarget, buffName);
         symbol = buffName;
     } else if (property == "ticking") {
         code = format("%s%sPresent(%s)", buffTarget, prefix, buffName);

@@ -2113,7 +2113,23 @@ local function TickTime(positionalParams, namedParams, atTime)
         end
         return Compare(INFINITY, comparator, limit)
     end
+local function CurrentTickTime(positionalParams, namedParams, atTime)
+        local auraId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+        local target, filter, mine = ParseCondition(positionalParams, namedParams)
+        local aura = OvaleAura:GetAura(target, auraId, atTime, filter, mine)
+        local tickTime
+        if OvaleAura:IsActiveAura(aura, atTime) then
+            tickTime = 0
+        else
+            tickTime = OvaleAura:GetTickLength(auraId, OvalePaperDoll.next)
+        end
+        if tickTime and tickTime > 0 then
+            return Compare(tickTime, comparator, limit)
+        end
+        return Compare(INFINITY, comparator, limit)
+    end
     OvaleCondition:RegisterCondition("ticktime", false, TickTime)
+    OvaleCondition:RegisterCondition("currentticktime", false, CurrentTickTime)
 end
 do
 local function TicksRemaining(positionalParams, namedParams, atTime)

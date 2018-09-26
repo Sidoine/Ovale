@@ -1212,7 +1212,7 @@ AddFunction UnholyAoeCdPostConditions
 AddFunction UnholyDefaultMainActions
 {
  #outbreak,target_if=(dot.virulent_plague.tick_time_remains+tick_time<=dot.virulent_plague.remains)&dot.virulent_plague.remains<=gcd
- if target.TickTimeRemaining(virulent_plague_debuff) + target.TickTime(virulent_plague_debuff) <= target.DebuffRemaining(virulent_plague_debuff) and target.DebuffRemaining(virulent_plague_debuff) <= GCD() Spell(outbreak)
+ if target.TickTimeRemaining(virulent_plague_debuff) + target.CurrentTickTime(virulent_plague_debuff) <= target.DebuffRemaining(virulent_plague_debuff) and target.DebuffRemaining(virulent_plague_debuff) <= GCD() Spell(outbreak)
  #call_action_list,name=cooldowns
  UnholyCooldownsMainActions()
 
@@ -1239,7 +1239,7 @@ AddFunction UnholyDefaultShortCdActions
  #auto_attack
  UnholyGetInMeleeRange()
 
- unless target.TickTimeRemaining(virulent_plague_debuff) + target.TickTime(virulent_plague_debuff) <= target.DebuffRemaining(virulent_plague_debuff) and target.DebuffRemaining(virulent_plague_debuff) <= GCD() and Spell(outbreak)
+ unless target.TickTimeRemaining(virulent_plague_debuff) + target.CurrentTickTime(virulent_plague_debuff) <= target.DebuffRemaining(virulent_plague_debuff) and target.DebuffRemaining(virulent_plague_debuff) <= GCD() and Spell(outbreak)
  {
   #call_action_list,name=cooldowns
   UnholyCooldownsShortCdActions()
@@ -1260,7 +1260,7 @@ AddFunction UnholyDefaultShortCdActions
 
 AddFunction UnholyDefaultShortCdPostConditions
 {
- target.TickTimeRemaining(virulent_plague_debuff) + target.TickTime(virulent_plague_debuff) <= target.DebuffRemaining(virulent_plague_debuff) and target.DebuffRemaining(virulent_plague_debuff) <= GCD() and Spell(outbreak) or UnholyCooldownsShortCdPostConditions() or Enemies() >= 2 and UnholyAoeShortCdPostConditions() or UnholyGenericShortCdPostConditions()
+ target.TickTimeRemaining(virulent_plague_debuff) + target.CurrentTickTime(virulent_plague_debuff) <= target.DebuffRemaining(virulent_plague_debuff) and target.DebuffRemaining(virulent_plague_debuff) <= GCD() and Spell(outbreak) or UnholyCooldownsShortCdPostConditions() or Enemies() >= 2 and UnholyAoeShortCdPostConditions() or UnholyGenericShortCdPostConditions()
 }
 
 AddFunction UnholyDefaultCdActions
@@ -1284,7 +1284,7 @@ AddFunction UnholyDefaultCdActions
  #potion,if=cooldown.army_of_the_dead.ready|pet.gargoyle.active|buff.unholy_frenzy.up
  if { SpellCooldown(army_of_the_dead) == 0 or pet.Present() or BuffPresent(unholy_frenzy_buff) } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
 
- unless target.TickTimeRemaining(virulent_plague_debuff) + target.TickTime(virulent_plague_debuff) <= target.DebuffRemaining(virulent_plague_debuff) and target.DebuffRemaining(virulent_plague_debuff) <= GCD() and Spell(outbreak)
+ unless target.TickTimeRemaining(virulent_plague_debuff) + target.CurrentTickTime(virulent_plague_debuff) <= target.DebuffRemaining(virulent_plague_debuff) and target.DebuffRemaining(virulent_plague_debuff) <= GCD() and Spell(outbreak)
  {
   #call_action_list,name=cooldowns
   UnholyCooldownsCdActions()
@@ -1305,7 +1305,7 @@ AddFunction UnholyDefaultCdActions
 
 AddFunction UnholyDefaultCdPostConditions
 {
- target.TickTimeRemaining(virulent_plague_debuff) + target.TickTime(virulent_plague_debuff) <= target.DebuffRemaining(virulent_plague_debuff) and target.DebuffRemaining(virulent_plague_debuff) <= GCD() and Spell(outbreak) or UnholyCooldownsCdPostConditions() or Enemies() >= 2 and UnholyAoeCdPostConditions() or UnholyGenericCdPostConditions()
+ target.TickTimeRemaining(virulent_plague_debuff) + target.CurrentTickTime(virulent_plague_debuff) <= target.DebuffRemaining(virulent_plague_debuff) and target.DebuffRemaining(virulent_plague_debuff) <= GCD() and Spell(outbreak) or UnholyCooldownsCdPostConditions() or Enemies() >= 2 and UnholyAoeCdPostConditions() or UnholyGenericCdPostConditions()
 }
 
 ### Unholy icons.

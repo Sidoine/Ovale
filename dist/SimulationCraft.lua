@@ -2929,7 +2929,7 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
     elseif property == "shard_react" then
         code = "SoulShards() >= 1"
     elseif property == "tick_time" then
-        code = format("%sTickTime(%s)", buffTarget, buffName)
+        code = format("%sCurrentTickTime(%s)", buffTarget, buffName)
         symbol = buffName
     elseif property == "ticking" then
         code = format("%s%sPresent(%s)", buffTarget, prefix, buffName)
