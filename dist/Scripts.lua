@@ -100,9 +100,9 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
         self.script[name] = nil
     end,
     SetScript = function(self, name)
-        local oldSource = Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()]
+        local oldSource = self:getCurrentSpecScriptName()
         if oldSource ~= name then
-            Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()] = name
+            self:setCurrentSpecScriptName(name)
             self:SendMessage("Ovale_ScriptChanged")
         end
     end,
@@ -131,6 +131,15 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
             return self.script[name].code
         end
     end,
+    getCurrentSpecIdentifier = function(self)
+        return Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()
+    end,
+    getCurrentSpecScriptName = function(self)
+        return Ovale.db.profile.source[self:getCurrentSpecIdentifier()]
+    end,
+    setCurrentSpecScriptName = function(self, source)
+        Ovale.db.profile.source[self:getCurrentSpecIdentifier()] = source
+    end,
     CreateOptions = function(self)
         local options = {
             name = Ovale:GetName() .. " " .. L["Script"],
@@ -146,7 +155,7 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
                         return __exports.OvaleScripts:GetDescriptions(scriptType)
                     end,
                     get = function(info)
-                        return Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()]
+                        return self:getCurrentSpecScriptName()
                     end,
                     set = function(info, v)
                         self:SetScript(v)
@@ -159,11 +168,10 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
                     name = L["Script"],
                     width = "full",
                     disabled = function()
-                        return Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()] ~= CUSTOM_NAME
+                        return self:getCurrentSpecScriptName() ~= CUSTOM_NAME
                     end,
                     get = function(info)
-                        local code = __exports.OvaleScripts:GetScript(Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()])
-                        code = code or ""
+                        local code = __exports.OvaleScripts:GetScript(self:getCurrentSpecScriptName()) or ""
                         return gsub(code, "	", "    ")
                     end,
                     set = function(info, v)
@@ -177,15 +185,15 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
                     type = "execute",
                     name = L["Copier sur Script personnalisé"],
                     disabled = function()
-                        return Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()] == CUSTOM_NAME
+                        return self:getCurrentSpecScriptName() == CUSTOM_NAME
                     end,
                     confirm = function()
                         return L["Ecraser le Script personnalisé préexistant?"]
                     end,
                     func = function()
-                        local code = __exports.OvaleScripts:GetScript(Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()])
+                        local code = __exports.OvaleScripts:GetScript(self:getCurrentSpecScriptName())
                         __exports.OvaleScripts:RegisterScript(Ovale.playerClass, nil, CUSTOM_NAME, CUSTOM_DESCRIPTION, code, "script")
-                        Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()] = CUSTOM_NAME
+                        self:setCurrentSpecScriptName(CUSTOM_NAME)
                         Ovale.db.profile.code = __exports.OvaleScripts:GetScript(CUSTOM_NAME)
                         self:SendMessage("Ovale_ScriptChanged")
                     end

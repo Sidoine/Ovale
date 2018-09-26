@@ -270,9 +270,9 @@
     commander "^2.11.0"
     typescript "^3.0.3"
 
-"@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.10.0", "@wowts/wow-mock@^1.6.0":
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.10.0.tgz#689235baa98930743b72d1f3ba1811994b5852d7"
+"@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.10.1", "@wowts/wow-mock@^1.6.0":
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.10.1.tgz#fab88d72ca66cf314e22ada881d7baf6f0e1f98f"
   dependencies:
     "@wowts/lua" "^1.3.0"
 
