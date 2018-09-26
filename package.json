@@ -15,7 +15,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/node": "^10.9.4",
+    "@types/node": "^10.11.0",
     "@wowts/ace_comm-3.0": "^1.0.0",
     "@wowts/ace_config-3.0": "^1.1.0",
     "@wowts/ace_config_dialog-3.0": "^1.0.3",
@@ -45,7 +45,7 @@
     "@wowts/table": "^1.0.1",
     "@wowts/tsaddon": "^1.1.2",
     "@wowts/tslib": "^1.1.0",
-    "@wowts/wow-mock": "^1.9.0"
+    "@wowts/wow-mock": "^1.10.0"
   },
   "devDependencies": {
     "@wowts/tstolua": "^1.5.0",
