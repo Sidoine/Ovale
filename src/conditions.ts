@@ -4679,19 +4679,13 @@ l    */
     function TotemExpires(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number): ConditionResult {
         let [id, seconds] = [positionalParams[1], positionalParams[2]];
         seconds = seconds || 0;
-        if (type(id) == "string") {
-            let [, , startTime, duration] = OvaleTotem.GetTotemInfo(id, atTime);
-            if (startTime) {
-                return [startTime + duration - seconds, INFINITY];
-            }
-        } else {
-            let [count, , ending] = OvaleTotem.GetTotemCount(id, atTime);
-            if (count > 0) {
-                return [ending - seconds, INFINITY];
-            }
+        let [count, , ending] = OvaleTotem.GetTotemInfo(id, atTime);
+        if (count > 0) {
+            return [ending - seconds, INFINITY];
         }
         return [0, INFINITY];
     }
+    OvaleCondition.RegisterCondition("totemexpires", false, TotemExpires);
 
     /** Test if the totem is present.
 	 @name TotemPresent
@@ -4705,20 +4699,12 @@ l    */
      */
     function TotemPresent(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number): ConditionResult {
         let id = positionalParams[1];
-        if (type(id) == "string") {
-            let [, , startTime, duration] = OvaleTotem.GetTotemInfo(id, atTime);
-            if (startTime && duration > 0) {
-                return [startTime, startTime + duration];
-            }
-        } else {
-            let [count, start, ending] = OvaleTotem.GetTotemCount(id, atTime);
-            if (count > 0) {
-                return [start, ending];
-            }
+        let [count, start, ending] = OvaleTotem.GetTotemInfo(id, atTime);
+        if (count > 0) {
+            return [start, ending];
         }
         return undefined;
     }
-    OvaleCondition.RegisterCondition("totemexpires", false, TotemExpires);
     OvaleCondition.RegisterCondition("totempresent", false, TotemPresent);
 
     /** Get the remaining time in seconds before a totem expires.
@@ -4735,17 +4721,9 @@ l    */
      */
     function TotemRemaining(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
         let [id, comparator, limit] = [positionalParams[1], positionalParams[2], <number>positionalParams[3]];
-        if (type(id) == "string") {
-            let [, , startTime, duration] = OvaleTotem.GetTotemInfo(id, atTime);
-            if (startTime && duration > 0) {
-                let [start, ending] = [startTime, startTime + duration];
-                return TestValue(start, ending, 0, ending, -1, comparator, limit);
-            }
-        } else {
-            let [count, start, ending] = OvaleTotem.GetTotemCount(id, atTime);
-            if (count > 0) {
-                return TestValue(start, ending, 0, ending, -1, comparator, limit);
-            }
+        let [count, start, ending] = OvaleTotem.GetTotemInfo(id, atTime);
+        if (count > 0) {
+            return TestValue(start, ending, 0, ending, -1, comparator, limit);
         }
         return Compare(0, comparator, limit);
     }

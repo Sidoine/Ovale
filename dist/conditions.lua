@@ -2286,49 +2286,27 @@ do
 local function TotemExpires(positionalParams, namedParams, atTime)
         local id, seconds = positionalParams[1], positionalParams[2]
         seconds = seconds or 0
-        if type(id) == "string" then
-            local _, _, startTime, duration = OvaleTotem:GetTotemInfo(id, atTime)
-            if startTime then
-                return startTime + duration - seconds, INFINITY
-            end
-        else
-            local count, _, ending = OvaleTotem:GetTotemCount(id, atTime)
-            if count > 0 then
-                return ending - seconds, INFINITY
-            end
+        local count, _, ending = OvaleTotem:GetTotemInfo(id, atTime)
+        if count > 0 then
+            return ending - seconds, INFINITY
         end
         return 0, INFINITY
     end
+    OvaleCondition:RegisterCondition("totemexpires", false, TotemExpires)
 local function TotemPresent(positionalParams, namedParams, atTime)
         local id = positionalParams[1]
-        if type(id) == "string" then
-            local _, _, startTime, duration = OvaleTotem:GetTotemInfo(id, atTime)
-            if startTime and duration > 0 then
-                return startTime, startTime + duration
-            end
-        else
-            local count, start, ending = OvaleTotem:GetTotemCount(id, atTime)
-            if count > 0 then
-                return start, ending
-            end
+        local count, start, ending = OvaleTotem:GetTotemInfo(id, atTime)
+        if count > 0 then
+            return start, ending
         end
         return nil
     end
-    OvaleCondition:RegisterCondition("totemexpires", false, TotemExpires)
     OvaleCondition:RegisterCondition("totempresent", false, TotemPresent)
 local function TotemRemaining(positionalParams, namedParams, atTime)
         local id, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-        if type(id) == "string" then
-            local _, _, startTime, duration = OvaleTotem:GetTotemInfo(id, atTime)
-            if startTime and duration > 0 then
-                local start, ending = startTime, startTime + duration
-                return TestValue(start, ending, 0, ending, -1, comparator, limit)
-            end
-        else
-            local count, start, ending = OvaleTotem:GetTotemCount(id, atTime)
-            if count > 0 then
-                return TestValue(start, ending, 0, ending, -1, comparator, limit)
-            end
+        local count, start, ending = OvaleTotem:GetTotemInfo(id, atTime)
+        if count > 0 then
+            return TestValue(start, ending, 0, ending, -1, comparator, limit)
         end
         return Compare(0, comparator, limit)
     end
