@@ -116,13 +116,10 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
         local count = 0
         local si = OvaleData.spellInfo[spellId]
         if si and si.totem then
-            local buffPresent = false
-            if si.buff_totem then
+            local buffPresent = (OvaleFuture.next.lastGCDSpellId == spellId)
+            if  not buffPresent and si.buff_totem then
                 local aura = OvaleAura:GetAura("player", si.buff_totem, atTime, "HELPFUL")
                 buffPresent = OvaleAura:IsActiveAura(aura, atTime)
-                if  not buffPresent then
-                    buffPresent = (OvaleFuture.next.lastGCDSpellId == spellId)
-                end
             end
             if  not si.buff_totem or buffPresent then
                 local texture = OvaleSpellBook:GetSpellTexture(spellId)

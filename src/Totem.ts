@@ -123,15 +123,12 @@ class OvaleTotemClass extends OvaleTotemBase {
         let count = 0;
         let si = OvaleData.spellInfo[spellId];
         if (si && si.totem) {
-            let buffPresent = false;
-            if (si.buff_totem) {
+            // if can take a while for the buffs to appear
+            // so if the previous GCD spell is our totem, we assume the buffs are up
+            let buffPresent = (OvaleFuture.next.lastGCDSpellId == spellId);
+            if (!buffPresent && si.buff_totem) {
                 let aura = OvaleAura.GetAura("player", si.buff_totem, atTime, "HELPFUL");
                 buffPresent = OvaleAura.IsActiveAura(aura, atTime);
-                // if can take a while for the buffs to appear
-                // so if the previous GCD spell is our totem, we assume the buffs are up
-                if(!buffPresent) {
-                    buffPresent = (OvaleFuture.next.lastGCDSpellId == spellId);
-                }
             }
             if (!si.buff_totem || buffPresent) {
                 let texture = OvaleSpellBook.GetSpellTexture(spellId);
