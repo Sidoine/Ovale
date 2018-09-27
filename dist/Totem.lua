@@ -71,9 +71,11 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
     end,
     ApplySpellAfterCast = function(self, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
         __exports.OvaleTotem:StartProfiling("OvaleTotem_ApplySpellAfterCast")
-        local si = OvaleData.spellInfo[spellId]
-        if si and si.totem then
-            self:SummonTotem(spellId, endCast)
+        if TOTEM_CLASS[Ovale.playerClass] then
+            local si = OvaleData.spellInfo[spellId]
+            if si and si.totem then
+                self:SummonTotem(spellId, endCast)
+            end
         end
         __exports.OvaleTotem:StopProfiling("OvaleTotem_ApplySpellAfterCast")
     end,

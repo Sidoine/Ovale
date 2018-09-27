@@ -77,9 +77,11 @@ class OvaleTotemClass extends OvaleTotemBase {
     
     ApplySpellAfterCast(spellId: number, targetGUID: string, startCast: number, endCast: number, isChanneled: boolean, spellcast: SpellCast) {
         OvaleTotem.StartProfiling("OvaleTotem_ApplySpellAfterCast");
-        let si = OvaleData.spellInfo[spellId];
-        if (si && si.totem) {
-            this.SummonTotem(spellId, endCast);
+        if (TOTEM_CLASS[Ovale.playerClass]) {
+            let si = OvaleData.spellInfo[spellId];
+            if (si && si.totem) {
+                this.SummonTotem(spellId, endCast);
+            }
         }
         OvaleTotem.StopProfiling("OvaleTotem_ApplySpellAfterCast");
     }
