@@ -1474,7 +1474,7 @@ local InitializeDisambiguation = function()
 end
 
 local IsTotem = function(name)
-    if sub(name, 1, 13) == "wild_mushroom" then
+    if sub(name, 1, 13) == "efflorescence" then
         return true
     elseif name == "prismatic_crystal" or name == "rune_of_power" then
         return true

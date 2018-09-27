@@ -1641,7 +1641,7 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("meat_cleaver", "whirlwind", "WARRIOR", "fury")
 }
 const IsTotem = function(name: string) {
-    if (sub(name, 1, 13) == "wild_mushroom") {
+    if (sub(name, 1, 13) == "efflorescence") {
         return true;
     } else if (name == "prismatic_crystal" || name == "rune_of_power") {
         return true;
