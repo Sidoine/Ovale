@@ -130,7 +130,7 @@ class OvaleTotemClass extends OvaleTotemBase {
             }
             if (!si.buff_totem || buffPresent) {
                 let texture = OvaleSpellBook.GetSpellTexture(spellId);
-                let maxTotems = si.max_totems || 1;
+                let maxTotems = si.max_totems || MAX_TOTEMS+1;
                 for (const [slot] of ipairs(this.next.totems)) {
                     let totem = this.GetTotem(slot);
                     if (this.IsActiveTotem(totem, atTime) && totem.icon == texture) {

@@ -120,7 +120,7 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
             end
             if  not si.buff_totem or buffPresent then
                 local texture = OvaleSpellBook:GetSpellTexture(spellId)
-                local maxTotems = si.max_totems or 1
+                local maxTotems = si.max_totems or MAX_TOTEMS + 1
                 for slot in ipairs(self.next.totems) do
                     local totem = self:GetTotem(slot)
                     if self:IsActiveTotem(totem, atTime) and totem.icon == texture then
