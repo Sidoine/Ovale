@@ -58,7 +58,9 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
     InitializeState = function(self)
         self.next.totems = {}
         for slot = 1, MAX_TOTEMS + 1, 1 do
-            self.next.totems[slot] = {}
+            self.next.totems[slot] = {
+                slot = slot
+            }
         end
     end,
     ResetState = function(self)
@@ -82,6 +84,9 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
         __exports.OvaleTotem:StopProfiling("OvaleTotem_ApplySpellAfterCast")
     end,
     IsActiveTotem = function(self, totem, atTime)
+        if totem.serial < self_serial then
+            totem = self:GetTotem(totem.slot)
+        end
         return (totem and (totem.serial == self_serial) and totem.start and totem.duration and totem.start < atTime and atTime < totem.start + totem.duration)
     end,
     GetTotem = function(self, slot)
@@ -100,6 +105,7 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
                 totem.duration = 0
                 totem.icon = ""
             end
+            totem.slot = slot
             totem.serial = self_serial
         end
         __exports.OvaleTotem:StopProfiling("OvaleTotem_state_GetTotem")
@@ -150,6 +156,7 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
         totem.start = atTime
         totem.duration = duration or 15
         totem.icon = icon
+        totem.slot = totemSlot
         __exports.OvaleTotem:StopProfiling("OvaleTotem_state_SummonTotem")
     end,
     GetAvailableTotemSlot = function(self, spellId, atTime)
