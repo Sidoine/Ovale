@@ -1643,7 +1643,7 @@ const InitializeDisambiguation = function() {
 const IsTotem = function(name: string) {
     if (sub(name, 1, 13) == "efflorescence") {
         return true;
-    } else if (name == "prismatic_crystal" || name == "rune_of_power") {
+    } else if (name == "rune_of_power") {
         return true;
     } else if (sub(name, -7, -1) == "_statue") {
         return true;

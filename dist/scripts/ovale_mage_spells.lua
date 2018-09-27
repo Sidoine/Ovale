@@ -494,8 +494,6 @@ Define(potent_flames_buff 145254)
 Define(presence_of_mind_buff 205025)
 Define(profound_magic_buff 145252)
 	SpellInfo(profound_magic_buff duration=10 max_stacks=4)
-Define(prismatic_crystal 152087)
-	SpellInfo(prismatic_crystal cd=90 duration=12 totem=1)
 
 	SpellInfo(pyroblast travel_time=1)
 	SpellInfo(pyroblast damage=FirePyroblastHitDamage specialization=fire)
@@ -515,7 +513,7 @@ Define(quickening_buff 198924)
 
 	SpellInfo(ray_of_frost cd=60 channel=10 tag=main)
 
-	SpellInfo(rune_of_power buff_totem=rune_of_power_buff duration=180 max_totems=2 totem=1)
+	SpellInfo(rune_of_power buff_totem=rune_of_power_buff duration=180 max_totems=1 totem=1)
 	SpellAddBuff(rune_of_power ice_floes_buff=0 if_spell=ice_floes)
 	SpellAddBuff(rune_of_power presence_of_mind_buff=0 if_spell=presence_of_mind)
 Define(rune_of_power_buff 116014)

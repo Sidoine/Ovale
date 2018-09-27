@@ -1476,7 +1476,7 @@ end
 local IsTotem = function(name)
     if sub(name, 1, 13) == "efflorescence" then
         return true
-    elseif name == "prismatic_crystal" or name == "rune_of_power" then
+    elseif name == "rune_of_power" then
         return true
     elseif sub(name, -7, -1) == "_statue" then
         return true
