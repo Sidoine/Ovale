@@ -19,6 +19,8 @@ local GetTotemInfo = GetTotemInfo
 local MAX_TOTEMS = MAX_TOTEMS
 local __Aura = LibStub:GetLibrary("ovale/Aura")
 local OvaleAura = __Aura.OvaleAura
+local __Future = LibStub:GetLibrary("ovale/Future")
+local OvaleFuture = __Future.OvaleFuture
 local self_serial = 0
 local TOTEM_CLASS = {
     DRUID = true,
@@ -112,6 +114,9 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
             if si.buff_totem then
                 local aura = OvaleAura:GetAura("player", si.buff_totem, atTime, "HELPFUL")
                 buffPresent = OvaleAura:IsActiveAura(aura, atTime)
+                if  not buffPresent then
+                    buffPresent = (OvaleFuture.next.lastGCDSpellId == spellId)
+                end
             end
             if  not si.buff_totem or buffPresent then
                 local texture = OvaleSpellBook:GetSpellTexture(spellId)

@@ -8,6 +8,7 @@ import { ipairs, pairs, LuaObj, LuaArray, kpairs } from "@wowts/lua";
 import { GetTotemInfo, MAX_TOTEMS } from "@wowts/wow-mock";
 import { SpellCast } from "./LastSpell";
 import { OvaleAura } from "./Aura";
+import { OvaleFuture } from "./Future";
 
 export let OvaleTotem: OvaleTotemClass;
 
@@ -121,6 +122,11 @@ class OvaleTotemClass extends OvaleTotemBase {
             if (si.buff_totem) {
                 let aura = OvaleAura.GetAura("player", si.buff_totem, atTime, "HELPFUL");
                 buffPresent = OvaleAura.IsActiveAura(aura, atTime);
+                // if can take a while for the buffs to appear
+                // so if the previous GCD spell is our totem, we assume the buffs are up
+                if(!buffPresent) {
+                    buffPresent = (OvaleFuture.next.lastGCDSpellId == spellId);
+                }
             }
             if (!si.buff_totem || buffPresent) {
                 let texture = OvaleSpellBook.GetSpellTexture(spellId);

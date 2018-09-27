@@ -73,10 +73,10 @@
    <Script file="CooldownState.lua"/>
    <Script file="Aura.lua"/>
    <Script file="Warlock.lua"/>
-   <Script file="Totem.lua"/>
    <Script file="DemonHunterSoulFragments.lua"/>
    <Script file="DemonHunterDemonic.lua"/>
    <Script file="Future.lua"/>
+   <Script file="Totem.lua"/>
    <Script file="Score.lua"/>
    <Script file="Recount.lua"/>
    <Script file="Power.lua"/>
