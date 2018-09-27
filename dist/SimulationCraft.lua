@@ -1480,6 +1480,8 @@ local IsTotem = function(name)
         return true
     elseif sub(name, -7, -1) == "_statue" then
         return true
+    elseif match(name, "invoke_(niuzao|xuen|chiji)") then
+        return true
     elseif sub(name, -6, -1) == "_totem" then
         return true
     end

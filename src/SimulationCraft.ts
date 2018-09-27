@@ -1647,6 +1647,8 @@ const IsTotem = function(name: string) {
         return true;
     } else if (sub(name, -7, -1) == "_statue") {
         return true;
+    } else if (truthy(match(name, "invoke_(niuzao|xuen|chiji)"))) {
+        return true;
     } else if (sub(name, -6, -1) == "_totem") {
         return true;
     }
