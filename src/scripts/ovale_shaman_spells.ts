@@ -349,7 +349,7 @@ Define(far_sight 6196)
 
 	SpellInfo(feral_lunge cd=30)
 
-	SpellInfo(feral_spirit cd=120 duration=15)
+	SpellInfo(feral_spirit cd=120 duration=15 totem=1 max_totems=2)
 	SpellInfo(feral_spirit add_cd=-30 talent=elemental_spirits_talent)
 	SpellAddBuff(feral_spirit icy_edge_buff=1)
 	SpellAddBuff(feral_spirit molten_weapon_buff=1)
