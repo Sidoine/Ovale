@@ -309,6 +309,7 @@ Define(cloudburst_totem 157153)
 Define(crash_lightning_buff 187878)
 Define(downpour 207778)
 
+    SpellInfo(earth_elemental totem=1 max_totems=1)
 	
 Define(earth_shield 974)
 	SpellAddTargetBuff(earth_shield earth_shield_buff=9)
@@ -355,7 +356,8 @@ Define(far_sight 6196)
 	SpellAddBuff(feral_spirit molten_weapon_buff=1)
 
 	
-	SpellInfo(fire_elemental replaced_by=storm_elemental talent=storm_elemental_talent)
+	SpellInfo(fire_elemental totem=1 max_totems=1)
+    SpellInfo(fire_elemental replaced_by=storm_elemental talent=storm_elemental_talent)
 
 	SpellInfo(flame_shock cd=6)
 	SpellAddTargetDebuff(flame_shock flame_shock_debuff=1)
@@ -498,7 +500,7 @@ Define(spiritwalkers_grace 79206)
 Define(spiritwalkers_grace_buff 79206)
 	SpellInfo(spiritwalkers_grace_buff duration=15)
 
-	SpellInfo(storm_elemental cd=150)
+	SpellInfo(storm_elemental cd=150 totem=1 max_totems=1)
 
 Define(stormbringer_buff 201846)
 	SpellInfo(stormbringer_buff duration=12)
