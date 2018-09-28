@@ -2190,6 +2190,11 @@ EmitAction = function(parseNode, nodeList, annotation)
             conditionCode = "SpellKnown(half_moon)"
         elseif className == "DRUID" and action == "full_moon" then
             conditionCode = "SpellKnown(full_moon)"
+        elseif className == "DRUID" and action == "regrowth" and specialization == "feral" then
+            conditionCode = "Talent(bloodtalons_talent) and (BuffRemaining(bloodtalons_buff) < CastTime(regrowth)+GCDRemaining() or InCombat())"
+            AddSymbol(annotation, "bloodtalons_talent")
+            AddSymbol(annotation, "bloodtalons_buff")
+            AddSymbol(annotation, "regrowth")
         elseif className == "HUNTER" and action == "kill_command" then
             conditionCode = "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()"
         elseif className == "MAGE" and action == "arcane_brilliance" then
