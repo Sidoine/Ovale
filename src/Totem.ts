@@ -123,7 +123,7 @@ class OvaleTotemClass extends OvaleTotemBase {
         let count = 0;
         let si = OvaleData.spellInfo[spellId];
         if (si && si.totem) {
-            // if can take a while for the buffs to appear
+            // it can take a while for the buffs to appear
             // so if the previous GCD spell is our totem, we assume the buffs are up
             let buffPresent = (OvaleFuture.next.lastGCDSpellId == spellId);
             if (!buffPresent && si.buff_totem) {
