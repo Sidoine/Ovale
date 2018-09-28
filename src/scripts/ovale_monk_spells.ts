@@ -312,13 +312,12 @@ Define(healing_elixir 122281)
 	SpellRequire(healing_elixir unusable 1=debuff,healing_immunity_debuff)
 
 Define(invoke_chiji_the_red_crane 198664)
-	SpellInfo(invoke_chiji_the_red_crane cd=180 talent=invoke_chiji_the_red_crane_talent)
+	SpellInfo(invoke_chiji_the_red_crane cd=180 totem=1)
 
 
-	SpellInfo(invoke_niuzao_the_black_ox cd=180 talent=invoke_niuzao_the_black_ox_talent)
+	SpellInfo(invoke_niuzao_the_black_ox cd=180 totem=1)
 
-
-	SpellInfo(invoke_xuen_the_white_tiger cd=180 talent=invoke_xuen_the_white_tiger_talent)
+	SpellInfo(invoke_xuen_the_white_tiger cd=180 totem=1)
 
 SpellInfo(ironskin_brew cd=15 charges=3 cd_haste=melee)
 SpellInfo(ironskin_brew add_cd=-3 charges=4 talent=light_brewing_talent)
@@ -419,13 +418,12 @@ SpellRequire(spinning_crane_kick chi_percent 0=buff,serenity)
 
     SpellRequire(storm_earth_and_fire unusable 1=buff,storm_earth_and_fire)
 	SpellInfo(storm_earth_and_fire replaced_by=serenity talent=serenity_talent)
-	
 
-	Define(summon_black_ox_statue 115315)
-	SpellInfo(summon_black_ox_statue cd=10 duration=900 totem=1)
+Define(summon_black_ox_statue 115315)
+	SpellInfo(summon_black_ox_statue cd=10 duration=900 totem=1 max_totems=1)
 
 Define(summon_jade_serpent_statue 115313)
-  SpellInfo(summon_jade_serpent_statue cd=10 duration=900 totem=1)
+    SpellInfo(summon_jade_serpent_statue cd=10 duration=900 totem=1 max_totems=1)
 
 SpellInfo(swift_roundhouse_buff max_stacks=2)
 

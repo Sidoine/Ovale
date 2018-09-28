@@ -1449,6 +1449,8 @@ local InitializeDisambiguation = function()
     AddDisambiguation("healing_surge", "healing_surge_restoration", "SHAMAN", "restoration")
     AddDisambiguation("lightning_bolt", "lightning_bolt_elemental", "SHAMAN", "elemental")
     AddDisambiguation("lightning_bolt", "lightning_bolt_enhancement", "SHAMAN", "enhancement")
+    AddDisambiguation("resonance_totem", "ele_resonance_totem_buff", "SHAMAN", "elemental")
+    AddDisambiguation("resonance_totem", "enh_resonance_totem_buff", "SHAMAN", "enhancement")
     AddDisambiguation("strike", "windstrike", "SHAMAN", "enhancement")
     AddDisambiguation("totem_mastery", "totem_mastery_elemental", "SHAMAN", "elemental")
     AddDisambiguation("totem_mastery", "totem_mastery_enhancement", "SHAMAN", "enhancement")
@@ -1474,11 +1476,13 @@ local InitializeDisambiguation = function()
 end
 
 local IsTotem = function(name)
-    if sub(name, 1, 13) == "wild_mushroom" then
+    if sub(name, 1, 13) == "efflorescence" then
         return true
-    elseif name == "prismatic_crystal" or name == "rune_of_power" then
+    elseif name == "rune_of_power" then
         return true
     elseif sub(name, -7, -1) == "_statue" then
+        return true
+    elseif match(name, "invoke_(niuzao|xuen|chiji)") then
         return true
     elseif sub(name, -6, -1) == "_totem" then
         return true
@@ -2280,10 +2284,10 @@ EmitAction = function(parseNode, nodeList, annotation)
             AddSymbol(annotation, spellName)
             conditionCode = format("target.InRange(%s)", spellName)
         elseif className == "SHAMAN" and action == "totem_mastery_elemental" then
-            conditionCode = "(not BuffPresent(ele_resonance_totem_buff) or InCombat())"
+            conditionCode = "(InCombat() or not BuffPresent(ele_resonance_totem_buff))"
             AddSymbol(annotation, "ele_resonance_totem_buff")
         elseif className == "SHAMAN" and action == "totem_mastery_enhancement" then
-            conditionCode = "(not BuffPresent(enh_resonance_totem_buff) or InCombat())"
+            conditionCode = "(InCombat() or not BuffPresent(enh_resonance_totem_buff))"
             AddSymbol(annotation, "enh_resonance_totem_buff")
         elseif className == "WARLOCK" and action == "cancel_metamorphosis" then
             local spellName = "metamorphosis"
@@ -3833,8 +3837,10 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
         code = "BuffRemaining(roll_the_bones_buff)"
         AddSymbol(annotation, "roll_the_bones_buff")
     elseif className == "SHAMAN" and operand == "buff.resonance_totem.remains" then
-        code = "TotemRemaining(totem_mastery)"
+        local spell = Disambiguate(annotation, "totem_mastery", annotation.class, annotation.specialization)
+        code = format("TotemRemaining(%s)", spell)
         ok = true
+        AddSymbol(annotation, spell)
     elseif className == "SHAMAN" and match(operand, "pet.[a-z_]+.active") then
         code = "pet.Present()"
         ok = true

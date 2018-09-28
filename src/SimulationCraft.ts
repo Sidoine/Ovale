@@ -1613,6 +1613,8 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("healing_surge", "healing_surge_restoration", "SHAMAN", "restoration");
     AddDisambiguation("lightning_bolt", "lightning_bolt_elemental", "SHAMAN", "elemental");
     AddDisambiguation("lightning_bolt", "lightning_bolt_enhancement", "SHAMAN", "enhancement");
+    AddDisambiguation("resonance_totem", "ele_resonance_totem_buff", "SHAMAN", "elemental");
+    AddDisambiguation("resonance_totem", "enh_resonance_totem_buff", "SHAMAN", "enhancement");
     AddDisambiguation("strike", "windstrike", "SHAMAN", "enhancement");
     AddDisambiguation("totem_mastery", "totem_mastery_elemental", "SHAMAN", "elemental");
     AddDisambiguation("totem_mastery", "totem_mastery_enhancement", "SHAMAN", "enhancement");
@@ -1641,11 +1643,13 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("meat_cleaver", "whirlwind", "WARRIOR", "fury")
 }
 const IsTotem = function(name: string) {
-    if (sub(name, 1, 13) == "wild_mushroom") {
+    if (sub(name, 1, 13) == "efflorescence") {
         return true;
-    } else if (name == "prismatic_crystal" || name == "rune_of_power") {
+    } else if (name == "rune_of_power") {
         return true;
     } else if (sub(name, -7, -1) == "_statue") {
+        return true;
+    } else if (truthy(match(name, "invoke_(niuzao|xuen|chiji)"))) {
         return true;
     } else if (sub(name, -6, -1) == "_totem") {
         return true;
@@ -2457,10 +2461,10 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             AddSymbol(annotation, spellName);
             conditionCode = format("target.InRange(%s)", spellName);
         } else if (className == "SHAMAN" && action == "totem_mastery_elemental") {
-            conditionCode = "(not BuffPresent(ele_resonance_totem_buff) or InCombat())";
+            conditionCode = "(InCombat() or not BuffPresent(ele_resonance_totem_buff))";
             AddSymbol(annotation, "ele_resonance_totem_buff");
 		} else if (className == "SHAMAN" && action == "totem_mastery_enhancement") {
-            conditionCode = "(not BuffPresent(enh_resonance_totem_buff) or InCombat())";
+            conditionCode = "(InCombat() or not BuffPresent(enh_resonance_totem_buff))";
             AddSymbol(annotation, "enh_resonance_totem_buff");
         } else if (className == "WARLOCK" && action == "cancel_metamorphosis") {
             let spellName = "metamorphosis";
@@ -4000,8 +4004,10 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
         code = "BuffRemaining(roll_the_bones_buff)";
         AddSymbol(annotation, "roll_the_bones_buff");
     } else if (className == "SHAMAN" && operand == "buff.resonance_totem.remains") {
-        code = "TotemRemaining(totem_mastery)";
+        let [spell] = Disambiguate(annotation, "totem_mastery", annotation.class, annotation.specialization);
+        code = format("TotemRemaining(%s)", spell);
         ok = true;
+        AddSymbol(annotation, spell);
     } else if (className == "SHAMAN" && truthy(match(operand, "pet.[a-z_]+.active"))) {
         code = "pet.Present()";
         ok = true;

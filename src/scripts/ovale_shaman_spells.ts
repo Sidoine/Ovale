@@ -309,6 +309,7 @@ Define(cloudburst_totem 157153)
 Define(crash_lightning_buff 187878)
 Define(downpour 207778)
 
+    SpellInfo(earth_elemental totem=1 max_totems=1)
 	
 Define(earth_shield 974)
 	SpellAddTargetBuff(earth_shield earth_shield_buff=9)
@@ -349,13 +350,14 @@ Define(far_sight 6196)
 
 	SpellInfo(feral_lunge cd=30)
 
-	SpellInfo(feral_spirit cd=120 duration=15)
+	SpellInfo(feral_spirit cd=120 duration=15 totem=1 max_totems=2)
 	SpellInfo(feral_spirit add_cd=-30 talent=elemental_spirits_talent)
 	SpellAddBuff(feral_spirit icy_edge_buff=1)
 	SpellAddBuff(feral_spirit molten_weapon_buff=1)
 
 	
-	SpellInfo(fire_elemental replaced_by=storm_elemental talent=storm_elemental_talent)
+	SpellInfo(fire_elemental totem=1 max_totems=1)
+    SpellInfo(fire_elemental replaced_by=storm_elemental talent=storm_elemental_talent)
 
 	SpellInfo(flame_shock cd=6)
 	SpellAddTargetDebuff(flame_shock flame_shock_debuff=1)
@@ -498,7 +500,7 @@ Define(spiritwalkers_grace 79206)
 Define(spiritwalkers_grace_buff 79206)
 	SpellInfo(spiritwalkers_grace_buff duration=15)
 
-	SpellInfo(storm_elemental cd=150)
+	SpellInfo(storm_elemental cd=150 totem=1 max_totems=1)
 
 Define(stormbringer_buff 201846)
 	SpellInfo(stormbringer_buff duration=12)
@@ -522,11 +524,13 @@ Define(tidal_waves 51564)
 Define(tidal_waves_buff 53390)
 	SpellInfo(tidal_waves_buff duration=15 max_stacks=2)
 Define(totem_mastery_elemental 210643)
+    SpellInfo(totem_mastery_elemental totem=1 buff_totem=ele_resonance_totem_buff)
 	SpellAddBuff(totem_mastery_elemental ele_resonance_totem_buff=1)
 	SpellAddBuff(totem_mastery_elemental ele_tailwind_totem_buff=1)
 	SpellAddBuff(totem_mastery_elemental ele_ember_totem_buff=1)
 	SpellAddBuff(totem_mastery_elemental ele_strom_totem_buff=1)
 Define(totem_mastery_enhancement 262395)
+    SpellInfo(totem_mastery_enhancement totem=1 buff_totem=enh_resonance_totem_buff)
 	SpellAddBuff(totem_mastery_enhancement enh_resonance_totem_buff=1)
 	SpellAddBuff(totem_mastery_enhancement enh_tailwind_totem_buff=1)
 	SpellAddBuff(totem_mastery_enhancement enh_ember_totem_buff=1)
