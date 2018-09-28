@@ -86,7 +86,7 @@ local OvaleActionBarClass = __class(OvaleActionBarBase, {
     GetKeyBinding = function(self, slot)
         local name
         if _G["Bartender4"] then
-            name = "CLICK BT4Button " .. slot .. ":LeftButton"
+            name = "CLICK BT4Button" .. slot .. ":LeftButton"
         else
             if slot <= 24 or slot > 72 then
                 name = "ACTIONBUTTON" .. (((slot - 1) % 12) + 1)
