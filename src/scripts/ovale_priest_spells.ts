@@ -17,6 +17,11 @@ Define(arcane_pulse 260364)
 # Deals <damage> Arcane damage to nearby enemies and reduces their movement speed by 260369s1. Lasts 12 seconds.
   SpellInfo(arcane_pulse cd=180 gcd=1)
 
+Define(battle_potion_of_intellect 279151)
+# Increases your Intellect by s1 for 25 seconds.
+  SpellInfo(battle_potion_of_intellect cd=1 duration=25 gcd=0 offgcd=1)
+  # Intellect increased by w1.
+  SpellAddBuff(battle_potion_of_intellect battle_potion_of_intellect=1)
 Define(berserking 26297)
 # Increases your haste by s1 for 10 seconds.
   SpellInfo(berserking cd=180 duration=10 gcd=0 offgcd=1)
