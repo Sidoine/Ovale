@@ -25,6 +25,7 @@ local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local ceil = math.ceil
 local INFINITY = math.huge
 local floor = math.floor
+local ipairs = ipairs
 local pairs = pairs
 local tostring = tostring
 local tonumber = tonumber
@@ -105,12 +106,16 @@ local PowerModule = __class(nil, {
             if ratio and ratio ~= 0 then
                 local addRequirements = si and si.require["add_" .. powerType .. "_from_aura"]
                 if addRequirements then
-                    for v, requirement in pairs(addRequirements) do
-                        local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
-                        if verified then
-                            local aura = OvaleAura:GetAura("player", requirement[2], atTime, nil, true)
-                            if OvaleAura:IsActiveAura(aura, atTime) then
-                                cost = cost + (tonumber(v) or 0) * aura.stacks
+                    for v, rArray in pairs(addRequirements) do
+                        if isLuaArray(rArray) then
+                            for _, requirement in ipairs(rArray) do
+                                local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                                if verified then
+                                    local aura = OvaleAura:GetAura("player", requirement[2], atTime, nil, true)
+                                    if OvaleAura:IsActiveAura(aura, atTime) then
+                                        cost = cost + (tonumber(v) or 0) * aura.stacks
+                                    end
+                                end
                             end
                         end
                     end
@@ -132,15 +137,19 @@ local PowerModule = __class(nil, {
                 else
                     local refundRequirements = si and si.require["refund_" .. powerType]
                     if refundRequirements then
-                        for v, requirement in pairs(refundRequirements) do
-                            local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
-                            if verified then
-                                if v == "cost" then
-                                    spellRefund = spellCost
-                                elseif isNumber(v) then
+                        for v, rArray in pairs(refundRequirements) do
+                            if isLuaArray(rArray) then
+                                for _, requirement in ipairs(rArray) do
+                                    local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                                    if verified then
+                                        if v == "cost" then
+                                            spellRefund = spellCost
+                                        elseif isNumber(v) then
+                                        end
+                                        refund = refund + (tonumber(v) or 0)
+                                        break
+                                    end
                                 end
-                                refund = refund + (tonumber(v) or 0)
-                                break
                             end
                         end
                     end

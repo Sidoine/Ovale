@@ -10,7 +10,7 @@ import { RegisterRequirement, UnregisterRequirement, CheckRequirements, Tokens }
 import { SpellCast } from "./LastSpell";
 import aceEvent from "@wowts/ace_event-3.0";
 import { ceil, huge as INFINITY, floor } from "@wowts/math";
-import { pairs, LuaObj, tostring, tonumber, LuaArray, kpairs } from "@wowts/lua";
+import { ipairs, pairs, LuaObj, tostring, tonumber, LuaArray, kpairs } from "@wowts/lua";
 import { lower } from "@wowts/string";
 import { concat, insert } from "@wowts/table";
 import { GetPowerRegen, GetManaRegen, GetSpellPowerCost, UnitPower, UnitPowerMax, UnitPowerType, Enum, MAX_COMBO_POINTS, ClassId } from "@wowts/wow-mock";
@@ -110,14 +110,18 @@ class PowerModule {
             if (ratio && ratio != 0) {
 				let addRequirements = si && si.require[`add_${powerType}_from_aura` as keyof SpellInfo];
 				if (addRequirements) {
-					for (const [v, requirement] of pairs(addRequirements)) {
-						let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
-						if (verified) {
-							let aura = <any>OvaleAura.GetAura("player", requirement[2], atTime, undefined, true);
-							if (OvaleAura.IsActiveAura(aura, atTime)) {
-								cost = cost + (tonumber(v) || 0) * aura.stacks;
-							}
-						}
+					for (const [v, rArray] of pairs(addRequirements)) {
+                        if (isLuaArray(rArray)) {
+                            for (const [, requirement] of ipairs<any>(rArray)) {
+                                let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
+                                if (verified) {
+                                    let aura = <any>OvaleAura.GetAura("player", requirement[2], atTime, undefined, true);
+                                    if (OvaleAura.IsActiveAura(aura, atTime)) {
+                                        cost = cost + (tonumber(v) || 0) * aura.stacks;
+                                    }
+                                }
+                            }
+                        }
 					}
 				}
 				
@@ -140,16 +144,20 @@ class PowerModule {
                 } else {
                     let refundRequirements = si && si.require[`refund_${powerType}` as keyof SpellInfo];
                     if (refundRequirements) {
-                        for (const [v, requirement] of pairs(refundRequirements)) {
-                            let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
-                            if (verified) {
-                                if (v == "cost") {
-                                    spellRefund = spellCost
-                                } else if (isNumber(v)) {
-
+                        for (const [v, rArray] of pairs(refundRequirements)) {
+                            if (isLuaArray(rArray)) {
+                                for (const [, requirement] of ipairs<any>(rArray)) {
+                                    let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
+                                    if (verified) {
+                                        if (v == "cost") {
+                                            spellRefund = spellCost
+                                        } else if (isNumber(v)) {
+ 
+                                        }
+                                        refund = <number>refund + (tonumber(v) || 0);
+                                        break;
+                                    }
                                 }
-                                refund = <number>refund + (tonumber(v) || 0);
-                                break;
                             }
                         }
                     }

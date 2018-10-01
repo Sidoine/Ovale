@@ -16,6 +16,7 @@ import { checkBoxes, lists, ResetControls } from "./Controls";
 import aceEvent from "@wowts/ace_event-3.0";
 import { ipairs, pairs, tonumber, tostring, type, wipe, LuaArray, lualength, truthy, LuaObj, kpairs } from "@wowts/lua";
 import { find, match, sub } from "@wowts/string";
+import { insert } from "@wowts/table";
 import { GetSpellInfo } from "@wowts/wow-mock";
 import { isLuaArray, checkToken } from "./tools";
 
@@ -245,11 +246,16 @@ function EvaluateItemRequire(node: AstNode) {
         const property = node.property;
         let count = 0;
         let ii = OvaleData.ItemInfo(itemId);
-        let tbl = ii.require[property] || {}
+        let tbl = ii.require[property] || {};
+        let arr = undefined;
         for (const [k, v] of kpairs(namedParams)) {
             if (!checkToken(PARAMETER_KEYWORD, k)) {
-                tbl[k] = <any>v;
-                count = count + 1;
+                arr = tbl[k] || {};
+                if (isLuaArray(arr)) {
+                    insert(arr, v);
+                    tbl[k] = arr;
+                    count = count + 1;
+                }
             }
         }
         if (count > 0) {
@@ -415,10 +421,15 @@ function EvaluateSpellRequire(node: AstNode) {
         let count = 0;
         let si = OvaleData.SpellInfo(spellId);
         let tbl = si.require[property] || {};
+        let arr = undefined;
         for (const [k, v] of kpairs(namedParams)) {
             if (!checkToken(PARAMETER_KEYWORD, k)) {
-                tbl[k] = <any>v;
-                count = count + 1;
+                arr = tbl[k] || {};
+                if (isLuaArray(arr)) {
+                    insert(arr, v);
+                    tbl[k] = arr;
+                    count = count + 1;
+                }
             }
         }
         if (count > 0) {

@@ -2,7 +2,7 @@ import { Ovale } from "./Ovale";
 import { OvaleGUID } from "./GUID";
 import { OvaleDebug } from "./Debug";
 import { nowRequirements, CheckRequirements } from "./Requirement";
-import { type, pairs, tonumber, wipe, truthy, LuaArray, LuaObj } from "@wowts/lua";
+import { type, ipairs, pairs, tonumber, wipe, truthy, LuaArray, LuaObj } from "@wowts/lua";
 import { find } from "@wowts/string";
 import { baseState } from "./BaseState";
 import { isLuaArray, isString } from "./tools";
@@ -507,11 +507,15 @@ class OvaleDataClass extends OvaleDataBase {
         let value = ii && ii[property];
         let requirements = ii && ii.require[property];
         if (requirements) {
-            for (const [v, requirement] of pairs(requirements)) {
-                let verified = CheckRequirements(itemId, atTime, requirement, 1, targetGUID);
-                if (verified) {
-                    value = tonumber(v) || v;
-                    break;
+            for (const [v, rArray] of pairs(requirements)) {
+                if (isLuaArray(rArray)) {
+                    for (const [, requirement] of ipairs<any>(rArray)) {
+                        let verified = CheckRequirements(itemId, atTime, requirement, 1, targetGUID);
+                        if (verified) {
+                            value = tonumber(v) || v;
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -533,11 +537,15 @@ class OvaleDataClass extends OvaleDataBase {
         let value = si && si[property];
         let requirements = si && si.require[property];
         if (requirements) {
-            for (const [v, requirement] of pairs(requirements)) {
-                let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
-                if (verified) {
-                    value = tonumber(v) || v;
-                    break;
+            for (const [v, rArray] of pairs(requirements)) {
+                if (isLuaArray(rArray)) {
+                    for (const [, requirement] of ipairs<any>(rArray)) {
+                        let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
+                        if (verified) {
+                            value = tonumber(v) || v;
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -566,13 +574,17 @@ class OvaleDataClass extends OvaleDataBase {
         if (atTime) {  
             let ratioRequirements = si && si.require[ratioParam];
             if (ratioRequirements) {
-                for (const [v, requirement] of pairs(ratioRequirements)) {
-                    let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
-                    if (verified) {
-                        if (ratio != 0) {
-                            ratio = ratio * ((tonumber(v) / 100) || 1);
-                        } else {
-                            break;
+                for (const [v, rArray] of pairs(ratioRequirements)) {
+                    if (isLuaArray(rArray)) {
+                        for (const [, requirement] of ipairs<any>(rArray)) {
+                            let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
+                            if (verified) {
+                                if (ratio != 0) {
+                                    ratio = ratio * ((tonumber(v) / 100) || 1);
+                                } else {
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
@@ -588,10 +600,14 @@ class OvaleDataClass extends OvaleDataBase {
             if (atTime) {
                 let addRequirements = si && si.require[addParam];
                 if (addRequirements) {
-                    for (const [v, requirement] of pairs(addRequirements)) {
-                        let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
-                        if (verified) {
-                            value = value + (tonumber(v) || 0);
+                    for (const [v, rArray] of pairs(addRequirements)) {
+                        if (isLuaArray(rArray)) {
+                            for (const [, requirement] of ipairs<any>(rArray)) {
+                                let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
+                                if (verified) {
+                                    value = value + (tonumber(v) || 0);
+                                }
+                            }
                         }
                     }
                 }

@@ -11,6 +11,7 @@ local __Requirement = LibStub:GetLibrary("ovale/Requirement")
 local nowRequirements = __Requirement.nowRequirements
 local CheckRequirements = __Requirement.CheckRequirements
 local type = type
+local ipairs = ipairs
 local pairs = pairs
 local tonumber = tonumber
 local wipe = wipe
@@ -411,11 +412,15 @@ local OvaleDataClass = __class(OvaleDataBase, {
         local value = ii and ii[property]
         local requirements = ii and ii.require[property]
         if requirements then
-            for v, requirement in pairs(requirements) do
-                local verified = CheckRequirements(itemId, atTime, requirement, 1, targetGUID)
-                if verified then
-                    value = tonumber(v) or v
-                    break
+            for v, rArray in pairs(requirements) do
+                if isLuaArray(rArray) then
+                    for _, requirement in ipairs(rArray) do
+                        local verified = CheckRequirements(itemId, atTime, requirement, 1, targetGUID)
+                        if verified then
+                            value = tonumber(v) or v
+                            break
+                        end
+                    end
                 end
             end
         end
@@ -427,11 +432,15 @@ local OvaleDataClass = __class(OvaleDataBase, {
         local value = si and si[property]
         local requirements = si and si.require[property]
         if requirements then
-            for v, requirement in pairs(requirements) do
-                local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
-                if verified then
-                    value = tonumber(v) or v
-                    break
+            for v, rArray in pairs(requirements) do
+                if isLuaArray(rArray) then
+                    for _, requirement in ipairs(rArray) do
+                        local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                        if verified then
+                            value = tonumber(v) or v
+                            break
+                        end
+                    end
                 end
             end
         end
@@ -450,13 +459,17 @@ local OvaleDataClass = __class(OvaleDataBase, {
         if atTime then
             local ratioRequirements = si and si.require[ratioParam]
             if ratioRequirements then
-                for v, requirement in pairs(ratioRequirements) do
-                    local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
-                    if verified then
-                        if ratio ~= 0 then
-                            ratio = ratio * ((tonumber(v) / 100) or 1)
-                        else
-                            break
+                for v, rArray in pairs(ratioRequirements) do
+                    if isLuaArray(rArray) then
+                        for _, requirement in ipairs(rArray) do
+                            local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                            if verified then
+                                if ratio ~= 0 then
+                                    ratio = ratio * ((tonumber(v) / 100) or 1)
+                                else
+                                    break
+                                end
+                            end
                         end
                     end
                 end
@@ -472,10 +485,14 @@ local OvaleDataClass = __class(OvaleDataBase, {
             if atTime then
                 local addRequirements = si and si.require[addParam]
                 if addRequirements then
-                    for v, requirement in pairs(addRequirements) do
-                        local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
-                        if verified then
-                            value = value + (tonumber(v) or 0)
+                    for v, rArray in pairs(addRequirements) do
+                        if isLuaArray(rArray) then
+                            for _, requirement in ipairs(rArray) do
+                                local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                                if verified then
+                                    value = value + (tonumber(v) or 0)
+                                end
+                            end
                         end
                     end
                 end
