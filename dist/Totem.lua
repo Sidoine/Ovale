@@ -84,6 +84,9 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
         __exports.OvaleTotem:StopProfiling("OvaleTotem_ApplySpellAfterCast")
     end,
     IsActiveTotem = function(self, totem, atTime)
+        if  not totem then
+            return false
+        end
         if totem.serial < self_serial then
             totem = self:GetTotem(totem.slot)
         end

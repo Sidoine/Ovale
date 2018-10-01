@@ -89,6 +89,7 @@ class OvaleTotemClass extends OvaleTotemBase {
     }
 
     IsActiveTotem(totem: Totem, atTime: number) {
+        if (!totem) return false;
         if (totem.serial < self_serial) {
             totem = this.GetTotem(totem.slot);
         }
