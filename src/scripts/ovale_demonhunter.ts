@@ -45,7 +45,7 @@ AddFunction waiting_for_nemesis
 
 AddFunction blade_dance
 {
- Talent(first_blood_talent) or ArmorSetBonus(T20 4) or Enemies() >= 3 - TalentPoints(trail_of_ruin_talent)
+ Talent(first_blood_talent) or Enemies() >= 3 - TalentPoints(trail_of_ruin_talent)
 }
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=havoc)
@@ -393,7 +393,7 @@ AddFunction HavocDefaultShortCdPostConditions
 
 AddFunction HavocDefaultCdActions
 {
- #variable,name=blade_dance,value=talent.first_blood.enabled|set_bonus.tier20_4pc|spell_targets.blade_dance1>=(3-talent.trail_of_ruin.enabled)
+ #variable,name=blade_dance,value=talent.first_blood.enabled|spell_targets.blade_dance1>=(3-talent.trail_of_ruin.enabled)
  #variable,name=waiting_for_nemesis,value=!(!talent.nemesis.enabled|cooldown.nemesis.ready|cooldown.nemesis.remains>target.time_to_die|cooldown.nemesis.remains>60)
  #variable,name=pooling_for_meta,value=!talent.demonic.enabled&cooldown.metamorphosis.remains<6&fury.deficit>30&(!variable.waiting_for_nemesis|cooldown.nemesis.remains<10)
  #variable,name=pooling_for_blade_dance,value=variable.blade_dance&(fury<75-talent.first_blood.enabled*20)

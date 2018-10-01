@@ -47,7 +47,7 @@ Define(crusader_strike 35395)
 # Rank 2: Crusader Strike now has s1+1 charges.
   SpellInfo(crusader_strike cd=6 holypower=0)
 Define(divine_right_buff 278519)
-# When Divine Storm damages an enemy who is below s2 health, your Strength is increased by s1 for 10 seconds.
+# When Divine Storm damages an enemy who is below s2 health, your Strength is increased by s1 for 15 seconds.
   SpellInfo(divine_right_buff channel=-0.001 gcd=0 offgcd=1)
 
 Define(divine_storm 53385)

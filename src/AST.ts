@@ -1786,8 +1786,7 @@ export class OvaleASTClass extends OvaleASTBase {
             node.name = name;
             node.rawPositionalParams = positionalParams;
             node.rawNamedParams = namedParams;
-            annotation.parametersReference = annotation.parametersReference || {
-            }
+            annotation.parametersReference = annotation.parametersReference || {}
             annotation.parametersReference[lualength(annotation.parametersReference) + 1] = node;
         }
         return [ok, node];
