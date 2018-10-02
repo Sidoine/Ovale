@@ -740,7 +740,7 @@ AddFunction VengeanceBrandCdPostConditions
 AddFunction VengeanceDefaultMainActions
 {
  #consume_magic
- Spell(consume_magic)
+ if target.HasDebuffType(magic) Spell(consume_magic)
  #call_action_list,name=brand,if=talent.charred_flesh.enabled
  if Talent(charred_flesh_talent) VengeanceBrandMainActions()
 
@@ -767,7 +767,7 @@ AddFunction VengeanceDefaultShortCdActions
  #auto_attack
  VengeanceGetInMeleeRange()
 
- unless Spell(consume_magic)
+ unless target.HasDebuffType(magic) and Spell(consume_magic)
  {
   #call_action_list,name=brand,if=talent.charred_flesh.enabled
   if Talent(charred_flesh_talent) VengeanceBrandShortCdActions()
@@ -788,14 +788,14 @@ AddFunction VengeanceDefaultShortCdActions
 
 AddFunction VengeanceDefaultShortCdPostConditions
 {
- Spell(consume_magic) or Talent(charred_flesh_talent) and VengeanceBrandShortCdPostConditions() or VengeanceDefensivesShortCdPostConditions() or VengeanceNormalShortCdPostConditions()
+ target.HasDebuffType(magic) and Spell(consume_magic) or Talent(charred_flesh_talent) and VengeanceBrandShortCdPostConditions() or VengeanceDefensivesShortCdPostConditions() or VengeanceNormalShortCdPostConditions()
 }
 
 AddFunction VengeanceDefaultCdActions
 {
  VengeanceInterruptActions()
 
- unless Spell(consume_magic)
+ unless target.HasDebuffType(magic) and Spell(consume_magic)
  {
   #use_item,slot=trinket1
   VengeanceUseItemActions()
@@ -820,7 +820,7 @@ AddFunction VengeanceDefaultCdActions
 
 AddFunction VengeanceDefaultCdPostConditions
 {
- Spell(consume_magic) or Talent(charred_flesh_talent) and VengeanceBrandCdPostConditions() or VengeanceDefensivesCdPostConditions() or VengeanceNormalCdPostConditions()
+ target.HasDebuffType(magic) and Spell(consume_magic) or Talent(charred_flesh_talent) and VengeanceBrandCdPostConditions() or VengeanceDefensivesCdPostConditions() or VengeanceNormalCdPostConditions()
 }
 
 ### Vengeance icons.
