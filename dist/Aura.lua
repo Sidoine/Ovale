@@ -47,6 +47,7 @@ local __BaseState = LibStub:GetLibrary("ovale/BaseState")
 local baseState = __BaseState.baseState
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isLuaArray = __tools.isLuaArray
+local isString = __tools.isString
 local strlower = lower
 local strsub = sub
 local tconcat = concat
@@ -119,11 +120,11 @@ do
     end
 end
 __exports.DEBUFF_TYPE = {
-    Curse = true,
-    Disease = true,
-    Enrage = true,
-    Magic = true,
-    Poison = true
+    curse = true,
+    disease = true,
+    enrage = true,
+    magic = true,
+    poison = true
 }
 __exports.SPELLINFO_DEBUFF_TYPE = {}
 do
@@ -586,8 +587,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
             aura.filter = filter
             aura.visible = visible
             aura.icon = icon
-            aura.debuffType = debuffType
-            aura.enrage = (debuffType == "Enrage")
+            aura.debuffType = isString(debuffType) and lower(debuffType) or debuffType
             aura.stealable = isStealable
             aura.value1, aura.value2, aura.value3 = value1, value2, value3
             local mine = (casterGUID == self_playerGUID or OvaleGUID:IsPlayerPet(casterGUID))
@@ -714,7 +714,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                 else
                     local casterGUID = unitCaster and OvaleGUID:UnitGUID(unitCaster)
                     if debuffType == "" then
-                        debuffType = "Enrage"
+                        debuffType = "enrage"
                     end
                     local auraType = (filter == harmfulFilter and "HARMFUL") or "HELPFUL"
                     self:GainedAuraOnGUID(guid, now, spellId, casterGUID, auraType, true, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3)
@@ -756,7 +756,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                 for _, aura in pairs(whoseTable) do
                     if self:IsActiveAura(aura, atTime) and aura.filter == filter and  not aura.state then
                         local name = aura.name or "Unknown spell"
-                        insert(array, name .. ": " .. auraId .. " " .. (aura.debuffType or "nil") .. " enrage=" .. (aura.enrage and 1 or 0))
+                        insert(array, name .. ": " .. auraId .. " " .. (aura.debuffType or "nil") .. " enrage=" .. (aura.debuffType == "enrage" and 1 or 0))
                     end
                 end
             end
@@ -766,7 +766,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                 for _, aura in pairs(whoseTable) do
                     if self:IsActiveAura(aura, atTime) and aura.filter == filter then
                         local name = aura.name or "Unknown spell"
-                        insert(array, name .. ": " .. auraId .. " " .. (aura.debuffType or "nil") .. " enrage=" .. (aura.enrage and 1 or 0))
+                        insert(array, name .. ": " .. auraId .. " " .. (aura.debuffType or "nil") .. " enrage=" .. (aura.debuffType == "enrage" and 1 or 0))
                     end
                 end
             end
@@ -1268,8 +1268,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         aura.duration = aura.ending - aura.start
         aura.gain = aura.start
         aura.stacks = 1
-        aura.debuffType = debuffType
-        aura.enrage = debuffType == "Enrage"
+        aura.debuffType = isString(debuffType) and lower(debuffType) or debuffType
         OvalePaperDoll:UpdateSnapshot(aura, snapshot)
         __exports.PutAura(self.next.aura, guid, auraId, casterGUID, aura)
         return aura

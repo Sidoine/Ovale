@@ -107,6 +107,7 @@ local __Stagger = LibStub:GetLibrary("ovale/Stagger")
 local OvaleStagger = __Stagger.OvaleStagger
 local __LossOfControl = LibStub:GetLibrary("ovale/LossOfControl")
 local OvaleLossOfControl = __LossOfControl.OvaleLossOfControl
+local lower = string.lower
 local INFINITY = huge
 local function BossArmorDamageReduction(target)
     return 0.3
@@ -842,9 +843,10 @@ do
 local function EnrageRemaining(positionalParams, namedParams, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
         local target = ParseCondition(positionalParams, namedParams)
-        local start, ending = OvaleAura:GetAuraWithProperty(target, "enrage", "HELPFUL", atTime)
-        if start and ending then
-            return TestValue(start, INFINITY, 0, ending, -1, comparator, limit)
+        local aura = OvaleAura:GetAura(target, "enrage", atTime, "HELPFUL", false)
+        if aura and aura.ending >= atTime then
+            local gain, _, ending = aura.gain, aura.start, aura.ending
+            return TestValue(gain, INFINITY, 0, ending, -1, comparator, limit)
         end
         return Compare(0, comparator, limit)
     end
@@ -1138,7 +1140,12 @@ end
 do
 local function IsEnraged(positionalParams, namedParams, atTime)
         local target = ParseCondition(positionalParams, namedParams)
-        return OvaleAura:GetAuraWithProperty(target, "enrage", "HELPFUL", atTime)
+        local aura = OvaleAura:GetAura(target, "enrage", atTime, "HELPFUL", false)
+        if aura then
+            local gain, _, ending = aura.gain, aura.start, aura.ending
+            return gain, ending
+        end
+        return nil
     end
     OvaleCondition:RegisterCondition("isenraged", false, IsEnraged)
 end
@@ -2455,4 +2462,18 @@ local function TimeToShard(positionalParams, namedParams, atTime)
         return Compare(value, comparator, limit)
     end
     OvaleCondition:RegisterCondition("timetoshard", false, TimeToShard)
+end
+do
+local function HasDebuffType(positionalParams, namedParams, atTime)
+        local target = ParseCondition(positionalParams, namedParams)
+        for _, debuffType in ipairs(positionalParams) do
+            local aura = OvaleAura:GetAura(target, lower(debuffType), atTime, (target == "player" and "HARMFUL" or "HELPFUL"), false)
+            if aura then
+                local gain, _, ending = aura.gain, aura.start, aura.ending
+                return gain, ending
+            end
+        end
+        return nil
+    end
+    OvaleCondition:RegisterCondition("hasdebufftype", false, HasDebuffType)
 end
