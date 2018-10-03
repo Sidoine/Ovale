@@ -2362,13 +2362,13 @@ local function WeaponDPS(positionalParams, namedParams, atTime)
         local value = 0
         if hand == "offhand" or hand == "off" then
             comparator, limit = positionalParams[2], positionalParams[3]
-            value = OvalePaperDoll.next.offHandWeaponDPS
+            value = OvalePaperDoll.current.offHandWeaponDPS
         elseif hand == "mainhand" or hand == "main" then
             comparator, limit = positionalParams[2], positionalParams[3]
-            value = OvalePaperDoll.next.mainHandWeaponDPS
+            value = OvalePaperDoll.current.mainHandWeaponDPS
         else
             comparator, limit = positionalParams[1], positionalParams[2]
-            value = OvalePaperDoll.next.mainHandWeaponDPS
+            value = OvalePaperDoll.current.mainHandWeaponDPS
         end
         return Compare(value, comparator, limit)
     end

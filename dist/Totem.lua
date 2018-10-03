@@ -59,7 +59,8 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
         self.next.totems = {}
         for slot = 1, MAX_TOTEMS + 1, 1 do
             self.next.totems[slot] = {
-                slot = slot
+                slot = slot,
+                serial = 0
             }
         end
     end,
@@ -84,7 +85,10 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
         __exports.OvaleTotem:StopProfiling("OvaleTotem_ApplySpellAfterCast")
     end,
     IsActiveTotem = function(self, totem, atTime)
-        if totem.serial < self_serial then
+        if  not totem then
+            return false
+        end
+        if  not totem.serial or totem.serial < self_serial then
             totem = self:GetTotem(totem.slot)
         end
         return (totem and (totem.serial == self_serial) and totem.start and totem.duration and totem.start < atTime and atTime < totem.start + totem.duration)

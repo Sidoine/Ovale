@@ -325,52 +325,13 @@ class OvalePaperDollClass extends OvalePaperDollBase implements SpellCastModule 
             this.StopProfiling("OvalePaperDoll_UpdateStats");
         }
     }
-    /*
-    UNIT_ATTACK_SPEED(event, unitId) {
-        if (unitId == "player") {
-            this.StartProfiling("OvalePaperDoll_UpdateStats");
-            this.current.meleeAttackSpeedPercent = GetMeleeHaste();
-            this.current.snapshotTime = GetTime();
-            Ovale.needRefresh();
-            this.UpdateDamage(event);
-            this.StopProfiling("OvalePaperDoll_UpdateStats");
-        }
-    }
-    UNIT_RANGEDDAMAGE(event, unitId) {
-        if (unitId == "player") {
-            this.StartProfiling("OvalePaperDoll_UpdateStats");
-            this.current.rangedAttackSpeedPercent = GetRangedHaste();
-            this.current.snapshotTime = GetTime();
-            Ovale.needRefresh();
-            this.StopProfiling("OvalePaperDoll_UpdateStats");
-        }
-    }
-    UNIT_SPELL_HASTE(event, unitId) {
-        if (unitId == "player") {
-            this.StartProfiling("OvalePaperDoll_UpdateStats");
-            this.current.spellCastSpeedPercent = UnitSpellHaste(unitId);
-            this.current.snapshotTime = GetTime();
-            Ovale.needRefresh();
-            this.UpdateDamage(event);
-            this.StopProfiling("OvalePaperDoll_UpdateStats");
-        }
-    }
-    PLAYER_DAMAGE_DONE_MODS(event, unitId) {
-        this.StartProfiling("OvalePaperDoll_UpdateStats");
-        this.current.spellPower = GetSpellBonusDamage(OVALE_SPELLDAMAGE_SCHOOL[this.class]);
-        this.current.snapshotTime = GetTime();
-        Ovale.needRefresh();
-        this.StopProfiling("OvalePaperDoll_UpdateStats");
-    }
-    */
     UpdateDamage(event: string) {
         this.StartProfiling("OvalePaperDoll_UpdateDamage");
         let damageMultiplier = GetAppropriateDamageMultiplier("player");
         // let [mainHandAttackSpeed, offHandAttackSpeed] = UnitAttackSpeed("player"); // Could add back if we need something like calculating next swing
 
         // Appartently, if the character is not loaded, it returns 0
-        if (damageMultiplier == 0) return;
-        this.current.baseDamageMultiplier = damageMultiplier;
+        this.current.baseDamageMultiplier = damageMultiplier || 1;
         this.current.mainHandWeaponDPS = OvaleEquipment.mainHandDPS || 0;
         this.current.offHandWeaponDPS = OvaleEquipment.offHandDPS || 0;
         this.current.snapshotTime = GetTime();

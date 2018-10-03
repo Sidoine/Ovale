@@ -523,7 +523,7 @@ Define(t18_class_trinket 124516)
 Define(temporal_displacement_debuff 80354)
 	SpellInfo(temporal_displacement_debuff duration=600)
 Define(thermal_void 155149)
-
+Define(time_warp 80353)
 	SpellInfo(time_warp cd=300 gcd=0)
 	SpellAddBuff(time_warp time_warp_buff=1)
 	SpellAddDebuff(time_warp temporal_displacement_debuff=1)

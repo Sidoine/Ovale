@@ -4819,13 +4819,13 @@ l    */
         let value = 0;
         if (hand == "offhand" || hand == "off") {
             [comparator, limit] = [positionalParams[2], positionalParams[3]];
-            value = OvalePaperDoll.next.offHandWeaponDPS;
+            value = OvalePaperDoll.current.offHandWeaponDPS;
         } else if (hand == "mainhand" || hand == "main") {
             [comparator, limit] = [positionalParams[2], positionalParams[3]];
-            value = OvalePaperDoll.next.mainHandWeaponDPS;
+            value = OvalePaperDoll.current.mainHandWeaponDPS;
         } else {
             [comparator, limit] = [positionalParams[1], positionalParams[2]];
-            value = OvalePaperDoll.next.mainHandWeaponDPS;
+            value = OvalePaperDoll.current.mainHandWeaponDPS;
         }
         return Compare(value, comparator, limit);
     }

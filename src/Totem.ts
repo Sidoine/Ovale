@@ -23,7 +23,7 @@ let TOTEM_CLASS: LuaObj<boolean> = {
 interface Totem {
     duration?: number;
     start?: number;
-    serial?: number;
+    serial: number;
     name?: string;
     icon?: string;
     slot: number;
@@ -63,7 +63,7 @@ class OvaleTotemClass extends OvaleTotemBase {
         // shamans can use the fifth slot when all of the totems are active
         // that's why we +1 it everywhere we use
         for (let slot = 1; slot <= MAX_TOTEMS+1; slot += 1) {
-            this.next.totems[slot] = {slot: slot};
+            this.next.totems[slot] = {slot: slot, serial: 0};
         }
     }
     ResetState(){        
@@ -89,7 +89,8 @@ class OvaleTotemClass extends OvaleTotemBase {
     }
 
     IsActiveTotem(totem: Totem, atTime: number) {
-        if (totem.serial < self_serial) {
+        if (!totem) return false;
+        if (!totem.serial || totem.serial < self_serial) {
             totem = this.GetTotem(totem.slot);
         }
         return (totem && (totem.serial == self_serial) && totem.start && totem.duration && totem.start < atTime && atTime < totem.start + totem.duration);
