@@ -2529,6 +2529,8 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
         } else if (className == "DEMONHUNTER" && action == "metamorphosis_havoc") {
             conditionCode = "not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()";
             annotation.opt_meta_only_during_boss = "DEMONHUNTER";
+        } else if (className == "DEMONHUNTER" && action == "consume_magic") {
+            conditionCode = "target.HasDebuffType(magic)";
         } else if (checkOptionalSkill(action, className, specialization)) {
             annotation[action] = className;
             conditionCode = `CheckBoxOn(opt_${action})`;

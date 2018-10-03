@@ -17,7 +17,7 @@ import { GetTime, UnitAura, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock
 import { huge as INFINITY, huge } from "@wowts/math";
 import { OvalePaperDoll } from "./PaperDoll";
 import { baseState } from "./BaseState";
-import { isLuaArray } from "./tools";
+import { isLuaArray, isString } from "./tools";
 import { ConditionResult } from "./Condition";
 
 export let OvaleAura: OvaleAuraClass;
@@ -95,11 +95,11 @@ let UNKNOWN_GUID = "0";
     }
 }
 export const DEBUFF_TYPE: LuaObj<boolean> = {
-    Curse: true,
-    Disease: true,
-    Enrage: true,
-    Magic: true,
-    Poison: true
+    curse: true,
+    disease: true,
+    enrage: true,
+    magic: true,
+    poison: true
 }
 export let SPELLINFO_DEBUFF_TYPE: LuaObj<string> = {};
 
@@ -146,7 +146,6 @@ export interface Aura {
     visible: boolean;
     lastUpdated: number;
     duration: number;
-    enrage: boolean;
     baseTick: number | undefined;
     tick: number | undefined;
     guid: string;
@@ -539,8 +538,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
             aura.filter = filter;
             aura.visible = visible;
             aura.icon = icon;
-            aura.debuffType = debuffType;
-            aura.enrage = (debuffType == "Enrage");
+            aura.debuffType = isString(debuffType) && lower(debuffType) || debuffType;
             aura.stealable = isStealable;
             [aura.value1, aura.value2, aura.value3] = [value1, value2, value3];
             let mine = (casterGUID == self_playerGUID || OvaleGUID.IsPlayerPet(casterGUID));
@@ -667,7 +665,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
                 } else {
                     const casterGUID = unitCaster && OvaleGUID.UnitGUID(unitCaster);
                     if (debuffType == "") {
-                        debuffType = "Enrage";
+                        debuffType = "enrage";
                     }
                     const auraType: AuraType = (filter === harmfulFilter && "HARMFUL") || "HELPFUL";
                     this.GainedAuraOnGUID(guid, now, spellId, casterGUID, auraType, true, icon, count, debuffType, duration, expirationTime, isStealable, name, value1, value2, value3);
@@ -790,7 +788,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
                 for (const [, aura] of pairs(whoseTable)) {
                     if (this.IsActiveAura(aura, atTime) && aura.filter == filter && !aura.state) {
                         let name = aura.name || "Unknown spell";
-                        insert(array, `${name}: ${auraId} ${(aura.debuffType || "nil")} enrage=${(aura.enrage && 1 || 0)}`);
+                        insert(array, `${name}: ${auraId} ${(aura.debuffType || "nil")} enrage=${(aura.debuffType == "enrage" && 1 || 0)}`);
                     }
                 }
             }
@@ -800,7 +798,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
                 for (const [, aura] of pairs(whoseTable)) {
                     if (this.IsActiveAura(aura, atTime) && aura.filter == filter) {
                         let name = aura.name || "Unknown spell";
-                        insert(array, `${name}: ${auraId} ${(aura.debuffType || "nil")} enrage=${(aura.enrage && 1 || 0)}`);
+                        insert(array, `${name}: ${auraId} ${(aura.debuffType || "nil")} enrage=${(aura.debuffType == "enrage" && 1 || 0)}`);
                     }
                 }
             }
@@ -1002,7 +1000,6 @@ export class OvaleAuraClass extends OvaleAuraBase {
         }
         return [start, ending];
     }
-
 
     AuraCount(auraId: number, filter: AuraType, mine: boolean, minStacks: number | undefined, atTime: number, excludeUnitId: string | undefined) {
         OvaleAura.StartProfiling("OvaleAura_state_AuraCount");
@@ -1315,8 +1312,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
         aura.duration = aura.ending - aura.start;
         aura.gain = aura.start;
         aura.stacks = 1;
-        aura.debuffType = debuffType;
-        aura.enrage = debuffType == "Enrage";
+        aura.debuffType = isString(debuffType) && lower(debuffType) || debuffType;
         OvalePaperDoll.UpdateSnapshot(aura, snapshot);
         PutAura(this.next.aura, guid, auraId, casterGUID, aura);
         return aura;

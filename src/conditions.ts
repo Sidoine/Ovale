@@ -37,6 +37,7 @@ import { OvaleAzerite } from "./AzeriteArmor";
 import { OvaleWarlock } from "./Warlock";
 import { OvaleStagger } from "./Stagger";
 import { OvaleLossOfControl } from "./LossOfControl";
+import { lower } from "@wowts/string";
 let INFINITY = huge;
 
 // Return the target's damage reduction from armor, which seems to be 30% with most bosses
@@ -1388,9 +1389,10 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
     function EnrageRemaining(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
         let [comparator, limit] = [positionalParams[1], positionalParams[2]];
         let [target] = ParseCondition(positionalParams, namedParams);
-        let [start, ending] = OvaleAura.GetAuraWithProperty(target, "enrage", "HELPFUL", atTime);
-        if (start && ending) {
-            return TestValue(start, INFINITY, 0, ending, -1, comparator, limit);
+        let aura = OvaleAura.GetAura(target, "enrage", atTime, "HELPFUL", false);
+        if (aura && aura.ending >= atTime) {
+            let [gain, , ending] = [aura.gain, aura.start, aura.ending];
+            return TestValue(gain, INFINITY, 0, ending, -1, comparator, limit);
         }
         return Compare(0, comparator, limit);
     }
@@ -2007,9 +2009,14 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
 	 @usage
 	 if target.IsEnraged() Spell(soothe)
      */
-    function IsEnraged(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
+    function IsEnraged(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number):ConditionResult {
         let [target] = ParseCondition(positionalParams, namedParams);
-        return OvaleAura.GetAuraWithProperty(target, "enrage", "HELPFUL", atTime);
+        let aura = OvaleAura.GetAura(target, "enrage", atTime, "HELPFUL", false);
+        if (aura) {
+            let [gain, , ending] = [aura.gain, aura.start, aura.ending];
+            return [gain, ending];
+        }
+        return undefined;
     }
     OvaleCondition.RegisterCondition("isenraged", false, IsEnraged);
 }
@@ -4967,4 +4974,31 @@ l    */
         return Compare(value, comparator, limit);
     }
     OvaleCondition.RegisterCondition("timetoshard", false, TimeToShard);
+}
+{
+    /** Test if a specific dispel type is present.
+	 @name HasDebuffType
+	 @paramsig boolean
+	 @param yesno Optional. If yes, then return true if enraged. If no, then return true if not enraged.
+	     Default is yes.
+	     Valid values: yes.  "no" currently doesn't work.
+	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	     Defaults to target=player.
+	     Valid values: player, target, focus, pet.
+	 @return A boolean value.
+	 @usage
+	 if player.HasDebuffType(magic) Spell(dispel)
+     */
+    function HasDebuffType(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number):ConditionResult {
+        let [target] = ParseCondition(positionalParams, namedParams);
+        for (const [, debuffType] of ipairs(positionalParams)) {
+            let aura = OvaleAura.GetAura(target, lower(debuffType), atTime, (target == "player" && "HARMFUL" || "HELPFUL"), false);
+            if (aura) {
+                let [gain, , ending] = [aura.gain, aura.start, aura.ending];
+                return [gain, ending];
+            }
+        }
+        return undefined;
+    }
+    OvaleCondition.RegisterCondition("hasdebufftype", false, HasDebuffType);
 }

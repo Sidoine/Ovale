@@ -2352,6 +2352,8 @@ EmitAction = function(parseNode, nodeList, annotation)
         elseif className == "DEMONHUNTER" and action == "metamorphosis_havoc" then
             conditionCode = "not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()"
             annotation.opt_meta_only_during_boss = "DEMONHUNTER"
+        elseif className == "DEMONHUNTER" and action == "consume_magic" then
+            conditionCode = "target.HasDebuffType(magic)"
         elseif checkOptionalSkill(action, className, specialization) then
             annotation[action] = className
             conditionCode = "CheckBoxOn(opt_" .. action .. ")"
