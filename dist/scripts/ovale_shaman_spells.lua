@@ -33,7 +33,7 @@ Define(capacitor_totem 192058)
 # Summons a totem at the target location that gathers electrical energy from the surrounding air and explodes after s2 sec, stunning all enemies within 118905A1 yards for 3 seconds.
   SpellInfo(capacitor_totem cd=60 duration=3 gcd=1)
 Define(chain_lightning_elemental 188443)
-# Hurls a lightning bolt at the enemy, dealing (30 of Spell Power) Nature damage and then jumping to additional nearby enemies. Affects x1 total targets.rnrn|cFFFFFFFFGenerates s2 Maelstrom per target hit.|r 
+# Hurls a lightning bolt at the enemy, dealing (34.5 of Spell Power) Nature damage and then jumping to additional nearby enemies. Affects x1 total targets.rnrn|cFFFFFFFFGenerates s2 Maelstrom per target hit.|r 
   SpellInfo(chain_lightning_elemental)
 Define(crash_lightning 187874)
 # Electrocutes all enemies in front of you, dealing s1*<CAP>/AP Nature damage. Hitting 2 or more targets enhances your weapons for 10 seconds, causing Stormstrike and Lava Lash to also deal 195592s1*<CAP>/AP Nature damage to all targets in front of you.  rnrnEach target hit by Crash Lightning increases the damage of your next Stormstrike by s2.
@@ -126,7 +126,7 @@ Define(landslide_buff 202004)
   # Your next Stormstrike will deal s1 increased damage.
   SpellAddBuff(landslide_buff landslide_buff=1)
 Define(lava_beam 114074)
-# Unleashes a blast of superheated flame at the enemy, dealing (37.5 of Spell Power) Fire damage and then jumping to additional nearby enemies. Damage is increased by s2 after each jump. Affects x1 total targets.  rnrn|cFFFFFFFFGenerates s3 Maelstrom per target hit.|r 
+# Unleashes a blast of superheated flame at the enemy, dealing (43 of Spell Power) Fire damage and then jumping to additional nearby enemies. Damage is increased by s2 after each jump. Affects x1 total targets.  rnrn|cFFFFFFFFGenerates s3 Maelstrom per target hit.|r 
   SpellInfo(lava_beam)
 Define(lava_burst 51505)
 # Hurls molten lava at the target, dealing (53.125 of Spell Power) Fire damage.?a231721[ Lava Burst will always critically strike if the target is affected by Flame Shock.][]?s137039[][rnrn|cFFFFFFFFGenerates 190493s2 Maelstrom.|r ]
@@ -136,7 +136,7 @@ Define(lava_lash 60103)
 # Charges your off-hand weapon with lava and burns your target, dealing s1 Fire damage.
   SpellInfo(lava_lash maelstrom=40)
 Define(lightning_bolt_elemental 188196)
-# Hurls a bolt of lightning at the target, dealing (50.31250000000001 of Spell Power) Nature damage.?a187828[rnrn|cFFFFFFFFGenerates 190493s1 Maelstrom.|r ][]
+# Hurls a bolt of lightning at the target, dealing (57.99999999999999 of Spell Power) Nature damage.?a187828[rnrn|cFFFFFFFFGenerates 190493s1 Maelstrom.|r ][]
   SpellInfo(lightning_bolt_elemental)
 Define(lightning_bolt_enhancement 187837)
 # Fires a bolt of lightning at the target, dealing ?s210727[up to (1+210727m2/100)*(14.0625 of Spell Power)][(14.0625 of Spell Power)] Nature damage.

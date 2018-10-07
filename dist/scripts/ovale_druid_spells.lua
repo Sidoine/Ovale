@@ -124,10 +124,12 @@ Define(innervate 29166)
   SpellInfo(innervate cd=180 duration=12)
   # Your spells cost no mana.
   SpellAddBuff(innervate innervate=1)
-Define(iron_jaws 276021)
+Define(iron_jaws 276026)
 # Ferocious Bite has a s2 chance per combo point to increase the damage of your next Maim by s1 per combo point.
-  SpellInfo(iron_jaws channel=0 gcd=0 offgcd=1)
+  SpellInfo(iron_jaws duration=30 channel=30 gcd=0 offgcd=1)
+  # Your next Maim will deal an additional w1 damage per combo point.
   SpellAddBuff(iron_jaws iron_jaws=1)
+
 Define(ironfur 192081)
 # Increases armor by s1*AGI/100 for 7 seconds.?a231070[ Multiple uses of this ability may overlap.][]
 # Rank 2: Multiple uses of Ironfur may overlap.rn
@@ -324,6 +326,7 @@ Define(lively_spirit_trait 279642)
 Define(power_of_the_moon_trait 273367)
 Define(streaking_stars_trait 272871)
 Define(sunblaze_trait 274397)
+Define(wild_fleshrending_trait 279527)
 Define(layered_mane_trait 279552)
     ]]
     code = code .. [[

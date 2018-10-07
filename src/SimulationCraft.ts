@@ -296,6 +296,7 @@ interface Modifiers {
     moving?: ParseNode,
     name?: ParseNode,
     nonlethal?: ParseNode,
+    off_gcd?: ParseNode,
     op?: ParseNode,
     pct_health?: ParseNode,
     precombat?: ParseNode,
@@ -406,6 +407,7 @@ const MODIFIER_KEYWORD: TypeCheck<Modifiers> = {
     ["moving"]: true,
     ["name"]: true,
     ["nonlethal"]: true,
+    ["off_gcd"]: true,
     ["op"]: true,
     ["pct_health"]: true,
     ["precombat"]: true,
@@ -1595,6 +1597,7 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("twist_of_fate_talent", "twist_of_fate_talent_discipline", "PRIEST", "discipline");
 
     //Rogue
+    AddDisambiguation("deadly_poison_dot", "deadly_poison_debuff", "ROGUE", "assassination");
     AddDisambiguation("stealth_buff", "stealthed_buff", "ROGUE");
     AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_assassination_buff", "ROGUE", "assassination");
     AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_outlaw_buff", "ROGUE", "outlaw");
