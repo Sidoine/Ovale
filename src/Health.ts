@@ -7,7 +7,7 @@ import { RegisterRequirement, UnregisterRequirement, Tokens } from "./Requiremen
 import aceEvent from "@wowts/ace_event-3.0";
 import { sub } from "@wowts/string";
 import { tonumber, wipe, LuaObj } from "@wowts/lua";
-import { UnitHealth, UnitHealthMax, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
+import { UnitHealth, UnitHealthMax, UnitGetTotalAbsorbs, UnitGetTotalHealAbsorbs, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
 import { baseState } from "./BaseState";
 
@@ -34,6 +34,8 @@ const OvaleHealthClassBase = OvaleDebug.RegisterDebugging(OvaleProfiler.Register
 class OvaleHealthClass extends OvaleHealthClassBase {
     health: LuaObj<number> = {}
     maxHealth: LuaObj<number> = {}
+    absorb: LuaObj<number> = {}
+    healAbsorb: LuaObj<number> = {}
     totalDamage: LuaObj<number> = {}
     totalHealing: LuaObj<number> = {}
     firstSeen: LuaObj<number> = {}
@@ -44,6 +46,8 @@ class OvaleHealthClass extends OvaleHealthClassBase {
         this.RegisterEvent("PLAYER_REGEN_ENABLED");
         this.RegisterEvent("UNIT_HEALTH_FREQUENT", "UpdateHealth");
         this.RegisterEvent("UNIT_MAXHEALTH", "UpdateHealth");
+        this.RegisterEvent("UNIT_ABSORB_AMOUNT_CHANGED", "UpdateAbsorb");
+        this.RegisterEvent("UNIT_HEAL_ABSORB_AMOUNT_CHANGED", "UpdateAbsorb");
         this.RegisterMessage("Ovale_UnitChanged");
         RegisterRequirement("health_pct", this.RequireHealthPercentHandler);
         RegisterRequirement("pet_health_pct", this.RequireHealthPercentHandler);
@@ -57,6 +61,8 @@ class OvaleHealthClass extends OvaleHealthClassBase {
         this.UnregisterEvent("PLAYER_TARGET_CHANGED");
         this.UnregisterEvent("UNIT_HEALTH_FREQUENT");
         this.UnregisterEvent("UNIT_MAXHEALTH");
+        this.UnregisterEvent("UNIT_ABSORB_AMOUNT_CHANGED");
+        this.UnregisterEvent("UNIT_HEAL_ABSORB_AMOUNT_CHANGED");
         this.UnregisterMessage("Ovale_UnitChanged");
     }
     COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
@@ -107,20 +113,62 @@ class OvaleHealthClass extends OvaleHealthClassBase {
             this.Debug(event, unitId, guid);
             this.UpdateHealth("UNIT_HEALTH_FREQUENT", unitId);
             this.UpdateHealth("UNIT_MAXHEALTH", unitId);
+            this.UpdateAbsorb("UNIT_ABSORB_AMOUNT_CHANGED", unitId);
+            this.UpdateAbsorb("UNIT_HEAL_ABSORB_AMOUNT_CHANGED", unitId);
         }
         this.StopProfiling("Ovale_UnitChanged");
+    }
+    UpdateAbsorb(event: string, unitId: string) {
+        if (!unitId) {
+            return;
+        }
+        this.StartProfiling("OvaleHealth_UpdateAbsorb");
+        
+        let func;
+        let db;
+        
+        if (event == "UNIT_ABSORB_AMOUNT_CHANGED") {
+            func = UnitGetTotalAbsorbs;
+            db = this.absorb;
+        } else if (event == "UNIT_HEAL_ABSORB_AMOUNT_CHANGED") {
+            func = UnitGetTotalHealAbsorbs;
+            db = this.absorb;
+        } else {
+            Ovale.OneTimeMessage("Warning: Invalid event (%s) in UpdateAbsorb.", event);
+            return;
+        }
+        
+        let amount = func(unitId);
+        if(amount >= 0) {
+            let guid = OvaleGUID.UnitGUID(unitId);
+            this.Debug(event, unitId, guid, amount);
+            if (guid) {
+                db[guid] = amount;
+            }
+        }
+        
+        this.StopProfiling("OvaleHealth_UpdateHealth");
     }
     UpdateHealth(event: string, unitId: string) {
         if (!unitId) {
             return;
         }
         this.StartProfiling("OvaleHealth_UpdateHealth");
-        let func = UnitHealth;
-        let db = this.health;
-        if (event == "UNIT_MAXHEALTH") {
+        
+        let func;
+        let db;
+        
+        if (event == "UNIT_HEALTH_FREQUENT") {
+            func = UnitHealth;
+            db = this.health;
+        } else if (event == "UNIT_MAXHEALTH") {
             func = UnitHealthMax;
             db = this.maxHealth;
+        } else {
+            Ovale.OneTimeMessage("Warning: Invalid event (%s) in UpdateHealth.", event);
+            return;
         }
+        
         let amount = func(unitId);
         if (amount) {
             let guid = OvaleGUID.UnitGUID(unitId);
@@ -138,32 +186,27 @@ class OvaleHealthClass extends OvaleHealthClassBase {
         this.StopProfiling("OvaleHealth_UpdateHealth");
     }
     UnitHealth(unitId: string, guid?: string) {
-        let amount;
-        if (unitId) {
-            guid = guid || OvaleGUID.UnitGUID(unitId);
-            if (guid) {
-                if (unitId == "target" || unitId == "focus") {
-                    amount = this.health[guid] || 0;
-                } else {
-                    amount = UnitHealth(unitId);
-                    this.health[guid] = amount;
-                }
-            } else {
-                amount = 0;
-            }
-        }
-        return amount;
+        return this.UnitAmount(UnitHealth, this.health, unitId, guid);
     }
     UnitHealthMax(unitId: string, guid?:string) {
+        return this.UnitAmount(UnitHealthMax, this.maxHealth, unitId, guid);
+    }
+    UnitAbsorb(unitId: string, guid?: string) {
+        return this.UnitAmount(UnitGetTotalAbsorbs, this.absorb, unitId, guid);
+    }
+    UnitHealAbsorb(unitId: string, guid?: string) {
+        return this.UnitAmount(UnitGetTotalHealAbsorbs, this.healAbsorb, unitId, guid);
+    }
+    UnitAmount(func: (_: string) => number, db: LuaObj<number>, unitId: string, guid?: string): number {
         let amount;
         if (unitId) {
             guid = guid || OvaleGUID.UnitGUID(unitId);
             if (guid) {
                 if (unitId == "target" || unitId == "focus") {
-                    amount = this.maxHealth[guid] || 0;
+                    amount = db[guid] || 0;
                 } else {
-                    amount = UnitHealthMax(unitId);
-                    this.maxHealth[guid] = amount;
+                    amount = func(unitId);
+                    db[guid] = amount;
                 }
             } else {
                 amount = 0;
@@ -171,12 +214,15 @@ class OvaleHealthClass extends OvaleHealthClassBase {
         }
         return amount;
     }
-    UnitTimeToDie(unitId: string, guid?: string) {
+    UnitTimeToDie(unitId: string, effectiveHealth?: boolean, guid?: string) {
         this.StartProfiling("OvaleHealth_UnitTimeToDie");
         let timeToDie = INFINITY;
         guid = guid || OvaleGUID.UnitGUID(unitId);
         if (guid) {
             let health = this.UnitHealth(unitId, guid);
+            if (effectiveHealth) {
+                health = health + this.UnitAbsorb(unitId, guid) - this.UnitHealAbsorb(unitId, guid);
+            }
             let maxHealth = this.UnitHealthMax(unitId, guid);
             if (health && maxHealth) {
                 if (health == 0) {

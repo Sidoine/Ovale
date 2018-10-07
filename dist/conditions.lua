@@ -1021,6 +1021,17 @@ local function Health(positionalParams, namedParams, atTime)
     end
     OvaleCondition:RegisterCondition("health", false, Health)
     OvaleCondition:RegisterCondition("life", false, Health)
+local function EffectiveHealth(positionalParams, namedParams, atTime)
+        local comparator, limit = positionalParams[1], positionalParams[2]
+        local target = ParseCondition(positionalParams, namedParams)
+        local health = OvaleHealth:UnitHealth(target) + OvaleHealth:UnitAbsorb(target) - OvaleHealth:UnitHealAbsorb(target) or 0
+        local now = GetTime()
+        local timeToDie = OvaleHealth:UnitTimeToDie(target)
+        local value, origin, rate = health, now, -1 * health / timeToDie
+        local start, ending = now, INFINITY
+        return TestValue(start, ending, value, origin, rate, comparator, limit)
+    end
+    OvaleCondition:RegisterCondition("effectivehealth", false, EffectiveHealth)
 local function HealthMissing(positionalParams, namedParams, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
         local target = ParseCondition(positionalParams, namedParams)
@@ -1055,6 +1066,19 @@ local function HealthPercent(positionalParams, namedParams, atTime)
     end
     OvaleCondition:RegisterCondition("healthpercent", false, HealthPercent)
     OvaleCondition:RegisterCondition("lifepercent", false, HealthPercent)
+local function EffectiveHealthPercent(positionalParams, namedParams, atTime)
+        local comparator, limit = positionalParams[1], positionalParams[2]
+        local target = ParseCondition(positionalParams, namedParams)
+        local health = OvaleHealth:UnitHealth(target) + OvaleHealth:UnitAbsorb(target) - OvaleHealth:UnitHealAbsorb(target) or 0
+        local now = GetTime()
+        local maxHealth = OvaleHealth:UnitHealthMax(target) or 1
+        local healthPercent = health / maxHealth * 100
+        local timeToDie = OvaleHealth:UnitTimeToDie(target)
+        local value, origin, rate = healthPercent, now, -1 * healthPercent / timeToDie
+        local start, ending = now, INFINITY
+        return TestValue(start, ending, value, origin, rate, comparator, limit)
+    end
+    OvaleCondition:RegisterCondition("effectivehealthpercent", false, EffectiveHealthPercent)
 local function MaxHealth(positionalParams, namedParams, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
         local target = ParseCondition(positionalParams, namedParams)
