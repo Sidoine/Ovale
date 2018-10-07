@@ -184,7 +184,7 @@ Define(unbound_chaos_trait 275144)
 ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!metamorphosis_veng,buff,!metamorphosis_veng_buff)	
 
 Define(annihilation 201427)
-	
+    SpellRequire(annihilation add_fury_from_aura -1=buff,thirsting_blades_buff)
 
 	SpellInfo(blade_dance replace death_sweep=buff,metamorphosis_havoc_buff)
 	SpellInfo(blade_dance fury=35 cd=9 cd_haste=melee)
@@ -203,7 +203,7 @@ Define(chaos_nova_debuff 179057)
 	SpellInfo(chaos_nova_debuff duration=2)
 
 	SpellInfo(chaos_strike replace annihilation=buff,metamorphosis_havoc_buff)
-	
+	SpellRequire(chaos_strike add_fury_from_aura -1=buff,thirsting_blades_buff)
 
 	SpellInfo(consume_magic cd=10)
 
@@ -338,6 +338,8 @@ Define(spectral_sight 188501)
 	SpellRequire(spirit_bomb unusable 1=buff,!soul_fragments)
 	SpellAddBuff(spirit_bomb soul_fragments=0)
 	SpellAddTargetDebuff(spirit_bomb frailty_debuff=1)
+Define(thirsting_blades_buff 278736)
+    SpellInfo(thirsting_blades_buff max_stacks=40)
 Define(throw_glaive_veng 204157)
 	SpellInfo(throw_glaive_veng cd=3 cd_haste=melee)
 Define(throw_glaive_havoc 185123)
