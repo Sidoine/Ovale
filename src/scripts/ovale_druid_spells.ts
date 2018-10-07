@@ -609,11 +609,10 @@ Define(incarnation_guardian_of_ursoc_buff 102558)
 	SpellInfo(incarnation_guardian_of_ursoc_buff duration=30)
 Define(intimidating_roar 236748)
 	SpellInfo(intimidating_roar cd=30)
-#
+
 	SpellAddBuff(ironfur guardian_of_elune_buff=0)
 	SpellRequire(ironfur add_rage_from_aura -15=buff,guardians_wrath_buff)
-#Define(ironfur_buff 192081)
-#
+
 	SpellInfo(mangle addrage=-4 talent=soul_of_the_forest_talent specialization=guardian)
 	SpellAddBuff(mangle guardian_of_elune_buff=1 talent=guardian_of_elune_talent)
 
@@ -625,11 +624,10 @@ Define(intimidating_roar 236748)
 Define(pulverize_buff 158792)
 	SpellInfo(pulverize_buff duration=20)
 Define(swipe_bear 213771)
-#Define(survival_instincts 61336)
+
 	SpellInfo(survival_instincts add_cd=120 specialization=guardian)
 	SpellInfo(survival_instincts add_cd=-80 specialization=guardian talent=survival_of_the_fittest_talent) 
-#Define(thrash_bear 77758)
-#Define(thrash_bear_debuff 192090)
+
 	SpellInfo(thrash_bear_debuff max_stacks=5 if_equipped=elizes_everlasting_encasement)
 
 # Guardian Legendaries
@@ -637,6 +635,7 @@ Define(elizes_everlasting_encasement 137067)
 Define(skysecs_hold 137025)
 
 # Guardian Talents
+Define(earthwarden_talent 16)
 Define(intimidating_roar_talent 5)
 Define(galactic_guardian_talent 14)
 Define(survival_of_the_fittest_talent 17)
