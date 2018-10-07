@@ -589,6 +589,8 @@ const registerSpec2 = function() {
 	SpellAddBuff(bristling_fur bristling_fur_buff=1)
 Define(bristling_fur_buff 155835)
 	SpellInfo(bristling_fur_buff duration=8)
+Define(earthwarden_buff 203975)
+    SpellInfo(earthwarden_buff max_stacks=3)
 #Define(frenzied_regeneration 22842)
 	SpellInfo(frenzied_regeneration charges=2 specialization=guardian)
 	SpellAddBuff(frenzied_regeneration guardian_of_elune_buff=0)
