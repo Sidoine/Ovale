@@ -327,10 +327,10 @@ Define(soul_barrier 263648)
 	SpellAddBuff(soul_barrier soul_fragments=0)
 Define(soul_barrier_buff 263648)
 	SpellInfo(soul_barrier_buff duration=12)
-
 	
 	SpellAddBuff(soul_cleave soul_fragments=-2)
 	SpellAddBuff(soul_cleave feast_of_souls_buff=1 talent=feast_of_souls_talent)
+    SpellAddTargetDebuff(soul_cleave void_reaver_debuff=1 talent=void_reaver_talent)
 Define(soul_fragments 203981)
 Define(spectral_sight 188501)
 	SpellInfo(spectral_sight cd=30)
@@ -355,6 +355,8 @@ Define(throw_glaive_havoc_debuff 213405)
 Define(vengeful_retreat_debuff 198813)
 	SpellInfo(vengeful_retreat_debuff duration=3)
 	SpellRequire(vengeful_retreat unusable 1=lossofcontrol,root)
+Define(void_reaver_debuff 268178)
+    SpellInfo(void_reaver_debuff duration=12)
 	
 #items
 Define(oblivions_embrace_item 151799)
