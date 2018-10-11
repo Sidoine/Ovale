@@ -1740,6 +1740,34 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
     }
     OvaleCondition.RegisterCondition("health", false, Health);
     OvaleCondition.RegisterCondition("life", false, Health);
+    
+    /** Get the current amount of health points of the target including absorbs.
+	 @name EffectiveHealth
+	 @paramsig number or boolean
+	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	 @param number Optional. The number to compare against.
+	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	     Defaults to target=player.
+	     Valid values: player, target, focus, pet.
+	 @return The current health including absorbs.
+	 @return A boolean value for the result of the comparison.
+	 @see Life
+	 @usage
+	 if EffectiveHealth() <10000 Spell(last_stand)
+	 if EffectiveHealth(less 10000) Spell(last_stand)
+     */
+    function EffectiveHealth(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
+        let [comparator, limit] = [positionalParams[1], positionalParams[2]];
+        let [target] = ParseCondition(positionalParams, namedParams);
+        let health = OvaleHealth.UnitHealth(target) + OvaleHealth.UnitAbsorb(target) - OvaleHealth.UnitHealAbsorb(target) || 0;
+
+        let now = GetTime();
+        let timeToDie = OvaleHealth.UnitTimeToDie(target);
+        let [value, origin, rate] = [health, now, -1 * health / timeToDie];
+        let [start, ending] = [now, INFINITY];
+        return TestValue(start, ending, value, origin, rate, comparator, limit);
+    }
+    OvaleCondition.RegisterCondition("effectivehealth", false, EffectiveHealth);
 
     /** Get the number of health points away from full health of the target.
 	 @name HealthMissing
@@ -1773,6 +1801,7 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
     }
     OvaleCondition.RegisterCondition("healthmissing", false, HealthMissing);
     OvaleCondition.RegisterCondition("lifemissing", false, HealthMissing);
+    
     /** Get the current percent level of health of the target.
 	 @name HealthPercent
 	 @paramsig number or boolean
@@ -1805,6 +1834,35 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
     }
     OvaleCondition.RegisterCondition("healthpercent", false, HealthPercent);
     OvaleCondition.RegisterCondition("lifepercent", false, HealthPercent);
+    
+    /** Get the current effective percent level of health of the target (including absorbs).
+	 @name EffectiveHealthPercent
+	 @paramsig number or boolean
+	 @param operator Optional. Comparison operator: less, atMost, equal, atLeast, more.
+	 @param number Optional. The number to compare against.
+	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	     Defaults to target=player.
+	     Valid values: player, target, focus, pet.
+	 @return The current health percent including absorbs.
+	 @return A boolean value for the result of the comparison.
+	 @usage
+	 if EffectiveHealthPercent() <20 Spell(last_stand)
+	 if target.EffectiveHealthPercent(less 25) Spell(kill_shot)
+     */
+    function EffectiveHealthPercent(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
+        let [comparator, limit] = [positionalParams[1], positionalParams[2]];
+        let [target] = ParseCondition(positionalParams, namedParams);
+        let health = OvaleHealth.UnitHealth(target) + OvaleHealth.UnitAbsorb(target) - OvaleHealth.UnitHealAbsorb(target) || 0;
+        
+        let now = GetTime();
+        let maxHealth = OvaleHealth.UnitHealthMax(target) || 1;
+        let healthPercent = health / maxHealth * 100;
+        let timeToDie = OvaleHealth.UnitTimeToDie(target);
+        let [value, origin, rate] = [healthPercent, now, -1 * healthPercent / timeToDie];
+        let [start, ending] = [now, INFINITY];
+        return TestValue(start, ending, value, origin, rate, comparator, limit);
+    }
+    OvaleCondition.RegisterCondition("effectivehealthpercent", false, EffectiveHealthPercent);
 
     /** Get the amount of health points of the target when it is at full health.
 	 @name MaxHealth
