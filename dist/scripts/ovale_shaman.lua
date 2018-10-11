@@ -570,8 +570,8 @@ AddFunction EnhancementOpenerCdPostConditions
 
 AddFunction EnhancementFillerMainActions
 {
- #rockbiter,if=maelstrom<70
- if Maelstrom() < 70 Spell(rockbiter)
+ #rockbiter,if=maelstrom<70&!buff.strength_of_earth.up
+ if Maelstrom() < 70 and not BuffPresent(strength_of_earth_buff) Spell(rockbiter)
  #crash_lightning,if=talent.crashing_storm.enabled&variable.OCPool60
  if Talent(crashing_storm_talent) and OCPool60() Spell(crash_lightning)
  #lava_lash,if=variable.OCPool80&variable.furyCheck45
@@ -592,7 +592,7 @@ AddFunction EnhancementFillerShortCdActions
 
 AddFunction EnhancementFillerShortCdPostConditions
 {
- Maelstrom() < 70 and Spell(rockbiter) or Talent(crashing_storm_talent) and OCPool60() and Spell(crash_lightning) or OCPool80() and furyCheck45() and Spell(lava_lash) or Spell(rockbiter) or Spell(flametongue)
+ Maelstrom() < 70 and not BuffPresent(strength_of_earth_buff) and Spell(rockbiter) or Talent(crashing_storm_talent) and OCPool60() and Spell(crash_lightning) or OCPool80() and furyCheck45() and Spell(lava_lash) or Spell(rockbiter) or Spell(flametongue)
 }
 
 AddFunction EnhancementFillerCdActions
@@ -601,7 +601,7 @@ AddFunction EnhancementFillerCdActions
 
 AddFunction EnhancementFillerCdPostConditions
 {
- Maelstrom() < 70 and Spell(rockbiter) or Talent(crashing_storm_talent) and OCPool60() and Spell(crash_lightning) or OCPool80() and furyCheck45() and Spell(lava_lash) or Spell(rockbiter) or Spell(flametongue)
+ Maelstrom() < 70 and not BuffPresent(strength_of_earth_buff) and Spell(rockbiter) or Talent(crashing_storm_talent) and OCPool60() and Spell(crash_lightning) or OCPool80() and furyCheck45() and Spell(lava_lash) or Spell(rockbiter) or Spell(flametongue)
 }
 
 ### actions.core
@@ -1021,6 +1021,7 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # searing_assault_talent
 # stormbringer_buff
 # stormstrike
+# strength_of_earth_buff
 # sundering
 # totem_mastery_enhancement
 # war_stomp

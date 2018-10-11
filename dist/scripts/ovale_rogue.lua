@@ -2346,9 +2346,9 @@ AddFunction SubtletyCdsMainPostConditions
 
 AddFunction SubtletyCdsShortCdActions
 {
- #shadow_dance,off_gcd=1,if=!buff.shadow_dance.up&buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
+ #shadow_dance,use_off_gcd=1,if=!buff.shadow_dance.up&buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
  if not BuffPresent(shadow_dance_buff) and DebuffPresent(shuriken_tornado) and DebuffRemaining(shuriken_tornado) <= 3.5 Spell(shadow_dance)
- #symbols_of_death,off_gcd=1,if=buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
+ #symbols_of_death,use_off_gcd=1,if=buff.shuriken_tornado.up&buff.shuriken_tornado.remains<=3.5
  if DebuffPresent(shuriken_tornado) and DebuffRemaining(shuriken_tornado) <= 3.5 Spell(symbols_of_death)
  #symbols_of_death,if=dot.nightblade.ticking&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|spell_targets.shuriken_storm<3|!cooldown.shuriken_tornado.up)
  if target.DebuffPresent(nightblade_debuff) and { not Talent(shuriken_tornado_talent) or Talent(shadow_focus_talent) or Enemies() < 3 or not { not SpellCooldown(shuriken_tornado) > 0 } } Spell(symbols_of_death)

@@ -178,6 +178,10 @@ Define(stormstrike 17364)
   SpellInfo(stormstrike maelstrom=30 cd=9)
 
 
+Define(strength_of_earth_buff 273463)
+# Rockbiter causes your next melee ability, other than Rockbiter, to deal an additional s1 Nature damage.
+  SpellInfo(strength_of_earth_buff channel=-0.001 gcd=0 offgcd=1)
+
 Define(sundering 197214)
 # Shatters a line of earth in front of you with your main hand weapon, causing s1 Flamestrike damage and Incapacitating any enemy hit for 2 seconds.
   SpellInfo(sundering maelstrom=20 cd=40 duration=2 talent=sundering_talent)
