@@ -184,7 +184,7 @@ Define(unbound_chaos_trait 275144)
 ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!metamorphosis_veng,buff,!metamorphosis_veng_buff)	
 
 Define(annihilation 201427)
-	
+    SpellRequire(annihilation add_fury_from_aura -1=buff,thirsting_blades_buff)
 
 	SpellInfo(blade_dance replace death_sweep=buff,metamorphosis_havoc_buff)
 	SpellInfo(blade_dance fury=35 cd=9 cd_haste=melee)
@@ -203,7 +203,7 @@ Define(chaos_nova_debuff 179057)
 	SpellInfo(chaos_nova_debuff duration=2)
 
 	SpellInfo(chaos_strike replace annihilation=buff,metamorphosis_havoc_buff)
-	
+	SpellRequire(chaos_strike add_fury_from_aura -1=buff,thirsting_blades_buff)
 
 	SpellInfo(consume_magic cd=10)
 
@@ -327,10 +327,10 @@ Define(soul_barrier 263648)
 	SpellAddBuff(soul_barrier soul_fragments=0)
 Define(soul_barrier_buff 263648)
 	SpellInfo(soul_barrier_buff duration=12)
-
 	
 	SpellAddBuff(soul_cleave soul_fragments=-2)
 	SpellAddBuff(soul_cleave feast_of_souls_buff=1 talent=feast_of_souls_talent)
+    SpellAddTargetDebuff(soul_cleave void_reaver_debuff=1 talent=void_reaver_talent)
 Define(soul_fragments 203981)
 Define(spectral_sight 188501)
 	SpellInfo(spectral_sight cd=30)
@@ -338,6 +338,8 @@ Define(spectral_sight 188501)
 	SpellRequire(spirit_bomb unusable 1=buff,!soul_fragments)
 	SpellAddBuff(spirit_bomb soul_fragments=0)
 	SpellAddTargetDebuff(spirit_bomb frailty_debuff=1)
+Define(thirsting_blades_buff 278736)
+    SpellInfo(thirsting_blades_buff max_stacks=40)
 Define(throw_glaive_veng 204157)
 	SpellInfo(throw_glaive_veng cd=3 cd_haste=melee)
 Define(throw_glaive_havoc 185123)
@@ -353,6 +355,8 @@ Define(throw_glaive_havoc_debuff 213405)
 Define(vengeful_retreat_debuff 198813)
 	SpellInfo(vengeful_retreat_debuff duration=3)
 	SpellRequire(vengeful_retreat unusable 1=lossofcontrol,root)
+Define(void_reaver_debuff 268178)
+    SpellInfo(void_reaver_debuff duration=12)
 	
 #items
 Define(oblivions_embrace_item 151799)

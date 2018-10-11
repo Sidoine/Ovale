@@ -433,20 +433,28 @@ AddFunction FrostObliterationMainActions
 {
  #remorseless_winter,if=talent.gathering_storm.enabled
  if Talent(gathering_storm_talent) Spell(remorseless_winter)
+ #obliterate,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&!talent.frostscythe.enabled&!buff.rime.up&spell_targets.howling_blast>=3
+ if { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and not Talent(frostscythe_talent) and not BuffPresent(rime_buff) and Enemies() >= 3 Spell(obliterate)
  #obliterate,if=!talent.frostscythe.enabled&!buff.rime.up&spell_targets.howling_blast>=3
  if not Talent(frostscythe_talent) and not BuffPresent(rime_buff) and Enemies() >= 3 Spell(obliterate)
  #frostscythe,if=(buff.killing_machine.react|(buff.killing_machine.up&(prev_gcd.1.frost_strike|prev_gcd.1.howling_blast|prev_gcd.1.glacial_advance)))&spell_targets.frostscythe>=2
  if { BuffPresent(killing_machine_buff) or BuffPresent(killing_machine_buff) and { PreviousGCDSpell(frost_strike) or PreviousGCDSpell(howling_blast) or PreviousGCDSpell(glacial_advance) } } and Enemies() >= 2 Spell(frostscythe)
+ #obliterate,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&buff.killing_machine.react|(buff.killing_machine.up&(prev_gcd.1.frost_strike|prev_gcd.1.howling_blast|prev_gcd.1.glacial_advance))
+ if { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and BuffPresent(killing_machine_buff) or BuffPresent(killing_machine_buff) and { PreviousGCDSpell(frost_strike) or PreviousGCDSpell(howling_blast) or PreviousGCDSpell(glacial_advance) } Spell(obliterate)
  #obliterate,if=buff.killing_machine.react|(buff.killing_machine.up&(prev_gcd.1.frost_strike|prev_gcd.1.howling_blast|prev_gcd.1.glacial_advance))
  if BuffPresent(killing_machine_buff) or BuffPresent(killing_machine_buff) and { PreviousGCDSpell(frost_strike) or PreviousGCDSpell(howling_blast) or PreviousGCDSpell(glacial_advance) } Spell(obliterate)
  #glacial_advance,if=(!buff.rime.up|runic_power.deficit<10|rune.time_to_2>gcd)&spell_targets.glacial_advance>=2
  if { not BuffPresent(rime_buff) or RunicPowerDeficit() < 10 or TimeToRunes(2) > GCD() } and Enemies() >= 2 Spell(glacial_advance)
  #howling_blast,if=buff.rime.up&spell_targets.howling_blast>=2
  if BuffPresent(rime_buff) and Enemies() >= 2 Spell(howling_blast)
+ #frost_strike,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&!buff.rime.up|runic_power.deficit<10|rune.time_to_2>gcd&!talent.frostscythe.enabled
+ if { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and not BuffPresent(rime_buff) or RunicPowerDeficit() < 10 or TimeToRunes(2) > GCD() and not Talent(frostscythe_talent) Spell(frost_strike)
  #frost_strike,if=!buff.rime.up|runic_power.deficit<10|rune.time_to_2>gcd
  if not BuffPresent(rime_buff) or RunicPowerDeficit() < 10 or TimeToRunes(2) > GCD() Spell(frost_strike)
  #howling_blast,if=buff.rime.up
  if BuffPresent(rime_buff) Spell(howling_blast)
+ #obliterate,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&!talent.frostscythe.enabled
+ if { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and not Talent(frostscythe_talent) Spell(obliterate)
  #obliterate
  Spell(obliterate)
 }
@@ -461,7 +469,7 @@ AddFunction FrostObliterationShortCdActions
 
 AddFunction FrostObliterationShortCdPostConditions
 {
- Talent(gathering_storm_talent) and Spell(remorseless_winter) or not Talent(frostscythe_talent) and not BuffPresent(rime_buff) and Enemies() >= 3 and Spell(obliterate) or { BuffPresent(killing_machine_buff) or BuffPresent(killing_machine_buff) and { PreviousGCDSpell(frost_strike) or PreviousGCDSpell(howling_blast) or PreviousGCDSpell(glacial_advance) } } and Enemies() >= 2 and Spell(frostscythe) or { BuffPresent(killing_machine_buff) or BuffPresent(killing_machine_buff) and { PreviousGCDSpell(frost_strike) or PreviousGCDSpell(howling_blast) or PreviousGCDSpell(glacial_advance) } } and Spell(obliterate) or { not BuffPresent(rime_buff) or RunicPowerDeficit() < 10 or TimeToRunes(2) > GCD() } and Enemies() >= 2 and Spell(glacial_advance) or BuffPresent(rime_buff) and Enemies() >= 2 and Spell(howling_blast) or { not BuffPresent(rime_buff) or RunicPowerDeficit() < 10 or TimeToRunes(2) > GCD() } and Spell(frost_strike) or BuffPresent(rime_buff) and Spell(howling_blast) or Spell(obliterate)
+ Talent(gathering_storm_talent) and Spell(remorseless_winter) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and not Talent(frostscythe_talent) and not BuffPresent(rime_buff) and Enemies() >= 3 and Spell(obliterate) or not Talent(frostscythe_talent) and not BuffPresent(rime_buff) and Enemies() >= 3 and Spell(obliterate) or { BuffPresent(killing_machine_buff) or BuffPresent(killing_machine_buff) and { PreviousGCDSpell(frost_strike) or PreviousGCDSpell(howling_blast) or PreviousGCDSpell(glacial_advance) } } and Enemies() >= 2 and Spell(frostscythe) or { { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and BuffPresent(killing_machine_buff) or BuffPresent(killing_machine_buff) and { PreviousGCDSpell(frost_strike) or PreviousGCDSpell(howling_blast) or PreviousGCDSpell(glacial_advance) } } and Spell(obliterate) or { BuffPresent(killing_machine_buff) or BuffPresent(killing_machine_buff) and { PreviousGCDSpell(frost_strike) or PreviousGCDSpell(howling_blast) or PreviousGCDSpell(glacial_advance) } } and Spell(obliterate) or { not BuffPresent(rime_buff) or RunicPowerDeficit() < 10 or TimeToRunes(2) > GCD() } and Enemies() >= 2 and Spell(glacial_advance) or BuffPresent(rime_buff) and Enemies() >= 2 and Spell(howling_blast) or { { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and not BuffPresent(rime_buff) or RunicPowerDeficit() < 10 or TimeToRunes(2) > GCD() and not Talent(frostscythe_talent) } and Spell(frost_strike) or { not BuffPresent(rime_buff) or RunicPowerDeficit() < 10 or TimeToRunes(2) > GCD() } and Spell(frost_strike) or BuffPresent(rime_buff) and Spell(howling_blast) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and not Talent(frostscythe_talent) and Spell(obliterate) or Spell(obliterate)
 }
 
 AddFunction FrostObliterationCdActions
@@ -470,7 +478,7 @@ AddFunction FrostObliterationCdActions
 
 AddFunction FrostObliterationCdPostConditions
 {
- Talent(gathering_storm_talent) and Spell(remorseless_winter) or not Talent(frostscythe_talent) and not BuffPresent(rime_buff) and Enemies() >= 3 and Spell(obliterate) or { BuffPresent(killing_machine_buff) or BuffPresent(killing_machine_buff) and { PreviousGCDSpell(frost_strike) or PreviousGCDSpell(howling_blast) or PreviousGCDSpell(glacial_advance) } } and Enemies() >= 2 and Spell(frostscythe) or { BuffPresent(killing_machine_buff) or BuffPresent(killing_machine_buff) and { PreviousGCDSpell(frost_strike) or PreviousGCDSpell(howling_blast) or PreviousGCDSpell(glacial_advance) } } and Spell(obliterate) or { not BuffPresent(rime_buff) or RunicPowerDeficit() < 10 or TimeToRunes(2) > GCD() } and Enemies() >= 2 and Spell(glacial_advance) or BuffPresent(rime_buff) and Enemies() >= 2 and Spell(howling_blast) or { not BuffPresent(rime_buff) or RunicPowerDeficit() < 10 or TimeToRunes(2) > GCD() } and Spell(frost_strike) or BuffPresent(rime_buff) and Spell(howling_blast) or Spell(obliterate)
+ Talent(gathering_storm_talent) and Spell(remorseless_winter) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and not Talent(frostscythe_talent) and not BuffPresent(rime_buff) and Enemies() >= 3 and Spell(obliterate) or not Talent(frostscythe_talent) and not BuffPresent(rime_buff) and Enemies() >= 3 and Spell(obliterate) or { BuffPresent(killing_machine_buff) or BuffPresent(killing_machine_buff) and { PreviousGCDSpell(frost_strike) or PreviousGCDSpell(howling_blast) or PreviousGCDSpell(glacial_advance) } } and Enemies() >= 2 and Spell(frostscythe) or { { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and BuffPresent(killing_machine_buff) or BuffPresent(killing_machine_buff) and { PreviousGCDSpell(frost_strike) or PreviousGCDSpell(howling_blast) or PreviousGCDSpell(glacial_advance) } } and Spell(obliterate) or { BuffPresent(killing_machine_buff) or BuffPresent(killing_machine_buff) and { PreviousGCDSpell(frost_strike) or PreviousGCDSpell(howling_blast) or PreviousGCDSpell(glacial_advance) } } and Spell(obliterate) or { not BuffPresent(rime_buff) or RunicPowerDeficit() < 10 or TimeToRunes(2) > GCD() } and Enemies() >= 2 and Spell(glacial_advance) or BuffPresent(rime_buff) and Enemies() >= 2 and Spell(howling_blast) or { { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and not BuffPresent(rime_buff) or RunicPowerDeficit() < 10 or TimeToRunes(2) > GCD() and not Talent(frostscythe_talent) } and Spell(frost_strike) or { not BuffPresent(rime_buff) or RunicPowerDeficit() < 10 or TimeToRunes(2) > GCD() } and Spell(frost_strike) or BuffPresent(rime_buff) and Spell(howling_blast) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and not Talent(frostscythe_talent) and Spell(obliterate) or Spell(obliterate)
 }
 
 ### actions.cooldowns
@@ -501,12 +509,12 @@ AddFunction FrostCooldownsShortCdPostConditions
 
 AddFunction FrostCooldownsCdActions
 {
- #use_items,if=cooldown.pillar_of_frost.ready&(!talent.breath_of_sindragosa.enabled|buff.empower_rune_weapon.up)
- if SpellCooldown(pillar_of_frost) == 0 and { not Talent(breath_of_sindragosa_talent) or BuffPresent(empower_rune_weapon_buff) } FrostUseItemActions()
+ #use_items,if=(cooldown.pillar_of_frost.ready|cooldown.pillar_of_frost.remains>20)&(!talent.breath_of_sindragosa.enabled|cooldown.empower_rune_weapon.remains>95)
+ if { SpellCooldown(pillar_of_frost) == 0 or SpellCooldown(pillar_of_frost) > 20 } and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(empower_rune_weapon) > 95 } FrostUseItemActions()
  #use_item,name=razdunks_big_red_button
  FrostUseItemActions()
- #use_item,name=merekthas_fang
- FrostUseItemActions()
+ #use_item,name=merekthas_fang,if=!dot.breath_of_sindragosa.ticking&!buff.pillar_of_frost.up
+ if not BuffPresent(breath_of_sindragosa_buff) and not BuffPresent(pillar_of_frost_buff) FrostUseItemActions()
  #potion,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
  if BuffPresent(pillar_of_frost_buff) and BuffPresent(empower_rune_weapon_buff) and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
  #blood_fury,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
@@ -574,12 +582,16 @@ AddFunction FrostColdheartCdPostConditions
 
 AddFunction FrostBostickingMainActions
 {
+ #obliterate,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&runic_power<=30&!talent.frostscythe.enabled
+ if { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPower() <= 30 and not Talent(frostscythe_talent) Spell(obliterate)
  #obliterate,if=runic_power<=30
  if RunicPower() <= 30 Spell(obliterate)
  #remorseless_winter,if=talent.gathering_storm.enabled
  if Talent(gathering_storm_talent) Spell(remorseless_winter)
  #howling_blast,if=buff.rime.up
  if BuffPresent(rime_buff) Spell(howling_blast)
+ #obliterate,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&rune.time_to_5<gcd|runic_power<=45&!talent.frostscythe.enabled
+ if { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and TimeToRunes(5) < GCD() or RunicPower() <= 45 and not Talent(frostscythe_talent) Spell(obliterate)
  #obliterate,if=rune.time_to_5<gcd|runic_power<=45
  if TimeToRunes(5) < GCD() or RunicPower() <= 45 Spell(obliterate)
  #frostscythe,if=buff.killing_machine.up&spell_targets.frostscythe>=2
@@ -590,6 +602,8 @@ AddFunction FrostBostickingMainActions
  Spell(remorseless_winter)
  #frostscythe,if=spell_targets.frostscythe>=2
  if Enemies() >= 2 Spell(frostscythe)
+ #obliterate,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&runic_power.deficit>25|rune>3&!talent.frostscythe.enabled
+ if { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() > 25 or Rune() >= 4 and not Talent(frostscythe_talent) Spell(obliterate)
  #obliterate,if=runic_power.deficit>25|rune>3
  if RunicPowerDeficit() > 25 or Rune() >= 4 Spell(obliterate)
 }
@@ -604,12 +618,12 @@ AddFunction FrostBostickingShortCdActions
 
 AddFunction FrostBostickingShortCdPostConditions
 {
- RunicPower() <= 30 and Spell(obliterate) or Talent(gathering_storm_talent) and Spell(remorseless_winter) or BuffPresent(rime_buff) and Spell(howling_blast) or { TimeToRunes(5) < GCD() or RunicPower() <= 45 } and Spell(obliterate) or BuffPresent(killing_machine_buff) and Enemies() >= 2 and Spell(frostscythe) or RunicPowerDeficit() >= 30 and TimeToRunes(3) > GCD() and Spell(horn_of_winter) or Spell(remorseless_winter) or Enemies() >= 2 and Spell(frostscythe) or { RunicPowerDeficit() > 25 or Rune() >= 4 } and Spell(obliterate)
+ { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPower() <= 30 and not Talent(frostscythe_talent) and Spell(obliterate) or RunicPower() <= 30 and Spell(obliterate) or Talent(gathering_storm_talent) and Spell(remorseless_winter) or BuffPresent(rime_buff) and Spell(howling_blast) or { { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and TimeToRunes(5) < GCD() or RunicPower() <= 45 and not Talent(frostscythe_talent) } and Spell(obliterate) or { TimeToRunes(5) < GCD() or RunicPower() <= 45 } and Spell(obliterate) or BuffPresent(killing_machine_buff) and Enemies() >= 2 and Spell(frostscythe) or RunicPowerDeficit() >= 30 and TimeToRunes(3) > GCD() and Spell(horn_of_winter) or Spell(remorseless_winter) or Enemies() >= 2 and Spell(frostscythe) or { { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() > 25 or Rune() >= 4 and not Talent(frostscythe_talent) } and Spell(obliterate) or { RunicPowerDeficit() > 25 or Rune() >= 4 } and Spell(obliterate)
 }
 
 AddFunction FrostBostickingCdActions
 {
- unless RunicPower() <= 30 and Spell(obliterate) or Talent(gathering_storm_talent) and Spell(remorseless_winter) or BuffPresent(rime_buff) and Spell(howling_blast) or { TimeToRunes(5) < GCD() or RunicPower() <= 45 } and Spell(obliterate) or BuffPresent(killing_machine_buff) and Enemies() >= 2 and Spell(frostscythe) or RunicPowerDeficit() >= 30 and TimeToRunes(3) > GCD() and Spell(horn_of_winter) or Spell(remorseless_winter) or Enemies() >= 2 and Spell(frostscythe) or { RunicPowerDeficit() > 25 or Rune() >= 4 } and Spell(obliterate)
+ unless { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPower() <= 30 and not Talent(frostscythe_talent) and Spell(obliterate) or RunicPower() <= 30 and Spell(obliterate) or Talent(gathering_storm_talent) and Spell(remorseless_winter) or BuffPresent(rime_buff) and Spell(howling_blast) or { { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and TimeToRunes(5) < GCD() or RunicPower() <= 45 and not Talent(frostscythe_talent) } and Spell(obliterate) or { TimeToRunes(5) < GCD() or RunicPower() <= 45 } and Spell(obliterate) or BuffPresent(killing_machine_buff) and Enemies() >= 2 and Spell(frostscythe) or RunicPowerDeficit() >= 30 and TimeToRunes(3) > GCD() and Spell(horn_of_winter) or Spell(remorseless_winter) or Enemies() >= 2 and Spell(frostscythe) or { { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() > 25 or Rune() >= 4 and not Talent(frostscythe_talent) } and Spell(obliterate) or { RunicPowerDeficit() > 25 or Rune() >= 4 } and Spell(obliterate)
  {
   #arcane_torrent,if=runic_power.deficit>20
   if RunicPowerDeficit() > 20 Spell(arcane_torrent_runicpower)
@@ -618,7 +632,7 @@ AddFunction FrostBostickingCdActions
 
 AddFunction FrostBostickingCdPostConditions
 {
- RunicPower() <= 30 and Spell(obliterate) or Talent(gathering_storm_talent) and Spell(remorseless_winter) or BuffPresent(rime_buff) and Spell(howling_blast) or { TimeToRunes(5) < GCD() or RunicPower() <= 45 } and Spell(obliterate) or BuffPresent(killing_machine_buff) and Enemies() >= 2 and Spell(frostscythe) or RunicPowerDeficit() >= 30 and TimeToRunes(3) > GCD() and Spell(horn_of_winter) or Spell(remorseless_winter) or Enemies() >= 2 and Spell(frostscythe) or { RunicPowerDeficit() > 25 or Rune() >= 4 } and Spell(obliterate)
+ { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPower() <= 30 and not Talent(frostscythe_talent) and Spell(obliterate) or RunicPower() <= 30 and Spell(obliterate) or Talent(gathering_storm_talent) and Spell(remorseless_winter) or BuffPresent(rime_buff) and Spell(howling_blast) or { { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and TimeToRunes(5) < GCD() or RunicPower() <= 45 and not Talent(frostscythe_talent) } and Spell(obliterate) or { TimeToRunes(5) < GCD() or RunicPower() <= 45 } and Spell(obliterate) or BuffPresent(killing_machine_buff) and Enemies() >= 2 and Spell(frostscythe) or RunicPowerDeficit() >= 30 and TimeToRunes(3) > GCD() and Spell(horn_of_winter) or Spell(remorseless_winter) or Enemies() >= 2 and Spell(frostscythe) or { { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() > 25 or Rune() >= 4 and not Talent(frostscythe_talent) } and Spell(obliterate) or { RunicPowerDeficit() > 25 or Rune() >= 4 } and Spell(obliterate)
 }
 
 ### actions.bos_pooling
@@ -627,20 +641,28 @@ AddFunction FrostBospoolingMainActions
 {
  #howling_blast,if=buff.rime.up
  if BuffPresent(rime_buff) Spell(howling_blast)
+ #obliterate,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&rune.time_to_4<gcd&runic_power.deficit>=25&!talent.frostscythe.enabled
+ if { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and TimeToRunes(4) < GCD() and RunicPowerDeficit() >= 25 and not Talent(frostscythe_talent) Spell(obliterate)
  #obliterate,if=rune.time_to_4<gcd&runic_power.deficit>=25
  if TimeToRunes(4) < GCD() and RunicPowerDeficit() >= 25 Spell(obliterate)
  #glacial_advance,if=runic_power.deficit<20&cooldown.pillar_of_frost.remains>rune.time_to_4&spell_targets.glacial_advance>=2
  if RunicPowerDeficit() < 20 and SpellCooldown(pillar_of_frost) > TimeToRunes(4) and Enemies() >= 2 Spell(glacial_advance)
+ #frost_strike,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&runic_power.deficit<20&cooldown.pillar_of_frost.remains>rune.time_to_4&!talent.frostscythe.enabled
+ if { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() < 20 and SpellCooldown(pillar_of_frost) > TimeToRunes(4) and not Talent(frostscythe_talent) Spell(frost_strike)
  #frost_strike,if=runic_power.deficit<20&cooldown.pillar_of_frost.remains>rune.time_to_4
  if RunicPowerDeficit() < 20 and SpellCooldown(pillar_of_frost) > TimeToRunes(4) Spell(frost_strike)
  #frostscythe,if=buff.killing_machine.up&runic_power.deficit>(15+talent.runic_attenuation.enabled*3)&spell_targets.frostscythe>=2
  if BuffPresent(killing_machine_buff) and RunicPowerDeficit() > 15 + TalentPoints(runic_attenuation_talent) * 3 and Enemies() >= 2 Spell(frostscythe)
  #frostscythe,if=runic_power.deficit>=(35+talent.runic_attenuation.enabled*3)&spell_targets.frostscythe>=2
  if RunicPowerDeficit() >= 35 + TalentPoints(runic_attenuation_talent) * 3 and Enemies() >= 2 Spell(frostscythe)
+ #obliterate,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&runic_power.deficit>=(35+talent.runic_attenuation.enabled*3)&!talent.frostscythe.enabled
+ if { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() >= 35 + TalentPoints(runic_attenuation_talent) * 3 and not Talent(frostscythe_talent) Spell(obliterate)
  #obliterate,if=runic_power.deficit>=(35+talent.runic_attenuation.enabled*3)
  if RunicPowerDeficit() >= 35 + TalentPoints(runic_attenuation_talent) * 3 Spell(obliterate)
  #glacial_advance,if=cooldown.pillar_of_frost.remains>rune.time_to_4&runic_power.deficit<40&spell_targets.glacial_advance>=2
  if SpellCooldown(pillar_of_frost) > TimeToRunes(4) and RunicPowerDeficit() < 40 and Enemies() >= 2 Spell(glacial_advance)
+ #frost_strike,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&cooldown.pillar_of_frost.remains>rune.time_to_4&runic_power.deficit<40&!talent.frostscythe.enabled
+ if { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and SpellCooldown(pillar_of_frost) > TimeToRunes(4) and RunicPowerDeficit() < 40 and not Talent(frostscythe_talent) Spell(frost_strike)
  #frost_strike,if=cooldown.pillar_of_frost.remains>rune.time_to_4&runic_power.deficit<40
  if SpellCooldown(pillar_of_frost) > TimeToRunes(4) and RunicPowerDeficit() < 40 Spell(frost_strike)
 }
@@ -655,7 +677,7 @@ AddFunction FrostBospoolingShortCdActions
 
 AddFunction FrostBospoolingShortCdPostConditions
 {
- BuffPresent(rime_buff) and Spell(howling_blast) or TimeToRunes(4) < GCD() and RunicPowerDeficit() >= 25 and Spell(obliterate) or RunicPowerDeficit() < 20 and SpellCooldown(pillar_of_frost) > TimeToRunes(4) and Enemies() >= 2 and Spell(glacial_advance) or RunicPowerDeficit() < 20 and SpellCooldown(pillar_of_frost) > TimeToRunes(4) and Spell(frost_strike) or BuffPresent(killing_machine_buff) and RunicPowerDeficit() > 15 + TalentPoints(runic_attenuation_talent) * 3 and Enemies() >= 2 and Spell(frostscythe) or RunicPowerDeficit() >= 35 + TalentPoints(runic_attenuation_talent) * 3 and Enemies() >= 2 and Spell(frostscythe) or RunicPowerDeficit() >= 35 + TalentPoints(runic_attenuation_talent) * 3 and Spell(obliterate) or SpellCooldown(pillar_of_frost) > TimeToRunes(4) and RunicPowerDeficit() < 40 and Enemies() >= 2 and Spell(glacial_advance) or SpellCooldown(pillar_of_frost) > TimeToRunes(4) and RunicPowerDeficit() < 40 and Spell(frost_strike)
+ BuffPresent(rime_buff) and Spell(howling_blast) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and TimeToRunes(4) < GCD() and RunicPowerDeficit() >= 25 and not Talent(frostscythe_talent) and Spell(obliterate) or TimeToRunes(4) < GCD() and RunicPowerDeficit() >= 25 and Spell(obliterate) or RunicPowerDeficit() < 20 and SpellCooldown(pillar_of_frost) > TimeToRunes(4) and Enemies() >= 2 and Spell(glacial_advance) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() < 20 and SpellCooldown(pillar_of_frost) > TimeToRunes(4) and not Talent(frostscythe_talent) and Spell(frost_strike) or RunicPowerDeficit() < 20 and SpellCooldown(pillar_of_frost) > TimeToRunes(4) and Spell(frost_strike) or BuffPresent(killing_machine_buff) and RunicPowerDeficit() > 15 + TalentPoints(runic_attenuation_talent) * 3 and Enemies() >= 2 and Spell(frostscythe) or RunicPowerDeficit() >= 35 + TalentPoints(runic_attenuation_talent) * 3 and Enemies() >= 2 and Spell(frostscythe) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() >= 35 + TalentPoints(runic_attenuation_talent) * 3 and not Talent(frostscythe_talent) and Spell(obliterate) or RunicPowerDeficit() >= 35 + TalentPoints(runic_attenuation_talent) * 3 and Spell(obliterate) or SpellCooldown(pillar_of_frost) > TimeToRunes(4) and RunicPowerDeficit() < 40 and Enemies() >= 2 and Spell(glacial_advance) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and SpellCooldown(pillar_of_frost) > TimeToRunes(4) and RunicPowerDeficit() < 40 and not Talent(frostscythe_talent) and Spell(frost_strike) or SpellCooldown(pillar_of_frost) > TimeToRunes(4) and RunicPowerDeficit() < 40 and Spell(frost_strike)
 }
 
 AddFunction FrostBospoolingCdActions
@@ -664,17 +686,19 @@ AddFunction FrostBospoolingCdActions
 
 AddFunction FrostBospoolingCdPostConditions
 {
- BuffPresent(rime_buff) and Spell(howling_blast) or TimeToRunes(4) < GCD() and RunicPowerDeficit() >= 25 and Spell(obliterate) or RunicPowerDeficit() < 20 and SpellCooldown(pillar_of_frost) > TimeToRunes(4) and Enemies() >= 2 and Spell(glacial_advance) or RunicPowerDeficit() < 20 and SpellCooldown(pillar_of_frost) > TimeToRunes(4) and Spell(frost_strike) or BuffPresent(killing_machine_buff) and RunicPowerDeficit() > 15 + TalentPoints(runic_attenuation_talent) * 3 and Enemies() >= 2 and Spell(frostscythe) or RunicPowerDeficit() >= 35 + TalentPoints(runic_attenuation_talent) * 3 and Enemies() >= 2 and Spell(frostscythe) or RunicPowerDeficit() >= 35 + TalentPoints(runic_attenuation_talent) * 3 and Spell(obliterate) or SpellCooldown(pillar_of_frost) > TimeToRunes(4) and RunicPowerDeficit() < 40 and Enemies() >= 2 and Spell(glacial_advance) or SpellCooldown(pillar_of_frost) > TimeToRunes(4) and RunicPowerDeficit() < 40 and Spell(frost_strike)
+ BuffPresent(rime_buff) and Spell(howling_blast) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and TimeToRunes(4) < GCD() and RunicPowerDeficit() >= 25 and not Talent(frostscythe_talent) and Spell(obliterate) or TimeToRunes(4) < GCD() and RunicPowerDeficit() >= 25 and Spell(obliterate) or RunicPowerDeficit() < 20 and SpellCooldown(pillar_of_frost) > TimeToRunes(4) and Enemies() >= 2 and Spell(glacial_advance) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() < 20 and SpellCooldown(pillar_of_frost) > TimeToRunes(4) and not Talent(frostscythe_talent) and Spell(frost_strike) or RunicPowerDeficit() < 20 and SpellCooldown(pillar_of_frost) > TimeToRunes(4) and Spell(frost_strike) or BuffPresent(killing_machine_buff) and RunicPowerDeficit() > 15 + TalentPoints(runic_attenuation_talent) * 3 and Enemies() >= 2 and Spell(frostscythe) or RunicPowerDeficit() >= 35 + TalentPoints(runic_attenuation_talent) * 3 and Enemies() >= 2 and Spell(frostscythe) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() >= 35 + TalentPoints(runic_attenuation_talent) * 3 and not Talent(frostscythe_talent) and Spell(obliterate) or RunicPowerDeficit() >= 35 + TalentPoints(runic_attenuation_talent) * 3 and Spell(obliterate) or SpellCooldown(pillar_of_frost) > TimeToRunes(4) and RunicPowerDeficit() < 40 and Enemies() >= 2 and Spell(glacial_advance) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and SpellCooldown(pillar_of_frost) > TimeToRunes(4) and RunicPowerDeficit() < 40 and not Talent(frostscythe_talent) and Spell(frost_strike) or SpellCooldown(pillar_of_frost) > TimeToRunes(4) and RunicPowerDeficit() < 40 and Spell(frost_strike)
 }
 
 ### actions.aoe
 
 AddFunction FrostAoeMainActions
 {
- #remorseless_winter,if=talent.gathering_storm.enabled
- if Talent(gathering_storm_talent) Spell(remorseless_winter)
+ #remorseless_winter,if=talent.gathering_storm.enabled|(azerite.frozen_tempest.rank&spell_targets.remorseless_winter>=3&!buff.rime.up)
+ if Talent(gathering_storm_talent) or AzeriteTraitRank(frozen_tempest_trait) and Enemies() >= 3 and not BuffPresent(rime_buff) Spell(remorseless_winter)
  #glacial_advance,if=talent.frostscythe.enabled
  if Talent(frostscythe_talent) Spell(glacial_advance)
+ #frost_strike,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&cooldown.remorseless_winter.remains<=2*gcd&talent.gathering_storm.enabled&!talent.frostscythe.enabled
+ if { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and SpellCooldown(remorseless_winter) <= 2 * GCD() and Talent(gathering_storm_talent) and not Talent(frostscythe_talent) Spell(frost_strike)
  #frost_strike,if=cooldown.remorseless_winter.remains<=2*gcd&talent.gathering_storm.enabled
  if SpellCooldown(remorseless_winter) <= 2 * GCD() and Talent(gathering_storm_talent) Spell(frost_strike)
  #howling_blast,if=buff.rime.up
@@ -683,16 +707,22 @@ AddFunction FrostAoeMainActions
  if BuffPresent(killing_machine_buff) Spell(frostscythe)
  #glacial_advance,if=runic_power.deficit<(15+talent.runic_attenuation.enabled*3)
  if RunicPowerDeficit() < 15 + TalentPoints(runic_attenuation_talent) * 3 Spell(glacial_advance)
+ #frost_strike,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&runic_power.deficit<(15+talent.runic_attenuation.enabled*3)&!talent.frostscythe.enabled
+ if { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() < 15 + TalentPoints(runic_attenuation_talent) * 3 and not Talent(frostscythe_talent) Spell(frost_strike)
  #frost_strike,if=runic_power.deficit<(15+talent.runic_attenuation.enabled*3)
  if RunicPowerDeficit() < 15 + TalentPoints(runic_attenuation_talent) * 3 Spell(frost_strike)
  #remorseless_winter
  Spell(remorseless_winter)
  #frostscythe
  Spell(frostscythe)
+ #obliterate,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&runic_power.deficit>(25+talent.runic_attenuation.enabled*3)&!talent.frostscythe.enabled
+ if { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() > 25 + TalentPoints(runic_attenuation_talent) * 3 and not Talent(frostscythe_talent) Spell(obliterate)
  #obliterate,if=runic_power.deficit>(25+talent.runic_attenuation.enabled*3)
  if RunicPowerDeficit() > 25 + TalentPoints(runic_attenuation_talent) * 3 Spell(obliterate)
  #glacial_advance
  Spell(glacial_advance)
+ #frost_strike,target_if=(debuff.razorice.stack<5|debuff.razorice.remains<10)&!talent.frostscythe.enabled
+ if { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and not Talent(frostscythe_talent) Spell(frost_strike)
  #frost_strike
  Spell(frost_strike)
  #horn_of_winter
@@ -709,12 +739,12 @@ AddFunction FrostAoeShortCdActions
 
 AddFunction FrostAoeShortCdPostConditions
 {
- Talent(gathering_storm_talent) and Spell(remorseless_winter) or Talent(frostscythe_talent) and Spell(glacial_advance) or SpellCooldown(remorseless_winter) <= 2 * GCD() and Talent(gathering_storm_talent) and Spell(frost_strike) or BuffPresent(rime_buff) and Spell(howling_blast) or BuffPresent(killing_machine_buff) and Spell(frostscythe) or RunicPowerDeficit() < 15 + TalentPoints(runic_attenuation_talent) * 3 and Spell(glacial_advance) or RunicPowerDeficit() < 15 + TalentPoints(runic_attenuation_talent) * 3 and Spell(frost_strike) or Spell(remorseless_winter) or Spell(frostscythe) or RunicPowerDeficit() > 25 + TalentPoints(runic_attenuation_talent) * 3 and Spell(obliterate) or Spell(glacial_advance) or Spell(frost_strike) or Spell(horn_of_winter)
+ { Talent(gathering_storm_talent) or AzeriteTraitRank(frozen_tempest_trait) and Enemies() >= 3 and not BuffPresent(rime_buff) } and Spell(remorseless_winter) or Talent(frostscythe_talent) and Spell(glacial_advance) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and SpellCooldown(remorseless_winter) <= 2 * GCD() and Talent(gathering_storm_talent) and not Talent(frostscythe_talent) and Spell(frost_strike) or SpellCooldown(remorseless_winter) <= 2 * GCD() and Talent(gathering_storm_talent) and Spell(frost_strike) or BuffPresent(rime_buff) and Spell(howling_blast) or BuffPresent(killing_machine_buff) and Spell(frostscythe) or RunicPowerDeficit() < 15 + TalentPoints(runic_attenuation_talent) * 3 and Spell(glacial_advance) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() < 15 + TalentPoints(runic_attenuation_talent) * 3 and not Talent(frostscythe_talent) and Spell(frost_strike) or RunicPowerDeficit() < 15 + TalentPoints(runic_attenuation_talent) * 3 and Spell(frost_strike) or Spell(remorseless_winter) or Spell(frostscythe) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() > 25 + TalentPoints(runic_attenuation_talent) * 3 and not Talent(frostscythe_talent) and Spell(obliterate) or RunicPowerDeficit() > 25 + TalentPoints(runic_attenuation_talent) * 3 and Spell(obliterate) or Spell(glacial_advance) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and not Talent(frostscythe_talent) and Spell(frost_strike) or Spell(frost_strike) or Spell(horn_of_winter)
 }
 
 AddFunction FrostAoeCdActions
 {
- unless Talent(gathering_storm_talent) and Spell(remorseless_winter) or Talent(frostscythe_talent) and Spell(glacial_advance) or SpellCooldown(remorseless_winter) <= 2 * GCD() and Talent(gathering_storm_talent) and Spell(frost_strike) or BuffPresent(rime_buff) and Spell(howling_blast) or BuffPresent(killing_machine_buff) and Spell(frostscythe) or RunicPowerDeficit() < 15 + TalentPoints(runic_attenuation_talent) * 3 and Spell(glacial_advance) or RunicPowerDeficit() < 15 + TalentPoints(runic_attenuation_talent) * 3 and Spell(frost_strike) or Spell(remorseless_winter) or Spell(frostscythe) or RunicPowerDeficit() > 25 + TalentPoints(runic_attenuation_talent) * 3 and Spell(obliterate) or Spell(glacial_advance) or Spell(frost_strike) or Spell(horn_of_winter)
+ unless { Talent(gathering_storm_talent) or AzeriteTraitRank(frozen_tempest_trait) and Enemies() >= 3 and not BuffPresent(rime_buff) } and Spell(remorseless_winter) or Talent(frostscythe_talent) and Spell(glacial_advance) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and SpellCooldown(remorseless_winter) <= 2 * GCD() and Talent(gathering_storm_talent) and not Talent(frostscythe_talent) and Spell(frost_strike) or SpellCooldown(remorseless_winter) <= 2 * GCD() and Talent(gathering_storm_talent) and Spell(frost_strike) or BuffPresent(rime_buff) and Spell(howling_blast) or BuffPresent(killing_machine_buff) and Spell(frostscythe) or RunicPowerDeficit() < 15 + TalentPoints(runic_attenuation_talent) * 3 and Spell(glacial_advance) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() < 15 + TalentPoints(runic_attenuation_talent) * 3 and not Talent(frostscythe_talent) and Spell(frost_strike) or RunicPowerDeficit() < 15 + TalentPoints(runic_attenuation_talent) * 3 and Spell(frost_strike) or Spell(remorseless_winter) or Spell(frostscythe) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() > 25 + TalentPoints(runic_attenuation_talent) * 3 and not Talent(frostscythe_talent) and Spell(obliterate) or RunicPowerDeficit() > 25 + TalentPoints(runic_attenuation_talent) * 3 and Spell(obliterate) or Spell(glacial_advance) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and not Talent(frostscythe_talent) and Spell(frost_strike) or Spell(frost_strike) or Spell(horn_of_winter)
  {
   #arcane_torrent
   Spell(arcane_torrent_runicpower)
@@ -723,7 +753,7 @@ AddFunction FrostAoeCdActions
 
 AddFunction FrostAoeCdPostConditions
 {
- Talent(gathering_storm_talent) and Spell(remorseless_winter) or Talent(frostscythe_talent) and Spell(glacial_advance) or SpellCooldown(remorseless_winter) <= 2 * GCD() and Talent(gathering_storm_talent) and Spell(frost_strike) or BuffPresent(rime_buff) and Spell(howling_blast) or BuffPresent(killing_machine_buff) and Spell(frostscythe) or RunicPowerDeficit() < 15 + TalentPoints(runic_attenuation_talent) * 3 and Spell(glacial_advance) or RunicPowerDeficit() < 15 + TalentPoints(runic_attenuation_talent) * 3 and Spell(frost_strike) or Spell(remorseless_winter) or Spell(frostscythe) or RunicPowerDeficit() > 25 + TalentPoints(runic_attenuation_talent) * 3 and Spell(obliterate) or Spell(glacial_advance) or Spell(frost_strike) or Spell(horn_of_winter)
+ { Talent(gathering_storm_talent) or AzeriteTraitRank(frozen_tempest_trait) and Enemies() >= 3 and not BuffPresent(rime_buff) } and Spell(remorseless_winter) or Talent(frostscythe_talent) and Spell(glacial_advance) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and SpellCooldown(remorseless_winter) <= 2 * GCD() and Talent(gathering_storm_talent) and not Talent(frostscythe_talent) and Spell(frost_strike) or SpellCooldown(remorseless_winter) <= 2 * GCD() and Talent(gathering_storm_talent) and Spell(frost_strike) or BuffPresent(rime_buff) and Spell(howling_blast) or BuffPresent(killing_machine_buff) and Spell(frostscythe) or RunicPowerDeficit() < 15 + TalentPoints(runic_attenuation_talent) * 3 and Spell(glacial_advance) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() < 15 + TalentPoints(runic_attenuation_talent) * 3 and not Talent(frostscythe_talent) and Spell(frost_strike) or RunicPowerDeficit() < 15 + TalentPoints(runic_attenuation_talent) * 3 and Spell(frost_strike) or Spell(remorseless_winter) or Spell(frostscythe) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and RunicPowerDeficit() > 25 + TalentPoints(runic_attenuation_talent) * 3 and not Talent(frostscythe_talent) and Spell(obliterate) or RunicPowerDeficit() > 25 + TalentPoints(runic_attenuation_talent) * 3 and Spell(obliterate) or Spell(glacial_advance) or { target.DebuffStacks(razorice_debuff) < 5 or target.DebuffRemaining(razorice_debuff) < 10 } and not Talent(frostscythe_talent) and Spell(frost_strike) or Spell(frost_strike) or Spell(horn_of_winter)
 }
 
 ### actions.default
@@ -948,6 +978,7 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # frostwyrms_fury
 # frozen_pulse_buff
 # frozen_pulse_talent
+# frozen_tempest_trait
 # gathering_storm_talent
 # glacial_advance
 # horn_of_winter

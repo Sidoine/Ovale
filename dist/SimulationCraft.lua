@@ -327,6 +327,7 @@ local MODIFIER_KEYWORD = {
     ["toggle"] = true,
     ["travel_speed"] = true,
     ["type"] = true,
+    ["use_off_gcd"] = true,
     ["value"] = true,
     ["value_else"] = true,
     ["wait"] = true,
@@ -1433,6 +1434,7 @@ local InitializeDisambiguation = function()
     AddDisambiguation("judgment", "judgment_prot", "PALADIN", "protection")
     AddDisambiguation("mindbender_talent", "mindbender_talent_discipline", "PRIEST", "discipline")
     AddDisambiguation("twist_of_fate_talent", "twist_of_fate_talent_discipline", "PRIEST", "discipline")
+    AddDisambiguation("deadly_poison_dot", "deadly_poison_debuff", "ROGUE", "assassination")
     AddDisambiguation("stealth_buff", "stealthed_buff", "ROGUE")
     AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_assassination_buff", "ROGUE", "assassination")
     AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_outlaw_buff", "ROGUE", "outlaw")

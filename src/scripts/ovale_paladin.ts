@@ -112,10 +112,16 @@ AddFunction ProtectionCooldownsCdActions
  {
   #avenging_wrath,if=buff.seraphim.up|cooldown.seraphim.remains<2|!talent.seraphim.enabled
   if BuffPresent(seraphim_buff) or SpellCooldown(seraphim) < 2 or not Talent(seraphim_talent) Spell(avenging_wrath)
+  #bastion_of_light,if=cooldown.shield_of_the_righteous.charges_fractional<=0.5
+  if SpellCharges(shield_of_the_righteous count=0) <= 0.5 Spell(bastion_of_light)
   #potion,if=buff.avenging_wrath.up
   if BuffPresent(avenging_wrath_buff) and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(bursting_blood usable=1)
   #use_items,if=buff.seraphim.up|!talent.seraphim.enabled
   if BuffPresent(seraphim_buff) or not Talent(seraphim_talent) ProtectionUseItemActions()
+  #use_item,name=merekthas_fang,if=!buff.avenging_wrath.up&(buff.seraphim.up|!talent.seraphim.enabled)
+  if not BuffPresent(avenging_wrath_buff) and { BuffPresent(seraphim_buff) or not Talent(seraphim_talent) } ProtectionUseItemActions()
+  #use_item,name=razdunks_big_red_button
+  ProtectionUseItemActions()
  }
 }
 
@@ -261,6 +267,7 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 # avengers_valor_buff
 # avenging_wrath
 # avenging_wrath_buff
+# bastion_of_light
 # blessed_hammer
 # blinding_light
 # bursting_blood

@@ -68,7 +68,7 @@ Define(deathbolt 264106)
 # Launches a bolt of death at the target, dealing s2 of the total remaining damage of your damage over time effects on the target.?s196103[rnrnCounts up to s3 sec of your Corruption's damage.][]
   SpellInfo(deathbolt cd=30 talent=deathbolt_talent)
 Define(demonbolt 264178)
-# Send the fiery soul of a fallen demon at the enemy, causing (57.99999999999999 of Spell Power) Shadowflame damage.?c2[rnrn|cFFFFFFFFGenerates 2 Soul Shards.|r][]
+# Send the fiery soul of a fallen demon at the enemy, causing (66.7 of Spell Power) Shadowflame damage.?c2[rnrn|cFFFFFFFFGenerates 2 Soul Shards.|r][]
   SpellInfo(demonbolt)
 Define(demonic_calling_buff 205146)
 # Shadow Bolt?s264178[ and Demonbolt have][ has] a h chance to make your next Call Dreadstalkers cost s1 less Soul Shard and have no cast time.
@@ -171,7 +171,7 @@ Define(seed_of_corruption 27243)
   # Embeded with a demon seed that will soon explode, dealing Shadow damage to the caster's enemies within 27285A1 yards, and applying Corruption to them.rnrnThe seed will detonate early if the target is hit by other detonations, or takes w3 damage from your spells.
   SpellAddTargetDebuff(seed_of_corruption seed_of_corruption=1)
 Define(shadow_bolt 686)
-# Sends a shadowy bolt at the enemy, causing (30 of Spell Power) Shadow damage.?c2[rnrn|cFFFFFFFFGenerates 1 Soul Shard.|r][]
+# Sends a shadowy bolt at the enemy, causing (34.5 of Spell Power) Shadow damage.?c2[rnrn|cFFFFFFFFGenerates 1 Soul Shard.|r][]
   SpellInfo(shadow_bolt)
 Define(shadowburn 17877)
 # Blasts a target for (60 of Spell Power) Shadowflame damage. rnrnIf the target dies within 5 seconds and yields experience or honor, Shadowburn's cooldown is reset.rnrn|cFFFFFFFFGenerates 245731s1 Soul Shard Fragments.|r

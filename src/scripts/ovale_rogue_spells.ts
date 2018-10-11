@@ -302,6 +302,7 @@ Define(venom_rush_talent 16) #22343
 # Mutilate refunds s1 Energy when used against a poisoned target.
 Define(vigor_talent 7) #19239
 # Increases your maximum Energy by (25 of Spell Power) and your Energy regeneration by (25 of Spell Power).
+Define(double_dose_trait 273007)
 Define(shrouded_suffocation_trait 278666)
 Define(ace_up_your_sleeve_trait 278676)
 Define(deadshot_trait 272935)

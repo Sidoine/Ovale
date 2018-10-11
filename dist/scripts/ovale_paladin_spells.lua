@@ -17,6 +17,9 @@ Define(avenging_wrath 31884)
   SpellInfo(avenging_wrath cd=120 duration=20)
   # Damage, healing, and critical strike chance increased by w1.
   SpellAddBuff(avenging_wrath avenging_wrath=1)
+Define(bastion_of_light 204035)
+# Immediately grants s1 charges of Shield of the Righteous.
+  SpellInfo(bastion_of_light cd=120 gcd=0 offgcd=1 talent=bastion_of_light_talent)
 Define(blade_of_justice 184575)
 # Pierces an enemy with a blade of light, dealing s2*<mult> Physical damage.rnrn|cFFFFFFFFGenerates s3 Holy Power.|r
   SpellInfo(blade_of_justice cd=10.5 holypower=-2)
@@ -123,6 +126,8 @@ Define(war_stomp 20549)
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
   # Stunned.
   SpellAddTargetDebuff(war_stomp war_stomp=1)
+Define(bastion_of_light_talent 6) #22594
+# Immediately grants s1 charges of Shield of the Righteous.
 Define(blinding_light_talent 9) #21811
 # Emits dazzling light in all directions, blinding enemies within 105421A1 yards, causing them to wander disoriented for 105421d. Non-Holy damage will break the disorient effect.
 Define(crusade_talent 20) #22215
@@ -194,7 +199,7 @@ Define(avenging_crusader_buff 216331)
 Define(avenging_wrath_buff 31884)
 	SpellInfo(avenging_wrath_buff duration=20)
 	SpellInfo(avenging_wrath_buff add_duration=5 talent=sanctified_wrath_talent specialization=holy)
-Define(bastion_of_light 204035)
+
 	SpellInfo(bastion_of_light cd=120 gcd=0 offgcd=1)
 Define(bastion_of_power_buff 144569)
 	SpellInfo(bastion_of_power_buff duration=20)
