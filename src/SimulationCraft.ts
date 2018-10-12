@@ -2443,8 +2443,6 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             } else {
                 isSpellAction = false;
             }
-        } else if (className == "ROGUE" && action == "between_the_eyes") {
-            bodyCode = "Spell(between_the_eyes text=BTE)";
         } else if (className == "ROGUE" && action == "cancel_autoattack") {
             isSpellAction = false;
         } else if (className == "ROGUE" && action == "premeditation") {
