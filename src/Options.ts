@@ -64,7 +64,7 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                 minFrameRefresh: 50,
                 maxFrameRefresh: 250,
                 fullAuraScan: false,
-                frequentHealthUpdates: false,
+                frequentHealthUpdates: true,
                 auraLag: 400,
                 moving: false,
                 spellFlash: {
