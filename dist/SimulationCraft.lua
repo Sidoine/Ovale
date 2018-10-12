@@ -2269,8 +2269,6 @@ EmitAction = function(parseNode, nodeList, annotation)
             bodyCode = "Spell(between_the_eyes text=BTE)"
         elseif className == "ROGUE" and action == "cancel_autoattack" then
             isSpellAction = false
-        elseif className == "ROGUE" and action == "pistol_shot" then
-            bodyCode = "Spell(pistol_shot text=PS)"
         elseif className == "ROGUE" and action == "premeditation" then
             conditionCode = "ComboPoints() < 5"
         elseif className == "ROGUE" and specialization == "assassination" and action == "vanish" then

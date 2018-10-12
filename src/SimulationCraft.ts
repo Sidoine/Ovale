@@ -2447,8 +2447,6 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             bodyCode = "Spell(between_the_eyes text=BTE)";
         } else if (className == "ROGUE" && action == "cancel_autoattack") {
             isSpellAction = false;
-        } else if (className == "ROGUE" && action == "pistol_shot") {
-            bodyCode = "Spell(pistol_shot text=PS)";
         } else if (className == "ROGUE" && action == "premeditation") {
             conditionCode = "ComboPoints() < 5";
         } else if (className == "ROGUE" && specialization == "assassination" && action == "vanish") {
