@@ -31,7 +31,6 @@ export function CheckRequirements(spellId: number, atTime: number, tokens: Token
     let name = <string>tokens[index];
     index = index + 1;
     if (name) {
-        // this.Log("Checking requirements:");
         let verified = true;
         let requirement = name;
         while (verified && name) {
@@ -49,6 +48,3 @@ export function CheckRequirements(spellId: number, atTime: number, tokens: Token
     }
     return [true, undefined, undefined];
 }
-
-// TODO to avoid circular dependencies
-RegisterRequirement("combat", baseState.CombatRequirement);

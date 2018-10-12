@@ -45,4 +45,3 @@ __exports.CheckRequirements = function(spellId, atTime, tokens, index, targetGUI
     end
     return true, nil, nil
 end
-__exports.RegisterRequirement("combat", baseState.CombatRequirement)

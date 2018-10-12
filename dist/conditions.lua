@@ -833,7 +833,7 @@ end
 do
 local function EnergyRegenRate(positionalParams, namedParams, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
-        local value = OvalePower.next:GetPowerRate("energy")
+        local value = OvalePower.next:GetPowerRate("energy", atTime)
         return Compare(value, comparator, limit)
     end
     OvaleCondition:RegisterCondition("energyregen", false, EnergyRegenRate)
@@ -870,7 +870,7 @@ end
 do
 local function FocusRegenRate(positionalParams, namedParams, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
-        local value = OvalePower.next:GetPowerRate("focus")
+        local value = OvalePower.next:GetPowerRate("focus", atTime)
         return Compare(value, comparator, limit)
     end
     OvaleCondition:RegisterCondition("focusregen", false, FocusRegenRate)
@@ -880,7 +880,7 @@ do
     local STEADY_FOCUS = 177668
 local function FocusCastingRegen(positionalParams, namedParams, atTime)
         local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-        local regenRate = OvalePower.next:GetPowerRate("focus")
+        local regenRate = OvalePower.next:GetPowerRate("focus", atTime)
         local power = 0
         local castTime = OvaleSpellBook:GetCastTime(spellId) or 0
         local gcd = OvaleFuture:GetGCD()
@@ -1121,7 +1121,7 @@ end
 do
 local function InCombat(positionalParams, namedParams, atTime)
         local yesno = positionalParams[1]
-        local boolean = baseState.next.inCombat
+        local boolean = OvaleFuture:IsInCombat(atTime)
         return TestBoolean(boolean, yesno)
     end
     OvaleCondition:RegisterCondition("incombat", false, InCombat)
@@ -1362,7 +1362,7 @@ local function Power(powerType, positionalParams, namedParams, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
         local target = ParseCondition(positionalParams, namedParams)
         if target == "player" then
-            local value, origin, rate = OvalePower.next.power[powerType], atTime, OvalePower.next:GetPowerRate(powerType)
+            local value, origin, rate = OvalePower.next.power[powerType], atTime, OvalePower.next:GetPowerRate(powerType, atTime)
             local start, ending = atTime, INFINITY
             return TestValue(start, ending, value, origin, rate, comparator, limit)
         else
@@ -1377,7 +1377,7 @@ local function PowerDeficit(powerType, positionalParams, namedParams, atTime)
         if target == "player" then
             local powerMax = OvalePower.current.maxPower[powerType] or 0
             if powerMax > 0 then
-                local value, origin, rate = powerMax - OvalePower.next.power[powerType], atTime, -1 * OvalePower.next:GetPowerRate(powerType)
+                local value, origin, rate = powerMax - OvalePower.next.power[powerType], atTime, -1 * OvalePower.next:GetPowerRate(powerType, atTime)
                 local start, ending = atTime, INFINITY
                 return TestValue(start, ending, value, origin, rate, comparator, limit)
             end
@@ -1399,7 +1399,7 @@ local function PowerPercent(powerType, positionalParams, namedParams, atTime)
             local powerMax = OvalePower.current.maxPower[powerType] or 0
             if powerMax > 0 then
                 local conversion = 100 / powerMax
-                local value, origin, rate = OvalePower.next.power[powerType] * conversion, atTime, OvalePower.next:GetPowerRate(powerType) * conversion
+                local value, origin, rate = OvalePower.next.power[powerType] * conversion, atTime, OvalePower.next:GetPowerRate(powerType, atTime) * conversion
                 if rate > 0 and value >= 100 or rate < 0 and value == 0 then
                     rate = 0
                 end
@@ -2193,8 +2193,8 @@ end
 do
 local function TimeInCombat(positionalParams, namedParams, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
-        if baseState.next.inCombat then
-            local start = baseState.next.combatStartTime
+        if OvaleFuture:IsInCombat(atTime) then
+            local start = OvaleFuture:GetState(atTime).combatStartTime
             return TestValue(start, INFINITY, 0, start, 1, comparator, limit)
         end
         return Compare(0, comparator, limit)
@@ -2230,7 +2230,7 @@ do
 local function TimeToPower(powerType, level, comparator, limit, atTime)
         level = level or 0
         local power = OvalePower.next.power[powerType] or 0
-        local powerRegen = OvalePower.next:GetPowerRate(powerType) or 1
+        local powerRegen = OvalePower.next:GetPowerRate(powerType, atTime) or 1
         if powerRegen == 0 then
             if power == level then
                 return Compare(0, comparator, limit)
@@ -2438,7 +2438,7 @@ local function SigilCharging(positionalParams, namedParams, atTime)
 end
 do
 local function IsBossFight(positionalParams, namedParams, atTime)
-        local bossEngaged = baseState.next.inCombat and OvaleBossMod:IsBossEngaged(atTime)
+        local bossEngaged = OvaleFuture:IsInCombat(atTime) and OvaleBossMod:IsBossEngaged(atTime)
         return TestBoolean(bossEngaged, "yes")
     end
     OvaleCondition:RegisterCondition("isbossfight", false, IsBossFight)

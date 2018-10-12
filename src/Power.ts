@@ -67,8 +67,8 @@ class PowerModule {
      * Power regeneration rate for the given powerType.
      * @param powerType
      */
-    GetPowerRate(powerType: string) {
-        if (baseState.next.inCombat) {
+    GetPowerRate(powerType: string, atTime: number) {
+        if (OvaleFuture.IsInCombat(atTime)) {
             return this.activeRegen[powerType]
         } else {
             return this.inactiveRegen[powerType]
@@ -85,7 +85,7 @@ class PowerModule {
             let now = baseState.next.currentTime;
             let seconds = atTime - now;
             if (seconds > 0) {
-                let powerRate = this.GetPowerRate(powerType) || 0;
+                let powerRate = this.GetPowerRate(powerType, atTime) || 0;
                 power = power + powerRate * seconds;
             }
         }
@@ -245,7 +245,7 @@ class PowerModule {
                     cost = cost + extraPower;
                 }
                 if (power < cost) {
-                    let powerRate = this.GetPowerRate(powerType) || 0;
+                    let powerRate = this.GetPowerRate(powerType, atTime) || 0;
                     if (powerRate > 0) {
                         seconds = (cost - power) / powerRate;
                     } else {
@@ -621,7 +621,7 @@ class OvalePowerClass extends OvalePowerBase {
                 }
                 let seconds = OvaleFuture.next.nextCast - atTime;
                 if (seconds > 0) {
-                    let powerRate = this.next.GetPowerRate(powerType) || 0;
+                    let powerRate = this.next.GetPowerRate(powerType, atTime) || 0;
                     power = power + powerRate * seconds;
                 }
                 let mini = powerInfo.mini || 0;

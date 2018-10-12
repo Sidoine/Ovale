@@ -19,9 +19,6 @@
    <Script file="Artifact.lua"/>
    <Script file="State.lua"/>
    <Script file="BaseState.lua"/>
-   <Script file="Stagger.lua"/>
-   <Script file="BossMod.lua"/>
-   <Script file="Variables.lua"/>
    <Script file="Condition.lua"/>
    <Script file="Equipment.lua"/>
    <Script file="AzeriteArmor.lua"/>
@@ -68,7 +65,6 @@
    <Script file="Data.lua"/>
    <Script file="Stance.lua"/>
    <Script file="AST.lua"/>
-   <Script file="SpellFlash.lua"/>
    <Script file="Cooldown.lua"/>
    <Script file="CooldownState.lua"/>
    <Script file="Aura.lua"/>
@@ -77,6 +73,10 @@
    <Script file="DemonHunterDemonic.lua"/>
    <Script file="Future.lua"/>
    <Script file="Totem.lua"/>
+   <Script file="Stagger.lua"/>
+   <Script file="BossMod.lua"/>
+   <Script file="SpellFlash.lua"/>
+   <Script file="Variables.lua"/>
    <Script file="Score.lua"/>
    <Script file="Recount.lua"/>
    <Script file="Power.lua"/>

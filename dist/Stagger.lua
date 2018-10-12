@@ -10,8 +10,8 @@ local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local pairs = pairs
 local insert = table.insert
 local remove = table.remove
-local __BaseState = LibStub:GetLibrary("ovale/BaseState")
-local baseState = __BaseState.baseState
+local __Future = LibStub:GetLibrary("ovale/Future")
+local OvaleFuture = __Future.OvaleFuture
 local OvaleStaggerBase = Ovale:NewModule("OvaleStagger", aceEvent)
 local self_serial = 1
 local MAX_LENGTH = 30
@@ -44,7 +44,7 @@ local OvaleStaggerClass = __class(OvaleStaggerBase, {
     InitializeState = function(self)
     end,
     ResetState = function(self)
-        if  not baseState.current.inCombat then
+        if  not OvaleFuture:IsInCombat(nil) then
             for k in pairs(self.staggerTicks) do
                 self.staggerTicks[k] = nil
             end

@@ -8,7 +8,7 @@ import { OvalePaperDoll, HasteType } from "./PaperDoll";
 import { OvaleSpellBook } from "./SpellBook";
 import { lastSpell, SpellCast, self_pool } from "./LastSpell";
 import aceEvent from "@wowts/ace_event-3.0";
-import { ipairs, pairs, type, lualength, LuaObj, LuaArray, wipe, kpairs } from "@wowts/lua";
+import { ipairs, pairs, type, lualength, LuaObj, LuaArray, wipe, kpairs, tonumber } from "@wowts/lua";
 import { sub } from "@wowts/string";
 import { insert, remove } from "@wowts/table";
 import { GetSpellInfo, GetTime, UnitCastingInfo, UnitChannelInfo, UnitExists, UnitGUID, UnitName, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
@@ -17,7 +17,7 @@ import { OvaleCooldown } from "./Cooldown";
 import { OvaleStance } from "./Stance";
 import { baseState } from "./BaseState";
 import { isLuaArray } from "./tools";
-import { CheckRequirements } from "./Requirement";
+import { RegisterRequirement, UnregisterRequirement, CheckRequirements, Tokens } from "./Requirement";
 
 let strsub = sub;
 let tremove = remove;
@@ -97,6 +97,8 @@ const IsSameSpellcast = function(a: SpellCast, b: SpellCast) {
 let eventDebug = false;
 
 export class OvaleFutureData {
+    inCombat: boolean = false;
+    combatStartTime: number = 0;  
     lastCastTime: LuaObj<number> = {}
     lastOffGCDSpellcast: SpellCast = {}
     lastGCDSpellcast: SpellCast = {}
@@ -162,6 +164,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
         this.RegisterEvent("UNIT_SPELLCAST_STOP", "UnitSpellcastEnded");
         this.RegisterEvent("UNIT_SPELLCAST_SUCCEEDED");
         this.RegisterMessage("Ovale_AuraAdded");
+        RegisterRequirement("combat", this.CombatRequirement);
     }
 
     OnDisable() {
@@ -181,7 +184,13 @@ export class OvaleFutureClass extends OvaleFutureBase {
         this.UnregisterEvent("UNIT_SPELLCAST_STOP");
         this.UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED");
         this.UnregisterMessage("Ovale_AuraAdded");
+        UnregisterRequirement("combat");
     }
+    
+    IsInCombat(atTime: number | undefined) {
+        return this.GetState(atTime).inCombat;
+    }
+    
     COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
         let [, cleuEvent, , sourceGUID, sourceName, , , destGUID, destName, , , spellId, spellName, , , , , , , , , , , isOffHand] = CombatLogGetCurrentEventInfo();
         if (sourceGUID == Ovale.playerGUID || OvaleGUID.IsPlayerPet(sourceGUID)) {
@@ -284,8 +293,8 @@ export class OvaleFutureClass extends OvaleFutureBase {
         this.StartProfiling("OvaleFuture_PLAYER_REGEN_DISABLED");
         this.Debug(event, "Entering combat.");
         let now = GetTime();
-        baseState.current.inCombat = true;
-        baseState.current.combatStartTime = now;
+        this.current.inCombat = true;
+        this.current.combatStartTime = now;
         Ovale.needRefresh();
         this.SendMessage("Ovale_CombatStarted", now);
         this.StopProfiling("OvaleFuture_PLAYER_REGEN_DISABLED");
@@ -294,7 +303,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
         this.StartProfiling("OvaleFuture_PLAYER_REGEN_ENABLED");
         this.Debug(event, "Leaving combat.");
         let now = GetTime();
-        baseState.current.inCombat = false;
+        this.current.inCombat = false;
         Ovale.needRefresh();
         this.SendMessage("Ovale_CombatEnded", now);
         this.StopProfiling("OvaleFuture_PLAYER_REGEN_ENABLED");
@@ -822,6 +831,8 @@ export class OvaleFutureClass extends OvaleFutureBase {
         OvaleFuture.StartProfiling("OvaleFuture_ResetState");
         const now = baseState.next.currentTime;
         this.Log("Reset state with current time = %f", now);
+        this.next.inCombat = this.current.inCombat;
+        this.next.combatStartTime = this.current.combatStartTime || 0;
         this.next.nextCast = now;
         wipe(this.next.lastCast);
         wipe(OvaleFutureClass.staticSpellcast);
@@ -973,12 +984,12 @@ export class OvaleFutureClass extends OvaleFutureBase {
             //     baseState.next.currentTime = now;
             // }
             OvaleFuture.Log("Apply spell %d at %f currentTime=%f nextCast=%f endCast=%f targetGUID=%s", spellId, startCast, baseState.next.currentTime, nextCast, endCast, targetGUID);
-            if (!baseState.next.inCombat && OvaleSpellBook.IsHarmfulSpell(spellId)) {
-                baseState.next.inCombat = true;
+            if (!this.next.inCombat && OvaleSpellBook.IsHarmfulSpell(spellId)) {
+                this.next.inCombat = true;
                 if (channel) {
-                    baseState.next.combatStartTime = startCast;
+                    this.next.combatStartTime = startCast;
                 } else {
-                    baseState.next.combatStartTime = endCast;
+                    this.next.combatStartTime = endCast;
                 }
             }
             if (startCast > baseState.next.currentTime) {
@@ -1030,6 +1041,29 @@ export class OvaleFutureClass extends OvaleFutureBase {
             index = index + 1;
         }
         this.StopProfiling("OvaleFuture_ApplyInFlightSpells");
+    }
+    
+    CombatRequirement = (spellId: number, atTime: number, requirement: string, tokens: Tokens, index: number, targetGUID: string):[boolean, string, number] => {
+        let verified = false;
+        let combatFlag = tokens[index]; 
+        index = index + 1;
+        
+        if(combatFlag) {
+            combatFlag = tonumber(combatFlag);
+            if(combatFlag == 1 && this.IsInCombat(atTime) || combatFlag != 1 && !this.IsInCombat(atTime))
+            {
+                verified = true;
+            }
+            let result = verified && "passed" || "FAILED";
+            if (combatFlag == 1) {
+                this.Log("    Require combat at time=%f: %s", atTime, result);
+            } else {
+                this.Log("    Require NOT combat at time=%f: %s", atTime, result);
+            }
+        } else {
+            Ovale.OneTimeMessage("Warning: requirement '%s' is missing an argument.", requirement);
+        }
+        return [verified, requirement, index];
     }
 }
 
