@@ -47,7 +47,11 @@ local OvaleHealthClass = __class(OvaleHealthClassBase, {
     OnInitialize = function(self)
         self:RegisterEvent("PLAYER_REGEN_DISABLED")
         self:RegisterEvent("PLAYER_REGEN_ENABLED")
-        self:RegisterEvent("UNIT_HEALTH_FREQUENT", "UpdateHealth")
+        if Ovale.db.profile.apparence.frequentHealthUpdates then
+            self:RegisterEvent("UNIT_HEALTH_FREQUENT", "UpdateHealth")
+        else
+            self:RegisterEvent("UNIT_HEALTH", "UpdateHealth")
+        end
         self:RegisterEvent("UNIT_MAXHEALTH", "UpdateHealth")
         self:RegisterEvent("UNIT_ABSORB_AMOUNT_CHANGED", "UpdateAbsorb")
         self:RegisterEvent("UNIT_HEAL_ABSORB_AMOUNT_CHANGED", "UpdateAbsorb")
@@ -63,6 +67,7 @@ local OvaleHealthClass = __class(OvaleHealthClassBase, {
         self:UnregisterEvent("PLAYER_REGEN_ENABLED")
         self:UnregisterEvent("PLAYER_TARGET_CHANGED")
         self:UnregisterEvent("UNIT_HEALTH_FREQUENT")
+        self:UnregisterEvent("UNIT_HEALTH")
         self:UnregisterEvent("UNIT_MAXHEALTH")
         self:UnregisterEvent("UNIT_ABSORB_AMOUNT_CHANGED")
         self:UnregisterEvent("UNIT_HEAL_ABSORB_AMOUNT_CHANGED")
@@ -155,7 +160,7 @@ local OvaleHealthClass = __class(OvaleHealthClassBase, {
         self:StartProfiling("OvaleHealth_UpdateHealth")
         local func
         local db
-        if event == "UNIT_HEALTH_FREQUENT" then
+        if event == "UNIT_HEALTH_FREQUENT" or event == "UNIT_HEALTH" then
             func = UnitHealth
             db = self.health
         elseif event == "UNIT_MAXHEALTH" then

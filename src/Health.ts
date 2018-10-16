@@ -44,7 +44,11 @@ class OvaleHealthClass extends OvaleHealthClassBase {
     OnInitialize() {
         this.RegisterEvent("PLAYER_REGEN_DISABLED");
         this.RegisterEvent("PLAYER_REGEN_ENABLED");
-        this.RegisterEvent("UNIT_HEALTH_FREQUENT", "UpdateHealth");
+        if (Ovale.db.profile.apparence.frequentHealthUpdates) {
+            this.RegisterEvent("UNIT_HEALTH_FREQUENT", "UpdateHealth");
+        } else {
+            this.RegisterEvent("UNIT_HEALTH", "UpdateHealth");
+        }
         this.RegisterEvent("UNIT_MAXHEALTH", "UpdateHealth");
         this.RegisterEvent("UNIT_ABSORB_AMOUNT_CHANGED", "UpdateAbsorb");
         this.RegisterEvent("UNIT_HEAL_ABSORB_AMOUNT_CHANGED", "UpdateAbsorb");
@@ -60,6 +64,7 @@ class OvaleHealthClass extends OvaleHealthClassBase {
         this.UnregisterEvent("PLAYER_REGEN_ENABLED");
         this.UnregisterEvent("PLAYER_TARGET_CHANGED");
         this.UnregisterEvent("UNIT_HEALTH_FREQUENT");
+        this.UnregisterEvent("UNIT_HEALTH");
         this.UnregisterEvent("UNIT_MAXHEALTH");
         this.UnregisterEvent("UNIT_ABSORB_AMOUNT_CHANGED");
         this.UnregisterEvent("UNIT_HEAL_ABSORB_AMOUNT_CHANGED");
@@ -158,7 +163,7 @@ class OvaleHealthClass extends OvaleHealthClassBase {
         let func;
         let db;
         
-        if (event == "UNIT_HEALTH_FREQUENT") {
+        if (event == "UNIT_HEALTH_FREQUENT" || event == "UNIT_HEALTH") {
             func = UnitHealth;
             db = this.health;
         } else if (event == "UNIT_MAXHEALTH") {
