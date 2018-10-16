@@ -21,8 +21,8 @@ local UnitHasVehicleUI = UnitHasVehicleUI
 local UnitExists = UnitExists
 local UnitIsDead = UnitIsDead
 local UnitCanAttack = UnitCanAttack
-local __BaseState = LibStub:GetLibrary("ovale/BaseState")
-local baseState = __BaseState.baseState
+local __Future = LibStub:GetLibrary("ovale/Future")
+local OvaleFuture = __Future.OvaleFuture
 local OvaleSpellFlashBase = Ovale:NewModule("OvaleSpellFlash", aceEvent)
 local SpellFlashCore = nil
 local colorMain = {
@@ -327,7 +327,7 @@ local OvaleSpellFlashClass = __class(OvaleSpellFlashBase, {
         if enabled and  not db.enabled then
             enabled = false
         end
-        if enabled and db.inCombat and  not baseState:IsInCombat(nil) then
+        if enabled and db.inCombat and  not OvaleFuture:IsInCombat(nil) then
             enabled = false
         end
         if enabled and db.hideInVehicle and UnitHasVehicleUI("player") then

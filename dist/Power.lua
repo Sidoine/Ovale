@@ -77,8 +77,8 @@ do
     end
 end
 local PowerModule = __class(nil, {
-    GetPowerRate = function(self, powerType)
-        if baseState.next.inCombat then
+    GetPowerRate = function(self, powerType, atTime)
+        if OvaleFuture:IsInCombat(atTime) then
             return self.activeRegen[powerType]
         else
             return self.inactiveRegen[powerType]
@@ -90,7 +90,7 @@ local PowerModule = __class(nil, {
             local now = baseState.next.currentTime
             local seconds = atTime - now
             if seconds > 0 then
-                local powerRate = self:GetPowerRate(powerType) or 0
+                local powerRate = self:GetPowerRate(powerType, atTime) or 0
                 power = power + powerRate * seconds
             end
         end
@@ -184,7 +184,7 @@ local PowerModule = __class(nil, {
                     cost = cost + extraPower
                 end
                 if power < cost then
-                    local powerRate = self:GetPowerRate(powerType) or 0
+                    local powerRate = self:GetPowerRate(powerType, atTime) or 0
                     if powerRate > 0 then
                         seconds = (cost - power) / powerRate
                     else
@@ -558,7 +558,7 @@ local OvalePowerClass = __class(OvalePowerBase, {
                 end
                 local seconds = OvaleFuture.next.nextCast - atTime
                 if seconds > 0 then
-                    local powerRate = self.next:GetPowerRate(powerType) or 0
+                    local powerRate = self.next:GetPowerRate(powerType, atTime) or 0
                     power = power + powerRate * seconds
                 end
                 local mini = powerInfo.mini or 0

@@ -4,7 +4,7 @@ import aceEvent from "@wowts/ace_event-3.0";
 import { CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { LuaArray, lualength, pairs } from "@wowts/lua";
 import { insert, remove } from "@wowts/table";
-import { baseState } from "./BaseState";
+import { OvaleFuture } from "./Future";
 
 let OvaleStaggerBase = Ovale.NewModule("OvaleStagger", aceEvent);
 export let OvaleStagger: OvaleStaggerClass;
@@ -43,7 +43,7 @@ class OvaleStaggerClass extends OvaleStaggerBase {
     InitializeState(): void {
     }
     ResetState(): void {   
-        if(!baseState.current.inCombat){
+        if(!OvaleFuture.IsInCombat(undefined)){
             for (const [k] of pairs(this.staggerTicks)) {
                 this.staggerTicks[k] = undefined;
             }

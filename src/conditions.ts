@@ -1365,7 +1365,7 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
      */
     function EnergyRegenRate(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
         let [comparator, limit] = [positionalParams[1], positionalParams[2]];
-        let value = OvalePower.next.GetPowerRate("energy");
+        let value = OvalePower.next.GetPowerRate("energy", atTime);
         return Compare(value, comparator, limit);
     }
     OvaleCondition.RegisterCondition("energyregen", false, EnergyRegenRate);
@@ -1446,7 +1446,7 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
      */
     function FocusRegenRate(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
         let [comparator, limit] = [positionalParams[1], positionalParams[2]];
-        let value = OvalePower.next.GetPowerRate("focus");
+        let value = OvalePower.next.GetPowerRate("focus", atTime);
         return Compare(value, comparator, limit);
     }
     OvaleCondition.RegisterCondition("focusregen", false, FocusRegenRate);
@@ -1465,7 +1465,7 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
      */
     function FocusCastingRegen(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
         let [spellId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
-        let regenRate = OvalePower.next.GetPowerRate("focus");
+        let regenRate = OvalePower.next.GetPowerRate("focus", atTime);
         let power = 0;
         let castTime = OvaleSpellBook.GetCastTime(spellId) || 0;
         let gcd = OvaleFuture.GetGCD();
@@ -1961,7 +1961,7 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
      */
     function InCombat(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
         let yesno = positionalParams[1];
-        let boolean = baseState.next.inCombat;
+        let boolean = OvaleFuture.IsInCombat(atTime);
         return TestBoolean(boolean, yesno);
     }
     OvaleCondition.RegisterCondition("incombat", false, InCombat);
@@ -2481,7 +2481,7 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
         let [comparator, limit] = [<string>positionalParams[1], <number>positionalParams[2]];
         let [target] = ParseCondition(positionalParams, namedParams);
         if (target == "player") {
-            let [value, origin, rate] = [OvalePower.next.power[powerType], atTime, OvalePower.next.GetPowerRate(powerType)];
+            let [value, origin, rate] = [OvalePower.next.power[powerType], atTime, OvalePower.next.GetPowerRate(powerType, atTime)];
             let [start, ending] = [atTime, INFINITY];
             return TestValue(start, ending, value, origin, rate, comparator, limit);
         } else {
@@ -2498,7 +2498,7 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
         if (target == "player") {
             let powerMax = OvalePower.current.maxPower[powerType] || 0;
             if (powerMax > 0) {
-                let [value, origin, rate] = [powerMax - OvalePower.next.power[powerType], atTime, -1 * OvalePower.next.GetPowerRate(powerType)];
+                let [value, origin, rate] = [powerMax - OvalePower.next.power[powerType], atTime, -1 * OvalePower.next.GetPowerRate(powerType, atTime)];
                 let [start, ending] = [atTime, INFINITY];
                 return TestValue(start, ending, value, origin, rate, comparator, limit);
             }
@@ -2523,7 +2523,7 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
             let powerMax = OvalePower.current.maxPower[powerType] || 0;
             if (powerMax > 0) {
                 let conversion = 100 / powerMax;
-                let [value, origin, rate] = [OvalePower.next.power[powerType] * conversion, atTime, OvalePower.next.GetPowerRate(powerType) * conversion];
+                let [value, origin, rate] = [OvalePower.next.power[powerType] * conversion, atTime, OvalePower.next.GetPowerRate(powerType, atTime) * conversion];
                 if (rate > 0 && value >= 100 || rate < 0 && value == 0) {
                     rate = 0;
                 }
@@ -4473,8 +4473,8 @@ l    */
      */
     function TimeInCombat(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
         let [comparator, limit] = [positionalParams[1], positionalParams[2]];
-        if (baseState.next.inCombat) {
-            let start = baseState.next.combatStartTime;
+        if (OvaleFuture.IsInCombat(atTime)) {
+            let start = OvaleFuture.GetState(atTime).combatStartTime;
             return TestValue(start, INFINITY, 0, start, 1, comparator, limit);
         }
         return Compare(0, comparator, limit);
@@ -4532,7 +4532,7 @@ l    */
     function TimeToPower(powerType: PowerType, level: number, comparator: string, limit: number, atTime: number) {
         level = level || 0;
         let power = OvalePower.next.power[powerType] || 0;
-        let powerRegen = OvalePower.next.GetPowerRate(powerType) || 1;
+        let powerRegen = OvalePower.next.GetPowerRate(powerType, atTime) || 1;
         if (powerRegen == 0) {
             if (power == level) {
                 return Compare(0, comparator, limit);
@@ -4955,7 +4955,7 @@ l    */
 	 if IsBossFight() Spell(metamorphosis_havoc)
      */
     function IsBossFight(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
-        let bossEngaged = baseState.next.inCombat && OvaleBossMod.IsBossEngaged(atTime);
+        let bossEngaged = OvaleFuture.IsInCombat(atTime) && OvaleBossMod.IsBossEngaged(atTime);
         return TestBoolean(bossEngaged, "yes");
     }
     OvaleCondition.RegisterCondition("isbossfight", false, IsBossFight);

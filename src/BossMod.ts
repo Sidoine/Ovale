@@ -3,7 +3,7 @@ import { OvaleProfiler } from "./Profiler";
 import { Ovale } from "./Ovale";
 import { UnitExists, UnitClassification } from "@wowts/wow-mock";
 import { _G, hooksecurefunc } from "@wowts/lua";
-import { baseState } from "./BaseState";
+import { OvaleFuture } from "./Future";
 let OvaleBossModBase = OvaleProfiler.RegisterProfiling(OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleBossMod")));
 let _BigWigsLoader: { RegisterMessage: any } = _G["BigWigsLoader"];
 let _DBM = _G["DBM"];
@@ -36,7 +36,7 @@ class OvaleBossModClass extends OvaleBossModBase {
     OnDisable() {
     }
     IsBossEngaged(atTime: number) {
-        if (!baseState.IsInCombat(atTime)) {
+        if (!OvaleFuture.IsInCombat(atTime)) {
             return false;
         }
         let dbmEngaged = (_DBM != undefined && this.EngagedDBM != undefined && this.EngagedDBM.inCombat);
