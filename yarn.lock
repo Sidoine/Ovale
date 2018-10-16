@@ -263,16 +263,22 @@
   dependencies:
     "@wowts/lua" "^1.3.0"
 
-"@wowts/tstolua@^1.5.0":
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/@wowts/tstolua/-/tstolua-1.5.0.tgz#19590786dbac1ee5a39e80b738b34330893180d4"
+"@wowts/tstolua@^1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@wowts/tstolua/-/tstolua-1.6.0.tgz#ebeb6a102d85e58b072c875538f2ad4ceb67bc62"
   dependencies:
-    commander "^2.11.0"
-    typescript "^3.0.3"
+    commander "^2.18.0"
+    typescript "^3.1.1"
 
-"@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.10.1", "@wowts/wow-mock@^1.6.0":
+"@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.6.0":
   version "1.10.1"
   resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.10.1.tgz#fab88d72ca66cf314e22ada881d7baf6f0e1f98f"
+  dependencies:
+    "@wowts/lua" "^1.3.0"
+
+"@wowts/wow-mock@^1.12.0":
+  version "1.12.0"
+  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.12.0.tgz#39ac5de8c20a501fd39f308c318ae1da4237f783"
   dependencies:
     "@wowts/lua" "^1.3.0"
 
@@ -1048,9 +1054,13 @@ color-name@1.1.3:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/color-name/-/color-name-1.1.3.tgz#a7d0558bd89c42f795dd42328f740831ca53bc25"
 
-commander@^2.11.0, commander@^2.12.1:
+commander@^2.12.1:
   version "2.18.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.18.0.tgz#2bf063ddee7c7891176981a2cc798e5754bc6970"
+
+commander@^2.18.0:
+  version "2.19.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-2.19.0.tgz#f6198aa84e5b83c46054b94ddedbfed5ee9ff12a"
 
 common-path-prefix@^1.0.0:
   version "1.0.0"
@@ -3197,9 +3207,9 @@ tsutils@^2.27.2:
   dependencies:
     tslib "^1.8.1"
 
-typescript@^3.0.3:
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.0.3.tgz#4853b3e275ecdaa27f78fda46dc273a7eb7fc1c8"
+typescript@^3.1.1:
+  version "3.1.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.1.3.tgz#01b70247a6d3c2467f70c45795ef5ea18ce191d5"
 
 uid2@0.0.3:
   version "0.0.3"

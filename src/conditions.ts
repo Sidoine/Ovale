@@ -835,9 +835,9 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
             castSpellId = OvaleFuture.next.currentCast.spellId;
             castSpellName = OvaleSpellBook.GetSpellName(castSpellId);
         } else {
-            let [spellName, _1, _2, startTime, endTime] = UnitCastingInfo(target);
+            let [spellName, , , startTime, endTime] = UnitCastingInfo(target);
             if (!spellName) {
-                [spellName, _1, _2, startTime, endTime] = UnitChannelInfo(target);
+                [spellName, , , startTime, endTime] = UnitChannelInfo(target);
             }
             if (spellName) {
                 castSpellName = spellName;
@@ -1246,12 +1246,12 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
     function DiseasesTicking(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number): ConditionResult {
         let [target, ,] = ParseCondition(positionalParams, namedParams);
         let [talented, npAura, bpAura, ffAura] = GetDiseases(target, atTime);
-        let gain, start, ending;
+        let gain, ending;
         if (talented && npAura) {
-            [gain, start, ending] = [npAura.gain, npAura.start, npAura.ending];
+            [gain,  ending] = [npAura.gain, npAura.start, npAura.ending];
         } else if (!talented && bpAura && ffAura) {
             gain = (bpAura.gain > ffAura.gain) && bpAura.gain || ffAura.gain;
-            start = (bpAura.start > ffAura.start) && bpAura.start || ffAura.start;
+            //start = (bpAura.start > ffAura.start) && bpAura.start || ffAura.start;
             ending = (bpAura.ending < ffAura.ending) && bpAura.ending || ffAura.ending;
         }
         if (gain && ending && ending > gain) {
@@ -2153,9 +2153,9 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
     function IsInterruptible(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
         let yesno = positionalParams[1];
         let [target] = ParseCondition(positionalParams, namedParams);
-        let [name, _1, _2, _3, _4, _5, , notInterruptible] = UnitCastingInfo(target);
+        let [name, , , , , , , notInterruptible] = UnitCastingInfo(target);
         if (!name) {
-            [name, _1, _2, _3, _4, _5, notInterruptible] = UnitChannelInfo(target);
+            [name, , , , , , notInterruptible] = UnitChannelInfo(target);
         }
         let boolean = notInterruptible != undefined && !notInterruptible;
         return TestBoolean(boolean, yesno);

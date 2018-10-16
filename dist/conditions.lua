@@ -523,9 +523,9 @@ local function Casting(positionalParams, namedParams, atTime)
             castSpellId = OvaleFuture.next.currentCast.spellId
             castSpellName = OvaleSpellBook:GetSpellName(castSpellId)
         else
-            local spellName, _1, _2, startTime, endTime = UnitCastingInfo(target)
+            local spellName, _, _, startTime, endTime = UnitCastingInfo(target)
             if  not spellName then
-                spellName, _1, _2, startTime, endTime = UnitChannelInfo(target)
+                spellName, _, _, startTime, endTime = UnitChannelInfo(target)
             end
             if spellName then
                 castSpellName = spellName
@@ -764,12 +764,11 @@ local function DiseasesRemaining(positionalParams, namedParams, atTime)
 local function DiseasesTicking(positionalParams, namedParams, atTime)
         local target, _ = ParseCondition(positionalParams, namedParams)
         local talented, npAura, bpAura, ffAura = GetDiseases(target, atTime)
-        local gain, start, ending
+        local gain, ending
         if talented and npAura then
-            gain, start, ending = npAura.gain, npAura.start, npAura.ending
+            gain, ending = npAura.gain, npAura.start, npAura.ending
         elseif  not talented and bpAura and ffAura then
             gain = (bpAura.gain > ffAura.gain) and bpAura.gain or ffAura.gain
-            start = (bpAura.start > ffAura.start) and bpAura.start or ffAura.start
             ending = (bpAura.ending < ffAura.ending) and bpAura.ending or ffAura.ending
         end
         if gain and ending and ending > gain then
@@ -1202,9 +1201,9 @@ do
 local function IsInterruptible(positionalParams, namedParams, atTime)
         local yesno = positionalParams[1]
         local target = ParseCondition(positionalParams, namedParams)
-        local name, _1, _2, _3, _4, _5, _, notInterruptible = UnitCastingInfo(target)
+        local name, _, _, _, _, _, _, notInterruptible = UnitCastingInfo(target)
         if  not name then
-            name, _1, _2, _3, _4, _5, notInterruptible = UnitChannelInfo(target)
+            name, _, _, _, _, _, notInterruptible = UnitChannelInfo(target)
         end
         local boolean = notInterruptible ~= nil and  not notInterruptible
         return TestBoolean(boolean, yesno)

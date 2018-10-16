@@ -45,10 +45,10 @@
     "@wowts/table": "^1.0.1",
     "@wowts/tsaddon": "^1.1.2",
     "@wowts/tslib": "^1.1.0",
-    "@wowts/wow-mock": "^1.10.1"
+    "@wowts/wow-mock": "^1.12.0"
   },
   "devDependencies": {
-    "@wowts/tstolua": "^1.5.0",
+    "@wowts/tstolua": "^1.6.0",
     "ava": "^0.25.0",
     "tslint": "^5.7.0"
   },

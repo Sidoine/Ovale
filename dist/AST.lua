@@ -1920,13 +1920,13 @@ __exports.OvaleASTClass = __class(OvaleASTBase, {
                 end
             end
             local child = self.self_childrenPool:Get()
-            local tokenType, token = tokenStream:Peek()
+            local tokenType = tokenStream:Peek()
             while ok and tokenType and tokenType ~= "}" do
                 local statementNode
                 ok, statementNode = self:ParseStatement(tokenStream, nodeList, annotation)
                 if ok then
                     child[#child + 1] = statementNode
-                    tokenType, token = tokenStream:Peek()
+                    tokenType = tokenStream:Peek()
                 else
                     break
                 end
@@ -2217,12 +2217,12 @@ __exports.OvaleASTClass = __class(OvaleASTBase, {
         self.ParseParameterValue = function(tokenStream, nodeList, annotation)
             local ok = true
             local node
-            local tokenType, token
+            local tokenType
             local parameters
             repeat
                 ok, node = self.ParseSimpleParameterValue(tokenStream, nodeList, annotation)
                 if ok and node then
-                    tokenType, token = tokenStream:Peek()
+                    tokenType = tokenStream:Peek()
                     if tokenType == "," then
                         tokenStream:Consume()
                         parameters = parameters or self.objectPool:Get()
@@ -2316,13 +2316,13 @@ __exports.OvaleASTClass = __class(OvaleASTBase, {
         self.ParseSimpleParameterValue = function(tokenStream, nodeList, annotation)
             local ok = true
             local isBang = false
-            local tokenType, token = tokenStream:Peek()
+            local tokenType = tokenStream:Peek()
             if tokenType == "!" then
                 isBang = true
                 tokenStream:Consume()
             end
             local expressionNode
-            tokenType, token = tokenStream:Peek()
+            tokenType = tokenStream:Peek()
             if tokenType == "(" or tokenType == "-" then
                 ok, expressionNode = self.ParseExpression(tokenStream, nodeList, annotation)
             else
