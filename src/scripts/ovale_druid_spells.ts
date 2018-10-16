@@ -431,7 +431,6 @@ Define(moonkin_form 197625)
 	SpellInfo(moonkin_form to_stance=druid_moonkin_form)
 	SpellInfo(moonkin_form unusable=1 if_stance=druid_moonkin_form)
 
-	SpellAddBuff(lunar_strike lunar_empowerment_buff=0)
 Define(solar_wrath 190984)
 Define(starsurge 197626)
 	SpellInfo(starsurge cd=10 specialization=!balance)
@@ -444,9 +443,6 @@ Define(sunfire_debuff 164815)
 
 	SpellInfo(ferocious_bite energy=25 max_energy=50 combopoints=1 max_combopoints=5)
 	SpellInfo(ferocious_bite physical=1)
-
-	
-
 
 	SpellInfo(rip energy=30 combopoints=1 max_combopoints=5)
 	SpellAddTargetDebuff(rip rip_debuff=1)
@@ -498,7 +494,6 @@ const registerSpec1 = function() {
 	SpellAddBuff(celestial_alignment celestial_alignment_buff=1)
 Define(celestial_alignment_buff 194223)
 
-
 	SpellInfo(fury_of_elune cd=90 astralpower=6)
 	SpellAddBuff(fury_of_elune fury_of_elune_up_buff=1)
 Define(fury_of_elune_up_buff 202770)
@@ -521,9 +516,9 @@ Define(lunar_empowerment_buff 164547)
 	SpellRequire(lunar_strike astralpower_percent 150=buff,celestial_alignment_buff)
 	SpellRequire(lunar_strike astralpower_percent 125=buff,blessing_of_elune_buff)
 	SpellAddBuff(lunar_strike lunar_empowerment_buff=0)
-#Define(moonfire )
+
 	SpellInfo(moonfire astralpower=-3 specialization=balance)
-#Define(moonfire_debuff)
+
 	SpellInfo(moonfire_debuff add_duration=6 specialization=balance)
 Define(moonkin_form_balance 24858)
 	SpellInfo(moonkin_form replaced_by=moonkin_form_balance specialization=balance)
@@ -535,7 +530,7 @@ Define(moonkin_form_balance 24858)
 Define(solar_empowerment_buff 164545)
 
 	SpellInfo(solar_beam cd=60 gcd=0 offgcd=1 interrupt=1)
-#Define(solar_wrath 190984)
+
 	SpellInfo(solar_wrath travel_time=1 astralpower=-8)
 	SpellRequire(solar_wrath astralpower_percent 125=buff,blessing_of_elune_buff)
 	SpellRequire(solar_wrath astralpower_percent 150=buff,celestial_alignment_buff)
@@ -559,11 +554,6 @@ Define(stellar_empowerment_debuff 197637)
 	SpellAddTargetDebuff(stellar_flare stellar_flare_debuff=1)
 Define(stellar_flare_debuff 202347)
 	SpellInfo(stellar_flare_debuff duration=24 haste=spell tick=2)
-#Define(sunfire_balance 93402)
-#	SpellInfo(sunfire replaced_by=sunfire_balance specialization=balance)
-#	SpellAddTargetDebuff(sunfire_balance sunfire_debuff=1)
-#Define(sunfire_debuff 164815)
-#	SpellInfo(sunfire_debuff add_duration=6 specialization=balance)
 
 	SpellInfo(warrior_of_elune gcd=0 cd=45 offgcd=1)
 Define(warrior_of_elune_buff 202425)
@@ -586,7 +576,6 @@ const registerSpec2 = function() {
 	Include(ovale_druid_base_spells)
 # NOT updated for 8.0
 # Guardian spells
-#Define(barkskin )
 	SpellInfo(barkskin add_cd=30 specialization=guardian talent=!survival_of_the_fittest_talent)
 
 	SpellInfo(bristling_fur cd=40 gcd=0 offgcd=1)
@@ -731,17 +720,16 @@ Define(moonfire_cat_debuff 155625)
 Define(predatory_swiftness_buff 69369)
 	SpellInfo(predatory_swiftness_buff duration=12)
 SpellList(improved_rake prowl_buff shadowmeld_buff incarnation_king_of_the_jungle_buff)
-#
+
 	SpellInfo(rake energy=35 combopoints=-1)
 	SpellAddBuff(rake prowl_buff=0)
 	SpellAddBuff(rake shadowmeld_buff=0)
 	SpellDamageBuff(rake improved_rake=2)
-#
+
 	SpellInfo(rake_debuff duration=15 haste=melee tick=3 talent=!jagged_wounds_talent)
 	SpellInfo(rake_debuff duration=12 haste=melee tick=2.4 talent=jagged_wounds_talent)
 	SpellDamageBuff(rake_debuff improved_rake=2)
-#
-#Define(rip_debuff 1079)
+
 	SpellInfo(rip_debuff duration=24 haste=melee tick=2 talent=!jagged_wounds_talent)
 	SpellInfo(rip_debuff duration=19.2 haste=melee tick=1.6 talent=jagged_wounds_talent)
 
@@ -773,9 +761,6 @@ Define(tigers_fury_buff 5217)
 
 Define(jagged_wounds_talent 14)
 Define(incarnation_king_of_the_jungle_talent 15)
-
-
-
 
 # Tier 21
 Define(apex_predator_buff 252752)

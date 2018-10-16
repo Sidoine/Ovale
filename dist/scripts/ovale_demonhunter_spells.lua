@@ -248,10 +248,13 @@ Define(feast_of_souls_buff 207693)
 	SpellRequire(felblade unusable 1=lossofcontrol,root)
 
 	SpellInfo(fiery_brand cd=60 gcd=0)
-	SpellAddTargetDebuff(fiery_brand fiery_brand_debuff=1)
-Define(fiery_brand_debuff 207771)
+	SpellAddTargetDebuff(fiery_brand fiery_brand_debuff=1 talent=!burning_alive_talent)
+    SpellAddTargetDebuff(fiery_brand fiery_demise_debuff=1 talent=burning_alive_talent)
+Define(fiery_brand_debuff 207744)
 	SpellInfo(fiery_brand_debuff duration=8)
-	
+    SpellInfo(fiery_brand_debuff replaced_by=fiery_demise_debuff talent=burning_alive_talent)
+Define(fiery_demise_debuff 207771)
+    SpellInfo(fiery_demise_debuff duration=8)
 Define(frailty_debuff 247456)
 	SpellInfo(frailty_debuff duration=20)
 
