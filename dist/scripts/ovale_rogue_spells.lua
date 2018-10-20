@@ -303,6 +303,7 @@ Define(venom_rush_talent 16) #22343
 # Mutilate refunds s1 Energy when used against a poisoned target.
 Define(vigor_talent 7) #19239
 # Increases your maximum Energy by (25 of Spell Power) and your Energy regeneration by (25 of Spell Power).
+Define(double_dose_trait 273007)
 Define(shrouded_suffocation_trait 278666)
 Define(ace_up_your_sleeve_trait 278676)
 Define(deadshot_trait 272935)
@@ -479,7 +480,7 @@ Define(master_of_shadows 196980)
 	SpellInfo(master_of_shadows duration=3)
 
 	SpellInfo(mutilate combopoints=-2 energy=50)
-	SpellRequire(mutilate add_energy -5=buff,lethal_poison_buff talent=venom_rush_talent)
+	SpellRequire(mutilate add_energy_from_aura -5=buff,lethal_poison_buff talent=venom_rush_talent)
 
 	SpellInfo(nightblade energy=25 combopoints=1 max_combopoints=5)
 	SpellInfo(nightblade max_combopoints=6 talent=deeper_stratagem_talent)
@@ -507,7 +508,7 @@ Define(riposte_buff 199754)
 
 	SpellInfo(roll_the_bones energy=25 combopoints=1 max_combopoints=5)
 	SpellInfo(roll_the_bones max_combopoints=6 talent=deeper_stratagem_talent)
-	SpellInfo(roll_the_bones replaced_by=slice_and_dice talent=slice_and_dice_talent)
+	SpellInfo(roll_the_bones unusable=1 talent=slice_and_dice_talent)
 	SpellAddBuff(roll_the_bones loaded_dice_buff=0 talent=loaded_dice_talent)
 
 	SpellInfo(rupture combopoints=1 max_combopoints=5 energy=25)
@@ -559,7 +560,6 @@ Define(shuriken_combo_buff 245640)
 	SpellInfo(slice_and_dice combopoints=1 max_combopoints=5 energy=25)
 	SpellInfo(slice_and_dice max_combopoints=6 talent=deeper_stratagem_talent)
 	SpellAddBuff(slice_and_dice slice_and_dice_buff=1)
-	SpellInfo(slice_and_dice replaced_by=roll_the_bones talent=slice_and_dice_talent)
 Define(slice_and_dice_buff 5171)
 	SpellInfo(slice_and_dice add_duration_combopoints=6 duration=6)
 Define(shot_in_the_dark_buff 257506)

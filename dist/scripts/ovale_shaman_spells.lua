@@ -33,7 +33,7 @@ Define(capacitor_totem 192058)
 # Summons a totem at the target location that gathers electrical energy from the surrounding air and explodes after s2 sec, stunning all enemies within 118905A1 yards for 3 seconds.
   SpellInfo(capacitor_totem cd=60 duration=3 gcd=1)
 Define(chain_lightning_elemental 188443)
-# Hurls a lightning bolt at the enemy, dealing (30 of Spell Power) Nature damage and then jumping to additional nearby enemies. Affects x1 total targets.rnrn|cFFFFFFFFGenerates s2 Maelstrom per target hit.|r 
+# Hurls a lightning bolt at the enemy, dealing (34.5 of Spell Power) Nature damage and then jumping to additional nearby enemies. Affects x1 total targets.rnrn|cFFFFFFFFGenerates s2 Maelstrom per target hit.|r 
   SpellInfo(chain_lightning_elemental)
 Define(crash_lightning 187874)
 # Electrocutes all enemies in front of you, dealing s1*<CAP>/AP Nature damage. Hitting 2 or more targets enhances your weapons for 10 seconds, causing Stormstrike and Lava Lash to also deal 195592s1*<CAP>/AP Nature damage to all targets in front of you.  rnrnEach target hit by Crash Lightning increases the damage of your next Stormstrike by s2.
@@ -126,7 +126,7 @@ Define(landslide_buff 202004)
   # Your next Stormstrike will deal s1 increased damage.
   SpellAddBuff(landslide_buff landslide_buff=1)
 Define(lava_beam 114074)
-# Unleashes a blast of superheated flame at the enemy, dealing (37.5 of Spell Power) Fire damage and then jumping to additional nearby enemies. Damage is increased by s2 after each jump. Affects x1 total targets.  rnrn|cFFFFFFFFGenerates s3 Maelstrom per target hit.|r 
+# Unleashes a blast of superheated flame at the enemy, dealing (43 of Spell Power) Fire damage and then jumping to additional nearby enemies. Damage is increased by s2 after each jump. Affects x1 total targets.  rnrn|cFFFFFFFFGenerates s3 Maelstrom per target hit.|r 
   SpellInfo(lava_beam)
 Define(lava_burst 51505)
 # Hurls molten lava at the target, dealing (53.125 of Spell Power) Fire damage.?a231721[ Lava Burst will always critically strike if the target is affected by Flame Shock.][]?s137039[][rnrn|cFFFFFFFFGenerates 190493s2 Maelstrom.|r ]
@@ -136,7 +136,7 @@ Define(lava_lash 60103)
 # Charges your off-hand weapon with lava and burns your target, dealing s1 Fire damage.
   SpellInfo(lava_lash maelstrom=40)
 Define(lightning_bolt_elemental 188196)
-# Hurls a bolt of lightning at the target, dealing (50.31250000000001 of Spell Power) Nature damage.?a187828[rnrn|cFFFFFFFFGenerates 190493s1 Maelstrom.|r ][]
+# Hurls a bolt of lightning at the target, dealing (57.99999999999999 of Spell Power) Nature damage.?a187828[rnrn|cFFFFFFFFGenerates 190493s1 Maelstrom.|r ][]
   SpellInfo(lightning_bolt_elemental)
 Define(lightning_bolt_enhancement 187837)
 # Fires a bolt of lightning at the target, dealing ?s210727[up to (1+210727m2/100)*(14.0625 of Spell Power)][(14.0625 of Spell Power)] Nature damage.
@@ -178,6 +178,10 @@ Define(stormstrike 17364)
 # Energizes both your weapons with lightning and delivers a massive blow to your target, dealing a total of 32175sw1+32176sw1 Physical damage.
   SpellInfo(stormstrike maelstrom=30 cd=9)
 
+
+Define(strength_of_earth_buff 273463)
+# Rockbiter causes your next melee ability, other than Rockbiter, to deal an additional s1 Nature damage.
+  SpellInfo(strength_of_earth_buff channel=-0.001 gcd=0 offgcd=1)
 
 Define(sundering 197214)
 # Shatters a line of earth in front of you with your main hand weapon, causing s1 Flamestrike damage and Incapacitating any enemy hit for 2 seconds.
@@ -242,6 +246,7 @@ Define(sundering_talent 18) #22351
 # Shatters a line of earth in front of you with your main hand weapon, causing s1 Flamestrike damage and Incapacitating any enemy hit for 2 seconds.
 Define(totem_mastery_talent_elemental 6) #23190
 # Summons four totems that increase your combat capabilities for 120 seconds.rnrn|cFFFFFFFFResonance Totem|rrnGenerates 202192s1 Maelstrom every 202192t1 sec.rnrn|cFFFFFFFFStorm Totem|rrnIncreases the chance for Lightning Bolt and Chain Lightning to trigger Elemental Overload by 210651s1.rnrn|cFFFFFFFFEmber Totem|rrnIncreases Flame Shock damage over time by 210658s1.rnrn|cFFFFFFFFTailwind Totem|rrnIncreases your Haste by 210659s1.
+Define(ancestral_resonance_trait 277666)
 Define(lightning_conduit_trait 275388)
     ]]
     code = code .. [[
@@ -308,6 +313,7 @@ Define(cloudburst_totem 157153)
 Define(crash_lightning_buff 187878)
 Define(downpour 207778)
 
+    SpellInfo(earth_elemental totem=1 max_totems=1)
 	
 Define(earth_shield 974)
 	SpellAddTargetBuff(earth_shield earth_shield_buff=9)
@@ -348,13 +354,14 @@ Define(far_sight 6196)
 
 	SpellInfo(feral_lunge cd=30)
 
-	SpellInfo(feral_spirit cd=120 duration=15)
+	SpellInfo(feral_spirit cd=120 duration=15 totem=1 max_totems=2)
 	SpellInfo(feral_spirit add_cd=-30 talent=elemental_spirits_talent)
 	SpellAddBuff(feral_spirit icy_edge_buff=1)
 	SpellAddBuff(feral_spirit molten_weapon_buff=1)
 
 	
-	SpellInfo(fire_elemental replaced_by=storm_elemental talent=storm_elemental_talent)
+	SpellInfo(fire_elemental totem=1 max_totems=1)
+    SpellInfo(fire_elemental replaced_by=storm_elemental talent=storm_elemental_talent)
 
 	SpellInfo(flame_shock cd=6)
 	SpellAddTargetDebuff(flame_shock flame_shock_debuff=1)
@@ -497,7 +504,7 @@ Define(spiritwalkers_grace 79206)
 Define(spiritwalkers_grace_buff 79206)
 	SpellInfo(spiritwalkers_grace_buff duration=15)
 
-	SpellInfo(storm_elemental cd=150)
+	SpellInfo(storm_elemental cd=150 totem=1 max_totems=1)
 
 Define(stormbringer_buff 201846)
 	SpellInfo(stormbringer_buff duration=12)
@@ -521,11 +528,13 @@ Define(tidal_waves 51564)
 Define(tidal_waves_buff 53390)
 	SpellInfo(tidal_waves_buff duration=15 max_stacks=2)
 Define(totem_mastery_elemental 210643)
+    SpellInfo(totem_mastery_elemental totem=1 buff_totem=ele_resonance_totem_buff)
 	SpellAddBuff(totem_mastery_elemental ele_resonance_totem_buff=1)
 	SpellAddBuff(totem_mastery_elemental ele_tailwind_totem_buff=1)
 	SpellAddBuff(totem_mastery_elemental ele_ember_totem_buff=1)
 	SpellAddBuff(totem_mastery_elemental ele_strom_totem_buff=1)
 Define(totem_mastery_enhancement 262395)
+    SpellInfo(totem_mastery_enhancement totem=1 buff_totem=enh_resonance_totem_buff)
 	SpellAddBuff(totem_mastery_enhancement enh_resonance_totem_buff=1)
 	SpellAddBuff(totem_mastery_enhancement enh_tailwind_totem_buff=1)
 	SpellAddBuff(totem_mastery_enhancement enh_ember_totem_buff=1)

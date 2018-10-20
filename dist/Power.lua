@@ -25,9 +25,11 @@ local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local ceil = math.ceil
 local INFINITY = math.huge
 local floor = math.floor
+local ipairs = ipairs
 local pairs = pairs
 local tostring = tostring
 local tonumber = tonumber
+local kpairs = pairs
 local lower = string.lower
 local concat = table.concat
 local insert = table.insert
@@ -75,8 +77,8 @@ do
     end
 end
 local PowerModule = __class(nil, {
-    GetPowerRate = function(self, powerType)
-        if baseState.next.inCombat then
+    GetPowerRate = function(self, powerType, atTime)
+        if OvaleFuture:IsInCombat(atTime) then
             return self.activeRegen[powerType]
         else
             return self.inactiveRegen[powerType]
@@ -88,7 +90,7 @@ local PowerModule = __class(nil, {
             local now = baseState.next.currentTime
             local seconds = atTime - now
             if seconds > 0 then
-                local powerRate = self:GetPowerRate(powerType) or 0
+                local powerRate = self:GetPowerRate(powerType, atTime) or 0
                 power = power + powerRate * seconds
             end
         end
@@ -108,6 +110,22 @@ local PowerModule = __class(nil, {
                 cost = current_power - max_power
             end
             if ratio and ratio ~= 0 then
+                local addRequirements = si and si.require["add_" .. powerType .. "_from_aura"]
+                if addRequirements then
+                    for v, rArray in pairs(addRequirements) do
+                        if isLuaArray(rArray) then
+                            for _, requirement in ipairs(rArray) do
+                                local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                                if verified then
+                                    local aura = OvaleAura:GetAura("player", requirement[2], atTime, nil, true)
+                                    if OvaleAura:IsActiveAura(aura, atTime) then
+                                        cost = cost + (tonumber(v) or 0) * aura.stacks
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
                 local maxCostParam = "max_" .. powerType
                 local maxCost = si[maxCostParam]
                 if maxCost then
@@ -117,19 +135,6 @@ local PowerModule = __class(nil, {
                     elseif power > cost then
                         cost = power
                     end
-                else
-                    local addRequirements = si and si.require["add_" .. powerType .. "_from_aura"]
-                    if addRequirements then
-                        for v, requirement in pairs(addRequirements) do
-                            local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
-                            if verified then
-                                local aura = OvaleAura:GetAura("player", requirement[2], atTime, nil, true)
-                                if aura[v] then
-                                    cost = cost + aura[v]
-                                end
-                            end
-                        end
-                    end
                 end
                 spellCost = (cost > 0 and floor(cost * ratio)) or ceil(cost * ratio)
                 local refund = si["refund_" .. powerType] or 0
@@ -138,15 +143,19 @@ local PowerModule = __class(nil, {
                 else
                     local refundRequirements = si and si.require["refund_" .. powerType]
                     if refundRequirements then
-                        for v, requirement in pairs(refundRequirements) do
-                            local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
-                            if verified then
-                                if v == "cost" then
-                                    spellRefund = spellCost
-                                elseif isNumber(v) then
+                        for v, rArray in pairs(refundRequirements) do
+                            if isLuaArray(rArray) then
+                                for _, requirement in ipairs(rArray) do
+                                    local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                                    if verified then
+                                        if v == "cost" then
+                                            spellRefund = spellCost
+                                        elseif isNumber(v) then
+                                        end
+                                        refund = refund + (tonumber(v) or 0)
+                                        break
+                                    end
                                 end
-                                refund = refund + (tonumber(v) or 0)
-                                break
                             end
                         end
                     end
@@ -181,7 +190,7 @@ local PowerModule = __class(nil, {
                     cost = cost + extraPower
                 end
                 if power < cost then
-                    local powerRate = self:GetPowerRate(powerType) or 0
+                    local powerRate = self:GetPowerRate(powerType, atTime) or 0
                     if powerRate > 0 then
                         seconds = (cost - power) / powerRate
                     else
@@ -430,7 +439,7 @@ local OvalePowerClass = __class(OvalePowerBase, {
                 self.current.power[powerType] = power
             end
         else
-            for powerType, powerInfo in pairs(self.POWER_INFO) do
+            for powerType, powerInfo in kpairs(self.POWER_INFO) do
                 local power = UnitPower("player", powerInfo.id, powerInfo.segments)
                 self:DebugTimestamp("%s: %d -> %d (%s).", event, self.current.power[powerType], power, powerType)
                 if self.current.power[powerType] ~= power then
@@ -509,14 +518,14 @@ local OvalePowerClass = __class(OvalePowerBase, {
         return self:GetState(atTime):TimeToPower(spellId, atTime, targetGUID, powerType, extraPower)
     end,
     InitializeState = function(self)
-        for powerType in pairs(__exports.OvalePower.POWER_INFO) do
+        for powerType in kpairs(__exports.OvalePower.POWER_INFO) do
             self.next.power[powerType] = 0
             self.next.inactiveRegen[powerType], self.next.activeRegen[powerType] = 0, 0
         end
     end,
     ResetState = function(self)
         __exports.OvalePower:StartProfiling("OvalePower_ResetState")
-        for powerType in pairs(__exports.OvalePower.POWER_INFO) do
+        for powerType in kpairs(__exports.OvalePower.POWER_INFO) do
             self.next.power[powerType] = self.current.power[powerType] or 0
             self.next.maxPower[powerType] = self.current.maxPower[powerType] or 0
             self.next.activeRegen[powerType] = self.current.activeRegen[powerType] or 0
@@ -525,7 +534,7 @@ local OvalePowerClass = __class(OvalePowerBase, {
         __exports.OvalePower:StopProfiling("OvalePower_ResetState")
     end,
     CleanState = function(self)
-        for powerType in pairs(__exports.OvalePower.POWER_INFO) do
+        for powerType in kpairs(__exports.OvalePower.POWER_INFO) do
             self.next.power[powerType] = nil
         end
     end,
@@ -553,7 +562,7 @@ local OvalePowerClass = __class(OvalePowerBase, {
             end
         end
         if si then
-            for powerType, powerInfo in pairs(__exports.OvalePower.POWER_INFO) do
+            for powerType, powerInfo in kpairs(__exports.OvalePower.POWER_INFO) do
                 local cost, refund = self.next:PowerCost(spellId, powerInfo.type, atTime, targetGUID)
                 local power = self.next.power[powerType] or 0
                 if cost then
@@ -564,7 +573,7 @@ local OvalePowerClass = __class(OvalePowerBase, {
                 end
                 local seconds = OvaleFuture.next.nextCast - atTime
                 if seconds > 0 then
-                    local powerRate = self.next:GetPowerRate(powerType) or 0
+                    local powerRate = self.next:GetPowerRate(powerType, atTime) or 0
                     power = power + powerRate * seconds
                 end
                 local mini = powerInfo.mini or 0

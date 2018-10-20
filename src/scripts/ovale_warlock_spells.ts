@@ -26,6 +26,10 @@ Define(bilescourge_bombers 267211)
 Define(call_dreadstalkers 104316)
 # Summons s1 ferocious Dreadstalkers to attack the target for 12 seconds.
   SpellInfo(call_dreadstalkers soulshards=2 cd=20)
+Define(cascading_calamity_buff 275376)
+# Casting Unstable Affliction on a target affected by your Unstable Affliction increases your Haste by s1 for 15 seconds
+  SpellInfo(cascading_calamity_buff channel=-0.001 gcd=0 offgcd=1)
+
 Define(cataclysm 152108)
 # Calls forth a cataclysm at the target location, dealing (180 of Spell Power) Shadowflame damage to all enemies within A1 yards and afflicting them with ?s980[Agony and Unstable Affliction][]?s104315[Corruption][]?s348[Immolate][]?!s980&!s104315&!s348[Agony, Unstable Affliction, Corruption, or Immolate][].
   SpellInfo(cataclysm cd=30 talent=cataclysm_talent)
@@ -37,7 +41,7 @@ Define(chaos_bolt 116858)
 # Unleashes a devastating blast of chaos, dealing a critical strike for 2*(120 of Spell Power) Chaos damage. Damage is further increased by your critical strike chance.
   SpellInfo(chaos_bolt soulshards=2)
 Define(conflagrate 17962)
-# Triggers an explosion on the target, dealing (90 of Spell Power) Fire damage.?s196406[rnrnReduces the cast time of your next Incinerate or Chaos Bolt by 117828s1 for 10 seconds.][]rnrn|cFFFFFFFFGenerates 245330s1 Soul Shard Fragments.|r
+# Triggers an explosion on the target, dealing (100 of Spell Power) Fire damage.?s196406[rnrnReduces the cast time of your next Incinerate or Chaos Bolt by 117828s1 for 10 seconds.][]rnrn|cFFFFFFFFGenerates 245330s1 Soul Shard Fragments.|r
 # Rank 2: Conflagrate has s1+1 charges.
   SpellInfo(conflagrate cd=12.96)
 Define(corruption 172)
@@ -64,7 +68,7 @@ Define(deathbolt 264106)
 # Launches a bolt of death at the target, dealing s2 of the total remaining damage of your damage over time effects on the target.?s196103[rnrnCounts up to s3 sec of your Corruption's damage.][]
   SpellInfo(deathbolt cd=30 talent=deathbolt_talent)
 Define(demonbolt 264178)
-# Send the fiery soul of a fallen demon at the enemy, causing (57.99999999999999 of Spell Power) Shadowflame damage.?c2[rnrn|cFFFFFFFFGenerates 2 Soul Shards.|r][]
+# Send the fiery soul of a fallen demon at the enemy, causing (66.7 of Spell Power) Shadowflame damage.?c2[rnrn|cFFFFFFFFGenerates 2 Soul Shards.|r][]
   SpellInfo(demonbolt)
 Define(demonic_calling_buff 205146)
 # Shadow Bolt?s264178[ and Demonbolt have][ has] a h chance to make your next Call Dreadstalkers cost s1 less Soul Shard and have no cast time.
@@ -124,19 +128,19 @@ Define(havoc 80240)
   # Spells cast by the Warlock also hit this target for s1 of normal initial damage.
   SpellAddTargetDebuff(havoc havoc=1)
 Define(immolate 348)
-# Burns the enemy, causing (36 of Spell Power) Fire damage immediately and an additional 157736o1 Fire damage over 18 seconds.rnrn|cFFFFFFFFPeriodic damage generates 1 Soul Shard Fragment and has a s2 chance to generate an additional 1 on critical strikes.|r
+# Burns the enemy, causing (40 of Spell Power) Fire damage immediately and an additional 157736o1 Fire damage over 18 seconds.rnrn|cFFFFFFFFPeriodic damage generates 1 Soul Shard Fragment and has a s2 chance to generate an additional 1 on critical strikes.|r
   SpellInfo(immolate)
 Define(implosion 196277)
 # Demonic forces suck all of your Wild Imps toward the target, and then cause them to violently explode, dealing 196278s2 Shadowflame damage to all enemies within 196278A3 yards.
   SpellInfo(implosion)
 Define(incinerate 29722)
-# Draws fire toward the enemy, dealing (58.275 of Spell Power) Fire damage.rnrn|cFFFFFFFFGenerates 244670s1 Soul Shard Fragments and an additional 1 on critical strikes.|r
+# Draws fire toward the enemy, dealing (64.1 of Spell Power) Fire damage.rnrn|cFFFFFFFFGenerates 244670s1 Soul Shard Fragments and an additional 1 on critical strikes.|r
   SpellInfo(incinerate max_stacks=5)
   SpellInfo(shadow_bolt replaced_by=incinerate)
 Define(inevitable_demise_buff 273522)
 # Damaging an enemy with Corruption increases the damage of your next Drain Life by s1. This effect stacks up to 273525u times.
   SpellInfo(inevitable_demise_buff channel=-0.001 gcd=0 offgcd=1)
-
+  SpellAddBuff(inevitable_demise_buff inevitable_demise_buff=1)
 Define(inner_demons 267216)
 # You passively summon a Wild Imp to fight for you every t1 sec, and have a s1 chance to also summon an additional Demon to fight for you for s2 sec.
   SpellInfo(inner_demons channel=0 gcd=0 offgcd=1 tick=12 talent=inner_demons_talent)
@@ -167,7 +171,7 @@ Define(seed_of_corruption 27243)
   # Embeded with a demon seed that will soon explode, dealing Shadow damage to the caster's enemies within 27285A1 yards, and applying Corruption to them.rnrnThe seed will detonate early if the target is hit by other detonations, or takes w3 damage from your spells.
   SpellAddTargetDebuff(seed_of_corruption seed_of_corruption=1)
 Define(shadow_bolt 686)
-# Sends a shadowy bolt at the enemy, causing (30 of Spell Power) Shadow damage.?c2[rnrn|cFFFFFFFFGenerates 1 Soul Shard.|r][]
+# Sends a shadowy bolt at the enemy, causing (34.5 of Spell Power) Shadow damage.?c2[rnrn|cFFFFFFFFGenerates 1 Soul Shard.|r][]
   SpellInfo(shadow_bolt)
 Define(shadowburn 17877)
 # Blasts a target for (60 of Spell Power) Shadowflame damage. rnrnIf the target dies within 5 seconds and yields experience or honor, Shadowburn's cooldown is reset.rnrn|cFFFFFFFFGenerates 245731s1 Soul Shard Fragments.|r
@@ -186,7 +190,7 @@ Define(soul_strike 264057)
 # Command your Felguard to strike into the soul of its enemy, dealing <damage> Shadow damage.?c2[rnrn|cFFFFFFFFGenerates 1 Soul Shard.|r][]
   SpellInfo(soul_strike cd=10 talent=soul_strike_talent)
 Define(summon_darkglare 205180)
-# Summons a Darkglare from the Twisting Nether that extends the duration of your damage over time effects on all enemies by s2 sec.rnrnThe Darkglare will serve you for 20 seconds, blasting its target for (40 of Spell Power) Shadow damage, increased by s3 for every damage over time effect you have active on any target.
+# Summons a Darkglare from the Twisting Nether that extends the duration of your damage over time effects on all enemies by s2 sec.rnrnThe Darkglare will serve you for 20 seconds, blasting its target for (32 of Spell Power) Shadow damage, increased by s3 for every damage over time effect you have active on any target.
   SpellInfo(summon_darkglare cd=180 duration=20)
   # Summons a Darkglare from the Twisting Nether that blasts its target for Shadow damage, dealing increased damage for every damage over time effect you have active on any target.
   SpellAddBuff(summon_darkglare summon_darkglare=1)
@@ -287,6 +291,7 @@ Define(writhe_in_agony_talent 4) #22044
 # Agony's damage may now ramp up to s2 stacks.
 Define(wilfreds_sigil_of_superior_summoning_item 132369)
 Define(cascading_calamity_trait 275372)
+Define(sudden_onset_trait 278721)
 Define(forbidden_knowledge_trait 278738)
     `;
 // END
@@ -517,7 +522,7 @@ Define(vile_taint_debuff 278350)
 
 # Azerite Traits
 Define(cascading_calamity_trait 275376)
-Define(cascading_calamity_buff 275376) #TODO verify buff id
+ #TODO verify buff id
 
 Define(forbidden_knowledge_buff 278738) #TODO verify buff id
 Define(inevitable_demise_trait 273521)

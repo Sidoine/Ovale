@@ -50,6 +50,10 @@ Define(bristling_fur 155835)
 Define(brutal_slash 202028)
 # Strikes all nearby enemies with a massive slash, inflicting s1 Physical damage.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
   SpellInfo(brutal_slash energy=25 cd=8 gcd=1 talent=brutal_slash_talent)
+Define(bursting_blood 251316)
+# Imbues your blood with heat for 25 seconds, giving your melee attacks a chance to create a burst of blood, dealing 265514s1 Physical damage split evenly amongst all nearby enemies.
+  SpellInfo(bursting_blood duration=25 channel=25 gcd=0 offgcd=1)
+
 Define(cat_form 768)
 # Shapeshift into Cat Form, increasing auto-attack damage by (25 of Spell Power), movement speed by 113636s1, granting protection from Polymorph effects, and reducing falling damage.rnrnThe act of shapeshifting frees you from movement impairing effects.
   SpellInfo(cat_form)
@@ -120,6 +124,18 @@ Define(innervate 29166)
   SpellInfo(innervate cd=180 duration=12)
   # Your spells cost no mana.
   SpellAddBuff(innervate innervate=1)
+Define(iron_jaws 276026)
+# Ferocious Bite has a s2 chance per combo point to increase the damage of your next Maim by s1 per combo point.
+  SpellInfo(iron_jaws duration=30 channel=30 gcd=0 offgcd=1)
+  # Your next Maim will deal an additional w1 damage per combo point.
+  SpellAddBuff(iron_jaws iron_jaws=1)
+
+Define(ironfur 192081)
+# Increases armor by s1*AGI/100 for 7 seconds.?a231070[ Multiple uses of this ability may overlap.][]
+# Rank 2: Multiple uses of Ironfur may overlap.rn
+  SpellInfo(ironfur rage=45 cd=0.5 duration=7 max_stacks=1 gcd=0 offgcd=1)
+  # Armor increased by w1*AGI/100.
+  SpellAddBuff(ironfur ironfur=1)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
@@ -155,10 +171,6 @@ Define(moonfire 8921)
 Define(new_moon 274281)
 # Deals m1 Arcane damage to the target and empowers New Moon to become Half Moon. rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
   SpellInfo(new_moon cd=25 gcd=1 lunarpower=-10 talent=new_moon_talent)
-Define(old_war 188028)
-# Summons a pair of ghostly fallen warriors that will join you in combat. They may echo your melee attacks and abilities, dealing 233150s1 damage.
-  SpellInfo(old_war cd=1 duration=25 gcd=0 offgcd=1)
-
 Define(prowl 5215)
 # Activates Cat Form and places you into stealth until cancelled.
   SpellInfo(prowl cd=6 gcd=0 offgcd=1)
@@ -291,8 +303,6 @@ Define(lunar_inspiration_talent 3) #22365
 # Moonfire is now usable while in Cat Form, generates 1 combo point, deals damage based on attack power, and costs 30 energy.
 Define(mighty_bash_talent 10) #21778
 # Invokes the spirit of Ursoc to stun the target for 5 seconds. Usable in all shapeshift forms.
-Define(moment_of_clarity_talent 19) #21646
-# Omen of Clarity now triggers s2 more often, can accumulate up to s135700u+s1 charges, and increases the damage of your next Shred, Thrash, or ?s202028[Brutal Slash][Swipe] by s4.rnrnYour maximum Energy is increased by s3.
 Define(new_moon_talent 21) #21655
 # Deals m1 Arcane damage to the target and empowers New Moon to become Half Moon. rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
 Define(pulverize_talent 21) #22425
@@ -311,13 +321,13 @@ Define(warrior_of_elune_talent 2) #22386
 # Your next u Lunar Strikes are instant cast and generate s2 additional Astral Power.
 Define(wild_charge_talent 6) #18571
 # Fly to a nearby ally's position.
-Define(ailuro_pouncers_item 137024)
-Define(luffa_wrappings_item 137056)
 Define(dawning_sun_trait 276152)
 Define(lively_spirit_trait 279642)
 Define(power_of_the_moon_trait 273367)
 Define(streaking_stars_trait 272871)
 Define(sunblaze_trait 274397)
+Define(wild_fleshrending_trait 279527)
+Define(layered_mane_trait 279552)
     ]]
     code = code .. [[
 Define(astralpower "lunarpower") # Astral Power is named LunarPower in Enum.PowerType
@@ -352,6 +362,7 @@ Define(moonfire_debuff 164812)
 	SpellInfo(moonfire_debuff duration=16)
 
 	SpellInfo(prowl cd=10 gcd=0 offgcd=1 to_stance=druid_cat_form)
+    SpellRequire(prowl unusable 1=stealthed,1)
 	SpellAddBuff(prowl prowl_buff=1)
 Define(prowl_buff 5215)
 Define(remove_corruption 2782)
@@ -420,7 +431,6 @@ Define(moonkin_form 197625)
 	SpellInfo(moonkin_form to_stance=druid_moonkin_form)
 	SpellInfo(moonkin_form unusable=1 if_stance=druid_moonkin_form)
 
-	SpellAddBuff(lunar_strike lunar_empowerment_buff=0)
 Define(solar_wrath 190984)
 Define(starsurge 197626)
 	SpellInfo(starsurge cd=10 specialization=!balance)
@@ -434,9 +444,6 @@ Define(sunfire_debuff 164815)
 	SpellInfo(ferocious_bite energy=25 max_energy=50 combopoints=1 max_combopoints=5)
 	SpellInfo(ferocious_bite physical=1)
 
-	
-
-
 	SpellInfo(rip energy=30 combopoints=1 max_combopoints=5)
 	SpellAddTargetDebuff(rip rip_debuff=1)
 Define(rip_debuff 1079)
@@ -446,9 +453,10 @@ Define(frenzied_regeneration 22842)
 	SpellInfo(frenzied_regeneration rage=10 cd=36 cd_haste=melee)
 	SpellAddBuff(frenzied_regeneration frenzied_regeneration_buff=1)
 	SpellRequire(frenzied_regeneration unusable 1=debuff,healing_immunity_debuff)
+    SpellRequire(frenzied_regeneration unusable 1=stance,!druid_bear_form)
 Define(frenzied_regeneration_buff 22842)
 	SpellInfo(frenzied_regeneration_buff duration=3)
-Define(ironfur 192081)
+
 	SpellInfo(ironfur rage=45 cd=0.5 offgcd=1)
 	SpellAddBuff(ironfur ironfur_buff=1)
 Define(ironfur_buff 192081)
@@ -486,7 +494,6 @@ local registerSpec1 = function()
 	SpellAddBuff(celestial_alignment celestial_alignment_buff=1)
 Define(celestial_alignment_buff 194223)
 
-
 	SpellInfo(fury_of_elune cd=90 astralpower=6)
 	SpellAddBuff(fury_of_elune fury_of_elune_up_buff=1)
 Define(fury_of_elune_up_buff 202770)
@@ -509,9 +516,9 @@ Define(lunar_empowerment_buff 164547)
 	SpellRequire(lunar_strike astralpower_percent 150=buff,celestial_alignment_buff)
 	SpellRequire(lunar_strike astralpower_percent 125=buff,blessing_of_elune_buff)
 	SpellAddBuff(lunar_strike lunar_empowerment_buff=0)
-#Define(moonfire )
+
 	SpellInfo(moonfire astralpower=-3 specialization=balance)
-#Define(moonfire_debuff)
+
 	SpellInfo(moonfire_debuff add_duration=6 specialization=balance)
 Define(moonkin_form_balance 24858)
 	SpellInfo(moonkin_form replaced_by=moonkin_form_balance specialization=balance)
@@ -523,7 +530,7 @@ Define(moonkin_form_balance 24858)
 Define(solar_empowerment_buff 164545)
 
 	SpellInfo(solar_beam cd=60 gcd=0 offgcd=1 interrupt=1)
-#Define(solar_wrath 190984)
+
 	SpellInfo(solar_wrath travel_time=1 astralpower=-8)
 	SpellRequire(solar_wrath astralpower_percent 125=buff,blessing_of_elune_buff)
 	SpellRequire(solar_wrath astralpower_percent 150=buff,celestial_alignment_buff)
@@ -547,11 +554,6 @@ Define(stellar_empowerment_debuff 197637)
 	SpellAddTargetDebuff(stellar_flare stellar_flare_debuff=1)
 Define(stellar_flare_debuff 202347)
 	SpellInfo(stellar_flare_debuff duration=24 haste=spell tick=2)
-#Define(sunfire_balance 93402)
-#	SpellInfo(sunfire replaced_by=sunfire_balance specialization=balance)
-#	SpellAddTargetDebuff(sunfire_balance sunfire_debuff=1)
-#Define(sunfire_debuff 164815)
-#	SpellInfo(sunfire_debuff add_duration=6 specialization=balance)
 
 	SpellInfo(warrior_of_elune gcd=0 cd=45 offgcd=1)
 Define(warrior_of_elune_buff 202425)
@@ -574,20 +576,22 @@ local registerSpec2 = function()
 	Include(ovale_druid_base_spells)
 # NOT updated for 8.0
 # Guardian spells
-#Define(barkskin )
 	SpellInfo(barkskin add_cd=30 specialization=guardian talent=!survival_of_the_fittest_talent)
 
 	SpellInfo(bristling_fur cd=40 gcd=0 offgcd=1)
 	SpellAddBuff(bristling_fur bristling_fur_buff=1)
 Define(bristling_fur_buff 155835)
 	SpellInfo(bristling_fur_buff duration=8)
-#Define(frenzied_regeneration 22842)
+Define(earthwarden_buff 203975)
+    SpellInfo(earthwarden_buff max_stacks=3)
+
 	SpellInfo(frenzied_regeneration charges=2 specialization=guardian)
 	SpellAddBuff(frenzied_regeneration guardian_of_elune_buff=0)
-Define(frenzied_regeneration_buff 22842)
+
 Define(galactic_guardian_buff 213708)
 Define(guardian_of_elune_buff 213680)
 	SpellInfo(guardian_of_elune_buff duration=15)
+Define(guardians_wrath_buff 279541)
 
 	SpellInfo(incapacitating_roar cd=30)
 	SpellInfo(incapacitating_roar replaced_by=intimidating_roar talent=intimidating_roar_talent)
@@ -600,10 +604,10 @@ Define(incarnation_guardian_of_ursoc_buff 102558)
 	SpellInfo(incarnation_guardian_of_ursoc_buff duration=30)
 Define(intimidating_roar 236748)
 	SpellInfo(intimidating_roar cd=30)
-#Define(ironfur 192081)
+
 	SpellAddBuff(ironfur guardian_of_elune_buff=0)
-#Define(ironfur_buff 192081)
-#
+	SpellRequire(ironfur add_rage_from_aura -15=buff,guardians_wrath_buff)
+
 	SpellInfo(mangle addrage=-4 talent=soul_of_the_forest_talent specialization=guardian)
 	SpellAddBuff(mangle guardian_of_elune_buff=1 talent=guardian_of_elune_talent)
 
@@ -615,11 +619,10 @@ Define(intimidating_roar 236748)
 Define(pulverize_buff 158792)
 	SpellInfo(pulverize_buff duration=20)
 Define(swipe_bear 213771)
-#Define(survival_instincts 61336)
+
 	SpellInfo(survival_instincts add_cd=120 specialization=guardian)
 	SpellInfo(survival_instincts add_cd=-80 specialization=guardian talent=survival_of_the_fittest_talent) 
-#Define(thrash_bear 77758)
-#Define(thrash_bear_debuff 192090)
+
 	SpellInfo(thrash_bear_debuff max_stacks=5 if_equipped=elizes_everlasting_encasement)
 
 # Guardian Legendaries
@@ -627,6 +630,7 @@ Define(elizes_everlasting_encasement 137067)
 Define(skysecs_hold 137025)
 
 # Guardian Talents
+Define(earthwarden_talent 16)
 Define(intimidating_roar_talent 5)
 Define(galactic_guardian_talent 14)
 Define(survival_of_the_fittest_talent 17)
@@ -708,25 +712,24 @@ Define(clearcasting_buff 135700)
 
 	SpellInfo(maim energy=35 combopoints=1 max_combopoints=5 cd=20)
 Define(moonfire_cat 155625)
-	SpellInfo(moonfire_cat energy=30 combopoints=-1)
-	SpellInfo(moonfire_cat unusable=1 if_stance=!druid_cat_form specialization=feral talent=lunar_inspiration_talent)
+	SpellInfo(moonfire_cat energy=30 combopoints=-1 unusable=1)
+	SpellInfo(moonfire_cat unusable=0 if_stance=druid_cat_form specialization=feral talent=lunar_inspiration_talent)
 	SpellAddTargetDebuff(moonfire_cat moonfire_cat_debuff=1)
 Define(moonfire_cat_debuff 155625)
 	SpellInfo(moonfire_cat_debuff duration=14 haste=melee tick=2 specialization=feral talent=lunar_inspiration_talent)
 Define(predatory_swiftness_buff 69369)
 	SpellInfo(predatory_swiftness_buff duration=12)
 SpellList(improved_rake prowl_buff shadowmeld_buff incarnation_king_of_the_jungle_buff)
-#
+
 	SpellInfo(rake energy=35 combopoints=-1)
 	SpellAddBuff(rake prowl_buff=0)
 	SpellAddBuff(rake shadowmeld_buff=0)
 	SpellDamageBuff(rake improved_rake=2)
-#
+
 	SpellInfo(rake_debuff duration=15 haste=melee tick=3 talent=!jagged_wounds_talent)
 	SpellInfo(rake_debuff duration=12 haste=melee tick=2.4 talent=jagged_wounds_talent)
 	SpellDamageBuff(rake_debuff improved_rake=2)
-#
-#Define(rip_debuff 1079)
+
 	SpellInfo(rip_debuff duration=24 haste=melee tick=2 talent=!jagged_wounds_talent)
 	SpellInfo(rip_debuff duration=19.2 haste=melee tick=1.6 talent=jagged_wounds_talent)
 
@@ -758,9 +761,6 @@ Define(tigers_fury_buff 5217)
 
 Define(jagged_wounds_talent 14)
 Define(incarnation_king_of_the_jungle_talent 15)
-
-
-
 
 # Tier 21
 Define(apex_predator_buff 252752)

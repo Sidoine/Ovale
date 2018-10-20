@@ -118,7 +118,7 @@ Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. 
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
 Define(flamestrike 2120)
-# Calls down a pillar of fire, burning all enemies within the area for s1 Fire damage and reducing their movement speed by (50 of Spell Power) for 8 seconds.
+# Calls down a pillar of fire, burning all enemies within the area for s1 Fire damage and reducing their movement speed by (57.49999999999999 of Spell Power) for 8 seconds.
   SpellInfo(flamestrike duration=8)
   # Movement speed slowed by s2.
   SpellAddTargetDebuff(flamestrike flamestrike=1)
@@ -227,11 +227,6 @@ Define(summon_water_elemental 31687)
 Define(supernova 157980)
 # Pulses arcane energy around the target enemy or ally, dealing (30 of Spell Power) Arcane damage to all enemies within A2 yards, and knocking them upward. A primary enemy target will take s1 increased damage.
   SpellInfo(supernova cd=25 talent=supernova_talent)
-Define(time_warp 80353)
-# Warp the flow of time, increasing haste by (25 of Spell Power) for all party and raid members for 40 seconds.rnrnAllies will be unable to benefit from Bloodlust, Heroism, or Time Warp again for 600 seconds.
-  SpellInfo(time_warp cd=300 duration=40 channel=40 gcd=0 offgcd=1)
-  # Haste increased by s1.
-  SpellAddBuff(time_warp time_warp=1)
 Define(winters_reach 273347)
 # Consuming Brain Freeze has a s2 chance to make your next non-instant Flurry cast within 15 seconds deal an additional s1 damage per hit.
   SpellInfo(winters_reach duration=15 channel=15 gcd=0 offgcd=1)
@@ -494,8 +489,6 @@ Define(potent_flames_buff 145254)
 Define(presence_of_mind_buff 205025)
 Define(profound_magic_buff 145252)
 	SpellInfo(profound_magic_buff duration=10 max_stacks=4)
-Define(prismatic_crystal 152087)
-	SpellInfo(prismatic_crystal cd=90 duration=12 totem=1)
 
 	SpellInfo(pyroblast travel_time=1)
 	SpellInfo(pyroblast damage=FirePyroblastHitDamage specialization=fire)
@@ -515,7 +508,7 @@ Define(quickening_buff 198924)
 
 	SpellInfo(ray_of_frost cd=60 channel=10 tag=main)
 
-	SpellInfo(rune_of_power buff_totem=rune_of_power_buff duration=180 max_totems=2 totem=1)
+	SpellInfo(rune_of_power buff_totem=rune_of_power_buff duration=180 max_totems=1 totem=1)
 	SpellAddBuff(rune_of_power ice_floes_buff=0 if_spell=ice_floes)
 	SpellAddBuff(rune_of_power presence_of_mind_buff=0 if_spell=presence_of_mind)
 Define(rune_of_power_buff 116014)
@@ -530,7 +523,7 @@ Define(t18_class_trinket 124516)
 Define(temporal_displacement_debuff 80354)
 	SpellInfo(temporal_displacement_debuff duration=600)
 Define(thermal_void 155149)
-
+Define(time_warp 80353)
 	SpellInfo(time_warp cd=300 gcd=0)
 	SpellAddBuff(time_warp time_warp_buff=1)
 	SpellAddDebuff(time_warp temporal_displacement_debuff=1)

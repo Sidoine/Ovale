@@ -129,7 +129,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
             if (profile.apparence.avecCible && !UnitExists("target")) {
                 this.visible = false;
             }
-            if (profile.apparence.enCombat && !baseState.current.inCombat) {
+            if (profile.apparence.enCombat && !OvaleFuture.IsInCombat(undefined)) {
                 this.visible = false;
             }
             if (profile.apparence.targetHostileOnly && (UnitIsDead("target") || !UnitCanAttack("player", "target"))) {

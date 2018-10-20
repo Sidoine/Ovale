@@ -26,6 +26,7 @@ local pairs = pairs
 local type = type
 local wipe = wipe
 local kpairs = pairs
+local tonumber = tonumber
 local sub = string.sub
 local insert = table.insert
 local remove = table.remove
@@ -48,6 +49,8 @@ local baseState = __BaseState.baseState
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isLuaArray = __tools.isLuaArray
 local __Requirement = LibStub:GetLibrary("ovale/Requirement")
+local RegisterRequirement = __Requirement.RegisterRequirement
+local UnregisterRequirement = __Requirement.UnregisterRequirement
 local CheckRequirements = __Requirement.CheckRequirements
 local strsub = sub
 local tremove = remove
@@ -150,6 +153,8 @@ __exports.OvaleFutureData = __class(nil, {
         return self.currentCast.channel and (atTime < self.currentCast.stop)
     end,
     constructor = function(self)
+        self.inCombat = false
+        self.combatStartTime = 0
         self.lastCastTime = {}
         self.lastOffGCDSpellcast = {}
         self.lastGCDSpellcast = {}
@@ -162,6 +167,26 @@ __exports.OvaleFutureData = __class(nil, {
 local OvaleFutureBase = OvaleState:RegisterHasState(OvaleProfiler:RegisterProfiling(OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleFuture", aceEvent))), __exports.OvaleFutureData)
 __exports.OvaleFutureClass = __class(OvaleFutureBase, {
     constructor = function(self)
+        self.CombatRequirement = function(spellId, atTime, requirement, tokens, index, targetGUID)
+            local verified = false
+            local combatFlag = tokens[index]
+            index = index + 1
+            if combatFlag then
+                combatFlag = tonumber(combatFlag)
+                if combatFlag == 1 and self:IsInCombat(atTime) or combatFlag ~= 1 and  not self:IsInCombat(atTime) then
+                    verified = true
+                end
+                local result = verified and "passed" or "FAILED"
+                if combatFlag == 1 then
+                    self:Log("    Require combat at time=%f: %s", atTime, result)
+                else
+                    self:Log("    Require NOT combat at time=%f: %s", atTime, result)
+                end
+            else
+                Ovale:OneTimeMessage("Warning: requirement '%s' is missing an argument.", requirement)
+            end
+            return verified, requirement, index
+        end
         OvaleFutureBase.constructor(self)
         OvaleState:RegisterState(self)
     end,
@@ -182,6 +207,7 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
         self:RegisterEvent("UNIT_SPELLCAST_STOP", "UnitSpellcastEnded")
         self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
         self:RegisterMessage("Ovale_AuraAdded")
+        RegisterRequirement("combat", self.CombatRequirement)
     end,
     OnDisable = function(self)
         self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -200,6 +226,10 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
         self:UnregisterEvent("UNIT_SPELLCAST_STOP")
         self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
         self:UnregisterMessage("Ovale_AuraAdded")
+        UnregisterRequirement("combat")
+    end,
+    IsInCombat = function(self, atTime)
+        return self:GetState(atTime).inCombat
     end,
     COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
         local _, cleuEvent, _, sourceGUID, sourceName, _, _, destGUID, destName, _, _, spellId, spellName, _, _, _, _, _, _, _, _, _, _, isOffHand = CombatLogGetCurrentEventInfo()
@@ -303,8 +333,8 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
         self:StartProfiling("OvaleFuture_PLAYER_REGEN_DISABLED")
         self:Debug(event, "Entering combat.")
         local now = GetTime()
-        baseState.current.inCombat = true
-        baseState.current.combatStartTime = now
+        self.current.inCombat = true
+        self.current.combatStartTime = now
         Ovale:needRefresh()
         self:SendMessage("Ovale_CombatStarted", now)
         self:StopProfiling("OvaleFuture_PLAYER_REGEN_DISABLED")
@@ -313,7 +343,7 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
         self:StartProfiling("OvaleFuture_PLAYER_REGEN_ENABLED")
         self:Debug(event, "Leaving combat.")
         local now = GetTime()
-        baseState.current.inCombat = false
+        self.current.inCombat = false
         Ovale:needRefresh()
         self:SendMessage("Ovale_CombatEnded", now)
         self:StopProfiling("OvaleFuture_PLAYER_REGEN_ENABLED")
@@ -831,6 +861,8 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
         __exports.OvaleFuture:StartProfiling("OvaleFuture_ResetState")
         local now = baseState.next.currentTime
         self:Log("Reset state with current time = %f", now)
+        self.next.inCombat = self.current.inCombat
+        self.next.combatStartTime = self.current.combatStartTime or 0
         self.next.nextCast = now
         wipe(self.next.lastCast)
         wipe(__exports.OvaleFutureClass.staticSpellcast)
@@ -964,12 +996,12 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
                 self.next.nextCast = nextCast
             end
             __exports.OvaleFuture:Log("Apply spell %d at %f currentTime=%f nextCast=%f endCast=%f targetGUID=%s", spellId, startCast, baseState.next.currentTime, nextCast, endCast, targetGUID)
-            if  not baseState.next.inCombat and OvaleSpellBook:IsHarmfulSpell(spellId) then
-                baseState.next.inCombat = true
+            if  not self.next.inCombat and OvaleSpellBook:IsHarmfulSpell(spellId) then
+                self.next.inCombat = true
                 if channel then
-                    baseState.next.combatStartTime = startCast
+                    self.next.combatStartTime = startCast
                 else
-                    baseState.next.combatStartTime = endCast
+                    self.next.combatStartTime = endCast
                 end
             end
             if startCast > baseState.next.currentTime then

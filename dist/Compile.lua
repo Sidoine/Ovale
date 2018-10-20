@@ -45,6 +45,7 @@ local kpairs = pairs
 local find = string.find
 local match = string.match
 local sub = string.sub
+local insert = table.insert
 local GetSpellInfo = GetSpellInfo
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isLuaArray = __tools.isLuaArray
@@ -272,10 +273,15 @@ local function EvaluateItemRequire(node)
         local count = 0
         local ii = OvaleData:ItemInfo(itemId)
         local tbl = ii.require[property] or {}
+        local arr = nil
         for k, v in kpairs(namedParams) do
             if  not checkToken(PARAMETER_KEYWORD, k) then
-                tbl[k] = v
-                count = count + 1
+                arr = tbl[k] or {}
+                if isLuaArray(arr) then
+                    insert(arr, v)
+                    tbl[k] = arr
+                    count = count + 1
+                end
             end
         end
         if count > 0 then
@@ -442,10 +448,15 @@ local function EvaluateSpellRequire(node)
         local count = 0
         local si = OvaleData:SpellInfo(spellId)
         local tbl = si.require[property] or {}
+        local arr = nil
         for k, v in kpairs(namedParams) do
             if  not checkToken(PARAMETER_KEYWORD, k) then
-                tbl[k] = v
-                count = count + 1
+                arr = tbl[k] or {}
+                if isLuaArray(arr) then
+                    insert(arr, v)
+                    tbl[k] = arr
+                    count = count + 1
+                end
             end
         end
         if count > 0 then
@@ -562,8 +573,7 @@ __exports.OvaleCompileClass = __class(OvaleCompileClassBase, {
         self:UnregisterMessage("Ovale_TalentsChanged")
     end,
     Ovale_ScriptChanged = function(self, event)
-        local specName = OvalePaperDoll:GetSpecialization()
-        self:CompileScript(Ovale.db.profile.source[specName])
+        self:CompileScript(Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()])
         self:EventHandler(event)
     end,
     Ovale_StanceChanged = function(self, event)

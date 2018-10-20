@@ -10,7 +10,7 @@ import { RegisterRequirement, UnregisterRequirement, CheckRequirements, Tokens }
 import { SpellCast } from "./LastSpell";
 import aceEvent from "@wowts/ace_event-3.0";
 import { ceil, huge as INFINITY, floor } from "@wowts/math";
-import { pairs, LuaObj, tostring, tonumber, LuaArray } from "@wowts/lua";
+import { ipairs, pairs, LuaObj, tostring, tonumber, LuaArray, kpairs } from "@wowts/lua";
 import { lower } from "@wowts/string";
 import { concat, insert } from "@wowts/table";
 import { GetPowerRegen, GetManaRegen, GetSpellPowerCost, UnitPower, UnitPowerMax, UnitPowerType, Enum, MAX_COMBO_POINTS, ClassId } from "@wowts/wow-mock";
@@ -62,13 +62,13 @@ class PowerModule {
     activeRegen: LuaObj<number> = {};
     inactiveRegen: LuaObj<number> = {};
     maxPower: LuaObj<number> = {};
-    power: LuaObj<number> = {};
+    power: Powers = {};
     /**
      * Power regeneration rate for the given powerType.
      * @param powerType
      */
-    GetPowerRate(powerType: string) {
-        if (baseState.next.inCombat) {
+    GetPowerRate(powerType: string, atTime: number) {
+        if (OvaleFuture.IsInCombat(atTime)) {
             return this.activeRegen[powerType]
         } else {
             return this.inactiveRegen[powerType]
@@ -79,13 +79,13 @@ class PowerModule {
      * @param powerType 
      * @param atTime 
      */
-    GetPower(powerType: string, atTime: number): number {
+    GetPower(powerType: PowerType, atTime: number): number {
         let power = this.power[powerType] || 0;
         if (atTime) {
             let now = baseState.next.currentTime;
             let seconds = atTime - now;
             if (seconds > 0) {
-                let powerRate = this.GetPowerRate(powerType) || 0;
+                let powerRate = this.GetPowerRate(powerType, atTime) || 0;
                 power = power + powerRate * seconds;
             }
         }
@@ -108,7 +108,24 @@ class PowerModule {
         if (si && si[powerType]) {
             let [cost, ratio] = OvaleData.GetSpellInfoPropertyNumber(spellId, atTime, powerType, targetGUID, true);
             if (ratio && ratio != 0) {
-                let maxCostParam = `max_${powerType}`;
+				let addRequirements = si && si.require[`add_${powerType}_from_aura` as keyof SpellInfo];
+				if (addRequirements) {
+					for (const [v, rArray] of pairs(addRequirements)) {
+                        if (isLuaArray(rArray)) {
+                            for (const [, requirement] of ipairs<any>(rArray)) {
+                                let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
+                                if (verified) {
+                                    let aura = <any>OvaleAura.GetAura("player", requirement[2], atTime, undefined, true);
+                                    if (OvaleAura.IsActiveAura(aura, atTime)) {
+                                        cost = cost + (tonumber(v) || 0) * aura.stacks;
+                                    }
+                                }
+                            }
+                        }
+					}
+				}
+				
+				let maxCostParam = `max_${powerType}`;
                 let maxCost = <number>si[maxCostParam as keyof SpellInfo];
                 if (maxCost) {
                     let power = this.GetPower(powerType, atTime);
@@ -117,20 +134,8 @@ class PowerModule {
                     } else if (power > cost) {
                         cost = power;
                     }
-                } else {
-                    let addRequirements = si && si.require[`add_${powerType}_from_aura` as keyof SpellInfo];
-                    if (addRequirements) {
-                        for (const [v, requirement] of pairs(addRequirements)) {
-                            let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
-                            if (verified) {
-                                let aura = <any>OvaleAura.GetAura("player", requirement[2], atTime, undefined, true);
-                                if (aura[v]) {
-                                    cost = cost + aura[v];
-                                }
-                            }
-                        }
-                    }
-                }
+                } 
+
                 spellCost = (cost > 0 && floor(cost * ratio)) || ceil(cost * ratio);
 
                 let refund = si[`refund_${powerType}` as keyof SpellInfo] || 0;
@@ -139,16 +144,20 @@ class PowerModule {
                 } else {
                     let refundRequirements = si && si.require[`refund_${powerType}` as keyof SpellInfo];
                     if (refundRequirements) {
-                        for (const [v, requirement] of pairs(refundRequirements)) {
-                            let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
-                            if (verified) {
-                                if (v == "cost") {
-                                    spellRefund = spellCost
-                                } else if (isNumber(v)) {
-
+                        for (const [v, rArray] of pairs(refundRequirements)) {
+                            if (isLuaArray(rArray)) {
+                                for (const [, requirement] of ipairs<any>(rArray)) {
+                                    let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
+                                    if (verified) {
+                                        if (v == "cost") {
+                                            spellRefund = spellCost
+                                        } else if (isNumber(v)) {
+ 
+                                        }
+                                        refund = <number>refund + (tonumber(v) || 0);
+                                        break;
+                                    }
                                 }
-                                refund = <number>refund + (tonumber(v) || 0);
-                                break;
                             }
                         }
                     }
@@ -236,7 +245,7 @@ class PowerModule {
                     cost = cost + extraPower;
                 }
                 if (power < cost) {
-                    let powerRate = this.GetPowerRate(powerType) || 0;
+                    let powerRate = this.GetPowerRate(powerType, atTime) || 0;
                     if (powerRate > 0) {
                         seconds = (cost - power) / powerRate;
                     } else {
@@ -280,7 +289,7 @@ export type Powers = {
 export const POWER_TYPES: LuaArray<PowerType> = {};
 
 class OvalePowerClass extends OvalePowerBase {
-    POWER_INFO: LuaObj<PowerInfo> = {}
+    POWER_INFO: {[k in PowerType]?:PowerInfo} = {}
     POWER_TYPE: LuaObj<PowerType> = {}
 
     POOLED_RESOURCE: { [key in ClassId]?: PowerType} = {
@@ -438,7 +447,7 @@ class OvalePowerClass extends OvalePowerBase {
             this.UpdatePowerRegen(event);
         }
     }
-    UpdateMaxPower(event: string, powerType?: string) {
+    UpdateMaxPower(event: string, powerType?: PowerType) {
         this.StartProfiling("OvalePower_UpdateMaxPower");
         if (powerType) {
             let powerInfo = this.POWER_INFO[powerType];
@@ -458,7 +467,7 @@ class OvalePowerClass extends OvalePowerBase {
         }
         this.StopProfiling("OvalePower_UpdateMaxPower");
     }
-    UpdatePower(event: string, powerType?: string) {
+    UpdatePower(event: string, powerType?: PowerType) {
         this.StartProfiling("OvalePower_UpdatePower");
         if (powerType) {
             let powerInfo = this.POWER_INFO[powerType];
@@ -468,7 +477,7 @@ class OvalePowerClass extends OvalePowerBase {
                 this.current.power[powerType] = power;
             }
         } else {
-            for (const [powerType, powerInfo] of pairs(this.POWER_INFO)) {
+            for (const [powerType, powerInfo] of kpairs(this.POWER_INFO)) {
                 let power = UnitPower("player", powerInfo.id, powerInfo.segments);
                 this.DebugTimestamp("%s: %d -> %d (%s).", event, this.current.power[powerType], power, powerType);
                 if (this.current.power[powerType] != power) {
@@ -556,14 +565,14 @@ class OvalePowerClass extends OvalePowerBase {
     }
 
     InitializeState() {
-        for (const [powerType] of pairs(OvalePower.POWER_INFO)) {
+        for (const [powerType] of kpairs(OvalePower.POWER_INFO)) {
             this.next.power[powerType] = 0;
             [this.next.inactiveRegen[powerType], this.next.activeRegen[powerType]] = [0, 0];
         }
     }
     ResetState() {
         OvalePower.StartProfiling("OvalePower_ResetState");
-        for (const [powerType] of pairs(OvalePower.POWER_INFO)) {
+        for (const [powerType] of kpairs(OvalePower.POWER_INFO)) {
             this.next.power[powerType] = this.current.power[powerType] || 0;
             this.next.maxPower[powerType] = this.current.maxPower[powerType] || 0;
             this.next.activeRegen[powerType] = this.current.activeRegen[powerType] || 0;
@@ -572,7 +581,7 @@ class OvalePowerClass extends OvalePowerBase {
         OvalePower.StopProfiling("OvalePower_ResetState");
     }
     CleanState() {
-        for (const [powerType] of pairs(OvalePower.POWER_INFO)) {
+        for (const [powerType] of kpairs(OvalePower.POWER_INFO)) {
             this.next.power[powerType] = undefined;
         }
     }
@@ -601,7 +610,7 @@ class OvalePowerClass extends OvalePowerBase {
             }
         }
         if (si) {
-            for (const [powerType, powerInfo] of pairs(OvalePower.POWER_INFO)) {
+            for (const [powerType, powerInfo] of kpairs(OvalePower.POWER_INFO)) {
                 let [cost, refund] = this.next.PowerCost(spellId, powerInfo.type, atTime, targetGUID);
                 let power = this.next.power[powerType] || 0;
                 if (cost) {
@@ -612,7 +621,7 @@ class OvalePowerClass extends OvalePowerBase {
                 }
                 let seconds = OvaleFuture.next.nextCast - atTime;
                 if (seconds > 0) {
-                    let powerRate = this.next.GetPowerRate(powerType) || 0;
+                    let powerRate = this.next.GetPowerRate(powerType, atTime) || 0;
                     power = power + powerRate * seconds;
                 }
                 let mini = powerInfo.mini || 0;

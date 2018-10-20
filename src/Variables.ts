@@ -1,6 +1,7 @@
 import { LuaObj, pairs } from "@wowts/lua";
 import { StateModule, OvaleState } from "./State";
-import { baseState } from "./BaseState";
+import { OvaleFuture } from "./Future";
+import { baseState} from "./BaseState";
 
 export class Variables implements StateModule {
     isState = true;
@@ -13,7 +14,7 @@ export class Variables implements StateModule {
     InitializeState() {
         this.futureVariable = {}
         this.futureLastEnable = {}
-        if (!baseState.current.inCombat) {
+        if (!OvaleFuture.IsInCombat(undefined)) {
             for (const [k] of pairs(this.variable)) {
                 this.Log("Resetting state variable '%s'.", k);
                 this.variable[k] = undefined;

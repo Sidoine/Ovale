@@ -76,6 +76,7 @@ export interface OvaleDb {
             minFrameRefresh: number,
             maxFrameRefresh: number,
             fullAuraScan: false,
+            frequentHealthUpdates: true,
             auraLag: number,
             moving: boolean,
             spellFlash: {

@@ -190,6 +190,8 @@ Define(fist_of_the_white_tiger_talent 8) #19771
 # Strike with the technique of the White Tiger, dealing s1+261977s1 Physical damage.rnrn|cFFFFFFFFGenerates 261978s1 Chi.
 Define(good_karma_talent 11) #23364
 # Touch of Karma can now redirect an additional s1 of your maximum health.
+Define(hit_combo_talent 16) #22093
+# Each successive attack that triggers Combo Strikes in a row grants 196741s1 increased damage, stacking up to 196741u times.
 Define(invoke_niuzao_the_black_ox_talent 18) #22103
 # Summons an effigy of Niuzao, the Black Ox for 45 seconds. Niuzao attacks your primary target and taunts it. He also frequently Stomps, damaging all nearby enemies.
 Define(invoke_xuen_the_white_tiger_talent 18) #22102
@@ -235,6 +237,7 @@ SpellInfo(chi_burst chi=-1 max_chi=-2 specialization=windwalker)
 Define(chi_torpedo 115008)
 	SpellInfo(chi_torpedo charges=2 cd=20)
 	SpellAddBuff(chi_torpedo chi_torpedo_buff=1)
+	SpellRequire(chi_torpedo unusable 1=lossofcontrol,root)
 Define(chi_torpedo_buff 119085)
 	SpellInfo(chi_torpedo_buff duration=10)
 
@@ -289,6 +292,7 @@ SpellRequire(fists_of_fury chi_percent 0=buff,serenity)
 
 
 	SpellInfo(flying_serpent_kick cd=25)
+	SpellRequire(flying_serpent_kick unusable 1=lossofcontrol,root)
 
 SpellAddBuff(fortifying_brew fortifying_brew_buff=1)
 
@@ -310,13 +314,12 @@ Define(healing_elixir 122281)
 	SpellRequire(healing_elixir unusable 1=debuff,healing_immunity_debuff)
 
 Define(invoke_chiji_the_red_crane 198664)
-	SpellInfo(invoke_chiji_the_red_crane cd=180 talent=invoke_chiji_the_red_crane_talent)
+	SpellInfo(invoke_chiji_the_red_crane cd=180 totem=1)
 
 
-	SpellInfo(invoke_niuzao_the_black_ox cd=180 talent=invoke_niuzao_the_black_ox_talent)
+	SpellInfo(invoke_niuzao_the_black_ox cd=180 totem=1)
 
-
-	SpellInfo(invoke_xuen_the_white_tiger cd=180 talent=invoke_xuen_the_white_tiger_talent)
+	SpellInfo(invoke_xuen_the_white_tiger cd=180 totem=1)
 
 SpellInfo(ironskin_brew cd=15 charges=3 cd_haste=melee)
 SpellInfo(ironskin_brew add_cd=-3 charges=4 talent=light_brewing_talent)
@@ -391,6 +394,7 @@ Define(roll 109132)
 	SpellInfo(roll cd=20 charges=2)
 	SpellInfo(roll charges=3 talent=celerity_talent)
 	SpellInfo(roll replaced_by=chi_torpedo talent=chi_torpedo_talent)
+	SpellRequire(roll unusable 1=lossofcontrol,root)
 
 SpellInfo(rushing_jade_wind chi=0 duration=9 cd_haste=melee haste=melee talent=rushing_jade_wind_talent)
 SpellAddBuff(rushing_jade_wind rushing_jade_wind=1)
@@ -414,16 +418,14 @@ SpellInfo(spinning_crane_kick chi=2 haste=melee specialization=windwalker)
 SpellInfo(spinning_crane_kick chi=0 haste=spell specialization=mistweaver)
 SpellRequire(spinning_crane_kick chi_percent 0=buff,serenity)
 
-
     SpellRequire(storm_earth_and_fire unusable 1=buff,storm_earth_and_fire)
 	SpellInfo(storm_earth_and_fire replaced_by=serenity talent=serenity_talent)
-	
 
-	Define(summon_black_ox_statue 115315)
-	SpellInfo(summon_black_ox_statue cd=10 duration=900 totem=1)
+Define(summon_black_ox_statue 115315)
+	SpellInfo(summon_black_ox_statue cd=10 duration=900 totem=1 max_totems=1)
 
 Define(summon_jade_serpent_statue 115313)
-  SpellInfo(summon_jade_serpent_statue cd=10 duration=900 totem=1)
+    SpellInfo(summon_jade_serpent_statue cd=10 duration=900 totem=1 max_totems=1)
 
 SpellInfo(swift_roundhouse_buff max_stacks=2)
 

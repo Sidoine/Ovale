@@ -17,6 +17,9 @@ Define(avenging_wrath 31884)
   SpellInfo(avenging_wrath cd=120 duration=20)
   # Damage, healing, and critical strike chance increased by w1.
   SpellAddBuff(avenging_wrath avenging_wrath=1)
+Define(bastion_of_light 204035)
+# Immediately grants s1 charges of Shield of the Righteous.
+  SpellInfo(bastion_of_light cd=120 gcd=0 offgcd=1 talent=bastion_of_light_talent)
 Define(blade_of_justice 184575)
 # Pierces an enemy with a blade of light, dealing s2*<mult> Physical damage.rnrn|cFFFFFFFFGenerates s3 Holy Power.|r
   SpellInfo(blade_of_justice cd=10.5 holypower=-2)
@@ -47,7 +50,7 @@ Define(crusader_strike 35395)
 # Rank 2: Crusader Strike now has s1+1 charges.
   SpellInfo(crusader_strike cd=6 holypower=0)
 Define(divine_right_buff 278519)
-# When Divine Storm damages an enemy who is below s2 health, your Strength is increased by s1 for 10 seconds.
+# When Divine Storm damages an enemy who is below s2 health, your Strength is increased by s1 for 15 seconds.
   SpellInfo(divine_right_buff channel=-0.001 gcd=0 offgcd=1)
 
 Define(divine_storm 53385)
@@ -123,6 +126,8 @@ Define(war_stomp 20549)
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
   # Stunned.
   SpellAddTargetDebuff(war_stomp war_stomp=1)
+Define(bastion_of_light_talent 6) #22594
+# Immediately grants s1 charges of Shield of the Righteous.
 Define(blinding_light_talent 9) #21811
 # Emits dazzling light in all directions, blinding enemies within 105421A1 yards, causing them to wander disoriented for 105421d. Non-Holy damage will break the disorient effect.
 Define(crusade_talent 20) #22215
@@ -194,7 +199,7 @@ Define(avenging_crusader_buff 216331)
 Define(avenging_wrath_buff 31884)
 	SpellInfo(avenging_wrath_buff duration=20)
 	SpellInfo(avenging_wrath_buff add_duration=5 talent=sanctified_wrath_talent specialization=holy)
-Define(bastion_of_light 204035)
+
 	SpellInfo(bastion_of_light cd=120 gcd=0 offgcd=1)
 Define(bastion_of_power_buff 144569)
 	SpellInfo(bastion_of_power_buff duration=20)
@@ -244,8 +249,8 @@ Define(blessing_of_spellwarding_buff 204018)
 	SpellInfo(blinding_light cd=90 interrupt=1 tag=cd)
 Define(cleanse 4987)
 	SpellInfo(cleanse cd=8)
-Define(cleense_toxins 213644)
-	SpellInfo(cleense_toxins cd=8)
+Define(cleanse_toxins 213644)
+	SpellInfo(cleanse_toxins cd=8)
 
 	SpellInfo(consecration cd=4.5 tag=main cd_haste=melee specialization=protection)
 	SpellInfo(consecration cd=4.5 tag=main cd_haste=spell specialization=holy)

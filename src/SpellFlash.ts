@@ -7,7 +7,7 @@ import { OvaleStance } from "./Stance";
 import aceEvent from "@wowts/ace_event-3.0";
 import { pairs, lualength, _G, LuaArray, LuaObj } from "@wowts/lua";
 import { GetTime, UnitHasVehicleUI, UnitExists, UnitIsDead, UnitCanAttack } from "@wowts/wow-mock";
-import { baseState } from "./BaseState";
+import { OvaleFuture } from "./Future";
 import { AstNode } from "./AST";
 import { Element } from "./BestAction";
 
@@ -299,7 +299,7 @@ class OvaleSpellFlashClass extends OvaleSpellFlashBase {
         if (enabled && !db.enabled) {
             enabled = false;
         }
-        if (enabled && db.inCombat && !baseState.IsInCombat(undefined)) {
+        if (enabled && db.inCombat && !OvaleFuture.IsInCombat(undefined)) {
             enabled = false;
         }
         if (enabled && db.hideInVehicle && UnitHasVehicleUI("player")) {

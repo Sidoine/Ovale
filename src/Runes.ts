@@ -27,7 +27,6 @@ const IsActiveRune = function(rune: Rune, atTime: number) {
 
 class RuneData {
     rune:LuaArray<Rune> = {}
-    runicpower:number = undefined;
 }
 
 let usedRune: LuaArray<number> = {}
@@ -185,10 +184,9 @@ class OvaleRunesClass extends OvaleRunesBase {
             let duration = 10 / OvalePaperDoll.GetSpellCastSpeedPercentMultiplier(snapshot);
             consumedRune.startCooldown = start;
             consumedRune.endCooldown = start + duration;
-            let runicpower = this.next.runicpower;
-            runicpower = runicpower + 10;
+            let runicpower = (OvalePower.next.power.runicpower || 0) + 10;
             let maxi = OvalePower.current.maxPower.runicpower;
-            this.next.runicpower = (runicpower < maxi) && runicpower || maxi;
+            OvalePower.next.power.runicpower = (runicpower < maxi) && runicpower || maxi;
         } 
         
         this.StopProfiling("OvaleRunes_state_ConsumeRune");

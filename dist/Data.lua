@@ -11,6 +11,7 @@ local __Requirement = LibStub:GetLibrary("ovale/Requirement")
 local nowRequirements = __Requirement.nowRequirements
 local CheckRequirements = __Requirement.CheckRequirements
 local type = type
+local ipairs = ipairs
 local pairs = pairs
 local tonumber = tonumber
 local wipe = wipe
@@ -153,29 +154,6 @@ local OvaleDataClass = __class(OvaleDataBase, {
         self.itemList = {}
         self.spellInfo = {}
         self.buffSpellList = {
-            fear_debuff = {
-                [5246] = true,
-                [5484] = true,
-                [5782] = true,
-                [8122] = true
-            },
-            incapacitate_debuff = {
-                [6770] = true,
-                [12540] = true,
-                [20066] = true,
-                [137460] = true
-            },
-            root_debuff = {
-                [122] = true,
-                [339] = true
-            },
-            stun_debuff = {
-                [408] = true,
-                [853] = true,
-                [1833] = true,
-                [5211] = true,
-                [46968] = true
-            },
             attack_power_multiplier_buff = {
                 [6673] = true,
                 [19506] = true,
@@ -485,11 +463,15 @@ local OvaleDataClass = __class(OvaleDataBase, {
         local value = ii and ii[property]
         local requirements = ii and ii.require[property]
         if requirements then
-            for v, requirement in pairs(requirements) do
-                local verified = CheckRequirements(itemId, atTime, requirement, 1, targetGUID)
-                if verified then
-                    value = tonumber(v) or v
-                    break
+            for v, rArray in pairs(requirements) do
+                if isLuaArray(rArray) then
+                    for _, requirement in ipairs(rArray) do
+                        local verified = CheckRequirements(itemId, atTime, requirement, 1, targetGUID)
+                        if verified then
+                            value = tonumber(v) or v
+                            break
+                        end
+                    end
                 end
             end
         end
@@ -501,11 +483,15 @@ local OvaleDataClass = __class(OvaleDataBase, {
         local value = si and si[property]
         local requirements = si and si.require[property]
         if requirements then
-            for v, requirement in pairs(requirements) do
-                local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
-                if verified then
-                    value = tonumber(v) or v
-                    break
+            for v, rArray in pairs(requirements) do
+                if isLuaArray(rArray) then
+                    for _, requirement in ipairs(rArray) do
+                        local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                        if verified then
+                            value = tonumber(v) or v
+                            break
+                        end
+                    end
                 end
             end
         end
@@ -524,13 +510,17 @@ local OvaleDataClass = __class(OvaleDataBase, {
         if atTime then
             local ratioRequirements = si and si.require[ratioParam]
             if ratioRequirements then
-                for v, requirement in pairs(ratioRequirements) do
-                    local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
-                    if verified then
-                        if ratio ~= 0 then
-                            ratio = ratio * ((tonumber(v) / 100) or 1)
-                        else
-                            break
+                for v, rArray in pairs(ratioRequirements) do
+                    if isLuaArray(rArray) then
+                        for _, requirement in ipairs(rArray) do
+                            local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                            if verified then
+                                if ratio ~= 0 then
+                                    ratio = ratio * ((tonumber(v) / 100) or 1)
+                                else
+                                    break
+                                end
+                            end
                         end
                     end
                 end
@@ -546,10 +536,14 @@ local OvaleDataClass = __class(OvaleDataBase, {
             if atTime then
                 local addRequirements = si and si.require[addParam]
                 if addRequirements then
-                    for v, requirement in pairs(addRequirements) do
-                        local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
-                        if verified then
-                            value = value + (tonumber(v) or 0)
+                    for v, rArray in pairs(addRequirements) do
+                        if isLuaArray(rArray) then
+                            for _, requirement in ipairs(rArray) do
+                                local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                                if verified then
+                                    value = value + (tonumber(v) or 0)
+                                end
+                            end
                         end
                     end
                 end

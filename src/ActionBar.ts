@@ -56,7 +56,7 @@ class OvaleActionBarClass extends OvaleActionBarBase {
     GetKeyBinding(slot: number) {
         let name;
         if (_G["Bartender4"]) {
-            name = `CLICK BT4Button ${slot}:LeftButton`;
+            name = `CLICK BT4Button${slot}:LeftButton`;
         } else {
             if (slot <= 24 || slot > 72) {
                 name = `ACTIONBUTTON${((slot - 1) % 12) + 1}`;

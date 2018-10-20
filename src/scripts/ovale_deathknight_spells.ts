@@ -273,6 +273,7 @@ Define(unholy_blight_talent 6) #22029
 # Surrounds yourself with a vile swarm of insects for 6 seconds, stinging all nearby enemies and infecting them with an unholy disease that deals 115994o1 damage over 14 seconds.
 Define(unholy_frenzy_talent 20) #22110
 # Incites you into a killing frenzy for 12 seconds, increasing Haste by s1 and causing your auto attacks to infect the target with a Festering Wound.
+Define(frozen_tempest_trait 278487)
     `;
 // END
 
@@ -357,6 +358,7 @@ Define(dark_transformation_buff 63560)
 	SpellRequire(death_and_decay runes 0=buff,crimson_scourge_buff)
 	SpellRequire(death_and_decay cd_percent 0=buff,crimson_scourge_buff)
 	SpellAddTargetDebuff(death_and_decay death_and_decay_debuff=1)
+	SpellAddBuff(death_and_decay death_and_decay_buff=1)
 Define(death_and_decay_buff 188290)
 Define(death_and_decay_debuff 43265)
 
@@ -373,7 +375,7 @@ Define(death_pact_debuff 48743)
 	SpellInfo(death_pact_debuff duration=15)
 
 	
-	SpellRequire(death_strike add_runicpower -5=buff,death_strike_cost)
+	SpellRequire(death_strike add_runicpower_from_aura -5=buff,death_strike_cost)
 	SpellAddBuff(death_strike blood_shield_buff=1 specialization=blood)
 	SpellAddBuff(death_strike voracius_buff=1 talent=voracious_talent specialization=blood)
 SpellList(death_strike_cost ossuary_buff gravewarden_buff)
@@ -479,7 +481,7 @@ Define(pillar_of_frost_buff 51271)
 	SpellInfo(pillar_of_frost duration=15)
 Define(raise_ally 61999)
 
-	
+    SpellRequire(raise_dead unusable 1=pet_health_pct,!0)
 Define(razorice_debuff 51714)
 
 	SpellInfo(remorseless_winter cd=20 runes=1 runicpower=-10)
@@ -549,9 +551,6 @@ Define(unholy_strength_buff 53365)
 	SpellInfo(unholy_strength_buff duration=15)
 
 ## Items
-
-Define(cold_heart_buff 235592)
-	SpellInfo(cold_heart_buff max_stacks=20)
 Define(consorts_cold_core 144293)
 Define(koltiras_newfound_will 132366)
 Define(lanathels_lament_item 133974)

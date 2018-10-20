@@ -12,10 +12,11 @@ import "../scripts/ovale_rogue";
 import "../scripts/ovale_shaman";
 import "../scripts/ovale_warlock";
 import "../scripts/ovale_warrior";
+import "../Options";
 import { OvaleCompile } from "../Compile";
 import { pairs } from "@wowts/lua";
 import { Ovale, oneTimeMessages } from "../Ovale";
-import { ClassId, eventDispatcher } from "@wowts/wow-mock";
+import { eventDispatcher } from "@wowts/wow-mock";
 import { OvaleCondition } from "../Condition";
 import "../conditions";
 import { OvaleDebug } from "../Debug";
@@ -32,8 +33,7 @@ for (const [name, script] of pairs(OvaleScripts.script)) {
         OvaleDebug.warning = undefined;
         OvaleDebug.bug = undefined;
         Ovale.playerGUID = "player";
-        // TODO
-        Ovale.playerClass = script.className.toUpperCase() as ClassId;
+        Ovale.playerClass = script.className;
         eventDispatcher.DispatchEvent("ADDON_LOADED", "Ovale");
         OvaleEquipment.UpdateEquippedItems();
         OvaleSpellBook.Update();

@@ -325,10 +325,7 @@ local OvalePaperDollClass = __class(OvalePaperDollBase, {
     UpdateDamage = function(self, event)
         self:StartProfiling("OvalePaperDoll_UpdateDamage")
         local damageMultiplier = GetAppropriateDamageMultiplier("player")
-        if damageMultiplier == 0 then
-            return 
-        end
-        self.current.baseDamageMultiplier = damageMultiplier
+        self.current.baseDamageMultiplier = damageMultiplier or 1
         self.current.mainHandWeaponDPS = OvaleEquipment.mainHandDPS or 0
         self.current.offHandWeaponDPS = OvaleEquipment.offHandDPS or 0
         self.current.snapshotTime = GetTime()

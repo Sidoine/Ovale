@@ -67,9 +67,9 @@ local interruptsClasses = {
     ["kick"] = "ROGUE",
     ["wind_shear"] = "SHAMAN",
     ["counter_shot"] = "HUNTER",
-    counterspell = "MAGE",
-    muzzle = "HUNTER",
-    spear_hand_strike = "MONK"
+    ["counterspell"] = "MAGE",
+    ["muzzle"] = "HUNTER",
+    ["spear_hand_strike"] = "MONK"
 }
 local classInfos = {
     DEATHKNIGHT = {
@@ -125,54 +125,54 @@ local classInfos = {
         }
     },
     MONK = {
-        brewmaster = {
+        ["brewmaster"] = {
             interrupt = "spear_hand_strike"
         },
-        windwalker = {
+        ["windwalker"] = {
             interrupt = "spear_hand_strike"
         }
     },
     PALADIN = {
-        retribution = {
+        ["retribution"] = {
             interrupt = "rebuke"
         },
-        protection = {
+        ["protection"] = {
             interrupt = "rebuke"
         }
     },
     PRIEST = {
-        shadow = {
+        ["shadow"] = {
             interrupt = "silence"
         }
     },
     ROGUE = {
-        assassination = {
+        ["assassination"] = {
             interrupt = "kick"
         },
-        outlaw = {
+        ["outlaw"] = {
             interrupt = "kick"
         },
-        subtlety = {
+        ["subtlety"] = {
             interrupt = "kick"
         }
     },
     SHAMAN = {
-        elemental = {
+        ["elemental"] = {
             interrupt = "wind_shear"
         },
-        enhancement = {
+        ["enhancement"] = {
             interrupt = "wind_shear"
         }
     },
     WARLOCK = {},
     WARRIOR = {
-        fury = {
+        ["fury"] = {
             interrupt = "pummel"
         },
-        protection = {
+        ["protection"] = {
             interrupt = "pummel"
         },
-        arms = {
+        ["arms"] = {
             interrupt = "pummel"
         }
     }
@@ -182,7 +182,6 @@ local CHARACTER_PROPERTY = {
     ["astral_power"] = "AstralPower()",
     ["astral_power.deficit"] = "AstralPowerDeficit()",
     ["blade_dance_worth_using"] = "0",
-    ["blood.frac"] = "Rune(blood)",
     ["buff.arcane_charge.stack"] = "ArcaneCharges()",
     ["buff.arcane_charge.max_stack"] = "MaxArcaneCharges()",
     ["buff.movement.up"] = "Speed() > 0",
@@ -222,7 +221,6 @@ local CHARACTER_PROPERTY = {
     ["focus.max"] = "MaxFocus()",
     ["focus.regen"] = "FocusRegenRate()",
     ["focus.time_to_max"] = "TimeToMaxFocus()",
-    ["frost.frac"] = "Rune(frost)",
     ["fury"] = "Fury()",
     ["fury.deficit"] = "FuryDeficit()",
     ["health"] = "Health()",
@@ -329,6 +327,7 @@ local MODIFIER_KEYWORD = {
     ["toggle"] = true,
     ["travel_speed"] = true,
     ["type"] = true,
+    ["use_off_gcd"] = true,
     ["value"] = true,
     ["value_else"] = true,
     ["wait"] = true,
@@ -1435,6 +1434,7 @@ local InitializeDisambiguation = function()
     AddDisambiguation("judgment", "judgment_prot", "PALADIN", "protection")
     AddDisambiguation("mindbender_talent", "mindbender_talent_discipline", "PRIEST", "discipline")
     AddDisambiguation("twist_of_fate_talent", "twist_of_fate_talent_discipline", "PRIEST", "discipline")
+    AddDisambiguation("deadly_poison_dot", "deadly_poison_debuff", "ROGUE", "assassination")
     AddDisambiguation("stealth_buff", "stealthed_buff", "ROGUE")
     AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_assassination_buff", "ROGUE", "assassination")
     AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_outlaw_buff", "ROGUE", "outlaw")
@@ -1449,6 +1449,8 @@ local InitializeDisambiguation = function()
     AddDisambiguation("healing_surge", "healing_surge_restoration", "SHAMAN", "restoration")
     AddDisambiguation("lightning_bolt", "lightning_bolt_elemental", "SHAMAN", "elemental")
     AddDisambiguation("lightning_bolt", "lightning_bolt_enhancement", "SHAMAN", "enhancement")
+    AddDisambiguation("resonance_totem", "ele_resonance_totem_buff", "SHAMAN", "elemental")
+    AddDisambiguation("resonance_totem", "enh_resonance_totem_buff", "SHAMAN", "enhancement")
     AddDisambiguation("strike", "windstrike", "SHAMAN", "enhancement")
     AddDisambiguation("totem_mastery", "totem_mastery_elemental", "SHAMAN", "elemental")
     AddDisambiguation("totem_mastery", "totem_mastery_enhancement", "SHAMAN", "enhancement")
@@ -1474,11 +1476,13 @@ local InitializeDisambiguation = function()
 end
 
 local IsTotem = function(name)
-    if sub(name, 1, 13) == "wild_mushroom" then
+    if sub(name, 1, 13) == "efflorescence" then
         return true
-    elseif name == "prismatic_crystal" or name == "rune_of_power" then
+    elseif name == "rune_of_power" then
         return true
     elseif sub(name, -7, -1) == "_statue" then
+        return true
+    elseif match(name, "invoke_(niuzao|xuen|chiji)") then
         return true
     elseif sub(name, -6, -1) == "_totem" then
         return true
@@ -2186,6 +2190,11 @@ EmitAction = function(parseNode, nodeList, annotation)
             conditionCode = "SpellKnown(half_moon)"
         elseif className == "DRUID" and action == "full_moon" then
             conditionCode = "SpellKnown(full_moon)"
+        elseif className == "DRUID" and action == "regrowth" and specialization == "feral" then
+            conditionCode = "Talent(bloodtalons_talent) and (BuffRemaining(bloodtalons_buff) < CastTime(regrowth)+GCDRemaining() or InCombat())"
+            AddSymbol(annotation, "bloodtalons_talent")
+            AddSymbol(annotation, "bloodtalons_buff")
+            AddSymbol(annotation, "regrowth")
         elseif className == "HUNTER" and action == "kill_command" then
             conditionCode = "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()"
         elseif className == "MAGE" and action == "arcane_brilliance" then
@@ -2256,12 +2265,8 @@ EmitAction = function(parseNode, nodeList, annotation)
             else
                 isSpellAction = false
             end
-        elseif className == "ROGUE" and action == "between_the_eyes" then
-            bodyCode = "Spell(between_the_eyes text=BTE)"
         elseif className == "ROGUE" and action == "cancel_autoattack" then
             isSpellAction = false
-        elseif className == "ROGUE" and action == "pistol_shot" then
-            bodyCode = "Spell(pistol_shot text=PS)"
         elseif className == "ROGUE" and action == "premeditation" then
             conditionCode = "ComboPoints() < 5"
         elseif className == "ROGUE" and specialization == "assassination" and action == "vanish" then
@@ -2279,9 +2284,12 @@ EmitAction = function(parseNode, nodeList, annotation)
             local spellName = "primal_strike"
             AddSymbol(annotation, spellName)
             conditionCode = format("target.InRange(%s)", spellName)
-        elseif className == "SHAMAN" and action == "totem_mastery" then
-            conditionCode = "(not TotemPresent(totem_mastery) or InCombat()) and Speed() == 0"
-            AddSymbol(annotation, "totem_mastery")
+        elseif className == "SHAMAN" and action == "totem_mastery_elemental" then
+            conditionCode = "(InCombat() or not BuffPresent(ele_resonance_totem_buff))"
+            AddSymbol(annotation, "ele_resonance_totem_buff")
+        elseif className == "SHAMAN" and action == "totem_mastery_enhancement" then
+            conditionCode = "(InCombat() or not BuffPresent(enh_resonance_totem_buff))"
+            AddSymbol(annotation, "enh_resonance_totem_buff")
         elseif className == "WARLOCK" and action == "cancel_metamorphosis" then
             local spellName = "metamorphosis"
             local buffName = "metamorphosis_buff"
@@ -2342,6 +2350,8 @@ EmitAction = function(parseNode, nodeList, annotation)
         elseif className == "DEMONHUNTER" and action == "metamorphosis_havoc" then
             conditionCode = "not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()"
             annotation.opt_meta_only_during_boss = "DEMONHUNTER"
+        elseif className == "DEMONHUNTER" and action == "consume_magic" then
+            conditionCode = "target.HasDebuffType(magic)"
         elseif checkOptionalSkill(action, className, specialization) then
             annotation[action] = className
             conditionCode = "CheckBoxOn(opt_" .. action .. ")"
@@ -2926,7 +2936,7 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
     elseif property == "shard_react" then
         code = "SoulShards() >= 1"
     elseif property == "tick_time" then
-        code = format("%sTickTime(%s)", buffTarget, buffName)
+        code = format("%sCurrentTickTime(%s)", buffTarget, buffName)
         symbol = buffName
     elseif property == "ticking" then
         code = format("%s%sPresent(%s)", buffTarget, prefix, buffName)
@@ -3836,8 +3846,10 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
         code = "BuffRemaining(roll_the_bones_buff)"
         AddSymbol(annotation, "roll_the_bones_buff")
     elseif className == "SHAMAN" and operand == "buff.resonance_totem.remains" then
-        code = "TotemRemaining(totem_mastery)"
+        local spell = Disambiguate(annotation, "totem_mastery", annotation.class, annotation.specialization)
+        code = format("TotemRemaining(%s)", spell)
         ok = true
+        AddSymbol(annotation, spell)
     elseif className == "SHAMAN" and match(operand, "pet.[a-z_]+.active") then
         code = "pet.Present()"
         ok = true

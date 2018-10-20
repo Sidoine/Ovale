@@ -503,7 +503,7 @@ export interface ValuedNamedParameters extends ConditionNamedParameters {
     offgcd?: number;
     casttime?: number;
     pool_resource?: number;
-    size?: string;
+    size?: "small";
     unlimited?: number;
     wait? :number;
     max?: number;
@@ -1512,13 +1512,13 @@ export class OvaleASTClass extends OvaleASTBase {
             }
         }
         let child = this.self_childrenPool.Get();
-        let [tokenType, token] = tokenStream.Peek();
+        let [tokenType] = tokenStream.Peek();
         while (ok && tokenType && tokenType != "}") {
             let statementNode;
             [ok, statementNode] = this.ParseStatement(tokenStream, nodeList, annotation);
             if (ok) {
                 child[lualength(child) + 1] = statementNode;
-                [tokenType, token] = tokenStream.Peek();
+                [tokenType] = tokenStream.Peek();
             } else {
                 break;
             }
@@ -1786,8 +1786,7 @@ export class OvaleASTClass extends OvaleASTBase {
             node.name = name;
             node.rawPositionalParams = positionalParams;
             node.rawNamedParams = namedParams;
-            annotation.parametersReference = annotation.parametersReference || {
-            }
+            annotation.parametersReference = annotation.parametersReference || {}
             annotation.parametersReference[lualength(annotation.parametersReference) + 1] = node;
         }
         return [ok, node];
@@ -1813,12 +1812,12 @@ export class OvaleASTClass extends OvaleASTBase {
     ParseParameterValue: ParserFunction = (tokenStream, nodeList, annotation) => {
         let ok = true;
         let node;
-        let tokenType, token;
+        let tokenType;
         let parameters: LuaArray<AstNode>;
         do {
             [ok, node] = this.ParseSimpleParameterValue(tokenStream, nodeList, annotation);
             if (ok && node) {
-                [tokenType, token] = tokenStream.Peek();
+                [tokenType] = tokenStream.Peek();
                 if (tokenType == ",") {
                     tokenStream.Consume();
                     parameters = parameters || <LuaArray<AstNode>> this.objectPool.Get();
@@ -2104,13 +2103,13 @@ export class OvaleASTClass extends OvaleASTBase {
     ParseSimpleParameterValue: ParserFunction = (tokenStream, nodeList, annotation) => {
         let ok = true;
         let isBang = false;
-        let [tokenType, token] = tokenStream.Peek();
+        let [tokenType] = tokenStream.Peek();
         if (tokenType == "!") {
             isBang = true;
             tokenStream.Consume();
         }
         let expressionNode;
-        [tokenType, token] = tokenStream.Peek();
+        [tokenType] = tokenStream.Peek();
         if (tokenType == "(" || tokenType == "-") {
             [ok, expressionNode] = this.ParseExpression(tokenStream, nodeList, annotation);
         } else {

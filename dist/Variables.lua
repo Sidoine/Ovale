@@ -4,13 +4,15 @@ local __class = LibStub:GetLibrary("tslib").newClass
 local pairs = pairs
 local __State = LibStub:GetLibrary("ovale/State")
 local OvaleState = __State.OvaleState
+local __Future = LibStub:GetLibrary("ovale/Future")
+local OvaleFuture = __Future.OvaleFuture
 local __BaseState = LibStub:GetLibrary("ovale/BaseState")
 local baseState = __BaseState.baseState
 __exports.Variables = __class(nil, {
     InitializeState = function(self)
         self.futureVariable = {}
         self.futureLastEnable = {}
-        if  not baseState.current.inCombat then
+        if  not OvaleFuture:IsInCombat(nil) then
             for k in pairs(self.variable) do
                 self:Log("Resetting state variable '%s'.", k)
                 self.variable[k] = nil

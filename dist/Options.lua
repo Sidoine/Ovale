@@ -110,6 +110,7 @@ local OvaleOptionsClass = __class(OvaleOptionsBase, {
                     minFrameRefresh = 50,
                     maxFrameRefresh = 250,
                     fullAuraScan = false,
+                    frequentHealthUpdates = true,
                     auraLag = 400,
                     moving = false,
                     spellFlash = {
@@ -461,7 +462,14 @@ local OvaleOptionsClass = __class(OvaleOptionsBase, {
                                     width = "full",
                                     type = "toggle",
                                     name = L["Full buffs/debuffs scan"],
-                                    desc = L["Scans also buffs/debuffs casted by other players\n\nWarning!: Very CPU intensive"]
+                                    desc = L["Scans also buffs/debuffs casted by other players or NPCs.\n\nWarning!: Very CPU intensive"]
+                                },
+                                frequentHealthUpdates = {
+                                    order = 60,
+                                    width = "full",
+                                    type = "toggle",
+                                    name = L["Frequent health updates"],
+                                    desc = L["Updates health of units more frquently; enabling this may reduce FPS."]
                                 }
                             }
                         }

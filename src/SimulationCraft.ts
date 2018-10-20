@@ -39,9 +39,9 @@ const interruptsClasses: { [k in Interrupts]: ClassId } = {
     "kick": "ROGUE",
     "wind_shear": "SHAMAN",
     "counter_shot": "HUNTER",
-    counterspell: "MAGE",
-    muzzle: "HUNTER",
-    spear_hand_strike: "MONK"
+    "counterspell": "MAGE",
+    "muzzle": "HUNTER",
+    "spear_hand_strike": "MONK"
 }
 
 interface SpecializationInfo {
@@ -76,31 +76,31 @@ const classInfos: { [key in ClassId]: ClassInfo} = {
         "arcane": {interrupt: "counterspell"}
     },
     MONK: {
-        brewmaster: { interrupt: "spear_hand_strike" },
-        windwalker: { interrupt: "spear_hand_strike"}
+        "brewmaster": { interrupt: "spear_hand_strike" },
+        "windwalker": { interrupt: "spear_hand_strike"}
     },
     PALADIN: {
-        retribution: { interrupt: "rebuke" },
-        protection: { interrupt: "rebuke"}
+        "retribution": { interrupt: "rebuke" },
+        "protection": { interrupt: "rebuke"}
     },
     PRIEST: {
-        shadow: { interrupt: "silence"}
+        "shadow": { interrupt: "silence"}
     },
     ROGUE: {
-        assassination: { interrupt: "kick" },
-        outlaw: { interrupt: "kick" },
-        subtlety: {interrupt: "kick"}
+        "assassination": { interrupt: "kick" },
+        "outlaw": { interrupt: "kick" },
+        "subtlety": {interrupt: "kick"}
     },
     SHAMAN: {
-        elemental: { interrupt: "wind_shear" },
-        enhancement: {interrupt: "wind_shear"}
+        "elemental": { interrupt: "wind_shear" },
+        "enhancement": {interrupt: "wind_shear"}
     },
     WARLOCK: {
     },
     WARRIOR: {
-        fury: { interrupt: "pummel" },
-        protection: { interrupt: "pummel" },
-        arms: { interrupt: "pummel"}
+        "fury": { interrupt: "pummel" },
+        "protection": { interrupt: "pummel" },
+        "arms": { interrupt: "pummel"}
     }
 }
 
@@ -109,7 +109,6 @@ const CHARACTER_PROPERTY: LuaObj<string> = {
     ["astral_power"]: "AstralPower()",
     ["astral_power.deficit"]: "AstralPowerDeficit()",
     ["blade_dance_worth_using"]: "0",
-    ["blood.frac"]: "Rune(blood)",
     ["buff.arcane_charge.stack"]: "ArcaneCharges()",
     ["buff.arcane_charge.max_stack"]: "MaxArcaneCharges()",
     ["buff.movement.up"]: "Speed() > 0",
@@ -149,7 +148,6 @@ const CHARACTER_PROPERTY: LuaObj<string> = {
     ["focus.max"]: "MaxFocus()",
     ["focus.regen"]: "FocusRegenRate()",
     ["focus.time_to_max"]: "TimeToMaxFocus()",
-    ["frost.frac"]: "Rune(frost)",
     ["fury"]: "Fury()",
     ["fury.deficit"]: "FuryDeficit()",
     ["health"]: "Health()",
@@ -317,6 +315,7 @@ interface Modifiers {
     toggle?: ParseNode,
     travel_speed?: ParseNode,
     type?: ParseNode,
+    use_off_gcd?: ParseNode,
     value?: ParseNode,
     value_else?: ParseNode,
     wait?: ParseNode,
@@ -427,6 +426,7 @@ const MODIFIER_KEYWORD: TypeCheck<Modifiers> = {
     ["toggle"]: true,
     ["travel_speed"]: true,
     ["type"]: true,
+    ["use_off_gcd"]: true,
     ["value"]: true,
     ["value_else"]: true,
     ["wait"]: true,
@@ -1495,11 +1495,11 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("none", "none");
 
     //Bloodlust
-    AddDisambiguation("bloodlust_buff", "burst_haste_buff")
-    AddDisambiguation("exhaustion_buff", "burst_haste_debuff")
+    AddDisambiguation("bloodlust_buff", "burst_haste_buff");
+    AddDisambiguation("exhaustion_buff", "burst_haste_debuff");
 
     //Items
-    AddDisambiguation("buff_sephuzs_secret", "sephuzs_secret_buff")
+    AddDisambiguation("buff_sephuzs_secret", "sephuzs_secret_buff");
 
     //Arcane Torrent
     AddDisambiguation("arcane_torrent", "arcane_torrent_runicpower", "DEATHKNIGHT");
@@ -1597,25 +1597,28 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("twist_of_fate_talent", "twist_of_fate_talent_discipline", "PRIEST", "discipline");
 
     //Rogue
+    AddDisambiguation("deadly_poison_dot", "deadly_poison_debuff", "ROGUE", "assassination");
     AddDisambiguation("stealth_buff", "stealthed_buff", "ROGUE");
     AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_assassination_buff", "ROGUE", "assassination");
     AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_outlaw_buff", "ROGUE", "outlaw");
     AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_subtlety_buff", "ROGUE", "subtlety");
 
     //Shaman
-    AddDisambiguation("ascendance", "ascendance_elemental", "SHAMAN", "elemental")
-    AddDisambiguation("ascendance", "ascendance_enhancement", "SHAMAN", "enhancement")
-    AddDisambiguation("ascendance", "ascendance_restoration", "SHAMAN", "restoration")
-    AddDisambiguation("chain_lightning", "chain_lightning_restoration", "SHAMAN", "restoration")
+    AddDisambiguation("ascendance", "ascendance_elemental", "SHAMAN", "elemental");
+    AddDisambiguation("ascendance", "ascendance_enhancement", "SHAMAN", "enhancement");
+    AddDisambiguation("ascendance", "ascendance_restoration", "SHAMAN", "restoration");
+    AddDisambiguation("chain_lightning", "chain_lightning_restoration", "SHAMAN", "restoration");
     AddDisambiguation("earth_shield_talent", "earth_shield_talent_restoration", "SHAMAN", "restoration");
     AddDisambiguation("echo_of_the_elements_talent", "resto_echo_of_the_elements_talent", "SHAMAN", "restoration");
-    AddDisambiguation("flame_shock", "flame_shock_restoration", "SHAMAN", "restoration")
-    AddDisambiguation("healing_surge", "healing_surge_restoration", "SHAMAN", "restoration")
-    AddDisambiguation("lightning_bolt", "lightning_bolt_elemental", "SHAMAN", "elemental")
-    AddDisambiguation("lightning_bolt", "lightning_bolt_enhancement", "SHAMAN", "enhancement")
-    AddDisambiguation("strike", "windstrike", "SHAMAN", "enhancement")
-    AddDisambiguation("totem_mastery", "totem_mastery_elemental", "SHAMAN", "elemental")
-    AddDisambiguation("totem_mastery", "totem_mastery_enhancement", "SHAMAN", "enhancement")
+    AddDisambiguation("flame_shock", "flame_shock_restoration", "SHAMAN", "restoration");
+    AddDisambiguation("healing_surge", "healing_surge_restoration", "SHAMAN", "restoration");
+    AddDisambiguation("lightning_bolt", "lightning_bolt_elemental", "SHAMAN", "elemental");
+    AddDisambiguation("lightning_bolt", "lightning_bolt_enhancement", "SHAMAN", "enhancement");
+    AddDisambiguation("resonance_totem", "ele_resonance_totem_buff", "SHAMAN", "elemental");
+    AddDisambiguation("resonance_totem", "enh_resonance_totem_buff", "SHAMAN", "enhancement");
+    AddDisambiguation("strike", "windstrike", "SHAMAN", "enhancement");
+    AddDisambiguation("totem_mastery", "totem_mastery_elemental", "SHAMAN", "elemental");
+    AddDisambiguation("totem_mastery", "totem_mastery_enhancement", "SHAMAN", "enhancement");
 
     //Warlock
     AddDisambiguation("132369", "wilfreds_sigil_of_superior_summoning", "WARLOCK", "demonology");
@@ -1641,11 +1644,13 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("meat_cleaver", "whirlwind", "WARRIOR", "fury")
 }
 const IsTotem = function(name: string) {
-    if (sub(name, 1, 13) == "wild_mushroom") {
+    if (sub(name, 1, 13) == "efflorescence") {
         return true;
-    } else if (name == "prismatic_crystal" || name == "rune_of_power") {
+    } else if (name == "rune_of_power") {
         return true;
     } else if (sub(name, -7, -1) == "_statue") {
+        return true;
+    } else if (truthy(match(name, "invoke_(niuzao|xuen|chiji)"))) {
         return true;
     } else if (sub(name, -6, -1) == "_totem") {
         return true;
@@ -2341,8 +2346,7 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             annotation[action as keyof typeof interruptsClasses] = className;
             annotation.interrupt = className;
             isSpellAction = false;
-        }
-        else if (className == "DEATHKNIGHT" && action == "antimagic_shell") {
+        } else if (className == "DEATHKNIGHT" && action == "antimagic_shell") {
             conditionCode = "IncomingDamage(1.5 magic=1) > 0";
         } else if (className == "DRUID" && action == "pulverize") {
             let debuffName = "thrash_bear_debuff";
@@ -2364,6 +2368,11 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             conditionCode = "SpellKnown(half_moon)";
         } else if (className == "DRUID" && action == "full_moon") {
             conditionCode = "SpellKnown(full_moon)";
+        } else if (className == "DRUID" && action == "regrowth" && specialization == "feral") {
+            conditionCode = "Talent(bloodtalons_talent) and (BuffRemaining(bloodtalons_buff) < CastTime(regrowth)+GCDRemaining() or InCombat())"
+            AddSymbol(annotation, "bloodtalons_talent")
+            AddSymbol(annotation, "bloodtalons_buff")
+            AddSymbol(annotation, "regrowth")
         } else if (className == "HUNTER" && action == "kill_command") {
             conditionCode = "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()";
         } else if (className == "MAGE" && action == "arcane_brilliance") {
@@ -2434,12 +2443,8 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             } else {
                 isSpellAction = false;
             }
-        } else if (className == "ROGUE" && action == "between_the_eyes") {
-            bodyCode = "Spell(between_the_eyes text=BTE)";
         } else if (className == "ROGUE" && action == "cancel_autoattack") {
             isSpellAction = false;
-        } else if (className == "ROGUE" && action == "pistol_shot") {
-            bodyCode = "Spell(pistol_shot text=PS)";
         } else if (className == "ROGUE" && action == "premeditation") {
             conditionCode = "ComboPoints() < 5";
         } else if (className == "ROGUE" && specialization == "assassination" && action == "vanish") {
@@ -2457,9 +2462,12 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             let spellName = "primal_strike";
             AddSymbol(annotation, spellName);
             conditionCode = format("target.InRange(%s)", spellName);
-        } else if (className == "SHAMAN" && action == "totem_mastery") {
-            conditionCode = "(not TotemPresent(totem_mastery) or InCombat()) and Speed() == 0";
-            AddSymbol(annotation, "totem_mastery");
+        } else if (className == "SHAMAN" && action == "totem_mastery_elemental") {
+            conditionCode = "(InCombat() or not BuffPresent(ele_resonance_totem_buff))";
+            AddSymbol(annotation, "ele_resonance_totem_buff");
+		} else if (className == "SHAMAN" && action == "totem_mastery_enhancement") {
+            conditionCode = "(InCombat() or not BuffPresent(enh_resonance_totem_buff))";
+            AddSymbol(annotation, "enh_resonance_totem_buff");
         } else if (className == "WARLOCK" && action == "cancel_metamorphosis") {
             let spellName = "metamorphosis";
             let buffName = "metamorphosis_buff";
@@ -2520,6 +2528,8 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
         } else if (className == "DEMONHUNTER" && action == "metamorphosis_havoc") {
             conditionCode = "not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()";
             annotation.opt_meta_only_during_boss = "DEMONHUNTER";
+        } else if (className == "DEMONHUNTER" && action == "consume_magic") {
+            conditionCode = "target.HasDebuffType(magic)";
         } else if (checkOptionalSkill(action, className, specialization)) {
             annotation[action] = className;
             conditionCode = `CheckBoxOn(opt_${action})`;
@@ -3106,7 +3116,7 @@ EmitOperandAction = function (operand, parseNode, nodeList, annotation, action, 
     } else if (property == "shard_react") {
         code = "SoulShards() >= 1";
     } else if (property == "tick_time") {
-        code = format("%sTickTime(%s)", buffTarget, buffName);
+        code = format("%sCurrentTickTime(%s)", buffTarget, buffName);
         symbol = buffName;
     } else if (property == "ticking") {
         code = format("%s%sPresent(%s)", buffTarget, prefix, buffName);
@@ -3851,14 +3861,6 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
         let buffName = "breath_of_sindragosa_buff";
         code = format("BuffPresent(%s)", buffName);
         AddSymbol(annotation, buffName);
-    /*
-    } else if (className == "DEATHKNIGHT" && sub(operand, -9, -1) == ".ready_in") {
-        let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
-        let spellName = tokenIterator();
-        [spellName] = Disambiguate(spellName, className, specialization);
-        code = format("TimeToSpell(%s)", spellName);
-        AddSymbol(annotation, spellName);
-    */
     } else if (className == "DEATHKNIGHT" && sub(operand, 1, 24) == "pet.dancing_rune_weapon.") {
         let petOperand = sub(operand, 25);
         let tokenIterator = gmatch(petOperand, OPERAND_TOKEN_PATTERN);
@@ -4006,8 +4008,10 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
         code = "BuffRemaining(roll_the_bones_buff)";
         AddSymbol(annotation, "roll_the_bones_buff");
     } else if (className == "SHAMAN" && operand == "buff.resonance_totem.remains") {
-        code = "TotemRemaining(totem_mastery)";
+        let [spell] = Disambiguate(annotation, "totem_mastery", annotation.class, annotation.specialization);
+        code = format("TotemRemaining(%s)", spell);
         ok = true;
+        AddSymbol(annotation, spell);
     } else if (className == "SHAMAN" && truthy(match(operand, "pet.[a-z_]+.active"))) {
         code = "pet.Present()";
         ok = true;

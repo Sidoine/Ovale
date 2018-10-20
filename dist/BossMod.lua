@@ -11,8 +11,8 @@ local UnitExists = UnitExists
 local UnitClassification = UnitClassification
 local _G = _G
 local hooksecurefunc = hooksecurefunc
-local __BaseState = LibStub:GetLibrary("ovale/BaseState")
-local baseState = __BaseState.baseState
+local __Future = LibStub:GetLibrary("ovale/Future")
+local OvaleFuture = __Future.OvaleFuture
 local OvaleBossModBase = OvaleProfiler:RegisterProfiling(OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleBossMod")))
 local _BigWigsLoader = _G["BigWigsLoader"]
 local _DBM = _G["DBM"]
@@ -42,7 +42,7 @@ local OvaleBossModClass = __class(OvaleBossModBase, {
     OnDisable = function(self)
     end,
     IsBossEngaged = function(self, atTime)
-        if  not baseState:IsInCombat(atTime) then
+        if  not OvaleFuture:IsInCombat(atTime) then
             return false
         end
         local dbmEngaged = (_DBM ~= nil and self.EngagedDBM ~= nil and self.EngagedDBM.inCombat)

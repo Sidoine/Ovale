@@ -21,7 +21,7 @@ AddFunction padding
  ExecuteTime(shadow_bolt_affliction) * HasAzeriteTrait(cascading_calamity_trait)
 }
 
-AddFunction spammable_seed
+AddFunction use_seed
 {
  Talent(sow_the_seeds_talent) and Enemies() >= 3 or Talent(siphon_life_talent) and Enemies() >= 5 or Enemies() >= 8
 }
@@ -32,6 +32,61 @@ AddFunction AfflictionUseItemActions
 {
  Item(Trinket0Slot text=13 usable=1)
  Item(Trinket1Slot text=14 usable=1)
+}
+
+### actions.spenders
+
+AddFunction AfflictionSpendersMainActions
+{
+ #unstable_affliction,if=cooldown.summon_darkglare.remains<=soul_shard*execute_time
+ if SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) Spell(unstable_affliction)
+ #call_action_list,name=fillers,if=(cooldown.summon_darkglare.remains<time_to_shard*(5-soul_shard)|cooldown.summon_darkglare.up)&time_to_die>cooldown.summon_darkglare.remains
+ if { SpellCooldown(summon_darkglare) < TimeToShard() * { 5 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) AfflictionFillersMainActions()
+
+ unless { SpellCooldown(summon_darkglare) < TimeToShard() * { 5 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) and AfflictionFillersMainPostConditions()
+ {
+  #seed_of_corruption,if=variable.use_seed
+  if use_seed() Spell(seed_of_corruption)
+  #unstable_affliction,if=!variable.use_seed&!prev_gcd.1.summon_darkglare&(talent.deathbolt.enabled&cooldown.deathbolt.remains<=execute_time&!azerite.cascading_calamity.enabled|soul_shard>=2&target.time_to_die>4+execute_time&active_enemies=1|target.time_to_die<=8+execute_time*soul_shard)
+  if not use_seed() and not PreviousGCDSpell(summon_darkglare) and { Talent(deathbolt_talent) and SpellCooldown(deathbolt) <= ExecuteTime(unstable_affliction) and not HasAzeriteTrait(cascading_calamity_trait) or SoulShards() >= 2 and target.TimeToDie() > 4 + ExecuteTime(unstable_affliction) and Enemies() == 1 or target.TimeToDie() <= 8 + ExecuteTime(unstable_affliction) * SoulShards() } Spell(unstable_affliction)
+  #unstable_affliction,if=!variable.use_seed&contagion<=cast_time+variable.padding
+  if not use_seed() and BuffRemaining(unstable_affliction_buff) <= CastTime(unstable_affliction) + padding() Spell(unstable_affliction)
+  #unstable_affliction,cycle_targets=1,if=!variable.use_seed&(!talent.deathbolt.enabled|cooldown.deathbolt.remains>time_to_shard|soul_shard>1)&contagion<=cast_time+variable.padding&(!azerite.cascading_calamity.enabled|buff.cascading_calamity.remains>time_to_shard)
+  if not use_seed() and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) > TimeToShard() or SoulShards() > 1 } and BuffRemaining(unstable_affliction_buff) <= CastTime(unstable_affliction) + padding() and { not HasAzeriteTrait(cascading_calamity_trait) or BuffRemaining(cascading_calamity_buff) > TimeToShard() } Spell(unstable_affliction)
+ }
+}
+
+AddFunction AfflictionSpendersMainPostConditions
+{
+ { SpellCooldown(summon_darkglare) < TimeToShard() * { 5 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) and AfflictionFillersMainPostConditions()
+}
+
+AddFunction AfflictionSpendersShortCdActions
+{
+ unless SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Spell(unstable_affliction)
+ {
+  #call_action_list,name=fillers,if=(cooldown.summon_darkglare.remains<time_to_shard*(5-soul_shard)|cooldown.summon_darkglare.up)&time_to_die>cooldown.summon_darkglare.remains
+  if { SpellCooldown(summon_darkglare) < TimeToShard() * { 5 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) AfflictionFillersShortCdActions()
+ }
+}
+
+AddFunction AfflictionSpendersShortCdPostConditions
+{
+ SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Spell(unstable_affliction) or { SpellCooldown(summon_darkglare) < TimeToShard() * { 5 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) and AfflictionFillersShortCdPostConditions() or use_seed() and Spell(seed_of_corruption) or not use_seed() and not PreviousGCDSpell(summon_darkglare) and { Talent(deathbolt_talent) and SpellCooldown(deathbolt) <= ExecuteTime(unstable_affliction) and not HasAzeriteTrait(cascading_calamity_trait) or SoulShards() >= 2 and target.TimeToDie() > 4 + ExecuteTime(unstable_affliction) and Enemies() == 1 or target.TimeToDie() <= 8 + ExecuteTime(unstable_affliction) * SoulShards() } and Spell(unstable_affliction) or not use_seed() and BuffRemaining(unstable_affliction_buff) <= CastTime(unstable_affliction) + padding() and Spell(unstable_affliction) or not use_seed() and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) > TimeToShard() or SoulShards() > 1 } and BuffRemaining(unstable_affliction_buff) <= CastTime(unstable_affliction) + padding() and { not HasAzeriteTrait(cascading_calamity_trait) or BuffRemaining(cascading_calamity_buff) > TimeToShard() } and Spell(unstable_affliction)
+}
+
+AddFunction AfflictionSpendersCdActions
+{
+ unless SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Spell(unstable_affliction)
+ {
+  #call_action_list,name=fillers,if=(cooldown.summon_darkglare.remains<time_to_shard*(5-soul_shard)|cooldown.summon_darkglare.up)&time_to_die>cooldown.summon_darkglare.remains
+  if { SpellCooldown(summon_darkglare) < TimeToShard() * { 5 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) AfflictionFillersCdActions()
+ }
+}
+
+AddFunction AfflictionSpendersCdPostConditions
+{
+ SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Spell(unstable_affliction) or { SpellCooldown(summon_darkglare) < TimeToShard() * { 5 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) and AfflictionFillersCdPostConditions() or use_seed() and Spell(seed_of_corruption) or not use_seed() and not PreviousGCDSpell(summon_darkglare) and { Talent(deathbolt_talent) and SpellCooldown(deathbolt) <= ExecuteTime(unstable_affliction) and not HasAzeriteTrait(cascading_calamity_trait) or SoulShards() >= 2 and target.TimeToDie() > 4 + ExecuteTime(unstable_affliction) and Enemies() == 1 or target.TimeToDie() <= 8 + ExecuteTime(unstable_affliction) * SoulShards() } and Spell(unstable_affliction) or not use_seed() and BuffRemaining(unstable_affliction_buff) <= CastTime(unstable_affliction) + padding() and Spell(unstable_affliction) or not use_seed() and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) > TimeToShard() or SoulShards() > 1 } and BuffRemaining(unstable_affliction_buff) <= CastTime(unstable_affliction) + padding() and { not HasAzeriteTrait(cascading_calamity_trait) or BuffRemaining(cascading_calamity_buff) > TimeToShard() } and Spell(unstable_affliction)
 }
 
 ### actions.precombat
@@ -85,6 +140,8 @@ AddFunction AfflictionPrecombatCdPostConditions
 
 AddFunction AfflictionFillersMainActions
 {
+ #agony,if=talent.deathbolt.enabled&cooldown.summon_darkglare.remains>=30+gcd&cooldown.deathbolt.remains<=gcd&!prev_gcd.1.summon_darkglare&!prev_gcd.1.agony&talent.writhe_in_agony.enabled&azerite.sudden_onset.enabled&remains<duration*0.5
+ if Talent(deathbolt_talent) and SpellCooldown(summon_darkglare) >= 30 + GCD() and SpellCooldown(deathbolt) <= GCD() and not PreviousGCDSpell(summon_darkglare) and not PreviousGCDSpell(agony) and Talent(writhe_in_agony_talent) and HasAzeriteTrait(sudden_onset_trait) and target.DebuffRemaining(agony_debuff) < BaseDuration(agony_debuff) * 0.5 Spell(agony)
  #shadow_bolt,if=buff.movement.up&buff.nightfall.remains
  if Speed() > 0 and BuffPresent(nightfall_buff) Spell(shadow_bolt_affliction)
  #agony,if=buff.movement.up&!(talent.siphon_life.enabled&(prev_gcd.1.agony&prev_gcd.2.agony&prev_gcd.3.agony)|prev_gcd.1.agony)
@@ -95,9 +152,15 @@ AddFunction AfflictionFillersMainActions
  if Speed() > 0 and not PreviousGCDSpell(corruption) and not Talent(absolute_corruption_talent) Spell(corruption)
  #drain_life,if=(buff.inevitable_demise.stack>=90&(cooldown.deathbolt.remains>execute_time|!talent.deathbolt.enabled)&(cooldown.phantom_singularity.remains>execute_time|!talent.phantom_singularity.enabled)&(cooldown.dark_soul.remains>execute_time|!talent.dark_soul_misery.enabled)&(cooldown.vile_taint.remains>execute_time|!talent.vile_taint.enabled)&cooldown.summon_darkglare.remains>execute_time+10|buff.inevitable_demise.stack>30&target.time_to_die<=10)
  if BuffStacks(inevitable_demise_buff) >= 90 and { SpellCooldown(deathbolt) > ExecuteTime(drain_life) or not Talent(deathbolt_talent) } and { SpellCooldown(phantom_singularity) > ExecuteTime(drain_life) or not Talent(phantom_singularity_talent) } and { SpellCooldown(dark_soul_misery) > ExecuteTime(drain_life) or not Talent(dark_soul_misery_talent) } and { SpellCooldown(vile_taint) > ExecuteTime(drain_life) or not Talent(vile_taint_talent) } and SpellCooldown(summon_darkglare) > ExecuteTime(drain_life) + 10 or BuffStacks(inevitable_demise_buff) > 30 and target.TimeToDie() <= 10 Spell(drain_life)
- #drain_soul,interrupt_global=1,chain=1,cycle_targets=1,if=target.time_to_die<=gcd
+ #haunt
+ Spell(haunt)
+ #drain_soul,interrupt_global=1,chain=1,interrupt=1,cycle_targets=1,if=target.time_to_die<=gcd
  if target.TimeToDie() <= GCD() Spell(drain_soul)
- #drain_soul,interrupt_global=1,chain=1
+ #drain_soul,target_if=min:debuff.shadow_embrace.remains,chain=1,interrupt_if=ticks_remain<5,interrupt_global=1,if=talent.shadow_embrace.enabled&active_enemies=2&!debuff.shadow_embrace.remains
+ if Talent(shadow_embrace_talent) and Enemies() == 2 and not target.DebuffPresent(shadow_embrace_debuff) Spell(drain_soul)
+ #drain_soul,target_if=min:debuff.shadow_embrace.remains,chain=1,interrupt_if=ticks_remain<5,interrupt_global=1,if=talent.shadow_embrace.enabled&active_enemies=2
+ if Talent(shadow_embrace_talent) and Enemies() == 2 Spell(drain_soul)
+ #drain_soul,interrupt_global=1,chain=1,interrupt=1
  Spell(drain_soul)
  #shadow_bolt,cycle_targets=1,if=talent.shadow_embrace.enabled&talent.absolute_corruption.enabled&active_enemies=2&!debuff.shadow_embrace.remains&!action.shadow_bolt.in_flight
  if Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() == 2 and not target.DebuffPresent(shadow_embrace_debuff) and not InFlightToTarget(shadow_bolt_affliction) Spell(shadow_bolt_affliction)
@@ -113,13 +176,16 @@ AddFunction AfflictionFillersMainPostConditions
 
 AddFunction AfflictionFillersShortCdActions
 {
- #deathbolt,if=cooldown.summon_darkglare.remains>=30+gcd|cooldown.summon_darkglare.remains>140
- if SpellCooldown(summon_darkglare) >= 30 + GCD() or SpellCooldown(summon_darkglare) > 140 Spell(deathbolt)
+ unless Talent(deathbolt_talent) and SpellCooldown(summon_darkglare) >= 30 + GCD() and SpellCooldown(deathbolt) <= GCD() and not PreviousGCDSpell(summon_darkglare) and not PreviousGCDSpell(agony) and Talent(writhe_in_agony_talent) and HasAzeriteTrait(sudden_onset_trait) and target.DebuffRemaining(agony_debuff) < BaseDuration(agony_debuff) * 0.5 and Spell(agony)
+ {
+  #deathbolt,if=cooldown.summon_darkglare.remains>=30+gcd|cooldown.summon_darkglare.remains>140
+  if SpellCooldown(summon_darkglare) >= 30 + GCD() or SpellCooldown(summon_darkglare) > 140 Spell(deathbolt)
+ }
 }
 
 AddFunction AfflictionFillersShortCdPostConditions
 {
- Speed() > 0 and BuffPresent(nightfall_buff) and Spell(shadow_bolt_affliction) or Speed() > 0 and not { Talent(siphon_life_talent) and PreviousGCDSpell(agony) and PreviousGCDSpell(agony count=2) and PreviousGCDSpell(agony count=3) or PreviousGCDSpell(agony) } and Spell(agony) or Speed() > 0 and not { PreviousGCDSpell(siphon_life) and PreviousGCDSpell(siphon_life count=2) and PreviousGCDSpell(siphon_life count=3) } and Spell(siphon_life) or Speed() > 0 and not PreviousGCDSpell(corruption) and not Talent(absolute_corruption_talent) and Spell(corruption) or { BuffStacks(inevitable_demise_buff) >= 90 and { SpellCooldown(deathbolt) > ExecuteTime(drain_life) or not Talent(deathbolt_talent) } and { SpellCooldown(phantom_singularity) > ExecuteTime(drain_life) or not Talent(phantom_singularity_talent) } and { SpellCooldown(dark_soul_misery) > ExecuteTime(drain_life) or not Talent(dark_soul_misery_talent) } and { SpellCooldown(vile_taint) > ExecuteTime(drain_life) or not Talent(vile_taint_talent) } and SpellCooldown(summon_darkglare) > ExecuteTime(drain_life) + 10 or BuffStacks(inevitable_demise_buff) > 30 and target.TimeToDie() <= 10 } and Spell(drain_life) or target.TimeToDie() <= GCD() and Spell(drain_soul) or Spell(drain_soul) or Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() == 2 and not target.DebuffPresent(shadow_embrace_debuff) and not InFlightToTarget(shadow_bolt_affliction) and Spell(shadow_bolt_affliction) or Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() == 2 and Spell(shadow_bolt_affliction) or Spell(shadow_bolt_affliction)
+ Talent(deathbolt_talent) and SpellCooldown(summon_darkglare) >= 30 + GCD() and SpellCooldown(deathbolt) <= GCD() and not PreviousGCDSpell(summon_darkglare) and not PreviousGCDSpell(agony) and Talent(writhe_in_agony_talent) and HasAzeriteTrait(sudden_onset_trait) and target.DebuffRemaining(agony_debuff) < BaseDuration(agony_debuff) * 0.5 and Spell(agony) or Speed() > 0 and BuffPresent(nightfall_buff) and Spell(shadow_bolt_affliction) or Speed() > 0 and not { Talent(siphon_life_talent) and PreviousGCDSpell(agony) and PreviousGCDSpell(agony count=2) and PreviousGCDSpell(agony count=3) or PreviousGCDSpell(agony) } and Spell(agony) or Speed() > 0 and not { PreviousGCDSpell(siphon_life) and PreviousGCDSpell(siphon_life count=2) and PreviousGCDSpell(siphon_life count=3) } and Spell(siphon_life) or Speed() > 0 and not PreviousGCDSpell(corruption) and not Talent(absolute_corruption_talent) and Spell(corruption) or { BuffStacks(inevitable_demise_buff) >= 90 and { SpellCooldown(deathbolt) > ExecuteTime(drain_life) or not Talent(deathbolt_talent) } and { SpellCooldown(phantom_singularity) > ExecuteTime(drain_life) or not Talent(phantom_singularity_talent) } and { SpellCooldown(dark_soul_misery) > ExecuteTime(drain_life) or not Talent(dark_soul_misery_talent) } and { SpellCooldown(vile_taint) > ExecuteTime(drain_life) or not Talent(vile_taint_talent) } and SpellCooldown(summon_darkglare) > ExecuteTime(drain_life) + 10 or BuffStacks(inevitable_demise_buff) > 30 and target.TimeToDie() <= 10 } and Spell(drain_life) or Spell(haunt) or target.TimeToDie() <= GCD() and Spell(drain_soul) or Talent(shadow_embrace_talent) and Enemies() == 2 and not target.DebuffPresent(shadow_embrace_debuff) and Spell(drain_soul) or Talent(shadow_embrace_talent) and Enemies() == 2 and Spell(drain_soul) or Spell(drain_soul) or Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() == 2 and not target.DebuffPresent(shadow_embrace_debuff) and not InFlightToTarget(shadow_bolt_affliction) and Spell(shadow_bolt_affliction) or Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() == 2 and Spell(shadow_bolt_affliction) or Spell(shadow_bolt_affliction)
 }
 
 AddFunction AfflictionFillersCdActions
@@ -128,105 +194,69 @@ AddFunction AfflictionFillersCdActions
 
 AddFunction AfflictionFillersCdPostConditions
 {
- { SpellCooldown(summon_darkglare) >= 30 + GCD() or SpellCooldown(summon_darkglare) > 140 } and Spell(deathbolt) or Speed() > 0 and BuffPresent(nightfall_buff) and Spell(shadow_bolt_affliction) or Speed() > 0 and not { Talent(siphon_life_talent) and PreviousGCDSpell(agony) and PreviousGCDSpell(agony count=2) and PreviousGCDSpell(agony count=3) or PreviousGCDSpell(agony) } and Spell(agony) or Speed() > 0 and not { PreviousGCDSpell(siphon_life) and PreviousGCDSpell(siphon_life count=2) and PreviousGCDSpell(siphon_life count=3) } and Spell(siphon_life) or Speed() > 0 and not PreviousGCDSpell(corruption) and not Talent(absolute_corruption_talent) and Spell(corruption) or { BuffStacks(inevitable_demise_buff) >= 90 and { SpellCooldown(deathbolt) > ExecuteTime(drain_life) or not Talent(deathbolt_talent) } and { SpellCooldown(phantom_singularity) > ExecuteTime(drain_life) or not Talent(phantom_singularity_talent) } and { SpellCooldown(dark_soul_misery) > ExecuteTime(drain_life) or not Talent(dark_soul_misery_talent) } and { SpellCooldown(vile_taint) > ExecuteTime(drain_life) or not Talent(vile_taint_talent) } and SpellCooldown(summon_darkglare) > ExecuteTime(drain_life) + 10 or BuffStacks(inevitable_demise_buff) > 30 and target.TimeToDie() <= 10 } and Spell(drain_life) or target.TimeToDie() <= GCD() and Spell(drain_soul) or Spell(drain_soul) or Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() == 2 and not target.DebuffPresent(shadow_embrace_debuff) and not InFlightToTarget(shadow_bolt_affliction) and Spell(shadow_bolt_affliction) or Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() == 2 and Spell(shadow_bolt_affliction) or Spell(shadow_bolt_affliction)
+ Talent(deathbolt_talent) and SpellCooldown(summon_darkglare) >= 30 + GCD() and SpellCooldown(deathbolt) <= GCD() and not PreviousGCDSpell(summon_darkglare) and not PreviousGCDSpell(agony) and Talent(writhe_in_agony_talent) and HasAzeriteTrait(sudden_onset_trait) and target.DebuffRemaining(agony_debuff) < BaseDuration(agony_debuff) * 0.5 and Spell(agony) or { SpellCooldown(summon_darkglare) >= 30 + GCD() or SpellCooldown(summon_darkglare) > 140 } and Spell(deathbolt) or Speed() > 0 and BuffPresent(nightfall_buff) and Spell(shadow_bolt_affliction) or Speed() > 0 and not { Talent(siphon_life_talent) and PreviousGCDSpell(agony) and PreviousGCDSpell(agony count=2) and PreviousGCDSpell(agony count=3) or PreviousGCDSpell(agony) } and Spell(agony) or Speed() > 0 and not { PreviousGCDSpell(siphon_life) and PreviousGCDSpell(siphon_life count=2) and PreviousGCDSpell(siphon_life count=3) } and Spell(siphon_life) or Speed() > 0 and not PreviousGCDSpell(corruption) and not Talent(absolute_corruption_talent) and Spell(corruption) or { BuffStacks(inevitable_demise_buff) >= 90 and { SpellCooldown(deathbolt) > ExecuteTime(drain_life) or not Talent(deathbolt_talent) } and { SpellCooldown(phantom_singularity) > ExecuteTime(drain_life) or not Talent(phantom_singularity_talent) } and { SpellCooldown(dark_soul_misery) > ExecuteTime(drain_life) or not Talent(dark_soul_misery_talent) } and { SpellCooldown(vile_taint) > ExecuteTime(drain_life) or not Talent(vile_taint_talent) } and SpellCooldown(summon_darkglare) > ExecuteTime(drain_life) + 10 or BuffStacks(inevitable_demise_buff) > 30 and target.TimeToDie() <= 10 } and Spell(drain_life) or Spell(haunt) or target.TimeToDie() <= GCD() and Spell(drain_soul) or Talent(shadow_embrace_talent) and Enemies() == 2 and not target.DebuffPresent(shadow_embrace_debuff) and Spell(drain_soul) or Talent(shadow_embrace_talent) and Enemies() == 2 and Spell(drain_soul) or Spell(drain_soul) or Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() == 2 and not target.DebuffPresent(shadow_embrace_debuff) and not InFlightToTarget(shadow_bolt_affliction) and Spell(shadow_bolt_affliction) or Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() == 2 and Spell(shadow_bolt_affliction) or Spell(shadow_bolt_affliction)
 }
 
-### actions.default
+### actions.dots
 
-AddFunction AfflictionDefaultMainActions
+AddFunction AfflictionDotsMainActions
 {
- #drain_soul,interrupt_global=1,chain=1,cycle_targets=1,if=target.time_to_die<=gcd&soul_shard<5
- if target.TimeToDie() <= GCD() and SoulShards() < 5 Spell(drain_soul)
- #haunt
- Spell(haunt)
- #agony,cycle_targets=1,if=remains<=gcd
- if target.DebuffRemaining(agony_debuff) <= GCD() Spell(agony)
- #shadow_bolt,target_if=min:debuff.shadow_embrace.remains,if=talent.shadow_embrace.enabled&talent.absolute_corruption.enabled&active_enemies=2&debuff.shadow_embrace.remains&debuff.shadow_embrace.remains<=execute_time*2+travel_time&!action.shadow_bolt.in_flight
- if Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() == 2 and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= ExecuteTime(shadow_bolt_affliction) * 2 + TravelTime(shadow_bolt_affliction) and not InFlightToTarget(shadow_bolt_affliction) Spell(shadow_bolt_affliction)
- #vile_taint,if=time>20
- if TimeInCombat() > 20 Spell(vile_taint)
  #seed_of_corruption,if=dot.corruption.remains<=action.seed_of_corruption.cast_time+time_to_shard+4.2*(1-talent.creeping_death.enabled*0.15)&spell_targets.seed_of_corruption_aoe>=3+talent.writhe_in_agony.enabled&!dot.seed_of_corruption.remains&!action.seed_of_corruption.in_flight
  if target.DebuffRemaining(corruption_debuff) <= CastTime(seed_of_corruption) + TimeToShard() + 4.2 * { 1 - TalentPoints(creeping_death_talent) * 0.15 } and Enemies() >= 3 + TalentPoints(writhe_in_agony_talent) and not target.DebuffRemaining(seed_of_corruption_debuff) and not InFlightToTarget(seed_of_corruption) Spell(seed_of_corruption)
- #agony,cycle_targets=1,max_cycle_targets=6,if=talent.creeping_death.enabled&target.time_to_die>10&refreshable
- if DebuffCountOnAny(agony_debuff) < Enemies() and DebuffCountOnAny(agony_debuff) <= 6 and Talent(creeping_death_talent) and target.TimeToDie() > 10 and target.Refreshable(agony_debuff) Spell(agony)
- #agony,cycle_targets=1,max_cycle_targets=8,if=(!talent.creeping_death.enabled)&target.time_to_die>10&refreshable
- if DebuffCountOnAny(agony_debuff) < Enemies() and DebuffCountOnAny(agony_debuff) <= 8 and not Talent(creeping_death_talent) and target.TimeToDie() > 10 and target.Refreshable(agony_debuff) Spell(agony)
- #siphon_life,cycle_targets=1,max_cycle_targets=1,if=refreshable&target.time_to_die>10&((!(cooldown.summon_darkglare.remains<=soul_shard*action.unstable_affliction.execute_time)&active_enemies>=8)|active_enemies=1)
- if DebuffCountOnAny(siphon_life_debuff) < Enemies() and DebuffCountOnAny(siphon_life_debuff) <= 1 and target.Refreshable(siphon_life_debuff) and target.TimeToDie() > 10 and { not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Enemies() >= 8 or Enemies() == 1 } Spell(siphon_life)
- #siphon_life,cycle_targets=1,max_cycle_targets=2,if=refreshable&target.time_to_die>10&((!(cooldown.summon_darkglare.remains<=soul_shard*action.unstable_affliction.execute_time)&active_enemies=7)|active_enemies=2)
- if DebuffCountOnAny(siphon_life_debuff) < Enemies() and DebuffCountOnAny(siphon_life_debuff) <= 2 and target.Refreshable(siphon_life_debuff) and target.TimeToDie() > 10 and { not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Enemies() == 7 or Enemies() == 2 } Spell(siphon_life)
- #siphon_life,cycle_targets=1,max_cycle_targets=3,if=refreshable&target.time_to_die>10&((!(cooldown.summon_darkglare.remains<=soul_shard*action.unstable_affliction.execute_time)&active_enemies=6)|active_enemies=3)
- if DebuffCountOnAny(siphon_life_debuff) < Enemies() and DebuffCountOnAny(siphon_life_debuff) <= 3 and target.Refreshable(siphon_life_debuff) and target.TimeToDie() > 10 and { not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Enemies() == 6 or Enemies() == 3 } Spell(siphon_life)
- #siphon_life,cycle_targets=1,max_cycle_targets=4,if=refreshable&target.time_to_die>10&((!(cooldown.summon_darkglare.remains<=soul_shard*action.unstable_affliction.execute_time)&active_enemies=5)|active_enemies=4)
- if DebuffCountOnAny(siphon_life_debuff) < Enemies() and DebuffCountOnAny(siphon_life_debuff) <= 4 and target.Refreshable(siphon_life_debuff) and target.TimeToDie() > 10 and { not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Enemies() == 5 or Enemies() == 4 } Spell(siphon_life)
- #corruption,cycle_targets=1,if=active_enemies<3+talent.writhe_in_agony.enabled&refreshable&target.time_to_die>10
- if Enemies() < 3 + TalentPoints(writhe_in_agony_talent) and target.Refreshable(corruption_debuff) and target.TimeToDie() > 10 Spell(corruption)
- #vile_taint
- Spell(vile_taint)
- #unstable_affliction,if=soul_shard>=5
- if SoulShards() >= 5 Spell(unstable_affliction)
- #unstable_affliction,if=cooldown.summon_darkglare.remains<=soul_shard*execute_time
- if SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) Spell(unstable_affliction)
- #call_action_list,name=fillers,if=(cooldown.summon_darkglare.remains<time_to_shard*(5-soul_shard)|cooldown.summon_darkglare.up)&time_to_die>cooldown.summon_darkglare.remains
- if { SpellCooldown(summon_darkglare) < TimeToShard() * { 5 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) AfflictionFillersMainActions()
-
- unless { SpellCooldown(summon_darkglare) < TimeToShard() * { 5 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) and AfflictionFillersMainPostConditions()
- {
-  #seed_of_corruption,if=variable.spammable_seed
-  if spammable_seed() Spell(seed_of_corruption)
-  #unstable_affliction,if=!prev_gcd.1.summon_darkglare&!variable.spammable_seed&(talent.deathbolt.enabled&cooldown.deathbolt.remains<=execute_time&!azerite.cascading_calamity.enabled|soul_shard>=2&target.time_to_die>4+execute_time&active_enemies=1|target.time_to_die<=8+execute_time*soul_shard)
-  if not PreviousGCDSpell(summon_darkglare) and not spammable_seed() and { Talent(deathbolt_talent) and SpellCooldown(deathbolt) <= ExecuteTime(unstable_affliction) and not HasAzeriteTrait(cascading_calamity_trait) or SoulShards() >= 2 and target.TimeToDie() > 4 + ExecuteTime(unstable_affliction) and Enemies() == 1 or target.TimeToDie() <= 8 + ExecuteTime(unstable_affliction) * SoulShards() } Spell(unstable_affliction)
-  #unstable_affliction,if=!variable.spammable_seed&contagion<=cast_time+variable.padding
-  if not spammable_seed() and BuffRemaining(unstable_affliction_buff) <= CastTime(unstable_affliction) + padding() Spell(unstable_affliction)
-  #unstable_affliction,cycle_targets=1,if=!variable.spammable_seed&(!talent.deathbolt.enabled|cooldown.deathbolt.remains>time_to_shard|soul_shard>1)&contagion<=cast_time+variable.padding
-  if not spammable_seed() and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) > TimeToShard() or SoulShards() > 1 } and BuffRemaining(unstable_affliction_buff) <= CastTime(unstable_affliction) + padding() Spell(unstable_affliction)
-  #call_action_list,name=fillers
-  AfflictionFillersMainActions()
- }
+ #agony,target_if=min:remains,if=talent.creeping_death.enabled&active_dot.agony<6&target.time_to_die>10&(remains<=gcd|cooldown.summon_darkglare.remains>10&refreshable)
+ if Talent(creeping_death_talent) and DebuffCountOnAny(agony_debuff) < 6 and target.TimeToDie() > 10 and { target.DebuffRemaining(agony_debuff) <= GCD() or SpellCooldown(summon_darkglare) > 10 and target.Refreshable(agony_debuff) } Spell(agony)
+ #agony,target_if=min:remains,if=!talent.creeping_death.enabled&active_dot.agony<8&target.time_to_die>10&(remains<=gcd|cooldown.summon_darkglare.remains>10&refreshable)
+ if not Talent(creeping_death_talent) and DebuffCountOnAny(agony_debuff) < 8 and target.TimeToDie() > 10 and { target.DebuffRemaining(agony_debuff) <= GCD() or SpellCooldown(summon_darkglare) > 10 and target.Refreshable(agony_debuff) } Spell(agony)
+ #siphon_life,target_if=min:remains,if=-spell_targets.sow_the_seeds_aoe<5&target.time_to_die>10&refreshable&!(cooldown.summon_darkglare.remains<=soul_shard*action.unstable_affliction.execute_time)
+ if -Enemies() < 5 and target.TimeToDie() > 10 and target.Refreshable(siphon_life_debuff) and not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) Spell(siphon_life)
+ #siphon_life,target_if=min:remains,if=(active_dot.siphon_life<8-talent.creeping_death.enabled-spell_targets.sow_the_seeds_aoe)&target.time_to_die>10&refreshable&!(cooldown.summon_darkglare.remains<=soul_shard*action.unstable_affliction.execute_time)
+ if DebuffCountOnAny(siphon_life_debuff) < 8 - TalentPoints(creeping_death_talent) - Enemies() and target.TimeToDie() > 10 and target.Refreshable(siphon_life_debuff) and not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) Spell(siphon_life)
+ #corruption,cycle_targets=1,if=active_enemies<3+talent.writhe_in_agony.enabled&(remains<=gcd|cooldown.summon_darkglare.remains>10&refreshable)&target.time_to_die>10
+ if Enemies() < 3 + TalentPoints(writhe_in_agony_talent) and { target.DebuffRemaining(corruption_debuff) <= GCD() or SpellCooldown(summon_darkglare) > 10 and target.Refreshable(corruption_debuff) } and target.TimeToDie() > 10 Spell(corruption)
 }
 
-AddFunction AfflictionDefaultMainPostConditions
+AddFunction AfflictionDotsMainPostConditions
 {
- { SpellCooldown(summon_darkglare) < TimeToShard() * { 5 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) and AfflictionFillersMainPostConditions() or AfflictionFillersMainPostConditions()
 }
 
-AddFunction AfflictionDefaultShortCdActions
+AddFunction AfflictionDotsShortCdActions
 {
- unless target.TimeToDie() <= GCD() and SoulShards() < 5 and Spell(drain_soul) or Spell(haunt) or target.DebuffRemaining(agony_debuff) <= GCD() and Spell(agony) or Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() == 2 and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= ExecuteTime(shadow_bolt_affliction) * 2 + TravelTime(shadow_bolt_affliction) and not InFlightToTarget(shadow_bolt_affliction) and Spell(shadow_bolt_affliction)
- {
-  #phantom_singularity,if=time>40&(cooldown.summon_darkglare.remains>=45|cooldown.summon_darkglare.remains<8)
-  if TimeInCombat() > 40 and { SpellCooldown(summon_darkglare) >= 45 or SpellCooldown(summon_darkglare) < 8 } Spell(phantom_singularity)
-
-  unless TimeInCombat() > 20 and Spell(vile_taint) or target.DebuffRemaining(corruption_debuff) <= CastTime(seed_of_corruption) + TimeToShard() + 4.2 * { 1 - TalentPoints(creeping_death_talent) * 0.15 } and Enemies() >= 3 + TalentPoints(writhe_in_agony_talent) and not target.DebuffRemaining(seed_of_corruption_debuff) and not InFlightToTarget(seed_of_corruption) and Spell(seed_of_corruption) or DebuffCountOnAny(agony_debuff) < Enemies() and DebuffCountOnAny(agony_debuff) <= 6 and Talent(creeping_death_talent) and target.TimeToDie() > 10 and target.Refreshable(agony_debuff) and Spell(agony) or DebuffCountOnAny(agony_debuff) < Enemies() and DebuffCountOnAny(agony_debuff) <= 8 and not Talent(creeping_death_talent) and target.TimeToDie() > 10 and target.Refreshable(agony_debuff) and Spell(agony) or DebuffCountOnAny(siphon_life_debuff) < Enemies() and DebuffCountOnAny(siphon_life_debuff) <= 1 and target.Refreshable(siphon_life_debuff) and target.TimeToDie() > 10 and { not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Enemies() >= 8 or Enemies() == 1 } and Spell(siphon_life) or DebuffCountOnAny(siphon_life_debuff) < Enemies() and DebuffCountOnAny(siphon_life_debuff) <= 2 and target.Refreshable(siphon_life_debuff) and target.TimeToDie() > 10 and { not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Enemies() == 7 or Enemies() == 2 } and Spell(siphon_life) or DebuffCountOnAny(siphon_life_debuff) < Enemies() and DebuffCountOnAny(siphon_life_debuff) <= 3 and target.Refreshable(siphon_life_debuff) and target.TimeToDie() > 10 and { not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Enemies() == 6 or Enemies() == 3 } and Spell(siphon_life) or DebuffCountOnAny(siphon_life_debuff) < Enemies() and DebuffCountOnAny(siphon_life_debuff) <= 4 and target.Refreshable(siphon_life_debuff) and target.TimeToDie() > 10 and { not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Enemies() == 5 or Enemies() == 4 } and Spell(siphon_life) or Enemies() < 3 + TalentPoints(writhe_in_agony_talent) and target.Refreshable(corruption_debuff) and target.TimeToDie() > 10 and Spell(corruption)
-  {
-   #phantom_singularity,if=time<=40
-   if TimeInCombat() <= 40 Spell(phantom_singularity)
-
-   unless Spell(vile_taint) or SoulShards() >= 5 and Spell(unstable_affliction) or SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Spell(unstable_affliction)
-   {
-    #call_action_list,name=fillers,if=(cooldown.summon_darkglare.remains<time_to_shard*(5-soul_shard)|cooldown.summon_darkglare.up)&time_to_die>cooldown.summon_darkglare.remains
-    if { SpellCooldown(summon_darkglare) < TimeToShard() * { 5 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) AfflictionFillersShortCdActions()
-
-    unless { SpellCooldown(summon_darkglare) < TimeToShard() * { 5 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) and AfflictionFillersShortCdPostConditions() or spammable_seed() and Spell(seed_of_corruption) or not PreviousGCDSpell(summon_darkglare) and not spammable_seed() and { Talent(deathbolt_talent) and SpellCooldown(deathbolt) <= ExecuteTime(unstable_affliction) and not HasAzeriteTrait(cascading_calamity_trait) or SoulShards() >= 2 and target.TimeToDie() > 4 + ExecuteTime(unstable_affliction) and Enemies() == 1 or target.TimeToDie() <= 8 + ExecuteTime(unstable_affliction) * SoulShards() } and Spell(unstable_affliction) or not spammable_seed() and BuffRemaining(unstable_affliction_buff) <= CastTime(unstable_affliction) + padding() and Spell(unstable_affliction) or not spammable_seed() and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) > TimeToShard() or SoulShards() > 1 } and BuffRemaining(unstable_affliction_buff) <= CastTime(unstable_affliction) + padding() and Spell(unstable_affliction)
-    {
-     #call_action_list,name=fillers
-     AfflictionFillersShortCdActions()
-    }
-   }
-  }
- }
 }
 
-AddFunction AfflictionDefaultShortCdPostConditions
+AddFunction AfflictionDotsShortCdPostConditions
 {
- target.TimeToDie() <= GCD() and SoulShards() < 5 and Spell(drain_soul) or Spell(haunt) or target.DebuffRemaining(agony_debuff) <= GCD() and Spell(agony) or Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() == 2 and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= ExecuteTime(shadow_bolt_affliction) * 2 + TravelTime(shadow_bolt_affliction) and not InFlightToTarget(shadow_bolt_affliction) and Spell(shadow_bolt_affliction) or TimeInCombat() > 20 and Spell(vile_taint) or target.DebuffRemaining(corruption_debuff) <= CastTime(seed_of_corruption) + TimeToShard() + 4.2 * { 1 - TalentPoints(creeping_death_talent) * 0.15 } and Enemies() >= 3 + TalentPoints(writhe_in_agony_talent) and not target.DebuffRemaining(seed_of_corruption_debuff) and not InFlightToTarget(seed_of_corruption) and Spell(seed_of_corruption) or DebuffCountOnAny(agony_debuff) < Enemies() and DebuffCountOnAny(agony_debuff) <= 6 and Talent(creeping_death_talent) and target.TimeToDie() > 10 and target.Refreshable(agony_debuff) and Spell(agony) or DebuffCountOnAny(agony_debuff) < Enemies() and DebuffCountOnAny(agony_debuff) <= 8 and not Talent(creeping_death_talent) and target.TimeToDie() > 10 and target.Refreshable(agony_debuff) and Spell(agony) or DebuffCountOnAny(siphon_life_debuff) < Enemies() and DebuffCountOnAny(siphon_life_debuff) <= 1 and target.Refreshable(siphon_life_debuff) and target.TimeToDie() > 10 and { not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Enemies() >= 8 or Enemies() == 1 } and Spell(siphon_life) or DebuffCountOnAny(siphon_life_debuff) < Enemies() and DebuffCountOnAny(siphon_life_debuff) <= 2 and target.Refreshable(siphon_life_debuff) and target.TimeToDie() > 10 and { not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Enemies() == 7 or Enemies() == 2 } and Spell(siphon_life) or DebuffCountOnAny(siphon_life_debuff) < Enemies() and DebuffCountOnAny(siphon_life_debuff) <= 3 and target.Refreshable(siphon_life_debuff) and target.TimeToDie() > 10 and { not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Enemies() == 6 or Enemies() == 3 } and Spell(siphon_life) or DebuffCountOnAny(siphon_life_debuff) < Enemies() and DebuffCountOnAny(siphon_life_debuff) <= 4 and target.Refreshable(siphon_life_debuff) and target.TimeToDie() > 10 and { not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Enemies() == 5 or Enemies() == 4 } and Spell(siphon_life) or Enemies() < 3 + TalentPoints(writhe_in_agony_talent) and target.Refreshable(corruption_debuff) and target.TimeToDie() > 10 and Spell(corruption) or Spell(vile_taint) or SoulShards() >= 5 and Spell(unstable_affliction) or SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Spell(unstable_affliction) or { SpellCooldown(summon_darkglare) < TimeToShard() * { 5 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) and AfflictionFillersShortCdPostConditions() or spammable_seed() and Spell(seed_of_corruption) or not PreviousGCDSpell(summon_darkglare) and not spammable_seed() and { Talent(deathbolt_talent) and SpellCooldown(deathbolt) <= ExecuteTime(unstable_affliction) and not HasAzeriteTrait(cascading_calamity_trait) or SoulShards() >= 2 and target.TimeToDie() > 4 + ExecuteTime(unstable_affliction) and Enemies() == 1 or target.TimeToDie() <= 8 + ExecuteTime(unstable_affliction) * SoulShards() } and Spell(unstable_affliction) or not spammable_seed() and BuffRemaining(unstable_affliction_buff) <= CastTime(unstable_affliction) + padding() and Spell(unstable_affliction) or not spammable_seed() and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) > TimeToShard() or SoulShards() > 1 } and BuffRemaining(unstable_affliction_buff) <= CastTime(unstable_affliction) + padding() and Spell(unstable_affliction) or AfflictionFillersShortCdPostConditions()
+ target.DebuffRemaining(corruption_debuff) <= CastTime(seed_of_corruption) + TimeToShard() + 4.2 * { 1 - TalentPoints(creeping_death_talent) * 0.15 } and Enemies() >= 3 + TalentPoints(writhe_in_agony_talent) and not target.DebuffRemaining(seed_of_corruption_debuff) and not InFlightToTarget(seed_of_corruption) and Spell(seed_of_corruption) or Talent(creeping_death_talent) and DebuffCountOnAny(agony_debuff) < 6 and target.TimeToDie() > 10 and { target.DebuffRemaining(agony_debuff) <= GCD() or SpellCooldown(summon_darkglare) > 10 and target.Refreshable(agony_debuff) } and Spell(agony) or not Talent(creeping_death_talent) and DebuffCountOnAny(agony_debuff) < 8 and target.TimeToDie() > 10 and { target.DebuffRemaining(agony_debuff) <= GCD() or SpellCooldown(summon_darkglare) > 10 and target.Refreshable(agony_debuff) } and Spell(agony) or -Enemies() < 5 and target.TimeToDie() > 10 and target.Refreshable(siphon_life_debuff) and not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Spell(siphon_life) or DebuffCountOnAny(siphon_life_debuff) < 8 - TalentPoints(creeping_death_talent) - Enemies() and target.TimeToDie() > 10 and target.Refreshable(siphon_life_debuff) and not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Spell(siphon_life) or Enemies() < 3 + TalentPoints(writhe_in_agony_talent) and { target.DebuffRemaining(corruption_debuff) <= GCD() or SpellCooldown(summon_darkglare) > 10 and target.Refreshable(corruption_debuff) } and target.TimeToDie() > 10 and Spell(corruption)
 }
 
-AddFunction AfflictionDefaultCdActions
+AddFunction AfflictionDotsCdActions
 {
- #variable,name=spammable_seed,value=talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption_aoe>=3|talent.siphon_life.enabled&spell_targets.seed_of_corruption>=5|spell_targets.seed_of_corruption>=8
- #variable,name=padding,op=set,value=action.shadow_bolt.execute_time*azerite.cascading_calamity.enabled
- #variable,name=padding,op=reset,value=gcd,if=azerite.cascading_calamity.enabled&(talent.drain_soul.enabled|talent.deathbolt.enabled&cooldown.deathbolt.remains<=gcd)
+}
+
+AddFunction AfflictionDotsCdPostConditions
+{
+ target.DebuffRemaining(corruption_debuff) <= CastTime(seed_of_corruption) + TimeToShard() + 4.2 * { 1 - TalentPoints(creeping_death_talent) * 0.15 } and Enemies() >= 3 + TalentPoints(writhe_in_agony_talent) and not target.DebuffRemaining(seed_of_corruption_debuff) and not InFlightToTarget(seed_of_corruption) and Spell(seed_of_corruption) or Talent(creeping_death_talent) and DebuffCountOnAny(agony_debuff) < 6 and target.TimeToDie() > 10 and { target.DebuffRemaining(agony_debuff) <= GCD() or SpellCooldown(summon_darkglare) > 10 and target.Refreshable(agony_debuff) } and Spell(agony) or not Talent(creeping_death_talent) and DebuffCountOnAny(agony_debuff) < 8 and target.TimeToDie() > 10 and { target.DebuffRemaining(agony_debuff) <= GCD() or SpellCooldown(summon_darkglare) > 10 and target.Refreshable(agony_debuff) } and Spell(agony) or -Enemies() < 5 and target.TimeToDie() > 10 and target.Refreshable(siphon_life_debuff) and not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Spell(siphon_life) or DebuffCountOnAny(siphon_life_debuff) < 8 - TalentPoints(creeping_death_talent) - Enemies() and target.TimeToDie() > 10 and target.Refreshable(siphon_life_debuff) and not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Spell(siphon_life) or Enemies() < 3 + TalentPoints(writhe_in_agony_talent) and { target.DebuffRemaining(corruption_debuff) <= GCD() or SpellCooldown(summon_darkglare) > 10 and target.Refreshable(corruption_debuff) } and target.TimeToDie() > 10 and Spell(corruption)
+}
+
+### actions.cooldowns
+
+AddFunction AfflictionCooldownsMainActions
+{
+}
+
+AddFunction AfflictionCooldownsMainPostConditions
+{
+}
+
+AddFunction AfflictionCooldownsShortCdActions
+{
+}
+
+AddFunction AfflictionCooldownsShortCdPostConditions
+{
+}
+
+AddFunction AfflictionCooldownsCdActions
+{
  #potion,if=(talent.dark_soul_misery.enabled&cooldown.summon_darkglare.up&cooldown.dark_soul.up)|cooldown.summon_darkglare.up|target.time_to_die<30
  if { Talent(dark_soul_misery_talent) and not SpellCooldown(summon_darkglare) > 0 and not SpellCooldown(dark_soul_misery) > 0 or not SpellCooldown(summon_darkglare) > 0 or target.TimeToDie() < 30 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_intellect usable=1)
  #use_items,if=!cooldown.summon_darkglare.up
@@ -235,25 +265,138 @@ AddFunction AfflictionDefaultCdActions
  if not { not SpellCooldown(summon_darkglare) > 0 } Spell(fireblood)
  #blood_fury,if=!cooldown.summon_darkglare.up
  if not { not SpellCooldown(summon_darkglare) > 0 } Spell(blood_fury_sp)
+}
 
- unless target.TimeToDie() <= GCD() and SoulShards() < 5 and Spell(drain_soul) or Spell(haunt)
+AddFunction AfflictionCooldownsCdPostConditions
+{
+}
+
+### actions.default
+
+AddFunction AfflictionDefaultMainActions
+{
+ #variable,name=use_seed,value=talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption_aoe>=3|talent.siphon_life.enabled&spell_targets.seed_of_corruption>=5|spell_targets.seed_of_corruption>=8
+ #variable,name=padding,op=set,value=action.shadow_bolt.execute_time*azerite.cascading_calamity.enabled
+ #variable,name=padding,op=reset,value=gcd,if=azerite.cascading_calamity.enabled&(talent.drain_soul.enabled|talent.deathbolt.enabled&cooldown.deathbolt.remains<=gcd)
+ #call_action_list,name=cooldowns
+ AfflictionCooldownsMainActions()
+
+ unless AfflictionCooldownsMainPostConditions()
+ {
+  #drain_soul,interrupt_global=1,chain=1,cycle_targets=1,if=target.time_to_die<=gcd&soul_shard<5
+  if target.TimeToDie() <= GCD() and SoulShards() < 5 Spell(drain_soul)
+  #haunt,if=spell_targets.seed_of_corruption_aoe<=2
+  if Enemies() <= 2 Spell(haunt)
+  #agony,target_if=min:dot.agony.remains,if=remains<=gcd+action.shadow_bolt.execute_time&target.time_to_die>8
+  if target.DebuffRemaining(agony_debuff) <= GCD() + ExecuteTime(shadow_bolt_affliction) and target.TimeToDie() > 8 Spell(agony)
+  #unstable_affliction,target_if=!contagion&target.time_to_die<=8
+  if not BuffRemaining(unstable_affliction_buff) and target.TimeToDie() <= 8 Spell(unstable_affliction)
+  #drain_soul,target_if=min:debuff.shadow_embrace.remains,interrupt_immediate=1,interrupt_if=ticks_remain<5,if=talent.shadow_embrace.enabled&active_enemies<=2&debuff.shadow_embrace.remains&debuff.shadow_embrace.remains<=gcd*2
+  if Talent(shadow_embrace_talent) and Enemies() <= 2 and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= GCD() * 2 Spell(drain_soul)
+  #shadow_bolt,target_if=min:debuff.shadow_embrace.remains,if=talent.shadow_embrace.enabled&talent.absolute_corruption.enabled&active_enemies<=2&debuff.shadow_embrace.remains&debuff.shadow_embrace.remains<=execute_time*2+travel_time&!action.shadow_bolt.in_flight
+  if Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() <= 2 and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= ExecuteTime(shadow_bolt_affliction) * 2 + TravelTime(shadow_bolt_affliction) and not InFlightToTarget(shadow_bolt_affliction) Spell(shadow_bolt_affliction)
+  #vile_taint,target_if=max:target.time_to_die,if=time>15&target.time_to_die>=10
+  if TimeInCombat() > 15 and target.TimeToDie() >= 10 Spell(vile_taint)
+  #unstable_affliction,if=!variable.use_seed&soul_shard=5
+  if not use_seed() and SoulShards() == 5 Spell(unstable_affliction)
+  #seed_of_corruption,if=variable.use_seed&soul_shard=5
+  if use_seed() and SoulShards() == 5 Spell(seed_of_corruption)
+  #call_action_list,name=dots
+  AfflictionDotsMainActions()
+
+  unless AfflictionDotsMainPostConditions()
+  {
+   #vile_taint,if=time<15
+   if TimeInCombat() < 15 Spell(vile_taint)
+   #call_action_list,name=spenders
+   AfflictionSpendersMainActions()
+
+   unless AfflictionSpendersMainPostConditions()
+   {
+    #call_action_list,name=fillers
+    AfflictionFillersMainActions()
+   }
+  }
+ }
+}
+
+AddFunction AfflictionDefaultMainPostConditions
+{
+ AfflictionCooldownsMainPostConditions() or AfflictionDotsMainPostConditions() or AfflictionSpendersMainPostConditions() or AfflictionFillersMainPostConditions()
+}
+
+AddFunction AfflictionDefaultShortCdActions
+{
+ #variable,name=use_seed,value=talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption_aoe>=3|talent.siphon_life.enabled&spell_targets.seed_of_corruption>=5|spell_targets.seed_of_corruption>=8
+ #variable,name=padding,op=set,value=action.shadow_bolt.execute_time*azerite.cascading_calamity.enabled
+ #variable,name=padding,op=reset,value=gcd,if=azerite.cascading_calamity.enabled&(talent.drain_soul.enabled|talent.deathbolt.enabled&cooldown.deathbolt.remains<=gcd)
+ #call_action_list,name=cooldowns
+ AfflictionCooldownsShortCdActions()
+
+ unless AfflictionCooldownsShortCdPostConditions() or target.TimeToDie() <= GCD() and SoulShards() < 5 and Spell(drain_soul) or Enemies() <= 2 and Spell(haunt) or target.DebuffRemaining(agony_debuff) <= GCD() + ExecuteTime(shadow_bolt_affliction) and target.TimeToDie() > 8 and Spell(agony) or not BuffRemaining(unstable_affliction_buff) and target.TimeToDie() <= 8 and Spell(unstable_affliction) or Talent(shadow_embrace_talent) and Enemies() <= 2 and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= GCD() * 2 and Spell(drain_soul) or Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() <= 2 and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= ExecuteTime(shadow_bolt_affliction) * 2 + TravelTime(shadow_bolt_affliction) and not InFlightToTarget(shadow_bolt_affliction) and Spell(shadow_bolt_affliction)
+ {
+  #phantom_singularity,target_if=max:target.time_to_die,if=time>35&(cooldown.summon_darkglare.remains>=45|cooldown.summon_darkglare.remains<8)&target.time_to_die>16*spell_haste
+  if TimeInCombat() > 35 and { SpellCooldown(summon_darkglare) >= 45 or SpellCooldown(summon_darkglare) < 8 } and target.TimeToDie() > 16 * { 100 / { 100 + SpellCastSpeedPercent() } } Spell(phantom_singularity)
+
+  unless TimeInCombat() > 15 and target.TimeToDie() >= 10 and Spell(vile_taint) or not use_seed() and SoulShards() == 5 and Spell(unstable_affliction) or use_seed() and SoulShards() == 5 and Spell(seed_of_corruption)
+  {
+   #call_action_list,name=dots
+   AfflictionDotsShortCdActions()
+
+   unless AfflictionDotsShortCdPostConditions()
+   {
+    #phantom_singularity,if=time<=35
+    if TimeInCombat() <= 35 Spell(phantom_singularity)
+
+    unless TimeInCombat() < 15 and Spell(vile_taint)
+    {
+     #call_action_list,name=spenders
+     AfflictionSpendersShortCdActions()
+
+     unless AfflictionSpendersShortCdPostConditions()
+     {
+      #call_action_list,name=fillers
+      AfflictionFillersShortCdActions()
+     }
+    }
+   }
+  }
+ }
+}
+
+AddFunction AfflictionDefaultShortCdPostConditions
+{
+ AfflictionCooldownsShortCdPostConditions() or target.TimeToDie() <= GCD() and SoulShards() < 5 and Spell(drain_soul) or Enemies() <= 2 and Spell(haunt) or target.DebuffRemaining(agony_debuff) <= GCD() + ExecuteTime(shadow_bolt_affliction) and target.TimeToDie() > 8 and Spell(agony) or not BuffRemaining(unstable_affliction_buff) and target.TimeToDie() <= 8 and Spell(unstable_affliction) or Talent(shadow_embrace_talent) and Enemies() <= 2 and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= GCD() * 2 and Spell(drain_soul) or Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() <= 2 and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= ExecuteTime(shadow_bolt_affliction) * 2 + TravelTime(shadow_bolt_affliction) and not InFlightToTarget(shadow_bolt_affliction) and Spell(shadow_bolt_affliction) or TimeInCombat() > 15 and target.TimeToDie() >= 10 and Spell(vile_taint) or not use_seed() and SoulShards() == 5 and Spell(unstable_affliction) or use_seed() and SoulShards() == 5 and Spell(seed_of_corruption) or AfflictionDotsShortCdPostConditions() or TimeInCombat() < 15 and Spell(vile_taint) or AfflictionSpendersShortCdPostConditions() or AfflictionFillersShortCdPostConditions()
+}
+
+AddFunction AfflictionDefaultCdActions
+{
+ #variable,name=use_seed,value=talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption_aoe>=3|talent.siphon_life.enabled&spell_targets.seed_of_corruption>=5|spell_targets.seed_of_corruption>=8
+ #variable,name=padding,op=set,value=action.shadow_bolt.execute_time*azerite.cascading_calamity.enabled
+ #variable,name=padding,op=reset,value=gcd,if=azerite.cascading_calamity.enabled&(talent.drain_soul.enabled|talent.deathbolt.enabled&cooldown.deathbolt.remains<=gcd)
+ #call_action_list,name=cooldowns
+ AfflictionCooldownsCdActions()
+
+ unless AfflictionCooldownsCdPostConditions() or target.TimeToDie() <= GCD() and SoulShards() < 5 and Spell(drain_soul) or Enemies() <= 2 and Spell(haunt)
  {
   #summon_darkglare,if=dot.agony.ticking&dot.corruption.ticking&(buff.active_uas.stack=5|soul_shard=0)&(!talent.phantom_singularity.enabled|cooldown.phantom_singularity.remains)
   if target.DebuffPresent(agony_debuff) and target.DebuffPresent(corruption_debuff) and { target.DebuffStacks(unstable_affliction_debuff) == 5 or SoulShards() == 0 } and { not Talent(phantom_singularity_talent) or SpellCooldown(phantom_singularity) > 0 } Spell(summon_darkglare)
 
-  unless target.DebuffRemaining(agony_debuff) <= GCD() and Spell(agony) or Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() == 2 and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= ExecuteTime(shadow_bolt_affliction) * 2 + TravelTime(shadow_bolt_affliction) and not InFlightToTarget(shadow_bolt_affliction) and Spell(shadow_bolt_affliction) or TimeInCombat() > 40 and { SpellCooldown(summon_darkglare) >= 45 or SpellCooldown(summon_darkglare) < 8 } and Spell(phantom_singularity) or TimeInCombat() > 20 and Spell(vile_taint) or target.DebuffRemaining(corruption_debuff) <= CastTime(seed_of_corruption) + TimeToShard() + 4.2 * { 1 - TalentPoints(creeping_death_talent) * 0.15 } and Enemies() >= 3 + TalentPoints(writhe_in_agony_talent) and not target.DebuffRemaining(seed_of_corruption_debuff) and not InFlightToTarget(seed_of_corruption) and Spell(seed_of_corruption) or DebuffCountOnAny(agony_debuff) < Enemies() and DebuffCountOnAny(agony_debuff) <= 6 and Talent(creeping_death_talent) and target.TimeToDie() > 10 and target.Refreshable(agony_debuff) and Spell(agony) or DebuffCountOnAny(agony_debuff) < Enemies() and DebuffCountOnAny(agony_debuff) <= 8 and not Talent(creeping_death_talent) and target.TimeToDie() > 10 and target.Refreshable(agony_debuff) and Spell(agony) or DebuffCountOnAny(siphon_life_debuff) < Enemies() and DebuffCountOnAny(siphon_life_debuff) <= 1 and target.Refreshable(siphon_life_debuff) and target.TimeToDie() > 10 and { not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Enemies() >= 8 or Enemies() == 1 } and Spell(siphon_life) or DebuffCountOnAny(siphon_life_debuff) < Enemies() and DebuffCountOnAny(siphon_life_debuff) <= 2 and target.Refreshable(siphon_life_debuff) and target.TimeToDie() > 10 and { not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Enemies() == 7 or Enemies() == 2 } and Spell(siphon_life) or DebuffCountOnAny(siphon_life_debuff) < Enemies() and DebuffCountOnAny(siphon_life_debuff) <= 3 and target.Refreshable(siphon_life_debuff) and target.TimeToDie() > 10 and { not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Enemies() == 6 or Enemies() == 3 } and Spell(siphon_life) or DebuffCountOnAny(siphon_life_debuff) < Enemies() and DebuffCountOnAny(siphon_life_debuff) <= 4 and target.Refreshable(siphon_life_debuff) and target.TimeToDie() > 10 and { not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Enemies() == 5 or Enemies() == 4 } and Spell(siphon_life) or Enemies() < 3 + TalentPoints(writhe_in_agony_talent) and target.Refreshable(corruption_debuff) and target.TimeToDie() > 10 and Spell(corruption) or TimeInCombat() <= 40 and Spell(phantom_singularity) or Spell(vile_taint)
+  unless target.DebuffRemaining(agony_debuff) <= GCD() + ExecuteTime(shadow_bolt_affliction) and target.TimeToDie() > 8 and Spell(agony) or not BuffRemaining(unstable_affliction_buff) and target.TimeToDie() <= 8 and Spell(unstable_affliction) or Talent(shadow_embrace_talent) and Enemies() <= 2 and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= GCD() * 2 and Spell(drain_soul) or Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() <= 2 and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= ExecuteTime(shadow_bolt_affliction) * 2 + TravelTime(shadow_bolt_affliction) and not InFlightToTarget(shadow_bolt_affliction) and Spell(shadow_bolt_affliction) or TimeInCombat() > 35 and { SpellCooldown(summon_darkglare) >= 45 or SpellCooldown(summon_darkglare) < 8 } and target.TimeToDie() > 16 * { 100 / { 100 + SpellCastSpeedPercent() } } and Spell(phantom_singularity) or TimeInCombat() > 15 and target.TimeToDie() >= 10 and Spell(vile_taint) or not use_seed() and SoulShards() == 5 and Spell(unstable_affliction) or use_seed() and SoulShards() == 5 and Spell(seed_of_corruption)
   {
-   #dark_soul
-   Spell(dark_soul_misery)
-   #berserking
-   Spell(berserking)
+   #call_action_list,name=dots
+   AfflictionDotsCdActions()
 
-   unless SoulShards() >= 5 and Spell(unstable_affliction) or SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Spell(unstable_affliction)
+   unless AfflictionDotsCdPostConditions() or TimeInCombat() <= 35 and Spell(phantom_singularity) or TimeInCombat() < 15 and Spell(vile_taint)
    {
-    #call_action_list,name=fillers,if=(cooldown.summon_darkglare.remains<time_to_shard*(5-soul_shard)|cooldown.summon_darkglare.up)&time_to_die>cooldown.summon_darkglare.remains
-    if { SpellCooldown(summon_darkglare) < TimeToShard() * { 5 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) AfflictionFillersCdActions()
+    #dark_soul
+    Spell(dark_soul_misery)
+    #berserking
+    Spell(berserking)
+    #call_action_list,name=spenders
+    AfflictionSpendersCdActions()
 
-    unless { SpellCooldown(summon_darkglare) < TimeToShard() * { 5 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) and AfflictionFillersCdPostConditions() or spammable_seed() and Spell(seed_of_corruption) or not PreviousGCDSpell(summon_darkglare) and not spammable_seed() and { Talent(deathbolt_talent) and SpellCooldown(deathbolt) <= ExecuteTime(unstable_affliction) and not HasAzeriteTrait(cascading_calamity_trait) or SoulShards() >= 2 and target.TimeToDie() > 4 + ExecuteTime(unstable_affliction) and Enemies() == 1 or target.TimeToDie() <= 8 + ExecuteTime(unstable_affliction) * SoulShards() } and Spell(unstable_affliction) or not spammable_seed() and BuffRemaining(unstable_affliction_buff) <= CastTime(unstable_affliction) + padding() and Spell(unstable_affliction) or not spammable_seed() and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) > TimeToShard() or SoulShards() > 1 } and BuffRemaining(unstable_affliction_buff) <= CastTime(unstable_affliction) + padding() and Spell(unstable_affliction)
+    unless AfflictionSpendersCdPostConditions()
     {
      #call_action_list,name=fillers
      AfflictionFillersCdActions()
@@ -265,7 +408,7 @@ AddFunction AfflictionDefaultCdActions
 
 AddFunction AfflictionDefaultCdPostConditions
 {
- target.TimeToDie() <= GCD() and SoulShards() < 5 and Spell(drain_soul) or Spell(haunt) or target.DebuffRemaining(agony_debuff) <= GCD() and Spell(agony) or Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() == 2 and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= ExecuteTime(shadow_bolt_affliction) * 2 + TravelTime(shadow_bolt_affliction) and not InFlightToTarget(shadow_bolt_affliction) and Spell(shadow_bolt_affliction) or TimeInCombat() > 40 and { SpellCooldown(summon_darkglare) >= 45 or SpellCooldown(summon_darkglare) < 8 } and Spell(phantom_singularity) or TimeInCombat() > 20 and Spell(vile_taint) or target.DebuffRemaining(corruption_debuff) <= CastTime(seed_of_corruption) + TimeToShard() + 4.2 * { 1 - TalentPoints(creeping_death_talent) * 0.15 } and Enemies() >= 3 + TalentPoints(writhe_in_agony_talent) and not target.DebuffRemaining(seed_of_corruption_debuff) and not InFlightToTarget(seed_of_corruption) and Spell(seed_of_corruption) or DebuffCountOnAny(agony_debuff) < Enemies() and DebuffCountOnAny(agony_debuff) <= 6 and Talent(creeping_death_talent) and target.TimeToDie() > 10 and target.Refreshable(agony_debuff) and Spell(agony) or DebuffCountOnAny(agony_debuff) < Enemies() and DebuffCountOnAny(agony_debuff) <= 8 and not Talent(creeping_death_talent) and target.TimeToDie() > 10 and target.Refreshable(agony_debuff) and Spell(agony) or DebuffCountOnAny(siphon_life_debuff) < Enemies() and DebuffCountOnAny(siphon_life_debuff) <= 1 and target.Refreshable(siphon_life_debuff) and target.TimeToDie() > 10 and { not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Enemies() >= 8 or Enemies() == 1 } and Spell(siphon_life) or DebuffCountOnAny(siphon_life_debuff) < Enemies() and DebuffCountOnAny(siphon_life_debuff) <= 2 and target.Refreshable(siphon_life_debuff) and target.TimeToDie() > 10 and { not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Enemies() == 7 or Enemies() == 2 } and Spell(siphon_life) or DebuffCountOnAny(siphon_life_debuff) < Enemies() and DebuffCountOnAny(siphon_life_debuff) <= 3 and target.Refreshable(siphon_life_debuff) and target.TimeToDie() > 10 and { not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Enemies() == 6 or Enemies() == 3 } and Spell(siphon_life) or DebuffCountOnAny(siphon_life_debuff) < Enemies() and DebuffCountOnAny(siphon_life_debuff) <= 4 and target.Refreshable(siphon_life_debuff) and target.TimeToDie() > 10 and { not SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Enemies() == 5 or Enemies() == 4 } and Spell(siphon_life) or Enemies() < 3 + TalentPoints(writhe_in_agony_talent) and target.Refreshable(corruption_debuff) and target.TimeToDie() > 10 and Spell(corruption) or TimeInCombat() <= 40 and Spell(phantom_singularity) or Spell(vile_taint) or SoulShards() >= 5 and Spell(unstable_affliction) or SpellCooldown(summon_darkglare) <= SoulShards() * ExecuteTime(unstable_affliction) and Spell(unstable_affliction) or { SpellCooldown(summon_darkglare) < TimeToShard() * { 5 - SoulShards() } or not SpellCooldown(summon_darkglare) > 0 } and target.TimeToDie() > SpellCooldown(summon_darkglare) and AfflictionFillersCdPostConditions() or spammable_seed() and Spell(seed_of_corruption) or not PreviousGCDSpell(summon_darkglare) and not spammable_seed() and { Talent(deathbolt_talent) and SpellCooldown(deathbolt) <= ExecuteTime(unstable_affliction) and not HasAzeriteTrait(cascading_calamity_trait) or SoulShards() >= 2 and target.TimeToDie() > 4 + ExecuteTime(unstable_affliction) and Enemies() == 1 or target.TimeToDie() <= 8 + ExecuteTime(unstable_affliction) * SoulShards() } and Spell(unstable_affliction) or not spammable_seed() and BuffRemaining(unstable_affliction_buff) <= CastTime(unstable_affliction) + padding() and Spell(unstable_affliction) or not spammable_seed() and { not Talent(deathbolt_talent) or SpellCooldown(deathbolt) > TimeToShard() or SoulShards() > 1 } and BuffRemaining(unstable_affliction_buff) <= CastTime(unstable_affliction) + padding() and Spell(unstable_affliction) or AfflictionFillersCdPostConditions()
+ AfflictionCooldownsCdPostConditions() or target.TimeToDie() <= GCD() and SoulShards() < 5 and Spell(drain_soul) or Enemies() <= 2 and Spell(haunt) or target.DebuffRemaining(agony_debuff) <= GCD() + ExecuteTime(shadow_bolt_affliction) and target.TimeToDie() > 8 and Spell(agony) or not BuffRemaining(unstable_affliction_buff) and target.TimeToDie() <= 8 and Spell(unstable_affliction) or Talent(shadow_embrace_talent) and Enemies() <= 2 and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= GCD() * 2 and Spell(drain_soul) or Talent(shadow_embrace_talent) and Talent(absolute_corruption_talent) and Enemies() <= 2 and target.DebuffPresent(shadow_embrace_debuff) and target.DebuffRemaining(shadow_embrace_debuff) <= ExecuteTime(shadow_bolt_affliction) * 2 + TravelTime(shadow_bolt_affliction) and not InFlightToTarget(shadow_bolt_affliction) and Spell(shadow_bolt_affliction) or TimeInCombat() > 35 and { SpellCooldown(summon_darkglare) >= 45 or SpellCooldown(summon_darkglare) < 8 } and target.TimeToDie() > 16 * { 100 / { 100 + SpellCastSpeedPercent() } } and Spell(phantom_singularity) or TimeInCombat() > 15 and target.TimeToDie() >= 10 and Spell(vile_taint) or not use_seed() and SoulShards() == 5 and Spell(unstable_affliction) or use_seed() and SoulShards() == 5 and Spell(seed_of_corruption) or AfflictionDotsCdPostConditions() or TimeInCombat() <= 35 and Spell(phantom_singularity) or TimeInCombat() < 15 and Spell(vile_taint) or AfflictionSpendersCdPostConditions() or AfflictionFillersCdPostConditions()
 }
 
 ### Affliction icons.
@@ -333,6 +476,7 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 # battle_potion_of_intellect
 # berserking
 # blood_fury_sp
+# cascading_calamity_buff
 # cascading_calamity_trait
 # corruption
 # corruption_debuff
@@ -361,6 +505,7 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 # siphon_life_debuff
 # siphon_life_talent
 # sow_the_seeds_talent
+# sudden_onset_trait
 # summon_darkglare
 # summon_imp
 # unstable_affliction
@@ -1367,22 +1512,22 @@ AddFunction DestructionDefaultShortCdActions
    #run_action_list,name=inf,if=spell_targets.infernal_awakening>=3&talent.inferno.enabled
    if Enemies() >= 3 and Talent(inferno_talent) DestructionInfShortCdActions()
 
-   unless Enemies() >= 3 and Talent(inferno_talent) and DestructionInfShortCdPostConditions() or not target.DebuffPresent(havoc_debuff) and { target.Refreshable(immolate_debuff) or Talent(internal_combustion_talent) and InFlightToTarget(chaos_bolt) and target.DebuffRemaining(immolate_debuff) - TravelTime(chaos_bolt) - 5 < BaseDuration(immolate_debuff) * 0.3 } and Spell(immolate)
+   unless Enemies() >= 3 and Talent(inferno_talent) and DestructionInfShortCdPostConditions()
    {
-    #call_action_list,name=cds
-    DestructionCdsShortCdActions()
+    #cataclysm
+    Spell(cataclysm)
 
-    unless DestructionCdsShortCdPostConditions()
+    unless not target.DebuffPresent(havoc_debuff) and { target.Refreshable(immolate_debuff) or Talent(internal_combustion_talent) and InFlightToTarget(chaos_bolt) and target.DebuffRemaining(immolate_debuff) - TravelTime(chaos_bolt) - 5 < BaseDuration(immolate_debuff) * 0.3 } and Spell(immolate)
     {
-     #havoc,cycle_targets=1,if=!(target=sim.target)&target.time_to_die>10
-     if not True(target_is_sim_target) and target.TimeToDie() > 10 and Enemies() > 1 Spell(havoc)
-     #havoc,if=active_enemies>1
-     if Enemies() > 1 and Enemies() > 1 Spell(havoc)
+     #call_action_list,name=cds
+     DestructionCdsShortCdActions()
 
-     unless Spell(channel_demonfire)
+     unless DestructionCdsShortCdPostConditions() or Spell(channel_demonfire)
      {
-      #cataclysm
-      Spell(cataclysm)
+      #havoc,cycle_targets=1,if=!(target=sim.target)&target.time_to_die>10
+      if not True(target_is_sim_target) and target.TimeToDie() > 10 and Enemies() > 1 Spell(havoc)
+      #havoc,if=active_enemies>1
+      if Enemies() > 1 and Enemies() > 1 Spell(havoc)
      }
     }
    }
@@ -1410,7 +1555,7 @@ AddFunction DestructionDefaultCdActions
    #run_action_list,name=inf,if=spell_targets.infernal_awakening>=3&talent.inferno.enabled
    if Enemies() >= 3 and Talent(inferno_talent) DestructionInfCdActions()
 
-   unless Enemies() >= 3 and Talent(inferno_talent) and DestructionInfCdPostConditions() or not target.DebuffPresent(havoc_debuff) and { target.Refreshable(immolate_debuff) or Talent(internal_combustion_talent) and InFlightToTarget(chaos_bolt) and target.DebuffRemaining(immolate_debuff) - TravelTime(chaos_bolt) - 5 < BaseDuration(immolate_debuff) * 0.3 } and Spell(immolate)
+   unless Enemies() >= 3 and Talent(inferno_talent) and DestructionInfCdPostConditions() or Spell(cataclysm) or not target.DebuffPresent(havoc_debuff) and { target.Refreshable(immolate_debuff) or Talent(internal_combustion_talent) and InFlightToTarget(chaos_bolt) and target.DebuffRemaining(immolate_debuff) - TravelTime(chaos_bolt) - 5 < BaseDuration(immolate_debuff) * 0.3 } and Spell(immolate)
    {
     #call_action_list,name=cds
     DestructionCdsCdActions()
@@ -1421,7 +1566,7 @@ AddFunction DestructionDefaultCdActions
 
 AddFunction DestructionDefaultCdPostConditions
 {
- Enemies() >= 3 and Talent(cataclysm_talent) and DestructionCataCdPostConditions() or Enemies() >= 3 and Talent(fire_and_brimstone_talent) and DestructionFnbCdPostConditions() or Enemies() >= 3 and Talent(inferno_talent) and DestructionInfCdPostConditions() or not target.DebuffPresent(havoc_debuff) and { target.Refreshable(immolate_debuff) or Talent(internal_combustion_talent) and InFlightToTarget(chaos_bolt) and target.DebuffRemaining(immolate_debuff) - TravelTime(chaos_bolt) - 5 < BaseDuration(immolate_debuff) * 0.3 } and Spell(immolate) or DestructionCdsCdPostConditions() or not True(target_is_sim_target) and target.TimeToDie() > 10 and Enemies() > 1 and Spell(havoc) or Enemies() > 1 and Enemies() > 1 and Spell(havoc) or Spell(channel_demonfire) or Spell(cataclysm) or not target.DebuffPresent(havoc_debuff) and Spell(soul_fire) or not target.DebuffPresent(havoc_debuff) and ExecuteTime(chaos_bolt) + TravelTime(chaos_bolt) < target.TimeToDie() and { Talent(internal_combustion_talent) or not Talent(internal_combustion_talent) and SoulShards() >= 4 or Talent(eradication_talent) and target.DebuffRemaining(eradication_debuff) <= CastTime(chaos_bolt) or BuffRemaining(dark_soul_instability_buff) > CastTime(chaos_bolt) or DemonDuration(infernal) > 0 and Talent(grimoire_of_supremacy_talent) } and Spell(chaos_bolt) or not target.DebuffPresent(havoc_debuff) and { Talent(flashover_talent) and BuffStacks(backdraft_buff) <= 2 or not Talent(flashover_talent) and BuffStacks(backdraft_buff) < 2 } and Spell(conflagrate) or not target.DebuffPresent(havoc_debuff) and { Charges(shadowburn) == 2 or not BuffPresent(backdraft_buff) or BuffRemaining(backdraft_buff) > BuffStacks(backdraft_buff) * ExecuteTime(incinerate) } and Spell(shadowburn) or not target.DebuffPresent(havoc_debuff) and Spell(incinerate)
+ Enemies() >= 3 and Talent(cataclysm_talent) and DestructionCataCdPostConditions() or Enemies() >= 3 and Talent(fire_and_brimstone_talent) and DestructionFnbCdPostConditions() or Enemies() >= 3 and Talent(inferno_talent) and DestructionInfCdPostConditions() or Spell(cataclysm) or not target.DebuffPresent(havoc_debuff) and { target.Refreshable(immolate_debuff) or Talent(internal_combustion_talent) and InFlightToTarget(chaos_bolt) and target.DebuffRemaining(immolate_debuff) - TravelTime(chaos_bolt) - 5 < BaseDuration(immolate_debuff) * 0.3 } and Spell(immolate) or DestructionCdsCdPostConditions() or Spell(channel_demonfire) or not True(target_is_sim_target) and target.TimeToDie() > 10 and Enemies() > 1 and Spell(havoc) or Enemies() > 1 and Enemies() > 1 and Spell(havoc) or not target.DebuffPresent(havoc_debuff) and Spell(soul_fire) or not target.DebuffPresent(havoc_debuff) and ExecuteTime(chaos_bolt) + TravelTime(chaos_bolt) < target.TimeToDie() and { Talent(internal_combustion_talent) or not Talent(internal_combustion_talent) and SoulShards() >= 4 or Talent(eradication_talent) and target.DebuffRemaining(eradication_debuff) <= CastTime(chaos_bolt) or BuffRemaining(dark_soul_instability_buff) > CastTime(chaos_bolt) or DemonDuration(infernal) > 0 and Talent(grimoire_of_supremacy_talent) } and Spell(chaos_bolt) or not target.DebuffPresent(havoc_debuff) and { Talent(flashover_talent) and BuffStacks(backdraft_buff) <= 2 or not Talent(flashover_talent) and BuffStacks(backdraft_buff) < 2 } and Spell(conflagrate) or not target.DebuffPresent(havoc_debuff) and { Charges(shadowburn) == 2 or not BuffPresent(backdraft_buff) or BuffRemaining(backdraft_buff) > BuffStacks(backdraft_buff) * ExecuteTime(incinerate) } and Spell(shadowburn) or not target.DebuffPresent(havoc_debuff) and Spell(incinerate)
 }
 
 ### Destruction icons.

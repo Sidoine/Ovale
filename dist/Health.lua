@@ -20,6 +20,8 @@ local tonumber = tonumber
 local wipe = wipe
 local UnitHealth = UnitHealth
 local UnitHealthMax = UnitHealthMax
+local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs
+local UnitGetTotalHealAbsorbs = UnitGetTotalHealAbsorbs
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local huge = math.huge
 local __BaseState = LibStub:GetLibrary("ovale/BaseState")
@@ -45,8 +47,14 @@ local OvaleHealthClass = __class(OvaleHealthClassBase, {
     OnInitialize = function(self)
         self:RegisterEvent("PLAYER_REGEN_DISABLED")
         self:RegisterEvent("PLAYER_REGEN_ENABLED")
-        self:RegisterEvent("UNIT_HEALTH_FREQUENT", "UpdateHealth")
+        if Ovale.db.profile.apparence.frequentHealthUpdates then
+            self:RegisterEvent("UNIT_HEALTH_FREQUENT", "UpdateHealth")
+        else
+            self:RegisterEvent("UNIT_HEALTH", "UpdateHealth")
+        end
         self:RegisterEvent("UNIT_MAXHEALTH", "UpdateHealth")
+        self:RegisterEvent("UNIT_ABSORB_AMOUNT_CHANGED", "UpdateAbsorb")
+        self:RegisterEvent("UNIT_HEAL_ABSORB_AMOUNT_CHANGED", "UpdateAbsorb")
         self:RegisterMessage("Ovale_UnitChanged")
         RegisterRequirement("health_pct", self.RequireHealthPercentHandler)
         RegisterRequirement("pet_health_pct", self.RequireHealthPercentHandler)
@@ -59,7 +67,10 @@ local OvaleHealthClass = __class(OvaleHealthClassBase, {
         self:UnregisterEvent("PLAYER_REGEN_ENABLED")
         self:UnregisterEvent("PLAYER_TARGET_CHANGED")
         self:UnregisterEvent("UNIT_HEALTH_FREQUENT")
+        self:UnregisterEvent("UNIT_HEALTH")
         self:UnregisterEvent("UNIT_MAXHEALTH")
+        self:UnregisterEvent("UNIT_ABSORB_AMOUNT_CHANGED")
+        self:UnregisterEvent("UNIT_HEAL_ABSORB_AMOUNT_CHANGED")
         self:UnregisterMessage("Ovale_UnitChanged")
     end,
     COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
@@ -110,19 +121,54 @@ local OvaleHealthClass = __class(OvaleHealthClassBase, {
             self:Debug(event, unitId, guid)
             self:UpdateHealth("UNIT_HEALTH_FREQUENT", unitId)
             self:UpdateHealth("UNIT_MAXHEALTH", unitId)
+            self:UpdateAbsorb("UNIT_ABSORB_AMOUNT_CHANGED", unitId)
+            self:UpdateAbsorb("UNIT_HEAL_ABSORB_AMOUNT_CHANGED", unitId)
         end
         self:StopProfiling("Ovale_UnitChanged")
+    end,
+    UpdateAbsorb = function(self, event, unitId)
+        if  not unitId then
+            return 
+        end
+        self:StartProfiling("OvaleHealth_UpdateAbsorb")
+        local func
+        local db
+        if event == "UNIT_ABSORB_AMOUNT_CHANGED" then
+            func = UnitGetTotalAbsorbs
+            db = self.absorb
+        elseif event == "UNIT_HEAL_ABSORB_AMOUNT_CHANGED" then
+            func = UnitGetTotalHealAbsorbs
+            db = self.absorb
+        else
+            Ovale:OneTimeMessage("Warning: Invalid event (%s) in UpdateAbsorb.", event)
+            return 
+        end
+        local amount = func(unitId)
+        if amount >= 0 then
+            local guid = OvaleGUID:UnitGUID(unitId)
+            self:Debug(event, unitId, guid, amount)
+            if guid then
+                db[guid] = amount
+            end
+        end
+        self:StopProfiling("OvaleHealth_UpdateHealth")
     end,
     UpdateHealth = function(self, event, unitId)
         if  not unitId then
             return 
         end
         self:StartProfiling("OvaleHealth_UpdateHealth")
-        local func = UnitHealth
-        local db = self.health
-        if event == "UNIT_MAXHEALTH" then
+        local func
+        local db
+        if event == "UNIT_HEALTH_FREQUENT" or event == "UNIT_HEALTH" then
+            func = UnitHealth
+            db = self.health
+        elseif event == "UNIT_MAXHEALTH" then
             func = UnitHealthMax
             db = self.maxHealth
+        else
+            Ovale:OneTimeMessage("Warning: Invalid event (%s) in UpdateHealth.", event)
+            return 
         end
         local amount = func(unitId)
         if amount then
@@ -141,32 +187,27 @@ local OvaleHealthClass = __class(OvaleHealthClassBase, {
         self:StopProfiling("OvaleHealth_UpdateHealth")
     end,
     UnitHealth = function(self, unitId, guid)
-        local amount
-        if unitId then
-            guid = guid or OvaleGUID:UnitGUID(unitId)
-            if guid then
-                if unitId == "target" or unitId == "focus" then
-                    amount = self.health[guid] or 0
-                else
-                    amount = UnitHealth(unitId)
-                    self.health[guid] = amount
-                end
-            else
-                amount = 0
-            end
-        end
-        return amount
+        return self:UnitAmount(UnitHealth, self.health, unitId, guid)
     end,
     UnitHealthMax = function(self, unitId, guid)
+        return self:UnitAmount(UnitHealthMax, self.maxHealth, unitId, guid)
+    end,
+    UnitAbsorb = function(self, unitId, guid)
+        return self:UnitAmount(UnitGetTotalAbsorbs, self.absorb, unitId, guid)
+    end,
+    UnitHealAbsorb = function(self, unitId, guid)
+        return self:UnitAmount(UnitGetTotalHealAbsorbs, self.healAbsorb, unitId, guid)
+    end,
+    UnitAmount = function(self, func, db, unitId, guid)
         local amount
         if unitId then
             guid = guid or OvaleGUID:UnitGUID(unitId)
             if guid then
                 if unitId == "target" or unitId == "focus" then
-                    amount = self.maxHealth[guid] or 0
+                    amount = db[guid] or 0
                 else
-                    amount = UnitHealthMax(unitId)
-                    self.maxHealth[guid] = amount
+                    amount = func(unitId)
+                    db[guid] = amount
                 end
             else
                 amount = 0
@@ -174,12 +215,15 @@ local OvaleHealthClass = __class(OvaleHealthClassBase, {
         end
         return amount
     end,
-    UnitTimeToDie = function(self, unitId, guid)
+    UnitTimeToDie = function(self, unitId, effectiveHealth, guid)
         self:StartProfiling("OvaleHealth_UnitTimeToDie")
         local timeToDie = INFINITY
         guid = guid or OvaleGUID:UnitGUID(unitId)
         if guid then
             local health = self:UnitHealth(unitId, guid)
+            if effectiveHealth then
+                health = health + self:UnitAbsorb(unitId, guid) - self:UnitHealAbsorb(unitId, guid)
+            end
             local maxHealth = self:UnitHealthMax(unitId, guid)
             if health and maxHealth then
                 if health == 0 then
@@ -209,6 +253,8 @@ local OvaleHealthClass = __class(OvaleHealthClassBase, {
         OvaleHealthClassBase.constructor(self, ...)
         self.health = {}
         self.maxHealth = {}
+        self.absorb = {}
+        self.healAbsorb = {}
         self.totalDamage = {}
         self.totalHealing = {}
         self.firstSeen = {}
@@ -239,8 +285,8 @@ local OvaleHealthClass = __class(OvaleHealthClassBase, {
                 end
                 guid = guid or OvaleGUID:UnitGUID(unitId)
                 local health = __exports.OvaleHealth:UnitHealth(unitId, guid) or 0
-                local maxHealth = __exports.OvaleHealth:UnitHealthMax(unitId, guid) or 0
-                local healthPercent = (maxHealth > 0) and (health / maxHealth * 100) or 100
+                local maxHealth = __exports.OvaleHealth:UnitHealthMax(unitId, guid) or 1
+                local healthPercent = (health / maxHealth * 100) or 100
                 if  not isBang and healthPercent <= thresholdValue or isBang and healthPercent > thresholdValue then
                     verified = true
                 end
