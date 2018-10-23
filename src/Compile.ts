@@ -1,6 +1,6 @@
 import { OvaleDebug } from "./Debug";
 import { OvaleProfiler } from "./Profiler";
-import { OvaleArtifact } from "./Artifact";
+import { OvaleAzerite } from "./AzeriteArmor";
 import { OvaleAST, AstNode, AstAnnotation, PositionalParameters, NamedParameters, PARAMETER_KEYWORD, ConditionNamedParameters } from "./AST";
 import { OvaleCondition } from "./Condition";
 import { OvaleCooldown } from "./Cooldown";
@@ -90,7 +90,7 @@ function TestConditionEquipped(value: string) {
 }
 function TestConditionTrait(value: string) {
     let [trait, required] = RequireNumber(value);
-    let hasTrait = OvaleArtifact.HasTrait(trait);
+    let hasTrait = OvaleAzerite.HasTrait(trait);
     return (required && hasTrait) || (!required && !hasTrait);
 }
 let TEST_CONDITION_DISPATCH: Record<keyof ConditionNamedParameters, (value: string | number) => boolean> = {
@@ -361,7 +361,7 @@ function EvaluateSpellInfo(node: AstNode) {
                 if (value) {
                     let realValue = value;
                     if (namedParams.pertrait != undefined) {
-                        realValue = value * OvaleArtifact.TraitRank(namedParams.pertrait);
+                        realValue = value * OvaleAzerite.TraitRank(namedParams.pertrait);
                     }
                     let addDuration = si.add_duration || 0;
                     si.add_duration = addDuration + realValue;
@@ -398,7 +398,7 @@ function EvaluateSpellInfo(node: AstNode) {
                 if (value) {
                     let realValue = value;
                     if (namedParams.pertrait != undefined) {
-                        realValue = value * OvaleArtifact.TraitRank(namedParams.pertrait);
+                        realValue = value * OvaleAzerite.TraitRank(namedParams.pertrait);
                     }
                     let power = <number>si[k as keyof SpellInfo] || 0;
                     si[k as keyof SpellInfo] = power + realValue;
