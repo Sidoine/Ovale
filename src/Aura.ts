@@ -947,7 +947,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
         } else {
             auraFound = this.GetStateAuraOnGUID(guid, auraId, filter, mine, atTime);
             if (auraFound) {
-                OvaleAura.Log("Aura %s found on %s with (%s, %s)", auraId, guid, auraFound.start, auraFound.ending);
+                OvaleAura.Log("Aura %s found on %s with (%s, %s) [stacks=%d]", auraId, guid, auraFound.start, auraFound.ending, auraFound.stacks);
             } else {
                 OvaleAura.Log("Aura %s is missing on %s.", auraId, guid);
             }

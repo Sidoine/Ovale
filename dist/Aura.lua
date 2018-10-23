@@ -909,7 +909,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         else
             auraFound = self:GetStateAuraOnGUID(guid, auraId, filter, mine, atTime)
             if auraFound then
-                __exports.OvaleAura:Log("Aura %s found on %s with (%s, %s)", auraId, guid, auraFound.start, auraFound.ending)
+                __exports.OvaleAura:Log("Aura %s found on %s with (%s, %s) [stacks=%d]", auraId, guid, auraFound.start, auraFound.ending, auraFound.stacks)
             else
                 __exports.OvaleAura:Log("Aura %s is missing on %s.", auraId, guid)
             end
