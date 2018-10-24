@@ -292,6 +292,7 @@ Define(enraged_regeneration_buff 184364)
 	SpellInfo(execute_arms target_health_pct=35 talent=arms_massacre_talent)
 	SpellRequire(execute_arms rage_percent 0=buff,execute_arms_norage)
 	SpellRequire(execute_arms target_health_pct 100=buff,execute_arms_nohp)
+    SpellAddTargetDebuff(execute_arms executioners_precision_debuff=0)
 SpellList(execute_arms_norage sudden_death_arms_buff stone_heart_buff deadly_calm_buff)
 SpellList(execute_arms_nohp sudden_death_arms_buff stone_heart_buff)
 
