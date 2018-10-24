@@ -2150,8 +2150,7 @@ local function TargetIsPlayer(positionalParams, namedParams, atTime)
     OvaleCondition:RegisterCondition("targetisplayer", false, TargetIsPlayer)
 end
 do
-local function Threat(positionalParams, namedParams, atTime)
-	local function IsFocus(positionalParams, namedParams, atTime)
+local function IsFocus(positionalParams, namedParams, atTime)
 		local yesno = positionalParams[1]
 		local target = ParseCondition(positionalParams, namedParams)
 		local boolean = UnitIsUnit("focus", target)
@@ -2160,7 +2159,7 @@ local function Threat(positionalParams, namedParams, atTime)
 	OvaleCondition:RegisterCondition("isfocus", false, IsFocus)
 end
 do
-	local function IsTarget(positionalParams, namedParams, atTime)
+local function IsTarget(positionalParams, namedParams, atTime)
 		local yesno = positionalParams[1]
 		local target = ParseCondition(positionalParams, namedParams)
 		local boolean = UnitIsUnit("target", target)
@@ -2169,7 +2168,7 @@ do
 	OvaleCondition:RegisterCondition("istarget", false, IsTarget)
 end
 do
-	local function IsMouseover(positionalParams, namedParams, atTime)
+local function IsMouseover(positionalParams, namedParams, atTime)
 		local yesno = positionalParams[1]
 		local target = ParseCondition(positionalParams, namedParams)
 		local boolean = UnitIsUnit("mouseover", target)
