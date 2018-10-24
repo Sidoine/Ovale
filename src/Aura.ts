@@ -374,7 +374,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
         self_pool.Drain();
     }
     COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
-        this.DebugTimestamp("DEBUG", CombatLogGetCurrentEventInfo())
+        this.DebugTimestamp("COMBAT_LOG_EVENT_UNFILTERED", CombatLogGetCurrentEventInfo())
         let [, cleuEvent, , sourceGUID, , , , destGUID, , , , spellId, spellName, , auraType, amount] = CombatLogGetCurrentEventInfo();
         let mine = (sourceGUID == self_playerGUID || OvaleGUID.IsPlayerPet(sourceGUID));
         if (mine && cleuEvent == "SPELL_MISSED") {

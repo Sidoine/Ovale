@@ -424,7 +424,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         self_pool:Drain()
     end,
     COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
-        self:DebugTimestamp("DEBUG", CombatLogGetCurrentEventInfo())
+        self:DebugTimestamp("COMBAT_LOG_EVENT_UNFILTERED", CombatLogGetCurrentEventInfo())
         local _, cleuEvent, _, sourceGUID, _, _, _, destGUID, _, _, _, spellId, spellName, _, auraType, amount = CombatLogGetCurrentEventInfo()
         local mine = (sourceGUID == self_playerGUID or OvaleGUID:IsPlayerPet(sourceGUID))
         if mine and cleuEvent == "SPELL_MISSED" then

@@ -193,7 +193,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
     }
     
     COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
-        //this.DebugTimeStamp("DEBUG", CombatLogGetCurrentEventInfo())
+        this.DebugTimestamp("COMBAT_LOG_EVENT_UNFILTERED", CombatLogGetCurrentEventInfo())
         let [, cleuEvent, , sourceGUID, sourceName, , , destGUID, destName, , , spellId, spellName, , , , , , , , , , , isOffHand] = CombatLogGetCurrentEventInfo();
         if (sourceGUID == Ovale.playerGUID || OvaleGUID.IsPlayerPet(sourceGUID)) {
             this.StartProfiling("OvaleFuture_COMBAT_LOG_EVENT_UNFILTERED");

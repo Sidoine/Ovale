@@ -233,6 +233,7 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
         return self:GetState(atTime).inCombat
     end,
     COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
+        self:DebugTimestamp("COMBAT_LOG_EVENT_UNFILTERED", CombatLogGetCurrentEventInfo())
         local _, cleuEvent, _, sourceGUID, sourceName, _, _, destGUID, destName, _, _, spellId, spellName, _, _, _, _, _, _, _, _, _, _, isOffHand = CombatLogGetCurrentEventInfo()
         if sourceGUID == Ovale.playerGUID or OvaleGUID:IsPlayerPet(sourceGUID) then
             self:StartProfiling("OvaleFuture_COMBAT_LOG_EVENT_UNFILTERED")
@@ -296,7 +297,7 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
             self:Debug("Finished (%s) spell %s (%d) queued at %s after seeing aura %d on %s.", finish, spellName, spellId, spellcast.queued, spellcast.auraId, spellcast.auraGUID)
             finished = true
         elseif cleuEvent == "Ovale_AuraChanged" and spellcast.auraGUID and destGUID == spellcast.auraGUID then
-            self:Debug("Finished (%s) spell %s (%d) queued at %s after Ovale_AuraChanged was called %d on %s.", finish, spellName, spellId, spellcast.queued, spellcast.auraId, spellcast.auraGUID)
+            self:Debug("Finished (%s) spell %s (%d) queued at %s after Ovale_AuraChanged was called for aura %d on %s.", finish, spellName, spellId, spellcast.queued, spellcast.auraId, spellcast.auraGUID)
             finished = true
         end
         if finished then
