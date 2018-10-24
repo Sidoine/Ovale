@@ -94,7 +94,6 @@ const IsSameSpellcast = function(a: SpellCast, b: SpellCast) {
     }
     return boolean;
 }
-let eventDebug = false;
 
 export class OvaleFutureData {
     inCombat: boolean = false;
@@ -164,6 +163,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
         this.RegisterEvent("UNIT_SPELLCAST_STOP", "UnitSpellcastEnded");
         this.RegisterEvent("UNIT_SPELLCAST_SUCCEEDED");
         this.RegisterMessage("Ovale_AuraAdded");
+        this.RegisterMessage("Ovale_AuraChanged");
         RegisterRequirement("combat", this.CombatRequirement);
     }
 
@@ -184,6 +184,7 @@ export class OvaleFutureClass extends OvaleFutureBase {
         this.UnregisterEvent("UNIT_SPELLCAST_STOP");
         this.UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED");
         this.UnregisterMessage("Ovale_AuraAdded");
+        this.UnregisterMessage("Ovale_AuraChanged");
         UnregisterRequirement("combat");
     }
     
@@ -192,24 +193,22 @@ export class OvaleFutureClass extends OvaleFutureBase {
     }
     
     COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
+        //this.DebugTimeStamp("DEBUG", CombatLogGetCurrentEventInfo())
         let [, cleuEvent, , sourceGUID, sourceName, , , destGUID, destName, , , spellId, spellName, , , , , , , , , , , isOffHand] = CombatLogGetCurrentEventInfo();
         if (sourceGUID == Ovale.playerGUID || OvaleGUID.IsPlayerPet(sourceGUID)) {
             this.StartProfiling("OvaleFuture_COMBAT_LOG_EVENT_UNFILTERED");
             if (CLEU_SPELLCAST_EVENT[cleuEvent]) {
                 let now = GetTime();
-                let eventDebug = false;
                 let delta = 0;
                 if (strsub(cleuEvent, 1, 11) == "SPELL_CAST_" && (destName && destName != "")) {
-                    if (!eventDebug) {
-                        this.DebugTimestamp("CLEU", cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName);
-                        eventDebug = true;
-                    }
+                    this.DebugTimestamp("CLEU", cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName);
                     let [spellcast] = this.GetSpellcast(spellName, spellId, undefined, now);
                     if (spellcast && spellcast.targetName && spellcast.targetName == destName && spellcast.target != destGUID) {
                         this.Debug("Disambiguating target of spell %s (%d) to %s (%s).", spellName, spellId, destName, destGUID);
                         spellcast.target = destGUID;
                     }
                 }
+                this.DebugTimestamp("CLUE", cleuEvent);
                 let finish = CLEU_SPELLCAST_FINISH_EVENT[cleuEvent];
                 if (cleuEvent == "SPELL_DAMAGE" || cleuEvent == "SPELL_HEAL") {
                     if (isOffHand) {
@@ -248,20 +247,17 @@ export class OvaleFutureClass extends OvaleFutureBase {
     FinishSpell(spellcast: SpellCast, cleuEvent: string, sourceName: string, sourceGUID: string, destName: string, destGUID: string, spellId: number, spellName: string, delta: number, finish: "hit"|"miss", i: number) {
         let finished = false;
         if (!spellcast.auraId) {
-            if (!eventDebug) {
-                this.DebugTimestamp("CLEU", cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName);
-                eventDebug = true;
-            }
+            this.DebugTimestamp("CLEU", cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName);
             if (!spellcast.channel) {
                 this.Debug("Finished (%s) spell %s (%d) queued at %s due to %s.", finish, spellName, spellId, spellcast.queued, cleuEvent);
                 finished = true;
             }
         } else if (CLEU_AURA_EVENT[cleuEvent] && spellcast.auraGUID && destGUID == spellcast.auraGUID) {
-            if (!eventDebug) {
-                this.DebugTimestamp("CLEU", cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName);
-                eventDebug = true;
-            }
+            this.DebugTimestamp("CLEU", cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName);
             this.Debug("Finished (%s) spell %s (%d) queued at %s after seeing aura %d on %s.", finish, spellName, spellId, spellcast.queued, spellcast.auraId, spellcast.auraGUID);
+            finished = true;
+        } else if (cleuEvent == "Ovale_AuraChanged" && spellcast.auraGUID && destGUID == spellcast.auraGUID) {
+            this.Debug("Finished (%s) spell %s (%d) queued at %s after Ovale_AuraChanged was called for aura %d on %s.", finish, spellName, spellId, spellcast.queued, spellcast.auraId, spellcast.auraGUID);
             finished = true;
         }
         if (finished) {
@@ -571,6 +567,24 @@ export class OvaleFutureClass extends OvaleFutureBase {
             self_timeAuraAdded = atTime;
             this.UpdateSpellcastSnapshot(lastSpell.lastGCDSpellcast, atTime);
             this.UpdateSpellcastSnapshot(this.current.lastOffGCDSpellcast, atTime);
+        }
+    }
+    Ovale_AuraChanged(event: string, atTime: number, guid: string, auraId: string, caster: string) {
+        this.DebugTimestamp("Ovale_AuraChanged", event, atTime, guid, auraId, caster);
+        if (caster == Ovale.playerGUID) {
+            // let's check if the aura matches a spell we have in flight, if so we can end it
+            let anyFinished = false;
+            for (let i = lualength(lastSpell.queue); i >= 1; i += -1) {
+                let spellcast = lastSpell.queue[i];
+                if (spellcast.success && (spellcast.auraId == auraId)) {
+                    if (this.FinishSpell(spellcast, "Ovale_AuraChanged", caster, Ovale.playerGUID, spellcast.targetName, guid, spellcast.spellId, spellcast.spellName, undefined, "hit", i)) {
+                        anyFinished = true;
+                    }
+                }
+            }
+            if (!anyFinished) {
+                this.Debug("No spell found to finish for auraId %d", auraId);
+            }
         }
     }
     UnitSpellcastEnded(event: string, unitId: string, lineId: number, spellId: number) {
@@ -1022,9 +1036,9 @@ export class OvaleFutureClass extends OvaleFutureBase {
                 }
                 if (isValid) {
                     if (spellcast.target) {
-                        OvaleState.Log("Active spell %s (%d) is %s to %s (%s), now=%f, endCast=%f", spellcast.spellName, spellcast.spellId, description, spellcast.targetName, spellcast.target, now, spellcast.stop);
+                        OvaleState.Log("Active spell %s (%d) is %s to %s (%s), now=%f, endCast=%f, start=%f", spellcast.spellName, spellcast.spellId, description, spellcast.targetName, spellcast.target, now, spellcast.stop, spellcast.start);
                     } else {
-                        OvaleState.Log("Active spell %s (%d) is %s, now=%f, endCast=%f", spellcast.spellName, spellcast.spellId, description, now, spellcast.stop);
+                        OvaleState.Log("Active spell %s (%d) is %s, now=%f, endCast=%f, start=%f", spellcast.spellName, spellcast.spellId, description, now, spellcast.stop, spellcast.start);
                     }
                     this.ApplySpell(spellcast.spellId, spellcast.target, spellcast.start, spellcast.stop, spellcast.channel, spellcast);
                 } else {

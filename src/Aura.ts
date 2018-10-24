@@ -374,22 +374,24 @@ export class OvaleAuraClass extends OvaleAuraBase {
         self_pool.Drain();
     }
     COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
+        this.DebugTimestamp("DEBUG", CombatLogGetCurrentEventInfo())
         let [, cleuEvent, , sourceGUID, , , , destGUID, , , , spellId, spellName, , auraType, amount] = CombatLogGetCurrentEventInfo();
         let mine = (sourceGUID == self_playerGUID || OvaleGUID.IsPlayerPet(sourceGUID));
         if (mine && cleuEvent == "SPELL_MISSED") {
             let [unitId] = OvaleGUID.GUIDUnit(destGUID);
             if (unitId) {
-                    this.DebugTimestamp("%s: %s (%s)", cleuEvent, destGUID, unitId);
-                    this.ScanAuras(unitId, destGUID);
+                this.DebugTimestamp("%s: %s (%s)", cleuEvent, destGUID, unitId);
+                this.ScanAuras(unitId, destGUID);
             }
         }
         if (CLEU_AURA_EVENTS[cleuEvent]) {
             let [unitId] = OvaleGUID.GUIDUnit(destGUID);
+            this.DebugTimestamp("UnitId: ", unitId);
             if (unitId) {
                 if (!OvaleGUID.UNIT_AURA_UNIT[unitId]) {
                     this.DebugTimestamp("%s: %s (%s)", cleuEvent, destGUID, unitId);
                     this.ScanAuras(unitId, destGUID);
-                }
+                } 
             } else if (mine) {
                 this.DebugTimestamp("%s: %s (%d) on %s", cleuEvent, spellName, spellId, destGUID);
                 let now = GetTime();
@@ -451,6 +453,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
         self_pool.Drain();
     }
     UNIT_AURA(event: string, unitId: string) {
+        this.Debug(event, unitId);
         this.ScanAuras(unitId);
     }
     Ovale_UnitChanged(event: string, unitId: string, guid: string) {
@@ -513,7 +516,7 @@ export class OvaleAuraClass extends OvaleAuraBase {
         let auraIsUnchanged = (aura.source == casterGUID && aura.duration == duration && aura.ending == expirationTime && aura.stacks == count && aura.value1 == value1 && aura.value2 == value2 && aura.value3 == value3);
         aura.serial = this.current.serial[guid]!;
         if (!auraIsActive || !auraIsUnchanged) {
-            this.Debug("    Adding %s %s (%s) to %s at %f, aura.serial=%d", filter, name, auraId, guid, atTime, aura.serial);
+            this.Debug("    Adding %s %s (%s) to %s at %f, aura.serial=%d, duration=%f, expirationTime=%f, auraIsActive=%s, auraIsUnchanged=%s", filter, name, auraId, guid, atTime, aura.serial, duration, expirationTime, auraIsActive && "true" || "false", auraIsUnchanged && "true" || "false");
             aura.name = name;
             aura.duration = duration;
             aura.ending = expirationTime;
@@ -1186,7 +1189,9 @@ export class OvaleAuraClass extends OvaleAuraBase {
                 if (verified) {
                     let si = OvaleData.spellInfo[auraId];
                     let auraFound = OvaleAura.GetAuraByGUID(guid, auraId, filter, true, atTime);
-                    if (OvaleAura.IsActiveAura(auraFound, atTime)) {
+                    let isActiveAura = OvaleAura.IsActiveAura(auraFound, atTime)
+                    OvaleAura.Log("Aura found, checking if it is Active at %f => IsActiveAura=%s", atTime, isActiveAura && "true" || "FALSE");
+                    if (isActiveAura) {
                         let aura: Aura;
                         if (auraFound.state) {
                             aura = auraFound;
