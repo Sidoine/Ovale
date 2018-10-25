@@ -399,8 +399,10 @@ Define(frost_bomb 112948)
 Define(frost_bomb_debuff 112948)
 	SpellInfo(frost_bomb_debuff duration=12)
 Define(frost_nova 122)
+	SpellInfo(frost_nova cd=30)
+	SpellAddTargetDebuff(frost_nova frost_nova_debuff=1)
 
-	SpellInfo(frostbolt travel_time=1)
+SpellInfo(frostbolt travel_time=1)
 	SpellAddBuff(frostbolt ice_floes_buff=0 if_spell=ice_floes)
 Define(frostfire_bolt 44614)
 	SpellInfo(frostfire_bolt travel_time=1)
@@ -624,6 +626,19 @@ Define(zannesu_journey_buff 226852)
 
 ### Pyroblast
 AddFunction FirePyroblastHitDamage asValue=1 { 2.423 * Spellpower() * { BuffPresent(pyroblast_buff asValue=1) * 1.25 } }
+
+# Xelditions
+Define(slow 31589)
+	SpellAddTargetDebuff(slow slow_debuff=1)
+Define(slow_debuff 31589)
+	SpellInfo(slow_debuff duration=15)
+Define(frost_nova_debuff 122)
+	SpellInfo(frost_nova_debuff duration=8)
+Define(prismatic_barrier 235450)
+	SpellInfo(prismatic_barrier cd=25)
+	SpellAddBuff(prismatic_barrier prismatic_barrier_buff=1)
+Define(prismatic_barrier_buff 235450)
+	SpellInfo(prismatic_barrier_buff duration=60)
 ]]
     OvaleScripts:RegisterScript("MAGE", nil, name, desc, code, "include")
 end
