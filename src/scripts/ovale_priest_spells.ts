@@ -79,10 +79,6 @@ Define(mind_sear 48045)
 # Corrosive shadow energy radiates from the target, dealing 49821m2*s2 Shadow damage over 3 seconds to all enemies within 49821a2 yards of the target.rnrn|cFFFFFFFFGenerates s2*208232m1/100 Insanity over the duration per target hit.|r
   SpellInfo(mind_sear duration=3 channel=3 tick=0.75)
 
-Define(mindbender 123040)
-# Summons a Mindbender to attack the target for 12 seconds. You regenerate 123051m1/100.1 of maximum mana each time the Mindbender attacks.
-  SpellInfo(mindbender cd=60 duration=12 talent=mindbender_talent_unknown)
-
 Define(quaking_palm 107079)
 # Strikes the target with lightning speed, incapacitating them for 4 seconds, and turns off your attack.
   SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
@@ -169,8 +165,6 @@ Define(halo_talent 18) #19763
 # Creates a ring of Holy energy around you that quickly expands to a 30 yd radius, healing allies for (110.00000000000001 of Spell Power) and dealing (110.00000000000001 of Spell Power) Holy damage to enemies.
 Define(mind_bomb_talent 11) #23375
 # Inflicts the target with a Mind Bomb.rnrnAfter 2 seconds or if the target dies, it unleashes a psychic explosion, disorienting all enemies within 226943A1 yds of the target for 5 seconds.
-Define(mindbender_talent_unknown 8) #22094
-# Summons a Mindbender to attack the target for 12 seconds. You regenerate 123051m1/100.1 of maximum mana each time the Mindbender attacks.
 Define(misery_talent 8) #23126
 # Vampiric Touch also applies Shadow Word: Pain to the target.
 Define(shadow_crash_talent 15) #21755
@@ -232,8 +226,9 @@ Define(mind_control 605)
 Define(mind_vision 2096)
 
 Define(mindbender_discipline 123040)
-	SpellInfo(mindbender cd=60 tag=main)
-	SpellInfo(mindbender replaced_by=shadowfiend talent=!disc_mindbender_talent)
+	SpellInfo(mindbender_discipline cd=60 tag=main)
+Define(mindbender_shadow 200174)
+    SpellInfo(mindbender_shadow cd=60 tag=main)
 Define(penance 47540)
 	SpellInfo(penance cd=9 channel=2)
 Define(power_word_fortitude 21562)
@@ -287,8 +282,9 @@ Define(shadow_word_pain_debuff 589)
 Define(shadowfiend 34433)
 	SpellInfo(shadowfiend cd=180)
 	SpellInfo(shadowfiend replaced_by=mindbender_discipline talent=disc_mindbender_talent specialization=discipline)
-
-	SpellRequire(shadowform unusable 1=buff,voidform_buff)
+    SpellInfo(shadowfiend replaced_by=mindbender_shadow talent=shadow_mindbender_talent specialization=shadow)
+    
+    SpellRequire(shadowform unusable 1=buff,voidform_buff)
 Define(shadowform_buff 232698)
 Define(shadowy_insight_buff 124430)
 	SpellInfo(shadowy_insight_buff duration=12)
@@ -357,8 +353,7 @@ Define(censure_talent 11)
 Define(circle_of_healing_talent 15)
 Define(contrition_talent 14)
 Define(cosmic_ripple_talent 7)
-
-
+Define(disc_mindbender_talent 8)
 Define(divine_star_talent 17)
 Define(dominant_mind_talent 11)
 Define(enduring_renewal_talent 3)
@@ -377,9 +372,6 @@ Define(luminous_barrier_talent 20)
 Define(mania_talent 6)
 Define(masochism_talent 5)
 Define(mind_bomb_talent 11)
-Define(disc_mindbender_talent 8)
-
-
 Define(perseverance_talent 5)
 Define(power_word_solace_talent 9)
 Define(psychic_horror_talent 12)
@@ -388,20 +380,15 @@ Define(purge_the_wicked_talent 16)
 Define(sanlayn_talent 5)
 Define(schism_talent 3)
 Define(shadow_covenant_talent 15)
-
-
-
+Define(shadow_mindbender_talent 17)
 Define(shadowy_insight_talent 2)
 Define(shield_discipline_talent 7)
 Define(shining_force_talent 12)
 Define(sins_of_the_many_talent 13)
 Define(surge_of_light_talent 13)
-
 Define(trail_of_light_talent 2)
 Define(twist_of_fate_talent_discipline 2)
 Define(twist_of_fate_talent 7)
-
-
 `;
     OvaleScripts.RegisterScript("PRIEST", undefined, name, desc, code, "include");
 }

@@ -1593,8 +1593,7 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("judgment", "judgment_prot", "PALADIN", "protection");
 
     //Priest
-    AddDisambiguation("mindbender_talent", "mindbender_talent_discipline", "PRIEST", "discipline");
-    AddDisambiguation("twist_of_fate_talent", "twist_of_fate_talent_discipline", "PRIEST", "discipline");
+    AddDisambiguation("mindbender", "mindbender_shadow", "PRIEST", "shadow");
 
     //Rogue
     AddDisambiguation("deadly_poison_dot", "deadly_poison_debuff", "ROGUE", "assassination");
