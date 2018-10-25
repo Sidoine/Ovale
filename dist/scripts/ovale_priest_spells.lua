@@ -308,7 +308,7 @@ Define(vampiric_embrace_buff 15286)
 	SpellAddTargetDebuff(vampiric_touch shadow_word_pain_debuff=1 talent=misery_talent)
 Define(vampiric_touch_debuff 34914)
 	SpellInfo(vampiric_touch_debuff duration=21 haste=spell tick=3)
-
+Define(void_bolt 205448)
 	SpellInfo(void_bolt cd=4.5 insanity=-16 cd_haste=spell)
 	SpellRequire(void_bolt unusable 1=buff,!voidform_buff)
 	SpellRequire(void_bolt insanity_percent 200=buff,surrender_to_madness_buff)
