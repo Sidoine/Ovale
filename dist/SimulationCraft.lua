@@ -1432,8 +1432,7 @@ local InitializeDisambiguation = function()
     AddDisambiguation("divine_purpose_buff", "divine_purpose_buff_holy", "PALADIN", "holy")
     AddDisambiguation("judgment", "judgment_holy", "PALADIN", "holy")
     AddDisambiguation("judgment", "judgment_prot", "PALADIN", "protection")
-    AddDisambiguation("mindbender_talent", "mindbender_talent_discipline", "PRIEST", "discipline")
-    AddDisambiguation("twist_of_fate_talent", "twist_of_fate_talent_discipline", "PRIEST", "discipline")
+    AddDisambiguation("mindbender", "mindbender_shadow", "PRIEST", "shadow")
     AddDisambiguation("deadly_poison_dot", "deadly_poison_debuff", "ROGUE", "assassination")
     AddDisambiguation("stealth_buff", "stealthed_buff", "ROGUE")
     AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_assassination_buff", "ROGUE", "assassination")
@@ -2640,37 +2639,7 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
                     operator = parseNodeOperator
                 end
             end
-            if parseNode.type == "compare" and parseNode.child[1].rune then
-                local lhsNode = parseNode.child[1]
-                local rhsNode = parseNode.child[2]
-                local runeType = lhsNode.rune
-                local number = (rhsNode.type == "number") and tonumber(Unparse(rhsNode)) or nil
-                if rhsNode.type == "number" then
-                    number = tonumber(Unparse(rhsNode))
-                end
-                if runeType and number then
-                    local code
-                    local op = parseNode.operator
-                    local runeFunction = "Rune"
-                    local runeCondition
-                    runeCondition = runeFunction .. "()"
-                    if op == ">" then
-                        code = format("%s >= %d", runeCondition, number + 1)
-                    elseif op == ">=" then
-                        code = format("%s >= %d", runeCondition, number)
-                    elseif op == "=" then
-                        code = format("%s >= %d", runeCondition, number)
-                    elseif op == "<=" then
-                        code = format("%s < %d", runeCondition, number + 1)
-                    elseif op == "<" then
-                        code = format("%s < %d", runeCondition, number)
-                    end
-                    if  not node and code then
-                        annotation.astAnnotation = annotation.astAnnotation or {}
-                        node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
-                    end
-                end
-            elseif (parseNode.operator == "=" or parseNode.operator == "!=") and (parseNode.child[1].name == "target" or parseNode.child[1].name == "current_target") then
+            if (parseNode.operator == "=" or parseNode.operator == "!=") and (parseNode.child[1].name == "target" or parseNode.child[1].name == "current_target") then
                 local rhsNode = parseNode.child[2]
                 local name = rhsNode.name
                 if find(name, "^[%a_]+%.") then
@@ -3551,6 +3520,12 @@ EmitOperandRaidEvent = function(operand, parseNode, nodeList, annotation, action
         else
             ok = false
         end
+    elseif name == "invulnerable" then
+        if property == "up" then
+            code = "False(raid_events_invulnerable_up)"
+        else
+            ok = false
+        end
     else
         ok = false
     end
@@ -3742,6 +3717,8 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
     elseif className == "HUNTER" and operand == "lowest_vuln_within.5" then
         code = "target.DebuffRemaining(vulnerable)"
         AddSymbol(annotation, "vulnerable")
+    elseif className == "HUNTER" and operand == "cooldown.trueshot.duration_guess" then
+        code = "0"
     elseif className == "MAGE" and operand == "buff.rune_of_power.remains" then
         code = "TotemRemaining(rune_of_power)"
     elseif className == "MAGE" and operand == "buff.shatterlance.up" then

@@ -688,6 +688,8 @@ AddFunction FuryPrecombatCdActions
  #snapshot_stats
  #potion
  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(bursting_blood usable=1)
+ #recklessness,if=!talent.furious_slash.enabled&!talent.reckless_abandon.enabled
+ if not Talent(furious_slash_talent) and not Talent(reckless_abandon_talent) Spell(recklessness)
 }
 
 AddFunction FuryPrecombatCdPostConditions
@@ -909,6 +911,7 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # quaking_palm
 # raging_blow
 # rampage
+# reckless_abandon_talent
 # recklessness
 # recklessness_buff
 # shockwave

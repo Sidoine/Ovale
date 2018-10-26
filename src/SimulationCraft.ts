@@ -2819,37 +2819,7 @@ EmitExpression = function (parseNode, nodeList, annotation, action) {
                     operator = parseNodeOperator;
                 }
             }
-            if (parseNode.type == "compare" && parseNode.child[1].rune) {
-                let lhsNode = parseNode.child[1];
-                let rhsNode = parseNode.child[2];
-                let runeType = lhsNode.rune;
-                let number = (rhsNode.type == "number") && tonumber(Unparse(rhsNode)) || undefined;
-                if (rhsNode.type == "number") {
-                    number = tonumber(Unparse(rhsNode));
-                }
-                if (runeType && number) {
-                    let code;
-                    let op = parseNode.operator;
-                    let runeFunction = "Rune";
-                    let runeCondition;
-                    runeCondition = `${runeFunction}()`;
-                    if (op == ">") {
-                        code = format("%s >= %d", runeCondition, number + 1);
-                    } else if (op == ">=") {
-                        code = format("%s >= %d", runeCondition, number);
-                    } else if (op == "=") {
-                        code = format("%s >= %d", runeCondition, number);
-                    } else if (op == "<=") {
-                        code = format("%s < %d", runeCondition, number + 1);
-                    } else if (op == "<") {
-                        code = format("%s < %d", runeCondition, number);
-                    }
-                    if (!node && code) {
-                        annotation.astAnnotation = annotation.astAnnotation || {};
-                        [node] = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation);
-                    }
-                }
-            } else if ((parseNode.operator == "=" || parseNode.operator == "!=") && (parseNode.child[1].name == "target" || parseNode.child[1].name == "current_target")) {
+            if ((parseNode.operator == "=" || parseNode.operator == "!=") && (parseNode.child[1].name == "target" || parseNode.child[1].name == "current_target")) {
                 let rhsNode = parseNode.child[2];
                 let name = rhsNode.name;
                 if (truthy(find(name, "^[%a_]+%."))) {
@@ -3722,6 +3692,12 @@ EmitOperandRaidEvent = function (operand, parseNode, nodeList, annotation, actio
         } else {
             ok = false;
         }
+    } else if (name == "invulnerable") {
+        if (property == "up") {
+            code = "False(raid_events_invulnerable_up)";
+        } else {
+            ok = false;
+        }
     } else {
         ok = false;
     }
@@ -3909,6 +3885,10 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
     } else if (className == "HUNTER" && operand == "lowest_vuln_within.5") {
         code = "target.DebuffRemaining(vulnerable)";
         AddSymbol(annotation, "vulnerable");
+    } else if (className == "HUNTER" && operand == "cooldown.trueshot.duration_guess") {
+        // we calculate the extension we got for trueshot (from talents), the last time we cast it
+        // does the simulator even have this information?
+        code = "0"
     } else if (className == "MAGE" && operand == "buff.rune_of_power.remains") {
         code = "TotemRemaining(rune_of_power)";
     } else if (className == "MAGE" && operand == "buff.shatterlance.up") {
