@@ -315,7 +315,7 @@ Define(void_bolt 205448)
 	SpellAddTargetDebuff(void_bolt shadow_word_pain_debuff=refresh)
 	SpellAddTargetDebuff(void_bolt vampiric_touch_debuff=refresh)
 
-	SpellInfo(void_eruption insanity=90 shared_cd=void_bolt tag=main)
+	SpellInfo(void_eruption insanity=90 tag=main)
 	SpellInfo(void_eruption insanity=60 talent=legacy_of_the_void_talent)
 	SpellAddBuff(void_eruption voidform_buff=1)
 	SpellRequire(void_eruption unusable 1=buff,voidform_buff)
