@@ -22,9 +22,9 @@ AddFunction BloodInterruptActions
 {
  if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
  {
-  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
-  if target.InRange(asphyxiate) and not target.Classification(worldboss) Spell(asphyxiate)
   if target.InRange(mind_freeze) and target.IsInterruptible() Spell(mind_freeze)
+  if target.InRange(asphyxiate) and not target.Classification(worldboss) Spell(asphyxiate)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
  }
 }
 
@@ -323,9 +323,9 @@ AddFunction FrostInterruptActions
 {
  if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
  {
-  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
-  if target.Distance(less 12) and not target.Classification(worldboss) Spell(blinding_sleet)
   if target.InRange(mind_freeze) and target.IsInterruptible() Spell(mind_freeze)
+  if target.Distance(less 12) and not target.Classification(worldboss) Spell(blinding_sleet)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
  }
 }
 
@@ -1027,9 +1027,9 @@ AddFunction UnholyInterruptActions
 {
  if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
  {
-  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
-  if target.InRange(asphyxiate) and not target.Classification(worldboss) Spell(asphyxiate)
   if target.InRange(mind_freeze) and target.IsInterruptible() Spell(mind_freeze)
+  if target.InRange(asphyxiate) and not target.Classification(worldboss) Spell(asphyxiate)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
  }
 }
 

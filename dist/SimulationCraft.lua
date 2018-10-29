@@ -4256,26 +4256,10 @@ local function Sweep(node)
 end
 local InsertInterruptFunction = function(child, annotation, interrupts)
     local nodeList = annotation.astAnnotation.nodeList
-    local className = annotation.class
     local camelSpecialization = CamelSpecialization(annotation)
     local spells = interrupts or {}
-    if OvaleData.PANDAREN_CLASSES[className] then
-        insert(spells, {
-            name = "quaking_palm",
-            stun = 1,
-            order = 98
-        })
-    end
-    if OvaleData.TAUREN_CLASSES[className] then
-        insert(spells, {
-            name = "war_stomp",
-            stun = 1,
-            order = 99,
-            range = "target.Distance(less 5)"
-        })
-    end
     sort(spells, function(a, b)
-        return tonumber(a.order or 0) < tonumber(b.order or 0)
+        return tonumber(a.order or 0) >= tonumber(b.order or 0)
     end
 )
     local lines = {}
@@ -4325,6 +4309,22 @@ end
 
 local InsertInterruptFunctions = function(child, annotation)
     local interrupts = {}
+    local className = annotation.class
+    if OvaleData.PANDAREN_CLASSES[className] then
+        insert(interrupts, {
+            name = "quaking_palm",
+            stun = 1,
+            order = 98
+        })
+    end
+    if OvaleData.TAUREN_CLASSES[className] then
+        insert(interrupts, {
+            name = "war_stomp",
+            stun = 1,
+            order = 99,
+            range = "target.Distance(less 5)"
+        })
+    end
     if annotation.mind_freeze == "DEATHKNIGHT" then
         insert(interrupts, {
             name = "mind_freeze",
@@ -4630,10 +4630,8 @@ local InsertInterruptFunctions = function(child, annotation)
     end
     if #interrupts > 0 then
         InsertInterruptFunction(child, annotation, interrupts)
-        return 1
-    else
-        return 0
     end
+    return #interrupts
 end
 
 local InsertSupportingFunctions = function(child, annotation)
@@ -5310,7 +5308,7 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
         end
         if ok then
             annotation.supportingFunctionCount = InsertSupportingFunctions(child, annotation)
-            annotation.supportingInterruptCount = InsertInterruptFunctions(child, annotation)
+            annotation.supportingInterruptCount = annotation.interrupt and InsertInterruptFunctions(child, annotation)
             annotation.supportingControlCount = InsertSupportingControls(child, annotation)
             InsertVariables(child, annotation)
             local className, specialization = annotation.class, annotation.specialization

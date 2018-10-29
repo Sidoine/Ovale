@@ -4443,27 +4443,10 @@ interface Spell {
 
 const InsertInterruptFunction = function(child: LuaArray<AstNode>, annotation: Annotation, interrupts: LuaArray<Spell>) {
     let nodeList = annotation.astAnnotation.nodeList;
-    let className = annotation.class;
-    // let specialization = annotation.specialization;
     let camelSpecialization = CamelSpecialization(annotation);
     let spells = interrupts || {}
-    if (OvaleData.PANDAREN_CLASSES[className]) {
-        insert(spells, {
-            name: "quaking_palm",
-            stun: 1,
-            order: 98
-        });
-    }
-    if (OvaleData.TAUREN_CLASSES[className]) {
-        insert(spells, {
-            name: "war_stomp",
-            stun: 1,
-            order: 99,
-            range: "target.Distance(less 5)"
-        });
-    }
     sort(spells, function (a, b) {
-        return tonumber(a.order || 0) < tonumber(b.order || 0);
+        return tonumber(a.order || 0) >= tonumber(b.order || 0);
     });
     let lines:LuaArray<string> = {}
     for (const [, spell] of pairs(spells)) {
@@ -4511,7 +4494,24 @@ const InsertInterruptFunction = function(child: LuaArray<AstNode>, annotation: A
 }
 const InsertInterruptFunctions = function(child: LuaArray<AstNode>, annotation: Annotation) {
     let interrupts = {};
-
+    let className = annotation.class;
+    
+    if (OvaleData.PANDAREN_CLASSES[className]) {
+        insert(interrupts, {
+            name: "quaking_palm",
+            stun: 1,
+            order: 98
+        });
+    }
+    if (OvaleData.TAUREN_CLASSES[className]) {
+        insert(interrupts, {
+            name: "war_stomp",
+            stun: 1,
+            order: 99,
+            range: "target.Distance(less 5)"
+        });
+    }
+    
     if (annotation.mind_freeze == "DEATHKNIGHT") {
         insert(interrupts, {
             name: "mind_freeze",
@@ -4817,10 +4817,8 @@ const InsertInterruptFunctions = function(child: LuaArray<AstNode>, annotation: 
     }
     if (lualength(interrupts) > 0) {
         InsertInterruptFunction(child, annotation, interrupts);
-        return 1;
-    } else {
-        return 0;
     }
+    return lualength(interrupts);
 }
 const InsertSupportingFunctions = function(child: LuaArray<AstNode>, annotation: Annotation) {
     let count = 0;
@@ -5494,7 +5492,7 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
         }
         if (ok) {
             annotation.supportingFunctionCount = InsertSupportingFunctions(child, annotation);
-            annotation.supportingInterruptCount = InsertInterruptFunctions(child, annotation);
+            annotation.supportingInterruptCount = annotation.interrupt && InsertInterruptFunctions(child, annotation);
             annotation.supportingControlCount = InsertSupportingControls(child, annotation);
             // annotation.supportingDefineCount = InsertSupportingDefines(child, annotation);
             InsertVariables(child, annotation);
