@@ -5215,29 +5215,6 @@ function InsertSupportingControls(child: LuaArray<AstNode>, annotation: Annotati
     }
     return count;
 }
-/* Honor Among Thieves is now a PvP talent and is no longer supported in simcraft.
-const InsertSupportingDefines = function(child: LuaArray<AstNode>, annotation: Annotation) {
-    let count = 0;
-    let nodeList = annotation.astAnnotation.nodeList;
-    if (annotation.honor_among_thieves == "ROGUE") {
-        let buffName = "honor_among_thieves_cooldown_buff";
-        {
-            let code = format("SpellInfo(%s duration=%f)", buffName, annotation[buffName]);
-            let [node] = OvaleAST.ParseCode("spell_info", code, nodeList, annotation.astAnnotation);
-            insert(child, 1, node);
-            count = count + 1;
-        }
-        {
-            let code = format("Define(%s %d)", buffName, OvaleHonorAmongThieves.spellId);
-            let [node] = OvaleAST.ParseCode("define", code, nodeList, annotation.astAnnotation);
-            insert(child, 1, node);
-            count = count + 1;
-        }
-        AddSymbol(annotation, buffName);
-    }
-    return count;
-}
-*/
 const InsertVariables = function(child: LuaArray<AstNode>, annotation: Annotation) {
     if (annotation.variable) {
         for (const [, v] of pairs(annotation.variable)) {
