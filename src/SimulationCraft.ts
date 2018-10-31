@@ -1593,8 +1593,7 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("judgment", "judgment_prot", "PALADIN", "protection");
 
     //Priest
-    AddDisambiguation("mindbender_talent", "mindbender_talent_discipline", "PRIEST", "discipline");
-    AddDisambiguation("twist_of_fate_talent", "twist_of_fate_talent_discipline", "PRIEST", "discipline");
+    AddDisambiguation("mindbender", "mindbender_shadow", "PRIEST", "shadow");
 
     //Rogue
     AddDisambiguation("deadly_poison_dot", "deadly_poison_debuff", "ROGUE", "assassination");
@@ -2820,37 +2819,7 @@ EmitExpression = function (parseNode, nodeList, annotation, action) {
                     operator = parseNodeOperator;
                 }
             }
-            if (parseNode.type == "compare" && parseNode.child[1].rune) {
-                let lhsNode = parseNode.child[1];
-                let rhsNode = parseNode.child[2];
-                let runeType = lhsNode.rune;
-                let number = (rhsNode.type == "number") && tonumber(Unparse(rhsNode)) || undefined;
-                if (rhsNode.type == "number") {
-                    number = tonumber(Unparse(rhsNode));
-                }
-                if (runeType && number) {
-                    let code;
-                    let op = parseNode.operator;
-                    let runeFunction = "Rune";
-                    let runeCondition;
-                    runeCondition = `${runeFunction}()`;
-                    if (op == ">") {
-                        code = format("%s >= %d", runeCondition, number + 1);
-                    } else if (op == ">=") {
-                        code = format("%s >= %d", runeCondition, number);
-                    } else if (op == "=") {
-                        code = format("%s >= %d", runeCondition, number);
-                    } else if (op == "<=") {
-                        code = format("%s < %d", runeCondition, number + 1);
-                    } else if (op == "<") {
-                        code = format("%s < %d", runeCondition, number);
-                    }
-                    if (!node && code) {
-                        annotation.astAnnotation = annotation.astAnnotation || {};
-                        [node] = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation);
-                    }
-                }
-            } else if ((parseNode.operator == "=" || parseNode.operator == "!=") && (parseNode.child[1].name == "target" || parseNode.child[1].name == "current_target")) {
+            if ((parseNode.operator == "=" || parseNode.operator == "!=") && (parseNode.child[1].name == "target" || parseNode.child[1].name == "current_target")) {
                 let rhsNode = parseNode.child[2];
                 let name = rhsNode.name;
                 if (truthy(find(name, "^[%a_]+%."))) {
@@ -3723,6 +3692,12 @@ EmitOperandRaidEvent = function (operand, parseNode, nodeList, annotation, actio
         } else {
             ok = false;
         }
+    } else if (name == "invulnerable") {
+        if (property == "up") {
+            code = "False(raid_events_invulnerable_up)";
+        } else {
+            ok = false;
+        }
     } else {
         ok = false;
     }
@@ -3910,6 +3885,10 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
     } else if (className == "HUNTER" && operand == "lowest_vuln_within.5") {
         code = "target.DebuffRemaining(vulnerable)";
         AddSymbol(annotation, "vulnerable");
+    } else if (className == "HUNTER" && operand == "cooldown.trueshot.duration_guess") {
+        // we calculate the extension we got for trueshot (from talents), the last time we cast it
+        // does the simulator even have this information?
+        code = "0"
     } else if (className == "MAGE" && operand == "buff.rune_of_power.remains") {
         code = "TotemRemaining(rune_of_power)";
     } else if (className == "MAGE" && operand == "buff.shatterlance.up") {
@@ -4464,27 +4443,10 @@ interface Spell {
 
 const InsertInterruptFunction = function(child: LuaArray<AstNode>, annotation: Annotation, interrupts: LuaArray<Spell>) {
     let nodeList = annotation.astAnnotation.nodeList;
-    let className = annotation.class;
-    // let specialization = annotation.specialization;
     let camelSpecialization = CamelSpecialization(annotation);
     let spells = interrupts || {}
-    if (OvaleData.PANDAREN_CLASSES[className]) {
-        insert(spells, {
-            name: "quaking_palm",
-            stun: 1,
-            order: 98
-        });
-    }
-    if (OvaleData.TAUREN_CLASSES[className]) {
-        insert(spells, {
-            name: "war_stomp",
-            stun: 1,
-            order: 99,
-            range: "target.Distance(less 5)"
-        });
-    }
     sort(spells, function (a, b) {
-        return tonumber(a.order || 0) < tonumber(b.order || 0);
+        return tonumber(a.order || 0) >= tonumber(b.order || 0);
     });
     let lines:LuaArray<string> = {}
     for (const [, spell] of pairs(spells)) {
@@ -4532,7 +4494,24 @@ const InsertInterruptFunction = function(child: LuaArray<AstNode>, annotation: A
 }
 const InsertInterruptFunctions = function(child: LuaArray<AstNode>, annotation: Annotation) {
     let interrupts = {};
-
+    let className = annotation.class;
+    
+    if (OvaleData.PANDAREN_CLASSES[className]) {
+        insert(interrupts, {
+            name: "quaking_palm",
+            stun: 1,
+            order: 98
+        });
+    }
+    if (OvaleData.TAUREN_CLASSES[className]) {
+        insert(interrupts, {
+            name: "war_stomp",
+            stun: 1,
+            order: 99,
+            range: "target.Distance(less 5)"
+        });
+    }
+    
     if (annotation.mind_freeze == "DEATHKNIGHT") {
         insert(interrupts, {
             name: "mind_freeze",
@@ -4838,10 +4817,8 @@ const InsertInterruptFunctions = function(child: LuaArray<AstNode>, annotation: 
     }
     if (lualength(interrupts) > 0) {
         InsertInterruptFunction(child, annotation, interrupts);
-        return 1;
-    } else {
-        return 0;
     }
+    return lualength(interrupts);
 }
 const InsertSupportingFunctions = function(child: LuaArray<AstNode>, annotation: Annotation) {
     let count = 0;
@@ -5236,29 +5213,6 @@ function InsertSupportingControls(child: LuaArray<AstNode>, annotation: Annotati
     }
     return count;
 }
-/* Honor Among Thieves is now a PvP talent and is no longer supported in simcraft.
-const InsertSupportingDefines = function(child: LuaArray<AstNode>, annotation: Annotation) {
-    let count = 0;
-    let nodeList = annotation.astAnnotation.nodeList;
-    if (annotation.honor_among_thieves == "ROGUE") {
-        let buffName = "honor_among_thieves_cooldown_buff";
-        {
-            let code = format("SpellInfo(%s duration=%f)", buffName, annotation[buffName]);
-            let [node] = OvaleAST.ParseCode("spell_info", code, nodeList, annotation.astAnnotation);
-            insert(child, 1, node);
-            count = count + 1;
-        }
-        {
-            let code = format("Define(%s %d)", buffName, OvaleHonorAmongThieves.spellId);
-            let [node] = OvaleAST.ParseCode("define", code, nodeList, annotation.astAnnotation);
-            insert(child, 1, node);
-            count = count + 1;
-        }
-        AddSymbol(annotation, buffName);
-    }
-    return count;
-}
-*/
 const InsertVariables = function(child: LuaArray<AstNode>, annotation: Annotation) {
     if (annotation.variable) {
         for (const [, v] of pairs(annotation.variable)) {
@@ -5538,7 +5492,7 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
         }
         if (ok) {
             annotation.supportingFunctionCount = InsertSupportingFunctions(child, annotation);
-            annotation.supportingInterruptCount = InsertInterruptFunctions(child, annotation);
+            annotation.supportingInterruptCount = annotation.interrupt && InsertInterruptFunctions(child, annotation);
             annotation.supportingControlCount = InsertSupportingControls(child, annotation);
             // annotation.supportingDefineCount = InsertSupportingDefines(child, annotation);
             InsertVariables(child, annotation);

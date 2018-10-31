@@ -141,6 +141,12 @@ Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
 
+Define(lock_and_load_buff 194594)
+# Your ranged auto attacks have a 194595h chance to trigger Lock and Load, causing your next Aimed Shot to cost no Focus and be instant.
+  SpellInfo(lock_and_load_buff duration=15 channel=15 gcd=0 offgcd=1)
+  # Aimed Shot costs no Focus and is instant.
+  SpellAddBuff(lock_and_load_buff lock_and_load_buff=1)
+  SpellAddBuff(lock_and_load_buff aimed_shot=1)
 Define(mongoose_bite 259387)
 # A brutal attack that deals s1 Physical damage and grants you Mongoose Fury.rnrn|cFFFFFFFFMongoose Fury|rrnIncreases the damage of Mongoose Bite by 259388s1 for 14 seconds, stacking up to 259388u times. Successive attacks do not increase duration.
   SpellInfo(mongoose_bite focus=30 talent=mongoose_bite_talent)
@@ -167,6 +173,9 @@ Define(revive_pet 982)
 # Revives your pet, returning it to life with s1 of its base health.
   SpellInfo(revive_pet focus=35 duration=3 channel=3)
   SpellAddBuff(revive_pet revive_pet=1)
+Define(rising_death 252346)
+# Chance to create multiple potions.
+  SpellInfo(rising_death gcd=0 offgcd=1)
 Define(shrapnel_bomb_debuff 270336)
 # Hurl a bomb at the target, exploding for 270338s1 Fire damage in a cone and impaling enemies with burning shrapnel, scorching them for 270339o1 Fire damage over 6 seconds.rnrn?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] apply Internal Bleeding, causing 270343o1 damage over 9 seconds. Internal Bleeding stacks up to 270343u times.
   SpellInfo(shrapnel_bomb_debuff duration=0.5 channel=0.5 gcd=0 offgcd=1)
@@ -179,6 +188,11 @@ Define(stampede 201430)
 # Summon a herd of stampeding animals from the wilds around you that deal damage to your enemies for 12 seconds.
   SpellInfo(stampede cd=180 duration=12 channel=12 talent=stampede_talent)
   SpellAddBuff(stampede stampede=1)
+Define(steady_aim 277959)
+# Steady Shot increases the damage of your next Aimed Shot against the target by s1, stacking up to 277959u times.
+  SpellInfo(steady_aim duration=15 max_stacks=5 gcd=0 offgcd=1)
+  # The Hunter's next Aimed Shot will deal w1 more damage.
+  SpellAddTargetDebuff(steady_aim steady_aim=1)
 Define(steady_shot 56641)
 # A steady shot that causes s1 Physical damage.rnrnUsable while moving.rnrn|cFFFFFFFFGenerates s2 Focus.
   SpellInfo(steady_shot)
@@ -218,6 +232,8 @@ Define(birds_of_prey_talent 19) #22272
 # Attacking your pet's target with ?s259387[Mongoose Bite][Raptor Strike] or ?s212436[Butchery][Carve] extends the duration of Coordinated Assault by <duration> sec.
 Define(butchery_talent 6) #22297
 # Strike all nearby enemies in a flurry of strikes, inflicting s1 Physical damage to each.rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit, up to s3.
+Define(careful_aim_talent 4) #22495
+# Aimed Shot has a s4 chance to deal s3 bonus damage to targets who are above s1 health or below s2 health.
 Define(chakrams_talent 21) #23105
 # Throw a pair of chakrams at your target, slicing all enemies in the chakrams' path for <damage> Physical damage. The chakrams will return to you, damaging enemies again.rnrnYour primary target takes 259398s2 increased damage.
 Define(dire_beast_talent 3) #22282
@@ -403,7 +419,7 @@ Define(kill_command_sv 259489)
 	SpellRequire(kill_command_sv cd_percent 0=target_debuff,pheromone_bomb_debuff)
 
 	SpellInfo(lethal_shots_buff duration=15)
-Define(lock_and_load_buff 194594)
+
 	SpellInfo(lock_and_load_buff duration=15)
 Define(master_marksman_buff 269576)
     SpellInfo(master_marksman_buff duration=12)

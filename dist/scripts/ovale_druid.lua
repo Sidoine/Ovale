@@ -42,10 +42,10 @@ AddFunction BalanceInterruptActions
 {
  if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
  {
-  if target.Distance(less 15) and not target.Classification(worldboss) Spell(typhoon)
-  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
-  if target.InRange(mighty_bash) and not target.Classification(worldboss) Spell(mighty_bash)
   if target.InRange(solar_beam) and target.IsInterruptible() Spell(solar_beam)
+  if target.InRange(mighty_bash) and not target.Classification(worldboss) Spell(mighty_bash)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+  if target.Distance(less 15) and not target.Classification(worldboss) Spell(typhoon)
  }
 }
 
@@ -343,11 +343,11 @@ AddFunction FeralInterruptActions
 {
  if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
  {
-  if target.Distance(less 15) and not target.Classification(worldboss) Spell(typhoon)
-  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
-  if target.InRange(maim) and not target.Classification(worldboss) Spell(maim)
-  if target.InRange(mighty_bash) and not target.Classification(worldboss) Spell(mighty_bash)
   if target.InRange(skull_bash) and target.IsInterruptible() Spell(skull_bash)
+  if target.InRange(mighty_bash) and not target.Classification(worldboss) Spell(mighty_bash)
+  if target.InRange(maim) and not target.Classification(worldboss) Spell(maim)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+  if target.Distance(less 15) and not target.Classification(worldboss) Spell(typhoon)
  }
 }
 
@@ -939,11 +939,11 @@ AddFunction GuardianInterruptActions
 {
  if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
  {
-  if target.Distance(less 15) and not target.Classification(worldboss) Spell(typhoon)
-  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
-  if target.Distance(less 10) and not target.Classification(worldboss) Spell(incapacitating_roar)
-  if target.InRange(mighty_bash) and not target.Classification(worldboss) Spell(mighty_bash)
   if target.InRange(skull_bash) and target.IsInterruptible() Spell(skull_bash)
+  if target.InRange(mighty_bash) and not target.Classification(worldboss) Spell(mighty_bash)
+  if target.Distance(less 10) and not target.Classification(worldboss) Spell(incapacitating_roar)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+  if target.Distance(less 15) and not target.Classification(worldboss) Spell(typhoon)
  }
 }
 

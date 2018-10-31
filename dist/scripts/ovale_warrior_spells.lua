@@ -191,6 +191,8 @@ Define(massacre_talent_fury 14) #22393
 # Execute is now usable on targets below s2 health.
 Define(ravager_talent 21) #21667
 # Throws a whirling weapon at the target location that inflicts 7*156287s1 damage to all enemies within 156287A1 yards over 7 seconds. ?a137048[rnrnAlso increases your Parry chance by 227744s1 for 12 seconds.][rnrn|cFFFFFFFFGenerates 248439s1/10 Rage each time it deals damage.|r]
+Define(reckless_abandon_talent 19) #22405
+# Recklessness generates m2/10 Rage and lasts s1/1000 sec longer.
 Define(rend_talent 9) #19138
 # Wounds the target, causing s1 Physical damage instantly and an additional o2 Bleed damage over 12 seconds.
 Define(siegebreaker_talent 21) #16037

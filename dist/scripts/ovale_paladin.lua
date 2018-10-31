@@ -22,11 +22,11 @@ AddFunction ProtectionInterruptActions
 {
  if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
  {
-  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
-  if target.Distance(less 10) and not target.Classification(worldboss) Spell(blinding_light)
-  if target.InRange(hammer_of_justice) and not target.Classification(worldboss) Spell(hammer_of_justice)
-  if target.InRange(avengers_shield) and target.IsInterruptible() Spell(avengers_shield)
   if target.InRange(rebuke) and target.IsInterruptible() Spell(rebuke)
+  if target.InRange(avengers_shield) and target.IsInterruptible() Spell(avengers_shield)
+  if target.InRange(hammer_of_justice) and not target.Classification(worldboss) Spell(hammer_of_justice)
+  if target.Distance(less 10) and not target.Classification(worldboss) Spell(blinding_light)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
  }
 }
 
@@ -317,9 +317,9 @@ AddFunction RetributionInterruptActions
 {
  if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
  {
-  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
-  if target.InRange(hammer_of_justice) and not target.Classification(worldboss) Spell(hammer_of_justice)
   if target.InRange(rebuke) and target.IsInterruptible() Spell(rebuke)
+  if target.InRange(hammer_of_justice) and not target.Classification(worldboss) Spell(hammer_of_justice)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
  }
 }
 

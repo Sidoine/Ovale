@@ -23,11 +23,11 @@ AddFunction BrewmasterInterruptActions
 {
  if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
  {
-  if target.InRange(paralysis) and not target.Classification(worldboss) Spell(paralysis)
-  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
-  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
-  if target.Distance(less 5) and not target.Classification(worldboss) Spell(leg_sweep)
   if target.InRange(spear_hand_strike) and target.IsInterruptible() Spell(spear_hand_strike)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(leg_sweep)
+  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+  if target.InRange(paralysis) and not target.Classification(worldboss) Spell(paralysis)
  }
 }
 
@@ -297,11 +297,11 @@ AddFunction WindwalkerInterruptActions
 {
  if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
  {
-  if target.InRange(paralysis) and not target.Classification(worldboss) Spell(paralysis)
-  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
-  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
-  if target.Distance(less 5) and not target.Classification(worldboss) Spell(leg_sweep)
   if target.InRange(spear_hand_strike) and target.IsInterruptible() Spell(spear_hand_strike)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(leg_sweep)
+  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+  if target.InRange(paralysis) and not target.Classification(worldboss) Spell(paralysis)
  }
 }
 
@@ -790,11 +790,11 @@ AddFunction WindwalkerInterruptActions
 {
  if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
  {
-  if target.InRange(paralysis) and not target.Classification(worldboss) Spell(paralysis)
-  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
-  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
-  if target.Distance(less 5) and not target.Classification(worldboss) Spell(leg_sweep)
   if target.InRange(spear_hand_strike) and target.IsInterruptible() Spell(spear_hand_strike)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(leg_sweep)
+  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+  if target.InRange(paralysis) and not target.Classification(worldboss) Spell(paralysis)
  }
 }
 
