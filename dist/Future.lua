@@ -124,7 +124,6 @@ local IsSameSpellcast = function(a, b)
     return boolean
 end
 
-local eventDebug = false
 __exports.OvaleFutureData = __class(nil, {
     PushGCDSpellId = function(self, spellId)
         if self.lastGCDSpellId then
@@ -207,6 +206,7 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
         self:RegisterEvent("UNIT_SPELLCAST_STOP", "UnitSpellcastEnded")
         self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
         self:RegisterMessage("Ovale_AuraAdded")
+        self:RegisterMessage("Ovale_AuraChanged")
         RegisterRequirement("combat", self.CombatRequirement)
     end,
     OnDisable = function(self)
@@ -226,30 +226,29 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
         self:UnregisterEvent("UNIT_SPELLCAST_STOP")
         self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
         self:UnregisterMessage("Ovale_AuraAdded")
+        self:UnregisterMessage("Ovale_AuraChanged")
         UnregisterRequirement("combat")
     end,
     IsInCombat = function(self, atTime)
         return self:GetState(atTime).inCombat
     end,
     COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
+        self:DebugTimestamp("COMBAT_LOG_EVENT_UNFILTERED", CombatLogGetCurrentEventInfo())
         local _, cleuEvent, _, sourceGUID, sourceName, _, _, destGUID, destName, _, _, spellId, spellName, _, _, _, _, _, _, _, _, _, _, isOffHand = CombatLogGetCurrentEventInfo()
         if sourceGUID == Ovale.playerGUID or OvaleGUID:IsPlayerPet(sourceGUID) then
             self:StartProfiling("OvaleFuture_COMBAT_LOG_EVENT_UNFILTERED")
             if CLEU_SPELLCAST_EVENT[cleuEvent] then
                 local now = GetTime()
-                local eventDebug = false
                 local delta = 0
                 if strsub(cleuEvent, 1, 11) == "SPELL_CAST_" and (destName and destName ~= "") then
-                    if  not eventDebug then
-                        self:DebugTimestamp("CLEU", cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName)
-                        eventDebug = true
-                    end
+                    self:DebugTimestamp("CLEU", cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName)
                     local spellcast = self:GetSpellcast(spellName, spellId, nil, now)
                     if spellcast and spellcast.targetName and spellcast.targetName == destName and spellcast.target ~= destGUID then
                         self:Debug("Disambiguating target of spell %s (%d) to %s (%s).", spellName, spellId, destName, destGUID)
                         spellcast.target = destGUID
                     end
                 end
+                self:DebugTimestamp("CLUE", cleuEvent)
                 local finish = CLEU_SPELLCAST_FINISH_EVENT[cleuEvent]
                 if cleuEvent == "SPELL_DAMAGE" or cleuEvent == "SPELL_HEAL" then
                     if isOffHand then
@@ -288,20 +287,17 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
     FinishSpell = function(self, spellcast, cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName, delta, finish, i)
         local finished = false
         if  not spellcast.auraId then
-            if  not eventDebug then
-                self:DebugTimestamp("CLEU", cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName)
-                eventDebug = true
-            end
+            self:DebugTimestamp("CLEU", cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName)
             if  not spellcast.channel then
                 self:Debug("Finished (%s) spell %s (%d) queued at %s due to %s.", finish, spellName, spellId, spellcast.queued, cleuEvent)
                 finished = true
             end
         elseif CLEU_AURA_EVENT[cleuEvent] and spellcast.auraGUID and destGUID == spellcast.auraGUID then
-            if  not eventDebug then
-                self:DebugTimestamp("CLEU", cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName)
-                eventDebug = true
-            end
+            self:DebugTimestamp("CLEU", cleuEvent, sourceName, sourceGUID, destName, destGUID, spellId, spellName)
             self:Debug("Finished (%s) spell %s (%d) queued at %s after seeing aura %d on %s.", finish, spellName, spellId, spellcast.queued, spellcast.auraId, spellcast.auraGUID)
+            finished = true
+        elseif cleuEvent == "Ovale_AuraChanged" and spellcast.auraGUID and destGUID == spellcast.auraGUID then
+            self:Debug("Finished (%s) spell %s (%d) queued at %s after Ovale_AuraChanged was called for aura %d on %s.", finish, spellName, spellId, spellcast.queued, spellcast.auraId, spellcast.auraGUID)
             finished = true
         end
         if finished then
@@ -611,6 +607,23 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
             self_timeAuraAdded = atTime
             self:UpdateSpellcastSnapshot(lastSpell.lastGCDSpellcast, atTime)
             self:UpdateSpellcastSnapshot(self.current.lastOffGCDSpellcast, atTime)
+        end
+    end,
+    Ovale_AuraChanged = function(self, event, atTime, guid, auraId, caster)
+        self:DebugTimestamp("Ovale_AuraChanged", event, atTime, guid, auraId, caster)
+        if caster == Ovale.playerGUID then
+            local anyFinished = false
+            for i = #lastSpell.queue, 1, -1 do
+                local spellcast = lastSpell.queue[i]
+                if spellcast.success and (spellcast.auraId == auraId) then
+                    if self:FinishSpell(spellcast, "Ovale_AuraChanged", caster, Ovale.playerGUID, spellcast.targetName, guid, spellcast.spellId, spellcast.spellName, nil, "hit", i) then
+                        anyFinished = true
+                    end
+                end
+            end
+            if  not anyFinished then
+                self:Debug("No spell found to finish for auraId %d", auraId)
+            end
         end
     end,
     UnitSpellcastEnded = function(self, event, unitId, lineId, spellId)
@@ -1031,9 +1044,9 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
                 end
                 if isValid then
                     if spellcast.target then
-                        OvaleState:Log("Active spell %s (%d) is %s to %s (%s), now=%f, endCast=%f", spellcast.spellName, spellcast.spellId, description, spellcast.targetName, spellcast.target, now, spellcast.stop)
+                        OvaleState:Log("Active spell %s (%d) is %s to %s (%s), now=%f, endCast=%f, start=%f", spellcast.spellName, spellcast.spellId, description, spellcast.targetName, spellcast.target, now, spellcast.stop, spellcast.start)
                     else
-                        OvaleState:Log("Active spell %s (%d) is %s, now=%f, endCast=%f", spellcast.spellName, spellcast.spellId, description, now, spellcast.stop)
+                        OvaleState:Log("Active spell %s (%d) is %s, now=%f, endCast=%f, start=%f", spellcast.spellName, spellcast.spellId, description, now, spellcast.stop, spellcast.start)
                     end
                     self:ApplySpell(spellcast.spellId, spellcast.target, spellcast.start, spellcast.stop, spellcast.channel, spellcast)
                 else

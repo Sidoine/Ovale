@@ -3888,6 +3888,9 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
         end
     elseif className == "WARRIOR" and operand == "gcd.remains" and (action == "battle_cry" or action == "avatar") then
         code = "0"
+    elseif className == "WARRIOR" and operand == "buff.executioners_precision.stack" then
+        code = "target.DebuffStacks(executioners_precision_debuff)"
+        AddSymbol(annotation, "executioners_precision_debuff")
     elseif operand == "buff.enrage.down" then
         code = "not " .. target .. "IsEnraged()"
     elseif operand == "buff.enrage.remains" then

@@ -4056,6 +4056,9 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
         }
     } else if (className == "WARRIOR" && operand == "gcd.remains" && (action == "battle_cry" || action == "avatar")) {
         code = "0";
+    } else if (className == "WARRIOR" && operand == "buff.executioners_precision.stack") {
+        code = "target.DebuffStacks(executioners_precision_debuff)";
+        AddSymbol(annotation, "executioners_precision_debuff");
     } else if (operand == "buff.enrage.down") {
         code = `not ${target}IsEnraged()`;
     } else if (operand == "buff.enrage.remains") {
