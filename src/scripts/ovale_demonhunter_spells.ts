@@ -309,6 +309,8 @@ Define(razor_spikes_debuff 210003)
 
 	SpellInfo(sigil_of_flame cd=30)
 	SpellInfo(sigil_of_flame cd=24 talent=quickened_sigils_talent)
+Define(sigil_of_flame_concentrated 204513)
+    SpellInfo(sigil_of_flame replaced_by=sigil_of_flame_concentrated talent=concentrated_sigils_talent)
 Define(sigil_of_flame_debuff 204598)
 	SpellInfo(sigil_of_flame_debuff duration=6)
 	SpellInfo(sigil_of_flame_debuff duration=8 talent=concentrated_sigils_talent)
