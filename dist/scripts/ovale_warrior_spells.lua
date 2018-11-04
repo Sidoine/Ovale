@@ -365,8 +365,8 @@ Define(mortal_wounds_debuff 115804)
 Define(overpower_buff 7384)
 	SpellInfo(overpower_buff duration=15 max_stacks=2)
 Define(piercing_howl 12323)
-	SpellInfo(piercing_howl rag=10)
-	SpellAddBuff(piercing_howl piercing_howl_debuff=1)
+	SpellInfo(piercing_howl rage=10)
+	SpellAddTargetDebuff(piercing_howl piercing_howl_debuff=1)
 Define(piercing_howl_debuff 12323)
 	SpellInfo(piercing_howl_debuff duration=15)
 
@@ -496,6 +496,7 @@ Define(stone_heart_buff 225947)
 	SpellAddBuff(execute_arms stone_heart_buff=0)
 	SpellAddBuff(execute stone_heart_buff=0)
 Define(the_great_storms_eye_item 151823)
+Define(sap_debuff 6770)
 
 
 # Talents
