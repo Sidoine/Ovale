@@ -22,12 +22,12 @@ AddFunction ArmsInterruptActions
 {
  if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
  {
-  if target.InRange(intimidating_shout) and not target.Classification(worldboss) Spell(intimidating_shout)
-  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
-  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
-  if target.Distance(less 10) and not target.Classification(worldboss) Spell(shockwave)
-  if target.InRange(storm_bolt) and not target.Classification(worldboss) Spell(storm_bolt)
   if target.InRange(pummel) and target.IsInterruptible() Spell(pummel)
+  if target.InRange(storm_bolt) and not target.Classification(worldboss) Spell(storm_bolt)
+  if target.Distance(less 10) and not target.Classification(worldboss) Spell(shockwave)
+  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+  if target.InRange(intimidating_shout) and not target.Classification(worldboss) Spell(intimidating_shout)
  }
 }
 
@@ -222,7 +222,7 @@ AddFunction ArmsFivetargetMainActions
  #execute,if=(!talent.cleave.enabled&dot.deep_wounds.remains<2)|(buff.sudden_death.react|buff.stone_heart.react)&(buff.sweeping_strikes.up|cooldown.sweeping_strikes.remains>8)
  if not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or { BuffPresent(sudden_death_arms_buff) or BuffPresent(stone_heart_buff) } and { BuffPresent(sweeping_strikes_buff) or SpellCooldown(sweeping_strikes) > 8 } Spell(execute_arms)
  #mortal_strike,if=(!talent.cleave.enabled&dot.deep_wounds.remains<2)|buff.sweeping_strikes.up&buff.overpower.stack=2&(talent.dreadnaught.enabled|buff.executioners_precision.stack=2)
- if not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or BuffPresent(sweeping_strikes_buff) and BuffStacks(overpower_buff) == 2 and { Talent(dreadnaught_talent) or BuffStacks(executioners_precision_buff) == 2 } Spell(mortal_strike)
+ if not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or BuffPresent(sweeping_strikes_buff) and BuffStacks(overpower_buff) == 2 and { Talent(dreadnaught_talent) or target.DebuffStacks(executioners_precision_debuff) == 2 } Spell(mortal_strike)
  #whirlwind,if=debuff.colossus_smash.up|(buff.crushing_assault.up&talent.fervor_of_battle.enabled)
  if target.DebuffPresent(colossus_smash_debuff) or BuffPresent(crushing_assault_buff) and Talent(fervor_of_battle_talent) Spell(whirlwind_arms)
  #whirlwind,if=buff.deadly_calm.up|rage>60
@@ -256,7 +256,7 @@ AddFunction ArmsFivetargetShortCdActions
 
 AddFunction ArmsFivetargetShortCdPostConditions
 {
- Rage() < 60 and { not Talent(deadly_calm_talent) or BuffExpires(deadly_calm_buff) } and Spell(skullsplitter) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or Spell(cleave) or { not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or { BuffPresent(sudden_death_arms_buff) or BuffPresent(stone_heart_buff) } and { BuffPresent(sweeping_strikes_buff) or SpellCooldown(sweeping_strikes) > 8 } } and Spell(execute_arms) or { not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or BuffPresent(sweeping_strikes_buff) and BuffStacks(overpower_buff) == 2 and { Talent(dreadnaught_talent) or BuffStacks(executioners_precision_buff) == 2 } } and Spell(mortal_strike) or { target.DebuffPresent(colossus_smash_debuff) or BuffPresent(crushing_assault_buff) and Talent(fervor_of_battle_talent) } and Spell(whirlwind_arms) or { BuffPresent(deadly_calm_buff) or Rage() > 60 } and Spell(whirlwind_arms) or Spell(overpower) or Spell(whirlwind_arms)
+ Rage() < 60 and { not Talent(deadly_calm_talent) or BuffExpires(deadly_calm_buff) } and Spell(skullsplitter) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or Spell(cleave) or { not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or { BuffPresent(sudden_death_arms_buff) or BuffPresent(stone_heart_buff) } and { BuffPresent(sweeping_strikes_buff) or SpellCooldown(sweeping_strikes) > 8 } } and Spell(execute_arms) or { not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or BuffPresent(sweeping_strikes_buff) and BuffStacks(overpower_buff) == 2 and { Talent(dreadnaught_talent) or target.DebuffStacks(executioners_precision_debuff) == 2 } } and Spell(mortal_strike) or { target.DebuffPresent(colossus_smash_debuff) or BuffPresent(crushing_assault_buff) and Talent(fervor_of_battle_talent) } and Spell(whirlwind_arms) or { BuffPresent(deadly_calm_buff) or Rage() > 60 } and Spell(whirlwind_arms) or Spell(overpower) or Spell(whirlwind_arms)
 }
 
 AddFunction ArmsFivetargetCdActions
@@ -265,7 +265,7 @@ AddFunction ArmsFivetargetCdActions
 
 AddFunction ArmsFivetargetCdPostConditions
 {
- Rage() < 60 and { not Talent(deadly_calm_talent) or BuffExpires(deadly_calm_buff) } and Spell(skullsplitter) or { not Talent(warbreaker_talent) or SpellCooldown(warbreaker) < 2 } and Spell(ravager) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or BuffExpires(sweeping_strikes_buff) and { not Talent(deadly_calm_talent) or BuffExpires(deadly_calm_buff) } and { target.DebuffRemaining(colossus_smash_debuff) > 4.5 and not HasAzeriteTrait(test_of_might_trait) or BuffPresent(test_of_might_buff) } and Spell(bladestorm_arms) or Spell(deadly_calm) or Spell(cleave) or { not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or { BuffPresent(sudden_death_arms_buff) or BuffPresent(stone_heart_buff) } and { BuffPresent(sweeping_strikes_buff) or SpellCooldown(sweeping_strikes) > 8 } } and Spell(execute_arms) or { not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or BuffPresent(sweeping_strikes_buff) and BuffStacks(overpower_buff) == 2 and { Talent(dreadnaught_talent) or BuffStacks(executioners_precision_buff) == 2 } } and Spell(mortal_strike) or { target.DebuffPresent(colossus_smash_debuff) or BuffPresent(crushing_assault_buff) and Talent(fervor_of_battle_talent) } and Spell(whirlwind_arms) or { BuffPresent(deadly_calm_buff) or Rage() > 60 } and Spell(whirlwind_arms) or Spell(overpower) or Spell(whirlwind_arms)
+ Rage() < 60 and { not Talent(deadly_calm_talent) or BuffExpires(deadly_calm_buff) } and Spell(skullsplitter) or { not Talent(warbreaker_talent) or SpellCooldown(warbreaker) < 2 } and Spell(ravager) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or BuffExpires(sweeping_strikes_buff) and { not Talent(deadly_calm_talent) or BuffExpires(deadly_calm_buff) } and { target.DebuffRemaining(colossus_smash_debuff) > 4.5 and not HasAzeriteTrait(test_of_might_trait) or BuffPresent(test_of_might_buff) } and Spell(bladestorm_arms) or Spell(deadly_calm) or Spell(cleave) or { not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or { BuffPresent(sudden_death_arms_buff) or BuffPresent(stone_heart_buff) } and { BuffPresent(sweeping_strikes_buff) or SpellCooldown(sweeping_strikes) > 8 } } and Spell(execute_arms) or { not Talent(cleave_talent) and target.DebuffRemaining(deep_wounds_arms_debuff) < 2 or BuffPresent(sweeping_strikes_buff) and BuffStacks(overpower_buff) == 2 and { Talent(dreadnaught_talent) or target.DebuffStacks(executioners_precision_debuff) == 2 } } and Spell(mortal_strike) or { target.DebuffPresent(colossus_smash_debuff) or BuffPresent(crushing_assault_buff) and Talent(fervor_of_battle_talent) } and Spell(whirlwind_arms) or { BuffPresent(deadly_calm_buff) or Rage() > 60 } and Spell(whirlwind_arms) or Spell(overpower) or Spell(whirlwind_arms)
 }
 
 ### actions.execute
@@ -283,7 +283,7 @@ AddFunction ArmsExecuteMainActions
  #slam,if=buff.crushing_assault.up
  if BuffPresent(crushing_assault_buff) Spell(slam)
  #mortal_strike,if=buff.overpower.stack=2&talent.dreadnaught.enabled|buff.executioners_precision.stack=2
- if BuffStacks(overpower_buff) == 2 and Talent(dreadnaught_talent) or BuffStacks(executioners_precision_buff) == 2 Spell(mortal_strike)
+ if BuffStacks(overpower_buff) == 2 and Talent(dreadnaught_talent) or target.DebuffStacks(executioners_precision_debuff) == 2 Spell(mortal_strike)
  #execute,if=buff.deadly_calm.up
  if BuffPresent(deadly_calm_buff) Spell(execute_arms)
  #overpower
@@ -315,7 +315,7 @@ AddFunction ArmsExecuteShortCdActions
 
 AddFunction ArmsExecuteShortCdPostConditions
 {
- Rage() < 60 and { not Talent(deadly_calm_talent) or BuffExpires(deadly_calm_buff) } and Spell(skullsplitter) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or Enemies() > 2 and Spell(cleave) or BuffPresent(crushing_assault_buff) and Spell(slam) or { BuffStacks(overpower_buff) == 2 and Talent(dreadnaught_talent) or BuffStacks(executioners_precision_buff) == 2 } and Spell(mortal_strike) or BuffPresent(deadly_calm_buff) and Spell(execute_arms) or Spell(overpower) or Spell(execute_arms)
+ Rage() < 60 and { not Talent(deadly_calm_talent) or BuffExpires(deadly_calm_buff) } and Spell(skullsplitter) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or Enemies() > 2 and Spell(cleave) or BuffPresent(crushing_assault_buff) and Spell(slam) or { BuffStacks(overpower_buff) == 2 and Talent(dreadnaught_talent) or target.DebuffStacks(executioners_precision_debuff) == 2 } and Spell(mortal_strike) or BuffPresent(deadly_calm_buff) and Spell(execute_arms) or Spell(overpower) or Spell(execute_arms)
 }
 
 AddFunction ArmsExecuteCdActions
@@ -324,7 +324,7 @@ AddFunction ArmsExecuteCdActions
 
 AddFunction ArmsExecuteCdPostConditions
 {
- Rage() < 60 and { not Talent(deadly_calm_talent) or BuffExpires(deadly_calm_buff) } and Spell(skullsplitter) or not BuffPresent(deadly_calm_buff) and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } and Spell(ravager) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or Spell(deadly_calm) or Rage() < 30 and not BuffPresent(deadly_calm_buff) and Spell(bladestorm_arms) or Enemies() > 2 and Spell(cleave) or BuffPresent(crushing_assault_buff) and Spell(slam) or { BuffStacks(overpower_buff) == 2 and Talent(dreadnaught_talent) or BuffStacks(executioners_precision_buff) == 2 } and Spell(mortal_strike) or BuffPresent(deadly_calm_buff) and Spell(execute_arms) or Spell(overpower) or Spell(execute_arms)
+ Rage() < 60 and { not Talent(deadly_calm_talent) or BuffExpires(deadly_calm_buff) } and Spell(skullsplitter) or not BuffPresent(deadly_calm_buff) and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } and Spell(ravager) or target.DebuffExpires(colossus_smash_debuff) and Spell(colossus_smash) or target.DebuffExpires(colossus_smash_debuff) and Spell(warbreaker) or Spell(deadly_calm) or Rage() < 30 and not BuffPresent(deadly_calm_buff) and Spell(bladestorm_arms) or Enemies() > 2 and Spell(cleave) or BuffPresent(crushing_assault_buff) and Spell(slam) or { BuffStacks(overpower_buff) == 2 and Talent(dreadnaught_talent) or target.DebuffStacks(executioners_precision_debuff) == 2 } and Spell(mortal_strike) or BuffPresent(deadly_calm_buff) and Spell(execute_arms) or Spell(overpower) or Spell(execute_arms)
 }
 
 ### actions.default
@@ -534,7 +534,7 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # deep_wounds_arms_debuff
 # dreadnaught_talent
 # execute_arms
-# executioners_precision_buff
+# executioners_precision_debuff
 # fervor_of_battle_talent
 # fireblood
 # heroic_leap
@@ -589,12 +589,12 @@ AddFunction FuryInterruptActions
 {
  if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
  {
-  if target.InRange(intimidating_shout) and not target.Classification(worldboss) Spell(intimidating_shout)
-  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
-  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
-  if target.Distance(less 10) and not target.Classification(worldboss) Spell(shockwave)
-  if target.InRange(storm_bolt) and not target.Classification(worldboss) Spell(storm_bolt)
   if target.InRange(pummel) and target.IsInterruptible() Spell(pummel)
+  if target.InRange(storm_bolt) and not target.Classification(worldboss) Spell(storm_bolt)
+  if target.Distance(less 10) and not target.Classification(worldboss) Spell(shockwave)
+  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+  if target.InRange(intimidating_shout) and not target.Classification(worldboss) Spell(intimidating_shout)
  }
 }
 
@@ -688,6 +688,8 @@ AddFunction FuryPrecombatCdActions
  #snapshot_stats
  #potion
  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(bursting_blood usable=1)
+ #recklessness,if=!talent.furious_slash.enabled&!talent.reckless_abandon.enabled
+ if not Talent(furious_slash_talent) and not Talent(reckless_abandon_talent) Spell(recklessness)
 }
 
 AddFunction FuryPrecombatCdPostConditions
@@ -909,6 +911,7 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # quaking_palm
 # raging_blow
 # rampage
+# reckless_abandon_talent
 # recklessness
 # recklessness_buff
 # shockwave

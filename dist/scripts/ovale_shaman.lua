@@ -22,11 +22,11 @@ AddFunction ElementalInterruptActions
 {
  if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
  {
-  if target.InRange(hex) and not target.Classification(worldboss) and target.RemainingCastTime() > CastTime(hex) + GCDRemaining() and target.CreatureType(Humanoid Beast) Spell(hex)
-  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
-  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
-  if not target.Classification(worldboss) and target.RemainingCastTime() > 2 Spell(capacitor_totem)
   if target.InRange(wind_shear) and target.IsInterruptible() Spell(wind_shear)
+  if not target.Classification(worldboss) and target.RemainingCastTime() > 2 Spell(capacitor_totem)
+  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+  if target.InRange(hex) and not target.Classification(worldboss) and target.RemainingCastTime() > CastTime(hex) + GCDRemaining() and target.CreatureType(Humanoid Beast) Spell(hex)
  }
 }
 
@@ -467,12 +467,12 @@ AddFunction EnhancementInterruptActions
 {
  if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
  {
-  if target.InRange(hex) and not target.Classification(worldboss) and target.RemainingCastTime() > CastTime(hex) + GCDRemaining() and target.CreatureType(Humanoid Beast) Spell(hex)
-  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
-  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
-  if not target.Classification(worldboss) and target.RemainingCastTime() > 2 Spell(capacitor_totem)
-  if target.Distance(less 5) and not target.Classification(worldboss) Spell(sundering)
   if target.InRange(wind_shear) and target.IsInterruptible() Spell(wind_shear)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(sundering)
+  if not target.Classification(worldboss) and target.RemainingCastTime() > 2 Spell(capacitor_totem)
+  if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+  if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+  if target.InRange(hex) and not target.Classification(worldboss) and target.RemainingCastTime() > CastTime(hex) + GCDRemaining() and target.CreatureType(Humanoid Beast) Spell(hex)
  }
 }
 

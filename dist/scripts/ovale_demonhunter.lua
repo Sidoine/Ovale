@@ -56,10 +56,10 @@ AddFunction HavocInterruptActions
 {
  if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
  {
-  if target.InRange(imprison) and not target.Classification(worldboss) and target.CreatureType(Demon Humanoid Beast) Spell(imprison)
-  if target.Distance(less 8) and not target.Classification(worldboss) Spell(chaos_nova)
-  if target.InRange(fel_eruption) and not target.Classification(worldboss) Spell(fel_eruption)
   if target.InRange(disrupt) and target.IsInterruptible() Spell(disrupt)
+  if target.InRange(fel_eruption) and not target.Classification(worldboss) Spell(fel_eruption)
+  if target.Distance(less 8) and not target.Classification(worldboss) Spell(chaos_nova)
+  if target.InRange(imprison) and not target.Classification(worldboss) and target.CreatureType(Demon Humanoid Beast) Spell(imprison)
  }
 }
 
@@ -546,11 +546,11 @@ AddFunction VengeanceInterruptActions
 {
  if CheckBoxOn(opt_interrupt) and not target.IsFriend() and target.Casting()
  {
-  if target.InRange(imprison) and not target.Classification(worldboss) and target.CreatureType(Demon Humanoid Beast) Spell(imprison)
-  if not target.Classification(worldboss) and not SigilCharging(silence misery chains) and target.RemainingCastTime() >= 2 - Talent(quickened_sigils_talent) + GCDRemaining() Spell(sigil_of_chains)
-  if not target.Classification(worldboss) and not SigilCharging(silence misery chains) and target.RemainingCastTime() >= 2 - Talent(quickened_sigils_talent) + GCDRemaining() Spell(sigil_of_misery)
-  if target.IsInterruptible() and not target.Classification(worldboss) and not SigilCharging(silence misery chains) and target.RemainingCastTime() >= 2 - Talent(quickened_sigils_talent) + GCDRemaining() Spell(sigil_of_silence)
   if target.InRange(disrupt) and target.IsInterruptible() Spell(disrupt)
+  if target.IsInterruptible() and not target.Classification(worldboss) and not SigilCharging(silence misery chains) and target.RemainingCastTime() >= 2 - Talent(quickened_sigils_talent) + GCDRemaining() Spell(sigil_of_silence)
+  if not target.Classification(worldboss) and not SigilCharging(silence misery chains) and target.RemainingCastTime() >= 2 - Talent(quickened_sigils_talent) + GCDRemaining() Spell(sigil_of_misery)
+  if not target.Classification(worldboss) and not SigilCharging(silence misery chains) and target.RemainingCastTime() >= 2 - Talent(quickened_sigils_talent) + GCDRemaining() Spell(sigil_of_chains)
+  if target.InRange(imprison) and not target.Classification(worldboss) and target.CreatureType(Demon Humanoid Beast) Spell(imprison)
  }
 }
 

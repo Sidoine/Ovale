@@ -57,10 +57,6 @@ Define(execute_arms 163201)
 # Attempts to finish off a foe, causing up to <damage> Physical damage based on Rage spent. Only usable on enemies that have less than 20 health.?s231830[rnrnIf your foe survives, s2 of the Rage spent is refunded.][]
   SpellInfo(execute_arms rage=20)
 
-Define(executioners_precision_buff 272867)
-# Execute increases the damage of your next Mortal Strike against the target by s1, stacking up to 272870u times.
-  SpellInfo(executioners_precision_buff channel=-0.001 gcd=0 offgcd=1)
-
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. 
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
@@ -194,6 +190,8 @@ Define(massacre_talent_fury 14) #22393
 # Execute is now usable on targets below s2 health.
 Define(ravager_talent 21) #21667
 # Throws a whirling weapon at the target location that inflicts 7*156287s1 damage to all enemies within 156287A1 yards over 7 seconds. ?a137048[rnrnAlso increases your Parry chance by 227744s1 for 12 seconds.][rnrn|cFFFFFFFFGenerates 248439s1/10 Rage each time it deals damage.|r]
+Define(reckless_abandon_talent 19) #22405
+# Recklessness generates m2/10 Rage and lasts s1/1000 sec longer.
 Define(rend_talent 9) #19138
 # Wounds the target, causing s1 Physical damage instantly and an additional o2 Bleed damage over 12 seconds.
 Define(siegebreaker_talent 21) #16037
@@ -296,6 +294,7 @@ Define(enraged_regeneration_buff 184364)
 	SpellInfo(execute_arms target_health_pct=35 talent=arms_massacre_talent)
 	SpellRequire(execute_arms rage_percent 0=buff,execute_arms_norage)
 	SpellRequire(execute_arms target_health_pct 100=buff,execute_arms_nohp)
+    SpellAddTargetDebuff(execute_arms executioners_precision_debuff=0)
 SpellList(execute_arms_norage sudden_death_arms_buff stone_heart_buff deadly_calm_buff)
 SpellList(execute_arms_nohp sudden_death_arms_buff stone_heart_buff)
 
@@ -304,6 +303,9 @@ SpellList(execute_arms_nohp sudden_death_arms_buff stone_heart_buff)
 	SpellRequire(execute target_health_pct 100=buff,execute_free)
 	SpellRequire(execute cd_percent 0=buff,execute_free)
 SpellList(execute_free sudden_death_fury_buff stone_heart_buff)
+Define(executioners_precision_debuff 272870)
+    SpellInfo(executioners_precision_debuff duration=30 max_stacks=2)
+    SpellAddTargetDebuff(execute_arms executioners_precision_debuff=1 trait=executioners_precision_trait)
 Define(frothing_berserker_buff 215572)
 	SpellInfo(frothing_berserker_buff duration=6)
 Define(frenzy_buff 202539)
@@ -355,6 +357,7 @@ Define(last_stand_buff 12975)
 	SpellInfo(mortal_strike cd=6 cd_haste=melee rage=30)
 	SpellRequire(mortal_strike rage_percent 0=buff,deadly_calm_buff talent=deadly_calm_talent specialization=arms)
 	SpellAddTargetDebuff(mortal_strike mortal_wounds_debuff=1)
+    SpellAddTargetDebuff(mortal_strike executioners_precision_debuff=0)
 	SpellAddBuff(mortal_strike overpower_buff=0)
 Define(mortal_wounds_debuff 115804)
 	SpellInfo(mortal_wounds_debuff duration=10)
@@ -501,28 +504,20 @@ Define(the_great_storms_eye_item 151823)
 # Talents
 Define(anger_management_talent 19)
 Define(arms_massacre_talent 7)
-
 Define(best_served_cold_talent 7)
 Define(bladestorm_talent 18)
 Define(bolster_talent 12)
 Define(booming_voice_talent 16)
 Define(bounding_stride_talent 11)
-
-
 Define(collateral_damage_talent 13)
 Define(crackling_thunder_talent 4)
-
 Define(defensive_stance_talent 12)
 Define(devastator_talent 18)
 Define(double_time_talent 4)
 Define(dragon_roar_talent 17)
-
 Define(endless_rage_talent 2)
-
 Define(fresh_meat_talent 3)
-
 Define(furious_charge_talent 10)
-
 Define(fury_anger_management_talent 20)
 Define(fury_sudden_death_talent 8)
 Define(heavy_repercussions_talent 20)
@@ -532,7 +527,6 @@ Define(in_for_the_kill_talent 16)
 Define(indomitable_talent 10)
 Define(inner_rage_talent 7)
 Define(into_the_fray_talent 1)
-
 Define(meat_cleaver_talent 16)
 Define(menace_talent 13)
 Define(never_surrender_talent 11)
@@ -540,21 +534,19 @@ Define(prot_bounding_stride_talent 5)
 Define(prot_dragon_roar_talent 9)
 Define(prot_storm_bolt_talent 15)
 Define(punish_talent 2)
-
 Define(reckless_abandon_talent 19)
-
 Define(rumbling_earth_talent 14)
 Define(safeguard_talent 6)
 Define(second_wind_talent 10)
-
-
 Define(storm_bolt_talent 6)
 Define(sudden_death_talent 2)
 Define(unstoppable_force_talent 8)
 Define(vengeance_talent 17)
 Define(war_machine_talent 1)
-
 Define(warpaint_talent 12)
+
+# Azerite Traits
+Define(executioners_precision_trait 272866)
 
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(heroic_throw tag=main)
