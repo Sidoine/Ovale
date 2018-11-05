@@ -253,6 +253,7 @@ export interface Annotation extends InterruptAnnotation {
     summon_pet?: string;
     storm_earth_and_fire?: string;
     touch_of_death?: string;
+    flying_serpent_kick?: string;
     opt_use_consumables?: string;
     righteous_fury?: string;
     blade_flurry?: string;
@@ -619,6 +620,10 @@ const OPTIONAL_SKILLS = {
     ["touch_of_karma"]: <OptionalSkill>{
         class: "MONK",
         default: false
+    },
+    ["flying_serpent_kick"]: <OptionalSkill>{
+        class: "MONK",
+        default: true
     },
     ["vanish"]: <OptionalSkill>{
         class: "ROGUE",

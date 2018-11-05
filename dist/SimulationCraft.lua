@@ -513,6 +513,10 @@ local OPTIONAL_SKILLS = {
         class = "MONK",
         default = false
     },
+    ["flying_serpent_kick"] = {
+        class = "MONK",
+        default = true
+    },
     ["vanish"] = {
         class = "ROGUE",
         specialization = "assassination",
