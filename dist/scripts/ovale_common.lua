@@ -204,6 +204,8 @@ Define(blood_fury_sp 33702)
 	SpellAddBuff(blood_fury_sp blood_fury_sp_buff=1)
 Define(blood_fury_sp_buff 33702)
 	SpellInfo(blood_fury_sp_buff duration=15)
+Define(every_man_for_himself 59752)
+	SpellInfo(every_man_for_himself cd=180)
 Define(fireblood 265221)
     SpellInfo(fireblood cd=120)
 Define(darkflight 68992)
@@ -276,6 +278,11 @@ AddFunction CanMove
 	if BuffPresent(ice_floes_buff) 1
 	if BuffPresent(spiritwalkers_grace_buff) 1
     0
+}
+
+AddFunction Boss
+{
+	IsBossFight() or target.Classification(worldboss) or target.Classification(rareelite) or BuffPresent(burst_haste_buff any=1) or { target.IsPvP() and not target.IsFriend() } or { target.Level() >= Level() and { target.Classification(elite) or target.Classification(rare) } }
 }
 
 # Party checks

@@ -487,6 +487,8 @@ Define(thrill_of_the_hunt_buff 257946)
 	SpellInfo(thrill_of_the_hunt_buff duration=8 max_stacks=3)
 Define(tip_of_the_spear_buff 260286)
     SpellInfo(tip_of_the_spear_buff duration=10 max_stacks=3)
+Define(trackers_net 212638)
+	SpellInfo(trackers_net cd=25)
 Define(trick_shots_buff 257622)
 	SpellInfo(trick_shots_buff duration=20)
 
