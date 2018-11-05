@@ -5,8 +5,8 @@ local __Debug = LibStub:GetLibrary("ovale/Debug")
 local OvaleDebug = __Debug.OvaleDebug
 local __Profiler = LibStub:GetLibrary("ovale/Profiler")
 local OvaleProfiler = __Profiler.OvaleProfiler
-local __Artifact = LibStub:GetLibrary("ovale/Artifact")
-local OvaleArtifact = __Artifact.OvaleArtifact
+local __AzeriteArmor = LibStub:GetLibrary("ovale/AzeriteArmor")
+local OvaleAzerite = __AzeriteArmor.OvaleAzerite
 local __AST = LibStub:GetLibrary("ovale/AST")
 local OvaleAST = __AST.OvaleAST
 local PARAMETER_KEYWORD = __AST.PARAMETER_KEYWORD
@@ -116,7 +116,7 @@ local function TestConditionEquipped(value)
 end
 local function TestConditionTrait(value)
     local trait, required = RequireNumber(value)
-    local hasTrait = OvaleArtifact:HasTrait(trait)
+    local hasTrait = OvaleAzerite:HasTrait(trait)
     return (required and hasTrait) or ( not required and  not hasTrait)
 end
 local TEST_CONDITION_DISPATCH = {
@@ -387,7 +387,7 @@ local function EvaluateSpellInfo(node)
                 if value then
                     local realValue = value
                     if namedParams.pertrait ~= nil then
-                        realValue = value * OvaleArtifact:TraitRank(namedParams.pertrait)
+                        realValue = value * OvaleAzerite:TraitRank(namedParams.pertrait)
                     end
                     local addDuration = si.add_duration or 0
                     si.add_duration = addDuration + realValue
@@ -425,7 +425,7 @@ local function EvaluateSpellInfo(node)
                 if value then
                     local realValue = value
                     if namedParams.pertrait ~= nil then
-                        realValue = value * OvaleArtifact:TraitRank(namedParams.pertrait)
+                        realValue = value * OvaleAzerite:TraitRank(namedParams.pertrait)
                     end
                     local power = si[k] or 0
                     si[k] = power + realValue

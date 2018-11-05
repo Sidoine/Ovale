@@ -424,6 +424,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         self_pool:Drain()
     end,
     COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
+        self:DebugTimestamp("COMBAT_LOG_EVENT_UNFILTERED", CombatLogGetCurrentEventInfo())
         local _, cleuEvent, _, sourceGUID, _, _, _, destGUID, _, _, _, spellId, spellName, _, auraType, amount = CombatLogGetCurrentEventInfo()
         local mine = (sourceGUID == self_playerGUID or OvaleGUID:IsPlayerPet(sourceGUID))
         if mine and cleuEvent == "SPELL_MISSED" then
@@ -435,6 +436,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         end
         if CLEU_AURA_EVENTS[cleuEvent] then
             local unitId = OvaleGUID:GUIDUnit(destGUID)
+            self:DebugTimestamp("UnitId: ", unitId)
             if unitId then
                 if  not OvaleGUID.UNIT_AURA_UNIT[unitId] then
                     self:DebugTimestamp("%s: %s (%s)", cleuEvent, destGUID, unitId)
@@ -501,6 +503,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         self_pool:Drain()
     end,
     UNIT_AURA = function(self, event, unitId)
+        self:Debug(event, unitId)
         self:ScanAuras(unitId)
     end,
     Ovale_UnitChanged = function(self, event, unitId, guid)
@@ -562,7 +565,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         local auraIsUnchanged = (aura.source == casterGUID and aura.duration == duration and aura.ending == expirationTime and aura.stacks == count and aura.value1 == value1 and aura.value2 == value2 and aura.value3 == value3)
         aura.serial = self.current.serial[guid]
         if  not auraIsActive or  not auraIsUnchanged then
-            self:Debug("    Adding %s %s (%s) to %s at %f, aura.serial=%d", filter, name, auraId, guid, atTime, aura.serial)
+            self:Debug("    Adding %s %s (%s) to %s at %f, aura.serial=%d, duration=%f, expirationTime=%f, auraIsActive=%s, auraIsUnchanged=%s", filter, name, auraId, guid, atTime, aura.serial, duration, expirationTime, auraIsActive and "true" or "false", auraIsUnchanged and "true" or "false")
             aura.name = name
             aura.duration = duration
             aura.ending = expirationTime
@@ -909,7 +912,7 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
         else
             auraFound = self:GetStateAuraOnGUID(guid, auraId, filter, mine, atTime)
             if auraFound then
-                __exports.OvaleAura:Log("Aura %s found on %s with (%s, %s)", auraId, guid, auraFound.start, auraFound.ending)
+                __exports.OvaleAura:Log("Aura %s found on %s with (%s, %s) [stacks=%d]", auraId, guid, auraFound.start, auraFound.ending, auraFound.stacks)
             else
                 __exports.OvaleAura:Log("Aura %s is missing on %s.", auraId, guid)
             end
@@ -1143,7 +1146,9 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                 if verified then
                     local si = OvaleData.spellInfo[auraId]
                     local auraFound = __exports.OvaleAura:GetAuraByGUID(guid, auraId, filter, true, atTime)
-                    if __exports.OvaleAura:IsActiveAura(auraFound, atTime) then
+                    local isActiveAura = __exports.OvaleAura:IsActiveAura(auraFound, atTime)
+                    __exports.OvaleAura:Log("Aura found, checking if it is Active at %f => IsActiveAura=%s", atTime, isActiveAura and "true" or "FALSE")
+                    if isActiveAura then
                         local aura
                         if auraFound.state then
                             aura = auraFound

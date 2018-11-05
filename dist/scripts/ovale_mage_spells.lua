@@ -16,6 +16,7 @@ Define(arcane_barrage 44425)
 Define(arcane_blast 30451)
 # Blasts the target with energy, dealing (55.00000000000001 of Spell Power) Arcane damage.rnrnEach Arcane Charge increases damage by 36032s1 and mana cost by 36032s5, and reduces cast time by 36032s4.rnrn|cFFFFFFFFGenerates 1 Arcane Charge.|r
   SpellInfo(arcane_blast arcanecharges=-1)
+  SpellAddBuff(arcane_blast rule_of_threes_buff=0)
 Define(arcane_explosion 1449)
 # Causes an explosion of magic around the caster, dealing (60 of Spell Power) Arcane damage to all enemies within A2 yards.rnrn|cFFFFFFFFGenerates s1 Arcane Charge if any targets are hit.|r
   SpellInfo(arcane_explosion arcanecharges=-1)
@@ -31,8 +32,10 @@ Define(arcane_intellect 1459)
   SpellAddTargetDebuff(arcane_intellect arcane_intellect=1)
 Define(arcane_missiles 5143)
 # Launches five waves of Arcane Missiles at the enemy over 2.5 seconds, causing a total of 5*(50 of Spell Power) Arcane damage.
-  SpellInfo(arcane_missiles duration=2.5 channel=2.5 tick=0.625)
+  SpellInfo(arcane_missiles channel=2.5 haste=spell)
   SpellAddBuff(arcane_missiles arcane_missiles=1)
+  SpellAddBuff(arcane_missiles clearcasting_buff=0)
+  SpellAddBuff(arcane_missiles rule_of_threes_buff=0)
   SpellAddTargetDebuff(arcane_missiles arcane_missiles=1)
 Define(arcane_orb 153626)
 # Launches an Arcane Orb forward from your position, traveling up to 40 yards, dealing (120 of Spell Power) Arcane damage to enemies it passes through.rnrn|cFFFFFFFFGrants 1 Arcane Charge when cast and every time it deals damage.|r
@@ -78,7 +81,9 @@ Define(charged_up 205032)
 Define(clearcasting 79684)
 # For each c*100/s1 mana you spend, you have a 1 chance to gain Clearcasting, making your next Arcane Missiles or Arcane Explosion free and channel 277726s1 faster.
   SpellInfo(clearcasting channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(clearcasting clearcasting=1)
+  SpellAddBuff(clearcasting clearcasting_buff=1)
+Define(clearcasting_buff 276743)
+	SpellInfo(clearcasting_buff duration=15 max_stacks=2)
 Define(combustion 190319)
 # Engulfs you in flames for 10 seconds, increasing your spells' critical strike chance by s1 and granting you Mastery equal to s3 your Critical Strike stat. Castable while casting other spells.
   SpellInfo(combustion cd=120 duration=10 gcd=0 offgcd=1 tick=0.5)
@@ -184,6 +189,7 @@ Define(preheat 273331)
 Define(presence_of_mind 205025)
 # Causes your next n Arcane Blasts to be instant cast.
   SpellInfo(presence_of_mind cd=60 gcd=0 offgcd=1)
+  SpellRequire(presence_of_mind unusable 1=buff,presence_of_mind_buff)
   # Arcane Blast is instant cast.
   SpellAddBuff(presence_of_mind presence_of_mind=1)
 Define(pyroblast 11366)
@@ -209,7 +215,9 @@ Define(rising_death 252346)
 Define(rule_of_threes 264354)
 # When you gain your third Arcane Charge, the cost of your next Arcane Blast or Arcane Missiles is reduced by 264774s1.
   SpellInfo(rule_of_threes channel=0 gcd=0 offgcd=1 talent=rule_of_threes_talent)
-  SpellAddBuff(rule_of_threes rule_of_threes=1)
+  SpellAddBuff(rule_of_threes rule_of_threes_buff=1)
+Define(rule_of_threes_buff 264774)
+	SpellInfo(rule_of_threes_buff duration=15)
 Define(rune_of_power 116011)
 # Places a Rune of Power on the ground for 10 seconds which increases your spell damage by 116014s1 while you stand within 8 yds.
   SpellInfo(rune_of_power cd=10 charge_cd=40 duration=10 talent=rune_of_power_talent)
@@ -317,12 +325,6 @@ Define(arcane_charge_debuff 36032)
 	
 Define(arcane_instability_buff 166872)
 	SpellInfo(arcane_instability_buff duration=15)
-
-	SpellInfo(arcane_missiles duration=2 travel_time=1 arcanecharges=-1)
-	SpellRequire(arcane_missiles unusable 1=buff,!arcane_missiles_buff)
-	SpellAddBuff(arcane_missiles arcane_instability_buff=0 itemset=T17 itemcount=4 specialization=arcane)
-	SpellAddBuff(arcane_missiles arcane_missiles_buff=-1)
-	SpellAddBuff(arcane_missiles arcane_power_buff=extend,2 if_spell=overpowered)
 Define(arcane_missiles_buff 79683)
 	SpellInfo(arcane_missiles_buff duration=20 max_stacks=3)
 
@@ -399,8 +401,10 @@ Define(frost_bomb 112948)
 Define(frost_bomb_debuff 112948)
 	SpellInfo(frost_bomb_debuff duration=12)
 Define(frost_nova 122)
+	SpellInfo(frost_nova cd=30)
+	SpellAddTargetDebuff(frost_nova frost_nova_debuff=1)
 
-	SpellInfo(frostbolt travel_time=1)
+SpellInfo(frostbolt travel_time=1)
 	SpellAddBuff(frostbolt ice_floes_buff=0 if_spell=ice_floes)
 Define(frostfire_bolt 44614)
 	SpellInfo(frostfire_bolt travel_time=1)
@@ -624,6 +628,19 @@ Define(zannesu_journey_buff 226852)
 
 ### Pyroblast
 AddFunction FirePyroblastHitDamage asValue=1 { 2.423 * Spellpower() * { BuffPresent(pyroblast_buff asValue=1) * 1.25 } }
+
+# Xelditions
+Define(slow 31589)
+	SpellAddTargetDebuff(slow slow_debuff=1)
+Define(slow_debuff 31589)
+	SpellInfo(slow_debuff duration=15)
+Define(frost_nova_debuff 122)
+	SpellInfo(frost_nova_debuff duration=8)
+Define(prismatic_barrier 235450)
+	SpellInfo(prismatic_barrier cd=25)
+	SpellAddBuff(prismatic_barrier prismatic_barrier_buff=1)
+Define(prismatic_barrier_buff 235450)
+	SpellInfo(prismatic_barrier_buff duration=60)
 ]]
     OvaleScripts:RegisterScript("MAGE", nil, name, desc, code, "include")
 end
