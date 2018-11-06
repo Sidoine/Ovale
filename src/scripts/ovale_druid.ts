@@ -176,6 +176,8 @@ AddFunction BalanceDefaultCdActions
  if HasEquippedItem(161377 _item) and { SpellCooldown(incarnation_chosen_of_elune) > 30 or SpellCooldown(celestial_alignment) > 30 } BalanceUseItemActions()
  #use_item,name=dread_gladiators_badge,if=equipped.161902&(cooldown.incarnation.remains>30|cooldown.celestial_alignment.remains>30)
  if HasEquippedItem(161902 _item) and { SpellCooldown(incarnation_chosen_of_elune) > 30 or SpellCooldown(celestial_alignment) > 30 } BalanceUseItemActions()
+ #use_item,name=balefire_branch,if=equipped.159630&(cooldown.incarnation.remains>30|cooldown.celestial_alignment.remains>30)
+ if HasEquippedItem(159630 _item) and { SpellCooldown(incarnation_chosen_of_elune) > 30 or SpellCooldown(celestial_alignment) > 30 } BalanceUseItemActions()
  #use_items
  BalanceUseItemActions()
 
@@ -254,6 +256,7 @@ AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
 }
 
 ### Required symbols
+# 159630_item
 # 161377_item
 # 161902_item
 # ancestral_call

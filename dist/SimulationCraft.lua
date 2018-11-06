@@ -216,6 +216,7 @@ local CHARACTER_PROPERTY = {
     ["energy.time_to_max"] = "TimeToMaxEnergy()",
     ["feral_spirit.remains"] = "TotemRemaining(sprit_wolf)",
     ["finality"] = "HasArtifactTrait(finality)",
+    ["firestarter.remains"] = "target.TimeToHealthPercent(90)",
     ["focus"] = "Focus()",
     ["focus.deficit"] = "FocusDeficit()",
     ["focus.max"] = "MaxFocus()",
@@ -282,6 +283,7 @@ local MODIFIER_KEYWORD = {
     ["ammo_type"] = true,
     ["animation_cancel"] = true,
     ["attack_speed"] = true,
+    ["cancel_if"] = true,
     ["chain"] = true,
     ["choose"] = true,
     ["condition"] = true,
@@ -361,6 +363,7 @@ local SPECIAL_ACTION = {
     ["stealth"] = true,
     ["stop_moving"] = true,
     ["swap_action_list"] = true,
+    ["use_items"] = true,
     ["use_item"] = true,
     ["variable"] = true,
     ["wait"] = true
@@ -2293,14 +2296,6 @@ EmitAction = function(parseNode, nodeList, annotation)
         elseif className == "SHAMAN" and action == "totem_mastery_enhancement" then
             conditionCode = "(InCombat() or not BuffPresent(enh_resonance_totem_buff))"
             AddSymbol(annotation, "enh_resonance_totem_buff")
-        elseif className == "WARLOCK" and action == "cancel_metamorphosis" then
-            local spellName = "metamorphosis"
-            local buffName = "metamorphosis_buff"
-            AddSymbol(annotation, spellName)
-            AddSymbol(annotation, buffName)
-            bodyCode = format("Spell(%s text=cancel)", spellName)
-            conditionCode = format("BuffPresent(%s)", buffName)
-            isSpellAction = false
         elseif className == "WARLOCK" and action == "felguard_felstorm" then
             conditionCode = "pet.Present() and pet.CreatureFamily(Felguard)"
         elseif className == "WARLOCK" and action == "grimoire_of_sacrifice" then

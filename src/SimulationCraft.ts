@@ -143,6 +143,7 @@ const CHARACTER_PROPERTY: LuaObj<string> = {
     ["energy.time_to_max"]: "TimeToMaxEnergy()",
     ["feral_spirit.remains"]: "TotemRemaining(sprit_wolf)",
     ["finality"]: "HasArtifactTrait(finality)",
+    ["firestarter.remains"]: "target.TimeToHealthPercent(90)",
     ["focus"]: "Focus()",
     ["focus.deficit"]: "FocusDeficit()",
     ["focus.max"]: "MaxFocus()",
@@ -271,6 +272,7 @@ interface Modifiers {
     ammo_type?: ParseNode;
     animation_cancel?: ParseNode;
     attack_speed?: ParseNode;
+    cancel_if?: ParseNode;
     chain?: ParseNode;
     choose?: ParseNode;
     condition?: ParseNode,
@@ -382,6 +384,7 @@ const MODIFIER_KEYWORD: TypeCheck<Modifiers> = {
     ["ammo_type"]: true,
     ["animation_cancel"]: true,
     ["attack_speed"]: true,
+    ["cancel_if"]: true,
     ["chain"]: true,
     ["choose"]: true,
     ["condition"]: true,
@@ -461,6 +464,7 @@ let SPECIAL_ACTION: LuaObj<boolean> = {
     ["stealth"]: true,
     ["stop_moving"]: true,
     ["swap_action_list"]: true,
+    ["use_items"]: true,
     ["use_item"]: true,
     ["variable"]: true,
     ["wait"]: true
@@ -2472,14 +2476,6 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
 		} else if (className == "SHAMAN" && action == "totem_mastery_enhancement") {
             conditionCode = "(InCombat() or not BuffPresent(enh_resonance_totem_buff))";
             AddSymbol(annotation, "enh_resonance_totem_buff");
-        } else if (className == "WARLOCK" && action == "cancel_metamorphosis") {
-            let spellName = "metamorphosis";
-            let buffName = "metamorphosis_buff";
-            AddSymbol(annotation, spellName);
-            AddSymbol(annotation, buffName);
-            bodyCode = format("Spell(%s text=cancel)", spellName);
-            conditionCode = format("BuffPresent(%s)", buffName);
-            isSpellAction = false;
         } else if (className == "WARLOCK" && action == "felguard_felstorm") {
             conditionCode = "pet.Present() and pet.CreatureFamily(Felguard)";
         } else if (className == "WARLOCK" && action == "grimoire_of_sacrifice") {
