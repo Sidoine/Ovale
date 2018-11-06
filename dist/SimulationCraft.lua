@@ -3884,8 +3884,11 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
         code = target .. "Distance()"
     elseif sub(operand, 1, 9) == "equipped." then
         local name = Disambiguate(annotation, sub(operand, 10), className, specialization)
-        code = format("HasEquippedItem(%s_item)", name)
-        AddSymbol(annotation, name .. "_item")
+        local itemId = tonumber(name)
+        local itemName = name .. "_item"
+        local item = itemId and tostring(itemId) or itemName
+        code = format("HasEquippedItem(%s)", item)
+        AddSymbol(annotation, item)
     elseif operand == "gcd.max" then
         code = "GCD()"
     elseif operand == "gcd.remains" then

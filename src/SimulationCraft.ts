@@ -4056,8 +4056,11 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
         code = `${target}Distance()`;
     } else if (sub(operand, 1, 9) == "equipped.") {
         let [name] = Disambiguate(annotation, sub(operand, 10), className, specialization);
-        code = format("HasEquippedItem(%s_item)", name);
-        AddSymbol(annotation, `${name}_item`);
+        let itemId = tonumber(name)
+        let itemName = `${name}_item`
+        let item = itemId && tostring(itemId) || itemName
+        code = format("HasEquippedItem(%s)", item)
+        AddSymbol(annotation, item);
     } else if (operand == "gcd.max") {
         code = "GCD()";
     } else if (operand == "gcd.remains") {
