@@ -246,6 +246,7 @@ export interface Annotation extends InterruptAnnotation {
     opt_touch_of_death_on_elite_only?:string;
     opt_arcane_mage_burn_phase?:string;
     opt_meta_only_during_boss?: string;
+    opt_priority_rotation?: string;
     time_to_hpg_heal?: string;
     time_to_hpg_melee?: string;
     time_to_hpg_tank?: string;
@@ -4113,6 +4114,9 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
     } else if (operand == "is_add") {
         let t = target || "target.";
         code = format("not %sClassification(worldboss)", t);
+    } else if (operand == "priority_rotation") {
+        code = "CheckBoxOn(opt_priority_rotation)"
+        annotation.opt_priority_rotation = className
     } else {
         ok = false;
     }
@@ -5209,6 +5213,15 @@ function InsertSupportingControls(child: LuaArray<AstNode>, annotation: Annotati
     if (annotation.interrupt) {
         let fmt = `
 			AddCheckBox(opt_interrupt L(interrupt) default %s)
+		`;
+        let code = format(fmt, ifSpecialization);
+        let [node] = OvaleAST.ParseCode("checkbox", code, nodeList, annotation.astAnnotation);
+        insert(child, 1, node);
+        count = count + 1;
+    }
+    if (annotation.opt_priority_rotation) {
+        let fmt = `
+			AddCheckBox(opt_priority_rotation L(opt_priority_rotation) default %s)
 		`;
         let code = format(fmt, ifSpecialization);
         let [node] = OvaleAST.ParseCode("checkbox", code, nodeList, annotation.astAnnotation);

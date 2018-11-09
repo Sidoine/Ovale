@@ -3939,6 +3939,9 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
     elseif operand == "is_add" then
         local t = target or "target."
         code = format("not %sClassification(worldboss)", t)
+    elseif operand == "priority_rotation" then
+        code = "CheckBoxOn(opt_priority_rotation)"
+        annotation.opt_priority_rotation = className
     else
         ok = false
     end
@@ -5022,6 +5025,15 @@ local function InsertSupportingControls(child, annotation)
     if annotation.interrupt then
         local fmt = [[
 			AddCheckBox(opt_interrupt L(interrupt) default %s)
+		]]
+        local code = format(fmt, ifSpecialization)
+        local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+        insert(child, 1, node)
+        count = count + 1
+    end
+    if annotation.opt_priority_rotation then
+        local fmt = [[
+			AddCheckBox(opt_priority_rotation L(opt_priority_rotation) default %s)
 		]]
         local code = format(fmt, ifSpecialization)
         local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
