@@ -257,6 +257,7 @@ export interface Annotation extends InterruptAnnotation {
     flying_serpent_kick?: string;
     opt_use_consumables?: string;
     blade_flurry?: string;
+    blink?: string;
     time_warp?:string;
     vanish?: string;
     volley?: string;
@@ -609,6 +610,10 @@ const OPTIONAL_SKILLS = {
         class: "HUNTER",
         specialization: "survival",
         default: true
+    },
+    ["blink"]: <OptionalSkill>{
+        class: "MAGE",
+        default: false,
     },
     ["time_warp"]: <OptionalSkill>{
         class: "MAGE"

@@ -502,6 +502,10 @@ local OPTIONAL_SKILLS = {
         specialization = "survival",
         default = true
     },
+    ["blink"] = {
+        class = "MAGE",
+        default = false
+    },
     ["time_warp"] = {
         class = "MAGE"
     },

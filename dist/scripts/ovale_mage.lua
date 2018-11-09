@@ -33,6 +33,7 @@ AddFunction conserve_mana
 AddCheckBox(opt_interrupt L(interrupt) default specialization=arcane)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=arcane)
 AddCheckBox(opt_arcane_mage_burn_phase L(arcane_mage_burn_phase) default specialization=arcane)
+AddCheckBox(opt_blink SpellName(blink) specialization=arcane)
 
 AddFunction ArcaneInterruptActions
 {
@@ -116,7 +117,7 @@ AddFunction ArcaneMovementShortCdActions
  unless target.Distance() >= 10 and Spell(shimmer)
  {
   #blink,if=movement.distance>=10
-  if target.Distance() >= 10 Spell(blink)
+  if target.Distance() >= 10 and CheckBoxOn(opt_blink) Spell(blink)
   #presence_of_mind
   Spell(presence_of_mind)
 
@@ -139,7 +140,7 @@ AddFunction ArcaneMovementCdActions
 
 AddFunction ArcaneMovementCdPostConditions
 {
- target.Distance() >= 10 and Spell(shimmer) or target.Distance() >= 10 and Spell(blink) or Spell(presence_of_mind) or Spell(arcane_missiles) or Spell(arcane_orb) or Spell(supernova)
+ target.Distance() >= 10 and Spell(shimmer) or target.Distance() >= 10 and CheckBoxOn(opt_blink) and Spell(blink) or Spell(presence_of_mind) or Spell(arcane_missiles) or Spell(arcane_orb) or Spell(supernova)
 }
 
 ### actions.conserve
@@ -1078,6 +1079,7 @@ Include(ovale_mage_spells)
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=frost)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=frost)
+AddCheckBox(opt_blink SpellName(blink) specialization=frost)
 
 AddFunction FrostInterruptActions
 {
@@ -1271,7 +1273,7 @@ AddFunction FrostMovementMainPostConditions
 AddFunction FrostMovementShortCdActions
 {
  #blink,if=movement.distance>10
- if target.Distance() > 10 Spell(blink)
+ if target.Distance() > 10 and CheckBoxOn(opt_blink) Spell(blink)
  #ice_floes,if=buff.ice_floes.down
  if BuffExpires(ice_floes_buff) and Speed() > 0 Spell(ice_floes)
 }
@@ -1286,7 +1288,7 @@ AddFunction FrostMovementCdActions
 
 AddFunction FrostMovementCdPostConditions
 {
- target.Distance() > 10 and Spell(blink) or BuffExpires(ice_floes_buff) and Speed() > 0 and Spell(ice_floes)
+ target.Distance() > 10 and CheckBoxOn(opt_blink) and Spell(blink) or BuffExpires(ice_floes_buff) and Speed() > 0 and Spell(ice_floes)
 }
 
 ### actions.cooldowns
