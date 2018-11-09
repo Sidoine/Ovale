@@ -493,6 +493,14 @@ end
 local EMIT_DISAMBIGUATION = {}
 local OPERAND_TOKEN_PATTERN = "[^.]+"
 local OPTIONAL_SKILLS = {
+    ["fel_rush"] = {
+        class = "DEMONHUNTER",
+        default = true
+    },
+    ["vengeful_retreat"] = {
+        class = "DEMONHUNTER",
+        default = true
+    },
     ["volley"] = {
         class = "HUNTER",
         default = true
@@ -537,14 +545,6 @@ local OPTIONAL_SKILLS = {
     },
     ["bloodlust"] = {
         class = "SHAMAN"
-    },
-    ["fel_rush"] = {
-        class = "DEMONHUNTER",
-        default = true
-    },
-    ["vengeful_retreat"] = {
-        class = "DEMONHUNTER",
-        default = true
     }
 }
 local self_functionDefined = {}

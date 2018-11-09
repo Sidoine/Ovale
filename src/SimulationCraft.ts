@@ -602,6 +602,14 @@ interface OptionalSkill {
 }
 
 const OPTIONAL_SKILLS = {
+    ["fel_rush"]: <OptionalSkill>{
+        class: "DEMONHUNTER",
+        default: true
+    },
+    ["vengeful_retreat"]: <OptionalSkill>{
+        class: "DEMONHUNTER",
+        default: true
+    },
     ["volley"]: <OptionalSkill> {
         class: "HUNTER",
         default: true
@@ -624,11 +632,11 @@ const OPTIONAL_SKILLS = {
     },
     ["chi_burst"]: <OptionalSkill>{
         class: "MONK",
-        default: true
+        default: true,
     },
     ["touch_of_karma"]: <OptionalSkill>{
         class: "MONK",
-        default: false
+        default: false,
     },
     ["flying_serpent_kick"]: <OptionalSkill>{
         class: "MONK",
@@ -646,15 +654,7 @@ const OPTIONAL_SKILLS = {
     },
     ["bloodlust"]: <OptionalSkill>{
         class: "SHAMAN"
-    },
-    ["fel_rush"]: <OptionalSkill>{
-        class: "DEMONHUNTER",
-        default: true
-    },
-    ["vengeful_retreat"]: <OptionalSkill>{
-        class: "DEMONHUNTER",
-        default: true
-    }
+    }, 
 }
 
 let self_functionDefined: LuaObj<boolean> = {};
