@@ -4105,8 +4105,7 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
     } else if (sub(operand, 1, 10) == "using_apl.") {
         let [aplName] = match(operand, "^using_apl%.([%w_]+)");
         code = format("List(opt_using_apl %s)", aplName);
-        annotation.using_apl = annotation.using_apl || {
-        }
+        annotation.using_apl = annotation.using_apl || {}
         annotation.using_apl[aplName] = true;
     } else if (operand == "cooldown.buff_sephuzs_secret.remains") {
         code = "BuffCooldown(sephuzs_secret_buff)";
