@@ -602,31 +602,31 @@ do
     end
     OvaleOptions:RegisterOptions(__exports.OvaleSimulationCraft)
 end
-local print_r = function(node, indent, done, output)
-    done = done or {}
-    output = output or {}
-    indent = indent or ""
-    if node == nil then
-        insert(output, indent .. "nil")
-    elseif type(node) ~= "table" then
-        insert(output, indent .. node)
-    else
-        for key, value in kpairs(node) do
-            if type(value) == "table" then
-                if done[value] then
-                    insert(output, indent .. "[" .. tostring(key) .. "] => (self_reference)")
-                else
-                    done[value] = true
-                    insert(output, indent .. "[" .. tostring(key) .. "] => {")
-                    print_r(value, indent .. "    ", done, output)
-                    insert(output, indent .. "}")
-                end
-            else
-                insert(output, indent .. "[" .. tostring(key) .. "] => " .. tostring(value))
+local print_r = function(data)
+    local buffer = ""
+    local padder = "    "
+    local max = 10
+local function _dumpvar(d, depth)
+        if depth > max then
+            return 
+        end
+        local t = type(d)
+        local str = d ~= nil and tostring(d) or "<NULL>"
+        if t == "table" then
+            buffer = format("%s (%s) {\n", buffer, str)
+            for k, v in pairs(d) do
+                buffer = format("%s %s [%s] =>", buffer, padder:repeat(depth + 1), k)
+                _dumpvar(v, depth + 1)
             end
+            buffer = format("%s %s }\n", buffer, padder:repeat(depth))
+        elseif t == "number" then
+            buffer = format("%s (%s) %d\n", buffer, t, str)
+        else
+            buffer = format("%s (%s) %s\n", buffer, t, str)
         end
     end
-    return output
+    _dumpvar(data, 0)
+    return buffer
 end
 
 local NewNode = function(nodeList, hasChild)

@@ -714,36 +714,37 @@ let OVALE_TAG_PRIORITY: LuaObj<number> = {}
     }
     OvaleOptions.RegisterOptions(OvaleSimulationCraft);
 }
-const print_r = function(node: AstNode, indent?: string, done?: LuaObj<boolean>, output?: LuaArray<string>) {
-    done = done || {}
-    output = output || {}
-    indent = indent || '';
-    if (node == undefined) {
-        insert(output, `${indent}nil`);
-    } else if (type(node) != "table") {
-        insert(output, `${indent}${node}`);
-    } else {
-        for (const [key, value] of kpairs(node)) {
-            if (type(value) == "table") {
-                if (done[<any>value]) {
-                    insert(output, `${indent}[${tostring(key)}] => (self_reference)`);
-                } else {
-                    done[<any>value] = true;
-                    insert(output, `${indent}[${tostring(key)}] => {`);
-                    print_r(<any>value, `${indent}    `, done, output);
-                    insert(output, `${indent}}`);
-                }
-            } else {
-                insert(output, `${indent}[${tostring(key)}] => ${tostring(value)}`);
+
+const print_r = function( data: any ) {
+    let buffer: string = ""
+    let padder: string = "    "
+    let max: number = 10
+    
+    function _dumpvar(d: any, depth: number) {
+        if (depth > max) return
+        
+        let t = type(d)
+        let str = d !== undefined && tostring(d) || "<NULL>"
+        if (t == "table") {
+            buffer = format("%s (%s) {\n", buffer, str)
+            for (const [k, v] of pairs(d)) {
+                buffer = format("%s %s [%s] =>", buffer, padder.repeat(depth+1), k)
+                _dumpvar(v, depth+1)
             }
+            buffer = format("%s %s }\n", buffer, padder.repeat(depth))
+        }
+        else if (t == "number") {
+            buffer = format("%s (%s) %d\n", buffer, t, str)
+        }
+        else {
+            buffer = format("%s (%s) %s\n", buffer, t, str)
         }
     }
-    return output;
+    
+    _dumpvar(data, 0)
+    return buffer
 }
-// const debug_r = function(tbl) {
-//     let output = print_r(tbl);
-//     OvaleSimulationCraft.Debug(tconcat(output, "\n"));
-// }
+
 const NewNode = function(nodeList: LuaArray<ParseNode>, hasChild?: boolean) {
     let node = self_pool.Get();
     if (nodeList) {
