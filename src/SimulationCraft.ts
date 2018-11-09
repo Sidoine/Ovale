@@ -256,7 +256,6 @@ export interface Annotation extends InterruptAnnotation {
     touch_of_death?: string;
     flying_serpent_kick?: string;
     opt_use_consumables?: string;
-    righteous_fury?: string;
     blade_flurry?: string;
     time_warp?:string;
     vanish?: string;
@@ -641,9 +640,6 @@ const OPTIONAL_SKILLS = {
     },
     ["bloodlust"]: <OptionalSkill>{
         class: "SHAMAN"
-    },
-    ["righteous_fury"]: <OptionalSkill>{
-        class: "PALADIN"
     },
     ["fel_rush"]: <OptionalSkill>{
         class: "DEMONHUNTER",
@@ -2436,9 +2432,6 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             }
         } else if (className == "PALADIN" && specialization == "protection" && action == "arcane_torrent_holy") {
             isSpellAction = false;
-        } else if (className == "PALADIN" && action == "righteous_fury") {
-            conditionCode = "CheckBoxOn(opt_righteous_fury_check)";
-            annotation[action] = className;
         } else if (className == "ROGUE" && action == "adrenaline_rush") {
             conditionCode = "EnergyDeficit() > 1";
         } else if (className == "ROGUE" && action == "apply_poison") {

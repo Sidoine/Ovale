@@ -533,9 +533,6 @@ local OPTIONAL_SKILLS = {
     ["bloodlust"] = {
         class = "SHAMAN"
     },
-    ["righteous_fury"] = {
-        class = "PALADIN"
-    },
     ["fel_rush"] = {
         class = "DEMONHUNTER",
         default = true
@@ -2256,9 +2253,6 @@ EmitAction = function(parseNode, nodeList, annotation)
             end
         elseif className == "PALADIN" and specialization == "protection" and action == "arcane_torrent_holy" then
             isSpellAction = false
-        elseif className == "PALADIN" and action == "righteous_fury" then
-            conditionCode = "CheckBoxOn(opt_righteous_fury_check)"
-            annotation[action] = className
         elseif className == "ROGUE" and action == "adrenaline_rush" then
             conditionCode = "EnergyDeficit() > 1"
         elseif className == "ROGUE" and action == "apply_poison" then
