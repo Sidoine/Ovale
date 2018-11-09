@@ -718,27 +718,35 @@ let OVALE_TAG_PRIORITY: LuaObj<number> = {}
 
 const print_r = function( data: any ) {
     let buffer: string = ""
-    let padder: string = "    "
+    let padder: string = "  "
     let max: number = 10
+    
+    function _repeat(str: string, num: number) {
+        let output: string = ""
+        for (let i = 0; i < num; i += 1) {
+            output = output + str;
+        }
+        return output;
+    }
     
     function _dumpvar(d: any, depth: number) {
         if (depth > max) return
         
         let t = type(d)
-        let str = d !== undefined && tostring(d) || "<NULL>"
+        let str = d !== undefined && tostring(d) || ""
         if (t == "table") {
-            buffer = format("%s (%s) {\n", buffer, str)
+            buffer = buffer + format(" (%s) {\n", str)
             for (const [k, v] of pairs(d)) {
-                buffer = format("%s %s [%s] =>", buffer, padder.repeat(depth+1), k)
+                buffer = buffer + format(" %s [%s] =>", _repeat(padder, depth+1), k)
                 _dumpvar(v, depth+1)
             }
-            buffer = format("%s %s }\n", buffer, padder.repeat(depth))
+            buffer = buffer + format(" %s }\n", _repeat(padder, depth))
         }
         else if (t == "number") {
-            buffer = format("%s (%s) %d\n", buffer, t, str)
+            buffer = buffer + format(" (%s) %d\n", t, str)
         }
         else {
-            buffer = format("%s (%s) %s\n", buffer, t, str)
+            buffer = buffer + format(" (%s) %s\n", t, str)
         }
     }
     

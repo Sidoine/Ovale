@@ -604,25 +604,32 @@ do
 end
 local print_r = function(data)
     local buffer = ""
-    local padder = "    "
+    local padder = "  "
     local max = 10
+local function _repeat(str, num)
+        local output = ""
+        for i = 0, num, 1 do
+            output = output .. str
+        end
+        return output
+    end
 local function _dumpvar(d, depth)
         if depth > max then
             return 
         end
         local t = type(d)
-        local str = d ~= nil and tostring(d) or "<NULL>"
+        local str = d ~= nil and tostring(d) or ""
         if t == "table" then
-            buffer = format("%s (%s) {\n", buffer, str)
+            buffer = buffer .. format(" (%s) {\n", str)
             for k, v in pairs(d) do
-                buffer = format("%s %s [%s] =>", buffer, padder:repeat(depth + 1), k)
+                buffer = buffer .. format(" %s [%s] =>", _repeat(padder, depth + 1), k)
                 _dumpvar(v, depth + 1)
             end
-            buffer = format("%s %s }\n", buffer, padder:repeat(depth))
+            buffer = buffer .. format(" %s }\n", _repeat(padder, depth))
         elseif t == "number" then
-            buffer = format("%s (%s) %d\n", buffer, t, str)
+            buffer = buffer .. format(" (%s) %d\n", t, str)
         else
-            buffer = format("%s (%s) %s\n", buffer, t, str)
+            buffer = buffer .. format(" (%s) %s\n", t, str)
         end
     end
     _dumpvar(data, 0)
