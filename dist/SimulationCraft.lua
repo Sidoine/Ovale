@@ -506,7 +506,8 @@ local OPTIONAL_SKILLS = {
         class = "MAGE"
     },
     ["storm_earth_and_fire"] = {
-        class = "MONK"
+        class = "MONK",
+        default = true
     },
     ["chi_burst"] = {
         class = "MONK",

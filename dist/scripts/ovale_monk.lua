@@ -292,7 +292,7 @@ AddCheckBox(opt_touch_of_death_on_elite_only L(touch_of_death_on_elite_only) def
 AddCheckBox(opt_flying_serpent_kick SpellName(flying_serpent_kick) default specialization=windwalker)
 AddCheckBox(opt_touch_of_karma SpellName(touch_of_karma) specialization=windwalker)
 AddCheckBox(opt_chi_burst SpellName(chi_burst) default specialization=windwalker)
-AddCheckBox(opt_storm_earth_and_fire SpellName(storm_earth_and_fire) specialization=windwalker)
+AddCheckBox(opt_storm_earth_and_fire SpellName(storm_earth_and_fire) default specialization=windwalker)
 
 AddFunction WindwalkerInterruptActions
 {
@@ -786,7 +786,7 @@ AddCheckBox(opt_touch_of_death_on_elite_only L(touch_of_death_on_elite_only) def
 AddCheckBox(opt_flying_serpent_kick SpellName(flying_serpent_kick) default specialization=windwalker)
 AddCheckBox(opt_touch_of_karma SpellName(touch_of_karma) specialization=windwalker)
 AddCheckBox(opt_chi_burst SpellName(chi_burst) default specialization=windwalker)
-AddCheckBox(opt_storm_earth_and_fire SpellName(storm_earth_and_fire) specialization=windwalker)
+AddCheckBox(opt_storm_earth_and_fire SpellName(storm_earth_and_fire) default specialization=windwalker)
 
 AddFunction WindwalkerInterruptActions
 {

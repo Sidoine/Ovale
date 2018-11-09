@@ -614,7 +614,8 @@ const OPTIONAL_SKILLS = {
         class: "MAGE"
     },
     ["storm_earth_and_fire"]: <OptionalSkill>{
-        class: "MONK"
+        class: "MONK",
+        default: true,
     },
     ["chi_burst"]: <OptionalSkill>{
         class: "MONK",
