@@ -216,6 +216,7 @@ local CHARACTER_PROPERTY = {
     ["energy.time_to_max"] = "TimeToMaxEnergy()",
     ["feral_spirit.remains"] = "TotemRemaining(sprit_wolf)",
     ["finality"] = "HasArtifactTrait(finality)",
+    ["firestarter.remains"] = "target.TimeToHealthPercent(90)",
     ["focus"] = "Focus()",
     ["focus.deficit"] = "FocusDeficit()",
     ["focus.max"] = "MaxFocus()",
@@ -282,6 +283,7 @@ local MODIFIER_KEYWORD = {
     ["ammo_type"] = true,
     ["animation_cancel"] = true,
     ["attack_speed"] = true,
+    ["cancel_if"] = true,
     ["chain"] = true,
     ["choose"] = true,
     ["condition"] = true,
@@ -361,6 +363,7 @@ local SPECIAL_ACTION = {
     ["stealth"] = true,
     ["stop_moving"] = true,
     ["swap_action_list"] = true,
+    ["use_items"] = true,
     ["use_item"] = true,
     ["variable"] = true,
     ["wait"] = true
@@ -490,6 +493,14 @@ end
 local EMIT_DISAMBIGUATION = {}
 local OPERAND_TOKEN_PATTERN = "[^.]+"
 local OPTIONAL_SKILLS = {
+    ["fel_rush"] = {
+        class = "DEMONHUNTER",
+        default = true
+    },
+    ["vengeful_retreat"] = {
+        class = "DEMONHUNTER",
+        default = true
+    },
     ["volley"] = {
         class = "HUNTER",
         default = true
@@ -499,11 +510,16 @@ local OPTIONAL_SKILLS = {
         specialization = "survival",
         default = true
     },
+    ["blink"] = {
+        class = "MAGE",
+        default = false
+    },
     ["time_warp"] = {
         class = "MAGE"
     },
     ["storm_earth_and_fire"] = {
-        class = "MONK"
+        class = "MONK",
+        default = true
     },
     ["chi_burst"] = {
         class = "MONK",
@@ -512,6 +528,10 @@ local OPTIONAL_SKILLS = {
     ["touch_of_karma"] = {
         class = "MONK",
         default = false
+    },
+    ["flying_serpent_kick"] = {
+        class = "MONK",
+        default = true
     },
     ["vanish"] = {
         class = "ROGUE",
@@ -525,17 +545,6 @@ local OPTIONAL_SKILLS = {
     },
     ["bloodlust"] = {
         class = "SHAMAN"
-    },
-    ["righteous_fury"] = {
-        class = "PALADIN"
-    },
-    ["fel_rush"] = {
-        class = "DEMONHUNTER",
-        default = true
-    },
-    ["vengeful_retreat"] = {
-        class = "DEMONHUNTER",
-        default = true
     }
 }
 local self_functionDefined = {}
@@ -2249,9 +2258,6 @@ EmitAction = function(parseNode, nodeList, annotation)
             end
         elseif className == "PALADIN" and specialization == "protection" and action == "arcane_torrent_holy" then
             isSpellAction = false
-        elseif className == "PALADIN" and action == "righteous_fury" then
-            conditionCode = "CheckBoxOn(opt_righteous_fury_check)"
-            annotation[action] = className
         elseif className == "ROGUE" and action == "adrenaline_rush" then
             conditionCode = "EnergyDeficit() > 1"
         elseif className == "ROGUE" and action == "apply_poison" then
@@ -2289,14 +2295,6 @@ EmitAction = function(parseNode, nodeList, annotation)
         elseif className == "SHAMAN" and action == "totem_mastery_enhancement" then
             conditionCode = "(InCombat() or not BuffPresent(enh_resonance_totem_buff))"
             AddSymbol(annotation, "enh_resonance_totem_buff")
-        elseif className == "WARLOCK" and action == "cancel_metamorphosis" then
-            local spellName = "metamorphosis"
-            local buffName = "metamorphosis_buff"
-            AddSymbol(annotation, spellName)
-            AddSymbol(annotation, buffName)
-            bodyCode = format("Spell(%s text=cancel)", spellName)
-            conditionCode = format("BuffPresent(%s)", buffName)
-            isSpellAction = false
         elseif className == "WARLOCK" and action == "felguard_felstorm" then
             conditionCode = "pet.Present() and pet.CreatureFamily(Felguard)"
         elseif className == "WARLOCK" and action == "grimoire_of_sacrifice" then
@@ -3885,8 +3883,11 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
         code = target .. "Distance()"
     elseif sub(operand, 1, 9) == "equipped." then
         local name = Disambiguate(annotation, sub(operand, 10), className, specialization)
-        code = format("HasEquippedItem(%s_item)", name)
-        AddSymbol(annotation, name .. "_item")
+        local itemId = tonumber(name)
+        local itemName = name .. "_item"
+        local item = itemId and tostring(itemId) or itemName
+        code = format("HasEquippedItem(%s)", item)
+        AddSymbol(annotation, item)
     elseif operand == "gcd.max" then
         code = "GCD()"
     elseif operand == "gcd.remains" then

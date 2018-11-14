@@ -171,9 +171,11 @@ AddFunction BalanceDefaultCdActions
  #ancestral_call,if=buff.celestial_alignment.up|buff.incarnation.up
  if BuffPresent(celestial_alignment_buff) or BuffPresent(incarnation_chosen_of_elune_buff) Spell(ancestral_call)
  #use_item,name=azurethos_singed_plumage,if=equipped.161377&(cooldown.incarnation.remains>30|cooldown.celestial_alignment.remains>30)
- if HasEquippedItem(161377 _item) and { SpellCooldown(incarnation_chosen_of_elune) > 30 or SpellCooldown(celestial_alignment) > 30 } BalanceUseItemActions()
+ if HasEquippedItem(161377) and { SpellCooldown(incarnation_chosen_of_elune) > 30 or SpellCooldown(celestial_alignment) > 30 } BalanceUseItemActions()
  #use_item,name=dread_gladiators_badge,if=equipped.161902&(cooldown.incarnation.remains>30|cooldown.celestial_alignment.remains>30)
- if HasEquippedItem(161902 _item) and { SpellCooldown(incarnation_chosen_of_elune) > 30 or SpellCooldown(celestial_alignment) > 30 } BalanceUseItemActions()
+ if HasEquippedItem(161902) and { SpellCooldown(incarnation_chosen_of_elune) > 30 or SpellCooldown(celestial_alignment) > 30 } BalanceUseItemActions()
+ #use_item,name=balefire_branch,if=equipped.159630&(cooldown.incarnation.remains>30|cooldown.celestial_alignment.remains>30)
+ if HasEquippedItem(159630) and { SpellCooldown(incarnation_chosen_of_elune) > 30 or SpellCooldown(celestial_alignment) > 30 } BalanceUseItemActions()
  #use_items
  BalanceUseItemActions()
 
@@ -252,8 +254,9 @@ AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
 }
 
 ### Required symbols
-# 161377_item
-# 161902_item
+# 159630
+# 161377
+# 161902
 # ancestral_call
 # arcane_torrent_energy
 # berserking

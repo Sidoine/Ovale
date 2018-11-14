@@ -292,7 +292,6 @@ Define(writhe_in_agony_talent 4) #22044
 # Agony's damage may now ramp up to s2 stacks.
 Define(wilfreds_sigil_of_superior_summoning_item 132369)
 Define(cascading_calamity_trait 275372)
-Define(sudden_onset_trait 278721)
 Define(forbidden_knowledge_trait 278738)
     ]]
     code = code .. [[
