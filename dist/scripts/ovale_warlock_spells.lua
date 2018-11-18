@@ -492,6 +492,10 @@ Define(summon_succubus 712)
 Define(summon_voidwalker 697)
 	SpellInfo(summon_voidwalker soulshards=1)
 Define(unending_breath 5697)
+	SpellAddTargetBuff(unending_breath unending_breath_buff=1)
+	SpellRequire(unending_breath unusable 1=buff,unending_breath_buff)
+Define(unending_breath_buff 5697)
+	SpellInfo(unending_breath_buff duration=600)
 Define(unending_resolve 104773)
 	SpellInfo(unending_resolve cd=180)
 	SpellAddBuff(unending_resolve unending_resolve_buff=1)
@@ -612,6 +616,9 @@ Define(felguard 17252)
 	SpellInfo(summon_imp tag=shortcd)
 	SpellInfo(summon_succubus tag=shortcd)
 	SpellInfo(summon_voidwalker tag=shortcd)
+
+# Custom stuff
+Define(healthstone 5512)
 ]]
     OvaleScripts:RegisterScript("WARLOCK", nil, name, desc, code, "include")
 end
