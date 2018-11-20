@@ -3990,6 +3990,8 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
     } else if (className == "ROGUE" && operand == "exsanguinated") {
         code = "target.DebuffPresent(exsanguinated)";
         AddSymbol(annotation, "exsanguinated");
+    } else if (className == "ROGUE" && operand == "ss_buffed") {
+        code = "False()"; // TODO: has garrote been casted out of stealth with shrouded suffocation azerite trait?
     } else if (className == "ROGUE" && operand == "master_assassin_remains") {
         code = "BuffRemaining(master_assassin_buff)";
         AddSymbol(annotation, "master_assassin_buff");

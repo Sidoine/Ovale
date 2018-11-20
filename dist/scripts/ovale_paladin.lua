@@ -146,7 +146,7 @@ AddFunction ProtectionDefaultMainActions
   if not BuffPresent(consecration) Spell(consecration)
   #judgment,if=(cooldown.judgment.remains<gcd&cooldown.judgment.charges_fractional>1&cooldown_react)|!talent.crusaders_judgment.enabled
   if SpellCooldown(judgment_protection) < GCD() and SpellCharges(judgment_protection count=0) > 1 and not SpellCooldown(judgment_protection) > 0 or not Talent(crusaders_judgment_talent) Spell(judgment_protection)
-  #avengers_shield,,if=cooldown_react
+  #avengers_shield,if=cooldown_react
   if not SpellCooldown(avengers_shield) > 0 Spell(avengers_shield)
   #judgment,if=cooldown_react|!talent.crusaders_judgment.enabled
   if not SpellCooldown(judgment_protection) > 0 or not Talent(crusaders_judgment_talent) Spell(judgment_protection)

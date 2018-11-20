@@ -618,8 +618,6 @@ AddFunction EnhancementCoreMainActions
  if furyCheck25() Spell(earthen_spike)
  #sundering,if=active_enemies>=3
  if Enemies() >= 3 Spell(sundering)
- #stormstrike,cycle_targets=1,if=azerite.lightning_conduit.enabled&!debuff.lightning_conduit.up&active_enemies>1&(buff.stormbringer.up|(variable.OCPool70&variable.furyCheck35))
- if HasAzeriteTrait(lightning_conduit_trait) and not target.DebuffPresent(lightning_conduit_debuff) and Enemies() > 1 and { BuffPresent(stormbringer_buff) or OCPool70() and furyCheck35() } Spell(stormstrike)
  #stormstrike,if=buff.stormbringer.up|(buff.gathering_storms.up&variable.OCPool70&variable.furyCheck35)
  if BuffPresent(stormbringer_buff) or BuffPresent(gathering_storms_buff) and OCPool70() and furyCheck35() Spell(stormstrike)
  #crash_lightning,if=active_enemies>=3&variable.furyCheck25
@@ -650,7 +648,7 @@ AddFunction EnhancementCoreShortCdActions
 
 AddFunction EnhancementCoreShortCdPostConditions
 {
- furyCheck25() and Spell(earthen_spike) or Enemies() >= 3 and Spell(sundering) or HasAzeriteTrait(lightning_conduit_trait) and not target.DebuffPresent(lightning_conduit_debuff) and Enemies() > 1 and { BuffPresent(stormbringer_buff) or OCPool70() and furyCheck35() } and Spell(stormstrike) or { BuffPresent(stormbringer_buff) or BuffPresent(gathering_storms_buff) and OCPool70() and furyCheck35() } and Spell(stormstrike) or Enemies() >= 3 and furyCheck25() and Spell(crash_lightning) or Talent(overcharge_talent) and Enemies() == 1 and furyCheck45() and Maelstrom() >= 40 and Spell(lightning_bolt_enhancement) or OCPool70() and furyCheck35() and Spell(stormstrike) or Spell(sundering) or Talent(forceful_winds_talent) and Enemies() > 1 and furyCheck25() and Spell(crash_lightning) or Talent(searing_assault_talent) and Spell(flametongue) or Talent(hot_hand_talent) and BuffPresent(hot_hand_buff) and Spell(lava_lash) or Enemies() > 1 and furyCheck25() and Spell(crash_lightning)
+ furyCheck25() and Spell(earthen_spike) or Enemies() >= 3 and Spell(sundering) or { BuffPresent(stormbringer_buff) or BuffPresent(gathering_storms_buff) and OCPool70() and furyCheck35() } and Spell(stormstrike) or Enemies() >= 3 and furyCheck25() and Spell(crash_lightning) or Talent(overcharge_talent) and Enemies() == 1 and furyCheck45() and Maelstrom() >= 40 and Spell(lightning_bolt_enhancement) or OCPool70() and furyCheck35() and Spell(stormstrike) or Spell(sundering) or Talent(forceful_winds_talent) and Enemies() > 1 and furyCheck25() and Spell(crash_lightning) or Talent(searing_assault_talent) and Spell(flametongue) or Talent(hot_hand_talent) and BuffPresent(hot_hand_buff) and Spell(lava_lash) or Enemies() > 1 and furyCheck25() and Spell(crash_lightning)
 }
 
 AddFunction EnhancementCoreCdActions
@@ -659,7 +657,7 @@ AddFunction EnhancementCoreCdActions
 
 AddFunction EnhancementCoreCdPostConditions
 {
- furyCheck25() and Spell(earthen_spike) or Enemies() >= 3 and Spell(sundering) or HasAzeriteTrait(lightning_conduit_trait) and not target.DebuffPresent(lightning_conduit_debuff) and Enemies() > 1 and { BuffPresent(stormbringer_buff) or OCPool70() and furyCheck35() } and Spell(stormstrike) or { BuffPresent(stormbringer_buff) or BuffPresent(gathering_storms_buff) and OCPool70() and furyCheck35() } and Spell(stormstrike) or Enemies() >= 3 and furyCheck25() and Spell(crash_lightning) or Talent(overcharge_talent) and Enemies() == 1 and furyCheck45() and Maelstrom() >= 40 and Spell(lightning_bolt_enhancement) or OCPool70() and furyCheck35() and Spell(stormstrike) or Spell(sundering) or Talent(forceful_winds_talent) and Enemies() > 1 and furyCheck25() and Spell(crash_lightning) or Talent(searing_assault_talent) and Spell(flametongue) or Talent(hot_hand_talent) and BuffPresent(hot_hand_buff) and Spell(lava_lash) or Enemies() > 1 and furyCheck25() and Spell(crash_lightning)
+ furyCheck25() and Spell(earthen_spike) or Enemies() >= 3 and Spell(sundering) or { BuffPresent(stormbringer_buff) or BuffPresent(gathering_storms_buff) and OCPool70() and furyCheck35() } and Spell(stormstrike) or Enemies() >= 3 and furyCheck25() and Spell(crash_lightning) or Talent(overcharge_talent) and Enemies() == 1 and furyCheck45() and Maelstrom() >= 40 and Spell(lightning_bolt_enhancement) or OCPool70() and furyCheck35() and Spell(stormstrike) or Spell(sundering) or Talent(forceful_winds_talent) and Enemies() > 1 and furyCheck25() and Spell(crash_lightning) or Talent(searing_assault_talent) and Spell(flametongue) or Talent(hot_hand_talent) and BuffPresent(hot_hand_buff) and Spell(lava_lash) or Enemies() > 1 and furyCheck25() and Spell(crash_lightning)
 }
 
 ### actions.cds
@@ -1018,8 +1016,6 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # landslide_talent
 # lava_lash
 # lightning_bolt_enhancement
-# lightning_conduit_debuff
-# lightning_conduit_trait
 # lightning_shield
 # overcharge_talent
 # quaking_palm

@@ -3815,6 +3815,8 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
     elseif className == "ROGUE" and operand == "exsanguinated" then
         code = "target.DebuffPresent(exsanguinated)"
         AddSymbol(annotation, "exsanguinated")
+    elseif className == "ROGUE" and operand == "ss_buffed" then
+        code = "False()"
     elseif className == "ROGUE" and operand == "master_assassin_remains" then
         code = "BuffRemaining(master_assassin_buff)"
         AddSymbol(annotation, "master_assassin_buff")
