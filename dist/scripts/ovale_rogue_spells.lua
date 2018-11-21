@@ -554,7 +554,7 @@ Define(shuriken_combo_buff 245640)
 	SpellInfo(shuriken_tornado energy=60 cd=60)
 
 	SpellInfo(shuriken_toss combopoints=-1 energy=40 travel_time=1)
-
+Define(sinister_strike 1752)
 	SpellInfo(sinister_strike combopoints=-1 energy=45)
 
 	SpellInfo(slice_and_dice combopoints=1 max_combopoints=5 energy=25)
