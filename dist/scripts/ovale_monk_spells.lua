@@ -396,20 +396,19 @@ Define(roll 109132)
 	SpellInfo(roll replaced_by=chi_torpedo talent=chi_torpedo_talent)
 	SpellRequire(roll unusable 1=lossofcontrol,root)
 
-SpellInfo(rushing_jade_wind chi=0 duration=9 cd_haste=melee haste=melee talent=rushing_jade_wind_talent)
-SpellAddBuff(rushing_jade_wind rushing_jade_wind=1)
-
-# Define(rushing_jade_wind_windwalker 261715)
-# 	SpellInfo(rushing_jade_wind_windwalker cd=6 cd_haste=melee tick=0.8 haste=melee talent=rushing_jade_wind_talent_windwalker)
-# 	SpellAddBuff(rushing_jade_wind_windwalker rushing_jade_wind_windwalker=1)
-
+    SpellInfo(rushing_jade_wind chi=0)
+Define(rushing_jade_wind_buff 116847)
+    SpellInfo(rushing_jade_wind_buff duration=9 haste=melee)
+    SpellAddBuff(rushing_jade_wind rushing_jade_wind_buff=1 specialization=brewmaster)
+Define(rushing_jade_wind_windwalker_buff 261715)
+    SpellInfo(rushing_jade_wind_windwalker_buff tick=0.8 haste=melee)
+    SpellAddBuff(rushing_jade_wind rushing_jade_wind_windwalker_buff=1 specialization=windwalker)
+    
 Define(song_of_chiji 198898)
 	SpellInfo(song_of_chiji cd=30)
 	SpellAddTargetDebuff(song_of_chiji song_of_chiji_debuff=1)
-
 Define(song_of_chiji_debuff 198909)
 	SpellInfo(song_of_chiji_debuff duration=20)
-
 Define(soothing_mist 115175)
 	SpellInfo(soothing_mist cd=1 channel=8 duration=8 haste=spell tick=1)
 	SpellAddTargetBuff(soothing_mist soothing_mist=1)

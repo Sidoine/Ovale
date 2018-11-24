@@ -1598,11 +1598,13 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("water_elemental", "summon_water_elemental", "MAGE", "frost");
     
     //Monk
-    AddDisambiguation("healing_elixir_talent", "healing_elixir_talent_mistweaver", "MONK", "mistweaver");
+    
     AddDisambiguation("bok_proc_buff", "blackout_kick_buff", "MONK", "windwalker");
-    AddDisambiguation("fortifying_brew", "fortifying_brew_mistweaver", "MONK", "mistweaver");
     AddDisambiguation("breath_of_fire_dot_debuff", "breath_of_fire_debuff", "MONK", "brewmaster");
     AddDisambiguation("brews", "ironskin_brew", "MONK", "brewmaster");
+    AddDisambiguation("fortifying_brew", "fortifying_brew_mistweaver", "MONK", "mistweaver");
+    AddDisambiguation("healing_elixir_talent", "healing_elixir_talent_mistweaver", "MONK", "mistweaver");
+    AddDisambiguation("rushing_jade_wind_buff", "rushing_jade_wind_windwalker_buff", "MONK", "windwalker");
 
     //Paladin
     AddDisambiguation("avenger_shield", "avengers_shield", "PALADIN", "protection");
