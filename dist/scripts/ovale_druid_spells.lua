@@ -434,13 +434,12 @@ Define(moonkin_form 197625)
 Define(solar_wrath 190984)
 Define(starsurge 197626)
 	SpellInfo(starsurge cd=10 specialization=!balance)
-Define(sunfire 197630)
-	SpellAddTargetDebuff(sunfire sunfire_debuff=1)
 Define(sunfire_debuff 164815)
-	SpellInfo(sunfire_debuff duration=12)
+    SpellAddTargetDebuff(sunfire sunfire_debuff=1)
+    SpellInfo(sunfire_debuff duration=12)
+    SpellInfo(sunfire_debuff add_duration=6 specialization=balance)
 
 # Feral Affinity
-
 	SpellInfo(ferocious_bite energy=25 max_energy=50 combopoints=1 max_combopoints=5)
 	SpellInfo(ferocious_bite physical=1)
 
@@ -557,8 +556,7 @@ Define(stellar_flare_debuff 202347)
 
 	SpellInfo(warrior_of_elune gcd=0 cd=45 offgcd=1)
 Define(warrior_of_elune_buff 202425)
-	#TODO 2 Lunar strikes are instant	
-	SpellInfo(sunfire_debuff add_duration=6 specialization=balance)
+	
 
 # Balance Legendaries
 Define(oneths_intuition_buff 209406)

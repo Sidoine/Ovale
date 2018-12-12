@@ -602,31 +602,38 @@ do
     end
     OvaleOptions:RegisterOptions(__exports.OvaleSimulationCraft)
 end
-local print_r = function(node, indent, done, output)
-    done = done or {}
-    output = output or {}
-    indent = indent or ""
-    if node == nil then
-        insert(output, indent .. "nil")
-    elseif type(node) ~= "table" then
-        insert(output, indent .. node)
-    else
-        for key, value in kpairs(node) do
-            if type(value) == "table" then
-                if done[value] then
-                    insert(output, indent .. "[" .. tostring(key) .. "] => (self_reference)")
-                else
-                    done[value] = true
-                    insert(output, indent .. "[" .. tostring(key) .. "] => {")
-                    print_r(value, indent .. "    ", done, output)
-                    insert(output, indent .. "}")
-                end
-            else
-                insert(output, indent .. "[" .. tostring(key) .. "] => " .. tostring(value))
+local print_r = function(data)
+    local buffer = ""
+    local padder = "  "
+    local max = 10
+local function _repeat(str, num)
+        local output = ""
+        for i = 0, num, 1 do
+            output = output .. str
+        end
+        return output
+    end
+local function _dumpvar(d, depth)
+        if depth > max then
+            return 
+        end
+        local t = type(d)
+        local str = d ~= nil and tostring(d) or ""
+        if t == "table" then
+            buffer = buffer .. format(" (%s) {\n", str)
+            for k, v in pairs(d) do
+                buffer = buffer .. format(" %s [%s] =>", _repeat(padder, depth + 1), k)
+                _dumpvar(v, depth + 1)
             end
+            buffer = buffer .. format(" %s }\n", _repeat(padder, depth))
+        elseif t == "number" then
+            buffer = buffer .. format(" (%s) %d\n", t, str)
+        else
+            buffer = buffer .. format(" (%s) %s\n", t, str)
         end
     end
-    return output
+    _dumpvar(data, 0)
+    return buffer
 end
 
 local NewNode = function(nodeList, hasChild)
@@ -1429,11 +1436,12 @@ local InitializeDisambiguation = function()
     AddDisambiguation("132863", "darcklis_dragonfire_diadem", "MAGE", "fire")
     AddDisambiguation("summon_arcane_familiar", "arcane_familiar", "MAGE", "arcane")
     AddDisambiguation("water_elemental", "summon_water_elemental", "MAGE", "frost")
-    AddDisambiguation("healing_elixir_talent", "healing_elixir_talent_mistweaver", "MONK", "mistweaver")
     AddDisambiguation("bok_proc_buff", "blackout_kick_buff", "MONK", "windwalker")
-    AddDisambiguation("fortifying_brew", "fortifying_brew_mistweaver", "MONK", "mistweaver")
     AddDisambiguation("breath_of_fire_dot_debuff", "breath_of_fire_debuff", "MONK", "brewmaster")
     AddDisambiguation("brews", "ironskin_brew", "MONK", "brewmaster")
+    AddDisambiguation("fortifying_brew", "fortifying_brew_mistweaver", "MONK", "mistweaver")
+    AddDisambiguation("healing_elixir_talent", "healing_elixir_talent_mistweaver", "MONK", "mistweaver")
+    AddDisambiguation("rushing_jade_wind_buff", "rushing_jade_wind_windwalker_buff", "MONK", "windwalker")
     AddDisambiguation("avenger_shield", "avengers_shield", "PALADIN", "protection")
     AddDisambiguation("judgment_of_light_talent", "judgment_of_light_talent_holy", "PALADIN", "holy")
     AddDisambiguation("unbreakable_spirit_talent", "unbreakable_spirit_talent_holy", "PALADIN", "holy")
@@ -3808,6 +3816,8 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
     elseif className == "ROGUE" and operand == "exsanguinated" then
         code = "target.DebuffPresent(exsanguinated)"
         AddSymbol(annotation, "exsanguinated")
+    elseif className == "ROGUE" and operand == "ss_buffed" then
+        code = "False()"
     elseif className == "ROGUE" and operand == "master_assassin_remains" then
         code = "BuffRemaining(master_assassin_buff)"
         AddSymbol(annotation, "master_assassin_buff")
@@ -3939,6 +3949,9 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
     elseif operand == "is_add" then
         local t = target or "target."
         code = format("not %sClassification(worldboss)", t)
+    elseif operand == "priority_rotation" then
+        code = "CheckBoxOn(opt_priority_rotation)"
+        annotation.opt_priority_rotation = className
     else
         ok = false
     end
@@ -5022,6 +5035,15 @@ local function InsertSupportingControls(child, annotation)
     if annotation.interrupt then
         local fmt = [[
 			AddCheckBox(opt_interrupt L(interrupt) default %s)
+		]]
+        local code = format(fmt, ifSpecialization)
+        local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+        insert(child, 1, node)
+        count = count + 1
+    end
+    if annotation.opt_priority_rotation then
+        local fmt = [[
+			AddCheckBox(opt_priority_rotation L(opt_priority_rotation) default %s)
 		]]
         local code = format(fmt, ifSpecialization)
         local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)

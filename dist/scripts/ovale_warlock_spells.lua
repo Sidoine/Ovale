@@ -238,6 +238,8 @@ Define(deathbolt_talent 3) #23141
 # Launches a bolt of death at the target, dealing s2 of the total remaining damage of your damage over time effects on the target.?s196103[rnrnCounts up to s3 sec of your Corruption's damage.][]
 Define(demonic_calling_talent 4) #22045
 # Shadow Bolt?s264178[ and Demonbolt have][ has] a h chance to make your next Call Dreadstalkers cost s1 less Soul Shard and have no cast time.
+Define(demonic_consumption_talent 20) #22479
+# Your Demonic Tyrant now destroys and absorbs the remaining power of all of your Wild Imps to empower himself.
 Define(demonic_strength_talent 2) #22048
 # Infuse your Felguard with demonic strength and command it to charge your target and unleash a Felstorm that will deal s2 increased damage.
 Define(doom_talent 6) #23158

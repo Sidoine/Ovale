@@ -246,6 +246,7 @@ export interface Annotation extends InterruptAnnotation {
     opt_touch_of_death_on_elite_only?:string;
     opt_arcane_mage_burn_phase?:string;
     opt_meta_only_during_boss?: string;
+    opt_priority_rotation?: string;
     time_to_hpg_heal?: string;
     time_to_hpg_melee?: string;
     time_to_hpg_tank?: string;
@@ -714,36 +715,45 @@ let OVALE_TAG_PRIORITY: LuaObj<number> = {}
     }
     OvaleOptions.RegisterOptions(OvaleSimulationCraft);
 }
-const print_r = function(node: AstNode, indent?: string, done?: LuaObj<boolean>, output?: LuaArray<string>) {
-    done = done || {}
-    output = output || {}
-    indent = indent || '';
-    if (node == undefined) {
-        insert(output, `${indent}nil`);
-    } else if (type(node) != "table") {
-        insert(output, `${indent}${node}`);
-    } else {
-        for (const [key, value] of kpairs(node)) {
-            if (type(value) == "table") {
-                if (done[<any>value]) {
-                    insert(output, `${indent}[${tostring(key)}] => (self_reference)`);
-                } else {
-                    done[<any>value] = true;
-                    insert(output, `${indent}[${tostring(key)}] => {`);
-                    print_r(<any>value, `${indent}    `, done, output);
-                    insert(output, `${indent}}`);
-                }
-            } else {
-                insert(output, `${indent}[${tostring(key)}] => ${tostring(value)}`);
+
+const print_r = function( data: any ) {
+    let buffer: string = ""
+    let padder: string = "  "
+    let max: number = 10
+    
+    function _repeat(str: string, num: number) {
+        let output: string = ""
+        for (let i = 0; i < num; i += 1) {
+            output = output + str;
+        }
+        return output;
+    }
+    
+    function _dumpvar(d: any, depth: number) {
+        if (depth > max) return
+        
+        let t = type(d)
+        let str = d !== undefined && tostring(d) || ""
+        if (t == "table") {
+            buffer = buffer + format(" (%s) {\n", str)
+            for (const [k, v] of pairs(d)) {
+                buffer = buffer + format(" %s [%s] =>", _repeat(padder, depth+1), k)
+                _dumpvar(v, depth+1)
             }
+            buffer = buffer + format(" %s }\n", _repeat(padder, depth))
+        }
+        else if (t == "number") {
+            buffer = buffer + format(" (%s) %d\n", t, str)
+        }
+        else {
+            buffer = buffer + format(" (%s) %s\n", t, str)
         }
     }
-    return output;
+    
+    _dumpvar(data, 0)
+    return buffer
 }
-// const debug_r = function(tbl) {
-//     let output = print_r(tbl);
-//     OvaleSimulationCraft.Debug(tconcat(output, "\n"));
-// }
+
 const NewNode = function(nodeList: LuaArray<ParseNode>, hasChild?: boolean) {
     let node = self_pool.Get();
     if (nodeList) {
@@ -1588,11 +1598,13 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("water_elemental", "summon_water_elemental", "MAGE", "frost");
     
     //Monk
-    AddDisambiguation("healing_elixir_talent", "healing_elixir_talent_mistweaver", "MONK", "mistweaver");
+    
     AddDisambiguation("bok_proc_buff", "blackout_kick_buff", "MONK", "windwalker");
-    AddDisambiguation("fortifying_brew", "fortifying_brew_mistweaver", "MONK", "mistweaver");
     AddDisambiguation("breath_of_fire_dot_debuff", "breath_of_fire_debuff", "MONK", "brewmaster");
     AddDisambiguation("brews", "ironskin_brew", "MONK", "brewmaster");
+    AddDisambiguation("fortifying_brew", "fortifying_brew_mistweaver", "MONK", "mistweaver");
+    AddDisambiguation("healing_elixir_talent", "healing_elixir_talent_mistweaver", "MONK", "mistweaver");
+    AddDisambiguation("rushing_jade_wind_buff", "rushing_jade_wind_windwalker_buff", "MONK", "windwalker");
 
     //Paladin
     AddDisambiguation("avenger_shield", "avengers_shield", "PALADIN", "protection");
@@ -3980,6 +3992,8 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
     } else if (className == "ROGUE" && operand == "exsanguinated") {
         code = "target.DebuffPresent(exsanguinated)";
         AddSymbol(annotation, "exsanguinated");
+    } else if (className == "ROGUE" && operand == "ss_buffed") {
+        code = "False()"; // TODO: has garrote been casted out of stealth with shrouded suffocation azerite trait?
     } else if (className == "ROGUE" && operand == "master_assassin_remains") {
         code = "BuffRemaining(master_assassin_buff)";
         AddSymbol(annotation, "master_assassin_buff");
@@ -4103,8 +4117,7 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
     } else if (sub(operand, 1, 10) == "using_apl.") {
         let [aplName] = match(operand, "^using_apl%.([%w_]+)");
         code = format("List(opt_using_apl %s)", aplName);
-        annotation.using_apl = annotation.using_apl || {
-        }
+        annotation.using_apl = annotation.using_apl || {}
         annotation.using_apl[aplName] = true;
     } else if (operand == "cooldown.buff_sephuzs_secret.remains") {
         code = "BuffCooldown(sephuzs_secret_buff)";
@@ -4112,6 +4125,9 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
     } else if (operand == "is_add") {
         let t = target || "target.";
         code = format("not %sClassification(worldboss)", t);
+    } else if (operand == "priority_rotation") {
+        code = "CheckBoxOn(opt_priority_rotation)"
+        annotation.opt_priority_rotation = className
     } else {
         ok = false;
     }
@@ -5208,6 +5224,15 @@ function InsertSupportingControls(child: LuaArray<AstNode>, annotation: Annotati
     if (annotation.interrupt) {
         let fmt = `
 			AddCheckBox(opt_interrupt L(interrupt) default %s)
+		`;
+        let code = format(fmt, ifSpecialization);
+        let [node] = OvaleAST.ParseCode("checkbox", code, nodeList, annotation.astAnnotation);
+        insert(child, 1, node);
+        count = count + 1;
+    }
+    if (annotation.opt_priority_rotation) {
+        let fmt = `
+			AddCheckBox(opt_priority_rotation L(opt_priority_rotation) default %s)
 		`;
         let code = format(fmt, ifSpecialization);
         let [node] = OvaleAST.ParseCode("checkbox", code, nodeList, annotation.astAnnotation);

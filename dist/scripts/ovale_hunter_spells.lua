@@ -246,6 +246,8 @@ Define(guerrilla_tactics_talent 4) #21997
 # Wildfire Bomb now has s1+1 charges, and the initial explosion deals s2 increased damage.
 Define(hunters_mark_talent 12) #21998
 # Apply Hunter's Mark to the target, increasing all damage you deal to the marked target by s1.  If the target dies while affected by Hunter's Mark, you instantly gain 259558s1 Focus. The target can always be seen and tracked by the Hunter.rnrnOnly one Hunter's Mark can be applied at a time.
+Define(killer_instinct_talent 1) #22291
+# Kill Command deals s1 increased damage against enemies below s2 health.
 Define(lethal_shots_talent 16) #23063
 # Steady Shot has a h chance to cause your next Aimed Shot or Rapid Fire to be guaranteed critical strikes.
 Define(mongoose_bite_talent 17) #22278
