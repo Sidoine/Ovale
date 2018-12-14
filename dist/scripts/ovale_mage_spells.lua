@@ -60,11 +60,6 @@ Define(berserking_buff 200953)
   SpellInfo(berserking_buff duration=3 max_stacks=12 gcd=0 offgcd=1)
   # Attack speed and critical strike chance increased by s1.
   SpellAddBuff(berserking_buff berserking_buff=1)
-Define(blast_wave 157981)
-# Causes an explosion around yourself, dealing (45 of Spell Power) Fire damage to all enemies within A1 yards, knocking them back, and reducing movement speed by s2 for 4 seconds.
-  SpellInfo(blast_wave cd=25 duration=4 talent=blast_wave_talent)
-  # Movement speed reduced by s2.
-  SpellAddTargetDebuff(blast_wave blast_wave=1)
 Define(blink 1953)
 # Teleports you forward A1 yds or until reaching an obstacle, and frees you from all stuns and bonds.
   SpellInfo(blink cd=0.5 charge_cd=15 duration=0.3 channel=0.3)
@@ -249,8 +244,6 @@ Define(arcane_familiar_talent 3) #22464
 # Summon a Familiar that attacks your enemies and increases your maximum mana by 210126s1 for 3600 seconds.
 Define(arcane_orb_talent 21) #21145
 # Launches an Arcane Orb forward from your position, traveling up to 40 yards, dealing (120 of Spell Power) Arcane damage to enemies it passes through.rnrn|cFFFFFFFFGrants 1 Arcane Charge when cast and every time it deals damage.|r
-Define(blast_wave_talent 6) #23074
-# Causes an explosion around yourself, dealing (45 of Spell Power) Fire damage to all enemies within A1 yards, knocking them back, and reducing movement speed by s2 for 4 seconds.
 Define(charged_up_talent 11) #22467
 # Immediately grants s1 Arcane Charges.
 Define(comet_storm_talent 18) #22473

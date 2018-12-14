@@ -216,6 +216,7 @@ local CHARACTER_PROPERTY = {
     ["energy.time_to_max"] = "TimeToMaxEnergy()",
     ["feral_spirit.remains"] = "TotemRemaining(sprit_wolf)",
     ["finality"] = "HasArtifactTrait(finality)",
+    ["firestarter.remains"] = "target.TimeToHealthPercent(90)",
     ["focus"] = "Focus()",
     ["focus.deficit"] = "FocusDeficit()",
     ["focus.max"] = "MaxFocus()",
@@ -282,6 +283,7 @@ local MODIFIER_KEYWORD = {
     ["ammo_type"] = true,
     ["animation_cancel"] = true,
     ["attack_speed"] = true,
+    ["cancel_if"] = true,
     ["chain"] = true,
     ["choose"] = true,
     ["condition"] = true,
@@ -361,6 +363,7 @@ local SPECIAL_ACTION = {
     ["stealth"] = true,
     ["stop_moving"] = true,
     ["swap_action_list"] = true,
+    ["use_items"] = true,
     ["use_item"] = true,
     ["variable"] = true,
     ["wait"] = true
@@ -490,6 +493,14 @@ end
 local EMIT_DISAMBIGUATION = {}
 local OPERAND_TOKEN_PATTERN = "[^.]+"
 local OPTIONAL_SKILLS = {
+    ["fel_rush"] = {
+        class = "DEMONHUNTER",
+        default = true
+    },
+    ["vengeful_retreat"] = {
+        class = "DEMONHUNTER",
+        default = true
+    },
     ["volley"] = {
         class = "HUNTER",
         default = true
@@ -499,11 +510,16 @@ local OPTIONAL_SKILLS = {
         specialization = "survival",
         default = true
     },
+    ["blink"] = {
+        class = "MAGE",
+        default = false
+    },
     ["time_warp"] = {
         class = "MAGE"
     },
     ["storm_earth_and_fire"] = {
-        class = "MONK"
+        class = "MONK",
+        default = true
     },
     ["chi_burst"] = {
         class = "MONK",
@@ -512,6 +528,10 @@ local OPTIONAL_SKILLS = {
     ["touch_of_karma"] = {
         class = "MONK",
         default = false
+    },
+    ["flying_serpent_kick"] = {
+        class = "MONK",
+        default = true
     },
     ["vanish"] = {
         class = "ROGUE",
@@ -525,17 +545,6 @@ local OPTIONAL_SKILLS = {
     },
     ["bloodlust"] = {
         class = "SHAMAN"
-    },
-    ["righteous_fury"] = {
-        class = "PALADIN"
-    },
-    ["fel_rush"] = {
-        class = "DEMONHUNTER",
-        default = true
-    },
-    ["vengeful_retreat"] = {
-        class = "DEMONHUNTER",
-        default = true
     }
 }
 local self_functionDefined = {}
@@ -593,31 +602,38 @@ do
     end
     OvaleOptions:RegisterOptions(__exports.OvaleSimulationCraft)
 end
-local print_r = function(node, indent, done, output)
-    done = done or {}
-    output = output or {}
-    indent = indent or ""
-    if node == nil then
-        insert(output, indent .. "nil")
-    elseif type(node) ~= "table" then
-        insert(output, indent .. node)
-    else
-        for key, value in kpairs(node) do
-            if type(value) == "table" then
-                if done[value] then
-                    insert(output, indent .. "[" .. tostring(key) .. "] => (self_reference)")
-                else
-                    done[value] = true
-                    insert(output, indent .. "[" .. tostring(key) .. "] => {")
-                    print_r(value, indent .. "    ", done, output)
-                    insert(output, indent .. "}")
-                end
-            else
-                insert(output, indent .. "[" .. tostring(key) .. "] => " .. tostring(value))
+local print_r = function(data)
+    local buffer = ""
+    local padder = "  "
+    local max = 10
+local function _repeat(str, num)
+        local output = ""
+        for i = 0, num, 1 do
+            output = output .. str
+        end
+        return output
+    end
+local function _dumpvar(d, depth)
+        if depth > max then
+            return 
+        end
+        local t = type(d)
+        local str = d ~= nil and tostring(d) or ""
+        if t == "table" then
+            buffer = buffer .. format(" (%s) {\n", str)
+            for k, v in pairs(d) do
+                buffer = buffer .. format(" %s [%s] =>", _repeat(padder, depth + 1), k)
+                _dumpvar(v, depth + 1)
             end
+            buffer = buffer .. format(" %s }\n", _repeat(padder, depth))
+        elseif t == "number" then
+            buffer = buffer .. format(" (%s) %d\n", t, str)
+        else
+            buffer = buffer .. format(" (%s) %s\n", t, str)
         end
     end
-    return output
+    _dumpvar(data, 0)
+    return buffer
 end
 
 local NewNode = function(nodeList, hasChild)
@@ -1420,11 +1436,12 @@ local InitializeDisambiguation = function()
     AddDisambiguation("132863", "darcklis_dragonfire_diadem", "MAGE", "fire")
     AddDisambiguation("summon_arcane_familiar", "arcane_familiar", "MAGE", "arcane")
     AddDisambiguation("water_elemental", "summon_water_elemental", "MAGE", "frost")
-    AddDisambiguation("healing_elixir_talent", "healing_elixir_talent_mistweaver", "MONK", "mistweaver")
     AddDisambiguation("bok_proc_buff", "blackout_kick_buff", "MONK", "windwalker")
-    AddDisambiguation("fortifying_brew", "fortifying_brew_mistweaver", "MONK", "mistweaver")
     AddDisambiguation("breath_of_fire_dot_debuff", "breath_of_fire_debuff", "MONK", "brewmaster")
     AddDisambiguation("brews", "ironskin_brew", "MONK", "brewmaster")
+    AddDisambiguation("fortifying_brew", "fortifying_brew_mistweaver", "MONK", "mistweaver")
+    AddDisambiguation("healing_elixir_talent", "healing_elixir_talent_mistweaver", "MONK", "mistweaver")
+    AddDisambiguation("rushing_jade_wind_buff", "rushing_jade_wind_windwalker_buff", "MONK", "windwalker")
     AddDisambiguation("avenger_shield", "avengers_shield", "PALADIN", "protection")
     AddDisambiguation("judgment_of_light_talent", "judgment_of_light_talent_holy", "PALADIN", "holy")
     AddDisambiguation("unbreakable_spirit_talent", "unbreakable_spirit_talent_holy", "PALADIN", "holy")
@@ -2249,9 +2266,6 @@ EmitAction = function(parseNode, nodeList, annotation)
             end
         elseif className == "PALADIN" and specialization == "protection" and action == "arcane_torrent_holy" then
             isSpellAction = false
-        elseif className == "PALADIN" and action == "righteous_fury" then
-            conditionCode = "CheckBoxOn(opt_righteous_fury_check)"
-            annotation[action] = className
         elseif className == "ROGUE" and action == "adrenaline_rush" then
             conditionCode = "EnergyDeficit() > 1"
         elseif className == "ROGUE" and action == "apply_poison" then
@@ -2289,14 +2303,6 @@ EmitAction = function(parseNode, nodeList, annotation)
         elseif className == "SHAMAN" and action == "totem_mastery_enhancement" then
             conditionCode = "(InCombat() or not BuffPresent(enh_resonance_totem_buff))"
             AddSymbol(annotation, "enh_resonance_totem_buff")
-        elseif className == "WARLOCK" and action == "cancel_metamorphosis" then
-            local spellName = "metamorphosis"
-            local buffName = "metamorphosis_buff"
-            AddSymbol(annotation, spellName)
-            AddSymbol(annotation, buffName)
-            bodyCode = format("Spell(%s text=cancel)", spellName)
-            conditionCode = format("BuffPresent(%s)", buffName)
-            isSpellAction = false
         elseif className == "WARLOCK" and action == "felguard_felstorm" then
             conditionCode = "pet.Present() and pet.CreatureFamily(Felguard)"
         elseif className == "WARLOCK" and action == "grimoire_of_sacrifice" then
@@ -3816,6 +3822,8 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
     elseif className == "ROGUE" and operand == "exsanguinated" then
         code = "target.DebuffPresent(exsanguinated)"
         AddSymbol(annotation, "exsanguinated")
+    elseif className == "ROGUE" and operand == "ss_buffed" then
+        code = "False()"
     elseif className == "ROGUE" and operand == "master_assassin_remains" then
         code = "BuffRemaining(master_assassin_buff)"
         AddSymbol(annotation, "master_assassin_buff")
@@ -3891,8 +3899,11 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
         code = target .. "Distance()"
     elseif sub(operand, 1, 9) == "equipped." then
         local name = Disambiguate(annotation, sub(operand, 10), className, specialization)
-        code = format("HasEquippedItem(%s_item)", name)
-        AddSymbol(annotation, name .. "_item")
+        local itemId = tonumber(name)
+        local itemName = name .. "_item"
+        local item = itemId and tostring(itemId) or itemName
+        code = format("HasEquippedItem(%s)", item)
+        AddSymbol(annotation, item)
     elseif operand == "gcd.max" then
         code = "GCD()"
     elseif operand == "gcd.remains" then
@@ -3944,6 +3955,9 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
     elseif operand == "is_add" then
         local t = target or "target."
         code = format("not %sClassification(worldboss)", t)
+    elseif operand == "priority_rotation" then
+        code = "CheckBoxOn(opt_priority_rotation)"
+        annotation.opt_priority_rotation = className
     else
         ok = false
     end
@@ -5027,6 +5041,15 @@ local function InsertSupportingControls(child, annotation)
     if annotation.interrupt then
         local fmt = [[
 			AddCheckBox(opt_interrupt L(interrupt) default %s)
+		]]
+        local code = format(fmt, ifSpecialization)
+        local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+        insert(child, 1, node)
+        count = count + 1
+    end
+    if annotation.opt_priority_rotation then
+        local fmt = [[
+			AddCheckBox(opt_priority_rotation L(opt_priority_rotation) default %s)
 		]]
         local code = format(fmt, ifSpecialization)
         local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)

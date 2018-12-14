@@ -1355,12 +1355,12 @@ export class OvaleAuraClass extends OvaleAuraBase {
                 duration = value * ratio;
             }
         }
-        /* Most aura durations are no longer reduced by haste
+        // Most aura durations are no longer reduced by haste
+        // but the ones that do still need their reduction
         if (si && si.haste && spellcast) {
             let hasteMultiplier = OvalePaperDoll.GetHasteMultiplier(si.haste, spellcast);
             duration = duration / hasteMultiplier;
         }
-        */
         return duration;
     }
     GetTickLength(auraId: number, snapshot?: PaperDollSnapshot) {

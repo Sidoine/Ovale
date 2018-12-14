@@ -1309,6 +1309,10 @@ __exports.OvaleAuraClass = __class(OvaleAuraBase, {
                 duration = value * ratio
             end
         end
+        if si and si.haste and spellcast then
+            local hasteMultiplier = OvalePaperDoll:GetHasteMultiplier(si.haste, spellcast)
+            duration = duration / hasteMultiplier
+        end
         return duration
     end,
     GetTickLength = function(self, auraId, snapshot)

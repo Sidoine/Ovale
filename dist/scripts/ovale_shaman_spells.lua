@@ -141,10 +141,6 @@ Define(lightning_bolt_elemental 188196)
 Define(lightning_bolt_enhancement 187837)
 # Fires a bolt of lightning at the target, dealing ?s210727[up to (1+210727m2/100)*(14.0625 of Spell Power)][(14.0625 of Spell Power)] Nature damage.
   SpellInfo(lightning_bolt_enhancement)
-Define(lightning_conduit_debuff 275388)
-# Stormstrike marks the target as a Lightning Conduit for 60 seconds. Stormstrike deals s1 Nature damage to all enemies you've marked as Conduits.
-  SpellInfo(lightning_conduit_debuff channel=0 gcd=0 offgcd=1)
-
 Define(lightning_shield 192106)
 # Surround yourself with a shield of lightning for 3600 seconds.rnrnMelee attackers have a chance to suffer 192109s1 Nature damage, and add a charge to your shield.rnWhen you Stormstrike, it gains s1 charges.rnrnAt 192106u charges, the shield overcharges, causing you to deal 273324s1 Nature damage with each attack and generate 273323s2*10 Maelstrom over 10 seconds.
   SpellInfo(lightning_shield duration=3600 channel=3600 max_stacks=20 talent=lightning_shield_talent)
@@ -247,7 +243,6 @@ Define(sundering_talent 18) #22351
 Define(totem_mastery_talent_elemental 6) #23190
 # Summons four totems that increase your combat capabilities for 120 seconds.rnrn|cFFFFFFFFResonance Totem|rrnGenerates 202192s1 Maelstrom every 202192t1 sec.rnrn|cFFFFFFFFStorm Totem|rrnIncreases the chance for Lightning Bolt and Chain Lightning to trigger Elemental Overload by 210651s1.rnrn|cFFFFFFFFEmber Totem|rrnIncreases Flame Shock damage over time by 210658s1.rnrn|cFFFFFFFFTailwind Totem|rrnIncreases your Haste by 210659s1.
 Define(ancestral_resonance_trait 277666)
-Define(lightning_conduit_trait 275388)
     ]]
     code = code .. [[
 
