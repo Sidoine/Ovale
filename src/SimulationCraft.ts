@@ -4642,14 +4642,6 @@ const InsertInterruptFunctions = function(child: LuaArray<AstNode>, annotation: 
             stun: 1,
             order: 20
         });
-        if (annotation.specialization == "guardian") {
-            insert(interrupts, {
-                name: "incapacitating_roar",
-                incapacitate: 1,
-                order: 30,
-                range: "target.Distance(less 10)"
-            });
-        }
         insert(interrupts, {
             name: "typhoon",
             knockback: 1,
