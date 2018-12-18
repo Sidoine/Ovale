@@ -483,6 +483,7 @@ Define(steady_focus_buff 193534)
 
 	SpellInfo(steady_shot focus=-10)
 	SpellAddBuff(steady_shot steady_focus_buff=1 talent=steady_focus_talent)
+Define(steady_focus_talent 10)
 
 	SpellInfo(steel_trap cd=60)
 Define(tar_trap 187698)
