@@ -2273,6 +2273,13 @@ function EmitVariableAdd(name: string, nodeList: LuaArray<AstNode>, annotation: 
     EmitNamedVariable(name, nodeList, annotation, modifiers, parseNode, action);
 }
 
+function EmitVariableSub(name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifiers: Modifiers, parseNode: ParseNode, action: string) {
+    // TODO
+    let valueNode = annotation.variable[name];
+    if (valueNode) return;
+    EmitNamedVariable(name, nodeList, annotation, modifiers, parseNode, action);
+}
+
 function EmitVariableIf(name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifiers: Modifiers, parseNode: ParseNode, action: string) {
     let node = annotation.variable[name];
     let group: AstNode;
@@ -2323,6 +2330,8 @@ function EmitVariable(nodeList: LuaArray<AstNode>, annotation: Annotation, modif
         EmitNamedVariable(name, nodeList, annotation, modifier, parseNode, action, conditionNode);
     } else if (op === "setif") {
         EmitVariableIf(name, nodeList, annotation, modifier, parseNode, action);
+    } else if (op === "sub") {
+        EmitVariableSub(name, nodeList, annotation, modifier, parseNode, action);
     } else if (op === "reset") {
         // TODO need to refactor code to allow this kind of thing
     } else {
