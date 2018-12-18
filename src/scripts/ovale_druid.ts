@@ -958,7 +958,6 @@ AddFunction GuardianInterruptActions
  {
   if target.InRange(skull_bash) and target.IsInterruptible() Spell(skull_bash)
   if target.InRange(mighty_bash) and not target.Classification(worldboss) Spell(mighty_bash)
-  if target.Distance(less 10) and not target.Classification(worldboss) Spell(incapacitating_roar)
   if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
   if target.Distance(less 15) and not target.Classification(worldboss) Spell(typhoon)
  }
@@ -1212,7 +1211,6 @@ AddIcon checkbox=opt_druid_guardian_aoe help=cd specialization=guardian
 # bursting_blood
 # fireblood
 # galactic_guardian_buff
-# incapacitating_roar
 # incarnation_guardian_of_ursoc
 # incarnation_guardian_of_ursoc_buff
 # ironfur
