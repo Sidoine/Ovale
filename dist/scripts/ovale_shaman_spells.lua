@@ -468,7 +468,6 @@ Define(lava_surge_buff 77762)
 
 	SpellInfo(lightning_bolt_elemental maelstrom=-8 cd=0)
 	SpellAddBuff(lightning_bolt_elemental stormkeeper_buff=-1 talent=stormkeeper_talent)
-	SpellAddTargetDebuff(lightning_bolt_elemental exposed_elements_debuff=0 talent=exposed_elements_talent)
 	SpellAddBuff(lightning_bolt_elemental master_of_the_elements_buff=-1 talent=master_of_the_elements_talent specialization=elemental)
 
 	SpellInfo(lightning_bolt_enhancement cd=12 cd_haste=melee)
