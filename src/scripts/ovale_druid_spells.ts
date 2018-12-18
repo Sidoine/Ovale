@@ -491,6 +491,7 @@ const registerSpec1 = function() {
 	SpellInfo(celestial_alignment cd=180 shared_cd=celestial_alignment_cd)
 	SpellInfo(celestial_alignment replaced_by=incarnation_chosen_of_elune talent=incarnation_talent specialization=balance)
 	SpellAddBuff(celestial_alignment celestial_alignment_buff=1)
+    
 Define(celestial_alignment_buff 194223)
 
 	SpellInfo(fury_of_elune cd=90 astralpower=6)
@@ -556,7 +557,9 @@ Define(stellar_flare_debuff 202347)
 
 	SpellInfo(warrior_of_elune gcd=0 cd=45 offgcd=1)
 Define(warrior_of_elune_buff 202425)
-	
+
+SpellList(ca_inc celestial_alignment incarnation_chosen_of_elune)
+SpellList(ca_inc_buff celestial_alignment_buff incarnation_chosen_of_elune_buff)	
 
 # Balance Legendaries
 Define(oneths_intuition_buff 209406)
