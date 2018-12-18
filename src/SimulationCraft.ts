@@ -3083,14 +3083,18 @@ EmitOperandAction = function (operand, parseNode, nodeList, annotation, action, 
             code = format("TalentPoints(%s)", talentName);
         }
         symbol = talentName;
-    } else if (property == "execute_time") {
+    } else if (property == "execute_time" || property == "execute_remains") {
         code = format("ExecuteTime(%s)", name);
+    } else if (property == "executing") {
+        code = format("ExecuteTime(%s) > 0", name);
     } else if (property == "gcd") {
         code = "GCD()";
     } else if (property == "hit_damage") {
         code = format("%sDamage(%s)", target, name);
     } else if (property == "in_flight" || property == "in_flight_to_target") {
         code = format("InFlightToTarget(%s)", name);
+    } else if (property == "in_flight_remains") {
+        code = "0";
     } else if (property == "miss_react") {
         code = "True(miss_react)";
     } else if (property == "persistent_multiplier" || property == "pmultiplier") {
