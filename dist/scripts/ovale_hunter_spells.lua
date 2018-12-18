@@ -281,7 +281,6 @@ Define(a_murder_of_crows_debuff 131894)
 	SpellAddBuff(aimed_shot double_tap_buff=-1)
 	SpellAddBuff(aimed_shot trick_shots_buff=-1)
 	SpellAddBuff(aimed_shot master_marksman_buff=1 talent=master_marksman_talent)
-	SpellAddBuff(aimed_shot lethal_shots_buff=-1 talent=lethal_shots_talent)
 
 	
 	SpellAddBuff(arcane_shot precise_shots_buff=-1)
@@ -449,7 +448,6 @@ Define(precise_shots_buff 260242)
 	SpellInfo(rapid_fire channel=4 talent=streamline_talent)
 	SpellAddBuff(rapid_fire precise_shots_buff=1)
 	SpellAddBuff(rapid_fire trick_shots_buff=-1)
-	SpellAddBuff(rapid_fire lethal_shots_buff=-1 talent=lethal_shots_talent)
 
 	SpellInfo(raptor_strike focus=25)
 	SpellInfo(raptor_strike replaced_by=mongoose_bite talent=mongoose_bite_talent)
