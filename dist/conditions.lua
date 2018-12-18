@@ -1320,7 +1320,7 @@ do
 local function PTR(positionalParams, namedParams, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
         local _, _, _, uiVersion = GetBuildInfo()
-        local value = (uiVersion > 80000) and 1 or 0
+        local value = (uiVersion > 80100) and 1 or 0
         return Compare(value, comparator, limit)
     end
     OvaleCondition:RegisterCondition("ptr", false, PTR)
