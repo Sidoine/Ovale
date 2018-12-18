@@ -4,7 +4,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 __exports.register = function()
     local name = "ovale_monk_spells"
-    local desc = "[8.0.1] Ovale: Monk spells"
+    local desc = "[8.1] Ovale: Monk spells"
     local code = [[Define(ancestral_call 274738)
 # Invoke the spirits of your ancestors, granting you their power for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
@@ -15,8 +15,8 @@ Define(battle_potion_of_agility 279152)
   # Agility increased by w1.
   SpellAddBuff(battle_potion_of_agility battle_potion_of_agility=1)
 Define(berserking 26297)
-# Increases your haste by s1 for 10 seconds.
-  SpellInfo(berserking cd=180 duration=10 gcd=0 offgcd=1)
+# Increases your haste by s1 for 12 seconds.
+  SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
   # Haste increased by s1.
   SpellAddBuff(berserking berserking=1)
 Define(black_ox_brew 115399)
@@ -122,8 +122,8 @@ Define(rising_sun_kick 107428)
   SpellInfo(rising_sun_kick chi=2 cd=10)
 
 Define(rushing_jade_wind 116847)
-# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to enemies within 107270A1 yards.?s220357[ Applies Mark of the Crane to up to s2 nearby targets.][]
-  SpellInfo(rushing_jade_wind chi=1 cd=6 duration=6 tick=0.75 talent=rushing_jade_wind_talent)
+# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to enemies within 107270A1 yards.
+  SpellInfo(rushing_jade_wind chi=1 cd=6 duration=6 tick=0.75 talent=rushing_jade_wind_talent_windwalker)
 
 Define(serenity 152173)
 # Enter an elevated state of mental and physical serenity for ?s115069[s1 sec][12 seconds]. While in this state, you deal s2 increased damage and healing, and all Chi consumers are free and cool down s4 more quickly.
@@ -134,7 +134,7 @@ Define(spear_hand_strike 116705)
 # Jabs the target in the throat, interrupting spellcasting and preventing any spell from that school of magic from being cast for 4 seconds.
   SpellInfo(spear_hand_strike cd=15 duration=4 gcd=0 offgcd=1 interrupt=1)
 Define(spinning_crane_kick 101546)
-# Spin while kicking in the air, dealing ?s137025[4*107270s1*<CAP>/AP][4*107270s1] Physical damage over 1.5 seconds to enemies within 107270A1 yds.?c3&s116847[rnrnSpinning Crane Kick's damage is increased by 220358s1 for each unique target you've struck in the last 15 seconds with Tiger Palm, Blackout Kick, Rising Sun Kick, or Rushing Jade Wind.]?c3[rnrnSpinning Crane Kick's damage is increased by 220358s1 for each unique target you've struck in the last 15 seconds with Tiger Palm, Blackout Kick, or Rising Sun Kick.][]
+# Spin while kicking in the air, dealing ?s137025[4*107270s1*<CAP>/AP][4*107270s1] Physical damage over 1.5 seconds to enemies within 107270A1 yds.?c3[rnrnSpinning Crane Kick's damage is increased by 220358s1 for each unique target you've struck in the last 15 seconds with Tiger Palm, Blackout Kick, or Rising Sun Kick.][]
   SpellInfo(spinning_crane_kick chi=3 duration=1.5 channel=1.5 tick=0.5)
   # Attacking all nearby enemies for Physical damage every 101546t1 sec.
   SpellAddBuff(spinning_crane_kick spinning_crane_kick=1)
@@ -157,11 +157,11 @@ Define(touch_of_death 115080)
   # Taking w1 damage when this effect expires.
   SpellAddTargetDebuff(touch_of_death touch_of_death=1)
 Define(touch_of_karma 122470)
-# All damage you take is redirected to the enemy target as Nature damage over 6 seconds. Damage cannot exceed s3 of your maximum health. Lasts 10 seconds.
+# Absorbs all damage taken for 10 seconds, up to s3 of your maximum health, and redirects s4 of that amount to the enemy target as Nature damage over 6 seconds.
   SpellInfo(touch_of_karma cd=90 duration=10 gcd=0 offgcd=1)
-  # All damage dealt to the Monk is redirected to you as Nature damage over 124280d.
+  # Damage dealt to the Monk is redirected to you as Nature damage over 124280d.
   SpellAddBuff(touch_of_karma touch_of_karma=1)
-  # All damage dealt to the Monk is redirected to you as Nature damage over 124280d.
+  # Damage dealt to the Monk is redirected to you as Nature damage over 124280d.
   SpellAddTargetDebuff(touch_of_karma touch_of_karma=1)
 Define(war_stomp 20549)
 # Stuns up to i enemies within A1 yds for 2 seconds.
@@ -188,8 +188,6 @@ Define(energizing_elixir_talent 9) #22096
 # Chug an Energizing Elixir, refilling all your Energy and instantly generate s2 Chi.
 Define(fist_of_the_white_tiger_talent 8) #19771
 # Strike with the technique of the White Tiger, dealing s1+261977s1 Physical damage.rnrn|cFFFFFFFFGenerates 261978s1 Chi.
-Define(good_karma_talent 11) #23364
-# Touch of Karma can now redirect an additional s1 of your maximum health.
 Define(hit_combo_talent 16) #22093
 # Each successive attack that triggers Combo Strikes in a row grants 196741s1 increased damage, stacking up to 196741u times.
 Define(invoke_niuzao_the_black_ox_talent 18) #22103
@@ -197,14 +195,15 @@ Define(invoke_niuzao_the_black_ox_talent 18) #22103
 Define(invoke_xuen_the_white_tiger_talent 18) #22102
 # Summons an effigy of Xuen, the White Tiger for 20 seconds. Xuen attacks your primary target, and strikes 3 enemies within 123996A1 yards every 123999t1 sec with Tiger Lightning for 123996s1 Nature damage.
 Define(rushing_jade_wind_talent 17) #20184
-# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to enemies within 107270A1 yards.?s220357[ Applies Mark of the Crane to up to s2 nearby targets.][]
+# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to enemies within 107270A1 yards.
+Define(rushing_jade_wind_talent_windwalker 17) #23122
+# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to enemies within 107270A1 yards.
 Define(serenity_talent 21) #21191
 # Enter an elevated state of mental and physical serenity for ?s115069[s1 sec][12 seconds]. While in this state, you deal s2 increased damage and healing, and all Chi consumers are free and cool down s4 more quickly.
 Define(special_delivery_talent 16) #19819
 # Drinking Ironskin or Purifying Brew has a h chance to toss a keg high into the air that lands nearby after s1 sec, dealing 196733s1 damage to all enemies within 196733A1 yards and reducing their movement speed by 196733m2 for 15 seconds.
 Define(whirling_dragon_punch_talent 20) #22105
 # Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
-Define(swift_roundhouse_trait 277669)
     ]]
     code = code .. [[
 ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!fortifying_brew,buff,!fortifying_brew_buff)
@@ -243,7 +242,9 @@ Define(chi_torpedo_buff 119085)
 
 # SpellInfo(crackling_jade_lightning haste=melee specialization=!mistweaver)
 # SpellInfo(crackling_jade_lightning haste=spell specialization=mistweaver)
-
+Define(dance_of_chiji_buff 286587)
+    SpellInfo(dance_of_chiji_buff duration=15)
+    
 Define(detox_mistweaver 115450)
 	SpellInfo(detox_mistweaver cd=8)
 

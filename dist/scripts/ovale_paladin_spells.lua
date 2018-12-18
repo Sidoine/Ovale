@@ -4,7 +4,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 __exports.register = function()
     local name = "ovale_paladin_spells"
-    local desc = "[8.0] Ovale: Paladin spells"
+    local desc = "[8.1] Ovale: Paladin spells"
     local code = [[Define(avengers_shield 31935)
 # Hurls your shield at an enemy target, dealing s1 Holy damage?a231665[, interrupting and silencing the non-Player target for 3 seconds][], and then jumping to x1-1 additional nearby enemies.rnrnIncreases the effects of your next Shield of the Righteous by 197561s2.
 # Rank 2: Avenger's Shield interrupts and silences the main target for 3 seconds if it is not a player.
@@ -49,23 +49,17 @@ Define(crusader_strike 35395)
 # Strike the target for s1 Physical damage.?s137027[rnrn|cFFFFFFFFGenerates s2 Holy Power.][]
 # Rank 2: Crusader Strike now has s1+1 charges.
   SpellInfo(crusader_strike cd=6 holypower=0)
-Define(divine_right_buff 278519)
-# When Divine Storm damages an enemy who is below s2 health, your Strength is increased by s1 for 15 seconds.
-  SpellInfo(divine_right_buff channel=-0.001 gcd=0 offgcd=1)
-
 Define(divine_storm 53385)
 # Unleashes a whirl of divine energy, dealing 224239sw1 Holy damage to all nearby enemies.
   SpellInfo(divine_storm holypower=3)
+Define(empyrean_power_buff 286392)
+# Your attacks have a chance to make your next Divine Storm free and deal s1 additional damage.
+  SpellInfo(empyrean_power_buff channel=-0.001 gcd=0 offgcd=1)
+
 Define(execution_sentence 267798)
 # Calls down the Light's punishment upon an enemy target, dealing s1 Holy damage and increasing the target's Holy damage taken from your attacks by 267799s1 for 12 seconds.
   SpellInfo(execution_sentence holypower=3 cd=30 talent=execution_sentence_talent)
-  # s1 increased Holy damage taken from the casting Paladin.
-  SpellAddTargetDebuff(execution_sentence execution_sentence_debuff=1)
-Define(execution_sentence_debuff 267799)
-# Calls down the Light's punishment upon an enemy target, dealing s1 Holy damage and increasing the target's Holy damage taken from your attacks by 267799s1 for 12 seconds.
-  SpellInfo(execution_sentence_debuff duration=12 channel=12 gcd=0 offgcd=1)
-  # s1 increased Holy damage taken from the casting Paladin.
-  SpellAddTargetDebuff(execution_sentence_debuff execution_sentence_debuff=1)
+
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. 
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
@@ -144,7 +138,6 @@ Define(seraphim_talent 21) #22645
 # The Light temporarily magnifies your power, increasing your Haste, Critical Strike, Mastery, and Versatility by s1.rnrnConsumes up to s2 charges of Shield of the Righteous, and lasts 8 seconds per charge.
 Define(wake_of_ashes_talent 12) #22183
 # Lash out at your enemies, dealing sw1 Radiant damage to all enemies within a1 yd in front of you and reducing their movement speed by s2 for 5 seconds.rnrnDemon and Undead enemies are also stunned for 5 seconds.rnrn|cFFFFFFFFGenerates s3 Holy Power.
-Define(divine_right_trait 277678)
     ]]
     code = code .. [[
 # Items

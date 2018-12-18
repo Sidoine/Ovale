@@ -5,7 +5,7 @@ import { OvaleScripts } from "../Scripts";
 
 {
 	const name = "sc_pr_priest_holy"
-	const desc = "[8.0] Simulationcraft: PR_Priest_Holy"
+	const desc = "[8.1] Simulationcraft: PR_Priest_Holy"
 	const code = `
 # Based on SimulationCraft profile "PR_Priest_Holy".
 #	class=priest
@@ -224,7 +224,7 @@ AddIcon checkbox=opt_priest_holy_aoe help=cd specialization=holy
 
 {
 	const name = "sc_pr_priest_shadow"
-	const desc = "[8.0] Simulationcraft: PR_Priest_Shadow"
+	const desc = "[8.1] Simulationcraft: PR_Priest_Shadow"
 	const code = `
 # Based on SimulationCraft profile "PR_Priest_Shadow".
 #	class=priest
@@ -324,8 +324,8 @@ AddFunction ShadowSingleCdActions
 {
  unless Spell(void_eruption) or DebuffExpires(voidform_shadow) and Spell(dark_ascension) or Spell(void_bolt) or { target.TimeToDie() < 3 or SpellCharges(shadow_word_death) == 2 or SpellCharges(shadow_word_death) == 1 and SpellCooldown(shadow_word_death) < GCD() } and Spell(shadow_word_death)
  {
-  #surrender_to_madness,if=buff.voidform.stack>=(15+buff.bloodlust.up)&target.time_to_die>200|target.time_to_die<75
-  if DebuffStacks(voidform_shadow) >= 15 + BuffPresent(burst_haste_buff any=1) and target.TimeToDie() > 200 or target.TimeToDie() < 75 Spell(surrender_to_madness)
+  #surrender_to_madness,if=target.time_to_die>200|target.time_to_die<75
+  if target.TimeToDie() > 200 or target.TimeToDie() < 75 Spell(surrender_to_madness)
  }
 }
 
@@ -380,6 +380,8 @@ AddFunction ShadowCleaveMainActions
 {
  #void_eruption
  Spell(void_eruption)
+ #mind_sear,if=buff.harvested_thoughts.up
+ if BuffPresent(harvested_thoughts_buff) Spell(mind_sear)
  #void_bolt
  Spell(void_bolt)
  #shadow_word_death,target_if=target.time_to_die<3|buff.voidform.down
@@ -415,7 +417,7 @@ AddFunction ShadowCleaveShortCdActions
   #dark_ascension,if=buff.voidform.down
   if DebuffExpires(voidform_shadow) Spell(dark_ascension)
 
-  unless Spell(void_bolt) or { target.TimeToDie() < 3 or DebuffExpires(voidform_shadow) } and Spell(shadow_word_death)
+  unless BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Spell(void_bolt) or { target.TimeToDie() < 3 or DebuffExpires(voidform_shadow) } and Spell(shadow_word_death)
   {
    #dark_void,if=raid_event.adds.in>10
    if 600 > 10 Spell(dark_void)
@@ -431,21 +433,21 @@ AddFunction ShadowCleaveShortCdActions
 
 AddFunction ShadowCleaveShortCdPostConditions
 {
- Spell(void_eruption) or Spell(void_bolt) or { target.TimeToDie() < 3 or DebuffExpires(voidform_shadow) } and Spell(shadow_word_death) or Spell(mindbender_shadow) or Spell(mind_blast) or target.Refreshable(shadow_word_pain_debuff) and target.TimeToDie() > 4 and not Talent(misery_talent) and not Talent(dark_void_talent) and Spell(shadow_word_pain) or target.Refreshable(vampiric_touch_debuff) and target.TimeToDie() > 6 and Spell(vampiric_touch) or target.DebuffRefreshable(shadow_word_pain_debuff) and Talent(misery_talent) and target.TimeToDie() > 4 and Spell(vampiric_touch) or DebuffPresent(voidform_shadow) and Spell(void_torrent) or Enemies() > 2 and Spell(mind_sear) or Spell(mind_flay) or Spell(shadow_word_pain)
+ Spell(void_eruption) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Spell(void_bolt) or { target.TimeToDie() < 3 or DebuffExpires(voidform_shadow) } and Spell(shadow_word_death) or Spell(mindbender_shadow) or Spell(mind_blast) or target.Refreshable(shadow_word_pain_debuff) and target.TimeToDie() > 4 and not Talent(misery_talent) and not Talent(dark_void_talent) and Spell(shadow_word_pain) or target.Refreshable(vampiric_touch_debuff) and target.TimeToDie() > 6 and Spell(vampiric_touch) or target.DebuffRefreshable(shadow_word_pain_debuff) and Talent(misery_talent) and target.TimeToDie() > 4 and Spell(vampiric_touch) or DebuffPresent(voidform_shadow) and Spell(void_torrent) or Enemies() > 2 and Spell(mind_sear) or Spell(mind_flay) or Spell(shadow_word_pain)
 }
 
 AddFunction ShadowCleaveCdActions
 {
- unless Spell(void_eruption) or DebuffExpires(voidform_shadow) and Spell(dark_ascension) or Spell(void_bolt) or { target.TimeToDie() < 3 or DebuffExpires(voidform_shadow) } and Spell(shadow_word_death)
+ unless Spell(void_eruption) or DebuffExpires(voidform_shadow) and Spell(dark_ascension) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Spell(void_bolt) or { target.TimeToDie() < 3 or DebuffExpires(voidform_shadow) } and Spell(shadow_word_death)
  {
-  #surrender_to_madness,if=buff.voidform.stack>=(15+buff.bloodlust.up)
-  if DebuffStacks(voidform_shadow) >= 15 + BuffPresent(burst_haste_buff any=1) Spell(surrender_to_madness)
+  #surrender_to_madness
+  Spell(surrender_to_madness)
  }
 }
 
 AddFunction ShadowCleaveCdPostConditions
 {
- Spell(void_eruption) or DebuffExpires(voidform_shadow) and Spell(dark_ascension) or Spell(void_bolt) or { target.TimeToDie() < 3 or DebuffExpires(voidform_shadow) } and Spell(shadow_word_death) or 600 > 10 and Spell(dark_void) or Spell(mindbender_shadow) or Spell(mind_blast) or { 600 > 5 and 10 < 2 or 10 > 2 } and Spell(shadow_crash) or target.Refreshable(shadow_word_pain_debuff) and target.TimeToDie() > 4 and not Talent(misery_talent) and not Talent(dark_void_talent) and Spell(shadow_word_pain) or target.Refreshable(vampiric_touch_debuff) and target.TimeToDie() > 6 and Spell(vampiric_touch) or target.DebuffRefreshable(shadow_word_pain_debuff) and Talent(misery_talent) and target.TimeToDie() > 4 and Spell(vampiric_touch) or DebuffPresent(voidform_shadow) and Spell(void_torrent) or Enemies() > 2 and Spell(mind_sear) or Spell(mind_flay) or Spell(shadow_word_pain)
+ Spell(void_eruption) or DebuffExpires(voidform_shadow) and Spell(dark_ascension) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Spell(void_bolt) or { target.TimeToDie() < 3 or DebuffExpires(voidform_shadow) } and Spell(shadow_word_death) or 600 > 10 and Spell(dark_void) or Spell(mindbender_shadow) or Spell(mind_blast) or { 600 > 5 and 10 < 2 or 10 > 2 } and Spell(shadow_crash) or target.Refreshable(shadow_word_pain_debuff) and target.TimeToDie() > 4 and not Talent(misery_talent) and not Talent(dark_void_talent) and Spell(shadow_word_pain) or target.Refreshable(vampiric_touch_debuff) and target.TimeToDie() > 6 and Spell(vampiric_touch) or target.DebuffRefreshable(shadow_word_pain_debuff) and Talent(misery_talent) and target.TimeToDie() > 4 and Spell(vampiric_touch) or DebuffPresent(voidform_shadow) and Spell(void_torrent) or Enemies() > 2 and Spell(mind_sear) or Spell(mind_flay) or Spell(shadow_word_pain)
 }
 
 ### actions.aoe
@@ -454,10 +456,16 @@ AddFunction ShadowAoeMainActions
 {
  #void_eruption
  Spell(void_eruption)
+ #mind_sear,if=buff.harvested_thoughts.up
+ if BuffPresent(harvested_thoughts_buff) Spell(mind_sear)
  #void_bolt,if=talent.dark_void.enabled&dot.shadow_word_pain.remains>travel_time
  if Talent(dark_void_talent) and target.DebuffRemaining(shadow_word_pain_debuff) > TravelTime(void_bolt) Spell(void_bolt)
  #mindbender
  Spell(mindbender_shadow)
+ #vampiric_touch,target_if=refreshable,if=(target.time_to_die>6)&azerite.thought_harvester.rank>0
+ if target.Refreshable(vampiric_touch_debuff) and target.TimeToDie() > 6 and AzeriteTraitRank(thought_harvester_trait) > 0 Spell(vampiric_touch)
+ #vampiric_touch,target_if=dot.shadow_word_pain.refreshable,if=(talent.misery.enabled&target.time_to_die>4)&azerite.thought_harvester.rank>0
+ if target.DebuffRefreshable(shadow_word_pain_debuff) and Talent(misery_talent) and target.TimeToDie() > 4 and AzeriteTraitRank(thought_harvester_trait) > 0 Spell(vampiric_touch)
  #mind_sear,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&(cooldown.void_bolt.up|cooldown.mind_blast.up)
  Spell(mind_sear)
  #shadow_word_pain
@@ -475,7 +483,7 @@ AddFunction ShadowAoeShortCdActions
   #dark_ascension,if=buff.voidform.down
   if DebuffExpires(voidform_shadow) Spell(dark_ascension)
 
-  unless Talent(dark_void_talent) and target.DebuffRemaining(shadow_word_pain_debuff) > TravelTime(void_bolt) and Spell(void_bolt)
+  unless BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Talent(dark_void_talent) and target.DebuffRemaining(shadow_word_pain_debuff) > TravelTime(void_bolt) and Spell(void_bolt)
   {
    #dark_void,if=raid_event.adds.in>10
    if 600 > 10 Spell(dark_void)
@@ -491,12 +499,12 @@ AddFunction ShadowAoeShortCdActions
 
 AddFunction ShadowAoeShortCdPostConditions
 {
- Spell(void_eruption) or Talent(dark_void_talent) and target.DebuffRemaining(shadow_word_pain_debuff) > TravelTime(void_bolt) and Spell(void_bolt) or Spell(mindbender_shadow) or Spell(mind_sear) or Spell(shadow_word_pain)
+ Spell(void_eruption) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Talent(dark_void_talent) and target.DebuffRemaining(shadow_word_pain_debuff) > TravelTime(void_bolt) and Spell(void_bolt) or Spell(mindbender_shadow) or target.Refreshable(vampiric_touch_debuff) and target.TimeToDie() > 6 and AzeriteTraitRank(thought_harvester_trait) > 0 and Spell(vampiric_touch) or target.DebuffRefreshable(shadow_word_pain_debuff) and Talent(misery_talent) and target.TimeToDie() > 4 and AzeriteTraitRank(thought_harvester_trait) > 0 and Spell(vampiric_touch) or Spell(mind_sear) or Spell(shadow_word_pain)
 }
 
 AddFunction ShadowAoeCdActions
 {
- unless Spell(void_eruption) or DebuffExpires(voidform_shadow) and Spell(dark_ascension) or Talent(dark_void_talent) and target.DebuffRemaining(shadow_word_pain_debuff) > TravelTime(void_bolt) and Spell(void_bolt)
+ unless Spell(void_eruption) or DebuffExpires(voidform_shadow) and Spell(dark_ascension) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Talent(dark_void_talent) and target.DebuffRemaining(shadow_word_pain_debuff) > TravelTime(void_bolt) and Spell(void_bolt)
  {
   #surrender_to_madness,if=buff.voidform.stack>=(15+buff.bloodlust.up)
   if DebuffStacks(voidform_shadow) >= 15 + BuffPresent(burst_haste_buff any=1) Spell(surrender_to_madness)
@@ -505,7 +513,7 @@ AddFunction ShadowAoeCdActions
 
 AddFunction ShadowAoeCdPostConditions
 {
- Spell(void_eruption) or DebuffExpires(voidform_shadow) and Spell(dark_ascension) or Talent(dark_void_talent) and target.DebuffRemaining(shadow_word_pain_debuff) > TravelTime(void_bolt) and Spell(void_bolt) or 600 > 10 and Spell(dark_void) or Spell(mindbender_shadow) or 600 > 5 and 10 < 20 and Spell(shadow_crash) or Spell(mind_sear) or Spell(shadow_word_pain)
+ Spell(void_eruption) or DebuffExpires(voidform_shadow) and Spell(dark_ascension) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Talent(dark_void_talent) and target.DebuffRemaining(shadow_word_pain_debuff) > TravelTime(void_bolt) and Spell(void_bolt) or 600 > 10 and Spell(dark_void) or Spell(mindbender_shadow) or 600 > 5 and 10 < 20 and Spell(shadow_crash) or target.Refreshable(vampiric_touch_debuff) and target.TimeToDie() > 6 and AzeriteTraitRank(thought_harvester_trait) > 0 and Spell(vampiric_touch) or target.DebuffRefreshable(shadow_word_pain_debuff) and Talent(misery_talent) and target.TimeToDie() > 4 and AzeriteTraitRank(thought_harvester_trait) > 0 and Spell(vampiric_touch) or Spell(mind_sear) or Spell(shadow_word_pain)
 }
 
 ### actions.default
@@ -650,6 +658,7 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # dark_ascension
 # dark_void
 # dark_void_talent
+# harvested_thoughts_buff
 # mind_blast
 # mind_bomb
 # mind_flay
@@ -667,6 +676,7 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # shadowform_buff
 # silence
 # surrender_to_madness
+# thought_harvester_trait
 # vampiric_touch
 # vampiric_touch_debuff
 # void_bolt
