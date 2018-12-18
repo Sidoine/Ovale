@@ -141,6 +141,7 @@ const CHARACTER_PROPERTY: LuaObj<string> = {
     ["energy.max"]: "MaxEnergy()",
     ["energy.regen"]: "EnergyRegenRate()",
     ["energy.time_to_max"]: "TimeToMaxEnergy()",
+    ["expected_combat_length"]: "600",
     ["feral_spirit.remains"]: "TotemRemaining(sprit_wolf)",
     ["finality"]: "HasArtifactTrait(finality)",
     ["firestarter.remains"]: "target.TimeToHealthPercent(90)",
