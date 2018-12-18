@@ -243,7 +243,9 @@ Define(chi_torpedo_buff 119085)
 
 # SpellInfo(crackling_jade_lightning haste=melee specialization=!mistweaver)
 # SpellInfo(crackling_jade_lightning haste=spell specialization=mistweaver)
-
+Define(dance_of_chiji_buff 286587)
+    SpellInfo(dance_of_chiji_buff duration=15)
+    
 Define(detox_mistweaver 115450)
 	SpellInfo(detox_mistweaver cd=8)
 
