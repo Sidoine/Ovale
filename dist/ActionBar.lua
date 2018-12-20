@@ -66,22 +66,12 @@ local OvaleActionBarClass = __class(OvaleActionBarBase, {
     end,
     OnInitialize = function(self)
         self:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
-        self:RegisterEvent("PLAYER_ENTERING_WORLD", function(event)
-            return self:UpdateActionSlots(event)
-        end)
+        self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateActionSlots")
         self:RegisterEvent("UPDATE_BINDINGS")
-        self:RegisterEvent("UPDATE_BONUS_ACTIONBAR", function(event)
-            return self:UpdateActionSlots(event)
-        end)
-        self:RegisterEvent("SPELLS_CHANGED", function(event)
-            return self:UpdateActionSlots(event)
-        end)
-        self:RegisterMessage("Ovale_StanceChanged", function(event)
-            return self:UpdateActionSlots(event)
-        end)
-        self:RegisterMessage("Ovale_TalentsChanged", function(event)
-            return self:UpdateActionSlots(event)
-        end)
+        self:RegisterEvent("UPDATE_BONUS_ACTIONBAR", "UpdateActionSlots")
+        self:RegisterEvent("SPELLS_CHANGED", "UpdateActionSlots")
+        self:RegisterMessage("Ovale_StanceChanged", "UpdateActionSlots")
+        self:RegisterMessage("Ovale_TalentsChanged", "UpdateActionSlots")
     end,
     GetKeyBinding = function(self, slot)
         local name
@@ -182,9 +172,9 @@ local OvaleActionBarClass = __class(OvaleActionBarBase, {
             for slot = start, 72, 1 do
                 self:UpdateActionSlot(slot)
             end
-            if event ~= "TimerUpdateActionSlots" then
-                self:ScheduleTimer("TimerUpdateActionSlots", 1)
-            end
+        end
+        if event ~= "TimerUpdateActionSlots" then
+            self:ScheduleTimer("TimerUpdateActionSlots", 1)
         end
         self:StopProfiling("OvaleActionBar_UpdateActionSlots")
     end,
