@@ -4449,6 +4449,14 @@ local InsertInterruptFunctions = function(child, annotation)
             stun = 1,
             order = 20
         })
+        if annotation.specialization == "guardian" then
+            insert(interrupts, {
+                name = "incapacitating_roar",
+                incapacitate = 1,
+                order = 30,
+                range = "target.Distance(less 10)"
+            })
+        end
         insert(interrupts, {
             name = "typhoon",
             knockback = 1,

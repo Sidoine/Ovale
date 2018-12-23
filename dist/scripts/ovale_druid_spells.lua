@@ -99,6 +99,11 @@ Define(fury_of_elune 202770)
 Define(half_moon 274282)
 # Deals m1 Arcane damage to the target and empowers Half Moon to become Full Moon.rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
   SpellInfo(half_moon cd=25 lunarpower=-20)
+Define(incapacitating_roar 99)
+# Invokes the spirit of Ursol to let loose a deafening roar, incapacitating all enemies within A1 yards for 3 seconds. Damage will cancel the effect. Usable in all shapeshift forms.
+  SpellInfo(incapacitating_roar cd=30 duration=3)
+  # Incapacitated.
+  SpellAddTargetDebuff(incapacitating_roar incapacitating_roar=1)
 Define(incarnation_chosen_of_elune 102560)
 # An improved Moonkin Form that increases the damage of all your spells by s1 and grants you s3 Haste.rnrnLasts 30 seconds. You may shapeshift in and out of this improved Moonkin Form for its duration.
   SpellInfo(incarnation_chosen_of_elune cd=180 duration=30 talent=incarnation_chosen_of_elune_talent)
