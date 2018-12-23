@@ -159,6 +159,11 @@ Define(master_of_the_elements_buff 260734)
   SpellInfo(master_of_the_elements_buff duration=15 channel=15 gcd=0 offgcd=1)
   # Your next Nature, Physical, or Frost spell will deal s1 increased damage.
   SpellAddBuff(master_of_the_elements_buff master_of_the_elements_buff=1)
+Define(primal_primer 273006)
+# Melee attacks with Flametongue active increase the damage the target takes from your next Lava Lash by s1/2, stacking up to 273006u times.
+  SpellInfo(primal_primer duration=30 channel=30 max_stacks=10 gcd=0 offgcd=1)
+  # Increases damage taken from Lava Lash by w1/2.
+  SpellAddTargetDebuff(primal_primer primal_primer=1)
 Define(quaking_palm 107079)
 # Strikes the target with lightning speed, incapacitating them for 4 seconds, and turns off your attack.
   SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
@@ -260,6 +265,7 @@ Define(ancestral_resonance_trait 277666)
 Define(echo_of_the_elementals_trait 275381)
 Define(natural_harmony_trait 278697)
 Define(lightning_conduit_trait 275388)
+Define(primal_primer_trait 272992)
     ]]
     code = code .. [[
 
