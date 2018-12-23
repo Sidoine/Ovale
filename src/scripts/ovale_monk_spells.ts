@@ -397,7 +397,7 @@ Define(roll 109132)
 	SpellInfo(roll replaced_by=chi_torpedo talent=chi_torpedo_talent)
 	SpellRequire(roll unusable 1=lossofcontrol,root)
 
-    SpellInfo(rushing_jade_wind chi=0)
+    SpellInfo(rushing_jade_wind chi=0 specialization=!windwalker)
 Define(rushing_jade_wind_buff 116847)
     SpellInfo(rushing_jade_wind_buff duration=9 haste=melee)
     SpellAddBuff(rushing_jade_wind rushing_jade_wind_buff=1 specialization=brewmaster)
