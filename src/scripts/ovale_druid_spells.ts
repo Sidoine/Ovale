@@ -573,6 +573,8 @@ Define(stellar_empowerment_debuff 197637)
 Define(stellar_flare_debuff 202347)
 	SpellInfo(stellar_flare_debuff duration=24 haste=spell tick=2)
 
+Define(warrior_of_elune_buff 202425)
+    
 Define(ca_inc 194223)
 SpellList(ca_inc_buff celestial_alignment_buff incarnation_chosen_of_elune_buff)	
 
