@@ -526,9 +526,9 @@ Define(incarnation_chosen_of_elune_buff 102560)
 
 	SpellInfo(lunar_beam cd=90)
 Define(lunar_empowerment_buff 164547)
-	SpellRequire(lunar_strike astralpower_percent 150=buff,celestial_alignment_buff)
-	SpellRequire(lunar_strike astralpower_percent 125=buff,blessing_of_elune_buff)
+    SpellRequire(lunar_strike astralpower_percent 140=buff,warrior_of_elune)
 	SpellAddBuff(lunar_strike lunar_empowerment_buff=0)
+    SpellAddBuff(lunar_strike warrior_of_elune=-1)
 
 	SpellInfo(moonfire astralpower=-3 specialization=balance)
 
@@ -545,8 +545,6 @@ Define(solar_empowerment_buff 164545)
 	SpellInfo(solar_beam cd=60 gcd=0 offgcd=1 interrupt=1)
 
 	SpellInfo(solar_wrath travel_time=1 astralpower=-8)
-	SpellRequire(solar_wrath astralpower_percent 125=buff,blessing_of_elune_buff)
-	SpellRequire(solar_wrath astralpower_percent 150=buff,celestial_alignment_buff)
 	SpellAddBuff(solar_wrath solar_empowerment_buff=-1)
 
 	SpellInfo(starfall astralpower=60)
@@ -567,9 +565,6 @@ Define(stellar_empowerment_debuff 197637)
 	SpellAddTargetDebuff(stellar_flare stellar_flare_debuff=1)
 Define(stellar_flare_debuff 202347)
 	SpellInfo(stellar_flare_debuff duration=24 haste=spell tick=2)
-
-	SpellInfo(warrior_of_elune gcd=0 cd=45 offgcd=1)
-Define(warrior_of_elune_buff 202425)
 
 SpellList(ca_inc celestial_alignment incarnation_chosen_of_elune)
 SpellList(ca_inc_buff celestial_alignment_buff incarnation_chosen_of_elune_buff)	
