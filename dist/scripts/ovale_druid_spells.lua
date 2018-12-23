@@ -573,6 +573,7 @@ Define(stellar_empowerment_debuff 197637)
 Define(stellar_flare_debuff 202347)
 	SpellInfo(stellar_flare_debuff duration=24 haste=spell tick=2)
 
+    SpellRequire(warrior_of_elune unusable 1=buff,warrior_of_elune_buff)
 Define(warrior_of_elune_buff 202425)
     
 Define(ca_inc 194223)
