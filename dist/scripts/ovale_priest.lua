@@ -320,8 +320,8 @@ AddFunction ShadowSingleCdActions
 {
  unless Spell(void_eruption) or DebuffExpires(voidform_shadow) and Spell(dark_ascension) or Spell(void_bolt) or { target.TimeToDie() < 3 or SpellCharges(shadow_word_death) == 2 or SpellCharges(shadow_word_death) == 1 and SpellCooldown(shadow_word_death) < GCD() } and Spell(shadow_word_death)
  {
-  #surrender_to_madness,if=target.time_to_die>200|target.time_to_die<75
-  if target.TimeToDie() > 200 or target.TimeToDie() < 75 Spell(surrender_to_madness)
+  #surrender_to_madness,if=buff.voidform.stack>10+(10*buff.bloodlust.up)
+  if DebuffStacks(voidform_shadow) > 10 + 10 * BuffPresent(burst_haste_buff any=1) Spell(surrender_to_madness)
  }
 }
 
@@ -436,8 +436,8 @@ AddFunction ShadowCleaveCdActions
 {
  unless Spell(void_eruption) or DebuffExpires(voidform_shadow) and Spell(dark_ascension) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Spell(void_bolt) or { target.TimeToDie() < 3 or DebuffExpires(voidform_shadow) } and Spell(shadow_word_death)
  {
-  #surrender_to_madness
-  Spell(surrender_to_madness)
+  #surrender_to_madness,if=buff.voidform.stack>10+(10*buff.bloodlust.up)
+  if DebuffStacks(voidform_shadow) > 10 + 10 * BuffPresent(burst_haste_buff any=1) Spell(surrender_to_madness)
  }
 }
 
@@ -502,8 +502,8 @@ AddFunction ShadowAoeCdActions
 {
  unless Spell(void_eruption) or DebuffExpires(voidform_shadow) and Spell(dark_ascension) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Talent(dark_void_talent) and target.DebuffRemaining(shadow_word_pain_debuff) > TravelTime(void_bolt) and Spell(void_bolt)
  {
-  #surrender_to_madness,if=buff.voidform.stack>=(15+buff.bloodlust.up)
-  if DebuffStacks(voidform_shadow) >= 15 + BuffPresent(burst_haste_buff any=1) Spell(surrender_to_madness)
+  #surrender_to_madness,if=buff.voidform.stack>10+(10*buff.bloodlust.up)
+  if DebuffStacks(voidform_shadow) > 10 + 10 * BuffPresent(burst_haste_buff any=1) Spell(surrender_to_madness)
  }
 }
 

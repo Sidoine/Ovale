@@ -10,7 +10,7 @@ import { OvaleScripts } from "../Scripts";
 # Based on SimulationCraft profile "PR_Monk_Brewmaster".
 #	class=monk
 #	spec=brewmaster
-#	talents=2020033
+#	talents=1030021
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)

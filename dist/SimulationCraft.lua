@@ -2868,6 +2868,8 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
             code = format("%s%sPresent(%s)", target, prefix, buffName)
             symbol = buffName
         end
+    elseif property == "ap_check" then
+        code = format("AstralPower() >= AstralPowerCost(%s)", name)
     elseif property == "cast_regen" then
         code = format("FocusCastingRegen(%s)", name)
     elseif property == "cast_time" then
@@ -3727,6 +3729,10 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
     elseif className == "DRUID" and operand == "max_fb_energy" then
         local spellName = "ferocious_bite"
         code = format("EnergyCost(%s max=1)", spellName)
+        AddSymbol(annotation, spellName)
+    elseif className == "DRUID" and operand == "solar_wrath.ap_check" then
+        local spellName = "solar_wrath"
+        code = format("AstralPower() >= AstralPowerCost(%s)", spellName)
         AddSymbol(annotation, spellName)
     elseif className == "HUNTER" and operand == "buff.careful_aim.up" then
         code = "target.HealthPercent() > 80 or BuffPresent(rapid_fire_buff)"

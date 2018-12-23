@@ -136,6 +136,11 @@ Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
 
+Define(master_marksman_buff 269576)
+# Aimed Shot has a h chance to reduce the focus cost of your next Arcane Shot or Multi-Shot by 269576s1.
+  SpellInfo(master_marksman_buff duration=12 gcd=0 offgcd=1)
+  # Focus cost of your next Arcane Shot or Multi-Shot reduced by s1.
+  SpellAddBuff(master_marksman_buff master_marksman_buff=1)
 Define(mongoose_bite 259387)
 # A brutal attack that deals s1 Physical damage and grants you Mongoose Fury.rnrn|cFFFFFFFFMongoose Fury|rrnIncreases the damage of Mongoose Bite by 259388s1 for 14 seconds, stacking up to 259388u times. Successive attacks do not increase duration.
   SpellInfo(mongoose_bite focus=30 talent=mongoose_bite_talent)
@@ -410,7 +415,7 @@ Define(kill_command_sv 259489)
 	SpellInfo(lethal_shots_buff duration=15)
 
 	SpellInfo(lock_and_load_buff duration=15)
-Define(master_marksman_buff 269576)
+
     SpellInfo(master_marksman_buff duration=12)
 Define(mend_pet 982)
 	SpellInfo(mend_pet cd=10)

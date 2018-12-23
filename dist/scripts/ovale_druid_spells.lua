@@ -9,6 +9,10 @@ local registerBase = function()
 # Invoke the spirits of your ancestors, granting you their power for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
   SpellAddBuff(ancestral_call ancestral_call=1)
+Define(arcanic_pulsar_buff 287784)
+# Starsurge's damage is increased by s2. Every s4 Starsurges, gain Celestial Alignment for s3 sec.
+  SpellInfo(arcanic_pulsar_buff channel=-0.001 gcd=0 offgcd=1)
+
 Define(barkskin 22812)
 # Your skin becomes as tough as bark, reducing all damage you take by s2 and preventing damage from delaying your spellcasts. Lasts 12 seconds.rnrnUsable while stunned, frozen, incapacitated, feared, or asleep, and in all shapeshift forms.
   SpellInfo(barkskin cd=60 duration=12 gcd=0 offgcd=1 tick=1)
@@ -234,6 +238,9 @@ Define(solar_beam 78675)
 # Summons a beam of solar light over an enemy target's location, interrupting the target and silencing all enemies within the beam.  Lasts 8 seconds.
   SpellInfo(solar_beam cd=60 duration=8 gcd=0 offgcd=1)
 
+Define(solar_wrath 5176)
+# Causes (57.75 of Spell Power) Nature damage to the target.
+  SpellInfo(solar_wrath)
 Define(solar_wrath_balance 190984)
 # Hurl a ball of solar energy at the target, dealing (60 of Spell Power) Nature damage.?a197911[rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r][]
   SpellInfo(solar_wrath_balance lunarpower=0)
@@ -566,7 +573,7 @@ Define(stellar_empowerment_debuff 197637)
 Define(stellar_flare_debuff 202347)
 	SpellInfo(stellar_flare_debuff duration=24 haste=spell tick=2)
 
-SpellList(ca_inc celestial_alignment incarnation_chosen_of_elune)
+Define(ca_inc 194223)
 SpellList(ca_inc_buff celestial_alignment_buff incarnation_chosen_of_elune_buff)	
 
 # Balance Legendaries

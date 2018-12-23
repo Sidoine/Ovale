@@ -3055,6 +3055,8 @@ EmitOperandAction = function (operand, parseNode, nodeList, annotation, action, 
             code = format("%s%sPresent(%s)", target, prefix, buffName);
             symbol = buffName;
         }
+    } else if (property == "ap_check") {
+        code = format("AstralPower() >= AstralPowerCost(%s)", name)
     } else if (property == "cast_regen") {
         code = format("FocusCastingRegen(%s)", name);
     } else if (property == "cast_time") {
@@ -3902,6 +3904,10 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
     } else if (className == "DRUID" && operand == "max_fb_energy") {
         let spellName = "ferocious_bite";
         code = format("EnergyCost(%s max=1)", spellName);
+        AddSymbol(annotation, spellName);
+    } else if (className == "DRUID" && operand == "solar_wrath.ap_check") {
+        let spellName = "solar_wrath";
+        code = format("AstralPower() >= AstralPowerCost(%s)", spellName);
         AddSymbol(annotation, spellName);
     } else if (className == "HUNTER" && operand == "buff.careful_aim.up") {
         code = "target.HealthPercent() > 80 or BuffPresent(rapid_fire_buff)";
