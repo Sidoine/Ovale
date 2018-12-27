@@ -159,6 +159,12 @@ Define(master_of_the_elements_buff 260734)
   SpellInfo(master_of_the_elements_buff duration=15 channel=15 gcd=0 offgcd=1)
   # Your next Nature, Physical, or Frost spell will deal s1 increased damage.
   SpellAddBuff(master_of_the_elements_buff master_of_the_elements_buff=1)
+Define(natural_harmony_frost 279029)
+# Dealing Fire damage grants s1 Critical Strike for 12 seconds. rnDealing Frost damage grants s2 Mastery for 12 seconds.rnDealing Nature damage grants s3 Haste for 12 seconds.
+  SpellInfo(natural_harmony_frost duration=12 channel=12 gcd=0 offgcd=1)
+  # Mastery increased by w1.
+  SpellAddBuff(natural_harmony_frost natural_harmony_frost=1)
+
 Define(primal_primer 273006)
 # Melee attacks with Flametongue active increase the damage the target takes from your next Lava Lash by s1/2, stacking up to 273006u times.
   SpellInfo(primal_primer duration=30 channel=30 max_stacks=10 gcd=0 offgcd=1)
