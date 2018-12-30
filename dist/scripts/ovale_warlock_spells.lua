@@ -373,9 +373,8 @@ Define(demonic_gateway 111771)
 	SpellAddPetBuff(demonic_strength demonic_strength_buff=1)
 Define(demonic_strength_buff 267171)
 
-	#SpellInfo(doom soulshards=-1) #TODO generates 1 soulshard after 30s
 	SpellAddTargetDebuff(doom doom_debuff=1)
-Define(doom_debuff 603)
+Define(doom_debuff 265412)
 	SpellInfo(doom_debuff duration=30)
 
 
