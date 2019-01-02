@@ -177,6 +177,7 @@ Define(surrender_to_madness_talent 21) #21979
 # All your Insanity-generating abilities generate s1 more Insanity and you can cast while moving for 60 seconds.rnrnThen, you take damage equal to s3 of your maximum health and cannot generate Insanity for 15 seconds.
 Define(void_torrent_talent 18) #21720
 # Channel a torrent of void energy into the target, dealing o Shadow damage over 4 seconds.rnrnInsanity does not drain during this channel.rnrn|cFFFFFFFFGenerates 289577s1*289577s2/100 Insanity over the duration.|r
+Define(searing_dialogue_trait 272788)
 Define(thought_harvester_trait 288340)
     `;
 // END

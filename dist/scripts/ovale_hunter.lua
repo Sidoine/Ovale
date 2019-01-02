@@ -385,14 +385,16 @@ AddFunction MarksmanshipStMainActions
 {
  #serpent_sting,if=refreshable&!action.serpent_sting.in_flight
  if target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) Spell(serpent_sting_mm)
- #arcane_shot,if=buff.master_marksman.up&focus+cast_regen<focus.max
- if BuffPresent(master_marksman_buff) and Focus() + FocusCastingRegen(arcane_shot) < MaxFocus() Spell(arcane_shot)
- #aimed_shot,if=buff.precise_shots.down|cooldown.aimed_shot.full_recharge_time<action.aimed_shot.cast_time|buff.bloodlust.up&buff.trueshot.up
- if BuffExpires(precise_shots_buff) or SpellCooldown(aimed_shot) < CastTime(aimed_shot) or BuffPresent(burst_haste_buff any=1) and BuffPresent(trueshot_buff) Spell(aimed_shot)
- #rapid_fire,if=focus+cast_regen<focus.max|azerite.focused_fire.enabled|azerite.in_the_rhythm.rank>1|azerite.surging_shots.enabled|talent.streamline.enabled|buff.trueshot.up
- if Focus() + FocusCastingRegen(rapid_fire) < MaxFocus() or HasAzeriteTrait(focused_fire_trait) or AzeriteTraitRank(in_the_rhythm_trait) > 1 or HasAzeriteTrait(surging_shots_trait) or Talent(streamline_talent) or BuffPresent(trueshot_buff) Spell(rapid_fire)
- #arcane_shot,if=focus>60|buff.precise_shots.up
- if Focus() > 60 or BuffPresent(precise_shots_buff) Spell(arcane_shot)
+ #rapid_fire,if=focus<50&(buff.bloodlust.up&buff.trueshot.up|buff.trueshot.down)
+ if Focus() < 50 and { BuffPresent(burst_haste_buff any=1) and BuffPresent(trueshot_buff) or BuffExpires(trueshot_buff) } Spell(rapid_fire)
+ #arcane_shot,if=buff.master_marksman.up&buff.trueshot.up&focus+cast_regen<focus.max
+ if BuffPresent(master_marksman_buff) and BuffPresent(trueshot_buff) and Focus() + FocusCastingRegen(arcane_shot) < MaxFocus() Spell(arcane_shot)
+ #aimed_shot,if=buff.precise_shots.down|cooldown.aimed_shot.full_recharge_time<action.aimed_shot.cast_time|buff.trueshot.up
+ if BuffExpires(precise_shots_buff) or SpellCooldown(aimed_shot) < CastTime(aimed_shot) or BuffPresent(trueshot_buff) Spell(aimed_shot)
+ #rapid_fire,if=focus+cast_regen<focus.max|azerite.focused_fire.enabled|azerite.in_the_rhythm.rank>1|azerite.surging_shots.enabled|talent.streamline.enabled
+ if Focus() + FocusCastingRegen(rapid_fire) < MaxFocus() or HasAzeriteTrait(focused_fire_trait) or AzeriteTraitRank(in_the_rhythm_trait) > 1 or HasAzeriteTrait(surging_shots_trait) or Talent(streamline_talent) Spell(rapid_fire)
+ #arcane_shot,if=focus>60|buff.precise_shots.up&buff.trueshot.down
+ if Focus() > 60 or BuffPresent(precise_shots_buff) and BuffExpires(trueshot_buff) Spell(arcane_shot)
  #steady_shot
  Spell(steady_shot)
 }
@@ -410,7 +412,7 @@ AddFunction MarksmanshipStShortCdActions
  #a_murder_of_crows
  Spell(a_murder_of_crows)
 
- unless target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or BuffPresent(master_marksman_buff) and Focus() + FocusCastingRegen(arcane_shot) < MaxFocus() and Spell(arcane_shot) or { BuffExpires(precise_shots_buff) or SpellCooldown(aimed_shot) < CastTime(aimed_shot) or BuffPresent(burst_haste_buff any=1) and BuffPresent(trueshot_buff) } and Spell(aimed_shot) or { Focus() + FocusCastingRegen(rapid_fire) < MaxFocus() or HasAzeriteTrait(focused_fire_trait) or AzeriteTraitRank(in_the_rhythm_trait) > 1 or HasAzeriteTrait(surging_shots_trait) or Talent(streamline_talent) or BuffPresent(trueshot_buff) } and Spell(rapid_fire)
+ unless target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or Focus() < 50 and { BuffPresent(burst_haste_buff any=1) and BuffPresent(trueshot_buff) or BuffExpires(trueshot_buff) } and Spell(rapid_fire) or BuffPresent(master_marksman_buff) and BuffPresent(trueshot_buff) and Focus() + FocusCastingRegen(arcane_shot) < MaxFocus() and Spell(arcane_shot) or { BuffExpires(precise_shots_buff) or SpellCooldown(aimed_shot) < CastTime(aimed_shot) or BuffPresent(trueshot_buff) } and Spell(aimed_shot) or { Focus() + FocusCastingRegen(rapid_fire) < MaxFocus() or HasAzeriteTrait(focused_fire_trait) or AzeriteTraitRank(in_the_rhythm_trait) > 1 or HasAzeriteTrait(surging_shots_trait) or Talent(streamline_talent) } and Spell(rapid_fire)
  {
   #piercing_shot
   Spell(piercing_shot)
@@ -419,7 +421,7 @@ AddFunction MarksmanshipStShortCdActions
 
 AddFunction MarksmanshipStShortCdPostConditions
 {
- target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or BuffPresent(master_marksman_buff) and Focus() + FocusCastingRegen(arcane_shot) < MaxFocus() and Spell(arcane_shot) or { BuffExpires(precise_shots_buff) or SpellCooldown(aimed_shot) < CastTime(aimed_shot) or BuffPresent(burst_haste_buff any=1) and BuffPresent(trueshot_buff) } and Spell(aimed_shot) or { Focus() + FocusCastingRegen(rapid_fire) < MaxFocus() or HasAzeriteTrait(focused_fire_trait) or AzeriteTraitRank(in_the_rhythm_trait) > 1 or HasAzeriteTrait(surging_shots_trait) or Talent(streamline_talent) or BuffPresent(trueshot_buff) } and Spell(rapid_fire) or { Focus() > 60 or BuffPresent(precise_shots_buff) } and Spell(arcane_shot) or Spell(steady_shot)
+ target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or Focus() < 50 and { BuffPresent(burst_haste_buff any=1) and BuffPresent(trueshot_buff) or BuffExpires(trueshot_buff) } and Spell(rapid_fire) or BuffPresent(master_marksman_buff) and BuffPresent(trueshot_buff) and Focus() + FocusCastingRegen(arcane_shot) < MaxFocus() and Spell(arcane_shot) or { BuffExpires(precise_shots_buff) or SpellCooldown(aimed_shot) < CastTime(aimed_shot) or BuffPresent(trueshot_buff) } and Spell(aimed_shot) or { Focus() + FocusCastingRegen(rapid_fire) < MaxFocus() or HasAzeriteTrait(focused_fire_trait) or AzeriteTraitRank(in_the_rhythm_trait) > 1 or HasAzeriteTrait(surging_shots_trait) or Talent(streamline_talent) } and Spell(rapid_fire) or { Focus() > 60 or BuffPresent(precise_shots_buff) and BuffExpires(trueshot_buff) } and Spell(arcane_shot) or Spell(steady_shot)
 }
 
 AddFunction MarksmanshipStCdActions
@@ -428,7 +430,7 @@ AddFunction MarksmanshipStCdActions
 
 AddFunction MarksmanshipStCdPostConditions
 {
- Spell(explosive_shot) or Enemies() > 1 and Spell(barrage) or Spell(a_murder_of_crows) or target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or BuffPresent(master_marksman_buff) and Focus() + FocusCastingRegen(arcane_shot) < MaxFocus() and Spell(arcane_shot) or { BuffExpires(precise_shots_buff) or SpellCooldown(aimed_shot) < CastTime(aimed_shot) or BuffPresent(burst_haste_buff any=1) and BuffPresent(trueshot_buff) } and Spell(aimed_shot) or { Focus() + FocusCastingRegen(rapid_fire) < MaxFocus() or HasAzeriteTrait(focused_fire_trait) or AzeriteTraitRank(in_the_rhythm_trait) > 1 or HasAzeriteTrait(surging_shots_trait) or Talent(streamline_talent) or BuffPresent(trueshot_buff) } and Spell(rapid_fire) or Spell(piercing_shot) or { Focus() > 60 or BuffPresent(precise_shots_buff) } and Spell(arcane_shot) or Spell(steady_shot)
+ Spell(explosive_shot) or Enemies() > 1 and Spell(barrage) or Spell(a_murder_of_crows) or target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or Focus() < 50 and { BuffPresent(burst_haste_buff any=1) and BuffPresent(trueshot_buff) or BuffExpires(trueshot_buff) } and Spell(rapid_fire) or BuffPresent(master_marksman_buff) and BuffPresent(trueshot_buff) and Focus() + FocusCastingRegen(arcane_shot) < MaxFocus() and Spell(arcane_shot) or { BuffExpires(precise_shots_buff) or SpellCooldown(aimed_shot) < CastTime(aimed_shot) or BuffPresent(trueshot_buff) } and Spell(aimed_shot) or { Focus() + FocusCastingRegen(rapid_fire) < MaxFocus() or HasAzeriteTrait(focused_fire_trait) or AzeriteTraitRank(in_the_rhythm_trait) > 1 or HasAzeriteTrait(surging_shots_trait) or Talent(streamline_talent) } and Spell(rapid_fire) or Spell(piercing_shot) or { Focus() > 60 or BuffPresent(precise_shots_buff) and BuffExpires(trueshot_buff) } and Spell(arcane_shot) or Spell(steady_shot)
 }
 
 ### actions.precombat

@@ -158,11 +158,23 @@ Define(master_of_the_elements_buff 260734)
   SpellInfo(master_of_the_elements_buff duration=15 channel=15 gcd=0 offgcd=1)
   # Your next Nature, Physical, or Frost spell will deal s1 increased damage.
   SpellAddBuff(master_of_the_elements_buff master_of_the_elements_buff=1)
+Define(natural_harmony_fire 279028)
+# Dealing Fire damage grants s1 Critical Strike for 12 seconds. rnDealing Frost damage grants s2 Mastery for 12 seconds.rnDealing Nature damage grants s3 Haste for 12 seconds.
+  SpellInfo(natural_harmony_fire duration=12 channel=12 gcd=0 offgcd=1)
+  # Critical Strike increased by w1.
+  SpellAddBuff(natural_harmony_fire natural_harmony_fire=1)
+
 Define(natural_harmony_frost 279029)
 # Dealing Fire damage grants s1 Critical Strike for 12 seconds. rnDealing Frost damage grants s2 Mastery for 12 seconds.rnDealing Nature damage grants s3 Haste for 12 seconds.
   SpellInfo(natural_harmony_frost duration=12 channel=12 gcd=0 offgcd=1)
   # Mastery increased by w1.
   SpellAddBuff(natural_harmony_frost natural_harmony_frost=1)
+
+Define(natural_harmony_nature 279033)
+# Dealing Fire damage grants s1 Critical Strike for 12 seconds. rnDealing Frost damage grants s2 Mastery for 12 seconds.rnDealing Nature damage grants s3 Haste for 12 seconds.
+  SpellInfo(natural_harmony_nature duration=12 channel=12 gcd=0 offgcd=1)
+  # Haste increased by w1.
+  SpellAddBuff(natural_harmony_nature natural_harmony_nature=1)
 
 Define(primal_primer 273006)
 # Melee attacks with Flametongue active increase the damage the target takes from your next Lava Lash by s1/2, stacking up to 273006u times.
@@ -220,6 +232,8 @@ Define(ascendance_talent 21) #21675
 # Transform into a Flame Ascendant for 15 seconds, replacing Chain Lightning with Lava Beam, removing the cooldown on Lava Burst, and increasing the damage of Lava Burst by an amount equal to your critical strike chance.
 Define(ascendance_talent_enhancement 21) #21972
 # Transform into an Air Ascendant for 15 seconds, reducing the cooldown and cost of Stormstrike by s4, and transforming your auto attack and Stormstrike into Wind attacks which bypass armor and have a s1 yd range.
+Define(boulderfist_talent 1) #22354
+# Rockbiter's recharge time is reduced by s1 and it deals s2 increased damage.
 Define(call_the_thunder_talent 5) #22139
 # Your maximum Maelstrom increased by s2, and the Maelstrom cost of Earth Shock?PL<48[][ and Earthquake] is reduced by s1.
 Define(crashing_storm_talent 16) #21973
@@ -228,8 +242,6 @@ Define(earthen_spike_talent 20) #22977
 # Summons an Earthen Spike under an enemy, dealing s1 Physical damage and increasing Physical and Nature damage you deal to the target by s2 for 10 seconds.
 Define(elemental_blast_talent 3) #22358
 # Harnesses the raw power of the elements, dealing (63 of Spell Power) Elemental damage and increasing your Critical Strike, Haste, or Mastery by 118522s1 for 10 seconds.rnrnCan cause an Elemental Overload?PL<78[ when at or above level 78][].
-Define(elemental_spirits_talent 19) #21970
-# Reduces the cooldown of Feral Spirit by m1/-1000 sec and causes your Feral Spirits to be imbued with Fire, Frost, or Lightning, enhancing your abilities.
 Define(feral_lunge_talent 14) #22149
 # Lunge at your enemy as a ghostly wolf, biting them to deal 215802s1 Physical damage.
 Define(forceful_winds_talent 5) #22150
@@ -271,6 +283,7 @@ Define(echo_of_the_elementals_trait 275381)
 Define(natural_harmony_trait 278697)
 Define(lightning_conduit_trait 275388)
 Define(primal_primer_trait 272992)
+Define(strength_of_earth_trait 273461)
     `;
 // END
     code += `

@@ -19,6 +19,11 @@ Define(avenging_wrath 31884)
 Define(bastion_of_light 204035)
 # Immediately grants s1 charges of Shield of the Righteous.
   SpellInfo(bastion_of_light cd=120 gcd=0 offgcd=1 talent=bastion_of_light_talent)
+Define(battle_potion_of_strength 279153)
+# Increases your Strength by s1 for 25 seconds.
+  SpellInfo(battle_potion_of_strength cd=1 duration=25 gcd=0 offgcd=1)
+  # Strength increased by w1.
+  SpellAddBuff(battle_potion_of_strength battle_potion_of_strength=1)
 Define(blade_of_justice 184575)
 # Pierces an enemy with a blade of light, dealing s2*<mult> Physical damage.rnrn|cFFFFFFFFGenerates s3 Holy Power.|r
   SpellInfo(blade_of_justice cd=10.5 holypower=-2)
@@ -133,6 +138,8 @@ Define(hammer_of_wrath_talent 6) #22593
 # Hurls a divine hammer that strikes an enemy for s1 Holy damage. Only usable on enemies that have less than 20 health, or while you are empowered by ?s231895[Crusade][Avenging Wrath].rnrn|cFFFFFFFFGenerates s2 Holy Power.
 Define(inquisition_talent 21) #22634
 # Consumes up to 3 Holy Power to increase your damage done and Haste by s1.rnrnLasts 15 seconds per Holy Power consumed.
+Define(righteous_verdict_talent 2) #22557
+# Templar's Verdict increases the damage of your next Templar's Verdict by 267611s1 for 6 seconds.
 Define(seraphim_talent 21) #22645
 # The Light temporarily magnifies your power, increasing your Haste, Critical Strike, Mastery, and Versatility by s1.rnrnConsumes up to s2 charges of Shield of the Righteous, and lasts 8 seconds per charge.
 Define(wake_of_ashes_talent 12) #22183

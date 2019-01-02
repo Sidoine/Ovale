@@ -731,8 +731,8 @@ AddFunction DemonologyNetherportalactiveMainActions
 
  unless SoulShards() == 1 and { SpellCooldown(call_dreadstalkers) < CastTime(shadow_bolt) or Talent(bilescourge_bombers_talent) and SpellCooldown(bilescourge_bombers) < CastTime(shadow_bolt) } and DemonologyBuildashardMainPostConditions()
  {
-  #hand_of_guldan,if=((cooldown.call_dreadstalkers.remains>action.demonbolt.cast_time)&(cooldown.call_dreadstalkers.remains>action.shadow_bolt.cast_time))&cooldown.nether_portal.remains>(160+action.hand_of_guldan.cast_time)
-  if SpellCooldown(call_dreadstalkers) > CastTime(demonbolt) and SpellCooldown(call_dreadstalkers) > CastTime(shadow_bolt) and SpellCooldown(nether_portal) > 160 + CastTime(hand_of_guldan) Spell(hand_of_guldan)
+  #hand_of_guldan,if=((cooldown.call_dreadstalkers.remains>action.demonbolt.cast_time)&(cooldown.call_dreadstalkers.remains>action.shadow_bolt.cast_time))&cooldown.nether_portal.remains>(165+action.hand_of_guldan.cast_time)
+  if SpellCooldown(call_dreadstalkers) > CastTime(demonbolt) and SpellCooldown(call_dreadstalkers) > CastTime(shadow_bolt) and SpellCooldown(nether_portal) > 165 + CastTime(hand_of_guldan) Spell(hand_of_guldan)
   #demonbolt,if=buff.demonic_core.up
   if BuffPresent(demonic_core_buff) Spell(demonbolt)
   #call_action_list,name=build_a_shard
@@ -747,6 +747,8 @@ AddFunction DemonologyNetherportalactiveMainPostConditions
 
 AddFunction DemonologyNetherportalactiveShortCdActions
 {
+ #bilescourge_bombers
+ Spell(bilescourge_bombers)
  #summon_vilefiend,if=cooldown.summon_demonic_tyrant.remains>40|cooldown.summon_demonic_tyrant.remains<12
  if SpellCooldown(summon_demonic_tyrant) > 40 or SpellCooldown(summon_demonic_tyrant) < 12 Spell(summon_vilefiend)
 
@@ -755,12 +757,12 @@ AddFunction DemonologyNetherportalactiveShortCdActions
   #call_action_list,name=build_a_shard,if=soul_shard=1&(cooldown.call_dreadstalkers.remains<action.shadow_bolt.cast_time|(talent.bilescourge_bombers.enabled&cooldown.bilescourge_bombers.remains<action.shadow_bolt.cast_time))
   if SoulShards() == 1 and { SpellCooldown(call_dreadstalkers) < CastTime(shadow_bolt) or Talent(bilescourge_bombers_talent) and SpellCooldown(bilescourge_bombers) < CastTime(shadow_bolt) } DemonologyBuildashardShortCdActions()
 
-  unless SoulShards() == 1 and { SpellCooldown(call_dreadstalkers) < CastTime(shadow_bolt) or Talent(bilescourge_bombers_talent) and SpellCooldown(bilescourge_bombers) < CastTime(shadow_bolt) } and DemonologyBuildashardShortCdPostConditions() or SpellCooldown(call_dreadstalkers) > CastTime(demonbolt) and SpellCooldown(call_dreadstalkers) > CastTime(shadow_bolt) and SpellCooldown(nether_portal) > 160 + CastTime(hand_of_guldan) and Spell(hand_of_guldan)
+  unless SoulShards() == 1 and { SpellCooldown(call_dreadstalkers) < CastTime(shadow_bolt) or Talent(bilescourge_bombers_talent) and SpellCooldown(bilescourge_bombers) < CastTime(shadow_bolt) } and DemonologyBuildashardShortCdPostConditions() or SpellCooldown(call_dreadstalkers) > CastTime(demonbolt) and SpellCooldown(call_dreadstalkers) > CastTime(shadow_bolt) and SpellCooldown(nether_portal) > 165 + CastTime(hand_of_guldan) and Spell(hand_of_guldan)
   {
-   #summon_demonic_tyrant,if=buff.nether_portal.remains<10&soul_shard=0
-   if BuffRemaining(nether_portal_buff) < 10 and SoulShards() == 0 Spell(summon_demonic_tyrant)
-   #summon_demonic_tyrant,if=buff.nether_portal.remains<action.summon_demonic_tyrant.cast_time+5.5
-   if BuffRemaining(nether_portal_buff) < CastTime(summon_demonic_tyrant) + 5.5 Spell(summon_demonic_tyrant)
+   #summon_demonic_tyrant,if=buff.nether_portal.remains<5&soul_shard=0
+   if BuffRemaining(nether_portal_buff) < 5 and SoulShards() == 0 Spell(summon_demonic_tyrant)
+   #summon_demonic_tyrant,if=buff.nether_portal.remains<action.summon_demonic_tyrant.cast_time+0.5
+   if BuffRemaining(nether_portal_buff) < CastTime(summon_demonic_tyrant) + 0.5 Spell(summon_demonic_tyrant)
 
    unless BuffPresent(demonic_core_buff) and Spell(demonbolt)
    {
@@ -773,30 +775,33 @@ AddFunction DemonologyNetherportalactiveShortCdActions
 
 AddFunction DemonologyNetherportalactiveShortCdPostConditions
 {
- { SpellCooldown(summon_demonic_tyrant) < 9 and BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) < 11 and not BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) > 14 } and Spell(call_dreadstalkers) or SoulShards() == 1 and { SpellCooldown(call_dreadstalkers) < CastTime(shadow_bolt) or Talent(bilescourge_bombers_talent) and SpellCooldown(bilescourge_bombers) < CastTime(shadow_bolt) } and DemonologyBuildashardShortCdPostConditions() or SpellCooldown(call_dreadstalkers) > CastTime(demonbolt) and SpellCooldown(call_dreadstalkers) > CastTime(shadow_bolt) and SpellCooldown(nether_portal) > 160 + CastTime(hand_of_guldan) and Spell(hand_of_guldan) or BuffPresent(demonic_core_buff) and Spell(demonbolt) or DemonologyBuildashardShortCdPostConditions()
+ { SpellCooldown(summon_demonic_tyrant) < 9 and BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) < 11 and not BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) > 14 } and Spell(call_dreadstalkers) or SoulShards() == 1 and { SpellCooldown(call_dreadstalkers) < CastTime(shadow_bolt) or Talent(bilescourge_bombers_talent) and SpellCooldown(bilescourge_bombers) < CastTime(shadow_bolt) } and DemonologyBuildashardShortCdPostConditions() or SpellCooldown(call_dreadstalkers) > CastTime(demonbolt) and SpellCooldown(call_dreadstalkers) > CastTime(shadow_bolt) and SpellCooldown(nether_portal) > 165 + CastTime(hand_of_guldan) and Spell(hand_of_guldan) or BuffPresent(demonic_core_buff) and Spell(demonbolt) or DemonologyBuildashardShortCdPostConditions()
 }
 
 AddFunction DemonologyNetherportalactiveCdActions
 {
- #grimoire_felguard,if=cooldown.summon_demonic_tyrant.remains<13|!equipped.132369
- if SpellCooldown(summon_demonic_tyrant) < 13 or not HasEquippedItem(wilfreds_sigil_of_superior_summoning_item) Spell(grimoire_felguard)
-
- unless { SpellCooldown(summon_demonic_tyrant) > 40 or SpellCooldown(summon_demonic_tyrant) < 12 } and Spell(summon_vilefiend) or { SpellCooldown(summon_demonic_tyrant) < 9 and BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) < 11 and not BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) > 14 } and Spell(call_dreadstalkers)
+ unless Spell(bilescourge_bombers)
  {
-  #call_action_list,name=build_a_shard,if=soul_shard=1&(cooldown.call_dreadstalkers.remains<action.shadow_bolt.cast_time|(talent.bilescourge_bombers.enabled&cooldown.bilescourge_bombers.remains<action.shadow_bolt.cast_time))
-  if SoulShards() == 1 and { SpellCooldown(call_dreadstalkers) < CastTime(shadow_bolt) or Talent(bilescourge_bombers_talent) and SpellCooldown(bilescourge_bombers) < CastTime(shadow_bolt) } DemonologyBuildashardCdActions()
+  #grimoire_felguard,if=cooldown.summon_demonic_tyrant.remains<13|!equipped.132369
+  if SpellCooldown(summon_demonic_tyrant) < 13 or not HasEquippedItem(wilfreds_sigil_of_superior_summoning_item) Spell(grimoire_felguard)
 
-  unless SoulShards() == 1 and { SpellCooldown(call_dreadstalkers) < CastTime(shadow_bolt) or Talent(bilescourge_bombers_talent) and SpellCooldown(bilescourge_bombers) < CastTime(shadow_bolt) } and DemonologyBuildashardCdPostConditions() or SpellCooldown(call_dreadstalkers) > CastTime(demonbolt) and SpellCooldown(call_dreadstalkers) > CastTime(shadow_bolt) and SpellCooldown(nether_portal) > 160 + CastTime(hand_of_guldan) and Spell(hand_of_guldan) or BuffRemaining(nether_portal_buff) < 10 and SoulShards() == 0 and Spell(summon_demonic_tyrant) or BuffRemaining(nether_portal_buff) < CastTime(summon_demonic_tyrant) + 5.5 and Spell(summon_demonic_tyrant) or BuffPresent(demonic_core_buff) and Spell(demonbolt)
+  unless { SpellCooldown(summon_demonic_tyrant) > 40 or SpellCooldown(summon_demonic_tyrant) < 12 } and Spell(summon_vilefiend) or { SpellCooldown(summon_demonic_tyrant) < 9 and BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) < 11 and not BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) > 14 } and Spell(call_dreadstalkers)
   {
-   #call_action_list,name=build_a_shard
-   DemonologyBuildashardCdActions()
+   #call_action_list,name=build_a_shard,if=soul_shard=1&(cooldown.call_dreadstalkers.remains<action.shadow_bolt.cast_time|(talent.bilescourge_bombers.enabled&cooldown.bilescourge_bombers.remains<action.shadow_bolt.cast_time))
+   if SoulShards() == 1 and { SpellCooldown(call_dreadstalkers) < CastTime(shadow_bolt) or Talent(bilescourge_bombers_talent) and SpellCooldown(bilescourge_bombers) < CastTime(shadow_bolt) } DemonologyBuildashardCdActions()
+
+   unless SoulShards() == 1 and { SpellCooldown(call_dreadstalkers) < CastTime(shadow_bolt) or Talent(bilescourge_bombers_talent) and SpellCooldown(bilescourge_bombers) < CastTime(shadow_bolt) } and DemonologyBuildashardCdPostConditions() or SpellCooldown(call_dreadstalkers) > CastTime(demonbolt) and SpellCooldown(call_dreadstalkers) > CastTime(shadow_bolt) and SpellCooldown(nether_portal) > 165 + CastTime(hand_of_guldan) and Spell(hand_of_guldan) or BuffRemaining(nether_portal_buff) < 5 and SoulShards() == 0 and Spell(summon_demonic_tyrant) or BuffRemaining(nether_portal_buff) < CastTime(summon_demonic_tyrant) + 0.5 and Spell(summon_demonic_tyrant) or BuffPresent(demonic_core_buff) and Spell(demonbolt)
+   {
+    #call_action_list,name=build_a_shard
+    DemonologyBuildashardCdActions()
+   }
   }
  }
 }
 
 AddFunction DemonologyNetherportalactiveCdPostConditions
 {
- { SpellCooldown(summon_demonic_tyrant) > 40 or SpellCooldown(summon_demonic_tyrant) < 12 } and Spell(summon_vilefiend) or { SpellCooldown(summon_demonic_tyrant) < 9 and BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) < 11 and not BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) > 14 } and Spell(call_dreadstalkers) or SoulShards() == 1 and { SpellCooldown(call_dreadstalkers) < CastTime(shadow_bolt) or Talent(bilescourge_bombers_talent) and SpellCooldown(bilescourge_bombers) < CastTime(shadow_bolt) } and DemonologyBuildashardCdPostConditions() or SpellCooldown(call_dreadstalkers) > CastTime(demonbolt) and SpellCooldown(call_dreadstalkers) > CastTime(shadow_bolt) and SpellCooldown(nether_portal) > 160 + CastTime(hand_of_guldan) and Spell(hand_of_guldan) or BuffRemaining(nether_portal_buff) < 10 and SoulShards() == 0 and Spell(summon_demonic_tyrant) or BuffRemaining(nether_portal_buff) < CastTime(summon_demonic_tyrant) + 5.5 and Spell(summon_demonic_tyrant) or BuffPresent(demonic_core_buff) and Spell(demonbolt) or DemonologyBuildashardCdPostConditions()
+ Spell(bilescourge_bombers) or { SpellCooldown(summon_demonic_tyrant) > 40 or SpellCooldown(summon_demonic_tyrant) < 12 } and Spell(summon_vilefiend) or { SpellCooldown(summon_demonic_tyrant) < 9 and BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) < 11 and not BuffPresent(demonic_calling_buff) or SpellCooldown(summon_demonic_tyrant) > 14 } and Spell(call_dreadstalkers) or SoulShards() == 1 and { SpellCooldown(call_dreadstalkers) < CastTime(shadow_bolt) or Talent(bilescourge_bombers_talent) and SpellCooldown(bilescourge_bombers) < CastTime(shadow_bolt) } and DemonologyBuildashardCdPostConditions() or SpellCooldown(call_dreadstalkers) > CastTime(demonbolt) and SpellCooldown(call_dreadstalkers) > CastTime(shadow_bolt) and SpellCooldown(nether_portal) > 165 + CastTime(hand_of_guldan) and Spell(hand_of_guldan) or BuffRemaining(nether_portal_buff) < 5 and SoulShards() == 0 and Spell(summon_demonic_tyrant) or BuffRemaining(nether_portal_buff) < CastTime(summon_demonic_tyrant) + 0.5 and Spell(summon_demonic_tyrant) or BuffPresent(demonic_core_buff) and Spell(demonbolt) or DemonologyBuildashardCdPostConditions()
 }
 
 ### actions.nether_portal
@@ -808,14 +813,14 @@ AddFunction DemonologyNetherportalMainActions
 
  unless SpellCooldown(nether_portal) < 20 and DemonologyNetherportalbuildingMainPostConditions()
  {
-  #call_action_list,name=nether_portal_active,if=cooldown.nether_portal.remains>160
-  if SpellCooldown(nether_portal) > 160 DemonologyNetherportalactiveMainActions()
+  #call_action_list,name=nether_portal_active,if=cooldown.nether_portal.remains>165
+  if SpellCooldown(nether_portal) > 165 DemonologyNetherportalactiveMainActions()
  }
 }
 
 AddFunction DemonologyNetherportalMainPostConditions
 {
- SpellCooldown(nether_portal) < 20 and DemonologyNetherportalbuildingMainPostConditions() or SpellCooldown(nether_portal) > 160 and DemonologyNetherportalactiveMainPostConditions()
+ SpellCooldown(nether_portal) < 20 and DemonologyNetherportalbuildingMainPostConditions() or SpellCooldown(nether_portal) > 165 and DemonologyNetherportalactiveMainPostConditions()
 }
 
 AddFunction DemonologyNetherportalShortCdActions
@@ -825,14 +830,14 @@ AddFunction DemonologyNetherportalShortCdActions
 
  unless SpellCooldown(nether_portal) < 20 and DemonologyNetherportalbuildingShortCdPostConditions()
  {
-  #call_action_list,name=nether_portal_active,if=cooldown.nether_portal.remains>160
-  if SpellCooldown(nether_portal) > 160 DemonologyNetherportalactiveShortCdActions()
+  #call_action_list,name=nether_portal_active,if=cooldown.nether_portal.remains>165
+  if SpellCooldown(nether_portal) > 165 DemonologyNetherportalactiveShortCdActions()
  }
 }
 
 AddFunction DemonologyNetherportalShortCdPostConditions
 {
- SpellCooldown(nether_portal) < 20 and DemonologyNetherportalbuildingShortCdPostConditions() or SpellCooldown(nether_portal) > 160 and DemonologyNetherportalactiveShortCdPostConditions()
+ SpellCooldown(nether_portal) < 20 and DemonologyNetherportalbuildingShortCdPostConditions() or SpellCooldown(nether_portal) > 165 and DemonologyNetherportalactiveShortCdPostConditions()
 }
 
 AddFunction DemonologyNetherportalCdActions
@@ -842,14 +847,14 @@ AddFunction DemonologyNetherportalCdActions
 
  unless SpellCooldown(nether_portal) < 20 and DemonologyNetherportalbuildingCdPostConditions()
  {
-  #call_action_list,name=nether_portal_active,if=cooldown.nether_portal.remains>160
-  if SpellCooldown(nether_portal) > 160 DemonologyNetherportalactiveCdActions()
+  #call_action_list,name=nether_portal_active,if=cooldown.nether_portal.remains>165
+  if SpellCooldown(nether_portal) > 165 DemonologyNetherportalactiveCdActions()
  }
 }
 
 AddFunction DemonologyNetherportalCdPostConditions
 {
- SpellCooldown(nether_portal) < 20 and DemonologyNetherportalbuildingCdPostConditions() or SpellCooldown(nether_portal) > 160 and DemonologyNetherportalactiveCdPostConditions()
+ SpellCooldown(nether_portal) < 20 and DemonologyNetherportalbuildingCdPostConditions() or SpellCooldown(nether_portal) > 165 and DemonologyNetherportalactiveCdPostConditions()
 }
 
 ### actions.implosion

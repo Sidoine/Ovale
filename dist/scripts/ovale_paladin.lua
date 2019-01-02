@@ -296,7 +296,7 @@ Include(ovale_paladin_spells)
 
 AddFunction ds_castable
 {
- Enemies() >= 2
+ Enemies() >= 2 and not Talent(righteous_verdict_talent) or Enemies() >= 3 and Talent(righteous_verdict_talent)
 }
 
 AddFunction HoW
@@ -354,7 +354,7 @@ AddFunction RetributionPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(bursting_blood usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
  #arcane_torrent,if=!talent.wake_of_ashes.enabled
  if not Talent(wake_of_ashes_talent) Spell(arcane_torrent_holy)
 }
@@ -491,7 +491,7 @@ AddFunction RetributionGeneratorsCdPostConditions
 
 AddFunction RetributionFinishersMainActions
 {
- #variable,name=ds_castable,value=spell_targets.divine_storm>=2
+ #variable,name=ds_castable,value=spell_targets.divine_storm>=2&!talent.righteous_verdict.enabled|spell_targets.divine_storm>=3&talent.righteous_verdict.enabled
  #inquisition,if=buff.inquisition.down|buff.inquisition.remains<5&holy_power>=3|talent.execution_sentence.enabled&cooldown.execution_sentence.remains<10&buff.inquisition.remains<15|cooldown.avenging_wrath.remains<15&buff.inquisition.remains<20&holy_power>=3
  if BuffExpires(inquisition_buff) or BuffRemaining(inquisition_buff) < 5 and HolyPower() >= 3 or Talent(execution_sentence_talent) and SpellCooldown(execution_sentence) < 10 and BuffRemaining(inquisition_buff) < 15 or SpellCooldown(avenging_wrath) < 15 and BuffRemaining(inquisition_buff) < 20 and HolyPower() >= 3 Spell(inquisition)
  #execution_sentence,if=spell_targets.divine_storm<=2&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*2)
@@ -553,7 +553,7 @@ AddFunction RetributionCooldownsCdActions
  #use_item,name=jes_howler,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10
  if BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) and BuffStacks(crusade_buff) == 10 RetributionUseItemActions()
  #potion,if=(buff.bloodlust.react|buff.avenging_wrath.up|buff.crusade.up&buff.crusade.remains<25|target.time_to_die<=40)
- if { BuffPresent(burst_haste_buff any=1) or BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) and BuffRemaining(crusade_buff) < 25 or target.TimeToDie() <= 40 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(bursting_blood usable=1)
+ if { BuffPresent(burst_haste_buff any=1) or BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) and BuffRemaining(crusade_buff) < 25 or target.TimeToDie() <= 40 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
  #lights_judgment,if=spell_targets.lights_judgment>=2|(!raid_event.adds.exists|raid_event.adds.in>75)
  if Enemies() >= 2 or not False(raid_event_adds_exists) or 600 > 75 Spell(lights_judgment)
  #fireblood,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10
@@ -710,8 +710,8 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 # arcane_torrent_holy
 # avenging_wrath
 # avenging_wrath_buff
+# battle_potion_of_strength
 # blade_of_justice
-# bursting_blood
 # consecration_retribution
 # crusade
 # crusade_buff
@@ -732,6 +732,7 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 # judgment
 # lights_judgment
 # rebuke
+# righteous_verdict_talent
 # shield_of_vengeance
 # templars_verdict
 # wake_of_ashes
