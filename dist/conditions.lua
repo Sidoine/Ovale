@@ -65,6 +65,14 @@ local GetUnitSpeed = GetUnitSpeed
 local GetWeaponEnchantInfo = GetWeaponEnchantInfo
 local HasFullControl = HasFullControl
 local IsStealthed = IsStealthed
+local IsMounted = IsMounted
+local IsFalling = IsFalling
+local IsFlyableArea = IsFlyableArea
+local IsFlying = IsFlying
+local IsInInstance = IsInInstance
+local IsIndoors = IsIndoors
+local IsOutdoors = IsOutdoors
+local IsSwimming = IsSwimming
 local UnitCastingInfo = UnitCastingInfo
 local UnitChannelInfo = UnitChannelInfo
 local UnitClass = UnitClass
@@ -2626,4 +2634,60 @@ local function PartyMembersInRange(positionalParams, namedParams, atTime)
         return Compare(value, comparator, limit)
     end
     OvaleCondition:RegisterCondition("partymembersinrange", false, PartyMembersInRange)
+end
+do
+local function mounted(condition)
+		local yesno = condition[1]
+		return TestBoolean(IsMounted(), yesno)
+	end
+	OvaleCondition:RegisterCondition("mounted", false, mounted)
+end
+do
+local function falling(condition)
+		local yesno = condition[1]
+		return TestBoolean(IsFalling(), yesno)
+	end
+	OvaleCondition:RegisterCondition("falling", false, falling)
+end
+do
+local function canfly(condition)
+		local yesno = condition[1]
+		return TestBoolean(IsFlyableArea(), yesno)
+	end
+	OvaleCondition:RegisterCondition("canfly", false, canfly)
+end
+do
+local function flying(condition)
+		local yesno = condition[1]
+		return TestBoolean(IsFlying(), yesno)
+	end
+	OvaleCondition:RegisterCondition("flying", false, flying)
+end
+do
+local function instanced(condition)
+		local yesno = condition[1]
+		return TestBoolean(IsInInstance(), yesno)
+	end
+	OvaleCondition:RegisterCondition("instanced", false, instanced)
+end
+do
+local function indoors(condition)
+		local yesno = condition[1]
+		return TestBoolean(IsIndoors(), yesno)
+	end
+	OvaleCondition:RegisterCondition("indoors", false, indoors)
+end
+do
+local function outdoors(condition)
+		local yesno = condition[1]
+		return TestBoolean(IsOutdoors(), yesno)
+	end
+	OvaleCondition:RegisterCondition("outdoors", false, outdoors)
+end
+do
+local function wet(condition)
+		local yesno = condition[1]
+		return TestBoolean(IsSwimming(), yesno)
+	end
+	OvaleCondition:RegisterCondition("wet", false, wet)
 end

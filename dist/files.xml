@@ -88,5 +88,4 @@
    <Script file="Frame.lua"/>
    <Script file="conditions.lua"/>
    <Script file="DataBroker.lua"/>
-   <Script file="conditions_xeltor.lua"/>
 </Ui>

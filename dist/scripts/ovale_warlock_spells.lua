@@ -379,7 +379,7 @@ Define(demonic_strength_buff 267171)
 
 	#SpellInfo(doom soulshards=-1) #TODO generates 1 soulshard after 30s
 	SpellAddTargetDebuff(doom doom_debuff=1)
-Define(doom_debuff 603)
+Define(doom_debuff 265412)
 	SpellInfo(doom_debuff duration=30)
 
 
@@ -598,6 +598,10 @@ Define(darkglare 103673)
 Define(infernal 89)
 Define(felguard 17252)
 
+# Pet skills
+Define(pet_axe_toss 119914)
+	SpellInfo(pet_axe_toss cd=30 offgcd=1 gcd=0)
+
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(dark_soul_instability tag=cd)
 	SpellInfo(dark_soul_knowledge tag=cd)
@@ -620,6 +624,7 @@ Define(felguard 17252)
 
 # Custom stuff
 Define(healthstone 5512)
+	SpellInfo(healthstone offgcd=1)
 ]]
     OvaleScripts:RegisterScript("WARLOCK", nil, name, desc, code, "include")
 end
