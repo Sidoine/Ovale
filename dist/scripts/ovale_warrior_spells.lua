@@ -4,7 +4,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 __exports.register = function()
     local name = "ovale_warrior_spells"
-    local desc = "[8.0.1] Ovale: Warrior spells"
+    local desc = "[8.1] Ovale: Warrior spells"
     local code = [[Define(ancestral_call 274738)
 # Invoke the spirits of your ancestors, granting you their power for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
@@ -15,8 +15,8 @@ Define(avatar 107574)
   # Damage done increased by s1.
   SpellAddBuff(avatar avatar=1)
 Define(berserking 26297)
-# Increases your haste by s1 for 10 seconds.
-  SpellInfo(berserking cd=180 duration=10 gcd=0 offgcd=1)
+# Increases your haste by s1 for 12 seconds.
+  SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
   # Haste increased by s1.
   SpellAddBuff(berserking berserking=1)
 Define(bloodthirst 23881)
@@ -28,7 +28,7 @@ Define(bursting_blood 251316)
 
 Define(charge 100)
 # Charge to an enemy, dealing 126664s2 Physical damage, rooting it for 1 second?s103828[, and stunning it for 0 second][].rnrn|cFFFFFFFFGenerates /10;s2 Rage.|r
-  SpellInfo(charge cd=1.5 charge_cd=20 gcd=0.5 rage=-20)
+  SpellInfo(charge cd=1.5 charge_cd=20 gcd=0 offgcd=1 rage=-20)
 Define(cleave 845)
 # Strikes all enemies in front of you with a sweeping attack for s1 Physical damage. Hitting s2 or more targets inflicts Deep Wounds.
   SpellInfo(cleave rage=20 cd=9 talent=cleave_talent)
@@ -368,8 +368,8 @@ Define(mortal_wounds_debuff 115804)
 Define(overpower_buff 7384)
 	SpellInfo(overpower_buff duration=15 max_stacks=2)
 Define(piercing_howl 12323)
-	SpellInfo(piercing_howl rage=10)
-	SpellAddTargetDebuff(piercing_howl piercing_howl_debuff=1)
+	SpellInfo(piercing_howl rag=10)
+	SpellAddBuff(piercing_howl piercing_howl_debuff=1)
 Define(piercing_howl_debuff 12323)
 	SpellInfo(piercing_howl_debuff duration=15)
 
@@ -499,7 +499,6 @@ Define(stone_heart_buff 225947)
 	SpellAddBuff(execute_arms stone_heart_buff=0)
 	SpellAddBuff(execute stone_heart_buff=0)
 Define(the_great_storms_eye_item 151823)
-Define(sap_debuff 6770)
 
 
 # Talents

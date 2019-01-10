@@ -45,12 +45,12 @@ class OvaleActionBarClass extends OvaleActionBarBase {
 
     OnInitialize() {
         this.RegisterEvent("ACTIONBAR_SLOT_CHANGED");
-        this.RegisterEvent("PLAYER_ENTERING_WORLD", event => this.UpdateActionSlots(event));
+        this.RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateActionSlots");
         this.RegisterEvent("UPDATE_BINDINGS");
-        this.RegisterEvent("UPDATE_BONUS_ACTIONBAR", event => this.UpdateActionSlots(event));
-        this.RegisterEvent("SPELLS_CHANGED", event => this.UpdateActionSlots(event));
-        this.RegisterMessage("Ovale_StanceChanged", event => this.UpdateActionSlots(event));
-        this.RegisterMessage("Ovale_TalentsChanged", event => this.UpdateActionSlots(event));
+        this.RegisterEvent("UPDATE_BONUS_ACTIONBAR", "UpdateActionSlots");
+        this.RegisterEvent("SPELLS_CHANGED", "UpdateActionSlots");
+        this.RegisterMessage("Ovale_StanceChanged", "UpdateActionSlots");
+        this.RegisterMessage("Ovale_TalentsChanged", "UpdateActionSlots");
     }
 
     GetKeyBinding(slot: number) {
@@ -155,10 +155,10 @@ class OvaleActionBarClass extends OvaleActionBarBase {
 			for (let slot = start; slot <= 72; slot += 1) {
 				this.UpdateActionSlot(slot);
 			}
-			if (event != "TimerUpdateActionSlots") {
-				this.ScheduleTimer("TimerUpdateActionSlots", 1);
-			}
 		}
+        if (event != "TimerUpdateActionSlots") {
+            this.ScheduleTimer("TimerUpdateActionSlots", 1);
+        }
         this.StopProfiling("OvaleActionBar_UpdateActionSlots");
     }
     UpdateActionSlot(slot: number) {

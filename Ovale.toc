@@ -1,4 +1,4 @@
-## Interface: 80000
+## Interface: 80100
 ## Title: Ovale Spell Priority
 ## Notes: Show the icon of the next spell to cast
 ## Notes-frFR: Affiche l'icône du prochain sort à lancer
