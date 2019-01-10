@@ -141,6 +141,7 @@ const CHARACTER_PROPERTY: LuaObj<string> = {
     ["energy.max"]: "MaxEnergy()",
     ["energy.regen"]: "EnergyRegenRate()",
     ["energy.time_to_max"]: "TimeToMaxEnergy()",
+    ["expected_combat_length"]: "600",
     ["feral_spirit.remains"]: "TotemRemaining(sprit_wolf)",
     ["finality"]: "HasArtifactTrait(finality)",
     ["firestarter.remains"]: "target.TimeToHealthPercent(90)",
@@ -320,6 +321,7 @@ interface Modifiers {
     travel_speed?: ParseNode,
     type?: ParseNode,
     use_off_gcd?: ParseNode,
+    use_while_casting?: ParseNode,
     value?: ParseNode,
     value_else?: ParseNode,
     wait?: ParseNode,
@@ -432,6 +434,7 @@ const MODIFIER_KEYWORD: TypeCheck<Modifiers> = {
     ["travel_speed"]: true,
     ["type"]: true,
     ["use_off_gcd"]: true,
+    ["use_while_casting"]: true,
     ["value"]: true,
     ["value_else"]: true,
     ["wait"]: true,
@@ -2272,6 +2275,13 @@ function EmitVariableAdd(name: string, nodeList: LuaArray<AstNode>, annotation: 
     EmitNamedVariable(name, nodeList, annotation, modifiers, parseNode, action);
 }
 
+function EmitVariableSub(name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifiers: Modifiers, parseNode: ParseNode, action: string) {
+    // TODO
+    let valueNode = annotation.variable[name];
+    if (valueNode) return;
+    EmitNamedVariable(name, nodeList, annotation, modifiers, parseNode, action);
+}
+
 function EmitVariableIf(name: string, nodeList: LuaArray<AstNode>, annotation: Annotation, modifiers: Modifiers, parseNode: ParseNode, action: string) {
     let node = annotation.variable[name];
     let group: AstNode;
@@ -2322,6 +2332,8 @@ function EmitVariable(nodeList: LuaArray<AstNode>, annotation: Annotation, modif
         EmitNamedVariable(name, nodeList, annotation, modifier, parseNode, action, conditionNode);
     } else if (op === "setif") {
         EmitVariableIf(name, nodeList, annotation, modifier, parseNode, action);
+    } else if (op === "sub") {
+        EmitVariableSub(name, nodeList, annotation, modifier, parseNode, action);
     } else if (op === "reset") {
         // TODO need to refactor code to allow this kind of thing
     } else {
@@ -3043,6 +3055,8 @@ EmitOperandAction = function (operand, parseNode, nodeList, annotation, action, 
             code = format("%s%sPresent(%s)", target, prefix, buffName);
             symbol = buffName;
         }
+    } else if (property == "ap_check") {
+        code = format("AstralPower() >= AstralPowerCost(%s)", name)
     } else if (property == "cast_regen") {
         code = format("FocusCastingRegen(%s)", name);
     } else if (property == "cast_time") {
@@ -3071,14 +3085,18 @@ EmitOperandAction = function (operand, parseNode, nodeList, annotation, action, 
             code = format("TalentPoints(%s)", talentName);
         }
         symbol = talentName;
-    } else if (property == "execute_time") {
+    } else if (property == "execute_time" || property == "execute_remains") {
         code = format("ExecuteTime(%s)", name);
+    } else if (property == "executing") {
+        code = format("ExecuteTime(%s) > 0", name);
     } else if (property == "gcd") {
         code = "GCD()";
     } else if (property == "hit_damage") {
         code = format("%sDamage(%s)", target, name);
     } else if (property == "in_flight" || property == "in_flight_to_target") {
         code = format("InFlightToTarget(%s)", name);
+    } else if (property == "in_flight_remains") {
+        code = "0";
     } else if (property == "miss_react") {
         code = "True(miss_react)";
     } else if (property == "persistent_multiplier" || property == "pmultiplier") {
@@ -3886,6 +3904,10 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
     } else if (className == "DRUID" && operand == "max_fb_energy") {
         let spellName = "ferocious_bite";
         code = format("EnergyCost(%s max=1)", spellName);
+        AddSymbol(annotation, spellName);
+    } else if (className == "DRUID" && operand == "solar_wrath.ap_check") {
+        let spellName = "solar_wrath";
+        code = format("AstralPower() >= AstralPowerCost(%s)", spellName);
         AddSymbol(annotation, spellName);
     } else if (className == "HUNTER" && operand == "buff.careful_aim.up") {
         code = "target.HealthPercent() > 80 or BuffPresent(rapid_fire_buff)";

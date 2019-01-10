@@ -214,6 +214,7 @@ local CHARACTER_PROPERTY = {
     ["energy.max"] = "MaxEnergy()",
     ["energy.regen"] = "EnergyRegenRate()",
     ["energy.time_to_max"] = "TimeToMaxEnergy()",
+    ["expected_combat_length"] = "600",
     ["feral_spirit.remains"] = "TotemRemaining(sprit_wolf)",
     ["finality"] = "HasArtifactTrait(finality)",
     ["firestarter.remains"] = "target.TimeToHealthPercent(90)",
@@ -330,6 +331,7 @@ local MODIFIER_KEYWORD = {
     ["travel_speed"] = true,
     ["type"] = true,
     ["use_off_gcd"] = true,
+    ["use_while_casting"] = true,
     ["value"] = true,
     ["value_else"] = true,
     ["wait"] = true,
@@ -2094,6 +2096,13 @@ local function EmitVariableAdd(name, nodeList, annotation, modifiers, parseNode,
     end
     EmitNamedVariable(name, nodeList, annotation, modifiers, parseNode, action)
 end
+local function EmitVariableSub(name, nodeList, annotation, modifiers, parseNode, action)
+    local valueNode = annotation.variable[name]
+    if valueNode then
+        return 
+    end
+    EmitNamedVariable(name, nodeList, annotation, modifiers, parseNode, action)
+end
 local function EmitVariableIf(name, nodeList, annotation, modifiers, parseNode, action)
     local node = annotation.variable[name]
     local group
@@ -2140,6 +2149,8 @@ local function EmitVariable(nodeList, annotation, modifier, parseNode, action, c
         EmitNamedVariable(name, nodeList, annotation, modifier, parseNode, action, conditionNode)
     elseif op == "setif" then
         EmitVariableIf(name, nodeList, annotation, modifier, parseNode, action)
+    elseif op == "sub" then
+        EmitVariableSub(name, nodeList, annotation, modifier, parseNode, action)
     elseif op == "reset" then
     else
         __exports.OvaleSimulationCraft:Error("Unknown variable operator '%s'.", op)
@@ -2857,6 +2868,8 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
             code = format("%s%sPresent(%s)", target, prefix, buffName)
             symbol = buffName
         end
+    elseif property == "ap_check" then
+        code = format("AstralPower() >= AstralPowerCost(%s)", name)
     elseif property == "cast_regen" then
         code = format("FocusCastingRegen(%s)", name)
     elseif property == "cast_time" then
@@ -2885,14 +2898,18 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
             code = format("TalentPoints(%s)", talentName)
         end
         symbol = talentName
-    elseif property == "execute_time" then
+    elseif property == "execute_time" or property == "execute_remains" then
         code = format("ExecuteTime(%s)", name)
+    elseif property == "executing" then
+        code = format("ExecuteTime(%s) > 0", name)
     elseif property == "gcd" then
         code = "GCD()"
     elseif property == "hit_damage" then
         code = format("%sDamage(%s)", target, name)
     elseif property == "in_flight" or property == "in_flight_to_target" then
         code = format("InFlightToTarget(%s)", name)
+    elseif property == "in_flight_remains" then
+        code = "0"
     elseif property == "miss_react" then
         code = "True(miss_react)"
     elseif property == "persistent_multiplier" or property == "pmultiplier" then
@@ -3712,6 +3729,10 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
     elseif className == "DRUID" and operand == "max_fb_energy" then
         local spellName = "ferocious_bite"
         code = format("EnergyCost(%s max=1)", spellName)
+        AddSymbol(annotation, spellName)
+    elseif className == "DRUID" and operand == "solar_wrath.ap_check" then
+        local spellName = "solar_wrath"
+        code = format("AstralPower() >= AstralPowerCost(%s)", spellName)
         AddSymbol(annotation, spellName)
     elseif className == "HUNTER" and operand == "buff.careful_aim.up" then
         code = "target.HealthPercent() > 80 or BuffPresent(rapid_fire_buff)"

@@ -5,7 +5,7 @@ import { OvaleScripts } from "../Scripts";
 
 {
 	const name = "sc_pr_warrior_arms"
-	const desc = "[8.0] Simulationcraft: PR_Warrior_Arms"
+	const desc = "[8.1] Simulationcraft: PR_Warrior_Arms"
 	const code = `
 # Based on SimulationCraft profile "PR_Warrior_Arms".
 #	class=warrior
@@ -573,7 +573,7 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 
 {
 	const name = "sc_pr_warrior_fury"
-	const desc = "[8.0] Simulationcraft: PR_Warrior_Fury"
+	const desc = "[8.1] Simulationcraft: PR_Warrior_Fury"
 	const code = `
 # Based on SimulationCraft profile "PR_Warrior_Fury".
 #	class=warrior
