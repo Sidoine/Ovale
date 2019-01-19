@@ -280,8 +280,8 @@ Define(a_murder_of_crows_debuff 131894)
 
 	SpellInfo(aimed_shot focus=30 cd=12 charges=2 cd_haste=ranged unusable=1)
 	SpellRequire(aimed_shot unusable 0=focus,30)
-	SpellRequire(aimed_shot focus_percent 0=buff,lock_and_load_buff talent=lock_and_load_talent)
-	SpellAddBuff(aimed_shot lock_and_load_buff=-1 talent=lock_and_load_talent)
+	# SpellRequire(aimed_shot focus_percent 0=buff,lock_and_load_buff talent=lock_and_load_talent)
+	# SpellAddBuff(aimed_shot lock_and_load_buff=-1 talent=lock_and_load_talent)
 	SpellAddBuff(aimed_shot precise_shots_buff=1)
 	SpellAddBuff(aimed_shot double_tap_buff=-1)
 	SpellAddBuff(aimed_shot trick_shots_buff=-1)
@@ -414,7 +414,7 @@ Define(kill_command_sv 259489)
 
 	SpellInfo(lethal_shots_buff duration=15)
 
-	SpellInfo(lock_and_load_buff duration=15)
+	# SpellInfo(lock_and_load_buff duration=15)
 
     SpellInfo(master_marksman_buff duration=12)
 Define(mend_pet 136)
