@@ -87,7 +87,7 @@ AddFunction BalancePrecombatCdActions
  {
   #snapshot_stats
   #potion
-  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(rising_death usable=1)
+  # if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(rising_death usable=1)
  }
 }
 

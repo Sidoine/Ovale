@@ -60,7 +60,7 @@ local function HasTalent(talentId)
     if OvaleSpellBook:IsKnownTalent(talentId) then
         return OvaleSpellBook:GetTalentPoints(talentId) > 0
     else
-        __exports.OvaleCompile:Error("Unknown talent ID '%s'", talentId)
+        -- __exports.OvaleCompile:Error("Unknown talent ID '%s'", talentId)
         return false
     end
 end

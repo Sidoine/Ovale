@@ -2622,6 +2622,26 @@ local function PartyMembersWithHealthPercent(positionalParams, namedParams, atTi
     OvaleCondition:RegisterCondition("partymemberswithhealthpercent", false, PartyMembersWithHealthPercent)
 end
 do
+local function PartyMemberWithLowestHealth(positionalParams, namedParams, atTime)
+        local countComparator, countLimit = positionalParams[1], positionalParams[2]
+		local value = 0
+		local prevHealth = 100
+		for num, uid in pairs(OvaleData.PARTY_UIDS) do
+			local health = OvaleHealth:UnitHealth(uid) or 0
+			if health > 0 then
+				local maxHealth = OvaleHealth:UnitHealthMax(uid) or 1
+				local healthPercent = health / maxHealth * 100
+				if healthPercent < prevHealth then
+					prevHealth = healthPercent
+					value = num
+				end
+			end
+		end
+        return Compare(value, countComparator, countLimit)
+    end
+    OvaleCondition:RegisterCondition("partymemberwithlowesthealth", false, PartyMemberWithLowestHealth)
+end
+do
 local function PartyMembersInRange(positionalParams, namedParams, atTime)
         local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
 		local value = 0
