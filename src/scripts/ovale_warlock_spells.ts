@@ -100,6 +100,12 @@ Define(drain_soul 198590)
   SpellInfo(drain_soul duration=5 channel=5 tick=1 talent=drain_soul_talent)
   # Suffering w1 Shadow damage every t1 seconds.
   SpellAddTargetDebuff(drain_soul drain_soul=1)
+Define(explosive_potential 275398)
+# When your Implosion consumes 3 or more Imps, gain s1 Haste for 15 seconds.
+  SpellInfo(explosive_potential duration=15 channel=15 gcd=0 offgcd=1)
+  # Haste increased by w1.
+  SpellAddBuff(explosive_potential explosive_potential=1)
+
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. 
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
@@ -290,6 +296,7 @@ Define(writhe_in_agony_talent 4) #22044
 Define(wilfreds_sigil_of_superior_summoning_item 132369)
 Define(cascading_calamity_trait 275372)
 Define(pandemic_invocation_trait 289364)
+Define(explosive_potential_trait 275395)
     `;
 // END
     code += `

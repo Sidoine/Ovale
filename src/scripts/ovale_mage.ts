@@ -29,7 +29,7 @@ AddFunction total_burns
 
 AddFunction conserve_mana
 {
- 60
+ 60 + 20 * HasAzeriteTrait(equipoise_trait)
 }
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=arcane)
@@ -84,7 +84,7 @@ AddFunction ArcanePrecombatCdActions
 {
  unless Spell(arcane_intellect) or Spell(arcane_familiar)
  {
-  #variable,name=conserve_mana,op=set,value=60
+  #variable,name=conserve_mana,op=set,value=60+20*azerite.equipoise.enabled
   #snapshot_stats
   #mirror_image
   Spell(mirror_image)
@@ -102,8 +102,6 @@ AddFunction ArcanePrecombatCdPostConditions
 
 AddFunction ArcaneMovementMainActions
 {
- #shimmer,if=movement.distance>=10
- if target.Distance() >= 10 Spell(shimmer)
  #arcane_missiles
  Spell(arcane_missiles)
  #supernova
@@ -116,24 +114,21 @@ AddFunction ArcaneMovementMainPostConditions
 
 AddFunction ArcaneMovementShortCdActions
 {
- unless target.Distance() >= 10 and Spell(shimmer)
- {
-  #blink,if=movement.distance>=10
-  if target.Distance() >= 10 and CheckBoxOn(opt_blink) Spell(blink)
-  #presence_of_mind
-  Spell(presence_of_mind)
+ #blink,if=movement.distance>=10
+ if target.Distance() >= 10 and CheckBoxOn(opt_blink) Spell(blink)
+ #presence_of_mind
+ Spell(presence_of_mind)
 
-  unless Spell(arcane_missiles)
-  {
-   #arcane_orb
-   Spell(arcane_orb)
-  }
+ unless Spell(arcane_missiles)
+ {
+  #arcane_orb
+  Spell(arcane_orb)
  }
 }
 
 AddFunction ArcaneMovementShortCdPostConditions
 {
- target.Distance() >= 10 and Spell(shimmer) or Spell(arcane_missiles) or Spell(supernova)
+ Spell(arcane_missiles) or Spell(supernova)
 }
 
 AddFunction ArcaneMovementCdActions
@@ -142,7 +137,7 @@ AddFunction ArcaneMovementCdActions
 
 AddFunction ArcaneMovementCdPostConditions
 {
- target.Distance() >= 10 and Spell(shimmer) or target.Distance() >= 10 and CheckBoxOn(opt_blink) and Spell(blink) or Spell(presence_of_mind) or Spell(arcane_missiles) or Spell(arcane_orb) or Spell(supernova)
+ target.Distance() >= 10 and CheckBoxOn(opt_blink) and Spell(blink) or Spell(presence_of_mind) or Spell(arcane_missiles) or Spell(arcane_orb) or Spell(supernova)
 }
 
 ### actions.conserve
@@ -198,6 +193,12 @@ AddFunction ArcaneConserveCdActions
 {
  #mirror_image
  Spell(mirror_image)
+
+ unless ArcaneCharges() == 0 and Spell(charged_up) or { target.Refreshable(nether_tempest_debuff) or not target.DebuffPresent(nether_tempest_debuff) } and ArcaneCharges() == MaxArcaneCharges() and BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and Spell(nether_tempest) or ArcaneCharges() <= 2 and { SpellCooldown(arcane_power) > 10 or Enemies() <= 2 } and Spell(arcane_orb) or DebuffPresent(rule_of_threes) and ArcaneCharges() > 3 and Mana() > ManaCost(arcane_blast) and Spell(arcane_blast)
+ {
+  #use_item,name=tidestorm_codex,if=buff.rune_of_power.down&!buff.arcane_power.react&cooldown.arcane_power.remains>20
+  if BuffExpires(rune_of_power_buff) and not BuffPresent(arcane_power_buff) and SpellCooldown(arcane_power) > 20 ArcaneUseItemActions()
+ }
 }
 
 AddFunction ArcaneConserveCdPostConditions
@@ -488,6 +489,7 @@ AddIcon checkbox=opt_mage_arcane_aoe help=cd specialization=arcane
 # charged_up_talent
 # clearcasting
 # counterspell
+# equipoise_trait
 # evocation
 # fireblood
 # lights_judgment
@@ -502,7 +504,6 @@ AddIcon checkbox=opt_mage_arcane_aoe help=cd specialization=arcane
 # rule_of_threes
 # rune_of_power
 # rune_of_power_buff
-# shimmer
 # supernova
 `
 	OvaleScripts.RegisterScript("MAGE", "arcane", name, desc, code, "script")
@@ -651,6 +652,12 @@ AddFunction FireStandardrotationCdActions
  {
   #call_action_list,name=active_talents
   FireActivetalentsCdActions()
+
+  unless FireActivetalentsCdPostConditions() or Enemies() > 1 and target.Distance(less 12) and Spell(dragons_breath)
+  {
+   #use_item,name=tidestorm_codex,if=cooldown.combustion.remains>20|talent.firestarter.enabled&firestarter.remains>20
+   if SpellCooldown(combustion) > 20 or Talent(firestarter_talent) and target.TimeToHealthPercent(90) > 20 FireUseItemActions()
+  }
  }
 }
 
@@ -1377,10 +1384,16 @@ AddFunction FrostSingleShortCdPostConditions
 
 AddFunction FrostSingleCdActions
 {
- unless SpellCooldown(ice_nova) == 0 and target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or Talent(ebonbolt_talent) and PreviousGCDSpell(ebonbolt) and { not Talent(glacial_spike_talent) or BuffStacks(icicles_buff) < 4 or BuffPresent(brain_freeze_buff) } and Spell(flurry) or Talent(glacial_spike_talent) and PreviousGCDSpell(glacial_spike) and BuffPresent(brain_freeze_buff) and Spell(flurry) or PreviousGCDSpell(frostbolt) and BuffPresent(brain_freeze_buff) and { not Talent(glacial_spike_talent) or BuffStacks(icicles_buff) < 4 } and Spell(flurry) or Spell(frozen_orb) or { Enemies() > 2 or Enemies() > 1 and CastTime(blizzard) == 0 and BuffStacks(fingers_of_frost_buff) < 2 } and Spell(blizzard) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or Spell(comet_storm) or Spell(ebonbolt) or not InFlightToTarget(frozen_orb) and not DebuffRemaining(frozen_orb_debuff) > 0 and Spell(ray_of_frost) or { CastTime(blizzard) == 0 or Enemies() > 1 } and Spell(blizzard) or { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) or Enemies() > 1 and Talent(splitting_ice_talent) } and Spell(glacial_spike) or Spell(ice_nova) or Spell(frostbolt)
+ unless SpellCooldown(ice_nova) == 0 and target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or Talent(ebonbolt_talent) and PreviousGCDSpell(ebonbolt) and { not Talent(glacial_spike_talent) or BuffStacks(icicles_buff) < 4 or BuffPresent(brain_freeze_buff) } and Spell(flurry) or Talent(glacial_spike_talent) and PreviousGCDSpell(glacial_spike) and BuffPresent(brain_freeze_buff) and Spell(flurry) or PreviousGCDSpell(frostbolt) and BuffPresent(brain_freeze_buff) and { not Talent(glacial_spike_talent) or BuffStacks(icicles_buff) < 4 } and Spell(flurry) or Spell(frozen_orb) or { Enemies() > 2 or Enemies() > 1 and CastTime(blizzard) == 0 and BuffStacks(fingers_of_frost_buff) < 2 } and Spell(blizzard) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or Spell(comet_storm) or Spell(ebonbolt) or not InFlightToTarget(frozen_orb) and not DebuffRemaining(frozen_orb_debuff) > 0 and Spell(ray_of_frost) or { CastTime(blizzard) == 0 or Enemies() > 1 } and Spell(blizzard) or { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) or Enemies() > 1 and Talent(splitting_ice_talent) } and Spell(glacial_spike) or Spell(ice_nova)
  {
-  #call_action_list,name=movement
-  FrostMovementCdActions()
+  #use_item,name=tidestorm_codex,if=buff.icy_veins.down&buff.rune_of_power.down
+  if BuffExpires(icy_veins_buff) and BuffExpires(rune_of_power_buff) FrostUseItemActions()
+
+  unless Spell(frostbolt)
+  {
+   #call_action_list,name=movement
+   FrostMovementCdActions()
+  }
  }
 }
 
@@ -1597,10 +1610,16 @@ AddFunction FrostAoeShortCdPostConditions
 
 AddFunction FrostAoeCdActions
 {
- unless Spell(frozen_orb) or Spell(blizzard) or Spell(comet_storm) or Spell(ice_nova) or { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(frostbolt) and { BuffStacks(icicles_buff) < 4 or not Talent(glacial_spike_talent) } or PreviousGCDSpell(glacial_spike) } } and Spell(flurry) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or Spell(ray_of_frost) or Spell(ebonbolt) or Spell(glacial_spike) or Spell(cone_of_cold) or Spell(frostbolt)
+ unless Spell(frozen_orb) or Spell(blizzard) or Spell(comet_storm) or Spell(ice_nova) or { PreviousGCDSpell(ebonbolt) or BuffPresent(brain_freeze_buff) and { PreviousGCDSpell(frostbolt) and { BuffStacks(icicles_buff) < 4 or not Talent(glacial_spike_talent) } or PreviousGCDSpell(glacial_spike) } } and Spell(flurry) or BuffPresent(fingers_of_frost_buff) and Spell(ice_lance) or Spell(ray_of_frost) or Spell(ebonbolt) or Spell(glacial_spike) or Spell(cone_of_cold)
  {
-  #call_action_list,name=movement
-  FrostMovementCdActions()
+  #use_item,name=tidestorm_codex,if=buff.icy_veins.down&buff.rune_of_power.down
+  if BuffExpires(icy_veins_buff) and BuffExpires(rune_of_power_buff) FrostUseItemActions()
+
+  unless Spell(frostbolt)
+  {
+   #call_action_list,name=movement
+   FrostMovementCdActions()
+  }
  }
 }
 
@@ -1778,6 +1797,7 @@ AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 # ice_nova
 # icicles_buff
 # icy_veins
+# icy_veins_buff
 # lights_judgment
 # mirror_image
 # quaking_palm
@@ -1785,6 +1805,7 @@ AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 # ray_of_frost_talent
 # rising_death
 # rune_of_power
+# rune_of_power_buff
 # rune_of_power_talent
 # splitting_ice_talent
 # summon_water_elemental

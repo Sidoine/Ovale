@@ -35,10 +35,6 @@ Define(blinding_light 115750)
 # Emits dazzling light in all directions, blinding enemies within 105421A1 yards, causing them to wander disoriented for 105421d. Non-Holy damage will break the disorient effect.
   SpellInfo(blinding_light cd=90 duration=6 talent=blinding_light_talent)
   SpellAddBuff(blinding_light blinding_light=1)
-Define(bursting_blood 251316)
-# Imbues your blood with heat for 25 seconds, giving your melee attacks a chance to create a burst of blood, dealing 265514s1 Physical damage split evenly amongst all nearby enemies.
-  SpellInfo(bursting_blood duration=25 channel=25 gcd=0 offgcd=1)
-
 Define(consecration 26573)
 # Consecrates the land beneath you, causing 81297s1*9 Holy damage over 12 seconds to enemies who enter the area. Limit s2.
   SpellInfo(consecration cd=4.5 duration=12 tick=1)

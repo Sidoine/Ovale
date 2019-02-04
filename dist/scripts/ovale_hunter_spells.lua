@@ -121,6 +121,12 @@ Define(hunters_mark 257284)
   SpellInfo(hunters_mark talent=hunters_mark_talent)
   # Damage taken from the Hunter increased by s1.rnrnCan always be seen and tracked by the Hunter.
   SpellAddTargetDebuff(hunters_mark hunters_mark=1)
+Define(in_the_rhythm 272733)
+# When Rapid Fire finishes fully channeling, your Haste is increased by s1 for 8 seconds.
+  SpellInfo(in_the_rhythm duration=8 gcd=0 offgcd=1)
+  # Haste increased by w1.
+  SpellAddBuff(in_the_rhythm in_the_rhythm=1)
+
 Define(kill_command 34026)
 # Give the command to kill, causing your pet to savagely deal <damage> Physical damage to the enemy.
 # Rank 2: Kill Command has a 259489s2 chance to immediately reset its cooldown.rnrnCoordinated Assault increases this chance by another 266779s4.
@@ -193,10 +199,6 @@ Define(trueshot 288613)
   SpellInfo(trueshot cd=120 duration=15)
   # The cooldown of Aimed Shot and Rapid Fire is reduced by m1/4, and Aimed Shot casts s4 faster.
   SpellAddBuff(trueshot trueshot=1)
-Define(unerring_vision_buff 274445)
-# While Trueshot is active you gain s1 Critical Strike rating every sec, stacking up to 10 times.
-  SpellInfo(unerring_vision_buff channel=-0.001 gcd=0 offgcd=1)
-
 Define(vipers_venom_buff 268552)
 # ?s259387[Mongoose Bite][Raptor Strike] has a chance to make your next Serpent Sting cost no Focus and deal an additional 268552s1 initial damage.
   SpellInfo(vipers_venom_buff duration=8 channel=8 gcd=0 offgcd=1)
@@ -264,7 +266,6 @@ Define(primal_instincts_trait 279806)
 Define(focused_fire_trait 278531)
 Define(in_the_rhythm_trait 264198)
 Define(surging_shots_trait 287707)
-Define(unerring_vision_trait 274444)
 Define(blur_of_talons_trait 277653)
 Define(latent_poison_trait 273283)
 Define(venomous_fangs_trait 274590)

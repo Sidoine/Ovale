@@ -210,11 +210,6 @@ Define(rune_of_power 116011)
 Define(scorch 2948)
 # Scorches an enemy for (17.7 of Spell Power) Fire damage. Castable while moving.
   SpellInfo(scorch)
-Define(shimmer 212653)
-# Teleports you A1 yards forward, unless something is in the way. Unaffected by the global cooldown and castable while casting.
-  SpellInfo(shimmer cd=0.5 charge_cd=20 duration=0.65 channel=0.65 gcd=0 offgcd=1 talent=shimmer_talent)
-  # Shimmering.
-  SpellAddBuff(shimmer shimmer=1)
 Define(summon_water_elemental 31687)
 # Summons a Water Elemental to follow and fight for you.
   SpellInfo(summon_water_elemental cd=30)
@@ -275,13 +270,12 @@ Define(rune_of_power_talent 9) #22447
 # Places a Rune of Power on the ground for 10 seconds which increases your spell damage by 116014s1 while you stand within 8 yds.
 Define(searing_touch_talent 3) #22462
 # Scorch deals s2 increased damage and is a guaranteed Critical Strike when the target is below s1 health.
-Define(shimmer_talent 5) #22443
-# Teleports you A1 yards forward, unless something is in the way. Unaffected by the global cooldown and castable while casting.
 Define(splitting_ice_talent 17) #23176
 # Your Ice Lance and Icicles now deal s3 increased damage, and hit a second nearby target for s2 of their damage.rnrnYour Ebonbolt and Glacial Spike also hit a second nearby target for s2 of its damage.
 Define(supernova_talent 12) #22470
 # Pulses arcane energy around the target enemy or ally, dealing (30 of Spell Power) Arcane damage to all enemies within A2 yards, and knocking them upward. A primary enemy target will take s1 increased damage.
 Define(arcane_pummeling_trait 270669)
+Define(equipoise_trait 286027)
 Define(blaster_master_trait 274596)
     `;
 // END

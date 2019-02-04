@@ -48,6 +48,8 @@ AddFunction ProtectionGetInMeleeRange
 
 AddFunction ProtectionPrecombatMainActions
 {
+ #consecration
+ Spell(consecration)
 }
 
 AddFunction ProtectionPrecombatMainPostConditions
@@ -60,6 +62,7 @@ AddFunction ProtectionPrecombatShortCdActions
 
 AddFunction ProtectionPrecombatShortCdPostConditions
 {
+ Spell(consecration)
 }
 
 AddFunction ProtectionPrecombatCdActions
@@ -69,13 +72,18 @@ AddFunction ProtectionPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(bursting_blood usable=1)
- #lights_judgment
- Spell(lights_judgment)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
+
+ unless Spell(consecration)
+ {
+  #lights_judgment
+  Spell(lights_judgment)
+ }
 }
 
 AddFunction ProtectionPrecombatCdPostConditions
 {
+ Spell(consecration)
 }
 
 ### actions.cooldowns
@@ -110,7 +118,7 @@ AddFunction ProtectionCooldownsCdActions
   #bastion_of_light,if=cooldown.shield_of_the_righteous.charges_fractional<=0.5
   if SpellCharges(shield_of_the_righteous count=0) <= 0.5 Spell(bastion_of_light)
   #potion,if=buff.avenging_wrath.up
-  if BuffPresent(avenging_wrath_buff) and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(bursting_blood usable=1)
+  if BuffPresent(avenging_wrath_buff) and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
   #use_items,if=buff.seraphim.up|!talent.seraphim.enabled
   if BuffPresent(seraphim_buff) or not Talent(seraphim_talent) ProtectionUseItemActions()
   #use_item,name=merekthas_fang,if=!buff.avenging_wrath.up&(buff.seraphim.up|!talent.seraphim.enabled)
@@ -148,7 +156,7 @@ AddFunction ProtectionDefaultMainActions
   if not SpellCooldown(avengers_shield) > 0 Spell(avengers_shield)
   #judgment,if=cooldown_react|!talent.crusaders_judgment.enabled
   if not SpellCooldown(judgment_protection) > 0 or not Talent(crusaders_judgment_talent) Spell(judgment_protection)
-  #blessed_hammer,strikes=2
+  #blessed_hammer,strikes=3
   Spell(blessed_hammer)
   #hammer_of_the_righteous
   Spell(hammer_of_the_righteous)
@@ -263,9 +271,9 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 # avenging_wrath
 # avenging_wrath_buff
 # bastion_of_light
+# battle_potion_of_strength
 # blessed_hammer
 # blinding_light
-# bursting_blood
 # consecration
 # crusaders_judgment_talent
 # fireblood
@@ -556,8 +564,8 @@ AddFunction RetributionCooldownsCdActions
 {
  #use_item,name=jes_howler,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10
  if BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) and BuffStacks(crusade_buff) == 10 RetributionUseItemActions()
- #potion,if=(buff.bloodlust.react|buff.avenging_wrath.up|buff.crusade.up&buff.crusade.remains<25|target.time_to_die<=40)
- if { BuffPresent(burst_haste_buff any=1) or BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) and BuffRemaining(crusade_buff) < 25 or target.TimeToDie() <= 40 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
+ #potion,if=buff.bloodlust.react|buff.avenging_wrath.up|buff.crusade.up&buff.crusade.remains<25
+ if { BuffPresent(burst_haste_buff any=1) or BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) and BuffRemaining(crusade_buff) < 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
  #lights_judgment,if=spell_targets.lights_judgment>=2|(!raid_event.adds.exists|raid_event.adds.in>75)
  if Enemies() >= 2 or not False(raid_event_adds_exists) or 600 > 75 Spell(lights_judgment)
  #fireblood,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10

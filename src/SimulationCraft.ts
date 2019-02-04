@@ -3923,6 +3923,9 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
         // we calculate the extension we got for trueshot (from talents), the last time we cast it
         // does the simulator even have this information?
         code = "0"
+    } else if (className == "HUNTER" && operand == "ca_execute") {
+        code = "Talent(careful_aim_talent) and (target.HealthPercent() > 80 or target.HealthPercent() < 20)";
+        AddSymbol(annotation, "careful_aim_talent")
     } else if (className == "MAGE" && operand == "buff.rune_of_power.remains") {
         code = "TotemRemaining(rune_of_power)";
     } else if (className == "MAGE" && operand == "buff.shatterlance.up") {

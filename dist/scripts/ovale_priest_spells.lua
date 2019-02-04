@@ -100,9 +100,6 @@ Define(shadow_word_pain 589)
   SpellInfo(shadow_word_pain duration=16 insanity=-400 tick=2)
   # Suffering w2 Shadow damage every t2 sec.
   SpellAddTargetDebuff(shadow_word_pain shadow_word_pain=1)
-Define(shadow_word_void 205351)
-# Blasts the target with a word of void for (130 of Spell Power) Shadow damage.?a185916[rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r][]
-  SpellInfo(shadow_word_void cd=9 insanity=-1500 talent=shadow_word_void_talent)
 Define(shadowform 232698)
 # Assume a Shadowform, increasing your spell damage dealt by s1.
   SpellInfo(shadowform)
@@ -172,14 +169,15 @@ Define(shadow_crash_talent 15) #21755
 # Hurl a bolt of slow-moving Shadow energy at the destination, dealing (125 of Spell Power) Shadow damage to all targets within 205386A1 yards.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r
 Define(shadow_word_death_talent 14) #22311
 # A word of dark binding that inflicts (187.5 of Spell Power) Shadow damage to the target. Only usable on enemies that have less than s2 health.rnrn|cFFFFFFFFGenerates s3 Insanity, or s4 Insanity if the target dies.|r
-Define(shadow_word_void_talent 3) #22314
-# Blasts the target with a word of void for (130 of Spell Power) Shadow damage.?a185916[rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r][]
 Define(surrender_to_madness_talent 21) #21979
 # All your Insanity-generating abilities generate s1 more Insanity and you can cast while moving for 60 seconds.rnrnThen, you take damage equal to s3 of your maximum health and cannot generate Insanity for 15 seconds.
 Define(void_torrent_talent 18) #21720
 # Channel a torrent of void energy into the target, dealing o Shadow damage over 4 seconds.rnrnInsanity does not drain during this channel.rnrn|cFFFFFFFFGenerates 289577s1*289577s2/100 Insanity over the duration.|r
+Define(death_throes_trait 278659)
 Define(searing_dialogue_trait 272788)
+Define(spiteful_apparitions_trait 277682)
 Define(thought_harvester_trait 288340)
+Define(whispers_of_the_damned_trait 275722)
     ]]
     code = code .. [[
 # Priest spells and functions.
