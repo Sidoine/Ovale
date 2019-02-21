@@ -547,6 +547,7 @@ Define(warpaint_talent 12)
 
 # Azerite Traits
 Define(executioners_precision_trait 272866)
+Define(cold_steel_hot_blood_trait 288080)
 
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(heroic_throw tag=main)

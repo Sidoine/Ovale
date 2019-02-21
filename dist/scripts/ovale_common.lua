@@ -285,6 +285,13 @@ AddFunction Boss
 	IsBossFight() or target.Classification(worldboss) or target.Classification(rareelite) or BuffPresent(burst_haste_buff any=1) or { target.IsPvP() and not target.IsFriend() } or { target.Level() >= Level() and { target.Classification(elite) and PartyMemberCount() < 5 or target.Classification(rare) } }
 }
 
+Define(ghost_debuff 8326)
+AddFunction Dead
+{
+	if DebuffPresent(ghost_debuff) 1
+	0
+}
+
 # Party checks
 AddFunction PartyMemberCount
 {
