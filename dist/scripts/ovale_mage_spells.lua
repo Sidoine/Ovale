@@ -74,10 +74,6 @@ Define(charged_up 205032)
 # Immediately grants s1 Arcane Charges.
   SpellInfo(charged_up cd=40 duration=10 arcanecharges=-4 talent=charged_up_talent)
   SpellAddBuff(charged_up charged_up=1)
-Define(clearcasting 79684)
-# For each c*100/s1 mana you spend, you have a 1 chance to gain Clearcasting, making your next Arcane Missiles or Arcane Explosion free and channel 277726s1 faster.
-  SpellInfo(clearcasting channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(clearcasting clearcasting=1)
 Define(combustion 190319)
 # Engulfs you in flames for 10 seconds, increasing your spells' critical strike chance by s1 and granting you Mastery equal to s3 your Critical Strike stat. Castable while casting other spells.
   SpellInfo(combustion cd=120 duration=10 gcd=0 offgcd=1 tick=0.5)
@@ -288,7 +284,6 @@ Define(arcane_affinity 166871)
 	SpellInfo(arcane_affinity duration=15)
 
 	SpellAddBuff(arcane_blast presence_of_mind_buff=-1 if_spell=presence_of_mind)
-	SpellAddBuff(arcane_blast profound_magic_buff=0 itemset=T16_caster itemcount=2 specialization=arcane)
 	SpellAddBuff(arcane_blast ice_floes_buff=0 if_spell=ice_floes)
 Define(arcane_brilliance 1459)
 	SpellAddBuff(arcane_brilliance arcane_brilliance_buff=1)
@@ -298,17 +293,8 @@ Define(arcane_charge 114664)
 Define(arcane_charge_debuff 36032)
 	SpellInfo(arcane_charge_debuff duration=15 max_stacks=4)
 
-	
-Define(arcane_instability_buff 166872)
-	SpellInfo(arcane_instability_buff duration=15)
-
-	SpellInfo(arcane_missiles duration=2 travel_time=1 arcanecharges=-1)
-	SpellRequire(arcane_missiles unusable 1=buff,!arcane_missiles_buff)
-	SpellAddBuff(arcane_missiles arcane_instability_buff=0 itemset=T17 itemcount=4 specialization=arcane)
-	SpellAddBuff(arcane_missiles arcane_missiles_buff=-1)
-	SpellAddBuff(arcane_missiles arcane_power_buff=extend,2 if_spell=overpowered)
-Define(arcane_missiles_buff 79683)
-	SpellInfo(arcane_missiles_buff duration=20 max_stacks=3)
+    SpellAddBuff(arcane_explosion clearcasting_buff=-1)
+    SpellAddBuff(arcane_missiles clearcasting_buff=-1)
 
 	SpellInfo(arcane_orb cd=15)
 
@@ -331,6 +317,8 @@ Define(brain_freeze_buff 190446)
 	SpellInfo(charged_up arcanecharges=-4)
 Define(cinderstorm 198929)
 	SpellInfo(cinderstorm cd=9)
+Define(clearcasting_buff 276743)
+    SpellInfo(clearcasting_buff duration=15 max_stacks=3)
 Define(cold_snap 11958)
 	SpellInfo(cold_snap cd=180 gcd=0 offgcd=1)
 
@@ -522,61 +510,32 @@ Define(water_elemental_water_jet 135029)
 	SpellInfo(water_elemental_water_jet cd=25 gcd=0 shared_cd=water_elemental_fingers_of_frost)
 	SpellInfo(water_elemental_water_jet unusable=1 talent=lonely_winter_talent)
 	SpellAddBuff(water_elemental_water_jet brain_freeze_buff=1 itemset=T18 itemcount=2)
-	SpellAddTargetDebuff(water_elemental_water_jet water_elemental_water_jet_debuff=1)
 Define(water_elemental_water_jet_debuff 135029)
 	SpellInfo(water_elemental_water_jet_debuff duration=4)
 	SpellInfo(water_elemental_water_jet_debuff add_duration=10 itemset=T18 itemcount=4)
 Define(winters_chill_debuff 157997) # TODO ???
 
 # Talents
-
-
-
-
-
 Define(blazing_soul_talent 4)
 Define(bone_chilling_talent 1)
 Define(chain_reaction_talent 11)
-
 Define(chrono_shift_talent 13)
-
 Define(conflagration_talent 17)
-
-
 Define(flame_on_talent 10)
-
-
 Define(frenetic_speed_talent 13)
 Define(frigid_winds_talent 13)
 Define(frozen_touch_talent 10)
 Define(glacial_insulation_talent 4)
-
-
-
 Define(ice_ward_talent 14)
 Define(incanters_flow_talent 7)
-
-
 Define(lonely_winter_talent 2)
 Define(mana_shield_talent 4)
 Define(meteor_talent 21)
-
-
-
-
-
 Define(pyromaniac_talent 2)
-
-
 Define(reverberate_talent 16)
 Define(ring_of_frost_talent 15)
 Define(rule_of_threes_talent 2)
-
-
-
 Define(slipstream_talent 6)
-
-
 Define(thermal_void_talent 19)
 Define(time_anomaly_talent 20)
 Define(touch_of_the_magi_talent 17)
