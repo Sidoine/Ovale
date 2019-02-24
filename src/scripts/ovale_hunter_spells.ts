@@ -414,7 +414,7 @@ Define(kill_command_sv 259489)
 	SpellRequire(kill_command_sv cd_percent 0=target_debuff,pheromone_bomb_debuff)
 
 	SpellInfo(lethal_shots_buff duration=15)
-
+Define(lock_and_load_buff 194594)
 	SpellInfo(lock_and_load_buff duration=15)
 
     SpellInfo(master_marksman_buff duration=12)
