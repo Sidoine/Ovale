@@ -61,11 +61,6 @@ Define(execute_arms 163201)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. 
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
-Define(fujiedas_fury_buff 207776)
-# Bloodthirst increases all damage you deal and all healing you take by 207776s1 for 10 seconds, stacking up to 207776u times.
-  SpellInfo(fujiedas_fury_buff duration=10 max_stacks=4 gcd=0 offgcd=1)
-  # All damage done increased by s1.rnAll healing taken increased by s2.
-  SpellAddBuff(fujiedas_fury_buff fujiedas_fury_buff=1)
 Define(furious_slash 100130)
 # Aggressively strike with your off-hand weapon for s1*<mult> Physical damage, and increases your Haste by 202539s3 for 15 seconds, stacking up to 202539u times.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
   SpellInfo(furious_slash rage=-4 talent=furious_slash_talent)
@@ -203,9 +198,9 @@ Define(storm_bolt_talent_fury 6) #23093
 # Hurls your weapon at an enemy, causing s1 Physical damage and stunning for 4 seconds.
 Define(warbreaker_talent 14) #22391
 # Smash the ground and shatter the armor of all enemies within A1 yds, dealing s1 Physical damage and increasing damage you deal to them by 208086s1 for 10 seconds.
-Define(kazzalax_fujiedas_fury_item 137053)
 Define(seismic_wave_trait 277639)
 Define(test_of_might_trait 275529)
+Define(cold_steel_hot_blood_trait 288080)
     ]]
     code = code .. [[
 ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!shield_wall,buff,!shield_wall_buff)	

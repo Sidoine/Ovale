@@ -487,7 +487,7 @@ Define(pick_pocket 921)
 
 	SpellInfo(pistol_shot combopoints=-1 energy=40)
 	SpellAddBuff(pistol_shot opportunity_buff=-1)
-	SpellRequire(pistol_shot energy_percent 0=buff,opportunity_buff)
+	SpellRequire(pistol_shot energy_percent 50=buff,opportunity_buff)
 	SpellRequire(pistol_shot combopionts -2=buff,opportunity_buff talent=quick_draw_talent)
 
 	SpellInfo(poisoned_knife energy=40 combopoints=-1)

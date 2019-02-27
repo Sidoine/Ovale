@@ -242,6 +242,31 @@ AddFunction dots_up
  target.DebuffPresent(shadow_word_pain_debuff) and target.DebuffPresent(vampiric_touch_debuff)
 }
 
+AddFunction vt_mis_sd_check
+{
+ 1 - 0.014 * AzeriteTraitRank(searing_dialogue_trait)
+}
+
+AddFunction vt_mis_trait_ranks_check
+{
+ { 1 - 0.07 * AzeriteTraitRank(death_throes_trait) - 0.03 * AzeriteTraitRank(thought_harvester_trait) - 0.055 * AzeriteTraitRank(spiteful_apparitions_trait) } * { 1 - 0.04 * AzeriteTraitRank(thought_harvester_trait) * AzeriteTraitRank(searing_dialogue_trait) }
+}
+
+AddFunction vt_trait_ranks_check
+{
+ { 1 - 0.04 * AzeriteTraitRank(thought_harvester_trait) - 0.05 * AzeriteTraitRank(spiteful_apparitions_trait) } * { 1 + 0.15 * AzeriteTraitRank(searing_dialogue_trait) * Enemies() }
+}
+
+AddFunction swp_trait_ranks_check
+{
+ { 1 - 0.07 * AzeriteTraitRank(death_throes_trait) + 0.2 * AzeriteTraitRank(thought_harvester_trait) } * { 1 - 0.018 * AzeriteTraitRank(searing_dialogue_trait) * Enemies() } * { 1 - 0.14 * AzeriteTraitRank(thought_harvester_trait) * AzeriteTraitRank(searing_dialogue_trait) }
+}
+
+AddFunction mind_blast_targets
+{
+ { 4.5 + AzeriteTraitRank(whispers_of_the_damned_trait) } / { 1 + 0.4 * AzeriteTraitRank(searing_dialogue_trait) }
+}
+
 AddCheckBox(opt_interrupt L(interrupt) default specialization=shadow)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=shadow)
 
@@ -342,12 +367,17 @@ AddFunction ShadowSingleCdPostConditions
 
 AddFunction ShadowPrecombatMainActions
 {
+ #variable,name=mind_blast_targets,op=set,value=floor((4.5+azerite.whispers_of_the_damned.rank)%(1+0.4*azerite.searing_dialogue.rank))
+ #variable,name=swp_trait_ranks_check,op=set,value=(1-0.07*azerite.death_throes.rank+0.2*azerite.thought_harvester.rank)*(1-0.018*azerite.searing_dialogue.rank*spell_targets.mind_sear)*(1-0.14*azerite.thought_harvester.rank*azerite.searing_dialogue.rank)
+ #variable,name=vt_trait_ranks_check,op=set,value=(1-0.04*azerite.thought_harvester.rank-0.05*azerite.spiteful_apparitions.rank)*(1+0.15*azerite.searing_dialogue.rank*spell_targets.mind_sear)
+ #variable,name=vt_mis_trait_ranks_check,op=set,value=(1-0.07*azerite.death_throes.rank-0.03*azerite.thought_harvester.rank-0.055*azerite.spiteful_apparitions.rank)*(1-0.04*azerite.thought_harvester.rank*azerite.searing_dialogue.rank)
+ #variable,name=vt_mis_sd_check,op=set,value=1-0.014*azerite.searing_dialogue.rank
  #shadowform,if=!buff.shadowform.up
  if not BuffPresent(shadowform_buff) Spell(shadowform)
- #mind_blast
- Spell(mind_blast)
- #shadow_word_void
- Spell(shadow_word_void)
+ #mind_blast,if=spell_targets.mind_sear<2|azerite.thought_harvester.rank=0
+ if Enemies() < 2 or AzeriteTraitRank(thought_harvester_trait) == 0 Spell(mind_blast)
+ #vampiric_touch
+ Spell(vampiric_touch)
 }
 
 AddFunction ShadowPrecombatMainPostConditions
@@ -360,7 +390,7 @@ AddFunction ShadowPrecombatShortCdActions
 
 AddFunction ShadowPrecombatShortCdPostConditions
 {
- not BuffPresent(shadowform_buff) and Spell(shadowform) or Spell(mind_blast) or Spell(shadow_word_void)
+ not BuffPresent(shadowform_buff) and Spell(shadowform) or { Enemies() < 2 or AzeriteTraitRank(thought_harvester_trait) == 0 } and Spell(mind_blast) or Spell(vampiric_touch)
 }
 
 AddFunction ShadowPrecombatCdActions
@@ -375,7 +405,7 @@ AddFunction ShadowPrecombatCdActions
 
 AddFunction ShadowPrecombatCdPostConditions
 {
- not BuffPresent(shadowform_buff) and Spell(shadowform) or Spell(mind_blast) or Spell(shadow_word_void)
+ not BuffPresent(shadowform_buff) and Spell(shadowform) or { Enemies() < 2 or AzeriteTraitRank(thought_harvester_trait) == 0 } and Spell(mind_blast) or Spell(vampiric_touch)
 }
 
 ### actions.cleave
@@ -384,6 +414,8 @@ AddFunction ShadowCleaveMainActions
 {
  #void_eruption
  Spell(void_eruption)
+ #vampiric_touch,if=!ticking&azerite.thought_harvester.rank>=1
+ if not target.DebuffPresent(vampiric_touch_debuff) and AzeriteTraitRank(thought_harvester_trait) >= 1 Spell(vampiric_touch)
  #mind_sear,if=buff.harvested_thoughts.up
  if BuffPresent(harvested_thoughts_buff) Spell(mind_sear)
  #void_bolt
@@ -392,14 +424,14 @@ AddFunction ShadowCleaveMainActions
  if target.TimeToDie() < 3 or DebuffExpires(voidform_shadow) Spell(shadow_word_death)
  #mindbender
  Spell(mindbender_shadow)
- #mind_blast,target_if=(spell_targets.mind_sear<4&azerite.searing_dialogue.rank=0)|(spell_targets.mind_sear<3&azerite.searing_dialogue.rank=1)|(spell_targets.mind_sear<2&azerite.searing_dialogue.rank>=2)
- if Enemies() < 4 and AzeriteTraitRank(searing_dialogue_trait) == 0 or Enemies() < 3 and AzeriteTraitRank(searing_dialogue_trait) == 1 or Enemies() < 2 and AzeriteTraitRank(searing_dialogue_trait) >= 2 Spell(mind_blast)
- #shadow_word_pain,target_if=refreshable&target.time_to_die>4,if=!talent.misery.enabled&!talent.dark_void.enabled
- if target.Refreshable(shadow_word_pain_debuff) and target.TimeToDie() > 4 and not Talent(misery_talent) and not Talent(dark_void_talent) Spell(shadow_word_pain)
- #vampiric_touch,target_if=refreshable,if=(target.time_to_die>6)
- if target.Refreshable(vampiric_touch_debuff) and target.TimeToDie() > 6 Spell(vampiric_touch)
- #vampiric_touch,target_if=dot.shadow_word_pain.refreshable,if=(talent.misery.enabled&target.time_to_die>4)
- if target.DebuffRefreshable(shadow_word_pain_debuff) and Talent(misery_talent) and target.TimeToDie() > 4 Spell(vampiric_touch)
+ #mind_blast,target_if=spell_targets.mind_sear<variable.mind_blast_targets
+ if Enemies() < mind_blast_targets() Spell(mind_blast)
+ #shadow_word_pain,target_if=refreshable&target.time_to_die>((-1.2+3.3*spell_targets.mind_sear)*variable.swp_trait_ranks_check),if=!talent.misery.enabled
+ if target.Refreshable(shadow_word_pain_debuff) and target.TimeToDie() > { -1.2 + 3.3 * Enemies() } * swp_trait_ranks_check() and not Talent(misery_talent) Spell(shadow_word_pain)
+ #vampiric_touch,target_if=refreshable,if=target.time_to_die>((1+3.3*spell_targets.mind_sear)*variable.vt_trait_ranks_check)
+ if target.Refreshable(vampiric_touch_debuff) and target.TimeToDie() > { 1 + 3.3 * Enemies() } * vt_trait_ranks_check() Spell(vampiric_touch)
+ #vampiric_touch,target_if=dot.shadow_word_pain.refreshable,if=(talent.misery.enabled&target.time_to_die>((1.0+2.0*spell_targets.mind_sear)*variable.vt_mis_trait_ranks_check*(variable.vt_mis_sd_check*spell_targets.mind_sear)))
+ if target.DebuffRefreshable(shadow_word_pain_debuff) and Talent(misery_talent) and target.TimeToDie() > { 1 + 2 * Enemies() } * vt_mis_trait_ranks_check() * vt_mis_sd_check() * Enemies() Spell(vampiric_touch)
  #void_torrent,if=buff.voidform.up
  if DebuffPresent(voidform_shadow) Spell(void_torrent)
  #mind_sear,target_if=spell_targets.mind_sear>1,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2
@@ -421,12 +453,12 @@ AddFunction ShadowCleaveShortCdActions
   #dark_ascension,if=buff.voidform.down
   if DebuffExpires(voidform_shadow) Spell(dark_ascension)
 
-  unless BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Spell(void_bolt) or { target.TimeToDie() < 3 or DebuffExpires(voidform_shadow) } and Spell(shadow_word_death)
+  unless not target.DebuffPresent(vampiric_touch_debuff) and AzeriteTraitRank(thought_harvester_trait) >= 1 and Spell(vampiric_touch) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Spell(void_bolt) or { target.TimeToDie() < 3 or DebuffExpires(voidform_shadow) } and Spell(shadow_word_death)
   {
-   #dark_void,if=raid_event.adds.in>10
-   if 600 > 10 Spell(dark_void)
+   #dark_void,if=raid_event.adds.in>10&(dot.shadow_word_pain.refreshable|target.time_to_die>30)
+   if 600 > 10 and { target.DebuffRefreshable(shadow_word_pain_debuff) or target.TimeToDie() > 30 } Spell(dark_void)
 
-   unless Spell(mindbender_shadow) or { Enemies() < 4 and AzeriteTraitRank(searing_dialogue_trait) == 0 or Enemies() < 3 and AzeriteTraitRank(searing_dialogue_trait) == 1 or Enemies() < 2 and AzeriteTraitRank(searing_dialogue_trait) >= 2 } and Spell(mind_blast)
+   unless Spell(mindbender_shadow) or Enemies() < mind_blast_targets() and Spell(mind_blast)
    {
     #shadow_crash,if=(raid_event.adds.in>5&raid_event.adds.duration<2)|raid_event.adds.duration>2
     if 600 > 5 and 10 < 2 or 10 > 2 Spell(shadow_crash)
@@ -437,12 +469,12 @@ AddFunction ShadowCleaveShortCdActions
 
 AddFunction ShadowCleaveShortCdPostConditions
 {
- Spell(void_eruption) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Spell(void_bolt) or { target.TimeToDie() < 3 or DebuffExpires(voidform_shadow) } and Spell(shadow_word_death) or Spell(mindbender_shadow) or { Enemies() < 4 and AzeriteTraitRank(searing_dialogue_trait) == 0 or Enemies() < 3 and AzeriteTraitRank(searing_dialogue_trait) == 1 or Enemies() < 2 and AzeriteTraitRank(searing_dialogue_trait) >= 2 } and Spell(mind_blast) or target.Refreshable(shadow_word_pain_debuff) and target.TimeToDie() > 4 and not Talent(misery_talent) and not Talent(dark_void_talent) and Spell(shadow_word_pain) or target.Refreshable(vampiric_touch_debuff) and target.TimeToDie() > 6 and Spell(vampiric_touch) or target.DebuffRefreshable(shadow_word_pain_debuff) and Talent(misery_talent) and target.TimeToDie() > 4 and Spell(vampiric_touch) or DebuffPresent(voidform_shadow) and Spell(void_torrent) or Enemies() > 1 and Spell(mind_sear) or Spell(mind_flay) or Spell(shadow_word_pain)
+ Spell(void_eruption) or not target.DebuffPresent(vampiric_touch_debuff) and AzeriteTraitRank(thought_harvester_trait) >= 1 and Spell(vampiric_touch) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Spell(void_bolt) or { target.TimeToDie() < 3 or DebuffExpires(voidform_shadow) } and Spell(shadow_word_death) or Spell(mindbender_shadow) or Enemies() < mind_blast_targets() and Spell(mind_blast) or target.Refreshable(shadow_word_pain_debuff) and target.TimeToDie() > { -1.2 + 3.3 * Enemies() } * swp_trait_ranks_check() and not Talent(misery_talent) and Spell(shadow_word_pain) or target.Refreshable(vampiric_touch_debuff) and target.TimeToDie() > { 1 + 3.3 * Enemies() } * vt_trait_ranks_check() and Spell(vampiric_touch) or target.DebuffRefreshable(shadow_word_pain_debuff) and Talent(misery_talent) and target.TimeToDie() > { 1 + 2 * Enemies() } * vt_mis_trait_ranks_check() * vt_mis_sd_check() * Enemies() and Spell(vampiric_touch) or DebuffPresent(voidform_shadow) and Spell(void_torrent) or Enemies() > 1 and Spell(mind_sear) or Spell(mind_flay) or Spell(shadow_word_pain)
 }
 
 AddFunction ShadowCleaveCdActions
 {
- unless Spell(void_eruption) or DebuffExpires(voidform_shadow) and Spell(dark_ascension) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Spell(void_bolt) or { target.TimeToDie() < 3 or DebuffExpires(voidform_shadow) } and Spell(shadow_word_death)
+ unless Spell(void_eruption) or DebuffExpires(voidform_shadow) and Spell(dark_ascension) or not target.DebuffPresent(vampiric_touch_debuff) and AzeriteTraitRank(thought_harvester_trait) >= 1 and Spell(vampiric_touch) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Spell(void_bolt) or { target.TimeToDie() < 3 or DebuffExpires(voidform_shadow) } and Spell(shadow_word_death)
  {
   #surrender_to_madness,if=buff.voidform.stack>10+(10*buff.bloodlust.up)
   if DebuffStacks(voidform_shadow) > 10 + 10 * BuffPresent(burst_haste_buff any=1) Spell(surrender_to_madness)
@@ -451,121 +483,43 @@ AddFunction ShadowCleaveCdActions
 
 AddFunction ShadowCleaveCdPostConditions
 {
- Spell(void_eruption) or DebuffExpires(voidform_shadow) and Spell(dark_ascension) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Spell(void_bolt) or { target.TimeToDie() < 3 or DebuffExpires(voidform_shadow) } and Spell(shadow_word_death) or 600 > 10 and Spell(dark_void) or Spell(mindbender_shadow) or { Enemies() < 4 and AzeriteTraitRank(searing_dialogue_trait) == 0 or Enemies() < 3 and AzeriteTraitRank(searing_dialogue_trait) == 1 or Enemies() < 2 and AzeriteTraitRank(searing_dialogue_trait) >= 2 } and Spell(mind_blast) or { 600 > 5 and 10 < 2 or 10 > 2 } and Spell(shadow_crash) or target.Refreshable(shadow_word_pain_debuff) and target.TimeToDie() > 4 and not Talent(misery_talent) and not Talent(dark_void_talent) and Spell(shadow_word_pain) or target.Refreshable(vampiric_touch_debuff) and target.TimeToDie() > 6 and Spell(vampiric_touch) or target.DebuffRefreshable(shadow_word_pain_debuff) and Talent(misery_talent) and target.TimeToDie() > 4 and Spell(vampiric_touch) or DebuffPresent(voidform_shadow) and Spell(void_torrent) or Enemies() > 1 and Spell(mind_sear) or Spell(mind_flay) or Spell(shadow_word_pain)
-}
-
-### actions.aoe
-
-AddFunction ShadowAoeMainActions
-{
- #void_eruption
- Spell(void_eruption)
- #mind_sear,if=buff.harvested_thoughts.up
- if BuffPresent(harvested_thoughts_buff) Spell(mind_sear)
- #void_bolt,if=talent.dark_void.enabled&dot.shadow_word_pain.remains>travel_time
- if Talent(dark_void_talent) and target.DebuffRemaining(shadow_word_pain_debuff) > TravelTime(void_bolt) Spell(void_bolt)
- #mindbender
- Spell(mindbender_shadow)
- #vampiric_touch,target_if=refreshable,if=(target.time_to_die>6)&azerite.thought_harvester.rank>0
- if target.Refreshable(vampiric_touch_debuff) and target.TimeToDie() > 6 and AzeriteTraitRank(thought_harvester_trait) > 0 Spell(vampiric_touch)
- #vampiric_touch,target_if=dot.shadow_word_pain.refreshable,if=(talent.misery.enabled&target.time_to_die>4)&azerite.thought_harvester.rank>0
- if target.DebuffRefreshable(shadow_word_pain_debuff) and Talent(misery_talent) and target.TimeToDie() > 4 and AzeriteTraitRank(thought_harvester_trait) > 0 Spell(vampiric_touch)
- #mind_sear,chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&(cooldown.void_bolt.up|cooldown.mind_blast.up)
- Spell(mind_sear)
- #shadow_word_pain
- Spell(shadow_word_pain)
-}
-
-AddFunction ShadowAoeMainPostConditions
-{
-}
-
-AddFunction ShadowAoeShortCdActions
-{
- unless Spell(void_eruption)
- {
-  #dark_ascension,if=buff.voidform.down
-  if DebuffExpires(voidform_shadow) Spell(dark_ascension)
-
-  unless BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Talent(dark_void_talent) and target.DebuffRemaining(shadow_word_pain_debuff) > TravelTime(void_bolt) and Spell(void_bolt)
-  {
-   #dark_void,if=raid_event.adds.in>10
-   if 600 > 10 Spell(dark_void)
-
-   unless Spell(mindbender_shadow)
-   {
-    #shadow_crash,if=raid_event.adds.in>5&raid_event.adds.duration<20
-    if 600 > 5 and 10 < 20 Spell(shadow_crash)
-   }
-  }
- }
-}
-
-AddFunction ShadowAoeShortCdPostConditions
-{
- Spell(void_eruption) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Talent(dark_void_talent) and target.DebuffRemaining(shadow_word_pain_debuff) > TravelTime(void_bolt) and Spell(void_bolt) or Spell(mindbender_shadow) or target.Refreshable(vampiric_touch_debuff) and target.TimeToDie() > 6 and AzeriteTraitRank(thought_harvester_trait) > 0 and Spell(vampiric_touch) or target.DebuffRefreshable(shadow_word_pain_debuff) and Talent(misery_talent) and target.TimeToDie() > 4 and AzeriteTraitRank(thought_harvester_trait) > 0 and Spell(vampiric_touch) or Spell(mind_sear) or Spell(shadow_word_pain)
-}
-
-AddFunction ShadowAoeCdActions
-{
- unless Spell(void_eruption) or DebuffExpires(voidform_shadow) and Spell(dark_ascension) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Talent(dark_void_talent) and target.DebuffRemaining(shadow_word_pain_debuff) > TravelTime(void_bolt) and Spell(void_bolt)
- {
-  #surrender_to_madness,if=buff.voidform.stack>10+(10*buff.bloodlust.up)
-  if DebuffStacks(voidform_shadow) > 10 + 10 * BuffPresent(burst_haste_buff any=1) Spell(surrender_to_madness)
- }
-}
-
-AddFunction ShadowAoeCdPostConditions
-{
- Spell(void_eruption) or DebuffExpires(voidform_shadow) and Spell(dark_ascension) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Talent(dark_void_talent) and target.DebuffRemaining(shadow_word_pain_debuff) > TravelTime(void_bolt) and Spell(void_bolt) or 600 > 10 and Spell(dark_void) or Spell(mindbender_shadow) or 600 > 5 and 10 < 20 and Spell(shadow_crash) or target.Refreshable(vampiric_touch_debuff) and target.TimeToDie() > 6 and AzeriteTraitRank(thought_harvester_trait) > 0 and Spell(vampiric_touch) or target.DebuffRefreshable(shadow_word_pain_debuff) and Talent(misery_talent) and target.TimeToDie() > 4 and AzeriteTraitRank(thought_harvester_trait) > 0 and Spell(vampiric_touch) or Spell(mind_sear) or Spell(shadow_word_pain)
+ Spell(void_eruption) or DebuffExpires(voidform_shadow) and Spell(dark_ascension) or not target.DebuffPresent(vampiric_touch_debuff) and AzeriteTraitRank(thought_harvester_trait) >= 1 and Spell(vampiric_touch) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Spell(void_bolt) or { target.TimeToDie() < 3 or DebuffExpires(voidform_shadow) } and Spell(shadow_word_death) or 600 > 10 and { target.DebuffRefreshable(shadow_word_pain_debuff) or target.TimeToDie() > 30 } and Spell(dark_void) or Spell(mindbender_shadow) or Enemies() < mind_blast_targets() and Spell(mind_blast) or { 600 > 5 and 10 < 2 or 10 > 2 } and Spell(shadow_crash) or target.Refreshable(shadow_word_pain_debuff) and target.TimeToDie() > { -1.2 + 3.3 * Enemies() } * swp_trait_ranks_check() and not Talent(misery_talent) and Spell(shadow_word_pain) or target.Refreshable(vampiric_touch_debuff) and target.TimeToDie() > { 1 + 3.3 * Enemies() } * vt_trait_ranks_check() and Spell(vampiric_touch) or target.DebuffRefreshable(shadow_word_pain_debuff) and Talent(misery_talent) and target.TimeToDie() > { 1 + 2 * Enemies() } * vt_mis_trait_ranks_check() * vt_mis_sd_check() * Enemies() and Spell(vampiric_touch) or DebuffPresent(voidform_shadow) and Spell(void_torrent) or Enemies() > 1 and Spell(mind_sear) or Spell(mind_flay) or Spell(shadow_word_pain)
 }
 
 ### actions.default
 
 AddFunction ShadowDefaultMainActions
 {
- #run_action_list,name=aoe,if=spell_targets.mind_sear>(5+1*talent.misery.enabled)
- if Enemies() > 5 + 1 * TalentPoints(misery_talent) ShadowAoeMainActions()
+ #run_action_list,name=cleave,if=active_enemies>1
+ if Enemies() > 1 ShadowCleaveMainActions()
 
- unless Enemies() > 5 + 1 * TalentPoints(misery_talent) and ShadowAoeMainPostConditions()
+ unless Enemies() > 1 and ShadowCleaveMainPostConditions()
  {
-  #run_action_list,name=cleave,if=active_enemies>1
-  if Enemies() > 1 ShadowCleaveMainActions()
-
-  unless Enemies() > 1 and ShadowCleaveMainPostConditions()
-  {
-   #run_action_list,name=single,if=active_enemies=1
-   if Enemies() == 1 ShadowSingleMainActions()
-  }
+  #run_action_list,name=single,if=active_enemies=1
+  if Enemies() == 1 ShadowSingleMainActions()
  }
 }
 
 AddFunction ShadowDefaultMainPostConditions
 {
- Enemies() > 5 + 1 * TalentPoints(misery_talent) and ShadowAoeMainPostConditions() or Enemies() > 1 and ShadowCleaveMainPostConditions() or Enemies() == 1 and ShadowSingleMainPostConditions()
+ Enemies() > 1 and ShadowCleaveMainPostConditions() or Enemies() == 1 and ShadowSingleMainPostConditions()
 }
 
 AddFunction ShadowDefaultShortCdActions
 {
- #run_action_list,name=aoe,if=spell_targets.mind_sear>(5+1*talent.misery.enabled)
- if Enemies() > 5 + 1 * TalentPoints(misery_talent) ShadowAoeShortCdActions()
+ #run_action_list,name=cleave,if=active_enemies>1
+ if Enemies() > 1 ShadowCleaveShortCdActions()
 
- unless Enemies() > 5 + 1 * TalentPoints(misery_talent) and ShadowAoeShortCdPostConditions()
+ unless Enemies() > 1 and ShadowCleaveShortCdPostConditions()
  {
-  #run_action_list,name=cleave,if=active_enemies>1
-  if Enemies() > 1 ShadowCleaveShortCdActions()
-
-  unless Enemies() > 1 and ShadowCleaveShortCdPostConditions()
-  {
-   #run_action_list,name=single,if=active_enemies=1
-   if Enemies() == 1 ShadowSingleShortCdActions()
-  }
+  #run_action_list,name=single,if=active_enemies=1
+  if Enemies() == 1 ShadowSingleShortCdActions()
  }
 }
 
 AddFunction ShadowDefaultShortCdPostConditions
 {
- Enemies() > 5 + 1 * TalentPoints(misery_talent) and ShadowAoeShortCdPostConditions() or Enemies() > 1 and ShadowCleaveShortCdPostConditions() or Enemies() == 1 and ShadowSingleShortCdPostConditions()
+ Enemies() > 1 and ShadowCleaveShortCdPostConditions() or Enemies() == 1 and ShadowSingleShortCdPostConditions()
 }
 
 AddFunction ShadowDefaultCdActions
@@ -578,25 +532,19 @@ AddFunction ShadowDefaultCdActions
  #variable,name=dots_up,op=set,value=dot.shadow_word_pain.ticking&dot.vampiric_touch.ticking
  #berserking
  Spell(berserking)
- #run_action_list,name=aoe,if=spell_targets.mind_sear>(5+1*talent.misery.enabled)
- if Enemies() > 5 + 1 * TalentPoints(misery_talent) ShadowAoeCdActions()
+ #run_action_list,name=cleave,if=active_enemies>1
+ if Enemies() > 1 ShadowCleaveCdActions()
 
- unless Enemies() > 5 + 1 * TalentPoints(misery_talent) and ShadowAoeCdPostConditions()
+ unless Enemies() > 1 and ShadowCleaveCdPostConditions()
  {
-  #run_action_list,name=cleave,if=active_enemies>1
-  if Enemies() > 1 ShadowCleaveCdActions()
-
-  unless Enemies() > 1 and ShadowCleaveCdPostConditions()
-  {
-   #run_action_list,name=single,if=active_enemies=1
-   if Enemies() == 1 ShadowSingleCdActions()
-  }
+  #run_action_list,name=single,if=active_enemies=1
+  if Enemies() == 1 ShadowSingleCdActions()
  }
 }
 
 AddFunction ShadowDefaultCdPostConditions
 {
- Enemies() > 5 + 1 * TalentPoints(misery_talent) and ShadowAoeCdPostConditions() or Enemies() > 1 and ShadowCleaveCdPostConditions() or Enemies() == 1 and ShadowSingleCdPostConditions()
+ Enemies() > 1 and ShadowCleaveCdPostConditions() or Enemies() == 1 and ShadowSingleCdPostConditions()
 }
 
 ### Shadow icons.
@@ -662,6 +610,7 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # dark_ascension
 # dark_void
 # dark_void_talent
+# death_throes_trait
 # harvested_thoughts_buff
 # mind_blast
 # mind_bomb
@@ -676,10 +625,10 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # shadow_word_death
 # shadow_word_pain
 # shadow_word_pain_debuff
-# shadow_word_void
 # shadowform
 # shadowform_buff
 # silence
+# spiteful_apparitions_trait
 # surrender_to_madness
 # thought_harvester_trait
 # vampiric_touch
@@ -689,6 +638,7 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # void_torrent
 # voidform_shadow
 # war_stomp
+# whispers_of_the_damned_trait
 `
 	OvaleScripts.RegisterScript("PRIEST", "shadow", name, desc, code, "script")
 }

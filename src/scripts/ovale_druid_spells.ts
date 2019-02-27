@@ -72,11 +72,6 @@ Define(celestial_alignment 194223)
   SpellInfo(celestial_alignment cd=180 duration=20)
   # Spell damage increased by s1.rnHaste increased by s3.
   SpellAddBuff(celestial_alignment celestial_alignment=1)
-Define(dash 1850)
-# Activates Cat Form and increases movement speed by s1 while in Cat Form for 10 seconds.
-  SpellInfo(dash cd=120 duration=10)
-  # Increased movement speed by s1 while in Cat Form.
-  SpellAddBuff(dash dash=1)
 Define(feral_frenzy 274837)
 # Unleash a furious frenzy, clawing your target m2 times for 274838s1*m2 Physical damage and an additional m2*274838s3*6 seconds/274838t3 Bleed damage over 6 seconds.rnrn|cFFFFFFFFAwards s1 combo points.|r
   SpellInfo(feral_frenzy energy=25 cd=45 duration=1 gcd=1 tick=0.2 talent=feral_frenzy_talent)
