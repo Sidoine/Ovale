@@ -239,8 +239,8 @@ Define(feast_of_souls_buff 207693)
 
 	SpellInfo(fel_devastation cd=60 channel=2)
 
-	SpellInfo(fel_eruption cd=30 interrupt=1)
-	SpellInfo(fel_eruption fury=10 specialization=havoc)
+	SpellInfo(fel_eruption pain=0 specialization=!vengeance)
+    SpellInfo(fel_eruption fury=0 specialization=!havoc)
 
 	SpellInfo(fel_rush cd=10 charges=2)
 	SpellAddBuff(fel_rush momentum_buff=1 talent=momentum_talent specialization=havoc)
