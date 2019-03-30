@@ -319,8 +319,10 @@ AddFunction HavocCooldownCdActions
  if not False(raid_event_adds_exists) Spell(nemesis)
  #potion,if=buff.metamorphosis.remains>25|target.time_to_die<60
  if { BuffRemaining(metamorphosis_havoc_buff) > 25 or target.TimeToDie() < 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_agility usable=1)
- #use_item,name=galecallers_boon
- HavocUseItemActions()
+ #use_item,name=galecallers_boon,sync=fel_barrage
+ if { { not { not SpellCooldown(eye_beam) > 0 } or BuffPresent(metamorphosis_havoc_buff) } and 600 > 30 or Enemies() > Enemies(tagged=1) } and Spell(fel_barrage) HavocUseItemActions()
+ #use_item,name=galecallers_boon,if=!talent.fel_barrage.enabled
+ if not Talent(fel_barrage_talent) HavocUseItemActions()
  #use_item,name=lustrous_golden_plumage
  HavocUseItemActions()
 }
@@ -507,6 +509,7 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # disrupt
 # eye_beam
 # fel_barrage
+# fel_barrage_talent
 # fel_eruption
 # fel_mastery_talent
 # fel_rush

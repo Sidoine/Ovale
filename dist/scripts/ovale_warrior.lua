@@ -639,12 +639,16 @@ AddFunction FurySingletargetShortCdActions
  #siegebreaker
  Spell(siegebreaker)
 
- unless { BuffPresent(recklessness_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or Spell(execute) or { not IsEnraged() or AzeriteTraitRank(cold_steel_hot_blood_trait) > 1 } and Spell(bloodthirst) or Charges(raging_blow) == 2 and Spell(raging_blow) or Spell(bloodthirst)
+ unless { BuffPresent(recklessness_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or Spell(execute)
  {
-  #bladestorm,if=prev_gcd.1.rampage&(debuff.siegebreaker.up|!talent.siegebreaker.enabled)
-  if PreviousGCDSpell(rampage) and { target.DebuffPresent(siegebreaker_debuff) or not Talent(siegebreaker_talent) } Spell(bladestorm_fury)
-  #dragon_roar,if=buff.enrage.up
-  if IsEnraged() Spell(dragon_roar)
+  #bladestorm,if=prev_gcd.1.rampage
+  if PreviousGCDSpell(rampage) Spell(bladestorm_fury)
+
+  unless { not IsEnraged() or AzeriteTraitRank(cold_steel_hot_blood_trait) > 1 } and Spell(bloodthirst) or Charges(raging_blow) == 2 and Spell(raging_blow) or Spell(bloodthirst)
+  {
+   #dragon_roar,if=buff.enrage.up
+   if IsEnraged() Spell(dragon_roar)
+  }
  }
 }
 
@@ -659,7 +663,7 @@ AddFunction FurySingletargetCdActions
 
 AddFunction FurySingletargetCdPostConditions
 {
- Spell(siegebreaker) or { BuffPresent(recklessness_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or Spell(execute) or { not IsEnraged() or AzeriteTraitRank(cold_steel_hot_blood_trait) > 1 } and Spell(bloodthirst) or Charges(raging_blow) == 2 and Spell(raging_blow) or Spell(bloodthirst) or PreviousGCDSpell(rampage) and { target.DebuffPresent(siegebreaker_debuff) or not Talent(siegebreaker_talent) } and Spell(bladestorm_fury) or IsEnraged() and Spell(dragon_roar) or { Talent(carnage_talent) or Talent(massacre_talent_fury) and Rage() < 80 or Talent(frothing_berserker_talent) and Rage() < 90 } and Spell(raging_blow) or Talent(furious_slash_talent) and Spell(furious_slash) or Spell(whirlwind_fury)
+ Spell(siegebreaker) or { BuffPresent(recklessness_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or Spell(execute) or PreviousGCDSpell(rampage) and Spell(bladestorm_fury) or { not IsEnraged() or AzeriteTraitRank(cold_steel_hot_blood_trait) > 1 } and Spell(bloodthirst) or Charges(raging_blow) == 2 and Spell(raging_blow) or Spell(bloodthirst) or IsEnraged() and Spell(dragon_roar) or { Talent(carnage_talent) or Talent(massacre_talent_fury) and Rage() < 80 or Talent(frothing_berserker_talent) and Rage() < 90 } and Spell(raging_blow) or Talent(furious_slash_talent) and Spell(furious_slash) or Spell(whirlwind_fury)
 }
 
 ### actions.precombat
@@ -797,21 +801,21 @@ AddFunction FuryDefaultCdActions
 
    unless Talent(furious_slash_talent) and { BuffStacks(furious_slash_buff) < 3 or BuffRemaining(furious_slash_buff) < 3 or SpellCooldown(recklessness) < 3 and BuffRemaining(furious_slash_buff) < 9 } and Spell(furious_slash) or SpellCooldown(recklessness) < 3 and Spell(rampage)
    {
-    #recklessness
-    Spell(recklessness)
+    #recklessness,if=!talent.siegebreaker.enabled|(cooldown.siegebreaker.remains<1|cooldown.siegebreaker.remains>5)
+    if not Talent(siegebreaker_talent) or SpellCooldown(siegebreaker) < 1 or SpellCooldown(siegebreaker) > 5 Spell(recklessness)
 
     unless Enemies() > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury)
     {
-     #blood_fury,if=buff.recklessness.up
-     if BuffPresent(recklessness_buff) Spell(blood_fury_ap)
-     #berserking,if=buff.recklessness.up
-     if BuffPresent(recklessness_buff) Spell(berserking)
+     #blood_fury
+     Spell(blood_fury_ap)
+     #berserking
+     Spell(berserking)
      #lights_judgment,if=buff.recklessness.down
      if BuffExpires(recklessness_buff) Spell(lights_judgment)
-     #fireblood,if=buff.recklessness.up
-     if BuffPresent(recklessness_buff) Spell(fireblood)
-     #ancestral_call,if=buff.recklessness.up
-     if BuffPresent(recklessness_buff) Spell(ancestral_call)
+     #fireblood
+     Spell(fireblood)
+     #ancestral_call
+     Spell(ancestral_call)
      #run_action_list,name=single_target
      FurySingletargetCdActions()
     }
@@ -913,7 +917,6 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # recklessness_buff
 # shockwave
 # siegebreaker
-# siegebreaker_debuff
 # siegebreaker_talent
 # storm_bolt
 # war_stomp

@@ -6,7 +6,7 @@ local registerBase = function()
     local name = "ovale_druid_base_spells"
     local desc = "[8.1] Ovale: Druid baseline spells"
     local code = [[Define(ancestral_call 274738)
-# Invoke the spirits of your ancestors, granting you their power for 15 seconds.
+# Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
   SpellAddBuff(ancestral_call ancestral_call=1)
 Define(arcanic_pulsar_buff 287784)
@@ -69,8 +69,8 @@ Define(cat_form 768)
   # Autoattack damage increased by w3.rnImmune to Polymorph effects.rnMovement speed increased by 113636s1 and falling damage reduced.
   SpellAddBuff(cat_form cat_form=1)
 Define(celestial_alignment 194223)
-# Celestial bodies align, increasing the damage of all your spells by s1 and granting you s3 Haste for 20 seconds.
-  SpellInfo(celestial_alignment cd=180 duration=20)
+# Celestial bodies align, granting s5/10 Astral Power, and increasing spell damage by s1 and Haste by s3 for 20 seconds.
+  SpellInfo(celestial_alignment cd=180 duration=20 lunarpower=-40)
   # Spell damage increased by s1.rnHaste increased by s3.
   SpellAddBuff(celestial_alignment celestial_alignment=1)
 Define(feral_frenzy 274837)
@@ -105,7 +105,7 @@ Define(incapacitating_roar 99)
   SpellAddTargetDebuff(incapacitating_roar incapacitating_roar=1)
 Define(incarnation_chosen_of_elune 102560)
 # An improved Moonkin Form that increases the damage of all your spells by s1 and grants you s3 Haste.rnrnLasts 30 seconds. You may shapeshift in and out of this improved Moonkin Form for its duration.
-  SpellInfo(incarnation_chosen_of_elune cd=180 duration=30 talent=incarnation_chosen_of_elune_talent)
+  SpellInfo(incarnation_chosen_of_elune cd=180 duration=30 lunarpower=-40 talent=incarnation_chosen_of_elune_talent)
   # Spell damage increased by s1.rnHaste increased by s3.
   SpellAddBuff(incarnation_chosen_of_elune incarnation_chosen_of_elune=1)
 Define(incarnation_guardian_of_ursoc 102558)
@@ -197,7 +197,7 @@ Define(rake_debuff 155722)
 Define(regrowth 8936)
 # Heals a friendly target for (120 of Spell Power) and another o2*<mult> over 12 seconds.?s231032[ Regrowth's initial heal has a 231032s1 increased chance for a critical effect.][]?s24858|s197625[ Usable while in Moonkin Form.][]?s33891[rnrn|C0033AA11Tree of Life: Instant cast.|R][]
   SpellInfo(regrowth duration=12 tick=2)
-  # Heals w2 every t2 seconds.
+  # Heals w2 every t2 sec.
   SpellAddBuff(regrowth regrowth=1)
 Define(rip 1079)
 # Finishing move that causes Bleed damage over time. Lasts longer per combo point.rnrn   1 point  : o1*2 over 8 secrn   2 points: o1*3 over 12 secrn   3 points: o1*4 over 16 secrn   4 points: o1*5 over 20 secrn   5 points: o1*6 over 24 sec

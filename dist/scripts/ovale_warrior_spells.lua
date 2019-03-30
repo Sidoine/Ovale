@@ -6,7 +6,7 @@ __exports.register = function()
     local name = "ovale_warrior_spells"
     local desc = "[8.1] Ovale: Warrior spells"
     local code = [[Define(ancestral_call 274738)
-# Invoke the spirits of your ancestors, granting you their power for 15 seconds.
+# Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
   SpellAddBuff(ancestral_call ancestral_call=1)
 Define(avatar 107574)

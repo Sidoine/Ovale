@@ -1492,7 +1492,7 @@ AddFunction FrostCooldownsMainPostConditions
 
 AddFunction FrostCooldownsShortCdActions
 {
- #rune_of_power,if=prev_gcd.1.frozen_orb|time_to_die>10+cast_time&time_to_die<20
+ #rune_of_power,if=prev_gcd.1.frozen_orb|target.time_to_die>10+cast_time&target.time_to_die<20
  if PreviousGCDSpell(frozen_orb) or target.TimeToDie() > 10 + CastTime(rune_of_power) and target.TimeToDie() < 20 Spell(rune_of_power)
  #call_action_list,name=talent_rop,if=talent.rune_of_power.enabled&active_enemies=1&cooldown.rune_of_power.full_recharge_time<cooldown.frozen_orb.remains
  if Talent(rune_of_power_talent) and Enemies() == 1 and SpellCooldown(rune_of_power) < SpellCooldown(frozen_orb) FrostTalentropShortCdActions()
@@ -1517,8 +1517,8 @@ AddFunction FrostCooldownsCdActions
 
   unless Talent(rune_of_power_talent) and Enemies() == 1 and SpellCooldown(rune_of_power) < SpellCooldown(frozen_orb) and FrostTalentropCdPostConditions()
   {
-   #potion,if=prev_gcd.1.icy_veins|target.time_to_die<70
-   if { PreviousGCDSpell(icy_veins) or target.TimeToDie() < 70 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(rising_death usable=1)
+   #potion,if=prev_gcd.1.icy_veins|target.time_to_die<30
+   if { PreviousGCDSpell(icy_veins) or target.TimeToDie() < 30 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(rising_death usable=1)
    #use_items
    FrostUseItemActions()
    #blood_fury
