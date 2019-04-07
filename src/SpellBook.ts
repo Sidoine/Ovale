@@ -263,6 +263,7 @@ class OvaleSpellBookClass extends OvaleSpellBookBase {
     }
     AddSpell(spellId: number, name: string) {
         if (spellId && name) {
+            this.Debug("Adding spell %s (%d)", name, spellId)
             this.spell[spellId] = name;
         }
     }
