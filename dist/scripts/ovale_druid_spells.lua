@@ -632,7 +632,6 @@ Define(intimidating_roar 236748)
 	SpellAddTargetDebuff(pulverize thrash_bear_debuff=-2)
 Define(pulverize_buff 158792)
 	SpellInfo(pulverize_buff duration=20)
-Define(swipe_bear 213771)
 
 	SpellInfo(survival_instincts add_cd=120 specialization=guardian)
 	SpellInfo(survival_instincts add_cd=-80 specialization=guardian talent=survival_of_the_fittest_talent) 
