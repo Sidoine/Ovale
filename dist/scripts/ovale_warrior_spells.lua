@@ -273,7 +273,7 @@ Define(die_by_the_sword 118038)
 Define(die_by_the_sword_buff 118038)
 	SpellInfo(die_by_the_sword_buff duration=8)
 
-	SpellInfo(dragon_roar cd=35 rage=-10)
+	SpellInfo(dragon_roar cd=35 rage=-10 tag=main)
 	SpellAddBuff(dragon_roar dragon_roar_buff=1)
 Define(dragon_roar_buff 118000)
 	SpellInfo(dragon_roar_buff duration=6)
