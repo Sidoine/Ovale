@@ -2529,7 +2529,8 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
         } else if (className == "WARRIOR" && action == "battle_shout" && role == "tank") {
             conditionCode = "BuffExpires(stamina_buff)";
         } else if (className == "WARRIOR" && action == "charge") {
-            conditionCode = "CheckBoxOn(opt_melee_range) and target.InRange(charge)";
+            conditionCode = "CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel)";
+            AddSymbol(annotation, "pummel");
         } else if (className == "WARRIOR" && action == "commanding_shout" && role == "attack") {
             conditionCode = "BuffExpires(attack_power_multiplier_buff)";
         } else if (className == "WARRIOR" && action == "enraged_regeneration") {
@@ -5107,11 +5108,11 @@ const InsertSupportingFunctions = function(child: LuaArray<AstNode>, annotation:
         let fmt = `
 			AddFunction %sGetInMeleeRange
 			{
-				if CheckBoxOn(opt_melee_range) and not InFlightToTarget(%s) and not InFlightToTarget(heroic_leap)
+				if CheckBoxOn(opt_melee_range) and not InFlightToTarget(%s) and not InFlightToTarget(heroic_leap) and not target.InRange(pummel)
 				{
 					if target.InRange(%s) Spell(%s)
 					if SpellCharges(%s) == 0 and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
-					if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+					Texture(misc_arrowlup help=L(not_in_melee_range))
 				}
 			}
 		`;

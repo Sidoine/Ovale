@@ -2344,7 +2344,8 @@ EmitAction = function(parseNode, nodeList, annotation)
         elseif className == "WARRIOR" and action == "battle_shout" and role == "tank" then
             conditionCode = "BuffExpires(stamina_buff)"
         elseif className == "WARRIOR" and action == "charge" then
-            conditionCode = "CheckBoxOn(opt_melee_range) and target.InRange(charge)"
+            conditionCode = "CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel)"
+            AddSymbol(annotation, "pummel")
         elseif className == "WARRIOR" and action == "commanding_shout" and role == "attack" then
             conditionCode = "BuffExpires(attack_power_multiplier_buff)"
         elseif className == "WARRIOR" and action == "enraged_regeneration" then
@@ -4915,11 +4916,11 @@ local InsertSupportingFunctions = function(child, annotation)
         local fmt = [[
 			AddFunction %sGetInMeleeRange
 			{
-				if CheckBoxOn(opt_melee_range) and not InFlightToTarget(%s) and not InFlightToTarget(heroic_leap)
+				if CheckBoxOn(opt_melee_range) and not InFlightToTarget(%s) and not InFlightToTarget(heroic_leap) and not target.InRange(pummel)
 				{
 					if target.InRange(%s) Spell(%s)
 					if SpellCharges(%s) == 0 and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
-					if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+					Texture(misc_arrowlup help=L(not_in_melee_range))
 				}
 			}
 		]]
