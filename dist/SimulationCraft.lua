@@ -2251,6 +2251,8 @@ EmitAction = function(parseNode, nodeList, annotation)
             conditionCode = "target.Distance(less 12)"
         elseif className == "MAGE" and action == "arcane_blast" then
             conditionCode = "Mana() > ManaCost(arcane_blast)"
+        elseif className == "MAGE" and action == "cone_of_cold" then
+            conditionCode = "target.Distance() < 12"
         elseif className == "MONK" and action == "chi_sphere" then
             isSpellAction = false
         elseif className == "MONK" and action == "gift_of_the_ox" then

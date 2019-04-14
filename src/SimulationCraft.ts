@@ -2436,6 +2436,8 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             conditionCode = "target.Distance(less 12)"
         } else if (className == "MAGE" && action == "arcane_blast") {
             conditionCode = "Mana() > ManaCost(arcane_blast)"
+        } else if (className == "MAGE" && action == "cone_of_cold") {
+            conditionCode = "target.Distance() < 12"
         } else if (className == "MONK" && action == "chi_sphere") {
             isSpellAction = false;
         } else if (className == "MONK" && action == "gift_of_the_ox") {
