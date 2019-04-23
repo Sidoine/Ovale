@@ -3305,7 +3305,7 @@ EmitOperandGroundAoe = function(operand, parseNode, nodeList, annotation, action
         local dotName = name .. "_debuff"
         dotName = Disambiguate(annotation, dotName, annotation.class, annotation.specialization)
         local prefix = find(dotName, "_buff$") and "Buff" or "Debuff"
-        local target = ""
+        local target = (prefix == "Debuff" and "target.") or ""
         local code
         if property == "remains" then
             code = format("%s%sRemaining(%s)", target, prefix, dotName)

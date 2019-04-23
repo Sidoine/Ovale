@@ -3487,7 +3487,7 @@ EmitOperandGroundAoe = (operand: string, parseNode: ParseNode, nodeList: LuaArra
         let dotName = `${name}_debuff`;
         [dotName] = Disambiguate(annotation, dotName, annotation.class, annotation.specialization);
         let prefix = truthy(find(dotName, "_buff$")) && "Buff" || "Debuff";
-        const target = "";
+        let target = (prefix == "Debuff" && "target.") || "";
         let code;
         if (property == "remains") {
             code = format("%s%sRemaining(%s)", target, prefix, dotName);
