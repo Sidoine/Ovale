@@ -3771,16 +3771,15 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
         else
             code = format("GetStateDuration(%s)", variable)
         end
-    elseif className == "MAGE" and operand == "dot.frozen_orb.ticking" then
-        local name = "frozen_orb"
-        code = format("SpellCooldown(%s) > SpellCooldownDuration(%s) - 10", name, name)
-        AddSymbol(annotation, name)
     elseif className == "MAGE" and operand == "firestarter.active" then
         code = "Talent(firestarter_talent) and target.HealthPercent() >= 90"
         AddSymbol(annotation, "firestarter_talent")
     elseif className == "MAGE" and operand == "brain_freeze_active" then
         code = "target.DebuffPresent(winters_chill_debuff)"
         AddSymbol(annotation, "winters_chill_debuff")
+    elseif className == "MAGE" and operand == "action.frozen_orb.in_flight" then
+        code = "PreviousGCDSpell(frozen_orb)"
+        AddSymbol(annotation, "frozen_orb")
     elseif className == "MONK" and sub(operand, 1, 35) == "debuff.storm_earth_and_fire_target." then
         local property = sub(operand, 36)
         if target == "" then

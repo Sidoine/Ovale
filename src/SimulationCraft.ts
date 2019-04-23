@@ -3948,16 +3948,15 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
         } else {
             code = format("GetStateDuration(%s)", variable);
         }
-    } else if (className == "MAGE" && operand == "dot.frozen_orb.ticking") {
-        let name = "frozen_orb";
-        code = format("SpellCooldown(%s) > SpellCooldownDuration(%s) - 10", name, name);
-        AddSymbol(annotation, name);
     } else if (className == "MAGE" && operand == "firestarter.active") {
         code = "Talent(firestarter_talent) and target.HealthPercent() >= 90";
         AddSymbol(annotation, "firestarter_talent");
     } else if (className == "MAGE" && operand == "brain_freeze_active") {
         code = "target.DebuffPresent(winters_chill_debuff)"
         AddSymbol(annotation, "winters_chill_debuff");
+	} else if (className == "MAGE" && operand == "action.frozen_orb.in_flight") {
+		code = "PreviousGCDSpell(frozen_orb)"
+		AddSymbol(annotation, "frozen_orb")
     } else if (className == "MONK" && sub(operand, 1, 35) == "debuff.storm_earth_and_fire_target.") {
         let property = sub(operand, 36);
         if (target == "") {
