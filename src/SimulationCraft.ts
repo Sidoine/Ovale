@@ -2595,10 +2595,10 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             let name = (modifiers.name && Unparse(modifiers.name)) || annotation.consumables["potion"];
             if (name) {
                 [name] = Disambiguate(annotation, name, className, specialization, "item");
-                bodyCode = format("Item(%s usable=1)", name);
+                bodyCode = format("Item(item_%s usable=1)", name);
                 conditionCode = "CheckBoxOn(opt_use_consumables) and target.Classification(worldboss)";
                 annotation.opt_use_consumables = className;
-                AddSymbol(annotation, format("%s", name));
+                AddSymbol(annotation, format("item_%s", name));
                 isSpellAction = false;
             }
         } else if (action === "sequence") {
