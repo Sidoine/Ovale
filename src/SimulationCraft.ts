@@ -3955,7 +3955,7 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
         code = "target.DebuffPresent(winters_chill_debuff)"
         AddSymbol(annotation, "winters_chill_debuff");
 	} else if (className == "MAGE" && operand == "action.frozen_orb.in_flight") {
-		code = "PreviousGCDSpell(frozen_orb)"
+		code = "TimeSincePreviousSpell(frozen_orb) < 10"
 		AddSymbol(annotation, "frozen_orb")
     } else if (className == "MONK" && sub(operand, 1, 35) == "debuff.storm_earth_and_fire_target.") {
         let property = sub(operand, 36);
