@@ -41,11 +41,6 @@ Define(arcane_power 12042)
   SpellInfo(arcane_power cd=90 duration=10)
   # Spell damage increased by w1.rnMana costs of your damaging spells reduced by w2.
   SpellAddBuff(arcane_power arcane_power=1)
-Define(battle_potion_of_intellect 279151)
-# Increases your Intellect by s1 for 25 seconds.
-  SpellInfo(battle_potion_of_intellect cd=1 duration=25 gcd=0 offgcd=1)
-  # Intellect increased by w1.
-  SpellAddBuff(battle_potion_of_intellect battle_potion_of_intellect=1)
 Define(berserking 26297)
 # Increases your haste by s1 for 12 seconds.
   SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
@@ -193,9 +188,6 @@ Define(ray_of_frost 205021)
   SpellInfo(ray_of_frost cd=75 duration=5 channel=5 tick=1 talent=ray_of_frost_talent)
   # Movement slowed by w1.rnTaking w2 Frost damage every t2 sec.
   SpellAddTargetDebuff(ray_of_frost ray_of_frost=1)
-Define(rising_death 252346)
-# Chance to create multiple potions.
-  SpellInfo(rising_death gcd=0 offgcd=1)
 Define(rule_of_threes 264354)
 # When you gain your third Arcane Charge, the cost of your next Arcane Blast or Arcane Missiles is reduced by 264774s1.
   SpellInfo(rule_of_threes channel=0 gcd=0 offgcd=1 talent=rule_of_threes_talent)
@@ -307,6 +299,7 @@ Define(blazing_speed 108843)
 	SpellInfo(blazing_speed cd=25 gcd=0 offgcd=1)
 
 	SpellInfo(blink cd=15)
+	SpellInfo(blink replaced_by=shimmer talent=shimmer_talent)
 
 	SpellInfo(blizzard cd=8 haste=spell)
 	SpellAddBuff(blizzard ice_floes_buff=0 if_spell=ice_floes)
@@ -315,6 +308,7 @@ Define(brain_freeze_buff 190446)
 	SpellInfo(brain_freeze_buff duration=15)
 
 	SpellInfo(charged_up arcanecharges=-4)
+
 Define(cinderstorm 198929)
 	SpellInfo(cinderstorm cd=9)
 Define(clearcasting_buff 276743)
@@ -485,6 +479,9 @@ Define(rune_of_power_buff 116014)
 
 	SpellInfo(scorch travel_time=1)
 Define(shard_of_the_exodar_warp 207970)
+Define(shimmer 212653)
+	SpellInfo(shimmer cd=20 charges=2)
+
 Define(spellsteal 30449)
 Define(summon_arcane_familiar 205022)
 	SpellInfo(summon_arcane_familiar cd=10)
@@ -535,6 +532,7 @@ Define(pyromaniac_talent 2)
 Define(reverberate_talent 16)
 Define(ring_of_frost_talent 15)
 Define(rule_of_threes_talent 2)
+Define(shimmer_talent 5)
 Define(slipstream_talent 6)
 Define(thermal_void_talent 19)
 Define(time_anomaly_talent 20)

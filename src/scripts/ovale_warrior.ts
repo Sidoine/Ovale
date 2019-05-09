@@ -138,7 +138,7 @@ AddFunction ArmsPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(bursting_blood usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_bursting_blood usable=1)
 }
 
 AddFunction ArmsPrecombatCdPostConditions
@@ -410,7 +410,7 @@ AddFunction ArmsDefaultCdActions
  unless CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel) and Spell(charge)
  {
   #potion
-  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(bursting_blood usable=1)
+  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_bursting_blood usable=1)
   #blood_fury,if=debuff.colossus_smash.up
   if target.DebuffPresent(colossus_smash_debuff) Spell(blood_fury_ap)
   #berserking,if=debuff.colossus_smash.up
@@ -524,7 +524,6 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # berserking
 # bladestorm_arms
 # blood_fury_ap
-# bursting_blood
 # charge
 # cleave
 # cleave_talent
@@ -542,6 +541,7 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # fireblood
 # heroic_leap
 # intimidating_shout
+# item_bursting_blood
 # lights_judgment
 # mortal_strike
 # overpower
@@ -691,7 +691,7 @@ AddFunction FuryPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(bursting_blood usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_bursting_blood usable=1)
  #recklessness,if=!talent.furious_slash.enabled&!talent.reckless_abandon.enabled
  if not Talent(furious_slash_talent) and not Talent(reckless_abandon_talent) Spell(recklessness)
 }
@@ -797,7 +797,7 @@ AddFunction FuryDefaultCdActions
   unless target.Distance() > 5 and FuryMovementCdPostConditions() or { target.Distance() > 25 and 600 > 45 or not False(raid_event_movement_exists) } and CheckBoxOn(opt_melee_range) and target.Distance(atLeast 8) and target.Distance(atMost 40) and Spell(heroic_leap)
   {
    #potion
-   if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(bursting_blood usable=1)
+   if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_bursting_blood usable=1)
 
    unless Talent(furious_slash_talent) and { BuffStacks(furious_slash_buff) < 3 or BuffRemaining(furious_slash_buff) < 3 or SpellCooldown(recklessness) < 3 and BuffRemaining(furious_slash_buff) < 9 } and Spell(furious_slash) or SpellCooldown(recklessness) < 3 and Spell(rampage)
    {
@@ -893,7 +893,6 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # bladestorm_fury
 # blood_fury_ap
 # bloodthirst
-# bursting_blood
 # carnage_talent
 # charge
 # cold_steel_hot_blood_trait
@@ -906,6 +905,7 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # furious_slash_talent
 # heroic_leap
 # intimidating_shout
+# item_bursting_blood
 # lights_judgment
 # massacre_talent_fury
 # pummel

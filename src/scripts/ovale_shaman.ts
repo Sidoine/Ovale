@@ -197,7 +197,7 @@ AddFunction ElementalPrecombatCdActions
    #storm_elemental,if=talent.storm_elemental.enabled
    if Talent(storm_elemental_talent) Spell(storm_elemental)
    #potion
-   if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_intellect usable=1)
+   if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_intellect usable=1)
   }
  }
 }
@@ -322,7 +322,7 @@ AddFunction ElementalDefaultCdActions
  #bloodlust,if=azerite.ancestral_resonance.enabled
  if HasAzeriteTrait(ancestral_resonance_trait) ElementalBloodlust()
  #potion,if=expected_combat_length-time<30|cooldown.fire_elemental.remains>120|cooldown.storm_elemental.remains>120
- if { 600 - TimeInCombat() < 30 or SpellCooldown(fire_elemental) > 120 or SpellCooldown(storm_elemental) > 120 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_intellect usable=1)
+ if { 600 - TimeInCombat() < 30 or SpellCooldown(fire_elemental) > 120 or SpellCooldown(storm_elemental) > 120 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_intellect usable=1)
  #wind_shear
  ElementalInterruptActions()
 
@@ -424,7 +424,6 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 # ascendance_elemental
 # ascendance_elemental_buff
 # ascendance_talent
-# battle_potion_of_intellect
 # berserking
 # blood_fury_apsp
 # bloodlust
@@ -450,6 +449,7 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 # icefury_buff
 # icefury_talent
 # igneous_potential_trait
+# item_battle_potion_of_intellect
 # lava_beam
 # lava_burst
 # lava_shock_buff
@@ -696,7 +696,7 @@ AddFunction EnhancementPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_agility usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
 }
 
 AddFunction EnhancementPrecombatCdPostConditions
@@ -933,7 +933,7 @@ AddFunction EnhancementCdsCdActions
  #ancestral_call,if=variable.cooldown_sync
  if cooldown_sync() Spell(ancestral_call)
  #potion,if=buff.ascendance.up|!talent.ascendance.enabled&feral_spirit.remains>5|target.time_to_die<=60
- if { BuffPresent(ascendance_enhancement_buff) or not Talent(ascendance_talent_enhancement) and TotemRemaining(sprit_wolf) > 5 or target.TimeToDie() <= 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_agility usable=1)
+ if { BuffPresent(ascendance_enhancement_buff) or not Talent(ascendance_talent_enhancement) and TotemRemaining(sprit_wolf) > 5 or target.TimeToDie() <= 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
  #feral_spirit
  Spell(feral_spirit)
  #ascendance,if=cooldown.strike.remains>0
@@ -1245,7 +1245,6 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # ascendance_enhancement
 # ascendance_enhancement_buff
 # ascendance_talent_enhancement
-# battle_potion_of_agility
 # berserking
 # blood_fury_apsp
 # bloodlust
@@ -1274,6 +1273,7 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # hex
 # hot_hand_buff
 # hot_hand_talent
+# item_battle_potion_of_agility
 # landslide_buff
 # landslide_talent
 # lava_lash

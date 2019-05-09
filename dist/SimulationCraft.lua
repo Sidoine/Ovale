@@ -1436,6 +1436,7 @@ local InitializeDisambiguation = function()
     AddDisambiguation("132410", "shard_of_the_exodar", "MAGE")
     AddDisambiguation("132454", "koralons_burning_touch", "MAGE", "fire")
     AddDisambiguation("132863", "darcklis_dragonfire_diadem", "MAGE", "fire")
+    AddDisambiguation("blink_any", "blink", "MAGE")
     AddDisambiguation("summon_arcane_familiar", "arcane_familiar", "MAGE", "arcane")
     AddDisambiguation("water_elemental", "summon_water_elemental", "MAGE", "frost")
     AddDisambiguation("bok_proc_buff", "blackout_kick_buff", "MONK", "windwalker")
@@ -2410,10 +2411,10 @@ EmitAction = function(parseNode, nodeList, annotation)
             local name = (modifiers.name and Unparse(modifiers.name)) or annotation.consumables["potion"]
             if name then
                 name = Disambiguate(annotation, name, className, specialization, "item")
-                bodyCode = format("Item(%s usable=1)", name)
+                bodyCode = format("Item(item_%s usable=1)", name)
                 conditionCode = "CheckBoxOn(opt_use_consumables) and target.Classification(worldboss)"
                 annotation.opt_use_consumables = className
-                AddSymbol(annotation, format("%s", name))
+                AddSymbol(annotation, format("item_%s", name))
                 isSpellAction = false
             end
         elseif action == "sequence" then
@@ -3229,7 +3230,7 @@ EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
             code = format("%sCooldownDuration(%s)", prefix, name)
         elseif property == "ready" then
             code = format("%sCooldown(%s) == 0", prefix, name)
-        elseif property == "remains" or property == "adjusted_remains" then
+        elseif property == "remains" or property == "remains_guess" or property == "adjusted_remains" then
             if parseNode.asType == "boolean" then
                 code = format("%sCooldown(%s) > 0", prefix, name)
             else
@@ -3778,7 +3779,7 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
         code = "target.DebuffPresent(winters_chill_debuff)"
         AddSymbol(annotation, "winters_chill_debuff")
     elseif className == "MAGE" and operand == "action.frozen_orb.in_flight" then
-        code = "PreviousGCDSpell(frozen_orb)"
+        code = "TimeSincePreviousSpell(frozen_orb) < 10"
         AddSymbol(annotation, "frozen_orb")
     elseif className == "MONK" and sub(operand, 1, 35) == "debuff.storm_earth_and_fire_target." then
         local property = sub(operand, 36)

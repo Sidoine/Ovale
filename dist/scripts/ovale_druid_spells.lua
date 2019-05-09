@@ -18,16 +18,6 @@ Define(barkskin 22812)
   SpellInfo(barkskin cd=60 duration=12 gcd=0 offgcd=1 tick=1)
   # All damage taken reduced by s2.
   SpellAddBuff(barkskin barkskin=1)
-Define(battle_potion_of_agility 279152)
-# Increases your Agility by s1 for 25 seconds.
-  SpellInfo(battle_potion_of_agility cd=1 duration=25 gcd=0 offgcd=1)
-  # Agility increased by w1.
-  SpellAddBuff(battle_potion_of_agility battle_potion_of_agility=1)
-Define(battle_potion_of_intellect 279151)
-# Increases your Intellect by s1 for 25 seconds.
-  SpellInfo(battle_potion_of_intellect cd=1 duration=25 gcd=0 offgcd=1)
-  # Intellect increased by w1.
-  SpellAddBuff(battle_potion_of_intellect battle_potion_of_intellect=1)
 Define(bear_form 5487)
 # Shapeshift into Bear Form, increasing armor by m3 and Stamina by 1178s2, granting protection from Polymorph effects, and increasing threat generation.rnrnThe act of shapeshifting frees you from movement impairing effects.
 # Rank 2: Bear Form gives an additional s1 Stamina.rn
@@ -59,10 +49,6 @@ Define(bristling_fur 155835)
 Define(brutal_slash 202028)
 # Strikes all nearby enemies with a massive slash, inflicting s1 Physical damage.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
   SpellInfo(brutal_slash energy=25 cd=8 gcd=1 talent=brutal_slash_talent)
-Define(bursting_blood 251316)
-# Imbues your blood with heat for 25 seconds, giving your melee attacks a chance to create a burst of blood, dealing 265514s1 Physical damage split evenly amongst all nearby enemies.
-  SpellInfo(bursting_blood duration=25 channel=25 gcd=0 offgcd=1)
-
 Define(cat_form 768)
 # Shapeshift into Cat Form, increasing auto-attack damage by (25 of Spell Power), movement speed by 113636s1, granting protection from Polymorph effects, and reducing falling damage.rnrnThe act of shapeshifting frees you from movement impairing effects.
   SpellInfo(cat_form)
@@ -204,9 +190,6 @@ Define(rip 1079)
   SpellInfo(rip energy=20 combopoints=1 duration=4 gcd=1 tick=2)
   # Bleeding for w1 damage every t1 sec.
   SpellAddTargetDebuff(rip rip=1)
-Define(rising_death 252346)
-# Chance to create multiple potions.
-  SpellInfo(rising_death gcd=0 offgcd=1)
 Define(savage_roar 52610)
 # Finishing move that increases damage by 62071s1 and energy regeneration rate by (25 of Spell Power) while in Cat Form. Lasts longer per combo point:rnrn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds
   SpellInfo(savage_roar energy=25 combopoints=1 duration=6 channel=6 gcd=1 tick=2 talent=savage_roar_talent)

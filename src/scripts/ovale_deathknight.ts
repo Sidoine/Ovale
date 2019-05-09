@@ -157,7 +157,7 @@ AddFunction BloodPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_strength usable=1)
 }
 
 AddFunction BloodPrecombatCdPostConditions
@@ -206,7 +206,7 @@ AddFunction BloodDefaultCdActions
  #use_item,name=merekthas_fang
  BloodUseItemActions()
  #potion,if=buff.dancing_rune_weapon.up
- if BuffPresent(dancing_rune_weapon_buff) and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
+ if BuffPresent(dancing_rune_weapon_buff) and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_strength usable=1)
  #dancing_rune_weapon,if=!talent.blooddrinker.enabled|!cooldown.blooddrinker.ready
  if not Talent(blooddrinker_talent) or not SpellCooldown(blooddrinker) == 0 Spell(dancing_rune_weapon)
 
@@ -283,7 +283,6 @@ AddIcon checkbox=opt_deathknight_blood_aoe help=cd specialization=blood
 ### Required symbols
 # arcane_torrent_runicpower
 # asphyxiate
-# battle_potion_of_strength
 # berserking
 # blood_boil
 # blood_fury_ap
@@ -300,6 +299,7 @@ AddIcon checkbox=opt_deathknight_blood_aoe help=cd specialization=blood
 # heart_strike
 # heartbreaker_talent
 # hemostasis_buff
+# item_battle_potion_of_strength
 # marrowrend
 # mind_freeze
 # ossuary_talent
@@ -426,7 +426,7 @@ AddFunction FrostPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_strength usable=1)
 }
 
 AddFunction FrostPrecombatCdPostConditions
@@ -526,7 +526,7 @@ AddFunction FrostCooldownsCdActions
  #use_item,name=merekthas_fang,if=!buff.breath_of_sindragosa.up&!buff.pillar_of_frost.up
  if not BuffPresent(breath_of_sindragosa_buff) and not BuffPresent(pillar_of_frost_buff) FrostUseItemActions()
  #potion,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
- if BuffPresent(pillar_of_frost_buff) and BuffPresent(empower_rune_weapon_buff) and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
+ if BuffPresent(pillar_of_frost_buff) and BuffPresent(empower_rune_weapon_buff) and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_strength usable=1)
  #blood_fury,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
  if BuffPresent(pillar_of_frost_buff) and BuffPresent(empower_rune_weapon_buff) Spell(blood_fury_ap)
  #berserking,if=buff.pillar_of_frost.up
@@ -978,7 +978,6 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 
 ### Required symbols
 # arcane_torrent_runicpower
-# battle_potion_of_strength
 # berserking
 # blinding_sleet
 # blood_fury_ap
@@ -1006,6 +1005,7 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # icy_citadel_buff
 # icy_citadel_trait
 # icy_talons_buff
+# item_battle_potion_of_strength
 # killing_machine_buff
 # mind_freeze
 # obliterate
@@ -1094,7 +1094,7 @@ AddFunction UnholyPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_strength usable=1)
 
  unless Spell(raise_dead)
  {
@@ -1349,7 +1349,7 @@ AddFunction UnholyDefaultCdActions
  #use_item,name=grongs_primal_rage,if=rune<=3&(time>20|!equipped.ramping_amplitude_gigavolt_engine)
  if RuneCount() <= 3 and { TimeInCombat() > 20 or not HasEquippedItem(ramping_amplitude_gigavolt_engine_item) } UnholyUseItemActions()
  #potion,if=cooldown.army_of_the_dead.ready|pet.gargoyle.active|buff.unholy_frenzy.up
- if { SpellCooldown(army_of_the_dead) == 0 or pet.Present() or BuffPresent(unholy_frenzy_buff) } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
+ if { SpellCooldown(army_of_the_dead) == 0 or pet.Present() or BuffPresent(unholy_frenzy_buff) } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_strength usable=1)
 
  unless target.DebuffRemaining(virulent_plague_debuff) <= GCD() and Spell(outbreak)
  {
@@ -1439,7 +1439,6 @@ AddIcon checkbox=opt_deathknight_unholy_aoe help=cd specialization=unholy
 # army_of_the_damned_talent
 # army_of_the_dead
 # asphyxiate
-# battle_potion_of_strength
 # berserking
 # blood_fury_ap
 # bursting_sores_talent
@@ -1453,6 +1452,7 @@ AddIcon checkbox=opt_deathknight_unholy_aoe help=cd specialization=unholy
 # epidemic
 # festering_strike
 # festering_wound_debuff
+# item_battle_potion_of_strength
 # magus_of_the_dead_trait
 # mind_freeze
 # outbreak

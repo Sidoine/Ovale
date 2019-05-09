@@ -1597,6 +1597,7 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("132410", "shard_of_the_exodar", "MAGE");
     AddDisambiguation("132454", "koralons_burning_touch", "MAGE", "fire");
     AddDisambiguation("132863", "darcklis_dragonfire_diadem", "MAGE", "fire");
+	AddDisambiguation("blink_any", "blink", "MAGE");
     AddDisambiguation("summon_arcane_familiar", "arcane_familiar", "MAGE", "arcane");
     AddDisambiguation("water_elemental", "summon_water_elemental", "MAGE", "frost");
     
@@ -3412,7 +3413,7 @@ EmitOperandCooldown = function (operand, parseNode, nodeList, annotation, action
             code = format("%sCooldownDuration(%s)", prefix, name);
         } else if (property == "ready") {
             code = format("%sCooldown(%s) == 0", prefix, name);
-        } else if (property == "remains" || property == "adjusted_remains") {
+        } else if (property == "remains" || property == "remains_guess" || property == "adjusted_remains") {
             if (parseNode.asType == "boolean") {
                 code = format("%sCooldown(%s) > 0", prefix, name);
             } else {

@@ -146,7 +146,7 @@ AddFunction BeastmasteryPrecombatCdActions
 {
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_agility usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
  #aspect_of_the_wild,precast_time=1.1,if=!azerite.primal_instincts.enabled
  if not HasAzeriteTrait(primal_instincts_trait) Spell(aspect_of_the_wild)
 }
@@ -160,11 +160,11 @@ AddFunction BeastmasteryPrecombatCdPostConditions
 
 AddFunction BeastmasteryCleaveMainActions
 {
- #barbed_shot,if=pet.cat.buff.frenzy.up&pet.cat.buff.frenzy.remains<=gcd.max
+ #barbed_shot,target_if=min:dot.barbed_shot.remains,if=pet.cat.buff.frenzy.up&pet.cat.buff.frenzy.remains<=gcd.max
  if pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() Spell(barbed_shot)
  #multishot,if=gcd.max-pet.cat.buff.beast_cleave.remains>0.25
  if GCD() - pet.BuffRemaining(pet_beast_cleave_buff) > 0.25 Spell(multishot_bm)
- #barbed_shot,if=full_recharge_time<gcd.max&cooldown.bestial_wrath.remains
+ #barbed_shot,target_if=min:dot.barbed_shot.remains,if=full_recharge_time<gcd.max&cooldown.bestial_wrath.remains
  if SpellFullRecharge(barbed_shot) < GCD() and SpellCooldown(bestial_wrath) > 0 Spell(barbed_shot)
  #chimaera_shot
  Spell(chimaera_shot)
@@ -172,8 +172,8 @@ AddFunction BeastmasteryCleaveMainActions
  if { Enemies() < 4 or not HasAzeriteTrait(rapid_reload_trait) } and pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() Spell(kill_command)
  #dire_beast
  Spell(dire_beast)
- #barbed_shot,if=pet.cat.buff.frenzy.down&(charges_fractional>1.8|buff.bestial_wrath.up)|cooldown.aspect_of_the_wild.remains<pet.cat.buff.frenzy.duration-gcd&azerite.primal_instincts.enabled|target.time_to_die<9
- if pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or target.TimeToDie() < 9 Spell(barbed_shot)
+ #barbed_shot,target_if=min:dot.barbed_shot.remains,if=pet.cat.buff.frenzy.down&(charges_fractional>1.8|buff.bestial_wrath.up)|cooldown.aspect_of_the_wild.remains<pet.cat.buff.frenzy.duration-gcd&azerite.primal_instincts.enabled|charges_fractional>1.4|target.time_to_die<9
+ if pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or Charges(barbed_shot count=0) > 1.4 or target.TimeToDie() < 9 Spell(barbed_shot)
  #multishot,if=azerite.rapid_reload.enabled&active_enemies>2
  if HasAzeriteTrait(rapid_reload_trait) and Enemies() > 2 Spell(multishot_bm)
  #cobra_shot,if=cooldown.kill_command.remains>focus.time_to_max&(active_enemies<3|!azerite.rapid_reload.enabled)
@@ -188,8 +188,8 @@ AddFunction BeastmasteryCleaveShortCdActions
 {
  unless pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() and Spell(barbed_shot) or GCD() - pet.BuffRemaining(pet_beast_cleave_buff) > 0.25 and Spell(multishot_bm) or SpellFullRecharge(barbed_shot) < GCD() and SpellCooldown(bestial_wrath) > 0 and Spell(barbed_shot)
  {
-  #bestial_wrath,if=cooldown.aspect_of_the_wild.remains>20|target.time_to_die<15
-  if SpellCooldown(aspect_of_the_wild) > 20 or target.TimeToDie() < 15 Spell(bestial_wrath)
+  #bestial_wrath,if=cooldown.aspect_of_the_wild.remains_guess>20|talent.one_with_the_pack.enabled|target.time_to_die<15
+  if SpellCooldown(aspect_of_the_wild) > 20 or Talent(one_with_the_pack_talent) or target.TimeToDie() < 15 Spell(bestial_wrath)
 
   unless Spell(chimaera_shot)
   {
@@ -198,7 +198,7 @@ AddFunction BeastmasteryCleaveShortCdActions
    #barrage
    Spell(barrage)
 
-   unless { Enemies() < 4 or not HasAzeriteTrait(rapid_reload_trait) } and pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or target.TimeToDie() < 9 } and Spell(barbed_shot) or HasAzeriteTrait(rapid_reload_trait) and Enemies() > 2 and Spell(multishot_bm) or SpellCooldown(kill_command) > TimeToMaxFocus() and { Enemies() < 3 or not HasAzeriteTrait(rapid_reload_trait) } and Spell(cobra_shot)
+   unless { Enemies() < 4 or not HasAzeriteTrait(rapid_reload_trait) } and pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or Charges(barbed_shot count=0) > 1.4 or target.TimeToDie() < 9 } and Spell(barbed_shot) or HasAzeriteTrait(rapid_reload_trait) and Enemies() > 2 and Spell(multishot_bm) or SpellCooldown(kill_command) > TimeToMaxFocus() and { Enemies() < 3 or not HasAzeriteTrait(rapid_reload_trait) } and Spell(cobra_shot)
    {
     #spitting_cobra
     Spell(spitting_cobra)
@@ -209,7 +209,7 @@ AddFunction BeastmasteryCleaveShortCdActions
 
 AddFunction BeastmasteryCleaveShortCdPostConditions
 {
- pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() and Spell(barbed_shot) or GCD() - pet.BuffRemaining(pet_beast_cleave_buff) > 0.25 and Spell(multishot_bm) or SpellFullRecharge(barbed_shot) < GCD() and SpellCooldown(bestial_wrath) > 0 and Spell(barbed_shot) or Spell(chimaera_shot) or { Enemies() < 4 or not HasAzeriteTrait(rapid_reload_trait) } and pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or target.TimeToDie() < 9 } and Spell(barbed_shot) or HasAzeriteTrait(rapid_reload_trait) and Enemies() > 2 and Spell(multishot_bm) or SpellCooldown(kill_command) > TimeToMaxFocus() and { Enemies() < 3 or not HasAzeriteTrait(rapid_reload_trait) } and Spell(cobra_shot)
+ pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() and Spell(barbed_shot) or GCD() - pet.BuffRemaining(pet_beast_cleave_buff) > 0.25 and Spell(multishot_bm) or SpellFullRecharge(barbed_shot) < GCD() and SpellCooldown(bestial_wrath) > 0 and Spell(barbed_shot) or Spell(chimaera_shot) or { Enemies() < 4 or not HasAzeriteTrait(rapid_reload_trait) } and pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or Charges(barbed_shot count=0) > 1.4 or target.TimeToDie() < 9 } and Spell(barbed_shot) or HasAzeriteTrait(rapid_reload_trait) and Enemies() > 2 and Spell(multishot_bm) or SpellCooldown(kill_command) > TimeToMaxFocus() and { Enemies() < 3 or not HasAzeriteTrait(rapid_reload_trait) } and Spell(cobra_shot)
 }
 
 AddFunction BeastmasteryCleaveCdActions
@@ -225,7 +225,7 @@ AddFunction BeastmasteryCleaveCdActions
 
 AddFunction BeastmasteryCleaveCdPostConditions
 {
- pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() and Spell(barbed_shot) or GCD() - pet.BuffRemaining(pet_beast_cleave_buff) > 0.25 and Spell(multishot_bm) or SpellFullRecharge(barbed_shot) < GCD() and SpellCooldown(bestial_wrath) > 0 and Spell(barbed_shot) or { SpellCooldown(aspect_of_the_wild) > 20 or target.TimeToDie() < 15 } and Spell(bestial_wrath) or Spell(chimaera_shot) or Spell(a_murder_of_crows) or Spell(barrage) or { Enemies() < 4 or not HasAzeriteTrait(rapid_reload_trait) } and pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or target.TimeToDie() < 9 } and Spell(barbed_shot) or HasAzeriteTrait(rapid_reload_trait) and Enemies() > 2 and Spell(multishot_bm) or SpellCooldown(kill_command) > TimeToMaxFocus() and { Enemies() < 3 or not HasAzeriteTrait(rapid_reload_trait) } and Spell(cobra_shot) or Spell(spitting_cobra)
+ pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() and Spell(barbed_shot) or GCD() - pet.BuffRemaining(pet_beast_cleave_buff) > 0.25 and Spell(multishot_bm) or SpellFullRecharge(barbed_shot) < GCD() and SpellCooldown(bestial_wrath) > 0 and Spell(barbed_shot) or { SpellCooldown(aspect_of_the_wild) > 20 or Talent(one_with_the_pack_talent) or target.TimeToDie() < 15 } and Spell(bestial_wrath) or Spell(chimaera_shot) or Spell(a_murder_of_crows) or Spell(barrage) or { Enemies() < 4 or not HasAzeriteTrait(rapid_reload_trait) } and pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or Charges(barbed_shot count=0) > 1.4 or target.TimeToDie() < 9 } and Spell(barbed_shot) or HasAzeriteTrait(rapid_reload_trait) and Enemies() > 2 and Spell(multishot_bm) or SpellCooldown(kill_command) > TimeToMaxFocus() and { Enemies() < 3 or not HasAzeriteTrait(rapid_reload_trait) } and Spell(cobra_shot) or Spell(spitting_cobra)
 }
 
 ### actions.cds
@@ -259,7 +259,7 @@ AddFunction BeastmasteryCdsCdActions
  #lights_judgment,if=pet.cat.buff.frenzy.up&pet.cat.buff.frenzy.remains>gcd.max|!pet.cat.buff.frenzy.up
  if pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) > GCD() or not pet.BuffPresent(pet_frenzy_buff) Spell(lights_judgment)
  #potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up&(target.health.pct<35|!talent.killer_instinct.enabled)|target.time_to_die<25
- if { BuffPresent(bestial_wrath_buff) and BuffPresent(aspect_of_the_wild_buff) and { target.HealthPercent() < 35 or not Talent(killer_instinct_talent) } or target.TimeToDie() < 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_agility usable=1)
+ if { BuffPresent(bestial_wrath_buff) and BuffPresent(aspect_of_the_wild_buff) and { target.HealthPercent() < 35 or not Talent(killer_instinct_talent) } or target.TimeToDie() < 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
 }
 
 AddFunction BeastmasteryCdsCdPostConditions
@@ -406,7 +406,6 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # aspect_of_the_wild_buff
 # barbed_shot
 # barrage
-# battle_potion_of_agility
 # berserking
 # bestial_wrath
 # bestial_wrath_buff
@@ -418,10 +417,12 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # dance_of_death_trait
 # dire_beast
 # fireblood
+# item_battle_potion_of_agility
 # kill_command
 # killer_instinct_talent
 # lights_judgment
 # multishot_bm
+# one_with_the_pack_talent
 # pet_beast_cleave_buff
 # pet_frenzy_buff
 # primal_instincts_trait
@@ -609,7 +610,7 @@ AddFunction MarksmanshipPrecombatCdActions
  #food
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_agility usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
 
  unless Spell(hunters_mark) or Spell(double_tap)
  {
@@ -664,7 +665,7 @@ AddFunction MarksmanshipCdsCdActions
   #lights_judgment
   Spell(lights_judgment)
   #potion,if=buff.trueshot.react&buff.bloodlust.react|buff.trueshot.up&ca_execute|target.time_to_die<25
-  if { BuffPresent(trueshot_buff) and BuffPresent(burst_haste_buff any=1) or BuffPresent(trueshot_buff) and Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } or target.TimeToDie() < 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_agility usable=1)
+  if { BuffPresent(trueshot_buff) and BuffPresent(burst_haste_buff any=1) or BuffPresent(trueshot_buff) and Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } or target.TimeToDie() < 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
   #trueshot,if=focus>60&(buff.precise_shots.down&cooldown.rapid_fire.remains&target.time_to_die>cooldown.trueshot.duration_guess+duration|target.health.pct<20|!talent.careful_aim.enabled)|target.time_to_die<15
   if Focus() > 60 and { BuffExpires(precise_shots_buff) and SpellCooldown(rapid_fire) > 0 and target.TimeToDie() > 0 + BaseDuration(trueshot) or target.HealthPercent() < 20 or not Talent(careful_aim_talent) } or target.TimeToDie() < 15 Spell(trueshot)
  }
@@ -727,6 +728,8 @@ AddFunction MarksmanshipDefaultCdActions
 {
  MarksmanshipInterruptActions()
  #auto_shot
+ #use_item,name=galecallers_boon,if=buff.trueshot.up|!talent.calling_the_shots.enabled|target.time_to_die<10
+ if BuffPresent(trueshot_buff) or not Talent(calling_the_shots_talent) or target.TimeToDie() < 10 MarksmanshipUseItemActions()
  #use_items,if=buff.trueshot.up|!talent.calling_the_shots.enabled|target.time_to_die<20
  if BuffPresent(trueshot_buff) or not Talent(calling_the_shots_talent) or target.TimeToDie() < 20 MarksmanshipUseItemActions()
  #call_action_list,name=cds
@@ -814,7 +817,6 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # ancestral_call
 # arcane_shot
 # barrage
-# battle_potion_of_agility
 # berserking
 # blood_fury_ap
 # calling_the_shots_talent
@@ -828,6 +830,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # hunters_mark
 # hunters_mark_debuff
 # in_the_rhythm_trait
+# item_battle_potion_of_agility
 # lights_judgment
 # master_marksman_buff
 # multishot_mm
@@ -1080,7 +1083,7 @@ AddFunction SurvivalPrecombatCdActions
 {
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_agility usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
 }
 
 AddFunction SurvivalPrecombatCdPostConditions
@@ -1255,7 +1258,7 @@ AddFunction SurvivalCdsCdActions
  #berserking,if=cooldown.coordinated_assault.remains>60|time_to_die<13
  if SpellCooldown(coordinated_assault) > 60 or target.TimeToDie() < 13 Spell(berserking)
  #potion,if=buff.coordinated_assault.up&(buff.berserking.up|buff.blood_fury.up|!race.troll&!race.orc)|time_to_die<26
- if { BuffPresent(coordinated_assault_buff) and { BuffPresent(berserking_buff) or BuffPresent(blood_fury_ap_buff) or not Race(Troll) and not Race(Orc) } or target.TimeToDie() < 26 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_agility usable=1)
+ if { BuffPresent(coordinated_assault_buff) and { BuffPresent(berserking_buff) or BuffPresent(blood_fury_ap_buff) or not Race(Troll) and not Race(Orc) } or target.TimeToDie() < 26 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
 }
 
 AddFunction SurvivalCdsCdPostConditions
@@ -1445,7 +1448,6 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # ancestral_call
 # arcane_torrent_focus
 # aspect_of_the_eagle
-# battle_potion_of_agility
 # berserking
 # berserking_buff
 # birds_of_prey_talent
@@ -1463,6 +1465,7 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # guerrilla_tactics_talent
 # harpoon
 # internal_bleeding_debuff
+# item_battle_potion_of_agility
 # kill_command_survival
 # latent_poison
 # latent_poison_trait

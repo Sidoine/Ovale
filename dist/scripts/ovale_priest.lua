@@ -50,7 +50,7 @@ AddFunction HolyPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_intellect usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_intellect usable=1)
 }
 
 AddFunction HolyPrecombatCdPostConditions
@@ -111,7 +111,7 @@ AddFunction HolyDefaultCdActions
  #use_items
  HolyUseItemActions()
  #potion,if=buff.bloodlust.react|(raid_event.adds.up&(raid_event.adds.remains>20|raid_event.adds.duration<20))|target.time_to_die<=30
- if { BuffPresent(burst_haste_buff any=1) or False(raid_event_adds_exists) and { 0 > 20 or 10 < 20 } or target.TimeToDie() <= 30 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_intellect usable=1)
+ if { BuffPresent(burst_haste_buff any=1) or False(raid_event_adds_exists) and { 0 > 20 or 10 < 20 } or target.TimeToDie() <= 30 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_intellect usable=1)
 
  unless target.DebuffPresent(holy_fire) and { target.DebuffRemaining(holy_fire) <= GCD() or target.DebuffStacks(holy_fire) < 2 } and Enemies() < 7 and Spell(holy_fire) or Enemies() < 5 and Spell(holy_word_chastise) or target.DebuffPresent(holy_fire) and { target.DebuffRefreshable(holy_fire) or target.DebuffStacks(holy_fire) < 2 } and Enemies() < 7 and Spell(holy_fire)
  {
@@ -205,7 +205,6 @@ AddIcon checkbox=opt_priest_holy_aoe help=cd specialization=holy
 # ancestral_call
 # apotheosis
 # arcane_pulse
-# battle_potion_of_intellect
 # berserking
 # divine_star
 # fireblood
@@ -213,6 +212,7 @@ AddIcon checkbox=opt_priest_holy_aoe help=cd specialization=holy
 # holy_fire
 # holy_nova
 # holy_word_chastise
+# item_battle_potion_of_intellect
 # lights_judgment
 # smite
 ]]
@@ -394,7 +394,7 @@ AddFunction ShadowPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(rising_death usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_rising_death usable=1)
 }
 
 AddFunction ShadowPrecombatCdPostConditions
@@ -522,7 +522,7 @@ AddFunction ShadowDefaultCdActions
  #use_item,slot=trinket2
  ShadowUseItemActions()
  #potion,if=buff.bloodlust.react|target.time_to_die<=80|target.health.pct<35
- if { BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 80 or target.HealthPercent() < 35 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(rising_death usable=1)
+ if { BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 80 or target.HealthPercent() < 35 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_rising_death usable=1)
  #variable,name=dots_up,op=set,value=dot.shadow_word_pain.ticking&dot.vampiric_touch.ticking
  #berserking
  Spell(berserking)
@@ -606,6 +606,7 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # dark_void_talent
 # death_throes_trait
 # harvested_thoughts_buff
+# item_rising_death
 # mind_blast
 # mind_bomb
 # mind_flay
@@ -614,7 +615,6 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # mindbender_talent
 # misery_talent
 # quaking_palm
-# rising_death
 # searing_dialogue_trait
 # shadow_crash
 # shadow_word_death

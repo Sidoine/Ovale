@@ -9,11 +9,6 @@ __exports.register = function()
 # Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
   SpellAddBuff(ancestral_call ancestral_call=1)
-Define(battle_potion_of_agility 279152)
-# Increases your Agility by s1 for 25 seconds.
-  SpellInfo(battle_potion_of_agility cd=1 duration=25 gcd=0 offgcd=1)
-  # Agility increased by w1.
-  SpellAddBuff(battle_potion_of_agility battle_potion_of_agility=1)
 Define(berserking 26297)
 # Increases your haste by s1 for 12 seconds.
   SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
@@ -33,10 +28,6 @@ Define(blackout_strike 205523)
 Define(breath_of_fire 115181)
 # Breathe fire on targets in front of you, causing s1 Fire damage.rnrnTargets affected by Keg Smash will also burn, taking 123725o1 Fire damage and dealing 123725s2 reduced damage to you for 12 seconds.
   SpellInfo(breath_of_fire cd=15 gcd=1)
-Define(bursting_blood 251316)
-# Imbues your blood with heat for 25 seconds, giving your melee attacks a chance to create a burst of blood, dealing 265514s1 Physical damage split evenly amongst all nearby enemies.
-  SpellInfo(bursting_blood duration=25 channel=25 gcd=0 offgcd=1)
-
 Define(chi_burst 123986)
 # Hurls a torrent of Chi energy up to 40 yds forward, dealing 148135s1 Nature damage to all enemies, and 130654s1 healing to the Monk and all allies in its path.?c1[rnrnCasting Chi Burst does not prevent avoiding attacks.][]?c3[rnrnChi Burst generates 1 Chi per enemy target damaged, up to a maximum of s3.][]
   SpellInfo(chi_burst cd=30 duration=1 talent=chi_burst_talent)

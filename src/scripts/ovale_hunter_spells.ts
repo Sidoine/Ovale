@@ -38,11 +38,6 @@ Define(barrage 120360)
 # Rapidly fires a spray of shots for 3 seconds, dealing an average of <damageSec> Physical damage to all enemies in front of you. Usable while moving.
   SpellInfo(barrage focus=60 cd=20 duration=3 channel=3 tick=0.2 talent=barrage_talent_marksmanship)
 
-Define(battle_potion_of_agility 279152)
-# Increases your Agility by s1 for 25 seconds.
-  SpellInfo(battle_potion_of_agility cd=1 duration=25 gcd=0 offgcd=1)
-  # Agility increased by w1.
-  SpellAddBuff(battle_potion_of_agility battle_potion_of_agility=1)
 Define(berserking 26297)
 # Increases your haste by s1 for 12 seconds.
   SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
@@ -244,6 +239,8 @@ Define(killer_instinct_talent 1) #22291
 # Kill Command deals s1 increased damage against enemies below s2 health.
 Define(mongoose_bite_talent 17) #22278
 # A brutal attack that deals s1 Physical damage and grants you Mongoose Fury.rnrn|cFFFFFFFFMongoose Fury|rrnIncreases the damage of Mongoose Bite by 259388s1 for 14 seconds, stacking up to 259388u times. Successive attacks do not increase duration.
+Define(one_with_the_pack_talent 5) #22266
+# Wild Call has a s1 increased chance to reset the cooldown of Barbed Shot.
 Define(piercing_shot_talent 21) #22288
 # A powerful shot which deals sw3 Physical damage to the target and up to sw3/(s1/10) Physical damage to all enemies between you and the target. rnrnPiercing Shot ignores the target's armor.
 Define(spitting_cobra_talent 21) #22295

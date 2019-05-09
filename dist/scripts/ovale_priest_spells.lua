@@ -18,11 +18,6 @@ Define(arcane_pulse 260364)
 # Deals <damage> Arcane damage to nearby enemies and reduces their movement speed by 260369s1. Lasts 12 seconds.
   SpellInfo(arcane_pulse cd=180 gcd=1)
 
-Define(battle_potion_of_intellect 279151)
-# Increases your Intellect by s1 for 25 seconds.
-  SpellInfo(battle_potion_of_intellect cd=1 duration=25 gcd=0 offgcd=1)
-  # Intellect increased by w1.
-  SpellAddBuff(battle_potion_of_intellect battle_potion_of_intellect=1)
 Define(berserking 26297)
 # Increases your haste by s1 for 12 seconds.
   SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
@@ -85,9 +80,6 @@ Define(quaking_palm 107079)
   SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
   # Incapacitated.
   SpellAddTargetDebuff(quaking_palm quaking_palm=1)
-Define(rising_death 252346)
-# Chance to create multiple potions.
-  SpellInfo(rising_death gcd=0 offgcd=1)
 Define(shadow_crash 205385)
 # Hurl a bolt of slow-moving Shadow energy at the destination, dealing (125 of Spell Power) Shadow damage to all targets within 205386A1 yards.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r
   SpellInfo(shadow_crash cd=20 insanity=-2000 talent=shadow_crash_talent)

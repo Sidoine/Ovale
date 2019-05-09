@@ -18,11 +18,6 @@ Define(asphyxiate 108194)
   SpellInfo(asphyxiate cd=45 duration=4 talent=asphyxiate_talent_unholy)
   # Stunned.
   SpellAddTargetDebuff(asphyxiate asphyxiate=1)
-Define(battle_potion_of_strength 279153)
-# Increases your Strength by s1 for 25 seconds.
-  SpellInfo(battle_potion_of_strength cd=1 duration=25 gcd=0 offgcd=1)
-  # Strength increased by w1.
-  SpellAddBuff(battle_potion_of_strength battle_potion_of_strength=1)
 Define(berserking 26297)
 # Increases your haste by s1 for 12 seconds.
   SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)

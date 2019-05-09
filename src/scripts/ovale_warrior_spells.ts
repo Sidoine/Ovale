@@ -21,10 +21,6 @@ Define(berserking 26297)
 Define(bloodthirst 23881)
 # Assault the target in a bloodthirsty craze, dealing s*<mult> Physical damage and restoring 117313s1 of your health.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
   SpellInfo(bloodthirst cd=4.5 rage=-8)
-Define(bursting_blood 251316)
-# Imbues your blood with heat for 25 seconds, giving your melee attacks a chance to create a burst of blood, dealing 265514s1 Physical damage split evenly amongst all nearby enemies.
-  SpellInfo(bursting_blood duration=25 channel=25 gcd=0 offgcd=1)
-
 Define(charge 100)
 # Charge to an enemy, dealing 126664s2 Physical damage, rooting it for 1 second?s103828[, and stunning it for 0 second][].rnrn|cFFFFFFFFGenerates /10;s2 Rage.|r
   SpellInfo(charge cd=1.5 charge_cd=20 gcd=0 offgcd=1 rage=-20)

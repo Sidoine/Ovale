@@ -9,16 +9,6 @@ __exports.register = function()
 # Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
   SpellAddBuff(ancestral_call ancestral_call=1)
-Define(battle_potion_of_agility 279152)
-# Increases your Agility by s1 for 25 seconds.
-  SpellInfo(battle_potion_of_agility cd=1 duration=25 gcd=0 offgcd=1)
-  # Agility increased by w1.
-  SpellAddBuff(battle_potion_of_agility battle_potion_of_agility=1)
-Define(battle_potion_of_intellect 279151)
-# Increases your Intellect by s1 for 25 seconds.
-  SpellInfo(battle_potion_of_intellect cd=1 duration=25 gcd=0 offgcd=1)
-  # Intellect increased by w1.
-  SpellAddBuff(battle_potion_of_intellect battle_potion_of_intellect=1)
 Define(berserking 26297)
 # Increases your haste by s1 for 12 seconds.
   SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
