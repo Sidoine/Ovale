@@ -626,6 +626,11 @@ Define(enh_strom_totem_buff 262397)
 # Azerite Traits
 Define(lightning_conduit_trait 275391)
 Define(lightning_conduit_debuff 275391)
+Define(igneous_potential_trait 279829)
+Define(lava_shock_buff 273448)
+Define(lava_shock_trait 273448)
+Define(tectonic_thunder_buff 286949)
+Define(tectonic_thunder_trait 286949)
 
 # Legendary items
 Define(echoes_of_the_great_sundering_item 137074)
