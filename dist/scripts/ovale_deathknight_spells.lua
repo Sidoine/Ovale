@@ -133,6 +133,10 @@ Define(horn_of_winter 57330)
 Define(howling_blast 49184)
 # Blast the target with a frigid wind, dealing s1*<CAP>/AP ?s204088[Frost damage and applying Frost Fever to the target.][Frost damage to that foe, and 237680s1*<CAP>/AP Frost damage to all other enemies within 237680A1 yards, infecting all targets with Frost Fever.]rnrn|Tinterfaceiconsspell_deathknight_frostfever.blp:24|t |cFFFFFFFFFrost Fever|rrnA disease that deals o1*<CAP>/AP Frost damage over 24 seconds and has a chance to grant the Death Knight 195617m1/10 Runic Power each time it deals damage.
   SpellInfo(howling_blast runes=1 runicpower=-10)
+Define(icy_citadel_buff 272719)
+# When Pillar of Frost expires, your Strength is increased by s1 for 6 seconds. This effect lasts s2/1000 sec longer for each Obliterate and Frostscythe critical strike during Pillar of Frost.
+  SpellInfo(icy_citadel_buff channel=-0.001 gcd=0 offgcd=1)
+
 Define(icy_talons_buff 194879)
 # Your Runic Power spending abilities increase your melee attack speed by 194879s1 for 6 seconds, stacking up to 194879u times.
   SpellInfo(icy_talons_buff duration=6 max_stacks=3 gcd=0 offgcd=1)
@@ -275,6 +279,7 @@ Define(unholy_blight_talent 6) #22029
 Define(unholy_frenzy_talent 20) #22110
 # Incites you into a killing frenzy for 12 seconds, increasing Haste by s1 and causing your auto attacks to infect the target with a Festering Wound.
 Define(frozen_tempest_trait 278487)
+Define(icy_citadel_trait 272718)
     ]]
     code = code .. [[
 

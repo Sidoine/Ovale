@@ -16,7 +16,6 @@ Define(arcane_barrage 44425)
 Define(arcane_blast 30451)
 # Blasts the target with energy, dealing (55.00000000000001 of Spell Power) Arcane damage.rnrnEach Arcane Charge increases damage by 36032s1 and mana cost by 36032s5, and reduces cast time by 36032s4.rnrn|cFFFFFFFFGenerates 1 Arcane Charge.|r
   SpellInfo(arcane_blast arcanecharges=-1)
-  SpellAddBuff(arcane_blast rule_of_threes_buff=0)
 Define(arcane_explosion 1449)
 # Causes an explosion of magic around the caster, dealing (60 of Spell Power) Arcane damage to all enemies within A2 yards.rnrn|cFFFFFFFFGenerates s1 Arcane Charge if any targets are hit.|r
   SpellInfo(arcane_explosion arcanecharges=-1)
@@ -32,10 +31,8 @@ Define(arcane_intellect 1459)
   SpellAddTargetDebuff(arcane_intellect arcane_intellect=1)
 Define(arcane_missiles 5143)
 # Launches five waves of Arcane Missiles at the enemy over 2.5 seconds, causing a total of 5*(50 of Spell Power) Arcane damage.
-  SpellInfo(arcane_missiles channel=2.5 haste=spell)
+  SpellInfo(arcane_missiles duration=2.5 channel=2.5 tick=0.625)
   SpellAddBuff(arcane_missiles arcane_missiles=1)
-  SpellAddBuff(arcane_missiles clearcasting_buff=0)
-  SpellAddBuff(arcane_missiles rule_of_threes_buff=0)
   SpellAddTargetDebuff(arcane_missiles arcane_missiles=1)
 Define(arcane_orb 153626)
 # Launches an Arcane Orb forward from your position, traveling up to 40 yards, dealing (120 of Spell Power) Arcane damage to enemies it passes through.rnrn|cFFFFFFFFGrants 1 Arcane Charge when cast and every time it deals damage.|r
@@ -77,12 +74,6 @@ Define(charged_up 205032)
 # Immediately grants s1 Arcane Charges.
   SpellInfo(charged_up cd=40 duration=10 arcanecharges=-4 talent=charged_up_talent)
   SpellAddBuff(charged_up charged_up=1)
-Define(clearcasting 79684)
-# For each c*100/s1 mana you spend, you have a 1 chance to gain Clearcasting, making your next Arcane Missiles or Arcane Explosion free and channel 277726s1 faster.
-  SpellInfo(clearcasting channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(clearcasting clearcasting_buff=1)
-Define(clearcasting_buff 276743)
-	SpellInfo(clearcasting_buff duration=15 max_stacks=2)
 Define(combustion 190319)
 # Engulfs you in flames for 10 seconds, increasing your spells' critical strike chance by s1 and granting you Mastery equal to s3 your Critical Strike stat. Castable while casting other spells.
   SpellInfo(combustion cd=120 duration=10 gcd=0 offgcd=1 tick=0.5)
@@ -184,7 +175,6 @@ Define(phoenix_flames 257541)
 Define(presence_of_mind 205025)
 # Causes your next n Arcane Blasts to be instant cast.
   SpellInfo(presence_of_mind cd=60 gcd=0 offgcd=1)
-  SpellRequire(presence_of_mind unusable 1=buff,presence_of_mind_buff)
   # Arcane Blast is instant cast.
   SpellAddBuff(presence_of_mind presence_of_mind=1)
 Define(pyroblast 11366)
@@ -210,20 +200,13 @@ Define(rising_death 252346)
 Define(rule_of_threes 264354)
 # When you gain your third Arcane Charge, the cost of your next Arcane Blast or Arcane Missiles is reduced by 264774s1.
   SpellInfo(rule_of_threes channel=0 gcd=0 offgcd=1 talent=rule_of_threes_talent)
-  SpellAddBuff(rule_of_threes rule_of_threes_buff=1)
-Define(rule_of_threes_buff 264774)
-	SpellInfo(rule_of_threes_buff duration=15)
+  SpellAddBuff(rule_of_threes rule_of_threes=1)
 Define(rune_of_power 116011)
 # Places a Rune of Power on the ground for 10 seconds which increases your spell damage by 116014s1 while you stand within 8 yds.
   SpellInfo(rune_of_power cd=10 charge_cd=40 duration=10 talent=rune_of_power_talent)
 Define(scorch 2948)
 # Scorches an enemy for (17.7 of Spell Power) Fire damage. Castable while moving.
   SpellInfo(scorch)
-Define(shimmer 212653)
-# Teleports you A1 yards forward, unless something is in the way. Unaffected by the global cooldown and castable while casting.
-  SpellInfo(shimmer cd=0.5 charge_cd=20 duration=0.65 channel=0.65 gcd=0 offgcd=1 talent=shimmer_talent)
-  # Shimmering.
-  SpellAddBuff(shimmer shimmer=1)
 Define(summon_water_elemental 31687)
 # Summons a Water Elemental to follow and fight for you.
   SpellInfo(summon_water_elemental cd=30)
@@ -284,13 +267,12 @@ Define(rune_of_power_talent 9) #22447
 # Places a Rune of Power on the ground for 10 seconds which increases your spell damage by 116014s1 while you stand within 8 yds.
 Define(searing_touch_talent 3) #22462
 # Scorch deals s2 increased damage and is a guaranteed Critical Strike when the target is below s1 health.
-Define(shimmer_talent 5) #22443
-# Teleports you A1 yards forward, unless something is in the way. Unaffected by the global cooldown and castable while casting.
 Define(splitting_ice_talent 17) #23176
 # Your Ice Lance and Icicles now deal s3 increased damage, and hit a second nearby target for s2 of their damage.rnrnYour Ebonbolt and Glacial Spike also hit a second nearby target for s2 of its damage.
 Define(supernova_talent 12) #22470
 # Pulses arcane energy around the target enemy or ally, dealing (30 of Spell Power) Arcane damage to all enemies within A2 yards, and knocking them upward. A primary enemy target will take s1 increased damage.
 Define(arcane_pummeling_trait 270669)
+Define(equipoise_trait 286027)
 Define(blaster_master_trait 274596)
     ]]
     code = code .. [[
@@ -301,8 +283,7 @@ SpellRequire(arcane_intellect unusable 1=buff,arcane_intellect)
 Define(arcane_affinity 166871)
 	SpellInfo(arcane_affinity duration=15)
 
-	SpellAddBuff(arcane_blast presence_of_mind_buff=0 if_spell=presence_of_mind)
-	SpellAddBuff(arcane_blast profound_magic_buff=0 itemset=T16_caster itemcount=2 specialization=arcane)
+	SpellAddBuff(arcane_blast presence_of_mind_buff=-1 if_spell=presence_of_mind)
 	SpellAddBuff(arcane_blast ice_floes_buff=0 if_spell=ice_floes)
 Define(arcane_brilliance 1459)
 	SpellAddBuff(arcane_brilliance arcane_brilliance_buff=1)
@@ -312,11 +293,8 @@ Define(arcane_charge 114664)
 Define(arcane_charge_debuff 36032)
 	SpellInfo(arcane_charge_debuff duration=15 max_stacks=4)
 
-	
-Define(arcane_instability_buff 166872)
-	SpellInfo(arcane_instability_buff duration=15)
-Define(arcane_missiles_buff 79683)
-	SpellInfo(arcane_missiles_buff duration=20 max_stacks=3)
+    SpellAddBuff(arcane_explosion clearcasting_buff=-1)
+    SpellAddBuff(arcane_missiles clearcasting_buff=-1)
 
 	SpellInfo(arcane_orb cd=15)
 
@@ -339,6 +317,8 @@ Define(brain_freeze_buff 190446)
 	SpellInfo(charged_up arcanecharges=-4)
 Define(cinderstorm 198929)
 	SpellInfo(cinderstorm cd=9)
+Define(clearcasting_buff 276743)
+    SpellInfo(clearcasting_buff duration=15 max_stacks=3)
 Define(cold_snap 11958)
 	SpellInfo(cold_snap cd=180 gcd=0 offgcd=1)
 
@@ -391,10 +371,8 @@ Define(frost_bomb 112948)
 Define(frost_bomb_debuff 112948)
 	SpellInfo(frost_bomb_debuff duration=12)
 Define(frost_nova 122)
-	SpellInfo(frost_nova cd=30)
-	SpellAddTargetDebuff(frost_nova frost_nova_debuff=1)
 
-SpellInfo(frostbolt travel_time=1)
+	SpellInfo(frostbolt travel_time=1)
 	SpellAddBuff(frostbolt ice_floes_buff=0 if_spell=ice_floes)
 Define(frostfire_bolt 44614)
 	SpellInfo(frostfire_bolt travel_time=1)
@@ -471,15 +449,14 @@ Define(pet_water_jet 135029)
 Define(pet_water_jet_debuff 135029)
 Define(phoenixs_flames 194466)
 Define(polymorph 118)
-	SpellAddBuff(polymorph presence_of_mind_buff=0)
 	SpellAddTargetDebuff(polymorph polymorph_debuff=1)
 Define(polymorph_debuff 118)
 	SpellInfo(polymorph_debuff duration=50)
 Define(potent_flames_buff 145254)
 	SpellInfo(potent_flames_buff duration=5 max_stacks=5)
 
-	SpellInfo(presence_of_mind cd=90 gcd=0)
-	SpellAddBuff(presence_of_mind presence_of_mind_buff=1)
+    SpellAddBuff(presence_of_mind presence_of_mind=2)
+	SpellRequire(presence_of_mind unusable 1=buff,presence_of_mind_buff)
 Define(presence_of_mind_buff 205025)
 Define(profound_magic_buff 145252)
 	SpellInfo(profound_magic_buff duration=10 max_stacks=4)
@@ -504,7 +481,6 @@ Define(quickening_buff 198924)
 
 	SpellInfo(rune_of_power buff_totem=rune_of_power_buff duration=180 max_totems=1 totem=1)
 	SpellAddBuff(rune_of_power ice_floes_buff=0 if_spell=ice_floes)
-	SpellAddBuff(rune_of_power presence_of_mind_buff=0 if_spell=presence_of_mind)
 Define(rune_of_power_buff 116014)
 
 	SpellInfo(scorch travel_time=1)
@@ -534,61 +510,32 @@ Define(water_elemental_water_jet 135029)
 	SpellInfo(water_elemental_water_jet cd=25 gcd=0 shared_cd=water_elemental_fingers_of_frost)
 	SpellInfo(water_elemental_water_jet unusable=1 talent=lonely_winter_talent)
 	SpellAddBuff(water_elemental_water_jet brain_freeze_buff=1 itemset=T18 itemcount=2)
-	SpellAddTargetDebuff(water_elemental_water_jet water_elemental_water_jet_debuff=1)
 Define(water_elemental_water_jet_debuff 135029)
 	SpellInfo(water_elemental_water_jet_debuff duration=4)
 	SpellInfo(water_elemental_water_jet_debuff add_duration=10 itemset=T18 itemcount=4)
 Define(winters_chill_debuff 157997) # TODO ???
 
 # Talents
-
-
-
-
-
 Define(blazing_soul_talent 4)
 Define(bone_chilling_talent 1)
 Define(chain_reaction_talent 11)
-
 Define(chrono_shift_talent 13)
-
 Define(conflagration_talent 17)
-
-
 Define(flame_on_talent 10)
-
-
 Define(frenetic_speed_talent 13)
 Define(frigid_winds_talent 13)
 Define(frozen_touch_talent 10)
 Define(glacial_insulation_talent 4)
-
-
-
 Define(ice_ward_talent 14)
 Define(incanters_flow_talent 7)
-
-
 Define(lonely_winter_talent 2)
 Define(mana_shield_talent 4)
 Define(meteor_talent 21)
-
-
-
-
-
 Define(pyromaniac_talent 2)
-
-
 Define(reverberate_talent 16)
 Define(ring_of_frost_talent 15)
 Define(rule_of_threes_talent 2)
-
-
-
 Define(slipstream_talent 6)
-
-
 Define(thermal_void_talent 19)
 Define(time_anomaly_talent 20)
 Define(touch_of_the_magi_talent 17)
@@ -618,19 +565,6 @@ Define(zannesu_journey_buff 226852)
 
 ### Pyroblast
 AddFunction FirePyroblastHitDamage asValue=1 { 2.423 * Spellpower() * { BuffPresent(pyroblast_buff asValue=1) * 1.25 } }
-
-# Xelditions
-Define(slow 31589)
-	SpellAddTargetDebuff(slow slow_debuff=1)
-Define(slow_debuff 31589)
-	SpellInfo(slow_debuff duration=15)
-Define(frost_nova_debuff 122)
-	SpellInfo(frost_nova_debuff duration=8)
-Define(prismatic_barrier 235450)
-	SpellInfo(prismatic_barrier cd=25)
-	SpellAddBuff(prismatic_barrier prismatic_barrier_buff=1)
-Define(prismatic_barrier_buff 235450)
-	SpellInfo(prismatic_barrier_buff duration=60)
 ]]
     OvaleScripts:RegisterScript("MAGE", nil, name, desc, code, "include")
 end

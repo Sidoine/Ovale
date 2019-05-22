@@ -121,6 +121,12 @@ Define(hunters_mark 257284)
   SpellInfo(hunters_mark talent=hunters_mark_talent)
   # Damage taken from the Hunter increased by s1.rnrnCan always be seen and tracked by the Hunter.
   SpellAddTargetDebuff(hunters_mark hunters_mark=1)
+Define(in_the_rhythm 272733)
+# When Rapid Fire finishes fully channeling, your Haste is increased by s1 for 8 seconds.
+  SpellInfo(in_the_rhythm duration=8 gcd=0 offgcd=1)
+  # Haste increased by w1.
+  SpellAddBuff(in_the_rhythm in_the_rhythm=1)
+
 Define(kill_command 34026)
 # Give the command to kill, causing your pet to savagely deal <damage> Physical damage to the enemy.
 # Rank 2: Kill Command has a 259489s2 chance to immediately reset its cooldown.rnrnCoordinated Assault increases this chance by another 266779s4.
@@ -193,10 +199,6 @@ Define(trueshot 288613)
   SpellInfo(trueshot cd=120 duration=15)
   # The cooldown of Aimed Shot and Rapid Fire is reduced by m1/4, and Aimed Shot casts s4 faster.
   SpellAddBuff(trueshot trueshot=1)
-Define(unerring_vision_buff 274445)
-# While Trueshot is active you gain s1 Critical Strike rating every sec, stacking up to 10 times.
-  SpellInfo(unerring_vision_buff channel=-0.001 gcd=0 offgcd=1)
-
 Define(vipers_venom_buff 268552)
 # ?s259387[Mongoose Bite][Raptor Strike] has a chance to make your next Serpent Sting cost no Focus and deal an additional 268552s1 initial damage.
   SpellInfo(vipers_venom_buff duration=8 channel=8 gcd=0 offgcd=1)
@@ -264,7 +266,6 @@ Define(primal_instincts_trait 279806)
 Define(focused_fire_trait 278531)
 Define(in_the_rhythm_trait 264198)
 Define(surging_shots_trait 287707)
-Define(unerring_vision_trait 274444)
 Define(blur_of_talons_trait 277653)
 Define(latent_poison_trait 273283)
 Define(venomous_fangs_trait 274590)
@@ -280,8 +281,8 @@ Define(a_murder_of_crows_debuff 131894)
 
 	SpellInfo(aimed_shot focus=30 cd=12 charges=2 cd_haste=ranged unusable=1)
 	SpellRequire(aimed_shot unusable 0=focus,30)
-	# SpellRequire(aimed_shot focus_percent 0=buff,lock_and_load_buff talent=lock_and_load_talent)
-	# SpellAddBuff(aimed_shot lock_and_load_buff=-1 talent=lock_and_load_talent)
+	SpellRequire(aimed_shot focus_percent 0=buff,lock_and_load_buff talent=lock_and_load_talent)
+	SpellAddBuff(aimed_shot lock_and_load_buff=-1 talent=lock_and_load_talent)
 	SpellAddBuff(aimed_shot precise_shots_buff=1)
 	SpellAddBuff(aimed_shot double_tap_buff=-1)
 	SpellAddBuff(aimed_shot trick_shots_buff=-1)
@@ -413,11 +414,11 @@ Define(kill_command_sv 259489)
 	SpellRequire(kill_command_sv cd_percent 0=target_debuff,pheromone_bomb_debuff)
 
 	SpellInfo(lethal_shots_buff duration=15)
-
-	# SpellInfo(lock_and_load_buff duration=15)
+Define(lock_and_load_buff 194594)
+	SpellInfo(lock_and_load_buff duration=15)
 
     SpellInfo(master_marksman_buff duration=12)
-Define(mend_pet 136)
+Define(mend_pet 982)
 	SpellInfo(mend_pet cd=10)
 Define(misdirection 34477)
 	SpellInfo(misdirection cd=30)
@@ -497,8 +498,6 @@ Define(thrill_of_the_hunt_buff 257946)
 	SpellInfo(thrill_of_the_hunt_buff duration=8 max_stacks=3)
 Define(tip_of_the_spear_buff 260286)
     SpellInfo(tip_of_the_spear_buff duration=10 max_stacks=3)
-Define(trackers_net 212638)
-	SpellInfo(trackers_net cd=25)
 Define(trick_shots_buff 257622)
 	SpellInfo(trick_shots_buff duration=20)
 

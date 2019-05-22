@@ -507,6 +507,8 @@ AddFunction FrostCooldownsCdActions
 {
  #use_items,if=(cooldown.pillar_of_frost.ready|cooldown.pillar_of_frost.remains>20)&(!talent.breath_of_sindragosa.enabled|cooldown.empower_rune_weapon.remains>95)
  if { SpellCooldown(pillar_of_frost) == 0 or SpellCooldown(pillar_of_frost) > 20 } and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(empower_rune_weapon) > 95 } FrostUseItemActions()
+ #use_item,name=grongs_primal_rage,if=rune<=3&!buff.pillar_of_frost.up&(!dot.breath_of_sindragosa.ticking|!talent.breath_of_sindragosa.enabled)
+ if RuneCount() <= 3 and not BuffPresent(pillar_of_frost_buff) and { not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) } FrostUseItemActions()
  #use_item,name=razdunks_big_red_button
  FrostUseItemActions()
  #use_item,name=merekthas_fang,if=!dot.breath_of_sindragosa.ticking&!buff.pillar_of_frost.up
@@ -531,8 +533,8 @@ AddFunction FrostCooldownsCdActions
 
   unless Talent(cold_heart_talent) and { BuffStacks(cold_heart_buff) >= 10 and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } and FrostColdheartCdPostConditions()
   {
-   #frostwyrms_fury,if=(buff.pillar_of_frost.remains<=gcd|(buff.pillar_of_frost.remains<8&buff.unholy_strength.remains<=gcd&buff.unholy_strength.up))&buff.pillar_of_frost.up
-   if { BuffRemaining(pillar_of_frost_buff) <= GCD() or BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) <= GCD() and BuffPresent(unholy_strength_buff) } and BuffPresent(pillar_of_frost_buff) Spell(frostwyrms_fury)
+   #frostwyrms_fury,if=(buff.pillar_of_frost.remains<=gcd|(buff.pillar_of_frost.remains<8&buff.unholy_strength.remains<=gcd&buff.unholy_strength.up))&buff.pillar_of_frost.up&azerite.icy_citadel.rank<=2
+   if { BuffRemaining(pillar_of_frost_buff) <= GCD() or BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) <= GCD() and BuffPresent(unholy_strength_buff) } and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 Spell(frostwyrms_fury)
    #frostwyrms_fury,if=target.time_to_die<gcd|(target.time_to_die<cooldown.pillar_of_frost.remains&buff.unholy_strength.up)
    if target.TimeToDie() < GCD() or target.TimeToDie() < SpellCooldown(pillar_of_frost) and BuffPresent(unholy_strength_buff) Spell(frostwyrms_fury)
   }
@@ -550,10 +552,14 @@ AddFunction FrostColdheartMainActions
 {
  #chains_of_ice,if=buff.cold_heart.stack>5&target.time_to_die<gcd
  if BuffStacks(cold_heart_buff) > 5 and target.TimeToDie() < GCD() Spell(chains_of_ice)
- #chains_of_ice,if=(buff.pillar_of_frost.remains<=gcd*(1+cooldown.frostwyrms_fury.ready)|buff.pillar_of_frost.remains<rune.time_to_3)&buff.pillar_of_frost.up
- if { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) Spell(chains_of_ice)
- #chains_of_ice,if=buff.pillar_of_frost.remains<8&buff.unholy_strength.remains<gcd*(1+cooldown.frostwyrms_fury.ready)&buff.unholy_strength.remains&buff.pillar_of_frost.up
- if BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(pillar_of_frost_buff) Spell(chains_of_ice)
+ #chains_of_ice,if=(buff.pillar_of_frost.remains<=gcd*(1+cooldown.frostwyrms_fury.ready)|buff.pillar_of_frost.remains<rune.time_to_3)&buff.pillar_of_frost.up&azerite.icy_citadel.rank<=2
+ if { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 Spell(chains_of_ice)
+ #chains_of_ice,if=buff.pillar_of_frost.remains<8&buff.unholy_strength.remains<gcd*(1+cooldown.frostwyrms_fury.ready)&buff.unholy_strength.remains&buff.pillar_of_frost.up&azerite.icy_citadel.rank<=2
+ if BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 Spell(chains_of_ice)
+ #chains_of_ice,if=(buff.icy_citadel.remains<=gcd*(1+cooldown.frostwyrms_fury.ready)|buff.icy_citadel.remains<rune.time_to_3)&buff.icy_citadel.up&azerite.icy_citadel.enabled&azerite.icy_citadel.rank>2
+ if { BuffRemaining(icy_citadel_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(icy_citadel_buff) < TimeToRunes(3) } and BuffPresent(icy_citadel_buff) and HasAzeriteTrait(icy_citadel_trait) and AzeriteTraitRank(icy_citadel_trait) > 2 Spell(chains_of_ice)
+ #chains_of_ice,if=buff.icy_citadel.remains<8&buff.unholy_strength.remains<gcd*(1+cooldown.frostwyrms_fury.ready)&buff.unholy_strength.remains&buff.icy_citadel.up&!azerite.icy_citadel.enabled&azerite.icy_citadel.rank>2
+ if BuffRemaining(icy_citadel_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(icy_citadel_buff) and not HasAzeriteTrait(icy_citadel_trait) and AzeriteTraitRank(icy_citadel_trait) > 2 Spell(chains_of_ice)
 }
 
 AddFunction FrostColdheartMainPostConditions
@@ -566,7 +572,7 @@ AddFunction FrostColdheartShortCdActions
 
 AddFunction FrostColdheartShortCdPostConditions
 {
- BuffStacks(cold_heart_buff) > 5 and target.TimeToDie() < GCD() and Spell(chains_of_ice) or { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and Spell(chains_of_ice) or BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(pillar_of_frost_buff) and Spell(chains_of_ice)
+ BuffStacks(cold_heart_buff) > 5 and target.TimeToDie() < GCD() and Spell(chains_of_ice) or { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 and Spell(chains_of_ice) or BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 and Spell(chains_of_ice) or { BuffRemaining(icy_citadel_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(icy_citadel_buff) < TimeToRunes(3) } and BuffPresent(icy_citadel_buff) and HasAzeriteTrait(icy_citadel_trait) and AzeriteTraitRank(icy_citadel_trait) > 2 and Spell(chains_of_ice) or BuffRemaining(icy_citadel_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(icy_citadel_buff) and not HasAzeriteTrait(icy_citadel_trait) and AzeriteTraitRank(icy_citadel_trait) > 2 and Spell(chains_of_ice)
 }
 
 AddFunction FrostColdheartCdActions
@@ -575,7 +581,7 @@ AddFunction FrostColdheartCdActions
 
 AddFunction FrostColdheartCdPostConditions
 {
- BuffStacks(cold_heart_buff) > 5 and target.TimeToDie() < GCD() and Spell(chains_of_ice) or { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and Spell(chains_of_ice) or BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(pillar_of_frost_buff) and Spell(chains_of_ice)
+ BuffStacks(cold_heart_buff) > 5 and target.TimeToDie() < GCD() and Spell(chains_of_ice) or { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 and Spell(chains_of_ice) or BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 and Spell(chains_of_ice) or { BuffRemaining(icy_citadel_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(icy_citadel_buff) < TimeToRunes(3) } and BuffPresent(icy_citadel_buff) and HasAzeriteTrait(icy_citadel_trait) and AzeriteTraitRank(icy_citadel_trait) > 2 and Spell(chains_of_ice) or BuffRemaining(icy_citadel_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(icy_citadel_buff) and not HasAzeriteTrait(icy_citadel_trait) and AzeriteTraitRank(icy_citadel_trait) > 2 and Spell(chains_of_ice)
 }
 
 ### actions.bos_ticking
@@ -983,6 +989,8 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # glacial_advance
 # horn_of_winter
 # howling_blast
+# icy_citadel_buff
+# icy_citadel_trait
 # icy_talons_buff
 # killing_machine_buff
 # mind_freeze
@@ -1148,8 +1156,8 @@ AddFunction UnholyCooldownsShortCdActions
 {
  #apocalypse,if=debuff.festering_wound.stack>=4
  if target.DebuffStacks(festering_wound_debuff) >= 4 Spell(apocalypse)
- #dark_transformation
- Spell(dark_transformation)
+ #dark_transformation,if=!raid_event.adds.exists|raid_event.adds.in>15
+ if not False(raid_event_adds_exists) or 600 > 15 Spell(dark_transformation)
  #unholy_frenzy,if=debuff.festering_wound.stack<4
  if target.DebuffStacks(festering_wound_debuff) < 4 Spell(unholy_frenzy)
  #unholy_frenzy,if=active_enemies>=2&((cooldown.death_and_decay.remains<=gcd&!talent.defile.enabled)|(cooldown.defile.remains<=gcd&talent.defile.enabled))
@@ -1171,7 +1179,7 @@ AddFunction UnholyCooldownsCdActions
  #army_of_the_dead
  Spell(army_of_the_dead)
 
- unless target.DebuffStacks(festering_wound_debuff) >= 4 and Spell(apocalypse) or Spell(dark_transformation)
+ unless target.DebuffStacks(festering_wound_debuff) >= 4 and Spell(apocalypse) or { not False(raid_event_adds_exists) or 600 > 15 } and Spell(dark_transformation)
  {
   #summon_gargoyle,if=runic_power.deficit<14
   if RunicPowerDeficit() < 14 Spell(summon_gargoyle)
@@ -1180,7 +1188,7 @@ AddFunction UnholyCooldownsCdActions
 
 AddFunction UnholyCooldownsCdPostConditions
 {
- target.DebuffStacks(festering_wound_debuff) >= 4 and Spell(apocalypse) or Spell(dark_transformation) or target.DebuffStacks(festering_wound_debuff) < 4 and Spell(unholy_frenzy) or Enemies() >= 2 and { SpellCooldown(death_and_decay) <= GCD() and not Talent(defile_talent) or SpellCooldown(defile) <= GCD() and Talent(defile_talent) } and Spell(unholy_frenzy) or target.TimeToDie() < 8 and target.TimeToDie() > 4 and Spell(soul_reaper) or { not False(raid_event_adds_exists) or 600 > 20 } and RuneCount() <= 1 - BuffPresent(unholy_frenzy_buff) and Spell(soul_reaper) or Spell(unholy_blight)
+ target.DebuffStacks(festering_wound_debuff) >= 4 and Spell(apocalypse) or { not False(raid_event_adds_exists) or 600 > 15 } and Spell(dark_transformation) or target.DebuffStacks(festering_wound_debuff) < 4 and Spell(unholy_frenzy) or Enemies() >= 2 and { SpellCooldown(death_and_decay) <= GCD() and not Talent(defile_talent) or SpellCooldown(defile) <= GCD() and Talent(defile_talent) } and Spell(unholy_frenzy) or target.TimeToDie() < 8 and target.TimeToDie() > 4 and Spell(soul_reaper) or { not False(raid_event_adds_exists) or 600 > 20 } and RuneCount() <= 1 - BuffPresent(unholy_frenzy_buff) and Spell(soul_reaper) or Spell(unholy_blight)
 }
 
 ### actions.aoe

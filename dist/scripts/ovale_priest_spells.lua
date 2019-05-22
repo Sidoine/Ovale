@@ -100,9 +100,6 @@ Define(shadow_word_pain 589)
   SpellInfo(shadow_word_pain duration=16 insanity=-400 tick=2)
   # Suffering w2 Shadow damage every t2 sec.
   SpellAddTargetDebuff(shadow_word_pain shadow_word_pain=1)
-Define(shadow_word_void 205351)
-# Blasts the target with a word of void for (130 of Spell Power) Shadow damage.?a185916[rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r][]
-  SpellInfo(shadow_word_void cd=9 insanity=-1500 talent=shadow_word_void_talent)
 Define(shadowform 232698)
 # Assume a Shadowform, increasing your spell damage dealt by s1.
   SpellInfo(shadowform)
@@ -172,14 +169,15 @@ Define(shadow_crash_talent 15) #21755
 # Hurl a bolt of slow-moving Shadow energy at the destination, dealing (125 of Spell Power) Shadow damage to all targets within 205386A1 yards.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r
 Define(shadow_word_death_talent 14) #22311
 # A word of dark binding that inflicts (187.5 of Spell Power) Shadow damage to the target. Only usable on enemies that have less than s2 health.rnrn|cFFFFFFFFGenerates s3 Insanity, or s4 Insanity if the target dies.|r
-Define(shadow_word_void_talent 3) #22314
-# Blasts the target with a word of void for (130 of Spell Power) Shadow damage.?a185916[rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r][]
 Define(surrender_to_madness_talent 21) #21979
 # All your Insanity-generating abilities generate s1 more Insanity and you can cast while moving for 60 seconds.rnrnThen, you take damage equal to s3 of your maximum health and cannot generate Insanity for 15 seconds.
 Define(void_torrent_talent 18) #21720
 # Channel a torrent of void energy into the target, dealing o Shadow damage over 4 seconds.rnrnInsanity does not drain during this channel.rnrn|cFFFFFFFFGenerates 289577s1*289577s2/100 Insanity over the duration.|r
+Define(death_throes_trait 278659)
 Define(searing_dialogue_trait 272788)
+Define(spiteful_apparitions_trait 277682)
 Define(thought_harvester_trait 288340)
+Define(whispers_of_the_damned_trait 275722)
     ]]
     code = code .. [[
 # Priest spells and functions.
@@ -280,7 +278,8 @@ Define(shadow_mend 186263)
 	SpellRequire(shadow_word_pain insanity_percent 200=buff,surrender_to_madness_buff)
 Define(shadow_word_pain_debuff 589)
 	SpellInfo(shadow_word_pain_debuff duration=16 haste=spell tick=2)
-
+Define(shadow_word_void 205351)
+    SpellInfo(shadow_word_void cd=9 insanity=-15 talent=shadow_word_void_talent)
 	SpellInfo(shadow_word_void cd=9 charges=2 insanity=-15 tag=main)
 	SpellInfo(shadow_word_void replaced_by=mind_blast talent=!shadow_word_void_talent)
 	SpellRequire(shadow_word_void cd 7.5=buff,voidform_buff)
@@ -346,55 +345,24 @@ Define(thought_harvester_trait 273319)
 	Define(harvested_thoughts_buff 273321)
 
 #Talents
-Define(afterlife_talent 9)
-Define(angelic_feather_talent 6)
-Define(angels_mercy_talent 4)
 Define(apotheosis_talent 20)
-Define(auspicious_spirits_talent 13)
-Define(benediction_talent 16)
-Define(binding_heal_talent 14)
-Define(body_and_soul_talent 4)
-Define(castigation_talent 1)
-Define(censure_talent 11)
-Define(circle_of_healing_talent 15)
-Define(contrition_talent 14)
-Define(cosmic_ripple_talent 7)
+Define(dark_ascension_talent 20)
+Define(dark_void_talent 9)
 Define(disc_mindbender_talent 8)
 Define(divine_star_talent 17)
-Define(dominant_mind_talent 11)
-Define(enduring_renewal_talent 3)
-Define(enlightenment_talent 1)
-Define(evangelism_talent 21)
 Define(fortress_of_the_mind_talent 1)
-Define(guardian_angel_talent 8)
 Define(halo_talent 18)
-Define(holy_word_salvation_talent 21)
-Define(last_word_talent 10)
 Define(legacy_of_the_void_talent 19)
-Define(lenience_talent 19)
-Define(light_of_the_naaru_talent 19)
-Define(lingering_insanity_talent 16)
-Define(luminous_barrier_talent 20)
-Define(mania_talent 6)
-Define(masochism_talent 5)
 Define(mind_bomb_talent 11)
-Define(perseverance_talent 5)
-Define(power_word_solace_talent 9)
-Define(psychic_horror_talent 12)
-Define(psychic_voice_talent 10)
+Define(misery_talent 8)
 Define(purge_the_wicked_talent 16)
-Define(sanlayn_talent 5)
-Define(schism_talent 3)
-Define(shadow_covenant_talent 15)
+Define(shadow_crash_talent 15)
 Define(shadow_mindbender_talent 17)
+Define(shadow_word_death_talent 14)
+Define(shadow_word_void_talent 3)
 Define(shadowy_insight_talent 2)
-Define(shield_discipline_talent 7)
-Define(shining_force_talent 12)
-Define(sins_of_the_many_talent 13)
-Define(surge_of_light_talent 13)
-Define(trail_of_light_talent 2)
-Define(twist_of_fate_talent_discipline 2)
-Define(twist_of_fate_talent 7)
+Define(surrender_to_madness_talent 21)
+Define(void_torrent_talent 18)
 ]]
     OvaleScripts:RegisterScript("PRIEST", nil, name, desc, code, "include")
 end

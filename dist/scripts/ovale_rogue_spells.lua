@@ -107,7 +107,7 @@ Define(kick 1766)
   SpellInfo(kick cd=15 duration=5 gcd=0 offgcd=1 interrupt=1)
 Define(kidney_shot 408)
 # Finishing move that stuns the target. Lasts longer per combo point:rn   1 point  : 2 secondsrn   2 points: 3 secondsrn   3 points: 4 secondsrn   4 points: 5 secondsrn   5 points: 6 seconds?s193531[rn   6 points: 7 seconds][]
-  SpellInfo(kidney_shot energy=25 combopoints=1 cd=20 duration=1 gcd=1 interrupt=1)
+  SpellInfo(kidney_shot energy=25 combopoints=1 cd=20 duration=1 gcd=1)
   # Stunned.
   SpellAddTargetDebuff(kidney_shot kidney_shot=1)
 Define(killing_spree 51690)
@@ -355,6 +355,7 @@ Define(blind_debuff 2094)
 	SpellAddBuff(blindside blindside_buff=-1)
 Define(blindside_buff 121153)
 	SpellInfo(blindside_buff duration=10)
+
 	SpellInfo(cheap_shot combopoints=-2 energy=40 interrupt=1 stealthed=1)
 	SpellInfo(cheap_shot energy=0 talent=dirty_tricks_talent)
 	SpellRequire(cheap_shot energy_percent 0=buff,shot_in_the_dark_buff specialization=subtlety)
@@ -486,7 +487,7 @@ Define(pick_pocket 921)
 
 	SpellInfo(pistol_shot combopoints=-1 energy=40)
 	SpellAddBuff(pistol_shot opportunity_buff=-1)
-	SpellRequire(pistol_shot energy_percent 0=buff,opportunity_buff)
+	SpellRequire(pistol_shot energy_percent 50=buff,opportunity_buff)
 	SpellRequire(pistol_shot combopionts -2=buff,opportunity_buff talent=quick_draw_talent)
 
 	SpellInfo(poisoned_knife energy=40 combopoints=-1)
@@ -543,8 +544,8 @@ Define(shuriken_combo_buff 245640)
 	SpellAddBuff(shuriken_storm shuriken_combo_buff=1)
 
 	SpellInfo(shuriken_tornado energy=60 cd=60)
-Define(shuriken_toss 114014)
-	SpellInfo(shuriken_toss combopoints=-1 energy=32 travel_time=1)
+
+	SpellInfo(shuriken_toss combopoints=-1 energy=40 travel_time=1)
 
 	SpellInfo(sinister_strike combopoints=-1 energy=45)
 
@@ -559,12 +560,13 @@ Define(sprint 2983)
 	SpellAddBuff(sprint sprint_buff=1)
 Define(sprint_buff 2983)
 	SpellInfo(sprint_buff duration=8)
-Define(stealth_buff 1784)
+
 	SpellInfo(stealth cd=2 to_stance=rogue_stealth)
 	SpellRequire(stealth unusable 1=stealthed,1)
 	SpellRequire(stealth unusable 1=combat,1)
 	SpellAddBuff(stealth stealth_buff=1)
 	SpellAddBuff(stealth master_of_shadows=1 talent=master_of_shadows_talent specialization=subtlety)
+Define(stealth_buff 1784)
 Define(subterfuge_buff 115192)
 	SpellInfo(subterfuge_buff duration=3)
 
@@ -673,12 +675,6 @@ Define(soothing_darkness_talent 10)
 
 
 Define(weaponmaster_talent 1)
-
-Define(cold_blood 213981)
-	SpellInfo(cold_blood cd=60)
-	SpellAddBuff(cold_blood cold_blood_buff=1)
-	SpellRequire(cold_blood unusable 1=buff,cold_blood_buff)
-Define(cold_blood_buff 213981)
 
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(vanish tag=shortcd)

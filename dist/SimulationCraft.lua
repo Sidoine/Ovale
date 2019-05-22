@@ -3752,6 +3752,9 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
         AddSymbol(annotation, "vulnerable")
     elseif className == "HUNTER" and operand == "cooldown.trueshot.duration_guess" then
         code = "0"
+    elseif className == "HUNTER" and operand == "ca_execute" then
+        code = "Talent(careful_aim_talent) and (target.HealthPercent() > 80 or target.HealthPercent() < 20)"
+        AddSymbol(annotation, "careful_aim_talent")
     elseif className == "MAGE" and operand == "buff.rune_of_power.remains" then
         code = "TotemRemaining(rune_of_power)"
     elseif className == "MAGE" and operand == "buff.shatterlance.up" then

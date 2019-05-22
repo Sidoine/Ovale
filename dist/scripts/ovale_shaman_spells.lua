@@ -5,8 +5,7 @@ local OvaleScripts = __Scripts.OvaleScripts
 __exports.register = function()
     local name = "ovale_shaman_spells"
     local desc = "[8.1] Ovale: Shaman spells"
-    local code = [[
-Define(ancestral_call 274738)
+    local code = [[Define(ancestral_call 274738)
 # Invoke the spirits of your ancestors, granting you their power for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
   SpellAddBuff(ancestral_call ancestral_call=1)
@@ -286,6 +285,8 @@ Define(natural_harmony_trait 278697)
 Define(lightning_conduit_trait 275388)
 Define(primal_primer_trait 272992)
 Define(strength_of_earth_trait 273461)
+    ]]
+    code = code .. [[
 
 # Alias
 SpellList(lava_burst_nocd ascendance_elemental_buff lava_surge_buff)
@@ -384,6 +385,7 @@ Define(elemental_blast_haste_buff 173183)
 	SpellInfo(elemental_blast_haste_buff duration=10)
 Define(elemental_blast_mastery_buff 173184)
 	SpellInfo(elemental_blast_mastery_buff duration=10)
+Define(elemental_spirits_talent 19)
 Define(exposed_elements_debuff 269808)
 	SpellInfo(exposed_elements_debuff duration=15)
 Define(far_sight 6196)
@@ -402,7 +404,7 @@ Define(far_sight 6196)
 	SpellInfo(flame_shock cd=6)
 	SpellAddTargetDebuff(flame_shock flame_shock_debuff=1)
 Define(flame_shock_debuff 188389)
-	SpellInfo(flame_shock_debuff duration=24 haste=spell)
+	SpellInfo(flame_shock_debuff duration=18 haste=spell tick=2)
 Define(flame_shock_restoration 188838)
 	SpellInfo(flame_shock_restoration cd=6)
 Define(flame_shock_restoration_debuff 188389)
@@ -445,7 +447,7 @@ Define(healing_rain_buff 73920)
 Define(healing_stream_totem 5394)
 	SpellInfo(healing_stream_totem cd=30)
 	SpellInfo(healing_stream_totem charges=2 talent=resto_echo_of_the_elements_talent)
-Define(healing_surge 8004)
+Define(healing_surge 188070)
 Define(healing_surge_restoration 8004)
 	SpellAddBuff(healing_surge_restoration ancestral_vigor_buff=1 talent=ancestral_vigor_talent)
 Define(healing_tide_totem 108280)
@@ -638,26 +640,48 @@ Define(aftershock_talent 4)
 Define(ancestral_guidance_talent 14)
 Define(ancestral_protection_totem_talent 12)
 Define(ancestral_vigor_talent 10)
+
 Define(boulderfist_talent 1)
 Define(cloudburst_totem_talent 18)
+
 Define(deluge_talent 5)
 Define(downpour_talent 17)
 Define(earth_shield_talent 8)
 Define(earth_shield_talent_restoration 6)
 Define(earthen_rage_talent 16)
+
 Define(earthen_wall_totem_talent 11)
 Define(earthgrab_totem_talent 8)
 Define(echo_of_the_elements_talent 2)
 Define(resto_echo_of_the_elements_talent 4)
+
+
+
+
 Define(flash_flood_talent 16)
+
+
 Define(graceful_spirit_talent 14)
+
 Define(high_tide_talent 19)
 Define(high_voltage_talent 10)
+
+
+
+
+
+
 Define(natures_guardian_talent 13)
+
 Define(primal_elementalist_talent 17)
+
 Define(spirit_wolf_talent 7)
 Define(static_charge_talent 9)
+
+
+
 Define(torrent_talent 1)
+
 Define(undulation_talent 2)
 Define(unleash_life_talent 3)
 Define(unlimited_power_talent 19)
