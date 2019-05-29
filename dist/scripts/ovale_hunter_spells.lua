@@ -599,6 +599,9 @@ Define(venomous_bite_talent 10)
 
 Define(volley_talent 5)
 
+# Pvp talents
+Define(trackers_net 212638)
+	SpellInfo(trackers_net cd=25)
 
 # Item set
 Define(t20_2p_critical_aimed_damage_buff 242242) # TODO
