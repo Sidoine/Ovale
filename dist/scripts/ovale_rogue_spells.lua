@@ -616,9 +616,13 @@ Define(skull_and_crossbones_buff 199603)
 Define(true_bearing_buff 193359)
 	SpellInfo(true_bearing_buff duration=12 add_duration_combopoints=6)
 
+# Pvp talents
+Define(cold_blood 213981)
+	SpellInfo(cold_blood cd=60)
 
 # Azerite Traits
-
+Define(deadshot_buff 272935)
+Define(keep_your_wits_about_you_buff 288985)
 
 
 # Leegendary items
