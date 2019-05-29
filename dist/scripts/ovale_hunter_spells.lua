@@ -418,7 +418,7 @@ Define(lock_and_load_buff 194594)
 	SpellInfo(lock_and_load_buff duration=15)
 
     SpellInfo(master_marksman_buff duration=12)
-Define(mend_pet 982)
+Define(mend_pet 136)
 	SpellInfo(mend_pet cd=10)
 Define(misdirection 34477)
 	SpellInfo(misdirection cd=30)
