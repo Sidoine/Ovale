@@ -5,7 +5,8 @@ local OvaleScripts = __Scripts.OvaleScripts
 __exports.register = function()
     local name = "ovale_deathknight_spells"
     local desc = "[8.1] Ovale: Death Knight spells"
-    local code = [[Define(apocalypse 275699)
+    local code = [[
+Define(apocalypse 275699)
 # Bring doom upon the enemy, dealing sw1 Shadow damage and bursting up to s2 Festering Wounds on the target.rnrnSummons an Army of the Dead ghoul for 15 seconds for each burst Festering Wound.
   SpellInfo(apocalypse cd=90)
 Define(army_of_the_dead 42650)
@@ -70,11 +71,10 @@ Define(dancing_rune_weapon 49028)
   SpellInfo(dancing_rune_weapon cd=120 duration=13)
 
   SpellAddTargetDebuff(dancing_rune_weapon dancing_rune_weapon=1)
-Define(dark_transformation 63560)
+
 # Transform your ?s207313[abomination]?s58640[geist][ghoul] into a powerful undead monstrosity for 15 seconds. The ?s207313[abomination]?s58640[geist][ghoul]'s abilities are empowered and take on new functions while the transformation is active.
-  SpellInfo(dark_transformation cd=60 duration=15 channel=15)
-  # ?w2>0[Transformed into an undead monstrosity.][Gassy.]rnDamage dealt increased by w1.
-  SpellAddBuff(dark_transformation dark_transformation=1)
+Define(dark_transformation 63560)
+	SpellInfo(dark_transformation cd=60)
 Define(death_and_decay 43265)
 # Corrupts the targeted ground, causing 52212m1*11 Shadow damage over 10 seconds to targets within the area.rnrnWhile you remain within the area, your ?s223829[Necrotic Strike and ][]?c1[Heart Strike will hit up to 188290m3 additional targets.]?s207311[Clawing Shadows will hit all enemies near the target.][Scourge Strike will hit all enemies near the target.]
   SpellInfo(death_and_decay runes=1 runicpower=-10 cd=30 duration=10 tick=1)
@@ -168,6 +168,8 @@ Define(pillar_of_frost 51271)
 Define(raise_dead 46584)
 # Raises ?s207313[an abomination]?s58640[a geist][a ghoul] to fight by your side. You can have a maximum of one ?s207313[abomination]?s58640[geist][ghoul] at a time.
   SpellInfo(raise_dead cd=30)
+Define(raise_abomination 288853)
+	SpellInfo(raise_abomination cd=90)
 Define(remorseless_winter 196770)
 # Drain the warmth of life from all nearby enemies within 196771A1 yards, dealing 9*196771s1*<CAP>/AP Frost damage over 8 seconds and reducing their movement speed by 211793s1.
   SpellInfo(remorseless_winter runes=1 runicpower=-10 cd=20 duration=8 tick=1)
@@ -352,12 +354,6 @@ Define(dark_command 56222)
 	SpellInfo(dark_command cd=8)
 Define(dark_succor_buff 101568)
 	SpellInfo(dark_succor_buff duration=15)
-
-	SpellInfo(dark_transformation cd=60)
-	SpellAddPetBuff(dark_transformation dark_transformation_buff=1)
-Define(dark_transformation_buff 63560)
-	SpellInfo(dark_transformation_buff duration=15)
-
 	SpellInfo(death_and_decay runes=1 runicpower=-10 cd=30 specialization=unholy)
 	SpellInfo(death_and_decay runes=1 runicpower=-10 cd=15 specialization=blood)
 	SpellInfo(death_and_decay replaced_by=defile talent=defile_talent specialization=unholy)
@@ -480,6 +476,10 @@ Define(outbreak_debuff 196782)
 	SpellInfo(outbreak_debuff duration=6)
 Define(ossuary_buff 219788)
 Define(path_of_frost 3714)
+	SpellRequire(path_of_frost unusable 1=buff,path_of_frost_buff)
+	SpellAddBuff(path_of_frost path_of_frost_buff=1)
+Define(path_of_frost_buff 3714)
+	SpellInfo(path_of_frost_buff duration=600)
 
 	SpellInfo(pillar_of_frost cd=45)
 	SpellAddBuff(pillar_of_frost pillar_of_frost_buff=1)
@@ -565,6 +565,7 @@ Define(lanathels_lament_buff 212975)
 	SpellAddBuff(death_and_decay lanathels_lament_buff=1 if_equipped=lanathels_lament)
 Define(perseverance_of_the_ebon_martyr_item 132459)
 Define(perseverance_of_the_ebon_martyr_debuff 216059)
+Define(ramping_amplitude_gigavolt_engine_item 165580)
 
 
 ## Tier Items

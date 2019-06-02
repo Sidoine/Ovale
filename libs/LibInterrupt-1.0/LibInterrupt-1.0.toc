@@ -1,0 +1,12 @@
+## Interface: 70300
+## Title: Lib: Interrupt-1.0
+## Notes: Provides interrupt details.
+## Author: Xeltor
+## Version: 7.0.3.2
+## LoadOnDemand: 1
+## X-Date: 2016-08-09T13:56:45Z
+## X-Category: Libraries
+## X-License: All Rights Reserved
+
+LibStub\LibStub.lua
+lib.xml

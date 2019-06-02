@@ -926,8 +926,9 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
         end
         if  not lastGCDSpellcastFound then
             local spellcast = lastSpell.lastGCDSpellcast
-            if spellcast then
+            if spellcast and next(spellcast) ~= nil then
                 self.next.lastGCDSpellcast = spellcast
+                self.next.lastGCDSpellId = spellcast.spellId
                 if spellcast.stop and self.next.nextCast < spellcast.stop then
                     self.next.nextCast = spellcast.stop
                     reason = " (waiting for spellcast)"

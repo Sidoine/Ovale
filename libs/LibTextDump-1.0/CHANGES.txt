@@ -1,0 +1,10 @@
+tag 8413f81c6c05e38cb42f512a58d2eba6108f0adb 8.0.1.2
+Author:	James D. Callahan III <jcallahan@curse.com>
+Date:	Sat Jul 21 01:21:52 2018 -0500
+
+commit a69240dd98573954f1edf246d07b2a1a8ef37396
+Author: James D. Callahan III <jcallahan@curse.com>
+Date:   Sat Jul 21 01:21:34 2018 -0500
+
+    Hard-embed LibStub, to stop the WoW 8.x client from complaining about being unable to load it under a dev environment.
+

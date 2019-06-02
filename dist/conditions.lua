@@ -1,5 +1,6 @@
 local LibBabbleCreatureType = LibStub:GetLibrary("LibBabble-CreatureType-3.0", true)
 local LibRangeCheck = LibStub:GetLibrary("LibRangeCheck-2.0", true)
+local LibInterrupt = LibStub:GetLibrary("LibInterrupt-1.0", true)
 local __BestAction = LibStub:GetLibrary("ovale/BestAction")
 local OvaleBestAction = __BestAction.OvaleBestAction
 local __Compile = LibStub:GetLibrary("ovale/Compile")
@@ -64,6 +65,14 @@ local GetUnitSpeed = GetUnitSpeed
 local GetWeaponEnchantInfo = GetWeaponEnchantInfo
 local HasFullControl = HasFullControl
 local IsStealthed = IsStealthed
+local IsMounted = IsMounted
+local IsFalling = IsFalling
+local IsFlyableArea = IsFlyableArea
+local IsFlying = IsFlying
+local IsInInstance = IsInInstance
+local IsIndoors = IsIndoors
+local IsOutdoors = IsOutdoors
+local IsSwimming = IsSwimming
 local UnitCastingInfo = UnitCastingInfo
 local UnitChannelInfo = UnitChannelInfo
 local UnitClass = UnitClass
@@ -84,6 +93,7 @@ local UnitPower = UnitPower
 local UnitPowerMax = UnitPowerMax
 local UnitRace = UnitRace
 local UnitStagger = UnitStagger
+local UnitGUID = UnitGUID
 local huge = math.huge
 local __AST = LibStub:GetLibrary("ovale/AST")
 local isValueNode = __AST.isValueNode
@@ -603,11 +613,11 @@ local function Classification(positionalParams, namedParams, atTime)
                 targetClassification = "worldboss"
             else
                 targetClassification = UnitClassification(target)
-                if targetClassification == "rareelite" then
-                    targetClassification = "elite"
-                elseif targetClassification == "rare" then
-                    targetClassification = "normal"
-                end
+                -- if targetClassification == "rareelite" then
+                    -- targetClassification = "elite"
+                -- elseif targetClassification == "rare" then
+                    -- targetClassification = "normal"
+                -- end
             end
         end
         local boolean = (targetClassification == classification)
@@ -1190,6 +1200,15 @@ local function IsFriend(positionalParams, namedParams, atTime)
     OvaleCondition:RegisterCondition("isfriend", false, IsFriend)
 end
 do
+
+local function PlayerIsResting(positionalParams, namedParams, atTime)
+		local yesno = positionalParams[1]
+        local boolean = IsResting()
+        return TestBoolean(boolean, yesno)
+    end
+    OvaleCondition:RegisterCondition("playerisresting", false, PlayerIsResting)
+end
+do
 local function IsIncapacitated(positionalParams, namedParams, atTime)
         local yesno = positionalParams[1]
         local boolean =  not HasFullControl() and OvaleLossOfControl.HasLossOfControl("CONFUSE", atTime)
@@ -1209,6 +1228,25 @@ local function IsInterruptible(positionalParams, namedParams, atTime)
         return TestBoolean(boolean, yesno)
     end
     OvaleCondition:RegisterCondition("isinterruptible", false, IsInterruptible)
+end
+do
+
+local function MustBeInterrupted(positionalParams, namedParams, atTime)
+        local yesno = positionalParams[1]
+        local target = ParseCondition(positionalParams, namedParams)
+        local boolean = LibInterrupt:MustInterrupt(target)
+        return TestBoolean(boolean, yesno)
+    end
+    OvaleCondition:RegisterCondition("mustbeinterrupted", false, MustBeInterrupted)
+end
+do
+local function HasManagedInterrupts(positionalParams, namedParams, atTime)
+        local yesno = positionalParams[1]
+        local target = ParseCondition(positionalParams, namedParams)
+        local boolean = LibInterrupt:HasInterrupts(target)
+        return TestBoolean(boolean, yesno)
+    end
+    OvaleCondition:RegisterCondition("hasmanagedinterrupts", false, HasManagedInterrupts)
 end
 do
 local function IsPVP(positionalParams, namedParams, atTime)
@@ -1360,13 +1398,14 @@ local function MaxPower(powerType, positionalParams, namedParams, atTime)
 local function Power(powerType, positionalParams, namedParams, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
         local target = ParseCondition(positionalParams, namedParams)
-        if target == "player" then
+        if target == "player" and powerType ~= "energy" then
             local value, origin, rate = OvalePower.next.power[powerType], atTime, OvalePower.next:GetPowerRate(powerType, atTime)
             local start, ending = atTime, INFINITY
             return TestValue(start, ending, value, origin, rate, comparator, limit)
         else
             local powerInfo = OvalePower.POWER_INFO[powerType]
             local value = UnitPower(target, powerInfo.id)
+			-- Ovale:OneTimeMessage("Test energy: %s %s %s %s %s", value, origin, rate, comparator, limit)
             return Compare(value, comparator, limit)
         end
     end
@@ -2119,7 +2158,34 @@ local function TargetIsPlayer(positionalParams, namedParams, atTime)
     OvaleCondition:RegisterCondition("targetisplayer", false, TargetIsPlayer)
 end
 do
-local function Threat(positionalParams, namedParams, atTime)
+local function IsFocus(positionalParams, namedParams, atTime)
+		local yesno = positionalParams[1]
+		local target = ParseCondition(positionalParams, namedParams)
+		local boolean = UnitIsUnit("focus", target)
+		return TestBoolean(boolean, yesno)
+	end
+	OvaleCondition:RegisterCondition("isfocus", false, IsFocus)
+end
+do
+local function IsTarget(positionalParams, namedParams, atTime)
+		local yesno = positionalParams[1]
+		local target = ParseCondition(positionalParams, namedParams)
+		local boolean = UnitIsUnit("target", target)
+		return TestBoolean(boolean, yesno)
+	end
+	OvaleCondition:RegisterCondition("istarget", false, IsTarget)
+end
+do
+local function IsMouseover(positionalParams, namedParams, atTime)
+		local yesno = positionalParams[1]
+		local target = ParseCondition(positionalParams, namedParams)
+		local boolean = UnitIsUnit("mouseover", target)
+		return TestBoolean(boolean, yesno)
+	end
+	OvaleCondition:RegisterCondition("ismouseover", false, IsMouseover)
+end
+do
+local function Threat(positionalParams, namedParams, state, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
         local target = ParseCondition(positionalParams, namedParams, "target")
         local _, _, value = UnitDetailedThreatSituation("player", target)
@@ -2473,8 +2539,13 @@ end
 do
 local function SoulFragments(positionalParams, namedParams, atTime)
         local comparator, limit = positionalParams[1], positionalParams[2]
-        local value = OvaleDemonHunterSoulFragments:SoulFragments(atTime)
-        return Compare(value, comparator, limit)
+		local value = nil
+		if OvaleDemonHunterSoulFragments:SoulFragments(atTime) ~= nil then
+			value = OvaleDemonHunterSoulFragments:SoulFragments(atTime)
+			return Compare(value, comparator, limit)
+		else
+			return false
+		end
     end
     OvaleCondition:RegisterCondition("soulfragments", false, SoulFragments)
 end
@@ -2499,4 +2570,144 @@ local function HasDebuffType(positionalParams, namedParams, atTime)
         return nil
     end
     OvaleCondition:RegisterCondition("hasdebufftype", false, HasDebuffType)
+end
+do
+local function RaidMembersWithHealthPercent(positionalParams, namedParams, atTime)
+        local healthComparator, healthLimit, countComparator, countLimit = positionalParams[1], positionalParams[2], positionalParams[3], positionalParams[4]
+		local value = 0
+		for _, uid in pairs(OvaleData.RAID_UIDS) do
+			local health = OvaleHealth:UnitHealth(uid) or 0
+			if health > 0 then
+				local maxHealth = OvaleHealth:UnitHealthMax(uid) or 1
+				local healthPercent = health / maxHealth * 100
+				if Compare(healthPercent, healthComparator, healthLimit) then
+					value = value + 1
+				end
+			end
+		end
+        return Compare(value, countComparator, countLimit)
+    end
+    OvaleCondition:RegisterCondition("raidmemberswithhealthpercent", false, RaidMembersWithHealthPercent)
+end
+do
+local function RaidMembersInRange(positionalParams, namedParams, atTime)
+        local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local value = 0
+		for _, uid in pairs(OvaleData.RAID_UIDS) do
+			local boolean = (OvaleSpells:IsSpellInRange(spellId, uid) == 1)
+			if boolean then
+				value = value + 1
+			end
+		end
+        return Compare(value, comparator, limit)
+    end
+    OvaleCondition:RegisterCondition("raidmembersinrange", false, RaidMembersInRange)
+end
+do
+local function PartyMembersWithHealthPercent(positionalParams, namedParams, atTime)
+        local healthComparator, healthLimit, countComparator, countLimit = positionalParams[1], positionalParams[2], positionalParams[3], positionalParams[4]
+		local value = 0
+		for _, uid in pairs(OvaleData.PARTY_UIDS) do
+			local health = OvaleHealth:UnitHealth(uid) or 0
+			if health > 0 then
+				local maxHealth = OvaleHealth:UnitHealthMax(uid) or 1
+				local healthPercent = health / maxHealth * 100
+				if Compare(healthPercent, healthComparator, healthLimit) then
+					value = value + 1
+				end
+			end
+		end
+        return Compare(value, countComparator, countLimit)
+    end
+    OvaleCondition:RegisterCondition("partymemberswithhealthpercent", false, PartyMembersWithHealthPercent)
+end
+do
+local function PartyMemberWithLowestHealth(positionalParams, namedParams, atTime)
+        local countComparator, countLimit = positionalParams[1], positionalParams[2]
+		local value = 0
+		local prevHealth = 100
+		for num, uid in pairs(OvaleData.PARTY_UIDS) do
+			local health = OvaleHealth:UnitHealth(uid) or 0
+			if health > 0 then
+				local maxHealth = OvaleHealth:UnitHealthMax(uid) or 1
+				local healthPercent = health / maxHealth * 100
+				if healthPercent < prevHealth then
+					prevHealth = healthPercent
+					value = num
+				end
+			end
+		end
+        return Compare(value, countComparator, countLimit)
+    end
+    OvaleCondition:RegisterCondition("partymemberwithlowesthealth", false, PartyMemberWithLowestHealth)
+end
+do
+local function PartyMembersInRange(positionalParams, namedParams, atTime)
+        local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+		local value = 0
+		for _, uid in pairs(OvaleData.PARTY_UIDS) do
+			local boolean = (OvaleSpells:IsSpellInRange(spellId, uid) == 1)
+			if boolean then
+				value = value + 1
+			end
+		end
+        return Compare(value, comparator, limit)
+    end
+    OvaleCondition:RegisterCondition("partymembersinrange", false, PartyMembersInRange)
+end
+do
+local function mounted(condition)
+		local yesno = condition[1]
+		return TestBoolean(IsMounted(), yesno)
+	end
+	OvaleCondition:RegisterCondition("mounted", false, mounted)
+end
+do
+local function falling(condition)
+		local yesno = condition[1]
+		return TestBoolean(IsFalling(), yesno)
+	end
+	OvaleCondition:RegisterCondition("falling", false, falling)
+end
+do
+local function canfly(condition)
+		local yesno = condition[1]
+		return TestBoolean(IsFlyableArea(), yesno)
+	end
+	OvaleCondition:RegisterCondition("canfly", false, canfly)
+end
+do
+local function flying(condition)
+		local yesno = condition[1]
+		return TestBoolean(IsFlying(), yesno)
+	end
+	OvaleCondition:RegisterCondition("flying", false, flying)
+end
+do
+local function instanced(condition)
+		local yesno = condition[1]
+		return TestBoolean(IsInInstance(), yesno)
+	end
+	OvaleCondition:RegisterCondition("instanced", false, instanced)
+end
+do
+local function indoors(condition)
+		local yesno = condition[1]
+		return TestBoolean(IsIndoors(), yesno)
+	end
+	OvaleCondition:RegisterCondition("indoors", false, indoors)
+end
+do
+local function outdoors(condition)
+		local yesno = condition[1]
+		return TestBoolean(IsOutdoors(), yesno)
+	end
+	OvaleCondition:RegisterCondition("outdoors", false, outdoors)
+end
+do
+local function wet(condition)
+		local yesno = condition[1]
+		return TestBoolean(IsSwimming(), yesno)
+	end
+	OvaleCondition:RegisterCondition("wet", false, wet)
 end

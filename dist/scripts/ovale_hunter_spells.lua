@@ -419,7 +419,7 @@ Define(lock_and_load_buff 194594)
 	SpellInfo(lock_and_load_buff duration=15)
 
     SpellInfo(master_marksman_buff duration=12)
-Define(mend_pet 982)
+Define(mend_pet 136)
 	SpellInfo(mend_pet cd=10)
 Define(misdirection 34477)
 	SpellInfo(misdirection cd=30)
@@ -600,6 +600,9 @@ Define(venomous_bite_talent 10)
 
 Define(volley_talent 5)
 
+# Pvp talents
+Define(trackers_net 212638)
+	SpellInfo(trackers_net cd=25)
 
 # Item set
 Define(t20_2p_critical_aimed_damage_buff 242242) # TODO

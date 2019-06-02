@@ -162,7 +162,7 @@ local OvaleSpellBookClass = __class(OvaleSpellBookBase, {
         end
         local numPetSpells = HasPetSpells()
         if numPetSpells then
-            self:ScanSpellBook(BOOKTYPE_PET, numPetSpells)
+            -- self:ScanSpellBook(BOOKTYPE_PET, numPetSpells)
         end
         Ovale:needRefresh()
         self:SendMessage("Ovale_SpellsChanged")

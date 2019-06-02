@@ -97,7 +97,7 @@ local OvaleWarlockClass = __class(OvaleWarlockBase, {
         elseif cleuEvent == "SPELL_CAST_SUCCESS" then
             if spellId == 196277 then
                 for k, d in pairs(self_demons) do
-                    if d.id == 55659 then
+                    if d.id == 55659 or d.id == 143622 then
                         self_demons[k] = nil
                     end
                 end

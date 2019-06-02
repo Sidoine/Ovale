@@ -2197,6 +2197,30 @@ EmitAction = function(parseNode, nodeList, annotation)
             isSpellAction = false
         elseif className == "DEATHKNIGHT" and action == "antimagic_shell" then
             conditionCode = "IncomingDamage(1.5 magic=1) > 0"
+		elseif className == "DEATHKNIGHT" and action == "festering_strike" then
+            conditionCode = "target.InRange(festering_strike)"
+		elseif className == "DEATHKNIGHT" and action == "scourge_strike" then
+            conditionCode = "target.InRange(scourge_strike)"
+		elseif className == "DEATHKNIGHT" and action == "death_strike" then
+            conditionCode = "target.InRange(death_strike)"
+		elseif className == "DEATHKNIGHT" and action == "soul_reaper" then
+            conditionCode = "target.InRange(soul_reaper)"
+		elseif className == "DEATHKNIGHT" and action == "unholy_blight" then
+            conditionCode = "target.InRange(festering_strike)"
+		elseif className == "DEATHKNIGHT" and action == "summon_gargoyle" then
+            conditionCode = "target.InRange(festering_strike)"
+		elseif className == "DEATHKNIGHT" and action == "army_of_the_dead" then
+            conditionCode = "target.InRange(festering_strike)"
+		elseif className == "DEATHKNIGHT" and action == "apocalypse" then
+            conditionCode = "target.InRange(apocalypse)"
+		elseif className == "DEATHKNIGHT" and action == "death_and_decay" then
+            conditionCode = "target.InRange(festering_strike)"
+		elseif className == "DEATHKNIGHT" and action == "defile" then
+            conditionCode = "target.InRange(festering_strike)"
+		elseif className == "DEATHKNIGHT" and action == "unholy_frenzy" then
+            conditionCode = "target.InRange(festering_strike)"
+		elseif className == "DEATHKNIGHT" and action == "epidemic" then
+            conditionCode = "DebuffCountOnAny(virulent_plague_debuff) >= 1"
         elseif className == "DRUID" and action == "pulverize" then
             local debuffName = "thrash_bear_debuff"
             AddSymbol(annotation, debuffName)
@@ -2224,6 +2248,20 @@ EmitAction = function(parseNode, nodeList, annotation)
             AddSymbol(annotation, "regrowth")
         elseif className == "HUNTER" and action == "kill_command" then
             conditionCode = "pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned()"
+        elseif className == "HUNTER" and action == "carve" then
+            conditionCode = "target.InRange(muzzle)"
+        elseif className == "HUNTER" and action == "mongoose_bite" then
+            conditionCode = "target.InRange(mongoose_bite)"
+        elseif className == "HUNTER" and action == "butchery" then
+            conditionCode = "target.InRange(butchery)"
+        elseif className == "HUNTER" and action == "raptor_strike" then
+            conditionCode = "target.InRange(raptor_strike)"
+        elseif className == "HUNTER" and action == "flanking_strike" then
+            conditionCode = "target.InRange(flanking_strike)"
+        elseif className == "HUNTER" and action == "steel_trap" then
+            conditionCode = "target.InRange(muzzle)"
+        elseif className == "HUNTER" and action == "harpoon" then
+            conditionCode = "target.InRange(harpoon)"
         elseif className == "MAGE" and action == "arcane_brilliance" then
             conditionCode = "BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1)"
         elseif className == "MAGE" and find(action, "pet_") then
@@ -2260,10 +2298,10 @@ EmitAction = function(parseNode, nodeList, annotation)
         elseif className == "MONK" and action == "nimble_brew" then
             conditionCode = "IsFeared() or IsRooted() or IsStunned()"
         elseif className == "MONK" and action == "storm_earth_and_fire" then
-            conditionCode = "CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff)"
+            conditionCode = "not BuffPresent(storm_earth_and_fire_buff)"
             annotation[action] = className
         elseif className == "MONK" and action == "touch_of_death" then
-            conditionCode = "(not CheckBoxOn(opt_touch_of_death_on_elite_only) or (not UnitInRaid() and target.Classification(elite)) or target.Classification(worldboss)) or not BuffExpires(hidden_masters_forbidden_touch_buff)"
+            conditionCode = "((not UnitInRaid() and target.Classification(elite)) or target.Classification(worldboss)) or not BuffExpires(hidden_masters_forbidden_touch_buff)"
             annotation[action] = className
             annotation.opt_touch_of_death_on_elite_only = "MONK"
             AddSymbol(annotation, "hidden_masters_forbidden_touch_buff")
@@ -3099,6 +3137,8 @@ EmitOperandBuff = function(operand, parseNode, nodeList, annotation, action, tar
             code = format("BaseDuration(%s)", buffName)
         elseif property == "max_stack" then
             code = format("SpellData(%s max_stacks)", buffName)
+		elseif property == "max_stacks" then
+            code = format("SpellData(%s max_stacks)", buffName)
         elseif property == "react" or property == "stack" then
             if parseNode.asType == "boolean" then
                 code = format("%s%sPresent(%s%s)", target, prefix, buffName, any)
@@ -3114,7 +3154,7 @@ EmitOperandBuff = function(operand, parseNode, nodeList, annotation, action, tar
         elseif property == "up" then
             code = format("%s%sPresent(%s%s)", target, prefix, buffName, any)
         elseif property == "improved" then
-            code = format("%sImproved(%s%s)", prefix, buffName)
+            code = format("%sImproved(%s%s)", prefix, buffName, any)
         elseif property == "value" then
             code = format("%s%sAmount(%s%s)", target, prefix, buffName, any)
         else
@@ -3249,6 +3289,8 @@ EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
             code = format("%sMaxCharges(%s)", prefix, name)
         elseif property == "full_recharge_time" then
             code = format("%sCooldown(%s)", prefix, name)
+		elseif property == "recharge_time" then
+			code = format("SpellChargeCooldown(%s)", name)
         else
             ok = false
         end
@@ -3344,6 +3386,8 @@ EmitOperandDot = function(operand, parseNode, nodeList, annotation, action, targ
             code = format("%s%sRemaining(%s)", target, prefix, dotName)
         elseif property == "stack" then
             code = format("%s%sStacks(%s)", target, prefix, dotName)
+        elseif property == "max_stacks" then
+			code = format("SpellData(%s max_stacks)", dotName)
         elseif property == "tick_dmg" then
             code = format("%sTickValue(%s)", target, prefix, dotName)
         elseif property == "ticking" then

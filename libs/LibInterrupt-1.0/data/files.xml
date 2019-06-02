@@ -1,0 +1,8 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+    <Script file="cataclysm_dungeon.lua"/>
+    <Script file="legion_raid.lua"/>
+    <Script file="legion_dungeon.lua"/>
+    <Script file="legion_world.lua"/>
+    <Script file="warlords_dungeon.lua"/>
+</Ui>
