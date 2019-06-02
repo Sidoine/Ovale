@@ -118,6 +118,8 @@ AddFunction ProtectionCooldownsCdActions
   if BuffPresent(avenging_wrath_buff) and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
   #use_items,if=buff.seraphim.up|!talent.seraphim.enabled
   if BuffPresent(seraphim_buff) or not Talent(seraphim_talent) ProtectionUseItemActions()
+  #use_item,name=grongs_primal_rage,if=((cooldown.judgment.full_recharge_time>4|(!talent.crusaders_judgment.enabled&prev_gcd.1.judgment))&cooldown.avengers_shield.remains>4&buff.seraphim.remains>4)|(buff.seraphim.remains<4)
+  if { SpellCooldown(judgment_protection) > 4 or not Talent(crusaders_judgment_talent) and PreviousGCDSpell(judgment_protection) } and SpellCooldown(avengers_shield) > 4 and BuffRemaining(seraphim_buff) > 4 or BuffRemaining(seraphim_buff) < 4 ProtectionUseItemActions()
   #use_item,name=merekthas_fang,if=!buff.avenging_wrath.up&(buff.seraphim.up|!talent.seraphim.enabled)
   if not BuffPresent(avenging_wrath_buff) and { BuffPresent(seraphim_buff) or not Talent(seraphim_talent) } ProtectionUseItemActions()
   #use_item,name=razdunks_big_red_button

@@ -6,7 +6,7 @@ __exports.register = function()
     local name = "ovale_monk_spells"
     local desc = "[8.1] Ovale: Monk spells"
     local code = [[Define(ancestral_call 274738)
-# Invoke the spirits of your ancestors, granting you their power for 15 seconds.
+# Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
   SpellAddBuff(ancestral_call ancestral_call=1)
 Define(battle_potion_of_agility 279152)
@@ -59,8 +59,10 @@ Define(elusive_brawler 195630)
   # Dodge chance increased by w1.
   SpellAddBuff(elusive_brawler elusive_brawler=1)
 Define(energizing_elixir 115288)
-# Chug an Energizing Elixir, refilling all your Energy and instantly generate s2 Chi.
-  SpellInfo(energizing_elixir cd=60 max_stacks=3 gcd=1 energy=-200 chi=-2 talent=energizing_elixir_talent)
+# Chug an Energizing Elixir, granting s2 Chi and generating s1/5*5 Energy over 5 seconds.
+  SpellInfo(energizing_elixir cd=60 duration=5 max_stacks=3 gcd=1 chi=-2 talent=energizing_elixir_talent)
+  # Generating w1/5 extra Energy per sec.
+  SpellAddBuff(energizing_elixir energizing_elixir=1)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. 
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
@@ -185,7 +187,7 @@ Define(dampen_harm_talent 15) #20175
 Define(diffuse_magic_talent 14) #20173
 # Reduces magic damage you take by m1 for 6 seconds, and transfers all currently active harmful magical effects on you back to their original caster if possible.
 Define(energizing_elixir_talent 9) #22096
-# Chug an Energizing Elixir, refilling all your Energy and instantly generate s2 Chi.
+# Chug an Energizing Elixir, granting s2 Chi and generating s1/5*5 Energy over 5 seconds.
 Define(fist_of_the_white_tiger_talent 8) #19771
 # Strike with the technique of the White Tiger, dealing s1+261977s1 Physical damage.rnrn|cFFFFFFFFGenerates 261978s1 Chi.
 Define(hit_combo_talent 16) #22093

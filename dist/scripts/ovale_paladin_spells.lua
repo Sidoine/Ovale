@@ -13,7 +13,7 @@ __exports.register = function()
   # Silenced.
   SpellAddTargetDebuff(avengers_shield avengers_shield=1)
 Define(avenging_wrath 31884)
-# Call upon the Light to become an avatar of retribution, increasing your damage, healing, and critical strike chance by s1 for 20 seconds. 
+# Call upon the Light to become an avatar of retribution, increasing your damage, healing, and critical strike chance by s1 for 20 seconds. Your first ?c1[Holy Shock]?c3[Templar's Verdict or Divine Storm][Light of the Protector] will critically strike.
   SpellInfo(avenging_wrath cd=120 duration=20)
   # Damage, healing, and critical strike chance increased by w1.
   SpellAddBuff(avenging_wrath avenging_wrath=1)

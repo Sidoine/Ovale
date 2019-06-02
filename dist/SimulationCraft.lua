@@ -2251,6 +2251,8 @@ EmitAction = function(parseNode, nodeList, annotation)
             conditionCode = "target.Distance(less 12)"
         elseif className == "MAGE" and action == "arcane_blast" then
             conditionCode = "Mana() > ManaCost(arcane_blast)"
+        elseif className == "MAGE" and action == "cone_of_cold" then
+            conditionCode = "target.Distance() < 12"
         elseif className == "MONK" and action == "chi_sphere" then
             isSpellAction = false
         elseif className == "MONK" and action == "gift_of_the_ox" then
@@ -2344,7 +2346,8 @@ EmitAction = function(parseNode, nodeList, annotation)
         elseif className == "WARRIOR" and action == "battle_shout" and role == "tank" then
             conditionCode = "BuffExpires(stamina_buff)"
         elseif className == "WARRIOR" and action == "charge" then
-            conditionCode = "CheckBoxOn(opt_melee_range) and target.InRange(charge)"
+            conditionCode = "CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel)"
+            AddSymbol(annotation, "pummel")
         elseif className == "WARRIOR" and action == "commanding_shout" and role == "attack" then
             conditionCode = "BuffExpires(attack_power_multiplier_buff)"
         elseif className == "WARRIOR" and action == "enraged_regeneration" then
@@ -3302,7 +3305,7 @@ EmitOperandGroundAoe = function(operand, parseNode, nodeList, annotation, action
         local dotName = name .. "_debuff"
         dotName = Disambiguate(annotation, dotName, annotation.class, annotation.specialization)
         local prefix = find(dotName, "_buff$") and "Buff" or "Debuff"
-        local target = ""
+        local target = (prefix == "Debuff" and "target.") or ""
         local code
         if property == "remains" then
             code = format("%s%sRemaining(%s)", target, prefix, dotName)
@@ -4915,11 +4918,11 @@ local InsertSupportingFunctions = function(child, annotation)
         local fmt = [[
 			AddFunction %sGetInMeleeRange
 			{
-				if CheckBoxOn(opt_melee_range) and not InFlightToTarget(%s) and not InFlightToTarget(heroic_leap)
+				if CheckBoxOn(opt_melee_range) and not InFlightToTarget(%s) and not InFlightToTarget(heroic_leap) and not target.InRange(pummel)
 				{
 					if target.InRange(%s) Spell(%s)
 					if SpellCharges(%s) == 0 and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
-					if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+					Texture(misc_arrowlup help=L(not_in_melee_range))
 				}
 			}
 		]]

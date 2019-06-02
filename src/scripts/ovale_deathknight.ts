@@ -114,10 +114,16 @@ AddFunction BloodStandardShortCdPostConditions
 
 AddFunction BloodStandardCdActions
 {
- unless RunicPowerDeficit() <= 10 and Spell(death_strike) or not BuffPresent(dancing_rune_weapon_buff) and Spell(blooddrinker) or { BuffRemaining(bone_shield_buff) <= TimeToRunes(3) or BuffRemaining(bone_shield_buff) <= GCD() + { SpellCooldown(blooddrinker) == 0 } * TalentPoints(blooddrinker_talent) * 2 or BuffStacks(bone_shield_buff) < 3 } and RunicPowerDeficit() >= 20 and Spell(marrowrend) or Charges(blood_boil count=0) >= 1.8 and { BuffStacks(hemostasis_buff) <= 5 - Enemies() or Enemies() > 2 } and Spell(blood_boil) or BuffStacks(bone_shield_buff) < 5 and Talent(ossuary_talent) and RunicPowerDeficit() >= 15 and Spell(marrowrend) or RunicPower() >= 100 and not BuffPresent(dancing_rune_weapon_buff) and Spell(bonestorm) or { RunicPowerDeficit() <= 15 + BuffPresent(dancing_rune_weapon_buff) * 5 + Enemies() * TalentPoints(heartbreaker_talent) * 2 or target.TimeToDie() < 10 } and Spell(death_strike) or Enemies() >= 3 and Spell(death_and_decay) or { Charges(rune_strike count=0) >= 1.8 or BuffPresent(dancing_rune_weapon_buff) } and TimeToRunes(3) >= GCD() and Spell(rune_strike) or { BuffPresent(dancing_rune_weapon_buff) or TimeToRunes(4) < GCD() } and Spell(heart_strike) or BuffPresent(dancing_rune_weapon_buff) and Spell(blood_boil) or { BuffPresent(crimson_scourge_buff) or Talent(rapid_decomposition_talent) or Enemies() >= 2 } and Spell(death_and_decay) or Spell(consumption) or Spell(blood_boil) or { TimeToRunes(3) < GCD() or BuffStacks(bone_shield_buff) > 6 } and Spell(heart_strike) or Spell(rune_strike)
+ unless RunicPowerDeficit() <= 10 and Spell(death_strike) or not BuffPresent(dancing_rune_weapon_buff) and Spell(blooddrinker) or { BuffRemaining(bone_shield_buff) <= TimeToRunes(3) or BuffRemaining(bone_shield_buff) <= GCD() + { SpellCooldown(blooddrinker) == 0 } * TalentPoints(blooddrinker_talent) * 2 or BuffStacks(bone_shield_buff) < 3 } and RunicPowerDeficit() >= 20 and Spell(marrowrend) or Charges(blood_boil count=0) >= 1.8 and { BuffStacks(hemostasis_buff) <= 5 - Enemies() or Enemies() > 2 } and Spell(blood_boil) or BuffStacks(bone_shield_buff) < 5 and Talent(ossuary_talent) and RunicPowerDeficit() >= 15 and Spell(marrowrend) or RunicPower() >= 100 and not BuffPresent(dancing_rune_weapon_buff) and Spell(bonestorm) or { RunicPowerDeficit() <= 15 + BuffPresent(dancing_rune_weapon_buff) * 5 + Enemies() * TalentPoints(heartbreaker_talent) * 2 or target.TimeToDie() < 10 } and Spell(death_strike) or Enemies() >= 3 and Spell(death_and_decay) or { Charges(rune_strike count=0) >= 1.8 or BuffPresent(dancing_rune_weapon_buff) } and TimeToRunes(3) >= GCD() and Spell(rune_strike) or { BuffPresent(dancing_rune_weapon_buff) or TimeToRunes(4) < GCD() } and Spell(heart_strike) or BuffPresent(dancing_rune_weapon_buff) and Spell(blood_boil) or { BuffPresent(crimson_scourge_buff) or Talent(rapid_decomposition_talent) or Enemies() >= 2 } and Spell(death_and_decay) or Spell(consumption) or Spell(blood_boil) or { TimeToRunes(3) < GCD() or BuffStacks(bone_shield_buff) > 6 } and Spell(heart_strike)
  {
-  #arcane_torrent,if=runic_power.deficit>20
-  if RunicPowerDeficit() > 20 Spell(arcane_torrent_runicpower)
+  #use_item,name=grongs_primal_rage
+  BloodUseItemActions()
+
+  unless Spell(rune_strike)
+  {
+   #arcane_torrent,if=runic_power.deficit>20
+   if RunicPowerDeficit() > 20 Spell(arcane_torrent_runicpower)
+  }
  }
 }
 
@@ -511,11 +517,13 @@ AddFunction FrostCooldownsCdActions
 {
  #use_items,if=(cooldown.pillar_of_frost.ready|cooldown.pillar_of_frost.remains>20)&(!talent.breath_of_sindragosa.enabled|cooldown.empower_rune_weapon.remains>95)
  if { SpellCooldown(pillar_of_frost) == 0 or SpellCooldown(pillar_of_frost) > 20 } and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(empower_rune_weapon) > 95 } FrostUseItemActions()
- #use_item,name=grongs_primal_rage,if=rune<=3&!buff.pillar_of_frost.up&(!dot.breath_of_sindragosa.ticking|!talent.breath_of_sindragosa.enabled)
+ #use_item,name=knot_of_ancient_fury,if=cooldown.empower_rune_weapon.remains>40
+ if SpellCooldown(empower_rune_weapon) > 40 FrostUseItemActions()
+ #use_item,name=grongs_primal_rage,if=rune<=3&!buff.pillar_of_frost.up&(!buff.breath_of_sindragosa.up|!talent.breath_of_sindragosa.enabled)
  if RuneCount() <= 3 and not BuffPresent(pillar_of_frost_buff) and { not BuffPresent(breath_of_sindragosa_buff) or not Talent(breath_of_sindragosa_talent) } FrostUseItemActions()
  #use_item,name=razdunks_big_red_button
  FrostUseItemActions()
- #use_item,name=merekthas_fang,if=!dot.breath_of_sindragosa.ticking&!buff.pillar_of_frost.up
+ #use_item,name=merekthas_fang,if=!buff.breath_of_sindragosa.up&!buff.pillar_of_frost.up
  if not BuffPresent(breath_of_sindragosa_buff) and not BuffPresent(pillar_of_frost_buff) FrostUseItemActions()
  #potion,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
  if BuffPresent(pillar_of_frost_buff) and BuffPresent(empower_rune_weapon_buff) and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
@@ -526,7 +534,7 @@ AddFunction FrostCooldownsCdActions
 
  unless SpellCooldown(empower_rune_weapon) > 0 and Spell(pillar_of_frost)
  {
-  #breath_of_sindragosa,if=cooldown.empower_rune_weapon.remains&cooldown.pillar_of_frost.remains
+  #breath_of_sindragosa,use_off_gcd=1,if=cooldown.empower_rune_weapon.remains&cooldown.pillar_of_frost.remains
   if SpellCooldown(empower_rune_weapon) > 0 and SpellCooldown(pillar_of_frost) > 0 Spell(breath_of_sindragosa)
   #empower_rune_weapon,if=cooldown.pillar_of_frost.ready&!talent.breath_of_sindragosa.enabled&rune.time_to_5>gcd&runic_power.deficit>=10|target.time_to_die<20
   if SpellCooldown(pillar_of_frost) == 0 and not Talent(breath_of_sindragosa_talent) and TimeToRunes(5) > GCD() and RunicPowerDeficit() >= 10 or target.TimeToDie() < 20 Spell(empower_rune_weapon)
@@ -539,6 +547,8 @@ AddFunction FrostCooldownsCdActions
   {
    #frostwyrms_fury,if=(buff.pillar_of_frost.remains<=gcd|(buff.pillar_of_frost.remains<8&buff.unholy_strength.remains<=gcd&buff.unholy_strength.up))&buff.pillar_of_frost.up&azerite.icy_citadel.rank<=2
    if { BuffRemaining(pillar_of_frost_buff) <= GCD() or BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) <= GCD() and BuffPresent(unholy_strength_buff) } and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 Spell(frostwyrms_fury)
+   #frostwyrms_fury,if=(buff.icy_citadel.remains<=gcd|(buff.icy_citadel.remains<8&buff.unholy_strength.remains<=gcd&buff.unholy_strength.up))&buff.icy_citadel.up&azerite.icy_citadel.rank>2
+   if { BuffRemaining(icy_citadel_buff) <= GCD() or BuffRemaining(icy_citadel_buff) < 8 and BuffRemaining(unholy_strength_buff) <= GCD() and BuffPresent(unholy_strength_buff) } and BuffPresent(icy_citadel_buff) and AzeriteTraitRank(icy_citadel_trait) > 2 Spell(frostwyrms_fury)
    #frostwyrms_fury,if=target.time_to_die<gcd|(target.time_to_die<cooldown.pillar_of_frost.remains&buff.unholy_strength.up)
    if target.TimeToDie() < GCD() or target.TimeToDie() < SpellCooldown(pillar_of_frost) and BuffPresent(unholy_strength_buff) Spell(frostwyrms_fury)
   }
@@ -560,10 +570,10 @@ AddFunction FrostColdheartMainActions
  if { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 Spell(chains_of_ice)
  #chains_of_ice,if=buff.pillar_of_frost.remains<8&buff.unholy_strength.remains<gcd*(1+cooldown.frostwyrms_fury.ready)&buff.unholy_strength.remains&buff.pillar_of_frost.up&azerite.icy_citadel.rank<=2
  if BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 Spell(chains_of_ice)
- #chains_of_ice,if=(buff.icy_citadel.remains<=gcd*(1+cooldown.frostwyrms_fury.ready)|buff.icy_citadel.remains<rune.time_to_3)&buff.icy_citadel.up&azerite.icy_citadel.enabled&azerite.icy_citadel.rank>2
- if { BuffRemaining(icy_citadel_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(icy_citadel_buff) < TimeToRunes(3) } and BuffPresent(icy_citadel_buff) and HasAzeriteTrait(icy_citadel_trait) and AzeriteTraitRank(icy_citadel_trait) > 2 Spell(chains_of_ice)
- #chains_of_ice,if=buff.icy_citadel.remains<8&buff.unholy_strength.remains<gcd*(1+cooldown.frostwyrms_fury.ready)&buff.unholy_strength.remains&buff.icy_citadel.up&!azerite.icy_citadel.enabled&azerite.icy_citadel.rank>2
- if BuffRemaining(icy_citadel_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(icy_citadel_buff) and not HasAzeriteTrait(icy_citadel_trait) and AzeriteTraitRank(icy_citadel_trait) > 2 Spell(chains_of_ice)
+ #chains_of_ice,if=(buff.icy_citadel.remains<4|buff.icy_citadel.remains<rune.time_to_3)&buff.icy_citadel.up&azerite.icy_citadel.rank>2
+ if { BuffRemaining(icy_citadel_buff) < 4 or BuffRemaining(icy_citadel_buff) < TimeToRunes(3) } and BuffPresent(icy_citadel_buff) and AzeriteTraitRank(icy_citadel_trait) > 2 Spell(chains_of_ice)
+ #chains_of_ice,if=buff.icy_citadel.up&buff.unholy_strength.up&azerite.icy_citadel.rank>2
+ if BuffPresent(icy_citadel_buff) and BuffPresent(unholy_strength_buff) and AzeriteTraitRank(icy_citadel_trait) > 2 Spell(chains_of_ice)
 }
 
 AddFunction FrostColdheartMainPostConditions
@@ -576,7 +586,7 @@ AddFunction FrostColdheartShortCdActions
 
 AddFunction FrostColdheartShortCdPostConditions
 {
- BuffStacks(cold_heart_buff) > 5 and target.TimeToDie() < GCD() and Spell(chains_of_ice) or { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 and Spell(chains_of_ice) or BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 and Spell(chains_of_ice) or { BuffRemaining(icy_citadel_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(icy_citadel_buff) < TimeToRunes(3) } and BuffPresent(icy_citadel_buff) and HasAzeriteTrait(icy_citadel_trait) and AzeriteTraitRank(icy_citadel_trait) > 2 and Spell(chains_of_ice) or BuffRemaining(icy_citadel_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(icy_citadel_buff) and not HasAzeriteTrait(icy_citadel_trait) and AzeriteTraitRank(icy_citadel_trait) > 2 and Spell(chains_of_ice)
+ BuffStacks(cold_heart_buff) > 5 and target.TimeToDie() < GCD() and Spell(chains_of_ice) or { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 and Spell(chains_of_ice) or BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 and Spell(chains_of_ice) or { BuffRemaining(icy_citadel_buff) < 4 or BuffRemaining(icy_citadel_buff) < TimeToRunes(3) } and BuffPresent(icy_citadel_buff) and AzeriteTraitRank(icy_citadel_trait) > 2 and Spell(chains_of_ice) or BuffPresent(icy_citadel_buff) and BuffPresent(unholy_strength_buff) and AzeriteTraitRank(icy_citadel_trait) > 2 and Spell(chains_of_ice)
 }
 
 AddFunction FrostColdheartCdActions
@@ -585,7 +595,7 @@ AddFunction FrostColdheartCdActions
 
 AddFunction FrostColdheartCdPostConditions
 {
- BuffStacks(cold_heart_buff) > 5 and target.TimeToDie() < GCD() and Spell(chains_of_ice) or { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 and Spell(chains_of_ice) or BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 and Spell(chains_of_ice) or { BuffRemaining(icy_citadel_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(icy_citadel_buff) < TimeToRunes(3) } and BuffPresent(icy_citadel_buff) and HasAzeriteTrait(icy_citadel_trait) and AzeriteTraitRank(icy_citadel_trait) > 2 and Spell(chains_of_ice) or BuffRemaining(icy_citadel_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(icy_citadel_buff) and not HasAzeriteTrait(icy_citadel_trait) and AzeriteTraitRank(icy_citadel_trait) > 2 and Spell(chains_of_ice)
+ BuffStacks(cold_heart_buff) > 5 and target.TimeToDie() < GCD() and Spell(chains_of_ice) or { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 and Spell(chains_of_ice) or BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 and Spell(chains_of_ice) or { BuffRemaining(icy_citadel_buff) < 4 or BuffRemaining(icy_citadel_buff) < TimeToRunes(3) } and BuffPresent(icy_citadel_buff) and AzeriteTraitRank(icy_citadel_trait) > 2 and Spell(chains_of_ice) or BuffPresent(icy_citadel_buff) and BuffPresent(unholy_strength_buff) and AzeriteTraitRank(icy_citadel_trait) > 2 and Spell(chains_of_ice)
 }
 
 ### actions.bos_ticking
@@ -786,7 +796,7 @@ AddFunction FrostDefaultMainActions
 
   unless Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and FrostBospoolingMainPostConditions()
   {
-   #run_action_list,name=bos_ticking,if=dot.breath_of_sindragosa.ticking
+   #run_action_list,name=bos_ticking,if=buff.breath_of_sindragosa.up
    if BuffPresent(breath_of_sindragosa_buff) FrostBostickingMainActions()
 
    unless BuffPresent(breath_of_sindragosa_buff) and FrostBostickingMainPostConditions()
@@ -832,7 +842,7 @@ AddFunction FrostDefaultShortCdActions
 
    unless Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and FrostBospoolingShortCdPostConditions()
    {
-    #run_action_list,name=bos_ticking,if=dot.breath_of_sindragosa.ticking
+    #run_action_list,name=bos_ticking,if=buff.breath_of_sindragosa.up
     if BuffPresent(breath_of_sindragosa_buff) FrostBostickingShortCdActions()
 
     unless BuffPresent(breath_of_sindragosa_buff) and FrostBostickingShortCdPostConditions()
@@ -878,7 +888,7 @@ AddFunction FrostDefaultCdActions
 
    unless Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and FrostBospoolingCdPostConditions()
    {
-    #run_action_list,name=bos_ticking,if=dot.breath_of_sindragosa.ticking
+    #run_action_list,name=bos_ticking,if=buff.breath_of_sindragosa.up
     if BuffPresent(breath_of_sindragosa_buff) FrostBostickingCdActions()
 
     unless BuffPresent(breath_of_sindragosa_buff) and FrostBostickingCdPostConditions()
@@ -1163,8 +1173,10 @@ AddFunction UnholyCooldownsShortCdActions
  if target.DebuffStacks(festering_wound_debuff) >= 4 Spell(apocalypse)
  #dark_transformation,if=!raid_event.adds.exists|raid_event.adds.in>15
  if not False(raid_event_adds_exists) or 600 > 15 Spell(dark_transformation)
- #unholy_frenzy,if=debuff.festering_wound.stack<4
- if target.DebuffStacks(festering_wound_debuff) < 4 Spell(unholy_frenzy)
+ #unholy_frenzy,if=debuff.festering_wound.stack<4&!(equipped.ramping_amplitude_gigavolt_engine|azerite.magus_of_the_dead.enabled)
+ if target.DebuffStacks(festering_wound_debuff) < 4 and not { HasEquippedItem(ramping_amplitude_gigavolt_engine_item) or HasAzeriteTrait(magus_of_the_dead_trait) } Spell(unholy_frenzy)
+ #unholy_frenzy,if=cooldown.apocalypse.remains<2&(equipped.ramping_amplitude_gigavolt_engine|azerite.magus_of_the_dead.enabled)
+ if SpellCooldown(apocalypse) < 2 and { HasEquippedItem(ramping_amplitude_gigavolt_engine_item) or HasAzeriteTrait(magus_of_the_dead_trait) } Spell(unholy_frenzy)
  #unholy_frenzy,if=active_enemies>=2&((cooldown.death_and_decay.remains<=gcd&!talent.defile.enabled)|(cooldown.defile.remains<=gcd&talent.defile.enabled))
  if Enemies() >= 2 and { SpellCooldown(death_and_decay) <= GCD() and not Talent(defile_talent) or SpellCooldown(defile) <= GCD() and Talent(defile_talent) } Spell(unholy_frenzy)
  #soul_reaper,target_if=target.time_to_die<8&target.time_to_die>4
@@ -1193,7 +1205,7 @@ AddFunction UnholyCooldownsCdActions
 
 AddFunction UnholyCooldownsCdPostConditions
 {
- target.DebuffStacks(festering_wound_debuff) >= 4 and Spell(apocalypse) or { not False(raid_event_adds_exists) or 600 > 15 } and Spell(dark_transformation) or target.DebuffStacks(festering_wound_debuff) < 4 and Spell(unholy_frenzy) or Enemies() >= 2 and { SpellCooldown(death_and_decay) <= GCD() and not Talent(defile_talent) or SpellCooldown(defile) <= GCD() and Talent(defile_talent) } and Spell(unholy_frenzy) or target.TimeToDie() < 8 and target.TimeToDie() > 4 and Spell(soul_reaper) or { not False(raid_event_adds_exists) or 600 > 20 } and RuneCount() <= 1 - BuffPresent(unholy_frenzy_buff) and Spell(soul_reaper) or Spell(unholy_blight)
+ target.DebuffStacks(festering_wound_debuff) >= 4 and Spell(apocalypse) or { not False(raid_event_adds_exists) or 600 > 15 } and Spell(dark_transformation) or target.DebuffStacks(festering_wound_debuff) < 4 and not { HasEquippedItem(ramping_amplitude_gigavolt_engine_item) or HasAzeriteTrait(magus_of_the_dead_trait) } and Spell(unholy_frenzy) or SpellCooldown(apocalypse) < 2 and { HasEquippedItem(ramping_amplitude_gigavolt_engine_item) or HasAzeriteTrait(magus_of_the_dead_trait) } and Spell(unholy_frenzy) or Enemies() >= 2 and { SpellCooldown(death_and_decay) <= GCD() and not Talent(defile_talent) or SpellCooldown(defile) <= GCD() and Talent(defile_talent) } and Spell(unholy_frenzy) or target.TimeToDie() < 8 and target.TimeToDie() > 4 and Spell(soul_reaper) or { not False(raid_event_adds_exists) or 600 > 20 } and RuneCount() <= 1 - BuffPresent(unholy_frenzy_buff) and Spell(soul_reaper) or Spell(unholy_blight)
 }
 
 ### actions.aoe
@@ -1262,8 +1274,8 @@ AddFunction UnholyAoeCdPostConditions
 
 AddFunction UnholyDefaultMainActions
 {
- #outbreak,target_if=(dot.virulent_plague.tick_time_remains+tick_time<=dot.virulent_plague.remains)&dot.virulent_plague.remains<=gcd
- if target.TickTimeRemaining(virulent_plague_debuff) + target.CurrentTickTime(virulent_plague_debuff) <= target.DebuffRemaining(virulent_plague_debuff) and target.DebuffRemaining(virulent_plague_debuff) <= GCD() Spell(outbreak)
+ #outbreak,target_if=dot.virulent_plague.remains<=gcd
+ if target.DebuffRemaining(virulent_plague_debuff) <= GCD() Spell(outbreak)
  #call_action_list,name=cooldowns
  UnholyCooldownsMainActions()
 
@@ -1290,7 +1302,7 @@ AddFunction UnholyDefaultShortCdActions
  #auto_attack
  UnholyGetInMeleeRange()
 
- unless target.TickTimeRemaining(virulent_plague_debuff) + target.CurrentTickTime(virulent_plague_debuff) <= target.DebuffRemaining(virulent_plague_debuff) and target.DebuffRemaining(virulent_plague_debuff) <= GCD() and Spell(outbreak)
+ unless target.DebuffRemaining(virulent_plague_debuff) <= GCD() and Spell(outbreak)
  {
   #call_action_list,name=cooldowns
   UnholyCooldownsShortCdActions()
@@ -1311,31 +1323,35 @@ AddFunction UnholyDefaultShortCdActions
 
 AddFunction UnholyDefaultShortCdPostConditions
 {
- target.TickTimeRemaining(virulent_plague_debuff) + target.CurrentTickTime(virulent_plague_debuff) <= target.DebuffRemaining(virulent_plague_debuff) and target.DebuffRemaining(virulent_plague_debuff) <= GCD() and Spell(outbreak) or UnholyCooldownsShortCdPostConditions() or Enemies() >= 2 and UnholyAoeShortCdPostConditions() or UnholyGenericShortCdPostConditions()
+ target.DebuffRemaining(virulent_plague_debuff) <= GCD() and Spell(outbreak) or UnholyCooldownsShortCdPostConditions() or Enemies() >= 2 and UnholyAoeShortCdPostConditions() or UnholyGenericShortCdPostConditions()
 }
 
 AddFunction UnholyDefaultCdActions
 {
  UnholyInterruptActions()
  #variable,name=pooling_for_gargoyle,value=cooldown.summon_gargoyle.remains<5&talent.summon_gargoyle.enabled
- #arcane_torrent,if=runic_power.deficit>65&(cooldown.summon_gargoyle.remains|!talent.summon_gargoyle.enabled)&rune.deficit>=5
- if RunicPowerDeficit() > 65 and { SpellCooldown(summon_gargoyle) > 0 or not Talent(summon_gargoyle_talent) } and RuneDeficit() >= 5 Spell(arcane_torrent_runicpower)
+ #arcane_torrent,if=runic_power.deficit>65&(pet.gargoyle.active|!talent.summon_gargoyle.enabled)&rune.deficit>=5
+ if RunicPowerDeficit() > 65 and { pet.Present() or not Talent(summon_gargoyle_talent) } and RuneDeficit() >= 5 Spell(arcane_torrent_runicpower)
  #blood_fury,if=pet.gargoyle.active|!talent.summon_gargoyle.enabled
  if pet.Present() or not Talent(summon_gargoyle_talent) Spell(blood_fury_ap)
- #berserking,if=pet.gargoyle.active|!talent.summon_gargoyle.enabled
- if pet.Present() or not Talent(summon_gargoyle_talent) Spell(berserking)
- #use_items
- UnholyUseItemActions()
- #use_item,name=bygone_bee_almanac,if=cooldown.summon_gargoyle.remains>60|!talent.summon_gargoyle.enabled
- if SpellCooldown(summon_gargoyle) > 60 or not Talent(summon_gargoyle_talent) UnholyUseItemActions()
- #use_item,name=jes_howler,if=pet.gargoyle.active|!talent.summon_gargoyle.enabled
- if pet.Present() or not Talent(summon_gargoyle_talent) UnholyUseItemActions()
- #use_item,name=galecallers_beak,if=pet.gargoyle.active|!talent.summon_gargoyle.enabled
- if pet.Present() or not Talent(summon_gargoyle_talent) UnholyUseItemActions()
+ #berserking,if=buff.unholy_frenzy.up|pet.gargoyle.active|!talent.summon_gargoyle.enabled
+ if BuffPresent(unholy_frenzy_buff) or pet.Present() or not Talent(summon_gargoyle_talent) Spell(berserking)
+ #use_items,if=time>20|!equipped.ramping_amplitude_gigavolt_engine
+ if TimeInCombat() > 20 or not HasEquippedItem(ramping_amplitude_gigavolt_engine_item) UnholyUseItemActions()
+ #use_item,name=ramping_amplitude_gigavolt_engine,if=cooldown.apocalypse.remains<2|talent.army_of_the_damned.enabled|raid_event.adds.in<5
+ if SpellCooldown(apocalypse) < 2 or Talent(army_of_the_damned_talent) or 600 < 5 UnholyUseItemActions()
+ #use_item,name=bygone_bee_almanac,if=cooldown.summon_gargoyle.remains>60|!talent.summon_gargoyle.enabled&time>20|!equipped.ramping_amplitude_gigavolt_engine
+ if SpellCooldown(summon_gargoyle) > 60 or not Talent(summon_gargoyle_talent) and TimeInCombat() > 20 or not HasEquippedItem(ramping_amplitude_gigavolt_engine_item) UnholyUseItemActions()
+ #use_item,name=jes_howler,if=pet.gargoyle.active|!talent.summon_gargoyle.enabled&time>20|!equipped.ramping_amplitude_gigavolt_engine
+ if pet.Present() or not Talent(summon_gargoyle_talent) and TimeInCombat() > 20 or not HasEquippedItem(ramping_amplitude_gigavolt_engine_item) UnholyUseItemActions()
+ #use_item,name=galecallers_beak,if=pet.gargoyle.active|!talent.summon_gargoyle.enabled&time>20|!equipped.ramping_amplitude_gigavolt_engine
+ if pet.Present() or not Talent(summon_gargoyle_talent) and TimeInCombat() > 20 or not HasEquippedItem(ramping_amplitude_gigavolt_engine_item) UnholyUseItemActions()
+ #use_item,name=grongs_primal_rage,if=rune<=3&(time>20|!equipped.ramping_amplitude_gigavolt_engine)
+ if RuneCount() <= 3 and { TimeInCombat() > 20 or not HasEquippedItem(ramping_amplitude_gigavolt_engine_item) } UnholyUseItemActions()
  #potion,if=cooldown.army_of_the_dead.ready|pet.gargoyle.active|buff.unholy_frenzy.up
  if { SpellCooldown(army_of_the_dead) == 0 or pet.Present() or BuffPresent(unholy_frenzy_buff) } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
 
- unless target.TickTimeRemaining(virulent_plague_debuff) + target.CurrentTickTime(virulent_plague_debuff) <= target.DebuffRemaining(virulent_plague_debuff) and target.DebuffRemaining(virulent_plague_debuff) <= GCD() and Spell(outbreak)
+ unless target.DebuffRemaining(virulent_plague_debuff) <= GCD() and Spell(outbreak)
  {
   #call_action_list,name=cooldowns
   UnholyCooldownsCdActions()
@@ -1356,7 +1372,7 @@ AddFunction UnholyDefaultCdActions
 
 AddFunction UnholyDefaultCdPostConditions
 {
- target.TickTimeRemaining(virulent_plague_debuff) + target.CurrentTickTime(virulent_plague_debuff) <= target.DebuffRemaining(virulent_plague_debuff) and target.DebuffRemaining(virulent_plague_debuff) <= GCD() and Spell(outbreak) or UnholyCooldownsCdPostConditions() or Enemies() >= 2 and UnholyAoeCdPostConditions() or UnholyGenericCdPostConditions()
+ target.DebuffRemaining(virulent_plague_debuff) <= GCD() and Spell(outbreak) or UnholyCooldownsCdPostConditions() or Enemies() >= 2 and UnholyAoeCdPostConditions() or UnholyGenericCdPostConditions()
 }
 
 ### Unholy icons.
@@ -1420,6 +1436,7 @@ AddIcon checkbox=opt_deathknight_unholy_aoe help=cd specialization=unholy
 ### Required symbols
 # apocalypse
 # arcane_torrent_runicpower
+# army_of_the_damned_talent
 # army_of_the_dead
 # asphyxiate
 # battle_potion_of_strength
@@ -1436,10 +1453,12 @@ AddIcon checkbox=opt_deathknight_unholy_aoe help=cd specialization=unholy
 # epidemic
 # festering_strike
 # festering_wound_debuff
+# magus_of_the_dead_trait
 # mind_freeze
 # outbreak
 # pestilence_talent
 # raise_dead
+# ramping_amplitude_gigavolt_engine_item
 # scourge_strike
 # soul_reaper
 # sudden_doom_buff

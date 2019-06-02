@@ -6,7 +6,7 @@ __exports.register = function()
     local name = "ovale_priest_spells"
     local desc = "[8.1] Ovale: Priest spells"
     local code = [[Define(ancestral_call 274738)
-# Invoke the spirits of your ancestors, granting you their power for 15 seconds.
+# Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
   SpellAddBuff(ancestral_call ancestral_call=1)
 Define(apotheosis 200183)
@@ -163,12 +163,16 @@ Define(halo_talent 18) #19763
 # Creates a ring of Holy energy around you that quickly expands to a 30 yd radius, healing allies for (103 of Spell Power) and dealing (103 of Spell Power) Holy damage to enemies.
 Define(mind_bomb_talent 11) #23375
 # Inflicts the target with a Mind Bomb.rnrnAfter 2 seconds or if the target dies, it unleashes a psychic explosion, disorienting all enemies within 226943A1 yds of the target for 6 seconds.
+Define(mindbender_talent 17) #21719
+# Summons a Mindbender to attack the target for 15 seconds.rnrn|cFFFFFFFFGenerates 200010s1/100 Insanity each time the Mindbender attacks.|r
 Define(misery_talent 8) #23126
 # Vampiric Touch also applies Shadow Word: Pain to the target.
 Define(shadow_crash_talent 15) #21755
 # Hurl a bolt of slow-moving Shadow energy at the destination, dealing (125 of Spell Power) Shadow damage to all targets within 205386A1 yards.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r
 Define(shadow_word_death_talent 14) #22311
 # A word of dark binding that inflicts (187.5 of Spell Power) Shadow damage to the target. Only usable on enemies that have less than s2 health.rnrn|cFFFFFFFFGenerates s3 Insanity, or s4 Insanity if the target dies.|r
+Define(shadow_word_void_talent 3) #22314
+# Blasts the target with a word of void for (130 of Spell Power) Shadow damage.?a185916[rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r][]
 Define(surrender_to_madness_talent 21) #21979
 # All your Insanity-generating abilities generate s1 more Insanity and you can cast while moving for 60 seconds.rnrnThen, you take damage equal to s3 of your maximum health and cannot generate Insanity for 15 seconds.
 Define(void_torrent_talent 18) #21720

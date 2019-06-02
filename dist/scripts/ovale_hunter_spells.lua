@@ -14,7 +14,7 @@ Define(aimed_shot 19434)
 # A powerful aimed shot that deals s1*<mult> Physical damage. ?!s19434&c1[rnrnReplaces Cobra Shot.][]
   SpellInfo(aimed_shot focus=30 cd=12)
 Define(ancestral_call 274738)
-# Invoke the spirits of your ancestors, granting you their power for 15 seconds.
+# Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
   SpellAddBuff(ancestral_call ancestral_call=1)
 Define(arcane_shot 185358)
@@ -31,7 +31,7 @@ Define(aspect_of_the_wild 193530)
   # Gaining s2 Focus per sec.rnCritical Strike chance increased by s1.
   SpellAddBuff(aspect_of_the_wild aspect_of_the_wild=1)
 Define(barbed_shot 217200)
-# Fire a shot that tears through your enemy, causing them to bleed for s1*8 seconds/t1 damage over 8 seconds.rnrnSends your pet into a frenzy, increasing attack speed by 272790s1 for 8 seconds, stacking up to 272790u times.rnrn|cFFFFFFFFGenerates 246152s1*8 seconds/246152t1 Focus over 8 seconds.|r
+# Fire a shot that tears through your enemy, causing them to bleed for s1*s2 damage over 8 seconds.rnrnSends your pet into a frenzy, increasing attack speed by 272790s1 for 8 seconds, stacking up to 272790u times.rnrn|cFFFFFFFFGenerates 246152s1*8 seconds/246152t1 Focus over 8 seconds.|r
   SpellInfo(barbed_shot cd=12 duration=8 tick=2)
   # Suffering sw1 damage every t1 sec.
   SpellAddTargetDebuff(barbed_shot barbed_shot=1)
@@ -65,10 +65,11 @@ Define(blur_of_talons_buff 277966)
   SpellInfo(blur_of_talons_buff channel=-0.001 gcd=0 offgcd=1)
 
 Define(butchery 212436)
-# Strike all nearby enemies in a flurry of strikes, inflicting s1 Physical damage to each.rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit, up to s3.
+# Attack all nearby enemies in a flurry of strikes, inflicting s1 Physical damage to each.?s294029[rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit, up to s3.][]
   SpellInfo(butchery focus=30 cd=9 talent=butchery_talent)
 Define(carve 187708)
-# A sweeping attack that strikes all enemies in front of you for s1 Physical damage.rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit, up to s3.
+# A sweeping attack that strikes all enemies in front of you for s1 Physical damage.?s294029[rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit, up to s3.][]
+# Rank 2: Carve reduces the remaining cooldown on Wildfire Bomb by 187708s2/1000 sec for each target hit, up to 187708s3.
   SpellInfo(carve focus=35 cd=6)
 Define(chakrams 259391)
 # Throw a pair of chakrams at your target, slicing all enemies in the chakrams' path for <damage> Physical damage. The chakrams will return to you, damaging enemies again.rnrnYour primary target takes 259398s2 increased damage.
@@ -90,6 +91,10 @@ Define(coordinated_assault 266779)
 Define(counter_shot 147362)
 # Interrupts spellcasting, preventing any spell in that school from being cast for 3 seconds.
   SpellInfo(counter_shot cd=24 duration=3 gcd=0 offgcd=1 interrupt=1)
+Define(dance_of_death_buff 274442)
+# Barbed Shot has a chance equal to your critical strike chance to grant you s1 Agility for 8 seconds.
+  SpellInfo(dance_of_death_buff channel=-0.001 gcd=0 offgcd=1)
+
 Define(dire_beast 120679)
 # Summons a powerful wild beast that attacks the target and roars, increasing your Haste by 281036s1 for 8 seconds.
   SpellInfo(dire_beast focus=25 cd=20 duration=8 talent=dire_beast_talent)
@@ -121,12 +126,6 @@ Define(hunters_mark 257284)
   SpellInfo(hunters_mark talent=hunters_mark_talent)
   # Damage taken from the Hunter increased by s1.rnrnCan always be seen and tracked by the Hunter.
   SpellAddTargetDebuff(hunters_mark hunters_mark=1)
-Define(in_the_rhythm 272733)
-# When Rapid Fire finishes fully channeling, your Haste is increased by s1 for 8 seconds.
-  SpellInfo(in_the_rhythm duration=8 gcd=0 offgcd=1)
-  # Haste increased by w1.
-  SpellAddBuff(in_the_rhythm in_the_rhythm=1)
-
 Define(kill_command 34026)
 # Give the command to kill, causing your pet to savagely deal <damage> Physical damage to the enemy.
 # Rank 2: Kill Command has a 259489s2 chance to immediately reset its cooldown.rnrnCoordinated Assault increases this chance by another 266779s4.
@@ -225,7 +224,7 @@ Define(barrage_talent_marksmanship 17) #23104
 Define(birds_of_prey_talent 19) #22272
 # Attacking your pet's target with ?s259387[Mongoose Bite][Raptor Strike] or ?s212436[Butchery][Carve] extends the duration of Coordinated Assault by <duration> sec.
 Define(butchery_talent 6) #22297
-# Strike all nearby enemies in a flurry of strikes, inflicting s1 Physical damage to each.rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit, up to s3.
+# Attack all nearby enemies in a flurry of strikes, inflicting s1 Physical damage to each.?s294029[rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit, up to s3.][]
 Define(calling_the_shots_talent 19) #22274
 # Casting Arcane Shot or Multi-Shot reduces the cooldown of Trueshot by m1/1000.1 sec.
 Define(careful_aim_talent 4) #22495
@@ -262,7 +261,9 @@ Define(vipers_venom_talent 1) #22275
 # ?s259387[Mongoose Bite][Raptor Strike] has a chance to make your next Serpent Sting cost no Focus and deal an additional 268552s1 initial damage.
 Define(wildfire_infusion_talent 20) #22301
 # Lace your Wildfire Bomb with extra reagents, randomly giving it one of the following enhancements each time you throw it:rnrn|cFFFFFFFFShrapnel Bomb: |rShrapnel pierces the targets, causing ?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] to apply a bleed for 9 seconds that stacks up to 270343u times.rnrn|cFFFFFFFFPheromone Bomb: |rKill Command has a 270323s2 chance to reset against targets coated with Pheromones.rnrn|cFFFFFFFFVolatile Bomb: |rReacts violently with poison, causing an extra explosion against enemies suffering from your Serpent Sting and refreshes your Serpent Stings.
+Define(dance_of_death_trait 274441)
 Define(primal_instincts_trait 279806)
+Define(rapid_reload_trait 278530)
 Define(focused_fire_trait 278531)
 Define(in_the_rhythm_trait 264198)
 Define(surging_shots_trait 287707)
