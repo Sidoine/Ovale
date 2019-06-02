@@ -2197,6 +2197,30 @@ EmitAction = function(parseNode, nodeList, annotation)
             isSpellAction = false
         elseif className == "DEATHKNIGHT" and action == "antimagic_shell" then
             conditionCode = "IncomingDamage(1.5 magic=1) > 0"
+		elseif className == "DEATHKNIGHT" and action == "festering_strike" then
+            conditionCode = "target.InRange(festering_strike)"
+		elseif className == "DEATHKNIGHT" and action == "scourge_strike" then
+            conditionCode = "target.InRange(scourge_strike)"
+		elseif className == "DEATHKNIGHT" and action == "death_strike" then
+            conditionCode = "target.InRange(death_strike)"
+		elseif className == "DEATHKNIGHT" and action == "soul_reaper" then
+            conditionCode = "target.InRange(soul_reaper)"
+		elseif className == "DEATHKNIGHT" and action == "unholy_blight" then
+            conditionCode = "target.InRange(festering_strike)"
+		elseif className == "DEATHKNIGHT" and action == "summon_gargoyle" then
+            conditionCode = "target.InRange(festering_strike)"
+		elseif className == "DEATHKNIGHT" and action == "army_of_the_dead" then
+            conditionCode = "target.InRange(festering_strike)"
+		elseif className == "DEATHKNIGHT" and action == "apocalypse" then
+            conditionCode = "target.InRange(apocalypse)"
+		elseif className == "DEATHKNIGHT" and action == "death_and_decay" then
+            conditionCode = "target.InRange(festering_strike)"
+		elseif className == "DEATHKNIGHT" and action == "defile" then
+            conditionCode = "target.InRange(festering_strike)"
+		elseif className == "DEATHKNIGHT" and action == "unholy_frenzy" then
+            conditionCode = "target.InRange(festering_strike)"
+		elseif className == "DEATHKNIGHT" and action == "epidemic" then
+            conditionCode = "DebuffCountOnAny(virulent_plague_debuff) >= 1"
         elseif className == "DRUID" and action == "pulverize" then
             local debuffName = "thrash_bear_debuff"
             AddSymbol(annotation, debuffName)

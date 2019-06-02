@@ -280,6 +280,7 @@ Define(unholy_frenzy_talent 20) #22110
 # Incites you into a killing frenzy for 12 seconds, increasing Haste by s1 and causing your auto attacks to infect the target with a Festering Wound.
 Define(frozen_tempest_trait 278487)
 Define(icy_citadel_trait 272718)
+Define(magus_of_the_dead_trait 288417)
     ]]
     code = code .. [[
 
@@ -561,6 +562,7 @@ Define(lanathels_lament_buff 212975)
 	SpellAddBuff(death_and_decay lanathels_lament_buff=1 if_equipped=lanathels_lament)
 Define(perseverance_of_the_ebon_martyr_item 132459)
 Define(perseverance_of_the_ebon_martyr_debuff 216059)
+Define(ramping_amplitude_gigavolt_engine_item 165580)
 
 
 ## Tier Items
