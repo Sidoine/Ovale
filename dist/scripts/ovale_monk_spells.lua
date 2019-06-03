@@ -6,14 +6,9 @@ __exports.register = function()
     local name = "ovale_monk_spells"
     local desc = "[8.1] Ovale: Monk spells"
     local code = [[Define(ancestral_call 274738)
-# Invoke the spirits of your ancestors, granting you their power for 15 seconds.
+# Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
   SpellAddBuff(ancestral_call ancestral_call=1)
-Define(battle_potion_of_agility 279152)
-# Increases your Agility by s1 for 25 seconds.
-  SpellInfo(battle_potion_of_agility cd=1 duration=25 gcd=0 offgcd=1)
-  # Agility increased by w1.
-  SpellAddBuff(battle_potion_of_agility battle_potion_of_agility=1)
 Define(berserking 26297)
 # Increases your haste by s1 for 12 seconds.
   SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
@@ -33,10 +28,6 @@ Define(blackout_strike 205523)
 Define(breath_of_fire 115181)
 # Breathe fire on targets in front of you, causing s1 Fire damage.rnrnTargets affected by Keg Smash will also burn, taking 123725o1 Fire damage and dealing 123725s2 reduced damage to you for 12 seconds.
   SpellInfo(breath_of_fire cd=15 gcd=1)
-Define(bursting_blood 251316)
-# Imbues your blood with heat for 25 seconds, giving your melee attacks a chance to create a burst of blood, dealing 265514s1 Physical damage split evenly amongst all nearby enemies.
-  SpellInfo(bursting_blood duration=25 channel=25 gcd=0 offgcd=1)
-
 Define(chi_burst 123986)
 # Hurls a torrent of Chi energy up to 40 yds forward, dealing 148135s1 Nature damage to all enemies, and 130654s1 healing to the Monk and all allies in its path.?c1[rnrnCasting Chi Burst does not prevent avoiding attacks.][]?c3[rnrnChi Burst generates 1 Chi per enemy target damaged, up to a maximum of s3.][]
   SpellInfo(chi_burst cd=30 duration=1 talent=chi_burst_talent)
@@ -59,8 +50,10 @@ Define(elusive_brawler 195630)
   # Dodge chance increased by w1.
   SpellAddBuff(elusive_brawler elusive_brawler=1)
 Define(energizing_elixir 115288)
-# Chug an Energizing Elixir, refilling all your Energy and instantly generate s2 Chi.
-  SpellInfo(energizing_elixir cd=60 max_stacks=3 gcd=1 energy=-200 chi=-2 talent=energizing_elixir_talent)
+# Chug an Energizing Elixir, granting s2 Chi and generating s1/5*5 Energy over 5 seconds.
+  SpellInfo(energizing_elixir cd=60 duration=5 max_stacks=3 gcd=1 chi=-2 talent=energizing_elixir_talent)
+  # Generating w1/5 extra Energy per sec.
+  SpellAddBuff(energizing_elixir energizing_elixir=1)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. 
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
@@ -185,7 +178,7 @@ Define(dampen_harm_talent 15) #20175
 Define(diffuse_magic_talent 14) #20173
 # Reduces magic damage you take by m1 for 6 seconds, and transfers all currently active harmful magical effects on you back to their original caster if possible.
 Define(energizing_elixir_talent 9) #22096
-# Chug an Energizing Elixir, refilling all your Energy and instantly generate s2 Chi.
+# Chug an Energizing Elixir, granting s2 Chi and generating s1/5*5 Energy over 5 seconds.
 Define(fist_of_the_white_tiger_talent 8) #19771
 # Strike with the technique of the White Tiger, dealing s1+261977s1 Physical damage.rnrn|cFFFFFFFFGenerates 261978s1 Chi.
 Define(hit_combo_talent 16) #22093

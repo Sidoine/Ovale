@@ -12,18 +12,13 @@ export function register() {
   # Silenced.
   SpellAddTargetDebuff(avengers_shield avengers_shield=1)
 Define(avenging_wrath 31884)
-# Call upon the Light to become an avatar of retribution, increasing your damage, healing, and critical strike chance by s1 for 20 seconds. 
+# Call upon the Light to become an avatar of retribution, increasing your damage, healing, and critical strike chance by s1 for 20 seconds. Your first ?c1[Holy Shock]?c3[Templar's Verdict or Divine Storm][Light of the Protector] will critically strike.
   SpellInfo(avenging_wrath cd=120 duration=20)
   # Damage, healing, and critical strike chance increased by w1.
   SpellAddBuff(avenging_wrath avenging_wrath=1)
 Define(bastion_of_light 204035)
 # Immediately grants s1 charges of Shield of the Righteous.
   SpellInfo(bastion_of_light cd=120 gcd=0 offgcd=1 talent=bastion_of_light_talent)
-Define(battle_potion_of_strength 279153)
-# Increases your Strength by s1 for 25 seconds.
-  SpellInfo(battle_potion_of_strength cd=1 duration=25 gcd=0 offgcd=1)
-  # Strength increased by w1.
-  SpellAddBuff(battle_potion_of_strength battle_potion_of_strength=1)
 Define(blade_of_justice 184575)
 # Pierces an enemy with a blade of light, dealing s2*<mult> Physical damage.rnrn|cFFFFFFFFGenerates s3 Holy Power.|r
   SpellInfo(blade_of_justice cd=10.5 holypower=-2)

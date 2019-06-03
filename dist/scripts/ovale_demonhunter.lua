@@ -108,7 +108,7 @@ AddFunction HavocPrecombatCdActions
  #food
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_agility usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
  #metamorphosis,if=!azerite.chaotic_transformation.enabled
  if not HasAzeriteTrait(chaotic_transformation_trait) and { not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight() } Spell(metamorphosis_havoc)
 }
@@ -318,9 +318,11 @@ AddFunction HavocCooldownCdActions
  #nemesis,if=!raid_event.adds.exists
  if not False(raid_event_adds_exists) Spell(nemesis)
  #potion,if=buff.metamorphosis.remains>25|target.time_to_die<60
- if { BuffRemaining(metamorphosis_havoc_buff) > 25 or target.TimeToDie() < 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_agility usable=1)
- #use_item,name=galecallers_boon
- HavocUseItemActions()
+ if { BuffRemaining(metamorphosis_havoc_buff) > 25 or target.TimeToDie() < 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
+ #use_item,name=galecallers_boon,sync=fel_barrage
+ if { { not { not SpellCooldown(eye_beam) > 0 } or BuffPresent(metamorphosis_havoc_buff) } and 600 > 30 or Enemies() > Enemies(tagged=1) } and Spell(fel_barrage) HavocUseItemActions()
+ #use_item,name=galecallers_boon,if=!talent.fel_barrage.enabled
+ if not Talent(fel_barrage_talent) HavocUseItemActions()
  #use_item,name=lustrous_golden_plumage
  HavocUseItemActions()
 }
@@ -491,7 +493,6 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 
 ### Required symbols
 # annihilation
-# battle_potion_of_agility
 # blade_dance
 # blind_fury_talent
 # chaos_nova
@@ -507,6 +508,7 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # disrupt
 # eye_beam
 # fel_barrage
+# fel_barrage_talent
 # fel_eruption
 # fel_mastery_talent
 # fel_rush
@@ -514,6 +516,7 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # first_blood_talent
 # immolation_aura_havoc
 # imprison
+# item_battle_potion_of_agility
 # metamorphosis_havoc
 # metamorphosis_havoc_buff
 # momentum_buff
@@ -596,7 +599,7 @@ AddFunction VengeancePrecombatCdActions
  #food
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(steelskin_potion usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_steelskin_potion usable=1)
 }
 
 AddFunction VengeancePrecombatCdPostConditions
@@ -900,6 +903,7 @@ AddIcon checkbox=opt_demonhunter_vengeance_aoe help=cd specialization=vengeance
 # immolation_aura
 # imprison
 # infernal_strike
+# item_steelskin_potion
 # metamorphosis_veng
 # shear
 # sigil_of_chains
@@ -909,7 +913,6 @@ AddIcon checkbox=opt_demonhunter_vengeance_aoe help=cd specialization=vengeance
 # soul_cleave
 # spirit_bomb
 # spirit_bomb_talent
-# steelskin_potion
 # throw_glaive_veng
 ]]
     OvaleScripts:RegisterScript("DEMONHUNTER", "vengeance", name, desc, code, "script")

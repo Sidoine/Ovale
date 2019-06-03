@@ -72,7 +72,7 @@ AddFunction ProtectionPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_strength usable=1)
 
  unless Spell(consecration)
  {
@@ -118,9 +118,11 @@ AddFunction ProtectionCooldownsCdActions
   #bastion_of_light,if=cooldown.shield_of_the_righteous.charges_fractional<=0.5
   if SpellCharges(shield_of_the_righteous count=0) <= 0.5 Spell(bastion_of_light)
   #potion,if=buff.avenging_wrath.up
-  if BuffPresent(avenging_wrath_buff) and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
+  if BuffPresent(avenging_wrath_buff) and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_strength usable=1)
   #use_items,if=buff.seraphim.up|!talent.seraphim.enabled
   if BuffPresent(seraphim_buff) or not Talent(seraphim_talent) ProtectionUseItemActions()
+  #use_item,name=grongs_primal_rage,if=((cooldown.judgment.full_recharge_time>4|(!talent.crusaders_judgment.enabled&prev_gcd.1.judgment))&cooldown.avengers_shield.remains>4&buff.seraphim.remains>4)|(buff.seraphim.remains<4)
+  if { SpellCooldown(judgment_protection) > 4 or not Talent(crusaders_judgment_talent) and PreviousGCDSpell(judgment_protection) } and SpellCooldown(avengers_shield) > 4 and BuffRemaining(seraphim_buff) > 4 or BuffRemaining(seraphim_buff) < 4 ProtectionUseItemActions()
   #use_item,name=merekthas_fang,if=!buff.avenging_wrath.up&(buff.seraphim.up|!talent.seraphim.enabled)
   if not BuffPresent(avenging_wrath_buff) and { BuffPresent(seraphim_buff) or not Talent(seraphim_talent) } ProtectionUseItemActions()
   #use_item,name=razdunks_big_red_button
@@ -271,7 +273,6 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 # avenging_wrath
 # avenging_wrath_buff
 # bastion_of_light
-# battle_potion_of_strength
 # blessed_hammer
 # blinding_light
 # consecration
@@ -279,6 +280,7 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 # fireblood
 # hammer_of_justice
 # hammer_of_the_righteous
+# item_battle_potion_of_strength
 # judgment_protection
 # lights_judgment
 # rebuke
@@ -366,7 +368,7 @@ AddFunction RetributionPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_strength usable=1)
  #arcane_torrent,if=!talent.wake_of_ashes.enabled
  if not Talent(wake_of_ashes_talent) Spell(arcane_torrent_holy)
 }
@@ -565,7 +567,7 @@ AddFunction RetributionCooldownsCdActions
  #use_item,name=jes_howler,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10
  if BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) and BuffStacks(crusade_buff) == 10 RetributionUseItemActions()
  #potion,if=buff.bloodlust.react|buff.avenging_wrath.up|buff.crusade.up&buff.crusade.remains<25
- if { BuffPresent(burst_haste_buff any=1) or BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) and BuffRemaining(crusade_buff) < 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_strength usable=1)
+ if { BuffPresent(burst_haste_buff any=1) or BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) and BuffRemaining(crusade_buff) < 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_strength usable=1)
  #lights_judgment,if=spell_targets.lights_judgment>=2|(!raid_event.adds.exists|raid_event.adds.in>75)
  if Enemies() >= 2 or not False(raid_event_adds_exists) or 600 > 75 Spell(lights_judgment)
  #fireblood,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10
@@ -722,7 +724,6 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 # arcane_torrent_holy
 # avenging_wrath
 # avenging_wrath_buff
-# battle_potion_of_strength
 # blade_of_justice
 # consecration_retribution
 # crusade
@@ -741,6 +742,7 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 # inquisition
 # inquisition_buff
 # inquisition_talent
+# item_battle_potion_of_strength
 # judgment
 # lights_judgment
 # rebuke

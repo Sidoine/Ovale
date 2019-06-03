@@ -1436,6 +1436,7 @@ local InitializeDisambiguation = function()
     AddDisambiguation("132410", "shard_of_the_exodar", "MAGE")
     AddDisambiguation("132454", "koralons_burning_touch", "MAGE", "fire")
     AddDisambiguation("132863", "darcklis_dragonfire_diadem", "MAGE", "fire")
+    AddDisambiguation("blink_any", "blink", "MAGE")
     AddDisambiguation("summon_arcane_familiar", "arcane_familiar", "MAGE", "arcane")
     AddDisambiguation("water_elemental", "summon_water_elemental", "MAGE", "frost")
     AddDisambiguation("bok_proc_buff", "blackout_kick_buff", "MONK", "windwalker")
@@ -2251,6 +2252,8 @@ EmitAction = function(parseNode, nodeList, annotation)
             conditionCode = "target.Distance(less 12)"
         elseif className == "MAGE" and action == "arcane_blast" then
             conditionCode = "Mana() > ManaCost(arcane_blast)"
+        elseif className == "MAGE" and action == "cone_of_cold" then
+            conditionCode = "target.Distance() < 12"
         elseif className == "MONK" and action == "chi_sphere" then
             isSpellAction = false
         elseif className == "MONK" and action == "gift_of_the_ox" then
@@ -2344,7 +2347,8 @@ EmitAction = function(parseNode, nodeList, annotation)
         elseif className == "WARRIOR" and action == "battle_shout" and role == "tank" then
             conditionCode = "BuffExpires(stamina_buff)"
         elseif className == "WARRIOR" and action == "charge" then
-            conditionCode = "CheckBoxOn(opt_melee_range) and target.InRange(charge)"
+            conditionCode = "CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel)"
+            AddSymbol(annotation, "pummel")
         elseif className == "WARRIOR" and action == "commanding_shout" and role == "attack" then
             conditionCode = "BuffExpires(attack_power_multiplier_buff)"
         elseif className == "WARRIOR" and action == "enraged_regeneration" then
@@ -2407,10 +2411,10 @@ EmitAction = function(parseNode, nodeList, annotation)
             local name = (modifiers.name and Unparse(modifiers.name)) or annotation.consumables["potion"]
             if name then
                 name = Disambiguate(annotation, name, className, specialization, "item")
-                bodyCode = format("Item(%s usable=1)", name)
+                bodyCode = format("Item(item_%s usable=1)", name)
                 conditionCode = "CheckBoxOn(opt_use_consumables) and target.Classification(worldboss)"
                 annotation.opt_use_consumables = className
-                AddSymbol(annotation, format("%s", name))
+                AddSymbol(annotation, format("item_%s", name))
                 isSpellAction = false
             end
         elseif action == "sequence" then
@@ -3226,7 +3230,7 @@ EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
             code = format("%sCooldownDuration(%s)", prefix, name)
         elseif property == "ready" then
             code = format("%sCooldown(%s) == 0", prefix, name)
-        elseif property == "remains" or property == "adjusted_remains" then
+        elseif property == "remains" or property == "remains_guess" or property == "adjusted_remains" then
             if parseNode.asType == "boolean" then
                 code = format("%sCooldown(%s) > 0", prefix, name)
             else
@@ -3302,7 +3306,7 @@ EmitOperandGroundAoe = function(operand, parseNode, nodeList, annotation, action
         local dotName = name .. "_debuff"
         dotName = Disambiguate(annotation, dotName, annotation.class, annotation.specialization)
         local prefix = find(dotName, "_buff$") and "Buff" or "Debuff"
-        local target = ""
+        local target = (prefix == "Debuff" and "target.") or ""
         local code
         if property == "remains" then
             code = format("%s%sRemaining(%s)", target, prefix, dotName)
@@ -3768,16 +3772,15 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
         else
             code = format("GetStateDuration(%s)", variable)
         end
-    elseif className == "MAGE" and operand == "dot.frozen_orb.ticking" then
-        local name = "frozen_orb"
-        code = format("SpellCooldown(%s) > SpellCooldownDuration(%s) - 10", name, name)
-        AddSymbol(annotation, name)
     elseif className == "MAGE" and operand == "firestarter.active" then
         code = "Talent(firestarter_talent) and target.HealthPercent() >= 90"
         AddSymbol(annotation, "firestarter_talent")
     elseif className == "MAGE" and operand == "brain_freeze_active" then
         code = "target.DebuffPresent(winters_chill_debuff)"
         AddSymbol(annotation, "winters_chill_debuff")
+    elseif className == "MAGE" and operand == "action.frozen_orb.in_flight" then
+        code = "TimeSincePreviousSpell(frozen_orb) < 10"
+        AddSymbol(annotation, "frozen_orb")
     elseif className == "MONK" and sub(operand, 1, 35) == "debuff.storm_earth_and_fire_target." then
         local property = sub(operand, 36)
         if target == "" then
@@ -4915,11 +4918,11 @@ local InsertSupportingFunctions = function(child, annotation)
         local fmt = [[
 			AddFunction %sGetInMeleeRange
 			{
-				if CheckBoxOn(opt_melee_range) and not InFlightToTarget(%s) and not InFlightToTarget(heroic_leap)
+				if CheckBoxOn(opt_melee_range) and not InFlightToTarget(%s) and not InFlightToTarget(heroic_leap) and not target.InRange(pummel)
 				{
 					if target.InRange(%s) Spell(%s)
 					if SpellCharges(%s) == 0 and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
-					if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+					Texture(misc_arrowlup help=L(not_in_melee_range))
 				}
 			}
 		]]

@@ -89,11 +89,13 @@ Define(umbral_glaive_storm 242553)
 # Battle for Azeroth
 Define(battle_scarred 160053)
 
-Define(battle_potion_of_agility 163223)
-Define(battle_potion_of_intellect 163222)
-Define(battle_potion_of_strength 163224)
-Define(battle_potion_of_stamina 163225)
-Define(steelskin_potion 152557)
+Define(item_battle_potion_of_agility 163223)
+Define(item_battle_potion_of_intellect 163222)
+Define(item_battle_potion_of_strength 163224)
+Define(item_battle_potion_of_stamina 163225)
+Define(item_bursting_blood 152560)
+Define(item_rising_death 152559)
+Define(item_steelskin_potion 152557)
 
 ###
 ### Trinkets & OnUse Rings

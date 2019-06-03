@@ -1597,6 +1597,7 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("132410", "shard_of_the_exodar", "MAGE");
     AddDisambiguation("132454", "koralons_burning_touch", "MAGE", "fire");
     AddDisambiguation("132863", "darcklis_dragonfire_diadem", "MAGE", "fire");
+	AddDisambiguation("blink_any", "blink", "MAGE");
     AddDisambiguation("summon_arcane_familiar", "arcane_familiar", "MAGE", "arcane");
     AddDisambiguation("water_elemental", "summon_water_elemental", "MAGE", "frost");
     
@@ -2436,6 +2437,8 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             conditionCode = "target.Distance(less 12)"
         } else if (className == "MAGE" && action == "arcane_blast") {
             conditionCode = "Mana() > ManaCost(arcane_blast)"
+        } else if (className == "MAGE" && action == "cone_of_cold") {
+            conditionCode = "target.Distance() < 12"
         } else if (className == "MONK" && action == "chi_sphere") {
             isSpellAction = false;
         } else if (className == "MONK" && action == "gift_of_the_ox") {
@@ -2529,7 +2532,8 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
         } else if (className == "WARRIOR" && action == "battle_shout" && role == "tank") {
             conditionCode = "BuffExpires(stamina_buff)";
         } else if (className == "WARRIOR" && action == "charge") {
-            conditionCode = "CheckBoxOn(opt_melee_range) and target.InRange(charge)";
+            conditionCode = "CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel)";
+            AddSymbol(annotation, "pummel");
         } else if (className == "WARRIOR" && action == "commanding_shout" && role == "attack") {
             conditionCode = "BuffExpires(attack_power_multiplier_buff)";
         } else if (className == "WARRIOR" && action == "enraged_regeneration") {
@@ -2592,10 +2596,10 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             let name = (modifiers.name && Unparse(modifiers.name)) || annotation.consumables["potion"];
             if (name) {
                 [name] = Disambiguate(annotation, name, className, specialization, "item");
-                bodyCode = format("Item(%s usable=1)", name);
+                bodyCode = format("Item(item_%s usable=1)", name);
                 conditionCode = "CheckBoxOn(opt_use_consumables) and target.Classification(worldboss)";
                 annotation.opt_use_consumables = className;
-                AddSymbol(annotation, format("%s", name));
+                AddSymbol(annotation, format("item_%s", name));
                 isSpellAction = false;
             }
         } else if (action === "sequence") {
@@ -3409,7 +3413,7 @@ EmitOperandCooldown = function (operand, parseNode, nodeList, annotation, action
             code = format("%sCooldownDuration(%s)", prefix, name);
         } else if (property == "ready") {
             code = format("%sCooldown(%s) == 0", prefix, name);
-        } else if (property == "remains" || property == "adjusted_remains") {
+        } else if (property == "remains" || property == "remains_guess" || property == "adjusted_remains") {
             if (parseNode.asType == "boolean") {
                 code = format("%sCooldown(%s) > 0", prefix, name);
             } else {
@@ -3484,7 +3488,7 @@ EmitOperandGroundAoe = (operand: string, parseNode: ParseNode, nodeList: LuaArra
         let dotName = `${name}_debuff`;
         [dotName] = Disambiguate(annotation, dotName, annotation.class, annotation.specialization);
         let prefix = truthy(find(dotName, "_buff$")) && "Buff" || "Debuff";
-        const target = "";
+        let target = (prefix == "Debuff" && "target.") || "";
         let code;
         if (property == "remains") {
             code = format("%s%sRemaining(%s)", target, prefix, dotName);
@@ -3945,16 +3949,15 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
         } else {
             code = format("GetStateDuration(%s)", variable);
         }
-    } else if (className == "MAGE" && operand == "dot.frozen_orb.ticking") {
-        let name = "frozen_orb";
-        code = format("SpellCooldown(%s) > SpellCooldownDuration(%s) - 10", name, name);
-        AddSymbol(annotation, name);
     } else if (className == "MAGE" && operand == "firestarter.active") {
         code = "Talent(firestarter_talent) and target.HealthPercent() >= 90";
         AddSymbol(annotation, "firestarter_talent");
     } else if (className == "MAGE" && operand == "brain_freeze_active") {
         code = "target.DebuffPresent(winters_chill_debuff)"
         AddSymbol(annotation, "winters_chill_debuff");
+	} else if (className == "MAGE" && operand == "action.frozen_orb.in_flight") {
+		code = "TimeSincePreviousSpell(frozen_orb) < 10"
+		AddSymbol(annotation, "frozen_orb")
     } else if (className == "MONK" && sub(operand, 1, 35) == "debuff.storm_earth_and_fire_target.") {
         let property = sub(operand, 36);
         if (target == "") {
@@ -5107,11 +5110,11 @@ const InsertSupportingFunctions = function(child: LuaArray<AstNode>, annotation:
         let fmt = `
 			AddFunction %sGetInMeleeRange
 			{
-				if CheckBoxOn(opt_melee_range) and not InFlightToTarget(%s) and not InFlightToTarget(heroic_leap)
+				if CheckBoxOn(opt_melee_range) and not InFlightToTarget(%s) and not InFlightToTarget(heroic_leap) and not target.InRange(pummel)
 				{
 					if target.InRange(%s) Spell(%s)
 					if SpellCharges(%s) == 0 and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
-					if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+					Texture(misc_arrowlup help=L(not_in_melee_range))
 				}
 			}
 		`;

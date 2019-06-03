@@ -6,7 +6,7 @@ local registerBase = function()
     local name = "ovale_druid_base_spells"
     local desc = "[8.1] Ovale: Druid baseline spells"
     local code = [[Define(ancestral_call 274738)
-# Invoke the spirits of your ancestors, granting you their power for 15 seconds.
+# Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
   SpellAddBuff(ancestral_call ancestral_call=1)
 Define(arcanic_pulsar_buff 287784)
@@ -18,16 +18,6 @@ Define(barkskin 22812)
   SpellInfo(barkskin cd=60 duration=12 gcd=0 offgcd=1 tick=1)
   # All damage taken reduced by s2.
   SpellAddBuff(barkskin barkskin=1)
-Define(battle_potion_of_agility 279152)
-# Increases your Agility by s1 for 25 seconds.
-  SpellInfo(battle_potion_of_agility cd=1 duration=25 gcd=0 offgcd=1)
-  # Agility increased by w1.
-  SpellAddBuff(battle_potion_of_agility battle_potion_of_agility=1)
-Define(battle_potion_of_intellect 279151)
-# Increases your Intellect by s1 for 25 seconds.
-  SpellInfo(battle_potion_of_intellect cd=1 duration=25 gcd=0 offgcd=1)
-  # Intellect increased by w1.
-  SpellAddBuff(battle_potion_of_intellect battle_potion_of_intellect=1)
 Define(bear_form 5487)
 # Shapeshift into Bear Form, increasing armor by m3 and Stamina by 1178s2, granting protection from Polymorph effects, and increasing threat generation.rnrnThe act of shapeshifting frees you from movement impairing effects.
 # Rank 2: Bear Form gives an additional s1 Stamina.rn
@@ -59,18 +49,14 @@ Define(bristling_fur 155835)
 Define(brutal_slash 202028)
 # Strikes all nearby enemies with a massive slash, inflicting s1 Physical damage.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
   SpellInfo(brutal_slash energy=25 cd=8 gcd=1 talent=brutal_slash_talent)
-Define(bursting_blood 251316)
-# Imbues your blood with heat for 25 seconds, giving your melee attacks a chance to create a burst of blood, dealing 265514s1 Physical damage split evenly amongst all nearby enemies.
-  SpellInfo(bursting_blood duration=25 channel=25 gcd=0 offgcd=1)
-
 Define(cat_form 768)
 # Shapeshift into Cat Form, increasing auto-attack damage by (25 of Spell Power), movement speed by 113636s1, granting protection from Polymorph effects, and reducing falling damage.rnrnThe act of shapeshifting frees you from movement impairing effects.
   SpellInfo(cat_form)
   # Autoattack damage increased by w3.rnImmune to Polymorph effects.rnMovement speed increased by 113636s1 and falling damage reduced.
   SpellAddBuff(cat_form cat_form=1)
 Define(celestial_alignment 194223)
-# Celestial bodies align, increasing the damage of all your spells by s1 and granting you s3 Haste for 20 seconds.
-  SpellInfo(celestial_alignment cd=180 duration=20)
+# Celestial bodies align, granting s5/10 Astral Power, and increasing spell damage by s1 and Haste by s3 for 20 seconds.
+  SpellInfo(celestial_alignment cd=180 duration=20 lunarpower=-40)
   # Spell damage increased by s1.rnHaste increased by s3.
   SpellAddBuff(celestial_alignment celestial_alignment=1)
 Define(feral_frenzy 274837)
@@ -105,7 +91,7 @@ Define(incapacitating_roar 99)
   SpellAddTargetDebuff(incapacitating_roar incapacitating_roar=1)
 Define(incarnation_chosen_of_elune 102560)
 # An improved Moonkin Form that increases the damage of all your spells by s1 and grants you s3 Haste.rnrnLasts 30 seconds. You may shapeshift in and out of this improved Moonkin Form for its duration.
-  SpellInfo(incarnation_chosen_of_elune cd=180 duration=30 talent=incarnation_chosen_of_elune_talent)
+  SpellInfo(incarnation_chosen_of_elune cd=180 duration=30 lunarpower=-40 talent=incarnation_chosen_of_elune_talent)
   # Spell damage increased by s1.rnHaste increased by s3.
   SpellAddBuff(incarnation_chosen_of_elune incarnation_chosen_of_elune=1)
 Define(incarnation_guardian_of_ursoc 102558)
@@ -197,16 +183,13 @@ Define(rake_debuff 155722)
 Define(regrowth 8936)
 # Heals a friendly target for (120 of Spell Power) and another o2*<mult> over 12 seconds.?s231032[ Regrowth's initial heal has a 231032s1 increased chance for a critical effect.][]?s24858|s197625[ Usable while in Moonkin Form.][]?s33891[rnrn|C0033AA11Tree of Life: Instant cast.|R][]
   SpellInfo(regrowth duration=12 tick=2)
-  # Heals w2 every t2 seconds.
+  # Heals w2 every t2 sec.
   SpellAddBuff(regrowth regrowth=1)
 Define(rip 1079)
 # Finishing move that causes Bleed damage over time. Lasts longer per combo point.rnrn   1 point  : o1*2 over 8 secrn   2 points: o1*3 over 12 secrn   3 points: o1*4 over 16 secrn   4 points: o1*5 over 20 secrn   5 points: o1*6 over 24 sec
   SpellInfo(rip energy=20 combopoints=1 duration=4 gcd=1 tick=2)
   # Bleeding for w1 damage every t1 sec.
   SpellAddTargetDebuff(rip rip=1)
-Define(rising_death 252346)
-# Chance to create multiple potions.
-  SpellInfo(rising_death gcd=0 offgcd=1)
 Define(savage_roar 52610)
 # Finishing move that increases damage by 62071s1 and energy regeneration rate by (25 of Spell Power) while in Cat Form. Lasts longer per combo point:rnrn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds
   SpellInfo(savage_roar energy=25 combopoints=1 duration=6 channel=6 gcd=1 tick=2 talent=savage_roar_talent)
@@ -632,7 +615,6 @@ Define(intimidating_roar 236748)
 	SpellAddTargetDebuff(pulverize thrash_bear_debuff=-2)
 Define(pulverize_buff 158792)
 	SpellInfo(pulverize_buff duration=20)
-Define(swipe_bear 213771)
 
 	SpellInfo(survival_instincts add_cd=120 specialization=guardian)
 	SpellInfo(survival_instincts add_cd=-80 specialization=guardian talent=survival_of_the_fittest_talent) 

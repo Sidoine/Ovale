@@ -18,11 +18,6 @@ Define(asphyxiate 108194)
   SpellInfo(asphyxiate cd=45 duration=4 talent=asphyxiate_talent_unholy)
   # Stunned.
   SpellAddTargetDebuff(asphyxiate asphyxiate=1)
-Define(battle_potion_of_strength 279153)
-# Increases your Strength by s1 for 25 seconds.
-  SpellInfo(battle_potion_of_strength cd=1 duration=25 gcd=0 offgcd=1)
-  # Strength increased by w1.
-  SpellAddBuff(battle_potion_of_strength battle_potion_of_strength=1)
 Define(berserking 26297)
 # Increases your haste by s1 for 12 seconds.
   SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
@@ -219,6 +214,8 @@ Define(war_stomp 20549)
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
   # Stunned.
   SpellAddTargetDebuff(war_stomp war_stomp=1)
+Define(army_of_the_damned_talent 19) #22030
+# ?s207317[Death Coil and Epidemic reduce][Death Coil reduces] the cooldown of Apocalypse by <cd1> sec and Army of the Dead by <cd2> sec.
 Define(asphyxiate_talent_unholy 9) #22520
 # Lifts the enemy target off the ground, crushing their throat with dark energy and stunning them for 4 seconds.
 Define(blinding_sleet_talent 9) #22519
@@ -277,8 +274,10 @@ Define(unholy_blight_talent 6) #22029
 # Surrounds yourself with a vile swarm of insects for 6 seconds, stinging all nearby enemies and infecting them with an unholy disease that deals 115994o1 damage over 14 seconds.
 Define(unholy_frenzy_talent 20) #22110
 # Incites you into a killing frenzy for 12 seconds, increasing Haste by s1 and causing your auto attacks to infect the target with a Festering Wound.
+Define(ramping_amplitude_gigavolt_engine_item 165580)
 Define(frozen_tempest_trait 278487)
 Define(icy_citadel_trait 272718)
+Define(magus_of_the_dead_trait 288417)
     `;
 // END
 
