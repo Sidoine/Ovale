@@ -2352,6 +2352,26 @@ EmitAction = function(parseNode, nodeList, annotation)
         elseif className == "SHAMAN" and action == "totem_mastery_enhancement" then
             conditionCode = "(InCombat() or not BuffPresent(enh_resonance_totem_buff))"
             AddSymbol(annotation, "enh_resonance_totem_buff")
+		elseif className == "SHAMAN" and action == "lava_lash" then
+            conditionCode = "target.InRange(lava_lash)"
+		elseif className == "SHAMAN" and action == "stormstrike" then
+            conditionCode = "target.InRange(stormstrike)"
+		elseif className == "SHAMAN" and action == "rockbiter" then
+            conditionCode = "target.InRange(rockbiter)"
+		elseif className == "SHAMAN" and action == "flametongue" then
+            conditionCode = "target.InRange(flametongue)"
+		elseif className == "SHAMAN" and action == "frostbrand" then
+            conditionCode = "target.InRange(frostbrand)"
+		elseif className == "SHAMAN" and action == "crash_lightning" then
+            conditionCode = "target.InRange(crash_lightning)"
+		elseif className == "SHAMAN" and action == "blood_fury" then
+            conditionCode = "target.InRange(lava_lash)"
+		elseif className == "SHAMAN" and action == "fury_of_air" then
+            conditionCode = "target.Distance(less 8)"
+		elseif className == "SHAMAN" and action == "sundering" then
+            conditionCode = "target.Distance(less 8)"
+		elseif className == "SHAMAN" and action == "earthen_spike" then
+            conditionCode = "target.InRange(earthen_spike)"
         elseif className == "WARLOCK" and action == "felguard_felstorm" then
             conditionCode = "pet.Present() and pet.CreatureFamily(Felguard)"
         elseif className == "WARLOCK" and action == "grimoire_of_sacrifice" then
