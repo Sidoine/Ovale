@@ -6,19 +6,9 @@ __exports.register = function()
     local name = "ovale_shaman_spells"
     local desc = "[8.1] Ovale: Shaman spells"
     local code = [[Define(ancestral_call 274738)
-# Invoke the spirits of your ancestors, granting you their power for 15 seconds.
+# Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
   SpellAddBuff(ancestral_call ancestral_call=1)
-Define(battle_potion_of_agility 279152)
-# Increases your Agility by s1 for 25 seconds.
-  SpellInfo(battle_potion_of_agility cd=1 duration=25 gcd=0 offgcd=1)
-  # Agility increased by w1.
-  SpellAddBuff(battle_potion_of_agility battle_potion_of_agility=1)
-Define(battle_potion_of_intellect 279151)
-# Increases your Intellect by s1 for 25 seconds.
-  SpellInfo(battle_potion_of_intellect cd=1 duration=25 gcd=0 offgcd=1)
-  # Intellect increased by w1.
-  SpellAddBuff(battle_potion_of_intellect battle_potion_of_intellect=1)
 Define(berserking 26297)
 # Increases your haste by s1 for 12 seconds.
   SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
@@ -136,6 +126,10 @@ Define(lava_burst 51505)
 Define(lava_lash 60103)
 # Charges your off-hand weapon with lava and burns your target, dealing s1 Fire damage.
   SpellInfo(lava_lash maelstrom=40)
+Define(lava_shock_buff 273449)
+# Flame Shock damage increases the damage of your next Earth Shock by s1, stacking up to 273453u times.
+  SpellInfo(lava_shock_buff channel=-0.001 gcd=0 offgcd=1)
+
 Define(lightning_bolt_elemental 188196)
 # Hurls a bolt of lightning at the target, dealing (70.39999999999999 of Spell Power) Nature damage.?a187828[rnrn|cFFFFFFFFGenerates 190493s1 Maelstrom.|r ][]
   SpellInfo(lightning_bolt_elemental)
@@ -217,6 +211,10 @@ Define(surge_of_power_buff 285514)
   SpellInfo(surge_of_power_buff duration=15 channel=15 gcd=0 offgcd=1)
   # Your next spell cast will be enhanced.
   SpellAddBuff(surge_of_power_buff surge_of_power_buff=1)
+Define(tectonic_thunder 286949)
+# Earthquake deals s1 Physical damage instantly, and has a s2 chance to make your next Chain Lightning be instant cast.
+  SpellInfo(tectonic_thunder channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(tectonic_thunder tectonic_thunder=1)
 Define(war_stomp 20549)
 # Stuns up to i enemies within A1 yds for 2 seconds.
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
@@ -241,6 +239,8 @@ Define(crashing_storm_talent 16) #21973
 # Crash Lightning also electrifies the ground, leaving an electrical field behind which damages enemies within it for 7*210801s1 Nature damage over 6 seconds. 
 Define(earthen_spike_talent 20) #22977
 # Summons an Earthen Spike under an enemy, dealing s1 Physical damage and increasing Physical and Nature damage you deal to the target by s2 for 10 seconds.
+Define(echo_of_the_elements_talent_elemental 2) #22357
+# ?c1[Lava Burst now has s2+1][Riptide, Healing Stream Totem, and Lava Burst now have s2+1] charges. Effects that reset ?c1[its][their] remaining cooldown will instead grant 1 charge.
 Define(elemental_blast_talent 3) #22358
 # Harnesses the raw power of the elements, dealing (63 of Spell Power) Elemental damage and increasing your Critical Strike, Haste, or Mastery by 118522s1 for 10 seconds.rnrnCan cause an Elemental Overload?PL<78[ when at or above level 78][].
 Define(feral_lunge_talent 14) #22149
@@ -281,7 +281,10 @@ Define(totem_mastery_talent_elemental 6) #23190
 # Summons four totems that increase your combat capabilities for 120 seconds.rnrn|cFFFFFFFFResonance Totem|rrnGenerates 202192s1 Maelstrom every 202192t1 sec.rnrn|cFFFFFFFFStorm Totem|rrnIncreases the chance for Lightning Bolt and Chain Lightning to trigger Elemental Overload by 210651s1.rnrn|cFFFFFFFFEmber Totem|rrnIncreases Flame Shock damage over time by 210658s1.rnrn|cFFFFFFFFTailwind Totem|rrnIncreases your Haste by 210659s1.
 Define(ancestral_resonance_trait 277666)
 Define(echo_of_the_elementals_trait 275381)
+Define(igneous_potential_trait 279829)
+Define(lava_shock_trait 273448)
 Define(natural_harmony_trait 278697)
+Define(tectonic_thunder_trait 286949)
 Define(lightning_conduit_trait 275388)
 Define(primal_primer_trait 272992)
 Define(strength_of_earth_trait 273461)

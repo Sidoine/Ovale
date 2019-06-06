@@ -9,11 +9,6 @@ __exports.register = function()
 # Slice your target for 227518s1+201428s1 Chaos damage. Annihilation has a 197125h chance to refund 193840s1 Fury.
   SpellInfo(annihilation fury=40)
 
-Define(battle_potion_of_agility 279152)
-# Increases your Agility by s1 for 25 seconds.
-  SpellInfo(battle_potion_of_agility cd=1 duration=25 gcd=0 offgcd=1)
-  # Agility increased by w1.
-  SpellAddBuff(battle_potion_of_agility battle_potion_of_agility=1)
 Define(blade_dance 188499)
 # Strike ?a206416[your primary target for <firstbloodDmg> Physical damage, ][]all nearby enemies for <baseDmg> Physical damage, and increase your chance to dodge by s2 for 1 second.
   SpellInfo(blade_dance fury=35 cd=9 duration=1)
@@ -133,11 +128,6 @@ Define(spirit_bomb 247454)
 # Consume up to s2 Soul Fragments within s1 yds and then explode, afflicting nearby enemies with Frailty for 20 seconds and damaging them for 247455s1 Fire per fragment.rnrnYou heal for 247456s1 of all damage you deal to enemies with Frailty.
   SpellInfo(spirit_bomb pain=30 duration=1.5 talent=spirit_bomb_talent)
   SpellAddBuff(spirit_bomb spirit_bomb=1)
-Define(steelskin_potion 251231)
-# Infuses your body with resilient energy, increasing your Armor by s1 for 25 seconds.
-  SpellInfo(steelskin_potion cd=1 duration=25 gcd=0 offgcd=1)
-  # Armor increased by w1.
-  SpellAddBuff(steelskin_potion steelskin_potion=1)
 Define(vengeful_retreat 198793)
 # Remove all snares and vault away. Nearby enemies take 198813s2 Physical damage and have their movement speed reduced by 198813s1 for 3 seconds.?a203551[rnrn|cFFFFFFFFGenerates (203650s1/5)*10 seconds Fury over 10 seconds if you damage an enemy.|r][]
   SpellInfo(vengeful_retreat cd=25 duration=1 channel=1 gcd=0 offgcd=1)

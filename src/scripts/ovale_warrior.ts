@@ -36,11 +36,11 @@ AddFunction ArmsInterruptActions
 
 AddFunction ArmsGetInMeleeRange
 {
- if CheckBoxOn(opt_melee_range) and not InFlightToTarget(charge) and not InFlightToTarget(heroic_leap)
+ if CheckBoxOn(opt_melee_range) and not InFlightToTarget(charge) and not InFlightToTarget(heroic_leap) and not target.InRange(pummel)
  {
   if target.InRange(charge) Spell(charge)
   if SpellCharges(charge) == 0 and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
-  if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+  Texture(misc_arrowlup help=L(not_in_melee_range))
  }
 }
 
@@ -138,7 +138,7 @@ AddFunction ArmsPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(bursting_blood usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_bursting_blood usable=1)
 }
 
 AddFunction ArmsPrecombatCdPostConditions
@@ -335,7 +335,7 @@ AddFunction ArmsExecuteCdPostConditions
 AddFunction ArmsDefaultMainActions
 {
  #charge
- if CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(charge)
+ if CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel) Spell(charge)
  #sweeping_strikes,if=spell_targets.whirlwind>1&(cooldown.bladestorm.remains>10|cooldown.colossus_smash.remains>8|azerite.test_of_might.enabled)
  if Enemies() > 1 and { SpellCooldown(bladestorm_arms) > 10 or SpellCooldown(colossus_smash) > 8 or HasAzeriteTrait(test_of_might_trait) } Spell(sweeping_strikes)
  #run_action_list,name=hac,if=raid_event.adds.exists
@@ -367,7 +367,7 @@ AddFunction ArmsDefaultMainPostConditions
 
 AddFunction ArmsDefaultShortCdActions
 {
- unless CheckBoxOn(opt_melee_range) and target.InRange(charge) and Spell(charge)
+ unless CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel) and Spell(charge)
  {
   #auto_attack
   ArmsGetInMeleeRange()
@@ -400,17 +400,17 @@ AddFunction ArmsDefaultShortCdActions
 
 AddFunction ArmsDefaultShortCdPostConditions
 {
- CheckBoxOn(opt_melee_range) and target.InRange(charge) and Spell(charge) or Enemies() > 1 and { SpellCooldown(bladestorm_arms) > 10 or SpellCooldown(colossus_smash) > 8 or HasAzeriteTrait(test_of_might_trait) } and Spell(sweeping_strikes) or False(raid_event_adds_exists) and ArmsHacShortCdPostConditions() or Enemies() > 4 and ArmsFivetargetShortCdPostConditions() or { Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 } and ArmsExecuteShortCdPostConditions() or ArmsSingletargetShortCdPostConditions()
+ CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel) and Spell(charge) or Enemies() > 1 and { SpellCooldown(bladestorm_arms) > 10 or SpellCooldown(colossus_smash) > 8 or HasAzeriteTrait(test_of_might_trait) } and Spell(sweeping_strikes) or False(raid_event_adds_exists) and ArmsHacShortCdPostConditions() or Enemies() > 4 and ArmsFivetargetShortCdPostConditions() or { Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 } and ArmsExecuteShortCdPostConditions() or ArmsSingletargetShortCdPostConditions()
 }
 
 AddFunction ArmsDefaultCdActions
 {
  ArmsInterruptActions()
 
- unless CheckBoxOn(opt_melee_range) and target.InRange(charge) and Spell(charge)
+ unless CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel) and Spell(charge)
  {
   #potion
-  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(bursting_blood usable=1)
+  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_bursting_blood usable=1)
   #blood_fury,if=debuff.colossus_smash.up
   if target.DebuffPresent(colossus_smash_debuff) Spell(blood_fury_ap)
   #berserking,if=debuff.colossus_smash.up
@@ -454,7 +454,7 @@ AddFunction ArmsDefaultCdActions
 
 AddFunction ArmsDefaultCdPostConditions
 {
- CheckBoxOn(opt_melee_range) and target.InRange(charge) and Spell(charge) or Enemies() > 1 and { SpellCooldown(bladestorm_arms) > 10 or SpellCooldown(colossus_smash) > 8 or HasAzeriteTrait(test_of_might_trait) } and Spell(sweeping_strikes) or False(raid_event_adds_exists) and ArmsHacCdPostConditions() or Enemies() > 4 and ArmsFivetargetCdPostConditions() or { Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 } and ArmsExecuteCdPostConditions() or ArmsSingletargetCdPostConditions()
+ CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel) and Spell(charge) or Enemies() > 1 and { SpellCooldown(bladestorm_arms) > 10 or SpellCooldown(colossus_smash) > 8 or HasAzeriteTrait(test_of_might_trait) } and Spell(sweeping_strikes) or False(raid_event_adds_exists) and ArmsHacCdPostConditions() or Enemies() > 4 and ArmsFivetargetCdPostConditions() or { Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 } and ArmsExecuteCdPostConditions() or ArmsSingletargetCdPostConditions()
 }
 
 ### Arms icons.
@@ -524,7 +524,6 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # berserking
 # bladestorm_arms
 # blood_fury_ap
-# bursting_blood
 # charge
 # cleave
 # cleave_talent
@@ -542,6 +541,7 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # fireblood
 # heroic_leap
 # intimidating_shout
+# item_bursting_blood
 # lights_judgment
 # mortal_strike
 # overpower
@@ -604,11 +604,11 @@ AddFunction FuryInterruptActions
 
 AddFunction FuryGetInMeleeRange
 {
- if CheckBoxOn(opt_melee_range) and not InFlightToTarget(charge) and not InFlightToTarget(heroic_leap)
+ if CheckBoxOn(opt_melee_range) and not InFlightToTarget(charge) and not InFlightToTarget(heroic_leap) and not target.InRange(pummel)
  {
   if target.InRange(charge) Spell(charge)
   if SpellCharges(charge) == 0 and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
-  if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+  Texture(misc_arrowlup help=L(not_in_melee_range))
  }
 }
 
@@ -626,6 +626,8 @@ AddFunction FurySingletargetMainActions
  if Charges(raging_blow) == 2 Spell(raging_blow)
  #bloodthirst
  Spell(bloodthirst)
+ #dragon_roar,if=buff.enrage.up
+ if IsEnraged() Spell(dragon_roar)
  #raging_blow,if=talent.carnage.enabled|(talent.massacre.enabled&rage<80)|(talent.frothing_berserker.enabled&rage<90)
  if Talent(carnage_talent) or Talent(massacre_talent_fury) and Rage() < 80 or Talent(frothing_berserker_talent) and Rage() < 90 Spell(raging_blow)
  #furious_slash,if=talent.furious_slash.enabled
@@ -643,18 +645,16 @@ AddFunction FurySingletargetShortCdActions
  #siegebreaker
  Spell(siegebreaker)
 
- unless { BuffPresent(recklessness_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or Spell(execute) or { not IsEnraged() or AzeriteTraitRank(cold_steel_hot_blood_trait) > 1 } and Spell(bloodthirst) or Charges(raging_blow) == 2 and Spell(raging_blow) or Spell(bloodthirst)
+ unless { BuffPresent(recklessness_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or Spell(execute)
  {
-  #bladestorm,if=prev_gcd.1.rampage&(debuff.siegebreaker.up|!talent.siegebreaker.enabled)
-  if PreviousGCDSpell(rampage) and { target.DebuffPresent(siegebreaker_debuff) or not Talent(siegebreaker_talent) } Spell(bladestorm_fury)
-  #dragon_roar,if=buff.enrage.up
-  if IsEnraged() Spell(dragon_roar)
+  #bladestorm,if=prev_gcd.1.rampage
+  if PreviousGCDSpell(rampage) Spell(bladestorm_fury)
  }
 }
 
 AddFunction FurySingletargetShortCdPostConditions
 {
- { BuffPresent(recklessness_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or Spell(execute) or { not IsEnraged() or AzeriteTraitRank(cold_steel_hot_blood_trait) > 1 } and Spell(bloodthirst) or Charges(raging_blow) == 2 and Spell(raging_blow) or Spell(bloodthirst) or { Talent(carnage_talent) or Talent(massacre_talent_fury) and Rage() < 80 or Talent(frothing_berserker_talent) and Rage() < 90 } and Spell(raging_blow) or Talent(furious_slash_talent) and Spell(furious_slash) or Spell(whirlwind_fury)
+ { BuffPresent(recklessness_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or Spell(execute) or { not IsEnraged() or AzeriteTraitRank(cold_steel_hot_blood_trait) > 1 } and Spell(bloodthirst) or Charges(raging_blow) == 2 and Spell(raging_blow) or Spell(bloodthirst) or IsEnraged() and Spell(dragon_roar) or { Talent(carnage_talent) or Talent(massacre_talent_fury) and Rage() < 80 or Talent(frothing_berserker_talent) and Rage() < 90 } and Spell(raging_blow) or Talent(furious_slash_talent) and Spell(furious_slash) or Spell(whirlwind_fury)
 }
 
 AddFunction FurySingletargetCdActions
@@ -663,7 +663,7 @@ AddFunction FurySingletargetCdActions
 
 AddFunction FurySingletargetCdPostConditions
 {
- Spell(siegebreaker) or { BuffPresent(recklessness_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or Spell(execute) or { not IsEnraged() or AzeriteTraitRank(cold_steel_hot_blood_trait) > 1 } and Spell(bloodthirst) or Charges(raging_blow) == 2 and Spell(raging_blow) or Spell(bloodthirst) or PreviousGCDSpell(rampage) and { target.DebuffPresent(siegebreaker_debuff) or not Talent(siegebreaker_talent) } and Spell(bladestorm_fury) or IsEnraged() and Spell(dragon_roar) or { Talent(carnage_talent) or Talent(massacre_talent_fury) and Rage() < 80 or Talent(frothing_berserker_talent) and Rage() < 90 } and Spell(raging_blow) or Talent(furious_slash_talent) and Spell(furious_slash) or Spell(whirlwind_fury)
+ Spell(siegebreaker) or { BuffPresent(recklessness_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or Spell(execute) or PreviousGCDSpell(rampage) and Spell(bladestorm_fury) or { not IsEnraged() or AzeriteTraitRank(cold_steel_hot_blood_trait) > 1 } and Spell(bloodthirst) or Charges(raging_blow) == 2 and Spell(raging_blow) or Spell(bloodthirst) or IsEnraged() and Spell(dragon_roar) or { Talent(carnage_talent) or Talent(massacre_talent_fury) and Rage() < 80 or Talent(frothing_berserker_talent) and Rage() < 90 } and Spell(raging_blow) or Talent(furious_slash_talent) and Spell(furious_slash) or Spell(whirlwind_fury)
 }
 
 ### actions.precombat
@@ -691,7 +691,7 @@ AddFunction FuryPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(bursting_blood usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_bursting_blood usable=1)
  #recklessness,if=!talent.furious_slash.enabled&!talent.reckless_abandon.enabled
  if not Talent(furious_slash_talent) and not Talent(reckless_abandon_talent) Spell(recklessness)
 }
@@ -734,7 +734,7 @@ AddFunction FuryMovementCdPostConditions
 AddFunction FuryDefaultMainActions
 {
  #charge
- if CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(charge)
+ if CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel) Spell(charge)
  #run_action_list,name=movement,if=movement.distance>5
  if target.Distance() > 5 FuryMovementMainActions()
 
@@ -761,7 +761,7 @@ AddFunction FuryDefaultShortCdActions
  #auto_attack
  FuryGetInMeleeRange()
 
- unless CheckBoxOn(opt_melee_range) and target.InRange(charge) and Spell(charge)
+ unless CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel) and Spell(charge)
  {
   #run_action_list,name=movement,if=movement.distance>5
   if target.Distance() > 5 FuryMovementShortCdActions()
@@ -782,14 +782,14 @@ AddFunction FuryDefaultShortCdActions
 
 AddFunction FuryDefaultShortCdPostConditions
 {
- CheckBoxOn(opt_melee_range) and target.InRange(charge) and Spell(charge) or target.Distance() > 5 and FuryMovementShortCdPostConditions() or Talent(furious_slash_talent) and { BuffStacks(furious_slash_buff) < 3 or BuffRemaining(furious_slash_buff) < 3 or SpellCooldown(recklessness) < 3 and BuffRemaining(furious_slash_buff) < 9 } and Spell(furious_slash) or SpellCooldown(recklessness) < 3 and Spell(rampage) or Enemies() > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury) or FurySingletargetShortCdPostConditions()
+ CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel) and Spell(charge) or target.Distance() > 5 and FuryMovementShortCdPostConditions() or Talent(furious_slash_talent) and { BuffStacks(furious_slash_buff) < 3 or BuffRemaining(furious_slash_buff) < 3 or SpellCooldown(recklessness) < 3 and BuffRemaining(furious_slash_buff) < 9 } and Spell(furious_slash) or SpellCooldown(recklessness) < 3 and Spell(rampage) or Enemies() > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury) or FurySingletargetShortCdPostConditions()
 }
 
 AddFunction FuryDefaultCdActions
 {
  FuryInterruptActions()
 
- unless CheckBoxOn(opt_melee_range) and target.InRange(charge) and Spell(charge)
+ unless CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel) and Spell(charge)
  {
   #run_action_list,name=movement,if=movement.distance>5
   if target.Distance() > 5 FuryMovementCdActions()
@@ -797,25 +797,25 @@ AddFunction FuryDefaultCdActions
   unless target.Distance() > 5 and FuryMovementCdPostConditions() or { target.Distance() > 25 and 600 > 45 or not False(raid_event_movement_exists) } and CheckBoxOn(opt_melee_range) and target.Distance(atLeast 8) and target.Distance(atMost 40) and Spell(heroic_leap)
   {
    #potion
-   if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(bursting_blood usable=1)
+   if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_bursting_blood usable=1)
 
    unless Talent(furious_slash_talent) and { BuffStacks(furious_slash_buff) < 3 or BuffRemaining(furious_slash_buff) < 3 or SpellCooldown(recklessness) < 3 and BuffRemaining(furious_slash_buff) < 9 } and Spell(furious_slash) or SpellCooldown(recklessness) < 3 and Spell(rampage)
    {
-    #recklessness
-    Spell(recklessness)
+    #recklessness,if=!talent.siegebreaker.enabled|(cooldown.siegebreaker.remains<1|cooldown.siegebreaker.remains>5)
+    if not Talent(siegebreaker_talent) or SpellCooldown(siegebreaker) < 1 or SpellCooldown(siegebreaker) > 5 Spell(recklessness)
 
     unless Enemies() > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury)
     {
-     #blood_fury,if=buff.recklessness.up
-     if BuffPresent(recklessness_buff) Spell(blood_fury_ap)
-     #berserking,if=buff.recklessness.up
-     if BuffPresent(recklessness_buff) Spell(berserking)
+     #blood_fury
+     Spell(blood_fury_ap)
+     #berserking
+     Spell(berserking)
      #lights_judgment,if=buff.recklessness.down
      if BuffExpires(recklessness_buff) Spell(lights_judgment)
-     #fireblood,if=buff.recklessness.up
-     if BuffPresent(recklessness_buff) Spell(fireblood)
-     #ancestral_call,if=buff.recklessness.up
-     if BuffPresent(recklessness_buff) Spell(ancestral_call)
+     #fireblood
+     Spell(fireblood)
+     #ancestral_call
+     Spell(ancestral_call)
      #run_action_list,name=single_target
      FurySingletargetCdActions()
     }
@@ -826,7 +826,7 @@ AddFunction FuryDefaultCdActions
 
 AddFunction FuryDefaultCdPostConditions
 {
- CheckBoxOn(opt_melee_range) and target.InRange(charge) and Spell(charge) or target.Distance() > 5 and FuryMovementCdPostConditions() or { target.Distance() > 25 and 600 > 45 or not False(raid_event_movement_exists) } and CheckBoxOn(opt_melee_range) and target.Distance(atLeast 8) and target.Distance(atMost 40) and Spell(heroic_leap) or Talent(furious_slash_talent) and { BuffStacks(furious_slash_buff) < 3 or BuffRemaining(furious_slash_buff) < 3 or SpellCooldown(recklessness) < 3 and BuffRemaining(furious_slash_buff) < 9 } and Spell(furious_slash) or SpellCooldown(recklessness) < 3 and Spell(rampage) or Enemies() > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury) or FurySingletargetCdPostConditions()
+ CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel) and Spell(charge) or target.Distance() > 5 and FuryMovementCdPostConditions() or { target.Distance() > 25 and 600 > 45 or not False(raid_event_movement_exists) } and CheckBoxOn(opt_melee_range) and target.Distance(atLeast 8) and target.Distance(atMost 40) and Spell(heroic_leap) or Talent(furious_slash_talent) and { BuffStacks(furious_slash_buff) < 3 or BuffRemaining(furious_slash_buff) < 3 or SpellCooldown(recklessness) < 3 and BuffRemaining(furious_slash_buff) < 9 } and Spell(furious_slash) or SpellCooldown(recklessness) < 3 and Spell(rampage) or Enemies() > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury) or FurySingletargetCdPostConditions()
 }
 
 ### Fury icons.
@@ -893,7 +893,6 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # bladestorm_fury
 # blood_fury_ap
 # bloodthirst
-# bursting_blood
 # carnage_talent
 # charge
 # cold_steel_hot_blood_trait
@@ -906,6 +905,7 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # furious_slash_talent
 # heroic_leap
 # intimidating_shout
+# item_bursting_blood
 # lights_judgment
 # massacre_talent_fury
 # pummel
@@ -917,7 +917,6 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # recklessness_buff
 # shockwave
 # siegebreaker
-# siegebreaker_debuff
 # siegebreaker_talent
 # storm_bolt
 # war_stomp

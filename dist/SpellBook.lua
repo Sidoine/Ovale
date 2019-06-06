@@ -275,6 +275,7 @@ local OvaleSpellBookClass = __class(OvaleSpellBookBase, {
     end,
     AddSpell = function(self, spellId, name)
         if spellId and name then
+            self:Debug("Adding spell %s (%d)", name, spellId)
             self.spell[spellId] = name
         end
     end,

@@ -492,7 +492,7 @@ function AddToBuffList(buffId: number, statName?: string, isStacking?: boolean) 
         }
     } else {
         let si = OvaleData.spellInfo[buffId];
-        isStacking = si && (si.stacking == 1 || si.max_stacks > 0);
+        isStacking = si && ((si.stacking || 0) == 1 || (si.max_stacks || 0) > 0);
         if (si && si.stat) {
             let stat = si.stat;
             if (isLuaArray(stat)) {

@@ -72,7 +72,7 @@ AddFunction BrewmasterPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_agility usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
 }
 
 AddFunction BrewmasterPrecombatCdPostConditions
@@ -140,7 +140,7 @@ AddFunction BrewmasterDefaultCdActions
  #use_item,name=lustrous_golden_plumage
  BrewmasterUseItemActions()
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_agility usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
  #blood_fury
  Spell(blood_fury_apsp)
  #berserking
@@ -235,7 +235,6 @@ AddIcon checkbox=opt_monk_brewmaster_aoe help=cd specialization=brewmaster
 ### Required symbols
 # ancestral_call
 # arcane_torrent_chi
-# battle_potion_of_agility
 # berserking
 # black_ox_brew
 # blackout_combo_buff
@@ -256,6 +255,7 @@ AddIcon checkbox=opt_monk_brewmaster_aoe help=cd specialization=brewmaster
 # invoke_niuzao_the_black_ox_talent
 # ironskin_brew
 # ironskin_brew_buff
+# item_battle_potion_of_agility
 # keg_smash
 # leg_sweep
 # lights_judgment
@@ -441,7 +441,7 @@ AddFunction WindwalkerPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(bursting_blood usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_bursting_blood usable=1)
 }
 
 AddFunction WindwalkerPrecombatCdPostConditions
@@ -629,7 +629,7 @@ AddFunction WindwalkerDefaultCdActions
  unless CheckBoxOn(opt_touch_of_karma) and Spell(touch_of_karma)
  {
   #potion,if=buff.serenity.up|buff.storm_earth_and_fire.up|(!talent.serenity.enabled&trinket.proc.agility.react)|buff.bloodlust.react|target.time_to_die<=60
-  if { DebuffPresent(serenity) or DebuffPresent(storm_earth_and_fire) or not Talent(serenity_talent) and BuffPresent(trinket_proc_agility_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(bursting_blood usable=1)
+  if { DebuffPresent(serenity) or DebuffPresent(storm_earth_and_fire) or not Talent(serenity_talent) and BuffPresent(trinket_proc_agility_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_bursting_blood usable=1)
   #call_action_list,name=serenity,if=buff.serenity.up
   if DebuffPresent(serenity) WindwalkerSerenityCdActions()
 
@@ -723,7 +723,6 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # blackout_kick_buff
 # blackout_kick_windwalker
 # blood_fury_apsp
-# bursting_blood
 # chi_burst
 # chi_wave
 # dance_of_chiji_buff
@@ -736,6 +735,7 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # hidden_masters_forbidden_touch_buff
 # hit_combo_talent
 # invoke_xuen_the_white_tiger
+# item_bursting_blood
 # leg_sweep
 # lights_judgment
 # paralysis
@@ -927,7 +927,7 @@ AddFunction WindwalkerPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(bursting_blood usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_bursting_blood usable=1)
 }
 
 AddFunction WindwalkerPrecombatCdPostConditions
@@ -1115,7 +1115,7 @@ AddFunction WindwalkerDefaultCdActions
  unless CheckBoxOn(opt_touch_of_karma) and Spell(touch_of_karma)
  {
   #potion,if=buff.serenity.up|buff.storm_earth_and_fire.up|(!talent.serenity.enabled&trinket.proc.agility.react)|buff.bloodlust.react|target.time_to_die<=60
-  if { DebuffPresent(serenity) or DebuffPresent(storm_earth_and_fire) or not Talent(serenity_talent) and BuffPresent(trinket_proc_agility_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(bursting_blood usable=1)
+  if { DebuffPresent(serenity) or DebuffPresent(storm_earth_and_fire) or not Talent(serenity_talent) and BuffPresent(trinket_proc_agility_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_bursting_blood usable=1)
   #call_action_list,name=serenity,if=buff.serenity.up
   if DebuffPresent(serenity) WindwalkerSerenityCdActions()
 
@@ -1209,7 +1209,6 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # blackout_kick_buff
 # blackout_kick_windwalker
 # blood_fury_apsp
-# bursting_blood
 # chi_burst
 # chi_wave
 # dance_of_chiji_buff
@@ -1222,6 +1221,7 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # hidden_masters_forbidden_touch_buff
 # hit_combo_talent
 # invoke_xuen_the_white_tiger
+# item_bursting_blood
 # leg_sweep
 # lights_judgment
 # paralysis

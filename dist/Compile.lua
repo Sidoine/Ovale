@@ -517,7 +517,7 @@ local function AddToBuffList(buffId, statName, isStacking)
         end
     else
         local si = OvaleData.spellInfo[buffId]
-        isStacking = si and (si.stacking == 1 or si.max_stacks > 0)
+        isStacking = si and ((si.stacking or 0) == 1 or (si.max_stacks or 0) > 0)
         if si and si.stat then
             local stat = si.stat
             if isLuaArray(stat) then
