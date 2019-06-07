@@ -529,7 +529,11 @@ Define(vile_taint_debuff 278350)
 
 # Azerite Traits
 Define(cascading_calamity_trait 275376)
- #TODO verify buff id
+Define(shadows_bite_trait 272944)
+Define(shadows_bite_buff 272945)
+	SpellInfo(shadows_bite_buff duration=8)
+Define(baleful_invocation_trait 287059)
+# TODO verify buff id
 
 Define(forbidden_knowledge_buff 278738) #TODO verify buff id
 Define(inevitable_demise_trait 273521)

@@ -277,7 +277,9 @@ local CHARACTER_PROPERTY = {
     ["time_to_sht.5"] = "100",
     ["wild_imp_count"] = "Demons(wild_imp)",
     ["wild_imp_no_de"] = "NotDeDemons(wild_imp)",
-    ["wild_imp_remaining_duration"] = "DemonDuration(wild_imp)"
+    ["wild_imp_remaining_duration"] = "DemonDuration(wild_imp)",
+    ["imps_spawned_during.2000"] = "DemonDuration(wild_imp) >= 15",
+    ["time_to_imps.all.remains"] = "DemonDuration(wild_imp)"
 }
 local KEYWORD = {}
 local MODIFIER_KEYWORD = {
