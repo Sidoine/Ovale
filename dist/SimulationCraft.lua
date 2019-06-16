@@ -3890,11 +3890,17 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
     elseif className == "WARLOCK" and operand == "contagion" then
         code = "BuffRemaining(unstable_affliction_buff)"
     elseif className == "WARLOCK" and operand == "buff.wild_imps.stack" then
-        code = "Demons(wild_imp)"
+        code = "Demons(wild_imp) + Demons(wild_imp_inner_demons)"
+        AddSymbol(annotation, "wild_imp")
+        AddSymbol(annotation, "wild_imp_inner_demons")
     elseif className == "WARLOCK" and operand == "buff.dreadstalkers.remains" then
         code = "DemonDuration(dreadstalker)"
-    elseif className == "WARLOCK" and match(operand, "prev_gcd.%d.hand_of_guldan") then
-        code = "PreviousGCDSpell(hand_of_guldan)"
+        AddSymbol(annotation, "dreadstalker")
+    elseif className == "WARLOCK" and match(operand, "imps_spawned_during.([%d]+)") then
+        local ms = match(operand, "imps_spawned_during.([%d]+)")
+        code = format("ImpsSpawnedDuring(%d)", ms)
+    elseif className == "WARLOCK" and operand == "time_to_imps.all.remains" then
+        code = "0"
     elseif className == "WARRIOR" and sub(operand, 1, 23) == "buff.colossus_smash_up." then
         local property = sub(operand, 24)
         local debuffName = "colossus_smash_debuff"

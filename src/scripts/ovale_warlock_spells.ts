@@ -591,6 +591,7 @@ Define(tormented_souls_buff 216695)
 # Pets
 Define(demonic_tyrant 135002)
 Define(wild_imp 55659)
+Define(wild_imp_inner_demons 143622)
 Define(dreadstalker 98035)
 Define(darkglare 103673)
 Define(infernal 89)

@@ -1186,9 +1186,34 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
         let value = OvaleWarlock.GetRemainingDemonDuration(creatureId, atTime);
         return Compare(value, comparator, limit);
     }
+	const INNER_DEMONS_TALENT = 17;
+	const HAND_OF_GULDAN_SPELL_ID = 105174;
+	const WILD_IMP_INNER_DEMONS = 143622;
+	function ImpsSpawnedDuring(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
+		let [ms, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
+		let delay = ms / 1000
+		let impsSpawned = 0
+		// check for hand of guldan
+		if (OvaleFuture.next.currentCast.spellId == HAND_OF_GULDAN_SPELL_ID) {
+			let soulshards = OvalePower.current.power["soulshards"]
+			if (soulshards >= 3) { soulshards = 3; } 
+			impsSpawned = impsSpawned + soulshards;
+		}
+		
+		// inner demons talent
+		let talented = (OvaleSpellBook.GetTalentPoints(INNER_DEMONS_TALENT) > 0);
+        if (talented) {
+			let value = OvaleWarlock.GetRemainingDemonDuration(WILD_IMP_INNER_DEMONS, atTime+delay);
+			if (value <= 0) {
+				impsSpawned = impsSpawned + 1;
+			}
+		}
+        return Compare(impsSpawned, comparator, limit);
+	}
     OvaleCondition.RegisterCondition("demons", false, Demons);
     OvaleCondition.RegisterCondition("notdedemons", false, NotDeDemons);
     OvaleCondition.RegisterCondition("demonduration", false, DemonDuration);
+	OvaleCondition.RegisterCondition("impsspawnedduring", false, ImpsSpawnedDuring);
 }
 {
     let NECROTIC_PLAGUE_TALENT = 19;

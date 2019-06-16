@@ -4070,12 +4070,18 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
     } else if (className == "WARLOCK" && operand == "contagion") {
         code = "BuffRemaining(unstable_affliction_buff)";
     } else if (className == "WARLOCK" && operand == "buff.wild_imps.stack") {
-        code = "Demons(wild_imp)";
+        code = "Demons(wild_imp) + Demons(wild_imp_inner_demons)";
+		AddSymbol(annotation, "wild_imp");
+		AddSymbol(annotation, "wild_imp_inner_demons");
     } else if (className == "WARLOCK" && operand == "buff.dreadstalkers.remains") {
         code = "DemonDuration(dreadstalker)";
-    } else if (className == "WARLOCK" && truthy(match(operand, "prev_gcd.%d.hand_of_guldan"))) { // TODO improve PreviousGCDSpell(spell count=number)
-        code = "PreviousGCDSpell(hand_of_guldan)";
-    } else if (className == "WARRIOR" && sub(operand, 1, 23) == "buff.colossus_smash_up.") {
+		AddSymbol(annotation, "dreadstalker");
+	} else if (className == "WARLOCK" && truthy(match(operand, "imps_spawned_during.([%d]+)"))) {
+		let ms = match(operand, "imps_spawned_during.([%d]+)");
+		code = format("ImpsSpawnedDuring(%d)", ms);
+    } else if (className == "WARLOCK" && operand == "time_to_imps.all.remains") {
+		code = "0" // let's assume imps spawn instantly
+	} else if (className == "WARRIOR" && sub(operand, 1, 23) == "buff.colossus_smash_up.") {
         let property = sub(operand, 24);
         let debuffName = "colossus_smash_debuff";
         AddSymbol(annotation, debuffName);
