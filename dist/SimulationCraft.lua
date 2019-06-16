@@ -2671,6 +2671,8 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
                 if parseNode.operator == "=" then
                     if name == "sim_target" then
                         code = "True(target_is_sim_target)"
+                    elseif name == "target" then
+                        code = "False(target_is_target)"
                     else
                         code = format("target.Name(%s)", name)
                         AddSymbol(annotation, name)

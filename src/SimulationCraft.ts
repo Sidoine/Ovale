@@ -1338,8 +1338,7 @@ ParseOperand = function (tokenStream: OvaleLexer, nodeList, annotation) {
             let firstCharacter = sub(name, 1, 1);
             node.includeDeath = (firstCharacter == "B" || firstCharacter == "F" || firstCharacter == "U");
         }
-        annotation.operand = annotation.operand || {
-        }
+        annotation.operand = annotation.operand || {}
         annotation.operand[lualength(annotation.operand) + 1] = node;
     }
     return [ok, node];
@@ -2859,9 +2858,11 @@ EmitExpression = function (parseNode, nodeList, annotation, action) {
                 if (parseNode.operator == "=") {
                     if (name == "sim_target") {
                         code = "True(target_is_sim_target)";
+					} else if (name == "target") {
+						code = "False(target_is_target)";
                     } else {
                         code = format("target.Name(%s)", name);
-                        AddSymbol(annotation, name);
+						AddSymbol(annotation, name);
                     }
                 } else {
                     code = format("not target.Name(%s)", name);
@@ -4239,8 +4240,7 @@ EmitOperandTarget = function (operand, parseNode, nodeList, annotation, action) 
             ok = false;
         }
         if (ok && code) {
-            annotation.astAnnotation = annotation.astAnnotation || {
-            };
+            annotation.astAnnotation = annotation.astAnnotation || {};
             [node] = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation);
         }
     } else {
