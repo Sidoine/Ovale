@@ -3981,12 +3981,6 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
         end
     elseif operand == "ptr" then
         code = "PTR()"
-    elseif operand == "time_to_die" then
-        if target ~= "" then
-            code = target .. "TimeToDie()"
-        else
-            code = "target.TimeToDie()"
-        end
     elseif sub(operand, 1, 10) == "using_apl." then
         local aplName = match(operand, "^using_apl%.([%w_]+)")
         code = format("List(opt_using_apl %s)", aplName)
@@ -4055,9 +4049,19 @@ EmitOperandTarget = function(operand, parseNode, nodeList, annotation, action)
     local token = tokenIterator()
     if token == "target" then
         local property = tokenIterator()
+        local howMany = 1
+        if tonumber(property) then
+            howMany = tonumber(property)
+            property = tokenIterator()
+        end
+        if howMany > 1 then
+            __exports.OvaleSimulationCraft:Print("Warning: target.%d.%property has not been implemented for multiple targets. (%s)", operand)
+        end
         local code
         if property == "adds" then
             code = "Enemies()-1"
+        elseif property == "time_to_die" then
+            code = "target.TimeToDie()"
         else
             ok = false
         end

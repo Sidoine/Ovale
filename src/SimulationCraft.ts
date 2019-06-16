@@ -4160,12 +4160,6 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
         }
     } else if (operand == "ptr") {
         code = "PTR()";
-    } else if (operand == "time_to_die") {
-        if (target != "") {
-            code = `${target}TimeToDie()`;
-        } else {
-            code = "target.TimeToDie()";
-        }
     } else if (sub(operand, 1, 10) == "using_apl.") {
         let [aplName] = match(operand, "^using_apl%.([%w_]+)");
         code = format("List(opt_using_apl %s)", aplName);
@@ -4233,9 +4227,20 @@ EmitOperandTarget = function (operand, parseNode, nodeList, annotation, action) 
     let token = tokenIterator();
     if (token == "target") {
         let property = tokenIterator();
+		let howMany = 1
+		if (tonumber(property)) {
+			howMany = tonumber(property);
+			property = tokenIterator();
+		}
+		if(howMany > 1) {
+			OvaleSimulationCraft.Print("Warning: target.%d.%property has not been implemented for multiple targets. (%s)", operand);
+		}
         let code;
+		//OvaleSimulationCraft.Print(token, property, operand);
         if (property == "adds") {
             code = "Enemies()-1";
+		} else if (property == "time_to_die") {
+			code = "target.TimeToDie()"
         } else {
             ok = false;
         }
