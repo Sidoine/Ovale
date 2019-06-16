@@ -121,6 +121,7 @@ const CHARACTER_PROPERTY: LuaObj<string> = {
     ["combo_points.max"]: "MaxComboPoints()",
     ["consecration.remains"]: "BuffRemaining(consecration)",
     ["consecration.up"]: "BuffPresent(consecration)",
+	["cooldown.army_of_the_dead.remains"]: "480", // always consider army of the dead to be on cooldown, this is to "fix" the UH DK script from working
     ["cp_max_spend"]: "MaxComboPoints()",
     ["crit_pct_current"]: "SpellCritChance()",
     ["current_insanity_drain"]: "CurrentInsanityDrain()",
