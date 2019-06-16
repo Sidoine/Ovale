@@ -3981,6 +3981,8 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
         end
     elseif operand == "ptr" then
         code = "PTR()"
+    elseif operand == "time_to_die" then
+        code = "target.TimeToDie()"
     elseif sub(operand, 1, 10) == "using_apl." then
         local aplName = match(operand, "^using_apl%.([%w_]+)")
         code = format("List(opt_using_apl %s)", aplName)

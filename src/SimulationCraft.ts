@@ -4160,6 +4160,8 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
         }
     } else if (operand == "ptr") {
         code = "PTR()";
+	} else if (operand == "time_to_die") {
+            code = "target.TimeToDie()";
     } else if (sub(operand, 1, 10) == "using_apl.") {
         let [aplName] = match(operand, "^using_apl%.([%w_]+)");
         code = format("List(opt_using_apl %s)", aplName);
