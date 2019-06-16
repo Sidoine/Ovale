@@ -3143,6 +3143,10 @@ EmitOperandCharacter = function(operand, parseNode, nodeList, annotation, action
     local code
     if CHARACTER_PROPERTY[operand] then
         code = target .. CHARACTER_PROPERTY[operand]
+    elseif operand == "position_front" then
+        code = annotation.position == "front" and "True(position_front)" or "False(position_front)"
+    elseif operand == "position_back" then
+        code = annotation.position == "back" and "True(position_back)" or "False(position_back)"
     elseif className == "MAGE" and operand == "incanters_flow_dir" then
         local name = "incanters_flow_buff"
         code = format("BuffDirection(%s)", name)
@@ -3186,8 +3190,6 @@ EmitOperandCharacter = function(operand, parseNode, nodeList, annotation, action
         end
     elseif operand == "mastery_value" then
         code = format("%sMasteryEffect() / 100", target)
-    elseif operand == "position_front" then
-        code = "False(position_front)"
     elseif sub(operand, 1, 5) == "role." then
         local role = match(operand, "^role%.([%w_]+)")
         if role and role == annotation.role then
@@ -5263,6 +5265,7 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
                 annotation.melee = annotation.class
             end
         end
+        annotation.position = profile.position
         local taggedFunctionName = {}
         for _, node in ipairs(actionList) do
             local fname = OvaleFunctionName(node.name, annotation)

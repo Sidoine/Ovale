@@ -220,6 +220,7 @@ export interface Annotation extends InterruptAnnotation {
     role?: ClassRole;
     melee?: ClassType;
     ranged?: ClassType;
+	position?: string;
     taggedFunctionName?: LuaObj<boolean>;
     functionTag?: any;
     nodeList?: LuaArray<ParseNode>;
@@ -3325,6 +3326,10 @@ EmitOperandCharacter = function (operand, parseNode, nodeList, annotation, actio
     let code;
     if (CHARACTER_PROPERTY[operand]) {
         code = `${target}${CHARACTER_PROPERTY[operand]}`;
+	} else if (operand == "position_front") {
+		code = annotation.position == "front" && "True(position_front)" || "False(position_front)"
+	} else if (operand == "position_back") {
+		code = annotation.position == "back" && "True(position_back)" || "False(position_back)"
     } else if (className == "MAGE" && operand == "incanters_flow_dir") {
         let name = "incanters_flow_buff";
         code = format("BuffDirection(%s)", name);
@@ -3368,8 +3373,6 @@ EmitOperandCharacter = function (operand, parseNode, nodeList, annotation, actio
         }
     } else if (operand == "mastery_value") {
         code = format("%sMasteryEffect() / 100", target);
-    } else if (operand == "position_front") {
-        code = "False(position_front)";
     } else if (sub(operand, 1, 5) == "role.") {
         let [role] = match(operand, "^role%.([%w_]+)");
         if (role && role == annotation.role) {
@@ -5453,6 +5456,7 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
                 annotation.melee = annotation.class;
             }
         }
+		annotation.position = profile.position;
         let taggedFunctionName: LuaObj<boolean> = { }
         for (const [, node] of ipairs(actionList)) {
             let fname = OvaleFunctionName(node.name, annotation);
