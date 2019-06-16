@@ -3901,6 +3901,12 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
         code = format("ImpsSpawnedDuring(%d)", ms)
     elseif className == "WARLOCK" and operand == "time_to_imps.all.remains" then
         code = "0"
+    elseif className == "WARLOCK" and operand == "havoc_active" then
+        code = "DebuffCountOnAny(havoc_debuff) > 0"
+        AddSymbol(annotation, "havoc_debuff")
+    elseif className == "WARLOCK" and operand == "havoc_remains" then
+        code = "DebuffRemainingOnAny(havoc_debuff)"
+        AddSymbol(annotation, "havoc_debuff")
     elseif className == "WARRIOR" and sub(operand, 1, 23) == "buff.colossus_smash_up." then
         local property = sub(operand, 24)
         local debuffName = "colossus_smash_debuff"

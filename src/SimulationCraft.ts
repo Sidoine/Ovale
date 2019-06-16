@@ -4081,6 +4081,12 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
 		code = format("ImpsSpawnedDuring(%d)", ms);
     } else if (className == "WARLOCK" && operand == "time_to_imps.all.remains") {
 		code = "0" // let's assume imps spawn instantly
+	} else if (className == "WARLOCK" && operand == "havoc_active") {
+		code = "DebuffCountOnAny(havoc_debuff) > 0";
+		AddSymbol(annotation, "havoc_debuff");
+	} else if (className == "WARLOCK" && operand == "havoc_remains") {
+		code = "DebuffRemainingOnAny(havoc_debuff)";
+		AddSymbol(annotation, "havoc_debuff");
 	} else if (className == "WARRIOR" && sub(operand, 1, 23) == "buff.colossus_smash_up.") {
         let property = sub(operand, 24);
         let debuffName = "colossus_smash_debuff";
