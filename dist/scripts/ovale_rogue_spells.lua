@@ -396,7 +396,7 @@ Define(elaborate_planning_buff 193640)
 Define(distract 1725)
 	SpellInfo(distract energy=30 cd=30)
 
-	SpellInfo(envenom combopoints=1 max_combopoints=5 energy=25)
+	SpellInfo(envenom combopoints=1 max_combopoints=5)
 	SpellInfo(envenom max_combopoints=6 talent=deeper_stratagem_talent)
 	SpellAddBuff(envenom envenom_buff=1)
 Define(envenom_buff 32645)
