@@ -566,7 +566,12 @@ Define(sprint_buff 2983)
 	SpellRequire(stealth unusable 1=combat,1)
 	SpellAddBuff(stealth stealth_buff=1)
 	SpellAddBuff(stealth master_of_shadows=1 talent=master_of_shadows_talent specialization=subtlety)
+	
+	SpellInfo(stealth replaced_by=subterfuge_stealth talent=subterfuge_talent specialization=assassination)
+	SpellInfo(stealth replaced_by=subterfuge_stealth talent=subterfuge_talent specialization=subtlety)
 Define(stealth_buff 1784)
+Define(subterfuge_stealth 115191)
+	
 Define(subterfuge_buff 115192)
 	SpellInfo(subterfuge_buff duration=3)
 
