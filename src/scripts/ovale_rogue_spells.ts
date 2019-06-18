@@ -571,7 +571,10 @@ Define(sprint_buff 2983)
 	SpellInfo(stealth replaced_by=subterfuge_stealth talent=subterfuge_talent specialization=subtlety)
 Define(stealth_buff 1784)
 Define(subterfuge_stealth 115191)
-	
+	SpellRequire(subterfuge_stealth unusable 1=stealthed,1)
+	SpellRequire(subterfuge_stealth unusable 1=combat,1)
+	SpellAddBuff(subterfuge_stealth subterfuge_stealth_buff=1)
+Define(subterfuge_stealth_buff 115191)
 Define(subterfuge_buff 115192)
 	SpellInfo(subterfuge_buff duration=3)
 

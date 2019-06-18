@@ -203,6 +203,7 @@ local function GetActionSpellInfo(element, atTime, target)
         __exports.OvaleBestAction:Log("Unknown spell ID '%s'.", spellId)
     else
         local isUsable, noMana = OvaleSpells:IsUsableSpell(spellId, atTime, targetGUID)
+        __exports.OvaleBestAction:Log("OvaleSpells:IsUsableSpell(%d, %f, %s) returned %d, %d", spellId, atTime, targetGUID, isUsable, noMana)
         if isUsable or noMana then
             if element.namedParams.texture then
                 actionTexture = "Interface\\Icons\\" .. element.namedParams.texture

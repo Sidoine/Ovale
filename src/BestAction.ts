@@ -185,6 +185,7 @@ function GetActionSpellInfo(element: Element, atTime: number, target: string): A
         OvaleBestAction.Log("Unknown spell ID '%s'.", spellId);
     } else {
         let [isUsable, noMana] = OvaleSpells.IsUsableSpell(spellId, atTime, targetGUID);
+		OvaleBestAction.Log("OvaleSpells:IsUsableSpell(%d, %f, %s) returned %d, %d", spellId, atTime, targetGUID, isUsable, noMana);
         if (isUsable || noMana) {
             if (element.namedParams.texture) {
                 actionTexture = `Interface\\Icons\\${element.namedParams.texture}`;
