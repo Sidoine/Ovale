@@ -4040,6 +4040,9 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
     } else if (className == "ROGUE" && operand == "buff.roll_the_bones.remains"){
         code = "BuffRemaining(roll_the_bones_buff)";
         AddSymbol(annotation, "roll_the_bones_buff");
+	} else if (className == "ROGUE" && operand == "buff.roll_the_bones.up"){
+        code = "BuffPresent(roll_the_bones_buff)";
+        AddSymbol(annotation, "roll_the_bones_buff");
     } else if (className == "SHAMAN" && operand == "buff.resonance_totem.remains") {
         let [spell] = Disambiguate(annotation, "totem_mastery", annotation.class, annotation.specialization);
         code = format("TotemRemaining(%s)", spell);
