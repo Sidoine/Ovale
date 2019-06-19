@@ -3264,7 +3264,7 @@ EmitOperandBuff = function (operand, parseNode, nodeList, annotation, action, ta
         [name] = Disambiguate(annotation, name, annotation.class, annotation.specialization);
         let buffName = (token == "debuff") && `${name}_debuff` || `${name}_buff`;
         [buffName] = Disambiguate(annotation, buffName, annotation.class, annotation.specialization);
-        let prefix = truthy(find(buffName, "_buff$")) && "Buff" || "Debuff";
+        let prefix = truthy(find(buffName, "_debuff$")) && "Debuff" || "Buff";
         let any = OvaleData.DEFAULT_SPELL_LIST[buffName] && " any=1" || "";
         target = target && (`${target}.`) || "";
         if (buffName == "dark_transformation_buff" && target == "") {
