@@ -330,6 +330,7 @@ Define(alacrity_buff 193538)
 
 	SpellInfo(between_the_eyes combopoints=1 max_combopoints=5 energy=25 cd=30)
 	SpellInfo(between_the_eyes max_combopoints=6 talent=deeper_stratagem_talent)
+	SpellAddBuff(between_the_eyes deadshot_buff=1 trait=deadshot_trait)
 
 	SpellInfo(blade_flurry cd=25 energy=15 charges=2)
 	SpellAddBuff(blade_flurry blade_flurry_buff=toggle)
@@ -388,6 +389,8 @@ Define(deadly_poison_buff 2823)
 	SpellInfo(deadly_poison_buff duration=3600)
 Define(deadly_poison_debuff 2818)
 	SpellInfo(deadly_poison_debuff duration=12 tick=2 haste=melee)
+Define(deadshot_buff 272940)
+	
 Define(elaborate_planning_buff 193640)
 	SpellInfo(elaborate_planning_buff duration=5)
 
