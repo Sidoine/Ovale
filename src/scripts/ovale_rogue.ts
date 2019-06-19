@@ -43,7 +43,7 @@ AddFunction AssassinationInterruptActions
  {
   if target.InRange(kick) and target.IsInterruptible() Spell(kick)
   if target.InRange(cheap_shot) and not target.Classification(worldboss) Spell(cheap_shot)
-  if target.InRange(kidney_shot) and not target.Classification(worldboss) and ComboPoints() >= 1 Spell(kidney_shot)
+  if target.InRange(kidney_shot) and not target.Classification(worldboss) and ComboPoints() >= MaxComboPoints()-1+Talent(internal_bleeding_talent) Spell(kidney_shot)
   if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
  }
 }
@@ -569,7 +569,7 @@ AddFunction AssassinationInterruptActions
  {
   if target.InRange(kick) and target.IsInterruptible() Spell(kick)
   if target.InRange(cheap_shot) and not target.Classification(worldboss) Spell(cheap_shot)
-  if target.InRange(kidney_shot) and not target.Classification(worldboss) and ComboPoints() >= 1 Spell(kidney_shot)
+  if target.InRange(kidney_shot) and not target.Classification(worldboss) and ComboPoints() >= MaxComboPoints()-1+Talent(internal_bleeding_talent) Spell(kidney_shot)
   if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
  }
 }
@@ -1097,7 +1097,7 @@ AddFunction OutlawInterruptActions
  {
   if target.InRange(kick) and target.IsInterruptible() Spell(kick)
   if target.InRange(cheap_shot) and not target.Classification(worldboss) Spell(cheap_shot)
-  if target.InRange(between_the_eyes) and not target.Classification(worldboss) and ComboPoints() >= 1 Spell(between_the_eyes)
+  if target.InRange(between_the_eyes) and not target.Classification(worldboss) and ComboPoints() >= MaxComboPoints()-1 Spell(between_the_eyes)
   if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
   if target.InRange(gouge) and not target.Classification(worldboss) Spell(gouge)
  }
@@ -1624,7 +1624,7 @@ AddFunction OutlawInterruptActions
  {
   if target.InRange(kick) and target.IsInterruptible() Spell(kick)
   if target.InRange(cheap_shot) and not target.Classification(worldboss) Spell(cheap_shot)
-  if target.InRange(between_the_eyes) and not target.Classification(worldboss) and ComboPoints() >= 1 Spell(between_the_eyes)
+  if target.InRange(between_the_eyes) and not target.Classification(worldboss) and ComboPoints() >= MaxComboPoints()-1 Spell(between_the_eyes)
   if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
   if target.InRange(gouge) and not target.Classification(worldboss) Spell(gouge)
  }
@@ -2141,7 +2141,7 @@ AddFunction SubtletyInterruptActions
  {
   if target.InRange(kick) and target.IsInterruptible() Spell(kick)
   if target.InRange(cheap_shot) and not target.Classification(worldboss) Spell(cheap_shot)
-  if target.InRange(kidney_shot) and not target.Classification(worldboss) and ComboPoints() >= 1 Spell(kidney_shot)
+  if target.InRange(kidney_shot) and not target.Classification(worldboss) and ComboPoints() >= MaxComboPoints()-1 Spell(kidney_shot)
   if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
  }
 }
