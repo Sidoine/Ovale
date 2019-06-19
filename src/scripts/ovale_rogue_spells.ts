@@ -685,6 +685,7 @@ Define(soothing_darkness_talent 10)
 Define(weaponmaster_talent 1)
 
 # Non-default tags for OvaleSimulationCraft.
+	SpellInfo(between_the_eyes tag=main)
 	SpellInfo(vanish tag=shortcd)
 	SpellInfo(goremaws_bite tag=main)
 `;
