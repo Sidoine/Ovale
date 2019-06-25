@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/CooldownState", 10000)
+local __exports = LibStub:NewLibrary("ovale/CooldownState", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __State = LibStub:GetLibrary("ovale/State")
@@ -6,6 +6,7 @@ local OvaleState = __State.OvaleState
 local __Cooldown = LibStub:GetLibrary("ovale/Cooldown")
 local OvaleCooldown = __Cooldown.OvaleCooldown
 local pairs = pairs
+local kpairs = pairs
 local CooldownState = __class(nil, {
     ApplySpellStartCast = function(self, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
         OvaleCooldown:StartProfiling("OvaleCooldown_ApplySpellStartCast")
@@ -31,7 +32,7 @@ local CooldownState = __class(nil, {
     end,
     CleanState = function(self)
         for spellId, cd in pairs(self.next.cd) do
-            for k in pairs(cd) do
+            for k in kpairs(cd) do
                 cd[k] = nil
             end
             self.next.cd[spellId] = nil
@@ -44,11 +45,11 @@ local CooldownState = __class(nil, {
         if duration == 0 then
             cd.start = 0
             cd.duration = 0
-            cd.enable = 1
+            cd.enable = true
         else
             cd.start = atTime
             cd.duration = duration
-            cd.enable = 1
+            cd.enable = true
         end
         if cd.charges and cd.charges > 0 then
             cd.chargeStart = cd.start

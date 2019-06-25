@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Spells", 10000)
+local __exports = LibStub:NewLibrary("ovale/Spells", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Debug = LibStub:GetLibrary("ovale/Debug")
@@ -27,7 +27,7 @@ local __SpellBook = LibStub:GetLibrary("ovale/SpellBook")
 local OvaleSpellBook = __SpellBook.OvaleSpellBook
 local WARRIOR_INCERCEPT_SPELLID = 198304
 local WARRIOR_HEROICTHROW_SPELLID = 57755
-local OvaleSpellsBase = OvaleProfiler:RegisterProfiling(OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleSpellBook", aceEvent)))
+local OvaleSpellsBase = OvaleProfiler:RegisterProfiling(OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleSpells", aceEvent)))
 local OvaleSpellsClass = __class(OvaleSpellsBase, {
     OnInitialize = function(self)
         RegisterRequirement("spellcount_min", self.RequireSpellCountHandler)
@@ -75,9 +75,9 @@ local OvaleSpellsClass = __class(OvaleSpellsBase, {
             returnValue = IsSpellInRange(name, unitId)
         end
         if (returnValue == 1 and spellId == WARRIOR_INCERCEPT_SPELLID) then
-            return (UnitIsFriend("player", unitId) == 1 or __exports.OvaleSpells:IsSpellInRange(WARRIOR_HEROICTHROW_SPELLID, unitId) == 1) and 1 or 0
+            return (UnitIsFriend("player", unitId) or __exports.OvaleSpells:IsSpellInRange(WARRIOR_HEROICTHROW_SPELLID, unitId))
         end
-        return returnValue
+        return (returnValue == 1 and true) or (returnValue == 0 and false) or (returnValue == nil and nil)
     end,
     CleanState = function(self)
     end,
@@ -106,6 +106,7 @@ local OvaleSpellsClass = __class(OvaleSpellsBase, {
         local isUsable = OvaleSpellBook:IsKnownSpell(spellId)
         local noMana = false
         local si = OvaleData.spellInfo[spellId]
+        local requirement
         if si then
             if isUsable then
                 local unusable = OvaleData:GetSpellInfoProperty(spellId, atTime, "unusable", targetGUID)
@@ -115,7 +116,6 @@ local OvaleSpellsClass = __class(OvaleSpellsBase, {
                 end
             end
             if isUsable then
-                local requirement
                 isUsable, requirement = OvaleData:CheckSpellInfo(spellId, atTime, targetGUID)
                 if  not isUsable then
                     noMana = OvalePower.PRIMARY_POWER[requirement]

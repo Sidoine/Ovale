@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Requirement", 10000)
+local __exports = LibStub:NewLibrary("ovale/Requirement", 80000)
 if not __exports then return end
 local __GUID = LibStub:GetLibrary("ovale/GUID")
 local OvaleGUID = __GUID.OvaleGUID
@@ -45,4 +45,3 @@ __exports.CheckRequirements = function(spellId, atTime, tokens, index, targetGUI
     end
     return true, nil, nil
 end
-__exports.RegisterRequirement("combat", baseState.CombatRequirement)

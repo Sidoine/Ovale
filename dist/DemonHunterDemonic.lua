@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/DemonHunterDemonic", 10000)
+local __exports = LibStub:NewLibrary("ovale/DemonHunterDemonic", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Ovale = LibStub:GetLibrary("ovale/Ovale")
@@ -12,6 +12,7 @@ local GetSpecialization = GetSpecialization
 local GetSpecializationInfo = GetSpecializationInfo
 local GetTime = GetTime
 local GetTalentInfoByID = GetTalentInfoByID
+local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local huge = math.huge
 local select = select
 local OvaleDemonHunterDemonicBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleDemonHunterDemonic", aceEvent))
@@ -54,8 +55,8 @@ local OvaleDemonHunterDemonicClass = __class(OvaleDemonHunterDemonicBase, {
             self:UnregisterMessage("COMBAT_LOG_EVENT_UNFILTERED")
         end
     end,
-    COMBAT_LOG_EVENT_UNFILTERED = function(self, event, timestamp, cleuEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
-        local arg12, arg13 = ...
+    COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
+        local _, cleuEvent, _, sourceGUID, _, _, _, _, _, _, _, arg12, arg13 = CombatLogGetCurrentEventInfo()
         if sourceGUID == self.playerGUID and cleuEvent == "SPELL_CAST_SUCCESS" then
             local spellId, spellName = arg12, arg13
             if HAVOC_EYE_BEAM_SPELL_ID == spellId then

@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/DataBroker", 10000)
+local __exports = LibStub:NewLibrary("ovale/DataBroker", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Localization = LibStub:GetLibrary("ovale/Localization")
@@ -13,6 +13,7 @@ local __Ovale = LibStub:GetLibrary("ovale/Ovale")
 local Ovale = __Ovale.Ovale
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
+local DEFAULT_NAME = __Scripts.DEFAULT_NAME
 local __Version = LibStub:GetLibrary("ovale/Version")
 local OvaleVersion = __Version.OvaleVersion
 local __Frame = LibStub:GetLibrary("ovale/Frame")
@@ -24,6 +25,8 @@ local CreateFrame = CreateFrame
 local EasyMenu = EasyMenu
 local IsShiftKeyDown = IsShiftKeyDown
 local UIParent = UIParent
+local __PaperDoll = LibStub:GetLibrary("ovale/PaperDoll")
+local OvalePaperDoll = __PaperDoll.OvalePaperDoll
 local OvaleDataBrokerBase = Ovale:NewModule("OvaleDataBroker", aceEvent)
 local CLASS_ICONS = {
     ["DEATHKNIGHT"] = "Interface\\Icons\\ClassIcon_DeathKnight",
@@ -77,7 +80,7 @@ local OnClick = function(fr, button)
                 isTitle = true
             }
         }
-        local scriptType =  not Ovale.db.profile.showHiddenScripts and "script"
+        local scriptType = ( not Ovale.db.profile.showHiddenScripts and "script") or nil
         local descriptions = OvaleScripts:GetDescriptions(scriptType)
         for name, description in pairs(descriptions) do
             local menuItem = {
@@ -129,12 +132,16 @@ local OvaleDataBrokerClass = __class(OvaleDataBrokerBase, {
         if self.broker then
             self:RegisterMessage("Ovale_ProfileChanged", "UpdateIcon")
             self:RegisterMessage("Ovale_ScriptChanged")
+            self:RegisterMessage("Ovale_SpecializationChanged", "Ovale_ScriptChanged")
+            self:RegisterEvent("PLAYER_ENTERING_WORLD", "Ovale_ScriptChanged")
             self:Ovale_ScriptChanged()
             self:UpdateIcon()
         end
     end,
     OnDisable = function(self)
         if self.broker then
+            self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+            self:UnregisterMessage("Ovale_SpecializationChanged")
             self:UnregisterMessage("Ovale_ProfileChanged")
             self:UnregisterMessage("Ovale_ScriptChanged")
         end
@@ -151,7 +158,8 @@ local OvaleDataBrokerClass = __class(OvaleDataBrokerBase, {
         end
     end,
     Ovale_ScriptChanged = function(self)
-        self.broker.text = Ovale.db.profile.source
+        local script = Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()]
+        self.broker.text = (script == DEFAULT_NAME and OvaleScripts:GetDefaultScriptName(Ovale.playerClass, OvalePaperDoll:GetSpecialization())) or script or "Disabled"
     end,
     constructor = function(self, ...)
         OvaleDataBrokerBase.constructor(self, ...)

@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Options", 10000)
+local __exports = LibStub:NewLibrary("ovale/Options", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local AceConfig = LibStub:GetLibrary("AceConfig-3.0", true)
@@ -13,6 +13,7 @@ local aceConsole = LibStub:GetLibrary("AceConsole-3.0", true)
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local InterfaceOptionsFrame_OpenToCategory = InterfaceOptionsFrame_OpenToCategory
 local ipairs = ipairs
+local huge = math.huge
 local OvaleOptionsBase = Ovale:NewModule("OvaleOptions", aceConsole, aceEvent)
 local self_register = {}
 local OvaleOptionsClass = __class(OvaleOptionsBase, {
@@ -106,6 +107,10 @@ local OvaleOptionsClass = __class(OvaleOptionsBase, {
                     predictif = false,
                     secondIconScale = 1,
                     taggedEnemies = false,
+                    minFrameRefresh = 50,
+                    maxFrameRefresh = 250,
+                    fullAuraScan = false,
+                    frequentHealthUpdates = true,
                     auraLag = 400,
                     moving = false,
                     spellFlash = {
@@ -433,6 +438,38 @@ local OvaleOptionsClass = __class(OvaleOptionsBase, {
                                     min = 100,
                                     max = 700,
                                     step = 10
+                                },
+                                minFrameRefresh = {
+                                    order = 30,
+                                    type = "range",
+                                    name = L["Min Refresh"],
+                                    desc = L["Minimum time (in milliseconds) between updates; lower values may reduce FPS."],
+                                    min = 50,
+                                    max = 100,
+                                    step = 5
+                                },
+                                maxFrameRefresh = {
+                                    order = 40,
+                                    type = "range",
+                                    name = L["Max Refresh"],
+                                    desc = L["Minimum time (in milliseconds) between updates; lower values may reduce FPS."],
+                                    min = 100,
+                                    max = 400,
+                                    step = 10
+                                },
+                                fullAuraScan = {
+                                    order = 50,
+                                    width = "full",
+                                    type = "toggle",
+                                    name = L["Full buffs/debuffs scan"],
+                                    desc = L["Scans also buffs/debuffs casted by other players or NPCs.\n\nWarning!: Very CPU intensive"]
+                                },
+                                frequentHealthUpdates = {
+                                    order = 60,
+                                    width = "full",
+                                    type = "toggle",
+                                    name = L["Frequent health updates"],
+                                    desc = L["Updates health of units more frquently; enabling this may reduce FPS."]
                                 }
                             }
                         }
@@ -472,6 +509,9 @@ local OvaleOptionsClass = __class(OvaleOptionsBase, {
                             type = "execute",
                             func = function()
                                 local avgRefresh, minRefresh, maxRefresh, count = Ovale:GetRefreshIntervalStatistics()
+                                if minRefresh == huge then
+                                    avgRefresh, minRefresh, maxRefresh, count = 0, 0, 0, 0
+                                end
                                 Ovale:Print("Refresh intervals: count = %d, avg = %d, min = %d, max = %d (ms)", count, avgRefresh, minRefresh, maxRefresh)
                             end
                         }

@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Condition", 10000)
+local __exports = LibStub:NewLibrary("ovale/Condition", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Ovale = LibStub:GetLibrary("ovale/Ovale")
@@ -13,8 +13,16 @@ local OvaleConditionBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleCo
 local INFINITY = huge
 local self_condition = {}
 local self_spellBookCondition = {}
-do
-    self_spellBookCondition["spell"] = true
+self_spellBookCondition["spell"] = true
+local COMPARATOR = {
+    atLeast = true,
+    atMost = true,
+    equal = true,
+    less = true,
+    more = true
+}
+__exports.isComparator = function(token)
+    return COMPARATOR[token] ~= nil
 end
 local OvaleConditionClass = __class(OvaleConditionBase, {
     RegisterCondition = function(self, name, isSpellBookCondition, func)
@@ -32,28 +40,18 @@ local OvaleConditionClass = __class(OvaleConditionBase, {
     IsSpellBookCondition = function(self, name)
         return (self_spellBookCondition[name] ~= nil)
     end,
-    EvaluateCondition = function(self, name, positionalParams, namedParams, state, atTime)
-        return self_condition[name](positionalParams, namedParams, state, atTime)
+    EvaluateCondition = function(self, name, positionalParams, namedParams, atTime)
+        return self_condition[name](positionalParams, namedParams, atTime)
     end,
     HasAny = function(self)
         return next(self_condition) ~= nil
     end,
-    constructor = function(self, ...)
-        OvaleConditionBase.constructor(self, ...)
-        self.COMPARATOR = {
-            atLeast = true,
-            atMost = true,
-            equal = true,
-            less = true,
-            more = true
-        }
-    end
 })
 __exports.OvaleCondition = OvaleConditionClass()
-__exports.ParseCondition = function(positionalParams, namedParams, state, defaultTarget)
+__exports.ParseCondition = function(positionalParams, namedParams, defaultTarget)
     local target = namedParams.target or defaultTarget or "player"
     namedParams.target = namedParams.target or target
-    if target == "target" then
+    if target == "cycle" or target == "target" then
         target = baseState.next.defaultTarget
     end
     local filter
@@ -98,7 +96,7 @@ __exports.TestValue = function(start, ending, value, origin, rate, comparator, l
         else
             return 0, INFINITY, 0, 0, 0
         end
-    elseif  not __exports.OvaleCondition.COMPARATOR[comparator] then
+    elseif  not __exports.isComparator(comparator) then
         __exports.OvaleCondition:Error("unknown comparator %s", comparator)
     elseif  not limit then
         __exports.OvaleCondition:Error("comparator %s missing limit", comparator)

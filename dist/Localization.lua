@@ -1,21 +1,18 @@
-local __exports = LibStub:NewLibrary("ovale/Localization", 10000)
+local __exports = LibStub:NewLibrary("ovale/Localization", 80000)
 if not __exports then return end
 local setmetatable = setmetatable
 local rawset = rawset
 local tostring = tostring
 local GetLocale = GetLocale
-__exports.L = nil
-do
-    local MT = {
-        __index = function(self, key)
-            local value = tostring(key)
-            rawset(self, key, value)
-            return value
-        end
+local MT = {
+    __index = function(self, key)
+        local value = tostring(key)
+        rawset(self, key, value)
+        return value
+    end
 
-    }
-    __exports.L = setmetatable({}, MT)
-end
+}
+__exports.L = setmetatable({}, MT)
 local locale = GetLocale()
 if locale == "deDE" then
     __exports.L["Affichage numérique"] = "Numerische Anzeige"

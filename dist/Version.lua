@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Version", 10000)
+local __exports = LibStub:NewLibrary("ovale/Version", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Localization = LibStub:GetLibrary("ovale/Localization")
@@ -28,7 +28,7 @@ local self_printTable = {}
 local self_userVersion = {}
 local self_timer
 local MSG_PREFIX = Ovale.MSG_PREFIX
-local OVALE_VERSION = "@project-version@"
+local OVALE_VERSION = "8.1.0"
 local REPOSITORY_KEYWORD = "@" .. "project-version" .. "@"
 do
     local actions = {

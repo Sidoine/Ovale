@@ -1,340 +1,532 @@
-local __exports = LibStub:NewLibrary("ovale/scripts/ovale_monk_spells", 10000)
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_monk_spells", 80000)
 if not __exports then return end
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 __exports.register = function()
     local name = "ovale_monk_spells"
-    local desc = "[7.3.2] Ovale: Monk spells"
-    local code = [[
+    local desc = "[8.1] Ovale: Monk spells"
+    local code = [[Define(ancestral_call 274738)
+# Invoke the spirits of your ancestors, granting you their power for 15 seconds.
+  SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
+  SpellAddBuff(ancestral_call ancestral_call=1)
+Define(battle_potion_of_agility 279152)
+# Increases your Agility by s1 for 25 seconds.
+  SpellInfo(battle_potion_of_agility cd=1 duration=25 gcd=0 offgcd=1)
+  # Agility increased by w1.
+  SpellAddBuff(battle_potion_of_agility battle_potion_of_agility=1)
+Define(berserking 26297)
+# Increases your haste by s1 for 12 seconds.
+  SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
+  # Haste increased by s1.
+  SpellAddBuff(berserking berserking=1)
+Define(black_ox_brew 115399)
+# Chug some Black Ox Brew, which instantly refills your Energy, and your Ironskin Brew and Purifying Brew charges.
+  SpellInfo(black_ox_brew cd=120 gcd=0 offgcd=1 energy=-200 talent=black_ox_brew_talent)
+Define(blackout_combo_buff 228563)
+# Blackout Strike also empowers your next ability:rnrnTiger Palm: Damage increased by s1.rnBreath of Fire: Cooldown reduced by s2 sec.rnKeg Smash: Reduces the remaining cooldown on your Brews by s3 additional sec.rnIronskin Brew: Pauses Stagger damage for s4 sec.
+  SpellInfo(blackout_combo_buff duration=15 gcd=0 offgcd=1)
+  # Your next ability is empowered.
+  SpellAddBuff(blackout_combo_buff blackout_combo_buff=1)
+Define(blackout_strike 205523)
+# Strike with a blast of Chi energy, dealing s1 Physical damage?s117906[ and generating a stack of Elusive Brawler][].
+  SpellInfo(blackout_strike cd=3)
+Define(breath_of_fire 115181)
+# Breathe fire on targets in front of you, causing s1 Fire damage.rnrnTargets affected by Keg Smash will also burn, taking 123725o1 Fire damage and dealing 123725s2 reduced damage to you for 12 seconds.
+  SpellInfo(breath_of_fire cd=15 gcd=1)
+Define(bursting_blood 251316)
+# Imbues your blood with heat for 25 seconds, giving your melee attacks a chance to create a burst of blood, dealing 265514s1 Physical damage split evenly amongst all nearby enemies.
+  SpellInfo(bursting_blood duration=25 channel=25 gcd=0 offgcd=1)
+
+Define(chi_burst 123986)
+# Hurls a torrent of Chi energy up to 40 yds forward, dealing 148135s1 Nature damage to all enemies, and 130654s1 healing to the Monk and all allies in its path.?c1[rnrnCasting Chi Burst does not prevent avoiding attacks.][]?c3[rnrnChi Burst generates 1 Chi per enemy target damaged, up to a maximum of s3.][]
+  SpellInfo(chi_burst cd=30 duration=1 talent=chi_burst_talent)
+Define(chi_wave 115098)
+# A wave of Chi energy flows through friends and foes, dealing 132467s1 Nature damage or 132463s1 healing. Bounces up to s1 times to targets within 132466a2 yards.
+  SpellInfo(chi_wave cd=15 talent=chi_wave_talent)
+Define(dampen_harm 122278)
+# Reduces all damage you take by m2 to m3 for 10 seconds, with larger attacks being reduced by more.
+  SpellInfo(dampen_harm cd=120 duration=10 gcd=0 offgcd=1 talent=dampen_harm_talent)
+  # Damage taken reduced by m2 to m3 for d, with larger attacks being reduced by more.
+  SpellAddBuff(dampen_harm dampen_harm=1)
+Define(diffuse_magic 122783)
+# Reduces magic damage you take by m1 for 6 seconds, and transfers all currently active harmful magical effects on you back to their original caster if possible.
+  SpellInfo(diffuse_magic cd=90 duration=6 gcd=0 offgcd=1 talent=diffuse_magic_talent)
+  # Spell damage taken reduced by m1.
+  SpellAddBuff(diffuse_magic diffuse_magic=1)
+Define(elusive_brawler 195630)
+# Each time you are hit by a melee attack, or hit with Blackout Strike, you gain stacking (100 of Spell Power).1 increased Dodge chance until your next successful Dodge.rnrnAlso increases your attack power by (100 of Spell Power).1.
+  SpellInfo(elusive_brawler duration=10 max_stacks=100 gcd=0 offgcd=1)
+  # Dodge chance increased by w1.
+  SpellAddBuff(elusive_brawler elusive_brawler=1)
+Define(energizing_elixir 115288)
+# Chug an Energizing Elixir, refilling all your Energy and instantly generate s2 Chi.
+  SpellInfo(energizing_elixir cd=60 max_stacks=3 gcd=1 energy=-200 chi=-2 talent=energizing_elixir_talent)
+Define(fireblood 265221)
+# Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. 
+  SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
+Define(fist_of_the_white_tiger 261947)
+# Strike with the technique of the White Tiger, dealing s1+261977s1 Physical damage.rnrn|cFFFFFFFFGenerates 261978s1 Chi.
+  SpellInfo(fist_of_the_white_tiger energy=40 cd=30 gcd=1 talent=fist_of_the_white_tiger_talent)
+
+Define(fists_of_fury 113656)
+# Pummels all targets in front of you, dealing 5*s5 damage over 4 seconds to your primary target and 5*s5*s6/100 damage over 4 seconds to other targets. Can be channeled while moving.
+  SpellInfo(fists_of_fury chi=3 cd=24 duration=4 channel=4 gcd=1 tick=0.166)
+  # w3 damage every t3 sec. ?s125671[Parrying all attacks.][]
+  SpellAddBuff(fists_of_fury fists_of_fury=1)
+Define(flying_serpent_kick 101545)
+# Soar forward through the air at high speed for 1.5 seconds.rn rnIf used again while active, you will land, dealing 123586m1 damage to all enemies within 123586A1 yards and reducing movement speed by 123586m2 for 4 seconds.
+  SpellInfo(flying_serpent_kick cd=25 duration=1.5 gcd=1)
+  SpellAddBuff(flying_serpent_kick flying_serpent_kick=1)
+Define(fortifying_brew 115203)
+# Turns your skin to stone for 15 seconds, increasing your current and maximum health by <health>, increasing the effectiveness of Stagger by s1, and reducing all damage you take by <damage>.
+  SpellInfo(fortifying_brew cd=420 gcd=0 offgcd=1)
+Define(invoke_niuzao_the_black_ox 132578)
+# Summons an effigy of Niuzao, the Black Ox for 45 seconds. Niuzao attacks your primary target and taunts it. He also frequently Stomps, damaging all nearby enemies.
+  SpellInfo(invoke_niuzao_the_black_ox cd=180 duration=45 talent=invoke_niuzao_the_black_ox_talent)
+Define(invoke_xuen_the_white_tiger 123904)
+# Summons an effigy of Xuen, the White Tiger for 20 seconds. Xuen attacks your primary target, and strikes 3 enemies within 123996A1 yards every 123999t1 sec with Tiger Lightning for 123996s1 Nature damage.
+  SpellInfo(invoke_xuen_the_white_tiger cd=120 duration=20 gcd=1 talent=invoke_xuen_the_white_tiger_talent)
+Define(ironskin_brew 115308)
+# A swig of strong brew allows you to Stagger substantially more damage for 7 seconds. rnrnShares charges with Purifying Brew.
+  SpellInfo(ironskin_brew cd=1 charge_cd=15 gcd=0 offgcd=1)
+Define(keg_smash 121253)
+# Smash a keg of brew on the target, dealing s2 damage to all enemies within A2 yds and reducing their movement speed by m3 for 15 seconds.rnrnReduces the remaining cooldown on your Brews by s4 sec.
+  SpellInfo(keg_smash energy=40 cd=1 charge_cd=8 duration=15 gcd=1)
+  # ?w3!=0[Movement speed reduced by w3.rn][]Drenched in brew, vulnerable to Breath of Fire.
+  SpellAddTargetDebuff(keg_smash keg_smash=1)
+Define(leg_sweep 119381)
+# Knocks down all enemies within A1 yards, stunning them for 3 seconds.
+  SpellInfo(leg_sweep cd=60 duration=3)
+  # Stunned.
+  SpellAddTargetDebuff(leg_sweep leg_sweep=1)
+Define(lights_judgment 255647)
+# Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
+  SpellInfo(lights_judgment cd=150)
+
+Define(paralysis 115078)
+# Incapacitates the target for 60 seconds. Limit 1. Damage will cancel the effect.
+  SpellInfo(paralysis energy=20 cd=45 duration=60)
+  # Incapacitated.
+  SpellAddTargetDebuff(paralysis paralysis=1)
+Define(purifying_brew 119582)
+# Clears s1 of your damage delayed with Stagger.rnrnShares charges with Ironskin Brew.
+  SpellInfo(purifying_brew cd=1 charge_cd=15 gcd=0 offgcd=1)
+Define(quaking_palm 107079)
+# Strikes the target with lightning speed, incapacitating them for 4 seconds, and turns off your attack.
+  SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
+  # Incapacitated.
+  SpellAddTargetDebuff(quaking_palm quaking_palm=1)
+Define(rising_sun_kick 107428)
+# Kick upwards, dealing ?s137025[185099s1*<CAP>/AP][185099s1] Physical damage?s128595[, and reducing the effectiveness of healing on the target for 10 seconds][].
+# Rank 2: Rising Sun Kick deals s1 increased damage.rn
+  SpellInfo(rising_sun_kick chi=2 cd=10)
+
+Define(rushing_jade_wind 116847)
+# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to enemies within 107270A1 yards.
+  SpellInfo(rushing_jade_wind chi=1 cd=6 duration=6 tick=0.75 talent=rushing_jade_wind_talent_windwalker)
+
+Define(serenity 152173)
+# Enter an elevated state of mental and physical serenity for ?s115069[s1 sec][12 seconds]. While in this state, you deal s2 increased damage and healing, and all Chi consumers are free and cool down s4 more quickly.
+  SpellInfo(serenity cd=90 duration=12 gcd=1 talent=serenity_talent)
+  # Damage and healing increased by w2.rnAll Chi consumers are free and cool down w4 more quickly.
+  SpellAddBuff(serenity serenity=1)
+Define(spear_hand_strike 116705)
+# Jabs the target in the throat, interrupting spellcasting and preventing any spell from that school of magic from being cast for 4 seconds.
+  SpellInfo(spear_hand_strike cd=15 duration=4 gcd=0 offgcd=1 interrupt=1)
+Define(spinning_crane_kick 101546)
+# Spin while kicking in the air, dealing ?s137025[4*107270s1*<CAP>/AP][4*107270s1] Physical damage over 1.5 seconds to enemies within 107270A1 yds.?c3[rnrnSpinning Crane Kick's damage is increased by 220358s1 for each unique target you've struck in the last 15 seconds with Tiger Palm, Blackout Kick, or Rising Sun Kick.][]
+  SpellInfo(spinning_crane_kick chi=3 duration=1.5 channel=1.5 tick=0.5)
+  # Attacking all nearby enemies for Physical damage every 101546t1 sec.
+  SpellAddBuff(spinning_crane_kick spinning_crane_kick=1)
+Define(storm_earth_and_fire 137639)
+# Split into 3 elemental spirits for 15 seconds, each spirit dealing 100+m1 of normal damage and healing.rnrnYou directly control the Storm spirit, while Earth and Fire spirits mimic your attacks on nearby enemies.rnrnWhile active, casting Storm, Earth, and Fire again will cause the spirits to fixate on your target.
+# Rank 2: Storm, Earth, and Fire has s1+1 charges.
+  SpellInfo(storm_earth_and_fire cd=16 charge_cd=90 duration=15 max_stacks=2 gcd=1)
+  # Elemental spirits summoned, mirroring all of the Monk's attacks.rnThe Monk and spirits each do 100+m1 of normal damage and healing.
+  SpellAddBuff(storm_earth_and_fire storm_earth_and_fire=1)
+Define(swift_roundhouse_buff 278707)
+# Blackout Kick increases the damage of your next Rising Sun Kick by s1, stacking up to 278710u times.
+  SpellInfo(swift_roundhouse_buff channel=-0.001 gcd=0 offgcd=1)
+
+Define(tiger_palm 100780)
+# Attack with the palm of your hand, dealing s1 damage.?a137384[rnrnTiger Palm has an 137384m1 chance to make your next Blackout Kick cost no Chi.][]?a137023[rnrnReduces the remaining cooldown on your Brews by s3 sec.][]?a137025[rnrn|cFFFFFFFFGenerates s2 Chi.][]
+  SpellInfo(tiger_palm energy=50 chi=0)
+Define(touch_of_death 115080)
+# Inflict mortal damage on an enemy, causing the target to take damage equal to s2 of your maximum health after 8 seconds, reduced against players.rnrnDuring the 8 seconds duration, 271232s1 of all other damage you deal to the target will be added to the final damage dealt.
+  SpellInfo(touch_of_death cd=120 duration=8 tick=8)
+  # Taking w1 damage when this effect expires.
+  SpellAddTargetDebuff(touch_of_death touch_of_death=1)
+Define(touch_of_karma 122470)
+# Absorbs all damage taken for 10 seconds, up to s3 of your maximum health, and redirects s4 of that amount to the enemy target as Nature damage over 6 seconds.
+  SpellInfo(touch_of_karma cd=90 duration=10 gcd=0 offgcd=1)
+  # Damage dealt to the Monk is redirected to you as Nature damage over 124280d.
+  SpellAddBuff(touch_of_karma touch_of_karma=1)
+  # Damage dealt to the Monk is redirected to you as Nature damage over 124280d.
+  SpellAddTargetDebuff(touch_of_karma touch_of_karma=1)
+Define(war_stomp 20549)
+# Stuns up to i enemies within A1 yds for 2 seconds.
+  SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
+  # Stunned.
+  SpellAddTargetDebuff(war_stomp war_stomp=1)
+Define(whirling_dragon_punch 152175)
+# Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
+  SpellInfo(whirling_dragon_punch cd=24 duration=1 gcd=1 tick=0.25 talent=whirling_dragon_punch_talent)
+  SpellAddBuff(whirling_dragon_punch whirling_dragon_punch=1)
+Define(black_ox_brew_talent 9) #19992
+# Chug some Black Ox Brew, which instantly refills your Energy, and your Ironskin Brew and Purifying Brew charges.
+Define(blackout_combo_talent 21) #22108
+# Blackout Strike also empowers your next ability:rnrnTiger Palm: Damage increased by s1.rnBreath of Fire: Cooldown reduced by s2 sec.rnKeg Smash: Reduces the remaining cooldown on your Brews by s3 additional sec.rnIronskin Brew: Pauses Stagger damage for s4 sec.
+Define(chi_burst_talent 3) #20185
+# Hurls a torrent of Chi energy up to 40 yds forward, dealing 148135s1 Nature damage to all enemies, and 130654s1 healing to the Monk and all allies in its path.?c1[rnrnCasting Chi Burst does not prevent avoiding attacks.][]?c3[rnrnChi Burst generates 1 Chi per enemy target damaged, up to a maximum of s3.][]
+Define(chi_wave_talent 2) #19820
+# A wave of Chi energy flows through friends and foes, dealing 132467s1 Nature damage or 132463s1 healing. Bounces up to s1 times to targets within 132466a2 yards.
+Define(dampen_harm_talent 15) #20175
+# Reduces all damage you take by m2 to m3 for 10 seconds, with larger attacks being reduced by more.
+Define(diffuse_magic_talent 14) #20173
+# Reduces magic damage you take by m1 for 6 seconds, and transfers all currently active harmful magical effects on you back to their original caster if possible.
+Define(energizing_elixir_talent 9) #22096
+# Chug an Energizing Elixir, refilling all your Energy and instantly generate s2 Chi.
+Define(fist_of_the_white_tiger_talent 8) #19771
+# Strike with the technique of the White Tiger, dealing s1+261977s1 Physical damage.rnrn|cFFFFFFFFGenerates 261978s1 Chi.
+Define(hit_combo_talent 16) #22093
+# Each successive attack that triggers Combo Strikes in a row grants 196741s1 increased damage, stacking up to 196741u times.
+Define(invoke_niuzao_the_black_ox_talent 18) #22103
+# Summons an effigy of Niuzao, the Black Ox for 45 seconds. Niuzao attacks your primary target and taunts it. He also frequently Stomps, damaging all nearby enemies.
+Define(invoke_xuen_the_white_tiger_talent 18) #22102
+# Summons an effigy of Xuen, the White Tiger for 20 seconds. Xuen attacks your primary target, and strikes 3 enemies within 123996A1 yards every 123999t1 sec with Tiger Lightning for 123996s1 Nature damage.
+Define(rushing_jade_wind_talent 17) #20184
+# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to enemies within 107270A1 yards.
+Define(rushing_jade_wind_talent_windwalker 17) #23122
+# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to enemies within 107270A1 yards.
+Define(serenity_talent 21) #21191
+# Enter an elevated state of mental and physical serenity for ?s115069[s1 sec][12 seconds]. While in this state, you deal s2 increased damage and healing, and all Chi consumers are free and cool down s4 more quickly.
+Define(special_delivery_talent 16) #19819
+# Drinking Ironskin or Purifying Brew has a h chance to toss a keg high into the air that lands nearby after s1 sec, dealing 196733s1 damage to all enemies within 196733A1 yards and reducing their movement speed by 196733m2 for 15 seconds.
+Define(whirling_dragon_punch_talent 20) #22105
+# Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
+    ]]
+    code = code .. [[
 ItemRequire(shifting_cosmic_sliver unusable 1=oncooldown,!fortifying_brew,buff,!fortifying_brew_buff)
 
-# Monk spells and functions.
+## Spells
+Define(blackout_kick_windwalker 100784) ## Added for now untill it is fixed in importspells
+SpellInfo(blackout_kick_windwalker cd=3 specialization=mistweaver)
+SpellInfo(blackout_kick_windwalker chi=1 specialization=windwalker)
+SpellRequire(blackout_kick_windwalker chi_percent 0=buff,blackout_kick_free specialization=windwalker)
+SpellAddBuff(blackout_kick_windwalker blackout_kick_buff=0 specialization=windwalker)
+SpellAddBuff(blackout_kick_windwalker teachings_of_the_monastery_buff=0 specialization=mistweaver)
+SpellAddTargetDebuff(blackout_kick_windwalker mark_of_the_crane_debuff=1 specialization=windwalker)
+SpellAddBuff(blackout_kick_windwalker swift_roundhouse_buff=1)
 
-Define(blackout_combo_buff 228563)
-	SpellInfo(blackout_combo_buff duration=15)
-Define(blackout_combo_talent 20)
-Define(blackout_kick 100784)
-	SpellInfo(blackout_kick cd=3)
-	SpellInfo(blackout_kick chi=1 specialization=windwalker)
-	SpellRequire(blackout_kick chi_percent 0=buff,combo_breaker_bok_buff specialization=windwalker)
-	SpellRequire(blackout_kick chi_percent 0=buff,serenity_buff if_spell=serenity specialization=windwalker)
-	SpellAddBuff(blackout_kick combo_breaker_bok_buff=0)
-	SpellAddBuff(blackout_kick cranes_zeal_buff=1)
-	SpellAddBuff(blackout_kick shuffle_buff=1)
-	SpellAddBuff(blackout_kick teachings_of_the_monastery_buff=0)
-Define(blackout_strike 205523)
-	SpellInfo(blackout_strike cd=3)
-	SpellAddBuff(blackout_strike blackout_combo_buff=1 talent=blackout_combo_talent)
-Define(black_ox_brew 115399)
-	SpellInfo(black_ox_brew cd=90 gcd=0 offgcd=1 talent=black_ox_brew_talent)
-Define(black_ox_brew_talent 8)
-Define(bok_proc_buff 116768) #Alias for combo_breaker_bok_buff
-Define(breath_of_fire 115181)
-	SpellAddTargetDebuff(breath_of_fire breath_of_fire_debuff=1 if_target_debuff=keg_smash_debuff)
-	SpellAddBuff(breath_of_fire blackout_combo_buff=0)
+Define(blackout_kick_buff 116768)
+SpellInfo(blackout_kick_buff duration=15)
+
+SpellList(blackout_kick_free blackout_kick_buff serenity)
+
+SpellAddBuff(blackout_strike blackout_combo_buff=1 talent=blackout_combo_talent)
+
+SpellAddTargetDebuff(breath_of_fire breath_of_fire_debuff=1 if_target_debuff=keg_smash)
+SpellAddBuff(breath_of_fire blackout_combo_buff=0)
+
 Define(breath_of_fire_debuff 123725)
-	SpellInfo(breath_of_fire_debuff duration=8 tick=2)
-Define(brew_stache_buff 214373)
-	SpellInfo(brew_stache_buff duration=4.5)
-Define(brew_stache_trait 214372)
-Define(crackling_jade_lightning 117952)
-	SpellInfo(crackling_jade_lightning channel=4)
-	SpellAddBuff(crackling_jade_lightning power_strikes_buff=0 talent=power_strikes_talent)
-	SpellAddBuff(crackling_jade_lightning the_emperors_capacitor_buff=0)
-Define(cranes_zeal_buff 127722)
-	SpellInfo(cranes_zeal_buff duration=20)
-Define(chi_burst 123986)
-	SpellInfo(chi_burst cd=30 travel_time=1 tag=main)
-Define(chi_burst_talent 6)
-Define(chi_explosion_heal 157675)
-	SpellInfo(chi_explosion_heal chi=1 max_chi=4)
-Define(chi_explosion_melee 152174)
-	SpellInfo(chi_explosion_melee chi=1 max_chi=4)
-	SpellInfo(chi_explosion_melee buff_chi=combo_breaker_ce_buff buff_chi_amount=-2)
-Define(chi_explosion_tank 157676)
-	SpellInfo(chi_explosion_tank chi=1 max_chi=4)
-Define(chi_explosion_talent 20)
-Define(chi_jis_guidance_buff 167717)
-	SpellInfo(chi_jis_guidance_buff duration=60 max_stacks=2)
+	SpellInfo(breath_of_fire_debuff duration=12 tick=2)
+
+SpellInfo(chi_burst chi=-1 max_chi=-2 specialization=windwalker)
+
 Define(chi_torpedo 115008)
-Define(chi_torpedo_talent 18)
-Define(chi_wave 115098)
-	SpellInfo(chi_wave cd=15)
-Define(chi_wave_talent 4)
-Define(combo_breaker 137384)
-Define(combo_breaker_bok_buff 116768)
-	SpellInfo(combo_breaker_bok_buff duration=15)
-Define(combo_breaker_ce_buff 159407)
-	SpellInfo(combo_breaker_ce_buff duration=15)
-Define(combo_breaker_tp_buff 118864)
-	SpellInfo(combo_breaker_tp_buff duration=15)
-Define(convergence_of_fates 140806)
-Define(dampen_harm 122278)
-	SpellInfo(dampen_harm cd=120 gcd=0 offgcd=1)
-	SpellAddBuff(dampen_harm dampen_harm_buff=3)
-Define(dampen_harm_buff 122278)
-	SpellInfo(dampen_harm_buff duration=45)
-Define(dampen_harm_talent 14)
-Define(death_note_buff 121125)
-Define(detonate_chi 115460)
-	SpellInfo(detonate_chi cd=10)
-Define(diffuse_magic 122783)
-	SpellInfo(diffuse_magic cd=90 gcd=0 offgcd=1)
-Define(diffuse_magic_buff 122783)
-	SpellInfo(diffuse_magic_buff duration=6)
-Define(diffuse_magic_talent 15)
-Define(dizzying_haze_debuff 116330)
-	SpellInfo(dizzying_haze_debuff duration=15)
-Define(drinking_horn_cover 137097)
+	SpellInfo(chi_torpedo charges=2 cd=20)
+	SpellAddBuff(chi_torpedo chi_torpedo_buff=1)
+	SpellRequire(chi_torpedo unusable 1=lossofcontrol,root)
+Define(chi_torpedo_buff 119085)
+	SpellInfo(chi_torpedo_buff duration=10)
+
+# SpellInfo(crackling_jade_lightning haste=melee specialization=!mistweaver)
+# SpellInfo(crackling_jade_lightning haste=spell specialization=mistweaver)
+Define(dance_of_chiji_buff 286587)
+    SpellInfo(dance_of_chiji_buff duration=15)
+    
+Define(detox_mistweaver 115450)
+	SpellInfo(detox_mistweaver cd=8)
+
+Define(detox 218164)
+	SpellInfo(detox energy=20 cd=8)
+
+Define(disable 116095)
+	SpellInfo(disable energy=15 duration=15)
+	SpellAddTargetDebuff(disable disable=1)
+	SpellAddTargetDebuff(disable disable_root=1 if_target_debuff=disable)
+
+Define(disable_root 116706)
+	SpellInfo(disable_root duration=8)
+
 Define(elusive_brew_stacks_buff 128939)
 	SpellInfo(elusive_brew_stacks_buff duration=30 max_stacks=15)
+
 Define(elusive_dance_buff 196739)
 	SpellInfo(elusive_dance_buff duration=6)
-Define(elusive_dance_talent 19)
-Define(energizing_brew 115288)
-	SpellInfo(energizing_brew cd=60 gcd=0)
-	SpellAddBuff(energizing_brew energizing_brew_buff=1)
-Define(energizing_brew_buff 115288)
-	SpellInfo(energizing_brew_buff duration=6 tick=1)
-	SpellInfo(energizing_brew_buff add_duration=5 itemset=T14_melee itemcount=4)
-Define(energizing_elixir 115288)
-	SpellInfo(energizing_elixir chi=refill energy=refill)
-Define(energizing_elixir_talent 7)
+
 Define(enveloping_mist 124682)
-	SpellInfo(enveloping_mist chi=3)
+	SpellAddBuff(enveloping_mist thunder_focus_tea_buff=-1 if_spell=thunder_focus_tea)
 	SpellAddTargetBuff(enveloping_mist enveloping_mist_buff=1)
+
 Define(enveloping_mist_buff 132120)
-	SpellInfo(enveloping_mist_buff duration=6 tick=1)
+	SpellInfo(enveloping_mist_buff duration=6 tick=1 haste=spell)
+
+Define(essence_font 191837)
+	SpellInfo(essence_font cd=12 channel=3 haste=spell)
+
+Define(essence_font_buff 191837)
+	SpellInfo(essence_font_buff duration=8 tick=2 haste=spell)
+
 Define(expel_harm 115072)
-	SpellInfo(expel_harm energy=15 specialization=brewmaster)
-	SpellRequire(expel_harm unusable 1=spellcount_max,0)
-	SpellRequire(expel_harm unusable 1=debuff,healing_immunity_debuff)
-Define(exploding_keg 214326)
-Define(extend_life_buff 185158)
-	SpellInfo(extend_life_buff duration=12)
-Define(firestone_walkers 137027)
-Define(fists_of_fury 113656)
-	SpellInfo(fists_of_fury channel=4 cd=25)
-	SpellInfo(fists_of_fury chi=3)
-	SpellInfo(fists_of_fury chi=2 if_equipped=katsuos_eclipse)
-	SpellRequire(fists_of_fury chi_percent 0=buff,serenity_buff)
-	SpellAddBuff(fists_of_fury rising_fist_debuff=1 itemset=T20 itemcount=4)
-Define(focus_and_harmony 154555)
-Define(focus_of_xuen_buff 145024)
-	SpellInfo(focus_of_xuen_buff duration=10)
-Define(fortifying_brew 115203)
-	SpellInfo(fortifying_brew cd=420 gcd=0 offgcd=1)
-	SpellAddBuff(fortifying_brew fortifying_brew_buff=1)
+	SpellInfo(expel_harm energy=15 specialization=brewmaster unusable=1)
+	SpellRequire(expel_harm unusable 0=spellcount_min,1,debuff,!healing_immunity_debuff)
+
+Define(eye_of_the_tiger_debuff 196608)
+	SpellInfo(eye_of_the_tiger_debuff duration=8)
+
+SpellInfo(fist_of_the_white_tiger chi=-3)
+SpellAddTargetDebuff(fist_of_the_white_tiger mark_of_the_crane_debuff=1 specialization=windwalker)
+
+SpellInfo(fists_of_fury cd_haste=melee haste=melee)
+SpellRequire(fists_of_fury chi_percent 0=buff,serenity)
+
+
+	SpellInfo(flying_serpent_kick cd=25)
+	SpellRequire(flying_serpent_kick unusable 1=lossofcontrol,root)
+
+SpellAddBuff(fortifying_brew fortifying_brew_buff=1)
+
 Define(fortifying_brew_buff 120954)
 	SpellInfo(fortifying_brew_buff duration=15)
-Define(fundamental_observation 137063)
-Define(gale_burst 195399)
-	SpellAddBuff(gale_burst gale_burst_buff=1)
-Define(gale_burst_buff 195403)
+
+Define(fortifying_brew_mistweaver 243435)
+	SpellInfo(fortifying_brew_mistweaver cd=90 gcd=0 offgcd=1 duration=15)
+	SpellAddBuff(fortifying_brew_mistweaver fortifying_brew_mistweaver=1)
+
+Define(guard 115295)
+	SpellInfo(guard cd=30 duration=8)
+	SpellAddBuff(guard guard=1)
+
 Define(healing_elixir 122281)
-	SpellInfo(healing_elixir charges=2 cd=30 talent=healing_elixir_talent)
+	SpellInfo(healing_elixir charges=2 cd=30 unusable=1)
+	SpellInfo(healing_elixir unusable=0 talent=healing_elixir_talent specialization=brewmaster)
+	SpellInfo(healing_elixir unusable=0 talent=healing_elixir_talent_mistweaver specialization=mistweaver)
 	SpellRequire(healing_elixir unusable 1=debuff,healing_immunity_debuff)
-Define(healing_elixir_talent 13)
-Define(heavy_stagger_debuff 124273)
-	SpellInfo(heavy_stagger_debuff duration=10 tick=1)
-Define(hidden_masters_forbidden_touch 137057)
-Define(hidden_masters_forbidden_touch_buff 213114)
-	SpellInfo(hidden_masters_forbidden_touch_buff duration=5)
-Define(hurricane_strike 152175)
-	SpellInfo(hurricane_strike channel=2 cd=45 chi=3)
-Define(hurricane_strike_talent 19)
-Define(improved_breath_of_fire 157362)
-Define(improved_renewing_mist 157398)
-Define(invoke_niuzao 132578)
-	SpellInfo(invoke_niuzao cd=180 talent=invoke_niuzao_talent)
-Define(invoke_niuzao_talent 17)
-Define(invoke_xuen_the_white_tiger 123904)
-	SpellInfo(invoke_xuen_the_white_tiger cd=180 talent=invoke_xuen_talent)
-Define(invoke_xuen_talent 17)
-Define(ironskin_brew 115308)
-	SpellInfo(ironskin_brew cd=21 charges=3 gcd=0 offgcd=1 cd_haste=melee)
-	SpellInfo(ironskin_brew cd=18 charges=4 gcd=0 offgcd=1 cd_haste=melee talent=light_brewing_talent)
-	SpellAddBuff(ironskin_brew brew_stache_buff=1 trait=brew_stache_trait)
-	SpellAddBuff(ironskin_brew ironskin_brew_buff=1)
-	SpellAddBuff(ironskin_brew blackout_combo_buff=0)
+
+Define(invoke_chiji_the_red_crane 198664)
+	SpellInfo(invoke_chiji_the_red_crane cd=180 totem=1)
+
+
+	SpellInfo(invoke_niuzao_the_black_ox cd=180 totem=1)
+
+	SpellInfo(invoke_xuen_the_white_tiger cd=180 totem=1)
+
+SpellInfo(ironskin_brew cd=15 charges=3 cd_haste=melee)
+SpellInfo(ironskin_brew add_cd=-3 charges=4 talent=light_brewing_talent)
+SpellAddBuff(ironskin_brew ironskin_brew_buff=1)
+SpellAddBuff(ironskin_brew blackout_combo_buff=0)
+
 Define(ironskin_brew_buff 215479)
-	SpellInfo(ironskin_brew_buff duration=6)
-	SpellInfo(ironskin_brew_buff add_duration=0.5 pertrait=potent_kick_trait)
-Define(jab 100780)
-	SpellInfo(jab chi=-1)
-	SpellInfo(jab buff_chi=power_strikes_buff talent=power_strikes_talent)
-	SpellAddBuff(jab power_strikes_buff=0 talent=power_strikes_talent)
-Define(katsuos_eclipse 137029)
-Define(keg_smash 121253)
-	SpellInfo(keg_smash charges=1 cd=8 energy=40 specialization=brewmaster cd_haste=melee)
-	SpellInfo(keg_smash charges=2 if_equipped=stormstouts_last_gasp)
-	SpellAddTargetDebuff(keg_smash keg_smash_debuff=1)
-	SpellAddBuff(keg_smash blackout_combo_buff=0)
-Define(keg_smash_debuff 121253)
-Define(legacy_of_the_emperor 115921)
-	SpellAddBuff(legacy_of_the_emperor legacy_of_the_emperor_buff=1)
-Define(legacy_of_the_emperor_buff 115921)
-	SpellInfo(legacy_of_the_emperor_buff duration=10)
-Define(legacy_of_the_white_tiger 116781)
-	SpellAddBuff(legacy_of_the_white_tiger legacy_of_the_white_tiger_buff=1)
-Define(legacy_of_the_white_tiger_buff 116781)
-	SpellInfo(legacy_of_the_white_tiger_buff duration=10)
-Define(leg_sweep 119381)
-	SpellInfo(leg_sweep unusable=1 talent=!leg_sweep_talent)
-	SpellAddTargetDebuff(leg_sweep leg_sweep_debuff=1)
-Define(leg_sweep_debuff 119381)
-	SpellInfo(leg_sweep_debuff duration=5)
-Define(leg_sweep_talent 12)
-Define(light_brewing_talent 7)
-Define(light_stagger_debuff 124275)
-	SpellInfo(light_stagger_debuff duration=10 tick=1)
-Define(mana_tea 115294)
-	SpellInfo(mana_tea channel=6 texture=inv_misc_herb_jadetealeaf)
-Define(mana_tea_buff 115867)
-	SpellInfo(mana_tea_buff duration=120 max_stacks=20)
-Define(moderate_stagger_debuff 124274)
-	SpellInfo(moderate_stagger_debuff duration=10 tick=1)
-Define(nimble_brew 137562)
-	SpellInfo(nimble_brew cd=120 gcd=0 offgcd=1)
-Define(paralysis 115078)
-	SpellInfo(paralysis cd=15 interrupt=1)
-Define(potent_kick_trait 213047)
-Define(power_strikes_buff 129914)
-Define(power_strikes_talent 7)
-Define(pressure_point_buff 247255)
-	SpellInfo(pressure_point_buff duration=5)
-Define(purifying_brew 119582)
-	SpellInfo(purifying_brew cd=21 charges=3 gcd=0 offgcd=1 cd_haste=melee)
-	SpellInfo(purifying_brew cd=18 charges=4 gcd=0 offgcd=1 cd_haste=melee talent=light_brewing_talent)
-	SpellInfo(purifying_brew unusable=1)
-	SpellAddBuff(purifying_brew elusive_dance_buff=1 talent=elusive_dance_talent)
-	SpellAddBuff(purifying_brew brew_stache_buff=1 trait=brew_stache_trait)
-	SpellAddBuff(purifying_brew blackout_combo_buff=0)
-	SpellRequire(purifying_brew unusable 0=debuff,any_stagger_debuff)
+	SpellInfo(ironskin_brew_buff duration=7)
+
+SpellInfo(keg_smash cd_haste=melee)
+SpellAddBuff(keg_smash blackout_combo_buff=0)
+
+SpellInfo(leg_sweep interrupt=1)
+SpellInfo(leg_sweep add_cd=-10 talent=tiger_tail_sweep_talent)
+
+Define(life_cocoon 116849)
+	SpellInfo(life_cocoon cd=120 duration=12)
+	SpellAddTargetBuff(life_cocoon life_cocoon=1)
+
+Define(mana_tea 197908)
+	SpellInfo(mana_tea cd=90 duration=12)
+	SpellAddBuff(mana_tea mana_tea=1)
+
+Define(mark_of_the_crane_debuff 228287)
+		SpellInfo(mark_of_the_crane_debuff duration=15)
+		
+Define(mystic_touch 8647)
+Define(mystic_touch_debuff 113746)
+
+SpellInfo(paralysis interrupt=1)
+
+Define(provoke 115546)
+	SpellInfo(provoke cd=8)
+
+SpellInfo(purifying_brew charges=3 cd_haste=melee)
+SpellInfo(purifying_brew add_cd=-3 charges=4 talent=light_brewing_talent)
+SpellInfo(purifying_brew unusable=1)
+SpellAddBuff(purifying_brew blackout_combo_buff=0)
+SpellRequire(purifying_brew unusable 0=debuff,any_stagger_debuff)
+
+Define(reawaken 212051)
+
 Define(refreshing_jade_wind 196725)
-	SpellInfo(refreshing_jade_wind cd=6 mana=5)
-Define(refreshing_jade_wind_talent 16)
+	SpellInfo(refreshing_jade_wind cd=9 mana=700 cd_haste=spell duration=9 tick=0.8 haste=spell)
+	SpellAddTargetBuff(refreshing_jade_wind refreshing_jade_wind=1)
+
 Define(renewing_mist 115151)
-	SpellInfo(renewing_mist cd=8 chi=-1)
-	SpellAddBuff(renewing_mist thunder_focus_tea_buff=0 if_spell=thunder_focus_tea)
+	SpellInfo(renewing_mist cd=9)
+	SpellAddBuff(renewing_mist thunder_focus_tea_buff=-1 if_spell=thunder_focus_tea)
 	SpellAddTargetBuff(renewing_mist renewing_mist_buff=1)
-	SpellAddTargetBuff(renewing_mist extend_life_buff=1 itemset=T18 itemcount=2)
+
 Define(renewing_mist_buff 119611)
 	SpellInfo(renewing_mist_buff duration=18 haste=spell tick=2)
-	SpellInfo(renewing_mist_buff add_duration=2 if_spell=improved_renewing_mist)
+	SpellInfo(renewing_mist_buff add_duration=1 talent=mist_wrap_talent)
+
+Define(resuscitate 115178)
+
 Define(revival 115310)
 	SpellInfo(revival cd=180)
-Define(rising_fist_debuff 242259)
-	SpellInfo(rising_fist_debuff duration=8)
-Define(rising_sun_kick 107428)
-	SpellInfo(rising_sun_kick cd=10 chi=2 specialization=windwalker cd_haste=melee)
-	SpellInfo(rising_sun_kick cd=7 specialization=windwalker itemset=T19 itemcount=2)
-	SpellRequire(rising_sun_kick refund_chi cost=buff,serenity_buff if_spell=serenity)
-	SpellAddTargetDebuff(rising_sun_kick rising_fist_debuff=0)
-Define(rushing_jade_wind 116847)
-	SpellInfo(rushing_jade_wind cd=6 cd_haste=melee talent=rushing_jade_wind_talent)
-	SpellInfo(rushing_jade_wind cd=6 cd_haste=melee talent=rushing_jade_wind_talent chi=1 specialization=windwalker)
-	SpellAddBuff(rushing_jade_wind rushing_jade_wind_buff=1)
+
+Define(ring_of_peace 116844)
+	SpellInfo(ring_of_peace cd=45)
+
+SpellInfo(rising_sun_kick cd_haste=melee specialization=windwalker)
+SpellInfo(rising_sun_kick cd_haste=spell cd=12 chi=0 specialization=mistweaver)
+SpellRequire(rising_sun_kick chi_percent 0=buff,serenity)
+SpellAddBuff(rising_sun_kick thunder_focus_tea_buff=-1 if_spell=thunder_focus_tea specialization=mistweaver)
+SpellAddTargetDebuff(rising_sun_kick mark_of_the_crane_debuff=1 specialization=windwalker)
+SpellAddBuff(rising_sun_kick swift_roundhouse_buff=0)
+
+Define(roll 109132)
+	SpellInfo(roll cd=20 charges=2)
+	SpellInfo(roll charges=3 talent=celerity_talent)
+	SpellInfo(roll replaced_by=chi_torpedo talent=chi_torpedo_talent)
+	SpellRequire(roll unusable 1=lossofcontrol,root)
+
+    SpellInfo(rushing_jade_wind chi=0 specialization=!windwalker)
 Define(rushing_jade_wind_buff 116847)
-	SpellInfo(rushing_jade_wind_buff duration=6 haste=melee)
-	SpellInfo(rushing_jade_wind_buff duration=9 haste=melee specialization=brewmaster)
-Define(rushing_jade_wind_talent 16)
-Define(salsalabims_lost_tunic 137016)
-Define(serenity 152173)
-	SpellInfo(serenity cd=90 gcd=0)
-	SpellAddBuff(serenity serenity_buff=1)
-Define(serenity_buff 152173)
-	SpellInfo(serenity_buff duration=10)
-	SpellInfo(serenity_buff duration=5 specialization=brewmaster)
-Define(serenity_talent 21)
-Define(shuffle_buff 115307)
-	SpellInfo(shuffle_buff duration=6)
+    SpellInfo(rushing_jade_wind_buff duration=9 haste=melee)
+    SpellAddBuff(rushing_jade_wind rushing_jade_wind_buff=1 specialization=brewmaster)
+Define(rushing_jade_wind_windwalker_buff 261715)
+    SpellInfo(rushing_jade_wind_windwalker_buff tick=0.8 haste=melee)
+    SpellAddBuff(rushing_jade_wind rushing_jade_wind_windwalker_buff=1 specialization=windwalker)
+    
+Define(song_of_chiji 198898)
+	SpellInfo(song_of_chiji cd=30)
+	SpellAddTargetDebuff(song_of_chiji song_of_chiji_debuff=1)
+Define(song_of_chiji_debuff 198909)
+	SpellInfo(song_of_chiji_debuff duration=20)
 Define(soothing_mist 115175)
-	SpellInfo(soothing_mist cd=1 channel=8)
-	SpellInfo(soothing_mist soothing_mist_buff=1)
-Define(soothing_mist_buff 115175)
-	SpellInfo(soothing_mist_buff duration=8 haste=spell tick=1)
-Define(spear_hand_strike 116705)
-	SpellInfo(spear_hand_strike cd=15 gcd=0 interrupt=1 offgcd=1)
-Define(special_delivery_talent 18)
-Define(spinning_crane_kick 101546)
-	SpellInfo(spinning_crane_kick duration=1.5 tick=0.5)
-	SpellInfo(spinning_crane_kick chi=3 specialization=windwalker)
-Define(stormstouts_last_gasp 151788)
-Define(storm_earth_and_fire 137639)
-	SpellInfo(storm_earth_and_fire tag=cd gcd=0 offgcd=1)
-	SpellAddBuff(storm_earth_and_fire storm_earth_and_fire_buff=1)
-Define(storm_earth_and_fire_buff 137639)
-	SpellInfo(storm_earth_and_fire_buff max_stacks=2)
-Define(strike_of_the_windlord 205320)
-	SpellInfo(strike_of_the_windlord cd=40 chi=2 tag=main)
+	SpellInfo(soothing_mist cd=1 channel=8 duration=8 haste=spell tick=1)
+	SpellAddTargetBuff(soothing_mist soothing_mist=1)
+
+SpellInfo(spinning_crane_kick chi=2 haste=melee specialization=windwalker)
+SpellInfo(spinning_crane_kick chi=0 haste=spell specialization=mistweaver)
+SpellRequire(spinning_crane_kick chi_percent 0=buff,serenity)
+
+    SpellRequire(storm_earth_and_fire unusable 1=buff,storm_earth_and_fire)
+	SpellInfo(storm_earth_and_fire replaced_by=serenity talent=serenity_talent)
+
 Define(summon_black_ox_statue 115315)
-	SpellInfo(summon_black_ox_statue cd=10 duration=900 totem=1)
+	SpellInfo(summon_black_ox_statue cd=10 duration=900 totem=1 max_totems=1)
+
 Define(summon_jade_serpent_statue 115313)
-	SpellInfo(summon_jade_serpent_statue cd=10 duration=900 totem=1)
-Define(surging_mist 116694)
-	SpellInfo(surging_mist chi=-1 specialization=mistweaver)
-	SpellRequire(surging_mist chi -2=buff,vital_mists_buff,5 itemset=T17 itemset=2 specialization=mistweaver)
-	SpellAddBuff(surging_mist thunder_focus_tea_buff=0 if_spell=thunder_focus_tea)
-Define(t18_class_trinket 124517)
+    SpellInfo(summon_jade_serpent_statue cd=10 duration=900 totem=1 max_totems=1)
+
+SpellInfo(swift_roundhouse_buff max_stacks=2)
+
+Define(teachings_of_the_monastery 116645)
 Define(teachings_of_the_monastery_buff 202090)
 	SpellInfo(teachings_of_the_monastery_buff duration=12 max_stacks=3)
-Define(the_emperors_capacitor 144239)
-Define(the_emperors_capacitor_buff 235054)
+
 Define(thunder_focus_tea 116680)
-	SpellInfo(thunder_focus_tea cd=45 gcd=0)
-	SpellInfo(thunder_focus_tea add_cd=-5 itemset=T15_heal itemcount=4)
-	SpellRequire(thunder_focus_tea chi 1=buff,chi_jis_guidance_buff itemset=T17 itemcount=4 specialization=mistweaver)
-	SpellAddBuff(thunder_focus_tea chi_jis_guidance_buff=-1 itemset=T17 itemcount=4 specialization=mistweaver)
-	SpellAddBuff(thunder_focus_tea thunder_focus_tea_buff=1)
-Define(thunder_focus_tea_buff 116680)
-	SpellInfo(thunder_focus_tea_buff duration=30)
-Define(tiger_palm 100780)
-	SpellInfo(tiger_palm energy=50 specialization=windwalker)
-	SpellInfo(tiger_palm energy=25 specialization=brewmaster)
-	SpellAddBuff(tiger_palm teachings_of_the_monastery_buff=1)
-	SpellAddBuff(tiger_palm blackout_combo_buff=0)
-Define(tigereye_brew 116740)
-	SpellInfo(tigereye_brew cd=5 gcd=0)
-	SpellAddBuff(tigereye_brew tigereye_brew_buff=-10 tigereye_brew_use_buff=1)
-Define(tigereye_brew_buff 125195)
-	SpellInfo(tigereye_brew_buff duration=120 max_stacks=20)
-Define(tigereye_brew_use_buff 116740)
-	SpellInfo(tigereye_brew_use_buff duration=15)
-Define(touch_of_death 115080)
-	SpellInfo(touch_of_death cd=120 tag=main)
-	SpellAddTargetDebuff(touch_of_death touch_of_death_debuff=1)
-	SpellRequire(touch_of_death unusable 1=target_debuff,touch_of_death_debuff)
-Define(touch_of_death_debuff 115080)
-	SpellInfo(touch_of_death_debuff duration=8)
-Define(touch_of_karma 122470)
-	SpellInfo(touch_of_karma cd=90 tag=cd)
-Define(uplift 116670)
-	SpellInfo(uplift chi=2)
-Define(vital_mists_buff 118674)
-	SpellInfo(vital_mists_buff duration=30)
-Define(whirling_dragon_punch 152175)
-	SpellInfo(whirling_dragon_punch cd=24 unusable=1)
-	SpellRequire(whirling_dragon_punch unusable 0=oncooldown,rising_sun_kick)
-	SpellRequire(whirling_dragon_punch unusable 0=oncooldown,fists_of_fury)
+	SpellInfo(thunder_focus_tea cd=30 gcd=0 offgcd=1 duration=3)
+	SpellAddBuff(thunder_focus_tea thunder_focus_tea=1)
+	SpellAddBuff(thunder_focus_tea thunder_focus_tea=2 talent=focused_thunder_talent)
+
+SpellInfo(tiger_palm energy=50 specialization=windwalker)
+SpellInfo(tiger_palm energy=25 specialization=brewmaster)
+SpellAddBuff(tiger_palm teachings_of_the_monastery_buff=1 specialization=mistweaver)
+SpellAddBuff(tiger_palm blackout_combo_buff=0 specialization=windwalker)
+SpellAddTargetDebuff(tiger_palm eye_of_the_tiger_debuff=1 specialization=!mistweaver talent=eye_of_the_tiger_talent)
+SpellAddTargetDebuff(tiger_palm mark_of_the_crane_debuff=1 specialization=windwalker)
+
+Define(tigers_lust 116841)
+	SpellInfo(tigers_lust cd=30 duration=6)
+	SpellAddBuff(tigers_lust tigers_lust=1)
+
+SpellRequire(touch_of_death unusable 1=target_debuff,touch_of_death_debuff)
+
+Define(transcendence 101643)
+Define(transcendence_transfer 119996)
+
+Define(vivify 116670)
+	SpellAddBuff(vivify thunder_focus_tea_buff=-1 if_spell=thunder_focus_tea)
+
+SpellInfo(whirling_dragon_punch unusable=1 cd_haste=melee)
+SpellRequire(whirling_dragon_punch unusable 0=oncooldown,rising_sun_kick)
+SpellRequire(whirling_dragon_punch unusable 0=oncooldown,fists_of_fury)
+
 Define(zen_meditation 115176)
 	SpellInfo(zen_meditation cd=300 gcd=0 offgcd=1)
-	SpellInfo(zen_meditation cd=150 if_equipped=fundamental_observation)
-Define(zen_sphere 124081)
-	SpellInfo(zen_sphere cd=10)
-	SpellAddTargetBuff(zen_sphere zen_sphere_buff=1)
-Define(zen_sphere_buff 124081)
-	SpellInfo(zen_sphere_buff duration=16 haste=spell tick=2)
-Define(zen_sphere_talent 5)
-
-# Stagger
+	SpellAddBuff(zen_meditation zen_meditation_buff=1)
+Define(zen_meditation_buff 115176)
+	SpellInfo(zen_meditation_buff duration=8)
+	
+## Stagger
+Define(stagger 115069)
+Define(heavy_stagger_debuff 124273)
+	SpellInfo(heavy_stagger_debuff duration=10 tick=1)
+	SpellInfo(heavy_stagger_debuff add_duration=3 talent=bob_and_weave_talent)
+Define(light_stagger_debuff 124275)
+	SpellInfo(light_stagger_debuff duration=10 tick=1)
+	SpellInfo(light_stagger_debuff add_duration=3 talent=bob_and_weave_talent)
+Define(moderate_stagger_debuff 124274)
+	SpellInfo(moderate_stagger_debuff duration=10 tick=1)
+	SpellInfo(moderate_stagger_debuff add_duration=3 talent=bob_and_weave_talent)
 SpellList(any_stagger_debuff light_stagger_debuff moderate_stagger_debuff heavy_stagger_debuff)
 
+## Items
+Define(hidden_masters_forbidden_touch_buff 213114)
+	SpellInfo(hidden_masters_forbidden_touch_buff duration=5)
+# SpellAddBuff(crackling_jade_lightning the_emperors_capacitor_buff=0)
+
+
+## Talents
+Define(ascension_talent 7)
+Define(bob_and_weave_talent 13)
+Define(celerity_talent 4)
+Define(chi_torpedo_talent 5)
+Define(eye_of_the_tiger_talent 1)
+Define(focused_thunder_talent 19)
+Define(guard_talent 20)
+Define(healing_elixir_talent 14)
+Define(healing_elixir_talent_mistweaver 13)
+Define(high_tolerance_talent 19)
+Define(hit_combo_talent 16)
+Define(inner_strength_talent 13)
+Define(invoke_chiji_the_red_crane_talent 18)
+Define(lifecycles_talent 7)
+Define(light_brewing_talent 7)
+Define(mana_tea_talent 9)
+Define(mist_wrap_talent 1)
+Define(refreshing_jade_wind_talent 17)
+Define(ring_of_peace_talent 12)
+Define(rising_mist_talent 21)
+Define(song_of_chiji_talent 11)
+Define(special_delivery_talent 16)
+Define(spirit_of_the_crane_talent 8)
+Define(spiritual_focus_talent 19)
+Define(spitfire_talent 8)
+Define(summon_black_ox_statue_talent 11)
+Define(summon_jade_serpent_statue_talent 16)
+Define(tiger_tail_sweep_talent 10)
+Define(tigers_lust_talent 6)
+Define(upwelling_talent 20)
+
 # Non-default tags for OvaleSimulationCraft.
-	SpellInfo(chi_brew tag=main)
-	SpellInfo(chi_torpedo tag=shortcd)
-	SpellInfo(dampen_harm tag=cd)
-	SpellInfo(diffuse_magic tag=cd)
+SpellInfo(chi_burst tag=main)
+SpellInfo(chi_torpedo tag=shortcd)
+SpellInfo(dampen_harm tag=cd)
+SpellInfo(diffuse_magic tag=cd)
+SpellInfo(fist_of_the_white_tiger tag=main)
+SpellInfo(ironskin_brew tag=shortcd)
+SpellInfo(purifying_brew tag=shortcd)
+SpellInfo(storm_earth_and_fire tag=cd)
 ]]
     OvaleScripts:RegisterScript("MONK", nil, name, desc, code, "include")
 end

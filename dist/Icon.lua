@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Icon", 10000)
+local __exports = LibStub:NewLibrary("ovale/Icon", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Localization = LibStub:GetLibrary("ovale/Localization")
@@ -11,9 +11,9 @@ local format = string.format
 local find = string.find
 local sub = string.sub
 local next = next
-local pairs = pairs
 local tostring = tostring
 local _G = _G
+local kpairs = pairs
 local GetTime = GetTime
 local PlaySoundFile = PlaySoundFile
 local CreateFrame = CreateFrame
@@ -156,14 +156,14 @@ __exports.OvaleIcon = __class(nil, {
             else
                 self.shortcut:Hide()
             end
-            if actionInRange == 1 then
+            if actionInRange == nil then
+                self.rangeIndicator:Hide()
+            elseif actionInRange then
                 self.rangeIndicator:SetVertexColor(0.6, 0.6, 0.6)
                 self.rangeIndicator:Show()
-            elseif actionInRange == 0 then
+            else
                 self.rangeIndicator:SetVertexColor(1, 0.1, 0.1)
                 self.rangeIndicator:Show()
-            else
-                self.rangeIndicator:Hide()
             end
             if element.namedParams.text then
                 self.focusText:SetText(tostring(element.namedParams.text))
@@ -201,7 +201,7 @@ __exports.OvaleIcon = __class(nil, {
         self.namedParams = namedParams
         self.actionButton = false
         if secure then
-            for k, v in pairs(namedParams) do
+            for k, v in kpairs(namedParams) do
                 local index = find(k, "spell")
                 if index then
                     local prefix = sub(k, 1, index - 1)

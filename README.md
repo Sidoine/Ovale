@@ -2,26 +2,12 @@
 
 It displays one or more icons that show the cooldown of an action.  The action is conditionally defined through a user-defined script, e.g. you may display either [Corruption][] if the DoT is not on your target or [Shadow Bolt][] if the [Corruption][] DoT is already on your target.
 
-The current release of Ovale provides default scripts for the following classes for *Legion*:
-
-- Death Knight: Blood, Forst, Unholy
-- Demon Hunter: Havoc, Vengeance
-- Druid: Balance, Feral, Guardian
-- Hunter: Beast Mastery, Marksmanship, Survival
-- Mage: Arcane, Fire, Frost
-- Monk: Brewmaster, Windwalker
-- Paladin: Protection, Retribution
-- Priest: Shadow
-- Rogue: Assassination, Outlaw, Subtlety
-- Shaman: Elemental, Enhancement
-- Warlock: Affliction, Demonology, Destruction
-- Warrior: Arms, Fury, Protection
-
 Default scripts are based on [SimulationCraft][].  You may also customize the default script to suit your needs (see [Documentation][]) or use scripts made by other users.
+Tank scripts based on guides from icy-veins.com are maintained by the [Ovale_TankScripts][] addon.
+
+**Please use the [Discord Server][ovale-discord] to submit scripts or discuss them. If you want to report bugs, use the [ticket manager][ovale-tickets]. You may contribute code on our [Github][] project or help with [translation][].**
 
 See the [video of a survival hunter][ovale-video] using [Ovale][] during *Wrath of the Lich King*.
-
-**Please use the [forums][ovale-forums] to submit scripts or discuss them. If you want to report bugs, use the [ticket manager][ovale-tickets]. You may contribute code on our [Github][] project or help with [translation][].**
 
 Features
 ========
@@ -57,13 +43,14 @@ You need to reach level 10 and choose a specialization.  However, be aware that 
   [Documentation]: http://wow.curseforge.com/projects/ovale/pages/documentation/
   [Masque]: http://www.curse.com/addons/wow/masque
   [Ovale]: http://www.curse.com/addons/wow/ovale
+  [Ovale_TankScripts]: https://www.curseforge.com/wow/addons/ovale_tankscripts
   [Recount]: http://www.curse.com/addons/wow/recount
   [Shadow Bolt]: http://www.wowhead.com/spell=686
   [SimulationCraft]: http://code.google.com/p/simulationcraft/
   [Skada]: http://www.curse.com/addons/wow/skada
   [SpellFlashCore]: http://www.curse.com/addons/wow/spellflashcore
   [SpellFlash]: http://www.curse.com/addons/wow/spellflash
-  [ovale-forums]: http://forums.wowdps.com/
+  [ovale-discord]: https://discord.gg/PYPpCdc
   [ovale-tickets]: https://github.com/Sidoine/Ovale/issues
   [ovale-video]: http://www.youtube.com/watch?v=rNHvk9GpyiM "Ovale WotLK video"
   [GitHub]: https://github.com/Sidoine/Ovale

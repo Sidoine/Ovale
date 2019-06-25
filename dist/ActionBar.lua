@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/ActionBar", 10000)
+local __exports = LibStub:NewLibrary("ovale/ActionBar", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Localization = LibStub:GetLibrary("ovale/Localization")
@@ -66,38 +66,28 @@ local OvaleActionBarClass = __class(OvaleActionBarBase, {
     end,
     OnInitialize = function(self)
         self:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
-        self:RegisterEvent("PLAYER_ENTERING_WORLD", function(event)
-            return self:UpdateActionSlots(event)
-        end)
+        self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateActionSlots")
         self:RegisterEvent("UPDATE_BINDINGS")
-        self:RegisterEvent("UPDATE_BONUS_ACTIONBAR", function(event)
-            return self:UpdateActionSlots(event)
-        end)
-        self:RegisterEvent("SPELLS_CHANGED", function(event)
-            return self:UpdateActionSlots(event)
-        end)
-        self:RegisterMessage("Ovale_StanceChanged", function(event)
-            return self:UpdateActionSlots(event)
-        end)
-        self:RegisterMessage("Ovale_TalentsChanged", function(event)
-            return self:UpdateActionSlots(event)
-        end)
+        self:RegisterEvent("UPDATE_BONUS_ACTIONBAR", "UpdateActionSlots")
+        self:RegisterEvent("SPELLS_CHANGED", "UpdateActionSlots")
+        self:RegisterMessage("Ovale_StanceChanged", "UpdateActionSlots")
+        self:RegisterMessage("Ovale_TalentsChanged", "UpdateActionSlots")
     end,
     GetKeyBinding = function(self, slot)
         local name
-        if _G["Bartender4"] and slot > 12 then
-            name = "CLICK BT4Button " .. slot .. ":LeftButton"
+        if _G["Bartender4"] then
+            name = "CLICK BT4Button" .. slot .. ":LeftButton"
         else
             if slot <= 24 or slot > 72 then
-                name = "ACTIONBUTTON" .. ((slot - 1) % 12) + 1
+                name = "ACTIONBUTTON" .. (((slot - 1) % 12) + 1)
             elseif slot <= 36 then
-                name = "MULTIACTIONBAR3BUTTON" .. slot - 24
+                name = "MULTIACTIONBAR3BUTTON" .. (slot - 24)
             elseif slot <= 48 then
-                name = "MULTIACTIONBAR4BUTTON" .. slot - 36
+                name = "MULTIACTIONBAR4BUTTON" .. (slot - 36)
             elseif slot <= 60 then
-                name = "MULTIACTIONBAR2BUTTON" .. slot - 48
+                name = "MULTIACTIONBAR2BUTTON" .. (slot - 48)
             else
-                name = "MULTIACTIONBAR1BUTTON" .. slot - 60
+                name = "MULTIACTIONBAR1BUTTON" .. (slot - 60)
             end
         end
         local key = name and GetBindingKey(name)
@@ -173,7 +163,7 @@ local OvaleActionBarClass = __class(OvaleActionBarBase, {
         else
             local start = 1
             local bonus = tonumber(GetBonusBarIndex()) * 12
-            if bonus > 0 and not _G["Bartender4"] then
+            if bonus > 0 then
                 start = 13
                 for slot = bonus - 11, bonus, 1 do
                     self:UpdateActionSlot(slot)
@@ -182,9 +172,9 @@ local OvaleActionBarClass = __class(OvaleActionBarBase, {
             for slot = start, 72, 1 do
                 self:UpdateActionSlot(slot)
             end
-            if event ~= "TimerUpdateActionSlots" then
-                self:ScheduleTimer("TimerUpdateActionSlots", 1)
-            end
+        end
+        if event ~= "TimerUpdateActionSlots" then
+            self:ScheduleTimer("TimerUpdateActionSlots", 1)
         end
         self:StopProfiling("OvaleActionBar_UpdateActionSlots")
     end,
@@ -224,7 +214,7 @@ local OvaleActionBarClass = __class(OvaleActionBarBase, {
                     if  not self.macro[actionText] or slot < self.macro[actionText] then
                         self.macro[actionText] = slot
                     end
-                    local _, _, spellId = GetMacroSpell(id)
+                    local spellId = GetMacroSpell(id)
                     if spellId then
                         if  not self.spell[spellId] or slot < self.spell[spellId] then
                             self.spell[spellId] = slot

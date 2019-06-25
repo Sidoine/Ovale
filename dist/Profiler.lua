@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Profiler", 10000)
+local __exports = LibStub:NewLibrary("ovale/Profiler", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local AceConfig = LibStub:GetLibrary("AceConfig-3.0", true)
@@ -127,7 +127,8 @@ local OvaleProfilerClass = __class(OvaleProfilerBase, {
                 self.enabled = false
                 module.constructor(self, ...)
                 name = name or self:GetName()
-                profiler.options.args.profiling.args.modules.args[name] = {
+                local args = profiler.options.args.profiling.args.modules.args
+                args[name] = {
                     name = name,
                     desc = format(L["Enable profiling for the %s module."], name),
                     type = "toggle"

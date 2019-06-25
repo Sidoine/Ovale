@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Cooldown", 10000)
+local __exports = LibStub:NewLibrary("ovale/Cooldown", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Debug = LibStub:GetLibrary("ovale/Debug")
@@ -19,6 +19,7 @@ local UnregisterRequirement = __Requirement.UnregisterRequirement
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local next = next
 local pairs = pairs
+local tonumber = tonumber
 local GetSpellCooldown = GetSpellCooldown
 local GetTime = GetTime
 local GetSpellCharges = GetSpellCharges
@@ -27,18 +28,16 @@ local __State = LibStub:GetLibrary("ovale/State")
 local OvaleState = __State.OvaleState
 local __PaperDoll = LibStub:GetLibrary("ovale/PaperDoll")
 local OvalePaperDoll = __PaperDoll.OvalePaperDoll
-local __Aura = LibStub:GetLibrary("ovale/Aura")
-local OvaleAura = __Aura.OvaleAura
 local GLOBAL_COOLDOWN = 61304
 local COOLDOWN_THRESHOLD = 0.1
 local BASE_GCD = {
     ["DEATHKNIGHT"] = {
         [1] = 1.5,
-        [2] = "melee"
+        [2] = "base"
     },
     ["DEMONHUNTER"] = {
         [1] = 1.5,
-        [2] = "melee"
+        [2] = "base"
     },
     ["DRUID"] = {
         [1] = 1.5,
@@ -46,7 +45,7 @@ local BASE_GCD = {
     },
     ["HUNTER"] = {
         [1] = 1.5,
-        [2] = "ranged"
+        [2] = "base"
     },
     ["MAGE"] = {
         [1] = 1.5,
@@ -54,7 +53,7 @@ local BASE_GCD = {
     },
     ["MONK"] = {
         [1] = 1,
-        [2] = false
+        [2] = "none"
     },
     ["PALADIN"] = {
         [1] = 1.5,
@@ -66,7 +65,7 @@ local BASE_GCD = {
     },
     ["ROGUE"] = {
         [1] = 1,
-        [2] = false
+        [2] = "none"
     },
     ["SHAMAN"] = {
         [1] = 1.5,
@@ -78,7 +77,7 @@ local BASE_GCD = {
     },
     ["WARRIOR"] = {
         [1] = 1.5,
-        [2] = "melee"
+        [2] = "base"
     }
 }
 __exports.CooldownData = __class(nil, {
@@ -118,7 +117,7 @@ local OvaleCooldownClass = __class(OvaleCooldownBase, {
         self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
         self:UnregisterEvent("UPDATE_SHAPESHIFT_COOLDOWN")
     end,
-    UNIT_SPELLCAST_INTERRUPTED = function(self, event, unit, name, rank, lineId, spellId)
+    UNIT_SPELLCAST_INTERRUPTED = function(self, event, unit, lineId, spellId)
         if unit == "player" or unit == "pet" then
             self:Update(event, unit)
             self:Debug("Resetting global cooldown.")
@@ -164,7 +163,7 @@ local OvaleCooldownClass = __class(OvaleCooldownBase, {
             local cd = self:GetCD(spellId, atTime)
             return cd.start, cd.duration, cd.enable
         end
-        local cdStart, cdDuration, cdEnable = 0, 0, 1
+        local cdStart, cdDuration, cdEnable = 0, 0, true
         if self.sharedCooldown[spellId] then
             for id in pairs(self.sharedCooldown[spellId]) do
                 local start, duration, enable = self:GetSpellCooldown(id, atTime)
@@ -264,7 +263,6 @@ local OvaleCooldownClass = __class(OvaleCooldownBase, {
         if duration > 0 and start + duration > atTime then
             __exports.OvaleCooldown:Log("Spell %d is on cooldown for %fs starting at %s.", spellId, duration, start)
         else
-            local si = OvaleData.spellInfo[spellId]
             duration = OvaleData:GetSpellInfoPropertyNumber(spellId, atTime, "cd", targetGUID)
             if duration then
                 if duration < 0 then
@@ -276,13 +274,9 @@ local OvaleCooldownClass = __class(OvaleCooldownBase, {
             __exports.OvaleCooldown:Log("Spell %d has a base cooldown of %fs.", spellId, duration)
             if duration > 0 then
                 local haste = OvaleData:GetSpellInfoProperty(spellId, atTime, "cd_haste", targetGUID)
-                local multiplier = OvalePaperDoll:GetHasteMultiplier(haste, OvalePaperDoll.next)
-                duration = duration / multiplier
-                if si and si.buff_cdr then
-                    local aura = OvaleAura:GetAura("player", si.buff_cdr, atTime)
-                    if OvaleAura:IsActiveAura(aura, atTime) then
-                        duration = duration * aura.value1
-                    end
+                if haste then
+                    local multiplier = OvalePaperDoll:GetBaseHasteMultiplier(OvalePaperDoll.next)
+                    duration = duration / multiplier
                 end
             end
         end
@@ -324,19 +318,16 @@ local OvaleCooldownClass = __class(OvaleCooldownBase, {
             end
         end
         self.RequireCooldownHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
-            local cdSpellId = tokens
             local verified = false
-            if index then
-                cdSpellId = tokens[index]
-                index = index + 1
-            end
+            local cdSpellId = tokens[index]
+            index = index + 1
             if cdSpellId then
                 local isBang = false
                 if sub(cdSpellId, 1, 1) == "!" then
                     isBang = true
                     cdSpellId = sub(cdSpellId, 2)
                 end
-                local cd = self:GetCD(cdSpellId, atTime)
+                local cd = self:GetCD(tonumber(cdSpellId), atTime)
                 verified =  not isBang and cd.duration > 0 or isBang and cd.duration <= 0
                 local result = verified and "passed" or "FAILED"
                 self:Log("    Require spell %s %s cooldown at time=%f: %s (duration = %f)", cdSpellId, isBang and "OFF" or  not isBang and "ON", atTime, result, cd.duration)

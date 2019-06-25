@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/scripts/ovale_common", 10000)
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_common", 80000)
 if not __exports then return end
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
@@ -65,23 +65,35 @@ Define(unbending_potion_buff 188029)
 SpellList(potion_buff unbending_potion_buff)
 
 Define(astral_healing_potion 152615)
+    ItemInfo(astral_healing_potion offgcd=1 gcd=0)
     ItemRequire(astral_healing_potion unusable 1=debuff,healing_immunity_debuff)
 Define(ancient_healing_potion 127834)
+    ItemInfo(ancient_healing_potion offgcd=1 gcd=0)
     ItemRequire(ancient_healing_potion unusable 1=debuff,healing_immunity_debuff)
 Define(aged_healing_potion 136569)
+    ItemInfo(aged_healing_potion offgcd=1 gcd=0)
     ItemRequire(aged_healing_potion unusable 1=debuff,healing_immunity_debuff)
+Define(coastal_healing_potion 152494)
+    ItemInfo(coastal_healing_potion offgcd=1 gcd=0)
+    ItemRequire(coastal_healing_potion unusable 1=debuff,healing_immunity_debuff)
 Define(healthstone 5512)
+    ItemInfo(healthstone offgcd=1 gcd=0)
     ItemRequire(healthstone unusable 1=debuff,healing_immunity_debuff)
 
 
 SpellList(trinket_proc_spell_power_buff)
 SpellList(trinket_stacking_proc_spell_power_buff)
 
-Define(astral_healing_potion 152615)
-Define(ancient_healing_potion 127834)
-Define(aged_healing_potion 136569)
-Define(healthstone 5512)
 Define(umbral_glaive_storm 242553)
+
+# Battle for Azeroth
+Define(battle_scarred 160053)
+
+Define(battle_potion_of_agility 163223)
+Define(battle_potion_of_intellect 163222)
+Define(battle_potion_of_strength 163224)
+Define(battle_potion_of_stamina 163225)
+Define(steelskin_potion 152557)
 
 ###
 ### Trinkets & OnUse Rings
@@ -147,7 +159,7 @@ Define(archmages_incandescence_str_buff 177160)
 ### Legendary Shared legiondaries
 ###
 
-Define(sephuzs_secret 132452)
+Define(sephuzs_secret_item 132452)
 Define(sephuzs_secret_buff 208051)
 	SpellInfo(sephuzs_secret_buff buff_cd=30 duration=10)
 
@@ -173,10 +185,10 @@ Define(arcane_torrent_dh 202719)
 	SpellInfo(arcane_torrent_dh cd=120 pain=-15 specialization=vengeance)
 	SpellInfo(arcane_torrent_dh cd=120 fury=-15 specialization=havoc)
 Define(berserking 26297)
-	SpellInfo(berserking cd=180)
+	SpellInfo(berserking cd=180 gcd=0 offgcd=1)
 	SpellAddBuff(berserking berserking_buff=1)
 Define(berserking_buff 26297)
-	SpellInfo(berserking_buff duration=10)
+	SpellInfo(berserking_buff duration=12)
 Define(blood_fury_ap 20572)
 	SpellInfo(blood_fury_ap cd=120)
 	SpellAddBuff(blood_fury_ap blood_fury_ap_buff=1)
@@ -192,6 +204,8 @@ Define(blood_fury_sp 33702)
 	SpellAddBuff(blood_fury_sp blood_fury_sp_buff=1)
 Define(blood_fury_sp_buff 33702)
 	SpellInfo(blood_fury_sp_buff duration=15)
+Define(fireblood 265221)
+    SpellInfo(fireblood cd=120)
 Define(darkflight 68992)
 	SpellInfo(darkflight cd=120)
 Define(quaking_palm 107079)
@@ -209,7 +223,14 @@ Define(stoneform_buff 20594)
 	SpellInfo(stoneform_buff duration=8)
 Define(war_stomp 20549)
 	SpellInfo(war_stomp cd=120 interrupt=1)
-    
+Define(lights_judgment 255647)
+	SpellInfo(lights_judgment cd=150)
+Define(fireblood 265221)
+	SpellInfo(fireblood cd=120)
+Define(ancestral_call 274738)
+	SpellInfo(ancestral_call cd=120)
+Define(arcane_pulse 260364)  
+	SpellInfo(arcane_pulse cd=180)
 	
 ###
 ### Boss Spells
@@ -232,7 +253,8 @@ AddFunction UseHealthPotions
 	Item(healthstone usable=1)
 	if CheckBoxOn(opt_use_consumables) 
 	{
-		Item(astral_healing_potion usable=1)
+        Item(coastal_healing_potion usable=1)
+        Item(astral_healing_potion usable=1)
 		Item(ancient_healing_potion usable=1)
 		Item(aged_healing_potion usable=1)
 	}

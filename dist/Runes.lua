@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Runes", 10000)
+local __exports = LibStub:NewLibrary("ovale/Runes", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Debug = LibStub:GetLibrary("ovale/Debug")
@@ -31,7 +31,6 @@ end
 local RuneData = __class(nil, {
     constructor = function(self)
         self.rune = {}
-        self.runicpower = nil
     end
 })
 local usedRune = {}
@@ -44,7 +43,6 @@ local OvaleRunesClass = __class(OvaleRunesBase, {
             end
             self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateAllRunes")
             self:RegisterEvent("RUNE_POWER_UPDATE")
-            self:RegisterEvent("RUNE_TYPE_UPDATE")
             self:RegisterEvent("UNIT_RANGEDDAMAGE")
             self:RegisterEvent("UNIT_SPELL_HASTE", "UNIT_RANGEDDAMAGE")
             if Ovale.playerGUID then
@@ -56,7 +54,6 @@ local OvaleRunesClass = __class(OvaleRunesBase, {
         if Ovale.playerClass == "DEATHKNIGHT" then
             self:UnregisterEvent("PLAYER_ENTERING_WORLD")
             self:UnregisterEvent("RUNE_POWER_UPDATE")
-            self:UnregisterEvent("RUNE_TYPE_UPDATE")
             self:UnregisterEvent("UNIT_RANGEDDAMAGE")
             self:UnregisterEvent("UNIT_SPELL_HASTE")
             self.current.rune = {}
@@ -185,13 +182,12 @@ local OvaleRunesClass = __class(OvaleRunesBase, {
                     start = rune.endCooldown
                 end
             end
-            local duration = 10 / OvalePaperDoll:GetSpellHasteMultiplier(snapshot)
+            local duration = 10 / OvalePaperDoll:GetSpellCastSpeedPercentMultiplier(snapshot)
             consumedRune.startCooldown = start
             consumedRune.endCooldown = start + duration
-            local runicpower = self.next.runicpower
-            runicpower = runicpower + 10
+            local runicpower = (OvalePower.next.power.runicpower or 0) + 10
             local maxi = OvalePower.current.maxPower.runicpower
-            self.next.runicpower = (runicpower < maxi) and runicpower or maxi
+            OvalePower.next.power.runicpower = (runicpower < maxi) and runicpower or maxi
         end
         self:StopProfiling("OvaleRunes_state_ConsumeRune")
     end,
@@ -209,6 +205,23 @@ local OvaleRunesClass = __class(OvaleRunesBase, {
             end
         end
         self:StopProfiling("OvaleRunes_state_RuneCount")
+        return count, startCooldown, endCooldown
+    end,
+    RuneDeficit = function(self, atTime)
+        self:StartProfiling("OvaleRunes_state_RuneDeficit")
+        local state = self:GetState(atTime)
+        local count = 0
+        local startCooldown, endCooldown = huge, huge
+        for slot = 1, RUNE_SLOTS, 1 do
+            local rune = state.rune[slot]
+            if  not IsActiveRune(rune, atTime) then
+                count = count + 1
+                if rune.endCooldown < endCooldown then
+                    startCooldown, endCooldown = rune.startCooldown, rune.endCooldown
+                end
+            end
+        end
+        self:StopProfiling("OvaleRunes_state_RuneDeficit")
         return count, startCooldown, endCooldown
     end,
     GetRunesCooldown = function(self, atTime, runes)

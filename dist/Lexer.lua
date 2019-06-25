@@ -1,10 +1,10 @@
-local __exports = LibStub:NewLibrary("ovale/Lexer", 10000)
+local __exports = LibStub:NewLibrary("ovale/Lexer", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Queue = LibStub:GetLibrary("ovale/Queue")
 local OvaleQueue = __Queue.OvaleQueue
-local pairs = pairs
 local ipairs = ipairs
+local kpairs = pairs
 local wrap = coroutine.wrap
 local find = string.find
 local sub = string.sub
@@ -46,7 +46,7 @@ __exports.OvaleLexer = __class(nil, {
         return wrap(lex)
     end,
     Release = function(self)
-        for key in pairs(self) do
+        for key in kpairs(self) do
             self[key] = nil
         end
     end,

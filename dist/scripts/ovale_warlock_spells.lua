@@ -1,350 +1,600 @@
-local __exports = LibStub:NewLibrary("ovale/scripts/ovale_warlock_spells", 10000)
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_warlock_spells", 80000)
 if not __exports then return end
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 __exports.register = function()
     local name = "ovale_warlock_spells"
-    local desc = "[7.0] Ovale: Warlock spells"
-    local code = [[
-# Warlock spells and functions.
+    local desc = "[8.1] Ovale: Warlock spells"
+    local code = [[Define(agony 980)
+# Inflicts increasing agony on the target, causing up to o1*u Shadow damage over 18 seconds. Damage starts low and increases over the duration. Refreshing Agony maintains its current damage level.rnrn|cFFFFFFFFAgony damage sometimes generates 1 Soul Shard.|r
+# Rank 2: Agony may now ramp up to s1+6 stacks.
+  SpellInfo(agony duration=18 max_stacks=6 tick=2)
+  # Suffering w1 Shadow damage every t1 sec. Damage increases over time.
+  SpellAddTargetDebuff(agony agony=1)
+Define(battle_potion_of_intellect 279151)
+# Increases your Intellect by s1 for 25 seconds.
+  SpellInfo(battle_potion_of_intellect cd=1 duration=25 gcd=0 offgcd=1)
+  # Intellect increased by w1.
+  SpellAddBuff(battle_potion_of_intellect battle_potion_of_intellect=1)
+Define(berserking 26297)
+# Increases your haste by s1 for 12 seconds.
+  SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
+  # Haste increased by s1.
+  SpellAddBuff(berserking berserking=1)
+Define(bilescourge_bombers 267211)
+# Tear open a portal to the nether above the target location, from which several Bilescourge will pour out of and crash into the ground over 6 seconds, dealing (21 of Spell Power) Shadow damage to all enemies within 267213A1 yards.
+  SpellInfo(bilescourge_bombers soulshards=2 cd=30 duration=6 talent=bilescourge_bombers_talent)
+Define(call_dreadstalkers 104316)
+# Summons s1 ferocious Dreadstalkers to attack the target for 12 seconds.
+  SpellInfo(call_dreadstalkers soulshards=2 cd=20)
+Define(cascading_calamity_buff 275376)
+# Casting Unstable Affliction on a target affected by your Unstable Affliction increases your Haste by s1 for 15 seconds
+  SpellInfo(cascading_calamity_buff channel=-0.001 gcd=0 offgcd=1)
 
+Define(cataclysm 152108)
+# Calls forth a cataclysm at the target location, dealing (180 of Spell Power) Shadowflame damage to all enemies within A1 yards and afflicting them with ?s980[Agony and Unstable Affliction][]?s104315[Corruption][]?s348[Immolate][]?!s980&!s104315&!s348[Agony, Unstable Affliction, Corruption, or Immolate][].
+  SpellInfo(cataclysm cd=30 talent=cataclysm_talent)
+Define(channel_demonfire 196447)
+# Launches s1 bolts of felfire over 3 seconds at random targets afflicted by your Immolate within 196449A1 yds. Each bolt deals (16 of Spell Power) Fire damage to the target and (7.000000000000001 of Spell Power) Fire damage to nearby enemies.
+  SpellInfo(channel_demonfire cd=25 duration=3 channel=3 tick=0.2 talent=channel_demonfire_talent)
+  SpellAddBuff(channel_demonfire channel_demonfire=1)
+Define(chaos_bolt 116858)
+# Unleashes a devastating blast of chaos, dealing a critical strike for 2*(120 of Spell Power) Chaos damage. Damage is further increased by your critical strike chance.
+  SpellInfo(chaos_bolt soulshards=2)
+Define(conflagrate 17962)
+# Triggers an explosion on the target, dealing (100 of Spell Power) Fire damage.?s196406[rnrnReduces the cast time of your next Incinerate or Chaos Bolt by 117828s1 for 10 seconds.][]rnrn|cFFFFFFFFGenerates 245330s1 Soul Shard Fragments.|r
+# Rank 2: Conflagrate has s1+1 charges.
+  SpellInfo(conflagrate cd=12.96)
+Define(corruption 172)
+# Corrupts the target, causing 146739o1 Shadow damage over 14 seconds.
+  SpellInfo(corruption)
+  # Suffering w1 Shadow damage every t1 sec.
+  SpellAddTargetDebuff(corruption corruption_debuff=1)
+Define(corruption_debuff 146739)
+# Corrupts the target, causing 146739o1 Shadow damage over 14 seconds.
+  SpellInfo(corruption_debuff duration=14 channel=14 gcd=0 offgcd=1 tick=2)
+  # Suffering w1 Shadow damage every t1 sec.
+  SpellAddTargetDebuff(corruption_debuff corruption_debuff=1)
+Define(dark_soul_instability 113858)
+# Infuses your soul with unstable power, increasing your critical strike chance by 113858s1 for 20 seconds.?s56228[rnrn|cFFFFFFFFPassive:|rrnIncreases your critical strike chance by 113858m1/56228m1. This effect is disabled while on cooldown.][]
+  SpellInfo(dark_soul_instability cd=120 charge_cd=120 duration=20 talent=dark_soul_instability_talent)
+  # Critical strike chance increased by w1.
+  SpellAddBuff(dark_soul_instability dark_soul_instability=1)
+Define(dark_soul_misery 113860)
+# Infuses your soul with the misery of fallen foes, increasing haste by (25 of Spell Power) for 20 seconds.
+  SpellInfo(dark_soul_misery cd=120 duration=20 talent=dark_soul_misery_talent)
+  # Haste increased by s1.
+  SpellAddBuff(dark_soul_misery dark_soul_misery=1)
+Define(deathbolt 264106)
+# Launches a bolt of death at the target, dealing s2 of the total remaining damage of your damage over time effects on the target.?s196103[rnrnCounts up to s3 sec of your Corruption's damage.][]
+  SpellInfo(deathbolt cd=30 talent=deathbolt_talent)
+Define(demonbolt 264178)
+# Send the fiery soul of a fallen demon at the enemy, causing (66.7 of Spell Power) Shadowflame damage.?c2[rnrn|cFFFFFFFFGenerates 2 Soul Shards.|r][]
+  SpellInfo(demonbolt)
+Define(demonic_calling_buff 205146)
+# Shadow Bolt?s264178[ and Demonbolt have][ has] a h chance to make your next Call Dreadstalkers cost s1 less Soul Shard and have no cast time.
+  SpellInfo(demonic_calling_buff duration=20 gcd=0 offgcd=1)
+  # Your next Call Dreadstalkers costs 205145s1 less Soul Shard and has no cast time.
+  SpellAddBuff(demonic_calling_buff demonic_calling_buff=1)
+Define(demonic_power 265273)
+# Summon a Demonic Tyrant to increase the duration of all of your current demons by 265273m3/1000.1 sec, and increase the damage of all of your other demons by 265273s2, while damaging your target.
+  SpellInfo(demonic_power duration=15 gcd=0 offgcd=1)
+  # Damage dealt by your demons increased by s2.
+  SpellAddBuff(demonic_power demonic_power=1)
+Define(demonic_strength 267171)
+# Infuse your Felguard with demonic strength and command it to charge your target and unleash a Felstorm that will deal s2 increased damage.
+  SpellInfo(demonic_strength cd=60 duration=20 talent=demonic_strength_talent)
+  # Your next Felstorm will deal s2 increased damage.
+  SpellAddBuff(demonic_strength demonic_strength=1)
+Define(doom 265412)
+# Inflicts impending doom upon the target, causing (160 of Spell Power) Shadow damage after 30 seconds. rnrnIf Doom kills the target, there is a s2 chance to summon a Doomguard to fight for you for 25 seconds.rnrn|cFFFFFFFFGenerates 1 Soul Shard when dealing damage.|r
+  SpellInfo(doom duration=30 tick=30 talent=doom_talent)
+  # Doomed to take 265469s1 Shadow damage.
+  SpellAddTargetDebuff(doom doom=1)
+Define(drain_life 234153)
+# Drains life from the target, causing o1 Shadow damage over 5 seconds, and healing you for e1*100 of the damage done.
+  SpellInfo(drain_life duration=5 channel=5 tick=1)
+  # Suffering s1 Shadow damage every t1 seconds.rnRestoring health to the Warlock.
+  SpellAddTargetDebuff(drain_life drain_life=1)
+Define(drain_soul 198590)
+# Drains the target's soul, causing o1 Shadow damage over 5 seconds.rnrnDamage is increased by s2 against enemies below s3 health.rnrn|cFFFFFFFFGenerates 1 Soul Shard if the target dies during this effect.|r
+  SpellInfo(drain_soul duration=5 channel=5 tick=1 talent=drain_soul_talent)
+  # Suffering w1 Shadow damage every t1 seconds.
+  SpellAddTargetDebuff(drain_soul drain_soul=1)
+Define(explosive_potential 275398)
+# When your Implosion consumes 3 or more Imps, gain s1 Haste for 15 seconds.
+  SpellInfo(explosive_potential duration=15 channel=15 gcd=0 offgcd=1)
+  # Haste increased by w1.
+  SpellAddBuff(explosive_potential explosive_potential=1)
+
+Define(fireblood 265221)
+# Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. 
+  SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
+Define(grimoire_felguard 111898)
+# Summons a Felguard who attacks the target for s1 sec that deals 216187s1 increased damage.rnrnThis Felguard will stun their target when summoned.
+  SpellInfo(grimoire_felguard soulshards=1 cd=120 duration=17 talent=grimoire_felguard_talent)
+Define(grimoire_of_sacrifice 108503)
+# Sacrifices your demon pet for power, gaining its command demon ability, and causing your spells to sometimes also deal (35 of Spell Power) additional Shadow damage.rnrnLasts 3600 seconds or until you summon a demon pet.
+  SpellInfo(grimoire_of_sacrifice cd=30 talent=grimoire_of_sacrifice_talent)
+
+Define(hand_of_guldan 105174)
+# Calls down a demonic meteor full of Wild Imps which burst forth to attack the target.rnrnDeals up to m1*86040m1 Shadowflame damage on impact to all enemies within 86040A1 yds of the target?s196283[, applies Doom to each target,][] and summons up to m1*104317m2 Wild Imps, based on Soul Shards consumed.
+  SpellInfo(hand_of_guldan soulshards=1)
+Define(haunt 48181)
+# A ghostly soul haunts the target, dealing (55.00000000000001 of Spell Power) Shadow damage and increasing your damage dealt to the target by s2 for 15 seconds.rnrnIf the target dies, Haunt's cooldown is reset.
+  SpellInfo(haunt cd=15 duration=15 talent=haunt_talent)
+  # Taking s2 increased damage from the Warlock. Haunt's cooldown will be reset on death.
+  SpellAddTargetDebuff(haunt haunt=1)
+Define(havoc 80240)
+# Marks a target with Havoc for 10 seconds, causing your single target spells to also strike the Havoc victim for s1 of normal initial damage.
+  SpellInfo(havoc cd=30 duration=10 channel=10 max_stacks=1)
+  # Spells cast by the Warlock also hit this target for s1 of normal initial damage.
+  SpellAddTargetDebuff(havoc havoc=1)
+Define(immolate 348)
+# Burns the enemy, causing (40 of Spell Power) Fire damage immediately and an additional 157736o1 Fire damage over 18 seconds.rnrn|cFFFFFFFFPeriodic damage generates 1 Soul Shard Fragment and has a s2 chance to generate an additional 1 on critical strikes.|r
+  SpellInfo(immolate)
+Define(implosion 196277)
+# Demonic forces suck all of your Wild Imps toward the target, and then cause them to violently explode, dealing 196278s2 Shadowflame damage to all enemies within 196278A3 yards.
+  SpellInfo(implosion)
+Define(incinerate 29722)
+# Draws fire toward the enemy, dealing (64.1 of Spell Power) Fire damage.rnrn|cFFFFFFFFGenerates 244670s1 Soul Shard Fragments and an additional 1 on critical strikes.|r
+  SpellInfo(incinerate max_stacks=5)
+  SpellInfo(shadow_bolt replaced_by=incinerate)
+Define(inevitable_demise_buff 273522)
+# Damaging an enemy with Agony increases the damage of your next Drain Life by s1. This effect stacks up to 273525u times.
+  SpellInfo(inevitable_demise_buff channel=-0.001 gcd=0 offgcd=1)
+  SpellAddBuff(inevitable_demise_buff inevitable_demise_buff=1)
+Define(inner_demons 267216)
+# You passively summon a Wild Imp to fight for you every t1 sec, and have a s1 chance to also summon an additional Demon to fight for you for s2 sec.
+  SpellInfo(inner_demons channel=0 gcd=0 offgcd=1 tick=12 talent=inner_demons_talent)
+  SpellAddBuff(inner_demons inner_demons=1)
+Define(nether_portal 267217)
+# Tear open a portal to the Twisting Nether for 15 seconds. Every time you spend Soul Shards, you will also command demons from the Nether to come out and fight for you.
+  SpellInfo(nether_portal soulshards=1 cd=180 duration=15 talent=nether_portal_talent)
+Define(nightfall_buff 213784)
+# Your damaging spells have a chance to pull a nightmare star from the sky, creating a pool of corruption that deals 10*213786s1 Shadow damage to all enemies in the area over 10 seconds.
+  SpellInfo(nightfall_buff channel=0 gcd=0 offgcd=1)
+
+Define(phantom_singularity 205179)
+# Places a phantom singularity above the target, which consumes the life of all enemies within 205246A2 yards, dealing 8*(18 of Spell Power) damage over 16 seconds, healing you for 205246e2*100 of the damage done.
+  SpellInfo(phantom_singularity cd=45 duration=16 tick=2 talent=phantom_singularity_talent)
+  # Dealing damage to all nearby targets every t1 sec and healing the casting Warlock.
+  SpellAddTargetDebuff(phantom_singularity phantom_singularity=1)
+Define(power_siphon 264130)
+# Instantly sacrifice up to s1 Wild Imps to generate s1 charges of Demonic Core.
+  SpellInfo(power_siphon cd=30 channel=0 talent=power_siphon_talent)
+Define(rain_of_fire 5740)
+# Calls down a rain of hellfire, dealing 42223m1*8 Fire damage over 8 seconds to enemies in the area.
+  SpellInfo(rain_of_fire soulshards=3 duration=8 tick=1)
+  # 42223s1 Fire damage every 5740t2 sec.
+  SpellAddBuff(rain_of_fire rain_of_fire=1)
+Define(seed_of_corruption 27243)
+# Embeds a demon seed in the enemy target that will explode after 12 seconds, dealing (24 of Spell Power) Shadow damage to all enemies within 27285A1 yards and applying Corruption to them.rnrnThe seed will detonate early if the target is hit by other detonations, or takes SPS*s1/100 damage from your spells.
+  SpellInfo(seed_of_corruption soulshards=1 duration=12 tick=12)
+  # Embeded with a demon seed that will soon explode, dealing Shadow damage to the caster's enemies within 27285A1 yards, and applying Corruption to them.rnrnThe seed will detonate early if the target is hit by other detonations, or takes w3 damage from your spells.
+  SpellAddTargetDebuff(seed_of_corruption seed_of_corruption=1)
+Define(shadow_bolt 686)
+# Sends a shadowy bolt at the enemy, causing (34.5 of Spell Power) Shadow damage.?c2[rnrn|cFFFFFFFFGenerates 1 Soul Shard.|r][]
+  SpellInfo(shadow_bolt)
+Define(shadowburn 17877)
+# Blasts a target for (60 of Spell Power) Shadowflame damage. rnrnIf the target dies within 5 seconds and yields experience or honor, Shadowburn's cooldown is reset.rnrn|cFFFFFFFFGenerates 245731s1 Soul Shard Fragments.|r
+  SpellInfo(shadowburn cd=12 duration=5 talent=shadowburn_talent)
+  # If the target dies and yields experience or honor, Shadowburn's cooldown is reset.
+  SpellAddTargetDebuff(shadowburn shadowburn=1)
+Define(siphon_life 63106)
+# Siphons the target's life essence, dealing o1 Shadow damage over 15 seconds and healing you for e1*100 of the damage done.
+  SpellInfo(siphon_life duration=15 tick=3 talent=siphon_life_talent)
+  # Suffering w1 Shadow damage every t1 sec and siphoning life to the casting Warlock.
+  SpellAddTargetDebuff(siphon_life siphon_life=1)
+Define(soul_fire 6353)
+# Burns the enemy's soul, dealing (100 of Spell Power) Fire damage.rnrnCooldown is reduced by <cdr> sec for every Soul Shard you spend.rnrn|cFFFFFFFFGenerates 281490s1 Soul Shard Fragments.|r
+  SpellInfo(soul_fire cd=20 talent=soul_fire_talent)
+Define(soul_strike 264057)
+# Command your Felguard to strike into the soul of its enemy, dealing <damage> Shadow damage.?c2[rnrn|cFFFFFFFFGenerates 1 Soul Shard.|r][]
+  SpellInfo(soul_strike cd=10 talent=soul_strike_talent)
+Define(summon_darkglare 205180)
+# Summons a Darkglare from the Twisting Nether that extends the duration of your damage over time effects on all enemies by s2 sec.rnrnThe Darkglare will serve you for 20 seconds, blasting its target for (32 of Spell Power) Shadow damage, increased by s3 for every damage over time effect you have active on any target.
+  SpellInfo(summon_darkglare cd=180 duration=20)
+  # Summons a Darkglare from the Twisting Nether that blasts its target for Shadow damage, dealing increased damage for every damage over time effect you have active on any target.
+  SpellAddBuff(summon_darkglare summon_darkglare=1)
+Define(summon_demonic_tyrant 265187)
+# Summon a Demonic Tyrant to increase the duration of all of your current demons by 265273m3/1000.1 sec, and increase the damage of all of your other demons by 265273s2, while damaging your target.
+  SpellInfo(summon_demonic_tyrant cd=90 duration=15)
+Define(summon_felguard 30146)
+# Summons a Felguard under your command as a powerful melee combatant.
+  SpellInfo(summon_felguard soulshards=1)
+Define(summon_imp 688)
+# Summons an Imp under your command that casts ranged Firebolts.
+  SpellInfo(summon_imp soulshards=1)
+Define(summon_infernal 1122)
+# Summons an Infernal from the Twisting Nether, impacting for (60 of Spell Power) Fire damage and stunning all enemies in the area for 2 seconds.rnrnThe Infernal will serve you for 30 seconds, dealing (50 of Spell Power)*(100+137046s3)/100 damage to all nearby enemies every 19483t1 sec and generating 264365s1 Soul Shard Fragment every 264364t1 sec.
+  SpellInfo(summon_infernal cd=180 duration=0.25 channel=0.25)
+
+Define(summon_vilefiend 264119)
+# Summon a Vilefiend to fight for you for the next 15 seconds.
+  SpellInfo(summon_vilefiend soulshards=1 cd=45 duration=15 talent=summon_vilefiend_talent)
+Define(unstable_affliction 30108)
+# Afflicts the target with 233490o1 Shadow damage over 8 seconds. You may afflict a target with up to s2 Unstable Afflictions at once.rnrnYou deal s3 increased damage to targets affected by your Unstable Affliction.rnrnIf dispelled, deals (14.499999999999998 of Spell Power)*s1/100 damage to the dispeller and silences them for 4 seconds.?a231791[rnrn|cFFFFFFFFRefunds 231791m1 Soul LShard:Shards; if the target dies while afflicted.|r][]
+# Rank 2: Unstable Affliction refunds m1 Soul LShard:Shards; if the target dies.
+  SpellInfo(unstable_affliction soulshards=1 max_stacks=10)
+Define(vile_taint 278350)
+# Unleashes a vile explosion at the target location, dealing o1 Shadow damage over 10 seconds to all enemies within a1 yds and reducing their movement speed by s2.
+  SpellInfo(vile_taint soulshards=1 cd=20 duration=10 tick=2 talent=vile_taint_talent)
+  # Suffering w1 Shadow damage every t1 sec.rnMovement slowed by s2.
+  SpellAddTargetDebuff(vile_taint vile_taint=1)
+Define(absolute_corruption_talent 5) #21180
+# Corruption is now permanent and deals s2 increased damage.rnrnDuration reduced to s1 sec against players.
+Define(bilescourge_bombers_talent 3) #23138
+# Tear open a portal to the nether above the target location, from which several Bilescourge will pour out of and crash into the ground over 6 seconds, dealing (21 of Spell Power) Shadow damage to all enemies within 267213A1 yards.
+Define(cataclysm_talent 12) #23143
+# Calls forth a cataclysm at the target location, dealing (180 of Spell Power) Shadowflame damage to all enemies within A1 yards and afflicting them with ?s980[Agony and Unstable Affliction][]?s104315[Corruption][]?s348[Immolate][]?!s980&!s104315&!s348[Agony, Unstable Affliction, Corruption, or Immolate][].
+Define(channel_demonfire_talent 20) #23144
+# Launches s1 bolts of felfire over 3 seconds at random targets afflicted by your Immolate within 196449A1 yds. Each bolt deals (16 of Spell Power) Fire damage to the target and (7.000000000000001 of Spell Power) Fire damage to nearby enemies.
+Define(creeping_death_talent 20) #19281
+# Your Agony, Corruption, Siphon Life, and Unstable Affliction deal their full damage s1 faster.
+Define(dark_soul_instability_talent 21) #23092
+# Infuses your soul with unstable power, increasing your critical strike chance by 113858s1 for 20 seconds.?s56228[rnrn|cFFFFFFFFPassive:|rrnIncreases your critical strike chance by 113858m1/56228m1. This effect is disabled while on cooldown.][]
+Define(dark_soul_misery_talent 21) #19293
+# Infuses your soul with the misery of fallen foes, increasing haste by (25 of Spell Power) for 20 seconds.
+Define(deathbolt_talent 3) #23141
+# Launches a bolt of death at the target, dealing s2 of the total remaining damage of your damage over time effects on the target.?s196103[rnrnCounts up to s3 sec of your Corruption's damage.][]
+Define(demonic_calling_talent 4) #22045
+# Shadow Bolt?s264178[ and Demonbolt have][ has] a h chance to make your next Call Dreadstalkers cost s1 less Soul Shard and have no cast time.
+Define(demonic_consumption_talent 20) #22479
+# Your Demonic Tyrant now destroys and absorbs the remaining power of all of your Wild Imps to empower himself.
+Define(demonic_strength_talent 2) #22048
+# Infuse your Felguard with demonic strength and command it to charge your target and unleash a Felstorm that will deal s2 increased damage.
+Define(doom_talent 6) #23158
+# Inflicts impending doom upon the target, causing (160 of Spell Power) Shadow damage after 30 seconds. rnrnIf Doom kills the target, there is a s2 chance to summon a Doomguard to fight for you for 25 seconds.rnrn|cFFFFFFFFGenerates 1 Soul Shard when dealing damage.|r
+Define(drain_soul_talent 2) #23140
+# Drains the target's soul, causing o1 Shadow damage over 5 seconds.rnrnDamage is increased by s2 against enemies below s3 health.rnrn|cFFFFFFFFGenerates 1 Soul Shard if the target dies during this effect.|r
+Define(eradication_talent 2) #22090
+# Chaos Bolt increases the damage you deal to the target by 196414s1 for 7 seconds.
+Define(fire_and_brimstone_talent 11) #22043
+# Incinerate now also hits all enemies near your target for s1 damage and generates s2 Soul Shard Fragment for each additional enemy hit.
+Define(flashover_talent 1) #22038
+# Conflagrate deals s3 increased damage and grants an additional charge of Backdraft.
+Define(grimoire_of_sacrifice_talent 18) #19295
+# Sacrifices your demon pet for power, gaining its command demon ability, and causing your spells to sometimes also deal (35 of Spell Power) additional Shadow damage.rnrnLasts 3600 seconds or until you summon a demon pet.
+Define(grimoire_of_supremacy_talent 17) #23156
+# While you have an Infernal active, every Soul Shard you spend increases the damage of your Chaos Bolt by 266091s1.
+Define(grimoire_felguard_talent 18) #21717
+# Summons a Felguard who attacks the target for s1 sec that deals 216187s1 increased damage.rnrnThis Felguard will stun their target when summoned.
+Define(haunt_talent 17) #23159
+# A ghostly soul haunts the target, dealing (55.00000000000001 of Spell Power) Shadow damage and increasing your damage dealt to the target by s2 for 15 seconds.rnrnIf the target dies, Haunt's cooldown is reset.
+Define(inferno_talent 10) #22480
+# Rain of Fire damage has a s1 chance to generate a Soul Shard Fragment.
+Define(inner_demons_talent 17) #23146
+# You passively summon a Wild Imp to fight for you every t1 sec, and have a s1 chance to also summon an additional Demon to fight for you for s2 sec.
+Define(internal_combustion_talent 5) #21695
+# Chaos Bolt consumes up to s1 sec of Immolate's damage over time effect on your target, instantly dealing that much damage.
+Define(nether_portal_talent 21) #23091
+# Tear open a portal to the Twisting Nether for 15 seconds. Every time you spend Soul Shards, you will also command demons from the Nether to come out and fight for you.
+Define(phantom_singularity_talent 11) #19292
+# Places a phantom singularity above the target, which consumes the life of all enemies within 205246A2 yards, dealing 8*(18 of Spell Power) damage over 16 seconds, healing you for 205246e2*100 of the damage done.
+Define(power_siphon_talent 5) #21694
+# Instantly sacrifice up to s1 Wild Imps to generate s1 charges of Demonic Core.
+Define(roaring_blaze_talent 16) #23155
+# Conflagrate burns the target for an additional 265931o1 Fire damage over 6 seconds.
+Define(shadow_embrace_talent 16) #23139
+# ?s198590[Drain Soul][Shadow Bolt] applies Shadow Embrace, increasing your damage dealt to the target by 32390s1 for 10 seconds. Stacks up to 32390u times.
+Define(shadowburn_talent 6) #23157
+# Blasts a target for (60 of Spell Power) Shadowflame damage. rnrnIf the target dies within 5 seconds and yields experience or honor, Shadowburn's cooldown is reset.rnrn|cFFFFFFFFGenerates 245731s1 Soul Shard Fragments.|r
+Define(siphon_life_talent 6) #22089
+# Siphons the target's life essence, dealing o1 Shadow damage over 15 seconds and healing you for e1*100 of the damage done.
+Define(soul_fire_talent 3) #22040
+# Burns the enemy's soul, dealing (100 of Spell Power) Fire damage.rnrnCooldown is reduced by <cdr> sec for every Soul Shard you spend.rnrn|cFFFFFFFFGenerates 281490s1 Soul Shard Fragments.|r
+Define(soul_strike_talent 11) #22042
+# Command your Felguard to strike into the soul of its enemy, dealing <damage> Shadow damage.?c2[rnrn|cFFFFFFFFGenerates 1 Soul Shard.|r][]
+Define(sow_the_seeds_talent 10) #19279
+# Seed of Corruption now @switch<s2>[][consumes a Soul Shard, if available, to ]embeds a demon seed into s1 additional nearby enemy.
+Define(summon_vilefiend_talent 12) #23160
+# Summon a Vilefiend to fight for you for the next 15 seconds.
+Define(vile_taint_talent 12) #22046
+# Unleashes a vile explosion at the target location, dealing o1 Shadow damage over 10 seconds to all enemies within a1 yds and reducing their movement speed by s2.
+Define(writhe_in_agony_talent 4) #22044
+# Agony's damage may now ramp up to s2 stacks.
+Define(wilfreds_sigil_of_superior_summoning_item 132369)
+Define(cascading_calamity_trait 275372)
+Define(pandemic_invocation_trait 289364)
+Define(explosive_potential_trait 275395)
+    ]]
+    code = code .. [[
+# Aliases
+SpellList(unstable_affliction_debuff unstable_affliction_1_debuff unstable_affliction_2_debuff unstable_affliction_3_debuff unstable_affliction_4_debuff unstable_affliction_5_debuff)
+
+# Dummy buff
+# Warlock.ts
+Define(active_havoc_buff -80240)
+	SpellInfo(active_havoc_buff duration=10)
+
+# Warlock spells and functions.
 Define(agony 980)
 	SpellAddTargetDebuff(agony agony_debuff=1)
 Define(agony_debuff 980)
-	SpellInfo(agony_debuff duration=24 haste=spell max_stacks=10 tick=2)
-Define(archimondes_darkness_talent 16)
-Define(backdraft 117896)
+	SpellInfo(agony_debuff duration=18 haste=spell max_stacks=10 tick=2)
+	SpellInfo(agony_debuff duration=15.3 tick=1.7 talent=creeping_death_talent)
+	SpellInfo(agony_debuff max_stacks=15 talent=writhe_in_agony_talent)
 Define(backdraft_buff 117828)
-	SpellInfo(backdraft_buff duration=15 max_stacks=3)
-# cancel_metamorphosis
-Define(call_dreadstalkers 104316)
-	SpellInfo(call_dreadstalkers soulshards=2 cd=15)
-Define(cataclysm 152108)
-	SpellInfo(cataclysm cd=60 gcd=0)
-Define(cataclysm_talent 20)
-Define(channel_demonfire 196447)
-	SpellInfo(channel_demonfire cd=15 channel=3)
-Define(chaos_bolt 116858)
+	SpellInfo(backdraft_buff duration=10 max_stacks=4)
+Define(banish 710)
+
+	SpellInfo(bilescourge_bombers soulshards=2 cd=30)
+Define(burning_rush 111400)
+	SpellAddBuff(burning_rush burning_rush_buff=1)
+Define(burning_rush_buff 111400)
+
+	
+	SpellRequire(call_dreadstalkers soulshards 1=buff,demonic_calling_buff)
+	SpellAddTargetDebuff(call_dreadstalkers from_the_shadows_debuff talent=from_the_shadows_talent)
+
+	SpellInfo(cataclysm cd=30)
+	SpellAddTargetDebuff(cataclysm immolate_debuff=1)
+
+	SpellInfo(channel_demonfire cd=25 channel=3 unusable=1)
+	SpellRequire(channel_demonfire unusable 0=target_debuff,immolate_debuff)
+
 	SpellInfo(chaos_bolt soulshards=2 travel_time=1)
-	SpellRequire(chaos_bolt replace chaos_bolt_fire_and_brimstone=buff,fire_and_brimstone_buff if_spell=charred_remains if_spell=fire_and_brimstone)
-	SpellAddBuff(chaos_bolt chaotic_infusion_buff=0 itemset=T17 itemcount=4 specialization=destruction)
-	SpellAddBuff(chaos_bolt backdraft_buff=-3 if_spell=backdraft)
-	SpellAddBuff(chaos_bolt fire_and_brimstone_buff=0 if_spell=charred_remains if_spell=fire_and_brimstone)
-	SpellAddBuff(chaos_bolt havoc_buff=-3 if_spell=havoc)
-Define(chaos_wave 124916)
-	SpellInfo(chaos_wave demonicfury=80 travel_time=1)
-	SpellAddBuff(chaos_wave fel_molten_core_aura=1 if_spell=the_codex_of_xerrath)
-	SpellAddBuff(chaos_wave molten_core_aura=1 if_spell=!the_codex_of_xerrath)
-Define(chaotic_infusion_buff 170000)
-	SpellInfo(chaotic_infusion_buff duration=30)
-Define(charred_remains 157696)
-Define(charred_remains_talent 19)
-Define(compounding_horror_buff 199281)
-	SpellAddBuff(unstable_affliction compounding_horror_buff=0)
-Define(conflagrate 17962)
-	SpellInfo(conflagrate soulshards=-1 mana=600)
-	SpellAddBuff(conflagrate havoc_buff=-1 if_spell=havoc)
-Define(conflagration_of_chaos_buff 219195)
-Define(corruption 172)
-	SpellAddTargetDebuff(corruption corruption_debuff=1)
-Define(corruption_debuff 146739)
-	SpellInfo(corruption_debuff duration=18 haste=spell tick=2)
-Define(dark_intent 109773)
-	SpellAddBuff(dark_intent dark_intent_buff=1)
-Define(dark_intent_buff 109773)
-	SpellInfo(dark_intent_buff duration=3600)
-Define(dark_soul_instability 113858)
-	SpellInfo(dark_soul_instability gcd=0)
-	SpellInfo(dark_soul_instability cd=120 talent=!archimondes_darkness_talent)
+	SpellAddBuff(chaos_bolt backdraft_buff=-1)
+	SpellAddTargetDebuff(chaos_bolt eradication_debuff=1 talent=eradication_talent)
+Define(command_demon 119898)
+
+	SpellInfo(conflagrate soulshards=-0.5)
+	SpellAddBuff(conflagrate backdraft_buff=1)
+	SpellAddBuff(conflagrate backdraft_buff=2 talent=flashover_talent)
+
+	
+
+	SpellInfo(corruption_debuff duration=14 haste=spell tick=2)
+	SpellInfo(corruption_debuff duration=11.9 tick=1.7 talent=creeping_death_talent)
+	#SpellInfo(corruption_debuff duration=3600 talent=absolute_corruption_talent)
+Define(create_healthstone 6201)
+Define(create_soulwell 29893)
+Define(dark_pact 108416)
+
+	SpellInfo(dark_soul_instability cd=120)
 	SpellAddBuff(dark_soul_instability dark_soul_instability_buff=1)
 Define(dark_soul_instability_buff 113858)
 	SpellInfo(dark_soul_instability_buff duration=20)
-Define(dark_soul_knowledge 113861)
-	SpellInfo(dark_soul_knowledge gcd=0)
-	SpellInfo(dark_soul_knowledge cd=120 talent=!archimondes_darkness_talent)
-	SpellAddBuff(dark_soul_knowledge dark_soul_knowledge_buff=1)
-Define(dark_soul_knowledge_buff 113861)
-	SpellInfo(dark_soul_knowledge_buff duration=20)
-Define(dark_soul_misery 113860)
-	SpellInfo(dark_soul_misery gcd=0)
-	SpellInfo(dark_soul_misery cd=120 talent=!archimondes_darkness_talent)
+
+	SpellInfo(dark_soul_misery cd=120)
 	SpellAddBuff(dark_soul_misery dark_soul_misery_buff=1)
 Define(dark_soul_misery_buff 113860)
 	SpellInfo(dark_soul_misery_buff duration=20)
-Define(demon_rush_buff 188857)
-	SpellInfo(demon_rush_buff duration=15 max_stacks=5)
-Define(demonbolt 157695)
-	SpellInfo(demonbolt soulshards=-1)
-Define(demonbolt_buff 157695)
-	SpellInfo(demonbolt_buff duration=40 max_stacks=10 stacking=1)
-Define(demonbolt_talent 19)
-Define(demonic_empowerment 193396)
-	SpellRequire(demonic_empowerment unusable 1=pet_buff,demonic_empowerment)
-	SpellAddPetBuff(demonic_empowerment demonic_empowerment=1)
-Define(demonic_calling_buff 205146)
+
+	SpellInfo(deathbolt cd=30)
+
+	SpellInfo(demonbolt soulshards=-2)
+	SpellAddBuff(demonbolt demonic_core_buff=-1)
+
 	SpellInfo(demonic_calling_buff duration=20)
-	SpellRequire(call_dreadstalkers soulshards_percent 0=buff,demonic_calling_buff)
-Define(demonic_power_buff 196099)
-	SpellInfo(demonic_power_buff duration=3600)
-Define(demonic_servitude_talent 21)
-Define(demonic_synergy_buff 171982)
-	SpellInfo(demonic_synergy_buff duration=15)
-Define(demonwrath 193440)
-Define(dimensional_rift 196586)
-	SpellInfo(dimensional_rift cd=45)
-Define(doom 603)
-	SpellInfo(doom soulshards=-1)
+Define(demonic_circle 48018)
+Define(demonic_circle_teleport 48020)
+Define(demonic_core_buff 264173)
+	SpellInfo(demonic_core_buff duration=20 max_stacks=4)
+Define(demonic_gateway 111771)
+
+	SpellInfo(demonic_power duration=15)
+
+	SpellInfo(demonic_strength cd=60)
+	SpellAddPetBuff(demonic_strength demonic_strength_buff=1)
+Define(demonic_strength_buff 267171)
+
 	SpellAddTargetDebuff(doom doom_debuff=1)
-	SpellRequire(doom unusable 1=target_debuff,doom_debuff)
-Define(doom_debuff 603)
-	SpellInfo(doom_debuff duration=60 haste=spell tick=15)
-Define(drain_soul 198590)
+Define(doom_debuff 265412)
+	SpellInfo(doom_debuff duration=30)
+
+
 	SpellInfo(drain_soul channel=4 haste=spell)
-Define(ember_master_buff 145164)	# tier16_4pc_caster
-	SpellInfo(ember_master_buff duration=5)
-Define(embrace_chaos_buff 212019)
-	SpellInfo(embrace_chaos_buff duration=4)
-Define(empowered_life_tap_buff 235156)
-	SpellInfo(empowered_life_tap_buff duration=20)
-Define(enhanced_haunt 157072)
-Define(enhanced_havoc 157126)
-Define(fel_molten_core_aura 140074)
-	SpellInfo(fel_molten_core_aura duration=30 max_stacks=10)
+	SpellInfo(drain_soul replaced_by=shadow_bolt_affliction talent=!drain_soul_talent)
+	SpellAddBuff(drain_soul shadow_embrace_debuff=1 talent=shadow_embrace_talent)
+Define(enslave_demon 1098)
+Define(eradication_debuff 196414)
+	SpellInfo(eradication_debuff duration=7)
+Define(eye_of_kilrogg 126)
+Define(fear 5782)
 Define(felguard_felstorm 89751)
-	SpellInfo(felguard_felstorm cd=45 gcd=0)
-Define(fire_and_brimstone 108683)
-	SpellInfo(fire_and_brimstone cd=1 gcd=0)
-	SpellAddBuff(fire_and_brimstone fire_and_brimstone_buff=1)
-Define(fire_and_brimstone_buff 108683)
-Define(flamelicked_debuff 185229)
-	SpellInfo(flamelicked_debuff duration=10 max_stacks=5)
-Define(grimoire_of_sacrifice 108503)
+	SpellInfo(felguard_felstorm cd=30 gcd=0 offgcd=1)
+Define(from_the_shadows_debuff 270569)
+	SpellInfo(from_the_shadows_debuff duration=12)
+
+	SpellInfo(grimoire_felguard soulshards=1 cd=120)
+
 	SpellInfo(grimoire_of_sacrifice cd=30 gcd=0)
-	SpellAddBuff(grimoire_of_sacrifice grimoire_of_sacrifice_buff=1)
-Define(grimoire_of_sacrifice_buff 108503)
+	
+Define(grimoire_of_sacrifice_buff 196099)
 	SpellInfo(grimoire_of_sacrifice_buff duration=3600)
-Define(grimoire_of_sacrifice_talent 15)
-Define(grimoire_of_service_talent 14)
-Define(grimoire_of_supremacy_talent 13)
-Define(hand_of_guldan 105174)
-	SpellInfo(hand_of_guldan max_travel_time=1.5 soulshards=1 max_soulshards=4) # maximum observed travel time with a bit of padding
-	SpellAddTargetDebuff(hand_of_guldan shadowflame_debuff=1)
-Define(haunt 48181)
-	SpellInfo(haunt mana=5)
-	SpellInfo(haunt travel_time=2.3) # maximum observed travel time with a bit of padding
+Define(grimoire_of_supremacy_buff 266091)
+
+	SpellInfo(hand_of_guldan max_travel_time=1.5 soulshards=1 max_soulshards=3) # maximum observed travel time with a bit of padding
+
+	SpellInfo(haunt cd=15 travel_time=2.3) # maximum observed travel time with a bit of padding
 	SpellAddTargetDebuff(haunt haunt_debuff=1)
 Define(haunt_debuff 48181)
-	SpellInfo(haunt_debuff duration=8 haste=spell tick=2)
-	SpellInfo(haunt_debuff add_duration=2 if_spell=enhanced_haunt)
-Define(haunting_spirits_buff 157698)
-	SpellInfo(haunting_spirits_buff duration=30)
-Define(havoc 80240)
-	SpellInfo(havoc cd=20)
-	SpellInfo(havoc add_cd=-5 if_spell=enhanced_havoc)
-	SpellAddBuff(havoc havoc_buff=3)
+	SpellInfo(haunt_debuff duration=15)
+
+	SpellInfo(havoc cd=30)
 	SpellAddTargetDebuff(havoc havoc_debuff=1)
-Define(havoc_buff 80240)
-	SpellInfo(havoc_buff duration=15 max_stacks=3)
 Define(havoc_debuff 80240)
-	SpellInfo(havoc_debuff duration=15)
-Define(hellfire 1949)
-	SpellInfo(hellfire channel=14)
-Define(immolate 348)
-	SpellAddBuff(immolate havoc_buff=-1 if_spell=havoc)
+	SpellInfo(havoc_debuff duration=10)
+Define(health_funnel 755)
+
 	SpellAddTargetDebuff(immolate immolate_debuff=1)
 Define(immolate_debuff 157736)
-	SpellInfo(immolate_debuff duration=15 haste=spell tick=3)
-Define(impending_doom_talent 4)
-Define(implosion 196277)
-Define(incinerate 29722)
-	SpellInfo(incinerate travel_time=1)
-	SpellAddBuff(incinerate backdraft_buff=-1 if_spell=backdraft)
-	SpellAddBuff(incinerate havoc_buff=-1 if_spell=havoc)
-	SpellAddTargetDebuff(incinerate flamelicked_debuff=1)
-Define(kiljaedens_cunning 137587)
-	SpellInfo(kiljaedens_cunning cd=35 gcd=0)
-	SpellAddBuff(kiljaedens_cunning kiljaedens_cunning_buff=1)
-Define(kiljaedens_cunning_buff 137587)
-	SpellInfo(kiljaedens_cunning_buff duration=8)
-Define(lessons_of_spacetime_buff 236176)
-Define(life_tap 1454)
-	SpellAddBuff(life_tap empowered_life_tap_buff=1 talent=empowered_life_tap_talent)
-Define(lord_of_flames 224103)
-Define(lord_of_flames_buff 224103) #TODO Not sure
-Define(mannoroths_fury 108508)
-	SpellInfo(mannoroths_fury cd=60 gcd=0)
-	SpellAddBuff(mannoroths_fury mannoroths_fury_buff=1)
-Define(mannoroths_fury_buff 108508)
-	SpellInfo(mannoroths_fury_buff duration=10)
-Define(mannoroths_fury_talent 18)
-Define(mark_of_doom_debuff 184073)
-	SpellInfo(mark_of_doom_debuff duration=10)
-Define(molten_core_aura 122355)
-	SpellInfo(molten_core_aura duration=30 max_stacks=10)
-SpellList(molten_core_buff fel_molten_core_aura molten_core_aura)
+	SpellInfo(immolate_debuff duration=18 haste=spell tick=3)
+
+
+	SpellInfo(incinerate travel_time=1 soulshards=-0.2)
+	SpellAddBuff(incinerate backdraft_buff=-1)
+
+	SpellInfo(inner_demons unusable=1)
 Define(mortal_coil 6789)
-Define(phantom_singularity 205179)
-	SpellInfo(phantom_singularity cd=60)
-Define(power_trip_talent 11)
-Define(rain_of_fire 5740)
-Define(rain_of_fire_debuff 5740)
-	SpellInfo(rain_of_fire_debuff duration=8 haste=spell tick=1)
-Define(roaring_blaze_debuff 205184) #TODO Check this
-Define(roaring_blaze_talent 2)
-Define(seed_of_corruption 27243)
+
+	SpellInfo(nether_portal cd=180 soulshards=3)
+	SpellAddBuff(nether_portal nether_portal_buff=1)
+Define(nether_portal_buff 267218)
+	SpellInfo(nether_portal_buff duration=20)
+Define(nightfall_buff 264571)
+	SpellInfo(nightfall_buff duration=1)
+
+	SpellInfo(phantom_singularity cd=45)
+ # TODO usabe with 2+ wilds imps
+	SpellAddBuff(power_siphon demonic_core_buff=2)
+
+	SpellInfo(rain_of_fire soulshards=3)
+Define(reverse_entropy_buff 266030)
+	SpellInfo(reverse_entropy_buff duration=8)
+Define(ritual_of_summoning 698)
+Define(roaring_blaze_debuff 265931)
+	SpellInfo(roaring_blaze_debuff duration=6 tick=2 haste=spell)
+
 	SpellInfo(seed_of_corruption soulshards=1)
-	SpellRequire(seed_of_corruption replace seed_of_corruption_soulburn=buff,soulburn_buff if_spell=soulburn)
-	SpellRequire(seed_of_corruption unusable 1=buff,soulburn_buff if_spell=soulburn)
 	SpellAddTargetDebuff(seed_of_corruption seed_of_corruption_debuff=1)
-Define(seed_of_corruption_aura 27243)
-	SpellInfo(seed_of_corruption_aura duration=18 tick=3)
-SpellList(seed_of_corruption_debuff seed_of_corruption_aura seed_of_corruption_soulburn_debuff)
-Define(seed_of_corruption_soulburn 114790)
-	SpellRequire(seed_of_corruption_soulburn unusable 1=buff,!soulburn_buff)
-	SpellAddTargetDebuff(seed_of_corruption_soulburn seed_of_corruption_soulburn_debuff=1)
-Define(seed_of_corruption_soulburn_debuff 114790)
-	SpellInfo(seed_of_corruption_soulburn_debuff duration=18 tick=3)
-Define(service_doomguard 157900)
-	SpellInfo(service_doomguard cd=120 shared_cd=service_pet soulshards=1)
-	SpellInfo(service_doomguard unusable=1 talent=!demonic_servitude_talent)
-Define(service_felguard 111898)
-	SpellInfo(service_felguard cd=120 shared_cd=service_pet soulshards=1)
-Define(service_felhunter 111897)
-	SpellInfo(service_felhunter cd=120 shared_cd=service_pet soulshards=1)
-Define(service_imp 111859)
-	SpellInfo(service_imp cd=120 shared_cd=service_pet soulshards=1)
-Define(service_infernal 157901)
-	SpellInfo(service_infernal cd=120 shared_cd=service_pet soulshards=1)
-	SpellInfo(service_infernal unusable=1 talent=!demonic_servitude_talent)
-Define(service_succubus 111896)
-	SpellInfo(service_succubus cd=120 shared_cd=service_pet soulshards=1)
-Define(service_pet 108501)
-Define(service_voidwalker 111895)
-	SpellInfo(service_voidwalker cd=120 shared_cd=service_pet soulshards=1)
-Define(shadow_bolt 686)
-	SpellInfo(shadow_bolt demonicfury=-25 specialization=demonology)
-	SpellInfo(shadow_bolt travel_time=2.2) # maximum observed travel time with a bit of padding
-	SpellAddBuff(shadow_bolt fel_molten_core_aura=1,target_health_pct,25 if_spell=the_codex_of_xerrath specialization=demonology)
-	SpellAddBuff(shadow_bolt molten_core_aura=1,target_health_pct,25 if_spell=!the_codex_of_xerrath specialization=demonology)
-Define(shadowburn 17877)
-	SpellInfo(shadowburn soulshards=-0.5 target_health_pct=20)
-	SpellAddBuff(shadowburn havoc_buff=-1 if_spell=havoc)
-Define(shadowflame 205181)
-	SpellInfo(shadowflame cd=14 soulshards=-1)
-Define(shadowflame_debuff 205181)
-	SpellInfo(shadowflame_debuff duration=8 haste=spell tick=2)
-Define(shard_instability_buff 216457)
-Define(siphon_life 63106)
+Define(seed_of_corruption_debuff 27243)
+	SpellInfo(seed_of_corruption_debuff duration=12)
+
+	SpellInfo(shadow_bolt soulshards=-1 travel_time=2.2)
+Define(shadow_bolt_affliction 232670)
+	SpellInfo(shadow_bolt_affliction travel_time=2.2)
+	SpellInfo(shadow_bolt_affliction replaced_by=drain_soul talent=drain_soul_talent)
+	SpellAddBuff(shadow_bolt_affliction nightfall_buff=-1)
+	SpellAddBuff(shadow_bolt_affliction shadow_embrace_debuff=1 talent=shadow_embrace_talent)
+Define(shadow_embrace_debuff 32390)
+	SpellInfo(shadow_embrace_debuff duration=10 max_stacks=3)
+
+	SpellInfo(shadowburn soulshards=-0.3 charges=2 cd=12)
+
 	SpellAddTargetDebuff(siphon_life siphon_life_debuff=1)
 Define(siphon_life_debuff 63106)
-	SpellInfo(siphon_life_debuff duration=15 tick=3)
-Define(soul_conduit_talent 21)
-Define(soul_effigy 205178)
-	SpellAddTargetDebuff(soul_effigy soul_effigy_debuff=1)
-Define(soul_effigy_debuff 205178)
-Define(soul_effigy_talent 19)
-Define(soul_fire 6353)
-	SpellInfo(soul_fire demonicfury=-30 travel_time=1)
-	SpellAddBuff(soul_fire fel_molten_core_aura=-1,target_health_pct,!25 if_spell=the_codex_of_xerrath)
-	SpellAddBuff(soul_fire molten_core_aura=-1,target_health_pct,!25 if_spell=!the_codex_of_xerrath)
-	SpellAddBuff(soul_fire demon_rush_buff=1 itemset=T18 itemcount=2 specialization=demonology)
-Define(soul_harvest 196098)
-	SpellInfo(soul_harvest cd=120)
-	SpellAddBuff(soul_harvest soul_harvest_buff=1)
-Define(soul_harvest_buff 196098)
-Define(soul_harvest_talent 16)
-Define(soul_swap 86121)
-	SpellInfo(soul_swap soulshards=1)
-	SpellRequire(soul_swap replace soul_swap_soulburn=buff,soulburn_buff)
-	SpellAddBuff(soul_swap soul_swap_buff=1)
-Define(soul_swap_buff 86211)
-	SpellInfo(soul_swap_buff duration=3)
-Define(soul_swap_exhale 86213)
-	SpellAddBuff(soul_swap_exhale soul_swap_buff=0)
-Define(soul_swap_soulburn 119678)
-	SpellInfo(soul_swap_soulburn soulshards=1)
-	SpellAddTargetDebuff(soul_swap_soulburn agony_debuff=1 corruption_debuff=1 unstable_affliction_debuff=1)
-Define(soulburn 74434)
-	SpellInfo(soulburn cd=1 gcd=0 soulshards=1)
-	SpellAddBuff(soulburn soulburn_buff=1)
-Define(soulburn_buff 74434)
-	SpellInfo(soulburn_buff duration=30)
-Define(soulburn_haunt_talent 19)
-Define(summon_darkglare 205180)
-	SpellInfo(summon_darkglare soulshards=1 cd=24)
-Define(summon_doomguard 18540)
-	SpellInfo(summon_doomguard cd=180 soulshards=1)
-	SpellInfo(summon_doomguard replace=summon_doomguard_demonic_servitude talent=demonic_servitude_talent)
-Define(summon_doomguard_demonic_servitude 157757)
-Define(summon_felguard 30146)
+	SpellInfo(siphon_life_debuff duration=15 tick=3 haste=spell)
+	SpellInfo(siphon_life_debuff duration=12.8 tick=2.5 haste=spell talent=creeping_death_talent)
+
+	SpellInfo(soul_fire soulshards=-0.4 cd=20 travel_time=1)
+Define(soul_leech 108370)
+Define(soul_link 108415)
+Define(soul_shards 246985)
+
+	SpellInfo(soul_strike soulshards=-1 cd=10)
+Define(soulstone 20707)
+
+	SpellInfo(summon_darkglare cd=180)
+
+	SpellInfo(summon_demonic_tyrant cd=90)
+
+	
 Define(summon_felhunter 691)
-Define(summon_imp 688)
-Define(summon_infernal 1122)
-	SpellInfo(summon_infernal cd=180 soulshards=1)
-	SpellInfo(summon_infernal replace=summon_infernal_demonic_servitude talent=demonic_servitude_talent)
-Define(summon_infernal_demonic_servitude 157898)
+	SpellInfo(summon_felhunter soulshards=1)
+
+	
+
+	SpellInfo(summon_infernal cd=180)
 Define(summon_succubus 712)
+	SpellInfo(summon_succubus soulshards=1)
+
+	SpellInfo(summon_vilefiend soulshards=1 cd=45)
 Define(summon_voidwalker 697)
-Define(t18_class_trinket 124522)
-Define(the_codex_of_xerrath 101508)
-Define(unstable_affliction 30108)
-    SpellInfo(unstable_affliction soulshards=1)
-    SpellAddTargetDebuff(unstable_affliction unstable_affliction_debuff=1)
-Define(unstable_affliction_debuff 30108)
-    SpellInfo(unstable_affliction_debuff duration=8 haste=spell)
-Define(wrathguard_mortal_cleave 115625)
-	SpellInfo(wrathguard_mortal_cleave gcd=0)
-	#SpellInfo(wrathguard_mortal_cleave energy=60)
-	SpellAddTargetDebuff(wrathguard_mortal_cleave wrathguard_mortal_cleave_debuff=1)
-Define(wrathguard_mortal_cleave_debuff 115625)
-	SpellInfo(wrathguard_mortal_cleave_debuff duration=6)
-Define(wrathguard_wrathstorm 115831)
-	SpellInfo(wrathguard_wrathstorm cd=45 gcd=0)
+	SpellInfo(summon_voidwalker soulshards=1)
+Define(unending_breath 5697)
+Define(unending_resolve 104773)
+	SpellInfo(unending_resolve cd=180)
+	SpellAddBuff(unending_resolve unending_resolve_buff=1)
+Define(unending_resolve_buff 104773)
+	SpellInfo(unending_resolve_buff duration=8)
+
+	SpellInfo(unstable_affliction soulshards=1)
+	# TODO apply affliction debuff
+Define(unstable_affliction_1_debuff 233940)
+	SpellInfo(unstable_affliction_1_debuff duration=8 tick=2)
+	SpellInfo(unstable_affliction_1_debuff duration=6.8 tick=1.7 talent=creeping_death_talent)
+Define(unstable_affliction_2_debuff 233946)
+	SpellInfo(unstable_affliction_2_debuff duration=8 tick=2)
+	SpellInfo(unstable_affliction_2_debuff duration=6.8 tick=1.7 talent=creeping_death_talent)
+Define(unstable_affliction_3_debuff 233947)
+	SpellInfo(unstable_affliction_3_debuff duration=8 tick=2)
+	SpellInfo(unstable_affliction_3_debuff duration=6.8 tick=1.7 talent=creeping_death_talent)
+Define(unstable_affliction_4_debuff 233948)
+	SpellInfo(unstable_affliction_4_debuff duration=8 tick=2)
+	SpellInfo(unstable_affliction_4_debuff duration=6.8 tick=1.7 talent=creeping_death_talent)
+Define(unstable_affliction_5_debuff 233949)
+	SpellInfo(unstable_affliction_5_debuff duration=8 tick=2)
+	SpellInfo(unstable_affliction_5_debuff duration=6.8 tick=1.7 talent=creeping_death_talent)
+
+	SpellInfo(vile_taint soulshards=1 cd=20)
+Define(vile_taint_debuff 278350)
+	SpellInfo(vile_taint_debuff duration=10)
+
+# Azerite Traits
+Define(cascading_calamity_trait 275376)
+ #TODO verify buff id
+
+Define(forbidden_knowledge_buff 278738) #TODO verify buff id
+Define(inevitable_demise_trait 273521)
+Define(inevitable_demise_buff 273521) #TODO verify buff id
 
 # Talents
-Define(absolute_corruption_talent 5)
-Define(contagion_talent 4)
-Define(deaths_embrace_talent 19)
-Define(empowered_life_tap_talent 6)
-Define(eradication_talent 5)
-Define(fire_and_brimstone_talent 11)
-Define(grimoire_of_synergy_talent 18)
-Define(hand_of_doom_talent 10)
-Define(haunt_talent 1)
-Define(implosion_talent 6)
-Define(malefic_grasp_talent 3)
-Define(shadowy_inspiration_talent 1)
-	Define(shadowy_inspiration_buff 196606)
-Define(siphon_life_talent 10)
-Define(sow_the_seeds_talent 11)
-Define(summon_darkglare_talent 19)
-Define(wreak_havoc_talent 19)
-Define(writhe_in_agony_talent 2)
+
+
+Define(burning_rush_talent 8)
+
+
+
+Define(dark_pact_talent 9)
+
+
+Define(darkfury_talent 13)
+
+Define(demon_skin_talent 7)
+
+Define(demonic_circle_talent 15)
+Define(demonic_consumption_talent 20)
+
+
+
+Define(dreadlash_talent 1)
+
+
+
+Define(from_the_shadows_talent 10)
+
+
+
+
+
+
+
+Define(mortal_coil_talent 14)
+
+Define(nightfall_talent 1)
+
+
+Define(reverse_entropy_talent 4)
+
+Define(sacrificed_souls_talent 19)
+
+
+
+Define(demo_soul_conduit_talent 16)
+Define(soul_conduit_talent 19)
+
+
+
+
+
+
 
 # Legendary items
 Define(deadwind_harvester_buff 216708)
 Define(sindorei_spite_icd 208871) # TODO should be the internal cooldown of the spell
 Define(tormented_souls_buff 216695)
-SpellList(concordance_of_the_legionfall_buff 243096 242583 242584 242586)
 
-# Legion Artifact
-Define(thalkiels_consumption 211714)
-	SpellInfo(thalkiels_consumption cd=45)
-Define(reap_souls 216698)
-	SpellInfo(reap_souls unusable=1)
-	SpellAddBuff(reap_souls deadwind_harvester=1)
-	SpellAddBuff(reap_souls tormented_souls_buff=0)
-	SpellRequire(reap_souls unusable 0=buff,tormented_souls_buff)
-
-# Legion traits
-Define(thalkiels_ascendance 238145)
 
 # Pets
-Define(doomguard 11859)
+Define(demonic_tyrant 135002)
 Define(wild_imp 55659)
 Define(dreadstalker 98035)
 Define(darkglare 103673)
 Define(infernal 89)
+Define(felguard 17252)
 
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(dark_soul_instability tag=cd)

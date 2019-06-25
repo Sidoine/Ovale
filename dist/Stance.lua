@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Stance", 10000)
+local __exports = LibStub:NewLibrary("ovale/Stance", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Localization = LibStub:GetLibrary("ovale/Localization")
@@ -29,6 +29,8 @@ local __State = LibStub:GetLibrary("ovale/State")
 local OvaleState = __State.OvaleState
 local __Data = LibStub:GetLibrary("ovale/Data")
 local OvaleData = __Data.OvaleData
+local __tools = LibStub:GetLibrary("ovale/tools")
+local isString = __tools.isString
 local druidCatForm = GetSpellInfo(768)
 local druidTravelForm = GetSpellInfo(783)
 local druidAquaticForm = GetSpellInfo(1066)
@@ -115,9 +117,10 @@ local OvaleStanceClass = __class(OvaleStanceBase, {
         self:StartProfiling("OvaleStance_CreateStanceList")
         wipe(self.stanceList)
         wipe(self.stanceId)
-        local _, name, stanceName
+        local name, stanceName, spellId
         for i = 1, GetNumShapeshiftForms(), 1 do
-            _, name = GetShapeshiftFormInfo(i)
+            _, _, _, spellId = GetShapeshiftFormInfo(i)
+            name = GetSpellInfo(spellId)
             stanceName = SPELL_NAME_TO_STANCE[name]
             if stanceName then
                 self.stanceList[i] = stanceName
@@ -202,14 +205,11 @@ local OvaleStanceClass = __class(OvaleStanceBase, {
         self.STANCE_NAME = STANCE_NAME
         self.RequireStanceHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
             local verified = false
-            local stance = tokens
-            if index then
-                stance = tokens[index]
-                index = index + 1
-            end
+            local stance = tokens[index]
+            index = index + 1
             if stance then
                 local isBang = false
-                if sub(stance, 1, 1) == "!" then
+                if isString(stance) and sub(stance, 1, 1) == "!" then
                     isBang = true
                     stance = sub(stance, 2)
                 end

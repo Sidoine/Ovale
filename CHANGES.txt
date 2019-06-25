@@ -1,0 +1,248 @@
+lightweight tag 330812e0b8abc6f9a0ba8d333c0a80524a9b7d2e 8.1.0
+Author:	GitHub <noreply@github.com>
+Date:	Wed Feb 27 10:34:27 2019 +0100
+
+commit 55a5699825acf6bbd4a7bfd273dd358ce1ccd307
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Sun Feb 24 12:01:44 2019 +0100
+
+    Define lock_and_load_buff
+
+commit 55a5699825acf6bbd4a7bfd273dd358ce1ccd307
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Sun Feb 24 12:01:44 2019 +0100
+
+    Define lock_and_load_buff
+
+commit 4b192688b8405a8d6feb61b59a9f323bb62d5c10
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Sun Feb 24 12:01:18 2019 +0100
+
+    arcane missiles and clearcasting cleanup
+
+commit dcb2e244f7d1cc4901410e8129bed3ddccb1f2aa
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Sun Feb 24 11:34:43 2019 +0100
+
+    PoM only applies to arcane blast
+
+commit b1e1508c5f7240c4f8dedfd60750b3b22d167d11
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Sat Feb 9 01:09:01 2019 +0100
+
+    opportunity only reduces energy cost of pistal shot by 50%
+
+commit 68982364cdeb8776bfe7b883bb96297763b049ff
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Fri Feb 8 13:53:25 2019 +0100
+
+    restore definition for shadow_word_void
+
+commit 251a9bc855ef65a69fb02f104d35fe1c1f0af1d5
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Fri Feb 8 13:51:36 2019 +0100
+
+    update priest talents
+
+commit bdf9cdbf3678b35fa43493f1009f249b7ff57178
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Thu Feb 7 00:42:01 2019 +0100
+
+    fell barrage to shortcd
+
+commit 44e62e59e1caff94e0450f20488a22ac0b8202e2
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Mon Feb 4 16:40:54 2019 +0100
+
+    update to latest simc scripts
+
+commit 44e62e59e1caff94e0450f20488a22ac0b8202e2
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Mon Feb 4 16:40:54 2019 +0100
+
+    update to latest simc scripts
+
+commit 200e4c41b93654b71596c6394c005c97ed1166ce
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Mon Feb 4 16:18:45 2019 +0100
+
+    Missing define for elemental_spirits_talent
+
+commit 093213b5c94f08388916b44242c91197130e8884
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Wed Jan 2 23:16:21 2019 +0100
+
+    latest simc profiles
+
+commit 093213b5c94f08388916b44242c91197130e8884
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Wed Jan 2 23:16:21 2019 +0100
+
+    latest simc profiles
+
+commit 7c2239cb5bed020453547850680455f9b2e3036b
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Sun Dec 30 03:04:52 2018 +0100
+
+    prevent doom when already applied
+
+commit 627df239677583495422cf9c721a7c253c23d2ba
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Thu Dec 27 02:42:50 2018 +0100
+
+    latest profiles
+
+commit 613614b556e7bb6ee1a12c1a6345718942b54e97
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Sun Dec 23 20:29:27 2018 +0100
+
+    update latest simc profiles
+
+commit 8fc0c6fc5976383de4b02e2c540900cc9206bb02
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Sun Dec 23 20:01:04 2018 +0100
+
+    warrior of elune not usable when the buff is up
+
+commit ad0680d29a7c57ecececbda8ef02d53eb7c5c91c
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Sun Dec 23 19:56:04 2018 +0100
+
+    warrior_of_elune_buff
+
+commit 5bd71b457efefc80f1156d8495c41e911bdd17e4
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Sun Dec 23 19:51:14 2018 +0100
+
+    update simc profiles
+
+commit 1c5a9dcf7ae5bb41fcd424c6ac644c274a046529
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Sun Dec 23 19:50:07 2018 +0100
+
+    warrior of elune
+
+commit bf92579791985a95eb613df7e3ed3f319d63831e
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Sun Dec 23 18:57:38 2018 +0100
+
+    RJW only requires chi in WW
+
+commit 8488df5ab6f2ef42d0a9045253ceb38b56e7a3ab
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Sun Dec 23 18:49:38 2018 +0100
+
+    Revert "remove incap roar for guardian druid"
+    
+    This reverts commit 358f0fcb3c1c9d397e90c7b37e54dc8c495aa018.
+
+commit 440f34b9a38af361555172eda45b0b308de49315
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Sun Dec 23 18:49:32 2018 +0100
+
+    Revert "remove incap roar from guardian (dist)"
+    
+    This reverts commit 8e50ed72a401fea5fa294c50d70c664e6e0f245c.
+
+commit a68c7f38bb8a5cea68ade142dfd833d4e07742b0
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Thu Dec 20 23:59:03 2018 +0100
+
+    Bugfix for keybindings after exiting vehicle
+
+commit eb3f01e044448769e46f26d21ad7ea7bcd1cfb05
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Tue Dec 18 23:56:56 2018 +0100
+
+    update berserking
+
+commit fa949e8f70c5e76d9a8ebe2ae1ba3659e7b19ea5
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Tue Dec 18 23:52:47 2018 +0100
+
+    steady_focus_talent is still a thing
+
+commit de6dfffb695c29e2ba1cd658cd4f5c380ee0bb21
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Tue Dec 18 23:52:37 2018 +0100
+
+    lethal_shots_talent removed
+
+commit cf462f6bbc659da6578962617b48e1ead43c07c2
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Tue Dec 18 23:52:21 2018 +0100
+
+    exposed_elements_talent removed
+
+commit 8e50ed72a401fea5fa294c50d70c664e6e0f245c
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Tue Dec 18 23:44:03 2018 +0100
+
+    remove incap roar from guardian (dist)
+
+commit 1ae3a9fbcdbda353ed506194bb197042115daa52
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Tue Dec 18 23:40:24 2018 +0100
+
+    update to latest simc profiles
+
+commit 9ddab984d91445e4d48dae4ffa2e1c5c19a927b2
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Tue Dec 18 23:39:40 2018 +0100
+
+    action.<spell>.x properties use by fire mage
+    
+    See #602
+
+commit 2f9aa371c3852832958a96d11e4348388bff6cf9
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Tue Dec 18 23:38:15 2018 +0100
+
+    impl for use_while_casting
+    
+    see #601
+
+commit dc72791574f88b2718bc3d4304e8f2f797c91731
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Tue Dec 18 23:37:48 2018 +0100
+
+    implementation for op="sub" for variable
+    
+    dummy implementation. See #600
+
+commit 9df0821b807ce5e900aa057e469278126e4b2f16
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Tue Dec 18 23:35:35 2018 +0100
+
+    define expected_combat_length
+
+commit a3073a3ee1bd95345fc6ee81e4a2d7b2dc21a1d6
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Tue Dec 18 23:34:34 2018 +0100
+
+    define dance_of_chiji_buff
+
+commit 89545b4c9a1ac4c51e1cceb89eff7b74569d85ed
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Tue Dec 18 22:05:32 2018 +0100
+
+    define ca_inc ca_inc_buff
+
+commit 1c8628adfa795d87d650688f16aabef886b97701
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Tue Dec 18 22:04:04 2018 +0100
+
+    update scripts titles to 8.1
+
+commit 21214756aa7a6805b17d2c49d4021672d322d006
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Tue Dec 18 21:48:51 2018 +0100
+
+    update toc version
+
+commit 358f0fcb3c1c9d397e90c7b37e54dc8c495aa018
+Author: Hemario <kevin.de.smet@outlook.be>
+Date:   Sun Dec 16 19:20:41 2018 +0100
+
+    remove incap roar for guardian druid
+

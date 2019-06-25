@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Power", 10000)
+local __exports = LibStub:NewLibrary("ovale/Power", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Localization = LibStub:GetLibrary("ovale/Localization")
@@ -25,10 +25,11 @@ local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local ceil = math.ceil
 local INFINITY = math.huge
 local floor = math.floor
+local ipairs = ipairs
 local pairs = pairs
-local type = type
 local tostring = tostring
 local tonumber = tonumber
+local kpairs = pairs
 local lower = string.lower
 local concat = table.concat
 local insert = table.insert
@@ -46,6 +47,7 @@ local __BaseState = LibStub:GetLibrary("ovale/BaseState")
 local baseState = __BaseState.baseState
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isNumber = __tools.isNumber
+local isLuaArray = __tools.isLuaArray
 local strlower = lower
 local self_SpellcastInfoPowerTypes = {
     [1] = "chi",
@@ -75,8 +77,8 @@ do
     end
 end
 local PowerModule = __class(nil, {
-    GetPowerRate = function(self, powerType)
-        if baseState.next.inCombat then
+    GetPowerRate = function(self, powerType, atTime)
+        if OvaleFuture:IsInCombat(atTime) then
             return self.activeRegen[powerType]
         else
             return self.inactiveRegen[powerType]
@@ -88,7 +90,7 @@ local PowerModule = __class(nil, {
             local now = baseState.next.currentTime
             local seconds = atTime - now
             if seconds > 0 then
-                local powerRate = self:GetPowerRate(powerType) or 0
+                local powerRate = self:GetPowerRate(powerType, atTime) or 0
                 power = power + powerRate * seconds
             end
         end
@@ -102,6 +104,22 @@ local PowerModule = __class(nil, {
         if si and si[powerType] then
             local cost, ratio = OvaleData:GetSpellInfoPropertyNumber(spellId, atTime, powerType, targetGUID, true)
             if ratio and ratio ~= 0 then
+                local addRequirements = si and si.require["add_" .. powerType .. "_from_aura"]
+                if addRequirements then
+                    for v, rArray in pairs(addRequirements) do
+                        if isLuaArray(rArray) then
+                            for _, requirement in ipairs(rArray) do
+                                local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                                if verified then
+                                    local aura = OvaleAura:GetAura("player", requirement[2], atTime, nil, true)
+                                    if OvaleAura:IsActiveAura(aura, atTime) then
+                                        cost = cost + (tonumber(v) or 0) * aura.stacks
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
                 local maxCostParam = "max_" .. powerType
                 local maxCost = si[maxCostParam]
                 if maxCost then
@@ -111,19 +129,6 @@ local PowerModule = __class(nil, {
                     elseif power > cost then
                         cost = power
                     end
-                else
-                    local addRequirements = si and si.require["add_" .. powerType .. "_from_aura"]
-                    if addRequirements then
-                        for v, requirement in pairs(addRequirements) do
-                            local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
-                            if verified then
-                                local aura = OvaleAura:GetAura("player", requirement[2], atTime, nil, true)
-                                if aura[v] then
-                                    cost = cost + aura[v]
-                                end
-                            end
-                        end
-                    end
                 end
                 spellCost = (cost > 0 and floor(cost * ratio)) or ceil(cost * ratio)
                 local refund = si["refund_" .. powerType] or 0
@@ -132,15 +137,19 @@ local PowerModule = __class(nil, {
                 else
                     local refundRequirements = si and si.require["refund_" .. powerType]
                     if refundRequirements then
-                        for v, requirement in pairs(refundRequirements) do
-                            local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
-                            if verified then
-                                if v == "cost" then
-                                    spellRefund = spellCost
-                                elseif isNumber(v) then
+                        for v, rArray in pairs(refundRequirements) do
+                            if isLuaArray(rArray) then
+                                for _, requirement in ipairs(rArray) do
+                                    local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                                    if verified then
+                                        if v == "cost" then
+                                            spellRefund = spellCost
+                                        elseif isNumber(v) then
+                                        end
+                                        refund = refund + (tonumber(v) or 0)
+                                        break
+                                    end
                                 end
-                                refund = refund + (tonumber(v) or 0)
-                                break
                             end
                         end
                     end
@@ -175,7 +184,7 @@ local PowerModule = __class(nil, {
                     cost = cost + extraPower
                 end
                 if power < cost then
-                    local powerRate = self:GetPowerRate(powerType) or 0
+                    local powerRate = self:GetPowerRate(powerType, atTime) or 0
                     if powerRate > 0 then
                         seconds = (cost - power) / powerRate
                     else
@@ -194,11 +203,8 @@ local PowerModule = __class(nil, {
         self.power = {}
         self.RequirePowerHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
             local verified = false
-            local baseCost = tokens
-            if index then
-                baseCost = tokens[index]
-                index = index + 1
-            end
+            local baseCost = tokens[index]
+            index = index + 1
             if baseCost then
                 if baseCost > 0 then
                     local powerType = requirement
@@ -222,7 +228,7 @@ local PowerModule = __class(nil, {
             else
                 Ovale:OneTimeMessage("Warning: requirement '%s' power is missing a cost argument.", requirement)
                 Ovale:OneTimeMessage(tostring(index))
-                if type(tokens) == "table" then
+                if isLuaArray(tokens) then
                     for k, v in pairs(tokens) do
                         Ovale:OneTimeMessage(k .. " = " .. tostring(v))
                     end
@@ -233,53 +239,98 @@ local PowerModule = __class(nil, {
     end
 })
 local OvalePowerBase = OvaleState:RegisterHasState(OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvalePower", aceEvent))), PowerModule)
+local POWERS = {
+    mana = true,
+    rage = true,
+    focus = true,
+    energy = true,
+    combopoints = true,
+    runicpower = true,
+    soulshards = true,
+    lunarpower = true,
+    holypower = true,
+    alternate = true,
+    maelstrom = true,
+    chi = true,
+    insanity = true,
+    arcanecharges = true,
+    pain = true,
+    fury = true
+}
+__exports.POWER_TYPES = {}
 local OvalePowerClass = __class(OvalePowerBase, {
-    constructor = function(self)
-        self.POWER_INFO = {}
-        self.POWER_TYPE = {}
-        self.POOLED_RESOURCE = {
-            ["DRUID"] = "energy",
-            ["HUNTER"] = "focus",
-            ["MONK"] = "energy",
-            ["ROGUE"] = "energy"
-        }
-        self.PRIMARY_POWER = {
-            energy = true,
-            focus = true,
-            mana = true
-        }
-        self.RequirePowerHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
-            return self:GetState(atTime).RequirePowerHandler(spellId, atTime, requirement, tokens, index, targetGUID)
+    OnInitialize = function(self)
+        self:RegisterEvent("PLAYER_ENTERING_WORLD", "EventHandler")
+        self:RegisterEvent("PLAYER_LEVEL_UP", "EventHandler")
+        self:RegisterEvent("UNIT_DISPLAYPOWER")
+        self:RegisterEvent("UNIT_LEVEL")
+        self:RegisterEvent("UNIT_MAXPOWER")
+        self:RegisterEvent("UNIT_POWER_UPDATE")
+        self:RegisterEvent("UNIT_POWER_FREQUENT", "UNIT_POWER_UPDATE")
+        self:RegisterEvent("UNIT_RANGEDDAMAGE")
+        self:RegisterEvent("UNIT_SPELL_HASTE", "UNIT_RANGEDDAMAGE")
+        self:RegisterMessage("Ovale_StanceChanged", "EventHandler")
+        self:RegisterMessage("Ovale_TalentsChanged", "EventHandler")
+        self:initializePower()
+        for powerType in pairs(self.POWER_INFO) do
+            RegisterRequirement(powerType, self.RequirePowerHandler)
         end
-        self.CopySpellcastInfo = function(mod, spellcast, dest)
-            for _, powerType in pairs(self_SpellcastInfoPowerTypes) do
-                if spellcast[powerType] then
-                    dest[powerType] = spellcast[powerType]
-                end
-            end
-        end
-        OvalePowerBase.constructor(self)
-        local powerTokens = {
-            mana = "MANA",
-            rage = "RAGE",
-            focus = "FOCUS",
-            energy = "ENERGY",
-            combopoints = "COMBO_POINTS",
-            runicpower = "RUNIC_POWER",
-            soulshards = "SOUL_SHARDS",
-            lunarpower = "LUNAR_POWER",
-            holypower = "HOLY_POWER",
-            alternate = "ALTERNATE_RESOURCE_TEXT",
-            maelstrom = "MAELSTROM",
-            chi = "CHI",
-            insanity = "INSANITY",
-            arcanecharges = "ARCANE_CHARGES",
-            pain = "PAIN",
-            fury = "FURY"
+    end,
+    initializePower = function(self)
+        local possiblePowerTypes = {
+            DEATHKNIGHT = {
+                runicpower = "RUNIC_POWER"
+            },
+            DEMONHUNTER = {
+                pain = "PAIN",
+                fury = "FURY"
+            },
+            DRUID = {
+                mana = "MANA",
+                rage = "RAGE",
+                energy = "ENERGY",
+                combopoints = "COMBO_POINTS",
+                lunarpower = "LUNAR_POWER"
+            },
+            HUNTER = {
+                focus = "FOCUS"
+            },
+            MAGE = {
+                mana = "MANA",
+                arcanecharges = "ARCANE_CHARGES"
+            },
+            MONK = {
+                mana = "MANA",
+                energy = "ENERGY",
+                chi = "CHI"
+            },
+            PALADIN = {
+                mana = "MANA",
+                holypower = "HOLY_POWER"
+            },
+            PRIEST = {
+                mana = "MANA",
+                insanity = "INSANITY"
+            },
+            ROGUE = {
+                energy = "ENERGY",
+                combopoints = "COMBO_POINTS"
+            },
+            SHAMAN = {
+                mana = "MANA",
+                maelstrom = "MAELSTROM"
+            },
+            WARLOCK = {
+                mana = "MANA",
+                soulshards = "SOUL_SHARDS"
+            },
+            WARRIOR = {
+                rage = "RAGE"
+            }
         }
         for powerType, powerId in pairs(Enum.PowerType) do
             local powerTypeLower = strlower(powerType)
-            local powerToken = powerTokens[powerTypeLower]
+            local powerToken = Ovale.playerClass ~= nil and possiblePowerTypes[Ovale.playerClass][powerTypeLower]
             if powerToken then
                 self.POWER_TYPE[powerId] = powerTypeLower
                 self.POWER_TYPE[powerToken] = powerTypeLower
@@ -287,25 +338,11 @@ local OvalePowerClass = __class(OvalePowerBase, {
                     id = powerId,
                     token = powerToken,
                     mini = 0,
+                    type = powerTypeLower,
                     maxCost = (powerTypeLower == "combopoints" and MAX_COMBO_POINTS) or 0
                 }
+                insert(__exports.POWER_TYPES, powerTypeLower)
             end
-        end
-    end,
-    OnInitialize = function(self)
-        self:RegisterEvent("PLAYER_ENTERING_WORLD", "EventHandler")
-        self:RegisterEvent("PLAYER_LEVEL_UP", "EventHandler")
-        self:RegisterEvent("UNIT_DISPLAYPOWER")
-        self:RegisterEvent("UNIT_LEVEL")
-        self:RegisterEvent("UNIT_MAXPOWER")
-        self:RegisterEvent("UNIT_POWER")
-        self:RegisterEvent("UNIT_POWER_FREQUENT", "UNIT_POWER")
-        self:RegisterEvent("UNIT_RANGEDDAMAGE")
-        self:RegisterEvent("UNIT_SPELL_HASTE", "UNIT_RANGEDDAMAGE")
-        self:RegisterMessage("Ovale_StanceChanged", "EventHandler")
-        self:RegisterMessage("Ovale_TalentsChanged", "EventHandler")
-        for powerType in pairs(self.POWER_INFO) do
-            RegisterRequirement(powerType, self.RequirePowerHandler)
         end
     end,
     OnDisable = function(self)
@@ -317,7 +354,7 @@ local OvalePowerClass = __class(OvalePowerBase, {
         self:UnregisterEvent("UNIT_DISPLAYPOWER")
         self:UnregisterEvent("UNIT_LEVEL")
         self:UnregisterEvent("UNIT_MAXPOWER")
-        self:UnregisterEvent("UNIT_POWER")
+        self:UnregisterEvent("UNIT_POWER_UPDATE")
         self:UnregisterEvent("UNIT_POWER_FREQUENT")
         self:UnregisterEvent("UNIT_RANGEDDAMAGE")
         self:UnregisterEvent("UNIT_SPELL_HASTE")
@@ -349,7 +386,7 @@ local OvalePowerClass = __class(OvalePowerBase, {
             end
         end
     end,
-    UNIT_POWER = function(self, event, unitId, powerToken)
+    UNIT_POWER_UPDATE = function(self, event, unitId, powerToken)
         if unitId == "player" then
             local powerType = self.POWER_TYPE[powerToken]
             if powerType then
@@ -376,10 +413,6 @@ local OvalePowerClass = __class(OvalePowerBase, {
                 local maxPower = UnitPowerMax("player", powerInfo.id, powerInfo.segments)
                 if self.current.maxPower[powerType] ~= maxPower then
                     self.current.maxPower[powerType] = maxPower
-                    if maxPower == 0 then
-                        self.POWER_INFO[powerType] = nil
-                        UnregisterRequirement(powerType)
-                    end
                     Ovale:needRefresh()
                 end
             end
@@ -394,19 +427,19 @@ local OvalePowerClass = __class(OvalePowerBase, {
             self:DebugTimestamp("%s: %d -> %d (%s).", event, self.current.power[powerType], power, powerType)
             if self.current.power[powerType] ~= power then
                 self.current.power[powerType] = power
-                Ovale:needRefresh()
             end
         else
-            for powerType, powerInfo in pairs(self.POWER_INFO) do
+            for powerType, powerInfo in kpairs(self.POWER_INFO) do
                 local power = UnitPower("player", powerInfo.id, powerInfo.segments)
                 self:DebugTimestamp("%s: %d -> %d (%s).", event, self.current.power[powerType], power, powerType)
                 if self.current.power[powerType] ~= power then
                     self.current.power[powerType] = power
-                    Ovale:needRefresh()
                 end
             end
         end
-        Ovale:needRefresh()
+        if event == "UNIT_POWER_UPDATE" then
+            Ovale:needRefresh()
+        end
         self:StopProfiling("OvalePower_UpdatePower")
     end,
     UpdatePowerRegen = function(self, event)
@@ -449,7 +482,7 @@ local OvalePowerClass = __class(OvalePowerBase, {
             local typeId = spellPowerCost.type
             for pt, p in pairs(self.POWER_INFO) do
                 if p.id == typeId and (powerType == nil or pt == powerType) then
-                    return cost, pt
+                    return cost, p.type
                 end
             end
         end
@@ -470,14 +503,14 @@ local OvalePowerClass = __class(OvalePowerBase, {
         return self:GetState(atTime):TimeToPower(spellId, atTime, targetGUID, powerType, extraPower)
     end,
     InitializeState = function(self)
-        for powerType in pairs(__exports.OvalePower.POWER_INFO) do
+        for powerType in kpairs(__exports.OvalePower.POWER_INFO) do
             self.next.power[powerType] = 0
             self.next.inactiveRegen[powerType], self.next.activeRegen[powerType] = 0, 0
         end
     end,
     ResetState = function(self)
         __exports.OvalePower:StartProfiling("OvalePower_ResetState")
-        for powerType in pairs(__exports.OvalePower.POWER_INFO) do
+        for powerType in kpairs(__exports.OvalePower.POWER_INFO) do
             self.next.power[powerType] = self.current.power[powerType] or 0
             self.next.maxPower[powerType] = self.current.maxPower[powerType] or 0
             self.next.activeRegen[powerType] = self.current.activeRegen[powerType] or 0
@@ -486,7 +519,7 @@ local OvalePowerClass = __class(OvalePowerBase, {
         __exports.OvalePower:StopProfiling("OvalePower_ResetState")
     end,
     CleanState = function(self)
-        for powerType in pairs(__exports.OvalePower.POWER_INFO) do
+        for powerType in kpairs(__exports.OvalePower.POWER_INFO) do
             self.next.power[powerType] = nil
         end
     end,
@@ -514,9 +547,9 @@ local OvalePowerClass = __class(OvalePowerBase, {
             end
         end
         if si then
-            for powerType, powerInfo in pairs(__exports.OvalePower.POWER_INFO) do
-                local cost, refund = self.next:PowerCost(spellId, powerType, atTime, targetGUID)
-                local power = self[powerType] or 0
+            for powerType, powerInfo in kpairs(__exports.OvalePower.POWER_INFO) do
+                local cost, refund = self.next:PowerCost(spellId, powerInfo.type, atTime, targetGUID)
+                local power = self.next.power[powerType] or 0
                 if cost then
                     power = power - cost
                 end
@@ -525,7 +558,7 @@ local OvalePowerClass = __class(OvalePowerBase, {
                 end
                 local seconds = OvaleFuture.next.nextCast - atTime
                 if seconds > 0 then
-                    local powerRate = self.next:GetPowerRate(powerType) or 0
+                    local powerRate = self.next:GetPowerRate(powerType, atTime) or 0
                     power = power + powerRate * seconds
                 end
                 local mini = powerInfo.mini or 0
@@ -536,7 +569,7 @@ local OvalePowerClass = __class(OvalePowerBase, {
                 if maxi and power > maxi then
                     power = maxi
                 end
-                self[powerType] = power
+                self.next.power[powerType] = power
             end
         end
         __exports.OvalePower:StopProfiling("OvalePower_state_ApplyPowerCost")
@@ -544,6 +577,32 @@ local OvalePowerClass = __class(OvalePowerBase, {
     PowerCost = function(self, spellId, powerType, atTime, targetGUID, maximumCost)
         return self:GetState(atTime):PowerCost(spellId, powerType, atTime, targetGUID, maximumCost)
     end,
+    constructor = function(self, ...)
+        OvalePowerBase.constructor(self, ...)
+        self.POWER_INFO = {}
+        self.POWER_TYPE = {}
+        self.POOLED_RESOURCE = {
+            ["DRUID"] = "energy",
+            ["HUNTER"] = "focus",
+            ["MONK"] = "energy",
+            ["ROGUE"] = "energy"
+        }
+        self.PRIMARY_POWER = {
+            energy = true,
+            focus = true,
+            mana = true
+        }
+        self.RequirePowerHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
+            return self:GetState(atTime).RequirePowerHandler(spellId, atTime, requirement, tokens, index, targetGUID)
+        end
+        self.CopySpellcastInfo = function(mod, spellcast, dest)
+            for _, powerType in pairs(self_SpellcastInfoPowerTypes) do
+                if spellcast[powerType] then
+                    dest[powerType] = spellcast[powerType]
+                end
+            end
+        end
+    end
 })
 __exports.OvalePower = OvalePowerClass()
 OvaleState:RegisterState(__exports.OvalePower)

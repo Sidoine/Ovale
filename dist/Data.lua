@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Data", 10000)
+local __exports = LibStub:NewLibrary("ovale/Data", 80000)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Ovale = LibStub:GetLibrary("ovale/Ovale")
@@ -11,6 +11,7 @@ local __Requirement = LibStub:GetLibrary("ovale/Requirement")
 local nowRequirements = __Requirement.nowRequirements
 local CheckRequirements = __Requirement.CheckRequirements
 local type = type
+local ipairs = ipairs
 local pairs = pairs
 local tonumber = tonumber
 local wipe = wipe
@@ -102,29 +103,6 @@ local OvaleDataClass = __class(OvaleDataBase, {
         self.itemList = {}
         self.spellInfo = {}
         self.buffSpellList = {
-            fear_debuff = {
-                [5246] = true,
-                [5484] = true,
-                [5782] = true,
-                [8122] = true
-            },
-            incapacitate_debuff = {
-                [6770] = true,
-                [12540] = true,
-                [20066] = true,
-                [137460] = true
-            },
-            root_debuff = {
-                [122] = true,
-                [339] = true
-            },
-            stun_debuff = {
-                [408] = true,
-                [853] = true,
-                [1833] = true,
-                [5211] = true,
-                [46968] = true
-            },
             attack_power_multiplier_buff = {
                 [6673] = true,
                 [19506] = true,
@@ -294,10 +272,22 @@ local OvaleDataClass = __class(OvaleDataBase, {
         if  not si then
             si = {
                 aura = {
-                    player = {},
-                    target = {},
-                    pet = {},
-                    damage = {}
+                    player = {
+                        HELPFUL = {},
+                        HARMFUL = {}
+                    },
+                    target = {
+                        HELPFUL = {},
+                        HARMFUL = {}
+                    },
+                    pet = {
+                        HELPFUL = {},
+                        HARMFUL = {}
+                    },
+                    damage = {
+                        HELPFUL = {},
+                        HARMFUL = {}
+                    }
                 },
                 require = {}
             }
@@ -356,7 +346,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
     CheckSpellAuraData = function(self, auraId, spellData, atTime, guid)
         guid = guid or OvaleGUID:UnitGUID("player")
         local index, value, data
-        local spellDataArray
+        local spellDataArray = nil
         if isLuaArray(spellData) then
             spellDataArray = spellData
             value = spellData[1]
@@ -422,11 +412,15 @@ local OvaleDataClass = __class(OvaleDataBase, {
         local value = ii and ii[property]
         local requirements = ii and ii.require[property]
         if requirements then
-            for v, requirement in pairs(requirements) do
-                local verified = CheckRequirements(itemId, atTime, requirement, 1, targetGUID)
-                if verified then
-                    value = tonumber(v) or v
-                    break
+            for v, rArray in pairs(requirements) do
+                if isLuaArray(rArray) then
+                    for _, requirement in ipairs(rArray) do
+                        local verified = CheckRequirements(itemId, atTime, requirement, 1, targetGUID)
+                        if verified then
+                            value = tonumber(v) or v
+                            break
+                        end
+                    end
                 end
             end
         end
@@ -438,11 +432,15 @@ local OvaleDataClass = __class(OvaleDataBase, {
         local value = si and si[property]
         local requirements = si and si.require[property]
         if requirements then
-            for v, requirement in pairs(requirements) do
-                local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
-                if verified then
-                    value = tonumber(v) or v
-                    break
+            for v, rArray in pairs(requirements) do
+                if isLuaArray(rArray) then
+                    for _, requirement in ipairs(rArray) do
+                        local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                        if verified then
+                            value = tonumber(v) or v
+                            break
+                        end
+                    end
                 end
             end
         end
@@ -461,13 +459,17 @@ local OvaleDataClass = __class(OvaleDataBase, {
         if atTime then
             local ratioRequirements = si and si.require[ratioParam]
             if ratioRequirements then
-                for v, requirement in pairs(ratioRequirements) do
-                    local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
-                    if verified then
-                        if ratio ~= 0 then
-                            ratio = ratio * ((tonumber(v) / 100) or 1)
-                        else
-                            break
+                for v, rArray in pairs(ratioRequirements) do
+                    if isLuaArray(rArray) then
+                        for _, requirement in ipairs(rArray) do
+                            local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                            if verified then
+                                if ratio ~= 0 then
+                                    ratio = ratio * ((tonumber(v) / 100) or 1)
+                                else
+                                    break
+                                end
+                            end
                         end
                     end
                 end
@@ -483,10 +485,14 @@ local OvaleDataClass = __class(OvaleDataBase, {
             if atTime then
                 local addRequirements = si and si.require[addParam]
                 if addRequirements then
-                    for v, requirement in pairs(addRequirements) do
-                        local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
-                        if verified then
-                            value = value + (tonumber(v) or 0)
+                    for v, rArray in pairs(addRequirements) do
+                        if isLuaArray(rArray) then
+                            for _, requirement in ipairs(rArray) do
+                                local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                                if verified then
+                                    value = value + (tonumber(v) or 0)
+                                end
+                            end
                         end
                     end
                 end
@@ -499,7 +505,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
         end
         return value * ratio
     end,
-    GetDamage = function(self, spellId, attackpower, spellpower, mainHandWeaponDamage, offHandWeaponDamage, combopoints)
+    GetDamage = function(self, spellId, attackpower, spellpower, mainHandWeaponDPS, offHandWeaponDPS, combopoints)
         local si = self.spellInfo[spellId]
         if  not si then
             return nil
@@ -507,14 +513,14 @@ local OvaleDataClass = __class(OvaleDataBase, {
         local damage = si.base or 0
         attackpower = attackpower or 0
         spellpower = spellpower or 0
-        mainHandWeaponDamage = mainHandWeaponDamage or 0
-        offHandWeaponDamage = offHandWeaponDamage or 0
+        mainHandWeaponDPS = mainHandWeaponDPS or 0
+        offHandWeaponDPS = offHandWeaponDPS or 0
         combopoints = combopoints or 0
         if si.bonusmainhand then
-            damage = damage + si.bonusmainhand * mainHandWeaponDamage
+            damage = damage + si.bonusmainhand * mainHandWeaponDPS
         end
         if si.bonusoffhand then
-            damage = damage + si.bonusoffhand * offHandWeaponDamage
+            damage = damage + si.bonusoffhand * offHandWeaponDPS
         end
         if si.bonuscp then
             damage = damage + si.bonuscp * combopoints
