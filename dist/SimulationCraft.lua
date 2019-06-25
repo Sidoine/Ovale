@@ -194,6 +194,7 @@ local CHARACTER_PROPERTY = {
     ["combo_points.max"] = "MaxComboPoints()",
     ["consecration.remains"] = "BuffRemaining(consecration)",
     ["consecration.up"] = "BuffPresent(consecration)",
+    ["cooldown.army_of_the_dead.remains"] = "480",
     ["cp_max_spend"] = "MaxComboPoints()",
     ["crit_pct_current"] = "SpellCritChance()",
     ["current_insanity_drain"] = "CurrentInsanityDrain()",
