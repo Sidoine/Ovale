@@ -3261,13 +3261,23 @@ EmitOperandBuff = function (operand, parseNode, nodeList, annotation, action, ta
         if ((token == "consumable" && property == undefined)) {
             property = "remains";
         }
+		
+		// buffname
         [name] = Disambiguate(annotation, name, annotation.class, annotation.specialization);
         let buffName = (token == "debuff") && `${name}_debuff` || `${name}_buff`;
         [buffName] = Disambiguate(annotation, buffName, annotation.class, annotation.specialization);
-        let prefix = truthy(find(buffName, "_debuff$")) && "Debuff" || "Buff";
+        let prefix
+		if (!truthy(find(buffName, "_debuff$")) && !truthy(find(buffName, "_debuff$"))) {
+			prefix = target == "target" && "Debuff" || "Buff";
+		} else {
+			prefix = truthy(find(buffName, "_debuff$")) && "Debuff" || "Buff";
+		}
+		
         let any = OvaleData.DEFAULT_SPELL_LIST[buffName] && " any=1" || "";
-        target = target && (`${target}.`) || "";
-        if (buffName == "dark_transformation_buff" && target == "") {
+        
+		// target
+		target = target && (`${target}.`) || "";
+		if (buffName == "dark_transformation_buff" && target == "") {
             target = "pet.";
         }
         if (buffName == "pet_beast_cleave_buff" && target == "") {
@@ -3276,6 +3286,7 @@ EmitOperandBuff = function (operand, parseNode, nodeList, annotation, action, ta
         if (buffName == "pet_frenzy_buff" && target == "") {
             target = "pet.";
         }
+		
         let code;
         if (property == "cooldown_remains") {
             code = format("SpellCooldown(%s)", name);
