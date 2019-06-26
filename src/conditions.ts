@@ -2429,7 +2429,7 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
     function PTR(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
         let [comparator, limit] = [positionalParams[1], positionalParams[2]];
         let [version, , , uiVersion ] = GetBuildInfo();
-        let value = (version > "8.1.5" || uiVersion > 80100) && 1 || 0;
+        let value = (version > "8.2.0" || uiVersion > 80200) && 1 || 0;
         return Compare(value, comparator, limit);
     }
     OvaleCondition.RegisterCondition("ptr", false, PTR);
