@@ -168,6 +168,7 @@ Define(sephuzs_secret_buff 208051)
 ### Essences
 ###
 
+Define(concentrated_flame 295373)
 Define(concentrated_flame_burn_debuff 295377)
 
 ###
