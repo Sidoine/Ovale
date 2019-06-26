@@ -94,8 +94,10 @@ Define(item_battle_potion_of_intellect 163222)
 Define(item_battle_potion_of_strength 163224)
 Define(item_battle_potion_of_stamina 163225)
 Define(item_bursting_blood 152560)
+Define(item_focused_resolve 168506)
 Define(item_rising_death 152559)
 Define(item_steelskin_potion 152557)
+Define(item_unbridled_fury 169299)
 
 ###
 ### Trinkets & OnUse Rings
@@ -164,6 +166,12 @@ Define(archmages_incandescence_str_buff 177160)
 Define(sephuzs_secret_item 132452)
 Define(sephuzs_secret_buff 208051)
 	SpellInfo(sephuzs_secret_buff buff_cd=30 duration=10)
+	
+###
+### Essences
+###
+
+Define(concentrated_flame_burn_debuff 295377)
 
 ###
 ### Racials

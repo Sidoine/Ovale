@@ -40,7 +40,7 @@ Define(bonestorm 194844)
   SpellInfo(bonestorm runicpower=10 cd=60 duration=1 tick=1 talent=bonestorm_talent)
 
 Define(breath_of_sindragosa 152279)
-# Continuously deal 155166s2*<CAP>/AP Frost damage every t1 sec to enemies in a cone in front of you. Deals reduced damage to secondary targets. You will continue breathing until your Runic Power is exhausted or you cancel the effect.
+# Continuously deal 155166s2*<CAP>/AP Frost damage every t1 sec to enemies in a cone in front of you, until your Runic Power is exhausted. Deals reduced damage to secondary targets.rnrn|cFFFFFFFFGenerates 303753s1 lRune:Runes; at the start and end.|r
   SpellInfo(breath_of_sindragosa cd=120 gcd=0 offgcd=1 tick=1 talent=breath_of_sindragosa_talent)
 
 Define(chains_of_ice 45524)
@@ -224,7 +224,7 @@ Define(blooddrinker_talent 2) #19166
 Define(bonestorm_talent 21) #21209
 # A whirl of bone and gore batters nearby enemies, dealing 196528s1 Shadow damage every t3 sec, and healing you for 196545s1 of your maximum health every time it deals damage (up to s1*s4). Lasts t3 sec per s3 Runic Power spent.
 Define(breath_of_sindragosa_talent 21) #22537
-# Continuously deal 155166s2*<CAP>/AP Frost damage every t1 sec to enemies in a cone in front of you. Deals reduced damage to secondary targets. You will continue breathing until your Runic Power is exhausted or you cancel the effect.
+# Continuously deal 155166s2*<CAP>/AP Frost damage every t1 sec to enemies in a cone in front of you, until your Runic Power is exhausted. Deals reduced damage to secondary targets.rnrn|cFFFFFFFFGenerates 303753s1 lRune:Runes; at the start and end.|r
 Define(bursting_sores_talent 4) #22027
 # Bursting a Festering Wound deals s1 more damage, and deals 207267s1 Shadow damage to all nearby targets.
 Define(clawing_shadows_talent 3) #22026
@@ -273,6 +273,14 @@ Define(unholy_blight_talent 6) #22029
 # Surrounds yourself with a vile swarm of insects for 6 seconds, stinging all nearby enemies and infecting them with an unholy disease that deals 115994o1 damage over 14 seconds.
 Define(unholy_frenzy_talent 20) #22110
 # Incites you into a killing frenzy for 12 seconds, increasing Haste by s1 and causing your auto attacks to infect the target with a Festering Wound.
+Define(dread_aspirants_medallion_item 162897)
+Define(dread_gladiators_badge_item 161902)
+Define(first_mates_spyglass_item 158163)
+Define(jes_howler_item 159627)
+Define(lurkers_insidious_gift_item 167866)
+Define(sinister_gladiators_badge_item 165058)
+Define(sinister_gladiators_medallion_item 165055)
+Define(vial_of_animated_blood_item 159625)
 Define(ramping_amplitude_gigavolt_engine_item 165580)
 Define(frozen_tempest_trait 278487)
 Define(icy_citadel_trait 272718)

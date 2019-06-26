@@ -2035,6 +2035,7 @@ let EmitOperandCharacter:EmitOperandVisitor = undefined;
 let EmitOperandCooldown:EmitOperandVisitor = undefined;
 let EmitOperandDisease:EmitOperandVisitor = undefined;
 let EmitOperandDot:EmitOperandVisitor = undefined;
+let EmitOperandEssence:EmitOperandVisitor = undefined;
 let EmitOperandGlyph:EmitOperandVisitor = undefined;
 let EmitOperandGroundAoe:EmitOperandVisitor = undefined;
 let EmitOperandPet:EmitOperandVisitor = undefined;
@@ -2993,6 +2994,8 @@ EmitOperand = function (parseNode, nodeList, annotation, action) {
         } else if (token == "dot") {
             target = target || "target";
             [ok, node] = EmitOperandDot(operand, parseNode, nodeList, annotation, action, target);
+		} else if (token == "essence") {
+            [ok, node] = EmitOperandEssence(operand, parseNode, nodeList, annotation, action, target);
         } else if (token == "glyph") {
             [ok, node] = EmitOperandGlyph(operand, parseNode, nodeList, annotation, action);
         } else if (token == "pet") {
@@ -3222,6 +3225,28 @@ EmitOperandAzerite = function (operand, parseNode, nodeList, annotation, action,
             annotation.astAnnotation = annotation.astAnnotation || {};
             [node] = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation);
             AddSymbol(annotation, `${name}_trait`);
+        }
+    } else {
+        ok = false;
+    }
+    return [ok, node];
+}
+EmitOperandEssence = function (operand, parseNode, nodeList, annotation, action, target) {
+    let ok = true;
+    let node;
+    let tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN);
+    let token = tokenIterator();
+    if (token == "essence") {
+        let code:string;
+        //let name = tokenIterator();
+        //let property = tokenIterator();
+		
+		// not implemented yet
+		OvaleSimulationCraft.Print("Warning: operand '%s' not implemented yet.", operand);
+		code = "False()"
+		if (ok && code) {
+            annotation.astAnnotation = annotation.astAnnotation || {};
+            [node] = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation);
         }
     } else {
         ok = false;

@@ -1867,6 +1867,7 @@ local EmitOperandCharacter = nil
 local EmitOperandCooldown = nil
 local EmitOperandDisease = nil
 local EmitOperandDot = nil
+local EmitOperandEssence = nil
 local EmitOperandGlyph = nil
 local EmitOperandGroundAoe = nil
 local EmitOperandPet = nil
@@ -2807,6 +2808,8 @@ EmitOperand = function(parseNode, nodeList, annotation, action)
         elseif token == "dot" then
             target = target or "target"
             ok, node = EmitOperandDot(operand, parseNode, nodeList, annotation, action, target)
+        elseif token == "essence" then
+            ok, node = EmitOperandEssence(operand, parseNode, nodeList, annotation, action, target)
         elseif token == "glyph" then
             ok, node = EmitOperandGlyph(operand, parseNode, nodeList, annotation, action)
         elseif token == "pet" then
@@ -3045,6 +3048,25 @@ EmitOperandAzerite = function(operand, parseNode, nodeList, annotation, action, 
     return ok, node
 end
 
+EmitOperandEssence = function(operand, parseNode, nodeList, annotation, action, target)
+    local ok = true
+    local node
+    local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
+    local token = tokenIterator()
+    if token == "essence" then
+        local code
+        __exports.OvaleSimulationCraft:Print("Warning: operand '%s' not implemented yet.", operand)
+        code = "False()"
+        if ok and code then
+            annotation.astAnnotation = annotation.astAnnotation or {}
+            node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+        end
+    else
+        ok = false
+    end
+    return ok, node
+end
+
 EmitOperandRefresh = function(operand, parseNode, nodeList, annotation, action, target)
     local ok = true
     local node
@@ -3082,7 +3104,12 @@ EmitOperandBuff = function(operand, parseNode, nodeList, annotation, action, tar
         name = Disambiguate(annotation, name, annotation.class, annotation.specialization)
         local buffName = (token == "debuff") and name .. "_debuff" or name .. "_buff"
         buffName = Disambiguate(annotation, buffName, annotation.class, annotation.specialization)
-        local prefix = find(buffName, "_buff$") and "Buff" or "Debuff"
+        local prefix
+        if  not find(buffName, "_debuff$") and  not find(buffName, "_debuff$") then
+            prefix = target == "target" and "Debuff" or "Buff"
+        else
+            prefix = find(buffName, "_debuff$") and "Debuff" or "Buff"
+        end
         local any = OvaleData.DEFAULT_SPELL_LIST[buffName] and " any=1" or ""
         target = target and (target .. ".") or ""
         if buffName == "dark_transformation_buff" and target == "" then
@@ -3860,6 +3887,9 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
         AddSymbol(annotation, "master_assassin_buff")
     elseif className == "ROGUE" and operand == "buff.roll_the_bones.remains" then
         code = "BuffRemaining(roll_the_bones_buff)"
+        AddSymbol(annotation, "roll_the_bones_buff")
+    elseif className == "ROGUE" and operand == "buff.roll_the_bones.up" then
+        code = "BuffPresent(roll_the_bones_buff)"
         AddSymbol(annotation, "roll_the_bones_buff")
     elseif className == "SHAMAN" and operand == "buff.resonance_totem.remains" then
         local spell = Disambiguate(annotation, "totem_mastery", annotation.class, annotation.specialization)

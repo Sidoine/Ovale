@@ -11,11 +11,6 @@ __exports.register = function()
   SpellInfo(agony duration=18 max_stacks=6 tick=2)
   # Suffering w1 Shadow damage every t1 sec. Damage increases over time.
   SpellAddTargetDebuff(agony agony=1)
-Define(battle_potion_of_intellect 279151)
-# Increases your Intellect by s1 for 25 seconds.
-  SpellInfo(battle_potion_of_intellect cd=1 duration=25 gcd=0 offgcd=1)
-  # Intellect increased by w1.
-  SpellAddBuff(battle_potion_of_intellect battle_potion_of_intellect=1)
 Define(berserking 26297)
 # Increases your haste by s1 for 12 seconds.
   SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
@@ -55,6 +50,10 @@ Define(corruption_debuff 146739)
   SpellInfo(corruption_debuff duration=14 channel=14 gcd=0 offgcd=1 tick=2)
   # Suffering w1 Shadow damage every t1 sec.
   SpellAddTargetDebuff(corruption_debuff corruption_debuff=1)
+Define(crashing_chaos_buff 277705)
+# Your Summon Infernal's cooldown is reduced by s3 sec, and summoning your Infernal increases the damage of your next s2 Chaos Bolts by s1.
+  SpellInfo(crashing_chaos_buff channel=-0.001 gcd=0 offgcd=1)
+  SpellAddBuff(crashing_chaos_buff crashing_chaos_buff=1)
 Define(dark_soul_instability 113858)
 # Infuses your soul with unstable power, increasing your critical strike chance by 113858s1 for 20 seconds.?s56228[rnrn|cFFFFFFFFPassive:|rrnIncreases your critical strike chance by 113858m1/56228m1. This effect is disabled while on cooldown.][]
   SpellInfo(dark_soul_instability cd=120 charge_cd=120 duration=20 talent=dark_soul_instability_talent)
@@ -77,7 +76,7 @@ Define(demonic_calling_buff 205146)
   # Your next Call Dreadstalkers costs 205145s1 less Soul Shard and has no cast time.
   SpellAddBuff(demonic_calling_buff demonic_calling_buff=1)
 Define(demonic_power 265273)
-# Summon a Demonic Tyrant to increase the duration of all of your current demons by 265273m3/1000.1 sec, and increase the damage of all of your other demons by 265273s2, while damaging your target.
+# Summon a Demonic Tyrant to increase the duration of all of your current lesser demons by 265273m3/1000.1 sec, and increase the damage of all of your other demons by 265273s2, while damaging your target.
   SpellInfo(demonic_power duration=15 gcd=0 offgcd=1)
   # Damage dealt by your demons increased by s2.
   SpellAddBuff(demonic_power demonic_power=1)
@@ -108,7 +107,7 @@ Define(explosive_potential 275398)
   SpellAddBuff(explosive_potential explosive_potential=1)
 
 Define(fireblood 265221)
-# Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. 
+# Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
 Define(grimoire_felguard 111898)
 # Summons a Felguard who attacks the target for s1 sec that deals 216187s1 increased damage.rnrnThis Felguard will stun their target when summoned.
@@ -181,6 +180,12 @@ Define(shadowburn 17877)
   SpellInfo(shadowburn cd=12 duration=5 talent=shadowburn_talent)
   # If the target dies and yields experience or honor, Shadowburn's cooldown is reset.
   SpellAddTargetDebuff(shadowburn shadowburn=1)
+Define(shadows_bite 272945)
+# When your summoned Dreadstalkers fade away, they increase the damage of your Demonbolt by s1 for 8 seconds.
+  SpellInfo(shadows_bite duration=8 channel=8 gcd=0 offgcd=1)
+  # Demonbolt damage increased by w1.
+  SpellAddBuff(shadows_bite shadows_bite=1)
+
 Define(siphon_life 63106)
 # Siphons the target's life essence, dealing o1 Shadow damage over 15 seconds and healing you for e1*100 of the damage done.
   SpellInfo(siphon_life duration=15 tick=3 talent=siphon_life_talent)
@@ -198,7 +203,7 @@ Define(summon_darkglare 205180)
   # Summons a Darkglare from the Twisting Nether that blasts its target for Shadow damage, dealing increased damage for every damage over time effect you have active on any target.
   SpellAddBuff(summon_darkglare summon_darkglare=1)
 Define(summon_demonic_tyrant 265187)
-# Summon a Demonic Tyrant to increase the duration of all of your current demons by 265273m3/1000.1 sec, and increase the damage of all of your other demons by 265273s2, while damaging your target.
+# Summon a Demonic Tyrant to increase the duration of all of your current lesser demons by 265273m3/1000.1 sec, and increase the damage of all of your other demons by 265273s2, while damaging your target.
   SpellInfo(summon_demonic_tyrant cd=90 duration=15)
 Define(summon_felguard 30146)
 # Summons a Felguard under your command as a powerful melee combatant.
@@ -222,6 +227,9 @@ Define(vile_taint 278350)
   SpellInfo(vile_taint soulshards=1 cd=20 duration=10 tick=2 talent=vile_taint_talent)
   # Suffering w1 Shadow damage every t1 sec.rnMovement slowed by s2.
   SpellAddTargetDebuff(vile_taint vile_taint=1)
+Define(wild_imp 279910)
+# Calls down a demonic meteor full of Wild Imps which burst forth to attack the target.rnrnDeals up to m1*86040m1 Shadowflame damage on impact to all enemies within 86040A1 yds of the target?s196283[, applies Doom to each target,][] and summons up to m1*104317m2 Wild Imps, based on Soul Shards consumed.
+  SpellInfo(wild_imp duration=20 gcd=0 offgcd=1)
 Define(absolute_corruption_talent 5) #21180
 # Corruption is now permanent and deals s2 increased damage.rnrnDuration reduced to s1 sec against players.
 Define(bilescourge_bombers_talent 3) #23138
@@ -274,8 +282,6 @@ Define(phantom_singularity_talent 11) #19292
 # Places a phantom singularity above the target, which consumes the life of all enemies within 205246A2 yards, dealing 8*(18 of Spell Power) damage over 16 seconds, healing you for 205246e2*100 of the damage done.
 Define(power_siphon_talent 5) #21694
 # Instantly sacrifice up to s1 Wild Imps to generate s1 charges of Demonic Core.
-Define(roaring_blaze_talent 16) #23155
-# Conflagrate burns the target for an additional 265931o1 Fire damage over 6 seconds.
 Define(shadow_embrace_talent 16) #23139
 # ?s198590[Drain Soul][Shadow Bolt] applies Shadow Embrace, increasing your damage dealt to the target by 32390s1 for 10 seconds. Stacks up to 32390u times.
 Define(shadowburn_talent 6) #23157
@@ -297,7 +303,10 @@ Define(writhe_in_agony_talent 4) #22044
 Define(wilfreds_sigil_of_superior_summoning_item 132369)
 Define(cascading_calamity_trait 275372)
 Define(pandemic_invocation_trait 289364)
+Define(baleful_invocation_trait 287059)
 Define(explosive_potential_trait 275395)
+Define(shadows_bite_trait 272944)
+Define(crashing_chaos_trait 277644)
     ]]
     code = code .. [[
 # Aliases
