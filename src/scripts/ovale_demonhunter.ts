@@ -4,13 +4,13 @@ import { OvaleScripts } from "../Scripts";
 // ANY CHANGES MADE BELOW THIS POINT WILL BE LOST
 
 {
-	const name = "sc_pr_demon_hunter_havoc"
-	const desc = "[8.1] Simulationcraft: PR_Demon_Hunter_Havoc"
+	const name = "sc_t23_demon_hunter_havoc"
+	const desc = "[8.2] Simulationcraft: T23_Demon_Hunter_Havoc"
 	const code = `
-# Based on SimulationCraft profile "PR_Demon_Hunter_Havoc".
+# Based on SimulationCraft profile "T23_Demon_Hunter_Havoc".
 #	class=demonhunter
 #	spec=havoc
-#	talents=3210222
+#	talents=1310221
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -322,11 +322,7 @@ AddFunction HavocCooldownCdActions
  if not False(raid_event_adds_exists) Spell(nemesis)
  #potion,if=buff.metamorphosis.remains>25|target.time_to_die<60
  if { BuffRemaining(metamorphosis_havoc_buff) > 25 or target.TimeToDie() < 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
- #use_item,name=galecallers_boon,sync=fel_barrage
- if { { not { not SpellCooldown(eye_beam) > 0 } or BuffPresent(metamorphosis_havoc_buff) } and 600 > 30 or Enemies() > Enemies(tagged=1) } and Spell(fel_barrage) HavocUseItemActions()
- #use_item,name=galecallers_boon,if=!talent.fel_barrage.enabled
- if not Talent(fel_barrage_talent) HavocUseItemActions()
- #use_item,name=lustrous_golden_plumage
+ #use_item,name=variable_intensity_gigavolt_oscillating_reactor
  HavocUseItemActions()
 }
 
@@ -511,7 +507,6 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # disrupt
 # eye_beam
 # fel_barrage
-# fel_barrage_talent
 # fel_eruption
 # fel_mastery_talent
 # fel_rush
@@ -538,10 +533,10 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 }
 
 {
-	const name = "sc_pr_demon_hunter_vengeance"
-	const desc = "[8.1] Simulationcraft: PR_Demon_Hunter_Vengeance"
+	const name = "sc_t23_demon_hunter_vengeance"
+	const desc = "[8.2] Simulationcraft: T23_Demon_Hunter_Vengeance"
 	const code = `
-# Based on SimulationCraft profile "PR_Demon_Hunter_Vengeance".
+# Based on SimulationCraft profile "T23_Demon_Hunter_Vengeance".
 #	class=demonhunter
 #	spec=vengeance
 #	talents=1213121
@@ -565,12 +560,6 @@ AddFunction VengeanceInterruptActions
   if not target.Classification(worldboss) and not SigilCharging(silence misery chains) and target.RemainingCastTime() >= 2 - Talent(quickened_sigils_talent) + GCDRemaining() Spell(sigil_of_chains)
   if target.InRange(imprison) and not target.Classification(worldboss) and target.CreatureType(Demon Humanoid Beast) Spell(imprison)
  }
-}
-
-AddFunction VengeanceUseItemActions
-{
- Item(Trinket0Slot text=13 usable=1)
- Item(Trinket1Slot text=14 usable=1)
 }
 
 AddFunction VengeanceGetInMeleeRange
@@ -810,10 +799,6 @@ AddFunction VengeanceDefaultCdActions
 
  unless target.HasDebuffType(magic) and Spell(consume_magic)
  {
-  #use_item,slot=trinket1
-  VengeanceUseItemActions()
-  #use_item,slot=trinket2
-  VengeanceUseItemActions()
   #call_action_list,name=brand,if=talent.charred_flesh.enabled
   if Talent(charred_flesh_talent) VengeanceBrandCdActions()
 

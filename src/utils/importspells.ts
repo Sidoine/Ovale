@@ -852,6 +852,7 @@ export interface SpellData {
     mechanic: number;
     /** 40 Azerite power id */
     power_id: number;
+    essence_id: number;
     // Textual data
     /** 41 Spell.dbc description stringblock */
     desc: string;
@@ -866,6 +867,8 @@ export interface SpellData {
 
     /** 45 */
     req_max_level: number;
+    /** 46 SpellCategories.db2 classification for the spell */
+    dmg_class: number;
 
     spellEffects?: SpellEffectData[];
     spellPowers?: SpellPowerData[];
@@ -1230,11 +1233,13 @@ export function getSpellData(directory: string) {
             stance_mask: row[38],
             mechanic: row[39],
             power_id: row[40],
-            desc: row[41],
-            tooltip: row[42],
-            desc_vars: row[43],
-            rank_str: row[44],
-            req_max_level: row[45],
+            essence_id: row[41],
+            desc: row[42],
+            tooltip: row[43],
+            desc_vars: row[44],
+            rank_str: row[45],
+            req_max_level: row[46],
+            dmg_class: row[47],
             identifierScore: 0
         };
 

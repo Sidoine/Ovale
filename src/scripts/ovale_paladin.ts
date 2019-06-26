@@ -4,13 +4,13 @@ import { OvaleScripts } from "../Scripts";
 // ANY CHANGES MADE BELOW THIS POINT WILL BE LOST
 
 {
-	const name = "sc_pr_paladin_protection"
-	const desc = "[8.1] Simulationcraft: PR_Paladin_Protection"
+	const name = "sc_t23_paladin_protection"
+	const desc = "[8.2] Simulationcraft: T23_Paladin_Protection"
 	const code = `
-# Based on SimulationCraft profile "PR_Paladin_Protection".
+# Based on SimulationCraft profile "T23_Paladin_Protection".
 #	class=paladin
 #	spec=protection
-#	talents=1200003
+#	talents=3200003
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -294,13 +294,13 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 }
 
 {
-	const name = "sc_pr_paladin_retribution"
-	const desc = "[8.1] Simulationcraft: PR_Paladin_Retribution"
+	const name = "sc_t23_paladin_retribution"
+	const desc = "[8.2] Simulationcraft: T23_Paladin_Retribution"
 	const code = `
-# Based on SimulationCraft profile "PR_Paladin_Retribution".
+# Based on SimulationCraft profile "T23_Paladin_Retribution".
 #	class=paladin
 #	spec=retribution
-#	talents=2303003
+#	talents=2303103
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -564,8 +564,8 @@ AddFunction RetributionCooldownsShortCdPostConditions
 
 AddFunction RetributionCooldownsCdActions
 {
- #use_item,name=jes_howler,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10
- if BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) and BuffStacks(crusade_buff) == 10 RetributionUseItemActions()
+ #use_item,name=ramping_amplitude_gigavolt_engine,if=(buff.avenging_wrath.up|buff.crusade.up)
+ if BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) RetributionUseItemActions()
  #potion,if=buff.bloodlust.react|buff.avenging_wrath.up|buff.crusade.up&buff.crusade.remains<25
  if { BuffPresent(burst_haste_buff any=1) or BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) and BuffRemaining(crusade_buff) < 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_strength usable=1)
  #lights_judgment,if=spell_targets.lights_judgment>=2|(!raid_event.adds.exists|raid_event.adds.in>75)

@@ -3,10 +3,10 @@ import { OvaleScripts } from "../Scripts";
 // ANY CHANGES MADE BELOW THIS POINT WILL BE LOST
 
 {
-	const name = "sc_pr_hunter_beast_mastery"
-	const desc = "[8.1] Simulationcraft: PR_Hunter_Beast_Mastery"
+	const name = "sc_t23_hunter_beast_mastery"
+	const desc = "[8.2] Simulationcraft: T23_Hunter_Beast_Mastery"
 	const code = `
-# Based on SimulationCraft profile "PR_Hunter_Beast_Mastery".
+# Based on SimulationCraft profile "T23_Hunter_Beast_Mastery".
 #	class=hunter
 #	spec=beast_mastery
 #	talents=1303011
@@ -437,13 +437,13 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 }
 
 {
-	const name = "sc_pr_hunter_marksmanship"
-	const desc = "[8.1] Simulationcraft: PR_Hunter_Marksmanship"
+	const name = "sc_t23_hunter_marksmanship"
+	const desc = "[8.2] Simulationcraft: T23_Hunter_Marksmanship"
 	const code = `
-# Based on SimulationCraft profile "PR_Hunter_Marksmanship".
+# Based on SimulationCraft profile "T23_Hunter_Marksmanship".
 #	class=hunter
 #	spec=marksmanship
-#	talents=2103012
+#	talents=1103031
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -852,13 +852,13 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 }
 
 {
-	const name = "sc_pr_hunter_survival"
-	const desc = "[8.1] Simulationcraft: PR_Hunter_Survival"
+	const name = "sc_t23_hunter_survival"
+	const desc = "[8.2] Simulationcraft: T23_Hunter_Survival"
 	const code = `
-# Based on SimulationCraft profile "PR_Hunter_Survival".
+# Based on SimulationCraft profile "T23_Hunter_Survival".
 #	class=hunter
 #	spec=survival
-#	talents=3101022
+#	talents=1101021
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)

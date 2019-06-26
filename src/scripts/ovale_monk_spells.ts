@@ -54,7 +54,7 @@ Define(energizing_elixir 115288)
   # Generating w1/5 extra Energy per sec.
   SpellAddBuff(energizing_elixir energizing_elixir=1)
 Define(fireblood 265221)
-# Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. 
+# Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
 Define(fist_of_the_white_tiger 261947)
 # Strike with the technique of the White Tiger, dealing s1+261977s1 Physical damage.rnrn|cFFFFFFFFGenerates 261978s1 Chi.
@@ -186,9 +186,9 @@ Define(invoke_niuzao_the_black_ox_talent 18) #22103
 # Summons an effigy of Niuzao, the Black Ox for 45 seconds. Niuzao attacks your primary target and taunts it. He also frequently Stomps, damaging all nearby enemies.
 Define(invoke_xuen_the_white_tiger_talent 18) #22102
 # Summons an effigy of Xuen, the White Tiger for 20 seconds. Xuen attacks your primary target, and strikes 3 enemies within 123996A1 yards every 123999t1 sec with Tiger Lightning for 123996s1 Nature damage.
-Define(rushing_jade_wind_talent 17) #20184
-# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to enemies within 107270A1 yards.
 Define(rushing_jade_wind_talent_windwalker 17) #23122
+# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to enemies within 107270A1 yards.
+Define(rushing_jade_wind_talent 17) #20184
 # Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to enemies within 107270A1 yards.
 Define(serenity_talent 21) #21191
 # Enter an elevated state of mental and physical serenity for ?s115069[s1 sec][12 seconds]. While in this state, you deal s2 increased damage and healing, and all Chi consumers are free and cool down s4 more quickly.

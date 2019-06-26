@@ -39,6 +39,14 @@ Define(deadly_calm 262228)
   SpellInfo(deadly_calm cd=60 duration=6 gcd=0 offgcd=1 talent=deadly_calm_talent)
   # Your abilities cost s1 less Rage.
   SpellAddBuff(deadly_calm deadly_calm=1)
+Define(demoralizing_shout 1160)
+# ?s199023[Demoralizes all enemies within A2 yards, reducing the damage they do by s2 for 8 seconds.][Demoralizes all enemies within A2 yards, reducing the damage they deal to you by s1 for 8 seconds.]?s202743[rnrn|cFFFFFFFFGenerates m5/10 Rage.|r][]
+  SpellInfo(demoralizing_shout cd=45 duration=8 rage=0)
+  # ?s199023[Demoralized, dealing s2 less damage.][Demoralized, dealing s1 less damage to the shouting Warrior.]
+  SpellAddTargetDebuff(demoralizing_shout demoralizing_shout=1)
+Define(devastate 20243)
+# A direct strike, dealing s1*<mult> Physical damage.
+  SpellInfo(devastate max_stacks=3)
 Define(dragon_roar 118000)
 # Roar explosively, dealing m1 Physical damage to all enemies within A1 yds and reducing their movement speed by s3 for 6 seconds.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
   SpellInfo(dragon_roar cd=35 duration=6 rage=-10 talent=dragon_roar_talent_protection)
@@ -54,7 +62,7 @@ Define(execute_arms 163201)
   SpellInfo(execute_arms rage=20)
 
 Define(fireblood 265221)
-# Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. 
+# Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
 Define(furious_slash 100130)
 # Aggressively strike with your off-hand weapon for s1*<mult> Physical damage, and increases your Haste by 202539s3 for 15 seconds, stacking up to 202539u times.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
@@ -69,6 +77,15 @@ Define(furious_slash_buff 202539)
 Define(heroic_leap 6544)
 # Leap through the air toward a target location, slamming down with destructive force to deal 52174s1 Physical damage to all enemies within 52174a1 yards?s23922[, and resetting the remaining cooldown on Taunt][].
   SpellInfo(heroic_leap cd=0.8 charge_cd=45 gcd=0 offgcd=1)
+Define(ignore_pain 190456)
+# Fight through the pain, ignoring s2 of damage taken, up to <absorb> total damage prevented.
+  SpellInfo(ignore_pain rage=40 cd=1 duration=12 gcd=0 offgcd=1)
+  # Ignoring s2 of damage taken, preventing w1 total damage.
+  SpellAddBuff(ignore_pain ignore_pain=1)
+Define(intercept 198304)
+# Run at high speed toward an enemy or ally.rnrnWhen targeting an enemy, deals 126664s2 Physical damage and roots the target for 1 second.rnrnWhen targeting an ally, intercepts the next melee or ranged attack against them within 10 seconds while the ally remains within 147833A2 yards.rnrn|cFFFFFFFFGenerates /10;s2 Rage.|r
+  SpellInfo(intercept cd=1.5 charge_cd=20 gcd=0 offgcd=1 rage=-15)
+  SpellInfo(charge replaced_by=intercept)
 Define(intimidating_shout 5246)
 # ?s275338[Causes the targeted enemy and up to s1 additional enemies within 5246A3 yards to cower in fear.][Causes the targeted enemy to cower in fear, and up to s1 additional enemies within 5246A3 yards to flee.] Targets are disoriented for 8 seconds.
   SpellInfo(intimidating_shout cd=90 duration=8)
@@ -118,6 +135,17 @@ Define(rend 772)
   SpellInfo(rend rage=30 duration=12 tick=3 talent=rend_talent)
   # Bleeding for w2 damage every t2 sec.
   SpellAddTargetDebuff(rend rend=1)
+Define(revenge 6572)
+# Swing in a wide arc, dealing s1 damage to all enemies in front of you.rnrnYour successful dodges and parries cause your next Revenge to become free.
+  SpellInfo(revenge rage=30 cd=3)
+Define(shield_block 2565)
+# Raise your shield, blocking all melee attacks against you for 6 seconds.?s76857[ These blocks can be critical blocks.][] Increases Shield Slam damage by 132404s2 while active.
+# Rank 2: Shield Block has s1+1 charges.
+  SpellInfo(shield_block rage=30 cd=1 charge_cd=16 gcd=0 offgcd=1)
+Define(shield_slam 23922)
+# Slams the target with your shield, causing s1 Physical damage.?a231834[rnrnDevastate, Thunder Clap, and Revenge have a 231834s1 chance to reset the cooldown of Shield Slam.][]rnrn|cFFFFFFFFGenerates s3/10 Rage.|r
+# Rank 2: Devastate, Thunder Clap, and Revenge have a s1 chance to reset the remaining cooldown on Shield Slam.rn
+  SpellInfo(shield_slam cd=9 rage=-15)
 Define(shockwave 46968)
 # Sends a wave of force in a frontal cone, causing m2 damage and stunning all enemies within a1 yards for 2 seconds.
   SpellInfo(shockwave cd=40)
@@ -142,6 +170,11 @@ Define(test_of_might_buff 275531)
 # When ?s262161[Warbreaker][Colossus Smash] expires, your Strength is increased by s1 for every s2 Rage you spent during ?s262161[Warbreaker][Colossus Smash]. Lasts 12 seconds.
   SpellInfo(test_of_might_buff channel=-0.001 gcd=0 offgcd=1)
 
+Define(thunder_clap 6343)
+# Blasts all enemies within 6343A1 yards for ?s12712[6343m1*1.2][6343m1] damage?s199045[, rooting them for 1 second and reducing their movement speed by s2 for 10 seconds.][ and reduces their movement speed by s2 for 10 seconds.]rnrn|cFFFFFFFFGenerates s4/10 Rage.|r
+  SpellInfo(thunder_clap cd=6 duration=10 rage=-5)
+  # Movement speed reduced by s2.
+  SpellAddTargetDebuff(thunder_clap thunder_clap=1)
 Define(war_stomp 20549)
 # Stuns up to i enemies within A1 yds for 2 seconds.
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
@@ -161,6 +194,8 @@ Define(anger_management_talent 19) #21204
 # Every ?c1[s1]?c2[s3][s2] Rage you spend reduces the remaining cooldown on ?c1&s262161[Warbreaker and Bladestorm]?c1[Colossus Smash and Bladestorm]?c2[Recklessness][Avatar, Last Stand, Shield Wall, and Demoralizing Shout] by 1 sec.
 Define(avatar_talent 17) #22397
 # Transform into a colossus for 20 seconds, causing you to deal s1 increased damage and removing all roots and snares.rnrn|cFFFFFFFFGenerates s5/10 Rage.|r
+Define(booming_voice_talent 16) #22395
+# Demoralizing Shout also generates m1/10 Rage, and increases damage you deal to affected targets by s2.
 Define(carnage_talent 13) #22383
 # Rampage costs s1/-10 less Rage and deals s4 increased damage.
 Define(cleave_talent 15) #22362
@@ -191,11 +226,15 @@ Define(skullsplitter_talent 3) #22371
 # Bash an enemy's skull, dealing s1 Physical damage.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
 Define(storm_bolt_talent_fury 6) #23093
 # Hurls your weapon at an enemy, causing s1 Physical damage and stunning for 4 seconds.
+Define(unstoppable_force_talent 8) #22626
+# Avatar increases the damage of Thunder Clap by s1, and reduces its cooldown by s2.
 Define(warbreaker_talent 14) #22391
 # Smash the ground and shatter the armor of all enemies within A1 yds, dealing s1 Physical damage and increasing damage you deal to them by 208086s1 for 10 seconds.
 Define(seismic_wave_trait 277639)
 Define(test_of_might_trait 275529)
 Define(cold_steel_hot_blood_trait 288080)
+Define(brace_for_impact_trait 277636)
+Define(deafening_crash_trait 272824)
     `;
 // END
     code += `
@@ -254,13 +293,13 @@ Define(defensive_stance 197690)
 	SpellInfo(defensive_stance cd=6)
 	SpellAddBuff(defensive_stance defensive_stance_buff=1)
 Define(defensive_stance_buff 197690)
-Define(demoralizing_shout 1160)
+
 	SpellInfo(demoralizing_shout cd=45)
 	SpellInfo(demoralizing_shout add_rage=-40 talent=booming_voice_talent)
 	SpellAddTargetDebuff(demoralizing_shout demoralizing_shout_debuff=1)
 Define(demoralizing_shout_debuff 1160)
 	SpellInfo(demoralizing_shout_debuff duration=8)
-Define(devastate 20243)
+
 	SpellInfo(devastate unusable=1 talent=devastator_talent)
 	SpellAddTargetDebuff(devastate deep_wounds_prot_debuff=1 specialization=protection)
 Define(die_by_the_sword 118038)
@@ -319,7 +358,7 @@ Define(heroic_leap_buff 202164)
 Define(heroic_throw 57755)
 	SpellInfo(heroic_throw cd=6 travel_time=1)
 	SpellInfo(heroic_throw add_cd=-6 specialization=protection)
-Define(ignore_pain 190456)
+
 	SpellInfo(ignore_pain rage=40)
 	SpellAddBuff(ignore_pain ignore_pain_buff=1)
 	SpellAddBuff(ignore_pain vengeance_ignore_pain_buff=0 talent=vengeance_talent)
@@ -332,7 +371,7 @@ Define(impending_victory 202168)
 	SpellAddBuff(impending_victory victorious_buff=0)
 Define(in_for_the_kill_buff 248622)
 	SpellInfo(in_for_the_kill_buff duration=8)
-Define(intercept 198304)
+
 	SpellInfo(intercept cd=15 rage=-20 charges=2)
 	SpellAddTargetDebuff(intercept charge_debuff=1)
 	SpellAddTargetBuff(intercept safeguard_buff=1)
@@ -402,7 +441,7 @@ Define(recklessness_buff 1719)
 	SpellRequire(rend rage_percent 0=buff,deadly_calm_buff talent=deadly_calm_talent specialization=arms)
 Define(rend_debuff 772)
 	SpellInfo(rend_debuff duration=12 tick=3)
-Define(revenge 6572)
+
 	SpellInfo(revenge cd=3 rage=30 cd_haste=melee)
 	SpellRequire(revenge rage_percent 0=buff,revenge_buff)
 	SpellAddTargetDebuff(revenge deep_wounds_prot_debuff=1)
@@ -413,12 +452,12 @@ Define(revenge_buff 5302)
 	SpellInfo(revenge_buff duration=6)
 Define(safeguard_buff 223658)
 	SpellInfo(safeguard_buff duration=6)
-Define(shield_block 2565)
+
 	SpellInfo(shield_block cd=18 cd_haste=melee gcd=0 offgcd=1 rage=30)
 	SpellAddBuff(shield_block shield_block_buff=1)
 Define(shield_block_buff 132404)
 	SpellInfo(shield_block_buff duration=6)
-Define(shield_slam 23922)
+
 	SpellInfo(shield_slam cd=9 cd_haste=melee rage=-15)
 	SpellAddTargetDebuff(shield_slam punish_debuff=1 talent=punish_talent)
 Define(shield_wall 871)
@@ -455,7 +494,7 @@ Define(sweeping_strikes_buff 260708)
 	SpellInfo(sweeping_strikes_buff duration=12)
 Define(taunt 355)
 	SpellInfo(taunt cd=8)
-Define(thunder_clap 6343)
+
 	SpellInfo(thunder_clap cd=6 rage=-5 cd_haste=melee)
 	SpellRequire(thunder_clap cd_percent 50=buff,avatar_buff)
 Define(vengeance_ignore_pain_buff 202574)
