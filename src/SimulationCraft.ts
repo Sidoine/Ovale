@@ -4810,7 +4810,7 @@ const InsertInterruptFunctions = function(child: LuaArray<AstNode>, annotation: 
                 name: "between_the_eyes",
                 stun: 1,
                 order: 30,
-                extraCondition: "ComboPoints() >= MaxComboPoints()-1"
+                extraCondition: "ComboPoints() >= 1"
             });
             insert(interrupts, {
                 name: "gouge",
@@ -4818,23 +4818,12 @@ const InsertInterruptFunctions = function(child: LuaArray<AstNode>, annotation: 
                 order: 100
             });
         }
-        if (annotation.specialization == "assassination") {
+        if (annotation.specialization == "assassination" || annotation.specialization == "subtlety") {
             insert(interrupts, {
                 name: "kidney_shot",
                 stun: 1,
                 order: 30,
-                extraCondition: "ComboPoints() >= MaxComboPoints()-1+Talent(internal_bleeding_talent)",
-				addSymbol: {
-					1: "internal_bleeding_talent",
-				}
-            });
-        }
-		if (annotation.specialization == "subtlety") {
-            insert(interrupts, {
-                name: "kidney_shot",
-                stun: 1,
-                order: 30,
-                extraCondition: "ComboPoints() >= MaxComboPoints()-1"
+                extraCondition: "ComboPoints() >= 1"
             });
         }
     }

@@ -4612,7 +4612,7 @@ local InsertInterruptFunctions = function(child, annotation)
                 name = "between_the_eyes",
                 stun = 1,
                 order = 30,
-                extraCondition = "ComboPoints() >= MaxComboPoints()-1"
+                extraCondition = "ComboPoints() >= 1"
             })
             insert(interrupts, {
                 name = "gouge",
@@ -4620,23 +4620,12 @@ local InsertInterruptFunctions = function(child, annotation)
                 order = 100
             })
         end
-        if annotation.specialization == "assassination" then
+        if annotation.specialization == "assassination" or annotation.specialization == "subtlety" then
             insert(interrupts, {
                 name = "kidney_shot",
                 stun = 1,
                 order = 30,
-                extraCondition = "ComboPoints() >= MaxComboPoints()-1+Talent(internal_bleeding_talent)",
-                addSymbol = {
-                    [1] = "internal_bleeding_talent"
-                }
-            })
-        end
-        if annotation.specialization == "subtlety" then
-            insert(interrupts, {
-                name = "kidney_shot",
-                stun = 1,
-                order = 30,
-                extraCondition = "ComboPoints() >= MaxComboPoints()-1"
+                extraCondition = "ComboPoints() >= 1"
             })
         end
     end
