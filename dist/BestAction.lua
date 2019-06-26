@@ -388,7 +388,7 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
             return timeSpan, result
         end
         self.ComputeArithmetic = function(element, atTime)
-            self:StartProfiling("OvaleBestAction_Compute")
+            self:StartProfiling("OvaleBestAction_ComputeArithmetic")
             local timeSpan = GetTimeSpan(element)
             local result
             local rawTimeSpanA, nodeA = self:Compute(element.child[1], atTime)
@@ -455,11 +455,11 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
                 __exports.OvaleBestAction:Log("[%d]    arithmetic '%s' returns %s+(t-%s)*%s", element.nodeId, operator, l, m, n)
                 result = SetValue(element, l, m, n)
             end
-            self:StopProfiling("OvaleBestAction_Compute")
+            self:StopProfiling("OvaleBestAction_ComputeArithmetic")
             return timeSpan, result
         end
         self.ComputeCompare = function(element, atTime)
-            self:StartProfiling("OvaleBestAction_Compute")
+            self:StartProfiling("OvaleBestAction_ComputeCompare")
             local timeSpan = GetTimeSpan(element)
             local rawTimeSpanA, elementA = self:Compute(element.child[1], atTime)
             local a, b, c, timeSpanA = AsValue(atTime, rawTimeSpanA, elementA)
@@ -502,11 +502,11 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
                 end
                 __exports.OvaleBestAction:Log("[%d]    compare '%s' returns %s", element.nodeId, operator, timeSpan)
             end
-            self:StopProfiling("OvaleBestAction_Compute")
+            self:StopProfiling("OvaleBestAction_ComputeCompare")
             return timeSpan, element
         end
         self.ComputeCustomFunction = function(element, atTime)
-            self:StartProfiling("OvaleBestAction_Compute")
+            self:StartProfiling("OvaleBestAction_ComputeCustomFunction")
             local timeSpan = GetTimeSpan(element)
             local result
             local node = OvaleCompile:GetFunctionNode(element.name)
@@ -517,7 +517,7 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
             else
                 wipe(timeSpan)
             end
-            self:StopProfiling("OvaleBestAction_Compute")
+            self:StopProfiling("OvaleBestAction_ComputeCustomFunction")
             return timeSpan, result
         end
         self.ComputeFunction = function(element, atTime)
@@ -538,7 +538,7 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
             return timeSpan, result
         end
         self.ComputeGroup = function(element, atTime)
-            self:StartProfiling("OvaleBestAction_Compute")
+            self:StartProfiling("OvaleBestAction_ComputeGroup")
             local bestTimeSpan, bestElement
             local best = newTimeSpan()
             local current = newTimeSpan()
@@ -588,11 +588,11 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
             else
                 __exports.OvaleBestAction:Log("[%d]    group no best action returns %s", element.nodeId, timeSpan)
             end
-            self:StopProfiling("OvaleBestAction_Compute")
+            self:StopProfiling("OvaleBestAction_ComputeGroup")
             return timeSpan, bestElement
         end
         self.ComputeIf = function(element, atTime)
-            self:StartProfiling("OvaleBestAction_Compute")
+            self:StartProfiling("OvaleBestAction_ComputeIf")
             local timeSpan = GetTimeSpan(element)
             local result
             local timeSpanA = self:ComputeBool(element.child[1], atTime)
@@ -612,11 +612,11 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
             if element.type == "unless" then
                 conditionTimeSpan:Release()
             end
-            self:StopProfiling("OvaleBestAction_Compute")
+            self:StopProfiling("OvaleBestAction_ComputeIf")
             return timeSpan, result
         end
         self.ComputeLogical = function(element, atTime)
-            self:StartProfiling("OvaleBestAction_Compute")
+            self:StartProfiling("OvaleBestAction_ComputeLogical")
             local timeSpan = GetTimeSpan(element)
             local timeSpanA = self:ComputeBool(element.child[1], atTime)
             if element.operator == "and" then
@@ -648,7 +648,7 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
                 wipe(timeSpan)
             end
             __exports.OvaleBestAction:Log("[%d]    logical '%s' returns %s", element.nodeId, element.operator, timeSpan)
-            self:StopProfiling("OvaleBestAction_Compute")
+            self:StopProfiling("OvaleBestAction_ComputeLogical")
             return timeSpan, element
         end
         self.ComputeLua = function(element, atTime)
@@ -664,7 +664,7 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
             return timeSpan, result
         end
         self.ComputeState = function(element, atTime)
-            self:StartProfiling("OvaleBestAction_Compute")
+            self:StartProfiling("OvaleBestAction_ComputeState")
             local result = element
             assert(element.func == "setstate")
             local name = element.positionalParams[1]
@@ -677,14 +677,14 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
             else
                 timeSpan = EMPTY_SET
             end
-            self:StopProfiling("OvaleBestAction_Compute")
+            self:StopProfiling("OvaleBestAction_ComputeState")
             return timeSpan, result
         end
         self.ComputeValue = function(element, atTime)
-            self:StartProfiling("OvaleBestAction_Compute")
+            self:StartProfiling("OvaleBestAction_ComputeValue")
             __exports.OvaleBestAction:Log("[%d]    value is %s", element.nodeId, element.value)
             local timeSpan = GetTimeSpan(element, UNIVERSE)
-            self:StopProfiling("OvaleBestAction_Compute")
+            self:StopProfiling("OvaleBestAction_ComputeValue")
             return timeSpan, element
         end
         self.COMPUTE_VISITOR = {
@@ -755,7 +755,7 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
         return timeSpan, element
     end,
     PostOrderCompute = function(self, element, atTime)
-        self:StartProfiling("OvaleBestAction_Compute")
+        self:StartProfiling("OvaleBestAction_PostOrderCompute")
         local timeSpan, result
         local postOrder = element.postOrder
         if postOrder and  not (element.serial and element.serial >= self_serial) then
@@ -794,11 +794,11 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
             end
         end
         timeSpan, result = self:RecursiveCompute(element, atTime)
-        self:StopProfiling("OvaleBestAction_Compute")
+        self:StopProfiling("OvaleBestAction_PostOrderCompute")
         return timeSpan, result
     end,
     RecursiveCompute = function(self, element, atTime)
-        self:StartProfiling("OvaleBestAction_Compute")
+        self:StartProfiling("OvaleBestAction_RecursiveCompute")
         local timeSpan, result
         if element then
             if element.serial == -1 then
@@ -832,7 +832,7 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
                 end
             end
         end
-        self:StopProfiling("OvaleBestAction_Compute")
+        self:StopProfiling("OvaleBestAction_RecursiveCompute")
         return timeSpan, result
     end,
     ComputeBool = function(self, element, atTime)

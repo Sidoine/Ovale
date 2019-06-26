@@ -313,7 +313,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         return [timeSpan, element];
     }
     PostOrderCompute(element: Element, atTime: number): [OvaleTimeSpan, Element] {
-        this.StartProfiling("OvaleBestAction_Compute");
+        this.StartProfiling("OvaleBestAction_PostOrderCompute");
         let timeSpan: OvaleTimeSpan, result: Element;
         let postOrder = element.postOrder;
         if (postOrder && !(element.serial && element.serial >= self_serial)) {
@@ -352,11 +352,11 @@ class OvaleBestActionClass extends OvaleBestActionBase {
             }
         }
         [timeSpan, result] = this.RecursiveCompute(element, atTime);
-        this.StopProfiling("OvaleBestAction_Compute");
+        this.StopProfiling("OvaleBestAction_PostOrderCompute");
         return [timeSpan, result];
     }
     RecursiveCompute(element: Element, atTime: number): [OvaleTimeSpan, any] {
-        this.StartProfiling("OvaleBestAction_Compute");
+        this.StartProfiling("OvaleBestAction_RecursiveCompute");
         let timeSpan: OvaleTimeSpan, result: Element;
         if (element) {
             if (element.serial == -1) {
@@ -391,7 +391,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
                 }
             }
         }
-        this.StopProfiling("OvaleBestAction_Compute");
+        this.StopProfiling("OvaleBestAction_RecursiveCompute");
         return [timeSpan, result];
     }
     ComputeBool(element: Element, atTime: number) {
@@ -517,7 +517,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         return [timeSpan, result];
     }
     ComputeArithmetic: ComputerFunction = (element, atTime): [OvaleTimeSpan, any] => {
-        this.StartProfiling("OvaleBestAction_Compute");
+        this.StartProfiling("OvaleBestAction_ComputeArithmetic");
         let timeSpan = GetTimeSpan(element);
         let result: Element;
         const [rawTimeSpanA, nodeA] = this.Compute(element.child[1], atTime);
@@ -584,11 +584,11 @@ class OvaleBestActionClass extends OvaleBestActionBase {
             OvaleBestAction.Log("[%d]    arithmetic '%s' returns %s+(t-%s)*%s", element.nodeId, operator, l, m, n);
             result = SetValue(element, l, m, n);
         }
-        this.StopProfiling("OvaleBestAction_Compute");
+        this.StopProfiling("OvaleBestAction_ComputeArithmetic");
         return [timeSpan, result];
     }
     ComputeCompare: ComputerFunction = (element, atTime) => {
-        this.StartProfiling("OvaleBestAction_Compute");
+        this.StartProfiling("OvaleBestAction_ComputeCompare");
         let timeSpan = GetTimeSpan(element);
         const [rawTimeSpanA, elementA] = this.Compute(element.child[1], atTime);
         let [a, b, c, timeSpanA] = AsValue(atTime, rawTimeSpanA, elementA);
@@ -631,11 +631,11 @@ class OvaleBestActionClass extends OvaleBestActionBase {
             }
             OvaleBestAction.Log("[%d]    compare '%s' returns %s", element.nodeId, operator, timeSpan);
         }
-        this.StopProfiling("OvaleBestAction_Compute");
+        this.StopProfiling("OvaleBestAction_ComputeCompare");
         return [timeSpan, element];
     }
     ComputeCustomFunction = (element: Element, atTime: number): [OvaleTimeSpan, Element] => {
-        this.StartProfiling("OvaleBestAction_Compute");
+        this.StartProfiling("OvaleBestAction_ComputeCustomFunction");
         let timeSpan = GetTimeSpan(element);
         let result: Element;
         let node = OvaleCompile.GetFunctionNode(element.name);
@@ -646,7 +646,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         } else {
             wipe(timeSpan);
         }
-        this.StopProfiling("OvaleBestAction_Compute");
+        this.StopProfiling("OvaleBestAction_ComputeCustomFunction");
         return [timeSpan, result];
     }
     ComputeFunction: ComputerFunction = (element, atTime: number): [OvaleTimeSpan, Element] => {
@@ -667,7 +667,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         return [timeSpan, result];
     }
     ComputeGroup: ComputerFunction = (element, atTime): [OvaleTimeSpan, Element] => {
-        this.StartProfiling("OvaleBestAction_Compute");
+        this.StartProfiling("OvaleBestAction_ComputeGroup");
         let bestTimeSpan, bestElement;
         let best = newTimeSpan();
         let current = newTimeSpan();
@@ -717,11 +717,11 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         } else {
             OvaleBestAction.Log("[%d]    group no best action returns %s", element.nodeId, timeSpan);
         }
-        this.StopProfiling("OvaleBestAction_Compute");
+        this.StopProfiling("OvaleBestAction_ComputeGroup");
         return [timeSpan, bestElement];
     }
     ComputeIf: ComputerFunction = (element, atTime): [OvaleTimeSpan, Element] => {
-        this.StartProfiling("OvaleBestAction_Compute");
+        this.StartProfiling("OvaleBestAction_ComputeIf");
         let timeSpan = GetTimeSpan(element);
         let result;
         let timeSpanA = this.ComputeBool(element.child[1], atTime);
@@ -741,11 +741,11 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         if (element.type == "unless") {
             conditionTimeSpan.Release();
         }
-        this.StopProfiling("OvaleBestAction_Compute");
+        this.StopProfiling("OvaleBestAction_ComputeIf");
         return [timeSpan, result];
     }
     ComputeLogical: ComputerFunction = (element, atTime) => {
-        this.StartProfiling("OvaleBestAction_Compute");
+        this.StartProfiling("OvaleBestAction_ComputeLogical");
         let timeSpan = GetTimeSpan(element);
         let timeSpanA = this.ComputeBool(element.child[1], atTime);
         if (element.operator == "and") {
@@ -778,7 +778,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         }
 
         OvaleBestAction.Log("[%d]    logical '%s' returns %s", element.nodeId, element.operator, timeSpan);
-        this.StopProfiling("OvaleBestAction_Compute");
+        this.StopProfiling("OvaleBestAction_ComputeLogical");
         return [timeSpan, element];
     }
     ComputeLua: ComputerFunction = (element: Element, atTime) => {
@@ -794,7 +794,7 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         return [timeSpan, result];
     }
     ComputeState: ComputerFunction = (element: Element, atTime): [OvaleTimeSpan, any] => {
-        this.StartProfiling("OvaleBestAction_Compute");
+        this.StartProfiling("OvaleBestAction_ComputeState");
         let result = element;
         assert(element.func == "setstate");
         const name = element.positionalParams[1] as string;
@@ -807,14 +807,14 @@ class OvaleBestActionClass extends OvaleBestActionBase {
         } else {
             timeSpan = EMPTY_SET;
         }
-        this.StopProfiling("OvaleBestAction_Compute");
+        this.StopProfiling("OvaleBestAction_ComputeState");
         return [timeSpan, result];
     }
     ComputeValue: ComputerFunction = (element: Element, atTime): [OvaleTimeSpan, any] => {
-        this.StartProfiling("OvaleBestAction_Compute");
+        this.StartProfiling("OvaleBestAction_ComputeValue");
         OvaleBestAction.Log("[%d]    value is %s", element.nodeId, element.value);
         let timeSpan = GetTimeSpan(element, UNIVERSE);
-        this.StopProfiling("OvaleBestAction_Compute");
+        this.StopProfiling("OvaleBestAction_ComputeValue");
         return [timeSpan, element];
     }
 
