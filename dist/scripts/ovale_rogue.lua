@@ -2,7 +2,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
     local name = "sc_pr_rogue_assassination"
-    local desc = "[8.1] Simulationcraft: PR_Rogue_Assassination"
+    local desc = "[8.2] Simulationcraft: PR_Rogue_Assassination"
     local code = [[
 # Based on SimulationCraft profile "PR_Rogue_Assassination".
 #	class=rogue
@@ -563,7 +563,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 end
 do
     local name = "sc_pr_rogue_assassination_exsg"
-    local desc = "[8.1] Simulationcraft: PR_Rogue_Assassination_Exsg"
+    local desc = "[8.2] Simulationcraft: PR_Rogue_Assassination_Exsg"
     local code = [[
 # Based on SimulationCraft profile "PR_Rogue_Assassination_Exsg".
 #	class=rogue
@@ -1124,7 +1124,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 end
 do
     local name = "sc_pr_rogue_outlaw"
-    local desc = "[8.1] Simulationcraft: PR_Rogue_Outlaw"
+    local desc = "[8.2] Simulationcraft: PR_Rogue_Outlaw"
     local code = [[
 # Based on SimulationCraft profile "PR_Rogue_Outlaw".
 #	class=rogue
@@ -1648,7 +1648,7 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 end
 do
     local name = "sc_pr_rogue_outlaw_snd"
-    local desc = "[8.1] Simulationcraft: PR_Rogue_Outlaw_SnD"
+    local desc = "[8.2] Simulationcraft: PR_Rogue_Outlaw_SnD"
     local code = [[
 # Based on SimulationCraft profile "PR_Rogue_Outlaw_SnD".
 #	class=rogue
@@ -2164,7 +2164,7 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 end
 do
     local name = "sc_pr_rogue_subtlety"
-    local desc = "[8.1] Simulationcraft: PR_Rogue_Subtlety"
+    local desc = "[8.2] Simulationcraft: PR_Rogue_Subtlety"
     local code = [[
 # Based on SimulationCraft profile "PR_Rogue_Subtlety".
 #	class=rogue

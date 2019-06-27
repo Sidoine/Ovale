@@ -5,7 +5,7 @@ import { OvaleScripts } from "../Scripts";
 
 {
 	const name = "sc_pr_monk_brewmaster"
-	const desc = "[8.1] Simulationcraft: PR_Monk_Brewmaster"
+	const desc = "[8.2] Simulationcraft: PR_Monk_Brewmaster"
 	const code = `
 # Based on SimulationCraft profile "PR_Monk_Brewmaster".
 #	class=monk
@@ -278,7 +278,7 @@ AddIcon checkbox=opt_monk_brewmaster_aoe help=cd specialization=brewmaster
 
 {
 	const name = "sc_pr_monk_windwalker"
-	const desc = "[8.1] Simulationcraft: PR_Monk_Windwalker"
+	const desc = "[8.2] Simulationcraft: PR_Monk_Windwalker"
 	const code = `
 # Based on SimulationCraft profile "PR_Monk_Windwalker".
 #	class=monk
@@ -765,7 +765,7 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 
 {
 	const name = "sc_pr_monk_windwalker_serenity"
-	const desc = "[8.1] Simulationcraft: PR_Monk_Windwalker_Serenity"
+	const desc = "[8.2] Simulationcraft: PR_Monk_Windwalker_Serenity"
 	const code = `
 # Based on SimulationCraft profile "PR_Monk_Windwalker_Serenity".
 #	class=monk

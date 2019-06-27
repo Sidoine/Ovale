@@ -1,7 +1,7 @@
 import { OvaleScripts } from "../Scripts";
 export function register() {
     let name = "ovale_common";
-    let desc = "[7.3.2] Ovale: Common spell definitions";
+    let desc = "[8.2] Ovale: Common spell definitions";
     let code = `
 # Common spell definitions shared by all classes and specializations.
 

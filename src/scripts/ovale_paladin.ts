@@ -5,7 +5,7 @@ import { OvaleScripts } from "../Scripts";
 
 {
 	const name = "sc_pr_paladin_protection"
-	const desc = "[8.1] Simulationcraft: PR_Paladin_Protection"
+	const desc = "[8.2] Simulationcraft: PR_Paladin_Protection"
 	const code = `
 # Based on SimulationCraft profile "PR_Paladin_Protection".
 #	class=paladin
@@ -295,7 +295,7 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 
 {
 	const name = "sc_pr_paladin_retribution"
-	const desc = "[8.1] Simulationcraft: PR_Paladin_Retribution"
+	const desc = "[8.2] Simulationcraft: PR_Paladin_Retribution"
 	const code = `
 # Based on SimulationCraft profile "PR_Paladin_Retribution".
 #	class=paladin

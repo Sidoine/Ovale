@@ -4,7 +4,7 @@ import { OvaleScripts } from "../Scripts";
 
 {
 	const name = "sc_pr_druid_balance"
-	const desc = "[8.1] Simulationcraft: PR_Druid_Balance"
+	const desc = "[8.2] Simulationcraft: PR_Druid_Balance"
 	const code = `
 # Based on SimulationCraft profile "PR_Druid_Balance".
 #	class=druid
@@ -355,7 +355,7 @@ AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
 
 {
 	const name = "sc_pr_druid_feral"
-	const desc = "[8.1] Simulationcraft: PR_Druid_Feral"
+	const desc = "[8.2] Simulationcraft: PR_Druid_Feral"
 	const code = `
 # Based on SimulationCraft profile "PR_Druid_Feral".
 #	class=druid
@@ -915,7 +915,7 @@ AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
 
 {
 	const name = "sc_pr_druid_guardian"
-	const desc = "[8.1] Simulationcraft: PR_Druid_Guardian"
+	const desc = "[8.2] Simulationcraft: PR_Druid_Guardian"
 	const code = `
 # Based on SimulationCraft profile "PR_Druid_Guardian".
 #	class=druid

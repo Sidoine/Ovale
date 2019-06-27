@@ -2,7 +2,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
     local name = "sc_pr_priest_holy"
-    local desc = "[8.1] Simulationcraft: PR_Priest_Holy"
+    local desc = "[8.2] Simulationcraft: PR_Priest_Holy"
     local code = [[
 # Based on SimulationCraft profile "PR_Priest_Holy".
 #	class=priest
@@ -220,7 +220,7 @@ AddIcon checkbox=opt_priest_holy_aoe help=cd specialization=holy
 end
 do
     local name = "sc_pr_priest_shadow"
-    local desc = "[8.1] Simulationcraft: PR_Priest_Shadow"
+    local desc = "[8.2] Simulationcraft: PR_Priest_Shadow"
     local code = [[
 # Based on SimulationCraft profile "PR_Priest_Shadow".
 #	class=priest

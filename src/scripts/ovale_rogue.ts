@@ -4,7 +4,7 @@ import { OvaleScripts } from "../Scripts";
 
 {
 	const name = "sc_pr_rogue_assassination"
-	const desc = "[8.1] Simulationcraft: PR_Rogue_Assassination"
+	const desc = "[8.2] Simulationcraft: PR_Rogue_Assassination"
 	const code = `
 # Based on SimulationCraft profile "PR_Rogue_Assassination".
 #	class=rogue
@@ -566,7 +566,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 
 {
 	const name = "sc_pr_rogue_assassination_exsg"
-	const desc = "[8.1] Simulationcraft: PR_Rogue_Assassination_Exsg"
+	const desc = "[8.2] Simulationcraft: PR_Rogue_Assassination_Exsg"
 	const code = `
 # Based on SimulationCraft profile "PR_Rogue_Assassination_Exsg".
 #	class=rogue
@@ -1128,7 +1128,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 
 {
 	const name = "sc_pr_rogue_outlaw"
-	const desc = "[8.1] Simulationcraft: PR_Rogue_Outlaw"
+	const desc = "[8.2] Simulationcraft: PR_Rogue_Outlaw"
 	const code = `
 # Based on SimulationCraft profile "PR_Rogue_Outlaw".
 #	class=rogue
@@ -1653,7 +1653,7 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 
 {
 	const name = "sc_pr_rogue_outlaw_snd"
-	const desc = "[8.1] Simulationcraft: PR_Rogue_Outlaw_SnD"
+	const desc = "[8.2] Simulationcraft: PR_Rogue_Outlaw_SnD"
 	const code = `
 # Based on SimulationCraft profile "PR_Rogue_Outlaw_SnD".
 #	class=rogue
@@ -2170,7 +2170,7 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 
 {
 	const name = "sc_pr_rogue_subtlety"
-	const desc = "[8.1] Simulationcraft: PR_Rogue_Subtlety"
+	const desc = "[8.2] Simulationcraft: PR_Rogue_Subtlety"
 	const code = `
 # Based on SimulationCraft profile "PR_Rogue_Subtlety".
 #	class=rogue

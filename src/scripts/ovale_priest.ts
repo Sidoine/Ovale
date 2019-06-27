@@ -5,7 +5,7 @@ import { OvaleScripts } from "../Scripts";
 
 {
 	const name = "sc_pr_priest_holy"
-	const desc = "[8.1] Simulationcraft: PR_Priest_Holy"
+	const desc = "[8.2] Simulationcraft: PR_Priest_Holy"
 	const code = `
 # Based on SimulationCraft profile "PR_Priest_Holy".
 #	class=priest
@@ -224,7 +224,7 @@ AddIcon checkbox=opt_priest_holy_aoe help=cd specialization=holy
 
 {
 	const name = "sc_pr_priest_shadow"
-	const desc = "[8.1] Simulationcraft: PR_Priest_Shadow"
+	const desc = "[8.2] Simulationcraft: PR_Priest_Shadow"
 	const code = `
 # Based on SimulationCraft profile "PR_Priest_Shadow".
 #	class=priest

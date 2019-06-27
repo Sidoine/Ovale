@@ -4,7 +4,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 __exports.register = function()
     local name = "ovale_common"
-    local desc = "[7.3.2] Ovale: Common spell definitions"
+    local desc = "[8.2] Ovale: Common spell definitions"
     local code = [[
 # Common spell definitions shared by all classes and specializations.
 

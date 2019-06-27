@@ -2,7 +2,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
     local name = "sc_pr_druid_balance"
-    local desc = "[8.1] Simulationcraft: PR_Druid_Balance"
+    local desc = "[8.2] Simulationcraft: PR_Druid_Balance"
     local code = [[
 # Based on SimulationCraft profile "PR_Druid_Balance".
 #	class=druid
@@ -352,7 +352,7 @@ AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
 end
 do
     local name = "sc_pr_druid_feral"
-    local desc = "[8.1] Simulationcraft: PR_Druid_Feral"
+    local desc = "[8.2] Simulationcraft: PR_Druid_Feral"
     local code = [[
 # Based on SimulationCraft profile "PR_Druid_Feral".
 #	class=druid
@@ -911,7 +911,7 @@ AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
 end
 do
     local name = "sc_pr_druid_guardian"
-    local desc = "[8.1] Simulationcraft: PR_Druid_Guardian"
+    local desc = "[8.2] Simulationcraft: PR_Druid_Guardian"
     local code = [[
 # Based on SimulationCraft profile "PR_Druid_Guardian".
 #	class=druid

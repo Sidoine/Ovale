@@ -2,7 +2,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
     local name = "sc_pr_monk_brewmaster"
-    local desc = "[8.1] Simulationcraft: PR_Monk_Brewmaster"
+    local desc = "[8.2] Simulationcraft: PR_Monk_Brewmaster"
     local code = [[
 # Based on SimulationCraft profile "PR_Monk_Brewmaster".
 #	class=monk
@@ -274,7 +274,7 @@ AddIcon checkbox=opt_monk_brewmaster_aoe help=cd specialization=brewmaster
 end
 do
     local name = "sc_pr_monk_windwalker"
-    local desc = "[8.1] Simulationcraft: PR_Monk_Windwalker"
+    local desc = "[8.2] Simulationcraft: PR_Monk_Windwalker"
     local code = [[
 # Based on SimulationCraft profile "PR_Monk_Windwalker".
 #	class=monk
@@ -760,7 +760,7 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 end
 do
     local name = "sc_pr_monk_windwalker_serenity"
-    local desc = "[8.1] Simulationcraft: PR_Monk_Windwalker_Serenity"
+    local desc = "[8.2] Simulationcraft: PR_Monk_Windwalker_Serenity"
     local code = [[
 # Based on SimulationCraft profile "PR_Monk_Windwalker_Serenity".
 #	class=monk

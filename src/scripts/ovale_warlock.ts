@@ -4,7 +4,7 @@ import { OvaleScripts } from "../Scripts";
 
 {
 	const name = "sc_pr_warlock_affliction"
-	const desc = "[8.1] Simulationcraft: PR_Warlock_Affliction"
+	const desc = "[8.2] Simulationcraft: PR_Warlock_Affliction"
 	const code = `
 # Based on SimulationCraft profile "PR_Warlock_Affliction".
 #	class=warlock
@@ -603,7 +603,7 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 
 {
 	const name = "sc_pr_warlock_demonology"
-	const desc = "[8.1] Simulationcraft: PR_Warlock_Demonology"
+	const desc = "[8.2] Simulationcraft: PR_Warlock_Demonology"
 	const code = `
 # Based on SimulationCraft profile "PR_Warlock_Demonology".
 #	class=warlock
@@ -1312,7 +1312,7 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 
 {
 	const name = "sc_pr_warlock_destruction"
-	const desc = "[8.1] Simulationcraft: PR_Warlock_Destruction"
+	const desc = "[8.2] Simulationcraft: PR_Warlock_Destruction"
 	const code = `
 # Based on SimulationCraft profile "PR_Warlock_Destruction".
 #	class=warlock

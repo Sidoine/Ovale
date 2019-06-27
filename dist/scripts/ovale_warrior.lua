@@ -2,7 +2,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
     local name = "sc_pr_warrior_arms"
-    local desc = "[8.1] Simulationcraft: PR_Warrior_Arms"
+    local desc = "[8.2] Simulationcraft: PR_Warrior_Arms"
     local code = [[
 # Based on SimulationCraft profile "PR_Warrior_Arms".
 #	class=warrior
@@ -614,7 +614,7 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 end
 do
     local name = "sc_pr_warrior_fury"
-    local desc = "[8.1] Simulationcraft: PR_Warrior_Fury"
+    local desc = "[8.2] Simulationcraft: PR_Warrior_Fury"
     local code = [[
 # Based on SimulationCraft profile "PR_Warrior_Fury".
 #	class=warrior

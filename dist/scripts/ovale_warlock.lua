@@ -2,7 +2,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
     local name = "sc_pr_warlock_affliction"
-    local desc = "[8.1] Simulationcraft: PR_Warlock_Affliction"
+    local desc = "[8.2] Simulationcraft: PR_Warlock_Affliction"
     local code = [[
 # Based on SimulationCraft profile "PR_Warlock_Affliction".
 #	class=warlock
@@ -600,7 +600,7 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 end
 do
     local name = "sc_pr_warlock_demonology"
-    local desc = "[8.1] Simulationcraft: PR_Warlock_Demonology"
+    local desc = "[8.2] Simulationcraft: PR_Warlock_Demonology"
     local code = [[
 # Based on SimulationCraft profile "PR_Warlock_Demonology".
 #	class=warlock
@@ -1308,7 +1308,7 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 end
 do
     local name = "sc_pr_warlock_destruction"
-    local desc = "[8.1] Simulationcraft: PR_Warlock_Destruction"
+    local desc = "[8.2] Simulationcraft: PR_Warlock_Destruction"
     local code = [[
 # Based on SimulationCraft profile "PR_Warlock_Destruction".
 #	class=warlock

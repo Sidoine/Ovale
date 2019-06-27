@@ -4,7 +4,7 @@ import { OvaleScripts } from "../Scripts";
 
 {
 	const name = "sc_pr_hunter_beast_mastery"
-	const desc = "[8.1] Simulationcraft: PR_Hunter_Beast_Mastery"
+	const desc = "[8.2] Simulationcraft: PR_Hunter_Beast_Mastery"
 	const code = `
 # Based on SimulationCraft profile "PR_Hunter_Beast_Mastery".
 #	class=hunter
@@ -438,7 +438,7 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 
 {
 	const name = "sc_pr_hunter_marksmanship"
-	const desc = "[8.1] Simulationcraft: PR_Hunter_Marksmanship"
+	const desc = "[8.2] Simulationcraft: PR_Hunter_Marksmanship"
 	const code = `
 # Based on SimulationCraft profile "PR_Hunter_Marksmanship".
 #	class=hunter
@@ -853,7 +853,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 
 {
 	const name = "sc_pr_hunter_survival"
-	const desc = "[8.1] Simulationcraft: PR_Hunter_Survival"
+	const desc = "[8.2] Simulationcraft: PR_Hunter_Survival"
 	const code = `
 # Based on SimulationCraft profile "PR_Hunter_Survival".
 #	class=hunter

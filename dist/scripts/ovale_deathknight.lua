@@ -2,7 +2,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
     local name = "sc_pr_death_knight_blood"
-    local desc = "[8.1] Simulationcraft: PR_Death_Knight_Blood"
+    local desc = "[8.2] Simulationcraft: PR_Death_Knight_Blood"
     local code = [[
 # Based on SimulationCraft profile "PR_Death_Knight_Blood".
 #	class=deathknight
@@ -309,7 +309,7 @@ AddIcon checkbox=opt_deathknight_blood_aoe help=cd specialization=blood
 end
 do
     local name = "sc_pr_death_knight_frost"
-    local desc = "[8.1] Simulationcraft: PR_Death_Knight_Frost"
+    local desc = "[8.2] Simulationcraft: PR_Death_Knight_Frost"
     local code = [[
 # Based on SimulationCraft profile "PR_Death_Knight_Frost".
 #	class=deathknight
@@ -1037,7 +1037,7 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 end
 do
     local name = "sc_pr_death_knight_unholy"
-    local desc = "[8.1] Simulationcraft: PR_Death_Knight_Unholy"
+    local desc = "[8.2] Simulationcraft: PR_Death_Knight_Unholy"
     local code = [[
 # Based on SimulationCraft profile "PR_Death_Knight_Unholy".
 #	class=deathknight

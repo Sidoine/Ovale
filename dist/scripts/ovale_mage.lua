@@ -2,7 +2,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
     local name = "sc_pr_mage_arcane"
-    local desc = "[8.1] Simulationcraft: PR_Mage_Arcane"
+    local desc = "[8.2] Simulationcraft: PR_Mage_Arcane"
     local code = [[
 # Based on SimulationCraft profile "PR_Mage_Arcane".
 #	class=mage
@@ -509,7 +509,7 @@ AddIcon checkbox=opt_mage_arcane_aoe help=cd specialization=arcane
 end
 do
     local name = "sc_pr_mage_fire"
-    local desc = "[8.1] Simulationcraft: PR_Mage_Fire"
+    local desc = "[8.2] Simulationcraft: PR_Mage_Fire"
     local code = [[
 # Based on SimulationCraft profile "PR_Mage_Fire".
 #	class=mage
@@ -1292,7 +1292,7 @@ AddIcon checkbox=opt_mage_fire_aoe help=cd specialization=fire
 end
 do
     local name = "sc_pr_mage_frost"
-    local desc = "[8.1] Simulationcraft: PR_Mage_Frost"
+    local desc = "[8.2] Simulationcraft: PR_Mage_Frost"
     local code = [[
 # Based on SimulationCraft profile "PR_Mage_Frost".
 #	class=mage

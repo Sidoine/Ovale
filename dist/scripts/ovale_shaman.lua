@@ -2,7 +2,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
     local name = "sc_pr_shaman_elemental"
-    local desc = "[8.1] Simulationcraft: PR_Shaman_Elemental"
+    local desc = "[8.2] Simulationcraft: PR_Shaman_Elemental"
     local code = [[
 # Based on SimulationCraft profile "PR_Shaman_Elemental".
 #	class=shaman
@@ -523,7 +523,7 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 end
 do
     local name = "sc_pr_shaman_enhancement"
-    local desc = "[8.1] Simulationcraft: PR_Shaman_Enhancement"
+    local desc = "[8.2] Simulationcraft: PR_Shaman_Enhancement"
     local code = [[
 # Based on SimulationCraft profile "PR_Shaman_Enhancement".
 #	class=shaman

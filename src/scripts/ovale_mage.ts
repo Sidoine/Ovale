@@ -4,7 +4,7 @@ import { OvaleScripts } from "../Scripts";
 
 {
 	const name = "sc_pr_mage_arcane"
-	const desc = "[8.1] Simulationcraft: PR_Mage_Arcane"
+	const desc = "[8.2] Simulationcraft: PR_Mage_Arcane"
 	const code = `
 # Based on SimulationCraft profile "PR_Mage_Arcane".
 #	class=mage
@@ -512,7 +512,7 @@ AddIcon checkbox=opt_mage_arcane_aoe help=cd specialization=arcane
 
 {
 	const name = "sc_pr_mage_fire"
-	const desc = "[8.1] Simulationcraft: PR_Mage_Fire"
+	const desc = "[8.2] Simulationcraft: PR_Mage_Fire"
 	const code = `
 # Based on SimulationCraft profile "PR_Mage_Fire".
 #	class=mage
@@ -1296,7 +1296,7 @@ AddIcon checkbox=opt_mage_fire_aoe help=cd specialization=fire
 
 {
 	const name = "sc_pr_mage_frost"
-	const desc = "[8.1] Simulationcraft: PR_Mage_Frost"
+	const desc = "[8.2] Simulationcraft: PR_Mage_Frost"
 	const code = `
 # Based on SimulationCraft profile "PR_Mage_Frost".
 #	class=mage

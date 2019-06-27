@@ -5,7 +5,7 @@ import { OvaleScripts } from "../Scripts";
 
 {
 	const name = "sc_pr_demon_hunter_havoc"
-	const desc = "[8.1] Simulationcraft: PR_Demon_Hunter_Havoc"
+	const desc = "[8.2] Simulationcraft: PR_Demon_Hunter_Havoc"
 	const code = `
 # Based on SimulationCraft profile "PR_Demon_Hunter_Havoc".
 #	class=demonhunter
@@ -539,7 +539,7 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 
 {
 	const name = "sc_pr_demon_hunter_vengeance"
-	const desc = "[8.1] Simulationcraft: PR_Demon_Hunter_Vengeance"
+	const desc = "[8.2] Simulationcraft: PR_Demon_Hunter_Vengeance"
 	const code = `
 # Based on SimulationCraft profile "PR_Demon_Hunter_Vengeance".
 #	class=demonhunter

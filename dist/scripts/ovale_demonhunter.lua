@@ -2,7 +2,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
     local name = "sc_pr_demon_hunter_havoc"
-    local desc = "[8.1] Simulationcraft: PR_Demon_Hunter_Havoc"
+    local desc = "[8.2] Simulationcraft: PR_Demon_Hunter_Havoc"
     local code = [[
 # Based on SimulationCraft profile "PR_Demon_Hunter_Havoc".
 #	class=demonhunter
@@ -535,7 +535,7 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 end
 do
     local name = "sc_pr_demon_hunter_vengeance"
-    local desc = "[8.1] Simulationcraft: PR_Demon_Hunter_Vengeance"
+    local desc = "[8.2] Simulationcraft: PR_Demon_Hunter_Vengeance"
     local code = [[
 # Based on SimulationCraft profile "PR_Demon_Hunter_Vengeance".
 #	class=demonhunter

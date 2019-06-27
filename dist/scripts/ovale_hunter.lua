@@ -2,7 +2,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
     local name = "sc_pr_hunter_beast_mastery"
-    local desc = "[8.1] Simulationcraft: PR_Hunter_Beast_Mastery"
+    local desc = "[8.2] Simulationcraft: PR_Hunter_Beast_Mastery"
     local code = [[
 # Based on SimulationCraft profile "PR_Hunter_Beast_Mastery".
 #	class=hunter
@@ -435,7 +435,7 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 end
 do
     local name = "sc_pr_hunter_marksmanship"
-    local desc = "[8.1] Simulationcraft: PR_Hunter_Marksmanship"
+    local desc = "[8.2] Simulationcraft: PR_Hunter_Marksmanship"
     local code = [[
 # Based on SimulationCraft profile "PR_Hunter_Marksmanship".
 #	class=hunter
@@ -849,7 +849,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 end
 do
     local name = "sc_pr_hunter_survival"
-    local desc = "[8.1] Simulationcraft: PR_Hunter_Survival"
+    local desc = "[8.2] Simulationcraft: PR_Hunter_Survival"
     local code = [[
 # Based on SimulationCraft profile "PR_Hunter_Survival".
 #	class=hunter

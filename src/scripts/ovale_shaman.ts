@@ -4,7 +4,7 @@ import { OvaleScripts } from "../Scripts";
 
 {
 	const name = "sc_pr_shaman_elemental"
-	const desc = "[8.1] Simulationcraft: PR_Shaman_Elemental"
+	const desc = "[8.2] Simulationcraft: PR_Shaman_Elemental"
 	const code = `
 # Based on SimulationCraft profile "PR_Shaman_Elemental".
 #	class=shaman
@@ -526,7 +526,7 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 
 {
 	const name = "sc_pr_shaman_enhancement"
-	const desc = "[8.1] Simulationcraft: PR_Shaman_Enhancement"
+	const desc = "[8.2] Simulationcraft: PR_Shaman_Enhancement"
 	const code = `
 # Based on SimulationCraft profile "PR_Shaman_Enhancement".
 #	class=shaman

@@ -2,7 +2,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
     local name = "sc_pr_paladin_protection"
-    local desc = "[8.1] Simulationcraft: PR_Paladin_Protection"
+    local desc = "[8.2] Simulationcraft: PR_Paladin_Protection"
     local code = [[
 # Based on SimulationCraft profile "PR_Paladin_Protection".
 #	class=paladin
@@ -291,7 +291,7 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 end
 do
     local name = "sc_pr_paladin_retribution"
-    local desc = "[8.1] Simulationcraft: PR_Paladin_Retribution"
+    local desc = "[8.2] Simulationcraft: PR_Paladin_Retribution"
     local code = [[
 # Based on SimulationCraft profile "PR_Paladin_Retribution".
 #	class=paladin
