@@ -1580,6 +1580,8 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("incarnation", "incarnation_tree_of_life", "DRUID", "restoration");
     AddDisambiguation("incarnation", "incarnation_king_of_the_jungle", "DRUID", "feral");
     AddDisambiguation("incarnation", "incarnation_guardian_of_ursoc", "DRUID", "guardian");
+	AddDisambiguation("swipe", "swipe_bear", "DRUID", "guardian");
+	AddDisambiguation("swipe", "swipe_cat", "DRUID", "feral");
     
     //Hunter
     AddDisambiguation("a_murder_of_crows_talent", "mm_a_murder_of_crows_talent", "HUNTER", "marksmanship");

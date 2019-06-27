@@ -273,10 +273,6 @@ Define(sunfire 93402)
 # A quick beam of solar light burns the enemy for (20 of Spell Power) Nature damage and then an additional 164815o2 Nature damage over 12 seconds?s231050[ to the primary target and all enemies within 164815A2 yards][].?s137013[rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r][]
 # Rank 2: Sunfire now applies its damage over time effect to all enemies within 164815A2 yards.
   SpellInfo(sunfire lunarpower=0)
-Define(swipe 213764)
-# Swipe nearby enemies, inflicting Physical damage. Damage varies by shapeshift form.
-# Rank 2: Swipe deals 106785s2 increased damage against bleeding targets.
-  SpellInfo(swipe gcd=1)
 Define(the_unbound_force 298452)
 # Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]
   SpellInfo(the_unbound_force cd=60 duration=2 channel=2 tick=0.33)
@@ -430,6 +426,7 @@ Define(survival_instincts_buff 61336)
 	SpellInfo(survival_instincts_buff duration=6)
 Define(stampeding_roar 77761)
 	SpellInfo(stampeding_roar cd=120)
+	
 
 # Balance and Restoration shared
  # Also Guardian
@@ -666,7 +663,8 @@ Define(pulverize_buff 158792)
 
 	SpellInfo(survival_instincts add_cd=120 specialization=guardian)
 	SpellInfo(survival_instincts add_cd=-80 specialization=guardian talent=survival_of_the_fittest_talent) 
-
+Define(swipe_bear 213771)
+	
 	SpellInfo(thrash_bear_debuff max_stacks=5 if_equipped=elizes_everlasting_encasement)
 
 # Guardian Legendaries
