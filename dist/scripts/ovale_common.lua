@@ -97,6 +97,25 @@ Define(item_bursting_blood 152560)
 Define(item_rising_death 152559)
 Define(item_steelskin_potion 152557)
 
+Define(concentrated_flame 295373)
+	SpellInfo(concentrated_flame cd=30)
+Define(memory_of_lucid_dreams 298357)
+	SpellInfo(memory_of_lucid_dreams cd=120)
+Define(blood_of_the_enemy 298277)
+	SpellInfo(blood_of_the_enemy cd=90)
+Define(guardian_of_azeroth 299358)
+	SpellInfo(guardian_of_azeroth cd=180)
+Define(focused_azerite_beam 299338)
+	SpellInfo(focused_azerite_beam cd=180)
+Define(purifying_blast 295337)
+	SpellInfo(purifying_blast cd=60)
+Define(ripple_in_space 302983)
+	SpellInfo(ripple_in_space cd=60)
+Define(the_unbound_force 298452)
+	SpellInfo(the_unbound_force cd=60)
+Define(worldvein_resonance 295186)
+	SpellInfo(worldvein_resonance cd=60)
+
 ###
 ### Trinkets & OnUse Rings
 ###
