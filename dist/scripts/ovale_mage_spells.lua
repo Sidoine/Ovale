@@ -82,11 +82,6 @@ Define(combustion 190319)
 Define(comet_storm 153595)
 # Calls down a series of 7 icy comets on and around the target, that deals up to 7*(40 of Spell Power) Frost damage to all enemies within 228601A1 yds of its impacts.
   SpellInfo(comet_storm cd=30 talent=comet_storm_talent)
-Define(concentrated_flame 295368)
-# Blast your target with a ball of concentrated flame, dealing 295365s2*(1+@versadmg) Fire damage to an enemy or healing an ally for 295365s2*(1+@versadmg)?a295377[, then burn the target for an additional 295377m1 of the damage or healing done over 6 seconds][]. rnrnEach cast of Concentrated Flame deals s3 increased damage or healing. This bonus resets after every third cast.
-  SpellInfo(concentrated_flame duration=6 channel=6 gcd=0 offgcd=1 tick=2)
-  # Suffering w1 damage every t1 sec.
-  SpellAddTargetDebuff(concentrated_flame concentrated_flame=1)
 Define(cone_of_cold 120)
 # Targets in a cone in front of you take (37.5 of Spell Power) Frost damage and have movement slowed by 212792m1 for 5 seconds.
   SpellInfo(cone_of_cold cd=12)

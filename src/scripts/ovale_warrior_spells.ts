@@ -35,11 +35,6 @@ Define(cleave 845)
 Define(colossus_smash 167105)
 # Smashes the enemy's armor, dealing s1 Physical damage, and increasing damage you deal to them by 208086s1 for 10 seconds.
   SpellInfo(colossus_smash cd=45)
-Define(concentrated_flame 295368)
-# Blast your target with a ball of concentrated flame, dealing 295365s2*(1+@versadmg) Fire damage to an enemy or healing an ally for 295365s2*(1+@versadmg)?a295377[, then burn the target for an additional 295377m1 of the damage or healing done over 6 seconds][]. rnrnEach cast of Concentrated Flame deals s3 increased damage or healing. This bonus resets after every third cast.
-  SpellInfo(concentrated_flame duration=6 channel=6 gcd=0 offgcd=1 tick=2)
-  # Suffering w1 damage every t1 sec.
-  SpellAddTargetDebuff(concentrated_flame concentrated_flame=1)
 Define(crushing_assault_buff 278824)
 # Your melee abilities have a chance to increase the damage of your next Slam by s1 and reduce its Rage cost by s2/10.
   SpellInfo(crushing_assault_buff channel=-0.001 gcd=0 offgcd=1)

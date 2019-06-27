@@ -36,11 +36,6 @@ Define(blood_of_the_enemy 297108)
   SpellInfo(blood_of_the_enemy cd=120 duration=10 channel=10)
   # You have a w2 increased chance to be Critically Hit by the caster.
   SpellAddTargetDebuff(blood_of_the_enemy blood_of_the_enemy=1)
-Define(concentrated_flame 295368)
-# Blast your target with a ball of concentrated flame, dealing 295365s2*(1+@versadmg) Fire damage to an enemy or healing an ally for 295365s2*(1+@versadmg)?a295377[, then burn the target for an additional 295377m1 of the damage or healing done over 6 seconds][]. rnrnEach cast of Concentrated Flame deals s3 increased damage or healing. This bonus resets after every third cast.
-  SpellInfo(concentrated_flame duration=6 channel=6 gcd=0 offgcd=1 tick=2)
-  # Suffering w1 damage every t1 sec.
-  SpellAddTargetDebuff(concentrated_flame concentrated_flame=1)
 Define(consecration 26573)
 # Consecrates the land beneath you, causing 81297s1*9 Holy damage over 12 seconds to enemies who enter the area. Limit s2.
   SpellInfo(consecration cd=4.5 duration=12 tick=1)

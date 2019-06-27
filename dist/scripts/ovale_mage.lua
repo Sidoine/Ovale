@@ -1075,7 +1075,7 @@ AddFunction FireActivetalentsCdPostConditions
 AddFunction FireDefaultMainActions
 {
  #concentrated_flame
- Spell(concentrated_flame)
+ Spell(concentrated_flame_essence)
  #focused_azerite_beam
  Spell(focused_azerite_beam)
  #ripple_in_space
@@ -1107,7 +1107,7 @@ AddFunction FireDefaultMainPostConditions
 
 AddFunction FireDefaultShortCdActions
 {
- unless Spell(concentrated_flame) or Spell(focused_azerite_beam)
+ unless Spell(concentrated_flame_essence) or Spell(focused_azerite_beam)
  {
   #purifying_blast
   Spell(purifying_blast)
@@ -1144,7 +1144,7 @@ AddFunction FireDefaultShortCdActions
 
 AddFunction FireDefaultShortCdPostConditions
 {
- Spell(concentrated_flame) or Spell(focused_azerite_beam) or Spell(ripple_in_space) or Spell(worldvein_resonance) or { { Talent(rune_of_power_talent) and SpellCooldown(combustion) <= CastTime(rune_of_power) or SpellCooldown(combustion) == 0 } and not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } or BuffPresent(combustion_buff) } and FireCombustionphaseShortCdPostConditions() or BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopphaseShortCdPostConditions() or FireStandardrotationShortCdPostConditions()
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space) or Spell(worldvein_resonance) or { { Talent(rune_of_power_talent) and SpellCooldown(combustion) <= CastTime(rune_of_power) or SpellCooldown(combustion) == 0 } and not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } or BuffPresent(combustion_buff) } and FireCombustionphaseShortCdPostConditions() or BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopphaseShortCdPostConditions() or FireStandardrotationShortCdPostConditions()
 }
 
 AddFunction FireDefaultCdActions
@@ -1154,7 +1154,7 @@ AddFunction FireDefaultCdActions
  #mirror_image,if=buff.combustion.down
  if BuffExpires(combustion_buff) Spell(mirror_image)
 
- unless Spell(concentrated_flame) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(ripple_in_space) or Spell(the_unbound_force) or Spell(worldvein_resonance) or { Talent(firestarter_talent) and target.TimeToHealthPercent(90) > SpellFullRecharge(rune_of_power) or SpellCooldown(combustion) > combustion_rop_cutoff() and BuffExpires(combustion_buff) or target.TimeToDie() < SpellCooldown(combustion) and BuffExpires(combustion_buff) } and Spell(rune_of_power)
+ unless Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(ripple_in_space) or Spell(the_unbound_force) or Spell(worldvein_resonance) or { Talent(firestarter_talent) and target.TimeToHealthPercent(90) > SpellFullRecharge(rune_of_power) or SpellCooldown(combustion) > combustion_rop_cutoff() and BuffExpires(combustion_buff) or target.TimeToDie() < SpellCooldown(combustion) and BuffExpires(combustion_buff) } and Spell(rune_of_power)
  {
   #use_item,name=malformed_heralds_legwraps,if=cooldown.combustion.remains>55
   if SpellCooldown(combustion) > 55 FireUseItemActions()
@@ -1179,7 +1179,7 @@ AddFunction FireDefaultCdActions
 
 AddFunction FireDefaultCdPostConditions
 {
- Spell(concentrated_flame) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(ripple_in_space) or Spell(the_unbound_force) or Spell(worldvein_resonance) or { Talent(firestarter_talent) and target.TimeToHealthPercent(90) > SpellFullRecharge(rune_of_power) or SpellCooldown(combustion) > combustion_rop_cutoff() and BuffExpires(combustion_buff) or target.TimeToDie() < SpellCooldown(combustion) and BuffExpires(combustion_buff) } and Spell(rune_of_power) or { { Talent(rune_of_power_talent) and SpellCooldown(combustion) <= CastTime(rune_of_power) or SpellCooldown(combustion) == 0 } and not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } or BuffPresent(combustion_buff) } and FireCombustionphaseCdPostConditions() or BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopphaseCdPostConditions() or FireStandardrotationCdPostConditions()
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(ripple_in_space) or Spell(the_unbound_force) or Spell(worldvein_resonance) or { Talent(firestarter_talent) and target.TimeToHealthPercent(90) > SpellFullRecharge(rune_of_power) or SpellCooldown(combustion) > combustion_rop_cutoff() and BuffExpires(combustion_buff) or target.TimeToDie() < SpellCooldown(combustion) and BuffExpires(combustion_buff) } and Spell(rune_of_power) or { { Talent(rune_of_power_talent) and SpellCooldown(combustion) <= CastTime(rune_of_power) or SpellCooldown(combustion) == 0 } and not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } or BuffPresent(combustion_buff) } and FireCombustionphaseCdPostConditions() or BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopphaseCdPostConditions() or FireStandardrotationCdPostConditions()
 }
 
 ### Fire icons.
@@ -1251,7 +1251,7 @@ AddIcon checkbox=opt_mage_fire_aoe help=cd specialization=fire
 # blood_of_the_enemy
 # combustion
 # combustion_buff
-# concentrated_flame
+# concentrated_flame_essence
 # counterspell
 # dragons_breath
 # fire_blast
@@ -1549,7 +1549,7 @@ AddFunction FrostEssencesMainActions
  #ripple_in_space
  Spell(ripple_in_space)
  #concentrated_flame,line_cd=6
- if TimeSincePreviousSpell(concentrated_flame) > 6 Spell(concentrated_flame)
+ if TimeSincePreviousSpell(concentrated_flame_essence) > 6 Spell(concentrated_flame_essence)
  #worldvein_resonance
  Spell(worldvein_resonance)
 }
@@ -1565,7 +1565,7 @@ AddFunction FrostEssencesShortCdActions
   #purifying_blast
   Spell(purifying_blast)
 
-  unless Spell(ripple_in_space) or TimeSincePreviousSpell(concentrated_flame) > 6 and Spell(concentrated_flame)
+  unless Spell(ripple_in_space) or TimeSincePreviousSpell(concentrated_flame_essence) > 6 and Spell(concentrated_flame_essence)
   {
    #the_unbound_force,if=buff.reckless_force.up
    if BuffPresent(reckless_force_buff) Spell(the_unbound_force)
@@ -1575,7 +1575,7 @@ AddFunction FrostEssencesShortCdActions
 
 AddFunction FrostEssencesShortCdPostConditions
 {
- Spell(focused_azerite_beam) or Spell(ripple_in_space) or TimeSincePreviousSpell(concentrated_flame) > 6 and Spell(concentrated_flame) or Spell(worldvein_resonance)
+ Spell(focused_azerite_beam) or Spell(ripple_in_space) or TimeSincePreviousSpell(concentrated_flame_essence) > 6 and Spell(concentrated_flame_essence) or Spell(worldvein_resonance)
 }
 
 AddFunction FrostEssencesCdActions
@@ -1591,7 +1591,7 @@ AddFunction FrostEssencesCdActions
 
 AddFunction FrostEssencesCdPostConditions
 {
- Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(ripple_in_space) or TimeSincePreviousSpell(concentrated_flame) > 6 and Spell(concentrated_flame) or BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or Spell(worldvein_resonance)
+ Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(ripple_in_space) or TimeSincePreviousSpell(concentrated_flame_essence) > 6 and Spell(concentrated_flame_essence) or BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or Spell(worldvein_resonance)
 }
 
 ### actions.cooldowns
@@ -1912,7 +1912,7 @@ AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 # brain_freeze_buff
 # comet_storm
 # comet_storm_talent
-# concentrated_flame
+# concentrated_flame_essence
 # cone_of_cold
 # counterspell
 # ebonbolt

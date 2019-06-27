@@ -1525,6 +1525,9 @@ const InitializeDisambiguation = function() {
 
     //Items
     AddDisambiguation("buff_sephuzs_secret", "sephuzs_secret_buff");
+    
+    // Essence
+    AddDisambiguation("concentrated_flame", "concentrated_flame_essence");
 
     //Arcane Torrent
     AddDisambiguation("arcane_torrent", "arcane_torrent_runicpower", "DEATHKNIGHT");

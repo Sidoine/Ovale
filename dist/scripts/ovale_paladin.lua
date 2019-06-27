@@ -408,7 +408,7 @@ AddFunction RetributionGeneratorsMainActions
    unless RetributionFinishersMainPostConditions()
    {
     #concentrated_flame
-    Spell(concentrated_flame)
+    Spell(concentrated_flame_essence)
     #crusader_strike,if=holy_power<=4
     if HolyPower() <= 4 Spell(crusader_strike)
    }
@@ -442,7 +442,7 @@ AddFunction RetributionGeneratorsShortCdActions
 
 AddFunction RetributionGeneratorsShortCdPostConditions
 {
- { HolyPower() >= 5 or BuffPresent(memory_of_lucid_dreams) or BuffPresent(seething_rage) } and RetributionFinishersShortCdPostConditions() or { not False(raid_event_adds_exists) or 600 > 15 or Enemies() >= 2 } and { HolyPower() <= 0 or HolyPower() == 1 and SpellCooldown(blade_of_justice) > GCD() } and { SpellCooldown(avenging_wrath) > 10 or Talent(crusade_talent) and SpellCooldown(crusade) > 10 } and Spell(wake_of_ashes) or { HolyPower() <= 2 or HolyPower() == 3 and { SpellCooldown(hammer_of_wrath) > GCD() * 2 or HoW() } } and Spell(blade_of_justice) or { HolyPower() <= 2 or HolyPower() <= 4 and { SpellCooldown(blade_of_justice) > GCD() * 2 or HoW() } } and Spell(judgment) or HolyPower() <= 4 and Spell(hammer_of_wrath) or { HolyPower() <= 2 or HolyPower() <= 3 and SpellCooldown(blade_of_justice) > GCD() * 2 or HolyPower() == 4 and SpellCooldown(blade_of_justice) > GCD() * 2 and SpellCooldown(judgment) > GCD() * 2 } and Spell(consecration_retribution) or Talent(hammer_of_wrath_talent) and { target.HealthPercent() <= 20 or BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) } and RetributionFinishersShortCdPostConditions() or SpellCharges(crusader_strike count=0) >= 1.75 and { HolyPower() <= 2 or HolyPower() <= 3 and SpellCooldown(blade_of_justice) > GCD() * 2 or HolyPower() == 4 and SpellCooldown(blade_of_justice) > GCD() * 2 and SpellCooldown(judgment) > GCD() * 2 and SpellCooldown(consecration_retribution) > GCD() * 2 } and Spell(crusader_strike) or RetributionFinishersShortCdPostConditions() or Spell(concentrated_flame) or HolyPower() <= 4 and Spell(crusader_strike)
+ { HolyPower() >= 5 or BuffPresent(memory_of_lucid_dreams) or BuffPresent(seething_rage) } and RetributionFinishersShortCdPostConditions() or { not False(raid_event_adds_exists) or 600 > 15 or Enemies() >= 2 } and { HolyPower() <= 0 or HolyPower() == 1 and SpellCooldown(blade_of_justice) > GCD() } and { SpellCooldown(avenging_wrath) > 10 or Talent(crusade_talent) and SpellCooldown(crusade) > 10 } and Spell(wake_of_ashes) or { HolyPower() <= 2 or HolyPower() == 3 and { SpellCooldown(hammer_of_wrath) > GCD() * 2 or HoW() } } and Spell(blade_of_justice) or { HolyPower() <= 2 or HolyPower() <= 4 and { SpellCooldown(blade_of_justice) > GCD() * 2 or HoW() } } and Spell(judgment) or HolyPower() <= 4 and Spell(hammer_of_wrath) or { HolyPower() <= 2 or HolyPower() <= 3 and SpellCooldown(blade_of_justice) > GCD() * 2 or HolyPower() == 4 and SpellCooldown(blade_of_justice) > GCD() * 2 and SpellCooldown(judgment) > GCD() * 2 } and Spell(consecration_retribution) or Talent(hammer_of_wrath_talent) and { target.HealthPercent() <= 20 or BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) } and RetributionFinishersShortCdPostConditions() or SpellCharges(crusader_strike count=0) >= 1.75 and { HolyPower() <= 2 or HolyPower() <= 3 and SpellCooldown(blade_of_justice) > GCD() * 2 or HolyPower() == 4 and SpellCooldown(blade_of_justice) > GCD() * 2 and SpellCooldown(judgment) > GCD() * 2 and SpellCooldown(consecration_retribution) > GCD() * 2 } and Spell(crusader_strike) or RetributionFinishersShortCdPostConditions() or Spell(concentrated_flame_essence) or HolyPower() <= 4 and Spell(crusader_strike)
 }
 
 AddFunction RetributionGeneratorsCdActions
@@ -461,7 +461,7 @@ AddFunction RetributionGeneratorsCdActions
    #call_action_list,name=finishers
    RetributionFinishersCdActions()
 
-   unless RetributionFinishersCdPostConditions() or Spell(concentrated_flame) or HolyPower() <= 4 and Spell(crusader_strike)
+   unless RetributionFinishersCdPostConditions() or Spell(concentrated_flame_essence) or HolyPower() <= 4 and Spell(crusader_strike)
    {
     #arcane_torrent,if=holy_power<=4
     if HolyPower() <= 4 Spell(arcane_torrent_holy)
@@ -472,7 +472,7 @@ AddFunction RetributionGeneratorsCdActions
 
 AddFunction RetributionGeneratorsCdPostConditions
 {
- { HolyPower() >= 5 or BuffPresent(memory_of_lucid_dreams) or BuffPresent(seething_rage) } and RetributionFinishersCdPostConditions() or { not False(raid_event_adds_exists) or 600 > 15 or Enemies() >= 2 } and { HolyPower() <= 0 or HolyPower() == 1 and SpellCooldown(blade_of_justice) > GCD() } and { SpellCooldown(avenging_wrath) > 10 or Talent(crusade_talent) and SpellCooldown(crusade) > 10 } and Spell(wake_of_ashes) or { HolyPower() <= 2 or HolyPower() == 3 and { SpellCooldown(hammer_of_wrath) > GCD() * 2 or HoW() } } and Spell(blade_of_justice) or { HolyPower() <= 2 or HolyPower() <= 4 and { SpellCooldown(blade_of_justice) > GCD() * 2 or HoW() } } and Spell(judgment) or HolyPower() <= 4 and Spell(hammer_of_wrath) or { HolyPower() <= 2 or HolyPower() <= 3 and SpellCooldown(blade_of_justice) > GCD() * 2 or HolyPower() == 4 and SpellCooldown(blade_of_justice) > GCD() * 2 and SpellCooldown(judgment) > GCD() * 2 } and Spell(consecration_retribution) or Talent(hammer_of_wrath_talent) and { target.HealthPercent() <= 20 or BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) } and RetributionFinishersCdPostConditions() or SpellCharges(crusader_strike count=0) >= 1.75 and { HolyPower() <= 2 or HolyPower() <= 3 and SpellCooldown(blade_of_justice) > GCD() * 2 or HolyPower() == 4 and SpellCooldown(blade_of_justice) > GCD() * 2 and SpellCooldown(judgment) > GCD() * 2 and SpellCooldown(consecration_retribution) > GCD() * 2 } and Spell(crusader_strike) or RetributionFinishersCdPostConditions() or Spell(concentrated_flame) or HolyPower() <= 4 and Spell(crusader_strike)
+ { HolyPower() >= 5 or BuffPresent(memory_of_lucid_dreams) or BuffPresent(seething_rage) } and RetributionFinishersCdPostConditions() or { not False(raid_event_adds_exists) or 600 > 15 or Enemies() >= 2 } and { HolyPower() <= 0 or HolyPower() == 1 and SpellCooldown(blade_of_justice) > GCD() } and { SpellCooldown(avenging_wrath) > 10 or Talent(crusade_talent) and SpellCooldown(crusade) > 10 } and Spell(wake_of_ashes) or { HolyPower() <= 2 or HolyPower() == 3 and { SpellCooldown(hammer_of_wrath) > GCD() * 2 or HoW() } } and Spell(blade_of_justice) or { HolyPower() <= 2 or HolyPower() <= 4 and { SpellCooldown(blade_of_justice) > GCD() * 2 or HoW() } } and Spell(judgment) or HolyPower() <= 4 and Spell(hammer_of_wrath) or { HolyPower() <= 2 or HolyPower() <= 3 and SpellCooldown(blade_of_justice) > GCD() * 2 or HolyPower() == 4 and SpellCooldown(blade_of_justice) > GCD() * 2 and SpellCooldown(judgment) > GCD() * 2 } and Spell(consecration_retribution) or Talent(hammer_of_wrath_talent) and { target.HealthPercent() <= 20 or BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) } and RetributionFinishersCdPostConditions() or SpellCharges(crusader_strike count=0) >= 1.75 and { HolyPower() <= 2 or HolyPower() <= 3 and SpellCooldown(blade_of_justice) > GCD() * 2 or HolyPower() == 4 and SpellCooldown(blade_of_justice) > GCD() * 2 and SpellCooldown(judgment) > GCD() * 2 and SpellCooldown(consecration_retribution) > GCD() * 2 } and Spell(crusader_strike) or RetributionFinishersCdPostConditions() or Spell(concentrated_flame_essence) or HolyPower() <= 4 and Spell(crusader_strike)
 }
 
 ### actions.finishers
@@ -705,7 +705,7 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 # avenging_wrath_buff
 # blade_of_justice
 # blood_of_the_enemy
-# concentrated_flame
+# concentrated_flame_essence
 # consecration_retribution
 # crusade
 # crusade_buff
