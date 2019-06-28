@@ -240,6 +240,7 @@ local CHARACTER_PROPERTY = {
     ["mana.deficit"] = "ManaDeficit()",
     ["mana.max"] = "MaxMana()",
     ["mana.pct"] = "ManaPercent()",
+    ["mana.time_to_max"] = "TimeToMaxMana()",
     ["maelstrom"] = "Maelstrom()",
     ["next_wi_bomb.pheromone"] = "SpellUsable(270323)",
     ["next_wi_bomb.shrapnel"] = "SpellUsable(270335)",
@@ -1714,6 +1715,8 @@ SplitByTagCustomFunction = function(tag, node, nodeList, annotation)
                 functionTag = "cd"
             elseif find(functionName, "UsePotion") then
                 functionTag = "cd"
+            elseif find(functionName, "UseHeartEssence") then
+                functionTag = "cd"
             end
         end
         if functionTag then
@@ -2482,6 +2485,10 @@ EmitAction = function(parseNode, nodeList, annotation)
                 end
             end
             isSpellAction = false
+        elseif action == "heart_essence" then
+            bodyCode = camelSpecialization .. "UseHeartEssence()"
+            annotation.use_heart_essence = true
+            isSpellAction = false
         end
         if isSpellAction then
             AddSymbol(annotation, action)
@@ -2868,7 +2875,7 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
     target = target and (target .. ".") or ""
     local buffName = name .. "_debuff"
     buffName = Disambiguate(annotation, buffName, className, specialization)
-    local prefix = find(buffName, "_buff$") and "Buff" or "Debuff"
+    local prefix = find(buffName, "_debuff$") and "Debuff" or "Buff"
     local buffTarget = (prefix == "Debuff") and "target." or target
     local talentName = name .. "_talent"
     talentName = Disambiguate(annotation, talentName, className, specialization)
@@ -2901,6 +2908,8 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
         code = format("PowerCost(%s)", name)
     elseif property == "crit_damage" then
         code = format("%sCritDamage(%s)", target, name)
+    elseif property == "damage" then
+        code = format("%sDamage(%s)", target, name)
     elseif property == "duration" or property == "new_duration" then
         code = format("BaseDuration(%s)", buffName)
         symbol = buffName
@@ -2940,6 +2949,8 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
         end
     elseif property == "shard_react" then
         code = "SoulShards() >= 1"
+    elseif property == "tick_dmg" then
+        code = format("%sLastDamage(%s)", buffTarget, buffName)
     elseif property == "tick_time" then
         code = format("%sCurrentTickTime(%s)", buffTarget, buffName)
         symbol = buffName
@@ -5013,6 +5024,20 @@ local InsertSupportingFunctions = function(child, annotation)
         insert(child, 1, node)
         annotation.functionTag[node.name] = "cd"
         count = count + 1
+    end
+    if annotation.use_heart_essence then
+        local fmt = [[
+			AddFunction %sUseHearthEssence
+			{
+				Spell(concentrated_flame_essence)
+			}
+		]]
+        local code = format(fmt, camelSpecialization)
+        local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+        insert(child, 1, node)
+        annotation.functionTag[node.name] = "cd"
+        count = count + 1
+        AddSymbol(annotation, "concentrated_flame_essence")
     end
     return count
 end

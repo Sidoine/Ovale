@@ -233,6 +233,9 @@ Define(shadowmeld 58984)
   SpellInfo(shadowmeld cd=120 channel=-0.001 gcd=0 offgcd=1)
   # Shadowmelded.
   SpellAddBuff(shadowmeld shadowmeld=1)
+Define(sharpened_claws_buff 268525)
+# Your attacks have a chance to summon a whirlwind of sharpened claws, inflicting 268525s1 Physical damage split evenly among all enemies within 268525A1 yards.
+  SpellInfo(sharpened_claws_buff channel=0 gcd=0 offgcd=1)
 Define(shred 5221)
 # Shred the target, causing s1*<mult> Physical damage to the target.?a231063[ Deals s4 increased damage against bleeding targets.][]?a231057[rnrnWhile stealthed, Shred deals m3 increased damage, and has double the chance to critically strike.][]?c2[rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r]?s202155[rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.][]
 # Rank 2: Shred deals 5221s5 increased damage against bleeding targets.
@@ -363,7 +366,6 @@ Define(lively_spirit_trait 279642)
 Define(streaking_stars_trait 272871)
 Define(wild_fleshrending_trait 279527)
 Define(layered_mane_trait 279552)
-Define(power_of_the_moon_trait 273367)
     `;
 // END
     code += `
@@ -385,6 +387,7 @@ Define(cat_form_buff 768)
 Define(entangling_roots 339)
 Define(growl 6795)
 	SpellInfo(growl cd=8)
+
 Define(hibernate 2637)
 
 	SpellInfo(shred energy=40 combopoints=-1)

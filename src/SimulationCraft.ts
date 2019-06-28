@@ -167,6 +167,7 @@ const CHARACTER_PROPERTY: LuaObj<string> = {
     ["mana.deficit"]: "ManaDeficit()",
     ["mana.max"]: "MaxMana()",
     ["mana.pct"]: "ManaPercent()",
+	["mana.time_to_max"]: "TimeToMaxMana()",
     ["maelstrom"]: "Maelstrom()",
     ["next_wi_bomb.pheromone"]: "SpellUsable(270323)",
     ["next_wi_bomb.shrapnel"]: "SpellUsable(270335)",
@@ -255,6 +256,7 @@ export interface Annotation extends InterruptAnnotation {
     time_to_hpg_tank?: string;
     bloodlust?: string;
     use_item?: boolean;
+	use_heart_essence?: boolean;
     summon_pet?: string;
     storm_earth_and_fire?: string;
     touch_of_death?: string;
@@ -1884,6 +1886,8 @@ SplitByTagCustomFunction = function (tag, node, nodeList, annotation) {
                 functionTag = "cd";
             } else if (truthy(find(functionName, "UsePotion"))) {
                 functionTag = "cd";
+            } else if (truthy(find(functionName, "UseHeartEssence"))) {
+                functionTag = "cd";
             }
         }
         if (functionTag) {
@@ -2673,6 +2677,10 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
                 }
             }
             isSpellAction = false;
+		} else if (action == "heart_essence") {
+			bodyCode = `${camelSpecialization}UseHeartEssence()`;
+			annotation.use_heart_essence = true;
+            isSpellAction = false;
         }
         if (isSpellAction) {
             AddSymbol(annotation, action);
@@ -3057,7 +3065,7 @@ EmitOperandAction = function (operand, parseNode, nodeList, annotation, action, 
     target = target && (`${target}.`) || "";
     let buffName = `${name}_debuff`;
     [buffName] = Disambiguate(annotation, buffName, className, specialization);
-    let prefix = truthy(find(buffName, "_buff$")) && "Buff" || "Debuff";
+    let prefix = truthy(find(buffName, "_debuff$")) && "Debuff" || "Buff";
     let buffTarget = (prefix == "Debuff") && "target." || target;
     let talentName = `${name}_talent`;
     [talentName] = Disambiguate(annotation, talentName, className, specialization);
@@ -3090,6 +3098,8 @@ EmitOperandAction = function (operand, parseNode, nodeList, annotation, action, 
         code = format("PowerCost(%s)", name);
     } else if (property == "crit_damage") {
         code = format("%sCritDamage(%s)", target, name);
+	} else if (property == "damage") {
+        code = format("%sDamage(%s)", target, name);
     } else if (property == "duration" || property == "new_duration") {
         code = format("BaseDuration(%s)", buffName);
         symbol = buffName;
@@ -3129,6 +3139,8 @@ EmitOperandAction = function (operand, parseNode, nodeList, annotation, action, 
         }
     } else if (property == "shard_react") {
         code = "SoulShards() >= 1";
+	} else if (property == "tick_dmg") {
+        code = format("%sLastDamage(%s)", buffTarget, buffName);
     } else if (property == "tick_time") {
         code = format("%sCurrentTickTime(%s)", buffTarget, buffName);
         symbol = buffName;
@@ -5219,7 +5231,22 @@ const InsertSupportingFunctions = function(child: LuaArray<AstNode>, annotation:
         annotation.functionTag[node.name] = "cd";
         count = count + 1;
     }
-    return count;
+    if (annotation.use_heart_essence) {
+		// TODO: add way more essences once we know the ID
+		let fmt = `
+			AddFunction %sUseHearthEssence
+			{
+				Spell(concentrated_flame_essence)
+			}
+		`;
+        let code = format(fmt, camelSpecialization);
+        let [node] = OvaleAST.ParseCode("add_function", code, nodeList, annotation.astAnnotation);
+        insert(child, 1, node);
+        annotation.functionTag[node.name] = "cd";
+        count = count + 1;
+		AddSymbol(annotation, "concentrated_flame_essence");
+	}
+	return count;
 }
 const AddOptionalSkillCheckBox = function(child: LuaArray<AstNode>, annotation: Annotation, data:any, skill: keyof Annotation) {
     let nodeList = annotation.astAnnotation.nodeList;

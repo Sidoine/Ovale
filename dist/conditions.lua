@@ -2288,10 +2288,17 @@ local function TimeToMaxFocus(positionalParams, namedParams, atTime)
         local level = OvalePower.current.maxPower[powerType] or 0
         return TimeToPower(powerType, level, comparator, limit, atTime)
     end
+local function TimeToMaxMana(positionalParams, namedParams, atTime)
+        local powerType = "mana"
+        local comparator, limit = positionalParams[1], positionalParams[2]
+        local level = OvalePower.current.maxPower[powerType] or 0
+        return TimeToPower(powerType, level, comparator, limit, atTime)
+    end
     OvaleCondition:RegisterCondition("timetoenergy", false, TimeToEnergy)
     OvaleCondition:RegisterCondition("timetofocus", false, TimeToFocus)
     OvaleCondition:RegisterCondition("timetomaxenergy", false, TimeToMaxEnergy)
     OvaleCondition:RegisterCondition("timetomaxfocus", false, TimeToMaxFocus)
+    OvaleCondition:RegisterCondition("timetomaxmana", false, TimeToMaxMana)
 end
 do
 local function TimeToPowerFor(powerType, positionalParams, namedParams, atTime)

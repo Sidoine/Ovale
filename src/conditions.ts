@@ -4642,10 +4642,18 @@ l    */
         let level = OvalePower.current.maxPower[powerType] || 0;
         return TimeToPower(powerType, level, comparator, limit, atTime);
     }
+	
+	function TimeToMaxMana(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
+        let powerType: PowerType = "mana";
+        let [comparator, limit] = [positionalParams[1], positionalParams[2]];
+        let level = OvalePower.current.maxPower[powerType] || 0;
+        return TimeToPower(powerType, level, comparator, limit, atTime);
+    }
     OvaleCondition.RegisterCondition("timetoenergy", false, TimeToEnergy);
     OvaleCondition.RegisterCondition("timetofocus", false, TimeToFocus);
     OvaleCondition.RegisterCondition("timetomaxenergy", false, TimeToMaxEnergy);
     OvaleCondition.RegisterCondition("timetomaxfocus", false, TimeToMaxFocus);
+	OvaleCondition.RegisterCondition("timetomaxmana", false, TimeToMaxMana);
 }
 {
     function TimeToPowerFor(powerType: PowerType, positionalParams: PositionalParameters, namedParams: NamedParameters, atTime: number) {
