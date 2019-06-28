@@ -5027,7 +5027,7 @@ local InsertSupportingFunctions = function(child, annotation)
     end
     if annotation.use_heart_essence then
         local fmt = [[
-			AddFunction %sUseHearthEssence
+			AddFunction %sUseHeartEssence
 			{
 				Spell(concentrated_flame_essence)
 			}

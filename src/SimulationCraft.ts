@@ -5234,7 +5234,7 @@ const InsertSupportingFunctions = function(child: LuaArray<AstNode>, annotation:
     if (annotation.use_heart_essence) {
 		// TODO: add way more essences once we know the ID
 		let fmt = `
-			AddFunction %sUseHearthEssence
+			AddFunction %sUseHeartEssence
 			{
 				Spell(concentrated_flame_essence)
 			}

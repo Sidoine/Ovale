@@ -392,7 +392,7 @@ AddFunction FeralInterruptActions
  }
 }
 
-AddFunction FeralUseHearthEssence
+AddFunction FeralUseHeartEssence
 {
  Spell(concentrated_flame_essence)
 }
@@ -974,7 +974,7 @@ AddFunction GuardianInterruptActions
  }
 }
 
-AddFunction GuardianUseHearthEssence
+AddFunction GuardianUseHeartEssence
 {
  Spell(concentrated_flame_essence)
 }
