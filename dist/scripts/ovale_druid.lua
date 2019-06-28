@@ -1105,7 +1105,7 @@ AddFunction GuardianDefaultMainActions
   #maul,if=rage.deficit<10&active_enemies<4
   if RageDeficit() < 10 and Enemies() < 4 Spell(maul)
   #maul,if=essence.conflict_and_strife.major&!buff.sharpened_claws.up
-  if False() and not BuffPresent(sharpened_claws_buff) Spell(maul)
+  if AzeriteEssenceIsMajor(conflict_and_strife_essence_id) and not BuffPresent(sharpened_claws_buff) Spell(maul)
   #ironfur,if=cost=0|(rage>cost&azerite.layered_mane.enabled&active_enemies>2)
   if PowerCost(ironfur) == 0 or Rage() > PowerCost(ironfur) and HasAzeriteTrait(layered_mane_trait) and Enemies() > 2 Spell(ironfur)
   #pulverize,target_if=dot.thrash_bear.stack=dot.thrash_bear.max_stacks
@@ -1144,7 +1144,7 @@ AddFunction GuardianDefaultShortCdActions
 
 AddFunction GuardianDefaultShortCdPostConditions
 {
- GuardianCooldownsShortCdPostConditions() or RageDeficit() < 10 and Enemies() < 4 and Spell(maul) or False() and not BuffPresent(sharpened_claws_buff) and Spell(maul) or { PowerCost(ironfur) == 0 or Rage() > PowerCost(ironfur) and HasAzeriteTrait(layered_mane_trait) and Enemies() > 2 } and Spell(ironfur) or target.DebuffStacks(thrash_bear_debuff) == MaxStacks(thrash_bear_debuff) and target.DebuffGain(thrash_bear_debuff) <= BaseDuration(thrash_bear_debuff) and Spell(pulverize) or target.DebuffRefreshable(moonfire_debuff) and Enemies() < 2 and Spell(moonfire) or { BuffExpires(incarnation_guardian_of_ursoc_buff) and Enemies() > 1 or BuffPresent(incarnation_guardian_of_ursoc_buff) and Enemies() > 4 } and Spell(thrash) or BuffExpires(incarnation_guardian_of_ursoc_buff) and Enemies() > 4 and Spell(swipe_bear) or target.DebuffPresent(thrash_bear_debuff) and Spell(mangle) or BuffPresent(galactic_guardian_buff) and Enemies() < 2 and Spell(moonfire) or Spell(thrash) or Spell(maul) or Spell(swipe_bear)
+ GuardianCooldownsShortCdPostConditions() or RageDeficit() < 10 and Enemies() < 4 and Spell(maul) or AzeriteEssenceIsMajor(conflict_and_strife_essence_id) and not BuffPresent(sharpened_claws_buff) and Spell(maul) or { PowerCost(ironfur) == 0 or Rage() > PowerCost(ironfur) and HasAzeriteTrait(layered_mane_trait) and Enemies() > 2 } and Spell(ironfur) or target.DebuffStacks(thrash_bear_debuff) == MaxStacks(thrash_bear_debuff) and target.DebuffGain(thrash_bear_debuff) <= BaseDuration(thrash_bear_debuff) and Spell(pulverize) or target.DebuffRefreshable(moonfire_debuff) and Enemies() < 2 and Spell(moonfire) or { BuffExpires(incarnation_guardian_of_ursoc_buff) and Enemies() > 1 or BuffPresent(incarnation_guardian_of_ursoc_buff) and Enemies() > 4 } and Spell(thrash) or BuffExpires(incarnation_guardian_of_ursoc_buff) and Enemies() > 4 and Spell(swipe_bear) or target.DebuffPresent(thrash_bear_debuff) and Spell(mangle) or BuffPresent(galactic_guardian_buff) and Enemies() < 2 and Spell(moonfire) or Spell(thrash) or Spell(maul) or Spell(swipe_bear)
 }
 
 AddFunction GuardianDefaultCdActions
@@ -1156,7 +1156,7 @@ AddFunction GuardianDefaultCdActions
 
 AddFunction GuardianDefaultCdPostConditions
 {
- GuardianCooldownsCdPostConditions() or RageDeficit() < 10 and Enemies() < 4 and Spell(maul) or False() and not BuffPresent(sharpened_claws_buff) and Spell(maul) or { PowerCost(ironfur) == 0 or Rage() > PowerCost(ironfur) and HasAzeriteTrait(layered_mane_trait) and Enemies() > 2 } and Spell(ironfur) or target.DebuffStacks(thrash_bear_debuff) == MaxStacks(thrash_bear_debuff) and target.DebuffGain(thrash_bear_debuff) <= BaseDuration(thrash_bear_debuff) and Spell(pulverize) or target.DebuffRefreshable(moonfire_debuff) and Enemies() < 2 and Spell(moonfire) or { BuffExpires(incarnation_guardian_of_ursoc_buff) and Enemies() > 1 or BuffPresent(incarnation_guardian_of_ursoc_buff) and Enemies() > 4 } and Spell(thrash) or BuffExpires(incarnation_guardian_of_ursoc_buff) and Enemies() > 4 and Spell(swipe_bear) or target.DebuffPresent(thrash_bear_debuff) and Spell(mangle) or BuffPresent(galactic_guardian_buff) and Enemies() < 2 and Spell(moonfire) or Spell(thrash) or Spell(maul) or Spell(swipe_bear)
+ GuardianCooldownsCdPostConditions() or RageDeficit() < 10 and Enemies() < 4 and Spell(maul) or AzeriteEssenceIsMajor(conflict_and_strife_essence_id) and not BuffPresent(sharpened_claws_buff) and Spell(maul) or { PowerCost(ironfur) == 0 or Rage() > PowerCost(ironfur) and HasAzeriteTrait(layered_mane_trait) and Enemies() > 2 } and Spell(ironfur) or target.DebuffStacks(thrash_bear_debuff) == MaxStacks(thrash_bear_debuff) and target.DebuffGain(thrash_bear_debuff) <= BaseDuration(thrash_bear_debuff) and Spell(pulverize) or target.DebuffRefreshable(moonfire_debuff) and Enemies() < 2 and Spell(moonfire) or { BuffExpires(incarnation_guardian_of_ursoc_buff) and Enemies() > 1 or BuffPresent(incarnation_guardian_of_ursoc_buff) and Enemies() > 4 } and Spell(thrash) or BuffExpires(incarnation_guardian_of_ursoc_buff) and Enemies() > 4 and Spell(swipe_bear) or target.DebuffPresent(thrash_bear_debuff) and Spell(mangle) or BuffPresent(galactic_guardian_buff) and Enemies() < 2 and Spell(moonfire) or Spell(thrash) or Spell(maul) or Spell(swipe_bear)
 }
 
 ### Guardian icons.
@@ -1226,6 +1226,7 @@ AddIcon checkbox=opt_druid_guardian_aoe help=cd specialization=guardian
 # blood_fury
 # bristling_fur
 # concentrated_flame_essence
+# conflict_and_strife_essence_id
 # fireblood
 # galactic_guardian_buff
 # incapacitating_roar

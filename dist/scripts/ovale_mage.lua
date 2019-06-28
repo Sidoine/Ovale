@@ -881,9 +881,9 @@ AddFunction FirePrecombatCdPostConditions
 AddFunction FireCombustionphaseMainActions
 {
  #call_action_list,name=bm_combustion_phase,if=azerite.blaster_master.enabled&talent.flame_on.enabled&!essence.memory_of_lucid_dreams.enabled
- if HasAzeriteTrait(blaster_master_trait) and Talent(flame_on_talent) and not False() FireBmcombustionphaseMainActions()
+ if HasAzeriteTrait(blaster_master_trait) and Talent(flame_on_talent) and not AzeriteEssenceIsEnabled(memory_of_lucid_dreams_essence_id) FireBmcombustionphaseMainActions()
 
- unless HasAzeriteTrait(blaster_master_trait) and Talent(flame_on_talent) and not False() and FireBmcombustionphaseMainPostConditions()
+ unless HasAzeriteTrait(blaster_master_trait) and Talent(flame_on_talent) and not AzeriteEssenceIsEnabled(memory_of_lucid_dreams_essence_id) and FireBmcombustionphaseMainPostConditions()
  {
   #call_action_list,name=active_talents,if=(azerite.blaster_master.enabled&buff.blaster_master.stack>=3)|!azerite.blaster_master.enabled
   if HasAzeriteTrait(blaster_master_trait) and BuffStacks(blaster_master_buff) >= 3 or not HasAzeriteTrait(blaster_master_trait) FireActivetalentsMainActions()
@@ -902,9 +902,9 @@ AddFunction FireCombustionphaseMainActions
     #pyroblast,if=buff.hot_streak.react
     if BuffPresent(hot_streak_buff) Spell(pyroblast)
     #fire_blast,use_off_gcd=1,use_while_casting=1,if=essence.memory_of_lucid_dreams.enabled&((buff.combustion.up&(buff.heating_up.react&!action.pyroblast.in_flight&!action.scorch.executing)|(action.scorch.execute_remains&buff.heating_up.down&buff.hot_streak.down&!action.pyroblast.in_flight)))
-    if False() and { BuffPresent(combustion_buff) and BuffPresent(heating_up_buff) and not InFlightToTarget(pyroblast) and not ExecuteTime(scorch) > 0 or ExecuteTime(scorch) and BuffExpires(heating_up_buff) and BuffExpires(hot_streak_buff) and not InFlightToTarget(pyroblast) } Spell(fire_blast)
+    if AzeriteEssenceIsEnabled(memory_of_lucid_dreams_essence_id) and { BuffPresent(combustion_buff) and BuffPresent(heating_up_buff) and not InFlightToTarget(pyroblast) and not ExecuteTime(scorch) > 0 or ExecuteTime(scorch) and BuffExpires(heating_up_buff) and BuffExpires(hot_streak_buff) and not InFlightToTarget(pyroblast) } Spell(fire_blast)
     #fire_blast,use_off_gcd=1,use_while_casting=1,if=!essence.memory_of_lucid_dreams.enabled&(!azerite.blaster_master.enabled|!talent.flame_on.enabled)&((buff.combustion.up&(buff.heating_up.react&!action.pyroblast.in_flight&!action.scorch.executing)|(action.scorch.execute_remains&buff.heating_up.down&buff.hot_streak.down&!action.pyroblast.in_flight)))
-    if not False() and { not HasAzeriteTrait(blaster_master_trait) or not Talent(flame_on_talent) } and { BuffPresent(combustion_buff) and BuffPresent(heating_up_buff) and not InFlightToTarget(pyroblast) and not ExecuteTime(scorch) > 0 or ExecuteTime(scorch) and BuffExpires(heating_up_buff) and BuffExpires(hot_streak_buff) and not InFlightToTarget(pyroblast) } Spell(fire_blast)
+    if not AzeriteEssenceIsEnabled(memory_of_lucid_dreams_essence_id) and { not HasAzeriteTrait(blaster_master_trait) or not Talent(flame_on_talent) } and { BuffPresent(combustion_buff) and BuffPresent(heating_up_buff) and not InFlightToTarget(pyroblast) and not ExecuteTime(scorch) > 0 or ExecuteTime(scorch) and BuffExpires(heating_up_buff) and BuffExpires(hot_streak_buff) and not InFlightToTarget(pyroblast) } Spell(fire_blast)
     #pyroblast,if=prev_gcd.1.scorch&buff.heating_up.up
     if PreviousGCDSpell(scorch) and BuffPresent(heating_up_buff) Spell(pyroblast)
     #scorch,if=buff.combustion.remains>cast_time&buff.combustion.up|buff.combustion.down
@@ -920,15 +920,15 @@ AddFunction FireCombustionphaseMainActions
 
 AddFunction FireCombustionphaseMainPostConditions
 {
- HasAzeriteTrait(blaster_master_trait) and Talent(flame_on_talent) and not False() and FireBmcombustionphaseMainPostConditions() or { HasAzeriteTrait(blaster_master_trait) and BuffStacks(blaster_master_buff) >= 3 or not HasAzeriteTrait(blaster_master_trait) } and FireActivetalentsMainPostConditions() or FireTrinketsMainPostConditions()
+ HasAzeriteTrait(blaster_master_trait) and Talent(flame_on_talent) and not AzeriteEssenceIsEnabled(memory_of_lucid_dreams_essence_id) and FireBmcombustionphaseMainPostConditions() or { HasAzeriteTrait(blaster_master_trait) and BuffStacks(blaster_master_buff) >= 3 or not HasAzeriteTrait(blaster_master_trait) } and FireActivetalentsMainPostConditions() or FireTrinketsMainPostConditions()
 }
 
 AddFunction FireCombustionphaseShortCdActions
 {
  #call_action_list,name=bm_combustion_phase,if=azerite.blaster_master.enabled&talent.flame_on.enabled&!essence.memory_of_lucid_dreams.enabled
- if HasAzeriteTrait(blaster_master_trait) and Talent(flame_on_talent) and not False() FireBmcombustionphaseShortCdActions()
+ if HasAzeriteTrait(blaster_master_trait) and Talent(flame_on_talent) and not AzeriteEssenceIsEnabled(memory_of_lucid_dreams_essence_id) FireBmcombustionphaseShortCdActions()
 
- unless HasAzeriteTrait(blaster_master_trait) and Talent(flame_on_talent) and not False() and FireBmcombustionphaseShortCdPostConditions()
+ unless HasAzeriteTrait(blaster_master_trait) and Talent(flame_on_talent) and not AzeriteEssenceIsEnabled(memory_of_lucid_dreams_essence_id) and FireBmcombustionphaseShortCdPostConditions()
  {
   #rune_of_power,if=buff.combustion.down
   if BuffExpires(combustion_buff) Spell(rune_of_power)
@@ -940,7 +940,7 @@ AddFunction FireCombustionphaseShortCdActions
    #call_action_list,name=trinkets
    FireTrinketsShortCdActions()
 
-   unless FireTrinketsShortCdPostConditions() or { Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 6 } and BuffPresent(hot_streak_buff) and not HasAzeriteTrait(blaster_master_trait) and Spell(flamestrike) or BuffPresent(pyroclasm) and BuffRemaining(combustion_buff) > CastTime(pyroblast) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Spell(pyroblast) or False() and { BuffPresent(combustion_buff) and BuffPresent(heating_up_buff) and not InFlightToTarget(pyroblast) and not ExecuteTime(scorch) > 0 or ExecuteTime(scorch) and BuffExpires(heating_up_buff) and BuffExpires(hot_streak_buff) and not InFlightToTarget(pyroblast) } and Spell(fire_blast) or not False() and { not HasAzeriteTrait(blaster_master_trait) or not Talent(flame_on_talent) } and { BuffPresent(combustion_buff) and BuffPresent(heating_up_buff) and not InFlightToTarget(pyroblast) and not ExecuteTime(scorch) > 0 or ExecuteTime(scorch) and BuffExpires(heating_up_buff) and BuffExpires(hot_streak_buff) and not InFlightToTarget(pyroblast) } and Spell(fire_blast) or PreviousGCDSpell(scorch) and BuffPresent(heating_up_buff) and Spell(pyroblast)
+   unless FireTrinketsShortCdPostConditions() or { Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 6 } and BuffPresent(hot_streak_buff) and not HasAzeriteTrait(blaster_master_trait) and Spell(flamestrike) or BuffPresent(pyroclasm) and BuffRemaining(combustion_buff) > CastTime(pyroblast) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Spell(pyroblast) or AzeriteEssenceIsEnabled(memory_of_lucid_dreams_essence_id) and { BuffPresent(combustion_buff) and BuffPresent(heating_up_buff) and not InFlightToTarget(pyroblast) and not ExecuteTime(scorch) > 0 or ExecuteTime(scorch) and BuffExpires(heating_up_buff) and BuffExpires(hot_streak_buff) and not InFlightToTarget(pyroblast) } and Spell(fire_blast) or not AzeriteEssenceIsEnabled(memory_of_lucid_dreams_essence_id) and { not HasAzeriteTrait(blaster_master_trait) or not Talent(flame_on_talent) } and { BuffPresent(combustion_buff) and BuffPresent(heating_up_buff) and not InFlightToTarget(pyroblast) and not ExecuteTime(scorch) > 0 or ExecuteTime(scorch) and BuffExpires(heating_up_buff) and BuffExpires(hot_streak_buff) and not InFlightToTarget(pyroblast) } and Spell(fire_blast) or PreviousGCDSpell(scorch) and BuffPresent(heating_up_buff) and Spell(pyroblast)
    {
     #phoenix_flames
     Spell(phoenix_flames)
@@ -957,7 +957,7 @@ AddFunction FireCombustionphaseShortCdActions
 
 AddFunction FireCombustionphaseShortCdPostConditions
 {
- HasAzeriteTrait(blaster_master_trait) and Talent(flame_on_talent) and not False() and FireBmcombustionphaseShortCdPostConditions() or { HasAzeriteTrait(blaster_master_trait) and BuffStacks(blaster_master_buff) >= 3 or not HasAzeriteTrait(blaster_master_trait) } and FireActivetalentsShortCdPostConditions() or FireTrinketsShortCdPostConditions() or { Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 6 } and BuffPresent(hot_streak_buff) and not HasAzeriteTrait(blaster_master_trait) and Spell(flamestrike) or BuffPresent(pyroclasm) and BuffRemaining(combustion_buff) > CastTime(pyroblast) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Spell(pyroblast) or False() and { BuffPresent(combustion_buff) and BuffPresent(heating_up_buff) and not InFlightToTarget(pyroblast) and not ExecuteTime(scorch) > 0 or ExecuteTime(scorch) and BuffExpires(heating_up_buff) and BuffExpires(hot_streak_buff) and not InFlightToTarget(pyroblast) } and Spell(fire_blast) or not False() and { not HasAzeriteTrait(blaster_master_trait) or not Talent(flame_on_talent) } and { BuffPresent(combustion_buff) and BuffPresent(heating_up_buff) and not InFlightToTarget(pyroblast) and not ExecuteTime(scorch) > 0 or ExecuteTime(scorch) and BuffExpires(heating_up_buff) and BuffExpires(hot_streak_buff) and not InFlightToTarget(pyroblast) } and Spell(fire_blast) or PreviousGCDSpell(scorch) and BuffPresent(heating_up_buff) and Spell(pyroblast) or { BuffRemaining(combustion_buff) > CastTime(scorch) and BuffPresent(combustion_buff) or BuffExpires(combustion_buff) } and Spell(scorch) or BuffRemaining(combustion_buff) < GCD() and Enemies() > 1 and Spell(living_bomb) or target.HealthPercent() <= 30 and Talent(searing_touch_talent) and Spell(scorch)
+ HasAzeriteTrait(blaster_master_trait) and Talent(flame_on_talent) and not AzeriteEssenceIsEnabled(memory_of_lucid_dreams_essence_id) and FireBmcombustionphaseShortCdPostConditions() or { HasAzeriteTrait(blaster_master_trait) and BuffStacks(blaster_master_buff) >= 3 or not HasAzeriteTrait(blaster_master_trait) } and FireActivetalentsShortCdPostConditions() or FireTrinketsShortCdPostConditions() or { Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 6 } and BuffPresent(hot_streak_buff) and not HasAzeriteTrait(blaster_master_trait) and Spell(flamestrike) or BuffPresent(pyroclasm) and BuffRemaining(combustion_buff) > CastTime(pyroblast) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Spell(pyroblast) or AzeriteEssenceIsEnabled(memory_of_lucid_dreams_essence_id) and { BuffPresent(combustion_buff) and BuffPresent(heating_up_buff) and not InFlightToTarget(pyroblast) and not ExecuteTime(scorch) > 0 or ExecuteTime(scorch) and BuffExpires(heating_up_buff) and BuffExpires(hot_streak_buff) and not InFlightToTarget(pyroblast) } and Spell(fire_blast) or not AzeriteEssenceIsEnabled(memory_of_lucid_dreams_essence_id) and { not HasAzeriteTrait(blaster_master_trait) or not Talent(flame_on_talent) } and { BuffPresent(combustion_buff) and BuffPresent(heating_up_buff) and not InFlightToTarget(pyroblast) and not ExecuteTime(scorch) > 0 or ExecuteTime(scorch) and BuffExpires(heating_up_buff) and BuffExpires(hot_streak_buff) and not InFlightToTarget(pyroblast) } and Spell(fire_blast) or PreviousGCDSpell(scorch) and BuffPresent(heating_up_buff) and Spell(pyroblast) or { BuffRemaining(combustion_buff) > CastTime(scorch) and BuffPresent(combustion_buff) or BuffExpires(combustion_buff) } and Spell(scorch) or BuffRemaining(combustion_buff) < GCD() and Enemies() > 1 and Spell(living_bomb) or target.HealthPercent() <= 30 and Talent(searing_touch_talent) and Spell(scorch)
 }
 
 AddFunction FireCombustionphaseCdActions
@@ -965,9 +965,9 @@ AddFunction FireCombustionphaseCdActions
  #lights_judgment,if=buff.combustion.down
  if BuffExpires(combustion_buff) Spell(lights_judgment)
  #call_action_list,name=bm_combustion_phase,if=azerite.blaster_master.enabled&talent.flame_on.enabled&!essence.memory_of_lucid_dreams.enabled
- if HasAzeriteTrait(blaster_master_trait) and Talent(flame_on_talent) and not False() FireBmcombustionphaseCdActions()
+ if HasAzeriteTrait(blaster_master_trait) and Talent(flame_on_talent) and not AzeriteEssenceIsEnabled(memory_of_lucid_dreams_essence_id) FireBmcombustionphaseCdActions()
 
- unless HasAzeriteTrait(blaster_master_trait) and Talent(flame_on_talent) and not False() and FireBmcombustionphaseCdPostConditions()
+ unless HasAzeriteTrait(blaster_master_trait) and Talent(flame_on_talent) and not AzeriteEssenceIsEnabled(memory_of_lucid_dreams_essence_id) and FireBmcombustionphaseCdPostConditions()
  {
   #blood_of_the_enemy
   Spell(blood_of_the_enemy)
@@ -984,9 +984,9 @@ AddFunction FireCombustionphaseCdActions
    unless { HasAzeriteTrait(blaster_master_trait) and BuffStacks(blaster_master_buff) >= 3 or not HasAzeriteTrait(blaster_master_trait) } and FireActivetalentsCdPostConditions()
    {
     #combustion,use_off_gcd=1,use_while_casting=1,if=!essence.memory_of_lucid_dreams.enabled&(!azerite.blaster_master.enabled|!talent.flame_on.enabled)&((action.meteor.in_flight&action.meteor.in_flight_remains<=0.5)|!talent.meteor.enabled)&(buff.rune_of_power.up|!talent.rune_of_power.enabled)
-    if not False() and { not HasAzeriteTrait(blaster_master_trait) or not Talent(flame_on_talent) } and { InFlightToTarget(meteor) and 0 <= 0.5 or not Talent(meteor_talent) } and { BuffPresent(rune_of_power_buff) or not Talent(rune_of_power_talent) } Spell(combustion)
+    if not AzeriteEssenceIsEnabled(memory_of_lucid_dreams_essence_id) and { not HasAzeriteTrait(blaster_master_trait) or not Talent(flame_on_talent) } and { InFlightToTarget(meteor) and 0 <= 0.5 or not Talent(meteor_talent) } and { BuffPresent(rune_of_power_buff) or not Talent(rune_of_power_talent) } Spell(combustion)
     #combustion,use_off_gcd=1,use_while_casting=1,if=essence.memory_of_lucid_dreams.enabled&(buff.rune_of_power.up|!talent.rune_of_power.enabled)
-    if False() and { BuffPresent(rune_of_power_buff) or not Talent(rune_of_power_talent) } Spell(combustion)
+    if AzeriteEssenceIsEnabled(memory_of_lucid_dreams_essence_id) and { BuffPresent(rune_of_power_buff) or not Talent(rune_of_power_talent) } Spell(combustion)
     #potion
     if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_intellect usable=1)
     #blood_fury
@@ -1006,7 +1006,7 @@ AddFunction FireCombustionphaseCdActions
 
 AddFunction FireCombustionphaseCdPostConditions
 {
- HasAzeriteTrait(blaster_master_trait) and Talent(flame_on_talent) and not False() and FireBmcombustionphaseCdPostConditions() or BuffExpires(combustion_buff) and Spell(rune_of_power) or { HasAzeriteTrait(blaster_master_trait) and BuffStacks(blaster_master_buff) >= 3 or not HasAzeriteTrait(blaster_master_trait) } and FireActivetalentsCdPostConditions() or FireTrinketsCdPostConditions() or { Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 6 } and BuffPresent(hot_streak_buff) and not HasAzeriteTrait(blaster_master_trait) and Spell(flamestrike) or BuffPresent(pyroclasm) and BuffRemaining(combustion_buff) > CastTime(pyroblast) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Spell(pyroblast) or False() and { BuffPresent(combustion_buff) and BuffPresent(heating_up_buff) and not InFlightToTarget(pyroblast) and not ExecuteTime(scorch) > 0 or ExecuteTime(scorch) and BuffExpires(heating_up_buff) and BuffExpires(hot_streak_buff) and not InFlightToTarget(pyroblast) } and Spell(fire_blast) or not False() and { not HasAzeriteTrait(blaster_master_trait) or not Talent(flame_on_talent) } and { BuffPresent(combustion_buff) and BuffPresent(heating_up_buff) and not InFlightToTarget(pyroblast) and not ExecuteTime(scorch) > 0 or ExecuteTime(scorch) and BuffExpires(heating_up_buff) and BuffExpires(hot_streak_buff) and not InFlightToTarget(pyroblast) } and Spell(fire_blast) or PreviousGCDSpell(scorch) and BuffPresent(heating_up_buff) and Spell(pyroblast) or Spell(phoenix_flames) or { BuffRemaining(combustion_buff) > CastTime(scorch) and BuffPresent(combustion_buff) or BuffExpires(combustion_buff) } and Spell(scorch) or BuffRemaining(combustion_buff) < GCD() and Enemies() > 1 and Spell(living_bomb) or BuffRemaining(combustion_buff) < GCD() and BuffPresent(combustion_buff) and target.Distance(less 12) and Spell(dragons_breath) or target.HealthPercent() <= 30 and Talent(searing_touch_talent) and Spell(scorch)
+ HasAzeriteTrait(blaster_master_trait) and Talent(flame_on_talent) and not AzeriteEssenceIsEnabled(memory_of_lucid_dreams_essence_id) and FireBmcombustionphaseCdPostConditions() or BuffExpires(combustion_buff) and Spell(rune_of_power) or { HasAzeriteTrait(blaster_master_trait) and BuffStacks(blaster_master_buff) >= 3 or not HasAzeriteTrait(blaster_master_trait) } and FireActivetalentsCdPostConditions() or FireTrinketsCdPostConditions() or { Talent(flame_patch_talent) and Enemies() > 2 or Enemies() > 6 } and BuffPresent(hot_streak_buff) and not HasAzeriteTrait(blaster_master_trait) and Spell(flamestrike) or BuffPresent(pyroclasm) and BuffRemaining(combustion_buff) > CastTime(pyroblast) and Spell(pyroblast) or BuffPresent(hot_streak_buff) and Spell(pyroblast) or AzeriteEssenceIsEnabled(memory_of_lucid_dreams_essence_id) and { BuffPresent(combustion_buff) and BuffPresent(heating_up_buff) and not InFlightToTarget(pyroblast) and not ExecuteTime(scorch) > 0 or ExecuteTime(scorch) and BuffExpires(heating_up_buff) and BuffExpires(hot_streak_buff) and not InFlightToTarget(pyroblast) } and Spell(fire_blast) or not AzeriteEssenceIsEnabled(memory_of_lucid_dreams_essence_id) and { not HasAzeriteTrait(blaster_master_trait) or not Talent(flame_on_talent) } and { BuffPresent(combustion_buff) and BuffPresent(heating_up_buff) and not InFlightToTarget(pyroblast) and not ExecuteTime(scorch) > 0 or ExecuteTime(scorch) and BuffExpires(heating_up_buff) and BuffExpires(hot_streak_buff) and not InFlightToTarget(pyroblast) } and Spell(fire_blast) or PreviousGCDSpell(scorch) and BuffPresent(heating_up_buff) and Spell(pyroblast) or Spell(phoenix_flames) or { BuffRemaining(combustion_buff) > CastTime(scorch) and BuffPresent(combustion_buff) or BuffExpires(combustion_buff) } and Spell(scorch) or BuffRemaining(combustion_buff) < GCD() and Enemies() > 1 and Spell(living_bomb) or BuffRemaining(combustion_buff) < GCD() and BuffPresent(combustion_buff) and target.Distance(less 12) and Spell(dragons_breath) or target.HealthPercent() <= 30 and Talent(searing_touch_talent) and Spell(scorch)
 }
 
 ### actions.bm_combustion_phase
@@ -1362,6 +1362,7 @@ AddIcon checkbox=opt_mage_fire_aoe help=cd specialization=fire
 # lights_judgment
 # living_bomb
 # memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence_id
 # meteor
 # meteor_talent
 # mirror_image

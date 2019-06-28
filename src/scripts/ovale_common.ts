@@ -171,6 +171,11 @@ Define(sephuzs_secret_buff 208051)
 Define(concentrated_flame_essence 295373)
 Define(concentrated_flame_burn_debuff 295377)
 
+Define(conflict_and_strife_essence_id 32)
+Define(memory_of_lucid_dreams_essence_id 27)
+Define(vision_of_perfection_essence_id 22)
+Define(condensed_lifeforce_essence_id 14)
+
 ###
 ### Racials
 ###
