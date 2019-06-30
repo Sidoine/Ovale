@@ -550,6 +550,13 @@ Define(wraith_walk_buff 212552)
 # Weapon Enchant
 Define(unholy_strength_buff 53365)
 	SpellInfo(unholy_strength_buff duration=15)
+Define(blood_for_blood 233411)
+	SpellInfo(blood_for_blood offgcd=1 gcd=0)
+	SpellAddBuff(blood_for_blood blood_for_blood_buff=1)
+Define(blood_for_blood_buff 233411)
+	SpellInfo(blood_for_blood_buff duration=12)
+Define(death_chain 203173)
+	SpellInfo(death_chain cd=30)
 
 ## Items
 Define(consorts_cold_core 144293)
