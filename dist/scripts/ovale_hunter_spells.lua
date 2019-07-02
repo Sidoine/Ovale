@@ -120,7 +120,7 @@ Define(hunters_mark 257284)
 # Apply Hunter's Mark to the target, increasing all damage you deal to the marked target by s1.  If the target dies while affected by Hunter's Mark, you instantly gain 259558s1 Focus. The target can always be seen and tracked by the Hunter.rnrnOnly one Hunter's Mark can be applied at a time.
   SpellInfo(hunters_mark talent=hunters_mark_talent)
   # Damage taken from the Hunter increased by s1.rnrnCan always be seen and tracked by the Hunter.
-  SpellAddTargetDebuff(hunters_mark hunters_mark=1)
+  SpellAddTargetDebuff(hunters_mark hunters_mark_debuff=1)
 Define(kill_command 34026)
 # Give the command to kill, causing your pet to savagely deal <damage> Physical damage to the enemy.
 # Rank 2: Kill Command has a 259489s2 chance to immediately reset its cooldown.rnrnCoordinated Assault increases this chance by another 266779s4.
