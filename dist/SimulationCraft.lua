@@ -2266,6 +2266,8 @@ EmitAction = function(parseNode, nodeList, annotation)
             conditionCode = "target.InRange(muzzle)"
         elseif className == "HUNTER" and action == "harpoon" then
             conditionCode = "target.InRange(harpoon)"
+        elseif className == "HUNTER" and action == "aimed_shot" then
+            conditionCode = "Speed() == 0 or CastTime(aimed_shot) <= CastTime(arcane_shot)"
         elseif className == "MAGE" and action == "arcane_brilliance" then
             conditionCode = "BuffExpires(critical_strike_buff any=1) or BuffExpires(spell_power_multiplier_buff any=1)"
         elseif className == "MAGE" and find(action, "pet_") then
