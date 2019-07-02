@@ -284,6 +284,7 @@ Define(frailty_debuff 247456)
 
     SpellAddBuff(fracture soul_fragments=2)
     SpellRequire(fracture add_pain_from_aura -20=buff,metamorphosis_veng_buff)
+    SpellAddBuff(fracture soul_fragments 3=buff,metamorphosis_veng_buff)
     
 	SpellInfo(immolation_aura cd=15 cd_haste=melee)
 	SpellAddBuff(immolation_aura immolation_aura_buff=1)
@@ -333,6 +334,7 @@ Define(revolving_blades_buff 279584)
 
     SpellAddBuff(shear soul_fragments=1)
     SpellRequire(shear add_pain_from_aura -20=buff,metamorphosis_veng_buff)
+    SpellAddBuff(shear soul_fragments 2=buff,metamorphosis_veng_buff)
     
 	SpellInfo(sigil_of_chains cd=90)
 
