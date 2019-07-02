@@ -355,7 +355,7 @@ AddFunction AfflictionCooldownsCdActions
  #blood_fury,if=!cooldown.summon_darkglare.up
  if not { not SpellCooldown(summon_darkglare) > 0 } Spell(blood_fury_sp)
  #memory_of_lucid_dreams
- Spell(memory_of_lucid_dreams)
+ Spell(memory_of_lucid_dreams_essence)
  #blood_of_the_enemy,if=pet.darkglare.active|cooldown.summon_darkglare.remains>30
  if DemonDuration(darkglare) > 0 or SpellCooldown(summon_darkglare) > 30 Spell(blood_of_the_enemy)
 }
@@ -611,7 +611,7 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 # haunt_talent
 # inevitable_demise_buff
 # item_unbridled_fury
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
 # nightfall_buff
 # pandemic_invocation_trait
 # phantom_singularity
@@ -1103,7 +1103,7 @@ AddFunction DemonologyBuildashardShortCdPostConditions
 AddFunction DemonologyBuildashardCdActions
 {
  #memory_of_lucid_dreams,if=soul_shard<2
- if SoulShards() < 2 Spell(memory_of_lucid_dreams)
+ if SoulShards() < 2 Spell(memory_of_lucid_dreams_essence)
 }
 
 AddFunction DemonologyBuildashardCdPostConditions
@@ -1379,7 +1379,7 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 # inner_demons
 # inner_demons_talent
 # item_unbridled_fury
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
 # nether_portal
 # nether_portal_buff
 # nether_portal_talent
@@ -1545,13 +1545,13 @@ AddFunction DestructionCdsShortCdPostConditions
 AddFunction DestructionCdsCdActions
 {
  #summon_infernal,if=cooldown.dark_soul_instability.ready|cooldown.memory_of_lucid_dreams.ready|(!talent.dark_soul_instability.enabled&!essence.memory_of_lucid_dreams.major)|cooldown.dark_soul_instability.remains<=10|cooldown.memory_of_lucid_dreams.remains<=10
- if SpellCooldown(dark_soul_instability) == 0 or SpellCooldown(memory_of_lucid_dreams) == 0 or not Talent(dark_soul_instability_talent) and not False() or SpellCooldown(dark_soul_instability) <= 10 or SpellCooldown(memory_of_lucid_dreams) <= 10 Spell(summon_infernal)
+ if SpellCooldown(dark_soul_instability) == 0 or SpellCooldown(memory_of_lucid_dreams_essence) == 0 or not Talent(dark_soul_instability_talent) and not False() or SpellCooldown(dark_soul_instability) <= 10 or SpellCooldown(memory_of_lucid_dreams_essence) <= 10 Spell(summon_infernal)
  #guardian_of_azeroth,if=pet.infernal.active
  if DemonDuration(infernal) > 0 Spell(guardian_of_azeroth)
  #dark_soul_instability,if=pet.infernal.active&pet.infernal.remains<=20
  if DemonDuration(infernal) > 0 and DemonDuration(infernal) <= 20 Spell(dark_soul_instability)
  #memory_of_lucid_dreams,if=pet.infernal.active&pet.infernal.remains<=20
- if DemonDuration(infernal) > 0 and DemonDuration(infernal) <= 20 Spell(memory_of_lucid_dreams)
+ if DemonDuration(infernal) > 0 and DemonDuration(infernal) <= 20 Spell(memory_of_lucid_dreams_essence)
  #summon_infernal,if=target.time_to_die>cooldown.summon_infernal.duration+30
  if target.TimeToDie() > SpellCooldownDuration(summon_infernal) + 30 Spell(summon_infernal)
  #guardian_of_azeroth,if=time>30&target.time_to_die>cooldown.guardian_of_azeroth.duration+30
@@ -1563,7 +1563,7 @@ AddFunction DestructionCdsCdActions
  #dark_soul_instability,if=cooldown.summon_infernal.remains>target.time_to_die
  if SpellCooldown(summon_infernal) > target.TimeToDie() Spell(dark_soul_instability)
  #memory_of_lucid_dreams,if=cooldown.summon_infernal.remains>target.time_to_die
- if SpellCooldown(summon_infernal) > target.TimeToDie() Spell(memory_of_lucid_dreams)
+ if SpellCooldown(summon_infernal) > target.TimeToDie() Spell(memory_of_lucid_dreams_essence)
  #summon_infernal,if=target.time_to_die<30
  if target.TimeToDie() < 30 Spell(summon_infernal)
  #guardian_of_azeroth,if=target.time_to_die<30
@@ -1571,7 +1571,7 @@ AddFunction DestructionCdsCdActions
  #dark_soul_instability,if=target.time_to_die<20
  if target.TimeToDie() < 20 Spell(dark_soul_instability)
  #memory_of_lucid_dreams,if=target.time_to_die<20
- if target.TimeToDie() < 20 Spell(memory_of_lucid_dreams)
+ if target.TimeToDie() < 20 Spell(memory_of_lucid_dreams_essence)
  #blood_of_the_enemy
  Spell(blood_of_the_enemy)
 
@@ -1580,13 +1580,13 @@ AddFunction DestructionCdsCdActions
   #potion,if=pet.infernal.active|target.time_to_die<30
   if { DemonDuration(infernal) > 0 or target.TimeToDie() < 30 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
   #berserking,if=pet.infernal.active|buff.memory_of_lucid_dreams.remains|buff.dark_soul_instability.remains|target.time_to_die<30
-  if DemonDuration(infernal) > 0 or BuffPresent(memory_of_lucid_dreams) or BuffPresent(dark_soul_instability_buff) or target.TimeToDie() < 30 Spell(berserking)
+  if DemonDuration(infernal) > 0 or BuffPresent(memory_of_lucid_dreams_essence_buff) or BuffPresent(dark_soul_instability_buff) or target.TimeToDie() < 30 Spell(berserking)
   #blood_fury,if=pet.infernal.active|buff.memory_of_lucid_dreams.remains|buff.dark_soul_instability.remains|target.time_to_die<30
-  if DemonDuration(infernal) > 0 or BuffPresent(memory_of_lucid_dreams) or BuffPresent(dark_soul_instability_buff) or target.TimeToDie() < 30 Spell(blood_fury_sp)
+  if DemonDuration(infernal) > 0 or BuffPresent(memory_of_lucid_dreams_essence_buff) or BuffPresent(dark_soul_instability_buff) or target.TimeToDie() < 30 Spell(blood_fury_sp)
   #fireblood,if=pet.infernal.active|buff.memory_of_lucid_dreams.remains|buff.dark_soul_instability.remains|target.time_to_die<30
-  if DemonDuration(infernal) > 0 or BuffPresent(memory_of_lucid_dreams) or BuffPresent(dark_soul_instability_buff) or target.TimeToDie() < 30 Spell(fireblood)
+  if DemonDuration(infernal) > 0 or BuffPresent(memory_of_lucid_dreams_essence_buff) or BuffPresent(dark_soul_instability_buff) or target.TimeToDie() < 30 Spell(fireblood)
   #use_items,if=pet.infernal.active|buff.memory_of_lucid_dreams.remains|buff.dark_soul_instability.remains|target.time_to_die<30
-  if DemonDuration(infernal) > 0 or BuffPresent(memory_of_lucid_dreams) or BuffPresent(dark_soul_instability_buff) or target.TimeToDie() < 30 DestructionUseItemActions()
+  if DemonDuration(infernal) > 0 or BuffPresent(memory_of_lucid_dreams_essence_buff) or BuffPresent(dark_soul_instability_buff) or target.TimeToDie() < 30 DestructionUseItemActions()
  }
 }
 
@@ -1891,7 +1891,8 @@ AddIcon checkbox=opt_warlock_destruction_aoe help=cd specialization=destruction
 # inferno_talent
 # internal_combustion_talent
 # item_unbridled_fury
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
+# memory_of_lucid_dreams_essence_buff
 # purifying_blast
 # rain_of_fire
 # reckless_force_buff

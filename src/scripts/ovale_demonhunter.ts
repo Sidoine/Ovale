@@ -245,7 +245,7 @@ AddFunction HavocEssencesCdActions
   unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
   {
    #memory_of_lucid_dreams,if=fury<40&buff.metamorphosis.up
-   if Fury() < 40 and BuffPresent(metamorphosis_havoc_buff) Spell(memory_of_lucid_dreams)
+   if Fury() < 40 and BuffPresent(metamorphosis_havoc_buff) Spell(memory_of_lucid_dreams_essence)
   }
  }
 }
@@ -589,7 +589,7 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # immolation_aura_havoc
 # imprison
 # item_focused_resolve
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
 # metamorphosis_havoc
 # metamorphosis_havoc_buff
 # momentum_buff

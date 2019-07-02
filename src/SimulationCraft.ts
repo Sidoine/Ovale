@@ -1530,6 +1530,7 @@ const InitializeDisambiguation = function() {
     
     // Essence
     AddDisambiguation("concentrated_flame", "concentrated_flame_essence");
+    AddDisambiguation("memory_of_lucid_dreams", "memory_of_lucid_dreams_essence");
     AddDisambiguation("ripple_in_space", "ripple_in_space_essence");
     AddDisambiguation("worldvein_resonance", "worldvein_resonance_essence");
 

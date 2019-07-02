@@ -48,21 +48,21 @@ AddFunction ArmsSingletargetMainActions
  #rend,if=remains<=duration*0.3&debuff.colossus_smash.down
  if target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and target.DebuffExpires(colossus_smash_debuff) Spell(rend)
  #skullsplitter,if=rage<60&buff.deadly_calm.down&buff.memory_of_lucid_dreams.down
- if Rage() < 60 and BuffExpires(deadly_calm_buff) and BuffExpires(memory_of_lucid_dreams) Spell(skullsplitter)
+ if Rage() < 60 and BuffExpires(deadly_calm_buff) and BuffExpires(memory_of_lucid_dreams_essence_buff) Spell(skullsplitter)
  #colossus_smash,if=!essence.memory_of_lucid_dreams.major|(buff.memory_of_lucid_dreams.up|cooldown.memory_of_lucid_dreams.remains>10)
- if not False() or BuffPresent(memory_of_lucid_dreams) or SpellCooldown(memory_of_lucid_dreams) > 10 Spell(colossus_smash)
+ if not False() or BuffPresent(memory_of_lucid_dreams_essence_buff) or SpellCooldown(memory_of_lucid_dreams_essence) > 10 Spell(colossus_smash)
  #warbreaker,if=!essence.memory_of_lucid_dreams.major|(buff.memory_of_lucid_dreams.up|cooldown.memory_of_lucid_dreams.remains>10)
- if not False() or BuffPresent(memory_of_lucid_dreams) or SpellCooldown(memory_of_lucid_dreams) > 10 Spell(warbreaker)
+ if not False() or BuffPresent(memory_of_lucid_dreams_essence_buff) or SpellCooldown(memory_of_lucid_dreams_essence) > 10 Spell(warbreaker)
  #execute,if=buff.sudden_death.react
  if BuffPresent(sudden_death_arms_buff) Spell(execute_arms)
  #cleave,if=spell_targets.whirlwind>2
  if Enemies() > 2 Spell(cleave)
  #overpower,if=rage<30&buff.memory_of_lucid_dreams.up&debuff.colossus_smash.up
- if Rage() < 30 and BuffPresent(memory_of_lucid_dreams) and target.DebuffPresent(colossus_smash_debuff) Spell(overpower)
+ if Rage() < 30 and BuffPresent(memory_of_lucid_dreams_essence_buff) and target.DebuffPresent(colossus_smash_debuff) Spell(overpower)
  #mortal_strike
  Spell(mortal_strike)
  #whirlwind,if=talent.fervor_of_battle.enabled&(buff.memory_of_lucid_dreams.up|buff.deadly_calm.up)
- if Talent(fervor_of_battle_talent) and { BuffPresent(memory_of_lucid_dreams) or BuffPresent(deadly_calm_buff) } Spell(whirlwind_arms)
+ if Talent(fervor_of_battle_talent) and { BuffPresent(memory_of_lucid_dreams_essence_buff) or BuffPresent(deadly_calm_buff) } Spell(whirlwind_arms)
  #overpower
  Spell(overpower)
  #whirlwind,if=talent.fervor_of_battle.enabled
@@ -77,12 +77,12 @@ AddFunction ArmsSingletargetMainPostConditions
 
 AddFunction ArmsSingletargetShortCdActions
 {
- unless target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 60 and BuffExpires(deadly_calm_buff) and BuffExpires(memory_of_lucid_dreams) and Spell(skullsplitter)
+ unless target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 60 and BuffExpires(deadly_calm_buff) and BuffExpires(memory_of_lucid_dreams_essence_buff) and Spell(skullsplitter)
  {
   #ravager,if=!buff.deadly_calm.up&(cooldown.colossus_smash.remains<2|(talent.warbreaker.enabled&cooldown.warbreaker.remains<2))
   if not BuffPresent(deadly_calm_buff) and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } Spell(ravager)
 
-  unless { not False() or BuffPresent(memory_of_lucid_dreams) or SpellCooldown(memory_of_lucid_dreams) > 10 } and Spell(colossus_smash) or { not False() or BuffPresent(memory_of_lucid_dreams) or SpellCooldown(memory_of_lucid_dreams) > 10 } and Spell(warbreaker)
+  unless { not False() or BuffPresent(memory_of_lucid_dreams_essence_buff) or SpellCooldown(memory_of_lucid_dreams_essence) > 10 } and Spell(colossus_smash) or { not False() or BuffPresent(memory_of_lucid_dreams_essence_buff) or SpellCooldown(memory_of_lucid_dreams_essence) > 10 } and Spell(warbreaker)
   {
    #deadly_calm
    Spell(deadly_calm)
@@ -90,7 +90,7 @@ AddFunction ArmsSingletargetShortCdActions
    unless BuffPresent(sudden_death_arms_buff) and Spell(execute_arms)
    {
     #bladestorm,if=cooldown.mortal_strike.remains&(!talent.deadly_calm.enabled|buff.deadly_calm.down)&((debuff.colossus_smash.up&!azerite.test_of_might.enabled)|buff.test_of_might.up)&buff.memory_of_lucid_dreams.down
-    if SpellCooldown(mortal_strike) > 0 and { not Talent(deadly_calm_talent) or BuffExpires(deadly_calm_buff) } and { target.DebuffPresent(colossus_smash_debuff) and not HasAzeriteTrait(test_of_might_trait) or BuffPresent(test_of_might_buff) } and BuffExpires(memory_of_lucid_dreams) Spell(bladestorm_arms)
+    if SpellCooldown(mortal_strike) > 0 and { not Talent(deadly_calm_talent) or BuffExpires(deadly_calm_buff) } and { target.DebuffPresent(colossus_smash_debuff) and not HasAzeriteTrait(test_of_might_trait) or BuffPresent(test_of_might_buff) } and BuffExpires(memory_of_lucid_dreams_essence_buff) Spell(bladestorm_arms)
    }
   }
  }
@@ -98,7 +98,7 @@ AddFunction ArmsSingletargetShortCdActions
 
 AddFunction ArmsSingletargetShortCdPostConditions
 {
- target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 60 and BuffExpires(deadly_calm_buff) and BuffExpires(memory_of_lucid_dreams) and Spell(skullsplitter) or { not False() or BuffPresent(memory_of_lucid_dreams) or SpellCooldown(memory_of_lucid_dreams) > 10 } and Spell(colossus_smash) or { not False() or BuffPresent(memory_of_lucid_dreams) or SpellCooldown(memory_of_lucid_dreams) > 10 } and Spell(warbreaker) or BuffPresent(sudden_death_arms_buff) and Spell(execute_arms) or Enemies() > 2 and Spell(cleave) or Rage() < 30 and BuffPresent(memory_of_lucid_dreams) and target.DebuffPresent(colossus_smash_debuff) and Spell(overpower) or Spell(mortal_strike) or Talent(fervor_of_battle_talent) and { BuffPresent(memory_of_lucid_dreams) or BuffPresent(deadly_calm_buff) } and Spell(whirlwind_arms) or Spell(overpower) or Talent(fervor_of_battle_talent) and Spell(whirlwind_arms) or not Talent(fervor_of_battle_talent) and Spell(slam)
+ target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 60 and BuffExpires(deadly_calm_buff) and BuffExpires(memory_of_lucid_dreams_essence_buff) and Spell(skullsplitter) or { not False() or BuffPresent(memory_of_lucid_dreams_essence_buff) or SpellCooldown(memory_of_lucid_dreams_essence) > 10 } and Spell(colossus_smash) or { not False() or BuffPresent(memory_of_lucid_dreams_essence_buff) or SpellCooldown(memory_of_lucid_dreams_essence) > 10 } and Spell(warbreaker) or BuffPresent(sudden_death_arms_buff) and Spell(execute_arms) or Enemies() > 2 and Spell(cleave) or Rage() < 30 and BuffPresent(memory_of_lucid_dreams_essence_buff) and target.DebuffPresent(colossus_smash_debuff) and Spell(overpower) or Spell(mortal_strike) or Talent(fervor_of_battle_talent) and { BuffPresent(memory_of_lucid_dreams_essence_buff) or BuffPresent(deadly_calm_buff) } and Spell(whirlwind_arms) or Spell(overpower) or Talent(fervor_of_battle_talent) and Spell(whirlwind_arms) or not Talent(fervor_of_battle_talent) and Spell(slam)
 }
 
 AddFunction ArmsSingletargetCdActions
@@ -107,7 +107,7 @@ AddFunction ArmsSingletargetCdActions
 
 AddFunction ArmsSingletargetCdPostConditions
 {
- target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 60 and BuffExpires(deadly_calm_buff) and BuffExpires(memory_of_lucid_dreams) and Spell(skullsplitter) or not BuffPresent(deadly_calm_buff) and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } and Spell(ravager) or { not False() or BuffPresent(memory_of_lucid_dreams) or SpellCooldown(memory_of_lucid_dreams) > 10 } and Spell(colossus_smash) or { not False() or BuffPresent(memory_of_lucid_dreams) or SpellCooldown(memory_of_lucid_dreams) > 10 } and Spell(warbreaker) or Spell(deadly_calm) or BuffPresent(sudden_death_arms_buff) and Spell(execute_arms) or SpellCooldown(mortal_strike) > 0 and { not Talent(deadly_calm_talent) or BuffExpires(deadly_calm_buff) } and { target.DebuffPresent(colossus_smash_debuff) and not HasAzeriteTrait(test_of_might_trait) or BuffPresent(test_of_might_buff) } and BuffExpires(memory_of_lucid_dreams) and Spell(bladestorm_arms) or Enemies() > 2 and Spell(cleave) or Rage() < 30 and BuffPresent(memory_of_lucid_dreams) and target.DebuffPresent(colossus_smash_debuff) and Spell(overpower) or Spell(mortal_strike) or Talent(fervor_of_battle_talent) and { BuffPresent(memory_of_lucid_dreams) or BuffPresent(deadly_calm_buff) } and Spell(whirlwind_arms) or Spell(overpower) or Talent(fervor_of_battle_talent) and Spell(whirlwind_arms) or not Talent(fervor_of_battle_talent) and Spell(slam)
+ target.DebuffRemaining(rend_debuff) <= BaseDuration(rend_debuff) * 0.3 and target.DebuffExpires(colossus_smash_debuff) and Spell(rend) or Rage() < 60 and BuffExpires(deadly_calm_buff) and BuffExpires(memory_of_lucid_dreams_essence_buff) and Spell(skullsplitter) or not BuffPresent(deadly_calm_buff) and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } and Spell(ravager) or { not False() or BuffPresent(memory_of_lucid_dreams_essence_buff) or SpellCooldown(memory_of_lucid_dreams_essence) > 10 } and Spell(colossus_smash) or { not False() or BuffPresent(memory_of_lucid_dreams_essence_buff) or SpellCooldown(memory_of_lucid_dreams_essence) > 10 } and Spell(warbreaker) or Spell(deadly_calm) or BuffPresent(sudden_death_arms_buff) and Spell(execute_arms) or SpellCooldown(mortal_strike) > 0 and { not Talent(deadly_calm_talent) or BuffExpires(deadly_calm_buff) } and { target.DebuffPresent(colossus_smash_debuff) and not HasAzeriteTrait(test_of_might_trait) or BuffPresent(test_of_might_buff) } and BuffExpires(memory_of_lucid_dreams_essence_buff) and Spell(bladestorm_arms) or Enemies() > 2 and Spell(cleave) or Rage() < 30 and BuffPresent(memory_of_lucid_dreams_essence_buff) and target.DebuffPresent(colossus_smash_debuff) and Spell(overpower) or Spell(mortal_strike) or Talent(fervor_of_battle_talent) and { BuffPresent(memory_of_lucid_dreams_essence_buff) or BuffPresent(deadly_calm_buff) } and Spell(whirlwind_arms) or Spell(overpower) or Talent(fervor_of_battle_talent) and Spell(whirlwind_arms) or not Talent(fervor_of_battle_talent) and Spell(slam)
 }
 
 ### actions.precombat
@@ -140,7 +140,7 @@ AddFunction ArmsPrecombatCdActions
  #potion
  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_bursting_blood usable=1)
  #memory_of_lucid_dreams
- Spell(memory_of_lucid_dreams)
+ Spell(memory_of_lucid_dreams_essence)
  #guardian_of_azeroth
  Spell(guardian_of_azeroth)
 }
@@ -281,19 +281,19 @@ AddFunction ArmsFivetargetCdPostConditions
 AddFunction ArmsExecuteMainActions
 {
  #skullsplitter,if=rage<60&buff.deadly_calm.down&buff.memory_of_lucid_dreams.down
- if Rage() < 60 and BuffExpires(deadly_calm_buff) and BuffExpires(memory_of_lucid_dreams) Spell(skullsplitter)
+ if Rage() < 60 and BuffExpires(deadly_calm_buff) and BuffExpires(memory_of_lucid_dreams_essence_buff) Spell(skullsplitter)
  #colossus_smash,if=!essence.memory_of_lucid_dreams.major|(buff.memory_of_lucid_dreams.up|cooldown.memory_of_lucid_dreams.remains>10)
- if not False() or BuffPresent(memory_of_lucid_dreams) or SpellCooldown(memory_of_lucid_dreams) > 10 Spell(colossus_smash)
+ if not False() or BuffPresent(memory_of_lucid_dreams_essence_buff) or SpellCooldown(memory_of_lucid_dreams_essence) > 10 Spell(colossus_smash)
  #warbreaker,if=!essence.memory_of_lucid_dreams.major|(buff.memory_of_lucid_dreams.up|cooldown.memory_of_lucid_dreams.remains>10)
- if not False() or BuffPresent(memory_of_lucid_dreams) or SpellCooldown(memory_of_lucid_dreams) > 10 Spell(warbreaker)
+ if not False() or BuffPresent(memory_of_lucid_dreams_essence_buff) or SpellCooldown(memory_of_lucid_dreams_essence) > 10 Spell(warbreaker)
  #cleave,if=spell_targets.whirlwind>2
  if Enemies() > 2 Spell(cleave)
  #slam,if=buff.crushing_assault.up&buff.memory_of_lucid_dreams.down
- if BuffPresent(crushing_assault_buff) and BuffExpires(memory_of_lucid_dreams) Spell(slam)
+ if BuffPresent(crushing_assault_buff) and BuffExpires(memory_of_lucid_dreams_essence_buff) Spell(slam)
  #mortal_strike,if=buff.overpower.stack=2&talent.dreadnaught.enabled|buff.executioners_precision.stack=2
  if BuffStacks(overpower_buff) == 2 and Talent(dreadnaught_talent) or target.DebuffStacks(executioners_precision_debuff) == 2 Spell(mortal_strike)
  #execute,if=buff.memory_of_lucid_dreams.up|buff.deadly_calm.up
- if BuffPresent(memory_of_lucid_dreams) or BuffPresent(deadly_calm_buff) Spell(execute_arms)
+ if BuffPresent(memory_of_lucid_dreams_essence_buff) or BuffPresent(deadly_calm_buff) Spell(execute_arms)
  #overpower
  Spell(overpower)
  #execute
@@ -306,24 +306,24 @@ AddFunction ArmsExecuteMainPostConditions
 
 AddFunction ArmsExecuteShortCdActions
 {
- unless Rage() < 60 and BuffExpires(deadly_calm_buff) and BuffExpires(memory_of_lucid_dreams) and Spell(skullsplitter)
+ unless Rage() < 60 and BuffExpires(deadly_calm_buff) and BuffExpires(memory_of_lucid_dreams_essence_buff) and Spell(skullsplitter)
  {
   #ravager,if=!buff.deadly_calm.up&(cooldown.colossus_smash.remains<2|(talent.warbreaker.enabled&cooldown.warbreaker.remains<2))
   if not BuffPresent(deadly_calm_buff) and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } Spell(ravager)
 
-  unless { not False() or BuffPresent(memory_of_lucid_dreams) or SpellCooldown(memory_of_lucid_dreams) > 10 } and Spell(colossus_smash) or { not False() or BuffPresent(memory_of_lucid_dreams) or SpellCooldown(memory_of_lucid_dreams) > 10 } and Spell(warbreaker)
+  unless { not False() or BuffPresent(memory_of_lucid_dreams_essence_buff) or SpellCooldown(memory_of_lucid_dreams_essence) > 10 } and Spell(colossus_smash) or { not False() or BuffPresent(memory_of_lucid_dreams_essence_buff) or SpellCooldown(memory_of_lucid_dreams_essence) > 10 } and Spell(warbreaker)
   {
    #deadly_calm
    Spell(deadly_calm)
    #bladestorm,if=!buff.memory_of_lucid_dreams.up&buff.test_of_might.up&rage<30&!buff.deadly_calm.up
-   if not BuffPresent(memory_of_lucid_dreams) and BuffPresent(test_of_might_buff) and Rage() < 30 and not BuffPresent(deadly_calm_buff) Spell(bladestorm_arms)
+   if not BuffPresent(memory_of_lucid_dreams_essence_buff) and BuffPresent(test_of_might_buff) and Rage() < 30 and not BuffPresent(deadly_calm_buff) Spell(bladestorm_arms)
   }
  }
 }
 
 AddFunction ArmsExecuteShortCdPostConditions
 {
- Rage() < 60 and BuffExpires(deadly_calm_buff) and BuffExpires(memory_of_lucid_dreams) and Spell(skullsplitter) or { not False() or BuffPresent(memory_of_lucid_dreams) or SpellCooldown(memory_of_lucid_dreams) > 10 } and Spell(colossus_smash) or { not False() or BuffPresent(memory_of_lucid_dreams) or SpellCooldown(memory_of_lucid_dreams) > 10 } and Spell(warbreaker) or Enemies() > 2 and Spell(cleave) or BuffPresent(crushing_assault_buff) and BuffExpires(memory_of_lucid_dreams) and Spell(slam) or { BuffStacks(overpower_buff) == 2 and Talent(dreadnaught_talent) or target.DebuffStacks(executioners_precision_debuff) == 2 } and Spell(mortal_strike) or { BuffPresent(memory_of_lucid_dreams) or BuffPresent(deadly_calm_buff) } and Spell(execute_arms) or Spell(overpower) or Spell(execute_arms)
+ Rage() < 60 and BuffExpires(deadly_calm_buff) and BuffExpires(memory_of_lucid_dreams_essence_buff) and Spell(skullsplitter) or { not False() or BuffPresent(memory_of_lucid_dreams_essence_buff) or SpellCooldown(memory_of_lucid_dreams_essence) > 10 } and Spell(colossus_smash) or { not False() or BuffPresent(memory_of_lucid_dreams_essence_buff) or SpellCooldown(memory_of_lucid_dreams_essence) > 10 } and Spell(warbreaker) or Enemies() > 2 and Spell(cleave) or BuffPresent(crushing_assault_buff) and BuffExpires(memory_of_lucid_dreams_essence_buff) and Spell(slam) or { BuffStacks(overpower_buff) == 2 and Talent(dreadnaught_talent) or target.DebuffStacks(executioners_precision_debuff) == 2 } and Spell(mortal_strike) or { BuffPresent(memory_of_lucid_dreams_essence_buff) or BuffPresent(deadly_calm_buff) } and Spell(execute_arms) or Spell(overpower) or Spell(execute_arms)
 }
 
 AddFunction ArmsExecuteCdActions
@@ -332,7 +332,7 @@ AddFunction ArmsExecuteCdActions
 
 AddFunction ArmsExecuteCdPostConditions
 {
- Rage() < 60 and BuffExpires(deadly_calm_buff) and BuffExpires(memory_of_lucid_dreams) and Spell(skullsplitter) or not BuffPresent(deadly_calm_buff) and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } and Spell(ravager) or { not False() or BuffPresent(memory_of_lucid_dreams) or SpellCooldown(memory_of_lucid_dreams) > 10 } and Spell(colossus_smash) or { not False() or BuffPresent(memory_of_lucid_dreams) or SpellCooldown(memory_of_lucid_dreams) > 10 } and Spell(warbreaker) or Spell(deadly_calm) or not BuffPresent(memory_of_lucid_dreams) and BuffPresent(test_of_might_buff) and Rage() < 30 and not BuffPresent(deadly_calm_buff) and Spell(bladestorm_arms) or Enemies() > 2 and Spell(cleave) or BuffPresent(crushing_assault_buff) and BuffExpires(memory_of_lucid_dreams) and Spell(slam) or { BuffStacks(overpower_buff) == 2 and Talent(dreadnaught_talent) or target.DebuffStacks(executioners_precision_debuff) == 2 } and Spell(mortal_strike) or { BuffPresent(memory_of_lucid_dreams) or BuffPresent(deadly_calm_buff) } and Spell(execute_arms) or Spell(overpower) or Spell(execute_arms)
+ Rage() < 60 and BuffExpires(deadly_calm_buff) and BuffExpires(memory_of_lucid_dreams_essence_buff) and Spell(skullsplitter) or not BuffPresent(deadly_calm_buff) and { SpellCooldown(colossus_smash) < 2 or Talent(warbreaker_talent) and SpellCooldown(warbreaker) < 2 } and Spell(ravager) or { not False() or BuffPresent(memory_of_lucid_dreams_essence_buff) or SpellCooldown(memory_of_lucid_dreams_essence) > 10 } and Spell(colossus_smash) or { not False() or BuffPresent(memory_of_lucid_dreams_essence_buff) or SpellCooldown(memory_of_lucid_dreams_essence) > 10 } and Spell(warbreaker) or Spell(deadly_calm) or not BuffPresent(memory_of_lucid_dreams_essence_buff) and BuffPresent(test_of_might_buff) and Rage() < 30 and not BuffPresent(deadly_calm_buff) and Spell(bladestorm_arms) or Enemies() > 2 and Spell(cleave) or BuffPresent(crushing_assault_buff) and BuffExpires(memory_of_lucid_dreams_essence_buff) and Spell(slam) or { BuffStacks(overpower_buff) == 2 and Talent(dreadnaught_talent) or target.DebuffStacks(executioners_precision_debuff) == 2 } and Spell(mortal_strike) or { BuffPresent(memory_of_lucid_dreams_essence_buff) or BuffPresent(deadly_calm_buff) } and Spell(execute_arms) or Spell(overpower) or Spell(execute_arms)
 }
 
 ### actions.default
@@ -457,7 +457,7 @@ AddFunction ArmsDefaultCdActions
     #guardian_of_azeroth,if=cooldown.colossus_smash.remains<10
     if SpellCooldown(colossus_smash) < 10 Spell(guardian_of_azeroth)
     #memory_of_lucid_dreams,if=cooldown.colossus_smash.remains<3
-    if SpellCooldown(colossus_smash) < 3 Spell(memory_of_lucid_dreams)
+    if SpellCooldown(colossus_smash) < 3 Spell(memory_of_lucid_dreams_essence)
     #run_action_list,name=hac,if=raid_event.adds.exists
     if False(raid_event_adds_exists) ArmsHacCdActions()
 
@@ -579,7 +579,8 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # intimidating_shout
 # item_bursting_blood
 # lights_judgment
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
+# memory_of_lucid_dreams_essence_buff
 # mortal_strike
 # overpower
 # overpower_buff
@@ -658,7 +659,7 @@ AddFunction FuryGetInMeleeRange
 AddFunction FurySingletargetMainActions
 {
  #rampage,if=(buff.recklessness.up|buff.memory_of_lucid_dreams.up)|(talent.frothing_berserker.enabled|talent.carnage.enabled&(buff.enrage.remains<gcd|rage>90)|talent.massacre.enabled&(buff.enrage.remains<gcd|rage>90))
- if BuffPresent(recklessness_buff) or BuffPresent(memory_of_lucid_dreams) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } Spell(rampage)
+ if BuffPresent(recklessness_buff) or BuffPresent(memory_of_lucid_dreams_essence_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } Spell(rampage)
  #execute
  Spell(execute)
  #bloodthirst,if=buff.enrage.down|azerite.cold_steel_hot_blood.rank>1
@@ -686,7 +687,7 @@ AddFunction FurySingletargetShortCdActions
  #siegebreaker
  Spell(siegebreaker)
 
- unless { BuffPresent(recklessness_buff) or BuffPresent(memory_of_lucid_dreams) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or Spell(execute)
+ unless { BuffPresent(recklessness_buff) or BuffPresent(memory_of_lucid_dreams_essence_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or Spell(execute)
  {
   #bladestorm,if=prev_gcd.1.rampage
   if PreviousGCDSpell(rampage) Spell(bladestorm_fury)
@@ -695,7 +696,7 @@ AddFunction FurySingletargetShortCdActions
 
 AddFunction FurySingletargetShortCdPostConditions
 {
- { BuffPresent(recklessness_buff) or BuffPresent(memory_of_lucid_dreams) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or Spell(execute) or { not IsEnraged() or AzeriteTraitRank(cold_steel_hot_blood_trait) > 1 } and Spell(bloodthirst) or IsEnraged() and Spell(dragon_roar) or Charges(raging_blow) == 2 and Spell(raging_blow) or Spell(bloodthirst) or { Talent(carnage_talent) or Talent(massacre_talent_fury) and Rage() < 80 or Talent(frothing_berserker_talent) and Rage() < 90 } and Spell(raging_blow) or Talent(furious_slash_talent) and Spell(furious_slash) or Spell(whirlwind_fury)
+ { BuffPresent(recklessness_buff) or BuffPresent(memory_of_lucid_dreams_essence_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or Spell(execute) or { not IsEnraged() or AzeriteTraitRank(cold_steel_hot_blood_trait) > 1 } and Spell(bloodthirst) or IsEnraged() and Spell(dragon_roar) or Charges(raging_blow) == 2 and Spell(raging_blow) or Spell(bloodthirst) or { Talent(carnage_talent) or Talent(massacre_talent_fury) and Rage() < 80 or Talent(frothing_berserker_talent) and Rage() < 90 } and Spell(raging_blow) or Talent(furious_slash_talent) and Spell(furious_slash) or Spell(whirlwind_fury)
 }
 
 AddFunction FurySingletargetCdActions
@@ -704,7 +705,7 @@ AddFunction FurySingletargetCdActions
 
 AddFunction FurySingletargetCdPostConditions
 {
- Spell(siegebreaker) or { BuffPresent(recklessness_buff) or BuffPresent(memory_of_lucid_dreams) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or Spell(execute) or PreviousGCDSpell(rampage) and Spell(bladestorm_fury) or { not IsEnraged() or AzeriteTraitRank(cold_steel_hot_blood_trait) > 1 } and Spell(bloodthirst) or IsEnraged() and Spell(dragon_roar) or Charges(raging_blow) == 2 and Spell(raging_blow) or Spell(bloodthirst) or { Talent(carnage_talent) or Talent(massacre_talent_fury) and Rage() < 80 or Talent(frothing_berserker_talent) and Rage() < 90 } and Spell(raging_blow) or Talent(furious_slash_talent) and Spell(furious_slash) or Spell(whirlwind_fury)
+ Spell(siegebreaker) or { BuffPresent(recklessness_buff) or BuffPresent(memory_of_lucid_dreams_essence_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or Spell(execute) or PreviousGCDSpell(rampage) and Spell(bladestorm_fury) or { not IsEnraged() or AzeriteTraitRank(cold_steel_hot_blood_trait) > 1 } and Spell(bloodthirst) or IsEnraged() and Spell(dragon_roar) or Charges(raging_blow) == 2 and Spell(raging_blow) or Spell(bloodthirst) or { Talent(carnage_talent) or Talent(massacre_talent_fury) and Rage() < 80 or Talent(frothing_berserker_talent) and Rage() < 90 } and Spell(raging_blow) or Talent(furious_slash_talent) and Spell(furious_slash) or Spell(whirlwind_fury)
 }
 
 ### actions.precombat
@@ -737,7 +738,7 @@ AddFunction FuryPrecombatCdActions
  #potion
  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_bursting_blood usable=1)
  #memory_of_lucid_dreams
- Spell(memory_of_lucid_dreams)
+ Spell(memory_of_lucid_dreams_essence)
  #guardian_of_azeroth
  Spell(guardian_of_azeroth)
 
@@ -882,7 +883,7 @@ AddFunction FuryDefaultCdActions
      #guardian_of_azeroth,if=!buff.recklessness.up
      if not BuffPresent(recklessness_buff) Spell(guardian_of_azeroth)
      #memory_of_lucid_dreams,if=!buff.recklessness.up
-     if not BuffPresent(recklessness_buff) Spell(memory_of_lucid_dreams)
+     if not BuffPresent(recklessness_buff) Spell(memory_of_lucid_dreams_essence)
      #recklessness,if=!essence.condensed_lifeforce.major|cooldown.guardian_of_azeroth.remains>20|buff.guardian_of_azeroth.up
      if not False() or SpellCooldown(guardian_of_azeroth) > 20 or BuffPresent(guardian_of_azeroth_buff) Spell(recklessness)
 
@@ -997,7 +998,8 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # item_bursting_blood
 # lights_judgment
 # massacre_talent_fury
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
+# memory_of_lucid_dreams_essence_buff
 # pummel
 # purifying_blast
 # quaking_palm

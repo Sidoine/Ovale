@@ -210,7 +210,7 @@ AddFunction AssassinationEssencesCdActions
   unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
   {
    #memory_of_lucid_dreams,if=energy<50
-   if Energy() < 50 Spell(memory_of_lucid_dreams)
+   if Energy() < 50 Spell(memory_of_lucid_dreams_essence)
   }
  }
 }
@@ -616,7 +616,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # marked_for_death
 # master_assassin_buff
 # master_assassin_talent
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
 # mutilate
 # nightstalker_talent
 # purifying_blast
@@ -852,7 +852,7 @@ AddFunction AssassinationEssencesCdActions
   unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
   {
    #memory_of_lucid_dreams,if=energy<50
-   if Energy() < 50 Spell(memory_of_lucid_dreams)
+   if Energy() < 50 Spell(memory_of_lucid_dreams_essence)
   }
  }
 }
@@ -1258,7 +1258,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # marked_for_death
 # master_assassin_buff
 # master_assassin_talent
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
 # mutilate
 # nightstalker_talent
 # purifying_blast
@@ -1516,7 +1516,7 @@ AddFunction OutlawEssencesCdActions
   unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
   {
    #memory_of_lucid_dreams,if=energy<45
-   if Energy() < 45 Spell(memory_of_lucid_dreams)
+   if Energy() < 45 Spell(memory_of_lucid_dreams_essence)
   }
  }
 }
@@ -1868,7 +1868,7 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # loaded_dice_buff
 # marked_for_death
 # marked_for_death_talent
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
 # opportunity_buff
 # pistol_shot
 # purifying_blast
@@ -2118,7 +2118,7 @@ AddFunction OutlawEssencesCdActions
   unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
   {
    #memory_of_lucid_dreams,if=energy<45
-   if Energy() < 45 Spell(memory_of_lucid_dreams)
+   if Energy() < 45 Spell(memory_of_lucid_dreams_essence)
   }
  }
 }
@@ -2468,7 +2468,7 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # loaded_dice_buff
 # marked_for_death
 # marked_for_death_talent
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
 # opportunity_buff
 # pistol_shot
 # purifying_blast
@@ -2802,7 +2802,7 @@ AddFunction SubtletyEssencesCdActions
   unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
   {
    #memory_of_lucid_dreams,if=energy<40&buff.symbols_of_death.up
-   if Energy() < 40 and BuffPresent(symbols_of_death_buff) Spell(memory_of_lucid_dreams)
+   if Energy() < 40 and BuffPresent(symbols_of_death_buff) Spell(memory_of_lucid_dreams_essence)
   }
  }
 }
@@ -3183,7 +3183,7 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 # lights_judgment
 # marked_for_death
 # master_of_shadows_talent
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
 # nightblade
 # nightblade_debuff
 # nights_vengeance_buff

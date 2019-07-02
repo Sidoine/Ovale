@@ -187,7 +187,7 @@ AddFunction ArcaneEssencesCdActions
   unless BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and Spell(purifying_blast) or BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and Spell(ripple_in_space_essence) or BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and Spell(the_unbound_force)
   {
    #memory_of_lucid_dreams,if=!burn_phase&buff.arcane_power.down&cooldown.arcane_power.remains&buff.arcane_charge.stack=buff.arcane_charge.max_stack&(!talent.rune_of_power.enabled|action.rune_of_power.charges)|time_to_die<cooldown.arcane_power.remains
-   if not GetState(burn_phase) > 0 and BuffExpires(arcane_power_buff) and SpellCooldown(arcane_power) > 0 and ArcaneCharges() == MaxArcaneCharges() and { not Talent(rune_of_power_talent) or Charges(rune_of_power) } or target.TimeToDie() < SpellCooldown(arcane_power) Spell(memory_of_lucid_dreams)
+   if not GetState(burn_phase) > 0 and BuffExpires(arcane_power_buff) and SpellCooldown(arcane_power) > 0 and ArcaneCharges() == MaxArcaneCharges() and { not Talent(rune_of_power_talent) or Charges(rune_of_power) } or target.TimeToDie() < SpellCooldown(arcane_power) Spell(memory_of_lucid_dreams_essence)
   }
  }
 }
@@ -572,7 +572,7 @@ AddIcon checkbox=opt_mage_arcane_aoe help=cd specialization=arcane
 # guardian_of_azeroth
 # item_battle_potion_of_intellect
 # lights_judgment
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
 # mirror_image
 # nether_tempest
 # nether_tempest_debuff
@@ -971,7 +971,7 @@ AddFunction FireCombustionphaseCdActions
   #blood_of_the_enemy
   Spell(blood_of_the_enemy)
   #memory_of_lucid_dreams
-  Spell(memory_of_lucid_dreams)
+  Spell(memory_of_lucid_dreams_essence)
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
 
@@ -1352,7 +1352,7 @@ AddIcon checkbox=opt_mage_fire_aoe help=cd specialization=fire
 # kindling_talent
 # lights_judgment
 # living_bomb
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
 # meteor
 # meteor_talent
 # mirror_image
@@ -1667,7 +1667,7 @@ AddFunction FrostEssencesCdActions
  unless Spell(focused_azerite_beam)
  {
   #memory_of_lucid_dreams,if=buff.icicles.stack<2
-  if BuffStacks(icicles_buff) < 2 Spell(memory_of_lucid_dreams)
+  if BuffStacks(icicles_buff) < 2 Spell(memory_of_lucid_dreams_essence)
   #blood_of_the_enemy,if=buff.icicles.stack=5&buff.brain_freeze.react|!talent.glacial_spike.enabled|active_enemies>4
   if BuffStacks(icicles_buff) == 5 and BuffPresent(brain_freeze_buff) or not Talent(glacial_spike_talent) or Enemies() > 4 Spell(blood_of_the_enemy)
  }
@@ -2021,7 +2021,7 @@ AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 # icy_veins_buff
 # item_rising_death
 # lights_judgment
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
 # mirror_image
 # purifying_blast
 # quaking_palm

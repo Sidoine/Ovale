@@ -348,7 +348,7 @@ AddFunction ShadowSingleCdActions
  unless Spell(void_eruption) or BuffExpires(voidform_shadow) and Spell(dark_ascension) or Spell(void_bolt)
  {
   #memory_of_lucid_dreams,if=buff.voidform.stack>(20+5*buff.bloodlust.up)&insanity<=50
-  if BuffStacks(voidform_shadow) > 20 + 5 * BuffPresent(burst_haste_buff any=1) and Insanity() <= 50 Spell(memory_of_lucid_dreams)
+  if BuffStacks(voidform_shadow) > 20 + 5 * BuffPresent(burst_haste_buff any=1) and Insanity() <= 50 Spell(memory_of_lucid_dreams_essence)
 
   unless BuffPresent(harvested_thoughts_buff) and SpellCooldown(void_bolt) >= 1.5 and AzeriteTraitRank(searing_dialogue_trait) >= 1 and Spell(mind_sear) or { target.TimeToDie() < 3 or SpellCharges(shadow_word_death) == 2 or SpellCharges(shadow_word_death) == 1 and SpellCooldown(shadow_word_death) < GCD() } and Spell(shadow_word_death)
   {
@@ -477,7 +477,7 @@ AddFunction ShadowCleaveCdActions
  unless Spell(void_eruption) or BuffExpires(voidform_shadow) and Spell(dark_ascension) or not target.DebuffPresent(vampiric_touch_debuff) and AzeriteTraitRank(thought_harvester_trait) >= 1 and Spell(vampiric_touch) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Spell(void_bolt)
  {
   #memory_of_lucid_dreams,if=buff.voidform.stack>(20+5*buff.bloodlust.up)&insanity<=50
-  if BuffStacks(voidform_shadow) > 20 + 5 * BuffPresent(burst_haste_buff any=1) and Insanity() <= 50 Spell(memory_of_lucid_dreams)
+  if BuffStacks(voidform_shadow) > 20 + 5 * BuffPresent(burst_haste_buff any=1) and Insanity() <= 50 Spell(memory_of_lucid_dreams_essence)
 
   unless { target.TimeToDie() < 3 or BuffExpires(voidform_shadow) } and Spell(shadow_word_death)
   {
@@ -643,7 +643,7 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # guardian_of_azeroth
 # harvested_thoughts_buff
 # item_unbridled_fury
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
 # mind_blast
 # mind_bomb
 # mind_flay

@@ -359,7 +359,7 @@ AddFunction ElementalDefaultCdActions
    unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force)
    {
     #memory_of_lucid_dreams
-    Spell(memory_of_lucid_dreams)
+    Spell(memory_of_lucid_dreams_essence)
 
     unless Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
     {
@@ -494,7 +494,7 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 # liquid_magma_totem_talent
 # master_of_the_elements_buff
 # master_of_the_elements_talent
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
 # natural_harmony_trait
 # primal_elementalist_talent
 # purifying_blast
@@ -1004,7 +1004,7 @@ AddFunction EnhancementCdsCdActions
  #guardian_of_azeroth
  Spell(guardian_of_azeroth)
  #memory_of_lucid_dreams
- Spell(memory_of_lucid_dreams)
+ Spell(memory_of_lucid_dreams_essence)
  #feral_spirit
  Spell(feral_spirit)
  #blood_of_the_enemy
@@ -1358,7 +1358,7 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # lightning_conduit_debuff
 # lightning_conduit_trait
 # lightning_shield
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
 # natural_harmony_fire
 # natural_harmony_frost
 # natural_harmony_nature

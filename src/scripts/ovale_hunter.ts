@@ -64,7 +64,7 @@ AddFunction BeastmasteryStMainActions
  #concentrated_flame
  Spell(concentrated_flame_essence)
  #cobra_shot,if=(focus-cost+focus.regen*(cooldown.kill_command.remains-1)>action.kill_command.cost|cooldown.kill_command.remains>1+gcd|buff.memory_of_lucid_dreams.up)&cooldown.kill_command.remains>1
- if { Focus() - PowerCost(cobra_shot) + FocusRegenRate() * { SpellCooldown(kill_command) - 1 } > PowerCost(kill_command) or SpellCooldown(kill_command) > 1 + GCD() or BuffPresent(memory_of_lucid_dreams) } and SpellCooldown(kill_command) > 1 Spell(cobra_shot)
+ if { Focus() - PowerCost(cobra_shot) + FocusRegenRate() * { SpellCooldown(kill_command) - 1 } > PowerCost(kill_command) or SpellCooldown(kill_command) > 1 + GCD() or BuffPresent(memory_of_lucid_dreams_essence_buff) } and SpellCooldown(kill_command) > 1 Spell(cobra_shot)
  #barbed_shot,if=charges_fractional>1.4
  if Charges(barbed_shot count=0) > 1.4 Spell(barbed_shot)
 }
@@ -94,7 +94,7 @@ AddFunction BeastmasteryStShortCdActions
     #barrage
     Spell(barrage)
 
-    unless { Focus() - PowerCost(cobra_shot) + FocusRegenRate() * { SpellCooldown(kill_command) - 1 } > PowerCost(kill_command) or SpellCooldown(kill_command) > 1 + GCD() or BuffPresent(memory_of_lucid_dreams) } and SpellCooldown(kill_command) > 1 and Spell(cobra_shot)
+    unless { Focus() - PowerCost(cobra_shot) + FocusRegenRate() * { SpellCooldown(kill_command) - 1 } > PowerCost(kill_command) or SpellCooldown(kill_command) > 1 + GCD() or BuffPresent(memory_of_lucid_dreams_essence_buff) } and SpellCooldown(kill_command) > 1 and Spell(cobra_shot)
     {
      #spitting_cobra
      Spell(spitting_cobra)
@@ -106,7 +106,7 @@ AddFunction BeastmasteryStShortCdActions
 
 AddFunction BeastmasteryStShortCdPostConditions
 {
- { pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() or SpellFullRecharge(barbed_shot) < GCD() and SpellCooldown(bestial_wrath) > 0 or HasAzeriteTrait(primal_instincts_trait) and SpellCooldown(aspect_of_the_wild) < GCD() } and Spell(barbed_shot) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(chimaera_shot) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or AzeriteTraitRank(dance_of_death_trait) > 1 and BuffExpires(dance_of_death_buff) and SpellCritChance() > 40 or target.TimeToDie() < 9 } and Spell(barbed_shot) or Spell(focused_azerite_beam) or Spell(concentrated_flame_essence) or { Focus() - PowerCost(cobra_shot) + FocusRegenRate() * { SpellCooldown(kill_command) - 1 } > PowerCost(kill_command) or SpellCooldown(kill_command) > 1 + GCD() or BuffPresent(memory_of_lucid_dreams) } and SpellCooldown(kill_command) > 1 and Spell(cobra_shot) or Charges(barbed_shot count=0) > 1.4 and Spell(barbed_shot)
+ { pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() or SpellFullRecharge(barbed_shot) < GCD() and SpellCooldown(bestial_wrath) > 0 or HasAzeriteTrait(primal_instincts_trait) and SpellCooldown(aspect_of_the_wild) < GCD() } and Spell(barbed_shot) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(chimaera_shot) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or AzeriteTraitRank(dance_of_death_trait) > 1 and BuffExpires(dance_of_death_buff) and SpellCritChance() > 40 or target.TimeToDie() < 9 } and Spell(barbed_shot) or Spell(focused_azerite_beam) or Spell(concentrated_flame_essence) or { Focus() - PowerCost(cobra_shot) + FocusRegenRate() * { SpellCooldown(kill_command) - 1 } > PowerCost(kill_command) or SpellCooldown(kill_command) > 1 + GCD() or BuffPresent(memory_of_lucid_dreams_essence_buff) } and SpellCooldown(kill_command) > 1 and Spell(cobra_shot) or Charges(barbed_shot count=0) > 1.4 and Spell(barbed_shot)
 }
 
 AddFunction BeastmasteryStCdActions
@@ -132,7 +132,7 @@ AddFunction BeastmasteryStCdActions
 
 AddFunction BeastmasteryStCdPostConditions
 {
- { pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() or SpellFullRecharge(barbed_shot) < GCD() and SpellCooldown(bestial_wrath) > 0 or HasAzeriteTrait(primal_instincts_trait) and SpellCooldown(aspect_of_the_wild) < GCD() } and Spell(barbed_shot) or Spell(a_murder_of_crows) or { SpellCooldown(aspect_of_the_wild) > 20 or target.TimeToDie() < 15 } and Spell(bestial_wrath) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(chimaera_shot) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or AzeriteTraitRank(dance_of_death_trait) > 1 and BuffExpires(dance_of_death_buff) and SpellCritChance() > 40 or target.TimeToDie() < 9 } and Spell(barbed_shot) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(concentrated_flame_essence) or Spell(the_unbound_force) or Spell(barrage) or { Focus() - PowerCost(cobra_shot) + FocusRegenRate() * { SpellCooldown(kill_command) - 1 } > PowerCost(kill_command) or SpellCooldown(kill_command) > 1 + GCD() or BuffPresent(memory_of_lucid_dreams) } and SpellCooldown(kill_command) > 1 and Spell(cobra_shot) or Spell(spitting_cobra) or Charges(barbed_shot count=0) > 1.4 and Spell(barbed_shot)
+ { pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() or SpellFullRecharge(barbed_shot) < GCD() and SpellCooldown(bestial_wrath) > 0 or HasAzeriteTrait(primal_instincts_trait) and SpellCooldown(aspect_of_the_wild) < GCD() } and Spell(barbed_shot) or Spell(a_murder_of_crows) or { SpellCooldown(aspect_of_the_wild) > 20 or target.TimeToDie() < 15 } and Spell(bestial_wrath) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(chimaera_shot) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or AzeriteTraitRank(dance_of_death_trait) > 1 and BuffExpires(dance_of_death_buff) and SpellCritChance() > 40 or target.TimeToDie() < 9 } and Spell(barbed_shot) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(concentrated_flame_essence) or Spell(the_unbound_force) or Spell(barrage) or { Focus() - PowerCost(cobra_shot) + FocusRegenRate() * { SpellCooldown(kill_command) - 1 } > PowerCost(kill_command) or SpellCooldown(kill_command) > 1 + GCD() or BuffPresent(memory_of_lucid_dreams_essence_buff) } and SpellCooldown(kill_command) > 1 and Spell(cobra_shot) or Spell(spitting_cobra) or Charges(barbed_shot count=0) > 1.4 and Spell(barbed_shot)
 }
 
 ### actions.precombat
@@ -173,7 +173,7 @@ AddFunction BeastmasteryPrecombatCdActions
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
   #memory_of_lucid_dreams
-  Spell(memory_of_lucid_dreams)
+  Spell(memory_of_lucid_dreams_essence)
   #aspect_of_the_wild,precast_time=1.1,if=!azerite.primal_instincts.enabled
   if not HasAzeriteTrait(primal_instincts_trait) Spell(aspect_of_the_wild)
  }
@@ -323,7 +323,7 @@ AddFunction BeastmasteryCdsCdActions
   unless Spell(ripple_in_space_essence)
   {
    #memory_of_lucid_dreams
-   Spell(memory_of_lucid_dreams)
+   Spell(memory_of_lucid_dreams_essence)
   }
  }
 }
@@ -492,7 +492,8 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # kill_command
 # killer_instinct_talent
 # lights_judgment
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
+# memory_of_lucid_dreams_essence_buff
 # multishot_bm
 # one_with_the_pack_talent
 # pet_beast_cleave_buff
@@ -625,11 +626,11 @@ AddFunction MarksmanshipStMainActions
  #rapid_fire,if=buff.trueshot.down|focus<70
  if BuffExpires(trueshot_buff) or Focus() < 70 Spell(rapid_fire)
  #arcane_shot,if=buff.trueshot.up&buff.master_marksman.up&!buff.memory_of_lucid_dreams.up
- if BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and not BuffPresent(memory_of_lucid_dreams) Spell(arcane_shot)
+ if BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) Spell(arcane_shot)
  #aimed_shot,if=buff.trueshot.up|(buff.double_tap.down|ca_execute)&buff.precise_shots.down|full_recharge_time<cast_time
  if BuffPresent(trueshot_buff) or { BuffExpires(double_tap_buff) or Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } } and BuffExpires(precise_shots_buff) or SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) Spell(aimed_shot)
  #arcane_shot,if=buff.trueshot.up&buff.master_marksman.up&buff.memory_of_lucid_dreams.up
- if BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and BuffPresent(memory_of_lucid_dreams) Spell(arcane_shot)
+ if BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and BuffPresent(memory_of_lucid_dreams_essence_buff) Spell(arcane_shot)
  #focused_azerite_beam
  Spell(focused_azerite_beam)
  #concentrated_flame
@@ -653,7 +654,7 @@ AddFunction MarksmanshipStShortCdActions
  #a_murder_of_crows
  Spell(a_murder_of_crows)
 
- unless target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or { BuffExpires(trueshot_buff) or Focus() < 70 } and Spell(rapid_fire) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and not BuffPresent(memory_of_lucid_dreams) and Spell(arcane_shot) or { BuffPresent(trueshot_buff) or { BuffExpires(double_tap_buff) or Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } } and BuffExpires(precise_shots_buff) or SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) } and Spell(aimed_shot) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and BuffPresent(memory_of_lucid_dreams) and Spell(arcane_shot)
+ unless target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or { BuffExpires(trueshot_buff) or Focus() < 70 } and Spell(rapid_fire) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or { BuffPresent(trueshot_buff) or { BuffExpires(double_tap_buff) or Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } } and BuffExpires(precise_shots_buff) or SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) } and Spell(aimed_shot) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot)
  {
   #piercing_shot
   Spell(piercing_shot)
@@ -674,12 +675,12 @@ AddFunction MarksmanshipStShortCdActions
 
 AddFunction MarksmanshipStShortCdPostConditions
 {
- target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or { BuffExpires(trueshot_buff) or Focus() < 70 } and Spell(rapid_fire) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and not BuffPresent(memory_of_lucid_dreams) and Spell(arcane_shot) or { BuffPresent(trueshot_buff) or { BuffExpires(double_tap_buff) or Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } } and BuffExpires(precise_shots_buff) or SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) } and Spell(aimed_shot) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and BuffPresent(memory_of_lucid_dreams) and Spell(arcane_shot) or Spell(focused_azerite_beam) or Spell(concentrated_flame_essence) or BuffExpires(trueshot_buff) and { BuffPresent(precise_shots_buff) and { Focus() > 41 or BuffPresent(master_marksman_buff) } or { Focus() > 50 and HasAzeriteTrait(focused_fire_trait) or Focus() > 75 } and { SpellCooldown(trueshot) > 5 or Focus() > 80 } or target.TimeToDie() < 5 } and Spell(arcane_shot) or Spell(steady_shot)
+ target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or { BuffExpires(trueshot_buff) or Focus() < 70 } and Spell(rapid_fire) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or { BuffPresent(trueshot_buff) or { BuffExpires(double_tap_buff) or Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } } and BuffExpires(precise_shots_buff) or SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) } and Spell(aimed_shot) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or Spell(focused_azerite_beam) or Spell(concentrated_flame_essence) or BuffExpires(trueshot_buff) and { BuffPresent(precise_shots_buff) and { Focus() > 41 or BuffPresent(master_marksman_buff) } or { Focus() > 50 and HasAzeriteTrait(focused_fire_trait) or Focus() > 75 } and { SpellCooldown(trueshot) > 5 or Focus() > 80 } or target.TimeToDie() < 5 } and Spell(arcane_shot) or Spell(steady_shot)
 }
 
 AddFunction MarksmanshipStCdActions
 {
- unless Spell(explosive_shot) or Enemies() > 1 and Spell(barrage) or Spell(a_murder_of_crows) or target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or { BuffExpires(trueshot_buff) or Focus() < 70 } and Spell(rapid_fire) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and not BuffPresent(memory_of_lucid_dreams) and Spell(arcane_shot) or { BuffPresent(trueshot_buff) or { BuffExpires(double_tap_buff) or Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } } and BuffExpires(precise_shots_buff) or SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) } and Spell(aimed_shot) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and BuffPresent(memory_of_lucid_dreams) and Spell(arcane_shot) or Spell(piercing_shot) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(concentrated_flame_essence)
+ unless Spell(explosive_shot) or Enemies() > 1 and Spell(barrage) or Spell(a_murder_of_crows) or target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or { BuffExpires(trueshot_buff) or Focus() < 70 } and Spell(rapid_fire) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or { BuffPresent(trueshot_buff) or { BuffExpires(double_tap_buff) or Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } } and BuffExpires(precise_shots_buff) or SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) } and Spell(aimed_shot) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or Spell(piercing_shot) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(concentrated_flame_essence)
  {
   #blood_of_the_enemy
   Spell(blood_of_the_enemy)
@@ -688,7 +689,7 @@ AddFunction MarksmanshipStCdActions
 
 AddFunction MarksmanshipStCdPostConditions
 {
- Spell(explosive_shot) or Enemies() > 1 and Spell(barrage) or Spell(a_murder_of_crows) or target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or { BuffExpires(trueshot_buff) or Focus() < 70 } and Spell(rapid_fire) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and not BuffPresent(memory_of_lucid_dreams) and Spell(arcane_shot) or { BuffPresent(trueshot_buff) or { BuffExpires(double_tap_buff) or Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } } and BuffExpires(precise_shots_buff) or SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) } and Spell(aimed_shot) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and BuffPresent(memory_of_lucid_dreams) and Spell(arcane_shot) or Spell(piercing_shot) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(concentrated_flame_essence) or Spell(the_unbound_force) or BuffExpires(trueshot_buff) and { BuffPresent(precise_shots_buff) and { Focus() > 41 or BuffPresent(master_marksman_buff) } or { Focus() > 50 and HasAzeriteTrait(focused_fire_trait) or Focus() > 75 } and { SpellCooldown(trueshot) > 5 or Focus() > 80 } or target.TimeToDie() < 5 } and Spell(arcane_shot) or Spell(steady_shot)
+ Spell(explosive_shot) or Enemies() > 1 and Spell(barrage) or Spell(a_murder_of_crows) or target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or { BuffExpires(trueshot_buff) or Focus() < 70 } and Spell(rapid_fire) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or { BuffPresent(trueshot_buff) or { BuffExpires(double_tap_buff) or Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } } and BuffExpires(precise_shots_buff) or SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) } and Spell(aimed_shot) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or Spell(piercing_shot) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(concentrated_flame_essence) or Spell(the_unbound_force) or BuffExpires(trueshot_buff) and { BuffPresent(precise_shots_buff) and { Focus() > 41 or BuffPresent(master_marksman_buff) } or { Focus() > 50 and HasAzeriteTrait(focused_fire_trait) or Focus() > 75 } and { SpellCooldown(trueshot) > 5 or Focus() > 80 } or target.TimeToDie() < 5 } and Spell(arcane_shot) or Spell(steady_shot)
 }
 
 ### actions.precombat
@@ -735,7 +736,7 @@ AddFunction MarksmanshipPrecombatCdActions
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
   #memory_of_lucid_dreams
-  Spell(memory_of_lucid_dreams)
+  Spell(memory_of_lucid_dreams_essence)
   #trueshot,precast_time=1.5,if=active_enemies>2
   if Enemies() > 2 Spell(trueshot)
  }
@@ -799,7 +800,7 @@ AddFunction MarksmanshipCdsCdActions
    unless SpellCooldown(trueshot) < 7 and Spell(ripple_in_space_essence)
    {
     #memory_of_lucid_dreams
-    Spell(memory_of_lucid_dreams)
+    Spell(memory_of_lucid_dreams_essence)
     #potion,if=buff.trueshot.react&buff.bloodlust.react|buff.trueshot.up&ca_execute|target.time_to_die<25
     if { BuffPresent(trueshot_buff) and BuffPresent(burst_haste_buff any=1) or BuffPresent(trueshot_buff) and Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } or target.TimeToDie() < 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
     #trueshot,if=focus>60&(buff.precise_shots.down&cooldown.rapid_fire.remains&target.time_to_die>cooldown.trueshot.duration_guess+duration|target.health.pct<20|!talent.careful_aim.enabled)|target.time_to_die<15
@@ -975,7 +976,8 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # item_battle_potion_of_agility
 # lights_judgment
 # master_marksman_buff
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
+# memory_of_lucid_dreams_essence_buff
 # multishot_mm
 # piercing_shot
 # precise_shots_buff
@@ -1375,7 +1377,7 @@ AddFunction SurvivalCdsCdActions
  unless target.Distance() >= 6 and Spell(aspect_of_the_eagle) or Spell(focused_azerite_beam)
  {
   #memory_of_lucid_dreams,if=buff.coordinated_assault.up
-  if BuffPresent(coordinated_assault_buff) Spell(memory_of_lucid_dreams)
+  if BuffPresent(coordinated_assault_buff) Spell(memory_of_lucid_dreams_essence)
   #blood_of_the_enemy,if=buff.coordinated_assault.up
   if BuffPresent(coordinated_assault_buff) Spell(blood_of_the_enemy)
 
@@ -1802,7 +1804,7 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # kill_command_survival
 # latent_poison
 # lights_judgment
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
 # mongoose_bite
 # mongoose_fury_buff
 # muzzle

@@ -203,7 +203,7 @@ AddFunction BalanceDefaultCdActions
  #blood_of_the_enemy,if=cooldown.ca_inc.remains>30
  if SpellCooldown(ca_inc) > 30 Spell(blood_of_the_enemy)
  #memory_of_lucid_dreams,if=dot.sunfire.remains>10&dot.moonfire.remains>10&(!talent.stellar_flare.enabled|dot.stellar_flare.remains>10)&(astral_power<40|cooldown.ca_inc.remains>30)&!buff.ca_inc.up
- if target.DebuffRemaining(sunfire_debuff) > 10 and target.DebuffRemaining(moonfire_debuff) > 10 and { not Talent(stellar_flare_talent) or target.DebuffRemaining(stellar_flare_debuff) > 10 } and { AstralPower() < 40 or SpellCooldown(ca_inc) > 30 } and not BuffPresent(ca_inc) Spell(memory_of_lucid_dreams)
+ if target.DebuffRemaining(sunfire_debuff) > 10 and target.DebuffRemaining(moonfire_debuff) > 10 and { not Talent(stellar_flare_talent) or target.DebuffRemaining(stellar_flare_debuff) > 10 } and { AstralPower() < 40 or SpellCooldown(ca_inc) > 30 } and not BuffPresent(ca_inc) Spell(memory_of_lucid_dreams_essence)
 
  unless Spell(purifying_blast) or Spell(ripple_in_space_essence) or Spell(concentrated_flame_essence) or { BuffPresent(reckless_force_buff) or TimeInCombat() < 5 } and Spell(the_unbound_force) or Spell(worldvein_resonance_essence) or Spell(focused_azerite_beam)
  {
@@ -215,9 +215,9 @@ AddFunction BalanceDefaultCdActions
    #innervate,if=azerite.lively_spirit.enabled&(cooldown.incarnation.remains<2|cooldown.celestial_alignment.remains<12)
    if HasAzeriteTrait(lively_spirit_trait) and { SpellCooldown(incarnation_chosen_of_elune) < 2 or SpellCooldown(celestial_alignment) < 12 } Spell(innervate)
    #incarnation,if=dot.sunfire.remains>8&dot.moonfire.remains>12&(dot.stellar_flare.remains>6|!talent.stellar_flare.enabled)&(buff.memory_of_lucid_dreams.up|ap_check)&!buff.ca_inc.up
-   if target.DebuffRemaining(sunfire_debuff) > 8 and target.DebuffRemaining(moonfire_debuff) > 12 and { target.DebuffRemaining(stellar_flare_debuff) > 6 or not Talent(stellar_flare_talent) } and { BuffPresent(memory_of_lucid_dreams) or AstralPower() >= AstralPowerCost(incarnation_chosen_of_elune) } and not BuffPresent(ca_inc) Spell(incarnation_chosen_of_elune)
+   if target.DebuffRemaining(sunfire_debuff) > 8 and target.DebuffRemaining(moonfire_debuff) > 12 and { target.DebuffRemaining(stellar_flare_debuff) > 6 or not Talent(stellar_flare_talent) } and { BuffPresent(memory_of_lucid_dreams_essence_buff) or AstralPower() >= AstralPowerCost(incarnation_chosen_of_elune) } and not BuffPresent(ca_inc) Spell(incarnation_chosen_of_elune)
    #celestial_alignment,if=!buff.ca_inc.up&(buff.memory_of_lucid_dreams.up|(ap_check&astral_power>=40))&(!azerite.lively_spirit.enabled|buff.lively_spirit.up)&(dot.sunfire.remains>2&dot.moonfire.ticking&(dot.stellar_flare.ticking|!talent.stellar_flare.enabled))
-   if not BuffPresent(ca_inc) and { BuffPresent(memory_of_lucid_dreams) or AstralPower() >= AstralPowerCost(celestial_alignment) and AstralPower() >= 40 } and { not HasAzeriteTrait(lively_spirit_trait) or BuffPresent(lively_spirit_buff) } and target.DebuffRemaining(sunfire_debuff) > 2 and target.DebuffPresent(moonfire_debuff) and { target.DebuffPresent(stellar_flare_debuff) or not Talent(stellar_flare_talent) } Spell(celestial_alignment)
+   if not BuffPresent(ca_inc) and { BuffPresent(memory_of_lucid_dreams_essence_buff) or AstralPower() >= AstralPowerCost(celestial_alignment) and AstralPower() >= 40 } and { not HasAzeriteTrait(lively_spirit_trait) or BuffPresent(lively_spirit_buff) } and target.DebuffRemaining(sunfire_debuff) > 2 and target.DebuffPresent(moonfire_debuff) and { target.DebuffPresent(stellar_flare_debuff) or not Talent(stellar_flare_talent) } Spell(celestial_alignment)
   }
  }
 }
@@ -315,7 +315,8 @@ AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
 # lively_spirit_trait
 # lunar_empowerment_buff
 # lunar_strike
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
+# memory_of_lucid_dreams_essence_buff
 # mighty_bash
 # moonfire
 # moonfire_debuff
@@ -697,7 +698,7 @@ AddFunction FeralCooldownsCdActions
   unless { Enemies() > Enemies(tagged=1) or 600 > 45 } and Spell(thorns) or { BuffPresent(reckless_force_buff) or BuffPresent(tigers_fury_buff) } and Spell(the_unbound_force)
   {
    #memory_of_lucid_dreams,if=buff.tigers_fury.up&buff.berserk.down
-   if BuffPresent(tigers_fury_buff) and BuffExpires(berserk_buff) Spell(memory_of_lucid_dreams)
+   if BuffPresent(tigers_fury_buff) and BuffExpires(berserk_buff) Spell(memory_of_lucid_dreams_essence)
    #blood_of_the_enemy,if=buff.tigers_fury.up
    if BuffPresent(tigers_fury_buff) Spell(blood_of_the_enemy)
 
@@ -904,7 +905,7 @@ AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
 # lunar_inspiration_talent
 # maim
 # mangle
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
 # mighty_bash
 # moonfire_cat
 # moonfire_cat_debuff
@@ -1021,7 +1022,7 @@ AddFunction GuardianPrecombatCdActions
  #food
  #augmentation
  #memory_of_lucid_dreams
- Spell(memory_of_lucid_dreams)
+ Spell(memory_of_lucid_dreams_essence)
 
  unless Spell(bear_form)
  {
@@ -1238,7 +1239,7 @@ AddIcon checkbox=opt_druid_guardian_aoe help=cd specialization=guardian
 # lunar_beam
 # mangle
 # maul
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
 # mighty_bash
 # moonfire
 # moonfire_debuff
