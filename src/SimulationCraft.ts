@@ -1530,6 +1530,7 @@ const InitializeDisambiguation = function() {
     
     // Essence
     AddDisambiguation("concentrated_flame", "concentrated_flame_essence");
+    AddDisambiguation("worldvein_resonance", "worldvein_resonance_essence");
 
     //Arcane Torrent
     AddDisambiguation("arcane_torrent", "arcane_torrent_runicpower", "DEATHKNIGHT");

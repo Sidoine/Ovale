@@ -517,7 +517,7 @@ AddFunction RetributionFinishersCdPostConditions
 AddFunction RetributionCooldownsMainActions
 {
  #worldvein_resonance,if=cooldown.avenging_wrath.remains<gcd&holy_power>=3|cooldown.crusade.remains<gcd&holy_power>=4|cooldown.avenging_wrath.remains>=45|cooldown.crusade.remains>=45
- if SpellCooldown(avenging_wrath) < GCD() and HolyPower() >= 3 or SpellCooldown(crusade) < GCD() and HolyPower() >= 4 or SpellCooldown(avenging_wrath) >= 45 or SpellCooldown(crusade) >= 45 Spell(worldvein_resonance)
+ if SpellCooldown(avenging_wrath) < GCD() and HolyPower() >= 3 or SpellCooldown(crusade) < GCD() and HolyPower() >= 4 or SpellCooldown(avenging_wrath) >= 45 or SpellCooldown(crusade) >= 45 Spell(worldvein_resonance_essence)
  #focused_azerite_beam,if=(!raid_event.adds.exists|raid_event.adds.in>30|spell_targets.divine_storm>=2)&(buff.avenging_wrath.down|buff.crusade.down)&(cooldown.blade_of_justice.remains>gcd*3&cooldown.judgment.remains>gcd*3)
  if { not False(raid_event_adds_exists) or 600 > 30 or Enemies() >= 2 } and { BuffExpires(avenging_wrath_buff) or BuffExpires(crusade_buff) } and SpellCooldown(blade_of_justice) > GCD() * 3 and SpellCooldown(judgment) > GCD() * 3 Spell(focused_azerite_beam)
 }
@@ -533,7 +533,7 @@ AddFunction RetributionCooldownsShortCdActions
  #the_unbound_force,if=time<=2|buff.reckless_force.up
  if TimeInCombat() <= 2 or BuffPresent(reckless_force_buff) Spell(the_unbound_force)
 
- unless { SpellCooldown(avenging_wrath) < GCD() and HolyPower() >= 3 or SpellCooldown(crusade) < GCD() and HolyPower() >= 4 or SpellCooldown(avenging_wrath) >= 45 or SpellCooldown(crusade) >= 45 } and Spell(worldvein_resonance) or { not False(raid_event_adds_exists) or 600 > 30 or Enemies() >= 2 } and { BuffExpires(avenging_wrath_buff) or BuffExpires(crusade_buff) } and SpellCooldown(blade_of_justice) > GCD() * 3 and SpellCooldown(judgment) > GCD() * 3 and Spell(focused_azerite_beam)
+ unless { SpellCooldown(avenging_wrath) < GCD() and HolyPower() >= 3 or SpellCooldown(crusade) < GCD() and HolyPower() >= 4 or SpellCooldown(avenging_wrath) >= 45 or SpellCooldown(crusade) >= 45 } and Spell(worldvein_resonance_essence) or { not False(raid_event_adds_exists) or 600 > 30 or Enemies() >= 2 } and { BuffExpires(avenging_wrath_buff) or BuffExpires(crusade_buff) } and SpellCooldown(blade_of_justice) > GCD() * 3 and SpellCooldown(judgment) > GCD() * 3 and Spell(focused_azerite_beam)
  {
   #purifying_blast,if=(!raid_event.adds.exists|raid_event.adds.in>30|spell_targets.divine_storm>=2)
   if not False(raid_event_adds_exists) or 600 > 30 or Enemies() >= 2 Spell(purifying_blast)
@@ -542,7 +542,7 @@ AddFunction RetributionCooldownsShortCdActions
 
 AddFunction RetributionCooldownsShortCdPostConditions
 {
- { SpellCooldown(avenging_wrath) < GCD() and HolyPower() >= 3 or SpellCooldown(crusade) < GCD() and HolyPower() >= 4 or SpellCooldown(avenging_wrath) >= 45 or SpellCooldown(crusade) >= 45 } and Spell(worldvein_resonance) or { not False(raid_event_adds_exists) or 600 > 30 or Enemies() >= 2 } and { BuffExpires(avenging_wrath_buff) or BuffExpires(crusade_buff) } and SpellCooldown(blade_of_justice) > GCD() * 3 and SpellCooldown(judgment) > GCD() * 3 and Spell(focused_azerite_beam)
+ { SpellCooldown(avenging_wrath) < GCD() and HolyPower() >= 3 or SpellCooldown(crusade) < GCD() and HolyPower() >= 4 or SpellCooldown(avenging_wrath) >= 45 or SpellCooldown(crusade) >= 45 } and Spell(worldvein_resonance_essence) or { not False(raid_event_adds_exists) or 600 > 30 or Enemies() >= 2 } and { BuffExpires(avenging_wrath_buff) or BuffExpires(crusade_buff) } and SpellCooldown(blade_of_justice) > GCD() * 3 and SpellCooldown(judgment) > GCD() * 3 and Spell(focused_azerite_beam)
 }
 
 AddFunction RetributionCooldownsCdActions
@@ -563,7 +563,7 @@ AddFunction RetributionCooldownsCdActions
   #guardian_of_azeroth,if=!talent.crusade.enabled&(cooldown.avenging_wrath.remains<gcd&holy_power>=3|cooldown.avenging_wrath.remains>=45)|(talent.crusade.enabled&cooldown.crusade.remains<gcd&holy_power>=4|cooldown.crusade.remains>=45)
   if not Talent(crusade_talent) and { SpellCooldown(avenging_wrath) < GCD() and HolyPower() >= 3 or SpellCooldown(avenging_wrath) >= 45 } or Talent(crusade_talent) and SpellCooldown(crusade) < GCD() and HolyPower() >= 4 or SpellCooldown(crusade) >= 45 Spell(guardian_of_azeroth)
 
-  unless { SpellCooldown(avenging_wrath) < GCD() and HolyPower() >= 3 or SpellCooldown(crusade) < GCD() and HolyPower() >= 4 or SpellCooldown(avenging_wrath) >= 45 or SpellCooldown(crusade) >= 45 } and Spell(worldvein_resonance) or { not False(raid_event_adds_exists) or 600 > 30 or Enemies() >= 2 } and { BuffExpires(avenging_wrath_buff) or BuffExpires(crusade_buff) } and SpellCooldown(blade_of_justice) > GCD() * 3 and SpellCooldown(judgment) > GCD() * 3 and Spell(focused_azerite_beam)
+  unless { SpellCooldown(avenging_wrath) < GCD() and HolyPower() >= 3 or SpellCooldown(crusade) < GCD() and HolyPower() >= 4 or SpellCooldown(avenging_wrath) >= 45 or SpellCooldown(crusade) >= 45 } and Spell(worldvein_resonance_essence) or { not False(raid_event_adds_exists) or 600 > 30 or Enemies() >= 2 } and { BuffExpires(avenging_wrath_buff) or BuffExpires(crusade_buff) } and SpellCooldown(blade_of_justice) > GCD() * 3 and SpellCooldown(judgment) > GCD() * 3 and Spell(focused_azerite_beam)
   {
    #memory_of_lucid_dreams,if=(buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10)&holy_power<=3
    if { BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) and BuffStacks(crusade_buff) == 10 } and HolyPower() <= 3 Spell(memory_of_lucid_dreams)
@@ -581,7 +581,7 @@ AddFunction RetributionCooldownsCdActions
 
 AddFunction RetributionCooldownsCdPostConditions
 {
- BuffExpires(seething_rage) and BuffExpires(memory_of_lucid_dreams) and Spell(shield_of_vengeance) or { TimeInCombat() <= 2 or BuffPresent(reckless_force_buff) } and Spell(the_unbound_force) or { SpellCooldown(avenging_wrath) < GCD() and HolyPower() >= 3 or SpellCooldown(crusade) < GCD() and HolyPower() >= 4 or SpellCooldown(avenging_wrath) >= 45 or SpellCooldown(crusade) >= 45 } and Spell(worldvein_resonance) or { not False(raid_event_adds_exists) or 600 > 30 or Enemies() >= 2 } and { BuffExpires(avenging_wrath_buff) or BuffExpires(crusade_buff) } and SpellCooldown(blade_of_justice) > GCD() * 3 and SpellCooldown(judgment) > GCD() * 3 and Spell(focused_azerite_beam) or { not False(raid_event_adds_exists) or 600 > 30 or Enemies() >= 2 } and Spell(purifying_blast)
+ BuffExpires(seething_rage) and BuffExpires(memory_of_lucid_dreams) and Spell(shield_of_vengeance) or { TimeInCombat() <= 2 or BuffPresent(reckless_force_buff) } and Spell(the_unbound_force) or { SpellCooldown(avenging_wrath) < GCD() and HolyPower() >= 3 or SpellCooldown(crusade) < GCD() and HolyPower() >= 4 or SpellCooldown(avenging_wrath) >= 45 or SpellCooldown(crusade) >= 45 } and Spell(worldvein_resonance_essence) or { not False(raid_event_adds_exists) or 600 > 30 or Enemies() >= 2 } and { BuffExpires(avenging_wrath_buff) or BuffExpires(crusade_buff) } and SpellCooldown(blade_of_justice) > GCD() * 3 and SpellCooldown(judgment) > GCD() * 3 and Spell(focused_azerite_beam) or { not False(raid_event_adds_exists) or 600 > 30 or Enemies() >= 2 } and Spell(purifying_blast)
 }
 
 ### actions.default
@@ -740,7 +740,7 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 # wake_of_ashes
 # wake_of_ashes_talent
 # war_stomp
-# worldvein_resonance
+# worldvein_resonance_essence
 ]]
     OvaleScripts:RegisterScript("PALADIN", "retribution", name, desc, code, "script")
 end

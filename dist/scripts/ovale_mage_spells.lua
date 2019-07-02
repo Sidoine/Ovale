@@ -239,10 +239,6 @@ Define(the_unbound_force 298452)
   SpellInfo(the_unbound_force cd=60 duration=2 channel=2 tick=0.33)
   SpellAddBuff(the_unbound_force the_unbound_force=1)
   SpellAddTargetDebuff(the_unbound_force the_unbound_force=1)
-Define(worldvein_resonance 295160)
-# Increases the radius of Lifeblood Shards by s1.
-  SpellInfo(worldvein_resonance channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(worldvein_resonance worldvein_resonance=1)
 Define(alexstraszas_fury_talent 11) #22465
 # Dragon's Breath always critically strikes and contributes to Hot Streak.
 Define(amplification_talent 1) #22458

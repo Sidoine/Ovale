@@ -207,7 +207,7 @@ AddFunction HavocEssencesMainActions
  #ripple_in_space
  Spell(ripple_in_space)
  #worldvein_resonance
- Spell(worldvein_resonance)
+ Spell(worldvein_resonance_essence)
 }
 
 AddFunction HavocEssencesMainPostConditions
@@ -227,7 +227,7 @@ AddFunction HavocEssencesShortCdActions
 
 AddFunction HavocEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space) or Spell(worldvein_resonance)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
 }
 
 AddFunction HavocEssencesCdActions
@@ -239,7 +239,7 @@ AddFunction HavocEssencesCdActions
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
 
-  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance)
+  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
   {
    #memory_of_lucid_dreams,if=fury<40&buff.metamorphosis.up
    if Fury() < 40 and BuffPresent(metamorphosis_havoc_buff) Spell(memory_of_lucid_dreams)
@@ -249,7 +249,7 @@ AddFunction HavocEssencesCdActions
 
 AddFunction HavocEssencesCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
 }
 
 ### actions.demonic
@@ -603,7 +603,7 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # throw_glaive_havoc
 # trail_of_ruin_talent
 # vengeful_retreat
-# worldvein_resonance
+# worldvein_resonance_essence
 ]]
     OvaleScripts:RegisterScript("DEMONHUNTER", "havoc", name, desc, code, "script")
 end

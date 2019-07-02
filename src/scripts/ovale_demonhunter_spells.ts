@@ -160,10 +160,6 @@ Define(vengeful_retreat 198793)
 # Remove all snares and vault away. Nearby enemies take 198813s2 Physical damage and have their movement speed reduced by 198813s1 for 3 seconds.?a203551[rnrn|cFFFFFFFFGenerates (203650s1/5)*10 seconds Fury over 10 seconds if you damage an enemy.|r][]
   SpellInfo(vengeful_retreat cd=25 duration=1 channel=1 gcd=0 offgcd=1)
   SpellAddBuff(vengeful_retreat vengeful_retreat=1)
-Define(worldvein_resonance 295160)
-# Increases the radius of Lifeblood Shards by s1.
-  SpellInfo(worldvein_resonance channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(worldvein_resonance worldvein_resonance=1)
 Define(blind_fury_talent 1) #21854
 # Eye Beam generates s3/5 Fury every sec. and its duration is increased by s1.
 Define(charred_flesh_talent 8) #22541

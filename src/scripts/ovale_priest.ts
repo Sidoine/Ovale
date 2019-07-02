@@ -505,7 +505,7 @@ AddFunction ShadowDefaultMainActions
  #ripple_in_space
  Spell(ripple_in_space)
  #worldvein_resonance
- Spell(worldvein_resonance)
+ Spell(worldvein_resonance_essence)
  #run_action_list,name=cleave,if=active_enemies>1
  if Enemies() > 1 ShadowCleaveMainActions()
 
@@ -530,7 +530,7 @@ AddFunction ShadowDefaultShortCdActions
   #the_unbound_force
   Spell(the_unbound_force)
 
-  unless Spell(ripple_in_space) or Spell(worldvein_resonance)
+  unless Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
   {
    #run_action_list,name=cleave,if=active_enemies>1
    if Enemies() > 1 ShadowCleaveShortCdActions()
@@ -546,7 +546,7 @@ AddFunction ShadowDefaultShortCdActions
 
 AddFunction ShadowDefaultShortCdPostConditions
 {
- Spell(focused_azerite_beam) or Spell(ripple_in_space) or Spell(worldvein_resonance) or Enemies() > 1 and ShadowCleaveShortCdPostConditions() or Enemies() == 1 and ShadowSingleShortCdPostConditions()
+ Spell(focused_azerite_beam) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence) or Enemies() > 1 and ShadowCleaveShortCdPostConditions() or Enemies() == 1 and ShadowSingleShortCdPostConditions()
 }
 
 AddFunction ShadowDefaultCdActions
@@ -564,7 +564,7 @@ AddFunction ShadowDefaultCdActions
  #guardian_of_azeroth
  Spell(guardian_of_azeroth)
 
- unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance)
+ unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
  {
   #run_action_list,name=cleave,if=active_enemies>1
   if Enemies() > 1 ShadowCleaveCdActions()
@@ -579,7 +579,7 @@ AddFunction ShadowDefaultCdActions
 
 AddFunction ShadowDefaultCdPostConditions
 {
- Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance) or Enemies() > 1 and ShadowCleaveCdPostConditions() or Enemies() == 1 and ShadowSingleCdPostConditions()
+ Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence) or Enemies() > 1 and ShadowCleaveCdPostConditions() or Enemies() == 1 and ShadowSingleCdPostConditions()
 }
 
 ### Shadow icons.
@@ -683,7 +683,7 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # voidform_shadow
 # war_stomp
 # whispers_of_the_damned_trait
-# worldvein_resonance
+# worldvein_resonance_essence
 `
 	OvaleScripts.RegisterScript("PRIEST", "shadow", name, desc, code, "script")
 }

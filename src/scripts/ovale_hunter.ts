@@ -140,7 +140,7 @@ AddFunction BeastmasteryStCdPostConditions
 AddFunction BeastmasteryPrecombatMainActions
 {
  #worldvein_resonance
- Spell(worldvein_resonance)
+ Spell(worldvein_resonance_essence)
 }
 
 AddFunction BeastmasteryPrecombatMainPostConditions
@@ -155,7 +155,7 @@ AddFunction BeastmasteryPrecombatShortCdActions
  #summon_pet
  BeastmasterySummonPet()
 
- unless Spell(worldvein_resonance)
+ unless Spell(worldvein_resonance_essence)
  {
   #bestial_wrath,precast_time=1.5,if=azerite.primal_instincts.enabled
   if HasAzeriteTrait(primal_instincts_trait) Spell(bestial_wrath)
@@ -164,7 +164,7 @@ AddFunction BeastmasteryPrecombatShortCdActions
 
 AddFunction BeastmasteryPrecombatShortCdPostConditions
 {
- Spell(worldvein_resonance)
+ Spell(worldvein_resonance_essence)
 }
 
 AddFunction BeastmasteryPrecombatCdActions
@@ -173,7 +173,7 @@ AddFunction BeastmasteryPrecombatCdActions
  #potion
  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
 
- unless Spell(worldvein_resonance)
+ unless Spell(worldvein_resonance_essence)
  {
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
@@ -186,7 +186,7 @@ AddFunction BeastmasteryPrecombatCdActions
 
 AddFunction BeastmasteryPrecombatCdPostConditions
 {
- Spell(worldvein_resonance) or HasAzeriteTrait(primal_instincts_trait) and Spell(bestial_wrath)
+ Spell(worldvein_resonance_essence) or HasAzeriteTrait(primal_instincts_trait) and Spell(bestial_wrath)
 }
 
 ### actions.cleave
@@ -288,7 +288,7 @@ AddFunction BeastmasteryCleaveCdPostConditions
 AddFunction BeastmasteryCdsMainActions
 {
  #worldvein_resonance
- Spell(worldvein_resonance)
+ Spell(worldvein_resonance_essence)
  #ripple_in_space
  Spell(ripple_in_space)
 }
@@ -303,7 +303,7 @@ AddFunction BeastmasteryCdsShortCdActions
 
 AddFunction BeastmasteryCdsShortCdPostConditions
 {
- Spell(worldvein_resonance) or Spell(ripple_in_space)
+ Spell(worldvein_resonance_essence) or Spell(ripple_in_space)
 }
 
 AddFunction BeastmasteryCdsCdActions
@@ -321,7 +321,7 @@ AddFunction BeastmasteryCdsCdActions
  #potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up&(target.health.pct<35|!talent.killer_instinct.enabled)|target.time_to_die<25
  if { BuffPresent(bestial_wrath_buff) and BuffPresent(aspect_of_the_wild_buff) and { target.HealthPercent() < 35 or not Talent(killer_instinct_talent) } or target.TimeToDie() < 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
 
- unless Spell(worldvein_resonance)
+ unless Spell(worldvein_resonance_essence)
  {
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
@@ -336,7 +336,7 @@ AddFunction BeastmasteryCdsCdActions
 
 AddFunction BeastmasteryCdsCdPostConditions
 {
- Spell(worldvein_resonance) or Spell(ripple_in_space)
+ Spell(worldvein_resonance_essence) or Spell(ripple_in_space)
 }
 
 ### actions.default
@@ -513,7 +513,7 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # stampede
 # the_unbound_force
 # war_stomp
-# worldvein_resonance
+# worldvein_resonance_essence
 `
 	OvaleScripts.RegisterScript("HUNTER", "beast_mastery", name, desc, code, "script")
 }
@@ -704,7 +704,7 @@ AddFunction MarksmanshipPrecombatMainActions
  #hunters_mark
  Spell(hunters_mark)
  #worldvein_resonance
- Spell(worldvein_resonance)
+ Spell(worldvein_resonance_essence)
  #aimed_shot,if=active_enemies<3
  if Enemies() < 3 Spell(aimed_shot)
 }
@@ -724,7 +724,7 @@ AddFunction MarksmanshipPrecombatShortCdActions
 
 AddFunction MarksmanshipPrecombatShortCdPostConditions
 {
- Spell(hunters_mark) or Spell(worldvein_resonance) or Enemies() < 3 and Spell(aimed_shot)
+ Spell(hunters_mark) or Spell(worldvein_resonance_essence) or Enemies() < 3 and Spell(aimed_shot)
 }
 
 AddFunction MarksmanshipPrecombatCdActions
@@ -736,7 +736,7 @@ AddFunction MarksmanshipPrecombatCdActions
  #potion
  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
 
- unless Spell(hunters_mark) or Spell(double_tap) or Spell(worldvein_resonance)
+ unless Spell(hunters_mark) or Spell(double_tap) or Spell(worldvein_resonance_essence)
  {
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
@@ -749,7 +749,7 @@ AddFunction MarksmanshipPrecombatCdActions
 
 AddFunction MarksmanshipPrecombatCdPostConditions
 {
- Spell(hunters_mark) or Spell(double_tap) or Spell(worldvein_resonance) or Enemies() < 3 and Spell(aimed_shot)
+ Spell(hunters_mark) or Spell(double_tap) or Spell(worldvein_resonance_essence) or Enemies() < 3 and Spell(aimed_shot)
 }
 
 ### actions.cds
@@ -759,7 +759,7 @@ AddFunction MarksmanshipCdsMainActions
  #hunters_mark,if=debuff.hunters_mark.down&!buff.trueshot.up
  if target.DebuffExpires(hunters_mark_debuff) and not BuffPresent(trueshot_buff) Spell(hunters_mark)
  #worldvein_resonance
- Spell(worldvein_resonance)
+ Spell(worldvein_resonance_essence)
  #ripple_in_space,if=cooldown.trueshot.remains<7
  if SpellCooldown(trueshot) < 7 Spell(ripple_in_space)
 }
@@ -779,7 +779,7 @@ AddFunction MarksmanshipCdsShortCdActions
 
 AddFunction MarksmanshipCdsShortCdPostConditions
 {
- target.DebuffExpires(hunters_mark_debuff) and not BuffPresent(trueshot_buff) and Spell(hunters_mark) or Spell(worldvein_resonance) or SpellCooldown(trueshot) < 7 and Spell(ripple_in_space)
+ target.DebuffExpires(hunters_mark_debuff) and not BuffPresent(trueshot_buff) and Spell(hunters_mark) or Spell(worldvein_resonance_essence) or SpellCooldown(trueshot) < 7 and Spell(ripple_in_space)
 }
 
 AddFunction MarksmanshipCdsCdActions
@@ -797,7 +797,7 @@ AddFunction MarksmanshipCdsCdActions
   #lights_judgment
   Spell(lights_judgment)
 
-  unless Spell(worldvein_resonance)
+  unless Spell(worldvein_resonance_essence)
   {
    #guardian_of_azeroth,if=cooldown.trueshot.remains<15
    if SpellCooldown(trueshot) < 15 Spell(guardian_of_azeroth)
@@ -817,7 +817,7 @@ AddFunction MarksmanshipCdsCdActions
 
 AddFunction MarksmanshipCdsCdPostConditions
 {
- target.DebuffExpires(hunters_mark_debuff) and not BuffPresent(trueshot_buff) and Spell(hunters_mark) or { SpellCooldown(rapid_fire) < GCD() or SpellCooldown(rapid_fire) < SpellCooldown(aimed_shot) or target.TimeToDie() < 20 } and Spell(double_tap) or Spell(worldvein_resonance) or SpellCooldown(trueshot) < 7 and Spell(ripple_in_space)
+ target.DebuffExpires(hunters_mark_debuff) and not BuffPresent(trueshot_buff) and Spell(hunters_mark) or { SpellCooldown(rapid_fire) < GCD() or SpellCooldown(rapid_fire) < SpellCooldown(aimed_shot) or target.TimeToDie() < 20 } and Spell(double_tap) or Spell(worldvein_resonance_essence) or SpellCooldown(trueshot) < 7 and Spell(ripple_in_space)
 }
 
 ### actions.default
@@ -999,7 +999,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # trueshot
 # trueshot_buff
 # war_stomp
-# worldvein_resonance
+# worldvein_resonance_essence
 `
 	OvaleScripts.RegisterScript("HUNTER", "marksmanship", name, desc, code, "script")
 }
@@ -1333,7 +1333,7 @@ AddFunction SurvivalCdsMainActions
  #concentrated_flame,if=full_recharge_time<1*gcd
  if SpellFullRecharge(concentrated_flame_essence) < 1 * GCD() Spell(concentrated_flame_essence)
  #worldvein_resonance
- Spell(worldvein_resonance)
+ Spell(worldvein_resonance_essence)
 }
 
 AddFunction SurvivalCdsMainPostConditions
@@ -1360,7 +1360,7 @@ AddFunction SurvivalCdsShortCdActions
 
 AddFunction SurvivalCdsShortCdPostConditions
 {
- Spell(focused_azerite_beam) or Spell(ripple_in_space) or SpellFullRecharge(concentrated_flame_essence) < 1 * GCD() and Spell(concentrated_flame_essence) or Spell(worldvein_resonance)
+ Spell(focused_azerite_beam) or Spell(ripple_in_space) or SpellFullRecharge(concentrated_flame_essence) < 1 * GCD() and Spell(concentrated_flame_essence) or Spell(worldvein_resonance_essence)
 }
 
 AddFunction SurvivalCdsCdActions
@@ -1395,7 +1395,7 @@ AddFunction SurvivalCdsCdActions
 
 AddFunction SurvivalCdsCdPostConditions
 {
- target.Distance() >= 6 and Spell(aspect_of_the_eagle) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(ripple_in_space) or SpellFullRecharge(concentrated_flame_essence) < 1 * GCD() and Spell(concentrated_flame_essence) or BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or Spell(worldvein_resonance)
+ target.Distance() >= 6 and Spell(aspect_of_the_eagle) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(ripple_in_space) or SpellFullRecharge(concentrated_flame_essence) < 1 * GCD() and Spell(concentrated_flame_essence) or BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or Spell(worldvein_resonance_essence)
 }
 
 ### actions.apwfi
@@ -1831,7 +1831,7 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # wildfire_bomb
 # wildfire_bomb_debuff
 # wildfire_infusion_talent
-# worldvein_resonance
+# worldvein_resonance_essence
 `
 	OvaleScripts.RegisterScript("HUNTER", "survival", name, desc, code, "script")
 }

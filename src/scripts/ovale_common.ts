@@ -169,7 +169,11 @@ Define(sephuzs_secret_buff 208051)
 ###
 
 Define(concentrated_flame_essence 295373)
+    SpellInfo(concentrated_flame_essence)
 Define(concentrated_flame_burn_debuff 295377)
+Define(worldvein_resonance_essence 295186)
+    SpellInfo(concentrated_flame_essence)
+    Define(lifeblood_buff 295137)
 
 ###
 ### Racials

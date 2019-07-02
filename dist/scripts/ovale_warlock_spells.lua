@@ -264,10 +264,6 @@ Define(vile_taint 278350)
 Define(wild_imp 279910)
 # Calls down a demonic meteor full of Wild Imps which burst forth to attack the target.rnrnDeals up to m1*86040m1 Shadowflame damage on impact to all enemies within 86040A1 yds of the target?s196283[, applies Doom to each target,][] and summons up to m1*104317m2 Wild Imps, based on Soul Shards consumed.
   SpellInfo(wild_imp duration=20 gcd=0 offgcd=1)
-Define(worldvein_resonance 295160)
-# Increases the radius of Lifeblood Shards by s1.
-  SpellInfo(worldvein_resonance channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(worldvein_resonance worldvein_resonance=1)
 Define(absolute_corruption_talent 5) #21180
 # Corruption is now permanent and deals s2 increased damage.rnrnDuration reduced to s1 sec against players.
 Define(bilescourge_bombers_talent 3) #23138

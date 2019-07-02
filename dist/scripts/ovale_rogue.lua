@@ -175,7 +175,7 @@ AddFunction AssassinationEssencesMainActions
  #ripple_in_space
  Spell(ripple_in_space)
  #worldvein_resonance
- Spell(worldvein_resonance)
+ Spell(worldvein_resonance_essence)
 }
 
 AddFunction AssassinationEssencesMainPostConditions
@@ -195,7 +195,7 @@ AddFunction AssassinationEssencesShortCdActions
 
 AddFunction AssassinationEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space) or Spell(worldvein_resonance)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
 }
 
 AddFunction AssassinationEssencesCdActions
@@ -207,7 +207,7 @@ AddFunction AssassinationEssencesCdActions
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
 
-  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance)
+  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
   {
    #memory_of_lucid_dreams,if=energy<50
    if Energy() < 50 Spell(memory_of_lucid_dreams)
@@ -217,7 +217,7 @@ AddFunction AssassinationEssencesCdActions
 
 AddFunction AssassinationEssencesCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
 }
 
 ### actions.dot
@@ -638,7 +638,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # vendetta
 # vendetta_debuff
 # venom_rush_talent
-# worldvein_resonance
+# worldvein_resonance_essence
 ]]
     OvaleScripts:RegisterScript("ROGUE", "assassination", name, desc, code, "script")
 end
@@ -817,7 +817,7 @@ AddFunction AssassinationEssencesMainActions
  #ripple_in_space
  Spell(ripple_in_space)
  #worldvein_resonance
- Spell(worldvein_resonance)
+ Spell(worldvein_resonance_essence)
 }
 
 AddFunction AssassinationEssencesMainPostConditions
@@ -837,7 +837,7 @@ AddFunction AssassinationEssencesShortCdActions
 
 AddFunction AssassinationEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space) or Spell(worldvein_resonance)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
 }
 
 AddFunction AssassinationEssencesCdActions
@@ -849,7 +849,7 @@ AddFunction AssassinationEssencesCdActions
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
 
-  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance)
+  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
   {
    #memory_of_lucid_dreams,if=energy<50
    if Energy() < 50 Spell(memory_of_lucid_dreams)
@@ -859,7 +859,7 @@ AddFunction AssassinationEssencesCdActions
 
 AddFunction AssassinationEssencesCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
 }
 
 ### actions.dot
@@ -1280,7 +1280,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # vendetta
 # vendetta_debuff
 # venom_rush_talent
-# worldvein_resonance
+# worldvein_resonance_essence
 ]]
     OvaleScripts:RegisterScript("ROGUE", "assassination", name, desc, code, "script")
 end
@@ -1481,7 +1481,7 @@ AddFunction OutlawEssencesMainActions
  #ripple_in_space
  Spell(ripple_in_space)
  #worldvein_resonance
- Spell(worldvein_resonance)
+ Spell(worldvein_resonance_essence)
 }
 
 AddFunction OutlawEssencesMainPostConditions
@@ -1501,7 +1501,7 @@ AddFunction OutlawEssencesShortCdActions
 
 AddFunction OutlawEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space) or Spell(worldvein_resonance)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
 }
 
 AddFunction OutlawEssencesCdActions
@@ -1513,7 +1513,7 @@ AddFunction OutlawEssencesCdActions
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
 
-  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance)
+  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
   {
    #memory_of_lucid_dreams,if=energy<45
    if Energy() < 45 Spell(memory_of_lucid_dreams)
@@ -1523,7 +1523,7 @@ AddFunction OutlawEssencesCdActions
 
 AddFunction OutlawEssencesCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
 }
 
 ### actions.cds
@@ -1888,7 +1888,7 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # stealth
 # the_unbound_force
 # vanish
-# worldvein_resonance
+# worldvein_resonance_essence
 ]]
     OvaleScripts:RegisterScript("ROGUE", "outlaw", name, desc, code, "script")
 end
@@ -2083,7 +2083,7 @@ AddFunction OutlawEssencesMainActions
  #ripple_in_space
  Spell(ripple_in_space)
  #worldvein_resonance
- Spell(worldvein_resonance)
+ Spell(worldvein_resonance_essence)
 }
 
 AddFunction OutlawEssencesMainPostConditions
@@ -2103,7 +2103,7 @@ AddFunction OutlawEssencesShortCdActions
 
 AddFunction OutlawEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space) or Spell(worldvein_resonance)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
 }
 
 AddFunction OutlawEssencesCdActions
@@ -2115,7 +2115,7 @@ AddFunction OutlawEssencesCdActions
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
 
-  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance)
+  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
   {
    #memory_of_lucid_dreams,if=energy<45
    if Energy() < 45 Spell(memory_of_lucid_dreams)
@@ -2125,7 +2125,7 @@ AddFunction OutlawEssencesCdActions
 
 AddFunction OutlawEssencesCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
 }
 
 ### actions.cds
@@ -2488,7 +2488,7 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # stealth
 # the_unbound_force
 # vanish
-# worldvein_resonance
+# worldvein_resonance_essence
 ]]
     OvaleScripts:RegisterScript("ROGUE", "outlaw", name, desc, code, "script")
 end
@@ -2767,7 +2767,7 @@ AddFunction SubtletyEssencesMainActions
  #ripple_in_space
  Spell(ripple_in_space)
  #worldvein_resonance
- Spell(worldvein_resonance)
+ Spell(worldvein_resonance_essence)
 }
 
 AddFunction SubtletyEssencesMainPostConditions
@@ -2787,7 +2787,7 @@ AddFunction SubtletyEssencesShortCdActions
 
 AddFunction SubtletyEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space) or Spell(worldvein_resonance)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
 }
 
 AddFunction SubtletyEssencesCdActions
@@ -2799,7 +2799,7 @@ AddFunction SubtletyEssencesCdActions
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
 
-  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance)
+  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
   {
    #memory_of_lucid_dreams,if=energy<40&buff.symbols_of_death.up
    if Energy() < 40 and BuffPresent(symbols_of_death_buff) Spell(memory_of_lucid_dreams)
@@ -2809,7 +2809,7 @@ AddFunction SubtletyEssencesCdActions
 
 AddFunction SubtletyEssencesCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
 }
 
 ### actions.cds
@@ -3217,7 +3217,7 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 # vanish_buff
 # vigor_talent
 # weaponmaster_talent
-# worldvein_resonance
+# worldvein_resonance_essence
 ]]
     OvaleScripts:RegisterScript("ROGUE", "subtlety", name, desc, code, "script")
 end

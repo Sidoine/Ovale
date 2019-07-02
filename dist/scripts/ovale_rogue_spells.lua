@@ -275,10 +275,6 @@ Define(vendetta 79140)
 
   # Marked for death, increasing damage taken from the Rogue's attacks, and always visible to the Rogue.
   SpellAddTargetDebuff(vendetta vendetta=1)
-Define(worldvein_resonance 295160)
-# Increases the radius of Lifeblood Shards by s1.
-  SpellInfo(worldvein_resonance channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(worldvein_resonance worldvein_resonance=1)
 Define(alacrity_talent 17) #19249
 # Your finishing moves have a s2 chance per combo point to grant 193538s1 Haste for 20 seconds, stacking up to 193538u times.
 Define(blade_rush_talent 20) #23075
