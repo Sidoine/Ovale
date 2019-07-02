@@ -282,8 +282,6 @@ AddFunction BeastmasteryCleaveCdPostConditions
 
 AddFunction BeastmasteryCdsMainActions
 {
- #ripple_in_space
- Spell(ripple_in_space)
 }
 
 AddFunction BeastmasteryCdsMainPostConditions
@@ -294,11 +292,12 @@ AddFunction BeastmasteryCdsShortCdActions
 {
  #worldvein_resonance
  Spell(worldvein_resonance_essence)
+ #ripple_in_space
+ Spell(ripple_in_space_essence)
 }
 
 AddFunction BeastmasteryCdsShortCdPostConditions
 {
- Spell(ripple_in_space)
 }
 
 AddFunction BeastmasteryCdsCdActions
@@ -321,7 +320,7 @@ AddFunction BeastmasteryCdsCdActions
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
 
-  unless Spell(ripple_in_space)
+  unless Spell(ripple_in_space_essence)
   {
    #memory_of_lucid_dreams
    Spell(memory_of_lucid_dreams)
@@ -331,7 +330,7 @@ AddFunction BeastmasteryCdsCdActions
 
 AddFunction BeastmasteryCdsCdPostConditions
 {
- Spell(worldvein_resonance_essence) or Spell(ripple_in_space)
+ Spell(worldvein_resonance_essence) or Spell(ripple_in_space_essence)
 }
 
 ### actions.default
@@ -503,7 +502,7 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # quaking_palm
 # rapid_reload_trait
 # revive_pet
-# ripple_in_space
+# ripple_in_space_essence
 # spitting_cobra
 # stampede
 # the_unbound_force
@@ -753,8 +752,6 @@ AddFunction MarksmanshipCdsMainActions
 {
  #hunters_mark,if=debuff.hunters_mark.down&!buff.trueshot.up
  if target.DebuffExpires(hunters_mark_debuff) and not BuffPresent(trueshot_buff) Spell(hunters_mark)
- #ripple_in_space,if=cooldown.trueshot.remains<7
- if SpellCooldown(trueshot) < 7 Spell(ripple_in_space)
 }
 
 AddFunction MarksmanshipCdsMainPostConditions
@@ -769,12 +766,14 @@ AddFunction MarksmanshipCdsShortCdActions
   if SpellCooldown(rapid_fire) < GCD() or SpellCooldown(rapid_fire) < SpellCooldown(aimed_shot) or target.TimeToDie() < 20 Spell(double_tap)
   #worldvein_resonance
   Spell(worldvein_resonance_essence)
+  #ripple_in_space,if=cooldown.trueshot.remains<7
+  if SpellCooldown(trueshot) < 7 Spell(ripple_in_space_essence)
  }
 }
 
 AddFunction MarksmanshipCdsShortCdPostConditions
 {
- target.DebuffExpires(hunters_mark_debuff) and not BuffPresent(trueshot_buff) and Spell(hunters_mark) or SpellCooldown(trueshot) < 7 and Spell(ripple_in_space)
+ target.DebuffExpires(hunters_mark_debuff) and not BuffPresent(trueshot_buff) and Spell(hunters_mark)
 }
 
 AddFunction MarksmanshipCdsCdActions
@@ -797,7 +796,7 @@ AddFunction MarksmanshipCdsCdActions
    #guardian_of_azeroth,if=cooldown.trueshot.remains<15
    if SpellCooldown(trueshot) < 15 Spell(guardian_of_azeroth)
 
-   unless SpellCooldown(trueshot) < 7 and Spell(ripple_in_space)
+   unless SpellCooldown(trueshot) < 7 and Spell(ripple_in_space_essence)
    {
     #memory_of_lucid_dreams
     Spell(memory_of_lucid_dreams)
@@ -812,7 +811,7 @@ AddFunction MarksmanshipCdsCdActions
 
 AddFunction MarksmanshipCdsCdPostConditions
 {
- target.DebuffExpires(hunters_mark_debuff) and not BuffPresent(trueshot_buff) and Spell(hunters_mark) or { SpellCooldown(rapid_fire) < GCD() or SpellCooldown(rapid_fire) < SpellCooldown(aimed_shot) or target.TimeToDie() < 20 } and Spell(double_tap) or Spell(worldvein_resonance_essence) or SpellCooldown(trueshot) < 7 and Spell(ripple_in_space)
+ target.DebuffExpires(hunters_mark_debuff) and not BuffPresent(trueshot_buff) and Spell(hunters_mark) or { SpellCooldown(rapid_fire) < GCD() or SpellCooldown(rapid_fire) < SpellCooldown(aimed_shot) or target.TimeToDie() < 20 } and Spell(double_tap) or Spell(worldvein_resonance_essence) or SpellCooldown(trueshot) < 7 and Spell(ripple_in_space_essence)
 }
 
 ### actions.default
@@ -983,7 +982,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # purifying_blast
 # quaking_palm
 # rapid_fire
-# ripple_in_space
+# ripple_in_space_essence
 # serpent_sting_mm
 # serpent_sting_mm_debuff
 # steady_shot
@@ -1323,8 +1322,6 @@ AddFunction SurvivalCdsMainActions
 {
  #focused_azerite_beam
  Spell(focused_azerite_beam)
- #ripple_in_space
- Spell(ripple_in_space)
  #concentrated_flame,if=full_recharge_time<1*gcd
  if SpellFullRecharge(concentrated_flame_essence) < 1 * GCD() Spell(concentrated_flame_essence)
 }
@@ -1342,8 +1339,10 @@ AddFunction SurvivalCdsShortCdActions
  {
   #purifying_blast
   Spell(purifying_blast)
+  #ripple_in_space
+  Spell(ripple_in_space_essence)
 
-  unless Spell(ripple_in_space) or SpellFullRecharge(concentrated_flame_essence) < 1 * GCD() and Spell(concentrated_flame_essence)
+  unless SpellFullRecharge(concentrated_flame_essence) < 1 * GCD() and Spell(concentrated_flame_essence)
   {
    #the_unbound_force,if=buff.reckless_force.up
    if BuffPresent(reckless_force_buff) Spell(the_unbound_force)
@@ -1355,7 +1354,7 @@ AddFunction SurvivalCdsShortCdActions
 
 AddFunction SurvivalCdsShortCdPostConditions
 {
- Spell(focused_azerite_beam) or Spell(ripple_in_space) or SpellFullRecharge(concentrated_flame_essence) < 1 * GCD() and Spell(concentrated_flame_essence)
+ Spell(focused_azerite_beam) or SpellFullRecharge(concentrated_flame_essence) < 1 * GCD() and Spell(concentrated_flame_essence)
 }
 
 AddFunction SurvivalCdsCdActions
@@ -1390,7 +1389,7 @@ AddFunction SurvivalCdsCdActions
 
 AddFunction SurvivalCdsCdPostConditions
 {
- target.Distance() >= 6 and Spell(aspect_of_the_eagle) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(ripple_in_space) or SpellFullRecharge(concentrated_flame_essence) < 1 * GCD() and Spell(concentrated_flame_essence) or BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or Spell(worldvein_resonance_essence)
+ target.Distance() >= 6 and Spell(aspect_of_the_eagle) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(ripple_in_space_essence) or SpellFullRecharge(concentrated_flame_essence) < 1 * GCD() and Spell(concentrated_flame_essence) or BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or Spell(worldvein_resonance_essence)
 }
 
 ### actions.apwfi
@@ -1812,7 +1811,7 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # raptor_strike
 # reckless_force_buff
 # revive_pet
-# ripple_in_space
+# ripple_in_space_essence
 # serpent_sting_sv
 # serpent_sting_sv_debuff
 # shrapnel_bomb_debuff

@@ -207,8 +207,6 @@ AddFunction HavocEssencesMainActions
  Spell(concentrated_flame_essence)
  #focused_azerite_beam
  Spell(focused_azerite_beam)
- #ripple_in_space
- Spell(ripple_in_space)
 }
 
 AddFunction HavocEssencesMainPostConditions
@@ -223,18 +221,16 @@ AddFunction HavocEssencesShortCdActions
   Spell(purifying_blast)
   #the_unbound_force
   Spell(the_unbound_force)
-
-  unless Spell(ripple_in_space)
-  {
-   #worldvein_resonance
-   Spell(worldvein_resonance_essence)
-  }
+  #ripple_in_space
+  Spell(ripple_in_space_essence)
+  #worldvein_resonance
+  Spell(worldvein_resonance_essence)
  }
 }
 
 AddFunction HavocEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam)
 }
 
 AddFunction HavocEssencesCdActions
@@ -246,7 +242,7 @@ AddFunction HavocEssencesCdActions
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
 
-  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
+  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
   {
    #memory_of_lucid_dreams,if=fury<40&buff.metamorphosis.up
    if Fury() < 40 and BuffPresent(metamorphosis_havoc_buff) Spell(memory_of_lucid_dreams)
@@ -256,7 +252,7 @@ AddFunction HavocEssencesCdActions
 
 AddFunction HavocEssencesCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
 }
 
 ### actions.demonic
@@ -605,7 +601,7 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # prepared_buff
 # purifying_blast
 # revolving_blades_trait
-# ripple_in_space
+# ripple_in_space_essence
 # the_unbound_force
 # throw_glaive_havoc
 # trail_of_ruin_talent

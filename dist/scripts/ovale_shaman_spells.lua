@@ -207,9 +207,6 @@ Define(reckless_force_buff 298409)
   SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
   # Gaining unstable Azerite energy.
   SpellAddBuff(reckless_force_buff reckless_force_buff=1)
-Define(ripple_in_space 299306)
-# Infuse your Heart of Azeroth with Ripple in Space.
-  SpellInfo(ripple_in_space)
 Define(rockbiter 193786)
 # Assaults your target with earthen power, dealing s1 Nature damage.rnrn|cFFFFFFFFGenerates s2 Maelstrom.|r
   SpellInfo(rockbiter cd=6 maelstrom=-25)
