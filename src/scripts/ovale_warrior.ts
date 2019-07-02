@@ -348,8 +348,6 @@ AddFunction ArmsDefaultMainActions
  if Enemies() > 1 and { SpellCooldown(bladestorm_arms) > 10 or SpellCooldown(colossus_smash) > 8 or HasAzeriteTrait(test_of_might_trait) } Spell(sweeping_strikes)
  #ripple_in_space,if=!debuff.colossus_smash.up&!buff.test_of_might.up
  if not target.DebuffPresent(colossus_smash_debuff) and not BuffPresent(test_of_might_buff) Spell(ripple_in_space)
- #worldvein_resonance,if=!debuff.colossus_smash.up&!buff.test_of_might.up
- if not target.DebuffPresent(colossus_smash_debuff) and not BuffPresent(test_of_might_buff) Spell(worldvein_resonance_essence)
  #focused_azerite_beam,if=!debuff.colossus_smash.up&!buff.test_of_might.up
  if not target.DebuffPresent(colossus_smash_debuff) and not BuffPresent(test_of_might_buff) Spell(focused_azerite_beam)
  #concentrated_flame,if=!debuff.colossus_smash.up&!buff.test_of_might.up&dot.concentrated_flame_burn.remains=0
@@ -393,27 +391,33 @@ AddFunction ArmsDefaultShortCdActions
    #purifying_blast,if=!debuff.colossus_smash.up&!buff.test_of_might.up
    if not target.DebuffPresent(colossus_smash_debuff) and not BuffPresent(test_of_might_buff) Spell(purifying_blast)
 
-   unless not target.DebuffPresent(colossus_smash_debuff) and not BuffPresent(test_of_might_buff) and Spell(ripple_in_space) or not target.DebuffPresent(colossus_smash_debuff) and not BuffPresent(test_of_might_buff) and Spell(worldvein_resonance_essence) or not target.DebuffPresent(colossus_smash_debuff) and not BuffPresent(test_of_might_buff) and Spell(focused_azerite_beam) or not target.DebuffPresent(colossus_smash_debuff) and not BuffPresent(test_of_might_buff) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence)
+   unless not target.DebuffPresent(colossus_smash_debuff) and not BuffPresent(test_of_might_buff) and Spell(ripple_in_space)
    {
-    #the_unbound_force,if=buff.reckless_force.up
-    if BuffPresent(reckless_force_buff) Spell(the_unbound_force)
-    #run_action_list,name=hac,if=raid_event.adds.exists
-    if False(raid_event_adds_exists) ArmsHacShortCdActions()
+    #worldvein_resonance,if=!debuff.colossus_smash.up&!buff.test_of_might.up
+    if not target.DebuffPresent(colossus_smash_debuff) and not BuffPresent(test_of_might_buff) Spell(worldvein_resonance_essence)
 
-    unless False(raid_event_adds_exists) and ArmsHacShortCdPostConditions()
+    unless not target.DebuffPresent(colossus_smash_debuff) and not BuffPresent(test_of_might_buff) and Spell(focused_azerite_beam) or not target.DebuffPresent(colossus_smash_debuff) and not BuffPresent(test_of_might_buff) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence)
     {
-     #run_action_list,name=five_target,if=spell_targets.whirlwind>4
-     if Enemies() > 4 ArmsFivetargetShortCdActions()
+     #the_unbound_force,if=buff.reckless_force.up
+     if BuffPresent(reckless_force_buff) Spell(the_unbound_force)
+     #run_action_list,name=hac,if=raid_event.adds.exists
+     if False(raid_event_adds_exists) ArmsHacShortCdActions()
 
-     unless Enemies() > 4 and ArmsFivetargetShortCdPostConditions()
+     unless False(raid_event_adds_exists) and ArmsHacShortCdPostConditions()
      {
-      #run_action_list,name=execute,if=(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20
-      if Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 ArmsExecuteShortCdActions()
+      #run_action_list,name=five_target,if=spell_targets.whirlwind>4
+      if Enemies() > 4 ArmsFivetargetShortCdActions()
 
-      unless { Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 } and ArmsExecuteShortCdPostConditions()
+      unless Enemies() > 4 and ArmsFivetargetShortCdPostConditions()
       {
-       #run_action_list,name=single_target
-       ArmsSingletargetShortCdActions()
+       #run_action_list,name=execute,if=(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20
+       if Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 ArmsExecuteShortCdActions()
+
+       unless { Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 } and ArmsExecuteShortCdPostConditions()
+       {
+        #run_action_list,name=single_target
+        ArmsSingletargetShortCdActions()
+       }
       }
      }
     }
@@ -424,7 +428,7 @@ AddFunction ArmsDefaultShortCdActions
 
 AddFunction ArmsDefaultShortCdPostConditions
 {
- CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel) and Spell(charge) or Enemies() > 1 and { SpellCooldown(bladestorm_arms) > 10 or SpellCooldown(colossus_smash) > 8 or HasAzeriteTrait(test_of_might_trait) } and Spell(sweeping_strikes) or not target.DebuffPresent(colossus_smash_debuff) and not BuffPresent(test_of_might_buff) and Spell(ripple_in_space) or not target.DebuffPresent(colossus_smash_debuff) and not BuffPresent(test_of_might_buff) and Spell(worldvein_resonance_essence) or not target.DebuffPresent(colossus_smash_debuff) and not BuffPresent(test_of_might_buff) and Spell(focused_azerite_beam) or not target.DebuffPresent(colossus_smash_debuff) and not BuffPresent(test_of_might_buff) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence) or False(raid_event_adds_exists) and ArmsHacShortCdPostConditions() or Enemies() > 4 and ArmsFivetargetShortCdPostConditions() or { Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 } and ArmsExecuteShortCdPostConditions() or ArmsSingletargetShortCdPostConditions()
+ CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel) and Spell(charge) or Enemies() > 1 and { SpellCooldown(bladestorm_arms) > 10 or SpellCooldown(colossus_smash) > 8 or HasAzeriteTrait(test_of_might_trait) } and Spell(sweeping_strikes) or not target.DebuffPresent(colossus_smash_debuff) and not BuffPresent(test_of_might_buff) and Spell(ripple_in_space) or not target.DebuffPresent(colossus_smash_debuff) and not BuffPresent(test_of_might_buff) and Spell(focused_azerite_beam) or not target.DebuffPresent(colossus_smash_debuff) and not BuffPresent(test_of_might_buff) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence) or False(raid_event_adds_exists) and ArmsHacShortCdPostConditions() or Enemies() > 4 and ArmsFivetargetShortCdPostConditions() or { Talent(arms_massacre_talent) and target.HealthPercent() < 35 or target.HealthPercent() < 20 } and ArmsExecuteShortCdPostConditions() or ArmsSingletargetShortCdPostConditions()
 }
 
 AddFunction ArmsDefaultCdActions
@@ -803,8 +807,6 @@ AddFunction FuryDefaultMainActions
   if SpellCooldown(recklessness) < 3 Spell(rampage)
   #ripple_in_space,if=!buff.recklessness.up&!buff.siegebreaker.up
   if not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) Spell(ripple_in_space)
-  #worldvein_resonance,if=!buff.recklessness.up&!buff.siegebreaker.up
-  if not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) Spell(worldvein_resonance_essence)
   #focused_azerite_beam,if=!buff.recklessness.up&!buff.siegebreaker.up
   if not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) Spell(focused_azerite_beam)
   #concentrated_flame,if=!buff.recklessness.up&!buff.siegebreaker.up&dot.concentrated_flame_burn.remains=0
@@ -841,15 +843,21 @@ AddFunction FuryDefaultShortCdActions
     #purifying_blast,if=!buff.recklessness.up&!buff.siegebreaker.up
     if not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) Spell(purifying_blast)
 
-    unless not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(ripple_in_space) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(worldvein_resonance_essence) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(focused_azerite_beam) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence)
+    unless not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(ripple_in_space)
     {
-     #the_unbound_force,if=buff.reckless_force.up
-     if BuffPresent(reckless_force_buff) Spell(the_unbound_force)
+     #worldvein_resonance,if=!buff.recklessness.up&!buff.siegebreaker.up
+     if not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) Spell(worldvein_resonance_essence)
 
-     unless Enemies() > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury)
+     unless not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(focused_azerite_beam) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence)
      {
-      #run_action_list,name=single_target
-      FurySingletargetShortCdActions()
+      #the_unbound_force,if=buff.reckless_force.up
+      if BuffPresent(reckless_force_buff) Spell(the_unbound_force)
+
+      unless Enemies() > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury)
+      {
+       #run_action_list,name=single_target
+       FurySingletargetShortCdActions()
+      }
      }
     }
    }
@@ -859,7 +867,7 @@ AddFunction FuryDefaultShortCdActions
 
 AddFunction FuryDefaultShortCdPostConditions
 {
- CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel) and Spell(charge) or target.Distance() > 5 and FuryMovementShortCdPostConditions() or Talent(furious_slash_talent) and { BuffStacks(furious_slash_buff) < 3 or BuffRemaining(furious_slash_buff) < 3 or SpellCooldown(recklessness) < 3 and BuffRemaining(furious_slash_buff) < 9 } and Spell(furious_slash) or SpellCooldown(recklessness) < 3 and Spell(rampage) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(ripple_in_space) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(worldvein_resonance_essence) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(focused_azerite_beam) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence) or Enemies() > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury) or FurySingletargetShortCdPostConditions()
+ CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel) and Spell(charge) or target.Distance() > 5 and FuryMovementShortCdPostConditions() or Talent(furious_slash_talent) and { BuffStacks(furious_slash_buff) < 3 or BuffRemaining(furious_slash_buff) < 3 or SpellCooldown(recklessness) < 3 and BuffRemaining(furious_slash_buff) < 9 } and Spell(furious_slash) or SpellCooldown(recklessness) < 3 and Spell(rampage) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(ripple_in_space) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(focused_azerite_beam) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence) or Enemies() > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury) or FurySingletargetShortCdPostConditions()
 }
 
 AddFunction FuryDefaultCdActions

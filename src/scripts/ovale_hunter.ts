@@ -139,8 +139,6 @@ AddFunction BeastmasteryStCdPostConditions
 
 AddFunction BeastmasteryPrecombatMainActions
 {
- #worldvein_resonance
- Spell(worldvein_resonance_essence)
 }
 
 AddFunction BeastmasteryPrecombatMainPostConditions
@@ -154,17 +152,14 @@ AddFunction BeastmasteryPrecombatShortCdActions
  #food
  #summon_pet
  BeastmasterySummonPet()
-
- unless Spell(worldvein_resonance_essence)
- {
-  #bestial_wrath,precast_time=1.5,if=azerite.primal_instincts.enabled
-  if HasAzeriteTrait(primal_instincts_trait) Spell(bestial_wrath)
- }
+ #worldvein_resonance
+ Spell(worldvein_resonance_essence)
+ #bestial_wrath,precast_time=1.5,if=azerite.primal_instincts.enabled
+ if HasAzeriteTrait(primal_instincts_trait) Spell(bestial_wrath)
 }
 
 AddFunction BeastmasteryPrecombatShortCdPostConditions
 {
- Spell(worldvein_resonance_essence)
 }
 
 AddFunction BeastmasteryPrecombatCdActions
@@ -287,8 +282,6 @@ AddFunction BeastmasteryCleaveCdPostConditions
 
 AddFunction BeastmasteryCdsMainActions
 {
- #worldvein_resonance
- Spell(worldvein_resonance_essence)
  #ripple_in_space
  Spell(ripple_in_space)
 }
@@ -299,11 +292,13 @@ AddFunction BeastmasteryCdsMainPostConditions
 
 AddFunction BeastmasteryCdsShortCdActions
 {
+ #worldvein_resonance
+ Spell(worldvein_resonance_essence)
 }
 
 AddFunction BeastmasteryCdsShortCdPostConditions
 {
- Spell(worldvein_resonance_essence) or Spell(ripple_in_space)
+ Spell(ripple_in_space)
 }
 
 AddFunction BeastmasteryCdsCdActions
@@ -703,8 +698,6 @@ AddFunction MarksmanshipPrecombatMainActions
 {
  #hunters_mark
  Spell(hunters_mark)
- #worldvein_resonance
- Spell(worldvein_resonance_essence)
  #aimed_shot,if=active_enemies<3
  if Enemies() < 3 Spell(aimed_shot)
 }
@@ -719,12 +712,14 @@ AddFunction MarksmanshipPrecombatShortCdActions
  {
   #double_tap,precast_time=10
   Spell(double_tap)
+  #worldvein_resonance
+  Spell(worldvein_resonance_essence)
  }
 }
 
 AddFunction MarksmanshipPrecombatShortCdPostConditions
 {
- Spell(hunters_mark) or Spell(worldvein_resonance_essence) or Enemies() < 3 and Spell(aimed_shot)
+ Spell(hunters_mark) or Enemies() < 3 and Spell(aimed_shot)
 }
 
 AddFunction MarksmanshipPrecombatCdActions
@@ -758,8 +753,6 @@ AddFunction MarksmanshipCdsMainActions
 {
  #hunters_mark,if=debuff.hunters_mark.down&!buff.trueshot.up
  if target.DebuffExpires(hunters_mark_debuff) and not BuffPresent(trueshot_buff) Spell(hunters_mark)
- #worldvein_resonance
- Spell(worldvein_resonance_essence)
  #ripple_in_space,if=cooldown.trueshot.remains<7
  if SpellCooldown(trueshot) < 7 Spell(ripple_in_space)
 }
@@ -774,12 +767,14 @@ AddFunction MarksmanshipCdsShortCdActions
  {
   #double_tap,if=cooldown.rapid_fire.remains<gcd|cooldown.rapid_fire.remains<cooldown.aimed_shot.remains|target.time_to_die<20
   if SpellCooldown(rapid_fire) < GCD() or SpellCooldown(rapid_fire) < SpellCooldown(aimed_shot) or target.TimeToDie() < 20 Spell(double_tap)
+  #worldvein_resonance
+  Spell(worldvein_resonance_essence)
  }
 }
 
 AddFunction MarksmanshipCdsShortCdPostConditions
 {
- target.DebuffExpires(hunters_mark_debuff) and not BuffPresent(trueshot_buff) and Spell(hunters_mark) or Spell(worldvein_resonance_essence) or SpellCooldown(trueshot) < 7 and Spell(ripple_in_space)
+ target.DebuffExpires(hunters_mark_debuff) and not BuffPresent(trueshot_buff) and Spell(hunters_mark) or SpellCooldown(trueshot) < 7 and Spell(ripple_in_space)
 }
 
 AddFunction MarksmanshipCdsCdActions
@@ -1332,8 +1327,6 @@ AddFunction SurvivalCdsMainActions
  Spell(ripple_in_space)
  #concentrated_flame,if=full_recharge_time<1*gcd
  if SpellFullRecharge(concentrated_flame_essence) < 1 * GCD() Spell(concentrated_flame_essence)
- #worldvein_resonance
- Spell(worldvein_resonance_essence)
 }
 
 AddFunction SurvivalCdsMainPostConditions
@@ -1354,13 +1347,15 @@ AddFunction SurvivalCdsShortCdActions
   {
    #the_unbound_force,if=buff.reckless_force.up
    if BuffPresent(reckless_force_buff) Spell(the_unbound_force)
+   #worldvein_resonance
+   Spell(worldvein_resonance_essence)
   }
  }
 }
 
 AddFunction SurvivalCdsShortCdPostConditions
 {
- Spell(focused_azerite_beam) or Spell(ripple_in_space) or SpellFullRecharge(concentrated_flame_essence) < 1 * GCD() and Spell(concentrated_flame_essence) or Spell(worldvein_resonance_essence)
+ Spell(focused_azerite_beam) or Spell(ripple_in_space) or SpellFullRecharge(concentrated_flame_essence) < 1 * GCD() and Spell(concentrated_flame_essence)
 }
 
 AddFunction SurvivalCdsCdActions

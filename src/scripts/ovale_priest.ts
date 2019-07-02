@@ -504,8 +504,6 @@ AddFunction ShadowDefaultMainActions
  Spell(focused_azerite_beam)
  #ripple_in_space
  Spell(ripple_in_space)
- #worldvein_resonance
- Spell(worldvein_resonance_essence)
  #run_action_list,name=cleave,if=active_enemies>1
  if Enemies() > 1 ShadowCleaveMainActions()
 
@@ -530,8 +528,10 @@ AddFunction ShadowDefaultShortCdActions
   #the_unbound_force
   Spell(the_unbound_force)
 
-  unless Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
+  unless Spell(ripple_in_space)
   {
+   #worldvein_resonance
+   Spell(worldvein_resonance_essence)
    #run_action_list,name=cleave,if=active_enemies>1
    if Enemies() > 1 ShadowCleaveShortCdActions()
 
@@ -546,7 +546,7 @@ AddFunction ShadowDefaultShortCdActions
 
 AddFunction ShadowDefaultShortCdPostConditions
 {
- Spell(focused_azerite_beam) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence) or Enemies() > 1 and ShadowCleaveShortCdPostConditions() or Enemies() == 1 and ShadowSingleShortCdPostConditions()
+ Spell(focused_azerite_beam) or Spell(ripple_in_space) or Enemies() > 1 and ShadowCleaveShortCdPostConditions() or Enemies() == 1 and ShadowSingleShortCdPostConditions()
 }
 
 AddFunction ShadowDefaultCdActions

@@ -176,8 +176,6 @@ AddFunction AssassinationEssencesMainActions
  Spell(focused_azerite_beam)
  #ripple_in_space
  Spell(ripple_in_space)
- #worldvein_resonance
- Spell(worldvein_resonance_essence)
 }
 
 AddFunction AssassinationEssencesMainPostConditions
@@ -192,12 +190,18 @@ AddFunction AssassinationEssencesShortCdActions
   Spell(purifying_blast)
   #the_unbound_force
   Spell(the_unbound_force)
+
+  unless Spell(ripple_in_space)
+  {
+   #worldvein_resonance
+   Spell(worldvein_resonance_essence)
+  }
  }
 }
 
 AddFunction AssassinationEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space)
 }
 
 AddFunction AssassinationEssencesCdActions
@@ -819,8 +823,6 @@ AddFunction AssassinationEssencesMainActions
  Spell(focused_azerite_beam)
  #ripple_in_space
  Spell(ripple_in_space)
- #worldvein_resonance
- Spell(worldvein_resonance_essence)
 }
 
 AddFunction AssassinationEssencesMainPostConditions
@@ -835,12 +837,18 @@ AddFunction AssassinationEssencesShortCdActions
   Spell(purifying_blast)
   #the_unbound_force
   Spell(the_unbound_force)
+
+  unless Spell(ripple_in_space)
+  {
+   #worldvein_resonance
+   Spell(worldvein_resonance_essence)
+  }
  }
 }
 
 AddFunction AssassinationEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space)
 }
 
 AddFunction AssassinationEssencesCdActions
@@ -1484,8 +1492,6 @@ AddFunction OutlawEssencesMainActions
  Spell(focused_azerite_beam)
  #ripple_in_space
  Spell(ripple_in_space)
- #worldvein_resonance
- Spell(worldvein_resonance_essence)
 }
 
 AddFunction OutlawEssencesMainPostConditions
@@ -1500,12 +1506,18 @@ AddFunction OutlawEssencesShortCdActions
   Spell(purifying_blast)
   #the_unbound_force
   Spell(the_unbound_force)
+
+  unless Spell(ripple_in_space)
+  {
+   #worldvein_resonance
+   Spell(worldvein_resonance_essence)
+  }
  }
 }
 
 AddFunction OutlawEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space)
 }
 
 AddFunction OutlawEssencesCdActions
@@ -2087,8 +2099,6 @@ AddFunction OutlawEssencesMainActions
  Spell(focused_azerite_beam)
  #ripple_in_space
  Spell(ripple_in_space)
- #worldvein_resonance
- Spell(worldvein_resonance_essence)
 }
 
 AddFunction OutlawEssencesMainPostConditions
@@ -2103,12 +2113,18 @@ AddFunction OutlawEssencesShortCdActions
   Spell(purifying_blast)
   #the_unbound_force
   Spell(the_unbound_force)
+
+  unless Spell(ripple_in_space)
+  {
+   #worldvein_resonance
+   Spell(worldvein_resonance_essence)
+  }
  }
 }
 
 AddFunction OutlawEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space)
 }
 
 AddFunction OutlawEssencesCdActions
@@ -2772,8 +2788,6 @@ AddFunction SubtletyEssencesMainActions
  Spell(focused_azerite_beam)
  #ripple_in_space
  Spell(ripple_in_space)
- #worldvein_resonance
- Spell(worldvein_resonance_essence)
 }
 
 AddFunction SubtletyEssencesMainPostConditions
@@ -2788,12 +2802,18 @@ AddFunction SubtletyEssencesShortCdActions
   Spell(purifying_blast)
   #the_unbound_force
   Spell(the_unbound_force)
+
+  unless Spell(ripple_in_space)
+  {
+   #worldvein_resonance
+   Spell(worldvein_resonance_essence)
+  }
  }
 }
 
 AddFunction SubtletyEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space) or Spell(worldvein_resonance_essence)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space)
 }
 
 AddFunction SubtletyEssencesCdActions
