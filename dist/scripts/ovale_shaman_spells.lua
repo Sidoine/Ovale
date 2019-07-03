@@ -606,6 +606,7 @@ Define(wind_rush_totem_buff 192082)
 	SpellAddBuff(windstrike stormbringer_buff=-1)
 	SpellRequire(windstrike cd_percent 0=buff,stormbringer_buff)
 	SpellRequire(windstrike maelstrom_percent 0=buff,stormbringer_buff)
+Define(lightning_lasso 305484)
 
 # Totems Buffs
 Define(ele_resonance_totem_buff 202192)
