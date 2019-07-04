@@ -12,7 +12,8 @@ local registerBase = function()
 Define(arcanic_pulsar_buff 287784)
 # Starsurge's damage is increased by s2. Every s4 Starsurges, gain Celestial Alignment for s3 sec.
   SpellInfo(arcanic_pulsar_buff channel=-0.001 gcd=0 offgcd=1)
-
+Define(natures_cure 88423)
+  SpellInfo(natures_cure cd=8)
 Define(barkskin 22812)
 # Your skin becomes as tough as bark, reducing all damage you take by s2 and preventing damage from delaying your spellcasts. Lasts 12 seconds.rnrnUsable while stunned, frozen, incapacitated, feared, or asleep, and in all shapeshift forms.
   SpellInfo(barkskin cd=60 duration=12 gcd=0 offgcd=1 tick=1)
