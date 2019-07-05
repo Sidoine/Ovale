@@ -165,11 +165,6 @@ Define(master_of_the_elements_buff 260734)
   SpellInfo(master_of_the_elements_buff duration=15 channel=15 gcd=0 offgcd=1)
   # Your next Nature, Physical, or Frost spell will deal s1 increased damage.
   SpellAddBuff(master_of_the_elements_buff master_of_the_elements_buff=1)
-Define(memory_of_lucid_dreams 298357)
-# Clear your mind and attune yourself with the Heart of Azeroth, ?a137028[increasing your Shield of the Righteous recharge rate by 300120s1*-2]?a137020[causing Frostbolt and Flurry to generate an additional Icicle]?a137019[increasing your Fire Blast recharge rate by 303399s1*-2][increasing your ?a137033[Insanity]?(a137032|a137031|a137021|a137020|a137019|a137012|a137029|a137028|a137024|a137039)[Mana]?a137027[Holy Power]?(a137050|a137049|a137048|a137010)[Rage]?(a137017|a137015|a137016)[Focus]?(a137011|a137025|a137023|a137037|a137036|a137035)[Energy]?a212613[Pain]?a212612[Fury]?(a137046|a137044|a137043)[Soul Shard]?(a137008|a137007|a137006)[Rune]?(a137041|a137040)[Maelstrom]?a137013[Astral Power][] generation rate by s1]?a298377[ and ][]?a137020&a298377[increases ][]?a298377[your Leech by 298268s6][] for 12 seconds.
-  SpellInfo(memory_of_lucid_dreams cd=120 duration=12 channel=12)
-  # ?a300120[Shield of the Righteous recharge rate increased by 300120s1*-2]?a303412[Frostbolt and Flurry will generate an additional Icicle]?a303399[Fire Blast recharge rate increased by 303399s1*-2][@spelldesc304633 generation increased by s1].?w2>0[rnLeech increased by w2.][]
-  SpellAddBuff(memory_of_lucid_dreams memory_of_lucid_dreams=1)
 Define(natural_harmony_fire 279028)
 # Dealing Fire damage grants s1 Critical Strike for 12 seconds. rnDealing Frost damage grants s2 Mastery for 12 seconds.rnDealing Nature damage grants s3 Haste for 12 seconds.
   SpellInfo(natural_harmony_fire duration=12 channel=12 gcd=0 offgcd=1)
@@ -206,9 +201,6 @@ Define(reckless_force_buff 298409)
   SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
   # Gaining unstable Azerite energy.
   SpellAddBuff(reckless_force_buff reckless_force_buff=1)
-Define(ripple_in_space 299306)
-# Infuse your Heart of Azeroth with Ripple in Space.
-  SpellInfo(ripple_in_space)
 Define(rockbiter 193786)
 # Assaults your target with earthen power, dealing s1 Nature damage.rnrn|cFFFFFFFFGenerates s2 Maelstrom.|r
   SpellInfo(rockbiter cd=6 maelstrom=-25)
@@ -260,10 +252,6 @@ Define(windstrike 115356)
 # Hurl a staggering blast of wind at an enemy, dealing a total of 115357sw1+115360sw1 Physical damage, bypassing armor.
   SpellInfo(windstrike maelstrom=30 cd=9)
 
-Define(worldvein_resonance 295160)
-# Increases the radius of Lifeblood Shards by s1.
-  SpellInfo(worldvein_resonance channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(worldvein_resonance worldvein_resonance=1)
 Define(ascendance_talent 21) #21675
 # Transform into a Flame Ascendant for 15 seconds, replacing Chain Lightning with Lava Beam, removing the cooldown on Lava Burst, and increasing the damage of Lava Burst by an amount equal to your critical strike chance.
 Define(ascendance_talent_enhancement 21) #21972

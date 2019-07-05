@@ -172,7 +172,16 @@ Define(sephuzs_secret_buff 208051)
 ###
 
 Define(concentrated_flame_essence 295373)
-Define(concentrated_flame_burn_debuff 295377)
+    SpellInfo(concentrated_flame_essence cd=30 tag=main)
+    Define(concentrated_flame_burn_debuff 295377)
+Define(memory_of_lucid_dreams_essence 298357)
+    SpellInfo(memory_of_lucid_dreams_essence cd=120 tag=cd)
+    Define(memory_of_lucid_dreams_essence_buff 298357)
+Define(ripple_in_space_essence 302731)
+    SpellInfo(ripple_in_space_essence cd=60 tag=shortcd)
+Define(worldvein_resonance_essence 295186)
+    SpellInfo(worldvein_resonance_essence cd=60 tag=shortcd)
+    Define(lifeblood_buff 295137)
 
 Define(conflict_and_strife_essence_id 32)
 Define(memory_of_lucid_dreams_essence_id 27)

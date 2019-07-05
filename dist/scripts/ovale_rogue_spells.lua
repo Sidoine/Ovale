@@ -146,11 +146,6 @@ Define(marked_for_death 137619)
 
   # Marked for Death will reset upon death.
   SpellAddTargetDebuff(marked_for_death marked_for_death=1)
-Define(memory_of_lucid_dreams 298357)
-# Clear your mind and attune yourself with the Heart of Azeroth, ?a137028[increasing your Shield of the Righteous recharge rate by 300120s1*-2]?a137020[causing Frostbolt and Flurry to generate an additional Icicle]?a137019[increasing your Fire Blast recharge rate by 303399s1*-2][increasing your ?a137033[Insanity]?(a137032|a137031|a137021|a137020|a137019|a137012|a137029|a137028|a137024|a137039)[Mana]?a137027[Holy Power]?(a137050|a137049|a137048|a137010)[Rage]?(a137017|a137015|a137016)[Focus]?(a137011|a137025|a137023|a137037|a137036|a137035)[Energy]?a212613[Pain]?a212612[Fury]?(a137046|a137044|a137043)[Soul Shard]?(a137008|a137007|a137006)[Rune]?(a137041|a137040)[Maelstrom]?a137013[Astral Power][] generation rate by s1]?a298377[ and ][]?a137020&a298377[increases ][]?a298377[your Leech by 298268s6][] for 12 seconds.
-  SpellInfo(memory_of_lucid_dreams cd=120 duration=12 channel=12)
-  # ?a300120[Shield of the Righteous recharge rate increased by 300120s1*-2]?a303412[Frostbolt and Flurry will generate an additional Icicle]?a303399[Fire Blast recharge rate increased by 303399s1*-2][@spelldesc304633 generation increased by s1].?w2>0[rnLeech increased by w2.][]
-  SpellAddBuff(memory_of_lucid_dreams memory_of_lucid_dreams=1)
 Define(mutilate 1329)
 # Attack with both weapons, dealing a total of <dmg> Physical damage.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
   SpellInfo(mutilate energy=50 gcd=1 combopoints=-2)
@@ -179,9 +174,6 @@ Define(quaking_palm 107079)
   SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
   # Incapacitated.
   SpellAddTargetDebuff(quaking_palm quaking_palm=1)
-Define(ripple_in_space 299306)
-# Infuse your Heart of Azeroth with Ripple in Space.
-  SpellInfo(ripple_in_space)
 Define(roll_the_bones 193316)
 # Finishing move that rolls the dice of fate, providing a random combat enhancement. Lasts longer per combo point:rn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds?s193531[rn   6 points: 42 seconds][]
   SpellInfo(roll_the_bones energy=25 combopoints=1 duration=6 channel=6 gcd=1 tick=2)
@@ -275,10 +267,6 @@ Define(vendetta 79140)
 
   # Marked for death, increasing damage taken from the Rogue's attacks, and always visible to the Rogue.
   SpellAddTargetDebuff(vendetta vendetta=1)
-Define(worldvein_resonance 295160)
-# Increases the radius of Lifeblood Shards by s1.
-  SpellInfo(worldvein_resonance channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(worldvein_resonance worldvein_resonance=1)
 Define(alacrity_talent 17) #19249
 # Your finishing moves have a s2 chance per combo point to grant 193538s1 Haste for 20 seconds, stacking up to 193538u times.
 Define(blade_rush_talent 20) #23075

@@ -155,11 +155,6 @@ Define(master_marksman_buff 269576)
   SpellInfo(master_marksman_buff duration=12 gcd=0 offgcd=1)
   # Focus cost of your next Arcane Shot or Multi-Shot reduced by s1.
   SpellAddBuff(master_marksman_buff master_marksman_buff=1)
-Define(memory_of_lucid_dreams 298357)
-# Clear your mind and attune yourself with the Heart of Azeroth, ?a137028[increasing your Shield of the Righteous recharge rate by 300120s1*-2]?a137020[causing Frostbolt and Flurry to generate an additional Icicle]?a137019[increasing your Fire Blast recharge rate by 303399s1*-2][increasing your ?a137033[Insanity]?(a137032|a137031|a137021|a137020|a137019|a137012|a137029|a137028|a137024|a137039)[Mana]?a137027[Holy Power]?(a137050|a137049|a137048|a137010)[Rage]?(a137017|a137015|a137016)[Focus]?(a137011|a137025|a137023|a137037|a137036|a137035)[Energy]?a212613[Pain]?a212612[Fury]?(a137046|a137044|a137043)[Soul Shard]?(a137008|a137007|a137006)[Rune]?(a137041|a137040)[Maelstrom]?a137013[Astral Power][] generation rate by s1]?a298377[ and ][]?a137020&a298377[increases ][]?a298377[your Leech by 298268s6][] for 12 seconds.
-  SpellInfo(memory_of_lucid_dreams cd=120 duration=12 channel=12)
-  # ?a300120[Shield of the Righteous recharge rate increased by 300120s1*-2]?a303412[Frostbolt and Flurry will generate an additional Icicle]?a303399[Fire Blast recharge rate increased by 303399s1*-2][@spelldesc304633 generation increased by s1].?w2>0[rnLeech increased by w2.][]
-  SpellAddBuff(memory_of_lucid_dreams memory_of_lucid_dreams=1)
 Define(mongoose_bite 259387)
 # A brutal attack that deals s1 Physical damage and grants you Mongoose Fury.rnrn|cFFFFFFFFMongoose Fury|rrnIncreases the damage of Mongoose Bite by 259388s1 for 14 seconds, stacking up to 259388u times. Successive attacks do not increase duration.
   SpellInfo(mongoose_bite focus=30 talent=mongoose_bite_talent)
@@ -195,9 +190,6 @@ Define(revive_pet 982)
 # Revives your pet, returning it to life with s1 of its base health.
   SpellInfo(revive_pet focus=35 duration=3 channel=3)
   SpellAddBuff(revive_pet revive_pet=1)
-Define(ripple_in_space 299306)
-# Infuse your Heart of Azeroth with Ripple in Space.
-  SpellInfo(ripple_in_space)
 Define(shrapnel_bomb_debuff 270336)
 # Hurl a bomb at the target, exploding for 270338s1 Fire damage in a cone and impaling enemies with burning shrapnel, scorching them for 270339o1 Fire damage over 6 seconds.rnrn?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] apply Internal Bleeding, causing 270343o1 damage over 9 seconds. Internal Bleeding stacks up to 270343u times.
   SpellInfo(shrapnel_bomb_debuff duration=0.5 channel=0.5 gcd=0 offgcd=1)
@@ -244,10 +236,6 @@ Define(wildfire_bomb 259495)
 Define(wildfire_bomb_debuff 265163)
 # Hurl a bomb at the target, exploding for 265157s1 Fire damage in a cone and coating enemies in wildfire, scorching them for 269747o1 Fire damage over 6 seconds.
   SpellInfo(wildfire_bomb_debuff duration=0.5 channel=0.5 gcd=0 offgcd=1)
-Define(worldvein_resonance 295160)
-# Increases the radius of Lifeblood Shards by s1.
-  SpellInfo(worldvein_resonance channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(worldvein_resonance worldvein_resonance=1)
 Define(a_murder_of_crows_talent_survival 12) #22299
 # Summons a flock of crows to attack your target, dealing 131900s1*16 Physical damage over 15 seconds. If the target dies while under attack, A Murder of Crows' cooldown is reset.
 Define(alpha_predator_talent 3) #22296

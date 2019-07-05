@@ -159,11 +159,6 @@ Define(inner_demons 267216)
 # You passively summon a Wild Imp to fight for you every t1 sec, and have a s1 chance to also summon an additional Demon to fight for you for s2 sec.
   SpellInfo(inner_demons channel=0 gcd=0 offgcd=1 tick=12 talent=inner_demons_talent)
   SpellAddBuff(inner_demons inner_demons=1)
-Define(memory_of_lucid_dreams 298357)
-# Clear your mind and attune yourself with the Heart of Azeroth, ?a137028[increasing your Shield of the Righteous recharge rate by 300120s1*-2]?a137020[causing Frostbolt and Flurry to generate an additional Icicle]?a137019[increasing your Fire Blast recharge rate by 303399s1*-2][increasing your ?a137033[Insanity]?(a137032|a137031|a137021|a137020|a137019|a137012|a137029|a137028|a137024|a137039)[Mana]?a137027[Holy Power]?(a137050|a137049|a137048|a137010)[Rage]?(a137017|a137015|a137016)[Focus]?(a137011|a137025|a137023|a137037|a137036|a137035)[Energy]?a212613[Pain]?a212612[Fury]?(a137046|a137044|a137043)[Soul Shard]?(a137008|a137007|a137006)[Rune]?(a137041|a137040)[Maelstrom]?a137013[Astral Power][] generation rate by s1]?a298377[ and ][]?a137020&a298377[increases ][]?a298377[your Leech by 298268s6][] for 12 seconds.
-  SpellInfo(memory_of_lucid_dreams cd=120 duration=12 channel=12)
-  # ?a300120[Shield of the Righteous recharge rate increased by 300120s1*-2]?a303412[Frostbolt and Flurry will generate an additional Icicle]?a303399[Fire Blast recharge rate increased by 303399s1*-2][@spelldesc304633 generation increased by s1].?w2>0[rnLeech increased by w2.][]
-  SpellAddBuff(memory_of_lucid_dreams memory_of_lucid_dreams=1)
 Define(nether_portal 267217)
 # Tear open a portal to the Twisting Nether for 15 seconds. Every time you spend Soul Shards, you will also command demons from the Nether to come out and fight for you.
   SpellInfo(nether_portal soulshards=1 cd=180 duration=15 talent=nether_portal_talent)
@@ -192,9 +187,6 @@ Define(reckless_force_buff 298409)
   SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
   # Gaining unstable Azerite energy.
   SpellAddBuff(reckless_force_buff reckless_force_buff=1)
-Define(ripple_in_space 299306)
-# Infuse your Heart of Azeroth with Ripple in Space.
-  SpellInfo(ripple_in_space)
 Define(seed_of_corruption 27243)
 # Embeds a demon seed in the enemy target that will explode after 12 seconds, dealing (24 of Spell Power) Shadow damage to all enemies within 27285A1 yards and applying Corruption to them.rnrnThe seed will detonate early if the target is hit by other detonations, or takes SPS*s1/100 damage from your spells.
   SpellInfo(seed_of_corruption soulshards=1 duration=12 tick=12)
@@ -263,10 +255,6 @@ Define(vile_taint 278350)
 Define(wild_imp 279910)
 # Calls down a demonic meteor full of Wild Imps which burst forth to attack the target.rnrnDeals up to m1*86040m1 Shadowflame damage on impact to all enemies within 86040A1 yds of the target?s196283[, applies Doom to each target,][] and summons up to m1*104317m2 Wild Imps, based on Soul Shards consumed.
   SpellInfo(wild_imp duration=20 gcd=0 offgcd=1)
-Define(worldvein_resonance 295160)
-# Increases the radius of Lifeblood Shards by s1.
-  SpellInfo(worldvein_resonance channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(worldvein_resonance worldvein_resonance=1)
 Define(absolute_corruption_talent 5) #21180
 # Corruption is now permanent and deals s2 increased damage.rnrnDuration reduced to s1 sec against players.
 Define(bilescourge_bombers_talent 3) #23138

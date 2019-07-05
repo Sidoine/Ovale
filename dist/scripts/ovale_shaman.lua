@@ -284,10 +284,6 @@ AddFunction ElementalDefaultMainActions
  Spell(concentrated_flame_essence)
  #focused_azerite_beam
  Spell(focused_azerite_beam)
- #ripple_in_space
- Spell(ripple_in_space)
- #worldvein_resonance
- Spell(worldvein_resonance)
  #run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
  if Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } ElementalAoeMainActions()
 
@@ -311,24 +307,24 @@ AddFunction ElementalDefaultShortCdActions
   Spell(purifying_blast)
   #the_unbound_force
   Spell(the_unbound_force)
+  #ripple_in_space
+  Spell(ripple_in_space_essence)
+  #worldvein_resonance
+  Spell(worldvein_resonance_essence)
+  #run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
+  if Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } ElementalAoeShortCdActions()
 
-  unless Spell(ripple_in_space) or Spell(worldvein_resonance)
+  unless Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } and ElementalAoeShortCdPostConditions()
   {
-   #run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
-   if Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } ElementalAoeShortCdActions()
-
-   unless Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } and ElementalAoeShortCdPostConditions()
-   {
-    #run_action_list,name=single_target
-    ElementalSingletargetShortCdActions()
-   }
+   #run_action_list,name=single_target
+   ElementalSingletargetShortCdActions()
   }
  }
 }
 
 AddFunction ElementalDefaultShortCdPostConditions
 {
- Talent(totem_mastery_talent_elemental) and TotemRemaining(totem_mastery_elemental) < 2 and { InCombat() or not BuffPresent(ele_resonance_totem_buff) } and Spell(totem_mastery_elemental) or Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(ripple_in_space) or Spell(worldvein_resonance) or Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } and ElementalAoeShortCdPostConditions() or ElementalSingletargetShortCdPostConditions()
+ Talent(totem_mastery_talent_elemental) and TotemRemaining(totem_mastery_elemental) < 2 and { InCombat() or not BuffPresent(ele_resonance_totem_buff) } and Spell(totem_mastery_elemental) or Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } and ElementalAoeShortCdPostConditions() or ElementalSingletargetShortCdPostConditions()
 }
 
 AddFunction ElementalDefaultCdActions
@@ -361,9 +357,9 @@ AddFunction ElementalDefaultCdActions
    unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force)
    {
     #memory_of_lucid_dreams
-    Spell(memory_of_lucid_dreams)
+    Spell(memory_of_lucid_dreams_essence)
 
-    unless Spell(ripple_in_space) or Spell(worldvein_resonance)
+    unless Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
     {
      #blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
      if not Talent(ascendance_talent) or BuffPresent(ascendance_elemental_buff) or SpellCooldown(ascendance_elemental) > 50 Spell(blood_fury_apsp)
@@ -389,7 +385,7 @@ AddFunction ElementalDefaultCdActions
 
 AddFunction ElementalDefaultCdPostConditions
 {
- Talent(totem_mastery_talent_elemental) and TotemRemaining(totem_mastery_elemental) < 2 and { InCombat() or not BuffPresent(ele_resonance_totem_buff) } and Spell(totem_mastery_elemental) or Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space) or Spell(worldvein_resonance) or Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } and ElementalAoeCdPostConditions() or ElementalSingletargetCdPostConditions()
+ Talent(totem_mastery_talent_elemental) and TotemRemaining(totem_mastery_elemental) < 2 and { InCombat() or not BuffPresent(ele_resonance_totem_buff) } and Spell(totem_mastery_elemental) or Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence) or Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } and ElementalAoeCdPostConditions() or ElementalSingletargetCdPostConditions()
 }
 
 ### Elemental icons.
@@ -496,12 +492,12 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 # liquid_magma_totem_talent
 # master_of_the_elements_buff
 # master_of_the_elements_talent
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
 # natural_harmony_trait
 # primal_elementalist_talent
 # purifying_blast
 # quaking_palm
-# ripple_in_space
+# ripple_in_space_essence
 # storm_elemental
 # storm_elemental_talent
 # stormkeeper
@@ -517,7 +513,7 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 # war_stomp
 # wind_gust_buff
 # wind_shear
-# worldvein_resonance
+# worldvein_resonance_essence
 ]]
     OvaleScripts:RegisterScript("SHAMAN", "elemental", name, desc, code, "script")
 end
@@ -875,8 +871,6 @@ AddFunction EnhancementFillerMainActions
  Spell(focused_azerite_beam)
  #concentrated_flame
  Spell(concentrated_flame_essence)
- #worldvein_resonance
- Spell(worldvein_resonance)
  #crash_lightning,if=talent.forceful_winds.enabled&active_enemies>1&variable.furyCheck_CL
  if Talent(forceful_winds_talent) and Enemies() > 1 and furyCheck_CL() Spell(crash_lightning)
  #flametongue,if=talent.searing_assault.enabled
@@ -909,12 +903,18 @@ AddFunction EnhancementFillerShortCdActions
  {
   #purifying_blast
   Spell(purifying_blast)
+
+  unless Spell(concentrated_flame_essence)
+  {
+   #worldvein_resonance
+   Spell(worldvein_resonance_essence)
+  }
  }
 }
 
 AddFunction EnhancementFillerShortCdPostConditions
 {
- Spell(sundering) or Spell(focused_azerite_beam) or Spell(concentrated_flame_essence) or Spell(worldvein_resonance) or Talent(forceful_winds_talent) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Talent(searing_assault_talent) and Spell(flametongue) or not HasAzeriteTrait(primal_primer_trait) and Talent(hot_hand_talent) and BuffPresent(hot_hand_buff) and Spell(lava_lash) or Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Maelstrom() < 70 and not BuffPresent(strength_of_earth_buff) and Spell(rockbiter) or Talent(crashing_storm_talent) and OCPool_CL() and Spell(crash_lightning) or OCPool_LL() and furyCheck_LL() and Spell(lava_lash) or Spell(rockbiter) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 + GCD() and furyCheck_FB() and Spell(frostbrand) or Spell(flametongue)
+ Spell(sundering) or Spell(focused_azerite_beam) or Spell(concentrated_flame_essence) or Talent(forceful_winds_talent) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Talent(searing_assault_talent) and Spell(flametongue) or not HasAzeriteTrait(primal_primer_trait) and Talent(hot_hand_talent) and BuffPresent(hot_hand_buff) and Spell(lava_lash) or Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Maelstrom() < 70 and not BuffPresent(strength_of_earth_buff) and Spell(rockbiter) or Talent(crashing_storm_talent) and OCPool_CL() and Spell(crash_lightning) or OCPool_LL() and furyCheck_LL() and Spell(lava_lash) or Spell(rockbiter) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 + GCD() and furyCheck_FB() and Spell(frostbrand) or Spell(flametongue)
 }
 
 AddFunction EnhancementFillerCdActions
@@ -923,7 +923,7 @@ AddFunction EnhancementFillerCdActions
 
 AddFunction EnhancementFillerCdPostConditions
 {
- Spell(sundering) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(concentrated_flame_essence) or Spell(worldvein_resonance) or Talent(forceful_winds_talent) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Talent(searing_assault_talent) and Spell(flametongue) or not HasAzeriteTrait(primal_primer_trait) and Talent(hot_hand_talent) and BuffPresent(hot_hand_buff) and Spell(lava_lash) or Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Maelstrom() < 70 and not BuffPresent(strength_of_earth_buff) and Spell(rockbiter) or Talent(crashing_storm_talent) and OCPool_CL() and Spell(crash_lightning) or OCPool_LL() and furyCheck_LL() and Spell(lava_lash) or Spell(rockbiter) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 + GCD() and furyCheck_FB() and Spell(frostbrand) or Spell(flametongue)
+ Spell(sundering) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(concentrated_flame_essence) or Spell(worldvein_resonance_essence) or Talent(forceful_winds_talent) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Talent(searing_assault_talent) and Spell(flametongue) or not HasAzeriteTrait(primal_primer_trait) and Talent(hot_hand_talent) and BuffPresent(hot_hand_buff) and Spell(lava_lash) or Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Maelstrom() < 70 and not BuffPresent(strength_of_earth_buff) and Spell(rockbiter) or Talent(crashing_storm_talent) and OCPool_CL() and Spell(crash_lightning) or OCPool_LL() and furyCheck_LL() and Spell(lava_lash) or Spell(rockbiter) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 + GCD() and furyCheck_FB() and Spell(frostbrand) or Spell(flametongue)
 }
 
 ### actions.default_core
@@ -1001,7 +1001,7 @@ AddFunction EnhancementCdsCdActions
  #guardian_of_azeroth
  Spell(guardian_of_azeroth)
  #memory_of_lucid_dreams
- Spell(memory_of_lucid_dreams)
+ Spell(memory_of_lucid_dreams_essence)
  #feral_spirit
  Spell(feral_spirit)
  #blood_of_the_enemy
@@ -1355,7 +1355,7 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # lightning_conduit_debuff
 # lightning_conduit_trait
 # lightning_shield
-# memory_of_lucid_dreams
+# memory_of_lucid_dreams_essence
 # natural_harmony_fire
 # natural_harmony_frost
 # natural_harmony_nature
@@ -1378,7 +1378,7 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # war_stomp
 # wind_shear
 # windstrike
-# worldvein_resonance
+# worldvein_resonance_essence
 ]]
     OvaleScripts:RegisterScript("SHAMAN", "enhancement", name, desc, code, "script")
 end

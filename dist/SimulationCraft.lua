@@ -1380,6 +1380,9 @@ local InitializeDisambiguation = function()
     AddDisambiguation("exhaustion_buff", "burst_haste_debuff")
     AddDisambiguation("buff_sephuzs_secret", "sephuzs_secret_buff")
     AddDisambiguation("concentrated_flame", "concentrated_flame_essence")
+    AddDisambiguation("memory_of_lucid_dreams", "memory_of_lucid_dreams_essence")
+    AddDisambiguation("ripple_in_space", "ripple_in_space_essence")
+    AddDisambiguation("worldvein_resonance", "worldvein_resonance_essence")
     AddDisambiguation("arcane_torrent", "arcane_torrent_runicpower", "DEATHKNIGHT")
     AddDisambiguation("arcane_torrent", "arcane_torrent_dh", "DEMONHUNTER")
     AddDisambiguation("arcane_torrent", "arcane_torrent_energy", "DRUID")
@@ -5038,7 +5041,7 @@ local InsertSupportingFunctions = function(child, annotation)
     end
     if annotation.use_heart_essence then
         local fmt = [[
-			AddFunction %sUseHearthEssence
+			AddFunction %sUseHeartEssence
 			{
 				Spell(concentrated_flame_essence)
 			}

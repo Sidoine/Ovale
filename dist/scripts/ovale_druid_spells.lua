@@ -158,11 +158,6 @@ Define(mangle 33917)
 Define(maul 6807)
 # Maul the target for s2 Physical damage.
   SpellInfo(maul rage=40)
-Define(memory_of_lucid_dreams 298357)
-# Clear your mind and attune yourself with the Heart of Azeroth, ?a137028[increasing your Shield of the Righteous recharge rate by 300120s1*-2]?a137020[causing Frostbolt and Flurry to generate an additional Icicle]?a137019[increasing your Fire Blast recharge rate by 303399s1*-2][increasing your ?a137033[Insanity]?(a137032|a137031|a137021|a137020|a137019|a137012|a137029|a137028|a137024|a137039)[Mana]?a137027[Holy Power]?(a137050|a137049|a137048|a137010)[Rage]?(a137017|a137015|a137016)[Focus]?(a137011|a137025|a137023|a137037|a137036|a137035)[Energy]?a212613[Pain]?a212612[Fury]?(a137046|a137044|a137043)[Soul Shard]?(a137008|a137007|a137006)[Rune]?(a137041|a137040)[Maelstrom]?a137013[Astral Power][] generation rate by s1]?a298377[ and ][]?a137020&a298377[increases ][]?a298377[your Leech by 298268s6][] for 12 seconds.
-  SpellInfo(memory_of_lucid_dreams cd=120 duration=12 channel=12)
-  # ?a300120[Shield of the Righteous recharge rate increased by 300120s1*-2]?a303412[Frostbolt and Flurry will generate an additional Icicle]?a303399[Fire Blast recharge rate increased by 303399s1*-2][@spelldesc304633 generation increased by s1].?w2>0[rnLeech increased by w2.][]
-  SpellAddBuff(memory_of_lucid_dreams memory_of_lucid_dreams=1)
 Define(mighty_bash 5211)
 # Invokes the spirit of Ursoc to stun the target for 5 seconds. Usable in all shapeshift forms.
   SpellInfo(mighty_bash cd=50 duration=5 talent=mighty_bash_talent)
@@ -216,9 +211,6 @@ Define(rip 1079)
   SpellInfo(rip energy=20 combopoints=1 duration=4 gcd=1 tick=2)
   # Bleeding for w1 damage every t1 sec.
   SpellAddTargetDebuff(rip rip=1)
-Define(ripple_in_space 299306)
-# Infuse your Heart of Azeroth with Ripple in Space.
-  SpellInfo(ripple_in_space)
 Define(savage_roar 52610)
 # Finishing move that increases damage by 62071s1 and energy regeneration rate by (25 of Spell Power) while in Cat Form. Lasts longer per combo point:rnrn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds
   SpellInfo(savage_roar energy=25 combopoints=1 duration=6 channel=6 gcd=1 tick=2 talent=savage_roar_talent)
@@ -310,10 +302,6 @@ Define(wild_charge 102401)
   SpellInfo(wild_charge cd=15 duration=0.5 gcd=0 offgcd=1 talent=wild_charge_talent)
   # Flying to an ally's position.
   SpellAddBuff(wild_charge wild_charge=1)
-Define(worldvein_resonance 295160)
-# Increases the radius of Lifeblood Shards by s1.
-  SpellInfo(worldvein_resonance channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(worldvein_resonance worldvein_resonance=1)
 Define(bloodtalons_talent 20) #21649
 # Casting Regrowth or Entangling Roots causes your next two melee abilities to deal 145152s1 increased damage for their full duration.
 Define(bristling_fur_talent 3) #22420
@@ -392,8 +380,6 @@ Define(hibernate 2637)
 
 	SpellInfo(shred energy=40 combopoints=-1)
 	SpellInfo(shred physical=1)
-
-	SpellInfo(mangle rage=-8 cd=6 cd_haste=melee)
 
 	SpellInfo(moonfire mana=6)
 	SpellInfo(moonfire unusable=1 if_stance=druid_cat_form)
@@ -497,10 +483,9 @@ Define(frenzied_regeneration 22842)
 Define(frenzied_regeneration_buff 22842)
 	SpellInfo(frenzied_regeneration_buff duration=3)
 
-	SpellInfo(ironfur rage=45 cd=0.5 offgcd=1)
 	SpellAddBuff(ironfur ironfur_buff=1)
 Define(ironfur_buff 192081)
-	SpellInfo(ironfur_buff duration=7)
+	SpellInfo(ironfur_buff duration=7 max_stacks=8)
 	SpellRequire(ironfur_buff add_duration 2=buff,guardian_of_elune_buff)
 Define(thrash_bear 77758)
 	SpellInfo(thrash_bear rage=-5 cd=6 cd_haste=melee)
@@ -651,7 +636,7 @@ Define(intimidating_roar 236748)
 	SpellInfo(mangle addrage=-4 talent=soul_of_the_forest_talent specialization=guardian)
 	SpellAddBuff(mangle guardian_of_elune_buff=1 talent=guardian_of_elune_talent)
 
-	SpellInfo(maul rage=45 stance=druid_bear_form)
+	SpellInfo(maul stance=druid_bear_form)
 
 	SpellRequire(pulverize unusable 1=target_debuff,!thrash_bear_debuff,2)
 	SpellAddBuff(pulverize pulverize_buff=1)

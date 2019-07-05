@@ -106,11 +106,6 @@ Define(infernal_strike 189110)
 # Leap through the air toward a targeted location, dealing 189112s1 Fire damage to all enemies within 189112a1 yards.
   SpellInfo(infernal_strike cd=0.8 charge_cd=20 gcd=0 offgcd=1)
   SpellInfo(fel_rush replaced_by=infernal_strike)
-Define(memory_of_lucid_dreams 298357)
-# Clear your mind and attune yourself with the Heart of Azeroth, ?a137028[increasing your Shield of the Righteous recharge rate by 300120s1*-2]?a137020[causing Frostbolt and Flurry to generate an additional Icicle]?a137019[increasing your Fire Blast recharge rate by 303399s1*-2][increasing your ?a137033[Insanity]?(a137032|a137031|a137021|a137020|a137019|a137012|a137029|a137028|a137024|a137039)[Mana]?a137027[Holy Power]?(a137050|a137049|a137048|a137010)[Rage]?(a137017|a137015|a137016)[Focus]?(a137011|a137025|a137023|a137037|a137036|a137035)[Energy]?a212613[Pain]?a212612[Fury]?(a137046|a137044|a137043)[Soul Shard]?(a137008|a137007|a137006)[Rune]?(a137041|a137040)[Maelstrom]?a137013[Astral Power][] generation rate by s1]?a298377[ and ][]?a137020&a298377[increases ][]?a298377[your Leech by 298268s6][] for 12 seconds.
-  SpellInfo(memory_of_lucid_dreams cd=120 duration=12 channel=12)
-  # ?a300120[Shield of the Righteous recharge rate increased by 300120s1*-2]?a303412[Frostbolt and Flurry will generate an additional Icicle]?a303399[Fire Blast recharge rate increased by 303399s1*-2][@spelldesc304633 generation increased by s1].?w2>0[rnLeech increased by w2.][]
-  SpellAddBuff(memory_of_lucid_dreams memory_of_lucid_dreams=1)
 Define(nemesis 206491)
 # Increases damage you inflict against the target by s1 for 60 seconds. rnrnWhen the target is slain, you will inflict s1 additional damage against all creature types matching the original target (Humanoid, Dragonkin, etc.) for the remaining duration.
   SpellInfo(nemesis cd=120 duration=60 talent=nemesis_talent)
@@ -124,9 +119,6 @@ Define(prepared_buff 203650)
 Define(purifying_blast 295337)
 # Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
   SpellInfo(purifying_blast cd=60 duration=6)
-Define(ripple_in_space 299306)
-# Infuse your Heart of Azeroth with Ripple in Space.
-  SpellInfo(ripple_in_space)
 Define(shear 203782)
 # Shears an enemy for s1 Physical damage, and shatters ?a187827[two Lesser Soul Fragments][a Lesser Soul Fragment] from your target.rnrn|cFFFFFFFFGenerates m2/10 Pain.|r
   SpellInfo(shear pain=-10)
@@ -161,10 +153,6 @@ Define(vengeful_retreat 198793)
 # Remove all snares and vault away. Nearby enemies take 198813s2 Physical damage and have their movement speed reduced by 198813s1 for 3 seconds.?a203551[rnrn|cFFFFFFFFGenerates (203650s1/5)*10 seconds Fury over 10 seconds if you damage an enemy.|r][]
   SpellInfo(vengeful_retreat cd=25 duration=1 channel=1 gcd=0 offgcd=1)
   SpellAddBuff(vengeful_retreat vengeful_retreat=1)
-Define(worldvein_resonance 295160)
-# Increases the radius of Lifeblood Shards by s1.
-  SpellInfo(worldvein_resonance channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(worldvein_resonance worldvein_resonance=1)
 Define(blind_fury_talent 1) #21854
 # Eye Beam generates s3/5 Fury every sec. and its duration is increased by s1.
 Define(charred_flesh_talent 8) #22541
@@ -283,6 +271,8 @@ Define(frailty_debuff 247456)
 	SpellInfo(frailty_debuff duration=20)
 
     SpellAddBuff(fracture soul_fragments=2)
+    SpellRequire(fracture add_pain_from_aura -20=buff,metamorphosis_veng_buff)
+    SpellAddBuff(fracture soul_fragments 3=buff,metamorphosis_veng_buff)
     
 	SpellInfo(immolation_aura cd=15 cd_haste=melee)
 	SpellAddBuff(immolation_aura immolation_aura_buff=1)
@@ -331,6 +321,8 @@ Define(revolving_blades_buff 279584)
     SpellInfo(revolving_blades_buff duration=15)
 
     SpellAddBuff(shear soul_fragments=1)
+    SpellRequire(shear add_pain_from_aura -20=buff,metamorphosis_veng_buff)
+    SpellAddBuff(shear soul_fragments 2=buff,metamorphosis_veng_buff)
     
 	SpellInfo(sigil_of_chains cd=90)
 

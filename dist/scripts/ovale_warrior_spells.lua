@@ -95,11 +95,6 @@ Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
 
-Define(memory_of_lucid_dreams 298357)
-# Clear your mind and attune yourself with the Heart of Azeroth, ?a137028[increasing your Shield of the Righteous recharge rate by 300120s1*-2]?a137020[causing Frostbolt and Flurry to generate an additional Icicle]?a137019[increasing your Fire Blast recharge rate by 303399s1*-2][increasing your ?a137033[Insanity]?(a137032|a137031|a137021|a137020|a137019|a137012|a137029|a137028|a137024|a137039)[Mana]?a137027[Holy Power]?(a137050|a137049|a137048|a137010)[Rage]?(a137017|a137015|a137016)[Focus]?(a137011|a137025|a137023|a137037|a137036|a137035)[Energy]?a212613[Pain]?a212612[Fury]?(a137046|a137044|a137043)[Soul Shard]?(a137008|a137007|a137006)[Rune]?(a137041|a137040)[Maelstrom]?a137013[Astral Power][] generation rate by s1]?a298377[ and ][]?a137020&a298377[increases ][]?a298377[your Leech by 298268s6][] for 12 seconds.
-  SpellInfo(memory_of_lucid_dreams cd=120 duration=12 channel=12)
-  # ?a300120[Shield of the Righteous recharge rate increased by 300120s1*-2]?a303412[Frostbolt and Flurry will generate an additional Icicle]?a303399[Fire Blast recharge rate increased by 303399s1*-2][@spelldesc304633 generation increased by s1].?w2>0[rnLeech increased by w2.][]
-  SpellAddBuff(memory_of_lucid_dreams memory_of_lucid_dreams=1)
 Define(mortal_strike 12294)
 # A vicious strike that deals s1 Physical damage and reduces the effectiveness of healing on the target by 115804s1 for 10 seconds.
   SpellInfo(mortal_strike rage=30 cd=6)
@@ -148,9 +143,6 @@ Define(rend 772)
   SpellInfo(rend rage=30 duration=12 tick=3 talent=rend_talent)
   # Bleeding for w2 damage every t2 sec.
   SpellAddTargetDebuff(rend rend=1)
-Define(ripple_in_space 299306)
-# Infuse your Heart of Azeroth with Ripple in Space.
-  SpellInfo(ripple_in_space)
 Define(shockwave 46968)
 # Sends a wave of force in a frontal cone, causing m2 damage and stunning all enemies within a1 yards for 2 seconds.
   SpellInfo(shockwave cd=40)
@@ -195,10 +187,6 @@ Define(whirlwind_fury 190411)
 # Unleashes a whirlwind of steel, striking all enemies within 199658A1 yards for 3*(199667sw2+44949sw2) Physical damage.?a12950[rnrnCauses your next s7 single-target lattack:attacks; to strike up to 85739s1 additional targets for 85739s3 damage.][]rnrn|cFFFFFFFFGenerates m8 Rage, plus an additional m9 per target hit. Maximum m10 Rage.|r
   SpellInfo(whirlwind_fury)
 
-Define(worldvein_resonance 295160)
-# Increases the radius of Lifeblood Shards by s1.
-  SpellInfo(worldvein_resonance channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(worldvein_resonance worldvein_resonance=1)
 Define(anger_management_talent 19) #21204
 # Every ?c1[s1]?c2[s3][s2] Rage you spend reduces the remaining cooldown on ?c1&s262161[Warbreaker and Bladestorm]?c1[Colossus Smash and Bladestorm]?c2[Recklessness][Avatar, Last Stand, Shield Wall, and Demoralizing Shout] by 1 sec.
 Define(avatar_talent 17) #22397
