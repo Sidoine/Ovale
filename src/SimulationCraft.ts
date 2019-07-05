@@ -3258,15 +3258,24 @@ EmitOperandEssence = function (operand, parseNode, nodeList, annotation, action,
     let token = tokenIterator();
     if (token == "essence") {
         let code:string;
-        //let name = tokenIterator();
-        //let property = tokenIterator();
-		
-		// not implemented yet
-		OvaleSimulationCraft.Print("Warning: operand '%s' not implemented yet.", operand);
-		code = "False()"
+        let name = tokenIterator();
+        let property = tokenIterator();
+        
+        let essenceId = format("%s_essence_id", name);
+        
+        if(property == "major") {
+            code = format("AzeriteEssenceIsMajor(%s)", essenceId);
+        } else if (property == "minor") {
+            code = format("AzeriteEssenceIsMinor(%s)", essenceId);
+        } else if (property == "enabled") {
+            code = format("AzeriteEssenceIsEnabled(%s)", essenceId);
+        } else {
+            ok = false;
+        }
 		if (ok && code) {
             annotation.astAnnotation = annotation.astAnnotation || {};
             [node] = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation);
+            AddSymbol(annotation, essenceId);
         }
     } else {
         ok = false;
