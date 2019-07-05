@@ -600,7 +600,7 @@ Define(divine_judgment_talent 10)
 Define(divine_purpose_talent 19)
 
 Define(eye_for_an_eye_talent 15)
-Define(final_stand_talent 13)
+Define(final_stand_talent 14)
 Define(fires_of_justice_talent 4)
 Define(first_avenger_talent 4)
 Define(fist_of_justice_talent 7)
