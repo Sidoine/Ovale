@@ -63,11 +63,6 @@ Define(celestial_alignment 194223)
   SpellInfo(celestial_alignment cd=180 duration=20 lunarpower=-40)
   # Spell damage increased by s1.rnHaste increased by s3.
   SpellAddBuff(celestial_alignment celestial_alignment=1)
-Define(concentrated_flame 295368)
-# Blast your target with a ball of concentrated flame, dealing 295365s2*(1+@versadmg) Fire damage to an enemy or healing an ally for 295365s2*(1+@versadmg)?a295377[, then burn the target for an additional 295377m1 of the damage or healing done over 6 seconds][]. rnrnEach cast of Concentrated Flame deals s3 increased damage or healing. This bonus resets after every third cast.
-  SpellInfo(concentrated_flame duration=6 channel=6 gcd=0 offgcd=1 tick=2)
-  # Suffering w1 damage every t1 sec.
-  SpellAddTargetDebuff(concentrated_flame concentrated_flame=1)
 Define(feral_frenzy 274837)
 # Unleash a furious frenzy, clawing your target m2 times for 274838s1*m2 Physical damage and an additional m2*274838s3*6 seconds/274838t3 Bleed damage over 6 seconds.rnrn|cFFFFFFFFAwards s1 combo points.|r
   SpellInfo(feral_frenzy energy=25 cd=45 duration=1 gcd=1 tick=0.2 talent=feral_frenzy_talent)
@@ -162,11 +157,6 @@ Define(mangle 33917)
 Define(maul 6807)
 # Maul the target for s2 Physical damage.
   SpellInfo(maul rage=40)
-Define(memory_of_lucid_dreams 298357)
-# Clear your mind and attune yourself with the Heart of Azeroth, ?a137028[increasing your Shield of the Righteous recharge rate by 300120s1*-2]?a137020[causing Frostbolt and Flurry to generate an additional Icicle]?a137019[increasing your Fire Blast recharge rate by 303399s1*-2][increasing your ?a137033[Insanity]?(a137032|a137031|a137021|a137020|a137019|a137012|a137029|a137028|a137024|a137039)[Mana]?a137027[Holy Power]?(a137050|a137049|a137048|a137010)[Rage]?(a137017|a137015|a137016)[Focus]?(a137011|a137025|a137023|a137037|a137036|a137035)[Energy]?a212613[Pain]?a212612[Fury]?(a137046|a137044|a137043)[Soul Shard]?(a137008|a137007|a137006)[Rune]?(a137041|a137040)[Maelstrom]?a137013[Astral Power][] generation rate by s1]?a298377[ and ][]?a137020&a298377[increases ][]?a298377[your Leech by 298268s6][] for 12 seconds.
-  SpellInfo(memory_of_lucid_dreams cd=120 duration=12 channel=12)
-  # ?a300120[Shield of the Righteous recharge rate increased by 300120s1*-2]?a303412[Frostbolt and Flurry will generate an additional Icicle]?a303399[Fire Blast recharge rate increased by 303399s1*-2][@spelldesc304633 generation increased by s1].?w2>0[rnLeech increased by w2.][]
-  SpellAddBuff(memory_of_lucid_dreams memory_of_lucid_dreams=1)
 Define(mighty_bash 5211)
 # Invokes the spirit of Ursoc to stun the target for 5 seconds. Usable in all shapeshift forms.
   SpellInfo(mighty_bash cd=50 duration=5 talent=mighty_bash_talent)
@@ -220,9 +210,6 @@ Define(rip 1079)
   SpellInfo(rip energy=20 combopoints=1 duration=4 gcd=1 tick=2)
   # Bleeding for w1 damage every t1 sec.
   SpellAddTargetDebuff(rip rip=1)
-Define(ripple_in_space 299306)
-# Infuse your Heart of Azeroth with Ripple in Space.
-  SpellInfo(ripple_in_space)
 Define(savage_roar 52610)
 # Finishing move that increases damage by 62071s1 and energy regeneration rate by (25 of Spell Power) while in Cat Form. Lasts longer per combo point:rnrn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds
   SpellInfo(savage_roar energy=25 combopoints=1 duration=6 channel=6 gcd=1 tick=2 talent=savage_roar_talent)
@@ -238,6 +225,9 @@ Define(shadowmeld 58984)
   SpellInfo(shadowmeld cd=120 channel=-0.001 gcd=0 offgcd=1)
   # Shadowmelded.
   SpellAddBuff(shadowmeld shadowmeld=1)
+Define(sharpened_claws_buff 268525)
+# Your attacks have a chance to summon a whirlwind of sharpened claws, inflicting 268525s1 Physical damage split evenly among all enemies within 268525A1 yards.
+  SpellInfo(sharpened_claws_buff channel=0 gcd=0 offgcd=1)
 Define(shred 5221)
 # Shred the target, causing s1*<mult> Physical damage to the target.?a231063[ Deals s4 increased damage against bleeding targets.][]?a231057[rnrnWhile stealthed, Shred deals m3 increased damage, and has double the chance to critically strike.][]?c2[rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r]?s202155[rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.][]
 # Rank 2: Shred deals 5221s5 increased damage against bleeding targets.
@@ -273,10 +263,6 @@ Define(sunfire 93402)
 # A quick beam of solar light burns the enemy for (20 of Spell Power) Nature damage and then an additional 164815o2 Nature damage over 12 seconds?s231050[ to the primary target and all enemies within 164815A2 yards][].?s137013[rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r][]
 # Rank 2: Sunfire now applies its damage over time effect to all enemies within 164815A2 yards.
   SpellInfo(sunfire lunarpower=0)
-Define(swipe 213764)
-# Swipe nearby enemies, inflicting Physical damage. Damage varies by shapeshift form.
-# Rank 2: Swipe deals 106785s2 increased damage against bleeding targets.
-  SpellInfo(swipe gcd=1)
 Define(the_unbound_force 298452)
 # Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]
   SpellInfo(the_unbound_force cd=60 duration=2 channel=2 tick=0.33)
@@ -315,10 +301,6 @@ Define(wild_charge 102401)
   SpellInfo(wild_charge cd=15 duration=0.5 gcd=0 offgcd=1 talent=wild_charge_talent)
   # Flying to an ally's position.
   SpellAddBuff(wild_charge wild_charge=1)
-Define(worldvein_resonance 295160)
-# Increases the radius of Lifeblood Shards by s1.
-  SpellInfo(worldvein_resonance channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(worldvein_resonance worldvein_resonance=1)
 Define(bloodtalons_talent 20) #21649
 # Casting Regrowth or Entangling Roots causes your next two melee abilities to deal 145152s1 increased damage for their full duration.
 Define(bristling_fur_talent 3) #22420
@@ -372,7 +354,6 @@ Define(lively_spirit_trait 279642)
 Define(streaking_stars_trait 272871)
 Define(wild_fleshrending_trait 279527)
 Define(layered_mane_trait 279552)
-Define(power_of_the_moon_trait 273367)
     `;
 // END
     code += `
@@ -394,12 +375,11 @@ Define(cat_form_buff 768)
 Define(entangling_roots 339)
 Define(growl 6795)
 	SpellInfo(growl cd=8)
+
 Define(hibernate 2637)
 
 	SpellInfo(shred energy=40 combopoints=-1)
 	SpellInfo(shred physical=1)
-
-	SpellInfo(mangle rage=-8 cd=6 cd_haste=melee)
 
 	SpellInfo(moonfire mana=6)
 	SpellInfo(moonfire unusable=1 if_stance=druid_cat_form)
@@ -430,6 +410,7 @@ Define(survival_instincts_buff 61336)
 	SpellInfo(survival_instincts_buff duration=6)
 Define(stampeding_roar 77761)
 	SpellInfo(stampeding_roar cd=120)
+	
 
 # Balance and Restoration shared
  # Also Guardian
@@ -502,10 +483,9 @@ Define(frenzied_regeneration 22842)
 Define(frenzied_regeneration_buff 22842)
 	SpellInfo(frenzied_regeneration_buff duration=3)
 
-	SpellInfo(ironfur rage=45 cd=0.5 offgcd=1)
 	SpellAddBuff(ironfur ironfur_buff=1)
 Define(ironfur_buff 192081)
-	SpellInfo(ironfur_buff duration=7)
+	SpellInfo(ironfur_buff duration=7 max_stacks=8)
 	SpellRequire(ironfur_buff add_duration 2=buff,guardian_of_elune_buff)
 Define(thrash_bear 77758)
 	SpellInfo(thrash_bear rage=-5 cd=6 cd_haste=melee)
@@ -656,7 +636,7 @@ Define(intimidating_roar 236748)
 	SpellInfo(mangle addrage=-4 talent=soul_of_the_forest_talent specialization=guardian)
 	SpellAddBuff(mangle guardian_of_elune_buff=1 talent=guardian_of_elune_talent)
 
-	SpellInfo(maul rage=45 stance=druid_bear_form)
+	SpellInfo(maul stance=druid_bear_form)
 
 	SpellRequire(pulverize unusable 1=target_debuff,!thrash_bear_debuff,2)
 	SpellAddBuff(pulverize pulverize_buff=1)
@@ -666,7 +646,8 @@ Define(pulverize_buff 158792)
 
 	SpellInfo(survival_instincts add_cd=120 specialization=guardian)
 	SpellInfo(survival_instincts add_cd=-80 specialization=guardian talent=survival_of_the_fittest_talent) 
-
+Define(swipe_bear 213771)
+	
 	SpellInfo(thrash_bear_debuff max_stacks=5 if_equipped=elizes_everlasting_encasement)
 
 # Guardian Legendaries

@@ -18,6 +18,11 @@ Define(berserking 26297)
 Define(bilescourge_bombers 267211)
 # Tear open a portal to the nether above the target location, from which several Bilescourge will pour out of and crash into the ground over 6 seconds, dealing (21 of Spell Power) Shadow damage to all enemies within 267213A1 yards.
   SpellInfo(bilescourge_bombers soulshards=2 cd=30 duration=6 talent=bilescourge_bombers_talent)
+Define(blood_of_the_enemy 297108)
+# The Heart of Azeroth erupts violently, dealing s1 Shadow damage to enemies within A1 yds. You gain m2 critical strike chance against the targets for 10 seconds?a297122[, and increases your critical hit damage by 297126m for 5 seconds][].
+  SpellInfo(blood_of_the_enemy cd=120 duration=10 channel=10)
+  # You have a w2 increased chance to be Critically Hit by the caster.
+  SpellAddTargetDebuff(blood_of_the_enemy blood_of_the_enemy=1)
 Define(call_dreadstalkers 104316)
 # Summons s1 ferocious Dreadstalkers to attack the target for 12 seconds.
   SpellInfo(call_dreadstalkers soulshards=2 cd=20)
@@ -108,6 +113,10 @@ Define(explosive_potential 275398)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
+Define(focused_azerite_beam 295262)
+# Reduces the cast time of Focused Azerite Beam by s1.
+  SpellInfo(focused_azerite_beam channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(focused_azerite_beam focused_azerite_beam=1)
 Define(grimoire_felguard 111898)
 # Summons a Felguard who attacks the target for s1 sec that deals 216187s1 increased damage.rnrnThis Felguard will stun their target when summoned.
   SpellInfo(grimoire_felguard soulshards=1 cd=120 duration=17 talent=grimoire_felguard_talent)
@@ -115,6 +124,10 @@ Define(grimoire_of_sacrifice 108503)
 # Sacrifices your demon pet for power, gaining its command demon ability, and causing your spells to sometimes also deal (35 of Spell Power) additional Shadow damage.rnrnLasts 3600 seconds or until you summon a demon pet.
   SpellInfo(grimoire_of_sacrifice cd=30 talent=grimoire_of_sacrifice_talent)
 
+Define(guardian_of_azeroth 295840)
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
+  SpellInfo(guardian_of_azeroth cd=180 duration=30)
+  SpellAddBuff(guardian_of_azeroth guardian_of_azeroth=1)
 Define(hand_of_guldan 105174)
 # Calls down a demonic meteor full of Wild Imps which burst forth to attack the target.rnrnDeals up to m1*86040m1 Shadowflame damage on impact to all enemies within 86040A1 yds of the target?s196283[, applies Doom to each target,][] and summons up to m1*104317m2 Wild Imps, based on Soul Shards consumed.
   SpellInfo(hand_of_guldan soulshards=1)
@@ -161,11 +174,19 @@ Define(phantom_singularity 205179)
 Define(power_siphon 264130)
 # Instantly sacrifice up to s1 Wild Imps to generate s1 charges of Demonic Core.
   SpellInfo(power_siphon cd=30 channel=0 talent=power_siphon_talent)
+Define(purifying_blast 295337)
+# Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
+  SpellInfo(purifying_blast cd=60 duration=6)
 Define(rain_of_fire 5740)
 # Calls down a rain of hellfire, dealing 42223m1*8 Fire damage over 8 seconds to enemies in the area.
   SpellInfo(rain_of_fire soulshards=3 duration=8 tick=1)
   # 42223s1 Fire damage every 5740t2 sec.
   SpellAddBuff(rain_of_fire rain_of_fire=1)
+Define(reckless_force_buff 298409)
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+  SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
+  # Gaining unstable Azerite energy.
+  SpellAddBuff(reckless_force_buff reckless_force_buff=1)
 Define(seed_of_corruption 27243)
 # Embeds a demon seed in the enemy target that will explode after 12 seconds, dealing (24 of Spell Power) Shadow damage to all enemies within 27285A1 yards and applying Corruption to them.rnrnThe seed will detonate early if the target is hit by other detonations, or takes SPS*s1/100 damage from your spells.
   SpellInfo(seed_of_corruption soulshards=1 duration=12 tick=12)
@@ -217,6 +238,11 @@ Define(summon_infernal 1122)
 Define(summon_vilefiend 264119)
 # Summon a Vilefiend to fight for you for the next 15 seconds.
   SpellInfo(summon_vilefiend soulshards=1 cd=45 duration=15 talent=summon_vilefiend_talent)
+Define(the_unbound_force 298452)
+# Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]
+  SpellInfo(the_unbound_force cd=60 duration=2 channel=2 tick=0.33)
+  SpellAddBuff(the_unbound_force the_unbound_force=1)
+  SpellAddTargetDebuff(the_unbound_force the_unbound_force=1)
 Define(unstable_affliction 30108)
 # Afflicts the target with 233490o1 Shadow damage over 8 seconds. You may afflict a target with up to s2 Unstable Afflictions at once.rnrnYou deal s3 increased damage to targets affected by your Unstable Affliction.rnrnIf dispelled, deals (14.499999999999998 of Spell Power)*s1/100 damage to the dispeller and silences them for 4 seconds.?a231791[rnrn|cFFFFFFFFRefunds 231791m1 Soul LShard:Shards; if the target dies while afflicted.|r][]
 # Rank 2: Unstable Affliction refunds m1 Soul LShard:Shards; if the target dies.
@@ -226,6 +252,9 @@ Define(vile_taint 278350)
   SpellInfo(vile_taint soulshards=1 cd=20 duration=10 tick=2 talent=vile_taint_talent)
   # Suffering w1 Shadow damage every t1 sec.rnMovement slowed by s2.
   SpellAddTargetDebuff(vile_taint vile_taint=1)
+Define(wild_imp 279910)
+# Calls down a demonic meteor full of Wild Imps which burst forth to attack the target.rnrnDeals up to m1*86040m1 Shadowflame damage on impact to all enemies within 86040A1 yds of the target?s196283[, applies Doom to each target,][] and summons up to m1*104317m2 Wild Imps, based on Soul Shards consumed.
+  SpellInfo(wild_imp duration=20 gcd=0 offgcd=1)
 Define(absolute_corruption_talent 5) #21180
 # Corruption is now permanent and deals s2 increased damage.rnrnDuration reduced to s1 sec against players.
 Define(bilescourge_bombers_talent 3) #23138
@@ -298,6 +327,7 @@ Define(writhe_in_agony_talent 4) #22044
 # Agony's damage may now ramp up to s2 stacks.
 Define(wilfreds_sigil_of_superior_summoning_item 132369)
 Define(cascading_calamity_trait 275372)
+Define(dreadful_calling_trait 278727)
 Define(pandemic_invocation_trait 289364)
 Define(baleful_invocation_trait 287059)
 Define(explosive_potential_trait 275395)
@@ -597,6 +627,7 @@ Define(tormented_souls_buff 216695)
 # Pets
 Define(demonic_tyrant 135002)
 Define(wild_imp 55659)
+Define(wild_imp_inner_demons 143622)
 Define(dreadstalker 98035)
 Define(darkglare 103673)
 Define(infernal 89)

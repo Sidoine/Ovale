@@ -4,13 +4,13 @@ import { OvaleScripts } from "../Scripts";
 // ANY CHANGES MADE BELOW THIS POINT WILL BE LOST
 
 {
-	const name = "sc_t23_death_knight_blood"
-	const desc = "[8.2] Simulationcraft: T23_Death_Knight_Blood"
+	const name = "sc_pr_death_knight_blood"
+	const desc = "[8.2] Simulationcraft: PR_Death_Knight_Blood"
 	const code = `
-# Based on SimulationCraft profile "T23_Death_Knight_Blood".
+# Based on SimulationCraft profile "PR_Death_Knight_Blood".
 #	class=deathknight
 #	spec=blood
-#	talents=2220022
+#	talents=2222023
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -55,7 +55,7 @@ AddFunction BloodStandardMainActions
  #marrowrend,if=buff.bone_shield.stack<5&talent.ossuary.enabled&runic_power.deficit>=15
  if BuffStacks(bone_shield_buff) < 5 and Talent(ossuary_talent) and RunicPowerDeficit() >= 15 Spell(marrowrend)
  #death_strike,if=runic_power.deficit<=(15+buff.dancing_rune_weapon.up*5+spell_targets.heart_strike*talent.heartbreaker.enabled*2)|target.1.time_to_die<10
- if RunicPowerDeficit() <= 15 + BuffPresent(dancing_rune_weapon_buff) * 5 + Enemies() * TalentPoints(heartbreaker_talent) * 2 or FIXME_target.1.time_to_die < 10 Spell(death_strike)
+ if RunicPowerDeficit() <= 15 + BuffPresent(dancing_rune_weapon_buff) * 5 + Enemies() * TalentPoints(heartbreaker_talent) * 2 or target.TimeToDie() < 10 Spell(death_strike)
  #heart_strike,if=buff.dancing_rune_weapon.up|rune.time_to_4<gcd
  if BuffPresent(dancing_rune_weapon_buff) or TimeToRunes(4) < GCD() Spell(heart_strike)
  #blood_boil,if=buff.dancing_rune_weapon.up
@@ -82,7 +82,7 @@ AddFunction BloodStandardShortCdActions
    #bonestorm,if=runic_power>=100&!buff.dancing_rune_weapon.up
    if RunicPower() >= 100 and not BuffPresent(dancing_rune_weapon_buff) Spell(bonestorm)
 
-   unless { RunicPowerDeficit() <= 15 + BuffPresent(dancing_rune_weapon_buff) * 5 + Enemies() * TalentPoints(heartbreaker_talent) * 2 or FIXME_target.1.time_to_die < 10 } and Spell(death_strike)
+   unless { RunicPowerDeficit() <= 15 + BuffPresent(dancing_rune_weapon_buff) * 5 + Enemies() * TalentPoints(heartbreaker_talent) * 2 or target.TimeToDie() < 10 } and Spell(death_strike)
    {
     #death_and_decay,if=spell_targets.death_and_decay>=3
     if Enemies() >= 3 Spell(death_and_decay)
@@ -109,12 +109,12 @@ AddFunction BloodStandardShortCdActions
 
 AddFunction BloodStandardShortCdPostConditions
 {
- RunicPowerDeficit() <= 10 and Spell(death_strike) or { BuffRemaining(bone_shield_buff) <= TimeToRunes(3) or BuffRemaining(bone_shield_buff) <= GCD() + { SpellCooldown(blooddrinker) == 0 } * TalentPoints(blooddrinker_talent) * 2 or BuffStacks(bone_shield_buff) < 3 } and RunicPowerDeficit() >= 20 and Spell(marrowrend) or Charges(blood_boil count=0) >= 1.8 and { BuffStacks(hemostasis_buff) <= 5 - Enemies() or Enemies() > 2 } and Spell(blood_boil) or BuffStacks(bone_shield_buff) < 5 and Talent(ossuary_talent) and RunicPowerDeficit() >= 15 and Spell(marrowrend) or { RunicPowerDeficit() <= 15 + BuffPresent(dancing_rune_weapon_buff) * 5 + Enemies() * TalentPoints(heartbreaker_talent) * 2 or FIXME_target.1.time_to_die < 10 } and Spell(death_strike) or { BuffPresent(dancing_rune_weapon_buff) or TimeToRunes(4) < GCD() } and Spell(heart_strike) or BuffPresent(dancing_rune_weapon_buff) and Spell(blood_boil) or Spell(blood_boil) or { TimeToRunes(3) < GCD() or BuffStacks(bone_shield_buff) > 6 } and Spell(heart_strike)
+ RunicPowerDeficit() <= 10 and Spell(death_strike) or { BuffRemaining(bone_shield_buff) <= TimeToRunes(3) or BuffRemaining(bone_shield_buff) <= GCD() + { SpellCooldown(blooddrinker) == 0 } * TalentPoints(blooddrinker_talent) * 2 or BuffStacks(bone_shield_buff) < 3 } and RunicPowerDeficit() >= 20 and Spell(marrowrend) or Charges(blood_boil count=0) >= 1.8 and { BuffStacks(hemostasis_buff) <= 5 - Enemies() or Enemies() > 2 } and Spell(blood_boil) or BuffStacks(bone_shield_buff) < 5 and Talent(ossuary_talent) and RunicPowerDeficit() >= 15 and Spell(marrowrend) or { RunicPowerDeficit() <= 15 + BuffPresent(dancing_rune_weapon_buff) * 5 + Enemies() * TalentPoints(heartbreaker_talent) * 2 or target.TimeToDie() < 10 } and Spell(death_strike) or { BuffPresent(dancing_rune_weapon_buff) or TimeToRunes(4) < GCD() } and Spell(heart_strike) or BuffPresent(dancing_rune_weapon_buff) and Spell(blood_boil) or Spell(blood_boil) or { TimeToRunes(3) < GCD() or BuffStacks(bone_shield_buff) > 6 } and Spell(heart_strike)
 }
 
 AddFunction BloodStandardCdActions
 {
- unless RunicPowerDeficit() <= 10 and Spell(death_strike) or not BuffPresent(dancing_rune_weapon_buff) and Spell(blooddrinker) or { BuffRemaining(bone_shield_buff) <= TimeToRunes(3) or BuffRemaining(bone_shield_buff) <= GCD() + { SpellCooldown(blooddrinker) == 0 } * TalentPoints(blooddrinker_talent) * 2 or BuffStacks(bone_shield_buff) < 3 } and RunicPowerDeficit() >= 20 and Spell(marrowrend) or Charges(blood_boil count=0) >= 1.8 and { BuffStacks(hemostasis_buff) <= 5 - Enemies() or Enemies() > 2 } and Spell(blood_boil) or BuffStacks(bone_shield_buff) < 5 and Talent(ossuary_talent) and RunicPowerDeficit() >= 15 and Spell(marrowrend) or RunicPower() >= 100 and not BuffPresent(dancing_rune_weapon_buff) and Spell(bonestorm) or { RunicPowerDeficit() <= 15 + BuffPresent(dancing_rune_weapon_buff) * 5 + Enemies() * TalentPoints(heartbreaker_talent) * 2 or FIXME_target.1.time_to_die < 10 } and Spell(death_strike) or Enemies() >= 3 and Spell(death_and_decay) or { Charges(rune_strike count=0) >= 1.8 or BuffPresent(dancing_rune_weapon_buff) } and TimeToRunes(3) >= GCD() and Spell(rune_strike) or { BuffPresent(dancing_rune_weapon_buff) or TimeToRunes(4) < GCD() } and Spell(heart_strike) or BuffPresent(dancing_rune_weapon_buff) and Spell(blood_boil) or { BuffPresent(crimson_scourge_buff) or Talent(rapid_decomposition_talent) or Enemies() >= 2 } and Spell(death_and_decay) or Spell(consumption) or Spell(blood_boil) or { TimeToRunes(3) < GCD() or BuffStacks(bone_shield_buff) > 6 } and Spell(heart_strike)
+ unless RunicPowerDeficit() <= 10 and Spell(death_strike) or not BuffPresent(dancing_rune_weapon_buff) and Spell(blooddrinker) or { BuffRemaining(bone_shield_buff) <= TimeToRunes(3) or BuffRemaining(bone_shield_buff) <= GCD() + { SpellCooldown(blooddrinker) == 0 } * TalentPoints(blooddrinker_talent) * 2 or BuffStacks(bone_shield_buff) < 3 } and RunicPowerDeficit() >= 20 and Spell(marrowrend) or Charges(blood_boil count=0) >= 1.8 and { BuffStacks(hemostasis_buff) <= 5 - Enemies() or Enemies() > 2 } and Spell(blood_boil) or BuffStacks(bone_shield_buff) < 5 and Talent(ossuary_talent) and RunicPowerDeficit() >= 15 and Spell(marrowrend) or RunicPower() >= 100 and not BuffPresent(dancing_rune_weapon_buff) and Spell(bonestorm) or { RunicPowerDeficit() <= 15 + BuffPresent(dancing_rune_weapon_buff) * 5 + Enemies() * TalentPoints(heartbreaker_talent) * 2 or target.TimeToDie() < 10 } and Spell(death_strike) or Enemies() >= 3 and Spell(death_and_decay) or { Charges(rune_strike count=0) >= 1.8 or BuffPresent(dancing_rune_weapon_buff) } and TimeToRunes(3) >= GCD() and Spell(rune_strike) or { BuffPresent(dancing_rune_weapon_buff) or TimeToRunes(4) < GCD() } and Spell(heart_strike) or BuffPresent(dancing_rune_weapon_buff) and Spell(blood_boil) or { BuffPresent(crimson_scourge_buff) or Talent(rapid_decomposition_talent) or Enemies() >= 2 } and Spell(death_and_decay) or Spell(consumption) or Spell(blood_boil) or { TimeToRunes(3) < GCD() or BuffStacks(bone_shield_buff) > 6 } and Spell(heart_strike)
  {
   #use_item,name=grongs_primal_rage
   BloodUseItemActions()
@@ -129,7 +129,7 @@ AddFunction BloodStandardCdActions
 
 AddFunction BloodStandardCdPostConditions
 {
- RunicPowerDeficit() <= 10 and Spell(death_strike) or not BuffPresent(dancing_rune_weapon_buff) and Spell(blooddrinker) or { BuffRemaining(bone_shield_buff) <= TimeToRunes(3) or BuffRemaining(bone_shield_buff) <= GCD() + { SpellCooldown(blooddrinker) == 0 } * TalentPoints(blooddrinker_talent) * 2 or BuffStacks(bone_shield_buff) < 3 } and RunicPowerDeficit() >= 20 and Spell(marrowrend) or Charges(blood_boil count=0) >= 1.8 and { BuffStacks(hemostasis_buff) <= 5 - Enemies() or Enemies() > 2 } and Spell(blood_boil) or BuffStacks(bone_shield_buff) < 5 and Talent(ossuary_talent) and RunicPowerDeficit() >= 15 and Spell(marrowrend) or RunicPower() >= 100 and not BuffPresent(dancing_rune_weapon_buff) and Spell(bonestorm) or { RunicPowerDeficit() <= 15 + BuffPresent(dancing_rune_weapon_buff) * 5 + Enemies() * TalentPoints(heartbreaker_talent) * 2 or FIXME_target.1.time_to_die < 10 } and Spell(death_strike) or Enemies() >= 3 and Spell(death_and_decay) or { Charges(rune_strike count=0) >= 1.8 or BuffPresent(dancing_rune_weapon_buff) } and TimeToRunes(3) >= GCD() and Spell(rune_strike) or { BuffPresent(dancing_rune_weapon_buff) or TimeToRunes(4) < GCD() } and Spell(heart_strike) or BuffPresent(dancing_rune_weapon_buff) and Spell(blood_boil) or { BuffPresent(crimson_scourge_buff) or Talent(rapid_decomposition_talent) or Enemies() >= 2 } and Spell(death_and_decay) or Spell(consumption) or Spell(blood_boil) or { TimeToRunes(3) < GCD() or BuffStacks(bone_shield_buff) > 6 } and Spell(heart_strike) or Spell(rune_strike)
+ RunicPowerDeficit() <= 10 and Spell(death_strike) or not BuffPresent(dancing_rune_weapon_buff) and Spell(blooddrinker) or { BuffRemaining(bone_shield_buff) <= TimeToRunes(3) or BuffRemaining(bone_shield_buff) <= GCD() + { SpellCooldown(blooddrinker) == 0 } * TalentPoints(blooddrinker_talent) * 2 or BuffStacks(bone_shield_buff) < 3 } and RunicPowerDeficit() >= 20 and Spell(marrowrend) or Charges(blood_boil count=0) >= 1.8 and { BuffStacks(hemostasis_buff) <= 5 - Enemies() or Enemies() > 2 } and Spell(blood_boil) or BuffStacks(bone_shield_buff) < 5 and Talent(ossuary_talent) and RunicPowerDeficit() >= 15 and Spell(marrowrend) or RunicPower() >= 100 and not BuffPresent(dancing_rune_weapon_buff) and Spell(bonestorm) or { RunicPowerDeficit() <= 15 + BuffPresent(dancing_rune_weapon_buff) * 5 + Enemies() * TalentPoints(heartbreaker_talent) * 2 or target.TimeToDie() < 10 } and Spell(death_strike) or Enemies() >= 3 and Spell(death_and_decay) or { Charges(rune_strike count=0) >= 1.8 or BuffPresent(dancing_rune_weapon_buff) } and TimeToRunes(3) >= GCD() and Spell(rune_strike) or { BuffPresent(dancing_rune_weapon_buff) or TimeToRunes(4) < GCD() } and Spell(heart_strike) or BuffPresent(dancing_rune_weapon_buff) and Spell(blood_boil) or { BuffPresent(crimson_scourge_buff) or Talent(rapid_decomposition_talent) or Enemies() >= 2 } and Spell(death_and_decay) or Spell(consumption) or Spell(blood_boil) or { TimeToRunes(3) < GCD() or BuffStacks(bone_shield_buff) > 6 } and Spell(heart_strike) or Spell(rune_strike)
 }
 
 ### actions.precombat
@@ -312,13 +312,13 @@ AddIcon checkbox=opt_deathknight_blood_aoe help=cd specialization=blood
 }
 
 {
-	const name = "sc_t23_death_knight_frost"
-	const desc = "[8.2] Simulationcraft: T23_Death_Knight_Frost"
+	const name = "sc_pr_death_knight_frost"
+	const desc = "[8.2] Simulationcraft: PR_Death_Knight_Frost"
 	const code = `
-# Based on SimulationCraft profile "T23_Death_Knight_Frost".
+# Based on SimulationCraft profile "PR_Death_Knight_Frost".
 #	class=deathknight
 #	spec=frost
-#	talents=3102013
+#	talents=3302033
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -498,12 +498,12 @@ AddFunction FrostObliterationCdPostConditions
 AddFunction FrostCooldownsMainActions
 {
  #call_action_list,name=cold_heart,if=talent.cold_heart.enabled&((buff.cold_heart.stack>=10&debuff.razorice.stack=5)|target.1.time_to_die<=gcd)
- if Talent(cold_heart_talent) and { BuffStacks(cold_heart_buff) >= 10 and target.DebuffStacks(razorice_debuff) == 5 or FIXME_target.1.time_to_die <= GCD() } FrostColdheartMainActions()
+ if Talent(cold_heart_talent) and { BuffStacks(cold_heart_buff) >= 10 and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } FrostColdheartMainActions()
 }
 
 AddFunction FrostCooldownsMainPostConditions
 {
- Talent(cold_heart_talent) and { BuffStacks(cold_heart_buff) >= 10 and target.DebuffStacks(razorice_debuff) == 5 or FIXME_target.1.time_to_die <= GCD() } and FrostColdheartMainPostConditions()
+ Talent(cold_heart_talent) and { BuffStacks(cold_heart_buff) >= 10 and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } and FrostColdheartMainPostConditions()
 }
 
 AddFunction FrostCooldownsShortCdActions
@@ -511,12 +511,12 @@ AddFunction FrostCooldownsShortCdActions
  #pillar_of_frost,if=cooldown.empower_rune_weapon.remains
  if SpellCooldown(empower_rune_weapon) > 0 Spell(pillar_of_frost)
  #call_action_list,name=cold_heart,if=talent.cold_heart.enabled&((buff.cold_heart.stack>=10&debuff.razorice.stack=5)|target.1.time_to_die<=gcd)
- if Talent(cold_heart_talent) and { BuffStacks(cold_heart_buff) >= 10 and target.DebuffStacks(razorice_debuff) == 5 or FIXME_target.1.time_to_die <= GCD() } FrostColdheartShortCdActions()
+ if Talent(cold_heart_talent) and { BuffStacks(cold_heart_buff) >= 10 and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } FrostColdheartShortCdActions()
 }
 
 AddFunction FrostCooldownsShortCdPostConditions
 {
- Talent(cold_heart_talent) and { BuffStacks(cold_heart_buff) >= 10 and target.DebuffStacks(razorice_debuff) == 5 or FIXME_target.1.time_to_die <= GCD() } and FrostColdheartShortCdPostConditions()
+ Talent(cold_heart_talent) and { BuffStacks(cold_heart_buff) >= 10 and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } and FrostColdheartShortCdPostConditions()
 }
 
 AddFunction FrostCooldownsCdActions
@@ -547,27 +547,27 @@ AddFunction FrostCooldownsCdActions
   #breath_of_sindragosa,use_off_gcd=1,if=cooldown.empower_rune_weapon.remains&cooldown.pillar_of_frost.remains
   if SpellCooldown(empower_rune_weapon) > 0 and SpellCooldown(pillar_of_frost) > 0 Spell(breath_of_sindragosa)
   #empower_rune_weapon,if=cooldown.pillar_of_frost.ready&!talent.breath_of_sindragosa.enabled&rune.time_to_5>gcd&runic_power.deficit>=10|target.1.time_to_die<20
-  if SpellCooldown(pillar_of_frost) == 0 and not Talent(breath_of_sindragosa_talent) and TimeToRunes(5) > GCD() and RunicPowerDeficit() >= 10 or FIXME_target.1.time_to_die < 20 Spell(empower_rune_weapon)
+  if SpellCooldown(pillar_of_frost) == 0 and not Talent(breath_of_sindragosa_talent) and TimeToRunes(5) > GCD() and RunicPowerDeficit() >= 10 or target.TimeToDie() < 20 Spell(empower_rune_weapon)
   #empower_rune_weapon,if=(cooldown.pillar_of_frost.ready|target.1.time_to_die<20)&talent.breath_of_sindragosa.enabled&rune>=3&runic_power>60
-  if { SpellCooldown(pillar_of_frost) == 0 or FIXME_target.1.time_to_die < 20 } and Talent(breath_of_sindragosa_talent) and RuneCount() >= 3 and RunicPower() > 60 Spell(empower_rune_weapon)
+  if { SpellCooldown(pillar_of_frost) == 0 or target.TimeToDie() < 20 } and Talent(breath_of_sindragosa_talent) and RuneCount() >= 3 and RunicPower() > 60 Spell(empower_rune_weapon)
   #call_action_list,name=cold_heart,if=talent.cold_heart.enabled&((buff.cold_heart.stack>=10&debuff.razorice.stack=5)|target.1.time_to_die<=gcd)
-  if Talent(cold_heart_talent) and { BuffStacks(cold_heart_buff) >= 10 and target.DebuffStacks(razorice_debuff) == 5 or FIXME_target.1.time_to_die <= GCD() } FrostColdheartCdActions()
+  if Talent(cold_heart_talent) and { BuffStacks(cold_heart_buff) >= 10 and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } FrostColdheartCdActions()
 
-  unless Talent(cold_heart_talent) and { BuffStacks(cold_heart_buff) >= 10 and target.DebuffStacks(razorice_debuff) == 5 or FIXME_target.1.time_to_die <= GCD() } and FrostColdheartCdPostConditions()
+  unless Talent(cold_heart_talent) and { BuffStacks(cold_heart_buff) >= 10 and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } and FrostColdheartCdPostConditions()
   {
    #frostwyrms_fury,if=(buff.pillar_of_frost.remains<=gcd|(buff.pillar_of_frost.remains<8&buff.unholy_strength.remains<=gcd&buff.unholy_strength.up))&buff.pillar_of_frost.up&azerite.icy_citadel.rank<=2
    if { BuffRemaining(pillar_of_frost_buff) <= GCD() or BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) <= GCD() and BuffPresent(unholy_strength_buff) } and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 Spell(frostwyrms_fury)
    #frostwyrms_fury,if=(buff.icy_citadel.remains<=gcd|(buff.icy_citadel.remains<8&buff.unholy_strength.remains<=gcd&buff.unholy_strength.up))&buff.icy_citadel.up&azerite.icy_citadel.rank>2
    if { BuffRemaining(icy_citadel_buff) <= GCD() or BuffRemaining(icy_citadel_buff) < 8 and BuffRemaining(unholy_strength_buff) <= GCD() and BuffPresent(unholy_strength_buff) } and BuffPresent(icy_citadel_buff) and AzeriteTraitRank(icy_citadel_trait) > 2 Spell(frostwyrms_fury)
    #frostwyrms_fury,if=target.1.time_to_die<gcd|(target.1.time_to_die<cooldown.pillar_of_frost.remains&buff.unholy_strength.up)
-   if FIXME_target.1.time_to_die < GCD() or FIXME_target.1.time_to_die < SpellCooldown(pillar_of_frost) and BuffPresent(unholy_strength_buff) Spell(frostwyrms_fury)
+   if target.TimeToDie() < GCD() or target.TimeToDie() < SpellCooldown(pillar_of_frost) and BuffPresent(unholy_strength_buff) Spell(frostwyrms_fury)
   }
  }
 }
 
 AddFunction FrostCooldownsCdPostConditions
 {
- SpellCooldown(empower_rune_weapon) > 0 and Spell(pillar_of_frost) or Talent(cold_heart_talent) and { BuffStacks(cold_heart_buff) >= 10 and target.DebuffStacks(razorice_debuff) == 5 or FIXME_target.1.time_to_die <= GCD() } and FrostColdheartCdPostConditions()
+ SpellCooldown(empower_rune_weapon) > 0 and Spell(pillar_of_frost) or Talent(cold_heart_talent) and { BuffStacks(cold_heart_buff) >= 10 and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } and FrostColdheartCdPostConditions()
 }
 
 ### actions.cold_heart
@@ -575,7 +575,7 @@ AddFunction FrostCooldownsCdPostConditions
 AddFunction FrostColdheartMainActions
 {
  #chains_of_ice,if=buff.cold_heart.stack>5&target.1.time_to_die<gcd
- if BuffStacks(cold_heart_buff) > 5 and FIXME_target.1.time_to_die < GCD() Spell(chains_of_ice)
+ if BuffStacks(cold_heart_buff) > 5 and target.TimeToDie() < GCD() Spell(chains_of_ice)
  #chains_of_ice,if=(buff.pillar_of_frost.remains<=gcd*(1+cooldown.frostwyrms_fury.ready)|buff.pillar_of_frost.remains<rune.time_to_3)&buff.pillar_of_frost.up&azerite.icy_citadel.rank<=2
  if { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 Spell(chains_of_ice)
  #chains_of_ice,if=buff.pillar_of_frost.remains<8&buff.unholy_strength.remains<gcd*(1+cooldown.frostwyrms_fury.ready)&buff.unholy_strength.remains&buff.pillar_of_frost.up&azerite.icy_citadel.rank<=2
@@ -596,7 +596,7 @@ AddFunction FrostColdheartShortCdActions
 
 AddFunction FrostColdheartShortCdPostConditions
 {
- BuffStacks(cold_heart_buff) > 5 and FIXME_target.1.time_to_die < GCD() and Spell(chains_of_ice) or { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 and Spell(chains_of_ice) or BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 and Spell(chains_of_ice) or { BuffRemaining(icy_citadel_buff) < 4 or BuffRemaining(icy_citadel_buff) < TimeToRunes(3) } and BuffPresent(icy_citadel_buff) and AzeriteTraitRank(icy_citadel_trait) > 2 and Spell(chains_of_ice) or BuffPresent(icy_citadel_buff) and BuffPresent(unholy_strength_buff) and AzeriteTraitRank(icy_citadel_trait) > 2 and Spell(chains_of_ice)
+ BuffStacks(cold_heart_buff) > 5 and target.TimeToDie() < GCD() and Spell(chains_of_ice) or { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 and Spell(chains_of_ice) or BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 and Spell(chains_of_ice) or { BuffRemaining(icy_citadel_buff) < 4 or BuffRemaining(icy_citadel_buff) < TimeToRunes(3) } and BuffPresent(icy_citadel_buff) and AzeriteTraitRank(icy_citadel_trait) > 2 and Spell(chains_of_ice) or BuffPresent(icy_citadel_buff) and BuffPresent(unholy_strength_buff) and AzeriteTraitRank(icy_citadel_trait) > 2 and Spell(chains_of_ice)
 }
 
 AddFunction FrostColdheartCdActions
@@ -605,7 +605,7 @@ AddFunction FrostColdheartCdActions
 
 AddFunction FrostColdheartCdPostConditions
 {
- BuffStacks(cold_heart_buff) > 5 and FIXME_target.1.time_to_die < GCD() and Spell(chains_of_ice) or { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 and Spell(chains_of_ice) or BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 and Spell(chains_of_ice) or { BuffRemaining(icy_citadel_buff) < 4 or BuffRemaining(icy_citadel_buff) < TimeToRunes(3) } and BuffPresent(icy_citadel_buff) and AzeriteTraitRank(icy_citadel_trait) > 2 and Spell(chains_of_ice) or BuffPresent(icy_citadel_buff) and BuffPresent(unholy_strength_buff) and AzeriteTraitRank(icy_citadel_trait) > 2 and Spell(chains_of_ice)
+ BuffStacks(cold_heart_buff) > 5 and target.TimeToDie() < GCD() and Spell(chains_of_ice) or { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 and Spell(chains_of_ice) or BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) < GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } and BuffPresent(unholy_strength_buff) and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 and Spell(chains_of_ice) or { BuffRemaining(icy_citadel_buff) < 4 or BuffRemaining(icy_citadel_buff) < TimeToRunes(3) } and BuffPresent(icy_citadel_buff) and AzeriteTraitRank(icy_citadel_trait) > 2 and Spell(chains_of_ice) or BuffPresent(icy_citadel_buff) and BuffPresent(unholy_strength_buff) and AzeriteTraitRank(icy_citadel_trait) > 2 and Spell(chains_of_ice)
 }
 
 ### actions.bos_ticking
@@ -802,9 +802,9 @@ AddFunction FrostDefaultMainActions
  unless FrostCooldownsMainPostConditions()
  {
   #run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&(cooldown.breath_of_sindragosa.remains<5|(cooldown.breath_of_sindragosa.remains<20&target.1.time_to_die<35))
-  if Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and FIXME_target.1.time_to_die < 35 } FrostBospoolingMainActions()
+  if Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } FrostBospoolingMainActions()
 
-  unless Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and FIXME_target.1.time_to_die < 35 } and FrostBospoolingMainPostConditions()
+  unless Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and FrostBospoolingMainPostConditions()
   {
    #run_action_list,name=bos_ticking,if=buff.breath_of_sindragosa.up
    if BuffPresent(breath_of_sindragosa_buff) FrostBostickingMainActions()
@@ -832,7 +832,7 @@ AddFunction FrostDefaultMainActions
 
 AddFunction FrostDefaultMainPostConditions
 {
- FrostCooldownsMainPostConditions() or Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and FIXME_target.1.time_to_die < 35 } and FrostBospoolingMainPostConditions() or BuffPresent(breath_of_sindragosa_buff) and FrostBostickingMainPostConditions() or BuffPresent(pillar_of_frost_buff) and Talent(obliteration_talent) and FrostObliterationMainPostConditions() or Enemies() >= 2 and FrostAoeMainPostConditions() or FrostStandardMainPostConditions()
+ FrostCooldownsMainPostConditions() or Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and FrostBospoolingMainPostConditions() or BuffPresent(breath_of_sindragosa_buff) and FrostBostickingMainPostConditions() or BuffPresent(pillar_of_frost_buff) and Talent(obliteration_talent) and FrostObliterationMainPostConditions() or Enemies() >= 2 and FrostAoeMainPostConditions() or FrostStandardMainPostConditions()
 }
 
 AddFunction FrostDefaultShortCdActions
@@ -848,9 +848,9 @@ AddFunction FrostDefaultShortCdActions
   unless FrostCooldownsShortCdPostConditions()
   {
    #run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&(cooldown.breath_of_sindragosa.remains<5|(cooldown.breath_of_sindragosa.remains<20&target.1.time_to_die<35))
-   if Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and FIXME_target.1.time_to_die < 35 } FrostBospoolingShortCdActions()
+   if Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } FrostBospoolingShortCdActions()
 
-   unless Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and FIXME_target.1.time_to_die < 35 } and FrostBospoolingShortCdPostConditions()
+   unless Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and FrostBospoolingShortCdPostConditions()
    {
     #run_action_list,name=bos_ticking,if=buff.breath_of_sindragosa.up
     if BuffPresent(breath_of_sindragosa_buff) FrostBostickingShortCdActions()
@@ -879,7 +879,7 @@ AddFunction FrostDefaultShortCdActions
 
 AddFunction FrostDefaultShortCdPostConditions
 {
- not target.DebuffPresent(frost_fever_debuff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(howling_blast) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and Enemies() >= 2 and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(glacial_advance) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(frost_strike) or FrostCooldownsShortCdPostConditions() or Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and FIXME_target.1.time_to_die < 35 } and FrostBospoolingShortCdPostConditions() or BuffPresent(breath_of_sindragosa_buff) and FrostBostickingShortCdPostConditions() or BuffPresent(pillar_of_frost_buff) and Talent(obliteration_talent) and FrostObliterationShortCdPostConditions() or Enemies() >= 2 and FrostAoeShortCdPostConditions() or FrostStandardShortCdPostConditions()
+ not target.DebuffPresent(frost_fever_debuff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(howling_blast) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and Enemies() >= 2 and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(glacial_advance) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(frost_strike) or FrostCooldownsShortCdPostConditions() or Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and FrostBospoolingShortCdPostConditions() or BuffPresent(breath_of_sindragosa_buff) and FrostBostickingShortCdPostConditions() or BuffPresent(pillar_of_frost_buff) and Talent(obliteration_talent) and FrostObliterationShortCdPostConditions() or Enemies() >= 2 and FrostAoeShortCdPostConditions() or FrostStandardShortCdPostConditions()
 }
 
 AddFunction FrostDefaultCdActions
@@ -894,9 +894,9 @@ AddFunction FrostDefaultCdActions
   unless FrostCooldownsCdPostConditions()
   {
    #run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&(cooldown.breath_of_sindragosa.remains<5|(cooldown.breath_of_sindragosa.remains<20&target.1.time_to_die<35))
-   if Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and FIXME_target.1.time_to_die < 35 } FrostBospoolingCdActions()
+   if Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } FrostBospoolingCdActions()
 
-   unless Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and FIXME_target.1.time_to_die < 35 } and FrostBospoolingCdPostConditions()
+   unless Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and FrostBospoolingCdPostConditions()
    {
     #run_action_list,name=bos_ticking,if=buff.breath_of_sindragosa.up
     if BuffPresent(breath_of_sindragosa_buff) FrostBostickingCdActions()
@@ -925,7 +925,7 @@ AddFunction FrostDefaultCdActions
 
 AddFunction FrostDefaultCdPostConditions
 {
- not target.DebuffPresent(frost_fever_debuff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(howling_blast) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and Enemies() >= 2 and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(glacial_advance) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(frost_strike) or FrostCooldownsCdPostConditions() or Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and FIXME_target.1.time_to_die < 35 } and FrostBospoolingCdPostConditions() or BuffPresent(breath_of_sindragosa_buff) and FrostBostickingCdPostConditions() or BuffPresent(pillar_of_frost_buff) and Talent(obliteration_talent) and FrostObliterationCdPostConditions() or Enemies() >= 2 and FrostAoeCdPostConditions() or FrostStandardCdPostConditions()
+ not target.DebuffPresent(frost_fever_debuff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(howling_blast) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and Enemies() >= 2 and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(glacial_advance) or BuffRemaining(icy_talons_buff) <= GCD() and BuffPresent(icy_talons_buff) and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(breath_of_sindragosa) > 15 } and Spell(frost_strike) or FrostCooldownsCdPostConditions() or Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and FrostBospoolingCdPostConditions() or BuffPresent(breath_of_sindragosa_buff) and FrostBostickingCdPostConditions() or BuffPresent(pillar_of_frost_buff) and Talent(obliteration_talent) and FrostObliterationCdPostConditions() or Enemies() >= 2 and FrostAoeCdPostConditions() or FrostStandardCdPostConditions()
 }
 
 ### Frost icons.
@@ -1041,13 +1041,13 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 }
 
 {
-	const name = "sc_t23_death_knight_unholy"
-	const desc = "[8.2] Simulationcraft: T23_Death_Knight_Unholy"
+	const name = "sc_pr_death_knight_unholy"
+	const desc = "[8.2] Simulationcraft: PR_Death_Knight_Unholy"
 	const code = `
-# Based on SimulationCraft profile "T23_Death_Knight_Unholy".
+# Based on SimulationCraft profile "PR_Death_Knight_Unholy".
 #	class=deathknight
 #	spec=unholy
-#	talents=2203032
+#	talents=2203022
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)

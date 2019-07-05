@@ -13,6 +13,11 @@ Define(blade_dance 188499)
   SpellInfo(blade_dance fury=35 cd=9 duration=1)
   # Dodge chance increased by s2.
   SpellAddBuff(blade_dance blade_dance=1)
+Define(blood_of_the_enemy 297108)
+# The Heart of Azeroth erupts violently, dealing s1 Shadow damage to enemies within A1 yds. You gain m2 critical strike chance against the targets for 10 seconds?a297122[, and increases your critical hit damage by 297126m for 5 seconds][].
+  SpellInfo(blood_of_the_enemy cd=120 duration=10 channel=10)
+  # You have a w2 increased chance to be Critically Hit by the caster.
+  SpellAddTargetDebuff(blood_of_the_enemy blood_of_the_enemy=1)
 Define(chaos_nova 179057)
 # Unleash an eruption of fel energy, dealing s2 Chaos damage and stunning all nearby enemies for 2 seconds.rnrnEach enemy stunned by Chaos Nova has a s3 chance to generate a Lesser Soul Fragment.
   SpellInfo(chaos_nova fury=30 cd=60 duration=2)
@@ -73,10 +78,18 @@ Define(fiery_brand 204021)
 # Brand an enemy with a demonic symbol, instantly dealing sw2 Fire damage and reducing the damage they deal to you by s1 for 8 seconds.
   SpellInfo(fiery_brand cd=60)
   SpellInfo(chaos_nova replaced_by=fiery_brand)
+Define(focused_azerite_beam 295262)
+# Reduces the cast time of Focused Azerite Beam by s1.
+  SpellInfo(focused_azerite_beam channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(focused_azerite_beam focused_azerite_beam=1)
 Define(fracture 263642)
 # Rapidly slash your target for 225919sw1+225921sw1 Physical damage, and shatter s1 Lesser Soul Fragments from them.rnrn|cFFFFFFFFGenerates s4/10 Pain.|r
   SpellInfo(fracture cd=4.5 pain=-25 talent=fracture_talent)
 
+Define(guardian_of_azeroth 295840)
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
+  SpellInfo(guardian_of_azeroth cd=180 duration=30)
+  SpellAddBuff(guardian_of_azeroth guardian_of_azeroth=1)
 Define(immolation_aura 178740)
 # Engulf yourself in flames, instantly causing 187727s1 Fire damage to enemies within 187727A1 yards and radiating 178741s1 Fire damage every sec for 6 seconds.rnrn|cFFFFFFFFGenerates s3/10+178741s2/10*6 seconds Pain over 6 seconds.|r
   SpellInfo(immolation_aura cd=15 duration=6 pain=-8 tick=1)
@@ -102,6 +115,9 @@ Define(prepared_buff 203650)
   SpellInfo(prepared_buff duration=10 gcd=0 offgcd=1)
   # Generating m1/5 Fury every sec.
   SpellAddBuff(prepared_buff prepared_buff=1)
+Define(purifying_blast 295337)
+# Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
+  SpellInfo(purifying_blast cd=60 duration=6)
 Define(shear 203782)
 # Shears an enemy for s1 Physical damage, and shatters ?a187827[two Lesser Soul Fragments][a Lesser Soul Fragment] from your target.rnrn|cFFFFFFFFGenerates m2/10 Pain.|r
   SpellInfo(shear pain=-10)
@@ -127,6 +143,11 @@ Define(spirit_bomb 247454)
 # Consume up to s2 Soul Fragments within s1 yds and then explode, afflicting nearby enemies with Frailty for 20 seconds and damaging them for 247455s1 Fire per fragment.rnrnYou heal for 247456s1 of all damage you deal to enemies with Frailty.
   SpellInfo(spirit_bomb pain=30 duration=1.5 talent=spirit_bomb_talent)
   SpellAddBuff(spirit_bomb spirit_bomb=1)
+Define(the_unbound_force 298452)
+# Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]
+  SpellInfo(the_unbound_force cd=60 duration=2 channel=2 tick=0.33)
+  SpellAddBuff(the_unbound_force the_unbound_force=1)
+  SpellAddTargetDebuff(the_unbound_force the_unbound_force=1)
 Define(vengeful_retreat 198793)
 # Remove all snares and vault away. Nearby enemies take 198813s2 Physical damage and have their movement speed reduced by 198813s1 for 3 seconds.?a203551[rnrn|cFFFFFFFFGenerates (203650s1/5)*10 seconds Fury over 10 seconds if you damage an enemy.|r][]
   SpellInfo(vengeful_retreat cd=25 duration=1 channel=1 gcd=0 offgcd=1)
@@ -250,6 +271,8 @@ Define(frailty_debuff 247456)
 	SpellInfo(frailty_debuff duration=20)
 
     SpellAddBuff(fracture soul_fragments=2)
+    SpellRequire(fracture add_pain_from_aura -20=buff,metamorphosis_veng_buff)
+    SpellAddBuff(fracture soul_fragments 3=buff,metamorphosis_veng_buff)
     
 	SpellInfo(immolation_aura cd=15 cd_haste=melee)
 	SpellAddBuff(immolation_aura immolation_aura_buff=1)
@@ -298,6 +321,8 @@ Define(revolving_blades_buff 279584)
     SpellInfo(revolving_blades_buff duration=15)
 
     SpellAddBuff(shear soul_fragments=1)
+    SpellRequire(shear add_pain_from_aura -20=buff,metamorphosis_veng_buff)
+    SpellAddBuff(shear soul_fragments 2=buff,metamorphosis_veng_buff)
     
 	SpellInfo(sigil_of_chains cd=90)
 

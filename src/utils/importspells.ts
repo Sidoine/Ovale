@@ -854,18 +854,18 @@ export interface SpellData {
     power_id: number;
     essence_id: number;
     // Textual data
-    /** 41 Spell.dbc description stringblock */
+    /** 42 Spell.dbc description stringblock */
     desc: string;
-    /** 42 Spell.dbc tooltip stringblock */
+    /** 43 Spell.dbc tooltip stringblock */
     tooltip: string;
     // SpellDescriptionVariables.dbc
-    /** 43 Spell description variable stringblock, if present */
+    /** 44 Spell description variable stringblock, if present */
     desc_vars: string;
     // SpellIcon.dbc
-    /** 44 */
+    /** 45 */
     rank_str: string;
 
-    /** 45 */
+    /** 46 */
     req_max_level: number;
     /** 46 SpellCategories.db2 classification for the spell */
     dmg_class: number;

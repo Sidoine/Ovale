@@ -725,9 +725,33 @@ local function DemonDuration(positionalParams, namedParams, atTime)
         local value = OvaleWarlock:GetRemainingDemonDuration(creatureId, atTime)
         return Compare(value, comparator, limit)
     end
+    local INNER_DEMONS_TALENT = 17
+    local HAND_OF_GULDAN_SPELL_ID = 105174
+    local WILD_IMP_INNER_DEMONS = 143622
+local function ImpsSpawnedDuring(positionalParams, namedParams, atTime)
+        local ms, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+        local delay = ms / 1000
+        local impsSpawned = 0
+        if OvaleFuture.next.currentCast.spellId == HAND_OF_GULDAN_SPELL_ID then
+            local soulshards = OvalePower.current.power["soulshards"]
+            if soulshards >= 3 then
+                soulshards = 3
+            end
+            impsSpawned = impsSpawned + soulshards
+        end
+        local talented = (OvaleSpellBook:GetTalentPoints(INNER_DEMONS_TALENT) > 0)
+        if talented then
+            local value = OvaleWarlock:GetRemainingDemonDuration(WILD_IMP_INNER_DEMONS, atTime + delay)
+            if value <= 0 then
+                impsSpawned = impsSpawned + 1
+            end
+        end
+        return Compare(impsSpawned, comparator, limit)
+    end
     OvaleCondition:RegisterCondition("demons", false, Demons)
     OvaleCondition:RegisterCondition("notdedemons", false, NotDeDemons)
     OvaleCondition:RegisterCondition("demonduration", false, DemonDuration)
+    OvaleCondition:RegisterCondition("impsspawnedduring", false, ImpsSpawnedDuring)
 end
 do
     local NECROTIC_PLAGUE_TALENT = 19
@@ -2264,10 +2288,17 @@ local function TimeToMaxFocus(positionalParams, namedParams, atTime)
         local level = OvalePower.current.maxPower[powerType] or 0
         return TimeToPower(powerType, level, comparator, limit, atTime)
     end
+local function TimeToMaxMana(positionalParams, namedParams, atTime)
+        local powerType = "mana"
+        local comparator, limit = positionalParams[1], positionalParams[2]
+        local level = OvalePower.current.maxPower[powerType] or 0
+        return TimeToPower(powerType, level, comparator, limit, atTime)
+    end
     OvaleCondition:RegisterCondition("timetoenergy", false, TimeToEnergy)
     OvaleCondition:RegisterCondition("timetofocus", false, TimeToFocus)
     OvaleCondition:RegisterCondition("timetomaxenergy", false, TimeToMaxEnergy)
     OvaleCondition:RegisterCondition("timetomaxfocus", false, TimeToMaxFocus)
+    OvaleCondition:RegisterCondition("timetomaxmana", false, TimeToMaxMana)
 end
 do
 local function TimeToPowerFor(powerType, positionalParams, namedParams, atTime)

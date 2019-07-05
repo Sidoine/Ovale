@@ -30,6 +30,11 @@ Define(blinding_light 115750)
 # Emits dazzling light in all directions, blinding enemies within 105421A1 yards, causing them to wander disoriented for 105421d. Non-Holy damage will break the disorient effect.
   SpellInfo(blinding_light cd=90 duration=6 talent=blinding_light_talent)
   SpellAddBuff(blinding_light blinding_light=1)
+Define(blood_of_the_enemy 297108)
+# The Heart of Azeroth erupts violently, dealing s1 Shadow damage to enemies within A1 yds. You gain m2 critical strike chance against the targets for 10 seconds?a297122[, and increases your critical hit damage by 297126m for 5 seconds][].
+  SpellInfo(blood_of_the_enemy cd=120 duration=10 channel=10)
+  # You have a w2 increased chance to be Critically Hit by the caster.
+  SpellAddTargetDebuff(blood_of_the_enemy blood_of_the_enemy=1)
 Define(consecration 26573)
 # Consecrates the land beneath you, causing 81297s1*9 Holy damage over 12 seconds to enemies who enter the area. Limit s2.
   SpellInfo(consecration cd=4.5 duration=12 tick=1)
@@ -58,6 +63,14 @@ Define(execution_sentence 267798)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
+Define(focused_azerite_beam 295262)
+# Reduces the cast time of Focused Azerite Beam by s1.
+  SpellInfo(focused_azerite_beam channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(focused_azerite_beam focused_azerite_beam=1)
+Define(guardian_of_azeroth 295840)
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
+  SpellInfo(guardian_of_azeroth cd=180 duration=30)
+  SpellAddBuff(guardian_of_azeroth guardian_of_azeroth=1)
 Define(hammer_of_justice 853)
 # Stuns the target for 6 seconds.
   SpellInfo(hammer_of_justice cd=60 duration=6)
@@ -86,9 +99,20 @@ Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
 
+Define(purifying_blast 295337)
+# Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
+  SpellInfo(purifying_blast cd=60 duration=6)
 Define(rebuke 96231)
 # Interrupts spellcasting and prevents any spell in that school from being cast for 4 seconds.
   SpellInfo(rebuke cd=15 duration=4 gcd=0 offgcd=1 interrupt=1)
+Define(reckless_force_buff 298409)
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+  SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
+  # Gaining unstable Azerite energy.
+  SpellAddBuff(reckless_force_buff reckless_force_buff=1)
+Define(seething_rage 297126)
+# Increases your critical hit damage by 297126m for 5 seconds.
+  SpellInfo(seething_rage duration=5 gcd=0 offgcd=1)
 Define(seraphim 152262)
 # The Light temporarily magnifies your power, increasing your Haste, Critical Strike, Mastery, and Versatility by s1.rnrnConsumes up to s2 charges of Shield of the Righteous, and lasts 8 seconds per charge.
   SpellInfo(seraphim cd=45 duration=8 talent=seraphim_talent)
@@ -105,6 +129,11 @@ Define(shield_of_vengeance 184662)
 Define(templars_verdict 85256)
 # Unleashes a powerful weapon strike that deals 224266sw1*<mult> Holy damage to an enemy target.
   SpellInfo(templars_verdict holypower=3)
+Define(the_unbound_force 298452)
+# Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]
+  SpellInfo(the_unbound_force cd=60 duration=2 channel=2 tick=0.33)
+  SpellAddBuff(the_unbound_force the_unbound_force=1)
+  SpellAddTargetDebuff(the_unbound_force the_unbound_force=1)
 Define(wake_of_ashes 255937)
 # Lash out at your enemies, dealing sw1 Radiant damage to all enemies within a1 yd in front of you and reducing their movement speed by s2 for 5 seconds.rnrnDemon and Undead enemies are also stunned for 5 seconds.rnrn|cFFFFFFFFGenerates s3 Holy Power.
   SpellInfo(wake_of_ashes cd=45 duration=5 holypower=-5 talent=wake_of_ashes_talent)
