@@ -79,7 +79,6 @@ local OvaleWarlockClass = __class(OvaleWarlockBase, {
             local now = GetTime()
             for id, v in pairs(demonData) do
                 if id == creatureId then
-                    creatureId = (creatureId == 143622) and 55659 or creatureId
                     self_demons[destGUID] = {
                         id = creatureId,
                         timestamp = now,
@@ -97,7 +96,7 @@ local OvaleWarlockClass = __class(OvaleWarlockBase, {
         elseif cleuEvent == "SPELL_CAST_SUCCESS" then
             if spellId == 196277 then
                 for k, d in pairs(self_demons) do
-                    if d.id == 55659 then
+                    if d.id == 55659 or d.id == 143622 then
                         self_demons[k] = nil
                     end
                 end

@@ -89,11 +89,10 @@ class OvaleWarlockClass extends OvaleWarlockBase {
             let now = GetTime();
             for (const [id, v] of pairs(demonData)) {
                 if (id == creatureId) {
-                    creatureId = (creatureId == 143622) && 55659 || creatureId
                     self_demons[destGUID] = {
                         id: creatureId,
                         timestamp: now,
-                        finish: now + v.duration
+                        finish: now + v.duration,
                     }
                     break;
                 }
@@ -107,7 +106,7 @@ class OvaleWarlockClass extends OvaleWarlockBase {
         } else if (cleuEvent == 'SPELL_CAST_SUCCESS') {
             if (spellId == 196277) {
                 for (const [k, d] of pairs(self_demons)) {
-                    if (d.id == 55659) {
+                    if (d.id == 55659 || d.id == 143622) {
                         delete self_demons[k];
                     }
                 }

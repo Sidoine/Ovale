@@ -2,7 +2,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
     local name = "sc_pr_death_knight_blood"
-    local desc = "[8.1] Simulationcraft: PR_Death_Knight_Blood"
+    local desc = "[8.2] Simulationcraft: PR_Death_Knight_Blood"
     local code = [[
 # Based on SimulationCraft profile "PR_Death_Knight_Blood".
 #	class=deathknight
@@ -51,7 +51,7 @@ AddFunction BloodStandardMainActions
  if Charges(blood_boil count=0) >= 1.8 and { BuffStacks(hemostasis_buff) <= 5 - Enemies() or Enemies() > 2 } Spell(blood_boil)
  #marrowrend,if=buff.bone_shield.stack<5&talent.ossuary.enabled&runic_power.deficit>=15
  if BuffStacks(bone_shield_buff) < 5 and Talent(ossuary_talent) and RunicPowerDeficit() >= 15 Spell(marrowrend)
- #death_strike,if=runic_power.deficit<=(15+buff.dancing_rune_weapon.up*5+spell_targets.heart_strike*talent.heartbreaker.enabled*2)|target.time_to_die<10
+ #death_strike,if=runic_power.deficit<=(15+buff.dancing_rune_weapon.up*5+spell_targets.heart_strike*talent.heartbreaker.enabled*2)|target.1.time_to_die<10
  if RunicPowerDeficit() <= 15 + BuffPresent(dancing_rune_weapon_buff) * 5 + Enemies() * TalentPoints(heartbreaker_talent) * 2 or target.TimeToDie() < 10 Spell(death_strike)
  #heart_strike,if=buff.dancing_rune_weapon.up|rune.time_to_4<gcd
  if BuffPresent(dancing_rune_weapon_buff) or TimeToRunes(4) < GCD() Spell(heart_strike)
@@ -309,7 +309,7 @@ AddIcon checkbox=opt_deathknight_blood_aoe help=cd specialization=blood
 end
 do
     local name = "sc_pr_death_knight_frost"
-    local desc = "[8.1] Simulationcraft: PR_Death_Knight_Frost"
+    local desc = "[8.2] Simulationcraft: PR_Death_Knight_Frost"
     local code = [[
 # Based on SimulationCraft profile "PR_Death_Knight_Frost".
 #	class=deathknight
@@ -320,6 +320,12 @@ Include(ovale_common)
 Include(ovale_trinkets_mop)
 Include(ovale_trinkets_wod)
 Include(ovale_deathknight_spells)
+
+
+AddFunction other_on_use_equipped
+{
+ HasEquippedItem(dread_gladiators_badge_item) or HasEquippedItem(sinister_gladiators_badge_item) or HasEquippedItem(sinister_gladiators_medallion_item) or HasEquippedItem(vial_of_animated_blood_item) or HasEquippedItem(first_mates_spyglass_item) or HasEquippedItem(jes_howler_item) or HasEquippedItem(dread_aspirants_medallion_item)
+}
 
 AddCheckBox(opt_interrupt L(interrupt) default specialization=frost)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=frost)
@@ -487,7 +493,7 @@ AddFunction FrostObliterationCdPostConditions
 
 AddFunction FrostCooldownsMainActions
 {
- #call_action_list,name=cold_heart,if=talent.cold_heart.enabled&((buff.cold_heart.stack>=10&debuff.razorice.stack=5)|target.time_to_die<=gcd)
+ #call_action_list,name=cold_heart,if=talent.cold_heart.enabled&((buff.cold_heart.stack>=10&debuff.razorice.stack=5)|target.1.time_to_die<=gcd)
  if Talent(cold_heart_talent) and { BuffStacks(cold_heart_buff) >= 10 and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } FrostColdheartMainActions()
 }
 
@@ -500,7 +506,7 @@ AddFunction FrostCooldownsShortCdActions
 {
  #pillar_of_frost,if=cooldown.empower_rune_weapon.remains
  if SpellCooldown(empower_rune_weapon) > 0 Spell(pillar_of_frost)
- #call_action_list,name=cold_heart,if=talent.cold_heart.enabled&((buff.cold_heart.stack>=10&debuff.razorice.stack=5)|target.time_to_die<=gcd)
+ #call_action_list,name=cold_heart,if=talent.cold_heart.enabled&((buff.cold_heart.stack>=10&debuff.razorice.stack=5)|target.1.time_to_die<=gcd)
  if Talent(cold_heart_talent) and { BuffStacks(cold_heart_buff) >= 10 and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } FrostColdheartShortCdActions()
 }
 
@@ -511,8 +517,12 @@ AddFunction FrostCooldownsShortCdPostConditions
 
 AddFunction FrostCooldownsCdActions
 {
+ #use_item,name=lurkers_insidious_gift,if=talent.breath_of_sindragosa.enabled&((cooldown.pillar_of_frost.remains<=10&variable.other_on_use_equipped)|(buff.pillar_of_frost.up&!variable.other_on_use_equipped))|(buff.pillar_of_frost.up&!talent.breath_of_sindragosa.enabled)
+ if Talent(breath_of_sindragosa_talent) and { SpellCooldown(pillar_of_frost) <= 10 and other_on_use_equipped() or BuffPresent(pillar_of_frost_buff) and not other_on_use_equipped() } or BuffPresent(pillar_of_frost_buff) and not Talent(breath_of_sindragosa_talent) FrostUseItemActions()
  #use_items,if=(cooldown.pillar_of_frost.ready|cooldown.pillar_of_frost.remains>20)&(!talent.breath_of_sindragosa.enabled|cooldown.empower_rune_weapon.remains>95)
  if { SpellCooldown(pillar_of_frost) == 0 or SpellCooldown(pillar_of_frost) > 20 } and { not Talent(breath_of_sindragosa_talent) or SpellCooldown(empower_rune_weapon) > 95 } FrostUseItemActions()
+ #use_item,name=jes_howler,if=(equipped.lurkers_insidious_gift&buff.pillar_of_frost.remains)|(!equipped.lurkers_insidious_gift&buff.pillar_of_frost.remains<12&buff.pillar_of_frost.up)
+ if HasEquippedItem(lurkers_insidious_gift_item) and BuffPresent(pillar_of_frost_buff) or not HasEquippedItem(lurkers_insidious_gift_item) and BuffRemaining(pillar_of_frost_buff) < 12 and BuffPresent(pillar_of_frost_buff) FrostUseItemActions()
  #use_item,name=knot_of_ancient_fury,if=cooldown.empower_rune_weapon.remains>40
  if SpellCooldown(empower_rune_weapon) > 40 FrostUseItemActions()
  #use_item,name=grongs_primal_rage,if=rune<=3&!buff.pillar_of_frost.up&(!buff.breath_of_sindragosa.up|!talent.breath_of_sindragosa.enabled)
@@ -532,11 +542,11 @@ AddFunction FrostCooldownsCdActions
  {
   #breath_of_sindragosa,use_off_gcd=1,if=cooldown.empower_rune_weapon.remains&cooldown.pillar_of_frost.remains
   if SpellCooldown(empower_rune_weapon) > 0 and SpellCooldown(pillar_of_frost) > 0 Spell(breath_of_sindragosa)
-  #empower_rune_weapon,if=cooldown.pillar_of_frost.ready&!talent.breath_of_sindragosa.enabled&rune.time_to_5>gcd&runic_power.deficit>=10|target.time_to_die<20
+  #empower_rune_weapon,if=cooldown.pillar_of_frost.ready&!talent.breath_of_sindragosa.enabled&rune.time_to_5>gcd&runic_power.deficit>=10|target.1.time_to_die<20
   if SpellCooldown(pillar_of_frost) == 0 and not Talent(breath_of_sindragosa_talent) and TimeToRunes(5) > GCD() and RunicPowerDeficit() >= 10 or target.TimeToDie() < 20 Spell(empower_rune_weapon)
-  #empower_rune_weapon,if=(cooldown.pillar_of_frost.ready|target.time_to_die<20)&talent.breath_of_sindragosa.enabled&rune>=3&runic_power>60
+  #empower_rune_weapon,if=(cooldown.pillar_of_frost.ready|target.1.time_to_die<20)&talent.breath_of_sindragosa.enabled&rune>=3&runic_power>60
   if { SpellCooldown(pillar_of_frost) == 0 or target.TimeToDie() < 20 } and Talent(breath_of_sindragosa_talent) and RuneCount() >= 3 and RunicPower() > 60 Spell(empower_rune_weapon)
-  #call_action_list,name=cold_heart,if=talent.cold_heart.enabled&((buff.cold_heart.stack>=10&debuff.razorice.stack=5)|target.time_to_die<=gcd)
+  #call_action_list,name=cold_heart,if=talent.cold_heart.enabled&((buff.cold_heart.stack>=10&debuff.razorice.stack=5)|target.1.time_to_die<=gcd)
   if Talent(cold_heart_talent) and { BuffStacks(cold_heart_buff) >= 10 and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } FrostColdheartCdActions()
 
   unless Talent(cold_heart_talent) and { BuffStacks(cold_heart_buff) >= 10 and target.DebuffStacks(razorice_debuff) == 5 or target.TimeToDie() <= GCD() } and FrostColdheartCdPostConditions()
@@ -545,7 +555,7 @@ AddFunction FrostCooldownsCdActions
    if { BuffRemaining(pillar_of_frost_buff) <= GCD() or BuffRemaining(pillar_of_frost_buff) < 8 and BuffRemaining(unholy_strength_buff) <= GCD() and BuffPresent(unholy_strength_buff) } and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 Spell(frostwyrms_fury)
    #frostwyrms_fury,if=(buff.icy_citadel.remains<=gcd|(buff.icy_citadel.remains<8&buff.unholy_strength.remains<=gcd&buff.unholy_strength.up))&buff.icy_citadel.up&azerite.icy_citadel.rank>2
    if { BuffRemaining(icy_citadel_buff) <= GCD() or BuffRemaining(icy_citadel_buff) < 8 and BuffRemaining(unholy_strength_buff) <= GCD() and BuffPresent(unholy_strength_buff) } and BuffPresent(icy_citadel_buff) and AzeriteTraitRank(icy_citadel_trait) > 2 Spell(frostwyrms_fury)
-   #frostwyrms_fury,if=target.time_to_die<gcd|(target.time_to_die<cooldown.pillar_of_frost.remains&buff.unholy_strength.up)
+   #frostwyrms_fury,if=target.1.time_to_die<gcd|(target.1.time_to_die<cooldown.pillar_of_frost.remains&buff.unholy_strength.up)
    if target.TimeToDie() < GCD() or target.TimeToDie() < SpellCooldown(pillar_of_frost) and BuffPresent(unholy_strength_buff) Spell(frostwyrms_fury)
   }
  }
@@ -560,7 +570,7 @@ AddFunction FrostCooldownsCdPostConditions
 
 AddFunction FrostColdheartMainActions
 {
- #chains_of_ice,if=buff.cold_heart.stack>5&target.time_to_die<gcd
+ #chains_of_ice,if=buff.cold_heart.stack>5&target.1.time_to_die<gcd
  if BuffStacks(cold_heart_buff) > 5 and target.TimeToDie() < GCD() Spell(chains_of_ice)
  #chains_of_ice,if=(buff.pillar_of_frost.remains<=gcd*(1+cooldown.frostwyrms_fury.ready)|buff.pillar_of_frost.remains<rune.time_to_3)&buff.pillar_of_frost.up&azerite.icy_citadel.rank<=2
  if { BuffRemaining(pillar_of_frost_buff) <= GCD() * { 1 + { SpellCooldown(frostwyrms_fury) == 0 } } or BuffRemaining(pillar_of_frost_buff) < TimeToRunes(3) } and BuffPresent(pillar_of_frost_buff) and AzeriteTraitRank(icy_citadel_trait) <= 2 Spell(chains_of_ice)
@@ -787,7 +797,7 @@ AddFunction FrostDefaultMainActions
 
  unless FrostCooldownsMainPostConditions()
  {
-  #run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&(cooldown.breath_of_sindragosa.remains<5|(cooldown.breath_of_sindragosa.remains<20&target.time_to_die<35))
+  #run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&(cooldown.breath_of_sindragosa.remains<5|(cooldown.breath_of_sindragosa.remains<20&target.1.time_to_die<35))
   if Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } FrostBospoolingMainActions()
 
   unless Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and FrostBospoolingMainPostConditions()
@@ -833,7 +843,7 @@ AddFunction FrostDefaultShortCdActions
 
   unless FrostCooldownsShortCdPostConditions()
   {
-   #run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&(cooldown.breath_of_sindragosa.remains<5|(cooldown.breath_of_sindragosa.remains<20&target.time_to_die<35))
+   #run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&(cooldown.breath_of_sindragosa.remains<5|(cooldown.breath_of_sindragosa.remains<20&target.1.time_to_die<35))
    if Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } FrostBospoolingShortCdActions()
 
    unless Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and FrostBospoolingShortCdPostConditions()
@@ -879,7 +889,7 @@ AddFunction FrostDefaultCdActions
 
   unless FrostCooldownsCdPostConditions()
   {
-   #run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&(cooldown.breath_of_sindragosa.remains<5|(cooldown.breath_of_sindragosa.remains<20&target.time_to_die<35))
+   #run_action_list,name=bos_pooling,if=talent.breath_of_sindragosa.enabled&(cooldown.breath_of_sindragosa.remains<5|(cooldown.breath_of_sindragosa.remains<20&target.1.time_to_die<35))
    if Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } FrostBospoolingCdActions()
 
    unless Talent(breath_of_sindragosa_talent) and { SpellCooldown(breath_of_sindragosa) < 5 or SpellCooldown(breath_of_sindragosa) < 20 and target.TimeToDie() < 35 } and FrostBospoolingCdPostConditions()
@@ -984,8 +994,11 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # cold_heart_buff
 # cold_heart_talent
 # death_strike
+# dread_aspirants_medallion_item
+# dread_gladiators_badge_item
 # empower_rune_weapon
 # empower_rune_weapon_buff
+# first_mates_spyglass_item
 # frost_fever_debuff
 # frost_strike
 # frostscythe
@@ -1002,7 +1015,9 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # icy_citadel_trait
 # icy_talons_buff
 # item_battle_potion_of_strength
+# jes_howler_item
 # killing_machine_buff
+# lurkers_insidious_gift_item
 # mind_freeze
 # obliterate
 # obliteration_talent
@@ -1012,14 +1027,17 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # remorseless_winter
 # rime_buff
 # runic_attenuation_talent
+# sinister_gladiators_badge_item
+# sinister_gladiators_medallion_item
 # unholy_strength_buff
+# vial_of_animated_blood_item
 # war_stomp
 ]]
     OvaleScripts:RegisterScript("DEATHKNIGHT", "frost", name, desc, code, "script")
 end
 do
     local name = "sc_pr_death_knight_unholy"
-    local desc = "[8.1] Simulationcraft: PR_Death_Knight_Unholy"
+    local desc = "[8.2] Simulationcraft: PR_Death_Knight_Unholy"
     local code = [[
 # Based on SimulationCraft profile "PR_Death_Knight_Unholy".
 #	class=deathknight

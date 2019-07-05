@@ -853,18 +853,18 @@ export interface SpellData {
     /** 40 Azerite power id */
     power_id: number;
     // Textual data
-    /** 41 Spell.dbc description stringblock */
+    /** 42 Spell.dbc description stringblock */
     desc: string;
-    /** 42 Spell.dbc tooltip stringblock */
+    /** 43 Spell.dbc tooltip stringblock */
     tooltip: string;
     // SpellDescriptionVariables.dbc
-    /** 43 Spell description variable stringblock, if present */
+    /** 44 Spell description variable stringblock, if present */
     desc_vars: string;
     // SpellIcon.dbc
-    /** 44 */
+    /** 45 */
     rank_str: string;
 
-    /** 45 */
+    /** 46 */
     req_max_level: number;
 
     spellEffects?: SpellEffectData[];
@@ -1230,11 +1230,11 @@ export function getSpellData(directory: string) {
             stance_mask: row[38],
             mechanic: row[39],
             power_id: row[40],
-            desc: row[41],
-            tooltip: row[42],
-            desc_vars: row[43],
-            rank_str: row[44],
-            req_max_level: row[45],
+            desc: row[42],
+            tooltip: row[43],
+            desc_vars: row[44],
+            rank_str: row[45],
+            req_max_level: row[46],
             identifierScore: 0
         };
 
