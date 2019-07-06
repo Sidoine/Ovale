@@ -423,16 +423,16 @@ Define(barkskin_buff 22812)
 Define(innervate_buff 29166)
 
 # Shared talents
-Define(tigers_dash_talent 4)
+Define(tiger_dash_talent 4)
 Define(soul_of_the_forest_talent 13)
 Define(incarnation_talent 15)
 
 # Shared talent spells
-Define(tigers_dash 252216)
-	SpellInfo(tigers_dash cd=45)
-	SpellInfo(tigers_dash gcd=0 offgcd=1 if_stance=druid_cat_form)
-	SpellInfo(tigers_dash to_stance=druid_cat_form if_stance=!druid_cat_form)
-	SpellInfo(dash replaced_by=tigers_dash talent=tigers_dash_talent)
+Define(tiger_dash 252216)
+	SpellInfo(tiger_dash cd=45)
+	SpellInfo(tiger_dash gcd=0 offgcd=1 if_stance=druid_cat_form)
+	SpellInfo(tiger_dash to_stance=druid_cat_form if_stance=!druid_cat_form)
+	SpellInfo(dash replaced_by=tiger_dash talent=tiger_dash_talent)
 Define(renewal 108238)
 	SpellInfo(renewal cd=120 gcd=0 offgcd=1 specialization=!guardian)
 
