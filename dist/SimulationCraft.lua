@@ -3134,8 +3134,14 @@ EmitOperandEssence = function(operand, parseNode, nodeList, annotation, action, 
     local token = tokenIterator()
     if token == "essence" then
         local code
-        __exports.OvaleSimulationCraft:Print("Warning: operand '%s' not implemented yet.", operand)
-        code = "False()"
+        local name = tokenIterator()
+        local property = tokenIterator()
+        -- __exports.OvaleSimulationCraft:Print("Warning: operand '%s' not implemented yet.", operand)
+        if property == "major" then
+            code = format("SpellKnown(%s_essence)", name)
+        else
+            ok = false
+        end
         if ok and code then
             annotation.astAnnotation = annotation.astAnnotation or {}
             node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)

@@ -661,6 +661,7 @@ Define(lava_shock_buff 273448)
 Define(lava_shock_trait 273448)
 Define(tectonic_thunder_buff 286949)
 Define(tectonic_thunder_trait 286949)
+Define(crackling_surge_buff 224127)
 
 # Legendary items
 Define(echoes_of_the_great_sundering_item 137074)
