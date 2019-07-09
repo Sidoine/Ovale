@@ -240,6 +240,7 @@ local CHARACTER_PROPERTY = {
     ["mana.deficit"] = "ManaDeficit()",
     ["mana.max"] = "MaxMana()",
     ["mana.pct"] = "ManaPercent()",
+    ["mana.time_to_max"] = "TimeToMaxMana()",
     ["maelstrom"] = "Maelstrom()",
     ["next_wi_bomb.pheromone"] = "SpellUsable(270323)",
     ["next_wi_bomb.shrapnel"] = "SpellUsable(270335)",
@@ -1380,6 +1381,10 @@ local InitializeDisambiguation = function()
     AddDisambiguation("bloodlust_buff", "burst_haste_buff")
     AddDisambiguation("exhaustion_buff", "burst_haste_debuff")
     AddDisambiguation("buff_sephuzs_secret", "sephuzs_secret_buff")
+    AddDisambiguation("concentrated_flame", "concentrated_flame_essence")
+    AddDisambiguation("memory_of_lucid_dreams", "memory_of_lucid_dreams_essence")
+    AddDisambiguation("ripple_in_space", "ripple_in_space_essence")
+    AddDisambiguation("worldvein_resonance", "worldvein_resonance_essence")
     AddDisambiguation("arcane_torrent", "arcane_torrent_runicpower", "DEATHKNIGHT")
     AddDisambiguation("arcane_torrent", "arcane_torrent_dh", "DEMONHUNTER")
     AddDisambiguation("arcane_torrent", "arcane_torrent_energy", "DRUID")
@@ -1425,6 +1430,8 @@ local InitializeDisambiguation = function()
     AddDisambiguation("incarnation", "incarnation_tree_of_life", "DRUID", "restoration")
     AddDisambiguation("incarnation", "incarnation_king_of_the_jungle", "DRUID", "feral")
     AddDisambiguation("incarnation", "incarnation_guardian_of_ursoc", "DRUID", "guardian")
+    AddDisambiguation("swipe", "swipe_bear", "DRUID", "guardian")
+    AddDisambiguation("swipe", "swipe_cat", "DRUID", "feral")
     AddDisambiguation("a_murder_of_crows_talent", "mm_a_murder_of_crows_talent", "HUNTER", "marksmanship")
     AddDisambiguation("cat_beast_cleave", "pet_beast_cleave", "HUNTER", "beast_mastery")
     AddDisambiguation("cat_frenzy", "pet_frenzy", "HUNTER", "beast_mastery")
@@ -1713,6 +1720,8 @@ SplitByTagCustomFunction = function(tag, node, nodeList, annotation)
                 functionTag = "cd"
             elseif find(functionName, "UsePotion") then
                 functionTag = "cd"
+            elseif find(functionName, "UseHeartEssence") then
+                functionTag = "cd"
             end
         end
         if functionTag then
@@ -1869,6 +1878,7 @@ local EmitOperandCharacter = nil
 local EmitOperandCooldown = nil
 local EmitOperandDisease = nil
 local EmitOperandDot = nil
+local EmitOperandEssence = nil
 local EmitOperandGlyph = nil
 local EmitOperandGroundAoe = nil
 local EmitOperandPet = nil
@@ -2540,6 +2550,10 @@ EmitAction = function(parseNode, nodeList, annotation)
                 end
             end
             isSpellAction = false
+        elseif action == "heart_essence" then
+            bodyCode = camelSpecialization .. "UseHeartEssence()"
+            annotation.use_heart_essence = true
+            isSpellAction = false
         end
         if isSpellAction then
             AddSymbol(annotation, action)
@@ -2733,6 +2747,8 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
                 if parseNode.operator == "=" then
                     if name == "sim_target" then
                         code = "True(target_is_sim_target)"
+                    elseif name == "target" then
+                        code = "False(target_is_target)"
                     else
                         code = format("target.Name(%s)", name)
                         AddSymbol(annotation, name)
@@ -2867,6 +2883,8 @@ EmitOperand = function(parseNode, nodeList, annotation, action)
         elseif token == "dot" then
             target = target or "target"
             ok, node = EmitOperandDot(operand, parseNode, nodeList, annotation, action, target)
+        elseif token == "essence" then
+            ok, node = EmitOperandEssence(operand, parseNode, nodeList, annotation, action, target)
         elseif token == "glyph" then
             ok, node = EmitOperandGlyph(operand, parseNode, nodeList, annotation, action)
         elseif token == "pet" then
@@ -2922,7 +2940,7 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
     target = target and (target .. ".") or ""
     local buffName = name .. "_debuff"
     buffName = Disambiguate(annotation, buffName, className, specialization)
-    local prefix = find(buffName, "_buff$") and "Buff" or "Debuff"
+    local prefix = find(buffName, "_debuff$") and "Debuff" or "Buff"
     local buffTarget = (prefix == "Debuff") and "target." or target
     local talentName = name .. "_talent"
     talentName = Disambiguate(annotation, talentName, className, specialization)
@@ -2955,6 +2973,8 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
         code = format("PowerCost(%s)", name)
     elseif property == "crit_damage" then
         code = format("%sCritDamage(%s)", target, name)
+    elseif property == "damage" then
+        code = format("%sDamage(%s)", target, name)
     elseif property == "duration" or property == "new_duration" then
         code = format("BaseDuration(%s)", buffName)
         symbol = buffName
@@ -2994,6 +3014,8 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
         end
     elseif property == "shard_react" then
         code = "SoulShards() >= 1"
+    elseif property == "tick_dmg" then
+        code = format("%sLastDamage(%s)", buffTarget, buffName)
     elseif property == "tick_time" then
         code = format("%sCurrentTickTime(%s)", buffTarget, buffName)
         symbol = buffName
@@ -3105,6 +3127,25 @@ EmitOperandAzerite = function(operand, parseNode, nodeList, annotation, action, 
     return ok, node
 end
 
+EmitOperandEssence = function(operand, parseNode, nodeList, annotation, action, target)
+    local ok = true
+    local node
+    local tokenIterator = gmatch(operand, OPERAND_TOKEN_PATTERN)
+    local token = tokenIterator()
+    if token == "essence" then
+        local code
+        __exports.OvaleSimulationCraft:Print("Warning: operand '%s' not implemented yet.", operand)
+        code = "False()"
+        if ok and code then
+            annotation.astAnnotation = annotation.astAnnotation or {}
+            node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+        end
+    else
+        ok = false
+    end
+    return ok, node
+end
+
 EmitOperandRefresh = function(operand, parseNode, nodeList, annotation, action, target)
     local ok = true
     local node
@@ -3142,7 +3183,12 @@ EmitOperandBuff = function(operand, parseNode, nodeList, annotation, action, tar
         name = Disambiguate(annotation, name, annotation.class, annotation.specialization)
         local buffName = (token == "debuff") and name .. "_debuff" or name .. "_buff"
         buffName = Disambiguate(annotation, buffName, annotation.class, annotation.specialization)
-        local prefix = find(buffName, "_buff$") and "Buff" or "Debuff"
+        local prefix
+        if  not find(buffName, "_debuff$") and  not find(buffName, "_debuff$") then
+            prefix = target == "target" and "Debuff" or "Buff"
+        else
+            prefix = find(buffName, "_debuff$") and "Debuff" or "Buff"
+        end
         local any = OvaleData.DEFAULT_SPELL_LIST[buffName] and " any=1" or ""
         target = target and (target .. ".") or ""
         if buffName == "dark_transformation_buff" and target == "" then
@@ -3207,6 +3253,10 @@ EmitOperandCharacter = function(operand, parseNode, nodeList, annotation, action
     local code
     if CHARACTER_PROPERTY[operand] then
         code = target .. CHARACTER_PROPERTY[operand]
+    elseif operand == "position_front" then
+        code = annotation.position == "front" and "True(position_front)" or "False(position_front)"
+    elseif operand == "position_back" then
+        code = annotation.position == "back" and "True(position_back)" or "False(position_back)"
     elseif className == "MAGE" and operand == "incanters_flow_dir" then
         local name = "incanters_flow_buff"
         code = format("BuffDirection(%s)", name)
@@ -3250,8 +3300,6 @@ EmitOperandCharacter = function(operand, parseNode, nodeList, annotation, action
         end
     elseif operand == "mastery_value" then
         code = format("%sMasteryEffect() / 100", target)
-    elseif operand == "position_front" then
-        code = "False(position_front)"
     elseif sub(operand, 1, 5) == "role." then
         local role = match(operand, "^role%.([%w_]+)")
         if role and role == annotation.role then
@@ -3913,12 +3961,20 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
         code = "target.DebuffPresent(exsanguinated)"
         AddSymbol(annotation, "exsanguinated")
     elseif className == "ROGUE" and operand == "ss_buffed" then
-        code = "False()"
+        code = "False(ss_buffed)"
+    elseif className == "ROGUE" and operand == "non_ss_buffed_targets" then
+        code = "Enemies() - DebuffCountOnAny(garrote_debuff)"
+        AddSymbol(annotation, "garrote_debuff")
+    elseif className == "ROGUE" and operand == "ss_buffed_targets_above_pandemic" then
+        code = "0"
     elseif className == "ROGUE" and operand == "master_assassin_remains" then
         code = "BuffRemaining(master_assassin_buff)"
         AddSymbol(annotation, "master_assassin_buff")
     elseif className == "ROGUE" and operand == "buff.roll_the_bones.remains" then
         code = "BuffRemaining(roll_the_bones_buff)"
+        AddSymbol(annotation, "roll_the_bones_buff")
+    elseif className == "ROGUE" and operand == "buff.roll_the_bones.up" then
+        code = "BuffPresent(roll_the_bones_buff)"
         AddSymbol(annotation, "roll_the_bones_buff")
     elseif className == "SHAMAN" and operand == "buff.resonance_totem.remains" then
         local spell = Disambiguate(annotation, "totem_mastery", annotation.class, annotation.specialization)
@@ -3951,11 +4007,23 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
     elseif className == "WARLOCK" and operand == "contagion" then
         code = "BuffRemaining(unstable_affliction_buff)"
     elseif className == "WARLOCK" and operand == "buff.wild_imps.stack" then
-        code = "Demons(wild_imp)"
+        code = "Demons(wild_imp) + Demons(wild_imp_inner_demons)"
+        AddSymbol(annotation, "wild_imp")
+        AddSymbol(annotation, "wild_imp_inner_demons")
     elseif className == "WARLOCK" and operand == "buff.dreadstalkers.remains" then
         code = "DemonDuration(dreadstalker)"
-    elseif className == "WARLOCK" and match(operand, "prev_gcd.%d.hand_of_guldan") then
-        code = "PreviousGCDSpell(hand_of_guldan)"
+        AddSymbol(annotation, "dreadstalker")
+    elseif className == "WARLOCK" and match(operand, "imps_spawned_during.([%d]+)") then
+        local ms = match(operand, "imps_spawned_during.([%d]+)")
+        code = format("ImpsSpawnedDuring(%d)", ms)
+    elseif className == "WARLOCK" and operand == "time_to_imps.all.remains" then
+        code = "0"
+    elseif className == "WARLOCK" and operand == "havoc_active" then
+        code = "DebuffCountOnAny(havoc_debuff) > 0"
+        AddSymbol(annotation, "havoc_debuff")
+    elseif className == "WARLOCK" and operand == "havoc_remains" then
+        code = "DebuffRemainingOnAny(havoc_debuff)"
+        AddSymbol(annotation, "havoc_debuff")
     elseif className == "WARRIOR" and sub(operand, 1, 23) == "buff.colossus_smash_up." then
         local property = sub(operand, 24)
         local debuffName = "colossus_smash_debuff"
@@ -4029,11 +4097,7 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
     elseif operand == "ptr" then
         code = "PTR()"
     elseif operand == "time_to_die" then
-        if target ~= "" then
-            code = target .. "TimeToDie()"
-        else
-            code = "target.TimeToDie()"
-        end
+        code = "target.TimeToDie()"
     elseif sub(operand, 1, 10) == "using_apl." then
         local aplName = match(operand, "^using_apl%.([%w_]+)")
         code = format("List(opt_using_apl %s)", aplName)
@@ -4102,9 +4166,19 @@ EmitOperandTarget = function(operand, parseNode, nodeList, annotation, action)
     local token = tokenIterator()
     if token == "target" then
         local property = tokenIterator()
+        local howMany = 1
+        if tonumber(property) then
+            howMany = tonumber(property)
+            property = tokenIterator()
+        end
+        if howMany > 1 then
+            __exports.OvaleSimulationCraft:Print("Warning: target.%d.%property has not been implemented for multiple targets. (%s)", operand)
+        end
         local code
         if property == "adds" then
             code = "Enemies()-1"
+        elseif property == "time_to_die" then
+            code = "target.TimeToDie()"
         else
             ok = false
         end
@@ -5022,6 +5096,20 @@ local InsertSupportingFunctions = function(child, annotation)
         annotation.functionTag[node.name] = "cd"
         count = count + 1
     end
+    if annotation.use_heart_essence then
+        local fmt = [[
+			AddFunction %sUseHeartEssence
+			{
+				Spell(concentrated_flame_essence)
+			}
+		]]
+        local code = format(fmt, camelSpecialization)
+        local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+        insert(child, 1, node)
+        annotation.functionTag[node.name] = "cd"
+        count = count + 1
+        AddSymbol(annotation, "concentrated_flame_essence")
+    end
     return count
 end
 
@@ -5326,6 +5414,7 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
                 annotation.melee = annotation.class
             end
         end
+        annotation.position = profile.position
         local taggedFunctionName = {}
         for _, node in ipairs(actionList) do
             local fname = OvaleFunctionName(node.name, annotation)

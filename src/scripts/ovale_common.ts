@@ -1,7 +1,7 @@
 import { OvaleScripts } from "../Scripts";
 export function register() {
     let name = "ovale_common";
-    let desc = "[7.3.2] Ovale: Common spell definitions";
+    let desc = "[8.2] Ovale: Common spell definitions";
     let code = `
 # Common spell definitions shared by all classes and specializations.
 
@@ -91,8 +91,10 @@ Define(item_battle_potion_of_intellect 163222)
 Define(item_battle_potion_of_strength 163224)
 Define(item_battle_potion_of_stamina 163225)
 Define(item_bursting_blood 152560)
+Define(item_focused_resolve 168506)
 Define(item_rising_death 152559)
 Define(item_steelskin_potion 152557)
+Define(item_unbridled_fury 169299)
 
 ###
 ### Trinkets & OnUse Rings
@@ -161,6 +163,22 @@ Define(archmages_incandescence_str_buff 177160)
 Define(sephuzs_secret_item 132452)
 Define(sephuzs_secret_buff 208051)
 	SpellInfo(sephuzs_secret_buff buff_cd=30 duration=10)
+	
+###
+### Essences
+###
+
+Define(concentrated_flame_essence 295373)
+    SpellInfo(concentrated_flame_essence cd=30 tag=main)
+    Define(concentrated_flame_burn_debuff 295377)
+Define(memory_of_lucid_dreams_essence 298357)
+    SpellInfo(memory_of_lucid_dreams_essence cd=120 tag=cd)
+    Define(memory_of_lucid_dreams_essence_buff 298357)
+Define(ripple_in_space_essence 302731)
+    SpellInfo(ripple_in_space_essence cd=60 tag=shortcd)
+Define(worldvein_resonance_essence 295186)
+    SpellInfo(worldvein_resonance_essence cd=60 tag=shortcd)
+    Define(lifeblood_buff 295137)
 
 ###
 ### Racials

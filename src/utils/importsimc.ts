@@ -155,7 +155,7 @@ for (const filename of files) {
             output.push("");
             output.push("{");
             output.push(format('	const name = "sc_%s"', name));
-            output.push(format('	const desc = "[8.1] Simulationcraft: %s"', desc));
+            output.push(format('	const desc = "[8.2] Simulationcraft: %s"', desc));
             output.push("	const code = `");
             output.push(OvaleSimulationCraft.Emit(profile, true));
             output.push("`");

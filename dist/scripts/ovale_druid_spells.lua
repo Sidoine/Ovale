@@ -20,12 +20,12 @@ Define(barkskin 22812)
   # All damage taken reduced by s2.
   SpellAddBuff(barkskin barkskin=1)
 Define(bear_form 5487)
-# Shapeshift into Bear Form, increasing armor by m3 and Stamina by 1178s2, granting protection from Polymorph effects, and increasing threat generation.rnrnThe act of shapeshifting frees you from movement impairing effects.
+# Shapeshift into Bear Form, increasing armor by m4 and Stamina by 1178s2, granting protection from Polymorph effects, and increasing threat generation.rnrnThe act of shapeshifting frees you from movement impairing effects.
 # Rank 2: Bear Form gives an additional s1 Stamina.rn
   SpellInfo(bear_form)
-  # Armor increased by w3.rnStamina increased by 1178s2.rnImmune to Polymorph effects.
+  # Armor increased by w4.rnStamina increased by 1178s2.rnImmune to Polymorph effects.
   SpellAddBuff(bear_form bear_form=1)
-  # Armor increased by w3.rnStamina increased by 1178s2.rnImmune to Polymorph effects.
+  # Armor increased by w4.rnStamina increased by 1178s2.rnImmune to Polymorph effects.
   SpellAddTargetDebuff(bear_form bear_form=1)
 Define(berserk 106951)
 # Reduces the energy cost of all Cat Form abilities by s1 and increases maximum Energy by s3 for 20 seconds.
@@ -42,6 +42,11 @@ Define(blood_fury 20572)
   SpellInfo(blood_fury cd=120 duration=15 gcd=0 offgcd=1)
   # Attack power increased by w1.
   SpellAddBuff(blood_fury blood_fury=1)
+Define(blood_of_the_enemy 297108)
+# The Heart of Azeroth erupts violently, dealing s1 Shadow damage to enemies within A1 yds. You gain m2 critical strike chance against the targets for 10 seconds?a297122[, and increases your critical hit damage by 297126m for 5 seconds][].
+  SpellInfo(blood_of_the_enemy cd=120 duration=10 channel=10)
+  # You have a w2 increased chance to be Critically Hit by the caster.
+  SpellAddTargetDebuff(blood_of_the_enemy blood_of_the_enemy=1)
 Define(bristling_fur 155835)
 # Bristle your fur, causing you to generate Rage based on damage taken for 8 seconds.
   SpellInfo(bristling_fur cd=40 duration=8 talent=bristling_fur_talent)
@@ -53,7 +58,7 @@ Define(brutal_slash 202028)
 Define(cat_form 768)
 # Shapeshift into Cat Form, increasing auto-attack damage by (25 of Spell Power), movement speed by 113636s1, granting protection from Polymorph effects, and reducing falling damage.rnrnThe act of shapeshifting frees you from movement impairing effects.
   SpellInfo(cat_form)
-  # Autoattack damage increased by w3.rnImmune to Polymorph effects.rnMovement speed increased by 113636s1 and falling damage reduced.
+  # Autoattack damage increased by w4.rnImmune to Polymorph effects.rnMovement speed increased by 113636s1 and falling damage reduced.
   SpellAddBuff(cat_form cat_form=1)
 Define(celestial_alignment 194223)
 # Celestial bodies align, granting s5/10 Astral Power, and increasing spell damage by s1 and Haste by s3 for 20 seconds.
@@ -68,8 +73,12 @@ Define(ferocious_bite 22568)
 # Finishing move that causes Physical damage per combo point and consumes up to ?a106951[25*106951s1/-100.1]?a102543[25*(25 of Spell Power)/-100.1][25] additional Energy to increase damage by up to 100.rnrn?s202031[Ferocious Bite will also refresh the duration of your Rip on your target.rnrn][]   1 point  : m1*1/5 damagern   2 points: m1*2/5 damagern   3 points: m1*3/5 damagern   4 points: m1*4/5 damagern   5 points: m1*5/5 damage
   SpellInfo(ferocious_bite energy=25 combopoints=1 gcd=1)
 Define(fireblood 265221)
-# Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. 
+# Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
+Define(focused_azerite_beam 295262)
+# Reduces the cast time of Focused Azerite Beam by s1.
+  SpellInfo(focused_azerite_beam channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(focused_azerite_beam focused_azerite_beam=1)
 Define(force_of_nature 205636)
 # Summons a stand of s1 Treants for 10 seconds which immediately taunt and attack enemies in the targeted area.rnrn|cFFFFFFFFGenerates m5/10 Astral Power.|r
   SpellInfo(force_of_nature cd=60 lunarpower=-20 talent=force_of_nature_talent)
@@ -82,6 +91,10 @@ Define(fury_of_elune 202770)
   SpellInfo(fury_of_elune cd=60 duration=8 tick=0.5 talent=fury_of_elune_talent)
   # Generating m3/10/t3*d Astral Power over d.
   SpellAddBuff(fury_of_elune fury_of_elune=1)
+Define(guardian_of_azeroth 295840)
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
+  SpellInfo(guardian_of_azeroth cd=180 duration=30)
+  SpellAddBuff(guardian_of_azeroth guardian_of_azeroth=1)
 Define(half_moon 274282)
 # Deals m1 Arcane damage to the target and empowers Half Moon to become Full Moon.rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
   SpellInfo(half_moon cd=25 lunarpower=-20)
@@ -119,7 +132,7 @@ Define(iron_jaws 276026)
 Define(ironfur 192081)
 # Increases armor by s1*AGI/100 for 7 seconds.?a231070[ Multiple uses of this ability may overlap.][]
 # Rank 2: Multiple uses of Ironfur may overlap.rn
-  SpellInfo(ironfur rage=45 cd=0.5 duration=7 max_stacks=1 gcd=0 offgcd=1)
+  SpellInfo(ironfur rage=40 cd=0.5 duration=7 max_stacks=1 gcd=0 offgcd=1)
   # Armor increased by w1*AGI/100.
   SpellAddBuff(ironfur ironfur=1)
 Define(lights_judgment 255647)
@@ -142,15 +155,15 @@ Define(maim 22570)
 Define(mangle 33917)
 # Mangle the target for s2 Physical damage.?a231064[ Deals s3 additional damage against bleeding targets.][]rnrn|cFFFFFFFFGenerates m4/10 Rage.|r
 # Rank 2: Mangle deals 33917s3 additional damage against bleeding targets.
-  SpellInfo(mangle cd=6 rage=-8)
+  SpellInfo(mangle cd=6 rage=-10)
 Define(maul 6807)
 # Maul the target for s2 Physical damage.
-  SpellInfo(maul rage=45)
+  SpellInfo(maul rage=40)
 Define(mighty_bash 5211)
   SpellInfo(mighty_bash cd=50 duration=5 interrupt=1 talent=mighty_bash_talent)
   SpellAddTargetDebuff(mighty_bash mighty_bash=1)
 Define(moonfire 8921)
-# A quick beam of lunar light burns the enemy for (14.499999999999998 of Spell Power) Arcane damage and then an additional 164812o2 Arcane damage over 16 seconds.?s5487[ Usable while in Bear Form.][]?s197911[rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r][]
+# A quick beam of lunar light burns the enemy for (14.499999999999998 of Spell Power) Arcane damage and then an additional 164812o2 Arcane damage over 16 seconds.?s197911[rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r][]
   SpellInfo(moonfire rage=0 lunarpower=0)
 Define(new_moon 274281)
 # Deals m1 Arcane damage to the target and empowers New Moon to become Half Moon. rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
@@ -168,6 +181,9 @@ Define(prowl 5215)
 Define(pulverize 80313)
 # A devastating blow that consumes s3 stacks of your Thrash on the target to deal s1 Physical damage, and reduces all damage you take by 158792s1 for 20 seconds.
   SpellInfo(pulverize talent=pulverize_talent)
+Define(purifying_blast 295337)
+# Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
+  SpellInfo(purifying_blast cd=60 duration=6)
 Define(rake 1822)
 # Rake the target for s1 Bleed damage and an additional 155722o1 Bleed damage over 15 seconds.?s48484[ Reduces the target's movement speed by 58180s1 for 12 seconds.][]?a231052[ rnrnWhile stealthed, Rake will also stun the target for 4 seconds, and deal s4 increased damage.][]rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
 # Rank 2: While stealthed, Rake will also stun the target for 4 seconds, and deal 1822s4 increased damage.
@@ -179,6 +195,11 @@ Define(rake_debuff 155722)
   SpellInfo(rake_debuff duration=15 gcd=0 offgcd=1 tick=3)
   # Bleeding for w1 damage every t1 seconds.
   SpellAddTargetDebuff(rake_debuff rake_debuff=1)
+Define(reckless_force_buff 298409)
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+  SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
+  # Gaining unstable Azerite energy.
+  SpellAddBuff(reckless_force_buff reckless_force_buff=1)
 Define(regrowth 8936)
 # Heals a friendly target for (120 of Spell Power) and another o2*<mult> over 12 seconds.?s231032[ Regrowth's initial heal has a 231032s1 increased chance for a critical effect.][]?s24858|s197625[ Usable while in Moonkin Form.][]?s33891[rnrn|C0033AA11Tree of Life: Instant cast.|R][]
   SpellInfo(regrowth duration=12 tick=2)
@@ -204,6 +225,9 @@ Define(shadowmeld 58984)
   SpellInfo(shadowmeld cd=120 channel=-0.001 gcd=0 offgcd=1)
   # Shadowmelded.
   SpellAddBuff(shadowmeld shadowmeld=1)
+Define(sharpened_claws_buff 268525)
+# Your attacks have a chance to summon a whirlwind of sharpened claws, inflicting 268525s1 Physical damage split evenly among all enemies within 268525A1 yards.
+  SpellInfo(sharpened_claws_buff channel=0 gcd=0 offgcd=1)
 Define(shred 5221)
 # Shred the target, causing s1*<mult> Physical damage to the target.?a231063[ Deals s4 increased damage against bleeding targets.][]?a231057[rnrnWhile stealthed, Shred deals m3 increased damage, and has double the chance to critically strike.][]?c2[rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r]?s202155[rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.][]
 # Rank 2: Shred deals 5221s5 increased damage against bleeding targets.
@@ -221,7 +245,7 @@ Define(solar_wrath_balance 190984)
   SpellInfo(solar_wrath_balance lunarpower=0)
 Define(starfall 191034)
 # Calls down waves of falling stars at the targeted area, dealing 9*191037m1 Astral damage over 8 seconds.
-  SpellInfo(starfall lunarpower=50 duration=8 channel=8)
+  SpellInfo(starfall lunarpower=50 duration=8)
   # Calling down falling stars at the targeted area.
   SpellAddBuff(starfall starfall=1)
 Define(starlord 202345)
@@ -237,10 +261,16 @@ Define(sunfire 93402)
 # A quick beam of solar light burns the enemy for (20 of Spell Power) Nature damage and then an additional 164815o2 Nature damage over 12 seconds?s231050[ to the primary target and all enemies within 164815A2 yards][].?s137013[rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r][]
 # Rank 2: Sunfire now applies its damage over time effect to all enemies within 164815A2 yards.
   SpellInfo(sunfire lunarpower=0)
-Define(swipe 213764)
-# Swipe nearby enemies, inflicting Physical damage. Damage varies by shapeshift form.
-# Rank 2: Swipe deals 106785s2 increased damage against bleeding targets.
-  SpellInfo(swipe gcd=1)
+Define(the_unbound_force 298452)
+# Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]
+  SpellInfo(the_unbound_force cd=60 duration=2 channel=2 tick=0.33)
+  SpellAddBuff(the_unbound_force the_unbound_force=1)
+  SpellAddTargetDebuff(the_unbound_force the_unbound_force=1)
+Define(thorns 236696)
+# Sprout thorns for 12 seconds on the friendly target. When victim to melee attacks, thorns deals up to 203728s2 of the attackers total health in Nature damage.rnrnAttackers also have their movement speed reduced by 232559s1 for 4 seconds.
+# Rank 1: When struck in combat you have a chance to inflict 15438s1 Arcane damage to the attacker.
+  SpellInfo(thorns cd=45 duration=12 gcd=1)
+
 Define(thrash 106832)
 # Thrash all nearby enemies, dealing immediate physical damage and periodic bleed damage. Damage varies by shapeshift form.
   SpellInfo(thrash gcd=0 offgcd=1)
@@ -322,7 +352,6 @@ Define(lively_spirit_trait 279642)
 Define(streaking_stars_trait 272871)
 Define(wild_fleshrending_trait 279527)
 Define(layered_mane_trait 279552)
-Define(power_of_the_moon_trait 273367)
     ]]
     code = code .. [[
 Define(astralpower "lunarpower") # Astral Power is named LunarPower in Enum.PowerType
@@ -343,12 +372,11 @@ Define(dash 1850)
 Define(entangling_roots 339)
 Define(growl 6795)
 	SpellInfo(growl cd=8)
+
 Define(hibernate 2637)
 
 	SpellInfo(shred energy=40 combopoints=-1)
 	SpellInfo(shred physical=1)
-
-	SpellInfo(mangle rage=-8 cd=6 cd_haste=melee)
 
 	SpellInfo(moonfire mana=6)
 	SpellInfo(moonfire unusable=1 if_stance=druid_cat_form)
@@ -379,6 +407,7 @@ Define(survival_instincts_buff 61336)
 	SpellInfo(survival_instincts_buff duration=6)
 Define(stampeding_roar 77761)
 	SpellInfo(stampeding_roar cd=120)
+	
 
 # Balance and Restoration shared
  # Also Guardian
@@ -446,10 +475,9 @@ Define(frenzied_regeneration 22842)
 Define(frenzied_regeneration_buff 22842)
 	SpellInfo(frenzied_regeneration_buff duration=3)
 
-	SpellInfo(ironfur rage=45 cd=0.5 offgcd=1)
 	SpellAddBuff(ironfur ironfur_buff=1)
 Define(ironfur_buff 192081)
-	SpellInfo(ironfur_buff duration=7)
+	SpellInfo(ironfur_buff duration=7 max_stacks=8)
 	SpellRequire(ironfur_buff add_duration 2=buff,guardian_of_elune_buff)
 Define(thrash_bear 77758)
 	SpellInfo(thrash_bear rage=-5 cd=6 cd_haste=melee)
@@ -600,7 +628,7 @@ Define(intimidating_roar 236748)
 	SpellInfo(mangle addrage=-4 talent=soul_of_the_forest_talent specialization=guardian)
 	SpellAddBuff(mangle guardian_of_elune_buff=1 talent=guardian_of_elune_talent)
 
-	SpellInfo(maul rage=45 stance=druid_bear_form)
+	SpellInfo(maul stance=druid_bear_form)
 
 	SpellRequire(pulverize unusable 1=target_debuff,!thrash_bear_debuff,2)
 	SpellAddBuff(pulverize pulverize_buff=1)
@@ -610,7 +638,8 @@ Define(pulverize_buff 158792)
 
 	SpellInfo(survival_instincts add_cd=120 specialization=guardian)
 	SpellInfo(survival_instincts add_cd=-80 specialization=guardian talent=survival_of_the_fittest_talent) 
-
+Define(swipe_bear 213771)
+	
 	SpellInfo(thrash_bear_debuff max_stacks=5 if_equipped=elizes_everlasting_encasement)
 
 # Guardian Legendaries

@@ -23,6 +23,11 @@ Define(berserking 26297)
   SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
   # Haste increased by s1.
   SpellAddBuff(berserking berserking=1)
+Define(blood_of_the_enemy 297108)
+# The Heart of Azeroth erupts violently, dealing s1 Shadow damage to enemies within A1 yds. You gain m2 critical strike chance against the targets for 10 seconds?a297122[, and increases your critical hit damage by 297126m for 5 seconds][].
+  SpellInfo(blood_of_the_enemy cd=120 duration=10 channel=10)
+  # You have a w2 increased chance to be Critically Hit by the caster.
+  SpellAddTargetDebuff(blood_of_the_enemy blood_of_the_enemy=1)
 Define(dark_ascension 280711)
 # Immediately activates a new Voidform, then releases an explosive blast of pure void energy, causing (95 of Spell Power)*2 Shadow damage to all enemies within a1 yds of your target.rnrn|cFFFFFFFFGenerates s2/100 Insanity.|r
   SpellInfo(dark_ascension cd=60 talent=dark_ascension_talent)
@@ -33,8 +38,16 @@ Define(divine_star 110744)
 # Throw a Divine Star forward 24 yds, healing allies in its path for (50 of Spell Power) and dealing (40 of Spell Power) Holy damage to enemies. After reaching its destination, the Divine Star returns to you, healing allies and damaging enemies in its path again.
   SpellInfo(divine_star cd=15 duration=15 talent=divine_star_talent)
 Define(fireblood 265221)
-# Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. 
+# Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
+Define(focused_azerite_beam 295262)
+# Reduces the cast time of Focused Azerite Beam by s1.
+  SpellInfo(focused_azerite_beam channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(focused_azerite_beam focused_azerite_beam=1)
+Define(guardian_of_azeroth 295840)
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
+  SpellInfo(guardian_of_azeroth cd=180 duration=30)
+  SpellAddBuff(guardian_of_azeroth guardian_of_azeroth=1)
 Define(halo 120517)
 # Creates a ring of Holy energy around you that quickly expands to a 30 yd radius, healing allies for (103 of Spell Power) and dealing (103 of Spell Power) Holy damage to enemies.
   SpellInfo(halo cd=40 duration=3.2 talent=halo_talent)
@@ -75,6 +88,9 @@ Define(mind_sear 48045)
 # Corrosive shadow energy radiates from the target, dealing 49821m2*s2 Shadow damage over 3 seconds to all enemies within 49821a2 yards of the target.rnrn|cFFFFFFFFGenerates s2*208232m1/100 Insanity over the duration per target hit.|r
   SpellInfo(mind_sear duration=3 channel=3 tick=0.75)
 
+Define(purifying_blast 295337)
+# Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
+  SpellInfo(purifying_blast cd=60 duration=6)
 Define(quaking_palm 107079)
 # Strikes the target with lightning speed, incapacitating them for 4 seconds, and turns off your attack.
   SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
@@ -88,7 +104,7 @@ Define(shadow_word_death 32379)
 # A word of dark binding that inflicts (187.5 of Spell Power) Shadow damage to the target. Only usable on enemies that have less than s2 health.rnrn|cFFFFFFFFGenerates s3 Insanity, or s4 Insanity if the target dies.|r
   SpellInfo(shadow_word_death cd=9 talent=shadow_word_death_talent)
 Define(shadow_word_pain 589)
-# A word of darkness that causes (22 of Spell Power) Shadow damage instantly, and an additional o2 Shadow damage over 16 seconds.?a185916[rnrn|cFFFFFFFFGenerates m3/100 Insanity.|r][]
+# A word of darkness that causes (18 of Spell Power) Shadow damage instantly, and an additional o2 Shadow damage over 16 seconds.?a185916[rnrn|cFFFFFFFFGenerates m3/100 Insanity.|r][]
   SpellInfo(shadow_word_pain duration=16 insanity=-400 tick=2)
   # Suffering w2 Shadow damage every t2 sec.
   SpellAddTargetDebuff(shadow_word_pain shadow_word_pain=1)
@@ -114,6 +130,11 @@ Define(surrender_to_madness 193223)
   SpellInfo(surrender_to_madness cd=180 duration=60 talent=surrender_to_madness_talent)
   # Generating s1 more Insanity.
   SpellAddBuff(surrender_to_madness surrender_to_madness=1)
+Define(the_unbound_force 298452)
+# Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]
+  SpellInfo(the_unbound_force cd=60 duration=2 channel=2 tick=0.33)
+  SpellAddBuff(the_unbound_force the_unbound_force=1)
+  SpellAddTargetDebuff(the_unbound_force the_unbound_force=1)
 Define(vampiric_touch 34914)
 # A touch of darkness that causes 34914o2 Shadow damage over 21 seconds, and heals you for e2*100 of damage dealt.rnrnIf Vampiric Touch is dispelled, the dispeller flees in Horror for 3 seconds.rnrn|cFFFFFFFFGenerates m3/100 Insanity.|r
   SpellInfo(vampiric_touch duration=21 insanity=-600 tick=3)

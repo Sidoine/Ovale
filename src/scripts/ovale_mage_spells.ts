@@ -64,6 +64,11 @@ Define(blizzard 190356)
 # Ice shards pelt the target area, dealing 190357m1*8 Frost damage over 8 seconds and reducing movement speed by 12486s1 for 3 seconds.?a236662[rnrnEach time Blizzard deals damage, the cooldown of Frozen Orb is reduced by 236662s1/100.1 sec.][]
 # Rank 2: Each time Blizzard deals damage, the cooldown of Frozen Orb is reduced by s1/100.1 sec.
   SpellInfo(blizzard cd=8 duration=8)
+Define(blood_of_the_enemy 297108)
+# The Heart of Azeroth erupts violently, dealing s1 Shadow damage to enemies within A1 yds. You gain m2 critical strike chance against the targets for 10 seconds?a297122[, and increases your critical hit damage by 297126m for 5 seconds][].
+  SpellInfo(blood_of_the_enemy cd=120 duration=10 channel=10)
+  # You have a w2 increased chance to be Critically Hit by the caster.
+  SpellAddTargetDebuff(blood_of_the_enemy blood_of_the_enemy=1)
 Define(charged_up 205032)
 # Immediately grants s1 Arcane Charges.
   SpellInfo(charged_up cd=40 duration=10 arcanecharges=-4 talent=charged_up_talent)
@@ -104,7 +109,7 @@ Define(fireball 133)
 # Throws a fiery ball that causes (59 of Spell Power) Fire damage.
   SpellInfo(fireball)
 Define(fireblood 265221)
-# Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. 
+# Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
 Define(flamestrike 2120)
 # Calls down a pillar of fire, burning all enemies within the area for s1 Fire damage and reducing their movement speed by (57.49999999999999 of Spell Power) for 8 seconds.
@@ -115,6 +120,10 @@ Define(flurry 44614)
 # Unleash a flurry of ice, striking the target s1 times for a total of (31.6 of Spell Power)*m1 Frost damage. Each hit reduces the target's movement speed by 228354s1 for 1 second.rnrnWhile Brain Freeze is active, Flurry applies Winter's Chill, causing your target to take damage from your spells as if it were frozen.
   SpellInfo(flurry)
 
+Define(focused_azerite_beam 295262)
+# Reduces the cast time of Focused Azerite Beam by s1.
+  SpellInfo(focused_azerite_beam channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(focused_azerite_beam focused_azerite_beam=1)
 Define(frostbolt 116)
 # Launches a bolt of frost at the enemy, causing (51.1 of Spell Power) Frost damage and slowing movement speed by 205708s1 for 8 seconds.
   SpellInfo(frostbolt)
@@ -123,8 +132,12 @@ Define(frozen_orb 84714)
 # Launches an orb of swirling ice up to s1 yards forward which deals up to 20*84721s2 Frost damage to all enemies it passes through. Grants 1 charge of Fingers of Frost when it first damages an enemy.rnrnEnemies damaged by the Frozen Orb are slowed by 289308s1 for 3 seconds.
   SpellInfo(frozen_orb cd=60 duration=15 channel=15)
 Define(glacial_spike 199786)
-# Conjures a massive spike of ice, and merges your current Icicles into it. It impales your target, dealing (320 of Spell Power) damage plus all of the damage stored in your Icicles, and freezes the target in place for 4 seconds. Damage may interrupt the freeze effect.rnrnRequires 5 Icicles to cast.rnrn|cFFFFFFFFPassive:|r Ice Lance no longer launches Icicles.
+# Conjures a massive spike of ice, and merges your current Icicles into it. It impales your target, dealing (297 of Spell Power) damage plus all of the damage stored in your Icicles, and freezes the target in place for 4 seconds. Damage may interrupt the freeze effect.rnrnRequires 5 Icicles to cast.rnrn|cFFFFFFFFPassive:|r Ice Lance no longer launches Icicles.
   SpellInfo(glacial_spike talent=glacial_spike_talent)
+Define(guardian_of_azeroth 295840)
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
+  SpellInfo(guardian_of_azeroth cd=180 duration=30)
+  SpellAddBuff(guardian_of_azeroth guardian_of_azeroth=1)
 Define(ice_floes 108839)
 # Makes your next Mage spell with a cast time shorter than s2 sec castable while moving. Unaffected by the global cooldown and castable while casting.
   SpellInfo(ice_floes cd=20 duration=15 max_stacks=3 gcd=0 offgcd=1 talent=ice_floes_talent)
@@ -171,6 +184,9 @@ Define(presence_of_mind 205025)
   SpellInfo(presence_of_mind cd=60 gcd=0 offgcd=1)
   # Arcane Blast is instant cast.
   SpellAddBuff(presence_of_mind presence_of_mind=1)
+Define(purifying_blast 295337)
+# Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
+  SpellInfo(purifying_blast cd=60 duration=6)
 Define(pyroblast 11366)
 # Hurls an immense fiery boulder that causes (123.9 of Spell Power) Fire damage.
   SpellInfo(pyroblast)
@@ -188,6 +204,11 @@ Define(ray_of_frost 205021)
   SpellInfo(ray_of_frost cd=75 duration=5 channel=5 tick=1 talent=ray_of_frost_talent)
   # Movement slowed by w1.rnTaking w2 Frost damage every t2 sec.
   SpellAddTargetDebuff(ray_of_frost ray_of_frost=1)
+Define(reckless_force_buff 298409)
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+  SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
+  # Gaining unstable Azerite energy.
+  SpellAddBuff(reckless_force_buff reckless_force_buff=1)
 Define(rule_of_threes 264354)
 # When you gain your third Arcane Charge, the cost of your next Arcane Blast or Arcane Missiles is reduced by 264774s1.
   SpellInfo(rule_of_threes channel=0 gcd=0 offgcd=1 talent=rule_of_threes_talent)
@@ -204,6 +225,11 @@ Define(summon_water_elemental 31687)
 Define(supernova 157980)
 # Pulses arcane energy around the target enemy or ally, dealing (30 of Spell Power) Arcane damage to all enemies within A2 yards, and knocking them upward. A primary enemy target will take s1 increased damage.
   SpellInfo(supernova cd=25 talent=supernova_talent)
+Define(the_unbound_force 298452)
+# Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]
+  SpellInfo(the_unbound_force cd=60 duration=2 channel=2 tick=0.33)
+  SpellAddBuff(the_unbound_force the_unbound_force=1)
+  SpellAddTargetDebuff(the_unbound_force the_unbound_force=1)
 Define(alexstraszas_fury_talent 11) #22465
 # Dragon's Breath always critically strikes and contributes to Hot Streak.
 Define(amplification_talent 1) #22458
@@ -227,7 +253,7 @@ Define(flame_patch_talent 16) #22451
 Define(freezing_rain_talent 16) #22454
 # Frozen Orb makes Blizzard instant cast and increases its damage done by 270232s2 for 12 seconds.
 Define(glacial_spike_talent 21) #21634
-# Conjures a massive spike of ice, and merges your current Icicles into it. It impales your target, dealing (320 of Spell Power) damage plus all of the damage stored in your Icicles, and freezes the target in place for 4 seconds. Damage may interrupt the freeze effect.rnrnRequires 5 Icicles to cast.rnrn|cFFFFFFFFPassive:|r Ice Lance no longer launches Icicles.
+# Conjures a massive spike of ice, and merges your current Icicles into it. It impales your target, dealing (297 of Spell Power) damage plus all of the damage stored in your Icicles, and freezes the target in place for 4 seconds. Damage may interrupt the freeze effect.rnrnRequires 5 Icicles to cast.rnrn|cFFFFFFFFPassive:|r Ice Lance no longer launches Icicles.
 Define(ice_floes_talent 6) #23073
 # Makes your next Mage spell with a cast time shorter than s2 sec castable while moving. Unaffected by the global cooldown and castable while casting.
 Define(ice_nova_talent 3) #22463

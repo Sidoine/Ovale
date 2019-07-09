@@ -79,7 +79,6 @@ local OvaleWarlockClass = __class(OvaleWarlockBase, {
             local now = GetTime()
             for id, v in pairs(demonData) do
                 if id == creatureId then
-                    creatureId = (creatureId == 143622) and 55659 or creatureId
                     self_demons[destGUID] = {
                         id = creatureId,
                         timestamp = now,

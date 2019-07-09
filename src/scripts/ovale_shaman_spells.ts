@@ -13,6 +13,11 @@ Define(berserking 26297)
   SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
   # Haste increased by s1.
   SpellAddBuff(berserking berserking=1)
+Define(blood_of_the_enemy 297108)
+# The Heart of Azeroth erupts violently, dealing s1 Shadow damage to enemies within A1 yds. You gain m2 critical strike chance against the targets for 10 seconds?a297122[, and increases your critical hit damage by 297126m for 5 seconds][].
+  SpellInfo(blood_of_the_enemy cd=120 duration=10 channel=10)
+  # You have a w2 increased chance to be Critically Hit by the caster.
+  SpellAddTargetDebuff(blood_of_the_enemy blood_of_the_enemy=1)
 Define(bloodlust 2825)
 # Increases Haste by (25 of Spell Power) for all party and raid members for 40 seconds.rnrnAllies receiving this effect will become Sated and unable to benefit from Bloodlust or Time Warp again for 600 seconds.
   SpellInfo(bloodlust cd=300 duration=40 channel=40 gcd=0 offgcd=1)
@@ -57,7 +62,7 @@ Define(fire_elemental 198067)
 # Calls forth a Greater Fire Elemental to rain destruction on your enemies for 30 seconds.rnrnWhile the Greater Fire Elemental is active, Flame Shock generates 263819s1 Maelstrom when it deals damage over time.
   SpellInfo(fire_elemental cd=150)
 Define(fireblood 265221)
-# Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. 
+# Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
 Define(flame_shock 188389)
 # Sears the target with fire, causing (35 of Spell Power) Fire damage and then an additional o2 Fire damage over 24 seconds.
@@ -74,6 +79,10 @@ Define(flametongue_buff 194084)
   SpellInfo(flametongue_buff duration=16 gcd=0 offgcd=1 tick=8)
   # Each of your weapon attacks causes up to <coeff>*AP additional Fire damage.
   SpellAddBuff(flametongue_buff flametongue_buff=1)
+Define(focused_azerite_beam 295262)
+# Reduces the cast time of Focused Azerite Beam by s1.
+  SpellInfo(focused_azerite_beam channel=0 gcd=0 offgcd=1)
+  SpellAddBuff(focused_azerite_beam focused_azerite_beam=1)
 Define(frost_shock 196840)
 # Chills the target with frost, causing (45 of Spell Power) Frost damage and reducing the target's movement speed by s2 for 6 seconds. 
   SpellInfo(frost_shock duration=6)
@@ -89,6 +98,10 @@ Define(fury_of_air 197211)
 # Creates a vortex of wind 197385A1 yards around you, dealing 197385s1*<CAP>/AP Nature damage every t1 sec to enemies caught in the storm, and slowing them by 197385s2 for 3 seconds.
   SpellInfo(fury_of_air maelstrom=3 tick=1 talent=fury_of_air_talent)
 
+Define(guardian_of_azeroth 295840)
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
+  SpellInfo(guardian_of_azeroth cd=180 duration=30)
+  SpellAddBuff(guardian_of_azeroth guardian_of_azeroth=1)
 Define(heroism 32182)
 # Increases haste by (25 of Spell Power) for all party and raid members for 40 seconds.rnrnAllies receiving this effect will become Exhausted and unable to benefit from Heroism or Time Warp again for 600 seconds.
   SpellInfo(heroism cd=300 duration=40 channel=40 gcd=0 offgcd=1)
@@ -105,7 +118,7 @@ Define(hot_hand_buff 215785)
   # Lava Lash damage increased by s1 and cost reduced by s2.
   SpellAddBuff(hot_hand_buff hot_hand_buff=1)
 Define(icefury 210714)
-# Hurls frigid ice at the target, dealing (55.00000000000001 of Spell Power) Frost damage and causing your next n Frost Shocks to deal s3 increased damage and generate 190493s9 Maelstrom.rnrn|cFFFFFFFFGenerates 190493s7 Maelstom.|rrnrnCan cause an Elemental Overload?PL<78[ when at or above level 78][].
+# Hurls frigid ice at the target, dealing (55.00000000000001 of Spell Power) Frost damage and causing your next n Frost Shocks to deal s3 increased damage and generate 190493s9 Maelstrom.rnrn|cFFFFFFFFGenerates 190493s7 Maelstrom.|rrnrnCan cause an Elemental Overload?PL<78[ when at or above level 78][].
   SpellInfo(icefury cd=30 duration=15 maelstrom=0 talent=icefury_talent)
   # Frost Shock damage increased by s3 and generates 190493s9 Maelstrom.
   SpellAddBuff(icefury icefury=1)
@@ -175,11 +188,19 @@ Define(primal_primer 273006)
   SpellInfo(primal_primer duration=30 channel=30 max_stacks=10 gcd=0 offgcd=1)
   # Increases damage taken from Lava Lash by w1/2.
   SpellAddTargetDebuff(primal_primer primal_primer=1)
+Define(purifying_blast 295337)
+# Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
+  SpellInfo(purifying_blast cd=60 duration=6)
 Define(quaking_palm 107079)
 # Strikes the target with lightning speed, incapacitating them for 4 seconds, and turns off your attack.
   SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
   # Incapacitated.
   SpellAddTargetDebuff(quaking_palm quaking_palm=1)
+Define(reckless_force_buff 298409)
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+  SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
+  # Gaining unstable Azerite energy.
+  SpellAddBuff(reckless_force_buff reckless_force_buff=1)
 Define(rockbiter 193786)
 # Assaults your target with earthen power, dealing s1 Nature damage.rnrn|cFFFFFFFFGenerates s2 Maelstrom.|r
   SpellInfo(rockbiter cd=6 maelstrom=-25)
@@ -214,6 +235,11 @@ Define(tectonic_thunder 286949)
 # Earthquake deals s1 Physical damage instantly, and has a s2 chance to make your next Chain Lightning be instant cast.
   SpellInfo(tectonic_thunder channel=0 gcd=0 offgcd=1)
   SpellAddBuff(tectonic_thunder tectonic_thunder=1)
+Define(the_unbound_force 298452)
+# Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]
+  SpellInfo(the_unbound_force cd=60 duration=2 channel=2 tick=0.33)
+  SpellAddBuff(the_unbound_force the_unbound_force=1)
+  SpellAddTargetDebuff(the_unbound_force the_unbound_force=1)
 Define(war_stomp 20549)
 # Stuns up to i enemies within A1 yds for 2 seconds.
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
@@ -253,7 +279,7 @@ Define(hailstorm_talent 11) #23090
 Define(hot_hand_talent 2) #22355
 # Melee attacks with Flametongue active have a chance to make your next Lava Lash cost no Maelstrom and deal 215785s1 increased damage.
 Define(icefury_talent 18) #23111
-# Hurls frigid ice at the target, dealing (55.00000000000001 of Spell Power) Frost damage and causing your next n Frost Shocks to deal s3 increased damage and generate 190493s9 Maelstrom.rnrn|cFFFFFFFFGenerates 190493s7 Maelstom.|rrnrnCan cause an Elemental Overload?PL<78[ when at or above level 78][].
+# Hurls frigid ice at the target, dealing (55.00000000000001 of Spell Power) Frost damage and causing your next n Frost Shocks to deal s3 increased damage and generate 190493s9 Maelstrom.rnrn|cFFFFFFFFGenerates 190493s7 Maelstrom.|rrnrnCan cause an Elemental Overload?PL<78[ when at or above level 78][].
 Define(landslide_talent 4) #22636
 # ?s201897[Boulderfist][Rockbiter] has a h chance to increase the damage of your next Stormstrike by 202004s1.
 Define(lightning_shield_talent 3) #22353
