@@ -2561,7 +2561,7 @@ do
 local function HasDebuffType(positionalParams, namedParams, atTime)
         local target = ParseCondition(positionalParams, namedParams)
         for _, debuffType in ipairs(positionalParams) do
-            local aura = OvaleAura:GetAura(target, lower(debuffType), atTime, (target == "player" and "HARMFUL" or "HELPFUL"), false)
+            local aura = OvaleAura:GetAura(target, lower(debuffType), atTime, "HARMFUL", false)
             if aura then
                 local gain, _, ending = aura.gain, aura.start, aura.ending
                 return gain, ending
@@ -2594,7 +2594,7 @@ local function RaidMembersInRange(positionalParams, namedParams, atTime)
         local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
 		local value = 0
 		for _, uid in pairs(OvaleData.RAID_UIDS) do
-			local boolean = (OvaleSpells:IsSpellInRange(spellId, uid) == 1)
+			local boolean = OvaleSpells:IsSpellInRange(spellId, uid)
 			if boolean then
 				value = value + 1
 			end
@@ -2617,6 +2617,7 @@ local function PartyMembersWithHealthPercent(positionalParams, namedParams, atTi
 				end
 			end
 		end
+		-- Ovale:OneTimeMessage("Warning: Party members with low health: '%s'.", value)
         return Compare(value, countComparator, countLimit)
     end
     OvaleCondition:RegisterCondition("partymemberswithhealthpercent", false, PartyMembersWithHealthPercent)
@@ -2646,11 +2647,12 @@ local function PartyMembersInRange(positionalParams, namedParams, atTime)
         local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
 		local value = 0
 		for _, uid in pairs(OvaleData.PARTY_UIDS) do
-			local boolean = (OvaleSpells:IsSpellInRange(spellId, uid) == 1)
+			local boolean = OvaleSpells:IsSpellInRange(spellId, uid)
 			if boolean then
 				value = value + 1
 			end
 		end
+		-- Ovale:OneTimeMessage("Warning: Party members in range: '%s'.", value)
         return Compare(value, comparator, limit)
     end
     OvaleCondition:RegisterCondition("partymembersinrange", false, PartyMembersInRange)
