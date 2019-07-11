@@ -511,7 +511,7 @@ Define(selfless_healer_buff 114250)
 Define(seraphim_buff 152262)
 	SpellInfo(seraphim_buff duration=16)
 
-	SpellInfo(shield_of_the_righteous max_charges=3)
+	SpellInfo(shield_of_the_righteous max_charges=3 tag=shortcd)
 	SpellAddBuff(shield_of_the_righteous shield_of_the_righteous_buff=1)
 Define(shield_of_the_righteous_buff 132403)
 	SpellInfo(shield_of_the_righteous_buff duration=4.5)
