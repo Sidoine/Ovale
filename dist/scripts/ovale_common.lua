@@ -183,6 +183,11 @@ Define(worldvein_resonance_essence 295186)
     SpellInfo(worldvein_resonance_essence cd=60 tag=shortcd)
     Define(lifeblood_buff 295137)
 
+Define(conflict_and_strife_essence_id 32)
+Define(memory_of_lucid_dreams_essence_id 27)
+Define(vision_of_perfection_essence_id 22)
+Define(condensed_lifeforce_essence_id 14)
+
 ###
 ### Racials
 ###
