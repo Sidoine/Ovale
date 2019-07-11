@@ -317,6 +317,7 @@ AddFunction HoW
 AddCheckBox(opt_interrupt L(interrupt) default specialization=retribution)
 AddCheckBox(opt_melee_range L(not_in_melee_range) specialization=retribution)
 AddCheckBox(opt_use_consumables L(opt_use_consumables) default specialization=retribution)
+AddCheckBox(opt_shield_of_vengeance SpellName(shield_of_vengeance) specialization=retribution)
 
 AddFunction RetributionInterruptActions
 {
@@ -527,7 +528,7 @@ AddFunction RetributionCooldownsMainPostConditions
 AddFunction RetributionCooldownsShortCdActions
 {
  #shield_of_vengeance,if=buff.seething_rage.down&buff.memory_of_lucid_dreams.down
- if BuffExpires(seething_rage) and BuffExpires(memory_of_lucid_dreams_essence_buff) Spell(shield_of_vengeance)
+ if BuffExpires(seething_rage) and BuffExpires(memory_of_lucid_dreams_essence_buff) and CheckBoxOn(opt_shield_of_vengeance) Spell(shield_of_vengeance)
  #the_unbound_force,if=time<=2|buff.reckless_force.up
  if TimeInCombat() <= 2 or BuffPresent(reckless_force_buff) Spell(the_unbound_force)
  #worldvein_resonance,if=cooldown.avenging_wrath.remains<gcd&holy_power>=3|cooldown.crusade.remains<gcd&holy_power>=4|cooldown.avenging_wrath.remains>=45|cooldown.crusade.remains>=45
@@ -556,7 +557,7 @@ AddFunction RetributionCooldownsCdActions
  #fireblood,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10
  if BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) and BuffStacks(crusade_buff) == 10 Spell(fireblood)
 
- unless BuffExpires(seething_rage) and BuffExpires(memory_of_lucid_dreams_essence_buff) and Spell(shield_of_vengeance) or { TimeInCombat() <= 2 or BuffPresent(reckless_force_buff) } and Spell(the_unbound_force)
+ unless BuffExpires(seething_rage) and BuffExpires(memory_of_lucid_dreams_essence_buff) and CheckBoxOn(opt_shield_of_vengeance) and Spell(shield_of_vengeance) or { TimeInCombat() <= 2 or BuffPresent(reckless_force_buff) } and Spell(the_unbound_force)
  {
   #blood_of_the_enemy,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10
   if BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) and BuffStacks(crusade_buff) == 10 Spell(blood_of_the_enemy)
@@ -581,7 +582,7 @@ AddFunction RetributionCooldownsCdActions
 
 AddFunction RetributionCooldownsCdPostConditions
 {
- BuffExpires(seething_rage) and BuffExpires(memory_of_lucid_dreams_essence_buff) and Spell(shield_of_vengeance) or { TimeInCombat() <= 2 or BuffPresent(reckless_force_buff) } and Spell(the_unbound_force) or { SpellCooldown(avenging_wrath) < GCD() and HolyPower() >= 3 or SpellCooldown(crusade) < GCD() and HolyPower() >= 4 or SpellCooldown(avenging_wrath) >= 45 or SpellCooldown(crusade) >= 45 } and Spell(worldvein_resonance_essence) or { not False(raid_event_adds_exists) or 600 > 30 or Enemies() >= 2 } and { BuffExpires(avenging_wrath_buff) or BuffExpires(crusade_buff) } and SpellCooldown(blade_of_justice) > GCD() * 3 and SpellCooldown(judgment) > GCD() * 3 and Spell(focused_azerite_beam) or { not False(raid_event_adds_exists) or 600 > 30 or Enemies() >= 2 } and Spell(purifying_blast)
+ BuffExpires(seething_rage) and BuffExpires(memory_of_lucid_dreams_essence_buff) and CheckBoxOn(opt_shield_of_vengeance) and Spell(shield_of_vengeance) or { TimeInCombat() <= 2 or BuffPresent(reckless_force_buff) } and Spell(the_unbound_force) or { SpellCooldown(avenging_wrath) < GCD() and HolyPower() >= 3 or SpellCooldown(crusade) < GCD() and HolyPower() >= 4 or SpellCooldown(avenging_wrath) >= 45 or SpellCooldown(crusade) >= 45 } and Spell(worldvein_resonance_essence) or { not False(raid_event_adds_exists) or 600 > 30 or Enemies() >= 2 } and { BuffExpires(avenging_wrath_buff) or BuffExpires(crusade_buff) } and SpellCooldown(blade_of_justice) > GCD() * 3 and SpellCooldown(judgment) > GCD() * 3 and Spell(focused_azerite_beam) or { not False(raid_event_adds_exists) or 600 > 30 or Enemies() >= 2 } and Spell(purifying_blast)
 }
 
 ### actions.default

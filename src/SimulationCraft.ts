@@ -272,6 +272,7 @@ export interface Annotation extends InterruptAnnotation {
     touch_of_karma?: string;
     fel_rush?: string;
     vengeful_retreat?:string;
+    shield_of_vengeance?: string;
 }
 
 interface Modifiers {
@@ -663,6 +664,11 @@ const OPTIONAL_SKILLS = {
     ["bloodlust"]: <OptionalSkill>{
         class: "SHAMAN"
     }, 
+    ["shield_of_vengeance"]: <OptionalSkill>{
+        class: "PALADIN",
+        specialization: "retribution",
+        default: false,
+    },
 }
 
 let self_functionDefined: LuaObj<boolean> = {};
