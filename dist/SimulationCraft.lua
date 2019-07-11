@@ -3077,11 +3077,22 @@ EmitOperandEssence = function(operand, parseNode, nodeList, annotation, action, 
     local token = tokenIterator()
     if token == "essence" then
         local code
-        __exports.OvaleSimulationCraft:Print("Warning: operand '%s' not implemented yet.", operand)
-        code = "False()"
+        local name = tokenIterator()
+        local property = tokenIterator()
+        local essenceId = format("%s_essence_id", name)
+        if property == "major" then
+            code = format("AzeriteEssenceIsMajor(%s)", essenceId)
+        elseif property == "minor" then
+            code = format("AzeriteEssenceIsMinor(%s)", essenceId)
+        elseif property == "enabled" then
+            code = format("AzeriteEssenceIsEnabled(%s)", essenceId)
+        else
+            ok = false
+        end
         if ok and code then
             annotation.astAnnotation = annotation.astAnnotation or {}
             node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+            AddSymbol(annotation, essenceId)
         end
     else
         ok = false

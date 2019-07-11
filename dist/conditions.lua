@@ -101,6 +101,8 @@ local __Spells = LibStub:GetLibrary("ovale/Spells")
 local OvaleSpells = __Spells.OvaleSpells
 local __AzeriteArmor = LibStub:GetLibrary("ovale/AzeriteArmor")
 local OvaleAzerite = __AzeriteArmor.OvaleAzerite
+local __AzeriteEssence = LibStub:GetLibrary("ovale/AzeriteEssence")
+local OvaleAzeriteEssence = __AzeriteEssence.OvaleAzeriteEssence
 local __Warlock = LibStub:GetLibrary("ovale/Warlock")
 local OvaleWarlock = __Warlock.OvaleWarlock
 local __Stagger = LibStub:GetLibrary("ovale/Stagger")
@@ -178,6 +180,26 @@ local function HasAzeriteTrait(positionalParams, namedParams, atTime)
     end
     OvaleCondition:RegisterCondition("hasazeritetrait", false, HasAzeriteTrait)
     OvaleCondition:RegisterCondition("azeritetraitrank", false, AzeriteTraitRank)
+end
+do
+local function AzeriteEssenceIsMajor(positionalParams, namedParams, atTime)
+        local essenceId, yesno = positionalParams[1], positionalParams[2]
+        local value = OvaleAzeriteEssence:IsMajorEssence(essenceId)
+        return TestBoolean(value, yesno)
+    end
+local function AzeriteEssenceIsMinor(positionalParams, namedParams, atTime)
+        local essenceId, yesno = positionalParams[1], positionalParams[2]
+        local value = OvaleAzeriteEssence:IsMinorEssence(essenceId)
+        return TestBoolean(value, yesno)
+    end
+local function AzeriteEssenceIsEnabled(positionalParams, namedParams, atTime)
+        local essenceId, yesno = positionalParams[1], positionalParams[2]
+        local value = OvaleAzeriteEssence:IsMajorEssence(essenceId) or OvaleAzeriteEssence:IsMinorEssence(essenceId)
+        return TestBoolean(value, yesno)
+    end
+    OvaleCondition:RegisterCondition("azeriteessenceismajor", false, AzeriteEssenceIsMajor)
+    OvaleCondition:RegisterCondition("azeriteessenceisminor", false, AzeriteEssenceIsMinor)
+    OvaleCondition:RegisterCondition("azeriteessenceisenabled", false, AzeriteEssenceIsEnabled)
 end
 do
 local function BaseDuration(positionalParams, namedParams, atTime)

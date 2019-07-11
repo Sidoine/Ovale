@@ -34,6 +34,7 @@ import { OvaleSigil } from "./DemonHunterSigils";
 import { baseState } from "./BaseState";
 import { OvaleSpells } from "./Spells";
 import { OvaleAzerite } from "./AzeriteArmor";
+import { OvaleAzeriteEssence } from "./AzeriteEssence";
 import { OvaleWarlock } from "./Warlock";
 import { OvaleStagger } from "./Stagger";
 import { OvaleLossOfControl } from "./LossOfControl";
@@ -140,6 +141,26 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
     }
     OvaleCondition.RegisterCondition("hasazeritetrait", false, HasAzeriteTrait);
     OvaleCondition.RegisterCondition("azeritetraitrank", false, AzeriteTraitRank);
+}
+{
+    function AzeriteEssenceIsMajor(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
+        let [essenceId, yesno] = [positionalParams[1], positionalParams[2]];
+        let value = OvaleAzeriteEssence.IsMajorEssence(essenceId);
+        return TestBoolean(value, yesno);
+    }
+    function AzeriteEssenceIsMinor(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number){
+        let [essenceId, yesno] = [positionalParams[1], positionalParams[2]];
+        let value = OvaleAzeriteEssence.IsMinorEssence(essenceId);
+        return TestBoolean(value, yesno);
+    }
+    function AzeriteEssenceIsEnabled(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number){
+        let [essenceId, yesno] = [positionalParams[1], positionalParams[2]];
+        let value = OvaleAzeriteEssence.IsMajorEssence(essenceId) || OvaleAzeriteEssence.IsMinorEssence(essenceId);
+        return TestBoolean(value, yesno);
+    }
+    OvaleCondition.RegisterCondition("azeriteessenceismajor", false, AzeriteEssenceIsMajor);
+    OvaleCondition.RegisterCondition("azeriteessenceisminor", false, AzeriteEssenceIsMinor);
+    OvaleCondition.RegisterCondition("azeriteessenceisenabled", false, AzeriteEssenceIsEnabled);
 }
 {
     /** Get the base duration of the aura in seconds if it is applied at the current time.
