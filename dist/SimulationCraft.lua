@@ -549,6 +549,11 @@ local OPTIONAL_SKILLS = {
     },
     ["bloodlust"] = {
         class = "SHAMAN"
+    },
+    ["shield_of_vengeance"] = {
+        class = "PALADIN",
+        specialization = "retribution",
+        default = false
     }
 }
 local self_functionDefined = {}
