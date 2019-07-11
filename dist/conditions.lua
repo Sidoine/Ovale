@@ -608,6 +608,7 @@ local function Class(positionalParams, namedParams, atTime)
         return TestBoolean(boolean, yesno)
     end
     OvaleCondition:RegisterCondition("class", false, Class)
+    OvaleCondition:RegisterCondition("unitclass", false, Class)
 end
 do
     local IMBUED_BUFF_ID = 214336

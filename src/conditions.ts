@@ -958,6 +958,7 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
         return TestBoolean(boolean, yesno);
     }
     OvaleCondition.RegisterCondition("class", false, Class);
+    OvaleCondition.RegisterCondition("unitclass", false, Class);
 }
 {
     let IMBUED_BUFF_ID = 214336;
