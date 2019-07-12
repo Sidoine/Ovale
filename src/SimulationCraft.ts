@@ -159,6 +159,8 @@ const CHARACTER_PROPERTY: LuaObj<string> = {
     ["health.pct"]: "HealthPercent()",
     ["health.percent"]: "HealthPercent()",
     ["holy_power"]: "HolyPower()",
+    ["incanters_flow_time_to.4.down"]: "0", // TODO: need implementation
+    ["incanters_flow_time_to.5.up"]: "0", // TODO: need implementation
     ["infernal_no_de"]: "NotDeDemons(infernal)",
     ["insanity"]: "Insanity()",
     ["level"]: "Level()",
