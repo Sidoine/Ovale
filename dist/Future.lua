@@ -776,14 +776,14 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
         if spellcast.offgcd then
             self:Debug("    Caching spell %s (%d) as most recent off-GCD spellcast.", spellcast.spellName, spellcast.spellId)
             for k, v in kpairs(spellcast) do
-                self.current.lastOffGCDSpellcast[k] = v
+                (self.current.lastOffGCDSpellcast)[k] = v
             end
             lastSpell.lastSpellcast = self.current.lastOffGCDSpellcast
             self.next.lastOffGCDSpellcast = self.current.lastOffGCDSpellcast
         else
             self:Debug("    Caching spell %s (%d) as most recent GCD spellcast.", spellcast.spellName, spellcast.spellId)
             for k, v in kpairs(spellcast) do
-                lastSpell.lastGCDSpellcast[k] = v
+                (lastSpell.lastGCDSpellcast)[k] = v
             end
             lastSpell.lastSpellcast = lastSpell.lastGCDSpellcast
             self.next.lastGCDSpellId = lastSpell.lastGCDSpellcast.spellId

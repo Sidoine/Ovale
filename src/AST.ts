@@ -1951,7 +1951,7 @@ export class OvaleASTClass extends OvaleASTBase {
                         }                            
                         else {
                             [ok, node] = this.ParseParameterValue(tokenStream, nodeList, annotation);
-                            namedParams[parameterName] = node;
+                            (<any>namedParams[parameterName]) = node;
                         }
                     } else {
                         positionalParams[lualength(positionalParams) + 1] = node;
@@ -2233,12 +2233,10 @@ export class OvaleASTClass extends OvaleASTBase {
             node.name = name;
             node.rawPositionalParams = positionalParams;
             node.rawNamedParams = namedParams;
-            annotation.parametersReference = annotation.parametersReference || {
-            }
+            annotation.parametersReference = annotation.parametersReference || {};
             annotation.parametersReference[lualength(annotation.parametersReference) + 1] = node;
             if (name) {
-                annotation.nameReference = annotation.nameReference || {
-                }
+                annotation.nameReference = annotation.nameReference || {};
                 annotation.nameReference[lualength(annotation.nameReference) + 1] = node;
             }
         }
@@ -2719,10 +2717,10 @@ export class OvaleASTClass extends OvaleASTBase {
                             const value = node.rawNamedParams[key];
                             const flattenValue = this.FlattenParameterValue(value, annotation);
                             if (type(key) != "number" && dictionary && dictionary[key]) {
-                                parameters[dictionary[key] as keyof NamedParameters] = flattenValue;
+                                (<any>parameters[dictionary[key] as keyof typeof parameters]) = flattenValue;
                             } else {
                                 // TODO delete named parameters that are not single values
-                                parameters[key] = flattenValue as (number | string);
+                                (<any>parameters[key]) = flattenValue;
                             }
                         }
                     }

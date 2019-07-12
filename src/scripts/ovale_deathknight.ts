@@ -4,13 +4,13 @@ import { OvaleScripts } from "../Scripts";
 // ANY CHANGES MADE BELOW THIS POINT WILL BE LOST
 
 {
-	const name = "sc_pr_death_knight_blood"
-	const desc = "[8.2] Simulationcraft: PR_Death_Knight_Blood"
+	const name = "sc_t23_death_knight_blood"
+	const desc = "[8.2] Simulationcraft: T23_Death_Knight_Blood"
 	const code = `
-# Based on SimulationCraft profile "PR_Death_Knight_Blood".
+# Based on SimulationCraft profile "T23_Death_Knight_Blood".
 #	class=deathknight
 #	spec=blood
-#	talents=2222023
+#	talents=2220022
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -312,13 +312,13 @@ AddIcon checkbox=opt_deathknight_blood_aoe help=cd specialization=blood
 }
 
 {
-	const name = "sc_pr_death_knight_frost"
-	const desc = "[8.2] Simulationcraft: PR_Death_Knight_Frost"
+	const name = "sc_t23_death_knight_frost"
+	const desc = "[8.2] Simulationcraft: T23_Death_Knight_Frost"
 	const code = `
-# Based on SimulationCraft profile "PR_Death_Knight_Frost".
+# Based on SimulationCraft profile "T23_Death_Knight_Frost".
 #	class=deathknight
 #	spec=frost
-#	talents=3302033
+#	talents=3102013
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -1041,13 +1041,13 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 }
 
 {
-	const name = "sc_pr_death_knight_unholy"
-	const desc = "[8.2] Simulationcraft: PR_Death_Knight_Unholy"
+	const name = "sc_t23_death_knight_unholy"
+	const desc = "[8.2] Simulationcraft: T23_Death_Knight_Unholy"
 	const code = `
-# Based on SimulationCraft profile "PR_Death_Knight_Unholy".
+# Based on SimulationCraft profile "T23_Death_Knight_Unholy".
 #	class=deathknight
 #	spec=unholy
-#	talents=2203022
+#	talents=2203032
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)

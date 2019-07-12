@@ -85,9 +85,10 @@
     "@wowts/lua" "^1.0.3"
     "@wowts/tslib" "^1.0.0"
 
-"@wowts/ace_db-3.0@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@wowts/ace_db-3.0/-/ace_db-3.0-1.1.0.tgz#13f7b6e1d8daeda36cda47dbb012b648fdef82fd"
+"@wowts/ace_db-3.0@^1.1.0", "@wowts/ace_db-3.0@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@wowts/ace_db-3.0/-/ace_db-3.0-1.1.1.tgz#3568108a1133aa6565a7f6e710bb59b800738005"
+  integrity sha512-T0SB+yOXAmocdLx0lqU2j1RRj4qCCfc2RgP5D9KjkdXCk7oOVczG+r14+aOXgucYEI4ziPQ5K+N2/QmUTndSsg==
   dependencies:
     "@wowts/lua" "^1.3.0"
     "@wowts/tslib" "^1.1.0"
@@ -263,18 +264,20 @@
   dependencies:
     "@wowts/lua" "^1.3.0"
 
-"@wowts/tstolua@^1.6.0":
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/@wowts/tstolua/-/tstolua-1.6.0.tgz#ebeb6a102d85e58b072c875538f2ad4ceb67bc62"
+"@wowts/tstolua@^1.6.1":
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/@wowts/tstolua/-/tstolua-1.6.1.tgz#ffcc53e8b125158ec871a3b9fcb40b6503ff0fa6"
+  integrity sha512-BIvzqwK0zjU6uOCg8UgwYbjKfF0IcYlqcm3LLXtE0jvcZt2qQXcO4zzb4/NUkcESmhgJUMgfjFXpAJrrdznW3w==
   dependencies:
     commander "^2.18.0"
-    typescript "^3.1.1"
+    typescript "^3.5.3"
 
-"@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.12.0", "@wowts/wow-mock@^1.6.0":
-  version "1.12.0"
-  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.12.0.tgz#39ac5de8c20a501fd39f308c318ae1da4237f783"
+"@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.13.0", "@wowts/wow-mock@^1.6.0":
+  version "1.13.0"
+  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.13.0.tgz#d41c4309cad587cbba779d95199a76dfa1b058d7"
+  integrity sha512-wjGcuS+j9c6eD2EJTQ+QcRGrdpVHK3OJRd3B1ycpv+bVAoF/WRAizUgCYowswyi0X8xdINvtrioGumvBO2Q+rg==
   dependencies:
-    "@wowts/lua" "^1.3.0"
+    "@wowts/lua" "^1.3.2"
 
 abbrev@1:
   version "1.1.1"
@@ -3197,9 +3200,10 @@ tsutils@^2.27.2:
   dependencies:
     tslib "^1.8.1"
 
-typescript@^3.1.1:
-  version "3.1.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.1.3.tgz#01b70247a6d3c2467f70c45795ef5ea18ce191d5"
+typescript@^3.5.3:
+  version "3.5.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.5.3.tgz#c830f657f93f1ea846819e929092f5fe5983e977"
+  integrity sha512-ACzBtm/PhXBDId6a6sDJfroT2pOWt/oOnk4/dElG5G33ZL776N3Y6/6bKZJBFpd+b05F3Ct9qDjMeJmRWtE2/g==
 
 uid2@0.0.3:
   version "0.0.3"

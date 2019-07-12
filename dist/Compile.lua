@@ -258,7 +258,7 @@ local function EvaluateItemInfo(node)
                     break
                 end
             elseif  not checkToken(PARAMETER_KEYWORD, k) then
-                ii[k] = v
+                (ii)[k] = v
             end
         end
         OvaleData.itemInfo[itemId] = ii
@@ -428,13 +428,13 @@ local function EvaluateSpellInfo(node)
                         realValue = value * OvaleAzerite:TraitRank(namedParams.pertrait)
                     end
                     local power = si[k] or 0
-                    si[k] = power + realValue
+                    (si)[k] = power + realValue
                 else
                     ok = false
                     break
                 end
             elseif  not checkToken(PARAMETER_KEYWORD, k) then
-                si[k] = v
+                (si)[k] = v
             end
         end
     end

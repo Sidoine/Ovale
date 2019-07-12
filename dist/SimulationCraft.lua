@@ -4741,18 +4741,6 @@ local InsertInterruptFunctions = function(child, annotation)
             worksOnBoss = 0,
             order = 20
         })
-        if (annotation.specialization == "protection") then
-            insert(interrupts, {
-                name = "intercept",
-                stun = 1,
-                worksOnBoss = 0,
-                order = 20,
-                extraCondition = "Talent(warbringer_talent)",
-                addSymbol = {
-                    [1] = "warbringer_talent"
-                }
-            })
-        end
         insert(interrupts, {
             name = "intimidating_shout",
             incapacitate = 1,
@@ -5274,7 +5262,7 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
                 local k, operator, value = match(line, "([^%+=]+)(%+?=)(.*)")
                 local key = k
                 if operator == "=" then
-                    profile[key] = value
+                    (profile)[key] = value
                 elseif operator == "+=" then
                     if type(profile[key]) ~= "table" then
                         local oldValue = profile[key]
@@ -5287,7 +5275,7 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
         end
         for k, v in kpairs(profile) do
             if isLuaArray(v) then
-                profile[k] = concat(v)
+                (profile)[k] = concat(v)
             end
         end
         profile.templates = {}
