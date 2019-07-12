@@ -203,11 +203,6 @@ Define(test_of_might_buff 275531)
 # When ?s262161[Warbreaker][Colossus Smash] expires, your Strength is increased by s1 for every s2 Rage you spent during ?s262161[Warbreaker][Colossus Smash]. Lasts 12 seconds.
   SpellInfo(test_of_might_buff channel=-0.001 gcd=0 offgcd=1)
 
-Define(the_unbound_force 298452)
-# Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]
-  SpellInfo(the_unbound_force cd=60 duration=2 channel=2 tick=0.33)
-  SpellAddBuff(the_unbound_force the_unbound_force=1)
-  SpellAddTargetDebuff(the_unbound_force the_unbound_force=1)
 Define(thunder_clap 6343)
 # Blasts all enemies within 6343A1 yards for ?s12712[6343m1*1.2][6343m1] damage?s199045[, rooting them for 1 second and reducing their movement speed by s2 for 10 seconds.][ and reduces their movement speed by s2 for 10 seconds.]rnrn|cFFFFFFFFGenerates s4/10 Rage.|r
   SpellInfo(thunder_clap cd=6 duration=10 rage=-5)
