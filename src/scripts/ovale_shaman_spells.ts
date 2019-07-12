@@ -29,9 +29,16 @@ Define(capacitor_totem 192058)
 Define(chain_lightning_elemental 188443)
 # Hurls a lightning bolt at the enemy, dealing (34.5 of Spell Power) Nature damage and then jumping to additional nearby enemies. Affects x1 total targets.rnrn|cFFFFFFFFGenerates s2 Maelstrom per target hit.|r 
   SpellInfo(chain_lightning_elemental)
+Define(crackling_surge 224127)
+# Reduces the cooldown of Feral Spirit by m1/-1000 sec and causes your Feral Spirits to be imbued with Fire, Frost, or Lightning, enhancing your abilities.
+  SpellInfo(crackling_surge duration=15 gcd=0 offgcd=1)
+  # The damage of Stormstrike and Windfury is increased by s1.
+  SpellAddBuff(crackling_surge crackling_surge=1)
 Define(crash_lightning 187874)
 # Electrocutes all enemies in front of you, dealing s1*<CAP>/AP Nature damage. Hitting 2 or more targets enhances your weapons for 10 seconds, causing Stormstrike and Lava Lash to also deal 195592s1*<CAP>/AP Nature damage to all targets in front of you.  rnrnEach target hit by Crash Lightning increases the damage of your next Stormstrike by s2.
   SpellInfo(crash_lightning maelstrom=20 cd=6)
+  # Stormstrike and Lava Lash deal an additional 195592s1 damage to all targets in front of you.
+  SpellAddBuff(crash_lightning crash_lightning=1)
 Define(earth_elemental 198103)
 # Calls forth a Greater Earth Elemental to protect you and your allies for 60 seconds.
   SpellInfo(earth_elemental cd=300)
@@ -102,7 +109,8 @@ Define(frostbrand 196834)
 Define(fury_of_air 197211)
 # Creates a vortex of wind 197385A1 yards around you, dealing 197385s1*<CAP>/AP Nature damage every t1 sec to enemies caught in the storm, and slowing them by 197385s2 for 3 seconds.
   SpellInfo(fury_of_air maelstrom=3 tick=1 talent=fury_of_air_talent)
-
+  # Dealing 197385s1 Nature damage every t1 sec to enemies caught in the storm.
+  SpellAddBuff(fury_of_air fury_of_air=1)
 Define(guardian_of_azeroth 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth cd=180 duration=30)
@@ -147,6 +155,10 @@ Define(lava_shock_buff 273449)
 # Flame Shock damage increases the damage of your next Earth Shock by s1, stacking up to 273453u times.
   SpellInfo(lava_shock_buff channel=-0.001 gcd=0 offgcd=1)
 
+Define(lifeblood_buff 274419)
+# When you use a Healthstone, gain s1 Leech for 20 seconds.
+  SpellInfo(lifeblood_buff channel=-0.001 gcd=0 offgcd=1)
+
 Define(lightning_bolt 403)
 # Hurls a bolt of lightning at the target, dealing (71.25 of Spell Power) Nature damage.
 # Rank 1: Blasts a target for s1 Nature damage.
@@ -161,6 +173,9 @@ Define(lightning_conduit_debuff 275388)
 # Stormstrike marks the target as a Lightning Conduit for 60 seconds. Stormstrike deals s1 Nature damage to all enemies you've marked as Conduits.
   SpellInfo(lightning_conduit_debuff channel=0 gcd=0 offgcd=1)
 
+Define(lightning_lasso 305483)
+# Grips the target in lightning, stunning and dealing 305485o1 Nature damage over 5 seconds while the target is lassoed. Can move while channeling.
+  SpellInfo(lightning_lasso cd=30)
 Define(lightning_shield 192106)
 # Surround yourself with a shield of lightning for 3600 seconds.rnrnMelee attackers have a chance to suffer 192109s1 Nature damage, and add a charge to your shield.rnWhen you Stormstrike, it gains s1 charges.rnrnAt 192106u charges, the shield overcharges, causing you to deal an additional 273324s1 Nature damage with each attack for 10 seconds.
   SpellInfo(lightning_shield duration=3600 channel=3600 max_stacks=20 talent=lightning_shield_talent)
@@ -213,6 +228,11 @@ Define(reckless_force_buff 298409)
 Define(rockbiter 193786)
 # Assaults your target with earthen power, dealing s1 Nature damage.rnrn|cFFFFFFFFGenerates s2 Maelstrom.|r
   SpellInfo(rockbiter cd=6 maelstrom=-25)
+Define(seething_rage 297126)
+# Increases your critical hit damage by 297126m for 5 seconds.
+  SpellInfo(seething_rage duration=5 gcd=0 offgcd=1)
+  # Critical strike damage increased by w1.
+  SpellAddBuff(seething_rage seething_rage=1)
 Define(spiritwalkers_grace 79206)
 # Calls upon the guidance of the spirits for 15 seconds, permitting movement while casting Shaman spells. Castable while casting.?a192088[ Increases movement speed by 192088s2.][]
   SpellInfo(spiritwalkers_grace cd=120 duration=15 gcd=0 offgcd=1)
@@ -266,10 +286,10 @@ Define(windstrike 115356)
 # Hurl a staggering blast of wind at an enemy, dealing a total of 115357sw1+115360sw1 Physical damage, bypassing armor.
   SpellInfo(windstrike maelstrom=30 cd=9)
 
-Define(ascendance_talent_enhancement 21) #21972
-# Transform into an Air Ascendant for 15 seconds, reducing the cooldown and cost of Stormstrike by s4, and transforming your auto attack and Stormstrike into Wind attacks which bypass armor and have a s1 yd range.
 Define(ascendance_talent 21) #21675
 # Transform into a Flame Ascendant for 15 seconds, replacing Chain Lightning with Lava Beam, removing the cooldown on Lava Burst, and increasing the damage of Lava Burst by an amount equal to your critical strike chance.
+Define(ascendance_talent_enhancement 21) #21972
+# Transform into an Air Ascendant for 15 seconds, reducing the cooldown and cost of Stormstrike by s4, and transforming your auto attack and Stormstrike into Wind attacks which bypass armor and have a s1 yd range.
 Define(boulderfist_talent 1) #22354
 # Rockbiter's recharge time is reduced by s1 and it deals s2 increased damage.
 Define(call_the_thunder_talent 5) #22139

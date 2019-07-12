@@ -159,6 +159,8 @@ const CHARACTER_PROPERTY: LuaObj<string> = {
     ["health.pct"]: "HealthPercent()",
     ["health.percent"]: "HealthPercent()",
     ["holy_power"]: "HolyPower()",
+    ["incanters_flow_time_to.5.up"]: "StackTimeTo(incanters_flow_buff 5 up)",
+    ["incanters_flow_time_to.4.down"]: "StackTimeTo(incanters_flow_buff 4 down)",
     ["infernal_no_de"]: "NotDeDemons(infernal)",
     ["insanity"]: "Insanity()",
     ["level"]: "Level()",
@@ -1454,6 +1456,9 @@ const OvaleFunctionName = function(name: string, annotation: Annotation) {
 function AddSymbol(annotation: Annotation, symbol: string) {
     let symbolTable = annotation.symbolTable || {}
     let symbolList = annotation.symbolList || {};
+    if (symbol === "target") {
+        debugger;
+    }
     if (!symbolTable[symbol] && !OvaleData.DEFAULT_SPELL_LIST[symbol]) {
         symbolTable[symbol] = true;
         symbolList[lualength(symbolList) + 1] = symbol;
@@ -2851,18 +2856,17 @@ EmitExpression = function (parseNode, nodeList, annotation, action) {
                     [name] = match(name, "^[%a_]+%.([%a_]+)");
                 }
                 let code;
-                if (parseNode.operator == "=") {
-                    if (name == "sim_target") {
-                        code = "True(target_is_sim_target)";
-					} else if (name == "target") {
-						code = "False(target_is_target)";
-                    } else {
-                        code = format("target.Name(%s)", name);
-						AddSymbol(annotation, name);
-                    }
+                if (name == "sim_target") {
+                    code = "True(target_is_sim_target)";
+                } else if (name == "target") {
+                    code = "False(target_is_target)";
                 } else {
-                    code = format("not target.Name(%s)", name);
+                    code = format("target.Name(%s)", name);
                     AddSymbol(annotation, name);
+                }
+                
+                if (parseNode.operator == "!=") {
+                    code = "not " + code;
                 }
                 annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation);
