@@ -1,6 +1,6 @@
 {
   "name": "ovale",
-  "version": "8.0.0",
+  "version": "8.2.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -15,12 +15,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/node": "^10.11.0",
+    "@types/node": "^12.6.2",
     "@wowts/ace_comm-3.0": "^1.0.0",
     "@wowts/ace_config-3.0": "^1.1.0",
     "@wowts/ace_config_dialog-3.0": "^1.0.3",
     "@wowts/ace_console-3.0": "^1.0.0",
-    "@wowts/ace_db-3.0": "^1.1.0",
+    "@wowts/ace_db-3.0": "^1.1.1",
     "@wowts/ace_db_options-3.0": "^1.1.0",
     "@wowts/ace_event-3.0": "^1.0.0",
     "@wowts/ace_gui-3.0": "^1.1.0",
@@ -45,12 +45,12 @@
     "@wowts/table": "^1.0.1",
     "@wowts/tsaddon": "^1.1.2",
     "@wowts/tslib": "^1.1.0",
-    "@wowts/wow-mock": "^1.12.0"
+    "@wowts/wow-mock": "^1.13.0"
   },
   "devDependencies": {
-    "@wowts/tstolua": "^1.6.0",
-    "ava": "^0.25.0",
-    "tslint": "^5.7.0"
+    "@wowts/tstolua": "^1.6.1",
+    "ava": "^2.2.0",
+    "tslint": "^5.18.0"
   },
   "repository": {
     "type": "git",

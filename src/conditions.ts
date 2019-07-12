@@ -2,7 +2,7 @@ import LibBabbleCreatureType from "@wowts/lib_babble-creature_type-3.0";
 import LibRangeCheck from "@wowts/lib_range_check-2.0";
 import { OvaleBestAction } from "./BestAction";
 import { OvaleCompile } from "./Compile";
-import { OvaleCondition, TestValue, Compare, TestBoolean, ParseCondition, ConditionFunction, isComparator, ConditionResult } from "./Condition";
+import { OvaleCondition, TestValue, Compare, TestBoolean, ParseCondition, ConditionFunction, isComparator, ConditionResult, ReturnValue } from "./Condition";
 import { OvaleDamageTaken } from "./DamageTaken";
 import { OvaleData, SpellInfo } from "./Data";
 import { OvaleEquipment } from "./Equipment";
@@ -25,7 +25,7 @@ import { OvaleFrameModule } from "./Frame";
 import { lastSpell } from "./LastSpell";
 import { ipairs, pairs, type, LuaArray, LuaObj, lualength } from "@wowts/lua";
 import { GetBuildInfo, GetItemCooldown, GetItemCount, GetNumTrackingTypes, GetTime, GetTrackingInfo, GetUnitSpeed, GetWeaponEnchantInfo, HasFullControl, IsStealthed, UnitCastingInfo, UnitChannelInfo, UnitClass, UnitClassification, UnitCreatureFamily, UnitCreatureType, UnitDetailedThreatSituation, UnitExists, UnitInParty, UnitInRaid, UnitIsDead, UnitIsFriend, UnitIsPVP, UnitIsUnit, UnitLevel, UnitName, UnitPower, UnitPowerMax, UnitRace, UnitStagger } from "@wowts/wow-mock";
-import { huge } from "@wowts/math";
+import { huge, min } from "@wowts/math";
 import { isValueNode, PositionalParameters, NamedParameters } from "./AST";
 import { OvaleCooldown } from "./Cooldown";
 import { variables } from "./Variables";
@@ -57,7 +57,7 @@ function ComputeParameter<T extends keyof SpellInfo>(spellId: number, paramName:
             let [, element] = OvaleBestAction.Compute(node.child[1], atTime);
             if (element && isValueNode(element)) {
                 let value = <number>element.value + (atTime - element.origin) * element.rate;
-                return value;
+                return <any>value;
             }
         } else {
             return si[paramName];
@@ -158,9 +158,15 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
         let value = OvaleAzeriteEssence.IsMajorEssence(essenceId) || OvaleAzeriteEssence.IsMinorEssence(essenceId);
         return TestBoolean(value, yesno);
     }
+    function AzeriteEssenceRank(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
+        const [essenceId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
+        const value = OvaleAzeriteEssence.self_essences[essenceId].rank;
+        return Compare(value, comparator, limit);
+    }
     OvaleCondition.RegisterCondition("azeriteessenceismajor", false, AzeriteEssenceIsMajor);
     OvaleCondition.RegisterCondition("azeriteessenceisminor", false, AzeriteEssenceIsMinor);
     OvaleCondition.RegisterCondition("azeriteessenceisenabled", false, AzeriteEssenceIsEnabled);
+    OvaleCondition.RegisterCondition("azeriteessencerank", false, AzeriteEssenceRank);
 }
 {
     /** Get the base duration of the aura in seconds if it is applied at the current time.
@@ -5121,3 +5127,43 @@ l    */
     }
     OvaleCondition.RegisterCondition("hasdebufftype", false, HasDebuffType);
 }
+
+function stackTimeTo(positionalParams: PositionalParameters, namedParams: NamedParameters, atTime: number):ConditionResult {
+    const spellId = <number>positionalParams[1];
+    const stacks = <number>positionalParams[2];
+    const direction = <string>positionalParams[3];
+    const incantersFlowBuff = OvaleData.GetSpellInfo(spellId);
+    const tickCycle = (incantersFlowBuff.max_stacks || 5) * 2;
+    let posLo;
+    let posHi;
+    if (direction === "up") {
+        posLo = stacks;
+        posHi = stacks;
+    } else if (direction === "down") {
+        posLo = tickCycle - stacks  +1;
+        posHi = posLo;
+    } else if (direction === "any") {
+        posLo = stacks;
+        posHi = tickCycle - stacks + 1;
+    }
+    const aura = OvaleAura.GetAura("player", spellId, atTime, "HELPFUL");
+    if (!aura) {
+        return undefined;
+    }
+    let buffPos;
+    const buffStacks = aura.stacks;
+    if (aura.direction < 0) {
+        buffPos = tickCycle - buffStacks + 1;
+    } else {
+        buffPos = buffStacks;
+    }    
+    if (posLo === buffPos || posHi === buffPos) return ReturnValue(0, 0, 0);
+    const ticksLo = (tickCycle + posLo - buffPos) % tickCycle;
+    const ticksHi = (tickCycle + posHi - buffPos) % tickCycle;
+    const tickTime = aura.tick;
+    const tickRem = tickTime - (atTime - aura.lastTickTime); 
+    const value = tickRem + tickTime * (min(ticksLo, ticksHi) - 1);
+    return ReturnValue(value, atTime, -1);
+}
+
+OvaleCondition.RegisterCondition("stacktimeto", false, stackTimeTo);

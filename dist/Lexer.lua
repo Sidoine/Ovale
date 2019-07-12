@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Lexer", 80000)
+local __exports = LibStub:NewLibrary("ovale/Lexer", 80201)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Queue = LibStub:GetLibrary("ovale/Queue")

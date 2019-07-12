@@ -741,14 +741,14 @@ export class OvaleFutureClass extends OvaleFutureBase {
         if (spellcast.offgcd) {
             this.Debug("    Caching spell %s (%d) as most recent off-GCD spellcast.", spellcast.spellName, spellcast.spellId);
             for (const [k, v] of kpairs(spellcast)) {
-                this.current.lastOffGCDSpellcast[k] = v;
+                (<any>this.current.lastOffGCDSpellcast)[k] = v;
             }
             lastSpell.lastSpellcast = this.current.lastOffGCDSpellcast;
             this.next.lastOffGCDSpellcast = this.current.lastOffGCDSpellcast
         } else {
             this.Debug("    Caching spell %s (%d) as most recent GCD spellcast.", spellcast.spellName, spellcast.spellId);
             for (const [k, v] of kpairs(spellcast)) {
-                lastSpell.lastGCDSpellcast[k] = v;
+                (<any>lastSpell.lastGCDSpellcast)[k] = v;
             }
             lastSpell.lastSpellcast = lastSpell.lastGCDSpellcast;
             this.next.lastGCDSpellId = lastSpell.lastGCDSpellcast.spellId

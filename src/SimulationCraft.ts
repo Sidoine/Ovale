@@ -159,6 +159,8 @@ const CHARACTER_PROPERTY: LuaObj<string> = {
     ["health.pct"]: "HealthPercent()",
     ["health.percent"]: "HealthPercent()",
     ["holy_power"]: "HolyPower()",
+    ["incanters_flow_time_to.5.up"]: "StackTimeTo(incanters_flow_buff 5 up)",
+    ["incanters_flow_time_to.4.down"]: "StackTimeTo(incanters_flow_buff 4 down)",
     ["infernal_no_de"]: "NotDeDemons(infernal)",
     ["insanity"]: "Insanity()",
     ["level"]: "Level()",
@@ -206,7 +208,8 @@ const CHARACTER_PROPERTY: LuaObj<string> = {
     ["time_to_sht.5"]: "100",
     ["wild_imp_count"]: "Demons(wild_imp)",
     ["wild_imp_no_de"]: "NotDeDemons(wild_imp)",
-    ["wild_imp_remaining_duration"]: "DemonDuration(wild_imp)"
+    ["wild_imp_remaining_duration"]: "DemonDuration(wild_imp)",
+    ["buff.executioners_precision.stack"]:"0"
 };
 
 export type InterruptAnnotation = { [key in Interrupts]?: ClassId };
@@ -1453,6 +1456,9 @@ const OvaleFunctionName = function(name: string, annotation: Annotation) {
 function AddSymbol(annotation: Annotation, symbol: string) {
     let symbolTable = annotation.symbolTable || {}
     let symbolList = annotation.symbolList || {};
+    if (symbol === "target") {
+        debugger;
+    }
     if (!symbolTable[symbol] && !OvaleData.DEFAULT_SPELL_LIST[symbol]) {
         symbolTable[symbol] = true;
         symbolList[lualength(symbolList) + 1] = symbol;
@@ -1528,7 +1534,6 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("none", "none");
 
     //Bloodlust
-    AddDisambiguation("bloodlust_buff", "burst_haste_buff");
     AddDisambiguation("exhaustion_buff", "burst_haste_debuff");
 
     //Items
@@ -1569,7 +1574,6 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("deaths_reach_talent", "deaths_reach_talent_unholy", "DEATHKNIGHT", "unholy");
     AddDisambiguation("grip_of_the_dead_talent", "grip_of_the_dead_talent_unholy", "DEATHKNIGHT", "unholy");
     AddDisambiguation("wraith_walk_talent", "wraith_walk_talent_blood", "DEATHKNIGHT", "blood");
-    AddDisambiguation("asphyxiate", "asphyxiate_blood", "DEATHKNIGHT", "blood");
     AddDisambiguation("deaths_reach_talent", "deaths_reach_talent_unholy", "DEATHKNIGHT", "unholy");
     AddDisambiguation("grip_of_the_dead_talent", "grip_of_the_dead_talent_unholy", "DEATHKNIGHT", "unholy");
     AddDisambiguation("cold_heart_talent_buff", "cold_heart_buff", "DEATHKNIGHT", "frost");
@@ -1640,28 +1644,18 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("mindbender", "mindbender_shadow", "PRIEST", "shadow");
 
     //Rogue
-    AddDisambiguation("deadly_poison_dot", "deadly_poison_debuff", "ROGUE", "assassination");
+    AddDisambiguation("deadly_poison_dot", "deadly_poison", "ROGUE", "assassination");
     AddDisambiguation("stealth_buff", "stealthed_buff", "ROGUE");
     AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_assassination_buff", "ROGUE", "assassination");
     AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_outlaw_buff", "ROGUE", "outlaw");
     AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_subtlety_buff", "ROGUE", "subtlety");
 
     //Shaman
-    AddDisambiguation("ascendance", "ascendance_elemental", "SHAMAN", "elemental");
-    AddDisambiguation("ascendance", "ascendance_enhancement", "SHAMAN", "enhancement");
-    AddDisambiguation("ascendance", "ascendance_restoration", "SHAMAN", "restoration");
-    AddDisambiguation("chain_lightning", "chain_lightning_restoration", "SHAMAN", "restoration");
     AddDisambiguation("earth_shield_talent", "earth_shield_talent_restoration", "SHAMAN", "restoration");
-    AddDisambiguation("echo_of_the_elements_talent", "resto_echo_of_the_elements_talent", "SHAMAN", "restoration");
     AddDisambiguation("flame_shock", "flame_shock_restoration", "SHAMAN", "restoration");
-    AddDisambiguation("healing_surge", "healing_surge_restoration", "SHAMAN", "restoration");
     AddDisambiguation("lightning_bolt", "lightning_bolt_elemental", "SHAMAN", "elemental");
     AddDisambiguation("lightning_bolt", "lightning_bolt_enhancement", "SHAMAN", "enhancement");
-    AddDisambiguation("resonance_totem", "ele_resonance_totem_buff", "SHAMAN", "elemental");
-    AddDisambiguation("resonance_totem", "enh_resonance_totem_buff", "SHAMAN", "enhancement");
     AddDisambiguation("strike", "windstrike", "SHAMAN", "enhancement");
-    AddDisambiguation("totem_mastery", "totem_mastery_elemental", "SHAMAN", "elemental");
-    AddDisambiguation("totem_mastery", "totem_mastery_enhancement", "SHAMAN", "enhancement");
 
     //Warlock
     AddDisambiguation("132369", "wilfreds_sigil_of_superior_summoning", "WARLOCK", "demonology");
@@ -1670,20 +1664,12 @@ const InitializeDisambiguation = function() {
     
     //Warrior
     AddDisambiguation("anger_management_talent", "fury_anger_management_talent", "WARRIOR", "fury");
-    AddDisambiguation("bladestorm", "bladestorm_arms", "WARRIOR", "arms");
-    AddDisambiguation("bladestorm", "bladestorm_fury", "WARRIOR", "fury");
     AddDisambiguation("bounding_stride_talent", "prot_bounding_stride_talent", "WARRIOR", "protection");
     AddDisambiguation("deep_wounds_debuff", "deep_wounds_arms_debuff", "WARRIOR", "arms")
     AddDisambiguation("deep_wounds_debuff", "deep_wounds_prot_debuff", "WARRIOR", "protection")
     AddDisambiguation("dragon_roar_talent", "prot_dragon_roar_talent", "WARRIOR", "protection");
     AddDisambiguation("execute", "execute_arms", "WARRIOR", "arms");
-    AddDisambiguation("ravager", "ravager_prot", "WARRIOR", "protection");
-    AddDisambiguation("massacre_talent", "arms_massacre_talent", "WARRIOR", "arms");
     AddDisambiguation("storm_bolt_talent", "prot_storm_bolt_talent", "WARRIOR", "protection");
-    AddDisambiguation("sudden_death_buff","sudden_death_arms_buff", "WARRIOR", "arms")
-    AddDisambiguation("sudden_death_buff","sudden_death_fury_buff", "WARRIOR", "fury")
-    AddDisambiguation("sudden_death_talent", "fury_sudden_death_talent", "WARRIOR", "fury");
-    AddDisambiguation("whirlwind", "whirlwind_arms", "WARRIOR", "arms");
     AddDisambiguation("meat_cleaver", "whirlwind", "WARRIOR", "fury")
 }
 const IsTotem = function(name: string) {
@@ -2107,7 +2093,7 @@ const EmitModifier = function (modifier: Modifier, parseNode: ParseNode, nodeLis
             code = format("TimeSincePreviousSpell(%s) > %s", action, expressionCode);
         }
     } else if (modifier == "max_cycle_targets") {
-        let debuffName = `${action}_debuff`;
+        let [debuffName] = Disambiguate(annotation, `${action}_debuff` , className, specialization);
         AddSymbol(annotation, debuffName);
         let expressionCode = OvaleAST.Unparse(Emit(parseNode, nodeList, annotation, action));
         code = format("DebuffCountOnAny(%s) < Enemies() and DebuffCountOnAny(%s) <= %s", debuffName, debuffName, expressionCode);
@@ -2401,8 +2387,6 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             annotation[action as keyof typeof interruptsClasses] = className;
             annotation.interrupt = className;
             isSpellAction = false;
-        } else if (className == "DEATHKNIGHT" && action == "antimagic_shell") {
-            conditionCode = "IncomingDamage(1.5 magic=1) > 0";
         } else if (className == "DRUID" && action == "pulverize") {
             let debuffName = "thrash_bear_debuff";
             AddSymbol(annotation, debuffName);
@@ -2516,12 +2500,6 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             let spellName = "primal_strike";
             AddSymbol(annotation, spellName);
             conditionCode = format("target.InRange(%s)", spellName);
-        } else if (className == "SHAMAN" && action == "totem_mastery_elemental") {
-            conditionCode = "(InCombat() or not BuffPresent(ele_resonance_totem_buff))";
-            AddSymbol(annotation, "ele_resonance_totem_buff");
-		} else if (className == "SHAMAN" && action == "totem_mastery_enhancement") {
-            conditionCode = "(InCombat() or not BuffPresent(enh_resonance_totem_buff))";
-            AddSymbol(annotation, "enh_resonance_totem_buff");
         } else if (className == "WARLOCK" && action == "felguard_felstorm") {
             conditionCode = "pet.Present() and pet.CreatureFamily(Felguard)";
         } else if (className == "WARLOCK" && action == "grimoire_of_sacrifice") {
@@ -2878,18 +2856,17 @@ EmitExpression = function (parseNode, nodeList, annotation, action) {
                     [name] = match(name, "^[%a_]+%.([%a_]+)");
                 }
                 let code;
-                if (parseNode.operator == "=") {
-                    if (name == "sim_target") {
-                        code = "True(target_is_sim_target)";
-					} else if (name == "target") {
-						code = "False(target_is_target)";
-                    } else {
-                        code = format("target.Name(%s)", name);
-						AddSymbol(annotation, name);
-                    }
+                if (name == "sim_target") {
+                    code = "True(target_is_sim_target)";
+                } else if (name == "target") {
+                    code = "False(target_is_target)";
                 } else {
-                    code = format("not target.Name(%s)", name);
+                    code = format("target.Name(%s)", name);
                     AddSymbol(annotation, name);
+                }
+                
+                if (parseNode.operator == "!=") {
+                    code = "not " + code;
                 }
                 annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation);
@@ -3275,6 +3252,8 @@ EmitOperandEssence = function (operand, parseNode, nodeList, annotation, action,
             code = format("AzeriteEssenceIsMinor(%s)", essenceId);
         } else if (property == "enabled") {
             code = format("AzeriteEssenceIsEnabled(%s)", essenceId);
+        } else if (property === "rank") {
+            code = format("AzeriteEssenceRank(%s)", essenceId);
         } else {
             ok = false;
         }
@@ -3943,7 +3922,7 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
     operand = lower(operand);
     let code;
     if (className == "DEATHKNIGHT" && operand == "dot.breath_of_sindragosa.ticking") {
-        let buffName = "breath_of_sindragosa_buff";
+        let buffName = "breath_of_sindragosa";
         code = format("BuffPresent(%s)", buffName);
         AddSymbol(annotation, buffName);
     } else if (className == "DEATHKNIGHT" && sub(operand, 1, 24) == "pet.dancing_rune_weapon.") {
@@ -4157,27 +4136,13 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
     } else if (className == "WARLOCK" && operand == "time_to_imps.all.remains") {
 		code = "0" // let's assume imps spawn instantly
 	} else if (className == "WARLOCK" && operand == "havoc_active") {
-		code = "DebuffCountOnAny(havoc_debuff) > 0";
-		AddSymbol(annotation, "havoc_debuff");
+		code = "DebuffCountOnAny(havoc) > 0";
+		AddSymbol(annotation, "havoc");
 	} else if (className == "WARLOCK" && operand == "havoc_remains") {
-		code = "DebuffRemainingOnAny(havoc_debuff)";
-		AddSymbol(annotation, "havoc_debuff");
-	} else if (className == "WARRIOR" && sub(operand, 1, 23) == "buff.colossus_smash_up.") {
-        let property = sub(operand, 24);
-        let debuffName = "colossus_smash_debuff";
-        AddSymbol(annotation, debuffName);
-        if (property == "down") {
-            code = format("DebuffCountOnAny(%s) == 0", debuffName);
-        } else if (property == "up") {
-            code = format("DebuffCountOnAny(%s) > 0", debuffName);
-        } else {
-            ok = false;
-        }
+		code = "DebuffRemainingOnAny(havoc)";
+		AddSymbol(annotation, "havoc");
     } else if (className == "WARRIOR" && operand == "gcd.remains" && (action == "battle_cry" || action == "avatar")) {
         code = "0";
-    } else if (className == "WARRIOR" && operand == "buff.executioners_precision.stack") {
-        code = "target.DebuffStacks(executioners_precision_debuff)";
-        AddSymbol(annotation, "executioners_precision_debuff");
     } else if (operand == "buff.enrage.down") {
         code = `not ${target}IsEnraged()`;
     } else if (operand == "buff.enrage.remains") {
@@ -4947,18 +4912,6 @@ const InsertInterruptFunctions = function(child: LuaArray<AstNode>, annotation: 
             worksOnBoss: 0,
             order: 20
         });
-        if ((annotation.specialization == "protection")) {
-            insert(interrupts, {
-                name: "intercept",
-                stun: 1,
-                worksOnBoss: 0,
-                order: 20,
-                extraCondition: "Talent(warbringer_talent)",
-                addSymbol: {
-                    1: "warbringer_talent"
-                }
-            });
-        }
         insert(interrupts, {
             name: "intimidating_shout",
             incapacitate: 1,
@@ -5477,11 +5430,11 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
                 let [k, operator, value] = match(line, "([^%+=]+)(%+?=)(.*)");
                 const key = <keyof Profile>k;
                 if (operator == "=") {
-                    profile[key] = value;
+                    (<any>profile)[key] = value;
                 } else if (operator == "+=") {
                     if (type(profile[key]) != "table") {
                         const oldValue = profile[key];
-                        profile[key] = {}
+                        (<any>profile[key]) = {}
                         insert(<LuaArray<any>> profile[key], oldValue);
                     }
                     insert(<LuaArray<any>> profile[key], value);
@@ -5490,7 +5443,7 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
         }
         for (const [k, v] of kpairs(profile)) {
             if (isLuaArray(v)) {
-                profile[k] = concat(<any>v);
+                (<any>profile)[k] = concat(<any>v);
             }
         }
         profile.templates = {}

@@ -1,10 +1,10 @@
-local __exports = LibStub:NewLibrary("ovale/scripts/ovale_shaman_spells", 80000)
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_shaman_spells", 80201)
 if not __exports then return end
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 __exports.register = function()
     local name = "ovale_shaman_spells"
-    local desc = "[8.1] Ovale: Shaman spells"
+    local desc = "[8.2] Ovale: Shaman spells"
     local code = [[Define(ancestral_call 274738)
 # Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
@@ -70,6 +70,11 @@ Define(flame_shock 188389)
   SpellInfo(flame_shock cd=6 duration=24 tick=2)
   # Suffering w2 Fire damage every t2 sec.
   SpellAddTargetDebuff(flame_shock flame_shock=1)
+Define(flame_shock_restoration 188838)
+# Sears the target with fire, causing (43.75 of Spell Power) Fire damage and then an additional o2 Fire damage over 21 seconds.
+  SpellInfo(flame_shock_restoration cd=6 duration=21 tick=3)
+  # Suffering w2 Fire damage every t2 sec.
+  SpellAddTargetDebuff(flame_shock_restoration flame_shock_restoration=1)
 Define(flametongue 193796)
 # Scorches your target, dealing s2 Fire damage, and enhances your weapons with fire for 16 seconds, causing each weapon attack to deal up to <coeff>*AP Fire damage.
   SpellInfo(flametongue cd=12)
@@ -143,6 +148,10 @@ Define(lava_shock_buff 273449)
 # Flame Shock damage increases the damage of your next Earth Shock by s1, stacking up to 273453u times.
   SpellInfo(lava_shock_buff channel=-0.001 gcd=0 offgcd=1)
 
+Define(lightning_bolt 403)
+# Hurls a bolt of lightning at the target, dealing (71.25 of Spell Power) Nature damage.
+# Rank 1: Blasts a target for s1 Nature damage.
+  SpellInfo(lightning_bolt)
 Define(lightning_bolt_elemental 188196)
 # Hurls a bolt of lightning at the target, dealing (70.39999999999999 of Spell Power) Nature damage.?a187828[rnrn|cFFFFFFFFGenerates 190493s1 Maelstrom.|r ][]
   SpellInfo(lightning_bolt_elemental)
@@ -205,6 +214,11 @@ Define(reckless_force_buff 298409)
 Define(rockbiter 193786)
 # Assaults your target with earthen power, dealing s1 Nature damage.rnrn|cFFFFFFFFGenerates s2 Maelstrom.|r
   SpellInfo(rockbiter cd=6 maelstrom=-25)
+Define(spiritwalkers_grace 79206)
+# Calls upon the guidance of the spirits for 15 seconds, permitting movement while casting Shaman spells. Castable while casting.?a192088[ Increases movement speed by 192088s2.][]
+  SpellInfo(spiritwalkers_grace cd=120 duration=15 gcd=0 offgcd=1)
+  # Able to move while casting all Shaman spells.
+  SpellAddBuff(spiritwalkers_grace spiritwalkers_grace=1)
 Define(storm_elemental 192249)
 # Calls forth a Greater Storm Elemental to hurl gusts of wind that damage the Shaman's enemies for 30 seconds.rnrnWhile the Storm Elemental is active, each time you cast Lightning Bolt or Chain Lightning, the cast time of Lightning Bolt and Chain Lightning is reduced by 263806s1, stacking up to 263806u times.
   SpellInfo(storm_elemental cd=150 talent=storm_elemental_talent)
@@ -253,10 +267,10 @@ Define(windstrike 115356)
 # Hurl a staggering blast of wind at an enemy, dealing a total of 115357sw1+115360sw1 Physical damage, bypassing armor.
   SpellInfo(windstrike maelstrom=30 cd=9)
 
-Define(ascendance_talent 21) #21675
-# Transform into a Flame Ascendant for 15 seconds, replacing Chain Lightning with Lava Beam, removing the cooldown on Lava Burst, and increasing the damage of Lava Burst by an amount equal to your critical strike chance.
 Define(ascendance_talent_enhancement 21) #21972
 # Transform into an Air Ascendant for 15 seconds, reducing the cooldown and cost of Stormstrike by s4, and transforming your auto attack and Stormstrike into Wind attacks which bypass armor and have a s1 yd range.
+Define(ascendance_talent 21) #21675
+# Transform into a Flame Ascendant for 15 seconds, replacing Chain Lightning with Lava Beam, removing the cooldown on Lava Burst, and increasing the damage of Lava Burst by an amount equal to your critical strike chance.
 Define(boulderfist_talent 1) #22354
 # Rockbiter's recharge time is reduced by s1 and it deals s2 increased damage.
 Define(call_the_thunder_talent 5) #22139
@@ -434,7 +448,7 @@ Define(far_sight 6196)
 	SpellAddTargetDebuff(flame_shock flame_shock_debuff=1)
 Define(flame_shock_debuff 188389)
 	SpellInfo(flame_shock_debuff duration=18 haste=spell tick=2)
-Define(flame_shock_restoration 188838)
+
 	SpellInfo(flame_shock_restoration cd=6)
 Define(flame_shock_restoration_debuff 188389)
 	SpellInfo(flame_shock_restoration_debuff duration=21 haste=spell tick=3)
@@ -527,7 +541,7 @@ Define(lava_surge_buff 77762)
 
 	SpellInfo(lightning_bolt_enhancement cd=12 cd_haste=melee)
 	SpellInfo(lightning_bolt_enhancement maelstrom=0 max_maelstrom=40 talent=overcharge_talent)
-Define(lightning_bolt 403)
+
 Define(lightning_crash_buff 187874)
 Define(lightning_rod_debuff 197209)
 
@@ -564,7 +578,7 @@ Define(spirit_link_totem_buff 98008)
 Define(spirit_walk 58875)
 	SpellInfo(spirit_walk cd=60)
 Define(spirit_wolf_buff 260881)
-Define(spiritwalkers_grace 79206)
+
 	SpellInfo(spiritwalkers_grace cd=120)
 	SpellInfo(spiritwalkers_grace add_cd=-60 talent=graceful_spirit_talent)
 Define(spiritwalkers_grace_buff 79206)

@@ -177,6 +177,11 @@ export function convertFromSpellData(spell: SpellData, spellDataById: Map<number
             }
         }
     }
+
+    if (!buffAdded && !debuffAdded && spell.tooltip) {
+        auras.player.push({ id: spell.id, stacks: 1 });
+    }
+
     if (auras.player.length === 0) delete auras.player;
     if (auras.target.length === 0) delete auras.target;
 

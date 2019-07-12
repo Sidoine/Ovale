@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Options", 80000)
+local __exports = LibStub:NewLibrary("ovale/Options", 80201)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local AceConfig = LibStub:GetLibrary("AceConfig-3.0", true)

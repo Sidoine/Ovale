@@ -1,10 +1,10 @@
-local __exports = LibStub:NewLibrary("ovale/scripts/ovale_mage_spells", 80000)
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_mage_spells", 80201)
 if not __exports then return end
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 __exports.register = function()
     local name = "ovale_mage_spells"
-    local desc = "[8.1] Ovale: Mage spells"
+    local desc = "[8.2] Ovale: Mage spells"
     local code = [[Define(ancestral_call 274738)
 # Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
@@ -177,6 +177,10 @@ Define(nether_tempest 114923)
   SpellInfo(nether_tempest duration=12 tick=1 talent=nether_tempest_talent)
   # Deals w1 Arcane damage and an additional w1 Arcane damage to all enemies within 114954A1 yards every t sec.
   SpellAddTargetDebuff(nether_tempest nether_tempest=1)
+Define(packed_ice 272968)
+# Ice Lance deals an additional s1 damage to enemies recently damaged by your Frozen Orb.
+  SpellInfo(packed_ice channel=0 gcd=0 offgcd=1)
+
 Define(phoenix_flames 257541)
 # Hurls a Phoenix that deals (75 of Spell Power) Fire damage to the target and splashes (20 of Spell Power) Fire damage to other nearby enemies. Always deals a critical strike.
   SpellInfo(phoenix_flames cd=30 talent=phoenix_flames_talent)
