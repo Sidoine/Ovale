@@ -2888,8 +2888,7 @@ EmitExpression = function (parseNode, nodeList, annotation, action) {
 						AddSymbol(annotation, name);
                     }
                 } else {
-                    code = format("not target.Name(%s)", name);
-                    AddSymbol(annotation, name);
+                    code = format("True(target_isnot_target)");
                 }
                 annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation);
