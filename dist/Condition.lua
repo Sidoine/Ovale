@@ -84,6 +84,9 @@ __exports.TestBoolean = function(a, yesno)
     end
     return nil
 end
+__exports.ReturnValue = function(value, origin, rate)
+    return 0, INFINITY, value, origin, rate
+end
 __exports.TestValue = function(start, ending, value, origin, rate, comparator, limit)
     if  not value or  not origin or  not rate then
         return nil
