@@ -107,7 +107,7 @@ let STRING_LOOKUP_FUNCTION: LuaObj<boolean> = {
 
 export type OperatorType = "not" | "or" | "and" | "-" | "=" | "!=" |
     "xor" | "^" | "|" | "==" | "/" | "!" | ">" |
-    ">=" | "<=" | "<" | "+" | "*" | "%";
+    ">=" | "<=" | "<" | "+" | "*" | "%" | ">?";
 
 let UNARY_OPERATOR: {[key in OperatorType]?:{1: "logical" | "arithmetic", 2: number}} = {
     ["not"]: {
@@ -184,6 +184,10 @@ let BINARY_OPERATOR: {[key in OperatorType]?:{1: "logical" | "compare" | "arithm
     ["^"]: {
         1: "arithmetic",
         2: 100
+    },
+    [">?"]: {
+        1: "arithmetic",
+        2: 25
     }
 }
 
@@ -425,10 +429,14 @@ const MATCHES:LuaArray<TokenizerDefinition> = {
         2: Tokenize
     },
     12: {
+        1: "^>%?",
+        2: Tokenize,
+    },
+    13: {
         1: "^.",
         2: Tokenize
     },
-    13: {
+    14: {
         1: "^$",
         2: NoToken
     }

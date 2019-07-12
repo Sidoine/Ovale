@@ -12,7 +12,7 @@ import { OvaleSpellBook } from "./SpellBook";
 import { Ovale } from "./Ovale";
 import { OvaleState } from "./State";
 import aceEvent from "@wowts/ace_event-3.0";
-import { abs, huge, floor } from "@wowts/math";
+import { abs, huge, floor, min } from "@wowts/math";
 import { assert, ipairs, loadstring, pairs, tonumber, wipe, LuaObj, lualength } from "@wowts/lua";
 import { GetActionCooldown, GetActionTexture, GetItemIcon, GetItemCooldown, GetItemSpell, GetSpellTexture, IsActionInRange, IsCurrentAction, IsItemInRange, IsUsableAction, IsUsableItem } from "@wowts/wow-mock";
 import { AstNode, isValueNode } from "./AST";
@@ -532,9 +532,9 @@ class OvaleBestActionClass extends OvaleBestActionBase {
             let operator = element.operator;
             let t = atTime;
             OvaleBestAction.Log("[%d]    %s+(t-%s)*%s %s %s+(t-%s)*%s", element.nodeId, a, b, c, operator, x, y, z);
-            let l, m, n;
-            let A = a + (t - b) * c;
-            let B = x + (t - y) * z;
+            let l, m, n; // The new value, origin, and rate
+            let A = a + (t - b) * c; // the A value at time t
+            let B = x + (t - y) * z; // The B value at time t
             if (operator == "+") {
                 l = A + B;
                 m = t;
@@ -579,6 +579,15 @@ class OvaleBestActionClass extends OvaleBestActionBase {
                     l = 0;
                     m = 0;
                     n = 0;
+                }
+            } else if (operator === ">?") {
+                l = min(A, B);
+                m = t;
+                // TODO should change the end
+                if (l === A) {
+                    n = c;
+                } else {
+                    n = z;
                 }
             }
             OvaleBestAction.Log("[%d]    arithmetic '%s' returns %s+(t-%s)*%s", element.nodeId, operator, l, m, n);

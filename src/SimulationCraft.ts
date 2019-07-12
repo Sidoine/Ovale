@@ -344,7 +344,7 @@ type ParseNodeType = "action" | "action_list" | "arithmetic" | "compare" |
 
 type SimcBinaryOperatorType = "|" | "^" |
     "&" | "!=" | "<" | "<=" | "=" | "==" | ">" | ">=" |
-    "~" | "!~" | "+" | "%" | "*" | "-";
+    "~" | "!~" | "+" | "%" | "*" | "-" | ">?";
 type SimcUnaryOperatorType = "!" | "-" | "@";
 type SimcOperatorType = SimcUnaryOperatorType | SimcBinaryOperatorType;
 
@@ -515,7 +515,7 @@ let UNARY_OPERATOR: {[k in SimcUnaryOperatorType]: {1: "logical" | "arithmetic",
         2: 50
     }
 }
-let BINARY_OPERATOR: {[k in SimcBinaryOperatorType]: {1: "logical" | "compare" | "arithmetic", 2: number, 3?: string}} = {
+let BINARY_OPERATOR: {[k in SimcBinaryOperatorType]: {1: "logical" | "compare" | "arithmetic", 2: number, 3?: "associative"}} = {
     ["|"]: {
         1: "logical",
         2: 5,
@@ -583,6 +583,11 @@ let BINARY_OPERATOR: {[k in SimcBinaryOperatorType]: {1: "logical" | "compare" |
     ["*"]: {
         1: "arithmetic",
         2: 40,
+        3: "associative"
+    },
+    [">?"]: {
+        1: "arithmetic",
+        2: 25,
         3: "associative"
     }
 }
@@ -832,16 +837,16 @@ const MATCHES:LuaArray<TokenizerDefinition> = {
         2: Tokenize
     },
     9: {
-        1: "^.",
+        1: "^>%?",
         2: Tokenize
     },
     10: {
-        1: "^$",
-        2: NoToken
+        1: "^.",
+        2: Tokenize
     },
     11: {
-        1: "^:",
-        2: Tokenize
+        1: "^$",
+        2: NoToken
     }
 }
 
