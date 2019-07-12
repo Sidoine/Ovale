@@ -3274,6 +3274,8 @@ EmitOperandEssence = function (operand, parseNode, nodeList, annotation, action,
             code = format("AzeriteEssenceIsMinor(%s)", essenceId);
         } else if (property == "enabled") {
             code = format("AzeriteEssenceIsEnabled(%s)", essenceId);
+        } else if (property == "rank") {
+            code = format("AzeriteEssenceRank(%s)", essenceId);
         } else {
             ok = false;
         }

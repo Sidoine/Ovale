@@ -161,6 +161,13 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
     OvaleCondition.RegisterCondition("azeriteessenceismajor", false, AzeriteEssenceIsMajor);
     OvaleCondition.RegisterCondition("azeriteessenceisminor", false, AzeriteEssenceIsMinor);
     OvaleCondition.RegisterCondition("azeriteessenceisenabled", false, AzeriteEssenceIsEnabled);
+    
+    function AzeriteEssenceRank(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
+        let [essenceId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
+        let value = OvaleAzeriteEssence.EssenceRank(essenceId);
+        return Compare(value, comparator, limit);
+    }
+    OvaleCondition.RegisterCondition("azeriteessencerank", false, AzeriteEssenceRank);
 }
 {
     /** Get the base duration of the aura in seconds if it is applied at the current time.
