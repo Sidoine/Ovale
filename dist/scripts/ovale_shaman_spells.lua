@@ -287,10 +287,10 @@ Define(windstrike 115356)
 # Hurl a staggering blast of wind at an enemy, dealing a total of 115357sw1+115360sw1 Physical damage, bypassing armor.
   SpellInfo(windstrike maelstrom=30 cd=9)
 
-Define(ascendance_talent 21) #21675
-# Transform into a Flame Ascendant for 15 seconds, replacing Chain Lightning with Lava Beam, removing the cooldown on Lava Burst, and increasing the damage of Lava Burst by an amount equal to your critical strike chance.
 Define(ascendance_talent_enhancement 21) #21972
 # Transform into an Air Ascendant for 15 seconds, reducing the cooldown and cost of Stormstrike by s4, and transforming your auto attack and Stormstrike into Wind attacks which bypass armor and have a s1 yd range.
+Define(ascendance_talent 21) #21675
+# Transform into a Flame Ascendant for 15 seconds, replacing Chain Lightning with Lava Beam, removing the cooldown on Lava Burst, and increasing the damage of Lava Burst by an amount equal to your critical strike chance.
 Define(boulderfist_talent 1) #22354
 # Rockbiter's recharge time is reduced by s1 and it deals s2 increased damage.
 Define(call_the_thunder_talent 5) #22139

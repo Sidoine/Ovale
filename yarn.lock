@@ -573,10 +573,17 @@
     commander "^2.18.0"
     typescript "^3.5.3"
 
-"@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.13.0", "@wowts/wow-mock@^1.6.0":
+"@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.6.0":
   version "1.13.0"
   resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.13.0.tgz#d41c4309cad587cbba779d95199a76dfa1b058d7"
   integrity sha512-wjGcuS+j9c6eD2EJTQ+QcRGrdpVHK3OJRd3B1ycpv+bVAoF/WRAizUgCYowswyi0X8xdINvtrioGumvBO2Q+rg==
+  dependencies:
+    "@wowts/lua" "^1.3.2"
+
+"@wowts/wow-mock@^1.13.1":
+  version "1.13.1"
+  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.13.1.tgz#f4c5469c92ba4e688d166573c92bcef0a1d24906"
+  integrity sha512-EEalLTWyEFn44WLQdloPveakRFexidx180mhSiORKTXjijRoHLBD5cGkFgARqKlRh8uw02JqbaFTMu5VgEkaOQ==
   dependencies:
     "@wowts/lua" "^1.3.2"
 
