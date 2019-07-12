@@ -1,4 +1,4 @@
-import { test } from "ava";
+import test from "ava";
 import { OvaleSimulationCraft } from "../SimulationCraft";
 import { OvaleDebug } from "../Debug";
 

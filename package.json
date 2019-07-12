@@ -15,7 +15,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/node": "^10.11.0",
+    "@types/node": "^12.6.2",
     "@wowts/ace_comm-3.0": "^1.0.0",
     "@wowts/ace_config-3.0": "^1.1.0",
     "@wowts/ace_config_dialog-3.0": "^1.0.3",
@@ -49,8 +49,8 @@
   },
   "devDependencies": {
     "@wowts/tstolua": "^1.6.1",
-    "ava": "^0.25.0",
-    "tslint": "^5.7.0"
+    "ava": "^2.2.0",
+    "tslint": "^5.18.0"
   },
   "repository": {
     "type": "git",

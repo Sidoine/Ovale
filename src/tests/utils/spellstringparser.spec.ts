@@ -1,4 +1,4 @@
-import { test } from "ava";
+import test from "ava";
 import { SpellData, SpellEffectData, EffectSubtype, EffectType } from "../../utils/importspells";
 import { parseDescription } from "../../utils/spellstringparser";
 
