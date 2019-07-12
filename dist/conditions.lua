@@ -202,7 +202,7 @@ local function AzeriteEssenceIsEnabled(positionalParams, namedParams, atTime)
     end
 local function AzeriteEssenceRank(positionalParams, namedParams, atTime)
         local essenceId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-        local value = OvaleAzeriteEssence.self_essences[essenceId].rank
+        local value = OvaleAzeriteEssence:EssenceRank(essenceId)
         return Compare(value, comparator, limit)
     end
     OvaleCondition:RegisterCondition("azeriteessenceismajor", false, AzeriteEssenceIsMajor)
