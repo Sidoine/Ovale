@@ -4947,18 +4947,6 @@ const InsertInterruptFunctions = function(child: LuaArray<AstNode>, annotation: 
             worksOnBoss: 0,
             order: 20
         });
-        if ((annotation.specialization == "protection")) {
-            insert(interrupts, {
-                name: "intercept",
-                stun: 1,
-                worksOnBoss: 0,
-                order: 20,
-                extraCondition: "Talent(warbringer_talent)",
-                addSymbol: {
-                    1: "warbringer_talent"
-                }
-            });
-        }
         insert(interrupts, {
             name: "intimidating_shout",
             incapacitate: 1,
@@ -5477,11 +5465,11 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
                 let [k, operator, value] = match(line, "([^%+=]+)(%+?=)(.*)");
                 const key = <keyof Profile>k;
                 if (operator == "=") {
-                    profile[key] = value;
+                    (<any>profile)[key] = value;
                 } else if (operator == "+=") {
                     if (type(profile[key]) != "table") {
                         const oldValue = profile[key];
-                        profile[key] = {}
+                        (<any>profile[key]) = {}
                         insert(<LuaArray<any>> profile[key], oldValue);
                     }
                     insert(<LuaArray<any>> profile[key], value);
@@ -5490,7 +5478,7 @@ class OvaleSimulationCraftClass extends OvaleSimulationCraftBase {
         }
         for (const [k, v] of kpairs(profile)) {
             if (isLuaArray(v)) {
-                profile[k] = concat(<any>v);
+                (<any>profile)[k] = concat(<any>v);
             }
         }
         profile.templates = {}

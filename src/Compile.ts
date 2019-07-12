@@ -232,7 +232,7 @@ function EvaluateItemInfo(node: AstNode) {
                 }
             } else if (!checkToken(PARAMETER_KEYWORD, k)) {
                 // TODO check that is a spell info parameter
-                ii[k as keyof SpellInfo] = <any>v;
+                (<any>ii)[k] = v;
             }
         }
         OvaleData.itemInfo[itemId] = ii;
@@ -401,13 +401,13 @@ function EvaluateSpellInfo(node: AstNode) {
                         realValue = value * OvaleAzerite.TraitRank(namedParams.pertrait);
                     }
                     let power = <number>si[k as keyof SpellInfo] || 0;
-                    si[k as keyof SpellInfo] = power + realValue;
+                    (<any>si)[k] = power + realValue;
                 } else {
                     ok = false;
                     break;
                 }
             } else if (!checkToken(PARAMETER_KEYWORD, k)) {
-                si[k as keyof SpellInfo] = <any>v;
+                (<any>si)[k] = v;
             }
         }
     }

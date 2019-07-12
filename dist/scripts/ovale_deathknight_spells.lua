@@ -4,7 +4,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 __exports.register = function()
     local name = "ovale_deathknight_spells"
-    local desc = "[8.1] Ovale: Death Knight spells"
+    local desc = "[8.2] Ovale: Death Knight spells"
     local code = [[Define(apocalypse 275699)
 # Bring doom upon the enemy, dealing sw1 Shadow damage and bursting up to s2 Festering Wounds on the target.rnrnSummons an Army of the Dead ghoul for 15 seconds for each burst Festering Wound.
   SpellInfo(apocalypse cd=90)

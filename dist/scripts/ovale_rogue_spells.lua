@@ -4,7 +4,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 __exports.register = function()
     local name = "ovale_rogue_spells"
-    local desc = "[8.1] Ovale: Rogue spells"
+    local desc = "[8.2] Ovale: Rogue spells"
     local code = [[Define(adrenaline_rush 13750)
 # Increases your Energy regeneration rate by (25 of Spell Power), your maximum Energy by (25 of Spell Power), and your attack speed by s2 for 20 seconds.
   SpellInfo(adrenaline_rush cd=180 duration=20 gcd=0.8)
@@ -46,11 +46,6 @@ Define(blade_rush 271877)
 Define(blindside 111240)
 # Exploits the vulnerability of foes with less than s4 health, dealing s2 Physical damage to the target.rnrnMutilate has a s5 chance to make your next Blindside free and usable on any target, regardless of their health.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|r
   SpellInfo(blindside energy=30 gcd=1 combopoints=-1 talent=blindside_talent)
-Define(blood_of_the_enemy 297108)
-# The Heart of Azeroth erupts violently, dealing s1 Shadow damage to enemies within A1 yds. You gain m2 critical strike chance against the targets for 10 seconds?a297122[, and increases your critical hit damage by 297126m for 5 seconds][].
-  SpellInfo(blood_of_the_enemy cd=120 duration=10 channel=10)
-  # You have a w2 increased chance to be Critically Hit by the caster.
-  SpellAddTargetDebuff(blood_of_the_enemy blood_of_the_enemy=1)
 Define(cheap_shot 1833)
 # Stuns the target for 4 seconds.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
   SpellInfo(cheap_shot energy=40 duration=4 gcd=1 combopoints=-2)
@@ -87,10 +82,6 @@ Define(fan_of_knives 51723)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
-Define(focused_azerite_beam 295262)
-# Reduces the cast time of Focused Azerite Beam by s1.
-  SpellInfo(focused_azerite_beam channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam=1)
 Define(garrote 703)
 # Garrote the enemy, causing o1 Bleed damage over 18 seconds.?a231719[ Silences the target for 3 seconds when used from Stealth.][]rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|r
 # Rank 2: Garrote silences the target for 3 seconds when used from Stealth.rn
@@ -110,10 +101,6 @@ Define(gouge 1776)
   SpellInfo(gouge energy=25 cd=15 duration=4 gcd=1 combopoints=-1)
   # Incapacitated.
   SpellAddTargetDebuff(gouge gouge=1)
-Define(guardian_of_azeroth 295840)
-# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
-  SpellInfo(guardian_of_azeroth cd=180 duration=30)
-  SpellAddBuff(guardian_of_azeroth guardian_of_azeroth=1)
 Define(keep_your_wits_about_you_buff 288985)
 # When an attack Blade Flurries, increase the chance for Sinister Strike to strike again by s1. Additional strikes of Sinister Strike deal s2 more damage.
   SpellInfo(keep_your_wits_about_you_buff channel=-0.001 gcd=0 offgcd=1)
@@ -166,9 +153,6 @@ Define(pistol_shot 185763)
   SpellAddBuff(pistol_shot pistol_shot=1)
   # Movement speed reduced by s3.
   SpellAddTargetDebuff(pistol_shot pistol_shot=1)
-Define(purifying_blast 295337)
-# Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
-  SpellInfo(purifying_blast cd=60 duration=6)
 Define(quaking_palm 107079)
 # Strikes the target with lightning speed, incapacitating them for 4 seconds, and turns off your attack.
   SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
@@ -242,11 +226,6 @@ Define(symbols_of_death 212283)
   SpellInfo(symbols_of_death cd=30 duration=10 gcd=0 offgcd=1 energy=-40 tick=1)
   # Damage done increased by s1.
   SpellAddBuff(symbols_of_death symbols_of_death=1)
-Define(the_unbound_force 298452)
-# Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]
-  SpellInfo(the_unbound_force cd=60 duration=2 channel=2 tick=0.33)
-  SpellAddBuff(the_unbound_force the_unbound_force=1)
-  SpellAddTargetDebuff(the_unbound_force the_unbound_force=1)
 Define(toxic_blade 245388)
 # Stab your enemy with a toxic poisoned blade, dealing s2 Nature damage.rnrnYour Nature damage done against the target is increased by 245389s1 for 9 seconds.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|r
   SpellInfo(toxic_blade energy=20 cd=25 gcd=1 combopoints=-1 talent=toxic_blade_talent)

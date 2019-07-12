@@ -57,7 +57,7 @@ function ComputeParameter<T extends keyof SpellInfo>(spellId: number, paramName:
             let [, element] = OvaleBestAction.Compute(node.child[1], atTime);
             if (element && isValueNode(element)) {
                 let value = <number>element.value + (atTime - element.origin) * element.rate;
-                return value;
+                return <any>value;
             }
         } else {
             return si[paramName];

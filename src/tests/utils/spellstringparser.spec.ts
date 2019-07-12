@@ -49,7 +49,9 @@ function createFakeSpell(options: {[k in keyof SpellData]?: SpellData[k]}): Spel
         school: 0,
         spell_level: 0,
         stance_mask: 0,
-        tooltip: ""
+        tooltip: "",
+        essence_id: 0,
+        dmg_class: 0
     };
 }
 

@@ -4,7 +4,7 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 __exports.register = function()
     local name = "ovale_monk_spells"
-    local desc = "[8.1] Ovale: Monk spells"
+    local desc = "[8.2] Ovale: Monk spells"
     local code = [[Define(ancestral_call 274738)
 # Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
@@ -187,9 +187,9 @@ Define(invoke_niuzao_the_black_ox_talent 18) #22103
 # Summons an effigy of Niuzao, the Black Ox for 45 seconds. Niuzao attacks your primary target and taunts it. He also frequently Stomps, damaging all nearby enemies.
 Define(invoke_xuen_the_white_tiger_talent 18) #22102
 # Summons an effigy of Xuen, the White Tiger for 20 seconds. Xuen attacks your primary target, and strikes 3 enemies within 123996A1 yards every 123999t1 sec with Tiger Lightning for 123996s1 Nature damage.
-Define(rushing_jade_wind_talent 17) #20184
-# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to enemies within 107270A1 yards.
 Define(rushing_jade_wind_talent_windwalker 17) #23122
+# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to enemies within 107270A1 yards.
+Define(rushing_jade_wind_talent 17) #20184
 # Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to enemies within 107270A1 yards.
 Define(serenity_talent 21) #21191
 # Enter an elevated state of mental and physical serenity for ?s115069[s1 sec][12 seconds]. While in this state, you deal s2 increased damage and healing, and all Chi consumers are free and cool down s4 more quickly.

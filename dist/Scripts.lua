@@ -48,7 +48,7 @@ do
         }
     }
     for k, v in kpairs(defaultDB) do
-        OvaleOptions.defaultDB.profile[k] = v
+        (OvaleOptions.defaultDB.profile)[k] = v
     end
     for k, v in pairs(actions) do
         OvaleOptions.options.args.actions.args[k] = v
@@ -115,7 +115,7 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
             scClassName = "death_knight"
         end
         if  not name and specialization then
-            name = format("sc_pr_%s_%s", scClassName, specialization)
+            name = format("sc_t23_%s_%s", scClassName, specialization)
         end
         if  not (name and self.script[name]) then
             name = DISABLED_NAME

@@ -1,10 +1,10 @@
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
-    local name = "sc_pr_monk_brewmaster"
-    local desc = "[8.2] Simulationcraft: PR_Monk_Brewmaster"
+    local name = "sc_t23_monk_brewmaster"
+    local desc = "[8.2] Simulationcraft: T23_Monk_Brewmaster"
     local code = [[
-# Based on SimulationCraft profile "PR_Monk_Brewmaster".
+# Based on SimulationCraft profile "T23_Monk_Brewmaster".
 #	class=monk
 #	spec=brewmaster
 #	talents=1030021
@@ -137,7 +137,7 @@ AddFunction BrewmasterDefaultCdActions
  if IncomingDamage(1.5) > 0 and BuffExpires(fortifying_brew_buff) Spell(dampen_harm)
  #fortifying_brew,if=incoming_damage_1500ms&(buff.dampen_harm.down|buff.diffuse_magic.down)
  if IncomingDamage(1.5) > 0 and { BuffExpires(dampen_harm) or BuffExpires(diffuse_magic) } Spell(fortifying_brew)
- #use_item,name=lustrous_golden_plumage
+ #use_item,name=invocation_of_yulon
  BrewmasterUseItemActions()
  #potion
  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
@@ -273,10 +273,10 @@ AddIcon checkbox=opt_monk_brewmaster_aoe help=cd specialization=brewmaster
     OvaleScripts:RegisterScript("MONK", "brewmaster", name, desc, code, "script")
 end
 do
-    local name = "sc_pr_monk_windwalker"
-    local desc = "[8.2] Simulationcraft: PR_Monk_Windwalker"
+    local name = "sc_t23_monk_windwalker"
+    local desc = "[8.2] Simulationcraft: T23_Monk_Windwalker"
     local code = [[
-# Based on SimulationCraft profile "PR_Monk_Windwalker".
+# Based on SimulationCraft profile "T23_Monk_Windwalker".
 #	class=monk
 #	spec=windwalker
 #	talents=2022032
@@ -473,7 +473,7 @@ AddFunction WindwalkerCdCdActions
 {
  #invoke_xuen_the_white_tiger
  Spell(invoke_xuen_the_white_tiger)
- #use_item,name=lustrous_golden_plumage
+ #use_item,name=variable_intensity_gigavolt_oscillating_reactor
  WindwalkerUseItemActions()
  #blood_fury
  Spell(blood_fury_apsp)
@@ -759,10 +759,10 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
     OvaleScripts:RegisterScript("MONK", "windwalker", name, desc, code, "script")
 end
 do
-    local name = "sc_pr_monk_windwalker_serenity"
-    local desc = "[8.2] Simulationcraft: PR_Monk_Windwalker_Serenity"
+    local name = "sc_t23_monk_windwalker_serenity"
+    local desc = "[8.2] Simulationcraft: T23_Monk_Windwalker_Serenity"
     local code = [[
-# Based on SimulationCraft profile "PR_Monk_Windwalker_Serenity".
+# Based on SimulationCraft profile "T23_Monk_Windwalker_Serenity".
 #	class=monk
 #	spec=windwalker
 #	talents=2022033
@@ -959,7 +959,7 @@ AddFunction WindwalkerCdCdActions
 {
  #invoke_xuen_the_white_tiger
  Spell(invoke_xuen_the_white_tiger)
- #use_item,name=lustrous_golden_plumage
+ #use_item,name=variable_intensity_gigavolt_oscillating_reactor
  WindwalkerUseItemActions()
  #blood_fury
  Spell(blood_fury_apsp)

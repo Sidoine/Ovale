@@ -4,26 +4,8 @@ local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 __exports.register = function()
     local name = "ovale_priest_spells"
-    local desc = "[8.1] Ovale: Priest spells"
-    local code = [[Define(ancestral_call 274738)
-# Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
-  SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
-  SpellAddBuff(ancestral_call ancestral_call=1)
-Define(apotheosis 200183)
-# Enter a pure Holy form for 20 seconds, increasing the cooldown reductions to your Holy Words by s1 and reducing their cost by s2.
-  SpellInfo(apotheosis cd=120 duration=20 talent=apotheosis_talent)
-  # Effects that reduce Holy Word cooldowns increased by s1. Cost of Holy Words reduced by s2.
-  SpellAddBuff(apotheosis apotheosis=1)
-Define(arcane_pulse 260364)
-# Deals <damage> Arcane damage to nearby enemies and reduces their movement speed by 260369s1. Lasts 12 seconds.
-  SpellInfo(arcane_pulse cd=180 gcd=1)
-
-Define(berserking 26297)
-# Increases your haste by s1 for 12 seconds.
-  SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
-  # Haste increased by s1.
-  SpellAddBuff(berserking berserking=1)
-Define(blood_of_the_enemy 297108)
+    local desc = "[8.2] Ovale: Priest spells"
+    local code = [[Define(blood_of_the_enemy 297108)
 # The Heart of Azeroth erupts violently, dealing s1 Shadow damage to enemies within A1 yds. You gain m2 critical strike chance against the targets for 10 seconds?a297122[, and increases your critical hit damage by 297126m for 5 seconds][].
   SpellInfo(blood_of_the_enemy cd=120 duration=10 channel=10)
   # You have a w2 increased chance to be Critically Hit by the caster.
@@ -34,12 +16,6 @@ Define(dark_ascension 280711)
 Define(dark_void 263346)
 # Unleashes an explosion of dark energy around the target, dealing (100 of Spell Power) Shadow damage and applying Shadow Word: Pain to all nearby enemies.rnrn|cFFFFFFFFGenerates s2/100 Insanity.|r
   SpellInfo(dark_void cd=30 insanity=-3000 talent=dark_void_talent)
-Define(divine_star 110744)
-# Throw a Divine Star forward 24 yds, healing allies in its path for (50 of Spell Power) and dealing (40 of Spell Power) Holy damage to enemies. After reaching its destination, the Divine Star returns to you, healing allies and damaging enemies in its path again.
-  SpellInfo(divine_star cd=15 duration=15 talent=divine_star_talent)
-Define(fireblood 265221)
-# Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
-  SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
 Define(focused_azerite_beam 295262)
 # Reduces the cast time of Focused Azerite Beam by s1.
   SpellInfo(focused_azerite_beam channel=0 gcd=0 offgcd=1)
@@ -48,26 +24,6 @@ Define(guardian_of_azeroth 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth cd=180 duration=30)
   SpellAddBuff(guardian_of_azeroth guardian_of_azeroth=1)
-Define(halo 120517)
-# Creates a ring of Holy energy around you that quickly expands to a 30 yd radius, healing allies for (103 of Spell Power) and dealing (103 of Spell Power) Holy damage to enemies.
-  SpellInfo(halo cd=40 duration=3.2 talent=halo_talent)
-Define(holy_fire 14914)
-# Consumes the enemy in Holy flames that cause (50 of Spell Power) Holy damage and an additional o2 Holy damage over 7 seconds.?a231687[ Stacks up to u times.][]
-# Rank 2: Smite and Holy Nova have a s1 chance to reset the cooldown of Holy Fire, and Holy Fire's damage over time effect can stack up to s2+1 times.
-  SpellInfo(holy_fire cd=10 duration=7 max_stacks=1 tick=1)
-  # w2 Holy damage every t2 seconds.
-  SpellAddTargetDebuff(holy_fire holy_fire=1)
-Define(holy_nova 132157)
-# Causes an explosion of holy light around you, dealing (24 of Spell Power) Holy damage to all enemies and (10 of Spell Power) healing to all allies within A1 yds.?a231687[ Has a 231687s1 chance to reset the cooldown of Holy Fire if any targets are hit.][]
-  SpellInfo(holy_nova)
-
-Define(holy_word_chastise 88625)
-# Chastises the target for (112.5 of Spell Power) Holy damage and ?s200199[stuns][incapacitates] them for ?s200199[4 seconds][4 seconds].?s63733[rnrn|cFFFFFFFFCooldown reduced by s2 sec when you cast Smite.|r][]
-  SpellInfo(holy_word_chastise cd=60)
-Define(lights_judgment 255647)
-# Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
-  SpellInfo(lights_judgment cd=150)
-
 Define(mind_blast 8092)
 # Blasts the target's mind for (120 of Spell Power) Shadow damage.?a185916[rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r][]
   SpellInfo(mind_blast cd=7.5 insanity=-1200)
@@ -79,7 +35,6 @@ Define(mind_bomb 205369)
 Define(mind_flay 15407)
 # Assaults the target's mind with Shadow energy, causing o1 Shadow damage over 3 seconds and slowing their movement speed by s2.?a185916[rnrn|cFFFFFFFFGenerates s4*m3/100 Insanity over the duration.|r][]
   SpellInfo(mind_flay duration=3 channel=3 tick=0.75)
-  SpellInfo(smite replaced_by=mind_flay)
   # Movement speed slowed by s2 and taking Shadow damage every t1 sec.
   SpellAddBuff(mind_flay mind_flay=1)
   # Movement speed slowed by s2 and taking Shadow damage every t1 sec.
@@ -121,10 +76,6 @@ Define(silence 15487)
   SpellInfo(silence cd=45 duration=4 gcd=0 offgcd=1)
   # Silenced.
   SpellAddTargetDebuff(silence silence=1)
-Define(smite 585)
-# Smites an enemy for (47 of Spell Power) Holy damage?s231682[ and absorbs the next <shield> damage dealt by the enemy]?s231687[ and has a 231687s1 chance to reset the cooldown of Holy Fire][].
-# Rank 2: Smite deals s1 increased damage.
-  SpellInfo(smite)
 Define(surrender_to_madness 193223)
 # All your Insanity-generating abilities generate s1 more Insanity and you can cast while moving for 60 seconds.rnrnThen, you take damage equal to s3 of your maximum health and cannot generate Insanity for 15 seconds.
   SpellInfo(surrender_to_madness cd=180 duration=60 talent=surrender_to_madness_talent)
@@ -164,16 +115,10 @@ Define(war_stomp 20549)
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
   # Stunned.
   SpellAddTargetDebuff(war_stomp war_stomp=1)
-Define(apotheosis_talent 20) #21644
-# Enter a pure Holy form for 20 seconds, increasing the cooldown reductions to your Holy Words by s1 and reducing their cost by s2.
 Define(dark_ascension_talent 20) #21978
 # Immediately activates a new Voidform, then releases an explosive blast of pure void energy, causing (95 of Spell Power)*2 Shadow damage to all enemies within a1 yds of your target.rnrn|cFFFFFFFFGenerates s2/100 Insanity.|r
 Define(dark_void_talent 9) #23127
 # Unleashes an explosion of dark energy around the target, dealing (100 of Spell Power) Shadow damage and applying Shadow Word: Pain to all nearby enemies.rnrn|cFFFFFFFFGenerates s2/100 Insanity.|r
-Define(divine_star_talent 17) #19760
-# Throw a Divine Star forward 24 yds, healing allies in its path for (50 of Spell Power) and dealing (40 of Spell Power) Holy damage to enemies. After reaching its destination, the Divine Star returns to you, healing allies and damaging enemies in its path again.
-Define(halo_talent 18) #19763
-# Creates a ring of Holy energy around you that quickly expands to a 30 yd radius, healing allies for (103 of Spell Power) and dealing (103 of Spell Power) Holy damage to enemies.
 Define(mind_bomb_talent 11) #23375
 # Inflicts the target with a Mind Bomb.rnrnAfter 2 seconds or if the target dies, it unleashes a psychic explosion, disorienting all enemies within 226943A1 yds of the target for 6 seconds.
 Define(mindbender_talent 17) #21719
