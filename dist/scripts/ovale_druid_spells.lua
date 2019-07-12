@@ -226,6 +226,9 @@ Define(shadowmeld 58984)
   SpellInfo(shadowmeld cd=120 channel=-0.001 gcd=0 offgcd=1)
   # Shadowmelded.
   SpellAddBuff(shadowmeld shadowmeld=1)
+Define(sharpened_claws_buff 268525)
+# Your attacks have a chance to summon a whirlwind of sharpened claws, inflicting 268525s1 Physical damage split evenly among all enemies within 268525A1 yards.
+  SpellInfo(sharpened_claws_buff channel=0 gcd=0 offgcd=1)
 Define(shred 5221)
 # Shred the target, causing s1*<mult> Physical damage to the target.?a231063[ Deals s4 increased damage against bleeding targets.][]?a231057[rnrnWhile stealthed, Shred deals m3 increased damage, and has double the chance to critically strike.][]?c2[rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r]?s202155[rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.][]
 # Rank 2: Shred deals 5221s5 increased damage against bleeding targets.
@@ -261,11 +264,6 @@ Define(sunfire 93402)
 # A quick beam of solar light burns the enemy for (20 of Spell Power) Nature damage and then an additional 164815o2 Nature damage over 12 seconds?s231050[ to the primary target and all enemies within 164815A2 yards][].?s137013[rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r][]
 # Rank 2: Sunfire now applies its damage over time effect to all enemies within 164815A2 yards.
   SpellInfo(sunfire lunarpower=0)
-Define(the_unbound_force 298452)
-# Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]
-  SpellInfo(the_unbound_force cd=60 duration=2 channel=2 tick=0.33)
-  SpellAddBuff(the_unbound_force the_unbound_force=1)
-  SpellAddTargetDebuff(the_unbound_force the_unbound_force=1)
 Define(thorns 236696)
 # Sprout thorns for 12 seconds on the friendly target. When victim to melee attacks, thorns deals up to 203728s2 of the attackers total health in Nature damage.rnrnAttackers also have their movement speed reduced by 232559s1 for 4 seconds.
 # Rank 1: When struck in combat you have a chance to inflict 15438s1 Arcane damage to the attacker.
@@ -352,7 +350,6 @@ Define(lively_spirit_trait 279642)
 Define(streaking_stars_trait 272871)
 Define(wild_fleshrending_trait 279527)
 Define(layered_mane_trait 279552)
-Define(power_of_the_moon_trait 273367)
     ]]
     code = code .. [[
 Define(astralpower "lunarpower") # Astral Power is named LunarPower in Enum.PowerType

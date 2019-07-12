@@ -1,13 +1,13 @@
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
-    local name = "sc_t23_shaman_elemental"
-    local desc = "[8.2] Simulationcraft: T23_Shaman_Elemental"
+    local name = "sc_t24_shaman_elemental"
+    local desc = "[8.2] Simulationcraft: T24_Shaman_Elemental"
     local code = [[
-# Based on SimulationCraft profile "T23_Shaman_Elemental".
+# Based on SimulationCraft profile "T24_Shaman_Elemental".
 #	class=shaman
 #	spec=elemental
-#	talents=2301032
+#	talents=2311132
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -118,10 +118,16 @@ AddFunction ElementalSingletargetShortCdActions
   #liquid_magma_totem,if=talent.liquid_magma_totem.enabled&(raid_event.adds.count<3|raid_event.adds.in>50)
   if Talent(liquid_magma_totem_talent) and { 0 < 3 or 600 > 50 } Spell(liquid_magma_totem)
 
-  unless BuffPresent(stormkeeper_buff) and Enemies() < 2 and AzeriteTraitRank(lava_shock_trait) * BuffStacks(lava_shock_buff) < 26 and { BuffPresent(master_of_the_elements_buff) and not Talent(surge_of_power_talent) or BuffPresent(surge_of_power_buff) } and Spell(lightning_bolt_elemental) or { Enemies() > 1 or AzeriteTraitRank(tectonic_thunder_trait) >= 3 and not Talent(surge_of_power_talent) and AzeriteTraitRank(lava_shock_trait) < 1 } and AzeriteTraitRank(lava_shock_trait) * BuffStacks(lava_shock_buff) < 36 + 3 * AzeriteTraitRank(tectonic_thunder_trait) * Enemies() and { not Talent(surge_of_power_talent) or not target.DebuffRefreshable(flame_shock_debuff) or SpellCooldown(storm_elemental) > 120 } and { not Talent(master_of_the_elements_talent) or BuffPresent(master_of_the_elements_buff) or SpellCooldown(lava_burst) > 0 and Maelstrom() >= 92 + 30 * TalentPoints(call_the_thunder_talent) } and Spell(earthquake) or not BuffPresent(surge_of_power_buff) and Talent(master_of_the_elements_talent) and { BuffPresent(master_of_the_elements_buff) or SpellCooldown(lava_burst) > 0 and Maelstrom() >= 92 + 30 * TalentPoints(call_the_thunder_talent) or Enemies() < 2 and AzeriteTraitRank(lava_shock_trait) * BuffStacks(lava_shock_buff) < 26 and BuffPresent(stormkeeper_buff) and SpellCooldown(lava_burst) <= GCD() } and Spell(earth_shock) or not Talent(master_of_the_elements_talent) and not { AzeriteTraitRank(igneous_potential_trait) > 2 and BuffPresent(ascendance_elemental_buff) } and { BuffPresent(stormkeeper_buff) or Maelstrom() >= 90 + 30 * TalentPoints(call_the_thunder_talent) or not { SpellCooldown(storm_elemental) > 120 and Talent(storm_elemental_talent) } and 600 - TimeInCombat() - SpellCooldown(storm_elemental) - 150 * { { 600 - TimeInCombat() - SpellCooldown(storm_elemental) } / 150 } >= 30 * { 1 + { AzeriteTraitRank(echo_of_the_elementals_trait) >= 2 } } } and Spell(earth_shock) or Talent(surge_of_power_talent) and not BuffPresent(surge_of_power_buff) and SpellCooldown(lava_burst) <= GCD() and { not Talent(storm_elemental_talent) and not SpellCooldown(fire_elemental) > 120 or Talent(storm_elemental_talent) and not SpellCooldown(storm_elemental) > 120 } and Spell(earth_shock) or SpellCooldown(storm_elemental) > 120 and Talent(storm_elemental_talent) and { AzeriteTraitRank(igneous_potential_trait) < 2 or not BuffPresent(lava_surge_buff) and BuffPresent(burst_haste_buff any=1) } and Spell(lightning_bolt_elemental) or { BuffRemaining(stormkeeper_buff) < 1.1 * GCD() * BuffStacks(stormkeeper_buff) or BuffPresent(stormkeeper_buff) and BuffPresent(master_of_the_elements_buff) } and Spell(lightning_bolt_elemental) or Talent(icefury_talent) and Talent(master_of_the_elements_talent) and BuffPresent(icefury_buff) and BuffPresent(master_of_the_elements_buff) and Spell(frost_shock) or BuffPresent(ascendance_elemental_buff) and Spell(lava_burst) or target.Refreshable(flame_shock_debuff) and Enemies() > 1 and BuffPresent(surge_of_power_buff) and Spell(flame_shock) or Talent(storm_elemental_talent) and not SpellCooldown(lava_burst) > 0 and BuffPresent(surge_of_power_buff) and { 600 - TimeInCombat() - SpellCooldown(storm_elemental) - 150 * { { 600 - TimeInCombat() - SpellCooldown(storm_elemental) } / 150 } < 30 * { 1 + { AzeriteTraitRank(echo_of_the_elementals_trait) >= 2 } } or 1.16 * { 600 - TimeInCombat() } - SpellCooldown(storm_elemental) - 150 * { { 1.16 * { 600 - TimeInCombat() } - SpellCooldown(storm_elemental) } / 150 } < 600 - TimeInCombat() - SpellCooldown(storm_elemental) - 150 * { { 600 - TimeInCombat() - SpellCooldown(storm_elemental) } / 150 } } and Spell(lava_burst) or not Talent(storm_elemental_talent) and not SpellCooldown(lava_burst) > 0 and BuffPresent(surge_of_power_buff) and { 600 - TimeInCombat() - SpellCooldown(fire_elemental) - 150 * { { 600 - TimeInCombat() - SpellCooldown(fire_elemental) } / 150 } < 30 * { 1 + { AzeriteTraitRank(echo_of_the_elementals_trait) >= 2 } } or 1.16 * { 600 - TimeInCombat() } - SpellCooldown(fire_elemental) - 150 * { { 1.16 * { 600 - TimeInCombat() } - SpellCooldown(fire_elemental) } / 150 } < 600 - TimeInCombat() - SpellCooldown(fire_elemental) - 150 * { { 600 - TimeInCombat() - SpellCooldown(fire_elemental) } / 150 } } and Spell(lava_burst) or BuffPresent(surge_of_power_buff) and Spell(lightning_bolt_elemental) or not SpellCooldown(lava_burst) > 0 and not Talent(master_of_the_elements_talent) and Spell(lava_burst)
+  unless BuffPresent(stormkeeper_buff) and Enemies() < 2 and AzeriteTraitRank(lava_shock_trait) * BuffStacks(lava_shock_buff) < 26 and { BuffPresent(master_of_the_elements_buff) and not Talent(surge_of_power_talent) or BuffPresent(surge_of_power_buff) } and Spell(lightning_bolt_elemental) or { Enemies() > 1 or AzeriteTraitRank(tectonic_thunder_trait) >= 3 and not Talent(surge_of_power_talent) and AzeriteTraitRank(lava_shock_trait) < 1 } and AzeriteTraitRank(lava_shock_trait) * BuffStacks(lava_shock_buff) < 36 + 3 * AzeriteTraitRank(tectonic_thunder_trait) * Enemies() and { not Talent(surge_of_power_talent) or not target.DebuffRefreshable(flame_shock_debuff) or SpellCooldown(storm_elemental) > 120 } and { not Talent(master_of_the_elements_talent) or BuffPresent(master_of_the_elements_buff) or SpellCooldown(lava_burst) > 0 and Maelstrom() >= 92 + 30 * TalentPoints(call_the_thunder_talent) } and Spell(earthquake) or not BuffPresent(surge_of_power_buff) and Talent(master_of_the_elements_talent) and { BuffPresent(master_of_the_elements_buff) or SpellCooldown(lava_burst) > 0 and Maelstrom() >= 92 + 30 * TalentPoints(call_the_thunder_talent) or Enemies() < 2 and AzeriteTraitRank(lava_shock_trait) * BuffStacks(lava_shock_buff) < 26 and BuffPresent(stormkeeper_buff) and SpellCooldown(lava_burst) <= GCD() } and Spell(earth_shock) or not Talent(master_of_the_elements_talent) and not { AzeriteTraitRank(igneous_potential_trait) > 2 and BuffPresent(ascendance_elemental_buff) } and { BuffPresent(stormkeeper_buff) or Maelstrom() >= 90 + 30 * TalentPoints(call_the_thunder_talent) or not { SpellCooldown(storm_elemental) > 120 and Talent(storm_elemental_talent) } and 600 - TimeInCombat() - SpellCooldown(storm_elemental) - 150 * { { 600 - TimeInCombat() - SpellCooldown(storm_elemental) } / 150 } >= 30 * { 1 + { AzeriteTraitRank(echo_of_the_elementals_trait) >= 2 } } } and Spell(earth_shock) or Talent(surge_of_power_talent) and not BuffPresent(surge_of_power_buff) and SpellCooldown(lava_burst) <= GCD() and { not Talent(storm_elemental_talent) and not SpellCooldown(fire_elemental) > 120 or Talent(storm_elemental_talent) and not SpellCooldown(storm_elemental) > 120 } and Spell(earth_shock)
   {
-   #icefury,if=talent.icefury.enabled&!(maelstrom>75&cooldown.lava_burst.remains<=0)&(!talent.storm_elemental.enabled|cooldown.storm_elemental.remains<120)
-   if Talent(icefury_talent) and not { Maelstrom() > 75 and SpellCooldown(lava_burst) <= 0 } and { not Talent(storm_elemental_talent) or SpellCooldown(storm_elemental) < 120 } Spell(icefury)
+   #lightning_lasso
+   Spell(lightning_lasso)
+
+   unless SpellCooldown(storm_elemental) > 120 and Talent(storm_elemental_talent) and { AzeriteTraitRank(igneous_potential_trait) < 2 or not BuffPresent(lava_surge_buff) and BuffPresent(burst_haste_buff any=1) } and Spell(lightning_bolt_elemental) or { BuffRemaining(stormkeeper_buff) < 1.1 * GCD() * BuffStacks(stormkeeper_buff) or BuffPresent(stormkeeper_buff) and BuffPresent(master_of_the_elements_buff) } and Spell(lightning_bolt_elemental) or Talent(icefury_talent) and Talent(master_of_the_elements_talent) and BuffPresent(icefury_buff) and BuffPresent(master_of_the_elements_buff) and Spell(frost_shock) or BuffPresent(ascendance_elemental_buff) and Spell(lava_burst) or target.Refreshable(flame_shock_debuff) and Enemies() > 1 and BuffPresent(surge_of_power_buff) and Spell(flame_shock) or Talent(storm_elemental_talent) and not SpellCooldown(lava_burst) > 0 and BuffPresent(surge_of_power_buff) and { 600 - TimeInCombat() - SpellCooldown(storm_elemental) - 150 * { { 600 - TimeInCombat() - SpellCooldown(storm_elemental) } / 150 } < 30 * { 1 + { AzeriteTraitRank(echo_of_the_elementals_trait) >= 2 } } or 1.16 * { 600 - TimeInCombat() } - SpellCooldown(storm_elemental) - 150 * { { 1.16 * { 600 - TimeInCombat() } - SpellCooldown(storm_elemental) } / 150 } < 600 - TimeInCombat() - SpellCooldown(storm_elemental) - 150 * { { 600 - TimeInCombat() - SpellCooldown(storm_elemental) } / 150 } } and Spell(lava_burst) or not Talent(storm_elemental_talent) and not SpellCooldown(lava_burst) > 0 and BuffPresent(surge_of_power_buff) and { 600 - TimeInCombat() - SpellCooldown(fire_elemental) - 150 * { { 600 - TimeInCombat() - SpellCooldown(fire_elemental) } / 150 } < 30 * { 1 + { AzeriteTraitRank(echo_of_the_elementals_trait) >= 2 } } or 1.16 * { 600 - TimeInCombat() } - SpellCooldown(fire_elemental) - 150 * { { 1.16 * { 600 - TimeInCombat() } - SpellCooldown(fire_elemental) } / 150 } < 600 - TimeInCombat() - SpellCooldown(fire_elemental) - 150 * { { 600 - TimeInCombat() - SpellCooldown(fire_elemental) } / 150 } } and Spell(lava_burst) or BuffPresent(surge_of_power_buff) and Spell(lightning_bolt_elemental) or not SpellCooldown(lava_burst) > 0 and not Talent(master_of_the_elements_talent) and Spell(lava_burst)
+   {
+    #icefury,if=talent.icefury.enabled&!(maelstrom>75&cooldown.lava_burst.remains<=0)&(!talent.storm_elemental.enabled|cooldown.storm_elemental.remains<120)
+    if Talent(icefury_talent) and not { Maelstrom() > 75 and SpellCooldown(lava_burst) <= 0 } and { not Talent(storm_elemental_talent) or SpellCooldown(storm_elemental) < 120 } Spell(icefury)
+   }
   }
  }
 }
@@ -142,7 +148,7 @@ AddFunction ElementalSingletargetCdActions
 
 AddFunction ElementalSingletargetCdPostConditions
 {
- { not target.DebuffPresent(flame_shock_debuff) or Talent(storm_elemental_talent) and SpellCooldown(storm_elemental) < 2 * GCD() or target.DebuffRemaining(flame_shock_debuff) <= GCD() or Talent(ascendance_talent) and target.DebuffRemaining(flame_shock_debuff) < SpellCooldown(ascendance_elemental) + BaseDuration(ascendance_elemental_buff) and SpellCooldown(ascendance_elemental) < 4 and { not Talent(storm_elemental_talent) or Talent(storm_elemental_talent) and SpellCooldown(storm_elemental) < 120 } } and { BuffStacks(wind_gust_buff) < 14 or AzeriteTraitRank(igneous_potential_trait) >= 2 or BuffPresent(lava_surge_buff) or not BuffPresent(burst_haste_buff any=1) } and not BuffPresent(surge_of_power_buff) and Spell(flame_shock) or Talent(elemental_blast_talent) and { Talent(master_of_the_elements_talent) and BuffPresent(master_of_the_elements_buff) and Maelstrom() < 60 or not Talent(master_of_the_elements_talent) } and { not { SpellCooldown(storm_elemental) > 120 and Talent(storm_elemental_talent) } or AzeriteTraitRank(natural_harmony_trait) == 3 and BuffStacks(wind_gust_buff) < 14 } and Spell(elemental_blast) or Talent(stormkeeper_talent) and { 0 < 3 or 600 > 50 } and { not Talent(surge_of_power_talent) or BuffPresent(surge_of_power_buff) or Maelstrom() >= 44 } and Spell(stormkeeper) or Talent(liquid_magma_totem_talent) and { 0 < 3 or 600 > 50 } and Spell(liquid_magma_totem) or BuffPresent(stormkeeper_buff) and Enemies() < 2 and AzeriteTraitRank(lava_shock_trait) * BuffStacks(lava_shock_buff) < 26 and { BuffPresent(master_of_the_elements_buff) and not Talent(surge_of_power_talent) or BuffPresent(surge_of_power_buff) } and Spell(lightning_bolt_elemental) or { Enemies() > 1 or AzeriteTraitRank(tectonic_thunder_trait) >= 3 and not Talent(surge_of_power_talent) and AzeriteTraitRank(lava_shock_trait) < 1 } and AzeriteTraitRank(lava_shock_trait) * BuffStacks(lava_shock_buff) < 36 + 3 * AzeriteTraitRank(tectonic_thunder_trait) * Enemies() and { not Talent(surge_of_power_talent) or not target.DebuffRefreshable(flame_shock_debuff) or SpellCooldown(storm_elemental) > 120 } and { not Talent(master_of_the_elements_talent) or BuffPresent(master_of_the_elements_buff) or SpellCooldown(lava_burst) > 0 and Maelstrom() >= 92 + 30 * TalentPoints(call_the_thunder_talent) } and Spell(earthquake) or not BuffPresent(surge_of_power_buff) and Talent(master_of_the_elements_talent) and { BuffPresent(master_of_the_elements_buff) or SpellCooldown(lava_burst) > 0 and Maelstrom() >= 92 + 30 * TalentPoints(call_the_thunder_talent) or Enemies() < 2 and AzeriteTraitRank(lava_shock_trait) * BuffStacks(lava_shock_buff) < 26 and BuffPresent(stormkeeper_buff) and SpellCooldown(lava_burst) <= GCD() } and Spell(earth_shock) or not Talent(master_of_the_elements_talent) and not { AzeriteTraitRank(igneous_potential_trait) > 2 and BuffPresent(ascendance_elemental_buff) } and { BuffPresent(stormkeeper_buff) or Maelstrom() >= 90 + 30 * TalentPoints(call_the_thunder_talent) or not { SpellCooldown(storm_elemental) > 120 and Talent(storm_elemental_talent) } and 600 - TimeInCombat() - SpellCooldown(storm_elemental) - 150 * { { 600 - TimeInCombat() - SpellCooldown(storm_elemental) } / 150 } >= 30 * { 1 + { AzeriteTraitRank(echo_of_the_elementals_trait) >= 2 } } } and Spell(earth_shock) or Talent(surge_of_power_talent) and not BuffPresent(surge_of_power_buff) and SpellCooldown(lava_burst) <= GCD() and { not Talent(storm_elemental_talent) and not SpellCooldown(fire_elemental) > 120 or Talent(storm_elemental_talent) and not SpellCooldown(storm_elemental) > 120 } and Spell(earth_shock) or SpellCooldown(storm_elemental) > 120 and Talent(storm_elemental_talent) and { AzeriteTraitRank(igneous_potential_trait) < 2 or not BuffPresent(lava_surge_buff) and BuffPresent(burst_haste_buff any=1) } and Spell(lightning_bolt_elemental) or { BuffRemaining(stormkeeper_buff) < 1.1 * GCD() * BuffStacks(stormkeeper_buff) or BuffPresent(stormkeeper_buff) and BuffPresent(master_of_the_elements_buff) } and Spell(lightning_bolt_elemental) or Talent(icefury_talent) and Talent(master_of_the_elements_talent) and BuffPresent(icefury_buff) and BuffPresent(master_of_the_elements_buff) and Spell(frost_shock) or BuffPresent(ascendance_elemental_buff) and Spell(lava_burst) or target.Refreshable(flame_shock_debuff) and Enemies() > 1 and BuffPresent(surge_of_power_buff) and Spell(flame_shock) or Talent(storm_elemental_talent) and not SpellCooldown(lava_burst) > 0 and BuffPresent(surge_of_power_buff) and { 600 - TimeInCombat() - SpellCooldown(storm_elemental) - 150 * { { 600 - TimeInCombat() - SpellCooldown(storm_elemental) } / 150 } < 30 * { 1 + { AzeriteTraitRank(echo_of_the_elementals_trait) >= 2 } } or 1.16 * { 600 - TimeInCombat() } - SpellCooldown(storm_elemental) - 150 * { { 1.16 * { 600 - TimeInCombat() } - SpellCooldown(storm_elemental) } / 150 } < 600 - TimeInCombat() - SpellCooldown(storm_elemental) - 150 * { { 600 - TimeInCombat() - SpellCooldown(storm_elemental) } / 150 } } and Spell(lava_burst) or not Talent(storm_elemental_talent) and not SpellCooldown(lava_burst) > 0 and BuffPresent(surge_of_power_buff) and { 600 - TimeInCombat() - SpellCooldown(fire_elemental) - 150 * { { 600 - TimeInCombat() - SpellCooldown(fire_elemental) } / 150 } < 30 * { 1 + { AzeriteTraitRank(echo_of_the_elementals_trait) >= 2 } } or 1.16 * { 600 - TimeInCombat() } - SpellCooldown(fire_elemental) - 150 * { { 1.16 * { 600 - TimeInCombat() } - SpellCooldown(fire_elemental) } / 150 } < 600 - TimeInCombat() - SpellCooldown(fire_elemental) - 150 * { { 600 - TimeInCombat() - SpellCooldown(fire_elemental) } / 150 } } and Spell(lava_burst) or BuffPresent(surge_of_power_buff) and Spell(lightning_bolt_elemental) or not SpellCooldown(lava_burst) > 0 and not Talent(master_of_the_elements_talent) and Spell(lava_burst) or Talent(icefury_talent) and not { Maelstrom() > 75 and SpellCooldown(lava_burst) <= 0 } and { not Talent(storm_elemental_talent) or SpellCooldown(storm_elemental) < 120 } and Spell(icefury) or not SpellCooldown(lava_burst) > 0 and Charges(lava_burst) > TalentPoints(echo_of_the_elements_talent_elemental) and Spell(lava_burst) or Talent(icefury_talent) and BuffPresent(icefury_buff) and BuffRemaining(icefury_buff) < 1.1 * GCD() * BuffStacks(icefury_buff) and Spell(frost_shock) or not SpellCooldown(lava_burst) > 0 and Spell(lava_burst) or target.Refreshable(flame_shock_debuff) and not BuffPresent(surge_of_power_buff) and Spell(flame_shock) or Talent(totem_mastery_talent_elemental) and { TotemRemaining(totem_mastery_elemental) < 6 or TotemRemaining(totem_mastery_elemental) < BaseDuration(ascendance_elemental_buff) + SpellCooldown(ascendance_elemental) and SpellCooldown(ascendance_elemental) < 15 } and { InCombat() or not BuffPresent(ele_resonance_totem_buff) } and Spell(totem_mastery_elemental) or Talent(icefury_talent) and BuffPresent(icefury_buff) and { BuffRemaining(icefury_buff) < GCD() * 4 * BuffStacks(icefury_buff) or BuffPresent(stormkeeper_buff) or not Talent(master_of_the_elements_talent) } and Spell(frost_shock) or BuffPresent(tectonic_thunder) and not BuffPresent(stormkeeper_buff) and Enemies() > 1 and Spell(chain_lightning_elemental) or Spell(lightning_bolt_elemental) or Speed() > 0 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Speed() > 0 and target.Distance() > 6 and Spell(flame_shock) or Speed() > 0 and Spell(frost_shock)
+ { not target.DebuffPresent(flame_shock_debuff) or Talent(storm_elemental_talent) and SpellCooldown(storm_elemental) < 2 * GCD() or target.DebuffRemaining(flame_shock_debuff) <= GCD() or Talent(ascendance_talent) and target.DebuffRemaining(flame_shock_debuff) < SpellCooldown(ascendance_elemental) + BaseDuration(ascendance_elemental_buff) and SpellCooldown(ascendance_elemental) < 4 and { not Talent(storm_elemental_talent) or Talent(storm_elemental_talent) and SpellCooldown(storm_elemental) < 120 } } and { BuffStacks(wind_gust_buff) < 14 or AzeriteTraitRank(igneous_potential_trait) >= 2 or BuffPresent(lava_surge_buff) or not BuffPresent(burst_haste_buff any=1) } and not BuffPresent(surge_of_power_buff) and Spell(flame_shock) or Talent(elemental_blast_talent) and { Talent(master_of_the_elements_talent) and BuffPresent(master_of_the_elements_buff) and Maelstrom() < 60 or not Talent(master_of_the_elements_talent) } and { not { SpellCooldown(storm_elemental) > 120 and Talent(storm_elemental_talent) } or AzeriteTraitRank(natural_harmony_trait) == 3 and BuffStacks(wind_gust_buff) < 14 } and Spell(elemental_blast) or Talent(stormkeeper_talent) and { 0 < 3 or 600 > 50 } and { not Talent(surge_of_power_talent) or BuffPresent(surge_of_power_buff) or Maelstrom() >= 44 } and Spell(stormkeeper) or Talent(liquid_magma_totem_talent) and { 0 < 3 or 600 > 50 } and Spell(liquid_magma_totem) or BuffPresent(stormkeeper_buff) and Enemies() < 2 and AzeriteTraitRank(lava_shock_trait) * BuffStacks(lava_shock_buff) < 26 and { BuffPresent(master_of_the_elements_buff) and not Talent(surge_of_power_talent) or BuffPresent(surge_of_power_buff) } and Spell(lightning_bolt_elemental) or { Enemies() > 1 or AzeriteTraitRank(tectonic_thunder_trait) >= 3 and not Talent(surge_of_power_talent) and AzeriteTraitRank(lava_shock_trait) < 1 } and AzeriteTraitRank(lava_shock_trait) * BuffStacks(lava_shock_buff) < 36 + 3 * AzeriteTraitRank(tectonic_thunder_trait) * Enemies() and { not Talent(surge_of_power_talent) or not target.DebuffRefreshable(flame_shock_debuff) or SpellCooldown(storm_elemental) > 120 } and { not Talent(master_of_the_elements_talent) or BuffPresent(master_of_the_elements_buff) or SpellCooldown(lava_burst) > 0 and Maelstrom() >= 92 + 30 * TalentPoints(call_the_thunder_talent) } and Spell(earthquake) or not BuffPresent(surge_of_power_buff) and Talent(master_of_the_elements_talent) and { BuffPresent(master_of_the_elements_buff) or SpellCooldown(lava_burst) > 0 and Maelstrom() >= 92 + 30 * TalentPoints(call_the_thunder_talent) or Enemies() < 2 and AzeriteTraitRank(lava_shock_trait) * BuffStacks(lava_shock_buff) < 26 and BuffPresent(stormkeeper_buff) and SpellCooldown(lava_burst) <= GCD() } and Spell(earth_shock) or not Talent(master_of_the_elements_talent) and not { AzeriteTraitRank(igneous_potential_trait) > 2 and BuffPresent(ascendance_elemental_buff) } and { BuffPresent(stormkeeper_buff) or Maelstrom() >= 90 + 30 * TalentPoints(call_the_thunder_talent) or not { SpellCooldown(storm_elemental) > 120 and Talent(storm_elemental_talent) } and 600 - TimeInCombat() - SpellCooldown(storm_elemental) - 150 * { { 600 - TimeInCombat() - SpellCooldown(storm_elemental) } / 150 } >= 30 * { 1 + { AzeriteTraitRank(echo_of_the_elementals_trait) >= 2 } } } and Spell(earth_shock) or Talent(surge_of_power_talent) and not BuffPresent(surge_of_power_buff) and SpellCooldown(lava_burst) <= GCD() and { not Talent(storm_elemental_talent) and not SpellCooldown(fire_elemental) > 120 or Talent(storm_elemental_talent) and not SpellCooldown(storm_elemental) > 120 } and Spell(earth_shock) or Spell(lightning_lasso) or SpellCooldown(storm_elemental) > 120 and Talent(storm_elemental_talent) and { AzeriteTraitRank(igneous_potential_trait) < 2 or not BuffPresent(lava_surge_buff) and BuffPresent(burst_haste_buff any=1) } and Spell(lightning_bolt_elemental) or { BuffRemaining(stormkeeper_buff) < 1.1 * GCD() * BuffStacks(stormkeeper_buff) or BuffPresent(stormkeeper_buff) and BuffPresent(master_of_the_elements_buff) } and Spell(lightning_bolt_elemental) or Talent(icefury_talent) and Talent(master_of_the_elements_talent) and BuffPresent(icefury_buff) and BuffPresent(master_of_the_elements_buff) and Spell(frost_shock) or BuffPresent(ascendance_elemental_buff) and Spell(lava_burst) or target.Refreshable(flame_shock_debuff) and Enemies() > 1 and BuffPresent(surge_of_power_buff) and Spell(flame_shock) or Talent(storm_elemental_talent) and not SpellCooldown(lava_burst) > 0 and BuffPresent(surge_of_power_buff) and { 600 - TimeInCombat() - SpellCooldown(storm_elemental) - 150 * { { 600 - TimeInCombat() - SpellCooldown(storm_elemental) } / 150 } < 30 * { 1 + { AzeriteTraitRank(echo_of_the_elementals_trait) >= 2 } } or 1.16 * { 600 - TimeInCombat() } - SpellCooldown(storm_elemental) - 150 * { { 1.16 * { 600 - TimeInCombat() } - SpellCooldown(storm_elemental) } / 150 } < 600 - TimeInCombat() - SpellCooldown(storm_elemental) - 150 * { { 600 - TimeInCombat() - SpellCooldown(storm_elemental) } / 150 } } and Spell(lava_burst) or not Talent(storm_elemental_talent) and not SpellCooldown(lava_burst) > 0 and BuffPresent(surge_of_power_buff) and { 600 - TimeInCombat() - SpellCooldown(fire_elemental) - 150 * { { 600 - TimeInCombat() - SpellCooldown(fire_elemental) } / 150 } < 30 * { 1 + { AzeriteTraitRank(echo_of_the_elementals_trait) >= 2 } } or 1.16 * { 600 - TimeInCombat() } - SpellCooldown(fire_elemental) - 150 * { { 1.16 * { 600 - TimeInCombat() } - SpellCooldown(fire_elemental) } / 150 } < 600 - TimeInCombat() - SpellCooldown(fire_elemental) - 150 * { { 600 - TimeInCombat() - SpellCooldown(fire_elemental) } / 150 } } and Spell(lava_burst) or BuffPresent(surge_of_power_buff) and Spell(lightning_bolt_elemental) or not SpellCooldown(lava_burst) > 0 and not Talent(master_of_the_elements_talent) and Spell(lava_burst) or Talent(icefury_talent) and not { Maelstrom() > 75 and SpellCooldown(lava_burst) <= 0 } and { not Talent(storm_elemental_talent) or SpellCooldown(storm_elemental) < 120 } and Spell(icefury) or not SpellCooldown(lava_burst) > 0 and Charges(lava_burst) > TalentPoints(echo_of_the_elements_talent_elemental) and Spell(lava_burst) or Talent(icefury_talent) and BuffPresent(icefury_buff) and BuffRemaining(icefury_buff) < 1.1 * GCD() * BuffStacks(icefury_buff) and Spell(frost_shock) or not SpellCooldown(lava_burst) > 0 and Spell(lava_burst) or target.Refreshable(flame_shock_debuff) and not BuffPresent(surge_of_power_buff) and Spell(flame_shock) or Talent(totem_mastery_talent_elemental) and { TotemRemaining(totem_mastery_elemental) < 6 or TotemRemaining(totem_mastery_elemental) < BaseDuration(ascendance_elemental_buff) + SpellCooldown(ascendance_elemental) and SpellCooldown(ascendance_elemental) < 15 } and { InCombat() or not BuffPresent(ele_resonance_totem_buff) } and Spell(totem_mastery_elemental) or Talent(icefury_talent) and BuffPresent(icefury_buff) and { BuffRemaining(icefury_buff) < GCD() * 4 * BuffStacks(icefury_buff) or BuffPresent(stormkeeper_buff) or not Talent(master_of_the_elements_talent) } and Spell(frost_shock) or BuffPresent(tectonic_thunder) and not BuffPresent(stormkeeper_buff) and Enemies() > 1 and Spell(chain_lightning_elemental) or Spell(lightning_bolt_elemental) or Speed() > 0 and target.Refreshable(flame_shock_debuff) and Spell(flame_shock) or Speed() > 0 and target.Distance() > 6 and Spell(flame_shock) or Speed() > 0 and Spell(frost_shock)
 }
 
 ### actions.precombat
@@ -195,7 +201,7 @@ AddFunction ElementalPrecombatCdActions
    #storm_elemental,if=talent.storm_elemental.enabled
    if Talent(storm_elemental_talent) Spell(storm_elemental)
    #potion
-   if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_intellect usable=1)
+   if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
   }
  }
 }
@@ -280,6 +286,10 @@ AddFunction ElementalDefaultMainActions
 {
  #totem_mastery,if=talent.totem_mastery.enabled&buff.resonance_totem.remains<2
  if Talent(totem_mastery_talent_elemental) and TotemRemaining(totem_mastery_elemental) < 2 and { InCombat() or not BuffPresent(ele_resonance_totem_buff) } Spell(totem_mastery_elemental)
+ #concentrated_flame
+ Spell(concentrated_flame_essence)
+ #focused_azerite_beam
+ Spell(focused_azerite_beam)
  #run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
  if Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } ElementalAoeMainActions()
 
@@ -297,8 +307,16 @@ AddFunction ElementalDefaultMainPostConditions
 
 AddFunction ElementalDefaultShortCdActions
 {
- unless Talent(totem_mastery_talent_elemental) and TotemRemaining(totem_mastery_elemental) < 2 and { InCombat() or not BuffPresent(ele_resonance_totem_buff) } and Spell(totem_mastery_elemental)
+ unless Talent(totem_mastery_talent_elemental) and TotemRemaining(totem_mastery_elemental) < 2 and { InCombat() or not BuffPresent(ele_resonance_totem_buff) } and Spell(totem_mastery_elemental) or Spell(concentrated_flame_essence) or Spell(focused_azerite_beam)
  {
+  #purifying_blast
+  Spell(purifying_blast)
+  #the_unbound_force
+  Spell(the_unbound_force_essence)
+  #ripple_in_space
+  Spell(ripple_in_space_essence)
+  #worldvein_resonance
+  Spell(worldvein_resonance_essence)
   #run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
   if Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } ElementalAoeShortCdActions()
 
@@ -312,7 +330,7 @@ AddFunction ElementalDefaultShortCdActions
 
 AddFunction ElementalDefaultShortCdPostConditions
 {
- Talent(totem_mastery_talent_elemental) and TotemRemaining(totem_mastery_elemental) < 2 and { InCombat() or not BuffPresent(ele_resonance_totem_buff) } and Spell(totem_mastery_elemental) or Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } and ElementalAoeShortCdPostConditions() or ElementalSingletargetShortCdPostConditions()
+ Talent(totem_mastery_talent_elemental) and TotemRemaining(totem_mastery_elemental) < 2 and { InCombat() or not BuffPresent(ele_resonance_totem_buff) } and Spell(totem_mastery_elemental) or Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } and ElementalAoeShortCdPostConditions() or ElementalSingletargetShortCdPostConditions()
 }
 
 AddFunction ElementalDefaultCdActions
@@ -320,7 +338,7 @@ AddFunction ElementalDefaultCdActions
  #bloodlust,if=azerite.ancestral_resonance.enabled
  if HasAzeriteTrait(ancestral_resonance_trait) ElementalBloodlust()
  #potion,if=expected_combat_length-time<30|cooldown.fire_elemental.remains>120|cooldown.storm_elemental.remains>120
- if { 600 - TimeInCombat() < 30 or SpellCooldown(fire_elemental) > 120 or SpellCooldown(storm_elemental) > 120 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_intellect usable=1)
+ if { 600 - TimeInCombat() < 30 or SpellCooldown(fire_elemental) > 120 or SpellCooldown(storm_elemental) > 120 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
  #wind_shear
  ElementalInterruptActions()
 
@@ -334,28 +352,46 @@ AddFunction ElementalDefaultCdActions
   if not Talent(primal_elementalist_talent) or Talent(primal_elementalist_talent) and { SpellCooldown(fire_elemental) < 120 and not Talent(storm_elemental_talent) or SpellCooldown(storm_elemental) < 120 and Talent(storm_elemental_talent) } Spell(earth_elemental)
   #use_items
   ElementalUseItemActions()
-  #blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-  if not Talent(ascendance_talent) or BuffPresent(ascendance_elemental_buff) or SpellCooldown(ascendance_elemental) > 50 Spell(blood_fury_apsp)
-  #berserking,if=!talent.ascendance.enabled|buff.ascendance.up
-  if not Talent(ascendance_talent) or BuffPresent(ascendance_elemental_buff) Spell(berserking)
-  #fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-  if not Talent(ascendance_talent) or BuffPresent(ascendance_elemental_buff) or SpellCooldown(ascendance_elemental) > 50 Spell(fireblood)
-  #ancestral_call,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-  if not Talent(ascendance_talent) or BuffPresent(ascendance_elemental_buff) or SpellCooldown(ascendance_elemental) > 50 Spell(ancestral_call)
-  #run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
-  if Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } ElementalAoeCdActions()
 
-  unless Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } and ElementalAoeCdPostConditions()
+  unless Spell(concentrated_flame_essence)
   {
-   #run_action_list,name=single_target
-   ElementalSingletargetCdActions()
+   #blood_of_the_enemy
+   Spell(blood_of_the_enemy)
+   #guardian_of_azeroth
+   Spell(guardian_of_azeroth)
+
+   unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force_essence)
+   {
+    #memory_of_lucid_dreams
+    Spell(memory_of_lucid_dreams_essence)
+
+    unless Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+    {
+     #blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+     if not Talent(ascendance_talent) or BuffPresent(ascendance_elemental_buff) or SpellCooldown(ascendance_elemental) > 50 Spell(blood_fury_apsp)
+     #berserking,if=!talent.ascendance.enabled|buff.ascendance.up
+     if not Talent(ascendance_talent) or BuffPresent(ascendance_elemental_buff) Spell(berserking)
+     #fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+     if not Talent(ascendance_talent) or BuffPresent(ascendance_elemental_buff) or SpellCooldown(ascendance_elemental) > 50 Spell(fireblood)
+     #ancestral_call,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
+     if not Talent(ascendance_talent) or BuffPresent(ascendance_elemental_buff) or SpellCooldown(ascendance_elemental) > 50 Spell(ancestral_call)
+     #run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
+     if Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } ElementalAoeCdActions()
+
+     unless Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } and ElementalAoeCdPostConditions()
+     {
+      #run_action_list,name=single_target
+      ElementalSingletargetCdActions()
+     }
+    }
+   }
   }
  }
 }
 
 AddFunction ElementalDefaultCdPostConditions
 {
- Talent(totem_mastery_talent_elemental) and TotemRemaining(totem_mastery_elemental) < 2 and { InCombat() or not BuffPresent(ele_resonance_totem_buff) } and Spell(totem_mastery_elemental) or Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } and ElementalAoeCdPostConditions() or ElementalSingletargetCdPostConditions()
+ Talent(totem_mastery_talent_elemental) and TotemRemaining(totem_mastery_elemental) < 2 and { InCombat() or not BuffPresent(ele_resonance_totem_buff) } and Spell(totem_mastery_elemental) or Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence) or Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } and ElementalAoeCdPostConditions() or ElementalSingletargetCdPostConditions()
 }
 
 ### Elemental icons.
@@ -424,10 +460,12 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 # ascendance_talent
 # berserking
 # blood_fury_apsp
+# blood_of_the_enemy
 # bloodlust
 # call_the_thunder_talent
 # capacitor_totem
 # chain_lightning_elemental
+# concentrated_flame_essence
 # earth_elemental
 # earth_shock
 # earthquake
@@ -440,27 +478,33 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 # fireblood
 # flame_shock
 # flame_shock_debuff
+# focused_azerite_beam
 # frost_shock
+# guardian_of_azeroth
 # heroism
 # hex
 # icefury
 # icefury_buff
 # icefury_talent
 # igneous_potential_trait
-# item_battle_potion_of_intellect
+# item_unbridled_fury
 # lava_beam
 # lava_burst
 # lava_shock_buff
 # lava_shock_trait
 # lava_surge_buff
 # lightning_bolt_elemental
+# lightning_lasso
 # liquid_magma_totem
 # liquid_magma_totem_talent
 # master_of_the_elements_buff
 # master_of_the_elements_talent
+# memory_of_lucid_dreams_essence
 # natural_harmony_trait
 # primal_elementalist_talent
+# purifying_blast
 # quaking_palm
+# ripple_in_space_essence
 # storm_elemental
 # storm_elemental_talent
 # stormkeeper
@@ -470,19 +514,21 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 # surge_of_power_talent
 # tectonic_thunder
 # tectonic_thunder_trait
+# the_unbound_force_essence
 # totem_mastery_elemental
 # totem_mastery_talent_elemental
 # war_stomp
 # wind_gust_buff
 # wind_shear
+# worldvein_resonance_essence
 ]]
     OvaleScripts:RegisterScript("SHAMAN", "elemental", name, desc, code, "script")
 end
 do
-    local name = "sc_t23_shaman_enhancement"
-    local desc = "[8.2] Simulationcraft: T23_Shaman_Enhancement"
+    local name = "sc_t24_shaman_enhancement"
+    local desc = "[8.2] Simulationcraft: T24_Shaman_Enhancement"
     local code = [[
-# Based on SimulationCraft profile "T23_Shaman_Enhancement".
+# Based on SimulationCraft profile "T24_Shaman_Enhancement".
 #	class=shaman
 #	spec=enhancement
 #	talents=2302031
@@ -631,8 +677,8 @@ AddFunction EnhancementPriorityMainActions
  if BuffPresent(fury_of_air_buff) and Enemies() < 1 + freezerburn_enabled() Spell(fury_of_air)
  #totem_mastery,if=buff.resonance_totem.remains<=2*gcd
  if TotemRemaining(totem_mastery_enhancement) <= 2 * GCD() and { InCombat() or not BuffPresent(enh_resonance_totem_buff) } Spell(totem_mastery_enhancement)
- #sundering,if=active_enemies>=3
- if Enemies() >= 3 Spell(sundering)
+ #sundering,if=active_enemies>=3&(!essence.blood_of_the_enemy.major|(essence.blood_of_the_enemy.major&(buff.seething_rage.up|cooldown.blood_of_the_enemy.remains>40)))
+ if Enemies() >= 3 and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) and { BuffPresent(seething_rage) or SpellCooldown(blood_of_the_enemy) > 40 } } Spell(sundering)
  #focused_azerite_beam,if=active_enemies>=3
  if Enemies() >= 3 Spell(focused_azerite_beam)
  #rockbiter,if=talent.landslide.enabled&!buff.landslide.up&charges_fractional>1.7
@@ -654,9 +700,9 @@ AddFunction EnhancementPriorityShortCdActions
  unless Enemies() >= 8 - TalentPoints(forceful_winds_talent) * 3 and freezerburn_enabled() and furyCheck_CL() and Spell(crash_lightning)
  {
   #the_unbound_force,if=buff.reckless_force.up|time<5
-  if BuffPresent(reckless_force_buff) or TimeInCombat() < 5 Spell(the_unbound_force)
+  if BuffPresent(reckless_force_buff) or TimeInCombat() < 5 Spell(the_unbound_force_essence)
 
-  unless AzeriteTraitRank(primal_primer_trait) >= 2 and target.DebuffStacks(primal_primer) == 10 and Enemies() == 1 and freezerburn_enabled() and furyCheck_LL() and Spell(lava_lash) or not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or not BuffPresent(fury_of_air_buff) and Maelstrom() >= 20 and Enemies() >= 1 + freezerburn_enabled() and Spell(fury_of_air) or BuffPresent(fury_of_air_buff) and Enemies() < 1 + freezerburn_enabled() and Spell(fury_of_air) or TotemRemaining(totem_mastery_enhancement) <= 2 * GCD() and { InCombat() or not BuffPresent(enh_resonance_totem_buff) } and Spell(totem_mastery_enhancement) or Enemies() >= 3 and Spell(sundering) or Enemies() >= 3 and Spell(focused_azerite_beam)
+  unless AzeriteTraitRank(primal_primer_trait) >= 2 and target.DebuffStacks(primal_primer) == 10 and Enemies() == 1 and freezerburn_enabled() and furyCheck_LL() and Spell(lava_lash) or not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or not BuffPresent(fury_of_air_buff) and Maelstrom() >= 20 and Enemies() >= 1 + freezerburn_enabled() and Spell(fury_of_air) or BuffPresent(fury_of_air_buff) and Enemies() < 1 + freezerburn_enabled() and Spell(fury_of_air) or TotemRemaining(totem_mastery_enhancement) <= 2 * GCD() and { InCombat() or not BuffPresent(enh_resonance_totem_buff) } and Spell(totem_mastery_enhancement) or Enemies() >= 3 and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) and { BuffPresent(seething_rage) or SpellCooldown(blood_of_the_enemy) > 40 } } and Spell(sundering) or Enemies() >= 3 and Spell(focused_azerite_beam)
   {
    #purifying_blast,if=active_enemies>=3
    if Enemies() >= 3 Spell(purifying_blast)
@@ -666,7 +712,7 @@ AddFunction EnhancementPriorityShortCdActions
 
 AddFunction EnhancementPriorityShortCdPostConditions
 {
- Enemies() >= 8 - TalentPoints(forceful_winds_talent) * 3 and freezerburn_enabled() and furyCheck_CL() and Spell(crash_lightning) or AzeriteTraitRank(primal_primer_trait) >= 2 and target.DebuffStacks(primal_primer) == 10 and Enemies() == 1 and freezerburn_enabled() and furyCheck_LL() and Spell(lava_lash) or not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or not BuffPresent(fury_of_air_buff) and Maelstrom() >= 20 and Enemies() >= 1 + freezerburn_enabled() and Spell(fury_of_air) or BuffPresent(fury_of_air_buff) and Enemies() < 1 + freezerburn_enabled() and Spell(fury_of_air) or TotemRemaining(totem_mastery_enhancement) <= 2 * GCD() and { InCombat() or not BuffPresent(enh_resonance_totem_buff) } and Spell(totem_mastery_enhancement) or Enemies() >= 3 and Spell(sundering) or Enemies() >= 3 and Spell(focused_azerite_beam) or Talent(landslide_talent) and not BuffPresent(landslide_buff) and Charges(rockbiter count=0) > 1.7 and Spell(rockbiter) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_frost) <= 2 * GCD() and Talent(hailstorm_talent) and furyCheck_FB() and Spell(frostbrand) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_fire) <= 2 * GCD() and Spell(flametongue) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_nature) <= 2 * GCD() and Maelstrom() < 70 and Spell(rockbiter)
+ Enemies() >= 8 - TalentPoints(forceful_winds_talent) * 3 and freezerburn_enabled() and furyCheck_CL() and Spell(crash_lightning) or AzeriteTraitRank(primal_primer_trait) >= 2 and target.DebuffStacks(primal_primer) == 10 and Enemies() == 1 and freezerburn_enabled() and furyCheck_LL() and Spell(lava_lash) or not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or not BuffPresent(fury_of_air_buff) and Maelstrom() >= 20 and Enemies() >= 1 + freezerburn_enabled() and Spell(fury_of_air) or BuffPresent(fury_of_air_buff) and Enemies() < 1 + freezerburn_enabled() and Spell(fury_of_air) or TotemRemaining(totem_mastery_enhancement) <= 2 * GCD() and { InCombat() or not BuffPresent(enh_resonance_totem_buff) } and Spell(totem_mastery_enhancement) or Enemies() >= 3 and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) and { BuffPresent(seething_rage) or SpellCooldown(blood_of_the_enemy) > 40 } } and Spell(sundering) or Enemies() >= 3 and Spell(focused_azerite_beam) or Talent(landslide_talent) and not BuffPresent(landslide_buff) and Charges(rockbiter count=0) > 1.7 and Spell(rockbiter) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_frost) <= 2 * GCD() and Talent(hailstorm_talent) and furyCheck_FB() and Spell(frostbrand) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_fire) <= 2 * GCD() and Spell(flametongue) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_nature) <= 2 * GCD() and Maelstrom() < 70 and Spell(rockbiter)
 }
 
 AddFunction EnhancementPriorityCdActions
@@ -675,7 +721,7 @@ AddFunction EnhancementPriorityCdActions
 
 AddFunction EnhancementPriorityCdPostConditions
 {
- Enemies() >= 8 - TalentPoints(forceful_winds_talent) * 3 and freezerburn_enabled() and furyCheck_CL() and Spell(crash_lightning) or { BuffPresent(reckless_force_buff) or TimeInCombat() < 5 } and Spell(the_unbound_force) or AzeriteTraitRank(primal_primer_trait) >= 2 and target.DebuffStacks(primal_primer) == 10 and Enemies() == 1 and freezerburn_enabled() and furyCheck_LL() and Spell(lava_lash) or not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or not BuffPresent(fury_of_air_buff) and Maelstrom() >= 20 and Enemies() >= 1 + freezerburn_enabled() and Spell(fury_of_air) or BuffPresent(fury_of_air_buff) and Enemies() < 1 + freezerburn_enabled() and Spell(fury_of_air) or TotemRemaining(totem_mastery_enhancement) <= 2 * GCD() and { InCombat() or not BuffPresent(enh_resonance_totem_buff) } and Spell(totem_mastery_enhancement) or Enemies() >= 3 and Spell(sundering) or Enemies() >= 3 and Spell(focused_azerite_beam) or Enemies() >= 3 and Spell(purifying_blast) or Talent(landslide_talent) and not BuffPresent(landslide_buff) and Charges(rockbiter count=0) > 1.7 and Spell(rockbiter) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_frost) <= 2 * GCD() and Talent(hailstorm_talent) and furyCheck_FB() and Spell(frostbrand) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_fire) <= 2 * GCD() and Spell(flametongue) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_nature) <= 2 * GCD() and Maelstrom() < 70 and Spell(rockbiter)
+ Enemies() >= 8 - TalentPoints(forceful_winds_talent) * 3 and freezerburn_enabled() and furyCheck_CL() and Spell(crash_lightning) or { BuffPresent(reckless_force_buff) or TimeInCombat() < 5 } and Spell(the_unbound_force_essence) or AzeriteTraitRank(primal_primer_trait) >= 2 and target.DebuffStacks(primal_primer) == 10 and Enemies() == 1 and freezerburn_enabled() and furyCheck_LL() and Spell(lava_lash) or not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or not BuffPresent(fury_of_air_buff) and Maelstrom() >= 20 and Enemies() >= 1 + freezerburn_enabled() and Spell(fury_of_air) or BuffPresent(fury_of_air_buff) and Enemies() < 1 + freezerburn_enabled() and Spell(fury_of_air) or TotemRemaining(totem_mastery_enhancement) <= 2 * GCD() and { InCombat() or not BuffPresent(enh_resonance_totem_buff) } and Spell(totem_mastery_enhancement) or Enemies() >= 3 and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) and { BuffPresent(seething_rage) or SpellCooldown(blood_of_the_enemy) > 40 } } and Spell(sundering) or Enemies() >= 3 and Spell(focused_azerite_beam) or Enemies() >= 3 and Spell(purifying_blast) or Talent(landslide_talent) and not BuffPresent(landslide_buff) and Charges(rockbiter count=0) > 1.7 and Spell(rockbiter) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_frost) <= 2 * GCD() and Talent(hailstorm_talent) and furyCheck_FB() and Spell(frostbrand) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_fire) <= 2 * GCD() and Spell(flametongue) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_nature) <= 2 * GCD() and Maelstrom() < 70 and Spell(rockbiter)
 }
 
 ### actions.precombat
@@ -826,10 +872,10 @@ AddFunction EnhancementFreezerburncoreCdPostConditions
 
 AddFunction EnhancementFillerMainActions
 {
- #sundering
- Spell(sundering)
- #focused_azerite_beam
- Spell(focused_azerite_beam)
+ #sundering,if=active_enemies<3
+ if Enemies() < 3 Spell(sundering)
+ #focused_azerite_beam,if=!buff.ascendance.up&!buff.molten_weapon.up&!buff.icy_edge.up&!buff.crackling_surge.up&!debuff.earthen_spike.up
+ if not BuffPresent(ascendance_enhancement_buff) and not BuffPresent(molten_weapon_buff) and not BuffPresent(icy_edge_buff) and not BuffPresent(crackling_surge) and not target.DebuffPresent(earthen_spike_debuff) Spell(focused_azerite_beam)
  #concentrated_flame
  Spell(concentrated_flame_essence)
  #crash_lightning,if=talent.forceful_winds.enabled&active_enemies>1&variable.furyCheck_CL
@@ -860,22 +906,22 @@ AddFunction EnhancementFillerMainPostConditions
 
 AddFunction EnhancementFillerShortCdActions
 {
- unless Spell(sundering) or Spell(focused_azerite_beam)
+ unless Enemies() < 3 and Spell(sundering) or not BuffPresent(ascendance_enhancement_buff) and not BuffPresent(molten_weapon_buff) and not BuffPresent(icy_edge_buff) and not BuffPresent(crackling_surge) and not target.DebuffPresent(earthen_spike_debuff) and Spell(focused_azerite_beam)
  {
   #purifying_blast
   Spell(purifying_blast)
 
   unless Spell(concentrated_flame_essence)
   {
-   #worldvein_resonance
-   Spell(worldvein_resonance_essence)
+   #worldvein_resonance,if=buff.lifeblood.stack<4
+   if BuffStacks(lifeblood_buff) < 4 Spell(worldvein_resonance_essence)
   }
  }
 }
 
 AddFunction EnhancementFillerShortCdPostConditions
 {
- Spell(sundering) or Spell(focused_azerite_beam) or Spell(concentrated_flame_essence) or Talent(forceful_winds_talent) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Talent(searing_assault_talent) and Spell(flametongue) or not HasAzeriteTrait(primal_primer_trait) and Talent(hot_hand_talent) and BuffPresent(hot_hand_buff) and Spell(lava_lash) or Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Maelstrom() < 70 and not BuffPresent(strength_of_earth_buff) and Spell(rockbiter) or Talent(crashing_storm_talent) and OCPool_CL() and Spell(crash_lightning) or OCPool_LL() and furyCheck_LL() and Spell(lava_lash) or Spell(rockbiter) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 + GCD() and furyCheck_FB() and Spell(frostbrand) or Spell(flametongue)
+ Enemies() < 3 and Spell(sundering) or not BuffPresent(ascendance_enhancement_buff) and not BuffPresent(molten_weapon_buff) and not BuffPresent(icy_edge_buff) and not BuffPresent(crackling_surge) and not target.DebuffPresent(earthen_spike_debuff) and Spell(focused_azerite_beam) or Spell(concentrated_flame_essence) or Talent(forceful_winds_talent) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Talent(searing_assault_talent) and Spell(flametongue) or not HasAzeriteTrait(primal_primer_trait) and Talent(hot_hand_talent) and BuffPresent(hot_hand_buff) and Spell(lava_lash) or Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Maelstrom() < 70 and not BuffPresent(strength_of_earth_buff) and Spell(rockbiter) or Talent(crashing_storm_talent) and OCPool_CL() and Spell(crash_lightning) or OCPool_LL() and furyCheck_LL() and Spell(lava_lash) or Spell(rockbiter) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 + GCD() and furyCheck_FB() and Spell(frostbrand) or Spell(flametongue)
 }
 
 AddFunction EnhancementFillerCdActions
@@ -884,7 +930,7 @@ AddFunction EnhancementFillerCdActions
 
 AddFunction EnhancementFillerCdPostConditions
 {
- Spell(sundering) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(concentrated_flame_essence) or Spell(worldvein_resonance_essence) or Talent(forceful_winds_talent) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Talent(searing_assault_talent) and Spell(flametongue) or not HasAzeriteTrait(primal_primer_trait) and Talent(hot_hand_talent) and BuffPresent(hot_hand_buff) and Spell(lava_lash) or Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Maelstrom() < 70 and not BuffPresent(strength_of_earth_buff) and Spell(rockbiter) or Talent(crashing_storm_talent) and OCPool_CL() and Spell(crash_lightning) or OCPool_LL() and furyCheck_LL() and Spell(lava_lash) or Spell(rockbiter) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 + GCD() and furyCheck_FB() and Spell(frostbrand) or Spell(flametongue)
+ Enemies() < 3 and Spell(sundering) or not BuffPresent(ascendance_enhancement_buff) and not BuffPresent(molten_weapon_buff) and not BuffPresent(icy_edge_buff) and not BuffPresent(crackling_surge) and not target.DebuffPresent(earthen_spike_debuff) and Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(concentrated_flame_essence) or BuffStacks(lifeblood_buff) < 4 and Spell(worldvein_resonance_essence) or Talent(forceful_winds_talent) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Talent(searing_assault_talent) and Spell(flametongue) or not HasAzeriteTrait(primal_primer_trait) and Talent(hot_hand_talent) and BuffPresent(hot_hand_buff) and Spell(lava_lash) or Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Maelstrom() < 70 and not BuffPresent(strength_of_earth_buff) and Spell(rockbiter) or Talent(crashing_storm_talent) and OCPool_CL() and Spell(crash_lightning) or OCPool_LL() and furyCheck_LL() and Spell(lava_lash) or Spell(rockbiter) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 + GCD() and furyCheck_FB() and Spell(frostbrand) or Spell(flametongue)
 }
 
 ### actions.default_core
@@ -1279,15 +1325,18 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # berserking
 # blood_fury_apsp
 # blood_of_the_enemy
+# blood_of_the_enemy_essence_id
 # bloodlust
 # boulderfist_talent
 # capacitor_totem
 # concentrated_flame_essence
+# crackling_surge
 # crash_lightning
 # crash_lightning_buff
 # crashing_storm_talent
 # earth_elemental
 # earthen_spike
+# earthen_spike_debuff
 # enh_resonance_totem_buff
 # feral_lunge
 # feral_spirit
@@ -1308,15 +1357,18 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # hex
 # hot_hand_buff
 # hot_hand_talent
+# icy_edge_buff
 # item_battle_potion_of_agility
 # landslide_buff
 # landslide_talent
 # lava_lash
+# lifeblood_buff
 # lightning_bolt_enhancement
 # lightning_conduit_debuff
 # lightning_conduit_trait
 # lightning_shield
 # memory_of_lucid_dreams_essence
+# molten_weapon_buff
 # natural_harmony_fire
 # natural_harmony_frost
 # natural_harmony_nature
@@ -1329,12 +1381,13 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # reckless_force_buff
 # rockbiter
 # searing_assault_talent
+# seething_rage
 # stormbringer_buff
 # stormstrike
 # strength_of_earth_buff
 # strength_of_earth_trait
 # sundering
-# the_unbound_force
+# the_unbound_force_essence
 # totem_mastery_enhancement
 # war_stomp
 # wind_shear
@@ -1344,10 +1397,10 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
     OvaleScripts:RegisterScript("SHAMAN", "enhancement", name, desc, code, "script")
 end
 do
-    local name = "sc_t23_shaman_restoration"
-    local desc = "[8.2] Simulationcraft: T23_Shaman_Restoration"
+    local name = "sc_t24_shaman_restoration"
+    local desc = "[8.2] Simulationcraft: T24_Shaman_Restoration"
     local code = [[
-# Based on SimulationCraft profile "T23_Shaman_Restoration".
+# Based on SimulationCraft profile "T24_Shaman_Restoration".
 #	class=shaman
 #	spec=restoration
 #	talents=1132221
@@ -1406,7 +1459,7 @@ AddFunction RestorationPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_intellect usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
 }
 
 AddFunction RestorationPrecombatCdPostConditions
@@ -1418,6 +1471,8 @@ AddFunction RestorationPrecombatCdPostConditions
 
 AddFunction RestorationDefaultMainActions
 {
+ #concentrated_flame
+ Spell(concentrated_flame_essence)
  #flame_shock,target_if=(!ticking|dot.flame_shock.remains<=gcd)|refreshable
  if not target.DebuffPresent(flame_shock_restoration_debuff) or target.DebuffRemaining(flame_shock_restoration_debuff) <= GCD() or target.Refreshable(flame_shock_restoration_debuff) Spell(flame_shock_restoration)
  #lava_burst,if=dot.flame_shock.remains>cast_time&cooldown_react
@@ -1436,17 +1491,24 @@ AddFunction RestorationDefaultMainPostConditions
 
 AddFunction RestorationDefaultShortCdActions
 {
+ unless Spell(concentrated_flame_essence)
+ {
+  #ripple_in_space
+  Spell(ripple_in_space_essence)
+  #worldvein_resonance
+  Spell(worldvein_resonance_essence)
+ }
 }
 
 AddFunction RestorationDefaultShortCdPostConditions
 {
- { not target.DebuffPresent(flame_shock_restoration_debuff) or target.DebuffRemaining(flame_shock_restoration_debuff) <= GCD() or target.Refreshable(flame_shock_restoration_debuff) } and Spell(flame_shock_restoration) or target.DebuffRemaining(flame_shock_restoration_debuff) > CastTime(lava_burst) and not SpellCooldown(lava_burst) > 0 and Spell(lava_burst) or Enemies() < 2 and Spell(lightning_bolt) or Enemies() > 1 and Enemies() > 1 and Spell(chain_lightning_restoration) or Speed() > 0 and Spell(flame_shock_restoration)
+ Spell(concentrated_flame_essence) or { not target.DebuffPresent(flame_shock_restoration_debuff) or target.DebuffRemaining(flame_shock_restoration_debuff) <= GCD() or target.Refreshable(flame_shock_restoration_debuff) } and Spell(flame_shock_restoration) or target.DebuffRemaining(flame_shock_restoration_debuff) > CastTime(lava_burst) and not SpellCooldown(lava_burst) > 0 and Spell(lava_burst) or Enemies() < 2 and Spell(lightning_bolt) or Enemies() > 1 and Enemies() > 1 and Spell(chain_lightning_restoration) or Speed() > 0 and Spell(flame_shock_restoration)
 }
 
 AddFunction RestorationDefaultCdActions
 {
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_intellect usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
  #wind_shear
  RestorationInterruptActions()
  #spiritwalkers_grace,moving=1,if=movement.distance>6
@@ -1462,7 +1524,7 @@ AddFunction RestorationDefaultCdActions
  #ancestral_call
  Spell(ancestral_call)
 
- unless { not target.DebuffPresent(flame_shock_restoration_debuff) or target.DebuffRemaining(flame_shock_restoration_debuff) <= GCD() or target.Refreshable(flame_shock_restoration_debuff) } and Spell(flame_shock_restoration) or target.DebuffRemaining(flame_shock_restoration_debuff) > CastTime(lava_burst) and not SpellCooldown(lava_burst) > 0 and Spell(lava_burst)
+ unless Spell(concentrated_flame_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence) or { not target.DebuffPresent(flame_shock_restoration_debuff) or target.DebuffRemaining(flame_shock_restoration_debuff) <= GCD() or target.Refreshable(flame_shock_restoration_debuff) } and Spell(flame_shock_restoration) or target.DebuffRemaining(flame_shock_restoration_debuff) > CastTime(lava_burst) and not SpellCooldown(lava_burst) > 0 and Spell(lava_burst)
  {
   #earth_elemental
   Spell(earth_elemental)
@@ -1471,7 +1533,7 @@ AddFunction RestorationDefaultCdActions
 
 AddFunction RestorationDefaultCdPostConditions
 {
- { not target.DebuffPresent(flame_shock_restoration_debuff) or target.DebuffRemaining(flame_shock_restoration_debuff) <= GCD() or target.Refreshable(flame_shock_restoration_debuff) } and Spell(flame_shock_restoration) or target.DebuffRemaining(flame_shock_restoration_debuff) > CastTime(lava_burst) and not SpellCooldown(lava_burst) > 0 and Spell(lava_burst) or Enemies() < 2 and Spell(lightning_bolt) or Enemies() > 1 and Enemies() > 1 and Spell(chain_lightning_restoration) or Speed() > 0 and Spell(flame_shock_restoration)
+ Spell(concentrated_flame_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence) or { not target.DebuffPresent(flame_shock_restoration_debuff) or target.DebuffRemaining(flame_shock_restoration_debuff) <= GCD() or target.Refreshable(flame_shock_restoration_debuff) } and Spell(flame_shock_restoration) or target.DebuffRemaining(flame_shock_restoration_debuff) > CastTime(lava_burst) and not SpellCooldown(lava_burst) > 0 and Spell(lava_burst) or Enemies() < 2 and Spell(lightning_bolt) or Enemies() > 1 and Enemies() > 1 and Spell(chain_lightning_restoration) or Speed() > 0 and Spell(flame_shock_restoration)
 }
 
 ### Restoration icons.
@@ -1538,18 +1600,21 @@ AddIcon checkbox=opt_shaman_restoration_aoe help=cd specialization=restoration
 # blood_fury_apsp
 # capacitor_totem
 # chain_lightning_restoration
+# concentrated_flame_essence
 # earth_elemental
 # fireblood
 # flame_shock_restoration
 # flame_shock_restoration_debuff
 # hex
-# item_battle_potion_of_intellect
+# item_unbridled_fury
 # lava_burst
 # lightning_bolt
 # quaking_palm
+# ripple_in_space_essence
 # spiritwalkers_grace
 # war_stomp
 # wind_shear
+# worldvein_resonance_essence
 ]]
     OvaleScripts:RegisterScript("SHAMAN", "restoration", name, desc, code, "script")
 end

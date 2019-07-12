@@ -132,11 +132,6 @@ Define(shield_of_vengeance 184662)
 Define(templars_verdict 85256)
 # Unleashes a powerful weapon strike that deals 224266sw1*<mult> Holy damage to an enemy target.
   SpellInfo(templars_verdict holypower=3)
-Define(the_unbound_force 298452)
-# Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]
-  SpellInfo(the_unbound_force cd=60 duration=2 channel=2 tick=0.33)
-  SpellAddBuff(the_unbound_force the_unbound_force=1)
-  SpellAddTargetDebuff(the_unbound_force the_unbound_force=1)
 Define(wake_of_ashes 255937)
 # Lash out at your enemies, dealing sw1 Radiant damage to all enemies within a1 yd in front of you and reducing their movement speed by s2 for 5 seconds.rnrnDemon and Undead enemies are also stunned for 5 seconds.rnrn|cFFFFFFFFGenerates s3 Holy Power.
   SpellInfo(wake_of_ashes cd=45 duration=5 holypower=-5 talent=wake_of_ashes_talent)

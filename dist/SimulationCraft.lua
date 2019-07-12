@@ -232,6 +232,8 @@ local CHARACTER_PROPERTY = {
     ["health.pct"] = "HealthPercent()",
     ["health.percent"] = "HealthPercent()",
     ["holy_power"] = "HolyPower()",
+    ["incanters_flow_time_to.4.down"] = "0",
+    ["incanters_flow_time_to.5.up"] = "0",
     ["infernal_no_de"] = "NotDeDemons(infernal)",
     ["insanity"] = "Insanity()",
     ["level"] = "Level()",
@@ -1387,6 +1389,7 @@ local InitializeDisambiguation = function()
     AddDisambiguation("concentrated_flame", "concentrated_flame_essence")
     AddDisambiguation("memory_of_lucid_dreams", "memory_of_lucid_dreams_essence")
     AddDisambiguation("ripple_in_space", "ripple_in_space_essence")
+    AddDisambiguation("the_unbound_force", "the_unbound_force_essence")
     AddDisambiguation("worldvein_resonance", "worldvein_resonance_essence")
     AddDisambiguation("arcane_torrent", "arcane_torrent_runicpower", "DEATHKNIGHT")
     AddDisambiguation("arcane_torrent", "arcane_torrent_dh", "DEMONHUNTER")
@@ -2697,8 +2700,7 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
                         AddSymbol(annotation, name)
                     end
                 else
-                    code = format("not target.Name(%s)", name)
-                    AddSymbol(annotation, name)
+                    code = format("True(target_isnot_target)")
                 end
                 annotation.astAnnotation = annotation.astAnnotation or {}
                 node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
@@ -3086,6 +3088,8 @@ EmitOperandEssence = function(operand, parseNode, nodeList, annotation, action, 
             code = format("AzeriteEssenceIsMinor(%s)", essenceId)
         elseif property == "enabled" then
             code = format("AzeriteEssenceIsEnabled(%s)", essenceId)
+        elseif property == "rank" then
+            code = format("AzeriteEssenceRank(%s)", essenceId)
         else
             ok = false
         end

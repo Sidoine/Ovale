@@ -264,11 +264,6 @@ Define(tectonic_thunder 286949)
 # Earthquake deals s1 Physical damage instantly, and has a s2 chance to make your next Chain Lightning be instant cast.
   SpellInfo(tectonic_thunder channel=0 gcd=0 offgcd=1)
   SpellAddBuff(tectonic_thunder tectonic_thunder=1)
-Define(the_unbound_force 298452)
-# Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]
-  SpellInfo(the_unbound_force cd=60 duration=2 channel=2 tick=0.33)
-  SpellAddBuff(the_unbound_force the_unbound_force=1)
-  SpellAddTargetDebuff(the_unbound_force the_unbound_force=1)
 Define(war_stomp 20549)
 # Stuns up to i enemies within A1 yds for 2 seconds.
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)

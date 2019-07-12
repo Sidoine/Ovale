@@ -205,16 +205,8 @@ AddFunction HavocEssencesMainActions
 {
  #concentrated_flame
  Spell(concentrated_flame_essence)
- #blood_of_the_enemy
- Spell(blood_of_the_enemy)
- #guardian_of_azeroth
- Spell(guardian_of_azeroth)
  #focused_azerite_beam
  Spell(focused_azerite_beam)
- #purifying_blast
- Spell(purifying_blast)
- #the_unbound_force
- Spell(the_unbound_force)
 }
 
 AddFunction HavocEssencesMainPostConditions
@@ -223,8 +215,12 @@ AddFunction HavocEssencesMainPostConditions
 
 AddFunction HavocEssencesShortCdActions
 {
- unless Spell(concentrated_flame_essence) or Spell(blood_of_the_enemy) or Spell(guardian_of_azeroth) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force)
+ unless Spell(concentrated_flame_essence) or Spell(focused_azerite_beam)
  {
+  #purifying_blast
+  Spell(purifying_blast)
+  #the_unbound_force
+  Spell(the_unbound_force_essence)
   #ripple_in_space
   Spell(ripple_in_space_essence)
   #worldvein_resonance
@@ -234,21 +230,29 @@ AddFunction HavocEssencesShortCdActions
 
 AddFunction HavocEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(blood_of_the_enemy) or Spell(guardian_of_azeroth) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam)
 }
 
 AddFunction HavocEssencesCdActions
 {
- unless Spell(concentrated_flame_essence) or Spell(blood_of_the_enemy) or Spell(guardian_of_azeroth) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+ unless Spell(concentrated_flame_essence)
  {
-  #memory_of_lucid_dreams,if=fury<40&buff.metamorphosis.up
-  if Fury() < 40 and BuffPresent(metamorphosis_havoc_buff) Spell(memory_of_lucid_dreams_essence)
+  #blood_of_the_enemy
+  Spell(blood_of_the_enemy)
+  #guardian_of_azeroth
+  Spell(guardian_of_azeroth)
+
+  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+  {
+   #memory_of_lucid_dreams,if=fury<40&buff.metamorphosis.up
+   if Fury() < 40 and BuffPresent(metamorphosis_havoc_buff) Spell(memory_of_lucid_dreams_essence)
+  }
  }
 }
 
 AddFunction HavocEssencesCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(blood_of_the_enemy) or Spell(guardian_of_azeroth) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
 }
 
 ### actions.demonic
@@ -593,7 +597,7 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # purifying_blast
 # revolving_blades_trait
 # ripple_in_space_essence
-# the_unbound_force
+# the_unbound_force_essence
 # throw_glaive_havoc
 # trail_of_ruin_talent
 # vengeful_retreat

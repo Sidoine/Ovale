@@ -1,10 +1,10 @@
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
-    local name = "sc_t23_demon_hunter_havoc"
-    local desc = "[8.2] Simulationcraft: T23_Demon_Hunter_Havoc"
+    local name = "sc_t24_demon_hunter_havoc"
+    local desc = "[8.2] Simulationcraft: T24_Demon_Hunter_Havoc"
     local code = [[
-# Based on SimulationCraft profile "T23_Demon_Hunter_Havoc".
+# Based on SimulationCraft profile "T24_Demon_Hunter_Havoc".
 #	class=demonhunter
 #	spec=havoc
 #	talents=1310221
@@ -108,7 +108,7 @@ AddFunction HavocPrecombatCdActions
  #food
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_focused_resolve usable=1)
  #metamorphosis,if=!azerite.chaotic_transformation.enabled
  if not HasAzeriteTrait(chaotic_transformation_trait) and { not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight() } Spell(metamorphosis_havoc)
 }
@@ -194,6 +194,62 @@ AddFunction HavocNormalCdActions
 AddFunction HavocNormalCdPostConditions
 {
  Talent(momentum_talent) and BuffExpires(prepared_buff) and TimeInCombat() > 1 and CheckBoxOn(opt_vengeful_retreat) and Spell(vengeful_retreat) or { waiting_for_momentum() or Talent(fel_mastery_talent) } and { Charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or not waiting_for_momentum() and { Enemies() > Enemies(tagged=1) or 600 > 30 } and Spell(fel_barrage) or blade_dance() and Spell(death_sweep) or Spell(immolation_aura_havoc) or Enemies() > 1 and { not False(raid_event_adds_exists) or False(raid_event_adds_exists) } and not waiting_for_momentum() and Spell(eye_beam) or blade_dance() and Spell(blade_dance) or FuryDeficit() >= 40 and Spell(felblade) or not Talent(blind_fury_talent) and not waiting_for_dark_slash() and 600 > SpellCooldown(eye_beam) and Spell(eye_beam) or { Talent(demon_blades_talent) or not waiting_for_momentum() or FuryDeficit() < 30 or BuffRemaining(metamorphosis_havoc_buff) < 5 } and not pooling_for_blade_dance() and not waiting_for_dark_slash() and Spell(annihilation) or { Talent(demon_blades_talent) or not waiting_for_momentum() or FuryDeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and not waiting_for_dark_slash() and Spell(chaos_strike) or Talent(blind_fury_talent) and 600 > SpellCooldown(eye_beam) and Spell(eye_beam) or Spell(demons_bite) or not Talent(momentum_talent) and 600 > Charges(fel_rush) * 10 and Talent(demon_blades_talent) and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or { target.Distance() > 15 or not target.InRange() } and Spell(felblade) or { target.Distance() > 15 or not target.InRange() and not Talent(momentum_talent) } and CheckBoxOn(opt_fel_rush) and Spell(fel_rush) or target.Distance() > 15 and CheckBoxOn(opt_vengeful_retreat) and Spell(vengeful_retreat) or Talent(demon_blades_talent) and Spell(throw_glaive_havoc)
+}
+
+### actions.essences
+
+AddFunction HavocEssencesMainActions
+{
+ #concentrated_flame
+ Spell(concentrated_flame_essence)
+ #focused_azerite_beam
+ Spell(focused_azerite_beam)
+}
+
+AddFunction HavocEssencesMainPostConditions
+{
+}
+
+AddFunction HavocEssencesShortCdActions
+{
+ unless Spell(concentrated_flame_essence) or Spell(focused_azerite_beam)
+ {
+  #purifying_blast
+  Spell(purifying_blast)
+  #the_unbound_force
+  Spell(the_unbound_force_essence)
+  #ripple_in_space
+  Spell(ripple_in_space_essence)
+  #worldvein_resonance
+  Spell(worldvein_resonance_essence)
+ }
+}
+
+AddFunction HavocEssencesShortCdPostConditions
+{
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam)
+}
+
+AddFunction HavocEssencesCdActions
+{
+ unless Spell(concentrated_flame_essence)
+ {
+  #blood_of_the_enemy
+  Spell(blood_of_the_enemy)
+  #guardian_of_azeroth
+  Spell(guardian_of_azeroth)
+
+  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+  {
+   #memory_of_lucid_dreams,if=fury<40&buff.metamorphosis.up
+   if Fury() < 40 and BuffPresent(metamorphosis_havoc_buff) Spell(memory_of_lucid_dreams_essence)
+  }
+ }
+}
+
+AddFunction HavocEssencesCdPostConditions
+{
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
 }
 
 ### actions.demonic
@@ -293,18 +349,24 @@ AddFunction HavocDarkslashCdPostConditions
 
 AddFunction HavocCooldownMainActions
 {
+ #call_action_list,name=essences
+ HavocEssencesMainActions()
 }
 
 AddFunction HavocCooldownMainPostConditions
 {
+ HavocEssencesMainPostConditions()
 }
 
 AddFunction HavocCooldownShortCdActions
 {
+ #call_action_list,name=essences
+ HavocEssencesShortCdActions()
 }
 
 AddFunction HavocCooldownShortCdPostConditions
 {
+ HavocEssencesShortCdPostConditions()
 }
 
 AddFunction HavocCooldownCdActions
@@ -318,13 +380,16 @@ AddFunction HavocCooldownCdActions
  #nemesis,if=!raid_event.adds.exists
  if not False(raid_event_adds_exists) Spell(nemesis)
  #potion,if=buff.metamorphosis.remains>25|target.time_to_die<60
- if { BuffRemaining(metamorphosis_havoc_buff) > 25 or target.TimeToDie() < 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
+ if { BuffRemaining(metamorphosis_havoc_buff) > 25 or target.TimeToDie() < 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_focused_resolve usable=1)
  #use_item,name=variable_intensity_gigavolt_oscillating_reactor
  HavocUseItemActions()
+ #call_action_list,name=essences
+ HavocEssencesCdActions()
 }
 
 AddFunction HavocCooldownCdPostConditions
 {
+ HavocEssencesCdPostConditions()
 }
 
 ### actions.default
@@ -491,9 +556,11 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # annihilation
 # blade_dance
 # blind_fury_talent
+# blood_of_the_enemy
 # chaos_nova
 # chaos_strike
 # chaotic_transformation_trait
+# concentrated_flame_essence
 # dark_slash
 # dark_slash_debuff
 # dark_slash_talent
@@ -509,9 +576,12 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # fel_rush
 # felblade
 # first_blood_talent
+# focused_azerite_beam
+# guardian_of_azeroth
 # immolation_aura_havoc
 # imprison
-# item_battle_potion_of_agility
+# item_focused_resolve
+# memory_of_lucid_dreams_essence
 # metamorphosis_havoc
 # metamorphosis_havoc_buff
 # momentum_buff
@@ -521,18 +591,22 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # nemesis_talent
 # pick_up_fragment
 # prepared_buff
+# purifying_blast
 # revolving_blades_trait
+# ripple_in_space_essence
+# the_unbound_force_essence
 # throw_glaive_havoc
 # trail_of_ruin_talent
 # vengeful_retreat
+# worldvein_resonance_essence
 ]]
     OvaleScripts:RegisterScript("DEMONHUNTER", "havoc", name, desc, code, "script")
 end
 do
-    local name = "sc_t23_demon_hunter_vengeance"
-    local desc = "[8.2] Simulationcraft: T23_Demon_Hunter_Vengeance"
+    local name = "sc_t24_demon_hunter_vengeance"
+    local desc = "[8.2] Simulationcraft: T24_Demon_Hunter_Vengeance"
     local code = [[
-# Based on SimulationCraft profile "T23_Demon_Hunter_Vengeance".
+# Based on SimulationCraft profile "T24_Demon_Hunter_Vengeance".
 #	class=demonhunter
 #	spec=vengeance
 #	talents=1213121

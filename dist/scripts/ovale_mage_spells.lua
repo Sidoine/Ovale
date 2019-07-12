@@ -88,6 +88,10 @@ Define(cone_of_cold 120)
 Define(counterspell 2139)
 # Counters the enemy's spellcast, preventing any spell from that school of magic from being cast for 6 seconds?s12598[ and silencing the target for 55021d][].
   SpellInfo(counterspell cd=24 duration=6 gcd=0 offgcd=1 interrupt=1)
+Define(cyclotronic_blast 293491)
+# Channel a cyclotronic blast, dealing s1 damage every t1 sec for D
+  SpellInfo(cyclotronic_blast cd=120 duration=2.5 channel=2.5 tick=0.5)
+  SpellAddTargetDebuff(cyclotronic_blast cyclotronic_blast=1)
 Define(dragons_breath 31661)
 # Enemies in a cone in front of you take (58.25 of Spell Power) Fire damage and are disoriented for 4 seconds. Damage will cancel the effect.
   SpellInfo(dragons_breath cd=20 duration=4)
@@ -177,10 +181,6 @@ Define(nether_tempest 114923)
   SpellInfo(nether_tempest duration=12 tick=1 talent=nether_tempest_talent)
   # Deals w1 Arcane damage and an additional w1 Arcane damage to all enemies within 114954A1 yards every t sec.
   SpellAddTargetDebuff(nether_tempest nether_tempest=1)
-Define(packed_ice 272968)
-# Ice Lance deals an additional s1 damage to enemies recently damaged by your Frozen Orb.
-  SpellInfo(packed_ice channel=0 gcd=0 offgcd=1)
-
 Define(phoenix_flames 257541)
 # Hurls a Phoenix that deals (75 of Spell Power) Fire damage to the target and splashes (20 of Spell Power) Fire damage to other nearby enemies. Always deals a critical strike.
   SpellInfo(phoenix_flames cd=30 talent=phoenix_flames_talent)
@@ -230,11 +230,6 @@ Define(summon_water_elemental 31687)
 Define(supernova 157980)
 # Pulses arcane energy around the target enemy or ally, dealing (30 of Spell Power) Arcane damage to all enemies within A2 yards, and knocking them upward. A primary enemy target will take s1 increased damage.
   SpellInfo(supernova cd=25 talent=supernova_talent)
-Define(the_unbound_force 298452)
-# Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]
-  SpellInfo(the_unbound_force cd=60 duration=2 channel=2 tick=0.33)
-  SpellAddBuff(the_unbound_force the_unbound_force=1)
-  SpellAddTargetDebuff(the_unbound_force the_unbound_force=1)
 Define(alexstraszas_fury_talent 11) #22465
 # Dragon's Breath always critically strikes and contributes to Hot Streak.
 Define(amplification_talent 1) #22458
@@ -263,6 +258,8 @@ Define(ice_floes_talent 6) #23073
 # Makes your next Mage spell with a cast time shorter than s2 sec castable while moving. Unaffected by the global cooldown and castable while casting.
 Define(ice_nova_talent 3) #22463
 # Causes a whirl of icy wind around the enemy, dealing (45 of Spell Power)*s3/100 Frost damage to the target and (45 of Spell Power) Frost damage to all other enemies within a2 yards, and freezing them in place for 2 seconds.
+Define(incanters_flow_talent 7) #22444
+# Magical energy flows through you while in combat, building up to 116267m1*5 increased damage and then diminishing down to 116267s1 increased damage, cycling every 10 sec.
 Define(kindling_talent 19) #21631
 # Your Fireball, Pyroblast, Fire Blast, and Phoenix Flames critical strikes reduce the remaining cooldown on Combustion by <cdr> sec.
 Define(living_bomb_talent 18) #22472

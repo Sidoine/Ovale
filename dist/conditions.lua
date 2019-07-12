@@ -200,6 +200,12 @@ local function AzeriteEssenceIsEnabled(positionalParams, namedParams, atTime)
     OvaleCondition:RegisterCondition("azeriteessenceismajor", false, AzeriteEssenceIsMajor)
     OvaleCondition:RegisterCondition("azeriteessenceisminor", false, AzeriteEssenceIsMinor)
     OvaleCondition:RegisterCondition("azeriteessenceisenabled", false, AzeriteEssenceIsEnabled)
+local function AzeriteEssenceRank(positionalParams, namedParams, atTime)
+        local essenceId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+        local value = OvaleAzeriteEssence:EssenceRank(essenceId)
+        return Compare(value, comparator, limit)
+    end
+    OvaleCondition:RegisterCondition("azeriteessencerank", false, AzeriteEssenceRank)
 end
 do
 local function BaseDuration(positionalParams, namedParams, atTime)

@@ -461,16 +461,8 @@ AddFunction WindwalkerEssencesMainActions
 {
  #concentrated_flame
  Spell(concentrated_flame_essence)
- #blood_of_the_enemy
- Spell(blood_of_the_enemy)
- #guardian_of_azeroth
- Spell(guardian_of_azeroth)
  #focused_azerite_beam
  Spell(focused_azerite_beam)
- #purifying_blast
- Spell(purifying_blast)
- #the_unbound_force
- Spell(the_unbound_force)
 }
 
 AddFunction WindwalkerEssencesMainPostConditions
@@ -479,8 +471,12 @@ AddFunction WindwalkerEssencesMainPostConditions
 
 AddFunction WindwalkerEssencesShortCdActions
 {
- unless Spell(concentrated_flame_essence) or Spell(blood_of_the_enemy) or Spell(guardian_of_azeroth) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force)
+ unless Spell(concentrated_flame_essence) or Spell(focused_azerite_beam)
  {
+  #purifying_blast
+  Spell(purifying_blast)
+  #the_unbound_force
+  Spell(the_unbound_force_essence)
   #ripple_in_space
   Spell(ripple_in_space_essence)
   #worldvein_resonance
@@ -490,21 +486,29 @@ AddFunction WindwalkerEssencesShortCdActions
 
 AddFunction WindwalkerEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(blood_of_the_enemy) or Spell(guardian_of_azeroth) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam)
 }
 
 AddFunction WindwalkerEssencesCdActions
 {
- unless Spell(concentrated_flame_essence) or Spell(blood_of_the_enemy) or Spell(guardian_of_azeroth) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+ unless Spell(concentrated_flame_essence)
  {
-  #memory_of_lucid_dreams,if=energy<40&buff.storm_earth_and_fire.up
-  if Energy() < 40 and BuffPresent(storm_earth_and_fire) Spell(memory_of_lucid_dreams_essence)
+  #blood_of_the_enemy
+  Spell(blood_of_the_enemy)
+  #guardian_of_azeroth
+  Spell(guardian_of_azeroth)
+
+  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+  {
+   #memory_of_lucid_dreams,if=energy<40&buff.storm_earth_and_fire.up
+   if Energy() < 40 and BuffPresent(storm_earth_and_fire) Spell(memory_of_lucid_dreams_essence)
+  }
  }
 }
 
 AddFunction WindwalkerEssencesCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(blood_of_the_enemy) or Spell(guardian_of_azeroth) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
 }
 
 ### actions.cd
@@ -829,7 +833,7 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # spinning_crane_kick
 # storm_earth_and_fire
 # swift_roundhouse_buff
-# the_unbound_force
+# the_unbound_force_essence
 # tiger_palm
 # touch_of_death
 # touch_of_karma
@@ -1026,16 +1030,8 @@ AddFunction WindwalkerEssencesMainActions
 {
  #concentrated_flame
  Spell(concentrated_flame_essence)
- #blood_of_the_enemy
- Spell(blood_of_the_enemy)
- #guardian_of_azeroth
- Spell(guardian_of_azeroth)
  #focused_azerite_beam
  Spell(focused_azerite_beam)
- #purifying_blast
- Spell(purifying_blast)
- #the_unbound_force
- Spell(the_unbound_force)
 }
 
 AddFunction WindwalkerEssencesMainPostConditions
@@ -1044,8 +1040,12 @@ AddFunction WindwalkerEssencesMainPostConditions
 
 AddFunction WindwalkerEssencesShortCdActions
 {
- unless Spell(concentrated_flame_essence) or Spell(blood_of_the_enemy) or Spell(guardian_of_azeroth) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force)
+ unless Spell(concentrated_flame_essence) or Spell(focused_azerite_beam)
  {
+  #purifying_blast
+  Spell(purifying_blast)
+  #the_unbound_force
+  Spell(the_unbound_force_essence)
   #ripple_in_space
   Spell(ripple_in_space_essence)
   #worldvein_resonance
@@ -1055,21 +1055,29 @@ AddFunction WindwalkerEssencesShortCdActions
 
 AddFunction WindwalkerEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(blood_of_the_enemy) or Spell(guardian_of_azeroth) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam)
 }
 
 AddFunction WindwalkerEssencesCdActions
 {
- unless Spell(concentrated_flame_essence) or Spell(blood_of_the_enemy) or Spell(guardian_of_azeroth) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+ unless Spell(concentrated_flame_essence)
  {
-  #memory_of_lucid_dreams,if=energy<40&buff.storm_earth_and_fire.up
-  if Energy() < 40 and BuffPresent(storm_earth_and_fire) Spell(memory_of_lucid_dreams_essence)
+  #blood_of_the_enemy
+  Spell(blood_of_the_enemy)
+  #guardian_of_azeroth
+  Spell(guardian_of_azeroth)
+
+  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+  {
+   #memory_of_lucid_dreams,if=energy<40&buff.storm_earth_and_fire.up
+   if Energy() < 40 and BuffPresent(storm_earth_and_fire) Spell(memory_of_lucid_dreams_essence)
+  }
  }
 }
 
 AddFunction WindwalkerEssencesCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(blood_of_the_enemy) or Spell(guardian_of_azeroth) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
 }
 
 ### actions.cd
@@ -1394,7 +1402,7 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # spinning_crane_kick
 # storm_earth_and_fire
 # swift_roundhouse_buff
-# the_unbound_force
+# the_unbound_force_essence
 # tiger_palm
 # touch_of_death
 # touch_of_karma

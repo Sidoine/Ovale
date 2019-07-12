@@ -115,7 +115,7 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
             scClassName = "death_knight"
         end
         if  not name and specialization then
-            name = format("sc_t23_%s_%s", scClassName, specialization)
+            name = format("sc_t24_%s_%s", scClassName, specialization)
         end
         if  not (name and self.script[name]) then
             name = DISABLED_NAME

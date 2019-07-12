@@ -82,6 +82,10 @@ local OvaleAzeriteEssenceClass = __class(OvaleAzeriteEssenceBase, {
     IsMinorEssence = function(self, essenceId)
         return self.self_essences[essenceId] ~= nil and true or false
     end,
+    EssenceRank = function(self, essenceId)
+        local essence = self.self_essences[essenceId]
+        return essence ~= nil and essence.rank or 0
+    end,
     DebugEssences = function(self)
         local output = {}
         local array = {}
