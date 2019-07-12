@@ -1456,9 +1456,6 @@ const OvaleFunctionName = function(name: string, annotation: Annotation) {
 function AddSymbol(annotation: Annotation, symbol: string) {
     let symbolTable = annotation.symbolTable || {}
     let symbolList = annotation.symbolList || {};
-    if (symbol === "target") {
-        debugger;
-    }
     if (!symbolTable[symbol] && !OvaleData.DEFAULT_SPELL_LIST[symbol]) {
         symbolTable[symbol] = true;
         symbolList[lualength(symbolList) + 1] = symbol;

@@ -10,6 +10,17 @@ __exports.register = function()
   SpellInfo(blood_of_the_enemy cd=120 duration=10 channel=10)
   # You have a w2 increased chance to be Critically Hit by the caster.
   SpellAddTargetDebuff(blood_of_the_enemy blood_of_the_enemy=1)
+Define(bloodlust 2825)
+# Increases Haste by (25 of Spell Power) for all party and raid members for 40 seconds.rnrnAllies receiving this effect will become Sated and unable to benefit from Bloodlust or Time Warp again for 600 seconds.
+  SpellInfo(bloodlust cd=300 duration=40 channel=40 gcd=0 offgcd=1)
+  # Haste increased by s1.
+  SpellAddBuff(bloodlust bloodlust=1)
+Define(chorus_of_insanity 279572)
+# When Voidform ends, gain s1 Critical Strike for each stack of Voidform. This effect decays every 279572t3 sec.
+  SpellInfo(chorus_of_insanity duration=120 max_stacks=100 gcd=0 offgcd=1 tick=1)
+  # Critical Strike increased by w1.
+  SpellAddBuff(chorus_of_insanity chorus_of_insanity=1)
+
 Define(dark_ascension 280711)
 # Immediately activates a new Voidform, then releases an explosive blast of pure void energy, causing (95 of Spell Power)*2 Shadow damage to all enemies within a1 yds of your target.rnrn|cFFFFFFFFGenerates s2/100 Insanity.|r
   SpellInfo(dark_ascension cd=60 talent=dark_ascension_talent)
@@ -42,6 +53,8 @@ Define(mind_flay 15407)
 Define(mind_sear 48045)
 # Corrosive shadow energy radiates from the target, dealing 49821m2*s2 Shadow damage over 3 seconds to all enemies within 49821a2 yards of the target.rnrn|cFFFFFFFFGenerates s2*208232m1/100 Insanity over the duration per target hit.|r
   SpellInfo(mind_sear duration=3 channel=3 tick=0.75)
+  # Causing Shadow damage to all targets within 49821a2 yards every t1 sec.
+  SpellAddBuff(mind_sear mind_sear=1)
 
 Define(purifying_blast 295337)
 # Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
@@ -135,6 +148,7 @@ Define(surrender_to_madness_talent 21) #21979
 # All your Insanity-generating abilities generate s1 more Insanity and you can cast while moving for 60 seconds.rnrnThen, you take damage equal to s3 of your maximum health and cannot generate Insanity for 15 seconds.
 Define(void_torrent_talent 18) #21720
 # Channel a torrent of void energy into the target, dealing o Shadow damage over 4 seconds.rnrnInsanity does not drain during this channel.rnrn|cFFFFFFFFGenerates 289577s1*289577s2/100 Insanity over the duration.|r
+Define(chorus_of_insanity_trait 278661)
 Define(death_throes_trait 278659)
 Define(searing_dialogue_trait 272788)
 Define(spiteful_apparitions_trait 277682)

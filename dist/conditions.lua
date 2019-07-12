@@ -11,6 +11,7 @@ local Compare = __Condition.Compare
 local TestBoolean = __Condition.TestBoolean
 local ParseCondition = __Condition.ParseCondition
 local isComparator = __Condition.isComparator
+local ReturnValue = __Condition.ReturnValue
 local __DamageTaken = LibStub:GetLibrary("ovale/DamageTaken")
 local OvaleDamageTaken = __DamageTaken.OvaleDamageTaken
 local __Data = LibStub:GetLibrary("ovale/Data")
@@ -85,6 +86,7 @@ local UnitPowerMax = UnitPowerMax
 local UnitRace = UnitRace
 local UnitStagger = UnitStagger
 local huge = math.huge
+local min = math.min
 local __AST = LibStub:GetLibrary("ovale/AST")
 local isValueNode = __AST.isValueNode
 local __Cooldown = LibStub:GetLibrary("ovale/Cooldown")
@@ -197,9 +199,15 @@ local function AzeriteEssenceIsEnabled(positionalParams, namedParams, atTime)
         local value = OvaleAzeriteEssence:IsMajorEssence(essenceId) or OvaleAzeriteEssence:IsMinorEssence(essenceId)
         return TestBoolean(value, yesno)
     end
+local function AzeriteEssenceRank(positionalParams, namedParams, atTime)
+        local essenceId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+        local value = OvaleAzeriteEssence.self_essences[essenceId].rank
+        return Compare(value, comparator, limit)
+    end
     OvaleCondition:RegisterCondition("azeriteessenceismajor", false, AzeriteEssenceIsMajor)
     OvaleCondition:RegisterCondition("azeriteessenceisminor", false, AzeriteEssenceIsMinor)
     OvaleCondition:RegisterCondition("azeriteessenceisenabled", false, AzeriteEssenceIsEnabled)
+    OvaleCondition:RegisterCondition("azeriteessencerank", false, AzeriteEssenceRank)
 end
 do
 local function BaseDuration(positionalParams, namedParams, atTime)
@@ -2553,3 +2561,43 @@ local function HasDebuffType(positionalParams, namedParams, atTime)
     end
     OvaleCondition:RegisterCondition("hasdebufftype", false, HasDebuffType)
 end
+local function stackTimeTo(positionalParams, namedParams, atTime)
+    local spellId = positionalParams[1]
+    local stacks = positionalParams[2]
+    local direction = positionalParams[3]
+    local incantersFlowBuff = OvaleData:GetSpellInfo(spellId)
+    local tickCycle = (incantersFlowBuff.max_stacks or 5) * 2
+    local posLo
+    local posHi
+    if direction == "up" then
+        posLo = stacks
+        posHi = stacks
+    elseif direction == "down" then
+        posLo = tickCycle - stacks + 1
+        posHi = posLo
+    elseif direction == "any" then
+        posLo = stacks
+        posHi = tickCycle - stacks + 1
+    end
+    local aura = OvaleAura:GetAura("player", spellId, atTime, "HELPFUL")
+    if  not aura then
+        return nil
+    end
+    local buffPos
+    local buffStacks = aura.stacks
+    if aura.direction < 0 then
+        buffPos = tickCycle - buffStacks + 1
+    else
+        buffPos = buffStacks
+    end
+    if posLo == buffPos or posHi == buffPos then
+        return ReturnValue(0, 0, 0)
+    end
+    local ticksLo = (tickCycle + posLo - buffPos) % tickCycle
+    local ticksHi = (tickCycle + posHi - buffPos) % tickCycle
+    local tickTime = aura.tick
+    local tickRem = tickTime - (atTime - aura.lastTickTime)
+    local value = tickRem + tickTime * (min(ticksLo, ticksHi) - 1)
+    return ReturnValue(value, atTime, -1)
+end
+OvaleCondition:RegisterCondition("stacktimeto", false, stackTimeTo)

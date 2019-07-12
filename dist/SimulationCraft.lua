@@ -232,6 +232,8 @@ local CHARACTER_PROPERTY = {
     ["health.pct"] = "HealthPercent()",
     ["health.percent"] = "HealthPercent()",
     ["holy_power"] = "HolyPower()",
+    ["incanters_flow_time_to.5.up"] = "StackTimeTo(incanters_flow_buff 5 up)",
+    ["incanters_flow_time_to.4.down"] = "StackTimeTo(incanters_flow_buff 4 down)",
     ["infernal_no_de"] = "NotDeDemons(infernal)",
     ["insanity"] = "Insanity()",
     ["level"] = "Level()",
@@ -279,7 +281,8 @@ local CHARACTER_PROPERTY = {
     ["time_to_sht.5"] = "100",
     ["wild_imp_count"] = "Demons(wild_imp)",
     ["wild_imp_no_de"] = "NotDeDemons(wild_imp)",
-    ["wild_imp_remaining_duration"] = "DemonDuration(wild_imp)"
+    ["wild_imp_remaining_duration"] = "DemonDuration(wild_imp)",
+    ["buff.executioners_precision.stack"] = "0"
 }
 local KEYWORD = {}
 local MODIFIER_KEYWORD = {
@@ -1381,7 +1384,6 @@ local function Disambiguate(annotation, name, className, specialization, _type)
 end
 local InitializeDisambiguation = function()
     AddDisambiguation("none", "none")
-    AddDisambiguation("bloodlust_buff", "burst_haste_buff")
     AddDisambiguation("exhaustion_buff", "burst_haste_debuff")
     AddDisambiguation("buff_sephuzs_secret", "sephuzs_secret_buff")
     AddDisambiguation("concentrated_flame", "concentrated_flame_essence")
@@ -1465,44 +1467,26 @@ local InitializeDisambiguation = function()
     AddDisambiguation("judgment", "judgment_holy", "PALADIN", "holy")
     AddDisambiguation("judgment", "judgment_prot", "PALADIN", "protection")
     AddDisambiguation("mindbender", "mindbender_shadow", "PRIEST", "shadow")
-    AddDisambiguation("deadly_poison_dot", "deadly_poison_debuff", "ROGUE", "assassination")
+    AddDisambiguation("deadly_poison_dot", "deadly_poison", "ROGUE", "assassination")
     AddDisambiguation("stealth_buff", "stealthed_buff", "ROGUE")
     AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_assassination_buff", "ROGUE", "assassination")
     AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_outlaw_buff", "ROGUE", "outlaw")
     AddDisambiguation("the_dreadlords_deceit_buff", "the_dreadlords_deceit_subtlety_buff", "ROGUE", "subtlety")
-    AddDisambiguation("ascendance", "ascendance_elemental", "SHAMAN", "elemental")
-    AddDisambiguation("ascendance", "ascendance_enhancement", "SHAMAN", "enhancement")
-    AddDisambiguation("ascendance", "ascendance_restoration", "SHAMAN", "restoration")
-    AddDisambiguation("chain_lightning", "chain_lightning_restoration", "SHAMAN", "restoration")
     AddDisambiguation("earth_shield_talent", "earth_shield_talent_restoration", "SHAMAN", "restoration")
-    AddDisambiguation("echo_of_the_elements_talent", "resto_echo_of_the_elements_talent", "SHAMAN", "restoration")
     AddDisambiguation("flame_shock", "flame_shock_restoration", "SHAMAN", "restoration")
-    AddDisambiguation("healing_surge", "healing_surge_restoration", "SHAMAN", "restoration")
     AddDisambiguation("lightning_bolt", "lightning_bolt_elemental", "SHAMAN", "elemental")
     AddDisambiguation("lightning_bolt", "lightning_bolt_enhancement", "SHAMAN", "enhancement")
-    AddDisambiguation("resonance_totem", "ele_resonance_totem_buff", "SHAMAN", "elemental")
-    AddDisambiguation("resonance_totem", "enh_resonance_totem_buff", "SHAMAN", "enhancement")
     AddDisambiguation("strike", "windstrike", "SHAMAN", "enhancement")
-    AddDisambiguation("totem_mastery", "totem_mastery_elemental", "SHAMAN", "elemental")
-    AddDisambiguation("totem_mastery", "totem_mastery_enhancement", "SHAMAN", "enhancement")
     AddDisambiguation("132369", "wilfreds_sigil_of_superior_summoning", "WARLOCK", "demonology")
     AddDisambiguation("dark_soul", "dark_soul_misery", "WARLOCK", "affliction")
     AddDisambiguation("soul_conduit_talent", "demo_soul_conduit_talent", "WARLOCK", "demonology")
     AddDisambiguation("anger_management_talent", "fury_anger_management_talent", "WARRIOR", "fury")
-    AddDisambiguation("bladestorm", "bladestorm_arms", "WARRIOR", "arms")
-    AddDisambiguation("bladestorm", "bladestorm_fury", "WARRIOR", "fury")
     AddDisambiguation("bounding_stride_talent", "prot_bounding_stride_talent", "WARRIOR", "protection")
     AddDisambiguation("deep_wounds_debuff", "deep_wounds_arms_debuff", "WARRIOR", "arms")
     AddDisambiguation("deep_wounds_debuff", "deep_wounds_prot_debuff", "WARRIOR", "protection")
     AddDisambiguation("dragon_roar_talent", "prot_dragon_roar_talent", "WARRIOR", "protection")
     AddDisambiguation("execute", "execute_arms", "WARRIOR", "arms")
-    AddDisambiguation("ravager", "ravager_prot", "WARRIOR", "protection")
-    AddDisambiguation("massacre_talent", "arms_massacre_talent", "WARRIOR", "arms")
     AddDisambiguation("storm_bolt_talent", "prot_storm_bolt_talent", "WARRIOR", "protection")
-    AddDisambiguation("sudden_death_buff", "sudden_death_arms_buff", "WARRIOR", "arms")
-    AddDisambiguation("sudden_death_buff", "sudden_death_fury_buff", "WARRIOR", "fury")
-    AddDisambiguation("sudden_death_talent", "fury_sudden_death_talent", "WARRIOR", "fury")
-    AddDisambiguation("whirlwind", "whirlwind_arms", "WARRIOR", "arms")
     AddDisambiguation("meat_cleaver", "whirlwind", "WARRIOR", "fury")
 end
 
@@ -1927,7 +1911,7 @@ local EmitModifier = function(modifier, parseNode, nodeList, annotation, action,
             code = format("TimeSincePreviousSpell(%s) > %s", action, expressionCode)
         end
     elseif modifier == "max_cycle_targets" then
-        local debuffName = action .. "_debuff"
+        local debuffName = Disambiguate(annotation, action .. "_debuff", className, specialization)
         AddSymbol(annotation, debuffName)
         local expressionCode = OvaleAST:Unparse(Emit(parseNode, nodeList, annotation, action))
         code = format("DebuffCountOnAny(%s) < Enemies() and DebuffCountOnAny(%s) <= %s", debuffName, debuffName, expressionCode)
@@ -2211,8 +2195,6 @@ EmitAction = function(parseNode, nodeList, annotation)
             annotation[action] = className
             annotation.interrupt = className
             isSpellAction = false
-        elseif className == "DEATHKNIGHT" and action == "antimagic_shell" then
-            conditionCode = "IncomingDamage(1.5 magic=1) > 0"
         elseif className == "DRUID" and action == "pulverize" then
             local debuffName = "thrash_bear_debuff"
             AddSymbol(annotation, debuffName)
@@ -2326,12 +2308,6 @@ EmitAction = function(parseNode, nodeList, annotation)
             local spellName = "primal_strike"
             AddSymbol(annotation, spellName)
             conditionCode = format("target.InRange(%s)", spellName)
-        elseif className == "SHAMAN" and action == "totem_mastery_elemental" then
-            conditionCode = "(InCombat() or not BuffPresent(ele_resonance_totem_buff))"
-            AddSymbol(annotation, "ele_resonance_totem_buff")
-        elseif className == "SHAMAN" and action == "totem_mastery_enhancement" then
-            conditionCode = "(InCombat() or not BuffPresent(enh_resonance_totem_buff))"
-            AddSymbol(annotation, "enh_resonance_totem_buff")
         elseif className == "WARLOCK" and action == "felguard_felstorm" then
             conditionCode = "pet.Present() and pet.CreatureFamily(Felguard)"
         elseif className == "WARLOCK" and action == "grimoire_of_sacrifice" then
@@ -2686,18 +2662,16 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
                     name = match(name, "^[%a_]+%.([%a_]+)")
                 end
                 local code
-                if parseNode.operator == "=" then
-                    if name == "sim_target" then
-                        code = "True(target_is_sim_target)"
-                    elseif name == "target" then
-                        code = "False(target_is_target)"
-                    else
-                        code = format("target.Name(%s)", name)
-                        AddSymbol(annotation, name)
-                    end
+                if name == "sim_target" then
+                    code = "True(target_is_sim_target)"
+                elseif name == "target" then
+                    code = "False(target_is_target)"
                 else
-                    code = format("not target.Name(%s)", name)
+                    code = format("target.Name(%s)", name)
                     AddSymbol(annotation, name)
+                end
+                if parseNode.operator == "!=" then
+                    code = "not " .. code
                 end
                 annotation.astAnnotation = annotation.astAnnotation or {}
                 node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
@@ -3085,6 +3059,8 @@ EmitOperandEssence = function(operand, parseNode, nodeList, annotation, action, 
             code = format("AzeriteEssenceIsMinor(%s)", essenceId)
         elseif property == "enabled" then
             code = format("AzeriteEssenceIsEnabled(%s)", essenceId)
+        elseif property == "rank" then
+            code = format("AzeriteEssenceRank(%s)", essenceId)
         else
             ok = false
         end
@@ -3756,7 +3732,7 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
     operand = lower(operand)
     local code
     if className == "DEATHKNIGHT" and operand == "dot.breath_of_sindragosa.ticking" then
-        local buffName = "breath_of_sindragosa_buff"
+        local buffName = "breath_of_sindragosa"
         code = format("BuffPresent(%s)", buffName)
         AddSymbol(annotation, buffName)
     elseif className == "DEATHKNIGHT" and sub(operand, 1, 24) == "pet.dancing_rune_weapon." then
@@ -3966,27 +3942,13 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
     elseif className == "WARLOCK" and operand == "time_to_imps.all.remains" then
         code = "0"
     elseif className == "WARLOCK" and operand == "havoc_active" then
-        code = "DebuffCountOnAny(havoc_debuff) > 0"
-        AddSymbol(annotation, "havoc_debuff")
+        code = "DebuffCountOnAny(havoc) > 0"
+        AddSymbol(annotation, "havoc")
     elseif className == "WARLOCK" and operand == "havoc_remains" then
-        code = "DebuffRemainingOnAny(havoc_debuff)"
-        AddSymbol(annotation, "havoc_debuff")
-    elseif className == "WARRIOR" and sub(operand, 1, 23) == "buff.colossus_smash_up." then
-        local property = sub(operand, 24)
-        local debuffName = "colossus_smash_debuff"
-        AddSymbol(annotation, debuffName)
-        if property == "down" then
-            code = format("DebuffCountOnAny(%s) == 0", debuffName)
-        elseif property == "up" then
-            code = format("DebuffCountOnAny(%s) > 0", debuffName)
-        else
-            ok = false
-        end
+        code = "DebuffRemainingOnAny(havoc)"
+        AddSymbol(annotation, "havoc")
     elseif className == "WARRIOR" and operand == "gcd.remains" and (action == "battle_cry" or action == "avatar") then
         code = "0"
-    elseif className == "WARRIOR" and operand == "buff.executioners_precision.stack" then
-        code = "target.DebuffStacks(executioners_precision_debuff)"
-        AddSymbol(annotation, "executioners_precision_debuff")
     elseif operand == "buff.enrage.down" then
         code = "not " .. target .. "IsEnraged()"
     elseif operand == "buff.enrage.remains" then
