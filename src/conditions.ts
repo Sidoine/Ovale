@@ -38,7 +38,7 @@ import { OvaleAzeriteEssence } from "./AzeriteEssence";
 import { OvaleWarlock } from "./Warlock";
 import { OvaleStagger } from "./Stagger";
 import { OvaleLossOfControl } from "./LossOfControl";
-import { lower } from "@wowts/string";
+import { lower, upper } from "@wowts/string";
 let INFINITY = huge;
 
 // Return the target's damage reduction from armor, which seems to be 30% with most bosses
@@ -953,8 +953,14 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
     function Class(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
         let [className, yesno] = [positionalParams[1], positionalParams[2]];
         let [target] = ParseCondition(positionalParams, namedParams);
-        let [, classToken] = UnitClass(target);
-        let boolean = (classToken == className);
+        
+        let classToken;
+        if (target == "player") {
+            classToken = OvalePaperDoll.class;
+        } else {
+            [, classToken] = UnitClass(target);
+        }
+        let boolean = (classToken == upper(className));
         return TestBoolean(boolean, yesno);
     }
     OvaleCondition.RegisterCondition("class", false, Class);

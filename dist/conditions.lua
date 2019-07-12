@@ -110,6 +110,7 @@ local OvaleStagger = __Stagger.OvaleStagger
 local __LossOfControl = LibStub:GetLibrary("ovale/LossOfControl")
 local OvaleLossOfControl = __LossOfControl.OvaleLossOfControl
 local lower = string.lower
+local upper = string.upper
 local INFINITY = huge
 local function BossArmorDamageReduction(target)
     return 0.3
@@ -603,8 +604,13 @@ do
 local function Class(positionalParams, namedParams, atTime)
         local className, yesno = positionalParams[1], positionalParams[2]
         local target = ParseCondition(positionalParams, namedParams)
-        local _, classToken = UnitClass(target)
-        local boolean = (classToken == className)
+        local classToken
+        if target == "player" then
+            classToken = OvalePaperDoll.class
+        else
+            _, classToken = UnitClass(target)
+        end
+        local boolean = (classToken == upper(className))
         return TestBoolean(boolean, yesno)
     end
     OvaleCondition:RegisterCondition("class", false, Class)
