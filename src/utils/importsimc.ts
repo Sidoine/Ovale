@@ -15,7 +15,7 @@ import { ConditionNamedParameters } from "../AST";
 
 let outputDirectory = "src/scripts";
 const simcDirectory = process.argv[2];
-const profilesDirectory = simcDirectory + '/profiles/Tier23';
+const profilesDirectory = simcDirectory + '/profiles/Tier24';
 const SIMC_CLASS = [
     "deathknight",
     "demonhunter",
