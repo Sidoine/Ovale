@@ -172,6 +172,8 @@ Define(sephuzs_secret_buff 208051)
 ### Essences
 ###
 
+Define(anima_of_death_essence 294926)
+    SpellInfo(anima_of_death_essence tag=cd)
 Define(concentrated_flame_essence 295373)
     SpellInfo(concentrated_flame_essence cd=30 tag=main)
     Define(concentrated_flame_burn_debuff 295377)
