@@ -201,6 +201,10 @@ local BINARY_OPERATOR = {
     ["^"] = {
         [1] = "arithmetic",
         [2] = 100
+    },
+    [">?"] = {
+        [1] = "arithmetic",
+        [2] = 25
     }
 }
 local indent = {}
@@ -316,10 +320,14 @@ local MATCHES = {
         [2] = Tokenize
     },
     [12] = {
-        [1] = "^.",
+        [1] = "^>%?",
         [2] = Tokenize
     },
     [13] = {
+        [1] = "^.",
+        [2] = Tokenize
+    },
+    [14] = {
         [1] = "^$",
         [2] = NoToken
     }

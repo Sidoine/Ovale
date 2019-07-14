@@ -251,8 +251,10 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
     end,
     UpdateFrame = function(self)
         local profile = Ovale.db.profile
-        self.frame:SetPoint("CENTER", self.hider, "CENTER", profile.apparence.offsetX, profile.apparence.offsetY)
-        self.frame:EnableMouse( not profile.apparence.clickThru)
+        if self.hider:IsVisible() then
+            self.frame:SetPoint("CENTER", self.hider, "CENTER", profile.apparence.offsetX, profile.apparence.offsetY)
+            self.frame:EnableMouse( not profile.apparence.clickThru)
+        end
         self:ReleaseChildren()
         self:UpdateIcons()
         self:UpdateControls()

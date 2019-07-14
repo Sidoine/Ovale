@@ -478,6 +478,11 @@ local BINARY_OPERATOR = {
         [1] = "arithmetic",
         [2] = 40,
         [3] = "associative"
+    },
+    [">?"] = {
+        [1] = "arithmetic",
+        [2] = 25,
+        [3] = "associative"
     }
 }
 local INDENT = {}
@@ -715,16 +720,16 @@ local MATCHES = {
         [2] = Tokenize
     },
     [9] = {
-        [1] = "^.",
+        [1] = "^>%?",
         [2] = Tokenize
     },
     [10] = {
-        [1] = "^$",
-        [2] = NoToken
+        [1] = "^.",
+        [2] = Tokenize
     },
     [11] = {
-        [1] = "^:",
-        [2] = Tokenize
+        [1] = "^$",
+        [2] = NoToken
     }
 }
 local GetPrecedence = function(node)
