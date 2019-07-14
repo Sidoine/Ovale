@@ -225,7 +225,7 @@ Define(summon_darkglare 205180)
   SpellAddBuff(summon_darkglare summon_darkglare=1)
 Define(summon_demonic_tyrant 265187)
 # Summon a Demonic Tyrant to increase the duration of all of your current lesser demons by 265273m3/1000.1 sec, and increase the damage of all of your other demons by 265273s2, while damaging your target.
-  SpellInfo(summon_demonic_tyrant cd=90 duration=15)
+  SpellInfo(summon_demonic_tyrant cd=90 duration=15 tag=cd)
 Define(summon_felguard 30146)
 # Summons a Felguard under your command as a powerful melee combatant.
   SpellInfo(summon_felguard soulshards=1)
