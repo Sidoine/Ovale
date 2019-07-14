@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Requirement", 80000)
+local __exports = LibStub:NewLibrary("ovale/Requirement", 80201)
 if not __exports then return end
 local __GUID = LibStub:GetLibrary("ovale/GUID")
 local OvaleGUID = __GUID.OvaleGUID

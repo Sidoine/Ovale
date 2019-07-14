@@ -95,6 +95,7 @@ Define(item_focused_resolve 168506)
 Define(item_rising_death 152559)
 Define(item_steelskin_potion 152557)
 Define(item_unbridled_fury 169299)
+Define(item_superior_battle_potion_of_strength 168500)
 
 ###
 ### Trinkets & OnUse Rings
@@ -180,6 +181,11 @@ Define(worldvein_resonance_essence 295186)
     SpellInfo(worldvein_resonance_essence cd=60 tag=shortcd)
     Define(lifeblood_buff 295137)
 
+Define(conflict_and_strife_essence_id 32)
+Define(memory_of_lucid_dreams_essence_id 27)
+Define(vision_of_perfection_essence_id 22)
+Define(condensed_lifeforce_essence_id 14)
+Define(blood_of_the_enemy_essence_id 23)
 ###
 ### Racials
 ###

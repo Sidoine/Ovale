@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/DemonHunterSoulFragments", 80000)
+local __exports = LibStub:NewLibrary("ovale/DemonHunterSoulFragments", 80201)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Ovale = LibStub:GetLibrary("ovale/Ovale")

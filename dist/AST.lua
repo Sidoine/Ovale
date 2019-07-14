@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/AST", 80000)
+local __exports = LibStub:NewLibrary("ovale/AST", 80201)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Localization = LibStub:GetLibrary("ovale/Localization")
@@ -201,6 +201,10 @@ local BINARY_OPERATOR = {
     ["^"] = {
         [1] = "arithmetic",
         [2] = 100
+    },
+    [">?"] = {
+        [1] = "arithmetic",
+        [2] = 25
     }
 }
 local indent = {}
@@ -316,10 +320,14 @@ local MATCHES = {
         [2] = Tokenize
     },
     [12] = {
-        [1] = "^.",
+        [1] = "^>%?",
         [2] = Tokenize
     },
     [13] = {
+        [1] = "^.",
+        [2] = Tokenize
+    },
+    [14] = {
         [1] = "^$",
         [2] = NoToken
     }

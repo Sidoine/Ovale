@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/scripts/ovale_common", 80000)
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_common", 80201)
 if not __exports then return end
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
@@ -98,6 +98,7 @@ Define(item_focused_resolve 168506)
 Define(item_rising_death 152559)
 Define(item_steelskin_potion 152557)
 Define(item_unbridled_fury 169299)
+Define(item_superior_battle_potion_of_strength 168500)
 
 Define(concentrated_flame 295373)
 	SpellInfo(concentrated_flame cd=30)
@@ -205,6 +206,11 @@ Define(blood_of_the_enemy_essence 298277)
 	SpellInfo(blood_of_the_enemy_essence cd=90 tag=shortcd)
 Define(seething_rage_buff 297126)
 
+Define(conflict_and_strife_essence_id 32)
+Define(memory_of_lucid_dreams_essence_id 27)
+Define(vision_of_perfection_essence_id 22)
+Define(condensed_lifeforce_essence_id 14)
+Define(blood_of_the_enemy_essence_id 23)
 ###
 ### Racials
 ###

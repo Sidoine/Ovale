@@ -32,7 +32,7 @@ class CooldownState implements StateModule {
     CleanState() {
         for (const [spellId, cd] of pairs(this.next.cd)) {
             for (const [k] of kpairs(cd)) {
-                cd[k] = undefined;
+                (<any>cd)[k] = undefined;
             }
             this.next.cd[spellId] = undefined;
         }

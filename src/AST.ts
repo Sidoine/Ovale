@@ -107,7 +107,7 @@ let STRING_LOOKUP_FUNCTION: LuaObj<boolean> = {
 
 export type OperatorType = "not" | "or" | "and" | "-" | "=" | "!=" |
     "xor" | "^" | "|" | "==" | "/" | "!" | ">" |
-    ">=" | "<=" | "<" | "+" | "*" | "%";
+    ">=" | "<=" | "<" | "+" | "*" | "%" | ">?";
 
 let UNARY_OPERATOR: {[key in OperatorType]?:{1: "logical" | "arithmetic", 2: number}} = {
     ["not"]: {
@@ -184,6 +184,10 @@ let BINARY_OPERATOR: {[key in OperatorType]?:{1: "logical" | "compare" | "arithm
     ["^"]: {
         1: "arithmetic",
         2: 100
+    },
+    [">?"]: {
+        1: "arithmetic",
+        2: 25
     }
 }
 
@@ -425,10 +429,14 @@ const MATCHES:LuaArray<TokenizerDefinition> = {
         2: Tokenize
     },
     12: {
+        1: "^>%?",
+        2: Tokenize,
+    },
+    13: {
         1: "^.",
         2: Tokenize
     },
-    13: {
+    14: {
         1: "^$",
         2: NoToken
     }
@@ -1951,7 +1959,7 @@ export class OvaleASTClass extends OvaleASTBase {
                         }                            
                         else {
                             [ok, node] = this.ParseParameterValue(tokenStream, nodeList, annotation);
-                            namedParams[parameterName] = node;
+                            (<any>namedParams[parameterName]) = node;
                         }
                     } else {
                         positionalParams[lualength(positionalParams) + 1] = node;
@@ -2233,12 +2241,10 @@ export class OvaleASTClass extends OvaleASTBase {
             node.name = name;
             node.rawPositionalParams = positionalParams;
             node.rawNamedParams = namedParams;
-            annotation.parametersReference = annotation.parametersReference || {
-            }
+            annotation.parametersReference = annotation.parametersReference || {};
             annotation.parametersReference[lualength(annotation.parametersReference) + 1] = node;
             if (name) {
-                annotation.nameReference = annotation.nameReference || {
-                }
+                annotation.nameReference = annotation.nameReference || {};
                 annotation.nameReference[lualength(annotation.nameReference) + 1] = node;
             }
         }
@@ -2719,10 +2725,10 @@ export class OvaleASTClass extends OvaleASTBase {
                             const value = node.rawNamedParams[key];
                             const flattenValue = this.FlattenParameterValue(value, annotation);
                             if (type(key) != "number" && dictionary && dictionary[key]) {
-                                parameters[dictionary[key] as keyof NamedParameters] = flattenValue;
+                                (<any>parameters[dictionary[key] as keyof typeof parameters]) = flattenValue;
                             } else {
                                 // TODO delete named parameters that are not single values
-                                parameters[key] = flattenValue as (number | string);
+                                (<any>parameters[key]) = flattenValue;
                             }
                         }
                     }

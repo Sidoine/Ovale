@@ -1,13 +1,13 @@
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
-    local name = "sc_pr_druid_balance"
-    local desc = "[8.2] Simulationcraft: PR_Druid_Balance"
+    local name = "sc_t23_druid_balance"
+    local desc = "[8.2] Simulationcraft: T23_Druid_Balance"
     local code = [[
-# Based on SimulationCraft profile "PR_Druid_Balance".
+# Based on SimulationCraft profile "T23_Druid_Balance".
 #	class=druid
 #	spec=balance
-#	talents=2000231
+#	talents=1000231
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -89,7 +89,7 @@ AddFunction BalancePrecombatCdActions
  {
   #snapshot_stats
   #potion
-  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_focused_resolve usable=1)
+  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
  }
 }
 
@@ -177,48 +177,34 @@ AddFunction BalanceDefaultCdActions
 {
  BalanceInterruptActions()
  #potion,if=buff.ca_inc.remains>6
- if BuffRemaining(ca_inc) > 6 and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_focused_resolve usable=1)
- #blood_fury,if=buff.ca_inc.up
- if BuffPresent(ca_inc) Spell(blood_fury)
+ if BuffRemaining(ca_inc) > 6 and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
  #berserking,if=buff.ca_inc.up
  if BuffPresent(ca_inc) Spell(berserking)
- #arcane_torrent,if=buff.ca_inc.up
- if BuffPresent(ca_inc) Spell(arcane_torrent_energy)
- #lights_judgment,if=buff.ca_inc.up
- if BuffPresent(ca_inc) Spell(lights_judgment)
- #fireblood,if=buff.ca_inc.up
- if BuffPresent(ca_inc) Spell(fireblood)
- #ancestral_call,if=buff.ca_inc.up
- if BuffPresent(ca_inc) Spell(ancestral_call)
- #use_item,name=balefire_branch,if=equipped.159630&cooldown.ca_inc.remains>30
- if HasEquippedItem(159630) and SpellCooldown(ca_inc) > 30 BalanceUseItemActions()
- #use_item,name=dread_gladiators_badge,if=equipped.161902&cooldown.ca_inc.remains>30
- if HasEquippedItem(161902) and SpellCooldown(ca_inc) > 30 BalanceUseItemActions()
- #use_item,name=azurethos_singed_plumage,if=equipped.161377&cooldown.ca_inc.remains>30
- if HasEquippedItem(161377) and SpellCooldown(ca_inc) > 30 BalanceUseItemActions()
+ #use_item,name=azsharas_font_of_power,if=equipped.169314&dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
+ if HasEquippedItem(169314) and target.DebuffPresent(moonfire_debuff) and target.DebuffPresent(sunfire_debuff) and { not Talent(stellar_flare_talent) or target.DebuffPresent(stellar_flare_debuff) } BalanceUseItemActions()
+ #guardian_of_azeroth,if=(!talent.starlord.enabled|buff.starlord.up)&dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
+ if { not Talent(starlord_talent) or BuffPresent(starlord_buff) } and target.DebuffPresent(moonfire_debuff) and target.DebuffPresent(sunfire_debuff) and { not Talent(stellar_flare_talent) or target.DebuffPresent(stellar_flare_debuff) } Spell(guardian_of_azeroth)
  #use_item,name=tidestorm_codex,if=equipped.165576
  if HasEquippedItem(165576) BalanceUseItemActions()
+ #use_item,name=pocketsized_computation_device,if=equipped.167555&dot.moonfire.ticking&dot.sunfire.ticking&(!talent.stellar_flare.enabled|dot.stellar_flare.ticking)
+ if HasEquippedItem(167555) and target.DebuffPresent(moonfire_debuff) and target.DebuffPresent(sunfire_debuff) and { not Talent(stellar_flare_talent) or target.DebuffPresent(stellar_flare_debuff) } BalanceUseItemActions()
+ #use_item,name=shiver_venom_relic,if=equipped.168905&cooldown.ca_inc.remains>30&!buff.ca_inc.up
+ if HasEquippedItem(168905) and SpellCooldown(ca_inc) > 30 and not BuffPresent(ca_inc) BalanceUseItemActions()
  #use_items,if=cooldown.ca_inc.remains>30
  if SpellCooldown(ca_inc) > 30 BalanceUseItemActions()
  #blood_of_the_enemy,if=cooldown.ca_inc.remains>30
  if SpellCooldown(ca_inc) > 30 Spell(blood_of_the_enemy)
- #memory_of_lucid_dreams,if=dot.sunfire.remains>10&dot.moonfire.remains>10&(!talent.stellar_flare.enabled|dot.stellar_flare.remains>10)&(astral_power<40|cooldown.ca_inc.remains>30)&!buff.ca_inc.up
- if target.DebuffRemaining(sunfire_debuff) > 10 and target.DebuffRemaining(moonfire_debuff) > 10 and { not Talent(stellar_flare_talent) or target.DebuffRemaining(stellar_flare_debuff) > 10 } and { AstralPower() < 40 or SpellCooldown(ca_inc) > 30 } and not BuffPresent(ca_inc) Spell(memory_of_lucid_dreams_essence)
+ #memory_of_lucid_dreams,if=dot.sunfire.remains>10&dot.moonfire.remains>10&(!talent.stellar_flare.enabled|dot.stellar_flare.remains>10)&!buff.ca_inc.up&(astral_power<25|cooldown.ca_inc.remains>30)
+ if target.DebuffRemaining(sunfire_debuff) > 10 and target.DebuffRemaining(moonfire_debuff) > 10 and { not Talent(stellar_flare_talent) or target.DebuffRemaining(stellar_flare_debuff) > 10 } and not BuffPresent(ca_inc) and { AstralPower() < 25 or SpellCooldown(ca_inc) > 30 } Spell(memory_of_lucid_dreams_essence)
 
- unless Spell(purifying_blast) or Spell(ripple_in_space_essence) or Spell(concentrated_flame_essence) or { BuffPresent(reckless_force_buff) or TimeInCombat() < 5 } and Spell(the_unbound_force) or Spell(worldvein_resonance_essence) or Spell(focused_azerite_beam)
+ unless Spell(purifying_blast) or Spell(ripple_in_space_essence) or Spell(concentrated_flame_essence) or { BuffPresent(reckless_force_buff) or TimeInCombat() < 5 } and Spell(the_unbound_force) or Spell(worldvein_resonance_essence) or Spell(focused_azerite_beam) or Spell(thorns) or Spell(warrior_of_elune)
  {
-  #guardian_of_azeroth
-  Spell(guardian_of_azeroth)
-
-  unless Spell(thorns) or Spell(warrior_of_elune)
-  {
-   #innervate,if=azerite.lively_spirit.enabled&(cooldown.incarnation.remains<2|cooldown.celestial_alignment.remains<12)
-   if HasAzeriteTrait(lively_spirit_trait) and { SpellCooldown(incarnation_chosen_of_elune) < 2 or SpellCooldown(celestial_alignment) < 12 } Spell(innervate)
-   #incarnation,if=dot.sunfire.remains>8&dot.moonfire.remains>12&(dot.stellar_flare.remains>6|!talent.stellar_flare.enabled)&(buff.memory_of_lucid_dreams.up|ap_check)&!buff.ca_inc.up
-   if target.DebuffRemaining(sunfire_debuff) > 8 and target.DebuffRemaining(moonfire_debuff) > 12 and { target.DebuffRemaining(stellar_flare_debuff) > 6 or not Talent(stellar_flare_talent) } and { BuffPresent(memory_of_lucid_dreams_essence_buff) or AstralPower() >= AstralPowerCost(incarnation_chosen_of_elune) } and not BuffPresent(ca_inc) Spell(incarnation_chosen_of_elune)
-   #celestial_alignment,if=!buff.ca_inc.up&(buff.memory_of_lucid_dreams.up|(ap_check&astral_power>=40))&(!azerite.lively_spirit.enabled|buff.lively_spirit.up)&(dot.sunfire.remains>2&dot.moonfire.ticking&(dot.stellar_flare.ticking|!talent.stellar_flare.enabled))
-   if not BuffPresent(ca_inc) and { BuffPresent(memory_of_lucid_dreams_essence_buff) or AstralPower() >= AstralPowerCost(celestial_alignment) and AstralPower() >= 40 } and { not HasAzeriteTrait(lively_spirit_trait) or BuffPresent(lively_spirit_buff) } and target.DebuffRemaining(sunfire_debuff) > 2 and target.DebuffPresent(moonfire_debuff) and { target.DebuffPresent(stellar_flare_debuff) or not Talent(stellar_flare_talent) } Spell(celestial_alignment)
-  }
+  #innervate,if=azerite.lively_spirit.enabled&(cooldown.incarnation.remains<2|cooldown.celestial_alignment.remains<12)
+  if HasAzeriteTrait(lively_spirit_trait) and { SpellCooldown(incarnation_chosen_of_elune) < 2 or SpellCooldown(celestial_alignment) < 12 } Spell(innervate)
+  #incarnation,if=!buff.ca_inc.up&(buff.memory_of_lucid_dreams.up|((cooldown.memory_of_lucid_dreams.remains>20|!essence.memory_of_lucid_dreams.major)&ap_check&astral_power>=40))&(buff.memory_of_lucid_dreams.up|ap_check)&dot.sunfire.remains>8&dot.moonfire.remains>12&(dot.stellar_flare.remains>6|!talent.stellar_flare.enabled)
+  if not BuffPresent(ca_inc) and { BuffPresent(memory_of_lucid_dreams_essence_buff) or { SpellCooldown(memory_of_lucid_dreams_essence) > 20 or not AzeriteEssenceIsMajor(memory_of_lucid_dreams_essence_id) } and AstralPower() >= AstralPowerCost(incarnation_chosen_of_elune) and AstralPower() >= 40 } and { BuffPresent(memory_of_lucid_dreams_essence_buff) or AstralPower() >= AstralPowerCost(incarnation_chosen_of_elune) } and target.DebuffRemaining(sunfire_debuff) > 8 and target.DebuffRemaining(moonfire_debuff) > 12 and { target.DebuffRemaining(stellar_flare_debuff) > 6 or not Talent(stellar_flare_talent) } Spell(incarnation_chosen_of_elune)
+  #celestial_alignment,if=!buff.ca_inc.up&(buff.memory_of_lucid_dreams.up|((cooldown.memory_of_lucid_dreams.remains>20|!essence.memory_of_lucid_dreams.major)&ap_check&astral_power>=40))&(!azerite.lively_spirit.enabled|buff.lively_spirit.up)&(dot.sunfire.remains>2&dot.moonfire.ticking&(dot.stellar_flare.ticking|!talent.stellar_flare.enabled))
+  if not BuffPresent(ca_inc) and { BuffPresent(memory_of_lucid_dreams_essence_buff) or { SpellCooldown(memory_of_lucid_dreams_essence) > 20 or not AzeriteEssenceIsMajor(memory_of_lucid_dreams_essence_id) } and AstralPower() >= AstralPowerCost(celestial_alignment) and AstralPower() >= 40 } and { not HasAzeriteTrait(lively_spirit_trait) or BuffPresent(lively_spirit_buff) } and target.DebuffRemaining(sunfire_debuff) > 2 and target.DebuffPresent(moonfire_debuff) and { target.DebuffPresent(stellar_flare_debuff) or not Talent(stellar_flare_talent) } Spell(celestial_alignment)
  }
 }
 
@@ -286,21 +272,17 @@ AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
 }
 
 ### Required symbols
-# 159630
-# 161377
-# 161902
 # 165576
-# ancestral_call
-# arcane_torrent_energy
+# 167555
+# 168905
+# 169314
 # arcanic_pulsar_buff
 # arcanic_pulsar_trait
 # berserking
-# blood_fury
 # blood_of_the_enemy
 # ca_inc
 # celestial_alignment
 # concentrated_flame_essence
-# fireblood
 # focused_azerite_beam
 # force_of_nature
 # full_moon
@@ -309,14 +291,14 @@ AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
 # half_moon
 # incarnation_chosen_of_elune
 # innervate
-# item_focused_resolve
-# lights_judgment
+# item_unbridled_fury
 # lively_spirit_buff
 # lively_spirit_trait
 # lunar_empowerment_buff
 # lunar_strike
 # memory_of_lucid_dreams_essence
 # memory_of_lucid_dreams_essence_buff
+# memory_of_lucid_dreams_essence_id
 # mighty_bash
 # moonfire
 # moonfire_debuff
@@ -352,13 +334,13 @@ AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
     OvaleScripts:RegisterScript("DRUID", "balance", name, desc, code, "script")
 end
 do
-    local name = "sc_pr_druid_feral"
-    local desc = "[8.2] Simulationcraft: PR_Druid_Feral"
+    local name = "sc_t23_druid_feral"
+    local desc = "[8.2] Simulationcraft: T23_Druid_Feral"
     local code = [[
-# Based on SimulationCraft profile "PR_Druid_Feral".
+# Based on SimulationCraft profile "T23_Druid_Feral".
 #	class=druid
 #	spec=feral
-#	talents=3000212
+#	talents=2000122
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -946,13 +928,13 @@ AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
     OvaleScripts:RegisterScript("DRUID", "feral", name, desc, code, "script")
 end
 do
-    local name = "sc_pr_druid_guardian"
-    local desc = "[8.2] Simulationcraft: PR_Druid_Guardian"
+    local name = "sc_t23_druid_guardian"
+    local desc = "[8.2] Simulationcraft: T23_Druid_Guardian"
     local code = [[
-# Based on SimulationCraft profile "PR_Druid_Guardian".
+# Based on SimulationCraft profile "T23_Druid_Guardian".
 #	class=druid
 #	spec=guardian
-#	talents=1111123
+#	talents=1000131
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -1106,7 +1088,7 @@ AddFunction GuardianDefaultMainActions
   #maul,if=rage.deficit<10&active_enemies<4
   if RageDeficit() < 10 and Enemies() < 4 Spell(maul)
   #maul,if=essence.conflict_and_strife.major&!buff.sharpened_claws.up
-  if False() and not BuffPresent(sharpened_claws_buff) Spell(maul)
+  if AzeriteEssenceIsMajor(conflict_and_strife_essence_id) and not BuffPresent(sharpened_claws_buff) Spell(maul)
   #ironfur,if=cost=0|(rage>cost&azerite.layered_mane.enabled&active_enemies>2)
   if PowerCost(ironfur) == 0 or Rage() > PowerCost(ironfur) and HasAzeriteTrait(layered_mane_trait) and Enemies() > 2 Spell(ironfur)
   #pulverize,target_if=dot.thrash_bear.stack=dot.thrash_bear.max_stacks
@@ -1145,7 +1127,7 @@ AddFunction GuardianDefaultShortCdActions
 
 AddFunction GuardianDefaultShortCdPostConditions
 {
- GuardianCooldownsShortCdPostConditions() or RageDeficit() < 10 and Enemies() < 4 and Spell(maul) or False() and not BuffPresent(sharpened_claws_buff) and Spell(maul) or { PowerCost(ironfur) == 0 or Rage() > PowerCost(ironfur) and HasAzeriteTrait(layered_mane_trait) and Enemies() > 2 } and Spell(ironfur) or target.DebuffStacks(thrash_bear_debuff) == MaxStacks(thrash_bear_debuff) and target.DebuffGain(thrash_bear_debuff) <= BaseDuration(thrash_bear_debuff) and Spell(pulverize) or target.DebuffRefreshable(moonfire_debuff) and Enemies() < 2 and Spell(moonfire) or { BuffExpires(incarnation_guardian_of_ursoc_buff) and Enemies() > 1 or BuffPresent(incarnation_guardian_of_ursoc_buff) and Enemies() > 4 } and Spell(thrash) or BuffExpires(incarnation_guardian_of_ursoc_buff) and Enemies() > 4 and Spell(swipe_bear) or target.DebuffPresent(thrash_bear_debuff) and Spell(mangle) or BuffPresent(galactic_guardian_buff) and Enemies() < 2 and Spell(moonfire) or Spell(thrash) or Spell(maul) or Spell(swipe_bear)
+ GuardianCooldownsShortCdPostConditions() or RageDeficit() < 10 and Enemies() < 4 and Spell(maul) or AzeriteEssenceIsMajor(conflict_and_strife_essence_id) and not BuffPresent(sharpened_claws_buff) and Spell(maul) or { PowerCost(ironfur) == 0 or Rage() > PowerCost(ironfur) and HasAzeriteTrait(layered_mane_trait) and Enemies() > 2 } and Spell(ironfur) or target.DebuffStacks(thrash_bear_debuff) == MaxStacks(thrash_bear_debuff) and target.DebuffGain(thrash_bear_debuff) <= BaseDuration(thrash_bear_debuff) and Spell(pulverize) or target.DebuffRefreshable(moonfire_debuff) and Enemies() < 2 and Spell(moonfire) or { BuffExpires(incarnation_guardian_of_ursoc_buff) and Enemies() > 1 or BuffPresent(incarnation_guardian_of_ursoc_buff) and Enemies() > 4 } and Spell(thrash) or BuffExpires(incarnation_guardian_of_ursoc_buff) and Enemies() > 4 and Spell(swipe_bear) or target.DebuffPresent(thrash_bear_debuff) and Spell(mangle) or BuffPresent(galactic_guardian_buff) and Enemies() < 2 and Spell(moonfire) or Spell(thrash) or Spell(maul) or Spell(swipe_bear)
 }
 
 AddFunction GuardianDefaultCdActions
@@ -1157,7 +1139,7 @@ AddFunction GuardianDefaultCdActions
 
 AddFunction GuardianDefaultCdPostConditions
 {
- GuardianCooldownsCdPostConditions() or RageDeficit() < 10 and Enemies() < 4 and Spell(maul) or False() and not BuffPresent(sharpened_claws_buff) and Spell(maul) or { PowerCost(ironfur) == 0 or Rage() > PowerCost(ironfur) and HasAzeriteTrait(layered_mane_trait) and Enemies() > 2 } and Spell(ironfur) or target.DebuffStacks(thrash_bear_debuff) == MaxStacks(thrash_bear_debuff) and target.DebuffGain(thrash_bear_debuff) <= BaseDuration(thrash_bear_debuff) and Spell(pulverize) or target.DebuffRefreshable(moonfire_debuff) and Enemies() < 2 and Spell(moonfire) or { BuffExpires(incarnation_guardian_of_ursoc_buff) and Enemies() > 1 or BuffPresent(incarnation_guardian_of_ursoc_buff) and Enemies() > 4 } and Spell(thrash) or BuffExpires(incarnation_guardian_of_ursoc_buff) and Enemies() > 4 and Spell(swipe_bear) or target.DebuffPresent(thrash_bear_debuff) and Spell(mangle) or BuffPresent(galactic_guardian_buff) and Enemies() < 2 and Spell(moonfire) or Spell(thrash) or Spell(maul) or Spell(swipe_bear)
+ GuardianCooldownsCdPostConditions() or RageDeficit() < 10 and Enemies() < 4 and Spell(maul) or AzeriteEssenceIsMajor(conflict_and_strife_essence_id) and not BuffPresent(sharpened_claws_buff) and Spell(maul) or { PowerCost(ironfur) == 0 or Rage() > PowerCost(ironfur) and HasAzeriteTrait(layered_mane_trait) and Enemies() > 2 } and Spell(ironfur) or target.DebuffStacks(thrash_bear_debuff) == MaxStacks(thrash_bear_debuff) and target.DebuffGain(thrash_bear_debuff) <= BaseDuration(thrash_bear_debuff) and Spell(pulverize) or target.DebuffRefreshable(moonfire_debuff) and Enemies() < 2 and Spell(moonfire) or { BuffExpires(incarnation_guardian_of_ursoc_buff) and Enemies() > 1 or BuffPresent(incarnation_guardian_of_ursoc_buff) and Enemies() > 4 } and Spell(thrash) or BuffExpires(incarnation_guardian_of_ursoc_buff) and Enemies() > 4 and Spell(swipe_bear) or target.DebuffPresent(thrash_bear_debuff) and Spell(mangle) or BuffPresent(galactic_guardian_buff) and Enemies() < 2 and Spell(moonfire) or Spell(thrash) or Spell(maul) or Spell(swipe_bear)
 }
 
 ### Guardian icons.
@@ -1227,6 +1209,7 @@ AddIcon checkbox=opt_druid_guardian_aoe help=cd specialization=guardian
 # blood_fury
 # bristling_fur
 # concentrated_flame_essence
+# conflict_and_strife_essence_id
 # fireblood
 # galactic_guardian_buff
 # incapacitating_roar

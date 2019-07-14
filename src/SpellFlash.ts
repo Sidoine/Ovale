@@ -130,7 +130,7 @@ let COLORTABLE: LuaObj<Color> = {
             get: function (info: LuaArray<keyof typeof Ovale.db.profile.apparence.spellFlash>) {
                 return Ovale.db.profile.apparence.spellFlash[info[lualength(info)]];
             },
-            set: function (info: LuaArray<keyof typeof Ovale.db.profile.apparence.spellFlash>, value: number | boolean | Color) {
+            set: function <T extends keyof typeof Ovale.db.profile.apparence.spellFlash>(info: LuaArray<T>, value: typeof Ovale.db.profile.apparence.spellFlash[T]) {
                 Ovale.db.profile.apparence.spellFlash[info[lualength(info)]] = value;
                 OvaleOptions.SendMessage("Ovale_OptionChanged");
             },

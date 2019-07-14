@@ -1,10 +1,10 @@
-local __exports = LibStub:NewLibrary("ovale/scripts/ovale_warlock_spells", 80000)
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_warlock_spells", 80201)
 if not __exports then return end
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 __exports.register = function()
     local name = "ovale_warlock_spells"
-    local desc = "[8.1] Ovale: Warlock spells"
+    local desc = "[8.2] Ovale: Warlock spells"
     local code = [[Define(agony 980)
 # Inflicts increasing agony on the target, causing up to o1*u Shadow damage over 18 seconds. Damage starts low and increases over the duration. Refreshing Agony maintains its current damage level.rnrn|cFFFFFFFFAgony damage sometimes generates 1 Soul Shard.|r
 # Rank 2: Agony may now ramp up to s1+6 stacks.
@@ -24,6 +24,11 @@ Define(blood_of_the_enemy 297108)
   SpellInfo(blood_of_the_enemy cd=120 duration=10 channel=10)
   # You have a w2 increased chance to be Critically Hit by the caster.
   SpellAddTargetDebuff(blood_of_the_enemy blood_of_the_enemy=1)
+Define(bloodlust 2825)
+# Increases Haste by (25 of Spell Power) for all party and raid members for 40 seconds.rnrnAllies receiving this effect will become Sated and unable to benefit from Bloodlust or Time Warp again for 600 seconds.
+  SpellInfo(bloodlust cd=300 duration=40 channel=40 gcd=0 offgcd=1)
+  # Haste increased by s1.
+  SpellAddBuff(bloodlust bloodlust=1)
 Define(call_dreadstalkers 104316)
 # Summons s1 ferocious Dreadstalkers to attack the target for 12 seconds.
   SpellInfo(call_dreadstalkers soulshards=2 cd=20)
@@ -160,6 +165,10 @@ Define(inner_demons 267216)
 # You passively summon a Wild Imp to fight for you every t1 sec, and have a s1 chance to also summon an additional Demon to fight for you for s2 sec.
   SpellInfo(inner_demons channel=0 gcd=0 offgcd=1 tick=12 talent=inner_demons_talent)
   SpellAddBuff(inner_demons inner_demons=1)
+Define(lifeblood_buff 274419)
+# When you use a Healthstone, gain s1 Leech for 20 seconds.
+  SpellInfo(lifeblood_buff channel=-0.001 gcd=0 offgcd=1)
+
 Define(nether_portal 267217)
 # Tear open a portal to the Twisting Nether for 15 seconds. Every time you spend Soul Shards, you will also command demons from the Nether to come out and fight for you.
   SpellInfo(nether_portal soulshards=1 cd=180 duration=15 talent=nether_portal_talent)

@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Condition", 80000)
+local __exports = LibStub:NewLibrary("ovale/Condition", 80201)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Ovale = LibStub:GetLibrary("ovale/Ovale")
@@ -83,6 +83,9 @@ __exports.TestBoolean = function(a, yesno)
         end
     end
     return nil
+end
+__exports.ReturnValue = function(value, origin, rate)
+    return 0, INFINITY, value, origin, rate
 end
 __exports.TestValue = function(start, ending, value, origin, rate, comparator, limit)
     if  not value or  not origin or  not rate then

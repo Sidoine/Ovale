@@ -1,10 +1,10 @@
-local __exports = LibStub:NewLibrary("ovale/scripts/ovale_druid_spells", 80000)
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_druid_spells", 80201)
 if not __exports then return end
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 local registerBase = function()
     local name = "ovale_druid_base_spells"
-    local desc = "[8.1] Ovale: Druid baseline spells"
+    local desc = "[8.2] Ovale: Druid baseline spells"
     local code = [[Define(ancestral_call 274738)
 # Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
@@ -82,6 +82,8 @@ Define(focused_azerite_beam 295262)
 Define(force_of_nature 205636)
 # Summons a stand of s1 Treants for 10 seconds which immediately taunt and attack enemies in the targeted area.rnrn|cFFFFFFFFGenerates m5/10 Astral Power.|r
   SpellInfo(force_of_nature cd=60 lunarpower=-20 talent=force_of_nature_talent)
+  # Granting s5/10*d Astral Power over d.
+  SpellAddBuff(force_of_nature force_of_nature=1)
 
 Define(full_moon 274283)
 # Deals m1 Arcane damage to the target and reduced damage to all other nearby enemies, and resets Full Moon to become New Moon.rnrn|cFFFFFFFFGenerates m2/10 Astral Power.|r
@@ -152,6 +154,8 @@ Define(lunar_strike 194153)
 Define(maim 22570)
 # Finishing move that causes Physical damage and stuns the target. Damage and duration increased per combo point:rnrn   1 point  : s2*1 damage, 1 secrn   2 points: s2*2 damage, 2 secrn   3 points: s2*3 damage, 3 secrn   4 points: s2*4 damage, 4 secrn   5 points: s2*5 damage, 5 sec
   SpellInfo(maim energy=30 combopoints=1 cd=20 gcd=1)
+  # Stunned.
+  SpellAddBuff(maim maim=1)
 Define(mangle 33917)
 # Mangle the target for s2 Physical damage.?a231064[ Deals s3 additional damage against bleeding targets.][]rnrn|cFFFFFFFFGenerates m4/10 Rage.|r
 # Rank 2: Mangle deals 33917s3 additional damage against bleeding targets.
@@ -236,7 +240,11 @@ Define(skull_bash 106839)
 # You charge and bash the target's skull, interrupting spellcasting and preventing any spell in that school from being cast for 4 seconds.
   SpellInfo(skull_bash cd=15 gcd=0 offgcd=1)
 Define(solar_beam 78675)
-  SpellInfo(solar_beam cd=60 duration=8 gcd=0 offgcd=1 interrupt=1)
+# Summons a beam of solar light over an enemy target's location, interrupting the target and silencing all enemies within the beam.  Lasts 8 seconds.
+  SpellInfo(solar_beam cd=60 duration=8 gcd=0 offgcd=1)
+  # Silenced.
+  SpellAddBuff(solar_beam solar_beam=1)
+
 Define(solar_wrath 5176)
 # Causes (57.75 of Spell Power) Nature damage to the target.
   SpellInfo(solar_wrath)
@@ -261,6 +269,8 @@ Define(sunfire 93402)
 # A quick beam of solar light burns the enemy for (20 of Spell Power) Nature damage and then an additional 164815o2 Nature damage over 12 seconds?s231050[ to the primary target and all enemies within 164815A2 yards][].?s137013[rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r][]
 # Rank 2: Sunfire now applies its damage over time effect to all enemies within 164815A2 yards.
   SpellInfo(sunfire lunarpower=0)
+  # Suffering w2 Nature damage every t2 sec.
+  SpellAddBuff(sunfire sunfire=1)
 Define(the_unbound_force 298452)
 # Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]
   SpellInfo(the_unbound_force cd=60 duration=2 channel=2 tick=0.33)
@@ -270,7 +280,8 @@ Define(thorns 236696)
 # Sprout thorns for 12 seconds on the friendly target. When victim to melee attacks, thorns deals up to 203728s2 of the attackers total health in Nature damage.rnrnAttackers also have their movement speed reduced by 232559s1 for 4 seconds.
 # Rank 1: When struck in combat you have a chance to inflict 15438s1 Arcane damage to the attacker.
   SpellInfo(thorns cd=45 duration=12 gcd=1)
-
+  # Melee attackers take Nature damage when hit and their movement speed is slowed by 232559s1 for 232559d.
+  SpellAddBuff(thorns thorns=1)
 Define(thrash 106832)
 # Thrash all nearby enemies, dealing immediate physical damage and periodic bleed damage. Damage varies by shapeshift form.
   SpellInfo(thrash gcd=0 offgcd=1)
@@ -420,16 +431,16 @@ Define(barkskin_buff 22812)
 Define(innervate_buff 29166)
 
 # Shared talents
-Define(tigers_dash_talent 4)
+Define(tiger_dash_talent 4)
 Define(soul_of_the_forest_talent 13)
 Define(incarnation_talent 15)
 
 # Shared talent spells
-Define(tigers_dash 252216)
-	SpellInfo(tigers_dash cd=45)
-	SpellInfo(tigers_dash gcd=0 offgcd=1 if_stance=druid_cat_form)
-	SpellInfo(tigers_dash to_stance=druid_cat_form if_stance=!druid_cat_form)
-	SpellInfo(dash replaced_by=tigers_dash talent=tigers_dash_talent)
+Define(tiger_dash 252216)
+	SpellInfo(tiger_dash cd=45)
+	SpellInfo(tiger_dash gcd=0 offgcd=1 if_stance=druid_cat_form)
+	SpellInfo(tiger_dash to_stance=druid_cat_form if_stance=!druid_cat_form)
+	SpellInfo(dash replaced_by=tiger_dash talent=tiger_dash_talent)
 Define(renewal 108238)
 	SpellInfo(renewal cd=120 gcd=0 offgcd=1 specialization=!guardian)
 

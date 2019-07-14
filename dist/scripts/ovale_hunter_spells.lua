@@ -1,10 +1,10 @@
-local __exports = LibStub:NewLibrary("ovale/scripts/ovale_hunter_spells", 80000)
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_hunter_spells", 80201)
 if not __exports then return end
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 __exports.register = function()
     local name = "ovale_hunter_spells"
-    local desc = "[8.1] Ovale: Hunter spells"
+    local desc = "[8.2] Ovale: Hunter spells"
     local code = [[Define(a_murder_of_crows 131894)
 # Summons a flock of crows to attack your target, dealing 131900s1*16 Physical damage over 15 seconds. If the target dies while under attack, A Murder of Crows' cooldown is reset.
   SpellInfo(a_murder_of_crows focus=30 cd=60 duration=15 tick=1 talent=a_murder_of_crows_talent_survival)
@@ -60,6 +60,11 @@ Define(blood_of_the_enemy 297108)
   SpellInfo(blood_of_the_enemy cd=120 duration=10 channel=10)
   # You have a w2 increased chance to be Critically Hit by the caster.
   SpellAddTargetDebuff(blood_of_the_enemy blood_of_the_enemy=1)
+Define(bloodlust 2825)
+# Increases Haste by (25 of Spell Power) for all party and raid members for 40 seconds.rnrnAllies receiving this effect will become Sated and unable to benefit from Bloodlust or Time Warp again for 600 seconds.
+  SpellInfo(bloodlust cd=300 duration=40 channel=40 gcd=0 offgcd=1)
+  # Haste increased by s1.
+  SpellAddBuff(bloodlust bloodlust=1)
 Define(blur_of_talons_buff 277966)
 # During Coordinated Assault, ?s259387[Mongoose Bite][Raptor Strike] increases your Agility by s1 and your Speed by s2 for 6 seconds. Stacks up to 277969u times.
   SpellInfo(blur_of_talons_buff channel=-0.001 gcd=0 offgcd=1)
@@ -145,6 +150,10 @@ Define(kill_command_survival 259489)
 Define(latent_poison 273283)
 # Serpent Sting damage applies Latent Poison, stacking up to 273286u times. Your ?s259387[Mongoose Bite][Raptor Strike] consumes all applications of Latent Poison to deal s1 Nature damage per stack.
   SpellInfo(latent_poison channel=0 gcd=0 offgcd=1)
+
+Define(lifeblood_buff 274419)
+# When you use a Healthstone, gain s1 Leech for 20 seconds.
+  SpellInfo(lifeblood_buff channel=-0.001 gcd=0 offgcd=1)
 
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
@@ -542,6 +551,7 @@ Define(wing_clip 195645)
 Define(wing_clip_debuff 195645)
 	SpellInfo(wing_clip_debuff duration=15)
 
+	Define(reckless_force_counter 302917)
 
 #Pet Spells
 Define(heart_of_the_phoenix 55709)

@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/BestAction", 80000)
+local __exports = LibStub:NewLibrary("ovale/BestAction", 80201)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Debug = LibStub:GetLibrary("ovale/Debug")
@@ -35,6 +35,7 @@ local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local abs = math.abs
 local huge = math.huge
 local floor = math.floor
+local min = math.min
 local assert = assert
 local ipairs = ipairs
 local loadstring = loadstring
@@ -450,6 +451,14 @@ local OvaleBestActionClass = __class(OvaleBestActionBase, {
                         l = 0
                         m = 0
                         n = 0
+                    end
+                elseif operator == ">?" then
+                    l = min(A, B)
+                    m = t
+                    if l == A then
+                        n = c
+                    else
+                        n = z
                     end
                 end
                 __exports.OvaleBestAction:Log("[%d]    arithmetic '%s' returns %s+(t-%s)*%s", element.nodeId, operator, l, m, n)

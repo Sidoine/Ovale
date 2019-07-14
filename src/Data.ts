@@ -542,7 +542,7 @@ class OvaleDataClass extends OvaleDataBase {
                     for (const [, requirement] of ipairs<any>(rArray)) {
                         let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
                         if (verified) {
-                            value = tonumber(v) || v;
+                            (<any>value) = tonumber(v) || v;
                             break;
                         }
                     }

@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/tools", 80000)
+local __exports = LibStub:NewLibrary("ovale/tools", 80201)
 if not __exports then return end
 local type = type
 __exports.isString = function(s)

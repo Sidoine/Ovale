@@ -1,4 +1,4 @@
-import { test } from "ava";
+import test from "ava";
 import { OvaleScripts } from "../Scripts";
 import { registerScripts } from "../scripts/index";
 import "../scripts/ovale_deathknight";

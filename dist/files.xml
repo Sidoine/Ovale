@@ -16,6 +16,7 @@
    <Script file="Debug.lua"/>
    <Script file="Version.lua"/>
    <Script file="DamageTaken.lua"/>
+   <Script file="AzeriteEssence.lua"/>
    <Script file="Artifact.lua"/>
    <Script file="State.lua"/>
    <Script file="BaseState.lua"/>

@@ -38,7 +38,7 @@ let DISABLED_DESCRIPTION = L["Disabled"];
         }
     }
     for (const [k, v] of kpairs(defaultDB)) {
-        OvaleOptions.defaultDB.profile[k] = v;
+        (<any>OvaleOptions.defaultDB.profile)[k] = v;
     }
     for (const [k, v] of pairs(actions)) {
         OvaleOptions.options.args.actions.args[k] = v;
@@ -123,7 +123,7 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
         }
 
         if (!name && specialization) {
-            name = format("sc_pr_%s_%s", scClassName, specialization);
+            name = format("sc_t23_%s_%s", scClassName, specialization);
         }
         if (!(name && this.script[name])) {
             name = DISABLED_NAME;

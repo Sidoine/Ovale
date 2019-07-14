@@ -1,10 +1,10 @@
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
-    local name = "sc_pr_monk_brewmaster"
-    local desc = "[8.2] Simulationcraft: PR_Monk_Brewmaster"
+    local name = "sc_t23_monk_brewmaster"
+    local desc = "[8.2] Simulationcraft: T23_Monk_Brewmaster"
     local code = [[
-# Based on SimulationCraft profile "PR_Monk_Brewmaster".
+# Based on SimulationCraft profile "T23_Monk_Brewmaster".
 #	class=monk
 #	spec=brewmaster
 #	talents=1030021
@@ -97,7 +97,7 @@ AddFunction BrewmasterDefaultMainActions
  #rushing_jade_wind,if=buff.rushing_jade_wind.down
  if BuffExpires(rushing_jade_wind_buff) Spell(rushing_jade_wind)
  #breath_of_fire,if=buff.blackout_combo.down&(buff.bloodlust.down|(buff.bloodlust.up&&dot.breath_of_fire_dot.refreshable))
- if BuffExpires(blackout_combo_buff) and { BuffExpires(burst_haste_buff any=1) or BuffPresent(burst_haste_buff any=1) and target.DebuffRefreshable(breath_of_fire_debuff) } Spell(breath_of_fire)
+ if BuffExpires(blackout_combo_buff) and { BuffExpires(bloodlust) or BuffPresent(bloodlust) and target.DebuffRefreshable(breath_of_fire_debuff) } Spell(breath_of_fire)
  #chi_burst
  if CheckBoxOn(opt_chi_burst) Spell(chi_burst)
  #chi_wave
@@ -126,7 +126,7 @@ AddFunction BrewmasterDefaultShortCdActions
 
 AddFunction BrewmasterDefaultShortCdPostConditions
 {
- Enemies() >= 2 and Spell(keg_smash) or Talent(rushing_jade_wind_talent) and BuffPresent(blackout_combo_buff) and BuffPresent(rushing_jade_wind_buff) and Spell(tiger_palm) or { Talent(invoke_niuzao_the_black_ox_talent) or Talent(special_delivery_talent) } and BuffPresent(blackout_combo_buff) and Spell(tiger_palm) or Spell(blackout_strike) or Spell(keg_smash) or BuffExpires(rushing_jade_wind_buff) and Spell(rushing_jade_wind) or BuffExpires(blackout_combo_buff) and { BuffExpires(burst_haste_buff any=1) or BuffPresent(burst_haste_buff any=1) and target.DebuffRefreshable(breath_of_fire_debuff) } and Spell(breath_of_fire) or CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or Spell(chi_wave) or not Talent(blackout_combo_talent) and SpellCooldown(keg_smash) > GCD() and Energy() + EnergyRegenRate() * { SpellCooldown(keg_smash) + GCD() } >= 65 and Spell(tiger_palm) or Spell(rushing_jade_wind)
+ Enemies() >= 2 and Spell(keg_smash) or Talent(rushing_jade_wind_talent) and BuffPresent(blackout_combo_buff) and BuffPresent(rushing_jade_wind_buff) and Spell(tiger_palm) or { Talent(invoke_niuzao_the_black_ox_talent) or Talent(special_delivery_talent) } and BuffPresent(blackout_combo_buff) and Spell(tiger_palm) or Spell(blackout_strike) or Spell(keg_smash) or BuffExpires(rushing_jade_wind_buff) and Spell(rushing_jade_wind) or BuffExpires(blackout_combo_buff) and { BuffExpires(bloodlust) or BuffPresent(bloodlust) and target.DebuffRefreshable(breath_of_fire_debuff) } and Spell(breath_of_fire) or CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or Spell(chi_wave) or not Talent(blackout_combo_talent) and SpellCooldown(keg_smash) > GCD() and Energy() + EnergyRegenRate() * { SpellCooldown(keg_smash) + GCD() } >= 65 and Spell(tiger_palm) or Spell(rushing_jade_wind)
 }
 
 AddFunction BrewmasterDefaultCdActions
@@ -137,7 +137,7 @@ AddFunction BrewmasterDefaultCdActions
  if IncomingDamage(1.5) > 0 and BuffExpires(fortifying_brew_buff) Spell(dampen_harm)
  #fortifying_brew,if=incoming_damage_1500ms&(buff.dampen_harm.down|buff.diffuse_magic.down)
  if IncomingDamage(1.5) > 0 and { BuffExpires(dampen_harm) or BuffExpires(diffuse_magic) } Spell(fortifying_brew)
- #use_item,name=lustrous_golden_plumage
+ #use_item,name=invocation_of_yulon
  BrewmasterUseItemActions()
  #potion
  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
@@ -161,7 +161,7 @@ AddFunction BrewmasterDefaultCdActions
   #black_ox_brew,if=(energy+(energy.regen*cooldown.keg_smash.remains))<40&buff.blackout_combo.down&cooldown.keg_smash.up
   if Energy() + EnergyRegenRate() * SpellCooldown(keg_smash) < 40 and BuffExpires(blackout_combo_buff) and not SpellCooldown(keg_smash) > 0 Spell(black_ox_brew)
 
-  unless Enemies() >= 2 and Spell(keg_smash) or Talent(rushing_jade_wind_talent) and BuffPresent(blackout_combo_buff) and BuffPresent(rushing_jade_wind_buff) and Spell(tiger_palm) or { Talent(invoke_niuzao_the_black_ox_talent) or Talent(special_delivery_talent) } and BuffPresent(blackout_combo_buff) and Spell(tiger_palm) or Spell(blackout_strike) or Spell(keg_smash) or BuffExpires(rushing_jade_wind_buff) and Spell(rushing_jade_wind) or BuffExpires(blackout_combo_buff) and { BuffExpires(burst_haste_buff any=1) or BuffPresent(burst_haste_buff any=1) and target.DebuffRefreshable(breath_of_fire_debuff) } and Spell(breath_of_fire) or CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or Spell(chi_wave) or not Talent(blackout_combo_talent) and SpellCooldown(keg_smash) > GCD() and Energy() + EnergyRegenRate() * { SpellCooldown(keg_smash) + GCD() } >= 65 and Spell(tiger_palm)
+  unless Enemies() >= 2 and Spell(keg_smash) or Talent(rushing_jade_wind_talent) and BuffPresent(blackout_combo_buff) and BuffPresent(rushing_jade_wind_buff) and Spell(tiger_palm) or { Talent(invoke_niuzao_the_black_ox_talent) or Talent(special_delivery_talent) } and BuffPresent(blackout_combo_buff) and Spell(tiger_palm) or Spell(blackout_strike) or Spell(keg_smash) or BuffExpires(rushing_jade_wind_buff) and Spell(rushing_jade_wind) or BuffExpires(blackout_combo_buff) and { BuffExpires(bloodlust) or BuffPresent(bloodlust) and target.DebuffRefreshable(breath_of_fire_debuff) } and Spell(breath_of_fire) or CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or Spell(chi_wave) or not Talent(blackout_combo_talent) and SpellCooldown(keg_smash) > GCD() and Energy() + EnergyRegenRate() * { SpellCooldown(keg_smash) + GCD() } >= 65 and Spell(tiger_palm)
   {
    #arcane_torrent,if=energy<31
    if Energy() < 31 Spell(arcane_torrent_chi)
@@ -171,7 +171,7 @@ AddFunction BrewmasterDefaultCdActions
 
 AddFunction BrewmasterDefaultCdPostConditions
 {
- BuffExpires(blackout_combo_buff) and IncomingDamage(1.999) > MaxHealth() * 0.1 + StaggerTick(4) and BuffStacks(elusive_brawler) < 2 and not BuffPresent(ironskin_brew_buff) and Spell(ironskin_brew) or SpellCharges(ironskin_brew count=0) > 1 and SpellCooldown(black_ox_brew) < 3 and Spell(ironskin_brew) or StaggerRemaining() / MaxHealth() * 100 > 6 * { 3 - SpellCharges(ironskin_brew count=0) } and StaggerTick(1) > { 0.02 + 0.001 * { 3 - SpellCharges(ironskin_brew count=0) } } * StaggerTick(30) and Spell(purifying_brew) or Enemies() >= 2 and Spell(keg_smash) or Talent(rushing_jade_wind_talent) and BuffPresent(blackout_combo_buff) and BuffPresent(rushing_jade_wind_buff) and Spell(tiger_palm) or { Talent(invoke_niuzao_the_black_ox_talent) or Talent(special_delivery_talent) } and BuffPresent(blackout_combo_buff) and Spell(tiger_palm) or Spell(blackout_strike) or Spell(keg_smash) or BuffExpires(rushing_jade_wind_buff) and Spell(rushing_jade_wind) or BuffExpires(blackout_combo_buff) and { BuffExpires(burst_haste_buff any=1) or BuffPresent(burst_haste_buff any=1) and target.DebuffRefreshable(breath_of_fire_debuff) } and Spell(breath_of_fire) or CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or Spell(chi_wave) or not Talent(blackout_combo_talent) and SpellCooldown(keg_smash) > GCD() and Energy() + EnergyRegenRate() * { SpellCooldown(keg_smash) + GCD() } >= 65 and Spell(tiger_palm) or Spell(rushing_jade_wind)
+ BuffExpires(blackout_combo_buff) and IncomingDamage(1.999) > MaxHealth() * 0.1 + StaggerTick(4) and BuffStacks(elusive_brawler) < 2 and not BuffPresent(ironskin_brew_buff) and Spell(ironskin_brew) or SpellCharges(ironskin_brew count=0) > 1 and SpellCooldown(black_ox_brew) < 3 and Spell(ironskin_brew) or StaggerRemaining() / MaxHealth() * 100 > 6 * { 3 - SpellCharges(ironskin_brew count=0) } and StaggerTick(1) > { 0.02 + 0.001 * { 3 - SpellCharges(ironskin_brew count=0) } } * StaggerTick(30) and Spell(purifying_brew) or Enemies() >= 2 and Spell(keg_smash) or Talent(rushing_jade_wind_talent) and BuffPresent(blackout_combo_buff) and BuffPresent(rushing_jade_wind_buff) and Spell(tiger_palm) or { Talent(invoke_niuzao_the_black_ox_talent) or Talent(special_delivery_talent) } and BuffPresent(blackout_combo_buff) and Spell(tiger_palm) or Spell(blackout_strike) or Spell(keg_smash) or BuffExpires(rushing_jade_wind_buff) and Spell(rushing_jade_wind) or BuffExpires(blackout_combo_buff) and { BuffExpires(bloodlust) or BuffPresent(bloodlust) and target.DebuffRefreshable(breath_of_fire_debuff) } and Spell(breath_of_fire) or CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or Spell(chi_wave) or not Talent(blackout_combo_talent) and SpellCooldown(keg_smash) > GCD() and Energy() + EnergyRegenRate() * { SpellCooldown(keg_smash) + GCD() } >= 65 and Spell(tiger_palm) or Spell(rushing_jade_wind)
 }
 
 ### Brewmaster icons.
@@ -241,6 +241,7 @@ AddIcon checkbox=opt_monk_brewmaster_aoe help=cd specialization=brewmaster
 # blackout_combo_talent
 # blackout_strike
 # blood_fury_apsp
+# bloodlust
 # breath_of_fire
 # breath_of_fire_debuff
 # chi_burst
@@ -273,10 +274,10 @@ AddIcon checkbox=opt_monk_brewmaster_aoe help=cd specialization=brewmaster
     OvaleScripts:RegisterScript("MONK", "brewmaster", name, desc, code, "script")
 end
 do
-    local name = "sc_pr_monk_windwalker"
-    local desc = "[8.2] Simulationcraft: PR_Monk_Windwalker"
+    local name = "sc_t23_monk_windwalker"
+    local desc = "[8.2] Simulationcraft: T23_Monk_Windwalker"
     local code = [[
-# Based on SimulationCraft profile "PR_Monk_Windwalker".
+# Based on SimulationCraft profile "T23_Monk_Windwalker".
 #	class=monk
 #	spec=windwalker
 #	talents=2022032
@@ -334,6 +335,8 @@ AddFunction WindwalkerStMainActions
  if not PreviousGCDSpell(spinning_crane_kick) and BuffPresent(dance_of_chiji_buff) Spell(spinning_crane_kick)
  #rushing_jade_wind,if=buff.rushing_jade_wind.down&active_enemies>1
  if BuffExpires(rushing_jade_wind_windwalker_buff) and Enemies() > 1 Spell(rushing_jade_wind)
+ #reverse_harm,if=chi.max-chi>=2
+ if MaxChi() - Chi() >= 2 Spell(reverse_harm)
  #fist_of_the_white_tiger,if=chi<=2
  if Chi() <= 2 Spell(fist_of_the_white_tiger)
  #blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.blackout_kick&(cooldown.rising_sun_kick.remains>3|chi>=3)&(cooldown.fists_of_fury.remains>4|chi>=4|(chi=2&prev_gcd.1.tiger_palm))&buff.swift_roundhouse.stack<2
@@ -354,7 +357,7 @@ AddFunction WindwalkerStMainPostConditions
 
 AddFunction WindwalkerStShortCdActions
 {
- unless SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Chi() >= 5 and Spell(rising_sun_kick) or TimeToMaxEnergy() > 3 and Spell(fists_of_fury) or Spell(rising_sun_kick) or not PreviousGCDSpell(spinning_crane_kick) and BuffPresent(dance_of_chiji_buff) and Spell(spinning_crane_kick) or BuffExpires(rushing_jade_wind_windwalker_buff) and Enemies() > 1 and Spell(rushing_jade_wind) or Chi() <= 2 and Spell(fist_of_the_white_tiger)
+ unless SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Chi() >= 5 and Spell(rising_sun_kick) or TimeToMaxEnergy() > 3 and Spell(fists_of_fury) or Spell(rising_sun_kick) or not PreviousGCDSpell(spinning_crane_kick) and BuffPresent(dance_of_chiji_buff) and Spell(spinning_crane_kick) or BuffExpires(rushing_jade_wind_windwalker_buff) and Enemies() > 1 and Spell(rushing_jade_wind) or MaxChi() - Chi() >= 2 and Spell(reverse_harm) or Chi() <= 2 and Spell(fist_of_the_white_tiger)
  {
   #energizing_elixir,if=chi<=3&energy<50
   if Chi() <= 3 and Energy() < 50 Spell(energizing_elixir)
@@ -363,7 +366,7 @@ AddFunction WindwalkerStShortCdActions
 
 AddFunction WindwalkerStShortCdPostConditions
 {
- SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Chi() >= 5 and Spell(rising_sun_kick) or TimeToMaxEnergy() > 3 and Spell(fists_of_fury) or Spell(rising_sun_kick) or not PreviousGCDSpell(spinning_crane_kick) and BuffPresent(dance_of_chiji_buff) and Spell(spinning_crane_kick) or BuffExpires(rushing_jade_wind_windwalker_buff) and Enemies() > 1 and Spell(rushing_jade_wind) or Chi() <= 2 and Spell(fist_of_the_white_tiger) or not PreviousGCDSpell(blackout_kick_windwalker) and { SpellCooldown(rising_sun_kick) > 3 or Chi() >= 3 } and { SpellCooldown(fists_of_fury) > 4 or Chi() >= 4 or Chi() == 2 and PreviousGCDSpell(tiger_palm) } and BuffStacks(swift_roundhouse_buff) < 2 and Spell(blackout_kick_windwalker) or Spell(chi_wave) or { MaxChi() - Chi() >= 1 and Enemies() == 1 or MaxChi() - Chi() >= 2 } and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or not PreviousGCDSpell(tiger_palm) and MaxChi() - Chi() >= 2 and Spell(tiger_palm) or PreviousGCDSpell(blackout_kick_windwalker) and Chi() > 3 and BuffStacks(swift_roundhouse_buff) < 2 and CheckBoxOn(opt_flying_serpent_kick) and Spell(flying_serpent_kick)
+ SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Chi() >= 5 and Spell(rising_sun_kick) or TimeToMaxEnergy() > 3 and Spell(fists_of_fury) or Spell(rising_sun_kick) or not PreviousGCDSpell(spinning_crane_kick) and BuffPresent(dance_of_chiji_buff) and Spell(spinning_crane_kick) or BuffExpires(rushing_jade_wind_windwalker_buff) and Enemies() > 1 and Spell(rushing_jade_wind) or MaxChi() - Chi() >= 2 and Spell(reverse_harm) or Chi() <= 2 and Spell(fist_of_the_white_tiger) or not PreviousGCDSpell(blackout_kick_windwalker) and { SpellCooldown(rising_sun_kick) > 3 or Chi() >= 3 } and { SpellCooldown(fists_of_fury) > 4 or Chi() >= 4 or Chi() == 2 and PreviousGCDSpell(tiger_palm) } and BuffStacks(swift_roundhouse_buff) < 2 and Spell(blackout_kick_windwalker) or Spell(chi_wave) or { MaxChi() - Chi() >= 1 and Enemies() == 1 or MaxChi() - Chi() >= 2 } and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or not PreviousGCDSpell(tiger_palm) and MaxChi() - Chi() >= 2 and Spell(tiger_palm) or PreviousGCDSpell(blackout_kick_windwalker) and Chi() > 3 and BuffStacks(swift_roundhouse_buff) < 2 and CheckBoxOn(opt_flying_serpent_kick) and Spell(flying_serpent_kick)
 }
 
 AddFunction WindwalkerStCdActions
@@ -372,7 +375,7 @@ AddFunction WindwalkerStCdActions
 
 AddFunction WindwalkerStCdPostConditions
 {
- SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Chi() >= 5 and Spell(rising_sun_kick) or TimeToMaxEnergy() > 3 and Spell(fists_of_fury) or Spell(rising_sun_kick) or not PreviousGCDSpell(spinning_crane_kick) and BuffPresent(dance_of_chiji_buff) and Spell(spinning_crane_kick) or BuffExpires(rushing_jade_wind_windwalker_buff) and Enemies() > 1 and Spell(rushing_jade_wind) or Chi() <= 2 and Spell(fist_of_the_white_tiger) or Chi() <= 3 and Energy() < 50 and Spell(energizing_elixir) or not PreviousGCDSpell(blackout_kick_windwalker) and { SpellCooldown(rising_sun_kick) > 3 or Chi() >= 3 } and { SpellCooldown(fists_of_fury) > 4 or Chi() >= 4 or Chi() == 2 and PreviousGCDSpell(tiger_palm) } and BuffStacks(swift_roundhouse_buff) < 2 and Spell(blackout_kick_windwalker) or Spell(chi_wave) or { MaxChi() - Chi() >= 1 and Enemies() == 1 or MaxChi() - Chi() >= 2 } and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or not PreviousGCDSpell(tiger_palm) and MaxChi() - Chi() >= 2 and Spell(tiger_palm) or PreviousGCDSpell(blackout_kick_windwalker) and Chi() > 3 and BuffStacks(swift_roundhouse_buff) < 2 and CheckBoxOn(opt_flying_serpent_kick) and Spell(flying_serpent_kick)
+ SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Chi() >= 5 and Spell(rising_sun_kick) or TimeToMaxEnergy() > 3 and Spell(fists_of_fury) or Spell(rising_sun_kick) or not PreviousGCDSpell(spinning_crane_kick) and BuffPresent(dance_of_chiji_buff) and Spell(spinning_crane_kick) or BuffExpires(rushing_jade_wind_windwalker_buff) and Enemies() > 1 and Spell(rushing_jade_wind) or MaxChi() - Chi() >= 2 and Spell(reverse_harm) or Chi() <= 2 and Spell(fist_of_the_white_tiger) or Chi() <= 3 and Energy() < 50 and Spell(energizing_elixir) or not PreviousGCDSpell(blackout_kick_windwalker) and { SpellCooldown(rising_sun_kick) > 3 or Chi() >= 3 } and { SpellCooldown(fists_of_fury) > 4 or Chi() >= 4 or Chi() == 2 and PreviousGCDSpell(tiger_palm) } and BuffStacks(swift_roundhouse_buff) < 2 and Spell(blackout_kick_windwalker) or Spell(chi_wave) or { MaxChi() - Chi() >= 1 and Enemies() == 1 or MaxChi() - Chi() >= 2 } and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or not PreviousGCDSpell(tiger_palm) and MaxChi() - Chi() >= 2 and Spell(tiger_palm) or PreviousGCDSpell(blackout_kick_windwalker) and Chi() > 3 and BuffStacks(swift_roundhouse_buff) < 2 and CheckBoxOn(opt_flying_serpent_kick) and Spell(flying_serpent_kick)
 }
 
 ### actions.serenity
@@ -382,7 +385,7 @@ AddFunction WindwalkerSerenityMainActions
  #rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=active_enemies<3|prev_gcd.1.spinning_crane_kick
  if Enemies() < 3 or PreviousGCDSpell(spinning_crane_kick) Spell(rising_sun_kick)
  #fists_of_fury,if=(buff.bloodlust.up&prev_gcd.1.rising_sun_kick)|buff.serenity.remains<1|(active_enemies>1&active_enemies<5)
- if BuffPresent(burst_haste_buff any=1) and PreviousGCDSpell(rising_sun_kick) or BuffRemaining(serenity) < 1 or Enemies() > 1 and Enemies() < 5 Spell(fists_of_fury)
+ if BuffPresent(bloodlust) and PreviousGCDSpell(rising_sun_kick) or BuffRemaining(serenity) < 1 or Enemies() > 1 and Enemies() < 5 Spell(fists_of_fury)
  #spinning_crane_kick,if=!prev_gcd.1.spinning_crane_kick&(active_enemies>=3|(active_enemies=2&prev_gcd.1.blackout_kick))
  if not PreviousGCDSpell(spinning_crane_kick) and { Enemies() >= 3 or Enemies() == 2 and PreviousGCDSpell(blackout_kick_windwalker) } Spell(spinning_crane_kick)
  #blackout_kick,target_if=min:debuff.mark_of_the_crane.remains
@@ -399,7 +402,7 @@ AddFunction WindwalkerSerenityShortCdActions
 
 AddFunction WindwalkerSerenityShortCdPostConditions
 {
- { Enemies() < 3 or PreviousGCDSpell(spinning_crane_kick) } and Spell(rising_sun_kick) or { BuffPresent(burst_haste_buff any=1) and PreviousGCDSpell(rising_sun_kick) or BuffRemaining(serenity) < 1 or Enemies() > 1 and Enemies() < 5 } and Spell(fists_of_fury) or not PreviousGCDSpell(spinning_crane_kick) and { Enemies() >= 3 or Enemies() == 2 and PreviousGCDSpell(blackout_kick_windwalker) } and Spell(spinning_crane_kick) or Spell(blackout_kick_windwalker)
+ { Enemies() < 3 or PreviousGCDSpell(spinning_crane_kick) } and Spell(rising_sun_kick) or { BuffPresent(bloodlust) and PreviousGCDSpell(rising_sun_kick) or BuffRemaining(serenity) < 1 or Enemies() > 1 and Enemies() < 5 } and Spell(fists_of_fury) or not PreviousGCDSpell(spinning_crane_kick) and { Enemies() >= 3 or Enemies() == 2 and PreviousGCDSpell(blackout_kick_windwalker) } and Spell(spinning_crane_kick) or Spell(blackout_kick_windwalker)
 }
 
 AddFunction WindwalkerSerenityCdActions
@@ -408,7 +411,7 @@ AddFunction WindwalkerSerenityCdActions
 
 AddFunction WindwalkerSerenityCdPostConditions
 {
- { Enemies() < 3 or PreviousGCDSpell(spinning_crane_kick) } and Spell(rising_sun_kick) or { BuffPresent(burst_haste_buff any=1) and PreviousGCDSpell(rising_sun_kick) or BuffRemaining(serenity) < 1 or Enemies() > 1 and Enemies() < 5 } and Spell(fists_of_fury) or not PreviousGCDSpell(spinning_crane_kick) and { Enemies() >= 3 or Enemies() == 2 and PreviousGCDSpell(blackout_kick_windwalker) } and Spell(spinning_crane_kick) or Spell(blackout_kick_windwalker)
+ { Enemies() < 3 or PreviousGCDSpell(spinning_crane_kick) } and Spell(rising_sun_kick) or { BuffPresent(bloodlust) and PreviousGCDSpell(rising_sun_kick) or BuffRemaining(serenity) < 1 or Enemies() > 1 and Enemies() < 5 } and Spell(fists_of_fury) or not PreviousGCDSpell(spinning_crane_kick) and { Enemies() >= 3 or Enemies() == 2 and PreviousGCDSpell(blackout_kick_windwalker) } and Spell(spinning_crane_kick) or Spell(blackout_kick_windwalker)
 }
 
 ### actions.precombat
@@ -441,7 +444,7 @@ AddFunction WindwalkerPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_bursting_blood usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
 }
 
 AddFunction WindwalkerPrecombatCdPostConditions
@@ -449,31 +452,93 @@ AddFunction WindwalkerPrecombatCdPostConditions
  { not Talent(serenity_talent) or not Talent(fist_of_the_white_tiger_talent) } and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or Spell(chi_wave)
 }
 
+### actions.essences
+
+AddFunction WindwalkerEssencesMainActions
+{
+ #concentrated_flame
+ Spell(concentrated_flame_essence)
+ #focused_azerite_beam
+ Spell(focused_azerite_beam)
+}
+
+AddFunction WindwalkerEssencesMainPostConditions
+{
+}
+
+AddFunction WindwalkerEssencesShortCdActions
+{
+ unless Spell(concentrated_flame_essence) or Spell(focused_azerite_beam)
+ {
+  #purifying_blast
+  Spell(purifying_blast)
+  #the_unbound_force
+  Spell(the_unbound_force)
+  #ripple_in_space
+  Spell(ripple_in_space_essence)
+  #worldvein_resonance
+  Spell(worldvein_resonance_essence)
+ }
+}
+
+AddFunction WindwalkerEssencesShortCdPostConditions
+{
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam)
+}
+
+AddFunction WindwalkerEssencesCdActions
+{
+ unless Spell(concentrated_flame_essence)
+ {
+  #blood_of_the_enemy
+  Spell(blood_of_the_enemy)
+  #guardian_of_azeroth
+  Spell(guardian_of_azeroth)
+
+  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+  {
+   #memory_of_lucid_dreams,if=energy<40&buff.storm_earth_and_fire.up
+   if Energy() < 40 and BuffPresent(storm_earth_and_fire) Spell(memory_of_lucid_dreams_essence)
+  }
+ }
+}
+
+AddFunction WindwalkerEssencesCdPostConditions
+{
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+}
+
 ### actions.cd
 
 AddFunction WindwalkerCdMainActions
 {
+ #call_action_list,name=essences
+ WindwalkerEssencesMainActions()
 }
 
 AddFunction WindwalkerCdMainPostConditions
 {
+ WindwalkerEssencesMainPostConditions()
 }
 
 AddFunction WindwalkerCdShortCdActions
 {
  #serenity,if=cooldown.rising_sun_kick.remains<=2|target.time_to_die<=12
  if SpellCooldown(rising_sun_kick) <= 2 or target.TimeToDie() <= 12 Spell(serenity)
+ #call_action_list,name=essences
+ WindwalkerEssencesShortCdActions()
 }
 
 AddFunction WindwalkerCdShortCdPostConditions
 {
+ WindwalkerEssencesShortCdPostConditions()
 }
 
 AddFunction WindwalkerCdCdActions
 {
  #invoke_xuen_the_white_tiger
  Spell(invoke_xuen_the_white_tiger)
- #use_item,name=lustrous_golden_plumage
+ #use_item,name=variable_intensity_gigavolt_oscillating_reactor
  WindwalkerUseItemActions()
  #blood_fury
  Spell(blood_fury_apsp)
@@ -491,11 +556,17 @@ AddFunction WindwalkerCdCdActions
  if target.TimeToDie() > 9 and { not CheckBoxOn(opt_touch_of_death_on_elite_only) or not UnitInRaid() and target.Classification(elite) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff) } Spell(touch_of_death)
  #storm_earth_and_fire,if=cooldown.storm_earth_and_fire.charges=2|(cooldown.fists_of_fury.remains<=6&chi>=3&cooldown.rising_sun_kick.remains<=1)|target.time_to_die<=15
  if { SpellCharges(storm_earth_and_fire) == 2 or SpellCooldown(fists_of_fury) <= 6 and Chi() >= 3 and SpellCooldown(rising_sun_kick) <= 1 or target.TimeToDie() <= 15 } and CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff) Spell(storm_earth_and_fire)
+
+ unless { SpellCooldown(rising_sun_kick) <= 2 or target.TimeToDie() <= 12 } and Spell(serenity)
+ {
+  #call_action_list,name=essences
+  WindwalkerEssencesCdActions()
+ }
 }
 
 AddFunction WindwalkerCdCdPostConditions
 {
- { SpellCooldown(rising_sun_kick) <= 2 or target.TimeToDie() <= 12 } and Spell(serenity)
+ { SpellCooldown(rising_sun_kick) <= 2 or target.TimeToDie() <= 12 } and Spell(serenity) or WindwalkerEssencesCdPostConditions()
 }
 
 ### actions.aoe
@@ -512,6 +583,8 @@ AddFunction WindwalkerAoeMainActions
  if BuffExpires(rushing_jade_wind_windwalker_buff) Spell(rushing_jade_wind)
  #spinning_crane_kick,if=!prev_gcd.1.spinning_crane_kick&(((chi>3|cooldown.fists_of_fury.remains>6)&(chi>=5|cooldown.fists_of_fury.remains>2))|energy.time_to_max<=3)
  if not PreviousGCDSpell(spinning_crane_kick) and { { Chi() > 3 or SpellCooldown(fists_of_fury) > 6 } and { Chi() >= 5 or SpellCooldown(fists_of_fury) > 2 } or TimeToMaxEnergy() <= 3 } Spell(spinning_crane_kick)
+ #reverse_harm,if=chi.max-chi>=2
+ if MaxChi() - Chi() >= 2 Spell(reverse_harm)
  #chi_burst,if=chi<=3
  if Chi() <= 3 and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
  #fist_of_the_white_tiger,if=chi.max-chi>=3
@@ -541,7 +614,7 @@ AddFunction WindwalkerAoeShortCdActions
 
 AddFunction WindwalkerAoeShortCdPostConditions
 {
- Talent(whirling_dragon_punch_talent) and SpellCooldown(whirling_dragon_punch) < 5 and SpellCooldown(fists_of_fury) > 3 and Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or TimeToMaxEnergy() > 3 and Spell(fists_of_fury) or BuffExpires(rushing_jade_wind_windwalker_buff) and Spell(rushing_jade_wind) or not PreviousGCDSpell(spinning_crane_kick) and { { Chi() > 3 or SpellCooldown(fists_of_fury) > 6 } and { Chi() >= 5 or SpellCooldown(fists_of_fury) > 2 } or TimeToMaxEnergy() <= 3 } and Spell(spinning_crane_kick) or Chi() <= 3 and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or MaxChi() - Chi() >= 3 and Spell(fist_of_the_white_tiger) or MaxChi() - Chi() >= 2 and { not Talent(hit_combo_talent) or not PreviousGCDSpell(tiger_palm) } and Spell(tiger_palm) or Spell(chi_wave) or BuffExpires(blackout_kick_buff) and CheckBoxOn(opt_flying_serpent_kick) and Spell(flying_serpent_kick) or not PreviousGCDSpell(blackout_kick_windwalker) and { BuffPresent(blackout_kick_buff) or Talent(hit_combo_talent) and PreviousGCDSpell(tiger_palm) and Chi() < 4 } and Spell(blackout_kick_windwalker)
+ Talent(whirling_dragon_punch_talent) and SpellCooldown(whirling_dragon_punch) < 5 and SpellCooldown(fists_of_fury) > 3 and Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or TimeToMaxEnergy() > 3 and Spell(fists_of_fury) or BuffExpires(rushing_jade_wind_windwalker_buff) and Spell(rushing_jade_wind) or not PreviousGCDSpell(spinning_crane_kick) and { { Chi() > 3 or SpellCooldown(fists_of_fury) > 6 } and { Chi() >= 5 or SpellCooldown(fists_of_fury) > 2 } or TimeToMaxEnergy() <= 3 } and Spell(spinning_crane_kick) or MaxChi() - Chi() >= 2 and Spell(reverse_harm) or Chi() <= 3 and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or MaxChi() - Chi() >= 3 and Spell(fist_of_the_white_tiger) or MaxChi() - Chi() >= 2 and { not Talent(hit_combo_talent) or not PreviousGCDSpell(tiger_palm) } and Spell(tiger_palm) or Spell(chi_wave) or BuffExpires(blackout_kick_buff) and CheckBoxOn(opt_flying_serpent_kick) and Spell(flying_serpent_kick) or not PreviousGCDSpell(blackout_kick_windwalker) and { BuffPresent(blackout_kick_buff) or Talent(hit_combo_talent) and PreviousGCDSpell(tiger_palm) and Chi() < 4 } and Spell(blackout_kick_windwalker)
 }
 
 AddFunction WindwalkerAoeCdActions
@@ -550,7 +623,7 @@ AddFunction WindwalkerAoeCdActions
 
 AddFunction WindwalkerAoeCdPostConditions
 {
- Talent(whirling_dragon_punch_talent) and SpellCooldown(whirling_dragon_punch) < 5 and SpellCooldown(fists_of_fury) > 3 and Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or not PreviousGCDSpell(tiger_palm) and Chi() <= 1 and Energy() < 50 and Spell(energizing_elixir) or TimeToMaxEnergy() > 3 and Spell(fists_of_fury) or BuffExpires(rushing_jade_wind_windwalker_buff) and Spell(rushing_jade_wind) or not PreviousGCDSpell(spinning_crane_kick) and { { Chi() > 3 or SpellCooldown(fists_of_fury) > 6 } and { Chi() >= 5 or SpellCooldown(fists_of_fury) > 2 } or TimeToMaxEnergy() <= 3 } and Spell(spinning_crane_kick) or Chi() <= 3 and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or MaxChi() - Chi() >= 3 and Spell(fist_of_the_white_tiger) or MaxChi() - Chi() >= 2 and { not Talent(hit_combo_talent) or not PreviousGCDSpell(tiger_palm) } and Spell(tiger_palm) or Spell(chi_wave) or BuffExpires(blackout_kick_buff) and CheckBoxOn(opt_flying_serpent_kick) and Spell(flying_serpent_kick) or not PreviousGCDSpell(blackout_kick_windwalker) and { BuffPresent(blackout_kick_buff) or Talent(hit_combo_talent) and PreviousGCDSpell(tiger_palm) and Chi() < 4 } and Spell(blackout_kick_windwalker)
+ Talent(whirling_dragon_punch_talent) and SpellCooldown(whirling_dragon_punch) < 5 and SpellCooldown(fists_of_fury) > 3 and Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or not PreviousGCDSpell(tiger_palm) and Chi() <= 1 and Energy() < 50 and Spell(energizing_elixir) or TimeToMaxEnergy() > 3 and Spell(fists_of_fury) or BuffExpires(rushing_jade_wind_windwalker_buff) and Spell(rushing_jade_wind) or not PreviousGCDSpell(spinning_crane_kick) and { { Chi() > 3 or SpellCooldown(fists_of_fury) > 6 } and { Chi() >= 5 or SpellCooldown(fists_of_fury) > 2 } or TimeToMaxEnergy() <= 3 } and Spell(spinning_crane_kick) or MaxChi() - Chi() >= 2 and Spell(reverse_harm) or Chi() <= 3 and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or MaxChi() - Chi() >= 3 and Spell(fist_of_the_white_tiger) or MaxChi() - Chi() >= 2 and { not Talent(hit_combo_talent) or not PreviousGCDSpell(tiger_palm) } and Spell(tiger_palm) or Spell(chi_wave) or BuffExpires(blackout_kick_buff) and CheckBoxOn(opt_flying_serpent_kick) and Spell(flying_serpent_kick) or not PreviousGCDSpell(blackout_kick_windwalker) and { BuffPresent(blackout_kick_buff) or Talent(hit_combo_talent) and PreviousGCDSpell(tiger_palm) and Chi() < 4 } and Spell(blackout_kick_windwalker)
 }
 
 ### actions.default
@@ -629,7 +702,7 @@ AddFunction WindwalkerDefaultCdActions
  unless CheckBoxOn(opt_touch_of_karma) and Spell(touch_of_karma)
  {
   #potion,if=buff.serenity.up|buff.storm_earth_and_fire.up|(!talent.serenity.enabled&trinket.proc.agility.react)|buff.bloodlust.react|target.time_to_die<=60
-  if { BuffPresent(serenity) or BuffPresent(storm_earth_and_fire) or not Talent(serenity_talent) and BuffPresent(trinket_proc_agility_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_bursting_blood usable=1)
+  if { BuffPresent(serenity) or BuffPresent(storm_earth_and_fire) or not Talent(serenity_talent) and BuffPresent(trinket_proc_agility_buff) or BuffPresent(bloodlust) or target.TimeToDie() <= 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
   #call_action_list,name=serenity,if=buff.serenity.up
   if BuffPresent(serenity) WindwalkerSerenityCdActions()
 
@@ -723,8 +796,11 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # blackout_kick_buff
 # blackout_kick_windwalker
 # blood_fury_apsp
+# blood_of_the_enemy
+# bloodlust
 # chi_burst
 # chi_wave
+# concentrated_flame_essence
 # dance_of_chiji_buff
 # energizing_elixir
 # fireblood
@@ -732,14 +808,20 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # fist_of_the_white_tiger_talent
 # fists_of_fury
 # flying_serpent_kick
+# focused_azerite_beam
+# guardian_of_azeroth
 # hidden_masters_forbidden_touch_buff
 # hit_combo_talent
 # invoke_xuen_the_white_tiger
-# item_bursting_blood
+# item_unbridled_fury
 # leg_sweep
 # lights_judgment
+# memory_of_lucid_dreams_essence
 # paralysis
+# purifying_blast
 # quaking_palm
+# reverse_harm
+# ripple_in_space_essence
 # rising_sun_kick
 # rushing_jade_wind
 # rushing_jade_wind_windwalker_buff
@@ -749,20 +831,22 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # spinning_crane_kick
 # storm_earth_and_fire
 # swift_roundhouse_buff
+# the_unbound_force
 # tiger_palm
 # touch_of_death
 # touch_of_karma
 # war_stomp
 # whirling_dragon_punch
 # whirling_dragon_punch_talent
+# worldvein_resonance_essence
 ]]
     OvaleScripts:RegisterScript("MONK", "windwalker", name, desc, code, "script")
 end
 do
-    local name = "sc_pr_monk_windwalker_serenity"
-    local desc = "[8.2] Simulationcraft: PR_Monk_Windwalker_Serenity"
+    local name = "sc_t23_monk_windwalker_serenity"
+    local desc = "[8.2] Simulationcraft: T23_Monk_Windwalker_Serenity"
     local code = [[
-# Based on SimulationCraft profile "PR_Monk_Windwalker_Serenity".
+# Based on SimulationCraft profile "T23_Monk_Windwalker_Serenity".
 #	class=monk
 #	spec=windwalker
 #	talents=2022033
@@ -820,6 +904,8 @@ AddFunction WindwalkerStMainActions
  if not PreviousGCDSpell(spinning_crane_kick) and BuffPresent(dance_of_chiji_buff) Spell(spinning_crane_kick)
  #rushing_jade_wind,if=buff.rushing_jade_wind.down&active_enemies>1
  if BuffExpires(rushing_jade_wind_windwalker_buff) and Enemies() > 1 Spell(rushing_jade_wind)
+ #reverse_harm,if=chi.max-chi>=2
+ if MaxChi() - Chi() >= 2 Spell(reverse_harm)
  #fist_of_the_white_tiger,if=chi<=2
  if Chi() <= 2 Spell(fist_of_the_white_tiger)
  #blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.blackout_kick&(cooldown.rising_sun_kick.remains>3|chi>=3)&(cooldown.fists_of_fury.remains>4|chi>=4|(chi=2&prev_gcd.1.tiger_palm))&buff.swift_roundhouse.stack<2
@@ -840,7 +926,7 @@ AddFunction WindwalkerStMainPostConditions
 
 AddFunction WindwalkerStShortCdActions
 {
- unless SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Chi() >= 5 and Spell(rising_sun_kick) or TimeToMaxEnergy() > 3 and Spell(fists_of_fury) or Spell(rising_sun_kick) or not PreviousGCDSpell(spinning_crane_kick) and BuffPresent(dance_of_chiji_buff) and Spell(spinning_crane_kick) or BuffExpires(rushing_jade_wind_windwalker_buff) and Enemies() > 1 and Spell(rushing_jade_wind) or Chi() <= 2 and Spell(fist_of_the_white_tiger)
+ unless SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Chi() >= 5 and Spell(rising_sun_kick) or TimeToMaxEnergy() > 3 and Spell(fists_of_fury) or Spell(rising_sun_kick) or not PreviousGCDSpell(spinning_crane_kick) and BuffPresent(dance_of_chiji_buff) and Spell(spinning_crane_kick) or BuffExpires(rushing_jade_wind_windwalker_buff) and Enemies() > 1 and Spell(rushing_jade_wind) or MaxChi() - Chi() >= 2 and Spell(reverse_harm) or Chi() <= 2 and Spell(fist_of_the_white_tiger)
  {
   #energizing_elixir,if=chi<=3&energy<50
   if Chi() <= 3 and Energy() < 50 Spell(energizing_elixir)
@@ -849,7 +935,7 @@ AddFunction WindwalkerStShortCdActions
 
 AddFunction WindwalkerStShortCdPostConditions
 {
- SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Chi() >= 5 and Spell(rising_sun_kick) or TimeToMaxEnergy() > 3 and Spell(fists_of_fury) or Spell(rising_sun_kick) or not PreviousGCDSpell(spinning_crane_kick) and BuffPresent(dance_of_chiji_buff) and Spell(spinning_crane_kick) or BuffExpires(rushing_jade_wind_windwalker_buff) and Enemies() > 1 and Spell(rushing_jade_wind) or Chi() <= 2 and Spell(fist_of_the_white_tiger) or not PreviousGCDSpell(blackout_kick_windwalker) and { SpellCooldown(rising_sun_kick) > 3 or Chi() >= 3 } and { SpellCooldown(fists_of_fury) > 4 or Chi() >= 4 or Chi() == 2 and PreviousGCDSpell(tiger_palm) } and BuffStacks(swift_roundhouse_buff) < 2 and Spell(blackout_kick_windwalker) or Spell(chi_wave) or { MaxChi() - Chi() >= 1 and Enemies() == 1 or MaxChi() - Chi() >= 2 } and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or not PreviousGCDSpell(tiger_palm) and MaxChi() - Chi() >= 2 and Spell(tiger_palm) or PreviousGCDSpell(blackout_kick_windwalker) and Chi() > 3 and BuffStacks(swift_roundhouse_buff) < 2 and CheckBoxOn(opt_flying_serpent_kick) and Spell(flying_serpent_kick)
+ SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Chi() >= 5 and Spell(rising_sun_kick) or TimeToMaxEnergy() > 3 and Spell(fists_of_fury) or Spell(rising_sun_kick) or not PreviousGCDSpell(spinning_crane_kick) and BuffPresent(dance_of_chiji_buff) and Spell(spinning_crane_kick) or BuffExpires(rushing_jade_wind_windwalker_buff) and Enemies() > 1 and Spell(rushing_jade_wind) or MaxChi() - Chi() >= 2 and Spell(reverse_harm) or Chi() <= 2 and Spell(fist_of_the_white_tiger) or not PreviousGCDSpell(blackout_kick_windwalker) and { SpellCooldown(rising_sun_kick) > 3 or Chi() >= 3 } and { SpellCooldown(fists_of_fury) > 4 or Chi() >= 4 or Chi() == 2 and PreviousGCDSpell(tiger_palm) } and BuffStacks(swift_roundhouse_buff) < 2 and Spell(blackout_kick_windwalker) or Spell(chi_wave) or { MaxChi() - Chi() >= 1 and Enemies() == 1 or MaxChi() - Chi() >= 2 } and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or not PreviousGCDSpell(tiger_palm) and MaxChi() - Chi() >= 2 and Spell(tiger_palm) or PreviousGCDSpell(blackout_kick_windwalker) and Chi() > 3 and BuffStacks(swift_roundhouse_buff) < 2 and CheckBoxOn(opt_flying_serpent_kick) and Spell(flying_serpent_kick)
 }
 
 AddFunction WindwalkerStCdActions
@@ -858,7 +944,7 @@ AddFunction WindwalkerStCdActions
 
 AddFunction WindwalkerStCdPostConditions
 {
- SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Chi() >= 5 and Spell(rising_sun_kick) or TimeToMaxEnergy() > 3 and Spell(fists_of_fury) or Spell(rising_sun_kick) or not PreviousGCDSpell(spinning_crane_kick) and BuffPresent(dance_of_chiji_buff) and Spell(spinning_crane_kick) or BuffExpires(rushing_jade_wind_windwalker_buff) and Enemies() > 1 and Spell(rushing_jade_wind) or Chi() <= 2 and Spell(fist_of_the_white_tiger) or Chi() <= 3 and Energy() < 50 and Spell(energizing_elixir) or not PreviousGCDSpell(blackout_kick_windwalker) and { SpellCooldown(rising_sun_kick) > 3 or Chi() >= 3 } and { SpellCooldown(fists_of_fury) > 4 or Chi() >= 4 or Chi() == 2 and PreviousGCDSpell(tiger_palm) } and BuffStacks(swift_roundhouse_buff) < 2 and Spell(blackout_kick_windwalker) or Spell(chi_wave) or { MaxChi() - Chi() >= 1 and Enemies() == 1 or MaxChi() - Chi() >= 2 } and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or not PreviousGCDSpell(tiger_palm) and MaxChi() - Chi() >= 2 and Spell(tiger_palm) or PreviousGCDSpell(blackout_kick_windwalker) and Chi() > 3 and BuffStacks(swift_roundhouse_buff) < 2 and CheckBoxOn(opt_flying_serpent_kick) and Spell(flying_serpent_kick)
+ SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or Chi() >= 5 and Spell(rising_sun_kick) or TimeToMaxEnergy() > 3 and Spell(fists_of_fury) or Spell(rising_sun_kick) or not PreviousGCDSpell(spinning_crane_kick) and BuffPresent(dance_of_chiji_buff) and Spell(spinning_crane_kick) or BuffExpires(rushing_jade_wind_windwalker_buff) and Enemies() > 1 and Spell(rushing_jade_wind) or MaxChi() - Chi() >= 2 and Spell(reverse_harm) or Chi() <= 2 and Spell(fist_of_the_white_tiger) or Chi() <= 3 and Energy() < 50 and Spell(energizing_elixir) or not PreviousGCDSpell(blackout_kick_windwalker) and { SpellCooldown(rising_sun_kick) > 3 or Chi() >= 3 } and { SpellCooldown(fists_of_fury) > 4 or Chi() >= 4 or Chi() == 2 and PreviousGCDSpell(tiger_palm) } and BuffStacks(swift_roundhouse_buff) < 2 and Spell(blackout_kick_windwalker) or Spell(chi_wave) or { MaxChi() - Chi() >= 1 and Enemies() == 1 or MaxChi() - Chi() >= 2 } and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or not PreviousGCDSpell(tiger_palm) and MaxChi() - Chi() >= 2 and Spell(tiger_palm) or PreviousGCDSpell(blackout_kick_windwalker) and Chi() > 3 and BuffStacks(swift_roundhouse_buff) < 2 and CheckBoxOn(opt_flying_serpent_kick) and Spell(flying_serpent_kick)
 }
 
 ### actions.serenity
@@ -868,7 +954,7 @@ AddFunction WindwalkerSerenityMainActions
  #rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=active_enemies<3|prev_gcd.1.spinning_crane_kick
  if Enemies() < 3 or PreviousGCDSpell(spinning_crane_kick) Spell(rising_sun_kick)
  #fists_of_fury,if=(buff.bloodlust.up&prev_gcd.1.rising_sun_kick)|buff.serenity.remains<1|(active_enemies>1&active_enemies<5)
- if BuffPresent(burst_haste_buff any=1) and PreviousGCDSpell(rising_sun_kick) or BuffRemaining(serenity) < 1 or Enemies() > 1 and Enemies() < 5 Spell(fists_of_fury)
+ if BuffPresent(bloodlust) and PreviousGCDSpell(rising_sun_kick) or BuffRemaining(serenity) < 1 or Enemies() > 1 and Enemies() < 5 Spell(fists_of_fury)
  #spinning_crane_kick,if=!prev_gcd.1.spinning_crane_kick&(active_enemies>=3|(active_enemies=2&prev_gcd.1.blackout_kick))
  if not PreviousGCDSpell(spinning_crane_kick) and { Enemies() >= 3 or Enemies() == 2 and PreviousGCDSpell(blackout_kick_windwalker) } Spell(spinning_crane_kick)
  #blackout_kick,target_if=min:debuff.mark_of_the_crane.remains
@@ -885,7 +971,7 @@ AddFunction WindwalkerSerenityShortCdActions
 
 AddFunction WindwalkerSerenityShortCdPostConditions
 {
- { Enemies() < 3 or PreviousGCDSpell(spinning_crane_kick) } and Spell(rising_sun_kick) or { BuffPresent(burst_haste_buff any=1) and PreviousGCDSpell(rising_sun_kick) or BuffRemaining(serenity) < 1 or Enemies() > 1 and Enemies() < 5 } and Spell(fists_of_fury) or not PreviousGCDSpell(spinning_crane_kick) and { Enemies() >= 3 or Enemies() == 2 and PreviousGCDSpell(blackout_kick_windwalker) } and Spell(spinning_crane_kick) or Spell(blackout_kick_windwalker)
+ { Enemies() < 3 or PreviousGCDSpell(spinning_crane_kick) } and Spell(rising_sun_kick) or { BuffPresent(bloodlust) and PreviousGCDSpell(rising_sun_kick) or BuffRemaining(serenity) < 1 or Enemies() > 1 and Enemies() < 5 } and Spell(fists_of_fury) or not PreviousGCDSpell(spinning_crane_kick) and { Enemies() >= 3 or Enemies() == 2 and PreviousGCDSpell(blackout_kick_windwalker) } and Spell(spinning_crane_kick) or Spell(blackout_kick_windwalker)
 }
 
 AddFunction WindwalkerSerenityCdActions
@@ -894,7 +980,7 @@ AddFunction WindwalkerSerenityCdActions
 
 AddFunction WindwalkerSerenityCdPostConditions
 {
- { Enemies() < 3 or PreviousGCDSpell(spinning_crane_kick) } and Spell(rising_sun_kick) or { BuffPresent(burst_haste_buff any=1) and PreviousGCDSpell(rising_sun_kick) or BuffRemaining(serenity) < 1 or Enemies() > 1 and Enemies() < 5 } and Spell(fists_of_fury) or not PreviousGCDSpell(spinning_crane_kick) and { Enemies() >= 3 or Enemies() == 2 and PreviousGCDSpell(blackout_kick_windwalker) } and Spell(spinning_crane_kick) or Spell(blackout_kick_windwalker)
+ { Enemies() < 3 or PreviousGCDSpell(spinning_crane_kick) } and Spell(rising_sun_kick) or { BuffPresent(bloodlust) and PreviousGCDSpell(rising_sun_kick) or BuffRemaining(serenity) < 1 or Enemies() > 1 and Enemies() < 5 } and Spell(fists_of_fury) or not PreviousGCDSpell(spinning_crane_kick) and { Enemies() >= 3 or Enemies() == 2 and PreviousGCDSpell(blackout_kick_windwalker) } and Spell(spinning_crane_kick) or Spell(blackout_kick_windwalker)
 }
 
 ### actions.precombat
@@ -927,7 +1013,7 @@ AddFunction WindwalkerPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_bursting_blood usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
 }
 
 AddFunction WindwalkerPrecombatCdPostConditions
@@ -935,31 +1021,93 @@ AddFunction WindwalkerPrecombatCdPostConditions
  { not Talent(serenity_talent) or not Talent(fist_of_the_white_tiger_talent) } and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or Spell(chi_wave)
 }
 
+### actions.essences
+
+AddFunction WindwalkerEssencesMainActions
+{
+ #concentrated_flame
+ Spell(concentrated_flame_essence)
+ #focused_azerite_beam
+ Spell(focused_azerite_beam)
+}
+
+AddFunction WindwalkerEssencesMainPostConditions
+{
+}
+
+AddFunction WindwalkerEssencesShortCdActions
+{
+ unless Spell(concentrated_flame_essence) or Spell(focused_azerite_beam)
+ {
+  #purifying_blast
+  Spell(purifying_blast)
+  #the_unbound_force
+  Spell(the_unbound_force)
+  #ripple_in_space
+  Spell(ripple_in_space_essence)
+  #worldvein_resonance
+  Spell(worldvein_resonance_essence)
+ }
+}
+
+AddFunction WindwalkerEssencesShortCdPostConditions
+{
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam)
+}
+
+AddFunction WindwalkerEssencesCdActions
+{
+ unless Spell(concentrated_flame_essence)
+ {
+  #blood_of_the_enemy
+  Spell(blood_of_the_enemy)
+  #guardian_of_azeroth
+  Spell(guardian_of_azeroth)
+
+  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+  {
+   #memory_of_lucid_dreams,if=energy<40&buff.storm_earth_and_fire.up
+   if Energy() < 40 and BuffPresent(storm_earth_and_fire) Spell(memory_of_lucid_dreams_essence)
+  }
+ }
+}
+
+AddFunction WindwalkerEssencesCdPostConditions
+{
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+}
+
 ### actions.cd
 
 AddFunction WindwalkerCdMainActions
 {
+ #call_action_list,name=essences
+ WindwalkerEssencesMainActions()
 }
 
 AddFunction WindwalkerCdMainPostConditions
 {
+ WindwalkerEssencesMainPostConditions()
 }
 
 AddFunction WindwalkerCdShortCdActions
 {
  #serenity,if=cooldown.rising_sun_kick.remains<=2|target.time_to_die<=12
  if SpellCooldown(rising_sun_kick) <= 2 or target.TimeToDie() <= 12 Spell(serenity)
+ #call_action_list,name=essences
+ WindwalkerEssencesShortCdActions()
 }
 
 AddFunction WindwalkerCdShortCdPostConditions
 {
+ WindwalkerEssencesShortCdPostConditions()
 }
 
 AddFunction WindwalkerCdCdActions
 {
  #invoke_xuen_the_white_tiger
  Spell(invoke_xuen_the_white_tiger)
- #use_item,name=lustrous_golden_plumage
+ #use_item,name=variable_intensity_gigavolt_oscillating_reactor
  WindwalkerUseItemActions()
  #blood_fury
  Spell(blood_fury_apsp)
@@ -977,11 +1125,17 @@ AddFunction WindwalkerCdCdActions
  if target.TimeToDie() > 9 and { not CheckBoxOn(opt_touch_of_death_on_elite_only) or not UnitInRaid() and target.Classification(elite) or target.Classification(worldboss) or not BuffExpires(hidden_masters_forbidden_touch_buff) } Spell(touch_of_death)
  #storm_earth_and_fire,if=cooldown.storm_earth_and_fire.charges=2|(cooldown.fists_of_fury.remains<=6&chi>=3&cooldown.rising_sun_kick.remains<=1)|target.time_to_die<=15
  if { SpellCharges(storm_earth_and_fire) == 2 or SpellCooldown(fists_of_fury) <= 6 and Chi() >= 3 and SpellCooldown(rising_sun_kick) <= 1 or target.TimeToDie() <= 15 } and CheckBoxOn(opt_storm_earth_and_fire) and not BuffPresent(storm_earth_and_fire_buff) Spell(storm_earth_and_fire)
+
+ unless { SpellCooldown(rising_sun_kick) <= 2 or target.TimeToDie() <= 12 } and Spell(serenity)
+ {
+  #call_action_list,name=essences
+  WindwalkerEssencesCdActions()
+ }
 }
 
 AddFunction WindwalkerCdCdPostConditions
 {
- { SpellCooldown(rising_sun_kick) <= 2 or target.TimeToDie() <= 12 } and Spell(serenity)
+ { SpellCooldown(rising_sun_kick) <= 2 or target.TimeToDie() <= 12 } and Spell(serenity) or WindwalkerEssencesCdPostConditions()
 }
 
 ### actions.aoe
@@ -998,6 +1152,8 @@ AddFunction WindwalkerAoeMainActions
  if BuffExpires(rushing_jade_wind_windwalker_buff) Spell(rushing_jade_wind)
  #spinning_crane_kick,if=!prev_gcd.1.spinning_crane_kick&(((chi>3|cooldown.fists_of_fury.remains>6)&(chi>=5|cooldown.fists_of_fury.remains>2))|energy.time_to_max<=3)
  if not PreviousGCDSpell(spinning_crane_kick) and { { Chi() > 3 or SpellCooldown(fists_of_fury) > 6 } and { Chi() >= 5 or SpellCooldown(fists_of_fury) > 2 } or TimeToMaxEnergy() <= 3 } Spell(spinning_crane_kick)
+ #reverse_harm,if=chi.max-chi>=2
+ if MaxChi() - Chi() >= 2 Spell(reverse_harm)
  #chi_burst,if=chi<=3
  if Chi() <= 3 and CheckBoxOn(opt_chi_burst) Spell(chi_burst)
  #fist_of_the_white_tiger,if=chi.max-chi>=3
@@ -1027,7 +1183,7 @@ AddFunction WindwalkerAoeShortCdActions
 
 AddFunction WindwalkerAoeShortCdPostConditions
 {
- Talent(whirling_dragon_punch_talent) and SpellCooldown(whirling_dragon_punch) < 5 and SpellCooldown(fists_of_fury) > 3 and Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or TimeToMaxEnergy() > 3 and Spell(fists_of_fury) or BuffExpires(rushing_jade_wind_windwalker_buff) and Spell(rushing_jade_wind) or not PreviousGCDSpell(spinning_crane_kick) and { { Chi() > 3 or SpellCooldown(fists_of_fury) > 6 } and { Chi() >= 5 or SpellCooldown(fists_of_fury) > 2 } or TimeToMaxEnergy() <= 3 } and Spell(spinning_crane_kick) or Chi() <= 3 and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or MaxChi() - Chi() >= 3 and Spell(fist_of_the_white_tiger) or MaxChi() - Chi() >= 2 and { not Talent(hit_combo_talent) or not PreviousGCDSpell(tiger_palm) } and Spell(tiger_palm) or Spell(chi_wave) or BuffExpires(blackout_kick_buff) and CheckBoxOn(opt_flying_serpent_kick) and Spell(flying_serpent_kick) or not PreviousGCDSpell(blackout_kick_windwalker) and { BuffPresent(blackout_kick_buff) or Talent(hit_combo_talent) and PreviousGCDSpell(tiger_palm) and Chi() < 4 } and Spell(blackout_kick_windwalker)
+ Talent(whirling_dragon_punch_talent) and SpellCooldown(whirling_dragon_punch) < 5 and SpellCooldown(fists_of_fury) > 3 and Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or TimeToMaxEnergy() > 3 and Spell(fists_of_fury) or BuffExpires(rushing_jade_wind_windwalker_buff) and Spell(rushing_jade_wind) or not PreviousGCDSpell(spinning_crane_kick) and { { Chi() > 3 or SpellCooldown(fists_of_fury) > 6 } and { Chi() >= 5 or SpellCooldown(fists_of_fury) > 2 } or TimeToMaxEnergy() <= 3 } and Spell(spinning_crane_kick) or MaxChi() - Chi() >= 2 and Spell(reverse_harm) or Chi() <= 3 and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or MaxChi() - Chi() >= 3 and Spell(fist_of_the_white_tiger) or MaxChi() - Chi() >= 2 and { not Talent(hit_combo_talent) or not PreviousGCDSpell(tiger_palm) } and Spell(tiger_palm) or Spell(chi_wave) or BuffExpires(blackout_kick_buff) and CheckBoxOn(opt_flying_serpent_kick) and Spell(flying_serpent_kick) or not PreviousGCDSpell(blackout_kick_windwalker) and { BuffPresent(blackout_kick_buff) or Talent(hit_combo_talent) and PreviousGCDSpell(tiger_palm) and Chi() < 4 } and Spell(blackout_kick_windwalker)
 }
 
 AddFunction WindwalkerAoeCdActions
@@ -1036,7 +1192,7 @@ AddFunction WindwalkerAoeCdActions
 
 AddFunction WindwalkerAoeCdPostConditions
 {
- Talent(whirling_dragon_punch_talent) and SpellCooldown(whirling_dragon_punch) < 5 and SpellCooldown(fists_of_fury) > 3 and Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or not PreviousGCDSpell(tiger_palm) and Chi() <= 1 and Energy() < 50 and Spell(energizing_elixir) or TimeToMaxEnergy() > 3 and Spell(fists_of_fury) or BuffExpires(rushing_jade_wind_windwalker_buff) and Spell(rushing_jade_wind) or not PreviousGCDSpell(spinning_crane_kick) and { { Chi() > 3 or SpellCooldown(fists_of_fury) > 6 } and { Chi() >= 5 or SpellCooldown(fists_of_fury) > 2 } or TimeToMaxEnergy() <= 3 } and Spell(spinning_crane_kick) or Chi() <= 3 and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or MaxChi() - Chi() >= 3 and Spell(fist_of_the_white_tiger) or MaxChi() - Chi() >= 2 and { not Talent(hit_combo_talent) or not PreviousGCDSpell(tiger_palm) } and Spell(tiger_palm) or Spell(chi_wave) or BuffExpires(blackout_kick_buff) and CheckBoxOn(opt_flying_serpent_kick) and Spell(flying_serpent_kick) or not PreviousGCDSpell(blackout_kick_windwalker) and { BuffPresent(blackout_kick_buff) or Talent(hit_combo_talent) and PreviousGCDSpell(tiger_palm) and Chi() < 4 } and Spell(blackout_kick_windwalker)
+ Talent(whirling_dragon_punch_talent) and SpellCooldown(whirling_dragon_punch) < 5 and SpellCooldown(fists_of_fury) > 3 and Spell(rising_sun_kick) or SpellCooldown(fists_of_fury) > 0 and SpellCooldown(rising_sun_kick) > 0 and Spell(whirling_dragon_punch) or not PreviousGCDSpell(tiger_palm) and Chi() <= 1 and Energy() < 50 and Spell(energizing_elixir) or TimeToMaxEnergy() > 3 and Spell(fists_of_fury) or BuffExpires(rushing_jade_wind_windwalker_buff) and Spell(rushing_jade_wind) or not PreviousGCDSpell(spinning_crane_kick) and { { Chi() > 3 or SpellCooldown(fists_of_fury) > 6 } and { Chi() >= 5 or SpellCooldown(fists_of_fury) > 2 } or TimeToMaxEnergy() <= 3 } and Spell(spinning_crane_kick) or MaxChi() - Chi() >= 2 and Spell(reverse_harm) or Chi() <= 3 and CheckBoxOn(opt_chi_burst) and Spell(chi_burst) or MaxChi() - Chi() >= 3 and Spell(fist_of_the_white_tiger) or MaxChi() - Chi() >= 2 and { not Talent(hit_combo_talent) or not PreviousGCDSpell(tiger_palm) } and Spell(tiger_palm) or Spell(chi_wave) or BuffExpires(blackout_kick_buff) and CheckBoxOn(opt_flying_serpent_kick) and Spell(flying_serpent_kick) or not PreviousGCDSpell(blackout_kick_windwalker) and { BuffPresent(blackout_kick_buff) or Talent(hit_combo_talent) and PreviousGCDSpell(tiger_palm) and Chi() < 4 } and Spell(blackout_kick_windwalker)
 }
 
 ### actions.default
@@ -1115,7 +1271,7 @@ AddFunction WindwalkerDefaultCdActions
  unless CheckBoxOn(opt_touch_of_karma) and Spell(touch_of_karma)
  {
   #potion,if=buff.serenity.up|buff.storm_earth_and_fire.up|(!talent.serenity.enabled&trinket.proc.agility.react)|buff.bloodlust.react|target.time_to_die<=60
-  if { BuffPresent(serenity) or BuffPresent(storm_earth_and_fire) or not Talent(serenity_talent) and BuffPresent(trinket_proc_agility_buff) or BuffPresent(burst_haste_buff any=1) or target.TimeToDie() <= 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_bursting_blood usable=1)
+  if { BuffPresent(serenity) or BuffPresent(storm_earth_and_fire) or not Talent(serenity_talent) and BuffPresent(trinket_proc_agility_buff) or BuffPresent(bloodlust) or target.TimeToDie() <= 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
   #call_action_list,name=serenity,if=buff.serenity.up
   if BuffPresent(serenity) WindwalkerSerenityCdActions()
 
@@ -1209,8 +1365,11 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # blackout_kick_buff
 # blackout_kick_windwalker
 # blood_fury_apsp
+# blood_of_the_enemy
+# bloodlust
 # chi_burst
 # chi_wave
+# concentrated_flame_essence
 # dance_of_chiji_buff
 # energizing_elixir
 # fireblood
@@ -1218,14 +1377,20 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # fist_of_the_white_tiger_talent
 # fists_of_fury
 # flying_serpent_kick
+# focused_azerite_beam
+# guardian_of_azeroth
 # hidden_masters_forbidden_touch_buff
 # hit_combo_talent
 # invoke_xuen_the_white_tiger
-# item_bursting_blood
+# item_unbridled_fury
 # leg_sweep
 # lights_judgment
+# memory_of_lucid_dreams_essence
 # paralysis
+# purifying_blast
 # quaking_palm
+# reverse_harm
+# ripple_in_space_essence
 # rising_sun_kick
 # rushing_jade_wind
 # rushing_jade_wind_windwalker_buff
@@ -1235,12 +1400,14 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # spinning_crane_kick
 # storm_earth_and_fire
 # swift_roundhouse_buff
+# the_unbound_force
 # tiger_palm
 # touch_of_death
 # touch_of_karma
 # war_stomp
 # whirling_dragon_punch
 # whirling_dragon_punch_talent
+# worldvein_resonance_essence
 ]]
     OvaleScripts:RegisterScript("MONK", "windwalker", name, desc, code, "script")
 end

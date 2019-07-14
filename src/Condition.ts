@@ -93,6 +93,11 @@ export function TestBoolean(a: boolean, yesno: "yes" | "no"): ConditionResult {
     }
     return undefined;
 }
+
+export function ReturnValue(value: number, origin: number, rate: number): ConditionResult {
+    return [0, INFINITY, value, origin, rate];
+}
+
 export function TestValue(start: number, ending: number, value: number, origin: number, rate: number, comparator: string, limit: number): ConditionResult {
     if (!value || !origin || !rate) {
         return undefined;

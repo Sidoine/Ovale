@@ -1,4 +1,4 @@
-local __exports = LibStub:NewLibrary("ovale/Future", 80000)
+local __exports = LibStub:NewLibrary("ovale/Future", 80201)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Debug = LibStub:GetLibrary("ovale/Debug")
@@ -776,14 +776,14 @@ __exports.OvaleFutureClass = __class(OvaleFutureBase, {
         if spellcast.offgcd then
             self:Debug("    Caching spell %s (%d) as most recent off-GCD spellcast.", spellcast.spellName, spellcast.spellId)
             for k, v in kpairs(spellcast) do
-                self.current.lastOffGCDSpellcast[k] = v
+                (self.current.lastOffGCDSpellcast)[k] = v
             end
             lastSpell.lastSpellcast = self.current.lastOffGCDSpellcast
             self.next.lastOffGCDSpellcast = self.current.lastOffGCDSpellcast
         else
             self:Debug("    Caching spell %s (%d) as most recent GCD spellcast.", spellcast.spellName, spellcast.spellId)
             for k, v in kpairs(spellcast) do
-                lastSpell.lastGCDSpellcast[k] = v
+                (lastSpell.lastGCDSpellcast)[k] = v
             end
             lastSpell.lastSpellcast = lastSpell.lastGCDSpellcast
             self.next.lastGCDSpellId = lastSpell.lastGCDSpellcast.spellId

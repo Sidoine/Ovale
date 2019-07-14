@@ -1,10 +1,10 @@
-local __exports = LibStub:NewLibrary("ovale/scripts/ovale_rogue_spells", 80000)
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_rogue_spells", 80201)
 if not __exports then return end
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 __exports.register = function()
     local name = "ovale_rogue_spells"
-    local desc = "[8.1] Ovale: Rogue spells"
+    local desc = "[8.2] Ovale: Rogue spells"
     local code = [[Define(adrenaline_rush 13750)
 # Increases your Energy regeneration rate by (25 of Spell Power), your maximum Energy by (25 of Spell Power), and your attack speed by s2 for 20 seconds.
   SpellInfo(adrenaline_rush cd=180 duration=20 gcd=0.8)
@@ -51,6 +51,11 @@ Define(blood_of_the_enemy 297108)
   SpellInfo(blood_of_the_enemy cd=120 duration=10 channel=10)
   # You have a w2 increased chance to be Critically Hit by the caster.
   SpellAddTargetDebuff(blood_of_the_enemy blood_of_the_enemy=1)
+Define(bloodlust 2825)
+# Increases Haste by (25 of Spell Power) for all party and raid members for 40 seconds.rnrnAllies receiving this effect will become Sated and unable to benefit from Bloodlust or Time Warp again for 600 seconds.
+  SpellInfo(bloodlust cd=300 duration=40 channel=40 gcd=0 offgcd=1)
+  # Haste increased by s1.
+  SpellAddBuff(bloodlust bloodlust=1)
 Define(cheap_shot 1833)
 # Stuns the target for 4 seconds.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
   SpellInfo(cheap_shot energy=40 duration=4 gcd=1 combopoints=-2)
@@ -131,6 +136,10 @@ Define(killing_spree 51690)
   SpellInfo(killing_spree cd=120 duration=2 gcd=1 tick=0.4 talent=killing_spree_talent)
   # Attacking an enemy every t1 sec.
   SpellAddBuff(killing_spree killing_spree=1)
+Define(lifeblood_buff 274419)
+# When you use a Healthstone, gain s1 Leech for 20 seconds.
+  SpellInfo(lifeblood_buff channel=-0.001 gcd=0 offgcd=1)
+
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
@@ -187,6 +196,11 @@ Define(rupture 1943)
 Define(secret_technique 280719)
 # Finishing move that creates shadow clones of yourself. You and your shadow clones each perform a piercing attack on all enemies near your target, dealing Physical damage to the primary target and reduced damage to other targets.rn   1 point  : 280720m1*1*<mult> total damagern   2 points: 280720m1*2*<mult> total damagern   3 points: 280720m1*3*<mult> total damagern   4 points: 280720m1*4*<mult> total damagern   5 points: 280720m1*5*<mult> total damage?s193531[rn   6 points: 280720m1*6*<mult> total damage][]rnrnCooldown is reduced by by s5 sec for every combo point you spend.
   SpellInfo(secret_technique energy=30 combopoints=1 cd=45 gcd=1 talent=secret_technique_talent)
+Define(seething_rage 297126)
+# Increases your critical hit damage by 297126m for 5 seconds.
+  SpellInfo(seething_rage duration=5 gcd=0 offgcd=1)
+  # Critical strike damage increased by w1.
+  SpellAddBuff(seething_rage seething_rage=1)
 Define(shadow_blades 121471)
 # Draws upon surrounding shadows to empower your weapons, causing your combo point generating abilities to generate s2 additional combo point and deal s1 additional damage as Shadow for 20 seconds.
   SpellInfo(shadow_blades cd=180 duration=20 gcd=1)
@@ -260,7 +274,8 @@ Define(toxic_blade_debuff 245389)
 Define(vanish 1856)
 # Allows you to vanish from sight, entering stealth while in combat. For the first 3 seconds after vanishing, damage and harmful effects received will not break stealth. Also breaks movement impairing effects.
   SpellInfo(vanish cd=120 channel=0 gcd=0 offgcd=1 combopoints=0)
-
+  # Improved stealth.
+  SpellAddBuff(vanish vanish=1)
 Define(vendetta 79140)
 # Marks an enemy for death for 20 seconds, increasing the damage your abilities and auto attacks deal to the target by s1, and making the target visible to you even through concealments such as stealth and invisibility.rnrnGenerates 256495s1*3 seconds/5 Energy over 3 seconds.
   SpellInfo(vendetta cd=120 duration=20 gcd=1)
@@ -321,6 +336,7 @@ Define(weaponmaster_talent 1) #19233
 # Shadowstrike and Backstab have a s1 chance to hit the target twice each time they deal damage.
 Define(double_dose_trait 273007)
 Define(echoing_blades_trait 287649)
+Define(scent_of_blood_trait 277679)
 Define(shrouded_suffocation_trait 278666)
 Define(ace_up_your_sleeve_trait 278676)
 Define(deadshot_trait 272935)

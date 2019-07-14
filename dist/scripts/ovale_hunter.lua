@@ -1,10 +1,10 @@
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
 local OvaleScripts = __Scripts.OvaleScripts
 do
-    local name = "sc_pr_hunter_beast_mastery"
-    local desc = "[8.2] Simulationcraft: PR_Hunter_Beast_Mastery"
+    local name = "sc_t23_hunter_beast_mastery"
+    local desc = "[8.2] Simulationcraft: T23_Hunter_Beast_Mastery"
     local code = [[
-# Based on SimulationCraft profile "PR_Hunter_Beast_Mastery".
+# Based on SimulationCraft profile "T23_Hunter_Beast_Mastery".
 #	class=hunter
 #	spec=beast_mastery
 #	talents=1303011
@@ -87,8 +87,8 @@ AddFunction BeastmasteryStShortCdActions
 
    unless Spell(concentrated_flame_essence)
    {
-    #the_unbound_force
-    Spell(the_unbound_force)
+    #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
+    if BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 Spell(the_unbound_force)
     #barrage
     Spell(barrage)
 
@@ -130,7 +130,7 @@ AddFunction BeastmasteryStCdActions
 
 AddFunction BeastmasteryStCdPostConditions
 {
- { pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() or SpellFullRecharge(barbed_shot) < GCD() and SpellCooldown(bestial_wrath) > 0 or HasAzeriteTrait(primal_instincts_trait) and SpellCooldown(aspect_of_the_wild) < GCD() } and Spell(barbed_shot) or Spell(a_murder_of_crows) or { SpellCooldown(aspect_of_the_wild) > 20 or target.TimeToDie() < 15 } and Spell(bestial_wrath) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(chimaera_shot) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or AzeriteTraitRank(dance_of_death_trait) > 1 and BuffExpires(dance_of_death_buff) and SpellCritChance() > 40 or target.TimeToDie() < 9 } and Spell(barbed_shot) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(concentrated_flame_essence) or Spell(the_unbound_force) or Spell(barrage) or { Focus() - PowerCost(cobra_shot) + FocusRegenRate() * { SpellCooldown(kill_command) - 1 } > PowerCost(kill_command) or SpellCooldown(kill_command) > 1 + GCD() or BuffPresent(memory_of_lucid_dreams_essence_buff) } and SpellCooldown(kill_command) > 1 and Spell(cobra_shot) or Spell(spitting_cobra) or Charges(barbed_shot count=0) > 1.4 and Spell(barbed_shot)
+ { pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() or SpellFullRecharge(barbed_shot) < GCD() and SpellCooldown(bestial_wrath) > 0 or HasAzeriteTrait(primal_instincts_trait) and SpellCooldown(aspect_of_the_wild) < GCD() } and Spell(barbed_shot) or Spell(a_murder_of_crows) or { SpellCooldown(aspect_of_the_wild) > 20 or target.TimeToDie() < 15 } and Spell(bestial_wrath) or pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(chimaera_shot) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or AzeriteTraitRank(dance_of_death_trait) > 1 and BuffExpires(dance_of_death_buff) and SpellCritChance() > 40 or target.TimeToDie() < 9 } and Spell(barbed_shot) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(concentrated_flame_essence) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 } and Spell(the_unbound_force) or Spell(barrage) or { Focus() - PowerCost(cobra_shot) + FocusRegenRate() * { SpellCooldown(kill_command) - 1 } > PowerCost(kill_command) or SpellCooldown(kill_command) > 1 + GCD() or BuffPresent(memory_of_lucid_dreams_essence_buff) } and SpellCooldown(kill_command) > 1 and Spell(cobra_shot) or Spell(spitting_cobra) or Charges(barbed_shot count=0) > 1.4 and Spell(barbed_shot)
 }
 
 ### actions.precombat
@@ -235,8 +235,8 @@ AddFunction BeastmasteryCleaveShortCdActions
 
     unless Spell(concentrated_flame_essence)
     {
-     #the_unbound_force
-     Spell(the_unbound_force)
+     #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
+     if BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 Spell(the_unbound_force)
 
      unless HasAzeriteTrait(rapid_reload_trait) and Enemies() > 2 and Spell(multishot_bm) or SpellCooldown(kill_command) > TimeToMaxFocus() and { Enemies() < 3 or not HasAzeriteTrait(rapid_reload_trait) } and Spell(cobra_shot)
      {
@@ -273,7 +273,7 @@ AddFunction BeastmasteryCleaveCdActions
 
 AddFunction BeastmasteryCleaveCdPostConditions
 {
- pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() and Spell(barbed_shot) or GCD() - pet.BuffRemaining(pet_beast_cleave_buff) > 0.25 and Spell(multishot_bm) or SpellFullRecharge(barbed_shot) < GCD() and SpellCooldown(bestial_wrath) > 0 and Spell(barbed_shot) or { SpellCooldown(aspect_of_the_wild) > 20 or Talent(one_with_the_pack_talent) or target.TimeToDie() < 15 } and Spell(bestial_wrath) or Spell(chimaera_shot) or Spell(a_murder_of_crows) or Spell(barrage) or { Enemies() < 4 or not HasAzeriteTrait(rapid_reload_trait) } and pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or Charges(barbed_shot count=0) > 1.4 or target.TimeToDie() < 9 } and Spell(barbed_shot) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(concentrated_flame_essence) or Spell(the_unbound_force) or HasAzeriteTrait(rapid_reload_trait) and Enemies() > 2 and Spell(multishot_bm) or SpellCooldown(kill_command) > TimeToMaxFocus() and { Enemies() < 3 or not HasAzeriteTrait(rapid_reload_trait) } and Spell(cobra_shot) or Spell(spitting_cobra)
+ pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) <= GCD() and Spell(barbed_shot) or GCD() - pet.BuffRemaining(pet_beast_cleave_buff) > 0.25 and Spell(multishot_bm) or SpellFullRecharge(barbed_shot) < GCD() and SpellCooldown(bestial_wrath) > 0 and Spell(barbed_shot) or { SpellCooldown(aspect_of_the_wild) > 20 or Talent(one_with_the_pack_talent) or target.TimeToDie() < 15 } and Spell(bestial_wrath) or Spell(chimaera_shot) or Spell(a_murder_of_crows) or Spell(barrage) or { Enemies() < 4 or not HasAzeriteTrait(rapid_reload_trait) } and pet.Present() and not pet.IsIncapacitated() and not pet.IsFeared() and not pet.IsStunned() and Spell(kill_command) or Spell(dire_beast) or { pet.BuffExpires(pet_frenzy_buff) and { Charges(barbed_shot count=0) > 1.8 or BuffPresent(bestial_wrath_buff) } or SpellCooldown(aspect_of_the_wild) < BaseDuration(pet_frenzy_buff) - GCD() and HasAzeriteTrait(primal_instincts_trait) or Charges(barbed_shot count=0) > 1.4 or target.TimeToDie() < 9 } and Spell(barbed_shot) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(concentrated_flame_essence) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 } and Spell(the_unbound_force) or HasAzeriteTrait(rapid_reload_trait) and Enemies() > 2 and Spell(multishot_bm) or SpellCooldown(kill_command) > TimeToMaxFocus() and { Enemies() < 3 or not HasAzeriteTrait(rapid_reload_trait) } and Spell(cobra_shot) or Spell(spitting_cobra)
 }
 
 ### actions.cds
@@ -288,8 +288,8 @@ AddFunction BeastmasteryCdsMainPostConditions
 
 AddFunction BeastmasteryCdsShortCdActions
 {
- #worldvein_resonance
- Spell(worldvein_resonance_essence)
+ #worldvein_resonance,if=buff.lifeblood.stack<4
+ if BuffStacks(lifeblood_buff) < 4 Spell(worldvein_resonance_essence)
  #ripple_in_space
  Spell(ripple_in_space_essence)
 }
@@ -313,7 +313,7 @@ AddFunction BeastmasteryCdsCdActions
  #potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up&(target.health.pct<35|!talent.killer_instinct.enabled)|target.time_to_die<25
  if { BuffPresent(bestial_wrath_buff) and BuffPresent(aspect_of_the_wild_buff) and { target.HealthPercent() < 35 or not Talent(killer_instinct_talent) } or target.TimeToDie() < 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
 
- unless Spell(worldvein_resonance_essence)
+ unless BuffStacks(lifeblood_buff) < 4 and Spell(worldvein_resonance_essence)
  {
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
@@ -328,7 +328,7 @@ AddFunction BeastmasteryCdsCdActions
 
 AddFunction BeastmasteryCdsCdPostConditions
 {
- Spell(worldvein_resonance_essence) or Spell(ripple_in_space_essence)
+ BuffStacks(lifeblood_buff) < 4 and Spell(worldvein_resonance_essence) or Spell(ripple_in_space_essence)
 }
 
 ### actions.default
@@ -489,6 +489,7 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # item_battle_potion_of_agility
 # kill_command
 # killer_instinct_talent
+# lifeblood_buff
 # lights_judgment
 # memory_of_lucid_dreams_essence
 # memory_of_lucid_dreams_essence_buff
@@ -500,6 +501,8 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # purifying_blast
 # quaking_palm
 # rapid_reload_trait
+# reckless_force_buff
+# reckless_force_counter
 # revive_pet
 # ripple_in_space_essence
 # spitting_cobra
@@ -511,13 +514,13 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
     OvaleScripts:RegisterScript("HUNTER", "beast_mastery", name, desc, code, "script")
 end
 do
-    local name = "sc_pr_hunter_marksmanship"
-    local desc = "[8.2] Simulationcraft: PR_Hunter_Marksmanship"
+    local name = "sc_t23_hunter_marksmanship"
+    local desc = "[8.2] Simulationcraft: T23_Hunter_Marksmanship"
     local code = [[
-# Based on SimulationCraft profile "PR_Hunter_Marksmanship".
+# Based on SimulationCraft profile "T23_Hunter_Marksmanship".
 #	class=hunter
 #	spec=marksmanship
-#	talents=2103012
+#	talents=1103031
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -585,8 +588,8 @@ AddFunction MarksmanshipTrickshotsShortCdActions
 
   unless Spell(concentrated_flame_essence)
   {
-   #the_unbound_force
-   Spell(the_unbound_force)
+   #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
+   if BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 Spell(the_unbound_force)
    #piercing_shot
    Spell(piercing_shot)
    #a_murder_of_crows
@@ -611,7 +614,7 @@ AddFunction MarksmanshipTrickshotsCdActions
 
 AddFunction MarksmanshipTrickshotsCdPostConditions
 {
- Spell(barrage) or Spell(explosive_shot) or BuffPresent(trick_shots_buff) and Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } and BuffPresent(double_tap_buff) and Spell(aimed_shot) or BuffPresent(trick_shots_buff) and { HasAzeriteTrait(focused_fire_trait) or AzeriteTraitRank(in_the_rhythm_trait) > 1 or HasAzeriteTrait(surging_shots_trait) or Talent(streamline_talent) } and Spell(rapid_fire) or BuffPresent(trick_shots_buff) and { BuffExpires(precise_shots_buff) or SpellCooldown(aimed_shot) < CastTime(aimed_shot) or BuffPresent(trueshot_buff) } and Spell(aimed_shot) or BuffPresent(trick_shots_buff) and Spell(rapid_fire) or { BuffExpires(trick_shots_buff) or BuffPresent(precise_shots_buff) and not BuffPresent(trueshot_buff) or Focus() > 70 } and Spell(multishot_mm) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(concentrated_flame_essence) or Spell(the_unbound_force) or Spell(piercing_shot) or Spell(a_murder_of_crows) or target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or Spell(steady_shot)
+ Spell(barrage) or Spell(explosive_shot) or BuffPresent(trick_shots_buff) and Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } and BuffPresent(double_tap_buff) and Spell(aimed_shot) or BuffPresent(trick_shots_buff) and { HasAzeriteTrait(focused_fire_trait) or AzeriteTraitRank(in_the_rhythm_trait) > 1 or HasAzeriteTrait(surging_shots_trait) or Talent(streamline_talent) } and Spell(rapid_fire) or BuffPresent(trick_shots_buff) and { BuffExpires(precise_shots_buff) or SpellCooldown(aimed_shot) < CastTime(aimed_shot) or BuffPresent(trueshot_buff) } and Spell(aimed_shot) or BuffPresent(trick_shots_buff) and Spell(rapid_fire) or { BuffExpires(trick_shots_buff) or BuffPresent(precise_shots_buff) and not BuffPresent(trueshot_buff) or Focus() > 70 } and Spell(multishot_mm) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(concentrated_flame_essence) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 } and Spell(the_unbound_force) or Spell(piercing_shot) or Spell(a_murder_of_crows) or target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or Spell(steady_shot)
 }
 
 ### actions.st
@@ -663,8 +666,8 @@ AddFunction MarksmanshipStShortCdActions
 
    unless Spell(concentrated_flame_essence)
    {
-    #the_unbound_force
-    Spell(the_unbound_force)
+    #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
+    if BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 Spell(the_unbound_force)
    }
   }
  }
@@ -686,7 +689,7 @@ AddFunction MarksmanshipStCdActions
 
 AddFunction MarksmanshipStCdPostConditions
 {
- Spell(explosive_shot) or Enemies() > 1 and Spell(barrage) or Spell(a_murder_of_crows) or target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or { BuffExpires(trueshot_buff) or Focus() < 70 } and Spell(rapid_fire) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or { BuffPresent(trueshot_buff) or { BuffExpires(double_tap_buff) or Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } } and BuffExpires(precise_shots_buff) or SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) } and Spell(aimed_shot) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or Spell(piercing_shot) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(concentrated_flame_essence) or Spell(the_unbound_force) or BuffExpires(trueshot_buff) and { BuffPresent(precise_shots_buff) and { Focus() > 41 or BuffPresent(master_marksman_buff) } or { Focus() > 50 and HasAzeriteTrait(focused_fire_trait) or Focus() > 75 } and { SpellCooldown(trueshot) > 5 or Focus() > 80 } or target.TimeToDie() < 5 } and Spell(arcane_shot) or Spell(steady_shot)
+ Spell(explosive_shot) or Enemies() > 1 and Spell(barrage) or Spell(a_murder_of_crows) or target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or { BuffExpires(trueshot_buff) or Focus() < 70 } and Spell(rapid_fire) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or { BuffPresent(trueshot_buff) or { BuffExpires(double_tap_buff) or Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } } and BuffExpires(precise_shots_buff) or SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) } and Spell(aimed_shot) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or Spell(piercing_shot) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(concentrated_flame_essence) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 } and Spell(the_unbound_force) or BuffExpires(trueshot_buff) and { BuffPresent(precise_shots_buff) and { Focus() > 41 or BuffPresent(master_marksman_buff) } or { Focus() > 50 and HasAzeriteTrait(focused_fire_trait) or Focus() > 75 } and { SpellCooldown(trueshot) > 5 or Focus() > 80 } or target.TimeToDie() < 5 } and Spell(arcane_shot) or Spell(steady_shot)
 }
 
 ### actions.precombat
@@ -762,8 +765,8 @@ AddFunction MarksmanshipCdsShortCdActions
  {
   #double_tap,if=cooldown.rapid_fire.remains<gcd|cooldown.rapid_fire.remains<cooldown.aimed_shot.remains|target.time_to_die<20
   if SpellCooldown(rapid_fire) < GCD() or SpellCooldown(rapid_fire) < SpellCooldown(aimed_shot) or target.TimeToDie() < 20 Spell(double_tap)
-  #worldvein_resonance
-  Spell(worldvein_resonance_essence)
+  #worldvein_resonance,if=buff.lifeblood.stack<4
+  if BuffStacks(lifeblood_buff) < 4 Spell(worldvein_resonance_essence)
   #ripple_in_space,if=cooldown.trueshot.remains<7
   if SpellCooldown(trueshot) < 7 Spell(ripple_in_space_essence)
  }
@@ -789,7 +792,7 @@ AddFunction MarksmanshipCdsCdActions
   #lights_judgment
   Spell(lights_judgment)
 
-  unless Spell(worldvein_resonance_essence)
+  unless BuffStacks(lifeblood_buff) < 4 and Spell(worldvein_resonance_essence)
   {
    #guardian_of_azeroth,if=cooldown.trueshot.remains<15
    if SpellCooldown(trueshot) < 15 Spell(guardian_of_azeroth)
@@ -799,7 +802,7 @@ AddFunction MarksmanshipCdsCdActions
     #memory_of_lucid_dreams
     Spell(memory_of_lucid_dreams_essence)
     #potion,if=buff.trueshot.react&buff.bloodlust.react|buff.trueshot.up&ca_execute|target.time_to_die<25
-    if { BuffPresent(trueshot_buff) and BuffPresent(burst_haste_buff any=1) or BuffPresent(trueshot_buff) and Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } or target.TimeToDie() < 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
+    if { BuffPresent(trueshot_buff) and BuffPresent(bloodlust) or BuffPresent(trueshot_buff) and Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } or target.TimeToDie() < 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
     #trueshot,if=focus>60&(buff.precise_shots.down&cooldown.rapid_fire.remains&target.time_to_die>cooldown.trueshot.duration_guess+duration|target.health.pct<20|!talent.careful_aim.enabled)|target.time_to_die<15
     if Focus() > 60 and { BuffExpires(precise_shots_buff) and SpellCooldown(rapid_fire) > 0 and target.TimeToDie() > 0 + BaseDuration(trueshot) or target.HealthPercent() < 20 or not Talent(careful_aim_talent) } or target.TimeToDie() < 15 Spell(trueshot)
    }
@@ -809,7 +812,7 @@ AddFunction MarksmanshipCdsCdActions
 
 AddFunction MarksmanshipCdsCdPostConditions
 {
- target.DebuffExpires(hunters_mark_debuff) and not BuffPresent(trueshot_buff) and Spell(hunters_mark) or { SpellCooldown(rapid_fire) < GCD() or SpellCooldown(rapid_fire) < SpellCooldown(aimed_shot) or target.TimeToDie() < 20 } and Spell(double_tap) or Spell(worldvein_resonance_essence) or SpellCooldown(trueshot) < 7 and Spell(ripple_in_space_essence)
+ target.DebuffExpires(hunters_mark_debuff) and not BuffPresent(trueshot_buff) and Spell(hunters_mark) or { SpellCooldown(rapid_fire) < GCD() or SpellCooldown(rapid_fire) < SpellCooldown(aimed_shot) or target.TimeToDie() < 20 } and Spell(double_tap) or BuffStacks(lifeblood_buff) < 4 and Spell(worldvein_resonance_essence) or SpellCooldown(trueshot) < 7 and Spell(ripple_in_space_essence)
 }
 
 ### actions.default
@@ -956,6 +959,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # berserking
 # blood_fury_ap
 # blood_of_the_enemy
+# bloodlust
 # calling_the_shots_talent
 # careful_aim_talent
 # concentrated_flame_essence
@@ -971,6 +975,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # hunters_mark_debuff
 # in_the_rhythm_trait
 # item_battle_potion_of_agility
+# lifeblood_buff
 # lights_judgment
 # master_marksman_buff
 # memory_of_lucid_dreams_essence
@@ -981,6 +986,8 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # purifying_blast
 # quaking_palm
 # rapid_fire
+# reckless_force_buff
+# reckless_force_counter
 # ripple_in_space_essence
 # serpent_sting_mm
 # serpent_sting_mm_debuff
@@ -997,13 +1004,13 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
     OvaleScripts:RegisterScript("HUNTER", "marksmanship", name, desc, code, "script")
 end
 do
-    local name = "sc_pr_hunter_survival"
-    local desc = "[8.2] Simulationcraft: PR_Hunter_Survival"
+    local name = "sc_t23_hunter_survival"
+    local desc = "[8.2] Simulationcraft: T23_Hunter_Survival"
     local code = [[
-# Based on SimulationCraft profile "PR_Hunter_Survival".
+# Based on SimulationCraft profile "T23_Hunter_Survival".
 #	class=hunter
 #	spec=survival
-#	talents=3101022
+#	talents=1101021
 
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -1138,8 +1145,10 @@ AddFunction SurvivalStMainActions
  if BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } Spell(raptor_strike)
  #mongoose_bite,if=buff.coordinated_assault.up&(buff.coordinated_assault.remains<1.5*gcd|buff.blur_of_talons.up&buff.blur_of_talons.remains<1.5*gcd)
  if BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } Spell(mongoose_bite)
- #wildfire_bomb,if=focus+cast_regen<focus.max&!ticking&(full_recharge_time<1.5*gcd|!dot.wildfire_bomb.ticking&!buff.coordinated_assault.up)
- if Focus() + FocusCastingRegen(wildfire_bomb) < MaxFocus() and not target.DebuffPresent(wildfire_bomb_debuff) and { SpellFullRecharge(wildfire_bomb) < 1.5 * GCD() or not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(coordinated_assault_buff) } Spell(wildfire_bomb)
+ #kill_command,if=focus+cast_regen<focus.max
+ if Focus() + FocusCastingRegen(kill_command_survival) < MaxFocus() Spell(kill_command_survival)
+ #wildfire_bomb,if=focus+cast_regen<focus.max&!ticking&!buff.memory_of_lucid_dreams.up&(full_recharge_time<1.5*gcd|!dot.wildfire_bomb.ticking&!buff.coordinated_assault.up)
+ if Focus() + FocusCastingRegen(wildfire_bomb) < MaxFocus() and not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and { SpellFullRecharge(wildfire_bomb) < 1.5 * GCD() or not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(coordinated_assault_buff) } Spell(wildfire_bomb)
  #mongoose_bite,if=buff.mongoose_fury.stack>5&!cooldown.coordinated_assault.remains
  if BuffStacks(mongoose_fury_buff) > 5 and not SpellCooldown(coordinated_assault) > 0 Spell(mongoose_bite)
  #serpent_sting,if=buff.vipers_venom.up&dot.serpent_sting.remains<4*gcd|dot.serpent_sting.refreshable&!buff.coordinated_assault.up
@@ -1165,12 +1174,12 @@ AddFunction SurvivalStShortCdActions
   #flanking_strike,if=focus+cast_regen<focus.max
   if Focus() + FocusCastingRegen(flanking_strike) < MaxFocus() Spell(flanking_strike)
 
-  unless BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(raptor_strike) or BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(mongoose_bite)
+  unless BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(raptor_strike) or BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(mongoose_bite) or Focus() + FocusCastingRegen(kill_command_survival) < MaxFocus() and Spell(kill_command_survival)
   {
    #steel_trap,if=focus+cast_regen<focus.max
    if Focus() + FocusCastingRegen(steel_trap) < MaxFocus() Spell(steel_trap)
 
-   unless Focus() + FocusCastingRegen(wildfire_bomb) < MaxFocus() and not target.DebuffPresent(wildfire_bomb_debuff) and { SpellFullRecharge(wildfire_bomb) < 1.5 * GCD() or not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(coordinated_assault_buff) } and Spell(wildfire_bomb) or BuffStacks(mongoose_fury_buff) > 5 and not SpellCooldown(coordinated_assault) > 0 and Spell(mongoose_bite) or { BuffPresent(vipers_venom_buff) and target.DebuffRemaining(serpent_sting_sv_debuff) < 4 * GCD() or target.DebuffRefreshable(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) } and Spell(serpent_sting_sv)
+   unless Focus() + FocusCastingRegen(wildfire_bomb) < MaxFocus() and not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and { SpellFullRecharge(wildfire_bomb) < 1.5 * GCD() or not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(coordinated_assault_buff) } and Spell(wildfire_bomb) or BuffStacks(mongoose_fury_buff) > 5 and not SpellCooldown(coordinated_assault) > 0 and Spell(mongoose_bite) or { BuffPresent(vipers_venom_buff) and target.DebuffRemaining(serpent_sting_sv_debuff) < 4 * GCD() or target.DebuffRefreshable(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) } and Spell(serpent_sting_sv)
    {
     #a_murder_of_crows,if=!buff.coordinated_assault.up
     if not BuffPresent(coordinated_assault_buff) Spell(a_murder_of_crows)
@@ -1181,12 +1190,12 @@ AddFunction SurvivalStShortCdActions
 
 AddFunction SurvivalStShortCdPostConditions
 {
- Talent(terms_of_engagement_talent) and CheckBoxOn(opt_harpoon) and Spell(harpoon) or BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(raptor_strike) or BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(mongoose_bite) or Focus() + FocusCastingRegen(wildfire_bomb) < MaxFocus() and not target.DebuffPresent(wildfire_bomb_debuff) and { SpellFullRecharge(wildfire_bomb) < 1.5 * GCD() or not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(coordinated_assault_buff) } and Spell(wildfire_bomb) or BuffStacks(mongoose_fury_buff) > 5 and not SpellCooldown(coordinated_assault) > 0 and Spell(mongoose_bite) or { BuffPresent(vipers_venom_buff) and target.DebuffRemaining(serpent_sting_sv_debuff) < 4 * GCD() or target.DebuffRefreshable(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) } and Spell(serpent_sting_sv) or { BuffPresent(mongoose_fury_buff) or Focus() + FocusCastingRegen(mongoose_bite) > MaxFocus() - 20 and Talent(vipers_venom_talent) or Focus() + FocusCastingRegen(mongoose_bite) > MaxFocus() - 1 and Talent(terms_of_engagement_talent) or BuffPresent(coordinated_assault_buff) } and Spell(mongoose_bite) or Spell(raptor_strike) or target.DebuffRefreshable(wildfire_bomb_debuff) and Spell(wildfire_bomb) or BuffPresent(vipers_venom_buff) and Spell(serpent_sting_sv)
+ Talent(terms_of_engagement_talent) and CheckBoxOn(opt_harpoon) and Spell(harpoon) or BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(raptor_strike) or BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(mongoose_bite) or Focus() + FocusCastingRegen(kill_command_survival) < MaxFocus() and Spell(kill_command_survival) or Focus() + FocusCastingRegen(wildfire_bomb) < MaxFocus() and not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and { SpellFullRecharge(wildfire_bomb) < 1.5 * GCD() or not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(coordinated_assault_buff) } and Spell(wildfire_bomb) or BuffStacks(mongoose_fury_buff) > 5 and not SpellCooldown(coordinated_assault) > 0 and Spell(mongoose_bite) or { BuffPresent(vipers_venom_buff) and target.DebuffRemaining(serpent_sting_sv_debuff) < 4 * GCD() or target.DebuffRefreshable(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) } and Spell(serpent_sting_sv) or { BuffPresent(mongoose_fury_buff) or Focus() + FocusCastingRegen(mongoose_bite) > MaxFocus() - 20 and Talent(vipers_venom_talent) or Focus() + FocusCastingRegen(mongoose_bite) > MaxFocus() - 1 and Talent(terms_of_engagement_talent) or BuffPresent(coordinated_assault_buff) } and Spell(mongoose_bite) or Spell(raptor_strike) or target.DebuffRefreshable(wildfire_bomb_debuff) and Spell(wildfire_bomb) or BuffPresent(vipers_venom_buff) and Spell(serpent_sting_sv)
 }
 
 AddFunction SurvivalStCdActions
 {
- unless Talent(terms_of_engagement_talent) and CheckBoxOn(opt_harpoon) and Spell(harpoon) or Focus() + FocusCastingRegen(flanking_strike) < MaxFocus() and Spell(flanking_strike) or BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(raptor_strike) or BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(mongoose_bite) or Focus() + FocusCastingRegen(steel_trap) < MaxFocus() and Spell(steel_trap) or Focus() + FocusCastingRegen(wildfire_bomb) < MaxFocus() and not target.DebuffPresent(wildfire_bomb_debuff) and { SpellFullRecharge(wildfire_bomb) < 1.5 * GCD() or not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(coordinated_assault_buff) } and Spell(wildfire_bomb) or BuffStacks(mongoose_fury_buff) > 5 and not SpellCooldown(coordinated_assault) > 0 and Spell(mongoose_bite) or { BuffPresent(vipers_venom_buff) and target.DebuffRemaining(serpent_sting_sv_debuff) < 4 * GCD() or target.DebuffRefreshable(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) } and Spell(serpent_sting_sv) or not BuffPresent(coordinated_assault_buff) and Spell(a_murder_of_crows)
+ unless Talent(terms_of_engagement_talent) and CheckBoxOn(opt_harpoon) and Spell(harpoon) or Focus() + FocusCastingRegen(flanking_strike) < MaxFocus() and Spell(flanking_strike) or BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(raptor_strike) or BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(mongoose_bite) or Focus() + FocusCastingRegen(kill_command_survival) < MaxFocus() and Spell(kill_command_survival) or Focus() + FocusCastingRegen(steel_trap) < MaxFocus() and Spell(steel_trap) or Focus() + FocusCastingRegen(wildfire_bomb) < MaxFocus() and not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and { SpellFullRecharge(wildfire_bomb) < 1.5 * GCD() or not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(coordinated_assault_buff) } and Spell(wildfire_bomb) or BuffStacks(mongoose_fury_buff) > 5 and not SpellCooldown(coordinated_assault) > 0 and Spell(mongoose_bite) or { BuffPresent(vipers_venom_buff) and target.DebuffRemaining(serpent_sting_sv_debuff) < 4 * GCD() or target.DebuffRefreshable(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) } and Spell(serpent_sting_sv) or not BuffPresent(coordinated_assault_buff) and Spell(a_murder_of_crows)
  {
   #coordinated_assault
   Spell(coordinated_assault)
@@ -1195,7 +1204,7 @@ AddFunction SurvivalStCdActions
 
 AddFunction SurvivalStCdPostConditions
 {
- Talent(terms_of_engagement_talent) and CheckBoxOn(opt_harpoon) and Spell(harpoon) or Focus() + FocusCastingRegen(flanking_strike) < MaxFocus() and Spell(flanking_strike) or BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(raptor_strike) or BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(mongoose_bite) or Focus() + FocusCastingRegen(steel_trap) < MaxFocus() and Spell(steel_trap) or Focus() + FocusCastingRegen(wildfire_bomb) < MaxFocus() and not target.DebuffPresent(wildfire_bomb_debuff) and { SpellFullRecharge(wildfire_bomb) < 1.5 * GCD() or not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(coordinated_assault_buff) } and Spell(wildfire_bomb) or BuffStacks(mongoose_fury_buff) > 5 and not SpellCooldown(coordinated_assault) > 0 and Spell(mongoose_bite) or { BuffPresent(vipers_venom_buff) and target.DebuffRemaining(serpent_sting_sv_debuff) < 4 * GCD() or target.DebuffRefreshable(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) } and Spell(serpent_sting_sv) or not BuffPresent(coordinated_assault_buff) and Spell(a_murder_of_crows) or { BuffPresent(mongoose_fury_buff) or Focus() + FocusCastingRegen(mongoose_bite) > MaxFocus() - 20 and Talent(vipers_venom_talent) or Focus() + FocusCastingRegen(mongoose_bite) > MaxFocus() - 1 and Talent(terms_of_engagement_talent) or BuffPresent(coordinated_assault_buff) } and Spell(mongoose_bite) or Spell(raptor_strike) or target.DebuffRefreshable(wildfire_bomb_debuff) and Spell(wildfire_bomb) or BuffPresent(vipers_venom_buff) and Spell(serpent_sting_sv)
+ Talent(terms_of_engagement_talent) and CheckBoxOn(opt_harpoon) and Spell(harpoon) or Focus() + FocusCastingRegen(flanking_strike) < MaxFocus() and Spell(flanking_strike) or BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(raptor_strike) or BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(mongoose_bite) or Focus() + FocusCastingRegen(kill_command_survival) < MaxFocus() and Spell(kill_command_survival) or Focus() + FocusCastingRegen(steel_trap) < MaxFocus() and Spell(steel_trap) or Focus() + FocusCastingRegen(wildfire_bomb) < MaxFocus() and not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and { SpellFullRecharge(wildfire_bomb) < 1.5 * GCD() or not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(coordinated_assault_buff) } and Spell(wildfire_bomb) or BuffStacks(mongoose_fury_buff) > 5 and not SpellCooldown(coordinated_assault) > 0 and Spell(mongoose_bite) or { BuffPresent(vipers_venom_buff) and target.DebuffRemaining(serpent_sting_sv_debuff) < 4 * GCD() or target.DebuffRefreshable(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) } and Spell(serpent_sting_sv) or not BuffPresent(coordinated_assault_buff) and Spell(a_murder_of_crows) or { BuffPresent(mongoose_fury_buff) or Focus() + FocusCastingRegen(mongoose_bite) > MaxFocus() - 20 and Talent(vipers_venom_talent) or Focus() + FocusCastingRegen(mongoose_bite) > MaxFocus() - 1 and Talent(terms_of_engagement_talent) or BuffPresent(coordinated_assault_buff) } and Spell(mongoose_bite) or Spell(raptor_strike) or target.DebuffRefreshable(wildfire_bomb_debuff) and Spell(wildfire_bomb) or BuffPresent(vipers_venom_buff) and Spell(serpent_sting_sv)
 }
 
 ### actions.precombat
@@ -1372,8 +1381,8 @@ AddFunction SurvivalCdsCdActions
 
  unless target.Distance() >= 6 and Spell(aspect_of_the_eagle) or Spell(focused_azerite_beam)
  {
-  #memory_of_lucid_dreams,if=buff.coordinated_assault.up
-  if BuffPresent(coordinated_assault_buff) Spell(memory_of_lucid_dreams_essence)
+  #memory_of_lucid_dreams,if=focus<focus.max-30&buff.coordinated_assault.up
+  if Focus() < MaxFocus() - 30 and BuffPresent(coordinated_assault_buff) Spell(memory_of_lucid_dreams_essence)
   #blood_of_the_enemy,if=buff.coordinated_assault.up
   if BuffPresent(coordinated_assault_buff) Spell(blood_of_the_enemy)
 
@@ -1474,8 +1483,8 @@ AddFunction SurvivalApstMainActions
  if BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } Spell(raptor_strike)
  #kill_command,if=full_recharge_time<1.5*gcd&focus+cast_regen<focus.max-10
  if SpellFullRecharge(kill_command_survival) < 1.5 * GCD() and Focus() + FocusCastingRegen(kill_command_survival) < MaxFocus() - 10 Spell(kill_command_survival)
- #wildfire_bomb,if=focus+cast_regen<focus.max&!ticking&(full_recharge_time<1.5*gcd|!dot.wildfire_bomb.ticking&!buff.coordinated_assault.up)
- if Focus() + FocusCastingRegen(wildfire_bomb) < MaxFocus() and not target.DebuffPresent(wildfire_bomb_debuff) and { SpellFullRecharge(wildfire_bomb) < 1.5 * GCD() or not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(coordinated_assault_buff) } Spell(wildfire_bomb)
+ #wildfire_bomb,if=focus+cast_regen<focus.max&!ticking&!buff.memory_of_lucid_dreams.up&(full_recharge_time<1.5*gcd|!dot.wildfire_bomb.ticking&!buff.coordinated_assault.up)
+ if Focus() + FocusCastingRegen(wildfire_bomb) < MaxFocus() and not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and { SpellFullRecharge(wildfire_bomb) < 1.5 * GCD() or not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(coordinated_assault_buff) } Spell(wildfire_bomb)
  #serpent_sting,if=!dot.serpent_sting.ticking&!buff.coordinated_assault.up
  if not target.DebuffPresent(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) Spell(serpent_sting_sv)
  #kill_command,if=focus+cast_regen<focus.max&(buff.mongoose_fury.stack<5|focus<action.mongoose_bite.cost)
@@ -1506,7 +1515,7 @@ AddFunction SurvivalApstShortCdActions
    #steel_trap,if=focus+cast_regen<focus.max
    if Focus() + FocusCastingRegen(steel_trap) < MaxFocus() Spell(steel_trap)
 
-   unless Focus() + FocusCastingRegen(wildfire_bomb) < MaxFocus() and not target.DebuffPresent(wildfire_bomb_debuff) and { SpellFullRecharge(wildfire_bomb) < 1.5 * GCD() or not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(coordinated_assault_buff) } and Spell(wildfire_bomb) or not target.DebuffPresent(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) and Spell(serpent_sting_sv) or Focus() + FocusCastingRegen(kill_command_survival) < MaxFocus() and { BuffStacks(mongoose_fury_buff) < 5 or Focus() < PowerCost(mongoose_bite) } and Spell(kill_command_survival) or target.Refreshable(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) and BuffStacks(mongoose_fury_buff) < 5 and Spell(serpent_sting_sv)
+   unless Focus() + FocusCastingRegen(wildfire_bomb) < MaxFocus() and not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and { SpellFullRecharge(wildfire_bomb) < 1.5 * GCD() or not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(coordinated_assault_buff) } and Spell(wildfire_bomb) or not target.DebuffPresent(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) and Spell(serpent_sting_sv) or Focus() + FocusCastingRegen(kill_command_survival) < MaxFocus() and { BuffStacks(mongoose_fury_buff) < 5 or Focus() < PowerCost(mongoose_bite) } and Spell(kill_command_survival) or target.Refreshable(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) and BuffStacks(mongoose_fury_buff) < 5 and Spell(serpent_sting_sv)
    {
     #a_murder_of_crows,if=!buff.coordinated_assault.up
     if not BuffPresent(coordinated_assault_buff) Spell(a_murder_of_crows)
@@ -1517,12 +1526,12 @@ AddFunction SurvivalApstShortCdActions
 
 AddFunction SurvivalApstShortCdPostConditions
 {
- BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(mongoose_bite) or BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(raptor_strike) or SpellFullRecharge(kill_command_survival) < 1.5 * GCD() and Focus() + FocusCastingRegen(kill_command_survival) < MaxFocus() - 10 and Spell(kill_command_survival) or Focus() + FocusCastingRegen(wildfire_bomb) < MaxFocus() and not target.DebuffPresent(wildfire_bomb_debuff) and { SpellFullRecharge(wildfire_bomb) < 1.5 * GCD() or not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(coordinated_assault_buff) } and Spell(wildfire_bomb) or not target.DebuffPresent(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) and Spell(serpent_sting_sv) or Focus() + FocusCastingRegen(kill_command_survival) < MaxFocus() and { BuffStacks(mongoose_fury_buff) < 5 or Focus() < PowerCost(mongoose_bite) } and Spell(kill_command_survival) or target.Refreshable(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) and BuffStacks(mongoose_fury_buff) < 5 and Spell(serpent_sting_sv) or { BuffPresent(mongoose_fury_buff) or Focus() + FocusCastingRegen(mongoose_bite) > MaxFocus() - 10 or BuffPresent(coordinated_assault_buff) } and Spell(mongoose_bite) or Spell(raptor_strike) or not target.DebuffPresent(wildfire_bomb_debuff) and Spell(wildfire_bomb)
+ BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(mongoose_bite) or BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(raptor_strike) or SpellFullRecharge(kill_command_survival) < 1.5 * GCD() and Focus() + FocusCastingRegen(kill_command_survival) < MaxFocus() - 10 and Spell(kill_command_survival) or Focus() + FocusCastingRegen(wildfire_bomb) < MaxFocus() and not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and { SpellFullRecharge(wildfire_bomb) < 1.5 * GCD() or not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(coordinated_assault_buff) } and Spell(wildfire_bomb) or not target.DebuffPresent(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) and Spell(serpent_sting_sv) or Focus() + FocusCastingRegen(kill_command_survival) < MaxFocus() and { BuffStacks(mongoose_fury_buff) < 5 or Focus() < PowerCost(mongoose_bite) } and Spell(kill_command_survival) or target.Refreshable(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) and BuffStacks(mongoose_fury_buff) < 5 and Spell(serpent_sting_sv) or { BuffPresent(mongoose_fury_buff) or Focus() + FocusCastingRegen(mongoose_bite) > MaxFocus() - 10 or BuffPresent(coordinated_assault_buff) } and Spell(mongoose_bite) or Spell(raptor_strike) or not target.DebuffPresent(wildfire_bomb_debuff) and Spell(wildfire_bomb)
 }
 
 AddFunction SurvivalApstCdActions
 {
- unless BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(mongoose_bite) or BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(raptor_strike) or Focus() + FocusCastingRegen(flanking_strike) < MaxFocus() and Spell(flanking_strike) or SpellFullRecharge(kill_command_survival) < 1.5 * GCD() and Focus() + FocusCastingRegen(kill_command_survival) < MaxFocus() - 10 and Spell(kill_command_survival) or Focus() + FocusCastingRegen(steel_trap) < MaxFocus() and Spell(steel_trap) or Focus() + FocusCastingRegen(wildfire_bomb) < MaxFocus() and not target.DebuffPresent(wildfire_bomb_debuff) and { SpellFullRecharge(wildfire_bomb) < 1.5 * GCD() or not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(coordinated_assault_buff) } and Spell(wildfire_bomb) or not target.DebuffPresent(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) and Spell(serpent_sting_sv) or Focus() + FocusCastingRegen(kill_command_survival) < MaxFocus() and { BuffStacks(mongoose_fury_buff) < 5 or Focus() < PowerCost(mongoose_bite) } and Spell(kill_command_survival) or target.Refreshable(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) and BuffStacks(mongoose_fury_buff) < 5 and Spell(serpent_sting_sv) or not BuffPresent(coordinated_assault_buff) and Spell(a_murder_of_crows)
+ unless BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(mongoose_bite) or BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(raptor_strike) or Focus() + FocusCastingRegen(flanking_strike) < MaxFocus() and Spell(flanking_strike) or SpellFullRecharge(kill_command_survival) < 1.5 * GCD() and Focus() + FocusCastingRegen(kill_command_survival) < MaxFocus() - 10 and Spell(kill_command_survival) or Focus() + FocusCastingRegen(steel_trap) < MaxFocus() and Spell(steel_trap) or Focus() + FocusCastingRegen(wildfire_bomb) < MaxFocus() and not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and { SpellFullRecharge(wildfire_bomb) < 1.5 * GCD() or not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(coordinated_assault_buff) } and Spell(wildfire_bomb) or not target.DebuffPresent(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) and Spell(serpent_sting_sv) or Focus() + FocusCastingRegen(kill_command_survival) < MaxFocus() and { BuffStacks(mongoose_fury_buff) < 5 or Focus() < PowerCost(mongoose_bite) } and Spell(kill_command_survival) or target.Refreshable(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) and BuffStacks(mongoose_fury_buff) < 5 and Spell(serpent_sting_sv) or not BuffPresent(coordinated_assault_buff) and Spell(a_murder_of_crows)
  {
   #coordinated_assault
   Spell(coordinated_assault)
@@ -1531,7 +1540,7 @@ AddFunction SurvivalApstCdActions
 
 AddFunction SurvivalApstCdPostConditions
 {
- BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(mongoose_bite) or BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(raptor_strike) or Focus() + FocusCastingRegen(flanking_strike) < MaxFocus() and Spell(flanking_strike) or SpellFullRecharge(kill_command_survival) < 1.5 * GCD() and Focus() + FocusCastingRegen(kill_command_survival) < MaxFocus() - 10 and Spell(kill_command_survival) or Focus() + FocusCastingRegen(steel_trap) < MaxFocus() and Spell(steel_trap) or Focus() + FocusCastingRegen(wildfire_bomb) < MaxFocus() and not target.DebuffPresent(wildfire_bomb_debuff) and { SpellFullRecharge(wildfire_bomb) < 1.5 * GCD() or not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(coordinated_assault_buff) } and Spell(wildfire_bomb) or not target.DebuffPresent(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) and Spell(serpent_sting_sv) or Focus() + FocusCastingRegen(kill_command_survival) < MaxFocus() and { BuffStacks(mongoose_fury_buff) < 5 or Focus() < PowerCost(mongoose_bite) } and Spell(kill_command_survival) or target.Refreshable(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) and BuffStacks(mongoose_fury_buff) < 5 and Spell(serpent_sting_sv) or not BuffPresent(coordinated_assault_buff) and Spell(a_murder_of_crows) or { BuffPresent(mongoose_fury_buff) or Focus() + FocusCastingRegen(mongoose_bite) > MaxFocus() - 10 or BuffPresent(coordinated_assault_buff) } and Spell(mongoose_bite) or Spell(raptor_strike) or not target.DebuffPresent(wildfire_bomb_debuff) and Spell(wildfire_bomb)
+ BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(mongoose_bite) or BuffPresent(coordinated_assault_buff) and { BuffRemaining(coordinated_assault_buff) < 1.5 * GCD() or BuffPresent(blur_of_talons_buff) and BuffRemaining(blur_of_talons_buff) < 1.5 * GCD() } and Spell(raptor_strike) or Focus() + FocusCastingRegen(flanking_strike) < MaxFocus() and Spell(flanking_strike) or SpellFullRecharge(kill_command_survival) < 1.5 * GCD() and Focus() + FocusCastingRegen(kill_command_survival) < MaxFocus() - 10 and Spell(kill_command_survival) or Focus() + FocusCastingRegen(steel_trap) < MaxFocus() and Spell(steel_trap) or Focus() + FocusCastingRegen(wildfire_bomb) < MaxFocus() and not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and { SpellFullRecharge(wildfire_bomb) < 1.5 * GCD() or not target.DebuffPresent(wildfire_bomb_debuff) and not BuffPresent(coordinated_assault_buff) } and Spell(wildfire_bomb) or not target.DebuffPresent(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) and Spell(serpent_sting_sv) or Focus() + FocusCastingRegen(kill_command_survival) < MaxFocus() and { BuffStacks(mongoose_fury_buff) < 5 or Focus() < PowerCost(mongoose_bite) } and Spell(kill_command_survival) or target.Refreshable(serpent_sting_sv_debuff) and not BuffPresent(coordinated_assault_buff) and BuffStacks(mongoose_fury_buff) < 5 and Spell(serpent_sting_sv) or not BuffPresent(coordinated_assault_buff) and Spell(a_murder_of_crows) or { BuffPresent(mongoose_fury_buff) or Focus() + FocusCastingRegen(mongoose_bite) > MaxFocus() - 10 or BuffPresent(coordinated_assault_buff) } and Spell(mongoose_bite) or Spell(raptor_strike) or not target.DebuffPresent(wildfire_bomb_debuff) and Spell(wildfire_bomb)
 }
 
 ### actions.default
@@ -1568,10 +1577,10 @@ AddFunction SurvivalDefaultMainActions
 
       unless Enemies() < 3 and Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) and SurvivalApwfiMainPostConditions()
       {
-       #call_action_list,name=apwfi,if=active_enemies<3&!talent.alpha_predator.enabled&talent.wildfire_infusion.enabled
-       if Enemies() < 3 and not Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) SurvivalApwfiMainActions()
+       #call_action_list,name=wfi,if=active_enemies<3&!talent.alpha_predator.enabled&talent.wildfire_infusion.enabled
+       if Enemies() < 3 and not Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) SurvivalWfiMainActions()
 
-       unless Enemies() < 3 and not Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) and SurvivalApwfiMainPostConditions()
+       unless Enemies() < 3 and not Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) and SurvivalWfiMainPostConditions()
        {
         #call_action_list,name=cleave,if=active_enemies>1
         if Enemies() > 1 SurvivalCleaveMainActions()
@@ -1592,7 +1601,7 @@ AddFunction SurvivalDefaultMainActions
 
 AddFunction SurvivalDefaultMainPostConditions
 {
- SurvivalCdsMainPostConditions() or Enemies() < 3 and Talent(chakrams_talent) and Talent(alpha_predator_talent) and SurvivalApwfiMainPostConditions() or Enemies() < 3 and Talent(chakrams_talent) and SurvivalWfiMainPostConditions() or Enemies() < 3 and not Talent(alpha_predator_talent) and not Talent(wildfire_infusion_talent) and SurvivalStMainPostConditions() or Enemies() < 3 and Talent(alpha_predator_talent) and not Talent(wildfire_infusion_talent) and SurvivalApstMainPostConditions() or Enemies() < 3 and Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) and SurvivalApwfiMainPostConditions() or Enemies() < 3 and not Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) and SurvivalApwfiMainPostConditions() or Enemies() > 1 and SurvivalCleaveMainPostConditions()
+ SurvivalCdsMainPostConditions() or Enemies() < 3 and Talent(chakrams_talent) and Talent(alpha_predator_talent) and SurvivalApwfiMainPostConditions() or Enemies() < 3 and Talent(chakrams_talent) and SurvivalWfiMainPostConditions() or Enemies() < 3 and not Talent(alpha_predator_talent) and not Talent(wildfire_infusion_talent) and SurvivalStMainPostConditions() or Enemies() < 3 and Talent(alpha_predator_talent) and not Talent(wildfire_infusion_talent) and SurvivalApstMainPostConditions() or Enemies() < 3 and Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) and SurvivalApwfiMainPostConditions() or Enemies() < 3 and not Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) and SurvivalWfiMainPostConditions() or Enemies() > 1 and SurvivalCleaveMainPostConditions()
 }
 
 AddFunction SurvivalDefaultShortCdActions
@@ -1629,10 +1638,10 @@ AddFunction SurvivalDefaultShortCdActions
 
       unless Enemies() < 3 and Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) and SurvivalApwfiShortCdPostConditions()
       {
-       #call_action_list,name=apwfi,if=active_enemies<3&!talent.alpha_predator.enabled&talent.wildfire_infusion.enabled
-       if Enemies() < 3 and not Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) SurvivalApwfiShortCdActions()
+       #call_action_list,name=wfi,if=active_enemies<3&!talent.alpha_predator.enabled&talent.wildfire_infusion.enabled
+       if Enemies() < 3 and not Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) SurvivalWfiShortCdActions()
 
-       unless Enemies() < 3 and not Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) and SurvivalApwfiShortCdPostConditions()
+       unless Enemies() < 3 and not Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) and SurvivalWfiShortCdPostConditions()
        {
         #call_action_list,name=cleave,if=active_enemies>1
         if Enemies() > 1 SurvivalCleaveShortCdActions()
@@ -1647,7 +1656,7 @@ AddFunction SurvivalDefaultShortCdActions
 
 AddFunction SurvivalDefaultShortCdPostConditions
 {
- SurvivalCdsShortCdPostConditions() or Enemies() < 3 and Talent(chakrams_talent) and Talent(alpha_predator_talent) and SurvivalApwfiShortCdPostConditions() or Enemies() < 3 and Talent(chakrams_talent) and SurvivalWfiShortCdPostConditions() or Enemies() < 3 and not Talent(alpha_predator_talent) and not Talent(wildfire_infusion_talent) and SurvivalStShortCdPostConditions() or Enemies() < 3 and Talent(alpha_predator_talent) and not Talent(wildfire_infusion_talent) and SurvivalApstShortCdPostConditions() or Enemies() < 3 and Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) and SurvivalApwfiShortCdPostConditions() or Enemies() < 3 and not Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) and SurvivalApwfiShortCdPostConditions() or Enemies() > 1 and SurvivalCleaveShortCdPostConditions() or Spell(concentrated_flame_essence)
+ SurvivalCdsShortCdPostConditions() or Enemies() < 3 and Talent(chakrams_talent) and Talent(alpha_predator_talent) and SurvivalApwfiShortCdPostConditions() or Enemies() < 3 and Talent(chakrams_talent) and SurvivalWfiShortCdPostConditions() or Enemies() < 3 and not Talent(alpha_predator_talent) and not Talent(wildfire_infusion_talent) and SurvivalStShortCdPostConditions() or Enemies() < 3 and Talent(alpha_predator_talent) and not Talent(wildfire_infusion_talent) and SurvivalApstShortCdPostConditions() or Enemies() < 3 and Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) and SurvivalApwfiShortCdPostConditions() or Enemies() < 3 and not Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) and SurvivalWfiShortCdPostConditions() or Enemies() > 1 and SurvivalCleaveShortCdPostConditions() or Spell(concentrated_flame_essence)
 }
 
 AddFunction SurvivalDefaultCdActions
@@ -1685,10 +1694,10 @@ AddFunction SurvivalDefaultCdActions
 
       unless Enemies() < 3 and Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) and SurvivalApwfiCdPostConditions()
       {
-       #call_action_list,name=apwfi,if=active_enemies<3&!talent.alpha_predator.enabled&talent.wildfire_infusion.enabled
-       if Enemies() < 3 and not Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) SurvivalApwfiCdActions()
+       #call_action_list,name=wfi,if=active_enemies<3&!talent.alpha_predator.enabled&talent.wildfire_infusion.enabled
+       if Enemies() < 3 and not Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) SurvivalWfiCdActions()
 
-       unless Enemies() < 3 and not Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) and SurvivalApwfiCdPostConditions()
+       unless Enemies() < 3 and not Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) and SurvivalWfiCdPostConditions()
        {
         #call_action_list,name=cleave,if=active_enemies>1
         if Enemies() > 1 SurvivalCleaveCdActions()
@@ -1709,7 +1718,7 @@ AddFunction SurvivalDefaultCdActions
 
 AddFunction SurvivalDefaultCdPostConditions
 {
- SurvivalCdsCdPostConditions() or Enemies() < 3 and Talent(chakrams_talent) and Talent(alpha_predator_talent) and SurvivalApwfiCdPostConditions() or Enemies() < 3 and Talent(chakrams_talent) and SurvivalWfiCdPostConditions() or Enemies() < 3 and not Talent(alpha_predator_talent) and not Talent(wildfire_infusion_talent) and SurvivalStCdPostConditions() or Enemies() < 3 and Talent(alpha_predator_talent) and not Talent(wildfire_infusion_talent) and SurvivalApstCdPostConditions() or Enemies() < 3 and Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) and SurvivalApwfiCdPostConditions() or Enemies() < 3 and not Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) and SurvivalApwfiCdPostConditions() or Enemies() > 1 and SurvivalCleaveCdPostConditions() or Spell(concentrated_flame_essence)
+ SurvivalCdsCdPostConditions() or Enemies() < 3 and Talent(chakrams_talent) and Talent(alpha_predator_talent) and SurvivalApwfiCdPostConditions() or Enemies() < 3 and Talent(chakrams_talent) and SurvivalWfiCdPostConditions() or Enemies() < 3 and not Talent(alpha_predator_talent) and not Talent(wildfire_infusion_talent) and SurvivalStCdPostConditions() or Enemies() < 3 and Talent(alpha_predator_talent) and not Talent(wildfire_infusion_talent) and SurvivalApstCdPostConditions() or Enemies() < 3 and Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) and SurvivalApwfiCdPostConditions() or Enemies() < 3 and not Talent(alpha_predator_talent) and Talent(wildfire_infusion_talent) and SurvivalWfiCdPostConditions() or Enemies() > 1 and SurvivalCleaveCdPostConditions() or Spell(concentrated_flame_essence)
 }
 
 ### Survival icons.
@@ -1801,6 +1810,7 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # latent_poison
 # lights_judgment
 # memory_of_lucid_dreams_essence
+# memory_of_lucid_dreams_essence_buff
 # mongoose_bite
 # mongoose_fury_buff
 # muzzle

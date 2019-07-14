@@ -278,8 +278,10 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
 
     UpdateFrame() {
         const profile = Ovale.db.profile;
-        this.frame.SetPoint("CENTER", this.hider, "CENTER", profile.apparence.offsetX, profile.apparence.offsetY);
-        this.frame.EnableMouse(!profile.apparence.clickThru);
+        if (this.hider.IsVisible()) {
+            this.frame.SetPoint("CENTER", this.hider, "CENTER", profile.apparence.offsetX, profile.apparence.offsetY);
+            this.frame.EnableMouse(!profile.apparence.clickThru);
+        }
         this.ReleaseChildren();
         this.UpdateIcons();
         this.UpdateControls();
