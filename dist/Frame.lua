@@ -252,6 +252,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
     UpdateFrame = function(self)
         local profile = Ovale.db.profile
         if self.hider:IsVisible() then
+            self.frame:ClearAllPoints()
             self.frame:SetPoint("CENTER", self.hider, "CENTER", profile.apparence.offsetX, profile.apparence.offsetY)
             self.frame:EnableMouse( not profile.apparence.clickThru)
         end
