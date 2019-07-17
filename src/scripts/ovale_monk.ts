@@ -462,8 +462,6 @@ AddFunction WindwalkerEssencesMainActions
 {
  #concentrated_flame
  Spell(concentrated_flame_essence)
- #focused_azerite_beam
- Spell(focused_azerite_beam)
 }
 
 AddFunction WindwalkerEssencesMainPostConditions
@@ -472,7 +470,7 @@ AddFunction WindwalkerEssencesMainPostConditions
 
 AddFunction WindwalkerEssencesShortCdActions
 {
- unless Spell(concentrated_flame_essence) or Spell(focused_azerite_beam)
+ unless Spell(concentrated_flame_essence)
  {
   #purifying_blast
   Spell(purifying_blast)
@@ -487,7 +485,7 @@ AddFunction WindwalkerEssencesShortCdActions
 
 AddFunction WindwalkerEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam)
+ Spell(concentrated_flame_essence)
 }
 
 AddFunction WindwalkerEssencesCdActions
@@ -498,8 +496,10 @@ AddFunction WindwalkerEssencesCdActions
   Spell(blood_of_the_enemy)
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
+  #focused_azerite_beam
+  Spell(focused_azerite_beam_essence)
 
-  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+  unless Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
   {
    #memory_of_lucid_dreams,if=energy<40&buff.storm_earth_and_fire.up
    if Energy() < 40 and BuffPresent(storm_earth_and_fire) Spell(memory_of_lucid_dreams_essence)
@@ -509,7 +509,7 @@ AddFunction WindwalkerEssencesCdActions
 
 AddFunction WindwalkerEssencesCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+ Spell(concentrated_flame_essence) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
 }
 
 ### actions.cd
@@ -812,7 +812,7 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # fist_of_the_white_tiger_talent
 # fists_of_fury
 # flying_serpent_kick
-# focused_azerite_beam
+# focused_azerite_beam_essence
 # guardian_of_azeroth
 # hidden_masters_forbidden_touch_buff
 # hit_combo_talent
@@ -1032,8 +1032,6 @@ AddFunction WindwalkerEssencesMainActions
 {
  #concentrated_flame
  Spell(concentrated_flame_essence)
- #focused_azerite_beam
- Spell(focused_azerite_beam)
 }
 
 AddFunction WindwalkerEssencesMainPostConditions
@@ -1042,7 +1040,7 @@ AddFunction WindwalkerEssencesMainPostConditions
 
 AddFunction WindwalkerEssencesShortCdActions
 {
- unless Spell(concentrated_flame_essence) or Spell(focused_azerite_beam)
+ unless Spell(concentrated_flame_essence)
  {
   #purifying_blast
   Spell(purifying_blast)
@@ -1057,7 +1055,7 @@ AddFunction WindwalkerEssencesShortCdActions
 
 AddFunction WindwalkerEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam)
+ Spell(concentrated_flame_essence)
 }
 
 AddFunction WindwalkerEssencesCdActions
@@ -1068,8 +1066,10 @@ AddFunction WindwalkerEssencesCdActions
   Spell(blood_of_the_enemy)
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
+  #focused_azerite_beam
+  Spell(focused_azerite_beam_essence)
 
-  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+  unless Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
   {
    #memory_of_lucid_dreams,if=energy<40&buff.storm_earth_and_fire.up
    if Energy() < 40 and BuffPresent(storm_earth_and_fire) Spell(memory_of_lucid_dreams_essence)
@@ -1079,7 +1079,7 @@ AddFunction WindwalkerEssencesCdActions
 
 AddFunction WindwalkerEssencesCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+ Spell(concentrated_flame_essence) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
 }
 
 ### actions.cd
@@ -1382,7 +1382,7 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # fist_of_the_white_tiger_talent
 # fists_of_fury
 # flying_serpent_kick
-# focused_azerite_beam
+# focused_azerite_beam_essence
 # guardian_of_azeroth
 # hidden_masters_forbidden_touch_buff
 # hit_combo_talent

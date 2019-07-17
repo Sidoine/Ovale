@@ -126,10 +126,6 @@ Define(flurry 44614)
 # Unleash a flurry of ice, striking the target s1 times for a total of (31.6 of Spell Power)*m1 Frost damage. Each hit reduces the target's movement speed by 228354s1 for 1 second.rnrnWhile Brain Freeze is active, Flurry applies Winter's Chill, causing your target to take damage from your spells as if it were frozen.
   SpellInfo(flurry)
 
-Define(focused_azerite_beam 295262)
-# Reduces the cast time of Focused Azerite Beam by s1.
-  SpellInfo(focused_azerite_beam channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam=1)
 Define(frostbolt 116)
 # Launches a bolt of frost at the enemy, causing (51.1 of Spell Power) Frost damage and slowing movement speed by 205708s1 for 8 seconds.
   SpellInfo(frostbolt)

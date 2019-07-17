@@ -76,8 +76,6 @@ AddFunction ShadowSingleMainActions
  Spell(void_eruption)
  #void_bolt
  Spell(void_bolt)
- #focused_azerite_beam
- Spell(focused_azerite_beam)
  #concentrated_flame
  Spell(concentrated_flame_essence)
  #mind_sear,if=buff.harvested_thoughts.up&cooldown.void_bolt.remains>=1.5&azerite.searing_dialogue.rank>=1
@@ -113,7 +111,7 @@ AddFunction ShadowSingleShortCdActions
   #dark_ascension,if=buff.voidform.down
   if BuffExpires(voidform_shadow) Spell(dark_ascension)
 
-  unless Spell(void_bolt) or Spell(focused_azerite_beam)
+  unless Spell(void_bolt)
   {
    #purifying_blast
    Spell(purifying_blast)
@@ -145,7 +143,7 @@ AddFunction ShadowSingleShortCdActions
 
 AddFunction ShadowSingleShortCdPostConditions
 {
- Spell(void_eruption) or Spell(void_bolt) or Spell(focused_azerite_beam) or Spell(concentrated_flame_essence) or BuffPresent(harvested_thoughts_buff) and SpellCooldown(void_bolt) >= 1.5 and AzeriteTraitRank(searing_dialogue_trait) >= 1 and Spell(mind_sear) or { target.TimeToDie() < 3 or SpellCharges(shadow_word_death) == 2 or SpellCharges(shadow_word_death) == 1 and SpellCooldown(shadow_word_death) < GCD() } and Spell(shadow_word_death) or { Talent(mindbender_talent) or BuffStacks(voidform_shadow) > 18 or target.TimeToDie() < 15 } and Spell(mindbender_shadow) or { not BuffPresent(voidform_shadow) or SpellCharges(shadow_word_death) == 2 and BuffStacks(voidform_shadow) < 15 } and Spell(shadow_word_death) or dots_up() and { 600 > CastTime(mind_blast) + 0.5 and 600 < 4 or not Talent(shadow_word_void_talent) or BuffExpires(voidform_shadow) or BuffStacks(voidform_shadow) > 14 and { Insanity() < 70 or Charges(mind_blast count=0) > 1.33 } or BuffStacks(voidform_shadow) <= 14 and { Insanity() < 60 or Charges(mind_blast count=0) > 1.33 } } and Spell(mind_blast) or target.DebuffRemaining(shadow_word_pain_debuff) > 4 and target.DebuffRemaining(vampiric_touch_debuff) > 4 and BuffPresent(voidform_shadow) and Spell(void_torrent) or target.Refreshable(shadow_word_pain_debuff) and target.TimeToDie() > 4 and not Talent(misery_talent) and not Talent(dark_void_talent) and Spell(shadow_word_pain) or { target.Refreshable(vampiric_touch_debuff) and target.TimeToDie() > 6 or Talent(misery_talent) and target.DebuffRefreshable(shadow_word_pain_debuff) } and Spell(vampiric_touch) or Spell(mind_flay) or Spell(shadow_word_pain)
+ Spell(void_eruption) or Spell(void_bolt) or Spell(concentrated_flame_essence) or BuffPresent(harvested_thoughts_buff) and SpellCooldown(void_bolt) >= 1.5 and AzeriteTraitRank(searing_dialogue_trait) >= 1 and Spell(mind_sear) or { target.TimeToDie() < 3 or SpellCharges(shadow_word_death) == 2 or SpellCharges(shadow_word_death) == 1 and SpellCooldown(shadow_word_death) < GCD() } and Spell(shadow_word_death) or { Talent(mindbender_talent) or BuffStacks(voidform_shadow) > 18 or target.TimeToDie() < 15 } and Spell(mindbender_shadow) or { not BuffPresent(voidform_shadow) or SpellCharges(shadow_word_death) == 2 and BuffStacks(voidform_shadow) < 15 } and Spell(shadow_word_death) or dots_up() and { 600 > CastTime(mind_blast) + 0.5 and 600 < 4 or not Talent(shadow_word_void_talent) or BuffExpires(voidform_shadow) or BuffStacks(voidform_shadow) > 14 and { Insanity() < 70 or Charges(mind_blast count=0) > 1.33 } or BuffStacks(voidform_shadow) <= 14 and { Insanity() < 60 or Charges(mind_blast count=0) > 1.33 } } and Spell(mind_blast) or target.DebuffRemaining(shadow_word_pain_debuff) > 4 and target.DebuffRemaining(vampiric_touch_debuff) > 4 and BuffPresent(voidform_shadow) and Spell(void_torrent) or target.Refreshable(shadow_word_pain_debuff) and target.TimeToDie() > 4 and not Talent(misery_talent) and not Talent(dark_void_talent) and Spell(shadow_word_pain) or { target.Refreshable(vampiric_touch_debuff) and target.TimeToDie() > 6 or Talent(misery_talent) and target.DebuffRefreshable(shadow_word_pain_debuff) } and Spell(vampiric_touch) or Spell(mind_flay) or Spell(shadow_word_pain)
 }
 
 AddFunction ShadowSingleCdActions
@@ -160,8 +158,10 @@ AddFunction ShadowSingleCdActions
   Spell(blood_of_the_enemy)
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
+  #focused_azerite_beam
+  Spell(focused_azerite_beam_essence)
 
-  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(concentrated_flame_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+  unless Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(concentrated_flame_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
   {
    #use_item,name=pocketsized_computation_device,if=equipped.167555&(buff.voidform.up&buff.chorus_of_insanity.stack>20)|azerite.chorus_of_insanity.rank=0
    if HasEquippedItem(167555) and BuffPresent(voidform_shadow) and BuffStacks(chorus_of_insanity) > 20 or AzeriteTraitRank(chorus_of_insanity_trait) == 0 ShadowUseItemActions()
@@ -177,7 +177,7 @@ AddFunction ShadowSingleCdActions
 
 AddFunction ShadowSingleCdPostConditions
 {
- Spell(void_eruption) or BuffExpires(voidform_shadow) and Spell(dark_ascension) or Spell(void_bolt) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(concentrated_flame_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence) or BuffPresent(harvested_thoughts_buff) and SpellCooldown(void_bolt) >= 1.5 and AzeriteTraitRank(searing_dialogue_trait) >= 1 and Spell(mind_sear) or { target.TimeToDie() < 3 or SpellCharges(shadow_word_death) == 2 or SpellCharges(shadow_word_death) == 1 and SpellCooldown(shadow_word_death) < GCD() } and Spell(shadow_word_death) or 600 > 10 and Spell(dark_void) or { Talent(mindbender_talent) or BuffStacks(voidform_shadow) > 18 or target.TimeToDie() < 15 } and Spell(mindbender_shadow) or { not BuffPresent(voidform_shadow) or SpellCharges(shadow_word_death) == 2 and BuffStacks(voidform_shadow) < 15 } and Spell(shadow_word_death) or 600 > 5 and 10 < 20 and Spell(shadow_crash) or dots_up() and { 600 > CastTime(mind_blast) + 0.5 and 600 < 4 or not Talent(shadow_word_void_talent) or BuffExpires(voidform_shadow) or BuffStacks(voidform_shadow) > 14 and { Insanity() < 70 or Charges(mind_blast count=0) > 1.33 } or BuffStacks(voidform_shadow) <= 14 and { Insanity() < 60 or Charges(mind_blast count=0) > 1.33 } } and Spell(mind_blast) or target.DebuffRemaining(shadow_word_pain_debuff) > 4 and target.DebuffRemaining(vampiric_touch_debuff) > 4 and BuffPresent(voidform_shadow) and Spell(void_torrent) or target.Refreshable(shadow_word_pain_debuff) and target.TimeToDie() > 4 and not Talent(misery_talent) and not Talent(dark_void_talent) and Spell(shadow_word_pain) or { target.Refreshable(vampiric_touch_debuff) and target.TimeToDie() > 6 or Talent(misery_talent) and target.DebuffRefreshable(shadow_word_pain_debuff) } and Spell(vampiric_touch) or Spell(mind_flay) or Spell(shadow_word_pain)
+ Spell(void_eruption) or BuffExpires(voidform_shadow) and Spell(dark_ascension) or Spell(void_bolt) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(concentrated_flame_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence) or BuffPresent(harvested_thoughts_buff) and SpellCooldown(void_bolt) >= 1.5 and AzeriteTraitRank(searing_dialogue_trait) >= 1 and Spell(mind_sear) or { target.TimeToDie() < 3 or SpellCharges(shadow_word_death) == 2 or SpellCharges(shadow_word_death) == 1 and SpellCooldown(shadow_word_death) < GCD() } and Spell(shadow_word_death) or 600 > 10 and Spell(dark_void) or { Talent(mindbender_talent) or BuffStacks(voidform_shadow) > 18 or target.TimeToDie() < 15 } and Spell(mindbender_shadow) or { not BuffPresent(voidform_shadow) or SpellCharges(shadow_word_death) == 2 and BuffStacks(voidform_shadow) < 15 } and Spell(shadow_word_death) or 600 > 5 and 10 < 20 and Spell(shadow_crash) or dots_up() and { 600 > CastTime(mind_blast) + 0.5 and 600 < 4 or not Talent(shadow_word_void_talent) or BuffExpires(voidform_shadow) or BuffStacks(voidform_shadow) > 14 and { Insanity() < 70 or Charges(mind_blast count=0) > 1.33 } or BuffStacks(voidform_shadow) <= 14 and { Insanity() < 60 or Charges(mind_blast count=0) > 1.33 } } and Spell(mind_blast) or target.DebuffRemaining(shadow_word_pain_debuff) > 4 and target.DebuffRemaining(vampiric_touch_debuff) > 4 and BuffPresent(voidform_shadow) and Spell(void_torrent) or target.Refreshable(shadow_word_pain_debuff) and target.TimeToDie() > 4 and not Talent(misery_talent) and not Talent(dark_void_talent) and Spell(shadow_word_pain) or { target.Refreshable(vampiric_touch_debuff) and target.TimeToDie() > 6 or Talent(misery_talent) and target.DebuffRefreshable(shadow_word_pain_debuff) } and Spell(vampiric_touch) or Spell(mind_flay) or Spell(shadow_word_pain)
 }
 
 ### actions.precombat
@@ -237,8 +237,6 @@ AddFunction ShadowCleaveMainActions
  if BuffPresent(harvested_thoughts_buff) Spell(mind_sear)
  #void_bolt
  Spell(void_bolt)
- #focused_azerite_beam
- Spell(focused_azerite_beam)
  #concentrated_flame
  Spell(concentrated_flame_essence)
  #shadow_word_death,target_if=target.time_to_die<3|buff.voidform.down
@@ -274,7 +272,7 @@ AddFunction ShadowCleaveShortCdActions
   #dark_ascension,if=buff.voidform.down
   if BuffExpires(voidform_shadow) Spell(dark_ascension)
 
-  unless not target.DebuffPresent(vampiric_touch_debuff) and AzeriteTraitRank(thought_harvester_trait) >= 1 and Spell(vampiric_touch) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Spell(void_bolt) or Spell(focused_azerite_beam)
+  unless not target.DebuffPresent(vampiric_touch_debuff) and AzeriteTraitRank(thought_harvester_trait) >= 1 and Spell(vampiric_touch) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Spell(void_bolt)
   {
    #purifying_blast
    Spell(purifying_blast)
@@ -306,7 +304,7 @@ AddFunction ShadowCleaveShortCdActions
 
 AddFunction ShadowCleaveShortCdPostConditions
 {
- Spell(void_eruption) or not target.DebuffPresent(vampiric_touch_debuff) and AzeriteTraitRank(thought_harvester_trait) >= 1 and Spell(vampiric_touch) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Spell(void_bolt) or Spell(focused_azerite_beam) or Spell(concentrated_flame_essence) or { target.TimeToDie() < 3 or BuffExpires(voidform_shadow) } and Spell(shadow_word_death) or Spell(mindbender_shadow) or Enemies() < mind_blast_targets() and Spell(mind_blast) or target.Refreshable(shadow_word_pain_debuff) and target.TimeToDie() > { -1.2 + 3.3 * Enemies() } * swp_trait_ranks_check() * { 1 - 0.012 * AzeriteTraitRank(searing_dialogue_trait) * Enemies() } and not Talent(misery_talent) and Spell(shadow_word_pain) or target.Refreshable(vampiric_touch_debuff) and target.TimeToDie() > { 1 + 3.3 * Enemies() } * vt_trait_ranks_check() * { 1 + 0.1 * AzeriteTraitRank(searing_dialogue_trait) * Enemies() } and Spell(vampiric_touch) or target.DebuffRefreshable(shadow_word_pain_debuff) and Talent(misery_talent) and target.TimeToDie() > { 1 + 2 * Enemies() } * vt_mis_trait_ranks_check() * vt_mis_sd_check() * Enemies() and Spell(vampiric_touch) or BuffPresent(voidform_shadow) and Spell(void_torrent) or Enemies() > 1 and Spell(mind_sear) or Spell(mind_flay) or Spell(shadow_word_pain)
+ Spell(void_eruption) or not target.DebuffPresent(vampiric_touch_debuff) and AzeriteTraitRank(thought_harvester_trait) >= 1 and Spell(vampiric_touch) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Spell(void_bolt) or Spell(concentrated_flame_essence) or { target.TimeToDie() < 3 or BuffExpires(voidform_shadow) } and Spell(shadow_word_death) or Spell(mindbender_shadow) or Enemies() < mind_blast_targets() and Spell(mind_blast) or target.Refreshable(shadow_word_pain_debuff) and target.TimeToDie() > { -1.2 + 3.3 * Enemies() } * swp_trait_ranks_check() * { 1 - 0.012 * AzeriteTraitRank(searing_dialogue_trait) * Enemies() } and not Talent(misery_talent) and Spell(shadow_word_pain) or target.Refreshable(vampiric_touch_debuff) and target.TimeToDie() > { 1 + 3.3 * Enemies() } * vt_trait_ranks_check() * { 1 + 0.1 * AzeriteTraitRank(searing_dialogue_trait) * Enemies() } and Spell(vampiric_touch) or target.DebuffRefreshable(shadow_word_pain_debuff) and Talent(misery_talent) and target.TimeToDie() > { 1 + 2 * Enemies() } * vt_mis_trait_ranks_check() * vt_mis_sd_check() * Enemies() and Spell(vampiric_touch) or BuffPresent(voidform_shadow) and Spell(void_torrent) or Enemies() > 1 and Spell(mind_sear) or Spell(mind_flay) or Spell(shadow_word_pain)
 }
 
 AddFunction ShadowCleaveCdActions
@@ -321,8 +319,10 @@ AddFunction ShadowCleaveCdActions
   Spell(blood_of_the_enemy)
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
+  #focused_azerite_beam
+  Spell(focused_azerite_beam_essence)
 
-  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(concentrated_flame_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+  unless Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(concentrated_flame_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
   {
    #use_item,name=pocketsized_computation_device,if=equipped.167555&(buff.voidform.up&buff.chorus_of_insanity.stack>20)|azerite.chorus_of_insanity.rank=0
    if HasEquippedItem(167555) and BuffPresent(voidform_shadow) and BuffStacks(chorus_of_insanity) > 20 or AzeriteTraitRank(chorus_of_insanity_trait) == 0 ShadowUseItemActions()
@@ -338,7 +338,7 @@ AddFunction ShadowCleaveCdActions
 
 AddFunction ShadowCleaveCdPostConditions
 {
- Spell(void_eruption) or BuffExpires(voidform_shadow) and Spell(dark_ascension) or not target.DebuffPresent(vampiric_touch_debuff) and AzeriteTraitRank(thought_harvester_trait) >= 1 and Spell(vampiric_touch) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Spell(void_bolt) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(concentrated_flame_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence) or { target.TimeToDie() < 3 or BuffExpires(voidform_shadow) } and Spell(shadow_word_death) or 600 > 10 and { target.DebuffRefreshable(shadow_word_pain_debuff) or target.TimeToDie() > 30 } and Spell(dark_void) or Spell(mindbender_shadow) or Enemies() < mind_blast_targets() and Spell(mind_blast) or { 600 > 5 and 10 < 2 or 10 > 2 } and Spell(shadow_crash) or target.Refreshable(shadow_word_pain_debuff) and target.TimeToDie() > { -1.2 + 3.3 * Enemies() } * swp_trait_ranks_check() * { 1 - 0.012 * AzeriteTraitRank(searing_dialogue_trait) * Enemies() } and not Talent(misery_talent) and Spell(shadow_word_pain) or target.Refreshable(vampiric_touch_debuff) and target.TimeToDie() > { 1 + 3.3 * Enemies() } * vt_trait_ranks_check() * { 1 + 0.1 * AzeriteTraitRank(searing_dialogue_trait) * Enemies() } and Spell(vampiric_touch) or target.DebuffRefreshable(shadow_word_pain_debuff) and Talent(misery_talent) and target.TimeToDie() > { 1 + 2 * Enemies() } * vt_mis_trait_ranks_check() * vt_mis_sd_check() * Enemies() and Spell(vampiric_touch) or BuffPresent(voidform_shadow) and Spell(void_torrent) or Enemies() > 1 and Spell(mind_sear) or Spell(mind_flay) or Spell(shadow_word_pain)
+ Spell(void_eruption) or BuffExpires(voidform_shadow) and Spell(dark_ascension) or not target.DebuffPresent(vampiric_touch_debuff) and AzeriteTraitRank(thought_harvester_trait) >= 1 and Spell(vampiric_touch) or BuffPresent(harvested_thoughts_buff) and Spell(mind_sear) or Spell(void_bolt) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(concentrated_flame_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence) or { target.TimeToDie() < 3 or BuffExpires(voidform_shadow) } and Spell(shadow_word_death) or 600 > 10 and { target.DebuffRefreshable(shadow_word_pain_debuff) or target.TimeToDie() > 30 } and Spell(dark_void) or Spell(mindbender_shadow) or Enemies() < mind_blast_targets() and Spell(mind_blast) or { 600 > 5 and 10 < 2 or 10 > 2 } and Spell(shadow_crash) or target.Refreshable(shadow_word_pain_debuff) and target.TimeToDie() > { -1.2 + 3.3 * Enemies() } * swp_trait_ranks_check() * { 1 - 0.012 * AzeriteTraitRank(searing_dialogue_trait) * Enemies() } and not Talent(misery_talent) and Spell(shadow_word_pain) or target.Refreshable(vampiric_touch_debuff) and target.TimeToDie() > { 1 + 3.3 * Enemies() } * vt_trait_ranks_check() * { 1 + 0.1 * AzeriteTraitRank(searing_dialogue_trait) * Enemies() } and Spell(vampiric_touch) or target.DebuffRefreshable(shadow_word_pain_debuff) and Talent(misery_talent) and target.TimeToDie() > { 1 + 2 * Enemies() } * vt_mis_trait_ranks_check() * vt_mis_sd_check() * Enemies() and Spell(vampiric_touch) or BuffPresent(voidform_shadow) and Spell(void_torrent) or Enemies() > 1 and Spell(mind_sear) or Spell(mind_flay) or Spell(shadow_word_pain)
 }
 
 ### actions.default
@@ -471,7 +471,7 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # dark_void
 # dark_void_talent
 # death_throes_trait
-# focused_azerite_beam
+# focused_azerite_beam_essence
 # guardian_of_azeroth
 # harvested_thoughts_buff
 # item_unbridled_fury

@@ -81,10 +81,6 @@ Define(fiery_brand 204021)
   SpellInfo(chaos_nova replaced_by=fiery_brand)
   # Dealing s1 less damage to the branding Demon Hunter.
   SpellAddBuff(fiery_brand fiery_brand=1)
-Define(focused_azerite_beam 295262)
-# Reduces the cast time of Focused Azerite Beam by s1.
-  SpellInfo(focused_azerite_beam channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam=1)
 Define(fracture 263642)
 # Rapidly slash your target for 225919sw1+225921sw1 Physical damage, and shatter s1 Lesser Soul Fragments from them.rnrn|cFFFFFFFFGenerates s4/10 Pain.|r
   SpellInfo(fracture cd=4.5 pain=-25 talent=fracture_talent)

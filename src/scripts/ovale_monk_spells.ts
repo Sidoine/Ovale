@@ -79,10 +79,6 @@ Define(flying_serpent_kick 101545)
 # Soar forward through the air at high speed for 1.5 seconds.rn rnIf used again while active, you will land, dealing 123586m1 damage to all enemies within 123586A1 yards and reducing movement speed by 123586m2 for 4 seconds.
   SpellInfo(flying_serpent_kick cd=25 duration=1.5 gcd=1)
   SpellAddBuff(flying_serpent_kick flying_serpent_kick=1)
-Define(focused_azerite_beam 295262)
-# Reduces the cast time of Focused Azerite Beam by s1.
-  SpellInfo(focused_azerite_beam channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam=1)
 Define(fortifying_brew 115203)
 # Turns your skin to stone for 15 seconds, increasing your current and maximum health by <health>, increasing the effectiveness of Stagger by s1, and reducing all damage you take by <damage>.
   SpellInfo(fortifying_brew cd=420 gcd=0 offgcd=1)

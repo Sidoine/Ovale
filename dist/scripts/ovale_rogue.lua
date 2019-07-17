@@ -186,8 +186,6 @@ AddFunction AssassinationEssencesMainActions
 {
  #concentrated_flame
  Spell(concentrated_flame_essence)
- #focused_azerite_beam,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60&energy<70
- if Enemies() >= 2 or 600 > 60 and Energy() < 70 Spell(focused_azerite_beam)
 }
 
 AddFunction AssassinationEssencesMainPostConditions
@@ -196,7 +194,7 @@ AddFunction AssassinationEssencesMainPostConditions
 
 AddFunction AssassinationEssencesShortCdActions
 {
- unless Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 and Energy() < 70 } and Spell(focused_azerite_beam)
+ unless Spell(concentrated_flame_essence)
  {
   #purifying_blast,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60
   if Enemies() >= 2 or 600 > 60 Spell(purifying_blast)
@@ -211,7 +209,7 @@ AddFunction AssassinationEssencesShortCdActions
 
 AddFunction AssassinationEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 and Energy() < 70 } and Spell(focused_azerite_beam)
+ Spell(concentrated_flame_essence)
 }
 
 AddFunction AssassinationEssencesCdActions
@@ -222,8 +220,10 @@ AddFunction AssassinationEssencesCdActions
   if target.DebuffPresent(vendetta_debuff) and { not Talent(toxic_blade_talent) or target.DebuffPresent(toxic_blade_debuff) and ComboPointsDeficit() <= 1 or target.DebuffRemaining(vendetta_debuff) <= 10 } or target.TimeToDie() <= 10 Spell(blood_of_the_enemy)
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
+  #focused_azerite_beam,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60&energy<70
+  if Enemies() >= 2 or 600 > 60 and Energy() < 70 Spell(focused_azerite_beam_essence)
 
-  unless { Enemies() >= 2 or 600 > 60 and Energy() < 70 } and Spell(focused_azerite_beam) or { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
+  unless { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
   {
    #memory_of_lucid_dreams,if=energy<50
    if Energy() < 50 Spell(memory_of_lucid_dreams_essence)
@@ -233,7 +233,7 @@ AddFunction AssassinationEssencesCdActions
 
 AddFunction AssassinationEssencesCdPostConditions
 {
- Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 and Energy() < 70 } and Spell(focused_azerite_beam) or { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
+ Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
 }
 
 ### actions.dot
@@ -633,7 +633,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # exsanguinated
 # fan_of_knives
 # fireblood
-# focused_azerite_beam
+# focused_azerite_beam_essence
 # garrote
 # garrote_debuff
 # guardian_of_azeroth
@@ -868,8 +868,6 @@ AddFunction OutlawEssencesMainActions
 {
  #concentrated_flame
  Spell(concentrated_flame_essence)
- #focused_azerite_beam,if=spell_targets.blade_flurry>=2|raid_event.adds.in>60&!buff.adrenaline_rush.up
- if Enemies() >= 2 or 600 > 60 and not BuffPresent(adrenaline_rush_buff) Spell(focused_azerite_beam)
 }
 
 AddFunction OutlawEssencesMainPostConditions
@@ -878,7 +876,7 @@ AddFunction OutlawEssencesMainPostConditions
 
 AddFunction OutlawEssencesShortCdActions
 {
- unless Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 and not BuffPresent(adrenaline_rush_buff) } and Spell(focused_azerite_beam)
+ unless Spell(concentrated_flame_essence)
  {
   #purifying_blast,if=spell_targets.blade_flurry>=2|raid_event.adds.in>60
   if Enemies() >= 2 or 600 > 60 Spell(purifying_blast)
@@ -893,7 +891,7 @@ AddFunction OutlawEssencesShortCdActions
 
 AddFunction OutlawEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 and not BuffPresent(adrenaline_rush_buff) } and Spell(focused_azerite_beam)
+ Spell(concentrated_flame_essence)
 }
 
 AddFunction OutlawEssencesCdActions
@@ -904,8 +902,10 @@ AddFunction OutlawEssencesCdActions
   if blade_flurry_sync() Spell(blood_of_the_enemy)
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
+  #focused_azerite_beam,if=spell_targets.blade_flurry>=2|raid_event.adds.in>60&!buff.adrenaline_rush.up
+  if Enemies() >= 2 or 600 > 60 and not BuffPresent(adrenaline_rush_buff) Spell(focused_azerite_beam_essence)
 
-  unless { Enemies() >= 2 or 600 > 60 and not BuffPresent(adrenaline_rush_buff) } and Spell(focused_azerite_beam) or { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
+  unless { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
   {
    #memory_of_lucid_dreams,if=energy<45
    if Energy() < 45 Spell(memory_of_lucid_dreams_essence)
@@ -915,7 +915,7 @@ AddFunction OutlawEssencesCdActions
 
 AddFunction OutlawEssencesCdPostConditions
 {
- Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 and not BuffPresent(adrenaline_rush_buff) } and Spell(focused_azerite_beam) or { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
+ Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
 }
 
 ### actions.cds
@@ -1247,7 +1247,7 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # deadshot_trait
 # dispatch
 # fireblood
-# focused_azerite_beam
+# focused_azerite_beam_essence
 # ghostly_strike
 # ghostly_strike_talent
 # gouge
@@ -1556,8 +1556,6 @@ AddFunction SubtletyEssencesMainActions
 {
  #concentrated_flame
  Spell(concentrated_flame_essence)
- #focused_azerite_beam,if=(spell_targets.shuriken_storm>=2|raid_event.adds.in>60)&!cooldown.symbols_of_death.up&!buff.symbols_of_death.up&energy.deficit>=30
- if { Enemies() >= 2 or 600 > 60 } and not { not SpellCooldown(symbols_of_death) > 0 } and not BuffPresent(symbols_of_death_buff) and EnergyDeficit() >= 30 Spell(focused_azerite_beam)
 }
 
 AddFunction SubtletyEssencesMainPostConditions
@@ -1566,7 +1564,7 @@ AddFunction SubtletyEssencesMainPostConditions
 
 AddFunction SubtletyEssencesShortCdActions
 {
- unless Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 } and not { not SpellCooldown(symbols_of_death) > 0 } and not BuffPresent(symbols_of_death_buff) and EnergyDeficit() >= 30 and Spell(focused_azerite_beam)
+ unless Spell(concentrated_flame_essence)
  {
   #purifying_blast,if=spell_targets.shuriken_storm>=2|raid_event.adds.in>60
   if Enemies() >= 2 or 600 > 60 Spell(purifying_blast)
@@ -1581,7 +1579,7 @@ AddFunction SubtletyEssencesShortCdActions
 
 AddFunction SubtletyEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 } and not { not SpellCooldown(symbols_of_death) > 0 } and not BuffPresent(symbols_of_death_buff) and EnergyDeficit() >= 30 and Spell(focused_azerite_beam)
+ Spell(concentrated_flame_essence)
 }
 
 AddFunction SubtletyEssencesCdActions
@@ -1592,8 +1590,10 @@ AddFunction SubtletyEssencesCdActions
   Spell(blood_of_the_enemy)
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
+  #focused_azerite_beam,if=(spell_targets.shuriken_storm>=2|raid_event.adds.in>60)&!cooldown.symbols_of_death.up&!buff.symbols_of_death.up&energy.deficit>=30
+  if { Enemies() >= 2 or 600 > 60 } and not { not SpellCooldown(symbols_of_death) > 0 } and not BuffPresent(symbols_of_death_buff) and EnergyDeficit() >= 30 Spell(focused_azerite_beam_essence)
 
-  unless { Enemies() >= 2 or 600 > 60 } and not { not SpellCooldown(symbols_of_death) > 0 } and not BuffPresent(symbols_of_death_buff) and EnergyDeficit() >= 30 and Spell(focused_azerite_beam) or { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
+  unless { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
   {
    #memory_of_lucid_dreams,if=energy<40&buff.symbols_of_death.up
    if Energy() < 40 and BuffPresent(symbols_of_death_buff) Spell(memory_of_lucid_dreams_essence)
@@ -1603,7 +1603,7 @@ AddFunction SubtletyEssencesCdActions
 
 AddFunction SubtletyEssencesCdPostConditions
 {
- Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 } and not { not SpellCooldown(symbols_of_death) > 0 } and not BuffPresent(symbols_of_death_buff) and EnergyDeficit() >= 30 and Spell(focused_azerite_beam) or { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
+ Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
 }
 
 ### actions.cds
@@ -1978,7 +1978,7 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 # find_weakness_debuff
 # find_weakness_talent
 # fireblood
-# focused_azerite_beam
+# focused_azerite_beam_essence
 # gloomblade
 # gloomblade_talent
 # guardian_of_azeroth

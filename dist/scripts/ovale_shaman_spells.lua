@@ -92,10 +92,6 @@ Define(flametongue_buff 194084)
   SpellInfo(flametongue_buff duration=16 gcd=0 offgcd=1 tick=8)
   # Each of your weapon attacks causes up to <coeff>*AP additional Fire damage.
   SpellAddBuff(flametongue_buff flametongue_buff=1)
-Define(focused_azerite_beam 295262)
-# Reduces the cast time of Focused Azerite Beam by s1.
-  SpellInfo(focused_azerite_beam channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam=1)
 Define(frost_shock 196840)
 # Chills the target with frost, causing (45 of Spell Power) Frost damage and reducing the target's movement speed by s2 for 6 seconds. 
   SpellInfo(frost_shock duration=6)

@@ -202,8 +202,6 @@ AddFunction HavocEssencesMainActions
 {
  #concentrated_flame
  Spell(concentrated_flame_essence)
- #focused_azerite_beam
- Spell(focused_azerite_beam)
 }
 
 AddFunction HavocEssencesMainPostConditions
@@ -212,7 +210,7 @@ AddFunction HavocEssencesMainPostConditions
 
 AddFunction HavocEssencesShortCdActions
 {
- unless Spell(concentrated_flame_essence) or Spell(focused_azerite_beam)
+ unless Spell(concentrated_flame_essence)
  {
   #purifying_blast
   Spell(purifying_blast)
@@ -227,7 +225,7 @@ AddFunction HavocEssencesShortCdActions
 
 AddFunction HavocEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam)
+ Spell(concentrated_flame_essence)
 }
 
 AddFunction HavocEssencesCdActions
@@ -238,8 +236,10 @@ AddFunction HavocEssencesCdActions
   Spell(blood_of_the_enemy)
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
+  #focused_azerite_beam
+  Spell(focused_azerite_beam_essence)
 
-  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+  unless Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
   {
    #memory_of_lucid_dreams,if=fury<40&buff.metamorphosis.up
    if Fury() < 40 and BuffPresent(metamorphosis_havoc_buff) Spell(memory_of_lucid_dreams_essence)
@@ -249,7 +249,7 @@ AddFunction HavocEssencesCdActions
 
 AddFunction HavocEssencesCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+ Spell(concentrated_flame_essence) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
 }
 
 ### actions.demonic
@@ -576,7 +576,7 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # fel_rush
 # felblade
 # first_blood_talent
-# focused_azerite_beam
+# focused_azerite_beam_essence
 # guardian_of_azeroth
 # immolation_aura_havoc
 # imprison
