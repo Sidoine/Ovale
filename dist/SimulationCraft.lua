@@ -1313,7 +1313,6 @@ local function AddSymbol(annotation, symbol)
     local symbolTable = annotation.symbolTable or {}
     local symbolList = annotation.symbolList or {}
     if symbol == "target" then
-        {DebuggerStatement}
     end
     if  not symbolTable[symbol] and  not OvaleData.DEFAULT_SPELL_LIST[symbol] then
         symbolTable[symbol] = true
