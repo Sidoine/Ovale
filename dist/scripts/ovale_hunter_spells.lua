@@ -566,8 +566,8 @@ Define(pet_frenzy_buff 272790)
 	SpellInfo(pet_frenzy_buff duration=8 max_stacks=3)
 
 # Azerite Traits
-
-
+Define(unerring_vision_trait 274445)
+Define(unerring_vision_buff 274446)
 
 #Items
 Define(frizzos_fingertrap_item 137043)
