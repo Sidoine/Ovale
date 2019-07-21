@@ -22,10 +22,9 @@ Define(bastion_of_light 204035)
 Define(blade_of_justice 184575)
 # Pierces an enemy with a blade of light, dealing s2*<mult> Physical damage.rnrn|cFFFFFFFFGenerates s3 Holy Power.|r
   SpellInfo(blade_of_justice cd=10.5 holypower=-2)
-Define(blessed_hammer 229976)
+Define(blessed_hammer 204019)
 # Throws a Blessed Hammer that spirals outward, dealing 204301s1 Holy damage to enemies and weakening them, reducing the damage you take from their next auto attack by 204301s2.
-  SpellInfo(blessed_hammer channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(blessed_hammer blessed_hammer=1)
+  SpellInfo(blessed_hammer cd=4.5 duration=5 talent=blessed_hammer_talent)
 Define(blinding_light 115750)
 # Emits dazzling light in all directions, blinding enemies within 105421A1 yards, causing them to wander disoriented for 105421d. Non-Holy damage will break the disorient effect.
   SpellInfo(blinding_light cd=90 duration=6 talent=blinding_light_talent)
@@ -68,10 +67,10 @@ Define(execution_sentence 267798)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
-Define(focused_azerite_beam 295262)
-# Reduces the cast time of Focused Azerite Beam by s1.
-  SpellInfo(focused_azerite_beam channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam=1)
+Define(focused_azerite_beam 299336)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+  SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
+
 Define(guardian_of_azeroth 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth cd=180 duration=30)
@@ -153,6 +152,8 @@ Define(war_stomp 20549)
   SpellAddTargetDebuff(war_stomp war_stomp=1)
 Define(bastion_of_light_talent 6) #22594
 # Immediately grants s1 charges of Shield of the Righteous.
+Define(blessed_hammer_talent 3) #22430
+# Throws a Blessed Hammer that spirals outward, dealing 204301s1 Holy damage to enemies and weakening them, reducing the damage you take from their next auto attack by 204301s2.
 Define(blinding_light_talent 9) #21811
 # Emits dazzling light in all directions, blinding enemies within 105421A1 yards, causing them to wander disoriented for 105421d. Non-Holy damage will break the disorient effect.
 Define(crusade_talent 20) #22215
@@ -253,7 +254,7 @@ Define(blade_of_wrath_buff 281178)
 	SpellInfo(blade_of_wrath_buff duration=10)
 Define(blazing_contempt_buff 166831)
 	SpellInfo(blazing_contempt_buff duration=20)
-Define(blessed_hammer 204019)
+
 	SpellInfo(blessed_hammer cd=4.5 cd_haste=melee max_charges=3)
 Define(blessed_hammer_debuff 204301)
 	SpellInfo(blessed_hammer_debuff duration=10)

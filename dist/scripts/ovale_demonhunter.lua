@@ -202,8 +202,6 @@ AddFunction HavocEssencesMainActions
 {
  #concentrated_flame
  Spell(concentrated_flame_essence)
- #focused_azerite_beam,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
- if Enemies() >= 2 or 600 > 60 Spell(focused_azerite_beam)
 }
 
 AddFunction HavocEssencesMainPostConditions
@@ -212,8 +210,10 @@ AddFunction HavocEssencesMainPostConditions
 
 AddFunction HavocEssencesShortCdActions
 {
- unless Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 } and Spell(focused_azerite_beam)
+ unless Spell(concentrated_flame_essence)
  {
+  #focused_azerite_beam,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
+  if Enemies() >= 2 or 600 > 60 Spell(focused_azerite_beam)
   #purifying_blast,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
   if Enemies() >= 2 or 600 > 60 Spell(purifying_blast)
   #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
@@ -227,7 +227,7 @@ AddFunction HavocEssencesShortCdActions
 
 AddFunction HavocEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 } and Spell(focused_azerite_beam)
+ Spell(concentrated_flame_essence)
 }
 
 AddFunction HavocEssencesCdActions

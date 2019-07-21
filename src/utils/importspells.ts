@@ -4,6 +4,37 @@ import { ClassId } from "@wowts/wow-mock";
 import { SpecializationName, OVALE_SPECIALIZATION_NAME } from "../PaperDoll";
 import { parseDescription } from "./spellstringparser";
 
+const enum SpellAttribute {
+  "Ranged Ability" =   1,                  
+  "Tradeskill ability" =   5,              
+  "Passive" =   6,                         
+  "Hidden" =   7,                          
+  "Requires stealth" =   17,                
+  "Stop attacks" =   20,                    
+  "Cannot dodge/parry/block" =   21,        
+  "Cannot be used in combat" =   28,        
+  "Cannot cancel aura" =   31,              
+  "Channeled" =   34,                       
+  "Does not break stealth" =   37,          
+  "Channeled_2" =   38,                       
+  "Cannot crit" =   93,                     
+  "Food buff" =   95,                       
+  "Not a proc" =  105,                      
+  "Requires main-hand weapon" =  106,       
+  "Disable player procs" =  112,            
+  "Disable target procs" =  113,            
+  "Always hits" =  114,                     
+  "Requires off-hand weapon" =  120,        
+  "Treat as periodic" =  121,               
+  "Disable weapon procs" =  151,            
+  "Tick on application" =  169,             
+  "Periodic effect affected by haste"=  173,
+  "Requires line of sight" =  186,          
+  "Disable player multipliers" =  221,      
+  "Periodic effect can crit" =  265,        
+  "Scales with item level" =  354,         
+};
+
 const specIds = {
     SPEC_NONE              : 0,
     SPEC_PET               : 1,
@@ -879,6 +910,7 @@ export interface SpellData {
     className?: ClassId | "PET";
     specializationName?: SpecializationName;
     nextRank?: SpellData;
+    spellAttributes: SpellAttribute[];
 }
 
 export interface SpellEffectData {
@@ -1243,8 +1275,17 @@ export function getSpellData(directory: string) {
             rank_str: row[45],
             req_max_level: row[46],
             dmg_class: row[47],
-            identifierScore: 0
+            identifierScore: 0,
+            spellAttributes: []
         };
+
+        for (let i = 0; i < spell.attributes.length ; i++) {
+            for (let flag = 0; flag < 32; flag++) {
+                if (spell.attributes[i] & (1 << flag)) {
+                    spell.spellAttributes.push(i * 32 + flag);
+                }
+            }
+        }
 
         if (identifierById.get(spell.id)) {
             spell.identifier = getIdentifier(identifierById.get(spell.id));
@@ -1262,6 +1303,7 @@ export function getSpellData(directory: string) {
         if (spell.rank_str === "Racial") spell.identifierScore += 3;
         if (spell.rank_str === "Artifact") spell.identifierScore -= 20;
         if (spell.rank_str === "Passive") spell.identifierScore--;
+        if (spell.spellAttributes.indexOf(SpellAttribute.Passive) >= 0)  spell.identifierScore--;
     }
 
     for (let classIndex = 0; classIndex  <  output.__tree_specialization_data.length; classIndex++) {

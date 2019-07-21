@@ -102,7 +102,7 @@ const itemsByClass = new Map<string, number[]>();
 const azeriteTraitByClass = new Map<string, number[]>();
 
 for (const filename of files) {
-    //if (filename.indexOf('Druid') < 0) continue;
+    // if (filename.indexOf('Hunter') < 0) continue;
     if (!filename.startsWith("generate")) {
         let output: string[] = []
         let inputName = profilesDirectory + "/" + filename;

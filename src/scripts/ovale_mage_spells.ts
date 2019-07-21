@@ -122,10 +122,10 @@ Define(flurry 44614)
 # Unleash a flurry of ice, striking the target s1 times for a total of (31.6 of Spell Power)*m1 Frost damage. Each hit reduces the target's movement speed by 228354s1 for 1 second.rnrnWhile Brain Freeze is active, Flurry applies Winter's Chill, causing your target to take damage from your spells as if it were frozen.
   SpellInfo(flurry)
 
-Define(focused_azerite_beam 295262)
-# Reduces the cast time of Focused Azerite Beam by s1.
-  SpellInfo(focused_azerite_beam channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam=1)
+Define(focused_azerite_beam 299336)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+  SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
+
 Define(frostbolt 116)
 # Launches a bolt of frost at the enemy, causing (51.1 of Spell Power) Frost damage and slowing movement speed by 205708s1 for 8 seconds.
   SpellInfo(frostbolt)
@@ -182,10 +182,11 @@ Define(nether_tempest 114923)
   SpellInfo(nether_tempest duration=12 tick=1 talent=nether_tempest_talent)
   # Deals w1 Arcane damage and an additional w1 Arcane damage to all enemies within 114954A1 yards every t sec.
   SpellAddTargetDebuff(nether_tempest nether_tempest=1)
-Define(packed_ice 272968)
+Define(packed_ice 272970)
 # Ice Lance deals an additional s1 damage to enemies recently damaged by your Frozen Orb.
-  SpellInfo(packed_ice channel=0 gcd=0 offgcd=1)
-
+  SpellInfo(packed_ice duration=4 channel=4 gcd=0 offgcd=1)
+  # The Mage's Ice Lances will deal increased damage to you.
+  SpellAddTargetDebuff(packed_ice packed_ice=1)
 Define(phoenix_flames 257541)
 # Hurls a Phoenix that deals (75 of Spell Power) Fire damage to the target and splashes (20 of Spell Power) Fire damage to other nearby enemies. Always deals a critical strike.
   SpellInfo(phoenix_flames cd=30 talent=phoenix_flames_talent)
