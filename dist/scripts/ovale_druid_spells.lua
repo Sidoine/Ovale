@@ -233,6 +233,10 @@ Define(shadowmeld 58984)
 Define(sharpened_claws_buff 268525)
 # Your attacks have a chance to summon a whirlwind of sharpened claws, inflicting 268525s1 Physical damage split evenly among all enemies within 268525A1 yards.
   SpellInfo(sharpened_claws_buff channel=0 gcd=0 offgcd=1)
+Define(shiver_venom 301576)
+# Your damaging abilities have a high chance to apply Shiver Venom to your target, dealing 301624s1*5 Nature damage over 20 seconds, and stacking up to 5 times.rn
+  SpellInfo(shiver_venom channel=0 gcd=0 offgcd=1)
+
 Define(shred 5221)
 # Shred the target, causing s1*<mult> Physical damage to the target.?a231063[ Deals s4 increased damage against bleeding targets.][]?a231057[rnrnWhile stealthed, Shred deals m3 increased damage, and has double the chance to critically strike.][]?c2[rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r]?s202155[rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.][]
 # Rank 2: Shred deals 5221s5 increased damage against bleeding targets.

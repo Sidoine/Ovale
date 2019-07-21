@@ -9,3 +9,5 @@ dist/**/*.js.map
 /sample.json
 /src/utils/override
 *.bat
+/items-data.txt
+/spells-data.txt

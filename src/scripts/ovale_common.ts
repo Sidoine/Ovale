@@ -186,6 +186,7 @@ Define(memory_of_lucid_dreams_essence_id 27)
 Define(vision_of_perfection_essence_id 22)
 Define(condensed_lifeforce_essence_id 14)
 Define(blood_of_the_enemy_essence_id 23)
+Define(essence_of_the_focusing_iris_essence_id 5)
 ###
 ### Racials
 ###

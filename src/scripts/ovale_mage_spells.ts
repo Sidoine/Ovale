@@ -89,10 +89,6 @@ Define(cone_of_cold 120)
 Define(counterspell 2139)
 # Counters the enemy's spellcast, preventing any spell from that school of magic from being cast for 6 seconds?s12598[ and silencing the target for 55021d][].
   SpellInfo(counterspell cd=24 duration=6 gcd=0 offgcd=1 interrupt=1)
-Define(cyclotronic_blast 293491)
-# Channel a cyclotronic blast, dealing s1 damage every t1 sec for D
-  SpellInfo(cyclotronic_blast cd=120 duration=2.5 channel=2.5 tick=0.5)
-  SpellAddTargetDebuff(cyclotronic_blast cyclotronic_blast=1)
 Define(dragons_breath 31661)
 # Enemies in a cone in front of you take (58.25 of Spell Power) Fire damage and are disoriented for 4 seconds. Damage will cancel the effect.
   SpellInfo(dragons_breath cd=20 duration=4)

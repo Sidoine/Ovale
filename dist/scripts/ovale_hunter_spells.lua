@@ -96,6 +96,10 @@ Define(coordinated_assault 266779)
 Define(counter_shot 147362)
 # Interrupts spellcasting, preventing any spell in that school from being cast for 3 seconds.
   SpellInfo(counter_shot cd=24 duration=3 gcd=0 offgcd=1 interrupt=1)
+Define(cyclotronic_blast 293491)
+# Channel a cyclotronic blast, dealing s1 damage every t1 sec for D
+  SpellInfo(cyclotronic_blast cd=120 duration=2.5 channel=2.5 tick=0.5)
+  SpellAddTargetDebuff(cyclotronic_blast cyclotronic_blast=1)
 Define(dance_of_death_buff 274442)
 # Barbed Shot has a chance equal to your critical strike chance to grant you s1 Agility for 8 seconds.
   SpellInfo(dance_of_death_buff channel=-0.001 gcd=0 offgcd=1)
@@ -129,6 +133,9 @@ Define(guardian_of_azeroth 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth cd=180 duration=30)
   SpellAddBuff(guardian_of_azeroth guardian_of_azeroth=1)
+Define(guardian_of_azeroth_buff 303349)
+  SpellInfo(guardian_of_azeroth_buff gcd=0 offgcd=1)
+
 Define(harpoon 190925)
 # Hurls a harpoon at an enemy, rooting them in place for 3 seconds and pulling you to them.
 # Rank 2: The cooldown of Harpoon is reduced by m1/-1000 sec.
@@ -190,11 +197,19 @@ Define(raptor_strike 186270)
 # A vicious slash dealing s1 Physical damage.
 # Rank 2: Raptor Strike deals s1 increased damage.
   SpellInfo(raptor_strike focus=30)
+Define(razor_coral 303564)
+# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]
+  SpellInfo(razor_coral cd=20 channel=0 gcd=0 offgcd=1)
 Define(reckless_force_buff 298409)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
   SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
   # Gaining unstable Azerite energy.
   SpellAddBuff(reckless_force_buff reckless_force_buff=1)
+Define(reckless_force_counter 302917)
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+  SpellInfo(reckless_force_counter duration=60 channel=60 max_stacks=20 gcd=0 offgcd=1)
+  # Upon reaching u stacks, you gain 302932s~1 Critical Strike for 302932d.
+  SpellAddBuff(reckless_force_counter reckless_force_counter=1)
 Define(revive_pet 982)
 # Revives your pet, returning it to life with s1 of its base health.
   SpellInfo(revive_pet focus=35 duration=3 channel=3)
@@ -228,6 +243,10 @@ Define(trueshot 288613)
   SpellInfo(trueshot cd=120 duration=15)
   # The cooldown of Aimed Shot and Rapid Fire is reduced by m1/4, and Aimed Shot casts s4 faster.
   SpellAddBuff(trueshot trueshot=1)
+Define(unerring_vision_buff 274445)
+# While Trueshot is active you gain s1 Critical Strike rating every sec, stacking up to 10 times.
+  SpellInfo(unerring_vision_buff channel=-0.001 gcd=0 offgcd=1)
+
 Define(vipers_venom_buff 268552)
 # ?s259387[Mongoose Bite][Raptor Strike] has a chance to make your next Serpent Sting cost no Focus and deal an additional 268552s1 initial damage.
   SpellInfo(vipers_venom_buff duration=8 channel=8 gcd=0 offgcd=1)
@@ -291,12 +310,15 @@ Define(vipers_venom_talent 1) #22275
 # ?s259387[Mongoose Bite][Raptor Strike] has a chance to make your next Serpent Sting cost no Focus and deal an additional 268552s1 initial damage.
 Define(wildfire_infusion_talent 20) #22301
 # Lace your Wildfire Bomb with extra reagents, randomly giving it one of the following enhancements each time you throw it:rnrn|cFFFFFFFFShrapnel Bomb: |rShrapnel pierces the targets, causing ?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] to apply a bleed for 9 seconds that stacks up to 270343u times.rnrn|cFFFFFFFFPheromone Bomb: |rKill Command has a 270323s2 chance to reset against targets coated with Pheromones.rnrn|cFFFFFFFFVolatile Bomb: |rReacts violently with poison, causing an extra explosion against enemies suffering from your Serpent Sting and refreshes your Serpent Stings.
+Define(azsharas_font_of_power_item 169314)
+Define(pocket_sized_computation_device_item 167555)
 Define(dance_of_death_trait 274441)
 Define(primal_instincts_trait 279806)
 Define(rapid_reload_trait 278530)
 Define(focused_fire_trait 278531)
 Define(in_the_rhythm_trait 264198)
 Define(surging_shots_trait 287707)
+Define(unerring_vision_trait 274444)
     ]]
     code = code .. [[
 # Hunter spells and functions.
@@ -551,7 +573,7 @@ Define(wing_clip 195645)
 Define(wing_clip_debuff 195645)
 	SpellInfo(wing_clip_debuff duration=15)
 
-	Define(reckless_force_counter 302917)
+	
 
 #Pet Spells
 Define(heart_of_the_phoenix 55709)

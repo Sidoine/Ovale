@@ -1187,6 +1187,9 @@ export function getSpellData(directory: string) {
     readFile(directory, "azerite", zone, output);
     readFile(directory, "sc_spell_lists", zone, output);
 
+    const identifierById = new Map<number, string>();
+    identifierById.set(302917, "reckless_force_counter");
+
     const identifiers: LuaObj<number> = {};
     const spellDataById = new Map<number, SpellData>();
     const spellData: SpellData[] = [];
@@ -1243,7 +1246,10 @@ export function getSpellData(directory: string) {
             identifierScore: 0
         };
 
-        if (spell.name) {
+        if (identifierById.get(spell.id)) {
+            spell.identifier = getIdentifier(identifierById.get(spell.id));
+            spell.identifierScore = 100;
+        } else if (spell.name) {
             spell.identifier = getIdentifier(spell.name);
         }
         spellData.push(spell);
@@ -1493,7 +1499,8 @@ export function getSpellData(directory: string) {
         identifiers[item.identifier] = item.id;
     }
 
-writeFileSync("sample.json", JSON.stringify(spellData, undefined, 2), { encoding: "utf8"});
+    writeFileSync("spells-data.txt", JSON.stringify(spellData, undefined, 2), { encoding: "utf8" });
+    writeFileSync("items-data.txt", JSON.stringify(Array.from(itemsById.values()), undefined, 2), { encoding: "utf8"});
 
     return { spellData, spellDataById, identifiers, talentsById, itemsById, azeriteTraitById };
 }

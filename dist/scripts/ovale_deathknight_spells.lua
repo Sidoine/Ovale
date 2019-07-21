@@ -56,6 +56,9 @@ Define(chains_of_ice 45524)
   SpellInfo(chains_of_ice runes=1 runicpower=-10 duration=8)
   # Movement slowed s1 by frozen chains.
   SpellAddTargetDebuff(chains_of_ice chains_of_ice=1)
+Define(chill_streak 204160)
+# Deals up to 204167s2 of the target's total health in Frost damage and reduces their movement speed by 204206m2 for 4 seconds.rnrnChill Streak bounces up to m1 times between closest targets within 204165A1 yards.
+  SpellInfo(chill_streak cd=45)
 Define(clawing_shadows 207311)
 # Deals s2 Shadow damage and causes 1 Festering Wound to burst.
   SpellInfo(clawing_shadows runes=1 runicpower=-10 talent=clawing_shadows_talent)
@@ -184,6 +187,16 @@ Define(raise_dead 46584)
   SpellInfo(raise_dead cd=30)
   # A Risen Ally is in your service.
   SpellAddBuff(raise_dead raise_dead=1)
+Define(reckless_force_buff 298409)
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+  SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
+  # Gaining unstable Azerite energy.
+  SpellAddBuff(reckless_force_buff reckless_force_buff=1)
+Define(reckless_force_counter 302917)
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+  SpellInfo(reckless_force_counter duration=60 channel=60 max_stacks=20 gcd=0 offgcd=1)
+  # Upon reaching u stacks, you gain 302932s~1 Critical Strike for 302932d.
+  SpellAddBuff(reckless_force_counter reckless_force_counter=1)
 Define(remorseless_winter 196770)
 # Drain the warmth of life from all nearby enemies within 196771A1 yards, dealing 9*196771s1*<CAP>/AP Frost damage over 8 seconds and reducing their movement speed by 211793s1.
   SpellInfo(remorseless_winter runes=1 runicpower=-10 cd=20 duration=8 tick=1)
@@ -215,6 +228,11 @@ Define(summon_gargoyle 49206)
 # Summon a Gargoyle into the area to bombard the target for 30 seconds.rnrnThe Gargoyle gains 211947s1 increased damage for every s4 Runic Power you spend.
   SpellInfo(summon_gargoyle cd=180 duration=35 talent=summon_gargoyle_talent)
 
+Define(the_unbound_force 298452)
+# Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]
+  SpellInfo(the_unbound_force cd=60 duration=2 channel=2 tick=0.33)
+  SpellAddBuff(the_unbound_force the_unbound_force=1)
+  SpellAddTargetDebuff(the_unbound_force the_unbound_force=1)
 Define(tombstone 219809)
 # Consume up to s5 Bone Shield charges. For each charge consumed, you gain s3 Runic Power and absorb damage equal to s4 of your maximum health for 8 seconds.
   SpellInfo(tombstone cd=60 duration=8 runicpower=0 talent=tombstone_talent)
@@ -295,15 +313,16 @@ Define(unholy_blight_talent 6) #22029
 # Surrounds yourself with a vile swarm of insects for 6 seconds, stinging all nearby enemies and infecting them with an unholy disease that deals 115994o1 damage over 14 seconds.
 Define(unholy_frenzy_talent 20) #22110
 # Incites you into a killing frenzy for 12 seconds, increasing Haste by s1 and causing your auto attacks to infect the target with a Festering Wound.
-Define(dread_aspirants_medallion_item 162897)
-Define(dread_gladiators_badge_item 161902)
 Define(first_mates_spyglass_item 158163)
 Define(jes_howler_item 159627)
 Define(lurkers_insidious_gift_item 167866)
+Define(notorious_gladiators_badge_item 167380)
+Define(notorious_gladiators_medallion_item 167377)
 Define(sinister_gladiators_badge_item 165058)
 Define(sinister_gladiators_medallion_item 165055)
 Define(vial_of_animated_blood_item 159625)
 Define(ramping_amplitude_gigavolt_engine_item 165580)
+Define(vision_of_demise_item 169307)
 Define(frozen_tempest_trait 278487)
 Define(icy_citadel_trait 272718)
 Define(magus_of_the_dead_trait 288417)

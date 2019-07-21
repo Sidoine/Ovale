@@ -107,6 +107,10 @@ Define(infernal_strike 189110)
 # Leap through the air toward a targeted location, dealing 189112s1 Fire damage to all enemies within 189112a1 yards.
   SpellInfo(infernal_strike cd=0.8 charge_cd=20 gcd=0 offgcd=1)
   SpellInfo(fel_rush replaced_by=infernal_strike)
+Define(lifeblood_buff 274419)
+# When you use a Healthstone, gain s1 Leech for 20 seconds.
+  SpellInfo(lifeblood_buff channel=-0.001 gcd=0 offgcd=1)
+
 Define(nemesis 206491)
 # Increases damage you inflict against the target by s1 for 60 seconds. rnrnWhen the target is slain, you will inflict s1 additional damage against all creature types matching the original target (Humanoid, Dragonkin, etc.) for the remaining duration.
   SpellInfo(nemesis cd=120 duration=60 talent=nemesis_talent)
@@ -120,6 +124,16 @@ Define(prepared_buff 203650)
 Define(purifying_blast 295337)
 # Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
   SpellInfo(purifying_blast cd=60 duration=6)
+Define(reckless_force_buff 298409)
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+  SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
+  # Gaining unstable Azerite energy.
+  SpellAddBuff(reckless_force_buff reckless_force_buff=1)
+Define(reckless_force_counter 302917)
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+  SpellInfo(reckless_force_counter duration=60 channel=60 max_stacks=20 gcd=0 offgcd=1)
+  # Upon reaching u stacks, you gain 302932s~1 Critical Strike for 302932d.
+  SpellAddBuff(reckless_force_counter reckless_force_counter=1)
 Define(shear 203782)
 # Shears an enemy for s1 Physical damage, and shatters ?a187827[two Lesser Soul Fragments][a Lesser Soul Fragment] from your target.rnrn|cFFFFFFFFGenerates m2/10 Pain.|r
   SpellInfo(shear pain=-10)

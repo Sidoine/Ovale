@@ -8,6 +8,9 @@ export function register() {
 # Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
   SpellAddBuff(ancestral_call ancestral_call=1)
+Define(anima_of_death 294926)
+# Draw upon your vitality to sear your foes, dealing s2 of your maximum health in Fire damage to all nearby enemies and heal for 294946s1 of your maximum health per enemy hit, up to ?a294945[294945s1*2][294945s1] of your maximum health.
+  SpellInfo(anima_of_death cd=150)
 Define(avatar 107574)
 # Transform into a colossus for 20 seconds, causing you to deal s1 increased damage and removing all roots and snares.rnrn|cFFFFFFFFGenerates s5/10 Rage.|r
   SpellInfo(avatar cd=90 duration=20 rage=-20 talent=avatar_talent)
@@ -107,6 +110,11 @@ Define(intimidating_shout 5246)
   SpellInfo(intimidating_shout cd=90 duration=8)
   # Disoriented.
   SpellAddTargetDebuff(intimidating_shout intimidating_shout=1)
+Define(last_stand 12975)
+# Increases maximum health by s1 for 15 seconds, and instantly heals you for that amount.
+  SpellInfo(last_stand cd=180 duration=15 gcd=0 offgcd=1)
+  # Maximum health increased by s1.
+  SpellAddBuff(last_stand last_stand=1)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
@@ -144,6 +152,9 @@ Define(ravager 152277)
   SpellInfo(ravager cd=60 duration=7 tick=1 talent=ravager_talent)
   # ?s23922[Chance to Parry increased by s1.][Ravager is currently active.]
   SpellAddBuff(ravager ravager=1)
+Define(razor_coral 303564)
+# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]
+  SpellInfo(razor_coral cd=20 channel=0 gcd=0 offgcd=1)
 Define(reckless_force_buff 298409)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
   SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
@@ -272,8 +283,6 @@ Define(warbreaker_talent 14) #22391
 Define(seismic_wave_trait 277639)
 Define(test_of_might_trait 275529)
 Define(cold_steel_hot_blood_trait 288080)
-Define(brace_for_impact_trait 277636)
-Define(deafening_crash_trait 272824)
     `;
 // END
     code += `
@@ -416,7 +425,7 @@ Define(in_for_the_kill_buff 248622)
 	SpellAddTargetBuff(intercept safeguard_buff=1)
 	SpellRequire(intercept unusable 1=lossofcontrol,root)
 Define(into_the_fray_buff 202602)
-Define(last_stand 12975)
+
 	SpellInfo(last_stand cd=180)
 	SpellInfo(last_stand add_cd=-60 talent=bolster_talent)
 	SpellAddBuff(last_stand last_stand_buff=1)

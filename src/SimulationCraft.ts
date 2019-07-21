@@ -182,6 +182,7 @@ const CHARACTER_PROPERTY: LuaObj<string> = {
     ["rage.deficit"]: "RageDeficit()",
     ["rage.max"]: "MaxRage()",
     ["raid_event.adds.remains"]: "0", // TODO
+    ["raid_event.invulnerable.exists"]: "0", //TODO
     ["raw_haste_pct"]: "SpellCastSpeedPercent()",
     ["rtb_list.any.5"]: "BuffCount(roll_the_bones_buff more 4)",
     ["rtb_list.any.6"]: "BuffCount(roll_the_bones_buff more 5)",
@@ -291,7 +292,9 @@ interface Modifiers {
     cycle_targets?: ParseNode,
     damage?: ParseNode,
     delay?: ParseNode;
+    dynamic_prepot?: ParseNode,
     early_chain_if?: ParseNode,
+    effect_name?: ParseNode,
     extra_amount?: ParseNode,
     five_stacks?: ParseNode,
     for_next?: ParseNode,
@@ -317,6 +320,7 @@ interface Modifiers {
     range?: ParseNode,
     sec?: ParseNode,
     slot?: ParseNode,
+    slots?: ParseNode,
     strikes?: ParseNode;
     sync?: ParseNode,
     sync_weapons?: ParseNode,
@@ -404,7 +408,9 @@ const MODIFIER_KEYWORD: TypeCheck<Modifiers> = {
     ["cycle_targets"]: true,
     ["damage"]: true,
     ["delay"]: true,
+    ["dynamic_prepot"]: true,
     ["early_chain_if"]: true,
+    ["effect_name"]: true,
     ["extra_amount"]: true,
     ["five_stacks"]: true,
     ["for_next"]: true,
@@ -430,6 +436,7 @@ const MODIFIER_KEYWORD: TypeCheck<Modifiers> = {
     ["range"]: true,
     ["sec"]: true,
     ["slot"]: true,
+    ["slots"]: true,
     ["strikes"]: true,
     ["sync"]: true,
     ["sync_weapons"]: true,
@@ -1518,7 +1525,7 @@ function Disambiguate(annotation: Annotation, name: string, className: string, s
     let [disname, distype] = GetPerClassSpecialization(EMIT_DISAMBIGUATION, name, className, specialization);
     if (!disname) {
         if (!annotation.dictionary[name]) {
-            let otherName = truthy(match(name, "_buff$")) && gsub(name, "_buff$", "") || gsub(name, "_debuff$", "")
+            let otherName = truthy(match(name, "_buff$")) && gsub(name, "_buff$", "") || (truthy(match(name, "_debuff$")) && gsub(name, "_debuff$", "")) || gsub(name, "_item$", "");
             if (annotation.dictionary[otherName]) {
                 return [otherName, _type];
             }
@@ -1581,6 +1588,7 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("cold_heart_talent_buff", "cold_heart_buff", "DEATHKNIGHT", "frost");
     AddDisambiguation("outbreak_debuff", "virulent_plague_debuff", "DEATHKNIGHT", "unholy");
     AddDisambiguation("gargoyle", "summon_gargoyle", "DEATHKNIGHT", "unholy");
+    AddDisambiguation("empowered_rune_weapon", "empower_rune_weapon", "DEATHKNIGHT");
 
     //Demon Hunter
     AddDisambiguation("felblade_talent", "felblade_talent_havoc", "DEMONHUNTER", "havoc");
@@ -1673,7 +1681,10 @@ const InitializeDisambiguation = function() {
     AddDisambiguation("execute", "execute_arms", "WARRIOR", "arms");
     AddDisambiguation("storm_bolt_talent", "prot_storm_bolt_talent", "WARRIOR", "protection");
     AddDisambiguation("meat_cleaver", "whirlwind", "WARRIOR", "fury")
+
+    AddDisambiguation("pocketsized_computation_device_item", "pocket_sized_computation_device_item");
 }
+
 const IsTotem = function(name: string) {
     if (sub(name, 1, 13) == "efflorescence") {
         return true;
@@ -2627,7 +2638,9 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
             isSpellAction = false;
         } else if (action == "use_item") {
             let legendaryRing: string = undefined;
+            // TODO use modifiers.slots
             if (modifiers.slot) {
+                // use this slot only?
                 let slot = Unparse(modifiers.slot);
                 if (truthy(match(slot, "finger"))) {
                     [legendaryRing] = Disambiguate(annotation, "legendary_ring", className, specialization);
@@ -2642,6 +2655,8 @@ EmitAction = function (parseNode: ParseNode, nodeList, annotation) {
                 //     bodyCode = format("Item(%s usable=1)", name);
                 //     AddSymbol(annotation, name);
                 // }
+            } else if (modifiers.effect_name) {
+                // TODO use any item that has this effect
             }
             if (legendaryRing) {
                 conditionCode = format("CheckBoxOn(opt_%s)", legendaryRing);
@@ -4161,9 +4176,9 @@ EmitOperandSpecial = function (operand, parseNode, nodeList, annotation, action,
     } else if (operand == "distance") {
         code = `${target}Distance()`;
     } else if (sub(operand, 1, 9) == "equipped.") {
-        let [name] = Disambiguate(annotation, sub(operand, 10), className, specialization);
+        let [name] = Disambiguate(annotation, `${sub(operand, 10)}_item`, className, specialization);
         let itemId = tonumber(name)
-        let itemName = `${name}_item`
+        let itemName = name;
         let item = itemId && tostring(itemId) || itemName
         code = format("HasEquippedItem(%s)", item)
         AddSymbol(annotation, item);
@@ -4329,6 +4344,9 @@ EmitOperandTrinket = function (operand, parseNode, nodeList, annotation, action)
     let token = tokenIterator();
     if (token == "trinket") {
         let procType = tokenIterator();
+        if (procType === "1" || procType === "2") {
+            procType = tokenIterator(); // TODO use trinket slot?
+        }
         let statName = tokenIterator();
         let code;
         if (procType === "cooldown") {
@@ -4370,8 +4388,7 @@ EmitOperandTrinket = function (operand, parseNode, nodeList, annotation, action)
             }
         }
         if (ok && code) {
-            annotation.astAnnotation = annotation.astAnnotation || {
-            };
+            annotation.astAnnotation = annotation.astAnnotation || {};
             [node] = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation);
         }
     } else {

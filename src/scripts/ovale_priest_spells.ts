@@ -34,6 +34,10 @@ Define(guardian_of_azeroth 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth cd=180 duration=30)
   SpellAddBuff(guardian_of_azeroth guardian_of_azeroth=1)
+Define(lifeblood_buff 274419)
+# When you use a Healthstone, gain s1 Leech for 20 seconds.
+  SpellInfo(lifeblood_buff channel=-0.001 gcd=0 offgcd=1)
+
 Define(mind_blast 8092)
 # Blasts the target's mind for (120 of Spell Power) Shadow damage.?a185916[rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r][]
   SpellInfo(mind_blast cd=7.5 insanity=-1200)
