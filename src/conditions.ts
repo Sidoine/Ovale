@@ -160,7 +160,7 @@ function GetHastedTime(seconds: number, haste: HasteType | undefined) {
     }
     function AzeriteEssenceRank(positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) {
         const [essenceId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
-        const value = OvaleAzeriteEssence.self_essences[essenceId].rank;
+        const value = OvaleAzeriteEssence.self_essences[essenceId] && OvaleAzeriteEssence.self_essences[essenceId].rank;
         return Compare(value, comparator, limit);
     }
     OvaleCondition.RegisterCondition("azeriteessenceismajor", false, AzeriteEssenceIsMajor);

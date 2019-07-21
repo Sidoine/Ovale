@@ -142,23 +142,25 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
                     OvaleEnemies.next.enemies = nil
                 end
                 OvaleState:Log("+++ Icon %d", k)
-                OvaleBestAction:StartNewAction()
-                local atTime = OvaleFuture.next.nextCast
-                if OvaleFuture.next.currentCast.spellId == nil or OvaleFuture.next.currentCast.spellId ~= OvaleFuture.next.lastGCDSpellId then
-                    atTime = baseState.next.currentTime
-                end
-                local timeSpan, element = OvaleBestAction:GetAction(node, atTime)
-                local start
-                if element and element.offgcd then
-                    start = timeSpan:NextTime(baseState.next.currentTime)
-                else
-                    start = timeSpan:NextTime(atTime)
-                end
-                if profile.apparence.enableIcons then
-                    self:UpdateActionIcon(node, self.actions[k], element, start)
-                end
-                if profile.apparence.spellFlash.enabled and OvaleSpellFlash then
-                    OvaleSpellFlash:Flash(nil, node, element, start)
+                if node.child and #node.child > 0 then
+                    OvaleBestAction:StartNewAction()
+                    local atTime = OvaleFuture.next.nextCast
+                    if OvaleFuture.next.currentCast.spellId == nil or OvaleFuture.next.currentCast.spellId ~= OvaleFuture.next.lastGCDSpellId then
+                        atTime = baseState.next.currentTime
+                    end
+                    local timeSpan, element = OvaleBestAction:GetAction(node, atTime)
+                    local start
+                    if element and element.offgcd then
+                        start = timeSpan:NextTime(baseState.next.currentTime)
+                    else
+                        start = timeSpan:NextTime(atTime)
+                    end
+                    if profile.apparence.enableIcons then
+                        self:UpdateActionIcon(node, self.actions[k], element, start)
+                    end
+                    if profile.apparence.spellFlash.enabled and OvaleSpellFlash then
+                        OvaleSpellFlash:Flash(nil, node, element, start)
+                    end
                 end
             end
             wipe(Ovale.refreshNeeded)

@@ -830,7 +830,7 @@ __exports.OvaleASTClass = __class(OvaleASTBase, {
         return node, nodeList, annotation
     end,
     ParseScript = function(self, name, options)
-        local code = OvaleScripts:GetScript(name)
+        local code = OvaleScripts:GetScriptOrDefault(name)
         local ast
         if code then
             options = options or {

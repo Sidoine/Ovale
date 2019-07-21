@@ -167,23 +167,25 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                     OvaleEnemies.next.enemies = undefined;
                 }
                 OvaleState.Log("+++ Icon %d", k);
-                OvaleBestAction.StartNewAction();
-                let atTime = OvaleFuture.next.nextCast;
-                if (OvaleFuture.next.currentCast.spellId == undefined || OvaleFuture.next.currentCast.spellId != OvaleFuture.next.lastGCDSpellId) {
-                    atTime = baseState.next.currentTime;
-                }
-                let [timeSpan, element] = OvaleBestAction.GetAction(node, atTime);
-                let start;
-                if (element && element.offgcd) {
-                    start = timeSpan.NextTime(baseState.next.currentTime);
-                } else {
-                    start = timeSpan.NextTime(atTime);
-                }
-                if (profile.apparence.enableIcons) {
-                    this.UpdateActionIcon(node, this.actions[k], element, start);
-                }
-                if (profile.apparence.spellFlash.enabled && OvaleSpellFlash) {
-                    OvaleSpellFlash.Flash(undefined, node, element, start);
+                if (node.child && lualength(node.child) > 0) {
+                    OvaleBestAction.StartNewAction();
+                    let atTime = OvaleFuture.next.nextCast;
+                    if (OvaleFuture.next.currentCast.spellId == undefined || OvaleFuture.next.currentCast.spellId != OvaleFuture.next.lastGCDSpellId) {
+                        atTime = baseState.next.currentTime;
+                    }
+                    let [timeSpan, element] = OvaleBestAction.GetAction(node, atTime);
+                    let start;
+                    if (element && element.offgcd) {
+                        start = timeSpan.NextTime(baseState.next.currentTime);
+                    } else {
+                        start = timeSpan.NextTime(atTime);
+                    }
+                    if (profile.apparence.enableIcons) {
+                        this.UpdateActionIcon(node, this.actions[k], element, start);
+                    }
+                    if (profile.apparence.spellFlash.enabled && OvaleSpellFlash) {
+                        OvaleSpellFlash.Flash(undefined, node, element, start);
+                    }
                 }
             }
             wipe(Ovale.refreshNeeded);

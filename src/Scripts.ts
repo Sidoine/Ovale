@@ -138,6 +138,10 @@ class OvaleScriptsClass  extends OvaleScriptsBase {
         if (name && this.script[name]) {
             return this.script[name].code;
         }
+        return undefined;
+    }
+    GetScriptOrDefault(name: string) {
+        return this.GetScript(name) || this.GetScript(this.GetDefaultScriptName(Ovale.playerClass, OvalePaperDoll.GetSpecialization()));
     }
 
     private getCurrentSpecIdentifier() {

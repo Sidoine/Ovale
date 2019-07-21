@@ -130,6 +130,10 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
         if name and self.script[name] then
             return self.script[name].code
         end
+        return nil
+    end,
+    GetScriptOrDefault = function(self, name)
+        return self:GetScript(name) or self:GetScript(self:GetDefaultScriptName(Ovale.playerClass, OvalePaperDoll:GetSpecialization()))
     end,
     getCurrentSpecIdentifier = function(self)
         return Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()

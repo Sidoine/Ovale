@@ -2551,7 +2551,7 @@ export class OvaleASTClass extends OvaleASTBase {
         return [node, nodeList, annotation];
     }
     ParseScript(name: string, options?: { optimize: boolean, verify: boolean}) {
-        let code = OvaleScripts.GetScript(name);
+        let code = OvaleScripts.GetScriptOrDefault(name);
         let ast: AstNode;
         if (code) {
             options = options || {
