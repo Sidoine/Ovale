@@ -1,7 +1,6 @@
 import LibBabbleCreatureType from "@wowts/lib_babble-creature_type-3.0";
 import LibRangeCheck from "@wowts/lib_range_check-2.0";
 import { OvaleBestAction } from "./BestAction";
-import { OvaleCompile } from "./Compile";
 import { OvaleCondition, TestValue, Compare, TestBoolean, ParseCondition, ConditionFunction, isComparator, ConditionResult, ReturnValue } from "./Condition";
 import { OvaleDamageTaken } from "./DamageTaken";
 import { OvaleData, SpellInfo } from "./Data";
@@ -39,6 +38,7 @@ import { OvaleWarlock } from "./Warlock";
 import { OvaleStagger } from "./Stagger";
 import { OvaleLossOfControl } from "./LossOfControl";
 import { lower } from "@wowts/string";
+import { OvaleCompile } from "./Compile";
 let INFINITY = huge;
 
 // Return the target's damage reduction from armor, which seems to be 30% with most bosses

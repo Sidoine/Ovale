@@ -24,6 +24,6 @@ __exports.OvalePoolGC = __class(nil, {
         self.size = 0
     end,
     DebuggingInfo = function(self)
-        Ovale:Print("Pool %s has size %d.", tostring(self.name), self.size)
+        Ovale.Print("Pool %s has size %d.", tostring(self.name), self.size)
     end,
 })

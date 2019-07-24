@@ -9,7 +9,7 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0", true)
 local Recount = LibStub:GetLibrary("recount", true)
 local setmetatable = setmetatable
 local GameTooltip = GameTooltip
-local OvaleRecountBase = Ovale:NewModule("OvaleRecount")
+local OvaleRecountBase = Ovale.NewModule("OvaleRecount")
 local DataModes = function(self, data, num)
     if  not data then
         return 0, 0
@@ -45,7 +45,7 @@ local OvaleRecountClass = __class(OvaleRecountBase, {
 
                 })
             end
-            Recount:AddModeTooltip(Ovale:GetName(), DataModes, TooltipFuncs, nil, nil, nil, nil)
+            Recount:AddModeTooltip(Ovale.GetName(), DataModes, TooltipFuncs, nil, nil, nil, nil)
             OvaleScore:RegisterDamageMeter("OvaleRecount", self, "ReceiveScore")
         end
     end,
@@ -56,8 +56,8 @@ local OvaleRecountClass = __class(OvaleRecountBase, {
         if Recount then
             local source = Recount.db2.combatants[name]
             if source then
-                Recount:AddAmount(source, Ovale:GetName(), scored)
-                Recount:AddAmount(source, Ovale:GetName() .. "Max", scoreMax)
+                Recount:AddAmount(source, Ovale.GetName(), scored)
+                Recount:AddAmount(source, Ovale.GetName() .. "Max", scoreMax)
             end
         end
     end,

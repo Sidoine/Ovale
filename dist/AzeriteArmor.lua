@@ -1,10 +1,6 @@
 local __exports = LibStub:NewLibrary("ovale/AzeriteArmor", 80201)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __Debug = LibStub:GetLibrary("ovale/Debug")
-local OvaleDebug = __Debug.OvaleDebug
-local __Ovale = LibStub:GetLibrary("ovale/Ovale")
-local Ovale = __Ovale.Ovale
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local wipe = wipe
 local pairs = pairs
@@ -17,22 +13,14 @@ local C_Item = C_Item
 local ItemLocation = ItemLocation
 local C_AzeriteEmpoweredItem = C_AzeriteEmpoweredItem
 local GetSpellInfo = GetSpellInfo
-local __Equipment = LibStub:GetLibrary("ovale/Equipment")
-local OvaleEquipment = __Equipment.OvaleEquipment
-local tsort = sort
-local tinsert = insert
-local tconcat = concat
-local item = C_Item
-local itemLocation = ItemLocation
-local azeriteItem = C_AzeriteEmpoweredItem
 local azeriteSlots = {
     [1] = true,
     [3] = true,
     [5] = true
 }
-local OvaleAzeriteArmorBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleAzerite", aceEvent))
-local OvaleAzeriteArmor = __class(OvaleAzeriteArmorBase, {
-    constructor = function(self)
+__exports.OvaleAzeriteArmor = __class(nil, {
+    constructor = function(self, OvaleEquipment, ovale, ovaleDebug)
+        self.OvaleEquipment = OvaleEquipment
         self.self_traits = {}
         self.output = {}
         self.debugOptions = {
@@ -52,44 +40,44 @@ local OvaleAzeriteArmor = __class(OvaleAzeriteArmorBase, {
                 }
             }
         }
-        OvaleAzeriteArmorBase.constructor(self)
-        for k, v in pairs(self.debugOptions) do
-            OvaleDebug.options.args[k] = v
+        self.OnInitialize = function()
+            self.module:RegisterMessage("Ovale_EquipmentChanged", self.ItemChanged)
+            self.module:RegisterEvent("AZERITE_EMPOWERED_ITEM_SELECTION_UPDATED", self.AZERITE_EMPOWERED_ITEM_SELECTION_UPDATED)
+            self.module:RegisterEvent("PLAYER_ENTERING_WORLD", self.PLAYER_ENTERING_WORLD)
         end
-    end,
-    OnInitialize = function(self)
-        self:RegisterMessage("Ovale_EquipmentChanged", "ItemChanged")
-        self:RegisterEvent("AZERITE_EMPOWERED_ITEM_SELECTION_UPDATED")
-        self:RegisterEvent("PLAYER_ENTERING_WORLD")
-    end,
-    OnDisable = function(self)
-        self:UnregisterMessage("Ovale_EquipmentChanged")
-        self:UnregisterEvent("AZERITE_EMPOWERED_ITEM_SELECTION_UPDATED")
-        self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-    end,
-    ItemChanged = function(self)
-        local slotId = OvaleEquipment.lastChangedSlot
-        if slotId ~= nil and azeriteSlots[slotId] then
+        self.OnDisable = function()
+            self.module:UnregisterMessage("Ovale_EquipmentChanged")
+            self.module:UnregisterEvent("AZERITE_EMPOWERED_ITEM_SELECTION_UPDATED")
+            self.module:UnregisterEvent("PLAYER_ENTERING_WORLD")
+        end
+        self.ItemChanged = function()
+            local slotId = self.OvaleEquipment.lastChangedSlot
+            if slotId ~= nil and azeriteSlots[slotId] then
+                self:UpdateTraits()
+            end
+        end
+        self.AZERITE_EMPOWERED_ITEM_SELECTION_UPDATED = function(event, itemSlot)
             self:UpdateTraits()
         end
-    end,
-    AZERITE_EMPOWERED_ITEM_SELECTION_UPDATED = function(self, event, itemSlot)
-        self:UpdateTraits()
-    end,
-    PLAYER_ENTERING_WORLD = function(self, event)
-        self:UpdateTraits()
+        self.PLAYER_ENTERING_WORLD = function(event)
+            self:UpdateTraits()
+        end
+        self.module = ovale:createModule("OvaleAzeriteArmor", self.OnInitialize, self.OnDisable, aceEvent)
+        for k, v in pairs(self.debugOptions) do
+            ovaleDebug.defaultOptions.args[k] = v
+        end
     end,
     UpdateTraits = function(self)
         self.self_traits = {}
         for slotId in pairs(azeriteSlots) do
-            local itemSlot = itemLocation:CreateFromEquipmentSlot(slotId)
-            if item.DoesItemExist(itemSlot) and azeriteItem.IsAzeriteEmpoweredItem(itemSlot) then
-                local allTraits = azeriteItem.GetAllTierInfo(itemSlot)
+            local itemSlot = ItemLocation:CreateFromEquipmentSlot(slotId)
+            if C_Item.DoesItemExist(itemSlot) and C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItem(itemSlot) then
+                local allTraits = C_AzeriteEmpoweredItem.GetAllTierInfo(itemSlot)
                 for _, traitsInRow in pairs(allTraits) do
                     for _, powerId in pairs(traitsInRow.azeritePowerIDs) do
-                        local isEnabled = azeriteItem.IsPowerSelected(itemSlot, powerId)
+                        local isEnabled = C_AzeriteEmpoweredItem.IsPowerSelected(itemSlot, powerId)
                         if isEnabled then
-                            local powerInfo = azeriteItem.GetPowerInfo(powerId)
+                            local powerInfo = C_AzeriteEmpoweredItem.GetPowerInfo(powerId)
                             local name = GetSpellInfo(powerInfo.spellID)
                             if self.self_traits[powerInfo.spellID] then
                                 local rank = self.self_traits[powerInfo.spellID].rank
@@ -121,13 +109,12 @@ local OvaleAzeriteArmor = __class(OvaleAzeriteArmorBase, {
         wipe(self.output)
         local array = {}
         for k, v in pairs(self.self_traits) do
-            tinsert(array, tostring(v.name) .. ": " .. tostring(k) .. " (" .. v.rank .. ")")
+            insert(array, tostring(v.name) .. ": " .. tostring(k) .. " (" .. v.rank .. ")")
         end
-        tsort(array)
+        sort(array)
         for _, v in ipairs(array) do
             self.output[#self.output + 1] = v
         end
-        return tconcat(self.output, "\n")
+        return concat(self.output, "\n")
     end,
 })
-__exports.OvaleAzerite = OvaleAzeriteArmor()

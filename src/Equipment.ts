@@ -1,19 +1,13 @@
-import { OvaleProfiler } from "./Profiler";
-import { Ovale } from "./Ovale";
-import { OvaleDebug } from "./Debug";
-import aceEvent from "@wowts/ace_event-3.0";
+import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { pairs, wipe, lualength, LuaArray, ipairs, kpairs, LuaObj } from "@wowts/lua";
 import { sub } from "@wowts/string";
 import { GetInventoryItemID, GetInventoryItemLink, GetItemStats, GetItemInfoInstant, GetInventorySlotInfo, INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED } from "@wowts/wow-mock";
 import { concat, insert } from "@wowts/table";
 import { isNumber } from "./tools";
-
-let strsub = sub;
-let tinsert = insert;
-let tconcat = concat;
-
-let OvaleEquipmentBase = OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleEquipment", aceEvent)));
-export let OvaleEquipment: OvaleEquipmentClass;
+import { AceModule } from "@wowts/tsaddon";
+import { OvaleClass } from "./Ovale";
+import { OvaleDebugClass } from "./Debug";
+import { Profiler, OvaleProfilerClass } from "./Profiler";
 
 let OVALE_SLOTID_BY_SLOTNAME = {
     AmmoSlot: 0,
@@ -55,7 +49,7 @@ let OVALE_RANGED_WEAPON:WeaponMap = {
     INVTYPE_RANGED: true
 }
 
-class OvaleEquipmentClass extends OvaleEquipmentBase {
+export class OvaleEquipmentClass {
     ready = false;
     equippedItemById: LuaArray<number> = {}
     equippedItemBySlot: LuaObj<number> = {}
@@ -87,11 +81,14 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
             }
         }
     }
+    private module: AceModule & AceEvent;
+    private profiler: Profiler;
 
-    constructor() {
-        super();
+    constructor(private ovale: OvaleClass, ovaleDebug: OvaleDebugClass, ovaleProfiler: OvaleProfilerClass) {
+        this.module =  ovale.createModule("OvaleEquipment", this.OnInitialize, this.OnDisable, aceEvent);
+        this.profiler = ovaleProfiler.create(this.module.GetName());
         for (const [k, v] of pairs(this.debugOptions)) {
-            OvaleDebug.options.args[k] = v;
+            ovaleDebug.defaultOptions.args[k] = v;
         }
         for (const [slotName, ] of kpairs(OVALE_SLOTID_BY_SLOTNAME)) {
             let [invSlotId] = GetInventorySlotInfo(slotName)
@@ -100,29 +97,25 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
         }
     }
 
-    OnInitialize() {
-        //this.RegisterEvent("GET_ITEM_INFO_RECEIVED");
-        this.RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateEquippedItems");
-        //this.RegisterEvent("PLAYER_AVG_ITEM_LEVEL_UPDATE", "UpdateEquippedItemLevels");
-        this.RegisterEvent("PLAYER_EQUIPMENT_CHANGED");
+    private OnInitialize = () => {
+        this.module.RegisterEvent("PLAYER_ENTERING_WORLD", this.UpdateEquippedItems);
+        this.module.RegisterEvent("PLAYER_EQUIPMENT_CHANGED", this.PLAYER_EQUIPMENT_CHANGED);
     }
-    OnDisable() {
-        //this.UnregisterEvent("GET_ITEM_INFO_RECEIVED");
-        this.UnregisterEvent("PLAYER_ENTERING_WORLD");
-        //this.UnregisterEvent("PLAYER_AVG_ITEM_LEVEL_UPDATE");
-        this.UnregisterEvent("PLAYER_EQUIPMENT_CHANGED");
+    private OnDisable = () => {
+        this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
+        this.module.UnregisterEvent("PLAYER_EQUIPMENT_CHANGED");
     }
     
-    PLAYER_EQUIPMENT_CHANGED(event: string, slotId: number, hasItem: number) {
-        this.StartProfiling("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED");
+    private PLAYER_EQUIPMENT_CHANGED = (event: string, slotId: number, hasItem: number) => {
+        this.profiler.StartProfiling("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED");
         let changed = this.UpdateItemBySlot(slotId)
         if (changed) {
             this.lastChangedSlot = slotId
             //this.UpdateArmorSetCount();
-            Ovale.needRefresh();
-            this.SendMessage("Ovale_EquipmentChanged");
+            this.ovale.needRefresh();
+            this.module.SendMessage("Ovale_EquipmentChanged");
         }
-        this.StopProfiling("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED");
+        this.profiler.StopProfiling("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED");
     }
     // Armor sets are retiring after Legion; for now, return 0
     GetArmorSetCount(name: string) {
@@ -275,8 +268,8 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
         }
         return [<WeaponType>itemEquipLoc, dps]
     }
-    UpdateEquippedItems() {
-        this.StartProfiling("OvaleEquipment_UpdateEquippedItems");
+    private UpdateEquippedItems = () => {
+        this.profiler.StartProfiling("OvaleEquipment_UpdateEquippedItems");
         let changed = false;
         for (let slotId = INVSLOT_FIRST_EQUIPPED; slotId <= INVSLOT_LAST_EQUIPPED; slotId += 1) {
             if (OVALE_SLOTNAME_BY_SLOTID[slotId] && this.UpdateItemBySlot(slotId)) {
@@ -284,11 +277,11 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
             }
         }
         if (changed) {
-            Ovale.needRefresh();
-            this.SendMessage("Ovale_EquipmentChanged");
+            this.ovale.needRefresh();
+            this.module.SendMessage("Ovale_EquipmentChanged");
         }
         this.ready = true;
-        this.StopProfiling("OvaleEquipment_UpdateEquippedItems");
+        this.profiler.StopProfiling("OvaleEquipment_UpdateEquippedItems");
     } 
     
     DebugEquipment() {
@@ -303,13 +296,13 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
         }*/
         for (const [slotId, slotName] of ipairs(OVALE_SLOTNAME_BY_SLOTID)) {
             let itemId = this.equippedItemBySlot[slotId] || '';
-            let shortSlotName = strsub(slotName, 1, -5)
-            tinsert(array, `${shortSlotName}: ${itemId}`)
+            let shortSlotName = sub(slotName, 1, -5)
+            insert(array, `${shortSlotName}: ${itemId}`)
         }
-        tinsert(array, `\n`)
-        tinsert(array, `Main Hand DPS = ${this.mainHandDPS}`)
+        insert(array, `\n`)
+        insert(array, `Main Hand DPS = ${this.mainHandDPS}`)
         if (this.HasOffHandWeapon()) {
-            tinsert(array, `Off hand DPS = ${this.offHandDPS}`)
+            insert(array, `Off hand DPS = ${this.offHandDPS}`)
         }
         /*
         for (const [k, v] of pairs(this.armorSetCount)) {
@@ -319,7 +312,7 @@ class OvaleEquipmentClass extends OvaleEquipmentBase {
         for (const [, v] of ipairs(array)) {
             this.output[lualength(this.output) + 1] = v;
         }
-        return tconcat(this.output, "\n");
+        return concat(this.output, "\n");
     }
     /* Removed for simplicity as I don't think anyone uses this.  If it does need to be added back then GET_ITEM_INFO_RECEIVED will need to be as well.
 const GetItemLevel = function(slotId) {
@@ -380,5 +373,3 @@ const GetItemLevel = function(slotId) {
     } 
 */
 }
-
-OvaleEquipment = new OvaleEquipmentClass();

@@ -40,7 +40,7 @@ __exports.OvalePool = __class(nil, {
         self.unused = 0
     end,
     DebuggingInfo = function(self)
-        Ovale:Print("Pool %s has size %d with %d item(s).", tostring(self.name), self.size, self.unused)
+        Ovale.Print("Pool %s has size %d with %d item(s).", tostring(self.name), self.size, self.unused)
     end,
     Clean = function(self, item)
     end,

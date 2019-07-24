@@ -26,7 +26,7 @@ local isNumber = __tools.isNumber
 local strsub = sub
 local tinsert = insert
 local tconcat = concat
-local OvaleEquipmentBase = OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvaleEquipment", aceEvent)))
+local OvaleEquipmentBase = OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleEquipment", aceEvent)))
 local OVALE_SLOTID_BY_SLOTNAME = {
     AmmoSlot = 0,
     HeadSlot = 1,
@@ -58,7 +58,7 @@ local OVALE_RANGED_WEAPON = {
     INVTYPE_RANGEDRIGHT = true,
     INVTYPE_RANGED = true
 }
-local OvaleEquipmentClass = __class(OvaleEquipmentBase, {
+__exports.OvaleEquipmentClass = __class(OvaleEquipmentBase, {
     constructor = function(self)
         self.ready = false
         self.equippedItemById = {}
@@ -98,22 +98,22 @@ local OvaleEquipmentClass = __class(OvaleEquipmentBase, {
         end
     end,
     OnInitialize = function(self)
-        self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateEquippedItems")
-        self:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
+        self.RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateEquippedItems")
+        self.RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
     end,
     OnDisable = function(self)
-        self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-        self:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED")
+        self.UnregisterEvent("PLAYER_ENTERING_WORLD")
+        self.UnregisterEvent("PLAYER_EQUIPMENT_CHANGED")
     end,
     PLAYER_EQUIPMENT_CHANGED = function(self, event, slotId, hasItem)
-        self:StartProfiling("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED")
+        self.StartProfiling("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED")
         local changed = self:UpdateItemBySlot(slotId)
         if changed then
             self.lastChangedSlot = slotId
-            Ovale:needRefresh()
-            self:SendMessage("Ovale_EquipmentChanged")
+            Ovale.needRefresh()
+            self.SendMessage("Ovale_EquipmentChanged")
         end
-        self:StopProfiling("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED")
+        self.StopProfiling("OvaleEquipment_PLAYER_EQUIPMENT_CHANGED")
     end,
     GetArmorSetCount = function(self, name)
         return 0
@@ -230,7 +230,7 @@ local OvaleEquipmentClass = __class(OvaleEquipmentBase, {
         return itemEquipLoc, dps
     end,
     UpdateEquippedItems = function(self)
-        self:StartProfiling("OvaleEquipment_UpdateEquippedItems")
+        self.StartProfiling("OvaleEquipment_UpdateEquippedItems")
         local changed = false
         for slotId = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED, 1 do
             if OVALE_SLOTNAME_BY_SLOTID[slotId] and self:UpdateItemBySlot(slotId) then
@@ -238,11 +238,11 @@ local OvaleEquipmentClass = __class(OvaleEquipmentBase, {
             end
         end
         if changed then
-            Ovale:needRefresh()
-            self:SendMessage("Ovale_EquipmentChanged")
+            Ovale.needRefresh()
+            self.SendMessage("Ovale_EquipmentChanged")
         end
         self.ready = true
-        self:StopProfiling("OvaleEquipment_UpdateEquippedItems")
+        self.StopProfiling("OvaleEquipment_UpdateEquippedItems")
     end,
     DebugEquipment = function(self)
         wipe(self.output)
@@ -264,4 +264,3 @@ local OvaleEquipmentClass = __class(OvaleEquipmentBase, {
         return tconcat(self.output, "\n")
     end,
 })
-__exports.OvaleEquipment = OvaleEquipmentClass()

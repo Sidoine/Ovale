@@ -22,7 +22,7 @@ local isLuaArray = __tools.isLuaArray
 local GetNumSpecializations = GetNumSpecializations
 local __Debug = LibStub:GetLibrary("ovale/Debug")
 local OvaleDebug = __Debug.OvaleDebug
-local OvaleScriptsBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleScripts", aceEvent))
+local OvaleScriptsBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleScripts", aceEvent))
 __exports.DEFAULT_NAME = "Ovale"
 local DEFAULT_DESCRIPTION = L["Script défaut"]
 local CUSTOM_NAME = "custom"
@@ -40,7 +40,7 @@ do
             name = L["Code"],
             type = "execute",
             func = function()
-                local appName = __exports.OvaleScripts:GetName()
+                local appName = __exports.OvaleScripts.GetName()
                 AceConfigDialog:SetDefaultSize(appName, 700, 550)
                 AceConfigDialog:Open(appName)
             end
@@ -53,7 +53,7 @@ do
     for k, v in pairs(actions) do
         OvaleOptions.options.args.actions.args[k] = v
     end
-    OvaleOptions:RegisterOptions(__exports.OvaleScripts)
+    OvaleOptions.RegisterOptions(__exports.OvaleScripts)
 end
 local OvaleScriptsClass = __class(OvaleScriptsBase, {
     constructor = function(self)
@@ -65,19 +65,19 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
         self:RegisterScript(nil, nil, __exports.DEFAULT_NAME, DEFAULT_DESCRIPTION, nil, "script")
         self:RegisterScript(Ovale.playerClass, nil, CUSTOM_NAME, CUSTOM_DESCRIPTION, Ovale.db.profile.code, "script")
         self:RegisterScript(nil, nil, DISABLED_NAME, DISABLED_DESCRIPTION, nil, "script")
-        self:RegisterMessage("Ovale_StanceChanged")
-        self:RegisterMessage("Ovale_ScriptChanged", "InitScriptProfiles")
+        self.RegisterMessage("Ovale_StanceChanged")
+        self.RegisterMessage("Ovale_ScriptChanged", "InitScriptProfiles")
     end,
     OnDisable = function(self)
-        self:UnregisterMessage("Ovale_StanceChanged")
-        self:UnregisterMessage("Ovale_ScriptChanged")
+        self.UnregisterMessage("Ovale_StanceChanged")
+        self.UnregisterMessage("Ovale_ScriptChanged")
     end,
     Ovale_StanceChanged = function(self, event, newStance, oldStance)
     end,
     GetDescriptions = function(self, scriptType)
         local descriptionsTable = {}
         for name, script in pairs(self.script) do
-            if ( not scriptType or script.type == scriptType) and ( not script.className or script.className == Ovale.playerClass) and ( not script.specialization or OvalePaperDoll:IsSpecialization(script.specialization)) then
+            if ( not scriptType or script.type == scriptType) and ( not script.className or script.className == Ovale.playerClass) and ( not script.specialization or OvalePaperDoll.IsSpecialization(script.specialization)) then
                 if name == __exports.DEFAULT_NAME then
                     descriptionsTable[name] = script.desc .. " (" .. self:GetScriptName(name) .. ")"
                 else
@@ -103,7 +103,7 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
         local oldSource = self:getCurrentSpecScriptName()
         if oldSource ~= name then
             self:setCurrentSpecScriptName(name)
-            self:SendMessage("Ovale_ScriptChanged")
+            self.SendMessage("Ovale_ScriptChanged")
         end
     end,
     GetDefaultScriptName = function(self, className, specialization)
@@ -123,7 +123,7 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
         return name
     end,
     GetScriptName = function(self, name)
-        return (name == __exports.DEFAULT_NAME) and self:GetDefaultScriptName(Ovale.playerClass, OvalePaperDoll:GetSpecialization()) or name
+        return (name == __exports.DEFAULT_NAME) and self:GetDefaultScriptName(Ovale.playerClass, OvalePaperDoll.GetSpecialization()) or name
     end,
     GetScript = function(self, name)
         name = self:GetScriptName(name)
@@ -132,7 +132,7 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
         end
     end,
     getCurrentSpecIdentifier = function(self)
-        return Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()
+        return Ovale.playerClass .. "_" .. OvalePaperDoll.GetSpecialization()
     end,
     getCurrentSpecScriptName = function(self)
         return Ovale.db.profile.source[self:getCurrentSpecIdentifier()]
@@ -142,7 +142,7 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
     end,
     CreateOptions = function(self)
         local options = {
-            name = Ovale:GetName() .. " " .. L["Script"],
+            name = Ovale.GetName() .. " " .. L["Script"],
             type = "group",
             args = {
                 source = {
@@ -177,7 +177,7 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
                     set = function(info, v)
                         __exports.OvaleScripts:RegisterScript(Ovale.playerClass, nil, CUSTOM_NAME, CUSTOM_DESCRIPTION, v, "script")
                         Ovale.db.profile.code = v
-                        self:SendMessage("Ovale_ScriptChanged")
+                        self.SendMessage("Ovale_ScriptChanged")
                     end
                 },
                 copy = {
@@ -195,7 +195,7 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
                         __exports.OvaleScripts:RegisterScript(Ovale.playerClass, nil, CUSTOM_NAME, CUSTOM_DESCRIPTION, code, "script")
                         self:setCurrentSpecScriptName(CUSTOM_NAME)
                         Ovale.db.profile.code = __exports.OvaleScripts:GetScript(CUSTOM_NAME)
-                        self:SendMessage("Ovale_ScriptChanged")
+                        self.SendMessage("Ovale_ScriptChanged")
                     end
                 },
                 showHiddenScripts = {
@@ -211,9 +211,9 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
                 }
             }
         }
-        local appName = self:GetName()
+        local appName = self.GetName()
         AceConfig:RegisterOptionsTable(appName, options)
-        AceConfigDialog:AddToBlizOptions(appName, L["Script"], Ovale:GetName())
+        AceConfigDialog:AddToBlizOptions(appName, L["Script"], Ovale.GetName())
     end,
     InitScriptProfiles = function(self)
         local countSpecializations = GetNumSpecializations(false, false)
@@ -221,7 +221,7 @@ local OvaleScriptsClass = __class(OvaleScriptsBase, {
             Ovale.db.profile.source = {}
         end
         for i = 1, countSpecializations, 1 do
-            local specName = OvalePaperDoll:GetSpecialization(i)
+            local specName = OvalePaperDoll.GetSpecialization(i)
             Ovale.db.profile.source[Ovale.playerClass .. "_" .. specName] = Ovale.db.profile.source[Ovale.playerClass .. "_" .. specName] or self:GetDefaultScriptName(Ovale.playerClass, specName)
         end
     end,

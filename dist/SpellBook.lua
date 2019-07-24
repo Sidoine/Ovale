@@ -93,23 +93,23 @@ local OutputTableValues = function(output, tbl)
 end
 
 local output = {}
-local OvaleSpellBookBase = OvaleProfiler:RegisterProfiling(OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleSpellBook", aceEvent)))
+local OvaleSpellBookBase = OvaleProfiler.RegisterProfiling(OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleSpellBook", aceEvent)))
 local OvaleSpellBookClass = __class(OvaleSpellBookBase, {
     OnInitialize = function(self)
-        self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "Update")
-        self:RegisterEvent("CHARACTER_POINTS_CHANGED", "UpdateTalents")
-        self:RegisterEvent("PLAYER_ENTERING_WORLD", "Update")
-        self:RegisterEvent("PLAYER_TALENT_UPDATE", "UpdateTalents")
-        self:RegisterEvent("SPELLS_CHANGED", "UpdateSpells")
-        self:RegisterEvent("UNIT_PET")
+        self.RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "Update")
+        self.RegisterEvent("CHARACTER_POINTS_CHANGED", "UpdateTalents")
+        self.RegisterEvent("PLAYER_ENTERING_WORLD", "Update")
+        self.RegisterEvent("PLAYER_TALENT_UPDATE", "UpdateTalents")
+        self.RegisterEvent("SPELLS_CHANGED", "UpdateSpells")
+        self.RegisterEvent("UNIT_PET")
     end,
     OnDisable = function(self)
-        self:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
-        self:UnregisterEvent("CHARACTER_POINTS_CHANGED")
-        self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-        self:UnregisterEvent("PLAYER_TALENT_UPDATE")
-        self:UnregisterEvent("SPELLS_CHANGED")
-        self:UnregisterEvent("UNIT_PET")
+        self.UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
+        self.UnregisterEvent("CHARACTER_POINTS_CHANGED")
+        self.UnregisterEvent("PLAYER_ENTERING_WORLD")
+        self.UnregisterEvent("PLAYER_TALENT_UPDATE")
+        self.UnregisterEvent("SPELLS_CHANGED")
+        self.UnregisterEvent("UNIT_PET")
     end,
     UNIT_PET = function(self, unitId)
         if unitId == "player" then
@@ -122,7 +122,7 @@ local OvaleSpellBookClass = __class(OvaleSpellBookBase, {
         self.ready = true
     end,
     UpdateTalents = function(self)
-        self:Debug("Updating talents.")
+        self.Debug("Updating talents.")
         wipe(self.talent)
         wipe(self.talentPoints)
         local activeTalentGroup = GetActiveSpecGroup()
@@ -139,13 +139,13 @@ local OvaleSpellBookClass = __class(OvaleSpellBookBase, {
                         else
                             self.talentPoints[index] = 0
                         end
-                        self:Debug("    Talent %s (%d) is %s.", name, index, combinedSelected and "enabled" or "disabled")
+                        self.Debug("    Talent %s (%d) is %s.", name, index, combinedSelected and "enabled" or "disabled")
                     end
                 end
             end
         end
-        Ovale:needRefresh()
-        self:SendMessage("Ovale_TalentsChanged")
+        Ovale.needRefresh()
+        self.SendMessage("Ovale_TalentsChanged")
     end,
     UpdateSpells = function(self)
         wipe(self.spell)
@@ -164,12 +164,12 @@ local OvaleSpellBookClass = __class(OvaleSpellBookBase, {
         if numPetSpells then
             self:ScanSpellBook(BOOKTYPE_PET, numPetSpells)
         end
-        Ovale:needRefresh()
-        self:SendMessage("Ovale_SpellsChanged")
+        Ovale.needRefresh()
+        self.SendMessage("Ovale_SpellsChanged")
     end,
     ScanSpellBook = function(self, bookType, numSpells, offset)
         offset = offset or 0
-        self:Debug("Updating '%s' spellbook starting at offset %d.", bookType, offset)
+        self.Debug("Updating '%s' spellbook starting at offset %d.", bookType, offset)
         for index = offset + 1, offset + numSpells, 1 do
             local skillType, spellId = GetSpellBookItemInfo(index, bookType)
             if skillType == "SPELL" or skillType == "PETACTION" then
@@ -183,7 +183,7 @@ local OvaleSpellBookClass = __class(OvaleSpellBookBase, {
                     self.isHelpful[id] = IsHelpfulSpell(index, bookType)
                     self.texture[id] = GetSpellTexture(index, bookType)
                     self.spellbookId[bookType][id] = index
-                    self:Debug("    %s (%d) is at offset %d (%s).", name, id, index, gsub(spellLink, "|", "_"))
+                    self.Debug("    %s (%d) is at offset %d (%s).", name, id, index, gsub(spellLink, "|", "_"))
                     if spellId and id ~= spellId then
                         local name
                         if skillType == "PETACTION" and spellName then
@@ -196,7 +196,7 @@ local OvaleSpellBookClass = __class(OvaleSpellBookBase, {
                         self.isHelpful[spellId] = self.isHelpful[id]
                         self.texture[spellId] = self.texture[id]
                         self.spellbookId[bookType][spellId] = index
-                        self:Debug("    %s (%d) is at offset %d.", name, spellId, index)
+                        self.Debug("    %s (%d) is at offset %d.", name, spellId, index)
                     end
                 end
             elseif skillType == "FLYOUT" then
@@ -212,7 +212,7 @@ local OvaleSpellBookClass = __class(OvaleSpellBookBase, {
                             self.isHelpful[id] = IsHelpfulSpell(spellName)
                             self.texture[id] = GetSpellTexture(index, bookType)
                             self.spellbookId[bookType][id] = nil
-                            self:Debug("    %s (%d) is at offset %d.", name, id, index)
+                            self.Debug("    %s (%d) is at offset %d.", name, id, index)
                             if id ~= overrideId then
                                 local name = GetSpellInfo(overrideId)
                                 self.spell[overrideId] = name
@@ -220,7 +220,7 @@ local OvaleSpellBookClass = __class(OvaleSpellBookBase, {
                                 self.isHelpful[overrideId] = self.isHelpful[id]
                                 self.texture[overrideId] = self.texture[id]
                                 self.spellbookId[bookType][overrideId] = nil
-                                self:Debug("    %s (%d) is at offset %d.", name, overrideId, index)
+                                self.Debug("    %s (%d) is at offset %d.", name, overrideId, index)
                             end
                         end
                     end
@@ -275,7 +275,7 @@ local OvaleSpellBookClass = __class(OvaleSpellBookBase, {
     end,
     AddSpell = function(self, spellId, name)
         if spellId and name then
-            self:Debug("Adding spell %s (%d)", name, spellId)
+            self.Debug("Adding spell %s (%d)", name, spellId)
             self.spell[spellId] = name
         end
     end,

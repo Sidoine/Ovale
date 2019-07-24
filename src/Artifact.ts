@@ -1,7 +1,5 @@
-import { OvaleDebug } from "./Debug";
+import { OvaleDebugClass } from "./Debug";
 import { L } from "./Localization";
-import { Ovale } from "./Ovale";
-import aceEvent from "@wowts/ace_event-3.0";
 import { sort, insert, concat } from "@wowts/table";
 import { pairs, ipairs, wipe, tostring, lualength, LuaObj, LuaArray } from "@wowts/lua";
 
@@ -15,8 +13,7 @@ interface Trait {
     currentRank?: number;
 }
 
-let OvaleArtifactBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleArtifact", aceEvent));
-class OvaleArtifactClass extends OvaleArtifactBase {
+export class OvaleArtifactClass {
     self_traits: LuaObj<Trait> = {}
 
     debugOptions = {
@@ -29,7 +26,7 @@ class OvaleArtifactClass extends OvaleArtifactBase {
                     type: "input",
                     multiline: 25,
                     width: "full",
-                    get: (info: LuaArray<string>) => {
+                    get: () => {
                         return this.DebugTraits();
                     }
                 }
@@ -37,10 +34,10 @@ class OvaleArtifactClass extends OvaleArtifactBase {
         }
     }    
 
-    constructor() {
-        super();
+
+    constructor(ovaleDebug: OvaleDebugClass) {
         for (const [k, v] of pairs(this.debugOptions)) {
-            OvaleDebug.options.args[k] = v;
+            ovaleDebug.defaultOptions.args[k] = v;
         }
     }
 
@@ -48,13 +45,13 @@ class OvaleArtifactClass extends OvaleArtifactBase {
     }
     OnDisable() {
     }
-    UpdateTraits(message: string) {
+    UpdateTraits() {
         return;
     }
-    HasTrait(spellId: number) {
+    HasTrait() {
         return false;
     }
-    TraitRank(spellId: number) {
+    TraitRank() {
         return 0;
     }
     output: LuaArray<string> = {}
@@ -71,5 +68,3 @@ class OvaleArtifactClass extends OvaleArtifactBase {
         return tconcat(this.output, "\n");
     }
 }
-
-export const OvaleArtifact = new OvaleArtifactClass();

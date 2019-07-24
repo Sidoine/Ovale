@@ -1,16 +1,8 @@
 local __exports = LibStub:NewLibrary("ovale/DemonHunterSigils", 80201)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __Profiler = LibStub:GetLibrary("ovale/Profiler")
-local OvaleProfiler = __Profiler.OvaleProfiler
-local __Ovale = LibStub:GetLibrary("ovale/Ovale")
-local Ovale = __Ovale.Ovale
-local __PaperDoll = LibStub:GetLibrary("ovale/PaperDoll")
-local OvalePaperDoll = __PaperDoll.OvalePaperDoll
 local __SpellBook = LibStub:GetLibrary("ovale/SpellBook")
 local OvaleSpellBook = __SpellBook.OvaleSpellBook
-local __State = LibStub:GetLibrary("ovale/State")
-local OvaleState = __State.OvaleState
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local ipairs = ipairs
 local tonumber = tonumber
@@ -18,7 +10,6 @@ local insert = table.insert
 local remove = table.remove
 local GetTime = GetTime
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
-local OvaleSigilBase = OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvaleSigil", aceEvent))
 local UPDATE_DELAY = 0.5
 local SIGIL_ACTIVATION_TIME = 2
 local activated_sigils = {}
@@ -58,55 +49,57 @@ local sigil_end = {
     }
 }
 local QUICKENED_SIGILS_TALENT = 14
-local OvaleSigilClass = __class(OvaleSigilBase, {
-    constructor = function(self)
-        OvaleSigilBase.constructor(self)
+__exports.OvaleSigilClass = __class(nil, {
+    constructor = function(self, ovalePaperDoll, ovale)
+        self.ovalePaperDoll = ovalePaperDoll
+        self.ovale = ovale
+        self.OnInitialize = function()
+            if self.ovale.playerClass == "DEMONHUNTER" then
+                self.module:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", self.UNIT_SPELLCAST_SUCCEEDED)
+                self.module:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", self.COMBAT_LOG_EVENT_UNFILTERED)
+            end
+        end
+        self.OnDisable = function()
+            if self.ovale.playerClass == "DEMONHUNTER" then
+                self.module:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
+                self.module:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+            end
+        end
+        self.COMBAT_LOG_EVENT_UNFILTERED = function(event, ...)
+            if ( not self.ovalePaperDoll:IsSpecialization("vengeance")) then
+                return 
+            end
+            local _, cleuEvent, _, sourceGUID, _, _, _, _, _, _, _, spellid = CombatLogGetCurrentEventInfo()
+            if sourceGUID == self.ovale.playerGUID and cleuEvent == "SPELL_AURA_APPLIED" then
+                if (sigil_end[spellid] ~= nil) then
+                    local s = sigil_end[spellid]
+                    local t = s.type
+                    remove(activated_sigils[t], 1)
+                end
+            end
+        end
+        self.UNIT_SPELLCAST_SUCCEEDED = function(event, unitId, guid, spellId, ...)
+            if ( not self.ovalePaperDoll:IsSpecialization("vengeance")) then
+                return 
+            end
+            if (unitId == nil or unitId ~= "player") then
+                return 
+            end
+            local id = tonumber(spellId)
+            if (sigil_start[id] ~= nil) then
+                local s = sigil_start[id]
+                local t = s.type
+                local tal = s.talent or nil
+                if (tal == nil or OvaleSpellBook:GetTalentPoints(tal) > 0) then
+                    insert(activated_sigils[t], GetTime())
+                end
+            end
+        end
+        self.module = ovale:createModule("OvaleSigil", self.OnInitialize, self.OnDisable, aceEvent)
         activated_sigils["flame"] = {}
         activated_sigils["silence"] = {}
         activated_sigils["misery"] = {}
         activated_sigils["chains"] = {}
-    end,
-    OnInitialize = function(self)
-        if Ovale.playerClass == "DEMONHUNTER" then
-            self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
-            self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-        end
-    end,
-    OnDisable = function(self)
-        if Ovale.playerClass == "DEMONHUNTER" then
-            self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
-            self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-        end
-    end,
-    COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
-        if ( not OvalePaperDoll:IsSpecialization("vengeance")) then
-            return 
-        end
-        local _, cleuEvent, _, sourceGUID, _, _, _, _, _, _, _, spellid = CombatLogGetCurrentEventInfo()
-        if sourceGUID == Ovale.playerGUID and cleuEvent == "SPELL_AURA_APPLIED" then
-            if (sigil_end[spellid] ~= nil) then
-                local s = sigil_end[spellid]
-                local t = s.type
-                remove(activated_sigils[t], 1)
-            end
-        end
-    end,
-    UNIT_SPELLCAST_SUCCEEDED = function(self, event, unitId, guid, spellId, ...)
-        if ( not OvalePaperDoll:IsSpecialization("vengeance")) then
-            return 
-        end
-        if (unitId == nil or unitId ~= "player") then
-            return 
-        end
-        local id = tonumber(spellId)
-        if (sigil_start[id] ~= nil) then
-            local s = sigil_start[id]
-            local t = s.type
-            local tal = s.talent or nil
-            if (tal == nil or OvaleSpellBook:GetTalentPoints(tal) > 0) then
-                insert(activated_sigils[t], GetTime())
-            end
-        end
     end,
     IsSigilCharging = function(self, type, atTime)
         if (#activated_sigils[type] == 0) then
@@ -129,5 +122,3 @@ local OvaleSigilClass = __class(OvaleSigilBase, {
     ResetState = function(self)
     end,
 })
-__exports.OvaleSigil = OvaleSigilClass()
-OvaleState:RegisterState(__exports.OvaleSigil)

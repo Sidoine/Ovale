@@ -24,7 +24,7 @@ __exports.getNextToken = function(tokens, index)
 end
 __exports.CheckRequirements = function(spellId, atTime, tokens, index, targetGUID)
     local requirements = __exports.nowRequirements
-    targetGUID = targetGUID or OvaleGUID:UnitGUID(baseState.next.defaultTarget or "target")
+    targetGUID = targetGUID or OvaleGUID.UnitGUID(baseState.next.defaultTarget or "target")
     local name = tokens[index]
     index = index + 1
     if name then
@@ -37,7 +37,7 @@ __exports.CheckRequirements = function(spellId, atTime, tokens, index, targetGUI
                 name = tokens[index]
                 index = index + 1
             else
-                Ovale:OneTimeMessage("Warning: requirement '%s' has no registered handler; FAILING requirement.", name)
+                Ovale.OneTimeMessage("Warning: requirement '%s' has no registered handler; FAILING requirement.", name)
                 verified = false
             end
         end

@@ -12,18 +12,18 @@ local insert = table.insert
 local remove = table.remove
 local __Future = LibStub:GetLibrary("ovale/Future")
 local OvaleFuture = __Future.OvaleFuture
-local OvaleStaggerBase = Ovale:NewModule("OvaleStagger", aceEvent)
+local OvaleStaggerBase = Ovale.NewModule("OvaleStagger", aceEvent)
 local self_serial = 1
 local MAX_LENGTH = 30
 local OvaleStaggerClass = __class(OvaleStaggerBase, {
     OnInitialize = function(self)
         if Ovale.playerClass == "MONK" then
-            self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+            self.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
         end
     end,
     OnDisable = function(self)
         if Ovale.playerClass == "MONK" then
-            self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+            self.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
         end
     end,
     COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
@@ -44,7 +44,7 @@ local OvaleStaggerClass = __class(OvaleStaggerBase, {
     InitializeState = function(self)
     end,
     ResetState = function(self)
-        if  not OvaleFuture:IsInCombat(nil) then
+        if  not OvaleFuture.IsInCombat(nil) then
             for k in pairs(self.staggerTicks) do
                 self.staggerTicks[k] = nil
             end
@@ -70,4 +70,4 @@ local OvaleStaggerClass = __class(OvaleStaggerBase, {
     end
 })
 __exports.OvaleStagger = OvaleStaggerClass()
-OvaleState:RegisterState(__exports.OvaleStagger)
+OvaleState.RegisterState(__exports.OvaleStagger)

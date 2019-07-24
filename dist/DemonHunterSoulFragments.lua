@@ -1,18 +1,9 @@
 local __exports = LibStub:NewLibrary("ovale/DemonHunterSoulFragments", 80201)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __Ovale = LibStub:GetLibrary("ovale/Ovale")
-local Ovale = __Ovale.Ovale
-local __Debug = LibStub:GetLibrary("ovale/Debug")
-local OvaleDebug = __Debug.OvaleDebug
-local __State = LibStub:GetLibrary("ovale/State")
-local OvaleState = __State.OvaleState
-local __Aura = LibStub:GetLibrary("ovale/Aura")
-local OvaleAura = __Aura.OvaleAura
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local GetTime = GetTime
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
-local OvaleDemonHunterSoulFragmentsBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleDemonHunterSoulFragments", aceEvent))
 local SOUL_FRAGMENTS_BUFF_ID = 203981
 local SOUL_FRAGMENT_SPELLS = {
     [225919] = 2,
@@ -23,31 +14,33 @@ local SOUL_FRAGMENT_FINISHERS = {
     [247454] = true,
     [263648] = true
 }
-local OvaleDemonHunterSoulFragmentsClass = __class(OvaleDemonHunterSoulFragmentsBase, {
-    constructor = function(self)
-        OvaleDemonHunterSoulFragmentsBase.constructor(self)
-    end,
-    OnInitialize = function(self)
-        if Ovale.playerClass == "DEMONHUNTER" then
-            self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-        end
-    end,
-    OnDisable = function(self)
-        if Ovale.playerClass == "DEMONHUNTER" then
-            self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-        end
-    end,
-    COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
-        local _, subtype, _, sourceGUID, _, _, _, _, _, _, _, spellID = CombatLogGetCurrentEventInfo()
-        local me = Ovale.playerGUID
-        if sourceGUID == me then
-            if subtype == "SPELL_CAST_SUCCESS" and SOUL_FRAGMENT_SPELLS[spellID] then
-                self:AddPredictedSoulFragments(GetTime(), SOUL_FRAGMENT_SPELLS[spellID])
-            end
-            if subtype == "SPELL_CAST_SUCCESS" and SOUL_FRAGMENT_FINISHERS[spellID] then
-                self:SetPredictedSoulFragment(GetTime(), 0)
+__exports.OvaleDemonHunterSoulFragmentsClass = __class(nil, {
+    constructor = function(self, ovaleAura, ovale)
+        self.ovaleAura = ovaleAura
+        self.ovale = ovale
+        self.OnInitialize = function()
+            if self.ovale.playerClass == "DEMONHUNTER" then
+                self.module:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", self.COMBAT_LOG_EVENT_UNFILTERED)
             end
         end
+        self.OnDisable = function()
+            if self.ovale.playerClass == "DEMONHUNTER" then
+                self.module:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+            end
+        end
+        self.COMBAT_LOG_EVENT_UNFILTERED = function(event, ...)
+            local _, subtype, _, sourceGUID, _, _, _, _, _, _, _, spellID = CombatLogGetCurrentEventInfo()
+            local me = self.ovale.playerGUID
+            if sourceGUID == me then
+                if subtype == "SPELL_CAST_SUCCESS" and SOUL_FRAGMENT_SPELLS[spellID] then
+                    self:AddPredictedSoulFragments(GetTime(), SOUL_FRAGMENT_SPELLS[spellID])
+                end
+                if subtype == "SPELL_CAST_SUCCESS" and SOUL_FRAGMENT_FINISHERS[spellID] then
+                    self:SetPredictedSoulFragment(GetTime(), 0)
+                end
+            end
+        end
+        self.module = ovale:createModule("OvaleDemonHunterSoulFragments", self.OnInitialize, self.OnDisable, aceEvent)
     end,
     AddPredictedSoulFragments = function(self, atTime, added)
         local currentCount = self:GetSoulFragmentsBuffStacks(atTime) or 0
@@ -70,12 +63,12 @@ local OvaleDemonHunterSoulFragmentsClass = __class(OvaleDemonHunterSoulFragments
         return stacks
     end,
     GetSoulFragmentsBuffStacks = function(self, atTime)
-        local aura = OvaleAura:GetAura("player", SOUL_FRAGMENTS_BUFF_ID, atTime, "HELPFUL", true)
-        local stacks = OvaleAura:IsActiveAura(aura, atTime) and aura.stacks or 0
+        local aura = self.ovaleAura:GetAura("player", SOUL_FRAGMENTS_BUFF_ID, atTime, "HELPFUL", true)
+        local stacks = self.ovaleAura:IsActiveAura(aura, atTime) and aura.stacks or 0
         return stacks
     end,
 })
-local DemonHunterSoulFragmentsState = __class(nil, {
+__exports.DemonHunterSoulFragmentsState = __class(nil, {
     CleanState = function(self)
     end,
     InitializeState = function(self)
@@ -83,6 +76,3 @@ local DemonHunterSoulFragmentsState = __class(nil, {
     ResetState = function(self)
     end,
 })
-__exports.OvaleDemonHunterSoulFragments = OvaleDemonHunterSoulFragmentsClass()
-__exports.demonHunterSoulFragmentsState = DemonHunterSoulFragmentsState()
-OvaleState:RegisterState(__exports.demonHunterSoulFragmentsState)

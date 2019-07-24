@@ -2,15 +2,12 @@ import AceConfig from "@wowts/ace_config-3.0";
 import AceConfigDialog from "@wowts/ace_config_dialog-3.0";
 import { L } from "./Localization";
 import LibTextDump, { TextDump } from "@wowts/lib_text_dump-1.0";
-import { OvaleOptions } from "./Options";
-import { Constructor, Ovale } from "./Ovale";
+import { OvaleOptionsClass } from "./Options";
+import { OvaleClass } from "./Ovale";
 import { debugprofilestop, GetTime } from "@wowts/wow-mock";
 import { format } from "@wowts/string";
 import { pairs, next, wipe, LuaObj, lualength, LuaArray } from "@wowts/lua";
 import { insert, sort, concat } from "@wowts/table";
-import { AceModule } from "@wowts/tsaddon";
-
-let OvaleProfilerBase = Ovale.NewModule("OvaleProfiler");
 
 let self_timestamp = debugprofilestop();
 let self_timeSpent: LuaObj<number> = {}
@@ -18,7 +15,57 @@ let self_timesInvoked: LuaObj<number> = {}
 let self_stack: LuaArray<string> = {}
 let self_stackSize = 0;
 
-class OvaleProfilerClass extends OvaleProfilerBase {
+export class Profiler {
+    constructor(name: string, profiler: OvaleProfilerClass) {
+        const args = profiler.options.args.profiling.args.modules.args as any;
+        args[name] = {
+            name: name,
+            desc: format(L["Enable profiling for the %s module."], name),
+            type: "toggle"
+        }
+        profiler.profiles[name] = this;       
+    }
+
+    enabled = false;
+    
+    StartProfiling(tag: string) {
+        if (!this.enabled) return;
+        let newTimestamp = debugprofilestop();
+        if (self_stackSize > 0) {
+            let delta = newTimestamp - self_timestamp;
+            let previous = self_stack[self_stackSize];
+            let timeSpent = self_timeSpent[previous] || 0;
+            timeSpent = timeSpent + delta;
+            self_timeSpent[previous] = timeSpent;
+        }
+        self_timestamp = newTimestamp;
+        self_stackSize = self_stackSize + 1;
+        self_stack[self_stackSize] = tag;
+        {
+            let timesInvoked = self_timesInvoked[tag] || 0;
+            timesInvoked = timesInvoked + 1;
+            self_timesInvoked[tag] = timesInvoked;
+        }
+    }
+
+    StopProfiling(tag: string) {
+        if (!this.enabled) return;
+        if (self_stackSize > 0) {
+            let currentTag = self_stack[self_stackSize];
+            if (currentTag == tag) {
+                let newTimestamp = debugprofilestop();
+                let delta = newTimestamp - self_timestamp;
+                let timeSpent = self_timeSpent[currentTag] || 0;
+                timeSpent = timeSpent + delta;
+                self_timeSpent[currentTag] = timeSpent;
+                self_timestamp = newTimestamp;
+                self_stackSize = self_stackSize - 1;
+            }
+        }
+    }
+}
+
+export class OvaleProfilerClass {
     self_profilingOutput: TextDump = undefined;
     profiles: LuaObj<{ enabled: boolean }> = {};
 
@@ -27,7 +74,7 @@ class OvaleProfilerClass extends OvaleProfilerBase {
             name: L["Profiling"],
             type: "execute",
             func: () => {
-                let appName = this.GetName();
+                let appName = this.ovale.GetName();
                 AceConfigDialog.SetDefaultSize(appName, 800, 550);
                 AceConfigDialog.Open(appName);
             }
@@ -35,7 +82,7 @@ class OvaleProfilerClass extends OvaleProfilerBase {
     }
 
     options = {
-        name: `${Ovale.GetName()} ${L["Profiling"]}`,
+        name: `${this.ovale.GetName()} ${L["Profiling"]}`,
         type: "group",
         args: {
             profiling: {
@@ -51,13 +98,13 @@ class OvaleProfilerClass extends OvaleProfilerBase {
                         },
                         get: (info: any) => {
                             let name = info[lualength(info)];
-                            const value = Ovale.db.global.profiler[name];
+                            const value = this.ovaleOptions.db.global.profiler[name];
                             return (value != undefined);
                         },
                         set: (info: any, value: string) => {
                             value = value || undefined;
                             let name = info[lualength(info)];
-                            Ovale.db.global.profiler[name] = value;
+                            this.ovaleOptions.db.global.profiler[name] = value;
                             if (value) {
                                 this.EnableProfiling(name);
                             } else {
@@ -93,90 +140,37 @@ class OvaleProfilerClass extends OvaleProfilerBase {
         }
     }
 
-    DoNothing = function() {}
-
     
-    constructor() {
-        super();
+    constructor(private ovaleOptions: OvaleOptionsClass, private ovale: OvaleClass) {
         for (const [k, v] of pairs(this.actions)) {
-            OvaleOptions.options.args.actions.args[k] = v;
+            ovaleOptions.options.args.actions.args[k] = v;
         }
-        OvaleOptions.defaultDB.global = OvaleOptions.defaultDB.global || {}
-        OvaleOptions.defaultDB.global.profiler = {}
-        OvaleOptions.RegisterOptions(OvaleProfilerClass);
+        ovaleOptions.defaultDB.global = ovaleOptions.defaultDB.global || {}
+        ovaleOptions.defaultDB.global.profiler = {}
+        ovaleOptions.RegisterOptions(OvaleProfilerClass);
+        ovale.createModule("OvaleProfiler", this.OnInitialize, this.OnDisable);
     }
 
-    OnInitialize() {
-        let appName = this.GetName();
+    private OnInitialize = () => {
+        let appName = this.ovale.GetName();
         AceConfig.RegisterOptionsTable(appName, this.options);
-        AceConfigDialog.AddToBlizOptions(appName, L["Profiling"], Ovale.GetName());
+        AceConfigDialog.AddToBlizOptions(appName, L["Profiling"], this.ovale.GetName());
     
         if (!this.self_profilingOutput) {
-            this.self_profilingOutput = LibTextDump.New(`${Ovale.GetName()} - ${L["Profiling"]}`, 750, 500);
+            this.self_profilingOutput = LibTextDump.New(`${this.ovale.GetName()} - ${L["Profiling"]}`, 750, 500);
         }
     }
-    OnDisable() {
+    private OnDisable = () => {
         this.self_profilingOutput.Clear();
     }
-    RegisterProfiling<T extends Constructor<AceModule>>(module: T, name?: string) {
-        const profiler = this;
-        return class extends module {
-            constructor(...__args:any[]) {
-                super(...__args);
-                name = name || this.GetName();
-                const args = profiler.options.args.profiling.args.modules.args as any;
-                args[name] = {
-                    name: name,
-                    desc: format(L["Enable profiling for the %s module."], name),
-                    type: "toggle"
-                }
-                profiler.profiles[name] = this;       
-            }
 
-            enabled = false;
-            
-            StartProfiling(tag: string) {
-                if (!this.enabled) return;
-                let newTimestamp = debugprofilestop();
-                if (self_stackSize > 0) {
-                    let delta = newTimestamp - self_timestamp;
-                    let previous = self_stack[self_stackSize];
-                    let timeSpent = self_timeSpent[previous] || 0;
-                    timeSpent = timeSpent + delta;
-                    self_timeSpent[previous] = timeSpent;
-                }
-                self_timestamp = newTimestamp;
-                self_stackSize = self_stackSize + 1;
-                self_stack[self_stackSize] = tag;
-                {
-                    let timesInvoked = self_timesInvoked[tag] || 0;
-                    timesInvoked = timesInvoked + 1;
-                    self_timesInvoked[tag] = timesInvoked;
-                }
-            }
-        
-            StopProfiling(tag: string) {
-                if (!this.enabled) return;
-                if (self_stackSize > 0) {
-                    let currentTag = self_stack[self_stackSize];
-                    if (currentTag == tag) {
-                        let newTimestamp = debugprofilestop();
-                        let delta = newTimestamp - self_timestamp;
-                        let timeSpent = self_timeSpent[currentTag] || 0;
-                        timeSpent = timeSpent + delta;
-                        self_timeSpent[currentTag] = timeSpent;
-                        self_timestamp = newTimestamp;
-                        self_stackSize = self_stackSize - 1;
-                    }
-                }
-            }
-        }
-        
+    create(name: string) {
+        return new Profiler(name, this);
     }
 
-    array = {}
+    private array = {}
             
-    ResetProfiling() {
+    private ResetProfiling() {
         for (const [tag] of pairs(self_timeSpent)) {
             self_timeSpent[tag] = undefined;
         }
@@ -185,7 +179,7 @@ class OvaleProfilerClass extends OvaleProfilerBase {
         }
     }
 
-    GetProfilingInfo() {
+    private GetProfilingInfo() {
         if (next(self_timeSpent)) {
             let width = 1;
             {
@@ -213,11 +207,11 @@ class OvaleProfilerClass extends OvaleProfilerBase {
     }
 
     DebuggingInfo() {
-        Ovale.Print("Profiler stack size = %d", self_stackSize);
+        this.ovale.Print("Profiler stack size = %d", self_stackSize);
         let index = self_stackSize;
         while (index > 0 && self_stackSize - index < 10) {
             let tag = self_stack[index];
-            Ovale.Print("    [%d] %s", index, tag);
+            this.ovale.Print("    [%d] %s", index, tag);
             index = index - 1;
         }
     }
@@ -229,5 +223,3 @@ class OvaleProfilerClass extends OvaleProfilerBase {
         this.profiles[name].enabled = false;
     }
 }
-
-export const OvaleProfiler = new OvaleProfilerClass();

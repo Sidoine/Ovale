@@ -13,13 +13,13 @@ local _G = _G
 local hooksecurefunc = hooksecurefunc
 local __Future = LibStub:GetLibrary("ovale/Future")
 local OvaleFuture = __Future.OvaleFuture
-local OvaleBossModBase = OvaleProfiler:RegisterProfiling(OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleBossMod")))
+local OvaleBossModBase = OvaleProfiler.RegisterProfiling(OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleBossMod")))
 local _BigWigsLoader = _G["BigWigsLoader"]
 local _DBM = _G["DBM"]
 local OvaleBossModClass = __class(OvaleBossModBase, {
     OnInitialize = function(self)
         if _DBM then
-            self:Debug("DBM is loaded")
+            self.Debug("DBM is loaded")
             hooksecurefunc(_DBM, "StartCombat", function(_DBM, mod, delay, event, ...)
                 if event ~= "TIMER_RECOVERY" then
                     self.EngagedDBM = mod
@@ -30,7 +30,7 @@ local OvaleBossModClass = __class(OvaleBossModBase, {
             end)
         end
         if _BigWigsLoader then
-            self:Debug("BigWigs is loaded")
+            self.Debug("BigWigs is loaded")
             _BigWigsLoader.RegisterMessage(__exports.OvaleBossMod, "BigWigs_OnBossEngage", function(_, mod, diff)
                 self.EngagedBigWigs = mod
             end)
@@ -42,27 +42,27 @@ local OvaleBossModClass = __class(OvaleBossModBase, {
     OnDisable = function(self)
     end,
     IsBossEngaged = function(self, atTime)
-        if  not OvaleFuture:IsInCombat(atTime) then
+        if  not OvaleFuture.IsInCombat(atTime) then
             return false
         end
         local dbmEngaged = (_DBM ~= nil and self.EngagedDBM ~= nil and self.EngagedDBM.inCombat)
         local bigWigsEngaged = (_BigWigsLoader ~= nil and self.EngagedBigWigs ~= nil and self.EngagedBigWigs.isEngaged)
         local neitherEngaged = (_DBM == nil and _BigWigsLoader == nil and self:ScanTargets())
         if dbmEngaged then
-            self:Debug("DBM Engaged: [name=%s]", self.EngagedDBM.localization.general.name)
+            self.Debug("DBM Engaged: [name=%s]", self.EngagedDBM.localization.general.name)
         end
         if bigWigsEngaged then
-            self:Debug("BigWigs Engaged: [name=%s]", self.EngagedBigWigs.displayName)
+            self.Debug("BigWigs Engaged: [name=%s]", self.EngagedBigWigs.displayName)
         end
         return dbmEngaged or bigWigsEngaged or neitherEngaged
     end,
     ScanTargets = function(self)
-        self:StartProfiling("OvaleBossMod:ScanTargets")
+        self.StartProfiling("OvaleBossMod:ScanTargets")
         local bossEngaged = false
         if UnitExists("target") then
             bossEngaged = (UnitClassification("target") == "worldboss") or false
         end
-        self:StopProfiling("OvaleBossMod:ScanTargets")
+        self.StopProfiling("OvaleBossMod:ScanTargets")
         return bossEngaged
     end,
     constructor = function(self, ...)

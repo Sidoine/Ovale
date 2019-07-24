@@ -3,14 +3,8 @@ if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Localization = LibStub:GetLibrary("ovale/Localization")
 local L = __Localization.L
-local __Debug = LibStub:GetLibrary("ovale/Debug")
-local OvaleDebug = __Debug.OvaleDebug
-local __Profiler = LibStub:GetLibrary("ovale/Profiler")
-local OvaleProfiler = __Profiler.OvaleProfiler
 local __SpellBook = LibStub:GetLibrary("ovale/SpellBook")
 local OvaleSpellBook = __SpellBook.OvaleSpellBook
-local __Ovale = LibStub:GetLibrary("ovale/Ovale")
-local Ovale = __Ovale.Ovale
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local aceTimer = LibStub:GetLibrary("AceTimer-3.0", true)
 local gsub = string.gsub
@@ -33,9 +27,8 @@ local GetBonusBarIndex = GetBonusBarIndex
 local GetMacroItem = GetMacroItem
 local GetMacroSpell = GetMacroSpell
 local ElvUI = LibStub:GetLibrary("LibActionButton-1.0-ElvUI", true)
-local OvaleActionBarBase = OvaleProfiler:RegisterProfiling(OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleActionBar", aceEvent, aceTimer)))
-local OvaleActionBarClass = __class(OvaleActionBarBase, {
-    constructor = function(self)
+__exports.OvaleActionBarClass = __class(nil, {
+    constructor = function(self, ovaleDebug, ovale, ovaleProfiler)
         self.debugOptions = {
             actionbar = {
                 name = L["Action bar"],
@@ -58,20 +51,87 @@ local OvaleActionBarClass = __class(OvaleActionBarBase, {
         self.spell = {}
         self.macro = {}
         self.item = {}
-        self.output = {}
-        OvaleActionBarBase.constructor(self)
-        for k, v in pairs(self.debugOptions) do
-            OvaleDebug.options.args[k] = v
+        self.OnInitialize = function()
+            self.module:RegisterEvent("ACTIONBAR_SLOT_CHANGED", self.ACTIONBAR_SLOT_CHANGED)
+            self.module:RegisterEvent("PLAYER_ENTERING_WORLD", self.UpdateActionSlots)
+            self.module:RegisterEvent("UPDATE_BINDINGS", self.UPDATE_BINDINGS)
+            self.module:RegisterEvent("UPDATE_BONUS_ACTIONBAR", self.UpdateActionSlots)
+            self.module:RegisterEvent("SPELLS_CHANGED", self.UpdateActionSlots)
+            self.module:RegisterMessage("Ovale_StanceChanged", self.UpdateActionSlots)
+            self.module:RegisterMessage("Ovale_TalentsChanged", self.UpdateActionSlots)
         end
-    end,
-    OnInitialize = function(self)
-        self:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
-        self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateActionSlots")
-        self:RegisterEvent("UPDATE_BINDINGS")
-        self:RegisterEvent("UPDATE_BONUS_ACTIONBAR", "UpdateActionSlots")
-        self:RegisterEvent("SPELLS_CHANGED", "UpdateActionSlots")
-        self:RegisterMessage("Ovale_StanceChanged", "UpdateActionSlots")
-        self:RegisterMessage("Ovale_TalentsChanged", "UpdateActionSlots")
+        self.OnDisable = function()
+            self.module:UnregisterEvent("ACTIONBAR_SLOT_CHANGED")
+            self.module:UnregisterEvent("PLAYER_ENTERING_WORLD")
+            self.module:UnregisterEvent("UPDATE_BINDINGS")
+            self.module:UnregisterEvent("UPDATE_BONUS_ACTIONBAR")
+            self.module:UnregisterEvent("SPELLS_CHANGED")
+            self.module:UnregisterMessage("Ovale_StanceChanged")
+            self.module:UnregisterMessage("Ovale_TalentsChanged")
+        end
+        self.ACTIONBAR_SLOT_CHANGED = function(event, slot)
+            slot = tonumber(slot)
+            if slot == 0 then
+                self.UpdateActionSlots(event)
+            elseif ElvUI then
+                local elvUIButtons = ElvUI.buttonRegistry
+                for btn in pairs(elvUIButtons) do
+                    local s = btn:GetAttribute("action")
+                    if s == slot then
+                        self:UpdateActionSlot(slot)
+                    end
+                end
+            elseif slot then
+                local bonus = tonumber(GetBonusBarIndex()) * 12
+                local bonusStart = (bonus > 0) and (bonus - 11) or 1
+                local isBonus = slot >= bonusStart and slot < bonusStart + 12
+                if isBonus or slot > 12 and slot < 73 then
+                    self:UpdateActionSlot(slot)
+                end
+            end
+        end
+        self.UPDATE_BINDINGS = function(event)
+            self.debug:Debug("%s: Updating key bindings.", event)
+            self:UpdateKeyBindings()
+        end
+        self.UpdateActionSlots = function(event)
+            self.profiler:StartProfiling("OvaleActionBar_UpdateActionSlots")
+            self.debug:Debug("%s: Updating all action slot mappings.", event)
+            wipe(self.action)
+            wipe(self.item)
+            wipe(self.macro)
+            wipe(self.spell)
+            if ElvUI then
+                local elvUIButtons = ElvUI.buttonRegistry
+                for btn in pairs(elvUIButtons) do
+                    local s = btn:GetAttribute("action")
+                    self:UpdateActionSlot(s)
+                end
+            else
+                local start = 1
+                local bonus = tonumber(GetBonusBarIndex()) * 12
+                if bonus > 0 then
+                    start = 13
+                    for slot = bonus - 11, bonus, 1 do
+                        self:UpdateActionSlot(slot)
+                    end
+                end
+                for slot = start, 72, 1 do
+                    self:UpdateActionSlot(slot)
+                end
+            end
+            if event ~= "TimerUpdateActionSlots" then
+                self.module:ScheduleTimer("TimerUpdateActionSlots", 1)
+            end
+            self.profiler:StopProfiling("OvaleActionBar_UpdateActionSlots")
+        end
+        self.output = {}
+        self.module = ovale:createModule("OvaleActionBar", self.OnInitialize, self.OnDisable, aceEvent, aceTimer)
+        self.debug = ovaleDebug:create("OvaleActionBar")
+        self.profiler = ovaleProfiler:create(self.module:GetName())
+        for k, v in pairs(self.debugOptions) do
+            ovaleDebug.defaultOptions.args[k] = v
+        end
     end,
     GetKeyBinding = function(self, slot)
         local name
@@ -110,76 +170,11 @@ local OvaleActionBarClass = __class(OvaleActionBarBase, {
         local color, linkType, linkData, text = match(hyperlink, "|?c?f?f?(%x*)|?H?([^:]*):?(%d+)|?h?%[?([^%[%]]*)%]?|?h?|?r?")
         return color, linkType, linkData, text
     end,
-    OnDisable = function(self)
-        self:UnregisterEvent("ACTIONBAR_SLOT_CHANGED")
-        self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-        self:UnregisterEvent("UPDATE_BINDINGS")
-        self:UnregisterEvent("UPDATE_BONUS_ACTIONBAR")
-        self:UnregisterEvent("SPELLS_CHANGED")
-        self:UnregisterMessage("Ovale_StanceChanged")
-        self:UnregisterMessage("Ovale_TalentsChanged")
-    end,
-    ACTIONBAR_SLOT_CHANGED = function(self, event, slot)
-        slot = tonumber(slot)
-        if slot == 0 then
-            self:UpdateActionSlots(event)
-        elseif ElvUI then
-            local elvUIButtons = ElvUI.buttonRegistry
-            for btn in pairs(elvUIButtons) do
-                local s = btn:GetAttribute("action")
-                if s == slot then
-                    self:UpdateActionSlot(slot)
-                end
-            end
-        elseif slot then
-            local bonus = tonumber(GetBonusBarIndex()) * 12
-            local bonusStart = (bonus > 0) and (bonus - 11) or 1
-            local isBonus = slot >= bonusStart and slot < bonusStart + 12
-            if isBonus or slot > 12 and slot < 73 then
-                self:UpdateActionSlot(slot)
-            end
-        end
-    end,
-    UPDATE_BINDINGS = function(self, event)
-        self:Debug("%s: Updating key bindings.", event)
-        self:UpdateKeyBindings()
-    end,
     TimerUpdateActionSlots = function(self)
-        self:UpdateActionSlots("TimerUpdateActionSlots")
-    end,
-    UpdateActionSlots = function(self, event)
-        self:StartProfiling("OvaleActionBar_UpdateActionSlots")
-        self:Debug("%s: Updating all action slot mappings.", event)
-        wipe(self.action)
-        wipe(self.item)
-        wipe(self.macro)
-        wipe(self.spell)
-        if ElvUI then
-            local elvUIButtons = ElvUI.buttonRegistry
-            for btn in pairs(elvUIButtons) do
-                local s = btn:GetAttribute("action")
-                self:UpdateActionSlot(s)
-            end
-        else
-            local start = 1
-            local bonus = tonumber(GetBonusBarIndex()) * 12
-            if bonus > 0 then
-                start = 13
-                for slot = bonus - 11, bonus, 1 do
-                    self:UpdateActionSlot(slot)
-                end
-            end
-            for slot = start, 72, 1 do
-                self:UpdateActionSlot(slot)
-            end
-        end
-        if event ~= "TimerUpdateActionSlots" then
-            self:ScheduleTimer("TimerUpdateActionSlots", 1)
-        end
-        self:StopProfiling("OvaleActionBar_UpdateActionSlots")
+        self.UpdateActionSlots("TimerUpdateActionSlots")
     end,
     UpdateActionSlot = function(self, slot)
-        self:StartProfiling("OvaleActionBar_UpdateActionSlot")
+        self.profiler:StartProfiling("OvaleActionBar_UpdateActionSlot")
         local action = self.action[slot]
         if self.spell[action] == slot then
             self.spell[action] = nil
@@ -241,19 +236,19 @@ local OvaleActionBarClass = __class(OvaleActionBarBase, {
             end
         end
         if self.action[slot] then
-            self:Debug("Mapping button %s to %s.", slot, self.action[slot])
+            self.debug:Debug("Mapping button %s to %s.", slot, self.action[slot])
         else
-            self:Debug("Clearing mapping for button %s.", slot)
+            self.debug:Debug("Clearing mapping for button %s.", slot)
         end
         self.keybind[slot] = self:GetKeyBinding(slot)
-        self:StopProfiling("OvaleActionBar_UpdateActionSlot")
+        self.profiler:StopProfiling("OvaleActionBar_UpdateActionSlot")
     end,
     UpdateKeyBindings = function(self)
-        self:StartProfiling("OvaleActionBar_UpdateKeyBindings")
+        self.profiler:StartProfiling("OvaleActionBar_UpdateKeyBindings")
         for slot = 1, 120, 1 do
             self.keybind[slot] = self:GetKeyBinding(slot)
         end
-        self:StopProfiling("OvaleActionBar_UpdateKeyBindings")
+        self.profiler:StopProfiling("OvaleActionBar_UpdateKeyBindings")
     end,
     GetForSpell = function(self, spellId)
         return self.spell[spellId]
@@ -287,4 +282,3 @@ local OvaleActionBarClass = __class(OvaleActionBarBase, {
         return concat(self.output, "\n")
     end,
 })
-__exports.OvaleActionBar = OvaleActionBarClass()

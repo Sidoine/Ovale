@@ -7,7 +7,7 @@ local pairs = pairs
 local remove = table.remove
 local insert = table.insert
 __exports.self_pool = OvalePool("OvaleFuture_pool")
-local LastSpell = __class(nil, {
+__exports.LastSpell = __class(nil, {
     LastInFlightSpell = function(self)
         local spellcast = nil
         if self.lastGCDSpellcast.success then
@@ -75,4 +75,3 @@ local LastSpell = __class(nil, {
         self.modules = {}
     end
 })
-__exports.lastSpell = LastSpell()

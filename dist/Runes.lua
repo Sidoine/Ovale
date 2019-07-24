@@ -34,17 +34,17 @@ local RuneData = __class(nil, {
     end
 })
 local usedRune = {}
-local OvaleRunesBase = OvaleState:RegisterHasState(OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvaleRunes", aceEvent))), RuneData)
+local OvaleRunesBase = OvaleState.RegisterHasState(OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleRunes", aceEvent))), RuneData)
 local OvaleRunesClass = __class(OvaleRunesBase, {
     OnInitialize = function(self)
         if Ovale.playerClass == "DEATHKNIGHT" then
             for slot = 1, RUNE_SLOTS, 1 do
                 self.current.rune[slot] = {}
             end
-            self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateAllRunes")
-            self:RegisterEvent("RUNE_POWER_UPDATE")
-            self:RegisterEvent("UNIT_RANGEDDAMAGE")
-            self:RegisterEvent("UNIT_SPELL_HASTE", "UNIT_RANGEDDAMAGE")
+            self.RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateAllRunes")
+            self.RegisterEvent("RUNE_POWER_UPDATE")
+            self.RegisterEvent("UNIT_RANGEDDAMAGE")
+            self.RegisterEvent("UNIT_SPELL_HASTE", "UNIT_RANGEDDAMAGE")
             if Ovale.playerGUID then
                 self:UpdateAllRunes()
             end
@@ -52,29 +52,29 @@ local OvaleRunesClass = __class(OvaleRunesBase, {
     end,
     OnDisable = function(self)
         if Ovale.playerClass == "DEATHKNIGHT" then
-            self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-            self:UnregisterEvent("RUNE_POWER_UPDATE")
-            self:UnregisterEvent("UNIT_RANGEDDAMAGE")
-            self:UnregisterEvent("UNIT_SPELL_HASTE")
+            self.UnregisterEvent("PLAYER_ENTERING_WORLD")
+            self.UnregisterEvent("RUNE_POWER_UPDATE")
+            self.UnregisterEvent("UNIT_RANGEDDAMAGE")
+            self.UnregisterEvent("UNIT_SPELL_HASTE")
             self.current.rune = {}
         end
     end,
     RUNE_POWER_UPDATE = function(self, event, slot, usable)
-        self:Debug(event, slot, usable)
+        self.Debug(event, slot, usable)
         self:UpdateRune(slot)
     end,
     RUNE_TYPE_UPDATE = function(self, event, slot)
-        self:Debug(event, slot)
+        self.Debug(event, slot)
         self:UpdateRune(slot)
     end,
     UNIT_RANGEDDAMAGE = function(self, event, unitId)
         if unitId == "player" then
-            self:Debug(event)
+            self.Debug(event)
             self:UpdateAllRunes()
         end
     end,
     UpdateRune = function(self, slot)
-        self:StartProfiling("OvaleRunes_UpdateRune")
+        self.StartProfiling("OvaleRunes_UpdateRune")
         local rune = self.current.rune[slot]
         local start, duration = GetRuneCooldown(slot)
         if start and duration then
@@ -85,11 +85,11 @@ local OvaleRunesClass = __class(OvaleRunesBase, {
                 rune.startCooldown = 0
                 rune.endCooldown = 0
             end
-            Ovale:needRefresh()
+            Ovale.needRefresh()
         else
-            self:Debug("Warning: rune information for slot %d not available.", slot)
+            self.Debug("Warning: rune information for slot %d not available.", slot)
         end
-        self:StopProfiling("OvaleRunes_UpdateRune")
+        self.StopProfiling("OvaleRunes_UpdateRune")
     end,
     UpdateAllRunes = function(self)
         for slot = 1, RUNE_SLOTS, 1 do
@@ -101,9 +101,9 @@ local OvaleRunesClass = __class(OvaleRunesBase, {
         for slot = 1, RUNE_SLOTS, 1 do
             local rune = self.current.rune[slot]
             if IsActiveRune(rune, now) then
-                self:Print("rune[%d] is active.", slot)
+                self.Print("rune[%d] is active.", slot)
             else
-                self:Print("rune[%d] comes off cooldown in %f seconds.", slot, rune.endCooldown - now)
+                self.Print("rune[%d] comes off cooldown in %f seconds.", slot, rune.endCooldown - now)
             end
         end
     end,
@@ -114,13 +114,13 @@ local OvaleRunesClass = __class(OvaleRunesBase, {
         end
     end,
     ResetState = function(self)
-        __exports.OvaleRunes:StartProfiling("OvaleRunes_ResetState")
+        __exports.OvaleRunes.StartProfiling("OvaleRunes_ResetState")
         for slot, rune in ipairs(self.current.rune) do
             local stateRune = self.next.rune[slot]
             stateRune.endCooldown = rune.endCooldown
             stateRune.startCooldown = rune.startCooldown
         end
-        __exports.OvaleRunes:StopProfiling("OvaleRunes_ResetState")
+        __exports.OvaleRunes.StopProfiling("OvaleRunes_ResetState")
     end,
     CleanState = function(self)
         for slot, rune in ipairs(self.next.rune) do
@@ -129,14 +129,14 @@ local OvaleRunesClass = __class(OvaleRunesBase, {
         end
     end,
     ApplySpellStartCast = function(self, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
-        __exports.OvaleRunes:StartProfiling("OvaleRunes_ApplySpellStartCast")
+        __exports.OvaleRunes.StartProfiling("OvaleRunes_ApplySpellStartCast")
         if isChanneled then
             self:ApplyRuneCost(spellId, startCast, spellcast)
         end
-        __exports.OvaleRunes:StopProfiling("OvaleRunes_ApplySpellStartCast")
+        __exports.OvaleRunes.StopProfiling("OvaleRunes_ApplySpellStartCast")
     end,
     ApplySpellAfterCast = function(self, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
-        __exports.OvaleRunes:StartProfiling("OvaleRunes_ApplySpellAfterCast")
+        __exports.OvaleRunes.StartProfiling("OvaleRunes_ApplySpellAfterCast")
         if  not isChanneled then
             self:ApplyRuneCost(spellId, endCast, spellcast)
             if spellId == EMPOWER_RUNE_WEAPON then
@@ -145,7 +145,7 @@ local OvaleRunesClass = __class(OvaleRunesBase, {
                 end
             end
         end
-        __exports.OvaleRunes:StopProfiling("OvaleRunes_ApplySpellAfterCast")
+        __exports.OvaleRunes.StopProfiling("OvaleRunes_ApplySpellAfterCast")
     end,
     ApplyRuneCost = function(self, spellId, atTime, spellcast)
         local si = OvaleData.spellInfo[spellId]
@@ -165,7 +165,7 @@ local OvaleRunesClass = __class(OvaleRunesBase, {
         rune.endCooldown = atTime
     end,
     ConsumeRune = function(self, spellId, atTime, snapshot)
-        __exports.OvaleRunes:StartProfiling("OvaleRunes_state_ConsumeRune")
+        __exports.OvaleRunes.StartProfiling("OvaleRunes_state_ConsumeRune")
         local consumedRune
         for slot = 1, RUNE_SLOTS, 1 do
             local rune = self.next.rune[slot]
@@ -182,18 +182,18 @@ local OvaleRunesClass = __class(OvaleRunesBase, {
                     start = rune.endCooldown
                 end
             end
-            local duration = 10 / OvalePaperDoll:GetSpellCastSpeedPercentMultiplier(snapshot)
+            local duration = 10 / OvalePaperDoll.GetSpellCastSpeedPercentMultiplier(snapshot)
             consumedRune.startCooldown = start
             consumedRune.endCooldown = start + duration
             local runicpower = (OvalePower.next.power.runicpower or 0) + 10
             local maxi = OvalePower.current.maxPower.runicpower
             OvalePower.next.power.runicpower = (runicpower < maxi) and runicpower or maxi
         end
-        self:StopProfiling("OvaleRunes_state_ConsumeRune")
+        self.StopProfiling("OvaleRunes_state_ConsumeRune")
     end,
     RuneCount = function(self, atTime)
-        self:StartProfiling("OvaleRunes_state_RuneCount")
-        local state = self:GetState(atTime)
+        self.StartProfiling("OvaleRunes_state_RuneCount")
+        local state = self.GetState(atTime)
         local count = 0
         local startCooldown, endCooldown = huge, huge
         for slot = 1, RUNE_SLOTS, 1 do
@@ -204,12 +204,12 @@ local OvaleRunesClass = __class(OvaleRunesBase, {
                 startCooldown, endCooldown = rune.startCooldown, rune.endCooldown
             end
         end
-        self:StopProfiling("OvaleRunes_state_RuneCount")
+        self.StopProfiling("OvaleRunes_state_RuneCount")
         return count, startCooldown, endCooldown
     end,
     RuneDeficit = function(self, atTime)
-        self:StartProfiling("OvaleRunes_state_RuneDeficit")
-        local state = self:GetState(atTime)
+        self.StartProfiling("OvaleRunes_state_RuneDeficit")
+        local state = self.GetState(atTime)
         local count = 0
         local startCooldown, endCooldown = huge, huge
         for slot = 1, RUNE_SLOTS, 1 do
@@ -221,7 +221,7 @@ local OvaleRunesClass = __class(OvaleRunesBase, {
                 end
             end
         end
-        self:StopProfiling("OvaleRunes_state_RuneDeficit")
+        self.StopProfiling("OvaleRunes_state_RuneDeficit")
         return count, startCooldown, endCooldown
     end,
     GetRunesCooldown = function(self, atTime, runes)
@@ -229,19 +229,19 @@ local OvaleRunesClass = __class(OvaleRunesBase, {
             return 0
         end
         if runes > RUNE_SLOTS then
-            __exports.OvaleRunes:Log("Attempt to read %d runes but the maximum is %d", runes, RUNE_SLOTS)
+            __exports.OvaleRunes.Log("Attempt to read %d runes but the maximum is %d", runes, RUNE_SLOTS)
             return 0
         end
-        local state = self:GetState(atTime)
-        __exports.OvaleRunes:StartProfiling("OvaleRunes_state_GetRunesCooldown")
+        local state = self.GetState(atTime)
+        __exports.OvaleRunes.StartProfiling("OvaleRunes_state_GetRunesCooldown")
         for slot = 1, RUNE_SLOTS, 1 do
             local rune = state.rune[slot]
             usedRune[slot] = rune.endCooldown - atTime
         end
         sort(usedRune)
-        self:StopProfiling("OvaleRunes_state_GetRunesCooldown")
+        self.StopProfiling("OvaleRunes_state_GetRunesCooldown")
         return usedRune[runes]
     end,
 })
 __exports.OvaleRunes = OvaleRunesClass()
-OvaleState:RegisterState(__exports.OvaleRunes)
+OvaleState.RegisterState(__exports.OvaleRunes)

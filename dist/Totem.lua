@@ -33,27 +33,27 @@ local TotemData = __class(nil, {
         self.totems = {}
     end
 })
-local OvaleTotemBase = OvaleState:RegisterHasState(OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvaleTotem", aceEvent)), TotemData)
+local OvaleTotemBase = OvaleState.RegisterHasState(OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleTotem", aceEvent)), TotemData)
 local OvaleTotemClass = __class(OvaleTotemBase, {
     OnInitialize = function(self)
         if TOTEM_CLASS[Ovale.playerClass] then
-            self:RegisterEvent("PLAYER_ENTERING_WORLD", "Update")
-            self:RegisterEvent("PLAYER_TALENT_UPDATE", "Update")
-            self:RegisterEvent("PLAYER_TOTEM_UPDATE", "Update")
-            self:RegisterEvent("UPDATE_SHAPESHIFT_FORM", "Update")
+            self.RegisterEvent("PLAYER_ENTERING_WORLD", "Update")
+            self.RegisterEvent("PLAYER_TALENT_UPDATE", "Update")
+            self.RegisterEvent("PLAYER_TOTEM_UPDATE", "Update")
+            self.RegisterEvent("UPDATE_SHAPESHIFT_FORM", "Update")
         end
     end,
     OnDisable = function(self)
         if TOTEM_CLASS[Ovale.playerClass] then
-            self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-            self:UnregisterEvent("PLAYER_TALENT_UPDATE")
-            self:UnregisterEvent("PLAYER_TOTEM_UPDATE")
-            self:UnregisterEvent("UPDATE_SHAPESHIFT_FORM")
+            self.UnregisterEvent("PLAYER_ENTERING_WORLD")
+            self.UnregisterEvent("PLAYER_TALENT_UPDATE")
+            self.UnregisterEvent("PLAYER_TOTEM_UPDATE")
+            self.UnregisterEvent("UPDATE_SHAPESHIFT_FORM")
         end
     end,
     Update = function(self)
         self_serial = self_serial + 1
-        Ovale:needRefresh()
+        Ovale.needRefresh()
     end,
     InitializeState = function(self)
         self.next.totems = {}
@@ -75,14 +75,14 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
         end
     end,
     ApplySpellAfterCast = function(self, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
-        __exports.OvaleTotem:StartProfiling("OvaleTotem_ApplySpellAfterCast")
+        __exports.OvaleTotem.StartProfiling("OvaleTotem_ApplySpellAfterCast")
         if TOTEM_CLASS[Ovale.playerClass] then
             local si = OvaleData.spellInfo[spellId]
             if si and si.totem then
                 self:SummonTotem(spellId, endCast)
             end
         end
-        __exports.OvaleTotem:StopProfiling("OvaleTotem_ApplySpellAfterCast")
+        __exports.OvaleTotem.StopProfiling("OvaleTotem_ApplySpellAfterCast")
     end,
     IsActiveTotem = function(self, totem, atTime)
         if  not totem then
@@ -94,7 +94,7 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
         return (totem and (totem.serial == self_serial) and totem.start and totem.duration and totem.start < atTime and atTime < totem.start + totem.duration)
     end,
     GetTotem = function(self, slot)
-        __exports.OvaleTotem:StartProfiling("OvaleTotem_state_GetTotem")
+        __exports.OvaleTotem.StartProfiling("OvaleTotem_state_GetTotem")
         local totem = self.next.totems[slot]
         if totem and ( not totem.serial or totem.serial < self_serial) then
             local haveTotem, name, startTime, duration, icon = GetTotemInfo(slot)
@@ -112,7 +112,7 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
             totem.slot = slot
             totem.serial = self_serial
         end
-        __exports.OvaleTotem:StopProfiling("OvaleTotem_state_GetTotem")
+        __exports.OvaleTotem.StopProfiling("OvaleTotem_state_GetTotem")
         return totem
     end,
     GetTotemInfo = function(self, spellId, atTime)
@@ -122,8 +122,8 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
         if si and si.totem then
             local buffPresent = (OvaleFuture.next.lastGCDSpellId == spellId)
             if  not buffPresent and si.buff_totem then
-                local aura = OvaleAura:GetAura("player", si.buff_totem, atTime, "HELPFUL")
-                buffPresent = OvaleAura:IsActiveAura(aura, atTime)
+                local aura = OvaleAura.GetAura("player", si.buff_totem, atTime, "HELPFUL")
+                buffPresent = OvaleAura.IsActiveAura(aura, atTime)
             end
             if  not si.buff_totem or buffPresent then
                 local texture = OvaleSpellBook:GetSpellTexture(spellId)
@@ -148,20 +148,20 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
         return count, start, ending
     end,
     SummonTotem = function(self, spellId, atTime)
-        __exports.OvaleTotem:StartProfiling("OvaleTotem_state_SummonTotem")
+        __exports.OvaleTotem.StartProfiling("OvaleTotem_state_SummonTotem")
         local totemSlot = self:GetAvailableTotemSlot(spellId, atTime)
         local name, _, icon = OvaleSpellBook:GetSpellInfo(spellId)
-        local duration = OvaleData:GetSpellInfoProperty(spellId, atTime, "duration", nil)
+        local duration = OvaleData.GetSpellInfoProperty(spellId, atTime, "duration", nil)
         local totem = self.next.totems[totemSlot]
         totem.name = name
         totem.start = atTime
         totem.duration = duration or 15
         totem.icon = icon
         totem.slot = totemSlot
-        __exports.OvaleTotem:StopProfiling("OvaleTotem_state_SummonTotem")
+        __exports.OvaleTotem.StopProfiling("OvaleTotem_state_SummonTotem")
     end,
     GetAvailableTotemSlot = function(self, spellId, atTime)
-        __exports.OvaleTotem:StartProfiling("OvaleTotem_state_GetNextAvailableTotemSlot")
+        __exports.OvaleTotem.StartProfiling("OvaleTotem_state_GetNextAvailableTotemSlot")
         local availableSlot = nil
         local si = OvaleData.spellInfo[spellId]
         if si and si.totem then
@@ -185,9 +185,9 @@ local OvaleTotemClass = __class(OvaleTotemBase, {
                 end
             end
         end
-        __exports.OvaleTotem:StopProfiling("OvaleTotem_state_GetNextAvailableTotemSlot")
+        __exports.OvaleTotem.StopProfiling("OvaleTotem_state_GetNextAvailableTotemSlot")
         return availableSlot
     end,
 })
 __exports.OvaleTotem = OvaleTotemClass()
-OvaleState:RegisterState(__exports.OvaleTotem)
+OvaleState.RegisterState(__exports.OvaleTotem)

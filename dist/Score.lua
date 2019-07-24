@@ -19,28 +19,28 @@ local UnitCastingInfo = UnitCastingInfo
 local UnitChannelInfo = UnitChannelInfo
 local __SpellBook = LibStub:GetLibrary("ovale/SpellBook")
 local OvaleSpellBook = __SpellBook.OvaleSpellBook
-local OvaleScoreBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleScore", aceEvent, AceSerializer))
+local OvaleScoreBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleScore", aceEvent, AceSerializer))
 local MSG_PREFIX = Ovale.MSG_PREFIX
 local self_playerGUID = nil
 local OvaleScoreClass = __class(OvaleScoreBase, {
     OnInitialize = function(self)
         self_playerGUID = Ovale.playerGUID
-        self:RegisterEvent("CHAT_MSG_ADDON")
-        self:RegisterEvent("PLAYER_REGEN_ENABLED")
-        self:RegisterEvent("PLAYER_REGEN_DISABLED")
-        self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
-        self:RegisterEvent("UNIT_SPELLCAST_START")
+        self.RegisterEvent("CHAT_MSG_ADDON")
+        self.RegisterEvent("PLAYER_REGEN_ENABLED")
+        self.RegisterEvent("PLAYER_REGEN_DISABLED")
+        self.RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
+        self.RegisterEvent("UNIT_SPELLCAST_START")
     end,
     OnDisable = function(self)
-        self:UnregisterEvent("CHAT_MSG_ADDON")
-        self:UnregisterEvent("PLAYER_REGEN_ENABLED")
-        self:UnregisterEvent("PLAYER_REGEN_DISABLED")
-        self:UnregisterEvent("UNIT_SPELLCAST_START")
+        self.UnregisterEvent("CHAT_MSG_ADDON")
+        self.UnregisterEvent("PLAYER_REGEN_ENABLED")
+        self.UnregisterEvent("PLAYER_REGEN_DISABLED")
+        self.UnregisterEvent("UNIT_SPELLCAST_START")
     end,
     CHAT_MSG_ADDON = function(self, event, ...)
         local prefix, message, _, sender = ...
         if prefix == MSG_PREFIX then
-            local ok, msgType, scored, scoreMax, guid = self:Deserialize(message)
+            local ok, msgType, scored, scoreMax, guid = self.Deserialize(message)
             if ok and msgType == "S" then
                 self:SendScore(sender, guid, scored, scoreMax)
             end
@@ -48,7 +48,7 @@ local OvaleScoreClass = __class(OvaleScoreBase, {
     end,
     PLAYER_REGEN_ENABLED = function(self)
         if self.maxScore > 0 and IsInGroup() then
-            local message = self:Serialize("score", self.score, self.maxScore, self_playerGUID)
+            local message = self.Serialize("score", self.score, self.maxScore, self_playerGUID)
             local channel = IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and "INSTANCE_CHAT" or "RAID"
             SendAddonMessage(MSG_PREFIX, message, channel)
         end
@@ -87,7 +87,7 @@ local OvaleScoreClass = __class(OvaleScoreBase, {
         if unitId == "player" or unitId == "pet" then
             local now = GetTime()
             local spell = OvaleSpellBook:GetSpellName(spellId)
-            local spellcast = OvaleFuture:GetSpellcast(spell, spellId, nil, now)
+            local spellcast = OvaleFuture.GetSpellcast(spell, spellId, nil, now)
             if spellcast then
                 local name = UnitChannelInfo(unitId)
                 if name == spell then
@@ -100,7 +100,7 @@ local OvaleScoreClass = __class(OvaleScoreBase, {
         if unitId == "player" or unitId == "pet" then
             local now = GetTime()
             local spell = OvaleSpellBook:GetSpellName(spellId)
-            local spellcast = OvaleFuture:GetSpellcast(spell, spellId, lineId, now)
+            local spellcast = OvaleFuture.GetSpellcast(spell, spellId, lineId, now)
             if spellcast then
                 local name, _, _, _, _, _, castId = UnitCastingInfo(unitId)
                 if lineId == castId and name == spell then
@@ -113,7 +113,7 @@ local OvaleScoreClass = __class(OvaleScoreBase, {
         if unitId == "player" or unitId == "pet" then
             local now = GetTime()
             local spell = OvaleSpellBook:GetSpellName(spellId)
-            local spellcast = OvaleFuture:GetSpellcast(spell, spellId, lineId, now)
+            local spellcast = OvaleFuture.GetSpellcast(spell, spellId, lineId, now)
             if spellcast then
                 if spellcast.success or ( not spellcast.start) or ( not spellcast.stop) or spellcast.channel then
                     local name = UnitChannelInfo(unitId)

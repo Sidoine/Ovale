@@ -1,18 +1,14 @@
-import { Ovale } from "./Ovale";
-import { OvaleGUID } from "./GUID";
-import { OvaleDebug } from "./Debug";
+import { OvaleGUIDClass } from "./GUID";
 import { nowRequirements, CheckRequirements } from "./Requirement";
 import { type, ipairs, pairs, tonumber, wipe, truthy, LuaArray, LuaObj } from "@wowts/lua";
 import { find } from "@wowts/string";
-import { baseState } from "./BaseState";
+import { BaseState } from "./BaseState";
 import { isLuaArray, isString } from "./tools";
 import { HasteType } from "./PaperDoll";
 import { Powers } from "./Power";
+import { OvaleClass } from "./Ovale";
 
-
-let OvaleDataBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleData"));
-
-let BLOODELF_CLASSES: LuaObj<boolean> = {
+const BLOODELF_CLASSES: LuaObj<boolean> = {
     ["DEATHKNIGHT"]: true,
     ["DEMONHUNTER"]: true,
     ["DRUID"]: false,
@@ -26,7 +22,7 @@ let BLOODELF_CLASSES: LuaObj<boolean> = {
     ["WARLOCK"]: true,
     ["WARRIOR"]: true
 }
-let PANDAREN_CLASSES: LuaObj<boolean> = {
+const PANDAREN_CLASSES: LuaObj<boolean> = {
     ["DEATHKNIGHT"]: false,
     ["DEMONHUNTER"]: false,
     ["DRUID"]: false,
@@ -40,7 +36,7 @@ let PANDAREN_CLASSES: LuaObj<boolean> = {
     ["WARLOCK"]: false,
     ["WARRIOR"]: true
 }
-let TAUREN_CLASSES: LuaObj<boolean> = {
+const TAUREN_CLASSES: LuaObj<boolean> = {
     ["DEATHKNIGHT"]: true,
     ["DEMONHUNTER"]: false,
     ["DRUID"]: true,
@@ -54,7 +50,7 @@ let TAUREN_CLASSES: LuaObj<boolean> = {
     ["WARLOCK"]: false,
     ["WARRIOR"]: true
 }
-let STAT_NAMES: LuaArray<string> = {
+const STAT_NAMES: LuaArray<string> = {
     1: "agility",
     2: "bonus_armor",
     3: "critical_strike",
@@ -66,14 +62,14 @@ let STAT_NAMES: LuaArray<string> = {
     9: "strength",
     10: "versatility"
 }
-let STAT_SHORTNAME: LuaObj<string> = {
+const STAT_SHORTNAME: LuaObj<string> = {
     agility: "agi",
     critical_strike: "crit",
     intellect: "int",
     strength: "str",
     spirit: "spi"
 }
-let STAT_USE_NAMES: LuaArray<string> = {
+const STAT_USE_NAMES: LuaArray<string> = {
     1: "trinket_proc",
     2: "trinket_stacking_proc",
     3: "trinket_stacking_stat",
@@ -178,7 +174,7 @@ export interface SpellInfo extends Powers {
 
 const tempTokens: LuaArray<string> = {};
 
-class OvaleDataClass extends OvaleDataBase {
+export class OvaleDataClass {
     STAT_NAMES = STAT_NAMES;
     STAT_SHORTNAME = STAT_SHORTNAME;
     STAT_USE_NAMES = STAT_USE_NAMES;
@@ -319,8 +315,7 @@ class OvaleDataClass extends OvaleDataBase {
             [106898]: true
         }
     }
-    constructor() {
-        super();
+    constructor(private baseState: BaseState, private ovaleGuid: OvaleGUIDClass, private ovale: OvaleClass) {
         for (const [, useName] of pairs(STAT_USE_NAMES)) {
             let name;
             for (const [, statName] of pairs(STAT_NAMES)) {
@@ -437,7 +432,7 @@ class OvaleDataClass extends OvaleDataBase {
     }
     
     CheckSpellAuraData(auraId: number | string, spellData: SpellData, atTime: number, guid: string): [boolean, string | number, number | undefined] {
-        guid = guid || OvaleGUID.UnitGUID("player");
+        guid = guid || this.ovaleGuid.UnitGUID("player");
         let index, value: string | number, data;
         let spellDataArray: LuaArray<string | number> | undefined = undefined;
         if (isLuaArray(spellData)) {
@@ -456,7 +451,7 @@ class OvaleDataClass extends OvaleDataBase {
             if (N) {
                 data = tonumber(N);
             } else {
-                Ovale.OneTimeMessage("Warning: '%d' has '%s' missing final stack count.", auraId, value);
+                this.ovale.OneTimeMessage("Warning: '%d' has '%s' missing final stack count.", auraId, value);
             }
         } else if (value == "extend") {
             let seconds;
@@ -467,7 +462,7 @@ class OvaleDataClass extends OvaleDataBase {
             if (seconds) {
                 data = tonumber(seconds);
             } else {
-                Ovale.OneTimeMessage("Warning: '%d' has '%s' missing duration.", auraId, value);
+                this.ovale.OneTimeMessage("Warning: '%d' has '%s' missing duration.", auraId, value);
             }
         } else {
             let asNumber = tonumber(value);
@@ -481,7 +476,7 @@ class OvaleDataClass extends OvaleDataBase {
     }
 
     CheckSpellInfo(spellId: number, atTime: number, targetGUID: string): [boolean, string] {
-        targetGUID = targetGUID || OvaleGUID.UnitGUID(baseState.next.defaultTarget || "target");
+        targetGUID = targetGUID || this.ovaleGuid.UnitGUID(this.baseState.next.defaultTarget || "target");
         let verified = true;
         let requirement;
         for (const [name, handler] of pairs(nowRequirements)) {
@@ -502,7 +497,7 @@ class OvaleDataClass extends OvaleDataBase {
         return [verified, requirement];
     }
     GetItemInfoProperty(itemId: number, atTime: number, property: keyof SpellInfo) {
-        const targetGUID = OvaleGUID.UnitGUID("player");
+        const targetGUID = this.ovaleGuid.UnitGUID("player");
         let ii = this.ItemInfo(itemId);
         let value = ii && ii[property];
         let requirements = ii && ii.require[property];
@@ -532,7 +527,7 @@ class OvaleDataClass extends OvaleDataBase {
      * @returns value or [value, ratio]
      */
     GetSpellInfoProperty<T extends keyof SpellInfo>(spellId: number, atTime: number, property:T, targetGUID: string|undefined): SpellInfo[T] {
-        targetGUID = targetGUID || OvaleGUID.UnitGUID(baseState.next.defaultTarget || "target");
+        targetGUID = targetGUID || this.ovaleGuid.UnitGUID(this.baseState.next.defaultTarget || "target");
         let si = this.spellInfo[spellId];
         let value = si && si[property];
         let requirements = si && si.require[property];
@@ -561,7 +556,7 @@ class OvaleDataClass extends OvaleDataBase {
      * @returns value or [value, ratio]
      */
     GetSpellInfoPropertyNumber(spellId: number, atTime: number|undefined, property:keyof SpellInfo, targetGUID: string|undefined, splitRatio?: boolean): number[] {
-        targetGUID = targetGUID || OvaleGUID.UnitGUID(baseState.next.defaultTarget || "target");
+        targetGUID = targetGUID || this.ovaleGuid.UnitGUID(this.baseState.next.defaultTarget || "target");
         let si = this.spellInfo[spellId];
         
         let ratioParam = `${property}_percent` as keyof SpellInfo;
@@ -654,5 +649,3 @@ class OvaleDataClass extends OvaleDataBase {
         return damage;
     }
 }
-
-export const OvaleData = new OvaleDataClass();

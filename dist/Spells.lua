@@ -27,7 +27,7 @@ local __SpellBook = LibStub:GetLibrary("ovale/SpellBook")
 local OvaleSpellBook = __SpellBook.OvaleSpellBook
 local WARRIOR_INCERCEPT_SPELLID = 198304
 local WARRIOR_HEROICTHROW_SPELLID = 57755
-local OvaleSpellsBase = OvaleProfiler:RegisterProfiling(OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleSpells", aceEvent)))
+local OvaleSpellsBase = OvaleProfiler.RegisterProfiling(OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleSpells", aceEvent)))
 local OvaleSpellsClass = __class(OvaleSpellsBase, {
     OnInitialize = function(self)
         RegisterRequirement("spellcount_min", self.RequireSpellCountHandler)
@@ -56,12 +56,12 @@ local OvaleSpellsClass = __class(OvaleSpellsBase, {
         local index, bookType = OvaleSpellBook:GetSpellBookIndex(spellId)
         if index and bookType then
             local spellCount = GetSpellCount(index, bookType)
-            self:Debug("GetSpellCount: index=%s bookType=%s for spellId=%s ==> spellCount=%s", index, bookType, spellId, spellCount)
+            self.Debug("GetSpellCount: index=%s bookType=%s for spellId=%s ==> spellCount=%s", index, bookType, spellId, spellCount)
             return spellCount
         else
             local spellName = OvaleSpellBook:GetSpellName(spellId)
             local spellCount = GetSpellCount(spellName)
-            self:Debug("GetSpellCount: spellName=%s for spellId=%s ==> spellCount=%s", spellName, spellId, spellCount)
+            self.Debug("GetSpellCount: spellName=%s for spellId=%s ==> spellCount=%s", spellName, spellId, spellCount)
             return spellCount
         end
     end,
@@ -86,43 +86,43 @@ local OvaleSpellsClass = __class(OvaleSpellsBase, {
     ResetState = function(self)
     end,
     IsUsableItem = function(self, itemId, atTime)
-        __exports.OvaleSpells:StartProfiling("OvaleSpellBook_state_IsUsableItem")
+        __exports.OvaleSpells.StartProfiling("OvaleSpellBook_state_IsUsableItem")
         local isUsable = IsUsableItem(itemId)
-        local ii = OvaleData:ItemInfo(itemId)
+        local ii = OvaleData.ItemInfo(itemId)
         if ii then
             if isUsable then
-                local unusable = OvaleData:GetItemInfoProperty(itemId, atTime, "unusable")
+                local unusable = OvaleData.GetItemInfoProperty(itemId, atTime, "unusable")
                 if unusable and unusable > 0 then
-                    __exports.OvaleSpells:Log("Item ID '%s' is flagged as unusable.", itemId)
+                    __exports.OvaleSpells.Log("Item ID '%s' is flagged as unusable.", itemId)
                     isUsable = false
                 end
             end
         end
-        __exports.OvaleSpells:StopProfiling("OvaleSpellBook_state_IsUsableItem")
+        __exports.OvaleSpells.StopProfiling("OvaleSpellBook_state_IsUsableItem")
         return isUsable
     end,
     IsUsableSpell = function(self, spellId, atTime, targetGUID)
-        __exports.OvaleSpells:StartProfiling("OvaleSpellBook_state_IsUsableSpell")
+        __exports.OvaleSpells.StartProfiling("OvaleSpellBook_state_IsUsableSpell")
         local isUsable = OvaleSpellBook:IsKnownSpell(spellId)
         local noMana = false
         local si = OvaleData.spellInfo[spellId]
         local requirement
         if si then
             if isUsable then
-                local unusable = OvaleData:GetSpellInfoProperty(spellId, atTime, "unusable", targetGUID)
+                local unusable = OvaleData.GetSpellInfoProperty(spellId, atTime, "unusable", targetGUID)
                 if unusable and unusable > 0 then
-                    __exports.OvaleSpells:Log("Spell ID '%s' is flagged as unusable.", spellId)
+                    __exports.OvaleSpells.Log("Spell ID '%s' is flagged as unusable.", spellId)
                     isUsable = false
                 end
             end
             if isUsable then
-                isUsable, requirement = OvaleData:CheckSpellInfo(spellId, atTime, targetGUID)
+                isUsable, requirement = OvaleData.CheckSpellInfo(spellId, atTime, targetGUID)
                 if  not isUsable then
                     noMana = OvalePower.PRIMARY_POWER[requirement]
                     if noMana then
-                        __exports.OvaleSpells:Log("Spell ID '%s' does not have enough %s.", spellId, requirement)
+                        __exports.OvaleSpells.Log("Spell ID '%s' does not have enough %s.", spellId, requirement)
                     else
-                        __exports.OvaleSpells:Log("Spell ID '%s' failed '%s' requirements.", spellId, requirement)
+                        __exports.OvaleSpells.Log("Spell ID '%s' failed '%s' requirements.", spellId, requirement)
                     end
                 end
             end
@@ -135,7 +135,7 @@ local OvaleSpellsClass = __class(OvaleSpellsBase, {
                 return IsUsableSpell(name)
             end
         end
-        __exports.OvaleSpells:StopProfiling("OvaleSpellBook_state_IsUsableSpell")
+        __exports.OvaleSpells.StopProfiling("OvaleSpellBook_state_IsUsableSpell")
         return isUsable, noMana
     end,
     constructor = function(self, ...)
@@ -152,11 +152,11 @@ local OvaleSpellsClass = __class(OvaleSpellsBase, {
                 local actualCount = __exports.OvaleSpells:GetSpellCount(spellId)
                 verified = (requirement == "spellcount_min" and count <= actualCount) or (requirement == "spellcount_max" and count >= actualCount)
             else
-                Ovale:OneTimeMessage("Warning: requirement '%s' is missing a count argument.", requirement)
+                Ovale.OneTimeMessage("Warning: requirement '%s' is missing a count argument.", requirement)
             end
             return verified, requirement, index
         end
     end
 })
 __exports.OvaleSpells = OvaleSpellsClass()
-OvaleState:RegisterState(__exports.OvaleSpells)
+OvaleState.RegisterState(__exports.OvaleSpells)

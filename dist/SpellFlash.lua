@@ -23,7 +23,7 @@ local UnitIsDead = UnitIsDead
 local UnitCanAttack = UnitCanAttack
 local __Future = LibStub:GetLibrary("ovale/Future")
 local OvaleFuture = __Future.OvaleFuture
-local OvaleSpellFlashBase = Ovale:NewModule("OvaleSpellFlash", aceEvent)
+local OvaleSpellFlashBase = Ovale.NewModule("OvaleSpellFlash", aceEvent)
 local SpellFlashCore = nil
 local colorMain = {
     r = nil,
@@ -149,7 +149,7 @@ do
 ,
             set = function(info, value)
                 Ovale.db.profile.apparence.spellFlash[info[#info]] = value
-                OvaleOptions:SendMessage("Ovale_OptionChanged")
+                OvaleOptions.SendMessage("Ovale_OptionChanged")
             end
 ,
             args = {
@@ -255,7 +255,7 @@ do
                         color.r = r
                         color.g = g
                         color.b = b
-                        OvaleOptions:SendMessage("Ovale_OptionChanged")
+                        OvaleOptions.SendMessage("Ovale_OptionChanged")
                     end
 ,
                     args = {
@@ -294,17 +294,17 @@ do
     for k, v in pairs(options) do
         OvaleOptions.options.args.apparence.args[k] = v
     end
-    OvaleOptions:RegisterOptions(__exports.OvaleSpellFlash)
+    OvaleOptions.RegisterOptions(__exports.OvaleSpellFlash)
 end
 local OvaleSpellFlashClass = __class(OvaleSpellFlashBase, {
     OnInitialize = function(self)
         SpellFlashCore = _G["SpellFlashCore"]
-        self:RegisterMessage("Ovale_OptionChanged")
+        self.RegisterMessage("Ovale_OptionChanged")
         self:Ovale_OptionChanged()
     end,
     OnDisable = function(self)
         SpellFlashCore = nil
-        self:UnregisterMessage("Ovale_OptionChanged")
+        self.UnregisterMessage("Ovale_OptionChanged")
     end,
     Ovale_OptionChanged = function(self)
         local db = Ovale.db.profile.apparence.spellFlash
@@ -327,7 +327,7 @@ local OvaleSpellFlashClass = __class(OvaleSpellFlashBase, {
         if enabled and  not db.enabled then
             enabled = false
         end
-        if enabled and db.inCombat and  not OvaleFuture:IsInCombat(nil) then
+        if enabled and db.inCombat and  not OvaleFuture.IsInCombat(nil) then
             enabled = false
         end
         if enabled and db.hideInVehicle and UnitHasVehicleUI("player") then

@@ -23,7 +23,7 @@ local IsInGroup = IsInGroup
 local IsInGuild = IsInGuild
 local IsInRaid = IsInRaid
 local LE_PARTY_CATEGORY_INSTANCE = LE_PARTY_CATEGORY_INSTANCE
-local OvaleVersionBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleVersion", AceComm, AceSerializer, AceTimer))
+local OvaleVersionBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleVersion", AceComm, AceSerializer, AceTimer))
 local self_printTable = {}
 local self_userVersion = {}
 local self_timer
@@ -44,7 +44,7 @@ do
             name = L["Show version number"],
             type = "execute",
             func = function()
-                __exports.OvaleVersion:Print(__exports.OvaleVersion.version)
+                __exports.OvaleVersion.Print(__exports.OvaleVersion.version)
             end
 
         }
@@ -52,23 +52,23 @@ do
     for k, v in pairs(actions) do
         OvaleOptions.options.args.actions.args[k] = v
     end
-    OvaleOptions:RegisterOptions(__exports.OvaleVersion)
+    OvaleOptions.RegisterOptions(__exports.OvaleVersion)
 end
 local OvaleVersionClass = __class(OvaleVersionBase, {
     constructor = function(self)
         self.version = (OVALE_VERSION == REPOSITORY_KEYWORD) and "development version" or OVALE_VERSION
         self.warned = false
         OvaleVersionBase.constructor(self)
-        self:RegisterComm(MSG_PREFIX)
+        self.RegisterComm(MSG_PREFIX)
     end,
     OnCommReceived = function(self, prefix, message, channel, sender)
         if prefix == MSG_PREFIX then
-            local ok, msgType, version = self:Deserialize(message)
+            local ok, msgType, version = self.Deserialize(message)
             if ok then
-                self:Debug(msgType, version, channel, sender)
+                self.Debug(msgType, version, channel, sender)
                 if msgType == "V" then
-                    local msg = self:Serialize("VR", self.version)
-                    self:SendCommMessage(MSG_PREFIX, msg, channel)
+                    local msg = self.Serialize("VR", self.version)
+                    self.SendCommMessage(MSG_PREFIX, msg, channel)
                 elseif msgType == "VR" then
                     self_userVersion[sender] = version
                 end
@@ -78,7 +78,7 @@ local OvaleVersionClass = __class(OvaleVersionBase, {
     VersionCheck = function(self)
         if  not self_timer then
             wipe(self_userVersion)
-            local message = self:Serialize("V", self.version)
+            local message = self.Serialize("V", self.version)
             local channel
             if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
                 channel = "INSTANCE_CHAT"
@@ -90,9 +90,9 @@ local OvaleVersionClass = __class(OvaleVersionBase, {
                 channel = "GUILD"
             end
             if channel then
-                self:SendCommMessage(MSG_PREFIX, message, channel)
+                self.SendCommMessage(MSG_PREFIX, message, channel)
             end
-            self_timer = self:ScheduleTimer("PrintVersionCheck", 3)
+            self_timer = self.ScheduleTimer("PrintVersionCheck", 3)
         end
     end,
     PrintVersionCheck = function(self)
@@ -103,10 +103,10 @@ local OvaleVersionClass = __class(OvaleVersionBase, {
             end
             sort(self_printTable)
             for _, v in ipairs(self_printTable) do
-                self:Print(v)
+                self.Print(v)
             end
         else
-            self:Print(">>> No other Ovale users present.")
+            self.Print(">>> No other Ovale users present.")
         end
         self_timer = nil
     end,

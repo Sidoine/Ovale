@@ -1,17 +1,16 @@
-import { OvaleState, StateModule } from "./State";
-import { Ovale } from "./Ovale";
-import aceEvent from "@wowts/ace_event-3.0";
+import { StateModule, States } from "./State";
 import { GetTime } from "@wowts/wow-mock";
-import { OvaleDebug } from "./Debug";
 
 class BaseStateData {
     currentTime: number = 0;
     defaultTarget: string = "target";
 }
 
-const BaseStateBase = OvaleDebug.RegisterDebugging(OvaleState.RegisterHasState(Ovale.NewModule("BaseState", aceEvent), BaseStateData));
+export class BaseState extends States<BaseStateData> implements StateModule {    
+    constructor() {
+        super(BaseStateData);
+    }
 
-class BaseState extends BaseStateBase implements StateModule {    
     InitializeState() {        
         this.next.defaultTarget = "target";
     }
@@ -25,5 +24,3 @@ class BaseState extends BaseStateBase implements StateModule {
     CleanState() {}
 }
 
-export const baseState = new BaseState();
-OvaleState.RegisterState(baseState);

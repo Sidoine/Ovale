@@ -415,10 +415,10 @@
     "@wowts/tsaddon" "^1.1.2"
     "@wowts/tslib" "^1.1.0"
 
-"@wowts/ace_timer-3.0@^2.1.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@wowts/ace_timer-3.0/-/ace_timer-3.0-2.1.0.tgz#4b97030b1f448102c2f166ba65a6cc1e43aa228d"
-  integrity sha512-92bSUjki2BBiGhf4Azy5B0SLVHv2gfNNnBKZsorrHqoR63t8VWPeOwucwBnhW7/U0uLK79lnL9BLwt1YWISKBw==
+"@wowts/ace_timer-3.0@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@wowts/ace_timer-3.0/-/ace_timer-3.0-2.2.0.tgz#384add39afcd66e18d96f1e19d0b5bc19fbb062d"
+  integrity sha512-Tm72+WTPA9HBjz7pzgDRGUeubH/2ma3w8k5OqdSwBMYxfzASDY8yUqJtw5xxAcTgzFMgeyiL2D6Nuykzm8x3Sw==
   dependencies:
     "@wowts/lua" "^1.3.0"
     "@wowts/tsaddon" "^1.1.2"

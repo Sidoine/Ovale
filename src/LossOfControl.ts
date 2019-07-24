@@ -1,13 +1,13 @@
-import { OvaleDebug } from "./Debug";
-import { OvaleProfiler } from "./Profiler";
-import { Ovale } from "./Ovale";
-import { OvaleState } from "./State";
 import { RegisterRequirement, UnregisterRequirement, Tokens } from "./Requirement";
-import aceEvent from "@wowts/ace_event-3.0";
+import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { C_LossOfControl, GetTime } from "@wowts/wow-mock";
 import { LuaArray, pairs } from "@wowts/lua";
 import { insert } from "@wowts/table";
 import { sub, upper } from "@wowts/string";
+import { AceModule } from "@wowts/tsaddon";
+import { OvaleClass } from "./Ovale";
+import { OvaleDebugClass, Tracer } from "./Debug";
+import { StateModule } from "./State";
 
 interface LossOfControlEventInfo{
 	locType: string;
@@ -16,25 +16,30 @@ interface LossOfControlEventInfo{
 	duration: number,
 }
 
-export let OvaleLossOfControl:OvaleLossOfControlClass;
-const OvaleLossOfControlBase = OvaleProfiler.RegisterProfiling(OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleLossOfControl", aceEvent)))
-class OvaleLossOfControlClass extends OvaleLossOfControlBase {
-	lossOfControlHistory: LuaArray<LossOfControlEventInfo>;
-	
-	OnInitialize() {
-		this.Debug("Enabled LossOfControl module");
+export class OvaleLossOfControlClass implements StateModule {
+	private lossOfControlHistory: LuaArray<LossOfControlEventInfo>;
+	private module: AceModule & AceEvent;
+	private tracer: Tracer;
+
+	constructor(private ovale: OvaleClass, ovaleDebug: OvaleDebugClass) {
+		this.module = ovale.createModule("OvaleLossOfControl", this.OnInitialize, this.OnDisable, aceEvent);
+		this.tracer = ovaleDebug.create(this.module.GetName());
+	}
+
+	private OnInitialize = () => {
+		this.tracer.Debug("Enabled LossOfControl module");
 		this.lossOfControlHistory = {};
-        this.RegisterEvent("LOSS_OF_CONTROL_ADDED");
+        this.module.RegisterEvent("LOSS_OF_CONTROL_ADDED", this.LOSS_OF_CONTROL_ADDED);
         RegisterRequirement("lossofcontrol", this.RequireLossOfControlHandler);
     }
-    OnDisable() {
-		this.Debug("Disabled LossOfControl module");
+    private OnDisable = () => {
+		this.tracer.Debug("Disabled LossOfControl module");
 		this.lossOfControlHistory = {};
-        this.UnregisterEvent("LOSS_OF_CONTROL_ADDED");
+        this.module.UnregisterEvent("LOSS_OF_CONTROL_ADDED");
 		UnregisterRequirement("lossofcontrol");
     }
-	LOSS_OF_CONTROL_ADDED(event: string, eventIndex: number){
-		this.Debug("GetEventInfo:", eventIndex, C_LossOfControl.GetEventInfo(eventIndex));
+	private LOSS_OF_CONTROL_ADDED = (event: string, eventIndex: number) => {
+		this.tracer.Debug("GetEventInfo:", eventIndex, C_LossOfControl.GetEventInfo(eventIndex));
 		let [locType, spellID, , , startTime, , duration] = C_LossOfControl.GetEventInfo(eventIndex);
 		let data: LossOfControlEventInfo = {
 			locType: upper(locType),
@@ -60,7 +65,7 @@ class OvaleLossOfControlClass extends OvaleLossOfControlBase {
 			verified = (required && hasLoss) || (!required && !hasLoss);
 			
 		} else {
-			Ovale.OneTimeMessage("Warning: requirement '%s' is missing a locType argument.", requirement);
+			this.ovale.OneTimeMessage("Warning: requirement '%s' is missing a locType argument.", requirement);
 		}
 		return [verified, requirement, index];
 	}
@@ -82,6 +87,3 @@ class OvaleLossOfControlClass extends OvaleLossOfControlBase {
     ResetState(): void {
     }
 }
-
-OvaleLossOfControl = new OvaleLossOfControlClass();
-OvaleState.RegisterState(OvaleLossOfControl);

@@ -5,22 +5,16 @@ local AceGUI = LibStub:GetLibrary("AceGUI-3.0", true)
 local Masque = LibStub:GetLibrary("Masque", true)
 local __BestAction = LibStub:GetLibrary("ovale/BestAction")
 local OvaleBestAction = __BestAction.OvaleBestAction
-local __Compile = LibStub:GetLibrary("ovale/Compile")
-local OvaleCompile = __Compile.OvaleCompile
 local __Debug = LibStub:GetLibrary("ovale/Debug")
 local OvaleDebug = __Debug.OvaleDebug
 local __GUID = LibStub:GetLibrary("ovale/GUID")
 local OvaleGUID = __GUID.OvaleGUID
 local __SpellFlash = LibStub:GetLibrary("ovale/SpellFlash")
 local OvaleSpellFlash = __SpellFlash.OvaleSpellFlash
-local __State = LibStub:GetLibrary("ovale/State")
-local OvaleState = __State.OvaleState
 local __Ovale = LibStub:GetLibrary("ovale/Ovale")
 local Ovale = __Ovale.Ovale
 local __Icon = LibStub:GetLibrary("ovale/Icon")
 local OvaleIcon = __Icon.OvaleIcon
-local __Enemies = LibStub:GetLibrary("ovale/Enemies")
-local OvaleEnemies = __Enemies.OvaleEnemies
 local __Controls = LibStub:GetLibrary("ovale/Controls")
 local lists = __Controls.lists
 local checkBoxes = __Controls.checkBoxes
@@ -43,13 +37,9 @@ local UIParent = UIParent
 local huge = math.huge
 local __aceguihelpers = LibStub:GetLibrary("ovale/acegui-helpers")
 local AceGUIRegisterAsContainer = __aceguihelpers.AceGUIRegisterAsContainer
-local __Future = LibStub:GetLibrary("ovale/Future")
-local OvaleFuture = __Future.OvaleFuture
-local __BaseState = LibStub:GetLibrary("ovale/BaseState")
-local baseState = __BaseState.baseState
 local strmatch = match
 local INFINITY = huge
-local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
+__exports.OvaleFrame = __class(AceGUI.WidgetContainerBase, {
     ToggleOptions = function(self)
         if (self.content:IsShown()) then
             self.content:Hide()
@@ -105,7 +95,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
             if profile.apparence.avecCible and  not UnitExists("target") then
                 self.visible = false
             end
-            if profile.apparence.enCombat and  not OvaleFuture:IsInCombat(nil) then
+            if profile.apparence.enCombat and  not self.ovaleFuture:IsInCombat(nil) then
                 self.visible = false
             end
             if profile.apparence.targetHostileOnly and (UnitIsDead("target") or  not UnitCanAttack("player", "target")) then
@@ -119,38 +109,38 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
         end
     end,
     OnUpdate = function(self, elapsed)
-        __exports.OvaleFrameModule:SendMessage("Ovale_OnUpdate")
+        self.ovaleFrameModule.SendMessage("Ovale_OnUpdate")
         self.timeSinceLastUpdate = self.timeSinceLastUpdate + elapsed
         local refresh = OvaleDebug.trace or (self.visible or OvaleSpellFlash:IsSpellFlashEnabled()) and (self.timeSinceLastUpdate > Ovale.db.profile.apparence.minFrameRefresh / 1000 and next(Ovale.refreshNeeded) or self.timeSinceLastUpdate > Ovale.db.profile.apparence.maxFrameRefresh / 1000)
         if refresh then
-            Ovale:AddRefreshInterval(self.timeSinceLastUpdate * 1000)
-            OvaleState:InitializeState()
-            if OvaleCompile:EvaluateScript() then
+            Ovale.AddRefreshInterval(self.timeSinceLastUpdate * 1000)
+            self.ovaleState:InitializeState()
+            if self.ovaleCompile:EvaluateScript() then
                 self:UpdateFrame()
             end
             local profile = Ovale.db.profile
-            local iconNodes = OvaleCompile:GetIconNodes()
+            local iconNodes = self.ovaleCompile:GetIconNodes()
             for k, node in ipairs(iconNodes) do
                 if node.namedParams and node.namedParams.target then
-                    baseState.current.defaultTarget = node.namedParams.target
+                    self.baseState.current.defaultTarget = node.namedParams.target
                 else
-                    baseState.current.defaultTarget = "target"
+                    self.baseState.current.defaultTarget = "target"
                 end
                 if node.namedParams and node.namedParams.enemies then
-                    OvaleEnemies.next.enemies = node.namedParams.enemies
+                    self.ovaleEnemies.next.enemies = node.namedParams.enemies
                 else
-                    OvaleEnemies.next.enemies = nil
+                    self.ovaleEnemies.next.enemies = nil
                 end
-                OvaleState:Log("+++ Icon %d", k)
+                self.ovaleState.Log("+++ Icon %d", k)
                 OvaleBestAction:StartNewAction()
-                local atTime = OvaleFuture.next.nextCast
-                if OvaleFuture.next.currentCast.spellId == nil or OvaleFuture.next.currentCast.spellId ~= OvaleFuture.next.lastGCDSpellId then
-                    atTime = baseState.next.currentTime
+                local atTime = self.ovaleFuture.next.nextCast
+                if self.ovaleFuture.next.currentCast.spellId == nil or self.ovaleFuture.next.currentCast.spellId ~= self.ovaleFuture.next.lastGCDSpellId then
+                    atTime = self.baseState.next.currentTime
                 end
                 local timeSpan, element = OvaleBestAction:GetAction(node, atTime)
                 local start
                 if element and element.offgcd then
-                    start = timeSpan:NextTime(baseState.next.currentTime)
+                    start = timeSpan:NextTime(self.baseState.next.currentTime)
                 else
                     start = timeSpan:NextTime(atTime)
                 end
@@ -162,8 +152,8 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
                 end
             end
             wipe(Ovale.refreshNeeded)
-            OvaleDebug:UpdateTrace()
-            Ovale:PrintOneTimeMessages()
+            OvaleDebug.UpdateTrace()
+            Ovale.PrintOneTimeMessages()
             self.timeSinceLastUpdate = 0
         end
     end,
@@ -176,7 +166,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
             if element.value and element.origin and element.rate then
                 value = element.value + (now - element.origin) * element.rate
             end
-            OvaleBestAction:Log("GetAction: start=%s, value=%f", start, value)
+            OvaleBestAction.Log("GetAction: start=%s, value=%f", start, value)
             local actionTexture
             if node.namedParams and node.namedParams.texture then
                 actionTexture = node.namedParams.texture
@@ -189,16 +179,16 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
             local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget, actionResourceExtend = OvaleBestAction:GetActionInfo(element, now)
             if actionResourceExtend and actionResourceExtend > 0 then
                 if actionCooldownDuration > 0 then
-                    OvaleBestAction:Log("Extending cooldown of spell ID '%s' for primary resource by %fs.", actionId, actionResourceExtend)
+                    OvaleBestAction.Log("Extending cooldown of spell ID '%s' for primary resource by %fs.", actionId, actionResourceExtend)
                     actionCooldownDuration = actionCooldownDuration + actionResourceExtend
                 elseif element.namedParams.pool_resource and element.namedParams.pool_resource == 1 then
-                    OvaleBestAction:Log("Delaying spell ID '%s' for primary resource by %fs.", actionId, actionResourceExtend)
+                    OvaleBestAction.Log("Delaying spell ID '%s' for primary resource by %fs.", actionId, actionResourceExtend)
                     start = start + actionResourceExtend
                 end
             end
-            OvaleBestAction:Log("GetAction: start=%s, id=%s", start, actionId)
-            if actionType == "spell" and actionId == OvaleFuture.next.currentCast.spellId and start and OvaleFuture.next.nextCast and start < OvaleFuture.next.nextCast then
-                start = OvaleFuture.next.nextCast
+            OvaleBestAction.Log("GetAction: start=%s, id=%s", start, actionId)
+            if actionType == "spell" and actionId == self.ovaleFuture.next.currentCast.spellId and start and self.ovaleFuture.next.nextCast and start < self.ovaleFuture.next.nextCast then
+                start = self.ovaleFuture.next.nextCast
             end
             if start and node.namedParams.nocd and now < start - node.namedParams.nocd then
                 icons[1]:Update(element, nil)
@@ -229,15 +219,15 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
             end
             if (node.namedParams.size ~= "small" and  not node.namedParams.nocd and profile.apparence.predictif) then
                 if start then
-                    OvaleBestAction:Log("****Second icon %s", start)
-                    OvaleFuture:ApplySpell(actionId, OvaleGUID:UnitGUID(actionTarget), start)
-                    local atTime = OvaleFuture.next.nextCast
-                    if actionId ~= OvaleFuture.next.lastGCDSpellId then
-                        atTime = baseState.next.currentTime
+                    OvaleBestAction.Log("****Second icon %s", start)
+                    self.ovaleFuture:ApplySpell(actionId, OvaleGUID.UnitGUID(actionTarget), start)
+                    local atTime = self.ovaleFuture.next.nextCast
+                    if actionId ~= self.ovaleFuture.next.lastGCDSpellId then
+                        atTime = self.baseState.next.currentTime
                     end
                     local timeSpan, nextElement = OvaleBestAction:GetAction(node, atTime)
                     if nextElement and nextElement.offgcd then
-                        start = timeSpan:NextTime(baseState.next.currentTime)
+                        start = timeSpan:NextTime(self.baseState.next.currentTime)
                     else
                         start = timeSpan:NextTime(atTime)
                     end
@@ -329,7 +319,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
                 self:AddChild(widget)
                 self.checkBoxWidget[name] = widget
             else
-                Ovale:OneTimeMessage("Warning: checkbox '%s' is used but not defined.", name)
+                Ovale.OneTimeMessage("Warning: checkbox '%s' is used but not defined.", name)
             end
         end
         wipe(self.listWidget)
@@ -348,7 +338,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
                 self:AddChild(widget)
                 self.listWidget[name] = widget
             else
-                Ovale:OneTimeMessage("Warning: list '%s' is used but has no items.", name)
+                Ovale.OneTimeMessage("Warning: list '%s' is used but has no items.", name)
             end
         end
     end,
@@ -369,7 +359,7 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
         local top = 0
         local BARRE = 8
         local margin = profile.apparence.margin
-        local iconNodes = OvaleCompile:GetIconNodes()
+        local iconNodes = self.ovaleCompile:GetIconNodes()
         for k, node in ipairs(iconNodes) do
             if  not self.actions[k] then
                 self.actions[k] = {
@@ -469,34 +459,40 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
             self.content:SetPoint("TOPLEFT", self.frame, "TOPLEFT", maxWidth + profile.apparence.iconShiftX, profile.apparence.iconShiftY)
         end
     end,
-    constructor = function(self)
+    constructor = function(self, ovaleState, ovaleFrameModule, ovaleCompile, ovaleFuture, baseState, ovaleEnemies)
+        self.ovaleState = ovaleState
+        self.ovaleFrameModule = ovaleFrameModule
+        self.ovaleCompile = ovaleCompile
+        self.ovaleFuture = ovaleFuture
+        self.baseState = baseState
+        self.ovaleEnemies = ovaleEnemies
         self.checkBoxWidget = {}
         self.listWidget = {}
         self.OnCheckBoxValueChanged = function(widget)
             local name = widget:GetUserData("name")
             Ovale.db.profile.check[name] = widget:GetValue()
-            __exports.OvaleFrameModule:SendMessage("Ovale_CheckBoxValueChanged", name)
+            self.ovaleFrameModule.SendMessage("Ovale_CheckBoxValueChanged", name)
         end
         self.OnDropDownValueChanged = function(widget)
             local name = widget:GetUserData("name")
             Ovale.db.profile.list[name] = widget:GetValue()
-            __exports.OvaleFrameModule:SendMessage("Ovale_ListValueChanged", name)
+            self.ovaleFrameModule.SendMessage("Ovale_ListValueChanged", name)
         end
         self.type = "Frame"
         self.localstatus = {}
         self.actions = {}
         AceGUI.WidgetContainerBase.constructor(self)
-        local hider = CreateFrame("Frame", Ovale:GetName() .. "PetBattleFrameHider", UIParent, "SecureHandlerStateTemplate")
+        local hider = CreateFrame("Frame", Ovale.GetName() .. "PetBattleFrameHider", UIParent, "SecureHandlerStateTemplate")
         local newFrame = CreateFrame("Frame", nil, hider)
         hider:SetAllPoints(UIParent)
         RegisterStateDriver(hider, "visibility", "[petbattle] hide; show")
         self.frame = newFrame
         self.hider = hider
-        self.updateFrame = CreateFrame("Frame", Ovale:GetName() .. "UpdateFrame")
+        self.updateFrame = CreateFrame("Frame", Ovale.GetName() .. "UpdateFrame")
         self.barre = self.frame:CreateTexture()
         self.content = CreateFrame("Frame", nil, self.updateFrame)
         if Masque then
-            self.skinGroup = Masque:Group(Ovale:GetName())
+            self.skinGroup = Masque:Group(Ovale.GetName())
         end
         self.timeSinceLastUpdate = INFINITY
         newFrame:SetWidth(100)
@@ -543,10 +539,10 @@ local OvaleFrame = __class(AceGUI.WidgetContainerBase, {
         self:UpdateFrame()
     end,
 })
-local OvaleFrameBase = Ovale:NewModule("OvaleFrame", aceEvent)
-local OvaleFrameModuleClass = __class(OvaleFrameBase, {
+local OvaleFrameBase = Ovale.NewModule("OvaleFrame", aceEvent)
+__exports.OvaleFrameModuleClass = __class(OvaleFrameBase, {
     OnInitialize = function(self)
-        self.frame = OvaleFrame()
+        self.frame = __exports.OvaleFrame(self.ovaleState, self, self.ovaleCompile, self.ovaleFuture, self.baseState, self.ovaleEnemies)
     end,
     Ovale_OptionChanged = function(self, event, eventType)
         if  not self.frame then
@@ -567,11 +563,15 @@ local OvaleFrameModuleClass = __class(OvaleFrameBase, {
     Ovale_CombatEnded = function(self, event, atTime)
         self.frame:UpdateVisibility()
     end,
-    constructor = function(self)
+    constructor = function(self, ovaleState, ovaleCompile, ovaleFuture, baseState, ovaleEnemies)
+        self.ovaleState = ovaleState
+        self.ovaleCompile = ovaleCompile
+        self.ovaleFuture = ovaleFuture
+        self.baseState = baseState
+        self.ovaleEnemies = ovaleEnemies
         OvaleFrameBase.constructor(self)
-        self:RegisterMessage("Ovale_OptionChanged")
-        self:RegisterMessage("Ovale_CombatStarted")
-        self:RegisterEvent("PLAYER_TARGET_CHANGED")
+        self.RegisterMessage("Ovale_OptionChanged")
+        self.RegisterMessage("Ovale_CombatStarted")
+        self.RegisterEvent("PLAYER_TARGET_CHANGED")
     end,
 })
-__exports.OvaleFrameModule = OvaleFrameModuleClass()

@@ -7,8 +7,6 @@ local __Profiler = LibStub:GetLibrary("ovale/Profiler")
 local OvaleProfiler = __Profiler.OvaleProfiler
 local __Ovale = LibStub:GetLibrary("ovale/Ovale")
 local Ovale = __Ovale.Ovale
-local __State = LibStub:GetLibrary("ovale/State")
-local OvaleState = __State.OvaleState
 local __Requirement = LibStub:GetLibrary("ovale/Requirement")
 local RegisterRequirement = __Requirement.RegisterRequirement
 local UnregisterRequirement = __Requirement.UnregisterRequirement
@@ -19,22 +17,22 @@ local pairs = pairs
 local insert = table.insert
 local sub = string.sub
 local upper = string.upper
-local OvaleLossOfControlBase = OvaleProfiler:RegisterProfiling(OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleLossOfControl", aceEvent)))
-local OvaleLossOfControlClass = __class(OvaleLossOfControlBase, {
+local OvaleLossOfControlBase = OvaleProfiler.RegisterProfiling(OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleLossOfControl", aceEvent)))
+__exports.OvaleLossOfControlClass = __class(OvaleLossOfControlBase, {
     OnInitialize = function(self)
-        self:Debug("Enabled LossOfControl module")
+        self.Debug("Enabled LossOfControl module")
         self.lossOfControlHistory = {}
-        self:RegisterEvent("LOSS_OF_CONTROL_ADDED")
+        self.RegisterEvent("LOSS_OF_CONTROL_ADDED")
         RegisterRequirement("lossofcontrol", self.RequireLossOfControlHandler)
     end,
     OnDisable = function(self)
-        self:Debug("Disabled LossOfControl module")
+        self.Debug("Disabled LossOfControl module")
         self.lossOfControlHistory = {}
-        self:UnregisterEvent("LOSS_OF_CONTROL_ADDED")
+        self.UnregisterEvent("LOSS_OF_CONTROL_ADDED")
         UnregisterRequirement("lossofcontrol")
     end,
     LOSS_OF_CONTROL_ADDED = function(self, event, eventIndex)
-        self:Debug("GetEventInfo:", eventIndex, C_LossOfControl.GetEventInfo(eventIndex))
+        self.Debug("GetEventInfo:", eventIndex, C_LossOfControl.GetEventInfo(eventIndex))
         local locType, spellID, _, _, startTime, _, duration = C_LossOfControl.GetEventInfo(eventIndex)
         local data = {
             locType = upper(locType),
@@ -65,7 +63,7 @@ local OvaleLossOfControlClass = __class(OvaleLossOfControlBase, {
                 local hasLoss = self.HasLossOfControl(locType, atTime)
                 verified = (required and hasLoss) or ( not required and  not hasLoss)
             else
-                Ovale:OneTimeMessage("Warning: requirement '%s' is missing a locType argument.", requirement)
+                Ovale.OneTimeMessage("Warning: requirement '%s' is missing a locType argument.", requirement)
             end
             return verified, requirement, index
         end
@@ -87,5 +85,3 @@ local OvaleLossOfControlClass = __class(OvaleLossOfControlBase, {
 
     end
 })
-__exports.OvaleLossOfControl = OvaleLossOfControlClass()
-OvaleState:RegisterState(__exports.OvaleLossOfControl)

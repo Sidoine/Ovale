@@ -39,11 +39,10 @@ __exports.MakeString = function(s, ...)
     return s
 end
 local OvaleBase = NewAddon("Ovale", aceEvent)
-local OvaleClass = __class(OvaleBase, {
+__exports.OvaleClass = __class(OvaleBase, {
     constructor = function(self)
         self.playerClass = nil
         self.playerGUID = nil
-        self.db = nil
         self.refreshNeeded = {}
         self.MSG_PREFIX = "Ovale"
         OvaleBase.constructor(self)
@@ -112,5 +111,19 @@ local OvaleClass = __class(OvaleBase, {
         local s = __exports.MakeString(...)
         DEFAULT_CHAT_FRAME:AddMessage(format("|cff33ff99%s|r: %s", self:GetName(), s))
     end,
+    createModule = function(self, name, onInitialize, onRelease)
+    end,
+    createModule = function(self, name, onInitialize, onRelease, dep1)
+    end,
+    createModule = function(self, name, onInitialize, onRelease, dep1, dep2)
+    end,
+    createModule = function(self, name, onInitialize, onRelease, dep1, dep2, dep3)
+    end,
+    createModule = function(self, name, onInitialize, onRelease, dep1, dep2, dep3, dep4)
+    end,
+    createModule = function(self, name, onInitialize, onRelease, dep1, dep2, dep3, dep4)
+        local ret = (self:NewModule(name, dep1, dep2, dep3, dep4))()
+        ret.OnInitialize = onInitialize
+        return ret
+    end,
 })
-__exports.Ovale = OvaleClass()

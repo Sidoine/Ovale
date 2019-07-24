@@ -5,7 +5,7 @@ import { eventDispatcher, ClassId } from "@wowts/wow-mock";
 import { OvaleEquipment } from "../Equipment";
 import { OvaleSpellBook } from "../SpellBook";
 import { OvaleStance } from "../Stance";
-import { OvaleSimulationCraft, Annotation } from "../SimulationCraft";
+import { OvaleSimulationCraft, Annotation } from "../simulationcraft/SimulationCraft";
 import  { registerScripts } from "../scripts/index";
 import { getSpellData, SpellData } from "./importspells";
 import { ipairs } from "@wowts/lua";

@@ -12,7 +12,7 @@ __exports.Variables = __class(nil, {
     InitializeState = function(self)
         self.futureVariable = {}
         self.futureLastEnable = {}
-        if  not OvaleFuture:IsInCombat(nil) then
+        if  not OvaleFuture.IsInCombat(nil) then
             for k in pairs(self.variable) do
                 self:Log("Resetting state variable '%s'.", k)
                 self.variable[k] = nil
@@ -58,7 +58,7 @@ __exports.Variables = __class(nil, {
         else
             local oldValue = self.variable[name] or 0
             if value ~= oldValue then
-                OvaleState:DebugTimestamp("Advancing combat state: %s from %s to %s.", name, oldValue, value)
+                OvaleState.DebugTimestamp("Advancing combat state: %s from %s to %s.", name, oldValue, value)
                 self:Log("Advancing combat state: %s from %s to %s.", name, oldValue, value)
                 self.variable[name] = value
                 self.lastEnable[name] = atTime
@@ -66,7 +66,7 @@ __exports.Variables = __class(nil, {
         end
     end,
     Log = function(self, ...)
-        OvaleState:Log(...)
+        OvaleState.Log(...)
     end,
     constructor = function(self)
         self.isState = true
@@ -78,4 +78,4 @@ __exports.Variables = __class(nil, {
     end
 })
 __exports.variables = __exports.Variables()
-OvaleState:RegisterState(__exports.variables)
+OvaleState.RegisterState(__exports.variables)

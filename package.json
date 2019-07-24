@@ -26,7 +26,7 @@
     "@wowts/ace_gui-3.0": "^1.1.0",
     "@wowts/ace_locale-3.0": "^1.0.0",
     "@wowts/ace_serializer-3.0": "^1.1.0",
-    "@wowts/ace_timer-3.0": "^2.1.0",
+    "@wowts/ace_timer-3.0": "^2.2.0",
     "@wowts/bit": "^1.0.0",
     "@wowts/coroutine": "^1.0.1",
     "@wowts/lib_artifact_data-1.0": "^1.0.0",

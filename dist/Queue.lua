@@ -89,7 +89,7 @@ __exports.OvaleDequeue = __class(nil, {
         return self.last - self.first + 1
     end,
     DebuggingInfo = function(self)
-        Ovale:Print("Queue %s has %d item(s), first=%d, last=%d.", self.name, self:Size(), self.first, self.last)
+        Ovale.Print("Queue %s has %d item(s), first=%d, last=%d.", self.name, self:Size(), self.first, self.last)
     end,
 })
 __exports.OvaleQueue = __class(__exports.OvaleDequeue, {

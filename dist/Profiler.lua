@@ -6,10 +6,6 @@ local AceConfigDialog = LibStub:GetLibrary("AceConfigDialog-3.0", true)
 local __Localization = LibStub:GetLibrary("ovale/Localization")
 local L = __Localization.L
 local LibTextDump = LibStub:GetLibrary("LibTextDump-1.0", true)
-local __Options = LibStub:GetLibrary("ovale/Options")
-local OvaleOptions = __Options.OvaleOptions
-local __Ovale = LibStub:GetLibrary("ovale/Ovale")
-local Ovale = __Ovale.Ovale
 local debugprofilestop = debugprofilestop
 local GetTime = GetTime
 local format = string.format
@@ -19,14 +15,65 @@ local wipe = wipe
 local insert = table.insert
 local sort = table.sort
 local concat = table.concat
-local OvaleProfilerBase = Ovale:NewModule("OvaleProfiler")
 local self_timestamp = debugprofilestop()
 local self_timeSpent = {}
 local self_timesInvoked = {}
 local self_stack = {}
 local self_stackSize = 0
-local OvaleProfilerClass = __class(OvaleProfilerBase, {
-    constructor = function(self)
+__exports.Profiler = __class(nil, {
+    constructor = function(self, name, profiler)
+        self.enabled = false
+        local args = profiler.options.args.profiling.args.modules.args
+        args[name] = {
+            name = name,
+            desc = format(L["Enable profiling for the %s module."], name),
+            type = "toggle"
+        }
+        profiler.profiles[name] = self
+    end,
+    StartProfiling = function(self, tag)
+        if  not self.enabled then
+            return 
+        end
+        local newTimestamp = debugprofilestop()
+        if self_stackSize > 0 then
+            local delta = newTimestamp - self_timestamp
+            local previous = self_stack[self_stackSize]
+            local timeSpent = self_timeSpent[previous] or 0
+            timeSpent = timeSpent + delta
+            self_timeSpent[previous] = timeSpent
+        end
+        self_timestamp = newTimestamp
+        self_stackSize = self_stackSize + 1
+        self_stack[self_stackSize] = tag
+        do
+            local timesInvoked = self_timesInvoked[tag] or 0
+            timesInvoked = timesInvoked + 1
+            self_timesInvoked[tag] = timesInvoked
+        end
+    end,
+    StopProfiling = function(self, tag)
+        if  not self.enabled then
+            return 
+        end
+        if self_stackSize > 0 then
+            local currentTag = self_stack[self_stackSize]
+            if currentTag == tag then
+                local newTimestamp = debugprofilestop()
+                local delta = newTimestamp - self_timestamp
+                local timeSpent = self_timeSpent[currentTag] or 0
+                timeSpent = timeSpent + delta
+                self_timeSpent[currentTag] = timeSpent
+                self_timestamp = newTimestamp
+                self_stackSize = self_stackSize - 1
+            end
+        end
+    end,
+})
+__exports.OvaleProfilerClass = __class(nil, {
+    constructor = function(self, options, ovale, ovaleOptions)
+        self.ovale = ovale
+        self.ovaleOptions = ovaleOptions
         self.self_profilingOutput = nil
         self.profiles = {}
         self.actions = {
@@ -34,14 +81,14 @@ local OvaleProfilerClass = __class(OvaleProfilerBase, {
                 name = L["Profiling"],
                 type = "execute",
                 func = function()
-                    local appName = self:GetName()
+                    local appName = self.ovale:GetName()
                     AceConfigDialog:SetDefaultSize(appName, 800, 550)
                     AceConfigDialog:Open(appName)
                 end
             }
         }
         self.options = {
-            name = Ovale:GetName() .. " " .. L["Profiling"],
+            name = self.ovale:GetName() .. " " .. L["Profiling"],
             type = "group",
             args = {
                 profiling = {
@@ -56,13 +103,13 @@ local OvaleProfilerClass = __class(OvaleProfilerBase, {
                             args = {},
                             get = function(info)
                                 local name = info[#info]
-                                local value = Ovale.db.global.profiler[name]
+                                local value = self.ovaleOptions.db.global.profiler[name]
                                 return (value ~= nil)
                             end,
                             set = function(info, value)
                                 value = value or nil
                                 local name = info[#info]
-                                Ovale.db.global.profiler[name] = value
+                                self.ovaleOptions.db.global.profiler[name] = value
                                 if value then
                                     self:EnableProfiling(name)
                                 else
@@ -101,79 +148,26 @@ local OvaleProfilerClass = __class(OvaleProfilerBase, {
         end
 
         self.array = {}
-        OvaleProfilerBase.constructor(self)
         for k, v in pairs(self.actions) do
-            OvaleOptions.options.args.actions.args[k] = v
+            options.options.args.actions.args[k] = v
         end
-        OvaleOptions.defaultDB.global = OvaleOptions.defaultDB.global or {}
-        OvaleOptions.defaultDB.global.profiler = {}
-        OvaleOptions:RegisterOptions(OvaleProfilerClass)
+        options.defaultDB.global = options.defaultDB.global or {}
+        options.defaultDB.global.profiler = {}
+        options:RegisterOptions(__exports.OvaleProfilerClass)
     end,
     OnInitialize = function(self)
-        local appName = self:GetName()
+        local appName = self.ovale:GetName()
         AceConfig:RegisterOptionsTable(appName, self.options)
-        AceConfigDialog:AddToBlizOptions(appName, L["Profiling"], Ovale:GetName())
+        AceConfigDialog:AddToBlizOptions(appName, L["Profiling"], self.ovale:GetName())
         if  not self.self_profilingOutput then
-            self.self_profilingOutput = LibTextDump:New(Ovale:GetName() .. " - " .. L["Profiling"], 750, 500)
+            self.self_profilingOutput = LibTextDump:New(self.ovale:GetName() .. " - " .. L["Profiling"], 750, 500)
         end
     end,
     OnDisable = function(self)
         self.self_profilingOutput:Clear()
     end,
-    RegisterProfiling = function(self, module, name)
-        local profiler = self
-        return __class(module, {
-            constructor = function(self, ...)
-                self.enabled = false
-                module.constructor(self, ...)
-                name = name or self:GetName()
-                local args = profiler.options.args.profiling.args.modules.args
-                args[name] = {
-                    name = name,
-                    desc = format(L["Enable profiling for the %s module."], name),
-                    type = "toggle"
-                }
-                profiler.profiles[name] = self
-            end,
-            StartProfiling = function(self, tag)
-                if  not self.enabled then
-                    return 
-                end
-                local newTimestamp = debugprofilestop()
-                if self_stackSize > 0 then
-                    local delta = newTimestamp - self_timestamp
-                    local previous = self_stack[self_stackSize]
-                    local timeSpent = self_timeSpent[previous] or 0
-                    timeSpent = timeSpent + delta
-                    self_timeSpent[previous] = timeSpent
-                end
-                self_timestamp = newTimestamp
-                self_stackSize = self_stackSize + 1
-                self_stack[self_stackSize] = tag
-                do
-                    local timesInvoked = self_timesInvoked[tag] or 0
-                    timesInvoked = timesInvoked + 1
-                    self_timesInvoked[tag] = timesInvoked
-                end
-            end,
-            StopProfiling = function(self, tag)
-                if  not self.enabled then
-                    return 
-                end
-                if self_stackSize > 0 then
-                    local currentTag = self_stack[self_stackSize]
-                    if currentTag == tag then
-                        local newTimestamp = debugprofilestop()
-                        local delta = newTimestamp - self_timestamp
-                        local timeSpent = self_timeSpent[currentTag] or 0
-                        timeSpent = timeSpent + delta
-                        self_timeSpent[currentTag] = timeSpent
-                        self_timestamp = newTimestamp
-                        self_stackSize = self_stackSize - 1
-                    end
-                end
-            end,
-        })
+    create = function(self, name)
+        return __exports.Profiler(name, self)
     end,
     ResetProfiling = function(self)
         for tag in pairs(self_timeSpent) do
@@ -210,11 +204,11 @@ local OvaleProfilerClass = __class(OvaleProfilerBase, {
         end
     end,
     DebuggingInfo = function(self)
-        Ovale:Print("Profiler stack size = %d", self_stackSize)
+        self.ovale:Print("Profiler stack size = %d", self_stackSize)
         local index = self_stackSize
         while index > 0 and self_stackSize - index < 10 do
             local tag = self_stack[index]
-            Ovale:Print("    [%d] %s", index, tag)
+            self.ovale:Print("    [%d] %s", index, tag)
             index = index - 1
         end
     end,
@@ -225,4 +219,3 @@ local OvaleProfilerClass = __class(OvaleProfilerBase, {
         self.profiles[name].enabled = false
     end,
 })
-__exports.OvaleProfiler = OvaleProfilerClass()
