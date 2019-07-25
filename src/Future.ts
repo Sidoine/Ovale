@@ -2,7 +2,6 @@ import { OvaleAuraClass } from "./Aura";
 import { OvaleDataClass } from "./Data";
 import { OvaleGUIDClass } from "./GUID";
 import { OvalePaperDollClass, HasteType } from "./PaperDoll";
-import { OvaleSpellBook } from "./SpellBook";
 import { LastSpell, SpellCast, self_pool } from "./LastSpell";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { ipairs, pairs, type, lualength, LuaObj, LuaArray, wipe, kpairs, tonumber } from "@wowts/lua";
@@ -11,14 +10,15 @@ import { insert, remove } from "@wowts/table";
 import { GetSpellInfo, GetTime, UnitCastingInfo, UnitChannelInfo, UnitExists, UnitGUID, UnitName, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { OvaleStateClass, States } from "./State";
 import { OvaleCooldownClass } from "./Cooldown";
-import { OvaleStance } from "./Stance";
 import { BaseState } from "./BaseState";
 import { isLuaArray } from "./tools";
-import { RegisterRequirement, UnregisterRequirement, CheckRequirements, Tokens } from "./Requirement";
+import { Tokens, OvaleRequirement } from "./Requirement";
 import { OvaleClass } from "./Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { Tracer, OvaleDebugClass } from "./Debug";
 import { Profiler, OvaleProfilerClass } from "./Profiler";
+import { OvaleStanceClass } from "./Stance";
+import { OvaleSpellBookClass } from "./SpellBook";
 
 let strsub = sub;
 let tremove = remove;
@@ -142,7 +142,10 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
         private lastSpell: LastSpell,
         private ovale: OvaleClass,
         ovaleDebug: OvaleDebugClass,
-        ovaleProfiler: OvaleProfilerClass
+        ovaleProfiler: OvaleProfilerClass,
+        private ovaleStance: OvaleStanceClass,
+        private requirement: OvaleRequirement,
+        private ovaleSpellBook: OvaleSpellBookClass
     ) {
         super(OvaleFutureData);
         this.module = ovale.createModule("OvaleFuture", this.OnInitialize, this.OnDisable, aceEvent)
@@ -181,7 +184,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
         this.module.RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", this.UNIT_SPELLCAST_SUCCEEDED);
         this.module.RegisterMessage("Ovale_AuraAdded", this.Ovale_AuraAdded);
         this.module.RegisterMessage("Ovale_AuraChanged", this.Ovale_AuraChanged);
-        RegisterRequirement("combat", this.CombatRequirement);
+        this.requirement.RegisterRequirement("combat", this.CombatRequirement);
     }
 
     private OnDisable = () => {
@@ -202,7 +205,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
         this.module.UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED");
         this.module.UnregisterMessage("Ovale_AuraAdded");
         this.module.UnregisterMessage("Ovale_AuraChanged");
-        UnregisterRequirement("combat");
+        this.requirement.UnregisterRequirement("combat");
     }
     
     IsInCombat(atTime: number | undefined) {
@@ -323,7 +326,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
     }
     UNIT_SPELLCAST_CHANNEL_START(event: string, unitId: string, lineId: number, spellId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
-            let spell = OvaleSpellBook.GetSpellName(spellId);
+            let spell = this.ovaleSpellBook.GetSpellName(spellId);
             this.profiler.StartProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_START");
             this.tracer.DebugTimestamp(event, unitId, spell, lineId, spellId);
             let now = GetTime();
@@ -357,7 +360,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
     }
     UNIT_SPELLCAST_CHANNEL_STOP(event: string, unitId: string, lineId: number, spellId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
-            let spell = OvaleSpellBook.GetSpellName(spellId);
+            let spell = this.ovaleSpellBook.GetSpellName(spellId);
             this.profiler.StartProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_STOP");
             this.tracer.DebugTimestamp(event, unitId, spell, lineId, spellId);
             let now = GetTime();
@@ -377,7 +380,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
     }
     UNIT_SPELLCAST_CHANNEL_UPDATE(event: string, unitId: string, lineId: number, spellId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
-            let spell = OvaleSpellBook.GetSpellName(spellId);
+            let spell = this.ovaleSpellBook.GetSpellName(spellId);
             this.profiler.StartProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_UPDATE");
             this.tracer.DebugTimestamp(event, unitId, spell, lineId, spellId);
             let now = GetTime();
@@ -405,7 +408,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
     }
     UNIT_SPELLCAST_DELAYED(event: string, unitId: string, lineId: number, spellId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
-            let spell = OvaleSpellBook.GetSpellName(spellId);
+            let spell = this.ovaleSpellBook.GetSpellName(spellId);
             this.profiler.StartProfiling("OvaleFuture_UNIT_SPELLCAST_DELAYED");
             this.tracer.DebugTimestamp(event, unitId, spell, lineId, spellId);
             let now = GetTime();
@@ -433,7 +436,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
     }
     UNIT_SPELLCAST_SENT(event: string, unitId: string, targetName: string, lineId: number, spellId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
-            let spell = OvaleSpellBook.GetSpellName(spellId);
+            let spell = this.ovaleSpellBook.GetSpellName(spellId);
             this.profiler.StartProfiling("OvaleFuture_UNIT_SPELLCAST_SENT");
             this.tracer.DebugTimestamp(event, unitId, spell, targetName, lineId);
             let now = GetTime();
@@ -477,7 +480,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
     }
     UNIT_SPELLCAST_START(event: string, unitId: string, lineId: number, spellId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
-            let spell = OvaleSpellBook.GetSpellName(spellId);
+            let spell = this.ovaleSpellBook.GetSpellName(spellId);
             this.profiler.StartProfiling("OvaleFuture_UNIT_SPELLCAST_START");
             this.tracer.DebugTimestamp(event, unitId, spell, lineId, spellId);
             let now = GetTime();
@@ -515,7 +518,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
     }
     UNIT_SPELLCAST_SUCCEEDED(event: string, unitId: string, lineId: number, spellId: number) {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
-            let spell = OvaleSpellBook.GetSpellName(spellId);
+            let spell = this.ovaleSpellBook.GetSpellName(spellId);
             this.profiler.StartProfiling("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED");
             this.tracer.DebugTimestamp(event, unitId, spell, lineId, spellId);
             let now = GetTime();
@@ -561,7 +564,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
                         this.tracer.Debug("Finished spell %s (%d) with no target queued at %s.", spell, spellId, spellcast.queued);
                         finished = true;
                         finish = "hit";
-                    } else if (targetGUID == this.ovale.playerGUID && OvaleSpellBook.IsHelpfulSpell(spellId)) {
+                    } else if (targetGUID == this.ovale.playerGUID && this.ovaleSpellBook.IsHelpfulSpell(spellId)) {
                         this.tracer.Debug("Finished helpful spell %s (%d) cast on player queued at %s.", spell, spellId, spellcast.queued);
                         finished = true;
                         finish = "hit";
@@ -609,7 +612,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
             if(event == 'UNIT_SPELLCAST_INTERRUPTED'){
                 this.next.lastGCDSpellId = undefined;
             }
-            let spell = OvaleSpellBook.GetSpellName(spellId);
+            let spell = this.ovaleSpellBook.GetSpellName(spellId);
             this.profiler.StartProfiling("OvaleFuture_UnitSpellcastEnded");
             this.tracer.DebugTimestamp(event, unitId, spell, lineId, spellId);
             let now = GetTime();
@@ -640,7 +643,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
                         index = i;
                         break;
                     } else if (spell) {
-                        let spellName = sc.spellName || OvaleSpellBook.GetSpellName(spellId);
+                        let spellName = sc.spellName || this.ovaleSpellBook.GetSpellName(spellId);
                         if (spell == spellName) {
                             spellcast = sc;
                             index = i;
@@ -651,7 +654,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
             }
         }
         if (spellcast) {
-            let spellName = spell || spellcast.spellName || OvaleSpellBook.GetSpellName(spellId);
+            let spellName = spell || spellcast.spellName || this.ovaleSpellBook.GetSpellName(spellId);
             if (spellcast.targetName) {
                 this.tracer.Debug("Found spellcast for %s to %s queued at %f.", spellName, spellcast.targetName, spellcast.queued);
             } else {
@@ -714,7 +717,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
                     if (isLuaArray(spellData)) {
                         multiplier = <number>spellData[1];
                         index = 2;
-                        verified = CheckRequirements(spellId, atTime, spellData, index, targetGUID);
+                        verified = this.requirement.CheckRequirements(spellId, atTime, spellData, index, targetGUID);
                     } else {
                         multiplier = spellData;
                         verified = true;
@@ -833,7 +836,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
                 gcd = 1.5;
                 haste = "spell";
             } else if (this.ovale.playerClass == "DRUID") {
-                if (OvaleStance.IsStance("druid_cat_form", atTime)) {
+                if (this.ovaleStance.IsStance("druid_cat_form", atTime)) {
                     gcd = 1.0;
                     haste = "none";
                 }
@@ -971,7 +974,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
             if (startCast && endCast) {
                 castTime = endCast - startCast;
             } else {
-                castTime = OvaleSpellBook.GetCastTime(spellId) || 0;
+                castTime = this.ovaleSpellBook.GetCastTime(spellId) || 0;
                 startCast = startCast || this.next.nextCast;
                 endCast = endCast || (startCast + castTime);
             }
@@ -980,7 +983,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
                 wipe(spellcast);
                 spellcast.caster = this.ovale.playerGUID;
                 spellcast.spellId = spellId;
-                spellcast.spellName = OvaleSpellBook.GetSpellName(spellId);
+                spellcast.spellName = this.ovaleSpellBook.GetSpellName(spellId);
                 spellcast.target = targetGUID;
                 spellcast.targetName = this.ovaleGuid.GUIDName(targetGUID);
                 spellcast.start = startCast;
@@ -1015,7 +1018,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
             //     baseState.next.currentTime = now;
             // }
             this.tracer.Log("Apply spell %d at %f currentTime=%f nextCast=%f endCast=%f targetGUID=%s", spellId, startCast, this.baseState.next.currentTime, nextCast, endCast, targetGUID);
-            if (!this.next.inCombat && OvaleSpellBook.IsHarmfulSpell(spellId)) {
+            if (!this.next.inCombat && this.ovaleSpellBook.IsHarmfulSpell(spellId)) {
                 this.next.inCombat = true;
                 if (channel) {
                     this.next.combatStartTime = startCast;

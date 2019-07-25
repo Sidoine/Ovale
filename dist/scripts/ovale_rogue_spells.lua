@@ -1,8 +1,6 @@
 local __exports = LibStub:NewLibrary("ovale/scripts/ovale_rogue_spells", 80201)
 if not __exports then return end
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-__exports.register = function()
+__exports.registerRogueSpells = function(OvaleScripts)
     local name = "ovale_rogue_spells"
     local desc = "[8.2] Ovale: Rogue spells"
     local code = [[Define(adrenaline_rush 13750)

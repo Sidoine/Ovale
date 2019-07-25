@@ -7,12 +7,8 @@ local __Pool = LibStub:GetLibrary("ovale/Pool")
 local OvalePool = __Pool.OvalePool
 local __Lexer = LibStub:GetLibrary("ovale/Lexer")
 local OvaleLexer = __Lexer.OvaleLexer
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-local __SpellBook = LibStub:GetLibrary("ovale/SpellBook")
-local OvaleSpellBook = __SpellBook.OvaleSpellBook
 local __Stance = LibStub:GetLibrary("ovale/Stance")
-local OvaleStance = __Stance.OvaleStance
+local STANCE_NAME = __Stance.STANCE_NAME
 local ipairs = ipairs
 local next = next
 local pairs = pairs
@@ -347,8 +343,10 @@ local function isAstNode(a)
     return type(a) == "table"
 end
 __exports.OvaleASTClass = __class(nil, {
-    constructor = function(self, ovaleCondition, ovaleDebug, ovaleProfiler)
+    constructor = function(self, ovaleCondition, ovaleDebug, ovaleProfiler, ovaleScripts, ovaleSpellBook)
         self.ovaleCondition = ovaleCondition
+        self.ovaleScripts = ovaleScripts
+        self.ovaleSpellBook = ovaleSpellBook
         self.self_indent = 0
         self.self_outputPool = OvalePool("OvaleAST_outputPool")
         self.self_listPool = OvalePool("OvaleAST_listPool")
@@ -1199,7 +1197,7 @@ __exports.OvaleASTClass = __class(nil, {
                     ok = false
                 end
             end
-            local code = OvaleScripts:GetScript(name)
+            local code = self.ovaleScripts:GetScript(name)
             if code == nil then
                 self.debug:Error("Script '%s' not found when parsing INCLUDE.", name)
                 ok = false
@@ -2221,12 +2219,12 @@ __exports.OvaleASTClass = __class(nil, {
         return ok, node
     end,
     DebugAST = function(self)
-        self.self_pool:DebuggingInfo()
-        self.self_namedParametersPool:DebuggingInfo()
-        self.self_checkboxPool:DebuggingInfo()
-        self.self_listPool:DebuggingInfo()
-        self.self_childrenPool:DebuggingInfo()
-        self.self_outputPool:DebuggingInfo()
+        self.debug:Log(self.self_pool:DebuggingInfo())
+        self.debug:Log(self.self_namedParametersPool:DebuggingInfo())
+        self.debug:Log(self.self_checkboxPool:DebuggingInfo())
+        self.debug:Log(self.self_listPool:DebuggingInfo())
+        self.debug:Log(self.self_childrenPool:DebuggingInfo())
+        self.debug:Log(self.self_outputPool:DebuggingInfo())
     end,
     NewNode = function(self, nodeList, hasChild)
         local node = self.self_pool:Get()
@@ -2301,7 +2299,7 @@ __exports.OvaleASTClass = __class(nil, {
         return node, nodeList, annotation
     end,
     ParseScript = function(self, name, options)
-        local code = OvaleScripts:GetScript(name)
+        local code = self.ovaleScripts:GetScript(name)
         local ast
         if code then
             options = options or {
@@ -2412,7 +2410,7 @@ __exports.OvaleASTClass = __class(nil, {
                         elseif name == "L" then
                             value = L[stringKey]
                         elseif name == "SpellName" then
-                            value = OvaleSpellBook:GetSpellName(tonumber(stringKey)) or "spell:" .. stringKey
+                            value = self.ovaleSpellBook:GetSpellName(tonumber(stringKey)) or "spell:" .. stringKey
                         end
                     end
                     if value then
@@ -2548,7 +2546,7 @@ __exports.OvaleASTClass = __class(nil, {
                             if  not isNumber(value) then
                                 if  not isString(value) then
                                     self.debug:Error("stance must be a string or a number")
-                                elseif  not OvaleStance.STANCE_NAME[value] then
+                                elseif  not checkToken(STANCE_NAME, value) then
                                     self.debug:Error("unknown stance '%s'.", value)
                                 end
                             end

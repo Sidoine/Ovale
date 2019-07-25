@@ -1,10 +1,6 @@
 local __exports = LibStub:NewLibrary("ovale/GUID", 80201)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __Debug = LibStub:GetLibrary("ovale/Debug")
-local OvaleDebug = __Debug.OvaleDebug
-local __Ovale = LibStub:GetLibrary("ovale/Ovale")
-local Ovale = __Ovale.Ovale
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local floor = math.floor
 local ipairs = ipairs
@@ -16,7 +12,6 @@ local remove = table.remove
 local GetTime = GetTime
 local UnitGUID = UnitGUID
 local UnitName = UnitName
-local OvaleGUIDBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleGUID", aceEvent))
 local PET_UNIT = {}
 do
     PET_UNIT["player"] = "pet"
@@ -124,79 +119,92 @@ local CompareUnit = function(a, b)
     return UNIT_AURA_UNIT[a] < UNIT_AURA_UNIT[b]
 end
 
-__exports.OvaleGUIDClass = __class(OvaleGUIDBase, {
-    OnInitialize = function(self)
-        self.RegisterEvent("ARENA_OPPONENT_UPDATE")
-        self.RegisterEvent("GROUP_ROSTER_UPDATE")
-        self.RegisterEvent("INSTANCE_ENCOUNTER_ENGAGE_UNIT")
-        self.RegisterEvent("PLAYER_ENTERING_WORLD", function(event)
-            return self:UpdateAllUnits()
-        end)
-        self.RegisterEvent("PLAYER_FOCUS_CHANGED")
-        self.RegisterEvent("PLAYER_TARGET_CHANGED")
-        self.RegisterEvent("UNIT_NAME_UPDATE")
-        self.RegisterEvent("UNIT_PET")
-        self.RegisterEvent("UNIT_TARGET")
-    end,
-    OnDisable = function(self)
-        self.UnregisterEvent("ARENA_OPPONENT_UPDATE")
-        self.UnregisterEvent("GROUP_ROSTER_UPDATE")
-        self.UnregisterEvent("INSTANCE_ENCOUNTER_ENGAGE_UNIT")
-        self.UnregisterEvent("PLAYER_ENTERING_WORLD")
-        self.UnregisterEvent("PLAYER_FOCUS_CHANGED")
-        self.UnregisterEvent("PLAYER_TARGET_CHANGED")
-        self.UnregisterEvent("UNIT_NAME_UPDATE")
-        self.UnregisterEvent("UNIT_PET")
-        self.UnregisterEvent("UNIT_TARGET")
-    end,
-    ARENA_OPPONENT_UPDATE = function(self, event, unitId, eventType)
-        if eventType ~= "cleared" or self.unitGUID[unitId] then
-            self.Debug(event, unitId, eventType)
-            self:UpdateUnitWithTarget(unitId)
+__exports.OvaleGUIDClass = __class(nil, {
+    constructor = function(self, ovale, ovaleDebug)
+        self.ovale = ovale
+        self.unitGUID = {}
+        self.guidUnit = {}
+        self.unitName = {}
+        self.nameUnit = {}
+        self.guidName = {}
+        self.nameGUID = {}
+        self.petGUID = {}
+        self.UNIT_AURA_UNIT = UNIT_AURA_UNIT
+        self.OnInitialize = function()
+            self.module:RegisterEvent("ARENA_OPPONENT_UPDATE", self.ARENA_OPPONENT_UPDATE)
+            self.module:RegisterEvent("GROUP_ROSTER_UPDATE", self.GROUP_ROSTER_UPDATE)
+            self.module:RegisterEvent("INSTANCE_ENCOUNTER_ENGAGE_UNIT", self.INSTANCE_ENCOUNTER_ENGAGE_UNIT)
+            self.module:RegisterEvent("PLAYER_ENTERING_WORLD", function(event)
+                return self:UpdateAllUnits()
+            end)
+            self.module:RegisterEvent("PLAYER_FOCUS_CHANGED", self.PLAYER_FOCUS_CHANGED)
+            self.module:RegisterEvent("PLAYER_TARGET_CHANGED", self.PLAYER_TARGET_CHANGED)
+            self.module:RegisterEvent("UNIT_NAME_UPDATE", self.UNIT_NAME_UPDATE)
+            self.module:RegisterEvent("UNIT_PET", self.UNIT_PET)
+            self.module:RegisterEvent("UNIT_TARGET", self.UNIT_TARGET)
         end
-    end,
-    GROUP_ROSTER_UPDATE = function(self, event)
-        self.Debug(event)
-        self:UpdateAllUnits()
-        self.SendMessage("Ovale_GroupChanged")
-    end,
-    INSTANCE_ENCOUNTER_ENGAGE_UNIT = function(self, event)
-        self.Debug(event)
-        for i = 1, 4, 1 do
-            self:UpdateUnitWithTarget("boss" .. i)
+        self.OnDisable = function()
+            self.module:UnregisterEvent("ARENA_OPPONENT_UPDATE")
+            self.module:UnregisterEvent("GROUP_ROSTER_UPDATE")
+            self.module:UnregisterEvent("INSTANCE_ENCOUNTER_ENGAGE_UNIT")
+            self.module:UnregisterEvent("PLAYER_ENTERING_WORLD")
+            self.module:UnregisterEvent("PLAYER_FOCUS_CHANGED")
+            self.module:UnregisterEvent("PLAYER_TARGET_CHANGED")
+            self.module:UnregisterEvent("UNIT_NAME_UPDATE")
+            self.module:UnregisterEvent("UNIT_PET")
+            self.module:UnregisterEvent("UNIT_TARGET")
         end
-    end,
-    PLAYER_FOCUS_CHANGED = function(self, event)
-        self.Debug(event)
-        self:UpdateUnitWithTarget("focus")
-    end,
-    PLAYER_TARGET_CHANGED = function(self, event, cause)
-        self.Debug(event, cause)
-        self:UpdateUnit("target")
-    end,
-    UNIT_NAME_UPDATE = function(self, event, unitId)
-        self.Debug(event, unitId)
-        self:UpdateUnit(unitId)
-    end,
-    UNIT_PET = function(self, event, unitId)
-        self.Debug(event, unitId)
-        local pet = PET_UNIT[unitId]
-        self:UpdateUnitWithTarget(pet)
-        if unitId == "player" then
-            local guid = self:UnitGUID("pet")
-            if guid then
-                self.petGUID[guid] = GetTime()
+        self.ARENA_OPPONENT_UPDATE = function(event, unitId, eventType)
+            if eventType ~= "cleared" or self.unitGUID[unitId] then
+                self.tracer:Debug(event, unitId, eventType)
+                self:UpdateUnitWithTarget(unitId)
             end
-            self.SendMessage("Ovale_PetChanged", guid)
         end
-        self.SendMessage("Ovale_GroupChanged")
-    end,
-    UNIT_TARGET = function(self, event, unitId)
-        if unitId ~= "player" then
-            self.Debug(event, unitId)
-            local target = unitId .. "target"
-            self:UpdateUnit(target)
+        self.GROUP_ROSTER_UPDATE = function(event)
+            self.tracer:Debug(event)
+            self:UpdateAllUnits()
+            self.module:SendMessage("Ovale_GroupChanged")
         end
+        self.INSTANCE_ENCOUNTER_ENGAGE_UNIT = function(event)
+            self.tracer:Debug(event)
+            for i = 1, 4, 1 do
+                self:UpdateUnitWithTarget("boss" .. i)
+            end
+        end
+        self.PLAYER_FOCUS_CHANGED = function(event)
+            self.tracer:Debug(event)
+            self:UpdateUnitWithTarget("focus")
+        end
+        self.PLAYER_TARGET_CHANGED = function(event, cause)
+            self.tracer:Debug(event, cause)
+            self:UpdateUnit("target")
+        end
+        self.UNIT_NAME_UPDATE = function(event, unitId)
+            self.tracer:Debug(event, unitId)
+            self:UpdateUnit(unitId)
+        end
+        self.UNIT_PET = function(event, unitId)
+            self.tracer:Debug(event, unitId)
+            local pet = PET_UNIT[unitId]
+            self:UpdateUnitWithTarget(pet)
+            if unitId == "player" then
+                local guid = self:UnitGUID("pet")
+                if guid then
+                    self.petGUID[guid] = GetTime()
+                end
+                self.module:SendMessage("Ovale_PetChanged", guid)
+            end
+            self.module:SendMessage("Ovale_GroupChanged")
+        end
+        self.UNIT_TARGET = function(event, unitId)
+            if unitId ~= "player" then
+                self.tracer:Debug(event, unitId)
+                local target = unitId .. "target"
+                self:UpdateUnit(target)
+            end
+        end
+        self.module = ovale:createModule("OvaleGUID", self.OnInitialize, self.OnDisable, aceEvent)
+        self.tracer = ovaleDebug:create(self.module:GetName())
     end,
     UpdateAllUnits = function(self)
         for _, unitId in ipairs(UNIT_AURA_UNITS) do
@@ -214,7 +222,7 @@ __exports.OvaleGUIDClass = __class(OvaleGUIDBase, {
                 if self.guidUnit[previousGUID] then
                     BinaryRemove(self.guidUnit[previousGUID], unitId, CompareUnit)
                 end
-                Ovale.refreshNeeded[previousGUID] = true
+                self.ovale.refreshNeeded[previousGUID] = true
             end
         end
         if  not name or name ~= previousName then
@@ -236,8 +244,8 @@ __exports.OvaleGUIDClass = __class(OvaleGUIDBase, {
                 BinaryInsert(list, unitId, true, CompareUnit)
                 self.guidUnit[guid] = list
             end
-            self.Debug("'%s' is '%s'.", unitId, guid)
-            Ovale.refreshNeeded[guid] = true
+            self.tracer:Debug("'%s' is '%s'.", unitId, guid)
+            self.ovale.refreshNeeded[guid] = true
         end
         if name and name ~= previousName then
             self.unitName[unitId] = name
@@ -246,7 +254,7 @@ __exports.OvaleGUIDClass = __class(OvaleGUIDBase, {
                 BinaryInsert(list, unitId, true, CompareUnit)
                 self.nameUnit[name] = list
             end
-            self.Debug("'%s' is '%s'.", unitId, name)
+            self.tracer:Debug("'%s' is '%s'.", unitId, name)
         end
         if guid and name then
             local previousNameFromGUID = self.guidName[guid]
@@ -256,14 +264,14 @@ __exports.OvaleGUIDClass = __class(OvaleGUIDBase, {
                 BinaryInsert(list, guid, true)
                 self.nameGUID[name] = list
                 if guid == previousGUID then
-                    self.Debug("'%s' changed names to '%s'.", guid, name)
+                    self.tracer:Debug("'%s' changed names to '%s'.", guid, name)
                 else
-                    self.Debug("'%s' is '%s'.", guid, name)
+                    self.tracer:Debug("'%s' is '%s'.", guid, name)
                 end
             end
         end
         if guid and guid ~= previousGUID then
-            self.SendMessage("Ovale_UnitChanged", unitId, guid)
+            self.module:SendMessage("Ovale_UnitChanged", unitId, guid)
         end
     end,
     UpdateUnitWithTarget = function(self, unitId)
@@ -307,15 +315,4 @@ __exports.OvaleGUIDClass = __class(OvaleGUIDBase, {
         end
         return nil
     end,
-    constructor = function(self, ...)
-        OvaleGUIDBase.constructor(self, ...)
-        self.unitGUID = {}
-        self.guidUnit = {}
-        self.unitName = {}
-        self.nameUnit = {}
-        self.guidName = {}
-        self.nameGUID = {}
-        self.petGUID = {}
-        self.UNIT_AURA_UNIT = UNIT_AURA_UNIT
-    end
 })

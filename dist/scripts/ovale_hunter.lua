@@ -1,9 +1,10 @@
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-do
-    local name = "sc_t23_hunter_beast_mastery"
-    local desc = "[8.2] Simulationcraft: T23_Hunter_Beast_Mastery"
-    local code = [[
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_hunter", 80201)
+if not __exports then return end
+__exports.registerHunter = function(OvaleScripts)
+    do
+        local name = "sc_t23_hunter_beast_mastery"
+        local desc = "[8.2] Simulationcraft: T23_Hunter_Beast_Mastery"
+        local code = [[
 # Based on SimulationCraft profile "T23_Hunter_Beast_Mastery".
 #	class=hunter
 #	spec=beast_mastery
@@ -511,12 +512,12 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # war_stomp
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("HUNTER", "beast_mastery", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_hunter_marksmanship"
-    local desc = "[8.2] Simulationcraft: T23_Hunter_Marksmanship"
-    local code = [[
+        OvaleScripts:RegisterScript("HUNTER", "beast_mastery", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_hunter_marksmanship"
+        local desc = "[8.2] Simulationcraft: T23_Hunter_Marksmanship"
+        local code = [[
 # Based on SimulationCraft profile "T23_Hunter_Marksmanship".
 #	class=hunter
 #	spec=marksmanship
@@ -1001,12 +1002,12 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # war_stomp
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("HUNTER", "marksmanship", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_hunter_survival"
-    local desc = "[8.2] Simulationcraft: T23_Hunter_Survival"
-    local code = [[
+        OvaleScripts:RegisterScript("HUNTER", "marksmanship", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_hunter_survival"
+        local desc = "[8.2] Simulationcraft: T23_Hunter_Survival"
+        local code = [[
 # Based on SimulationCraft profile "T23_Hunter_Survival".
 #	class=hunter
 #	spec=survival
@@ -1835,5 +1836,6 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # wildfire_infusion_talent
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("HUNTER", "survival", name, desc, code, "script")
+        OvaleScripts:RegisterScript("HUNTER", "survival", name, desc, code, "script")
+    end
 end

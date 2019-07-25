@@ -2,7 +2,7 @@ import { OvaleDataClass } from "./Data";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleClass } from "./Ovale";
 import { LastSpell, SpellCast, SpellCastModule } from "./LastSpell";
-import { RegisterRequirement, UnregisterRequirement, RequirementMethod } from "./Requirement";
+import { RequirementMethod, OvaleRequirement } from "./Requirement";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { next, pairs, LuaObj, tonumber } from "@wowts/lua";
 import { GetSpellCooldown, GetTime, GetSpellCharges } from "@wowts/wow-mock";
@@ -111,7 +111,8 @@ export class OvaleCooldownClass extends States<CooldownData> implements SpellCas
         private ovale: OvaleClass,
         ovaleDebug: OvaleDebugClass,
         ovaleProfiler: OvaleProfilerClass,
-        private ovaleSpellBook: OvaleSpellBookClass) {
+        private ovaleSpellBook: OvaleSpellBookClass,
+        private requirement: OvaleRequirement) {
         super(CooldownData);
         this.module = ovale.createModule("OvaleCooldown", this.OnInitialize, this.OnDisable, aceEvent);
         this.tracer = ovaleDebug.create("OvaleCooldown");
@@ -131,12 +132,12 @@ export class OvaleCooldownClass extends States<CooldownData> implements SpellCas
         this.module.RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", this.Update);
         this.module.RegisterEvent("UPDATE_SHAPESHIFT_COOLDOWN", this.Update);
         this.lastSpell.RegisterSpellcastInfo(this);
-        RegisterRequirement("oncooldown", this.RequireCooldownHandler);
+        this.requirement.RegisterRequirement("oncooldown", this.RequireCooldownHandler);
     }
     
     private OnDisable = () => {
         this.lastSpell.UnregisterSpellcastInfo(this);
-        UnregisterRequirement("oncooldown");
+        this.requirement.UnregisterRequirement("oncooldown");
         this.module.UnregisterEvent("ACTIONBAR_UPDATE_COOLDOWN");
         this.module.UnregisterEvent("BAG_UPDATE_COOLDOWN");
         this.module.UnregisterEvent("PET_BAR_UPDATE_COOLDOWN");

@@ -58,7 +58,7 @@ export class OvaleSpellBookClass {
                         type: "input",
                         multiline: 25,
                         width: "full",
-                        get: function (info: any) {
+                        get: (info: any) => {
                             return this.DebugSpells();
                         }
                     }
@@ -73,7 +73,7 @@ export class OvaleSpellBookClass {
                         type: "input",
                         multiline: 25,
                         width: "full",
-                        get: function (info: any) {
+                        get: (info: any) => {
                             return this.DebugTalents();
                         }
                     }

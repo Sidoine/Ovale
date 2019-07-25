@@ -1,9 +1,10 @@
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-do
-    local name = "sc_t23_priest_shadow"
-    local desc = "[8.2] Simulationcraft: T23_Priest_Shadow"
-    local code = [[
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_priest", 80201)
+if not __exports then return end
+__exports.registerPriest = function(OvaleScripts)
+    do
+        local name = "sc_t23_priest_shadow"
+        local desc = "[8.2] Simulationcraft: T23_Priest_Shadow"
+        local code = [[
 # Based on SimulationCraft profile "T23_Priest_Shadow".
 #	class=priest
 #	spec=shadow
@@ -506,5 +507,6 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 # whispers_of_the_damned_trait
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("PRIEST", "shadow", name, desc, code, "script")
+        OvaleScripts:RegisterScript("PRIEST", "shadow", name, desc, code, "script")
+    end
 end

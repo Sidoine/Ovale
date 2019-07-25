@@ -111,7 +111,7 @@ __exports.OvaleDamageTakenClass = __class(nil, {
         self.profiler:StopProfiling("OvaleDamageTaken_RemoveExpiredEvents")
     end,
     DebugDamageTaken = function(self)
-        self.damageEvent:DebuggingInfo()
+        self.tracer:Print(self.damageEvent:DebuggingInfo())
         local iterator = self.damageEvent:BackToFrontIterator()
         while iterator:Next() do
             local event = iterator.value

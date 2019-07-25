@@ -1,5 +1,5 @@
 import { OvaleGUIDClass } from "./GUID";
-import { RegisterRequirement, UnregisterRequirement, Tokens } from "./Requirement";
+import { Tokens, OvaleRequirement } from "./Requirement";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { sub } from "@wowts/string";
 import { tonumber, wipe, LuaObj } from "@wowts/lua";
@@ -48,7 +48,8 @@ export class OvaleHealthClass {
         private ovale: OvaleClass,
         private ovaleOptions: OvaleOptionsClass,
         ovaleDebug: OvaleDebugClass,
-        ovaleProfiler: OvaleProfilerClass
+        ovaleProfiler: OvaleProfilerClass,
+        private requirement: OvaleRequirement
     ) {
         
         this.module = ovale.createModule("OvaleHealth", this.OnInitialize, this.OnDisable, aceEvent);
@@ -68,14 +69,14 @@ export class OvaleHealthClass {
         this.module.RegisterEvent("UNIT_ABSORB_AMOUNT_CHANGED", this.UpdateAbsorb);
         this.module.RegisterEvent("UNIT_HEAL_ABSORB_AMOUNT_CHANGED", this.UpdateAbsorb);
         this.module.RegisterMessage("Ovale_UnitChanged", this.Ovale_UnitChanged);
-        RegisterRequirement("health_pct", this.RequireHealthPercentHandler);
-        RegisterRequirement("pet_health_pct", this.RequireHealthPercentHandler);
-        RegisterRequirement("target_health_pct", this.RequireHealthPercentHandler);
+        this.requirement.RegisterRequirement("health_pct", this.RequireHealthPercentHandler);
+        this.requirement.RegisterRequirement("pet_health_pct", this.RequireHealthPercentHandler);
+        this.requirement.RegisterRequirement("target_health_pct", this.RequireHealthPercentHandler);
     }
     private OnDisable = () => {
-        UnregisterRequirement("health_pct");
-        UnregisterRequirement("pet_health_pct");
-        UnregisterRequirement("target_health_pct");
+        this.requirement.UnregisterRequirement("health_pct");
+        this.requirement.UnregisterRequirement("pet_health_pct");
+        this.requirement.UnregisterRequirement("target_health_pct");
         this.module.UnregisterEvent("PLAYER_REGEN_ENABLED");
         this.module.UnregisterEvent("PLAYER_TARGET_CHANGED");
         this.module.UnregisterEvent("UNIT_HEALTH_FREQUENT");

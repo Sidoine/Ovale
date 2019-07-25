@@ -1,32 +1,35 @@
-import { OvaleState } from "./State";
-import { Ovale } from "./Ovale";
-import aceEvent from "@wowts/ace_event-3.0";
+import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { LuaArray, lualength, pairs } from "@wowts/lua";
 import { insert, remove } from "@wowts/table";
-import { OvaleFuture } from "./Future";
-
-let OvaleStaggerBase = Ovale.NewModule("OvaleStagger", aceEvent);
-export let OvaleStagger: OvaleStaggerClass;
+import { AceModule } from "@wowts/tsaddon";
+import { OvaleClass } from "./Ovale";
+import { StateModule } from "./State";
+import { OvaleFutureClass } from "./Future";
 
 let self_serial = 1;
 let MAX_LENGTH = 30
-class OvaleStaggerClass extends OvaleStaggerBase {
+export class OvaleStaggerClass implements StateModule {
     staggerTicks: LuaArray<number> = {}
+    private module: AceModule & AceEvent;
 
-    OnInitialize() {
-        if (Ovale.playerClass == "MONK") {
-            this.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
+    constructor(private ovale: OvaleClass, private ovaleFuture: OvaleFutureClass) {
+        this.module = ovale.createModule("OvaleStagger", this.OnInitialize, this.OnDisable, aceEvent);
+    }
+
+    private OnInitialize = () => {
+        if (this.ovale.playerClass == "MONK") {
+            this.module.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", this.COMBAT_LOG_EVENT_UNFILTERED);
         }
     }
-    OnDisable() {
-        if (Ovale.playerClass == "MONK") {
-            this.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
+    private OnDisable = () => {
+        if (this.ovale.playerClass == "MONK") {
+            this.module.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         }
     }
-    COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
+    private COMBAT_LOG_EVENT_UNFILTERED = (event: string, ...__args: any[]) => {
         let [, cleuEvent, , sourceGUID, , , , , , , , spellId, , , amount] = CombatLogGetCurrentEventInfo();
-        if (sourceGUID != Ovale.playerGUID) {
+        if (sourceGUID != this.ovale.playerGUID) {
             return;
         }
         self_serial = self_serial + 1;
@@ -43,7 +46,7 @@ class OvaleStaggerClass extends OvaleStaggerBase {
     InitializeState(): void {
     }
     ResetState(): void {   
-        if(!OvaleFuture.IsInCombat(undefined)){
+        if(!this.ovaleFuture.IsInCombat(undefined)){
             for (const [k] of pairs(this.staggerTicks)) {
                 this.staggerTicks[k] = undefined;
             }
@@ -65,5 +68,4 @@ class OvaleStaggerClass extends OvaleStaggerBase {
     }
 }
 
-OvaleStagger = new OvaleStaggerClass();
-OvaleState.RegisterState(OvaleStagger);
+

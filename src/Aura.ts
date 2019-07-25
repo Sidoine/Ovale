@@ -8,7 +8,7 @@ import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleStateClass, States } from "./State";
 import { OvaleClass } from "./Ovale";
 import { LastSpell, SpellCast, PaperDollSnapshot } from "./LastSpell";
-import { RegisterRequirement, UnregisterRequirement, CheckRequirements, Tokens } from "./Requirement";
+import { Tokens, OvaleRequirement } from "./Requirement";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { pairs, tonumber, wipe, lualength, LuaObj, next, LuaArray, kpairs } from "@wowts/lua";
 import { lower, sub } from "@wowts/string";
@@ -252,7 +252,8 @@ export class OvaleAuraClass extends States<AuraInterface> {
         private ovaleDebug: OvaleDebugClass,
         private ovale: OvaleClass,
         ovaleProfiler: OvaleProfilerClass,
-        private ovaleSpellBook: OvaleSpellBookClass) {
+        private ovaleSpellBook: OvaleSpellBookClass,
+        private requirement: OvaleRequirement) {
         super(AuraInterface);
         this.module = ovale.createModule("OvaleAura", this.OnInitialize, this.OnDisable, aceEvent);
         this.debug = ovaleDebug.create("OvaleAura");
@@ -296,7 +297,7 @@ export class OvaleAuraClass extends States<AuraInterface> {
                         type: "input",
                         multiline: 25,
                         width: "full",
-                        get: function (info: LuaArray<string>) {
+                        get: (info: LuaArray<string>) => {
                             wipe(output);
                             let now = GetTime()
                             let helpful = this.DebugUnitAuras("player", "HELPFUL", now);
@@ -323,7 +324,7 @@ export class OvaleAuraClass extends States<AuraInterface> {
                         type: "input",
                         multiline: 25,
                         width: "full",
-                        get: function (info: LuaArray<string>) {
+                        get: (info: LuaArray<string>) => {
                             wipe(output);
                             let now = GetTime()
                             let helpful = this.DebugUnitAuras("target", "HELPFUL", now);
@@ -356,33 +357,33 @@ export class OvaleAuraClass extends States<AuraInterface> {
         this.module.RegisterEvent("UNIT_AURA", this.UNIT_AURA);
         this.module.RegisterMessage("Ovale_GroupChanged", this.handleOvaleGroupChanged);
         this.module.RegisterMessage("Ovale_UnitChanged", this.Ovale_UnitChanged);
-        RegisterRequirement("buff", this.RequireBuffHandler);
-        RegisterRequirement("buff_any", this.RequireBuffHandler);
-        RegisterRequirement("debuff", this.RequireBuffHandler);
-        RegisterRequirement("debuff_any", this.RequireBuffHandler);
-        RegisterRequirement("pet_buff", this.RequireBuffHandler);
-        RegisterRequirement("pet_debuff", this.RequireBuffHandler);
-        RegisterRequirement("stealth", this.RequireStealthHandler);
-        RegisterRequirement("stealthed", this.RequireStealthHandler);
-        RegisterRequirement("target_buff", this.RequireBuffHandler);
-        RegisterRequirement("target_buff_any", this.RequireBuffHandler);
-        RegisterRequirement("target_debuff", this.RequireBuffHandler);
-        RegisterRequirement("target_debuff_any", this.RequireBuffHandler);
+        this.requirement.RegisterRequirement("buff", this.RequireBuffHandler);
+        this.requirement.RegisterRequirement("buff_any", this.RequireBuffHandler);
+        this.requirement.RegisterRequirement("debuff", this.RequireBuffHandler);
+        this.requirement.RegisterRequirement("debuff_any", this.RequireBuffHandler);
+        this.requirement.RegisterRequirement("pet_buff", this.RequireBuffHandler);
+        this.requirement.RegisterRequirement("pet_debuff", this.RequireBuffHandler);
+        this.requirement.RegisterRequirement("stealth", this.RequireStealthHandler);
+        this.requirement.RegisterRequirement("stealthed", this.RequireStealthHandler);
+        this.requirement.RegisterRequirement("target_buff", this.RequireBuffHandler);
+        this.requirement.RegisterRequirement("target_buff_any", this.RequireBuffHandler);
+        this.requirement.RegisterRequirement("target_debuff", this.RequireBuffHandler);
+        this.requirement.RegisterRequirement("target_debuff_any", this.RequireBuffHandler);
     }
     
     private OnDisable = () => {
-        UnregisterRequirement("buff");
-        UnregisterRequirement("buff_any");
-        UnregisterRequirement("debuff");
-        UnregisterRequirement("debuff_any");
-        UnregisterRequirement("pet_buff");
-        UnregisterRequirement("pet_debuff");
-        UnregisterRequirement("stealth");
-        UnregisterRequirement("stealthed");
-        UnregisterRequirement("target_buff");
-        UnregisterRequirement("target_buff_any");
-        UnregisterRequirement("target_debuff");
-        UnregisterRequirement("target_debuff_any");
+        this.requirement.UnregisterRequirement("buff");
+        this.requirement.UnregisterRequirement("buff_any");
+        this.requirement.UnregisterRequirement("debuff");
+        this.requirement.UnregisterRequirement("debuff_any");
+        this.requirement.UnregisterRequirement("pet_buff");
+        this.requirement.UnregisterRequirement("pet_debuff");
+        this.requirement.UnregisterRequirement("stealth");
+        this.requirement.UnregisterRequirement("stealthed");
+        this.requirement.UnregisterRequirement("target_buff");
+        this.requirement.UnregisterRequirement("target_buff_any");
+        this.requirement.UnregisterRequirement("target_debuff");
+        this.requirement.UnregisterRequirement("target_debuff_any");
         this.module.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
         this.module.UnregisterEvent("PLAYER_REGEN_ENABLED");
@@ -596,7 +597,7 @@ export class OvaleAuraClass extends States<AuraInterface> {
                             if (spellData == "refresh_keep_snapshot") {
                                 keepSnapshot = true;
                             } else if (isLuaArray(spellData) && spellData[1] == "refresh_keep_snapshot") {
-                                [keepSnapshot] = CheckRequirements(spellId, atTime, spellData, 2, guid);
+                                [keepSnapshot] = this.requirement.CheckRequirements(spellId, atTime, spellData, 2, guid);
                             }
                         }
                     }

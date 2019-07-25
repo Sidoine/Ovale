@@ -6,6 +6,7 @@ import { insert, remove } from "@wowts/table";
 import { GetTime, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { OvaleClass } from "./Ovale";
 import { AceModule } from "@wowts/tsaddon";
+import { StateModule } from "./State";
 
 let UPDATE_DELAY = 0.5;
 let SIGIL_ACTIVATION_TIME = 2;
@@ -53,7 +54,7 @@ let sigil_end: LuaArray<Sigil> = {
     }
 }
 let QUICKENED_SIGILS_TALENT = 14;
-export class OvaleSigilClass {
+export class OvaleSigilClass implements StateModule {
     private module: AceModule & AceEvent;
 
     constructor(private ovalePaperDoll: OvalePaperDollClass, private ovale: OvaleClass, private ovaleSpellBook: OvaleSpellBookClass) {

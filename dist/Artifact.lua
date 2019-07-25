@@ -45,10 +45,10 @@ __exports.OvaleArtifactClass = __class(nil, {
     UpdateTraits = function(self)
         return 
     end,
-    HasTrait = function(self)
+    HasTrait = function(self, spellId)
         return false
     end,
-    TraitRank = function(self)
+    TraitRank = function(self, spellId)
         return 0
     end,
     DebugTraits = function(self)

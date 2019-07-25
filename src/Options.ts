@@ -9,7 +9,7 @@ import { InterfaceOptionsFrame_OpenToCategory } from "@wowts/wow-mock";
 import { ipairs, LuaObj, lualength, LuaArray } from "@wowts/lua";
 import { huge } from "@wowts/math";
 import { Color } from "./SpellFlash";
-import { OvaleClass } from "./Ovale";
+import { OvaleClass, Print } from "./Ovale";
 import { AceModule } from "@wowts/tsaddon";
 
 interface OptionModule {
@@ -565,7 +565,7 @@ export class OvaleOptionsClass {
                             if(minRefresh == huge){
                                 [avgRefresh, minRefresh, maxRefresh, count] = [0,0,0,0]
                             }
-                            this.ovale.Print("Refresh intervals: count = %d, avg = %d, min = %d, max = %d (ms)", count, avgRefresh, minRefresh, maxRefresh);
+                            Print("Refresh intervals: count = %d, avg = %d, min = %d, max = %d (ms)", count, avgRefresh, minRefresh, maxRefresh);
                         }
                     }
                 }

@@ -7,7 +7,6 @@ import { OvaleEquipmentClass } from "./Equipment";
 import { OvalePaperDollClass } from "./PaperDoll";
 import { POWER_TYPES, PowerType } from "./Power";
 import { OvaleSpellBookClass } from "./SpellBook";
-import { OvaleStance } from "./Stance";
 import { checkBoxes, lists, ResetControls } from "./Controls";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { ipairs, pairs, tonumber, tostring, type, wipe, LuaArray, lualength, truthy, LuaObj, kpairs } from "@wowts/lua";
@@ -21,6 +20,7 @@ import { OvaleOptionsClass } from "./Options";
 import { OvaleClass } from "./Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleScoreClass } from "./Score";
+import { OvaleStanceClass } from "./Stance";
 
 const NUMBER_PATTERN = "^%-?%d+%.?%d*$";
 
@@ -49,7 +49,8 @@ export class OvaleCompileClass {
         private ovaleOptions: OvaleOptionsClass,
         private ovale: OvaleClass,
         private ovaleScore: OvaleScoreClass,
-        private ovaleSpellBook: OvaleSpellBookClass) {
+        private ovaleSpellBook: OvaleSpellBookClass,
+        private ovaleStance: OvaleStanceClass) {
         this.tracer = ovaleDebug.create("OvaleCompile");
         this.profiler = ovaleProfiler.create("OvaleCompile");
         this.module = ovale.createModule("OvaleCompile", this.OnInitialize, this.OnDisable, aceEvent);
@@ -101,7 +102,7 @@ export class OvaleCompileClass {
     private TestConditionStance = (value: string) => {
         this.compileOnStances = true;
         let [stance, required] = this.RequireValue(value);
-        let isStance = OvaleStance.IsStance(stance, undefined);
+        let isStance = this.ovaleStance.IsStance(stance, undefined);
         return (required && isStance) || (!required && !isStance);
     }
 
@@ -637,6 +638,7 @@ export class OvaleCompileClass {
             this.ast = this.ovaleAst.ParseScript(name);
         }
         ResetControls();
+        return this.ast;
     }
     EvaluateScript(ast?: AstNode, forceEvaluation?: boolean) {
         this.profiler.StartProfiling("OvaleCompile_EvaluateScript");

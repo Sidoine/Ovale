@@ -1,16 +1,15 @@
-import { OvaleProfiler } from "./Profiler";
-import { Ovale } from "./Ovale";
-import { OvaleData } from "./Data";
-import { OvaleSpellBook }from "./SpellBook";
-import { OvaleState } from "./State";
-import aceEvent from "@wowts/ace_event-3.0";
+import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { ipairs, pairs, LuaObj, LuaArray, kpairs } from "@wowts/lua";
 import { GetTotemInfo, MAX_TOTEMS } from "@wowts/wow-mock";
 import { SpellCast } from "./LastSpell";
-import { OvaleAura } from "./Aura";
-import { OvaleFuture } from "./Future";
-
-export let OvaleTotem: OvaleTotemClass;
+import { StateModule, States } from "./State";
+import { AceModule } from "@wowts/tsaddon";
+import { OvaleClass } from "./Ovale";
+import { Profiler, OvaleProfilerClass } from "./Profiler";
+import { OvaleDataClass } from "./Data";
+import { OvaleFutureClass } from "./Future";
+import { OvaleAuraClass } from "./Aura";
+import { OvaleSpellBookClass } from "./SpellBook";
 
 let self_serial = 0;
 let TOTEM_CLASS: LuaObj<boolean> = {
@@ -33,29 +32,35 @@ class TotemData {
     totems: LuaArray<Totem> = {}
 }
 
-let OvaleTotemBase = OvaleState.RegisterHasState(OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleTotem", aceEvent)), TotemData);
+export class OvaleTotemClass extends States<TotemData> implements StateModule {
+    private module: AceModule & AceEvent;
+    private profiler: Profiler;
 
-class OvaleTotemClass extends OvaleTotemBase {
-    
-    OnInitialize() {
-        if (TOTEM_CLASS[Ovale.playerClass]) {
-            this.RegisterEvent("PLAYER_ENTERING_WORLD", "Update");
-            this.RegisterEvent("PLAYER_TALENT_UPDATE", "Update");
-            this.RegisterEvent("PLAYER_TOTEM_UPDATE", "Update");
-            this.RegisterEvent("UPDATE_SHAPESHIFT_FORM", "Update");
+    constructor(private ovale: OvaleClass, ovaleProfiler: OvaleProfilerClass, private ovaleData: OvaleDataClass, private ovaleFuture: OvaleFutureClass, private ovaleAura: OvaleAuraClass, private ovaleSpellBook: OvaleSpellBookClass) {
+        super(TotemData);
+        this.module = ovale.createModule("OvaleTotem", this.OnInitialize, this.OnDisable, aceEvent);
+        this.profiler = ovaleProfiler.create(this.module.GetName());
+    }
+
+    private OnInitialize = () => {
+        if (TOTEM_CLASS[this.ovale.playerClass]) {
+            this.module.RegisterEvent("PLAYER_ENTERING_WORLD", this.Update);
+            this.module.RegisterEvent("PLAYER_TALENT_UPDATE", this.Update);
+            this.module.RegisterEvent("PLAYER_TOTEM_UPDATE", this.Update);
+            this.module.RegisterEvent("UPDATE_SHAPESHIFT_FORM", this.Update);
         }
     }
-    OnDisable() {
-        if (TOTEM_CLASS[Ovale.playerClass]) {
-            this.UnregisterEvent("PLAYER_ENTERING_WORLD");
-            this.UnregisterEvent("PLAYER_TALENT_UPDATE");
-            this.UnregisterEvent("PLAYER_TOTEM_UPDATE");
-            this.UnregisterEvent("UPDATE_SHAPESHIFT_FORM");
+    private OnDisable = () => {
+        if (TOTEM_CLASS[this.ovale.playerClass]) {
+            this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
+            this.module.UnregisterEvent("PLAYER_TALENT_UPDATE");
+            this.module.UnregisterEvent("PLAYER_TOTEM_UPDATE");
+            this.module.UnregisterEvent("UPDATE_SHAPESHIFT_FORM");
         }
     }
-    Update() {
+    private Update = () => {
         self_serial = self_serial + 1;
-        Ovale.needRefresh();
+        this.ovale.needRefresh();
     }
 
     InitializeState() {
@@ -78,14 +83,14 @@ class OvaleTotemClass extends OvaleTotemBase {
     }
     
     ApplySpellAfterCast(spellId: number, targetGUID: string, startCast: number, endCast: number, isChanneled: boolean, spellcast: SpellCast) {
-        OvaleTotem.StartProfiling("OvaleTotem_ApplySpellAfterCast");
-        if (TOTEM_CLASS[Ovale.playerClass]) {
-            let si = OvaleData.spellInfo[spellId];
+        this.profiler.StartProfiling("OvaleTotem_ApplySpellAfterCast");
+        if (TOTEM_CLASS[this.ovale.playerClass]) {
+            let si = this.ovaleData.spellInfo[spellId];
             if (si && si.totem) {
                 this.SummonTotem(spellId, endCast);
             }
         }
-        OvaleTotem.StopProfiling("OvaleTotem_ApplySpellAfterCast");
+        this.profiler.StopProfiling("OvaleTotem_ApplySpellAfterCast");
     }
 
     IsActiveTotem(totem: Totem, atTime: number) {
@@ -97,7 +102,7 @@ class OvaleTotemClass extends OvaleTotemBase {
     }
     
     GetTotem(slot: number) {
-        OvaleTotem.StartProfiling("OvaleTotem_state_GetTotem");
+        this.profiler.StartProfiling("OvaleTotem_state_GetTotem");
         let totem = this.next.totems[slot];
         if (totem && (!totem.serial || totem.serial < self_serial)) {
             let [haveTotem, name, startTime, duration, icon] = GetTotemInfo(slot);
@@ -115,24 +120,24 @@ class OvaleTotemClass extends OvaleTotemBase {
             totem.slot = slot;
             totem.serial = self_serial;
         }
-        OvaleTotem.StopProfiling("OvaleTotem_state_GetTotem");
+        this.profiler.StopProfiling("OvaleTotem_state_GetTotem");
         return totem;
     }
 
     GetTotemInfo(spellId: number, atTime: number) {
         let start, ending;
         let count = 0;
-        let si = OvaleData.spellInfo[spellId];
+        let si = this.ovaleData.spellInfo[spellId];
         if (si && si.totem) {
             // it can take a while for the buffs to appear
             // so if the previous GCD spell is our totem, we assume the buffs are up
-            let buffPresent = (OvaleFuture.next.lastGCDSpellId == spellId);
+            let buffPresent = (this.ovaleFuture.next.lastGCDSpellId == spellId);
             if (!buffPresent && si.buff_totem) {
-                let aura = OvaleAura.GetAura("player", si.buff_totem, atTime, "HELPFUL");
-                buffPresent = OvaleAura.IsActiveAura(aura, atTime);
+                let aura = this.ovaleAura.GetAura("player", si.buff_totem, atTime, "HELPFUL");
+                buffPresent = this.ovaleAura.IsActiveAura(aura, atTime);
             }
             if (!si.buff_totem || buffPresent) {
-                let texture = OvaleSpellBook.GetSpellTexture(spellId);
+                let texture = this.ovaleSpellBook.GetSpellTexture(spellId);
                 let maxTotems = si.max_totems || MAX_TOTEMS+1;
                 for (const [slot] of ipairs(this.next.totems)) {
                     let totem = this.GetTotem(slot);
@@ -155,28 +160,28 @@ class OvaleTotemClass extends OvaleTotemBase {
     }
     
     SummonTotem(spellId: number, atTime: number) {
-        OvaleTotem.StartProfiling("OvaleTotem_state_SummonTotem");
+        this.profiler.StartProfiling("OvaleTotem_state_SummonTotem");
         
         let totemSlot = this.GetAvailableTotemSlot(spellId, atTime);
         
-        let [name, , icon] = OvaleSpellBook.GetSpellInfo(spellId);
-        let duration = OvaleData.GetSpellInfoProperty(spellId, atTime, "duration", undefined);
+        let [name, , icon] = this.ovaleSpellBook.GetSpellInfo(spellId);
+        let duration = this.ovaleData.GetSpellInfoProperty(spellId, atTime, "duration", undefined);
         let totem = this.next.totems[totemSlot];
         totem.name = name;
         totem.start = atTime;
         totem.duration = duration || 15;
         totem.icon = icon;
         totem.slot = totemSlot;
-        OvaleTotem.StopProfiling("OvaleTotem_state_SummonTotem");
+        this.profiler.StopProfiling("OvaleTotem_state_SummonTotem");
     }
     
     GetAvailableTotemSlot(spellId: number, atTime: number): number {
-        OvaleTotem.StartProfiling("OvaleTotem_state_GetNextAvailableTotemSlot");
+        this.profiler.StartProfiling("OvaleTotem_state_GetNextAvailableTotemSlot");
         let availableSlot = undefined;
         
-        let si = OvaleData.spellInfo[spellId];
+        let si = this.ovaleData.spellInfo[spellId];
         if(si && si.totem) {
-            let [, , icon] = OvaleSpellBook.GetSpellInfo(spellId);
+            let [, , icon] = this.ovaleSpellBook.GetSpellInfo(spellId);
             
             for(let i = 1; i <= MAX_TOTEMS+1; i+=1) {
                 let totem = this.next.totems[i];
@@ -200,10 +205,7 @@ class OvaleTotemClass extends OvaleTotemBase {
                 }
             }
         }
-        OvaleTotem.StopProfiling("OvaleTotem_state_GetNextAvailableTotemSlot");
+        this.profiler.StopProfiling("OvaleTotem_state_GetNextAvailableTotemSlot");
         return availableSlot;
     }
 }
-
-OvaleTotem = new OvaleTotemClass();
-OvaleState.RegisterState(OvaleTotem);

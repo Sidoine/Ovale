@@ -3,8 +3,6 @@ if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Localization = LibStub:GetLibrary("ovale/Localization")
 local L = __Localization.L
-local __SpellBook = LibStub:GetLibrary("ovale/SpellBook")
-local OvaleSpellBook = __SpellBook.OvaleSpellBook
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local aceTimer = LibStub:GetLibrary("AceTimer-3.0", true)
 local gsub = string.gsub
@@ -28,7 +26,8 @@ local GetMacroItem = GetMacroItem
 local GetMacroSpell = GetMacroSpell
 local ElvUI = LibStub:GetLibrary("LibActionButton-1.0-ElvUI", true)
 __exports.OvaleActionBarClass = __class(nil, {
-    constructor = function(self, ovaleDebug, ovale, ovaleProfiler)
+    constructor = function(self, ovaleDebug, ovale, ovaleProfiler, ovaleSpellBook)
+        self.ovaleSpellBook = ovaleSpellBook
         self.debugOptions = {
             actionbar = {
                 name = L["Action bar"],
@@ -268,7 +267,7 @@ __exports.OvaleActionBarClass = __class(nil, {
         wipe(self.output)
         local array = {}
         for k, v in pairs(self.spell) do
-            insert(array, tostring(self:GetKeyBinding(v)) .. ": " .. tostring(k) .. " " .. tostring(OvaleSpellBook:GetSpellName(k)))
+            insert(array, tostring(self:GetKeyBinding(v)) .. ": " .. tostring(k) .. " " .. tostring(self.ovaleSpellBook:GetSpellName(k)))
         end
         sort(array)
         for _, v in ipairs(array) do

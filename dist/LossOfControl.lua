@@ -1,15 +1,6 @@
 local __exports = LibStub:NewLibrary("ovale/LossOfControl", 80201)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __Debug = LibStub:GetLibrary("ovale/Debug")
-local OvaleDebug = __Debug.OvaleDebug
-local __Profiler = LibStub:GetLibrary("ovale/Profiler")
-local OvaleProfiler = __Profiler.OvaleProfiler
-local __Ovale = LibStub:GetLibrary("ovale/Ovale")
-local Ovale = __Ovale.Ovale
-local __Requirement = LibStub:GetLibrary("ovale/Requirement")
-local RegisterRequirement = __Requirement.RegisterRequirement
-local UnregisterRequirement = __Requirement.UnregisterRequirement
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local C_LossOfControl = C_LossOfControl
 local GetTime = GetTime
@@ -17,39 +8,33 @@ local pairs = pairs
 local insert = table.insert
 local sub = string.sub
 local upper = string.upper
-local OvaleLossOfControlBase = OvaleProfiler.RegisterProfiling(OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleLossOfControl", aceEvent)))
-__exports.OvaleLossOfControlClass = __class(OvaleLossOfControlBase, {
-    OnInitialize = function(self)
-        self.Debug("Enabled LossOfControl module")
-        self.lossOfControlHistory = {}
-        self.RegisterEvent("LOSS_OF_CONTROL_ADDED")
-        RegisterRequirement("lossofcontrol", self.RequireLossOfControlHandler)
-    end,
-    OnDisable = function(self)
-        self.Debug("Disabled LossOfControl module")
-        self.lossOfControlHistory = {}
-        self.UnregisterEvent("LOSS_OF_CONTROL_ADDED")
-        UnregisterRequirement("lossofcontrol")
-    end,
-    LOSS_OF_CONTROL_ADDED = function(self, event, eventIndex)
-        self.Debug("GetEventInfo:", eventIndex, C_LossOfControl.GetEventInfo(eventIndex))
-        local locType, spellID, _, _, startTime, _, duration = C_LossOfControl.GetEventInfo(eventIndex)
-        local data = {
-            locType = upper(locType),
-            spellID = spellID,
-            startTime = startTime or GetTime(),
-            duration = duration or 10
-        }
-        insert(self.lossOfControlHistory, data)
-    end,
-    CleanState = function(self)
-    end,
-    InitializeState = function(self)
-    end,
-    ResetState = function(self)
-    end,
-    constructor = function(self, ...)
-        OvaleLossOfControlBase.constructor(self, ...)
+__exports.OvaleLossOfControlClass = __class(nil, {
+    constructor = function(self, ovale, ovaleDebug, requirement)
+        self.ovale = ovale
+        self.requirement = requirement
+        self.OnInitialize = function()
+            self.tracer:Debug("Enabled LossOfControl module")
+            self.lossOfControlHistory = {}
+            self.module:RegisterEvent("LOSS_OF_CONTROL_ADDED", self.LOSS_OF_CONTROL_ADDED)
+            self.requirement:RegisterRequirement("lossofcontrol", self.RequireLossOfControlHandler)
+        end
+        self.OnDisable = function()
+            self.tracer:Debug("Disabled LossOfControl module")
+            self.lossOfControlHistory = {}
+            self.module:UnregisterEvent("LOSS_OF_CONTROL_ADDED")
+            self.requirement:UnregisterRequirement("lossofcontrol")
+        end
+        self.LOSS_OF_CONTROL_ADDED = function(event, eventIndex)
+            self.tracer:Debug("GetEventInfo:", eventIndex, C_LossOfControl.GetEventInfo(eventIndex))
+            local locType, spellID, _, _, startTime, _, duration = C_LossOfControl.GetEventInfo(eventIndex)
+            local data = {
+                locType = upper(locType),
+                spellID = spellID,
+                startTime = startTime or GetTime(),
+                duration = duration or 10
+            }
+            insert(self.lossOfControlHistory, data)
+        end
         self.RequireLossOfControlHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
             local verified = false
             local locType = tokens[index]
@@ -63,7 +48,7 @@ __exports.OvaleLossOfControlClass = __class(OvaleLossOfControlBase, {
                 local hasLoss = self.HasLossOfControl(locType, atTime)
                 verified = (required and hasLoss) or ( not required and  not hasLoss)
             else
-                Ovale.OneTimeMessage("Warning: requirement '%s' is missing a locType argument.", requirement)
+                self.ovale:OneTimeMessage("Warning: requirement '%s' is missing a locType argument.", requirement)
             end
             return verified, requirement, index
         end
@@ -83,5 +68,13 @@ __exports.OvaleLossOfControlClass = __class(OvaleLossOfControlBase, {
             return lowestStartTime ~= nil and highestEndTime ~= nil
         end
 
-    end
+        self.module = ovale:createModule("OvaleLossOfControl", self.OnInitialize, self.OnDisable, aceEvent)
+        self.tracer = ovaleDebug:create(self.module:GetName())
+    end,
+    CleanState = function(self)
+    end,
+    InitializeState = function(self)
+    end,
+    ResetState = function(self)
+    end,
 })

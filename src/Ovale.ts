@@ -29,8 +29,17 @@ export function MakeString(s?: string, ...__args: any[]) {
     return s;
 }
 
-const OvaleBase = NewAddon("Ovale", aceEvent);
-export const MSG_PREFIX = "Ovale";
+const name = "Ovale";
+
+const OvaleBase = NewAddon(name, aceEvent);
+export const MSG_PREFIX = name;
+
+
+export function Print(...__args: any[]) {
+    let s = MakeString(...__args);
+    DEFAULT_CHAT_FRAME.AddMessage(format("|cff33ff99%s|r: %s", name, s));
+}
+
 
 export class OvaleClass extends OvaleBase {
     playerClass: ClassId = undefined;
@@ -109,15 +118,10 @@ export class OvaleClass extends OvaleBase {
     PrintOneTimeMessages() {
         for (const [s] of pairs(oneTimeMessages)) {
             if (oneTimeMessages[s] != "printed") {
-                this.Print(s);
+                Print(s);
                 oneTimeMessages[s] = "printed";
             }
         }
-    }
-
-    Print(...__args: any[]) {
-        let s = MakeString(...__args);
-        DEFAULT_CHAT_FRAME.AddMessage(format("|cff33ff99%s|r: %s", this.GetName(), s));
     }
 
     createModule(name: string, onInitialize: () => void, onRelease: () => void) : AceModule;

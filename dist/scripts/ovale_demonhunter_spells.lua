@@ -1,8 +1,6 @@
 local __exports = LibStub:NewLibrary("ovale/scripts/ovale_demonhunter_spells", 80201)
 if not __exports then return end
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-__exports.register = function()
+__exports.registerDemonHunterSpells = function(OvaleScripts)
     local name = "ovale_demonhunter_spells"
     local desc = "[8.2] Ovale: DemonHunter spells"
     local code = [[Define(annihilation 201427)

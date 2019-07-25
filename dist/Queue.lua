@@ -1,8 +1,7 @@
 local __exports = LibStub:NewLibrary("ovale/Queue", 80201)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __Ovale = LibStub:GetLibrary("ovale/Ovale")
-local Ovale = __Ovale.Ovale
+local format = string.format
 local BackToFrontIterator = __class(nil, {
     constructor = function(self, invariant, control)
         self.invariant = invariant
@@ -89,7 +88,7 @@ __exports.OvaleDequeue = __class(nil, {
         return self.last - self.first + 1
     end,
     DebuggingInfo = function(self)
-        Ovale.Print("Queue %s has %d item(s), first=%d, last=%d.", self.name, self:Size(), self.first, self.last)
+        return format("Queue %s has %d item(s), first=%d, last=%d.", self.name, self:Size(), self.first, self.last)
     end,
 })
 __exports.OvaleQueue = __class(__exports.OvaleDequeue, {

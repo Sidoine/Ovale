@@ -1,6 +1,6 @@
 import AceGUI, { AceGUIWidgetCheckBox, AceGUIWidgetDropDown } from "@wowts/ace_gui-3.0";
 import Masque, { MasqueSkinGroup } from "@wowts/masque";
-import { OvaleBestAction, Element } from "./BestAction";
+import { Element, OvaleBestActionClass } from "./BestAction";
 import { OvaleCompileClass } from "./Compile";
 import { OvaleSpellFlashClass } from "./SpellFlash";
 import { OvaleStateClass } from "./State";
@@ -21,6 +21,7 @@ import { OvaleOptionsClass } from "./Options";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleDebugClass, Tracer } from "./Debug";
 import { OvaleGUIDClass } from "./GUID";
+import { OvaleSpellBookClass } from "./SpellBook";
 
 let strmatch = match;
 let INFINITY = huge;
@@ -169,12 +170,12 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                     this.ovaleEnemies.next.enemies = undefined;
                 }
                 this.tracer.Log("+++ Icon %d", k);
-                OvaleBestAction.StartNewAction();
+                this.ovaleBestAction.StartNewAction();
                 let atTime = this.ovaleFuture.next.nextCast;
                 if (this.ovaleFuture.next.currentCast.spellId == undefined || this.ovaleFuture.next.currentCast.spellId != this.ovaleFuture.next.lastGCDSpellId) {
                     atTime = this.baseState.next.currentTime;
                 }
-                let [timeSpan, element] = OvaleBestAction.GetAction(node, atTime);
+                let [timeSpan, element] = this.ovaleBestAction.GetAction(node, atTime);
                 let start;
                 if (element && element.offgcd) {
                     start = timeSpan.NextTime(this.baseState.next.currentTime);
@@ -213,7 +214,7 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                 icons[2].Update(element, undefined);
             }
         } else {
-            let [actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget, actionResourceExtend] = OvaleBestAction.GetActionInfo(element, now);
+            let [actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionTarget, actionResourceExtend] = this.ovaleBestAction.GetActionInfo(element, now);
             if (actionResourceExtend && actionResourceExtend > 0) {
                 if (actionCooldownDuration > 0) {
                     this.tracer.Log("Extending cooldown of spell ID '%s' for primary resource by %fs.", actionId, actionResourceExtend);
@@ -263,13 +264,13 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                     if (actionId != this.ovaleFuture.next.lastGCDSpellId) {
                         atTime = this.baseState.next.currentTime;
                     }
-                    let [timeSpan, nextElement] = OvaleBestAction.GetAction(node, atTime);
+                    let [timeSpan, nextElement] = this.ovaleBestAction.GetAction(node, atTime);
                     if (nextElement && nextElement.offgcd) {
                         start = timeSpan.NextTime(this.baseState.next.currentTime);
                     } else {
                         start = timeSpan.NextTime(atTime);
                     }
-                    const [actionTexture2, actionInRange2, actionCooldownStart2, actionCooldownDuration2, actionUsable2, actionShortcut2, actionIsCurrent2, actionEnable2, actionType2, actionId2, actionTarget2, actionResourceExtend2]= OvaleBestAction.GetActionInfo(nextElement, start);
+                    const [actionTexture2, actionInRange2, actionCooldownStart2, actionCooldownDuration2, actionUsable2, actionShortcut2, actionIsCurrent2, actionEnable2, actionType2, actionId2, actionTarget2, actionResourceExtend2]= this.ovaleBestAction.GetActionInfo(nextElement, start);
                     icons[2].Update(nextElement, start, actionTexture2, actionInRange2, actionCooldownStart2, actionCooldownDuration2, actionUsable2, actionShortcut2, actionIsCurrent2, actionEnable2, actionType2, actionId2, actionTarget2, actionResourceExtend2);
                 } else {
                     icons[2].Update(element, undefined);
@@ -462,12 +463,12 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
                 let icon: OvaleIcon;
                 if (!node.secure) {
                     if (!action.icons[l]) {
-                        action.icons[l] = new OvaleIcon(`Icon${k}n${l}`, this, false);
+                        action.icons[l] = new OvaleIcon(`Icon${k}n${l}`, this, false, this.ovaleOptions, this.ovaleSpellBook);
                     }
                     icon = action.icons[l];
                 } else {
                     if (!action.secureIcons[l]) {
-                        action.secureIcons[l] = new OvaleIcon(`SecureIcon${k}n${l}`, this, true);
+                        action.secureIcons[l] = new OvaleIcon(`SecureIcon${k}n${l}`, this, true, this.ovaleOptions, this.ovaleSpellBook);
                     }
                     icon = action.secureIcons[l];
                 }
@@ -542,7 +543,9 @@ class OvaleFrame extends AceGUI.WidgetContainerBase {
         private ovaleOptions: OvaleOptionsClass,
         private ovaleDebug: OvaleDebugClass,
         private ovaleGuid: OvaleGUIDClass,
-        private ovaleSpellFlash: OvaleSpellFlashClass) {
+        private ovaleSpellFlash: OvaleSpellFlashClass,
+        private ovaleSpellBook: OvaleSpellBookClass,
+        private ovaleBestAction: OvaleBestActionClass) {
         super();
         let hider = CreateFrame("Frame", `${ovale.GetName()}PetBattleFrameHider`, UIParent, "SecureHandlerStateTemplate");
         let newFrame = CreateFrame("Frame", undefined, hider);
@@ -607,7 +610,7 @@ export class OvaleFrameModuleClass {
         this.module.RegisterMessage("Ovale_CombatStarted", this.Ovale_CombatStarted);
         this.module.RegisterMessage("Ovale_CombatEnded", this.Ovale_CombatEnded);
         this.module.RegisterEvent("PLAYER_TARGET_CHANGED", this.PLAYER_TARGET_CHANGED);
-        this.frame = new OvaleFrame(this.ovaleState, this, this.ovaleCompile, this.ovaleFuture, this.baseState, this.ovaleEnemies, this.ovale, this.ovaleOptions, this.ovaleDebug, this.ovaleGuid, this.ovaleSpellFlash);
+        this.frame = new OvaleFrame(this.ovaleState, this, this.ovaleCompile, this.ovaleFuture, this.baseState, this.ovaleEnemies, this.ovale, this.ovaleOptions, this.ovaleDebug, this.ovaleGuid, this.ovaleSpellFlash, this.ovaleSpellBook, this.ovaleBestAction);
     }
 
     private handleDisable = () =>{
@@ -652,7 +655,9 @@ export class OvaleFrameModuleClass {
         private ovaleOptions: OvaleOptionsClass,
         private ovaleDebug: OvaleDebugClass,
         private ovaleGuid: OvaleGUIDClass,
-        private ovaleSpellFlash: OvaleSpellFlashClass){
+        private ovaleSpellFlash: OvaleSpellFlashClass,
+        private ovaleSpellBook: OvaleSpellBookClass,
+        private ovaleBestAction: OvaleBestActionClass){
         this.module = ovale.createModule("OvaleFrame", this.OnInitialize, this.handleDisable, aceEvent);
     }
 }

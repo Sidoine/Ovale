@@ -1,9 +1,10 @@
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-do
-    local name = "sc_t23_death_knight_blood"
-    local desc = "[8.2] Simulationcraft: T23_Death_Knight_Blood"
-    local code = [[
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_deathknight", 80201)
+if not __exports then return end
+__exports.registerDeathKnight = function(OvaleScripts)
+    do
+        local name = "sc_t23_death_knight_blood"
+        local desc = "[8.2] Simulationcraft: T23_Death_Knight_Blood"
+        local code = [[
 # Based on SimulationCraft profile "T23_Death_Knight_Blood".
 #	class=deathknight
 #	spec=blood
@@ -317,12 +318,12 @@ AddIcon checkbox=opt_deathknight_blood_aoe help=cd specialization=blood
 # tombstone
 # war_stomp
 ]]
-    OvaleScripts:RegisterScript("DEATHKNIGHT", "blood", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_death_knight_frost"
-    local desc = "[8.2] Simulationcraft: T23_Death_Knight_Frost"
-    local code = [[
+        OvaleScripts:RegisterScript("DEATHKNIGHT", "blood", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_death_knight_frost"
+        local desc = "[8.2] Simulationcraft: T23_Death_Knight_Frost"
+        local code = [[
 # Based on SimulationCraft profile "T23_Death_Knight_Frost".
 #	class=deathknight
 #	spec=frost
@@ -1123,12 +1124,12 @@ AddIcon checkbox=opt_deathknight_frost_aoe help=cd specialization=frost
 # war_stomp
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("DEATHKNIGHT", "frost", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_death_knight_unholy"
-    local desc = "[8.2] Simulationcraft: T23_Death_Knight_Unholy"
-    local code = [[
+        OvaleScripts:RegisterScript("DEATHKNIGHT", "frost", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_death_knight_unholy"
+        local desc = "[8.2] Simulationcraft: T23_Death_Knight_Unholy"
+        local code = [[
 # Based on SimulationCraft profile "T23_Death_Knight_Unholy".
 #	class=deathknight
 #	spec=unholy
@@ -1647,5 +1648,6 @@ AddIcon checkbox=opt_deathknight_unholy_aoe help=cd specialization=unholy
 # war_stomp
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("DEATHKNIGHT", "unholy", name, desc, code, "script")
+        OvaleScripts:RegisterScript("DEATHKNIGHT", "unholy", name, desc, code, "script")
+    end
 end

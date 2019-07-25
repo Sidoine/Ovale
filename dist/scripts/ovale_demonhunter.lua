@@ -1,9 +1,10 @@
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-do
-    local name = "sc_t23_demon_hunter_havoc"
-    local desc = "[8.2] Simulationcraft: T23_Demon_Hunter_Havoc"
-    local code = [[
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_demonhunter", 80201)
+if not __exports then return end
+__exports.registerDemonHunter = function(OvaleScripts)
+    do
+        local name = "sc_t23_demon_hunter_havoc"
+        local desc = "[8.2] Simulationcraft: T23_Demon_Hunter_Havoc"
+        local code = [[
 # Based on SimulationCraft profile "T23_Demon_Hunter_Havoc".
 #	class=demonhunter
 #	spec=havoc
@@ -600,12 +601,12 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # vengeful_retreat
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("DEMONHUNTER", "havoc", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_demon_hunter_vengeance"
-    local desc = "[8.2] Simulationcraft: T23_Demon_Hunter_Vengeance"
-    local code = [[
+        OvaleScripts:RegisterScript("DEMONHUNTER", "havoc", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_demon_hunter_vengeance"
+        local desc = "[8.2] Simulationcraft: T23_Demon_Hunter_Vengeance"
+        local code = [[
 # Based on SimulationCraft profile "T23_Demon_Hunter_Vengeance".
 #	class=demonhunter
 #	spec=vengeance
@@ -974,5 +975,6 @@ AddIcon checkbox=opt_demonhunter_vengeance_aoe help=cd specialization=vengeance
 # spirit_bomb_talent
 # throw_glaive_veng
 ]]
-    OvaleScripts:RegisterScript("DEMONHUNTER", "vengeance", name, desc, code, "script")
+        OvaleScripts:RegisterScript("DEMONHUNTER", "vengeance", name, desc, code, "script")
+    end
 end

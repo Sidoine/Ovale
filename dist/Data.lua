@@ -1,9 +1,6 @@
 local __exports = LibStub:NewLibrary("ovale/Data", 80201)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __Requirement = LibStub:GetLibrary("ovale/Requirement")
-local nowRequirements = __Requirement.nowRequirements
-local CheckRequirements = __Requirement.CheckRequirements
 local type = type
 local ipairs = ipairs
 local pairs = pairs
@@ -83,10 +80,11 @@ local STAT_USE_NAMES = {
 }
 local tempTokens = {}
 __exports.OvaleDataClass = __class(nil, {
-    constructor = function(self, baseState, ovaleGuid, ovale)
+    constructor = function(self, baseState, ovaleGuid, ovale, requirement)
         self.baseState = baseState
         self.ovaleGuid = ovaleGuid
         self.ovale = ovale
+        self.requirement = requirement
         self.STAT_NAMES = STAT_NAMES
         self.STAT_SHORTNAME = STAT_SHORTNAME
         self.STAT_USE_NAMES = STAT_USE_NAMES
@@ -375,7 +373,7 @@ __exports.OvaleDataClass = __class(nil, {
         end
         local verified = true
         if index then
-            verified = CheckRequirements(auraId, atTime, spellDataArray, index, guid)
+            verified = self.requirement:CheckRequirements(auraId, atTime, spellDataArray, index, guid)
         end
         return verified, value, data
     end,
@@ -383,7 +381,7 @@ __exports.OvaleDataClass = __class(nil, {
         targetGUID = targetGUID or self.ovaleGuid:UnitGUID(self.baseState.next.defaultTarget or "target")
         local verified = true
         local requirement
-        for name, handler in pairs(nowRequirements) do
+        for name, handler in pairs(self.requirement.nowRequirements) do
             local value = self:GetSpellInfoProperty(spellId, atTime, name, targetGUID)
             if value then
                 if  not isString(value) and isLuaArray(value) then
@@ -408,7 +406,7 @@ __exports.OvaleDataClass = __class(nil, {
             for v, rArray in pairs(requirements) do
                 if isLuaArray(rArray) then
                     for _, requirement in ipairs(rArray) do
-                        local verified = CheckRequirements(itemId, atTime, requirement, 1, targetGUID)
+                        local verified = self.requirement:CheckRequirements(itemId, atTime, requirement, 1, targetGUID)
                         if verified then
                             value = tonumber(v) or v
                             break
@@ -428,7 +426,7 @@ __exports.OvaleDataClass = __class(nil, {
             for v, rArray in pairs(requirements) do
                 if isLuaArray(rArray) then
                     for _, requirement in ipairs(rArray) do
-                        local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                        local verified = self.requirement:CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
                         if verified then
                             value = tonumber(v) or v
                             break
@@ -455,7 +453,7 @@ __exports.OvaleDataClass = __class(nil, {
                 for v, rArray in pairs(ratioRequirements) do
                     if isLuaArray(rArray) then
                         for _, requirement in ipairs(rArray) do
-                            local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                            local verified = self.requirement:CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
                             if verified then
                                 if ratio ~= 0 then
                                     ratio = ratio * ((tonumber(v) / 100) or 1)
@@ -481,7 +479,7 @@ __exports.OvaleDataClass = __class(nil, {
                     for v, rArray in pairs(addRequirements) do
                         if isLuaArray(rArray) then
                             for _, requirement in ipairs(rArray) do
-                                local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                                local verified = self.requirement:CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
                                 if verified then
                                     value = value + (tonumber(v) or 0)
                                 end

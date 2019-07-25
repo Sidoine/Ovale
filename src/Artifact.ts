@@ -48,10 +48,10 @@ export class OvaleArtifactClass {
     UpdateTraits() {
         return;
     }
-    HasTrait() {
+    HasTrait(spellId: number) {
         return false;
     }
-    TraitRank() {
+    TraitRank(spellId: number) {
         return 0;
     }
     output: LuaArray<string> = {}

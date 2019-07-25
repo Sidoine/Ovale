@@ -1,5 +1,5 @@
 import { OvaleGUIDClass } from "./GUID";
-import { nowRequirements, CheckRequirements } from "./Requirement";
+import { OvaleRequirement } from "./Requirement";
 import { type, ipairs, pairs, tonumber, wipe, truthy, LuaArray, LuaObj } from "@wowts/lua";
 import { find } from "@wowts/string";
 import { BaseState } from "./BaseState";
@@ -315,7 +315,7 @@ export class OvaleDataClass {
             [106898]: true
         }
     }
-    constructor(private baseState: BaseState, private ovaleGuid: OvaleGUIDClass, private ovale: OvaleClass) {
+    constructor(private baseState: BaseState, private ovaleGuid: OvaleGUIDClass, private ovale: OvaleClass, private requirement: OvaleRequirement) {
         for (const [, useName] of pairs(STAT_USE_NAMES)) {
             let name;
             for (const [, statName] of pairs(STAT_NAMES)) {
@@ -470,7 +470,7 @@ export class OvaleDataClass {
         }
         let verified = true;
         if (index) {
-            [verified] = CheckRequirements(<number>auraId, atTime, spellDataArray!, index, guid);
+            [verified] = this.requirement.CheckRequirements(<number>auraId, atTime, spellDataArray!, index, guid);
         }
         return [verified, value, data];
     }
@@ -479,7 +479,7 @@ export class OvaleDataClass {
         targetGUID = targetGUID || this.ovaleGuid.UnitGUID(this.baseState.next.defaultTarget || "target");
         let verified = true;
         let requirement;
-        for (const [name, handler] of pairs(nowRequirements)) {
+        for (const [name, handler] of pairs(this.requirement.nowRequirements)) {
             let value = this.GetSpellInfoProperty(spellId, atTime, <any>name, targetGUID);
             if (value) {
                 if (!isString(value) && isLuaArray<string>(value)) {
@@ -505,7 +505,7 @@ export class OvaleDataClass {
             for (const [v, rArray] of pairs(requirements)) {
                 if (isLuaArray(rArray)) {
                     for (const [, requirement] of ipairs<any>(rArray)) {
-                        let verified = CheckRequirements(itemId, atTime, requirement, 1, targetGUID);
+                        let verified = this.requirement.CheckRequirements(itemId, atTime, requirement, 1, targetGUID);
                         if (verified) {
                             value = tonumber(v) || v;
                             break;
@@ -535,7 +535,7 @@ export class OvaleDataClass {
             for (const [v, rArray] of pairs(requirements)) {
                 if (isLuaArray(rArray)) {
                     for (const [, requirement] of ipairs<any>(rArray)) {
-                        let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
+                        let verified = this.requirement.CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
                         if (verified) {
                             (<any>value) = tonumber(v) || v;
                             break;
@@ -572,7 +572,7 @@ export class OvaleDataClass {
                 for (const [v, rArray] of pairs(ratioRequirements)) {
                     if (isLuaArray(rArray)) {
                         for (const [, requirement] of ipairs<any>(rArray)) {
-                            let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
+                            let verified = this.requirement.CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
                             if (verified) {
                                 if (ratio != 0) {
                                     ratio = ratio * ((tonumber(v) / 100) || 1);
@@ -598,7 +598,7 @@ export class OvaleDataClass {
                     for (const [v, rArray] of pairs(addRequirements)) {
                         if (isLuaArray(rArray)) {
                             for (const [, requirement] of ipairs<any>(rArray)) {
-                                let verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
+                                let verified = this.requirement.CheckRequirements(spellId, atTime, requirement, 1, targetGUID);
                                 if (verified) {
                                     value = value + (tonumber(v) || 0);
                                 }

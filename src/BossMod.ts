@@ -1,19 +1,29 @@
-import { OvaleDebug } from "./Debug";
-import { OvaleProfiler } from "./Profiler";
-import { Ovale } from "./Ovale";
+import { Tracer, OvaleDebugClass } from "./Debug";
+import { Profiler, OvaleProfilerClass } from "./Profiler";
+import { OvaleClass } from "./Ovale";
 import { UnitExists, UnitClassification } from "@wowts/wow-mock";
 import { _G, hooksecurefunc } from "@wowts/lua";
-import { OvaleFuture } from "./Future";
-let OvaleBossModBase = OvaleProfiler.RegisterProfiling(OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleBossMod")));
+import { AceModule } from "@wowts/tsaddon";
+import { OvaleFutureClass } from "./Future";
 let _BigWigsLoader: { RegisterMessage: any } = _G["BigWigsLoader"];
 let _DBM = _G["DBM"];
-class OvaleBossModClass extends OvaleBossModBase {
+export class OvaleBossModClass {
     EngagedDBM: any = undefined;
     EngagedBigWigs: any = undefined;
 
-    OnInitialize() {
+    private module: AceModule;
+    private tracer: Tracer;
+    private profiler: Profiler;
+
+    constructor(ovale: OvaleClass, ovaleDebug: OvaleDebugClass, ovaleProfiler: OvaleProfilerClass, private ovaleFuture: OvaleFutureClass) {
+        this.module = ovale.createModule("BossMod", this.OnInitialize, this.OnDisable);
+        this.tracer = ovaleDebug.create(this.module.GetName());
+        this.profiler = ovaleProfiler.create(this.module.GetName());
+    }
+
+    private OnInitialize = () => {
         if (_DBM) {
-            this.Debug("DBM is loaded");
+            this.tracer.Debug("DBM is loaded");
             hooksecurefunc(_DBM, "StartCombat", (_DBM, mod, delay, event, ...__args) => {
                 if (event != "TIMER_RECOVERY") {
                     this.EngagedDBM = mod;
@@ -24,11 +34,11 @@ class OvaleBossModClass extends OvaleBossModBase {
             });
         }
         if (_BigWigsLoader) {
-            this.Debug("BigWigs is loaded");
-            _BigWigsLoader.RegisterMessage(OvaleBossMod, "BigWigs_OnBossEngage", (_: any, mod: any, diff: any) => {
+            this.tracer.Debug("BigWigs is loaded");
+            _BigWigsLoader.RegisterMessage(this, "BigWigs_OnBossEngage", (_: any, mod: any, diff: any) => {
                 this.EngagedBigWigs = mod;
             });
-            _BigWigsLoader.RegisterMessage(OvaleBossMod, "BigWigs_OnBossDisable", (_: any, mod: any) => {
+            _BigWigsLoader.RegisterMessage(this, "BigWigs_OnBossDisable", (_: any, mod: any) => {
                 this.EngagedBigWigs = undefined;
             });
         }
@@ -36,22 +46,22 @@ class OvaleBossModClass extends OvaleBossModBase {
     OnDisable() {
     }
     IsBossEngaged(atTime: number) {
-        if (!OvaleFuture.IsInCombat(atTime)) {
+        if (!this.ovaleFuture.IsInCombat(atTime)) {
             return false;
         }
         let dbmEngaged = (_DBM != undefined && this.EngagedDBM != undefined && this.EngagedDBM.inCombat);
         let bigWigsEngaged = (_BigWigsLoader != undefined && this.EngagedBigWigs != undefined && this.EngagedBigWigs.isEngaged);
         let neitherEngaged = (_DBM == undefined && _BigWigsLoader == undefined && this.ScanTargets());
         if (dbmEngaged) {
-            this.Debug("DBM Engaged: [name=%s]", this.EngagedDBM.localization.general.name);
+            this.tracer.Debug("DBM Engaged: [name=%s]", this.EngagedDBM.localization.general.name);
         }
         if (bigWigsEngaged) {
-            this.Debug("BigWigs Engaged: [name=%s]", this.EngagedBigWigs.displayName);
+            this.tracer.Debug("BigWigs Engaged: [name=%s]", this.EngagedBigWigs.displayName);
         }
         return dbmEngaged || bigWigsEngaged || neitherEngaged;
     }
     ScanTargets() {
-        this.StartProfiling("OvaleBossMod:ScanTargets");
+        this.profiler.StartProfiling("OvaleBossMod:ScanTargets");
         let bossEngaged = false; 
         if(UnitExists("target")){
             bossEngaged = (UnitClassification("target") == "worldboss") || false
@@ -90,9 +100,7 @@ class OvaleBossModClass extends OvaleBossModBase {
         //         }
         //     }
         // }
-        this.StopProfiling("OvaleBossMod:ScanTargets");
+        this.profiler.StopProfiling("OvaleBossMod:ScanTargets");
         return bossEngaged;
     }
 }
-
-export const OvaleBossMod = new OvaleBossModClass();

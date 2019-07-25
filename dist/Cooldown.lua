@@ -1,11 +1,6 @@
 local __exports = LibStub:NewLibrary("ovale/Cooldown", 80201)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __SpellBook = LibStub:GetLibrary("ovale/SpellBook")
-local OvaleSpellBook = __SpellBook.OvaleSpellBook
-local __Requirement = LibStub:GetLibrary("ovale/Requirement")
-local RegisterRequirement = __Requirement.RegisterRequirement
-local UnregisterRequirement = __Requirement.UnregisterRequirement
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local next = next
 local pairs = pairs
@@ -74,11 +69,13 @@ __exports.CooldownData = __class(nil, {
     end
 })
 __exports.OvaleCooldownClass = __class(States, {
-    constructor = function(self, ovalePaperDoll, ovaleData, lastSpell, ovale, ovaleDebug, ovaleProfiler)
+    constructor = function(self, ovalePaperDoll, ovaleData, lastSpell, ovale, ovaleDebug, ovaleProfiler, ovaleSpellBook, requirement)
         self.ovalePaperDoll = ovalePaperDoll
         self.ovaleData = ovaleData
         self.lastSpell = lastSpell
         self.ovale = ovale
+        self.ovaleSpellBook = ovaleSpellBook
+        self.requirement = requirement
         self.serial = 0
         self.sharedCooldown = {}
         self.gcd = {
@@ -99,11 +96,11 @@ __exports.OvaleCooldownClass = __class(States, {
             self.module:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", self.Update)
             self.module:RegisterEvent("UPDATE_SHAPESHIFT_COOLDOWN", self.Update)
             self.lastSpell:RegisterSpellcastInfo(self)
-            RegisterRequirement("oncooldown", self.RequireCooldownHandler)
+            self.requirement:RegisterRequirement("oncooldown", self.RequireCooldownHandler)
         end
         self.OnDisable = function()
             self.lastSpell:UnregisterSpellcastInfo(self)
-            UnregisterRequirement("oncooldown")
+            self.requirement:UnregisterRequirement("oncooldown")
             self.module:UnregisterEvent("ACTIONBAR_UPDATE_COOLDOWN")
             self.module:UnregisterEvent("BAG_UPDATE_COOLDOWN")
             self.module:UnregisterEvent("PET_BAR_UPDATE_COOLDOWN")
@@ -212,7 +209,7 @@ __exports.OvaleCooldownClass = __class(States, {
             end
         else
             local start, duration, enable
-            local index, bookType = OvaleSpellBook:GetSpellBookIndex(spellId)
+            local index, bookType = self.ovaleSpellBook:GetSpellBookIndex(spellId)
             if index and bookType then
                 start, duration, enable = GetSpellCooldown(index, bookType)
             else

@@ -1,8 +1,6 @@
 local __exports = LibStub:NewLibrary("ovale/scripts/ovale_common", 80201)
 if not __exports then return end
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-__exports.register = function()
+__exports.registerCommon = function(OvaleScripts)
     local name = "ovale_common"
     local desc = "[8.2] Ovale: Common spell definitions"
     local code = [[

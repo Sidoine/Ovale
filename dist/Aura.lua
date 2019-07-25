@@ -5,14 +5,8 @@ local __Localization = LibStub:GetLibrary("ovale/Localization")
 local L = __Localization.L
 local __Pool = LibStub:GetLibrary("ovale/Pool")
 local OvalePool = __Pool.OvalePool
-local __SpellBook = LibStub:GetLibrary("ovale/SpellBook")
-local OvaleSpellBook = __SpellBook.OvaleSpellBook
 local __State = LibStub:GetLibrary("ovale/State")
 local States = __State.States
-local __Requirement = LibStub:GetLibrary("ovale/Requirement")
-local RegisterRequirement = __Requirement.RegisterRequirement
-local UnregisterRequirement = __Requirement.UnregisterRequirement
-local CheckRequirements = __Requirement.CheckRequirements
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local pairs = pairs
 local tonumber = tonumber
@@ -195,7 +189,7 @@ local stacks
 local startChangeCount, endingChangeCount
 local startFirst, endingLast
 __exports.OvaleAuraClass = __class(States, {
-    constructor = function(self, ovaleState, ovalePaperDoll, baseState, ovaleData, ovaleGuid, lastSpell, ovaleOptions, ovaleDebug, ovale, ovaleProfiler)
+    constructor = function(self, ovaleState, ovalePaperDoll, baseState, ovaleData, ovaleGuid, lastSpell, ovaleOptions, ovaleDebug, ovale, ovaleProfiler, ovaleSpellBook, requirement)
         self.ovaleState = ovaleState
         self.ovalePaperDoll = ovalePaperDoll
         self.baseState = baseState
@@ -205,6 +199,8 @@ __exports.OvaleAuraClass = __class(States, {
         self.ovaleOptions = ovaleOptions
         self.ovaleDebug = ovaleDebug
         self.ovale = ovale
+        self.ovaleSpellBook = ovaleSpellBook
+        self.requirement = requirement
         self.OnInitialize = function()
             self_playerGUID = self.ovale.playerGUID
             self_petGUID = self.ovaleGuid.petGUID
@@ -214,32 +210,32 @@ __exports.OvaleAuraClass = __class(States, {
             self.module:RegisterEvent("UNIT_AURA", self.UNIT_AURA)
             self.module:RegisterMessage("Ovale_GroupChanged", self.handleOvaleGroupChanged)
             self.module:RegisterMessage("Ovale_UnitChanged", self.Ovale_UnitChanged)
-            RegisterRequirement("buff", self.RequireBuffHandler)
-            RegisterRequirement("buff_any", self.RequireBuffHandler)
-            RegisterRequirement("debuff", self.RequireBuffHandler)
-            RegisterRequirement("debuff_any", self.RequireBuffHandler)
-            RegisterRequirement("pet_buff", self.RequireBuffHandler)
-            RegisterRequirement("pet_debuff", self.RequireBuffHandler)
-            RegisterRequirement("stealth", self.RequireStealthHandler)
-            RegisterRequirement("stealthed", self.RequireStealthHandler)
-            RegisterRequirement("target_buff", self.RequireBuffHandler)
-            RegisterRequirement("target_buff_any", self.RequireBuffHandler)
-            RegisterRequirement("target_debuff", self.RequireBuffHandler)
-            RegisterRequirement("target_debuff_any", self.RequireBuffHandler)
+            self.requirement:RegisterRequirement("buff", self.RequireBuffHandler)
+            self.requirement:RegisterRequirement("buff_any", self.RequireBuffHandler)
+            self.requirement:RegisterRequirement("debuff", self.RequireBuffHandler)
+            self.requirement:RegisterRequirement("debuff_any", self.RequireBuffHandler)
+            self.requirement:RegisterRequirement("pet_buff", self.RequireBuffHandler)
+            self.requirement:RegisterRequirement("pet_debuff", self.RequireBuffHandler)
+            self.requirement:RegisterRequirement("stealth", self.RequireStealthHandler)
+            self.requirement:RegisterRequirement("stealthed", self.RequireStealthHandler)
+            self.requirement:RegisterRequirement("target_buff", self.RequireBuffHandler)
+            self.requirement:RegisterRequirement("target_buff_any", self.RequireBuffHandler)
+            self.requirement:RegisterRequirement("target_debuff", self.RequireBuffHandler)
+            self.requirement:RegisterRequirement("target_debuff_any", self.RequireBuffHandler)
         end
         self.OnDisable = function()
-            UnregisterRequirement("buff")
-            UnregisterRequirement("buff_any")
-            UnregisterRequirement("debuff")
-            UnregisterRequirement("debuff_any")
-            UnregisterRequirement("pet_buff")
-            UnregisterRequirement("pet_debuff")
-            UnregisterRequirement("stealth")
-            UnregisterRequirement("stealthed")
-            UnregisterRequirement("target_buff")
-            UnregisterRequirement("target_buff_any")
-            UnregisterRequirement("target_debuff")
-            UnregisterRequirement("target_debuff_any")
+            self.requirement:UnregisterRequirement("buff")
+            self.requirement:UnregisterRequirement("buff_any")
+            self.requirement:UnregisterRequirement("debuff")
+            self.requirement:UnregisterRequirement("debuff_any")
+            self.requirement:UnregisterRequirement("pet_buff")
+            self.requirement:UnregisterRequirement("pet_debuff")
+            self.requirement:UnregisterRequirement("stealth")
+            self.requirement:UnregisterRequirement("stealthed")
+            self.requirement:UnregisterRequirement("target_buff")
+            self.requirement:UnregisterRequirement("target_buff_any")
+            self.requirement:UnregisterRequirement("target_debuff")
+            self.requirement:UnregisterRequirement("target_debuff_any")
             self.module:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
             self.module:UnregisterEvent("PLAYER_ENTERING_WORLD")
             self.module:UnregisterEvent("PLAYER_REGEN_ENABLED")
@@ -462,19 +458,18 @@ __exports.OvaleAuraClass = __class(States, {
                         get = function(info)
                             wipe(output)
                             local now = GetTime()
-                            local helpful = self.DebugUnitAuras("player", "HELPFUL", now)
+                            local helpful = self:DebugUnitAuras("player", "HELPFUL", now)
                             if helpful then
                                 output[#output + 1] = "== BUFFS =="
                                 output[#output + 1] = helpful
                             end
-                            local harmful = self.DebugUnitAuras("player", "HARMFUL", now)
+                            local harmful = self:DebugUnitAuras("player", "HARMFUL", now)
                             if harmful then
                                 output[#output + 1] = "== DEBUFFS =="
                                 output[#output + 1] = harmful
                             end
                             return tconcat(output, "\n")
                         end
-
                     }
                 }
             },
@@ -490,19 +485,18 @@ __exports.OvaleAuraClass = __class(States, {
                         get = function(info)
                             wipe(output)
                             local now = GetTime()
-                            local helpful = self.DebugUnitAuras("target", "HELPFUL", now)
+                            local helpful = self:DebugUnitAuras("target", "HELPFUL", now)
                             if helpful then
                                 output[#output + 1] = "== BUFFS =="
                                 output[#output + 1] = helpful
                             end
-                            local harmful = self.DebugUnitAuras("target", "HARMFUL", now)
+                            local harmful = self:DebugUnitAuras("target", "HARMFUL", now)
                             if harmful then
                                 output[#output + 1] = "== DEBUFFS =="
                                 output[#output + 1] = harmful
                             end
                             return tconcat(output, "\n")
                         end
-
                     }
                 }
             }
@@ -603,7 +597,7 @@ __exports.OvaleAuraClass = __class(States, {
                 end
                 if spellcast and spellcast.target == guid then
                     local spellId = spellcast.spellId
-                    local spellName = OvaleSpellBook:GetSpellName(spellId) or "Unknown spell"
+                    local spellName = self.ovaleSpellBook:GetSpellName(spellId) or "Unknown spell"
                     local keepSnapshot = false
                     local si = self.ovaleData.spellInfo[spellId]
                     if si and si.aura then
@@ -613,7 +607,7 @@ __exports.OvaleAuraClass = __class(States, {
                             if spellData == "refresh_keep_snapshot" then
                                 keepSnapshot = true
                             elseif isLuaArray(spellData) and spellData[1] == "refresh_keep_snapshot" then
-                                keepSnapshot = CheckRequirements(spellId, atTime, spellData, 2, guid)
+                                keepSnapshot = self.requirement:CheckRequirements(spellId, atTime, spellData, 2, guid)
                             end
                         end
                     end
@@ -678,7 +672,7 @@ __exports.OvaleAuraClass = __class(States, {
                     if spellcast then
                         if (spellcast.success and spellcast.stop and self:IsWithinAuraLag(spellcast.stop, aura.ending)) or (spellcast.queued and self:IsWithinAuraLag(spellcast.queued, aura.ending)) then
                             aura.consumed = true
-                            local spellName = OvaleSpellBook:GetSpellName(spellcast.spellId) or "Unknown spell"
+                            local spellName = self.ovaleSpellBook:GetSpellName(spellcast.spellId) or "Unknown spell"
                             self.debug:Debug("    Consuming %s %s (%d) on %s with queued %s (%d) at %f.", filter, aura.name, auraId, guid, spellName, spellcast.spellId, spellcast.queued)
                         end
                     end

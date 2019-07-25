@@ -1,50 +1,49 @@
 local __exports = LibStub:NewLibrary("ovale/Stagger", 80201)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __State = LibStub:GetLibrary("ovale/State")
-local OvaleState = __State.OvaleState
-local __Ovale = LibStub:GetLibrary("ovale/Ovale")
-local Ovale = __Ovale.Ovale
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local pairs = pairs
 local insert = table.insert
 local remove = table.remove
-local __Future = LibStub:GetLibrary("ovale/Future")
-local OvaleFuture = __Future.OvaleFuture
-local OvaleStaggerBase = Ovale.NewModule("OvaleStagger", aceEvent)
 local self_serial = 1
 local MAX_LENGTH = 30
-local OvaleStaggerClass = __class(OvaleStaggerBase, {
-    OnInitialize = function(self)
-        if Ovale.playerClass == "MONK" then
-            self.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-        end
-    end,
-    OnDisable = function(self)
-        if Ovale.playerClass == "MONK" then
-            self.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-        end
-    end,
-    COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
-        local _, cleuEvent, _, sourceGUID, _, _, _, _, _, _, _, spellId, _, _, amount = CombatLogGetCurrentEventInfo()
-        if sourceGUID ~= Ovale.playerGUID then
-            return 
-        end
-        self_serial = self_serial + 1
-        if cleuEvent == "SPELL_PERIODIC_DAMAGE" and spellId == 124255 then
-            insert(self.staggerTicks, amount)
-            if #self.staggerTicks > MAX_LENGTH then
-                remove(self.staggerTicks, 1)
+__exports.OvaleStaggerClass = __class(nil, {
+    constructor = function(self, ovale, ovaleFuture)
+        self.ovale = ovale
+        self.ovaleFuture = ovaleFuture
+        self.staggerTicks = {}
+        self.OnInitialize = function()
+            if self.ovale.playerClass == "MONK" then
+                self.module:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", self.COMBAT_LOG_EVENT_UNFILTERED)
             end
         end
+        self.OnDisable = function()
+            if self.ovale.playerClass == "MONK" then
+                self.module:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+            end
+        end
+        self.COMBAT_LOG_EVENT_UNFILTERED = function(event, ...)
+            local _, cleuEvent, _, sourceGUID, _, _, _, _, _, _, _, spellId, _, _, amount = CombatLogGetCurrentEventInfo()
+            if sourceGUID ~= self.ovale.playerGUID then
+                return 
+            end
+            self_serial = self_serial + 1
+            if cleuEvent == "SPELL_PERIODIC_DAMAGE" and spellId == 124255 then
+                insert(self.staggerTicks, amount)
+                if #self.staggerTicks > MAX_LENGTH then
+                    remove(self.staggerTicks, 1)
+                end
+            end
+        end
+        self.module = ovale:createModule("OvaleStagger", self.OnInitialize, self.OnDisable, aceEvent)
     end,
     CleanState = function(self)
     end,
     InitializeState = function(self)
     end,
     ResetState = function(self)
-        if  not OvaleFuture.IsInCombat(nil) then
+        if  not self.ovaleFuture:IsInCombat(nil) then
             for k in pairs(self.staggerTicks) do
                 self.staggerTicks[k] = nil
             end
@@ -64,10 +63,4 @@ local OvaleStaggerClass = __class(OvaleStaggerBase, {
         end
         return damage
     end,
-    constructor = function(self, ...)
-        OvaleStaggerBase.constructor(self, ...)
-        self.staggerTicks = {}
-    end
 })
-__exports.OvaleStagger = OvaleStaggerClass()
-OvaleState.RegisterState(__exports.OvaleStagger)

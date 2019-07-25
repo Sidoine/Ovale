@@ -12,6 +12,8 @@ local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local InterfaceOptionsFrame_OpenToCategory = InterfaceOptionsFrame_OpenToCategory
 local ipairs = ipairs
 local huge = math.huge
+local __Ovale = LibStub:GetLibrary("ovale/Ovale")
+local Print = __Ovale.Print
 local self_register = {}
 __exports.OvaleOptionsClass = __class(nil, {
     constructor = function(self, ovale)
@@ -66,7 +68,34 @@ __exports.OvaleOptionsClass = __class(nil, {
                     auraLag = 400,
                     moving = false,
                     spellFlash = {
-                        enabled = true
+                        enabled = true,
+                        brightness = 1,
+                        hasHostileTarget = false,
+                        hasTarget = false,
+                        hideInVehicle = false,
+                        inCombat = false,
+                        size = 2.4,
+                        threshold = 500,
+                        colorMain = {
+                            r = 1,
+                            g = 1,
+                            b = 1
+                        },
+                        colorShortCd = {
+                            r = 1,
+                            g = 1,
+                            b = 0
+                        },
+                        colorCd = {
+                            r = 1,
+                            g = 1,
+                            b = 0
+                        },
+                        colorInterrupt = {
+                            r = 0,
+                            g = 1,
+                            b = 1
+                        }
                     },
                     minimap = {
                         hide = false
@@ -458,7 +487,7 @@ __exports.OvaleOptionsClass = __class(nil, {
                                 if minRefresh == huge then
                                     avgRefresh, minRefresh, maxRefresh, count = 0, 0, 0, 0
                                 end
-                                self.ovale:Print("Refresh intervals: count = %d, avg = %d, min = %d, max = %d (ms)", count, avgRefresh, minRefresh, maxRefresh)
+                                Print("Refresh intervals: count = %d, avg = %d, min = %d, max = %d (ms)", count, avgRefresh, minRefresh, maxRefresh)
                             end
                         }
                     }

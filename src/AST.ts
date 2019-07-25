@@ -7,7 +7,7 @@ import { OvaleConditionClass } from "./Condition";
 import { OvaleLexer, LexerFilter } from "./Lexer";
 import { OvaleScriptsClass } from "./Scripts";
 import { OvaleSpellBookClass } from "./SpellBook";
-import { OvaleStance } from "./Stance";
+import { STANCE_NAME } from "./Stance";
 import { LuaArray, LuaObj, ipairs, next, pairs, tonumber, tostring, type, wipe, lualength, kpairs } from "@wowts/lua";
 import { format, gsub, lower, sub } from "@wowts/string";
 import { concat, insert, sort } from "@wowts/table";
@@ -2816,7 +2816,7 @@ export class OvaleASTClass {
                                 if (!isString(value)) {
                                     this.debug.Error("stance must be a string or a number");
                                 }
-                                else if (!OvaleStance.STANCE_NAME[value]) {
+                                else if (!checkToken(STANCE_NAME, value)) {
                                     this.debug.Error("unknown stance '%s'.", value);
                                 }
                             }                            

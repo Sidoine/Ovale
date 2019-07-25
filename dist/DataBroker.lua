@@ -6,10 +6,7 @@ local L = __Localization.L
 local LibDataBroker = LibStub:GetLibrary("LibDataBroker-1.1", true)
 local LibDBIcon = LibStub:GetLibrary("LibDBIcon-1.0", true)
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
 local DEFAULT_NAME = __Scripts.DEFAULT_NAME
-local __Version = LibStub:GetLibrary("ovale/Version")
-local OvaleVersion = __Version.OvaleVersion
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local pairs = pairs
 local insert = table.insert
@@ -37,15 +34,17 @@ local defaultDB = {
     minimap = {}
 }
 __exports.OvaleDataBrokerClass = __class(nil, {
-    constructor = function(self, ovalePaperDoll, ovaleFrameModule, ovaleOptions, ovale, ovaleDebug)
+    constructor = function(self, ovalePaperDoll, ovaleFrameModule, ovaleOptions, ovale, ovaleDebug, ovaleScripts, ovaleVersion)
         self.ovalePaperDoll = ovalePaperDoll
         self.ovaleFrameModule = ovaleFrameModule
         self.ovaleOptions = ovaleOptions
         self.ovale = ovale
         self.ovaleDebug = ovaleDebug
+        self.ovaleScripts = ovaleScripts
+        self.ovaleVersion = ovaleVersion
         self.broker = nil
         self.OnTooltipShow = function(tooltip)
-            self_tooltipTitle = self_tooltipTitle or self.ovale:GetName() .. " " .. OvaleVersion.version
+            self_tooltipTitle = self_tooltipTitle or self.ovale:GetName() .. " " .. self.ovaleVersion.version
             tooltip:SetText(self_tooltipTitle, 1, 1, 1)
             tooltip:AddLine(L["Click to select the script."])
             tooltip:AddLine(L["Middle-Click to toggle the script options panel."])
@@ -61,14 +60,13 @@ __exports.OvaleDataBrokerClass = __class(nil, {
                     }
                 }
                 local scriptType = ( not self.ovaleOptions.db.profile.showHiddenScripts and "script") or nil
-                local descriptions = OvaleScripts:GetDescriptions(scriptType)
+                local descriptions = self.ovaleScripts:GetDescriptions(scriptType)
                 for name, description in pairs(descriptions) do
                     local menuItem = {
                         text = description,
                         func = function()
-                            OvaleScripts:SetScript(name)
+                            self.ovaleScripts:SetScript(name)
                         end
-
                     }
                     insert(menu, menuItem)
                 end
@@ -128,7 +126,7 @@ __exports.OvaleDataBrokerClass = __class(nil, {
         end
         self.Ovale_ScriptChanged = function()
             local script = self.ovaleOptions.db.profile.source[self.ovale.playerClass .. "_" .. self.ovalePaperDoll:GetSpecialization()]
-            self.broker.text = (script == DEFAULT_NAME and OvaleScripts:GetDefaultScriptName(self.ovale.playerClass, self.ovalePaperDoll:GetSpecialization())) or script or "Disabled"
+            self.broker.text = (script == DEFAULT_NAME and self.ovaleScripts:GetDefaultScriptName(self.ovale.playerClass, self.ovalePaperDoll:GetSpecialization())) or script or "Disabled"
         end
         self.module = ovale:createModule("OvaleDataBroker", self.OnInitialize, self.OnDisable, aceEvent)
         local options = {

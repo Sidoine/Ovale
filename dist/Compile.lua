@@ -5,12 +5,6 @@ local __AST = LibStub:GetLibrary("ovale/AST")
 local PARAMETER_KEYWORD = __AST.PARAMETER_KEYWORD
 local __Power = LibStub:GetLibrary("ovale/Power")
 local POWER_TYPES = __Power.POWER_TYPES
-local __Score = LibStub:GetLibrary("ovale/Score")
-local OvaleScore = __Score.OvaleScore
-local __SpellBook = LibStub:GetLibrary("ovale/SpellBook")
-local OvaleSpellBook = __SpellBook.OvaleSpellBook
-local __Stance = LibStub:GetLibrary("ovale/Stance")
-local OvaleStance = __Stance.OvaleStance
 local __Controls = LibStub:GetLibrary("ovale/Controls")
 local checkBoxes = __Controls.checkBoxes
 local lists = __Controls.lists
@@ -33,7 +27,7 @@ local isLuaArray = __tools.isLuaArray
 local checkToken = __tools.checkToken
 local NUMBER_PATTERN = "^%-?%d+%.?%d*$"
 __exports.OvaleCompileClass = __class(nil, {
-    constructor = function(self, ovaleAzerite, ovaleEquipment, ovaleAst, ovaleCondition, ovaleCooldown, ovalePaperDoll, ovaleData, ovaleProfiler, ovaleDebug, ovaleOptions, ovale)
+    constructor = function(self, ovaleAzerite, ovaleEquipment, ovaleAst, ovaleCondition, ovaleCooldown, ovalePaperDoll, ovaleData, ovaleProfiler, ovaleDebug, ovaleOptions, ovale, ovaleScore, ovaleSpellBook, ovaleStance)
         self.ovaleAzerite = ovaleAzerite
         self.ovaleEquipment = ovaleEquipment
         self.ovaleAst = ovaleAst
@@ -44,6 +38,9 @@ __exports.OvaleCompileClass = __class(nil, {
         self.ovaleDebug = ovaleDebug
         self.ovaleOptions = ovaleOptions
         self.ovale = ovale
+        self.ovaleScore = ovaleScore
+        self.ovaleSpellBook = ovaleSpellBook
+        self.ovaleStance = ovaleStance
         self.serial = nil
         self.ast = nil
         self.compileOnStances = false
@@ -64,12 +61,12 @@ __exports.OvaleCompileClass = __class(nil, {
         self.TestConditionStance = function(value)
             self.compileOnStances = true
             local stance, required = self:RequireValue(value)
-            local isStance = OvaleStance:IsStance(stance, nil)
+            local isStance = self.ovaleStance:IsStance(stance, nil)
             return (required and isStance) or ( not required and  not isStance)
         end
         self.TestConditionSpell = function(value)
             local spell, required = self:RequireValue(value)
-            local hasSpell = OvaleSpellBook:IsKnownSpell(spell)
+            local hasSpell = self.ovaleSpellBook:IsKnownSpell(spell)
             return (required and hasSpell) or ( not required and  not hasSpell)
         end
         self.TestConditionTalent = function(value)
@@ -154,8 +151,8 @@ __exports.OvaleCompileClass = __class(nil, {
         self.module = ovale:createModule("OvaleCompile", self.OnInitialize, self.OnDisable, aceEvent)
     end,
     HasTalent = function(self, talentId)
-        if OvaleSpellBook:IsKnownTalent(talentId) then
-            return OvaleSpellBook:GetTalentPoints(talentId) > 0
+        if self.ovaleSpellBook:IsKnownTalent(talentId) then
+            return self.ovaleSpellBook:GetTalentPoints(talentId) > 0
         else
             self.tracer:Error("Unknown talent ID '%s'", talentId)
             return false
@@ -367,7 +364,7 @@ __exports.OvaleCompileClass = __class(nil, {
         for _, _spellId in ipairs(positionalParams) do
             local spellId = tonumber(_spellId)
             if spellId then
-                OvaleScore:AddSpell(tonumber(spellId))
+                self.ovaleScore:AddSpell(tonumber(spellId))
             else
                 ok = false
                 break
@@ -462,10 +459,10 @@ __exports.OvaleCompileClass = __class(nil, {
                     if  not spellName then
                         spellName = v
                     end
-                    OvaleSpellBook:AddSpell(spellId, spellName)
+                    self.ovaleSpellBook:AddSpell(spellId, spellName)
                 elseif k == "learn" and v == 1 then
                     local spellName = GetSpellInfo(spellId)
-                    OvaleSpellBook:AddSpell(spellId, spellName)
+                    self.ovaleSpellBook:AddSpell(spellId, spellName)
                 elseif k == "shared_cd" then
                     si[k] = v
                     self.ovaleCooldown:AddSharedCooldown(v, spellId)
@@ -520,16 +517,16 @@ __exports.OvaleCompileClass = __class(nil, {
                 local positionalParams = node.positionalParams, node.namedParams
                 local spellId = positionalParams[1]
                 if spellId and self.ovaleCondition:IsSpellBookCondition(node.func) then
-                    if  not OvaleSpellBook:IsKnownSpell(spellId) and  not self.ovaleCooldown:IsSharedCooldown(spellId) then
+                    if  not self.ovaleSpellBook:IsKnownSpell(spellId) and  not self.ovaleCooldown:IsSharedCooldown(spellId) then
                         local spellName
                         if type(spellId) == "number" then
-                            spellName = OvaleSpellBook:GetSpellName(spellId)
+                            spellName = self.ovaleSpellBook:GetSpellName(spellId)
                         end
                         if spellName then
                             local name = GetSpellInfo(spellName)
                             if spellName == name then
                                 self.tracer:Debug("Learning spell %s with ID %d.", spellName, spellId)
-                                OvaleSpellBook:AddSpell(spellId, spellName)
+                                self.ovaleSpellBook:AddSpell(spellId, spellName)
                             end
                         else
                             local functionCall = node.name
@@ -607,6 +604,7 @@ __exports.OvaleCompileClass = __class(nil, {
             self.ast = self.ovaleAst:ParseScript(name)
         end
         ResetControls()
+        return self.ast
     end,
     EvaluateScript = function(self, ast, forceEvaluation)
         self.profiler:StartProfiling("OvaleCompile_EvaluateScript")

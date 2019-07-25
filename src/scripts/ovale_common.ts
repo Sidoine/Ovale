@@ -1,5 +1,6 @@
-import { OvaleScripts } from "../Scripts";
-export function register() {
+import { OvaleScriptsClass } from "../Scripts";
+
+export function registerCommon(OvaleScripts: OvaleScriptsClass) {
     let name = "ovale_common";
     let desc = "[8.2] Ovale: Common spell definitions";
     let code = `

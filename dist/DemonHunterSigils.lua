@@ -1,8 +1,6 @@
 local __exports = LibStub:NewLibrary("ovale/DemonHunterSigils", 80201)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __SpellBook = LibStub:GetLibrary("ovale/SpellBook")
-local OvaleSpellBook = __SpellBook.OvaleSpellBook
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local ipairs = ipairs
 local tonumber = tonumber
@@ -50,9 +48,10 @@ local sigil_end = {
 }
 local QUICKENED_SIGILS_TALENT = 14
 __exports.OvaleSigilClass = __class(nil, {
-    constructor = function(self, ovalePaperDoll, ovale)
+    constructor = function(self, ovalePaperDoll, ovale, ovaleSpellBook)
         self.ovalePaperDoll = ovalePaperDoll
         self.ovale = ovale
+        self.ovaleSpellBook = ovaleSpellBook
         self.OnInitialize = function()
             if self.ovale.playerClass == "DEMONHUNTER" then
                 self.module:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", self.UNIT_SPELLCAST_SUCCEEDED)
@@ -90,7 +89,7 @@ __exports.OvaleSigilClass = __class(nil, {
                 local s = sigil_start[id]
                 local t = s.type
                 local tal = s.talent or nil
-                if (tal == nil or OvaleSpellBook:GetTalentPoints(tal) > 0) then
+                if (tal == nil or self.ovaleSpellBook:GetTalentPoints(tal) > 0) then
                     insert(activated_sigils[t], GetTime())
                 end
             end
@@ -108,7 +107,7 @@ __exports.OvaleSigilClass = __class(nil, {
         local charging = false
         for _, v in ipairs(activated_sigils[type]) do
             local activation_time = SIGIL_ACTIVATION_TIME + UPDATE_DELAY
-            if (OvaleSpellBook:GetTalentPoints(QUICKENED_SIGILS_TALENT) > 0) then
+            if (self.ovaleSpellBook:GetTalentPoints(QUICKENED_SIGILS_TALENT) > 0) then
                 activation_time = activation_time - 1
             end
             charging = charging or atTime < v + activation_time

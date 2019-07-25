@@ -29,40 +29,40 @@ __exports.OvaleAzeriteEssenceClass = __class(nil, {
                 }
             }
         }
-        self.module = ovale:createModule("OvaleAzeriteEssence", aceEvent)
+        self.OnInitialize = function()
+            self.module:RegisterEvent("AZERITE_ESSENCE_CHANGED", self.UpdateEssences)
+            self.module:RegisterEvent("AZERITE_ESSENCE_UPDATE", self.UpdateEssences)
+            self.module:RegisterEvent("PLAYER_ENTERING_WORLD", self.UpdateEssences)
+        end
+        self.OnDisable = function()
+            self.module:UnregisterEvent("AZERITE_ESSENCE_CHANGED")
+            self.module:UnregisterEvent("AZERITE_ESSENCE_UPDATE")
+            self.module:UnregisterEvent("PLAYER_ENTERING_WORLD")
+        end
+        self.UpdateEssences = function(e)
+            self.tracer:Debug("UpdateEssences after event %s", e)
+            self.self_essences = {}
+            for _, mileStoneInfo in pairs(C_AzeriteEssence.GetMilestones() or {}) do
+                if mileStoneInfo.ID and mileStoneInfo.unlocked and mileStoneInfo.slot ~= nil then
+                    local essenceId = C_AzeriteEssence.GetMilestoneEssence(mileStoneInfo.ID)
+                    if essenceId then
+                        local essenceInfo = C_AzeriteEssence.GetEssenceInfo(essenceId)
+                        local essenceData = {
+                            ID = essenceId,
+                            name = essenceInfo.name,
+                            rank = essenceInfo.rank,
+                            slot = mileStoneInfo.slot
+                        }
+                        self.self_essences[essenceId] = essenceData
+                        self.tracer:Debug("Found essence {ID: %d, name: %s, rank: %d, slot: %d}", essenceData.ID, essenceData.name, essenceData.rank, essenceData.slot)
+                    end
+                end
+            end
+        end
+        self.module = ovale:createModule("OvaleAzeriteEssence", self.OnInitialize, self.OnDisable, aceEvent)
         self.tracer = ovaleDebug:create("OvaleAzeriteEssence")
         for k, v in pairs(self.debugOptions) do
             ovaleDebug.defaultOptions.args[k] = v
-        end
-    end,
-    OnInitialize = function(self)
-        self.module:RegisterEvent("AZERITE_ESSENCE_CHANGED", "UpdateEssences")
-        self.module:RegisterEvent("AZERITE_ESSENCE_UPDATE", "UpdateEssences")
-        self.module:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateEssences")
-    end,
-    OnDisable = function(self)
-        self.module:UnregisterEvent("AZERITE_ESSENCE_CHANGED")
-        self.module:UnregisterEvent("AZERITE_ESSENCE_UPDATE")
-        self.module:UnregisterEvent("PLAYER_ENTERING_WORLD")
-    end,
-    UpdateEssences = function(self, e)
-        self.tracer:Debug("UpdateEssences after event %s", e)
-        self.self_essences = {}
-        for _, mileStoneInfo in pairs(C_AzeriteEssence.GetMilestones() or {}) do
-            if mileStoneInfo.ID and mileStoneInfo.unlocked and mileStoneInfo.slot ~= nil then
-                local essenceId = C_AzeriteEssence.GetMilestoneEssence(mileStoneInfo.ID)
-                if essenceId then
-                    local essenceInfo = C_AzeriteEssence.GetEssenceInfo(essenceId)
-                    local essenceData = {
-                        ID = essenceId,
-                        name = essenceInfo.name,
-                        rank = essenceInfo.rank,
-                        slot = mileStoneInfo.slot
-                    }
-                    self.self_essences[essenceId] = essenceData
-                    self.tracer:Debug("Found essence {ID: %d, name: %s, rank: %d, slot: %d}", essenceData.ID, essenceData.name, essenceData.rank, essenceData.slot)
-                end
-            end
         end
     end,
     IsMajorEssence = function(self, essenceId)

@@ -68,11 +68,3 @@ __exports.OvaleDemonHunterSoulFragmentsClass = __class(nil, {
         return stacks
     end,
 })
-__exports.DemonHunterSoulFragmentsState = __class(nil, {
-    CleanState = function(self)
-    end,
-    InitializeState = function(self)
-    end,
-    ResetState = function(self)
-    end,
-})

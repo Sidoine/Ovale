@@ -3,7 +3,7 @@ import AceConfigDialog from "@wowts/ace_config_dialog-3.0";
 import { L } from "./Localization";
 import LibTextDump, { TextDump } from "@wowts/lib_text_dump-1.0";
 import { OvaleOptionsClass } from "./Options";
-import { OvaleClass } from "./Ovale";
+import { OvaleClass, Print } from "./Ovale";
 import { debugprofilestop, GetTime } from "@wowts/wow-mock";
 import { format } from "@wowts/string";
 import { pairs, next, wipe, LuaObj, lualength, LuaArray } from "@wowts/lua";
@@ -207,11 +207,11 @@ export class OvaleProfilerClass {
     }
 
     DebuggingInfo() {
-        this.ovale.Print("Profiler stack size = %d", self_stackSize);
+        Print("Profiler stack size = %d", self_stackSize);
         let index = self_stackSize;
         while (index > 0 && self_stackSize - index < 10) {
             let tag = self_stack[index];
-            this.ovale.Print("    [%d] %s", index, tag);
+            Print("    [%d] %s", index, tag);
             index = index - 1;
         }
     }

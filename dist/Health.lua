@@ -1,15 +1,6 @@
 local __exports = LibStub:NewLibrary("ovale/Health", 80201)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __Debug = LibStub:GetLibrary("ovale/Debug")
-local OvaleDebug = __Debug.OvaleDebug
-local __Profiler = LibStub:GetLibrary("ovale/Profiler")
-local OvaleProfiler = __Profiler.OvaleProfiler
-local __Ovale = LibStub:GetLibrary("ovale/Ovale")
-local Ovale = __Ovale.Ovale
-local __Requirement = LibStub:GetLibrary("ovale/Requirement")
-local RegisterRequirement = __Requirement.RegisterRequirement
-local UnregisterRequirement = __Requirement.UnregisterRequirement
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local sub = string.sub
 local tonumber = tonumber
@@ -20,7 +11,6 @@ local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs
 local UnitGetTotalHealAbsorbs = UnitGetTotalHealAbsorbs
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local huge = math.huge
-local OvaleHealthBase = Ovale.NewModule("OvaleHealth", aceEvent)
 local INFINITY = huge
 local CLEU_DAMAGE_EVENT = {
     DAMAGE_SHIELD = true,
@@ -36,11 +26,13 @@ local CLEU_HEAL_EVENT = {
     SPELL_HEAL = true,
     SPELL_PERIODIC_HEAL = true
 }
-local OvaleHealthClassBase = OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(OvaleHealthBase))
-__exports.OvaleHealthClass = __class(OvaleHealthClassBase, {
-    constructor = function(self, ovaleGuid, baseState)
+__exports.OvaleHealthClass = __class(nil, {
+    constructor = function(self, ovaleGuid, baseState, ovale, ovaleOptions, ovaleDebug, ovaleProfiler, requirement)
         self.ovaleGuid = ovaleGuid
         self.baseState = baseState
+        self.ovale = ovale
+        self.ovaleOptions = ovaleOptions
+        self.requirement = requirement
         self.health = {}
         self.maxHealth = {}
         self.absorb = {}
@@ -49,6 +41,148 @@ __exports.OvaleHealthClass = __class(OvaleHealthClassBase, {
         self.totalHealing = {}
         self.firstSeen = {}
         self.lastUpdated = {}
+        self.OnInitialize = function()
+            self.module:RegisterEvent("PLAYER_REGEN_DISABLED", self.PLAYER_REGEN_DISABLED)
+            self.module:RegisterEvent("PLAYER_REGEN_ENABLED", self.PLAYER_REGEN_ENABLED)
+            if self.ovaleOptions.db.profile.apparence.frequentHealthUpdates then
+                self.module:RegisterEvent("UNIT_HEALTH_FREQUENT", self.UpdateHealth)
+            else
+                self.module:RegisterEvent("UNIT_HEALTH", self.UpdateHealth)
+            end
+            self.module:RegisterEvent("UNIT_MAXHEALTH", self.UpdateHealth)
+            self.module:RegisterEvent("UNIT_ABSORB_AMOUNT_CHANGED", self.UpdateAbsorb)
+            self.module:RegisterEvent("UNIT_HEAL_ABSORB_AMOUNT_CHANGED", self.UpdateAbsorb)
+            self.module:RegisterMessage("Ovale_UnitChanged", self.Ovale_UnitChanged)
+            self.requirement:RegisterRequirement("health_pct", self.RequireHealthPercentHandler)
+            self.requirement:RegisterRequirement("pet_health_pct", self.RequireHealthPercentHandler)
+            self.requirement:RegisterRequirement("target_health_pct", self.RequireHealthPercentHandler)
+        end
+        self.OnDisable = function()
+            self.requirement:UnregisterRequirement("health_pct")
+            self.requirement:UnregisterRequirement("pet_health_pct")
+            self.requirement:UnregisterRequirement("target_health_pct")
+            self.module:UnregisterEvent("PLAYER_REGEN_ENABLED")
+            self.module:UnregisterEvent("PLAYER_TARGET_CHANGED")
+            self.module:UnregisterEvent("UNIT_HEALTH_FREQUENT")
+            self.module:UnregisterEvent("UNIT_HEALTH")
+            self.module:UnregisterEvent("UNIT_MAXHEALTH")
+            self.module:UnregisterEvent("UNIT_ABSORB_AMOUNT_CHANGED")
+            self.module:UnregisterEvent("UNIT_HEAL_ABSORB_AMOUNT_CHANGED")
+            self.module:UnregisterMessage("Ovale_UnitChanged")
+        end
+        self.COMBAT_LOG_EVENT_UNFILTERED = function(event, ...)
+            local timestamp, cleuEvent, _, _, _, _, _, destGUID, _, _, _, arg12, arg13, _, arg15 = CombatLogGetCurrentEventInfo()
+            self.profiler:StartProfiling("OvaleHealth_COMBAT_LOG_EVENT_UNFILTERED")
+            local healthUpdate = false
+            if CLEU_DAMAGE_EVENT[cleuEvent] then
+                local amount
+                if cleuEvent == "SWING_DAMAGE" then
+                    amount = arg12
+                elseif cleuEvent == "ENVIRONMENTAL_DAMAGE" then
+                    amount = arg13
+                else
+                    amount = arg15
+                end
+                self.tracer:Debug(cleuEvent, destGUID, amount)
+                local total = self.totalDamage[destGUID] or 0
+                self.totalDamage[destGUID] = total + amount
+                healthUpdate = true
+            elseif CLEU_HEAL_EVENT[cleuEvent] then
+                local amount = arg15
+                self.tracer:Debug(cleuEvent, destGUID, amount)
+                local total = self.totalHealing[destGUID] or 0
+                self.totalHealing[destGUID] = total + amount
+                healthUpdate = true
+            end
+            if healthUpdate then
+                if  not self.firstSeen[destGUID] then
+                    self.firstSeen[destGUID] = timestamp
+                end
+                self.lastUpdated[destGUID] = timestamp
+            end
+            self.profiler:StopProfiling("OvaleHealth_COMBAT_LOG_EVENT_UNFILTERED")
+        end
+        self.PLAYER_REGEN_DISABLED = function(event)
+            self.module:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", self.COMBAT_LOG_EVENT_UNFILTERED)
+        end
+        self.PLAYER_REGEN_ENABLED = function(event)
+            self.module:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+            wipe(self.totalDamage)
+            wipe(self.totalHealing)
+            wipe(self.firstSeen)
+            wipe(self.lastUpdated)
+        end
+        self.Ovale_UnitChanged = function(event, unitId, guid)
+            self.profiler:StartProfiling("Ovale_UnitChanged")
+            if unitId == "target" or unitId == "focus" then
+                self.tracer:Debug(event, unitId, guid)
+                self.UpdateHealth("UNIT_HEALTH_FREQUENT", unitId)
+                self.UpdateHealth("UNIT_MAXHEALTH", unitId)
+                self.UpdateAbsorb("UNIT_ABSORB_AMOUNT_CHANGED", unitId)
+                self.UpdateAbsorb("UNIT_HEAL_ABSORB_AMOUNT_CHANGED", unitId)
+            end
+            self.profiler:StopProfiling("Ovale_UnitChanged")
+        end
+        self.UpdateAbsorb = function(event, unitId)
+            if  not unitId then
+                return 
+            end
+            self.profiler:StartProfiling("OvaleHealth_UpdateAbsorb")
+            local func
+            local db
+            if event == "UNIT_ABSORB_AMOUNT_CHANGED" then
+                func = UnitGetTotalAbsorbs
+                db = self.absorb
+            elseif event == "UNIT_HEAL_ABSORB_AMOUNT_CHANGED" then
+                func = UnitGetTotalHealAbsorbs
+                db = self.absorb
+            else
+                self.ovale:OneTimeMessage("Warning: Invalid event (%s) in UpdateAbsorb.", event)
+                return 
+            end
+            local amount = func(unitId)
+            if amount >= 0 then
+                local guid = self.ovaleGuid:UnitGUID(unitId)
+                self.tracer:Debug(event, unitId, guid, amount)
+                if guid then
+                    db[guid] = amount
+                end
+            end
+            self.profiler:StopProfiling("OvaleHealth_UpdateHealth")
+        end
+        self.UpdateHealth = function(event, unitId)
+            if  not unitId then
+                return 
+            end
+            self.profiler:StartProfiling("OvaleHealth_UpdateHealth")
+            local func
+            local db
+            if event == "UNIT_HEALTH_FREQUENT" or event == "UNIT_HEALTH" then
+                func = UnitHealth
+                db = self.health
+            elseif event == "UNIT_MAXHEALTH" then
+                func = UnitHealthMax
+                db = self.maxHealth
+            else
+                self.ovale:OneTimeMessage("Warning: Invalid event (%s) in UpdateHealth.", event)
+                return 
+            end
+            local amount = func(unitId)
+            if amount then
+                local guid = self.ovaleGuid:UnitGUID(unitId)
+                self.tracer:Debug(event, unitId, guid, amount)
+                if guid then
+                    if amount > 0 then
+                        db[guid] = amount
+                    else
+                        db[guid] = nil
+                        self.firstSeen[guid] = nil
+                        self.lastUpdated[guid] = nil
+                    end
+                end
+            end
+            self.profiler:StopProfiling("OvaleHealth_UpdateHealth")
+        end
         self.RequireHealthPercentHandler = function(spellId, atTime, requirement, tokens, index, targetGUID)
             local verified = false
             local threshold = tokens[index]
@@ -82,158 +216,18 @@ __exports.OvaleHealthClass = __class(OvaleHealthClassBase, {
                 end
                 local result = verified and "passed" or "FAILED"
                 if isBang then
-                    self.Log("    Require %s health > %f%% (%f) at time=%f: %s", unitId, threshold, healthPercent, atTime, result)
+                    self.tracer:Log("    Require %s health > %f%% (%f) at time=%f: %s", unitId, threshold, healthPercent, atTime, result)
                 else
-                    self.Log("    Require %s health <= %f%% (%f) at time=%f: %s", unitId, threshold, healthPercent, atTime, result)
+                    self.tracer:Log("    Require %s health <= %f%% (%f) at time=%f: %s", unitId, threshold, healthPercent, atTime, result)
                 end
             else
-                Ovale.OneTimeMessage("Warning: requirement '%s' is missing a threshold argument.", requirement)
+                self.ovale:OneTimeMessage("Warning: requirement '%s' is missing a threshold argument.", requirement)
             end
             return verified, requirement, index
         end
-        OvaleHealthClassBase.constructor(self)
-    end,
-    OnInitialize = function(self)
-        self.RegisterEvent("PLAYER_REGEN_DISABLED")
-        self.RegisterEvent("PLAYER_REGEN_ENABLED")
-        if Ovale.db.profile.apparence.frequentHealthUpdates then
-            self.RegisterEvent("UNIT_HEALTH_FREQUENT", "UpdateHealth")
-        else
-            self.RegisterEvent("UNIT_HEALTH", "UpdateHealth")
-        end
-        self.RegisterEvent("UNIT_MAXHEALTH", "UpdateHealth")
-        self.RegisterEvent("UNIT_ABSORB_AMOUNT_CHANGED", "UpdateAbsorb")
-        self.RegisterEvent("UNIT_HEAL_ABSORB_AMOUNT_CHANGED", "UpdateAbsorb")
-        self.RegisterMessage("Ovale_UnitChanged")
-        RegisterRequirement("health_pct", self.RequireHealthPercentHandler)
-        RegisterRequirement("pet_health_pct", self.RequireHealthPercentHandler)
-        RegisterRequirement("target_health_pct", self.RequireHealthPercentHandler)
-    end,
-    OnDisable = function(self)
-        UnregisterRequirement("health_pct")
-        UnregisterRequirement("pet_health_pct")
-        UnregisterRequirement("target_health_pct")
-        self.UnregisterEvent("PLAYER_REGEN_ENABLED")
-        self.UnregisterEvent("PLAYER_TARGET_CHANGED")
-        self.UnregisterEvent("UNIT_HEALTH_FREQUENT")
-        self.UnregisterEvent("UNIT_HEALTH")
-        self.UnregisterEvent("UNIT_MAXHEALTH")
-        self.UnregisterEvent("UNIT_ABSORB_AMOUNT_CHANGED")
-        self.UnregisterEvent("UNIT_HEAL_ABSORB_AMOUNT_CHANGED")
-        self.UnregisterMessage("Ovale_UnitChanged")
-    end,
-    COMBAT_LOG_EVENT_UNFILTERED = function(self, event, ...)
-        local timestamp, cleuEvent, _, _, _, _, _, destGUID, _, _, _, arg12, arg13, _, arg15 = CombatLogGetCurrentEventInfo()
-        self.StartProfiling("OvaleHealth_COMBAT_LOG_EVENT_UNFILTERED")
-        local healthUpdate = false
-        if CLEU_DAMAGE_EVENT[cleuEvent] then
-            local amount
-            if cleuEvent == "SWING_DAMAGE" then
-                amount = arg12
-            elseif cleuEvent == "ENVIRONMENTAL_DAMAGE" then
-                amount = arg13
-            else
-                amount = arg15
-            end
-            self.Debug(cleuEvent, destGUID, amount)
-            local total = self.totalDamage[destGUID] or 0
-            self.totalDamage[destGUID] = total + amount
-            healthUpdate = true
-        elseif CLEU_HEAL_EVENT[cleuEvent] then
-            local amount = arg15
-            self.Debug(cleuEvent, destGUID, amount)
-            local total = self.totalHealing[destGUID] or 0
-            self.totalHealing[destGUID] = total + amount
-            healthUpdate = true
-        end
-        if healthUpdate then
-            if  not self.firstSeen[destGUID] then
-                self.firstSeen[destGUID] = timestamp
-            end
-            self.lastUpdated[destGUID] = timestamp
-        end
-        self.StopProfiling("OvaleHealth_COMBAT_LOG_EVENT_UNFILTERED")
-    end,
-    PLAYER_REGEN_DISABLED = function(self, event)
-        self.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-    end,
-    PLAYER_REGEN_ENABLED = function(self, event)
-        self.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-        wipe(self.totalDamage)
-        wipe(self.totalHealing)
-        wipe(self.firstSeen)
-        wipe(self.lastUpdated)
-    end,
-    Ovale_UnitChanged = function(self, event, unitId, guid)
-        self.StartProfiling("Ovale_UnitChanged")
-        if unitId == "target" or unitId == "focus" then
-            self.Debug(event, unitId, guid)
-            self:UpdateHealth("UNIT_HEALTH_FREQUENT", unitId)
-            self:UpdateHealth("UNIT_MAXHEALTH", unitId)
-            self:UpdateAbsorb("UNIT_ABSORB_AMOUNT_CHANGED", unitId)
-            self:UpdateAbsorb("UNIT_HEAL_ABSORB_AMOUNT_CHANGED", unitId)
-        end
-        self.StopProfiling("Ovale_UnitChanged")
-    end,
-    UpdateAbsorb = function(self, event, unitId)
-        if  not unitId then
-            return 
-        end
-        self.StartProfiling("OvaleHealth_UpdateAbsorb")
-        local func
-        local db
-        if event == "UNIT_ABSORB_AMOUNT_CHANGED" then
-            func = UnitGetTotalAbsorbs
-            db = self.absorb
-        elseif event == "UNIT_HEAL_ABSORB_AMOUNT_CHANGED" then
-            func = UnitGetTotalHealAbsorbs
-            db = self.absorb
-        else
-            Ovale.OneTimeMessage("Warning: Invalid event (%s) in UpdateAbsorb.", event)
-            return 
-        end
-        local amount = func(unitId)
-        if amount >= 0 then
-            local guid = self.ovaleGuid:UnitGUID(unitId)
-            self.Debug(event, unitId, guid, amount)
-            if guid then
-                db[guid] = amount
-            end
-        end
-        self.StopProfiling("OvaleHealth_UpdateHealth")
-    end,
-    UpdateHealth = function(self, event, unitId)
-        if  not unitId then
-            return 
-        end
-        self.StartProfiling("OvaleHealth_UpdateHealth")
-        local func
-        local db
-        if event == "UNIT_HEALTH_FREQUENT" or event == "UNIT_HEALTH" then
-            func = UnitHealth
-            db = self.health
-        elseif event == "UNIT_MAXHEALTH" then
-            func = UnitHealthMax
-            db = self.maxHealth
-        else
-            Ovale.OneTimeMessage("Warning: Invalid event (%s) in UpdateHealth.", event)
-            return 
-        end
-        local amount = func(unitId)
-        if amount then
-            local guid = self.ovaleGuid:UnitGUID(unitId)
-            self.Debug(event, unitId, guid, amount)
-            if guid then
-                if amount > 0 then
-                    db[guid] = amount
-                else
-                    db[guid] = nil
-                    self.firstSeen[guid] = nil
-                    self.lastUpdated[guid] = nil
-                end
-            end
-        end
-        self.StopProfiling("OvaleHealth_UpdateHealth")
+        self.module = ovale:createModule("OvaleHealth", self.OnInitialize, self.OnDisable, aceEvent)
+        self.tracer = ovaleDebug:create(self.module:GetName())
+        self.profiler = ovaleProfiler:create(self.module:GetName())
     end,
     UnitHealth = function(self, unitId, guid)
         return self:UnitAmount(UnitHealth, self.health, unitId, guid)
@@ -265,7 +259,7 @@ __exports.OvaleHealthClass = __class(OvaleHealthClassBase, {
         return amount
     end,
     UnitTimeToDie = function(self, unitId, effectiveHealth, guid)
-        self.StartProfiling("OvaleHealth_UnitTimeToDie")
+        self.profiler:StartProfiling("OvaleHealth_UnitTimeToDie")
         local timeToDie = INFINITY
         guid = guid or self.ovaleGuid:UnitGUID(unitId)
         if guid then
@@ -289,7 +283,7 @@ __exports.OvaleHealthClass = __class(OvaleHealthClassBase, {
                 end
             end
         end
-        self.StopProfiling("OvaleHealth_UnitTimeToDie")
+        self.profiler:StopProfiling("OvaleHealth_UnitTimeToDie")
         return timeToDie
     end,
     CleanState = function(self)

@@ -1,4 +1,4 @@
-import { RegisterRequirement, UnregisterRequirement, Tokens } from "./Requirement";
+import { Tokens, OvaleRequirement } from "./Requirement";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { C_LossOfControl, GetTime } from "@wowts/wow-mock";
 import { LuaArray, pairs } from "@wowts/lua";
@@ -21,7 +21,7 @@ export class OvaleLossOfControlClass implements StateModule {
 	private module: AceModule & AceEvent;
 	private tracer: Tracer;
 
-	constructor(private ovale: OvaleClass, ovaleDebug: OvaleDebugClass) {
+	constructor(private ovale: OvaleClass, ovaleDebug: OvaleDebugClass, private requirement: OvaleRequirement) {
 		this.module = ovale.createModule("OvaleLossOfControl", this.OnInitialize, this.OnDisable, aceEvent);
 		this.tracer = ovaleDebug.create(this.module.GetName());
 	}
@@ -30,13 +30,13 @@ export class OvaleLossOfControlClass implements StateModule {
 		this.tracer.Debug("Enabled LossOfControl module");
 		this.lossOfControlHistory = {};
         this.module.RegisterEvent("LOSS_OF_CONTROL_ADDED", this.LOSS_OF_CONTROL_ADDED);
-        RegisterRequirement("lossofcontrol", this.RequireLossOfControlHandler);
+        this.requirement.RegisterRequirement("lossofcontrol", this.RequireLossOfControlHandler);
     }
     private OnDisable = () => {
 		this.tracer.Debug("Disabled LossOfControl module");
 		this.lossOfControlHistory = {};
         this.module.UnregisterEvent("LOSS_OF_CONTROL_ADDED");
-		UnregisterRequirement("lossofcontrol");
+		this.requirement.UnregisterRequirement("lossofcontrol");
     }
 	private LOSS_OF_CONTROL_ADDED = (event: string, eventIndex: number) => {
 		this.tracer.Debug("GetEventInfo:", eventIndex, C_LossOfControl.GetEventInfo(eventIndex));

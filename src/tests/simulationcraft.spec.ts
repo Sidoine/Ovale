@@ -1,6 +1,5 @@
 import test from "ava";
-import { OvaleSimulationCraftClass } from "../simulationcraft/SimulationCraft";
-import { OvaleDebugClass } from "../Debug";
+import { IoC } from "../ioc";
 
 test("parse decimal number", t => {
     // Arrange
@@ -8,7 +7,8 @@ test("parse decimal number", t => {
 spec=blood
 level=120
 actions=/potion,if=buff.test.stack>=0.1`;
-    const simulationcraft = new OvaleSimulationCraftClass()
+    const ioc = new IoC();
+    const simulationcraft = ioc.simulationCraft;
     
     // Act
     const result = simulationcraft.ParseProfile(code);
@@ -28,13 +28,14 @@ test("parse sequence", t => {
     spec=blood
     level=120
 actions=/sequence,if=talent.wake_of_ashes.enabled&talent.crusade.enabled&talent.execution_sentence.enabled&!talent.hammer_of_wrath.enabled,name=wake_opener_ES_CS:shield_of_vengeance:blade_of_justice:judgment:crusade:templars_verdict:wake_of_ashes:templars_verdict:crusader_strike:execution_sentence`
-    const simulationcraft = new OvaleSimulationCraftClass();
-    
+    const ioc = new IoC();
+    const simulationcraft = ioc.simulationCraft;
+
     // Act
     const result = simulationcraft.ParseProfile(code);
 
     // Assert
-    t.is(OvaleDebug.warning, undefined);
+    t.is(ioc.debug.warning, undefined);
     t.not(result, undefined);
 })
 

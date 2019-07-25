@@ -1,9 +1,10 @@
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-do
-    local name = "sc_t23_warlock_affliction"
-    local desc = "[8.2] Simulationcraft: T23_Warlock_Affliction"
-    local code = [[
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_warlock", 80201)
+if not __exports then return end
+__exports.registerWarlock = function(OvaleScripts)
+    do
+        local name = "sc_t23_warlock_affliction"
+        local desc = "[8.2] Simulationcraft: T23_Warlock_Affliction"
+        local code = [[
 # Based on SimulationCraft profile "T23_Warlock_Affliction".
 #	class=warlock
 #	spec=affliction
@@ -660,12 +661,12 @@ AddIcon checkbox=opt_warlock_affliction_aoe help=cd specialization=affliction
 # worldvein_resonance_essence
 # writhe_in_agony_talent
 ]]
-    OvaleScripts:RegisterScript("WARLOCK", "affliction", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_warlock_demonology"
-    local desc = "[8.2] Simulationcraft: T23_Warlock_Demonology"
-    local code = [[
+        OvaleScripts:RegisterScript("WARLOCK", "affliction", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_warlock_demonology"
+        local desc = "[8.2] Simulationcraft: T23_Warlock_Demonology"
+        local code = [[
 # Based on SimulationCraft profile "T23_Warlock_Demonology".
 #	class=warlock
 #	spec=demonology
@@ -1426,12 +1427,12 @@ AddIcon checkbox=opt_warlock_demonology_aoe help=cd specialization=demonology
 # wilfreds_sigil_of_superior_summoning_item
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("WARLOCK", "demonology", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_warlock_destruction"
-    local desc = "[8.2] Simulationcraft: T23_Warlock_Destruction"
-    local code = [[
+        OvaleScripts:RegisterScript("WARLOCK", "demonology", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_warlock_destruction"
+        local desc = "[8.2] Simulationcraft: T23_Warlock_Destruction"
+        local code = [[
 # Based on SimulationCraft profile "T23_Warlock_Destruction".
 #	class=warlock
 #	spec=destruction
@@ -1931,5 +1932,6 @@ AddIcon checkbox=opt_warlock_destruction_aoe help=cd specialization=destruction
 # the_unbound_force
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("WARLOCK", "destruction", name, desc, code, "script")
+        OvaleScripts:RegisterScript("WARLOCK", "destruction", name, desc, code, "script")
+    end
 end

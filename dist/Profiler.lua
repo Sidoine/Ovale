@@ -6,6 +6,8 @@ local AceConfigDialog = LibStub:GetLibrary("AceConfigDialog-3.0", true)
 local __Localization = LibStub:GetLibrary("ovale/Localization")
 local L = __Localization.L
 local LibTextDump = LibStub:GetLibrary("LibTextDump-1.0", true)
+local __Ovale = LibStub:GetLibrary("ovale/Ovale")
+local Print = __Ovale.Print
 local debugprofilestop = debugprofilestop
 local GetTime = GetTime
 local format = string.format
@@ -71,9 +73,9 @@ __exports.Profiler = __class(nil, {
     end,
 })
 __exports.OvaleProfilerClass = __class(nil, {
-    constructor = function(self, options, ovale, ovaleOptions)
-        self.ovale = ovale
+    constructor = function(self, ovaleOptions, ovale)
         self.ovaleOptions = ovaleOptions
+        self.ovale = ovale
         self.self_profilingOutput = nil
         self.profiles = {}
         self.actions = {
@@ -144,27 +146,25 @@ __exports.OvaleProfilerClass = __class(nil, {
                 }
             }
         }
-        self.DoNothing = function()
+        self.OnInitialize = function()
+            local appName = self.ovale:GetName()
+            AceConfig:RegisterOptionsTable(appName, self.options)
+            AceConfigDialog:AddToBlizOptions(appName, L["Profiling"], self.ovale:GetName())
+            if  not self.self_profilingOutput then
+                self.self_profilingOutput = LibTextDump:New(self.ovale:GetName() .. " - " .. L["Profiling"], 750, 500)
+            end
         end
-
+        self.OnDisable = function()
+            self.self_profilingOutput:Clear()
+        end
         self.array = {}
         for k, v in pairs(self.actions) do
-            options.options.args.actions.args[k] = v
+            ovaleOptions.options.args.actions.args[k] = v
         end
-        options.defaultDB.global = options.defaultDB.global or {}
-        options.defaultDB.global.profiler = {}
-        options:RegisterOptions(__exports.OvaleProfilerClass)
-    end,
-    OnInitialize = function(self)
-        local appName = self.ovale:GetName()
-        AceConfig:RegisterOptionsTable(appName, self.options)
-        AceConfigDialog:AddToBlizOptions(appName, L["Profiling"], self.ovale:GetName())
-        if  not self.self_profilingOutput then
-            self.self_profilingOutput = LibTextDump:New(self.ovale:GetName() .. " - " .. L["Profiling"], 750, 500)
-        end
-    end,
-    OnDisable = function(self)
-        self.self_profilingOutput:Clear()
+        ovaleOptions.defaultDB.global = ovaleOptions.defaultDB.global or {}
+        ovaleOptions.defaultDB.global.profiler = {}
+        ovaleOptions:RegisterOptions(__exports.OvaleProfilerClass)
+        ovale:createModule("OvaleProfiler", self.OnInitialize, self.OnDisable)
     end,
     create = function(self, name)
         return __exports.Profiler(name, self)
@@ -204,11 +204,11 @@ __exports.OvaleProfilerClass = __class(nil, {
         end
     end,
     DebuggingInfo = function(self)
-        self.ovale:Print("Profiler stack size = %d", self_stackSize)
+        Print("Profiler stack size = %d", self_stackSize)
         local index = self_stackSize
         while index > 0 and self_stackSize - index < 10 do
             local tag = self_stack[index]
-            self.ovale:Print("    [%d] %s", index, tag)
+            Print("    [%d] %s", index, tag)
             index = index - 1
         end
     end,

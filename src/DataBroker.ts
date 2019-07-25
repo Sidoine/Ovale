@@ -3,7 +3,7 @@ import LibDataBroker from "@wowts/lib_data_broker-1.1";
 import LibDBIcon from "@wowts/lib_d_b_icon-1.0";
 import { OvaleOptionsClass } from "./Options";
 import { DEFAULT_NAME, OvaleScriptsClass } from "./Scripts";
-import { OvaleVersion } from "./Version";
+import { OvaleVersionClass } from "./Version";
 import { OvaleFrameModuleClass } from "./Frame";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { pairs, LuaArray } from "@wowts/lua";
@@ -50,7 +50,8 @@ export class OvaleDataBrokerClass {
         private ovaleOptions: OvaleOptionsClass,
         private ovale: OvaleClass,
         private ovaleDebug: OvaleDebugClass,
-        private ovaleScripts: OvaleScriptsClass) {
+        private ovaleScripts: OvaleScriptsClass,
+        private ovaleVersion: OvaleVersionClass) {
         this.module = ovale.createModule("OvaleDataBroker", this.OnInitialize, this.OnDisable, aceEvent);
         let options = {
             minimap: {
@@ -76,7 +77,7 @@ export class OvaleDataBrokerClass {
     }
 
     private OnTooltipShow = (tooltip: UIGameTooltip) => {
-        self_tooltipTitle = self_tooltipTitle || `${this.ovale.GetName()} ${OvaleVersion.version}`;
+        self_tooltipTitle = self_tooltipTitle || `${this.ovale.GetName()} ${this.ovaleVersion.version}`;
         tooltip.SetText(self_tooltipTitle, 1, 1, 1);
         tooltip.AddLine(L["Click to select the script."]);
         tooltip.AddLine(L["Middle-Click to toggle the script options panel."]);
@@ -97,7 +98,7 @@ export class OvaleDataBrokerClass {
             for (const [name, description] of pairs(descriptions)) {
                 let menuItem = {
                     text: description,
-                    func: function () {
+                    func: () => {
                         this.ovaleScripts.SetScript(name);
                     }
                 }

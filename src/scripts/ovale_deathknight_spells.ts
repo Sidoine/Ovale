@@ -1,6 +1,6 @@
-import { OvaleScripts } from "../Scripts";
+import { OvaleScriptsClass } from "../Scripts";
 
-export function register() {
+export function registerDeathKnightSpells(OvaleScripts: OvaleScriptsClass) {
     let name = "ovale_deathknight_spells";
     let desc = "[8.2] Ovale: Death Knight spells";
 

@@ -1,5 +1,4 @@
 import { L } from "./Localization";
-import { OvaleStance } from "./Stance";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { lualength, _G, LuaArray, LuaObj } from "@wowts/lua";
 import { GetTime, UnitHasVehicleUI, UnitExists, UnitIsDead, UnitCanAttack } from "@wowts/wow-mock";
@@ -11,6 +10,7 @@ import { AceModule } from "@wowts/tsaddon";
 import { OvaleFutureClass } from "./Future";
 import { OvaleDataClass } from "./Data";
 import { OvaleSpellBookClass } from "./SpellBook";
+import { OvaleStanceClass } from "./Stance";
 
 interface SpellFlashCoreClass {
     FlashForm: (spellId: number, color: Color, size: number, brightness: number) => void;   
@@ -90,7 +90,7 @@ let COLORTABLE: LuaObj<Color> = {
 export class OvaleSpellFlashClass {
     private module: AceModule & AceEvent;
 
-    constructor(private ovaleOptions: OvaleOptionsClass, ovale: OvaleClass, private ovaleFuture: OvaleFutureClass, private ovaleData: OvaleDataClass, private ovaleSpellBook: OvaleSpellBookClass) {
+    constructor(private ovaleOptions: OvaleOptionsClass, ovale: OvaleClass, private ovaleFuture: OvaleFutureClass, private ovaleData: OvaleDataClass, private ovaleSpellBook: OvaleSpellBookClass, private ovaleStance: OvaleStanceClass) {
         this.module = ovale.createModule("OvaleSpellFlash", this.OnInitialize, this.OnDisable, aceEvent);
         this.ovaleOptions.options.args.apparence.spellFlash = this.getSpellFlashOptions();
     }
@@ -317,7 +317,7 @@ export class OvaleSpellFlashClass {
                 }
                 let brightness = db.brightness * 100;
                 if (element.lowername == "spell") {
-                    if (OvaleStance.IsStanceSpell(spellId)) {
+                    if (this.ovaleStance.IsStanceSpell(spellId)) {
                         SpellFlashCore.FlashForm(spellId, color, size, brightness);
                     }
                     if (this.ovaleSpellBook.IsPetSpell(spellId)) {

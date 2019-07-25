@@ -1,13 +1,12 @@
 local __exports = LibStub:NewLibrary("ovale/Pool", 80201)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __Ovale = LibStub:GetLibrary("ovale/Ovale")
-local Ovale = __Ovale.Ovale
 local assert = assert
 local tostring = tostring
 local wipe = wipe
 local insert = table.insert
 local remove = table.remove
+local format = string.format
 __exports.OvalePool = __class(nil, {
     constructor = function(self, name)
         self.pool = nil
@@ -40,7 +39,7 @@ __exports.OvalePool = __class(nil, {
         self.unused = 0
     end,
     DebuggingInfo = function(self)
-        Ovale.Print("Pool %s has size %d with %d item(s).", tostring(self.name), self.size, self.unused)
+        return format("Pool %s has size %d with %d item(s).", tostring(self.name), self.size, self.unused)
     end,
     Clean = function(self, item)
     end,

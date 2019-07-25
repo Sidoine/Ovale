@@ -1,4 +1,3 @@
-import { StateModule } from "./State";
 import { OvaleAuraClass } from "./Aura";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { GetTime, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
@@ -77,13 +76,3 @@ export class OvaleDemonHunterSoulFragmentsClass {
         return stacks;
     }
 }
-
-export class DemonHunterSoulFragmentsState implements StateModule {
-    CleanState(): void {
-    }
-    InitializeState(): void {
-    }
-    ResetState(): void {
-    }
-}
-

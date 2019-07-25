@@ -6,7 +6,7 @@ import { format, gmatch, find, match, lower, gsub, sub, len, upper } from "@wowt
 import { OvaleDataClass } from "../Data";
 import { insert } from "@wowts/table";
 import { CamelSpecialization, CamelCase, OvaleFunctionName } from "./text-tools";
-import { OvalePower } from "../Power";
+import { POOLED_RESOURCE } from "../Power";
 import { MakeString } from "../Ovale";
 import { Unparser } from "./unparser";
 
@@ -902,7 +902,7 @@ export class Emiter {
                 let statementNode = this.EmitAction(actionNode, nodeList, annotation, actionNode.name);
                 if (statementNode) {
                     if (statementNode.type == "simc_pool_resource") {
-                        let powerType = OvalePower.POOLED_RESOURCE[annotation.class];
+                        let powerType = POOLED_RESOURCE[annotation.class];
                         if (powerType) {
                             if (statementNode.for_next) {
                                 poolResourceNode = statementNode;
