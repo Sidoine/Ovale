@@ -8,6 +8,7 @@ import { debugprofilestop, GetTime } from "@wowts/wow-mock";
 import { format } from "@wowts/string";
 import { pairs, next, wipe, LuaObj, lualength, LuaArray } from "@wowts/lua";
 import { insert, sort, concat } from "@wowts/table";
+import { AceModule } from "@wowts/tsaddon";
 
 let self_timestamp = debugprofilestop();
 let self_timeSpent: LuaObj<number> = {}
@@ -140,6 +141,7 @@ export class OvaleProfilerClass {
         }
     }
 
+    private module: AceModule;
     
     constructor(private ovaleOptions: OvaleOptionsClass, private ovale: OvaleClass) {
         for (const [k, v] of pairs(this.actions)) {
@@ -148,11 +150,11 @@ export class OvaleProfilerClass {
         ovaleOptions.defaultDB.global = ovaleOptions.defaultDB.global || {}
         ovaleOptions.defaultDB.global.profiler = {}
         ovaleOptions.RegisterOptions(OvaleProfilerClass);
-        ovale.createModule("OvaleProfiler", this.OnInitialize, this.OnDisable);
+        this.module = ovale.createModule("OvaleProfiler", this.OnInitialize, this.OnDisable);
     }
 
     private OnInitialize = () => {
-        let appName = this.ovale.GetName();
+        const appName = this.module.GetName();
         AceConfig.RegisterOptionsTable(appName, this.options);
         AceConfigDialog.AddToBlizOptions(appName, L["Profiling"], this.ovale.GetName());
     

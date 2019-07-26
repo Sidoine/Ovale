@@ -15,7 +15,7 @@ import { OvaleCooldownClass } from "./Cooldown";
 import { OvaleRunesClass } from "./Runes";
 import { OvalePaperDollClass } from "./PaperDoll";
 import { BaseState } from "./BaseState";
-import { OvaleSpells } from "./Spells";
+import { OvaleSpellsClass } from "./Spells";
 import { isNumber } from "./tools";
 import { OvaleClass } from "./Ovale";
 import { AceModule } from "@wowts/tsaddon";
@@ -83,7 +83,8 @@ export class OvaleBestActionClass {
         ovaleProfiler: OvaleProfilerClass,
         ovaleDebug: OvaleDebugClass,
         private variables: Variables,
-        private ovaleRunes: OvaleRunesClass
+        private ovaleRunes: OvaleRunesClass,
+        private OvaleSpells: OvaleSpellsClass
 
     ) {
         this.module = Ovale.createModule("BestAction", this.onInitialize, this.OnDisable, aceEvent);
@@ -152,7 +153,7 @@ export class OvaleBestActionClass {
             actionTexture = actionTexture || GetItemIcon(itemId);
             actionInRange = IsItemInRange(itemId, target);
             [actionCooldownStart, actionCooldownDuration, actionEnable] = GetItemCooldown(itemId);
-            actionUsable = spellName && IsUsableItem(itemId) && OvaleSpells.IsUsableItem(itemId, atTime);
+            actionUsable = spellName && IsUsableItem(itemId) && this.OvaleSpells.IsUsableItem(itemId, atTime);
             if (action) {
                 actionShortcut = this.ovaleActionBar.GetBinding(action);
                 actionIsCurrent = IsCurrentAction(action);
@@ -219,14 +220,14 @@ export class OvaleBestActionClass {
         if (!isKnownSpell && !action) {
             this.tracer.Log("Unknown spell ID '%s'.", spellId);
         } else {
-            let [isUsable, noMana] = OvaleSpells.IsUsableSpell(spellId, atTime, targetGUID);
+            let [isUsable, noMana] = this.OvaleSpells.IsUsableSpell(spellId, atTime, targetGUID);
             this.tracer.Log("OvaleSpells:IsUsableSpell(%d, %f, %s) returned %d, %d", spellId, atTime, targetGUID, isUsable, noMana);
             if (isUsable || noMana) {
                 if (element.namedParams.texture) {
                     actionTexture = `Interface\\Icons\\${element.namedParams.texture}`;
                 }
                 actionTexture = actionTexture || GetSpellTexture(spellId);
-                actionInRange = OvaleSpells.IsSpellInRange(spellId, target);
+                actionInRange = this.OvaleSpells.IsSpellInRange(spellId, target);
                 [actionCooldownStart, actionCooldownDuration, actionEnable] = this.ovaleCooldown.GetSpellCooldown(spellId, atTime);
 
                 this.tracer.Log("GetSpellCooldown returned %f, %f", actionCooldownStart, actionCooldownDuration);

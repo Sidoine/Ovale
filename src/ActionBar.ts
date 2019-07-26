@@ -134,7 +134,7 @@ export class OvaleActionBarClass {
         this.debug.Debug("%s: Updating key bindings.", event);
         this.UpdateKeyBindings();
     }
-    TimerUpdateActionSlots() {
+    private TimerUpdateActionSlots = () => {
         this.UpdateActionSlots("TimerUpdateActionSlots");
     }
     
@@ -165,7 +165,7 @@ export class OvaleActionBarClass {
 			}
 		}
         if (event != "TimerUpdateActionSlots") {
-            this.module.ScheduleTimer("TimerUpdateActionSlots", 1);
+            this.module.ScheduleTimer(this.TimerUpdateActionSlots, 1);
         }
         this.profiler.StopProfiling("OvaleActionBar_UpdateActionSlots");
     }

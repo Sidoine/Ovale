@@ -35,7 +35,7 @@ __exports.OvaleSpellsClass = __class(nil, {
             end
             if countString then
                 local count = tonumber(countString) or 1
-                local actualCount = __exports.OvaleSpells:GetSpellCount(spellId)
+                local actualCount = self:GetSpellCount(spellId)
                 verified = (requirement == "spellcount_min" and count <= actualCount) or (requirement == "spellcount_max" and count >= actualCount)
             else
                 self.ovale:OneTimeMessage("Warning: requirement '%s' is missing a count argument.", requirement)
@@ -84,7 +84,7 @@ __exports.OvaleSpellsClass = __class(nil, {
             returnValue = IsSpellInRange(name, unitId)
         end
         if (returnValue == 1 and spellId == WARRIOR_INCERCEPT_SPELLID) then
-            return (UnitIsFriend("player", unitId) or __exports.OvaleSpells:IsSpellInRange(WARRIOR_HEROICTHROW_SPELLID, unitId))
+            return (UnitIsFriend("player", unitId) or self:IsSpellInRange(WARRIOR_HEROICTHROW_SPELLID, unitId))
         end
         return (returnValue == 1 and true) or (returnValue == 0 and false) or (returnValue == nil and nil)
     end,

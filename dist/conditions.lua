@@ -46,8 +46,6 @@ local huge = math.huge
 local min = math.min
 local __AST = LibStub:GetLibrary("ovale/AST")
 local isValueNode = __AST.isValueNode
-local __Spells = LibStub:GetLibrary("ovale/Spells")
-local OvaleSpells = __Spells.OvaleSpells
 local lower = string.lower
 local __Ovale = LibStub:GetLibrary("ovale/Ovale")
 local Print = __Ovale.Print
@@ -231,7 +229,7 @@ __exports.OvaleConditions = __class(nil, {
     ParseCondition = function(self, positionalParams, namedParams, defaultTarget)
         return self.ovaleCondition:ParseCondition(positionalParams, namedParams, defaultTarget)
     end,
-    constructor = function(self, ovaleCondition, OvaleData, OvaleCompile, OvalePaperDoll, Ovale, OvaleArtifact, OvaleAzerite, OvaleAzeriteEssence, OvaleAura, baseState, OvaleCooldown, OvaleFuture, OvaleSpellBook, OvaleFrameModule, OvaleGUID, OvaleDamageTaken, OvaleWarlock, OvalePower, OvaleEnemies, variables, lastSpell, OvaleEquipment, OvaleHealth, ovaleOptions, OvaleLossOfControl, OvaleSpellDamage, OvaleStagger, OvaleTotem, OvaleSigil, OvaleDemonHunterSoulFragments, OvaleBestAction, OvaleRunes, OvaleStance, OvaleBossMod)
+    constructor = function(self, ovaleCondition, OvaleData, OvaleCompile, OvalePaperDoll, Ovale, OvaleArtifact, OvaleAzerite, OvaleAzeriteEssence, OvaleAura, baseState, OvaleCooldown, OvaleFuture, OvaleSpellBook, OvaleFrameModule, OvaleGUID, OvaleDamageTaken, OvaleWarlock, OvalePower, OvaleEnemies, variables, lastSpell, OvaleEquipment, OvaleHealth, ovaleOptions, OvaleLossOfControl, OvaleSpellDamage, OvaleStagger, OvaleTotem, OvaleSigil, OvaleDemonHunterSoulFragments, OvaleBestAction, OvaleRunes, OvaleStance, OvaleBossMod, OvaleSpells)
         self.ovaleCondition = ovaleCondition
         self.OvaleData = OvaleData
         self.OvaleCompile = OvaleCompile
@@ -266,6 +264,7 @@ __exports.OvaleConditions = __class(nil, {
         self.OvaleRunes = OvaleRunes
         self.OvaleStance = OvaleStance
         self.OvaleBossMod = OvaleBossMod
+        self.OvaleSpells = OvaleSpells
         self.ArmorSetBonus = function(positionalParams, namedParams, atTime)
             self.Ovale:OneTimeMessage("Warning: 'ArmorSetBonus()' is depreciated.  Returns 0")
             local value = 0
@@ -1075,7 +1074,7 @@ __exports.OvaleConditions = __class(nil, {
         self.InRange = function(positionalParams, namedParams, atTime)
             local spellId, yesno = positionalParams[1], positionalParams[2]
             local target = self:ParseCondition(positionalParams, namedParams)
-            local boolean = OvaleSpells:IsSpellInRange(spellId, target)
+            local boolean = self.OvaleSpells:IsSpellInRange(spellId, target)
             return TestBoolean(boolean, yesno)
         end
         self.IsAggroed = function(positionalParams, namedParams, atTime)
@@ -1575,7 +1574,7 @@ __exports.OvaleConditions = __class(nil, {
                 if isComparator(spellId) then
                     comparator, limit = spellId, positionalParams[i + 1]
                     break
-                elseif  not usable or OvaleSpells:IsUsableSpell(spellId, atTime, self.OvaleGUID:UnitGUID(target)) then
+                elseif  not usable or self.OvaleSpells:IsUsableSpell(spellId, atTime, self.OvaleGUID:UnitGUID(target)) then
                     local start, duration = self.OvaleCooldown:GetSpellCooldown(spellId, atTime)
                     local t = 0
                     if start > 0 and duration > 0 then
@@ -1627,7 +1626,7 @@ __exports.OvaleConditions = __class(nil, {
         end
         self.SpellCount = function(positionalParams, namedParams, atTime)
             local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-            local spellCount = OvaleSpells:GetSpellCount(spellId)
+            local spellCount = self.OvaleSpells:GetSpellCount(spellId)
             return Compare(spellCount, comparator, limit)
         end
         self.SpellKnown = function(positionalParams, namedParams, atTime)
@@ -1647,7 +1646,7 @@ __exports.OvaleConditions = __class(nil, {
         self.SpellUsable = function(positionalParams, namedParams, atTime)
             local spellId, yesno = positionalParams[1], positionalParams[2]
             local target = self:ParseCondition(positionalParams, namedParams, "target")
-            local isUsable, noMana = OvaleSpells:IsUsableSpell(spellId, atTime, self.OvaleGUID:UnitGUID(target))
+            local isUsable, noMana = self.OvaleSpells:IsUsableSpell(spellId, atTime, self.OvaleGUID:UnitGUID(target))
             local boolean = isUsable or noMana
             return TestBoolean(boolean, yesno)
         end

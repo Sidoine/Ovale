@@ -159,7 +159,8 @@ export class IoC {
         this.demonHunterSoulFragments = new OvaleDemonHunterSoulFragmentsClass(this.aura, this.ovale);
         this.runes = new OvaleRunesClass(this.ovale, this.debug, this.profiler, this.data, this.power, this.paperDoll);
         this.actionBar = new OvaleActionBarClass(this.debug, this.ovale, this.profiler, this.spellBook);
-        this.bestAction = new OvaleBestActionClass(this.equipment, this.actionBar, this.data, this.cooldown, this.state, this.baseState, this.paperDoll, this.compile, this.condition, this.ovale, this.guid, this.power, this.future, this.spellBook, this.profiler, this.debug, this.variables, this.runes);
+        this.spells = new OvaleSpellsClass(this.spellBook, this.ovale, this.debug, this.profiler, this.data, this.requirement);
+        this.bestAction = new OvaleBestActionClass(this.equipment, this.actionBar, this.data, this.cooldown, this.state, this.baseState, this.paperDoll, this.compile, this.condition, this.ovale, this.guid, this.power, this.future, this.spellBook, this.profiler, this.debug, this.variables, this.runes, this.spells);
         this.frame = new OvaleFrameModuleClass(this.state, this.compile, this.future, this.baseState, this.enemies, this.ovale, this.options, this.debug, this.guid, this.spellFlash, this.spellBook, this.bestAction);
         this.dataBroker = new OvaleDataBrokerClass(this.paperDoll, this.frame, this.options, this.ovale, this.debug, this.scripts, this.version);
         this.unparser = new Unparser(this.debug);
@@ -169,10 +170,9 @@ export class IoC {
         this.bossMod = new OvaleBossModClass(this.ovale, this.debug, this.profiler, this.future);
         this.demonHunterDemonic = new OvaleDemonHunterDemonicClass(this.aura, this.ovale, this.debug);
         this.generator = new Generator(this.ast, this.data);
-        this.spells = new OvaleSpellsClass(this.spellBook, this.ovale, this.debug, this.profiler, this.data, this.requirement);
         this.simulationCraft = new OvaleSimulationCraftClass(this.options, this.data, this.emiter, this.ast, this.parser, this.unparser, this.debug, this.compile, this.splitter, this.generator, this.ovale);
         this.recount = new OvaleRecountClass(this.ovale, this.score);
-        this.conditions = new OvaleConditions(this.condition, this.data, this.compile, this.paperDoll, this.ovale, this.artifact, this.azeriteArmor, this.azeriteEssence, this.aura, this.baseState, this.cooldown, this.future, this.spellBook, this.frame, this.guid, this.damageTaken, this.warlock, this.power, this.enemies, this.variables, this.lastSpell, this.equipment, this.health, this.options, this.lossOfControl, this.spellDamage, this.stagger, this.totem, this.demonHunterSigils, this.demonHunterSoulFragments, this.bestAction, this.runes, this.stance, this.bossMod);
+        this.conditions = new OvaleConditions(this.condition, this.data, this.compile, this.paperDoll, this.ovale, this.artifact, this.azeriteArmor, this.azeriteEssence, this.aura, this.baseState, this.cooldown, this.future, this.spellBook, this.frame, this.guid, this.damageTaken, this.warlock, this.power, this.enemies, this.variables, this.lastSpell, this.equipment, this.health, this.options, this.lossOfControl, this.spellDamage, this.stagger, this.totem, this.demonHunterSigils, this.demonHunterSoulFragments, this.bestAction, this.runes, this.stance, this.bossMod, this.spells);
         
         this.state.RegisterState(this.cooldownState);
         this.state.RegisterState(this.paperDoll);

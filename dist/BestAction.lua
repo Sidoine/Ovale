@@ -33,13 +33,11 @@ local IsUsableAction = IsUsableAction
 local IsUsableItem = IsUsableItem
 local __AST = LibStub:GetLibrary("ovale/AST")
 local isValueNode = __AST.isValueNode
-local __Spells = LibStub:GetLibrary("ovale/Spells")
-local OvaleSpells = __Spells.OvaleSpells
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isNumber = __tools.isNumber
 local INFINITY = huge
 __exports.OvaleBestActionClass = __class(nil, {
-    constructor = function(self, ovaleEquipment, ovaleActionBar, ovaleData, ovaleCooldown, ovaleState, baseState, ovalePaperDoll, ovaleCompile, ovaleCondition, Ovale, OvaleGUID, OvalePower, OvaleFuture, OvaleSpellBook, ovaleProfiler, ovaleDebug, variables, ovaleRunes)
+    constructor = function(self, ovaleEquipment, ovaleActionBar, ovaleData, ovaleCooldown, ovaleState, baseState, ovalePaperDoll, ovaleCompile, ovaleCondition, Ovale, OvaleGUID, OvalePower, OvaleFuture, OvaleSpellBook, ovaleProfiler, ovaleDebug, variables, ovaleRunes, OvaleSpells)
         self.ovaleEquipment = ovaleEquipment
         self.ovaleActionBar = ovaleActionBar
         self.ovaleData = ovaleData
@@ -56,6 +54,7 @@ __exports.OvaleBestActionClass = __class(nil, {
         self.OvaleSpellBook = OvaleSpellBook
         self.variables = variables
         self.ovaleRunes = ovaleRunes
+        self.OvaleSpells = OvaleSpells
         self.self_serial = 0
         self.self_timeSpan = {}
         self.self_valuePool = OvalePool("OvaleBestAction_valuePool")
@@ -569,7 +568,7 @@ __exports.OvaleBestActionClass = __class(nil, {
             actionTexture = actionTexture or GetItemIcon(itemId)
             actionInRange = IsItemInRange(itemId, target)
             actionCooldownStart, actionCooldownDuration, actionEnable = GetItemCooldown(itemId)
-            actionUsable = spellName and IsUsableItem(itemId) and OvaleSpells:IsUsableItem(itemId, atTime)
+            actionUsable = spellName and IsUsableItem(itemId) and self.OvaleSpells:IsUsableItem(itemId, atTime)
             if action then
                 actionShortcut = self.ovaleActionBar:GetBinding(action)
                 actionIsCurrent = IsCurrentAction(action)
@@ -638,14 +637,14 @@ __exports.OvaleBestActionClass = __class(nil, {
         if  not isKnownSpell and  not action then
             self.tracer:Log("Unknown spell ID '%s'.", spellId)
         else
-            local isUsable, noMana = OvaleSpells:IsUsableSpell(spellId, atTime, targetGUID)
+            local isUsable, noMana = self.OvaleSpells:IsUsableSpell(spellId, atTime, targetGUID)
             self.tracer:Log("OvaleSpells:IsUsableSpell(%d, %f, %s) returned %d, %d", spellId, atTime, targetGUID, isUsable, noMana)
             if isUsable or noMana then
                 if element.namedParams.texture then
                     actionTexture = "Interface\\Icons\\" .. element.namedParams.texture
                 end
                 actionTexture = actionTexture or GetSpellTexture(spellId)
-                actionInRange = OvaleSpells:IsSpellInRange(spellId, target)
+                actionInRange = self.OvaleSpells:IsSpellInRange(spellId, target)
                 actionCooldownStart, actionCooldownDuration, actionEnable = self.ovaleCooldown:GetSpellCooldown(spellId, atTime)
                 self.tracer:Log("GetSpellCooldown returned %f, %f", actionCooldownStart, actionCooldownDuration)
                 actionCharges = self.ovaleCooldown:GetSpellCharges(spellId, atTime)

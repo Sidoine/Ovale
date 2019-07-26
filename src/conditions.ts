@@ -9,7 +9,7 @@ import { ipairs, pairs, type, LuaArray, LuaObj, lualength } from "@wowts/lua";
 import { GetBuildInfo, GetItemCooldown, GetItemCount, GetNumTrackingTypes, GetTime, GetTrackingInfo, GetUnitSpeed, GetWeaponEnchantInfo, HasFullControl, IsStealthed, UnitCastingInfo, UnitChannelInfo, UnitClass, UnitClassification, UnitCreatureFamily, UnitCreatureType, UnitDetailedThreatSituation, UnitExists, UnitInParty, UnitInRaid, UnitIsDead, UnitIsFriend, UnitIsPVP, UnitIsUnit, UnitLevel, UnitName, UnitPower, UnitPowerMax, UnitRace, UnitStagger } from "@wowts/wow-mock";
 import { huge, min } from "@wowts/math";
 import { isValueNode, PositionalParameters, NamedParameters } from "./AST";
-import { OvaleSpells } from "./Spells";
+import { OvaleSpellsClass } from "./Spells";
 import { lower } from "@wowts/string";
 import { OvaleClass, Print } from "./Ovale";
 import { OvaleArtifactClass } from "./Artifact";
@@ -1864,7 +1864,7 @@ export class OvaleConditions {
     private InRange = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
         let [spellId, yesno] = [positionalParams[1], positionalParams[2]];
         let [target] = this.ParseCondition(positionalParams, namedParams);
-        let boolean = OvaleSpells.IsSpellInRange(spellId, target);
+        let boolean = this.OvaleSpells.IsSpellInRange(spellId, target);
         return TestBoolean(boolean, yesno);
     }
   
@@ -3617,7 +3617,7 @@ l    */
             if (isComparator(spellId)) {
                 [comparator, limit] = [spellId, positionalParams[i + 1]];
                 break;
-            } else if (!usable || OvaleSpells.IsUsableSpell(spellId, atTime, this.OvaleGUID.UnitGUID(target))) {
+            } else if (!usable || this.OvaleSpells.IsUsableSpell(spellId, atTime, this.OvaleGUID.UnitGUID(target))) {
                 let [start, duration] = this.OvaleCooldown.GetSpellCooldown(spellId, atTime);
                 let t = 0;
                 if (start > 0 && duration > 0) {
@@ -3738,7 +3738,7 @@ l    */
      */
     private SpellCount = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
         let [spellId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
-        let spellCount = OvaleSpells.GetSpellCount(spellId);
+        let spellCount = this.OvaleSpells.GetSpellCount(spellId);
         return Compare(spellCount, comparator, limit);
     }
  
@@ -3801,7 +3801,7 @@ l    */
     private SpellUsable = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
         let [spellId, yesno] = [positionalParams[1], positionalParams[2]];
         let [target] = this.ParseCondition(positionalParams, namedParams, "target");
-        let [isUsable, noMana] = OvaleSpells.IsUsableSpell(spellId, atTime, this.OvaleGUID.UnitGUID(target));
+        let [isUsable, noMana] = this.OvaleSpells.IsUsableSpell(spellId, atTime, this.OvaleGUID.UnitGUID(target));
         let boolean = isUsable || noMana;
         return TestBoolean(boolean, yesno);
     }
@@ -4750,7 +4750,8 @@ l    */
         private OvaleBestAction: OvaleBestActionClass,
         private OvaleRunes: OvaleRunesClass,
         private OvaleStance: OvaleStanceClass,
-        private OvaleBossMod: OvaleBossModClass) {
+        private OvaleBossMod: OvaleBossModClass,
+        private OvaleSpells: OvaleSpellsClass) {
         ovaleCondition.RegisterCondition("present", false, this.Present);
         ovaleCondition.RegisterCondition("stacktimeto", false, this.stackTimeTo);
         ovaleCondition.RegisterCondition("armorsetbonus", false, this.ArmorSetBonus);

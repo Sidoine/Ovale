@@ -147,7 +147,7 @@ __exports.OvaleProfilerClass = __class(nil, {
             }
         }
         self.OnInitialize = function()
-            local appName = self.ovale:GetName()
+            local appName = self.module:GetName()
             AceConfig:RegisterOptionsTable(appName, self.options)
             AceConfigDialog:AddToBlizOptions(appName, L["Profiling"], self.ovale:GetName())
             if  not self.self_profilingOutput then
@@ -164,7 +164,7 @@ __exports.OvaleProfilerClass = __class(nil, {
         ovaleOptions.defaultDB.global = ovaleOptions.defaultDB.global or {}
         ovaleOptions.defaultDB.global.profiler = {}
         ovaleOptions:RegisterOptions(__exports.OvaleProfilerClass)
-        ovale:createModule("OvaleProfiler", self.OnInitialize, self.OnDisable)
+        self.module = ovale:createModule("OvaleProfiler", self.OnInitialize, self.OnDisable)
     end,
     create = function(self, name)
         return __exports.Profiler(name, self)

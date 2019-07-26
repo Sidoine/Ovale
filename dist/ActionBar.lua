@@ -93,6 +93,9 @@ __exports.OvaleActionBarClass = __class(nil, {
             self.debug:Debug("%s: Updating key bindings.", event)
             self:UpdateKeyBindings()
         end
+        self.TimerUpdateActionSlots = function()
+            self.UpdateActionSlots("TimerUpdateActionSlots")
+        end
         self.UpdateActionSlots = function(event)
             self.profiler:StartProfiling("OvaleActionBar_UpdateActionSlots")
             self.debug:Debug("%s: Updating all action slot mappings.", event)
@@ -120,7 +123,7 @@ __exports.OvaleActionBarClass = __class(nil, {
                 end
             end
             if event ~= "TimerUpdateActionSlots" then
-                self.module:ScheduleTimer("TimerUpdateActionSlots", 1)
+                self.module:ScheduleTimer(self.TimerUpdateActionSlots, 1)
             end
             self.profiler:StopProfiling("OvaleActionBar_UpdateActionSlots")
         end
@@ -168,9 +171,6 @@ __exports.OvaleActionBarClass = __class(nil, {
     ParseHyperlink = function(self, hyperlink)
         local color, linkType, linkData, text = match(hyperlink, "|?c?f?f?(%x*)|?H?([^:]*):?(%d+)|?h?%[?([^%[%]]*)%]?|?h?|?r?")
         return color, linkType, linkData, text
-    end,
-    TimerUpdateActionSlots = function(self)
-        self.UpdateActionSlots("TimerUpdateActionSlots")
     end,
     UpdateActionSlot = function(self, slot)
         self.profiler:StartProfiling("OvaleActionBar_UpdateActionSlot")

@@ -14,7 +14,6 @@ import { StateModule } from "./State";
 let WARRIOR_INCERCEPT_SPELLID = 198304;
 let WARRIOR_HEROICTHROW_SPELLID = 57755;
 
-export let OvaleSpells:OvaleSpellsClass;
 export class OvaleSpellsClass implements StateModule {
     private module: AceModule & AceEvent;
     private tracer: Tracer;
@@ -74,7 +73,7 @@ export class OvaleSpellsClass implements StateModule {
             returnValue = IsSpellInRange(name, unitId);
         }
         if ((returnValue == 1 && spellId == WARRIOR_INCERCEPT_SPELLID)) {
-            return (UnitIsFriend("player", unitId) || OvaleSpells.IsSpellInRange(WARRIOR_HEROICTHROW_SPELLID, unitId));
+            return (UnitIsFriend("player", unitId) || this.IsSpellInRange(WARRIOR_HEROICTHROW_SPELLID, unitId));
         }
         return (returnValue == 1 && true) || (returnValue == 0 && false) || (returnValue === undefined && undefined);
     }
@@ -88,7 +87,7 @@ export class OvaleSpellsClass implements StateModule {
         }
         if (countString) {
             let count = tonumber(countString) || 1;
-            let actualCount = OvaleSpells.GetSpellCount(spellId);
+            let actualCount = this.GetSpellCount(spellId);
             verified = (requirement == "spellcount_min" && count <= actualCount) || (requirement == "spellcount_max" && count >= actualCount);
         } else {
             this.ovale.OneTimeMessage("Warning: requirement '%s' is missing a count argument.", requirement);

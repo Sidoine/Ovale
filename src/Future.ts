@@ -148,9 +148,10 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
         private ovaleSpellBook: OvaleSpellBookClass
     ) {
         super(OvaleFutureData);
-        this.module = ovale.createModule("OvaleFuture", this.OnInitialize, this.OnDisable, aceEvent)
-        this.tracer = ovaleDebug.create(this.module.GetName());
-        this.profiler = ovaleProfiler.create(this.module.GetName());
+        const name = "OvaleFuture";
+        this.tracer = ovaleDebug.create(name);
+        this.profiler = ovaleProfiler.create(name);
+        this.module = ovale.createModule(name, this.OnInitialize, this.OnDisable, aceEvent)
     }
 
     
@@ -300,12 +301,12 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
         }
         return finished;
     }
-    PLAYER_ENTERING_WORLD(event: string) {
+    private PLAYER_ENTERING_WORLD = (event: string) => {
         this.profiler.StartProfiling("OvaleFuture_PLAYER_ENTERING_WORLD");
         this.tracer.Debug(event);
         this.profiler.StopProfiling("OvaleFuture_PLAYER_ENTERING_WORLD");
     }
-    PLAYER_REGEN_DISABLED(event: string) {
+    private PLAYER_REGEN_DISABLED = (event: string) => {
         this.profiler.StartProfiling("OvaleFuture_PLAYER_REGEN_DISABLED");
         this.tracer.Debug(event, "Entering combat.");
         let now = GetTime();
@@ -315,7 +316,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
         this.module.SendMessage("Ovale_CombatStarted", now);
         this.profiler.StopProfiling("OvaleFuture_PLAYER_REGEN_DISABLED");
     }
-    PLAYER_REGEN_ENABLED(event: string) {
+    private PLAYER_REGEN_ENABLED = (event: string) => {
         this.profiler.StartProfiling("OvaleFuture_PLAYER_REGEN_ENABLED");
         this.tracer.Debug(event, "Leaving combat.");
         let now = GetTime();
@@ -324,7 +325,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
         this.module.SendMessage("Ovale_CombatEnded", now);
         this.profiler.StopProfiling("OvaleFuture_PLAYER_REGEN_ENABLED");
     }
-    UNIT_SPELLCAST_CHANNEL_START(event: string, unitId: string, lineId: number, spellId: number) {
+    private UNIT_SPELLCAST_CHANNEL_START = (event: string, unitId: string, lineId: number, spellId: number) => {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
             let spell = this.ovaleSpellBook.GetSpellName(spellId);
             this.profiler.StartProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_START");
@@ -358,7 +359,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
             this.profiler.StopProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_START");
         }
     }
-    UNIT_SPELLCAST_CHANNEL_STOP(event: string, unitId: string, lineId: number, spellId: number) {
+    private UNIT_SPELLCAST_CHANNEL_STOP = (event: string, unitId: string, lineId: number, spellId: number) => {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
             let spell = this.ovaleSpellBook.GetSpellName(spellId);
             this.profiler.StartProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_STOP");
@@ -378,7 +379,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
             this.profiler.StopProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_STOP");
         }
     }
-    UNIT_SPELLCAST_CHANNEL_UPDATE(event: string, unitId: string, lineId: number, spellId: number) {
+    private UNIT_SPELLCAST_CHANNEL_UPDATE = (event: string, unitId: string, lineId: number, spellId: number) => {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
             let spell = this.ovaleSpellBook.GetSpellName(spellId);
             this.profiler.StartProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_UPDATE");
@@ -406,7 +407,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
             this.profiler.StopProfiling("OvaleFuture_UNIT_SPELLCAST_CHANNEL_UPDATE");
         }
     }
-    UNIT_SPELLCAST_DELAYED(event: string, unitId: string, lineId: number, spellId: number) {
+    private UNIT_SPELLCAST_DELAYED = (event: string, unitId: string, lineId: number, spellId: number) => {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
             let spell = this.ovaleSpellBook.GetSpellName(spellId);
             this.profiler.StartProfiling("OvaleFuture_UNIT_SPELLCAST_DELAYED");
@@ -434,7 +435,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
             this.profiler.StopProfiling("OvaleFuture_UNIT_SPELLCAST_DELAYED");
         }
     }
-    UNIT_SPELLCAST_SENT(event: string, unitId: string, targetName: string, lineId: number, spellId: number) {
+    private UNIT_SPELLCAST_SENT = (event: string, unitId: string, targetName: string, lineId: number, spellId: number) => {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
             let spell = this.ovaleSpellBook.GetSpellName(spellId);
             this.profiler.StartProfiling("OvaleFuture_UNIT_SPELLCAST_SENT");
@@ -478,7 +479,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
             this.profiler.StopProfiling("OvaleFuture_UNIT_SPELLCAST_SENT");
         }
     }
-    UNIT_SPELLCAST_START(event: string, unitId: string, lineId: number, spellId: number) {
+    private UNIT_SPELLCAST_START = (event: string, unitId: string, lineId: number, spellId: number) => {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
             let spell = this.ovaleSpellBook.GetSpellName(spellId);
             this.profiler.StartProfiling("OvaleFuture_UNIT_SPELLCAST_START");
@@ -516,7 +517,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
             this.profiler.StopProfiling("OvaleFuture_UNIT_SPELLCAST_START");
         }
     }
-    UNIT_SPELLCAST_SUCCEEDED(event: string, unitId: string, lineId: number, spellId: number) {
+    private UNIT_SPELLCAST_SUCCEEDED = (event: string, unitId: string, lineId: number, spellId: number) => {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
             let spell = this.ovaleSpellBook.GetSpellName(spellId);
             this.profiler.StartProfiling("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED");
@@ -582,14 +583,14 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
             this.profiler.StopProfiling("OvaleFuture_UNIT_SPELLCAST_SUCCEEDED");
         }
     }
-    Ovale_AuraAdded(event: string, atTime: number, guid: string, auraId: string, caster: string) {
+    private Ovale_AuraAdded = (event: string, atTime: number, guid: string, auraId: string, caster: string) => {
         if (guid == this.ovale.playerGUID) {
             self_timeAuraAdded = atTime;
             this.UpdateSpellcastSnapshot(this.lastSpell.lastGCDSpellcast, atTime);
             this.UpdateSpellcastSnapshot(this.current.lastOffGCDSpellcast, atTime);
         }
     }
-    Ovale_AuraChanged(event: string, atTime: number, guid: string, auraId: string, caster: string) {
+    private Ovale_AuraChanged = (event: string, atTime: number, guid: string, auraId: string, caster: string) => {
         this.tracer.DebugTimestamp("Ovale_AuraChanged", event, atTime, guid, auraId, caster);
         if (caster == this.ovale.playerGUID) {
             // let's check if the aura matches a spell we have in flight, if so we can end it
@@ -607,7 +608,7 @@ export class OvaleFutureClass extends States<OvaleFutureData> {
             }
         }
     }
-    UnitSpellcastEnded(event: string, unitId: string, lineId: number, spellId: number) {
+    private UnitSpellcastEnded = (event: string, unitId: string, lineId: number, spellId: number) => {
         if ((unitId == "player" || unitId == "pet") && !WHITE_ATTACK[spellId]) {
             if(event == 'UNIT_SPELLCAST_INTERRUPTED'){
                 this.next.lastGCDSpellId = undefined;
