@@ -1,8 +1,6 @@
 local __exports = LibStub:NewLibrary("ovale/scripts/ovale_hunter_spells", 80201)
 if not __exports then return end
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-__exports.register = function()
+__exports.registerHunterSpells = function(OvaleScripts)
     local name = "ovale_hunter_spells"
     local desc = "[8.2] Ovale: Hunter spells"
     local code = [[Define(a_murder_of_crows 131894)
@@ -577,10 +575,6 @@ Define(wing_clip_debuff 195645)
 	
 
 #Pet Spells
-Define(heart_of_the_phoenix 55709)
-	SpellInfo(heart_of_the_phoenix cd=480)
-Define(heart_of_the_phoenix_debuff 55711)
-	SpellInfo(heart_of_the_phoenix_debuff duration=480)
 Define(pet_beast_cleave_buff 118455)
 	SpellInfo(pet_beast_cleave_buff duration=4)
 Define(pet_coordinated_assault_buff 266779)

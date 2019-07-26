@@ -1,9 +1,10 @@
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-do
-    local name = "sc_t23_rogue_assassination"
-    local desc = "[8.2] Simulationcraft: T23_Rogue_Assassination"
-    local code = [[
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_rogue", 80201)
+if not __exports then return end
+__exports.registerRogue = function(OvaleScripts)
+    do
+        local name = "sc_t23_rogue_assassination"
+        local desc = "[8.2] Simulationcraft: T23_Rogue_Assassination"
+        local code = [[
 # Based on SimulationCraft profile "T23_Rogue_Assassination".
 #	class=rogue
 #	spec=assassination
@@ -693,12 +694,12 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # venom_rush_talent
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("ROGUE", "assassination", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_rogue_outlaw"
-    local desc = "[8.2] Simulationcraft: T23_Rogue_Outlaw"
-    local code = [[
+        OvaleScripts:RegisterScript("ROGUE", "assassination", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_rogue_outlaw"
+        local desc = "[8.2] Simulationcraft: T23_Rogue_Outlaw"
+        local code = [[
 # Based on SimulationCraft profile "T23_Rogue_Outlaw".
 #	class=rogue
 #	spec=outlaw
@@ -1312,12 +1313,12 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # vanish
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("ROGUE", "outlaw", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_rogue_subtlety"
-    local desc = "[8.2] Simulationcraft: T23_Rogue_Subtlety"
-    local code = [[
+        OvaleScripts:RegisterScript("ROGUE", "outlaw", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_rogue_subtlety"
+        local desc = "[8.2] Simulationcraft: T23_Rogue_Subtlety"
+        local code = [[
 # Based on SimulationCraft profile "T23_Rogue_Subtlety".
 #	class=rogue
 #	spec=subtlety
@@ -2116,5 +2117,6 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 # weaponmaster_talent
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("ROGUE", "subtlety", name, desc, code, "script")
+        OvaleScripts:RegisterScript("ROGUE", "subtlety", name, desc, code, "script")
+    end
 end

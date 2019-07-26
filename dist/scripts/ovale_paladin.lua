@@ -1,9 +1,10 @@
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-do
-    local name = "sc_t23_paladin_protection"
-    local desc = "[8.2] Simulationcraft: T23_Paladin_Protection"
-    local code = [[
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_paladin", 80201)
+if not __exports then return end
+__exports.registerPaladin = function(OvaleScripts)
+    do
+        local name = "sc_t23_paladin_protection"
+        local desc = "[8.2] Simulationcraft: T23_Paladin_Protection"
+        local code = [[
 # Based on SimulationCraft profile "T23_Paladin_Protection".
 #	class=paladin
 #	spec=protection
@@ -289,12 +290,12 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 # shield_of_the_righteous
 # war_stomp
 ]]
-    OvaleScripts:RegisterScript("PALADIN", "protection", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_paladin_retribution"
-    local desc = "[8.2] Simulationcraft: T23_Paladin_Retribution"
-    local code = [[
+        OvaleScripts:RegisterScript("PALADIN", "protection", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_paladin_retribution"
+        local desc = "[8.2] Simulationcraft: T23_Paladin_Retribution"
+        local code = [[
 # Based on SimulationCraft profile "T23_Paladin_Retribution".
 #	class=paladin
 #	spec=retribution
@@ -760,5 +761,6 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 # war_stomp
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("PALADIN", "retribution", name, desc, code, "script")
+        OvaleScripts:RegisterScript("PALADIN", "retribution", name, desc, code, "script")
+    end
 end

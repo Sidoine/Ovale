@@ -1,11 +1,11 @@
 import { L } from "./Localization";
-import { OvaleSpellBook } from "./SpellBook";
-import { Ovale } from "./Ovale";
 import { format, find, sub } from "@wowts/string";
 import { next, tostring, _G, kpairs } from "@wowts/lua";
 import { GetTime, PlaySoundFile, UIFrame, UIFontString, UITexture, UICooldown, UICheckButton, CreateFrame, GameTooltip, UIPosition } from "@wowts/wow-mock";
 import { huge } from "@wowts/math";
 import { NamedParameters, PositionalParameters, AstNode } from "./AST";
+import { OvaleOptionsClass } from "./Options";
+import { OvaleSpellBookClass } from "./SpellBook";
 let INFINITY = huge;
 let COOLDOWN_THRESHOLD = 0.1;
 
@@ -48,7 +48,7 @@ export class OvaleIcon {
         return (next(this.parent.checkBoxWidget) != undefined || next(this.parent.listWidget) != undefined);
     }
 
-    constructor(private name: string, private parent: IconParent, secure: boolean) {
+    constructor(private name: string, private parent: IconParent, secure: boolean, private ovaleOptions: OvaleOptionsClass, private ovaleSpellBook: OvaleSpellBookClass) {
         if (!secure) {
             this.frame = CreateFrame("CheckButton", name, parent.frame, "ActionButtonTemplate");
         }        
@@ -61,7 +61,7 @@ export class OvaleIcon {
     SetValue(value: number, actionTexture: string) {
         this.icone.Show();
         this.icone.SetTexture(actionTexture);
-        this.icone.SetAlpha(Ovale.db.profile.apparence.alpha);
+        this.icone.SetAlpha(this.ovaleOptions.db.profile.apparence.alpha);
         this.cd.Hide();
         this.focusText.Hide();
         this.rangeIndicator.Hide();
@@ -88,7 +88,7 @@ export class OvaleIcon {
         this.actionId = actionId;
         this.value = undefined;
         let now = GetTime();
-        const profile = Ovale.db.profile;
+        const profile = this.ovaleOptions.db.profile;
         if (startTime && actionTexture) {
             let cd = this.cd;
             let resetCooldown = false;
@@ -231,7 +231,7 @@ export class OvaleIcon {
                     let suffix = sub(k, index + 5);
                     this.frame.SetAttribute(`${prefix}type${suffix}`, "spell");
                     this.frame.SetAttribute("unit", this.namedParams.target || "target");
-                    this.frame.SetAttribute(k, OvaleSpellBook.GetSpellName(<number>v));
+                    this.frame.SetAttribute(k, this.ovaleSpellBook.GetSpellName(<number>v));
                     this.actionButton = true;
                 }
             }
@@ -268,7 +268,7 @@ export class OvaleIcon {
                 let actionHelp = this.actionHelp;
                 if (!actionHelp) {
                     if (this.actionType == "spell") {
-                        actionHelp = OvaleSpellBook.GetSpellName(this.actionId);
+                        actionHelp = this.ovaleSpellBook.GetSpellName(this.actionId);
                     } else if (this.actionType == "value") {
                         actionHelp = (this.value < INFINITY) && tostring(this.value) || "infinity";
                     } else {
@@ -290,7 +290,7 @@ export class OvaleIcon {
     }
     OvaleIcon_OnLoad() {
         let name = this.name;
-        const profile = Ovale.db.profile;
+        const profile = this.ovaleOptions.db.profile;
         this.icone = _G[`${name}Icon`];
         this.shortcut = _G[`${name}HotKey`];
         this.remains = _G[`${name}Name`];

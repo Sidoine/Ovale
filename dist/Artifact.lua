@@ -1,13 +1,8 @@
 local __exports = LibStub:NewLibrary("ovale/Artifact", 80201)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __Debug = LibStub:GetLibrary("ovale/Debug")
-local OvaleDebug = __Debug.OvaleDebug
 local __Localization = LibStub:GetLibrary("ovale/Localization")
 local L = __Localization.L
-local __Ovale = LibStub:GetLibrary("ovale/Ovale")
-local Ovale = __Ovale.Ovale
-local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local sort = table.sort
 local insert = table.insert
 local concat = table.concat
@@ -18,9 +13,8 @@ local tostring = tostring
 local tsort = sort
 local tinsert = insert
 local tconcat = concat
-local OvaleArtifactBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleArtifact", aceEvent))
-local OvaleArtifactClass = __class(OvaleArtifactBase, {
-    constructor = function(self)
+__exports.OvaleArtifactClass = __class(nil, {
+    constructor = function(self, ovaleDebug)
         self.self_traits = {}
         self.debugOptions = {
             artifacttraits = {
@@ -32,7 +26,7 @@ local OvaleArtifactClass = __class(OvaleArtifactBase, {
                         type = "input",
                         multiline = 25,
                         width = "full",
-                        get = function(info)
+                        get = function()
                             return self:DebugTraits()
                         end
                     }
@@ -40,16 +34,15 @@ local OvaleArtifactClass = __class(OvaleArtifactBase, {
             }
         }
         self.output = {}
-        OvaleArtifactBase.constructor(self)
         for k, v in pairs(self.debugOptions) do
-            OvaleDebug.options.args[k] = v
+            ovaleDebug.defaultOptions.args[k] = v
         end
     end,
     OnInitialize = function(self)
     end,
     OnDisable = function(self)
     end,
-    UpdateTraits = function(self, message)
+    UpdateTraits = function(self)
         return 
     end,
     HasTrait = function(self, spellId)
@@ -71,4 +64,3 @@ local OvaleArtifactClass = __class(OvaleArtifactBase, {
         return tconcat(self.output, "\n")
     end,
 })
-__exports.OvaleArtifact = OvaleArtifactClass()

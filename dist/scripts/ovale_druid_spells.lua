@@ -1,8 +1,6 @@
 local __exports = LibStub:NewLibrary("ovale/scripts/ovale_druid_spells", 80201)
 if not __exports then return end
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-local registerBase = function()
+local function registerBase(OvaleScripts)
     local name = "ovale_druid_base_spells"
     local desc = "[8.2] Ovale: Druid baseline spells"
     local code = [[Define(ancestral_call 274738)
@@ -519,8 +517,7 @@ Define(swiftmend 18562)
 ]]
     OvaleScripts:RegisterScript("DRUID", nil, name, desc, code, "include")
 end
-
-local registerSpec1 = function()
+local function registerSpec1(OvaleScripts)
     local name = "ovale_druid_balance_spells"
     local desc = "[8.1] Ovale: Druid Balance spells"
     local code = [[
@@ -606,8 +603,7 @@ Define(oneths_overconfidence_buff 209407)
 	]]
     OvaleScripts:RegisterScript("DRUID", nil, name, desc, code, "include")
 end
-
-local registerSpec2 = function()
+local function registerSpec2(OvaleScripts)
     local name = "ovale_druid_guardian_spells"
     local desc = "[8.1] Ovale: Druid Guardian spells"
     local code = [[
@@ -676,8 +672,7 @@ Define(guardian_of_elune_talent 18)
 	]]
     OvaleScripts:RegisterScript("DRUID", nil, name, desc, code, "include")
 end
-
-local registerSpec3 = function()
+local function registerSpec3(OvaleScripts)
     local name = "ovale_druid_feral_spells"
     local desc = "[8.1] Ovale: Druid Feral spells"
     local code = [[
@@ -810,12 +805,11 @@ Define(luffa_wrappings 137056)
 	]]
     OvaleScripts:RegisterScript("DRUID", nil, name, desc, code, "include")
 end
-
-__exports.register = function()
-    registerBase()
-    registerSpec1()
-    registerSpec2()
-    registerSpec3()
+__exports.registerDruidSpells = function(OvaleScripts)
+    registerBase(OvaleScripts)
+    registerSpec1(OvaleScripts)
+    registerSpec2(OvaleScripts)
+    registerSpec3(OvaleScripts)
     local name = "ovale_druid_spells"
     local desc = "[8.1] Ovale: Druid spells"
     local code = [[

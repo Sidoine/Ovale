@@ -1,8 +1,6 @@
 local __exports = LibStub:NewLibrary("ovale/scripts/ovale_monk_spells", 80201)
 if not __exports then return end
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-__exports.register = function()
+__exports.registerMonkSpells = function(OvaleScripts)
     local name = "ovale_monk_spells"
     local desc = "[8.2] Ovale: Monk spells"
     local code = [[Define(ancestral_call 274738)

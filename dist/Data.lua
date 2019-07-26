@@ -1,27 +1,15 @@
 local __exports = LibStub:NewLibrary("ovale/Data", 80201)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __Ovale = LibStub:GetLibrary("ovale/Ovale")
-local Ovale = __Ovale.Ovale
-local __GUID = LibStub:GetLibrary("ovale/GUID")
-local OvaleGUID = __GUID.OvaleGUID
-local __Debug = LibStub:GetLibrary("ovale/Debug")
-local OvaleDebug = __Debug.OvaleDebug
-local __Requirement = LibStub:GetLibrary("ovale/Requirement")
-local nowRequirements = __Requirement.nowRequirements
-local CheckRequirements = __Requirement.CheckRequirements
 local type = type
 local ipairs = ipairs
 local pairs = pairs
 local tonumber = tonumber
 local wipe = wipe
 local find = string.find
-local __BaseState = LibStub:GetLibrary("ovale/BaseState")
-local baseState = __BaseState.baseState
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isLuaArray = __tools.isLuaArray
 local isString = __tools.isString
-local OvaleDataBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleData"))
 local BLOODELF_CLASSES = {
     ["DEATHKNIGHT"] = true,
     ["DEMONHUNTER"] = true,
@@ -91,8 +79,12 @@ local STAT_USE_NAMES = {
     [5] = "trinket_stack_proc"
 }
 local tempTokens = {}
-local OvaleDataClass = __class(OvaleDataBase, {
-    constructor = function(self)
+__exports.OvaleDataClass = __class(nil, {
+    constructor = function(self, baseState, ovaleGuid, ovale, requirement)
+        self.baseState = baseState
+        self.ovaleGuid = ovaleGuid
+        self.ovale = ovale
+        self.requirement = requirement
         self.STAT_NAMES = STAT_NAMES
         self.STAT_SHORTNAME = STAT_SHORTNAME
         self.STAT_USE_NAMES = STAT_USE_NAMES
@@ -234,7 +226,6 @@ local OvaleDataClass = __class(OvaleDataBase, {
             }
         }
         self.DEFAULT_SPELL_LIST = {}
-        OvaleDataBase.constructor(self)
         for _, useName in pairs(STAT_USE_NAMES) do
             local name
             for _, statName in pairs(STAT_NAMES) do
@@ -344,7 +335,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
         return tag, invokesGCD
     end,
     CheckSpellAuraData = function(self, auraId, spellData, atTime, guid)
-        guid = guid or OvaleGUID:UnitGUID("player")
+        guid = guid or self.ovaleGuid:UnitGUID("player")
         local index, value, data
         local spellDataArray = nil
         if isLuaArray(spellData) then
@@ -363,7 +354,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
             if N then
                 data = tonumber(N)
             else
-                Ovale:OneTimeMessage("Warning: '%d' has '%s' missing final stack count.", auraId, value)
+                self.ovale:OneTimeMessage("Warning: '%d' has '%s' missing final stack count.", auraId, value)
             end
         elseif value == "extend" then
             local seconds
@@ -374,7 +365,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
             if seconds then
                 data = tonumber(seconds)
             else
-                Ovale:OneTimeMessage("Warning: '%d' has '%s' missing duration.", auraId, value)
+                self.ovale:OneTimeMessage("Warning: '%d' has '%s' missing duration.", auraId, value)
             end
         else
             local asNumber = tonumber(value)
@@ -382,15 +373,15 @@ local OvaleDataClass = __class(OvaleDataBase, {
         end
         local verified = true
         if index then
-            verified = CheckRequirements(auraId, atTime, spellDataArray, index, guid)
+            verified = self.requirement:CheckRequirements(auraId, atTime, spellDataArray, index, guid)
         end
         return verified, value, data
     end,
     CheckSpellInfo = function(self, spellId, atTime, targetGUID)
-        targetGUID = targetGUID or OvaleGUID:UnitGUID(baseState.next.defaultTarget or "target")
+        targetGUID = targetGUID or self.ovaleGuid:UnitGUID(self.baseState.next.defaultTarget or "target")
         local verified = true
         local requirement
-        for name, handler in pairs(nowRequirements) do
+        for name, handler in pairs(self.requirement.nowRequirements) do
             local value = self:GetSpellInfoProperty(spellId, atTime, name, targetGUID)
             if value then
                 if  not isString(value) and isLuaArray(value) then
@@ -407,7 +398,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
         return verified, requirement
     end,
     GetItemInfoProperty = function(self, itemId, atTime, property)
-        local targetGUID = OvaleGUID:UnitGUID("player")
+        local targetGUID = self.ovaleGuid:UnitGUID("player")
         local ii = self:ItemInfo(itemId)
         local value = ii and ii[property]
         local requirements = ii and ii.require[property]
@@ -415,7 +406,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
             for v, rArray in pairs(requirements) do
                 if isLuaArray(rArray) then
                     for _, requirement in ipairs(rArray) do
-                        local verified = CheckRequirements(itemId, atTime, requirement, 1, targetGUID)
+                        local verified = self.requirement:CheckRequirements(itemId, atTime, requirement, 1, targetGUID)
                         if verified then
                             value = tonumber(v) or v
                             break
@@ -427,7 +418,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
         return value
     end,
     GetSpellInfoProperty = function(self, spellId, atTime, property, targetGUID)
-        targetGUID = targetGUID or OvaleGUID:UnitGUID(baseState.next.defaultTarget or "target")
+        targetGUID = targetGUID or self.ovaleGuid:UnitGUID(self.baseState.next.defaultTarget or "target")
         local si = self.spellInfo[spellId]
         local value = si and si[property]
         local requirements = si and si.require[property]
@@ -435,7 +426,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
             for v, rArray in pairs(requirements) do
                 if isLuaArray(rArray) then
                     for _, requirement in ipairs(rArray) do
-                        local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                        local verified = self.requirement:CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
                         if verified then
                             value = tonumber(v) or v
                             break
@@ -447,7 +438,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
         return value
     end,
     GetSpellInfoPropertyNumber = function(self, spellId, atTime, property, targetGUID, splitRatio)
-        targetGUID = targetGUID or OvaleGUID:UnitGUID(baseState.next.defaultTarget or "target")
+        targetGUID = targetGUID or self.ovaleGuid:UnitGUID(self.baseState.next.defaultTarget or "target")
         local si = self.spellInfo[spellId]
         local ratioParam = property .. "_percent"
         local ratio = si and si[ratioParam]
@@ -462,7 +453,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
                 for v, rArray in pairs(ratioRequirements) do
                     if isLuaArray(rArray) then
                         for _, requirement in ipairs(rArray) do
-                            local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                            local verified = self.requirement:CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
                             if verified then
                                 if ratio ~= 0 then
                                     ratio = ratio * ((tonumber(v) / 100) or 1)
@@ -488,7 +479,7 @@ local OvaleDataClass = __class(OvaleDataBase, {
                     for v, rArray in pairs(addRequirements) do
                         if isLuaArray(rArray) then
                             for _, requirement in ipairs(rArray) do
-                                local verified = CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
+                                local verified = self.requirement:CheckRequirements(spellId, atTime, requirement, 1, targetGUID)
                                 if verified then
                                     value = value + (tonumber(v) or 0)
                                 end
@@ -537,4 +528,3 @@ local OvaleDataClass = __class(OvaleDataBase, {
         return damage
     end,
 })
-__exports.OvaleData = OvaleDataClass()

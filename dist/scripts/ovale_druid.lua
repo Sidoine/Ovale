@@ -1,9 +1,10 @@
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-do
-    local name = "sc_t23_druid_balance"
-    local desc = "[8.2] Simulationcraft: T23_Druid_Balance"
-    local code = [[
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_druid", 80201)
+if not __exports then return end
+__exports.registerDruid = function(OvaleScripts)
+    do
+        local name = "sc_t23_druid_balance"
+        local desc = "[8.2] Simulationcraft: T23_Druid_Balance"
+        local code = [[
 # Based on SimulationCraft profile "T23_Druid_Balance".
 #	class=druid
 #	spec=balance
@@ -346,12 +347,12 @@ AddIcon checkbox=opt_druid_balance_aoe help=cd specialization=balance
 # warrior_of_elune_buff
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("DRUID", "balance", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_druid_feral"
-    local desc = "[8.2] Simulationcraft: T23_Druid_Feral"
-    local code = [[
+        OvaleScripts:RegisterScript("DRUID", "balance", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_druid_feral"
+        local desc = "[8.2] Simulationcraft: T23_Druid_Feral"
+        local code = [[
 # Based on SimulationCraft profile "T23_Druid_Feral".
 #	class=druid
 #	spec=feral
@@ -940,12 +941,12 @@ AddIcon checkbox=opt_druid_feral_aoe help=cd specialization=feral
 # wild_charge_cat
 # wild_fleshrending_trait
 ]]
-    OvaleScripts:RegisterScript("DRUID", "feral", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_druid_guardian"
-    local desc = "[8.2] Simulationcraft: T23_Druid_Guardian"
-    local code = [[
+        OvaleScripts:RegisterScript("DRUID", "feral", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_druid_guardian"
+        local desc = "[8.2] Simulationcraft: T23_Druid_Guardian"
+        local code = [[
 # Based on SimulationCraft profile "T23_Druid_Guardian".
 #	class=druid
 #	spec=guardian
@@ -1254,5 +1255,6 @@ AddIcon checkbox=opt_druid_guardian_aoe help=cd specialization=guardian
 # wild_charge_bear
 # wild_charge_cat
 ]]
-    OvaleScripts:RegisterScript("DRUID", "guardian", name, desc, code, "script")
+        OvaleScripts:RegisterScript("DRUID", "guardian", name, desc, code, "script")
+    end
 end

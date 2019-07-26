@@ -1,31 +1,22 @@
 local __exports = LibStub:NewLibrary("ovale/State", 80201)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __Debug = LibStub:GetLibrary("ovale/Debug")
-local OvaleDebug = __Debug.OvaleDebug
 local __Queue = LibStub:GetLibrary("ovale/Queue")
 local OvaleQueue = __Queue.OvaleQueue
-local __Ovale = LibStub:GetLibrary("ovale/Ovale")
-local Ovale = __Ovale.Ovale
-local OvaleStateBase = Ovale:NewModule("OvaleState")
 local self_stateAddons = OvaleQueue("OvaleState_stateAddons")
-local OvaleStateBaseClass = OvaleDebug:RegisterDebugging(OvaleStateBase)
-local OvaleStateClass = __class(OvaleStateBaseClass, {
-    RegisterHasState = function(self, Base, ctor)
-        return __class(Base, {
-            GetState = function(self, atTime)
-                if  not atTime then
-                    return self.current
-                end
-                return self.next
-            end,
-            constructor = function(self, ...)
-                Base.constructor(self, ...)
-                self.current = ctor()
-                self.next = ctor()
-            end
-        })
+__exports.States = __class(nil, {
+    constructor = function(self, c)
+        self.current = c()
+        self.next = c()
     end,
+    GetState = function(self, atTime)
+        if  not atTime then
+            return self.current
+        end
+        return self.next
+    end,
+})
+__exports.OvaleStateClass = __class(nil, {
     RegisterState = function(self, stateAddon)
         self_stateAddons:Insert(stateAddon)
     end,
@@ -77,4 +68,3 @@ local OvaleStateClass = __class(OvaleStateBaseClass, {
         end
     end,
 })
-__exports.OvaleState = OvaleStateClass()

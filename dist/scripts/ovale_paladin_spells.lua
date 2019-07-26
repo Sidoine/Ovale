@@ -1,8 +1,6 @@
 local __exports = LibStub:NewLibrary("ovale/scripts/ovale_paladin_spells", 80201)
 if not __exports then return end
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-__exports.register = function()
+__exports.registerPaladinSpells = function(OvaleScripts)
     local name = "ovale_paladin_spells"
     local desc = "[8.2] Ovale: Paladin spells"
     local code = [[Define(avengers_shield 31935)

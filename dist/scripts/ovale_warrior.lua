@@ -1,9 +1,10 @@
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-do
-    local name = "sc_t23_warrior_arms"
-    local desc = "[8.2] Simulationcraft: T23_Warrior_Arms"
-    local code = [[
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_warrior", 80201)
+if not __exports then return end
+__exports.registerWarrior = function(OvaleScripts)
+    do
+        local name = "sc_t23_warrior_arms"
+        local desc = "[8.2] Simulationcraft: T23_Warrior_Arms"
+        local code = [[
 # Based on SimulationCraft profile "T23_Warrior_Arms".
 #	class=warrior
 #	spec=arms
@@ -615,12 +616,12 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # whirlwind_arms
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("WARRIOR", "arms", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_warrior_fury"
-    local desc = "[8.2] Simulationcraft: T23_Warrior_Fury"
-    local code = [[
+        OvaleScripts:RegisterScript("WARRIOR", "arms", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_warrior_fury"
+        local desc = "[8.2] Simulationcraft: T23_Warrior_Fury"
+        local code = [[
 # Based on SimulationCraft profile "T23_Warrior_Fury".
 #	class=warrior
 #	spec=fury
@@ -1024,12 +1025,12 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # whirlwind_fury
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("WARRIOR", "fury", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_warrior_protection"
-    local desc = "[8.2] Simulationcraft: T23_Warrior_Protection"
-    local code = [[
+        OvaleScripts:RegisterScript("WARRIOR", "fury", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_warrior_protection"
+        local desc = "[8.2] Simulationcraft: T23_Warrior_Protection"
+        local code = [[
 # Based on SimulationCraft profile "T23_Warrior_Protection".
 #	class=warrior
 #	spec=protection
@@ -1455,5 +1456,6 @@ AddIcon checkbox=opt_warrior_protection_aoe help=cd specialization=protection
 # war_stomp
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("WARRIOR", "protection", name, desc, code, "script")
+        OvaleScripts:RegisterScript("WARRIOR", "protection", name, desc, code, "script")
+    end
 end

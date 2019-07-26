@@ -5,22 +5,10 @@ local __Localization = LibStub:GetLibrary("ovale/Localization")
 local L = __Localization.L
 local __Pool = LibStub:GetLibrary("ovale/Pool")
 local OvalePool = __Pool.OvalePool
-local __Profiler = LibStub:GetLibrary("ovale/Profiler")
-local OvaleProfiler = __Profiler.OvaleProfiler
-local __Debug = LibStub:GetLibrary("ovale/Debug")
-local OvaleDebug = __Debug.OvaleDebug
-local __Ovale = LibStub:GetLibrary("ovale/Ovale")
-local Ovale = __Ovale.Ovale
-local __Condition = LibStub:GetLibrary("ovale/Condition")
-local OvaleCondition = __Condition.OvaleCondition
 local __Lexer = LibStub:GetLibrary("ovale/Lexer")
 local OvaleLexer = __Lexer.OvaleLexer
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-local __SpellBook = LibStub:GetLibrary("ovale/SpellBook")
-local OvaleSpellBook = __SpellBook.OvaleSpellBook
 local __Stance = LibStub:GetLibrary("ovale/Stance")
-local OvaleStance = __Stance.OvaleStance
+local STANCE_NAME = __Stance.STANCE_NAME
 local ipairs = ipairs
 local next = next
 local pairs = pairs
@@ -42,7 +30,6 @@ local isLuaArray = __tools.isLuaArray
 local isNumber = __tools.isNumber
 local isString = __tools.isString
 local checkToken = __tools.checkToken
-local OvaleASTBase = OvaleDebug:RegisterDebugging(OvaleProfiler:RegisterProfiling(Ovale:NewModule("OvaleAST")))
 local KEYWORD = {
     ["and"] = true,
     ["if"] = true,
@@ -355,815 +342,11 @@ local SelfPool = __class(OvalePool, {
 local function isAstNode(a)
     return type(a) == "table"
 end
-__exports.OvaleASTClass = __class(OvaleASTBase, {
-    OnInitialize = function(self)
-    end,
-    print_r = function(self, node, indent, done, output)
-        done = done or {}
-        output = output or {}
-        indent = indent or ""
-        for key, value in kpairs(node) do
-            if isAstNode(value) then
-                if done[value.nodeId] then
-                    insert(output, indent .. "[" .. tostring(key) .. "] => (self_reference)")
-                else
-                    done[value.nodeId] = true
-                    if value.type then
-                        insert(output, indent .. "[" .. tostring(key) .. "] =>")
-                    else
-                        insert(output, indent .. "[" .. tostring(key) .. "] => {")
-                    end
-                    self:print_r(value, indent .. "    ", done, output)
-                    if  not value.type then
-                        insert(output, indent .. "}")
-                    end
-                end
-            else
-                insert(output, indent .. "[" .. tostring(key) .. "] => " .. tostring(value))
-            end
-        end
-        return output
-    end,
-    GetNumberNode = function(self, value, nodeList, annotation)
-        annotation.numberFlyweight = annotation.numberFlyweight or {}
-        local node = annotation.numberFlyweight[value]
-        if  not node then
-            node = self:NewNode(nodeList)
-            node.type = "value"
-            node.value = value
-            node.origin = 0
-            node.rate = 0
-            annotation.numberFlyweight[value] = node
-        end
-        return node
-    end,
-    PostOrderTraversal = function(self, node, array, visited)
-        if node.child then
-            for _, childNode in ipairs(node.child) do
-                if  not visited[childNode.nodeId] then
-                    self:PostOrderTraversal(childNode, array, visited)
-                    array[#array + 1] = node
-                end
-            end
-        end
-        array[#array + 1] = node
-        visited[node.nodeId] = true
-    end,
-    FlattenParameterValueNotCsv = function(self, parameterValue, annotation)
-        if isAstNode(parameterValue) then
-            local node = parameterValue
-            local isBang = false
-            local value
-            if node.type == "bang_value" then
-                isBang = true
-                node = node.child[1]
-            end
-            if __exports.isValueNode(node) then
-                value = node.value
-            elseif node.type == "variable" then
-                value = node.name
-            elseif __exports.isStringNode(node) then
-                value = node.value
-            else
-                return parameterValue
-            end
-            if isBang then
-                value = "!" .. tostring(value)
-            end
-            return value
-        end
-        return parameterValue
-    end,
-    FlattenParameterValue = function(self, parameterValue, annotation)
-        if isAstNode(parameterValue) and isCsvNode(parameterValue) then
-            local parameters = self.self_flattenParametersPool:Get()
-            for k, v in ipairs(parameterValue.csv) do
-                parameters[k] = self:FlattenParameterValueNotCsv(v, annotation)
-            end
-            annotation.flattenParametersList = annotation.flattenParametersList or {}
-            annotation.flattenParametersList[#annotation.flattenParametersList + 1] = parameters
-            return parameters
-        else
-            return self:FlattenParameterValueNotCsv(parameterValue, annotation)
-        end
-    end,
-    GetPrecedence = function(self, node)
-        local precedence = node.precedence
-        if  not precedence then
-            local operator = node.operator
-            if operator then
-                if node.expressionType == "unary" and UNARY_OPERATOR[operator] then
-                    precedence = UNARY_OPERATOR[operator][2]
-                elseif node.expressionType == "binary" and BINARY_OPERATOR[operator] then
-                    precedence = BINARY_OPERATOR[operator][2]
-                end
-            end
-        end
-        return precedence
-    end,
-    HasParameters = function(self, node)
-        return node.rawPositionalParams and next(node.rawPositionalParams) or node.rawNamedParams and next(node.rawNamedParams)
-    end,
-    Unparse = function(self, node)
-        if node.asString then
-            return node.asString
-        else
-            local visitor
-            if node.previousType then
-                visitor = self.UNPARSE_VISITOR[node.previousType]
-            else
-                visitor = self.UNPARSE_VISITOR[node.type]
-            end
-            if  not visitor then
-                self:Error("Unable to unparse node of type '%s'.", node.type)
-            else
-                return visitor(node)
-            end
-        end
-    end,
-    UnparseParameters = function(self, positionalParams, namedParams)
-        local output = self.self_outputPool:Get()
-        for k, v in kpairs(namedParams) do
-            if isListItemParameter(k, v) then
-                for list, item in pairs(v) do
-                    output[#output + 1] = format("listitem=%s:%s", list, self:Unparse(item))
-                end
-            elseif isCheckBoxParameter(k, v) then
-                for _, name in ipairs(v) do
-                    output[#output + 1] = format("checkbox=%s", self:Unparse(name))
-                end
-            elseif isAstNode(v) then
-                output[#output + 1] = format("%s=%s", k, self:Unparse(v))
-            elseif k == "filter" or k == "target" then
-            else
-                output[#output + 1] = format("%s=%s", k, v)
-            end
-        end
-        sort(output)
-        for k = #positionalParams, 1, -1 do
-            insert(output, 1, self:Unparse(positionalParams[k]))
-        end
-        local outputString = concat(output, " ")
-        self.self_outputPool:Release(output)
-        return outputString
-    end,
-    SyntaxError = function(self, tokenStream, ...)
-        self:Warning(...)
-        local context = {
-            [1] = "Next tokens:"
-        }
-        for i = 1, 20, 1 do
-            local tokenType, token = tokenStream:Peek(i)
-            if tokenType then
-                context[#context + 1] = token
-            else
-                context[#context + 1] = "<EOS>"
-                break
-            end
-        end
-        self:Warning(concat(context, " "))
-    end,
-    Parse = function(self, nodeType, tokenStream, nodeList, annotation)
-        local visitor = self.PARSE_VISITOR[nodeType]
-        if  not visitor then
-            self:Error("Unable to parse node of type '%s'.", nodeType)
-        else
-            return visitor(tokenStream, nodeList, annotation)
-        end
-    end,
-    ParseParameters = function(self, tokenStream, nodeList, annotation, isList)
-        local ok = true
-        local positionalParams = self.self_rawPositionalParametersPool:Get()
-        local namedParams = self.self_rawNamedParametersPool:Get()
-        while ok do
-            local tokenType, token = tokenStream:Peek()
-            if tokenType then
-                local name
-                local node
-                if tokenType == "name" then
-                    ok, node = self.ParseVariable(tokenStream, nodeList, annotation)
-                    if ok then
-                        name = node.name
-                    end
-                elseif tokenType == "number" then
-                    ok, node = self.ParseNumber(tokenStream, nodeList, annotation)
-                    if ok then
-                        name = tostring(node.value)
-                    end
-                elseif tokenType == "-" then
-                    tokenStream:Consume()
-                    ok, node = self.ParseNumber(tokenStream, nodeList, annotation)
-                    if ok then
-                        local value = -1 * node.value
-                        node = self:GetNumberNode(value, nodeList, annotation)
-                        name = tostring(value)
-                    end
-                elseif tokenType == "string" then
-                    ok, node = self.ParseString(tokenStream, nodeList, annotation)
-                    if ok and __exports.isStringNode(node) then
-                        name = node.value
-                    end
-                elseif checkToken(__exports.PARAMETER_KEYWORD, token) then
-                    if isList then
-                        self:SyntaxError(tokenStream, "Syntax error: unexpected keyword '%s' when parsing PARAMETERS; simple expression expected.", token)
-                        ok = false
-                    else
-                        tokenStream:Consume()
-                        name = token
-                    end
-                else
-                    break
-                end
-                if ok and name then
-                    tokenType, token = tokenStream:Peek()
-                    if tokenType == "=" then
-                        tokenStream:Consume()
-                        local parameterName = name
-                        if parameterName == "listitem" then
-                            local np = namedParams[parameterName]
-                            local control = np or self.self_listPool:Get()
-                            tokenType, token = tokenStream:Consume()
-                            local list
-                            if tokenType == "name" then
-                                list = token
-                            else
-                                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing PARAMETERS; name expected.", token)
-                                ok = false
-                            end
-                            if ok then
-                                tokenType, token = tokenStream:Consume()
-                                if tokenType ~= ":" then
-                                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing PARAMETERS; ':' expected.", token)
-                                    ok = false
-                                end
-                            end
-                            if ok then
-                                ok, node = self.ParseSimpleParameterValue(tokenStream, nodeList, annotation)
-                            end
-                            if ok and node then
-                                if  not (node.type == "variable" or (node.type == "bang_value" and node.child[1].type == "variable")) then
-                                    self:SyntaxError(tokenStream, "Syntax error: 'listitem=%s' parameter with unexpected value '%s'.", self:Unparse(node))
-                                    ok = false
-                                end
-                            end
-                            if ok then
-                                control[list] = node
-                            end
-                            if  not namedParams[parameterName] then
-                                namedParams[parameterName] = control
-                                annotation.listList = annotation.listList or {}
-                                annotation.listList[#annotation.listList + 1] = control
-                            end
-                        elseif name == "checkbox" then
-                            local np = namedParams[name]
-                            local control = np or self.self_checkboxPool:Get()
-                            ok, node = self.ParseSimpleParameterValue(tokenStream, nodeList, annotation)
-                            if ok and node then
-                                if  not (node.type == "variable" or (node.type == "bang_value" and node.child[1].type == "variable")) then
-                                    self:SyntaxError(tokenStream, "Syntax error: 'checkbox' parameter with unexpected value '%s'.", self:Unparse(node))
-                                    ok = false
-                                end
-                            end
-                            if ok then
-                                control[#control + 1] = node
-                            end
-                            if  not namedParams[name] then
-                                namedParams[name] = control
-                                annotation.checkBoxList = annotation.checkBoxList or {}
-                                annotation.checkBoxList[#annotation.checkBoxList + 1] = control
-                            end
-                        else
-                            ok, node = self.ParseParameterValue(tokenStream, nodeList, annotation)
-                            namedParams[parameterName] = node
-                        end
-                    else
-                        positionalParams[#positionalParams + 1] = node
-                    end
-                end
-            else
-                break
-            end
-        end
-        if ok then
-            annotation.rawPositionalParametersList = annotation.rawPositionalParametersList or {}
-            annotation.rawPositionalParametersList[#annotation.rawPositionalParametersList + 1] = positionalParams
-            annotation.rawNamedParametersList = annotation.rawNamedParametersList or {}
-            annotation.rawNamedParametersList[#annotation.rawNamedParametersList + 1] = namedParams
-        else
-            positionalParams = nil
-            namedParams = nil
-        end
-        return ok, positionalParams, namedParams
-    end,
-    ParseParentheses = function(self, tokenStream, nodeList, annotation)
-        local ok = true
-        local leftToken, rightToken
-        do
-            local tokenType, token = tokenStream:Consume()
-            if tokenType == "(" then
-                leftToken, rightToken = "(", ")"
-            elseif tokenType == "{" then
-                leftToken, rightToken = "{", "}"
-            else
-                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing PARENTHESES; '(' or '{' expected.", token)
-                ok = false
-            end
-        end
-        local node
-        if ok then
-            ok, node = self.ParseExpression(tokenStream, nodeList, annotation)
-        end
-        if ok then
-            local tokenType, token = tokenStream:Consume()
-            if tokenType ~= rightToken then
-                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing PARENTHESES; '%s' expected.", token, rightToken)
-                ok = false
-            end
-        end
-        if ok then
-            node.left = leftToken
-            node.right = rightToken
-        end
-        return ok, node
-    end,
-    ParseSimpleExpression = function(self, tokenStream, nodeList, annotation)
-        local ok = true
-        local node
-        local tokenType, token = tokenStream:Peek()
-        if tokenType == "number" then
-            ok, node = self.ParseNumber(tokenStream, nodeList, annotation)
-        elseif tokenType == "string" then
-            ok, node = self.ParseString(tokenStream, nodeList, annotation)
-        elseif tokenType == "name" then
-            tokenType, token = tokenStream:Peek(2)
-            if tokenType == "." or tokenType == "(" then
-                ok, node = self.ParseFunction(tokenStream, nodeList, annotation)
-            else
-                ok, node = self.ParseVariable(tokenStream, nodeList, annotation)
-            end
-        elseif tokenType == "(" or tokenType == "{" then
-            ok, node = self:ParseParentheses(tokenStream, nodeList, annotation)
-        else
-            tokenStream:Consume()
-            self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SIMPLE EXPRESSION", token)
-            ok = false
-        end
-        return ok, node
-    end,
-    ParseStatement = function(self, tokenStream, nodeList, annotation)
-        local ok = true
-        local node
-        local tokenType, token = tokenStream:Peek()
-        if tokenType then
-            if token == "{" then
-                local i = 1
-                local count = 0
-                while tokenType do
-                    if token == "{" then
-                        count = count + 1
-                    elseif token == "}" then
-                        count = count - 1
-                    end
-                    i = i + 1
-                    tokenType, token = tokenStream:Peek(i)
-                    if count == 0 then
-                        break
-                    end
-                end
-                if tokenType then
-                    if BINARY_OPERATOR[token] then
-                        ok, node = self.ParseExpression(tokenStream, nodeList, annotation)
-                    else
-                        ok, node = self.ParseGroup(tokenStream, nodeList, annotation)
-                    end
-                else
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected end of script.")
-                end
-            elseif token == "if" then
-                ok, node = self.ParseIf(tokenStream, nodeList, annotation)
-            elseif token == "unless" then
-                ok, node = self.ParseUnless(tokenStream, nodeList, annotation)
-            else
-                ok, node = self.ParseExpression(tokenStream, nodeList, annotation)
-            end
-        end
-        return ok, node
-    end,
-    DebugAST = function(self)
-        self.self_pool:DebuggingInfo()
-        self.self_namedParametersPool:DebuggingInfo()
-        self.self_checkboxPool:DebuggingInfo()
-        self.self_listPool:DebuggingInfo()
-        self.self_childrenPool:DebuggingInfo()
-        self.self_outputPool:DebuggingInfo()
-    end,
-    NewNode = function(self, nodeList, hasChild)
-        local node = self.self_pool:Get()
-        if nodeList then
-            local nodeId = #nodeList + 1
-            node.nodeId = nodeId
-            nodeList[nodeId] = node
-        end
-        if hasChild then
-            node.child = self.self_childrenPool:Get()
-        end
-        return node
-    end,
-    NodeToString = function(self, node)
-        local output = self:print_r(node)
-        return concat(output, "\n")
-    end,
-    ReleaseAnnotation = function(self, annotation)
-        if annotation.checkBoxList then
-            for _, control in ipairs(annotation.checkBoxList) do
-                self.self_checkboxPool:Release(control)
-            end
-        end
-        if annotation.listList then
-            for _, control in ipairs(annotation.listList) do
-                self.self_listPool:Release(control)
-            end
-        end
-        if annotation.objects then
-            for _, parameters in ipairs(annotation.objects) do
-                self.objectPool:Release(parameters)
-            end
-        end
-        if annotation.rawPositionalParametersList then
-            for _, parameters in ipairs(annotation.rawPositionalParametersList) do
-                self.self_rawPositionalParametersPool:Release(parameters)
-            end
-        end
-        if annotation.rawNamedParametersList then
-            for _, parameters in ipairs(annotation.rawNamedParametersList) do
-                self.self_rawNamedParametersPool:Release(parameters)
-            end
-        end
-        if annotation.nodeList then
-            for _, node in ipairs(annotation.nodeList) do
-                self.self_pool:Release(node)
-            end
-        end
-        for _, value in kpairs(annotation) do
-            if type(value) == "table" then
-                wipe(value)
-            end
-        end
-        wipe(annotation)
-    end,
-    Release = function(self, ast)
-        if ast.annotation then
-            self:ReleaseAnnotation(ast.annotation)
-            ast.annotation = nil
-        end
-        self.self_pool:Release(ast)
-    end,
-    ParseCode = function(self, nodeType, code, nodeList, annotation)
-        nodeList = nodeList or {}
-        annotation = annotation or {}
-        local tokenStream = OvaleLexer("Ovale", code, MATCHES, {
-            comments = TokenizeComment,
-            space = TokenizeWhitespace
-        })
-        local _, node = self:Parse(nodeType, tokenStream, nodeList, annotation)
-        tokenStream:Release()
-        return node, nodeList, annotation
-    end,
-    ParseScript = function(self, name, options)
-        local code = OvaleScripts:GetScriptOrDefault(name)
-        local ast
-        if code then
-            options = options or {
-                optimize = true,
-                verify = true
-            }
-            local annotation = {
-                nodeList = {},
-                verify = options.verify
-            }
-            ast = self:ParseCode("script", code, annotation.nodeList, annotation)
-            if ast then
-                ast.annotation = annotation
-                self:PropagateConstants(ast)
-                self:PropagateStrings(ast)
-                self:FlattenParameters(ast)
-                self:VerifyParameterStances(ast)
-                self:VerifyFunctionCalls(ast)
-                if options.optimize then
-                    self:Optimize(ast)
-                end
-                self:InsertPostOrderTraversal(ast)
-            else
-                ast = self:NewNode()
-                ast.annotation = annotation
-                self:Release(ast)
-                ast = nil
-            end
-        else
-            self:Debug("No code to parse")
-        end
-        return ast
-    end,
-    PropagateConstants = function(self, ast)
-        self:StartProfiling("OvaleAST_PropagateConstants")
-        if ast.annotation then
-            local dictionary = ast.annotation.definition
-            if dictionary and ast.annotation.nameReference then
-                for _, node in ipairs(ast.annotation.nameReference) do
-                    local valueNode = node
-                    if (node.type == "item_info" or node.type == "item_require") and node.name then
-                        local itemId = dictionary[node.name]
-                        if itemId then
-                            node.itemId = itemId
-                        end
-                    elseif (node.type == "spell_aura_list" or node.type == "spell_info" or node.type == "spell_require") and node.name then
-                        local spellId = dictionary[node.name]
-                        if spellId then
-                            node.spellId = spellId
-                        end
-                    elseif isVariableNode(node) then
-                        local name = node.name
-                        local value = dictionary[name]
-                        if value then
-                            valueNode.previousType = "variable"
-                            valueNode.type = "value"
-                            valueNode.value = value
-                            valueNode.origin = 0
-                            valueNode.rate = 0
-                        end
-                    end
-                end
-            end
-        end
-        self:StopProfiling("OvaleAST_PropagateConstants")
-    end,
-    PropagateStrings = function(self, ast)
-        self:StartProfiling("OvaleAST_PropagateStrings")
-        if ast.annotation and ast.annotation.stringReference then
-            for _, node in ipairs(ast.annotation.stringReference) do
-                local targetNode = node
-                if __exports.isStringNode(node) then
-                    local key = node.value
-                    local value = L[key]
-                    if key ~= value then
-                        targetNode.value = value
-                        targetNode.key = key
-                    end
-                elseif isVariableNode(node) then
-                    local value = node.name
-                    targetNode.previousType = node.type
-                    targetNode.type = "string"
-                    targetNode.value = value
-                elseif __exports.isValueNode(node) then
-                    local value = node.value
-                    targetNode.previousType = "value"
-                    targetNode.type = "string"
-                    targetNode.value = tostring(value)
-                elseif node.type == "function" then
-                    local key = node.rawPositionalParams[1]
-                    local stringKey
-                    if isAstNode(key) then
-                        if __exports.isValueNode(key) then
-                            stringKey = tostring(key.value)
-                        elseif isVariableNode(key) then
-                            stringKey = key.name
-                        elseif __exports.isStringNode(key) then
-                            stringKey = key.value
-                        end
-                    else
-                        stringKey = tostring(key)
-                    end
-                    local value
-                    if stringKey then
-                        local name = node.name
-                        if name == "ItemName" then
-                            value = GetItemInfo(stringKey) or "item:" .. stringKey
-                        elseif name == "L" then
-                            value = L[stringKey]
-                        elseif name == "SpellName" then
-                            value = OvaleSpellBook:GetSpellName(tonumber(stringKey)) or "spell:" .. stringKey
-                        end
-                    end
-                    if value then
-                        targetNode.previousType = "function"
-                        targetNode.type = "string"
-                        targetNode.value = value
-                        targetNode.key = stringKey
-                    end
-                end
-            end
-        end
-        self:StopProfiling("OvaleAST_PropagateStrings")
-    end,
-    FlattenParameters = function(self, ast)
-        self:StartProfiling("OvaleAST_FlattenParameters")
-        local annotation = ast.annotation
-        if annotation and annotation.parametersReference then
-            local dictionary = annotation.definition
-            for _, node in ipairs(annotation.parametersReference) do
-                if node.rawPositionalParams then
-                    local parameters = self.self_flattenParameterValuesPool:Get()
-                    for key, value in ipairs(node.rawPositionalParams) do
-                        parameters[key] = self:FlattenParameterValue(value, annotation)
-                    end
-                    node.positionalParams = parameters
-                    annotation.positionalParametersList = annotation.positionalParametersList or {}
-                    annotation.positionalParametersList[#annotation.positionalParametersList + 1] = parameters
-                end
-                if node.rawNamedParams then
-                    local parameters = self.objectPool:Get()
-                    for key in kpairs(node.rawNamedParams) do
-                        if key == "listitem" then
-                            local control = parameters[key] or self.objectPool:Get()
-                            local listItems = node.rawNamedParams[key]
-                            for list, item in pairs(listItems) do
-                                control[list] = self:FlattenParameterValueNotCsv(item, annotation)
-                            end
-                            if  not parameters[key] then
-                                parameters[key] = control
-                                annotation.objects = annotation.objects or {}
-                                annotation.objects[#annotation.objects + 1] = control
-                            end
-                        elseif key == "checkbox" then
-                            local control = parameters[key] or self.objectPool:Get()
-                            local checkBoxItems = node.rawNamedParams[key]
-                            for i, name in ipairs(checkBoxItems) do
-                                control[i] = self:FlattenParameterValueNotCsv(name, annotation)
-                            end
-                            if  not parameters[key] then
-                                parameters[key] = control
-                                annotation.objects = annotation.objects or {}
-                                annotation.objects[#annotation.objects + 1] = control
-                            end
-                        else
-                            local value = node.rawNamedParams[key]
-                            local flattenValue = self:FlattenParameterValue(value, annotation)
-                            if type(key) ~= "number" and dictionary and dictionary[key] then
-                                parameters[dictionary[key]] = flattenValue
-                            else
-                                parameters[key] = flattenValue
-                            end
-                        end
-                    end
-                    node.namedParams = parameters
-                    annotation.parametersList = annotation.parametersList or {}
-                    annotation.parametersList[#annotation.parametersList + 1] = parameters
-                end
-                local output = self.self_outputPool:Get()
-                for k, v in kpairs(node.namedParams) do
-                    if isCheckBoxFlattenParameters(k, v) then
-                        for _, name in ipairs(v) do
-                            output[#output + 1] = format("checkbox=%s", name)
-                        end
-                    elseif isListItemFlattenParameters(k, v) then
-                        for list, item in ipairs(v) do
-                            output[#output + 1] = format("listitem=%s:%s", list, item)
-                        end
-                    elseif isLuaArray(v) then
-                        output[#output + 1] = format("%s=%s", k, concat(v, ","))
-                    else
-                        output[#output + 1] = format("%s=%s", k, v)
-                    end
-                end
-                sort(output)
-                for k = #node.positionalParams, 1, -1 do
-                    insert(output, 1, node.positionalParams[k])
-                end
-                if #output > 0 then
-                    node.paramsAsString = concat(output, " ")
-                else
-                    node.paramsAsString = ""
-                end
-                self.self_outputPool:Release(output)
-            end
-        end
-        self:StopProfiling("OvaleAST_FlattenParameters")
-    end,
-    VerifyFunctionCalls = function(self, ast)
-        self:StartProfiling("OvaleAST_VerifyFunctionCalls")
-        if ast.annotation and ast.annotation.verify then
-            local customFunction = ast.annotation.customFunction
-            local functionCall = ast.annotation.functionCall
-            if functionCall then
-                for name in pairs(functionCall) do
-                    if ACTION_PARAMETER_COUNT[name] then
-                    elseif STRING_LOOKUP_FUNCTION[name] then
-                    elseif OvaleCondition:IsCondition(name) then
-                    elseif customFunction and customFunction[name] then
-                    else
-                        self:Error("unknown function '%s'.", name)
-                    end
-                end
-            end
-        end
-        self:StopProfiling("OvaleAST_VerifyFunctionCalls")
-    end,
-    VerifyParameterStances = function(self, ast)
-        self:StartProfiling("OvaleAST_VerifyParameterStances")
-        local annotation = ast.annotation
-        if annotation and annotation.verify and annotation.parametersReference then
-            for _, node in ipairs(annotation.parametersReference) do
-                if node.rawNamedParams then
-                    for stanceKeyword in kpairs(STANCE_KEYWORD) do
-                        local valueNode = node.rawNamedParams[stanceKeyword]
-                        if valueNode then
-                            if isCsvNode(valueNode) then
-                                valueNode = valueNode.csv[1]
-                            end
-                            if valueNode.type == "bang_value" then
-                                valueNode = valueNode.child[1]
-                            end
-                            local value = self:FlattenParameterValue(valueNode, annotation)
-                            if  not isNumber(value) then
-                                if  not isString(value) then
-                                    self:Error("stance must be a string or a number")
-                                elseif  not OvaleStance.STANCE_NAME[value] then
-                                    self:Error("unknown stance '%s'.", value)
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-        self:StopProfiling("OvaleAST_VerifyParameterStances")
-    end,
-    InsertPostOrderTraversal = function(self, ast)
-        self:StartProfiling("OvaleAST_InsertPostOrderTraversal")
-        local annotation = ast.annotation
-        if annotation and annotation.postOrderReference then
-            for _, node in ipairs(annotation.postOrderReference) do
-                local array = self.self_postOrderPool:Get()
-                local visited = self.postOrderVisitedPool:Get()
-                self:PostOrderTraversal(node, array, visited)
-                self.postOrderVisitedPool:Release(visited)
-                node.postOrder = array
-            end
-        end
-        self:StopProfiling("OvaleAST_InsertPostOrderTraversal")
-    end,
-    Optimize = function(self, ast)
-        self:CommonFunctionElimination(ast)
-        self:CommonSubExpressionElimination(ast)
-    end,
-    CommonFunctionElimination = function(self, ast)
-        self:StartProfiling("OvaleAST_CommonFunctionElimination")
-        if ast.annotation then
-            if ast.annotation.functionReference then
-                local functionHash = ast.annotation.functionHash or {}
-                for _, node in ipairs(ast.annotation.functionReference) do
-                    if node.positionalParams or node.namedParams then
-                        local hash = node.name .. "(" .. node.paramsAsString .. ")"
-                        node.functionHash = hash
-                        functionHash[hash] = functionHash[hash] or node
-                    end
-                end
-                ast.annotation.functionHash = functionHash
-            end
-            if ast.annotation.functionHash and ast.annotation.nodeList then
-                local functionHash = ast.annotation.functionHash
-                for _, node in ipairs(ast.annotation.nodeList) do
-                    if node.child then
-                        for k, childNode in ipairs(node.child) do
-                            if childNode.functionHash then
-                                node.child[k] = functionHash[childNode.functionHash]
-                            end
-                        end
-                    end
-                end
-            end
-        end
-        self:StopProfiling("OvaleAST_CommonFunctionElimination")
-    end,
-    CommonSubExpressionElimination = function(self, ast)
-        self:StartProfiling("OvaleAST_CommonSubExpressionElimination")
-        if ast and ast.annotation and ast.annotation.nodeList then
-            local expressionHash = {}
-            for _, node in ipairs(ast.annotation.nodeList) do
-                local hash = node.asString
-                if hash then
-                    expressionHash[hash] = expressionHash[hash] or node
-                end
-                if node.child then
-                    for i, childNode in ipairs(node.child) do
-                        hash = childNode.asString
-                        if hash then
-                            local hashNode = expressionHash[hash]
-                            if hashNode then
-                                node.child[i] = hashNode
-                            else
-                                expressionHash[hash] = childNode
-                            end
-                        end
-                    end
-                end
-            end
-            ast.annotation.expressionHash = expressionHash
-        end
-        self:StopProfiling("OvaleAST_CommonSubExpressionElimination")
-    end,
-    constructor = function(self, ...)
-        OvaleASTBase.constructor(self, ...)
+__exports.OvaleASTClass = __class(nil, {
+    constructor = function(self, ovaleCondition, ovaleDebug, ovaleProfiler, ovaleScripts, ovaleSpellBook)
+        self.ovaleCondition = ovaleCondition
+        self.ovaleScripts = ovaleScripts
+        self.ovaleSpellBook = ovaleSpellBook
         self.self_indent = 0
         self.self_outputPool = OvalePool("OvaleAST_outputPool")
         self.self_listPool = OvalePool("OvaleAST_listPool")
@@ -1899,7 +1082,7 @@ __exports.OvaleASTClass = __class(OvaleASTBase, {
                     node.func = name
                     annotation.stringReference = annotation.stringReference or {}
                     annotation.stringReference[#annotation.stringReference + 1] = node
-                elseif OvaleCondition:IsCondition(lowername) then
+                elseif self.ovaleCondition:IsCondition(lowername) then
                     node.type = "function"
                     node.func = lowername
                 else
@@ -2014,9 +1197,9 @@ __exports.OvaleASTClass = __class(OvaleASTBase, {
                     ok = false
                 end
             end
-            local code = OvaleScripts:GetScript(name)
+            local code = self.ovaleScripts:GetScript(name)
             if code == nil then
-                self:Error("Script '%s' not found when parsing INCLUDE.", name)
+                self.debug:Error("Script '%s' not found when parsing INCLUDE.", name)
                 ok = false
             end
             local node
@@ -2288,7 +1471,7 @@ __exports.OvaleASTClass = __class(OvaleASTBase, {
             return ok, node
         end
         self.ParseScriptStream = function(tokenStream, nodeList, annotation)
-            self:StartProfiling("OvaleAST_ParseScript")
+            self.profiler:StartProfiling("OvaleAST_ParseScript")
             local ok = true
             local child = self.self_childrenPool:Get()
             while ok do
@@ -2318,7 +1501,7 @@ __exports.OvaleASTClass = __class(OvaleASTBase, {
             else
                 self.self_childrenPool:Release(child)
             end
-            self:StopProfiling("OvaleAST_ParseScript")
+            self.profiler:StopProfiling("OvaleAST_ParseScript")
             return ok, ast
         end
         self.ParseSimpleParameterValue = function(tokenStream, nodeList, annotation)
@@ -2639,6 +1822,813 @@ __exports.OvaleASTClass = __class(OvaleASTBase, {
             ["value"] = self.ParseNumber,
             ["variable"] = self.ParseVariable
         }
-    end
+        self.debug = ovaleDebug:create("OvaleAST")
+        self.profiler = ovaleProfiler:create("OvaleAST")
+    end,
+    OnInitialize = function(self)
+    end,
+    print_r = function(self, node, indent, done, output)
+        done = done or {}
+        output = output or {}
+        indent = indent or ""
+        for key, value in kpairs(node) do
+            if isAstNode(value) then
+                if done[value.nodeId] then
+                    insert(output, indent .. "[" .. tostring(key) .. "] => (self_reference)")
+                else
+                    done[value.nodeId] = true
+                    if value.type then
+                        insert(output, indent .. "[" .. tostring(key) .. "] =>")
+                    else
+                        insert(output, indent .. "[" .. tostring(key) .. "] => {")
+                    end
+                    self:print_r(value, indent .. "    ", done, output)
+                    if  not value.type then
+                        insert(output, indent .. "}")
+                    end
+                end
+            else
+                insert(output, indent .. "[" .. tostring(key) .. "] => " .. tostring(value))
+            end
+        end
+        return output
+    end,
+    GetNumberNode = function(self, value, nodeList, annotation)
+        annotation.numberFlyweight = annotation.numberFlyweight or {}
+        local node = annotation.numberFlyweight[value]
+        if  not node then
+            node = self:NewNode(nodeList)
+            node.type = "value"
+            node.value = value
+            node.origin = 0
+            node.rate = 0
+            annotation.numberFlyweight[value] = node
+        end
+        return node
+    end,
+    PostOrderTraversal = function(self, node, array, visited)
+        if node.child then
+            for _, childNode in ipairs(node.child) do
+                if  not visited[childNode.nodeId] then
+                    self:PostOrderTraversal(childNode, array, visited)
+                    array[#array + 1] = node
+                end
+            end
+        end
+        array[#array + 1] = node
+        visited[node.nodeId] = true
+    end,
+    FlattenParameterValueNotCsv = function(self, parameterValue, annotation)
+        if isAstNode(parameterValue) then
+            local node = parameterValue
+            local isBang = false
+            local value
+            if node.type == "bang_value" then
+                isBang = true
+                node = node.child[1]
+            end
+            if __exports.isValueNode(node) then
+                value = node.value
+            elseif node.type == "variable" then
+                value = node.name
+            elseif __exports.isStringNode(node) then
+                value = node.value
+            else
+                return parameterValue
+            end
+            if isBang then
+                value = "!" .. tostring(value)
+            end
+            return value
+        end
+        return parameterValue
+    end,
+    FlattenParameterValue = function(self, parameterValue, annotation)
+        if isAstNode(parameterValue) and isCsvNode(parameterValue) then
+            local parameters = self.self_flattenParametersPool:Get()
+            for k, v in ipairs(parameterValue.csv) do
+                parameters[k] = self:FlattenParameterValueNotCsv(v, annotation)
+            end
+            annotation.flattenParametersList = annotation.flattenParametersList or {}
+            annotation.flattenParametersList[#annotation.flattenParametersList + 1] = parameters
+            return parameters
+        else
+            return self:FlattenParameterValueNotCsv(parameterValue, annotation)
+        end
+    end,
+    GetPrecedence = function(self, node)
+        local precedence = node.precedence
+        if  not precedence then
+            local operator = node.operator
+            if operator then
+                if node.expressionType == "unary" and UNARY_OPERATOR[operator] then
+                    precedence = UNARY_OPERATOR[operator][2]
+                elseif node.expressionType == "binary" and BINARY_OPERATOR[operator] then
+                    precedence = BINARY_OPERATOR[operator][2]
+                end
+            end
+        end
+        return precedence
+    end,
+    HasParameters = function(self, node)
+        return node.rawPositionalParams and next(node.rawPositionalParams) or node.rawNamedParams and next(node.rawNamedParams)
+    end,
+    Unparse = function(self, node)
+        if node.asString then
+            return node.asString
+        else
+            local visitor
+            if node.previousType then
+                visitor = self.UNPARSE_VISITOR[node.previousType]
+            else
+                visitor = self.UNPARSE_VISITOR[node.type]
+            end
+            if  not visitor then
+                self.debug:Error("Unable to unparse node of type '%s'.", node.type)
+            else
+                return visitor(node)
+            end
+        end
+    end,
+    UnparseParameters = function(self, positionalParams, namedParams)
+        local output = self.self_outputPool:Get()
+        for k, v in kpairs(namedParams) do
+            if isListItemParameter(k, v) then
+                for list, item in pairs(v) do
+                    output[#output + 1] = format("listitem=%s:%s", list, self:Unparse(item))
+                end
+            elseif isCheckBoxParameter(k, v) then
+                for _, name in ipairs(v) do
+                    output[#output + 1] = format("checkbox=%s", self:Unparse(name))
+                end
+            elseif isAstNode(v) then
+                output[#output + 1] = format("%s=%s", k, self:Unparse(v))
+            elseif k == "filter" or k == "target" then
+            else
+                output[#output + 1] = format("%s=%s", k, v)
+            end
+        end
+        sort(output)
+        for k = #positionalParams, 1, -1 do
+            insert(output, 1, self:Unparse(positionalParams[k]))
+        end
+        local outputString = concat(output, " ")
+        self.self_outputPool:Release(output)
+        return outputString
+    end,
+    SyntaxError = function(self, tokenStream, ...)
+        self.debug:Warning(...)
+        local context = {
+            [1] = "Next tokens:"
+        }
+        for i = 1, 20, 1 do
+            local tokenType, token = tokenStream:Peek(i)
+            if tokenType then
+                context[#context + 1] = token
+            else
+                context[#context + 1] = "<EOS>"
+                break
+            end
+        end
+        self.debug:Warning(concat(context, " "))
+    end,
+    Parse = function(self, nodeType, tokenStream, nodeList, annotation)
+        local visitor = self.PARSE_VISITOR[nodeType]
+        if  not visitor then
+            self.debug:Error("Unable to parse node of type '%s'.", nodeType)
+        else
+            return visitor(tokenStream, nodeList, annotation)
+        end
+    end,
+    ParseParameters = function(self, tokenStream, nodeList, annotation, isList)
+        local ok = true
+        local positionalParams = self.self_rawPositionalParametersPool:Get()
+        local namedParams = self.self_rawNamedParametersPool:Get()
+        while ok do
+            local tokenType, token = tokenStream:Peek()
+            if tokenType then
+                local name
+                local node
+                if tokenType == "name" then
+                    ok, node = self.ParseVariable(tokenStream, nodeList, annotation)
+                    if ok then
+                        name = node.name
+                    end
+                elseif tokenType == "number" then
+                    ok, node = self.ParseNumber(tokenStream, nodeList, annotation)
+                    if ok then
+                        name = tostring(node.value)
+                    end
+                elseif tokenType == "-" then
+                    tokenStream:Consume()
+                    ok, node = self.ParseNumber(tokenStream, nodeList, annotation)
+                    if ok then
+                        local value = -1 * node.value
+                        node = self:GetNumberNode(value, nodeList, annotation)
+                        name = tostring(value)
+                    end
+                elseif tokenType == "string" then
+                    ok, node = self.ParseString(tokenStream, nodeList, annotation)
+                    if ok and __exports.isStringNode(node) then
+                        name = node.value
+                    end
+                elseif checkToken(__exports.PARAMETER_KEYWORD, token) then
+                    if isList then
+                        self:SyntaxError(tokenStream, "Syntax error: unexpected keyword '%s' when parsing PARAMETERS; simple expression expected.", token)
+                        ok = false
+                    else
+                        tokenStream:Consume()
+                        name = token
+                    end
+                else
+                    break
+                end
+                if ok and name then
+                    tokenType, token = tokenStream:Peek()
+                    if tokenType == "=" then
+                        tokenStream:Consume()
+                        local parameterName = name
+                        if parameterName == "listitem" then
+                            local np = namedParams[parameterName]
+                            local control = np or self.self_listPool:Get()
+                            tokenType, token = tokenStream:Consume()
+                            local list
+                            if tokenType == "name" then
+                                list = token
+                            else
+                                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing PARAMETERS; name expected.", token)
+                                ok = false
+                            end
+                            if ok then
+                                tokenType, token = tokenStream:Consume()
+                                if tokenType ~= ":" then
+                                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing PARAMETERS; ':' expected.", token)
+                                    ok = false
+                                end
+                            end
+                            if ok then
+                                ok, node = self.ParseSimpleParameterValue(tokenStream, nodeList, annotation)
+                            end
+                            if ok and node then
+                                if  not (node.type == "variable" or (node.type == "bang_value" and node.child[1].type == "variable")) then
+                                    self:SyntaxError(tokenStream, "Syntax error: 'listitem=%s' parameter with unexpected value '%s'.", self:Unparse(node))
+                                    ok = false
+                                end
+                            end
+                            if ok then
+                                control[list] = node
+                            end
+                            if  not namedParams[parameterName] then
+                                namedParams[parameterName] = control
+                                annotation.listList = annotation.listList or {}
+                                annotation.listList[#annotation.listList + 1] = control
+                            end
+                        elseif name == "checkbox" then
+                            local np = namedParams[name]
+                            local control = np or self.self_checkboxPool:Get()
+                            ok, node = self.ParseSimpleParameterValue(tokenStream, nodeList, annotation)
+                            if ok and node then
+                                if  not (node.type == "variable" or (node.type == "bang_value" and node.child[1].type == "variable")) then
+                                    self:SyntaxError(tokenStream, "Syntax error: 'checkbox' parameter with unexpected value '%s'.", self:Unparse(node))
+                                    ok = false
+                                end
+                            end
+                            if ok then
+                                control[#control + 1] = node
+                            end
+                            if  not namedParams[name] then
+                                namedParams[name] = control
+                                annotation.checkBoxList = annotation.checkBoxList or {}
+                                annotation.checkBoxList[#annotation.checkBoxList + 1] = control
+                            end
+                        else
+                            ok, node = self.ParseParameterValue(tokenStream, nodeList, annotation)
+                            namedParams[parameterName] = node
+                        end
+                    else
+                        positionalParams[#positionalParams + 1] = node
+                    end
+                end
+            else
+                break
+            end
+        end
+        if ok then
+            annotation.rawPositionalParametersList = annotation.rawPositionalParametersList or {}
+            annotation.rawPositionalParametersList[#annotation.rawPositionalParametersList + 1] = positionalParams
+            annotation.rawNamedParametersList = annotation.rawNamedParametersList or {}
+            annotation.rawNamedParametersList[#annotation.rawNamedParametersList + 1] = namedParams
+        else
+            positionalParams = nil
+            namedParams = nil
+        end
+        return ok, positionalParams, namedParams
+    end,
+    ParseParentheses = function(self, tokenStream, nodeList, annotation)
+        local ok = true
+        local leftToken, rightToken
+        do
+            local tokenType, token = tokenStream:Consume()
+            if tokenType == "(" then
+                leftToken, rightToken = "(", ")"
+            elseif tokenType == "{" then
+                leftToken, rightToken = "{", "}"
+            else
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing PARENTHESES; '(' or '{' expected.", token)
+                ok = false
+            end
+        end
+        local node
+        if ok then
+            ok, node = self.ParseExpression(tokenStream, nodeList, annotation)
+        end
+        if ok then
+            local tokenType, token = tokenStream:Consume()
+            if tokenType ~= rightToken then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing PARENTHESES; '%s' expected.", token, rightToken)
+                ok = false
+            end
+        end
+        if ok then
+            node.left = leftToken
+            node.right = rightToken
+        end
+        return ok, node
+    end,
+    ParseSimpleExpression = function(self, tokenStream, nodeList, annotation)
+        local ok = true
+        local node
+        local tokenType, token = tokenStream:Peek()
+        if tokenType == "number" then
+            ok, node = self.ParseNumber(tokenStream, nodeList, annotation)
+        elseif tokenType == "string" then
+            ok, node = self.ParseString(tokenStream, nodeList, annotation)
+        elseif tokenType == "name" then
+            tokenType, token = tokenStream:Peek(2)
+            if tokenType == "." or tokenType == "(" then
+                ok, node = self.ParseFunction(tokenStream, nodeList, annotation)
+            else
+                ok, node = self.ParseVariable(tokenStream, nodeList, annotation)
+            end
+        elseif tokenType == "(" or tokenType == "{" then
+            ok, node = self:ParseParentheses(tokenStream, nodeList, annotation)
+        else
+            tokenStream:Consume()
+            self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing SIMPLE EXPRESSION", token)
+            ok = false
+        end
+        return ok, node
+    end,
+    ParseStatement = function(self, tokenStream, nodeList, annotation)
+        local ok = true
+        local node
+        local tokenType, token = tokenStream:Peek()
+        if tokenType then
+            if token == "{" then
+                local i = 1
+                local count = 0
+                while tokenType do
+                    if token == "{" then
+                        count = count + 1
+                    elseif token == "}" then
+                        count = count - 1
+                    end
+                    i = i + 1
+                    tokenType, token = tokenStream:Peek(i)
+                    if count == 0 then
+                        break
+                    end
+                end
+                if tokenType then
+                    if BINARY_OPERATOR[token] then
+                        ok, node = self.ParseExpression(tokenStream, nodeList, annotation)
+                    else
+                        ok, node = self.ParseGroup(tokenStream, nodeList, annotation)
+                    end
+                else
+                    self:SyntaxError(tokenStream, "Syntax error: unexpected end of script.")
+                end
+            elseif token == "if" then
+                ok, node = self.ParseIf(tokenStream, nodeList, annotation)
+            elseif token == "unless" then
+                ok, node = self.ParseUnless(tokenStream, nodeList, annotation)
+            else
+                ok, node = self.ParseExpression(tokenStream, nodeList, annotation)
+            end
+        end
+        return ok, node
+    end,
+    DebugAST = function(self)
+        self.debug:Log(self.self_pool:DebuggingInfo())
+        self.debug:Log(self.self_namedParametersPool:DebuggingInfo())
+        self.debug:Log(self.self_checkboxPool:DebuggingInfo())
+        self.debug:Log(self.self_listPool:DebuggingInfo())
+        self.debug:Log(self.self_childrenPool:DebuggingInfo())
+        self.debug:Log(self.self_outputPool:DebuggingInfo())
+    end,
+    NewNode = function(self, nodeList, hasChild)
+        local node = self.self_pool:Get()
+        if nodeList then
+            local nodeId = #nodeList + 1
+            node.nodeId = nodeId
+            nodeList[nodeId] = node
+        end
+        if hasChild then
+            node.child = self.self_childrenPool:Get()
+        end
+        return node
+    end,
+    NodeToString = function(self, node)
+        local output = self:print_r(node)
+        return concat(output, "\n")
+    end,
+    ReleaseAnnotation = function(self, annotation)
+        if annotation.checkBoxList then
+            for _, control in ipairs(annotation.checkBoxList) do
+                self.self_checkboxPool:Release(control)
+            end
+        end
+        if annotation.listList then
+            for _, control in ipairs(annotation.listList) do
+                self.self_listPool:Release(control)
+            end
+        end
+        if annotation.objects then
+            for _, parameters in ipairs(annotation.objects) do
+                self.objectPool:Release(parameters)
+            end
+        end
+        if annotation.rawPositionalParametersList then
+            for _, parameters in ipairs(annotation.rawPositionalParametersList) do
+                self.self_rawPositionalParametersPool:Release(parameters)
+            end
+        end
+        if annotation.rawNamedParametersList then
+            for _, parameters in ipairs(annotation.rawNamedParametersList) do
+                self.self_rawNamedParametersPool:Release(parameters)
+            end
+        end
+        if annotation.nodeList then
+            for _, node in ipairs(annotation.nodeList) do
+                self.self_pool:Release(node)
+            end
+        end
+        for _, value in kpairs(annotation) do
+            if type(value) == "table" then
+                wipe(value)
+            end
+        end
+        wipe(annotation)
+    end,
+    Release = function(self, ast)
+        if ast.annotation then
+            self:ReleaseAnnotation(ast.annotation)
+            ast.annotation = nil
+        end
+        self.self_pool:Release(ast)
+    end,
+    ParseCode = function(self, nodeType, code, nodeList, annotation)
+        nodeList = nodeList or {}
+        annotation = annotation or {}
+        local tokenStream = OvaleLexer("Ovale", code, MATCHES, {
+            comments = TokenizeComment,
+            space = TokenizeWhitespace
+        })
+        local _, node = self:Parse(nodeType, tokenStream, nodeList, annotation)
+        tokenStream:Release()
+        return node, nodeList, annotation
+    end,
+    ParseScript = function(self, name, options)
+        local code = self.ovaleScripts:GetScriptOrDefault(name)
+        local ast
+        if code then
+            options = options or {
+                optimize = true,
+                verify = true
+            }
+            local annotation = {
+                nodeList = {},
+                verify = options.verify
+            }
+            ast = self:ParseCode("script", code, annotation.nodeList, annotation)
+            if ast then
+                ast.annotation = annotation
+                self:PropagateConstants(ast)
+                self:PropagateStrings(ast)
+                self:FlattenParameters(ast)
+                self:VerifyParameterStances(ast)
+                self:VerifyFunctionCalls(ast)
+                if options.optimize then
+                    self:Optimize(ast)
+                end
+                self:InsertPostOrderTraversal(ast)
+            else
+                ast = self:NewNode()
+                ast.annotation = annotation
+                self:Release(ast)
+                ast = nil
+            end
+        else
+            self.debug:Debug("No code to parse")
+        end
+        return ast
+    end,
+    PropagateConstants = function(self, ast)
+        self.profiler:StartProfiling("OvaleAST_PropagateConstants")
+        if ast.annotation then
+            local dictionary = ast.annotation.definition
+            if dictionary and ast.annotation.nameReference then
+                for _, node in ipairs(ast.annotation.nameReference) do
+                    local valueNode = node
+                    if (node.type == "item_info" or node.type == "item_require") and node.name then
+                        local itemId = dictionary[node.name]
+                        if itemId then
+                            node.itemId = itemId
+                        end
+                    elseif (node.type == "spell_aura_list" or node.type == "spell_info" or node.type == "spell_require") and node.name then
+                        local spellId = dictionary[node.name]
+                        if spellId then
+                            node.spellId = spellId
+                        end
+                    elseif isVariableNode(node) then
+                        local name = node.name
+                        local value = dictionary[name]
+                        if value then
+                            valueNode.previousType = "variable"
+                            valueNode.type = "value"
+                            valueNode.value = value
+                            valueNode.origin = 0
+                            valueNode.rate = 0
+                        end
+                    end
+                end
+            end
+        end
+        self.profiler:StopProfiling("OvaleAST_PropagateConstants")
+    end,
+    PropagateStrings = function(self, ast)
+        self.profiler:StartProfiling("OvaleAST_PropagateStrings")
+        if ast.annotation and ast.annotation.stringReference then
+            for _, node in ipairs(ast.annotation.stringReference) do
+                local targetNode = node
+                if __exports.isStringNode(node) then
+                    local key = node.value
+                    local value = L[key]
+                    if key ~= value then
+                        targetNode.value = value
+                        targetNode.key = key
+                    end
+                elseif isVariableNode(node) then
+                    local value = node.name
+                    targetNode.previousType = node.type
+                    targetNode.type = "string"
+                    targetNode.value = value
+                elseif __exports.isValueNode(node) then
+                    local value = node.value
+                    targetNode.previousType = "value"
+                    targetNode.type = "string"
+                    targetNode.value = tostring(value)
+                elseif node.type == "function" then
+                    local key = node.rawPositionalParams[1]
+                    local stringKey
+                    if isAstNode(key) then
+                        if __exports.isValueNode(key) then
+                            stringKey = tostring(key.value)
+                        elseif isVariableNode(key) then
+                            stringKey = key.name
+                        elseif __exports.isStringNode(key) then
+                            stringKey = key.value
+                        end
+                    else
+                        stringKey = tostring(key)
+                    end
+                    local value
+                    if stringKey then
+                        local name = node.name
+                        if name == "ItemName" then
+                            value = GetItemInfo(stringKey) or "item:" .. stringKey
+                        elseif name == "L" then
+                            value = L[stringKey]
+                        elseif name == "SpellName" then
+                            value = self.ovaleSpellBook:GetSpellName(tonumber(stringKey)) or "spell:" .. stringKey
+                        end
+                    end
+                    if value then
+                        targetNode.previousType = "function"
+                        targetNode.type = "string"
+                        targetNode.value = value
+                        targetNode.key = stringKey
+                    end
+                end
+            end
+        end
+        self.profiler:StopProfiling("OvaleAST_PropagateStrings")
+    end,
+    FlattenParameters = function(self, ast)
+        self.profiler:StartProfiling("OvaleAST_FlattenParameters")
+        local annotation = ast.annotation
+        if annotation and annotation.parametersReference then
+            local dictionary = annotation.definition
+            for _, node in ipairs(annotation.parametersReference) do
+                if node.rawPositionalParams then
+                    local parameters = self.self_flattenParameterValuesPool:Get()
+                    for key, value in ipairs(node.rawPositionalParams) do
+                        parameters[key] = self:FlattenParameterValue(value, annotation)
+                    end
+                    node.positionalParams = parameters
+                    annotation.positionalParametersList = annotation.positionalParametersList or {}
+                    annotation.positionalParametersList[#annotation.positionalParametersList + 1] = parameters
+                end
+                if node.rawNamedParams then
+                    local parameters = self.objectPool:Get()
+                    for key in kpairs(node.rawNamedParams) do
+                        if key == "listitem" then
+                            local control = parameters[key] or self.objectPool:Get()
+                            local listItems = node.rawNamedParams[key]
+                            for list, item in pairs(listItems) do
+                                control[list] = self:FlattenParameterValueNotCsv(item, annotation)
+                            end
+                            if  not parameters[key] then
+                                parameters[key] = control
+                                annotation.objects = annotation.objects or {}
+                                annotation.objects[#annotation.objects + 1] = control
+                            end
+                        elseif key == "checkbox" then
+                            local control = parameters[key] or self.objectPool:Get()
+                            local checkBoxItems = node.rawNamedParams[key]
+                            for i, name in ipairs(checkBoxItems) do
+                                control[i] = self:FlattenParameterValueNotCsv(name, annotation)
+                            end
+                            if  not parameters[key] then
+                                parameters[key] = control
+                                annotation.objects = annotation.objects or {}
+                                annotation.objects[#annotation.objects + 1] = control
+                            end
+                        else
+                            local value = node.rawNamedParams[key]
+                            local flattenValue = self:FlattenParameterValue(value, annotation)
+                            if type(key) ~= "number" and dictionary and dictionary[key] then
+                                parameters[dictionary[key]] = flattenValue
+                            else
+                                parameters[key] = flattenValue
+                            end
+                        end
+                    end
+                    node.namedParams = parameters
+                    annotation.parametersList = annotation.parametersList or {}
+                    annotation.parametersList[#annotation.parametersList + 1] = parameters
+                end
+                local output = self.self_outputPool:Get()
+                for k, v in kpairs(node.namedParams) do
+                    if isCheckBoxFlattenParameters(k, v) then
+                        for _, name in ipairs(v) do
+                            output[#output + 1] = format("checkbox=%s", name)
+                        end
+                    elseif isListItemFlattenParameters(k, v) then
+                        for list, item in ipairs(v) do
+                            output[#output + 1] = format("listitem=%s:%s", list, item)
+                        end
+                    elseif isLuaArray(v) then
+                        output[#output + 1] = format("%s=%s", k, concat(v, ","))
+                    else
+                        output[#output + 1] = format("%s=%s", k, v)
+                    end
+                end
+                sort(output)
+                for k = #node.positionalParams, 1, -1 do
+                    insert(output, 1, node.positionalParams[k])
+                end
+                if #output > 0 then
+                    node.paramsAsString = concat(output, " ")
+                else
+                    node.paramsAsString = ""
+                end
+                self.self_outputPool:Release(output)
+            end
+        end
+        self.profiler:StopProfiling("OvaleAST_FlattenParameters")
+    end,
+    VerifyFunctionCalls = function(self, ast)
+        self.profiler:StartProfiling("OvaleAST_VerifyFunctionCalls")
+        if ast.annotation and ast.annotation.verify then
+            local customFunction = ast.annotation.customFunction
+            local functionCall = ast.annotation.functionCall
+            if functionCall then
+                for name in pairs(functionCall) do
+                    if ACTION_PARAMETER_COUNT[name] then
+                    elseif STRING_LOOKUP_FUNCTION[name] then
+                    elseif self.ovaleCondition:IsCondition(name) then
+                    elseif customFunction and customFunction[name] then
+                    else
+                        self.debug:Error("unknown function '%s'.", name)
+                    end
+                end
+            end
+        end
+        self.profiler:StopProfiling("OvaleAST_VerifyFunctionCalls")
+    end,
+    VerifyParameterStances = function(self, ast)
+        self.profiler:StartProfiling("OvaleAST_VerifyParameterStances")
+        local annotation = ast.annotation
+        if annotation and annotation.verify and annotation.parametersReference then
+            for _, node in ipairs(annotation.parametersReference) do
+                if node.rawNamedParams then
+                    for stanceKeyword in kpairs(STANCE_KEYWORD) do
+                        local valueNode = node.rawNamedParams[stanceKeyword]
+                        if valueNode then
+                            if isCsvNode(valueNode) then
+                                valueNode = valueNode.csv[1]
+                            end
+                            if valueNode.type == "bang_value" then
+                                valueNode = valueNode.child[1]
+                            end
+                            local value = self:FlattenParameterValue(valueNode, annotation)
+                            if  not isNumber(value) then
+                                if  not isString(value) then
+                                    self.debug:Error("stance must be a string or a number")
+                                elseif  not checkToken(STANCE_NAME, value) then
+                                    self.debug:Error("unknown stance '%s'.", value)
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        self.profiler:StopProfiling("OvaleAST_VerifyParameterStances")
+    end,
+    InsertPostOrderTraversal = function(self, ast)
+        self.profiler:StartProfiling("OvaleAST_InsertPostOrderTraversal")
+        local annotation = ast.annotation
+        if annotation and annotation.postOrderReference then
+            for _, node in ipairs(annotation.postOrderReference) do
+                local array = self.self_postOrderPool:Get()
+                local visited = self.postOrderVisitedPool:Get()
+                self:PostOrderTraversal(node, array, visited)
+                self.postOrderVisitedPool:Release(visited)
+                node.postOrder = array
+            end
+        end
+        self.profiler:StopProfiling("OvaleAST_InsertPostOrderTraversal")
+    end,
+    Optimize = function(self, ast)
+        self:CommonFunctionElimination(ast)
+        self:CommonSubExpressionElimination(ast)
+    end,
+    CommonFunctionElimination = function(self, ast)
+        self.profiler:StartProfiling("OvaleAST_CommonFunctionElimination")
+        if ast.annotation then
+            if ast.annotation.functionReference then
+                local functionHash = ast.annotation.functionHash or {}
+                for _, node in ipairs(ast.annotation.functionReference) do
+                    if node.positionalParams or node.namedParams then
+                        local hash = node.name .. "(" .. node.paramsAsString .. ")"
+                        node.functionHash = hash
+                        functionHash[hash] = functionHash[hash] or node
+                    end
+                end
+                ast.annotation.functionHash = functionHash
+            end
+            if ast.annotation.functionHash and ast.annotation.nodeList then
+                local functionHash = ast.annotation.functionHash
+                for _, node in ipairs(ast.annotation.nodeList) do
+                    if node.child then
+                        for k, childNode in ipairs(node.child) do
+                            if childNode.functionHash then
+                                node.child[k] = functionHash[childNode.functionHash]
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        self.profiler:StopProfiling("OvaleAST_CommonFunctionElimination")
+    end,
+    CommonSubExpressionElimination = function(self, ast)
+        self.profiler:StartProfiling("OvaleAST_CommonSubExpressionElimination")
+        if ast and ast.annotation and ast.annotation.nodeList then
+            local expressionHash = {}
+            for _, node in ipairs(ast.annotation.nodeList) do
+                local hash = node.asString
+                if hash then
+                    expressionHash[hash] = expressionHash[hash] or node
+                end
+                if node.child then
+                    for i, childNode in ipairs(node.child) do
+                        hash = childNode.asString
+                        if hash then
+                            local hashNode = expressionHash[hash]
+                            if hashNode then
+                                node.child[i] = hashNode
+                            else
+                                expressionHash[hash] = childNode
+                            end
+                        end
+                    end
+                end
+            end
+            ast.annotation.expressionHash = expressionHash
+        end
+        self.profiler:StopProfiling("OvaleAST_CommonSubExpressionElimination")
+    end,
 })
-__exports.OvaleAST = __exports.OvaleASTClass()

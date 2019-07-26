@@ -1,9 +1,10 @@
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-do
-    local name = "sc_t23_mage_arcane"
-    local desc = "[8.2] Simulationcraft: T23_Mage_Arcane"
-    local code = [[
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_mage", 80201)
+if not __exports then return end
+__exports.registerMage = function(OvaleScripts)
+    do
+        local name = "sc_t23_mage_arcane"
+        local desc = "[8.2] Simulationcraft: T23_Mage_Arcane"
+        local code = [[
 # Based on SimulationCraft profile "T23_Mage_Arcane".
 #	class=mage
 #	spec=arcane
@@ -595,12 +596,12 @@ AddIcon checkbox=opt_mage_arcane_aoe help=cd specialization=arcane
 # the_unbound_force
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("MAGE", "arcane", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_mage_fire"
-    local desc = "[8.2] Simulationcraft: T23_Mage_Fire"
-    local code = [[
+        OvaleScripts:RegisterScript("MAGE", "arcane", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_mage_fire"
+        local desc = "[8.2] Simulationcraft: T23_Mage_Fire"
+        local code = [[
 # Based on SimulationCraft profile "T23_Mage_Fire".
 #	class=mage
 #	spec=fire
@@ -1387,12 +1388,12 @@ AddIcon checkbox=opt_mage_fire_aoe help=cd specialization=fire
 # the_unbound_force
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("MAGE", "fire", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_mage_frost"
-    local desc = "[8.2] Simulationcraft: T23_Mage_Frost"
-    local code = [[
+        OvaleScripts:RegisterScript("MAGE", "fire", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_mage_frost"
+        local desc = "[8.2] Simulationcraft: T23_Mage_Frost"
+        local code = [[
 # Based on SimulationCraft profile "T23_Mage_Frost".
 #	class=mage
 #	spec=frost
@@ -2059,12 +2060,12 @@ AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 # winters_chill_debuff
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("MAGE", "frost", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_mage_frost_frozenorb"
-    local desc = "[8.2] Simulationcraft: T23_Mage_Frost_FrozenOrb"
-    local code = [[
+        OvaleScripts:RegisterScript("MAGE", "frost", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_mage_frost_frozenorb"
+        local desc = "[8.2] Simulationcraft: T23_Mage_Frost_FrozenOrb"
+        local code = [[
 # Based on SimulationCraft profile "T23_Mage_Frost_FrozenOrb".
 #	class=mage
 #	spec=frost
@@ -2731,12 +2732,12 @@ AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 # winters_chill_debuff
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("MAGE", "frost", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_mage_frost_noicelance"
-    local desc = "[8.2] Simulationcraft: T23_Mage_Frost_NoIceLance"
-    local code = [[
+        OvaleScripts:RegisterScript("MAGE", "frost", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_mage_frost_noicelance"
+        local desc = "[8.2] Simulationcraft: T23_Mage_Frost_NoIceLance"
+        local code = [[
 # Based on SimulationCraft profile "T23_Mage_Frost_NoIceLance".
 #	class=mage
 #	spec=frost
@@ -3388,5 +3389,6 @@ AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 # winters_chill_debuff
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("MAGE", "frost", name, desc, code, "script")
+        OvaleScripts:RegisterScript("MAGE", "frost", name, desc, code, "script")
+    end
 end

@@ -1,7 +1,8 @@
 import { LuaObj, pairs } from "@wowts/lua";
-import { StateModule, OvaleState } from "./State";
-import { OvaleFuture } from "./Future";
-import { baseState} from "./BaseState";
+import { StateModule } from "./State";
+import { OvaleFutureClass } from "./Future";
+import { BaseState } from "./BaseState";
+import { OvaleDebugClass, Tracer } from "./Debug";
 
 export class Variables implements StateModule {
     isState = true;
@@ -10,13 +11,18 @@ export class Variables implements StateModule {
     futureLastEnable: LuaObj<number> = undefined;
     variable:LuaObj<number> = {};
     lastEnable: LuaObj<number> = {}
+    private tracer: Tracer;
     
+    constructor(private ovaleFuture: OvaleFutureClass, private baseState: BaseState, ovaleDebug: OvaleDebugClass) {
+        this.tracer = ovaleDebug.create("Variables");
+    }
+
     InitializeState() {
         this.futureVariable = {}
         this.futureLastEnable = {}
-        if (!OvaleFuture.IsInCombat(undefined)) {
+        if (!this.ovaleFuture.IsInCombat(undefined)) {
             for (const [k] of pairs(this.variable)) {
-                this.Log("Resetting state variable '%s'.", k);
+                this.tracer.Log("Resetting state variable '%s'.", k);
                 this.variable[k] = undefined;
                 this.lastEnable[k] = undefined;
             }
@@ -47,32 +53,25 @@ export class Variables implements StateModule {
         return this.futureVariable[name] || this.variable[name] || 0;
     }
     GetStateDuration(name: string) {
-        let lastEnable = this.futureLastEnable[name] || this.lastEnable[name] || baseState.next.currentTime;
-        return baseState.next.currentTime - lastEnable;
+        let lastEnable = this.futureLastEnable[name] || this.lastEnable[name] || this.baseState.next.currentTime;
+        return this.baseState.next.currentTime - lastEnable;
     }
     PutState(name: string, value: number, isFuture: boolean, atTime: number) {
         if (isFuture) {
             let oldValue = this.GetState(name);
             if (value != oldValue) {
-                this.Log("Setting future state: %s from %s to %s.", name, oldValue, value);
+                this.tracer.Log("Setting future state: %s from %s to %s.", name, oldValue, value);
                 this.futureVariable[name] = value;
                 this.futureLastEnable[name] = atTime;
             }
         } else {
             let oldValue = this.variable[name] || 0;
             if (value != oldValue) {
-                OvaleState.DebugTimestamp("Advancing combat state: %s from %s to %s.", name, oldValue, value);
-                this.Log("Advancing combat state: %s from %s to %s.", name, oldValue, value);
+                this.tracer.DebugTimestamp("Advancing combat state: %s from %s to %s.", name, oldValue, value);
+                this.tracer.Log("Advancing combat state: %s from %s to %s.", name, oldValue, value);
                 this.variable[name] = value;
                 this.lastEnable[name] = atTime;
             }
         }
     }
-
-    Log(...__args: any[]) {
-        OvaleState.Log(...__args);
-    }
 }
-
-export const variables = new Variables();
-OvaleState.RegisterState(variables);

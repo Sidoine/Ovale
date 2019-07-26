@@ -1,16 +1,14 @@
-import { OvaleState } from "./State";
-import { Ovale } from "./Ovale";
-import aceEvent from "@wowts/ace_event-3.0";
+import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { LuaArray, tonumber, pairs, LuaObj } from "@wowts/lua";
 import { GetTime, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { find } from "@wowts/string";
-import { OvaleAura } from "./Aura";
-import { OvalePaperDoll } from "./PaperDoll";
 import { pow } from "@wowts/math";
-import { OvaleSpellBook } from "./SpellBook";
-
-let OvaleWarlockBase = Ovale.NewModule("OvaleWarlock", aceEvent);
-export let OvaleWarlock: OvaleWarlockClass;
+import { AceModule } from "@wowts/tsaddon";
+import { OvaleClass } from "./Ovale";
+import { StateModule } from "./State";
+import { OvaleAuraClass } from "./Aura";
+import { OvalePaperDollClass } from "./PaperDoll";
+import { OvaleSpellBookClass } from "./SpellBook";
 
 interface customAura {
     customId: number;
@@ -65,21 +63,29 @@ interface Demon {
 let self_demons: LuaObj<Demon> = {
 }
 let self_serial = 1;
-class OvaleWarlockClass extends OvaleWarlockBase {
-    OnInitialize() {
-        if (Ovale.playerClass == "WARLOCK") {
-            this.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
+export class OvaleWarlockClass implements StateModule {
+    private module: AceModule & AceEvent;
+
+    constructor(private ovale: OvaleClass, private ovaleAura: OvaleAuraClass, private ovalePaperDoll: OvalePaperDollClass, private ovaleSpellBook: OvaleSpellBookClass) {
+        this.module = ovale.createModule("OvaleWarlock", this.OnInitialize, this.OnDisable, aceEvent);
+    }
+
+    private OnInitialize = () => {
+        if (this.ovale.playerClass == "WARLOCK") {
+            this.module.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", this.COMBAT_LOG_EVENT_UNFILTERED);
             self_demons = {}
         }
     }
-    OnDisable() {
-        if (Ovale.playerClass == "WARLOCK") {
-            this.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
+    
+    private OnDisable = () => {
+        if (this.ovale.playerClass == "WARLOCK") {
+            this.module.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         }
     }
-    COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
+    
+    private COMBAT_LOG_EVENT_UNFILTERED = (event: string, ...__args: any[]) => {
         let [, cleuEvent, , sourceGUID, , , , destGUID, , , , spellId] = CombatLogGetCurrentEventInfo();
-        if (sourceGUID != Ovale.playerGUID) {
+        if (sourceGUID != this.ovale.playerGUID) {
             return;
         }
         self_serial = self_serial + 1;
@@ -102,7 +108,7 @@ class OvaleWarlockClass extends OvaleWarlockBase {
                     delete self_demons[k];
                 }
             }
-            Ovale.needRefresh();
+            this.ovale.needRefresh();
         } else if (cleuEvent == 'SPELL_CAST_SUCCESS') {
             if (spellId == 196277) {
                 for (const [k, d] of pairs(self_demons)) {
@@ -110,7 +116,7 @@ class OvaleWarlockClass extends OvaleWarlockBase {
                         delete self_demons[k];
                     }
                 }
-                Ovale.needRefresh();
+                this.ovale.needRefresh();
             }
 
             const aura = CUSTOM_AURAS[spellId];
@@ -160,7 +166,7 @@ class OvaleWarlockClass extends OvaleWarlockBase {
     AddCustomAura(customId: number, stacks: number, duration: number, buffName: string){
         let now = GetTime()
         let expire = now + duration;
-        OvaleAura.GainedAuraOnGUID(Ovale.playerGUID, now, customId, Ovale.playerGUID, "HELPFUL", false, undefined, stacks, undefined, duration, expire, false, buffName, undefined, undefined, undefined);
+        this.ovaleAura.GainedAuraOnGUID(this.ovale.playerGUID, now, customId, this.ovale.playerGUID, "HELPFUL", false, undefined, stacks, undefined, duration, expire, false, buffName, undefined, undefined, undefined);
     }
 
     /**
@@ -170,17 +176,14 @@ class OvaleWarlockClass extends OvaleWarlockBase {
     TimeToShard(now: number){
         let value = 3600;
         let creepingDeathTalent = 20;
-        let tickTime = 2 / OvalePaperDoll.GetHasteMultiplier("spell", OvalePaperDoll.next);
-        let [activeAgonies] = OvaleAura.AuraCount(980, "HARMFUL", true, undefined, now, undefined)
+        let tickTime = 2 / this.ovalePaperDoll.GetHasteMultiplier("spell", this.ovalePaperDoll.next);
+        let [activeAgonies] = this.ovaleAura.AuraCount(980, "HARMFUL", true, undefined, now, undefined)
         if(activeAgonies > 0){
             value = 1 / ( 0.184 * pow( activeAgonies, -2/3 ) ) * tickTime / activeAgonies;
-            if(OvaleSpellBook.IsKnownTalent(creepingDeathTalent)){
+            if (this.ovaleSpellBook.IsKnownTalent(creepingDeathTalent)) {
                 value = value * 0.85;
             }
         }
         return value;
     }
 }
-
-OvaleWarlock = new OvaleWarlockClass();
-OvaleState.RegisterState(OvaleWarlock);

@@ -1,9 +1,10 @@
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-do
-    local name = "sc_t23_monk_brewmaster"
-    local desc = "[8.2] Simulationcraft: T23_Monk_Brewmaster"
-    local code = [[
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_monk", 80201)
+if not __exports then return end
+__exports.registerMonk = function(OvaleScripts)
+    do
+        local name = "sc_t23_monk_brewmaster"
+        local desc = "[8.2] Simulationcraft: T23_Monk_Brewmaster"
+        local code = [[
 # Based on SimulationCraft profile "T23_Monk_Brewmaster".
 #	class=monk
 #	spec=brewmaster
@@ -271,12 +272,12 @@ AddIcon checkbox=opt_monk_brewmaster_aoe help=cd specialization=brewmaster
 # tiger_palm
 # war_stomp
 ]]
-    OvaleScripts:RegisterScript("MONK", "brewmaster", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_monk_windwalker"
-    local desc = "[8.2] Simulationcraft: T23_Monk_Windwalker"
-    local code = [[
+        OvaleScripts:RegisterScript("MONK", "brewmaster", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_monk_windwalker"
+        local desc = "[8.2] Simulationcraft: T23_Monk_Windwalker"
+        local code = [[
 # Based on SimulationCraft profile "T23_Monk_Windwalker".
 #	class=monk
 #	spec=windwalker
@@ -842,12 +843,12 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # whirling_dragon_punch_talent
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("MONK", "windwalker", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_monk_windwalker_serenity"
-    local desc = "[8.2] Simulationcraft: T23_Monk_Windwalker_Serenity"
-    local code = [[
+        OvaleScripts:RegisterScript("MONK", "windwalker", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_monk_windwalker_serenity"
+        local desc = "[8.2] Simulationcraft: T23_Monk_Windwalker_Serenity"
+        local code = [[
 # Based on SimulationCraft profile "T23_Monk_Windwalker_Serenity".
 #	class=monk
 #	spec=windwalker
@@ -1413,5 +1414,6 @@ AddIcon checkbox=opt_monk_windwalker_aoe help=cd specialization=windwalker
 # whirling_dragon_punch_talent
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("MONK", "windwalker", name, desc, code, "script")
+        OvaleScripts:RegisterScript("MONK", "windwalker", name, desc, code, "script")
+    end
 end
