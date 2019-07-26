@@ -60,7 +60,6 @@ export class OvaleCompileClass {
         if (this.ovaleSpellBook.IsKnownTalent(talentId)) {
             return this.ovaleSpellBook.GetTalentPoints(talentId) > 0;
         } else {
-            this.tracer.Error("Unknown talent ID '%s'", talentId);
             return false;
         }
     }

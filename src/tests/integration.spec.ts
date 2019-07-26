@@ -3,14 +3,17 @@ import { IoC } from "../ioc";
 import { pairs } from "@wowts/lua";
 import { eventDispatcher } from "@wowts/wow-mock";
 import { oneTimeMessages } from "../Ovale";
+import { registerScripts } from "../scripts/index";
 
-const ioc = new IoC();
+const mainIoC = new IoC();
+registerScripts(mainIoC.scripts);
 
-for (const [name, script] of pairs(ioc.scripts.script)) {
+for (const [name, script] of pairs(mainIoC.scripts.script)) {
     if (!script.className || script.type !== "script") continue;
 
     test(`Test ${name} script`, t => {
-
+        const ioc = new IoC();
+        registerScripts(ioc.scripts);
         ioc.debug.warning = undefined;
         ioc.debug.bug = undefined;
         ioc.ovale.playerGUID = "player";

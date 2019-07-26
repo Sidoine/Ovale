@@ -555,10 +555,6 @@ Define(wing_clip_debuff 195645)
 	Define(reckless_force_counter 302917)
 
 #Pet Spells
-Define(heart_of_the_phoenix 55709)
-	SpellInfo(heart_of_the_phoenix cd=480)
-Define(heart_of_the_phoenix_debuff 55711)
-	SpellInfo(heart_of_the_phoenix_debuff duration=480)
 Define(pet_beast_cleave_buff 118455)
 	SpellInfo(pet_beast_cleave_buff duration=4)
 Define(pet_coordinated_assault_buff 266779)

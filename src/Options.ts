@@ -577,10 +577,10 @@ export class OvaleOptionsClass {
     module: AceModule & AceConsole & AceEvent;
     
     constructor(private ovale: OvaleClass) {
-        this.module = new (ovale.NewModule("OvaleOptions", aceConsole, aceEvent));
+        this.module = ovale.createModule("OvaleOptions", this.OnInitialize, this.handleDisable, aceConsole, aceEvent);
     }
 
-    OnInitialize() {
+    private OnInitialize = () => {
         const ovale = this.ovale.GetName();
         const db = AceDB.New("OvaleDB", this.defaultDB);
         this.options.args.profile = AceDBOptions.GetOptionsTable(db);
@@ -589,10 +589,10 @@ export class OvaleOptionsClass {
         //     LibDualSpec.EnhanceDatabase(db, "Ovale");
         //     LibDualSpec.EnhanceOptions(this.options.args.profile, db);
         // }
-        db.RegisterCallback(this, "OnNewProfile", "HandleProfileChanges");
-        db.RegisterCallback(this, "OnProfileReset", "HandleProfileChanges");
-        db.RegisterCallback(this, "OnProfileChanged", "HandleProfileChanges");
-        db.RegisterCallback(this, "OnProfileCopied", "HandleProfileChanges");
+        db.RegisterCallback(this, "OnNewProfile", this.HandleProfileChanges);
+        db.RegisterCallback(this, "OnProfileReset", this.HandleProfileChanges);
+        db.RegisterCallback(this, "OnProfileChanged", this.HandleProfileChanges);
+        db.RegisterCallback(this, "OnProfileCopied", this.HandleProfileChanges);
         this.db = db;
         this.UpgradeSavedVariables();
         AceConfig.RegisterOptionsTable(ovale, this.options.args.apparence);
@@ -602,6 +602,9 @@ export class OvaleOptionsClass {
         AceConfigDialog.AddToBlizOptions(`${ovale} Profiles`, "Profiles", ovale);
         this.HandleProfileChanges();
     }
+
+    private handleDisable = () => {};
+
     RegisterOptions(addon: {}) {
         // tinsert(self_register, addon);
     }
@@ -623,7 +626,7 @@ export class OvaleOptionsClass {
         }
         this.db.RegisterDefaults(this.defaultDB);
     }
-    HandleProfileChanges() {
+    private HandleProfileChanges = () => {
         this.module.SendMessage("Ovale_ProfileChanged");
         this.module.SendMessage("Ovale_ScriptChanged");
         this.module.SendMessage("Ovale_OptionChanged", "layout");

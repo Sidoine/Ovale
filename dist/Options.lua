@@ -495,24 +495,32 @@ __exports.OvaleOptionsClass = __class(nil, {
                 profile = {}
             }
         }
-        self.module = (ovale:NewModule("OvaleOptions", aceConsole, aceEvent))()
-    end,
-    OnInitialize = function(self)
-        local ovale = self.ovale:GetName()
-        local db = AceDB:New("OvaleDB", self.defaultDB)
-        self.options.args.profile = AceDBOptions:GetOptionsTable(db)
-        db.RegisterCallback(self, "OnNewProfile", "HandleProfileChanges")
-        db.RegisterCallback(self, "OnProfileReset", "HandleProfileChanges")
-        db.RegisterCallback(self, "OnProfileChanged", "HandleProfileChanges")
-        db.RegisterCallback(self, "OnProfileCopied", "HandleProfileChanges")
-        self.db = db
-        self:UpgradeSavedVariables()
-        AceConfig:RegisterOptionsTable(ovale, self.options.args.apparence)
-        AceConfig:RegisterOptionsTable(ovale .. " Profiles", self.options.args.profile)
-        AceConfig:RegisterOptionsTable(ovale .. " Actions", self.options.args.actions, "Ovale")
-        AceConfigDialog:AddToBlizOptions(ovale)
-        AceConfigDialog:AddToBlizOptions(ovale .. " Profiles", "Profiles", ovale)
-        self:HandleProfileChanges()
+        self.OnInitialize = function()
+            local ovale = self.ovale:GetName()
+            local db = AceDB:New("OvaleDB", self.defaultDB)
+            self.options.args.profile = AceDBOptions:GetOptionsTable(db)
+            db.RegisterCallback(self, "OnNewProfile", self.HandleProfileChanges)
+            db.RegisterCallback(self, "OnProfileReset", self.HandleProfileChanges)
+            db.RegisterCallback(self, "OnProfileChanged", self.HandleProfileChanges)
+            db.RegisterCallback(self, "OnProfileCopied", self.HandleProfileChanges)
+            self.db = db
+            self:UpgradeSavedVariables()
+            AceConfig:RegisterOptionsTable(ovale, self.options.args.apparence)
+            AceConfig:RegisterOptionsTable(ovale .. " Profiles", self.options.args.profile)
+            AceConfig:RegisterOptionsTable(ovale .. " Actions", self.options.args.actions, "Ovale")
+            AceConfigDialog:AddToBlizOptions(ovale)
+            AceConfigDialog:AddToBlizOptions(ovale .. " Profiles", "Profiles", ovale)
+            self.HandleProfileChanges()
+        end
+        self.handleDisable = function()
+        end
+        self.HandleProfileChanges = function()
+            self.module:SendMessage("Ovale_ProfileChanged")
+            self.module:SendMessage("Ovale_ScriptChanged")
+            self.module:SendMessage("Ovale_OptionChanged", "layout")
+            self.module:SendMessage("Ovale_OptionChanged", "visibility")
+        end
+        self.module = ovale:createModule("OvaleOptions", self.OnInitialize, self.handleDisable, aceConsole, aceEvent)
     end,
     RegisterOptions = function(self, addon)
     end,
@@ -523,12 +531,6 @@ __exports.OvaleOptionsClass = __class(nil, {
             end
         end
         self.db.RegisterDefaults(self.defaultDB)
-    end,
-    HandleProfileChanges = function(self)
-        self.module:SendMessage("Ovale_ProfileChanged")
-        self.module:SendMessage("Ovale_ScriptChanged")
-        self.module:SendMessage("Ovale_OptionChanged", "layout")
-        self.module:SendMessage("Ovale_OptionChanged", "visibility")
     end,
     ToggleConfig = function(self)
         local appName = self.ovale:GetName()
