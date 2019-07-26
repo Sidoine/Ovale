@@ -92,10 +92,10 @@ Define(flametongue_buff 194084)
   SpellInfo(flametongue_buff duration=16 gcd=0 offgcd=1 tick=8)
   # Each of your weapon attacks causes up to <coeff>*AP additional Fire damage.
   SpellAddBuff(flametongue_buff flametongue_buff=1)
-Define(focused_azerite_beam 295262)
-# Reduces the cast time of Focused Azerite Beam by s1.
-  SpellInfo(focused_azerite_beam channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam=1)
+Define(focused_azerite_beam 299336)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+  SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
+
 Define(frost_shock 196840)
 # Chills the target with frost, causing (45 of Spell Power) Frost damage and reducing the target's movement speed by s2 for 6 seconds. 
   SpellInfo(frost_shock duration=6)
@@ -266,9 +266,10 @@ Define(surge_of_power_buff 285514)
   SpellInfo(surge_of_power_buff duration=15 channel=15 gcd=0 offgcd=1)
   # Your next spell cast will be enhanced.
   SpellAddBuff(surge_of_power_buff surge_of_power_buff=1)
-Define(tectonic_thunder 286949)
+Define(tectonic_thunder 286976)
 # Earthquake deals s1 Physical damage instantly, and has a s2 chance to make your next Chain Lightning be instant cast.
-  SpellInfo(tectonic_thunder channel=0 gcd=0 offgcd=1)
+  SpellInfo(tectonic_thunder duration=15 channel=15 gcd=0 offgcd=1)
+  # Your next Chain Lightning will be instant cast.
   SpellAddBuff(tectonic_thunder tectonic_thunder=1)
 Define(the_unbound_force 298452)
 # Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]

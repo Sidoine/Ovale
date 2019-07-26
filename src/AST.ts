@@ -2562,7 +2562,7 @@ export class OvaleASTClass {
         return [node, nodeList, annotation];
     }
     ParseScript(name: string, options?: { optimize: boolean, verify: boolean}) {
-        let code = this.ovaleScripts.GetScript(name);
+        let code = this.ovaleScripts.GetScriptOrDefault(name);
         let ast: AstNode;
         if (code) {
             options = options || {

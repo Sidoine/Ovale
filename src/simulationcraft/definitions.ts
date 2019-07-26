@@ -166,6 +166,7 @@ export const CHARACTER_PROPERTY: LuaObj<string> = {
     ["rage.deficit"]: "RageDeficit()",
     ["rage.max"]: "MaxRage()",
     ["raid_event.adds.remains"]: "0", // TODO
+    ["raid_event.invulnerable.exists"]: "0", //TODO
     ["raw_haste_pct"]: "SpellCastSpeedPercent()",
     ["rtb_list.any.5"]: "BuffCount(roll_the_bones_buff more 4)",
     ["rtb_list.any.6"]: "BuffCount(roll_the_bones_buff more 5)",
@@ -209,7 +210,9 @@ export interface Modifiers {
     cycle_targets?: ParseNode,
     damage?: ParseNode,
     delay?: ParseNode;
+    dynamic_prepot?: ParseNode,
     early_chain_if?: ParseNode,
+    effect_name?: ParseNode,
     extra_amount?: ParseNode,
     five_stacks?: ParseNode,
     for_next?: ParseNode,
@@ -235,6 +238,7 @@ export interface Modifiers {
     range?: ParseNode,
     sec?: ParseNode,
     slot?: ParseNode,
+    slots?: ParseNode,
     strikes?: ParseNode;
     sync?: ParseNode,
     sync_weapons?: ParseNode,
@@ -322,7 +326,9 @@ export const MODIFIER_KEYWORD: TypeCheck<Modifiers> = {
     ["cycle_targets"]: true,
     ["damage"]: true,
     ["delay"]: true,
+    ["dynamic_prepot"]: true,
     ["early_chain_if"]: true,
+    ["effect_name"]: true,
     ["extra_amount"]: true,
     ["five_stacks"]: true,
     ["for_next"]: true,
@@ -348,6 +354,7 @@ export const MODIFIER_KEYWORD: TypeCheck<Modifiers> = {
     ["range"]: true,
     ["sec"]: true,
     ["slot"]: true,
+    ["slots"]: true,
     ["strikes"]: true,
     ["sync"]: true,
     ["sync_weapons"]: true,

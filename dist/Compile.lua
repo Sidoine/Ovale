@@ -154,7 +154,6 @@ __exports.OvaleCompileClass = __class(nil, {
         if self.ovaleSpellBook:IsKnownTalent(talentId) then
             return self.ovaleSpellBook:GetTalentPoints(talentId) > 0
         else
-            self.tracer:Error("Unknown talent ID '%s'", talentId)
             return false
         end
     end,

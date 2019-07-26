@@ -314,7 +314,7 @@ __exports.OvaleConditions = __class(nil, {
         end
         self.AzeriteEssenceRank = function(positionalParams, namedParams, atTime)
             local essenceId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-            local value = self.OvaleAzeriteEssence.self_essences[essenceId].rank
+            local value = self.OvaleAzeriteEssence.self_essences[essenceId] and self.OvaleAzeriteEssence.self_essences[essenceId].rank
             return Compare(value, comparator, limit)
         end
         self.BaseDuration = function(positionalParams, namedParams, atTime)

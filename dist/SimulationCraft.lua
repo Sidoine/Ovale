@@ -255,6 +255,7 @@ local CHARACTER_PROPERTY = {
     ["rage.deficit"] = "RageDeficit()",
     ["rage.max"] = "MaxRage()",
     ["raid_event.adds.remains"] = "0",
+    ["raid_event.invulnerable.exists"] = "0",
     ["raw_haste_pct"] = "SpellCastSpeedPercent()",
     ["rtb_list.any.5"] = "BuffCount(roll_the_bones_buff more 4)",
     ["rtb_list.any.6"] = "BuffCount(roll_the_bones_buff more 5)",
@@ -298,7 +299,9 @@ local MODIFIER_KEYWORD = {
     ["cycle_targets"] = true,
     ["damage"] = true,
     ["delay"] = true,
+    ["dynamic_prepot"] = true,
     ["early_chain_if"] = true,
+    ["effect_name"] = true,
     ["extra_amount"] = true,
     ["five_stacks"] = true,
     ["for_next"] = true,
@@ -324,6 +327,7 @@ local MODIFIER_KEYWORD = {
     ["range"] = true,
     ["sec"] = true,
     ["slot"] = true,
+    ["slots"] = true,
     ["strikes"] = true,
     ["sync"] = true,
     ["sync_weapons"] = true,
@@ -1374,7 +1378,7 @@ local function Disambiguate(annotation, name, className, specialization, _type)
     local disname, distype = GetPerClassSpecialization(EMIT_DISAMBIGUATION, name, className, specialization)
     if  not disname then
         if  not annotation.dictionary[name] then
-            local otherName = match(name, "_buff$") and gsub(name, "_buff$", "") or gsub(name, "_debuff$", "")
+            local otherName = match(name, "_buff$") and gsub(name, "_buff$", "") or (match(name, "_debuff$") and gsub(name, "_debuff$", "")) or gsub(name, "_item$", "")
             if annotation.dictionary[otherName] then
                 return otherName, _type
             end
@@ -1424,6 +1428,7 @@ local InitializeDisambiguation = function()
     AddDisambiguation("cold_heart_talent_buff", "cold_heart_buff", "DEATHKNIGHT", "frost")
     AddDisambiguation("outbreak_debuff", "virulent_plague_debuff", "DEATHKNIGHT", "unholy")
     AddDisambiguation("gargoyle", "summon_gargoyle", "DEATHKNIGHT", "unholy")
+    AddDisambiguation("empowered_rune_weapon", "empower_rune_weapon", "DEATHKNIGHT")
     AddDisambiguation("felblade_talent", "felblade_talent_havoc", "DEMONHUNTER", "havoc")
     AddDisambiguation("immolation_aura", "immolation_aura_havoc", "DEMONHUNTER", "havoc")
     AddDisambiguation("metamorphosis", "metamorphosis_veng", "DEMONHUNTER", "vengeance")
@@ -1493,6 +1498,7 @@ local InitializeDisambiguation = function()
     AddDisambiguation("execute", "execute_arms", "WARRIOR", "arms")
     AddDisambiguation("storm_bolt_talent", "prot_storm_bolt_talent", "WARRIOR", "protection")
     AddDisambiguation("meat_cleaver", "whirlwind", "WARRIOR", "fury")
+    AddDisambiguation("pocketsized_computation_device_item", "pocket_sized_computation_device_item")
 end
 
 local IsTotem = function(name)
@@ -2449,6 +2455,7 @@ EmitAction = function(parseNode, nodeList, annotation)
                 if match(name, "legendary_ring") then
                     legendaryRing = name
                 end
+            elseif modifiers.effect_name then
             end
             if legendaryRing then
                 conditionCode = format("CheckBoxOn(opt_%s)", legendaryRing)
@@ -3970,9 +3977,9 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
     elseif operand == "distance" then
         code = target .. "Distance()"
     elseif sub(operand, 1, 9) == "equipped." then
-        local name = Disambiguate(annotation, sub(operand, 10), className, specialization)
+        local name = Disambiguate(annotation, sub(operand, 10) .. "_item", className, specialization)
         local itemId = tonumber(name)
-        local itemName = name .. "_item"
+        local itemName = name
         local item = itemId and tostring(itemId) or itemName
         code = format("HasEquippedItem(%s)", item)
         AddSymbol(annotation, item)
@@ -4139,6 +4146,9 @@ EmitOperandTrinket = function(operand, parseNode, nodeList, annotation, action)
     local token = tokenIterator()
     if token == "trinket" then
         local procType = tokenIterator()
+        if procType == "1" or procType == "2" then
+            procType = tokenIterator()
+        end
         local statName = tokenIterator()
         local code
         if procType == "cooldown" then

@@ -56,7 +56,7 @@ export class Emiter {
         let [disname, distype] = this.GetPerClassSpecialization(this.EMIT_DISAMBIGUATION, name, className, specialization);
         if (!disname) {
             if (!annotation.dictionary[name]) {
-                let otherName = truthy(match(name, "_buff$")) && gsub(name, "_buff$", "") || gsub(name, "_debuff$", "")
+                let otherName = truthy(match(name, "_buff$")) && gsub(name, "_buff$", "") || (truthy(match(name, "_debuff$")) && gsub(name, "_debuff$", "")) || gsub(name, "_item$", "");
                 if (annotation.dictionary[otherName]) {
                     return [otherName, _type];
                 }
@@ -155,6 +155,7 @@ export class Emiter {
         this.AddDisambiguation("cold_heart_talent_buff", "cold_heart_buff", "DEATHKNIGHT", "frost");
         this.AddDisambiguation("outbreak_debuff", "virulent_plague_debuff", "DEATHKNIGHT", "unholy");
         this.AddDisambiguation("gargoyle", "summon_gargoyle", "DEATHKNIGHT", "unholy");
+        this.AddDisambiguation("empowered_rune_weapon", "empower_rune_weapon", "DEATHKNIGHT");
     
         //Demon Hunter
         this.AddDisambiguation("felblade_talent", "felblade_talent_havoc", "DEMONHUNTER", "havoc");
@@ -246,7 +247,9 @@ export class Emiter {
         this.AddDisambiguation("dragon_roar_talent", "prot_dragon_roar_talent", "WARRIOR", "protection");
         this.AddDisambiguation("execute", "execute_arms", "WARRIOR", "arms");
         this.AddDisambiguation("storm_bolt_talent", "prot_storm_bolt_talent", "WARRIOR", "protection");
-        this.AddDisambiguation("meat_cleaver", "whirlwind", "WARRIOR", "fury")
+        this.AddDisambiguation("meat_cleaver", "whirlwind", "WARRIOR", "fury");
+
+        this.AddDisambiguation("pocketsized_computation_device_item", "pocket_sized_computation_device_item");
     }
 
     /** Transform a ParseNode to an AstNode
@@ -816,7 +819,9 @@ export class Emiter {
                 isSpellAction = false;
             } else if (action == "use_item") {
                 let legendaryRing: string = undefined;
+                // TODO use modifiers.slots
                 if (modifiers.slot) {
+                    // use this slot only?
                     let slot = this.unparser.Unparse(modifiers.slot);
                     if (truthy(match(slot, "finger"))) {
                         [legendaryRing] = this.Disambiguate(annotation, "legendary_ring", className, specialization);
@@ -831,6 +836,8 @@ export class Emiter {
                     //     bodyCode = format("Item(%s usable=1)", name);
                     //     AddSymbol(annotation, name);
                     // }
+                } else if (modifiers.effect_name) {
+                    // TODO use any item that has this effect
                 }
                 if (legendaryRing) {
                     conditionCode = format("CheckBoxOn(opt_%s)", legendaryRing);
@@ -2359,9 +2366,9 @@ export class Emiter {
         } else if (operand == "distance") {
             code = `${target}Distance()`;
         } else if (sub(operand, 1, 9) == "equipped.") {
-            let [name] = this.Disambiguate(annotation, sub(operand, 10), className, specialization);
+            let [name] = this.Disambiguate(annotation, `${sub(operand, 10)}_item`, className, specialization);
             let itemId = tonumber(name)
-            let itemName = `${name}_item`
+            let itemName = name;
             let item = itemId && tostring(itemId) || itemName
             code = format("HasEquippedItem(%s)", item)
             this.AddSymbol(annotation, item);
@@ -2529,6 +2536,9 @@ export class Emiter {
         let token = tokenIterator();
         if (token == "trinket") {
             let procType = tokenIterator();
+            if (procType === "1" || procType === "2") {
+                procType = tokenIterator(); // TODO use trinket slot?
+            }
             let statName = tokenIterator();
             let code;
             if (procType === "cooldown") {
@@ -2570,8 +2580,7 @@ export class Emiter {
                 }
             }
             if (ok && code) {
-                annotation.astAnnotation = annotation.astAnnotation || {
-                };
+                annotation.astAnnotation = annotation.astAnnotation || {};
                 [node] = this.ovaleAst.ParseCode("expression", code, nodeList, annotation.astAnnotation);
             }
         } else {

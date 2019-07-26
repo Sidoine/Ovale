@@ -131,6 +131,10 @@ __exports.OvaleScriptsClass = __class(nil, {
         if name and self.script[name] then
             return self.script[name].code
         end
+        return nil
+    end,
+    GetScriptOrDefault = function(self, name)
+        return self:GetScript(name) or self:GetScript(self:GetDefaultScriptName(self.ovale.playerClass, self.ovalePaperDoll:GetSpecialization()))
     end,
     getCurrentSpecIdentifier = function(self)
         return self.ovale.playerClass .. "_" .. self.ovalePaperDoll:GetSpecialization()

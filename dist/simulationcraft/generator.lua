@@ -614,11 +614,6 @@ __exports.Generator = __class(nil, {
             fmt = [[
                 AddFunction %sSummonPet
                 {
-                    if pet.IsDead()
-                    {
-                        if not DebuffPresent(heart_of_the_phoenix_debuff) Spell(heart_of_the_phoenix)
-                        Spell(revive_pet)
-                    }
                     if not pet.Present() and not pet.IsDead() and not PreviousSpell(revive_pet) Texture(ability_hunter_beastcall help=L(summon_pet))
                 }
             ]]

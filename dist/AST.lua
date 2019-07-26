@@ -2299,7 +2299,7 @@ __exports.OvaleASTClass = __class(nil, {
         return node, nodeList, annotation
     end,
     ParseScript = function(self, name, options)
-        local code = self.ovaleScripts:GetScript(name)
+        local code = self.ovaleScripts:GetScriptOrDefault(name)
         local ast
         if code then
             options = options or {

@@ -137,6 +137,10 @@ export class OvaleScriptsClass  {
         if (name && this.script[name]) {
             return this.script[name].code;
         }
+        return undefined;
+    }
+    GetScriptOrDefault(name: string) {
+        return this.GetScript(name) || this.GetScript(this.GetDefaultScriptName(this.ovale.playerClass, this.ovalePaperDoll.GetSpecialization()));
     }
 
     private getCurrentSpecIdentifier() {

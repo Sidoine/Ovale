@@ -74,10 +74,10 @@ Define(ferocious_bite 22568)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
-Define(focused_azerite_beam 295262)
-# Reduces the cast time of Focused Azerite Beam by s1.
-  SpellInfo(focused_azerite_beam channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam=1)
+Define(focused_azerite_beam 299336)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+  SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
+
 Define(force_of_nature 205636)
 # Summons a stand of s1 Treants for 10 seconds which immediately taunt and attack enemies in the targeted area.rnrn|cFFFFFFFFGenerates m5/10 Astral Power.|r
   SpellInfo(force_of_nature cd=60 lunarpower=-20 talent=force_of_nature_talent)
@@ -233,6 +233,10 @@ Define(shadowmeld 58984)
 Define(sharpened_claws_buff 268525)
 # Your attacks have a chance to summon a whirlwind of sharpened claws, inflicting 268525s1 Physical damage split evenly among all enemies within 268525A1 yards.
   SpellInfo(sharpened_claws_buff channel=0 gcd=0 offgcd=1)
+Define(shiver_venom 301576)
+# Your damaging abilities have a high chance to apply Shiver Venom to your target, dealing 301624s1*5 Nature damage over 20 seconds, and stacking up to 5 times.rn
+  SpellInfo(shiver_venom channel=0 gcd=0 offgcd=1)
+
 Define(shred 5221)
 # Shred the target, causing s1*<mult> Physical damage to the target.?a231063[ Deals s4 increased damage against bleeding targets.][]?a231057[rnrnWhile stealthed, Shred deals m3 increased damage, and has double the chance to critically strike.][]?c2[rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r]?s202155[rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.][]
 # Rank 2: Shred deals 5221s5 increased damage against bleeding targets.

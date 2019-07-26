@@ -592,6 +592,7 @@ __exports.Emiter = __class(nil, {
                         if match(name, "legendary_ring") then
                             legendaryRing = name
                         end
+                    elseif modifiers.effect_name then
                     end
                     if legendaryRing then
                         conditionCode = format("CheckBoxOn(opt_%s)", legendaryRing)
@@ -2088,9 +2089,9 @@ __exports.Emiter = __class(nil, {
             elseif operand == "distance" then
                 code = target .. "Distance()"
             elseif sub(operand, 1, 9) == "equipped." then
-                local name = self:Disambiguate(annotation, sub(operand, 10), className, specialization)
+                local name = self:Disambiguate(annotation, sub(operand, 10) .. "_item", className, specialization)
                 local itemId = tonumber(name)
-                local itemName = name .. "_item"
+                local itemName = name
                 local item = itemId and tostring(itemId) or itemName
                 code = format("HasEquippedItem(%s)", item)
                 self:AddSymbol(annotation, item)
@@ -2253,6 +2254,9 @@ __exports.Emiter = __class(nil, {
             local token = tokenIterator()
             if token == "trinket" then
                 local procType = tokenIterator()
+                if procType == "1" or procType == "2" then
+                    procType = tokenIterator()
+                end
                 local statName = tokenIterator()
                 local code
                 if procType == "cooldown" then
@@ -2351,7 +2355,7 @@ __exports.Emiter = __class(nil, {
         local disname, distype = self:GetPerClassSpecialization(self.EMIT_DISAMBIGUATION, name, className, specialization)
         if  not disname then
             if  not annotation.dictionary[name] then
-                local otherName = match(name, "_buff$") and gsub(name, "_buff$", "") or gsub(name, "_debuff$", "")
+                local otherName = match(name, "_buff$") and gsub(name, "_buff$", "") or (match(name, "_debuff$") and gsub(name, "_debuff$", "")) or gsub(name, "_item$", "")
                 if annotation.dictionary[otherName] then
                     return otherName, _type
                 end
@@ -2435,6 +2439,7 @@ __exports.Emiter = __class(nil, {
         self:AddDisambiguation("cold_heart_talent_buff", "cold_heart_buff", "DEATHKNIGHT", "frost")
         self:AddDisambiguation("outbreak_debuff", "virulent_plague_debuff", "DEATHKNIGHT", "unholy")
         self:AddDisambiguation("gargoyle", "summon_gargoyle", "DEATHKNIGHT", "unholy")
+        self:AddDisambiguation("empowered_rune_weapon", "empower_rune_weapon", "DEATHKNIGHT")
         self:AddDisambiguation("felblade_talent", "felblade_talent_havoc", "DEMONHUNTER", "havoc")
         self:AddDisambiguation("immolation_aura", "immolation_aura_havoc", "DEMONHUNTER", "havoc")
         self:AddDisambiguation("metamorphosis", "metamorphosis_veng", "DEMONHUNTER", "vengeance")
@@ -2504,6 +2509,7 @@ __exports.Emiter = __class(nil, {
         self:AddDisambiguation("execute", "execute_arms", "WARRIOR", "arms")
         self:AddDisambiguation("storm_bolt_talent", "prot_storm_bolt_talent", "WARRIOR", "protection")
         self:AddDisambiguation("meat_cleaver", "whirlwind", "WARRIOR", "fury")
+        self:AddDisambiguation("pocketsized_computation_device_item", "pocket_sized_computation_device_item")
     end,
     Emit = function(self, parseNode, nodeList, annotation, action)
         local visitor = self.EMIT_VISITOR[parseNode.type]

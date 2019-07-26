@@ -85,6 +85,8 @@ AddFunction ArcanePrecombatCdActions
  {
   #variable,name=conserve_mana,op=set,value=60+20*azerite.equipoise.enabled
   #snapshot_stats
+  #use_item,name=azsharas_font_of_power
+  ArcaneUseItemActions()
   #mirror_image
   Spell(mirror_image)
   #potion
@@ -254,8 +256,8 @@ AddFunction ArcaneConserveCdActions
  {
   #use_item,name=tidestorm_codex,if=buff.rune_of_power.down&!buff.arcane_power.react&cooldown.arcane_power.remains>20
   if BuffExpires(rune_of_power_buff) and not BuffPresent(arcane_power_buff) and SpellCooldown(arcane_power) > 20 ArcaneUseItemActions()
-  #use_item,name=pocketsized_computation_device,if=cooldown.cyclotronic_blast.duration&buff.rune_of_power.down&!buff.arcane_power.react&cooldown.arcane_power.remains>20
-  if SpellCooldownDuration(cyclotronic_blast) and BuffExpires(rune_of_power_buff) and not BuffPresent(arcane_power_buff) and SpellCooldown(arcane_power) > 20 ArcaneUseItemActions()
+  #use_item,effect_name=cyclotronic_blast,if=buff.rune_of_power.down&!buff.arcane_power.react&cooldown.arcane_power.remains>20
+  if BuffExpires(rune_of_power_buff) and not BuffPresent(arcane_power_buff) and SpellCooldown(arcane_power) > 20 ArcaneUseItemActions()
  }
 }
 
@@ -336,6 +338,8 @@ AddFunction ArcaneBurnCdActions
   {
    #lights_judgment,if=buff.arcane_power.down
    if BuffExpires(arcane_power_buff) Spell(lights_judgment)
+   #use_item,name=azsharas_font_of_power
+   ArcaneUseItemActions()
 
    unless not BuffPresent(arcane_power_buff) and { ManaPercent() >= 50 or not SpellCooldown(arcane_power) > 0 } and ArcaneCharges() == MaxArcaneCharges() and Spell(rune_of_power)
    {
@@ -345,8 +349,6 @@ AddFunction ArcaneBurnCdActions
     Spell(arcane_power)
     #use_items,if=buff.arcane_power.up|target.time_to_die<cooldown.arcane_power.remains
     if BuffPresent(arcane_power_buff) or target.TimeToDie() < SpellCooldown(arcane_power) ArcaneUseItemActions()
-    #use_item,name=pocketsized_computation_device,if=!cooldown.cyclotronic_blast.duration&(buff.arcane_power.up|target.time_to_die<cooldown.arcane_power.remains)
-    if not SpellCooldownDuration(cyclotronic_blast) and { BuffPresent(arcane_power_buff) or target.TimeToDie() < SpellCooldown(arcane_power) } ArcaneUseItemActions()
     #blood_fury
     Spell(blood_fury_sp)
     #fireblood
@@ -568,7 +570,6 @@ AddIcon checkbox=opt_mage_arcane_aoe help=cd specialization=arcane
 # clearcasting_buff
 # concentrated_flame_essence
 # counterspell
-# cyclotronic_blast
 # equipoise_trait
 # evocation
 # fireblood
@@ -667,8 +668,6 @@ AddFunction FireTrinketsCdActions
 {
  #use_items
  FireUseItemActions()
- #use_item,name=pocketsized_computation_device,if=!cooldown.cyclotronic_blast.duration
- if not SpellCooldownDuration(cyclotronic_blast) FireUseItemActions()
 }
 
 AddFunction FireTrinketsCdPostConditions
@@ -747,8 +746,8 @@ AddFunction FireStandardrotationCdActions
   {
    #use_item,name=tidestorm_codex,if=cooldown.combustion.remains>20|talent.firestarter.enabled&firestarter.remains>20
    if SpellCooldown(combustion) > 20 or Talent(firestarter_talent) and target.TimeToHealthPercent(90) > 20 FireUseItemActions()
-   #use_item,name=pocketsized_computation_device,if=cooldown.cyclotronic_blast.duration&(cooldown.combustion.remains>20|talent.firestarter.enabled&firestarter.remains>20)
-   if SpellCooldownDuration(cyclotronic_blast) and { SpellCooldown(combustion) > 20 or Talent(firestarter_talent) and target.TimeToHealthPercent(90) > 20 } FireUseItemActions()
+   #use_item,effect_name=cyclotronic_blast,if=cooldown.combustion.remains>20|talent.firestarter.enabled&firestarter.remains>20
+   if SpellCooldown(combustion) > 20 or Talent(firestarter_talent) and target.TimeToHealthPercent(90) > 20 FireUseItemActions()
   }
  }
 }
@@ -870,6 +869,8 @@ AddFunction FirePrecombatCdActions
  {
   #variable,name=combustion_rop_cutoff,op=set,value=60
   #snapshot_stats
+  #use_item,name=azsharas_font_of_power
+  FireUseItemActions()
   #mirror_image
   Spell(mirror_image)
   #potion
@@ -972,17 +973,21 @@ AddFunction FireCombustionphaseCdActions
 {
  #lights_judgment,if=buff.combustion.down
  if BuffExpires(combustion_buff) Spell(lights_judgment)
+ #use_item,name=azsharas_font_of_power
+ FireUseItemActions()
+ #use_item,name=hyperthread_wristwraps,if=buff.combustion.up&action.fire_blast.charges_fractional<1.2
+ if BuffPresent(combustion_buff) and Charges(fire_blast count=0) < 1.2 FireUseItemActions()
+ #blood_of_the_enemy
+ Spell(blood_of_the_enemy)
+ #guardian_of_azeroth
+ Spell(guardian_of_azeroth)
  #call_action_list,name=bm_combustion_phase,if=azerite.blaster_master.enabled&talent.flame_on.enabled&!essence.memory_of_lucid_dreams.major
  if HasAzeriteTrait(blaster_master_trait) and Talent(flame_on_talent) and not AzeriteEssenceIsMajor(memory_of_lucid_dreams_essence_id) FireBmcombustionphaseCdActions()
 
  unless HasAzeriteTrait(blaster_master_trait) and Talent(flame_on_talent) and not AzeriteEssenceIsMajor(memory_of_lucid_dreams_essence_id) and FireBmcombustionphaseCdPostConditions()
  {
-  #blood_of_the_enemy
-  Spell(blood_of_the_enemy)
   #memory_of_lucid_dreams
   Spell(memory_of_lucid_dreams_essence)
-  #guardian_of_azeroth
-  Spell(guardian_of_azeroth)
 
   unless AzeriteEssenceIsMajor(memory_of_lucid_dreams_essence_id) and Charges(fire_blast) == SpellMaxCharges(fire_blast) and not BuffPresent(hot_streak_buff) and not { BuffPresent(heating_up_buff) and { BuffPresent(combustion_buff) and { InFlightToTarget(fireball) or InFlightToTarget(pyroblast) or ExecuteTime(scorch) > 0 } or target.HealthPercent() <= 30 and ExecuteTime(scorch) > 0 } } and not { not BuffPresent(heating_up_buff) and not BuffPresent(hot_streak_buff) and BuffExpires(combustion_buff) and { InFlightToTarget(fireball) or InFlightToTarget(pyroblast) } } and Spell(fire_blast) or BuffExpires(combustion_buff) and Spell(rune_of_power)
   {
@@ -1347,7 +1352,6 @@ AddIcon checkbox=opt_mage_fire_aoe help=cd specialization=fire
 # combustion_buff
 # concentrated_flame_essence
 # counterspell
-# cyclotronic_blast
 # dragons_breath
 # fire_blast
 # fireball
@@ -1542,8 +1546,8 @@ AddFunction FrostSingleCdActions
   {
    #use_item,name=tidestorm_codex,if=buff.icy_veins.down&buff.rune_of_power.down
    if BuffExpires(icy_veins_buff) and BuffExpires(rune_of_power_buff) FrostUseItemActions()
-   #use_item,name=pocketsized_computation_device,if=cooldown.cyclotronic_blast.duration&buff.icy_veins.down&buff.rune_of_power.down
-   if SpellCooldownDuration(cyclotronic_blast) and BuffExpires(icy_veins_buff) and BuffExpires(rune_of_power_buff) FrostUseItemActions()
+   #use_item,effect_name=cyclotronic_blast,if=buff.icy_veins.down&buff.rune_of_power.down
+   if BuffExpires(icy_veins_buff) and BuffExpires(rune_of_power_buff) FrostUseItemActions()
 
    unless Spell(frostbolt)
    {
@@ -1595,6 +1599,8 @@ AddFunction FrostPrecombatCdActions
  unless Spell(arcane_intellect) or not pet.Present() and Spell(summon_water_elemental)
  {
   #snapshot_stats
+  #use_item,name=azsharas_font_of_power
+  FrostUseItemActions()
   #mirror_image
   Spell(mirror_image)
   #potion
@@ -1738,8 +1744,6 @@ AddFunction FrostCooldownsCdActions
    if { PreviousGCDSpell(icy_veins) or target.TimeToDie() < 30 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
    #use_items
    FrostUseItemActions()
-   #use_item,name=pocketsized_computation_device,if=!cooldown.cyclotronic_blast.duration
-   if not SpellCooldownDuration(cyclotronic_blast) FrostUseItemActions()
    #blood_fury
    Spell(blood_fury_sp)
    #berserking
@@ -1846,8 +1850,8 @@ AddFunction FrostAoeCdActions
   {
    #use_item,name=tidestorm_codex,if=buff.icy_veins.down&buff.rune_of_power.down
    if BuffExpires(icy_veins_buff) and BuffExpires(rune_of_power_buff) FrostUseItemActions()
-   #use_item,name=pocketsized_computation_device,if=cooldown.cyclotronic_blast.duration&buff.icy_veins.down&buff.rune_of_power.down
-   if SpellCooldownDuration(cyclotronic_blast) and BuffExpires(icy_veins_buff) and BuffExpires(rune_of_power_buff) FrostUseItemActions()
+   #use_item,effect_name=cyclotronic_blast,if=buff.icy_veins.down&buff.rune_of_power.down
+   if BuffExpires(icy_veins_buff) and BuffExpires(rune_of_power_buff) FrostUseItemActions()
 
    unless Spell(frostbolt)
    {
@@ -2017,7 +2021,6 @@ AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 # concentrated_flame_essence
 # cone_of_cold
 # counterspell
-# cyclotronic_blast
 # ebonbolt
 # ebonbolt_talent
 # fingers_of_frost_buff
@@ -2215,8 +2218,8 @@ AddFunction FrostSingleCdActions
   {
    #use_item,name=tidestorm_codex,if=buff.icy_veins.down&buff.rune_of_power.down
    if BuffExpires(icy_veins_buff) and BuffExpires(rune_of_power_buff) FrostUseItemActions()
-   #use_item,name=pocketsized_computation_device,if=cooldown.cyclotronic_blast.duration&buff.icy_veins.down&buff.rune_of_power.down
-   if SpellCooldownDuration(cyclotronic_blast) and BuffExpires(icy_veins_buff) and BuffExpires(rune_of_power_buff) FrostUseItemActions()
+   #use_item,effect_name=cyclotronic_blast,if=buff.icy_veins.down&buff.rune_of_power.down
+   if BuffExpires(icy_veins_buff) and BuffExpires(rune_of_power_buff) FrostUseItemActions()
 
    unless Spell(frostbolt)
    {
@@ -2268,6 +2271,8 @@ AddFunction FrostPrecombatCdActions
  unless Spell(arcane_intellect) or not pet.Present() and Spell(summon_water_elemental)
  {
   #snapshot_stats
+  #use_item,name=azsharas_font_of_power
+  FrostUseItemActions()
   #mirror_image
   Spell(mirror_image)
   #potion
@@ -2411,8 +2416,6 @@ AddFunction FrostCooldownsCdActions
    if { PreviousGCDSpell(icy_veins) or target.TimeToDie() < 30 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
    #use_items
    FrostUseItemActions()
-   #use_item,name=pocketsized_computation_device,if=!cooldown.cyclotronic_blast.duration
-   if not SpellCooldownDuration(cyclotronic_blast) FrostUseItemActions()
    #blood_fury
    Spell(blood_fury_sp)
    #berserking
@@ -2519,8 +2522,8 @@ AddFunction FrostAoeCdActions
   {
    #use_item,name=tidestorm_codex,if=buff.icy_veins.down&buff.rune_of_power.down
    if BuffExpires(icy_veins_buff) and BuffExpires(rune_of_power_buff) FrostUseItemActions()
-   #use_item,name=pocketsized_computation_device,if=cooldown.cyclotronic_blast.duration&buff.icy_veins.down&buff.rune_of_power.down
-   if SpellCooldownDuration(cyclotronic_blast) and BuffExpires(icy_veins_buff) and BuffExpires(rune_of_power_buff) FrostUseItemActions()
+   #use_item,effect_name=cyclotronic_blast,if=buff.icy_veins.down&buff.rune_of_power.down
+   if BuffExpires(icy_veins_buff) and BuffExpires(rune_of_power_buff) FrostUseItemActions()
 
    unless Spell(frostbolt)
    {
@@ -2690,7 +2693,6 @@ AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 # concentrated_flame_essence
 # cone_of_cold
 # counterspell
-# cyclotronic_blast
 # ebonbolt
 # ebonbolt_talent
 # fingers_of_frost_buff
@@ -2811,10 +2813,8 @@ AddFunction FrostSingleMainActions
 
  unless FrostEssencesMainPostConditions()
  {
-  #blizzard,if=active_enemies>2|active_enemies>1&cast_time=0
-  if Enemies() > 2 or Enemies() > 1 and CastTime(blizzard) == 0 Spell(blizzard)
-  #ice_lance,if=buff.fingers_of_frost.react&talent.splitting_ice.enabled&active_enemies>1
-  if BuffPresent(fingers_of_frost_buff) and Talent(splitting_ice_talent) and Enemies() > 1 Spell(ice_lance)
+  #blizzard,if=active_enemies>2|active_enemies>1&!talent.splitting_ice.enabled
+  if Enemies() > 2 or Enemies() > 1 and not Talent(splitting_ice_talent) Spell(blizzard)
   #ebonbolt,if=buff.icicles.stack=5&!buff.brain_freeze.react&buff.memory_of_lucid_dreams.down
   if BuffStacks(icicles_buff) == 5 and not BuffPresent(brain_freeze_buff) and BuffExpires(memory_of_lucid_dreams_essence_buff) Spell(ebonbolt)
   #glacial_spike,if=buff.brain_freeze.react|prev_gcd.1.ebonbolt|talent.incanters_flow.enabled&cast_time+travel_time>incanters_flow_time_to.5.up&cast_time+travel_time<incanters_flow_time_to.4.down
@@ -2851,7 +2851,7 @@ AddFunction FrostSingleShortCdActions
    #frozen_orb
    Spell(frozen_orb)
 
-   unless { Enemies() > 2 or Enemies() > 1 and CastTime(blizzard) == 0 } and Spell(blizzard) or BuffPresent(fingers_of_frost_buff) and Talent(splitting_ice_talent) and Enemies() > 1 and Spell(ice_lance)
+   unless { Enemies() > 2 or Enemies() > 1 and not Talent(splitting_ice_talent) } and Spell(blizzard)
    {
     #comet_storm
     Spell(comet_storm)
@@ -2868,7 +2868,7 @@ AddFunction FrostSingleShortCdActions
 
 AddFunction FrostSingleShortCdPostConditions
 {
- SpellCooldown(ice_nova) == 0 and target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or Talent(ebonbolt_talent) and PreviousGCDSpell(ebonbolt) and BuffPresent(brain_freeze_buff) and Spell(flurry) or PreviousGCDSpell(glacial_spike) and BuffPresent(brain_freeze_buff) and Spell(flurry) or FrostEssencesShortCdPostConditions() or { Enemies() > 2 or Enemies() > 1 and CastTime(blizzard) == 0 } and Spell(blizzard) or BuffPresent(fingers_of_frost_buff) and Talent(splitting_ice_talent) and Enemies() > 1 and Spell(ice_lance) or BuffStacks(icicles_buff) == 5 and not BuffPresent(brain_freeze_buff) and BuffExpires(memory_of_lucid_dreams_essence_buff) and Spell(ebonbolt) or { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) or Talent(incanters_flow_talent) and CastTime(glacial_spike) + TravelTime(glacial_spike) > StackTimeTo(incanters_flow_buff 5 up) and CastTime(glacial_spike) + TravelTime(glacial_spike) < StackTimeTo(incanters_flow_buff 4 down) } and Spell(glacial_spike) or Spell(ice_nova) or Spell(frostbolt) or FrostMovementShortCdPostConditions() or Spell(ice_lance)
+ SpellCooldown(ice_nova) == 0 and target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or Talent(ebonbolt_talent) and PreviousGCDSpell(ebonbolt) and BuffPresent(brain_freeze_buff) and Spell(flurry) or PreviousGCDSpell(glacial_spike) and BuffPresent(brain_freeze_buff) and Spell(flurry) or FrostEssencesShortCdPostConditions() or { Enemies() > 2 or Enemies() > 1 and not Talent(splitting_ice_talent) } and Spell(blizzard) or BuffStacks(icicles_buff) == 5 and not BuffPresent(brain_freeze_buff) and BuffExpires(memory_of_lucid_dreams_essence_buff) and Spell(ebonbolt) or { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) or Talent(incanters_flow_talent) and CastTime(glacial_spike) + TravelTime(glacial_spike) > StackTimeTo(incanters_flow_buff 5 up) and CastTime(glacial_spike) + TravelTime(glacial_spike) < StackTimeTo(incanters_flow_buff 4 down) } and Spell(glacial_spike) or Spell(ice_nova) or Spell(frostbolt) or FrostMovementShortCdPostConditions() or Spell(ice_lance)
 }
 
 AddFunction FrostSingleCdActions
@@ -2878,12 +2878,12 @@ AddFunction FrostSingleCdActions
   #call_action_list,name=essences
   FrostEssencesCdActions()
 
-  unless FrostEssencesCdPostConditions() or Spell(frozen_orb) or { Enemies() > 2 or Enemies() > 1 and CastTime(blizzard) == 0 } and Spell(blizzard) or BuffPresent(fingers_of_frost_buff) and Talent(splitting_ice_talent) and Enemies() > 1 and Spell(ice_lance) or Spell(comet_storm) or BuffStacks(icicles_buff) == 5 and not BuffPresent(brain_freeze_buff) and BuffExpires(memory_of_lucid_dreams_essence_buff) and Spell(ebonbolt) or { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) or Talent(incanters_flow_talent) and CastTime(glacial_spike) + TravelTime(glacial_spike) > StackTimeTo(incanters_flow_buff 5 up) and CastTime(glacial_spike) + TravelTime(glacial_spike) < StackTimeTo(incanters_flow_buff 4 down) } and Spell(glacial_spike) or Spell(ice_nova)
+  unless FrostEssencesCdPostConditions() or Spell(frozen_orb) or { Enemies() > 2 or Enemies() > 1 and not Talent(splitting_ice_talent) } and Spell(blizzard) or Spell(comet_storm) or BuffStacks(icicles_buff) == 5 and not BuffPresent(brain_freeze_buff) and BuffExpires(memory_of_lucid_dreams_essence_buff) and Spell(ebonbolt) or { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) or Talent(incanters_flow_talent) and CastTime(glacial_spike) + TravelTime(glacial_spike) > StackTimeTo(incanters_flow_buff 5 up) and CastTime(glacial_spike) + TravelTime(glacial_spike) < StackTimeTo(incanters_flow_buff 4 down) } and Spell(glacial_spike) or Spell(ice_nova)
   {
    #use_item,name=tidestorm_codex,if=buff.icy_veins.down&buff.rune_of_power.down
    if BuffExpires(icy_veins_buff) and BuffExpires(rune_of_power_buff) FrostUseItemActions()
-   #use_item,name=pocketsized_computation_device,if=cooldown.cyclotronic_blast.duration&buff.icy_veins.down&buff.rune_of_power.down
-   if SpellCooldownDuration(cyclotronic_blast) and BuffExpires(icy_veins_buff) and BuffExpires(rune_of_power_buff) FrostUseItemActions()
+   #use_item,effect_name=cyclotronic_blast,if=buff.icy_veins.down&buff.rune_of_power.down
+   if BuffExpires(icy_veins_buff) and BuffExpires(rune_of_power_buff) FrostUseItemActions()
 
    unless Spell(frostbolt)
    {
@@ -2896,7 +2896,7 @@ AddFunction FrostSingleCdActions
 
 AddFunction FrostSingleCdPostConditions
 {
- SpellCooldown(ice_nova) == 0 and target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or Talent(ebonbolt_talent) and PreviousGCDSpell(ebonbolt) and BuffPresent(brain_freeze_buff) and Spell(flurry) or PreviousGCDSpell(glacial_spike) and BuffPresent(brain_freeze_buff) and Spell(flurry) or FrostEssencesCdPostConditions() or Spell(frozen_orb) or { Enemies() > 2 or Enemies() > 1 and CastTime(blizzard) == 0 } and Spell(blizzard) or BuffPresent(fingers_of_frost_buff) and Talent(splitting_ice_talent) and Enemies() > 1 and Spell(ice_lance) or Spell(comet_storm) or BuffStacks(icicles_buff) == 5 and not BuffPresent(brain_freeze_buff) and BuffExpires(memory_of_lucid_dreams_essence_buff) and Spell(ebonbolt) or { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) or Talent(incanters_flow_talent) and CastTime(glacial_spike) + TravelTime(glacial_spike) > StackTimeTo(incanters_flow_buff 5 up) and CastTime(glacial_spike) + TravelTime(glacial_spike) < StackTimeTo(incanters_flow_buff 4 down) } and Spell(glacial_spike) or Spell(ice_nova) or Spell(frostbolt) or FrostMovementCdPostConditions() or Spell(ice_lance)
+ SpellCooldown(ice_nova) == 0 and target.DebuffPresent(winters_chill_debuff) and Spell(ice_nova) or Talent(ebonbolt_talent) and PreviousGCDSpell(ebonbolt) and BuffPresent(brain_freeze_buff) and Spell(flurry) or PreviousGCDSpell(glacial_spike) and BuffPresent(brain_freeze_buff) and Spell(flurry) or FrostEssencesCdPostConditions() or Spell(frozen_orb) or { Enemies() > 2 or Enemies() > 1 and not Talent(splitting_ice_talent) } and Spell(blizzard) or Spell(comet_storm) or BuffStacks(icicles_buff) == 5 and not BuffPresent(brain_freeze_buff) and BuffExpires(memory_of_lucid_dreams_essence_buff) and Spell(ebonbolt) or { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) or Talent(incanters_flow_talent) and CastTime(glacial_spike) + TravelTime(glacial_spike) > StackTimeTo(incanters_flow_buff 5 up) and CastTime(glacial_spike) + TravelTime(glacial_spike) < StackTimeTo(incanters_flow_buff 4 down) } and Spell(glacial_spike) or Spell(ice_nova) or Spell(frostbolt) or FrostMovementCdPostConditions() or Spell(ice_lance)
 }
 
 ### actions.precombat
@@ -2935,6 +2935,8 @@ AddFunction FrostPrecombatCdActions
  unless Spell(arcane_intellect) or not pet.Present() and Spell(summon_water_elemental)
  {
   #snapshot_stats
+  #use_item,name=azsharas_font_of_power
+  FrostUseItemActions()
   #mirror_image
   Spell(mirror_image)
   #potion
@@ -3078,8 +3080,6 @@ AddFunction FrostCooldownsCdActions
    if { PreviousGCDSpell(icy_veins) or target.TimeToDie() < 30 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
    #use_items
    FrostUseItemActions()
-   #use_item,name=pocketsized_computation_device,if=!cooldown.cyclotronic_blast.duration
-   if not SpellCooldownDuration(cyclotronic_blast) FrostUseItemActions()
    #blood_fury
    Spell(blood_fury_sp)
    #berserking
@@ -3186,8 +3186,8 @@ AddFunction FrostAoeCdActions
   {
    #use_item,name=tidestorm_codex,if=buff.icy_veins.down&buff.rune_of_power.down
    if BuffExpires(icy_veins_buff) and BuffExpires(rune_of_power_buff) FrostUseItemActions()
-   #use_item,name=pocketsized_computation_device,if=cooldown.cyclotronic_blast.duration&buff.icy_veins.down&buff.rune_of_power.down
-   if SpellCooldownDuration(cyclotronic_blast) and BuffExpires(icy_veins_buff) and BuffExpires(rune_of_power_buff) FrostUseItemActions()
+   #use_item,effect_name=cyclotronic_blast,if=buff.icy_veins.down&buff.rune_of_power.down
+   if BuffExpires(icy_veins_buff) and BuffExpires(rune_of_power_buff) FrostUseItemActions()
 
    unless Spell(frostbolt)
    {
@@ -3348,7 +3348,6 @@ AddIcon checkbox=opt_mage_frost_aoe help=cd specialization=frost
 # concentrated_flame_essence
 # cone_of_cold
 # counterspell
-# cyclotronic_blast
 # ebonbolt
 # ebonbolt_talent
 # fingers_of_frost_buff

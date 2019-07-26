@@ -61,11 +61,19 @@ Define(cheap_shot 1833)
   SpellInfo(cheap_shot energy=40 duration=4 gcd=1 combopoints=-2)
   # Stunned.
   SpellAddTargetDebuff(cheap_shot cheap_shot=1)
+Define(conductive_ink 302491)
+# Your damaging abilities against enemies above 30 health have a very high chance to apply Conductive Ink. When an enemy falls below M3 health, Conductive Ink inflicts s1*(1+@versadmg) Nature damage per stack.
+  SpellInfo(conductive_ink channel=0 gcd=0 offgcd=1)
+
 Define(crimson_tempest 121411)
 # Finishing move that slashes at all enemies within A1 yards, dealing instant damage and causing victims to bleed for additional damage. Lasts longer per combo point.rnrn   1 point  : s2*2 plus o1*2 over 4 secrn   2 points: s2*3 plus o1*3 over 6 secrn   3 points: s2*4 plus o1*4 over 8 secrn   4 points: s2*5 plus o1*5 over 10 secrn   5 points: s2*6 plus o1*6 over 12 sec?s193531[rn   6 points: s2*7 plus o1*7 over 14 sec][]
   SpellInfo(crimson_tempest energy=35 combopoints=1 duration=2 gcd=1 tick=2 talent=crimson_tempest_talent)
   # Bleeding for w1 damage every t1 sec.
   SpellAddTargetDebuff(crimson_tempest crimson_tempest=1)
+Define(cyclotronic_blast 293491)
+# Channel a cyclotronic blast, dealing s1 damage every t1 sec for D
+  SpellInfo(cyclotronic_blast cd=120 duration=2.5 channel=2.5 tick=0.5)
+  SpellAddTargetDebuff(cyclotronic_blast cyclotronic_blast=1)
 Define(deadshot_buff 272936)
 # Mutilate has a s1 chance to apply additional Deadly Poison, and does s2*2 additional damage.rnrn|C000FFF00Assassination|R
   SpellInfo(deadshot_buff channel=-0.001 gcd=0 offgcd=1)
@@ -92,10 +100,10 @@ Define(fan_of_knives 51723)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
-Define(focused_azerite_beam 295262)
-# Reduces the cast time of Focused Azerite Beam by s1.
-  SpellInfo(focused_azerite_beam channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(focused_azerite_beam focused_azerite_beam=1)
+Define(focused_azerite_beam 299336)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+  SpellInfo(focused_azerite_beam cd=90 duration=3 channel=3 tick=0.33)
+
 Define(garrote 703)
 # Garrote the enemy, causing o1 Bleed damage over 18 seconds.?a231719[ Silences the target for 3 seconds when used from Stealth.][]rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|r
 # Rank 2: Garrote silences the target for 3 seconds when used from Stealth.rn
@@ -136,6 +144,11 @@ Define(killing_spree 51690)
   SpellInfo(killing_spree cd=120 duration=2 gcd=1 tick=0.4 talent=killing_spree_talent)
   # Attacking an enemy every t1 sec.
   SpellAddBuff(killing_spree killing_spree=1)
+Define(latent_arcana 296971)
+# Channel latent magic for up to 4 seconds, increasing your primary stat by s1. The duration is extended for each second spent channeling, up to M4 sec.
+  SpellInfo(latent_arcana cd=120 duration=4 channel=4 tick=1)
+  # Infusing your body with arcane energies.
+  SpellAddBuff(latent_arcana latent_arcana=1)
 Define(lifeblood_buff 274419)
 # When you use a Healthstone, gain s1 Leech for 20 seconds.
   SpellInfo(lifeblood_buff channel=-0.001 gcd=0 offgcd=1)
@@ -183,6 +196,19 @@ Define(quaking_palm 107079)
   SpellInfo(quaking_palm cd=120 duration=4 gcd=1)
   # Incapacitated.
   SpellAddTargetDebuff(quaking_palm quaking_palm=1)
+Define(razor_coral 303564)
+# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]
+  SpellInfo(razor_coral cd=20 channel=0 gcd=0 offgcd=1)
+Define(reckless_force_buff 298409)
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+  SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
+  # Gaining unstable Azerite energy.
+  SpellAddBuff(reckless_force_buff reckless_force_buff=1)
+Define(reckless_force_counter 302917)
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+  SpellInfo(reckless_force_counter duration=60 channel=60 max_stacks=20 gcd=0 offgcd=1)
+  # Upon reaching u stacks, you gain 302932s~1 Critical Strike for 302932d.
+  SpellAddBuff(reckless_force_counter reckless_force_counter=1)
 Define(roll_the_bones 193316)
 # Finishing move that rolls the dice of fate, providing a random combat enhancement. Lasts longer per combo point:rn   1 point  : 12 secondsrn   2 points: 18 secondsrn   3 points: 24 secondsrn   4 points: 30 secondsrn   5 points: 36 seconds?s193531[rn   6 points: 42 seconds][]
   SpellInfo(roll_the_bones energy=25 combopoints=1 duration=6 channel=6 gcd=1 tick=2)
@@ -196,11 +222,6 @@ Define(rupture 1943)
 Define(secret_technique 280719)
 # Finishing move that creates shadow clones of yourself. You and your shadow clones each perform a piercing attack on all enemies near your target, dealing Physical damage to the primary target and reduced damage to other targets.rn   1 point  : 280720m1*1*<mult> total damagern   2 points: 280720m1*2*<mult> total damagern   3 points: 280720m1*3*<mult> total damagern   4 points: 280720m1*4*<mult> total damagern   5 points: 280720m1*5*<mult> total damage?s193531[rn   6 points: 280720m1*6*<mult> total damage][]rnrnCooldown is reduced by by s5 sec for every combo point you spend.
   SpellInfo(secret_technique energy=30 combopoints=1 cd=45 gcd=1 talent=secret_technique_talent)
-Define(seething_rage 297126)
-# Increases your critical hit damage by 297126m for 5 seconds.
-  SpellInfo(seething_rage duration=5 gcd=0 offgcd=1)
-  # Critical strike damage increased by w1.
-  SpellAddBuff(seething_rage seething_rage=1)
 Define(shadow_blades 121471)
 # Draws upon surrounding shadows to empower your weapons, causing your combo point generating abilities to generate s2 additional combo point and deal s1 additional damage as Shadow for 20 seconds.
   SpellInfo(shadow_blades cd=180 duration=20 gcd=1)
@@ -334,6 +355,8 @@ Define(vigor_talent 7) #19239
 # Increases your maximum Energy by (25 of Spell Power) and your Energy regeneration by (25 of Spell Power).
 Define(weaponmaster_talent 1) #19233
 # Shadowstrike and Backstab have a s1 chance to hit the target twice each time they deal damage.
+Define(azsharas_font_of_power_item 169314)
+Define(pocket_sized_computation_device_item 167555)
 Define(double_dose_trait 273007)
 Define(echoing_blades_trait 287649)
 Define(scent_of_blood_trait 277679)
