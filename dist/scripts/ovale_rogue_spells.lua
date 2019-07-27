@@ -220,6 +220,11 @@ Define(rupture 1943)
 Define(secret_technique 280719)
 # Finishing move that creates shadow clones of yourself. You and your shadow clones each perform a piercing attack on all enemies near your target, dealing Physical damage to the primary target and reduced damage to other targets.rn   1 point  : 280720m1*1*<mult> total damagern   2 points: 280720m1*2*<mult> total damagern   3 points: 280720m1*3*<mult> total damagern   4 points: 280720m1*4*<mult> total damagern   5 points: 280720m1*5*<mult> total damage?s193531[rn   6 points: 280720m1*6*<mult> total damage][]rnrnCooldown is reduced by by s5 sec for every combo point you spend.
   SpellInfo(secret_technique energy=30 combopoints=1 cd=45 gcd=1 talent=secret_technique_talent)
+Define(seething_rage 297126)
+# Increases your critical hit damage by 297126m for 5 seconds.
+  SpellInfo(seething_rage duration=5 gcd=0 offgcd=1)
+  # Critical strike damage increased by w1.
+  SpellAddBuff(seething_rage seething_rage=1)
 Define(shadow_blades 121471)
 # Draws upon surrounding shadows to empower your weapons, causing your combo point generating abilities to generate s2 additional combo point and deal s1 additional damage as Shadow for 20 seconds.
   SpellInfo(shadow_blades cd=180 duration=20 gcd=1)
@@ -692,8 +697,13 @@ Define(skull_and_crossbones_buff 199603)
 Define(true_bearing_buff 193359)
 	SpellInfo(true_bearing_buff duration=12 add_duration_combopoints=6)
 
+# Pvp talents
+Define(cold_blood 213981)
+	SpellInfo(cold_blood cd=60)
 
 # Azerite Traits
+Define(deadshot_buff 272935)
+Define(keep_your_wits_about_you_buff 288985)
 
 
 

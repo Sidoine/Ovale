@@ -10,7 +10,8 @@ local function registerBase(OvaleScripts)
 Define(arcanic_pulsar_buff 287784)
 # Starsurge's damage is increased by s2. Every s4 Starsurges, gain Celestial Alignment for s3 sec.
   SpellInfo(arcanic_pulsar_buff channel=-0.001 gcd=0 offgcd=1)
-
+Define(natures_cure 88423)
+  SpellInfo(natures_cure cd=8)
 Define(barkskin 22812)
 # Your skin becomes as tough as bark, reducing all damage you take by s2 and preventing damage from delaying your spellcasts. Lasts 12 seconds.rnrnUsable while stunned, frozen, incapacitated, feared, or asleep, and in all shapeshift forms.
   SpellInfo(barkskin cd=60 duration=12 gcd=0 offgcd=1 tick=1)
@@ -161,9 +162,7 @@ Define(maul 6807)
 # Maul the target for s2 Physical damage.
   SpellInfo(maul rage=40)
 Define(mighty_bash 5211)
-# Invokes the spirit of Ursoc to stun the target for 5 seconds. Usable in all shapeshift forms.
-  SpellInfo(mighty_bash cd=50 duration=5 talent=mighty_bash_talent)
-  # Stunned.
+  SpellInfo(mighty_bash cd=50 duration=5 interrupt=1 talent=mighty_bash_talent)
   SpellAddTargetDebuff(mighty_bash mighty_bash=1)
 Define(moonfire 8921)
 # A quick beam of lunar light burns the enemy for (14.499999999999998 of Spell Power) Arcane damage and then an additional 164812o2 Arcane damage over 16 seconds.?s197911[rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r][]
@@ -379,7 +378,7 @@ Define(astralpower "lunarpower") # Astral Power is named LunarPower in Enum.Powe
 	SpellInfo(cat_form unusable=1 if_stance=druid_cat_form)
 	SpellAddBuff(cat_form cat_form_buff=1)
 Define(cat_form_buff 768)
-
+Define(dash 1850)
 	SpellInfo(dash cd=120)
 	SpellInfo(dash gcd=0 offgcd=1 if_stance=druid_cat_form)
 	SpellInfo(dash to_stance=druid_cat_form if_stance=!druid_cat_form)
@@ -578,6 +577,9 @@ Define(starfall_buff 191034)
 	SpellInfo(starfall_buff duration=8)
 Define(starlord_buff 279709)
 Define(starsurge 197626)
+	SpellInfo(starsurge cd=10 specialization=!balance)
+	SpellAddBuff(starsurge lunar_empowerment_buff=1 talent=balance_affinity_talent)
+	SpellAddBuff(starsurge solar_empowerment_buff=1 talent=balance_affinity_talent)
 Define(starsurge_balance 78674)
 	SpellInfo(starsurge_balance astralpower=40)
 	SpellAddBuff(starsurge_balance lunar_empowerment_buff=1)
@@ -802,6 +804,33 @@ SpellRequire(ferocious_bite refund_combopoints cost=buff,apex_predator_buff)
 
 # Legendaries
 Define(luffa_wrappings 137056)
+
+# Restoration
+Define(revitalize 212040)
+Define(ironbark 102342)
+	SpellInfo(ironbark cd=48)
+Define(flourish 197721)
+	SpellInfo(flourish cd=90)
+Define(lifebloom 33763)
+	SpellAddTargetBuff(lifebloom lifebloom_buff=1)
+Define(lifebloom_buff 33763)
+	SpellInfo(lifebloom_buff duration=15)
+Define(wild_growth 48438)
+	SpellInfo(wild_growth cd=10)
+Define(wild_growth_buff 48438)
+	SpellInfo(wild_growth_buff duration=7)
+Define(cenarion_ward 102351)
+	SpellInfo(cenarion_ward cd=30)
+	SpellAddTargetBuff(cenarion_ward cenarion_ward_buff=1)
+Define(cenarion_ward_buff 102351)
+Define(cenarion_ward_hot_buff 102352)
+Define(tranquility 740)
+	SpellInfo(tranquility cd=180 talent=!inner_peace_talent)
+	SpellInfo(tranquility cd=120 talent=inner_peace_talent)
+Define(tranquility_buff 157982)
+	SpellInfo(tranquility_buff duration=8)
+Define(inner_peace_talent 16)
+Define(balance_affinity_talent 7)
 	]]
     OvaleScripts:RegisterScript("DRUID", nil, name, desc, code, "include")
 end

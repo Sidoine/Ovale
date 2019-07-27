@@ -3,6 +3,7 @@ if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local LibBabbleCreatureType = LibStub:GetLibrary("LibBabble-CreatureType-3.0", true)
 local LibRangeCheck = LibStub:GetLibrary("LibRangeCheck-2.0", true)
+local LibInterrupt = LibStub:GetLibrary("LibInterrupt-1.0", true)
 local __Condition = LibStub:GetLibrary("ovale/Condition")
 local TestValue = __Condition.TestValue
 local Compare = __Condition.Compare
@@ -2034,6 +2035,144 @@ __exports.OvaleConditions = __class(nil, {
             local value = tickRem + tickTime * (min(ticksLo, ticksHi) - 1)
             return ReturnValue(value, atTime, -1)
         end
+		self.MustBeInterrupted = function(positionalParams, namedParams, atTime)
+			local yesno = positionalParams[1]
+			local target = self:ParseCondition(positionalParams, namedParams)
+			local boolean = LibInterrupt:MustInterrupt(target)
+			return TestBoolean(boolean, yesno)
+		end
+		self.HasManagedInterrupts = function(positionalParams, namedParams, atTime)
+			local yesno = positionalParams[1]
+			local target = self:ParseCondition(positionalParams, namedParams)
+			local boolean = LibInterrupt:HasInterrupts(target)
+			return TestBoolean(boolean, yesno)
+		end
+		self.RaidMembersWithHealthPercent = function(positionalParams, namedParams, atTime)
+			local healthComparator, healthLimit, countComparator, countLimit = positionalParams[1], positionalParams[2], positionalParams[3], positionalParams[4]
+			local value = 0
+			for _, uid in pairs(self.OvaleData.RAID_UIDS) do
+				local health = self.OvaleHealth:UnitHealth(uid) or 0
+				if health > 0 then
+					local maxHealth = self.OvaleHealth:UnitHealthMax(uid) or 1
+					local healthPercent = health / maxHealth * 100
+					if Compare(healthPercent, healthComparator, healthLimit) then
+						value = value + 1
+					end
+				end
+			end
+			return Compare(value, countComparator, countLimit)
+		end
+		self.RaidMembersInRange = function(positionalParams, namedParams, atTime)
+			local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+			local value = 0
+			for _, uid in pairs(self.OvaleData.RAID_UIDS) do
+				local boolean = self.OvaleSpells:IsSpellInRange(spellId, uid)
+				if boolean then
+					value = value + 1
+				end
+			end
+			return Compare(value, comparator, limit)
+		end
+		self.PartyMembersWithHealthPercent = function(positionalParams, namedParams, atTime)
+			local healthComparator, healthLimit, countComparator, countLimit = positionalParams[1], positionalParams[2], positionalParams[3], positionalParams[4]
+			local value = 0
+			for _, uid in pairs(self.OvaleData.PARTY_UIDS) do
+				local health = self.OvaleHealth:UnitHealth(uid) or 0
+				if health > 0 then
+					local maxHealth = self.OvaleHealth:UnitHealthMax(uid) or 1
+					local healthPercent = health / maxHealth * 100
+					if Compare(healthPercent, healthComparator, healthLimit) then
+						value = value + 1
+					end
+				end
+			end
+			-- Ovale:OneTimeMessage("Warning: Party members with low health: '%s'.", value)
+			return Compare(value, countComparator, countLimit)
+		end
+		self.PartyMemberWithLowestHealth = function(positionalParams, namedParams, atTime)
+			local countComparator, countLimit = positionalParams[1], positionalParams[2]
+			local value = 0
+			local prevHealth = 100
+			for num, uid in pairs(self.OvaleData.PARTY_UIDS) do
+				local health = self.OvaleHealth:UnitHealth(uid) or 0
+				if health > 0 then
+					local maxHealth = self.OvaleHealth:UnitHealthMax(uid) or 1
+					local healthPercent = health / maxHealth * 100
+					if healthPercent < prevHealth then
+						prevHealth = healthPercent
+						value = num
+					end
+				end
+			end
+			return Compare(value, countComparator, countLimit)
+		end
+		self.PartyMembersInRange = function(positionalParams, namedParams, atTime)
+			local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+			local value = 0
+			for _, uid in pairs(self.OvaleData.PARTY_UIDS) do
+				local boolean = self.OvaleSpells:IsSpellInRange(spellId, uid)
+				if boolean then
+					value = value + 1
+				end
+			end
+			-- Ovale:OneTimeMessage("Warning: Party members in range: '%s'.", value)
+			return Compare(value, comparator, limit)
+		end
+		self.PlayerIsResting = function(positionalParams, namedParams, atTime)
+			local yesno = positionalParams[1]
+			local boolean = IsResting()
+			return TestBoolean(boolean, yesno)
+		end
+		self.IsFocus = function(positionalParams, namedParams, atTime)
+			local yesno = positionalParams[1]
+			local target = self:ParseCondition(positionalParams, namedParams)
+			local boolean = UnitIsUnit("focus", target)
+			return TestBoolean(boolean, yesno)
+		end
+		self.IsTarget = function(positionalParams, namedParams, atTime)
+			local yesno = positionalParams[1]
+			local target = self:ParseCondition(positionalParams, namedParams)
+			local boolean = UnitIsUnit("target", target)
+			return TestBoolean(boolean, yesno)
+		end
+		self.IsMouseover = function(positionalParams, namedParams, atTime)
+			local yesno = positionalParams[1]
+			local target = self:ParseCondition(positionalParams, namedParams)
+			local boolean = UnitIsUnit("mouseover", target)
+			return TestBoolean(boolean, yesno)
+		end
+		self.mounted = function(condition)
+			local yesno = condition[1]
+			return TestBoolean(IsMounted(), yesno)
+		end
+		self.falling = function(condition)
+			local yesno = condition[1]
+			return TestBoolean(IsFalling(), yesno)
+		end
+		self.canfly = function(condition)
+			local yesno = condition[1]
+			return TestBoolean(IsFlyableArea(), yesno)
+		end
+		self.flying = function(condition)
+			local yesno = condition[1]
+			return TestBoolean(IsFlying(), yesno)
+		end
+		self.instanced = function(condition)
+			local yesno = condition[1]
+			return TestBoolean(IsInInstance(), yesno)
+		end
+		self.indoors = function(condition)
+			local yesno = condition[1]
+			return TestBoolean(IsIndoors(), yesno)
+		end
+		self.outdoors = function(condition)
+			local yesno = condition[1]
+			return TestBoolean(IsOutdoors(), yesno)
+		end
+		self.wet = function(condition)
+			local yesno = condition[1]
+			return TestBoolean(IsSwimming(), yesno)
+		end
         ovaleCondition:RegisterCondition("present", false, self.Present)
         ovaleCondition:RegisterCondition("stacktimeto", false, self.stackTimeTo)
         ovaleCondition:RegisterCondition("armorsetbonus", false, self.ArmorSetBonus)
@@ -2311,5 +2450,24 @@ __exports.OvaleConditions = __class(nil, {
         ovaleCondition:RegisterCondition("soulfragments", false, self.SoulFragments)
         ovaleCondition:RegisterCondition("timetoshard", false, self.TimeToShard)
         ovaleCondition:RegisterCondition("hasdebufftype", false, self.HasDebuffType)
+		ovaleCondition:RegisterCondition("mustbeinterrupted", false, self.MustBeInterrupted)
+		ovaleCondition:RegisterCondition("hasmanagedinterrupts", false, self.HasManagedInterrupts)
+		ovaleCondition:RegisterCondition("raidmemberswithhealthpercent", false, self.RaidMembersWithHealthPercent)
+		ovaleCondition:RegisterCondition("raidmembersinrange", false, self.RaidMembersInRange)
+		ovaleCondition:RegisterCondition("partymemberswithhealthpercent", false, self.PartyMembersWithHealthPercent)
+		ovaleCondition:RegisterCondition("partymemberwithlowesthealth", false, self.PartyMemberWithLowestHealth)
+		ovaleCondition:RegisterCondition("partymembersinrange", false, self.PartyMembersInRange)
+		ovaleCondition:RegisterCondition("playerisresting", false, self.PlayerIsResting)
+		ovaleCondition:RegisterCondition("isfocus", false, self.IsFocus)
+		ovaleCondition:RegisterCondition("istarget", false, self.IsTarget)
+		ovaleCondition:RegisterCondition("ismouseover", false, self.IsMouseover)
+		ovaleCondition:RegisterCondition("mounted", false, self.mounted)
+		ovaleCondition:RegisterCondition("falling", false, self.falling)
+		ovaleCondition:RegisterCondition("canfly", false, self.canfly)
+		ovaleCondition:RegisterCondition("flying", false, self.flying)
+		ovaleCondition:RegisterCondition("instanced", false, self.instanced)
+		ovaleCondition:RegisterCondition("indoors", false, self.indoors)
+		ovaleCondition:RegisterCondition("outdoors", false, self.outdoors)
+		ovaleCondition:RegisterCondition("wet", false, self.wet)
     end,
 })

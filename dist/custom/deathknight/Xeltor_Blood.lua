@@ -65,7 +65,7 @@ AddFunction BloodDefaultShortCdActions
  #tombstone,if=buff.bone_shield.stack>=7&incoming_damage_5s>health.max*0.10
  if BuffStacks(bone_shield_buff) >= 7 and IncomingDamage(5) > MaxHealth() * 0.1 Spell(tombstone)
  #death_chain,if=spell_targets.death_chain>=3
- if Enemies(tagged=1) >= 3 Spell(death_chain)
+ # if Enemies(tagged=1) >= 3 Spell(death_chain)
  #call_action_list,name=standard
  BloodStandardShortCdActions()
 }
@@ -89,7 +89,7 @@ AddFunction BloodDefaultCdActions
  #dancing_rune_weapon,if=(!talent.blooddrinker.enabled|!cooldown.blooddrinker.ready)&(buff.icebound_fortitude.up|buff.vampiric_blood.up|spell_targets.blood_boil>2)
  if { not Talent(blooddrinker_talent) or not SpellCooldown(blooddrinker) == 0 } and { BuffPresent(icebound_fortitude_buff) or BuffPresent(vampiric_blood_buff) or Enemies(tagged=1) > 2 } Spell(dancing_rune_weapon)
 
- unless BuffStacks(bone_shield_buff) >= 7 and IncomingDamage(5) > MaxHealth() * 0.1 and Spell(tombstone) or Enemies(tagged=1) >= 3 and Spell(death_chain)
+ unless BuffStacks(bone_shield_buff) >= 7 and IncomingDamage(5) > MaxHealth() * 0.1 and Spell(tombstone) or Enemies(tagged=1) >= 3
  {
   #call_action_list,name=standard
   BloodStandardCdActions()
@@ -98,7 +98,7 @@ AddFunction BloodDefaultCdActions
 
 AddFunction BloodDefaultCdPostConditions
 {
- BuffStacks(bone_shield_buff) >= 7 and IncomingDamage(5) > MaxHealth() * 0.1 and Spell(tombstone) or Enemies(tagged=1) >= 3 and Spell(death_chain) or BloodStandardCdPostConditions()
+ BuffStacks(bone_shield_buff) >= 7 and IncomingDamage(5) > MaxHealth() * 0.1 and Spell(tombstone) or Enemies(tagged=1) >= 3 or BloodStandardCdPostConditions()
 }
 
 ### actions.precombat
@@ -155,7 +155,7 @@ AddFunction BloodStandardMainActions
  if BuffPresent(dancing_rune_weapon_buff) or TimeToRunes(4) < GCD()
  {
   #blood_for_blood,if=health>health.max*0.50&buff.blood_for_blood.remains<=gcd
-  if Health() >= MaxHealth() * 0.75 and BuffRemaining(blood_for_blood_buff) <= GCD() Spell(blood_for_blood)
+  # if Health() >= MaxHealth() * 0.75 and BuffRemaining(blood_for_blood_buff) <= GCD() Spell(blood_for_blood)
   Spell(heart_strike)
  }
  #blood_boil,if=buff.dancing_rune_weapon.up
@@ -170,7 +170,7 @@ AddFunction BloodStandardMainActions
  if TimeToRunes(3) < GCD() or BuffStacks(bone_shield_buff) > 6
  {
   #blood_for_blood,if=health>health.max*0.50&buff.blood_for_blood.remains<=gcd
-  if Health() >= MaxHealth() * 0.75 and BuffRemaining(blood_for_blood_buff) <= GCD() Spell(blood_for_blood)
+  # if Health() >= MaxHealth() * 0.75 and BuffRemaining(blood_for_blood_buff) <= GCD() Spell(blood_for_blood)
   Spell(heart_strike)
  }
 }

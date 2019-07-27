@@ -572,9 +572,14 @@ Define(wing_clip 195645)
 Define(wing_clip_debuff 195645)
 	SpellInfo(wing_clip_debuff duration=15)
 
+	Define(reckless_force_counter 302917)
 	
 
 #Pet Spells
+Define(heart_of_the_phoenix 55709)
+	SpellInfo(heart_of_the_phoenix cd=480)
+Define(heart_of_the_phoenix_debuff 55711)
+	SpellInfo(heart_of_the_phoenix_debuff duration=480)
 Define(pet_beast_cleave_buff 118455)
 	SpellInfo(pet_beast_cleave_buff duration=4)
 Define(pet_coordinated_assault_buff 266779)
@@ -583,6 +588,8 @@ Define(pet_frenzy_buff 272790)
 	SpellInfo(pet_frenzy_buff duration=8 max_stacks=3)
 
 # Azerite Traits
+Define(unerring_vision_trait 274445)
+Define(unerring_vision_buff 274446)
 
 
 
@@ -644,6 +651,9 @@ Define(venomous_bite_talent 10)
 
 Define(volley_talent 5)
 
+# Pvp talents
+Define(trackers_net 212638)
+	SpellInfo(trackers_net cd=25)
 
 # Item set
 Define(t20_2p_critical_aimed_damage_buff 242242) # TODO
