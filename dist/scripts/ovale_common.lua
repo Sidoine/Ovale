@@ -98,25 +98,6 @@ Define(item_steelskin_potion 152557)
 Define(item_unbridled_fury 169299)
 Define(item_superior_battle_potion_of_strength 168500)
 
-Define(concentrated_flame 295373)
-	SpellInfo(concentrated_flame cd=30)
-Define(memory_of_lucid_dreams 298357)
-	SpellInfo(memory_of_lucid_dreams cd=120)
-Define(blood_of_the_enemy 298277)
-	SpellInfo(blood_of_the_enemy cd=90)
-Define(guardian_of_azeroth 299358)
-	SpellInfo(guardian_of_azeroth cd=180)
-Define(focused_azerite_beam 299338)
-	SpellInfo(focused_azerite_beam cd=180)
-Define(purifying_blast 295337)
-	SpellInfo(purifying_blast cd=60)
-Define(ripple_in_space 302983)
-	SpellInfo(ripple_in_space cd=60)
-Define(the_unbound_force 298452)
-	SpellInfo(the_unbound_force cd=60)
-Define(worldvein_resonance 295186)
-	SpellInfo(worldvein_resonance cd=60)
-
 ###
 ### Trinkets & OnUse Rings
 ###
@@ -191,18 +172,15 @@ Define(sephuzs_secret_buff 208051)
 
 Define(concentrated_flame_essence 295373)
     SpellInfo(concentrated_flame_essence cd=30 tag=main)
-Define(concentrated_flame_burn_debuff 295377)
+    Define(concentrated_flame_burn_debuff 295377)
 Define(memory_of_lucid_dreams_essence 298357)
     SpellInfo(memory_of_lucid_dreams_essence cd=120 tag=cd)
-Define(memory_of_lucid_dreams_essence_buff 298357)
+    Define(memory_of_lucid_dreams_essence_buff 298357)
 Define(ripple_in_space_essence 302731)
     SpellInfo(ripple_in_space_essence cd=60 tag=shortcd)
 Define(worldvein_resonance_essence 295186)
     SpellInfo(worldvein_resonance_essence cd=60 tag=shortcd)
-Define(lifeblood_buff 295137)
-Define(blood_of_the_enemy_essence 298277)
-	SpellInfo(blood_of_the_enemy_essence cd=90 tag=shortcd)
-Define(seething_rage_buff 297126)
+    Define(lifeblood_buff 295137)
 
 Define(conflict_and_strife_essence_id 32)
 Define(memory_of_lucid_dreams_essence_id 27)
@@ -251,8 +229,6 @@ Define(blood_fury_sp 33702)
 	SpellAddBuff(blood_fury_sp blood_fury_sp_buff=1)
 Define(blood_fury_sp_buff 33702)
 	SpellInfo(blood_fury_sp_buff duration=15)
-Define(every_man_for_himself 59752)
-	SpellInfo(every_man_for_himself cd=180)
 Define(fireblood 265221)
     SpellInfo(fireblood cd=120)
 Define(darkflight 68992)
@@ -278,12 +254,8 @@ Define(fireblood 265221)
 	SpellInfo(fireblood cd=120)
 Define(ancestral_call 274738)
 	SpellInfo(ancestral_call cd=120)
-Define(arcane_pulse 260364)
+Define(arcane_pulse 260364)  
 	SpellInfo(arcane_pulse cd=180)
-	SpellAddTargetDebuff(arcane_pulse arcane_pulse_debuff=1)
-Define(arcane_pulse_debuff 260369)
-	SpellInfo(arcane_pulse_debuff duration=12)
-    
 	
 ###
 ### Boss Spells
@@ -311,75 +283,6 @@ AddFunction UseHealthPotions
 		Item(ancient_healing_potion usable=1)
 		Item(aged_healing_potion usable=1)
 	}
-}
-
-# Movement allowing defines
-Define(stellar_drift_buff 202461)
-Define(norgannons_foresight_buff 236380)
-Define(spiritwalkers_grace_buff 79206)
-
-AddFunction CanMove
-{
-	if BuffPresent(norgannons_foresight_buff) 1
-    if BuffPresent(stellar_drift_buff) 1
-	if BuffPresent(ice_floes_buff) 1
-	if BuffPresent(spiritwalkers_grace_buff) 1
-    0
-}
-
-AddFunction Boss
-{
-	IsBossFight() or target.Classification(worldboss) or target.Classification(rareelite) or BuffPresent(burst_haste_buff any=1) or { target.IsPvP() and not target.IsFriend() } or { target.Level() >= Level() and { target.Classification(elite) and PartyMemberCount() < 5 or target.Classification(rare) } }
-}
-
-Define(ghost_debuff 8326)
-AddFunction Dead
-{
-	if Health() <= 0 1
-	if DebuffPresent(ghost_debuff) 1
-	0
-}
-
-# Party checks
-AddFunction PartyMemberCount
-{
-	Present() + party1.Present() + party2.Present() + party3.Present() + party4.Present()
-}
-
-AddFunction PartyHealth
-{
-	Health() + party1.Health() + party2.Health() + party3.Health() + party4.Health()
-}
-
-AddFunction PartyMaxHealth
-{
-	MaxHealth() + party1.MaxHealth() + party2.MaxHealth() + party3.MaxHealth() + party4.MaxHealth()
-}
-
-AddFunction PartyHealthPercent
-{
-	{ PartyHealth() / PartyMaxHealth() } * 100
-}
-
-# Raid checks
-AddFunction RaidMemberCount
-{
-	Present() + raid1.Present() + raid2.Present() + raid3.Present() + raid4.Present() + raid5.Present() + raid6.Present() + raid7.Present() + raid8.Present() + raid9.Present() + raid10.Present() + raid11.Present() + raid12.Present() + raid13.Present() + raid14.Present() + raid15.Present() + raid16.Present() + raid17.Present() + raid18.Present() + raid19.Present() + raid20.Present() + raid21.Present() + raid22.Present() + raid23.Present() + raid24.Present() + raid25.Present()
-}
-
-AddFunction RaidHealth
-{
-	Health() + raid1.Health() + raid2.Health() + raid3.Health() + raid4.Health() + raid5.Health() + raid6.Health() + raid7.Health() + raid8.Health() + raid9.Health() + raid10.Health() + raid11.Health() + raid12.Health() + raid13.Health() + raid14.Health() + raid15.Health() + raid16.Health() + raid17.Health() + raid18.Health() + raid19.Health() + raid20.Health() + raid21.Health() + raid22.Health() + raid23.Health() + raid24.Health() + raid25.Health()
-}
-
-AddFunction RaidMaxHealth
-{
-	MaxHealth() + raid1.MaxHealth() + raid2.MaxHealth() + raid3.MaxHealth() + raid4.MaxHealth() + raid5.MaxHealth() + raid6.MaxHealth() + raid7.MaxHealth() + raid8.MaxHealth() + raid9.MaxHealth() + raid10.MaxHealth() + raid11.MaxHealth() + raid12.MaxHealth() + raid13.MaxHealth() + raid14.MaxHealth() + raid15.MaxHealth() + raid16.MaxHealth() + raid17.MaxHealth() + raid18.MaxHealth() + raid19.MaxHealth() + raid20.MaxHealth() + raid21.MaxHealth() + raid22.MaxHealth() + raid23.MaxHealth() + raid24.MaxHealth() + raid25.MaxHealth()
-}
-
-AddFunction RaidHealthPercent
-{
-	{ RaidHealth() / RaidMaxHealth() } * 100
 }
 ]]
     OvaleScripts:RegisterScript(nil, nil, name, desc, code, "include")

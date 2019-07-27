@@ -47,42 +47,6 @@ local registerWarlockDestructionXeltor = __ovale_warlock.registerWarlockDestruct
 local registerWarriorArmsXeltor = __ovale_warrior.registerWarriorArmsXeltor
 local registerWarriorFuryXeltor = __ovale_warrior.registerWarriorFuryXeltor
 local registerWarriorProtectionXeltor = __ovale_warrior.registerWarriorProtectionXeltor
--- Helpers
--- local registerDeathKnightBloodHelper = __ovale_deathknight.registerDeathKnightBloodHelper
--- local registerDeathKnightFrostHelper = __ovale_deathknight.registerDeathKnightFrostHelper
--- local registerDeathKnightUnholyHelper = __ovale_deathknight.registerDeathKnightUnholyHelper
--- local registerDemonHunterHavocHelper = __ovale_demonhunter.registerDemonHunterHavocHelper
--- local registerDemonHunterVengeanceHelper = __ovale_demonhunter.registerDemonHunterVengeanceHelper
--- local registerDruidCommonHelper = __ovale_druid.registerDruidCommonHelper
--- local registerDruidBalanceHelper = __ovale_druid.registerDruidBalanceHelper
--- local registerDruidFeralHelper = __ovale_druid.registerDruidFeralHelper
--- local registerDruidGuardianHelper = __ovale_druid.registerDruidGuardianHelper
--- local registerDruidRestorationHelper = __ovale_druid.registerDruidRestorationHelper
--- local registerHunterBeastMasteryHelper = __ovale_hunter.registerHunterBeastMasteryHelper
--- local registerHunterMarksmanshipHelper = __ovale_hunter.registerHunterMarksmanshipHelper
--- local registerHunterSurvivalHelper = __ovale_hunter.registerHunterSurvivalHelper
--- local registerMageFireHelper = __ovale_mage.registerMageFireHelper
--- local registerMageFrostHelper = __ovale_mage.registerMageFrostHelper
--- local registerMageArcaneHelper = __ovale_mage.registerMageArcaneHelper
--- local registerMonkBrewmasterHelper = __ovale_monk.registerMonkBrewmasterHelper
--- local registerMonkMistweaverHelper = __ovale_monk.registerMonkMistweaverHelper
--- local registerMonkWindwalkerHelper = __ovale_monk.registerMonkWindwalkerHelper
--- local registerPaladinProtectionHelper = __ovale_paladin.registerPaladinProtectionHelper
--- local registerPaladinRetributionHelper = __ovale_paladin.registerPaladinRetributionHelper
--- local registerPriestDisciplineHelper = __ovale_priest.registerPriestDisciplineHelper
--- local registerPriestShadowHelper = __ovale_priest.registerPriestShadowHelper
--- local registerRogueAssassinationHelper = __ovale_rogue.registerRogueAssassinationHelper
--- local registerRogueOutlawHelper = __ovale_rogue.registerRogueOutlawHelper
--- local registerRogueSubtletyHelper = __ovale_rogue.registerRogueSubtletyHelper
--- local registerShamanElementalHelper = __ovale_shaman.registerShamanElementalHelper
--- local registerShamanEnhancementHelper = __ovale_shaman.registerShamanEnhancementHelper
--- local registerShamanRestorationHelper = __ovale_shaman.registerShamanRestorationHelper
--- local registerWarlockAfflictionHelper = __ovale_warlock.registerWarlockAfflictionHelper
--- local registerWarlockDemonologyHelper = __ovale_warlock.registerWarlockDemonologyHelper
--- local registerWarlockDestructionHelper = __ovale_warlock.registerWarlockDestructionHelper
--- local registerWarriorArmsHelper = __ovale_warrior.registerWarriorArmsHelper
--- local registerWarriorFuryHelper = __ovale_warrior.registerWarriorFuryHelper
--- local registerWarriorProtectionHelper = __ovale_warrior.registerWarriorProtectionHelper
 __exports.registerScripts = function(ovaleScripts)
 	registerDeathKnightBloodXeltor(ovaleScripts)
 	registerDeathKnightFrostXeltor(ovaleScripts)
@@ -120,41 +84,3 @@ __exports.registerScripts = function(ovaleScripts)
 	registerWarriorFuryXeltor(ovaleScripts)
 	registerWarriorProtectionXeltor(ovaleScripts)
 end
--- __exports.registerScripts = function(ovaleScripts)
-	-- -- Helpers
-	-- registerDeathKnightBloodHelper(ovaleScripts)
-	-- registerDeathKnightFrostHelper(ovaleScripts)
-	-- registerDeathKnightUnholyHelper(ovaleScripts)
-	-- registerDemonHunterHavocHelper(ovaleScripts)
-	-- registerDemonHunterVengeanceHelper(ovaleScripts)
-	-- registerDruidCommonHelper(ovaleScripts)
-	-- registerDruidBalanceHelper(ovaleScripts)
-	-- registerDruidFeralHelper(ovaleScripts)
-	-- registerDruidGuardianHelper(ovaleScripts)
-	-- registerDruidRestorationHelper(ovaleScripts)
-	-- registerHunterBeastMasteryHelper(ovaleScripts)
-	-- registerHunterMarksmanshipHelper(ovaleScripts)
-	-- registerHunterSurvivalHelper(ovaleScripts)
-	-- registerMageFireHelper(ovaleScripts)
-	-- registerMageFrostHelper(ovaleScripts)
-	-- registerMageArcaneHelper(ovaleScripts)
-	-- registerMonkBrewmasterHelper(ovaleScripts)
-	-- registerMonkMistweaverHelper(ovaleScripts)
-	-- registerMonkWindwalkerHelper(ovaleScripts)
-	-- registerPaladinProtectionHelper(ovaleScripts)
-	-- registerPaladinRetributionHelper(ovaleScripts)
-	-- registerPriestDisciplineHelper(ovaleScripts)
-	-- registerPriestShadowHelper(ovaleScripts)
-	-- registerRogueAssassinationHelper(ovaleScripts)
-	-- registerRogueOutlawHelper(ovaleScripts)
-	-- registerRogueSubtletyHelper(ovaleScripts)
-	-- registerShamanElementalHelper(ovaleScripts)
-	-- registerShamanEnhancementHelper(ovaleScripts)
-	-- registerShamanRestorationHelper(ovaleScripts)
-	-- registerWarlockAfflictionHelper(ovaleScripts)
-	-- registerWarlockDemonologyHelper(ovaleScripts)
-	-- registerWarlockDestructionHelper(ovaleScripts)
-	-- registerWarriorArmsHelper(ovaleScripts)
-	-- registerWarriorFuryHelper(ovaleScripts)
-	-- registerWarriorProtectionHelper(ovaleScripts)
--- end

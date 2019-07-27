@@ -232,7 +232,7 @@ Define(summon_darkglare 205180)
   SpellAddBuff(summon_darkglare summon_darkglare=1)
 Define(summon_demonic_tyrant 265187)
 # Summon a Demonic Tyrant to increase the duration of all of your current lesser demons by 265273m3/1000.1 sec, and increase the damage of all of your other demons by 265273s2, while damaging your target.
-  SpellInfo(summon_demonic_tyrant cd=90 duration=15 tag=cd)
+  SpellInfo(summon_demonic_tyrant cd=90 duration=15)
 Define(summon_felguard 30146)
 # Summons a Felguard under your command as a powerful melee combatant.
   SpellInfo(summon_felguard soulshards=1)
@@ -537,10 +537,6 @@ Define(summon_succubus 712)
 Define(summon_voidwalker 697)
 	SpellInfo(summon_voidwalker soulshards=1)
 Define(unending_breath 5697)
-	SpellAddTargetBuff(unending_breath unending_breath_buff=1)
-	SpellRequire(unending_breath unusable 1=buff,unending_breath_buff)
-Define(unending_breath_buff 5697)
-	SpellInfo(unending_breath_buff duration=600)
 Define(unending_resolve 104773)
 	SpellInfo(unending_resolve cd=180)
 	SpellAddBuff(unending_resolve unending_resolve_buff=1)
@@ -571,11 +567,7 @@ Define(vile_taint_debuff 278350)
 
 # Azerite Traits
 Define(cascading_calamity_trait 275376)
-Define(shadows_bite_trait 272944)
-Define(shadows_bite_buff 272945)
-	SpellInfo(shadows_bite_buff duration=8)
-Define(baleful_invocation_trait 287059)
-# TODO verify buff id
+ #TODO verify buff id
 
 Define(forbidden_knowledge_buff 278738) #TODO verify buff id
 Define(inevitable_demise_trait 273521)
@@ -647,10 +639,6 @@ Define(darkglare 103673)
 Define(infernal 89)
 Define(felguard 17252)
 
-# Pet skills
-Define(pet_axe_toss 119914)
-	SpellInfo(pet_axe_toss cd=30 offgcd=1 gcd=0)
-
 # Non-default tags for OvaleSimulationCraft.
 	SpellInfo(dark_soul_instability tag=cd)
 	SpellInfo(dark_soul_knowledge tag=cd)
@@ -670,10 +658,6 @@ Define(pet_axe_toss 119914)
 	SpellInfo(summon_imp tag=shortcd)
 	SpellInfo(summon_succubus tag=shortcd)
 	SpellInfo(summon_voidwalker tag=shortcd)
-
-# Custom stuff
-Define(healthstone 5512)
-	SpellInfo(healthstone offgcd=1)
 ]]
     OvaleScripts:RegisterScript("WARLOCK", nil, name, desc, code, "include")
 end

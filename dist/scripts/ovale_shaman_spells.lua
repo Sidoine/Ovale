@@ -665,7 +665,6 @@ Define(wind_rush_totem_buff 192082)
 	SpellAddBuff(windstrike stormbringer_buff=-1)
 	SpellRequire(windstrike cd_percent 0=buff,stormbringer_buff)
 	SpellRequire(windstrike maelstrom_percent 0=buff,stormbringer_buff)
-Define(lightning_lasso 305484)
 
 # Totems Buffs
 Define(ele_resonance_totem_buff 202192)
@@ -689,12 +688,6 @@ Define(enh_strom_totem_buff 262397)
 # Azerite Traits
 Define(lightning_conduit_trait 275391)
 Define(lightning_conduit_debuff 275391)
-Define(igneous_potential_trait 279829)
-Define(lava_shock_buff 273448)
-Define(lava_shock_trait 273448)
-Define(tectonic_thunder_buff 286949)
-Define(tectonic_thunder_trait 286949)
-Define(crackling_surge_buff 224127)
 
 # Legendary items
 Define(echoes_of_the_great_sundering_item 137074)

@@ -3,8 +3,7 @@ if not __exports then return end
 __exports.registerDeathKnightSpells = function(OvaleScripts)
     local name = "ovale_deathknight_spells"
     local desc = "[8.2] Ovale: Death Knight spells"
-    local code = [[
-Define(apocalypse 275699)
+    local code = [[Define(apocalypse 275699)
 # Bring doom upon the enemy, dealing sw1 Shadow damage and bursting up to s2 Festering Wounds on the target.rnrnSummons an Army of the Dead ghoul for 15 seconds for each burst Festering Wound.
   SpellInfo(apocalypse cd=90)
 Define(army_of_the_dead 42650)
@@ -12,11 +11,10 @@ Define(army_of_the_dead 42650)
   SpellInfo(army_of_the_dead runes=3 runicpower=-30 cd=480 duration=4 tick=0.5)
   # Summoning ghouls.
   SpellAddBuff(army_of_the_dead army_of_the_dead=1)
-Define(asphyxiate 221562)
-  SpellInfo(asphyxiate cd=45 duration=5)
-  SpellAddTargetDebuff(asphyxiate asphyxiate=1)
-Define(asphyxiate_unholy 108194)
+Define(asphyxiate 108194)
+# Lifts the enemy target off the ground, crushing their throat with dark energy and stunning them for 4 seconds.
   SpellInfo(asphyxiate cd=45 duration=4 talent=asphyxiate_talent_unholy)
+  # Stunned.
   SpellAddTargetDebuff(asphyxiate asphyxiate=1)
 Define(berserking 26297)
 # Increases your haste by s1 for 12 seconds.
@@ -76,10 +74,11 @@ Define(dancing_rune_weapon 49028)
   SpellInfo(dancing_rune_weapon cd=120 duration=13)
 
   SpellAddTargetDebuff(dancing_rune_weapon dancing_rune_weapon=1)
-
-# Transform your ?s207313[abomination]?s58640[geist][ghoul] into a powerful undead monstrosity for 15 seconds. The ?s207313[abomination]?s58640[geist][ghoul]'s abilities are empowered and take on new functions while the transformation is active.
 Define(dark_transformation 63560)
-	SpellInfo(dark_transformation cd=60)
+# Transform your ?s207313[abomination]?s58640[geist][ghoul] into a powerful undead monstrosity for 15 seconds. The ?s207313[abomination]?s58640[geist][ghoul]'s abilities are empowered and take on new functions while the transformation is active.
+  SpellInfo(dark_transformation cd=60 duration=15 channel=15)
+  # ?w2>0[Transformed into an undead monstrosity.][Gassy.]rnDamage dealt increased by w1.
+  SpellAddBuff(dark_transformation dark_transformation=1)
 Define(death_and_decay 43265)
 # Corrupts the targeted ground, causing 52212m1*11 Shadow damage over 10 seconds to targets within the area.rnrnWhile you remain within the area, your ?s223829[Necrotic Strike and ][]?c1[Heart Strike will hit up to 188290m3 additional targets.]?s207311[Clawing Shadows will hit all enemies near the target.][Scourge Strike will hit all enemies near the target.]
   SpellInfo(death_and_decay runes=1 runicpower=-10 cd=30 duration=10 tick=1)
@@ -196,8 +195,6 @@ Define(reckless_force_counter 302917)
   SpellInfo(reckless_force_counter duration=60 channel=60 max_stacks=20 gcd=0 offgcd=1)
   # Upon reaching u stacks, you gain 302932s~1 Critical Strike for 302932d.
   SpellAddBuff(reckless_force_counter reckless_force_counter=1)
-Define(raise_abomination 288853)
-	SpellInfo(raise_abomination cd=90)
 Define(remorseless_winter 196770)
 # Drain the warmth of life from all nearby enemies within 196771A1 yards, dealing 9*196771s1*<CAP>/AP Frost damage over 8 seconds and reducing their movement speed by 211793s1.
   SpellInfo(remorseless_winter runes=1 runicpower=-10 cd=20 duration=8 tick=1)
@@ -397,6 +394,12 @@ Define(dark_command 56222)
 	SpellInfo(dark_command cd=8)
 Define(dark_succor_buff 101568)
 	SpellInfo(dark_succor_buff duration=15)
+
+	SpellInfo(dark_transformation cd=60)
+	SpellAddPetBuff(dark_transformation dark_transformation_buff=1)
+Define(dark_transformation_buff 63560)
+	SpellInfo(dark_transformation_buff duration=15)
+
 	SpellInfo(death_and_decay runes=1 runicpower=-10 cd=30 specialization=unholy)
 	SpellInfo(death_and_decay runes=1 runicpower=-10 cd=15 specialization=blood)
 	SpellInfo(death_and_decay replaced_by=defile talent=defile_talent specialization=unholy)
@@ -519,10 +522,6 @@ Define(outbreak_debuff 196782)
 	SpellInfo(outbreak_debuff duration=6)
 Define(ossuary_buff 219788)
 Define(path_of_frost 3714)
-	SpellRequire(path_of_frost unusable 1=buff,path_of_frost_buff)
-	SpellAddBuff(path_of_frost path_of_frost_buff=1)
-Define(path_of_frost_buff 3714)
-	SpellInfo(path_of_frost_buff duration=600)
 
 	SpellInfo(pillar_of_frost cd=45)
 	SpellAddBuff(pillar_of_frost pillar_of_frost_buff=1)
@@ -598,13 +597,6 @@ Define(wraith_walk_buff 212552)
 # Weapon Enchant
 Define(unholy_strength_buff 53365)
 	SpellInfo(unholy_strength_buff duration=15)
-Define(blood_for_blood 233411)
-	SpellInfo(blood_for_blood offgcd=1 gcd=0)
-	SpellAddBuff(blood_for_blood blood_for_blood_buff=1)
-Define(blood_for_blood_buff 233411)
-	SpellInfo(blood_for_blood_buff duration=12)
-Define(death_chain 203173)
-	SpellInfo(death_chain cd=30)
 
 ## Items
 Define(consorts_cold_core 144293)
@@ -615,7 +607,6 @@ Define(lanathels_lament_buff 212975)
 	SpellAddBuff(death_and_decay lanathels_lament_buff=1 if_equipped=lanathels_lament)
 Define(perseverance_of_the_ebon_martyr_item 132459)
 Define(perseverance_of_the_ebon_martyr_debuff 216059)
-Define(ramping_amplitude_gigavolt_engine_item 165580)
 
 
 ## Tier Items
