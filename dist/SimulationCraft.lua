@@ -54,7 +54,7 @@ local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isLuaArray = __tools.isLuaArray
 local checkToken = __tools.checkToken
-local OvaleSimulationCraftBase = OvaleDebug:RegisterDebugging(Ovale:NewModule("OvaleSimulationCraft"))
+local OvaleSimulationCraftBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleSimulationCraft"))
 local interruptsClasses = {
     ["mind_freeze"] = "DEATHKNIGHT",
     ["pummel"] = "WARRIOR",
@@ -255,6 +255,7 @@ local CHARACTER_PROPERTY = {
     ["rage.deficit"] = "RageDeficit()",
     ["rage.max"] = "MaxRage()",
     ["raid_event.adds.remains"] = "0",
+    ["raid_event.invulnerable.exists"] = "0",
     ["raw_haste_pct"] = "SpellCastSpeedPercent()",
     ["rtb_list.any.5"] = "BuffCount(roll_the_bones_buff more 4)",
     ["rtb_list.any.6"] = "BuffCount(roll_the_bones_buff more 5)",
@@ -301,7 +302,9 @@ local MODIFIER_KEYWORD = {
     ["cycle_targets"] = true,
     ["damage"] = true,
     ["delay"] = true,
+    ["dynamic_prepot"] = true,
     ["early_chain_if"] = true,
+    ["effect_name"] = true,
     ["extra_amount"] = true,
     ["five_stacks"] = true,
     ["for_next"] = true,
@@ -327,6 +330,7 @@ local MODIFIER_KEYWORD = {
     ["range"] = true,
     ["sec"] = true,
     ["slot"] = true,
+    ["slots"] = true,
     ["strikes"] = true,
     ["sync"] = true,
     ["sync_weapons"] = true,
@@ -591,7 +595,7 @@ do
             name = "SimulationCraft",
             type = "execute",
             func = function()
-                local appName = __exports.OvaleSimulationCraft:GetName()
+                local appName = __exports.OvaleSimulationCraft.GetName()
                 AceConfigDialog:SetDefaultSize(appName, 700, 550)
                 AceConfigDialog:Open(appName)
             end
@@ -620,7 +624,7 @@ do
     for k, v in pairs(defaultDB) do
         (OvaleOptions.defaultDB.profile)[k] = v
     end
-    OvaleOptions:RegisterOptions(__exports.OvaleSimulationCraft)
+    OvaleOptions.RegisterOptions(__exports.OvaleSimulationCraft)
 end
 local print_r = function(data)
     local buffer = ""
@@ -754,7 +758,7 @@ local UNPARSE_VISITOR = nil
 local Unparse = function(node)
     local visitor = UNPARSE_VISITOR[node.type]
     if  not visitor then
-        __exports.OvaleSimulationCraft:Error("Unable to unparse node of type '%s'.", node.type)
+        __exports.OvaleSimulationCraft.Error("Unable to unparse node of type '%s'.", node.type)
     else
         return visitor(node)
     end
@@ -854,7 +858,7 @@ do
     }
 end
 local SyntaxError = function(tokenStream, ...)
-    __exports.OvaleSimulationCraft:Warning(...)
+    __exports.OvaleSimulationCraft.Warning(...)
     local context = {
         [1] = "Next tokens:"
     }
@@ -867,7 +871,7 @@ local SyntaxError = function(tokenStream, ...)
             break
         end
     end
-    __exports.OvaleSimulationCraft:Warning(concat(context, " "))
+    __exports.OvaleSimulationCraft.Warning(concat(context, " "))
 end
 
 local ParseFunction = nil
@@ -1377,7 +1381,7 @@ local function Disambiguate(annotation, name, className, specialization, _type)
     local disname, distype = GetPerClassSpecialization(EMIT_DISAMBIGUATION, name, className, specialization)
     if  not disname then
         if  not annotation.dictionary[name] then
-            local otherName = match(name, "_buff$") and gsub(name, "_buff$", "") or gsub(name, "_debuff$", "")
+            local otherName = match(name, "_buff$") and gsub(name, "_buff$", "") or (match(name, "_debuff$") and gsub(name, "_debuff$", "")) or gsub(name, "_item$", "")
             if annotation.dictionary[otherName] then
                 return otherName, _type
             end
@@ -1427,6 +1431,7 @@ local InitializeDisambiguation = function()
     AddDisambiguation("cold_heart_talent_buff", "cold_heart_buff", "DEATHKNIGHT", "frost")
     AddDisambiguation("outbreak_debuff", "virulent_plague_debuff", "DEATHKNIGHT", "unholy")
     AddDisambiguation("gargoyle", "summon_gargoyle", "DEATHKNIGHT", "unholy")
+    AddDisambiguation("empowered_rune_weapon", "empower_rune_weapon", "DEATHKNIGHT")
     AddDisambiguation("felblade_talent", "felblade_talent_havoc", "DEMONHUNTER", "havoc")
     AddDisambiguation("immolation_aura", "immolation_aura_havoc", "DEMONHUNTER", "havoc")
     AddDisambiguation("metamorphosis", "metamorphosis_veng", "DEMONHUNTER", "vengeance")
@@ -1496,6 +1501,7 @@ local InitializeDisambiguation = function()
     AddDisambiguation("execute", "execute_arms", "WARRIOR", "arms")
     AddDisambiguation("storm_bolt_talent", "prot_storm_bolt_talent", "WARRIOR", "protection")
     AddDisambiguation("meat_cleaver", "whirlwind", "WARRIOR", "fury")
+    AddDisambiguation("pocketsized_computation_device_item", "pocket_sized_computation_device_item")
 end
 
 local IsTotem = function(name)
@@ -1514,7 +1520,7 @@ local IsTotem = function(name)
 end
 
 local NewLogicalNode = function(operator, lhsNode, rhsNode, nodeList)
-    local node = OvaleAST:NewNode(nodeList, true)
+    local node = OvaleAST.NewNode(nodeList, true)
     node.type = "logical"
     node.operator = operator
     if operator == "not" then
@@ -1550,7 +1556,7 @@ end
 local ConcatenatedBodyNode = function(bodyList, nodeList, annotation)
     local bodyNode
     if #bodyList > 0 then
-        bodyNode = OvaleAST:NewNode(nodeList, true)
+        bodyNode = OvaleAST.NewNode(nodeList, true)
         bodyNode.type = "group"
         for k, node in ipairs(bodyList) do
             bodyNode.child[k] = node
@@ -1590,7 +1596,7 @@ local SplitByTagState = nil
 SplitByTag = function(tag, node, nodeList, annotation)
     local visitor = SPLIT_BY_TAG_VISITOR[node.type]
     if  not visitor then
-        __exports.OvaleSimulationCraft:Error("Unable to split-by-tag node of type '%s'.", node.type)
+        __exports.OvaleSimulationCraft.Error("Unable to split-by-tag node of type '%s'.", node.type)
     else
         return visitor(tag, node, nodeList, annotation)
     end
@@ -1613,12 +1619,12 @@ SplitByTagAction = function(tag, node, nodeList, annotation)
         end
         if id then
             if actionType == "item" then
-                actionTag, invokesGCD = OvaleData:GetItemTagInfo(id)
+                actionTag, invokesGCD = OvaleData.GetItemTagInfo(id)
             elseif actionType == "spell" then
-                actionTag, invokesGCD = OvaleData:GetSpellTagInfo(id)
+                actionTag, invokesGCD = OvaleData.GetSpellTagInfo(id)
             end
         else
-            __exports.OvaleSimulationCraft:Print("Warning: Unable to find %s '%s'", actionType, name)
+            __exports.OvaleSimulationCraft.Print("Warning: Unable to find %s '%s'", actionType, name)
         end
     elseif actionType == "texture" then
         local firstParamNode = node.rawPositionalParams[1]
@@ -1631,22 +1637,22 @@ SplitByTagAction = function(tag, node, nodeList, annotation)
             id = name
         end
         if actionTag == nil then
-            actionTag, invokesGCD = OvaleData:GetSpellTagInfo(id)
+            actionTag, invokesGCD = OvaleData.GetSpellTagInfo(id)
         end
         if actionTag == nil then
-            actionTag, invokesGCD = OvaleData:GetItemTagInfo(id)
+            actionTag, invokesGCD = OvaleData.GetItemTagInfo(id)
         end
         if actionTag == nil then
             actionTag = "main"
             invokesGCD = true
         end
     else
-        __exports.OvaleSimulationCraft:Print("Warning: Unknown action type '%'", actionType)
+        __exports.OvaleSimulationCraft.Print("Warning: Unknown action type '%'", actionType)
     end
     if  not actionTag then
         actionTag = "main"
         invokesGCD = true
-        __exports.OvaleSimulationCraft:Print("Warning: Unable to determine tag for '%s', assuming '%s' (actionType: %s).", name, actionTag, actionType)
+        __exports.OvaleSimulationCraft.Print("Warning: Unable to determine tag for '%s', assuming '%s' (actionType: %s).", name, actionTag, actionType)
     end
     if actionTag == tag then
         bodyNode = node
@@ -1660,22 +1666,22 @@ SplitByTagAddFunction = function(tag, node, nodeList, annotation)
     local bodyName, conditionName = OvaleTaggedFunctionName(node.name, tag)
     local bodyNode, conditionNode = SplitByTag(tag, node.child[1], nodeList, annotation)
     if  not bodyNode or bodyNode.type ~= "group" then
-        local newGroupNode = OvaleAST:NewNode(nodeList, true)
+        local newGroupNode = OvaleAST.NewNode(nodeList, true)
         newGroupNode.type = "group"
         newGroupNode.child[1] = bodyNode
         bodyNode = newGroupNode
     end
     if  not conditionNode or conditionNode.type ~= "group" then
-        local newGroupNode = OvaleAST:NewNode(nodeList, true)
+        local newGroupNode = OvaleAST.NewNode(nodeList, true)
         newGroupNode.type = "group"
         newGroupNode.child[1] = conditionNode
         conditionNode = newGroupNode
     end
-    local bodyFunctionNode = OvaleAST:NewNode(nodeList, true)
+    local bodyFunctionNode = OvaleAST.NewNode(nodeList, true)
     bodyFunctionNode.type = "add_function"
     bodyFunctionNode.name = bodyName
     bodyFunctionNode.child[1] = bodyNode
-    local conditionFunctionNode = OvaleAST:NewNode(nodeList, true)
+    local conditionFunctionNode = OvaleAST.NewNode(nodeList, true)
     conditionFunctionNode.type = "add_function"
     conditionFunctionNode.name = conditionName
     conditionFunctionNode.child[1] = conditionNode
@@ -1687,13 +1693,13 @@ SplitByTagCustomFunction = function(tag, node, nodeList, annotation)
     local functionName = node.name
     if annotation.taggedFunctionName[functionName] then
         local bodyName, conditionName = OvaleTaggedFunctionName(functionName, tag)
-        bodyNode = OvaleAST:NewNode(nodeList)
+        bodyNode = OvaleAST.NewNode(nodeList)
         bodyNode.name = bodyName
         bodyNode.lowername = lower(bodyName)
         bodyNode.type = "custom_function"
         bodyNode.func = bodyName
         bodyNode.asString = bodyName .. "()"
-        conditionNode = OvaleAST:NewNode(nodeList)
+        conditionNode = OvaleAST.NewNode(nodeList)
         conditionNode.name = conditionName
         conditionNode.lowername = lower(conditionName)
         conditionNode.type = "custom_function"
@@ -1723,7 +1729,7 @@ SplitByTagCustomFunction = function(tag, node, nodeList, annotation)
                 bodyNode = node
             end
         else
-            __exports.OvaleSimulationCraft:Print("Warning: Unable to determine tag for '%s()'.", node.name)
+            __exports.OvaleSimulationCraft.Print("Warning: Unable to determine tag for '%s()'.", node.name)
             bodyNode = node
         end
     end
@@ -1751,14 +1757,14 @@ SplitByTagGroup = function(tag, node, nodeList, annotation)
                     wipe(conditionList)
                     insert(bodyList, 1, bodyNode)
                 else
-                    local unlessNode = OvaleAST:NewNode(nodeList, true)
+                    local unlessNode = OvaleAST.NewNode(nodeList, true)
                     unlessNode.type = "unless"
                     unlessNode.child[1] = ConcatenatedConditionNode(conditionList, nodeList, annotation)
                     unlessNode.child[2] = ConcatenatedBodyNode(bodyList, nodeList, annotation)
                     wipe(bodyList)
                     wipe(conditionList)
                     insert(bodyList, 1, unlessNode)
-                    local commentNode = OvaleAST:NewNode(nodeList)
+                    local commentNode = OvaleAST.NewNode(nodeList)
                     commentNode.type = "comment"
                     insert(bodyList, 1, commentNode)
                     insert(bodyList, 1, bodyNode)
@@ -1806,11 +1812,11 @@ SplitByTagGroup = function(tag, node, nodeList, annotation)
     local remainderNode = ConcatenatedConditionNode(remainderList, nodeList, annotation)
     if bodyNode then
         if conditionNode then
-            local unlessNode = OvaleAST:NewNode(nodeList, true)
+            local unlessNode = OvaleAST.NewNode(nodeList, true)
             unlessNode.type = "unless"
             unlessNode.child[1] = conditionNode
             unlessNode.child[2] = bodyNode
-            local groupNode = OvaleAST:NewNode(nodeList, true)
+            local groupNode = OvaleAST.NewNode(nodeList, true)
             groupNode.type = "group"
             groupNode.child[1] = unlessNode
             bodyNode = groupNode
@@ -1832,7 +1838,7 @@ SplitByTagIf = function(tag, node, nodeList, annotation)
         conditionNode = andNode
     end
     if bodyNode then
-        local ifNode = OvaleAST:NewNode(nodeList, true)
+        local ifNode = OvaleAST.NewNode(nodeList, true)
         ifNode.type = node.type
         ifNode.child[1] = node.child[1]
         ifNode.child[2] = bodyNode
@@ -1892,7 +1898,7 @@ local EmitOperandVariable = nil
 local function Emit(parseNode, nodeList, annotation, action)
     local visitor = EMIT_VISITOR[parseNode.type]
     if  not visitor then
-        __exports.OvaleSimulationCraft:Error("Unable to emit node of type '%s'.", parseNode.type)
+        __exports.OvaleSimulationCraft.Error("Unable to emit node of type '%s'.", parseNode.type)
     else
         return visitor(parseNode, nodeList, annotation, action)
     end
@@ -1915,13 +1921,13 @@ local EmitModifier = function(modifier, parseNode, nodeList, annotation, action,
     elseif modifier == "line_cd" then
         if  not SPECIAL_ACTION[action] then
             AddSymbol(annotation, action)
-            local expressionCode = OvaleAST:Unparse(Emit(parseNode, nodeList, annotation, action))
+            local expressionCode = OvaleAST.Unparse(Emit(parseNode, nodeList, annotation, action))
             code = format("TimeSincePreviousSpell(%s) > %s", action, expressionCode)
         end
     elseif modifier == "max_cycle_targets" then
         local debuffName = Disambiguate(annotation, action .. "_debuff", className, specialization)
         AddSymbol(annotation, debuffName)
-        local expressionCode = OvaleAST:Unparse(Emit(parseNode, nodeList, annotation, action))
+        local expressionCode = OvaleAST.Unparse(Emit(parseNode, nodeList, annotation, action))
         code = format("DebuffCountOnAny(%s) < Enemies() and DebuffCountOnAny(%s) <= %s", debuffName, debuffName, expressionCode)
     elseif modifier == "max_energy" then
         local value = tonumber(Unparse(parseNode))
@@ -1967,7 +1973,7 @@ local EmitModifier = function(modifier, parseNode, nodeList, annotation, action,
                 elseif syncActionType == "if" or syncActionType == "unless" then
                     local lhsNode = syncActionNode.child[1]
                     if syncActionType == "unless" then
-                        local notNode = OvaleAST:NewNode(nodeList, true)
+                        local notNode = OvaleAST.NewNode(nodeList, true)
                         notNode.type = "logical"
                         notNode.expressionType = "unary"
                         notNode.operator = "not"
@@ -1975,7 +1981,7 @@ local EmitModifier = function(modifier, parseNode, nodeList, annotation, action,
                         lhsNode = notNode
                     end
                     local rhsNode = syncActionNode.child[2]
-                    local andNode = OvaleAST:NewNode(nodeList, true)
+                    local andNode = OvaleAST.NewNode(nodeList, true)
                     andNode.type = "logical"
                     andNode.expressionType = "binary"
                     andNode.operator = "and"
@@ -1983,7 +1989,7 @@ local EmitModifier = function(modifier, parseNode, nodeList, annotation, action,
                     andNode.child[2] = rhsNode
                     node = andNode
                 else
-                    __exports.OvaleSimulationCraft:Print("Warning: Unable to emit action for 'sync=%s'.", name)
+                    __exports.OvaleSimulationCraft.Print("Warning: Unable to emit action for 'sync=%s'.", name)
                     name = Disambiguate(annotation, name, className, specialization)
                     AddSymbol(annotation, name)
                     code = format("Spell(%s)", name)
@@ -1998,7 +2004,7 @@ local EmitModifier = function(modifier, parseNode, nodeList, annotation, action,
     end
     if  not node and code then
         annotation.astAnnotation = annotation.astAnnotation or {}
-        node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+        node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
     end
     return node
 end
@@ -2013,7 +2019,7 @@ local EmitConditionNode = function(nodeList, bodyNode, conditionNode, parseNode,
                 conditionNode = rhsNode
             else
                 local lhsNode = conditionNode
-                conditionNode = OvaleAST:NewNode(nodeList, true)
+                conditionNode = OvaleAST.NewNode(nodeList, true)
                 conditionNode.type = "logical"
                 conditionNode.expressionType = "binary"
                 conditionNode.operator = "and"
@@ -2026,7 +2032,7 @@ local EmitConditionNode = function(nodeList, bodyNode, conditionNode, parseNode,
         if conditionNode then
             local lhsNode = conditionNode
             local rhsNode = extraConditionNode
-            conditionNode = OvaleAST:NewNode(nodeList, true)
+            conditionNode = OvaleAST.NewNode(nodeList, true)
             conditionNode.type = "logical"
             conditionNode.expressionType = "binary"
             conditionNode.operator = "and"
@@ -2037,7 +2043,7 @@ local EmitConditionNode = function(nodeList, bodyNode, conditionNode, parseNode,
         end
     end
     if conditionNode then
-        local node = OvaleAST:NewNode(nodeList, true)
+        local node = OvaleAST.NewNode(nodeList, true)
         node.type = "if"
         node.child[1] = conditionNode
         node.child[2] = bodyNode
@@ -2059,11 +2065,11 @@ local function EmitNamedVariable(name, nodeList, annotation, modifiers, parseNod
     local node = annotation.variable[name]
     local group
     if  not node then
-        node = OvaleAST:NewNode(nodeList, true)
+        node = OvaleAST.NewNode(nodeList, true)
         annotation.variable[name] = node
         node.type = "add_function"
         node.name = name
-        group = OvaleAST:NewNode(nodeList, true)
+        group = OvaleAST.NewNode(nodeList, true)
         group.type = "group"
         node.child[1] = group
     else
@@ -2085,7 +2091,7 @@ local function EmitVariableMin(name, nodeList, annotation, modifier, parseNode, 
     valueNode.name = name .. "_value"
     annotation.variable[valueNode.name] = valueNode
     local bodyCode = format("AddFunction %s { if %s_value() > %s_min() %s_value() %s_min() }", name, name, name, name, name)
-    local node = OvaleAST:ParseCode("add_function", bodyCode, nodeList, annotation.astAnnotation)
+    local node = OvaleAST.ParseCode("add_function", bodyCode, nodeList, annotation.astAnnotation)
     annotation.variable[name] = node
 end
 local function EmitVariableMax(name, nodeList, annotation, modifier, parseNode, action)
@@ -2094,7 +2100,7 @@ local function EmitVariableMax(name, nodeList, annotation, modifier, parseNode, 
     valueNode.name = name .. "_value"
     annotation.variable[valueNode.name] = valueNode
     local bodyCode = format("AddFunction %s { if %s_value() < %s_max() %s_value() %s_max() }", name, name, name, name, name)
-    local node = OvaleAST:ParseCode("add_function", bodyCode, nodeList, annotation.astAnnotation)
+    local node = OvaleAST.ParseCode("add_function", bodyCode, nodeList, annotation.astAnnotation)
     annotation.variable[name] = node
 end
 local function EmitVariableAdd(name, nodeList, annotation, modifiers, parseNode, action)
@@ -2115,23 +2121,23 @@ local function EmitVariableIf(name, nodeList, annotation, modifiers, parseNode, 
     local node = annotation.variable[name]
     local group
     if  not node then
-        node = OvaleAST:NewNode(nodeList, true)
+        node = OvaleAST.NewNode(nodeList, true)
         annotation.variable[name] = node
         node.type = "add_function"
         node.name = name
-        group = OvaleAST:NewNode(nodeList, true)
+        group = OvaleAST.NewNode(nodeList, true)
         group.type = "group"
         node.child[1] = group
     else
         group = node.child[1]
     end
     annotation.currentVariable = node
-    local ifNode = OvaleAST:NewNode(nodeList, true)
+    local ifNode = OvaleAST.NewNode(nodeList, true)
     ifNode.type = "if"
     ifNode.child[1] = Emit(modifiers.condition, nodeList, annotation, nil)
     ifNode.child[2] = Emit(modifiers.value, nodeList, annotation, nil)
     insert(group.child, ifNode)
-    local elseNode = OvaleAST:NewNode(nodeList, true)
+    local elseNode = OvaleAST.NewNode(nodeList, true)
     elseNode.type = "unless"
     elseNode.child[1] = ifNode.child[1]
     elseNode.child[2] = Emit(modifiers.value_else, nodeList, annotation, nil)
@@ -2161,7 +2167,7 @@ local function EmitVariable(nodeList, annotation, modifier, parseNode, action, c
         EmitVariableSub(name, nodeList, annotation, modifier, parseNode, action)
     elseif op == "reset" then
     else
-        __exports.OvaleSimulationCraft:Error("Unknown variable operator '%s'.", op)
+        __exports.OvaleSimulationCraft.Error("Unknown variable operator '%s'.", op)
     end
 end
 local checkOptionalSkill = function(action, className, specialization)
@@ -2459,7 +2465,7 @@ EmitAction = function(parseNode, nodeList, annotation)
                 isSpellAction = false
             end
         elseif action == "pool_resource" then
-            bodyNode = OvaleAST:NewNode(nodeList)
+            bodyNode = OvaleAST.NewNode(nodeList)
             bodyNode.type = "simc_pool_resource"
             bodyNode.for_next = (modifiers.for_next ~= nil)
             if modifiers.extra_amount then
@@ -2512,6 +2518,7 @@ EmitAction = function(parseNode, nodeList, annotation)
                 if match(name, "legendary_ring") then
                     legendaryRing = name
                 end
+            elseif modifiers.effect_name then
             end
             if legendaryRing then
                 conditionCode = format("CheckBoxOn(opt_%s)", legendaryRing)
@@ -2528,10 +2535,10 @@ EmitAction = function(parseNode, nodeList, annotation)
                 local seconds = tonumber(Unparse(modifiers.sec))
                 if seconds then
                 else
-                    bodyNode = OvaleAST:NewNode(nodeList)
+                    bodyNode = OvaleAST.NewNode(nodeList)
                     bodyNode.type = "simc_wait"
                     local expressionNode = Emit(modifiers.sec, nodeList, annotation, action)
-                    local code = OvaleAST:Unparse(expressionNode)
+                    local code = OvaleAST.Unparse(expressionNode)
                     conditionCode = code .. " > 0"
                 end
             end
@@ -2556,10 +2563,10 @@ EmitAction = function(parseNode, nodeList, annotation)
         end
         annotation.astAnnotation = annotation.astAnnotation or {}
         if  not bodyNode and bodyCode then
-            bodyNode = OvaleAST:ParseCode(expressionType, bodyCode, nodeList, annotation.astAnnotation)
+            bodyNode = OvaleAST.ParseCode(expressionType, bodyCode, nodeList, annotation.astAnnotation)
         end
         if  not conditionNode and conditionCode then
-            conditionNode = OvaleAST:ParseCode(expressionType, conditionCode, nodeList, annotation.astAnnotation)
+            conditionNode = OvaleAST.ParseCode(expressionType, conditionCode, nodeList, annotation.astAnnotation)
         end
         if bodyNode then
             node = EmitConditionNode(nodeList, bodyNode, conditionNode, parseNode, annotation, action, modifiers)
@@ -2569,13 +2576,13 @@ EmitAction = function(parseNode, nodeList, annotation)
 end
 
 EmitActionList = function(parseNode, nodeList, annotation)
-    local groupNode = OvaleAST:NewNode(nodeList, true)
+    local groupNode = OvaleAST.NewNode(nodeList, true)
     groupNode.type = "group"
     local child = groupNode.child
     local poolResourceNode
     local emit = true
     for _, actionNode in ipairs(parseNode.child) do
-        local commentNode = OvaleAST:NewNode(nodeList)
+        local commentNode = OvaleAST.NewNode(nodeList)
         commentNode.type = "comment"
         commentNode.comment = actionNode.action
         child[#child + 1] = commentNode
@@ -2605,14 +2612,14 @@ EmitActionList = function(parseNode, nodeList, annotation)
                     local powerType = CamelCase(poolResourceNode.powerType)
                     local extra_amount = poolResourceNode.extra_amount
                     if extra_amount and poolingConditionNode then
-                        local code = OvaleAST:Unparse(poolingConditionNode)
+                        local code = OvaleAST.Unparse(poolingConditionNode)
                         local extraAmountPattern = powerType .. "%(%) >= [%d.]+"
                         local replaceString = format("True(pool_%s %d)", poolResourceNode.powerType, extra_amount)
                         code = gsub(code, extraAmountPattern, replaceString)
-                        poolingConditionNode = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+                        poolingConditionNode = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
                     end
                     if bodyNode.type == "action" and bodyNode.rawPositionalParams and bodyNode.rawPositionalParams[1] then
-                        local name = OvaleAST:Unparse(bodyNode.rawPositionalParams[1])
+                        local name = OvaleAST.Unparse(bodyNode.rawPositionalParams[1])
                         local powerCondition
                         if extra_amount then
                             powerCondition = format("TimeTo%s(%d)", powerType, extra_amount)
@@ -2620,17 +2627,17 @@ EmitActionList = function(parseNode, nodeList, annotation)
                             powerCondition = format("TimeTo%sFor(%s)", powerType, name)
                         end
                         local code = format("SpellUsable(%s) and SpellCooldown(%s) < %s", name, name, powerCondition)
-                        local conditionNode = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+                        local conditionNode = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
                         if statementNode.child then
                             local rhsNode = conditionNode
-                            conditionNode = OvaleAST:NewNode(nodeList, true)
+                            conditionNode = OvaleAST.NewNode(nodeList, true)
                             conditionNode.type = "logical"
                             conditionNode.expressionType = "binary"
                             conditionNode.operator = "and"
                             conditionNode.child[1] = poolingConditionNode
                             conditionNode.child[2] = rhsNode
                         end
-                        local restNode = OvaleAST:NewNode(nodeList, true)
+                        local restNode = OvaleAST.NewNode(nodeList, true)
                         child[#child + 1] = restNode
                         if statementNode.type == "unless" then
                             restNode.type = "if"
@@ -2638,18 +2645,18 @@ EmitActionList = function(parseNode, nodeList, annotation)
                             restNode.type = "unless"
                         end
                         restNode.child[1] = conditionNode
-                        restNode.child[2] = OvaleAST:NewNode(nodeList, true)
+                        restNode.child[2] = OvaleAST.NewNode(nodeList, true)
                         restNode.child[2].type = "group"
                         child = restNode.child[2].child
                     end
                     poolResourceNode = nil
                 elseif statementNode.type == "simc_wait" then
                 elseif statementNode.simc_wait then
-                    local restNode = OvaleAST:NewNode(nodeList, true)
+                    local restNode = OvaleAST.NewNode(nodeList, true)
                     child[#child + 1] = restNode
                     restNode.type = "unless"
                     restNode.child[1] = statementNode.child[1]
-                    restNode.child[2] = OvaleAST:NewNode(nodeList, true)
+                    restNode.child[2] = OvaleAST.NewNode(nodeList, true)
                     restNode.child[2].type = "group"
                     child = restNode.child[2].child
                 else
@@ -2660,7 +2667,7 @@ EmitActionList = function(parseNode, nodeList, annotation)
                         elseif statementNode.type == "unless" then
                             statementNode.type = "if"
                         end
-                        statementNode.child[2] = OvaleAST:NewNode(nodeList, true)
+                        statementNode.child[2] = OvaleAST.NewNode(nodeList, true)
                         statementNode.child[2].type = "group"
                         child = statementNode.child[2].child
                     end
@@ -2668,7 +2675,7 @@ EmitActionList = function(parseNode, nodeList, annotation)
             end
         end
     end
-    local node = OvaleAST:NewNode(nodeList, true)
+    local node = OvaleAST.NewNode(nodeList, true)
     node.type = "add_function"
     node.name = OvaleFunctionName(parseNode.name, annotation)
     node.child[1] = groupNode
@@ -2693,7 +2700,7 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
                     if operator == "-" and isValueNode(rhsNode) then
                         rhsNode.value = -1 * rhsNode.value
                     else
-                        node = OvaleAST:NewNode(nodeList, true)
+                        node = OvaleAST.NewNode(nodeList, true)
                         node.type = opInfo[1]
                         node.expressionType = "unary"
                         node.operator = operator
@@ -2742,7 +2749,7 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
                     code = "not " .. code
                 end
                 annotation.astAnnotation = annotation.astAnnotation or {}
-                node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+                node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
             elseif (parseNode.operator == "=" or parseNode.operator == "!=") and parseNode.child[1].name == "sim_target" then
                 local code
                 if parseNode.operator == "=" then
@@ -2751,12 +2758,12 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
                     code = "False(target_is_sim_target)"
                 end
                 annotation.astAnnotation = annotation.astAnnotation or {}
-                node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+                node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
             elseif operator then
                 local lhsNode = Emit(parseNode.child[1], nodeList, annotation, action)
                 local rhsNode = Emit(parseNode.child[2], nodeList, annotation, action)
                 if lhsNode and rhsNode then
-                    node = OvaleAST:NewNode(nodeList, true)
+                    node = OvaleAST.NewNode(nodeList, true)
                     node.type = opInfo[1]
                     node.expressionType = "binary"
                     node.operator = operator
@@ -2779,8 +2786,8 @@ EmitExpression = function(parseNode, nodeList, annotation, action)
         end
     else
         msg = msg or MakeString("Warning: Operator '%s' is not implemented.", parseNode.operator)
-        __exports.OvaleSimulationCraft:Print(msg)
-        local stringNode = OvaleAST:NewNode(nodeList)
+        __exports.OvaleSimulationCraft.Print(msg)
+        local stringNode = OvaleAST.NewNode(nodeList)
         stringNode.type = "string"
         stringNode.value = "FIXME_" .. parseNode.operator
         return stringNode
@@ -2793,8 +2800,8 @@ EmitFunction = function(parseNode, nodeList, annotation, action)
     if parseNode.name == "ceil" or parseNode.name == "floor" then
         node = EmitExpression(parseNode.child[1], nodeList, annotation, action)
     else
-        __exports.OvaleSimulationCraft:Print("Warning: Function '%s' is not implemented.", parseNode.name)
-        node = OvaleAST:NewNode(nodeList)
+        __exports.OvaleSimulationCraft.Print("Warning: Function '%s' is not implemented.", parseNode.name)
+        node = OvaleAST.NewNode(nodeList)
         node.type = "variable"
         node.name = "FIXME_" .. parseNode.name
     end
@@ -2802,7 +2809,7 @@ EmitFunction = function(parseNode, nodeList, annotation, action)
 end
 
 EmitNumber = function(parseNode, nodeList, annotation, action)
-    local node = OvaleAST:NewNode(nodeList)
+    local node = OvaleAST.NewNode(nodeList)
     node.type = "value"
     node.value = parseNode.value
     node.origin = 0
@@ -2894,8 +2901,8 @@ EmitOperand = function(parseNode, nodeList, annotation, action)
         end
     end
     if  not ok then
-        __exports.OvaleSimulationCraft:Print("Warning: Variable '%s' is not implemented.", parseNode.name)
-        node = OvaleAST:NewNode(nodeList)
+        __exports.OvaleSimulationCraft.Print("Warning: Variable '%s' is not implemented.", parseNode.name)
+        node = OvaleAST.NewNode(nodeList)
         node.type = "variable"
         node.name = "FIXME_" .. parseNode.name
     end
@@ -3022,10 +3029,10 @@ EmitOperandAction = function(operand, parseNode, nodeList, annotation, action, t
     end
     if ok and code then
         if name == "call_action_list" and property ~= "gcd" then
-            __exports.OvaleSimulationCraft:Print("Warning: dubious use of call_action_list in %s", code)
+            __exports.OvaleSimulationCraft.Print("Warning: dubious use of call_action_list in %s", code)
         end
         annotation.astAnnotation = annotation.astAnnotation or {}
-        node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+        node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
         if  not SPECIAL_ACTION[symbol] then
             AddSymbol(annotation, symbol)
         end
@@ -3048,7 +3055,7 @@ EmitOperandActiveDot = function(operand, parseNode, nodeList, annotation, action
         local code = format("%sCountOnAny(%s)", prefix, dotName)
         if ok and code then
             annotation.astAnnotation = annotation.astAnnotation or {}
-            node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+            node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
             AddSymbol(annotation, dotName)
         end
     else
@@ -3075,7 +3082,7 @@ EmitOperandArtifact = function(operand, parseNode, nodeList, annotation, action,
         end
         if ok and code then
             annotation.astAnnotation = annotation.astAnnotation or {}
-            node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+            node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
             AddSymbol(annotation, name)
         end
     else
@@ -3102,7 +3109,7 @@ EmitOperandAzerite = function(operand, parseNode, nodeList, annotation, action, 
         end
         if ok and code then
             annotation.astAnnotation = annotation.astAnnotation or {}
-            node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+            node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
             AddSymbol(annotation, name .. "_trait")
         end
     else
@@ -3134,7 +3141,7 @@ EmitOperandEssence = function(operand, parseNode, nodeList, annotation, action, 
         end
         if ok and code then
             annotation.astAnnotation = annotation.astAnnotation or {}
-            node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+            node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
             AddSymbol(annotation, essenceId)
         end
     else
@@ -3160,7 +3167,7 @@ EmitOperandRefresh = function(operand, parseNode, nodeList, annotation, action, 
         end
         local any = OvaleData.DEFAULT_SPELL_LIST[buffName] and " any=1" or ""
         local code = format("%sRefreshable(%s%s)", target, buffName, any)
-        node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+        node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
         AddSymbol(annotation, buffName)
     end
     return ok, node
@@ -3231,7 +3238,7 @@ EmitOperandBuff = function(operand, parseNode, nodeList, annotation, action, tar
         end
         if ok and code then
             annotation.astAnnotation = annotation.astAnnotation or {}
-            node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+            node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
             AddSymbol(annotation, buffName)
         end
     else
@@ -3318,7 +3325,7 @@ EmitOperandCharacter = function(operand, parseNode, nodeList, annotation, action
     end
     if ok and code then
         annotation.astAnnotation = annotation.astAnnotation or {}
-        node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+        node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
     end
     return ok, node
 end
@@ -3367,7 +3374,7 @@ EmitOperandCooldown = function(operand, parseNode, nodeList, annotation, action)
         end
         if ok and code then
             annotation.astAnnotation = annotation.astAnnotation or {}
-            node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+            node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
             AddSymbol(annotation, name)
         end
     else
@@ -3398,7 +3405,7 @@ EmitOperandDisease = function(operand, parseNode, nodeList, annotation, action, 
         end
         if ok and code then
             annotation.astAnnotation = annotation.astAnnotation or {}
-            node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+            node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
         end
     else
         ok = false
@@ -3427,7 +3434,7 @@ EmitOperandGroundAoe = function(operand, parseNode, nodeList, annotation, action
         end
         if ok and code then
             annotation.astAnnotation = annotation.astAnnotation or {}
-            node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+            node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
             AddSymbol(annotation, dotName)
         end
     else
@@ -3478,7 +3485,7 @@ EmitOperandDot = function(operand, parseNode, nodeList, annotation, action, targ
         end
         if ok and code then
             annotation.astAnnotation = annotation.astAnnotation or {}
-            node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+            node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
             AddSymbol(annotation, dotName)
         end
     else
@@ -3508,7 +3515,7 @@ EmitOperandGlyph = function(operand, parseNode, nodeList, annotation, action)
         end
         if ok and code then
             annotation.astAnnotation = annotation.astAnnotation or {}
-            node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+            node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
             AddSymbol(annotation, glyphName)
         end
     else
@@ -3574,7 +3581,7 @@ EmitOperandPet = function(operand, parseNode, nodeList, annotation, action)
         end
         if ok and code then
             annotation.astAnnotation = annotation.astAnnotation or {}
-            node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+            node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
             AddSymbol(annotation, name)
         end
     else
@@ -3610,7 +3617,7 @@ EmitOperandPreviousSpell = function(operand, parseNode, nodeList, annotation, ac
         end
         if ok and code then
             annotation.astAnnotation = annotation.astAnnotation or {}
-            node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+            node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
             AddSymbol(annotation, name)
         end
     else
@@ -3672,7 +3679,7 @@ EmitOperandRaidEvent = function(operand, parseNode, nodeList, annotation, action
     end
     if ok and code then
         annotation.astAnnotation = annotation.astAnnotation or {}
-        node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+        node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
     end
     return ok, node
 end
@@ -3694,7 +3701,7 @@ EmitOperandRace = function(operand, parseNode, nodeList, annotation, action)
             elseif race == "orc" then
                 raceId = "Orc"
             else
-                __exports.OvaleSimulationCraft:Print("Warning: Race '%s' not defined", race)
+                __exports.OvaleSimulationCraft.Print("Warning: Race '%s' not defined", race)
             end
             code = format("Race(%s)", raceId)
         else
@@ -3702,7 +3709,7 @@ EmitOperandRace = function(operand, parseNode, nodeList, annotation, action)
         end
         if ok and code then
             annotation.astAnnotation = annotation.astAnnotation or {}
-            node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+            node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
         end
     else
         ok = false
@@ -3728,7 +3735,7 @@ EmitOperandRune = function(operand, parseNode, nodeList, annotation, action)
     end
     if ok and code then
         annotation.astAnnotation = annotation.astAnnotation or {}
-        node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+        node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
     end
     return ok, node
 end
@@ -3769,7 +3776,7 @@ EmitOperandSetBonus = function(operand, parseNode, nodeList, annotation, action)
     end
     if ok and code then
         annotation.astAnnotation = annotation.astAnnotation or {}
-        node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+        node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
     end
     return ok, node
 end
@@ -3789,7 +3796,7 @@ EmitOperandSeal = function(operand, parseNode, nodeList, annotation, action)
         end
         if ok and code then
             annotation.astAnnotation = annotation.astAnnotation or {}
-            node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+            node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
         end
     else
         ok = false
@@ -4039,9 +4046,9 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
     elseif operand == "distance" then
         code = target .. "Distance()"
     elseif sub(operand, 1, 9) == "equipped." then
-        local name = Disambiguate(annotation, sub(operand, 10), className, specialization)
+        local name = Disambiguate(annotation, sub(operand, 10) .. "_item", className, specialization)
         local itemId = tonumber(name)
-        local itemName = name .. "_item"
+        local itemName = name
         local item = itemId and tostring(itemId) or itemName
         code = format("HasEquippedItem(%s)", item)
         AddSymbol(annotation, item)
@@ -4100,7 +4107,7 @@ EmitOperandSpecial = function(operand, parseNode, nodeList, annotation, action, 
     end
     if ok and code then
         annotation.astAnnotation = annotation.astAnnotation or {}
-        node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+        node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
     end
     return ok, node
 end
@@ -4133,7 +4140,7 @@ EmitOperandTalent = function(operand, parseNode, nodeList, annotation, action)
         end
         if ok and code then
             annotation.astAnnotation = annotation.astAnnotation or {}
-            node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+            node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
             AddSymbol(annotation, talentName)
         end
     else
@@ -4155,7 +4162,7 @@ EmitOperandTarget = function(operand, parseNode, nodeList, annotation, action)
             property = tokenIterator()
         end
         if howMany > 1 then
-            __exports.OvaleSimulationCraft:Print("Warning: target.%d.%property has not been implemented for multiple targets. (%s)", operand)
+            __exports.OvaleSimulationCraft.Print("Warning: target.%d.%property has not been implemented for multiple targets. (%s)", operand)
         end
         local code
         if property == "adds" then
@@ -4167,7 +4174,7 @@ EmitOperandTarget = function(operand, parseNode, nodeList, annotation, action)
         end
         if ok and code then
             annotation.astAnnotation = annotation.astAnnotation or {}
-            node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+            node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
         end
     else
         ok = false
@@ -4193,7 +4200,7 @@ EmitOperandTotem = function(operand, parseNode, nodeList, annotation, action)
         end
         if ok and code then
             annotation.astAnnotation = annotation.astAnnotation or {}
-            node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+            node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
         end
     else
         ok = false
@@ -4208,6 +4215,9 @@ EmitOperandTrinket = function(operand, parseNode, nodeList, annotation, action)
     local token = tokenIterator()
     if token == "trinket" then
         local procType = tokenIterator()
+        if procType == "1" or procType == "2" then
+            procType = tokenIterator()
+        end
         local statName = tokenIterator()
         local code
         if procType == "cooldown" then
@@ -4249,7 +4259,7 @@ EmitOperandTrinket = function(operand, parseNode, nodeList, annotation, action)
         end
         if ok and code then
             annotation.astAnnotation = annotation.astAnnotation or {}
-            node = OvaleAST:ParseCode("expression", code, nodeList, annotation.astAnnotation)
+            node = OvaleAST.ParseCode("expression", code, nodeList, annotation.astAnnotation)
         end
     else
         ok = false
@@ -4267,12 +4277,12 @@ EmitOperandVariable = function(operand, parseNode, nodeList, annotation, action)
         if annotation.currentVariable and annotation.currentVariable.name == name then
             local group = annotation.currentVariable.child[1]
             if #group.child == 0 then
-                node = OvaleAST:ParseCode("expression", "0", nodeList, annotation.astAnnotation)
+                node = OvaleAST.ParseCode("expression", "0", nodeList, annotation.astAnnotation)
             else
-                node = OvaleAST:ParseCode("expression", OvaleAST:Unparse(group), nodeList, annotation.astAnnotation)
+                node = OvaleAST.ParseCode("expression", OvaleAST.Unparse(group), nodeList, annotation.astAnnotation)
             end
         else
-            node = OvaleAST:NewNode(nodeList)
+            node = OvaleAST.NewNode(nodeList)
             node.type = "function"
             node.name = name
         end
@@ -4469,7 +4479,7 @@ local InsertInterruptFunction = function(child, annotation, interrupts)
 		}
 	]]
     local code = format(fmt, camelSpecialization, concat(lines, "\n"))
-    local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+    local node = OvaleAST.ParseCode("add_function", code, nodeList, annotation.astAnnotation)
     insert(child, 1, node)
     annotation.functionTag[node.name] = "cd"
 end
@@ -4801,7 +4811,7 @@ local InsertSupportingFunctions = function(child, annotation)
 			}
 		]]
         local code = format(fmt, camelSpecialization)
-        local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("add_function", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         annotation.functionTag[node.name] = "shortcd"
         AddSymbol(annotation, "death_strike")
@@ -4819,7 +4829,7 @@ local InsertSupportingFunctions = function(child, annotation)
 			}
 		]]
         local code = format(fmt, camelSpecialization)
-        local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("add_function", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         annotation.functionTag[node.name] = "shortcd"
         AddSymbol(annotation, "chaos_strike")
@@ -4833,7 +4843,7 @@ local InsertSupportingFunctions = function(child, annotation)
 			}
 		]]
         local code = format(fmt, camelSpecialization)
-        local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("add_function", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         annotation.functionTag[node.name] = "shortcd"
         AddSymbol(annotation, "shear")
@@ -4851,7 +4861,7 @@ local InsertSupportingFunctions = function(child, annotation)
 			}
 		]]
         local code = format(fmt, camelSpecialization)
-        local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("add_function", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         annotation.functionTag[node.name] = "shortcd"
         AddSymbol(annotation, "mangle")
@@ -4872,7 +4882,7 @@ local InsertSupportingFunctions = function(child, annotation)
 			}
 		]]
         local code = format(fmt, camelSpecialization)
-        local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("add_function", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         annotation.functionTag[node.name] = "shortcd"
         AddSymbol(annotation, "raptor_strike")
@@ -4892,7 +4902,7 @@ local InsertSupportingFunctions = function(child, annotation)
 			}
 		]]
         local code = format(fmt, camelSpecialization)
-        local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("add_function", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         annotation.functionTag[node.name] = "shortcd"
         AddSymbol(annotation, "revive_pet")
@@ -4906,7 +4916,7 @@ local InsertSupportingFunctions = function(child, annotation)
 			}
 		]]
         local code = format(fmt, camelSpecialization)
-        local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("add_function", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         annotation.functionTag[node.name] = "shortcd"
         AddSymbol(annotation, "tiger_palm")
@@ -4919,7 +4929,7 @@ local InsertSupportingFunctions = function(child, annotation)
 				SpellCooldown(crusader_strike holy_shock judgment)
 			}
 		]]
-        local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("add_function", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         AddSymbol(annotation, "crusader_strike")
         AddSymbol(annotation, "holy_shock")
@@ -4933,7 +4943,7 @@ local InsertSupportingFunctions = function(child, annotation)
 				SpellCooldown(crusader_strike exorcism hammer_of_wrath hammer_of_wrath_empowered judgment usable=1)
 			}
 		]]
-        local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("add_function", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         AddSymbol(annotation, "crusader_strike")
         AddSymbol(annotation, "exorcism")
@@ -4949,7 +4959,7 @@ local InsertSupportingFunctions = function(child, annotation)
 				if not Talent(sanctified_wrath_talent) SpellCooldown(crusader_strike judgment)
 			}
 		]]
-        local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("add_function", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         AddSymbol(annotation, "crusader_strike")
         AddSymbol(annotation, "holy_wrath")
@@ -4965,7 +4975,7 @@ local InsertSupportingFunctions = function(child, annotation)
 			}
 		]]
         local code = format(fmt, camelSpecialization)
-        local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("add_function", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         annotation.functionTag[node.name] = "shortcd"
         AddSymbol(annotation, "rebuke")
@@ -4983,7 +4993,7 @@ local InsertSupportingFunctions = function(child, annotation)
 			}
 		]]
         local code = format(fmt, camelSpecialization)
-        local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("add_function", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         annotation.functionTag[node.name] = "shortcd"
         AddSymbol(annotation, "kick")
@@ -5002,7 +5012,7 @@ local InsertSupportingFunctions = function(child, annotation)
 			}
 		]]
         local code = format(fmt, camelSpecialization)
-        local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("add_function", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         annotation.functionTag[node.name] = "shortcd"
         AddSymbol(annotation, "feral_lunge")
@@ -5021,7 +5031,7 @@ local InsertSupportingFunctions = function(child, annotation)
 			}
 		]]
         local code = format(fmt, camelSpecialization)
-        local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("add_function", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         annotation.functionTag[node.name] = "cd"
         AddSymbol(annotation, "bloodlust")
@@ -5045,7 +5055,7 @@ local InsertSupportingFunctions = function(child, annotation)
             charge = "intercept"
         end
         local code = format(fmt, camelSpecialization, charge, charge, charge, charge)
-        local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("add_function", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         annotation.functionTag[node.name] = "shortcd"
         AddSymbol(annotation, charge)
@@ -5062,7 +5072,7 @@ local InsertSupportingFunctions = function(child, annotation)
 			}
 		]]
         local code = format(fmt, camelSpecialization)
-        local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("add_function", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         annotation.functionTag[node.name] = "cd"
         count = count + 1
@@ -5075,7 +5085,7 @@ local InsertSupportingFunctions = function(child, annotation)
 			}
 		]]
         local code = format(fmt, camelSpecialization)
-        local node = OvaleAST:ParseCode("add_function", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("add_function", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         annotation.functionTag[node.name] = "cd"
         count = count + 1
@@ -5099,7 +5109,7 @@ local AddOptionalSkillCheckBox = function(child, annotation, data, skill)
 		AddCheckBox(opt_%s SpellName(%s)%s specialization=%s)
 	]]
     local code = format(fmt, skill, skill, defaultText, annotation.specialization)
-    local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+    local node = OvaleAST.ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
     insert(child, 1, node)
     AddSymbol(annotation, skill)
     return 1
@@ -5119,7 +5129,7 @@ local function InsertSupportingControls(child, annotation)
 					AddListItem(opt_using_apl %s "%s APL")
 				]]
                 local code = format(fmt, name, name)
-                local node = OvaleAST:ParseCode("list_item", code, nodeList, annotation.astAnnotation)
+                local node = OvaleAST.ParseCode("list_item", code, nodeList, annotation.astAnnotation)
                 insert(child, 1, node)
             end
         end
@@ -5127,7 +5137,7 @@ local function InsertSupportingControls(child, annotation)
             local code = [[
 				AddListItem(opt_using_apl normal L(normal_apl) default)
 			]]
-            local node = OvaleAST:ParseCode("list_item", code, nodeList, annotation.astAnnotation)
+            local node = OvaleAST.ParseCode("list_item", code, nodeList, annotation.astAnnotation)
             insert(child, 1, node)
         end
     end
@@ -5136,7 +5146,7 @@ local function InsertSupportingControls(child, annotation)
 			AddCheckBox(opt_meta_only_during_boss L(meta_only_during_boss) default %s)
 		]]
         local code = format(fmt, ifSpecialization)
-        local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         count = count + 1
     end
@@ -5145,7 +5155,7 @@ local function InsertSupportingControls(child, annotation)
 			AddCheckBox(opt_arcane_mage_burn_phase L(arcane_mage_burn_phase) default %s)
 		]]
         local code = format(fmt, ifSpecialization)
-        local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         count = count + 1
     end
@@ -5154,7 +5164,7 @@ local function InsertSupportingControls(child, annotation)
 			AddCheckBox(opt_touch_of_death_on_elite_only L(touch_of_death_on_elite_only) default %s)
 		]]
         local code = format(fmt, ifSpecialization)
-        local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         count = count + 1
     end
@@ -5164,7 +5174,7 @@ local function InsertSupportingControls(child, annotation)
 			AddCheckBox(opt_%s ItemName(%s) default %s)
 		]]
         local code = format(fmt, legendaryRing, legendaryRing, ifSpecialization)
-        local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         AddSymbol(annotation, legendaryRing)
         count = count + 1
@@ -5174,7 +5184,7 @@ local function InsertSupportingControls(child, annotation)
 			AddCheckBox(opt_use_consumables L(opt_use_consumables) default %s)
 		]]
         local code = format(fmt, ifSpecialization)
-        local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         count = count + 1
     end
@@ -5183,7 +5193,7 @@ local function InsertSupportingControls(child, annotation)
 			AddCheckBox(opt_melee_range L(not_in_melee_range) %s)
 		]]
         local code = format(fmt, ifSpecialization)
-        local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         count = count + 1
     end
@@ -5192,7 +5202,7 @@ local function InsertSupportingControls(child, annotation)
 			AddCheckBox(opt_interrupt L(interrupt) default %s)
 		]]
         local code = format(fmt, ifSpecialization)
-        local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         count = count + 1
     end
@@ -5201,7 +5211,7 @@ local function InsertSupportingControls(child, annotation)
 			AddCheckBox(opt_priority_rotation L(opt_priority_rotation) default %s)
 		]]
         local code = format(fmt, ifSpecialization)
-        local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+        local node = OvaleAST.ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
         insert(child, 1, node)
         count = count + 1
     end
@@ -5272,7 +5282,7 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
         if profile.annotation then
             local annotation = profile.annotation
             if annotation.astAnnotation then
-                OvaleAST:ReleaseAnnotation(annotation.astAnnotation)
+                OvaleAST.ReleaseAnnotation(annotation.astAnnotation)
             end
             if annotation.nodeList then
                 for _, node in ipairs(annotation.nodeList) do
@@ -5420,7 +5430,7 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
     end,
     EmitAST = function(self, profile)
         local nodeList = {}
-        local ast = OvaleAST:NewNode(nodeList, true)
+        local ast = OvaleAST.NewNode(nodeList, true)
         local child = ast.child
         ast.type = "script"
         local annotation = profile.annotation
@@ -5430,7 +5440,7 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
             annotation.astAnnotation.nodeList = nodeList
             local dictionaryAST
             do
-                OvaleDebug:ResetTrace()
+                OvaleDebug.ResetTrace()
                 local dictionaryAnnotation = {
                     nodeList = {},
                     definition = profile.annotation.dictionary
@@ -5443,16 +5453,16 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
 				%s
 			]]
                 local dictionaryCode = format(dictionaryFormat, lower(annotation.class), (Ovale.db and Ovale.db.profile.overrideCode) or "")
-                dictionaryAST = OvaleAST:ParseCode("script", dictionaryCode, dictionaryAnnotation.nodeList, dictionaryAnnotation)
+                dictionaryAST = OvaleAST.ParseCode("script", dictionaryCode, dictionaryAnnotation.nodeList, dictionaryAnnotation)
                 if dictionaryAST then
                     dictionaryAST.annotation = dictionaryAnnotation
                     annotation.dictionaryAST = dictionaryAST
                     annotation.dictionary = dictionaryAnnotation.definition
-                    OvaleAST:PropagateConstants(dictionaryAST)
-                    OvaleAST:PropagateStrings(dictionaryAST)
-                    OvaleAST:FlattenParameters(dictionaryAST)
+                    OvaleAST.PropagateConstants(dictionaryAST)
+                    OvaleAST.PropagateStrings(dictionaryAST)
+                    OvaleAST.FlattenParameters(dictionaryAST)
                     ResetControls()
-                    OvaleCompile:EvaluateScript(dictionaryAST, true)
+                    OvaleCompile.EvaluateScript(dictionaryAST, true)
                 end
             end
             for _, node in ipairs(profile.actionList) do
@@ -5461,7 +5471,7 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
                     if node.name == "_default" and  not annotation.interrupt then
                         local defaultInterrupt = classInfos[annotation.class][annotation.specialization]
                         if defaultInterrupt and defaultInterrupt.interrupt then
-                            local interruptCall = OvaleAST:NewNode(nodeList)
+                            local interruptCall = OvaleAST.NewNode(nodeList)
                             interruptCall.type = "custom_function"
                             interruptCall.name = CamelSpecialization(annotation) .. "InterruptActions"
                             annotation.interrupt = annotation.class
@@ -5470,7 +5480,7 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
                         end
                     end
                     local actionListName = gsub(node.name, "^_+", "")
-                    local commentNode = OvaleAST:NewNode(nodeList)
+                    local commentNode = OvaleAST.NewNode(nodeList)
                     commentNode.type = "comment"
                     commentNode.comment = "## actions." .. actionListName
                     child[#child + 1] = commentNode
@@ -5494,12 +5504,12 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
             local lowerclass = lower(className)
             local aoeToggle = "opt_" .. lowerclass .. "_" .. specialization .. "_aoe"
             do
-                local commentNode = OvaleAST:NewNode(nodeList)
+                local commentNode = OvaleAST.NewNode(nodeList)
                 commentNode.type = "comment"
                 commentNode.comment = "## " .. CamelCase(specialization) .. " icons."
                 insert(child, commentNode)
                 local code = format("AddCheckBox(%s L(AOE) default specialization=%s)", aoeToggle, specialization)
-                local node = OvaleAST:ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
+                local node = OvaleAST.ParseCode("checkbox", code, nodeList, annotation.astAnnotation)
                 insert(child, node)
             end
             do
@@ -5510,7 +5520,7 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
 				}
 			]]
                 local code = format(fmt, aoeToggle, specialization, GenerateIconBody("shortcd", profile))
-                local node = OvaleAST:ParseCode("icon", code, nodeList, annotation.astAnnotation)
+                local node = OvaleAST.ParseCode("icon", code, nodeList, annotation.astAnnotation)
                 insert(child, node)
             end
             do
@@ -5521,7 +5531,7 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
 				}
 			]]
                 local code = format(fmt, aoeToggle, specialization, GenerateIconBody("shortcd", profile))
-                local node = OvaleAST:ParseCode("icon", code, nodeList, annotation.astAnnotation)
+                local node = OvaleAST.ParseCode("icon", code, nodeList, annotation.astAnnotation)
                 insert(child, node)
             end
             do
@@ -5532,7 +5542,7 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
 				}
 			]]
                 local code = format(fmt, specialization, GenerateIconBody("main", profile))
-                local node = OvaleAST:ParseCode("icon", code, nodeList, annotation.astAnnotation)
+                local node = OvaleAST.ParseCode("icon", code, nodeList, annotation.astAnnotation)
                 insert(child, node)
             end
             do
@@ -5543,7 +5553,7 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
 				}
 			]]
                 local code = format(fmt, aoeToggle, specialization, GenerateIconBody("main", profile))
-                local node = OvaleAST:ParseCode("icon", code, nodeList, annotation.astAnnotation)
+                local node = OvaleAST.ParseCode("icon", code, nodeList, annotation.astAnnotation)
                 insert(child, node)
             end
             do
@@ -5554,7 +5564,7 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
 				}
 			]]
                 local code = format(fmt, aoeToggle, specialization, GenerateIconBody("cd", profile))
-                local node = OvaleAST:ParseCode("icon", code, nodeList, annotation.astAnnotation)
+                local node = OvaleAST.ParseCode("icon", code, nodeList, annotation.astAnnotation)
                 insert(child, node)
             end
             do
@@ -5565,7 +5575,7 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
 				}
 			]]
                 local code = format(fmt, aoeToggle, specialization, GenerateIconBody("cd", profile))
-                local node = OvaleAST:ParseCode("icon", code, nodeList, annotation.astAnnotation)
+                local node = OvaleAST.ParseCode("icon", code, nodeList, annotation.astAnnotation)
                 insert(child, node)
             end
             Mark(ast)
@@ -5578,7 +5588,7 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
             Sweep(ast)
         end
         if  not ok then
-            OvaleAST:Release(ast)
+            OvaleAST.Release(ast)
             ast = nil
         end
         return ast
@@ -5620,33 +5630,33 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
                 output[#output + 1] = ""
             end
         end
-        output[#output + 1] = OvaleAST:Unparse(ast)
+        output[#output + 1] = OvaleAST.Unparse(ast)
         if profile.annotation.symbolTable then
             output[#output + 1] = ""
             output[#output + 1] = "### Required symbols"
             sort(profile.annotation.symbolList)
             for _, symbol in ipairs(profile.annotation.symbolList) do
                 if  not tonumber(symbol) and profile.annotation.dictionary and  not profile.annotation.dictionary[symbol] and  not OvaleData.buffSpellList[symbol] then
-                    self:Print("Warning: Symbol '%s' not defined", symbol)
+                    self.Print("Warning: Symbol '%s' not defined", symbol)
                 end
                 output[#output + 1] = "# " .. symbol
             end
         end
         annotation.dictionary = nil
         if annotation.dictionaryAST then
-            OvaleAST:Release(annotation.dictionaryAST)
+            OvaleAST.Release(annotation.dictionaryAST)
         end
         if  not noFinalNewLine and output[#output] ~= "" then
             output[#output + 1] = ""
         end
         local s = concat(output, "\n")
         self_outputPool:Release(output)
-        OvaleAST:Release(ast)
+        OvaleAST.Release(ast)
         return s
     end,
     CreateOptions = function(self)
         local options = {
-            name = Ovale:GetName() .. " SimulationCraft",
+            name = Ovale.GetName() .. " SimulationCraft",
             type = "group",
             args = {
                 input = {
@@ -5739,9 +5749,9 @@ local OvaleSimulationCraftClass = __class(OvaleSimulationCraftBase, {
                 }
             }
         }
-        local appName = self:GetName()
+        local appName = self.GetName()
         AceConfig:RegisterOptionsTable(appName, options)
-        AceConfigDialog:AddToBlizOptions(appName, "SimulationCraft", Ovale:GetName())
+        AceConfigDialog:AddToBlizOptions(appName, "SimulationCraft", Ovale.GetName())
     end,
 })
 __exports.OvaleSimulationCraft = OvaleSimulationCraftClass()

@@ -1,17 +1,14 @@
 import { format } from "@wowts/string";
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "fs";
-import { Ovale } from "../Ovale";
 import { eventDispatcher, ClassId } from "@wowts/wow-mock";
-import { OvaleEquipment } from "../Equipment";
-import { OvaleSpellBook } from "../SpellBook";
-import { OvaleStance } from "../Stance";
-import { OvaleSimulationCraft, Annotation } from "../SimulationCraft";
 import  { registerScripts } from "../scripts/index";
 import { getSpellData, SpellData } from "./importspells";
 import { ipairs } from "@wowts/lua";
 import { convertFromSpellData, CustomAura, CustomAuras, CustomSpellData } from "./customspell";
 import { SpellInfo } from "../Data";
 import { ConditionNamedParameters } from "../AST";
+import { IoC } from "../ioc";
+import { Annotation } from "../simulationcraft/definitions";
 
 let outputDirectory = "src/scripts";
 const simcDirectory = process.argv[2];
@@ -102,7 +99,7 @@ const itemsByClass = new Map<string, number[]>();
 const azeriteTraitByClass = new Map<string, number[]>();
 
 for (const filename of files) {
-    //if (filename.indexOf('Death') < 0) continue;
+    // if (filename.indexOf('Hunter') < 0) continue;
     if (!filename.startsWith("generate")) {
         let output: string[] = []
         let inputName = profilesDirectory + "/" + filename;
@@ -134,18 +131,16 @@ for (const filename of files) {
             }
             
             console.log(filename);
-            Ovale.playerGUID = "player";
-            Ovale.playerClass = <ClassId>className;
+            const ioc = new IoC();
+            ioc.ovale.playerGUID = "player";
+            ioc.ovale.playerClass = <ClassId>className;
             eventDispatcher.DispatchEvent("ADDON_LOADED", "Ovale");
-            OvaleEquipment.UpdateEquippedItems();
-            OvaleSpellBook.Update();
-            OvaleStance.UpdateStances();
-            registerScripts();
+            eventDispatcher.DispatchEvent("PLAYER_ENTERING_WORLD", "Ovale");
+            registerScripts(ioc.scripts);
 
-            const annotation: Annotation = {
-                dictionary: Object.assign({}, spellData.identifiers)
-            };
-            let profile = OvaleSimulationCraft.ParseProfile(simc, annotation);
+            const annotation: Annotation = new Annotation(ioc.data);
+            annotation.dictionary = Object.assign({}, spellData.identifiers);
+            let profile = ioc.simulationCraft.ParseProfile(simc, annotation);
             let profileName = profile.annotation.name.substring(1, profile.annotation.name.length - 1);
             let name: string, desc: string;
             if (source) {
@@ -159,7 +154,7 @@ for (const filename of files) {
             output.push(format('	const name = "sc_%s"', name));
             output.push(format('	const desc = "[8.2] Simulationcraft: %s"', desc));
             output.push("	const code = `");
-            output.push(OvaleSimulationCraft.Emit(profile, true));
+            output.push(ioc.simulationCraft.Emit(profile, true));
             output.push("`");
             output.push(format('	OvaleScripts.RegisterScript("%s", "%s", name, desc, code, "%s")', profile.annotation.class, profile.annotation.specialization, "script"));
             output.push("}");

@@ -1,9 +1,10 @@
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-do
-    local name = "sc_t23_warrior_arms"
-    local desc = "[8.2] Simulationcraft: T23_Warrior_Arms"
-    local code = [[
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_warrior", 80201)
+if not __exports then return end
+__exports.registerWarrior = function(OvaleScripts)
+    do
+        local name = "sc_t23_warrior_arms"
+        local desc = "[8.2] Simulationcraft: T23_Warrior_Arms"
+        local code = [[
 # Based on SimulationCraft profile "T23_Warrior_Arms".
 #	class=warrior
 #	spec=arms
@@ -615,12 +616,12 @@ AddIcon checkbox=opt_warrior_arms_aoe help=cd specialization=arms
 # whirlwind_arms
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("WARRIOR", "arms", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_warrior_fury"
-    local desc = "[8.2] Simulationcraft: T23_Warrior_Fury"
-    local code = [[
+        OvaleScripts:RegisterScript("WARRIOR", "arms", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_warrior_fury"
+        local desc = "[8.2] Simulationcraft: T23_Warrior_Fury"
+        local code = [[
 # Based on SimulationCraft profile "T23_Warrior_Fury".
 #	class=warrior
 #	spec=fury
@@ -828,8 +829,8 @@ AddFunction FuryDefaultShortCdActions
 
   unless target.Distance() > 5 and FuryMovementShortCdPostConditions()
   {
-   #heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
-   if { target.Distance() > 25 and 600 > 45 or not False(raid_event_movement_exists) } and CheckBoxOn(opt_melee_range) and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
+   #heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)
+   if target.Distance() > 25 and 600 > 45 and CheckBoxOn(opt_melee_range) and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
 
    unless Talent(furious_slash_talent) and { BuffStacks(furious_slash_buff) < 3 or BuffRemaining(furious_slash_buff) < 3 or SpellCooldown(recklessness) < 3 and BuffRemaining(furious_slash_buff) < 9 } and Spell(furious_slash) or SpellCooldown(recklessness) < 3 and Spell(rampage)
    {
@@ -870,7 +871,7 @@ AddFunction FuryDefaultCdActions
   #run_action_list,name=movement,if=movement.distance>5
   if target.Distance() > 5 FuryMovementCdActions()
 
-  unless target.Distance() > 5 and FuryMovementCdPostConditions() or { target.Distance() > 25 and 600 > 45 or not False(raid_event_movement_exists) } and CheckBoxOn(opt_melee_range) and target.Distance(atLeast 8) and target.Distance(atMost 40) and Spell(heroic_leap)
+  unless target.Distance() > 5 and FuryMovementCdPostConditions() or target.Distance() > 25 and 600 > 45 and CheckBoxOn(opt_melee_range) and target.Distance(atLeast 8) and target.Distance(atMost 40) and Spell(heroic_leap)
   {
    #potion
    if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
@@ -886,8 +887,8 @@ AddFunction FuryDefaultCdActions
      if not BuffPresent(recklessness_buff) Spell(guardian_of_azeroth)
      #memory_of_lucid_dreams,if=!buff.recklessness.up
      if not BuffPresent(recklessness_buff) Spell(memory_of_lucid_dreams_essence)
-     #recklessness,if=!essence.condensed_lifeforce.major|cooldown.guardian_of_azeroth.remains>20|buff.guardian_of_azeroth.up
-     if not AzeriteEssenceIsMajor(condensed_lifeforce_essence_id) or SpellCooldown(guardian_of_azeroth) > 20 or BuffPresent(guardian_of_azeroth_buff) Spell(recklessness)
+     #recklessness,if=!essence.condensed_lifeforce.major&!essence.blood_of_the_enemy.major|cooldown.guardian_of_azeroth.remains>20|buff.guardian_of_azeroth.up|cooldown.blood_of_the_enemy.remains<gcd
+     if not AzeriteEssenceIsMajor(condensed_lifeforce_essence_id) and not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or SpellCooldown(guardian_of_azeroth) > 20 or BuffPresent(guardian_of_azeroth_buff) or SpellCooldown(blood_of_the_enemy) < GCD() Spell(recklessness)
 
      unless Enemies() > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury)
      {
@@ -914,7 +915,7 @@ AddFunction FuryDefaultCdActions
 
 AddFunction FuryDefaultCdPostConditions
 {
- CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel) and Spell(charge) or target.Distance() > 5 and FuryMovementCdPostConditions() or { target.Distance() > 25 and 600 > 45 or not False(raid_event_movement_exists) } and CheckBoxOn(opt_melee_range) and target.Distance(atLeast 8) and target.Distance(atMost 40) and Spell(heroic_leap) or Talent(furious_slash_talent) and { BuffStacks(furious_slash_buff) < 3 or BuffRemaining(furious_slash_buff) < 3 or SpellCooldown(recklessness) < 3 and BuffRemaining(furious_slash_buff) < 9 } and Spell(furious_slash) or SpellCooldown(recklessness) < 3 and Spell(rampage) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(purifying_blast) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(ripple_in_space_essence) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(worldvein_resonance_essence) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(focused_azerite_beam) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence) or BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or Enemies() > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury) or FurySingletargetCdPostConditions()
+ CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel) and Spell(charge) or target.Distance() > 5 and FuryMovementCdPostConditions() or target.Distance() > 25 and 600 > 45 and CheckBoxOn(opt_melee_range) and target.Distance(atLeast 8) and target.Distance(atMost 40) and Spell(heroic_leap) or Talent(furious_slash_talent) and { BuffStacks(furious_slash_buff) < 3 or BuffRemaining(furious_slash_buff) < 3 or SpellCooldown(recklessness) < 3 and BuffRemaining(furious_slash_buff) < 9 } and Spell(furious_slash) or SpellCooldown(recklessness) < 3 and Spell(rampage) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(purifying_blast) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(ripple_in_space_essence) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(worldvein_resonance_essence) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(focused_azerite_beam) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence) or BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or Enemies() > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury) or FurySingletargetCdPostConditions()
 }
 
 ### Fury icons.
@@ -981,6 +982,7 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # bladestorm_fury
 # blood_fury_ap
 # blood_of_the_enemy
+# blood_of_the_enemy_essence_id
 # bloodthirst
 # carnage_talent
 # charge
@@ -1023,12 +1025,12 @@ AddIcon checkbox=opt_warrior_fury_aoe help=cd specialization=fury
 # whirlwind_fury
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("WARRIOR", "fury", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_warrior_protection"
-    local desc = "[8.2] Simulationcraft: T23_Warrior_Protection"
-    local code = [[
+        OvaleScripts:RegisterScript("WARRIOR", "fury", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_warrior_protection"
+        local desc = "[8.2] Simulationcraft: T23_Warrior_Protection"
+        local code = [[
 # Based on SimulationCraft profile "T23_Warrior_Protection".
 #	class=warrior
 #	spec=protection
@@ -1078,14 +1080,12 @@ AddFunction ProtectionStMainActions
 {
  #thunder_clap,if=spell_targets.thunder_clap=2&talent.unstoppable_force.enabled&buff.avatar.up
  if Enemies() == 2 and Talent(unstoppable_force_talent) and BuffPresent(avatar_buff) Spell(thunder_clap)
- #shield_block,if=cooldown.shield_slam.ready&buff.shield_block.down&azerite.brace_for_impact.rank>azerite.deafening_crash.rank&buff.avatar.up
- if SpellCooldown(shield_slam) == 0 and BuffExpires(shield_block_buff) and AzeriteTraitRank(brace_for_impact_trait) > AzeriteTraitRank(deafening_crash_trait) and BuffPresent(avatar_buff) Spell(shield_block)
- #shield_slam,if=azerite.brace_for_impact.rank>azerite.deafening_crash.rank&buff.avatar.up&buff.shield_block.up
- if AzeriteTraitRank(brace_for_impact_trait) > AzeriteTraitRank(deafening_crash_trait) and BuffPresent(avatar_buff) and BuffPresent(shield_block_buff) Spell(shield_slam)
- #thunder_clap,if=(talent.unstoppable_force.enabled&buff.avatar.up)
- if Talent(unstoppable_force_talent) and BuffPresent(avatar_buff) Spell(thunder_clap)
  #shield_block,if=cooldown.shield_slam.ready&buff.shield_block.down
  if SpellCooldown(shield_slam) == 0 and BuffExpires(shield_block_buff) Spell(shield_block)
+ #shield_slam,if=buff.shield_block.up
+ if BuffPresent(shield_block_buff) Spell(shield_slam)
+ #thunder_clap,if=(talent.unstoppable_force.enabled&buff.avatar.up)
+ if Talent(unstoppable_force_talent) and BuffPresent(avatar_buff) Spell(thunder_clap)
  #shield_slam
  Spell(shield_slam)
  #dragon_roar
@@ -1104,12 +1104,12 @@ AddFunction ProtectionStMainPostConditions
 
 AddFunction ProtectionStShortCdActions
 {
- unless Enemies() == 2 and Talent(unstoppable_force_talent) and BuffPresent(avatar_buff) and Spell(thunder_clap) or SpellCooldown(shield_slam) == 0 and BuffExpires(shield_block_buff) and AzeriteTraitRank(brace_for_impact_trait) > AzeriteTraitRank(deafening_crash_trait) and BuffPresent(avatar_buff) and Spell(shield_block) or AzeriteTraitRank(brace_for_impact_trait) > AzeriteTraitRank(deafening_crash_trait) and BuffPresent(avatar_buff) and BuffPresent(shield_block_buff) and Spell(shield_slam) or Talent(unstoppable_force_talent) and BuffPresent(avatar_buff) and Spell(thunder_clap)
+ unless Enemies() == 2 and Talent(unstoppable_force_talent) and BuffPresent(avatar_buff) and Spell(thunder_clap) or SpellCooldown(shield_slam) == 0 and BuffExpires(shield_block_buff) and Spell(shield_block) or BuffPresent(shield_block_buff) and Spell(shield_slam) or Talent(unstoppable_force_talent) and BuffPresent(avatar_buff) and Spell(thunder_clap)
  {
   #demoralizing_shout,if=talent.booming_voice.enabled
   if Talent(booming_voice_talent) Spell(demoralizing_shout)
 
-  unless SpellCooldown(shield_slam) == 0 and BuffExpires(shield_block_buff) and Spell(shield_block) or Spell(shield_slam) or Spell(dragon_roar) or Spell(thunder_clap) or Spell(revenge)
+  unless Spell(shield_slam) or Spell(dragon_roar) or Spell(thunder_clap) or Spell(revenge)
   {
    #ravager
    Spell(ravager)
@@ -1119,21 +1119,35 @@ AddFunction ProtectionStShortCdActions
 
 AddFunction ProtectionStShortCdPostConditions
 {
- Enemies() == 2 and Talent(unstoppable_force_talent) and BuffPresent(avatar_buff) and Spell(thunder_clap) or SpellCooldown(shield_slam) == 0 and BuffExpires(shield_block_buff) and AzeriteTraitRank(brace_for_impact_trait) > AzeriteTraitRank(deafening_crash_trait) and BuffPresent(avatar_buff) and Spell(shield_block) or AzeriteTraitRank(brace_for_impact_trait) > AzeriteTraitRank(deafening_crash_trait) and BuffPresent(avatar_buff) and BuffPresent(shield_block_buff) and Spell(shield_slam) or Talent(unstoppable_force_talent) and BuffPresent(avatar_buff) and Spell(thunder_clap) or SpellCooldown(shield_slam) == 0 and BuffExpires(shield_block_buff) and Spell(shield_block) or Spell(shield_slam) or Spell(dragon_roar) or Spell(thunder_clap) or Spell(revenge) or Spell(devastate)
+ Enemies() == 2 and Talent(unstoppable_force_talent) and BuffPresent(avatar_buff) and Spell(thunder_clap) or SpellCooldown(shield_slam) == 0 and BuffExpires(shield_block_buff) and Spell(shield_block) or BuffPresent(shield_block_buff) and Spell(shield_slam) or Talent(unstoppable_force_talent) and BuffPresent(avatar_buff) and Spell(thunder_clap) or Spell(shield_slam) or Spell(dragon_roar) or Spell(thunder_clap) or Spell(revenge) or Spell(devastate)
 }
 
 AddFunction ProtectionStCdActions
 {
- unless Enemies() == 2 and Talent(unstoppable_force_talent) and BuffPresent(avatar_buff) and Spell(thunder_clap) or SpellCooldown(shield_slam) == 0 and BuffExpires(shield_block_buff) and AzeriteTraitRank(brace_for_impact_trait) > AzeriteTraitRank(deafening_crash_trait) and BuffPresent(avatar_buff) and Spell(shield_block) or AzeriteTraitRank(brace_for_impact_trait) > AzeriteTraitRank(deafening_crash_trait) and BuffPresent(avatar_buff) and BuffPresent(shield_block_buff) and Spell(shield_slam) or Talent(unstoppable_force_talent) and BuffPresent(avatar_buff) and Spell(thunder_clap) or Talent(booming_voice_talent) and Spell(demoralizing_shout) or SpellCooldown(shield_slam) == 0 and BuffExpires(shield_block_buff) and Spell(shield_block) or Spell(shield_slam) or Spell(dragon_roar) or Spell(thunder_clap) or Spell(revenge)
+ unless Enemies() == 2 and Talent(unstoppable_force_talent) and BuffPresent(avatar_buff) and Spell(thunder_clap) or SpellCooldown(shield_slam) == 0 and BuffExpires(shield_block_buff) and Spell(shield_block) or BuffPresent(shield_block_buff) and Spell(shield_slam) or Talent(unstoppable_force_talent) and BuffPresent(avatar_buff) and Spell(thunder_clap) or Talent(booming_voice_talent) and Spell(demoralizing_shout)
  {
-  #use_item,name=grongs_primal_rage,if=buff.avatar.down|cooldown.shield_slam.remains>=4
-  if BuffExpires(avatar_buff) or SpellCooldown(shield_slam) >= 4 ProtectionUseItemActions()
+  #anima_of_death,if=buff.last_stand.up
+  if BuffPresent(last_stand_buff) Spell(anima_of_death)
+
+  unless Spell(shield_slam)
+  {
+   #use_item,name=ashvanes_razor_coral,target_if=debuff.razor_coral_debuff.stack=0
+   if target.DebuffStacks(razor_coral) == 0 ProtectionUseItemActions()
+   #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.stack>7&(cooldown.avatar.remains<5|buff.avatar.up)
+   if target.DebuffStacks(razor_coral) > 7 and { SpellCooldown(avatar) < 5 or BuffPresent(avatar_buff) } ProtectionUseItemActions()
+
+   unless Spell(dragon_roar) or Spell(thunder_clap) or Spell(revenge)
+   {
+    #use_item,name=grongs_primal_rage,if=buff.avatar.down|cooldown.shield_slam.remains>=4
+    if BuffExpires(avatar_buff) or SpellCooldown(shield_slam) >= 4 ProtectionUseItemActions()
+   }
+  }
  }
 }
 
 AddFunction ProtectionStCdPostConditions
 {
- Enemies() == 2 and Talent(unstoppable_force_talent) and BuffPresent(avatar_buff) and Spell(thunder_clap) or SpellCooldown(shield_slam) == 0 and BuffExpires(shield_block_buff) and AzeriteTraitRank(brace_for_impact_trait) > AzeriteTraitRank(deafening_crash_trait) and BuffPresent(avatar_buff) and Spell(shield_block) or AzeriteTraitRank(brace_for_impact_trait) > AzeriteTraitRank(deafening_crash_trait) and BuffPresent(avatar_buff) and BuffPresent(shield_block_buff) and Spell(shield_slam) or Talent(unstoppable_force_talent) and BuffPresent(avatar_buff) and Spell(thunder_clap) or Talent(booming_voice_talent) and Spell(demoralizing_shout) or SpellCooldown(shield_slam) == 0 and BuffExpires(shield_block_buff) and Spell(shield_block) or Spell(shield_slam) or Spell(dragon_roar) or Spell(thunder_clap) or Spell(revenge) or Spell(ravager) or Spell(devastate)
+ Enemies() == 2 and Talent(unstoppable_force_talent) and BuffPresent(avatar_buff) and Spell(thunder_clap) or SpellCooldown(shield_slam) == 0 and BuffExpires(shield_block_buff) and Spell(shield_block) or BuffPresent(shield_block_buff) and Spell(shield_slam) or Talent(unstoppable_force_talent) and BuffPresent(avatar_buff) and Spell(thunder_clap) or Talent(booming_voice_talent) and Spell(demoralizing_shout) or Spell(shield_slam) or Spell(dragon_roar) or Spell(thunder_clap) or Spell(revenge) or Spell(ravager) or Spell(devastate)
 }
 
 ### actions.precombat
@@ -1214,10 +1228,22 @@ AddFunction ProtectionAoeShortCdPostConditions
 
 AddFunction ProtectionAoeCdActions
 {
- unless Spell(thunder_clap) or Talent(booming_voice_talent) and Spell(demoralizing_shout) or Spell(dragon_roar) or Spell(revenge)
+ unless Spell(thunder_clap)
  {
-  #use_item,name=grongs_primal_rage,if=buff.avatar.down|cooldown.thunder_clap.remains>=4
-  if BuffExpires(avatar_buff) or SpellCooldown(thunder_clap) >= 4 ProtectionUseItemActions()
+  #memory_of_lucid_dreams,if=buff.avatar.down
+  if BuffExpires(avatar_buff) Spell(memory_of_lucid_dreams_essence)
+
+  unless Talent(booming_voice_talent) and Spell(demoralizing_shout)
+  {
+   #anima_of_death,if=buff.last_stand.up
+   if BuffPresent(last_stand_buff) Spell(anima_of_death)
+
+   unless Spell(dragon_roar) or Spell(revenge)
+   {
+    #use_item,name=grongs_primal_rage,if=buff.avatar.down|cooldown.thunder_clap.remains>=4
+    if BuffExpires(avatar_buff) or SpellCooldown(thunder_clap) >= 4 ProtectionUseItemActions()
+   }
+  }
  }
 }
 
@@ -1232,6 +1258,8 @@ AddFunction ProtectionDefaultMainActions
 {
  #ignore_pain,if=rage.deficit<25+20*talent.booming_voice.enabled*cooldown.demoralizing_shout.ready
  if RageDeficit() < 25 + 20 * TalentPoints(booming_voice_talent) * { SpellCooldown(demoralizing_shout) == 0 } Spell(ignore_pain)
+ #concentrated_flame,if=buff.avatar.down
+ if BuffExpires(avatar_buff) Spell(concentrated_flame_essence)
  #run_action_list,name=aoe,if=spell_targets.thunder_clap>=3
  if Enemies() >= 3 ProtectionAoeMainActions()
 
@@ -1254,20 +1282,28 @@ AddFunction ProtectionDefaultShortCdActions
 
  unless TimeInCombat() == 0 and Spell(intercept) or RageDeficit() < 25 + 20 * TalentPoints(booming_voice_talent) * { SpellCooldown(demoralizing_shout) == 0 } and Spell(ignore_pain)
  {
-  #run_action_list,name=aoe,if=spell_targets.thunder_clap>=3
-  if Enemies() >= 3 ProtectionAoeShortCdActions()
+  #worldvein_resonance,if=cooldown.avatar.remains<=2
+  if SpellCooldown(avatar) <= 2 Spell(worldvein_resonance_essence)
+  #ripple_in_space
+  Spell(ripple_in_space_essence)
 
-  unless Enemies() >= 3 and ProtectionAoeShortCdPostConditions()
+  unless BuffExpires(avatar_buff) and Spell(concentrated_flame_essence)
   {
-   #call_action_list,name=st
-   ProtectionStShortCdActions()
+   #run_action_list,name=aoe,if=spell_targets.thunder_clap>=3
+   if Enemies() >= 3 ProtectionAoeShortCdActions()
+
+   unless Enemies() >= 3 and ProtectionAoeShortCdPostConditions()
+   {
+    #call_action_list,name=st
+    ProtectionStShortCdActions()
+   }
   }
  }
 }
 
 AddFunction ProtectionDefaultShortCdPostConditions
 {
- TimeInCombat() == 0 and Spell(intercept) or RageDeficit() < 25 + 20 * TalentPoints(booming_voice_talent) * { SpellCooldown(demoralizing_shout) == 0 } and Spell(ignore_pain) or Enemies() >= 3 and ProtectionAoeShortCdPostConditions() or ProtectionStShortCdPostConditions()
+ TimeInCombat() == 0 and Spell(intercept) or RageDeficit() < 25 + 20 * TalentPoints(booming_voice_talent) * { SpellCooldown(demoralizing_shout) == 0 } and Spell(ignore_pain) or BuffExpires(avatar_buff) and Spell(concentrated_flame_essence) or Enemies() >= 3 and ProtectionAoeShortCdPostConditions() or ProtectionStShortCdPostConditions()
 }
 
 AddFunction ProtectionDefaultCdActions
@@ -1293,17 +1329,25 @@ AddFunction ProtectionDefaultCdActions
   #potion,if=buff.avatar.up|target.time_to_die<25
   if { BuffPresent(avatar_buff) or target.TimeToDie() < 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_superior_battle_potion_of_strength usable=1)
 
-  unless RageDeficit() < 25 + 20 * TalentPoints(booming_voice_talent) * { SpellCooldown(demoralizing_shout) == 0 } and Spell(ignore_pain)
+  unless RageDeficit() < 25 + 20 * TalentPoints(booming_voice_talent) * { SpellCooldown(demoralizing_shout) == 0 } and Spell(ignore_pain) or SpellCooldown(avatar) <= 2 and Spell(worldvein_resonance_essence) or Spell(ripple_in_space_essence)
   {
-   #avatar
-   Spell(avatar)
-   #run_action_list,name=aoe,if=spell_targets.thunder_clap>=3
-   if Enemies() >= 3 ProtectionAoeCdActions()
+   #memory_of_lucid_dreams
+   Spell(memory_of_lucid_dreams_essence)
 
-   unless Enemies() >= 3 and ProtectionAoeCdPostConditions()
+   unless BuffExpires(avatar_buff) and Spell(concentrated_flame_essence)
    {
-    #call_action_list,name=st
-    ProtectionStCdActions()
+    #last_stand,if=cooldown.anima_of_death.remains<=2
+    if SpellCooldown(anima_of_death) <= 2 Spell(last_stand)
+    #avatar
+    Spell(avatar)
+    #run_action_list,name=aoe,if=spell_targets.thunder_clap>=3
+    if Enemies() >= 3 ProtectionAoeCdActions()
+
+    unless Enemies() >= 3 and ProtectionAoeCdPostConditions()
+    {
+     #call_action_list,name=st
+     ProtectionStCdActions()
+    }
    }
   }
  }
@@ -1311,7 +1355,7 @@ AddFunction ProtectionDefaultCdActions
 
 AddFunction ProtectionDefaultCdPostConditions
 {
- TimeInCombat() == 0 and Spell(intercept) or RageDeficit() < 25 + 20 * TalentPoints(booming_voice_talent) * { SpellCooldown(demoralizing_shout) == 0 } and Spell(ignore_pain) or Enemies() >= 3 and ProtectionAoeCdPostConditions() or ProtectionStCdPostConditions()
+ TimeInCombat() == 0 and Spell(intercept) or RageDeficit() < 25 + 20 * TalentPoints(booming_voice_talent) * { SpellCooldown(demoralizing_shout) == 0 } and Spell(ignore_pain) or SpellCooldown(avatar) <= 2 and Spell(worldvein_resonance_essence) or Spell(ripple_in_space_essence) or BuffExpires(avatar_buff) and Spell(concentrated_flame_essence) or Enemies() >= 3 and ProtectionAoeCdPostConditions() or ProtectionStCdPostConditions()
 }
 
 ### Protection icons.
@@ -1374,14 +1418,14 @@ AddIcon checkbox=opt_warrior_protection_aoe help=cd specialization=protection
 
 ### Required symbols
 # ancestral_call
+# anima_of_death
 # arcane_torrent_rage
 # avatar
 # avatar_buff
 # berserking
 # blood_fury_ap
 # booming_voice_talent
-# brace_for_impact_trait
-# deafening_crash_trait
+# concentrated_flame_essence
 # demoralizing_shout
 # devastate
 # dragon_roar
@@ -1392,12 +1436,16 @@ AddIcon checkbox=opt_warrior_protection_aoe help=cd specialization=protection
 # intercept
 # intimidating_shout
 # item_superior_battle_potion_of_strength
+# last_stand
+# last_stand_buff
 # lights_judgment
 # memory_of_lucid_dreams_essence
 # pummel
 # quaking_palm
 # ravager
+# razor_coral
 # revenge
+# ripple_in_space_essence
 # shield_block
 # shield_block_buff
 # shield_slam
@@ -1406,6 +1454,8 @@ AddIcon checkbox=opt_warrior_protection_aoe help=cd specialization=protection
 # thunder_clap
 # unstoppable_force_talent
 # war_stomp
+# worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("WARRIOR", "protection", name, desc, code, "script")
+        OvaleScripts:RegisterScript("WARRIOR", "protection", name, desc, code, "script")
+    end
 end

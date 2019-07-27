@@ -1,8 +1,5 @@
 import { registerScripts } from "./scripts/index";
-// import { OvaleAuraClass } from "./Aura";
-// import { OvaleFutureClass } from "./Future";
-registerScripts();
+import { IoC } from "./ioc";
 
-// const aura = new OvaleAuraClass();
-// const future = new OvaleFutureClass();
-
+const ioc = new IoC();
+registerScripts(ioc.scripts);

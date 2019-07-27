@@ -1,0 +1,7 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+	<Script file="Druid_Common.lua" />
+	<Script file="Xeltor_Balance.lua" />
+	<Script file="Xeltor_Feral.lua" />
+	<Script file="Xeltor_Guardian.lua" />
+	<Script file="Xeltor_Restoration.lua" />
+</Ui>

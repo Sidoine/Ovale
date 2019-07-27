@@ -1,26 +1,28 @@
 local __exports = LibStub:NewLibrary("ovale/CooldownState", 80201)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
-local __State = LibStub:GetLibrary("ovale/State")
-local OvaleState = __State.OvaleState
-local __Cooldown = LibStub:GetLibrary("ovale/Cooldown")
-local OvaleCooldown = __Cooldown.OvaleCooldown
 local pairs = pairs
 local kpairs = pairs
-local CooldownState = __class(nil, {
+__exports.CooldownState = __class(nil, {
+    constructor = function(self, ovaleCooldown, ovaleProfiler, ovaleDebug)
+        self.ovaleCooldown = ovaleCooldown
+        self.profiler = ovaleProfiler:create("CooldownState")
+        self.tracer = ovaleDebug:create("CooldownState")
+        self.next = self.ovaleCooldown.next
+    end,
     ApplySpellStartCast = function(self, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
-        OvaleCooldown:StartProfiling("OvaleCooldown_ApplySpellStartCast")
+        self.profiler:StartProfiling("OvaleCooldown_ApplySpellStartCast")
         if isChanneled then
             self:ApplyCooldown(spellId, targetGUID, startCast)
         end
-        OvaleCooldown:StopProfiling("OvaleCooldown_ApplySpellStartCast")
+        self.profiler:StopProfiling("OvaleCooldown_ApplySpellStartCast")
     end,
     ApplySpellAfterCast = function(self, spellId, targetGUID, startCast, endCast, isChanneled, spellcast)
-        OvaleCooldown:StartProfiling("OvaleCooldown_ApplySpellAfterCast")
+        self.profiler:StartProfiling("OvaleCooldown_ApplySpellAfterCast")
         if  not isChanneled then
             self:ApplyCooldown(spellId, targetGUID, endCast)
         end
-        OvaleCooldown:StopProfiling("OvaleCooldown_ApplySpellAfterCast")
+        self.profiler:StopProfiling("OvaleCooldown_ApplySpellAfterCast")
     end,
     InitializeState = function(self)
         self.next.cd = {}
@@ -39,9 +41,9 @@ local CooldownState = __class(nil, {
         end
     end,
     ApplyCooldown = function(self, spellId, targetGUID, atTime)
-        OvaleCooldown:StartProfiling("OvaleCooldown_state_ApplyCooldown")
-        local cd = OvaleCooldown:GetCD(spellId, atTime)
-        local duration = OvaleCooldown:GetSpellCooldownDuration(spellId, atTime, targetGUID)
+        self.profiler:StartProfiling("OvaleCooldown_state_ApplyCooldown")
+        local cd = self.ovaleCooldown:GetCD(spellId, atTime)
+        local duration = self.ovaleCooldown:GetSpellCooldownDuration(spellId, atTime, targetGUID)
         if duration == 0 then
             cd.start = 0
             cd.duration = 0
@@ -58,23 +60,18 @@ local CooldownState = __class(nil, {
                 cd.duration = cd.chargeDuration
             end
         end
-        OvaleCooldown:Log("Spell %d cooldown info: start=%f, duration=%f, charges=%s", spellId, cd.start, cd.duration, cd.charges or "(nil)")
-        OvaleCooldown:StopProfiling("OvaleCooldown_state_ApplyCooldown")
+        self.tracer:Log("Spell %d cooldown info: start=%f, duration=%f, charges=%s", spellId, cd.start, cd.duration, cd.charges or "(nil)")
+        self.profiler:StopProfiling("OvaleCooldown_state_ApplyCooldown")
     end,
     DebugCooldown = function(self)
         for spellId, cd in pairs(self.next.cd) do
             if cd.start then
                 if cd.charges then
-                    OvaleCooldown:Print("Spell %s cooldown: start=%f, duration=%f, charges=%d, maxCharges=%d, chargeStart=%f, chargeDuration=%f", spellId, cd.start, cd.duration, cd.charges, cd.maxCharges, cd.chargeStart, cd.chargeDuration)
+                    self.tracer:Print("Spell %s cooldown: start=%f, duration=%f, charges=%d, maxCharges=%d, chargeStart=%f, chargeDuration=%f", spellId, cd.start, cd.duration, cd.charges, cd.maxCharges, cd.chargeStart, cd.chargeDuration)
                 else
-                    OvaleCooldown:Print("Spell %s cooldown: start=%f, duration=%f", spellId, cd.start, cd.duration)
+                    self.tracer:Print("Spell %s cooldown: start=%f, duration=%f", spellId, cd.start, cd.duration)
                 end
             end
         end
     end,
-    constructor = function(self)
-        self.next = OvaleCooldown.next
-    end
 })
-__exports.cooldownState = CooldownState()
-OvaleState:RegisterState(__exports.cooldownState)

@@ -1,0 +1,207 @@
+local __exports = LibStub:GetLibrary("ovale/scripts/ovale_warrior")
+if not __exports then return end
+__exports.registerWarriorProtectionXeltor = function(OvaleScripts)
+do
+	local name = "xeltor_protection"
+	local desc = "[Xel][7.3.5] Warrior: Protection"
+	local code = [[
+Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
+Include(ovale_warrior_spells)
+
+AddIcon specialization=3 help=main
+{
+	if InCombat() InterruptActions()
+	
+	if target.InRange(shield_slam) and HasFullControl()
+	{
+		if PreviousGCDSpell(intercept) Spell(thunder_clap)
+		
+		# Cooldowns
+		ProtectionDefaultCdActions()
+		
+		# Short Cooldowns
+		ProtectionDefaultShortCdActions()
+		
+		# Default rotation
+		ProtectionDefaultMainActions()
+	}
+
+	# Move to the target!
+	if target.InRange(heroic_throw) and not PreviousGCDSpell(intercept) and target.InRange(intercept) and InCombat() and Falling() Spell(intercept)
+	if target.InRange(heroic_throw) and InCombat() Spell(heroic_throw usable=1)
+}
+
+AddFunction ProtectionHealMe
+{
+	if HealthPercent() < 70 Spell(victory_rush)
+	if HealthPercent() < 85 Spell(impending_victory)
+}
+
+AddFunction ProtectionGetInMeleeRange
+{
+	if InFlightToTarget(intercept) and not InFlightToTarget(heroic_leap)
+	{
+		if target.InRange(intercept) Spell(intercept)
+		# if SpellCharges(intercept) == 0 and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
+		# if not target.InRange(pummel) Texture(misc_arrowlup help=L(not_in_melee_range))
+	}
+}
+
+AddFunction InterruptActions
+{
+	if not target.IsFriend() and target.IsInterruptible() and { target.MustBeInterrupted() or Level() < 100 or target.IsPVP() }
+	{
+		if target.InRange(pummel) and target.IsInterruptible() Spell(pummel)
+		if target.InRange(storm_bolt) and not target.Classification(worldboss) Spell(storm_bolt)
+		if target.InRange(intercept) and not target.Classification(worldboss) and Talent(warbringer_talent) Spell(intercept)
+		if target.Distance(less 10) and not target.Classification(worldboss) Spell(shockwave)
+		if target.Distance(less 8) and target.IsInterruptible() Spell(arcane_torrent_rage)
+		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
+		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
+		if target.InRange(intimidating_shout) and not target.Classification(worldboss) Spell(intimidating_shout)
+	}
+}
+
+### actions.default
+
+AddFunction ProtectionDefaultMainActions
+{
+	#call_action_list,name=prot
+	ProtectionProtMainActions()
+}
+
+AddFunction ProtectionDefaultMainPostConditions
+{
+	ProtectionProtMainPostConditions()
+}
+
+AddFunction ProtectionDefaultShortCdActions
+{
+	#auto_attack
+	# ProtectionGetInMeleeRange()
+
+	#call_action_list,name=prot
+	ProtectionProtShortCdActions()
+}
+
+AddFunction ProtectionDefaultShortCdPostConditions
+{
+	ProtectionProtShortCdPostConditions()
+}
+
+AddFunction ProtectionDefaultCdActions
+{
+	#pummel
+	# ProtectionInterruptActions()
+
+	#blood_fury
+	Spell(blood_fury_ap)
+	#berserking
+	Spell(berserking)
+	#arcane_torrent
+	Spell(arcane_torrent_rage)
+	#call_action_list,name=prot
+	ProtectionProtCdActions()
+}
+
+AddFunction ProtectionDefaultCdPostConditions
+{
+	ProtectionProtCdPostConditions()
+}
+
+### actions.precombat
+
+AddFunction ProtectionPrecombatMainActions
+{
+}
+
+AddFunction ProtectionPrecombatMainPostConditions
+{
+}
+
+AddFunction ProtectionPrecombatShortCdActions
+{
+}
+
+AddFunction ProtectionPrecombatShortCdPostConditions
+{
+}
+
+AddFunction ProtectionPrecombatCdActions
+{
+	#flask,type=ten_thousand_scars
+	#food,type=azshari_salad
+	#augmentation,type=defiled
+	#snapshot_stats
+	#potion,name=unbending_potion
+	# if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(unbending_potion usable=1)
+}
+
+AddFunction ProtectionPrecombatCdPostConditions
+{
+}
+
+### actions.prot
+
+AddFunction ProtectionProtMainActions
+{
+	#spell_reflection,if=incoming_damage_2500ms>health.max*0.20
+	# if IncomingDamage(2.5) > MaxHealth() * 0.2 Spell(spell_reflection)
+	#shield_slam,if=(!(cooldown.shield_block.remains<=gcd.max*2&!buff.shield_block.up)&talent.heavy_repercussions.enabled)|!talent.heavy_repercussions.enabled
+	if not { SpellCooldown(shield_block) <= GCD() * 2 and not BuffPresent(shield_block_buff) } and Talent(heavy_repercussions_talent) or not Talent(heavy_repercussions_talent) Spell(shield_slam)
+	#thunder_clap
+	Spell(thunder_clap)
+	#revenge,if=(talent.vengeance.enabled&buff.revenge.react&!buff.vengeance_ignore_pain.up)|(buff.vengeance_revenge.up&rage>=59)|(talent.vengeance.enabled&!buff.vengeance_ignore_pain.up&!buff.vengeance_revenge.up&rage>=69)|(!talent.vengeance.enabled&buff.revenge.react)
+	if Talent(vengeance_talent) and BuffPresent(revenge_buff) and not BuffPresent(vengeance_ignore_pain_buff) or BuffPresent(vengeance_revenge_buff) and Rage() >= 59 or Talent(vengeance_talent) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_revenge_buff) and Rage() >= 69 or not Talent(vengeance_talent) and BuffPresent(revenge_buff) Spell(revenge)
+	#devastate
+	Spell(devastate)
+}
+
+AddFunction ProtectionProtMainPostConditions
+{
+}
+
+AddFunction ProtectionProtShortCdActions
+{
+	#demoralizing_shout,if=incoming_damage_2500ms>health.max*0.20&!talent.booming_voice.enabled
+	if IncomingDamage(2.5) > MaxHealth() * 0.2 and not Talent(booming_voice_talent) Spell(demoralizing_shout)
+	#demoralizing_shout,if=talent.booming_voice.enabled&buff.battle_cry.up
+	if Talent(booming_voice_talent) and BuffPresent(battle_cry_buff) Spell(demoralizing_shout)
+	#ravager,if=talent.ravager.enabled&buff.battle_cry.up
+	if Talent(ravager_talent) and BuffPresent(battle_cry_buff) Spell(ravager)
+	#neltharions_fury,if=!buff.shield_block.up&cooldown.shield_block.remains>3&((cooldown.shield_slam.remains>3&talent.heavy_repercussions.enabled)|(!talent.heavy_repercussions.enabled))
+	if not BuffPresent(shield_block_buff) and SpellCooldown(shield_block) > 3 and { SpellCooldown(shield_slam) > 3 and Talent(heavy_repercussions_talent) or not Talent(heavy_repercussions_talent) } Spell(neltharions_fury)
+	#shield_block,if=!buff.neltharions_fury.up&((cooldown.shield_slam.remains=0&talent.heavy_repercussions.enabled)|action.shield_block.charges=2|!talent.heavy_repercussions.enabled)
+	if not BuffPresent(neltharions_fury_buff) and { not SpellCooldown(shield_slam) > 0 and Talent(heavy_repercussions_talent) or Charges(shield_block) == 2 or not Talent(heavy_repercussions_talent) } Spell(shield_block)
+	#ignore_pain,if=(rage>=60&!talent.vengeance.enabled)|(buff.vengeance_ignore_pain.up&rage>=39)|(talent.vengeance.enabled&!buff.vengeance_ignore_pain.up&!buff.vengeance_revenge.up&rage<30&!buff.revenge.react)
+	if Rage() >= 60 and not Talent(vengeance_talent) or BuffPresent(vengeance_ignore_pain_buff) and Rage() >= 39 or Talent(vengeance_talent) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_revenge_buff) and Rage() < 30 and not BuffPresent(revenge_buff) Spell(ignore_pain)
+}
+
+AddFunction ProtectionProtShortCdPostConditions
+{
+	{ not { SpellCooldown(shield_block) <= GCD() * 2 and not BuffPresent(shield_block_buff) } and Talent(heavy_repercussions_talent) or not Talent(heavy_repercussions_talent) } and Spell(shield_slam) or Spell(thunder_clap) or { Talent(vengeance_talent) and BuffPresent(revenge_buff) and not BuffPresent(vengeance_ignore_pain_buff) or BuffPresent(vengeance_revenge_buff) and Rage() >= 59 or Talent(vengeance_talent) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_revenge_buff) and Rage() >= 69 or not Talent(vengeance_talent) and BuffPresent(revenge_buff) } and Spell(revenge) or Spell(devastate)
+}
+
+AddFunction ProtectionProtCdActions
+{
+	#last_stand,if=incoming_damage_2500ms>health.max*0.40
+	#if IncomingDamage(2.5) > MaxHealth() * 0.4 Spell(last_stand)
+	#shield_wall,if=incoming_damage_2500ms>health.max*0.40&!cooldown.last_stand.remains=0
+	#if IncomingDamage(2.5) > MaxHealth() * 0.4 and not { not SpellCooldown(last_stand) > 0 } Spell(shield_wall)
+	#potion,name=unbending_potion,if=(incoming_damage_2500ms>health.max*0.15&!buff.potion.up)|target.time_to_die<=25
+	# if { IncomingDamage(2.5) > MaxHealth() * 0.15 and not BuffPresent(potion_buff) or target.TimeToDie() <= 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(unbending_potion usable=1)
+	#battle_cry,if=cooldown.shield_slam.remains=0
+	if not SpellCooldown(shield_slam) > 0 Spell(battle_cry)
+}
+
+AddFunction ProtectionProtCdPostConditions
+{
+	Talent(ravager_talent) and BuffPresent(battle_cry_buff) and Spell(ravager) or not BuffPresent(shield_block_buff) and SpellCooldown(shield_block) > 3 and { SpellCooldown(shield_slam) > 3 and Talent(heavy_repercussions_talent) or not Talent(heavy_repercussions_talent) } and Spell(neltharions_fury) or { not { SpellCooldown(shield_block) <= GCD() * 2 and not BuffPresent(shield_block_buff) } and Talent(heavy_repercussions_talent) or not Talent(heavy_repercussions_talent) } and Spell(shield_slam) or Spell(thunder_clap) or { Talent(vengeance_talent) and BuffPresent(revenge_buff) and not BuffPresent(vengeance_ignore_pain_buff) or BuffPresent(vengeance_revenge_buff) and Rage() >= 59 or Talent(vengeance_talent) and not BuffPresent(vengeance_ignore_pain_buff) and not BuffPresent(vengeance_revenge_buff) and Rage() >= 69 or not Talent(vengeance_talent) and BuffPresent(revenge_buff) } and Spell(revenge) or Spell(devastate)
+}
+]]
+
+		OvaleScripts:RegisterScript("WARRIOR", "protection", name, desc, code, "script")
+	end
+end

@@ -1,0 +1,64 @@
+<NotepadPlus>
+    <UserLang name="Ovale" ext="lua" udlVersion="2.1">
+        <Settings>
+            <Global caseIgnored="yes" allowFoldOfComments="yes" foldCompact="no" forcePureLC="0" decimalSeparator="0" />
+            <Prefix Keywords1="no" Keywords2="no" Keywords3="no" Keywords4="no" Keywords5="no" Keywords6="no" Keywords7="no" Keywords8="no" />
+        </Settings>
+        <KeywordLists>
+            <Keywords name="Comments">00# 01 02 03 04</Keywords>
+            <Keywords name="Numbers, prefix1"></Keywords>
+            <Keywords name="Numbers, prefix2"></Keywords>
+            <Keywords name="Numbers, extras1"></Keywords>
+            <Keywords name="Numbers, extras2"></Keywords>
+            <Keywords name="Numbers, suffix1"></Keywords>
+            <Keywords name="Numbers, suffix2"></Keywords>
+            <Keywords name="Numbers, range"></Keywords>
+            <Keywords name="Operators1">( ) . + &lt; = &gt; !</Keywords>
+            <Keywords name="Operators2"></Keywords>
+            <Keywords name="Folders in code1, open">{</Keywords>
+            <Keywords name="Folders in code1, middle"></Keywords>
+            <Keywords name="Folders in code1, close">}</Keywords>
+            <Keywords name="Folders in code2, open"></Keywords>
+            <Keywords name="Folders in code2, middle"></Keywords>
+            <Keywords name="Folders in code2, close"></Keywords>
+            <Keywords name="Folders in comment, open"></Keywords>
+            <Keywords name="Folders in comment, middle"></Keywords>
+            <Keywords name="Folders in comment, close"></Keywords>
+            <Keywords name="Keywords1">if and or not less more equal unless</Keywords>
+            <Keywords name="Keywords2">AfterWhiteHit mounted falling canfly flying instanced indoors wet WildMushroomIsCharged WildMushroomCount WeaponEnchantExpires WeaponDamage Tracking TotemExpires TotemRemains TotemPresent DeadIn outdoors TimeWithHaste Texture TimeToBloodlust TimeInCombat TickTime TicksRemain TicksAdded Ticks Threat TargetIsPlayer TalentPoints LastSwing NextSwing Stealthed IsStealthed Stance StaggerRemains SpellUsable SpellKnown SpellData SpellCooldown SpellCharges SpellChargeCooldown Speed Runes RunesCooldown RuneOfPowerRemains Spirit Stamina Strength Agility AttackPower CritRating HasteRating Intellect MasteryEffect MasteryRating MeleeCritChance RangedCritChance SpellCritChance SpellHaste Spellpower RuneCount Rune RemainingCastTime RelativeLevel PTR PreviousSpell Present MaxPower Power PowerDeficit PowerPercent PetPresent NextTick ManaPercent List Level Latency LastAttackPower LastMastery LastMeleeCritChance LastRangedCritChance LastSpellCritChance LastSpellpower LastEstimatedDamage LastDamageMultiplier LastDamage LastComboPoints ItemCount ItemCooldown ItemCharges IsStunned IsRooted IsPVP IsInterruptible IsIncapacitated IsFriend IsFeared IsEnraged IsDead IsAggroed InRange InFlightToTarget InCombat Health HealthMissing HealthPercent LifePercent MaxHealth TimeToDie TimeToHealthPercent HasWeapon HasTrinket HasShield HasFullControl HasEquippedItem Glyph GCD FocusRegen Exists EnergyRegen Enemies EclipseDir Eclipse Distance DamageTaken DamageMultiplier CritDamage Damage CreatureType CreatureFamily Counter Classification Class CheckBoxOff CheckBoxOn CastTime Casting CanCast BuffStealable BuffStacksOnAny DeBuffStacksOnAny BuffStacks DeBuffStacks BuffAttackPower DeBuffAttackPower BuffMasteryEffect DeBuffMasteryEffect BuffMeleeCritChance DeBuffMeleeCritChance BuffRangedAttackPower DeBuffRangedAttackPower BuffRangedCritChance DeBuffRangedCritChance BuffSpellCritChance DeBuffSpellCritChance BuffSpellHaste DeBuffSpellHaste BuffSpellpower DeBuffSpellpower BuffRemainsOnAny DeBuffRemainsOnAny BuffRemains DeBuffRemains BuffGain DeBuffGain BuffExpires DeBuffExpires BuffPresent DeBuffPresent BuffDuration DeBuffDuration BuffDamageMultiplier DeBuffDamageMultiplier BuffCountOnAny DeBuffCountOnAny BuffCount DeBuffCount BuffComboPoints DeBuffComboPoints BuffAmount DeBuffAmount TickValue ArmorSetParts ArmorSetBonus Spell Talent IncomingDamage BuffRemaining DebuffRemaining DiseasesRemaining DiseasesAnyTicking DiseasesTicking TimeSincePreviousSpell Item True SpellCooldownDuration TicksRemaining BuffDurationIfApplied BaseDuration False TotemRemaining MultistrikeChance Charges ExecuteTime max_stacks offgcd if_spell cd usable duration specialization totem buff_cdr learn travel_time cd_haste addcd unusable itemset TimeToSpell BuffCooldown BuffCooldownDuration BuffDirection BuffPersistentMultiplier BuffRemainingOnAny EnrageRemaining GCDRemaining GetState GetStateDuration Name PersistentMultiplier AlternatePowerDeficit MaxAlternatePower PowerCost PreviousGCDSpell PreviousOffGCDSpell Refreshable Snapshot SpellMaxCharges StaggerRemaining TravelTime MustBeInterrupted add_duration replace interrupt tag if_equipped</Keywords>
+            <Keywords name="Keywords3">MaxChi Chi BurningEmbers Energy Focus HolyPower Mana Rage RunicPower ShadowOrbs SoulShards AlternatePower DemonicFury EnergyRegenRate MaxRage Maelstrom AstralPower AstralPowerDeficit FocusRegenRate EnergyCost FocusCost ManaCost RageCost RunicPowerCost TimeToFocusFor TimeToMaxEnergy TimeToMaxFocus TimeToEnergyFor PrimaryResource Fury Pain ChiDeficit DemonicFuryDeficit EnergyDeficit FocusCastingRegen FocusDeficit HolyPowerDeficit ManaDeficit RageDeficit RunicPowerDeficit ShadowOrbsDeficit SoulShardsDeficit FuryDeficit ComboPointsDeficit MaxDemonicFury MaxEnergy MaxFocus MaxHolyPower MaxMana MaxRunicPower MaxShadowOrbs MaxSoulShards MaxComboPoints TimeToPower TimeToEnergy TimeToFocus TimeToPowerFor ComboPoints add_holypower holypower_percent</Keywords>
+            <Keywords name="Keywords4">bleed cast_slow healing_reduced lower_physical_damage magic_vulnerability physical_vulnerability ranged_vulnerability enrage burst_haste burst_haste_debuff raid_movement fear incapacitate root stun attack_power_multiplier critical_strike melee_haste spell_power_multiplier stamina str_agi_int spell_haste AddCheckBox SpellDamageBuff inccounter critcombo base bonusap combo shadoworbs burningembers chi demonicfury energy focus holypower mana rage runicpower soulshards AddIcon mastery help Define SpellInfo test canStopChannelling SpellAddTargetDebuff SpellAddBuff SpellList tick haste worldboss rare rareelite elite normal checkbox AddFunction str_agi_int_buff blood_fury_apsp berserking arcane_torrent_chi arcane_torrent_runicpower attack_power_multiplier_buff blood_fury_ap text Include unholy blood frost death no arcane_torrent_energy stealthed_buff arcane_torrent_mana arcane_torrent_focus arcane_torrent_holy mastery_buff wait miss_react burst_haste_buff blood_fury_sp stamina_buff arcane_torrent_rage SpellRequire</Keywords>
+            <Keywords name="Keywords5">yes any</Keywords>
+            <Keywords name="Keywords6"></Keywords>
+            <Keywords name="Keywords7"></Keywords>
+            <Keywords name="Keywords8">target focus pet player targettarget mouseover vehicle</Keywords>
+            <Keywords name="Delimiters">00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23</Keywords>
+        </KeywordLists>
+        <Styles>
+            <WordsStyle name="DEFAULT" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="COMMENTS" fgColor="C0C0C0" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="LINE COMMENTS" fgColor="C0C0C0" bgColor="FFFFFF" fontName="" fontStyle="3" nesting="0" />
+            <WordsStyle name="NUMBERS" fgColor="800040" bgColor="FFFFFF" fontName="" fontStyle="1" nesting="0" />
+            <WordsStyle name="KEYWORDS1" fgColor="0000FF" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="KEYWORDS2" fgColor="0080FF" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="KEYWORDS3" fgColor="8000FF" bgColor="FFFFFF" fontName="" fontStyle="1" nesting="0" />
+            <WordsStyle name="KEYWORDS4" fgColor="FF0000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="KEYWORDS5" fgColor="008000" bgColor="FFFFFF" fontName="" fontStyle="1" nesting="0" />
+            <WordsStyle name="KEYWORDS6" fgColor="008000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="KEYWORDS7" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="KEYWORDS8" fgColor="FF8000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="OPERATORS" fgColor="8080C0" bgColor="FFFFFF" fontName="" fontStyle="1" nesting="0" />
+            <WordsStyle name="FOLDER IN CODE1" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="FOLDER IN CODE2" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="FOLDER IN COMMENT" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS1" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS2" fgColor="00FF80" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS3" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS4" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS5" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS6" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS7" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS8" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" nesting="0" />
+        </Styles>
+    </UserLang>
+</NotepadPlus>

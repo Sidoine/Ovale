@@ -7,64 +7,18 @@ local __Localization = LibStub:GetLibrary("ovale/Localization")
 local L = __Localization.L
 local AceDB = LibStub:GetLibrary("AceDB-3.0", true)
 local AceDBOptions = LibStub:GetLibrary("AceDBOptions-3.0", true)
-local __Ovale = LibStub:GetLibrary("ovale/Ovale")
-local Ovale = __Ovale.Ovale
 local aceConsole = LibStub:GetLibrary("AceConsole-3.0", true)
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local InterfaceOptionsFrame_OpenToCategory = InterfaceOptionsFrame_OpenToCategory
 local ipairs = ipairs
 local huge = math.huge
-local OvaleOptionsBase = Ovale:NewModule("OvaleOptions", aceConsole, aceEvent)
+local __Ovale = LibStub:GetLibrary("ovale/Ovale")
+local Print = __Ovale.Print
 local self_register = {}
-local OvaleOptionsClass = __class(OvaleOptionsBase, {
-    OnInitialize = function(self)
-        local ovale = Ovale:GetName()
-        local db = AceDB:New("OvaleDB", self.defaultDB)
-        self.options.args.profile = AceDBOptions:GetOptionsTable(db)
-        db.RegisterCallback(self, "OnNewProfile", "HandleProfileChanges")
-        db.RegisterCallback(self, "OnProfileReset", "HandleProfileChanges")
-        db.RegisterCallback(self, "OnProfileChanged", "HandleProfileChanges")
-        db.RegisterCallback(self, "OnProfileCopied", "HandleProfileChanges")
-        Ovale.db = db
-        self:UpgradeSavedVariables()
-        AceConfig:RegisterOptionsTable(ovale, self.options.args.apparence)
-        AceConfig:RegisterOptionsTable(ovale .. " Profiles", self.options.args.profile)
-        AceConfig:RegisterOptionsTable(ovale .. " Actions", self.options.args.actions, "Ovale")
-        AceConfigDialog:AddToBlizOptions(ovale)
-        AceConfigDialog:AddToBlizOptions(ovale .. " Profiles", "Profiles", ovale)
-        self:HandleProfileChanges()
-    end,
-    RegisterOptions = function(self, addon)
-    end,
-    UpgradeSavedVariables = function(self)
-        for _, addon in ipairs(self_register) do
-            if addon.UpgradeSavedVariables then
-                addon:UpgradeSavedVariables()
-            end
-        end
-        Ovale.db.RegisterDefaults(self.defaultDB)
-    end,
-    HandleProfileChanges = function(self)
-        self:SendMessage("Ovale_ProfileChanged")
-        self:SendMessage("Ovale_ScriptChanged")
-        self:SendMessage("Ovale_OptionChanged", "layout")
-        self:SendMessage("Ovale_OptionChanged", "visibility")
-    end,
-    ToggleConfig = function(self)
-        local appName = Ovale:GetName()
-        if Ovale.db.profile.standaloneOptions then
-            if AceConfigDialog.OpenFrames[appName] then
-                AceConfigDialog:Close(appName)
-            else
-                AceConfigDialog:Open(appName)
-            end
-        else
-            InterfaceOptionsFrame_OpenToCategory(appName)
-            InterfaceOptionsFrame_OpenToCategory(appName)
-        end
-    end,
-    constructor = function(self, ...)
-        OvaleOptionsBase.constructor(self, ...)
+__exports.OvaleOptionsClass = __class(nil, {
+    constructor = function(self, ovale)
+        self.ovale = ovale
+        self.db = nil
         self.defaultDB = {
             profile = {
                 source = nil,
@@ -114,7 +68,34 @@ local OvaleOptionsClass = __class(OvaleOptionsBase, {
                     auraLag = 400,
                     moving = false,
                     spellFlash = {
-                        enabled = true
+                        enabled = true,
+                        brightness = 1,
+                        hasHostileTarget = false,
+                        hasTarget = false,
+                        hideInVehicle = false,
+                        inCombat = false,
+                        size = 2.4,
+                        threshold = 500,
+                        colorMain = {
+                            r = 1,
+                            g = 1,
+                            b = 1
+                        },
+                        colorShortCd = {
+                            r = 1,
+                            g = 1,
+                            b = 0
+                        },
+                        colorCd = {
+                            r = 1,
+                            g = 1,
+                            b = 0
+                        },
+                        colorInterrupt = {
+                            r = 0,
+                            g = 1,
+                            b = 1
+                        }
                     },
                     minimap = {
                         hide = false
@@ -127,14 +108,14 @@ local OvaleOptionsClass = __class(OvaleOptionsBase, {
             type = "group",
             args = {
                 apparence = {
-                    name = Ovale:GetName(),
+                    name = "Ovale Spell Priority",
                     type = "group",
                     get = function(info)
-                        return Ovale.db.profile.apparence[info[#info]]
+                        return self.db.profile.apparence[info[#info]]
                     end,
                     set = function(info, value)
-                        Ovale.db.profile.apparence[info[#info]] = value
-                        self:SendMessage("Ovale_OptionChanged", info[#info - 1])
+                        self.db.profile.apparence[info[#info]] = value
+                        self.module:SendMessage("Ovale_OptionChanged", info[#info - 1])
                     end,
                     args = {
                         standaloneOptions = {
@@ -143,13 +124,11 @@ local OvaleOptionsClass = __class(OvaleOptionsBase, {
                             desc = L["Open configuration panel in a separate, movable window."],
                             type = "toggle",
                             get = function(info)
-                                return Ovale.db.profile.standaloneOptions
-                            end
-,
+                                return self.db.profile.standaloneOptions
+                            end,
                             set = function(info, value)
-                                Ovale.db.profile.standaloneOptions = value
+                                self.db.profile.standaloneOptions = value
                             end
-
                         },
                         iconGroupAppearance = {
                             order = 40,
@@ -162,8 +141,8 @@ local OvaleOptionsClass = __class(OvaleOptionsBase, {
                                     name = L["Enabled"],
                                     width = "full",
                                     set = function(info, value)
-                                        Ovale.db.profile.apparence.enableIcons = value
-                                        self:SendMessage("Ovale_OptionChanged", "visibility")
+                                        self.db.profile.apparence.enableIcons = value
+                                        self.module:SendMessage("Ovale_OptionChanged", "visibility")
                                     end
                                 },
                                 verrouille = {
@@ -171,7 +150,7 @@ local OvaleOptionsClass = __class(OvaleOptionsBase, {
                                     type = "toggle",
                                     name = L["Verrouiller position"],
                                     disabled = function()
-                                        return  not Ovale.db.profile.apparence.enableIcons
+                                        return  not self.db.profile.apparence.enableIcons
                                     end
                                 },
                                 clickThru = {
@@ -179,7 +158,7 @@ local OvaleOptionsClass = __class(OvaleOptionsBase, {
                                     type = "toggle",
                                     name = L["Ignorer les clics souris"],
                                     disabled = function()
-                                        return  not Ovale.db.profile.apparence.enableIcons
+                                        return  not self.db.profile.apparence.enableIcons
                                     end
                                 },
                                 visibility = {
@@ -188,9 +167,8 @@ local OvaleOptionsClass = __class(OvaleOptionsBase, {
                                     name = L["Visibilité"],
                                     inline = true,
                                     disabled = function()
-                                        return  not Ovale.db.profile.apparence.enableIcons
-                                    end
-,
+                                        return  not self.db.profile.apparence.enableIcons
+                                    end,
                                     args = {
                                         enCombat = {
                                             order = 10,
@@ -225,9 +203,8 @@ local OvaleOptionsClass = __class(OvaleOptionsBase, {
                                     name = L["Layout"],
                                     inline = true,
                                     disabled = function()
-                                        return  not Ovale.db.profile.apparence.enableIcons
-                                    end
-,
+                                        return  not self.db.profile.apparence.enableIcons
+                                    end,
                                     args = {
                                         moving = {
                                             order = 10,
@@ -304,16 +281,14 @@ local OvaleOptionsClass = __class(OvaleOptionsBase, {
                                     order = 25,
                                     name = L["Remaining time font color"],
                                     get = function(info)
-                                        local t = Ovale.db.profile.apparence.remainsFontColor
+                                        local t = self.db.profile.apparence.remainsFontColor
                                         return t.r, t.g, t.b
-                                    end
-,
+                                    end,
                                     set = function(info, r, g, b)
-                                        local t = Ovale.db.profile.apparence.remainsFontColor
+                                        local t = self.db.profile.apparence.remainsFontColor
                                         t.r, t.g, t.b = r, g, b
-                                        Ovale.db.profile.apparence.remainsFontColor = t
+                                        self.db.profile.apparence.remainsFontColor = t
                                     end
-
                                 },
                                 fontScale = {
                                     order = 30,
@@ -484,8 +459,8 @@ local OvaleOptionsClass = __class(OvaleOptionsBase, {
                             name = L["Afficher la fenêtre"],
                             guiHidden = true,
                             func = function()
-                                Ovale.db.profile.apparence.enableIcons = true
-                                self:SendMessage("Ovale_OptionChanged", "visibility")
+                                self.db.profile.apparence.enableIcons = true
+                                self.module:SendMessage("Ovale_OptionChanged", "visibility")
                             end
                         },
                         hide = {
@@ -493,8 +468,8 @@ local OvaleOptionsClass = __class(OvaleOptionsBase, {
                             name = L["Cacher la fenêtre"],
                             guiHidden = true,
                             func = function()
-                                Ovale.db.profile.apparence.enableIcons = false
-                                self:SendMessage("Ovale_OptionChanged", "visibility")
+                                self.db.profile.apparence.enableIcons = false
+                                self.module:SendMessage("Ovale_OptionChanged", "visibility")
                             end
                         },
                         config = {
@@ -508,11 +483,11 @@ local OvaleOptionsClass = __class(OvaleOptionsBase, {
                             name = L["Display refresh statistics"],
                             type = "execute",
                             func = function()
-                                local avgRefresh, minRefresh, maxRefresh, count = Ovale:GetRefreshIntervalStatistics()
+                                local avgRefresh, minRefresh, maxRefresh, count = self.ovale:GetRefreshIntervalStatistics()
                                 if minRefresh == huge then
                                     avgRefresh, minRefresh, maxRefresh, count = 0, 0, 0, 0
                                 end
-                                Ovale:Print("Refresh intervals: count = %d, avg = %d, min = %d, max = %d (ms)", count, avgRefresh, minRefresh, maxRefresh)
+                                Print("Refresh intervals: count = %d, avg = %d, min = %d, max = %d (ms)", count, avgRefresh, minRefresh, maxRefresh)
                             end
                         }
                     }
@@ -520,6 +495,54 @@ local OvaleOptionsClass = __class(OvaleOptionsBase, {
                 profile = {}
             }
         }
-    end
+        self.OnInitialize = function()
+            local ovale = self.ovale:GetName()
+            local db = AceDB:New("OvaleDB", self.defaultDB)
+            self.options.args.profile = AceDBOptions:GetOptionsTable(db)
+            db.RegisterCallback(self, "OnNewProfile", self.HandleProfileChanges)
+            db.RegisterCallback(self, "OnProfileReset", self.HandleProfileChanges)
+            db.RegisterCallback(self, "OnProfileChanged", self.HandleProfileChanges)
+            db.RegisterCallback(self, "OnProfileCopied", self.HandleProfileChanges)
+            self.db = db
+            self:UpgradeSavedVariables()
+            AceConfig:RegisterOptionsTable(ovale, self.options.args.apparence)
+            AceConfig:RegisterOptionsTable(ovale .. " Profiles", self.options.args.profile)
+            AceConfig:RegisterOptionsTable(ovale .. " Actions", self.options.args.actions, "Ovale")
+            AceConfigDialog:AddToBlizOptions(ovale)
+            AceConfigDialog:AddToBlizOptions(ovale .. " Profiles", "Profiles", ovale)
+            self.HandleProfileChanges()
+        end
+        self.handleDisable = function()
+        end
+        self.HandleProfileChanges = function()
+            self.module:SendMessage("Ovale_ProfileChanged")
+            self.module:SendMessage("Ovale_ScriptChanged")
+            self.module:SendMessage("Ovale_OptionChanged", "layout")
+            self.module:SendMessage("Ovale_OptionChanged", "visibility")
+        end
+        self.module = ovale:createModule("OvaleOptions", self.OnInitialize, self.handleDisable, aceConsole, aceEvent)
+    end,
+    RegisterOptions = function(self, addon)
+    end,
+    UpgradeSavedVariables = function(self)
+        for _, addon in ipairs(self_register) do
+            if addon.UpgradeSavedVariables then
+                addon:UpgradeSavedVariables()
+            end
+        end
+        self.db.RegisterDefaults(self.defaultDB)
+    end,
+    ToggleConfig = function(self)
+        local appName = self.ovale:GetName()
+        if self.db.profile.standaloneOptions then
+            if AceConfigDialog.OpenFrames[appName] then
+                AceConfigDialog:Close(appName)
+            else
+                AceConfigDialog:Open(appName)
+            end
+        else
+            InterfaceOptionsFrame_OpenToCategory(appName)
+            InterfaceOptionsFrame_OpenToCategory(appName)
+        end
+    end,
 })
-__exports.OvaleOptions = OvaleOptionsClass()

@@ -1,9 +1,10 @@
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-do
-    local name = "sc_t23_paladin_protection"
-    local desc = "[8.2] Simulationcraft: T23_Paladin_Protection"
-    local code = [[
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_paladin", 80201)
+if not __exports then return end
+__exports.registerPaladin = function(OvaleScripts)
+    do
+        local name = "sc_t23_paladin_protection"
+        local desc = "[8.2] Simulationcraft: T23_Paladin_Protection"
+        local code = [[
 # Based on SimulationCraft profile "T23_Paladin_Protection".
 #	class=paladin
 #	spec=protection
@@ -289,12 +290,12 @@ AddIcon checkbox=opt_paladin_protection_aoe help=cd specialization=protection
 # shield_of_the_righteous
 # war_stomp
 ]]
-    OvaleScripts:RegisterScript("PALADIN", "protection", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_paladin_retribution"
-    local desc = "[8.2] Simulationcraft: T23_Paladin_Retribution"
-    local code = [[
+        OvaleScripts:RegisterScript("PALADIN", "protection", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_paladin_retribution"
+        local desc = "[8.2] Simulationcraft: T23_Paladin_Retribution"
+        local code = [[
 # Based on SimulationCraft profile "T23_Paladin_Retribution".
 #	class=paladin
 #	spec=retribution
@@ -491,10 +492,10 @@ AddFunction RetributionFinishersMainActions
  if BuffExpires(avenging_wrath_buff) and { BuffExpires(inquisition_buff) or BuffRemaining(inquisition_buff) < 8 and HolyPower() >= 3 or Talent(execution_sentence_talent) and SpellCooldown(execution_sentence) < 10 and BuffRemaining(inquisition_buff) < 15 or SpellCooldown(avenging_wrath) < 15 and BuffRemaining(inquisition_buff) < 20 and HolyPower() >= 3 } Spell(inquisition)
  #execution_sentence,if=spell_targets.divine_storm<=2&(!talent.crusade.enabled&cooldown.avenging_wrath.remains>10|talent.crusade.enabled&buff.crusade.down&cooldown.crusade.remains>10|buff.crusade.stack>=7)
  if Enemies() <= 2 and { not Talent(crusade_talent) and SpellCooldown(avenging_wrath) > 10 or Talent(crusade_talent) and BuffExpires(crusade_buff) and SpellCooldown(crusade) > 10 or BuffStacks(crusade_buff) >= 7 } Spell(execution_sentence)
- #divine_storm,if=variable.ds_castable&variable.wings_pool&(!talent.execution_sentence.enabled|spell_targets.divine_storm<=2&cooldown.execution_sentence.remains>gcd*2|cooldown.avenging_wrath.remains>gcd*3&cooldown.avenging_wrath.remains<10|buff.crusade.up&buff.crusade.stack<10)
- if ds_castable() and wings_pool() and { not Talent(execution_sentence_talent) or Enemies() <= 2 and SpellCooldown(execution_sentence) > GCD() * 2 or SpellCooldown(avenging_wrath) > GCD() * 3 and SpellCooldown(avenging_wrath) < 10 or BuffPresent(crusade_buff) and BuffStacks(crusade_buff) < 10 } Spell(divine_storm)
- #templars_verdict,if=variable.wings_pool&(!talent.execution_sentence.enabled|cooldown.execution_sentence.remains>gcd*2|cooldown.avenging_wrath.remains>gcd*3&cooldown.avenging_wrath.remains<10|buff.crusade.up&buff.crusade.stack<10)
- if wings_pool() and { not Talent(execution_sentence_talent) or SpellCooldown(execution_sentence) > GCD() * 2 or SpellCooldown(avenging_wrath) > GCD() * 3 and SpellCooldown(avenging_wrath) < 10 or BuffPresent(crusade_buff) and BuffStacks(crusade_buff) < 10 } Spell(templars_verdict)
+ #divine_storm,if=variable.ds_castable&variable.wings_pool&((!talent.execution_sentence.enabled|(spell_targets.divine_storm>=2|cooldown.execution_sentence.remains>gcd*2))|(cooldown.avenging_wrath.remains>gcd*3&cooldown.avenging_wrath.remains<10|cooldown.crusade.remains>gcd*3&cooldown.crusade.remains<10|buff.crusade.up&buff.crusade.stack<10))
+ if ds_castable() and wings_pool() and { not Talent(execution_sentence_talent) or Enemies() >= 2 or SpellCooldown(execution_sentence) > GCD() * 2 or SpellCooldown(avenging_wrath) > GCD() * 3 and SpellCooldown(avenging_wrath) < 10 or SpellCooldown(crusade) > GCD() * 3 and SpellCooldown(crusade) < 10 or BuffPresent(crusade_buff) and BuffStacks(crusade_buff) < 10 } Spell(divine_storm)
+ #templars_verdict,if=variable.wings_pool&(!talent.execution_sentence.enabled|cooldown.execution_sentence.remains>gcd*2|cooldown.avenging_wrath.remains>gcd*3&cooldown.avenging_wrath.remains<10|cooldown.crusade.remains>gcd*3&cooldown.crusade.remains<10|buff.crusade.up&buff.crusade.stack<10)
+ if wings_pool() and { not Talent(execution_sentence_talent) or SpellCooldown(execution_sentence) > GCD() * 2 or SpellCooldown(avenging_wrath) > GCD() * 3 and SpellCooldown(avenging_wrath) < 10 or SpellCooldown(crusade) > GCD() * 3 and SpellCooldown(crusade) < 10 or BuffPresent(crusade_buff) and BuffStacks(crusade_buff) < 10 } Spell(templars_verdict)
 }
 
 AddFunction RetributionFinishersMainPostConditions
@@ -507,7 +508,7 @@ AddFunction RetributionFinishersShortCdActions
 
 AddFunction RetributionFinishersShortCdPostConditions
 {
- BuffExpires(avenging_wrath_buff) and { BuffExpires(inquisition_buff) or BuffRemaining(inquisition_buff) < 8 and HolyPower() >= 3 or Talent(execution_sentence_talent) and SpellCooldown(execution_sentence) < 10 and BuffRemaining(inquisition_buff) < 15 or SpellCooldown(avenging_wrath) < 15 and BuffRemaining(inquisition_buff) < 20 and HolyPower() >= 3 } and Spell(inquisition) or Enemies() <= 2 and { not Talent(crusade_talent) and SpellCooldown(avenging_wrath) > 10 or Talent(crusade_talent) and BuffExpires(crusade_buff) and SpellCooldown(crusade) > 10 or BuffStacks(crusade_buff) >= 7 } and Spell(execution_sentence) or ds_castable() and wings_pool() and { not Talent(execution_sentence_talent) or Enemies() <= 2 and SpellCooldown(execution_sentence) > GCD() * 2 or SpellCooldown(avenging_wrath) > GCD() * 3 and SpellCooldown(avenging_wrath) < 10 or BuffPresent(crusade_buff) and BuffStacks(crusade_buff) < 10 } and Spell(divine_storm) or wings_pool() and { not Talent(execution_sentence_talent) or SpellCooldown(execution_sentence) > GCD() * 2 or SpellCooldown(avenging_wrath) > GCD() * 3 and SpellCooldown(avenging_wrath) < 10 or BuffPresent(crusade_buff) and BuffStacks(crusade_buff) < 10 } and Spell(templars_verdict)
+ BuffExpires(avenging_wrath_buff) and { BuffExpires(inquisition_buff) or BuffRemaining(inquisition_buff) < 8 and HolyPower() >= 3 or Talent(execution_sentence_talent) and SpellCooldown(execution_sentence) < 10 and BuffRemaining(inquisition_buff) < 15 or SpellCooldown(avenging_wrath) < 15 and BuffRemaining(inquisition_buff) < 20 and HolyPower() >= 3 } and Spell(inquisition) or Enemies() <= 2 and { not Talent(crusade_talent) and SpellCooldown(avenging_wrath) > 10 or Talent(crusade_talent) and BuffExpires(crusade_buff) and SpellCooldown(crusade) > 10 or BuffStacks(crusade_buff) >= 7 } and Spell(execution_sentence) or ds_castable() and wings_pool() and { not Talent(execution_sentence_talent) or Enemies() >= 2 or SpellCooldown(execution_sentence) > GCD() * 2 or SpellCooldown(avenging_wrath) > GCD() * 3 and SpellCooldown(avenging_wrath) < 10 or SpellCooldown(crusade) > GCD() * 3 and SpellCooldown(crusade) < 10 or BuffPresent(crusade_buff) and BuffStacks(crusade_buff) < 10 } and Spell(divine_storm) or wings_pool() and { not Talent(execution_sentence_talent) or SpellCooldown(execution_sentence) > GCD() * 2 or SpellCooldown(avenging_wrath) > GCD() * 3 and SpellCooldown(avenging_wrath) < 10 or SpellCooldown(crusade) > GCD() * 3 and SpellCooldown(crusade) < 10 or BuffPresent(crusade_buff) and BuffStacks(crusade_buff) < 10 } and Spell(templars_verdict)
 }
 
 AddFunction RetributionFinishersCdActions
@@ -516,7 +517,7 @@ AddFunction RetributionFinishersCdActions
 
 AddFunction RetributionFinishersCdPostConditions
 {
- BuffExpires(avenging_wrath_buff) and { BuffExpires(inquisition_buff) or BuffRemaining(inquisition_buff) < 8 and HolyPower() >= 3 or Talent(execution_sentence_talent) and SpellCooldown(execution_sentence) < 10 and BuffRemaining(inquisition_buff) < 15 or SpellCooldown(avenging_wrath) < 15 and BuffRemaining(inquisition_buff) < 20 and HolyPower() >= 3 } and Spell(inquisition) or Enemies() <= 2 and { not Talent(crusade_talent) and SpellCooldown(avenging_wrath) > 10 or Talent(crusade_talent) and BuffExpires(crusade_buff) and SpellCooldown(crusade) > 10 or BuffStacks(crusade_buff) >= 7 } and Spell(execution_sentence) or ds_castable() and wings_pool() and { not Talent(execution_sentence_talent) or Enemies() <= 2 and SpellCooldown(execution_sentence) > GCD() * 2 or SpellCooldown(avenging_wrath) > GCD() * 3 and SpellCooldown(avenging_wrath) < 10 or BuffPresent(crusade_buff) and BuffStacks(crusade_buff) < 10 } and Spell(divine_storm) or wings_pool() and { not Talent(execution_sentence_talent) or SpellCooldown(execution_sentence) > GCD() * 2 or SpellCooldown(avenging_wrath) > GCD() * 3 and SpellCooldown(avenging_wrath) < 10 or BuffPresent(crusade_buff) and BuffStacks(crusade_buff) < 10 } and Spell(templars_verdict)
+ BuffExpires(avenging_wrath_buff) and { BuffExpires(inquisition_buff) or BuffRemaining(inquisition_buff) < 8 and HolyPower() >= 3 or Talent(execution_sentence_talent) and SpellCooldown(execution_sentence) < 10 and BuffRemaining(inquisition_buff) < 15 or SpellCooldown(avenging_wrath) < 15 and BuffRemaining(inquisition_buff) < 20 and HolyPower() >= 3 } and Spell(inquisition) or Enemies() <= 2 and { not Talent(crusade_talent) and SpellCooldown(avenging_wrath) > 10 or Talent(crusade_talent) and BuffExpires(crusade_buff) and SpellCooldown(crusade) > 10 or BuffStacks(crusade_buff) >= 7 } and Spell(execution_sentence) or ds_castable() and wings_pool() and { not Talent(execution_sentence_talent) or Enemies() >= 2 or SpellCooldown(execution_sentence) > GCD() * 2 or SpellCooldown(avenging_wrath) > GCD() * 3 and SpellCooldown(avenging_wrath) < 10 or SpellCooldown(crusade) > GCD() * 3 and SpellCooldown(crusade) < 10 or BuffPresent(crusade_buff) and BuffStacks(crusade_buff) < 10 } and Spell(divine_storm) or wings_pool() and { not Talent(execution_sentence_talent) or SpellCooldown(execution_sentence) > GCD() * 2 or SpellCooldown(avenging_wrath) > GCD() * 3 and SpellCooldown(avenging_wrath) < 10 or SpellCooldown(crusade) > GCD() * 3 and SpellCooldown(crusade) < 10 or BuffPresent(crusade_buff) and BuffStacks(crusade_buff) < 10 } and Spell(templars_verdict)
 }
 
 ### actions.cooldowns
@@ -580,6 +581,8 @@ AddFunction RetributionCooldownsCdActions
 
     unless { not False(raid_event_adds_exists) or 600 > 30 or Enemies() >= 2 } and Spell(purifying_blast)
     {
+     #use_item,effect_name=cyclotronic_blast,if=(buff.avenging_wrath.down|buff.crusade.down)&(cooldown.blade_of_justice.remains>gcd*3&cooldown.judgment.remains>gcd*3)
+     if { BuffExpires(avenging_wrath_buff) or BuffExpires(crusade_buff) } and SpellCooldown(blade_of_justice) > GCD() * 3 and SpellCooldown(judgment) > GCD() * 3 RetributionUseItemActions()
      #avenging_wrath,if=(!talent.inquisition.enabled|buff.inquisition.up)&holy_power>=3
      if { not Talent(inquisition_talent) or BuffPresent(inquisition_buff) } and HolyPower() >= 3 Spell(avenging_wrath)
      #crusade,if=holy_power>=4|holy_power>=3&time<10&talent.wake_of_ashes.enabled
@@ -758,5 +761,6 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 # war_stomp
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("PALADIN", "retribution", name, desc, code, "script")
+        OvaleScripts:RegisterScript("PALADIN", "retribution", name, desc, code, "script")
+    end
 end

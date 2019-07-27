@@ -3,10 +3,6 @@ if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Localization = LibStub:GetLibrary("ovale/Localization")
 local L = __Localization.L
-local __SpellBook = LibStub:GetLibrary("ovale/SpellBook")
-local OvaleSpellBook = __SpellBook.OvaleSpellBook
-local __Ovale = LibStub:GetLibrary("ovale/Ovale")
-local Ovale = __Ovale.Ovale
 local format = string.format
 local find = string.find
 local sub = string.sub
@@ -25,9 +21,11 @@ __exports.OvaleIcon = __class(nil, {
     HasScriptControls = function(self)
         return (next(self.parent.checkBoxWidget) ~= nil or next(self.parent.listWidget) ~= nil)
     end,
-    constructor = function(self, name, parent, secure)
+    constructor = function(self, name, parent, secure, ovaleOptions, ovaleSpellBook)
         self.name = name
         self.parent = parent
+        self.ovaleOptions = ovaleOptions
+        self.ovaleSpellBook = ovaleSpellBook
         if  not secure then
             self.frame = CreateFrame("CheckButton", name, parent.frame, "ActionButtonTemplate")
         else
@@ -38,7 +36,7 @@ __exports.OvaleIcon = __class(nil, {
     SetValue = function(self, value, actionTexture)
         self.icone:Show()
         self.icone:SetTexture(actionTexture)
-        self.icone:SetAlpha(Ovale.db.profile.apparence.alpha)
+        self.icone:SetAlpha(self.ovaleOptions.db.profile.apparence.alpha)
         self.cd:Hide()
         self.focusText:Hide()
         self.rangeIndicator:Hide()
@@ -65,7 +63,7 @@ __exports.OvaleIcon = __class(nil, {
         self.actionId = actionId
         self.value = nil
         local now = GetTime()
-        local profile = Ovale.db.profile
+        local profile = self.ovaleOptions.db.profile
         if startTime and actionTexture then
             local cd = self.cd
             local resetCooldown = false
@@ -208,7 +206,7 @@ __exports.OvaleIcon = __class(nil, {
                     local suffix = sub(k, index + 5)
                     self.frame:SetAttribute(prefix .. "type" .. suffix, "spell")
                     self.frame:SetAttribute("unit", self.namedParams.target or "target")
-                    self.frame:SetAttribute(k, OvaleSpellBook:GetSpellName(v))
+                    self.frame:SetAttribute(k, self.ovaleSpellBook:GetSpellName(v))
                     self.actionButton = true
                 end
             end
@@ -245,7 +243,7 @@ __exports.OvaleIcon = __class(nil, {
                 local actionHelp = self.actionHelp
                 if  not actionHelp then
                     if self.actionType == "spell" then
-                        actionHelp = OvaleSpellBook:GetSpellName(self.actionId)
+                        actionHelp = self.ovaleSpellBook:GetSpellName(self.actionId)
                     elseif self.actionType == "value" then
                         actionHelp = (self.value < INFINITY) and tostring(self.value) or "infinity"
                     else
@@ -267,7 +265,7 @@ __exports.OvaleIcon = __class(nil, {
     end,
     OvaleIcon_OnLoad = function(self)
         local name = self.name
-        local profile = Ovale.db.profile
+        local profile = self.ovaleOptions.db.profile
         self.icone = _G[name .. "Icon"]
         self.shortcut = _G[name .. "HotKey"]
         self.remains = _G[name .. "Name"]

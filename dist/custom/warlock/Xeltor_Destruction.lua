@@ -1,0 +1,533 @@
+local __exports = LibStub:GetLibrary("ovale/scripts/ovale_warlock")
+if not __exports then return end
+__exports.registerWarlockDestructionXeltor = function(OvaleScripts)
+do
+	local name = "xeltor_destruction"
+	local desc = "[Xel][8.1] Warlock: Destruction"
+	local code = [[
+Include(ovale_common)
+Include(ovale_trinkets_mop)
+Include(ovale_trinkets_wod)
+Include(ovale_warlock_spells)
+
+Define(spell_lock_fh 19647)
+	SpellInfo(spell_lock_fh cd=24)
+
+AddIcon specialization=3 help=main
+{
+	# Interrupt
+	if InCombat() InterruptActions()
+	
+	# Save ass
+	SaveActions()
+	
+	if wet() and not mounted() Spell(unending_breath)
+	
+	if InCombat() and target.InRange(chaos_bolt) and HasFullControl()
+    {
+		# Cooldowns
+		if Boss() and {Speed() == 0 or CanMove() > 0 } DestructionDefaultCdActions()
+		
+		# Short Cooldowns
+		if Speed() == 0 or CanMove() > 0 DestructionDefaultShortCdActions()
+		
+		# Default rotation
+		if Speed() == 0 or CanMove() > 0 DestructionDefaultMainActions()
+	}
+	
+	if not InCombat() and not mounted() OutOfCombatActions()
+}
+
+AddFunction AoeSafety
+{
+	MouseOver.DebuffPresent(immolate_debuff)
+}
+
+AddFunction CanHavoc
+{
+	not MouseOver.DebuffPresent(immolate_debuff) and MouseOver.Present() and not MouseOver.IsFriend()
+}
+
+AddFunction InterruptActions
+{
+	if { target.HasManagedInterrupts() and target.MustBeInterrupted() } or { not target.HasManagedInterrupts() and target.IsInterruptible() }
+	{
+		# Felhunter Spell Lock
+		if target.Distance() - pet.Distance() <= 40 and pet.CreatureFamily(Felhunter) Spell(spell_lock_fh)
+	}
+}
+
+AddFunction SaveActions
+{
+	if HealthPercent() < 30 and InCombat() Spell(unending_resolve)
+	if HealthPercent() < 50 and ItemCharges(healthstone) > 0 and Item(healthstone usable=1) Texture(inv_stone_04)
+}
+
+AddFunction OutOfCombatActions
+{
+	if not ItemCharges(healthstone) > 0 and Speed() == 0 and SpellUsable(create_healthstone) and not PreviousGCDSpell(create_healthstone) Texture(inv_misc_gem_bloodstone_01)
+}
+
+AddFunction DestructionUseItemActions
+{
+	if Item(Trinket0Slot usable=1) Texture(inv_jewelry_talisman_12)
+	if Item(Trinket1Slot usable=1) Texture(inv_jewelry_talisman_12)
+}
+
+### actions.default
+
+AddFunction DestructionDefaultMainActions
+{
+ #run_action_list,name=cata,if=spell_targets.infernal_awakening>=3+raid_event.invulnerable.up&talent.cataclysm.enabled
+ if Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(cataclysm_talent) DestructionCataMainActions()
+
+ unless Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(cataclysm_talent) and DestructionCataMainPostConditions()
+ {
+  #run_action_list,name=fnb,if=spell_targets.infernal_awakening>=3+raid_event.invulnerable.up&talent.fire_and_brimstone.enabled
+  if Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(fire_and_brimstone_talent) DestructionFnbMainActions()
+
+  unless Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(fire_and_brimstone_talent) and DestructionFnbMainPostConditions()
+  {
+   #run_action_list,name=inf,if=spell_targets.infernal_awakening>=3+raid_event.invulnerable.up&talent.inferno.enabled
+   if Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(inferno_talent) DestructionInfMainActions()
+
+   unless Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(inferno_talent) and DestructionInfMainPostConditions()
+   {
+    #immolate,cycle_targets=1,if=!debuff.havoc.remains&(refreshable|talent.internal_combustion.enabled&action.chaos_bolt.in_flight&remains-action.chaos_bolt.travel_time-5<duration*0.3)
+    if not target.DebuffPresent(havoc_debuff) and { target.Refreshable(immolate_debuff) or Talent(internal_combustion_talent) and InFlightToTarget(chaos_bolt) and target.DebuffRemaining(immolate_debuff) - TravelTime(chaos_bolt) - 5 < BaseDuration(immolate_debuff) * 0.3 } Spell(immolate)
+    #call_action_list,name=cds
+    DestructionCdsMainActions()
+
+    unless DestructionCdsMainPostConditions()
+    {
+     #channel_demonfire,if=!buff.active_havoc.remains
+     if not BuffPresent(active_havoc_buff) and DebuffCountOnAny(immolate_debuff) >= 1 Spell(channel_demonfire)
+     #soul_fire,cycle_targets=1,if=!debuff.havoc.remains
+     if not target.DebuffPresent(havoc_debuff) Spell(soul_fire)
+     #chaos_bolt,cycle_targets=1,if=!debuff.havoc.remains&execute_time+travel_time<target.time_to_die&(trinket.proc.intellect.react&trinket.proc.intellect.remains>cast_time|trinket.proc.mastery.react&trinket.proc.mastery.remains>cast_time|trinket.proc.versatility.react&trinket.proc.versatility.remains>cast_time|trinket.proc.crit.react&trinket.proc.crit.remains>cast_time|trinket.proc.spell_power.react&trinket.proc.spell_power.remains>cast_time)
+     if not target.DebuffPresent(havoc_debuff) and ExecuteTime(chaos_bolt) + TravelTime(chaos_bolt) < target.TimeToDie() and { BuffPresent(trinket_proc_intellect_buff) and BuffRemaining(trinket_proc_intellect_buff) > CastTime(chaos_bolt) or BuffPresent(trinket_proc_mastery_buff) and BuffRemaining(trinket_proc_mastery_buff) > CastTime(chaos_bolt) or BuffPresent(trinket_proc_versatility_buff) and BuffRemaining(trinket_proc_versatility_buff) > CastTime(chaos_bolt) or BuffPresent(trinket_proc_crit_buff) and BuffRemaining(trinket_proc_crit_buff) > CastTime(chaos_bolt) or BuffPresent(trinket_proc_spell_power_buff) and BuffRemaining(trinket_proc_spell_power_buff) > CastTime(chaos_bolt) } Spell(chaos_bolt)
+     #chaos_bolt,cycle_targets=1,if=!debuff.havoc.remains&execute_time+travel_time<target.time_to_die&(trinket.stacking_proc.intellect.react&trinket.stacking_proc.intellect.remains>cast_time|trinket.stacking_proc.mastery.react&trinket.stacking_proc.mastery.remains>cast_time|trinket.stacking_proc.versatility.react&trinket.stacking_proc.versatility.remains>cast_time|trinket.stacking_proc.crit.react&trinket.stacking_proc.crit.remains>cast_time|trinket.stacking_proc.spell_power.react&trinket.stacking_proc.spell_power.remains>cast_time)
+     if not target.DebuffPresent(havoc_debuff) and ExecuteTime(chaos_bolt) + TravelTime(chaos_bolt) < target.TimeToDie() and { BuffPresent(trinket_stacking_proc_intellect_buff) and BuffRemaining(trinket_stacking_proc_intellect_buff) > CastTime(chaos_bolt) or BuffPresent(trinket_stacking_proc_mastery_buff) and BuffRemaining(trinket_stacking_proc_mastery_buff) > CastTime(chaos_bolt) or BuffPresent(trinket_stacking_proc_versatility_buff) and BuffRemaining(trinket_stacking_proc_versatility_buff) > CastTime(chaos_bolt) or BuffPresent(trinket_stacking_proc_crit_buff) and BuffRemaining(trinket_stacking_proc_crit_buff) > CastTime(chaos_bolt) or BuffPresent(trinket_stacking_proc_spell_power_buff) and BuffRemaining(trinket_stacking_proc_spell_power_buff) > CastTime(chaos_bolt) } Spell(chaos_bolt)
+     #chaos_bolt,cycle_targets=1,if=!debuff.havoc.remains&execute_time+travel_time<target.time_to_die&(cooldown.summon_infernal.remains>=20|!talent.grimoire_of_supremacy.enabled)&(cooldown.dark_soul_instability.remains>=20|!talent.dark_soul_instability.enabled)&(talent.eradication.enabled&debuff.eradication.remains<=cast_time|buff.backdraft.remains|talent.internal_combustion.enabled)
+     if not target.DebuffPresent(havoc_debuff) and ExecuteTime(chaos_bolt) + TravelTime(chaos_bolt) < target.TimeToDie() and { SpellCooldown(summon_infernal) >= 20 or not Talent(grimoire_of_supremacy_talent) } and { SpellCooldown(dark_soul_instability) >= 20 or not Talent(dark_soul_instability_talent) } and { Talent(eradication_talent) and target.DebuffRemaining(eradication_debuff) <= CastTime(chaos_bolt) or BuffPresent(backdraft_buff) or Talent(internal_combustion_talent) } Spell(chaos_bolt)
+     #chaos_bolt,cycle_targets=1,if=!debuff.havoc.remains&execute_time+travel_time<target.time_to_die&(soul_shard>=4|buff.dark_soul_instability.remains>cast_time|pet.infernal.active|buff.active_havoc.remains>cast_time)
+     if not target.DebuffPresent(havoc_debuff) and ExecuteTime(chaos_bolt) + TravelTime(chaos_bolt) < target.TimeToDie() and { SoulShards() >= 4 or BuffRemaining(dark_soul_instability_buff) > CastTime(chaos_bolt) or DemonDuration(infernal) > 0 or BuffRemaining(active_havoc_buff) > CastTime(chaos_bolt) } Spell(chaos_bolt)
+     #conflagrate,cycle_targets=1,if=!debuff.havoc.remains&((talent.flashover.enabled&buff.backdraft.stack<=2)|(!talent.flashover.enabled&buff.backdraft.stack<2))
+     if not target.DebuffPresent(havoc_debuff) and { Talent(flashover_talent) and BuffStacks(backdraft_buff) <= 2 or not Talent(flashover_talent) and BuffStacks(backdraft_buff) < 2 } Spell(conflagrate)
+     #shadowburn,cycle_targets=1,if=!debuff.havoc.remains&((charges=2|!buff.backdraft.remains|buff.backdraft.remains>buff.backdraft.stack*action.incinerate.execute_time))
+     if not target.DebuffPresent(havoc_debuff) and { Charges(shadowburn) == 2 or not BuffPresent(backdraft_buff) or BuffRemaining(backdraft_buff) > BuffStacks(backdraft_buff) * ExecuteTime(incinerate) } Spell(shadowburn)
+     #incinerate,cycle_targets=1,if=!debuff.havoc.remains
+     if not target.DebuffPresent(havoc_debuff) Spell(incinerate)
+    }
+   }
+  }
+ }
+}
+
+AddFunction DestructionDefaultMainPostConditions
+{
+ Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(cataclysm_talent) and DestructionCataMainPostConditions() or Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(fire_and_brimstone_talent) and DestructionFnbMainPostConditions() or Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(inferno_talent) and DestructionInfMainPostConditions() or DestructionCdsMainPostConditions()
+}
+
+AddFunction DestructionDefaultShortCdActions
+{
+ #run_action_list,name=cata,if=spell_targets.infernal_awakening>=3+raid_event.invulnerable.up&talent.cataclysm.enabled
+ if Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(cataclysm_talent) DestructionCataShortCdActions()
+
+ unless Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(cataclysm_talent) and DestructionCataShortCdPostConditions()
+ {
+  #run_action_list,name=fnb,if=spell_targets.infernal_awakening>=3+raid_event.invulnerable.up&talent.fire_and_brimstone.enabled
+  if Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(fire_and_brimstone_talent) DestructionFnbShortCdActions()
+
+  unless Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(fire_and_brimstone_talent) and DestructionFnbShortCdPostConditions()
+  {
+   #run_action_list,name=inf,if=spell_targets.infernal_awakening>=3+raid_event.invulnerable.up&talent.inferno.enabled
+   if Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(inferno_talent) DestructionInfShortCdActions()
+
+   unless Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(inferno_talent) and DestructionInfShortCdPostConditions()
+   {
+    #cataclysm
+    Spell(cataclysm)
+
+    unless not target.DebuffPresent(havoc_debuff) and { target.Refreshable(immolate_debuff) or Talent(internal_combustion_talent) and InFlightToTarget(chaos_bolt) and target.DebuffRemaining(immolate_debuff) - TravelTime(chaos_bolt) - 5 < BaseDuration(immolate_debuff) * 0.3 } and Spell(immolate)
+    {
+     #call_action_list,name=cds
+     DestructionCdsShortCdActions()
+
+     unless DestructionCdsShortCdPostConditions() or not BuffPresent(active_havoc_buff) and Spell(channel_demonfire)
+     {
+      #havoc,cycle_targets=1,if=!(target=sim.target)&target.time_to_die>10&active_enemies>1+raid_event.invulnerable.up
+      if not True(target_is_sim_target) and target.TimeToDie() > 10 and Enemies(tagged=1) > 1 + False(raid_events_invulnerable_up) and Enemies(tagged=1) > 1 and CanHavoc() Spell(havoc)
+      #havoc,if=active_enemies>1+raid_event.invulnerable.up
+      if Enemies(tagged=1) > 1 + False(raid_events_invulnerable_up) and Enemies(tagged=1) > 1 and CanHavoc() Spell(havoc)
+     }
+    }
+   }
+  }
+ }
+}
+
+AddFunction DestructionDefaultShortCdPostConditions
+{
+ Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(cataclysm_talent) and DestructionCataShortCdPostConditions() or Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(fire_and_brimstone_talent) and DestructionFnbShortCdPostConditions() or Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(inferno_talent) and DestructionInfShortCdPostConditions() or not target.DebuffPresent(havoc_debuff) and { target.Refreshable(immolate_debuff) or Talent(internal_combustion_talent) and InFlightToTarget(chaos_bolt) and target.DebuffRemaining(immolate_debuff) - TravelTime(chaos_bolt) - 5 < BaseDuration(immolate_debuff) * 0.3 } and Spell(immolate) or DestructionCdsShortCdPostConditions() or not BuffPresent(active_havoc_buff) and Spell(channel_demonfire) or not target.DebuffPresent(havoc_debuff) and Spell(soul_fire) or not target.DebuffPresent(havoc_debuff) and ExecuteTime(chaos_bolt) + TravelTime(chaos_bolt) < target.TimeToDie() and { BuffPresent(trinket_proc_intellect_buff) and BuffRemaining(trinket_proc_intellect_buff) > CastTime(chaos_bolt) or BuffPresent(trinket_proc_mastery_buff) and BuffRemaining(trinket_proc_mastery_buff) > CastTime(chaos_bolt) or BuffPresent(trinket_proc_versatility_buff) and BuffRemaining(trinket_proc_versatility_buff) > CastTime(chaos_bolt) or BuffPresent(trinket_proc_crit_buff) and BuffRemaining(trinket_proc_crit_buff) > CastTime(chaos_bolt) or BuffPresent(trinket_proc_spell_power_buff) and BuffRemaining(trinket_proc_spell_power_buff) > CastTime(chaos_bolt) } and Spell(chaos_bolt) or not target.DebuffPresent(havoc_debuff) and ExecuteTime(chaos_bolt) + TravelTime(chaos_bolt) < target.TimeToDie() and { BuffPresent(trinket_stacking_proc_intellect_buff) and BuffRemaining(trinket_stacking_proc_intellect_buff) > CastTime(chaos_bolt) or BuffPresent(trinket_stacking_proc_mastery_buff) and BuffRemaining(trinket_stacking_proc_mastery_buff) > CastTime(chaos_bolt) or BuffPresent(trinket_stacking_proc_versatility_buff) and BuffRemaining(trinket_stacking_proc_versatility_buff) > CastTime(chaos_bolt) or BuffPresent(trinket_stacking_proc_crit_buff) and BuffRemaining(trinket_stacking_proc_crit_buff) > CastTime(chaos_bolt) or BuffPresent(trinket_stacking_proc_spell_power_buff) and BuffRemaining(trinket_stacking_proc_spell_power_buff) > CastTime(chaos_bolt) } and Spell(chaos_bolt) or not target.DebuffPresent(havoc_debuff) and ExecuteTime(chaos_bolt) + TravelTime(chaos_bolt) < target.TimeToDie() and { SpellCooldown(summon_infernal) >= 20 or not Talent(grimoire_of_supremacy_talent) } and { SpellCooldown(dark_soul_instability) >= 20 or not Talent(dark_soul_instability_talent) } and { Talent(eradication_talent) and target.DebuffRemaining(eradication_debuff) <= CastTime(chaos_bolt) or BuffPresent(backdraft_buff) or Talent(internal_combustion_talent) } and Spell(chaos_bolt) or not target.DebuffPresent(havoc_debuff) and ExecuteTime(chaos_bolt) + TravelTime(chaos_bolt) < target.TimeToDie() and { SoulShards() >= 4 or BuffRemaining(dark_soul_instability_buff) > CastTime(chaos_bolt) or DemonDuration(infernal) > 0 or BuffRemaining(active_havoc_buff) > CastTime(chaos_bolt) } and Spell(chaos_bolt) or not target.DebuffPresent(havoc_debuff) and { Talent(flashover_talent) and BuffStacks(backdraft_buff) <= 2 or not Talent(flashover_talent) and BuffStacks(backdraft_buff) < 2 } and Spell(conflagrate) or not target.DebuffPresent(havoc_debuff) and { Charges(shadowburn) == 2 or not BuffPresent(backdraft_buff) or BuffRemaining(backdraft_buff) > BuffStacks(backdraft_buff) * ExecuteTime(incinerate) } and Spell(shadowburn) or not target.DebuffPresent(havoc_debuff) and Spell(incinerate)
+}
+
+AddFunction DestructionDefaultCdActions
+{
+ #run_action_list,name=cata,if=spell_targets.infernal_awakening>=3+raid_event.invulnerable.up&talent.cataclysm.enabled
+ if Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(cataclysm_talent) DestructionCataCdActions()
+
+ unless Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(cataclysm_talent) and DestructionCataCdPostConditions()
+ {
+  #run_action_list,name=fnb,if=spell_targets.infernal_awakening>=3+raid_event.invulnerable.up&talent.fire_and_brimstone.enabled
+  if Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(fire_and_brimstone_talent) DestructionFnbCdActions()
+
+  unless Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(fire_and_brimstone_talent) and DestructionFnbCdPostConditions()
+  {
+   #run_action_list,name=inf,if=spell_targets.infernal_awakening>=3+raid_event.invulnerable.up&talent.inferno.enabled
+   if Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(inferno_talent) DestructionInfCdActions()
+
+   unless Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(inferno_talent) and DestructionInfCdPostConditions() or Spell(cataclysm) or not target.DebuffPresent(havoc_debuff) and { target.Refreshable(immolate_debuff) or Talent(internal_combustion_talent) and InFlightToTarget(chaos_bolt) and target.DebuffRemaining(immolate_debuff) - TravelTime(chaos_bolt) - 5 < BaseDuration(immolate_debuff) * 0.3 } and Spell(immolate)
+   {
+    #call_action_list,name=cds
+    DestructionCdsCdActions()
+   }
+  }
+ }
+}
+
+AddFunction DestructionDefaultCdPostConditions
+{
+ Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(cataclysm_talent) and DestructionCataCdPostConditions() or Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(fire_and_brimstone_talent) and DestructionFnbCdPostConditions() or Enemies(tagged=1) >= 3 + False(raid_events_invulnerable_up) and Talent(inferno_talent) and DestructionInfCdPostConditions() or Spell(cataclysm) or not target.DebuffPresent(havoc_debuff) and { target.Refreshable(immolate_debuff) or Talent(internal_combustion_talent) and InFlightToTarget(chaos_bolt) and target.DebuffRemaining(immolate_debuff) - TravelTime(chaos_bolt) - 5 < BaseDuration(immolate_debuff) * 0.3 } and Spell(immolate) or DestructionCdsCdPostConditions() or not BuffPresent(active_havoc_buff) and Spell(channel_demonfire) or not True(target_is_sim_target) and target.TimeToDie() > 10 and Enemies(tagged=1) > 1 + False(raid_events_invulnerable_up) and Enemies(tagged=1) > 1 and Spell(havoc) or Enemies(tagged=1) > 1 + False(raid_events_invulnerable_up) and Enemies(tagged=1) > 1 and Spell(havoc) or not target.DebuffPresent(havoc_debuff) and Spell(soul_fire) or not target.DebuffPresent(havoc_debuff) and ExecuteTime(chaos_bolt) + TravelTime(chaos_bolt) < target.TimeToDie() and { BuffPresent(trinket_proc_intellect_buff) and BuffRemaining(trinket_proc_intellect_buff) > CastTime(chaos_bolt) or BuffPresent(trinket_proc_mastery_buff) and BuffRemaining(trinket_proc_mastery_buff) > CastTime(chaos_bolt) or BuffPresent(trinket_proc_versatility_buff) and BuffRemaining(trinket_proc_versatility_buff) > CastTime(chaos_bolt) or BuffPresent(trinket_proc_crit_buff) and BuffRemaining(trinket_proc_crit_buff) > CastTime(chaos_bolt) or BuffPresent(trinket_proc_spell_power_buff) and BuffRemaining(trinket_proc_spell_power_buff) > CastTime(chaos_bolt) } and Spell(chaos_bolt) or not target.DebuffPresent(havoc_debuff) and ExecuteTime(chaos_bolt) + TravelTime(chaos_bolt) < target.TimeToDie() and { BuffPresent(trinket_stacking_proc_intellect_buff) and BuffRemaining(trinket_stacking_proc_intellect_buff) > CastTime(chaos_bolt) or BuffPresent(trinket_stacking_proc_mastery_buff) and BuffRemaining(trinket_stacking_proc_mastery_buff) > CastTime(chaos_bolt) or BuffPresent(trinket_stacking_proc_versatility_buff) and BuffRemaining(trinket_stacking_proc_versatility_buff) > CastTime(chaos_bolt) or BuffPresent(trinket_stacking_proc_crit_buff) and BuffRemaining(trinket_stacking_proc_crit_buff) > CastTime(chaos_bolt) or BuffPresent(trinket_stacking_proc_spell_power_buff) and BuffRemaining(trinket_stacking_proc_spell_power_buff) > CastTime(chaos_bolt) } and Spell(chaos_bolt) or not target.DebuffPresent(havoc_debuff) and ExecuteTime(chaos_bolt) + TravelTime(chaos_bolt) < target.TimeToDie() and { SpellCooldown(summon_infernal) >= 20 or not Talent(grimoire_of_supremacy_talent) } and { SpellCooldown(dark_soul_instability) >= 20 or not Talent(dark_soul_instability_talent) } and { Talent(eradication_talent) and target.DebuffRemaining(eradication_debuff) <= CastTime(chaos_bolt) or BuffPresent(backdraft_buff) or Talent(internal_combustion_talent) } and Spell(chaos_bolt) or not target.DebuffPresent(havoc_debuff) and ExecuteTime(chaos_bolt) + TravelTime(chaos_bolt) < target.TimeToDie() and { SoulShards() >= 4 or BuffRemaining(dark_soul_instability_buff) > CastTime(chaos_bolt) or DemonDuration(infernal) > 0 or BuffRemaining(active_havoc_buff) > CastTime(chaos_bolt) } and Spell(chaos_bolt) or not target.DebuffPresent(havoc_debuff) and { Talent(flashover_talent) and BuffStacks(backdraft_buff) <= 2 or not Talent(flashover_talent) and BuffStacks(backdraft_buff) < 2 } and Spell(conflagrate) or not target.DebuffPresent(havoc_debuff) and { Charges(shadowburn) == 2 or not BuffPresent(backdraft_buff) or BuffRemaining(backdraft_buff) > BuffStacks(backdraft_buff) * ExecuteTime(incinerate) } and Spell(shadowburn) or not target.DebuffPresent(havoc_debuff) and Spell(incinerate)
+}
+
+### actions.cata
+
+AddFunction DestructionCataMainActions
+{
+ #call_action_list,name=cds
+ DestructionCdsMainActions()
+
+ unless DestructionCdsMainPostConditions()
+ {
+  #rain_of_fire,if=soul_shard>=4.5
+  if SoulShards() >= 4.5 Spell(rain_of_fire)
+  #immolate,if=talent.channel_demonfire.enabled&!remains&cooldown.channel_demonfire.remains<=action.chaos_bolt.execute_time
+  if Talent(channel_demonfire_talent) and not target.DebuffRemaining(immolate_debuff) and SpellCooldown(channel_demonfire) <= ExecuteTime(chaos_bolt) Spell(immolate)
+  #channel_demonfire,if=!buff.active_havoc.remains
+  if not BuffPresent(active_havoc_buff) and DebuffCountOnAny(immolate_debuff) >= 1 Spell(channel_demonfire)
+  #chaos_bolt,cycle_targets=1,if=!debuff.havoc.remains&talent.grimoire_of_supremacy.enabled&pet.infernal.remains>execute_time&active_enemies<=8+raid_event.invulnerable.up&((108*(spell_targets.rain_of_fire+raid_event.invulnerable.up)%3)<(240*(1+0.08*buff.grimoire_of_supremacy.stack)%2*(1+buff.active_havoc.remains>execute_time)))
+  if not target.DebuffPresent(havoc_debuff) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > ExecuteTime(chaos_bolt) and Enemies(tagged=1) <= 8 + False(raid_events_invulnerable_up) and 108 * { Enemies(tagged=1) + False(raid_events_invulnerable_up) } / 3 < 240 * { 1 + 0.08 * BuffStacks(grimoire_of_supremacy_buff) } / 2 * { 1 + BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) } Spell(chaos_bolt)
+  #chaos_bolt,cycle_targets=1,if=!debuff.havoc.remains&buff.active_havoc.remains>execute_time&spell_targets.rain_of_fire<=4+raid_event.invulnerable.up
+  if not target.DebuffPresent(havoc_debuff) and BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) and Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) Spell(chaos_bolt)
+  #immolate,cycle_targets=1,if=!debuff.havoc.remains&refreshable&remains<=cooldown.cataclysm.remains
+  if not target.DebuffPresent(havoc_debuff) and target.Refreshable(immolate_debuff) and target.DebuffRemaining(immolate_debuff) <= SpellCooldown(cataclysm) Spell(immolate)
+  #rain_of_fire
+  Spell(rain_of_fire)
+  #soul_fire,cycle_targets=1,if=!debuff.havoc.remains
+  if not target.DebuffPresent(havoc_debuff) Spell(soul_fire)
+  #conflagrate,cycle_targets=1,if=!debuff.havoc.remains
+  if not target.DebuffPresent(havoc_debuff) Spell(conflagrate)
+  #shadowburn,cycle_targets=1,if=!debuff.havoc.remains&((charges=2|!buff.backdraft.remains|buff.backdraft.remains>buff.backdraft.stack*action.incinerate.execute_time))
+  if not target.DebuffPresent(havoc_debuff) and { Charges(shadowburn) == 2 or not BuffPresent(backdraft_buff) or BuffRemaining(backdraft_buff) > BuffStacks(backdraft_buff) * ExecuteTime(incinerate) } Spell(shadowburn)
+  #incinerate,cycle_targets=1,if=!debuff.havoc.remains
+  if not target.DebuffPresent(havoc_debuff) Spell(incinerate)
+ }
+}
+
+AddFunction DestructionCataMainPostConditions
+{
+ DestructionCdsMainPostConditions()
+}
+
+AddFunction DestructionCataShortCdActions
+{
+ #call_action_list,name=cds
+ DestructionCdsShortCdActions()
+
+ unless DestructionCdsShortCdPostConditions() or SoulShards() >= 4.5 and Spell(rain_of_fire)
+ {
+  #cataclysm
+  Spell(cataclysm)
+
+  unless Talent(channel_demonfire_talent) and not target.DebuffRemaining(immolate_debuff) and SpellCooldown(channel_demonfire) <= ExecuteTime(chaos_bolt) and Spell(immolate) or not BuffPresent(active_havoc_buff) and Spell(channel_demonfire)
+  {
+   #havoc,cycle_targets=1,if=!(target=sim.target)&target.time_to_die>10&spell_targets.rain_of_fire<=8+raid_event.invulnerable.up&talent.grimoire_of_supremacy.enabled&pet.infernal.active&pet.infernal.remains<=10
+   if not True(target_is_sim_target) and target.TimeToDie() > 10 and Enemies(tagged=1) <= 8 + False(raid_events_invulnerable_up) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 and DemonDuration(infernal) <= 10 and Enemies(tagged=1) > 1 and CanHavoc() Spell(havoc)
+   #havoc,if=spell_targets.rain_of_fire<=8+raid_event.invulnerable.up&talent.grimoire_of_supremacy.enabled&pet.infernal.active&pet.infernal.remains<=10
+   if Enemies(tagged=1) <= 8 + False(raid_events_invulnerable_up) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 and DemonDuration(infernal) <= 10 and Enemies(tagged=1) > 1 and CanHavoc() Spell(havoc)
+
+   unless not target.DebuffPresent(havoc_debuff) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > ExecuteTime(chaos_bolt) and Enemies(tagged=1) <= 8 + False(raid_events_invulnerable_up) and 108 * { Enemies(tagged=1) + False(raid_events_invulnerable_up) } / 3 < 240 * { 1 + 0.08 * BuffStacks(grimoire_of_supremacy_buff) } / 2 * { 1 + BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) } and Spell(chaos_bolt)
+   {
+    #havoc,cycle_targets=1,if=!(target=sim.target)&target.time_to_die>10&spell_targets.rain_of_fire<=4+raid_event.invulnerable.up
+    if not True(target_is_sim_target) and target.TimeToDie() > 10 and Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) and Enemies(tagged=1) > 1 and CanHavoc() Spell(havoc)
+    #havoc,if=spell_targets.rain_of_fire<=4+raid_event.invulnerable.up
+    if Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) and Enemies(tagged=1) > 1 and CanHavoc() Spell(havoc)
+   }
+  }
+ }
+}
+
+AddFunction DestructionCataShortCdPostConditions
+{
+ DestructionCdsShortCdPostConditions() or SoulShards() >= 4.5 and Spell(rain_of_fire) or Talent(channel_demonfire_talent) and not target.DebuffRemaining(immolate_debuff) and SpellCooldown(channel_demonfire) <= ExecuteTime(chaos_bolt) and Spell(immolate) or not BuffPresent(active_havoc_buff) and Spell(channel_demonfire) or not target.DebuffPresent(havoc_debuff) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > ExecuteTime(chaos_bolt) and Enemies(tagged=1) <= 8 + False(raid_events_invulnerable_up) and 108 * { Enemies(tagged=1) + False(raid_events_invulnerable_up) } / 3 < 240 * { 1 + 0.08 * BuffStacks(grimoire_of_supremacy_buff) } / 2 * { 1 + BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) } and Spell(chaos_bolt) or not target.DebuffPresent(havoc_debuff) and BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) and Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) and Spell(chaos_bolt) or not target.DebuffPresent(havoc_debuff) and target.Refreshable(immolate_debuff) and target.DebuffRemaining(immolate_debuff) <= SpellCooldown(cataclysm) and Spell(immolate) or Spell(rain_of_fire) or not target.DebuffPresent(havoc_debuff) and Spell(soul_fire) or not target.DebuffPresent(havoc_debuff) and Spell(conflagrate) or not target.DebuffPresent(havoc_debuff) and { Charges(shadowburn) == 2 or not BuffPresent(backdraft_buff) or BuffRemaining(backdraft_buff) > BuffStacks(backdraft_buff) * ExecuteTime(incinerate) } and Spell(shadowburn) or not target.DebuffPresent(havoc_debuff) and Spell(incinerate)
+}
+
+AddFunction DestructionCataCdActions
+{
+ #call_action_list,name=cds
+ DestructionCdsCdActions()
+}
+
+AddFunction DestructionCataCdPostConditions
+{
+ DestructionCdsCdPostConditions() or SoulShards() >= 4.5 and Spell(rain_of_fire) or Spell(cataclysm) or Talent(channel_demonfire_talent) and not target.DebuffRemaining(immolate_debuff) and SpellCooldown(channel_demonfire) <= ExecuteTime(chaos_bolt) and Spell(immolate) or not BuffPresent(active_havoc_buff) and Spell(channel_demonfire) or not True(target_is_sim_target) and target.TimeToDie() > 10 and Enemies(tagged=1) <= 8 + False(raid_events_invulnerable_up) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 and DemonDuration(infernal) <= 10 and Enemies(tagged=1) > 1 and Spell(havoc) or Enemies(tagged=1) <= 8 + False(raid_events_invulnerable_up) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 and DemonDuration(infernal) <= 10 and Enemies(tagged=1) > 1 and Spell(havoc) or not target.DebuffPresent(havoc_debuff) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > ExecuteTime(chaos_bolt) and Enemies(tagged=1) <= 8 + False(raid_events_invulnerable_up) and 108 * { Enemies(tagged=1) + False(raid_events_invulnerable_up) } / 3 < 240 * { 1 + 0.08 * BuffStacks(grimoire_of_supremacy_buff) } / 2 * { 1 + BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) } and Spell(chaos_bolt) or not True(target_is_sim_target) and target.TimeToDie() > 10 and Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) and Enemies(tagged=1) > 1 and Spell(havoc) or Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) and Enemies(tagged=1) > 1 and Spell(havoc) or not target.DebuffPresent(havoc_debuff) and BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) and Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) and Spell(chaos_bolt) or not target.DebuffPresent(havoc_debuff) and target.Refreshable(immolate_debuff) and target.DebuffRemaining(immolate_debuff) <= SpellCooldown(cataclysm) and Spell(immolate) or Spell(rain_of_fire) or not target.DebuffPresent(havoc_debuff) and Spell(soul_fire) or not target.DebuffPresent(havoc_debuff) and Spell(conflagrate) or not target.DebuffPresent(havoc_debuff) and { Charges(shadowburn) == 2 or not BuffPresent(backdraft_buff) or BuffRemaining(backdraft_buff) > BuffStacks(backdraft_buff) * ExecuteTime(incinerate) } and Spell(shadowburn) or not target.DebuffPresent(havoc_debuff) and Spell(incinerate)
+}
+
+### actions.cds
+
+AddFunction DestructionCdsMainActions
+{
+}
+
+AddFunction DestructionCdsMainPostConditions
+{
+}
+
+AddFunction DestructionCdsShortCdActions
+{
+}
+
+AddFunction DestructionCdsShortCdPostConditions
+{
+}
+
+AddFunction DestructionCdsCdActions
+{
+ #summon_infernal,if=target.time_to_die>=210|!cooldown.dark_soul_instability.remains|target.time_to_die<=30+gcd|!talent.dark_soul_instability.enabled
+ if target.TimeToDie() >= 210 or not SpellCooldown(dark_soul_instability) > 0 or target.TimeToDie() <= 30 + GCD() or not Talent(dark_soul_instability_talent) Spell(summon_infernal)
+ #dark_soul_instability,if=target.time_to_die>=140|pet.infernal.active|target.time_to_die<=20+gcd
+ if target.TimeToDie() >= 140 or DemonDuration(infernal) > 0 or target.TimeToDie() <= 20 + GCD() Spell(dark_soul_instability)
+ #potion,if=pet.infernal.active|target.time_to_die<65
+ # if { DemonDuration(infernal) > 0 or target.TimeToDie() < 65 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_intellect usable=1)
+ #berserking
+ Spell(berserking)
+ #blood_fury
+ Spell(blood_fury_sp)
+ #fireblood
+ Spell(fireblood)
+ #use_items
+ DestructionUseItemActions()
+}
+
+AddFunction DestructionCdsCdPostConditions
+{
+}
+
+### actions.fnb
+
+AddFunction DestructionFnbMainActions
+{
+ #call_action_list,name=cds
+ DestructionCdsMainActions()
+
+ unless DestructionCdsMainPostConditions()
+ {
+  #rain_of_fire,if=soul_shard>=4.5
+  if SoulShards() >= 4.5 Spell(rain_of_fire)
+  #immolate,if=talent.channel_demonfire.enabled&!remains&cooldown.channel_demonfire.remains<=action.chaos_bolt.execute_time
+  if Talent(channel_demonfire_talent) and not target.DebuffRemaining(immolate_debuff) and SpellCooldown(channel_demonfire) <= ExecuteTime(chaos_bolt) Spell(immolate)
+  #channel_demonfire,if=!buff.active_havoc.remains
+  if not BuffPresent(active_havoc_buff) and DebuffCountOnAny(immolate_debuff) >= 1 Spell(channel_demonfire)
+  #chaos_bolt,cycle_targets=1,if=!debuff.havoc.remains&talent.grimoire_of_supremacy.enabled&pet.infernal.remains>execute_time&active_enemies<=4+raid_event.invulnerable.up&((108*(spell_targets.rain_of_fire+raid_event.invulnerable.up)%3)<(240*(1+0.08*buff.grimoire_of_supremacy.stack)%2*(1+buff.active_havoc.remains>execute_time)))
+  if not target.DebuffPresent(havoc_debuff) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > ExecuteTime(chaos_bolt) and Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) and 108 * { Enemies(tagged=1) + False(raid_events_invulnerable_up) } / 3 < 240 * { 1 + 0.08 * BuffStacks(grimoire_of_supremacy_buff) } / 2 * { 1 + BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) } Spell(chaos_bolt)
+  #chaos_bolt,cycle_targets=1,if=!debuff.havoc.remains&buff.active_havoc.remains>execute_time&spell_targets.rain_of_fire<=4+raid_event.invulnerable.up
+  if not target.DebuffPresent(havoc_debuff) and BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) and Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) Spell(chaos_bolt)
+  #immolate,cycle_targets=1,if=!debuff.havoc.remains&refreshable&spell_targets.incinerate<=8+raid_event.invulnerable.up
+  if not target.DebuffPresent(havoc_debuff) and target.Refreshable(immolate_debuff) and Enemies(tagged=1) <= 8 + False(raid_events_invulnerable_up) Spell(immolate)
+  #rain_of_fire
+  Spell(rain_of_fire)
+  #soul_fire,cycle_targets=1,if=!debuff.havoc.remains&spell_targets.incinerate<=3+raid_event.invulnerable.up
+  if not target.DebuffPresent(havoc_debuff) and Enemies(tagged=1) <= 3 + False(raid_events_invulnerable_up) Spell(soul_fire)
+  #conflagrate,cycle_targets=1,if=!debuff.havoc.remains&(talent.flashover.enabled&buff.backdraft.stack<=2|spell_targets.incinerate<=7+raid_event.invulnerable.up|talent.roaring_blaze.enabled&spell_targets.incinerate<=9+raid_event.invulnerable.up)
+  if not target.DebuffPresent(havoc_debuff) and { Talent(flashover_talent) and BuffStacks(backdraft_buff) <= 2 or Enemies(tagged=1) <= 7 + False(raid_events_invulnerable_up) or Talent(roaring_blaze_talent) and Enemies(tagged=1) <= 9 + False(raid_events_invulnerable_up) } Spell(conflagrate)
+  #incinerate,cycle_targets=1,if=!debuff.havoc.remains
+  if not target.DebuffPresent(havoc_debuff) Spell(incinerate)
+ }
+}
+
+AddFunction DestructionFnbMainPostConditions
+{
+ DestructionCdsMainPostConditions()
+}
+
+AddFunction DestructionFnbShortCdActions
+{
+ #call_action_list,name=cds
+ DestructionCdsShortCdActions()
+
+ unless DestructionCdsShortCdPostConditions() or SoulShards() >= 4.5 and Spell(rain_of_fire) or Talent(channel_demonfire_talent) and not target.DebuffRemaining(immolate_debuff) and SpellCooldown(channel_demonfire) <= ExecuteTime(chaos_bolt) and Spell(immolate) or not BuffPresent(active_havoc_buff) and Spell(channel_demonfire)
+ {
+  #havoc,cycle_targets=1,if=!(target=sim.target)&target.time_to_die>10&spell_targets.rain_of_fire<=4+raid_event.invulnerable.up&talent.grimoire_of_supremacy.enabled&pet.infernal.active&pet.infernal.remains<=10
+  if not True(target_is_sim_target) and target.TimeToDie() > 10 and Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 and DemonDuration(infernal) <= 10 and Enemies(tagged=1) > 1 and CanHavoc() Spell(havoc)
+  #havoc,if=spell_targets.rain_of_fire<=4+raid_event.invulnerable.up&talent.grimoire_of_supremacy.enabled&pet.infernal.active&pet.infernal.remains<=10
+  if Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 and DemonDuration(infernal) <= 10 and Enemies(tagged=1) > 1 and CanHavoc() Spell(havoc)
+
+  unless not target.DebuffPresent(havoc_debuff) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > ExecuteTime(chaos_bolt) and Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) and 108 * { Enemies(tagged=1) + False(raid_events_invulnerable_up) } / 3 < 240 * { 1 + 0.08 * BuffStacks(grimoire_of_supremacy_buff) } / 2 * { 1 + BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) } and Spell(chaos_bolt)
+  {
+   #havoc,cycle_targets=1,if=!(target=sim.target)&target.time_to_die>10&spell_targets.rain_of_fire<=4+raid_event.invulnerable.up
+   if not True(target_is_sim_target) and target.TimeToDie() > 10 and Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) and Enemies(tagged=1) > 1 and CanHavoc() Spell(havoc)
+   #havoc,if=spell_targets.rain_of_fire<=4+raid_event.invulnerable.up
+   if Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) and Enemies(tagged=1) > 1 and CanHavoc() Spell(havoc)
+  }
+ }
+}
+
+AddFunction DestructionFnbShortCdPostConditions
+{
+ DestructionCdsShortCdPostConditions() or SoulShards() >= 4.5 and Spell(rain_of_fire) or Talent(channel_demonfire_talent) and not target.DebuffRemaining(immolate_debuff) and SpellCooldown(channel_demonfire) <= ExecuteTime(chaos_bolt) and Spell(immolate) or not BuffPresent(active_havoc_buff) and Spell(channel_demonfire) or not target.DebuffPresent(havoc_debuff) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > ExecuteTime(chaos_bolt) and Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) and 108 * { Enemies(tagged=1) + False(raid_events_invulnerable_up) } / 3 < 240 * { 1 + 0.08 * BuffStacks(grimoire_of_supremacy_buff) } / 2 * { 1 + BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) } and Spell(chaos_bolt) or not target.DebuffPresent(havoc_debuff) and BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) and Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) and Spell(chaos_bolt) or not target.DebuffPresent(havoc_debuff) and target.Refreshable(immolate_debuff) and Enemies(tagged=1) <= 8 + False(raid_events_invulnerable_up) and Spell(immolate) or Spell(rain_of_fire) or not target.DebuffPresent(havoc_debuff) and Enemies(tagged=1) <= 3 + False(raid_events_invulnerable_up) and Spell(soul_fire) or not target.DebuffPresent(havoc_debuff) and { Talent(flashover_talent) and BuffStacks(backdraft_buff) <= 2 or Enemies(tagged=1) <= 7 + False(raid_events_invulnerable_up) or Talent(roaring_blaze_talent) and Enemies(tagged=1) <= 9 + False(raid_events_invulnerable_up) } and Spell(conflagrate) or not target.DebuffPresent(havoc_debuff) and Spell(incinerate)
+}
+
+AddFunction DestructionFnbCdActions
+{
+ #call_action_list,name=cds
+ DestructionCdsCdActions()
+}
+
+AddFunction DestructionFnbCdPostConditions
+{
+ DestructionCdsCdPostConditions() or SoulShards() >= 4.5 and Spell(rain_of_fire) or Talent(channel_demonfire_talent) and not target.DebuffRemaining(immolate_debuff) and SpellCooldown(channel_demonfire) <= ExecuteTime(chaos_bolt) and Spell(immolate) or not BuffPresent(active_havoc_buff) and Spell(channel_demonfire) or not True(target_is_sim_target) and target.TimeToDie() > 10 and Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 and DemonDuration(infernal) <= 10 and Enemies(tagged=1) > 1 and Spell(havoc) or Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 and DemonDuration(infernal) <= 10 and Enemies(tagged=1) > 1 and Spell(havoc) or not target.DebuffPresent(havoc_debuff) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > ExecuteTime(chaos_bolt) and Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) and 108 * { Enemies(tagged=1) + False(raid_events_invulnerable_up) } / 3 < 240 * { 1 + 0.08 * BuffStacks(grimoire_of_supremacy_buff) } / 2 * { 1 + BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) } and Spell(chaos_bolt) or not True(target_is_sim_target) and target.TimeToDie() > 10 and Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) and Enemies(tagged=1) > 1 and Spell(havoc) or Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) and Enemies(tagged=1) > 1 and Spell(havoc) or not target.DebuffPresent(havoc_debuff) and BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) and Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) and Spell(chaos_bolt) or not target.DebuffPresent(havoc_debuff) and target.Refreshable(immolate_debuff) and Enemies(tagged=1) <= 8 + False(raid_events_invulnerable_up) and Spell(immolate) or Spell(rain_of_fire) or not target.DebuffPresent(havoc_debuff) and Enemies(tagged=1) <= 3 + False(raid_events_invulnerable_up) and Spell(soul_fire) or not target.DebuffPresent(havoc_debuff) and { Talent(flashover_talent) and BuffStacks(backdraft_buff) <= 2 or Enemies(tagged=1) <= 7 + False(raid_events_invulnerable_up) or Talent(roaring_blaze_talent) and Enemies(tagged=1) <= 9 + False(raid_events_invulnerable_up) } and Spell(conflagrate) or not target.DebuffPresent(havoc_debuff) and Spell(incinerate)
+}
+
+### actions.inf
+
+AddFunction DestructionInfMainActions
+{
+ #call_action_list,name=cds
+ DestructionCdsMainActions()
+
+ unless DestructionCdsMainPostConditions()
+ {
+  #rain_of_fire,if=soul_shard>=4.5
+  if SoulShards() >= 4.5 Spell(rain_of_fire)
+  #immolate,if=talent.channel_demonfire.enabled&!remains&cooldown.channel_demonfire.remains<=action.chaos_bolt.execute_time
+  if Talent(channel_demonfire_talent) and not target.DebuffRemaining(immolate_debuff) and SpellCooldown(channel_demonfire) <= ExecuteTime(chaos_bolt) Spell(immolate)
+  #channel_demonfire,if=!buff.active_havoc.remains
+  if not BuffPresent(active_havoc_buff) and DebuffCountOnAny(immolate_debuff) >= 1 Spell(channel_demonfire)
+  #chaos_bolt,cycle_targets=1,if=!debuff.havoc.remains&talent.grimoire_of_supremacy.enabled&pet.infernal.remains>execute_time&spell_targets.rain_of_fire<=4+raid_event.invulnerable.up+talent.internal_combustion.enabled&((108*(spell_targets.rain_of_fire+raid_event.invulnerable.up)%(3-0.16*(spell_targets.rain_of_fire+raid_event.invulnerable.up)))<(240*(1+0.08*buff.grimoire_of_supremacy.stack)%2*(1+buff.active_havoc.remains>execute_time)))
+  if not target.DebuffPresent(havoc_debuff) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > ExecuteTime(chaos_bolt) and Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) + TalentPoints(internal_combustion_talent) and 108 * { Enemies(tagged=1) + False(raid_events_invulnerable_up) } / { 3 - 0.16 * { Enemies(tagged=1) + False(raid_events_invulnerable_up) } } < 240 * { 1 + 0.08 * BuffStacks(grimoire_of_supremacy_buff) } / 2 * { 1 + BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) } Spell(chaos_bolt)
+  #chaos_bolt,cycle_targets=1,if=!debuff.havoc.remains&buff.active_havoc.remains>execute_time&spell_targets.rain_of_fire<=3+raid_event.invulnerable.up&(talent.eradication.enabled|talent.internal_combustion.enabled)
+  if not target.DebuffPresent(havoc_debuff) and BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) and Enemies(tagged=1) <= 3 + False(raid_events_invulnerable_up) and { Talent(eradication_talent) or Talent(internal_combustion_talent) } Spell(chaos_bolt)
+  #immolate,cycle_targets=1,if=!debuff.havoc.remains&refreshable
+  if not target.DebuffPresent(havoc_debuff) and target.Refreshable(immolate_debuff) Spell(immolate)
+  #rain_of_fire
+  Spell(rain_of_fire)
+  #soul_fire,cycle_targets=1,if=!debuff.havoc.remains
+  if not target.DebuffPresent(havoc_debuff) Spell(soul_fire)
+  #conflagrate,cycle_targets=1,if=!debuff.havoc.remains
+  if not target.DebuffPresent(havoc_debuff) Spell(conflagrate)
+  #shadowburn,cycle_targets=1,if=!debuff.havoc.remains&((charges=2|!buff.backdraft.remains|buff.backdraft.remains>buff.backdraft.stack*action.incinerate.execute_time))
+  if not target.DebuffPresent(havoc_debuff) and { Charges(shadowburn) == 2 or not BuffPresent(backdraft_buff) or BuffRemaining(backdraft_buff) > BuffStacks(backdraft_buff) * ExecuteTime(incinerate) } Spell(shadowburn)
+  #incinerate,cycle_targets=1,if=!debuff.havoc.remains
+  if not target.DebuffPresent(havoc_debuff) Spell(incinerate)
+ }
+}
+
+AddFunction DestructionInfMainPostConditions
+{
+ DestructionCdsMainPostConditions()
+}
+
+AddFunction DestructionInfShortCdActions
+{
+ #call_action_list,name=cds
+ DestructionCdsShortCdActions()
+
+ unless DestructionCdsShortCdPostConditions() or SoulShards() >= 4.5 and Spell(rain_of_fire)
+ {
+  #cataclysm
+  Spell(cataclysm)
+
+  unless Talent(channel_demonfire_talent) and not target.DebuffRemaining(immolate_debuff) and SpellCooldown(channel_demonfire) <= ExecuteTime(chaos_bolt) and Spell(immolate) or not BuffPresent(active_havoc_buff) and Spell(channel_demonfire)
+  {
+   #havoc,cycle_targets=1,if=!(target=sim.target)&target.time_to_die>10&spell_targets.rain_of_fire<=4+raid_event.invulnerable.up+talent.internal_combustion.enabled&talent.grimoire_of_supremacy.enabled&pet.infernal.active&pet.infernal.remains<=10
+   if not True(target_is_sim_target) and target.TimeToDie() > 10 and Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) + TalentPoints(internal_combustion_talent) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 and DemonDuration(infernal) <= 10 and Enemies(tagged=1) > 1 and CanHavoc() Spell(havoc)
+   #havoc,if=spell_targets.rain_of_fire<=4+raid_event.invulnerable.up+talent.internal_combustion.enabled&talent.grimoire_of_supremacy.enabled&pet.infernal.active&pet.infernal.remains<=10
+   if Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) + TalentPoints(internal_combustion_talent) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 and DemonDuration(infernal) <= 10 and Enemies(tagged=1) > 1 and CanHavoc() Spell(havoc)
+
+   unless not target.DebuffPresent(havoc_debuff) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > ExecuteTime(chaos_bolt) and Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) + TalentPoints(internal_combustion_talent) and 108 * { Enemies(tagged=1) + False(raid_events_invulnerable_up) } / { 3 - 0.16 * { Enemies(tagged=1) + False(raid_events_invulnerable_up) } } < 240 * { 1 + 0.08 * BuffStacks(grimoire_of_supremacy_buff) } / 2 * { 1 + BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) } and Spell(chaos_bolt)
+   {
+    #havoc,cycle_targets=1,if=!(target=sim.target)&target.time_to_die>10&spell_targets.rain_of_fire<=3+raid_event.invulnerable.up&(talent.eradication.enabled|talent.internal_combustion.enabled)
+    if not True(target_is_sim_target) and target.TimeToDie() > 10 and Enemies(tagged=1) <= 3 + False(raid_events_invulnerable_up) and { Talent(eradication_talent) or Talent(internal_combustion_talent) } and Enemies(tagged=1) > 1 and CanHavoc() Spell(havoc)
+    #havoc,if=spell_targets.rain_of_fire<=3+raid_event.invulnerable.up&(talent.eradication.enabled|talent.internal_combustion.enabled)
+    if Enemies(tagged=1) <= 3 + False(raid_events_invulnerable_up) and { Talent(eradication_talent) or Talent(internal_combustion_talent) } and Enemies(tagged=1) > 1 and CanHavoc() Spell(havoc)
+   }
+  }
+ }
+}
+
+AddFunction DestructionInfShortCdPostConditions
+{
+ DestructionCdsShortCdPostConditions() or SoulShards() >= 4.5 and Spell(rain_of_fire) or Talent(channel_demonfire_talent) and not target.DebuffRemaining(immolate_debuff) and SpellCooldown(channel_demonfire) <= ExecuteTime(chaos_bolt) and Spell(immolate) or not BuffPresent(active_havoc_buff) and Spell(channel_demonfire) or not target.DebuffPresent(havoc_debuff) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > ExecuteTime(chaos_bolt) and Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) + TalentPoints(internal_combustion_talent) and 108 * { Enemies(tagged=1) + False(raid_events_invulnerable_up) } / { 3 - 0.16 * { Enemies(tagged=1) + False(raid_events_invulnerable_up) } } < 240 * { 1 + 0.08 * BuffStacks(grimoire_of_supremacy_buff) } / 2 * { 1 + BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) } and Spell(chaos_bolt) or not target.DebuffPresent(havoc_debuff) and BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) and Enemies(tagged=1) <= 3 + False(raid_events_invulnerable_up) and { Talent(eradication_talent) or Talent(internal_combustion_talent) } and Spell(chaos_bolt) or not target.DebuffPresent(havoc_debuff) and target.Refreshable(immolate_debuff) and Spell(immolate) or Spell(rain_of_fire) or not target.DebuffPresent(havoc_debuff) and Spell(soul_fire) or not target.DebuffPresent(havoc_debuff) and Spell(conflagrate) or not target.DebuffPresent(havoc_debuff) and { Charges(shadowburn) == 2 or not BuffPresent(backdraft_buff) or BuffRemaining(backdraft_buff) > BuffStacks(backdraft_buff) * ExecuteTime(incinerate) } and Spell(shadowburn) or not target.DebuffPresent(havoc_debuff) and Spell(incinerate)
+}
+
+AddFunction DestructionInfCdActions
+{
+ #call_action_list,name=cds
+ DestructionCdsCdActions()
+}
+
+AddFunction DestructionInfCdPostConditions
+{
+ DestructionCdsCdPostConditions() or SoulShards() >= 4.5 and Spell(rain_of_fire) or Spell(cataclysm) or Talent(channel_demonfire_talent) and not target.DebuffRemaining(immolate_debuff) and SpellCooldown(channel_demonfire) <= ExecuteTime(chaos_bolt) and Spell(immolate) or not BuffPresent(active_havoc_buff) and Spell(channel_demonfire) or not True(target_is_sim_target) and target.TimeToDie() > 10 and Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) + TalentPoints(internal_combustion_talent) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 and DemonDuration(infernal) <= 10 and Enemies(tagged=1) > 1 and Spell(havoc) or Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) + TalentPoints(internal_combustion_talent) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > 0 and DemonDuration(infernal) <= 10 and Enemies(tagged=1) > 1 and Spell(havoc) or not target.DebuffPresent(havoc_debuff) and Talent(grimoire_of_supremacy_talent) and DemonDuration(infernal) > ExecuteTime(chaos_bolt) and Enemies(tagged=1) <= 4 + False(raid_events_invulnerable_up) + TalentPoints(internal_combustion_talent) and 108 * { Enemies(tagged=1) + False(raid_events_invulnerable_up) } / { 3 - 0.16 * { Enemies(tagged=1) + False(raid_events_invulnerable_up) } } < 240 * { 1 + 0.08 * BuffStacks(grimoire_of_supremacy_buff) } / 2 * { 1 + BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) } and Spell(chaos_bolt) or not True(target_is_sim_target) and target.TimeToDie() > 10 and Enemies(tagged=1) <= 3 + False(raid_events_invulnerable_up) and { Talent(eradication_talent) or Talent(internal_combustion_talent) } and Enemies(tagged=1) > 1 and Spell(havoc) or Enemies(tagged=1) <= 3 + False(raid_events_invulnerable_up) and { Talent(eradication_talent) or Talent(internal_combustion_talent) } and Enemies(tagged=1) > 1 and Spell(havoc) or not target.DebuffPresent(havoc_debuff) and BuffRemaining(active_havoc_buff) > ExecuteTime(chaos_bolt) and Enemies(tagged=1) <= 3 + False(raid_events_invulnerable_up) and { Talent(eradication_talent) or Talent(internal_combustion_talent) } and Spell(chaos_bolt) or not target.DebuffPresent(havoc_debuff) and target.Refreshable(immolate_debuff) and Spell(immolate) or Spell(rain_of_fire) or not target.DebuffPresent(havoc_debuff) and Spell(soul_fire) or not target.DebuffPresent(havoc_debuff) and Spell(conflagrate) or not target.DebuffPresent(havoc_debuff) and { Charges(shadowburn) == 2 or not BuffPresent(backdraft_buff) or BuffRemaining(backdraft_buff) > BuffStacks(backdraft_buff) * ExecuteTime(incinerate) } and Spell(shadowburn) or not target.DebuffPresent(havoc_debuff) and Spell(incinerate)
+}
+
+### actions.precombat
+
+AddFunction DestructionPrecombatMainActions
+{
+ #grimoire_of_sacrifice,if=talent.grimoire_of_sacrifice.enabled
+ if Talent(grimoire_of_sacrifice_talent) and pet.Present() Spell(grimoire_of_sacrifice)
+ #soul_fire
+ Spell(soul_fire)
+ #incinerate,if=!talent.soul_fire.enabled
+ if not Talent(soul_fire_talent) Spell(incinerate)
+}
+
+AddFunction DestructionPrecombatMainPostConditions
+{
+}
+
+AddFunction DestructionPrecombatShortCdActions
+{
+ #flask
+ #food
+ #augmentation
+ #summon_pet
+ # if not pet.Present() Spell(summon_imp)
+}
+
+AddFunction DestructionPrecombatShortCdPostConditions
+{
+ Spell(soul_fire) or not Talent(soul_fire_talent) and Spell(incinerate)
+}
+
+AddFunction DestructionPrecombatCdActions
+{
+ unless not pet.Present() and Spell(summon_imp)
+ {
+  #snapshot_stats
+  #potion
+  # if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(battle_potion_of_intellect usable=1)
+ }
+}
+
+AddFunction DestructionPrecombatCdPostConditions
+{
+ # not pet.Present() and Spell(summon_imp) or Spell(soul_fire) or not Talent(soul_fire_talent) and Spell(incinerate)
+}
+]]
+
+		OvaleScripts:RegisterScript("WARLOCK", "destruction", name, desc, code, "script")
+	end
+end

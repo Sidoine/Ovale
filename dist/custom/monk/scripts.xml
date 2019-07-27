@@ -1,0 +1,5 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+	<Script file="Xeltor_Brewmaster.lua" />
+	<Script file="Xeltor_Mistweaver.lua" />
+	<Script file="Xeltor_Windwalker.lua" />
+</Ui>

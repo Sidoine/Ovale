@@ -1,8 +1,6 @@
 local __exports = LibStub:NewLibrary("ovale/scripts/ovale_trinkets_mop", 80201)
 if not __exports then return end
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-__exports.register = function()
+__exports.registerMopTrinkets = function(OvaleScripts)
     local name = "ovale_trinkets_mop"
     local desc = "[6.0.3] Ovale: Trinkets (Mists of Pandaria)"
     local code = [[

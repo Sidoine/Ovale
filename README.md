@@ -41,15 +41,15 @@ You need to reach level 10 and choose a specialization.  However, be aware that 
 
   [Corruption]: http://www.wowhead.com/spell=172
   [Documentation]: http://wow.curseforge.com/projects/ovale/pages/documentation/
-  [Masque]: http://www.curse.com/addons/wow/masque
-  [Ovale]: http://www.curse.com/addons/wow/ovale
+  [Masque]: https://www.curseforge.com/wow/addons/masque
+  [Ovale]: https://www.curseforge.com/wow/addons/ovale
   [Ovale_TankScripts]: https://www.curseforge.com/wow/addons/ovale_tankscripts
   [Recount]: http://www.curse.com/addons/wow/recount
   [Shadow Bolt]: http://www.wowhead.com/spell=686
   [SimulationCraft]: http://code.google.com/p/simulationcraft/
-  [Skada]: http://www.curse.com/addons/wow/skada
-  [SpellFlashCore]: http://www.curse.com/addons/wow/spellflashcore
-  [SpellFlash]: http://www.curse.com/addons/wow/spellflash
+  [Skada]: https://www.curseforge.com/wow/addons/skada
+  [SpellFlashCore]: https://www.curseforge.com/wow/addons/spellflashcore
+  [SpellFlash]: https://www.curseforge.com/wow/addons/spellflash
   [ovale-discord]: https://discord.gg/PYPpCdc
   [ovale-tickets]: https://github.com/Sidoine/Ovale/issues
   [ovale-video]: http://www.youtube.com/watch?v=rNHvk9GpyiM "Ovale WotLK video"

@@ -2,7 +2,7 @@ local __exports = LibStub:NewLibrary("ovale/PoolGC", 80201)
 if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Ovale = LibStub:GetLibrary("ovale/Ovale")
-local Ovale = __Ovale.Ovale
+local Print = __Ovale.Print
 local tostring = tostring
 __exports.OvalePoolGC = __class(nil, {
     constructor = function(self, name)
@@ -24,6 +24,6 @@ __exports.OvalePoolGC = __class(nil, {
         self.size = 0
     end,
     DebuggingInfo = function(self)
-        Ovale:Print("Pool %s has size %d.", tostring(self.name), self.size)
+        Print("Pool %s has size %d.", tostring(self.name), self.size)
     end,
 })

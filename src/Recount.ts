@@ -1,12 +1,10 @@
-import { Ovale } from "./Ovale";
-import { OvaleScore } from "./Score";
 import AceLocale from "@wowts/ace_locale-3.0";
 import Recount from "@wowts/recount";
 import { setmetatable, LuaObj } from "@wowts/lua";
 import { GameTooltip } from "@wowts/wow-mock";
+import { OvaleClass } from "./Ovale";
+import { OvaleScoreClass } from "./Score";
 
-let OvaleRecountBase = Ovale.NewModule("OvaleRecount");
-export let OvaleRecount: OvaleRecountClass;
 const DataModes = function(self: never, data: any, num: number) {
     if (!data) {
         return [0, 0];
@@ -27,8 +25,12 @@ const TooltipFuncs = function(self: never, name: string) {
     GameTooltip.ClearLines();
     GameTooltip.AddLine(name);
 }
-class OvaleRecountClass extends OvaleRecountBase {
-    OnInitialize() {
+export class OvaleRecountClass {
+    constructor(private ovale: OvaleClass, private ovaleScore: OvaleScoreClass) {
+        ovale.createModule("OvaleRecount", this.OnInitialize, this.OnDisable);
+    }
+
+    private OnInitialize = () => {
         if (Recount) {
             let aceLocale = AceLocale && AceLocale.GetLocale("Recount", true);
             if (!aceLocale) {
@@ -39,20 +41,20 @@ class OvaleRecountClass extends OvaleRecountBase {
                     }
                 });
             }
-            Recount.AddModeTooltip(Ovale.GetName(), DataModes, TooltipFuncs, undefined, undefined, undefined, undefined);
+            Recount.AddModeTooltip(this.ovale.GetName(), DataModes, TooltipFuncs, undefined, undefined, undefined, undefined);
 
-            OvaleScore.RegisterDamageMeter("OvaleRecount", this, "ReceiveScore");
+            this.ovaleScore.RegisterDamageMeter("OvaleRecount", this, this.ReceiveScore);
         }
     }
-    OnDisable() {
-        OvaleScore.UnregisterDamageMeter("OvaleRecount");
+    private OnDisable = () => {
+        this.ovaleScore.UnregisterDamageMeter("OvaleRecount");
     }
-    ReceiveScore(name: string, guid: string, scored: number, scoreMax: number) {
+    private ReceiveScore = (name: string, guid: string, scored: number, scoreMax: number) => {
         if (Recount) {
             let source = Recount.db2.combatants[name];
             if (source) {
-                Recount.AddAmount(source, Ovale.GetName(), scored);
-                Recount.AddAmount(source, `${Ovale.GetName()}Max`, scoreMax);
+                Recount.AddAmount(source, this.ovale.GetName(), scored);
+                Recount.AddAmount(source, `${this.ovale.GetName()}Max`, scoreMax);
             }
         }
     }

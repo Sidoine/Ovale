@@ -1,9 +1,10 @@
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-do
-    local name = "sc_t23_shaman_elemental"
-    local desc = "[8.2] Simulationcraft: T23_Shaman_Elemental"
-    local code = [[
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_shaman", 80201)
+if not __exports then return end
+__exports.registerShaman = function(OvaleScripts)
+    do
+        local name = "sc_t23_shaman_elemental"
+        local desc = "[8.2] Simulationcraft: T23_Shaman_Elemental"
+        local code = [[
 # Based on SimulationCraft profile "T23_Shaman_Elemental".
 #	class=shaman
 #	spec=elemental
@@ -344,14 +345,14 @@ AddFunction ElementalDefaultCdActions
 
  unless Talent(totem_mastery_talent_elemental) and TotemRemaining(totem_mastery_elemental) < 2 and Spell(totem_mastery_elemental)
  {
+  #use_items
+  ElementalUseItemActions()
   #fire_elemental,if=!talent.storm_elemental.enabled
   if not Talent(storm_elemental_talent) Spell(fire_elemental)
   #storm_elemental,if=talent.storm_elemental.enabled&(!talent.icefury.enabled|!buff.icefury.up&!cooldown.icefury.up)&(!talent.ascendance.enabled|!cooldown.ascendance.up)
   if Talent(storm_elemental_talent) and { not Talent(icefury_talent) or not BuffPresent(icefury_buff) and not { not SpellCooldown(icefury) > 0 } } and { not Talent(ascendance_talent) or not { not SpellCooldown(ascendance_elemental) > 0 } } Spell(storm_elemental)
   #earth_elemental,if=!talent.primal_elementalist.enabled|talent.primal_elementalist.enabled&(cooldown.fire_elemental.remains<120&!talent.storm_elemental.enabled|cooldown.storm_elemental.remains<120&talent.storm_elemental.enabled)
   if not Talent(primal_elementalist_talent) or Talent(primal_elementalist_talent) and { SpellCooldown(fire_elemental) < 120 and not Talent(storm_elemental_talent) or SpellCooldown(storm_elemental) < 120 and Talent(storm_elemental_talent) } Spell(earth_elemental)
-  #use_items
-  ElementalUseItemActions()
 
   unless Spell(concentrated_flame_essence)
   {
@@ -522,12 +523,12 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 # wind_shear
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("SHAMAN", "elemental", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_shaman_enhancement"
-    local desc = "[8.2] Simulationcraft: T23_Shaman_Enhancement"
-    local code = [[
+        OvaleScripts:RegisterScript("SHAMAN", "elemental", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_shaman_enhancement"
+        local desc = "[8.2] Simulationcraft: T23_Shaman_Enhancement"
+        local code = [[
 # Based on SimulationCraft profile "T23_Shaman_Enhancement".
 #	class=shaman
 #	spec=enhancement
@@ -1393,12 +1394,12 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # windstrike
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("SHAMAN", "enhancement", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_shaman_restoration"
-    local desc = "[8.2] Simulationcraft: T23_Shaman_Restoration"
-    local code = [[
+        OvaleScripts:RegisterScript("SHAMAN", "enhancement", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_shaman_restoration"
+        local desc = "[8.2] Simulationcraft: T23_Shaman_Restoration"
+        local code = [[
 # Based on SimulationCraft profile "T23_Shaman_Restoration".
 #	class=shaman
 #	spec=restoration
@@ -1615,5 +1616,6 @@ AddIcon checkbox=opt_shaman_restoration_aoe help=cd specialization=restoration
 # wind_shear
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("SHAMAN", "restoration", name, desc, code, "script")
+        OvaleScripts:RegisterScript("SHAMAN", "restoration", name, desc, code, "script")
+    end
 end

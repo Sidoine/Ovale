@@ -1,20 +1,18 @@
 import { L } from "./Localization";
 import LibDataBroker from "@wowts/lib_data_broker-1.1";
 import LibDBIcon from "@wowts/lib_d_b_icon-1.0";
-import { OvaleDebug } from "./Debug";
-import { OvaleOptions } from "./Options";
-import { Ovale } from "./Ovale";
-import { OvaleScripts, DEFAULT_NAME } from "./Scripts";
-import { OvaleVersion } from "./Version";
-import { OvaleFrameModule } from "./Frame";
-import aceEvent from "@wowts/ace_event-3.0";
+import { OvaleOptionsClass } from "./Options";
+import { DEFAULT_NAME, OvaleScriptsClass } from "./Scripts";
+import { OvaleVersionClass } from "./Version";
+import { OvaleFrameModuleClass } from "./Frame";
+import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { pairs, LuaArray } from "@wowts/lua";
 import { insert } from "@wowts/table";
 import { CreateFrame, EasyMenu, IsShiftKeyDown, UIParent, UIGameTooltip, UIFrame } from "@wowts/wow-mock";
-import { OvalePaperDoll } from "./PaperDoll";
-
-let OvaleDataBrokerBase = Ovale.NewModule("OvaleDataBroker", aceEvent);
-export let OvaleDataBroker: OvaleDataBrokerClass;
+import { OvalePaperDollClass } from "./PaperDoll";
+import { AceModule } from "@wowts/tsaddon";
+import { OvaleClass } from "./Ovale";
+import { OvaleDebugClass } from "./Debug";
 
 let CLASS_ICONS = {
     ["DEATHKNIGHT"]: "Interface\\Icons\\ClassIcon_DeathKnight",
@@ -32,33 +30,9 @@ let CLASS_ICONS = {
 }
 let self_menuFrame: UIFrame = undefined;
 let self_tooltipTitle: string = undefined;
-{
-    let defaultDB = {
-        minimap: {
-        }
-    }
-    let options = {
-        minimap: {
-            order: 25,
-            type: "toggle",
-            name: L["Show minimap icon"],
-            get: function (info: any) {
-                return !Ovale.db.profile.apparence.minimap.hide;
-            },
-            set: function (info: any, value: boolean) {
-                Ovale.db.profile.apparence.minimap.hide = !value;
-                OvaleDataBroker.UpdateIcon();
-            }
-        }
-    }
-    for (const [k, v] of pairs(defaultDB)) {
-        OvaleOptions.defaultDB.profile.apparence[k] = v;
-    }
-    for (const [k, v] of pairs(options)) {
-        OvaleOptions.options.args.apparence.args[k] = v;
-    }
-    OvaleOptions.RegisterOptions(OvaleDataBroker);
-}
+let defaultDB = {
+    minimap: {}
+};
 
 interface MenuItem {
     text: string;
@@ -66,96 +40,129 @@ interface MenuItem {
     func?: () => void;
 }
 
-const OnClick = function(fr: any, button: "LeftButton") {
-    if (button == "LeftButton") {
-        let menu:LuaArray<MenuItem> = {
-            1: {
-                text: L["Script"],
-                isTitle: true
-            }
-        }
-        const scriptType = (!Ovale.db.profile.showHiddenScripts && "script") || undefined;
-        let descriptions = OvaleScripts.GetDescriptions(scriptType);
-        for (const [name, description] of pairs(descriptions)) {
-            let menuItem = {
-                text: description,
-                func: function () {
-                    OvaleScripts.SetScript(name);
+export class OvaleDataBrokerClass {
+    private broker: any = undefined;
+    private module: AceEvent & AceModule;
+
+    constructor(
+        private ovalePaperDoll: OvalePaperDollClass,
+        private ovaleFrameModule: OvaleFrameModuleClass,
+        private ovaleOptions: OvaleOptionsClass,
+        private ovale: OvaleClass,
+        private ovaleDebug: OvaleDebugClass,
+        private ovaleScripts: OvaleScriptsClass,
+        private ovaleVersion: OvaleVersionClass) {
+        this.module = ovale.createModule("OvaleDataBroker", this.OnInitialize, this.OnDisable, aceEvent);
+        let options = {
+            minimap: {
+                order: 25,
+                type: "toggle",
+                name: L["Show minimap icon"],
+                get: (info: any) => {
+                    return !this.ovaleOptions.db.profile.apparence.minimap.hide;
+                },
+                set: (info: any, value: boolean) => {
+                    this.ovaleOptions.db.profile.apparence.minimap.hide = !value;
+                    this.UpdateIcon();
                 }
             }
-            insert(menu, menuItem);
         }
-        self_menuFrame = self_menuFrame || CreateFrame("Frame", "OvaleDataBroker_MenuFrame", UIParent, "UIDropDownMenuTemplate");
-        EasyMenu(menu, self_menuFrame, "cursor", 0, 0, "MENU");
-    } else if (button == "MiddleButton") {
-        OvaleFrameModule.frame.ToggleOptions();
-    } else if (button == "RightButton") {
-        if (IsShiftKeyDown()) {
-            OvaleDebug.DoTrace(true);
-        } else {
-            OvaleOptions.ToggleConfig();
+        for (const [k, v] of pairs(defaultDB)) {
+            this.ovaleOptions.defaultDB.profile.apparence[k] = v;
+        }
+        for (const [k, v] of pairs(options)) {
+            this.ovaleOptions.options.args.apparence.args[k] = v;
+        }
+        this.ovaleOptions.RegisterOptions(this);
+    }
+
+    private OnTooltipShow = (tooltip: UIGameTooltip) => {
+        self_tooltipTitle = self_tooltipTitle || `${this.ovale.GetName()} ${this.ovaleVersion.version}`;
+        tooltip.SetText(self_tooltipTitle, 1, 1, 1);
+        tooltip.AddLine(L["Click to select the script."]);
+        tooltip.AddLine(L["Middle-Click to toggle the script options panel."]);
+        tooltip.AddLine(L["Right-Click for options."]);
+        tooltip.AddLine(L["Shift-Right-Click for the current trace log."]);
+    }
+
+    private OnClick = (fr: any, button: "LeftButton") => {
+        if (button == "LeftButton") {
+            let menu:LuaArray<MenuItem> = {
+                1: {
+                    text: L["Script"],
+                    isTitle: true
+                }
+            }
+            const scriptType = (!this.ovaleOptions.db.profile.showHiddenScripts && "script") || undefined;
+            let descriptions = this.ovaleScripts.GetDescriptions(scriptType);
+            for (const [name, description] of pairs(descriptions)) {
+                let menuItem = {
+                    text: description,
+                    func: () => {
+                        this.ovaleScripts.SetScript(name);
+                    }
+                }
+                insert(menu, menuItem);
+            }
+            self_menuFrame = self_menuFrame || CreateFrame("Frame", "OvaleDataBroker_MenuFrame", UIParent, "UIDropDownMenuTemplate");
+            EasyMenu(menu, self_menuFrame, "cursor", 0, 0, "MENU");
+        } else if (button == "MiddleButton") {
+            this.ovaleFrameModule.frame.ToggleOptions();
+        } else if (button == "RightButton") {
+            if (IsShiftKeyDown()) {
+                this.ovaleDebug.DoTrace(true);
+            } else {
+                this.ovaleOptions.ToggleConfig();
+            }
         }
     }
-}
-const OnTooltipShow = function(tooltip: UIGameTooltip) {
-    self_tooltipTitle = self_tooltipTitle || `${Ovale.GetName()} ${OvaleVersion.version}`;
-    tooltip.SetText(self_tooltipTitle, 1, 1, 1);
-    tooltip.AddLine(L["Click to select the script."]);
-    tooltip.AddLine(L["Middle-Click to toggle the script options panel."]);
-    tooltip.AddLine(L["Right-Click for options."]);
-    tooltip.AddLine(L["Shift-Right-Click for the current trace log."]);
-}
 
-class OvaleDataBrokerClass extends OvaleDataBrokerBase {
-    broker: any = undefined;
-    OnInitialize() {    
+    private OnInitialize = () => {    
         if (LibDataBroker) {
             let broker = {
                 type: "data source",
                 text: "",
-                icon: CLASS_ICONS[Ovale.playerClass],
-                OnClick: OnClick,
-                OnTooltipShow: OnTooltipShow
+                icon: CLASS_ICONS[this.ovale.playerClass],
+                OnClick: this.OnClick,
+                OnTooltipShow: this.OnTooltipShow
             }
-            this.broker = LibDataBroker.NewDataObject(Ovale.GetName(), broker);
+            this.broker = LibDataBroker.NewDataObject(this.ovale.GetName(), broker);
             if (LibDBIcon) {
-                LibDBIcon.Register(Ovale.GetName(), this.broker, Ovale.db.profile.apparence.minimap);
+                LibDBIcon.Register(this.ovale.GetName(), this.broker, this.ovaleOptions.db.profile.apparence.minimap);
             }
         }
    
         if (this.broker) {
-            this.RegisterMessage("Ovale_ProfileChanged", "UpdateIcon");
-            this.RegisterMessage("Ovale_ScriptChanged");
-            this.RegisterMessage("Ovale_SpecializationChanged", "Ovale_ScriptChanged");
-			this.RegisterEvent("PLAYER_ENTERING_WORLD", "Ovale_ScriptChanged");
+            this.module.RegisterMessage("Ovale_ProfileChanged", this.UpdateIcon);
+            this.module.RegisterMessage("Ovale_ScriptChanged", this.Ovale_ScriptChanged);
+            this.module.RegisterMessage("Ovale_SpecializationChanged", this.Ovale_ScriptChanged);
+			this.module.RegisterEvent("PLAYER_ENTERING_WORLD", this.Ovale_ScriptChanged);
             this.Ovale_ScriptChanged();
             this.UpdateIcon();
         }
     }
 
-    OnDisable() {
+    private OnDisable = () => {
         if (this.broker) {
-			this.UnregisterEvent("PLAYER_ENTERING_WORLD");
-            this.UnregisterMessage("Ovale_SpecializationChanged");
-            this.UnregisterMessage("Ovale_ProfileChanged");
-            this.UnregisterMessage("Ovale_ScriptChanged");
+			this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
+            this.module.UnregisterMessage("Ovale_SpecializationChanged");
+            this.module.UnregisterMessage("Ovale_ProfileChanged");
+            this.module.UnregisterMessage("Ovale_ScriptChanged");
         }
     }
-    UpdateIcon() {
+    private UpdateIcon = () => {
         if (LibDBIcon && this.broker) {
-            const minimap = Ovale.db.profile.apparence.minimap
-            LibDBIcon.Refresh(Ovale.GetName(), minimap);
+            const minimap = this.ovaleOptions.db.profile.apparence.minimap
+            LibDBIcon.Refresh(this.ovale.GetName(), minimap);
             if (minimap && minimap.hide) {
-                LibDBIcon.Hide(Ovale.GetName());
+                LibDBIcon.Hide(this.ovale.GetName());
             } else {
-                LibDBIcon.Show(Ovale.GetName());
+                LibDBIcon.Show(this.ovale.GetName());
             }
         }
     }
-    Ovale_ScriptChanged() {
-        const script = Ovale.db.profile.source[`${Ovale.playerClass}_${OvalePaperDoll.GetSpecialization()}`];
-        this.broker.text = (script == DEFAULT_NAME && OvaleScripts.GetDefaultScriptName(Ovale.playerClass, OvalePaperDoll.GetSpecialization())) || script || "Disabled";
+    private Ovale_ScriptChanged = () => {
+        const script = this.ovaleOptions.db.profile.source[`${this.ovale.playerClass}_${this.ovalePaperDoll.GetSpecialization()}`];
+        this.broker.text = (script == DEFAULT_NAME && this.ovaleScripts.GetDefaultScriptName(this.ovale.playerClass, this.ovalePaperDoll.GetSpecialization())) || script || "Disabled";
     }
 }
-
-OvaleDataBroker = new OvaleDataBrokerClass();

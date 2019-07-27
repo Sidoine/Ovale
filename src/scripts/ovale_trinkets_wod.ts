@@ -1,5 +1,6 @@
-import { OvaleScripts } from "../Scripts";
-export function register() {
+import { OvaleScriptsClass } from "../Scripts";
+
+export function registerWodTrinkets(OvaleScripts: OvaleScriptsClass) {
     let name = "ovale_trinkets_wod";
     let desc = "[6.2] Ovale: Trinkets (Warlords of Draenor)";
     let code = `
