@@ -3,7 +3,7 @@ import { ipairs, LuaArray, lualength, kpairs } from "@wowts/lua";
 import { wrap, LuaIterable } from "@wowts/coroutine";
 import { find, sub } from "@wowts/string";
 
-export type Tokenizer = (tok:string) => [string, string];
+export type Tokenizer = (tok:string) => [string | undefined, string | undefined];
 
 export interface LexerFilter {
     space?: Tokenizer;

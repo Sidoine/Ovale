@@ -173,13 +173,13 @@ export class OvaleActionBarClass {
         this.profiler.StartProfiling("OvaleActionBar_UpdateActionSlot");
         const action = this.action[slot];
         if (this.spell[<number>action] == slot) {
-            this.spell[<number>action] = undefined;
+            delete this.spell[<number>action];
         } else if (this.item[action] == slot) {
-            this.item[action] = undefined;
+            delete this.item[action];
         } else if (this.macro[action] == slot) {
-            this.macro[action] = undefined;
+            delete this.macro[action];
         }
-        this.action[slot] = undefined;
+        delete this.action[slot];
         let [actionType, actionId] = GetActionInfo(slot);
         if (actionType == "spell") {
             const id = tonumber(actionId);

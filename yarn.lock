@@ -548,10 +548,10 @@
   dependencies:
     "@wowts/lua" "^1.0.5"
 
-"@wowts/tsaddon@^1.0.0", "@wowts/tsaddon@^1.1.2":
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/@wowts/tsaddon/-/tsaddon-1.1.2.tgz#d6907a4f25e49889ebc68d9502bb1c86bc050ab8"
-  integrity sha512-eSL+mD7I+7QELXyfHE3vG3JdWnKFZJ3UXMuFJa1fOWbQhJYg/khN2ak8nRdcVsMsc2d/gBpdFAWoaztmD7aG4g==
+"@wowts/tsaddon@^1.0.0", "@wowts/tsaddon@^1.1.2", "@wowts/tsaddon@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@wowts/tsaddon/-/tsaddon-1.2.0.tgz#da81559049479fe34dcd116c2e86e971bea68633"
+  integrity sha512-80fFkdqEOVgiYJVOzlPr6qJ2tKg4DmR8rf7YXT3eVLJOGpfuZDv68+YSTKHFpBcPc7w0x4MaotQQorovUoN3cQ==
   dependencies:
     "@wowts/lua" "^1.0.3"
     "@wowts/table" "^1.0.0"
