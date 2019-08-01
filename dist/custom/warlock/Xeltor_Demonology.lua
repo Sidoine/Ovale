@@ -25,7 +25,7 @@ AddIcon specialization=2 help=main
 	# Save ass
 	SaveActions()
 	
-	if wet() and not mounted() Spell(unending_breath)
+	if wet() and not mounted() and not BuffPresent(unending_breath) Spell(unending_breath)
 	
 	# Rotation
 	if InCombat() and target.InRange(shadow_bolt) and HasFullControl()
