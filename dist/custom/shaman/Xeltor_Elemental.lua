@@ -2,7 +2,7 @@ local __exports = LibStub:GetLibrary("ovale/scripts/ovale_shaman")
 if not __exports then return end
 __exports.registerShamanElementalXeltor = function(OvaleScripts)
 do
-	local name = "xeltor_elemental_815"
+	local name = "xeltor_elemental"
 	local desc = "[Xel][8.2] Shaman: Elemental"
 	local code = [[
 Include(ovale_common)
@@ -26,6 +26,8 @@ AddIcon specialization=1 help=main
 	
 	if target.InRange(lightning_bolt_elemental) and HasFullControl() and InCombat()
     {
+		if PreviousGCDSpell(lava_burst) and not target.DebuffPresent(flame_shock_debuff) Spell(flame_shock)
+		
 		# Cooldowns
 		if Boss() and { Speed() == 0 or CanMove() > 0 } ElementalDefaultCdActions()
 		
@@ -77,7 +79,7 @@ AddFunction ElementalUseItemActions
 AddFunction ElementalDefaultMainActions
 {
  #totem_mastery,if=talent.totem_mastery.enabled&buff.resonance_totem.remains<2
- if Talent(totem_mastery_talent_elemental) and TotemRemaining(totem_mastery_elemental) < 2 and { InCombat() or not BuffPresent(ele_resonance_totem_buff) } Spell(totem_mastery_elemental)
+ # if Talent(totem_mastery_talent_elemental) and TotemRemaining(totem_mastery_elemental) < 2 and { InCombat() or not BuffPresent(ele_resonance_totem_buff) } Spell(totem_mastery_elemental)
  #run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
  if Enemies(tagged=1) > 2 and { Enemies(tagged=1) > 2 or Enemies(tagged=1) > 2 } ElementalAoeMainActions()
 
@@ -264,7 +266,7 @@ AddFunction ElementalPrecombatMainActions
  #augmentation
  #snapshot_stats
  #totem_mastery
- if InCombat() or not BuffPresent(ele_resonance_totem_buff) Spell(totem_mastery_elemental)
+ # if InCombat() or not BuffPresent(ele_resonance_totem_buff) Spell(totem_mastery_elemental)
  #elemental_blast,if=talent.elemental_blast.enabled
  if Talent(elemental_blast_talent) Spell(elemental_blast)
  #lava_burst,if=!talent.elemental_blast.enabled&spell_targets.chain_lightning<3
@@ -362,7 +364,7 @@ AddFunction ElementalSingleTargetMainActions
  #flame_shock,target_if=refreshable&!buff.surge_of_power.up
  if target.Refreshable(flame_shock_debuff) and not BuffPresent(surge_of_power_buff) Spell(flame_shock)
  #totem_mastery,if=talent.totem_mastery.enabled&(buff.resonance_totem.remains<6|(buff.resonance_totem.remains<(buff.ascendance.duration+cooldown.ascendance.remains)&cooldown.ascendance.remains<15))
- if Talent(totem_mastery_talent_elemental) and { TotemRemaining(totem_mastery_elemental) < 6 or TotemRemaining(totem_mastery_elemental) < BaseDuration(ascendance_elemental_buff) + SpellCooldown(ascendance_elemental) and SpellCooldown(ascendance_elemental) < 15 } and { InCombat() or not BuffPresent(ele_resonance_totem_buff) } Spell(totem_mastery_elemental)
+ # if Talent(totem_mastery_talent_elemental) and { TotemRemaining(totem_mastery_elemental) < 6 or TotemRemaining(totem_mastery_elemental) < BaseDuration(ascendance_elemental_buff) + SpellCooldown(ascendance_elemental) and SpellCooldown(ascendance_elemental) < 15 } and { InCombat() or not BuffPresent(ele_resonance_totem_buff) } Spell(totem_mastery_elemental)
  #frost_shock,if=talent.icefury.enabled&buff.icefury.up&(buff.icefury.remains<gcd*4*buff.icefury.stack|buff.stormkeeper.up|!talent.master_of_the_elements.enabled)
  if Talent(icefury_talent) and BuffPresent(icefury_buff) and { BuffRemaining(icefury_buff) < GCD() * 4 * BuffStacks(icefury_buff) or BuffPresent(stormkeeper_buff) or not Talent(master_of_the_elements_talent) } Spell(frost_shock)
  #chain_lightning,if=buff.tectonic_thunder.up&!buff.stormkeeper.up&spell_targets.chain_lightning>1
