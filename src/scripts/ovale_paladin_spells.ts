@@ -57,10 +57,6 @@ Define(crusader_strike 35395)
 Define(divine_storm 53385)
 # Unleashes a whirl of divine energy, dealing 224239sw1 Holy damage to all nearby enemies.
   SpellInfo(divine_storm holypower=3)
-Define(empyrean_power_buff 286392)
-# Your attacks have a chance to make your next Divine Storm free and deal s1 additional damage.
-  SpellInfo(empyrean_power_buff channel=-0.001 gcd=0 offgcd=1)
-
 Define(execution_sentence 267798)
 # Calls down the Light's punishment upon an enemy target, dealing s1 Holy damage and increasing the target's Holy damage taken from your attacks by 267799s1 for 12 seconds.
   SpellInfo(execution_sentence holypower=3 cd=30 talent=execution_sentence_talent)

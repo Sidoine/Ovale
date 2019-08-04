@@ -316,7 +316,7 @@ Include(ovale_paladin_spells)
 
 AddFunction ds_castable
 {
- Enemies() >= 2 and not Talent(righteous_verdict_talent) or Enemies() >= 3 and Talent(righteous_verdict_talent) or BuffPresent(empyrean_power_buff) and target.DebuffExpires(judgment) and BuffExpires(divine_purpose_buff) and BuffExpires(avenging_wrath_autocrit_buff)
+ Enemies() >= 2 and not Talent(righteous_verdict_talent) or Enemies() >= 3 and Talent(righteous_verdict_talent)
 }
 
 AddFunction wings_pool
@@ -494,7 +494,7 @@ AddFunction RetributionGeneratorsCdPostConditions
 AddFunction RetributionFinishersMainActions
 {
  #variable,name=wings_pool,value=!equipped.169314&(!talent.crusade.enabled&cooldown.avenging_wrath.remains>gcd*3|cooldown.crusade.remains>gcd*3)|equipped.169314&(!talent.crusade.enabled&cooldown.avenging_wrath.remains>gcd*6|cooldown.crusade.remains>gcd*6)
- #variable,name=ds_castable,value=spell_targets.divine_storm>=2&!talent.righteous_verdict.enabled|spell_targets.divine_storm>=3&talent.righteous_verdict.enabled|buff.empyrean_power.up&debuff.judgment.down&buff.divine_purpose.down&buff.avenging_wrath_autocrit.down
+ #variable,name=ds_castable,value=spell_targets.divine_storm>=2&!talent.righteous_verdict.enabled|spell_targets.divine_storm>=3&talent.righteous_verdict.enabled
  #inquisition,if=buff.avenging_wrath.down&(buff.inquisition.down|buff.inquisition.remains<8&holy_power>=3|talent.execution_sentence.enabled&cooldown.execution_sentence.remains<10&buff.inquisition.remains<15|cooldown.avenging_wrath.remains<15&buff.inquisition.remains<20&holy_power>=3)
  if BuffExpires(avenging_wrath_buff) and { BuffExpires(inquisition_buff) or BuffRemaining(inquisition_buff) < 8 and HolyPower() >= 3 or Talent(execution_sentence_talent) and SpellCooldown(execution_sentence) < 10 and BuffRemaining(inquisition_buff) < 15 or SpellCooldown(avenging_wrath) < 15 and BuffRemaining(inquisition_buff) < 20 and HolyPower() >= 3 } Spell(inquisition)
  #execution_sentence,if=spell_targets.divine_storm<=2&(!talent.crusade.enabled&cooldown.avenging_wrath.remains>10|talent.crusade.enabled&buff.crusade.down&cooldown.crusade.remains>10|buff.crusade.stack>=7)
@@ -555,8 +555,8 @@ AddFunction RetributionCooldownsShortCdPostConditions
 
 AddFunction RetributionCooldownsCdActions
 {
- #potion,if=(cooldown.guardian_of_azeroth.remains>90|!essence.condensed_lifeforce.major)&(buff.bloodlust.react|buff.avenging_wrath.up|buff.crusade.up&buff.crusade.remains<25)
- if { SpellCooldown(guardian_of_azeroth) > 90 or not AzeriteEssenceIsMajor(condensed_lifeforce_essence_id) } and { BuffPresent(bloodlust) or BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) and BuffRemaining(crusade_buff) < 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_focused_resolve usable=1)
+ #potion,if=buff.bloodlust.react|buff.avenging_wrath.up|buff.crusade.up&buff.crusade.remains<25
+ if { BuffPresent(bloodlust) or BuffPresent(avenging_wrath_buff) or BuffPresent(crusade_buff) and BuffRemaining(crusade_buff) < 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_focused_resolve usable=1)
  #lights_judgment,if=spell_targets.lights_judgment>=2|(!raid_event.adds.exists|raid_event.adds.in>75)
  if Enemies() >= 2 or not False(raid_event_adds_exists) or 600 > 75 Spell(lights_judgment)
  #fireblood,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10
@@ -717,21 +717,17 @@ AddIcon checkbox=opt_paladin_retribution_aoe help=cd specialization=retribution
 # 169314
 # arcane_torrent_holy
 # avenging_wrath
-# avenging_wrath_autocrit_buff
 # avenging_wrath_buff
 # blade_of_justice
 # blood_of_the_enemy
 # bloodlust
 # concentrated_flame_essence
-# condensed_lifeforce_essence_id
 # consecration_retribution
 # crusade
 # crusade_buff
 # crusade_talent
 # crusader_strike
-# divine_purpose_buff
 # divine_storm
-# empyrean_power_buff
 # execution_sentence
 # execution_sentence_talent
 # fireblood

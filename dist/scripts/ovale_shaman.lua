@@ -201,7 +201,7 @@ AddFunction ElementalPrecombatCdActions
    #storm_elemental,if=talent.storm_elemental.enabled
    if Talent(storm_elemental_talent) Spell(storm_elemental)
    #potion
-   if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
+   if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_intellect usable=1)
   }
  }
 }
@@ -336,7 +336,7 @@ AddFunction ElementalDefaultCdActions
  #bloodlust,if=azerite.ancestral_resonance.enabled
  if HasAzeriteTrait(ancestral_resonance_trait) ElementalBloodlust()
  #potion,if=expected_combat_length-time<30|cooldown.fire_elemental.remains>120|cooldown.storm_elemental.remains>120
- if { 600 - TimeInCombat() < 30 or SpellCooldown(fire_elemental) > 120 or SpellCooldown(storm_elemental) > 120 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
+ if { 600 - TimeInCombat() < 30 or SpellCooldown(fire_elemental) > 120 or SpellCooldown(storm_elemental) > 120 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_intellect usable=1)
  #wind_shear
  ElementalInterruptActions()
 
@@ -487,7 +487,7 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 # icefury_buff
 # icefury_talent
 # igneous_potential_trait
-# item_unbridled_fury
+# item_battle_potion_of_intellect
 # lava_beam
 # lava_burst
 # lava_shock_buff
@@ -1464,7 +1464,7 @@ AddFunction RestorationPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_intellect usable=1)
 }
 
 AddFunction RestorationPrecombatCdPostConditions
@@ -1513,7 +1513,7 @@ AddFunction RestorationDefaultShortCdPostConditions
 AddFunction RestorationDefaultCdActions
 {
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_intellect usable=1)
  #wind_shear
  RestorationInterruptActions()
  #spiritwalkers_grace,moving=1,if=movement.distance>6
@@ -1611,7 +1611,7 @@ AddIcon checkbox=opt_shaman_restoration_aoe help=cd specialization=restoration
 # flame_shock_restoration
 # flame_shock_restoration_debuff
 # hex
-# item_unbridled_fury
+# item_battle_potion_of_intellect
 # lava_burst
 # lightning_bolt
 # quaking_palm

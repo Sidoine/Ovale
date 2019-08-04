@@ -220,8 +220,8 @@ AddFunction AssassinationEssencesCdActions
   if target.DebuffPresent(vendetta_debuff) and { not Talent(toxic_blade_talent) or target.DebuffPresent(toxic_blade_debuff) and ComboPointsDeficit() <= 1 or target.DebuffRemaining(vendetta_debuff) <= 10 } or target.TimeToDie() <= 10 Spell(blood_of_the_enemy)
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
-  #focused_azerite_beam,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60&energy<70
-  if Enemies() >= 2 or 600 > 60 and Energy() < 70 Spell(focused_azerite_beam_essence)
+  #focused_azerite_beam,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60
+  if Enemies() >= 2 or 600 > 60 Spell(focused_azerite_beam_essence)
 
   unless { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
   {
@@ -1590,8 +1590,8 @@ AddFunction SubtletyEssencesCdActions
   Spell(blood_of_the_enemy)
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
-  #focused_azerite_beam,if=(spell_targets.shuriken_storm>=2|raid_event.adds.in>60)&!cooldown.symbols_of_death.up&!buff.symbols_of_death.up&energy.deficit>=30
-  if { Enemies() >= 2 or 600 > 60 } and not { not SpellCooldown(symbols_of_death) > 0 } and not BuffPresent(symbols_of_death_buff) and EnergyDeficit() >= 30 Spell(focused_azerite_beam_essence)
+  #focused_azerite_beam,if=(spell_targets.shuriken_storm>=2|raid_event.adds.in>60)&!cooldown.symbols_of_death.up&!buff.symbols_of_death.up
+  if { Enemies() >= 2 or 600 > 60 } and not { not SpellCooldown(symbols_of_death) > 0 } and not BuffPresent(symbols_of_death_buff) Spell(focused_azerite_beam_essence)
 
   unless { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
   {
