@@ -444,6 +444,30 @@ __exports.Emiter = __class(nil, {
                 elseif className == "ROGUE" and specialization == "assassination" and action == "vanish" then
                     annotation.vanish = className
                     conditionCode = format("CheckBoxOn(opt_vanish)", action)
+				elseif className == "ROGUE" and specialization == "subtlety" and action == "shadowstrike" then
+                    conditionCode = "target.InRange(shadowstrike)"
+				elseif className == "ROGUE" and specialization == "subtlety" and action == "backstab" then
+                    conditionCode = "target.InRange(backstab)"
+				elseif className == "ROGUE" and specialization == "subtlety" and action == "eviscerate" then
+                    conditionCode = "target.InRange(eviscerate)"
+				elseif className == "ROGUE" and specialization == "subtlety" and action == "stealth" then
+                    conditionCode = "target.InRange(shadowstep)"
+				elseif className == "ROGUE" and specialization == "subtlety" and action == "ambush" then
+                    conditionCode = "target.InRange(shadowstep)"
+				elseif className == "ROGUE" and specialization == "subtlety" and action == "shadow_dance" then
+                    conditionCode = "target.InRange(shadowstep)"
+				elseif className == "ROGUE" and specialization == "subtlety" and action == "shadow_blades" then
+                    conditionCode = "target.InRange(backstab)"
+				elseif className == "ROGUE" and specialization == "subtlety" and action == "nightblade" then
+                    conditionCode = "target.InRange(nightblade)"
+				elseif className == "ROGUE" and specialization == "subtlety" and action == "shuriken_storm" then
+                    conditionCode = "target.InRange(backstab)"
+				elseif className == "ROGUE" and specialization == "subtlety" and action == "kidney_shot" then
+                    conditionCode = "target.InRange(kidney_shot)"
+				elseif className == "ROGUE" and specialization == "subtlety" and action == "secret_technique" then
+                    conditionCode = "target.InRange(secret_technique)"
+				elseif className == "ROGUE" and specialization == "subtlety" and action == "shuriken_tornado" then
+                    conditionCode = "target.InRange(backstab)"
                 elseif className == "SHAMAN" and sub(action, 1, 11) == "ascendance_" then
                     local buffName = action .. "_buff"
                     self:AddSymbol(annotation, buffName)

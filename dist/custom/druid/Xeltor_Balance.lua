@@ -13,9 +13,13 @@ Include(druid_common_functions)
 
 AddIcon specialization=1 help=main
 {
-	if not mounted() and target.Present() and target.Exists() and not BuffPresent(travel_form)
+	if not mounted() and not BuffPresent(travel_form) and not Dead() and not PlayerIsResting()
 	{
-		if InCombat() or not target.IsFriend() and target.Distance(more 8) Spell(moonkin_form)
+		if InCombat() Spell(moonkin_form)
+		unless target.Present() and target.Distance(less 5)
+		{
+			if Speed() > 0 Spell(moonkin_form)
+		}
 	}
 	
 	if not mounted() and not BuffPresent(travel_form) and not Dead() SaveActions()
