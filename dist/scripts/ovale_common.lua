@@ -211,6 +211,7 @@ Define(archmages_incandescence_str_buff 177160)
 Define(sephuzs_secret_item 132452)
 Define(sephuzs_secret_buff 208051)
 	SpellInfo(sephuzs_secret_buff buff_cd=30 duration=10)
+Define(ashvanes_razor_coral_item 169311)
 	
 ###
 ### Essences
