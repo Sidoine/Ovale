@@ -9,8 +9,7 @@ AddIcon
 {
 	# Remove a line when you have its colour
 	# Spells
-	Texture(spell_shadow_ritualofsacrifice) # Sinister Strike
-	Texture(ability_rogue_shadowstrikes) # Mutilate (replaces Sinister Strike)
+	Texture(ability_rogue_shadowstrikes) # Mutilate
 	Texture(ability_rogue_garrote) # Garrote
 	Texture(ability_rogue_rupture) # Rupture
 	Texture(ability_rogue_disembowel) # Envenom
@@ -19,6 +18,10 @@ AddIcon
 	Texture(ability_kick) # Kick
 	Texture(ability_rogue_kidneyshot) # Kidney Shot
 	Texture(ability_cheapshot) # Cheap Shot
+	
+	# Poisons
+	Texture(spell_nature_corrosivebreath) # Deadly Poison
+	Texture(ability_poisonsting) # Crippling Poison
 	
 	# Buffs
 	Texture(ability_stealth) # Stealth

@@ -21,18 +21,18 @@ AddIcon specialization=2 help=main
 			if Speed() > 0 Spell(ghost_wolf)
 		}
 	}
-	if not InCombat() and not target.IsFriend() and not mounted() and target.Present() and Speed() == 0
+	if not InCombat() and not target.IsFriend() and not mounted() and target.Present()
 	{
 		if TotemRemaining(totem_mastery_enhancement) <= 2 * GCD() and not BuffPresent(enh_resonance_totem_buff) and Boss() Spell(totem_mastery_enhancement)
 	}
 	
 	# Interrupt
-	if InCombat() InterruptActions()
+	if InCombat() and target.RemainingCastTime() < 3 InterruptActions()
 	
 	# Save ass
 	if not mounted() SaveActions()
 	
-	if target.InRange(lava_lash) or target.InRange(wind_shear) and InCombat() and { target.HealthPercent() < 100 or target.istargetingplayer() }
+	if target.InRange(lava_lash) and HasFullControl()
     {
 		# Cooldowns
 		if Boss() EnhancementDefaultCdActions()
@@ -56,12 +56,12 @@ AddFunction InterruptActions
 {
 	if { target.HasManagedInterrupts() and target.MustBeInterrupted() } or { not target.HasManagedInterrupts() and target.IsInterruptible() }
 	{
-		if target.InRange(hex) and not target.Classification(worldboss) and target.RemainingCastTime() > CastTime(hex) + GCDRemaining() and target.CreatureType(Humanoid Beast) and { Speed() == 0 or CanMove() > 0 } Spell(hex)
+		if target.InRange(wind_shear) and target.IsInterruptible() Spell(wind_shear)
 		if target.Distance(less 5) and not target.Classification(worldboss) Spell(war_stomp)
 		if target.InRange(quaking_palm) and not target.Classification(worldboss) Spell(quaking_palm)
 		if not target.Classification(worldboss) and target.RemainingCastTime() > 2 and target.Distance(less 8) Spell(capacitor_totem)
 		if target.Distance(less 5) and not target.Classification(worldboss) Spell(sundering)
-		if target.InRange(wind_shear) and target.IsInterruptible() Spell(wind_shear)
+		if target.InRange(hex) and not target.Classification(worldboss) and target.RemainingCastTime() > CastTime(hex) + GCDRemaining() and target.CreatureType(Humanoid Beast) and { Speed() == 0 or CanMove() > 0 } Spell(hex)
 	}
 }
 

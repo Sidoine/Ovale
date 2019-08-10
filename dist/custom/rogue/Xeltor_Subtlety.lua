@@ -22,12 +22,12 @@ AddIcon specialization=3 help=main
 	}
 	if not InCombat() and target.Present() and target.Exists() and not target.IsFriend() and not mounted() and not Dead()
 	{
-		if target.InRange(marked_for_death) and Stealthed() Spell(cold_blood)
+		if target.InRange(marked_for_death) and Stealthed() and not BuffPresent(cold_blood) Spell(cold_blood)
 		#marked_for_death
 		if target.InRange(marked_for_death) and ComboPoints() < 5 Spell(marked_for_death)
 	}
 	
-	if InCombat() and { not target.IsFriend() or target.IsPvP() } InterruptActions()
+	if InCombat() InterruptActions()
 	if { HealthPercent() <= 25 or HealthPercent() < 70 and not InCombat() and not mounted() } and not Dead() and Energy() > 24 Spell(crimson_vial)
 	
 	if target.InRange(backstab)

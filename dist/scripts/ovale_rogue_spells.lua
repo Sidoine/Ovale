@@ -562,7 +562,7 @@ Define(pick_pocket 921)
 	SpellAddBuff(pistol_shot opportunity_buff=-1)
 	SpellRequire(pistol_shot energy_percent 50=buff,opportunity_buff)
 	SpellRequire(pistol_shot combopionts -2=buff,opportunity_buff talent=quick_draw_talent)
-
+Define(poisoned_knife 185565)
 	SpellInfo(poisoned_knife energy=40 combopoints=-1)
 Define(prey_on_the_weak_debuff 255909)
 	SpellInfo(prey_on_the_weak_debuff duration=6)
