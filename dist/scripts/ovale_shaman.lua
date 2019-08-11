@@ -289,8 +289,6 @@ AddFunction ElementalDefaultMainActions
  if Talent(totem_mastery_talent_elemental) and TotemRemaining(totem_mastery_elemental) < 2 Spell(totem_mastery_elemental)
  #concentrated_flame
  Spell(concentrated_flame_essence)
- #focused_azerite_beam
- Spell(focused_azerite_beam)
  #run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
  if Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } ElementalAoeMainActions()
 
@@ -308,8 +306,10 @@ AddFunction ElementalDefaultMainPostConditions
 
 AddFunction ElementalDefaultShortCdActions
 {
- unless Talent(totem_mastery_talent_elemental) and TotemRemaining(totem_mastery_elemental) < 2 and Spell(totem_mastery_elemental) or Spell(concentrated_flame_essence) or Spell(focused_azerite_beam)
+ unless Talent(totem_mastery_talent_elemental) and TotemRemaining(totem_mastery_elemental) < 2 and Spell(totem_mastery_elemental) or Spell(concentrated_flame_essence)
  {
+  #focused_azerite_beam
+  Spell(focused_azerite_beam)
   #purifying_blast
   Spell(purifying_blast)
   #the_unbound_force
@@ -331,7 +331,7 @@ AddFunction ElementalDefaultShortCdActions
 
 AddFunction ElementalDefaultShortCdPostConditions
 {
- Talent(totem_mastery_talent_elemental) and TotemRemaining(totem_mastery_elemental) < 2 and Spell(totem_mastery_elemental) or Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } and ElementalAoeShortCdPostConditions() or ElementalSingletargetShortCdPostConditions()
+ Talent(totem_mastery_talent_elemental) and TotemRemaining(totem_mastery_elemental) < 2 and Spell(totem_mastery_elemental) or Spell(concentrated_flame_essence) or Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } and ElementalAoeShortCdPostConditions() or ElementalSingletargetShortCdPostConditions()
 }
 
 AddFunction ElementalDefaultCdActions
@@ -680,8 +680,6 @@ AddFunction EnhancementPriorityMainActions
  if TotemRemaining(totem_mastery_enhancement) <= 2 * GCD() Spell(totem_mastery_enhancement)
  #sundering,if=active_enemies>=3&(!essence.blood_of_the_enemy.major|(essence.blood_of_the_enemy.major&(buff.seething_rage.up|cooldown.blood_of_the_enemy.remains>40)))
  if Enemies() >= 3 and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) and { BuffPresent(seething_rage) or SpellCooldown(blood_of_the_enemy) > 40 } } Spell(sundering)
- #focused_azerite_beam,if=active_enemies>=3
- if Enemies() >= 3 Spell(focused_azerite_beam)
  #rockbiter,if=talent.landslide.enabled&!buff.landslide.up&charges_fractional>1.7
  if Talent(landslide_talent) and not BuffPresent(landslide_buff) and Charges(rockbiter count=0) > 1.7 Spell(rockbiter)
  #frostbrand,if=(azerite.natural_harmony.enabled&buff.natural_harmony_frost.remains<=2*gcd)&talent.hailstorm.enabled&variable.furyCheck_FB
@@ -703,17 +701,21 @@ AddFunction EnhancementPriorityShortCdActions
   #the_unbound_force,if=buff.reckless_force.up|time<5
   if BuffPresent(reckless_force_buff) or TimeInCombat() < 5 Spell(the_unbound_force)
 
-  unless AzeriteTraitRank(primal_primer_trait) >= 2 and target.DebuffStacks(primal_primer) == 10 and Enemies() == 1 and freezerburn_enabled() and furyCheck_LL() and Spell(lava_lash) or not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or not BuffPresent(fury_of_air_buff) and Maelstrom() >= 20 and Enemies() >= 1 + freezerburn_enabled() and Spell(fury_of_air) or BuffPresent(fury_of_air_buff) and Enemies() < 1 + freezerburn_enabled() and Spell(fury_of_air) or TotemRemaining(totem_mastery_enhancement) <= 2 * GCD() and Spell(totem_mastery_enhancement) or Enemies() >= 3 and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) and { BuffPresent(seething_rage) or SpellCooldown(blood_of_the_enemy) > 40 } } and Spell(sundering) or Enemies() >= 3 and Spell(focused_azerite_beam)
+  unless AzeriteTraitRank(primal_primer_trait) >= 2 and target.DebuffStacks(primal_primer) == 10 and Enemies() == 1 and freezerburn_enabled() and furyCheck_LL() and Spell(lava_lash) or not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or not BuffPresent(fury_of_air_buff) and Maelstrom() >= 20 and Enemies() >= 1 + freezerburn_enabled() and Spell(fury_of_air) or BuffPresent(fury_of_air_buff) and Enemies() < 1 + freezerburn_enabled() and Spell(fury_of_air) or TotemRemaining(totem_mastery_enhancement) <= 2 * GCD() and Spell(totem_mastery_enhancement) or Enemies() >= 3 and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) and { BuffPresent(seething_rage) or SpellCooldown(blood_of_the_enemy) > 40 } } and Spell(sundering)
   {
+   #focused_azerite_beam,if=active_enemies>=3
+   if Enemies() >= 3 Spell(focused_azerite_beam)
    #purifying_blast,if=active_enemies>=3
    if Enemies() >= 3 Spell(purifying_blast)
+   #ripple_in_space,if=active_enemies>=3
+   if Enemies() >= 3 Spell(ripple_in_space_essence)
   }
  }
 }
 
 AddFunction EnhancementPriorityShortCdPostConditions
 {
- Enemies() >= 8 - TalentPoints(forceful_winds_talent) * 3 and freezerburn_enabled() and furyCheck_CL() and Spell(crash_lightning) or AzeriteTraitRank(primal_primer_trait) >= 2 and target.DebuffStacks(primal_primer) == 10 and Enemies() == 1 and freezerburn_enabled() and furyCheck_LL() and Spell(lava_lash) or not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or not BuffPresent(fury_of_air_buff) and Maelstrom() >= 20 and Enemies() >= 1 + freezerburn_enabled() and Spell(fury_of_air) or BuffPresent(fury_of_air_buff) and Enemies() < 1 + freezerburn_enabled() and Spell(fury_of_air) or TotemRemaining(totem_mastery_enhancement) <= 2 * GCD() and Spell(totem_mastery_enhancement) or Enemies() >= 3 and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) and { BuffPresent(seething_rage) or SpellCooldown(blood_of_the_enemy) > 40 } } and Spell(sundering) or Enemies() >= 3 and Spell(focused_azerite_beam) or Talent(landslide_talent) and not BuffPresent(landslide_buff) and Charges(rockbiter count=0) > 1.7 and Spell(rockbiter) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_frost) <= 2 * GCD() and Talent(hailstorm_talent) and furyCheck_FB() and Spell(frostbrand) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_fire) <= 2 * GCD() and Spell(flametongue) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_nature) <= 2 * GCD() and Maelstrom() < 70 and Spell(rockbiter)
+ Enemies() >= 8 - TalentPoints(forceful_winds_talent) * 3 and freezerburn_enabled() and furyCheck_CL() and Spell(crash_lightning) or AzeriteTraitRank(primal_primer_trait) >= 2 and target.DebuffStacks(primal_primer) == 10 and Enemies() == 1 and freezerburn_enabled() and furyCheck_LL() and Spell(lava_lash) or not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or not BuffPresent(fury_of_air_buff) and Maelstrom() >= 20 and Enemies() >= 1 + freezerburn_enabled() and Spell(fury_of_air) or BuffPresent(fury_of_air_buff) and Enemies() < 1 + freezerburn_enabled() and Spell(fury_of_air) or TotemRemaining(totem_mastery_enhancement) <= 2 * GCD() and Spell(totem_mastery_enhancement) or Enemies() >= 3 and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) and { BuffPresent(seething_rage) or SpellCooldown(blood_of_the_enemy) > 40 } } and Spell(sundering) or Talent(landslide_talent) and not BuffPresent(landslide_buff) and Charges(rockbiter count=0) > 1.7 and Spell(rockbiter) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_frost) <= 2 * GCD() and Talent(hailstorm_talent) and furyCheck_FB() and Spell(frostbrand) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_fire) <= 2 * GCD() and Spell(flametongue) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_nature) <= 2 * GCD() and Maelstrom() < 70 and Spell(rockbiter)
 }
 
 AddFunction EnhancementPriorityCdActions
@@ -722,7 +724,7 @@ AddFunction EnhancementPriorityCdActions
 
 AddFunction EnhancementPriorityCdPostConditions
 {
- Enemies() >= 8 - TalentPoints(forceful_winds_talent) * 3 and freezerburn_enabled() and furyCheck_CL() and Spell(crash_lightning) or { BuffPresent(reckless_force_buff) or TimeInCombat() < 5 } and Spell(the_unbound_force) or AzeriteTraitRank(primal_primer_trait) >= 2 and target.DebuffStacks(primal_primer) == 10 and Enemies() == 1 and freezerburn_enabled() and furyCheck_LL() and Spell(lava_lash) or not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or not BuffPresent(fury_of_air_buff) and Maelstrom() >= 20 and Enemies() >= 1 + freezerburn_enabled() and Spell(fury_of_air) or BuffPresent(fury_of_air_buff) and Enemies() < 1 + freezerburn_enabled() and Spell(fury_of_air) or TotemRemaining(totem_mastery_enhancement) <= 2 * GCD() and Spell(totem_mastery_enhancement) or Enemies() >= 3 and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) and { BuffPresent(seething_rage) or SpellCooldown(blood_of_the_enemy) > 40 } } and Spell(sundering) or Enemies() >= 3 and Spell(focused_azerite_beam) or Enemies() >= 3 and Spell(purifying_blast) or Talent(landslide_talent) and not BuffPresent(landslide_buff) and Charges(rockbiter count=0) > 1.7 and Spell(rockbiter) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_frost) <= 2 * GCD() and Talent(hailstorm_talent) and furyCheck_FB() and Spell(frostbrand) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_fire) <= 2 * GCD() and Spell(flametongue) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_nature) <= 2 * GCD() and Maelstrom() < 70 and Spell(rockbiter)
+ Enemies() >= 8 - TalentPoints(forceful_winds_talent) * 3 and freezerburn_enabled() and furyCheck_CL() and Spell(crash_lightning) or { BuffPresent(reckless_force_buff) or TimeInCombat() < 5 } and Spell(the_unbound_force) or AzeriteTraitRank(primal_primer_trait) >= 2 and target.DebuffStacks(primal_primer) == 10 and Enemies() == 1 and freezerburn_enabled() and furyCheck_LL() and Spell(lava_lash) or not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or not BuffPresent(fury_of_air_buff) and Maelstrom() >= 20 and Enemies() >= 1 + freezerburn_enabled() and Spell(fury_of_air) or BuffPresent(fury_of_air_buff) and Enemies() < 1 + freezerburn_enabled() and Spell(fury_of_air) or TotemRemaining(totem_mastery_enhancement) <= 2 * GCD() and Spell(totem_mastery_enhancement) or Enemies() >= 3 and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) and { BuffPresent(seething_rage) or SpellCooldown(blood_of_the_enemy) > 40 } } and Spell(sundering) or Enemies() >= 3 and Spell(focused_azerite_beam) or Enemies() >= 3 and Spell(purifying_blast) or Enemies() >= 3 and Spell(ripple_in_space_essence) or Talent(landslide_talent) and not BuffPresent(landslide_buff) and Charges(rockbiter count=0) > 1.7 and Spell(rockbiter) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_frost) <= 2 * GCD() and Talent(hailstorm_talent) and furyCheck_FB() and Spell(frostbrand) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_fire) <= 2 * GCD() and Spell(flametongue) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_nature) <= 2 * GCD() and Maelstrom() < 70 and Spell(rockbiter)
 }
 
 ### actions.precombat
@@ -753,7 +755,13 @@ AddFunction EnhancementPrecombatCdActions
  #augmentation
  #snapshot_stats
  #potion
- if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
+ if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
+
+ unless Spell(lightning_shield)
+ {
+  #use_item,name=azsharas_font_of_power
+  EnhancementUseItemActions()
+ }
 }
 
 AddFunction EnhancementPrecombatCdPostConditions
@@ -875,8 +883,6 @@ AddFunction EnhancementFillerMainActions
 {
  #sundering,if=active_enemies<3
  if Enemies() < 3 Spell(sundering)
- #focused_azerite_beam,if=!buff.ascendance.up&!buff.molten_weapon.up&!buff.icy_edge.up&!buff.crackling_surge.up&!debuff.earthen_spike.up
- if not BuffPresent(ascendance_enhancement_buff) and not BuffPresent(molten_weapon_buff) and not BuffPresent(icy_edge_buff) and not BuffPresent(crackling_surge) and not target.DebuffPresent(earthen_spike_debuff) Spell(focused_azerite_beam)
  #concentrated_flame
  Spell(concentrated_flame_essence)
  #crash_lightning,if=talent.forceful_winds.enabled&active_enemies>1&variable.furyCheck_CL
@@ -907,10 +913,16 @@ AddFunction EnhancementFillerMainPostConditions
 
 AddFunction EnhancementFillerShortCdActions
 {
- unless Enemies() < 3 and Spell(sundering) or not BuffPresent(ascendance_enhancement_buff) and not BuffPresent(molten_weapon_buff) and not BuffPresent(icy_edge_buff) and not BuffPresent(crackling_surge) and not target.DebuffPresent(earthen_spike_debuff) and Spell(focused_azerite_beam)
+ unless Enemies() < 3 and Spell(sundering)
  {
+  #focused_azerite_beam,if=!buff.ascendance.up&!buff.molten_weapon.up&!buff.icy_edge.up&!buff.crackling_surge.up&!debuff.earthen_spike.up
+  if not BuffPresent(ascendance_enhancement_buff) and not BuffPresent(molten_weapon_buff) and not BuffPresent(icy_edge_buff) and not BuffPresent(crackling_surge) and not target.DebuffPresent(earthen_spike_debuff) Spell(focused_azerite_beam)
   #purifying_blast
   Spell(purifying_blast)
+  #ripple_in_space
+  Spell(ripple_in_space_essence)
+  #thundercharge
+  Spell(thundercharge)
 
   unless Spell(concentrated_flame_essence)
   {
@@ -922,7 +934,7 @@ AddFunction EnhancementFillerShortCdActions
 
 AddFunction EnhancementFillerShortCdPostConditions
 {
- Enemies() < 3 and Spell(sundering) or not BuffPresent(ascendance_enhancement_buff) and not BuffPresent(molten_weapon_buff) and not BuffPresent(icy_edge_buff) and not BuffPresent(crackling_surge) and not target.DebuffPresent(earthen_spike_debuff) and Spell(focused_azerite_beam) or Spell(concentrated_flame_essence) or Talent(forceful_winds_talent) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Talent(searing_assault_talent) and Spell(flametongue) or not HasAzeriteTrait(primal_primer_trait) and Talent(hot_hand_talent) and BuffPresent(hot_hand_buff) and Spell(lava_lash) or Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Maelstrom() < 70 and not BuffPresent(strength_of_earth_buff) and Spell(rockbiter) or Talent(crashing_storm_talent) and OCPool_CL() and Spell(crash_lightning) or OCPool_LL() and furyCheck_LL() and Spell(lava_lash) or Spell(rockbiter) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 + GCD() and furyCheck_FB() and Spell(frostbrand) or Spell(flametongue)
+ Enemies() < 3 and Spell(sundering) or Spell(concentrated_flame_essence) or Talent(forceful_winds_talent) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Talent(searing_assault_talent) and Spell(flametongue) or not HasAzeriteTrait(primal_primer_trait) and Talent(hot_hand_talent) and BuffPresent(hot_hand_buff) and Spell(lava_lash) or Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Maelstrom() < 70 and not BuffPresent(strength_of_earth_buff) and Spell(rockbiter) or Talent(crashing_storm_talent) and OCPool_CL() and Spell(crash_lightning) or OCPool_LL() and furyCheck_LL() and Spell(lava_lash) or Spell(rockbiter) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 + GCD() and furyCheck_FB() and Spell(frostbrand) or Spell(flametongue)
 }
 
 AddFunction EnhancementFillerCdActions
@@ -931,7 +943,7 @@ AddFunction EnhancementFillerCdActions
 
 AddFunction EnhancementFillerCdPostConditions
 {
- Enemies() < 3 and Spell(sundering) or not BuffPresent(ascendance_enhancement_buff) and not BuffPresent(molten_weapon_buff) and not BuffPresent(icy_edge_buff) and not BuffPresent(crackling_surge) and not target.DebuffPresent(earthen_spike_debuff) and Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(concentrated_flame_essence) or BuffStacks(lifeblood_buff) < 4 and Spell(worldvein_resonance_essence) or Talent(forceful_winds_talent) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Talent(searing_assault_talent) and Spell(flametongue) or not HasAzeriteTrait(primal_primer_trait) and Talent(hot_hand_talent) and BuffPresent(hot_hand_buff) and Spell(lava_lash) or Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Maelstrom() < 70 and not BuffPresent(strength_of_earth_buff) and Spell(rockbiter) or Talent(crashing_storm_talent) and OCPool_CL() and Spell(crash_lightning) or OCPool_LL() and furyCheck_LL() and Spell(lava_lash) or Spell(rockbiter) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 + GCD() and furyCheck_FB() and Spell(frostbrand) or Spell(flametongue)
+ Enemies() < 3 and Spell(sundering) or not BuffPresent(ascendance_enhancement_buff) and not BuffPresent(molten_weapon_buff) and not BuffPresent(icy_edge_buff) and not BuffPresent(crackling_surge) and not target.DebuffPresent(earthen_spike_debuff) and Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(ripple_in_space_essence) or Spell(thundercharge) or Spell(concentrated_flame_essence) or BuffStacks(lifeblood_buff) < 4 and Spell(worldvein_resonance_essence) or Talent(forceful_winds_talent) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Talent(searing_assault_talent) and Spell(flametongue) or not HasAzeriteTrait(primal_primer_trait) and Talent(hot_hand_talent) and BuffPresent(hot_hand_buff) and Spell(lava_lash) or Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Maelstrom() < 70 and not BuffPresent(strength_of_earth_buff) and Spell(rockbiter) or Talent(crashing_storm_talent) and OCPool_CL() and Spell(crash_lightning) or OCPool_LL() and furyCheck_LL() and Spell(lava_lash) or Spell(rockbiter) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 + GCD() and furyCheck_FB() and Spell(frostbrand) or Spell(flametongue)
 }
 
 ### actions.default_core
@@ -998,6 +1010,8 @@ AddFunction EnhancementCdsCdActions
  if HasAzeriteTrait(ancestral_resonance_trait) EnhancementBloodlust()
  #berserking,if=variable.cooldown_sync
  if cooldown_sync() Spell(berserking)
+ #use_item,name=azsharas_font_of_power
+ EnhancementUseItemActions()
  #blood_fury,if=variable.cooldown_sync
  if cooldown_sync() Spell(blood_fury_apsp)
  #fireblood,if=variable.cooldown_sync
@@ -1005,7 +1019,7 @@ AddFunction EnhancementCdsCdActions
  #ancestral_call,if=variable.cooldown_sync
  if cooldown_sync() Spell(ancestral_call)
  #potion,if=buff.ascendance.up|!talent.ascendance.enabled&feral_spirit.remains>5|target.time_to_die<=60
- if { BuffPresent(ascendance_enhancement_buff) or not Talent(ascendance_talent_enhancement) and TotemRemaining(sprit_wolf) > 5 or target.TimeToDie() <= 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_battle_potion_of_agility usable=1)
+ if { BuffPresent(ascendance_enhancement_buff) or not Talent(ascendance_talent_enhancement) and TotemRemaining(sprit_wolf) > 5 or target.TimeToDie() <= 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
  #guardian_of_azeroth
  Spell(guardian_of_azeroth)
  #memory_of_lucid_dreams
@@ -1016,6 +1030,12 @@ AddFunction EnhancementCdsCdActions
  Spell(blood_of_the_enemy)
  #ascendance,if=cooldown.strike.remains>0
  if SpellCooldown(windstrike) > 0 and BuffExpires(ascendance_enhancement_buff) Spell(ascendance_enhancement)
+ #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|(target.time_to_die<20&debuff.razor_coral_debuff.stack>2)
+ if target.DebuffExpires(razor_coral) or target.TimeToDie() < 20 and target.DebuffStacks(razor_coral) > 2 EnhancementUseItemActions()
+ #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.stack>2&debuff.conductive_ink_debuff.down&(buff.ascendance.remains>10|buff.molten_weapon.remains>10|buff.crackling_surge.remains>10|buff.icy_edge.remains>10|debuff.earthen_spike.remains>6)
+ if target.DebuffStacks(razor_coral) > 2 and target.DebuffExpires(conductive_ink) and { BuffRemaining(ascendance_enhancement_buff) > 10 or BuffRemaining(molten_weapon_buff) > 10 or BuffRemaining(crackling_surge) > 10 or BuffRemaining(icy_edge_buff) > 10 or target.DebuffRemaining(earthen_spike_debuff) > 6 } EnhancementUseItemActions()
+ #use_item,name=ashvanes_razor_coral,if=(debuff.conductive_ink_debuff.up|buff.ascendance.remains>10|buff.molten_weapon.remains>10|buff.crackling_surge.remains>10|buff.icy_edge.remains>10|debuff.earthen_spike.remains>6)&target.health.pct<31
+ if { target.DebuffPresent(conductive_ink) or BuffRemaining(ascendance_enhancement_buff) > 10 or BuffRemaining(molten_weapon_buff) > 10 or BuffRemaining(crackling_surge) > 10 or BuffRemaining(icy_edge_buff) > 10 or target.DebuffRemaining(earthen_spike_debuff) > 6 } and target.HealthPercent() < 31 EnhancementUseItemActions()
  #use_items
  EnhancementUseItemActions()
  #earth_elemental
@@ -1331,6 +1351,7 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # boulderfist_talent
 # capacitor_totem
 # concentrated_flame_essence
+# conductive_ink
 # crackling_surge
 # crash_lightning
 # crash_lightning_buff
@@ -1358,7 +1379,7 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # hot_hand_buff
 # hot_hand_talent
 # icy_edge_buff
-# item_battle_potion_of_agility
+# item_unbridled_fury
 # landslide_buff
 # landslide_talent
 # lava_lash
@@ -1378,7 +1399,9 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # primal_primer_trait
 # purifying_blast
 # quaking_palm
+# razor_coral
 # reckless_force_buff
+# ripple_in_space_essence
 # rockbiter
 # searing_assault_talent
 # seething_rage
@@ -1388,6 +1411,7 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # strength_of_earth_trait
 # sundering
 # the_unbound_force
+# thundercharge
 # totem_mastery_enhancement
 # war_stomp
 # wind_shear

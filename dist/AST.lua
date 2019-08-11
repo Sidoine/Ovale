@@ -204,8 +204,8 @@ local function INDENT(key)
     end
     return ret
 end
-__exports.isStringNode = function(node)
-    return node.type == "string"
+__exports.isNodeType = function(node, type)
+    return node.type == type
 end
 local function isCheckBoxParameter(key, value)
     return key == "checkbox"
@@ -220,13 +220,10 @@ local function isListItemFlattenParameters(key, value)
     return key == "listitem"
 end
 local function isCsvNode(node)
-    return node.type == "comma_separated_values"
+    return node.type == "comma_separated_values" or node.previousType == "comma_separated_values"
 end
 local function isVariableNode(node)
-    return node.type == "variable"
-end
-__exports.isValueNode = function(node)
-    return node.type == "value"
+    return node.type == "variable" or node.previousType == "variable"
 end
 local TokenizeComment = function(token)
     return "comment", token
@@ -408,15 +405,6 @@ __exports.OvaleASTClass = __class(nil, {
                 return "#" .. node.comment
             end
         end
-        self.UnparseCommaSeparatedValues = function(node)
-            local output = self.self_outputPool:Get()
-            for k, v in ipairs(node.csv) do
-                output[k] = self:Unparse(v)
-            end
-            local outputString = concat(output, ",")
-            self.self_outputPool:Release(output)
-            return outputString
-        end
         self.UnparseDefine = function(node)
             return format("Define(%s %s)", node.name, node.value)
         end
@@ -451,7 +439,8 @@ __exports.OvaleASTClass = __class(nil, {
                 if rhsPrecedence and precedence > rhsPrecedence then
                     rhsExpression = "{ " .. self:Unparse(rhsNode) .. " }"
                 elseif rhsPrecedence and precedence == rhsPrecedence then
-                    if BINARY_OPERATOR[node.operator][3] == "associative" and node.operator == rhsNode.operator then
+                    local operatorInfo = BINARY_OPERATOR[node.operator]
+                    if operatorInfo and operatorInfo[3] == "associative" and node.operator == rhsNode.operator then
                         rhsExpression = self:Unparse(rhsNode)
                     else
                         rhsExpression = "{ " .. self:Unparse(rhsNode) .. " }"
@@ -460,6 +449,9 @@ __exports.OvaleASTClass = __class(nil, {
                     rhsExpression = self:Unparse(rhsNode)
                 end
                 expression = lhsExpression .. " " .. node.operator .. " " .. rhsExpression
+            else
+                self.debug:Error("node.expressionType '" .. node.expressionType .. "' is not known")
+                return "Not_Unparsable"
             end
             return expression
         end
@@ -521,9 +513,6 @@ __exports.OvaleASTClass = __class(nil, {
         self.UnparseList = function(node)
             return format("%s(%s %s)", node.keyword, node.name, self:UnparseParameters(node.rawPositionalParams, node.rawNamedParams))
         end
-        self.UnparseValue = function(node)
-            return tostring(node.value)
-        end
         self.UnparseScoreSpells = function(node)
             return format("ScoreSpells(%s)", self:UnparseParameters(node.rawPositionalParams, node.rawNamedParams))
         end
@@ -569,9 +558,6 @@ __exports.OvaleASTClass = __class(nil, {
             local identifier = node.name and node.name or node.spellId
             return format("SpellRequire(%s %s %s)", identifier, node.property, self:UnparseParameters(node.rawPositionalParams, node.rawNamedParams))
         end
-        self.UnparseString = function(node)
-            return "\"" .. node.value .. "\""
-        end
         self.UnparseUnless = function(node)
             if node.child[2].type == "group" then
                 return format("unless %s%s", self:Unparse(node.child[1]), self.UnparseGroup(node.child[2]))
@@ -614,58 +600,47 @@ __exports.OvaleASTClass = __class(nil, {
             ["variable"] = self.UnparseVariable
         }
         self.ParseAddCheckBox = function(tokenStream, nodeList, annotation)
-            local ok = true
-            do
-                local tokenType, token = tokenStream:Consume()
-                if  not (tokenType == "keyword" and token == "AddCheckBox") then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDCHECKBOX; 'AddCheckBox' expected.", token)
-                    ok = false
-                end
+            local tokenType, token = tokenStream:Consume()
+            if  not (tokenType == "keyword" and token == "AddCheckBox") then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDCHECKBOX; 'AddCheckBox' expected.", token)
+                return false
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= "(" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDCHECKBOX; '(' expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= "(" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDCHECKBOX; '(' expected.", token)
+                return false
             end
-            local name
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType == "name" then
-                    name = token
-                else
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDCHECKBOX; name expected.", token)
-                    ok = false
-                end
+            local name = ""
+            tokenType, token = tokenStream:Consume()
+            if tokenType == "name" then
+                name = token
+            else
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDCHECKBOX; name expected.", token)
+                return false
             end
-            local descriptionNode
-            if ok then
-                ok, descriptionNode = self.ParseString(tokenStream, nodeList, annotation)
+            local ok, descriptionNode = self.ParseString(tokenStream, nodeList, annotation)
+            if  not ok then
+                return false
             end
             local positionalParams, namedParams
-            if ok then
-                ok, positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            ok, positionalParams, namedParams = self:ParseParameters(tokenStream, nodeList, annotation)
+            if  not ok then
+                return false
             end
-            if ok then
-                local tokenType, token = tokenStream:Consume()
-                if tokenType ~= ")" then
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDCHECKBOX; ')' expected.", token)
-                    ok = false
-                end
+            tokenType, token = tokenStream:Consume()
+            if tokenType ~= ")" then
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing ADDCHECKBOX; ')' expected.", token)
+                return false
             end
-            local node
-            if ok then
-                node = self:NewNode(nodeList)
-                node.type = "checkbox"
-                node.name = name
-                node.description = descriptionNode
-                node.rawPositionalParams = positionalParams
-                node.rawNamedParams = namedParams
-                annotation.parametersReference = annotation.parametersReference or {}
-                annotation.parametersReference[#annotation.parametersReference + 1] = node
-            end
-            return ok, node
+            local node = self:NewNode(nodeList)
+            node.type = "checkbox"
+            node.name = name
+            node.description = descriptionNode
+            node.rawPositionalParams = positionalParams
+            node.rawNamedParams = namedParams
+            annotation.parametersReference = annotation.parametersReference or {}
+            annotation.parametersReference[#annotation.parametersReference + 1] = node
+            return true, node
         end
         self.ParseAddFunction = function(tokenStream, nodeList, annotation)
             local ok = true
@@ -926,7 +901,7 @@ __exports.OvaleASTClass = __class(nil, {
                         local rhsNode
                         ok, rhsNode = self.ParseExpression(tokenStream, nodeList, annotation, precedence)
                         if ok then
-                            if operator == "-" and __exports.isValueNode(rhsNode) then
+                            if operator == "-" and __exports.isNodeType(rhsNode, "value") then
                                 local value = -1 * tonumber(rhsNode.value)
                                 node = self:GetNumberNode(value, nodeList, annotation)
                             else
@@ -1552,7 +1527,7 @@ __exports.OvaleASTClass = __class(nil, {
             if ok then
                 local tokenType, token = tokenStream:Consume()
                 if tokenType == "number" then
-                    spellId = token
+                    spellId = tonumber(token)
                 elseif tokenType == "name" then
                     name = token
                 else
@@ -1576,7 +1551,7 @@ __exports.OvaleASTClass = __class(nil, {
                 node = self:NewNode(nodeList)
                 node.type = "spell_aura_list"
                 node.keyword = keyword
-                node.spellId = tonumber(spellId)
+                node.spellId = spellId
                 node.name = name
                 node.rawPositionalParams = positionalParams
                 node.rawNamedParams = namedParams
@@ -1610,7 +1585,7 @@ __exports.OvaleASTClass = __class(nil, {
             if ok then
                 local tokenType, token = tokenStream:Consume()
                 if tokenType == "number" then
-                    spellId = token
+                    spellId = tonumber(token)
                 elseif tokenType == "name" then
                     name = token
                 else
@@ -1633,7 +1608,7 @@ __exports.OvaleASTClass = __class(nil, {
             if ok then
                 node = self:NewNode(nodeList)
                 node.type = "spell_info"
-                node.spellId = tonumber(spellId)
+                node.spellId = spellId
                 node.name = name
                 node.rawPositionalParams = positionalParams
                 node.rawNamedParams = namedParams
@@ -1666,7 +1641,7 @@ __exports.OvaleASTClass = __class(nil, {
             if ok then
                 local tokenType, token = tokenStream:Consume()
                 if tokenType == "number" then
-                    spellId = token
+                    spellId = tonumber(token)
                 elseif tokenType == "name" then
                     name = token
                 else
@@ -1699,7 +1674,7 @@ __exports.OvaleASTClass = __class(nil, {
             if ok then
                 node = self:NewNode(nodeList)
                 node.type = "spell_require"
-                node.spellId = tonumber(spellId)
+                node.spellId = spellId
                 node.name = name
                 node.property = property
                 node.rawPositionalParams = positionalParams
@@ -1714,36 +1689,30 @@ __exports.OvaleASTClass = __class(nil, {
             return ok, node
         end
         self.ParseString = function(tokenStream, nodeList, annotation)
-            local ok = true
             local value
-            if ok then
-                local tokenType, token = tokenStream:Peek()
-                if tokenType == "string" then
+            local tokenType, token = tokenStream:Peek()
+            if tokenType == "string" then
+                value = token
+                tokenStream:Consume()
+            elseif tokenType == "name" then
+                if STRING_LOOKUP_FUNCTION[token] then
+                    return self.ParseFunction(tokenStream, nodeList, annotation)
+                else
                     value = token
                     tokenStream:Consume()
-                elseif tokenType == "name" then
-                    if STRING_LOOKUP_FUNCTION[token] then
-                        return self.ParseFunction(tokenStream, nodeList, annotation)
-                    else
-                        value = token
-                        tokenStream:Consume()
-                    end
-                else
-                    tokenStream:Consume()
-                    self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing STRING; string, variable, or function expected.", token)
-                    ok = false
                 end
+            else
+                tokenStream:Consume()
+                self:SyntaxError(tokenStream, "Syntax error: unexpected token '%s' when parsing STRING; string, variable, or function expected.", token)
+                return false
             end
-            if ok then
-                local node
-                node = self:NewNode(nodeList)
-                node.type = "string"
-                node.value = value
-                annotation.stringReference = annotation.stringReference or {}
-                annotation.stringReference[#annotation.stringReference + 1] = node
-                return ok, node
-            end
-            return false, nil
+            local node
+            node = self:NewNode(nodeList)
+            node.type = "string"
+            node.value = value
+            annotation.stringReference = annotation.stringReference or {}
+            annotation.stringReference[#annotation.stringReference + 1] = node
+            return true, node
         end
         self.ParseUnless = function(tokenStream, nodeList, annotation)
             local ok = true
@@ -1887,11 +1856,11 @@ __exports.OvaleASTClass = __class(nil, {
                 isBang = true
                 node = node.child[1]
             end
-            if __exports.isValueNode(node) then
+            if __exports.isNodeType(node, "value") then
                 value = node.value
             elseif node.type == "variable" then
                 value = node.name
-            elseif __exports.isStringNode(node) then
+            elseif __exports.isNodeType(node, "string") then
                 value = node.value
             else
                 return parameterValue
@@ -1921,10 +1890,16 @@ __exports.OvaleASTClass = __class(nil, {
         if  not precedence then
             local operator = node.operator
             if operator then
-                if node.expressionType == "unary" and UNARY_OPERATOR[operator] then
-                    precedence = UNARY_OPERATOR[operator][2]
-                elseif node.expressionType == "binary" and BINARY_OPERATOR[operator] then
-                    precedence = BINARY_OPERATOR[operator][2]
+                if node.expressionType == "unary" then
+                    local operatorInfos = UNARY_OPERATOR[operator]
+                    if operatorInfos then
+                        precedence = operatorInfos[2]
+                    end
+                elseif node.expressionType == "binary" then
+                    local operatorInfos = BINARY_OPERATOR[operator]
+                    if operatorInfos then
+                        precedence = operatorInfos[2]
+                    end
                 end
             end
         end
@@ -1945,10 +1920,23 @@ __exports.OvaleASTClass = __class(nil, {
             end
             if  not visitor then
                 self.debug:Error("Unable to unparse node of type '%s'.", node.type)
+                return "Unkown_" .. node.type
             else
                 return visitor(node)
             end
         end
+    end,
+    UnparseCommaSeparatedValues = function(self, node)
+        local output = self.self_outputPool:Get()
+        for k, v in ipairs(node.csv) do
+            output[k] = self:Unparse(v)
+        end
+        local outputString = concat(output, ",")
+        self.self_outputPool:Release(output)
+        return outputString
+    end,
+    UnparseValue = function(self, node)
+        return tostring(node.value)
     end,
     UnparseParameters = function(self, positionalParams, namedParams)
         local output = self.self_outputPool:Get()
@@ -1975,6 +1963,9 @@ __exports.OvaleASTClass = __class(nil, {
         local outputString = concat(output, " ")
         self.self_outputPool:Release(output)
         return outputString
+    end,
+    UnparseString = function(self, node)
+        return "\"" .. node.value .. "\""
     end,
     SyntaxError = function(self, tokenStream, ...)
         self.debug:Warning(...)
@@ -2029,7 +2020,7 @@ __exports.OvaleASTClass = __class(nil, {
                     end
                 elseif tokenType == "string" then
                     ok, node = self.ParseString(tokenStream, nodeList, annotation)
-                    if ok and __exports.isStringNode(node) then
+                    if ok and __exports.isNodeType(node, "string") then
                         name = node.value
                     end
                 elseif checkToken(__exports.PARAMETER_KEYWORD, token) then
@@ -2371,7 +2362,7 @@ __exports.OvaleASTClass = __class(nil, {
         if ast.annotation and ast.annotation.stringReference then
             for _, node in ipairs(ast.annotation.stringReference) do
                 local targetNode = node
-                if __exports.isStringNode(node) then
+                if __exports.isNodeType(node, "string") then
                     local key = node.value
                     local value = L[key]
                     if key ~= value then
@@ -2383,7 +2374,7 @@ __exports.OvaleASTClass = __class(nil, {
                     targetNode.previousType = node.type
                     targetNode.type = "string"
                     targetNode.value = value
-                elseif __exports.isValueNode(node) then
+                elseif __exports.isNodeType(node, "value") then
                     local value = node.value
                     targetNode.previousType = "value"
                     targetNode.type = "string"
@@ -2392,32 +2383,37 @@ __exports.OvaleASTClass = __class(nil, {
                     local key = node.rawPositionalParams[1]
                     local stringKey
                     if isAstNode(key) then
-                        if __exports.isValueNode(key) then
+                        if __exports.isNodeType(key, "value") then
                             stringKey = tostring(key.value)
                         elseif isVariableNode(key) then
                             stringKey = key.name
-                        elseif __exports.isStringNode(key) then
+                        elseif __exports.isNodeType(key, "string") then
                             stringKey = key.value
+                        else
+                            stringKey = nil
                         end
                     else
                         stringKey = tostring(key)
                     end
-                    local value
                     if stringKey then
+                        local value
                         local name = node.name
                         if name == "ItemName" then
-                            value = GetItemInfo(stringKey) or "item:" .. stringKey
+                            value = GetItemInfo(stringKey)
+                            if  not value then
+                                value = "item:" .. stringKey
+                            end
                         elseif name == "L" then
                             value = L[stringKey]
                         elseif name == "SpellName" then
                             value = self.ovaleSpellBook:GetSpellName(tonumber(stringKey)) or "spell:" .. stringKey
                         end
-                    end
-                    if value then
-                        targetNode.previousType = "function"
-                        targetNode.type = "string"
-                        targetNode.value = value
-                        targetNode.key = stringKey
+                        if value then
+                            targetNode.previousType = "function"
+                            targetNode.type = "string"
+                            targetNode.value = value
+                            targetNode.key = stringKey
+                        end
                     end
                 end
             end

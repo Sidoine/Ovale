@@ -4,9 +4,6 @@ local __class = LibStub:GetLibrary("tslib").newClass
 local next = next
 local huge = math.huge
 local INFINITY = huge
-local self_condition = {}
-local self_spellBookCondition = {}
-self_spellBookCondition["spell"] = true
 local COMPARATOR = {
     atLeast = true,
     atMost = true,
@@ -20,27 +17,31 @@ end
 __exports.OvaleConditionClass = __class(nil, {
     constructor = function(self, baseState)
         self.baseState = baseState
+        self.conditions = {}
+        self.spellBookConditions = {
+            spell = true
+        }
     end,
     RegisterCondition = function(self, name, isSpellBookCondition, func)
-        self_condition[name] = func
+        self.conditions[name] = func
         if isSpellBookCondition then
-            self_spellBookCondition[name] = true
+            self.spellBookConditions[name] = true
         end
     end,
     UnregisterCondition = function(self, name)
-        self_condition[name] = nil
+        self.conditions[name] = nil
     end,
     IsCondition = function(self, name)
-        return (self_condition[name] ~= nil)
+        return (self.conditions[name] ~= nil)
     end,
     IsSpellBookCondition = function(self, name)
-        return (self_spellBookCondition[name] ~= nil)
+        return (self.spellBookConditions[name] ~= nil)
     end,
     EvaluateCondition = function(self, name, positionalParams, namedParams, atTime)
-        return self_condition[name](positionalParams, namedParams, atTime)
+        return self.conditions[name](positionalParams, namedParams, atTime)
     end,
     HasAny = function(self)
-        return next(self_condition) ~= nil
+        return next(self.conditions) ~= nil
     end,
     ParseCondition = function(self, positionalParams, namedParams, defaultTarget)
         local target = namedParams.target or defaultTarget or "player"

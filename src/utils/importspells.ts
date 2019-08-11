@@ -908,7 +908,7 @@ export interface SpellData {
     talent?: TalentData;
     azeriteTrait?: AzeriteTrait;
     className?: ClassId | "PET";
-    specializationName?: SpecializationName;
+    specializationName: SpecializationName[];
     nextRank?: SpellData;
     spellAttributes: SpellAttribute[];
 }
@@ -1223,6 +1223,7 @@ export function getSpellData(directory: string) {
     identifierById.set(302917, "reckless_force_counter");
 
     const identifiers: LuaObj<number> = {};
+    const spellListsByIdentifier = new Map<string, SpellData[]>();
     const spellDataById = new Map<number, SpellData>();
     const spellData: SpellData[] = [];
     for (const row of output.spell_data_t) {
@@ -1276,7 +1277,8 @@ export function getSpellData(directory: string) {
             req_max_level: row[46],
             dmg_class: row[47],
             identifierScore: 0,
-            spellAttributes: []
+            spellAttributes: [],
+            specializationName: []
         };
 
         for (let i = 0; i < spell.attributes.length ; i++) {
@@ -1331,7 +1333,7 @@ export function getSpellData(directory: string) {
                     spell.identifierScore += 10;
                     spell.className = classNames[classIndex];
                     if (spell.className !== "PET") {
-                        spell.specializationName = OVALE_SPECIALIZATION_NAME[spell.className][<1|2|3|4>(specIndex + 1)];
+                        spell.specializationName.push(OVALE_SPECIALIZATION_NAME[spell.className][<1|2|3|4>(specIndex + 1)]);
                     }
                 } else {
                     console.error(`Unknown spell ${spellId}`);
@@ -1448,6 +1450,8 @@ export function getSpellData(directory: string) {
             const spell = spellDataById.get(talent.spell_id);
             if (spell) {
                 spell.talent = talent;
+                const spec = specIdToSpecName.get(talent.spec);
+                if (spell.specializationName.indexOf(spec) < 0) spell.specializationName.push(spec);
                 spell.identifierScore += 10;
             }
         }
@@ -1458,8 +1462,8 @@ export function getSpellData(directory: string) {
         if (identifiers[spell.identifier]) {
             const other = spellDataById.get(identifiers[spell.identifier]);
             if (other.identifierScore === spell.identifierScore) {
-                if (other.className === spell.className && spell.specializationName) {
-                    spell.identifier += "_" + spell.specializationName.toLowerCase();
+                if (other.className === spell.className && spell.specializationName.length > 0) {
+                    spell.identifier += "_" + spell.specializationName[0].toLowerCase();
                 } else if (spell.className && spell.className !== other.className) {
                     spell.identifier += "_" + spell.className.toLowerCase();
                 } else {
@@ -1470,6 +1474,28 @@ export function getSpellData(directory: string) {
             }
         } 
         identifiers[spell.identifier] = spell.id;
+    }
+
+    for (const spell of spellData) {
+        if (!spell.identifier) continue;
+        const existing = spellListsByIdentifier.get(spell.identifier);
+        if (existing) {
+            existing.push(spell);
+        } else {
+            spellListsByIdentifier.set(spell.identifier, [spell]);
+        }
+    }
+
+    const spellLists = new Map<string, SpellData[]>();
+    for (const [identifier, spells] of Array.from(spellListsByIdentifier)) {
+        if (spells.length === 1) continue;
+        const max = spells.reduce((a, s) => s.identifierScore > a ? s.identifierScore : a, 0);
+        const filtered = spells.filter(x => x.identifierScore === max);
+        if (filtered.length === 1) continue;
+        for (let i = 0; i < filtered.length; i++) {
+            filtered[i].identifier += `_${i}`;
+        }
+        spellLists.set(identifier, filtered);
     }
 
     for (const spell of spellData) {
@@ -1544,5 +1570,5 @@ export function getSpellData(directory: string) {
     writeFileSync("spells-data.txt", JSON.stringify(spellData, undefined, 2), { encoding: "utf8" });
     writeFileSync("items-data.txt", JSON.stringify(Array.from(itemsById.values()), undefined, 2), { encoding: "utf8"});
 
-    return { spellData, spellDataById, identifiers, talentsById, itemsById, azeriteTraitById };
+    return { spellData, spellDataById, identifiers, talentsById, itemsById, azeriteTraitById, spellLists };
 }

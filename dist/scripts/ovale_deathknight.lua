@@ -51,6 +51,8 @@ AddFunction BloodStandardMainActions
 {
  #death_strike,if=runic_power.deficit<=10
  if RunicPowerDeficit() <= 10 Spell(death_strike)
+ #blooddrinker,if=!buff.dancing_rune_weapon.up
+ if not BuffPresent(dancing_rune_weapon_buff) Spell(blooddrinker)
  #marrowrend,if=(buff.bone_shield.remains<=rune.time_to_3|buff.bone_shield.remains<=(gcd+cooldown.blooddrinker.ready*talent.blooddrinker.enabled*2)|buff.bone_shield.stack<3)&runic_power.deficit>=20
  if { BuffRemaining(bone_shield_buff) <= TimeToRunes(3) or BuffRemaining(bone_shield_buff) <= GCD() + { SpellCooldown(blooddrinker) == 0 } * TalentPoints(blooddrinker_talent) * 2 or BuffStacks(bone_shield_buff) < 3 } and RunicPowerDeficit() >= 20 Spell(marrowrend)
  #blood_boil,if=charges_fractional>=1.8&(buff.hemostasis.stack<=(5-spell_targets.blood_boil)|spell_targets.blood_boil>2)
@@ -63,6 +65,8 @@ AddFunction BloodStandardMainActions
  if BuffPresent(dancing_rune_weapon_buff) or TimeToRunes(4) < GCD() Spell(heart_strike)
  #blood_boil,if=buff.dancing_rune_weapon.up
  if BuffPresent(dancing_rune_weapon_buff) Spell(blood_boil)
+ #consumption
+ Spell(consumption)
  #blood_boil
  Spell(blood_boil)
  #heart_strike,if=rune.time_to_3<gcd|buff.bone_shield.stack>6
@@ -75,35 +79,27 @@ AddFunction BloodStandardMainPostConditions
 
 AddFunction BloodStandardShortCdActions
 {
- unless RunicPowerDeficit() <= 10 and Spell(death_strike)
+ unless RunicPowerDeficit() <= 10 and Spell(death_strike) or not BuffPresent(dancing_rune_weapon_buff) and Spell(blooddrinker) or { BuffRemaining(bone_shield_buff) <= TimeToRunes(3) or BuffRemaining(bone_shield_buff) <= GCD() + { SpellCooldown(blooddrinker) == 0 } * TalentPoints(blooddrinker_talent) * 2 or BuffStacks(bone_shield_buff) < 3 } and RunicPowerDeficit() >= 20 and Spell(marrowrend) or Charges(blood_boil count=0) >= 1.8 and { BuffStacks(hemostasis_buff) <= 5 - Enemies() or Enemies() > 2 } and Spell(blood_boil) or BuffStacks(bone_shield_buff) < 5 and Talent(ossuary_talent) and RunicPowerDeficit() >= 15 and Spell(marrowrend)
  {
-  #blooddrinker,if=!buff.dancing_rune_weapon.up
-  if not BuffPresent(dancing_rune_weapon_buff) Spell(blooddrinker)
+  #bonestorm,if=runic_power>=100&!buff.dancing_rune_weapon.up
+  if RunicPower() >= 100 and not BuffPresent(dancing_rune_weapon_buff) Spell(bonestorm)
 
-  unless { BuffRemaining(bone_shield_buff) <= TimeToRunes(3) or BuffRemaining(bone_shield_buff) <= GCD() + { SpellCooldown(blooddrinker) == 0 } * TalentPoints(blooddrinker_talent) * 2 or BuffStacks(bone_shield_buff) < 3 } and RunicPowerDeficit() >= 20 and Spell(marrowrend) or Charges(blood_boil count=0) >= 1.8 and { BuffStacks(hemostasis_buff) <= 5 - Enemies() or Enemies() > 2 } and Spell(blood_boil) or BuffStacks(bone_shield_buff) < 5 and Talent(ossuary_talent) and RunicPowerDeficit() >= 15 and Spell(marrowrend)
+  unless { RunicPowerDeficit() <= 15 + BuffPresent(dancing_rune_weapon_buff) * 5 + Enemies() * TalentPoints(heartbreaker_talent) * 2 or target.TimeToDie() < 10 } and Spell(death_strike)
   {
-   #bonestorm,if=runic_power>=100&!buff.dancing_rune_weapon.up
-   if RunicPower() >= 100 and not BuffPresent(dancing_rune_weapon_buff) Spell(bonestorm)
+   #death_and_decay,if=spell_targets.death_and_decay>=3
+   if Enemies() >= 3 Spell(death_and_decay)
+   #rune_strike,if=(charges_fractional>=1.8|buff.dancing_rune_weapon.up)&rune.time_to_3>=gcd
+   if { Charges(rune_strike count=0) >= 1.8 or BuffPresent(dancing_rune_weapon_buff) } and TimeToRunes(3) >= GCD() Spell(rune_strike)
 
-   unless { RunicPowerDeficit() <= 15 + BuffPresent(dancing_rune_weapon_buff) * 5 + Enemies() * TalentPoints(heartbreaker_talent) * 2 or target.TimeToDie() < 10 } and Spell(death_strike)
+   unless { BuffPresent(dancing_rune_weapon_buff) or TimeToRunes(4) < GCD() } and Spell(heart_strike) or BuffPresent(dancing_rune_weapon_buff) and Spell(blood_boil)
    {
-    #death_and_decay,if=spell_targets.death_and_decay>=3
-    if Enemies() >= 3 Spell(death_and_decay)
-    #rune_strike,if=(charges_fractional>=1.8|buff.dancing_rune_weapon.up)&rune.time_to_3>=gcd
-    if { Charges(rune_strike count=0) >= 1.8 or BuffPresent(dancing_rune_weapon_buff) } and TimeToRunes(3) >= GCD() Spell(rune_strike)
+    #death_and_decay,if=buff.crimson_scourge.up|talent.rapid_decomposition.enabled|spell_targets.death_and_decay>=2
+    if BuffPresent(crimson_scourge_buff) or Talent(rapid_decomposition_talent) or Enemies() >= 2 Spell(death_and_decay)
 
-    unless { BuffPresent(dancing_rune_weapon_buff) or TimeToRunes(4) < GCD() } and Spell(heart_strike) or BuffPresent(dancing_rune_weapon_buff) and Spell(blood_boil)
+    unless Spell(consumption) or Spell(blood_boil) or { TimeToRunes(3) < GCD() or BuffStacks(bone_shield_buff) > 6 } and Spell(heart_strike)
     {
-     #death_and_decay,if=buff.crimson_scourge.up|talent.rapid_decomposition.enabled|spell_targets.death_and_decay>=2
-     if BuffPresent(crimson_scourge_buff) or Talent(rapid_decomposition_talent) or Enemies() >= 2 Spell(death_and_decay)
-     #consumption
-     Spell(consumption)
-
-     unless Spell(blood_boil) or { TimeToRunes(3) < GCD() or BuffStacks(bone_shield_buff) > 6 } and Spell(heart_strike)
-     {
-      #rune_strike
-      Spell(rune_strike)
-     }
+     #rune_strike
+     Spell(rune_strike)
     }
    }
   }
@@ -112,7 +108,7 @@ AddFunction BloodStandardShortCdActions
 
 AddFunction BloodStandardShortCdPostConditions
 {
- RunicPowerDeficit() <= 10 and Spell(death_strike) or { BuffRemaining(bone_shield_buff) <= TimeToRunes(3) or BuffRemaining(bone_shield_buff) <= GCD() + { SpellCooldown(blooddrinker) == 0 } * TalentPoints(blooddrinker_talent) * 2 or BuffStacks(bone_shield_buff) < 3 } and RunicPowerDeficit() >= 20 and Spell(marrowrend) or Charges(blood_boil count=0) >= 1.8 and { BuffStacks(hemostasis_buff) <= 5 - Enemies() or Enemies() > 2 } and Spell(blood_boil) or BuffStacks(bone_shield_buff) < 5 and Talent(ossuary_talent) and RunicPowerDeficit() >= 15 and Spell(marrowrend) or { RunicPowerDeficit() <= 15 + BuffPresent(dancing_rune_weapon_buff) * 5 + Enemies() * TalentPoints(heartbreaker_talent) * 2 or target.TimeToDie() < 10 } and Spell(death_strike) or { BuffPresent(dancing_rune_weapon_buff) or TimeToRunes(4) < GCD() } and Spell(heart_strike) or BuffPresent(dancing_rune_weapon_buff) and Spell(blood_boil) or Spell(blood_boil) or { TimeToRunes(3) < GCD() or BuffStacks(bone_shield_buff) > 6 } and Spell(heart_strike)
+ RunicPowerDeficit() <= 10 and Spell(death_strike) or not BuffPresent(dancing_rune_weapon_buff) and Spell(blooddrinker) or { BuffRemaining(bone_shield_buff) <= TimeToRunes(3) or BuffRemaining(bone_shield_buff) <= GCD() + { SpellCooldown(blooddrinker) == 0 } * TalentPoints(blooddrinker_talent) * 2 or BuffStacks(bone_shield_buff) < 3 } and RunicPowerDeficit() >= 20 and Spell(marrowrend) or Charges(blood_boil count=0) >= 1.8 and { BuffStacks(hemostasis_buff) <= 5 - Enemies() or Enemies() > 2 } and Spell(blood_boil) or BuffStacks(bone_shield_buff) < 5 and Talent(ossuary_talent) and RunicPowerDeficit() >= 15 and Spell(marrowrend) or { RunicPowerDeficit() <= 15 + BuffPresent(dancing_rune_weapon_buff) * 5 + Enemies() * TalentPoints(heartbreaker_talent) * 2 or target.TimeToDie() < 10 } and Spell(death_strike) or { BuffPresent(dancing_rune_weapon_buff) or TimeToRunes(4) < GCD() } and Spell(heart_strike) or BuffPresent(dancing_rune_weapon_buff) and Spell(blood_boil) or Spell(consumption) or Spell(blood_boil) or { TimeToRunes(3) < GCD() or BuffStacks(bone_shield_buff) > 6 } and Spell(heart_strike)
 }
 
 AddFunction BloodStandardCdActions
@@ -506,8 +502,6 @@ AddFunction FrostObliterationCdPostConditions
 
 AddFunction FrostEssencesMainActions
 {
- #focused_azerite_beam,if=!buff.pillar_of_frost.up&!buff.breath_of_sindragosa.up
- if not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) Spell(focused_azerite_beam)
  #concentrated_flame,if=!buff.pillar_of_frost.up&!buff.breath_of_sindragosa.up&dot.concentrated_flame_burn.remains=0
  if not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 Spell(concentrated_flame_essence)
 }
@@ -522,8 +516,10 @@ AddFunction FrostEssencesShortCdActions
  if BuffRemaining(pillar_of_frost_buff) < 5 or target.TimeToDie() < 5 Spell(chill_streak)
  #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<11
  if BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 11 Spell(the_unbound_force)
+ #focused_azerite_beam,if=!buff.pillar_of_frost.up&!buff.breath_of_sindragosa.up
+ if not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) Spell(focused_azerite_beam)
 
- unless not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) and Spell(focused_azerite_beam) or not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence)
+ unless not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence)
  {
   #purifying_blast,if=!buff.pillar_of_frost.up&!buff.breath_of_sindragosa.up
   if not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) Spell(purifying_blast)
@@ -536,7 +532,7 @@ AddFunction FrostEssencesShortCdActions
 
 AddFunction FrostEssencesShortCdPostConditions
 {
- not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) and Spell(focused_azerite_beam) or not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence)
+ not BuffPresent(pillar_of_frost_buff) and not BuffPresent(breath_of_sindragosa_buff) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence)
 }
 
 AddFunction FrostEssencesCdActions
@@ -1217,6 +1213,8 @@ AddFunction UnholyPrecombatCdActions
 
  unless Spell(raise_dead)
  {
+  #use_item,name=azsharas_font_of_power
+  UnholyUseItemActions()
   #army_of_the_dead,delay=2
   Spell(army_of_the_dead)
  }
@@ -1280,8 +1278,6 @@ AddFunction UnholyGenericCdPostConditions
 
 AddFunction UnholyEssencesMainActions
 {
- #focused_azerite_beam,if=!death_and_decay.ticking
- if not BuffPresent(death_and_decay) Spell(focused_azerite_beam)
  #concentrated_flame,if=dot.concentrated_flame_burn.remains=0
  if not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 Spell(concentrated_flame_essence)
 }
@@ -1294,8 +1290,10 @@ AddFunction UnholyEssencesShortCdActions
 {
  #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<11
  if BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 11 Spell(the_unbound_force)
+ #focused_azerite_beam,if=!death_and_decay.ticking
+ if not BuffPresent(death_and_decay) Spell(focused_azerite_beam)
 
- unless not BuffPresent(death_and_decay) and Spell(focused_azerite_beam) or not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence)
+ unless not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence)
  {
   #purifying_blast,if=!death_and_decay.ticking
   if not BuffPresent(death_and_decay) Spell(purifying_blast)
@@ -1308,7 +1306,7 @@ AddFunction UnholyEssencesShortCdActions
 
 AddFunction UnholyEssencesShortCdPostConditions
 {
- not BuffPresent(death_and_decay) and Spell(focused_azerite_beam) or not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence)
+ not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence)
 }
 
 AddFunction UnholyEssencesCdActions
@@ -1519,6 +1517,10 @@ AddFunction UnholyDefaultCdActions
  if BuffPresent(unholy_frenzy_buff) or pet.Present() or not Talent(summon_gargoyle_talent) Spell(berserking)
  #use_items,if=time>20|!equipped.ramping_amplitude_gigavolt_engine|!equipped.vision_of_demise
  if TimeInCombat() > 20 or not HasEquippedItem(ramping_amplitude_gigavolt_engine_item) or not HasEquippedItem(vision_of_demise_item) UnholyUseItemActions()
+ #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.stack<1
+ if target.DebuffStacks(razor_coral) < 1 UnholyUseItemActions()
+ #use_item,name=ashvanes_razor_coral,if=(cooldown.apocalypse.ready&debuff.festering_wound.stack>=4&debuff.razor_coral_debuff.stack>=1)|buff.unholy_frenzy.up
+ if SpellCooldown(apocalypse) == 0 and target.DebuffStacks(festering_wound_debuff) >= 4 and target.DebuffStacks(razor_coral) >= 1 or BuffPresent(unholy_frenzy_buff) UnholyUseItemActions()
  #use_item,name=vision_of_demise,if=(cooldown.apocalypse.ready&debuff.festering_wound.stack>=4&essence.vision_of_perfection.enabled)|buff.unholy_frenzy.up|pet.gargoyle.active
  if SpellCooldown(apocalypse) == 0 and target.DebuffStacks(festering_wound_debuff) >= 4 and AzeriteEssenceIsEnabled(vision_of_perfection_essence_id) or BuffPresent(unholy_frenzy_buff) or pet.Present() UnholyUseItemActions()
  #use_item,name=ramping_amplitude_gigavolt_engine,if=cooldown.apocalypse.remains<2|talent.army_of_the_damned.enabled|raid_event.adds.in<5
@@ -1655,6 +1657,7 @@ AddIcon checkbox=opt_deathknight_unholy_aoe help=cd specialization=unholy
 # purifying_blast
 # raise_dead
 # ramping_amplitude_gigavolt_engine_item
+# razor_coral
 # reckless_force_buff
 # reckless_force_counter
 # ripple_in_space_essence

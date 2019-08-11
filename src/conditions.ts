@@ -8,7 +8,7 @@ import { Aura, OvaleAuraClass } from "./Aura";
 import { ipairs, pairs, type, LuaArray, LuaObj, lualength } from "@wowts/lua";
 import { GetBuildInfo, GetItemCooldown, GetItemCount, GetNumTrackingTypes, GetTime, GetTrackingInfo, GetUnitSpeed, GetWeaponEnchantInfo, HasFullControl, IsStealthed, UnitCastingInfo, UnitChannelInfo, UnitClass, UnitClassification, UnitCreatureFamily, UnitCreatureType, UnitDetailedThreatSituation, UnitExists, UnitInParty, UnitInRaid, UnitIsDead, UnitIsFriend, UnitIsPVP, UnitIsUnit, UnitLevel, UnitName, UnitPower, UnitPowerMax, UnitRace, UnitStagger } from "@wowts/wow-mock";
 import { huge, min } from "@wowts/math";
-import { isValueNode, PositionalParameters, NamedParameters } from "./AST";
+import { PositionalParameters, NamedParameters, isNodeType } from "./AST";
 import { OvaleSpellsClass } from "./Spells";
 import { lower } from "@wowts/string";
 import { OvaleClass, Print } from "./Ovale";
@@ -80,7 +80,7 @@ export class OvaleConditions {
             let node = this.OvaleCompile.GetFunctionNode(<string>name);
             if (node) {
                 let [, element] = this.OvaleBestAction.Compute(node.child[1], atTime);
-                if (element && isValueNode(element)) {
+                if (element && isNodeType(element, "value")) {
                     let value = <number>element.value + (atTime - element.origin) * element.rate;
                     return <any>value;
                 }
@@ -5029,10 +5029,5 @@ l    */
         ovaleCondition.RegisterCondition("soulfragments", false, this.SoulFragments);
         ovaleCondition.RegisterCondition("timetoshard", false, this.TimeToShard);
         ovaleCondition.RegisterCondition("hasdebufftype", false, this.HasDebuffType);
-
-    
-       
-  
-  
     }
 }

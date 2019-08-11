@@ -264,7 +264,7 @@ interface NodeTypes {
 
 export type NodeType = keyof NodeTypes;
 
-function isNodeType<T extends keyof NodeTypes>(node: AstNode, type:T) : node is NodeTypes[T] {
+export function isNodeType<T extends keyof NodeTypes>(node: AstNode, type:T) : node is NodeTypes[T] {
     return node.type === type;
 }
 
@@ -2190,7 +2190,7 @@ export class OvaleASTClass {
         if (ok) {
             let [tokenType, token] = tokenStream.Consume();
             if (tokenType == "number") {
-                spellId = token;
+                spellId = tonumber(token);
             } else if (tokenType == "name") {
                 name = token;
             } else {
@@ -2214,7 +2214,7 @@ export class OvaleASTClass {
             node = this.NewNode(nodeList);
             node.type = "spell_aura_list";
             node.keyword = keyword;
-            node.spellId = tonumber(spellId);
+            node.spellId = spellId;
             node.name = name;
             node.rawPositionalParams = positionalParams;
             node.rawNamedParams = namedParams;
@@ -2248,7 +2248,7 @@ export class OvaleASTClass {
         if (ok) {
             let [tokenType, token] = tokenStream.Consume();
             if (tokenType == "number") {
-                spellId = token;
+                spellId = tonumber(token);
             } else if (tokenType == "name") {
                 name = token;
             } else {
@@ -2271,7 +2271,7 @@ export class OvaleASTClass {
         if (ok) {
             node = this.NewNode(nodeList);
             node.type = "spell_info";
-            node.spellId = tonumber(spellId);
+            node.spellId = spellId;
             node.name = name;
             node.rawPositionalParams = positionalParams;
             node.rawNamedParams = namedParams;
@@ -2304,7 +2304,7 @@ export class OvaleASTClass {
         if (ok) {
             let [tokenType, token] = tokenStream.Consume();
             if (tokenType == "number") {
-                spellId = token;
+                spellId = tonumber(token);
             } else if (tokenType == "name") {
                 name = token;
             } else {
@@ -2337,7 +2337,7 @@ export class OvaleASTClass {
         if (ok) {
             node = this.NewNode(nodeList);
             node.type = "spell_require";
-            node.spellId = tonumber(spellId);
+            node.spellId = spellId;
             node.name = name;
 
             // TODO check all the casts to property names

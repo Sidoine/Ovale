@@ -4,7 +4,7 @@ local __class = LibStub:GetLibrary("tslib").newClass
 local ipairs = ipairs
 local wipe = wipe
 local __AST = LibStub:GetLibrary("ovale/AST")
-local isValueNode = __AST.isValueNode
+local isNodeType = __AST.isNodeType
 local __definitions = LibStub:GetLibrary("ovale/simulationcraft/definitions")
 local TagPriority = __definitions.TagPriority
 local __texttools = LibStub:GetLibrary("ovale/simulationcraft/text-tools")
@@ -36,7 +36,7 @@ __exports.Splitter = __class(nil, {
                 if firstParamNode.type == "variable" then
                     name = firstParamNode.name
                     id = annotation.dictionary and annotation.dictionary[name]
-                elseif isValueNode(firstParamNode) then
+                elseif isNodeType(firstParamNode, "value") then
                     name = firstParamNode.value
                     id = firstParamNode.value
                 end
@@ -55,7 +55,7 @@ __exports.Splitter = __class(nil, {
                 if firstParamNode.type == "variable" then
                     name = firstParamNode.name
                     id = annotation.dictionary and annotation.dictionary[name]
-                elseif isValueNode(firstParamNode) then
+                elseif isNodeType(firstParamNode, "value") then
                     name = firstParamNode.value
                     id = name
                 end

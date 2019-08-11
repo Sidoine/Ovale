@@ -39,10 +39,6 @@ AddFunction BeastmasteryUseItemActions
 
 AddFunction BeastmasterySummonPet
 {
- if pet.IsDead()
- {
-  Spell(revive_pet)
- }
  if not pet.Present() and not pet.IsDead() and not PreviousSpell(revive_pet) Texture(ability_hunter_beastcall help=L(summon_pet))
 }
 
@@ -149,8 +145,8 @@ AddFunction BeastmasteryPrecombatShortCdActions
  Spell(worldvein_resonance_essence)
  #focused_azerite_beam,if=!raid_event.invulnerable.exists
  if not 0 Spell(focused_azerite_beam)
- #bestial_wrath,precast_time=1.5,if=azerite.primal_instincts.enabled&!essence.essence_of_the_focusing_iris.major&(equipped.azsharas_font_of_power|!equipped.pocketsized_computation_device|!cooldown.cyclotronic_blast.duration)
- if HasAzeriteTrait(primal_instincts_trait) and not AzeriteEssenceIsMajor(essence_of_the_focusing_iris_essence_id) and { HasEquippedItem(azsharas_font_of_power_item) or not HasEquippedItem(pocket_sized_computation_device_item) or not SpellCooldownDuration(cyclotronic_blast) } Spell(bestial_wrath)
+ #bestial_wrath,precast_time=1.5,if=azerite.primal_instincts.enabled&!essence.essence_of_the_focusing_iris.major&(equipped.azsharas_font_of_power|!equipped.cyclotronic_blast)
+ if HasAzeriteTrait(primal_instincts_trait) and not AzeriteEssenceIsMajor(essence_of_the_focusing_iris_essence_id) and { HasEquippedItem(azsharas_font_of_power_item) or not HasEquippedItem(cyclotronic_blast_item) } Spell(bestial_wrath)
 }
 
 AddFunction BeastmasteryPrecombatShortCdPostConditions
@@ -162,6 +158,8 @@ AddFunction BeastmasteryPrecombatCdActions
  #snapshot_stats
  #potion
  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
+ #use_item,name=azsharas_font_of_power
+ BeastmasteryUseItemActions()
 
  unless Spell(worldvein_resonance_essence)
  {
@@ -169,22 +167,20 @@ AddFunction BeastmasteryPrecombatCdActions
   Spell(guardian_of_azeroth)
   #memory_of_lucid_dreams
   Spell(memory_of_lucid_dreams_essence)
-  #use_item,name=azsharas_font_of_power
-  BeastmasteryUseItemActions()
-  #use_item,effect_name=cyclotronic_blast,if=!raid_event.invulnerable.exists
-  if not 0 BeastmasteryUseItemActions()
+  #use_item,effect_name=cyclotronic_blast,if=!raid_event.invulnerable.exists&(trinket.1.has_cooldown+trinket.2.has_cooldown<2|equipped.variable_intensity_gigavolt_oscillating_reactor)
+  if not 0 and { True(trinket_has_cooldown_undefined) + True(trinket_has_cooldown_undefined) < 2 or HasEquippedItem(variable_intensity_gigavolt_oscillating_reactor_item) } BeastmasteryUseItemActions()
 
   unless not 0 and Spell(focused_azerite_beam)
   {
-   #aspect_of_the_wild,precast_time=1.1,if=!azerite.primal_instincts.enabled&!essence.essence_of_the_focusing_iris.major&(equipped.azsharas_font_of_power|!equipped.pocketsized_computation_device|!cooldown.cyclotronic_blast.duration)
-   if not HasAzeriteTrait(primal_instincts_trait) and not AzeriteEssenceIsMajor(essence_of_the_focusing_iris_essence_id) and { HasEquippedItem(azsharas_font_of_power_item) or not HasEquippedItem(pocket_sized_computation_device_item) or not SpellCooldownDuration(cyclotronic_blast) } Spell(aspect_of_the_wild)
+   #aspect_of_the_wild,precast_time=1.1,if=!azerite.primal_instincts.enabled&!essence.essence_of_the_focusing_iris.major&(equipped.azsharas_font_of_power|!equipped.cyclotronic_blast)
+   if not HasAzeriteTrait(primal_instincts_trait) and not AzeriteEssenceIsMajor(essence_of_the_focusing_iris_essence_id) and { HasEquippedItem(azsharas_font_of_power_item) or not HasEquippedItem(cyclotronic_blast_item) } Spell(aspect_of_the_wild)
   }
  }
 }
 
 AddFunction BeastmasteryPrecombatCdPostConditions
 {
- Spell(worldvein_resonance_essence) or not 0 and Spell(focused_azerite_beam) or HasAzeriteTrait(primal_instincts_trait) and not AzeriteEssenceIsMajor(essence_of_the_focusing_iris_essence_id) and { HasEquippedItem(azsharas_font_of_power_item) or not HasEquippedItem(pocket_sized_computation_device_item) or not SpellCooldownDuration(cyclotronic_blast) } and Spell(bestial_wrath)
+ Spell(worldvein_resonance_essence) or not 0 and Spell(focused_azerite_beam) or HasAzeriteTrait(primal_instincts_trait) and not AzeriteEssenceIsMajor(essence_of_the_focusing_iris_essence_id) and { HasEquippedItem(azsharas_font_of_power_item) or not HasEquippedItem(cyclotronic_blast_item) } and Spell(bestial_wrath)
 }
 
 ### actions.cleave
@@ -315,8 +311,8 @@ AddFunction BeastmasteryCdsCdActions
  if BuffPresent(aspect_of_the_wild_buff) and { target.TimeToDie() > SpellCooldownDuration(blood_fury_ap) + BaseDuration(blood_fury_ap) or target.HealthPercent() < 35 or not Talent(killer_instinct_talent) } or target.TimeToDie() < 16 Spell(blood_fury_ap)
  #lights_judgment,if=pet.cat.buff.frenzy.up&pet.cat.buff.frenzy.remains>gcd.max|!pet.cat.buff.frenzy.up
  if pet.BuffPresent(pet_frenzy_buff) and pet.BuffRemaining(pet_frenzy_buff) > GCD() or not pet.BuffPresent(pet_frenzy_buff) Spell(lights_judgment)
- #potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up&(target.health.pct<35|!talent.killer_instinct.enabled)|target.time_to_die<25
- if { BuffPresent(bestial_wrath_buff) and BuffPresent(aspect_of_the_wild_buff) and { target.HealthPercent() < 35 or not Talent(killer_instinct_talent) } or target.TimeToDie() < 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
+ #potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up&(target.health.pct<35|!talent.killer_instinct.enabled)|(consumable.potion_of_unbridled_fury&target.time_to_die<61|target.time_to_die<26)
+ if { BuffPresent(bestial_wrath_buff) and BuffPresent(aspect_of_the_wild_buff) and { target.HealthPercent() < 35 or not Talent(killer_instinct_talent) } or BuffPresent(unbridled_fury) and target.TimeToDie() < 61 or target.TimeToDie() < 26 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
 
  unless BuffStacks(lifeblood_buff) < 4 and Spell(worldvein_resonance_essence)
  {
@@ -390,10 +386,10 @@ AddFunction BeastmasteryDefaultCdActions
  #auto_shot
  #use_items
  BeastmasteryUseItemActions()
- #use_item,effect_name=cyclotronic_blast,if=!buff.bestial_wrath.up
- if not BuffPresent(bestial_wrath_buff) BeastmasteryUseItemActions()
- #use_item,name=ashvanes_razor_coral,if=buff.aspect_of_the_wild.remains>15|debuff.razor_coral_debuff.down|target.time_to_die<20
- if BuffRemaining(aspect_of_the_wild_buff) > 15 or target.DebuffExpires(razor_coral) or target.TimeToDie() < 20 BeastmasteryUseItemActions()
+ #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.up&(prev_gcd.1.aspect_of_the_wild|!equipped.cyclotronic_blast&buff.aspect_of_the_wild.up)|(debuff.razor_coral_debuff.down|target.time_to_die<26)&target.time_to_die>(24*(cooldown.cyclotronic_blast.remains+4<target.time_to_die))
+ if target.DebuffPresent(razor_coral) and { PreviousGCDSpell(aspect_of_the_wild) or not HasEquippedItem(cyclotronic_blast_item) and BuffPresent(aspect_of_the_wild_buff) } or { target.DebuffExpires(razor_coral) or target.TimeToDie() < 26 } and target.TimeToDie() > 24 * { SpellCooldown(cyclotronic_blast) + 4 < target.TimeToDie() } BeastmasteryUseItemActions()
+ #use_item,effect_name=cyclotronic_blast,if=buff.bestial_wrath.down|target.time_to_die<5
+ if BuffExpires(bestial_wrath_buff) or target.TimeToDie() < 5 BeastmasteryUseItemActions()
  #call_action_list,name=cds
  BeastmasteryCdsCdActions()
 
@@ -492,6 +488,7 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # concentrated_flame_essence
 # counter_shot
 # cyclotronic_blast
+# cyclotronic_blast_item
 # dance_of_death_buff
 # dance_of_death_trait
 # dire_beast
@@ -510,7 +507,6 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # one_with_the_pack_talent
 # pet_beast_cleave_buff
 # pet_frenzy_buff
-# pocket_sized_computation_device_item
 # primal_instincts_trait
 # purifying_blast
 # quaking_palm
@@ -523,6 +519,8 @@ AddIcon checkbox=opt_hunter_beast_mastery_aoe help=cd specialization=beast_maste
 # spitting_cobra
 # stampede
 # the_unbound_force
+# unbridled_fury
+# variable_intensity_gigavolt_oscillating_reactor_item
 # war_stomp
 # worldvein_resonance_essence
 `
@@ -647,8 +645,8 @@ AddFunction MarksmanshipStMainActions
  if BuffPresent(trueshot_buff) or { BuffExpires(double_tap_buff) or Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } } and BuffExpires(precise_shots_buff) or SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) and SpellCooldown(trueshot) > 0 Spell(aimed_shot)
  #arcane_shot,if=buff.trueshot.up&buff.master_marksman.up&buff.memory_of_lucid_dreams.up
  if BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and BuffPresent(memory_of_lucid_dreams_essence_buff) Spell(arcane_shot)
- #concentrated_flame,if=!buff.trueshot.up
- if not BuffPresent(trueshot_buff) Spell(concentrated_flame_essence)
+ #concentrated_flame,if=focus+focus.regen*gcd<focus.max&buff.trueshot.down&(!dot.concentrated_flame_burn.remains&!action.concentrated_flame.in_flight)|full_recharge_time<gcd|target.time_to_die<5
+ if Focus() + FocusRegenRate() * GCD() < MaxFocus() and BuffExpires(trueshot_buff) and not target.DebuffRemaining(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() or target.TimeToDie() < 5 Spell(concentrated_flame_essence)
  #arcane_shot,if=buff.trueshot.down&(buff.precise_shots.up&(focus>41|buff.master_marksman.up)|(focus>50&azerite.focused_fire.enabled|focus>75)&(cooldown.trueshot.remains>5|focus>80)|target.time_to_die<5)
  if BuffExpires(trueshot_buff) and { BuffPresent(precise_shots_buff) and { Focus() > 41 or BuffPresent(master_marksman_buff) } or { Focus() > 50 and HasAzeriteTrait(focused_fire_trait) or Focus() > 75 } and { SpellCooldown(trueshot) > 5 or Focus() > 80 } or target.TimeToDie() < 5 } Spell(arcane_shot)
  #steady_shot
@@ -670,20 +668,20 @@ AddFunction MarksmanshipStShortCdActions
 
  unless target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or { BuffExpires(trueshot_buff) or Focus() < 70 } and Spell(rapid_fire)
  {
-  #focused_azerite_beam,if=!buff.trueshot.up
-  if not BuffPresent(trueshot_buff) Spell(focused_azerite_beam)
+  #focused_azerite_beam,if=!buff.trueshot.up|target.time_to_die<5
+  if not BuffPresent(trueshot_buff) or target.TimeToDie() < 5 Spell(focused_azerite_beam)
 
   unless BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or { BuffPresent(trueshot_buff) or { BuffExpires(double_tap_buff) or Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } } and BuffExpires(precise_shots_buff) or SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) and SpellCooldown(trueshot) > 0 } and Spell(aimed_shot) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot)
   {
    #piercing_shot
    Spell(piercing_shot)
-   #purifying_blast,if=!buff.trueshot.up
-   if not BuffPresent(trueshot_buff) Spell(purifying_blast)
+   #purifying_blast,if=!buff.trueshot.up|target.time_to_die<8
+   if not BuffPresent(trueshot_buff) or target.TimeToDie() < 8 Spell(purifying_blast)
 
-   unless not BuffPresent(trueshot_buff) and Spell(concentrated_flame_essence)
+   unless { Focus() + FocusRegenRate() * GCD() < MaxFocus() and BuffExpires(trueshot_buff) and not target.DebuffRemaining(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() or target.TimeToDie() < 5 } and Spell(concentrated_flame_essence)
    {
-    #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
-    if BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 Spell(the_unbound_force)
+    #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10|target.time_to_die<5
+    if BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 or target.TimeToDie() < 5 Spell(the_unbound_force)
    }
   }
  }
@@ -691,7 +689,7 @@ AddFunction MarksmanshipStShortCdActions
 
 AddFunction MarksmanshipStShortCdPostConditions
 {
- target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or { BuffExpires(trueshot_buff) or Focus() < 70 } and Spell(rapid_fire) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or { BuffPresent(trueshot_buff) or { BuffExpires(double_tap_buff) or Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } } and BuffExpires(precise_shots_buff) or SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) and SpellCooldown(trueshot) > 0 } and Spell(aimed_shot) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or not BuffPresent(trueshot_buff) and Spell(concentrated_flame_essence) or BuffExpires(trueshot_buff) and { BuffPresent(precise_shots_buff) and { Focus() > 41 or BuffPresent(master_marksman_buff) } or { Focus() > 50 and HasAzeriteTrait(focused_fire_trait) or Focus() > 75 } and { SpellCooldown(trueshot) > 5 or Focus() > 80 } or target.TimeToDie() < 5 } and Spell(arcane_shot) or Spell(steady_shot)
+ target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or { BuffExpires(trueshot_buff) or Focus() < 70 } and Spell(rapid_fire) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or { BuffPresent(trueshot_buff) or { BuffExpires(double_tap_buff) or Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } } and BuffExpires(precise_shots_buff) or SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) and SpellCooldown(trueshot) > 0 } and Spell(aimed_shot) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or { Focus() + FocusRegenRate() * GCD() < MaxFocus() and BuffExpires(trueshot_buff) and not target.DebuffRemaining(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() or target.TimeToDie() < 5 } and Spell(concentrated_flame_essence) or BuffExpires(trueshot_buff) and { BuffPresent(precise_shots_buff) and { Focus() > 41 or BuffPresent(master_marksman_buff) } or { Focus() > 50 and HasAzeriteTrait(focused_fire_trait) or Focus() > 75 } and { SpellCooldown(trueshot) > 5 or Focus() > 80 } or target.TimeToDie() < 5 } and Spell(arcane_shot) or Spell(steady_shot)
 }
 
 AddFunction MarksmanshipStCdActions
@@ -705,7 +703,7 @@ AddFunction MarksmanshipStCdActions
 
 AddFunction MarksmanshipStCdPostConditions
 {
- Spell(explosive_shot) or Enemies() > 1 and Spell(barrage) or Spell(a_murder_of_crows) or target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or { BuffExpires(trueshot_buff) or Focus() < 70 } and Spell(rapid_fire) or not BuffPresent(trueshot_buff) and Spell(focused_azerite_beam) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or { BuffPresent(trueshot_buff) or { BuffExpires(double_tap_buff) or Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } } and BuffExpires(precise_shots_buff) or SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) and SpellCooldown(trueshot) > 0 } and Spell(aimed_shot) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or Spell(piercing_shot) or not BuffPresent(trueshot_buff) and Spell(purifying_blast) or not BuffPresent(trueshot_buff) and Spell(concentrated_flame_essence) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 } and Spell(the_unbound_force) or BuffExpires(trueshot_buff) and { BuffPresent(precise_shots_buff) and { Focus() > 41 or BuffPresent(master_marksman_buff) } or { Focus() > 50 and HasAzeriteTrait(focused_fire_trait) or Focus() > 75 } and { SpellCooldown(trueshot) > 5 or Focus() > 80 } or target.TimeToDie() < 5 } and Spell(arcane_shot) or Spell(steady_shot)
+ Spell(explosive_shot) or Enemies() > 1 and Spell(barrage) or Spell(a_murder_of_crows) or target.Refreshable(serpent_sting_mm_debuff) and not InFlightToTarget(serpent_sting_mm) and Spell(serpent_sting_mm) or { BuffExpires(trueshot_buff) or Focus() < 70 } and Spell(rapid_fire) or { not BuffPresent(trueshot_buff) or target.TimeToDie() < 5 } and Spell(focused_azerite_beam) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and not BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or { BuffPresent(trueshot_buff) or { BuffExpires(double_tap_buff) or Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } } and BuffExpires(precise_shots_buff) or SpellFullRecharge(aimed_shot) < CastTime(aimed_shot) and SpellCooldown(trueshot) > 0 } and Spell(aimed_shot) or BuffPresent(trueshot_buff) and BuffPresent(master_marksman_buff) and BuffPresent(memory_of_lucid_dreams_essence_buff) and Spell(arcane_shot) or Spell(piercing_shot) or { not BuffPresent(trueshot_buff) or target.TimeToDie() < 8 } and Spell(purifying_blast) or { Focus() + FocusRegenRate() * GCD() < MaxFocus() and BuffExpires(trueshot_buff) and not target.DebuffRemaining(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() or target.TimeToDie() < 5 } and Spell(concentrated_flame_essence) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 or target.TimeToDie() < 5 } and Spell(the_unbound_force) or BuffExpires(trueshot_buff) and { BuffPresent(precise_shots_buff) and { Focus() > 41 or BuffPresent(master_marksman_buff) } or { Focus() > 50 and HasAzeriteTrait(focused_fire_trait) or Focus() > 75 } and { SpellCooldown(trueshot) > 5 or Focus() > 80 } or target.TimeToDie() < 5 } and Spell(arcane_shot) or Spell(steady_shot)
 }
 
 ### actions.precombat
@@ -753,6 +751,8 @@ AddFunction MarksmanshipPrecombatCdActions
   Spell(guardian_of_azeroth)
   #memory_of_lucid_dreams
   Spell(memory_of_lucid_dreams_essence)
+  #use_item,name=azsharas_font_of_power
+  MarksmanshipUseItemActions()
   #trueshot,precast_time=1.5,if=active_enemies>2
   if Enemies() > 2 Spell(trueshot)
  }
@@ -817,8 +817,8 @@ AddFunction MarksmanshipCdsCdActions
    {
     #memory_of_lucid_dreams,if=!buff.trueshot.up
     if not BuffPresent(trueshot_buff) Spell(memory_of_lucid_dreams_essence)
-    #potion,if=buff.trueshot.react&buff.bloodlust.react|buff.trueshot.up&ca_execute|target.time_to_die<25
-    if { BuffPresent(trueshot_buff) and BuffPresent(bloodlust) or BuffPresent(trueshot_buff) and Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } or target.TimeToDie() < 25 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
+    #potion,if=buff.trueshot.react&buff.bloodlust.react|buff.trueshot.up&ca_execute|(consumable.potion_of_unbridled_fury&target.time_to_die<61|target.time_to_die<26)
+    if { BuffPresent(trueshot_buff) and BuffPresent(bloodlust) or BuffPresent(trueshot_buff) and Talent(careful_aim_talent) and { target.HealthPercent() > 80 or target.HealthPercent() < 20 } or BuffPresent(unbridled_fury) and target.TimeToDie() < 61 or target.TimeToDie() < 26 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
     #trueshot,if=focus>60&(buff.precise_shots.down&cooldown.rapid_fire.remains&target.time_to_die>cooldown.trueshot.duration_guess+duration|target.health.pct<20|!talent.careful_aim.enabled)|target.time_to_die<15
     if Focus() > 60 and { BuffExpires(precise_shots_buff) and SpellCooldown(rapid_fire) > 0 and target.TimeToDie() > 0 + BaseDuration(trueshot) or target.HealthPercent() < 20 or not Talent(careful_aim_talent) } or target.TimeToDie() < 15 Spell(trueshot)
    }
@@ -981,6 +981,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # bloodlust
 # calling_the_shots_talent
 # careful_aim_talent
+# concentrated_flame_burn_debuff
 # concentrated_flame_essence
 # counter_shot
 # double_tap
@@ -1017,6 +1018,7 @@ AddIcon checkbox=opt_hunter_marksmanship_aoe help=cd specialization=marksmanship
 # trick_shots_buff
 # trueshot
 # trueshot_buff
+# unbridled_fury
 # unerring_vision_buff
 # unerring_vision_trait
 # war_stomp
@@ -1069,10 +1071,6 @@ AddFunction SurvivalUseItemActions
 
 AddFunction SurvivalSummonPet
 {
- if pet.IsDead()
- {
-  Spell(revive_pet)
- }
  if not pet.Present() and not pet.IsDead() and not PreviousSpell(revive_pet) Texture(ability_hunter_beastcall help=L(summon_pet))
 }
 
@@ -1261,6 +1259,12 @@ AddFunction SurvivalPrecombatCdActions
  #snapshot_stats
  #potion
  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
+ #use_item,name=azsharas_font_of_power
+ SurvivalUseItemActions()
+ #use_item,effect_name=cyclotronic_blast,if=!raid_event.invulnerable.exists
+ if not 0 SurvivalUseItemActions()
+ #guardian_of_azeroth
+ Spell(guardian_of_azeroth)
 }
 
 AddFunction SurvivalPrecombatCdPostConditions
@@ -1393,13 +1397,17 @@ AddFunction SurvivalCdsCdActions
  Spell(lights_judgment)
  #berserking,if=cooldown.coordinated_assault.remains>60|time_to_die<13
  if SpellCooldown(coordinated_assault) > 60 or target.TimeToDie() < 13 Spell(berserking)
- #potion,if=buff.coordinated_assault.up&(buff.berserking.up|buff.blood_fury.up|!race.troll&!race.orc)|time_to_die<26
- if { BuffPresent(coordinated_assault_buff) and { BuffPresent(berserking_buff) or BuffPresent(blood_fury_ap_buff) or not Race(Troll) and not Race(Orc) } or target.TimeToDie() < 26 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
+ #potion,if=buff.coordinated_assault.up&(buff.berserking.up|buff.blood_fury.up|!race.troll&!race.orc)|(consumable.potion_of_unbridled_fury&target.time_to_die<61|target.time_to_die<26)
+ if { BuffPresent(coordinated_assault_buff) and { BuffPresent(berserking_buff) or BuffPresent(blood_fury_ap_buff) or not Race(Troll) and not Race(Orc) } or BuffPresent(unbridled_fury) and target.TimeToDie() < 61 or target.TimeToDie() < 26 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_unbridled_fury usable=1)
 
  unless target.Distance() >= 6 and Spell(aspect_of_the_eagle)
  {
   #use_item,name=ashvanes_razor_coral,if=buff.memory_of_lucid_dreams.up|buff.guardian_of_azeroth.up|debuff.razor_coral_debuff.down|target.time_to_die<20
   if BuffPresent(memory_of_lucid_dreams_essence_buff) or BuffPresent(guardian_of_azeroth_buff) or target.DebuffExpires(razor_coral) or target.TimeToDie() < 20 SurvivalUseItemActions()
+  #use_item,name=galecallers_boon,if=cooldown.memory_of_lucid_dreams.remains|talent.wildfire_infusion.enabled&cooldown.coordinated_assault.remains|cooldown.cyclotronic_blast.remains|!essence.memory_of_lucid_dreams.major&cooldown.coordinated_assault.remains
+  if SpellCooldown(memory_of_lucid_dreams_essence) > 0 or Talent(wildfire_infusion_talent) and SpellCooldown(coordinated_assault) > 0 or SpellCooldown(cyclotronic_blast) > 0 or not AzeriteEssenceIsMajor(memory_of_lucid_dreams_essence_id) and SpellCooldown(coordinated_assault) > 0 SurvivalUseItemActions()
+  #use_item,name=azsharas_font_of_power
+  SurvivalUseItemActions()
 
   unless Spell(focused_azerite_beam)
   {
@@ -1821,6 +1829,7 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # concentrated_flame_essence
 # coordinated_assault
 # coordinated_assault_buff
+# cyclotronic_blast
 # fireblood
 # flanking_strike
 # focused_azerite_beam
@@ -1835,6 +1844,7 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # lights_judgment
 # memory_of_lucid_dreams_essence
 # memory_of_lucid_dreams_essence_buff
+# memory_of_lucid_dreams_essence_id
 # mongoose_bite
 # mongoose_fury_buff
 # muzzle
@@ -1852,6 +1862,7 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 # terms_of_engagement_talent
 # the_unbound_force
 # tip_of_the_spear_buff
+# unbridled_fury
 # vipers_venom_buff
 # vipers_venom_talent
 # war_stomp
@@ -1862,4 +1873,5 @@ AddIcon checkbox=opt_hunter_survival_aoe help=cd specialization=survival
 `
 	OvaleScripts.RegisterScript("HUNTER", "survival", name, desc, code, "script")
 }
+
 }

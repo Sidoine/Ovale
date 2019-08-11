@@ -45,7 +45,7 @@ local UnitStagger = UnitStagger
 local huge = math.huge
 local min = math.min
 local __AST = LibStub:GetLibrary("ovale/AST")
-local isValueNode = __AST.isValueNode
+local isNodeType = __AST.isNodeType
 local lower = string.lower
 local __Ovale = LibStub:GetLibrary("ovale/Ovale")
 local Print = __Ovale.Print
@@ -75,7 +75,7 @@ __exports.OvaleConditions = __class(nil, {
             local node = self.OvaleCompile:GetFunctionNode(name)
             if node then
                 local _, element = self.OvaleBestAction:Compute(node.child[1], atTime)
-                if element and isValueNode(element) then
+                if element and isNodeType(element, "value") then
                     local value = element.value + (atTime - element.origin) * element.rate
                     return value
                 end

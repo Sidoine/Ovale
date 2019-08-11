@@ -1,5 +1,5 @@
 import { LuaObj, LuaArray, lualength, ipairs, truthy, wipe } from "@wowts/lua";
-import { AstNode, OperatorType, OvaleASTClass, isValueNode } from "../AST";
+import { AstNode, OperatorType, OvaleASTClass, isNodeType } from "../AST";
 import { Annotation, TagPriority } from "./definitions";
 import { OvaleDebugClass, Tracer } from "../Debug";
 import { OvaleDataClass } from "../Data";
@@ -82,7 +82,7 @@ export class Splitter {
             if (firstParamNode.type == "variable") {
                 name = firstParamNode.name;
                 id = annotation.dictionary && annotation.dictionary[name];
-            } else if (isValueNode(firstParamNode)) {
+            } else if (isNodeType(firstParamNode, "value")) {
                 name = firstParamNode.value;
                 id = <number>firstParamNode.value;
             }
@@ -101,7 +101,7 @@ export class Splitter {
             if (firstParamNode.type == "variable") {
                 name = firstParamNode.name;
                 id = annotation.dictionary && annotation.dictionary[name];
-            } else if (isValueNode(firstParamNode)) {
+            } else if (isNodeType(firstParamNode, "value")) {
                 name = firstParamNode.value;
                 id = <number>name;
             }

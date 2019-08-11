@@ -9,11 +9,11 @@ import { POWER_TYPES, PowerType } from "./Power";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { checkBoxes, lists, ResetControls } from "./Controls";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import { ipairs, pairs, tonumber, tostring, type, wipe, LuaArray, lualength, truthy, LuaObj, kpairs } from "@wowts/lua";
+import { ipairs, pairs, tonumber, tostring, wipe, LuaArray, lualength, truthy, LuaObj, kpairs } from "@wowts/lua";
 import { find, match, sub } from "@wowts/string";
 import { insert } from "@wowts/table";
 import { GetSpellInfo } from "@wowts/wow-mock";
-import { isLuaArray, checkToken } from "./tools";
+import { isLuaArray, checkToken, isNumber, isString } from "./tools";
 import { OvaleDebugClass, Tracer } from "./Debug";
 import { OvaleProfilerClass, Profiler } from "./Profiler";
 import { OvaleOptionsClass } from "./Options";
@@ -23,6 +23,14 @@ import { OvaleScoreClass } from "./Score";
 import { OvaleStanceClass } from "./Stance";
 
 const NUMBER_PATTERN = "^%-?%d+%.?%d*$";
+
+function getFunctionCallString(node: AstNode) {
+    let functionCall = node.name;
+    if (node.paramsAsString) {
+        functionCall = `${node.name}(${node.paramsAsString})`;
+    }
+    return functionCall;
+}                                
 
 export class OvaleCompileClass {
     private serial: number | undefined = undefined;
@@ -347,6 +355,7 @@ export class OvaleCompileClass {
     
     private EvaluateSpellAuraList(node: AstNode) {
         let ok = true;
+
         let [spellId, positionalParams, namedParams] = [node.spellId, node.positionalParams, node.namedParams];
         if (!spellId) {
             this.tracer.Error("No spellId for name %s", node.name);
@@ -486,32 +495,36 @@ export class OvaleCompileClass {
         return ok;
     }
     
+    /** This attempt to replace an unknown spell by a spell with
+     * the same name that is known in a Spell function call. In the case of
+     * a spell list, it tries to find the one that is known. */ 
     private AddMissingVariantSpells(annotation: AstAnnotation) {
         if (annotation.functionReference) {
             for (const [, node] of ipairs(annotation.functionReference)) {
-                let [positionalParams,] = [node.positionalParams, node.namedParams];
-                let spellId = <number>positionalParams[1];
-                if (spellId && this.ovaleCondition.IsSpellBookCondition(node.func)) {
-                    if (!this.ovaleSpellBook.IsKnownSpell(spellId) && !this.ovaleCooldown.IsSharedCooldown(spellId)) {
-                        let spellName;
-                        if (type(spellId) == "number") {
-                            spellName = this.ovaleSpellBook.GetSpellName(spellId);
-                        }
-                        if (spellName) {
-                            let [name] = GetSpellInfo(spellName);
-                            if (spellName == name) {
-                                this.tracer.Debug("Learning spell %s with ID %d.", spellName, spellId);
-                                this.ovaleSpellBook.AddSpell(spellId, spellName);
+                if (this.ovaleCondition.IsSpellBookCondition(node.func)) {
+                    let [positionalParams,] = [node.positionalParams, node.namedParams];
+                    let spellId = positionalParams[1];
+                    if (isNumber(spellId)) {
+                        if (!this.ovaleSpellBook.IsKnownSpell(spellId) && !this.ovaleCooldown.IsSharedCooldown(spellId)) {
+                            const spellName = this.ovaleSpellBook.GetSpellName(spellId);
+                            if (spellName) {
+                                let [name] = GetSpellInfo(spellName);
+                                if (spellName == name) {
+                                    this.tracer.Debug("Learning spell %s with ID %d.", spellName, spellId);
+                                    this.ovaleSpellBook.AddSpell(spellId, spellName);
+                                }
+                            } else {
+                                this.tracer.Error("Unknown spell with ID %s used in %s.", spellId, getFunctionCallString(node));
                             }
-                        } else {
-                            let functionCall = node.name;
-                            if (node.paramsAsString) {
-                                functionCall = `${node.name}(${node.paramsAsString})`;
-                            }
-                            this.tracer.Error("Unknown spell with ID %s used in %s.", spellId, functionCall);
                         }
-                    }
-                }
+                    } else if (isString(spellId)) {
+                        if (!this.ovaleData.buffSpellList[spellId]) {
+                            this.tracer.Error("Unknown spell list %s in %s.", spellId, getFunctionCallString(node));
+                        }
+                    } else if (spellId) {
+                        this.tracer.Error("Spell argument must be either a spell id or a spell list name in %s.", getFunctionCallString(node))
+                    }     
+                }                           
             }
         }
     }
