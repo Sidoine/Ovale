@@ -797,7 +797,7 @@ export class OvaleASTClass {
             return `#${node.comment}`;
         }
     }
-    private UnparseCommaSeparatedValues(node: CsvNode) {
+    private UnparseCommaSeparatedValues = (node: CsvNode) => {
         let output = this.self_outputPool.Get();
         for (const [k, v] of ipairs(node.csv)) {
             output[k] = this.Unparse(v);
@@ -914,7 +914,7 @@ export class OvaleASTClass {
     UnparseList:UnparserFunction = (node) => {
         return format("%s(%s %s)", node.keyword, node.name, this.UnparseParameters(node.rawPositionalParams, node.rawNamedParams));
     }
-    private UnparseValue(node: ValueNode) {
+    private UnparseValue = (node: ValueNode) => {
         return tostring(node.value);
     }
     UnparseParameters(positionalParams: RawPositionalParameters, namedParams: RawNamedParameters) {
@@ -989,7 +989,7 @@ export class OvaleASTClass {
         let identifier = node.name && node.name || node.spellId;
         return format("SpellRequire(%s %s %s)", identifier, node.property, this.UnparseParameters(node.rawPositionalParams, node.rawNamedParams));
     }
-    private UnparseString(node: StringNode) {
+    private UnparseString = (node: StringNode) => {
         return `"${node.value}"`;
     }
     UnparseUnless: UnparserFunction = (node) => {

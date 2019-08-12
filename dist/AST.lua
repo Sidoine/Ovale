@@ -405,6 +405,15 @@ __exports.OvaleASTClass = __class(nil, {
                 return "#" .. node.comment
             end
         end
+        self.UnparseCommaSeparatedValues = function(node)
+            local output = self.self_outputPool:Get()
+            for k, v in ipairs(node.csv) do
+                output[k] = self:Unparse(v)
+            end
+            local outputString = concat(output, ",")
+            self.self_outputPool:Release(output)
+            return outputString
+        end
         self.UnparseDefine = function(node)
             return format("Define(%s %s)", node.name, node.value)
         end
@@ -513,6 +522,9 @@ __exports.OvaleASTClass = __class(nil, {
         self.UnparseList = function(node)
             return format("%s(%s %s)", node.keyword, node.name, self:UnparseParameters(node.rawPositionalParams, node.rawNamedParams))
         end
+        self.UnparseValue = function(node)
+            return tostring(node.value)
+        end
         self.UnparseScoreSpells = function(node)
             return format("ScoreSpells(%s)", self:UnparseParameters(node.rawPositionalParams, node.rawNamedParams))
         end
@@ -557,6 +569,9 @@ __exports.OvaleASTClass = __class(nil, {
         self.UnparseSpellRequire = function(node)
             local identifier = node.name and node.name or node.spellId
             return format("SpellRequire(%s %s %s)", identifier, node.property, self:UnparseParameters(node.rawPositionalParams, node.rawNamedParams))
+        end
+        self.UnparseString = function(node)
+            return "\"" .. node.value .. "\""
         end
         self.UnparseUnless = function(node)
             if node.child[2].type == "group" then
@@ -1926,18 +1941,6 @@ __exports.OvaleASTClass = __class(nil, {
             end
         end
     end,
-    UnparseCommaSeparatedValues = function(self, node)
-        local output = self.self_outputPool:Get()
-        for k, v in ipairs(node.csv) do
-            output[k] = self:Unparse(v)
-        end
-        local outputString = concat(output, ",")
-        self.self_outputPool:Release(output)
-        return outputString
-    end,
-    UnparseValue = function(self, node)
-        return tostring(node.value)
-    end,
     UnparseParameters = function(self, positionalParams, namedParams)
         local output = self.self_outputPool:Get()
         for k, v in kpairs(namedParams) do
@@ -1963,9 +1966,6 @@ __exports.OvaleASTClass = __class(nil, {
         local outputString = concat(output, " ")
         self.self_outputPool:Release(output)
         return outputString
-    end,
-    UnparseString = function(self, node)
-        return "\"" .. node.value .. "\""
     end,
     SyntaxError = function(self, tokenStream, ...)
         self.debug:Warning(...)
