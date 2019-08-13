@@ -1,6 +1,6 @@
 import { ParseNode, Annotation, Modifier, SPECIAL_ACTION, interruptsClasses, Modifiers, UNARY_OPERATOR, SimcBinaryOperatorType, BINARY_OPERATOR, SimcUnaryOperatorType, checkOptionalSkill, CHARACTER_PROPERTY } from "./definitions";
 import { LuaArray, truthy, tonumber, lualength, kpairs, LuaObj, ipairs, tostring } from "@wowts/lua";
-import { AstNode, OvaleASTClass, isValueNode, OperatorType, StringNode, ValueNode } from "../AST";
+import { AstNode, OvaleASTClass, OperatorType, StringNode, ValueNode, isNodeType } from "../AST";
 import { Tracer, OvaleDebugClass } from "../Debug";
 import { format, gmatch, find, match, lower, gsub, sub, len, upper } from "@wowts/string";
 import { OvaleDataClass } from "../Data";
@@ -177,6 +177,7 @@ export class Emiter {
         this.AddDisambiguation("incarnation", "incarnation_guardian_of_ursoc", "DRUID", "guardian");
         this.AddDisambiguation("swipe", "swipe_bear", "DRUID", "guardian");
         this.AddDisambiguation("swipe", "swipe_cat", "DRUID", "feral");
+        this.AddDisambiguation("rake_bleed", "rake_debuff", "DRUID", "feral");
         
         //Hunter
         this.AddDisambiguation("a_murder_of_crows_talent", "mm_a_murder_of_crows_talent", "HUNTER", "marksmanship");
@@ -1016,7 +1017,7 @@ export class Emiter {
                 if (operator) {
                     let rhsNode = this.Emit(parseNode.child[1], nodeList, annotation, action);
                     if (rhsNode) {
-                        if (operator == "-" && isValueNode(rhsNode)) {
+                        if (operator == "-" && isNodeType(rhsNode, "value")) {
                             rhsNode.value = -1 * <number>rhsNode.value;
                         } else {
                             node = this.ovaleAst.NewNode(nodeList, true);
@@ -1327,7 +1328,7 @@ export class Emiter {
             }
         } else if (property == "shard_react") {
             code = "SoulShards() >= 1";
-        } else if (property == "tick_dmg") {
+        } else if (property == "tick_dmg" || property === "tick_damage") {
             code = format("%sLastDamage(%s)", buffTarget, buffName);
         } else if (property == "tick_time") {
             code = format("%sCurrentTickTime(%s)", buffTarget, buffName);
@@ -2489,7 +2490,9 @@ export class Emiter {
             if (property == "adds") {
                 code = "Enemies()-1";
             } else if (property == "time_to_die") {
-                code = "target.TimeToDie()"
+                code = "target.TimeToDie()";
+            } else if (property === "time_to_pct_30") {
+                code = "target.TimeToHealthPercent(30)";
             } else {
                 ok = false;
             }

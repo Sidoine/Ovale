@@ -41,7 +41,7 @@ AddFunction use_filler
 
 AddFunction skip_rupture
 {
- target.DebuffPresent(vendetta_debuff) and target.DebuffPresent(toxic_blade_debuff) and target.DebuffRemaining(rupture_debuff) > 2
+ target.DebuffPresent(vendetta_debuff) and { target.DebuffPresent(toxic_blade_debuff) or BuffRemaining(master_assassin_buff) > 0 } and target.DebuffRemaining(rupture_debuff) > 2
 }
 
 AddFunction skip_cycle_rupture
@@ -188,10 +188,8 @@ AddFunction AssassinationPrecombatCdPostConditions
 
 AddFunction AssassinationEssencesMainActions
 {
- #concentrated_flame
- Spell(concentrated_flame_essence)
- #focused_azerite_beam,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60&energy<70
- if Enemies() >= 2 or 600 > 60 and Energy() < 70 Spell(focused_azerite_beam)
+ #concentrated_flame,if=energy.time_to_max>1&!debuff.vendetta.up&(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
+ if TimeToMaxEnergy() > 1 and not target.DebuffPresent(vendetta_debuff) and { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } Spell(concentrated_flame_essence)
 }
 
 AddFunction AssassinationEssencesMainPostConditions
@@ -200,8 +198,10 @@ AddFunction AssassinationEssencesMainPostConditions
 
 AddFunction AssassinationEssencesShortCdActions
 {
- unless Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 and Energy() < 70 } and Spell(focused_azerite_beam)
+ unless TimeToMaxEnergy() > 1 and not target.DebuffPresent(vendetta_debuff) and { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } and Spell(concentrated_flame_essence)
  {
+  #focused_azerite_beam,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60&energy<70
+  if Enemies() >= 2 or 600 > 60 and Energy() < 70 Spell(focused_azerite_beam)
   #purifying_blast,if=spell_targets.fan_of_knives>=2|raid_event.adds.in>60
   if Enemies() >= 2 or 600 > 60 Spell(purifying_blast)
   #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
@@ -215,17 +215,19 @@ AddFunction AssassinationEssencesShortCdActions
 
 AddFunction AssassinationEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 and Energy() < 70 } and Spell(focused_azerite_beam)
+ TimeToMaxEnergy() > 1 and not target.DebuffPresent(vendetta_debuff) and { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } and Spell(concentrated_flame_essence)
 }
 
 AddFunction AssassinationEssencesCdActions
 {
- unless Spell(concentrated_flame_essence)
+ unless TimeToMaxEnergy() > 1 and not target.DebuffPresent(vendetta_debuff) and { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } and Spell(concentrated_flame_essence)
  {
   #blood_of_the_enemy,if=debuff.vendetta.up&(!talent.toxic_blade.enabled|debuff.toxic_blade.up&combo_points.deficit<=1|debuff.vendetta.remains<=10)|target.time_to_die<=10
   if target.DebuffPresent(vendetta_debuff) and { not Talent(toxic_blade_talent) or target.DebuffPresent(toxic_blade_debuff) and ComboPointsDeficit() <= 1 or target.DebuffRemaining(vendetta_debuff) <= 10 } or target.TimeToDie() <= 10 Spell(blood_of_the_enemy)
-  #guardian_of_azeroth
-  Spell(guardian_of_azeroth)
+  #guardian_of_azeroth,if=cooldown.vendetta.remains<3|debuff.vendetta.up|target.time_to_die<30
+  if SpellCooldown(vendetta) < 3 or target.DebuffPresent(vendetta_debuff) or target.TimeToDie() < 30 Spell(guardian_of_azeroth)
+  #guardian_of_azeroth,if=floor((target.time_to_die-30)%cooldown)>floor((target.time_to_die-30-cooldown.vendetta.remains)%cooldown)
+  if { target.TimeToDie() - 30 } / SpellCooldown(guardian_of_azeroth) > { target.TimeToDie() - 30 - SpellCooldown(vendetta) } / SpellCooldown(guardian_of_azeroth) Spell(guardian_of_azeroth)
 
   unless { Enemies() >= 2 or 600 > 60 and Energy() < 70 } and Spell(focused_azerite_beam) or { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 } and Spell(the_unbound_force) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
   {
@@ -237,7 +239,7 @@ AddFunction AssassinationEssencesCdActions
 
 AddFunction AssassinationEssencesCdPostConditions
 {
- Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 and Energy() < 70 } and Spell(focused_azerite_beam) or { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 } and Spell(the_unbound_force) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
+ TimeToMaxEnergy() > 1 and not target.DebuffPresent(vendetta_debuff) and { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } and Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 and Energy() < 70 } and Spell(focused_azerite_beam) or { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 } and Spell(the_unbound_force) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
 }
 
 ### actions.dot
@@ -246,7 +248,7 @@ AddFunction AssassinationDotMainActions
 {
  #variable,name=skip_cycle_garrote,value=priority_rotation&spell_targets.fan_of_knives>3&(dot.garrote.remains<cooldown.garrote.duration|poisoned_bleeds>5)
  #variable,name=skip_cycle_rupture,value=priority_rotation&spell_targets.fan_of_knives>3&(debuff.toxic_blade.up|(poisoned_bleeds>5&!azerite.scent_of_blood.enabled))
- #variable,name=skip_rupture,value=debuff.vendetta.up&debuff.toxic_blade.up&dot.rupture.remains>2
+ #variable,name=skip_rupture,value=debuff.vendetta.up&(debuff.toxic_blade.up|master_assassin_remains>0)&dot.rupture.remains>2
  #rupture,if=talent.exsanguinate.enabled&((combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1)|(!ticking&(time>10|combo_points>=2)))
  if Talent(exsanguinate_talent) and { ComboPoints() >= MaxComboPoints() and SpellCooldown(exsanguinate) < 1 or not target.DebuffPresent(rupture_debuff) and { TimeInCombat() > 10 or ComboPoints() >= 2 } } Spell(rupture)
  #pool_resource,for_next=1
@@ -382,8 +384,8 @@ AddFunction AssassinationCdsShortCdActions
   if Talent(subterfuge_talent) and not Stealthed() and not SpellCooldown(garrote) > 0 and { ss_vanish_condition() or not HasAzeriteTrait(shrouded_suffocation_trait) and target.DebuffRefreshable(garrote_debuff) } and ComboPointsDeficit() >= { 1 + 2 * HasAzeriteTrait(shrouded_suffocation_trait) } * Enemies() >? 4 and 600 > 12 and CheckBoxOn(opt_vanish) Spell(vanish)
   unless Talent(subterfuge_talent) and not Stealthed() and not SpellCooldown(garrote) > 0 and { ss_vanish_condition() or not HasAzeriteTrait(shrouded_suffocation_trait) and target.DebuffRefreshable(garrote_debuff) } and ComboPointsDeficit() >= { 1 + 2 * HasAzeriteTrait(shrouded_suffocation_trait) } * Enemies() >? 4 and 600 > 12 and CheckBoxOn(opt_vanish) and SpellUsable(vanish) and SpellCooldown(vanish) < TimeToEnergy(45)
   {
-   #vanish,if=talent.master_assassin.enabled&!stealthed.all&master_assassin_remains<=0&!dot.rupture.refreshable&dot.garrote.remains>3&(!essence.blood_of_the_enemy.major|debuff.blood_of_the_enemy.up)
-   if Talent(master_assassin_talent) and not Stealthed() and BuffRemaining(master_assassin_buff) <= 0 and not target.DebuffRefreshable(rupture_debuff) and target.DebuffRemaining(garrote_debuff) > 3 and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or target.DebuffPresent(blood_of_the_enemy) } and CheckBoxOn(opt_vanish) Spell(vanish)
+   #vanish,if=talent.master_assassin.enabled&!stealthed.all&master_assassin_remains<=0&!dot.rupture.refreshable&dot.garrote.remains>3&debuff.vendetta.up&(!talent.toxic_blade.enabled|debuff.toxic_blade.up)&(!essence.blood_of_the_enemy.major|debuff.blood_of_the_enemy.up)
+   if Talent(master_assassin_talent) and not Stealthed() and BuffRemaining(master_assassin_buff) <= 0 and not target.DebuffRefreshable(rupture_debuff) and target.DebuffRemaining(garrote_debuff) > 3 and target.DebuffPresent(vendetta_debuff) and { not Talent(toxic_blade_talent) or target.DebuffPresent(toxic_blade_debuff) } and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or target.DebuffPresent(blood_of_the_enemy) } and CheckBoxOn(opt_vanish) Spell(vanish)
   }
  }
 }
@@ -400,8 +402,8 @@ AddFunction AssassinationCdsCdActions
 
  unless not Stealthed() and target.DebuffPresent(rupture_debuff) and BuffRemaining(master_assassin_buff) == 0 and AssassinationEssencesCdPostConditions() or False(raid_event_adds_exists) and { target.TimeToDie() < ComboPointsDeficit() * 1.5 or ComboPointsDeficit() >= MaxComboPoints() } and Spell(marked_for_death) or 600 > 30 - 10 and ComboPointsDeficit() >= MaxComboPoints() and Spell(marked_for_death)
  {
-  #vendetta,if=!stealthed.rogue&dot.rupture.ticking&!debuff.vendetta.up&(!talent.subterfuge.enabled|!azerite.shrouded_suffocation.enabled|dot.garrote.pmultiplier>1&(spell_targets.fan_of_knives<6|!cooldown.vanish.up))&(!talent.nightstalker.enabled|!talent.exsanguinate.enabled|cooldown.exsanguinate.remains<5-2*talent.deeper_stratagem.enabled)
-  if not Stealthed() and target.DebuffPresent(rupture_debuff) and not target.DebuffPresent(vendetta_debuff) and { not Talent(subterfuge_talent) or not HasAzeriteTrait(shrouded_suffocation_trait) or target.DebuffPersistentMultiplier(garrote_debuff) > 1 and { Enemies() < 6 or not { not SpellCooldown(vanish) > 0 } } } and { not Talent(nightstalker_talent) or not Talent(exsanguinate_talent) or SpellCooldown(exsanguinate) < 5 - 2 * TalentPoints(deeper_stratagem_talent) } Spell(vendetta)
+  #vendetta,if=!stealthed.rogue&dot.rupture.ticking&!debuff.vendetta.up&(!talent.subterfuge.enabled|!azerite.shrouded_suffocation.enabled|dot.garrote.pmultiplier>1&(spell_targets.fan_of_knives<6|!cooldown.vanish.up))&(!talent.nightstalker.enabled|!talent.exsanguinate.enabled|cooldown.exsanguinate.remains<5-2*talent.deeper_stratagem.enabled)&(!equipped.azsharas_font_of_power|azerite.shrouded_suffocation.enabled|debuff.razor_coral_debuff.down|trinket.ashvanes_razor_coral.cooldown.remains<10&cooldown.toxic_blade.remains<1)
+  if not Stealthed() and target.DebuffPresent(rupture_debuff) and not target.DebuffPresent(vendetta_debuff) and { not Talent(subterfuge_talent) or not HasAzeriteTrait(shrouded_suffocation_trait) or target.DebuffPersistentMultiplier(garrote_debuff) > 1 and { Enemies() < 6 or not { not SpellCooldown(vanish) > 0 } } } and { not Talent(nightstalker_talent) or not Talent(exsanguinate_talent) or SpellCooldown(exsanguinate) < 5 - 2 * TalentPoints(deeper_stratagem_talent) } and { not HasEquippedItem(azsharas_font_of_power_item) or HasAzeriteTrait(shrouded_suffocation_trait) or target.DebuffExpires(razor_coral) or BuffRemaining(trinket_ashvanes_razor_coral_cooldown_buff) < 10 and SpellCooldown(toxic_blade) < 1 } Spell(vendetta)
 
   unless Talent(exsanguinate_talent) and { Talent(nightstalker_talent) or Talent(subterfuge_talent) and single_target() } and ComboPoints() >= MaxComboPoints() and SpellCooldown(exsanguinate) < 1 and { not Talent(subterfuge_talent) or not HasAzeriteTrait(shrouded_suffocation_trait) or target.DebuffPersistentMultiplier(garrote_debuff) <= 1 } and CheckBoxOn(opt_vanish) and Spell(vanish) or Talent(nightstalker_talent) and not Talent(exsanguinate_talent) and ComboPoints() >= MaxComboPoints() and target.DebuffPresent(vendetta_debuff) and CheckBoxOn(opt_vanish) and Spell(vanish)
   {
@@ -410,7 +412,7 @@ AddFunction AssassinationCdsCdActions
    #vanish,if=talent.subterfuge.enabled&!stealthed.rogue&cooldown.garrote.up&(variable.ss_vanish_condition|!azerite.shrouded_suffocation.enabled&dot.garrote.refreshable)&combo_points.deficit>=((1+2*azerite.shrouded_suffocation.enabled)*spell_targets.fan_of_knives)>?4&raid_event.adds.in>12
    unless Talent(subterfuge_talent) and not Stealthed() and not SpellCooldown(garrote) > 0 and { ss_vanish_condition() or not HasAzeriteTrait(shrouded_suffocation_trait) and target.DebuffRefreshable(garrote_debuff) } and ComboPointsDeficit() >= { 1 + 2 * HasAzeriteTrait(shrouded_suffocation_trait) } * Enemies() >? 4 and 600 > 12 and CheckBoxOn(opt_vanish) and SpellUsable(vanish) and SpellCooldown(vanish) < TimeToEnergy(45)
    {
-    unless Talent(master_assassin_talent) and not Stealthed() and BuffRemaining(master_assassin_buff) <= 0 and not target.DebuffRefreshable(rupture_debuff) and target.DebuffRemaining(garrote_debuff) > 3 and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or target.DebuffPresent(blood_of_the_enemy) } and CheckBoxOn(opt_vanish) and Spell(vanish)
+    unless Talent(master_assassin_talent) and not Stealthed() and BuffRemaining(master_assassin_buff) <= 0 and not target.DebuffRefreshable(rupture_debuff) and target.DebuffRemaining(garrote_debuff) > 3 and target.DebuffPresent(vendetta_debuff) and { not Talent(toxic_blade_talent) or target.DebuffPresent(toxic_blade_debuff) } and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or target.DebuffPresent(blood_of_the_enemy) } and CheckBoxOn(opt_vanish) and Spell(vanish)
     {
      #shadowmeld,if=!stealthed.all&azerite.shrouded_suffocation.enabled&dot.garrote.refreshable&dot.garrote.pmultiplier<=1&combo_points.deficit>=1
      if not Stealthed() and HasAzeriteTrait(shrouded_suffocation_trait) and target.DebuffRefreshable(garrote_debuff) and target.DebuffPersistentMultiplier(garrote_debuff) <= 1 and ComboPointsDeficit() >= 1 Spell(shadowmeld)
@@ -429,8 +431,8 @@ AddFunction AssassinationCdsCdActions
       if target.DebuffPresent(vendetta_debuff) Spell(ancestral_call)
       #use_item,name=galecallers_boon,if=cooldown.vendetta.remains>45
       if SpellCooldown(vendetta) > 45 AssassinationUseItemActions()
-      #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.vendetta.remains>10|target.time_to_die<20+cooldown.latent_arcana.remains
-      if target.DebuffExpires(razor_coral) or target.DebuffRemaining(vendetta_debuff) > 10 or target.TimeToDie() < 20 + SpellCooldown(latent_arcana) AssassinationUseItemActions()
+      #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.vendetta.remains>10-4*equipped.azsharas_font_of_power|target.time_to_die<20
+      if target.DebuffExpires(razor_coral) or target.DebuffRemaining(vendetta_debuff) > 10 - 4 * HasEquippedItem(azsharas_font_of_power_item) or target.TimeToDie() < 20 AssassinationUseItemActions()
       #use_item,name=lurkers_insidious_gift,if=debuff.vendetta.up
       if target.DebuffPresent(vendetta_debuff) AssassinationUseItemActions()
       #use_item,name=lustrous_golden_plumage,if=debuff.vendetta.up
@@ -452,7 +454,7 @@ AddFunction AssassinationCdsCdActions
 
 AddFunction AssassinationCdsCdPostConditions
 {
- not Stealthed() and target.DebuffPresent(rupture_debuff) and BuffRemaining(master_assassin_buff) == 0 and AssassinationEssencesCdPostConditions() or False(raid_event_adds_exists) and { target.TimeToDie() < ComboPointsDeficit() * 1.5 or ComboPointsDeficit() >= MaxComboPoints() } and Spell(marked_for_death) or 600 > 30 - 10 and ComboPointsDeficit() >= MaxComboPoints() and Spell(marked_for_death) or Talent(exsanguinate_talent) and { Talent(nightstalker_talent) or Talent(subterfuge_talent) and single_target() } and ComboPoints() >= MaxComboPoints() and SpellCooldown(exsanguinate) < 1 and { not Talent(subterfuge_talent) or not HasAzeriteTrait(shrouded_suffocation_trait) or target.DebuffPersistentMultiplier(garrote_debuff) <= 1 } and CheckBoxOn(opt_vanish) and Spell(vanish) or Talent(nightstalker_talent) and not Talent(exsanguinate_talent) and ComboPoints() >= MaxComboPoints() and target.DebuffPresent(vendetta_debuff) and CheckBoxOn(opt_vanish) and Spell(vanish) or not { Talent(subterfuge_talent) and not Stealthed() and not SpellCooldown(garrote) > 0 and { ss_vanish_condition() or not HasAzeriteTrait(shrouded_suffocation_trait) and target.DebuffRefreshable(garrote_debuff) } and ComboPointsDeficit() >= { 1 + 2 * HasAzeriteTrait(shrouded_suffocation_trait) } * Enemies() >? 4 and 600 > 12 and CheckBoxOn(opt_vanish) and SpellUsable(vanish) and SpellCooldown(vanish) < TimeToEnergy(45) } and { Talent(master_assassin_talent) and not Stealthed() and BuffRemaining(master_assassin_buff) <= 0 and not target.DebuffRefreshable(rupture_debuff) and target.DebuffRemaining(garrote_debuff) > 3 and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or target.DebuffPresent(blood_of_the_enemy) } and CheckBoxOn(opt_vanish) and Spell(vanish) or target.DebuffRemaining(rupture_debuff) > 4 + 4 * MaxComboPoints() and not target.DebuffRefreshable(garrote_debuff) and Spell(exsanguinate) or target.DebuffPresent(rupture_debuff) and Spell(toxic_blade) }
+ not Stealthed() and target.DebuffPresent(rupture_debuff) and BuffRemaining(master_assassin_buff) == 0 and AssassinationEssencesCdPostConditions() or False(raid_event_adds_exists) and { target.TimeToDie() < ComboPointsDeficit() * 1.5 or ComboPointsDeficit() >= MaxComboPoints() } and Spell(marked_for_death) or 600 > 30 - 10 and ComboPointsDeficit() >= MaxComboPoints() and Spell(marked_for_death) or Talent(exsanguinate_talent) and { Talent(nightstalker_talent) or Talent(subterfuge_talent) and single_target() } and ComboPoints() >= MaxComboPoints() and SpellCooldown(exsanguinate) < 1 and { not Talent(subterfuge_talent) or not HasAzeriteTrait(shrouded_suffocation_trait) or target.DebuffPersistentMultiplier(garrote_debuff) <= 1 } and CheckBoxOn(opt_vanish) and Spell(vanish) or Talent(nightstalker_talent) and not Talent(exsanguinate_talent) and ComboPoints() >= MaxComboPoints() and target.DebuffPresent(vendetta_debuff) and CheckBoxOn(opt_vanish) and Spell(vanish) or not { Talent(subterfuge_talent) and not Stealthed() and not SpellCooldown(garrote) > 0 and { ss_vanish_condition() or not HasAzeriteTrait(shrouded_suffocation_trait) and target.DebuffRefreshable(garrote_debuff) } and ComboPointsDeficit() >= { 1 + 2 * HasAzeriteTrait(shrouded_suffocation_trait) } * Enemies() >? 4 and 600 > 12 and CheckBoxOn(opt_vanish) and SpellUsable(vanish) and SpellCooldown(vanish) < TimeToEnergy(45) } and { Talent(master_assassin_talent) and not Stealthed() and BuffRemaining(master_assassin_buff) <= 0 and not target.DebuffRefreshable(rupture_debuff) and target.DebuffRemaining(garrote_debuff) > 3 and target.DebuffPresent(vendetta_debuff) and { not Talent(toxic_blade_talent) or target.DebuffPresent(toxic_blade_debuff) } and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or target.DebuffPresent(blood_of_the_enemy) } and CheckBoxOn(opt_vanish) and Spell(vanish) or target.DebuffRemaining(rupture_debuff) > 4 + 4 * MaxComboPoints() and not target.DebuffRefreshable(garrote_debuff) and Spell(exsanguinate) or target.DebuffPresent(rupture_debuff) and Spell(toxic_blade) }
 }
 
 ### actions.default
@@ -528,8 +530,8 @@ AddFunction AssassinationDefaultCdActions
  {
   #variable,name=energy_regen_combined,value=energy.regen+poisoned_bleeds*7%(2*spell_haste)
   #variable,name=single_target,value=spell_targets.fan_of_knives<2
-  #use_item,name=azsharas_font_of_power,if=!stealthed.all&master_assassin_remains=0&cooldown.vendetta.remains<10&!debuff.vendetta.up&!debuff.toxic_blade.up
-  if not Stealthed() and BuffRemaining(master_assassin_buff) == 0 and SpellCooldown(vendetta) < 10 and not target.DebuffPresent(vendetta_debuff) and not target.DebuffPresent(toxic_blade_debuff) AssassinationUseItemActions()
+  #use_item,name=azsharas_font_of_power,if=!stealthed.all&master_assassin_remains=0&cooldown.vendetta.remains<10+10*equipped.ashvanes_razor_coral&!debuff.vendetta.up&!debuff.toxic_blade.up
+  if not Stealthed() and BuffRemaining(master_assassin_buff) == 0 and SpellCooldown(vendetta) < 10 + 10 * HasEquippedItem(ashvanes_razor_coral_item) and not target.DebuffPresent(vendetta_debuff) and not target.DebuffPresent(toxic_blade_debuff) AssassinationUseItemActions()
   #call_action_list,name=stealthed,if=stealthed.rogue
   if Stealthed() AssassinationStealthedCdActions()
 
@@ -630,6 +632,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # ancestral_call
 # arcane_pulse
 # arcane_torrent_energy
+# ashvanes_razor_coral_item
 # azsharas_font_of_power_item
 # berserking
 # blindside
@@ -639,6 +642,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # blood_of_the_enemy_essence_id
 # bloodlust
 # cheap_shot
+# concentrated_flame_burn_debuff
 # concentrated_flame_essence
 # crimson_tempest
 # crimson_tempest_debuff
@@ -691,6 +695,7 @@ AddIcon checkbox=opt_rogue_assassination_aoe help=cd specialization=assassinatio
 # toxic_blade
 # toxic_blade_debuff
 # toxic_blade_talent
+# trinket_ashvanes_razor_coral_cooldown_buff
 # vanish
 # vendetta
 # vendetta_debuff
@@ -720,13 +725,19 @@ AddFunction blade_flurry_sync
  Enemies() < 2 and 600 > 20 or BuffPresent(blade_flurry_buff)
 }
 
+AddFunction bte_condition
+{
+ BuffPresent(ruthless_precision_buff) or { HasAzeriteTrait(deadshot_trait) or HasAzeriteTrait(ace_up_your_sleeve_trait) } and BuffPresent(roll_the_bones_buff)
+}
+
 AddFunction ambush_condition
 {
- ComboPointsDeficit() >= 2 + 2 * { Talent(ghostly_strike_talent) and SpellCooldown(ghostly_strike) < 1 } + BuffPresent(broadside_buff) and Energy() > 60 and not BuffPresent(skull_and_crossbones_buff)
+ ComboPointsDeficit() >= 2 + 2 * { Talent(ghostly_strike_talent) and SpellCooldown(ghostly_strike) < 1 } + BuffPresent(broadside_buff) and Energy() > 60 and not BuffPresent(skull_and_crossbones_buff) and not BuffPresent(keep_your_wits_about_you_buff)
 }
 
 AddFunction rtb_reroll
 {
+ if BuffPresent(blade_flurry_buff) BuffCount(roll_the_bones_buff) - BuffPresent(skull_and_crossbones_buff) < 2 and { BuffPresent(loaded_dice_buff) or not BuffPresent(grand_melee_buff) and not BuffPresent(ruthless_precision_buff) and not BuffPresent(broadside_buff) }
  if AzeriteTraitRank(snake_eyes_trait) >= 2 BuffCount(roll_the_bones_buff) < 2
  if HasAzeriteTrait(deadshot_trait) or HasAzeriteTrait(ace_up_your_sleeve_trait) BuffCount(roll_the_bones_buff) < 2 and { BuffPresent(loaded_dice_buff) or BuffRemaining(ruthless_precision_buff) <= SpellCooldown(between_the_eyes) }
  BuffCount(roll_the_bones_buff) < 2 and { BuffPresent(loaded_dice_buff) or not BuffPresent(grand_melee_buff) and not BuffPresent(ruthless_precision_buff) }
@@ -850,8 +861,8 @@ AddFunction OutlawPrecombatCdPostConditions
 
 AddFunction OutlawFinishMainActions
 {
- #between_the_eyes,if=buff.ruthless_precision.up|(azerite.deadshot.enabled|azerite.ace_up_your_sleeve.enabled)&buff.roll_the_bones.up
- if BuffPresent(ruthless_precision_buff) or { HasAzeriteTrait(deadshot_trait) or HasAzeriteTrait(ace_up_your_sleeve_trait) } and BuffPresent(roll_the_bones_buff) Spell(between_the_eyes)
+ #between_the_eyes,if=variable.bte_condition
+ if bte_condition() Spell(between_the_eyes)
  #slice_and_dice,if=buff.slice_and_dice.remains<target.time_to_die&buff.slice_and_dice.remains<(1+combo_points)*1.8
  if BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 Spell(slice_and_dice)
  #roll_the_bones,if=buff.roll_the_bones.remains<=3|variable.rtb_reroll
@@ -872,7 +883,7 @@ AddFunction OutlawFinishShortCdActions
 
 AddFunction OutlawFinishShortCdPostConditions
 {
- { BuffPresent(ruthless_precision_buff) or { HasAzeriteTrait(deadshot_trait) or HasAzeriteTrait(ace_up_your_sleeve_trait) } and BuffPresent(roll_the_bones_buff) } and Spell(between_the_eyes) or BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 and Spell(slice_and_dice) or { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and Spell(roll_the_bones) or { HasAzeriteTrait(ace_up_your_sleeve_trait) or HasAzeriteTrait(deadshot_trait) } and Spell(between_the_eyes) or Spell(dispatch)
+ bte_condition() and Spell(between_the_eyes) or BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 and Spell(slice_and_dice) or { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and Spell(roll_the_bones) or { HasAzeriteTrait(ace_up_your_sleeve_trait) or HasAzeriteTrait(deadshot_trait) } and Spell(between_the_eyes) or Spell(dispatch)
 }
 
 AddFunction OutlawFinishCdActions
@@ -881,17 +892,15 @@ AddFunction OutlawFinishCdActions
 
 AddFunction OutlawFinishCdPostConditions
 {
- { BuffPresent(ruthless_precision_buff) or { HasAzeriteTrait(deadshot_trait) or HasAzeriteTrait(ace_up_your_sleeve_trait) } and BuffPresent(roll_the_bones_buff) } and Spell(between_the_eyes) or BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 and Spell(slice_and_dice) or { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and Spell(roll_the_bones) or { HasAzeriteTrait(ace_up_your_sleeve_trait) or HasAzeriteTrait(deadshot_trait) } and Spell(between_the_eyes) or Spell(dispatch)
+ bte_condition() and Spell(between_the_eyes) or BuffRemaining(slice_and_dice_buff) < target.TimeToDie() and BuffRemaining(slice_and_dice_buff) < { 1 + ComboPoints() } * 1.8 and Spell(slice_and_dice) or { BuffRemaining(roll_the_bones_buff) <= 3 or rtb_reroll() } and Spell(roll_the_bones) or { HasAzeriteTrait(ace_up_your_sleeve_trait) or HasAzeriteTrait(deadshot_trait) } and Spell(between_the_eyes) or Spell(dispatch)
 }
 
 ### actions.essences
 
 AddFunction OutlawEssencesMainActions
 {
- #concentrated_flame
- Spell(concentrated_flame_essence)
- #focused_azerite_beam,if=spell_targets.blade_flurry>=2|raid_event.adds.in>60&!buff.adrenaline_rush.up
- if Enemies() >= 2 or 600 > 60 and not BuffPresent(adrenaline_rush_buff) Spell(focused_azerite_beam)
+ #concentrated_flame,if=energy.time_to_max>1&!buff.blade_flurry.up&(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
+ if TimeToMaxEnergy() > 1 and not BuffPresent(blade_flurry_buff) and { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } Spell(concentrated_flame_essence)
 }
 
 AddFunction OutlawEssencesMainPostConditions
@@ -900,8 +909,10 @@ AddFunction OutlawEssencesMainPostConditions
 
 AddFunction OutlawEssencesShortCdActions
 {
- unless Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 and not BuffPresent(adrenaline_rush_buff) } and Spell(focused_azerite_beam)
+ unless TimeToMaxEnergy() > 1 and not BuffPresent(blade_flurry_buff) and { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } and Spell(concentrated_flame_essence)
  {
+  #focused_azerite_beam,if=spell_targets.blade_flurry>=2|raid_event.adds.in>60&!buff.adrenaline_rush.up
+  if Enemies() >= 2 or 600 > 60 and not BuffPresent(adrenaline_rush_buff) Spell(focused_azerite_beam)
   #purifying_blast,if=spell_targets.blade_flurry>=2|raid_event.adds.in>60
   if Enemies() >= 2 or 600 > 60 Spell(purifying_blast)
   #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
@@ -915,15 +926,15 @@ AddFunction OutlawEssencesShortCdActions
 
 AddFunction OutlawEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 and not BuffPresent(adrenaline_rush_buff) } and Spell(focused_azerite_beam)
+ TimeToMaxEnergy() > 1 and not BuffPresent(blade_flurry_buff) and { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } and Spell(concentrated_flame_essence)
 }
 
 AddFunction OutlawEssencesCdActions
 {
- unless Spell(concentrated_flame_essence)
+ unless TimeToMaxEnergy() > 1 and not BuffPresent(blade_flurry_buff) and { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } and Spell(concentrated_flame_essence)
  {
-  #blood_of_the_enemy,if=variable.blade_flurry_sync
-  if blade_flurry_sync() Spell(blood_of_the_enemy)
+  #blood_of_the_enemy,if=variable.blade_flurry_sync&cooldown.between_the_eyes.up&variable.bte_condition
+  if blade_flurry_sync() and not SpellCooldown(between_the_eyes) > 0 and bte_condition() Spell(blood_of_the_enemy)
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
 
@@ -937,7 +948,7 @@ AddFunction OutlawEssencesCdActions
 
 AddFunction OutlawEssencesCdPostConditions
 {
- Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 and not BuffPresent(adrenaline_rush_buff) } and Spell(focused_azerite_beam) or { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 } and Spell(the_unbound_force) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
+ TimeToMaxEnergy() > 1 and not BuffPresent(blade_flurry_buff) and { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } and Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 and not BuffPresent(adrenaline_rush_buff) } and Spell(focused_azerite_beam) or { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 } and Spell(the_unbound_force) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
 }
 
 ### actions.cds
@@ -951,6 +962,8 @@ AddFunction OutlawCdsMainActions
  {
   #blade_flurry,if=spell_targets>=2&!buff.blade_flurry.up&(!raid_event.adds.exists|raid_event.adds.remains>8|raid_event.adds.in>(2-cooldown.blade_flurry.charges_fractional)*25)
   if Enemies() >= 2 and not BuffPresent(blade_flurry_buff) and { not False(raid_event_adds_exists) or 0 > 8 or 600 > { 2 - SpellCharges(blade_flurry count=0) } * 25 } and CheckBoxOn(opt_blade_flurry) Spell(blade_flurry)
+  #ghostly_strike,if=variable.blade_flurry_sync&combo_points.deficit>=1+buff.broadside.up
+  if blade_flurry_sync() and ComboPointsDeficit() >= 1 + BuffPresent(broadside_buff) Spell(ghostly_strike)
  }
 }
 
@@ -971,10 +984,8 @@ AddFunction OutlawCdsShortCdActions
   #marked_for_death,if=raid_event.adds.in>30-raid_event.adds.duration&!stealthed.rogue&combo_points.deficit>=cp_max_spend-1
   if 600 > 30 - 10 and not Stealthed() and ComboPointsDeficit() >= MaxComboPoints() - 1 Spell(marked_for_death)
 
-  unless Enemies() >= 2 and not BuffPresent(blade_flurry_buff) and { not False(raid_event_adds_exists) or 0 > 8 or 600 > { 2 - SpellCharges(blade_flurry count=0) } * 25 } and CheckBoxOn(opt_blade_flurry) and Spell(blade_flurry)
+  unless Enemies() >= 2 and not BuffPresent(blade_flurry_buff) and { not False(raid_event_adds_exists) or 0 > 8 or 600 > { 2 - SpellCharges(blade_flurry count=0) } * 25 } and CheckBoxOn(opt_blade_flurry) and Spell(blade_flurry) or blade_flurry_sync() and ComboPointsDeficit() >= 1 + BuffPresent(broadside_buff) and Spell(ghostly_strike)
   {
-   #ghostly_strike,if=variable.blade_flurry_sync&combo_points.deficit>=1+buff.broadside.up
-   if blade_flurry_sync() and ComboPointsDeficit() >= 1 + BuffPresent(broadside_buff) Spell(ghostly_strike)
    #blade_rush,if=variable.blade_flurry_sync&energy.time_to_max>1
    if blade_flurry_sync() and TimeToMaxEnergy() > 1 Spell(blade_rush)
    #vanish,if=!stealthed.all&variable.ambush_condition
@@ -985,7 +996,7 @@ AddFunction OutlawCdsShortCdActions
 
 AddFunction OutlawCdsShortCdPostConditions
 {
- not Stealthed() and OutlawEssencesShortCdPostConditions() or Enemies() >= 2 and not BuffPresent(blade_flurry_buff) and { not False(raid_event_adds_exists) or 0 > 8 or 600 > { 2 - SpellCharges(blade_flurry count=0) } * 25 } and CheckBoxOn(opt_blade_flurry) and Spell(blade_flurry)
+ not Stealthed() and OutlawEssencesShortCdPostConditions() or Enemies() >= 2 and not BuffPresent(blade_flurry_buff) and { not False(raid_event_adds_exists) or 0 > 8 or 600 > { 2 - SpellCharges(blade_flurry count=0) } * 25 } and CheckBoxOn(opt_blade_flurry) and Spell(blade_flurry) or blade_flurry_sync() and ComboPointsDeficit() >= 1 + BuffPresent(broadside_buff) and Spell(ghostly_strike)
 }
 
 AddFunction OutlawCdsCdActions
@@ -995,8 +1006,8 @@ AddFunction OutlawCdsCdActions
 
  unless not Stealthed() and OutlawEssencesCdPostConditions()
  {
-  #adrenaline_rush,if=!buff.adrenaline_rush.up&energy.time_to_max>1
-  if not BuffPresent(adrenaline_rush_buff) and TimeToMaxEnergy() > 1 and EnergyDeficit() > 1 Spell(adrenaline_rush)
+  #adrenaline_rush,if=!buff.adrenaline_rush.up&energy.time_to_max>1&(!equipped.azsharas_font_of_power|cooldown.latent_arcana.remains>20)
+  if not BuffPresent(adrenaline_rush_buff) and TimeToMaxEnergy() > 1 and { not HasEquippedItem(azsharas_font_of_power_item) or SpellCooldown(latent_arcana) > 20 } and EnergyDeficit() > 1 Spell(adrenaline_rush)
 
   unless False(raid_event_adds_exists) and { target.TimeToDie() < ComboPointsDeficit() or not Stealthed() and ComboPointsDeficit() >= MaxComboPoints() - 1 } and Spell(marked_for_death) or 600 > 30 - 10 and not Stealthed() and ComboPointsDeficit() >= MaxComboPoints() - 1 and Spell(marked_for_death) or Enemies() >= 2 and not BuffPresent(blade_flurry_buff) and { not False(raid_event_adds_exists) or 0 > 8 or 600 > { 2 - SpellCharges(blade_flurry count=0) } * 25 } and CheckBoxOn(opt_blade_flurry) and Spell(blade_flurry) or blade_flurry_sync() and ComboPointsDeficit() >= 1 + BuffPresent(broadside_buff) and Spell(ghostly_strike)
   {
@@ -1019,8 +1030,10 @@ AddFunction OutlawCdsCdActions
     Spell(ancestral_call)
     #use_item,effect_name=cyclotronic_blast,if=!stealthed.all&buff.adrenaline_rush.down&buff.memory_of_lucid_dreams.down&energy.time_to_max>4&rtb_buffs<5
     if not Stealthed() and BuffExpires(adrenaline_rush_buff) and BuffExpires(memory_of_lucid_dreams_essence_buff) and TimeToMaxEnergy() > 4 and BuffCount(roll_the_bones_buff) < 5 OutlawUseItemActions()
-    #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|(buff.adrenaline_rush.up|debuff.conductive_ink_debuff.up)&(target.health.pct<31|target.time_to_die<60)
-    if target.DebuffExpires(razor_coral) or { BuffPresent(adrenaline_rush_buff) or target.DebuffPresent(conductive_ink) } and { target.HealthPercent() < 31 or target.TimeToDie() < 60 } OutlawUseItemActions()
+    #use_item,name=azsharas_font_of_power,if=!buff.adrenaline_rush.up&!buff.blade_flurry.up&cooldown.adrenaline_rush.remains<15
+    if not BuffPresent(adrenaline_rush_buff) and not BuffPresent(blade_flurry_buff) and SpellCooldown(adrenaline_rush) < 15 OutlawUseItemActions()
+    #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<32&target.health.pct>=30|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=20-10*debuff.blood_of_the_enemy.up|target.time_to_die<60)&buff.adrenaline_rush.remains>18
+    if target.DebuffExpires(razor_coral) or target.DebuffPresent(conductive_ink) and target.HealthPercent() < 32 and target.HealthPercent() >= 30 or not target.DebuffPresent(conductive_ink) and { target.DebuffStacks(razor_coral) >= 20 - 10 * target.DebuffPresent(blood_of_the_enemy) or target.TimeToDie() < 60 } and BuffRemaining(adrenaline_rush_buff) > 18 OutlawUseItemActions()
     #use_items,if=buff.bloodlust.react|target.time_to_die<=20|combo_points.deficit<=2
     if BuffPresent(bloodlust) or target.TimeToDie() <= 20 or ComboPointsDeficit() <= 2 OutlawUseItemActions()
    }
@@ -1075,7 +1088,9 @@ AddFunction OutlawDefaultMainActions
  #variable,name=rtb_reroll,op=set,if=azerite.deadshot.enabled|azerite.ace_up_your_sleeve.enabled,value=rtb_buffs<2&(buff.loaded_dice.up|buff.ruthless_precision.remains<=cooldown.between_the_eyes.remains)
  #variable,name=rtb_reroll,op=set,if=azerite.snake_eyes.rank>=2,value=rtb_buffs<2
  #variable,name=rtb_reroll,op=reset,if=azerite.snake_eyes.rank>=2&buff.snake_eyes.stack>=2-buff.broadside.up
- #variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&cooldown.ghostly_strike.remains<1)+buff.broadside.up&energy>60&!buff.skull_and_crossbones.up
+ #variable,name=rtb_reroll,op=set,if=buff.blade_flurry.up,value=rtb_buffs-buff.skull_and_crossbones.up<2&(buff.loaded_dice.up|!buff.grand_melee.up&!buff.ruthless_precision.up&!buff.broadside.up)
+ #variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&cooldown.ghostly_strike.remains<1)+buff.broadside.up&energy>60&!buff.skull_and_crossbones.up&!buff.keep_your_wits_about_you.up
+ #variable,name=bte_condition,value=buff.ruthless_precision.up|(azerite.deadshot.enabled|azerite.ace_up_your_sleeve.enabled)&buff.roll_the_bones.up
  #variable,name=blade_flurry_sync,value=spell_targets.blade_flurry<2&raid_event.adds.in>20|buff.blade_flurry.up
  #call_action_list,name=stealth,if=stealthed.all
  if Stealthed() OutlawStealthMainActions()
@@ -1112,7 +1127,9 @@ AddFunction OutlawDefaultShortCdActions
   #variable,name=rtb_reroll,op=set,if=azerite.deadshot.enabled|azerite.ace_up_your_sleeve.enabled,value=rtb_buffs<2&(buff.loaded_dice.up|buff.ruthless_precision.remains<=cooldown.between_the_eyes.remains)
   #variable,name=rtb_reroll,op=set,if=azerite.snake_eyes.rank>=2,value=rtb_buffs<2
   #variable,name=rtb_reroll,op=reset,if=azerite.snake_eyes.rank>=2&buff.snake_eyes.stack>=2-buff.broadside.up
-  #variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&cooldown.ghostly_strike.remains<1)+buff.broadside.up&energy>60&!buff.skull_and_crossbones.up
+  #variable,name=rtb_reroll,op=set,if=buff.blade_flurry.up,value=rtb_buffs-buff.skull_and_crossbones.up<2&(buff.loaded_dice.up|!buff.grand_melee.up&!buff.ruthless_precision.up&!buff.broadside.up)
+  #variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&cooldown.ghostly_strike.remains<1)+buff.broadside.up&energy>60&!buff.skull_and_crossbones.up&!buff.keep_your_wits_about_you.up
+  #variable,name=bte_condition,value=buff.ruthless_precision.up|(azerite.deadshot.enabled|azerite.ace_up_your_sleeve.enabled)&buff.roll_the_bones.up
   #variable,name=blade_flurry_sync,value=spell_targets.blade_flurry<2&raid_event.adds.in>20|buff.blade_flurry.up
   #call_action_list,name=stealth,if=stealthed.all
   if Stealthed() OutlawStealthShortCdActions()
@@ -1152,7 +1169,9 @@ AddFunction OutlawDefaultCdActions
   #variable,name=rtb_reroll,op=set,if=azerite.deadshot.enabled|azerite.ace_up_your_sleeve.enabled,value=rtb_buffs<2&(buff.loaded_dice.up|buff.ruthless_precision.remains<=cooldown.between_the_eyes.remains)
   #variable,name=rtb_reroll,op=set,if=azerite.snake_eyes.rank>=2,value=rtb_buffs<2
   #variable,name=rtb_reroll,op=reset,if=azerite.snake_eyes.rank>=2&buff.snake_eyes.stack>=2-buff.broadside.up
-  #variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&cooldown.ghostly_strike.remains<1)+buff.broadside.up&energy>60&!buff.skull_and_crossbones.up
+  #variable,name=rtb_reroll,op=set,if=buff.blade_flurry.up,value=rtb_buffs-buff.skull_and_crossbones.up<2&(buff.loaded_dice.up|!buff.grand_melee.up&!buff.ruthless_precision.up&!buff.broadside.up)
+  #variable,name=ambush_condition,value=combo_points.deficit>=2+2*(talent.ghostly_strike.enabled&cooldown.ghostly_strike.remains<1)+buff.broadside.up&energy>60&!buff.skull_and_crossbones.up&!buff.keep_your_wits_about_you.up
+  #variable,name=bte_condition,value=buff.ruthless_precision.up|(azerite.deadshot.enabled|azerite.ace_up_your_sleeve.enabled)&buff.roll_the_bones.up
   #variable,name=blade_flurry_sync,value=spell_targets.blade_flurry<2&raid_event.adds.in>20|buff.blade_flurry.up
   #call_action_list,name=stealth,if=stealthed.all
   if Stealthed() OutlawStealthCdActions()
@@ -1258,6 +1277,7 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # ancestral_call
 # arcane_pulse
 # arcane_torrent_energy
+# azsharas_font_of_power_item
 # berserking
 # between_the_eyes
 # blade_flurry
@@ -1268,6 +1288,7 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # bloodlust
 # broadside_buff
 # cheap_shot
+# concentrated_flame_burn_debuff
 # concentrated_flame_essence
 # conductive_ink
 # cyclotronic_blast
@@ -1285,6 +1306,7 @@ AddIcon checkbox=opt_rogue_outlaw_aoe help=cd specialization=outlaw
 # keep_your_wits_about_you_buff
 # kick
 # killing_spree
+# latent_arcana
 # lifeblood_buff
 # lights_judgment
 # loaded_dice_buff
@@ -1503,8 +1525,8 @@ AddFunction SubtletyStealthcdsShortCdActions
  {
   #variable,name=shd_combo_points,value=combo_points.deficit>=4
   #variable,name=shd_combo_points,value=combo_points.deficit<=1+2*azerite.the_first_dance.enabled,if=variable.use_priority_rotation&(talent.nightstalker.enabled|talent.dark_shadow.enabled)
-  #shadow_dance,if=variable.shd_combo_points&(!talent.dark_shadow.enabled|dot.nightblade.remains>=5+talent.subterfuge.enabled)&(variable.shd_threshold|buff.symbols_of_death.remains>=1.2|spell_targets.shuriken_storm>=4&cooldown.symbols_of_death.remains>10)&(azerite.nights_vengeance.rank<3|buff.nights_vengeance.up)
-  if shd_combo_points() and { not Talent(dark_shadow_talent) or target.DebuffRemaining(nightblade_debuff) >= 5 + TalentPoints(subterfuge_talent) } and { shd_threshold() or BuffRemaining(symbols_of_death_buff) >= 1.2 or Enemies() >= 4 and SpellCooldown(symbols_of_death) > 10 } and { AzeriteTraitRank(nights_vengeance_trait) < 3 or BuffPresent(nights_vengeance_buff) } Spell(shadow_dance)
+  #shadow_dance,if=variable.shd_combo_points&(!talent.dark_shadow.enabled|dot.nightblade.remains>=5+talent.subterfuge.enabled)&(variable.shd_threshold|buff.symbols_of_death.remains>=1.2|spell_targets.shuriken_storm>=4&cooldown.symbols_of_death.remains>10)&(azerite.nights_vengeance.rank<2|buff.nights_vengeance.up)
+  if shd_combo_points() and { not Talent(dark_shadow_talent) or target.DebuffRemaining(nightblade_debuff) >= 5 + TalentPoints(subterfuge_talent) } and { shd_threshold() or BuffRemaining(symbols_of_death_buff) >= 1.2 or Enemies() >= 4 and SpellCooldown(symbols_of_death) > 10 } and { AzeriteTraitRank(nights_vengeance_trait) < 2 or BuffPresent(nights_vengeance_buff) } Spell(shadow_dance)
   #shadow_dance,if=variable.shd_combo_points&target.time_to_die<cooldown.symbols_of_death.remains&!raid_event.adds.up
   if shd_combo_points() and target.TimeToDie() < SpellCooldown(symbols_of_death) and not False(raid_event_adds_exists) Spell(shadow_dance)
  }
@@ -1526,7 +1548,7 @@ AddFunction SubtletyStealthcdsCdActions
 
 AddFunction SubtletyStealthcdsCdPostConditions
 {
- not shd_threshold() and ComboPointsDeficit() > 1 and target.DebuffRemaining(find_weakness_debuff) < 1 and Spell(vanish) or not { True(pool_energy 40) and EnergyDeficit() >= 10 and not shd_threshold() and ComboPointsDeficit() > 1 and target.DebuffRemaining(find_weakness_debuff) < 1 and SpellUsable(shadowmeld) and SpellCooldown(shadowmeld) < TimeToEnergy(40) } and { shd_combo_points() and { not Talent(dark_shadow_talent) or target.DebuffRemaining(nightblade_debuff) >= 5 + TalentPoints(subterfuge_talent) } and { shd_threshold() or BuffRemaining(symbols_of_death_buff) >= 1.2 or Enemies() >= 4 and SpellCooldown(symbols_of_death) > 10 } and { AzeriteTraitRank(nights_vengeance_trait) < 3 or BuffPresent(nights_vengeance_buff) } and Spell(shadow_dance) or shd_combo_points() and target.TimeToDie() < SpellCooldown(symbols_of_death) and not False(raid_event_adds_exists) and Spell(shadow_dance) }
+ not shd_threshold() and ComboPointsDeficit() > 1 and target.DebuffRemaining(find_weakness_debuff) < 1 and Spell(vanish) or not { True(pool_energy 40) and EnergyDeficit() >= 10 and not shd_threshold() and ComboPointsDeficit() > 1 and target.DebuffRemaining(find_weakness_debuff) < 1 and SpellUsable(shadowmeld) and SpellCooldown(shadowmeld) < TimeToEnergy(40) } and { shd_combo_points() and { not Talent(dark_shadow_talent) or target.DebuffRemaining(nightblade_debuff) >= 5 + TalentPoints(subterfuge_talent) } and { shd_threshold() or BuffRemaining(symbols_of_death_buff) >= 1.2 or Enemies() >= 4 and SpellCooldown(symbols_of_death) > 10 } and { AzeriteTraitRank(nights_vengeance_trait) < 2 or BuffPresent(nights_vengeance_buff) } and Spell(shadow_dance) or shd_combo_points() and target.TimeToDie() < SpellCooldown(symbols_of_death) and not False(raid_event_adds_exists) and Spell(shadow_dance) }
 }
 
 ### actions.precombat
@@ -1635,10 +1657,8 @@ AddFunction SubtletyFinishCdPostConditions
 
 AddFunction SubtletyEssencesMainActions
 {
- #concentrated_flame
- Spell(concentrated_flame_essence)
- #focused_azerite_beam,if=(spell_targets.shuriken_storm>=2|raid_event.adds.in>60)&!cooldown.symbols_of_death.up&!buff.symbols_of_death.up&energy.deficit>=30
- if { Enemies() >= 2 or 600 > 60 } and not { not SpellCooldown(symbols_of_death) > 0 } and not BuffPresent(symbols_of_death_buff) and EnergyDeficit() >= 30 Spell(focused_azerite_beam)
+ #concentrated_flame,if=energy.time_to_max>1&!buff.symbols_of_death.up&(!dot.concentrated_flame_burn.ticking&!action.concentrated_flame.in_flight|full_recharge_time<gcd.max)
+ if TimeToMaxEnergy() > 1 and not BuffPresent(symbols_of_death_buff) and { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } Spell(concentrated_flame_essence)
 }
 
 AddFunction SubtletyEssencesMainPostConditions
@@ -1647,8 +1667,10 @@ AddFunction SubtletyEssencesMainPostConditions
 
 AddFunction SubtletyEssencesShortCdActions
 {
- unless Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 } and not { not SpellCooldown(symbols_of_death) > 0 } and not BuffPresent(symbols_of_death_buff) and EnergyDeficit() >= 30 and Spell(focused_azerite_beam)
+ unless TimeToMaxEnergy() > 1 and not BuffPresent(symbols_of_death_buff) and { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } and Spell(concentrated_flame_essence)
  {
+  #focused_azerite_beam,if=(spell_targets.shuriken_storm>=2|raid_event.adds.in>60)&!cooldown.symbols_of_death.up&!buff.symbols_of_death.up&energy.deficit>=30
+  if { Enemies() >= 2 or 600 > 60 } and not { not SpellCooldown(symbols_of_death) > 0 } and not BuffPresent(symbols_of_death_buff) and EnergyDeficit() >= 30 Spell(focused_azerite_beam)
   #purifying_blast,if=spell_targets.shuriken_storm>=2|raid_event.adds.in>60
   if Enemies() >= 2 or 600 > 60 Spell(purifying_blast)
   #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
@@ -1662,15 +1684,15 @@ AddFunction SubtletyEssencesShortCdActions
 
 AddFunction SubtletyEssencesShortCdPostConditions
 {
- Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 } and not { not SpellCooldown(symbols_of_death) > 0 } and not BuffPresent(symbols_of_death_buff) and EnergyDeficit() >= 30 and Spell(focused_azerite_beam)
+ TimeToMaxEnergy() > 1 and not BuffPresent(symbols_of_death_buff) and { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } and Spell(concentrated_flame_essence)
 }
 
 AddFunction SubtletyEssencesCdActions
 {
- unless Spell(concentrated_flame_essence)
+ unless TimeToMaxEnergy() > 1 and not BuffPresent(symbols_of_death_buff) and { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } and Spell(concentrated_flame_essence)
  {
-  #blood_of_the_enemy
-  Spell(blood_of_the_enemy)
+  #blood_of_the_enemy,if=cooldown.symbols_of_death.up|target.time_to_die<=10
+  if not SpellCooldown(symbols_of_death) > 0 or target.TimeToDie() <= 10 Spell(blood_of_the_enemy)
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
 
@@ -1684,7 +1706,7 @@ AddFunction SubtletyEssencesCdActions
 
 AddFunction SubtletyEssencesCdPostConditions
 {
- Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 } and not { not SpellCooldown(symbols_of_death) > 0 } and not BuffPresent(symbols_of_death_buff) and EnergyDeficit() >= 30 and Spell(focused_azerite_beam) or { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 } and Spell(the_unbound_force) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
+ TimeToMaxEnergy() > 1 and not BuffPresent(symbols_of_death_buff) and { not target.DebuffPresent(concentrated_flame_burn_debuff) and not InFlightToTarget(concentrated_flame_essence) or SpellFullRecharge(concentrated_flame_essence) < GCD() } and Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 } and not { not SpellCooldown(symbols_of_death) > 0 } and not BuffPresent(symbols_of_death_buff) and EnergyDeficit() >= 30 and Spell(focused_azerite_beam) or { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 } and Spell(the_unbound_force) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
 }
 
 ### actions.cds
@@ -1716,8 +1738,8 @@ AddFunction SubtletyCdsShortCdActions
   {
    #shuriken_tornado,if=energy>=60&dot.nightblade.ticking&cooldown.symbols_of_death.up&cooldown.shadow_dance.charges>=1
    if Energy() >= 60 and target.DebuffPresent(nightblade_debuff) and not SpellCooldown(symbols_of_death) > 0 and SpellCharges(shadow_dance) >= 1 Spell(shuriken_tornado)
-   #symbols_of_death,if=dot.nightblade.ticking&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|cooldown.shuriken_tornado.remains>2)
-   if target.DebuffPresent(nightblade_debuff) and { not Talent(shuriken_tornado_talent) or Talent(shadow_focus_talent) or SpellCooldown(shuriken_tornado) > 2 } Spell(symbols_of_death)
+   #symbols_of_death,if=dot.nightblade.ticking&(!talent.shuriken_tornado.enabled|talent.shadow_focus.enabled|cooldown.shuriken_tornado.remains>2)&(!essence.blood_of_the_enemy.major|cooldown.blood_of_the_enemy.remains>2)
+   if target.DebuffPresent(nightblade_debuff) and { not Talent(shuriken_tornado_talent) or Talent(shadow_focus_talent) or SpellCooldown(shuriken_tornado) > 2 } and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or SpellCooldown(blood_of_the_enemy) > 2 } Spell(symbols_of_death)
    #marked_for_death,target_if=min:target.time_to_die,if=raid_event.adds.up&(target.time_to_die<combo_points.deficit|!stealthed.all&combo_points.deficit>=cp_max_spend)
    if False(raid_event_adds_exists) and { target.TimeToDie() < ComboPointsDeficit() or not Stealthed() and ComboPointsDeficit() >= MaxComboPoints() } Spell(marked_for_death)
    #marked_for_death,if=raid_event.adds.in>30-raid_event.adds.duration&!stealthed.all&combo_points.deficit>=cp_max_spend
@@ -1747,7 +1769,7 @@ AddFunction SubtletyCdsCdActions
    #pool_resource,for_next=1,if=!talent.shadow_focus.enabled
    unless not Talent(shadow_focus_talent)
    {
-    unless Energy() >= 60 and target.DebuffPresent(nightblade_debuff) and not SpellCooldown(symbols_of_death) > 0 and SpellCharges(shadow_dance) >= 1 and Spell(shuriken_tornado) or target.DebuffPresent(nightblade_debuff) and { not Talent(shuriken_tornado_talent) or Talent(shadow_focus_talent) or SpellCooldown(shuriken_tornado) > 2 } and Spell(symbols_of_death) or False(raid_event_adds_exists) and { target.TimeToDie() < ComboPointsDeficit() or not Stealthed() and ComboPointsDeficit() >= MaxComboPoints() } and Spell(marked_for_death) or 600 > 30 - 10 and not Stealthed() and ComboPointsDeficit() >= MaxComboPoints() and Spell(marked_for_death)
+    unless Energy() >= 60 and target.DebuffPresent(nightblade_debuff) and not SpellCooldown(symbols_of_death) > 0 and SpellCharges(shadow_dance) >= 1 and Spell(shuriken_tornado) or target.DebuffPresent(nightblade_debuff) and { not Talent(shuriken_tornado_talent) or Talent(shadow_focus_talent) or SpellCooldown(shuriken_tornado) > 2 } and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or SpellCooldown(blood_of_the_enemy) > 2 } and Spell(symbols_of_death) or False(raid_event_adds_exists) and { target.TimeToDie() < ComboPointsDeficit() or not Stealthed() and ComboPointsDeficit() >= MaxComboPoints() } and Spell(marked_for_death) or 600 > 30 - 10 and not Stealthed() and ComboPointsDeficit() >= MaxComboPoints() and Spell(marked_for_death)
     {
      #shadow_blades,if=combo_points.deficit>=2+stealthed.all
      if ComboPointsDeficit() >= 2 + Stealthed() Spell(shadow_blades)
@@ -1768,8 +1790,8 @@ AddFunction SubtletyCdsCdActions
       if not Stealthed() and target.DebuffPresent(nightblade_debuff) and not BuffPresent(symbols_of_death_buff) and EnergyDeficit() >= 30 SubtletyUseItemActions()
       #use_item,name=azsharas_font_of_power,if=!buff.shadow_dance.up&cooldown.symbols_of_death.remains<10
       if not BuffPresent(shadow_dance_buff) and SpellCooldown(symbols_of_death) < 10 SubtletyUseItemActions()
-      #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|(buff.symbols_of_death.up|debuff.conductive_ink_debuff.up)&(target.health.pct<31|target.time_to_die<60)
-      if target.DebuffExpires(razor_coral) or { BuffPresent(symbols_of_death_buff) or target.DebuffPresent(conductive_ink) } and { target.HealthPercent() < 31 or target.TimeToDie() < 60 } SubtletyUseItemActions()
+      #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|debuff.conductive_ink_debuff.up&target.health.pct<32&target.health.pct>=30|!debuff.conductive_ink_debuff.up&(debuff.razor_coral_debuff.stack>=25-10*debuff.blood_of_the_enemy.up|target.time_to_die<40)&buff.symbols_of_death.remains>8
+      if target.DebuffExpires(razor_coral) or target.DebuffPresent(conductive_ink) and target.HealthPercent() < 32 and target.HealthPercent() >= 30 or not target.DebuffPresent(conductive_ink) and { target.DebuffStacks(razor_coral) >= 25 - 10 * target.DebuffPresent(blood_of_the_enemy) or target.TimeToDie() < 40 } and BuffRemaining(symbols_of_death_buff) > 8 SubtletyUseItemActions()
       #use_item,name=mydas_talisman
       SubtletyUseItemActions()
       #use_items,if=buff.symbols_of_death.up|target.time_to_die<20
@@ -1783,7 +1805,7 @@ AddFunction SubtletyCdsCdActions
 
 AddFunction SubtletyCdsCdPostConditions
 {
- not BuffPresent(shadow_dance_buff) and BuffPresent(shuriken_tornado) and BuffRemaining(shuriken_tornado) <= 3.5 and Spell(shadow_dance) or BuffPresent(shuriken_tornado) and BuffRemaining(shuriken_tornado) <= 3.5 and Spell(symbols_of_death) or not Stealthed() and target.DebuffPresent(nightblade_debuff) and SubtletyEssencesCdPostConditions() or not { not Talent(shadow_focus_talent) } and { Energy() >= 60 and target.DebuffPresent(nightblade_debuff) and not SpellCooldown(symbols_of_death) > 0 and SpellCharges(shadow_dance) >= 1 and Spell(shuriken_tornado) or target.DebuffPresent(nightblade_debuff) and { not Talent(shuriken_tornado_talent) or Talent(shadow_focus_talent) or SpellCooldown(shuriken_tornado) > 2 } and Spell(symbols_of_death) or False(raid_event_adds_exists) and { target.TimeToDie() < ComboPointsDeficit() or not Stealthed() and ComboPointsDeficit() >= MaxComboPoints() } and Spell(marked_for_death) or 600 > 30 - 10 and not Stealthed() and ComboPointsDeficit() >= MaxComboPoints() and Spell(marked_for_death) or Talent(shadow_focus_talent) and target.DebuffPresent(nightblade_debuff) and BuffPresent(symbols_of_death_buff) and Spell(shuriken_tornado) or not BuffPresent(shadow_dance_buff) and target.TimeToDie() <= 5 + TalentPoints(subterfuge_talent) and not False(raid_event_adds_exists) and Spell(shadow_dance) }
+ not BuffPresent(shadow_dance_buff) and BuffPresent(shuriken_tornado) and BuffRemaining(shuriken_tornado) <= 3.5 and Spell(shadow_dance) or BuffPresent(shuriken_tornado) and BuffRemaining(shuriken_tornado) <= 3.5 and Spell(symbols_of_death) or not Stealthed() and target.DebuffPresent(nightblade_debuff) and SubtletyEssencesCdPostConditions() or not { not Talent(shadow_focus_talent) } and { Energy() >= 60 and target.DebuffPresent(nightblade_debuff) and not SpellCooldown(symbols_of_death) > 0 and SpellCharges(shadow_dance) >= 1 and Spell(shuriken_tornado) or target.DebuffPresent(nightblade_debuff) and { not Talent(shuriken_tornado_talent) or Talent(shadow_focus_talent) or SpellCooldown(shuriken_tornado) > 2 } and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or SpellCooldown(blood_of_the_enemy) > 2 } and Spell(symbols_of_death) or False(raid_event_adds_exists) and { target.TimeToDie() < ComboPointsDeficit() or not Stealthed() and ComboPointsDeficit() >= MaxComboPoints() } and Spell(marked_for_death) or 600 > 30 - 10 and not Stealthed() and ComboPointsDeficit() >= MaxComboPoints() and Spell(marked_for_death) or Talent(shadow_focus_talent) and target.DebuffPresent(nightblade_debuff) and BuffPresent(symbols_of_death_buff) and Spell(shuriken_tornado) or not BuffPresent(shadow_dance_buff) and target.TimeToDie() <= 5 + TalentPoints(subterfuge_talent) and not False(raid_event_adds_exists) and Spell(shadow_dance) }
 }
 
 ### actions.build
@@ -1850,8 +1872,8 @@ AddFunction SubtletyDefaultMainActions
 
     unless EnergyDeficit() <= stealth_threshold() and SubtletyStealthcdsMainPostConditions()
     {
-     #nightblade,if=azerite.nights_vengeance.enabled&!buff.nights_vengeance.up&combo_points>=2&(spell_targets.shuriken_storm<2|variable.use_priority_rotation)&(cooldown.symbols_of_death.remains<=3|(azerite.nights_vengeance.rank>=3&buff.symbols_of_death.remains>3&!stealthed.all&cooldown.shadow_dance.charges_fractional>=0.9))
-     if HasAzeriteTrait(nights_vengeance_trait) and not BuffPresent(nights_vengeance_buff) and ComboPoints() >= 2 and { Enemies() < 2 or use_priority_rotation() } and { SpellCooldown(symbols_of_death) <= 3 or AzeriteTraitRank(nights_vengeance_trait) >= 3 and BuffRemaining(symbols_of_death_buff) > 3 and not Stealthed() and SpellCharges(shadow_dance count=0) >= 0.9 } Spell(nightblade)
+     #nightblade,if=azerite.nights_vengeance.enabled&!buff.nights_vengeance.up&combo_points>=2&(spell_targets.shuriken_storm<2|variable.use_priority_rotation)&(cooldown.symbols_of_death.remains<=3|(azerite.nights_vengeance.rank>=2&buff.symbols_of_death.remains>3&!stealthed.all&cooldown.shadow_dance.charges_fractional>=0.9))
+     if HasAzeriteTrait(nights_vengeance_trait) and not BuffPresent(nights_vengeance_buff) and ComboPoints() >= 2 and { Enemies() < 2 or use_priority_rotation() } and { SpellCooldown(symbols_of_death) <= 3 or AzeriteTraitRank(nights_vengeance_trait) >= 2 and BuffRemaining(symbols_of_death_buff) > 3 and not Stealthed() and SpellCharges(shadow_dance count=0) >= 0.9 } Spell(nightblade)
      #call_action_list,name=finish,if=combo_points.deficit<=1|target.time_to_die<=1&combo_points>=3
      if ComboPointsDeficit() <= 1 or target.TimeToDie() <= 1 and ComboPoints() >= 3 SubtletyFinishMainActions()
 
@@ -1901,7 +1923,7 @@ AddFunction SubtletyDefaultShortCdActions
      #call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold
      if EnergyDeficit() <= stealth_threshold() SubtletyStealthcdsShortCdActions()
 
-     unless EnergyDeficit() <= stealth_threshold() and SubtletyStealthcdsShortCdPostConditions() or HasAzeriteTrait(nights_vengeance_trait) and not BuffPresent(nights_vengeance_buff) and ComboPoints() >= 2 and { Enemies() < 2 or use_priority_rotation() } and { SpellCooldown(symbols_of_death) <= 3 or AzeriteTraitRank(nights_vengeance_trait) >= 3 and BuffRemaining(symbols_of_death_buff) > 3 and not Stealthed() and SpellCharges(shadow_dance count=0) >= 0.9 } and Spell(nightblade)
+     unless EnergyDeficit() <= stealth_threshold() and SubtletyStealthcdsShortCdPostConditions() or HasAzeriteTrait(nights_vengeance_trait) and not BuffPresent(nights_vengeance_buff) and ComboPoints() >= 2 and { Enemies() < 2 or use_priority_rotation() } and { SpellCooldown(symbols_of_death) <= 3 or AzeriteTraitRank(nights_vengeance_trait) >= 2 and BuffRemaining(symbols_of_death_buff) > 3 and not Stealthed() and SpellCharges(shadow_dance count=0) >= 0.9 } and Spell(nightblade)
      {
       #call_action_list,name=finish,if=combo_points.deficit<=1|target.time_to_die<=1&combo_points>=3
       if ComboPointsDeficit() <= 1 or target.TimeToDie() <= 1 and ComboPoints() >= 3 SubtletyFinishShortCdActions()
@@ -1926,7 +1948,7 @@ AddFunction SubtletyDefaultShortCdActions
 
 AddFunction SubtletyDefaultShortCdPostConditions
 {
- Spell(stealth) or SubtletyCdsShortCdPostConditions() or Stealthed() and SubtletyStealthedShortCdPostConditions() or target.TimeToDie() > 6 and target.DebuffRemaining(nightblade_debuff) < GCD() and ComboPoints() >= 4 - { TimeInCombat() < 10 } * 2 and Spell(nightblade) or use_priority_rotation() and SubtletyStealthcdsShortCdPostConditions() or EnergyDeficit() <= stealth_threshold() and SubtletyStealthcdsShortCdPostConditions() or HasAzeriteTrait(nights_vengeance_trait) and not BuffPresent(nights_vengeance_buff) and ComboPoints() >= 2 and { Enemies() < 2 or use_priority_rotation() } and { SpellCooldown(symbols_of_death) <= 3 or AzeriteTraitRank(nights_vengeance_trait) >= 3 and BuffRemaining(symbols_of_death_buff) > 3 and not Stealthed() and SpellCharges(shadow_dance count=0) >= 0.9 } and Spell(nightblade) or { ComboPointsDeficit() <= 1 or target.TimeToDie() <= 1 and ComboPoints() >= 3 } and SubtletyFinishShortCdPostConditions() or Enemies() == 4 and ComboPoints() >= 4 and SubtletyFinishShortCdPostConditions() or EnergyDeficit() <= stealth_threshold() and SubtletyBuildShortCdPostConditions()
+ Spell(stealth) or SubtletyCdsShortCdPostConditions() or Stealthed() and SubtletyStealthedShortCdPostConditions() or target.TimeToDie() > 6 and target.DebuffRemaining(nightblade_debuff) < GCD() and ComboPoints() >= 4 - { TimeInCombat() < 10 } * 2 and Spell(nightblade) or use_priority_rotation() and SubtletyStealthcdsShortCdPostConditions() or EnergyDeficit() <= stealth_threshold() and SubtletyStealthcdsShortCdPostConditions() or HasAzeriteTrait(nights_vengeance_trait) and not BuffPresent(nights_vengeance_buff) and ComboPoints() >= 2 and { Enemies() < 2 or use_priority_rotation() } and { SpellCooldown(symbols_of_death) <= 3 or AzeriteTraitRank(nights_vengeance_trait) >= 2 and BuffRemaining(symbols_of_death_buff) > 3 and not Stealthed() and SpellCharges(shadow_dance count=0) >= 0.9 } and Spell(nightblade) or { ComboPointsDeficit() <= 1 or target.TimeToDie() <= 1 and ComboPoints() >= 3 } and SubtletyFinishShortCdPostConditions() or Enemies() == 4 and ComboPoints() >= 4 and SubtletyFinishShortCdPostConditions() or EnergyDeficit() <= stealth_threshold() and SubtletyBuildShortCdPostConditions()
 }
 
 AddFunction SubtletyDefaultCdActions
@@ -1955,7 +1977,7 @@ AddFunction SubtletyDefaultCdActions
      #call_action_list,name=stealth_cds,if=energy.deficit<=variable.stealth_threshold
      if EnergyDeficit() <= stealth_threshold() SubtletyStealthcdsCdActions()
 
-     unless EnergyDeficit() <= stealth_threshold() and SubtletyStealthcdsCdPostConditions() or HasAzeriteTrait(nights_vengeance_trait) and not BuffPresent(nights_vengeance_buff) and ComboPoints() >= 2 and { Enemies() < 2 or use_priority_rotation() } and { SpellCooldown(symbols_of_death) <= 3 or AzeriteTraitRank(nights_vengeance_trait) >= 3 and BuffRemaining(symbols_of_death_buff) > 3 and not Stealthed() and SpellCharges(shadow_dance count=0) >= 0.9 } and Spell(nightblade)
+     unless EnergyDeficit() <= stealth_threshold() and SubtletyStealthcdsCdPostConditions() or HasAzeriteTrait(nights_vengeance_trait) and not BuffPresent(nights_vengeance_buff) and ComboPoints() >= 2 and { Enemies() < 2 or use_priority_rotation() } and { SpellCooldown(symbols_of_death) <= 3 or AzeriteTraitRank(nights_vengeance_trait) >= 2 and BuffRemaining(symbols_of_death_buff) > 3 and not Stealthed() and SpellCharges(shadow_dance count=0) >= 0.9 } and Spell(nightblade)
      {
       #call_action_list,name=finish,if=combo_points.deficit<=1|target.time_to_die<=1&combo_points>=3
       if ComboPointsDeficit() <= 1 or target.TimeToDie() <= 1 and ComboPoints() >= 3 SubtletyFinishCdActions()
@@ -1990,7 +2012,7 @@ AddFunction SubtletyDefaultCdActions
 
 AddFunction SubtletyDefaultCdPostConditions
 {
- Spell(stealth) or SubtletyCdsCdPostConditions() or Stealthed() and SubtletyStealthedCdPostConditions() or target.TimeToDie() > 6 and target.DebuffRemaining(nightblade_debuff) < GCD() and ComboPoints() >= 4 - { TimeInCombat() < 10 } * 2 and Spell(nightblade) or use_priority_rotation() and SubtletyStealthcdsCdPostConditions() or EnergyDeficit() <= stealth_threshold() and SubtletyStealthcdsCdPostConditions() or HasAzeriteTrait(nights_vengeance_trait) and not BuffPresent(nights_vengeance_buff) and ComboPoints() >= 2 and { Enemies() < 2 or use_priority_rotation() } and { SpellCooldown(symbols_of_death) <= 3 or AzeriteTraitRank(nights_vengeance_trait) >= 3 and BuffRemaining(symbols_of_death_buff) > 3 and not Stealthed() and SpellCharges(shadow_dance count=0) >= 0.9 } and Spell(nightblade) or { ComboPointsDeficit() <= 1 or target.TimeToDie() <= 1 and ComboPoints() >= 3 } and SubtletyFinishCdPostConditions() or Enemies() == 4 and ComboPoints() >= 4 and SubtletyFinishCdPostConditions() or EnergyDeficit() <= stealth_threshold() and SubtletyBuildCdPostConditions()
+ Spell(stealth) or SubtletyCdsCdPostConditions() or Stealthed() and SubtletyStealthedCdPostConditions() or target.TimeToDie() > 6 and target.DebuffRemaining(nightblade_debuff) < GCD() and ComboPoints() >= 4 - { TimeInCombat() < 10 } * 2 and Spell(nightblade) or use_priority_rotation() and SubtletyStealthcdsCdPostConditions() or EnergyDeficit() <= stealth_threshold() and SubtletyStealthcdsCdPostConditions() or HasAzeriteTrait(nights_vengeance_trait) and not BuffPresent(nights_vengeance_buff) and ComboPoints() >= 2 and { Enemies() < 2 or use_priority_rotation() } and { SpellCooldown(symbols_of_death) <= 3 or AzeriteTraitRank(nights_vengeance_trait) >= 2 and BuffRemaining(symbols_of_death_buff) > 3 and not Stealthed() and SpellCharges(shadow_dance count=0) >= 0.9 } and Spell(nightblade) or { ComboPointsDeficit() <= 1 or target.TimeToDie() <= 1 and ComboPoints() >= 3 } and SubtletyFinishCdPostConditions() or Enemies() == 4 and ComboPoints() >= 4 and SubtletyFinishCdPostConditions() or EnergyDeficit() <= stealth_threshold() and SubtletyBuildCdPostConditions()
 }
 
 ### Subtlety icons.
@@ -2061,8 +2083,10 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 # blade_in_the_shadows_trait
 # blood_fury_ap
 # blood_of_the_enemy
+# blood_of_the_enemy_essence_id
 # bloodlust
 # cheap_shot
+# concentrated_flame_burn_debuff
 # concentrated_flame_essence
 # conductive_ink
 # dark_shadow_talent
@@ -2124,4 +2148,5 @@ AddIcon checkbox=opt_rogue_subtlety_aoe help=cd specialization=subtlety
 `
 	OvaleScripts.RegisterScript("ROGUE", "subtlety", name, desc, code, "script")
 }
+
 }

@@ -20,6 +20,7 @@ local loadstring = loadstring
 local pairs = pairs
 local tonumber = tonumber
 local wipe = wipe
+local kpairs = pairs
 local GetActionCooldown = GetActionCooldown
 local GetActionTexture = GetActionTexture
 local GetItemIcon = GetItemIcon
@@ -32,9 +33,10 @@ local IsItemInRange = IsItemInRange
 local IsUsableAction = IsUsableAction
 local IsUsableItem = IsUsableItem
 local __AST = LibStub:GetLibrary("ovale/AST")
-local isValueNode = __AST.isValueNode
+local isNodeType = __AST.isNodeType
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isNumber = __tools.isNumber
+local isString = __tools.isString
 local INFINITY = huge
 __exports.OvaleBestActionClass = __class(nil, {
     constructor = function(self, ovaleEquipment, ovaleActionBar, ovaleData, ovaleCooldown, ovaleState, baseState, ovalePaperDoll, ovaleCompile, ovaleCondition, Ovale, OvaleGUID, OvalePower, OvaleFuture, OvaleSpellBook, ovaleProfiler, ovaleDebug, variables, ovaleRunes, OvaleSpells)
@@ -528,7 +530,7 @@ __exports.OvaleBestActionClass = __class(nil, {
     end,
     AsValue = function(self, atTime, timeSpan, node)
         local value, origin, rate
-        if node and isValueNode(node) then
+        if node and isNodeType(node, "value") then
             value, origin, rate = node.value, node.origin, node.rate
         elseif timeSpan and timeSpan:HasTime(atTime) then
             value, origin, rate, timeSpan = 1, 0, 0, UNIVERSE
@@ -604,9 +606,22 @@ __exports.OvaleBestActionClass = __class(nil, {
     end,
     GetActionSpellInfo = function(self, element, atTime, target)
         self.profiler:StartProfiling("OvaleBestAction_GetActionSpellInfo")
-        local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionResourceExtend, actionCharges
+        local spell = element.positionalParams[1]
+        if isNumber(spell) then
+            return self:getSpellActionInfo(spell, element, atTime, target)
+        elseif isString(spell) then
+            local spellList = self.ovaleData.buffSpellList[spell]
+            for spellId in kpairs(spellList) do
+                if self.OvaleSpellBook:IsKnownSpell(spellId) then
+                    return self:getSpellActionInfo(spellId, element, atTime, target)
+                end
+            end
+        end
+        return nil
+    end,
+    getSpellActionInfo = function(self, spellId, element, atTime, target)
         local targetGUID = self.OvaleGUID:UnitGUID(target)
-        local spellId = element.positionalParams[1]
+        local actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionResourceExtend, actionCharges
         local si = self.ovaleData.spellInfo[spellId]
         local replacedSpellId = nil
         if si and si.replaced_by then
@@ -812,7 +827,7 @@ __exports.OvaleBestActionClass = __class(nil, {
                 else
                     self.tracer:Log("[%d] Runtime error: unable to compute node of type '%s'.", element.nodeId, element.type)
                 end
-                if result and isValueNode(result) then
+                if result and isNodeType(result, "value") then
                     self.tracer:Log("[%d] <<< '%s' returns %s with value = %s, %s, %s", element.nodeId, element.type, timeSpan, result.value, result.origin, result.rate)
                 elseif result and result.nodeId then
                     self.tracer:Log("[%d] <<< '%s' returns [%d] %s", element.nodeId, element.type, result.nodeId, timeSpan)
@@ -826,7 +841,7 @@ __exports.OvaleBestActionClass = __class(nil, {
     end,
     ComputeBool = function(self, element, atTime)
         local timeSpan, newElement = self:Compute(element, atTime)
-        if newElement and isValueNode(newElement) and newElement.value == 0 and newElement.rate == 0 then
+        if newElement and isNodeType(newElement, "value") and newElement.value == 0 and newElement.rate == 0 then
             return EMPTY_SET
         else
             return timeSpan

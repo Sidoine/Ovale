@@ -4,9 +4,6 @@ import { BaseState } from "./BaseState";
 import { PositionalParameters, NamedParameters } from "./AST";
 import { AuraType } from "./Data";
 let INFINITY = huge;
-let self_condition: LuaObj<ConditionFunction> = {}
-let self_spellBookCondition: LuaObj<boolean> = {};
-self_spellBookCondition["spell"] = true;
 
 export type ConditionResult = [number, number, number?, number?, number?];
 export type ConditionFunction = (positionalParams: PositionalParameters, namedParams: NamedParameters, atTime: number) => ConditionResult;
@@ -26,29 +23,40 @@ export function isComparator(token: string): token is ComparatorId {
 }
 
 export class OvaleConditionClass {
+    private conditions: LuaObj<ConditionFunction> = {}
+    private spellBookConditions: LuaObj<boolean> = {
+        spell: true
+    };
+    
     constructor(private baseState: BaseState) {        
     }
 
+    /**
+     * Register a new condition
+     * @param name The condition name (must be lowercase)
+     * @param isSpellBookCondition Is the first argument a spell id from the spell book or a spell list name 
+     * @param func The function to register
+     */
     RegisterCondition(name: string, isSpellBookCondition: boolean, func: ConditionFunction) {
-        self_condition[name] = func;
+        this.conditions[name] = func;
         if (isSpellBookCondition) {
-            self_spellBookCondition[name] = true;
+            this.spellBookConditions[name] = true;
         }
     }
     UnregisterCondition(name: string) {
-        self_condition[name] = undefined;
+        this.conditions[name] = undefined;
     }
     IsCondition(name: string) {
-        return (self_condition[name] != undefined);
+        return (this.conditions[name] != undefined);
     }
     IsSpellBookCondition(name: string) {
-        return (self_spellBookCondition[name] != undefined);
+        return (this.spellBookConditions[name] != undefined);
     }
     EvaluateCondition(name: string, positionalParams: PositionalParameters, namedParams: NamedParameters, atTime: number) {
-        return self_condition[name](positionalParams, namedParams, atTime);
+        return this.conditions[name](positionalParams, namedParams, atTime);
     }
     HasAny(){
-        return next(self_condition) !== undefined;
+        return next(this.conditions) !== undefined;
     }
 
     

@@ -8,15 +8,15 @@ import { OvaleEquipmentClass, SlotName } from "./Equipment";
 import { OvaleStateClass } from "./State";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { abs, huge, floor, min } from "@wowts/math";
-import { assert, ipairs, loadstring, pairs, tonumber, wipe, LuaObj, lualength } from "@wowts/lua";
+import { assert, ipairs, loadstring, pairs, tonumber, wipe, LuaObj, lualength, kpairs } from "@wowts/lua";
 import { GetActionCooldown, GetActionTexture, GetItemIcon, GetItemCooldown, GetItemSpell, GetSpellTexture, IsActionInRange, IsCurrentAction, IsItemInRange, IsUsableAction, IsUsableItem } from "@wowts/wow-mock";
-import { AstNode, isValueNode } from "./AST";
+import { AstNode, isNodeType } from "./AST";
 import { OvaleCooldownClass } from "./Cooldown";
 import { OvaleRunesClass } from "./Runes";
 import { OvalePaperDollClass } from "./PaperDoll";
 import { BaseState } from "./BaseState";
 import { OvaleSpellsClass } from "./Spells";
-import { isNumber } from "./tools";
+import { isNumber, isString } from "./tools";
 import { OvaleClass } from "./Ovale";
 import { AceModule } from "@wowts/tsaddon";
 import { OvaleGUIDClass } from "./GUID";
@@ -111,7 +111,7 @@ export class OvaleBestActionClass {
 
     private AsValue(atTime: number, timeSpan: OvaleTimeSpan, node?: AstNode): [number, number, number, OvaleTimeSpan] {
         let value: number, origin: number, rate: number;
-        if (node && isValueNode(node)) {
+        if (node && isNodeType(node, "value")) {
             [value, origin, rate] = [<number>node.value, node.origin, node.rate];
         } else if (timeSpan && timeSpan.HasTime(atTime)) {
             [value, origin, rate, timeSpan] = [1, 0, 0, UNIVERSE];
@@ -191,9 +191,23 @@ export class OvaleBestActionClass {
 
     private GetActionSpellInfo(element: Element, atTime: number, target: string): ActionInfo {
         this.profiler.StartProfiling("OvaleBestAction_GetActionSpellInfo");
-        let actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionResourceExtend, actionCharges;
+        const spell = element.positionalParams[1];
+        if (isNumber(spell)) {
+            return this.getSpellActionInfo(spell, element, atTime, target);
+        } else if (isString(spell)) {
+            const spellList = this.ovaleData.buffSpellList[spell];
+            for (const [spellId] of kpairs(spellList)) {
+                if (this.OvaleSpellBook.IsKnownSpell(spellId)) {
+                    return this.getSpellActionInfo(spellId, element, atTime, target);
+                }
+            }
+        } 
+        return undefined;
+    }
+
+    private getSpellActionInfo(spellId: number, element: Element, atTime: number, target: string): ActionInfo {
         let targetGUID = this.OvaleGUID.UnitGUID(target);
-        let spellId = <number>element.positionalParams[1];
+        let actionTexture, actionInRange, actionCooldownStart, actionCooldownDuration, actionUsable, actionShortcut, actionIsCurrent, actionEnable, actionType, actionId, actionResourceExtend, actionCharges;
         let si = this.ovaleData.spellInfo[spellId];
         let replacedSpellId = undefined;
         if (si && si.replaced_by) {
@@ -413,7 +427,7 @@ export class OvaleBestActionClass {
                 } else {
                     this.tracer.Log("[%d] Runtime error: unable to compute node of type '%s'.", element.nodeId, element.type);
                 }
-                if (result && isValueNode(result)) {
+                if (result && isNodeType(result, "value")) {
                     this.tracer.Log("[%d] <<< '%s' returns %s with value = %s, %s, %s", element.nodeId, element.type, timeSpan, result.value, result.origin, result.rate);
                 } else if (result && result.nodeId) {
                     this.tracer.Log("[%d] <<< '%s' returns [%d] %s", element.nodeId, element.type, result.nodeId, timeSpan);
@@ -427,7 +441,7 @@ export class OvaleBestActionClass {
     }
     ComputeBool(element: Element, atTime: number) {
         let [timeSpan, newElement] = this.Compute(element, atTime);
-        if (newElement && isValueNode(newElement) && newElement.value == 0 && newElement.rate == 0) {
+        if (newElement && isNodeType(newElement, "value") && newElement.value == 0 && newElement.rate == 0) {
             return EMPTY_SET;
         } else {
             return timeSpan;

@@ -14,7 +14,6 @@ local ipairs = ipairs
 local pairs = pairs
 local tonumber = tonumber
 local tostring = tostring
-local type = type
 local wipe = wipe
 local kpairs = pairs
 local find = string.find
@@ -25,7 +24,16 @@ local GetSpellInfo = GetSpellInfo
 local __tools = LibStub:GetLibrary("ovale/tools")
 local isLuaArray = __tools.isLuaArray
 local checkToken = __tools.checkToken
+local isNumber = __tools.isNumber
+local isString = __tools.isString
 local NUMBER_PATTERN = "^%-?%d+%.?%d*$"
+local function getFunctionCallString(node)
+    local functionCall = node.name
+    if node.paramsAsString then
+        functionCall = node.name .. "(" .. node.paramsAsString .. ")"
+    end
+    return functionCall
+end
 __exports.OvaleCompileClass = __class(nil, {
     constructor = function(self, ovaleAzerite, ovaleEquipment, ovaleAst, ovaleCondition, ovaleCooldown, ovalePaperDoll, ovaleData, ovaleProfiler, ovaleDebug, ovaleOptions, ovale, ovaleScore, ovaleSpellBook, ovaleStance)
         self.ovaleAzerite = ovaleAzerite
@@ -513,27 +521,28 @@ __exports.OvaleCompileClass = __class(nil, {
     AddMissingVariantSpells = function(self, annotation)
         if annotation.functionReference then
             for _, node in ipairs(annotation.functionReference) do
-                local positionalParams = node.positionalParams, node.namedParams
-                local spellId = positionalParams[1]
-                if spellId and self.ovaleCondition:IsSpellBookCondition(node.func) then
-                    if  not self.ovaleSpellBook:IsKnownSpell(spellId) and  not self.ovaleCooldown:IsSharedCooldown(spellId) then
-                        local spellName
-                        if type(spellId) == "number" then
-                            spellName = self.ovaleSpellBook:GetSpellName(spellId)
-                        end
-                        if spellName then
-                            local name = GetSpellInfo(spellName)
-                            if spellName == name then
-                                self.tracer:Debug("Learning spell %s with ID %d.", spellName, spellId)
-                                self.ovaleSpellBook:AddSpell(spellId, spellName)
+                if self.ovaleCondition:IsSpellBookCondition(node.func) then
+                    local positionalParams = node.positionalParams, node.namedParams
+                    local spellId = positionalParams[1]
+                    if isNumber(spellId) then
+                        if  not self.ovaleSpellBook:IsKnownSpell(spellId) and  not self.ovaleCooldown:IsSharedCooldown(spellId) then
+                            local spellName = self.ovaleSpellBook:GetSpellName(spellId)
+                            if spellName then
+                                local name = GetSpellInfo(spellName)
+                                if spellName == name then
+                                    self.tracer:Debug("Learning spell %s with ID %d.", spellName, spellId)
+                                    self.ovaleSpellBook:AddSpell(spellId, spellName)
+                                end
+                            else
+                                self.tracer:Error("Unknown spell with ID %s used in %s.", spellId, getFunctionCallString(node))
                             end
-                        else
-                            local functionCall = node.name
-                            if node.paramsAsString then
-                                functionCall = node.name .. "(" .. node.paramsAsString .. ")"
-                            end
-                            self.tracer:Error("Unknown spell with ID %s used in %s.", spellId, functionCall)
                         end
+                    elseif isString(spellId) then
+                        if  not self.ovaleData.buffSpellList[spellId] then
+                            self.tracer:Error("Unknown spell list %s in %s.", spellId, getFunctionCallString(node))
+                        end
+                    elseif spellId then
+                        self.tracer:Error("Spell argument must be either a spell id or a spell list name in %s.", getFunctionCallString(node))
                     end
                 end
             end

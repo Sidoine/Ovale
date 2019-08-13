@@ -166,6 +166,15 @@ Define(sephuzs_secret_item 132452)
 Define(sephuzs_secret_buff 208051)
 	SpellInfo(sephuzs_secret_buff buff_cd=30 duration=10)
 	
+### Missing items (temporary)
+Define(dread_combatants_insignia_item 161813)
+Define(dread_combatants_medallion_item 161811)
+
+### Missing spells 
+Define(trinket_grongs_primal_rage_cooldown_buff 288267)
+Define(trinket_ashvanes_razor_coral_cooldown_buff 303568)
+Define(hyperthread_wristwraps_300142 300142)
+
 ###
 ### Essences
 ###
@@ -182,12 +191,16 @@ Define(worldvein_resonance_essence 295186)
     SpellInfo(worldvein_resonance_essence cd=60 tag=shortcd)
     Define(lifeblood_buff 295137)
 
-Define(conflict_and_strife_essence_id 32)
-Define(memory_of_lucid_dreams_essence_id 27)
-Define(vision_of_perfection_essence_id 22)
-Define(condensed_lifeforce_essence_id 14)
+# Essences: TODO import from simc
+Define(anima_of_life_and_death_essence_id 7)
 Define(blood_of_the_enemy_essence_id 23)
+Define(condensed_lifeforce_essence_id 14)
+Define(conflict_and_strife_essence_id 32)
 Define(essence_of_the_focusing_iris_essence_id 5)
+Define(memory_of_lucid_dreams_essence_id 27)
+Define(the_crucible_of_flame_essence_id 12)
+Define(vision_of_perfection_essence_id 22)
+Define(worldvein_resonance_essence_id 4)
 ###
 ### Racials
 ###

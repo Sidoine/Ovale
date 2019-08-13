@@ -345,8 +345,6 @@ AddFunction ShadowCleaveCdPostConditions
 
 AddFunction ShadowCdsMainActions
 {
- #focused_azerite_beam,if=spell_targets.mind_sear>=2|raid_event.adds.in>60
- if Enemies() >= 2 or 600 > 60 Spell(focused_azerite_beam)
  #concentrated_flame
  Spell(concentrated_flame_essence)
  #call_action_list,name=crit_cds,if=(buff.voidform.up&buff.chorus_of_insanity.stack>20)|azerite.chorus_of_insanity.rank=0
@@ -360,38 +358,37 @@ AddFunction ShadowCdsMainPostConditions
 
 AddFunction ShadowCdsShortCdActions
 {
- unless { Enemies() >= 2 or 600 > 60 } and Spell(focused_azerite_beam)
- {
-  #purifying_blast,if=spell_targets.mind_sear>=2|raid_event.adds.in>60
-  if Enemies() >= 2 or 600 > 60 Spell(purifying_blast)
-  #the_unbound_force
-  Spell(the_unbound_force)
+ #focused_azerite_beam,if=spell_targets.mind_sear>=2|raid_event.adds.in>60
+ if Enemies() >= 2 or 600 > 60 Spell(focused_azerite_beam)
+ #purifying_blast,if=spell_targets.mind_sear>=2|raid_event.adds.in>60
+ if Enemies() >= 2 or 600 > 60 Spell(purifying_blast)
+ #the_unbound_force
+ Spell(the_unbound_force)
 
-  unless Spell(concentrated_flame_essence)
-  {
-   #ripple_in_space
-   Spell(ripple_in_space_essence)
-   #worldvein_resonance,if=buff.lifeblood.stack<3
-   if BuffStacks(lifeblood_buff) < 3 Spell(worldvein_resonance_essence)
-   #call_action_list,name=crit_cds,if=(buff.voidform.up&buff.chorus_of_insanity.stack>20)|azerite.chorus_of_insanity.rank=0
-   if BuffPresent(voidform_shadow) and BuffStacks(chorus_of_insanity) > 20 or AzeriteTraitRank(chorus_of_insanity_trait) == 0 ShadowCritcdsShortCdActions()
-  }
+ unless Spell(concentrated_flame_essence)
+ {
+  #ripple_in_space
+  Spell(ripple_in_space_essence)
+  #worldvein_resonance,if=buff.lifeblood.stack<3
+  if BuffStacks(lifeblood_buff) < 3 Spell(worldvein_resonance_essence)
+  #call_action_list,name=crit_cds,if=(buff.voidform.up&buff.chorus_of_insanity.stack>20)|azerite.chorus_of_insanity.rank=0
+  if BuffPresent(voidform_shadow) and BuffStacks(chorus_of_insanity) > 20 or AzeriteTraitRank(chorus_of_insanity_trait) == 0 ShadowCritcdsShortCdActions()
  }
 }
 
 AddFunction ShadowCdsShortCdPostConditions
 {
- { Enemies() >= 2 or 600 > 60 } and Spell(focused_azerite_beam) or Spell(concentrated_flame_essence) or { BuffPresent(voidform_shadow) and BuffStacks(chorus_of_insanity) > 20 or AzeriteTraitRank(chorus_of_insanity_trait) == 0 } and ShadowCritcdsShortCdPostConditions()
+ Spell(concentrated_flame_essence) or { BuffPresent(voidform_shadow) and BuffStacks(chorus_of_insanity) > 20 or AzeriteTraitRank(chorus_of_insanity_trait) == 0 } and ShadowCritcdsShortCdPostConditions()
 }
 
 AddFunction ShadowCdsCdActions
 {
- #memory_of_lucid_dreams,if=(buff.voidform.stack>20&insanity<=50)|buff.voidform.stack>(25+5*buff.bloodlust.up)|(current_insanity_drain*gcd.max*3)>insanity
- if BuffStacks(voidform_shadow) > 20 and Insanity() <= 50 or BuffStacks(voidform_shadow) > 25 + 5 * BuffPresent(bloodlust) or CurrentInsanityDrain() * GCD() * 3 > Insanity() Spell(memory_of_lucid_dreams_essence)
+ #memory_of_lucid_dreams,if=(buff.voidform.stack>20&insanity<=50)|buff.voidform.stack>(26+7*buff.bloodlust.up)|(current_insanity_drain*((gcd.max*2)+action.mind_blast.cast_time))>insanity
+ if BuffStacks(voidform_shadow) > 20 and Insanity() <= 50 or BuffStacks(voidform_shadow) > 26 + 7 * BuffPresent(bloodlust) or CurrentInsanityDrain() * { GCD() * 2 + CastTime(mind_blast) } > Insanity() Spell(memory_of_lucid_dreams_essence)
  #blood_of_the_enemy
  Spell(blood_of_the_enemy)
- #guardian_of_azeroth
- Spell(guardian_of_azeroth)
+ #guardian_of_azeroth,if=buff.voidform.stack>15
+ if BuffStacks(voidform_shadow) > 15 Spell(guardian_of_azeroth)
 
  unless { Enemies() >= 2 or 600 > 60 } and Spell(focused_azerite_beam) or { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or Spell(the_unbound_force) or Spell(concentrated_flame_essence) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
  {
@@ -579,4 +576,5 @@ AddIcon checkbox=opt_priest_shadow_aoe help=cd specialization=shadow
 `
 	OvaleScripts.RegisterScript("PRIEST", "shadow", name, desc, code, "script")
 }
+
 }

@@ -52,7 +52,8 @@ function createFakeSpell(options: {[k in keyof SpellData]?: SpellData[k]}): Spel
         tooltip: "",
         essence_id: 0,
         dmg_class: 0,
-        spellAttributes: []
+        spellAttributes: [],
+        specializationName: []
     };
 }
 

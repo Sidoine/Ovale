@@ -13,7 +13,7 @@ local kpairs = pairs
 local ipairs = ipairs
 local tostring = tostring
 local __AST = LibStub:GetLibrary("ovale/AST")
-local isValueNode = __AST.isValueNode
+local isNodeType = __AST.isNodeType
 local format = string.format
 local gmatch = string.gmatch
 local find = string.find
@@ -793,7 +793,7 @@ __exports.Emiter = __class(nil, {
                     if operator then
                         local rhsNode = self:Emit(parseNode.child[1], nodeList, annotation, action)
                         if rhsNode then
-                            if operator == "-" and isValueNode(rhsNode) then
+                            if operator == "-" and isNodeType(rhsNode, "value") then
                                 rhsNode.value = -1 * rhsNode.value
                             else
                                 node = self.ovaleAst:NewNode(nodeList, true)
@@ -1097,7 +1097,7 @@ __exports.Emiter = __class(nil, {
                 end
             elseif property == "shard_react" then
                 code = "SoulShards() >= 1"
-            elseif property == "tick_dmg" then
+            elseif property == "tick_dmg" or property == "tick_damage" then
                 code = format("%sLastDamage(%s)", buffTarget, buffName)
             elseif property == "tick_time" then
                 code = format("%sCurrentTickTime(%s)", buffTarget, buffName)
@@ -2234,6 +2234,8 @@ __exports.Emiter = __class(nil, {
                     code = "Enemies()-1"
                 elseif property == "time_to_die" then
                     code = "target.TimeToDie()"
+                elseif property == "time_to_pct_30" then
+                    code = "target.TimeToHealthPercent(30)"
                 else
                     ok = false
                 end
@@ -2481,6 +2483,7 @@ __exports.Emiter = __class(nil, {
         self:AddDisambiguation("incarnation", "incarnation_guardian_of_ursoc", "DRUID", "guardian")
         self:AddDisambiguation("swipe", "swipe_bear", "DRUID", "guardian")
         self:AddDisambiguation("swipe", "swipe_cat", "DRUID", "feral")
+        self:AddDisambiguation("rake_bleed", "rake_debuff", "DRUID", "feral")
         self:AddDisambiguation("a_murder_of_crows_talent", "mm_a_murder_of_crows_talent", "HUNTER", "marksmanship")
         self:AddDisambiguation("cat_beast_cleave", "pet_beast_cleave", "HUNTER", "beast_mastery")
         self:AddDisambiguation("cat_frenzy", "pet_frenzy", "HUNTER", "beast_mastery")
