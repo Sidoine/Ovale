@@ -22,6 +22,9 @@ Define(arcane_familiar 205022)
   SpellInfo(arcane_familiar cd=10 duration=3600 talent=arcane_familiar_talent)
 
   SpellAddTargetDebuff(arcane_familiar arcane_familiar=1)
+  SpellAddBuff(arcane_familiar arcane_familiar_buff=1)
+Define(arcane_familiar_buff 210126)
+	SpellInfo(arcane_familiar_buff duration=3600)
 Define(arcane_intellect 1459)
 # Infuses the target with brilliance, increasing their Intellect by s1 for 3600 seconds.  rnrnIf target is in your party or raid, all party and raid members will be affected.
   SpellInfo(arcane_intellect duration=3600)
@@ -472,7 +475,7 @@ Define(brain_freeze_buff 190446)
 
 Define(cinderstorm 198929)
 	SpellInfo(cinderstorm cd=9)
-Define(clearcasting_buff 276743)
+Define(clearcasting_buff 263725)
     SpellInfo(clearcasting_buff duration=15 max_stacks=3)
 Define(cold_snap 11958)
 	SpellInfo(cold_snap cd=180 gcd=0 offgcd=1)
