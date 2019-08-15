@@ -122,7 +122,7 @@ Define(ebonbolt 257537)
 Define(evocation 12051)
 # Increases your mana regeneration by s1 for 6 seconds.
 # Rank 2: Evocation's cooldown is reduced by s1.
-  SpellInfo(evocation cd=180 duration=6 channel=6)
+  SpellInfo(evocation cd=90 duration=6 channel=6)
   # Mana regeneration increased by s1.
   SpellAddBuff(evocation evocation=1)
 Define(fire_blast 108853)
