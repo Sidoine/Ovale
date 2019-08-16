@@ -675,6 +675,14 @@ Define(water_elemental_water_jet_debuff 135029)
 	SpellInfo(water_elemental_water_jet_debuff duration=4)
 	SpellInfo(water_elemental_water_jet_debuff add_duration=10 itemset=T18 itemcount=4)
 Define(winters_chill_debuff 157997) # TODO ???
+Define(prismatic_barrier 235450)
+	SpellInfo(prismatic_barrier cd=25)
+	SpellAddBuff(prismatic_barrier prismatic_barrier_buff=1)
+Define(prismatic_barrier_buff 235450)
+	SpellInfo(prismatic_barrier_buff duration=60)
+Define(slow 31589)
+	SpellAddTargetDebuff(slow slow_debuff=1)
+Define(slow_debuff 31589)
 
 # Talents
 Define(blazing_soul_talent 4)

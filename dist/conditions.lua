@@ -2030,8 +2030,9 @@ __exports.OvaleConditions = __class(nil, {
             end
             local ticksLo = (tickCycle + posLo - buffPos) % tickCycle
             local ticksHi = (tickCycle + posHi - buffPos) % tickCycle
-            local tickTime = aura.tick
-            local tickRem = tickTime - (atTime - aura.lastTickTime)
+            local tickTime = aura.tick or 0
+			local tickLastTime = aura.lastTickTime or 0
+            local tickRem = tickTime - (atTime - tickLastTime)
             local value = tickRem + tickTime * (min(ticksLo, ticksHi) - 1)
             return ReturnValue(value, atTime, -1)
         end

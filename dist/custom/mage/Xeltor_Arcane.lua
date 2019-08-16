@@ -46,8 +46,8 @@ AddFunction InterruptActions
 
 AddFunction SafetyDance
 {
-	# if target.istargetingplayer() and { target.distance() <= 8 or IncomingDamage(3) >= MaxHealth() * 0.01 } and not BuffPresent(prismatic_barrier_buff) Spell(prismatic_barrier)
-	# if target.InRange(slow) and target.DebuffRemains(slow_debuff) <= 2 and not target.DebuffPresent(frost_nova_debuff) and target.IsPvP() and not IsBossFight() Spell(slow)
+	if target.istargetingplayer() and { target.distance() <= 8 or IncomingDamage(3) >= MaxHealth() * 0.01 } and not BuffPresent(prismatic_barrier_buff) Spell(prismatic_barrier)
+	if target.InRange(slow) and target.DebuffRemains(slow_debuff) <= 2 and not target.DebuffPresent(frost_nova_debuff) and target.IsPvP() and not IsBossFight() Spell(slow)
 	if target.Distance(less 12) and not target.DebuffPresent(frost_nova_debuff) and target.IsPvP() and not IsBossFight() Spell(frost_nova)
 	if target.BuffStealable() and target.InRange(spellsteal) Spell(spellsteal)
 }

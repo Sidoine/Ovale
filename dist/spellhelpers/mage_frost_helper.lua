@@ -3,7 +3,7 @@ if not __exports then return end
 __exports.registerMageFrostHelper = function(OvaleScripts)
 do
 	local name = "MAGEFROST"
-	local desc = "[Xel][7.x] Spellhelper: Frost"
+	local desc = "[Xel][8.x] Spellhelper: Frost"
 	local code = [[
 AddIcon
 {
@@ -12,16 +12,16 @@ AddIcon
 	Texture(spell_frost_frostbolt02) # Frostbolt
 	Texture(spell_frost_frostblast) # Ice Lance
 	Texture(ability_warlock_burningembersblue) # Flurry
+	Texture(spell_frost_glacier) # Cone of Cold
+	Texture(spell_frost_frostnova) # Frost Nova
 	Texture(spell_frost_frozenorb) # Frozen Orb
 	Texture(spell_frost_icestorm) # Blizzard
-
-	# Pet skills (For non lonely winter rotation)
-	Texture(ability_vehicle_sonicshockwave) # Water Jet (DO NOT SET TO AUTOCAST)
 	
 	# Buffs
 	Texture(spell_frost_coldhearted) # Icy Veins
 	Texture(spell_ice_lament) # Ice Barrier
-	Texture(ability_mage_timewarp) # Time Warp
+	Texture(spell_holy_magicalsentry) # Arcane Intellect
+	Texture(spell_arcane_arcane02) # Spellsteal
 	
 	# Items
 	Texture(inv_jewelry_talisman_12) # Link to a trinket macro
@@ -38,16 +38,15 @@ AddIcon
 	Texture(inv_misc_azerite_01) # Worldvein Resonance
 
 	# Talents
-	Texture(ability_mage_rayoffrost) # Ray of Frost (T1)
+	Texture(spell_mage_icenova) # Ice Nova (T1)
 	Texture(spell_arcane_massdispel) # Shimmer (T2)
 	Texture(spell_mage_iceflows) # Ice Floes (T2)
 	Texture(spell_magic_lesserinvisibilty) # Mirror Image (T3)
 	Texture(spell_mage_runeofpower) # Rune of Power (T3)
-	Texture(spell_mage_icenova) # Ice Nova (T4)
-	Texture(ability_mage_coldasice) # Frozen Touch (T4)
-	Texture(spell_mage_frostbomb) # Frost Bomb (T6)
+	Texture(artifactability_frostmage_ebonbolt) # Ebonbolt (T4)
+	Texture(spell_mage_cometstorm) # Comet Storm (T6)
+	Texture(ability_mage_rayoffrost) # Ray of Frost (T7)
 	Texture(ability_mage_glacialspike) # Glacial Spike (T7)
-	Texture(spell_mage_cometstorm) # Comet Storm (T7)
 
 	# Racials
 	Texture(racial_orc_berserkerstrength) # Blood Fury (Orc)
