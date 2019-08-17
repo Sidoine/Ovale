@@ -18,7 +18,7 @@ AddIcon specialization=2 help=main
 		unless target.Present() and target.Distance(less 5)
 		{
 			if not BuffPresent(lightning_shield) Spell(lightning_shield)
-			if Speed() > 0 Spell(ghost_wolf)
+			# if Speed() > 0 Spell(ghost_wolf)
 		}
 	}
 	if not InCombat() and not target.IsFriend() and not mounted() and target.Present()

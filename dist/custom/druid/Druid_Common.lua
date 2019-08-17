@@ -7,8 +7,8 @@ do
 	local code = [[
 AddFunction SaveActions
 {
-	if HealthPercent() <= 50 and ManaPercent() > 20 and { not InCombat() or target.istargetingplayer() } and not target.IsFriend() Spell(swiftmend)
-	if HealthPercent() <= 50 and ManaPercent() > 20 and { not InCombat() or target.istargetingplayer() } and not target.IsFriend() and not BuffPresent(rejuvenation_buff) Spell(rejuvenation)
+	# if HealthPercent() <= 50 and ManaPercent() > 20 and { not InCombat() or target.istargetingplayer() } and not target.IsFriend() Spell(swiftmend)
+	# if HealthPercent() <= 50 and ManaPercent() > 20 and { not InCombat() or target.istargetingplayer() } and not target.IsFriend() and not BuffPresent(rejuvenation_buff) Spell(rejuvenation)
 	if { Speed() == 0 or CanMove() > 0 } and HealthPercent() <= 50 and ManaPercent() > 20 and { not InCombat() or target.istargetingplayer() } and not target.IsFriend() Spell(regrowth)
 }
 

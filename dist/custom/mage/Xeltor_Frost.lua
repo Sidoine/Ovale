@@ -12,13 +12,13 @@ Include(ovale_mage_spells)
 
 AddIcon specialization=3 help=main
 {
-	if not mounted() and not PlayerIsResting() and not IsDead()
+	if not mounted() and not PlayerIsResting() and not IsDead() and not Dead()
 	{
 		#arcane_intellect
 		if not BuffPresent(arcane_intellect_buff any=1) and not { target.IsFriend() or target.Present() } Spell(arcane_intellect)
 		if not target.BuffPresent(arcane_intellect_buff any=1) and target.IsFriend() Spell(arcane_intellect)
 		#summon_arcane_familiar
-		if not pet.Present() Spell(summon_water_elemental)
+		if not pet.Present() and { Speed() == 0 or CanMove() > 0 } and not Talent(lonely_winter_talent) Spell(summon_water_elemental)
 	}
 	
 	if InCombat() InterruptActions()
@@ -37,7 +37,7 @@ AddIcon specialization=3 help=main
 		if Speed() == 0 or CanMove() > 0 FrostDefaultShortCdActions()
 		if Speed() == 0 or CanMove() > 0 FrostDefaultMainActions()
 		#ice_lance,moving=1
-		if Speed() > 0 Spell(ice_lance)
+		if Speed() > 0 and not BuffPresent(ice_floes_buff) and not SpellCharges(ice_floes) Spell(ice_lance)
 	}
 }
 
@@ -58,7 +58,7 @@ AddFunction SafetyDance
 {
 	if target.istargetingplayer() and { target.distance() <= 8 or IncomingDamage(3) >= MaxHealth() * 0.01 } and not BuffPresent(ice_barrier_buff) Spell(ice_barrier)
 	if target.Distance(less 12) and not target.DebuffPresent(frost_nova_debuff) and target.IsPvP() and not IsBossFight() Spell(frost_nova)
-	if target.BuffStealable() and target.InRange(spellsteal) and not PreviousGCDSpell(spellsteal) Spell(spellsteal)
+	if target.BuffStealable() and target.InRange(spellsteal) and not PreviousGCDSpell(spellsteal) and ManaPercent() > 90 Spell(spellsteal)
 }
 
 AddFunction FrostUseItemActions
