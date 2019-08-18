@@ -14,15 +14,15 @@ Include(ovale_deathknight_spells)
 # Unholy
 AddIcon specialization=3 help=main
 {
-	if not mounted() and not Stealthed() and not InCombat() and not Dead() and not PlayerIsResting()
+	if not mounted() and not Stealthed() and not Dead() and not PlayerIsResting()
 	{
-		if not pet.Present() Spell(raise_dead)
+		if not pet.Present() and target.Present() and not target.IsFriend() Spell(raise_dead)
 	}
 	
 	# Interrupt
 	if InCombat() InterruptActions()
 	
-	if wet() and not BuffPresent(path_of_frost_buff) Spell(path_of_frost)
+	if wet() and not BuffPresent(path_of_frost) and not InCombat() Spell(path_of_frost)
 	
     if target.InRange(festering_strike) and HasFullControl()
     {
