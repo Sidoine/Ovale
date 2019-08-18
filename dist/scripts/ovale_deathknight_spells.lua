@@ -3,7 +3,8 @@ if not __exports then return end
 __exports.registerDeathKnightSpells = function(OvaleScripts)
     local name = "ovale_deathknight_spells"
     local desc = "[8.2] Ovale: Death Knight spells"
-    local code = [[Define(apocalypse 275699)
+    local code = [[
+Define(apocalypse 275699)
 # Bring doom upon the enemy, dealing sw1 Shadow damage and bursting up to s2 Festering Wounds on the target.rnrnSummons an Army of the Dead ghoul for 15 seconds for each burst Festering Wound.
   SpellInfo(apocalypse cd=90)
 Define(army_of_the_dead 42650)
@@ -657,7 +658,7 @@ Define(pillar_of_frost_buff 51271)
 	SpellInfo(pillar_of_frost duration=15)
 Define(raise_ally 61999)
 
-    SpellRequire(raise_dead unusable 1=pet_health_pct,!0)
+    # SpellRequire(raise_dead unusable 1=pet_health_pct,!0)
 Define(razorice_debuff 51714)
 
 	SpellInfo(remorseless_winter cd=20 runes=1 runicpower=-10)

@@ -3,7 +3,8 @@ if not __exports then return end
 __exports.registerShamanSpells = function(OvaleScripts)
     local name = "ovale_shaman_spells"
     local desc = "[8.2] Ovale: Shaman spells"
-    local code = [[Define(ancestral_call 274738)
+    local code = [[
+Define(ancestral_call 274738)
 # Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
   SpellAddBuff(ancestral_call ancestral_call=1)
@@ -936,6 +937,10 @@ Define(unlimited_power_talent 19)
 Define(wellspring_talent 20)
 Define(wind_rush_totem_talent 15)
 
+# PvP Talents
+Define(bloodlust_shamanism 204361)
+	SpellInfo(bloodlust_shamanism cd=60)
+Define(shamanism 193876)
 ]]
     OvaleScripts:RegisterScript("SHAMAN", nil, name, desc, code, "include")
 end

@@ -51,6 +51,7 @@ AddIcon specialization=2 help=main
 		if target.InRange(feral_lunge) Spell(feral_lunge)
 	}
 }
+AddCheckBox(shambl "Shamanism")
 
 AddFunction InterruptActions
 {
@@ -654,6 +655,7 @@ AddFunction EnhancementOpenerMainPostConditions
 
 AddFunction EnhancementOpenerShortCdActions
 {
+ if CheckBoxOn(shambl) and player.IsPvP() Spell(bloodlust_shamanism)
 }
 
 AddFunction EnhancementOpenerShortCdPostConditions
