@@ -221,6 +221,8 @@ Define(dread_combatants_medallion_item 161811)
 Define(trinket_grongs_primal_rage_cooldown_buff 288267)
 Define(trinket_ashvanes_razor_coral_cooldown_buff 303568)
 Define(hyperthread_wristwraps_300142 300142)
+Define(razor_coral_debuff 303564)
+Define(conductive_ink_debuff 302565)
 
 ###
 ### Essences

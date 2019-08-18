@@ -33,7 +33,7 @@ __exports.OvaleRunesClass = __class(States, {
                 for slot = 1, RUNE_SLOTS, 1 do
                     self.current.rune[slot] = {}
                 end
-                self.module:RegisterEvent("PLAYER_ENTERING_WORLD", self.UpdateAllRunes)
+                -- self.module:RegisterEvent("PLAYER_ENTERING_WORLD", self.UpdateAllRunes)
                 self.module:RegisterEvent("RUNE_POWER_UPDATE", self.RUNE_POWER_UPDATE)
                 self.module:RegisterEvent("UNIT_RANGEDDAMAGE", self.UNIT_RANGEDDAMAGE)
                 self.module:RegisterEvent("UNIT_SPELL_HASTE", self.UNIT_RANGEDDAMAGE)
@@ -86,7 +86,7 @@ __exports.OvaleRunesClass = __class(States, {
     end,
     UpdateAllRunes = function(self)
         for slot = 1, RUNE_SLOTS, 1 do
-            self:UpdateRune(slot)
+			self:UpdateRune(slot)
         end
     end,
     DebugRunes = function(self)

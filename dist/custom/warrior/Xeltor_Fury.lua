@@ -3,7 +3,7 @@ if not __exports then return end
 __exports.registerWarriorFuryXeltor = function(OvaleScripts)
 do
 	local name = "xeltor_fury"
-	local desc = "[Xel][8.1.5] Warrior: Fury"
+	local desc = "[Xel][8.2] Warrior: Fury"
 	local code = [[
 Include(ovale_common)
 Include(ovale_trinkets_mop)
@@ -82,10 +82,10 @@ AddFunction FuryDefaultMainActions
 
  unless target.Distance() > 5 and FuryMovementMainPostConditions()
  {
-  #furious_slash,if=talent.furious_slash.enabled&(buff.furious_slash.stack<3|buff.furious_slash.remains<3|(cooldown.recklessness.remains<3&buff.furious_slash.remains<9))
-  if Talent(furious_slash_talent) and { BuffStacks(furious_slash_buff) < 3 or BuffRemaining(furious_slash_buff) < 3 or SpellCooldown(recklessness) < 3 and BuffRemaining(furious_slash_buff) < 9 } Spell(furious_slash)
   #rampage,if=cooldown.recklessness.remains<3
   if SpellCooldown(recklessness) < 3 Spell(rampage)
+  #concentrated_flame,if=!buff.recklessness.up&!buff.siegebreaker.up&dot.concentrated_flame_burn.remains=0
+  if not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 Spell(concentrated_flame_essence)
   #whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up
   if Enemies(tagged=1) > 1 and not BuffPresent(whirlwind_buff) Spell(whirlwind_fury)
   #run_action_list,name=single_target
@@ -103,26 +103,46 @@ AddFunction FuryDefaultShortCdActions
  #auto_attack
  # FuryGetInMeleeRange()
  #charge
- # if CheckBoxOn(opt_melee_range) and target.InRange(charge) Spell(charge)
+ # if CheckBoxOn(opt_melee_range) and target.InRange(charge) and not target.InRange(pummel) Spell(charge)
  #run_action_list,name=movement,if=movement.distance>5
  if target.Distance() > 5 FuryMovementShortCdActions()
 
  unless target.Distance() > 5 and FuryMovementShortCdPostConditions()
  {
-  #heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)|!raid_event.movement.exists
-  # if { target.Distance() > 25 and 600 > 45 or not False(raid_event_movement_exists) } and CheckBoxOn(opt_melee_range) and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
+  #heroic_leap,if=(raid_event.movement.distance>25&raid_event.movement.in>45)
+  # if target.Distance() > 25 and 600 > 45 and CheckBoxOn(opt_melee_range) and target.Distance(atLeast 8) and target.Distance(atMost 40) Spell(heroic_leap)
 
-  unless Talent(furious_slash_talent) and { BuffStacks(furious_slash_buff) < 3 or BuffRemaining(furious_slash_buff) < 3 or SpellCooldown(recklessness) < 3 and BuffRemaining(furious_slash_buff) < 9 } and Spell(furious_slash) or SpellCooldown(recklessness) < 3 and Spell(rampage) or Enemies(tagged=1) > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury)
+  unless SpellCooldown(recklessness) < 3 and Spell(rampage)
   {
-   #run_action_list,name=single_target
-   FurySingleTargetShortCdActions()
+   #blood_of_the_enemy,if=buff.recklessness.up
+   if BuffPresent(recklessness_buff) Spell(blood_of_the_enemy)
+   #purifying_blast,if=!buff.recklessness.up&!buff.siegebreaker.up
+   if not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) Spell(purifying_blast)
+   #ripple_in_space,if=!buff.recklessness.up&!buff.siegebreaker.up
+   if not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) Spell(ripple_in_space_essence)
+   #worldvein_resonance,if=!buff.recklessness.up&!buff.siegebreaker.up
+   if not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) Spell(worldvein_resonance_essence)
+   #focused_azerite_beam,if=!buff.recklessness.up&!buff.siegebreaker.up
+   if not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) Spell(focused_azerite_beam)
+
+   unless not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence)
+   {
+    #the_unbound_force,if=buff.reckless_force.up
+    if BuffPresent(reckless_force_buff) Spell(the_unbound_force)
+
+    unless Enemies(tagged=1) > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury)
+    {
+     #run_action_list,name=single_target
+     FurySingleTargetShortCdActions()
+    }
+   }
   }
  }
 }
 
 AddFunction FuryDefaultShortCdPostConditions
 {
- target.Distance() > 5 and FuryMovementShortCdPostConditions() or Talent(furious_slash_talent) and { BuffStacks(furious_slash_buff) < 3 or BuffRemaining(furious_slash_buff) < 3 or SpellCooldown(recklessness) < 3 and BuffRemaining(furious_slash_buff) < 9 } and Spell(furious_slash) or SpellCooldown(recklessness) < 3 and Spell(rampage) or Enemies(tagged=1) > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury) or FurySingleTargetShortCdPostConditions()
+ target.Distance() > 5 and FuryMovementShortCdPostConditions() or SpellCooldown(recklessness) < 3 and Spell(rampage) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence) or Enemies(tagged=1) > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury) or FurySingleTargetShortCdPostConditions()
 }
 
 AddFunction FuryDefaultCdActions
@@ -134,17 +154,21 @@ AddFunction FuryDefaultCdActions
  unless target.Distance() > 5 and FuryMovementCdPostConditions()
  {
   #potion
-  # if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(bursting_blood usable=1)
+  # if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_potion_of_unbridled_fury usable=1)
 
-  unless Talent(furious_slash_talent) and { BuffStacks(furious_slash_buff) < 3 or BuffRemaining(furious_slash_buff) < 3 or SpellCooldown(recklessness) < 3 and BuffRemaining(furious_slash_buff) < 9 } and Spell(furious_slash) or SpellCooldown(recklessness) < 3 and Spell(rampage)
+  unless SpellCooldown(recklessness) < 3 and Spell(rampage) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(purifying_blast) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(ripple_in_space_essence) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(worldvein_resonance_essence) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(focused_azerite_beam) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence) or BuffPresent(reckless_force_buff) and Spell(the_unbound_force)
   {
-   #recklessness,if=!talent.siegebreaker.enabled|(cooldown.siegebreaker.remains<1|cooldown.siegebreaker.remains>5)
-   if not Talent(siegebreaker_talent) or SpellCooldown(siegebreaker) < 1 or SpellCooldown(siegebreaker) > 5 Spell(recklessness)
+   #guardian_of_azeroth,if=!buff.recklessness.up
+   if not BuffPresent(recklessness_buff) Spell(guardian_of_azeroth)
+   #memory_of_lucid_dreams,if=!buff.recklessness.up
+   if not BuffPresent(recklessness_buff) Spell(memory_of_lucid_dreams_essence)
+   #recklessness,if=!essence.condensed_lifeforce.major&!essence.blood_of_the_enemy.major|cooldown.guardian_of_azeroth.remains>20|buff.guardian_of_azeroth.up|cooldown.blood_of_the_enemy.remains<gcd
+   if not AzeriteEssenceIsMajor(condensed_lifeforce_essence_id) and not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or SpellCooldown(guardian_of_azeroth) > 20 or BuffPresent(guardian_of_azeroth_buff) or SpellCooldown(blood_of_the_enemy) < GCD() Spell(recklessness)
 
    unless Enemies(tagged=1) > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury)
    {
-    #use_item,name=ramping_amplitude_gigavolt_engine
-    FuryUseItemActions()
+    #use_item,name=ashvanes_razor_coral,if=!debuff.razor_coral.up|(target.health.pct<30.1&debuff.conductive_ink.up)|(!debuff.conductive_ink.up&buff.memory_of_lucid_dreams.up|prev_gcd.2.guardian_of_azeroth|prev_gcd.2.recklessness&(!essence.memory_of_lucid_dreams.major&!essence.condensed_lifeforce.major))
+    if not target.DebuffPresent(razor_coral_debuff) or target.HealthPercent() < 30.1 and target.DebuffPresent(conductive_ink_debuff) or not target.DebuffPresent(conductive_ink_debuff) and BuffPresent(memory_of_lucid_dreams_essence_buff) or PreviousGCDSpell(guardian_of_azeroth count=2) or PreviousGCDSpell(recklessness count=2) and not AzeriteEssenceIsMajor(memory_of_lucid_dreams_essence_id) and not AzeriteEssenceIsMajor(condensed_lifeforce_essence_id) FuryUseItemActions()
     #blood_fury
     Spell(blood_fury_ap)
     #berserking
@@ -164,7 +188,7 @@ AddFunction FuryDefaultCdActions
 
 AddFunction FuryDefaultCdPostConditions
 {
- target.Distance() > 5 and FuryMovementCdPostConditions() or Talent(furious_slash_talent) and { BuffStacks(furious_slash_buff) < 3 or BuffRemaining(furious_slash_buff) < 3 or SpellCooldown(recklessness) < 3 and BuffRemaining(furious_slash_buff) < 9 } and Spell(furious_slash) or SpellCooldown(recklessness) < 3 and Spell(rampage) or Enemies(tagged=1) > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury) or FurySingleTargetCdPostConditions()
+ target.Distance() > 5 and FuryMovementCdPostConditions() or SpellCooldown(recklessness) < 3 and Spell(rampage) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(purifying_blast) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(ripple_in_space_essence) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(worldvein_resonance_essence) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and Spell(focused_azerite_beam) or not BuffPresent(recklessness_buff) and not BuffPresent(siegebreaker) and not target.DebuffRemaining(concentrated_flame_burn_debuff) > 0 and Spell(concentrated_flame_essence) or BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or Enemies(tagged=1) > 1 and not BuffPresent(whirlwind_buff) and Spell(whirlwind_fury) or FurySingleTargetCdPostConditions()
 }
 
 ### actions.movement
@@ -219,10 +243,16 @@ AddFunction FuryPrecombatCdActions
  #food
  #augmentation
  #snapshot_stats
+ #use_item,name=azsharas_font_of_power
+ FuryUseItemActions()
+ #memory_of_lucid_dreams
+ Spell(memory_of_lucid_dreams_essence)
+ #guardian_of_azeroth
+ Spell(guardian_of_azeroth)
+ #recklessness
+ Spell(recklessness)
  #potion
- # if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(bursting_blood usable=1)
- #recklessness,if=!talent.furious_slash.enabled&!talent.reckless_abandon.enabled
- if not Talent(furious_slash_talent) and not Talent(reckless_abandon_talent) Spell(recklessness)
+ # if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_potion_of_unbridled_fury usable=1)
 }
 
 AddFunction FuryPrecombatCdPostConditions
@@ -233,12 +263,16 @@ AddFunction FuryPrecombatCdPostConditions
 
 AddFunction FurySingleTargetMainActions
 {
- #rampage,if=buff.recklessness.up|(talent.frothing_berserker.enabled|talent.carnage.enabled&(buff.enrage.remains<gcd|rage>90)|talent.massacre.enabled&(buff.enrage.remains<gcd|rage>90))
- if BuffPresent(recklessness_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } Spell(rampage)
+ #rampage,if=(buff.recklessness.up|buff.memory_of_lucid_dreams.up)|(talent.frothing_berserker.enabled|talent.carnage.enabled&(buff.enrage.remains<gcd|rage>90)|talent.massacre.enabled&(buff.enrage.remains<gcd|rage>90))
+ if BuffPresent(recklessness_buff) or BuffPresent(memory_of_lucid_dreams_essence_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } Spell(rampage)
  #execute
  Spell(execute)
+ #furious_slash,if=!buff.bloodlust.up&buff.furious_slash.remains<3
+ if not BuffPresent(bloodlust) and BuffRemaining(furious_slash_buff) < 3 Spell(furious_slash)
  #bloodthirst,if=buff.enrage.down|azerite.cold_steel_hot_blood.rank>1
  if not IsEnraged() or AzeriteTraitRank(cold_steel_hot_blood_trait) > 1 Spell(bloodthirst)
+ #dragon_roar,if=buff.enrage.up
+ if IsEnraged() Spell(dragon_roar)
  #raging_blow,if=charges=2
  if Charges(raging_blow) == 2 Spell(raging_blow)
  #bloodthirst
@@ -260,22 +294,16 @@ AddFunction FurySingleTargetShortCdActions
  #siegebreaker
  Spell(siegebreaker)
 
- unless { BuffPresent(recklessness_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or Spell(execute)
+ unless { BuffPresent(recklessness_buff) or BuffPresent(memory_of_lucid_dreams_essence_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or Spell(execute) or not BuffPresent(bloodlust) and BuffRemaining(furious_slash_buff) < 3 and Spell(furious_slash)
  {
   #bladestorm,if=prev_gcd.1.rampage
   if PreviousGCDSpell(rampage) Spell(bladestorm_fury)
-
-  unless { not IsEnraged() or AzeriteTraitRank(cold_steel_hot_blood_trait) > 1 } and Spell(bloodthirst) or Charges(raging_blow) == 2 and Spell(raging_blow) or Spell(bloodthirst)
-  {
-   #dragon_roar,if=buff.enrage.up
-   if IsEnraged() Spell(dragon_roar)
-  }
  }
 }
 
 AddFunction FurySingleTargetShortCdPostConditions
 {
- { BuffPresent(recklessness_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or Spell(execute) or { not IsEnraged() or AzeriteTraitRank(cold_steel_hot_blood_trait) > 1 } and Spell(bloodthirst) or Charges(raging_blow) == 2 and Spell(raging_blow) or Spell(bloodthirst) or { Talent(carnage_talent) or Talent(massacre_talent_fury) and Rage() < 80 or Talent(frothing_berserker_talent) and Rage() < 90 } and Spell(raging_blow) or Talent(furious_slash_talent) and Spell(furious_slash) or Spell(whirlwind_fury)
+ { BuffPresent(recklessness_buff) or BuffPresent(memory_of_lucid_dreams_essence_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or Spell(execute) or not BuffPresent(bloodlust) and BuffRemaining(furious_slash_buff) < 3 and Spell(furious_slash) or { not IsEnraged() or AzeriteTraitRank(cold_steel_hot_blood_trait) > 1 } and Spell(bloodthirst) or IsEnraged() and Spell(dragon_roar) or Charges(raging_blow) == 2 and Spell(raging_blow) or Spell(bloodthirst) or { Talent(carnage_talent) or Talent(massacre_talent_fury) and Rage() < 80 or Talent(frothing_berserker_talent) and Rage() < 90 } and Spell(raging_blow) or Talent(furious_slash_talent) and Spell(furious_slash) or Spell(whirlwind_fury)
 }
 
 AddFunction FurySingleTargetCdActions
@@ -284,7 +312,7 @@ AddFunction FurySingleTargetCdActions
 
 AddFunction FurySingleTargetCdPostConditions
 {
- Spell(siegebreaker) or { BuffPresent(recklessness_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or Spell(execute) or PreviousGCDSpell(rampage) and Spell(bladestorm_fury) or { not IsEnraged() or AzeriteTraitRank(cold_steel_hot_blood_trait) > 1 } and Spell(bloodthirst) or Charges(raging_blow) == 2 and Spell(raging_blow) or Spell(bloodthirst) or IsEnraged() and Spell(dragon_roar) or { Talent(carnage_talent) or Talent(massacre_talent_fury) and Rage() < 80 or Talent(frothing_berserker_talent) and Rage() < 90 } and Spell(raging_blow) or Talent(furious_slash_talent) and Spell(furious_slash) or Spell(whirlwind_fury)
+ Spell(siegebreaker) or { BuffPresent(recklessness_buff) or BuffPresent(memory_of_lucid_dreams_essence_buff) or Talent(frothing_berserker_talent) or Talent(carnage_talent) and { EnrageRemaining() < GCD() or Rage() > 90 } or Talent(massacre_talent_fury) and { EnrageRemaining() < GCD() or Rage() > 90 } } and Spell(rampage) or Spell(execute) or not BuffPresent(bloodlust) and BuffRemaining(furious_slash_buff) < 3 and Spell(furious_slash) or PreviousGCDSpell(rampage) and Spell(bladestorm_fury) or { not IsEnraged() or AzeriteTraitRank(cold_steel_hot_blood_trait) > 1 } and Spell(bloodthirst) or IsEnraged() and Spell(dragon_roar) or Charges(raging_blow) == 2 and Spell(raging_blow) or Spell(bloodthirst) or { Talent(carnage_talent) or Talent(massacre_talent_fury) and Rage() < 80 or Talent(frothing_berserker_talent) and Rage() < 90 } and Spell(raging_blow) or Talent(furious_slash_talent) and Spell(furious_slash) or Spell(whirlwind_fury)
 }
 ]]
 
