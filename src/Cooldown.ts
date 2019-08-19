@@ -231,7 +231,7 @@ export class OvaleCooldownClass extends States<CooldownData> implements SpellCas
                     cdEnable = enable;
                 }
             } else {
-                [cdStart, cdDuration, cdEnable] = [start || 0, duration, enable];
+                [cdStart, cdDuration, cdEnable] = [start || 0, duration || 0, enable];
             }
         }
         return [cdStart - COOLDOWN_THRESHOLD, cdDuration, cdEnable];
