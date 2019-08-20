@@ -1376,6 +1376,8 @@ export function getSpellData(directory: string) {
         if (!spell.spellEffects) spell.spellEffects = [];
         spell.spellEffects.push(spellEffect);
         if (spellEffect.trigger_spell_id) {
+            // for some weird reason, Azerite Essence are considered buffs instead of spells
+            if (spell.rank_str === "Azerite Essence") continue;
             const triggerSpell = spellDataById.get(spellEffect.trigger_spell_id);
             if (!triggerSpell) {
                 // console.log(`Can't find spell ${spellEffect.trigger_spell_id}`);

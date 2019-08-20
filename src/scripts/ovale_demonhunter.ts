@@ -217,8 +217,6 @@ AddFunction HavocEssencesShortCdActions
 {
  unless Spell(concentrated_flame_essence)
  {
-  #focused_azerite_beam
-  Spell(focused_azerite_beam)
   #purifying_blast
   Spell(purifying_blast)
   #the_unbound_force
@@ -243,8 +241,10 @@ AddFunction HavocEssencesCdActions
   Spell(blood_of_the_enemy)
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
+  #focused_azerite_beam
+  Spell(focused_azerite_beam)
 
-  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+  unless Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
   {
    #memory_of_lucid_dreams,if=fury<40&buff.metamorphosis.up
    if Fury() < 40 and BuffPresent(metamorphosis_havoc_buff) Spell(memory_of_lucid_dreams_essence)
@@ -254,7 +254,7 @@ AddFunction HavocEssencesCdActions
 
 AddFunction HavocEssencesCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+ Spell(concentrated_flame_essence) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
 }
 
 ### actions.demonic

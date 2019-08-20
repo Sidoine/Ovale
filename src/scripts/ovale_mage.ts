@@ -158,8 +158,6 @@ AddFunction ArcaneEssencesShortCdActions
 {
  unless TimeSincePreviousSpell(concentrated_flame_essence) > 6 and BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and { not GetState(burn_phase) > 0 or target.TimeToDie() < SpellCooldown(arcane_power) } and TimeToMaxMana() >= ExecuteTime(concentrated_flame_essence) and Spell(concentrated_flame_essence)
  {
-  #focused_azerite_beam,if=buff.rune_of_power.down&buff.arcane_power.down
-  if BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) Spell(focused_azerite_beam)
   #purifying_blast,if=buff.rune_of_power.down&buff.arcane_power.down
   if BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) Spell(purifying_blast)
   #ripple_in_space,if=buff.rune_of_power.down&buff.arcane_power.down
@@ -181,8 +179,10 @@ AddFunction ArcaneEssencesCdActions
  #blood_of_the_enemy,if=burn_phase&buff.arcane_power.down&buff.rune_of_power.down&buff.arcane_charge.stack=buff.arcane_charge.max_stack|time_to_die<cooldown.arcane_power.remains
  if GetState(burn_phase) > 0 and BuffExpires(arcane_power_buff) and BuffExpires(rune_of_power_buff) and ArcaneCharges() == MaxArcaneCharges() or target.TimeToDie() < SpellCooldown(arcane_power) Spell(blood_of_the_enemy)
 
- unless TimeSincePreviousSpell(concentrated_flame_essence) > 6 and BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and { not GetState(burn_phase) > 0 or target.TimeToDie() < SpellCooldown(arcane_power) } and TimeToMaxMana() >= ExecuteTime(concentrated_flame_essence) and Spell(concentrated_flame_essence) or BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and Spell(focused_azerite_beam)
+ unless TimeSincePreviousSpell(concentrated_flame_essence) > 6 and BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and { not GetState(burn_phase) > 0 or target.TimeToDie() < SpellCooldown(arcane_power) } and TimeToMaxMana() >= ExecuteTime(concentrated_flame_essence) and Spell(concentrated_flame_essence)
  {
+  #focused_azerite_beam,if=buff.rune_of_power.down&buff.arcane_power.down
+  if BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) Spell(focused_azerite_beam)
   #guardian_of_azeroth,if=buff.rune_of_power.down&buff.arcane_power.down
   if BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) Spell(guardian_of_azeroth)
 
@@ -196,7 +196,7 @@ AddFunction ArcaneEssencesCdActions
 
 AddFunction ArcaneEssencesCdPostConditions
 {
- TimeSincePreviousSpell(concentrated_flame_essence) > 6 and BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and { not GetState(burn_phase) > 0 or target.TimeToDie() < SpellCooldown(arcane_power) } and TimeToMaxMana() >= ExecuteTime(concentrated_flame_essence) and Spell(concentrated_flame_essence) or BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and Spell(focused_azerite_beam) or BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and Spell(purifying_blast) or BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and Spell(ripple_in_space_essence) or BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and Spell(the_unbound_force) or { GetState(burn_phase) > 0 and BuffExpires(arcane_power_buff) and BuffExpires(rune_of_power_buff) and ArcaneCharges() == MaxArcaneCharges() or target.TimeToDie() < SpellCooldown(arcane_power) } and Spell(worldvein_resonance_essence)
+ TimeSincePreviousSpell(concentrated_flame_essence) > 6 and BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and { not GetState(burn_phase) > 0 or target.TimeToDie() < SpellCooldown(arcane_power) } and TimeToMaxMana() >= ExecuteTime(concentrated_flame_essence) and Spell(concentrated_flame_essence) or BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and Spell(purifying_blast) or BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and Spell(ripple_in_space_essence) or BuffExpires(rune_of_power_buff) and BuffExpires(arcane_power_buff) and Spell(the_unbound_force) or { GetState(burn_phase) > 0 and BuffExpires(arcane_power_buff) and BuffExpires(rune_of_power_buff) and ArcaneCharges() == MaxArcaneCharges() or target.TimeToDie() < SpellCooldown(arcane_power) } and Spell(worldvein_resonance_essence)
 }
 
 ### actions.conserve
@@ -1196,8 +1196,6 @@ AddFunction FireDefaultShortCdActions
 {
  unless Spell(concentrated_flame_essence)
  {
-  #focused_azerite_beam
-  Spell(focused_azerite_beam)
   #purifying_blast
   Spell(purifying_blast)
   #ripple_in_space
@@ -1239,24 +1237,30 @@ AddFunction FireDefaultCdActions
  #mirror_image,if=buff.combustion.down
  if BuffExpires(combustion_buff) Spell(mirror_image)
 
- unless Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(ripple_in_space_essence) or Spell(the_unbound_force) or Spell(worldvein_resonance_essence) or { Talent(firestarter_talent) and target.TimeToHealthPercent(90) > SpellFullRecharge(rune_of_power) or SpellCooldown(combustion) > combustion_rop_cutoff() and BuffExpires(combustion_buff) or target.TimeToDie() < SpellCooldown(combustion) and BuffExpires(combustion_buff) } and Spell(rune_of_power)
+ unless Spell(concentrated_flame_essence)
  {
-  #use_item,name=malformed_heralds_legwraps,if=cooldown.combustion.remains>55
-  if SpellCooldown(combustion) > 55 FireUseItemActions()
-  #call_action_list,name=combustion_phase,if=(talent.rune_of_power.enabled&cooldown.combustion.remains<=action.rune_of_power.cast_time|cooldown.combustion.ready)&!firestarter.active|buff.combustion.up
-  if { Talent(rune_of_power_talent) and SpellCooldown(combustion) <= CastTime(rune_of_power) or SpellCooldown(combustion) == 0 } and not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } or BuffPresent(combustion_buff) FireCombustionphaseCdActions()
+  #focused_azerite_beam
+  Spell(focused_azerite_beam)
 
-  unless { { Talent(rune_of_power_talent) and SpellCooldown(combustion) <= CastTime(rune_of_power) or SpellCooldown(combustion) == 0 } and not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } or BuffPresent(combustion_buff) } and FireCombustionphaseCdPostConditions() or { AzeriteEssenceIsMajor(memory_of_lucid_dreams_essence_id) or AzeriteEssenceIsMinor(memory_of_lucid_dreams_essence_id) and HasAzeriteTrait(blaster_master_trait) } and Charges(fire_blast) == SpellMaxCharges(fire_blast) and not BuffPresent(hot_streak_buff) and not { BuffPresent(heating_up_buff) and { BuffPresent(combustion_buff) and { InFlightToTarget(fireball) or InFlightToTarget(pyroblast) or ExecuteTime(scorch) > 0 } or target.HealthPercent() <= 30 and ExecuteTime(scorch) > 0 } } and not { not BuffPresent(heating_up_buff) and not BuffPresent(hot_streak_buff) and BuffExpires(combustion_buff) and { InFlightToTarget(fireball) or InFlightToTarget(pyroblast) } } and Spell(fire_blast)
+  unless Spell(purifying_blast) or Spell(ripple_in_space_essence) or Spell(the_unbound_force) or Spell(worldvein_resonance_essence) or { Talent(firestarter_talent) and target.TimeToHealthPercent(90) > SpellFullRecharge(rune_of_power) or SpellCooldown(combustion) > combustion_rop_cutoff() and BuffExpires(combustion_buff) or target.TimeToDie() < SpellCooldown(combustion) and BuffExpires(combustion_buff) } and Spell(rune_of_power)
   {
-   #call_action_list,name=rop_phase,if=buff.rune_of_power.up&buff.combustion.down
-   if BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) FireRopphaseCdActions()
+   #use_item,name=malformed_heralds_legwraps,if=cooldown.combustion.remains>55
+   if SpellCooldown(combustion) > 55 FireUseItemActions()
+   #call_action_list,name=combustion_phase,if=(talent.rune_of_power.enabled&cooldown.combustion.remains<=action.rune_of_power.cast_time|cooldown.combustion.ready)&!firestarter.active|buff.combustion.up
+   if { Talent(rune_of_power_talent) and SpellCooldown(combustion) <= CastTime(rune_of_power) or SpellCooldown(combustion) == 0 } and not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } or BuffPresent(combustion_buff) FireCombustionphaseCdActions()
 
-   unless BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopphaseCdPostConditions()
+   unless { { Talent(rune_of_power_talent) and SpellCooldown(combustion) <= CastTime(rune_of_power) or SpellCooldown(combustion) == 0 } and not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } or BuffPresent(combustion_buff) } and FireCombustionphaseCdPostConditions() or { AzeriteEssenceIsMajor(memory_of_lucid_dreams_essence_id) or AzeriteEssenceIsMinor(memory_of_lucid_dreams_essence_id) and HasAzeriteTrait(blaster_master_trait) } and Charges(fire_blast) == SpellMaxCharges(fire_blast) and not BuffPresent(hot_streak_buff) and not { BuffPresent(heating_up_buff) and { BuffPresent(combustion_buff) and { InFlightToTarget(fireball) or InFlightToTarget(pyroblast) or ExecuteTime(scorch) > 0 } or target.HealthPercent() <= 30 and ExecuteTime(scorch) > 0 } } and not { not BuffPresent(heating_up_buff) and not BuffPresent(hot_streak_buff) and BuffExpires(combustion_buff) and { InFlightToTarget(fireball) or InFlightToTarget(pyroblast) } } and Spell(fire_blast)
    {
-    #variable,name=fire_blast_pooling,value=talent.rune_of_power.enabled&cooldown.rune_of_power.remains<cooldown.fire_blast.full_recharge_time&(cooldown.combustion.remains>variable.combustion_rop_cutoff|firestarter.active)&(cooldown.rune_of_power.remains<target.time_to_die|action.rune_of_power.charges>0)|cooldown.combustion.remains<action.fire_blast.full_recharge_time+cooldown.fire_blast.duration*azerite.blaster_master.enabled&!firestarter.active&cooldown.combustion.remains<target.time_to_die|talent.firestarter.enabled&firestarter.active&firestarter.remains<cooldown.fire_blast.full_recharge_time+cooldown.fire_blast.duration*azerite.blaster_master.enabled
-    #variable,name=phoenix_pooling,value=talent.rune_of_power.enabled&cooldown.rune_of_power.remains<cooldown.phoenix_flames.full_recharge_time&cooldown.combustion.remains>variable.combustion_rop_cutoff&(cooldown.rune_of_power.remains<target.time_to_die|action.rune_of_power.charges>0)|cooldown.combustion.remains<action.phoenix_flames.full_recharge_time&cooldown.combustion.remains<target.time_to_die
-    #call_action_list,name=standard_rotation
-    FireStandardrotationCdActions()
+    #call_action_list,name=rop_phase,if=buff.rune_of_power.up&buff.combustion.down
+    if BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) FireRopphaseCdActions()
+
+    unless BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopphaseCdPostConditions()
+    {
+     #variable,name=fire_blast_pooling,value=talent.rune_of_power.enabled&cooldown.rune_of_power.remains<cooldown.fire_blast.full_recharge_time&(cooldown.combustion.remains>variable.combustion_rop_cutoff|firestarter.active)&(cooldown.rune_of_power.remains<target.time_to_die|action.rune_of_power.charges>0)|cooldown.combustion.remains<action.fire_blast.full_recharge_time+cooldown.fire_blast.duration*azerite.blaster_master.enabled&!firestarter.active&cooldown.combustion.remains<target.time_to_die|talent.firestarter.enabled&firestarter.active&firestarter.remains<cooldown.fire_blast.full_recharge_time+cooldown.fire_blast.duration*azerite.blaster_master.enabled
+     #variable,name=phoenix_pooling,value=talent.rune_of_power.enabled&cooldown.rune_of_power.remains<cooldown.phoenix_flames.full_recharge_time&cooldown.combustion.remains>variable.combustion_rop_cutoff&(cooldown.rune_of_power.remains<target.time_to_die|action.rune_of_power.charges>0)|cooldown.combustion.remains<action.phoenix_flames.full_recharge_time&cooldown.combustion.remains<target.time_to_die
+     #call_action_list,name=standard_rotation
+     FireStandardrotationCdActions()
+    }
    }
   }
  }
@@ -1264,7 +1268,7 @@ AddFunction FireDefaultCdActions
 
 AddFunction FireDefaultCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(ripple_in_space_essence) or Spell(the_unbound_force) or Spell(worldvein_resonance_essence) or { Talent(firestarter_talent) and target.TimeToHealthPercent(90) > SpellFullRecharge(rune_of_power) or SpellCooldown(combustion) > combustion_rop_cutoff() and BuffExpires(combustion_buff) or target.TimeToDie() < SpellCooldown(combustion) and BuffExpires(combustion_buff) } and Spell(rune_of_power) or { { Talent(rune_of_power_talent) and SpellCooldown(combustion) <= CastTime(rune_of_power) or SpellCooldown(combustion) == 0 } and not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } or BuffPresent(combustion_buff) } and FireCombustionphaseCdPostConditions() or { AzeriteEssenceIsMajor(memory_of_lucid_dreams_essence_id) or AzeriteEssenceIsMinor(memory_of_lucid_dreams_essence_id) and HasAzeriteTrait(blaster_master_trait) } and Charges(fire_blast) == SpellMaxCharges(fire_blast) and not BuffPresent(hot_streak_buff) and not { BuffPresent(heating_up_buff) and { BuffPresent(combustion_buff) and { InFlightToTarget(fireball) or InFlightToTarget(pyroblast) or ExecuteTime(scorch) > 0 } or target.HealthPercent() <= 30 and ExecuteTime(scorch) > 0 } } and not { not BuffPresent(heating_up_buff) and not BuffPresent(hot_streak_buff) and BuffExpires(combustion_buff) and { InFlightToTarget(fireball) or InFlightToTarget(pyroblast) } } and Spell(fire_blast) or BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopphaseCdPostConditions() or FireStandardrotationCdPostConditions()
+ Spell(concentrated_flame_essence) or Spell(purifying_blast) or Spell(ripple_in_space_essence) or Spell(the_unbound_force) or Spell(worldvein_resonance_essence) or { Talent(firestarter_talent) and target.TimeToHealthPercent(90) > SpellFullRecharge(rune_of_power) or SpellCooldown(combustion) > combustion_rop_cutoff() and BuffExpires(combustion_buff) or target.TimeToDie() < SpellCooldown(combustion) and BuffExpires(combustion_buff) } and Spell(rune_of_power) or { { Talent(rune_of_power_talent) and SpellCooldown(combustion) <= CastTime(rune_of_power) or SpellCooldown(combustion) == 0 } and not { Talent(firestarter_talent) and target.HealthPercent() >= 90 } or BuffPresent(combustion_buff) } and FireCombustionphaseCdPostConditions() or { AzeriteEssenceIsMajor(memory_of_lucid_dreams_essence_id) or AzeriteEssenceIsMinor(memory_of_lucid_dreams_essence_id) and HasAzeriteTrait(blaster_master_trait) } and Charges(fire_blast) == SpellMaxCharges(fire_blast) and not BuffPresent(hot_streak_buff) and not { BuffPresent(heating_up_buff) and { BuffPresent(combustion_buff) and { InFlightToTarget(fireball) or InFlightToTarget(pyroblast) or ExecuteTime(scorch) > 0 } or target.HealthPercent() <= 30 and ExecuteTime(scorch) > 0 } } and not { not BuffPresent(heating_up_buff) and not BuffPresent(hot_streak_buff) and BuffExpires(combustion_buff) and { InFlightToTarget(fireball) or InFlightToTarget(pyroblast) } } and Spell(fire_blast) or BuffPresent(rune_of_power_buff) and BuffExpires(combustion_buff) and FireRopphaseCdPostConditions() or FireStandardrotationCdPostConditions()
 }
 
 ### Fire icons.
@@ -1644,8 +1648,6 @@ AddFunction FrostEssencesMainPostConditions
 
 AddFunction FrostEssencesShortCdActions
 {
- #focused_azerite_beam,if=buff.rune_of_power.down|active_enemies>3
- if BuffExpires(rune_of_power_buff) or Enemies() > 3 Spell(focused_azerite_beam)
  #purifying_blast,if=buff.rune_of_power.down|active_enemies>3
  if BuffExpires(rune_of_power_buff) or Enemies() > 3 Spell(purifying_blast)
  #ripple_in_space,if=buff.rune_of_power.down|active_enemies>3
@@ -1667,18 +1669,17 @@ AddFunction FrostEssencesShortCdPostConditions
 
 AddFunction FrostEssencesCdActions
 {
- unless { BuffExpires(rune_of_power_buff) or Enemies() > 3 } and Spell(focused_azerite_beam)
- {
-  #memory_of_lucid_dreams,if=active_enemies<5&(buff.icicles.stack<=1|!talent.glacial_spike.enabled)&cooldown.frozen_orb.remains>10&!action.frozen_orb.in_flight&ground_aoe.frozen_orb.remains=0
-  if Enemies() < 5 and { BuffStacks(icicles_buff) <= 1 or not Talent(glacial_spike_talent) } and SpellCooldown(frozen_orb) > 10 and not TimeSincePreviousSpell(frozen_orb) < 10 and not target.DebuffRemaining(frozen_orb_debuff) > 0 Spell(memory_of_lucid_dreams_essence)
-  #blood_of_the_enemy,if=(talent.glacial_spike.enabled&buff.icicles.stack=5&(buff.brain_freeze.react|prev_gcd.1.ebonbolt))|((active_enemies>3|!talent.glacial_spike.enabled)&(prev_gcd.1.frozen_orb|ground_aoe.frozen_orb.remains>5))
-  if Talent(glacial_spike_talent) and BuffStacks(icicles_buff) == 5 and { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) } or { Enemies() > 3 or not Talent(glacial_spike_talent) } and { PreviousGCDSpell(frozen_orb) or target.DebuffRemaining(frozen_orb_debuff) > 5 } Spell(blood_of_the_enemy)
- }
+ #focused_azerite_beam,if=buff.rune_of_power.down|active_enemies>3
+ if BuffExpires(rune_of_power_buff) or Enemies() > 3 Spell(focused_azerite_beam)
+ #memory_of_lucid_dreams,if=active_enemies<5&(buff.icicles.stack<=1|!talent.glacial_spike.enabled)&cooldown.frozen_orb.remains>10&!action.frozen_orb.in_flight&ground_aoe.frozen_orb.remains=0
+ if Enemies() < 5 and { BuffStacks(icicles_buff) <= 1 or not Talent(glacial_spike_talent) } and SpellCooldown(frozen_orb) > 10 and not TimeSincePreviousSpell(frozen_orb) < 10 and not target.DebuffRemaining(frozen_orb_debuff) > 0 Spell(memory_of_lucid_dreams_essence)
+ #blood_of_the_enemy,if=(talent.glacial_spike.enabled&buff.icicles.stack=5&(buff.brain_freeze.react|prev_gcd.1.ebonbolt))|((active_enemies>3|!talent.glacial_spike.enabled)&(prev_gcd.1.frozen_orb|ground_aoe.frozen_orb.remains>5))
+ if Talent(glacial_spike_talent) and BuffStacks(icicles_buff) == 5 and { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) } or { Enemies() > 3 or not Talent(glacial_spike_talent) } and { PreviousGCDSpell(frozen_orb) or target.DebuffRemaining(frozen_orb_debuff) > 5 } Spell(blood_of_the_enemy)
 }
 
 AddFunction FrostEssencesCdPostConditions
 {
- { BuffExpires(rune_of_power_buff) or Enemies() > 3 } and Spell(focused_azerite_beam) or { BuffExpires(rune_of_power_buff) or Enemies() > 3 } and Spell(purifying_blast) or { BuffExpires(rune_of_power_buff) or Enemies() > 3 } and Spell(ripple_in_space_essence) or TimeSincePreviousSpell(concentrated_flame_essence) > 6 and BuffExpires(rune_of_power_buff) and Spell(concentrated_flame_essence) or BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or { BuffExpires(rune_of_power_buff) or Enemies() > 3 } and Spell(worldvein_resonance_essence)
+ { BuffExpires(rune_of_power_buff) or Enemies() > 3 } and Spell(purifying_blast) or { BuffExpires(rune_of_power_buff) or Enemies() > 3 } and Spell(ripple_in_space_essence) or TimeSincePreviousSpell(concentrated_flame_essence) > 6 and BuffExpires(rune_of_power_buff) and Spell(concentrated_flame_essence) or BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or { BuffExpires(rune_of_power_buff) or Enemies() > 3 } and Spell(worldvein_resonance_essence)
 }
 
 ### actions.cooldowns
@@ -2315,8 +2316,6 @@ AddFunction FrostEssencesMainPostConditions
 
 AddFunction FrostEssencesShortCdActions
 {
- #focused_azerite_beam,if=buff.rune_of_power.down&debuff.packed_ice.down|active_enemies>3
- if BuffExpires(rune_of_power_buff) and target.DebuffExpires(packed_ice) or Enemies() > 3 Spell(focused_azerite_beam)
  #purifying_blast,if=buff.rune_of_power.down&debuff.packed_ice.down|active_enemies>3
  if BuffExpires(rune_of_power_buff) and target.DebuffExpires(packed_ice) or Enemies() > 3 Spell(purifying_blast)
  #ripple_in_space,if=buff.rune_of_power.down&debuff.packed_ice.down|active_enemies>3
@@ -2338,18 +2337,17 @@ AddFunction FrostEssencesShortCdPostConditions
 
 AddFunction FrostEssencesCdActions
 {
- unless { BuffExpires(rune_of_power_buff) and target.DebuffExpires(packed_ice) or Enemies() > 3 } and Spell(focused_azerite_beam)
- {
-  #memory_of_lucid_dreams,if=active_enemies<5&debuff.packed_ice.down&cooldown.frozen_orb.remains>5&!action.frozen_orb.in_flight&ground_aoe.frozen_orb.remains=0
-  if Enemies() < 5 and target.DebuffExpires(packed_ice) and SpellCooldown(frozen_orb) > 5 and not TimeSincePreviousSpell(frozen_orb) < 10 and not target.DebuffRemaining(frozen_orb_debuff) > 0 Spell(memory_of_lucid_dreams_essence)
-  #blood_of_the_enemy,if=prev_gcd.1.frozen_orb|ground_aoe.frozen_orb.remains>5
-  if PreviousGCDSpell(frozen_orb) or target.DebuffRemaining(frozen_orb_debuff) > 5 Spell(blood_of_the_enemy)
- }
+ #focused_azerite_beam,if=buff.rune_of_power.down&debuff.packed_ice.down|active_enemies>3
+ if BuffExpires(rune_of_power_buff) and target.DebuffExpires(packed_ice) or Enemies() > 3 Spell(focused_azerite_beam)
+ #memory_of_lucid_dreams,if=active_enemies<5&debuff.packed_ice.down&cooldown.frozen_orb.remains>5&!action.frozen_orb.in_flight&ground_aoe.frozen_orb.remains=0
+ if Enemies() < 5 and target.DebuffExpires(packed_ice) and SpellCooldown(frozen_orb) > 5 and not TimeSincePreviousSpell(frozen_orb) < 10 and not target.DebuffRemaining(frozen_orb_debuff) > 0 Spell(memory_of_lucid_dreams_essence)
+ #blood_of_the_enemy,if=prev_gcd.1.frozen_orb|ground_aoe.frozen_orb.remains>5
+ if PreviousGCDSpell(frozen_orb) or target.DebuffRemaining(frozen_orb_debuff) > 5 Spell(blood_of_the_enemy)
 }
 
 AddFunction FrostEssencesCdPostConditions
 {
- { BuffExpires(rune_of_power_buff) and target.DebuffExpires(packed_ice) or Enemies() > 3 } and Spell(focused_azerite_beam) or { BuffExpires(rune_of_power_buff) and target.DebuffExpires(packed_ice) or Enemies() > 3 } and Spell(purifying_blast) or { BuffExpires(rune_of_power_buff) and target.DebuffExpires(packed_ice) or Enemies() > 3 } and Spell(ripple_in_space_essence) or TimeSincePreviousSpell(concentrated_flame_essence) > 6 and BuffExpires(rune_of_power_buff) and target.DebuffExpires(packed_ice) and Spell(concentrated_flame_essence) or BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or { BuffExpires(rune_of_power_buff) and target.DebuffExpires(packed_ice) or Enemies() > 3 } and Spell(worldvein_resonance_essence)
+ { BuffExpires(rune_of_power_buff) and target.DebuffExpires(packed_ice) or Enemies() > 3 } and Spell(purifying_blast) or { BuffExpires(rune_of_power_buff) and target.DebuffExpires(packed_ice) or Enemies() > 3 } and Spell(ripple_in_space_essence) or TimeSincePreviousSpell(concentrated_flame_essence) > 6 and BuffExpires(rune_of_power_buff) and target.DebuffExpires(packed_ice) and Spell(concentrated_flame_essence) or BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or { BuffExpires(rune_of_power_buff) and target.DebuffExpires(packed_ice) or Enemies() > 3 } and Spell(worldvein_resonance_essence)
 }
 
 ### actions.cooldowns
@@ -2980,8 +2978,6 @@ AddFunction FrostEssencesMainPostConditions
 
 AddFunction FrostEssencesShortCdActions
 {
- #focused_azerite_beam,if=buff.rune_of_power.down|active_enemies>3
- if BuffExpires(rune_of_power_buff) or Enemies() > 3 Spell(focused_azerite_beam)
  #purifying_blast,if=buff.rune_of_power.down|active_enemies>3
  if BuffExpires(rune_of_power_buff) or Enemies() > 3 Spell(purifying_blast)
  #ripple_in_space,if=buff.rune_of_power.down|active_enemies>3
@@ -3003,18 +2999,17 @@ AddFunction FrostEssencesShortCdPostConditions
 
 AddFunction FrostEssencesCdActions
 {
- unless { BuffExpires(rune_of_power_buff) or Enemies() > 3 } and Spell(focused_azerite_beam)
- {
-  #memory_of_lucid_dreams,if=active_enemies<5&(buff.icicles.stack<=1|!talent.glacial_spike.enabled)&cooldown.frozen_orb.remains>10
-  if Enemies() < 5 and { BuffStacks(icicles_buff) <= 1 or not Talent(glacial_spike_talent) } and SpellCooldown(frozen_orb) > 10 Spell(memory_of_lucid_dreams_essence)
-  #blood_of_the_enemy,if=(talent.glacial_spike.enabled&buff.icicles.stack=5&(buff.brain_freeze.react|prev_gcd.1.ebonbolt))|((active_enemies>3|!talent.glacial_spike.enabled)&(prev_gcd.1.frozen_orb|ground_aoe.frozen_orb.remains>5))
-  if Talent(glacial_spike_talent) and BuffStacks(icicles_buff) == 5 and { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) } or { Enemies() > 3 or not Talent(glacial_spike_talent) } and { PreviousGCDSpell(frozen_orb) or target.DebuffRemaining(frozen_orb_debuff) > 5 } Spell(blood_of_the_enemy)
- }
+ #focused_azerite_beam,if=buff.rune_of_power.down|active_enemies>3
+ if BuffExpires(rune_of_power_buff) or Enemies() > 3 Spell(focused_azerite_beam)
+ #memory_of_lucid_dreams,if=active_enemies<5&(buff.icicles.stack<=1|!talent.glacial_spike.enabled)&cooldown.frozen_orb.remains>10
+ if Enemies() < 5 and { BuffStacks(icicles_buff) <= 1 or not Talent(glacial_spike_talent) } and SpellCooldown(frozen_orb) > 10 Spell(memory_of_lucid_dreams_essence)
+ #blood_of_the_enemy,if=(talent.glacial_spike.enabled&buff.icicles.stack=5&(buff.brain_freeze.react|prev_gcd.1.ebonbolt))|((active_enemies>3|!talent.glacial_spike.enabled)&(prev_gcd.1.frozen_orb|ground_aoe.frozen_orb.remains>5))
+ if Talent(glacial_spike_talent) and BuffStacks(icicles_buff) == 5 and { BuffPresent(brain_freeze_buff) or PreviousGCDSpell(ebonbolt) } or { Enemies() > 3 or not Talent(glacial_spike_talent) } and { PreviousGCDSpell(frozen_orb) or target.DebuffRemaining(frozen_orb_debuff) > 5 } Spell(blood_of_the_enemy)
 }
 
 AddFunction FrostEssencesCdPostConditions
 {
- { BuffExpires(rune_of_power_buff) or Enemies() > 3 } and Spell(focused_azerite_beam) or { BuffExpires(rune_of_power_buff) or Enemies() > 3 } and Spell(purifying_blast) or { BuffExpires(rune_of_power_buff) or Enemies() > 3 } and Spell(ripple_in_space_essence) or TimeSincePreviousSpell(concentrated_flame_essence) > 6 and BuffExpires(rune_of_power_buff) and Spell(concentrated_flame_essence) or BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or { BuffExpires(rune_of_power_buff) or Enemies() > 3 } and Spell(worldvein_resonance_essence)
+ { BuffExpires(rune_of_power_buff) or Enemies() > 3 } and Spell(purifying_blast) or { BuffExpires(rune_of_power_buff) or Enemies() > 3 } and Spell(ripple_in_space_essence) or TimeSincePreviousSpell(concentrated_flame_essence) > 6 and BuffExpires(rune_of_power_buff) and Spell(concentrated_flame_essence) or BuffPresent(reckless_force_buff) and Spell(the_unbound_force) or { BuffExpires(rune_of_power_buff) or Enemies() > 3 } and Spell(worldvein_resonance_essence)
 }
 
 ### actions.cooldowns
