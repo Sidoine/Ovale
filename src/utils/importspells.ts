@@ -4,6 +4,37 @@ import { ClassId } from "@wowts/wow-mock";
 import { SpecializationName, OVALE_SPECIALIZATION_NAME } from "../PaperDoll";
 import { parseDescription } from "./spellstringparser";
 
+const enum SpellAttribute {
+  "Ranged Ability" =   1,                  
+  "Tradeskill ability" =   5,              
+  "Passive" =   6,                         
+  "Hidden" =   7,                          
+  "Requires stealth" =   17,                
+  "Stop attacks" =   20,                    
+  "Cannot dodge/parry/block" =   21,        
+  "Cannot be used in combat" =   28,        
+  "Cannot cancel aura" =   31,              
+  "Channeled" =   34,                       
+  "Does not break stealth" =   37,          
+  "Channeled_2" =   38,                       
+  "Cannot crit" =   93,                     
+  "Food buff" =   95,                       
+  "Not a proc" =  105,                      
+  "Requires main-hand weapon" =  106,       
+  "Disable player procs" =  112,            
+  "Disable target procs" =  113,            
+  "Always hits" =  114,                     
+  "Requires off-hand weapon" =  120,        
+  "Treat as periodic" =  121,               
+  "Disable weapon procs" =  151,            
+  "Tick on application" =  169,             
+  "Periodic effect affected by haste"=  173,
+  "Requires line of sight" =  186,          
+  "Disable player multipliers" =  221,      
+  "Periodic effect can crit" =  265,        
+  "Scales with item level" =  354,         
+};
+
 const specIds = {
     SPEC_NONE              : 0,
     SPEC_PET               : 1,
@@ -877,8 +908,9 @@ export interface SpellData {
     talent?: TalentData;
     azeriteTrait?: AzeriteTrait;
     className?: ClassId | "PET";
-    specializationName?: SpecializationName;
+    specializationName: SpecializationName[];
     nextRank?: SpellData;
+    spellAttributes: SpellAttribute[];
 }
 
 export interface SpellEffectData {
@@ -1187,7 +1219,11 @@ export function getSpellData(directory: string) {
     readFile(directory, "azerite", zone, output);
     readFile(directory, "sc_spell_lists", zone, output);
 
+    const identifierById = new Map<number, string>();
+    identifierById.set(302917, "reckless_force_counter");
+
     const identifiers: LuaObj<number> = {};
+    const spellListsByIdentifier = new Map<string, SpellData[]>();
     const spellDataById = new Map<number, SpellData>();
     const spellData: SpellData[] = [];
     for (const row of output.spell_data_t) {
@@ -1240,10 +1276,23 @@ export function getSpellData(directory: string) {
             rank_str: row[45],
             req_max_level: row[46],
             dmg_class: row[47],
-            identifierScore: 0
+            identifierScore: 0,
+            spellAttributes: [],
+            specializationName: []
         };
 
-        if (spell.name) {
+        for (let i = 0; i < spell.attributes.length ; i++) {
+            for (let flag = 0; flag < 32; flag++) {
+                if (spell.attributes[i] & (1 << flag)) {
+                    spell.spellAttributes.push(i * 32 + flag);
+                }
+            }
+        }
+
+        if (identifierById.get(spell.id)) {
+            spell.identifier = getIdentifier(identifierById.get(spell.id));
+            spell.identifierScore = 100;
+        } else if (spell.name) {
             spell.identifier = getIdentifier(spell.name);
         }
         spellData.push(spell);
@@ -1256,6 +1305,7 @@ export function getSpellData(directory: string) {
         if (spell.rank_str === "Racial") spell.identifierScore += 3;
         if (spell.rank_str === "Artifact") spell.identifierScore -= 20;
         if (spell.rank_str === "Passive") spell.identifierScore--;
+        if (spell.spellAttributes.indexOf(SpellAttribute.Passive) >= 0)  spell.identifierScore--;
     }
 
     for (let classIndex = 0; classIndex  <  output.__tree_specialization_data.length; classIndex++) {
@@ -1283,7 +1333,7 @@ export function getSpellData(directory: string) {
                     spell.identifierScore += 10;
                     spell.className = classNames[classIndex];
                     if (spell.className !== "PET") {
-                        spell.specializationName = OVALE_SPECIALIZATION_NAME[spell.className][<1|2|3|4>(specIndex + 1)];
+                        spell.specializationName.push(OVALE_SPECIALIZATION_NAME[spell.className][<1|2|3|4>(specIndex + 1)]);
                     }
                 } else {
                     console.error(`Unknown spell ${spellId}`);
@@ -1400,6 +1450,8 @@ export function getSpellData(directory: string) {
             const spell = spellDataById.get(talent.spell_id);
             if (spell) {
                 spell.talent = talent;
+                const spec = specIdToSpecName.get(talent.spec);
+                if (spell.specializationName.indexOf(spec) < 0) spell.specializationName.push(spec);
                 spell.identifierScore += 10;
             }
         }
@@ -1410,8 +1462,8 @@ export function getSpellData(directory: string) {
         if (identifiers[spell.identifier]) {
             const other = spellDataById.get(identifiers[spell.identifier]);
             if (other.identifierScore === spell.identifierScore) {
-                if (other.className === spell.className && spell.specializationName) {
-                    spell.identifier += "_" + spell.specializationName.toLowerCase();
+                if (other.className === spell.className && spell.specializationName.length > 0) {
+                    spell.identifier += "_" + spell.specializationName[0].toLowerCase();
                 } else if (spell.className && spell.className !== other.className) {
                     spell.identifier += "_" + spell.className.toLowerCase();
                 } else {
@@ -1422,6 +1474,28 @@ export function getSpellData(directory: string) {
             }
         } 
         identifiers[spell.identifier] = spell.id;
+    }
+
+    for (const spell of spellData) {
+        if (!spell.identifier) continue;
+        const existing = spellListsByIdentifier.get(spell.identifier);
+        if (existing) {
+            existing.push(spell);
+        } else {
+            spellListsByIdentifier.set(spell.identifier, [spell]);
+        }
+    }
+
+    const spellLists = new Map<string, SpellData[]>();
+    for (const [identifier, spells] of Array.from(spellListsByIdentifier)) {
+        if (spells.length === 1) continue;
+        const max = spells.reduce((a, s) => s.identifierScore > a ? s.identifierScore : a, 0);
+        const filtered = spells.filter(x => x.identifierScore === max);
+        if (filtered.length === 1) continue;
+        for (let i = 0; i < filtered.length; i++) {
+            filtered[i].identifier += `_${i}`;
+        }
+        spellLists.set(identifier, filtered);
     }
 
     for (const spell of spellData) {
@@ -1493,7 +1567,8 @@ export function getSpellData(directory: string) {
         identifiers[item.identifier] = item.id;
     }
 
-writeFileSync("sample.json", JSON.stringify(spellData, undefined, 2), { encoding: "utf8"});
+    writeFileSync("spells-data.txt", JSON.stringify(spellData, undefined, 2), { encoding: "utf8" });
+    writeFileSync("items-data.txt", JSON.stringify(Array.from(itemsById.values()), undefined, 2), { encoding: "utf8"});
 
-    return { spellData, spellDataById, identifiers, talentsById, itemsById, azeriteTraitById };
+    return { spellData, spellDataById, identifiers, talentsById, itemsById, azeriteTraitById, spellLists };
 }

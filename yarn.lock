@@ -330,13 +330,13 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.6.2.tgz#a5ccec6abb6060d5f20d256fb03ed743e9774999"
   integrity sha512-gojym4tX0FWeV2gsW4Xmzo5wxGjXGm550oVUII7f7G5o4BV6c7DBdiG1RRQd+y1bvqRyYtPfMK85UM95vsapqQ==
 
-"@wowts/ace_comm-3.0@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@wowts/ace_comm-3.0/-/ace_comm-3.0-1.0.0.tgz#2992e71aea80ef657493601587bbbc93414854c3"
-  integrity sha1-KZLnGuqA72V0k2AVh7u8k0FIVMM=
+"@wowts/ace_comm-3.0@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@wowts/ace_comm-3.0/-/ace_comm-3.0-1.1.0.tgz#6375df006f5368010eaf462e451893033131cefa"
+  integrity sha512-/Z2a9NqK42tT/QsByZRrE9qtBti/LJHPfvZuEoALOyYLhUH0GsIyMkAh3E5QAq/NG3igSXuEjrz48uxcgT6vOw==
   dependencies:
-    "@wowts/lua" "^1.0.3"
-    "@wowts/tslib" "^1.0.0"
+    "@wowts/lua" "^1.3.2"
+    "@wowts/tslib" "^1.1.0"
 
 "@wowts/ace_config-3.0@^1.1.0":
   version "1.1.0"
@@ -362,10 +362,10 @@
     "@wowts/lua" "^1.0.3"
     "@wowts/tslib" "^1.0.0"
 
-"@wowts/ace_db-3.0@^1.1.0", "@wowts/ace_db-3.0@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@wowts/ace_db-3.0/-/ace_db-3.0-1.1.1.tgz#3568108a1133aa6565a7f6e710bb59b800738005"
-  integrity sha512-T0SB+yOXAmocdLx0lqU2j1RRj4qCCfc2RgP5D9KjkdXCk7oOVczG+r14+aOXgucYEI4ziPQ5K+N2/QmUTndSsg==
+"@wowts/ace_db-3.0@^1.1.0", "@wowts/ace_db-3.0@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@wowts/ace_db-3.0/-/ace_db-3.0-1.2.0.tgz#d2839571a6e4f2c956980d4ed822a206df197132"
+  integrity sha512-3tAlpPpX8SKWtwn7mT8PjF8Cwod5xShJvk3ZJW32lIPy3rxZvp906VyclBp/Gx+IQ3vvpk23Lt/gLvbt18xXQQ==
   dependencies:
     "@wowts/lua" "^1.3.0"
     "@wowts/tslib" "^1.1.0"
@@ -415,10 +415,10 @@
     "@wowts/tsaddon" "^1.1.2"
     "@wowts/tslib" "^1.1.0"
 
-"@wowts/ace_timer-3.0@^2.1.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@wowts/ace_timer-3.0/-/ace_timer-3.0-2.1.0.tgz#4b97030b1f448102c2f166ba65a6cc1e43aa228d"
-  integrity sha512-92bSUjki2BBiGhf4Azy5B0SLVHv2gfNNnBKZsorrHqoR63t8VWPeOwucwBnhW7/U0uLK79lnL9BLwt1YWISKBw==
+"@wowts/ace_timer-3.0@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@wowts/ace_timer-3.0/-/ace_timer-3.0-2.2.0.tgz#384add39afcd66e18d96f1e19d0b5bc19fbb062d"
+  integrity sha512-Tm72+WTPA9HBjz7pzgDRGUeubH/2ma3w8k5OqdSwBMYxfzASDY8yUqJtw5xxAcTgzFMgeyiL2D6Nuykzm8x3Sw==
   dependencies:
     "@wowts/lua" "^1.3.0"
     "@wowts/tsaddon" "^1.1.2"
@@ -548,10 +548,10 @@
   dependencies:
     "@wowts/lua" "^1.0.5"
 
-"@wowts/tsaddon@^1.0.0", "@wowts/tsaddon@^1.1.2":
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/@wowts/tsaddon/-/tsaddon-1.1.2.tgz#d6907a4f25e49889ebc68d9502bb1c86bc050ab8"
-  integrity sha512-eSL+mD7I+7QELXyfHE3vG3JdWnKFZJ3UXMuFJa1fOWbQhJYg/khN2ak8nRdcVsMsc2d/gBpdFAWoaztmD7aG4g==
+"@wowts/tsaddon@^1.0.0", "@wowts/tsaddon@^1.1.2", "@wowts/tsaddon@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@wowts/tsaddon/-/tsaddon-1.2.0.tgz#da81559049479fe34dcd116c2e86e971bea68633"
+  integrity sha512-80fFkdqEOVgiYJVOzlPr6qJ2tKg4DmR8rf7YXT3eVLJOGpfuZDv68+YSTKHFpBcPc7w0x4MaotQQorovUoN3cQ==
   dependencies:
     "@wowts/lua" "^1.0.3"
     "@wowts/table" "^1.0.0"
@@ -573,10 +573,10 @@
     commander "^2.18.0"
     typescript "^3.5.3"
 
-"@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.13.0", "@wowts/wow-mock@^1.6.0":
-  version "1.13.0"
-  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.13.0.tgz#d41c4309cad587cbba779d95199a76dfa1b058d7"
-  integrity sha512-wjGcuS+j9c6eD2EJTQ+QcRGrdpVHK3OJRd3B1ycpv+bVAoF/WRAizUgCYowswyi0X8xdINvtrioGumvBO2Q+rg==
+"@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.14.0", "@wowts/wow-mock@^1.6.0":
+  version "1.14.0"
+  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.14.0.tgz#076f9dc388df814e5f6b9a1ba94f4addb91f11ae"
+  integrity sha512-pavbHfsZ6lRedvOT5i9qh43vGu4A9jYkLwgb4PNvTT6RJymKX82j5MH3AH+NOewyHi+jRpLDoWuJ5e//R4hSmQ==
   dependencies:
     "@wowts/lua" "^1.3.2"
 

@@ -16,17 +16,17 @@
   "license": "ISC",
   "dependencies": {
     "@types/node": "^12.6.2",
-    "@wowts/ace_comm-3.0": "^1.0.0",
+    "@wowts/ace_comm-3.0": "^1.1.0",
     "@wowts/ace_config-3.0": "^1.1.0",
     "@wowts/ace_config_dialog-3.0": "^1.0.3",
     "@wowts/ace_console-3.0": "^1.0.0",
-    "@wowts/ace_db-3.0": "^1.1.1",
+    "@wowts/ace_db-3.0": "^1.2.0",
     "@wowts/ace_db_options-3.0": "^1.1.0",
     "@wowts/ace_event-3.0": "^1.0.0",
     "@wowts/ace_gui-3.0": "^1.1.0",
     "@wowts/ace_locale-3.0": "^1.0.0",
     "@wowts/ace_serializer-3.0": "^1.1.0",
-    "@wowts/ace_timer-3.0": "^2.1.0",
+    "@wowts/ace_timer-3.0": "^2.2.0",
     "@wowts/bit": "^1.0.0",
     "@wowts/coroutine": "^1.0.1",
     "@wowts/lib_artifact_data-1.0": "^1.0.0",
@@ -43,9 +43,9 @@
     "@wowts/recount": "^1.1.0",
     "@wowts/string": "^1.0.5",
     "@wowts/table": "^1.0.1",
-    "@wowts/tsaddon": "^1.1.2",
+    "@wowts/tsaddon": "^1.2.0",
     "@wowts/tslib": "^1.1.0",
-    "@wowts/wow-mock": "^1.13.0"
+    "@wowts/wow-mock": "^1.14.0"
   },
   "devDependencies": {
     "@wowts/tstolua": "^1.6.1",

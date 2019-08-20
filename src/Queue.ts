@@ -1,4 +1,4 @@
-import { Ovale } from "./Ovale";
+import { format } from "@wowts/string";
 
 class BackToFrontIterator<T> {
     public value:T;
@@ -99,7 +99,7 @@ export class OvaleDequeue<T> {
 	}
 
 	DebuggingInfo() {
-		Ovale.Print("Queue %s has %d item(s), first=%d, last=%d.", this.name, this.Size(), this.first, this.last)
+		return format("Queue %s has %d item(s), first=%d, last=%d.", this.name, this.Size(), this.first, this.last)
 	}
 }
 

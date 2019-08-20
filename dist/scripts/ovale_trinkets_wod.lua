@@ -1,8 +1,6 @@
 local __exports = LibStub:NewLibrary("ovale/scripts/ovale_trinkets_wod", 80201)
 if not __exports then return end
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-__exports.register = function()
+__exports.registerWodTrinkets = function(OvaleScripts)
     local name = "ovale_trinkets_wod"
     local desc = "[6.2] Ovale: Trinkets (Warlords of Draenor)"
     local code = [[

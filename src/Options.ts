@@ -1,22 +1,99 @@
 import AceConfig from "@wowts/ace_config-3.0";
 import AceConfigDialog from "@wowts/ace_config_dialog-3.0";
 import { L } from "./Localization";
-import AceDB from "@wowts/ace_db-3.0";
+import AceDB, { AceDatabase } from "@wowts/ace_db-3.0";
 import AceDBOptions from "@wowts/ace_db_options-3.0";
-import { OvaleDb, Ovale } from "./Ovale";
-import aceConsole from "@wowts/ace_console-3.0";
-import aceEvent from "@wowts/ace_event-3.0";
+import aceConsole, { AceConsole } from "@wowts/ace_console-3.0";
+import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { InterfaceOptionsFrame_OpenToCategory } from "@wowts/wow-mock";
 import { ipairs, LuaObj, lualength, LuaArray } from "@wowts/lua";
 import { huge } from "@wowts/math";
-let OvaleOptionsBase = Ovale.NewModule("OvaleOptions", aceConsole, aceEvent);
+import { Color } from "./SpellFlash";
+import { OvaleClass, Print } from "./Ovale";
+import { AceModule } from "@wowts/tsaddon";
+
 interface OptionModule {
     UpgradeSavedVariables():void;
 }
 
 let self_register:LuaObj<OptionModule> = {  }
 
-class OvaleOptionsClass extends OvaleOptionsBase {
+export interface SpellFlashOptions {
+    enabled: boolean,
+    colorMain?: Color,
+    colorCd?: Color,
+    colorShortCd?: Color,
+    colorInterrupt?: Color,
+    inCombat?: boolean,
+    hideInVehicle?: boolean,
+    hasTarget?: boolean,
+    hasHostileTarget?: boolean,
+    threshold?: number,
+    size?: number,
+    brightness?: number,
+}
+
+export interface OvaleDb {
+    profile: {
+        source: LuaObj<string>;
+        code: string,
+        check: LuaObj<boolean>,
+        list: LuaObj<string>,
+        standaloneOptions: boolean,
+        showHiddenScripts: boolean;
+        overrideCode: string;
+        apparence: {
+            [k: string]: any,
+            avecCible: boolean,
+            clickThru: boolean,
+            enCombat: boolean,
+            enableIcons: boolean,
+            hideEmpty: boolean,
+            hideVehicule: boolean,
+            margin: number,
+            offsetX: number,
+            offsetY: number,
+            targetHostileOnly: boolean,
+            verrouille: boolean,
+            vertical: boolean,
+            alpha: number,
+            flashIcon: boolean,
+            remainsFontColor: {
+                r: number,
+                g: number,
+                b: number
+            },
+            fontScale: number,
+            highlightIcon: true,
+            iconScale: number,
+            numeric: false,
+            raccourcis: true,
+            smallIconScale: number,
+            targetText: string,
+            iconShiftX: number,
+            iconShiftY: number,
+            optionsAlpha: number,
+            predictif: boolean,
+            secondIconScale: number,
+            taggedEnemies: boolean,
+            minFrameRefresh: number,
+            maxFrameRefresh: number,
+            fullAuraScan: false,
+            frequentHealthUpdates: true,
+            auraLag: number,
+            moving: boolean,
+            spellFlash: SpellFlashOptions,
+            minimap: {
+                hide: boolean
+            }
+        }
+    },
+    global: any;
+}
+
+export class OvaleOptionsClass {
+    db: AceDatabase & OvaleDb = undefined;
+
     defaultDB:OvaleDb = {
         profile: {
             source: undefined,
@@ -69,6 +146,33 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                 moving: false,
                 spellFlash: {
                     enabled: true,
+                    brightness: 1,
+                    hasHostileTarget: false,
+                    hasTarget: false,
+                    hideInVehicle: false,
+                    inCombat: false,
+                    size: 2.4,
+                    threshold: 500,
+                    colorMain: {
+                        r: 1,
+                        g: 1,
+                        b: 1
+                    },
+                    colorShortCd: {
+                        r: 1,
+                        g: 1,
+                        b: 0
+                    },
+                    colorCd: {
+                        r: 1,
+                        g: 1,
+                        b: 0
+                    },
+                    colorInterrupt: {
+                        r: 0,
+                        g: 1,
+                        b: 1
+                    }
                 },
                 minimap: { 
                     hide: false
@@ -82,14 +186,14 @@ class OvaleOptionsClass extends OvaleOptionsBase {
         type: "group",
         args: {
             apparence: {
-                name: Ovale.GetName(),
+                name: "Ovale Spell Priority",
                 type: "group",
                 get: (info: LuaArray<string>) => {
-                    return Ovale.db.profile.apparence[info[lualength(info)]];
+                    return this.db.profile.apparence[info[lualength(info)]];
                 },
                 set: (info: LuaArray<string>, value: string) => {
-                    Ovale.db.profile.apparence[info[lualength(info)]] = value;
-                    this.SendMessage("Ovale_OptionChanged", info[lualength(info) - 1]);
+                    this.db.profile.apparence[info[lualength(info)]] = value;
+                    this.module.SendMessage("Ovale_OptionChanged", info[lualength(info) - 1]);
                 },
                 args: {
                     standaloneOptions: {
@@ -97,11 +201,11 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                         name: L["Standalone options"],
                         desc: L["Open configuration panel in a separate, movable window."],
                         type: "toggle",
-                        get: function (info: LuaArray<string>) {
-                            return Ovale.db.profile.standaloneOptions;
+                        get: (info: LuaArray<string>) => {
+                            return this.db.profile.standaloneOptions;
                         },
-                        set: function (info: LuaArray<string>, value: boolean) {
-                            Ovale.db.profile.standaloneOptions = value;
+                        set: (info: LuaArray<string>, value: boolean) => {
+                            this.db.profile.standaloneOptions = value;
                         }
                     },
                     iconGroupAppearance: {
@@ -115,8 +219,8 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                                 name: L["Enabled"],
                                 width: "full",
                                 set: (info: LuaArray<string>, value: boolean) => {
-                                    Ovale.db.profile.apparence.enableIcons = value;
-                                    this.SendMessage("Ovale_OptionChanged", "visibility");
+                                    this.db.profile.apparence.enableIcons = value;
+                                    this.module.SendMessage("Ovale_OptionChanged", "visibility");
                                 }
                             },
                             verrouille: {
@@ -124,7 +228,7 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                                 type: "toggle",
                                 name: L["Verrouiller position"],
                                 disabled: () => {
-                                    return !Ovale.db.profile.apparence.enableIcons;
+                                    return !this.db.profile.apparence.enableIcons;
                                 }
                             },
                             clickThru: {
@@ -132,7 +236,7 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                                 type: "toggle",
                                 name: L["Ignorer les clics souris"],
                                 disabled: () => {
-                                    return !Ovale.db.profile.apparence.enableIcons;
+                                    return !this.db.profile.apparence.enableIcons;
                                 }
                             },
                             visibility: {
@@ -140,8 +244,8 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                                 type: "group",
                                 name: L["Visibilité"],
                                 inline: true,
-                                disabled: function () {
-                                    return !Ovale.db.profile.apparence.enableIcons;
+                                disabled: () => {
+                                    return !this.db.profile.apparence.enableIcons;
                                 },
                                 args: {
                                     enCombat: {
@@ -176,8 +280,8 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                                 type: "group",
                                 name: L["Layout"],
                                 inline: true,
-                                disabled: function () {
-                                    return !Ovale.db.profile.apparence.enableIcons;
+                                disabled: () => {
+                                    return !this.db.profile.apparence.enableIcons;
                                 },
                                 args: {
                                     moving: {
@@ -254,14 +358,14 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                                 type: "color",
                                 order: 25,
                                 name: L["Remaining time font color"],
-                                get: function (info: LuaArray<string>) {
-                                    const t = Ovale.db.profile.apparence.remainsFontColor;
+                                get: (info: LuaArray<string>) => {
+                                    const t = this.db.profile.apparence.remainsFontColor;
                                     return [t.r, t.g, t.b];
                                 },
-                                set: function (info: LuaArray<string>, r: number, g: number, b: number) {
-                                    const t = Ovale.db.profile.apparence.remainsFontColor;
+                                set: (info: LuaArray<string>, r: number, g: number, b: number) => {
+                                    const t = this.db.profile.apparence.remainsFontColor;
                                     [t.r, t.g, t.b] = [r, g, b];
-                                    Ovale.db.profile.apparence.remainsFontColor = t;
+                                    this.db.profile.apparence.remainsFontColor = t;
                                 }
                             },
                             fontScale: {
@@ -433,8 +537,8 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                         name: L["Afficher la fenêtre"],
                         guiHidden: true,
                         func: () => {
-                            Ovale.db.profile.apparence.enableIcons = true;
-                            this.SendMessage("Ovale_OptionChanged", "visibility");
+                            this.db.profile.apparence.enableIcons = true;
+                            this.module.SendMessage("Ovale_OptionChanged", "visibility");
                         }
                     },
                     hide: {
@@ -442,8 +546,8 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                         name: L["Cacher la fenêtre"],
                         guiHidden: true,
                         func: () => {
-                            Ovale.db.profile.apparence.enableIcons = false;
-                            this.SendMessage("Ovale_OptionChanged", "visibility");
+                            this.db.profile.apparence.enableIcons = false;
+                            this.module.SendMessage("Ovale_OptionChanged", "visibility");
                         }
                     },
                     config: {
@@ -457,11 +561,11 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                         name: L["Display refresh statistics"],
                         type: "execute",
                         func: () => {
-                            let [avgRefresh, minRefresh, maxRefresh, count] = Ovale.GetRefreshIntervalStatistics();
+                            let [avgRefresh, minRefresh, maxRefresh, count] = this.ovale.GetRefreshIntervalStatistics();
                             if(minRefresh == huge){
                                 [avgRefresh, minRefresh, maxRefresh, count] = [0,0,0,0]
                             }
-                            Ovale.Print("Refresh intervals: count = %d, avg = %d, min = %d, max = %d (ms)", count, avgRefresh, minRefresh, maxRefresh);
+                            Print("Refresh intervals: count = %d, avg = %d, min = %d, max = %d (ms)", count, avgRefresh, minRefresh, maxRefresh);
                         }
                     }
                 }
@@ -470,8 +574,14 @@ class OvaleOptionsClass extends OvaleOptionsBase {
         }
     }
 
-    OnInitialize() {
-        const ovale = Ovale.GetName();
+    module: AceModule & AceConsole & AceEvent;
+    
+    constructor(private ovale: OvaleClass) {
+        this.module = ovale.createModule("OvaleOptions", this.OnInitialize, this.handleDisable, aceConsole, aceEvent);
+    }
+
+    private OnInitialize = () => {
+        const ovale = this.ovale.GetName();
         const db = AceDB.New("OvaleDB", this.defaultDB);
         this.options.args.profile = AceDBOptions.GetOptionsTable(db);
         // let LibDualSpec = LibStub("LibDualSpec-1.0", true);
@@ -479,11 +589,11 @@ class OvaleOptionsClass extends OvaleOptionsBase {
         //     LibDualSpec.EnhanceDatabase(db, "Ovale");
         //     LibDualSpec.EnhanceOptions(this.options.args.profile, db);
         // }
-        db.RegisterCallback(this, "OnNewProfile", "HandleProfileChanges");
-        db.RegisterCallback(this, "OnProfileReset", "HandleProfileChanges");
-        db.RegisterCallback(this, "OnProfileChanged", "HandleProfileChanges");
-        db.RegisterCallback(this, "OnProfileCopied", "HandleProfileChanges");
-        Ovale.db = db;
+        db.RegisterCallback(this, "OnNewProfile", this.HandleProfileChanges);
+        db.RegisterCallback(this, "OnProfileReset", this.HandleProfileChanges);
+        db.RegisterCallback(this, "OnProfileChanged", this.HandleProfileChanges);
+        db.RegisterCallback(this, "OnProfileCopied", this.HandleProfileChanges);
+        this.db = db;
         this.UpgradeSavedVariables();
         AceConfig.RegisterOptionsTable(ovale, this.options.args.apparence);
         AceConfig.RegisterOptionsTable(`${ovale} Profiles`, this.options.args.profile);
@@ -492,6 +602,9 @@ class OvaleOptionsClass extends OvaleOptionsBase {
         AceConfigDialog.AddToBlizOptions(`${ovale} Profiles`, "Profiles", ovale);
         this.HandleProfileChanges();
     }
+
+    private handleDisable = () => {};
+
     RegisterOptions(addon: {}) {
         // tinsert(self_register, addon);
     }
@@ -511,17 +624,17 @@ class OvaleOptionsClass extends OvaleOptionsBase {
                 addon.UpgradeSavedVariables();
             }
         }
-        Ovale.db.RegisterDefaults(this.defaultDB);
+        this.db.RegisterDefaults(this.defaultDB);
     }
-    HandleProfileChanges() {
-        this.SendMessage("Ovale_ProfileChanged");
-        this.SendMessage("Ovale_ScriptChanged");
-        this.SendMessage("Ovale_OptionChanged", "layout");
-        this.SendMessage("Ovale_OptionChanged", "visibility");
+    private HandleProfileChanges = () => {
+        this.module.SendMessage("Ovale_ProfileChanged");
+        this.module.SendMessage("Ovale_ScriptChanged");
+        this.module.SendMessage("Ovale_OptionChanged", "layout");
+        this.module.SendMessage("Ovale_OptionChanged", "visibility");
     }
     ToggleConfig() {
-        let appName = Ovale.GetName();
-        if (Ovale.db.profile.standaloneOptions) {
+        let appName = this.ovale.GetName();
+        if (this.db.profile.standaloneOptions) {
             if (AceConfigDialog.OpenFrames[appName]) {
                 AceConfigDialog.Close(appName);
             } else {
@@ -533,5 +646,3 @@ class OvaleOptionsClass extends OvaleOptionsBase {
         }
     }
 }
-
-export const OvaleOptions = new OvaleOptionsClass();

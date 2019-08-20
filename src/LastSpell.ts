@@ -67,7 +67,7 @@ export interface SpellCastModule {
 export const self_pool = new OvalePool<SpellCast>("OvaleFuture_pool");
 
 
-class LastSpell {
+export class LastSpell {
     lastSpellcast: SpellCast | undefined = undefined;
     lastGCDSpellcast: SpellCast = { spellId: 0 }
     queue: LuaArray<SpellCast> = {}
@@ -134,5 +134,3 @@ class LastSpell {
         return spellcast;
     }
 }
-
-export const lastSpell = new LastSpell();

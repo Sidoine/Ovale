@@ -1,5 +1,6 @@
-import { OvaleScripts } from "../Scripts";
-export function register() {
+import { OvaleScriptsClass } from "../Scripts";
+
+export function registerMopTrinkets(OvaleScripts: OvaleScriptsClass) {
     let name = "ovale_trinkets_mop";
     let desc = "[6.0.3] Ovale: Trinkets (Mists of Pandaria)";
     let code = `

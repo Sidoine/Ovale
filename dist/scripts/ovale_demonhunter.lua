@@ -1,9 +1,10 @@
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-do
-    local name = "sc_t23_demon_hunter_havoc"
-    local desc = "[8.2] Simulationcraft: T23_Demon_Hunter_Havoc"
-    local code = [[
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_demonhunter", 80201)
+if not __exports then return end
+__exports.registerDemonHunter = function(OvaleScripts)
+    do
+        local name = "sc_t23_demon_hunter_havoc"
+        local desc = "[8.2] Simulationcraft: T23_Demon_Hunter_Havoc"
+        local code = [[
 # Based on SimulationCraft profile "T23_Demon_Hunter_Havoc".
 #	class=demonhunter
 #	spec=havoc
@@ -212,10 +213,12 @@ AddFunction HavocEssencesShortCdActions
 {
  unless Spell(concentrated_flame_essence)
  {
+  #focused_azerite_beam
+  Spell(focused_azerite_beam)
   #purifying_blast
   Spell(purifying_blast)
   #the_unbound_force
-  Spell(the_unbound_force_essence)
+  Spell(the_unbound_force)
   #ripple_in_space
   Spell(ripple_in_space_essence)
   #worldvein_resonance
@@ -236,10 +239,8 @@ AddFunction HavocEssencesCdActions
   Spell(blood_of_the_enemy)
   #guardian_of_azeroth
   Spell(guardian_of_azeroth)
-  #focused_azerite_beam
-  Spell(focused_azerite_beam_essence)
 
-  unless Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+  unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
   {
    #memory_of_lucid_dreams,if=fury<40&buff.metamorphosis.up
    if Fury() < 40 and BuffPresent(metamorphosis_havoc_buff) Spell(memory_of_lucid_dreams_essence)
@@ -249,7 +250,7 @@ AddFunction HavocEssencesCdActions
 
 AddFunction HavocEssencesCdPostConditions
 {
- Spell(concentrated_flame_essence) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
+ Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
 }
 
 ### actions.demonic
@@ -576,7 +577,7 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # fel_rush
 # felblade
 # first_blood_talent
-# focused_azerite_beam_essence
+# focused_azerite_beam
 # guardian_of_azeroth
 # immolation_aura_havoc
 # imprison
@@ -594,18 +595,18 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # purifying_blast
 # revolving_blades_trait
 # ripple_in_space_essence
-# the_unbound_force_essence
+# the_unbound_force
 # throw_glaive_havoc
 # trail_of_ruin_talent
 # vengeful_retreat
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("DEMONHUNTER", "havoc", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_demon_hunter_vengeance"
-    local desc = "[8.2] Simulationcraft: T23_Demon_Hunter_Vengeance"
-    local code = [[
+        OvaleScripts:RegisterScript("DEMONHUNTER", "havoc", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_demon_hunter_vengeance"
+        local desc = "[8.2] Simulationcraft: T23_Demon_Hunter_Vengeance"
+        local code = [[
 # Based on SimulationCraft profile "T23_Demon_Hunter_Vengeance".
 #	class=demonhunter
 #	spec=vengeance
@@ -974,5 +975,6 @@ AddIcon checkbox=opt_demonhunter_vengeance_aoe help=cd specialization=vengeance
 # spirit_bomb_talent
 # throw_glaive_veng
 ]]
-    OvaleScripts:RegisterScript("DEMONHUNTER", "vengeance", name, desc, code, "script")
+        OvaleScripts:RegisterScript("DEMONHUNTER", "vengeance", name, desc, code, "script")
+    end
 end

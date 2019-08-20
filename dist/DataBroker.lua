@@ -5,19 +5,8 @@ local __Localization = LibStub:GetLibrary("ovale/Localization")
 local L = __Localization.L
 local LibDataBroker = LibStub:GetLibrary("LibDataBroker-1.1", true)
 local LibDBIcon = LibStub:GetLibrary("LibDBIcon-1.0", true)
-local __Debug = LibStub:GetLibrary("ovale/Debug")
-local OvaleDebug = __Debug.OvaleDebug
-local __Options = LibStub:GetLibrary("ovale/Options")
-local OvaleOptions = __Options.OvaleOptions
-local __Ovale = LibStub:GetLibrary("ovale/Ovale")
-local Ovale = __Ovale.Ovale
 local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
 local DEFAULT_NAME = __Scripts.DEFAULT_NAME
-local __Version = LibStub:GetLibrary("ovale/Version")
-local OvaleVersion = __Version.OvaleVersion
-local __Frame = LibStub:GetLibrary("ovale/Frame")
-local OvaleFrameModule = __Frame.OvaleFrameModule
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
 local pairs = pairs
 local insert = table.insert
@@ -25,9 +14,6 @@ local CreateFrame = CreateFrame
 local EasyMenu = EasyMenu
 local IsShiftKeyDown = IsShiftKeyDown
 local UIParent = UIParent
-local __PaperDoll = LibStub:GetLibrary("ovale/PaperDoll")
-local OvalePaperDoll = __PaperDoll.OvalePaperDoll
-local OvaleDataBrokerBase = Ovale:NewModule("OvaleDataBroker", aceEvent)
 local CLASS_ICONS = {
     ["DEATHKNIGHT"] = "Interface\\Icons\\ClassIcon_DeathKnight",
     ["DEMONHUNTER"] = "Interface\\Icons\\ClassIcon_DemonHunter",
@@ -44,126 +30,125 @@ local CLASS_ICONS = {
 }
 local self_menuFrame = nil
 local self_tooltipTitle = nil
-do
-    local defaultDB = {
-        minimap = {}
-    }
-    local options = {
-        minimap = {
-            order = 25,
-            type = "toggle",
-            name = L["Show minimap icon"],
-            get = function(info)
-                return  not Ovale.db.profile.apparence.minimap.hide
-            end
-,
-            set = function(info, value)
-                Ovale.db.profile.apparence.minimap.hide =  not value
-                __exports.OvaleDataBroker:UpdateIcon()
-            end
-
-        }
-    }
-    for k, v in pairs(defaultDB) do
-        OvaleOptions.defaultDB.profile.apparence[k] = v
-    end
-    for k, v in pairs(options) do
-        OvaleOptions.options.args.apparence.args[k] = v
-    end
-    OvaleOptions:RegisterOptions(__exports.OvaleDataBroker)
-end
-local OnClick = function(fr, button)
-    if button == "LeftButton" then
-        local menu = {
-            [1] = {
-                text = L["Script"],
-                isTitle = true
-            }
-        }
-        local scriptType = ( not Ovale.db.profile.showHiddenScripts and "script") or nil
-        local descriptions = OvaleScripts:GetDescriptions(scriptType)
-        for name, description in pairs(descriptions) do
-            local menuItem = {
-                text = description,
-                func = function()
-                    OvaleScripts:SetScript(name)
-                end
-
-            }
-            insert(menu, menuItem)
-        end
-        self_menuFrame = self_menuFrame or CreateFrame("Frame", "OvaleDataBroker_MenuFrame", UIParent, "UIDropDownMenuTemplate")
-        EasyMenu(menu, self_menuFrame, "cursor", 0, 0, "MENU")
-    elseif button == "MiddleButton" then
-        OvaleFrameModule.frame:ToggleOptions()
-    elseif button == "RightButton" then
-        if IsShiftKeyDown() then
-            OvaleDebug:DoTrace(true)
-        else
-            OvaleOptions:ToggleConfig()
-        end
-    end
-end
-
-local OnTooltipShow = function(tooltip)
-    self_tooltipTitle = self_tooltipTitle or Ovale:GetName() .. " " .. OvaleVersion.version
-    tooltip:SetText(self_tooltipTitle, 1, 1, 1)
-    tooltip:AddLine(L["Click to select the script."])
-    tooltip:AddLine(L["Middle-Click to toggle the script options panel."])
-    tooltip:AddLine(L["Right-Click for options."])
-    tooltip:AddLine(L["Shift-Right-Click for the current trace log."])
-end
-
-local OvaleDataBrokerClass = __class(OvaleDataBrokerBase, {
-    OnInitialize = function(self)
-        if LibDataBroker then
-            local broker = {
-                type = "data source",
-                text = "",
-                icon = CLASS_ICONS[Ovale.playerClass],
-                OnClick = OnClick,
-                OnTooltipShow = OnTooltipShow
-            }
-            self.broker = LibDataBroker:NewDataObject(Ovale:GetName(), broker)
-            if LibDBIcon then
-                LibDBIcon:Register(Ovale:GetName(), self.broker, Ovale.db.profile.apparence.minimap)
-            end
-        end
-        if self.broker then
-            self:RegisterMessage("Ovale_ProfileChanged", "UpdateIcon")
-            self:RegisterMessage("Ovale_ScriptChanged")
-            self:RegisterMessage("Ovale_SpecializationChanged", "Ovale_ScriptChanged")
-            self:RegisterEvent("PLAYER_ENTERING_WORLD", "Ovale_ScriptChanged")
-            self:Ovale_ScriptChanged()
-            self:UpdateIcon()
-        end
-    end,
-    OnDisable = function(self)
-        if self.broker then
-            self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-            self:UnregisterMessage("Ovale_SpecializationChanged")
-            self:UnregisterMessage("Ovale_ProfileChanged")
-            self:UnregisterMessage("Ovale_ScriptChanged")
-        end
-    end,
-    UpdateIcon = function(self)
-        if LibDBIcon and self.broker then
-            local minimap = Ovale.db.profile.apparence.minimap
-            LibDBIcon:Refresh(Ovale:GetName(), minimap)
-            if minimap and minimap.hide then
-                LibDBIcon:Hide(Ovale:GetName())
-            else
-                LibDBIcon:Show(Ovale:GetName())
-            end
-        end
-    end,
-    Ovale_ScriptChanged = function(self)
-        local script = Ovale.db.profile.source[Ovale.playerClass .. "_" .. OvalePaperDoll:GetSpecialization()]
-        self.broker.text = (script == DEFAULT_NAME and OvaleScripts:GetDefaultScriptName(Ovale.playerClass, OvalePaperDoll:GetSpecialization())) or script or "Disabled"
-    end,
-    constructor = function(self, ...)
-        OvaleDataBrokerBase.constructor(self, ...)
+local defaultDB = {
+    minimap = {}
+}
+__exports.OvaleDataBrokerClass = __class(nil, {
+    constructor = function(self, ovalePaperDoll, ovaleFrameModule, ovaleOptions, ovale, ovaleDebug, ovaleScripts, ovaleVersion)
+        self.ovalePaperDoll = ovalePaperDoll
+        self.ovaleFrameModule = ovaleFrameModule
+        self.ovaleOptions = ovaleOptions
+        self.ovale = ovale
+        self.ovaleDebug = ovaleDebug
+        self.ovaleScripts = ovaleScripts
+        self.ovaleVersion = ovaleVersion
         self.broker = nil
-    end
+        self.OnTooltipShow = function(tooltip)
+            self_tooltipTitle = self_tooltipTitle or self.ovale:GetName() .. " " .. self.ovaleVersion.version
+            tooltip:SetText(self_tooltipTitle, 1, 1, 1)
+            tooltip:AddLine(L["Click to select the script."])
+            tooltip:AddLine(L["Middle-Click to toggle the script options panel."])
+            tooltip:AddLine(L["Right-Click for options."])
+            tooltip:AddLine(L["Shift-Right-Click for the current trace log."])
+        end
+        self.OnClick = function(fr, button)
+            if button == "LeftButton" then
+                local menu = {
+                    [1] = {
+                        text = L["Script"],
+                        isTitle = true
+                    }
+                }
+                local scriptType = ( not self.ovaleOptions.db.profile.showHiddenScripts and "script") or nil
+                local descriptions = self.ovaleScripts:GetDescriptions(scriptType)
+                for name, description in pairs(descriptions) do
+                    local menuItem = {
+                        text = description,
+                        func = function()
+                            self.ovaleScripts:SetScript(name)
+                        end
+                    }
+                    insert(menu, menuItem)
+                end
+                self_menuFrame = self_menuFrame or CreateFrame("Frame", "OvaleDataBroker_MenuFrame", UIParent, "UIDropDownMenuTemplate")
+                EasyMenu(menu, self_menuFrame, "cursor", 0, 0, "MENU")
+            elseif button == "MiddleButton" then
+                self.ovaleFrameModule.frame:ToggleOptions()
+            elseif button == "RightButton" then
+                if IsShiftKeyDown() then
+                    self.ovaleDebug:DoTrace(true)
+                else
+                    self.ovaleOptions:ToggleConfig()
+                end
+            end
+        end
+        self.OnInitialize = function()
+            if LibDataBroker then
+                local broker = {
+                    type = "data source",
+                    text = "",
+                    icon = CLASS_ICONS[self.ovale.playerClass],
+                    OnClick = self.OnClick,
+                    OnTooltipShow = self.OnTooltipShow
+                }
+                self.broker = LibDataBroker:NewDataObject(self.ovale:GetName(), broker)
+                if LibDBIcon then
+                    LibDBIcon:Register(self.ovale:GetName(), self.broker, self.ovaleOptions.db.profile.apparence.minimap)
+                end
+            end
+            if self.broker then
+                self.module:RegisterMessage("Ovale_ProfileChanged", self.UpdateIcon)
+                self.module:RegisterMessage("Ovale_ScriptChanged", self.Ovale_ScriptChanged)
+                self.module:RegisterMessage("Ovale_SpecializationChanged", self.Ovale_ScriptChanged)
+                self.module:RegisterEvent("PLAYER_ENTERING_WORLD", self.Ovale_ScriptChanged)
+                self.Ovale_ScriptChanged()
+                self.UpdateIcon()
+            end
+        end
+        self.OnDisable = function()
+            if self.broker then
+                self.module:UnregisterEvent("PLAYER_ENTERING_WORLD")
+                self.module:UnregisterMessage("Ovale_SpecializationChanged")
+                self.module:UnregisterMessage("Ovale_ProfileChanged")
+                self.module:UnregisterMessage("Ovale_ScriptChanged")
+            end
+        end
+        self.UpdateIcon = function()
+            if LibDBIcon and self.broker then
+                local minimap = self.ovaleOptions.db.profile.apparence.minimap
+                LibDBIcon:Refresh(self.ovale:GetName(), minimap)
+                if minimap and minimap.hide then
+                    LibDBIcon:Hide(self.ovale:GetName())
+                else
+                    LibDBIcon:Show(self.ovale:GetName())
+                end
+            end
+        end
+        self.Ovale_ScriptChanged = function()
+            local script = self.ovaleOptions.db.profile.source[self.ovale.playerClass .. "_" .. self.ovalePaperDoll:GetSpecialization()]
+            self.broker.text = (script == DEFAULT_NAME and self.ovaleScripts:GetDefaultScriptName(self.ovale.playerClass, self.ovalePaperDoll:GetSpecialization())) or script or "Disabled"
+        end
+        self.module = ovale:createModule("OvaleDataBroker", self.OnInitialize, self.OnDisable, aceEvent)
+        local options = {
+            minimap = {
+                order = 25,
+                type = "toggle",
+                name = L["Show minimap icon"],
+                get = function(info)
+                    return  not self.ovaleOptions.db.profile.apparence.minimap.hide
+                end,
+                set = function(info, value)
+                    self.ovaleOptions.db.profile.apparence.minimap.hide =  not value
+                    self.UpdateIcon()
+                end
+            }
+        }
+        for k, v in pairs(defaultDB) do
+            self.ovaleOptions.defaultDB.profile.apparence[k] = v
+        end
+        for k, v in pairs(options) do
+            self.ovaleOptions.options.args.apparence.args[k] = v
+        end
+        self.ovaleOptions:RegisterOptions(self)
+    end,
 })
-__exports.OvaleDataBroker = OvaleDataBrokerClass()

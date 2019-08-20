@@ -3,27 +3,13 @@ if not __exports then return end
 local __class = LibStub:GetLibrary("tslib").newClass
 local __Localization = LibStub:GetLibrary("ovale/Localization")
 local L = __Localization.L
-local __Options = LibStub:GetLibrary("ovale/Options")
-local OvaleOptions = __Options.OvaleOptions
-local __Ovale = LibStub:GetLibrary("ovale/Ovale")
-local Ovale = __Ovale.Ovale
-local __Data = LibStub:GetLibrary("ovale/Data")
-local OvaleData = __Data.OvaleData
-local __SpellBook = LibStub:GetLibrary("ovale/SpellBook")
-local OvaleSpellBook = __SpellBook.OvaleSpellBook
-local __Stance = LibStub:GetLibrary("ovale/Stance")
-local OvaleStance = __Stance.OvaleStance
 local aceEvent = LibStub:GetLibrary("AceEvent-3.0", true)
-local pairs = pairs
 local _G = _G
 local GetTime = GetTime
 local UnitHasVehicleUI = UnitHasVehicleUI
 local UnitExists = UnitExists
 local UnitIsDead = UnitIsDead
 local UnitCanAttack = UnitCanAttack
-local __Future = LibStub:GetLibrary("ovale/Future")
-local OvaleFuture = __Future.OvaleFuture
-local OvaleSpellFlashBase = Ovale:NewModule("OvaleSpellFlash", aceEvent)
 local SpellFlashCore = nil
 local colorMain = {
     r = nil,
@@ -102,56 +88,54 @@ local COLORTABLE = {
         b = 0
     }
 }
-do
-    local defaultDB = {
-        spellFlash = {
-            brightness = 1,
-            enabled = true,
-            hasHostileTarget = false,
-            hasTarget = false,
-            hideInVehicle = false,
-            inCombat = false,
-            size = 2.4,
-            threshold = 500,
-            colorMain = {
-                r = 1,
-                g = 1,
-                b = 1
-            },
-            colorShortCd = {
-                r = 1,
-                g = 1,
-                b = 0
-            },
-            colorCd = {
-                r = 1,
-                g = 1,
-                b = 0
-            },
-            colorInterrupt = {
-                r = 0,
-                g = 1,
-                b = 1
-            }
-        }
-    }
-    local options = {
-        spellFlash = {
+__exports.OvaleSpellFlashClass = __class(nil, {
+    constructor = function(self, ovaleOptions, ovale, ovaleFuture, ovaleData, ovaleSpellBook, ovaleStance)
+        self.ovaleOptions = ovaleOptions
+        self.ovaleFuture = ovaleFuture
+        self.ovaleData = ovaleData
+        self.ovaleSpellBook = ovaleSpellBook
+        self.ovaleStance = ovaleStance
+        self.OnInitialize = function()
+            SpellFlashCore = _G["SpellFlashCore"]
+            self.module:RegisterMessage("Ovale_OptionChanged", self.Ovale_OptionChanged)
+            self.Ovale_OptionChanged()
+        end
+        self.OnDisable = function()
+            SpellFlashCore = nil
+            self.module:UnregisterMessage("Ovale_OptionChanged")
+        end
+        self.Ovale_OptionChanged = function()
+            local db = self.ovaleOptions.db.profile.apparence.spellFlash
+            colorMain.r = db.colorMain.r
+            colorMain.g = db.colorMain.g
+            colorMain.b = db.colorMain.b
+            colorCd.r = db.colorCd.r
+            colorCd.g = db.colorCd.g
+            colorCd.b = db.colorCd.b
+            colorShortCd.r = db.colorShortCd.r
+            colorShortCd.g = db.colorShortCd.g
+            colorShortCd.b = db.colorShortCd.b
+            colorInterrupt.r = db.colorInterrupt.r
+            colorInterrupt.g = db.colorInterrupt.g
+            colorInterrupt.b = db.colorInterrupt.b
+        end
+        self.module = ovale:createModule("OvaleSpellFlash", self.OnInitialize, self.OnDisable, aceEvent)
+        self.ovaleOptions.options.args.apparence.spellFlash = self:getSpellFlashOptions()
+    end,
+    getSpellFlashOptions = function(self)
+        return {
             type = "group",
             name = "SpellFlash",
             disabled = function()
-                return  not SpellFlashCore
-            end
-,
+                return  not self:isEnabled()
+            end,
             get = function(info)
-                return Ovale.db.profile.apparence.spellFlash[info[#info]]
-            end
-,
+                return self.ovaleOptions.db.profile.apparence.spellFlash[info[#info]]
+            end,
             set = function(info, value)
-                Ovale.db.profile.apparence.spellFlash[info[#info]] = value
-                OvaleOptions:SendMessage("Ovale_OptionChanged")
-            end
-,
+                self.ovaleOptions.db.profile.apparence.spellFlash[info[#info]] = value
+                self.module:SendMessage("Ovale_OptionChanged")
+            end,
             args = {
                 enabled = {
                     order = 10,
@@ -165,36 +149,32 @@ do
                     type = "toggle",
                     name = L["En combat uniquement"],
                     disabled = function()
-                        return  not SpellFlashCore or  not Ovale.db.profile.apparence.spellFlash.enabled
+                        return  not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled
                     end
-
                 },
                 hasTarget = {
                     order = 20,
                     type = "toggle",
                     name = L["Si cible uniquement"],
                     disabled = function()
-                        return  not SpellFlashCore or  not Ovale.db.profile.apparence.spellFlash.enabled
+                        return  not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled
                     end
-
                 },
                 hasHostileTarget = {
                     order = 30,
                     type = "toggle",
                     name = L["Cacher si cible amicale ou morte"],
                     disabled = function()
-                        return  not SpellFlashCore or  not Ovale.db.profile.apparence.spellFlash.enabled
+                        return  not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled
                     end
-
                 },
                 hideInVehicle = {
                     order = 40,
                     type = "toggle",
                     name = L["Cacher dans les véhicules"],
                     disabled = function()
-                        return  not SpellFlashCore or  not Ovale.db.profile.apparence.spellFlash.enabled
+                        return  not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled
                     end
-
                 },
                 brightness = {
                     order = 50,
@@ -205,9 +185,8 @@ do
                     bigStep = 0.01,
                     isPercent = true,
                     disabled = function()
-                        return  not SpellFlashCore or  not Ovale.db.profile.apparence.spellFlash.enabled
+                        return  not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled
                     end
-
                 },
                 size = {
                     order = 60,
@@ -218,9 +197,8 @@ do
                     bigStep = 0.01,
                     isPercent = true,
                     disabled = function()
-                        return  not SpellFlashCore or  not Ovale.db.profile.apparence.spellFlash.enabled
+                        return  not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled
                     end
-
                 },
                 threshold = {
                     order = 70,
@@ -232,9 +210,8 @@ do
                     step = 1,
                     bigStep = 50,
                     disabled = function()
-                        return  not SpellFlashCore or  not Ovale.db.profile.apparence.spellFlash.enabled
+                        return  not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled
                     end
-
                 },
                 colors = {
                     order = 80,
@@ -242,22 +219,19 @@ do
                     name = L["Colors"],
                     inline = true,
                     disabled = function()
-                        return  not SpellFlashCore or  not Ovale.db.profile.apparence.spellFlash.enabled
-                    end
-,
+                        return  not self:isEnabled() or  not self.ovaleOptions.db.profile.apparence.spellFlash.enabled
+                    end,
                     get = function(info)
-                        local color = Ovale.db.profile.apparence.spellFlash[info[#info]]
+                        local color = self.ovaleOptions.db.profile.apparence.spellFlash[info[#info]]
                         return color.r, color.g, color.b, 1
-                    end
-,
+                    end,
                     set = function(info, r, g, b, a)
-                        local color = Ovale.db.profile.apparence.spellFlash[info[#info]]
+                        local color = self.ovaleOptions.db.profile.apparence.spellFlash[info[#info]]
                         color.r = r
                         color.g = g
                         color.b = b
-                        OvaleOptions:SendMessage("Ovale_OptionChanged")
-                    end
-,
+                        self.module:SendMessage("Ovale_OptionChanged")
+                    end,
                     args = {
                         colorMain = {
                             order = 10,
@@ -287,47 +261,17 @@ do
                 }
             }
         }
-    }
-    for k, v in pairs(defaultDB) do
-        OvaleOptions.defaultDB.profile.apparence[k] = v
-    end
-    for k, v in pairs(options) do
-        OvaleOptions.options.args.apparence.args[k] = v
-    end
-    OvaleOptions:RegisterOptions(__exports.OvaleSpellFlash)
-end
-local OvaleSpellFlashClass = __class(OvaleSpellFlashBase, {
-    OnInitialize = function(self)
-        SpellFlashCore = _G["SpellFlashCore"]
-        self:RegisterMessage("Ovale_OptionChanged")
-        self:Ovale_OptionChanged()
     end,
-    OnDisable = function(self)
-        SpellFlashCore = nil
-        self:UnregisterMessage("Ovale_OptionChanged")
-    end,
-    Ovale_OptionChanged = function(self)
-        local db = Ovale.db.profile.apparence.spellFlash
-        colorMain.r = db.colorMain.r
-        colorMain.g = db.colorMain.g
-        colorMain.b = db.colorMain.b
-        colorCd.r = db.colorCd.r
-        colorCd.g = db.colorCd.g
-        colorCd.b = db.colorCd.b
-        colorShortCd.r = db.colorShortCd.r
-        colorShortCd.g = db.colorShortCd.g
-        colorShortCd.b = db.colorShortCd.b
-        colorInterrupt.r = db.colorInterrupt.r
-        colorInterrupt.g = db.colorInterrupt.g
-        colorInterrupt.b = db.colorInterrupt.b
+    isEnabled = function(self)
+        return SpellFlashCore ~= nil
     end,
     IsSpellFlashEnabled = function(self)
         local enabled = (SpellFlashCore ~= nil)
-        local db = Ovale.db.profile.apparence.spellFlash
+        local db = self.ovaleOptions.db.profile.apparence.spellFlash
         if enabled and  not db.enabled then
             enabled = false
         end
-        if enabled and db.inCombat and  not OvaleFuture:IsInCombat(nil) then
+        if enabled and db.inCombat and  not self.ovaleFuture:IsInCombat(nil) then
             enabled = false
         end
         if enabled and db.hideInVehicle and UnitHasVehicleUI("player") then
@@ -342,14 +286,14 @@ local OvaleSpellFlashClass = __class(OvaleSpellFlashBase, {
         return enabled
     end,
     Flash = function(self, state, node, element, start, now)
-        local db = Ovale.db.profile.apparence.spellFlash
+        local db = self.ovaleOptions.db.profile.apparence.spellFlash
         now = now or GetTime()
         if self:IsSpellFlashEnabled() and start and start - now <= db.threshold / 1000 then
             if element and element.type == "action" then
                 local spellId, spellInfo
                 if element.lowername == "spell" then
                     spellId = element.positionalParams[1]
-                    spellInfo = OvaleData.spellInfo[spellId]
+                    spellInfo = self.ovaleData.spellInfo[spellId]
                 end
                 local interrupt = spellInfo and spellInfo.interrupt
                 local color = nil
@@ -374,10 +318,10 @@ local OvaleSpellFlashClass = __class(OvaleSpellFlashBase, {
                 end
                 local brightness = db.brightness * 100
                 if element.lowername == "spell" then
-                    if OvaleStance:IsStanceSpell(spellId) then
+                    if self.ovaleStance:IsStanceSpell(spellId) then
                         SpellFlashCore.FlashForm(spellId, color, size, brightness)
                     end
-                    if OvaleSpellBook:IsPetSpell(spellId) then
+                    if self.ovaleSpellBook:IsPetSpell(spellId) then
                         SpellFlashCore.FlashPet(spellId, color, size, brightness)
                     end
                     SpellFlashCore.FlashAction(spellId, color, size, brightness)
@@ -389,4 +333,3 @@ local OvaleSpellFlashClass = __class(OvaleSpellFlashBase, {
         end
     end,
 })
-__exports.OvaleSpellFlash = OvaleSpellFlashClass()

@@ -1,16 +1,16 @@
-import { OvaleDebug } from "./Debug";
-import { OvaleProfiler } from "./Profiler";
-import { Ovale } from "./Ovale";
-import { OvaleGUID } from "./GUID";
-import { OvaleState } from "./State";
-import aceEvent from "@wowts/ace_event-3.0";
-import AceTimer, { Timer } from "@wowts/ace_timer-3.0";
+import { OvaleGUIDClass } from "./GUID";
+import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
+import aceTimer, { AceTimer, Timer } from "@wowts/ace_timer-3.0";
 import { band, bor } from "@wowts/bit";
 import { ipairs, pairs, wipe, truthy, LuaObj } from "@wowts/lua";
 import { find } from "@wowts/string";
 import { GetTime, COMBATLOG_OBJECT_AFFILIATION_MINE, COMBATLOG_OBJECT_AFFILIATION_PARTY, COMBATLOG_OBJECT_AFFILIATION_RAID, COMBATLOG_OBJECT_REACTION_FRIENDLY, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
+import { States } from "./State";
+import { AceModule } from "@wowts/tsaddon";
+import { OvaleClass } from "./Ovale";
+import { Profiler, OvaleProfilerClass } from "./Profiler";
+import { Tracer, OvaleDebugClass } from "./Debug";
 
-export let OvaleEnemies: OvaleEnemiesClass;
 let GROUP_MEMBER = bor(COMBATLOG_OBJECT_AFFILIATION_MINE, COMBATLOG_OBJECT_AFFILIATION_PARTY, COMBATLOG_OBJECT_AFFILIATION_RAID);
 let CLEU_TAG_SUFFIXES = {
     1: "_DAMAGE",
@@ -65,26 +65,37 @@ class EnemiesData {
     taggedEnemies = 0;
     enemies: number | undefined = undefined;
 }
-let OvaleEnemiesBase = OvaleState.RegisterHasState(OvaleDebug.RegisterDebugging(OvaleProfiler.RegisterProfiling(Ovale.NewModule("OvaleEnemies", aceEvent, AceTimer))), EnemiesData);
 
-class OvaleEnemiesClass extends OvaleEnemiesBase {
-    
-    OnInitialize() {
-        if (!self_reaperTimer) {
-            self_reaperTimer = this.ScheduleRepeatingTimer("RemoveInactiveEnemies", REAP_INTERVAL);
-        }
-        this.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
-        this.RegisterEvent("PLAYER_REGEN_DISABLED");
+export class OvaleEnemiesClass extends States<EnemiesData> {
+    private module: AceModule & AceEvent & AceTimer;
+    private profiler: Profiler;
+    private tracer: Tracer;
+
+    constructor(private ovaleGuid: OvaleGUIDClass, private ovale: OvaleClass, ovaleProfiler: OvaleProfilerClass, ovaleDebug: OvaleDebugClass) {
+        super(EnemiesData);
+        this.module = ovale.createModule("OvaleEnemies", this.OnInitialize, this.OnDisable, aceEvent, aceTimer);
+        this.profiler = ovaleProfiler.create(this.module.GetName());
+        this.tracer = ovaleDebug.create(this.module.GetName());
     }
-    OnDisable() {
+
+    private OnInitialize = () => {
         if (!self_reaperTimer) {
-            this.CancelTimer(self_reaperTimer);
+            self_reaperTimer = this.module.ScheduleRepeatingTimer(this.RemoveInactiveEnemies, REAP_INTERVAL);
+        }
+        this.module.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", this.COMBAT_LOG_EVENT_UNFILTERED);
+        this.module.RegisterEvent("PLAYER_REGEN_DISABLED", this.PLAYER_REGEN_DISABLED);
+    }
+    
+    private OnDisable = () => {
+        if (!self_reaperTimer) {
+            this.module.CancelTimer(self_reaperTimer);
             self_reaperTimer = undefined;
         }
-        this.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
-        this.UnregisterEvent("PLAYER_REGEN_DISABLED");
+        this.module.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
+        this.module.UnregisterEvent("PLAYER_REGEN_DISABLED");
     }
-    COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
+    
+    private COMBAT_LOG_EVENT_UNFILTERED = (event: string, ...__args: any[]) => {
         let [, cleuEvent, , sourceGUID, sourceName, sourceFlags, , destGUID, destName, destFlags] = CombatLogGetCurrentEventInfo();
         if (CLEU_UNIT_REMOVED[cleuEvent]) {
             let now = GetTime();
@@ -98,24 +109,24 @@ class OvaleEnemiesClass extends OvaleEnemiesBase {
             } else if (IsFriendly(sourceFlags, true) && !IsFriendly(destFlags) && IsTagEvent(cleuEvent)) {
                 let now = GetTime();
                 let isPlayerTag;
-                if (sourceGUID == Ovale.playerGUID) {
+                if (sourceGUID == this.ovale.playerGUID) {
                     isPlayerTag = true;
                 } else {
-                    [isPlayerTag] =  OvaleGUID.IsPlayerPet(sourceGUID);
+                    [isPlayerTag] =  this.ovaleGuid.IsPlayerPet(sourceGUID);
                 }
                 this.AddEnemy(cleuEvent, destGUID, destName, now, isPlayerTag);
             }
         }
     }
-    PLAYER_REGEN_DISABLED() {
+    private PLAYER_REGEN_DISABLED = () => {
         wipe(self_enemyName);
         wipe(self_enemyLastSeen);
         wipe(self_taggedEnemyLastSeen);
         this.current.activeEnemies = 0;
         this.current.taggedEnemies = 0;
     }
-    RemoveInactiveEnemies() {
-        this.StartProfiling("OvaleEnemies_RemoveInactiveEnemies");
+    private RemoveInactiveEnemies = () => {
+        this.profiler.StartProfiling("OvaleEnemies_RemoveInactiveEnemies");
         let now = GetTime();
         for (const [guid, timestamp] of pairs(self_enemyLastSeen)) {
             if (now - timestamp > REAP_INTERVAL) {
@@ -127,10 +138,10 @@ class OvaleEnemiesClass extends OvaleEnemiesBase {
                 this.RemoveTaggedEnemy("REAPED", guid, now);
             }
         }
-        this.StopProfiling("OvaleEnemies_RemoveInactiveEnemies");
+        this.profiler.StopProfiling("OvaleEnemies_RemoveInactiveEnemies");
     }
     private AddEnemy(cleuEvent: string, guid: string, name: string, timestamp: number, isTagged?: boolean) {
-        this.StartProfiling("OvaleEnemies_AddEnemy");
+        this.profiler.StartProfiling("OvaleEnemies_AddEnemy");
         if (guid) {
             self_enemyName[guid] = name;
             let changed = false;
@@ -149,14 +160,14 @@ class OvaleEnemiesClass extends OvaleEnemiesBase {
                 self_taggedEnemyLastSeen[guid] = timestamp;
             }
             if (changed) {
-                this.DebugTimestamp("%s: %d/%d enemy seen: %s (%s)", cleuEvent, this.current.taggedEnemies, this.current.activeEnemies, guid, name);
-                Ovale.needRefresh();
+                this.tracer.DebugTimestamp("%s: %d/%d enemy seen: %s (%s)", cleuEvent, this.current.taggedEnemies, this.current.activeEnemies, guid, name);
+                this.ovale.needRefresh();
             }
         }
-        this.StopProfiling("OvaleEnemies_AddEnemy");
+        this.profiler.StopProfiling("OvaleEnemies_AddEnemy");
     }
     private RemoveEnemy(cleuEvent: string, guid: string, timestamp: number, isDead?: boolean) {
-        this.StartProfiling("OvaleEnemies_RemoveEnemy");
+        this.profiler.StartProfiling("OvaleEnemies_RemoveEnemy");
         if (guid) {
             let name = self_enemyName[guid];
             let changed = false;
@@ -175,15 +186,15 @@ class OvaleEnemiesClass extends OvaleEnemiesBase {
                 }
             }
             if (changed) {
-                this.DebugTimestamp("%s: %d/%d enemy %s: %s (%s)", cleuEvent, this.current.taggedEnemies, this.current.activeEnemies, isDead && "died" || "removed", guid, name);
-                Ovale.needRefresh();
-                this.SendMessage("Ovale_InactiveUnit", guid, isDead);
+                this.tracer.DebugTimestamp("%s: %d/%d enemy %s: %s (%s)", cleuEvent, this.current.taggedEnemies, this.current.activeEnemies, isDead && "died" || "removed", guid, name);
+                this.ovale.needRefresh();
+                this.module.SendMessage("Ovale_InactiveUnit", guid, isDead);
             }
         }
-        this.StopProfiling("OvaleEnemies_RemoveEnemy");
+        this.profiler.StopProfiling("OvaleEnemies_RemoveEnemy");
     }
     private RemoveTaggedEnemy(cleuEvent: string, guid: string, timestamp: number) {
-        this.StartProfiling("OvaleEnemies_RemoveTaggedEnemy");
+        this.profiler.StartProfiling("OvaleEnemies_RemoveTaggedEnemy");
         if (guid) {
             let name = self_enemyName[guid];
             let tagged = self_taggedEnemyLastSeen[guid];
@@ -192,34 +203,34 @@ class OvaleEnemiesClass extends OvaleEnemiesBase {
                 if (this.current.taggedEnemies > 0) {
                     this.current.taggedEnemies = this.current.taggedEnemies - 1;
                 }
-                this.DebugTimestamp("%s: %d/%d enemy removed: %s (%s), last tagged at %f", cleuEvent, this.current.taggedEnemies, this.current.activeEnemies, guid, name, tagged);
-                Ovale.needRefresh();
+                this.tracer.DebugTimestamp("%s: %d/%d enemy removed: %s (%s), last tagged at %f", cleuEvent, this.current.taggedEnemies, this.current.activeEnemies, guid, name, tagged);
+                this.ovale.needRefresh();
             }
         }
-        this.StopProfiling("OvaleEnemies_RemoveTaggedEnemy");
+        this.profiler.StopProfiling("OvaleEnemies_RemoveTaggedEnemy");
     }
     DebugEnemies() {
         for (const [guid, seen] of pairs(self_enemyLastSeen)) {
             let name = self_enemyName[guid];
             let tagged = self_taggedEnemyLastSeen[guid];
             if (tagged) {
-                this.Print("Tagged enemy %s (%s) last seen at %f", guid, name, tagged);
+                this.tracer.Print("Tagged enemy %s (%s) last seen at %f", guid, name, tagged);
             } else {
-                this.Print("Enemy %s (%s) last seen at %f", guid, name, seen);
+                this.tracer.Print("Enemy %s (%s) last seen at %f", guid, name, seen);
             }
         }
-        this.Print("Total enemies: %d", this.current.activeEnemies);
-        this.Print("Total tagged enemies: %d", this.current.taggedEnemies);
+        this.tracer.Print("Total enemies: %d", this.current.activeEnemies);
+        this.tracer.Print("Total tagged enemies: %d", this.current.taggedEnemies);
     }
     
     InitializeState() {
         this.next.enemies = undefined;
     }
     ResetState() {
-        this.StartProfiling("OvaleEnemies_ResetState");
+        this.profiler.StartProfiling("OvaleEnemies_ResetState");
         this.next.activeEnemies = this.current.activeEnemies;
         this.next.taggedEnemies = this.current.taggedEnemies;
-        this.StopProfiling("OvaleEnemies_ResetState");
+        this.profiler.StopProfiling("OvaleEnemies_ResetState");
     }
     CleanState() {
         this.next.activeEnemies = undefined;
@@ -227,6 +238,3 @@ class OvaleEnemiesClass extends OvaleEnemiesBase {
         this.next.enemies = undefined;
     }
 }
-
-OvaleEnemies = new OvaleEnemiesClass();
-OvaleState.RegisterState(OvaleEnemies);

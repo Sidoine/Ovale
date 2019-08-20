@@ -1,8 +1,6 @@
 local __exports = LibStub:NewLibrary("ovale/scripts/ovale_druid_spells", 80201)
 if not __exports then return end
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-local registerBase = function()
+local function registerBase(OvaleScripts)
     local name = "ovale_druid_base_spells"
     local desc = "[8.2] Ovale: Druid baseline spells"
     local code = [[Define(ancestral_call 274738)
@@ -36,16 +34,46 @@ Define(berserking 26297)
   SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
   # Haste increased by s1.
   SpellAddBuff(berserking berserking=1)
-Define(blood_fury 20572)
+Define(blood_fury_0 20572)
 # Increases your attack power by s1 for 15 seconds.
-  SpellInfo(blood_fury cd=120 duration=15 gcd=0 offgcd=1)
+  SpellInfo(blood_fury_0 cd=120 duration=15 gcd=0 offgcd=1)
   # Attack power increased by w1.
-  SpellAddBuff(blood_fury blood_fury=1)
-Define(blood_of_the_enemy 297108)
+  SpellAddBuff(blood_fury_0 blood_fury_0=1)
+Define(blood_fury_1 33697)
+# Increases your attack power and Intellect by s1 for 15 seconds.
+  SpellInfo(blood_fury_1 cd=120 duration=15 gcd=0 offgcd=1)
+  # Attack power and Intellect increased by w1.
+  SpellAddBuff(blood_fury_1 blood_fury_1=1)
+Define(blood_fury_2 33702)
+# Increases your Intellect by s1 for 15 seconds.
+  SpellInfo(blood_fury_2 cd=120 duration=15 gcd=0 offgcd=1)
+  # Intellect increased by w1.
+  SpellAddBuff(blood_fury_2 blood_fury_2=1)
+Define(blood_of_the_enemy_0 297108)
 # The Heart of Azeroth erupts violently, dealing s1 Shadow damage to enemies within A1 yds. You gain m2 critical strike chance against the targets for 10 seconds?a297122[, and increases your critical hit damage by 297126m for 5 seconds][].
-  SpellInfo(blood_of_the_enemy cd=120 duration=10 channel=10)
+  SpellInfo(blood_of_the_enemy_0 cd=120 duration=10 channel=10)
   # You have a w2 increased chance to be Critically Hit by the caster.
-  SpellAddTargetDebuff(blood_of_the_enemy blood_of_the_enemy=1)
+  SpellAddTargetDebuff(blood_of_the_enemy_0 blood_of_the_enemy_0=1)
+Define(blood_of_the_enemy_1 297969)
+# Infuse your Heart of Azeroth with Blood of the Enemy.
+  SpellInfo(blood_of_the_enemy_1)
+Define(blood_of_the_enemy_2 297970)
+# Infuse your Heart of Azeroth with Blood of the Enemy.
+  SpellInfo(blood_of_the_enemy_2)
+Define(blood_of_the_enemy_3 297971)
+# Infuse your Heart of Azeroth with Blood of the Enemy.
+  SpellInfo(blood_of_the_enemy_3)
+Define(blood_of_the_enemy_4 298273)
+# The Heart of Azeroth erupts violently, dealing 297108s1 Shadow damage to enemies within 297108A1 yds. You gain 297108m2 critical strike chance against the targets for 10 seconds.
+  SpellInfo(blood_of_the_enemy_4 cd=90 duration=15 gcd=0 offgcd=1)
+  SpellAddBuff(blood_of_the_enemy_4 blood_of_the_enemy_4=1)
+Define(blood_of_the_enemy_5 298277)
+# The Heart of Azeroth erupts violently, dealing 297108s1 Shadow damage to enemies within 297108A1 yds. You gain 297108m2 critical strike chance against the targets for 10 seconds, and increases your critical hit damage by 297126m for 5 seconds.
+  SpellInfo(blood_of_the_enemy_5 cd=90 duration=15 gcd=0 offgcd=1)
+  SpellAddBuff(blood_of_the_enemy_5 blood_of_the_enemy_5=1)
+Define(blood_of_the_enemy_6 299039)
+# Infuse your Heart of Azeroth with Blood of the Enemy.
+  SpellInfo(blood_of_the_enemy_6)
 Define(bristling_fur 155835)
 # Bristle your fur, causing you to generate Rage based on damage taken for 8 seconds.
   SpellInfo(bristling_fur cd=40 duration=8 talent=bristling_fur_talent)
@@ -71,9 +99,22 @@ Define(feral_frenzy 274837)
 Define(ferocious_bite 22568)
 # Finishing move that causes Physical damage per combo point and consumes up to ?a106951[25*106951s1/-100.1]?a102543[25*(25 of Spell Power)/-100.1][25] additional Energy to increase damage by up to 100.rnrn?s202031[Ferocious Bite will also refresh the duration of your Rip on your target.rnrn][]   1 point  : m1*1/5 damagern   2 points: m1*2/5 damagern   3 points: m1*3/5 damagern   4 points: m1*4/5 damagern   5 points: m1*5/5 damage
   SpellInfo(ferocious_bite energy=25 combopoints=1 gcd=1)
-Define(fireblood 265221)
+Define(fireblood_0 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
-  SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
+  SpellInfo(fireblood_0 cd=120 gcd=0 offgcd=1)
+Define(fireblood_1 265226)
+# Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by s1.
+  SpellInfo(fireblood_1 duration=8 max_stacks=6 gcd=0 offgcd=1)
+  # Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by w1.
+  SpellAddBuff(fireblood_1 fireblood_1=1)
+Define(focused_azerite_beam_0 299336)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+  SpellInfo(focused_azerite_beam_0 cd=90 duration=3 channel=3 tick=0.33)
+
+Define(focused_azerite_beam_1 299338)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds. Castable while moving.
+  SpellInfo(focused_azerite_beam_1 cd=90 duration=3 channel=3 tick=0.33)
+
 Define(force_of_nature 205636)
 # Summons a stand of s1 Treants for 10 seconds which immediately taunt and attack enemies in the targeted area.rnrn|cFFFFFFFFGenerates m5/10 Astral Power.|r
   SpellInfo(force_of_nature cd=60 lunarpower=-20 talent=force_of_nature_talent)
@@ -88,10 +129,29 @@ Define(fury_of_elune 202770)
   SpellInfo(fury_of_elune cd=60 duration=8 tick=0.5 talent=fury_of_elune_talent)
   # Generating m3/10/t3*d Astral Power over d.
   SpellAddBuff(fury_of_elune fury_of_elune=1)
-Define(guardian_of_azeroth 295840)
+Define(guardian_of_azeroth_0 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
-  SpellInfo(guardian_of_azeroth cd=180 duration=30)
-  SpellAddBuff(guardian_of_azeroth guardian_of_azeroth=1)
+  SpellInfo(guardian_of_azeroth_0 cd=180 duration=30)
+  SpellAddBuff(guardian_of_azeroth_0 guardian_of_azeroth_0=1)
+Define(guardian_of_azeroth_1 295855)
+# Each time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
+  SpellInfo(guardian_of_azeroth_1 duration=60 max_stacks=5 gcd=0 offgcd=1)
+  # Haste increased by s1.
+  SpellAddBuff(guardian_of_azeroth_1 guardian_of_azeroth_1=1)
+Define(guardian_of_azeroth_2 299355)
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.
+  SpellInfo(guardian_of_azeroth_2 cd=180 duration=30 gcd=1)
+  SpellAddBuff(guardian_of_azeroth_2 guardian_of_azeroth_2=1)
+Define(guardian_of_azeroth_3 299358)
+# Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg)*(1+(295836m1/100)) Fire damage. Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.
+  SpellInfo(guardian_of_azeroth_3 cd=180 duration=20 gcd=1)
+  SpellAddBuff(guardian_of_azeroth_3 guardian_of_azeroth_3=1)
+Define(guardian_of_azeroth_4 300091)
+# Call upon Azeroth to summon a Guardian of Azeroth to aid you in combat for 30 seconds.
+  SpellInfo(guardian_of_azeroth_4 cd=300 duration=30 gcd=1)
+Define(guardian_of_azeroth_5 303347)
+  SpellInfo(guardian_of_azeroth_5 gcd=0 offgcd=1 tick=8)
+
 Define(half_moon 274282)
 # Deals m1 Arcane damage to the target and empowers Half Moon to become Full Moon.rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
   SpellInfo(half_moon cd=25 lunarpower=-20)
@@ -163,9 +223,19 @@ Define(mighty_bash 5211)
   SpellInfo(mighty_bash cd=50 duration=5 talent=mighty_bash_talent)
   # Stunned.
   SpellAddTargetDebuff(mighty_bash mighty_bash=1)
-Define(moonfire 8921)
+Define(moonfire_0 8921)
 # A quick beam of lunar light burns the enemy for (14.499999999999998 of Spell Power) Arcane damage and then an additional 164812o2 Arcane damage over 16 seconds.?s197911[rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r][]
-  SpellInfo(moonfire rage=0 lunarpower=0)
+  SpellInfo(moonfire_0 rage=0 lunarpower=0)
+Define(moonfire_1 155625)
+# A quick beam of lunar light burns the enemy for s2 Arcane damage and then an additional o1 Arcane damage over 14 seconds.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|r
+  SpellInfo(moonfire_1 energy=30 duration=14 gcd=1 combopoints=-1 tick=2)
+  # Suffering w1 Arcane damage every t1 seconds.
+  SpellAddTargetDebuff(moonfire_1 moonfire_1=1)
+Define(moonfire_2 164812)
+# A quick beam of lunar light burns the enemy for (14.499999999999998 of Spell Power) Arcane damage and then an additional 164812o2 Arcane damage over 16 seconds.?s197911[rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r][]
+  SpellInfo(moonfire_2 duration=16 gcd=0 offgcd=1 tick=2)
+  # Suffering w2 Arcane damage every t2 seconds.
+  SpellAddTargetDebuff(moonfire_2 moonfire_2=1)
 Define(new_moon 274281)
 # Deals m1 Arcane damage to the target and empowers New Moon to become Half Moon. rnrn|cFFFFFFFFGenerates m3/10 Astral Power.|r
   SpellInfo(new_moon cd=25 gcd=1 lunarpower=-10 talent=new_moon_talent)
@@ -182,9 +252,28 @@ Define(prowl 5215)
 Define(pulverize 80313)
 # A devastating blow that consumes s3 stacks of your Thrash on the target to deal s1 Physical damage, and reduces all damage you take by 158792s1 for 20 seconds.
   SpellInfo(pulverize talent=pulverize_talent)
-Define(purifying_blast 295337)
+Define(purifying_blast_0 295337)
 # Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
-  SpellInfo(purifying_blast cd=60 duration=6)
+  SpellInfo(purifying_blast_0 cd=60 duration=6)
+Define(purifying_blast_1 295338)
+# Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
+  SpellInfo(purifying_blast_1 channel=0 gcd=0 offgcd=1)
+Define(purifying_blast_2 295354)
+# When an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.
+  SpellInfo(purifying_blast_2 duration=8 gcd=0 offgcd=1)
+  # Damage dealt increased by s1.
+  SpellAddBuff(purifying_blast_2 purifying_blast_2=1)
+Define(purifying_blast_3 295366)
+# Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds.?a295364[ Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.][]?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
+  SpellInfo(purifying_blast_3 duration=3 gcd=0 offgcd=1)
+  # Stunned.
+  SpellAddTargetDebuff(purifying_blast_3 purifying_blast_3=1)
+Define(purifying_blast_4 299345)
+# Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds. Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.?a295352[rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.][]rnrnAny Aberration struck by the beam is stunned for 3 seconds.
+  SpellInfo(purifying_blast_4 cd=60 duration=6 channel=6 gcd=1)
+Define(purifying_blast_5 299347)
+# Call down a purifying beam upon the target area, dealing 295293s3*(1+@versadmg)*s2 Fire damage over 6 seconds. Has a low chance to immediately annihilate any specimen deemed unworthy by MOTHER.rnrnWhen an enemy dies within the beam, your damage is increased by 295354s1 for 8 seconds.rnrnAny Aberration struck by the beam is stunned for 3 seconds.
+  SpellInfo(purifying_blast_5 cd=60 duration=6 gcd=1)
 Define(rake 1822)
 # Rake the target for s1 Bleed damage and an additional 155722o1 Bleed damage over 15 seconds.?s48484[ Reduces the target's movement speed by 58180s1 for 12 seconds.][]?a231052[ rnrnWhile stealthed, Rake will also stun the target for 4 seconds, and deal s4 increased damage.][]rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
 # Rank 2: While stealthed, Rake will also stun the target for 4 seconds, and deal 1822s4 increased damage.
@@ -196,11 +285,15 @@ Define(rake_debuff 155722)
   SpellInfo(rake_debuff duration=15 gcd=0 offgcd=1 tick=3)
   # Bleeding for w1 damage every t1 seconds.
   SpellAddTargetDebuff(rake_debuff rake_debuff=1)
-Define(reckless_force_buff 298409)
+Define(reckless_force_buff_0 298409)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
-  SpellInfo(reckless_force_buff max_stacks=5 gcd=0 offgcd=1 tick=10)
+  SpellInfo(reckless_force_buff_0 max_stacks=5 gcd=0 offgcd=1 tick=10)
   # Gaining unstable Azerite energy.
-  SpellAddBuff(reckless_force_buff reckless_force_buff=1)
+  SpellAddBuff(reckless_force_buff_0 reckless_force_buff_0=1)
+Define(reckless_force_buff_1 304038)
+# When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
+  SpellInfo(reckless_force_buff_1 channel=-0.001 gcd=0 offgcd=1)
+  SpellAddBuff(reckless_force_buff_1 reckless_force_buff_1=1)
 Define(regrowth 8936)
 # Heals a friendly target for (120 of Spell Power) and another o2*<mult> over 12 seconds.?s231032[ Regrowth's initial heal has a 231032s1 increased chance for a critical effect.][]?s24858|s197625[ Usable while in Moonkin Form.][]?s33891[rnrn|C0033AA11Tree of Life: Instant cast.|R][]
   SpellInfo(regrowth duration=12 tick=2)
@@ -216,19 +309,23 @@ Define(savage_roar 52610)
   SpellInfo(savage_roar energy=25 combopoints=1 duration=6 channel=6 gcd=1 tick=2 talent=savage_roar_talent)
   # Damage increased 62071s1 while in Cat Form.rnEnergy regeneration increased by 62071s3.
   SpellAddBuff(savage_roar savage_roar=1)
-Define(scent_of_blood_buff 213888)
-# Increases your movement speed by 213888s1 for 10 seconds when you kill a target that gives experience or honor.
-  SpellInfo(scent_of_blood_buff duration=10 channel=10 gcd=0 offgcd=1)
-  # Movement speed increased by s1.
-  SpellAddBuff(scent_of_blood_buff scent_of_blood_buff=1)
+Define(scent_of_blood_feral 285564)
+# Each enemy hit by Thrash reduces the cost of Swipe by s1 Energy for the next 6 seconds.
+  SpellInfo(scent_of_blood_feral channel=0 gcd=0 offgcd=1 talent=scent_of_blood_talent)
+  SpellAddBuff(scent_of_blood_feral scent_of_blood_feral=1)
 Define(shadowmeld 58984)
 # Activate to slip into the shadows, reducing the chance for enemies to detect your presence. Lasts until cancelled or upon moving. Any threat is restored versus enemies still in combat upon cancellation of this effect.
   SpellInfo(shadowmeld cd=120 channel=-0.001 gcd=0 offgcd=1)
   # Shadowmelded.
   SpellAddBuff(shadowmeld shadowmeld=1)
-Define(sharpened_claws_buff 268525)
+Define(sharpened_claws_buff_0 268525)
 # Your attacks have a chance to summon a whirlwind of sharpened claws, inflicting 268525s1 Physical damage split evenly among all enemies within 268525A1 yards.
-  SpellInfo(sharpened_claws_buff channel=0 gcd=0 offgcd=1)
+  SpellInfo(sharpened_claws_buff_0 channel=0 gcd=0 offgcd=1)
+Define(sharpened_claws_buff_1 279943)
+# Maul increases the damage done by your Swipe and Thrash by 279943s1 for 6 seconds.
+  SpellInfo(sharpened_claws_buff_1 duration=6 gcd=0 offgcd=1)
+  # Swipe and Thrash damage increased by m1.
+  SpellAddBuff(sharpened_claws_buff_1 sharpened_claws_buff_1=1)
 Define(shred 5221)
 # Shred the target, causing s1*<mult> Physical damage to the target.?a231063[ Deals s4 increased damage against bleeding targets.][]?a231057[rnrnWhile stealthed, Shred deals m3 increased damage, and has double the chance to critically strike.][]?c2[rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r]?s202155[rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.][]
 # Rank 2: Shred deals 5221s5 increased damage against bleeding targets.
@@ -268,12 +365,47 @@ Define(sunfire 93402)
   SpellInfo(sunfire lunarpower=0)
   # Suffering w2 Nature damage every t2 sec.
   SpellAddBuff(sunfire sunfire=1)
-Define(thorns 236696)
+Define(the_unbound_force_0 298452)
+# Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]
+  SpellInfo(the_unbound_force_0 cd=60 duration=2 channel=2 tick=0.33)
+  SpellAddBuff(the_unbound_force_0 the_unbound_force_0=1)
+  SpellAddTargetDebuff(the_unbound_force_0 the_unbound_force_0=1)
+Define(the_unbound_force_1 298453)
+# Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.?a298456[rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.][]
+  SpellInfo(the_unbound_force_1 gcd=0 offgcd=1)
+Define(the_unbound_force_2 299321)
+# Infuse your Heart of Azeroth with The Unbound Force.
+  SpellInfo(the_unbound_force_2)
+Define(the_unbound_force_3 299322)
+# Infuse your Heart of Azeroth with The Unbound Force.
+  SpellInfo(the_unbound_force_3)
+Define(the_unbound_force_4 299323)
+# Infuse your Heart of Azeroth with The Unbound Force.
+  SpellInfo(the_unbound_force_4)
+Define(the_unbound_force_5 299324)
+# Infuse your Heart of Azeroth with The Unbound Force.
+  SpellInfo(the_unbound_force_5)
+Define(the_unbound_force_6 299376)
+# Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/298452t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.
+  SpellInfo(the_unbound_force_6 cd=45 duration=2 channel=2 gcd=1 tick=0.33)
+  SpellAddBuff(the_unbound_force_6 the_unbound_force_6=1)
+  SpellAddTargetDebuff(the_unbound_force_6 the_unbound_force_6=1)
+Define(the_unbound_force_7 299378)
+# Unleash the forces within the Heart of Azeroth, causing shards of Azerite to strike your target for (298407s3*((2 seconds/298452t)+1)+298407s3) Fire damage over 2 seconds. This damage is increased by s2 if it critically strikes.rnrnEach time The Unbound Force causes a critical strike, it immediately strikes the target with an additional Azerite shard, up to a maximum of 298456m2.
+  SpellInfo(the_unbound_force_7 cd=45 duration=2 channel=2 gcd=1 tick=0.33)
+  SpellAddBuff(the_unbound_force_7 the_unbound_force_7=1)
+  SpellAddTargetDebuff(the_unbound_force_7 the_unbound_force_7=1)
+Define(thorns_0 236696)
 # Sprout thorns for 12 seconds on the friendly target. When victim to melee attacks, thorns deals up to 203728s2 of the attackers total health in Nature damage.rnrnAttackers also have their movement speed reduced by 232559s1 for 4 seconds.
 # Rank 1: When struck in combat you have a chance to inflict 15438s1 Arcane damage to the attacker.
-  SpellInfo(thorns cd=45 duration=12 gcd=1)
+  SpellInfo(thorns_0 cd=45 duration=12 gcd=1)
   # Melee attackers take Nature damage when hit and their movement speed is slowed by 232559s1 for 232559d.
-  SpellAddBuff(thorns thorns=1)
+  SpellAddBuff(thorns_0 thorns_0=1)
+Define(thorns_1 305497)
+# Sprout thorns for 12 seconds on the friendly target. When victim to melee attacks, thorns deals (120 of Spell Power) Nature damage back to the attacker.rnrnAttackers also have their movement speed reduced by 232559s1 for 4 seconds.
+  SpellInfo(thorns_1 cd=45 duration=12 gcd=1)
+  # Melee attackers take Nature damage when hit and their movement speed is slowed by 232559s1 for 232559d.
+  SpellAddBuff(thorns_1 thorns_1=1)
 Define(thrash 106832)
 # Thrash all nearby enemies, dealing immediate physical damage and periodic bleed damage. Damage varies by shapeshift form.
   SpellInfo(thrash gcd=0 offgcd=1)
@@ -302,6 +434,17 @@ Define(wild_charge 102401)
   SpellInfo(wild_charge cd=15 duration=0.5 gcd=0 offgcd=1 talent=wild_charge_talent)
   # Flying to an ally's position.
   SpellAddBuff(wild_charge wild_charge=1)
+SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3 blood_of_the_enemy_4 blood_of_the_enemy_5 blood_of_the_enemy_6)
+SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1)
+SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
+SpellList(moonfire moonfire_0 moonfire_1 moonfire_2)
+SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
+SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
+SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3 the_unbound_force_4 the_unbound_force_5 the_unbound_force_6 the_unbound_force_7)
+SpellList(thorns thorns_0 thorns_1)
+SpellList(blood_fury blood_fury_0 blood_fury_1 blood_fury_2)
+SpellList(fireblood fireblood_0 fireblood_1)
+SpellList(sharpened_claws_buff sharpened_claws_buff_0 sharpened_claws_buff_1)
 Define(bloodtalons_talent 20) #21649
 # Casting Regrowth or Entangling Roots causes your next two melee abilities to deal 145152s1 increased damage for their full duration.
 Define(bristling_fur_talent 3) #22420
@@ -380,12 +523,6 @@ Define(hibernate 2637)
 
 	SpellInfo(shred energy=40 combopoints=-1)
 	SpellInfo(shred physical=1)
-
-	SpellInfo(moonfire mana=6)
-	SpellInfo(moonfire unusable=1 if_stance=druid_cat_form)
-	SpellAddBuff(moonfire moonfire_debuff=1)
-Define(moonfire_debuff 164812)
-	SpellInfo(moonfire_debuff duration=16)
 
 	SpellInfo(prowl cd=10 gcd=0 offgcd=1 to_stance=druid_cat_form)
     SpellRequire(prowl unusable 1=stealthed,1)
@@ -506,8 +643,7 @@ Define(swiftmend 18562)
 ]]
     OvaleScripts:RegisterScript("DRUID", nil, name, desc, code, "include")
 end
-
-local registerSpec1 = function()
+local function registerSpec1(OvaleScripts)
     local name = "ovale_druid_balance_spells"
     local desc = "[8.1] Ovale: Druid Balance spells"
     local code = [[
@@ -593,8 +729,7 @@ Define(oneths_overconfidence_buff 209407)
 	]]
     OvaleScripts:RegisterScript("DRUID", nil, name, desc, code, "include")
 end
-
-local registerSpec2 = function()
+local function registerSpec2(OvaleScripts)
     local name = "ovale_druid_guardian_spells"
     local desc = "[8.1] Ovale: Druid Guardian spells"
     local code = [[
@@ -663,8 +798,7 @@ Define(guardian_of_elune_talent 18)
 	]]
     OvaleScripts:RegisterScript("DRUID", nil, name, desc, code, "include")
 end
-
-local registerSpec3 = function()
+local function registerSpec3(OvaleScripts)
     local name = "ovale_druid_feral_spells"
     local desc = "[8.1] Ovale: Druid Feral spells"
     local code = [[
@@ -797,12 +931,11 @@ Define(luffa_wrappings 137056)
 	]]
     OvaleScripts:RegisterScript("DRUID", nil, name, desc, code, "include")
 end
-
-__exports.register = function()
-    registerBase()
-    registerSpec1()
-    registerSpec2()
-    registerSpec3()
+__exports.registerDruidSpells = function(OvaleScripts)
+    registerBase(OvaleScripts)
+    registerSpec1(OvaleScripts)
+    registerSpec2(OvaleScripts)
+    registerSpec3(OvaleScripts)
     local name = "ovale_druid_spells"
     local desc = "[8.1] Ovale: Druid spells"
     local code = [[

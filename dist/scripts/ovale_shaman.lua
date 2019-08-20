@@ -1,9 +1,10 @@
-local __Scripts = LibStub:GetLibrary("ovale/Scripts")
-local OvaleScripts = __Scripts.OvaleScripts
-do
-    local name = "sc_t23_shaman_elemental"
-    local desc = "[8.2] Simulationcraft: T23_Shaman_Elemental"
-    local code = [[
+local __exports = LibStub:NewLibrary("ovale/scripts/ovale_shaman", 80201)
+if not __exports then return end
+__exports.registerShaman = function(OvaleScripts)
+    do
+        local name = "sc_t23_shaman_elemental"
+        local desc = "[8.2] Simulationcraft: T23_Shaman_Elemental"
+        local code = [[
 # Based on SimulationCraft profile "T23_Shaman_Elemental".
 #	class=shaman
 #	spec=elemental
@@ -307,10 +308,12 @@ AddFunction ElementalDefaultShortCdActions
 {
  unless Talent(totem_mastery_talent_elemental) and TotemRemaining(totem_mastery_elemental) < 2 and Spell(totem_mastery_elemental) or Spell(concentrated_flame_essence)
  {
+  #focused_azerite_beam
+  Spell(focused_azerite_beam)
   #purifying_blast
   Spell(purifying_blast)
   #the_unbound_force
-  Spell(the_unbound_force_essence)
+  Spell(the_unbound_force)
   #ripple_in_space
   Spell(ripple_in_space_essence)
   #worldvein_resonance
@@ -357,10 +360,8 @@ AddFunction ElementalDefaultCdActions
    Spell(blood_of_the_enemy)
    #guardian_of_azeroth
    Spell(guardian_of_azeroth)
-   #focused_azerite_beam
-   Spell(focused_azerite_beam_essence)
 
-   unless Spell(purifying_blast) or Spell(the_unbound_force_essence)
+   unless Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force)
    {
     #memory_of_lucid_dreams
     Spell(memory_of_lucid_dreams_essence)
@@ -391,7 +392,7 @@ AddFunction ElementalDefaultCdActions
 
 AddFunction ElementalDefaultCdPostConditions
 {
- Talent(totem_mastery_talent_elemental) and TotemRemaining(totem_mastery_elemental) < 2 and Spell(totem_mastery_elemental) or Spell(concentrated_flame_essence) or Spell(purifying_blast) or Spell(the_unbound_force_essence) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence) or Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } and ElementalAoeCdPostConditions() or ElementalSingletargetCdPostConditions()
+ Talent(totem_mastery_talent_elemental) and TotemRemaining(totem_mastery_elemental) < 2 and Spell(totem_mastery_elemental) or Spell(concentrated_flame_essence) or Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence) or Enemies() > 2 and { Enemies() > 2 or Enemies() > 2 } and ElementalAoeCdPostConditions() or ElementalSingletargetCdPostConditions()
 }
 
 ### Elemental icons.
@@ -478,7 +479,7 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 # fireblood
 # flame_shock
 # flame_shock_debuff
-# focused_azerite_beam_essence
+# focused_azerite_beam
 # frost_shock
 # guardian_of_azeroth
 # heroism
@@ -514,7 +515,7 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 # surge_of_power_talent
 # tectonic_thunder
 # tectonic_thunder_trait
-# the_unbound_force_essence
+# the_unbound_force
 # totem_mastery_elemental
 # totem_mastery_talent_elemental
 # war_stomp
@@ -522,12 +523,12 @@ AddIcon checkbox=opt_shaman_elemental_aoe help=cd specialization=elemental
 # wind_shear
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("SHAMAN", "elemental", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_shaman_enhancement"
-    local desc = "[8.2] Simulationcraft: T23_Shaman_Enhancement"
-    local code = [[
+        OvaleScripts:RegisterScript("SHAMAN", "elemental", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_shaman_enhancement"
+        local desc = "[8.2] Simulationcraft: T23_Shaman_Enhancement"
+        local code = [[
 # Based on SimulationCraft profile "T23_Shaman_Enhancement".
 #	class=shaman
 #	spec=enhancement
@@ -698,10 +699,12 @@ AddFunction EnhancementPriorityShortCdActions
  unless Enemies() >= 8 - TalentPoints(forceful_winds_talent) * 3 and freezerburn_enabled() and furyCheck_CL() and Spell(crash_lightning)
  {
   #the_unbound_force,if=buff.reckless_force.up|time<5
-  if BuffPresent(reckless_force_buff) or TimeInCombat() < 5 Spell(the_unbound_force_essence)
+  if BuffPresent(reckless_force_buff) or TimeInCombat() < 5 Spell(the_unbound_force)
 
   unless AzeriteTraitRank(primal_primer_trait) >= 2 and target.DebuffStacks(primal_primer) == 10 and Enemies() == 1 and freezerburn_enabled() and furyCheck_LL() and Spell(lava_lash) or not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or not BuffPresent(fury_of_air_buff) and Maelstrom() >= 20 and Enemies() >= 1 + freezerburn_enabled() and Spell(fury_of_air) or BuffPresent(fury_of_air_buff) and Enemies() < 1 + freezerburn_enabled() and Spell(fury_of_air) or TotemRemaining(totem_mastery_enhancement) <= 2 * GCD() and Spell(totem_mastery_enhancement) or Enemies() >= 3 and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) and { BuffPresent(seething_rage) or SpellCooldown(blood_of_the_enemy) > 40 } } and Spell(sundering)
   {
+   #focused_azerite_beam,if=active_enemies>=3
+   if Enemies() >= 3 Spell(focused_azerite_beam)
    #purifying_blast,if=active_enemies>=3
    if Enemies() >= 3 Spell(purifying_blast)
   }
@@ -715,16 +718,11 @@ AddFunction EnhancementPriorityShortCdPostConditions
 
 AddFunction EnhancementPriorityCdActions
 {
- unless Enemies() >= 8 - TalentPoints(forceful_winds_talent) * 3 and freezerburn_enabled() and furyCheck_CL() and Spell(crash_lightning) or { BuffPresent(reckless_force_buff) or TimeInCombat() < 5 } and Spell(the_unbound_force_essence) or AzeriteTraitRank(primal_primer_trait) >= 2 and target.DebuffStacks(primal_primer) == 10 and Enemies() == 1 and freezerburn_enabled() and furyCheck_LL() and Spell(lava_lash) or not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or not BuffPresent(fury_of_air_buff) and Maelstrom() >= 20 and Enemies() >= 1 + freezerburn_enabled() and Spell(fury_of_air) or BuffPresent(fury_of_air_buff) and Enemies() < 1 + freezerburn_enabled() and Spell(fury_of_air) or TotemRemaining(totem_mastery_enhancement) <= 2 * GCD() and Spell(totem_mastery_enhancement) or Enemies() >= 3 and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) and { BuffPresent(seething_rage) or SpellCooldown(blood_of_the_enemy) > 40 } } and Spell(sundering)
- {
-  #focused_azerite_beam,if=active_enemies>=3
-  if Enemies() >= 3 Spell(focused_azerite_beam_essence)
- }
 }
 
 AddFunction EnhancementPriorityCdPostConditions
 {
- Enemies() >= 8 - TalentPoints(forceful_winds_talent) * 3 and freezerburn_enabled() and furyCheck_CL() and Spell(crash_lightning) or { BuffPresent(reckless_force_buff) or TimeInCombat() < 5 } and Spell(the_unbound_force_essence) or AzeriteTraitRank(primal_primer_trait) >= 2 and target.DebuffStacks(primal_primer) == 10 and Enemies() == 1 and freezerburn_enabled() and furyCheck_LL() and Spell(lava_lash) or not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or not BuffPresent(fury_of_air_buff) and Maelstrom() >= 20 and Enemies() >= 1 + freezerburn_enabled() and Spell(fury_of_air) or BuffPresent(fury_of_air_buff) and Enemies() < 1 + freezerburn_enabled() and Spell(fury_of_air) or TotemRemaining(totem_mastery_enhancement) <= 2 * GCD() and Spell(totem_mastery_enhancement) or Enemies() >= 3 and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) and { BuffPresent(seething_rage) or SpellCooldown(blood_of_the_enemy) > 40 } } and Spell(sundering) or Enemies() >= 3 and Spell(purifying_blast) or Talent(landslide_talent) and not BuffPresent(landslide_buff) and Charges(rockbiter count=0) > 1.7 and Spell(rockbiter) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_frost) <= 2 * GCD() and Talent(hailstorm_talent) and furyCheck_FB() and Spell(frostbrand) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_fire) <= 2 * GCD() and Spell(flametongue) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_nature) <= 2 * GCD() and Maelstrom() < 70 and Spell(rockbiter)
+ Enemies() >= 8 - TalentPoints(forceful_winds_talent) * 3 and freezerburn_enabled() and furyCheck_CL() and Spell(crash_lightning) or { BuffPresent(reckless_force_buff) or TimeInCombat() < 5 } and Spell(the_unbound_force) or AzeriteTraitRank(primal_primer_trait) >= 2 and target.DebuffStacks(primal_primer) == 10 and Enemies() == 1 and freezerburn_enabled() and furyCheck_LL() and Spell(lava_lash) or not BuffPresent(crash_lightning_buff) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or not BuffPresent(fury_of_air_buff) and Maelstrom() >= 20 and Enemies() >= 1 + freezerburn_enabled() and Spell(fury_of_air) or BuffPresent(fury_of_air_buff) and Enemies() < 1 + freezerburn_enabled() and Spell(fury_of_air) or TotemRemaining(totem_mastery_enhancement) <= 2 * GCD() and Spell(totem_mastery_enhancement) or Enemies() >= 3 and { not AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) or AzeriteEssenceIsMajor(blood_of_the_enemy_essence_id) and { BuffPresent(seething_rage) or SpellCooldown(blood_of_the_enemy) > 40 } } and Spell(sundering) or Enemies() >= 3 and Spell(focused_azerite_beam) or Enemies() >= 3 and Spell(purifying_blast) or Talent(landslide_talent) and not BuffPresent(landslide_buff) and Charges(rockbiter count=0) > 1.7 and Spell(rockbiter) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_frost) <= 2 * GCD() and Talent(hailstorm_talent) and furyCheck_FB() and Spell(frostbrand) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_fire) <= 2 * GCD() and Spell(flametongue) or HasAzeriteTrait(natural_harmony_trait) and BuffRemaining(natural_harmony_nature) <= 2 * GCD() and Maelstrom() < 70 and Spell(rockbiter)
 }
 
 ### actions.precombat
@@ -909,6 +907,8 @@ AddFunction EnhancementFillerShortCdActions
 {
  unless Enemies() < 3 and Spell(sundering)
  {
+  #focused_azerite_beam,if=!buff.ascendance.up&!buff.molten_weapon.up&!buff.icy_edge.up&!buff.crackling_surge.up&!debuff.earthen_spike.up
+  if not BuffPresent(ascendance_enhancement_buff) and not BuffPresent(molten_weapon_buff) and not BuffPresent(icy_edge_buff) and not BuffPresent(crackling_surge) and not target.DebuffPresent(earthen_spike_debuff) Spell(focused_azerite_beam)
   #purifying_blast
   Spell(purifying_blast)
 
@@ -927,16 +927,11 @@ AddFunction EnhancementFillerShortCdPostConditions
 
 AddFunction EnhancementFillerCdActions
 {
- unless Enemies() < 3 and Spell(sundering)
- {
-  #focused_azerite_beam,if=!buff.ascendance.up&!buff.molten_weapon.up&!buff.icy_edge.up&!buff.crackling_surge.up&!debuff.earthen_spike.up
-  if not BuffPresent(ascendance_enhancement_buff) and not BuffPresent(molten_weapon_buff) and not BuffPresent(icy_edge_buff) and not BuffPresent(crackling_surge) and not target.DebuffPresent(earthen_spike_debuff) Spell(focused_azerite_beam_essence)
- }
 }
 
 AddFunction EnhancementFillerCdPostConditions
 {
- Enemies() < 3 and Spell(sundering) or Spell(purifying_blast) or Spell(concentrated_flame_essence) or BuffStacks(lifeblood_buff) < 4 and Spell(worldvein_resonance_essence) or Talent(forceful_winds_talent) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Talent(searing_assault_talent) and Spell(flametongue) or not HasAzeriteTrait(primal_primer_trait) and Talent(hot_hand_talent) and BuffPresent(hot_hand_buff) and Spell(lava_lash) or Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Maelstrom() < 70 and not BuffPresent(strength_of_earth_buff) and Spell(rockbiter) or Talent(crashing_storm_talent) and OCPool_CL() and Spell(crash_lightning) or OCPool_LL() and furyCheck_LL() and Spell(lava_lash) or Spell(rockbiter) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 + GCD() and furyCheck_FB() and Spell(frostbrand) or Spell(flametongue)
+ Enemies() < 3 and Spell(sundering) or not BuffPresent(ascendance_enhancement_buff) and not BuffPresent(molten_weapon_buff) and not BuffPresent(icy_edge_buff) and not BuffPresent(crackling_surge) and not target.DebuffPresent(earthen_spike_debuff) and Spell(focused_azerite_beam) or Spell(purifying_blast) or Spell(concentrated_flame_essence) or BuffStacks(lifeblood_buff) < 4 and Spell(worldvein_resonance_essence) or Talent(forceful_winds_talent) and Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Talent(searing_assault_talent) and Spell(flametongue) or not HasAzeriteTrait(primal_primer_trait) and Talent(hot_hand_talent) and BuffPresent(hot_hand_buff) and Spell(lava_lash) or Enemies() > 1 and furyCheck_CL() and Spell(crash_lightning) or Maelstrom() < 70 and not BuffPresent(strength_of_earth_buff) and Spell(rockbiter) or Talent(crashing_storm_talent) and OCPool_CL() and Spell(crash_lightning) or OCPool_LL() and furyCheck_LL() and Spell(lava_lash) or Spell(rockbiter) or Talent(hailstorm_talent) and BuffRemaining(frostbrand_buff) < 4.8 + GCD() and furyCheck_FB() and Spell(frostbrand) or Spell(flametongue)
 }
 
 ### actions.default_core
@@ -1348,7 +1343,7 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # fireblood
 # flametongue
 # flametongue_buff
-# focused_azerite_beam_essence
+# focused_azerite_beam
 # forceful_winds_talent
 # frostbrand
 # frostbrand_buff
@@ -1392,19 +1387,19 @@ AddIcon checkbox=opt_shaman_enhancement_aoe help=cd specialization=enhancement
 # strength_of_earth_buff
 # strength_of_earth_trait
 # sundering
-# the_unbound_force_essence
+# the_unbound_force
 # totem_mastery_enhancement
 # war_stomp
 # wind_shear
 # windstrike
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("SHAMAN", "enhancement", name, desc, code, "script")
-end
-do
-    local name = "sc_t23_shaman_restoration"
-    local desc = "[8.2] Simulationcraft: T23_Shaman_Restoration"
-    local code = [[
+        OvaleScripts:RegisterScript("SHAMAN", "enhancement", name, desc, code, "script")
+    end
+    do
+        local name = "sc_t23_shaman_restoration"
+        local desc = "[8.2] Simulationcraft: T23_Shaman_Restoration"
+        local code = [[
 # Based on SimulationCraft profile "T23_Shaman_Restoration".
 #	class=shaman
 #	spec=restoration
@@ -1621,5 +1616,6 @@ AddIcon checkbox=opt_shaman_restoration_aoe help=cd specialization=restoration
 # wind_shear
 # worldvein_resonance_essence
 ]]
-    OvaleScripts:RegisterScript("SHAMAN", "restoration", name, desc, code, "script")
+        OvaleScripts:RegisterScript("SHAMAN", "restoration", name, desc, code, "script")
+    end
 end

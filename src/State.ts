@@ -1,10 +1,5 @@
-import { OvaleDebug } from "./Debug";
 import { OvaleQueue } from "./Queue";
-import { Ovale, Constructor } from "./Ovale";
 import { SpellCast } from "./LastSpell";
-
-let OvaleStateBase = Ovale.NewModule("OvaleState");
-export let OvaleState: OvaleStateClass;
 
 let self_stateAddons = new OvaleQueue<StateModule>("OvaleState_stateAddons");
 
@@ -17,19 +12,23 @@ export interface StateModule {
     ApplySpellOnHit?(spellId: number, targetGUID: string, startCast: number, endCast: number, channel: boolean, spellcast: SpellCast):void;
 }
 
-const OvaleStateBaseClass = OvaleDebug.RegisterDebugging(OvaleStateBase);
-class OvaleStateClass extends OvaleStateBaseClass {
-    RegisterHasState<T extends Constructor<{}>, U>(Base: T, ctor: new () => U) {
-        return class extends Base {
-            current = new ctor();
-            next = new ctor();
-            GetState(atTime: number | undefined) {
-                if (!atTime) return this.current;
-                return this.next;
-            }
-        }
+export class States<T> {
+    current: T;
+    next: T;
+
+    constructor(c: {new(): T}) {
+        this.current = new c();
+        this.next = new c();
     }
 
+    GetState(atTime: number | undefined) {
+        if (!atTime) return this.current;
+        return this.next;
+    }
+}
+
+export class OvaleStateClass {
+    
     RegisterState(stateAddon: StateModule) {
         self_stateAddons.Insert(stateAddon);
     }
@@ -88,5 +87,3 @@ class OvaleStateClass extends OvaleStateBaseClass {
         }
     }
 }
-
-OvaleState = new OvaleStateClass();

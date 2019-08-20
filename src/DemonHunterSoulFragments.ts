@@ -1,13 +1,9 @@
-import { Ovale } from "./Ovale";
-import { OvaleDebug } from "./Debug";
-import { OvaleState, StateModule } from "./State";
-import { OvaleAura } from "./Aura";
-import aceEvent from "@wowts/ace_event-3.0";
+import { OvaleAuraClass } from "./Aura";
+import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { GetTime, CombatLogGetCurrentEventInfo } from "@wowts/wow-mock";
 import { LuaArray } from "@wowts/lua";
-
-let OvaleDemonHunterSoulFragmentsBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleDemonHunterSoulFragments", aceEvent));
-export let OvaleDemonHunterSoulFragments: OvaleDemonHunterSoulFragmentsClass;
+import { AceModule } from "@wowts/tsaddon";
+import { OvaleClass } from "./Ovale";
 
 let SOUL_FRAGMENTS_BUFF_ID = 203981;
 let SOUL_FRAGMENT_SPELLS:LuaArray<number> = {
@@ -20,28 +16,30 @@ let SOUL_FRAGMENT_FINISHERS:LuaArray<boolean> = {
     [263648]: true,   // Soul Barrier
 }
 
-class OvaleDemonHunterSoulFragmentsClass extends OvaleDemonHunterSoulFragmentsBase {
+export class OvaleDemonHunterSoulFragmentsClass {
     estimatedCount: number;
     atTime: number;
     estimated: boolean;
+    private module: AceModule & AceEvent;
 
-    constructor() {
-        super();
+    constructor(private ovaleAura: OvaleAuraClass, private ovale: OvaleClass) {
+        this.module = ovale.createModule("OvaleDemonHunterSoulFragments", this.OnInitialize, this.OnDisable, aceEvent)
     }
 
-    OnInitialize() {
-        if (Ovale.playerClass == "DEMONHUNTER") {
-            this.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
+    private OnInitialize = () => {
+        if (this.ovale.playerClass == "DEMONHUNTER") {
+            this.module.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", this.COMBAT_LOG_EVENT_UNFILTERED);
         }
     }
-    OnDisable() {
-        if (Ovale.playerClass == "DEMONHUNTER") {
-            this.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
+    
+    private OnDisable = () => {
+        if (this.ovale.playerClass == "DEMONHUNTER") {
+            this.module.UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
         }
     }
-    COMBAT_LOG_EVENT_UNFILTERED(event: string, ...__args: any[]) {
+    private COMBAT_LOG_EVENT_UNFILTERED = (event: string, ...__args: any[]) => {
         let [, subtype, , sourceGUID, , , , , , , , spellID] = CombatLogGetCurrentEventInfo();
-        let me = Ovale.playerGUID;
+        let me = this.ovale.playerGUID;
         if (sourceGUID == me) {
             if (subtype == "SPELL_CAST_SUCCESS" && SOUL_FRAGMENT_SPELLS[spellID]) {
                 this.AddPredictedSoulFragments(GetTime(), SOUL_FRAGMENT_SPELLS[spellID]);
@@ -73,21 +71,8 @@ class OvaleDemonHunterSoulFragmentsClass extends OvaleDemonHunterSoulFragmentsBa
         return stacks;
     }
     GetSoulFragmentsBuffStacks(atTime: number) {
-        let aura = OvaleAura.GetAura("player", SOUL_FRAGMENTS_BUFF_ID, atTime, "HELPFUL", true);
-        let stacks = OvaleAura.IsActiveAura(aura, atTime) && aura.stacks || 0;
+        let aura = this.ovaleAura.GetAura("player", SOUL_FRAGMENTS_BUFF_ID, atTime, "HELPFUL", true);
+        let stacks = this.ovaleAura.IsActiveAura(aura, atTime) && aura.stacks || 0;
         return stacks;
     }
 }
-
-class DemonHunterSoulFragmentsState implements StateModule {
-    CleanState(): void {
-    }
-    InitializeState(): void {
-    }
-    ResetState(): void {
-    }
-}
-
-OvaleDemonHunterSoulFragments = new OvaleDemonHunterSoulFragmentsClass();
-export const demonHunterSoulFragmentsState = new DemonHunterSoulFragmentsState();
-OvaleState.RegisterState(demonHunterSoulFragmentsState);

@@ -1,13 +1,10 @@
-import { OvaleDebug } from "./Debug";
-import { Ovale } from "./Ovale";
-import aceEvent from "@wowts/ace_event-3.0";
+import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { LuaObj, LuaArray, pairs, tostring, lualength, ipairs } from "@wowts/lua";
 import { sort, insert, concat } from "@wowts/table";
 import { C_AzeriteEssence } from "@wowts/wow-mock";
-
-let tsort = sort;
-let tinsert = insert;
-let tconcat = concat;
+import { OvaleClass } from "./Ovale";
+import { AceModule } from "@wowts/tsaddon";
+import { OvaleDebugClass, Tracer } from "./Debug";
 
 interface Essence {
     name?: string;
@@ -16,12 +13,11 @@ interface Essence {
     slot: number,
 }
 
-let OvaleAzeriteEssenceBase = OvaleDebug.RegisterDebugging(Ovale.NewModule("OvaleAzeriteEssence", aceEvent));
 
-class OvaleAzeriteEssenceClass extends OvaleAzeriteEssenceBase {
+export class OvaleAzeriteEssenceClass {
     self_essences: LuaObj<Essence> = {}
 
-    debugOptions = {
+    private debugOptions = {
         azeraitessences: {
             name: "Azerite essences",
             type: "group",
@@ -37,29 +33,33 @@ class OvaleAzeriteEssenceClass extends OvaleAzeriteEssenceBase {
                 }
             }
         }
-    }
+    };
 
-    constructor() {
-        super();
+    private module: AceModule & AceEvent;
+    private tracer: Tracer;
+
+    constructor(ovale: OvaleClass, ovaleDebug: OvaleDebugClass) {
+        this.module = ovale.createModule("OvaleAzeriteEssence", this.OnInitialize, this.OnDisable, aceEvent);
+        this.tracer = ovaleDebug.create("OvaleAzeriteEssence");
         for (const [k, v] of pairs(this.debugOptions)) {
-            OvaleDebug.options.args[k] = v;
+            ovaleDebug.defaultOptions.args[k] = v;
         }
     }
     
-    OnInitialize() {
-        this.RegisterEvent("AZERITE_ESSENCE_CHANGED", "UpdateEssences")
-        this.RegisterEvent("AZERITE_ESSENCE_UPDATE", "UpdateEssences")
-        this.RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateEssences")
+    private OnInitialize = () => {
+        this.module.RegisterEvent("AZERITE_ESSENCE_CHANGED", this.UpdateEssences);
+        this.module.RegisterEvent("AZERITE_ESSENCE_UPDATE", this.UpdateEssences);
+        this.module.RegisterEvent("PLAYER_ENTERING_WORLD", this.UpdateEssences);
     }
     
-    OnDisable() {
-        this.UnregisterEvent("AZERITE_ESSENCE_CHANGED")
-        this.UnregisterEvent("AZERITE_ESSENCE_UPDATE")
-        this.UnregisterEvent("PLAYER_ENTERING_WORLD")
+    private OnDisable = () => {
+        this.module.UnregisterEvent("AZERITE_ESSENCE_CHANGED");
+        this.module.UnregisterEvent("AZERITE_ESSENCE_UPDATE");
+        this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
     }
     
-    UpdateEssences(e: string) {
-        this.Debug("UpdateEssences after event %s", e);
+    private UpdateEssences = (e: string) => {
+        this.tracer.Debug("UpdateEssences after event %s", e);
         this.self_essences = {};
         for(const [,mileStoneInfo] of pairs(C_AzeriteEssence.GetMilestones() || {})) {
             if(mileStoneInfo.ID && mileStoneInfo.unlocked && mileStoneInfo.slot !== undefined) {
@@ -74,7 +74,7 @@ class OvaleAzeriteEssenceClass extends OvaleAzeriteEssenceBase {
                         slot: mileStoneInfo.slot,
                     }
                     this.self_essences[essenceId] = essenceData;
-                    this.Debug("Found essence {ID: %d, name: %s, rank: %d, slot: %d}", essenceData.ID, essenceData.name, essenceData.rank, essenceData.slot);
+                    this.tracer.Debug("Found essence {ID: %d, name: %s, rank: %d, slot: %d}", essenceData.ID, essenceData.name, essenceData.rank, essenceData.slot);
                 }
             }
         }
@@ -102,13 +102,12 @@ class OvaleAzeriteEssenceClass extends OvaleAzeriteEssenceBase {
         let output: LuaArray<string> = {};
         let array: LuaArray<string> = {}
         for (const [k, v] of pairs(this.self_essences)) {
-            tinsert(array, `${tostring(v.name)}: ${tostring(k)} (slot:${v.slot} | rank:${v.rank})`);
+            insert(array, `${tostring(v.name)}: ${tostring(k)} (slot:${v.slot} | rank:${v.rank})`);
         }
-        tsort(array);
+        sort(array);
         for (const [, v] of ipairs(array)) {
             output[lualength(output) + 1] = v;
         }
-        return tconcat(output, "\n");
+        return concat(output, "\n");
     }
 }
-export const OvaleAzeriteEssence = new OvaleAzeriteEssenceClass();
