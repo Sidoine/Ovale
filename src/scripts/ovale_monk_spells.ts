@@ -410,7 +410,7 @@ Define(essence_font 191837)
 Define(essence_font_buff 191837)
 	SpellInfo(essence_font_buff duration=8 tick=2 haste=spell)
 
-
+Define(expel_harm 115072)
 	SpellInfo(expel_harm energy=15 specialization=brewmaster unusable=1)
 	SpellRequire(expel_harm unusable 0=spellcount_min,1,debuff,!healing_immunity_debuff)
 
