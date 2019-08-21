@@ -44,7 +44,7 @@ export class OvaleSimulationCraftClass {
         private ovale: OvaleClass) {
         this.registerOptions();
         this.module = ovale.createModule("OvaleSimulationCraft", this.OnInitialize, this.handleDisable);
-        this.tracer = ovaleDebug.create("")
+        this.tracer = ovaleDebug.create("SimulationCraft")
     }
 
     public AddSymbol(annotation: Annotation, symbol: string) {

@@ -47,6 +47,7 @@ local min = math.min
 local __AST = LibStub:GetLibrary("ovale/AST")
 local isNodeType = __AST.isNodeType
 local lower = string.lower
+local upper = string.upper
 local __Ovale = LibStub:GetLibrary("ovale/Ovale")
 local Print = __Ovale.Print
 local INFINITY = huge
@@ -313,7 +314,7 @@ __exports.OvaleConditions = __class(nil, {
         end
         self.AzeriteEssenceRank = function(positionalParams, namedParams, atTime)
             local essenceId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
-            local value = self.OvaleAzeriteEssence.self_essences[essenceId] and self.OvaleAzeriteEssence.self_essences[essenceId].rank
+            local value = self.OvaleAzeriteEssence:EssenceRank(essenceId)
             return Compare(value, comparator, limit)
         end
         self.BaseDuration = function(positionalParams, namedParams, atTime)
@@ -624,8 +625,13 @@ __exports.OvaleConditions = __class(nil, {
         self.Class = function(positionalParams, namedParams, atTime)
             local className, yesno = positionalParams[1], positionalParams[2]
             local target = self:ParseCondition(positionalParams, namedParams)
-            local _, classToken = UnitClass(target)
-            local boolean = (classToken == className)
+            local classToken
+            if target == "player" then
+                classToken = self.OvalePaperDoll.class
+            else
+                _, classToken = UnitClass(target)
+            end
+            local boolean = (classToken == upper(className))
             return TestBoolean(boolean, yesno)
         end
         self.Classification = function(positionalParams, namedParams, atTime)

@@ -10,7 +10,7 @@ import { GetBuildInfo, GetItemCooldown, GetItemCount, GetNumTrackingTypes, GetTi
 import { huge, min } from "@wowts/math";
 import { PositionalParameters, NamedParameters, isNodeType } from "./AST";
 import { OvaleSpellsClass } from "./Spells";
-import { lower } from "@wowts/string";
+import { lower, upper } from "@wowts/string";
 import { OvaleClass, Print } from "./Ovale";
 import { OvaleArtifactClass } from "./Artifact";
 import { OvaleAzeriteArmor } from "./AzeriteArmor";
@@ -175,7 +175,7 @@ export class OvaleConditions {
     }
     private AzeriteEssenceRank = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
         const [essenceId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
-        const value = this.OvaleAzeriteEssence.self_essences[essenceId] && this.OvaleAzeriteEssence.self_essences[essenceId].rank;
+        const value = this.OvaleAzeriteEssence.EssenceRank(essenceId);
         return Compare(value, comparator, limit);
     }
 
@@ -898,12 +898,17 @@ export class OvaleConditions {
     private Class = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
         let [className, yesno] = [positionalParams[1], positionalParams[2]];
         let [target] = this.ParseCondition(positionalParams, namedParams);
-        let [, classToken] = UnitClass(target);
-        let boolean = (classToken == className);
+        
+        let classToken;
+        if (target == "player") {
+            classToken = this.OvalePaperDoll.class;
+        } else {
+            [, classToken] = UnitClass(target);
+        }
+        let boolean = (classToken == upper(className));
         return TestBoolean(boolean, yesno);
     }
 
-    
     /** Test whether the target's classification matches the given classification.
 	 @name Classification
 	 @paramsig boolean

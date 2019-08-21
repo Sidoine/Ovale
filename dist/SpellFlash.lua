@@ -120,7 +120,7 @@ __exports.OvaleSpellFlashClass = __class(nil, {
             colorInterrupt.b = db.colorInterrupt.b
         end
         self.module = ovale:createModule("OvaleSpellFlash", self.OnInitialize, self.OnDisable, aceEvent)
-        self.ovaleOptions.options.args.apparence.spellFlash = self:getSpellFlashOptions()
+        self.ovaleOptions.options.args.apparence.args.spellFlash = self:getSpellFlashOptions()
     end,
     getSpellFlashOptions = function(self)
         return {

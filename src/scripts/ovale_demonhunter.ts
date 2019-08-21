@@ -116,8 +116,6 @@ AddFunction HavocPrecombatCdActions
  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_focused_resolve usable=1)
  #metamorphosis,if=!azerite.chaotic_transformation.enabled
  if not HasAzeriteTrait(chaotic_transformation_trait) and { not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight() } Spell(metamorphosis_havoc)
- #use_item,name=azsharas_font_of_power
- HavocUseItemActions()
 }
 
 AddFunction HavocPrecombatCdPostConditions
@@ -219,16 +217,14 @@ AddFunction HavocEssencesShortCdActions
 {
  unless Spell(concentrated_flame_essence)
  {
-  #focused_azerite_beam,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
-  if Enemies() >= 2 or 600 > 60 Spell(focused_azerite_beam)
-  #purifying_blast,if=spell_targets.blade_dance1>=2|raid_event.adds.in>60
-  if Enemies() >= 2 or 600 > 60 Spell(purifying_blast)
-  #the_unbound_force,if=buff.reckless_force.up|buff.reckless_force_counter.stack<10
-  if BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 Spell(the_unbound_force)
+  #purifying_blast
+  Spell(purifying_blast)
+  #the_unbound_force
+  Spell(the_unbound_force)
   #ripple_in_space
   Spell(ripple_in_space_essence)
-  #worldvein_resonance,if=buff.lifeblood.stack<3
-  if BuffStacks(lifeblood_buff) < 3 Spell(worldvein_resonance_essence)
+  #worldvein_resonance
+  Spell(worldvein_resonance_essence)
  }
 }
 
@@ -241,12 +237,14 @@ AddFunction HavocEssencesCdActions
 {
  unless Spell(concentrated_flame_essence)
  {
-  #blood_of_the_enemy,if=buff.metamorphosis.up|target.time_to_die<=10
-  if BuffPresent(metamorphosis_havoc_buff) or target.TimeToDie() <= 10 Spell(blood_of_the_enemy)
-  #guardian_of_azeroth,if=buff.metamorphosis.up|target.time_to_die<=30
-  if BuffPresent(metamorphosis_havoc_buff) or target.TimeToDie() <= 30 Spell(guardian_of_azeroth)
+  #blood_of_the_enemy
+  Spell(blood_of_the_enemy)
+  #guardian_of_azeroth
+  Spell(guardian_of_azeroth)
+  #focused_azerite_beam
+  Spell(focused_azerite_beam)
 
-  unless { Enemies() >= 2 or 600 > 60 } and Spell(focused_azerite_beam) or { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 } and Spell(the_unbound_force) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
+  unless Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
   {
    #memory_of_lucid_dreams,if=fury<40&buff.metamorphosis.up
    if Fury() < 40 and BuffPresent(metamorphosis_havoc_buff) Spell(memory_of_lucid_dreams_essence)
@@ -256,7 +254,7 @@ AddFunction HavocEssencesCdActions
 
 AddFunction HavocEssencesCdPostConditions
 {
- Spell(concentrated_flame_essence) or { Enemies() >= 2 or 600 > 60 } and Spell(focused_azerite_beam) or { Enemies() >= 2 or 600 > 60 } and Spell(purifying_blast) or { BuffPresent(reckless_force_buff) or BuffStacks(reckless_force_counter) < 10 } and Spell(the_unbound_force) or Spell(ripple_in_space_essence) or BuffStacks(lifeblood_buff) < 3 and Spell(worldvein_resonance_essence)
+ Spell(concentrated_flame_essence) or Spell(purifying_blast) or Spell(the_unbound_force) or Spell(ripple_in_space_essence) or Spell(worldvein_resonance_essence)
 }
 
 ### actions.demonic
@@ -380,24 +378,16 @@ AddFunction HavocCooldownCdActions
 {
  #metamorphosis,if=!(talent.demonic.enabled|variable.pooling_for_meta|variable.waiting_for_nemesis)|target.time_to_die<25
  if { not { Talent(demonic_talent) or pooling_for_meta() or waiting_for_nemesis() } or target.TimeToDie() < 25 } and { not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight() } Spell(metamorphosis_havoc)
- #metamorphosis,if=talent.demonic.enabled&(!azerite.chaotic_transformation.enabled|(cooldown.eye_beam.remains>20&(!variable.blade_dance|cooldown.blade_dance.remains>gcd.max)))
- if Talent(demonic_talent) and { not HasAzeriteTrait(chaotic_transformation_trait) or SpellCooldown(eye_beam) > 20 and { not blade_dance() or SpellCooldown(blade_dance) > GCD() } } and { not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight() } Spell(metamorphosis_havoc)
+ #metamorphosis,if=talent.demonic.enabled&(!azerite.chaotic_transformation.enabled|(cooldown.eye_beam.remains>20&cooldown.blade_dance.remains>gcd.max))
+ if Talent(demonic_talent) and { not HasAzeriteTrait(chaotic_transformation_trait) or SpellCooldown(eye_beam) > 20 and SpellCooldown(blade_dance) > GCD() } and { not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight() } Spell(metamorphosis_havoc)
  #nemesis,target_if=min:target.time_to_die,if=raid_event.adds.exists&debuff.nemesis.down&(active_enemies>desired_targets|raid_event.adds.in>60)
  if False(raid_event_adds_exists) and target.DebuffExpires(nemesis_debuff) and { Enemies() > Enemies(tagged=1) or 600 > 60 } Spell(nemesis)
  #nemesis,if=!raid_event.adds.exists
  if not False(raid_event_adds_exists) Spell(nemesis)
  #potion,if=buff.metamorphosis.remains>25|target.time_to_die<60
  if { BuffRemaining(metamorphosis_havoc_buff) > 25 or target.TimeToDie() < 60 } and CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_focused_resolve usable=1)
- #use_item,name=galecallers_boon,if=!talent.fel_barrage.enabled|cooldown.fel_barrage.ready
- if not Talent(fel_barrage_talent) or SpellCooldown(fel_barrage) == 0 HavocUseItemActions()
- #use_item,effect_name=cyclotronic_blast,if=buff.metamorphosis.up&buff.memory_of_lucid_dreams.down&(!variable.blade_dance|!cooldown.blade_dance.ready)
- if BuffPresent(metamorphosis_havoc_buff) and BuffExpires(memory_of_lucid_dreams_essence_buff) and { not blade_dance() or not SpellCooldown(blade_dance) == 0 } HavocUseItemActions()
- #use_item,name=ashvanes_razor_coral,if=debuff.razor_coral_debuff.down|(debuff.conductive_ink_debuff.up|buff.metamorphosis.remains>20)&target.health.pct<31|target.time_to_die<20
- if target.DebuffExpires(razor_coral) or { target.DebuffPresent(conductive_ink) or BuffRemaining(metamorphosis_havoc_buff) > 20 } and target.HealthPercent() < 31 or target.TimeToDie() < 20 HavocUseItemActions()
- #use_item,name=azsharas_font_of_power,if=cooldown.metamorphosis.remains<10|cooldown.metamorphosis.remains>60
- if SpellCooldown(metamorphosis_havoc) < 10 or SpellCooldown(metamorphosis_havoc) > 60 HavocUseItemActions()
- #use_items,if=buff.metamorphosis.up
- if BuffPresent(metamorphosis_havoc_buff) HavocUseItemActions()
+ #use_item,name=variable_intensity_gigavolt_oscillating_reactor
+ HavocUseItemActions()
  #call_action_list,name=essences
  HavocEssencesCdActions()
 }
@@ -576,7 +566,6 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # chaos_strike
 # chaotic_transformation_trait
 # concentrated_flame_essence
-# conductive_ink
 # dark_slash
 # dark_slash_debuff
 # dark_slash_talent
@@ -587,7 +576,6 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # disrupt
 # eye_beam
 # fel_barrage
-# fel_barrage_talent
 # fel_eruption
 # fel_mastery_talent
 # fel_rush
@@ -598,9 +586,7 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # immolation_aura_havoc
 # imprison
 # item_focused_resolve
-# lifeblood_buff
 # memory_of_lucid_dreams_essence
-# memory_of_lucid_dreams_essence_buff
 # metamorphosis_havoc
 # metamorphosis_havoc_buff
 # momentum_buff
@@ -611,9 +597,6 @@ AddIcon checkbox=opt_demonhunter_havoc_aoe help=cd specialization=havoc
 # pick_up_fragment
 # prepared_buff
 # purifying_blast
-# razor_coral
-# reckless_force_buff
-# reckless_force_counter
 # revolving_blades_trait
 # ripple_in_space_essence
 # the_unbound_force
@@ -655,12 +638,6 @@ AddFunction VengeanceInterruptActions
  }
 }
 
-AddFunction VengeanceUseItemActions
-{
- Item(Trinket0Slot text=13 usable=1)
- Item(Trinket1Slot text=14 usable=1)
-}
-
 AddFunction VengeanceGetInMeleeRange
 {
  if CheckBoxOn(opt_melee_range) and not target.InRange(shear) Texture(misc_arrowlup help=L(not_in_melee_range))
@@ -692,8 +669,6 @@ AddFunction VengeancePrecombatCdActions
  #snapshot_stats
  #potion
  if CheckBoxOn(opt_use_consumables) and target.Classification(worldboss) Item(item_steelskin_potion usable=1)
- #use_item,name=azsharas_font_of_power
- VengeanceUseItemActions()
 }
 
 AddFunction VengeancePrecombatCdPostConditions

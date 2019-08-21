@@ -9,18 +9,6 @@ export function registerWarriorSpells(OvaleScripts: OvaleScriptsClass) {
 # Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
   SpellAddBuff(ancestral_call ancestral_call=1)
-Define(anima_of_death_0 294926)
-# Draw upon your vitality to sear your foes, dealing s2 of your maximum health in Fire damage to all nearby enemies and heal for 294946s1 of your maximum health per enemy hit, up to ?a294945[294945s1*2][294945s1] of your maximum health.
-  SpellInfo(anima_of_death_0 cd=150)
-Define(anima_of_death_1 294946)
-# Heal for s1 of your maximum health.
-  SpellInfo(anima_of_death_1 gcd=0 offgcd=1)
-Define(anima_of_death_2 300002)
-# Draw upon your vitality to sear your foes, dealing s2 of your maximum health in Fire damage to all nearby enemies and heal for 294946s1 of your maximum health per enemy hit, up to 294945s1 of your maximum health.
-  SpellInfo(anima_of_death_2 cd=120 gcd=1)
-Define(anima_of_death_3 300003)
-# Draw upon your vitality to sear your foes, dealing s2 of your maximum health in Fire damage to all nearby enemies and heal for 294946s1+294945s2 of your maximum health per enemy hit, up to 294945s1*2 of your maximum health.
-  SpellInfo(anima_of_death_3 cd=120 gcd=1)
 Define(avatar 107574)
 # Transform into a colossus for 20 seconds, causing you to deal s1 increased damage and removing all roots and snares.rnrn|cFFFFFFFFGenerates s5/10 Rage.|r
   SpellInfo(avatar cd=90 duration=20 rage=-20 talent=avatar_talent)
@@ -56,11 +44,6 @@ Define(blood_of_the_enemy_5 298277)
 Define(blood_of_the_enemy_6 299039)
 # Infuse your Heart of Azeroth with Blood of the Enemy.
   SpellInfo(blood_of_the_enemy_6)
-Define(bloodlust 2825)
-# Increases Haste by (25 of Spell Power) for all party and raid members for 40 seconds.rnrnAllies receiving this effect will become Sated and unable to benefit from Bloodlust or Time Warp again for 600 seconds.
-  SpellInfo(bloodlust cd=300 duration=40 channel=40 gcd=0 offgcd=1)
-  # Haste increased by s1.
-  SpellAddBuff(bloodlust bloodlust=1)
 Define(bloodthirst 23881)
 # Assault the target in a bloodthirsty craze, dealing s*<mult> Physical damage and restoring 117313s1 of your health.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
   SpellInfo(bloodthirst cd=4.5 rage=-8)
@@ -112,14 +95,24 @@ Define(fireblood_1 265226)
   SpellInfo(fireblood_1 duration=8 max_stacks=6 gcd=0 offgcd=1)
   # Increases ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by w1.
   SpellAddBuff(fireblood_1 fireblood_1=1)
-Define(focused_azerite_beam_0 299336)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+Define(focused_azerite_beam_0 295258)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam_0 cd=90 duration=3 channel=3 tick=0.33)
-
-Define(focused_azerite_beam_1 299338)
+  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_1=1)
+Define(focused_azerite_beam_1 295261)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
+  SpellInfo(focused_azerite_beam_1 cd=90)
+Define(focused_azerite_beam_2 299336)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+  SpellInfo(focused_azerite_beam_2 cd=90 duration=3 channel=3 tick=0.33)
+  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_1=1)
+Define(focused_azerite_beam_3 299338)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds. Castable while moving.
-  SpellInfo(focused_azerite_beam_1 cd=90 duration=3 channel=3 tick=0.33)
-
+  SpellInfo(focused_azerite_beam_3 cd=90 duration=3 channel=3 tick=0.33)
+  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_1=1)
 Define(furious_slash 100130)
 # Aggressively strike with your off-hand weapon for s1*<mult> Physical damage, and increases your Haste by 202539s3 for 15 seconds, stacking up to 202539u times.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
   SpellInfo(furious_slash rage=-4 talent=furious_slash_talent)
@@ -173,11 +166,6 @@ Define(intimidating_shout 5246)
   SpellInfo(intimidating_shout cd=90 duration=8)
   # Disoriented.
   SpellAddTargetDebuff(intimidating_shout intimidating_shout=1)
-Define(last_stand 12975)
-# Increases maximum health by s1 for 15 seconds, and instantly heals you for that amount.
-  SpellInfo(last_stand cd=180 duration=15 gcd=0 offgcd=1)
-  # Maximum health increased by s1.
-  SpellAddBuff(last_stand last_stand=1)
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
@@ -239,26 +227,6 @@ Define(ravager_protection 228920)
   SpellInfo(ravager_protection cd=60 duration=7 tick=1 talent=ravager_talent_protection)
   # ?s23922[Chance to Parry increased by s1.][Ravager is currently active.]
   SpellAddBuff(ravager_protection ravager_protection=1)
-Define(razor_coral_0 303564)
-# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]
-  SpellInfo(razor_coral_0 cd=20 channel=0 gcd=0 offgcd=1)
-Define(razor_coral_1 303565)
-# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
-  SpellInfo(razor_coral_1 duration=120 max_stacks=100 gcd=0 offgcd=1)
-  SpellAddBuff(razor_coral_1 razor_coral_1=1)
-Define(razor_coral_2 303568)
-# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
-  SpellInfo(razor_coral_2 duration=120 max_stacks=100 gcd=0 offgcd=1)
-  # Withdrawing the Razor Coral will grant w1 Critical Strike.
-  SpellAddTargetDebuff(razor_coral_2 razor_coral_2=1)
-Define(razor_coral_3 303570)
-# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
-  SpellInfo(razor_coral_3 duration=20 channel=20 max_stacks=100 gcd=0 offgcd=1)
-  # Critical Strike increased by w1.
-  SpellAddBuff(razor_coral_3 razor_coral_3=1)
-Define(razor_coral_4 303572)
-# ?a303565[Remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.][Deal 304877s1*(1+@versadmg) Physical damage and apply Razor Coral to your target, giving your damaging abilities against the target a high chance to deal 304877s1*(1+@versadmg) Physical damage and add a stack of Razor Coral.rnrnReactivating this ability will remove Razor Coral from your target, granting you 303573s1 Critical Strike per stack for 20 seconds.]rn
-  SpellInfo(razor_coral_4 channel=0 gcd=0 offgcd=1)
 Define(reckless_force_buff_0 298409)
 # When an ability fails to critically strike, you have a high chance to gain Reckless Force. When Reckless Force reaches 302917u stacks, your critical strike is increased by 302932s1 for 3 seconds.
   SpellInfo(reckless_force_buff_0 max_stacks=5 gcd=0 offgcd=1 tick=10)
@@ -381,14 +349,12 @@ Define(whirlwind_fury 190411)
   SpellAddBuff(whirlwind_fury whirlwind_buff_1=1)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3 blood_of_the_enemy_4 blood_of_the_enemy_5 blood_of_the_enemy_6)
 SpellList(fireblood fireblood_0 fireblood_1)
-SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1)
+SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
 SpellList(reckless_force_buff reckless_force_buff_0 reckless_force_buff_1)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3 the_unbound_force_4 the_unbound_force_5 the_unbound_force_6 the_unbound_force_7)
 SpellList(whirlwind_buff whirlwind_buff_0 whirlwind_buff_1 whirlwind_buff_2)
-SpellList(anima_of_death anima_of_death_0 anima_of_death_1 anima_of_death_2 anima_of_death_3)
-SpellList(razor_coral razor_coral_0 razor_coral_1 razor_coral_2 razor_coral_3 razor_coral_4)
 Define(anger_management_talent 19) #21204
 # Every ?c1[s1]?c2[s3][s2] Rage you spend reduces the remaining cooldown on ?c1&s262161[Warbreaker and Bladestorm]?c1[Colossus Smash and Bladestorm]?c2[Recklessness][Avatar, Last Stand, Shield Wall, and Demoralizing Shout] by 1 sec.
 Define(avatar_talent 17) #22397
@@ -436,6 +402,8 @@ Define(warbreaker_talent 14) #22391
 Define(seismic_wave_trait 277639)
 Define(test_of_might_trait 275529)
 Define(cold_steel_hot_blood_trait 288080)
+Define(brace_for_impact_trait 277636)
+Define(deafening_crash_trait 272824)
     `;
 // END
     code += `
@@ -578,7 +546,7 @@ Define(in_for_the_kill_buff 248622)
 	SpellAddTargetBuff(intercept safeguard_buff=1)
 	SpellRequire(intercept unusable 1=lossofcontrol,root)
 Define(into_the_fray_buff 202602)
-
+Define(last_stand 12975)
 	SpellInfo(last_stand cd=180)
 	SpellInfo(last_stand add_cd=-60 talent=bolster_talent)
 	SpellAddBuff(last_stand last_stand_buff=1)

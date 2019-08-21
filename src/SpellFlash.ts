@@ -92,7 +92,7 @@ export class OvaleSpellFlashClass {
 
     constructor(private ovaleOptions: OvaleOptionsClass, ovale: OvaleClass, private ovaleFuture: OvaleFutureClass, private ovaleData: OvaleDataClass, private ovaleSpellBook: OvaleSpellBookClass, private ovaleStance: OvaleStanceClass) {
         this.module = ovale.createModule("OvaleSpellFlash", this.OnInitialize, this.OnDisable, aceEvent);
-        this.ovaleOptions.options.args.apparence.spellFlash = this.getSpellFlashOptions();
+        this.ovaleOptions.options.args.apparence.args.spellFlash = this.getSpellFlashOptions();
     }
 
     private getSpellFlashOptions() {

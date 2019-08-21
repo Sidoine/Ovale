@@ -82,9 +82,6 @@ Define(energizing_elixir 115288)
   SpellInfo(energizing_elixir cd=60 duration=5 max_stacks=3 gcd=1 chi=-2 talent=energizing_elixir_talent)
   # Generating w1/5 extra Energy per sec.
   SpellAddBuff(energizing_elixir energizing_elixir=1)
-Define(expel_harm 115072)
-# Draw in the positive chi of all your Healing Spheres, and expel negative chi, damaging the nearest enemy for s2 of the amount healed.
-  SpellInfo(expel_harm energy=15 gcd=1)
 Define(fireblood_0 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood_0 cd=120 gcd=0 offgcd=1)
@@ -106,21 +103,27 @@ Define(flying_serpent_kick 101545)
 # Soar forward through the air at high speed for 1.5 seconds.rn rnIf used again while active, you will land, dealing 123586m1 damage to all enemies within 123586A1 yards and reducing movement speed by 123586m2 for 4 seconds.
   SpellInfo(flying_serpent_kick cd=25 duration=1.5 gcd=1)
   SpellAddBuff(flying_serpent_kick flying_serpent_kick=1)
-Define(focused_azerite_beam_0 299336)
-# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+Define(focused_azerite_beam_0 295258)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
   SpellInfo(focused_azerite_beam_0 cd=90 duration=3 channel=3 tick=0.33)
-
-Define(focused_azerite_beam_1 299338)
+  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_0 focused_azerite_beam_1=1)
+Define(focused_azerite_beam_1 295261)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.?a295263[ Castable while moving.][]
+  SpellInfo(focused_azerite_beam_1 cd=90)
+Define(focused_azerite_beam_2 299336)
+# Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds.
+  SpellInfo(focused_azerite_beam_2 cd=90 duration=3 channel=3 tick=0.33)
+  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_2 focused_azerite_beam_1=1)
+Define(focused_azerite_beam_3 299338)
 # Focus excess Azerite energy into the Heart of Azeroth, then expel that energy outward, dealing m1*10 Fire damage to all enemies in front of you over 3 seconds. Castable while moving.
-  SpellInfo(focused_azerite_beam_1 cd=90 duration=3 channel=3 tick=0.33)
-
+  SpellInfo(focused_azerite_beam_3 cd=90 duration=3 channel=3 tick=0.33)
+  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_0=1)
+  SpellAddBuff(focused_azerite_beam_3 focused_azerite_beam_1=1)
 Define(fortifying_brew 115203)
 # Turns your skin to stone for 15 seconds, increasing your current and maximum health by <health>, increasing the effectiveness of Stagger by s1, and reducing all damage you take by <damage>.
   SpellInfo(fortifying_brew cd=420 gcd=0 offgcd=1)
-Define(gift_of_the_ox 124502)
-# When you take damage, you have a chance to summon a Healing Sphere visible only to you. Moving through this Healing Sphere heals you for 124507s1.
-  SpellInfo(gift_of_the_ox channel=0 gcd=0 offgcd=1)
-  SpellAddBuff(gift_of_the_ox gift_of_the_ox=1)
 Define(guardian_of_azeroth_0 295840)
 # Call upon Azeroth to summon a Guardian of Azeroth for 30 seconds who impales your target with spikes of Azerite every 2 sec that deal 295834m1*(1+@versadmg) Fire damage.?a295841[ Every 303347t1 sec, the Guardian launches a volley of Azerite Spikes at its target, dealing 295841s1 Fire damage to all nearby enemies.][]?a295843[rnrnEach time the Guardian of Azeroth casts a spell, you gain 295855s1 Haste, stacking up to 295855u times. This effect ends when the Guardian of Azeroth despawns.][]rn
   SpellInfo(guardian_of_azeroth_0 cd=180 duration=30)
@@ -294,7 +297,7 @@ Define(whirling_dragon_punch 152175)
   SpellAddBuff(whirling_dragon_punch whirling_dragon_punch=1)
 SpellList(fireblood fireblood_0 fireblood_1)
 SpellList(blood_of_the_enemy blood_of_the_enemy_0 blood_of_the_enemy_1 blood_of_the_enemy_2 blood_of_the_enemy_3 blood_of_the_enemy_4 blood_of_the_enemy_5 blood_of_the_enemy_6)
-SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1)
+SpellList(focused_azerite_beam focused_azerite_beam_0 focused_azerite_beam_1 focused_azerite_beam_2 focused_azerite_beam_3)
 SpellList(guardian_of_azeroth guardian_of_azeroth_0 guardian_of_azeroth_1 guardian_of_azeroth_2 guardian_of_azeroth_3 guardian_of_azeroth_4 guardian_of_azeroth_5)
 SpellList(purifying_blast purifying_blast_0 purifying_blast_1 purifying_blast_2 purifying_blast_3 purifying_blast_4 purifying_blast_5)
 SpellList(the_unbound_force the_unbound_force_0 the_unbound_force_1 the_unbound_force_2 the_unbound_force_3 the_unbound_force_4 the_unbound_force_5 the_unbound_force_6 the_unbound_force_7)
@@ -404,7 +407,7 @@ Define(essence_font 191837)
 Define(essence_font_buff 191837)
 	SpellInfo(essence_font_buff duration=8 tick=2 haste=spell)
 
-
+Define(expel_harm 115072)
 	SpellInfo(expel_harm energy=15 specialization=brewmaster unusable=1)
 	SpellRequire(expel_harm unusable 0=spellcount_min,1,debuff,!healing_immunity_debuff)
 
@@ -484,7 +487,6 @@ Define(provoke 115546)
 SpellInfo(purifying_brew charges=3 cd_haste=melee)
 SpellInfo(purifying_brew add_cd=-3 charges=4 talent=light_brewing_talent)
 SpellInfo(purifying_brew unusable=1)
-SpellAddBuff(purifying_brew blackout_combo_buff=0)
 SpellRequire(purifying_brew unusable 0=debuff,any_stagger_debuff)
 
 Define(reawaken 212051)
@@ -567,7 +569,7 @@ Define(thunder_focus_tea 116680)
 SpellInfo(tiger_palm energy=50 specialization=windwalker)
 SpellInfo(tiger_palm energy=25 specialization=brewmaster)
 SpellAddBuff(tiger_palm teachings_of_the_monastery_buff=1 specialization=mistweaver)
-SpellAddBuff(tiger_palm blackout_combo_buff=0 specialization=windwalker)
+SpellAddBuff(tiger_palm blackout_combo_buff=0)
 SpellAddTargetDebuff(tiger_palm eye_of_the_tiger_debuff=1 specialization=!mistweaver talent=eye_of_the_tiger_talent)
 SpellAddTargetDebuff(tiger_palm mark_of_the_crane_debuff=1 specialization=windwalker)
 
