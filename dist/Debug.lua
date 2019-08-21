@@ -14,7 +14,6 @@ local pairs = pairs
 local GetTime = GetTime
 local DEFAULT_CHAT_FRAME = DEFAULT_CHAT_FRAME
 local self_traced = false
-local self_traceLog = nil
 local OVALE_TRACELOG_MAXLINES = 4096
 __exports.Tracer = __class(nil, {
     constructor = function(self, options, debug, name)
@@ -43,11 +42,11 @@ __exports.Tracer = __class(nil, {
     end,
     Log = function(self, ...)
         if self.debug.trace then
-            local N = self_traceLog:Lines()
+            local N = self.debug.traceLog:Lines()
             if N < OVALE_TRACELOG_MAXLINES - 1 then
-                self_traceLog:AddLine(MakeString(...))
+                self.debug.traceLog:AddLine(MakeString(...))
             elseif N == OVALE_TRACELOG_MAXLINES - 1 then
-                self_traceLog:AddLine("WARNING: Maximum length of trace log has been reached.")
+                self.debug.traceLog:AddLine("WARNING: Maximum length of trace log has been reached.")
             end
         end
     end,
@@ -117,8 +116,17 @@ __exports.OvaleDebugClass = __class(nil, {
                 }
             }
         }
+        self.traceLog = nil
         self.trace = false
-        self.module = (ovale:NewModule("OvaleDebug", aceTimer))()
+        self.OnInitialize = function()
+            local appName = self.module:GetName()
+            AceConfig:RegisterOptionsTable(appName, self.defaultOptions)
+            AceConfigDialog:AddToBlizOptions(appName, L["Debug"], self.ovale:GetName())
+            self.traceLog = LibTextDump:New(self.ovale:GetName() .. " - " .. L["Trace Log"], 750, 500)
+        end
+        self.OnDisable = function()
+        end
+        self.module = ovale:createModule("OvaleDebug", self.OnInitialize, self.OnDisable, aceTimer)
         local actions = {
             debug = {
                 name = L["Debug"],
@@ -140,18 +148,14 @@ __exports.OvaleDebugClass = __class(nil, {
     create = function(self, name)
         return __exports.Tracer(self.options, self, name)
     end,
-    OnInitialize = function(self)
-        local appName = self.module:GetName()
-        AceConfig:RegisterOptionsTable(appName, self.defaultOptions)
-        AceConfigDialog:AddToBlizOptions(appName, L["Debug"], self.ovale:GetName())
-        self_traceLog = LibTextDump:New(self.ovale:GetName() .. " - " .. L["Trace Log"], 750, 500)
-    end,
     DoTrace = function(self, displayLog)
-        self_traceLog:Clear()
+        self.traceLog:Clear()
         self.trace = true
         DEFAULT_CHAT_FRAME:AddMessage(format("=== Trace @%f", GetTime()))
         if displayLog then
-            self.module:ScheduleTimer("DisplayTraceLog", 0.5)
+            self.module:ScheduleTimer(function()
+                self:DisplayTraceLog()
+            end, 0.5)
         end
     end,
     ResetTrace = function(self)
@@ -172,9 +176,9 @@ __exports.OvaleDebugClass = __class(nil, {
         end
     end,
     DisplayTraceLog = function(self)
-        if self_traceLog:Lines() == 0 then
-            self_traceLog:AddLine("Trace log is empty.")
+        if self.traceLog:Lines() == 0 then
+            self.traceLog:AddLine("Trace log is empty.")
         end
-        self_traceLog:Display()
+        self.traceLog:Display()
     end,
 })
