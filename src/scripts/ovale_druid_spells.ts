@@ -695,7 +695,6 @@ Define(lunar_empowerment_buff 164547)
 
 	SpellInfo(moonfire astralpower=-3 specialization=balance)
 
-	SpellInfo(moonfire_debuff add_duration=6 specialization=balance)
 Define(moonkin_form_balance 24858)
 	SpellInfo(moonkin_form replaced_by=moonkin_form_balance specialization=balance)
 	SpellInfo(moonkin_form_balance to_stance=druid_moonkin_form)

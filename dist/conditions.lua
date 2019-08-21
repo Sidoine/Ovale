@@ -174,7 +174,8 @@ __exports.OvaleConditions = __class(nil, {
         return Compare(0, comparator, limit)
     end,
     PowerCost = function(self, powerType, positionalParams, namedParams, atTime)
-        local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+        local spell, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+        local spellId = self.OvaleSpellBook:getKnownSpellId(spell)
         local target = self:ParseCondition(positionalParams, namedParams, "target")
         local maxCost = (namedParams.max == 1)
         local value = self.OvalePower:PowerCost(spellId, powerType, atTime, target, maxCost) or 0
@@ -1381,7 +1382,8 @@ __exports.OvaleConditions = __class(nil, {
             return TestBoolean(boolean, yesno)
         end
         self.PreviousGCDSpell = function(positionalParams, namedParams, atTime)
-            local spellId, yesno = positionalParams[1], positionalParams[2]
+            local spell, yesno = positionalParams[1], positionalParams[2]
+            local spellId = self.OvaleSpellBook:getKnownSpellId(spell)
             local count = namedParams.count
             local boolean
             if count and count > 1 then
@@ -1392,12 +1394,14 @@ __exports.OvaleConditions = __class(nil, {
             return TestBoolean(boolean, yesno)
         end
         self.PreviousOffGCDSpell = function(positionalParams, namedParams, atTime)
-            local spellId, yesno = positionalParams[1], positionalParams[2]
+            local spell, yesno = positionalParams[1], positionalParams[2]
+            local spellId = self.OvaleSpellBook:getKnownSpellId(spell)
             local boolean = (spellId == self.OvaleFuture.next.lastOffGCDSpellcast.spellId)
             return TestBoolean(boolean, yesno)
         end
         self.PreviousSpell = function(positionalParams, namedParams, atTime)
-            local spellId, yesno = positionalParams[1], positionalParams[2]
+            local spell, yesno = positionalParams[1], positionalParams[2]
+            local spellId = self.OvaleSpellBook:getKnownSpellId(spell)
             local boolean = (spellId == self.OvaleFuture.next.lastGCDSpellId)
             return TestBoolean(boolean, yesno)
         end
@@ -1801,7 +1805,8 @@ __exports.OvaleConditions = __class(nil, {
             return Compare(0, comparator, limit)
         end
         self.TimeSincePreviousSpell = function(positionalParams, namedParams, atTime)
-            local spellId, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+            local spell, comparator, limit = positionalParams[1], positionalParams[2], positionalParams[3]
+            local spellId = self.OvaleSpellBook:getKnownSpellId(spell)
             local t = self.OvaleFuture:TimeOfLastCast(spellId, atTime)
             return TestValue(0, INFINITY, 0, t, 1, comparator, limit)
         end

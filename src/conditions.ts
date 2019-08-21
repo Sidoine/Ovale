@@ -2930,7 +2930,8 @@ l    */
     /**  Return the amount of power of the given power type required to cast the given spell.
 	 */
     private PowerCost(powerType: PowerType, positionalParams: PositionalParameters, namedParams: NamedParameters, atTime: number) {
-        let [spellId, comparator, limit] = [<number>positionalParams[1], <string>positionalParams[2], <number>positionalParams[3]];
+        let [spell, comparator, limit] = [<number>positionalParams[1], <string>positionalParams[2], <number>positionalParams[3]];
+        const spellId = this.OvaleSpellBook.getKnownSpellId(spell);
         let [target] = this.ParseCondition(positionalParams, namedParams, "target");
         let maxCost = (namedParams.max == 1);
         let [value] = this.OvalePower.PowerCost(spellId, powerType, atTime, target, maxCost) || [0];
@@ -3087,7 +3088,8 @@ l    */
 	 @return A boolean value.
      */
     private PreviousGCDSpell = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
-        let [spellId, yesno] = [positionalParams[1], positionalParams[2]];
+        let [spell, yesno] = [positionalParams[1], positionalParams[2]];
+        const spellId = this.OvaleSpellBook.getKnownSpellId(spell);
         let count = namedParams.count;
         let boolean;
         if (count && count > 1) {
@@ -3108,7 +3110,8 @@ l    */
 	 @return A boolean value.
      */
     private PreviousOffGCDSpell = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
-        let [spellId, yesno] = [positionalParams[1], positionalParams[2]];
+        let [spell, yesno] = [positionalParams[1], positionalParams[2]];
+        const spellId = this.OvaleSpellBook.getKnownSpellId(spell);
         let boolean = (spellId == this.OvaleFuture.next.lastOffGCDSpellcast.spellId);
         return TestBoolean(boolean, yesno);
     }
@@ -3123,7 +3126,8 @@ l    */
 	 @return A boolean value.
      */
     private PreviousSpell = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
-        let [spellId, yesno] = [positionalParams[1], positionalParams[2]];
+        let [spell, yesno] = [positionalParams[1], positionalParams[2]];
+        const spellId = this.OvaleSpellBook.getKnownSpellId(spell);
         let boolean = (spellId == this.OvaleFuture.next.lastGCDSpellId);
         return TestBoolean(boolean, yesno);
     }
@@ -4156,7 +4160,8 @@ l    */
 	 if TimeSincePreviousSpell(pestilence) > 28 Spell(pestilence)
      */
     private TimeSincePreviousSpell = (positionalParams: LuaArray<any>, namedParams: LuaObj<any>, atTime: number) => {
-        let [spellId, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
+        let [spell, comparator, limit] = [positionalParams[1], positionalParams[2], positionalParams[3]];
+        const spellId = this.OvaleSpellBook.getKnownSpellId(spell);
         let t = this.OvaleFuture.TimeOfLastCast(spellId, atTime);
         return TestValue(0, INFINITY, 0, t, 1, comparator, limit);
     }
@@ -4285,7 +4290,7 @@ l    */
         let [spellId, comparator, limit] = [<number>positionalParams[1], <string>positionalParams[2], <number>positionalParams[3]];
         let [target] = this.ParseCondition(positionalParams, namedParams, "target");
         if (!powerType) {
-            let [, pt] = this.OvalePower.GetSpellCost(<number>spellId);
+            let [, pt] = this.OvalePower.GetSpellCost(spellId);
             powerType = pt;
         }
         let seconds = this.OvalePower.TimeToPower(spellId, atTime, this.OvaleGUID.UnitGUID(target), powerType);

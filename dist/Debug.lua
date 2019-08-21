@@ -13,7 +13,6 @@ local format = string.format
 local pairs = pairs
 local GetTime = GetTime
 local DEFAULT_CHAT_FRAME = DEFAULT_CHAT_FRAME
-local self_traced = false
 local OVALE_TRACELOG_MAXLINES = 4096
 __exports.Tracer = __class(nil, {
     constructor = function(self, options, debug, name)
@@ -72,6 +71,7 @@ __exports.OvaleDebugClass = __class(nil, {
     constructor = function(self, ovale, options)
         self.ovale = ovale
         self.options = options
+        self.self_traced = false
         self.defaultOptions = {
             name = "Ovale " .. L["Debug"],
             type = "group",
@@ -161,17 +161,17 @@ __exports.OvaleDebugClass = __class(nil, {
     ResetTrace = function(self)
         self.bug = nil
         self.trace = false
-        self_traced = false
+        self.self_traced = false
     end,
     UpdateTrace = function(self)
         if self.trace then
-            self_traced = true
+            self.self_traced = true
         end
         if self.bug then
             self.trace = true
         end
-        if self.trace and self_traced then
-            self_traced = false
+        if self.trace and self.self_traced then
+            self.self_traced = false
             self.trace = false
         end
     end,

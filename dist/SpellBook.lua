@@ -30,6 +30,8 @@ local BOOKTYPE_PET = BOOKTYPE_PET
 local BOOKTYPE_SPELL = BOOKTYPE_SPELL
 local MAX_TALENT_TIERS = MAX_TALENT_TIERS
 local NUM_TALENT_COLUMNS = NUM_TALENT_COLUMNS
+local __tools = LibStub:GetLibrary("ovale/tools")
+local isNumber = __tools.isNumber
 local MAX_NUM_TALENTS = NUM_TALENT_COLUMNS * MAX_TALENT_TIERS
 local ParseHyperlink = function(hyperlink)
     local color, linkType, linkData, text = match(hyperlink, "|?c?f?f?(%x*)|?H?([^:]*):?(%d*):?%d?|?h?%[?([^%[%]]*)%]?|?h?|?r?")
@@ -49,8 +51,9 @@ end
 
 local output = {}
 __exports.OvaleSpellBookClass = __class(nil, {
-    constructor = function(self, ovale, ovaleDebug)
+    constructor = function(self, ovale, ovaleDebug, ovaleData)
         self.ovale = ovale
+        self.ovaleData = ovaleData
         self.ready = false
         self.spell = {}
         self.spellbookId = {
@@ -295,6 +298,22 @@ __exports.OvaleSpellBookClass = __class(nil, {
     end,
     IsKnownTalent = function(self, talentId)
         return (talentId and self.talentPoints[talentId]) and true or false
+    end,
+    getKnownSpellId = function(self, spell)
+        if isNumber(spell) then
+            return spell
+        end
+        local spells = self.ovaleData.buffSpellList[spell]
+        if  not spells then
+            self.ovale:OneTimeMessage("Unknown spell list " .. spell)
+            return nil
+        end
+        for spellId in pairs(spells) do
+            if self.spell[spellId] then
+                return spellId
+            end
+        end
+        return nil
     end,
     GetSpellBookIndex = function(self, spellId)
         local bookType = BOOKTYPE_SPELL

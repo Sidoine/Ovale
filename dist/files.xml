@@ -43,8 +43,8 @@
    <Script file="AzeriteEssence.lua"/>
    <Script file="Variables.lua"/>
    <Script file="Controls.lua"/>
+   <Script file="AzeriteArmor.lua"/>
    <Script file="Condition.lua"/>
-   <Script file="GUID.lua"/>
    <Script file="Queue.lua"/>
    <Script file="Lexer.lua"/>
    <Script file="State.lua"/>
@@ -53,12 +53,12 @@
    <Script file="Runes.lua"/>
    <Script file="BaseState.lua"/>
    <Script file="Cooldown.lua"/>
-   <Script file="AzeriteArmor.lua"/>
    <Script file="tools.lua"/>
    <Script file="Data.lua"/>
-   <Script file="PaperDoll.lua"/>
    <Script file="Requirement.lua"/>
+   <Script file="PaperDoll.lua"/>
    <Script file="Equipment.lua"/>
+   <Script file="GUID.lua"/>
    <Script file="TimeSpan.lua"/>
    <Script file="Pool.lua"/>
    <Script file="simulationcraft\parser.lua"/>
@@ -76,6 +76,8 @@
    <Script file="Scripts.lua"/>
    <Script file="DataBroker.lua"/>
    <Script file="SpellFlash.lua"/>
+   <Script file="ActionBar.lua"/>
+   <Script file="SpellBook.lua"/>
    <Script file="Power.lua"/>
    <Script file="Spells.lua"/>
    <Script file="Stance.lua"/>
@@ -84,8 +86,6 @@
    <Script file="BestAction.lua"/>
    <Script file="Compile.lua"/>
    <Script file="Aura.lua"/>
-   <Script file="ActionBar.lua"/>
-   <Script file="SpellBook.lua"/>
    <Script file="Ovale.lua"/>
    <Script file="simulationcraft\emiter.lua"/>
    <Script file="conditions.lua"/>

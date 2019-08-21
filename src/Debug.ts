@@ -9,8 +9,8 @@ import { format } from "@wowts/string";
 import { pairs, lualength, LuaArray } from "@wowts/lua";
 import { GetTime, DEFAULT_CHAT_FRAME } from "@wowts/wow-mock";
 import { AceModule } from "@wowts/tsaddon";
-let self_traced = false;
-let OVALE_TRACELOG_MAXLINES = 4096;
+
+const OVALE_TRACELOG_MAXLINES = 4096;
 
 export class Tracer {
     constructor(private options: OvaleOptionsClass, private debug: OvaleDebugClass, private name: string) {
@@ -65,6 +65,8 @@ export class Tracer {
 }
 
 export class OvaleDebugClass {
+    self_traced = false;
+    
     defaultOptions: any = {
         name: `Ovale ${L["Debug"]}`,
         type: "group",
@@ -165,17 +167,17 @@ export class OvaleDebugClass {
     ResetTrace() {
         this.bug = undefined;
         this.trace = false;
-        self_traced = false;
+        this.self_traced = false;
     }
     UpdateTrace() {
         if (this.trace) {
-            self_traced = true;
+            this.self_traced = true;
         }
         if (this.bug) {
             this.trace = true;
         }
-        if (this.trace && self_traced) {
-            self_traced = false;
+        if (this.trace && this.self_traced) {
+            this.self_traced = false;
             this.trace = false;
         }
     }

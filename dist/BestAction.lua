@@ -20,7 +20,6 @@ local loadstring = loadstring
 local pairs = pairs
 local tonumber = tonumber
 local wipe = wipe
-local kpairs = pairs
 local GetActionCooldown = GetActionCooldown
 local GetActionTexture = GetActionTexture
 local GetItemIcon = GetItemIcon
@@ -611,7 +610,7 @@ __exports.OvaleBestActionClass = __class(nil, {
             return self:getSpellActionInfo(spell, element, atTime, target)
         elseif isString(spell) then
             local spellList = self.ovaleData.buffSpellList[spell]
-            for spellId in kpairs(spellList) do
+            for spellId in pairs(spellList) do
                 if self.OvaleSpellBook:IsKnownSpell(spellId) then
                     return self:getSpellActionInfo(spellId, element, atTime, target)
                 end

@@ -7,6 +7,8 @@ import { match, gsub } from "@wowts/string";
 import { concat, insert, sort } from "@wowts/table";
 import { GetActiveSpecGroup, GetFlyoutInfo, GetFlyoutSlotInfo, GetSpellBookItemInfo, GetSpellInfo, GetSpellLink, GetSpellTabInfo, GetSpellTexture, GetTalentInfo, HasPetSpells, IsHarmfulSpell, IsHelpfulSpell, BOOKTYPE_PET, BOOKTYPE_SPELL, MAX_TALENT_TIERS, NUM_TALENT_COLUMNS } from "@wowts/wow-mock";
 import { AceModule } from "@wowts/tsaddon";
+import { OvaleDataClass } from "./Data";
+import { isNumber } from "./tools";
 
 let MAX_NUM_TALENTS = NUM_TALENT_COLUMNS * MAX_TALENT_TIERS;
 
@@ -47,7 +49,7 @@ export class OvaleSpellBookClass {
     private module: AceModule & AceEvent;
     private tracer: Tracer;
     
-    constructor(private ovale: OvaleClass, ovaleDebug: OvaleDebugClass) {    
+    constructor(private ovale: OvaleClass, ovaleDebug: OvaleDebugClass, private ovaleData: OvaleDataClass) {    
         let debugOptions = {
             spellbook: {
                 name: L["Spellbook"],
@@ -283,6 +285,20 @@ export class OvaleSpellBookClass {
     IsKnownTalent(talentId: number): boolean {
         return (talentId && this.talentPoints[talentId]) && true || false;
     }
+
+    getKnownSpellId(spell: number | string) {
+        if (isNumber(spell)) return spell;
+        const spells = this.ovaleData.buffSpellList[spell];
+        if (!spells) {
+            this.ovale.OneTimeMessage(`Unknown spell list ${spell}`);
+            return undefined;
+        } 
+        for (const [spellId] of pairs(spells)) {
+            if (this.spell[spellId]) return spellId;
+        }
+        return undefined;
+    }
+
     GetSpellBookIndex(spellId: number): [number, BookType] {
         let bookType: BookType = BOOKTYPE_SPELL;
         while (true) {

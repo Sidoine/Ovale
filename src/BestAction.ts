@@ -8,7 +8,7 @@ import { OvaleEquipmentClass, SlotName } from "./Equipment";
 import { OvaleStateClass } from "./State";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { abs, huge, floor, min } from "@wowts/math";
-import { assert, ipairs, loadstring, pairs, tonumber, wipe, LuaObj, lualength, kpairs } from "@wowts/lua";
+import { assert, ipairs, loadstring, pairs, tonumber, wipe, LuaObj, lualength } from "@wowts/lua";
 import { GetActionCooldown, GetActionTexture, GetItemIcon, GetItemCooldown, GetItemSpell, GetSpellTexture, IsActionInRange, IsCurrentAction, IsItemInRange, IsUsableAction, IsUsableItem } from "@wowts/wow-mock";
 import { AstNode, isNodeType } from "./AST";
 import { OvaleCooldownClass } from "./Cooldown";
@@ -196,7 +196,7 @@ export class OvaleBestActionClass {
             return this.getSpellActionInfo(spell, element, atTime, target);
         } else if (isString(spell)) {
             const spellList = this.ovaleData.buffSpellList[spell];
-            for (const [spellId] of kpairs(spellList)) {
+            for (const [spellId] of pairs(spellList)) {
                 if (this.OvaleSpellBook.IsKnownSpell(spellId)) {
                     return this.getSpellActionInfo(spellId, element, atTime, target);
                 }
