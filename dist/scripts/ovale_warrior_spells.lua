@@ -543,7 +543,7 @@ Define(in_for_the_kill_buff 248622)
 	SpellAddTargetBuff(intercept safeguard_buff=1)
 	SpellRequire(intercept unusable 1=lossofcontrol,root)
 Define(into_the_fray_buff 202602)
-
+Define(last_stand 12975)
 	SpellInfo(last_stand cd=180)
 	SpellInfo(last_stand add_cd=-60 talent=bolster_talent)
 	SpellAddBuff(last_stand last_stand_buff=1)

@@ -532,7 +532,7 @@ Define(crippling_poison_buff 3408)
 	SpellInfo(crippling_poison_buff duration=3600)
 Define(crippling_poison_debuff 3409)
 	SpellInfo(crippling_poison_debuff duration=12)
-
+Define(deadly_poison 2823)
 	SpellAddBuff(deadly_poison deadly_poison_buff=1)
 	SpellAddBuff(deadly_poison leeching_poison_buff talent=leeching_poison_talent)
 Define(deadly_poison_buff 2823)
