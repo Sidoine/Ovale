@@ -5,7 +5,7 @@
     "noImplicitAny": true,
     "outDir": "dist",
     "rootDir": "src",
-    "sourceMap": true,
+    "inlineSourceMap": true,
     "noUnusedLocals": true,
     "strict": false
   },

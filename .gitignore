@@ -11,3 +11,5 @@ dist/**/*.js.map
 *.bat
 /items-data.txt
 /spells-data.txt
+/.nyc_output
+/coverage

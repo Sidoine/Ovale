@@ -574,7 +574,7 @@ export class Emiter {
         } else if (action == "snapshot_stats") {
         } else {
             let bodyCode, conditionCode;
-            let expressionType = "expression";
+            const expressionType = "expression";
             const modifiers = parseNode.modifiers;
             let isSpellAction = true;
             if (interruptsClasses[action as keyof typeof interruptsClasses] === className) {
