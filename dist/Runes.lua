@@ -38,7 +38,7 @@ __exports.OvaleRunesClass = __class(States, {
                 self.module:RegisterEvent("UNIT_RANGEDDAMAGE", self.UNIT_RANGEDDAMAGE)
                 self.module:RegisterEvent("UNIT_SPELL_HASTE", self.UNIT_RANGEDDAMAGE)
                 if self.ovale.playerGUID then
-                    self:UpdateAllRunes()
+                    self.UpdateAllRunes()
                 end
             end
         end
@@ -58,7 +58,12 @@ __exports.OvaleRunesClass = __class(States, {
         self.UNIT_RANGEDDAMAGE = function(event, unitId)
             if unitId == "player" then
                 self.tracer:Debug(event)
-                self:UpdateAllRunes()
+                self.UpdateAllRunes()
+            end
+        end
+        self.UpdateAllRunes = function()
+            for slot = 1, RUNE_SLOTS, 1 do
+                self:UpdateRune(slot)
             end
         end
         States.constructor(self, RuneData)
@@ -83,11 +88,6 @@ __exports.OvaleRunesClass = __class(States, {
             self.tracer:Debug("Warning: rune information for slot %d not available.", slot)
         end
         self.profiler:StopProfiling("OvaleRunes_UpdateRune")
-    end,
-    UpdateAllRunes = function(self)
-        for slot = 1, RUNE_SLOTS, 1 do
-            self:UpdateRune(slot)
-        end
     end,
     DebugRunes = function(self)
         local now = GetTime()

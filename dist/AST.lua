@@ -2302,10 +2302,7 @@ __exports.OvaleASTClass = __class(nil, {
                 end
                 self:InsertPostOrderTraversal(ast)
             else
-                ast = self:NewNode()
-                ast.annotation = annotation
-                self:Release(ast)
-                ast = nil
+                self:ReleaseAnnotation(annotation)
             end
         else
             self.debug:Debug("No code to parse")
